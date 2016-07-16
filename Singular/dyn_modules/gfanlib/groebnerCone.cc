@@ -142,7 +142,7 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const tropicalStrategy& 
   gfan::ZVector leadexpw = gfan::ZVector(n);
   gfan::ZVector tailexpw = gfan::ZVector(n);
   gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
-  for (int i=0; i<idSize(polynomialIdeal); i++)
+  for (int i=0; i<IDELEMS(polynomialIdeal); i++)
   {
     g = polynomialIdeal->m[i];
     if (g)
@@ -192,7 +192,7 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& w, 
   gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
   gfan::ZMatrix equations = gfan::ZMatrix(0,n);
   int* expv = (int*) omAlloc((n+1)*sizeof(int));
-  for (int i=0; i<idSize(polynomialIdeal); i++)
+  for (int i=0; i<IDELEMS(polynomialIdeal); i++)
   {
     poly g = polynomialIdeal->m[i];
     if (g)
@@ -250,7 +250,7 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& u, 
   gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
   gfan::ZMatrix equations = gfan::ZMatrix(0,n);
   int* expv = (int*) omAlloc((n+1)*sizeof(int));
-  for (int i=0; i<idSize(polynomialIdeal); i++)
+  for (int i=0; i<IDELEMS(polynomialIdeal); i++)
   {
     poly g = polynomialIdeal->m[i];
     if (g)
@@ -302,7 +302,7 @@ groebnerCone::groebnerCone(const ideal I, const ideal inI, const ring r, const t
   int n = rVar(r);
   gfan::ZMatrix equations = gfan::ZMatrix(0,n);
   int* expv = (int*) omAlloc((n+1)*sizeof(int));
-  for (int i=0; i<idSize(inI); i++)
+  for (int i=0; i<IDELEMS(inI); i++)
   {
     poly g = inI->m[i];
     if (g)
@@ -318,7 +318,7 @@ groebnerCone::groebnerCone(const ideal I, const ideal inI, const ring r, const t
     }
   }
   gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
-  for (int i=0; i<idSize(polynomialIdeal); i++)
+  for (int i=0; i<IDELEMS(polynomialIdeal); i++)
   {
     poly g = polynomialIdeal->m[i];
     if (g)

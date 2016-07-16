@@ -703,8 +703,6 @@ void proclevel::push(char *n)
 {
   //Print("push %s\n",n);
   proclevel *p=(proclevel*)omAlloc0(sizeof(proclevel));
-  p->cRing=currRing;
-  p->cRingHdl=currRingHdl;
   p->name=n;
   p->cPackHdl=currPackHdl;
   p->cPack=currPack;

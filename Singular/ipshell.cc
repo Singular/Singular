@@ -1325,17 +1325,7 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
         {
           Warn("redefining %s (%s)",IDID(h),my_yylinebuf);
         }
-#ifdef USE_IILOCALRING
         if (iiLocalRing[0]==IDRING(h) && (!keepring)) iiLocalRing[0]=NULL;
-#else
-        proclevel *p=procstack;
-        while (p->next!=NULL) p=p->next;
-        if ((p->cRing==IDRING(h)) && (!keepring))
-        {
-          p->cRing=NULL;
-          p->cRingHdl=NULL;
-        }
-#endif
         killhdl2(h,root,currRing);
       }
       else
@@ -4627,8 +4617,6 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
 
   int ldummy;
   int deg= currRing->pLDeg( gls, &ldummy, currRing );
-  //  int deg= pDeg( gls );
-  //  int len= pLength( gls );
   int i,vpos=0;
   poly piter;
   lists elist;
@@ -4663,7 +4651,6 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   piter= gls;
   for ( i= deg; i >= 0; i-- )
   {
-    //if ( piter ) Print("deg %d, pDeg(piter) %d\n",i,pTotaldegree(piter));
     if ( piter && pTotaldegree(piter) == i )
     {
       pcoeffs[i]= nCopy( pGetCoeff( piter ) );
@@ -6073,32 +6060,14 @@ void rKill(ring r)
       r->qideal = NULL;
     }
     int j;
-#ifdef USE_IILOCALRING
     for (j=0;j<myynest;j++)
     {
       if (iiLocalRing[j]==r)
       {
-        if (j+1==myynest) Warn("killing the basering for level %d",j);
+        if (j==0) WarnS("killing the basering for level 0");
         iiLocalRing[j]=NULL;
       }
     }
-#else /* USE_IILOCALRING */
-//#endif /* USE_IILOCALRING */
-    {
-      proclevel * nshdl = procstack;
-      int lev=myynest-1;
-
-      for(; nshdl != NULL; nshdl = nshdl->next)
-      {
-        if (nshdl->cRing==r)
-        {
-          Warn("killing the basering for level %d",lev);
-          nshdl->cRing=NULL;
-          nshdl->cRingHdl=NULL;
-        }
-      }
-    }
-#endif /* USE_IILOCALRING */
 // any variables depending on r ?
     while (r->idroot!=NULL)
     {
@@ -6135,6 +6104,13 @@ void rKill(idhdl h)
   int ref=0;
   if (r!=NULL)
   {
+    // avoid, that sLastPrinted is the last reference to the base ring:
+    // clean up before killing the last "named" refrence:
+    if ((sLastPrinted.rtyp==RING_CMD)
+    && (sLastPrinted.data==(void*)r))
+    {
+      sLastPrinted.CleanUp(r);
+    }
     ref=r->ref;
     rKill(r);
   }
@@ -6150,7 +6126,6 @@ void rKill(idhdl h)
 
 idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n)
 {
-  //idhdl next_best=NULL;
   idhdl h=root;
   while (h!=NULL)
   {
@@ -6159,17 +6134,10 @@ idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n)
     && (IDRING(h)==r)
     )
     {
-   //   if (IDLEV(h)==myynest)
-   //     return h;
-   //   if ((IDLEV(h)==0) || (next_best==NULL))
-   //     next_best=h;
-   //   else if (IDLEV(next_best)<IDLEV(h))
-   //     next_best=h;
       return h;
     }
     h=IDNEXT(h);
   }
-  //return next_best;
   return NULL;
 }
 

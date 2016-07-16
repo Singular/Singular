@@ -83,8 +83,9 @@ def R1=splitring(b3+b2+b-2,list(a,b,c,d,j));
 setring R1; erg;
 number(erg[5])^2;
 factorize(b3+b2+b-2);
-def R2=splitring(c2-2j,list(a2+ja,j,erg[5]));
+def R2=splitring(factorize(c2-2j)[1][2],list(a2+ja,j,erg[5]));
 setring R2;
+R2;
 erg[3]^2;
 kill R1,R2,r;
 tst_status(1); $

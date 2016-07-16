@@ -134,70 +134,6 @@ while(0)
 #define OM_DEFAULT_ERROR_HOOK omErrorBreak
 #endif
 
-/********************************************************************
- *
- * The following can NOT be set at run time
- *
- ********************************************************************/
-/* The following hooks are called after the respective
-   system routine was called, and the Stats struct was updated
-   Not settable at run-time (makes no sense for thise to be functions, for they would
-   be called each time the underlying malloc/valloc is called !) */
-#ifndef OM_MALLOC_HOOK
-#define OM_MALLOC_HOOK(size) do {} while (0)
-#endif
-#ifndef OM_REALLOC_HOOK
-#define OM_REALLOC_HOOK(oldsize, newsize) do {} while (0)
-#endif
-#ifndef OM_VALLOC_HOOK
-#define OM_VALLOC_HOOK(size) do {} while (0)
-#endif
-#ifndef OM_FREE_HOOK
-#define OM_FREE_HOOK(size) do {} while (0)
-#endif
-#ifndef OM_VFREE_HOOK
-#define OM_VFREE_HOOK(size) do {} while (0)
-#endif
-#ifndef OM_ALLOC_BINPAGE_HOOK
-#define OM_ALLOC_BINPAGE_HOOK do {} while (0)
-#endif
-#ifndef OM_FREE_BINPAGE_HOOK
-#define OM_FREE_BINPAGE_HOOK do {} while (0)
-#endif
-
-/*
- * Some stuff related to tracking of addresses
- */
-
-/* minimal number of WORDS for padding before addr: needs to > 0: only relevant for track >= 3 */
-#ifndef OM_MIN_SIZEWOF_FRONT_PATTERN
-#define OM_MIN_SIZEWOF_FRONT_PATTERN 1
-#endif
-
-/* minimal number of WORDS for padding before addr: needs to > 0: only relevant for track >= 3 */
-#ifndef OM_MIN_SIZEWOF_BACK_PATTERN
-#define OM_MIN_SIZEWOF_BACK_PATTERN 1
-#endif
-
-/* maximal number of stack frames kept for stack at the allocation time of addr (track >= 2)
-   and free time of addr (track >= 5) */
-#ifndef OM_MAX_KEPT_FRAMES
-#define OM_MAX_KEPT_FRAMES 10
-#endif
-
-/* pattern with which memory is initalized, for front and back padding,
-   and for free memory: only relevant if track >= 3*/
-#ifndef OM_INIT_PATTERN
-#define OM_INIT_PATTERN    0xfe
-#endif
-#ifndef OM_FRONT_PATTERN
-#define OM_FRONT_PATTERN   0xfd
-#endif
-#ifndef OM_BACK_PATTERN
-#define OM_BACK_PATTERN    0xfc
-#endif
-#ifndef OM_FREE_PATTERN
-#define OM_FREE_PATTERN    0xfb
 /*******************************************************************
  *  File:    omSingularConfig.h
  *  Purpose: declaration of External Config stuff for omalloc
@@ -216,10 +152,6 @@ extern "C"
 #include <stdlib.h>
 #include <stdio.h>
 
-#define OM_MALLOC_HOOK(size)                OM_SINGULAR_HOOK
-#define OM_FREE_HOOK(size)                  OM_SINGULAR_HOOK
-#define OM_ALLOC_BINPAGE_HOOK               OM_SINGULAR_HOOK
-#define OM_FREE_BINPAGE_HOOK                OM_SINGULAR_HOOK
 
 #ifdef OM_ALLOC_SYSTEM_C
 int om_sing_opt_show_mem = 0;
@@ -255,4 +187,60 @@ while (0)
 }
 #endif
 
+/********************************************************************
+ *
+ * The following can NOT be set at run time
+ *
+ ********************************************************************/
+/* The following hooks are called after the respective
+   system routine was called, and the Stats struct was updated
+   Not settable at run-time (makes no sense for these to be functions, for they would
+   be called each time the underlying malloc/valloc is called !) */
+#ifndef OM_REALLOC_HOOK
+#define OM_REALLOC_HOOK(oldsize, newsize) do {} while (0)
+#endif
+#ifndef OM_VALLOC_HOOK
+#define OM_VALLOC_HOOK(size) do {} while (0)
+#endif
+#ifndef OM_VFREE_HOOK
+#define OM_VFREE_HOOK(size) do {} while (0)
+#endif
+#define OM_MALLOC_HOOK(size)                OM_SINGULAR_HOOK
+#define OM_FREE_HOOK(size)                  OM_SINGULAR_HOOK
+#define OM_ALLOC_BINPAGE_HOOK               OM_SINGULAR_HOOK
+#define OM_FREE_BINPAGE_HOOK                OM_SINGULAR_HOOK
+
+/*
+ * Some stuff related to tracking of addresses
+ */
+
+/* minimal number of WORDS for padding before addr: needs to > 0: only relevant for track >= 3 */
+#ifndef OM_MIN_SIZEWOF_FRONT_PATTERN
+#define OM_MIN_SIZEWOF_FRONT_PATTERN 1
+#endif
+
+/* minimal number of WORDS for padding before addr: needs to > 0: only relevant for track >= 3 */
+#ifndef OM_MIN_SIZEWOF_BACK_PATTERN
+#define OM_MIN_SIZEWOF_BACK_PATTERN 1
+#endif
+
+/* maximal number of stack frames kept for stack at the allocation time of addr (track >= 2)
+   and free time of addr (track >= 5) */
+#ifndef OM_MAX_KEPT_FRAMES
+#define OM_MAX_KEPT_FRAMES 10
+#endif
+
+/* pattern with which memory is initalized, for front and back padding,
+   and for free memory: only relevant if track >= 3*/
+#ifndef OM_INIT_PATTERN
+#define OM_INIT_PATTERN    0xfe
+#endif
+#ifndef OM_FRONT_PATTERN
+#define OM_FRONT_PATTERN   0xfd
+#endif
+#ifndef OM_BACK_PATTERN
+#define OM_BACK_PATTERN    0xfc
+#endif
+#ifndef OM_FREE_PATTERN
+#define OM_FREE_PATTERN    0xfb
 #endif

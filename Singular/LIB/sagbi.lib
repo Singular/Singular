@@ -543,12 +543,11 @@ PURPOSE: Returns SAGBI S-polynomials of the leading terms of a given ideal A if 
 @*       Otherwise returns a new ring containing the ideals algebraicRelations
 @*       and spolynomials, where these objects are explained by their name.
 @*       See the example on how to access these objects.
-@format     The other optional argument meth determines which method is
-            used for computing the algebraic relations.
-            - If meth=0 (default), the procedure std is used.
-            - If meth=1, the procedure slimgb is used.
-            - If meth=2, the prodecure uses toric_ideal.
-@end format
+@*       The other optional argument meth determines which method is
+@*          used for computing the algebraic relations.
+@*          - If meth=0 (default), the procedure std is used.
+@*          - If meth=1, the procedure slimgb is used.
+@*          - If meth=2, the prodecure uses toric_ideal.
 EXAMPLE:  example sagbiSPoly; shows an example"
 {
   assumeQring();

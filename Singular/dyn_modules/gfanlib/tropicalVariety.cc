@@ -99,7 +99,7 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
     ideal I = (ideal) u->Data();
     leftv v = u->next;
 
-    if (idSize(I)==1)
+    if ((I->m[0]!=NULL) && (idElem(I)==1))
     {
       poly g = I->m[0];
       if (v==NULL)

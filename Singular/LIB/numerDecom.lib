@@ -8,7 +8,7 @@ OVERVIEW:
       numerical irreducible decomposition, and
       numerical primary decomposition of an algebraic variety defined by a
       polynomial system. The use of the library requires to install Bertini
-           (http://www.nd.edu/~sommese/bertini).
+           (@uref{http://www.nd.edu/~sommese/bertini}).
 AUTHOR: Shawki AlRashed, rashed@mathematik.uni-kl.de; sh.shawki@yahoo.de
 
 PROCEDURES:

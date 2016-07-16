@@ -244,7 +244,7 @@ void ptNormalize(poly* gStar, const number p, const ring r)
 
 void ptNormalize(ideal I, const number p, const ring r)
 {
-  for (int i=0; i<idSize(I); i++)
+  for (int i=0; i<IDELEMS(I); i++)
     ptNormalize(&(I->m[i]),p,r);
   return;
 }
@@ -300,7 +300,7 @@ BOOLEAN pReduceDebug(leftv res, leftv args)
 
 void pReduce(ideal &I, const number p, const ring r)
 {
-  int k = idSize(I);
+  int k = IDELEMS(I);
   for (int i=0; i<k; i++)
   {
     if (I->m[i]!=NULL)
@@ -310,7 +310,6 @@ void pReduce(ideal &I, const number p, const ring r)
         pReduce(I->m[i],p,r);
     }
   }
-  return;
 }
 
 
@@ -394,13 +393,14 @@ BOOLEAN ppreduceInitially0(leftv res, leftv args)
  **/
 bool ppreduceInitially(ideal I, const number p, const ring r)
 {
-  int m=idSize(I),n=m; poly cache;
+  idSkipZeroes(I);
+  int m=IDELEMS(I),n=m; poly cache;
   do
   {
     int j=0;
     for (int i=1; i<n; i++)
     {
-      if (p_LmCmp(I->m[i-1],I->m[i],r)<0)
+      if (p_LmCmp(I->m[i-1],I->m[i],r)<0) /*p_LmCmp(p,q): requires: p,q!=NULL*/
       {
         cache=I->m[i-1];
         I->m[i-1]=I->m[i];
@@ -480,11 +480,12 @@ int ppreduceInitially(ideal I, const number p, const poly g, const ring r)
   id_Test(I,r);
   p_Test(g,r);
   idInsertPoly(I,g);
-  int n=idSize(I);
+  idSkipZeroes(I);
+  int n=IDELEMS(I);
   int j;
   for (j=n-1; j>0; j--)
   {
-    if (p_LmCmp(I->m[j], I->m[j-1],r)>0)
+    if (p_LmCmp(I->m[j], I->m[j-1],r)>0) /*p_LmCmp(p,q) requires: p,q!=NULL */
     {
       poly cache = I->m[j];
       I->m[j] = I->m[j-1];
@@ -665,26 +666,35 @@ bool ppreduceInitially(ideal &H, const number p, const ideal G, const ring r)
    *   term j and subsequent terms need to be checked for reduction.
    *   T is sorted by the ordering on the temrs the pairs correspond to.
    **/
-  int m=idSize(H);
+  int m=IDELEMS(H);
   ideal I = idInit(m);
   std::vector<mark> T;
   for (int i=0; i<m; i++)
   {
-    I->m[i]=H->m[i];
-    if (pNext(I->m[i])!=NULL)
-      T.push_back(std::pair<int,int>(i,1));
+    if(H->m[i]!=NULL)
+    {
+      I->m[i]=H->m[i];
+      if (pNext(I->m[i])!=NULL)
+        T.push_back(std::pair<int,int>(i,1));
+    }
   }
 
   /***
    * Step 3: as long as the working list is not empty, successively reduce terms in it
    *   by adding suitable elements to I and reducing it initially with respect to itself
    **/
-  int k=idSize(G);
+  int k=IDELEMS(G);
   while (T.size()>0)
   {
     sortMarks(I,r,T);
-    int i=0; for (; i<k; i++)
-      if (p_LeadmonomDivisibleBy(G->m[i],getTerm(I,T[0]),r)) break;
+    int i=0;
+    for (; i<k; i++)
+    {
+      if(G->m[i]!=NULL)
+      {
+        if (p_LeadmonomDivisibleBy(G->m[i],getTerm(I,T[0]),r)) break;
+      }
+    }
     if (i<k)
     {
       poly g = p_One(r); poly h0 = getTerm(I,T[0]);
@@ -704,15 +714,19 @@ bool ppreduceInitially(ideal &H, const number p, const ideal G, const ring r)
   /***
    * Step 4: cleanup, delete all polynomials in I which have been added in Step 3
    **/
-  k=idSize(I);
+  k=IDELEMS(I);
   for (int i=0; i<k; i++)
   {
-    for (int j=0; j<m; j++)
+    if(I->m[i]!=NULL)
     {
-      if (p_LeadmonomDivisibleBy(H->m[j],I->m[i],r))
+      for (int j=0; j<m; j++)
       {
-        I->m[i]=NULL;
-        break;
+        if ((H->m[j]!=NULL)
+        && (p_LeadmonomDivisibleBy(H->m[j],I->m[i],r)))
+        {
+          I->m[i]=NULL;
+          break;
+        }
       }
     }
   }
@@ -764,21 +778,24 @@ bool ppreduceInitially(ideal I, const ring r, const number p)
    * Step 1: split up I into components of same degree in x
    *  the lowest component should only contain p-t
    **/
-  std::map<long,ideal> H; int n = idSize(I);
+  std::map<long,ideal> H; int n = IDELEMS(I);
   for (int i=0; i<n; i++)
   {
-    I->m[i] = p_Cleardenom(I->m[i],r);
-    long d = 0;
-    for (int j=2; j<=r->N; j++)
-      d += p_GetExp(I->m[i],j,r);
-    std::map<long,ideal>::iterator it = H.find(d);
-    if (it != H.end())
-      idInsertPoly(it->second,I->m[i]);
-    else
+    if(I->m[i]!=NULL)
     {
-      std::pair<long,ideal> Hd(d,idInit(1));
-      Hd.second->m[0] = I->m[i];
-      H.insert(Hd);
+      I->m[i] = p_Cleardenom(I->m[i],r);
+      long d = 0;
+      for (int j=2; j<=r->N; j++)
+        d += p_GetExp(I->m[i],j,r);
+      std::map<long,ideal>::iterator it = H.find(d);
+      if (it != H.end())
+        idInsertPoly(it->second,I->m[i]);
+      else
+      {
+        std::pair<long,ideal> Hd(d,idInit(1));
+        Hd.second->m[0] = I->m[i];
+        H.insert(Hd);
+      }
     }
   }
 
@@ -793,6 +810,7 @@ bool ppreduceInitially(ideal I, const ring r, const number p)
    *  and all lower components
    **/
   if (ppreduceInitially(Hi,p,r)) return true;
+  idSkipZeroes(Hi);
   id_Test(Hi,r);
   id_Test(I,r);
 
@@ -802,7 +820,7 @@ bool ppreduceInitially(ideal I, const ring r, const number p)
 
   for (it++; it!=H.end(); it++)
   {
-    int l=idSize(Hi); int k=l; poly cache;
+    int l=IDELEMS(Hi); int k=l; poly cache;
     /**
      * sorts Hi according to degree in t in descending order
      * (lowest first, highest last)

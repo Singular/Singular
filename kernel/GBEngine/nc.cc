@@ -305,7 +305,7 @@ ideal Approx_Step(ideal L)
       else
     h2->m[j]=0;
     }
-    // W[1..idElems(I)]
+    // W[1..IDELEMS(I)]
     if (flag >0)
     {
       // compute syzygies with values in I

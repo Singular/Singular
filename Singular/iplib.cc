@@ -58,7 +58,6 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport);
 procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
               const char *procname, int line, long pos, BOOLEAN pstatic=FALSE);
 #endif /* HAVE_LIBPARSER */
-#define NS_LRING (procstack->cRing)
 
 extern int iiArithAddCmd(const char *szName, short nAlias, short nTokval,
                          short nToktype, short nPos);
@@ -418,10 +417,6 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   {
     err=iiAllStart(pi,pi->data.s.body,BT_proc,pi->data.s.body_lineno-(v!=NULL));
 
-#ifdef USE_IILOCALRING
-#if 0
-  if(procstack->cRing != iiLocalRing[myynest]) Print("iiMake_proc: 1 ring not saved procs:%x, iiLocal:%x\n",procstack->cRing, iiLocalRing[myynest]);
-#endif
     if (iiLocalRing[myynest-1] != currRing)
     {
       if (iiRETURNEXPR.RingDependend())
@@ -455,45 +450,6 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
       rSetHdl(rFindHdl(currRing,NULL));
       iiLocalRing[myynest-1]=NULL;
     }
-#else /* USE_IILOCALRING */
-    if (procstack->cRing != currRing)
-    {
-      //if (procstack->cRingHdl!=NULL)
-      //Print("procstack:%s,",IDID(procstack->cRingHdl));
-      //if (currRingHdl!=NULL)
-      //Print(" curr:%s\n",IDID(currRingHdl));
-      //Print("pr:%x, curr: %x\n",procstack->cRing,currRing);
-      if (iiRETURNEXPR.RingDependend())
-      {
-        //idhdl hn;
-        const char *n;
-        const char *o;
-        if (procstack->cRing!=NULL)
-        {
-          //PrintS("reset ring\n");
-          procstack->cRingHdl=rFindHdl(procstack->cRing,NULL);
-          o=IDID(procstack->cRingHdl);
-          currRing=procstack->cRing;
-          currRingHdl=procstack->cRingHdl;
-        }
-        else                            o="none";
-        if (currRing!=NULL)             n=IDID(currRingHdl);
-        else                            n="none";
-        if (currRing==NULL)
-        {
-          Werror("ring change during procedure call: %s -> %s (level %d)",o,n,myynest);
-          iiRETURNEXPR.CleanUp();
-          err=TRUE;
-        }
-      }
-      if (procstack->cRingHdl!=NULL)
-      {
-        rSetHdl(procstack->cRingHdl);
-      }
-      else
-      { currRingHdl=NULL; currRing=NULL; }
-    }
-#endif /* USE_IILOCALRING */
     //Print("kill locals for %s (level %d)\n",IDID(pn),myynest);
     killlocals(myynest);
 #ifndef SING_NDEBUG
@@ -511,9 +467,7 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   return err;
 }
 
-#ifdef USE_IILOCALRING
 ring    *iiLocalRing;
-#endif
 sleftv  iiRETURNEXPR;
 int     iiRETURNEXPR_len=0;
 
@@ -521,7 +475,6 @@ int     iiRETURNEXPR_len=0;
 static void iiShowLevRings()
 {
   int i;
-#ifdef USE_IILOCALRING
   for (i=0;i<=myynest;i++)
   {
     Print("lev %d:",i);
@@ -529,19 +482,6 @@ static void iiShowLevRings()
     else                      Print("%lx",(long)iiLocalRing[i]);
     PrintLn();
   }
-#endif
-#if  0
-  i=myynest;
-  proclevel *p=procstack;
-  while (p!=NULL)
-  {
-    Print("lev %d:",i);
-    if (p->cRingHdl==NULL) PrintS("NULL");
-    else                   Print("%s",IDID(p->cRingHdl));
-    PrintLn();
-    p=p->next;
-  }
-#endif
   if (currRing==NULL) PrintS("curr:NULL\n");
   else                Print ("curr:%lx\n",(long)currRing);
 }
@@ -551,12 +491,10 @@ static void iiCheckNest()
 {
   if (myynest >= iiRETURNEXPR_len-1)
   {
-#ifdef USE_IILOCALRING
     iiLocalRing=(ring *)omreallocSize(iiLocalRing,
                                    iiRETURNEXPR_len*sizeof(ring),
                                    (iiRETURNEXPR_len+16)*sizeof(ring));
     memset(&(iiLocalRing[iiRETURNEXPR_len]),0,16*sizeof(ring));
-#endif
     iiRETURNEXPR_len+=16;
   }
 }
@@ -571,10 +509,8 @@ BOOLEAN iiMake_proc(idhdl pn, package pack, sleftv* sl)
     return TRUE;
   }
   iiCheckNest();
-#ifdef USE_IILOCALRING
   iiLocalRing[myynest]=currRing;
   //Print("currRing(%d):%s(%x) in %s\n",myynest,IDID(currRingHdl),currRing,IDID(pn));
-#endif
   iiRETURNEXPR.Init();
   procstack->push(pi->procname);
   if ((traceit&TRACE_SHOW_PROC)
@@ -659,9 +595,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
 
   iiCheckNest();
   procstack->push(example);
-#ifdef USE_IILOCALRING
   iiLocalRing[myynest]=currRing;
-#endif
   if (traceit&TRACE_SHOW_PROC)
   {
     if (traceit&TRACE_SHOW_LINENO) printf("\n");
@@ -679,7 +613,6 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
     if (traceit&TRACE_SHOW_LINENO) printf("\n");
     printf("leaving  -example- (level %d)\n",myynest);
   }
-#ifdef USE_IILOCALRING
   if (iiLocalRing[myynest] != currRing)
   {
     if (iiLocalRing[myynest]!=NULL)
@@ -693,24 +626,6 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
       currRing=NULL;
     }
   }
-#else /* USE_IILOCALRING */
-#endif /* USE_IILOCALRING */
-  if (NS_LRING != currRing)
-  {
-    if (NS_LRING!=NULL)
-    {
-      idhdl rh=procstack->cRingHdl;
-      if ((rh==NULL)||(IDRING(rh)!=NS_LRING))
-        rh=rFindHdl(NS_LRING,NULL);
-      rSetHdl(rh);
-    }
-    else
-    {
-      currRingHdl=NULL;
-      currRing=NULL;
-    }
-  }
-//#endif /* USE_IILOCALRING */
   procstack->pop();
   return err;
 }

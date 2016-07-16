@@ -587,7 +587,7 @@ PURPOSE: define a ring (Weyl algebra) and create a Gelfand-Kapranov-Zelevinsky (
 NOTE:    activate the output ring with the @code{setring} command. This procedure is elaborated by Oleksandr Iena
 ASSUME: This procedure uses toric_lib and therefore inherits its input requirements:
 @*        possible values for input variable @code{alg} are: \"ect\",\"pt\",\"blr\", \"hs\", \"du\".
-@*        As for the term ordering, it should be a string @code{sord} in @sc{Singular} format like \"lp\",\"dp\", etc.
+@*        As for the term ordering, it should be a string @code{sord} in Singular format like \"lp\",\"dp\", etc.
 @*        Please consult the toric_lib for allowed orderings and more details.
 SEE ALSO: toric_lib
 EXAMPLE: example GKZsystem; shows examples

@@ -35,7 +35,7 @@ module M = [(a+8)*x2y2+5*xy3,(-a2+3)*x3z+x2yz], [x5+2*y3z2,13*a*y2z3+5*yz4],
            [8*x3+(a2+12)*y3,xz2+(3a)], [(-a+7)*x2y4+y3z3,18*y3z2];
 tst_test_nfmodsyz(M);
 kill r;
-     
+
 ring r=(0,a),(x,y,z,w,u),(c,dp);
 minpoly = a^3+a+5;
 module M = (5+a)*x^3*y^2*z + (a+3)*y^3*x^2*z + (a+7)*x*y^2*z^2,

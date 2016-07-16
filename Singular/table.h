@@ -925,7 +925,7 @@ cmdnames cmds[] =
   { "continue",    0, CONTINUE_CMD ,      CONTINUE_CMD},
   { "contract",    0, CONTRACT_CMD ,      CMD_2},
   { "convhull",    0, NEWTONPOLY_CMD,     CMD_1},
-#ifdef SINGULAR_4_1  
+#ifdef SINGULAR_4_1
   { "cring",       0, CRING_CMD,          ROOT_DECL},
 #endif
   { "dbprint",     0, DBPRINT_CMD ,       CMD_M},
@@ -1128,8 +1128,8 @@ cmdnames cmds[] =
   { "varstr",      0, VARSTR_CMD ,        CMD_12},
   { "vdim",        0, VDIM_CMD ,          CMD_1},
   { "vector",      0, VECTOR_CMD ,        RING_DECL},
-  { "waitfirst",   0, WAIT1ST_CMD ,       CMD_12},
   { "waitall",     0, WAITALL_CMD ,       CMD_12},
+  { "waitfirst",   0, WAIT1ST_CMD ,       CMD_12},
   { "wedge",       0, WEDGE_CMD ,         CMD_2},
   { "weight",      0, WEIGHT_CMD ,        CMD_1},
   { "whileif",     0, IF_CMD ,            IF_CMD},

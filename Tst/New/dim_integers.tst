@@ -85,7 +85,7 @@ ring r=(integer,10),(x,y),dp;
 dim(std(ideal(x)));
 kill r;
 
-ring r=(integer,2,4),x,dp; 
+ring r=(integer,2,4),x,dp;
 dim(std(ideal(x)));
 kill r;
 

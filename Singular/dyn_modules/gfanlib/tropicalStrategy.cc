@@ -47,9 +47,9 @@ int dim(ideal I, ring r)
 
 static void swapElements(ideal I, ideal J)
 {
-  assume(idSize(I)==idSize(J));
+  assume(IDELEMS(I)==IDELEMS(J));
 
-  for (int i=idSize(I)-1; i>=0; i--)
+  for (int i=IDELEMS(I)-1; i>=0; i--)
   {
     poly cache = I->m[i];
     I->m[i] = J->m[i];
@@ -96,11 +96,16 @@ static bool noExtraReduction(ideal I, ring r, number /*p*/)
   omFree(block1);
   omFree(wvhdl);
 
-  int k = idSize(I);
+  int k = IDELEMS(I);
   ideal IShortcut = idInit(k);
   nMapFunc intoShortcut = n_SetMap(r->cf,rShortcut->cf);
   for (int i=0; i<k; i++)
-    IShortcut->m[i] = p_PermPoly(I->m[i],NULL,r,rShortcut,intoShortcut,NULL,0);
+  {
+    if(I->m[i]!=NULL)
+    {
+      IShortcut->m[i] = p_PermPoly(I->m[i],NULL,r,rShortcut,intoShortcut,NULL,0);
+    }
+  }
 
   ideal JShortcut = gfanlib_kStd_wrapper(IShortcut,rShortcut);
 
@@ -225,7 +230,7 @@ static ideal constructStartingIdeal(ideal originalIdeal, ring originalRing, numb
   pt->m[0] = g;
 
   // map originalIdeal from originalRing into startingRing
-  int k = idSize(originalIdeal);
+  int k = IDELEMS(originalIdeal);
   ideal J = idInit(k+1);
   nMapFunc nMap = n_SetMap(originalRing->cf,startingRing->cf);
   int n = rVar(originalRing);
@@ -233,7 +238,12 @@ static ideal constructStartingIdeal(ideal originalIdeal, ring originalRing, numb
   for (int i=1; i<=n; i++)
     shiftByOne[i]=i+1;
   for (int i=0; i<k; i++)
-    J->m[i] = p_PermPoly(originalIdeal->m[i],shiftByOne,originalRing,startingRing,nMap,NULL,0);
+  {
+    if(originalIdeal->m[i]!=NULL)
+    {
+      J->m[i] = p_PermPoly(originalIdeal->m[i],shiftByOne,originalRing,startingRing,nMap,NULL,0);
+    }
+  }
   omFreeSize(shiftByOne,(n+1)*sizeof(int));
 
   ring origin = currRing;
@@ -374,7 +384,7 @@ void tropicalStrategy::putUniformizingBinomialInFront(ideal I, const ring r, con
   p_Setm(t,r);
   poly pt = p_Add_q(p,p_Neg(t,r),r);
 
-  int k = idSize(I);
+  int k = IDELEMS(I);
   int l;
   for (l=0; l<k; l++)
   {
@@ -475,11 +485,13 @@ ring tropicalStrategy::getShortcutRingPrependingWeight(const ring r, const gfan:
 std::pair<poly,int> tropicalStrategy::checkInitialIdealForMonomial(const ideal I, const ring r, const gfan::ZVector &w) const
 {
   // quick check whether I already contains an ideal
-  int k = idSize(I);
+  int k = IDELEMS(I);
   for (int i=0; i<k; i++)
   {
     poly g = I->m[i];
-    if (pNext(g)==NULL && (isValuationTrivial() || n_IsOne(p_GetCoeff(g,r),r->cf)))
+    if (g!=NULL
+    && pNext(g)==NULL
+    && (isValuationTrivial() || n_IsOne(p_GetCoeff(g,r),r->cf)))
       return std::pair<poly,int>(g,i);
   }
 
@@ -552,7 +564,7 @@ ideal tropicalStrategy::computeWitness(const ideal inJ, const ideal inI, const i
   // then we can make a shortcut through the residue field
   else
   {
-    assume(idSize(inI)==idSize(I));
+    assume(IDELEMS(inI)==IDELEMS(I));
     int uni = findPositionOfUniformizingBinomial(I,r);
     assume(uni>=0);
     /**
@@ -561,8 +573,8 @@ ideal tropicalStrategy::computeWitness(const ideal inJ, const ideal inI, const i
      */
     ring rShortcut = copyAndChangeCoefficientRing(r);
 
-    int k = idSize(inJ);
-    int l = idSize(I);
+    int k = IDELEMS(inJ);
+    int l = IDELEMS(I);
     ideal inJShortcut = idInit(k);
     ideal inIShortcut = idInit(l);
     nMapFunc takingResidues = n_SetMap(r->cf,rShortcut->cf);
@@ -633,7 +645,7 @@ ideal tropicalStrategy::computeStdOfInitialIdeal(const ideal inI, const ring r) 
   // so switch to residue field first and compute standard basis over the residue field
   ring rShortcut = copyAndChangeCoefficientRing(r);
   nMapFunc takingResidues = n_SetMap(r->cf,rShortcut->cf);
-  int k = idSize(inI);
+  int k = IDELEMS(inI);
   ideal inIShortcut = idInit(k);
   for (int i=0; i<k; i++)
     inIShortcut->m[i] = p_PermPoly(inI->m[i],NULL,r,rShortcut,takingResidues,NULL,0);
@@ -641,7 +653,7 @@ ideal tropicalStrategy::computeStdOfInitialIdeal(const ideal inI, const ring r) 
 
   // and lift the result back to the ring with valuation
   nMapFunc takingRepresentatives = n_SetMap(rShortcut->cf,r->cf);
-  k = idSize(inJShortcut);
+  k = IDELEMS(inJShortcut);
   ideal inJ = idInit(k+1);
   inJ->m[0] = p_One(r);
   nMapFunc identity = n_SetMap(startingRing->cf,r->cf);
@@ -657,7 +669,7 @@ ideal tropicalStrategy::computeStdOfInitialIdeal(const ideal inI, const ring r) 
 
 ideal tropicalStrategy::computeLift(const ideal inJs, const ring s, const ideal inIr, const ideal Ir, const ring r) const
 {
-  int k = idSize(inJs);
+  int k = IDELEMS(inJs);
   ideal inJr = idInit(k);
   nMapFunc identitysr = n_SetMap(s->cf,r->cf);
   for (int i=0; i<k; i++)
@@ -764,7 +776,7 @@ std::pair<ideal,ring> tropicalStrategy::computeFlip(const ideal Ir, const ring r
   ideal inIr = initial(Ir,r,interiorPoint);
   ring sAdjusted = copyAndChangeOrderingWP(r,interiorPoint,facetNormal);
   nMapFunc identity = n_SetMap(r->cf,sAdjusted->cf);
-  int k = idSize(Ir);
+  int k = IDELEMS(Ir);
   ideal inIsAdjusted = idInit(k);
   for (int i=0; i<k; i++)
     inIsAdjusted->m[i] = p_PermPoly(inIr->m[i],NULL,r,sAdjusted,identity,NULL,0);
@@ -772,7 +784,7 @@ std::pair<ideal,ring> tropicalStrategy::computeFlip(const ideal Ir, const ring r
 
   // find witnesses of the new standard basis elements of the initial ideal
   // with the help of the old standard basis of the ideal
-  k = idSize(inJsAdjusted);
+  k = IDELEMS(inJsAdjusted);
   ideal inJr = idInit(k);
   identity = n_SetMap(sAdjusted->cf,r->cf);
   for (int i=0; i<k; i++)
@@ -815,7 +827,7 @@ bool tropicalStrategy::checkForUniformizingBinomial(const ideal I, const ring r)
   p_Setm(t,r);
   poly pt = p_Add_q(p,p_Neg(t,r),r);
 
-  for (int i=0; i<idSize(I); i++)
+  for (int i=0; i<IDELEMS(I); i++)
   {
     if (p_EqualPolys(I->m[i],pt,r))
     {
@@ -840,7 +852,7 @@ int tropicalStrategy::findPositionOfUniformizingBinomial(const ideal I, const ri
   p_Setm(t,r);
   poly pt = p_Add_q(p,p_Neg(t,r),r);
 
-  for (int i=0; i<idSize(I); i++)
+  for (int i=0; i<IDELEMS(I); i++)
   {
     if (p_EqualPolys(I->m[i],pt,r))
     {
@@ -866,7 +878,7 @@ bool tropicalStrategy::checkForUniformizingParameter(const ideal inI, const ring
   poly p = p_One(r);
   p_SetCoeff(p,identity(uniformizingParameter,startingRing->cf,r->cf),r);
 
-  for (int i=0; i<idSize(inI); i++)
+  for (int i=0; i<IDELEMS(inI); i++)
   {
     if (p_EqualPolys(inI->m[i],p,r))
     {

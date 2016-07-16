@@ -68,9 +68,7 @@ COMPUTE:  normal form and singularity type of f with respect to right
 RETURN:   normal form of f, of type poly
 REMARK:   This version of classify is only beta. Please send bugs and
           comments to: \"Kai Krueger\" <krueger@mathematik.uni-kl.de> @*
-          Be sure to have at least @sc{Singular} version 1.0.1. Updates can be
-          found at: @*
-          URL=http://www.mathematik.uni-kl.de/~krueger/Singular/
+          Be sure to have at least Singular version 1.0.1.
 NOTE:     type init_debug(n); (0 <= n <= 10) in order to get intermediate
           information, higher values of n give more information.
           The proc creates several global objects with names all starting

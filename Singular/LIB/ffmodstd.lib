@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version poly.lib 4.0.3.0 Mar_2016 "; // $Id$
+version="version ffmodstd.lib 4.0.3.0 May_2016 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:   ffmodstd.lib  Groebner bases of ideals in polynomial rings
@@ -19,10 +19,10 @@ OVERVIEW:
   Z^m\\{(0,...,0)}, we map J to K via the map sending (T,z) to (b,z), where
   b:=(b_1,...,b_m) (usually the b_i's are distinct primes), so that K is an ideal in
   Q(z)[X]. For such a rational point b, we compute a Groebner basis G_b of K using
-  modular algorithms [1] and univariate rational interpolation[2,7]. The
-  procedure is repeated for many rational points b until their is sufficiently large
-  to recover the correct coeffcients in Q(T). Once we have these points, we obtain a
-  set of polynomials G by applying the sparse multivariate rational interpolation
+  modular algorithms [1] and univariate rational interpolation [2,7]. The
+  procedure is repeated for many rational points b until their number is sufficiently
+  large to recover the correct coeffcients in Q(T). Once we have these points, we
+  obtain a set of polynomials G by applying the sparse multivariate rational interpolation
   algorithm from [4] coefficient-wise to the list of Groebner bases G_b in Q(z)[X],
   where this algorithm makes use of the following algorithms: univariate polynomial
   interpolation [2], univariate rational function reconstruction [7], and multivariate
@@ -208,8 +208,8 @@ example
 
 static proc NewtonInterpolationNormal(list d, list e,int vr)
 {
-    /*  compute a polynomial from given numerical data
-     *  size of d and e must be equal
+    /* compute a polynomial from given numerical data
+     * size of d and e must be equal
      * d is list of distinct elements
      * number of points here are sufficiently large
      */
@@ -299,17 +299,15 @@ static proc choose_a_shift(int pa)
 
 static proc choose_a_prime(int p)
 {
-    int i;
+    // p must be a prime number and the procedure returns the next prime
+    if(p==2){return(3);}
+    int i=p;
     while(1)
     {
-        i++;
-        if((p+i)%2 !=0)
+        i = i+2;
+        if(prime(i)==i)
         {
-            if(prime(p+i)==p+i)
-            {
-                return(p+i);
-                break;
-            }
+            return(i);
         }
     }
 }
@@ -318,7 +316,7 @@ static proc choose_a_prime(int p)
 
 static proc list_of_primes(int pa, list #)
 {
-    // find distinct pa prime(s)
+    // find distinct pa prime(s) up to permutations
     int p=3;
     int j,k;
     list L,l,l1;
@@ -528,7 +526,6 @@ static proc p_adic_valuation(bigint B, bigint p)
             return(list(j,(B div (H div p))));
         }
     }
-    return(list(0,B));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -621,13 +618,12 @@ EXAMPLE: example sparseInterpolation; shows an example
 example
 {   "EXAMPLE:"; echo = 2;
     ring rr=0,(x,y),dp;
-    list lpr = 2,3; // assign 2 for y and 3 for z
+    list lpr = 2,3; // assign 2 for x and 3 for y
     list La = 150,3204,79272,2245968,70411680, 2352815424, 81496927872;
     // La[i] = number(subst(f,y,lpr[1]^i,z,lpr[2]^i)); for f = x2y2+2x2y+5xy2 and i=1,...,7
     poly Br = BerlekampMassey(La,1)[1];
     Br;
-    sparseInterpolation(Br,La,lpr,0,1); // reconstruct f
-    sparseInterpolation(Br,La,lpr,0); // default
+    sparseInterpolation(Br,La,lpr,0); // reconstruct f default
     La = 97,275,793,2315,6817;
     // La[i] = number(subst(g,y,lpr[1]^i,z,lpr[2]^i)); for g = x+y and i=4,...,8
     Br = BerlekampMassey(La,1)[1];
@@ -663,14 +659,13 @@ EXAMPLE: example fareypoly; shows an example
     }
     poly r1,r2,r3,t1,t2,q_m,r_m,t_m,q1;
     q_m = 1;
-
     if(g==0)
     {
         return(list(poly(0),poly(1)));
     }
-
     if(2*deg(g)<deg(f))
     {
+        // the degree of f is large enough
         return(list(g,poly(1)));
     }
     number h=number(1)/lu(g);
@@ -679,22 +674,22 @@ EXAMPLE: example fareypoly; shows an example
     t1=0;
     t2=h;
     list ls,l1,l,T;
-
     int i=0;
-
+    // a modified while loop in the Extended Euclidean algorithm
     while(r2!=0)
     {
         i++;
         ls=division(r1,r2);
         r3=r2;
-        q1=ls[1][1,1];
+        q1=ls[1][1,1]; // quotient
         h=number(1)/lu(ls[2][1]);
-        r2=ls[2][1]*h;
+        r2=ls[2][1]*h; // remainder times h
         r1=r3;
         r3=t2;
         t2=(t1-q1*t2)*h;
         t1=r3;
-
+        /***** find a quotient q_m whose degree is maximal and polynomials r_m & t_m
+        correspond to q_m *********************************************************/
         if( deg(q1) > deg(q_m))
         {
             q_m=q1;
@@ -716,6 +711,7 @@ EXAMPLE: example fareypoly; shows an example
             r_m = r_m/vd;
             if(normalize_constant_term)
             {
+                // here we normalize only for internal use
                 number ut=number(1)/lu(t_m[size(t_m)]);
                 return(list(ut*r_m,ut*t_m));
             }
@@ -726,6 +722,7 @@ EXAMPLE: example fareypoly; shows an example
         {
             if(normalize_constant_term)
             {
+                // here we normalize only for internal use
                 number ut=number(1)/lu(t_m[size(t_m)]);
                 return(list(ut*r_m,ut*t_m));
             }
@@ -810,7 +807,7 @@ static proc scalIdeal(ideal I)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc expandf_wrt_vaRnvaRkplusShift(poly f,list shft,int n)
+static proc evaluate_f_at_given_points(poly f,list shft,int n)
 {
     // evaluate f at var(n+k) = bigint(shft[k])**j for each j
     if(deg(f)==0 or f==0)
@@ -924,7 +921,6 @@ example
     list m1 = list(list(-4y-5/6,poly(1)));
     list m2 = list(list(poly(-7/6),21/2y+1));
     list L = list(l1,l2),list(m1,m2);
-    L;
     Add_the_list_farey(L);
 }
 
@@ -932,8 +928,8 @@ example
 
 static proc Add_list_of_list(list l1,list l2, int m)
 {
+    // the procedure returns a list containing list of polynomials w.r.t. m
     list lst,lyt,Yt,lm;
-
     if(size(l1)!=size(l2))
     {
         ERROR("wrong size: sizes of lists do not coincide");
@@ -952,11 +948,22 @@ static proc Add_list_of_list(list l1,list l2, int m)
     }
     return(l1);
 }
-
+example
+{
+    "EXAMPLE:"; echo = 2;
+    ring rr=0,y,dp;
+    list l2,m2;
+    l2[1] = list(list(-2y-5/6,y+1));
+    m2[1] = list(list(-4y-5/6,y-5));
+    l2[2] = list(list(-2y-5/6,2y+3));
+    m2[2] = list(list(-4y-5/6,3y-7));
+    Add_list_of_list(l2,m2,1);
+}
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc Add_two_lists(list l1, list l2)
 {
+    // the procedure returns a list containing list of polynomials
     int im=size(l1);
     int k,i;
     list l,m;
@@ -985,9 +992,6 @@ example
     list l2,m2;
     l2[2] = list(list(-2y-5/6,poly(1)));
     m2[2] = list(list(-4y-5/6,poly(1)));
-    list L = l2,m2;
-    L;
-    Add_the_list_farey(L);
     Add_two_lists(l2[2],m2[2]);
 }
 
@@ -1013,13 +1017,11 @@ static proc arrange_list_first(list L)
 example
 {   "EXAMPLE:"; echo = 2;
     ring rr=0,y,dp;
-    list l1,l2,l3,l4;
-    l1 = 1,2,3;
-    l2 = 1,4,9;
-    l3 = 1,8,27;
-    l4 = 1,16,81;
+    list l1 = 1,2,3;
+    list l2 = 1,4,9;
+    list l3 = 1,8,27;
+    list l4 = 1,16,81;
     list L = l1,l2,l3,l4;
-    L;
     arrange_list_first(L);
 }
 
@@ -1053,6 +1055,11 @@ static proc return_coef_indx_wrtk(def I, int i, int k)
 
 static proc arrangeListofIdeals(list L, list #)
 {
+    /* the procedure returns list of coeffcients in the given list of ideals. The
+     * coeffcients are correspond to polynomials whose leading monomials are the same.
+     * Moreover, if optional parameter # is given, then it also returns a list
+     * of monomials in one of these ideals
+    */
     ideal Tr = L[1];
     L = arrange_list_first(L);
     list l1,l2,ln,ld, J,ln1,ld1,Ld;
@@ -1088,13 +1095,22 @@ static proc arrangeListofIdeals(list L, list #)
     }
     return(Ld);
 }
+example
+{
+    "EXAMPLE:"; echo = 2;
+    ring rr=(0,a),y,dp;
+    ideal I1 = y2+(3a2+6a+5)/(a+2)*y+1, y-6a;
+    ideal I2 = y2+(3a2+5a+7)/(a+4)*y+1, 7y-17a;
+    list L = I1,I2;
+    arrangeListofIdeals(L);
+    arrangeListofIdeals(L,1);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
-// return list(Jc, us) if us is a good point
 
 static proc Add_the_shift_and_evaluate_new(ideal J,list pr, list shft, int i)
 {
-    // n number of variables
+    // evaluate J at a given point
     int k;
     number Nm;
     ideal Jc=J;
@@ -1107,13 +1123,12 @@ static proc Add_the_shift_and_evaluate_new(ideal J,list pr, list shft, int i)
     return(Jc);
 }
 
-// =============== a procedure for one parameter ends here ==========
-
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc generate_uniRationalFunctions(ideal I, list pr, list shift, int in,
     int fn, string Command, list JL,list #)
 {
+    // generate a set of ideals whose coefficients are univariate rational functions
     def Gt = basering;
     int i,i1;
     int tp = 0;
@@ -1130,25 +1145,26 @@ static proc generate_uniRationalFunctions(ideal I, list pr, list shift, int in,
     list L = imap(Gt, L);
     list optL = imap(Gt,JL);
     list T;
+    int tmp;
     int c_z = size(L);
     for(i1=1;i1<=c_z;i1++)
     {
         if(Command == "slimgb")
         {
-            task t(i1) = "slimgb", list(L[i1]);
+            task tk(i1) = "slimgb", list(L[i1]);
         }
         else
         {
-            task t(i1) = "Ffmodstd::ffmodStdOne",list(L[i1],list(optL,1));
+            task tk(i1) = "Ffmodstd::ffmodStdOne",list(L[i1],list(optL,1));
         }
     }
-    startTasks(t(1..c_z));
-    waitAllTasks(t(1..c_z));
+    startTasks(tk(1..c_z));
+    waitAllTasks(tk(1..c_z));
     for(i1 = 1;i1 <= c_z; i1++)
     {
-        T[i1] = getResult(t(i1));
-        killTask(t(i1));
-        kill t(i1);
+        T[i1] = getResult(tk(i1));
+        killTask(tk(i1));
+        kill tk(i1);
     }
     if(tp)
     {
@@ -1165,6 +1181,7 @@ static proc generate_uniRationalFunctions(ideal I, list pr, list shift, int in,
 
 static proc normalize_LiftofIdeal(list L)
 {
+    // normalize each ideal L[j]
     for(int j=1;j<=size(L);j++)
     {
         L[j] = normalize(L[j]);
@@ -1176,6 +1193,8 @@ static proc normalize_LiftofIdeal(list L)
 
 static proc normalize_constTerm(poly g, poly f)
 {
+    /* Assumption: f has a non-zero constant. Then the procedure
+    returns a pair (g/N, f/N) where N is the constant term of f */
     number N = leadcoef(f[size(f)]);
     g = g/N;
     f = f/N;
@@ -1186,6 +1205,12 @@ static proc normalize_constTerm(poly g, poly f)
 
 static proc normalize_constTermAll(list M2, int kk)
 {
+    /*
+      Assumption: each polynomial in the list has a non-zero constant term. Then
+      the procedure normalize_constTermAll normalizes the constatnt term of
+      each polynomial in this list starting from M2[kk] where kk is a
+      positive integer less than or equal to the size of M2
+    */
     int i,j,k;
     list l,l1,l2,l3,l4;
     if(kk!=1)
@@ -1215,9 +1240,9 @@ static proc normalize_constTermAll(list M2, int kk)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc stdoverFF(ideal I, list pr, list shft, string Command,list Zr, list JL)
+static proc stdoverFF(ideal I, list pr, list shft,string Command,list Zr, list JL)
 {
-    // return std of I with high probability
+    // return std of I with high probability using sparse rational interpolation
     int fn=13;
     def R_1=basering;
     int n,pa;
@@ -1235,6 +1260,7 @@ static proc stdoverFF(ideal I, list pr, list shft, string Command,list Zr, list 
     setring R_2;
     setring R_1;
     int in = 2;
+    // with respect to given bounds, generate univariate rational functions
     list M2 = generate_uniRationalFunctions(I, pr, shft, in,fn, Command,JL[1],JL[2]);
     M2 = arrangeListofIdeals(M2);
     poly Gn;
@@ -1243,7 +1269,7 @@ static proc stdoverFF(ideal I, list pr, list shft, string Command,list Zr, list 
     setring R_2;
     list M2 = imap(R_1,M2);
     M2 = normalize_constTermAll(M2,1); // starts from 1
-    list Zr = imap(R_1, Zr);
+    list Zr = imap(R_1, Zr); // list of monomials in the std of I
     int u_w,i1,i2,i3;
     poly Gn,pn,pl,plm;
     list l1,l2,l3,bp,lup,lk1,lk2,lk3,py,l3n;
@@ -1257,19 +1283,23 @@ static proc stdoverFF(ideal I, list pr, list shft, string Command,list Zr, list 
             setring R_1;
             Gn = Zr[u_w][1];
             setring R_2;
+            /******** start lifting elements from Q to Q(var(1),.., var(pa)) *****/
             l1 = M2[u_w];
             for(i1=1;i1<=size(l1);i1++)
             {
                 for(i2=1;i2<=2;i2++)
                 {
+                    // the procedure first lifts the numerator and then the denominator
                     for(i3=1;i3<=size(l1[i1][i2][1]);i3++)
                     {
                         l3 = return_coef_indx(l1[i1][i2],i3);
                         l3 = l3,lk1;
-                        l3 = SubList(l3);
+                        l3 = SubList(l3); // adjust the coefficients
+                        // early termination for BerlekampMassey algorithm(BMA)
                         bp = BerlekampMassey(l3,n);
                         if(size(bp)==2)
                         {
+                            // at this step BerlekampMassey algorithm terminated early
                             if(bp[1]==1)
                             {
                                 lup = lk3,list(); // if l3 = 0, ..., 0
@@ -1279,18 +1309,26 @@ static proc stdoverFF(ideal I, list pr, list shft, string Command,list Zr, list 
                                 l3 = l3[1..bp[2]];
                                 pn = sparseInterpolation(bp[1],l3,pr,n);
                                 pl = pn+pl;
-                                lup = expandf_wrt_vaRnvaRkplusShift(pn, shft, n);
+                                lup = evaluate_f_at_given_points(pn, shft, n);
                                 lup = lup,lk3;
                             }
                         }
                         else
                         {
+                            /* elements in the sequence l3[i] are not large enough.
+                             * We thus add more elements to l3 and continue with the
+                             * early termination strategy until size(bp)=2 where bp[2]
+                             * is the length of the sequence that the early temination
+                             * of BMA requires
+                             */
                             l3n = bp[6];
                             while(1)
                             {
                                 in = fn+1;
                                 fn = 2*in;
                                 setring R_1;
+                                /* add more points to l3 by generating rational
+                                functions*/
                                 uM1 = generate_uniRationalFunctions(I, pr, shft, in,
                                                                     fn, Command,JL[1]);
                                 uM1 = arrangeListofIdeals(uM1);
@@ -1311,10 +1349,11 @@ static proc stdoverFF(ideal I, list pr, list shft, string Command,list Zr, list 
                                 bp = BerlekampMassey(l3,n,#);
                                 if(size(bp)==2)
                                 {
+                                    // at this step BerlekampMassey algorithm terminated early
                                     l3n = l3n[1..bp[2]];
                                     pn = sparseInterpolation(bp[1],l3n,pr,n);
                                     pl = pn+pl;
-                                    lup = expandf_wrt_vaRnvaRkplusShift(pn,shft,n);
+                                    lup = evaluate_f_at_given_points(pn,shft,n);
                                     lup = lup,lk3;
                                     break;
                                 }
@@ -1323,6 +1362,7 @@ static proc stdoverFF(ideal I, list pr, list shft, string Command,list Zr, list 
                         }
                         if(i3 < size(l1[i1][i2][1]))
                         {
+                            // unshift the shifted parameters see also SubList
                             lk3 = Add_poly_list(lup);
                             plm = lk3[1];
                             lk1 = evaluatef_ataprime_power(lk3[1], pr, n,1,fn);
@@ -1337,6 +1377,7 @@ static proc stdoverFF(ideal I, list pr, list shft, string Command,list Zr, list 
                 }
                 setring R_1;
                 list H = imap(R_2,py);
+                // numerator H[1] & denominator H[2] are recovered for each i1=1,2,...
                 Gn = Gn + (H[1]/H[2])*Zr[u_w][i1+1];
                 kill H;
                 setring R_2;
@@ -1357,6 +1398,7 @@ static proc stdoverFF(ideal I, list pr, list shft, string Command,list Zr, list 
     return(J);
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // +++++++++++++++++ std for one parameter begins here +++++++++++++++++++
 
@@ -1374,14 +1416,12 @@ static proc test_fmodI(poly f,ideal I)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc ChooseprimeIdealsIAnd_ImodgJ(ideal gJ, ideal I,int n1,int nt,
-                                     int i_s)
+static proc  choose_evaluation_points(ideal I, ideal cI,int n1,int nt, int i_s)
 {
     /*
-     * gJ is given ideal
-     * f is linear polynomial with leadcoef 1
-     * I is an output from Testlist_all
-     * n is number of variables
+     * I is given ideal
+     * cI is an output from Testlist_all
+     * n1 is number of variables
      * nt number of prime ideals
      * i_s is an integer
      */
@@ -1397,10 +1437,11 @@ static proc ChooseprimeIdealsIAnd_ImodgJ(ideal gJ, ideal I,int n1,int nt,
             ERROR("no more points");
         }
         f=var(n1)-i_s;
-        if(test_fmodI(f,I)==1)
+        if(test_fmodI(f,cI)==1)
         {
             j=j+1;
-            n=n+list(subst(gJ,var(n1),i_s));
+            // specialize var(n1) with i_s
+            n=n+list(subst(I,var(n1),i_s));
             m[j]=i_s;
         }
         i_s = i_s-1;
@@ -1408,18 +1449,18 @@ static proc ChooseprimeIdealsIAnd_ImodgJ(ideal gJ, ideal I,int n1,int nt,
         {
             n=n,m;
             return(n);
-            break;
         }
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc firststdmodp(ideal I,ideal cI, int in_value)
+static proc firststdmodp(ideal I,ideal cI,int in_value)
 {
-    /* return a list of univariate rational functions, where each function is the
-     coefficient for each of monomials appear in the output ideal */
+    /* return std FJ of I together with the coefficients, as a list of univariate
+    rational functions, of FJ */
     def St=basering;
+    // define a new ring
     int nx=nvars(St);
     int nr=nx-1;
     list ly=ringlist(St);
@@ -1441,41 +1482,40 @@ static proc firststdmodp(ideal I,ideal cI, int in_value)
     setring St;
     int i,k1,k2;
     list T,T1,L1,L2,L3,m_l;
-    int r_d = char(basering)-10000000;
-    list l_1 = ChooseprimeIdealsIAnd_ImodgJ(I,cI, nx,in_value,r_d);
+    int r_d = char(basering)-10000000; // choose an integer r_d which is d/t from
+    // char(basering)
+    list l_1 =  choose_evaluation_points(I,cI, nx,in_value,r_d);
     list lus = l_1[2];
     l_1 = l_1[1];
-    m_l[1] = normalize(std(l_1[1]));
+    m_l[1] = std(l_1[1]);
     if(size(m_l[1])==1 and deg(m_l[1][1])==0)
     {
         return(list(ideal(1)));
     }
-
+    // compute std in parallel w.r.t. distinct r_d
     for(k1 = 2; k1<= in_value; k1++)
     {
-        task t(k1-1) = "std", list(l_1[k1]);
+        task tk(k1-1) = "std", list(l_1[k1]);
     }
-    startTasks(t(1..in_value-1));
-    waitAllTasks(t(1..in_value-1));
+    startTasks(tk(1..in_value-1));
+    waitAllTasks(tk(1..in_value-1));
     for(k1 = 1;k1<=in_value-1;k1++)
     {
-        m_l = m_l + list(getResult(t(k1)));
-        killTask(t(k1));
-        kill t(k1);
+        m_l = m_l + list(getResult(tk(k1)));
+        killTask(tk(k1));
+        kill tk(k1);
     }
     r_d = lus[in_value]-1;
-
     // DeleteUnluckyEvaluationPoints
-
-    list indices = delete_unlucky_primes(m_l);
+    list indices = Modstd::deleteUnluckyPrimes_std(m_l);
     for(i = size(indices); i > 0; i--)
     {
         m_l = delete(m_l, indices[i]);
         lus = delete(lus, indices[i]);
     }
+    m_l = normalize_LiftofIdeal(m_l);
     in_value = size(lus);
     int ug;
-
     for(int cZ =1;cZ<=ncols(m_l[1]);cZ++)
     {
         if(size(m_l[1][cZ])>1)
@@ -1488,6 +1528,7 @@ static proc firststdmodp(ideal I,ideal cI, int in_value)
     {
         return(list(m_l[1]));
     }
+    // dense univariate rational interpolation
     list lev = list_coef_index(m_l,ug,2,in_value-1);
     list L = polyInterpolation(list(lus[1..in_value-1]),lev,nx);
     poly G1 = L[2];
@@ -1527,11 +1568,13 @@ static proc firststdmodp(ideal I,ideal cI, int in_value)
                     lev = list_coef_index(list(M[size(M)]), k1, k2,1);
                 }
                 T1 = fareypolyEarlyTermination(I,cI,M,nx,lus,lev, k1, k2, r_d,#);
+                // save maximum number of data m_x that are used in each lifting
                 if(m_x < T1[3][2]){ m_x = T1[3][2];}
                 L1[k2-1] = T1[3];
                 Fr = T1[4];
                 setring Gt;
                 list Fr = imap(St,Fr);
+                // add the coeffcients to g_t which are already lifted
                 g_t = g_t + (Fr[1]/Fr[2])*Zr[k1][k2];
                 kill Fr;
                 setring St;
@@ -1584,7 +1627,6 @@ static proc fareypolyEarlyTermination(ideal I, ideal cI, list M, int nx,
 {
     /* the early termination version of the farey rational funtion map for
     polynomials */
-
     ideal Id;
     list Tr,fr,L,l_1,m_l;
     int ksz,us,sz, deg_fr, mx_data,i,k11;
@@ -1594,6 +1636,7 @@ static proc fareypolyEarlyTermination(ideal I, ideal cI, list M, int nx,
     list indices;
     if(size(#)==1)
     {
+        // dense univariate rational interpolation
         sz = size(lus);
         L = polyInterpolation(list(lus[1..sz-1]),list(lev[1..sz-1]),#);
         fr = fareypoly(L[1],L[2]);
@@ -1605,7 +1648,7 @@ static proc fareypolyEarlyTermination(ideal I, ideal cI, list M, int nx,
     }
     else
     {
-        // update
+        // update by adding more evaluation points
         NR = #[1];
         DR = #[2];
         # = #[3..size(#)];
@@ -1616,32 +1659,35 @@ static proc fareypolyEarlyTermination(ideal I, ideal cI, list M, int nx,
     us = r_d;
     while(fr[1]!=NR or fr[2]!=DR)
     {
-        l_1 = ChooseprimeIdealsIAnd_ImodgJ(I, cI, nx, in_value, us);
+        l_1 =  choose_evaluation_points(I, cI, nx, in_value, us);
         lus = l_1[2];
         l_1 = l_1[1];
+        // compute std in parallel w.r.t. lus
         for(k11 = 1; k11 <= in_value; k11++)
         {
-            task t(k11) = "std", list(l_1[k11]);
+            task tk(k11) = "std", list(l_1[k11]);
         }
-        startTasks(t(1..in_value));
-        waitAllTasks(t(1..in_value));
+        startTasks(tk(1..in_value));
+        waitAllTasks(tk(1..in_value));
         for(k11 = 1;k11<=in_value;k11++)
         {
-            m_l[k11] = getResult(t(k11));
-            killTask(t(k11));
-            kill t(k11);
+            m_l[k11] = getResult(tk(k11));
+            killTask(tk(k11));
+            kill tk(k11);
         }
         us = lus[size(lus)]-1;
         // DeleteUnluckyEvaluationPoints
-        indices = delete_unlucky_primes(m_l);
+        indices = Modstd::deleteUnluckyPrimes_std(m_l);
         for(i = size(indices); i > 0; i--)
         {
             m_l = delete(m_l, indices[i]);
             lus = delete(lus, indices[i]);
         }
         sz = size(m_l);
+        m_l = normalize_LiftofIdeal(m_l);
         lev = list_coef_index(m_l,k1,k2,sz);
         # = L;
+        // dense univariate rational interpolation
         L = polyInterpolation(list(lus[1..sz-1]),list(lev[1..sz-1]),nx,#);
         fr = fareypoly(L[1],L[2]);
         NR = fr[1];
@@ -1665,14 +1711,15 @@ static proc fareypolyEarlyTermination(ideal I, ideal cI, list M, int nx,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc RecoverCoeffsForAFixedData(list stdResults, list distElmnt,
-         list maxData, list Zr)
+static proc  RecoverCoeffsForAFixedData(list stdResults,list distElmnt,list maxData,
+                                       list Zr)
 {
     /* here a bound on the number of interpolation points is known and, hence,
      * w.r.t this bound we apply rational interpolation algorithm to obtain
      * a set of polynomials over a function field modulo p. stdResults is a list
      * of std over F_p*/
     def St=basering;
+    // define a new ring
     int nx=nvars(St);
     int nr=nx-1;
     list ly=ringlist(St);
@@ -1725,6 +1772,7 @@ static proc RecoverCoeffsForAFixedData(list stdResults, list distElmnt,
         setring St;
         if(n_z>1)
         {
+            // dense univariate rational interpolation in parallel
             list TL = interpolation_farey_lift_parallel(maxData, M, distElmnt, n_z,
                                                        nx, k1);
             setring Gt;
@@ -1748,24 +1796,24 @@ static proc RecoverCoeffsForAFixedData(list stdResults, list distElmnt,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc interpolation_farey_lift_parallel(list maxData, list M, list distElmnt, int m_sz,
-       int nx, int k1)
+static proc interpolation_farey_lift_parallel(list maxData, list M, list distElmnt,
+                                              int m_sz,int nx, int k1)
 {
-    // return list of uni.rational functions
+    // return list of univariate rational functions
     list L;
     int k2;
     for(k2=2;k2<=m_sz;k2++)
     {
-       task t(k2) = "Ffmodstd::lift_interp_farey", list(maxData, M, distElmnt,
+       task tk(k2) = "Ffmodstd::lift_interp_farey", list(maxData, M, distElmnt,
        nx, k1, k2);
     }
-    startTasks(t(2..m_sz));
-    waitAllTasks(t(2..m_sz));
+    startTasks(tk(2..m_sz));
+    waitAllTasks(tk(2..m_sz));
     for(k2 = 2;k2 <= m_sz; k2++)
     {
-         L[k2] = getResult(t(k2));
-         killTask(t(k2));
-         kill t(k2);
+         L[k2] = getResult(tk(k2));
+         killTask(tk(k2));
+         kill tk(k2);
     }
     return(L);
 }
@@ -1805,6 +1853,7 @@ static proc fareypoly_wrt_deg_dg(poly g, poly f, int dg, list #)
     }
     if(2*deg(g)<deg(f))
     {
+        // here the degree of f is large enough
         return(list(g,poly(1)));
     }
     number h=number(1)/lu(g);
@@ -1814,6 +1863,7 @@ static proc fareypoly_wrt_deg_dg(poly g, poly f, int dg, list #)
     t2=h;
     list ls,l1,l,T;
     int i=0;
+    // a modified while loop in the Extended Euclidean algorithm
     while(r2!=0)
     {
         i++;
@@ -1849,92 +1899,37 @@ static proc passThePreList(ideal I, ideal cI, int nva, int ma_x)
 
     list m_l,l_1,R_d, indices,G,Fd;
     int k11,v_r,i;
-    int r_d = char(basering)-10000000;
+    int r_d = char(basering)-10000000; // choose an integer r_d d/f from char(basering)
     while(size(G) < ma_x)
     {
-        l_1 = ChooseprimeIdealsIAnd_ImodgJ(I, cI,nva,ma_x,r_d);
+        l_1 =  choose_evaluation_points(I, cI,nva,ma_x,r_d);
         R_d = l_1[2];
         l_1 = l_1[1];
+        // compute std in parallel
         for(k11 = 1; k11 <= ma_x; k11++)
         {
-            task t(k11) = "std", list(l_1[k11]);
+            task tk(k11) = "std", list(l_1[k11]);
         }
-        startTasks(t(1..ma_x));
-        waitAllTasks(t(1..ma_x));
+        startTasks(tk(1..ma_x));
+        waitAllTasks(tk(1..ma_x));
         for(k11 = 1;k11 <= ma_x; k11++)
         {
-            m_l[k11] = getResult(t(k11));
-            killTask(t(k11));
-            kill t(k11);
+            m_l[k11] = getResult(tk(k11));
+            killTask(tk(k11));
+            kill tk(k11);
         }
-        indices = delete_unlucky_primes(m_l);
+        indices = Modstd::deleteUnluckyPrimes_std(m_l);
         r_d = R_d[size(R_d)]-1;
         for(i = size(indices); i > 0; i--)
         {
             m_l = delete(m_l, indices[i]);
             R_d = delete(R_d, indices[i]);
         }
+        m_l = normalize_LiftofIdeal(m_l);
         G = G + m_l;
         Fd = Fd + R_d;
     }
     return(list(G,Fd));
-}
-
-/////////////// copied from modstd.lib /////////////////////////////////
-
-static proc delete_unlucky_primes(list modresults)
-{
-    int size_modresults = size(modresults);
-    // the command delete_unlucky_primes is the same as delete_unlucky_evaluation points
-    /* sort results into categories.
-     * each category is represented by three entries:
-     * - the corresponding leading ideal
-     * - the number of elements
-     * - the indices of the elements
-     */
-
-    list cat;
-    ideal L;
-    int i, j, size_cat;
-    for (i = 1; i <= size_modresults; i++) {
-        L = lead(modresults[i]);
-        attrib(L, "isSB", 1);
-        for (j = 1; j <= size_cat; j++) {
-            if (size(L) == size(cat[j][1])
-                && size(reduce(L, cat[j][1])) == 0
-                && size(reduce(cat[j][1], L)) == 0) {
-                cat[j][2] = cat[j][2]+1;
-            cat[j][3][cat[j][2]] = i;
-            break;
-                }
-        }
-        if (j > size_cat) {
-            size_cat++;
-            cat[size_cat] = list();
-            cat[size_cat][1] = L;
-            cat[size_cat][2] = 1;
-            cat[size_cat][3] = list(i);
-        }
-    }
-
-    /* find the biggest categories */
-    int cat_max = 1;
-    int max = cat[1][2];
-    for (i = 2; i <= size_cat; i++) {
-        if (cat[i][2] > max) {
-            cat_max = i;
-            max = cat[i][2];
-        }
-    }
-
-    /* return all other indices */
-    list unluckyIndices;
-    for (i = 1; i <= size_cat; i++) {
-        if (i != cat_max) {
-            unluckyIndices = unluckyIndices + cat[i][3];
-        }
-    }
-    return(unluckyIndices);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2008,6 +2003,10 @@ static proc prime_pass(int p, ideal I)
 
 static proc select_the_command(ideal I)
 {
+    /* the procedure select_the_command selects a command which finishes the
+       computation first but if this command applied in a machine with a single
+       core it returns (by default) the command ffmodStdOne
+    */
     if(getcores() == 1)
     {
         def F = ffmodStdOne(I);
@@ -2043,7 +2042,7 @@ static proc modp_tran(list newL)
     list tedY = passThePreList(I, cI, nva, L[3]);
     list stdResults = tedY[1];
     list distElmnt = tedY[2];
-    ideal F = RecoverCoeffsForAFixedData(stdResults, distElmnt, L[1], L[2]);
+    ideal F =  RecoverCoeffsForAFixedData(stdResults, distElmnt, L[1], L[2]);
     return(F);
 }
 
@@ -2051,11 +2050,7 @@ static proc modp_tran(list newL)
 
 static proc ffmodStdOne(ideal I,list #)
 {
-    /*
-     * note that the number of parameter(s) and variable(s)
-     * in I must be equal to those in the current
-     * base ring
-     */
+    // compute std of I using dense univariate rationa interpolation
     int tmp2 = 0;
     int tmp = 0;
     int tmp1 = 1;
@@ -2063,6 +2058,7 @@ static proc ffmodStdOne(ideal I,list #)
     intvec opt = option(get);
     option(redSB);
     list pL;
+    // optional parameters
     if(size(#)>0)
     {
         tmp = 1;
@@ -2079,9 +2075,10 @@ static proc ffmodStdOne(ideal I,list #)
     int n,pa,kr;
     n=nvars(G_t);
     pa=1;
-    I = normalize(I);
+    I = normalize(I); // make each element of I monic
     I=scalIdeal(I);
     list L=collect_coeffs(I);
+    // define a new ring
     list rl=ringlist(G_t);
     list la=rl[1][2];
     list m=rl[2];
@@ -2100,9 +2097,8 @@ static proc ffmodStdOne(ideal I,list #)
     {
         cI = 1;
     }
-
     int pr = 536870909;
-    int paSS = prime_pass(pr, cI); // I
+    int paSS = prime_pass(pr, cI); // test whether pr is a suitable for cI
     pr = paSS;
     if(!tmp)
     {
@@ -2111,6 +2107,7 @@ static proc ffmodStdOne(ideal I,list #)
         lbr[1] = pr;
         def rp = ring(lbr);
         setring(rp);
+        // initial std computation using dense rational interpolation
         list rL = firststdmodp(imap(S_t,I),imap(S_t,cI), in_value);
         setring S_t;
         list rL = imap(rp,rL);
@@ -2120,32 +2117,39 @@ static proc ffmodStdOne(ideal I,list #)
             list EI = imap(S_t,rL);
             return(EI[1]);
         }
+        /*
+        * from the initial std we obtain bounds on the number of interpolation points
+        * and degree of each numerator and denominator which we use for later
+        * interpolation
+        */
         rL= rL[2..size(rL)];
     }
-
     list newL,optionL;
     ideal J;
     if(tmp)
     {
         newL = I, cI, opL;
+        // apply modular command from the Singular library parallel.lib
         if(tmp2)
         {
+            // with final test
             J = modular("Ffmodstd::modp_tran", list(newL), primeTest_tran,
             Modstd::deleteUnluckyPrimes_std, pTest_tran, finalTest_tran, pr);
         }
         else
         {
+            // without final test
             J = modular("Ffmodstd::modp_tran", list(newL), primeTest_tran,
             Modstd::deleteUnluckyPrimes_std, pTest_tran, pr);
         }
     }
     else
     {
+        // apply modular command from the Singular library parallel.lib with final test
         newL = I, cI, rL;
         J = modular("Ffmodstd::modp_tran", list(newL),  primeTest_tran,
         Modstd::deleteUnluckyPrimes_std, pTest_tran, finalTest_tran, pr);
     }
-
     setring G_t;
     ideal J = imap(S_t, J);
     attrib(J, "isSB", 1);
@@ -2203,7 +2207,7 @@ static proc primeTest_tran(int p, list L)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc Is_belongs(ideal I, ideal fareyresult)
+static proc ideal_Inclusion(ideal I, ideal fareyresult)
 {
     //return 1 if I is in fareyresult otherwise 0
     attrib(fareyresult,"isSB",1);
@@ -2244,7 +2248,7 @@ static proc pTest_tran(string Command,list args, ideal fareyResult,int Testp)
     ideal fry = imap(St,fareyResult);
     attrib(fry,"isSB",1);
     attrib(Jp,"isSB",1);
-    if(Is_belongs(Jp,fry))
+    if(ideal_Inclusion(Jp,fry))
     {
         // test if fry is in Jp
         if(size(reduce(fry,Jp))==0)
@@ -2279,6 +2283,8 @@ static proc finalTest(ideal I, ideal fareyresult)
     }
     return(1);
 }
+
+// =============== a procedure for one parameter ends here ==========
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -2328,13 +2334,8 @@ SEE ALSO: nfmodStd
 EXAMPLE: example ffmodStd; shows an example
 "
 {
-    /*
-     * note that the number of parameter(s) and variable(s)
-     * in the given ideal must be equal to those in the current
-     * basering
-     */
     intvec opt = option(get);
-    option(redSB);
+    option(redSB); // to obtain the reduced standard basis
     def G_t=basering;
     int n,pa,kr;
     n=nvars(G_t);
@@ -2358,6 +2359,7 @@ EXAMPLE: example ffmodStd; shows an example
     // optional parameters
     if(pa==1)
     {
+        // if the current ring has one parameter
         def GF = ffmodStdOne(I);
         if(size(GF)==1)
         {
@@ -2368,6 +2370,7 @@ EXAMPLE: example ffmodStd; shows an example
     I = normalize(I);
     I=scalIdeal(I);
     list L=collect_coeffs(I);
+    // define a new ring
     list rl=ringlist(G_t);
     list la=rl[1][2];
     list m=rl[2];
@@ -2386,17 +2389,14 @@ EXAMPLE: example ffmodStd; shows an example
         cI = 1;
     }
     list shft = test_the_shift(cI,n,pa);
-    //intvec vshft = shft[1..pa]; vshft;
     int j;
     // shift the parameters
     for(j=1;j<=size(shft);j++)
     {
         cI = subst(cI, var(n+j), var(n+j) + shft[j]);
     }
-
-    list pr=list_of_primes(pa);
-    //intvec vpr = pr[1..pa];
-    //vpr;
+    list pr=list_of_primes(pa); // list distinct primes
+    // define a new ring
     setring G_t;
     rl = ringlist(G_t);
     rl[1][2][size(rl[1][2])+1] = "AXVR";
@@ -2409,6 +2409,7 @@ EXAMPLE: example ffmodStd; shows an example
     def StA = ring(rl);
     setring StA;
     ideal Jc = imap(St,Jc);
+    // make selection to use relitively fast command
     list Lcom = select_the_command(Jc);
     string Command = Lcom[1];
     def GF = Lcom[2];
@@ -2425,7 +2426,6 @@ EXAMPLE: example ffmodStd; shows an example
         Zr = list_all_monom(Jc);
         Lcom = poly(0);
     }
-
     Lcom = Lcom,Jc;
     if(ncols(Jc)==1 and Jc[1]==1)
     {
@@ -2450,6 +2450,7 @@ EXAMPLE: example ffmodStd; shows an example
     Jc = imap(StA,Jc);
     list Zr = imap(StA,Zr);
     list FG = imap(StA, Lcom);
+    // compute std using sparse multivariate rational interpolation
     ideal J = stdoverFF(I,pr,shft, Command, Zr, FG);
     setring G_t;
     ideal J = imap(St,J);
@@ -2472,7 +2473,7 @@ example
     ffmodStd(I);
     ideal J = x^2*y+y*z^2, x*z^2+x^2-y^2;
     ffmodStd(J);
-    ring R=(0,a,b),(x,y,z),dp;
+    ring R1=(0,a,b),(x,y,z),dp;
     ideal I = x^2*y^3*z+2*a*x*y*z^2+7*y^3,
               x^2*y^4*z+(a-7b)*x^2*y*z^2-x*y^2*z^2+2*x^2*y*z-12*x+by,
               (a2+b-2)*y^5*z+(a+5b)*x^2*y^2*z-b*x*y^3*z-x*y^3+y^4+2*a2*y^2*z,

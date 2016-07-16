@@ -14,10 +14,10 @@ OVERVIEW:
  diploma thesis (advisor: Prof. Gert-Martin Greuel) 'Computations of moduli
  spaces of semiquasihomogeneous singularities and an implementation in Singular'.
  This library is meant as a preliminary extension of the functionality
- of @sc{Singular} for univariate factorization of polynomials over simple algebraic
+ of Singular for univariate factorization of polynomials over simple algebraic
  extensions in characteristic 0.
 
- NOTE:
+NOTE:
  Subprocedures with postfix 'Main' require that the ring contains a variable
  'a' and no parameters, and the ideal 'mpoly', where 'minpoly' from the
  basering is stored.

@@ -33,10 +33,10 @@ matrix divisionDiscardingRemainder(const ideal F, const ideal G, const ring r)
 
 poly witness(const poly m, const ideal I, const ideal inI, const ring r)
 {
-  assume(idSize(I)==idSize(inI));
+  assume(IDELEMS(I)==IDELEMS(inI));
   matrix Q = divisionDiscardingRemainder(m,inI,r);
 
-  int k = idSize(I);
+  int k = IDELEMS(I);
   poly f = p_Mult_q(p_Copy(I->m[0],r),Q->m[0],r);
   Q->m[0] = NULL;
   for (int i=1; i<k; i++)
@@ -58,7 +58,7 @@ ideal witness(const ideal inI, const ideal J, const ring r)
   if (origin!=r)
     rChangeCurrRing(origin);
 
-  int k = idSize(inI);
+  int k = IDELEMS(inI);
   ideal I = idInit(k);
   for (int i=0; i<k; i++)
   {

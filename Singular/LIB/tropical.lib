@@ -52,7 +52,7 @@ THEORY:
   in t, i.e. we replace C{{t}} by Q(t), or sometimes even by Q[t].
   Note, that this in particular forbids rational exponents for the t's.
 
-  Moreover, in @sc{Singular} no negative exponents of monomials are allowed, so
+  Moreover, in Singular no negative exponents of monomials are allowed, so
   that the integer vectors vi will have to have non-negative entries.
   Shifting all exponents by a fixed integer vector does not change the
   tropicalisation nor does it change the toric variety. Thus this does not
@@ -291,7 +291,7 @@ REMARK:  - it is best to use the procedure displayTropicalLifting to
 @*       - the procedure requires that the program GFAN is installed on your
            computer; if you have GFAN version less than 0.3.0 then you must
            use the optional parameter 'oldGfan'
-@*       - the procedure requires the @sc{Singular} procedure absPrimdecGTZ to be
+@*       - the procedure requires the Singular procedure absPrimdecGTZ to be
            present in the package primdec.lib, unless the option 'noAbs' is set;
            but even if absPrimdecGTZ is present it might be necessary to set
            the option 'noAbs' in order to avoid the costly absolute primary
@@ -310,7 +310,7 @@ REMARK:  - it is best to use the procedure displayTropicalLifting to
              reduction to zero might not work if the characteristic is small
              and you are unlucky
 @*         + the option 'noAbs' has to be used since absolute primary
-             decomposition in @sc{Singular} only works in characteristic zero
+             decomposition in Singular only works in characteristic zero
 @*       - the basefield should either be Q or Z/pZ for some prime p;
            field extensions will be computed if necessary; if you need
            parameters or field extensions from the beginning they should
@@ -990,7 +990,7 @@ RETURN:  list, where each entry of the list l describes the Newton-Puiseux
            y has been substituted by y(t^{1/N}) as a string
 REMARK:  - it is best to use the procedure displayPuiseuxExpansion to
            display the result
-@*       - the procedure requires the @sc{Singular} procedure absPrimdecGTZ to be
+@*       - the procedure requires the Singular procedure absPrimdecGTZ to be
            present in the package primdec.lib
 @*       - if f is not squarefree it will be replaced by its squarefree part
 EXAMPLE:   example puiseuxExpansion;   shows an example"

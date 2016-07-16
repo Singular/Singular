@@ -7,7 +7,7 @@ LIBRARY: freegb.lib   Compute two-sided Groebner bases in free algebras via
 AUTHORS: Viktor Levandovskyy,     viktor.levandovskyy@math.rwth-aachen.de
 @*       Grischa Studzinski,      grischa.studzinski@math.rwth-aachen.de
 
-OVERVIEW: For the theory, see chapter 'Letterplace' in the @sc{Singular} Manual
+OVERVIEW: For the theory, see chapter 'Letterplace' in the Singular Manual
 
 PROCEDURES:
 makeLetterplaceRing(d);    creates a ring with d blocks of shifted original

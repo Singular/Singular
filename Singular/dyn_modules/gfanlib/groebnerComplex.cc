@@ -30,7 +30,7 @@ BOOLEAN groebnerComplex(leftv res, leftv args)
       {
         number p = (number) v->Data();
         tropicalStrategy currentStrategy(I,p,currRing);
-        if (idSize(I)==1)
+        if ((I->m[0]!=NULL) && (idElem(I)==1))
         {
           try
           {

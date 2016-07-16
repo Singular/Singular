@@ -26,12 +26,14 @@
 #include <unistd.h>
 
 /* declarations */
-static BOOLEAN DumpAscii(FILE *fd, idhdl h);
-static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h);
+static BOOLEAN DumpAscii(FILE *fd, idhdl h,char ***list_of_libs);
+static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h,char ***list_of_libs);
 static const char* GetIdString(idhdl h);
 static int DumpRhs(FILE *fd, idhdl h);
 static BOOLEAN DumpQring(FILE *fd, idhdl h, const char *type_str);
 static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl);
+static BOOLEAN CollectLibs(FILE *fd, char *name, char ***list_of_libs);
+static BOOLEAN DumpLibs(FILE *fd, char ***list_of_libs);
 
 extern si_link_extension si_link_root;
 
@@ -212,12 +214,23 @@ BOOLEAN slDumpAscii(si_link l)
 {
   FILE *fd = (FILE *) l->data;
   idhdl h = IDROOT, rh = currRingHdl;
-  BOOLEAN status = DumpAscii(fd, h);
+  char **list_of_libs=NULL;
+  BOOLEAN status = DumpAscii(fd, h, &list_of_libs);
 
   if (! status ) status = DumpAsciiMaps(fd, h, NULL);
 
   if (currRingHdl != rh) rSetHdl(rh);
   fprintf(fd, "option(set, intvec(%d, %d));\n", si_opt_1, si_opt_2);
+  char **p=list_of_libs;
+  if (p!=NULL)
+  {
+    while((*p!=NULL) && (*p!=(char*)1))
+    {
+      fprintf(fd,"load(\"%s\",\"try\");\n",*p);
+      p++;
+    }
+    omFree(list_of_libs);
+  }
   fprintf(fd, "RETURN();\n");
   fflush(fd);
 
@@ -226,21 +239,21 @@ BOOLEAN slDumpAscii(si_link l)
 
 // we do that recursively, to dump ids in the the order in which they
 // were actually defined
-static BOOLEAN DumpAscii(FILE *fd, idhdl h)
+static BOOLEAN DumpAscii(FILE *fd, idhdl h, char ***list_of_libs)
 {
   if (h == NULL) return FALSE;
 
-  if (DumpAscii(fd, IDNEXT(h))) return TRUE;
+  if (DumpAscii(fd, IDNEXT(h),list_of_libs)) return TRUE;
 
   // need to set the ring before writing it, otherwise we get in
   // trouble with minpoly
   if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
     rSetHdl(h);
 
-  if (DumpAsciiIdhdl(fd, h)) return TRUE;
+  if (DumpAsciiIdhdl(fd, h,list_of_libs)) return TRUE;
 
   if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
-    return DumpAscii(fd, IDRING(h)->idroot);
+    return DumpAscii(fd, IDRING(h)->idroot,list_of_libs);
   else
     return FALSE;
 }
@@ -274,13 +287,16 @@ static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl)
   else return FALSE;
 }
 
-static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
+static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h, char ***list_of_libs)
 {
   const char *type_str = GetIdString(h);
   int type_id = IDTYP(h);
 
-  if ((type_id == PACKAGE_CMD) &&(strcmp(IDID(h), "Top") == 0))
-    return FALSE;
+  if (type_id == PACKAGE_CMD)
+  {
+    if (strcmp(IDID(h),"Top")==0) return FALSE;
+    if (IDPACKAGE(h)->language==LANG_SINGULAR) return FALSE;
+  }
 
   // we do not throw an error if a wrong type was attempted to be dumped
   if (type_str == NULL)
@@ -293,6 +309,12 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
   // C-proc not to be dumped
   if ((type_id == PROC_CMD) && (IDPROC(h)->language == LANG_C))
     return FALSE;
+
+  // handle libraries
+  if ((type_id == PROC_CMD)
+  && (IDPROC(h)->language == LANG_SINGULAR)
+  && (IDPROC(h)->libname!=NULL))
+    return CollectLibs(fd,IDPROC(h)->libname,list_of_libs);
 
   // put type and name
   if (fprintf(fd, "%s %s", type_str, IDID(h)) == EOF)
@@ -332,41 +354,42 @@ static const char* GetIdString(idhdl h)
 
   switch(type)
   {
-      case LIST_CMD:
-      {
-        lists l = IDLIST(h);
-        int i, nl = l->nr + 1;
+    case LIST_CMD:
+    {
+      lists l = IDLIST(h);
+      int i, nl = l->nr + 1;
 
-        for (i=0; i<nl; i++)
-          if (GetIdString((idhdl) &(l->m[i])) == NULL) return NULL;
-      }
-      #ifdef SINGULAR_4_1
-      case CRING_CMD:
-      case CNUMBER_CMD:
-      case CMATRIX_CMD:
-      #endif
-      case PACKAGE_CMD:
-      case INT_CMD:
-      case INTVEC_CMD:
-      case INTMAT_CMD:
-      case STRING_CMD:
-      case RING_CMD:
-      case QRING_CMD:
-      case PROC_CMD:
-      case NUMBER_CMD:
-      case POLY_CMD:
-      case IDEAL_CMD:
-      case VECTOR_CMD:
-      case MODUL_CMD:
-      case MATRIX_CMD:
-        return Tok2Cmdname(type);
+      for (i=0; i<nl; i++)
+        if (GetIdString((idhdl) &(l->m[i])) == NULL) return NULL;
+    }
+    #ifdef SINGULAR_4_1
+    case CRING_CMD:
+    case CNUMBER_CMD:
+    case CMATRIX_CMD:
+    #endif
+    case BIGINT_CMD:
+    case PACKAGE_CMD:
+    case INT_CMD:
+    case INTVEC_CMD:
+    case INTMAT_CMD:
+    case STRING_CMD:
+    case RING_CMD:
+    case QRING_CMD:
+    case PROC_CMD:
+    case NUMBER_CMD:
+    case POLY_CMD:
+    case IDEAL_CMD:
+    case VECTOR_CMD:
+    case MODUL_CMD:
+    case MATRIX_CMD:
+      return Tok2Cmdname(type);
 
-      case MAP_CMD:
-      case LINK_CMD:
-        return NULL;
+    case MAP_CMD:
+    case LINK_CMD:
+      return NULL;
 
-      default:
-       Warn("Error dump data of type %s", Tok2Cmdname(IDTYP(h)));
+    default:
+      Warn("Error dump data of type %s", Tok2Cmdname(IDTYP(h)));
        return NULL;
   }
 }
@@ -388,6 +411,37 @@ static BOOLEAN DumpQring(FILE *fd, idhdl h, const char *type_str)
     omFree(ring_str);
     return FALSE;
   }
+}
+
+static BOOLEAN CollectLibs(FILE *fd, char *name, char *** list_of_libs)
+{
+  if (*list_of_libs==NULL)
+  {
+    #define MAX_LIBS 256
+    (*list_of_libs)=(char**)omalloc0(MAX_LIBS*sizeof(char**));
+    (*list_of_libs)[0]=name;
+    (*list_of_libs)[MAX_LIBS-1]=(char*)1;
+    return FALSE;
+  }
+  else
+  {
+    char **p=*list_of_libs;
+    while (((*p)!=NULL)&&((*p!=(char*)1)))
+    {
+      if (strcmp((*p),name)==0) return FALSE;
+      p++;
+    }
+    if (*p==(char*)1)
+    {
+      WerrorS("too many libs");
+      return TRUE;
+    }
+    else
+    {
+      *p=name;
+    }
+  }
+  return FALSE;
 }
 
 
@@ -430,7 +484,7 @@ static int DumpRhs(FILE *fd, idhdl h)
     procinfov pi = IDPROC(h);
     if (pi->language == LANG_SINGULAR)
     {
-      if( pi->data.s.body==NULL) iiGetLibProcBuffer(pi);
+      /* pi-Libname==NULL */
       char *pstr = pi->data.s.body;
       fputc('"', fd);
       while (*pstr != '\0')
@@ -453,6 +507,7 @@ static int DumpRhs(FILE *fd, idhdl h)
     if (type_id == INTVEC_CMD) { fprintf(fd, "intvec(");need_klammer=TRUE; }
     else if (type_id == IDEAL_CMD) { fprintf(fd, "ideal(");need_klammer=TRUE; }
     else if (type_id == MODUL_CMD) { fprintf(fd, "module(");need_klammer=TRUE; }
+    else if (type_id == BIGINT_CMD) { fprintf(fd, "bigint(");need_klammer=TRUE; }
 
     if (fprintf(fd, "%s", rhs) == EOF) return EOF;
     omFree(rhs);

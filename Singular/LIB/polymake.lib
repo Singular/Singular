@@ -18,23 +18,25 @@ WARNING:
    whenever possible.
 
 IMPORTANT NOTE:
+@texinfo
    Even though this is a Singular library for computing polytopes and fans
    such as the Newton polytope or the Groebner fan of a polynomial, most of
    the hard computations are NOT done by Singular but by the program
 @* - polymake by Ewgenij Gawrilow, TU Berlin and Michael Joswig, TU Darmstadt
-@*   (see http://www.math.tu-berlin.de/polymake/),
+   (see @uref{http://www.polymake.org/}),
 @* respectively (only in the procedure triangulations) by the program
 @* - topcom by Joerg Rambau, Universitaet Bayreuth (see
-@*   http://www.uni-bayreuth.de/departments/wirtschaftsmathematik/rambau/TOPCOM);
-@*   this library should rather be seen as an interface which allows to use a
-     (very limited) number of options which polymake respectively topcom offers
-     to compute with polytopes and fans and to make the results available in
-     Singular for further computations;
-     moreover, the user familiar with Singular does not have to learn the syntax
-     of polymake or topcom, if the options offered here are sufficient for his
-     purposes.
-@*   Note, though, that the procedures concerned with planar polygons are
-     independent of both, polymake and topcom.
+     @uref{http://www.rambau.wm.uni-bayreuth.de/TOPCOM/});
+@* this library should rather be seen as an interface which allows to use a
+   (very limited) number of options which polymake respectively topcom offers
+   to compute with polytopes and fans and to make the results available in
+   Singular for further computations;
+   moreover, the user familiar with Singular does not have to learn the syntax
+   of polymake or topcom, if the options offered here are sufficient for his
+   purposes.
+@* Note, though, that the procedures concerned with planar polygons are
+   independent of both, polymake and topcom.
+@end texinfo
 
 PROCEDURES USING POLYMAKE:
   polymakePolytope()  computes the vertices of a polytope using polymake
@@ -122,7 +124,7 @@ NOTE: -  for its computations the procedure calls the program polymake by
          Ewgenij Gawrilow, TU Berlin and Michael Joswig, TU Darmstadt;
          it therefore is necessary that this program is installed in order
          to use this procedure;
-         see http://www.math.tu-berlin.de/polymake/
+         see http://www.polymake.org/
 @*    -  note that in the vertex edge graph we have changed the polymake
          convention which starts indexing its vertices by zero while we start
          with one !
@@ -188,7 +190,7 @@ NOTE: -  if we replace the first column of L[4] by zeros, i.e. if we move
          we need as input for polymake when computing the normal fan
 @*    -  the procedure calls for its computation polymake by Ewgenij Gawrilow,
          TU Berlin and Michael Joswig, so it only works if polymake is installed;
-         see http://www.math.tu-berlin.de/polymake/
+         see http://www.polymake.org/
 EXAMPLE: example newtonPolytopeP;   shows an example"
 {
   int i,j;
@@ -295,7 +297,7 @@ RETURN:  list, the ith entry of L[1] contains information about the cone in the
 NOTE:    - the procedure calls for its computation polymake by Ewgenij Gawrilow,
            TU Berlin and Michael Joswig, so it only works if polymake is
            installed;
-           see http://www.math.tu-berlin.de/polymake/
+           see http://www.polymake.org/
 @*       - in the optional argument # it is possible to hand over other names
            for the variables to be used -- be careful, the format must be correct
            and that is not tested, e.g. if you want the variable names to be
@@ -458,7 +460,7 @@ NOTE: - if you have already computed the Newton polytope of f then you might wan
         computation twice
 @*    - the procedure calls for its computation polymake by Ewgenij Gawrilow,
         TU Berlin and Michael Joswig, so it only works if polymake is installed;
-        see http://www.math.tu-berlin.de/polymake/
+        see http://www.polymake.org/
 EXAMPLE: example groebnerFanP;   shows an example"
 {
   int i,j;
@@ -536,8 +538,7 @@ RETURN:  list, each entry corresponds to one triangulation and the ith entry is
 NOTE:- the procedure calls for its computations the program points2triangs
        from the program topcom by Joerg Rambau, Universitaet Bayreuth; it
        therefore is necessary that this program is installed in order to use
-       this  procedure; see
-@*     http://www.uni-bayreuth.de/departments/wirtschaftsmathematik/rambau/TOPCOM
+       this  procedure; see http://www.rambau.wm.uni-bayreuth.de/TOPCOM/);
 @*   - if you only want to have the regular triangulations the procedure should
        be called with the string 'regular' as optional argument
 @*   - the procedure creates the files /tmp/triangulationsinput and
@@ -744,7 +745,7 @@ NOTE: if the triangluations are not handed over as optional argument the
       points2triangs from the program topcom by Joerg Rambau, Universitaet
       Bayreuth; it therefore is necessary that this program is installed in
       order to use this procedure; see
-@*    http://www.uni-bayreuth.de/departments/wirtschaftsmathematik/rambau/TOPCOM
+@*    http://www.rambau.wm.uni-bayreuth.de/TOPCOM/);
 EXAMPLE: example secondaryPolytope;   shows an example"
 {
   // compute the triangulations of the point configuration with points2triangs
@@ -848,7 +849,7 @@ RETURN:  list, the ith entry of L[1] contains information about the ith cone in
                       of the secondary polytope
 NOTE:- the procedure calls for its computation polymake by Ewgenij Gawrilow,
        TU Berlin and Michael Joswig, so it only works if polymake is installed;
-       see http://www.math.tu-berlin.de/polymake/
+       see http://www.polymake.org/
 @*   - in the optional argument # it is possible to hand over other names for
        the variables to be used -- be careful, the format must be correct and
        that is not tested, e.g. if you want the variable names to be
@@ -858,7 +859,7 @@ NOTE:- the procedure calls for its computation polymake by Ewgenij Gawrilow,
        points2triangs from the program topcom by Joerg Rambau, Universitaet
        Bayreuth; it therefore is necessary that this program is installed in
        order to use this procedure; see
-@*     http://www.uni-bayreuth.de/departments/wirtschaftsmathematik/rambau/TOPCOM
+@*     http://www.rambau.wm.uni-bayreuth.de/TOPCOM/);
 EXAMPLE: example secondaryFan;   shows an example"
 {
   if (size(#)==0)

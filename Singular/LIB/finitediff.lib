@@ -11,7 +11,7 @@ OVERVIEW:
  Using @code{qepcad}/@code{qepcadsystem} from this
  library requires the program @code{qepcad} to be installed.
  You can download @code{qepcad} from
- @uref{http://www.usna.edu/Users/cs/qepcad/INSTALL/IQ.html}
+ @uref{http://www.usna.edu/CS/qepcadweb/B/QEPCAD.html}
  @end texinfo
 
 PROCEDURES:

@@ -163,7 +163,7 @@ gfan::ZCone groebnerCone(const ideal I, const ring r, const gfan::ZVector &w)
   gfan::ZVector tailexpw = gfan::ZVector(n);
 
   gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
-  for (int i=0; i<idSize(I); i++)
+  for (int i=0; i<IDELEMS(I); i++)
   {
     g = (poly) I->m[i];
     if (g!=NULL)
@@ -183,7 +183,7 @@ gfan::ZCone groebnerCone(const ideal I, const ring r, const gfan::ZVector &w)
 
   ideal inI = initial(I,currRing,w);
   gfan::ZMatrix equations = gfan::ZMatrix(0,n);
-  for (int i=0; i<idSize(I); i++)
+  for (int i=0; i<IDELEMS(I); i++)
   {
     g = (poly) inI->m[i];
     if (g!=NULL)

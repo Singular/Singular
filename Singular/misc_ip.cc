@@ -781,7 +781,7 @@ char * versionString(/*const bool bShowDetails = false*/ )
   StringSetS("");
   StringAppend("Singular for %s version %s (%d, %d bit) %s #%s",
                S_UNAME, VERSION, // SINGULAR_VERSION,
-               SINGULAR_VERSION, SIZEOF_VOIDP*8, 
+               SINGULAR_VERSION, SIZEOF_VOIDP*8,
 #ifdef MAKE_DISTRIBUTION
 	       VERSION_DATE, GIT_VERSION);
 #else
@@ -1352,7 +1352,7 @@ void siInit(char *name)
   sca_bba=k_sca_bba;
   sca_mora=k_sca_mora;
   sca_gr_bba=k_sca_gr_bba;
-#endif  
+#endif
 // loading standard.lib -----------------------------------------------
   if (! feOptValue(FE_OPT_NO_STDLIB))
   {

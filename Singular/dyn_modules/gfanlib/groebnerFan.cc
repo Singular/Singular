@@ -92,7 +92,7 @@ BOOLEAN groebnerFan(leftv res, leftv args)
 
     if (v==NULL)
     {
-      if (idSize(I)==1)
+      if ((I->m[0]!=NULL) && (idElem(I)==1))
       {
         try
         {

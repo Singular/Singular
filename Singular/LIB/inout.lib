@@ -8,7 +8,7 @@ PROCEDURES:
  allprint(list);        print list if ALLprint is defined, with pause if >0
  lprint(poly/...[,n]);  display poly/... fitting to pagewidth [size n]
  pmat(matrix[,n]);      print form-matrix [first n chars of each colum]
- rMacaulay(string);     read Macaulay_1 output and return its @sc{Singular} format
+ rMacaulay(string);     read Macaulay_1 output and return its Singular format
  show(any);             display any object in a compact format
  showrecursive(id,p);   display id recursively with respect to variables in p
  split(string,n);       split given string into lines of length n

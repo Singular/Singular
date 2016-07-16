@@ -59,7 +59,7 @@ poly initial(const poly p, const ring r, const gfan::ZVector w)
 
 ideal initial(const ideal I, const ring r, const gfan::ZVector w)
 {
-  int k = idSize(I); ideal inI = idInit(k);
+  int k = IDELEMS(I); ideal inI = idInit(k);
   for (int i=0; i<k; i++)
     inI->m[i] = initial(I->m[i],r,w);
   return inI;
@@ -95,7 +95,7 @@ poly initial(const poly p, const ring r, const gfan::ZVector w, const gfan::ZMat
 
 ideal initial(const ideal I, const ring r, const gfan::ZVector w, const gfan::ZMatrix W)
 {
-  int k = idSize(I); ideal inI = idInit(k);
+  int k = IDELEMS(I); ideal inI = idInit(k);
   for (int i=0; i<k; i++)
     inI->m[i] = initial(I->m[i],r,w,W);
   return inI;
@@ -143,7 +143,7 @@ void initial(poly* pStar, const ring r, const gfan::ZVector w)
 void initial(ideal* IStar, const ring r, const gfan::ZVector w)
 {
   ideal I = *IStar;
-  int k = idSize(I);
+  int k = IDELEMS(I);
   for (int i=0; i<k; i++)
     initial(&I->m[i],r,w);
   return;
@@ -191,7 +191,7 @@ void initial(poly* pStar, const ring r, const gfan::ZVector w, const gfan::ZMatr
 void initial(ideal* IStar, const ring r, const gfan::ZVector w, const gfan::ZMatrix W)
 {
   ideal I = *IStar;
-  int k = idSize(I);
+  int k = IDELEMS(I);
   for (int i=0; i<k; i++)
     initial(&I->m[i],r,w,W);
   return;

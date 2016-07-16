@@ -18,11 +18,6 @@ extern char     my_yylinebuf[80];
 extern int  yyparse(void);
 #endif
 
-/* Define to use old mechanismen for saving currRing with procedures
- */
-#define USE_IILOCALRING 1
-
-
 /* the follwing defines for infix operators should not be changed: *
 *  grammar.y does not use the symbolic names                       *
 *  scanner.l uses the identies for some optimzations              */

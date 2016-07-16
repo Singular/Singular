@@ -183,15 +183,15 @@ extern char *getenv(const char *name);
 extern int  strcmp (const char *s1, const char *s2);
 extern int  strncmp(const char *s1, const char *s2, size_t n);
 
-static int my_strlen(const char *s);
+static size_t my_strlen(const char *s);
 static const char *my_index (const char *str, int chr);
 #else
 extern char *getenv ();
 #endif
 
-static unsigned my_strlen (const char *str)
+static size_t my_strlen (const char *str)
 {
-  unsigned n = 0;
+  size_t n = 0;
   while (*str++)
     n++;
   return n;

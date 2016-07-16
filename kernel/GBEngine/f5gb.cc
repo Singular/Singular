@@ -28,6 +28,10 @@
 #include <kernel/GBEngine/f5gb.h>
 #include <kernel/GBEngine/f5data.h>
 #include <kernel/GBEngine/f5lists.h>
+#include <kernel/oswrapper/timer.h>
+
+#define pDeg(A) p_Deg(A,currRing)
+
 int notInG              =   0;
 int numberOfRules       =   0;
 int reductionsToZero    =   0;
@@ -48,19 +52,24 @@ sorting ideals by decreasing total degree "left" and "right" are the
 pointer of the first and last polynomial in the considered ideal
 ====================================================================
 */
-void qsortDegree(poly* left, poly* right) {
+void qsortDegree(poly* left, poly* right)
+{
     poly* ptr1 = left;
     poly* ptr2 = right;
     poly p1,p2;
     p2 = *(left + (right - left >> 1));
-    do {
-            while(pTotaldegree(*ptr1, currRing) < pTotaldegree(p2, currRing)) {
+    do
+    {
+            while(p_Totaldegree(*ptr1, currRing) < p_Totaldegree(p2, currRing))
+            {
                     ptr1++;
             }
-            while(pTotaldegree(*ptr2, currRing) > pTotaldegree(p2,currRing)) {
+            while(p_Totaldegree(*ptr2, currRing) > p_Totaldegree(p2,currRing))
+            {
                     ptr2--;
             }
-            if(ptr1 > ptr2) {
+            if(ptr1 > ptr2)
+            {
                     break;
             }
             p1    = *ptr1;
@@ -68,10 +77,12 @@ void qsortDegree(poly* left, poly* right) {
             *ptr2 = p1;
     } while(++ptr1 <= --ptr2);
 
-    if(left < ptr2) {
+    if(left < ptr2)
+    {
             qsortDegree(left,ptr2);
     }
-    if(ptr1 < right) {
+    if(ptr1 < right)
+    {
             qsortDegree(ptr1,right);
     }
 }

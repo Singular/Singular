@@ -32,9 +32,7 @@ extern int iiOp; /* the current operation*/
 extern const char *  currid;
 extern int     iiRETURNEXPR_len;
 extern sleftv  iiRETURNEXPR;
-#ifdef USE_IILOCALRING
 extern ring   *iiLocalRing;
-#endif
 //extern cmdnames cmds[];
 extern const char *lastreserved;
 extern int myynest;

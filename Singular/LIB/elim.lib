@@ -409,7 +409,7 @@ METHOD: elim uses elimRing to create a ring with an elimination ordering for
         method.
 @*      If the variables in the basering have weights these weights are used
         in elimRing. If a string \"withWeigts\" as (optional) argument is given
-        @sc{Singular} computes weights for the variables to make the input as
+        Singular computes weights for the variables to make the input as
         homogeneous as possible.
 @*      The method is different from that used by eliminate and elim1;
         depending on the example, any of these commands can be faster.

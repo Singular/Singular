@@ -50,12 +50,14 @@ can be carried out seamlessly in SINGULAR:
 @code{_[2] = x(3)*x(4) + x(4)} @*
 
 
-NOTE: For using this library SINGULAR's @code{python} interface must be available
+NOTE:
+@texinfo
+ For using this library SINGULAR's @code{python} interface must be available
  on your system.
  Please @code{./configure --with-python} when building SINGULAR for this purpose.
 
  There are prebuilt binary packages for @code{PolyBoRi} available
- from @code{http://polybori.sf.net/}.
+ from @uref{http://polybori.sf.net/}.
 
  For building your own @code{PolyBoRi} please ensure that you have @code{scons} and a
  development version of the boost libaries installed on you system.
@@ -69,10 +71,12 @@ NOTE: For using this library SINGULAR's @code{python} interface must be availabl
 @code{cd polybori-0.8.2} @*
 @code{scons install PREFIX=$PBDIR PYINSTALLPREFIX=$PBDIR/python} @*
 @code{export PYTHONPATH=$PBDIR/python:$PYTHONPATH} @*
-
+@end texinfo
 
 REFERENCES:
-See @code{http://polybori.sf.net} for details about @code{PolyBoRi}.
+@texinfo
+See @uref{http://polybori.sf.net} for details about @code{PolyBoRi}.
+@end texinfo
 
 PROCEDURES:
   boolean_std(bideal);                            Singular ideal of boolean groebner basis of I

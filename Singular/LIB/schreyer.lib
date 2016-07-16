@@ -557,7 +557,7 @@ static proc MySort(def M)
 }
 
 
-/* static */ 
+/* static */
 proc SSinit(def M)
 {
 //  rtimer, "***TIMESNAP0 for SSinit: on level: [",-1,"] :: t: ", timer, ", r: ", rtimer;
@@ -1844,7 +1844,7 @@ static proc SSComputeSyzygy(def L, def T)
 }
 
 // resolution/syzygy step:
-/* static */ 
+/* static */
 proc SSstep()
 {
 //  rtimer, "***TIMESNAP0 for SSstep(): on level: [",attrib(basering,"SYZNUMBER"),"] :: t: ", timer, ", r: ", rtimer;
@@ -1978,7 +1978,7 @@ proc SSstep()
 //  rtimer, "***TIMESNAP1 for SSstep(): on level: [",attrib(basering,"SYZNUMBER"),"] :: t: ", timer, ", r: ", rtimer;
 }
 
-/* static */ 
+/* static */
 proc SScontinue(int l)
 "USAGE:  SScontinue(l)
 RETURN:  nothing, instead it changes RES and MRES variables in the current ring
@@ -2017,7 +2017,7 @@ example
   RES; MRES;
 }
 
-/* static */ 
+/* static */
 proc SSsyz(def M)
 "USAGE:  SSsyz(M)
 RETURN:  ring, containing a list of modules RES and a module MRES
@@ -2075,7 +2075,7 @@ example
   RES;
 }
 
-/* static */ 
+/* static */
 proc SSres(def M, int l)
 "USAGE:  SSres(I, l)
 RETURN:  ring, containing a list of modules RES and a module MRES
@@ -2547,7 +2547,7 @@ example
   print(betti(rs, 1), "betti"); //minimal betties
 }
 
-/* static */ 
+/* static */
 proc s_res_bm(def I)
 {
   int @prot = (find(option(),"prot") != 0) && (defined(  Syzextra::NumberStatsInit)) && (defined(  Syzextra::NumberStatsPrint));

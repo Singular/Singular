@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version finvar.lib 4.0.1.1 Dec_2104 "; // $Id$
+version="version finvar.lib 4.0.3.2 June_2016 "; // $Id$
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -100,13 +100,10 @@ THEORY:  x^i-1 is divided by the j-th cyclotomic polynomial where j takes on
 EXAMPLE: example cyclotomic; shows an example
 "
 { if (i<=0)
-  { "ERROR:   the input should be > 0.";
-    return();
-  }
+  { ERROR("the input should be > 0"); }
   poly v1=var(1);
   if (i==1)
-  { return(v1-1);                      // 1-st cyclotomic polynomial
-  }
+  { return(v1-1); }                    // 1-st cyclotomic polynomial
   poly min=v1^i-1;
   matrix s[1][2];
   min=min/(v1-1);                      // dividing by the 1-st cyclotomic
@@ -171,9 +168,7 @@ EXAMPLE: example group_reynolds; shows an example
  //------------------------ making sure the input is okay ---------------------
   if (typeof(#[size(#)])=="int")
   { if (size(#)==1)
-    { "ERROR:   there are no matrices given among the parameters";
-      return();
-    }
+    { ERROR("there are no matrices given among the parameters"); }
     int v=#[size(#)];
     gen_num=size(#)-1;
   }
@@ -182,19 +177,12 @@ EXAMPLE: example group_reynolds; shows an example
     gen_num=size(#);
   }
   if (typeof(#[1])<>"matrix")
-  { "ERROR:   The parameters must be a list of matrices and maybe an <int>";
-    return();
-  }
+  { ERROR("The parameters must be a list of matrices and maybe an <int>"); }
   int n=nrows(#[1]);
   if (n<>nvars(basering))
-  { "ERROR:   the number of variables of the basering needs to be the same";
-    "         as the dimension of the matrices";
-    return();
-  }
+  { ERROR("the number of variables of the basering needs to be the same as the dimension of the matrices"); }
   if (n<>ncols(#[1]))
-  { "ERROR:   matrices need to be square and of the same dimensions";
-    return();
-  }
+  { ERROR("matrices need to be square and of the same dimensions"); }
   matrix vars=matrix(maxideal(1));     // creating an nx1-matrix containing the
   vars=transpose(vars);                // variables of the ring -
   matrix REY=#[1]*vars;                // calculating the first ring mapping -
@@ -219,13 +207,9 @@ EXAMPLE: example group_reynolds; shows an example
                                        // compatible with the task of the
                                        // procedure
     if (not(typeof(#[j])=="matrix"))
-    { "ERROR:   The parameters must be a list of matrices and maybe an <int>";
-      return();
-    }
+    { ERROR("The parameters must be a list of matrices and maybe an <int>"); }
     if ((n!=nrows(#[j])) or (n!=ncols(#[j])))
-    { "ERROR:   matrices need to be square and of the same dimensions";
-       return();
-    }
+    { ERROR("matrices need to be square and of the same dimensions"); }
     if (unique(G(1..i),#[j]))
     { i++;
       matrix G(i)=#[j];
@@ -389,44 +373,30 @@ EXAMPLE: example molien; shows an example
   { if (size(#[size(#)])==3)
     { int mol_flag=#[size(#)][1];
       if (#[size(#)][2]<0 && (ch==0 or (ch<>0 && mol_flag<>0)))
-      { "ERROR:   the second component of <intvec> should be >=0"
-        return();
-      }
+      { ERROR("the second component of <intvec> should be >=0"); }
       int interval=#[size(#)][2];
       int v=#[size(#)][3];
     }
     else
-    { "ERROR:   <intvec> should have three components";
-      return();
-    }
+    { ERROR("<intvec> should have three components"); }
     if (ch<>0)
     { if (typeof(#[size(#)-1])=="int")
       { int r=#[size(#)-1];
         if (typeof(#[size(#)-2])<>"string")
-        { "ERROR:   In characteristic p>0 a <string> must be given for the name of a new";
-          "         ring where the Molien series can be stored";
-          return();
-        }
+        { ERROR("In characteristic p>0 a <string> must be given for the name of a new ring where the Molien series can be stored"); }
         else
         { if (#[size(#)-2]=="")
-          { "ERROR:   <string> may not be empty";
-            return();
-          }
+          { ERROR("<string> may not be empty"); }
           string newring=#[size(#)-2];
           g=size(#)-3;
         }
       }
       else
       { if (typeof(#[size(#)-1])<>"string")
-        { "ERROR:   In characteristic p>0 a <string> must be given for the name of a new";
-          "         ring where the Molien series can be stored";
-          return();
-        }
+        { ERROR("In characteristic p>0 a <string> must be given for the name of a new ring where the Molien series can be stored"); }
         else
         { if (#[size(#)-1]=="")
-          { "ERROR:   <string> may not be empty";
-            return();
-          }
+          { ERROR("<string> may not be empty"); }
           string newring=#[size(#)-1];
           g=size(#)-2;
           int r=g;
@@ -445,30 +415,22 @@ EXAMPLE: example molien; shows an example
     { if (typeof(#[size(#)])=="int")
       { int r=#[size(#)];
         if (typeof(#[size(#)-1])<>"string")
-        { "ERROR:   in characteristic p>0 a <string> must be given for the name of a new";
-          "         ring where the Molien series can be stored";
+        { ERROR("in characteristic p>0 a <string> must be given for the name of a new ring where the Molien series can be stored");
             return();
         }
         else
         { if (#[size(#)-1]=="")
-          { "ERROR:   <string> may not be empty";
-            return();
-          }
+          { ERROR("<string> may not be empty"); }
           string newring=#[size(#)-1];
           g=size(#)-2;
         }
       }
       else
       { if (typeof(#[size(#)])<>"string")
-        { "ERROR:   in characteristic p>0 a <string> must be given for the name of a new";
-          "         ring where the Molien series can be stored";
-          return();
-        }
+        { ERROR("in characteristic p>0 a <string> must be given for the name of a new ring where the Molien series can be stored"); }
         else
         { if (#[size(#)]=="")
-          { "ERROR:   <string> may not be empty";
-            return();
-          }
+          { ERROR("<string> may not be empty"); }
           string newring=#[size(#)];
           g=size(#)-1;
           int r=g;
@@ -481,9 +443,7 @@ EXAMPLE: example molien; shows an example
   }
   if (ch<>0)
   { if ((g div r)*r<>g)
-   { "ERROR:   <int> should divide the group order."
-      return();
-    }
+   { ERROR("<int> should divide the group order."); }
   }
   if (ch<>0)
   { if ((g%ch)==0)
@@ -517,15 +477,10 @@ EXAMPLE: example molien; shows an example
   }
  //----------------------------------------------------------------------------
   if (not(typeof(#[1])=="matrix"))
-  { "ERROR:   the parameters must be a list of matrices and maybe an <intvec>";
-    return();
-  }
+  { ERROR("the parameters must be a list of matrices and maybe an <intvec>"); }
   int n=nrows(#[1]);
   if (n<>nvars(br))
-  { "ERROR:   the number of variables of the basering needs to be the same";
-    "         as the dimension of the square matrices";
-    return();
-  }
+  { ERROR("the number of variables of the basering needs to be the same as the dimension of the square matrices"); }
   if (v && voice<>2)
   { "";
     "  Generating the Molien series...";
@@ -550,13 +505,9 @@ EXAMPLE: example molien; shows an example
  //------------ computing 1/det(1+xE) for all E in the group ------------------
     for (int j=1;j<=g;j++)
     { if (not(typeof(#[j])=="matrix"))
-      { "ERROR:   the parameters must be a list of matrices and maybe an <intvec>";
-        return();
-      }
+      { ERROR("the parameters must be a list of matrices and maybe an <intvec>"); }
       if ((n<>nrows(#[j])) or (n<>ncols(#[j])))
-      { "ERROR:   matrices need to be square and of the same dimensions";
-         return();
-      }
+      { ERROR("matrices need to be square and of the same dimensions"); }
       p=det(I-v1*#[j]);                // denominator of new term -
       M[1,1]=M[1,1]*p+M[1,2];          // expanding M[1,1]/M[1,2] + 1/p
       M[1,2]=M[1,2]*p;
@@ -647,13 +598,9 @@ EXAMPLE: example molien; shows an example
       for (i=1;i<=g;i++)
       { setring br;
         if (not(typeof(#[i])=="matrix"))
-        { "ERROR:   the parameters must be a list of matrices and maybe an <intvec>";
-          return();
-        }
+        { ERROR("the parameters must be a list of matrices and maybe an <intvec>"); }
         if ((n<>nrows(#[i])) or (n<>ncols(#[i])))
-        { "ERROR:   matrices need to be square and of the same dimensions";
-           return();
-        }
+        { ERROR("matrices need to be square and of the same dimensions"); }
         setring bre;
         p=det(xI-f2(G(i)));           // characteristic polynomial of G(i)
         L=factorize(p);
@@ -808,13 +755,9 @@ EXAMPLE: example molien; shows an example
     for (i=1;i<=g;i++)
     { setring br;
       if (not(typeof(#[i])=="matrix"))
-      { "ERROR:   the parameters must be a list of matrices and maybe an <intvec>";
-        return();
-      }
+      { ERROR("the parameters must be a list of matrices and maybe an <intvec>"); }
       if ((n<>nrows(#[i])) or (n<>ncols(#[i])))
-      { "ERROR:   matrices need to be square and of the same dimensions";
-         return();
-      }
+      { ERROR("matrices need to be square and of the same dimensions"); }
       string stM(i)=string(#[i]);
       for (j=1;j<=size(stM(i));j++)
       { if (stM(i)[j]=="
@@ -935,27 +878,18 @@ EXAMPLE: example reynolds_molien; shows an example
   { if (size(#[size(#)])==3)
     { int mol_flag=#[size(#)][1];
       if (#[size(#)][2]<0 && (ch==0 or (ch<>0 && mol_flag<>0)))
-      { "ERROR:   the second component of the <intvec> should be >=0";
-        return();
-      }
+      { ERROR("the second component of the <intvec> should be >=0"); }
       int interval=#[size(#)][2];
       int v=#[size(#)][3];
     }
     else
-    { "ERROR:   <intvec> should have three components";
-      return();
-    }
+    { ERROR("<intvec> should have three components"); }
     if (ch<>0)
     { if (typeof(#[size(#)-1])<>"string")
-      { "ERROR:   in characteristic p a <string> must be given for the name";
-        "         of a new ring where the Molien series can be stored";
-        return();
-      }
+      { ERROR("in characteristic p a <string> must be given for the name of a new ring where the Molien series can be stored"); }
       else
       { if (#[size(#)-1]=="")
-        { "ERROR:   <string> may not be empty";
-          return();
-        }
+        { ERROR("<string> may not be empty"); }
         string newring=#[size(#)-1];
         gen_num=size(#)-2;
       }
@@ -970,15 +904,10 @@ EXAMPLE: example reynolds_molien; shows an example
     int mol_flag=0;                    // computing of Molien series is default
     if (ch<>0)
     { if (typeof(#[size(#)])<>"string")
-      { "ERROR:   in characteristic p a <string> must be given for the name";
-        "         of a new ring where the Molien series can be stored";
-        return();
-      }
+      { ERROR("in characteristic p a <string> must be given for the name of a new ring where the Molien series can be stored"); }
       else
       { if (#[size(#)]=="")
-        { "ERROR:   <string> may not be empty";
-          return();
-        }
+        { ERROR("<string> may not be empty"); }
         string newring=#[size(#)];
         gen_num=size(#)-1;
       }
@@ -1028,19 +957,12 @@ EXAMPLE: example reynolds_molien; shows an example
  //----------- computing Molien series in the straight forward way ------------
   if (ch==0)
   { if (typeof(#[1])<>"matrix")
-    { "ERROR:   the parameters must be a list of matrices and maybe an <intvec>";
-      return();
-    }
+    { ERROR("the parameters must be a list of matrices and maybe an <intvec>"); }
     int n=nrows(#[1]);
     if (n<>nvars(br))
-    { "ERROR:   the number of variables of the basering needs to be the same";
-      "         as the dimension of the matrices";
-      return();
-    }
+    { ERROR("the number of variables of the basering needs to be the same as the dimension of the matrices"); }
     if (n<>ncols(#[1]))
-    { "ERROR:   matrices need to be square and of the same dimensions";
-      return();
-    }
+    { ERROR("matrices need to be square and of the same dimensions"); }
     matrix vars=matrix(maxideal(1));   // creating an nx1-matrix containing the
     vars=transpose(vars);              // variables of the ring -
     matrix A(1)=#[1]*vars;             // calculating the first ring mapping -
@@ -1065,13 +987,9 @@ EXAMPLE: example reynolds_molien; shows an example
                                        // compatible with the task of the
                                        // procedure
       if (not(typeof(#[j])=="matrix"))
-      { "ERROR:   the parameters must be a list of matrices and maybe an <intvec>";
-        return();
-      }
+      { ERROR("the parameters must be a list of matrices and maybe an <intvec>"); }
       if ((n!=nrows(#[j])) or (n!=ncols(#[j])))
-      { "ERROR:   matrices need to be square and of the same dimensions";
-         return();
-      }
+      { ERROR("matrices need to be square and of the same dimensions"); }
       if (unique(G(1..i),#[j]))
       { i++;
         matrix G(i)=#[j];
@@ -1188,19 +1106,12 @@ EXAMPLE: example reynolds_molien; shows an example
  //------------------------ simulating characteristic 0 -----------------------
   else                                 // if ch<>0 and mol_flag<>0
   { if (typeof(#[1])<>"matrix")
-    { "ERROR:   the parameters must be a list of matrices and maybe an <intvec>";
-      return();
-    }
+    { ERROR("the parameters must be a list of matrices and maybe an <intvec>"); }
     int n=nrows(#[1]);
     if (n<>nvars(br))
-    { "ERROR:   the number of variables of the basering needs to be the same";
-      "         as the dimension of the matrices";
-      return();
-    }
+    { ERROR("the number of variables of the basering needs to be the same as the dimension of the matrices"); }
     if (n<>ncols(#[1]))
-    { "ERROR:   matrices need to be square and of the same dimensions";
-      return();
-    }
+    { ERROR("matrices need to be square and of the same dimensions"); }
     matrix vars=matrix(maxideal(1));   // creating an nx1-matrix containing the
     vars=transpose(vars);              // variables of the ring -
     matrix A(1)=#[1]*vars;             // calculating the first ring mapping -
@@ -1263,13 +1174,9 @@ EXAMPLE: example reynolds_molien; shows an example
                                        // procedure
       setring br;
       if (not(typeof(#[j])=="matrix"))
-      { "ERROR:   the parameters must be a list of matrices and maybe an <intvec>";
-        return();
-      }
+      { ERROR("the parameters must be a list of matrices and maybe an <intvec>"); }
       if ((n!=nrows(#[j])) or (n!=ncols(#[j])))
-      { "ERROR:   matrices need to be square and of the same dimensions";
-         return();
-      }
+      { ERROR("matrices need to be square and of the same dimensions"); }
       if (unique(G(1..i),#[j]))
       { i++;
         matrix G(i)=#[j];
@@ -1460,17 +1367,13 @@ EXAMPLE: example partial_molien; shows an example
 { poly A(2);                           // A(2) will contain the return value of
                                        // the intermediate result
   if (char(basering)<>0)
-  { "ERROR:   you have to change to a basering of characteristic 0, one in";
-    "         which the Molien series is defined";
-  }
+  { ERROR("you have to change to a basering of characteristic 0, one in which the Molien series is defined"); }
   if (ncols(M)==2 && nrows(M)==1 && n>0 && size(#)<2)
   { def br=basering;                   // keeping track of the old ring
     map slead=br,ideal(0);
     matrix s=slead(M);
     if (s[1,1]<>1 || s[1,2]<>1)
-    { "ERROR:   the constant terms of enumerator and denominator are not 1";
-      return();
-    }
+    { ERROR("the constant terms of enumerator and denominator are not 1"); }
 
     if (size(#)==0)
     { A(2)=M[1,1];                    // if a third parameter is not given, the
@@ -1482,9 +1385,7 @@ EXAMPLE: example partial_molien; shows an example
       { A(2)=#[1];                    // if a third term is given we 'start'
       }                               // with its smallest term
       else
-      { "ERROR:   <poly> as third parameter expected";
-        return();
-      }
+      { ERROR("<poly> as third parameter expected"); }
     }
     poly A(1)=M[1,2];                 // denominator of Molien series (for now)
     string mp=string(minpoly);
@@ -1508,10 +1409,9 @@ EXAMPLE: example partial_molien; shows an example
     return(A(1..2));
   }
   else
-  { "ERROR:   the first parameter has to be a 1x2-matrix, i.e. the matrix";
-    "         returned by the procedure 'reynolds_molien', the second one";
-    "         should be > 0 and there should be no more than 3 parameters;"
-    return();
+  { ERROR("the first parameter has to be a 1x2-matrix, i.e. the matrix
+         returned by the procedure 'reynolds_molien', the second one
+         should be > 0 and there should be no more than 3 parameters");
   }
 }
 example
@@ -1560,9 +1460,9 @@ EXAMPLE: example evaluate_reynolds; shows an example
     return(ideal(MiI));
   }
   else
-  { "ERROR:   the number of columns in the <matrix> should be the same as the";
-    "         number of variables in the basering; in fact it should be first";
-    "         return value of group_reynolds() or reynolds_molien().";
+  { ERROR("the number of columns in the <matrix> should be the same as the
+         number of variables in the basering; in fact it should be first
+         return value of group_reynolds() or reynolds_molien().");
     return();
   }
 }
@@ -1588,7 +1488,7 @@ THEORY:  A general polynomial of degree g is generated and the generators of
 EXAMPLE: example invariant_basis; shows an example
 "
 { if (g<=0)
-  { "ERROR:   the first parameter should be > 0";
+  { ERROR("the first parameter should be > 0");
     return();
   }
   def br=basering;
@@ -1607,15 +1507,10 @@ EXAMPLE: example invariant_basis; shows an example
       { matrix G(i)=#[i];
       }
       else
-      { "ERROR:   the number of variables of the base ring needs to be the same";
-        "         as the dimension of the square matrices";
-        return();
-      }
+      { ERROR("the number of variables of the base ring needs to be the same as the dimension of the square matrices"); }
     }
     else
-    { "ERROR:   the last parameters should be a list of matrices";
-      return();
-    }
+    { ERROR("the last parameters should be a list of matrices"); }
   }
  //----------------------------------------------------------------------------
   ring tmpR = char(br),(p(1..m)),dp;
@@ -1696,30 +1591,20 @@ EXAMPLE: example invariant_basis_reynolds; shows an example
 {
  //---------------------- checking that the input is ok -----------------------
   if (d<=0)
-  { "  ERROR:   the second parameter should be > 0";
-     return();
-  }
+  { ERROR("the second parameter should be > 0"); }
   if (size(#)>1)
-  { "  ERROR:   there should be at most three parameters";
-    return();
-  }
+  { ERROR("there should be at most three parameters"); }
   if (size(#)==1)
   { if (typeof(#[1])<>"intvec")
-    { "  ERROR: the third parameter should be of type <intvec>";
-      return();
-    }
+    { ERROR("the third parameter should be of type <intvec>"); }
     if (size(#[1])<>2)
-    { "  ERROR: there should be two components in <intvec>";
-      return();
-    }
+    { ERROR("there should be two components in <intvec>"); }
     else
     { int cd=#[1][1];
       int step_fac=#[1][2];
     }
     if (step_fac<=0)
-    { "  ERROR: the second component of <intvec> should be > 0";
-      return();
-    }
+    { ERROR("the second component of <intvec> should be > 0"); }
     if (cd==0)
     { return(ideal(0));
     }
@@ -1729,10 +1614,9 @@ EXAMPLE: example invariant_basis_reynolds; shows an example
     int cd=-1;
   }
   if (ncols(REY)<>nvars(basering))
-  { "ERROR:   the number of columns in the <matrix> should be the same as the";
-    "         number of variables in the basering; in fact it should be first";
-    "         return value of group_reynolds() or reynolds_molien().";
-    return();
+  { ERROR("the number of columns in the <matrix> should be the same as the
+         number of variables in the basering; in fact it should be first
+         return value of group_reynolds() or reynolds_molien().");
   }
  //----------------------------------------------------------------------------
   ideal mon=sort(maxideal(d))[1];
@@ -2097,38 +1981,26 @@ EXAMPLE: example primary_char0; shows an example
 "
 { degBound=0;
   if (char(basering)<>0)
-  { "ERROR:   primary_char0 should only be used with rings of characteristic 0.";
-    return();
-  }
+  { ERROR("primary_char0 should only be used with rings of characteristic 0."); }
  //----------------- checking input and setting verbose mode ------------------
   if (size(#)>1)
-  { "ERROR:   primary_char0 can only have three parameters.";
-    return();
-  }
+  { ERROR("primary_char0 can only have three parameters."); }
   if (size(#)==1)
   { if (typeof(#[1])<>"int")
-    { "ERROR:   The third parameter should be of type <int>.";
-      return();
-    }
+    { ERROR("The third parameter should be of type <int>."); }
     else
-    { int v=#[1];
-    }
+    { int v=#[1]; }
   }
   else
-  { int v=0;
-  }
+  { int v=0; }
   int n=nvars(basering);               // n is the number of variables, as well
                                        // as the size of the matrices, as well
                                        // as the number of primary invariants,
                                        // we should get
   if (ncols(REY)<>n)
-  { "ERROR:   First parameter ought to be the Reynolds operator."
-    return();
-  }
+  { ERROR("First parameter ought to be the Reynolds operator."); }
   if (ncols(M)<>2 or nrows(M)<>1)
-  { "ERROR:   Second parameter ought to be the Molien series."
-    return();
-  }
+  { ERROR("Second parameter ought to be the Molien series."); }
  //----------------------------------------------------------------------------
   if (v && voice<>2)
   { "  We can start looking for primary invariants...";
@@ -2241,39 +2113,26 @@ EXAMPLE: example primary_charp; shows an example
 { degBound=0;
 // ---------------- checking input and setting verbose mode -------------------
   if (char(basering)==0)
-  { "ERROR:   primary_charp should only be used with rings of characteristic p>0.";
-    return();
-  }
+  { ERROR("primary_charp should only be used with rings of characteristic p>0"); }
   if (size(#)>1)
-  { "ERROR:   primary_charp can only have three parameters.";
-    return();
-  }
+  { ERROR("primary_charp can only have three parameters"); }
   if (size(#)==1)
   { if (typeof(#[1])<>"int")
-    { "ERROR:   The third parameter should be of type <int>.";
-      return();
-    }
+    { ERROR("The third parameter should be of type <int>"); }
     else
-    { int v=#[1];
-    }
+    { int v=#[1]; }
   }
   else
-  { int v=0;
-  }
+  { int v=0; }
   def br=basering;
   int n=nvars(br);                     // n is the number of variables, as well
                                        // as the size of the matrices, as well
                                        // as the number of primary invariants,
                                        // we should get
   if (ncols(REY)<>n)
-  { "ERROR:   First parameter ought to be the Reynolds operator."
-    return();
-  }
+  { ERROR("First parameter ought to be the Reynolds operator"): }
   if (typeof(`ring_name`)<>"ring")
-  { "ERROR:   Second parameter ought to be ring where ";
-    "         the Molien series is stored.";
-    return();
-  }
+  { ERROR("Second parameter ought to be ring where the Molien series is stored"); }
  //----------------------------------------------------------------------------
   if (v && voice<>2)
   { "  We can start looking for primary invariants...";
@@ -2396,22 +2255,14 @@ EXAMPLE: example primary_char0_no_molien; shows an example
 { degBound=0;
  //-------------- checking input and setting verbose mode ---------------------
   if (char(basering)<>0)
-  { "ERROR:   primary_char0_no_molien should only be used with rings of";
-    "         characteristic 0.";
-    return();
-  }
+  { ERROR("primary_char0_no_molien should only be used with rings of characteristic 0"); }
   if (size(#)>1)
-  { "ERROR:   primary_char0_no_molien can only have two parameters.";
-    return();
-  }
+  { ERROR("primary_char0_no_molien can only have two parameters"); }
   if (size(#)==1)
   { if (typeof(#[1])<>"int")
-    { "ERROR:   The second parameter should be of type <int>.";
-      return();
-    }
+    { ERROR("The second parameter should be of type <int>"); }
     else
-    { int v=#[1];
-    }
+    { int v=#[1]; }
   }
   else
   { int v=0;
@@ -2421,9 +2272,7 @@ EXAMPLE: example primary_char0_no_molien; shows an example
                                        // as the number of primary invariants,
                                        // we should get
   if (ncols(REY)<>n)
-  { "ERROR:   First parameter ought to be the Reynolds operator."
-    return();
-  }
+  { ERROR("First parameter ought to be the Reynolds operator"); }
  //----------------------------------------------------------------------------
   if (v && voice<>2)
   { "  We can start looking for primary invariants...";
@@ -2539,19 +2388,12 @@ EXAMPLE: example primary_charp_no_molien; shows an example
 { degBound=0;
  //----------------- checking input and setting verbose mode ------------------
   if (char(basering)==0)
-  { "ERROR:   primary_charp_no_molien should only be used with rings of";
-    "         characteristic p>0.";
-    return();
-  }
+  { ERROR("primary_charp_no_molien should only be used with rings of characteristic p>0"); }
   if (size(#)>1)
-  { "ERROR:   primary_charp_no_molien can only have two parameters.";
-    return();
-  }
+  { ERROR("primary_charp_no_molien can only have two parameters"); }
   if (size(#)==1)
   { if (typeof(#[1])<>"int")
-    { "ERROR:   The second parameter should be of type <int>.";
-      return();
-    }
+    { ERROR("The second parameter should be of type <int>"); }
     else
     { int v=#[1]; }
   }
@@ -2563,9 +2405,7 @@ EXAMPLE: example primary_charp_no_molien; shows an example
                                        // as the number of primary invariants,
                                        // we should get
   if (ncols(REY)<>n)
-  { "ERROR:   First parameter ought to be the Reynolds operator."
-    return();
-  }
+  { ERROR("First parameter ought to be the Reynolds operator"): }
  //----------------------------------------------------------------------------
   if (v && voice<>2)
   { "  We can start looking for primary invariants...";
@@ -2679,21 +2519,14 @@ EXAMPLE: example primary_charp_without; shows an example
 { degBound=0;
  //--------------------- checking input and setting verbose mode --------------
   if (char(basering)==0)
-  { "ERROR:   primary_charp_without should not be used with rings of";
-    "         characteristic 0.";
-    return();
-  }
+  { ERROR("primary_charp_without should not be used with rings of characteristic 0"); }
   if (size(#)==0)
-  { "ERROR:   There are no parameters.";
-    return();
-  }
+  { ERROR("There are no parameters"); }
   if (typeof(#[size(#)])=="int")
   { int v=#[size(#)];
     int gen_num=size(#)-1;
     if (gen_num==0)
-    { "ERROR:   There are no generators of a finite matrix group given.";
-      return();
-    }
+    { ERROR("There are no generators of a finite matrix group given"); }
   }
   else
   { int v=0;
@@ -2706,15 +2539,10 @@ EXAMPLE: example primary_charp_without; shows an example
   for (int i=1;i<=gen_num;i++)
   { if (typeof(#[i])=="matrix")
     { if (nrows(#[i])<>n or ncols(#[i])<>n)
-      { "ERROR:   The number of variables of the base ring needs to be the same";
-        "         as the dimension of the square matrices";
-        return();
-      }
+      { ERROR("The number of variables of the base ring needs to be the same as the dimension of the square matrices"); }
     }
     else
-    { "ERROR:   The first parameters should be a list of matrices";
-      return();
-    }
+    { ERROR("The first parameters should be a list of matrices"); }
   }
  //----------------------------------------------------------------------------
   if (v && voice==2)
@@ -2836,9 +2664,7 @@ EXAMPLE: example primary_invariants; shows an example
 {
  // ----------------- checking input and setting flags ------------------------
   if (size(#)==0)
-  { "ERROR:   There are no parameters.";
-    return();
-  }
+  { ERROR("There are no parameters"); }
   int ch=char(basering);               // the algorithms depend very much on the
                                        // characteristic of the ground field
   int n=nvars(basering);               // n is the number of variables, as well
@@ -2849,21 +2675,15 @@ EXAMPLE: example primary_invariants; shows an example
   int mol_flag,v;
   if (typeof(#[size(#)])=="intvec")
   { if (size(#[size(#)])<>3)
-    { "ERROR:   <intvec> should have three entries.";
-      return();
-    }
+    { ERROR("<intvec> should have three entries"); }
     gen_num=size(#)-1;
     mol_flag=#[size(#)][1];
     if (#[size(#)][2]<0 && (ch==0 or (ch<>0 && mol_flag==-1)))
-    { "ERROR:   the second component of <intvec> should be >=0";
-      return();
-    }
+    { ERROR("the second component of <intvec> should be >=0"); }
     int interval=#[size(#)][2];
     v=#[size(#)][3];
     if (gen_num==0)
-    { "ERROR:   There are no generators of a finite matrix group given.";
-      return();
-    }
+    { ERROR("There are no generators of a finite matrix group given"); }
   }
   else
   { gen_num=size(#);
@@ -2874,15 +2694,12 @@ EXAMPLE: example primary_invariants; shows an example
   for (int i=1;i<=gen_num;i++)
   { if (typeof(#[i])=="matrix")
     { if (nrows(#[i])<>n or ncols(#[i])<>n)
-      { "ERROR:   The number of variables of the base ring needs to be the same";
-        "         as the dimension of the square matrices";
-        return();
+      { ERROR("The number of variables of the base ring needs to be the same
+         as the dimension of the square matrices");
       }
     }
     else
-    { "ERROR:   The first parameters should be a list of matrices";
-      return();
-    }
+    { ERROR("The first parameters should be a list of matrices"); }
   }
  //----------------------------------------------------------------------------
   if (mol_flag==0)
@@ -2900,8 +2717,7 @@ EXAMPLE: example primary_invariants; shows an example
       { string newring="aksldfalkdsflkj"; // case
         if (minpoly==0)
         { if (v)
-          { "  We are dealing with the non-modular case.";
-          }
+          { "  We are dealing with the non-modular case."; }
           if (typeof(L[2])=="int")
           { molien(L[3..size(L)],newring,L[2],intvec(mol_flag,interval,v));
           }
@@ -2921,11 +2737,9 @@ EXAMPLE: example primary_invariants; shows an example
           }
           list l=primary_charp_no_molien(L[1],v);
           if (size(l)==2)
-          { return(l[1],L[1],l[2]);
-          }
+          { return(l[1],L[1],l[2]); }
           else
-          { return(l[1],L[1]);
-          }
+          { return(l[1],L[1]); }
         }
       }
       else                             // the modular case
@@ -2971,9 +2785,7 @@ EXAMPLE: example primary_invariants; shows an example
   }
   if (mol_flag==-1)
   { if (ch==0)
-    { "ERROR:   Characteristic 0 can only be simulated in characteristic p>>0.";
-      return();
-    }
+    { ERROR("Characteristic 0 can only be simulated in characteristic p>>0"); }
     list L=group_reynolds(#[1..gen_num],v);
     string newring="aksldfalkdsflkj";
     molien(L[2..size(L)],newring,intvec(1,interval,v));
@@ -2982,9 +2794,7 @@ EXAMPLE: example primary_invariants; shows an example
   }
   else                                 // the user specified that the
   { if (ch==0)                         // characteristic divides the group order
-    { "ERROR:   The characteristic cannot divide the group order when it is 0.";
-      return();
-    }
+    { ERROR("The characteristic cannot divide the group order when it is 0"); }
     if (v)
     { "";
     }
@@ -3232,39 +3042,26 @@ EXAMPLE: example primary_char0_random; shows an example
 "
 { degBound=0;
   if (char(basering)<>0)
-  { "ERROR:   primary_char0_random should only be used with rings of";
-    "         characteristic 0.";
-    return();
-  }
+  { ERROR("primary_char0_random should only be used with rings of characteristic 0"); }
  //----------------- checking input and setting verbose mode ------------------
   if (size(#)>1)
-  { "ERROR:   primary_char0_random can only have four parameters.";
-    return();
-  }
+  { ERROR("primary_char0_random can only have four parameters"); }
   if (size(#)==1)
   { if (typeof(#[1])<>"int")
-    { "ERROR:   The fourth parameter should be of type <int>.";
-      return();
-    }
+    { ERROR("The fourth parameter should be of type <int>"); }
     else
-    { int v=#[1];
-    }
+    { int v=#[1]; }
   }
   else
-  { int v=0;
-  }
+  { int v=0; }
   int n=nvars(basering);               // n is the number of variables, as well
                                        // as the size of the matrices, as well
                                        // as the number of primary invariants,
                                        // we should get
   if (ncols(REY)<>n)
-  { "ERROR:   First parameter ought to be the Reynolds operator."
-    return();
-  }
+  { ERROR("First parameter ought to be the Reynolds operator"); }
   if (ncols(M)<>2 or nrows(M)<>1)
-  { "ERROR:   Second parameter ought to be the Molien series."
-    return();
-  }
+  { ERROR("Second parameter ought to be the Molien series"); }
  //----------------------------------------------------------------------------
   if (v && voice<>2)
   { "  We can start looking for primary invariants...";
@@ -3380,22 +3177,14 @@ EXAMPLE: example primary_charp_random; shows an example
 { degBound=0;
  // ---------------- checking input and setting verbose mode ------------------
   if (char(basering)==0)
-  { "ERROR:   primary_charp_random should only be used with rings of";
-    "         characteristic p>0.";
-    return();
-  }
+  { ERROR("primary_charp_random should only be used with rings of characteristic p>0"); }
   if (size(#)>1)
-  { "ERROR:   primary_charp_random can only have four parameters.";
-    return();
-  }
+  { ERROR("primary_charp_random can only have four parameters"); }
   if (size(#)==1)
   { if (typeof(#[1])<>"int")
-    { "ERROR:   The fourth parameter should be of type <int>.";
-      return();
-    }
+    { ERROR("The fourth parameter should be of type <int>"); }
     else
-    { int v=#[1];
-    }
+    { int v=#[1]; }
   }
   else
   { int v=0;
@@ -3406,14 +3195,9 @@ EXAMPLE: example primary_charp_random; shows an example
                                        // as the number of primary invariants,
                                        // we should get
   if (ncols(REY)<>n)
-  { "ERROR:   First parameter ought to be the Reynolds operator."
-    return();
-  }
+  { ERROR("First parameter ought to be the Reynolds operator"); }
   if (typeof(`ring_name`)<>"ring")
-  { "ERROR:   Second parameter ought to the name of a ring where the Molien";
-    "         is stored.";
-    return();
-  }
+  { EROOR("Second parameter ought to the name of a ring where the Molien is stored"); }
  //----------------------------------------------------------------------------
   if (v && voice<>2)
   { "  We can start looking for primary invariants...";
@@ -3535,22 +3319,14 @@ EXAMPLE: example primary_char0_no_molien_random; shows an example
 { degBound=0;
  //-------------- checking input and setting verbose mode ---------------------
   if (char(basering)<>0)
-  { "ERROR:   primary_char0_no_molien_random should only be used with rings of";
-    "         characteristic 0.";
-    return();
-  }
+  { ERROR("primary_char0_no_molien_random should only be used with rings of characteristic 0"); }
   if (size(#)>1)
-  { "ERROR:   primary_char0_no_molien_random can only have three parameters.";
-    return();
-  }
+  { ERROR("primary_char0_no_molien_random can only have three parameters"); }
   if (size(#)==1)
   { if (typeof(#[1])<>"int")
-    { "ERROR:   The third parameter should be of type <int>.";
-      return();
-    }
+    { ERROR("The third parameter should be of type <int>"); }
     else
-    { int v=#[1];
-    }
+    { int v=#[1]; }
   }
   else
   { int v=0;
@@ -3560,9 +3336,7 @@ EXAMPLE: example primary_char0_no_molien_random; shows an example
                                        // as the number of primary invariants,
                                        // we should get
   if (ncols(REY)<>n)
-  { "ERROR:   First parameter ought to be the Reynolds operator."
-    return();
-  }
+  { ERROR("First parameter ought to be the Reynolds operator"); }
  //----------------------------------------------------------------------------
   if (v && voice<>2)
   { "  We can start looking for primary invariants...";
@@ -3682,22 +3456,14 @@ EXAMPLE: example primary_charp_no_molien_random; shows an example
 { degBound=0;
  //----------------- checking input and setting verbose mode ------------------
   if (char(basering)==0)
-  { "ERROR:   primary_charp_no_molien_random should only be used with rings of";
-    "         characteristic p>0.";
-    return();
-  }
+  { ERROR("primary_charp_no_molien_random should only be used with rings of characteristic p>0"); }
   if (size(#)>1)
-  { "ERROR:   primary_charp_no_molien_random can only have three parameters.";
-    return();
-  }
+  { ERROR("primary_charp_no_molien_random can only have three parameters"); }
   if (size(#)==1)
   { if (typeof(#[1])<>"int")
-    { "ERROR:   The third parameter should be of type <int>.";
-      return();
-    }
+    { ERROR("The third parameter should be of type <int>"); }
     else
-    { int v=#[1];
-    }
+    { int v=#[1]; }
   }
   else
   { int v=0;
@@ -3707,9 +3473,7 @@ EXAMPLE: example primary_charp_no_molien_random; shows an example
                                        // as the number of primary invariants,
                                        // we should get
   if (ncols(REY)<>n)
-  { "ERROR:   First parameter ought to be the Reynolds operator."
-    return();
-  }
+  { ERROR("First parameter ought to be the Reynolds operator"); }
  //----------------------------------------------------------------------------
   if (v && voice<>2)
   { "  We can start looking for primary invariants...";
@@ -3827,22 +3591,15 @@ EXAMPLE: example primary_charp_without_random; shows an example
 { degBound=0;
  //--------------------- checking input and setting verbose mode --------------
   if (char(basering)==0)
-  { "ERROR:   primary_charp_without_random should only be used with rings of";
-    "         characteristic 0.";
-    return();
-  }
+  { ERROR("primary_charp_without_random should only be used with rings of characteristic 0"); }
   if (size(#)<2)
-  { "ERROR:   There are too few parameters.";
-    return();
-  }
+  { ERROR("There are too few parameters"); }
   if (typeof(#[size(#)])=="int" && typeof(#[size(#)-1])=="int")
   { int v=#[size(#)];
     int max=#[size(#)-1];
     int gen_num=size(#)-2;
     if (gen_num==0)
-    { "ERROR:   There are no generators of a finite matrix group given.";
-      return();
-    }
+    { ERROR("There are no generators of a finite matrix group given"); }
   }
   else
   { if (typeof(#[size(#)])=="int")
@@ -3851,9 +3608,7 @@ EXAMPLE: example primary_charp_without_random; shows an example
       int gen_num=size(#)-1;
     }
     else
-    { "ERROR:   The last parameter should be an <int>.";
-      return();
-    }
+    { ERROR("The last parameter should be an <int>"); }
   }
   int n=nvars(basering);               // n is the number of variables, as well
                                        // as the size of the matrices, as well
@@ -3862,15 +3617,12 @@ EXAMPLE: example primary_charp_without_random; shows an example
   for (int i=1;i<=gen_num;i++)
   { if (typeof(#[i])=="matrix")
     { if (nrows(#[i])<>n or ncols(#[i])<>n)
-      { "ERROR:   The number of variables of the base ring needs to be the same";
-        "         as the dimension of the square matrices";
-        return();
+      { ERROR("The number of variables of the base ring needs to be the same
+         as the dimension of the square matrices");
       }
     }
     else
-    { "ERROR:   The first parameters should be a list of matrices";
-      return();
-    }
+    { ERROR("The first parameters should be a list of matrices"); }
   }
  //----------------------------------------------------------------------------
   if (v && voice==2)
@@ -3995,9 +3747,7 @@ EXAMPLE: example primary_invariants_random; shows an example
 {
  // ----------------- checking input and setting flags ------------------------
   if (size(#)<2)
-  { "ERROR:   There are too few parameters.";
-    return();
-  }
+  { ERROR("There are too few parameters"); }
   int ch=char(basering);               // the algorithms depend very much on the
                                        // characteristic of the ground field
   int n=nvars(basering);               // n is the number of variables, as well
@@ -4008,22 +3758,16 @@ EXAMPLE: example primary_invariants_random; shows an example
   int mol_flag,v;
   if (typeof(#[size(#)])=="intvec" && typeof(#[size(#)-1])=="int")
   { if (size(#[size(#)])<>3)
-    { "ERROR:   <intvec> should have three entries.";
-      return();
-    }
+    { ERROR("<intvec> should have three entries"); }
     gen_num=size(#)-2;
     mol_flag=#[size(#)][1];
     if (#[size(#)][2]<0 && (ch==0 or (ch<>0 && mol_flag<>0)))
-    { "ERROR:   the second component of <intvec> should be >=0";
-      return();
-    }
+    { ERROR("the second component of <intvec> should be >=0"); }
     int interval=#[size(#)][2];
     v=#[size(#)][3];
     int max=#[size(#)-1];
     if (gen_num==0)
-    { "ERROR:   There are no generators of a finite matrix group given.";
-      return();
-    }
+    { ERROR("There are no generators of a finite matrix group given"); }
   }
   else
   { if (typeof(#[size(#)])=="int")
@@ -4034,23 +3778,19 @@ EXAMPLE: example primary_invariants_random; shows an example
       int max=#[size(#)];
     }
     else
-    { "ERROR:   If the two last parameters are not <int> and <intvec>, the last";
-      "         parameter should be an <int>.";
-      return();
+    { ERROR("If the two last parameters are not <int> and <intvec>, the last
+         parameter should be an <int>");
     }
   }
   for (int i=1;i<=gen_num;i++)
   { if (typeof(#[i])=="matrix")
     { if (nrows(#[i])<>n or ncols(#[i])<>n)
-      { "ERROR:   The number of variables of the base ring needs to be the same";
-        "         as the dimension of the square matrices";
-        return();
+      { ERROR("The number of variables of the base ring needs to be the same
+         as the dimension of the square matrices");
       }
     }
     else
-    { "ERROR:   The first parameters should be a list of matrices";
-      return();
-    }
+    { ERROR("The first parameters should be a list of matrices"); }
   }
  //----------------------------------------------------------------------------
   if (mol_flag==0)
@@ -4139,9 +3879,7 @@ EXAMPLE: example primary_invariants_random; shows an example
   }
   if (mol_flag==-1)
   { if (ch==0)
-    { "ERROR:   Characteristic 0 can only be simulated in characteristic p>>0.";
-      return();
-    }
+    { ERROR("Characteristic 0 can only be simulated in characteristic p>>0"); }
     list L=group_reynolds(#[1..gen_num],v);
     string newring="aksldfalkdsflkj";
     if (typeof(L[2])=="int")
@@ -4155,9 +3893,7 @@ EXAMPLE: example primary_invariants_random; shows an example
   }
   else                                 // the user specified that the
   { if (ch==0)                         // characteristic divides the group order
-    { "ERROR:   The characteristic cannot divide the group order when it is 0.";
-      return();
-    }
+    { ERROR("The characteristic cannot divide the group order when it is 0"); }
     if (v)
     { "";
     }
@@ -4195,18 +3931,14 @@ EXAMPLE: example power_products; shows an example
 "
 { ring R=0,x,dp;
   if (d<=0)
-  { "ERROR:   The <int> may not be <= 0";
-    return();
-  }
+  { ERROR("The <int> may not be <= 0"); }
   int d_neu,j,nc;
   int s=size(deg_vec);
   intmat PP[s][1];
   intmat TEST[s][1];
   for (int i=1;i<=s;i++)
   { if (i<0)
-    { "ERROR:   The entries of <intvec> may not be <= 0";
-      return();
-    }
+    { ERROR("The entries of <intvec> may not be <= 0"); }
     d_neu=d-deg_vec[i];
     if (d_neu>0)
     { intmat PPd_neu=power_products(intvec(deg_vec[i..s]),d_neu);
@@ -4267,9 +3999,7 @@ THEORY:  The secondary invariants are calculated by finding a basis (in terms
   degBound=0;
  //----------------- checking input and setting verbose mode ------------------
   if (char(br)<>0)
-  { "ERROR:   secondary_char0 should only be used with rings of characteristic 0.";
-    return();
-  }
+  { ERROR("secondary_char0 should only be used with rings of characteristic 0"); }
   int i;
   if (size(#)>0)
   { if (typeof(#[size(#)])=="int")
@@ -4287,18 +4017,11 @@ THEORY:  The secondary invariants are calculated by finding a basis (in terms
                                        // as the number of primary invariants,
                                        // we should get
   if (ncols(P)<>n)
-  { "ERROR:   The first parameter ought to be the matrix of the primary";
-    "         invariants."
-    return();
-  }
+  { ERROR("The first parameter ought to be the matrix of the primary invariants"); }
   if (ncols(REY)<>n)
-  { "ERROR:   The second parameter ought to be the Reynolds operator."
-    return();
-  }
+  { ERROR("The second parameter ought to be the Reynolds operator"); }
   if (ncols(M)<>2 or nrows(M)<>1)
-  { "ERROR:   The third parameter ought to be the Molien series."
-    return();
-  }
+  { ERROR("The third parameter ought to be the Molien series"); }
   if (v && voice==2)
   { "";
   }
@@ -4501,22 +4224,17 @@ EXAMPLE:  example secondary_char0; shows an example
 
  //----------------- checking input and setting verbose mode ------------------
   if (char(br)<>0)
-  { "ERROR:   secondary_char0 can only be used with rings of characteristic 0.";
-    "         Try secondary_charp";
-      return();
-  }
+  { ERROR("secondary_char0 can only be used with rings of characteristic 0.
+         Try secondary_charp"); }
   int i;
   if (size(#)>0)
   { if (typeof(#[1])=="int")
-    { int v=#[1];
-    }
+    { int v=#[1]; }
     else
-    { int v=0;
-    }
+    { int v=0; }
   }
   else
-  { int v=0;
-  }
+  { int v=0; }
   if (size(#)>0)
   { if (typeof(#[size(#)])=="string")
     { if (#[size(#)]=="old")
@@ -4530,9 +4248,7 @@ EXAMPLE:  example secondary_char0; shows an example
         }
       }
       else
-      { "ERROR:   If the last optional parameter is a string, it should be \"old\".";
-        return(matrix(ideal()),matrix(ideal()));
-      }
+      { ERROR("If the last optional parameter is a string, it should be \"old\""); }
     }
   }
   int n=nvars(br);                // n is the number of variables, as well
@@ -4540,18 +4256,11 @@ EXAMPLE:  example secondary_char0; shows an example
                                   // as the number of primary invariants,
                                   // we should get
   if (ncols(P)<>n)
-  { "ERROR:   The first parameter ought to be the matrix of the primary";
-    "         invariants.";
-    return();
-  }
+  { ERROR("The first parameter ought to be the matrix of the primary invariants"); }
   if (ncols(REY)<>n)
-  { "ERROR:   The second parameter ought to be the Reynolds operator.";
-    return();
-  }
+  { ERROR("The second parameter ought to be the Reynolds operator"); }
   if (ncols(M)<>2 or nrows(M)<>1)
-  { "ERROR:   The third parameter ought to be the Molien series.";
-    return();
-  }
+  { ERROR("The third parameter ought to be the Molien series"); }
   if (v && voice==2)
   { "";
   }
@@ -4953,10 +4662,8 @@ EXAMPLE:  example irred_secondary_char0; shows an example
   def br=basering;
  //----------------- checking input and setting verbose mode ------------------
   if (char(br)<>0)
-  { "ERROR:   irred_secondary_char0 can only be used with rings of characteristic 0.";
-    "         Try irred_secondary_charp";
-      return();
-  }
+  { ERROR("irred_secondary_char0 can only be used with rings of characteristic 0.
+         Try irred_secondary_charp"); }
   int i;
   if (size(#)>0)
   { if (typeof(#[1])=="int")
@@ -4977,9 +4684,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
       { UsePP = 1;
       }
       else
-      { "ERROR:   If the last optional parameter is a string, it should be \"PP\".";
-        return(matrix(ideal()),matrix(ideal()));
-      }
+      { ERROR("If the last optional parameter is a string, it should be \"PP\""); }
     }
   }
   int n=nvars(br);                // n is the number of variables, as well
@@ -4987,18 +4692,11 @@ EXAMPLE:  example irred_secondary_char0; shows an example
                                   // as the number of primary invariants,
                                   // we should get
   if (ncols(P)<>n)
-  { "ERROR:   The first parameter ought to be the matrix of the primary";
-    "         invariants."
-    return();
-  }
+  { ERROR("The first parameter ought to be the matrix of the primary invariants"); }
   if (ncols(REY)<>n)
-  { "ERROR:   The second parameter ought to be the Reynolds operator."
-    return();
-  }
+  { ERROR("The second parameter ought to be the Reynolds operator"); }
   if (ncols(M)<>2 or nrows(M)<>1)
-  { "ERROR:   The third parameter ought to be the Molien series."
-    return();
-  }
+  { ERROR("The third parameter ought to be the Molien series"); }
   if (v && voice==2)
   { "";
   }
@@ -5431,9 +5129,7 @@ EXAMPLE: example secondary_charp; shows an example
   degBound=0;
  //---------------- checking input and setting verbose mode -------------------
   if (char(br)==0)
-  { "ERROR:   secondary_charp should only be used with rings of characteristic p>0.";
-    return();
-  }
+  { ERROR("secondary_charp should only be used with rings of characteristic p>0"); }
   int i;
   if (size(#)>0)
   { if (typeof(#[size(#)])=="int")
@@ -5451,19 +5147,11 @@ EXAMPLE: example secondary_charp; shows an example
                                        // as the number of primary invariants,
                                        // we should get
   if (ncols(P)<>n)
-  { "ERROR:   The first parameter ought to be the matrix of the primary";
-    "         invariants."
-    return();
-  }
+  { ERROR("The first parameter ought to be the matrix of the primary invariants"); }
   if (ncols(REY)<>n)
-  { "ERROR:   The second parameter ought to be the Reynolds operator."
-    return();
-  }
+  { ERROR("The second parameter ought to be the Reynolds operator"); }
   if (typeof(`ring_name`)<>"ring")
-  { "ERROR:   The <string> should give the name of the ring where the Molien."
-    "         series is stored.";
-    return();
-  }
+  { ERROR("The <string> should give the name of the ring where the Molien series is stored"); }
   if (v && voice==2)
   { "";
   }
@@ -5675,21 +5363,16 @@ EXAMPLE:  example secondary_charp; shows an example
 
  //---------------- checking input and setting verbose mode -------------------
   if (char(br)==0)
-  { "ERROR:   secondary_charp should only be used with rings of characteristic p>0.";
-    return();
-  }
+  { ERROR("secondary_charp should only be used with rings of characteristic p>0"); }
   int i;
   if (size(#)>0)
   { if (typeof(#[size(#)])=="int")
-    { int v=#[size(#)];
-    }
+    { int v=#[size(#)]; }
     else
-    { int v=0;
-    }
+    { int v=0; }
   }
   else
-  { int v=0;
-  }
+  { int v=0; }
   if (size(#)>0)
   { if (typeof(#[size(#)])=="string")
     { if (#[size(#)]=="old")
@@ -5703,9 +5386,7 @@ EXAMPLE:  example secondary_charp; shows an example
         }
       }
       else
-      { "ERROR:   If the last optional parameter is a string, it should be \"old\".";
-        return(matrix(ideal()),matrix(ideal()));
-      }
+      { ERROR("If the last optional parameter is a string, it should be \"old\""); }
     }
   }
   int n=nvars(br);                     // n is the number of variables, as well
@@ -5713,19 +5394,11 @@ EXAMPLE:  example secondary_charp; shows an example
                                        // as the number of primary invariants,
                                        // we should get
   if (ncols(P)<>n)
-  { "ERROR:   The first parameter ought to be the matrix of the primary";
-    "         invariants."
-    return();
-  }
+  { ERROR("The first parameter ought to be the matrix of the primary invariants"); }
   if (ncols(REY)<>n)
-  { "ERROR:   The second parameter ought to be the Reynolds operator."
-    return();
-  }
+  { ERROR("The second parameter ought to be the Reynolds operator"); }
   if (typeof(`ring_name`)<>"ring")
-  { "ERROR:   The <string> should give the name of the ring where the Molien."
-    "         series is stored.";
-    return();
-  }
+  { ERROR("The <string> should give the name of the ring where the Molien series is stored"); }
   if (v && voice==2)
   { "";
   }
@@ -6137,9 +5810,7 @@ EXAMPLE:  example secondary_no_molien; shows an example
         { intvec deg_vec=#[size(#)-1];
         }
         else
-        { "ERROR:   the third parameter should be an <intvec>";
-          return();
-        }
+        { ERROR("the third parameter should be an <intvec>"); }
       }
       int v=#[size(#)];
     }
@@ -6150,21 +5821,15 @@ EXAMPLE:  example secondary_no_molien; shows an example
           int v=0;
         }
         else
-        { "ERROR:   the third parameter should be an <intvec>";
-          return();
-        }
+        { ERROR("the third parameter should be an <intvec>"); }
       }
       else
-      { "ERROR:   wrong list of parameters";
-        return();
-      }
+      { ERROR("wrong list of parameters"); }
     }
   }
   else
   { if (size(#)>2)
-    { "ERROR:   there are too many parameters";
-      return();
-    }
+    { ERROR("there are too many parameters"); }
     int v=0;
   }
   int n=nvars(basering);               // n is the number of variables, as well
@@ -6172,22 +5837,15 @@ EXAMPLE:  example secondary_no_molien; shows an example
                                        // as the number of primary invariants,
                                        // we should get
   if (ncols(P)<>n)
-  { "ERROR:   The first parameter ought to be the matrix of the primary";
-    "         invariants."
-    return();
-  }
+  { ERROR("The first parameter ought to be the matrix of the primary invariants"); }
   if (ncols(REY)<>n)
-  { "ERROR:   The second parameter ought to be the Reynolds operator.";
-    return();
-  }
+  { ERROR("The second parameter ought to be the Reynolds operator"); }
   if (char(br)<>0)
   { if (nrows(REY) mod char(br) == 0)
-    { "ERROR:   We need to be in the non-modular case.";
-      return();
-    }
+    { ERROR("We need to be in the non-modular case"); }
   }
   else
-  { "WARNING: In char 0, secondary_char0 should be faster.";
+  { "WARNING: In char 0, secondary_char0 should be faster";
   }
   if (v && voice==2)
   { "";
@@ -6387,12 +6045,9 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
   { if (typeof(#[size(#)])=="int")
     { if (size(#)==2)
       { if (typeof(#[size(#)-1])=="intvec")
-        { intvec deg_vec=#[size(#)-1];
-        }
+        { intvec deg_vec=#[size(#)-1]; }
         else
-        { "ERROR:   the third parameter should be an <intvec>";
-          return();
-        }
+        { ERROR("the third parameter should be an <intvec>"); }
       }
       int v=#[size(#)];
     }
@@ -6403,21 +6058,15 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
           int v=0;
         }
         else
-        { "ERROR:   the third parameter should be an <intvec>";
-          return();
-        }
+        { ERROR("the third parameter should be an <intvec>"); }
       }
       else
-      { "ERROR:   wrong list of parameters";
-        return();
-      }
+      { ERROR("wrong list of parameters"); }
     }
   }
   else
   { if (size(#)>2)
-    { "ERROR:   there are too many parameters";
-      return();
-    }
+    { ERROR("there are too many parameters"); }
     int v=0;
   }
   int n=nvars(basering);               // n is the number of variables, as well
@@ -6425,22 +6074,15 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
                                        // as the number of primary invariants,
                                        // we should get
   if (ncols(P)<>n)
-  { "ERROR:   The first parameter ought to be the matrix of the primary";
-    "         invariants."
-    return();
-  }
+  { ERROR("The first parameter ought to be the matrix of the primary invariants"); }
   if (ncols(REY)<>n)
-  { "ERROR:   The second parameter ought to be the Reynolds operator.";
-    return();
-  }
+  { ERROR("The second parameter ought to be the Reynolds operator"); }
   if (char(br)<>0)
   { if (nrows(REY) mod char(br) == 0)
-    { "ERROR:   We need to be in the non-modular case.";
-      return();
-    }
+    { ERROR("We need to be in the non-modular case"); }
   }
   else
-  { "WARNING: In char 0, secondary_char0 should be faster.";
+  { "WARNING: In char 0, secondary_char0 should be faster";
   }
   if (v && voice==2)
   { "";
@@ -6790,12 +6432,9 @@ EXAMPLE: example irred_secondary_no_molien; shows an example
   { if (typeof(#[size(#)])=="int")
     { if (size(#)==2)
       { if (typeof(#[size(#)-1])=="intvec")
-        { intvec deg_vec=#[size(#)-1];
-        }
+        { intvec deg_vec=#[size(#)-1]; }
         else
-        { "ERROR:   the third parameter should be an <intvec>";
-          return();
-        }
+        { ERROR("the third parameter should be an <intvec>"); }
       }
       int v=#[size(#)];
     }
@@ -6806,21 +6445,15 @@ EXAMPLE: example irred_secondary_no_molien; shows an example
           int v=0;
         }
         else
-        { "ERROR:   the third parameter should be an <intvec>";
-          return();
-        }
+        { ERROR("the third parameter should be an <intvec>"); }
       }
       else
-      { "ERROR:   wrong list of parameters";
-        return();
-      }
+      { ERROR("wrong list of parameters"); }
     }
   }
   else
   { if (size(#)>2)
-    { "ERROR:   there are too many parameters";
-      return();
-    }
+    { ERROR("there are too many parameters"); }
     int v=0;
   }
   int n=nvars(basering);               // n is the number of variables, as well
@@ -6828,26 +6461,17 @@ EXAMPLE: example irred_secondary_no_molien; shows an example
                                        // as the number of primary invariants,
                                        // we should get
   if (ncols(P)<>n)
-  { "ERROR:   The first parameter ought to be the matrix of the primary";
-    "         invariants."
-    return();
-  }
+  { ERROR("The first parameter ought to be the matrix of the primary invariants"); }
   if (ncols(REY)<>n)
-  { "ERROR:   The second parameter ought to be the Reynolds operator.";
-    return();
-  }
+  { ERROR("The second parameter ought to be the Reynolds operator"); }
   if (char(br)<>0)
   { if (nrows(REY) mod char(br) == 0)
-    { "ERROR:   We need to be in the non-modular case.";
-      return();
-    }
+    { ERROR("We need to be in the non-modular case"); }
   }
   if (v && voice==2)
-  { "";
-  }
+  { ""; }
   if (defined(deg_vec)<>voice)
-  { intvec deg_vec;
-  }
+  { intvec deg_vec; }
   int l=1;
 
  //-------------------------- initializing variables --------------------------
@@ -6862,7 +6486,7 @@ EXAMPLE: example irred_secondary_no_molien; shows an example
   ideal sP = slimgb(ideal(P));
   int Max = vdim(sP);
   if (Max<0)
-  { ERROR("The first parameter ought to be a matrix of primary invariants.");
+  { ERROR("The first parameter ought to be a matrix of primary invariants");
   }
   ideal sIS = sP;   // sIS will be a Groebner basis up to degree d of P+irred. sec. inv.
   while (totalcount < Max)
@@ -6981,43 +6605,28 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
     { int gen_num=size(#)-1;
       v=#[size(#)];
       if (gen_num==0)
-      { "ERROR:   There are no generators of the finite matrix group given.";
-        return();
-      }
+      { ERROR("There are no generators of the finite matrix group given"); }
       for (i=1;i<=gen_num;i++)
       { if (typeof(#[i])<>"matrix")
-        { "ERROR:   These parameters should be generators of the finite matrix group.";
-          return();
-        }
+        { ERROR("These parameters should be generators of the finite matrix group"); }
         if ((n<>nrows(#[i])) or (n<>ncols(#[i])))
-        { "ERROR:   matrices need to be square and of the same dimensions";
-          return();
-        }
+        { ERROR("matrices need to be square and of the same dimensions"); }
       }
     }
     else
     { int gen_num=size(#);
       for (i=1;i<=gen_num;i++)
       { if (typeof(#[i])<>"matrix")
-        { "ERROR:   These parameters should be generators of the finite matrix group.";
-          return();
-        }
+        { ERROR("These parameters should be generators of the finite matrix group"); }
         if ((n<>nrows(#[i])) or (n<>ncols(#[i])))
-        { "ERROR:   matrices need to be square and of the same dimensions";
-          return();
-        }
+        { ERROR("matrices need to be square and of the same dimensions"); }
       }
     }
   }
   else
-  { "ERROR:   There are no generators of the finite matrix group given.";
-    return();
-  }
+  { ERROR("There are no generators of the finite matrix group given"); }
   if (ncols(P)<>n)
-  { "ERROR:   The first parameter ought to be the matrix of the primary";
-    "         invariants."
-    return();
-  }
+  { ERROR("The first parameter ought to be the matrix of the primary invariants"); }
   if (v && voice==2)
   { "";
   }
@@ -7044,10 +6653,7 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
   }
   ideal GP = groebner(ideal(P));
   if (dim(GP)<>0)
-  { "ERROR:   The ideal spanned by primary invariants of a finite group";
-    "         always is of dimension zero.";
-    return();
-  }
+  { ERROR("The ideal spanned by primary invariants of a finite group always is of dimension zero"); }
   matrix trivialS = matrix(kbase(GP));// , trivialIS=secondary_charp(P,REY,"alskdfalkdsj",v);
   // kill trivialIS;
   // kill alskdfalkdsj;
@@ -7199,9 +6805,7 @@ THEORY:  Bases of homogeneous invariants are generated successively and those
 EXAMPLE: example invariant_ring; shows an example
 "
 { if (size(#)==0)
-  { "ERROR:   There are no generators given.";
-    return();
-  }
+  { ERROR("There are no generators given"); }
   int ch=char(basering);               // the algorithms depend very much on the
                                        // characteristic of the ground field -
   int n=nvars(basering);               // n is the number of variables, as well
@@ -7213,15 +6817,11 @@ EXAMPLE: example invariant_ring; shows an example
  //------------------- checking input and setting flags -----------------------
   if (typeof(#[size(#)])=="intvec")
   { if (size(#[size(#)])<>3)
-    { "ERROR:   The <intvec> should have three entries.";
-      return();
-    }
+    { ERROR("The <intvec> should have three entries"); }
     gen_num=size(#)-1;
     mol_flag=#[size(#)][1];
     if (#[size(#)][2]<0 && (ch==0 or (ch<>0 && mol_flag<>0)))
-    { "ERROR:   the second component of <intvec> should be >=0";
-      return();
-    }
+    { ERROR("the second component of <intvec> should be >=0"); }
     int interval=#[size(#)][2];
     v=#[size(#)][3];
   }
@@ -7332,10 +6932,7 @@ EXAMPLE: example invariant_ring; shows an example
   }
   if (mol_flag==-1)
   { if (ch==0)
-    { "ERROR:   Characteristic 0 can only be simulated in characteristic p>>0.
-";
-      return();
-    }
+    { ERROR("Characteristic 0 can only be simulated in characteristic p>>0"); }
     list L=group_reynolds(#[1..gen_num],v);
     string newring="aksldfalkdsflkj";
     if (typeof(L[2])=="int")
@@ -7351,13 +6948,9 @@ EXAMPLE: example invariant_ring; shows an example
   }
   else                                 // the user specified that the
   { if (ch==0)                         // characteristic divides the group order
-    { "ERROR:   The characteristic cannot divide the group order when it is 0.
-";
-      return();
-    }
+    { ERROR("The characteristic cannot divide the group order when it is 0"); }
     if (v)
-    { "";
-    }
+    { ""; }
     matrix P=primary_charp_without(#[1..gen_num],v);
     matrix S=secondary_not_cohen_macaulay(P,#[1..gen_num],v);
     return(L[1],S);
@@ -7406,9 +6999,7 @@ THEORY:  is the same as for invariant_ring except that random combinations of
 EXAMPLE: example invariant_ring_random; shows an example
 "
 { if (size(#)<2)
-  { "ERROR:   There are too few parameters.";
-    return();
-  }
+  { ERROR("There are too few parameters"); }
   int ch=char(basering);               // the algorithms depend very much on the
                                        // characteristic of the ground field
   int n=nvars(basering);               // n is the number of variables, as well
@@ -7420,22 +7011,16 @@ EXAMPLE: example invariant_ring_random; shows an example
  //------------------- checking input and setting flags -----------------------
   if (typeof(#[size(#)])=="intvec" && typeof(#[size(#)-1])=="int")
   { if (size(#[size(#)])<>3)
-    { "ERROR:   <intvec> should have three entries.";
-      return();
-    }
+    { ERROR("<intvec> should have three entries"); }
     gen_num=size(#)-2;
     mol_flag=#[size(#)][1];
     if (#[size(#)][2]<0 && (ch==0 or (ch<>0 && mol_flag<>0)))
-    { "ERROR:   the second component of <intvec> should be >=0";
-      return();
-    }
+    { ERROR("the second component of <intvec> should be >=0"); }
     int interval=#[size(#)][2];
     v=#[size(#)][3];
     int max=#[size(#)-1];
     if (gen_num==0)
-    { "ERROR:   There are no generators of a finite matrix group given.";
-      return();
-    }
+    { ERROR("There are no generators of a finite matrix group given"); }
   }
   else
   { if (typeof(#[size(#)])=="int")
@@ -7446,23 +7031,15 @@ EXAMPLE: example invariant_ring_random; shows an example
       int max=#[size(#)];
     }
    else
-    { "ERROR:   If the two last parameters are not <int> and <intvec>, the last";
-      "         parameter should be an <int>.";
-      return();
-    }
+    { ERROR("If the two last parameters are not <int> and <intvec>, the last parameter should be an <int>"); }
   }
   for (int i=1;i<=gen_num;i++)
   { if (typeof(#[i])=="matrix")
     { if (nrows(#[i])<>n or ncols(#[i])<>n)
-      { "ERROR:   The number of variables of the base ring needs to be the same";
-        "         as the dimension of the square matrices";
-        return();
-      }
+      { ERROR("The number of variables of the base ring needs to be the same as the dimension of the square matrices"); }
     }
     else
-    { "ERROR:   The first parameters should be a list of matrices";
-      return();
-    }
+    { ERROR("The first parameters should be a list of matrices"); }
   }
  //----------------------------------------------------------------------------
   if (mol_flag==0)
@@ -7565,18 +7142,13 @@ EXAMPLE: example invariant_ring_random; shows an example
   }
   if (mol_flag==-1)
   { if (ch==0)
-    { "ERROR:   Characteristic 0 can only be simulated in characteristic p>>0.
-";
-      return();
-    }
+    { ERROR("Characteristic 0 can only be simulated in characteristic p>>0"); }
     list L=group_reynolds(#[1..gen_num],v);
     string newring="aksldfalkdsflkj";
     if (typeof(L[2])=="int")
-    { molien(L[3..size(L)],newring,L[2],intvec(mol_flag,interval,v));
-    }
+    { molien(L[3..size(L)],newring,L[2],intvec(mol_flag,interval,v)); }
     else
-    { molien(L[2..size(L)],newring,intvec(mol_flag,interval,v));
-    }
+    { molien(L[2..size(L)],newring,intvec(mol_flag,interval,v)); }
     matrix P=primary_charp_random(L[1],newring,max,v);
     matrix S,IS=secondary_charp(P,L[1],newring,v);
     kill aksldfalkdsflkj;
@@ -7584,13 +7156,9 @@ EXAMPLE: example invariant_ring_random; shows an example
   }
   else                                 // the user specified that the
   { if (ch==0)                         // characteristic divides the group order
-    { "ERROR:   The characteristic cannot divide the group order when it is 0.
-";
-      return();
-    }
+    { ERROR("The characteristic cannot divide the group order when it is 0"); }
     if (v)
-    { "";
-    }
+    { ""; }
     matrix P=primary_charp_without_random(#[1..gen_num],max,v);
     matrix S=secondary_not_cohen_macaulay(P,#[1..gen_num],v);
     return(L[1],S);
@@ -7619,9 +7187,7 @@ THEORY:  The ideal of algebraic relations of the invariant ring generators is
 EXAMPLE: example orbit_variety; shows an example
 "
 { if (newring=="")
-  { "ERROR:   the second parameter may not be an empty <string>";
-    return();
-  }
+  { ERROR("the second parameter may not be an empty <string>"); }
   if (nrows(F)==1)
   { def br=basering;
     int n=nvars(br);
@@ -7649,9 +7215,7 @@ EXAMPLE: example orbit_variety; shows an example
     return();
   }
   else
-  { "ERROR:   the <matrix> may only have one row";
-    return();
-  }
+  { ERROR("the <matrix> may only have one row"); }
 }
 example
 { "EXAMPLE: Sturmfels: Algorithms in Invariant Theory 2.3.7:"; echo=2;
@@ -7725,9 +7289,7 @@ EXAMPLE:  example rel_orbit_variety; shows an example.
       return();
     }
     else
-    { "ERROR:    the third parameter may either be empty or a <string>.";
-      return();
-    }
+    { ERROR("the third parameter may either be empty or a <string>."); }
   }
   degBound=0;
   if (nrows(F)==1)
@@ -7809,9 +7371,7 @@ EXAMPLE:  example rel_orbit_variety; shows an example.
     return(L);
   }
   else
-  { "ERROR:   the <matrix> may only have one row";
-    return();
-  }
+  { ERROR("the <matrix> may only have one row"); }
 }
 example
 { "EXAMPLE: Sturmfels: Algorithms in Invariant Theory 2.6.3:"; echo=2;
@@ -7848,9 +7408,7 @@ SEE ALSO: rel_orbit_variety
 EXAMPLE: example relative_orbit_variety; shows an example
 "
 { if (newring=="")
-  { "ERROR:   the third parameter may not be empty a <string>";
-    return();
-  }
+  { ERROR("the third parameter may not be empty a <string>"); }
   degBound=0;
   if (nrows(F)==1)
   { def br=basering;
@@ -7899,9 +7457,7 @@ EXAMPLE: example relative_orbit_variety; shows an example
     return();
   }
   else
-  { "ERROR:   the <matrix> may only have one row";
-    return();
-  }
+  { ERROR("the <matrix> may only have one row"); }
 }
 
 example
@@ -7945,9 +7501,7 @@ EXAMPLE: example image_of_variety; shows an example
     return(imap(newring,trafo));
   }
   else
-  { "ERROR:   the <matrix> may only have one row";
-    return();
-  }
+  { ERROR("the <matrix> may only have one row"); }
 }
 example
 { "EXAMPLE: Sturmfels: Algorithms in Invariant Theory 2.6.8:"; echo=2;
@@ -8020,35 +7574,22 @@ EXAMPLE: example orbit_sums; shows an example
 //----------------- checking input ------------------
   mon=simplify(mon,2); // remove 0
   if (not homog(sum(mon)))
-  { "ERROR: Monomials in the first parameter must be of the same degree.";
-    return();
-  }
+  { ERROR("Monomials in the first parameter must be of the same degree."); }
   int k,k2;
   for (k=1;k<=ncols(mon);k++)
   { if (leadmonom(mon[k])!=mon[k])
-    { "ERROR: The first parameter must be formed by monomials.";
-      return();
-    }
+    { ERROR("The first parameter must be formed by monomials."); }
   }
   for (k2=1;k2<=size(M);k2++)
   { if (typeof(M[k2])!="ideal")
-    { "ERROR: The second parameter must be a list of ideals providing a ";
-      "       permutation of the ring variables.";
-      return();
-    }
+    { ERROR("The second parameter must be a list of ideals providing a permutation of the ring variables"); }
     if ((ncols(M[k2])!=nvars(basering))
      or (ncols(M[k2])!=ncols(simplify(M[k2],6)))
      or (M[k2][1]==0))
-    { "ERROR: The second parameter must be a list of ideals providing a ";
-      "       permutation of the ring variables.";
-      return();
-    }
+    { ERROR("The second parameter must be a list of ideals providing a permutation of the ring variables"); }
     for (k=1;k<=ncols(M[k2]);k++)
     { if ((leadmonom(M[k2][k])!=M[k2][k]) or (deg(M[k2][k])!=1))
-      { "ERROR: The second parameter must be a list of ideals providing a ";
-        "       permutation of the ring variables.";
-        return();
-      }
+      { ERROR("The second parameter must be a list of ideals providing a permutation of the ring variables"); }
     }
   }
 //--------------- preparing steps -------------------
@@ -8186,9 +7727,7 @@ EXAMPLE:  example invariant_algebra_perm; shows an example
 {
 //----------------- checking input and setting verbose mode ------------------
   if (size(#)==0)
-  { "ERROR: There are no parameters given.";
-    return();
-  }
+  { ERROR("There are no parameters given"); }
   if (typeof(#[size(#)])=="int")
   { int v=#[size(#)];
     list GEN=#[1..size(#)-1];
@@ -8201,36 +7740,21 @@ EXAMPLE:  example invariant_algebra_perm; shows an example
   list TST;
   for (i=1;i<=size(GEN);i++)
   { if (typeof(GEN[i])!="list")
-    { "ERROR: The permutation group must be given by generators in";
-      "       disjoint cycle presentation";
-      return();
-    }
+    { ERROR("The permutation group must be given by generators in disjoint cycle presentation"); }
     for (j=1;j<=size(GEN[i]);j++)
     { if (typeof(GEN[i][j])!="list")
-      { "ERROR: The permutation group must be given by generators in";
-        "       disjoint cycle presentation";
-      return();
-      }
+      { ERROR("The permutation group must be given by generators in disjoint cycle presentation"); }
       for (k=1;k<=size(GEN[i][j]);k++)
       { if (typeof(GEN[i][j][k])!="int")
-        { "ERROR: The permutation group must be given by generators in";
-          "       disjoint cycle presentation";
-          return();
-        }
+        { ERROR("The permutation group must be given by generators in disjoint cycle presentation"); }
       }
     }
     TST=sort(sum(sum(GEN[i])))[1];
     if (TST[1]<=0)
-    { "ERROR: The permutation group must be given by generators in";
-      "       disjoint cycle presentation";
-      return();
-    }
+    { ERROR("The permutation group must be given by generators in disjoint cycle presentation"); }
     for (k2=1;k2<size(TST);k2++)
     { if ((TST[k2]==TST[k2+1]) or (TST[k2+1]>nvars(basering)))
-      { "ERROR: The permutation group must be given by generators in";
-        "       disjoint cycle presentation";
-        return();
-      }
+      { ERROR("The permutation group must be given by generators in disjoint cycle presentation"); }
     }
   }
 //-------------- starting computation -------------------------

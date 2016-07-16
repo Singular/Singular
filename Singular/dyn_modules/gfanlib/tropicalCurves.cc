@@ -116,14 +116,19 @@ static ring genericlyWeightedOrdering(const ring r, const gfan::ZVector &u, cons
 ZConesSortedByDimension tropicalStar(ideal inI, const ring r, const gfan::ZVector &u,
                                      const tropicalStrategy* currentStrategy)
 {
-  int k = idSize(inI);
+  int k = IDELEMS(inI);
   int d = currentStrategy->getExpectedDimension();
 
   /* Compute the common refinement over all tropical varieties
    * of the polynomials in the generating set */
   ZConesSortedByDimension C = tropicalVarietySortedByDimension(inI->m[0],r,currentStrategy);
   for (int i=1; i<k; i++)
-    C = intersect(C,tropicalVarietySortedByDimension(inI->m[i],r,currentStrategy),d);
+  {
+    if(inI->m[i]!=NULL)
+    {
+      C = intersect(C,tropicalVarietySortedByDimension(inI->m[i],r,currentStrategy),d);
+    }
+  }
 
   /* Cycle through all maximal cones of the refinement.
    * Pick a monomial ordering corresponding to a generic weight vector in it
