@@ -4,7 +4,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
-* ABSTRACT: numbers modulo p (<=32003)
+* ABSTRACT: numbers modulo p (<=32749)
 */
 #include <misc/auxiliary.h>
 
@@ -16,9 +16,9 @@
 // define if an if should be used
 //#define HAVE_GENERIC_ADD
 
-// enable large primes (32003 < p < 2^31-)
+// enable large primes (32749 < p < 2^31-)
 #define NV_OPS
-#define NV_MAX_PRIME 32003
+#define NV_MAX_PRIME 32749
 
 struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
 struct snumber; typedef struct snumber *   number;
