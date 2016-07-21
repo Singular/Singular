@@ -10,6 +10,7 @@
 #include <kernel/linear_algebra/MinorProcessor.h>
 
 #include <polys/simpleideals.h>
+#include <coeffs/modulop.h> // for NV_MAX_PRIME
 
 #include <kernel/polys.h>
 #include <kernel/structs.h>
@@ -509,7 +510,7 @@ ideal getMinorIdealHeuristic (const matrix mat, const int minorSize,
      integral domain and minorSize <= 2                -> Bareiss
      integral domain and minorSize >= 3 and vars <= 2  -> Bareiss
      field case and minorSize >= 3 and vars = 3
-       and c in {2, 3, ..., 32003}                     -> Bareiss
+       and c in {2, 3, ..., 32749}                     -> Bareiss
 
      otherwise:
      if not all minors are requested                   -> Laplace, no Caching
@@ -532,7 +533,7 @@ ideal getMinorIdealHeuristic (const matrix mat, const int minorSize,
     if      (minorSize <= 2)                                     b = true;
     else if (vars <= 2)                                          b = true;
     else if (currRingIsOverField() && (vars == 3)
-             && (currRing->cf->ch >= 2) && (currRing->cf->ch <= 32003))
+             && (currRing->cf->ch >= 2) && (currRing->cf->ch <= NV_MAX_PRIME))
           b = true;
   }
   if (!b)

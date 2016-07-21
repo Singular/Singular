@@ -246,7 +246,7 @@ void paPrint(const char *n,package p);
 
 BOOLEAN iiTestAssume(leftv a, leftv b);
 
-/* table inteface for iiAddCproc */
+/* table interface for iiAddCproc */
 /// apply an operation 'op' to an argument a
 /// return TRUE on failure
 BOOLEAN iiExprArith1Tab(leftv res,///< [out] pre-allocated result
