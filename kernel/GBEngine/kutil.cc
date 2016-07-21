@@ -362,7 +362,6 @@ void cancelunit (LObject* L,BOOLEAN inNF)
 //    }
   h = pNext(p);
 
-#ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
   {
     loop
@@ -424,7 +423,6 @@ void cancelunit (LObject* L,BOOLEAN inNF)
     }
   }
   else
-#endif
   {
     loop
     {
@@ -1806,11 +1804,8 @@ BOOLEAN enterOneStrongPolySig (int i,poly p,poly sig,int /*ecart*/, int /*isFrom
     h.sig = pNeg(h.sig);
     h.p = pNeg(h.p);
   }
-  #ifdef HAVE_RINGS
   
-    if(rField_is_Ring(currRing) &&
-      pLtCmp(h.sig,sig) == -1
-      )
+    if(rField_is_Ring(currRing) &&  pLtCmp(h.sig,sig) == -1)
     {
       #if ADIDEBUG
       printf("\nSigDrop in enteronestrongpolySig\n");
@@ -1844,7 +1839,6 @@ BOOLEAN enterOneStrongPolySig (int i,poly p,poly sig,int /*ecart*/, int /*isFrom
         return FALSE;
       }
     }
-    #endif
   #if ADIDEBUG
   printf("\nThis strong poly was added to L:\n");pWrite(h.p);pWrite(h.p1);pWrite(h.p2);pWrite(h.sig);
   #endif
@@ -2437,7 +2431,6 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   pSetm(Lp.lcm);
 
   // set coeffs of multipliers m1 and m2
-  #ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
   {
     number s = nCopy(pGetCoeff(strat->S[i]));
@@ -2451,7 +2444,6 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
     #endif
   }
   else
-  #endif
   {
     pSetCoeff0(m1, nInit(1));
     pSetCoeff0(m2, nInit(1));
@@ -2469,9 +2461,11 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   
   // get multiplied signatures for testing
   pSigMult = pp_Mult_mm(pSigMult,m1,currRing);
-  pSigMultNegSev = ~p_GetShortExpVector(pSigMult,currRing);
+  if(pSigMult != NULL)
+    pSigMultNegSev = ~p_GetShortExpVector(pSigMult,currRing);
   sSigMult = pp_Mult_mm(sSigMult,m2,currRing);
-  sSigMultNegSev = ~p_GetShortExpVector(sSigMult,currRing);
+  if(sSigMult != NULL)
+    sSigMultNegSev = ~p_GetShortExpVector(sSigMult,currRing);
 //#if 1
 #ifdef DEBUGF5
   Print("----------------\n");
@@ -2481,12 +2475,25 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   Lp.checked  = 0;
 #endif
   int sigCmp;
-  #ifdef HAVE_RINGS
-  if(rField_is_Ring(currRing))
-    sigCmp = p_LtCmpNoAbs(pSigMult,sSigMult,currRing);
+  if(pSigMult != NULL && sSigMult != NULL)
+  {
+    if(rField_is_Ring(currRing))
+      sigCmp = p_LtCmpNoAbs(pSigMult,sSigMult,currRing);
+    else
+      sigCmp = p_LmCmp(pSigMult,sSigMult,currRing);
+  }
   else
-  #endif
-    sigCmp = p_LmCmp(pSigMult,sSigMult,currRing);
+  {
+    if(pSigMult == NULL)
+    {
+      if(sSigMult == NULL)
+        sigCmp = 0;
+      else
+        sigCmp = -1;
+    }
+    else
+      sigCmp = 1;
+  }
 //#if 1
 #if DEBUGF5
   Print("IN PAIR GENERATION - COMPARING SIGS: %d\n",sigCmp);
@@ -2496,7 +2503,6 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   //In the ring case we already build the sig
   if(rField_is_Ring(currRing))
   {
-    //I have to test it not in absolute value
     if(sigCmp == 0)
     {
       #if ADIDEBUG
@@ -2541,7 +2547,7 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
         return;
       }
     }
-    if(p_LmCmp(pSigMult,sSigMult,currRing) == 0)
+    if(pSigMult != NULL && sSigMult != NULL && p_LmCmp(pSigMult,sSigMult,currRing) == 0)
     {
       //Same lm, have to substract
       Lp.sig = p_Sub(pCopy(pSigMult),pCopy(sSigMult),currRing);
@@ -2662,7 +2668,6 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   }
   // store from which element this pair comes from for further tests
   //Lp.from = strat->sl+1;
-  #ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
   {
     //Put the sig to be > 0
@@ -2673,7 +2678,6 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
     }
   }
   else
-  #endif
   {
     if(sigCmp==currRing->OrdSgn)
     {
@@ -2747,9 +2751,7 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
     if (
         (!rIsPluralRing(currRing))
 //      ||  (rIsPluralRing(currRing) && (ncRingType(currRing) != nc_lie))
-      #ifdef HAVE_RINGS 
       && !rField_is_Ring(currRing)
-      #endif
        )
     {
       assume(pNext(Lp.p)==NULL); // TODO: this may be violated whenever ext.prod.crit. for Lie alg. is used
@@ -2770,18 +2772,11 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
 
     if (TEST_OPT_INTSTRATEGY)
     {
-      if (!rIsPluralRing(currRing) 
-      #ifdef HAVE_RINGS 
-      && !rField_is_Ring(currRing)
-      #endif
-      )
+      if (!rIsPluralRing(currRing) && !rField_is_Ring(currRing))
         nDelete(&(Lp.p->coef));
     }
     // Check for sigdrop
-    #ifdef HAVE_RINGS
-    if(rField_is_Ring(currRing) &&
-      pLtCmp(Lp.sig,pSig) == -1
-      )
+    if(rField_is_Ring(currRing) && pLtCmp(Lp.sig,pSig) == -1)
     {
       #if ADIDEBUG
       printf("\nSigDrop in enteronepairSig\n");pWrite(Lp.sig);
@@ -2814,7 +2809,6 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
         return;
       }
     }
-    #endif
     #if ADIDEBUG
     printf("\nThis spair was added to B:\n");
     pWrite(Lp.p);
@@ -4496,7 +4490,7 @@ void enterExtendedSpolySig(poly h,poly hSig,kStrategy strat)
           PrintLn();
         }
 #endif
-        enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
+  //pWrite(h);pWrite(hSig);pWrite(Lp.p);pWrite(Lp.sig);printf("\n------------------\n");getchar();
         enterL(&strat->L,&strat->Ll,&strat->Lmax,Lp,posx);
       }
     }
@@ -4545,7 +4539,7 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 
 void superenterpairsSig (poly h,poly hSig,int hFrom,int k,int ecart,int pos,kStrategy strat, int atR)
 {
-  assume (rField_is_Ring_Z(currRing));
+  assume (rField_is_Ring(currRing));
   // enter also zero divisor * poly, if this is non zero and of smaller degree
   #if ADIDEBUG
   printf("\n      Trying to add extended spolys\n");
@@ -4624,7 +4618,6 @@ void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat, int atR 
   int j;
   const int iCompH = pGetComp(h);
 
-  #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     for (j=0; j<=k; j++)
@@ -4640,15 +4633,16 @@ void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat, int atR 
     kMergeBintoL(strat);
   }
   else
-  #endif
-  for (j=0; j<=k; j++)
   {
-    const int iCompSj = pGetComp(strat->S[j]);
-    if ((iCompH==iCompSj)
-        //|| (0==iCompH) // can only happen,if iCompSj==0
-        || (0==iCompSj))
+    for (j=0; j<=k; j++)
     {
-      enterOnePairSpecial(j,h,ecart,strat, atR);
+      const int iCompSj = pGetComp(strat->S[j]);
+      if ((iCompH==iCompSj)
+          //|| (0==iCompH) // can only happen,if iCompSj==0
+          || (0==iCompSj))
+      {
+        enterOnePairSpecial(j,h,ecart,strat, atR);
+      }
     }
   }
 
@@ -6773,11 +6767,8 @@ BOOLEAN syzCriterion(poly sig, unsigned long not_sevSig, kStrategy strat)
     pWrite(pHead(strat->syz[k]));
 #endif
     if (p_LmShortDivisibleBy(strat->syz[k], strat->sevSyz[k], sig, not_sevSig, currRing)
-    #ifdef HAVE_RINGS
     && (!rField_is_Ring(currRing) || 
-    (n_DivBy(pGetCoeff(sig), pGetCoeff(strat->syz[k]),currRing) && pLtCmp(sig,strat->syz[k]) == 1))
-    #endif
-    )
+    (n_DivBy(pGetCoeff(sig), pGetCoeff(strat->syz[k]),currRing) && pLtCmp(sig,strat->syz[k]) == 1)))
     {
 //#if 1
 #ifdef DEBUGF5
@@ -6801,6 +6792,8 @@ BOOLEAN syzCriterion(poly sig, unsigned long not_sevSig, kStrategy strat)
 BOOLEAN syzCriterionInc(poly sig, unsigned long not_sevSig, kStrategy strat)
 {
 //#if 1
+  if(sig == NULL)
+    return FALSE;
 #ifdef DEBUGF5
   Print("--- syzygy criterion checks:  ");
   pWrite(sig);
@@ -6831,11 +6824,8 @@ BOOLEAN syzCriterionInc(poly sig, unsigned long not_sevSig, kStrategy strat)
       pWrite(pHead(strat->syz[k]));
 #endif
       if (p_LmShortDivisibleBy(strat->syz[k], strat->sevSyz[k], sig, not_sevSig, currRing)
-      #ifdef HAVE_RINGS
       && (!rField_is_Ring(currRing) || 
-      (n_DivBy(pGetCoeff(sig), pGetCoeff(strat->syz[k]),currRing) && pLtCmp(sig,strat->syz[k]) == 1))
-    #endif      
-      )
+      (n_DivBy(pGetCoeff(sig), pGetCoeff(strat->syz[k]),currRing) && pLtCmp(sig,strat->syz[k]) == 1)))
       {
         #if ADIDEBUG
         printf("\nsyzCrit:\n");pWrite(strat->syz[k]);pWrite(sig);
@@ -6870,10 +6860,7 @@ BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly /*lm*/, kSt
     pWrite(pHead(strat->S[k]));
 #endif
     if (p_LmShortDivisibleBy(strat->sig[k], strat->sevSig[k], sig, not_sevSig, currRing)
-    #ifdef HAVE_RINGS
-    && (!rField_is_Ring(currRing) || (n_DivBy(pGetCoeff(sig),pGetCoeff(strat->sig[k]),currRing)  && pLmCmp(sig,strat->sig[k]) == 1 ))
-    #endif
-    )
+    && (!rField_is_Ring(currRing) || (n_DivBy(pGetCoeff(sig),pGetCoeff(strat->sig[k]),currRing)  && pLmCmp(sig,strat->sig[k]) == 1 )))
     {
 //#if 1
 #ifdef DEBUGF5
@@ -6925,10 +6912,7 @@ BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, poly /*lm*/
   for (int ii=strat->sl; ii>start; ii--)
   {
     if (p_LmShortDivisibleBy(strat->sig[ii], strat->sevSig[ii], strat->P.sig, ~strat->P.sevSig, currRing)
-    #ifdef HAVE_RINGS
-    && (!(rField_is_Ring(currRing)) || n_DivBy(pGetCoeff(strat->P.sig),pGetCoeff(strat->sig[ii]),currRing))
-    #endif
-    )
+    && (!(rField_is_Ring(currRing)) || n_DivBy(pGetCoeff(strat->P.sig),pGetCoeff(strat->sig[ii]),currRing)))
     {
       p_ExpVectorSum(p1,strat->P.sig,strat->S[ii],currRing);
       p_ExpVectorSum(p2,strat->sig[ii],strat->P.p,currRing);
@@ -6956,17 +6940,13 @@ BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, poly /*lm*/
 
 BOOLEAN arriRewCriterionPre(poly sig, unsigned long not_sevSig, poly lm, kStrategy strat, int /*start=0*/)
 {
-  #ifdef HAVE_RINGS
   //Over Rings, there are still some changes to do: considering coeffs
   if(rField_is_Ring(currRing))
     return FALSE;
-  #endif
   int found = -1;
   for (int i=strat->Bl; i>-1; i--) {
     if (pLmEqual(strat->B[i].sig,sig)
-    #ifdef HAVE_RINGS
     && (rField_is_Ring(currRing) && n_Equal(pGetCoeff(strat->B[i].sig),pGetCoeff(sig),currRing))
-    #endif
     ) 
     {
       found = i;
@@ -7988,17 +7968,13 @@ void initSyzRules (kStrategy strat)
         for (k = 0; k<i; k++)
         {
           Q.sig          = pOne();
-          #ifdef HAVE_RINGS
           if(rField_is_Ring(currRing))
             p_SetCoeff(Q.sig,nCopy(p_GetCoeff(strat->S[k],currRing)),currRing);
-          #endif
           p_ExpVectorCopy(Q.sig,strat->S[k],currRing);
           p_SetCompP (Q.sig, comp, currRing);
           poly q          = p_One(currRing);
-          #ifdef HAVE_RINGS
           if(rField_is_Ring(currRing))
             p_SetCoeff(q,nCopy(p_GetCoeff(strat->S[i],currRing)),currRing);
-          #endif
           p_ExpVectorCopy(q,strat->S[i],currRing);
           q               = p_Neg (q, currRing);
           p_SetCompP (q, p_GetComp(strat->sig[k], currRing), currRing);
@@ -8036,17 +8012,13 @@ void initSyzRules (kStrategy strat)
     for (k = 0; k<strat->sl+1; k++)
     {
       Q.sig          = pOne();
-      #ifdef HAVE_RINGS
       if(rField_is_Ring(currRing))
         p_SetCoeff(Q.sig,nCopy(p_GetCoeff(strat->S[k],currRing)),currRing);
-      #endif
       p_ExpVectorCopy(Q.sig,strat->S[k],currRing);
       p_SetCompP (Q.sig, comp, currRing);
       poly q          = p_One(currRing);
-      #ifdef HAVE_RINGS
       if(rField_is_Ring(currRing))
         p_SetCoeff(q,nCopy(p_GetCoeff(strat->L[strat->Ll].p,currRing)),currRing);
-      #endif
       p_ExpVectorCopy(q,strat->L[strat->Ll].p,currRing);
       q               = p_Neg (q, currRing);
       p_SetCompP (q, p_GetComp(strat->sig[k], currRing), currRing);
@@ -10678,6 +10650,8 @@ void postReduceByMonSig(LObject* h, kStrategy strat)
           ok = TRUE;
         }
       }
+      if(p == NULL)
+        return;
       pp = pNext(p);
       while(pp != NULL)
       {

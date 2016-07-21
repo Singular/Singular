@@ -152,11 +152,9 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat, bool 
                              pGetShallowCopyDeleteProc(h->tailRing,
                                                        strat->tailRing));
     }
-    #ifdef HAVE_RINGS
     if(redMoraNF && (rField_is_Ring(currRing)))
       enterT_strong(*h,strat);
     else
-    #endif
       enterT(*h,strat);
     *h = L;
   }
@@ -1155,13 +1153,10 @@ void updateL(kStrategy strat)
       if (j<0) break;
       if (pNext(strat->L[j].p) == strat->tail)
       {
-#ifdef HAVE_RINGS
         if (rField_is_Ring(currRing))
           pLmDelete(strat->L[j].p);    /*deletes the short spoly and computes*/
         else
-#else
           pLmFree(strat->L[j].p);    /*deletes the short spoly and computes*/
-#endif
         strat->L[j].p = NULL;
         poly m1 = NULL, m2 = NULL;
         // check that spoly creation is ok
@@ -1216,21 +1211,17 @@ void updateLHC(kStrategy strat)
        /*- deletes the int spoly and computes -*/
       if (pLmCmp(strat->L[i].p,strat->kNoether) == -1)
       {
-        #ifdef HAVE_RINGS
         if (rField_is_Ring(currRing))
           pLmDelete(strat->L[i].p);
         else
-        #endif
           pLmFree(strat->L[i].p);
         strat->L[i].p = NULL;
       }
       else
       {
-        #ifdef HAVE_RINGS
         if (rField_is_Ring(currRing))
           pLmDelete(strat->L[i].p);
         else
-        #endif
           pLmFree(strat->L[i].p);
         strat->L[i].p = NULL;
         poly m1 = NULL, m2 = NULL;
@@ -1338,18 +1329,14 @@ void firstUpdate(kStrategy strat)
     if (TEST_OPT_FINDET)
       return;
 
-#ifdef HAVE_RINGS
     if ( (!rField_is_Ring(currRing)) || (rHasGlobalOrdering(currRing)))
-#endif
     {
       strat->red = redFirst;
       strat->use_buckets = kMoraUseBucket(strat);
     }
     updateT(strat);
 
-#ifdef HAVE_RINGS
     if ( (!rField_is_Ring(currRing)) || (rHasGlobalOrdering(currRing)))
-#endif
     {
       strat->posInT = posInT2;
       reorderT(strat);
@@ -1450,12 +1437,10 @@ void initBba(kStrategy strat)
     strat->LazyPass *=4;
     strat->red = redHomog;
   }
-#ifdef HAVE_RINGS  //TODO Oliver
   if (rField_is_Ring(currRing))
   {
     strat->red = redRing;
   }
-#endif
   if (currRing->pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
   else
@@ -1586,10 +1571,8 @@ void initMora(ideal F,kStrategy strat)
     strat->HCord = 32000;/*- very large -*/
   }
 
-#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
     strat->red = redRiloc;
-#endif
 
   /*reads the ecartWeights used for Graebes method from the
    *intvec ecart and set ecartWeights
@@ -1738,12 +1721,10 @@ loop_count = 1;
     if (pNext(strat->P.p) == strat->tail)
     {
       /*- deletes the short spoly and computes -*/
-#ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
         pLmDelete(strat->P.p);
       else
-#endif
-      pLmFree(strat->P.p);
+        pLmFree(strat->P.p);
       strat->P.p = NULL;
       poly m1 = NULL, m2 = NULL;
       // check that spoly creation is ok
@@ -1778,13 +1759,9 @@ loop_count = 1;
       printf("\nThis is P vor red:\n");p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.p1,strat->tailRing);p_Write(strat->P.p2,strat->tailRing);
       printf("\nBefore Ll = %i\n", strat->Ll);
       #endif
-      #ifdef HAVE_RINGS
       if(rField_is_Ring(strat->tailRing) && rHasLocalOrMixedOrdering(currRing))
-      {
         red_result = strat->red(&strat->P,strat);
-      }
       else
-      #endif
         red_result = strat->red(&strat->P,strat);
       #if ADIDEBUG
       printf("\nThis is P nach red:\n");p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.p1,strat->tailRing);p_Write(strat->P.p2,strat->tailRing);
@@ -1822,14 +1799,10 @@ loop_count = 1;
 
       enterT(strat->P,strat);
       // build new pairs
-#ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
-      {
         superenterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
-      }
       else
-#endif
-      enterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
+        enterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
       // put in S
 
         #if ADIDEBUG
@@ -1864,12 +1837,10 @@ loop_count = 1;
       // clear strat->P
       if (strat->P.lcm!=NULL)
       {
-#ifdef HAVE_RINGS
-        if (rField_is_Ring(currRing)) pLmDelete(strat->P.lcm);
+        if (rField_is_Ring(currRing)) 
+          pLmDelete(strat->P.lcm);
         else
-#else
           pLmFree(strat->P.lcm);
-#endif
         strat->P.lcm=NULL;
       }
 
@@ -1925,10 +1896,8 @@ loop_count = 1;
 //      ecartWeights=NULL;
 //    }
 //  }
-  #ifdef HAVE_RINGS
   if(nCoeff_is_Ring_Z(currRing->cf))
     finalReduceByMon(strat);
-  #endif
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
   SI_RESTORE_OPT1(save1);
   idTest(strat->Shdl);
@@ -2031,14 +2000,14 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   kTest(strat);
   if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
   if (BVERBOSE(23)) kDebugPrint(strat);
-  #ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
   {
     if (p!=NULL) p = redMoraNFRing(p,strat, lazyReduce & KSTD_NF_ECART);
   }
   else
-  #endif
+  {
     if (p!=NULL) p = redMoraNF(p,strat, lazyReduce & KSTD_NF_ECART);
+  }
   if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
   {
     if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
@@ -2174,21 +2143,17 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
           else assume(strat->sevS[j] == pGetShortExpVector(h.p));
           h.sev = strat->sevS[j];
           h.SetpFDeg();
-          #ifdef HAVE_RINGS
           if(rField_is_Ring(currRing) && rHasLocalOrMixedOrdering(currRing))
             enterT_strong(h,strat);
           else
-          #endif
             enterT(h,strat);
         }
         if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
-        #ifdef HAVE_RINGS
         if(rField_is_Ring(currRing))
         {
           p = redMoraNFRing(p,strat, lazyReduce & KSTD_NF_ECART);
         }
         else
-        #endif
           p = redMoraNF(p,strat, lazyReduce & KSTD_NF_ECART);
         if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
         {
@@ -2588,7 +2553,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
     printf("\nEnter the nice kSba loop\n");
     #endif
     //This is how we set the SBA algorithm;
-    int totalsbaruns = 1,blockedreductions = 10,blockred = 0,loops = 0;
+    int totalsbaruns = 1,blockedreductions = 20,blockred = 0,loops = 0;
     while(sigdrop && (loops < totalsbaruns || totalsbaruns == -1) 
                   && (blockred <= blockedreductions))
     {
@@ -2713,7 +2678,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
           #if ADIDEBUG
           printf("\nSBA Run %i: %i elements (syzCrit = %i,rewCrit = %i)\n",loops,IDELEMS(r),strat->nrsyzcrit,strat->nrrewcrit);
           idPrint(r);
-          getchar();
+          //getchar();
           #endif
         }
       }
@@ -2742,8 +2707,8 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
     {
       #if ADIDEBUG
       printf("\nWent to std\n");
-      //idPrint(r);
-      //getchar();
+      idPrint(r);
+      getchar();
       #endif
       r = kStd(r, Q, h, w, hilb, syzComp, newIdeal, vw);
     }

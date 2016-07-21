@@ -245,6 +245,10 @@ pWrite(PW->p);pWrite(PW->sig);
     if(rField_is_Ring(currRing))
     {
       pSetCoeff(sigMult,nMult(nDiv(pGetCoeff(PR->p),pGetCoeff(PW->p)), pGetCoeff(sigMult)));
+      if(nIsZero(pGetCoeff(sigMult)))
+      {
+        sigMult = NULL;
+      }
     }
 //#if 1
 #ifdef DEBUGF5
@@ -269,7 +273,8 @@ pWrite(PW->p);pWrite(PW->sig);
     {
       // Set the sig
       poly origsig = pCopy(PR->sig);
-      PR->sig = pHead(pSub(PR->sig, sigMult));
+      if(sigMult != NULL)
+        PR->sig = pHead(pSub(PR->sig, sigMult));
       //The sigs have the same lm, have to substract
       //It may happen that now the signature is 0 (drop)
       if(PR->sig == NULL)

@@ -108,14 +108,14 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
         if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
         {
-          if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r))
+          if(n_DivBy(p_GetCoeff(p,r), p_GetCoeff(T[j].p,r), r))
             return j;
         }
 #else
         if (!(sevT[j] & not_sev) &&
           p_LmDivisibleBy(T[j].p, p, r))
         {
-          if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r))
+          if(n_DivBy(p_GetCoeff(p,r), p_GetCoeff(T[j].p,r), r))
             return j;
         }
 #endif
@@ -211,7 +211,6 @@ int kFindDivisibleByInS(const kStrategy strat, int* max_ind, LObject* L)
   int ende=strat->sl;
 #endif
   (*max_ind)=ende;
-#ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
   {
     loop
@@ -236,7 +235,6 @@ int kFindDivisibleByInS(const kStrategy strat, int* max_ind, LObject* L)
     }
   }
   else
-#endif
   {
     loop
     {
@@ -271,7 +269,6 @@ int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObjec
 #else
   int ende=strat->sl;
 #endif
-#ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
   {
     loop
@@ -296,7 +293,6 @@ int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObjec
     }
   }
   else
-#endif
   {
     loop
     {
@@ -716,11 +712,10 @@ int redSig (LObject* h,kStrategy strat)
   printf("\nAfter sbaCheckGcdPair ");pWrite(h->p);
   #endif
   #endif
-  #ifdef HAVE_RINGS
   poly beforeredsig;
   if(rField_is_Ring(currRing)) 
     beforeredsig = pCopy(h->sig);
-  #endif
+    
   if (strat->tl<0) return 1;
   //if (h->GetLmTailRing()==NULL) return 0; // HS: SHOULD NOT BE NEEDED!
   //printf("FDEGS: %ld -- %ld\n",h->FDeg, h->pFDeg());
@@ -793,7 +788,6 @@ int redSig (LObject* h,kStrategy strat)
           h->Clear();
           return 0;
         }
-        #ifdef HAVE_RINGS
         if(rField_is_Ring(currRing))
         {
           //Check for sigdrop after reduction
@@ -826,7 +820,6 @@ int redSig (LObject* h,kStrategy strat)
           }
           p_Delete(&beforeredsig,currRing);
         }
-        #endif
         return 1;
       }
     }
@@ -1894,11 +1887,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
       {
         enterT(strat->P, strat);
-        #ifdef HAVE_RINGS
         if (rField_is_Ring(currRing))
           superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
         else
-        #endif
           enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
         // posInS only depends on the leading term
         strat->enterS(strat->P, pos, strat, strat->tl);
@@ -1939,11 +1930,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           // and add pairs
           int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
           enterT(strat->P, strat);
-          #ifdef HAVE_RINGS
           if (rField_is_Ring(currRing))
             superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
           else
-          #endif
             enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
           strat->enterS(strat->P, pos, strat, strat->tl);
         }
@@ -2000,7 +1989,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
   }
   else if (TEST_OPT_PROT) PrintLn();
-  #ifdef HAVE_RINGS
   if(nCoeff_is_Ring_Z(currRing->cf))
     finalReduceByMon(strat);
   if(rField_is_Ring(currRing))
@@ -2013,7 +2001,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
     }
   }
-  #endif
   /* release temp data-------------------------------- */
   exitBuchMora(strat);
 //  if (TEST_OPT_WEIGHTM)
@@ -2321,10 +2308,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     strat->P = strat->L[strat->Ll];
     strat->Ll--;
     
-    #ifdef HAVE_RINGS
     if(rField_is_Ring(currRing))
       strat->sbaEnterS = pGetComp(strat->P.sig) - 1;
-    #endif
     
     #if ADIDEBUG
     printf("\n-------------------------\nThis is the current element P\n");
@@ -2672,10 +2657,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         #endif
       // posInS only depends on the leading term
       
-      #ifdef HAVE_RINGS
       if(rField_is_Ring(currRing) && strat->sigdrop)
         break;
-      #endif
       strat->P.sevSig = p_GetShortExpVector(strat->P.sig,currRing);
       strat->enterS(strat->P, pos, strat, strat->tl);
       
@@ -2847,13 +2830,11 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #if SBA_PRINT_ZERO_REDUCTIONS
         zeroreductions++;
 #endif
-        #ifdef HAVE_RINGS
         if(rField_is_Ring(currRing) && strat->P.p == NULL && strat->P.sig == NULL)
         {
           //Catch the case when p = 0, sig = 0
         }
         else
-        #endif
         {
           int pos = posInSyz(strat, strat->P.sig);
           enterSyz(strat->P, strat, pos);
@@ -2883,7 +2864,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     printf("\nEnded with no SigDrop\n");
   #endif
 // Clean strat->P for the next sba call
-#ifdef HAVE_RINGS
   if(rField_is_Ring(currRing) && strat->sigdrop)
   {
     //This is used to know how many elements can we directly add to S in the next run
@@ -2894,7 +2874,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     memset(&(strat->P), 0, sizeof(strat->P));
     #endif /* KDEBUG */
   }
-#endif
 #ifdef KDEBUG
   if (TEST_OPT_DEBUG) messageSets(strat);
 #endif /* KDEBUG */
@@ -3015,11 +2994,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       strat->tailRing = currRing;
     rDelete (sRing);
   }
-  #ifdef HAVE_RINGS
-  //if(nCoeff_is_Ring_Z(currRing->cf))
-  //  finalReduceByMon(strat);
   if(rField_is_Ring(currRing) && !strat->sigdrop)
-  #endif
     id_DelDiv(strat->Shdl, currRing);
   idSkipZeroes(strat->Shdl);
   idTest(strat->Shdl);
@@ -3128,13 +3103,11 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
   {
     if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
-    #ifdef HAVE_RINGS
     if (rField_is_Ring(currRing))
     {
       p = redtailBba_Z(p,max_ind,strat);
     }
     else
-    #endif
     {
       si_opt_1 &= ~Sy_bit(OPT_INTSTRATEGY);
       p = redtailBba(p,max_ind,strat,(lazyReduce & KSTD_NF_NONORM)==0);
@@ -3201,13 +3174,11 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
       if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
       {
         if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
-        #ifdef HAVE_RINGS
         if (rField_is_Ring(currRing))
         {
           p = redtailBba_Z(p,max_ind,strat);
         }
         else
-        #endif
         {
           p = redtailBba(p,max_ind,strat,(lazyReduce & KSTD_NF_NONORM)==0);
         }
