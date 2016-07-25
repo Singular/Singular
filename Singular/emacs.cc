@@ -202,9 +202,9 @@ int main(int argc, char** argv)
   if (emacs == NULL)
   {
   #ifdef __CYGWIN__
-    error( "Error: Can't find rxvt program. \n Expected it at %s or %s\n Specify alternative with --rxvt=PROGRAM option,\n or set RXVT environment variable to the name of the program to use as xterm.\n",
+    error( "Error: Can't find rxvt program. \n Expected it at %s\n Specify alternative with --rxvt=PROGRAM option,\n or set RXVT environment variable to the name of the program to use as rxvt.\n",
   #else
-    error( "Error: Can't find xterm program. \n Expected it at %s or %s\n Specify alternative with --xterm=PROGRAM option,\n or set XTERM environment variable to the name of the program to use as xterm.\n",
+    error( "Error: Can't find xterm program. \n Expected it at %s\n Specify alternative with --xterm=PROGRAM option,\n or set XTERM environment variable to the name of the program to use as xterm.\n",
   #endif
            feResourceDefault('X'));
     mainUsage();
