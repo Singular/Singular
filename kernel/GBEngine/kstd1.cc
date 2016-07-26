@@ -11,8 +11,8 @@
 // define if buckets should be used
 #define MORA_USE_BUCKETS
 
-#define ADIDEBUG 0
-#define ADIDEBUG_NF 0
+//#define ADIDEBUG 0
+//#define ADIDEBUG_NF 0
 #define PRE_INTEGER_CHECK 0
 
 #include <kernel/mod2.h>
@@ -353,7 +353,7 @@ int redRiloc (LObject* h,kStrategy strat)
   long d,reddeg;
 
 
-#if ADIDEBUG_NF
+#ifdef ADIDEBUG_NF
   int iii;
   PrintS("\n---------------------------- NEW REDRILOC COMPUTATION ----------------------------\n");
   PrintS("    The pair h :\n");
@@ -375,13 +375,13 @@ int redRiloc (LObject* h,kStrategy strat)
   d = h->GetpFDeg()+ h->ecart;
   reddeg = strat->LazyDegree+d;
   h->SetShortExpVector();
-#if ADIDEBUG_NF
+#ifdef ADIDEBUG_NF
   Print("\n  Searching for a poly in T that divides h (of ecart %i) ...\n",h->ecart);
 #endif
   loop
   {
     j = kFindDivisibleByInT(strat, h);
-#if ADIDEBUG_NF
+#ifdef ADIDEBUG_NF
     if(j != -1)
     {
       ei = strat->T[j].ecart;
@@ -421,7 +421,7 @@ int redRiloc (LObject* h,kStrategy strat)
 
     ei = strat->T[j].ecart;
     ii = j;
-#if ADIDEBUG_NF
+#ifdef ADIDEBUG_NF
     iii=ii;
 #endif
     if (ei > h->ecart && ii < strat->tl)
@@ -452,7 +452,7 @@ int redRiloc (LObject* h,kStrategy strat)
 #endif
         {
           // the polynomial to reduce with is now
-          #if ADIDEBUG_NF
+          #ifdef ADIDEBUG_NF
           printf("\n    Intermidiate one, h.ecart = %i < ecart = %i < ei = %i: ",h->ecart,strat->T[i].ecart, ei);
           pWrite(strat->T[i].p);
           #endif
@@ -463,7 +463,7 @@ int redRiloc (LObject* h,kStrategy strat)
         }
       }
 
-#if ADIDEBUG_NF
+#ifdef ADIDEBUG_NF
       if(iii == ii)
       {
         PrintS("\n    None was found.\n");
@@ -480,7 +480,7 @@ int redRiloc (LObject* h,kStrategy strat)
     // end of search: have to reduce with pi
     if (ei > h->ecart)
     {
-      #if ADIDEBUG_NF
+      #ifdef ADIDEBUG_NF
       printf("\nHAD TO REDUCE WITH BIGGER ECART!!!\n");
       #endif
       // It is not possible to reduce h with smaller ecart;
@@ -517,7 +517,7 @@ int redRiloc (LObject* h,kStrategy strat)
     // are we done ???
     if (h->IsNull())
     {
-      #if ADIDEBUG_NF
+      #ifdef ADIDEBUG_NF
       printf("\nReduced to 0. Exit\n");
       #endif
       if (h->lcm!=NULL) pLmDelete(h->lcm);
@@ -538,7 +538,7 @@ int redRiloc (LObject* h,kStrategy strat)
     else
       // this has the side effect of setting h->length
       h->ecart = h->pLDeg(strat->LDegLast) - h->GetpFDeg();
-    #if ADIDEBUG_NF
+    #ifdef ADIDEBUG_NF
     printf("\n  Partial Reduced (ecart %i) h = ",h->ecart);p_Write(h->p,strat->tailRing);
     PrintLn();
     #endif
@@ -854,7 +854,7 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
       if (kModDeg(H.p)>Kstd1_deg) pLmDelete(&H.p);
       if (H.p==NULL) return NULL;
     }
-    #if ADIDEBUG_NF
+    #ifdef ADIDEBUG_NF
     printf("\nSearching for a reducer...\n");
     #endif
     if (p_LmShortDivisibleBy(strat->T[j].GetLmTailRing(), strat->sevT[j], H.GetLmTailRing(), not_sev, strat->tailRing)
@@ -866,7 +866,7 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
       int ei = strat->T[j].ecart;
       int li = strat->T[j].length;
       int ii = j;
-      #if ADIDEBUG_NF
+      #ifdef ADIDEBUG_NF
       printf("\nFound: j = %i, ecart = %i\nTrying to find a better one...\n",j,ei);pWrite(strat->T[j].p);
       #endif
       /*
@@ -894,7 +894,7 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
           ei = strat->T[j].ecart;
           li = strat->T[j].length;
           ii = j;
-          #if ADIDEBUG_NF
+          #ifdef ADIDEBUG_NF
           printf("\nFound a better one: j = %i, ecart = %i\nTrying to find a better one...\n",j,ei);
           pWrite(strat->T[j].p);
           #endif
@@ -915,7 +915,7 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
         * It is not possible to reduce h with smaller ecart;
         * we have to reduce with bad ecart: H has to enter in T
         */
-        #if ADIDEBUG_NF
+        #ifdef ADIDEBUG_NF
         printf("\nHAVE TO REDUCE IT WITH BIGGER ECART\n");
         #endif
         doRed(&H,&(strat->T[ii]),TRUE,strat,TRUE);
@@ -931,7 +931,7 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
         if (H.p == NULL)
           return NULL;
       }
-      #if ADIDEBUG_NF
+      #ifdef ADIDEBUG_NF
       printf("\nAfter the small reduction it looks like this:\n");pWrite(H.p);
       getchar();
       #endif
@@ -1603,7 +1603,7 @@ void kDebugPrint(kStrategy strat);
 ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 {
 #ifdef HAVE_RINGS
-#if ADIDEBUG
+#ifdef ADIDEBUG
 int loop_count;
 loop_count = 1;
 #endif
@@ -1668,7 +1668,7 @@ loop_count = 1;
   /*- compute-------------------------------------------*/
   while (strat->Ll >= 0)
   {
-    #if ADIDEBUG
+    #ifdef ADIDEBUG
     printf("\n      ------------------------NEW LOOP\n");
     printf("\nShdl = \n");
     for(int iii = 0; iii<= strat->sl; iii++)
@@ -1678,7 +1678,7 @@ loop_count = 1;
     }
     printf("\n   list   L has %i\n", strat->Ll);
     int iii;
-    #if ADIDEBUG
+    #ifdef ADIDEBUG
     for(iii = 0; iii<= strat->Ll; iii++)
     {
         printf("L[%i]:",iii);
@@ -1755,7 +1755,7 @@ loop_count = 1;
       if (TEST_OPT_PROT)
         message(strat->P.ecart+strat->P.GetpFDeg(),&olddeg,&reduc,strat, red_result);
       // reduce
-      #if ADIDEBUG
+      #ifdef ADIDEBUG
       printf("\nThis is P vor red:\n");p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.p1,strat->tailRing);p_Write(strat->P.p2,strat->tailRing);
       printf("\nBefore Ll = %i\n", strat->Ll);
       #endif
@@ -1763,7 +1763,7 @@ loop_count = 1;
         red_result = strat->red(&strat->P,strat);
       else
         red_result = strat->red(&strat->P,strat);
-      #if ADIDEBUG
+      #ifdef ADIDEBUG
       printf("\nThis is P nach red:\n");p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.p1,strat->tailRing);p_Write(strat->P.p2,strat->tailRing);
       printf("\nAfter Ll = %i\n", strat->Ll);
       #endif
@@ -1805,7 +1805,7 @@ loop_count = 1;
         enterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
       // put in S
 
-        #if ADIDEBUG
+        #ifdef ADIDEBUG
         Print("\n    The new pair list L -- after superenterpairs in loop %d -- is:\n",loop_count);
         for(int iii=0;iii<=strat->Ll;iii++)
         {
@@ -1818,7 +1818,7 @@ loop_count = 1;
       strat->enterS(strat->P,
                     posInS(strat,strat->sl,strat->P.p, strat->P.ecart),
                     strat, strat->tl);
-      #if ADIDEBUG
+      #ifdef ADIDEBUG
       printf("\nThis pair has been added to S:\n");
       pWrite(strat->P.p);
       pWrite(strat->P.p1);
@@ -2317,7 +2317,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
       if(pFmon != NULL)
       {
         idInsertPoly(FCopy, pFmon);
-        #if ADIDEBUG
+        #ifdef ADIDEBUG
         printf("\nPreintegerCheck found this constant:\n");pWrite(pFmon);
         #endif
 
@@ -2355,7 +2355,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
       }
       else
       {
-        #if ADIDEBUG
+        #ifdef ADIDEBUG
         printf("\npreIntegerCheck didn't found any new information\n");
         #endif
       }
@@ -2549,7 +2549,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
     r = idCopy(F);
     int sbaEnterS = -1;
     bool sigdrop = TRUE;
-    #if ADIDEBUG
+    #ifdef ADIDEBUG
     printf("\nEnter the nice kSba loop\n");
     #endif
     //This is how we set the SBA algorithm;
@@ -2675,7 +2675,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
           { 
             r=sba(r,Q,NULL,hilb,strat);
           }
-          #if ADIDEBUG
+          #ifdef ADIDEBUG
           printf("\nSBA Run %i: %i elements (syzCrit = %i,rewCrit = %i)\n",loops,IDELEMS(r),strat->nrsyzcrit,strat->nrrewcrit);
           idPrint(r);
           //getchar();
@@ -2696,7 +2696,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
       sigdrop = strat->sigdrop;
       sbaEnterS = strat->sbaEnterS;
       blockred = strat->blockred;
-      #if ADIDEBUG
+      #ifdef ADIDEBUG
       printf("\nsbaEnterS = %i\n",sbaEnterS);
       #endif
       delete(strat);
@@ -2705,7 +2705,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
     // Go to std
     if(sigdrop || blockred > blockedreductions)
     {
-      #if ADIDEBUG
+      #ifdef ADIDEBUG
       printf("\nWent to std\n");
       idPrint(r);
       getchar();

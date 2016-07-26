@@ -2987,18 +2987,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
          return FALSE;
        }
       else
-  /*==================== wait  =================*/
-       if (strcmp(sys_cmd, "wait") == 0)
-       {
-         if ((h!=NULL) && (h->Typ()==INT_CMD))
-         {
-           int ms = (int)((long)(h->Data()));
-           usleep(ms);
-         }
-         else return TRUE;
-         return FALSE;
-       }
-      else
   /*==================== F5 Implementation =================*/
   #ifdef HAVE_F5
       if (strcmp(sys_cmd, "f5")==0)
