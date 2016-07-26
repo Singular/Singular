@@ -667,53 +667,56 @@ proc sagbiAlg(ideal I,list #)
 RETURN: An ideal.The sagbi bases of I.
 EXAMPLE: example sagbiAlg;  shows an example
 {
-    def R=basering;
-    def O=changeord(list(list("Ds",nvars(R))));
-    setring O;
-    ideal I=imap(R,I);
-    ideal L;
-    poly h;
-    int z,n;
+  def R=basering;
+  def O=changeord(list(list("Ds",nvars(R))));
+  setring O;
+  ideal I=imap(R,I);
+  ideal L,S;
+  poly h;
+  int z,n;
 
-    if(size(I)==0){return(I);}
-    if(size(#)==0)
-    {
-       int b=ConductorBound(I);
+  if(size(I)==0){return(I);}
+  if(size(#)==0)
+  {
+    int b=ConductorBound(I);
+    S=interReduceSagbi(I,b) ;
+    b=ConductorBound(S);
     // int b=200;
-  //   b=correctBound(I,b);
-    }
-    else
-    {
-       int b=#[1];
-    }
-   ideal S=interReduceSagbi(I,b) ;
+    // b=correctBound(I,b);
+  }
+  else
+  {
+    int b=#[1];
+  }
+  S=interReduceSagbi(I,b) ;
   // b=correctBound(S,b);
-   while(size(S)!=n)
-   {
-       n=size(S);
-       L=sagbiSP(S);
-       for (z=1;z<=size(L);z++)
-       {
-             h=sagbiNF(L[z],S,b);
-             if(h!=0)
-             {
-                  S=insertOne(h,S,b);
-             }
-        }
-   }
-   setring R;
-   ideal S=imap(O,S);
-   return(S);
+  while(size(S)!=n)
+  {
+    n=size(S);
+    L=sagbiSP(S);
+    for (z=1;z<=size(L);z++)
+    {
+      h=sagbiNF(L[z],S,b);
+      if(h!=0)
+      {
+        S=insertOne(h,S,b);
+      }
+    }
+  }
+  setring R;
+  ideal S=imap(O,S);
+  return(S);
 }
 example
 {
   "EXAMPLE:"; echo=2;
-ring R=0,t,ds;
-ideal I=t8,t10+t13,t12+t15;
-sagbiAlg(I);
-I=t8,t10+t13,t12+2t15;
-sagbiAlg(I);
+  ring R=0,t,ds;
+  ideal I=t8,t10+t13,t12+t15;
+  sagbiAlg(I);
+  I=t8,t10+t13,t12+2t15;
+  sagbiAlg(I);
 }
+
 //////////////////////////////////////////////////////////////////////////////// NEU
 proc reducedSagbiAlg(ideal I,list #)
 {
