@@ -25,16 +25,17 @@ typedef std::map<long, TReducers_test> CReducersHash_test;
 
 static poly TraverseTail_test(poly multiplier, const int tail,
    const ideal m_idTails_test, const std::vector<bool> &m_lcm,
-   const CReducersHash_test *m_div);
+   const CReducersHash_test *m_div, const CReducersHash_test *m_checker);
 static poly ComputeImage_test(poly multiplier, const int tail,
     const ideal m_idTails_test, const std::vector<bool> &m_lcm,
-    const CReducersHash_test *m_div);
+    const CReducersHash_test *m_div, const CReducersHash_test *m_checker);
 static poly TraverseTail_test(poly multiplier, poly tail,
     const ideal m_idTails_test, const std::vector<bool> &m_lcm,
-    const CReducersHash_test *m_div);
+    const CReducersHash_test *m_div, const CReducersHash_test *m_checker);
 static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
     poly syztermCheck, const ideal m_idTails_test,
-    const std::vector<bool> &m_lcm, const CReducersHash_test *m_div);
+    const std::vector<bool> &m_lcm, const CReducersHash_test *m_div,
+    const CReducersHash_test *m_checker);
 static poly leadmonom_test(const poly p, const ring r, const bool bSetZeroComp = true);
 
 static std::vector<bool> CLCM_test_redefine(const ideal L)
@@ -71,15 +72,16 @@ bool CLCM_test_Check(const std::vector<bool> &clcm, const poly m)
 
 static poly TraverseNF_test(const poly a, ideal m_idLeads_test,
     const ideal m_idTails_test, const std::vector<bool> &m_lcm,
-    const CReducersHash_test *m_div)
+    const CReducersHash_test *m_div, const CReducersHash_test *m_checker)
 {
   const ideal& L = m_idLeads_test;
   const ring R = currRing;
   const int r = p_GetComp(a, R) - 1;
   poly aa = leadmonom_test(a, R);
-  poly t = TraverseTail_test(aa, r, m_idTails_test, m_lcm, m_div);
+  poly t = TraverseTail_test(aa, r, m_idTails_test, m_lcm, m_div, m_checker);
   t = p_Add_q(t,
-      ReduceTerm_test(aa, L->m[r], a, m_idTails_test, m_lcm, m_div), R);
+      ReduceTerm_test(aa, L->m[r], a, m_idTails_test, m_lcm, m_div, m_checker),
+      R);
   p_Delete(&aa, R);
   return t;
 }
@@ -136,7 +138,7 @@ static FORCE_INLINE poly myp_Head_test(const poly p, const bool bIgnoreCoeff,
 
 static poly TraverseTail_test(poly multiplier, const int tail,
     const ideal m_idTails_test, const std::vector<bool> &m_lcm,
-    const CReducersHash_test *m_div)
+    const CReducersHash_test *m_div, const CReducersHash_test *m_checker)
 {
   const ring& r = currRing;
 #if CACHE
@@ -158,8 +160,8 @@ static poly TraverseTail_test(poly multiplier, const int tail,
        }
        return p;
      }
-     const poly p
-         = ComputeImage_test(multiplier, tail, m_idTails_test, m_lcm, m_div);
+     const poly p = ComputeImage_test(multiplier, tail, m_idTails_test, m_lcm,
+         m_div, m_checker);
      itr = T.find(multiplier);
      if( itr == T.end() )
      {
@@ -170,8 +172,8 @@ static poly TraverseTail_test(poly multiplier, const int tail,
      return p;
   }
 #endif   // CACHE
-  const poly p
-      = ComputeImage_test(multiplier, tail, m_idTails_test, m_lcm, m_div);
+  const poly p = ComputeImage_test(multiplier, tail, m_idTails_test, m_lcm,
+      m_div, m_checker);
 #if CACHE
   top_itr = m_cache_test.find(tail);
   if ( top_itr != m_cache_test.end() )
@@ -199,13 +201,13 @@ static poly TraverseTail_test(poly multiplier, const int tail,
 
 static poly ComputeImage_test(poly multiplier, const int tail,
     const ideal m_idTails_test, const std::vector<bool> &m_lcm,
-    const CReducersHash_test *m_div)
+    const CReducersHash_test *m_div, const CReducersHash_test *m_checker)
 {
   const poly t = m_idTails_test->m[tail];
   if(t != NULL)
   {
-    const poly p
-        = TraverseTail_test(multiplier, t, m_idTails_test, m_lcm, m_div);
+    const poly p = TraverseTail_test(multiplier, t, m_idTails_test, m_lcm,
+        m_div, m_checker);
     return p;
   }
   return NULL;
@@ -219,7 +221,7 @@ static poly ComputeImage_test(poly multiplier, const int tail,
 
 static poly TraverseTail_test(poly multiplier, poly tail,
     const ideal m_idTails_test, const std::vector<bool> &m_lcm,
-    const CReducersHash_test *m_div)
+    const CReducersHash_test *m_div, const CReducersHash_test *m_checker)
 {
   const ring r = currRing;
   if( !CLCM_test_Check(m_lcm, multiplier) )
@@ -235,8 +237,8 @@ static poly TraverseTail_test(poly multiplier, poly tail,
 #endif   // BUCKETS
   for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
   {
-    const poly rt
-        = ReduceTerm_test(multiplier, p, NULL, m_idTails_test, m_lcm, m_div);
+    const poly rt = ReduceTerm_test(multiplier, p, NULL, m_idTails_test, m_lcm,
+        m_div, m_checker);
 #if BUCKETS == 0
     sum.Add(rt);
 #elif BUCKETS == 1
@@ -324,20 +326,10 @@ static void deleteCRH(CReducersHash_test *C)
     C->erase(C->begin(), C->end());
 }
 
-static void initialize(CReducersHash_test &C, const ideal L);
-
-static void redefine(CReducersHash_test *C, const ideal L)
-{
-    deleteCRH(C);
-    initialize(*C, L);
-}
-
-static CReducersHash_test m_checker;
-
 bool IsDivisible(const CReducersHash_test *C, const poly product);
 
 poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
-    const CReducersHash_test &syz_checker, const CReducersHash_test *m_div)
+    const CReducersHash_test *syz_checker, const CReducersHash_test *m_div)
 {
   const ring r = currRing;
   CReducersHash_test::const_iterator m_itr
@@ -353,7 +345,7 @@ poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
   long c = 0;
   if (syzterm != NULL)
     c = p_GetComp(syzterm, r) - 1;
-  const BOOLEAN to_check = !syz_checker.empty();
+  const BOOLEAN to_check = !syz_checker->empty();
   const poly q = p_New(r);
   pNext(q) = NULL;
   const unsigned long m_not_sev = ~p_GetShortExpVector(multiplier, t, r);
@@ -379,7 +371,7 @@ poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
     if (p_ExpVectorEqual(syzterm, q, r)) {
       continue;
     }
-    if (to_check && IsDivisible(&syz_checker, q)) {
+    if (to_check && IsDivisible(syz_checker, q)) {
       continue;
     }
     number n = n_Mult(p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
@@ -411,7 +403,8 @@ bool IsDivisible(const CReducersHash_test *C, const poly product)
 
 static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
     poly syztermCheck, const ideal m_idTails_test,
-    const std::vector<bool> &m_lcm, const CReducersHash_test *m_div)
+    const std::vector<bool> &m_lcm, const CReducersHash_test *m_div,
+    const CReducersHash_test *m_checker)
 {
   const ring r = currRing;
   poly s = NULL;
@@ -426,7 +419,8 @@ static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
   }
   poly b = leadmonom_test(s, r);
   const int c = p_GetComp(s, r) - 1;
-  const poly t = TraverseTail_test(b, c, m_idTails_test, m_lcm, m_div);
+  const poly t
+      = TraverseTail_test(b, c, m_idTails_test, m_lcm, m_div, m_checker);
   pDelete(&b);
   if( t != NULL )
     s = p_Add_q(s, t, r);
@@ -630,7 +624,6 @@ static ideal computeFrame(const ideal G, const syzM_i_Function syzM_i,
 static void setGlobalVariables(const resolvente res, const int index,
     const ideal m_idLeads_test, const ideal m_syzLeads_test)
 {
-    redefine(&m_checker, m_syzLeads_test);
 #if CACHE
     for (TCache_test::iterator it = m_cache_test.begin();
         it != m_cache_test.end(); it++) {
@@ -668,15 +661,18 @@ static void computeLiftings(const resolvente res, const int index)
         pDelete(&m_syzLeads_test->m[i]->next);
         m_syzLeads_test->m[i]->next = NULL;
     }
+    CReducersHash_test m_checker;
+    initialize(m_checker, m_syzLeads_test);
     setGlobalVariables(res, index, m_idLeads_test, m_syzLeads_test);
     poly p;
     for (int j = res[index]->ncols-1; j >= 0; j--) {
         p = res[index]->m[j];
         pDelete(&res[index]->m[j]->next);
         p->next = NULL;
-        res[index]->m[j]->next
-            = TraverseNF_test(p, m_idLeads_test, m_idTails_test, m_lcm, &m_div);
+        res[index]->m[j]->next = TraverseNF_test(p, m_idLeads_test,
+            m_idTails_test, m_lcm, &m_div, &m_checker);
     }
+    deleteCRH(&m_checker);
     deleteCRH(&m_div);
     m_lcm.clear();
     idDelete(&m_idLeads_test);
@@ -743,8 +739,6 @@ syStrategy syFrank(const ideal arg, int &length, const char *method)
     }
     length = computeResolution(res, length, syzHead);
     sortPolys(res, length);
-
-    deleteCRH(&m_checker);
 #if CACHE
     for (TCache_test::iterator it = m_cache_test.begin();
         it != m_cache_test.end(); it++) {
