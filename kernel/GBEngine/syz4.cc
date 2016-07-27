@@ -622,6 +622,7 @@ static void setGlobalVariables(const resolvente res, const int index)
         m_idLeads_test->m[i]->next = NULL;
     }
     redefine(&m_div, m_idLeads_test);
+    m_lcm.clear();
     m_lcm = CLCM_test_redefine(m_idLeads_test);
     m_syzLeads_test = idCopy(res[index]);
     for (int i = IDELEMS(res[index])-1; i >= 0; i--) {
@@ -725,6 +726,21 @@ syStrategy syFrank(const ideal arg, int &length, const char *method)
     idDelete(&m_idLeads_test);
     idDelete(&m_idTails_test);
     idDelete(&m_syzLeads_test);
+    m_lcm.clear();
+    deleteCRH(&m_checker);
+    deleteCRH(&m_div);
+#if CACHE
+    for (TCache_test::iterator it = m_cache_test.begin();
+        it != m_cache_test.end(); it++) {
+        TP2PCache_test& T = it->second;
+        for (TP2PCache_test::iterator vit = T.begin(); vit != T.end(); vit++) {
+            p_Delete((&(vit->second)), currRing);
+            p_Delete(const_cast<poly*>(&(vit->first)), currRing);
+        }
+        T.erase(T.begin(), T.end());
+    }
+    m_cache_test.erase(m_cache_test.begin(), m_cache_test.end());
+#endif   // CACHE
 
     result->fullres = res;
     result->length = length+1;
