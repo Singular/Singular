@@ -632,9 +632,7 @@ void nfReadTable(const int c, const coeffs r)
 
   if (fftable[i]==0)
   {
-#ifndef SING_NDEBUG
-    Warn("illegal GF-table size: %d", c);
-#endif
+    // illegal GF-table size: c
     return;
   }
 
@@ -953,9 +951,6 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
 
   if( r->m_nfPlus1Table == NULL )
   {
-#ifndef SING_NDEBUG
-    Warn("Sorry: cannot init lookup table!");
-#endif
     return TRUE;
   }
 

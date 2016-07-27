@@ -5631,8 +5631,7 @@ ring rInit(leftv pn, leftv rv, leftv ord)
       }
     }
 
-//    if (cf==NULL) goto rInitError;
-    assume( cf != NULL );
+    //if (cf==NULL) ->Error: Invalid ground field specification
   }
   else if ((pn->name != NULL)
   && ((strcmp(pn->name,"real")==0) || (strcmp(pn->name,"complex")==0)))
@@ -5784,8 +5783,9 @@ ring rInit(leftv pn, leftv rv, leftv ord)
   }
   else
   {
-    Werror("Wrong or unknown ground field specification");
-#ifndef SING_NDEBUG
+    WerrorS("Wrong or unknown ground field specification");
+#if 0 
+// debug stuff for unknown cf descriptions:
     sleftv* p = pn;
     while (p != NULL)
     {
