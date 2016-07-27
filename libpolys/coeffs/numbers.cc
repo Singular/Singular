@@ -260,13 +260,13 @@ static number  ndExtGcd (number, number, number *, number *, const coeffs r) { r
 static CanonicalForm ndConvSingNFactoryN( number, BOOLEAN /*setChar*/, const coeffs)
 {
   CanonicalForm term(0);
-  Werror("no conversion to factory");
+  WerrorS("no conversion to factory");
   return term;
 }
 
 static number ndConvFactoryNSingN( const CanonicalForm, const coeffs)
 {
-  Werror("no conversion from factory");
+  WerrorS("no conversion from factory");
   return NULL;
 }
 

@@ -32,7 +32,7 @@ void* pyobject_autoload(blackbox* bbx)
 
 void pyobject_default_destroy(blackbox  */*b*/, void */*d*/)
 {
-  Werror("Python-based functionality not available!");
+  WerrorS("Python-based functionality not available!");
 }
 
 // Setting up an empty blackbox type, which can be filled with pyobject

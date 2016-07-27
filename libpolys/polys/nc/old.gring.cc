@@ -1464,7 +1464,7 @@ poly gnc_ReduceSpolyNew(const poly p1, poly p2, const ring r)
   if ((lCompP1!=lCompP2) && (lCompP1!=0) && (lCompP2!=0))
   {
 #ifdef PDEBUG
-    Werror("gnc_ReduceSpolyNew: different non-zero components!");
+    WerrorS("gnc_ReduceSpolyNew: different non-zero components!");
 #endif
     return(NULL);
   }
@@ -1632,7 +1632,7 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
   if ((lCompP1!=lCompP2) && (lCompP1!=0) && (lCompP2!=0))
   {
 #ifdef PDEBUG
-    Werror("gnc_CreateSpolyNew: different non-zero components!");
+    WerrorS("gnc_CreateSpolyNew: different non-zero components!");
     assume(0);
 #endif
     return(NULL);
@@ -1742,7 +1742,7 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
        Print("m2 = ");
        p_Write(m2, r);
 
-       Werror("ERROR in nc_CreateSpoly: result of multiplication is Zero!\n");
+       WerrorS("ERROR in nc_CreateSpoly: result of multiplication is Zero!\n");
 #endif
        return(NULL);
   }
@@ -1949,7 +1949,7 @@ poly nc_CreateShortSpoly(poly p1, poly p2, const ring r)
   if ((lCompP1!=lCompP2) && (lCompP1!=0) && (lCompP2!=0))
   {
 #ifdef PDEBUG
-    Werror("nc_CreateShortSpoly: wrong module components!"); // !!!!
+    WerrorS("nc_CreateShortSpoly: wrong module components!"); // !!!!
 #endif
     return(NULL);
   }
@@ -2018,7 +2018,7 @@ void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c)
 #endif
 
 #ifdef KDEBUG
-  if( !kbTest(b) )Werror("nc_kBucketPolyRed: broken bucket!");
+  if( !kbTest(b) ) WerrorS("nc_kBucketPolyRed: broken bucket!");
 #endif
 
 #ifdef PDEBUG
@@ -2597,7 +2597,7 @@ poly nc_p_CopyGet(poly a, const ring r)
 //  if (r != currRing)
 //  {
 //#ifdef PDEBUF
-//    Werror("nc_p_CopyGet call not in currRing");
+//    WerrorS("nc_p_CopyGet call not in currRing");
 //#endif
 //    return(NULL);
 //  }
@@ -2618,7 +2618,7 @@ poly nc_p_CopyPut(poly a, const ring r)
 //  if (r != currRing)
 //  {
 //#ifdef PDEBUF
-//    Werror("nc_p_CopyGet call not in currRing");
+//    WerrorS("nc_p_CopyGet call not in currRing");
 //#endif
 //    return(NULL);
 //  }
@@ -2878,7 +2878,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
   {
     if (!p_IsConstant(CN,curr))
     {
-      Werror("Incorrect input : non-constants are not allowed as coefficients (first argument)");
+      WerrorS("Incorrect input : non-constants are not allowed as coefficients (first argument)");
       return TRUE;
     }
     assume(p_IsConstant(CN,curr));
@@ -2886,7 +2886,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
     nN = p_GetCoeff(CN, curr);
     if (n_IsZero(nN, curr))
     {
-      Werror("Incorrect input : zero coefficients are not allowed");
+      WerrorS("Incorrect input : zero coefficients are not allowed");
 
 //      if( currRing != save )
 //        rChangeCurrRing(save);
@@ -2944,7 +2944,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
         if ( qN == NULL )   /* check the consistency: Cij!=0 */
         // find also illegal pN
         {
-          Werror("Incorrect input : matrix of coefficients contains zeros in the upper triangle");
+          WerrorS("Incorrect input : matrix of coefficients contains zeros in the upper triangle");
 
 //        if( currRing != save )
 //            rChangeCurrRing(save);
@@ -3045,7 +3045,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
     if( bCnew ) mp_Delete( &C, r );
     if( bDnew ) mp_Delete( &D, r );
 
-    Werror("Matrix of polynomials violates the ordering condition");
+    WerrorS("Matrix of polynomials violates the ordering condition");
 
 //    if( currRing != save )
 //      rChangeCurrRing(save);
@@ -3385,7 +3385,7 @@ poly p_CopyEmbed(poly p, ring srcRing, int shift, int /*par_shift*/, ring dstRin
     //    }
     if ((shift<0) || (shift > rVar(srcRing))) // ???
     {
-      Werror("bad shifts in p_CopyEmbed");
+      WerrorS("bad shifts in p_CopyEmbed");
       return(0);
     }
     for (i=1; i<= srcRing->N; i++)

@@ -833,7 +833,7 @@ BOOLEAN iiLoadLIB(FILE *fp, const char *libnamebuf, const char*newlib,
     }
     else
       Werror(yylp_errlist[yylp_errno], yylplineno);
-    Werror("Cannot load library,... aborting.");
+    WerrorS("Cannot load library,... aborting.");
     reinit_yylp();
     fclose( yylpin );
     iiCleanProcs(IDROOT);

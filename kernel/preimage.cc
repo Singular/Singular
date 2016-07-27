@@ -69,7 +69,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
   {
     if ((rIsPluralRing(sourcering)) && (ncRingType(sourcering)!=nc_comm))
     {
-      Werror("Sorry, not yet implemented for noncomm. rings");
+      WerrorS("Sorry, not yet implemented for noncomm. rings");
       return NULL;
     }
   }
@@ -95,7 +95,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
   if (theImageRing->cf != dst_r->cf)
   {
     /// TODO: there might be extreme cases where this doesn't hold...
-    Werror("Coefficient fields/rings must be equal");
+    WerrorS("Coefficient fields/rings must be equal");
     return NULL;
   }
 

@@ -183,7 +183,7 @@ BOOLEAN slWriteAscii(si_link l, leftv v)
       }
       else
       {
-        Werror("cannot convert to string");
+        WerrorS("cannot convert to string");
         err=TRUE;
       }
     }
@@ -530,7 +530,7 @@ BOOLEAN slGetDumpAscii(si_link l)
 {
   if (l->name[0] == '\0')
   {
-    Werror("getdump: Can not get dump from stdin");
+    WerrorS("getdump: Can not get dump from stdin");
     return TRUE;
   }
   else

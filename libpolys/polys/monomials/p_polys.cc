@@ -3877,7 +3877,7 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
   else
   {
     assume (FALSE);
-    Werror("Number permutation is not implemented for this data yet!");
+    WerrorS("Number permutation is not implemented for this data yet!");
     return NULL;
   }
 

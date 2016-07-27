@@ -374,7 +374,7 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
             {
               res->data=(void *)currRing; r=currRing;
               if (r!=NULL) r->ref++;
-              else Werror("ring of this member is not set and no basering found");
+              else WerrorS("ring of this member is not set and no basering found");
             }
             return r==NULL;
           }

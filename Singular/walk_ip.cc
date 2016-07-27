@@ -123,7 +123,7 @@ walkProc(leftv first, leftv second)
           break;
 
         case WalkIncompatibleDestRing:
-          Werror( "Order of basering not allowed,\n must be a combination of a,A,lp,dp,Dp,wp,Wp,M and C.\n");
+          WerrorS( "Order of basering not allowed,\n must be a combination of a,A,lp,dp,Dp,wp,Wp,M and C.\n");
           destIdeal= NULL;
           break;
 
@@ -140,7 +140,7 @@ walkProc(leftv first, leftv second)
           break;
 
         case WalkOverFlowError:
-          Werror( "Overflow occurred.\n");
+          WerrorS( "Overflow occurred.\n");
           destIdeal= NULL;
           break;
 

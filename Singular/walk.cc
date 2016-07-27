@@ -5530,14 +5530,14 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
   //check that weight radius is valid
   if(weight_rad < 0)
   {
-    Werror("Invalid radius.\n");
+    WerrorS("Invalid radius.\n");
     return NULL;
   }
 
   //check that perturbation degree is valid
   if(pert_deg > nV || pert_deg < 1)
   {
-    Werror("Invalid perturbation degree.\n");
+    WerrorS("Invalid perturbation degree.\n");
     return NULL;
   }
 
@@ -5875,7 +5875,7 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
   //check that perturbation degree is valid
   if(op_deg < 1 || tp_deg < 1 || op_deg > nV || tp_deg > nV)
   {
-    Werror("Invalid perturbation degree.\n");
+    WerrorS("Invalid perturbation degree.\n");
     return NULL;
   }
 
@@ -6310,14 +6310,14 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
   //check that weight radius is valid
   if(weight_rad < 0)
   {
-    Werror("Invalid radius.\n");
+    WerrorS("Invalid radius.\n");
     return NULL;
   }
 
   //check that perturbation degree is valid
   if(op_deg < 1 || tp_deg < 1 || op_deg > nV || tp_deg > nV)
   {
-    Werror("Invalid perturbation degree.\n");
+    WerrorS("Invalid perturbation degree.\n");
     return NULL;
   }
 
@@ -8112,7 +8112,7 @@ ideal Mfrwalk(ideal G, intvec* ivstart, intvec* ivtarget,
   //check that weight radius is valid
   if(weight_rad < 0)
   {
-    Werror("Invalid radius.\n");
+    WerrorS("Invalid radius.\n");
     return NULL;
   }
   if(reduction == 0)
@@ -9218,7 +9218,7 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
   //check that perturbation degree is valid
   if(tp_deg < 1 || tp_deg > nV)
   {
-    Werror("Invalid perturbation degree.\n");
+    WerrorS("Invalid perturbation degree.\n");
     return NULL;
   }
 

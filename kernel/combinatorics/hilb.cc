@@ -69,7 +69,7 @@ static void hHilbEst(scfmon stc, int Nstc, varset var, int Nvar)
     {
       if (z>(MAX_INT_VAL)/2)
       {
-       Werror("interal arrays too big");
+       WerrorS("interal arrays too big");
        return;
       }
       p = (int *)omAlloc((unsigned long)z * sizeof(int));
@@ -257,7 +257,7 @@ static bool idDegSortTest(ideal I)
         if(DegMon(I->m[i])>DegMon(I->m[i+1]))
         {
             idPrint(I);
-            Werror("Ideal is not deg sorted!!");
+            WerrorS("Ideal is not deg sorted!!");
             return(FALSE);
         }
     }

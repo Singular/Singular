@@ -350,7 +350,7 @@ poly nc_rat_CreateSpoly(poly pp1, poly pp2, int ishift, const ring r)
   if ((lCompP1!=lCompP2) && (lCompP1!=0) && (lCompP2!=0))
   {
 #ifdef PDEBUG
-    Werror("nc_rat_CreateSpoly: different non-zero components!");
+    WerrorS("nc_rat_CreateSpoly: different non-zero components!");
 #endif
     return(NULL);
   }
@@ -471,7 +471,7 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
   if ((lCompP1!=lCompP2) && (lCompP1!=0) && (lCompP2!=0))
   {
 #ifdef PDEBUG
-    Werror("nc_rat_ReduceSpolyNew: different non-zero components!");
+    WerrorS("nc_rat_ReduceSpolyNew: different non-zero components!");
 #endif
     return(NULL);
   }

@@ -75,7 +75,7 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
         int d2 = zq->ambientDimension();
         if (d1 != d2)
         {
-          Werror("mismatching ambient dimensions");
+          WerrorS("mismatching ambient dimensions");
           return TRUE;
         }
         gfan::ZCone* zs = new gfan::ZCone();
@@ -96,7 +96,7 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
         int d2 = zq->ambientDimension();
         if (d1 != d2)
         {
-          Werror("mismatching ambient dimensions");
+          WerrorS("mismatching ambient dimensions");
           return TRUE;
         }
         gfan::ZMatrix rays = zp->extremeRays();

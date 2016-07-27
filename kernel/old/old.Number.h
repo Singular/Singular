@@ -71,7 +71,7 @@ class Number{
   }
   Number& operator+=(const Number & n2){
     if (r!=n2.r){
-      Werror("not the same ring");
+      WerrorS("not the same ring");
       return *this;
     }
     number nv=n_Add(n,n2.n,r.get());
@@ -81,7 +81,7 @@ class Number{
   }
   Number& operator*=(const Number & n2){
     if (r!=n2.r){
-      Werror("not the same ring");
+      WerrorS("not the same ring");
       return *this;
     }
     number nv=n_Mult(n,n2.n,r.get());
@@ -91,7 +91,7 @@ class Number{
   }
   Number& operator-=(const Number & n2){
     if (r!=n2.r){
-      Werror("not the same ring");
+      WerrorS("not the same ring");
       return *this;
     }
     number nv=n_Sub(n,n2.n,r.get());
@@ -101,7 +101,7 @@ class Number{
   }
   Number& operator/=(const Number & n2){
     if (r!=n2.r){
-      Werror("not the same ring");
+      WerrorS("not the same ring");
       return *this;
     }
     number nv=n_Div(n,n2.n,r.get());

@@ -1519,7 +1519,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   {
     if ( nc_rComplete(origR, tmpR, false) ) // no quotient ideal!
     {
-      Werror("no elimination is possible: ordering condition is violated");
+      WerrorS("no elimination is possible: ordering condition is violated");
       // cleanup
       rDelete(tmpR);
       if (w!=NULL)

@@ -45,7 +45,7 @@ poly p_SubstPoly (poly p, int var, poly image, const ring preimage_r, const ring
     if((image_r!=preimage_r)
     ||(preimage_r!=currRing))
     {
-      Werror("not implemented");
+      WerrorS("not implemented");
       return NULL;
     }
     return pSubst(pCopy(p),var,image);
