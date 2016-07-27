@@ -14,15 +14,15 @@
 #include <vector>
 #include <map>
 
-static poly TraverseTail_test(poly multiplier, const int tail);
-static poly ComputeImage_test(poly multiplier, const int tail);
-static poly TraverseTail_test(poly multiplier, poly tail);
-static poly ReduceTerm_test(poly multiplier, poly term4reduction, poly syztermCheck);
+static poly TraverseTail_test(poly multiplier, const int tail,
+   const ideal m_idTails_test);
+static poly ComputeImage_test(poly multiplier, const int tail,
+    const ideal m_idTails_test);
+static poly TraverseTail_test(poly multiplier, poly tail,
+    const ideal m_idTails_test);
+static poly ReduceTerm_test(poly multiplier, poly term4reduction,
+    poly syztermCheck, const ideal m_idTails_test);
 static poly leadmonom_test(const poly p, const ring r, const bool bSetZeroComp = true);
-
-static ideal m_idLeads_test;
-static ideal m_idTails_test;
-static ideal m_syzLeads_test;
 
 static std::vector<bool> CLCM_test_redefine(const ideal L)
 {
@@ -58,14 +58,15 @@ bool CLCM_test_Check(const std::vector<bool> &clcm, const poly m)
 
 static std::vector<bool> m_lcm;
 
-static poly TraverseNF_test(const poly a)
+static poly TraverseNF_test(const poly a, ideal m_idLeads_test,
+    const ideal m_idTails_test)
 {
   const ideal& L = m_idLeads_test;
   const ring R = currRing;
   const int r = p_GetComp(a, R) - 1;
   poly aa = leadmonom_test(a, R);
-  poly t = TraverseTail_test(aa, r);
-  t = p_Add_q(t, ReduceTerm_test(aa, L->m[r], a), R);
+  poly t = TraverseTail_test(aa, r, m_idTails_test);
+  t = p_Add_q(t, ReduceTerm_test(aa, L->m[r], a, m_idTails_test), R);
   p_Delete(&aa, R);
   return t;
 }
@@ -120,7 +121,8 @@ static FORCE_INLINE poly myp_Head_test(const poly p, const bool bIgnoreCoeff,
 }
 #endif   // CACHE
 
-static poly TraverseTail_test(poly multiplier, const int tail)
+static poly TraverseTail_test(poly multiplier, const int tail,
+    const ideal m_idTails_test)
 {
   const ring& r = currRing;
 #if CACHE
@@ -142,7 +144,7 @@ static poly TraverseTail_test(poly multiplier, const int tail)
        }
        return p;
      }
-     const poly p = ComputeImage_test(multiplier, tail);
+     const poly p = ComputeImage_test(multiplier, tail, m_idTails_test);
      itr = T.find(multiplier);
      if( itr == T.end() )
      {
@@ -153,7 +155,7 @@ static poly TraverseTail_test(poly multiplier, const int tail)
      return p;
   }
 #endif   // CACHE
-  const poly p = ComputeImage_test(multiplier, tail);
+  const poly p = ComputeImage_test(multiplier, tail, m_idTails_test);
 #if CACHE
   top_itr = m_cache_test.find(tail);
   if ( top_itr != m_cache_test.end() )
@@ -179,12 +181,13 @@ static poly TraverseTail_test(poly multiplier, const int tail)
 #endif   // CACHE
 }
 
-static poly ComputeImage_test(poly multiplier, const int tail)
+static poly ComputeImage_test(poly multiplier, const int tail,
+    const ideal m_idTails_test)
 {
   const poly t = m_idTails_test->m[tail];
   if(t != NULL)
   {
-    const poly p = TraverseTail_test(multiplier, t);
+    const poly p = TraverseTail_test(multiplier, t, m_idTails_test);
     return p;
   }
   return NULL;
@@ -196,7 +199,8 @@ static poly ComputeImage_test(poly multiplier, const int tail)
  * 2: use Singular's polynomial arithmetic
  */
 
-static poly TraverseTail_test(poly multiplier, poly tail)
+static poly TraverseTail_test(poly multiplier, poly tail,
+    const ideal m_idTails_test)
 {
   const ring r = currRing;
   if( !CLCM_test_Check(m_lcm, multiplier) )
@@ -212,7 +216,7 @@ static poly TraverseTail_test(poly multiplier, poly tail)
 #endif   // BUCKETS
   for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
   {
-    const poly rt = ReduceTerm_test(multiplier, p, NULL);
+    const poly rt = ReduceTerm_test(multiplier, p, NULL, m_idTails_test);
 #if BUCKETS == 0
     sum.Add(rt);
 #elif BUCKETS == 1
@@ -395,7 +399,8 @@ bool IsDivisible(const CReducersHash_test *C, const poly product)
     return false;
 }
 
-static poly ReduceTerm_test(poly multiplier, poly term4reduction, poly syztermCheck)
+static poly ReduceTerm_test(poly multiplier, poly term4reduction,
+    poly syztermCheck, const ideal m_idTails_test)
 {
   const ring r = currRing;
   poly s = NULL;
@@ -409,7 +414,7 @@ static poly ReduceTerm_test(poly multiplier, poly term4reduction, poly syztermCh
   }
   poly b = leadmonom_test(s, r);
   const int c = p_GetComp(s, r) - 1;
-  const poly t = TraverseTail_test(b, c);
+  const poly t = TraverseTail_test(b, c, m_idTails_test);
   pDelete(&b);
   if( t != NULL )
     s = p_Add_q(s, t, r);
@@ -610,25 +615,12 @@ static ideal computeFrame(const ideal G, const syzM_i_Function syzM_i,
     return frame;
 }
 
-static void setGlobalVariables(const resolvente res, const int index)
+static void setGlobalVariables(const resolvente res, const int index,
+    const ideal m_idLeads_test, const ideal m_syzLeads_test)
 {
-    idDelete(&m_idLeads_test);
-    idDelete(&m_idTails_test);
-    idDelete(&m_syzLeads_test);
-    m_idLeads_test = idCopy(res[index-1]);
-    m_idTails_test = idInit(IDELEMS(res[index-1]), res[index-1]->rank);
-    for (int i = IDELEMS(res[index-1])-1; i >= 0; i--) {
-        m_idTails_test->m[i] = m_idLeads_test->m[i]->next;
-        m_idLeads_test->m[i]->next = NULL;
-    }
     redefine(&m_div, m_idLeads_test);
     m_lcm.clear();
     m_lcm = CLCM_test_redefine(m_idLeads_test);
-    m_syzLeads_test = idCopy(res[index]);
-    for (int i = IDELEMS(res[index])-1; i >= 0; i--) {
-        pDelete(&m_syzLeads_test->m[i]->next);
-        m_syzLeads_test->m[i]->next = NULL;
-    }
     redefine(&m_checker, m_syzLeads_test);
 #if CACHE
     for (TCache_test::iterator it = m_cache_test.begin();
@@ -653,14 +645,29 @@ static void computeLiftings(const resolvente res, const int index)
         liftTree(res[index]->m[j], res[index-1]);
     }
 #else
-    setGlobalVariables(res, index);
+    ideal m_idLeads_test = idCopy(res[index-1]);
+    ideal m_idTails_test = idInit(IDELEMS(res[index-1]), res[index-1]->rank);
+    for (int i = IDELEMS(res[index-1])-1; i >= 0; i--) {
+        m_idTails_test->m[i] = m_idLeads_test->m[i]->next;
+        m_idLeads_test->m[i]->next = NULL;
+    }
+    ideal m_syzLeads_test = idCopy(res[index]);
+    for (int i = IDELEMS(res[index])-1; i >= 0; i--) {
+        pDelete(&m_syzLeads_test->m[i]->next);
+        m_syzLeads_test->m[i]->next = NULL;
+    }
+    setGlobalVariables(res, index, m_idLeads_test, m_syzLeads_test);
     poly p;
     for (int j = res[index]->ncols-1; j >= 0; j--) {
         p = res[index]->m[j];
         pDelete(&res[index]->m[j]->next);
         p->next = NULL;
-        res[index]->m[j]->next = TraverseNF_test(p);
+        res[index]->m[j]->next
+            = TraverseNF_test(p, m_idLeads_test, m_idTails_test);
     }
+    idDelete(&m_idLeads_test);
+    idDelete(&m_idTails_test);
+    idDelete(&m_syzLeads_test);
 #endif   // MYLIFT
 }
 
@@ -723,9 +730,6 @@ syStrategy syFrank(const ideal arg, int &length, const char *method)
     length = computeResolution(res, length, syzHead);
     sortPolys(res, length);
 
-    idDelete(&m_idLeads_test);
-    idDelete(&m_idTails_test);
-    idDelete(&m_syzLeads_test);
     m_lcm.clear();
     deleteCRH(&m_checker);
     deleteCRH(&m_div);
