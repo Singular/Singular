@@ -616,7 +616,7 @@ static void setGlobalVariables(const resolvente res, const int index)
     idDelete(&m_idTails_test);
     idDelete(&m_syzLeads_test);
     m_idLeads_test = idCopy(res[index-1]);
-    m_idTails_test = idInit(IDELEMS(res[index-1]), 1);
+    m_idTails_test = idInit(IDELEMS(res[index-1]), res[index-1]->rank);
     for (int i = IDELEMS(res[index-1])-1; i >= 0; i--) {
         m_idTails_test->m[i] = m_idLeads_test->m[i]->next;
         m_idLeads_test->m[i]->next = NULL;
