@@ -242,8 +242,8 @@ void NFL(Poly *p, TreeM *F)
 
     if ((pX == pF) && (pF == phF))
     {
-      pLmDelete(&f->history);
-      f->history=pCopy(p->history);
+      pLmFree(&f->history);
+      f->history=p_Copy_noCheck(p->history,currRing); /* cf of p->history is NULL */
     }
   }
 
@@ -390,7 +390,7 @@ Poly *NewPoly(poly p)
 void DestroyPoly(Poly *x)
 {
   pDelete(&x->root);
-  pDelete(&x->history);
+  pLmFree(&x->history);
   if (x->lead) pDelete(&x->lead);
   GCF(x->mult);
   GCF(x);
@@ -408,7 +408,7 @@ void ControlProlong(Poly *x)
 
 void InitHistory(Poly *p)
 {
-  if (p->history) pLmDelete(&p->history);
+  if (p->history) pLmFree(&p->history);
   p->history=pLmInit(p->root);
   p->changed=0;
 }
