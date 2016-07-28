@@ -406,7 +406,7 @@ poly gnc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r)
 #ifdef PDEBUG
         if (side)
         {
-          Print("gnc_p_Mult_mm: Multiplication in the left module from the right");
+          PrintS("gnc_p_Mult_mm: Multiplication in the left module from the right");
         }
 #endif
       }
@@ -1621,8 +1621,8 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
   p_Test(p1, r);
   p_Test(p2, r);
 #if MYTEST
-  Print("p1: "); p_Write(p1, r);
-  Print("p2: "); p_Write(p2, r);
+  PrintS("p1: "); p_Write(p1, r);
+  PrintS("p2: "); p_Write(p2, r);
 #endif
 #endif
 
@@ -1674,8 +1674,8 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
 
 #ifdef PDEBUG
 #if MYTEST
-  Print("m1: "); pWrite(m1);
-  Print("m2: "); pWrite(m2);
+  PrintS("m1: "); pWrite(m1);
+  PrintS("m2: "); pWrite(m2);
 #endif
 #endif
 
@@ -1722,24 +1722,24 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
   p_Test(M2,r);
 
 #if MYTEST
-  Print("M1: "); pWrite(M1);
-  Print("M2: "); pWrite(M2);
+  PrintS("M1: "); pWrite(M1);
+  PrintS("M2: "); pWrite(M2);
 #endif
 #endif
 
   if(M1 == NULL || M2 == NULL)
   {
 #ifdef PDEBUG
-       Print("\np1 = ");
+       PrintS("\np1 = ");
        p_Write(p1, r);
 
-       Print("m1 = ");
+       PrintS("m1 = ");
        p_Write(m1, r);
 
-       Print("p2 = ");
+       PrintS("p2 = ");
        p_Write(p2, r);
 
-       Print("m2 = ");
+       PrintS("m2 = ");
        p_Write(m2, r);
 
        WerrorS("ERROR in nc_CreateSpoly: result of multiplication is Zero!\n");
@@ -1789,8 +1789,8 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
   p_Test(M2,r);
 
 #if MYTEST
-  Print("M1: "); pWrite(M1);
-  Print("M2: "); pWrite(M2);
+  PrintS("M1: "); pWrite(M1);
+  PrintS("M2: "); pWrite(M2);
 #endif
 #endif
 
@@ -1801,7 +1801,7 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
   p_Test(M2,r);
 
 #if MYTEST
-  Print("M2: "); pWrite(M2);
+  PrintS("M2: "); pWrite(M2);
 #endif
 
 #endif
@@ -1830,7 +1830,7 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
   p_Test(M1,r);
 
 #if MYTEST
-  Print("M1: "); pWrite(M1);
+  PrintS("M1: "); pWrite(M1);
 #endif
 
 #endif
@@ -1841,7 +1841,7 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
   p_Test(M2,r);
 
 #if MYTEST
-  Print("M2: "); pWrite(M2);
+  PrintS("M2: "); pWrite(M2);
 #endif
 
 #endif
@@ -1859,7 +1859,7 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
   p_Test(M1,r);
 
 #if MYTEST
-  Print("M1: "); pWrite(M1);
+  PrintS("M1: "); pWrite(M1);
 #endif
 
 #endif
@@ -1871,7 +1871,7 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
   p_Test(M2,r);
 
 #if MYTEST
-  Print("M2: "); pWrite(M2);
+  PrintS("M2: "); pWrite(M2);
 #endif
 
 #endif
@@ -2014,7 +2014,7 @@ void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c)
 {
   const ring r = b->bucket_ring;
 #ifdef PDEBUG
-//   Print(">*");
+//   PrintS(">*");
 #endif
 
 #ifdef KDEBUG
@@ -2024,7 +2024,7 @@ void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c)
 #ifdef PDEBUG
   p_Test(p, r);
 #if MYTEST
-  Print("p: "); p_Write(p, r);
+  PrintS("p: "); p_Write(p, r);
 #endif
 #endif
 
@@ -2040,7 +2040,7 @@ void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c)
   p_Test(pLmB, r);
 
 #if MYTEST
-  Print("pLmB: "); p_Write(pLmB, r);
+  PrintS("pLmB: "); p_Write(pLmB, r);
 #endif
 #endif
 
@@ -2050,7 +2050,7 @@ void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c)
 #ifdef PDEBUG
   p_Test(m, r);
 #if MYTEST
-  Print("m: "); p_Write(m, r);
+  PrintS("m: "); p_Write(m, r);
 #endif
 #endif
 
@@ -2078,14 +2078,14 @@ void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c)
 
 #ifdef PDEBUG
   p_Test(pp, r);
-//   Print("PP: "); pWrite(pp);
+//   PrintS("PP: "); pWrite(pp);
 #endif
 
   kBucket_Add_q(b,pp,&l);
 
 
 #ifdef PDEBUG
-//   Print("*>");
+//   PrintS("*>");
 #endif
 }
 

@@ -1203,7 +1203,7 @@ ideal k_gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *,
           if ( p_LmIsConstantRat(strat->P.p, currRing) )
           {
 #ifdef PDEBUG
-             Print("unit element detected:");
+             PrintS("unit element detected:");
              p_wrp(strat->P.p,currRing);
 #endif
             p_Delete(&strat->P.p,currRing, strat->tailRing);
@@ -1239,7 +1239,7 @@ ideal k_gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *,
             PrintS("new s:"); wrp(strat->P.p);
             PrintLn();
 #if MYTEST
-            Print("s: "); pWrite(strat->P.p);
+            PrintS("s: "); pWrite(strat->P.p);
 #endif
 
           }

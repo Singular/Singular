@@ -2645,7 +2645,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   if (rHasLocalOrMixedOrdering(currRing))
   {
     /* error: no local ord yet with shifts */
-    Print("No local ordering possible for shifts");
+    PrintS("No local ordering possible for shifts");
     return(NULL);
   }
   else

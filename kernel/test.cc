@@ -549,9 +549,9 @@ void TestSimpleRingArithmetcs()
 
   poly pp = pp_Mult_qq( p, p, R);
 
-  Print("p: "); p_Write0(p, R); Print(", deg(p): %ld", p_Totaldegree(p, R)); assume( 1 == p_Totaldegree(p, R) );
+  PrintS("p: "); p_Write0(p, R); Print(", deg(p): %ld", p_Totaldegree(p, R)); assume( 1 == p_Totaldegree(p, R) );
 
-  Print("; p*p : "); p_Write0(pp, R); Print("deg(pp): %ld\n", p_Totaldegree(pp, R)); assume( 2 == p_Totaldegree(pp, R) );
+  PrintS("; p*p : "); p_Write0(pp, R); Print("deg(pp): %ld\n", p_Totaldegree(pp, R)); assume( 2 == p_Totaldegree(pp, R) );
 
 
   p_Delete(&p, R);
@@ -576,9 +576,9 @@ void TestSimpleRingArithmetcs()
   pSetm(p2);
 
   // print p1 + p2
-  Print("p1: "); pWrite0(p1);
-  Print(" + p2: "); pWrite0(p2);
-  Print("  ---- >>>> ");
+  PrintS("p1: "); pWrite0(p1);
+  PrintS(" + p2: "); pWrite0(p2);
+  PrintS("  ---- >>>> ");
 
   // compute p1+p2
   p1=p_Add_q(p1,p2,R); p2=NULL;

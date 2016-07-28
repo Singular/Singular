@@ -384,7 +384,7 @@ poly sca_p_Mult_mm(poly pPoly, const poly pMonom, const ring rRing)
   assume( rIsSCA(rRing) );
 
 #ifdef PDEBUG
-//  Print("sca_p_Mult_mm\n"); // !
+//  PrintS("sca_p_Mult_mm\n"); // !
 
   p_Test(pPoly, rRing);
   p_Test(pMonom, rRing);
@@ -470,7 +470,7 @@ poly sca_pp_Mult_mm(const poly pPoly, const poly pMonom, const ring rRing)
   assume( rIsSCA(rRing) );
 
 #ifdef PDEBUG
-//  Print("sca_pp_Mult_mm\n"); // !
+//  PrintS("sca_pp_Mult_mm\n"); // !
 
   p_Test(pPoly, rRing);
   p_Test(pMonom, rRing);
@@ -580,7 +580,7 @@ static poly sca_mm_Mult_pp(const poly pMonom, const poly pPoly, const ring rRing
   assume( rIsSCA(rRing) );
 
 #ifdef PDEBUG
-//  Print("sca_mm_Mult_pp\n"); // !
+//  PrintS("sca_mm_Mult_pp\n"); // !
 
   p_Test(pPoly, rRing);
   p_Test(pMonom, rRing);
@@ -1459,7 +1459,7 @@ static inline poly m_KillSquares(const poly m,
   assume( (iFirstAltVar >= 1) && (iLastAltVar <= rVar(r)) && (iFirstAltVar <= iLastAltVar) );
 
 #if 0
-  Print("m_KillSquares, m = "); // !
+  PrintS("m_KillSquares, m = "); // !
   p_Write(m, r);
 #endif
 #endif
@@ -1486,7 +1486,7 @@ poly p_KillSquares(const poly p,
   assume( (iFirstAltVar >= 1) && (iLastAltVar <= r->N) && (iFirstAltVar <= iLastAltVar) );
 
 #if 0
-  Print("p_KillSquares, p = "); // !
+  PrintS("p_KillSquares, p = "); // !
   p_Write(p, r);
 #endif
 #endif
@@ -1518,7 +1518,7 @@ poly p_KillSquares(const poly p,
 #ifdef PDEBUG
   p_Test(pResult, r);
 #if 0
-  Print("p_KillSquares => "); // !
+  PrintS("p_KillSquares => "); // !
   p_Write(pResult, r);
 #endif
 #endif

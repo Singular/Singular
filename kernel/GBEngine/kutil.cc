@@ -2102,13 +2102,13 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   pSetCoeff0(m2, nInit(1));
 //#if 1
 #ifdef DEBUGF5
-  Print("P1  ");
+  PrintS("P1  ");
   pWrite(pHead(p));
-  Print("P2  ");
+  PrintS("P2  ");
   pWrite(pHead(strat->S[i]));
-  Print("M1  ");
+  PrintS("M1  ");
   pWrite(m1);
-  Print("M2  ");
+  PrintS("M2  ");
   pWrite(m2);
 #endif
   // get multiplied signatures for testing
@@ -2119,10 +2119,10 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
 
 //#if 1
 #ifdef DEBUGF5
-  Print("----------------\n");
+  PrintS("----------------\n");
   pWrite(pSigMult);
   pWrite(sSigMult);
-  Print("----------------\n");
+  PrintS("----------------\n");
   Lp.checked  = 0;
 #endif
   int sigCmp = p_LmCmp(pSigMult,sSigMult,currRing);
@@ -3659,9 +3659,9 @@ void initenterzeropairsRing (poly p, int ecart, kStrategy strat, int atR)
     poly zeroPoly = kCreateZeroPoly(cexp, cabsind, &t_p, currRing, strat->tailRing);
 #ifdef OLI_DEBUG
     Print("%d, (%d, %d), ind = (%d, %d)\n", cabsind, cexp[1], cexp[2], cind[1], cind[2]);
-    Print("zPoly : ");
+    PrintS("zPoly : ");
     wrp(zeroPoly);
-    Print("\n");
+    PrintLn();
 #endif
     enterOneZeroPairRing(zeroPoly, t_p, p, ecart, strat, atR);
   }
@@ -3719,9 +3719,9 @@ ideal createG0()
     poly zeroPoly = kCreateZeroPoly(cexp, cabsind, &t_p, currRing, currRing);
 #ifdef OLI_DEBUG
     Print("%d, (%d, %d), ind = (%d, %d)\n", cabsind, cexp[1], cexp[2], cind[1], cind[2]);
-    Print("zPoly : ");
+    PrintS("zPoly : ");
     wrp(zeroPoly);
-    Print("\n");
+    PrintLn();
 #endif
     // Add to ideal
     pEnlargeSet(&(G0->m), IDELEMS(G0), 1);
@@ -5878,7 +5878,7 @@ BOOLEAN syzCriterion(poly sig, unsigned long not_sevSig, kStrategy strat)
 {
 //#if 1
 #ifdef DEBUGF5
-  Print("syzygy criterion checks:  ");
+  PrintS("syzygy criterion checks:  ");
   pWrite(sig);
 #endif
   for (int k=0; k<strat->syzl; k++)
@@ -5910,7 +5910,7 @@ BOOLEAN syzCriterionInc(poly sig, unsigned long not_sevSig, kStrategy strat)
 {
 //#if 1
 #ifdef DEBUGF5
-  Print("--- syzygy criterion checks:  ");
+  PrintS("--- syzygy criterion checks:  ");
   pWrite(sig);
 #endif
   int comp = p_GetComp(sig, currRing);
@@ -5960,7 +5960,7 @@ BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly /*lm*/, kSt
   {
 //#if 1
 #ifdef DEBUGF5
-    Print("checking with:  ");
+    PrintS("checking with:  ");
     pWrite(strat->sig[k]);
     pWrite(pHead(strat->S[k]));
 #endif
@@ -5975,12 +5975,12 @@ BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly /*lm*/, kSt
     //k--;
   }
 #ifdef DEBUGF5
-  Print("ALL ELEMENTS OF S\n----------------------------------------\n");
+  PrintS("ALL ELEMENTS OF S\n----------------------------------------\n");
   for(int kk = 0; kk<strat->sl+1; kk++)
   {
     pWrite(pHead(strat->S[kk]));
   }
-  Print("------------------------------\n");
+  PrintS("------------------------------\n");
 #endif
   return FALSE;
 }
@@ -8035,7 +8035,7 @@ void enterSSba (LObject &p,int atS,kStrategy strat, int atR)
   {
     pWrite(strat->sig[k]);
   }
-  Print("--- LIST S END ---\n");
+  PrintS("--- LIST S END ---\n");
 #endif
 }
 

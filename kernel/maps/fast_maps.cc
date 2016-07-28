@@ -394,11 +394,11 @@ ideal fast_map_common_subexp(const ideal map_id,const ring map_r,const ideal ima
 
   // do the actual evaluation
   maPoly_Eval(mp, src_r, dest_id, dest_r, length);
-  if (TEST_OPT_PROT) Print(".");
+  if (TEST_OPT_PROT) PrintS(".");
 
   // collect the results back into an ideal
   ideal res_dest_id = maIdeal_2_Ideal(mideal, dest_r);
-  if (TEST_OPT_PROT) Print(".");
+  if (TEST_OPT_PROT) PrintS(".");
 
   // convert result back to image_r
   ideal res_image_id;
@@ -414,13 +414,13 @@ ideal fast_map_common_subexp(const ideal map_id,const ring map_r,const ideal ima
   else
     res_image_id = res_dest_id;
 
-  if (TEST_OPT_PROT) Print(".");
+  if (TEST_OPT_PROT) PrintS(".");
 
   // clean-up the rings
   maMap_KillRings(map_r, image_r, src_r, dest_r);
 
   if (TEST_OPT_PROT)
-    Print("\n");
+    PrintLn();
 
   idTest(res_image_id);
   return res_image_id;
@@ -558,7 +558,7 @@ void maPoly_Eval(mapoly root, ring src_r, ideal dest_id, ring dest_r, int total_
       cost++;
       if (cost > next_print_cost)
       {
-        Print("-");
+        PrintS("-");
         next_print_cost += total_cost;
       }
     }

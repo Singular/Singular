@@ -2315,7 +2315,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
              test_PosInT=posInT17_c;
            else if (strcmp(s,"posInT19")==0)
              test_PosInT=posInT19;
-           else Print("valid posInT:0,1,2,11,110,13,15,17,17_c,19,_EcartFDegpLength,_FDegpLength,_pLength,_EcartpLength\n");
+           else PrintS("valid posInT:0,1,2,11,110,13,15,17,17_c,19,_EcartFDegpLength,_FDegpLength,_pLength,_EcartpLength\n");
          }
          else
          {
@@ -3104,7 +3104,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         {
           p=(poly)h->CopyD();
           h=h->next;
-          //        Print("poly is done\n");
+          //        PrintS("poly is done\n");
         }
         else return TRUE;
         if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
@@ -3112,14 +3112,14 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           I=(ideal)h->CopyD();
           q = I->m;
           h=h->next;
-          //        Print("ideal is done\n");
+          //        PrintS("ideal is done\n");
         }
         else return TRUE;
         if ((h!=NULL) && (h->Typ()==INT_CMD))
         {
           is=(int)((long)(h->Data()));
           //        res->rtyp=INT_CMD;
-          //        Print("int is done\n");
+          //        PrintS("int is done\n");
           //        res->rtyp=IDEAL_CMD;
           if (rIsPluralRing(currRing))
           {
@@ -3129,7 +3129,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
             {
               pl[k] = pLength(I->m[k]);
             }
-            Print("starting redRat\n");
+            PrintS("starting redRat\n");
             //res->data = (char *)
             redRat(&p, q, pl, (int)IDELEMS(I),is,currRing);
             res->data=p;

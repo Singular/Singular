@@ -1229,7 +1229,7 @@ void piShowProcList()
               proc->data.s.body_lineno, proc->data.s.body_start,
               proc->data.s.example_lineno, proc->data.s.example_start);
       else if(proc->language==LANG_C)
-        Print("type: object\n");
+        PrintS("type: object\n");
     }
   }
 }

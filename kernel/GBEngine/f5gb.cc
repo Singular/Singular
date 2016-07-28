@@ -277,7 +277,7 @@ LList* F5inc(int i, poly f_i, LList* gPrev, LList* reducers, ideal gbPrev, poly 
     delete critPairs;
     //Print("IN F5INC\n");
     /*
-    Print("\n\n\nRULES: \n");
+    PrintS("\n\n\nRULES: \n");
         RNode* tempR    =   rules->getFirst();
         Print("%p\n",tempR);
         int t   = 1;
@@ -329,7 +329,7 @@ bool checkDGB(LList* gPrev) {
       pLcm(temp->getPoly(),temp2->getPoly(),lcm);
       pSetCoeff(lcm,nOne);
       pSetm(lcm);
-      Print("LCM:   ");
+      PrintS("LCM:   ");
       pWrite(lcm);
       if(pDeg(lcm) <= pDeg(gPrev->getLast()->getPoly())) {
         poly u1 = pOne();
@@ -371,7 +371,7 @@ bool checkDGB(LList* gPrev) {
     }
     temp  = temp->getNext();
   }
-  Print("------------------\n");
+  PrintS("------------------\n");
   return isDGb;
 }
 
@@ -679,7 +679,7 @@ Criterion 2, i.e. Rewritten Criterion
 inline bool criterion2(int idx, poly t, LNode* l, RList* rules, RTagList* rTag) {
     //Print("------------------------------IN CRITERION 2/1-----------------------------------------\n");
     /*
-    Print("RULES: \n");
+    PrintS("RULES: \n");
         RNode* tempR    =   rules->getFirst();
         Print("%p\n",tempR);
         int i   = 1;
@@ -792,7 +792,7 @@ inline bool criterion2(poly t, LPolyOld* l, RList* rules, RuleOld* testedRuleOld
     //Print("------------------------------IN CRITERION 2/2-----------------------------------------\n");
     //Print("LAST RuleOld TESTED: %p",testedRuleOld);
     /*
-    Print("RULES: \n");
+    PrintS("RULES: \n");
         RNode* tempR    =   rules->getFirst();
         while(NULL != tempR) {
             pWrite(tempR->getRuleTerm());
@@ -1039,23 +1039,23 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList, 
           else {
              //numberRejectedF5CriticalPairs == 7) {
             /*
-            Print("--------------------------------- rejected F5-critical pair-------------------------------------\n");
+            PrintS("--------------------------------- rejected F5-critical pair-------------------------------------\n");
             pWrite(pHead(ppMult_qq(temp->getT1(),temp->getLp1Poly())));
-            Print("Label: ");
+            PrintS("Label: ");
             pWrite(ppMult_qq(temp->getT1(),temp->getLp1Term()));
             Print("%d\n",temp->getDel());
-            Print("Comes from:\n ");
+            PrintS("Comes from:\n ");
             pWrite(pHead(temp->getLp1Poly()));
-            Print("Label: ");
+            PrintS("Label: ");
             pWrite(temp->getLp1Term());
             Print("%d\n",temp->getLp1Index());
             pWrite(pHead(temp->getLp2Poly()));
-            Print("Label: ");
+            PrintS("Label: ");
             pWrite(temp->getLp2Term());
             Print("%d\n",temp->getLp2Index());
             //Print("--------------------------------------LIST OF GB PAIRS REJECTED-----------------------------------------\n");
             //rejectedGBList->print();
-            Print("--------------------------------------------------------------------------------------------------------\n");
+            PrintS("--------------------------------------------------------------------------------------------------------\n");
             //if(temp->getLp1Index() < 7) {
               sPolyList->insertByLabel(ppMult_qq(temp->getT1(),temp->getLp1Term()),temp->getLp1Index(),sp,tempRule->getRuleOld());
 
@@ -1530,12 +1530,14 @@ addToG  = 0;
             reductionsToZero++;
             //pDelete(&redPoly);
         }
-        else {
-            Print("\nELEMENT ADDED TO GPREV: ");
+        else
+        {
+            PrintS("\nELEMENT ADDED TO GPREV: ");
             pNorm(redPoly);
-              if(highestDegree < pDeg(redPoly)) {
-                  highestDegree   = pDeg(redPoly);
-              }
+            if(highestDegree < pDeg(redPoly))
+            {
+              highestDegree   = pDeg(redPoly);
+            }
             pWrite(pHead(redPoly));
             //pWrite(l->getTerm());
             //Print("%d\n",canonicalize);
@@ -1888,16 +1890,18 @@ MAIN:computes a gb of the ideal i in the ring r with our F5 implementation
 OPTIONS: INTEGER "opt" is to be set "0" for F5, "1" for F5R, "2" for F5C
 ==========================================================================
 */
-ideal F5main(ideal id, ring r, int opt, int plus, int termination) {
-  switch(opt) {
+ideal F5main(ideal id, ring r, int opt, int plus, int termination)
+{
+  switch(opt)
+  {
     case 0:
-      Print("\nComputations are done by the standard F5 Algorithm");
+      PrintS("\nComputations are done by the standard F5 Algorithm");
       break;
     case 1:
-      Print("\nComputations are done by the variant F5R of the F5 Algorithm");
+      PrintS("\nComputations are done by the variant F5R of the F5 Algorithm");
       break;
     case 2:
-      Print("\nComputations are done by the variant F5C of the F5 Algorithm");
+      PrintS("\nComputations are done by the variant F5C of the F5 Algorithm");
       break;
     default:
       WerrorS("\nThe option can only be set to \"0\", \"1\" or \"2\":\n\"0\": standard F5 Algorithm\n\"1\": variant F5R\n\"2\": variant F5C\nComputations are aborted!\n");
@@ -1943,7 +1947,7 @@ ideal F5main(ideal id, ring r, int opt, int plus, int termination) {
     /*for(j=0; j<IDELEMS(id); j++) {
         if(NULL != id->m[j]) {
             if(pComparePolys(id->m[j],ONE)) {
-                Print("One Polynomial in Input => Computations stopped\n");
+                PrintS("One Polynomial in Input => Computations stopped\n");
                 ideal idNew = idInit(1,1);
                 idNew->m[0] = ONE;
                 return(idNew);

@@ -711,14 +711,14 @@ int redSig (LObject* h,kStrategy strat)
   assume(h->FDeg == h->pFDeg());
 //#if 1
 #ifdef DEBUGF5
-  Print("------- IN REDSIG -------\n");
+  PrintS("------- IN REDSIG -------\n");
   Print("p: ");
   pWrite(pHead(h->p));
-  Print("p1: ");
+  PrintS("p1: ");
   pWrite(pHead(h->p1));
-  Print("p2: ");
+  PrintS("p2: ");
   pWrite(pHead(h->p2));
-  Print("---------------------------\n");
+  PrintS("---------------------------\n");
 #endif
   poly h_p;
   int i,j,at,pass, ii;
@@ -789,14 +789,14 @@ int redSig (LObject* h,kStrategy strat)
 //#if 1
 #ifdef DEBUGF5
     Print("BEFORE REDUCTION WITH %d:\n",ii);
-    Print("--------------------------------\n");
+    PrintS("--------------------------------\n");
     pWrite(h->sig);
     pWrite(strat->T[ii].sig);
     pWrite(h->GetLmCurrRing());
     pWrite(pHead(h->p1));
     pWrite(pHead(h->p2));
     pWrite(pHead(strat->T[ii].p));
-    Print("--------------------------------\n");
+    PrintS("--------------------------------\n");
     printf("INDEX OF REDUCER T: %d\n",ii);
 #endif
     sigSafe = ksReducePolySig(h, &(strat->T[ii]), strat->S_2_R[ii], NULL, NULL, strat);
@@ -1978,13 +1978,13 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if (!strat->rewCrit2(strat->P.sig, ~strat->P.sevSig, strat->P.GetLmCurrRing(), strat, strat->P.checked+1)) {
       //#if 1
 #ifdef DEBUGF5
-      Print("SIG OF NEXT PAIR TO HANDLE IN SIG-BASED ALGORITHM\n");
-      Print("-------------------------------------------------\n");
+      PrintS("SIG OF NEXT PAIR TO HANDLE IN SIG-BASED ALGORITHM\n");
+      PrintS("-------------------------------------------------\n");
       pWrite(strat->P.sig);
       pWrite(pHead(strat->P.p));
       pWrite(pHead(strat->P.p1));
       pWrite(pHead(strat->P.p2));
-      Print("-------------------------------------------------\n");
+      PrintS("-------------------------------------------------\n");
 #endif
       if (pNext(strat->P.p) == strat->tail)
       {
@@ -2034,7 +2034,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       {
         //#if 1
 #ifdef DEBUGF5
-        Print("Poly before red: ");
+        PrintS("Poly before red: ");
         pWrite(pHead(strat->P.p));
         pWrite(strat->P.sig);
 #endif
@@ -2067,7 +2067,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 //#if 1
 #ifdef DEBUGF5
     if (red_result != 0) {
-        Print("Poly after red: ");
+        PrintS("Poly after red: ");
         pWrite(pHead(strat->P.p));
         pWrite(strat->P.GetLmCurrRing());
         pWrite(strat->P.sig);
@@ -2310,8 +2310,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #if DEBUGF50
     printf("---------------------------\n");
     Print(" %d. ELEMENT ADDED TO GCURR:\n",strat->sl+1);
-    Print("LEAD POLY:  "); pWrite(pHead(strat->S[strat->sl]));
-    Print("SIGNATURE:  "); pWrite(strat->sig[strat->sl]);
+    PrintS("LEAD POLY:  "); pWrite(pHead(strat->S[strat->sl]));
+    PrintS("SIGNATURE:  "); pWrite(strat->sig[strat->sl]);
 #endif
       /*
       if (newrules)
@@ -2357,7 +2357,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         enterSyz(strat->P, strat, pos);
 //#if 1
 #ifdef DEBUGF5
-        Print("ADDING STUFF TO SYZ :  ");
+        PrintS("ADDING STUFF TO SYZ :  ");
         //pWrite(strat->P.p);
         pWrite(strat->P.sig);
 #endif
@@ -2729,13 +2729,13 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
     strat->Ll--;
 //#if 1
 #ifdef DEBUGF5
-    Print("NEXT PAIR TO HANDLE IN INTERRED ALGORITHM\n");
-    Print("-------------------------------------------------\n");
+    PrintS("NEXT PAIR TO HANDLE IN INTERRED ALGORITHM\n");
+    PrintS("-------------------------------------------------\n");
     pWrite(pHead(strat->P.p));
     pWrite(pHead(strat->P.p1));
     pWrite(pHead(strat->P.p2));
     printf("%d\n",strat->tl);
-    Print("-------------------------------------------------\n");
+    PrintS("-------------------------------------------------\n");
 #endif
     if (pNext(strat->P.p) == strat->tail)
     {
@@ -2787,7 +2787,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
             &olddeg,&reduc,strat, red_result);
 
 #ifdef DEBUGF5
-      Print("Poly before red: ");
+      PrintS("Poly before red: ");
       pWrite(strat->P.p);
 #endif
       /* complete reduction of the element chosen from L */
@@ -2870,7 +2870,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
         strat->enterS(strat->P, pos, strat, strat->tl);
 //#if 1
 #ifdef DEBUGF5
-        Print("ELEMENT ADDED TO GCURR DURING INTERRED: ");
+        PrintS("ELEMENT ADDED TO GCURR DURING INTERRED: ");
         pWrite(pHead(strat->S[strat->sl]));
         pWrite(strat->sig[strat->sl]);
 #endif
@@ -2927,7 +2927,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
     strat->Shdl->m[cc]  = NULL;
 //#if 1
 #if DEBUGF5
-  Print("------------------- STRAT S ---------------------\n");
+  PrintS("------------------- STRAT S ---------------------\n");
   cc = 0;
   while (cc<strat->tl+1)
   {
@@ -2936,8 +2936,8 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
     printf("- - - - - -\n");
     cc++;
   }
-  Print("-------------------------------------------------\n");
-  Print("------------------- STRAT T ---------------------\n");
+  PrintS("-------------------------------------------------\n");
+  PrintS("------------------- STRAT T ---------------------\n");
   cc = 0;
   while (cc<strat->tl+1)
   {
@@ -2946,8 +2946,8 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
     printf("- - - - - -\n");
     cc++;
   }
-  Print("-------------------------------------------------\n");
-  Print("------------------- STRAT L ---------------------\n");
+  PrintS("-------------------------------------------------\n");
+  PrintS("------------------- STRAT L ---------------------\n");
   cc = 0;
   while (cc<strat->Ll+1)
   {
@@ -2958,7 +2958,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
     printf("- - - - - -\n");
     cc++;
   }
-  Print("-------------------------------------------------\n");
+  PrintS("-------------------------------------------------\n");
   printf("F5C DONE\nSTRAT SL: %d -- %d\n",strat->sl, strat->currIdx);
 #endif
 

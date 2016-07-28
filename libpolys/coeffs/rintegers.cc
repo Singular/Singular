@@ -1411,11 +1411,11 @@ static number nrzFarey(number r, number N, const coeffs R)
   number b1 = nrzInit(1, R);
   number two = nrzInit(2, R);
 #if 0
-  Print("Farey start with ");
+  PrintS("Farey start with ");
   n_Print(r, R);
-  Print(" mod ");
+  PrintS(" mod ");
   n_Print(N, R);
-  Print("\n");
+  PrintLn();
 #endif
   while (1)
   {

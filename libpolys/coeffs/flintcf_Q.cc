@@ -70,7 +70,7 @@ static const char* Eati(const char *s, int *i)
 
 static void CoeffWrite(const coeffs r, BOOLEAN details)
 {
-  Print("// coefficients: flint fmpq_poly\n");
+  PrintS("// coefficients: flint fmpq_poly\n");
 }
 static BOOLEAN CoeffIsEqual(const coeffs r, n_coeffType n, void * parameter)
 {

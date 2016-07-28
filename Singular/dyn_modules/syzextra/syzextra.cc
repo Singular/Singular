@@ -2683,7 +2683,7 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
 #ifndef SING_NDEBUG
         if( OPT__DEBUG )
         {
-          Print("_FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
+          PrintS("_FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
           dPrint(syzterm, r, r, 0);
         }
 #endif
@@ -2786,7 +2786,7 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
       {
         if( OPT__DEBUG )
         {
-          Print("_FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
+          PrintS("_FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
           dPrint(syzterm, r, r, 0);
         }
 
@@ -2896,7 +2896,7 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
 #ifndef SING_NDEBUG
         if( OPT__DEBUG )
         {
-          Print("_FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
+          PrintS("_FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
           dPrint(syzterm, r, r, 0);
         }
 #endif
@@ -2999,7 +2999,7 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
       {
         if( OPT__DEBUG )
         {
-          Print("_FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
+          PrintS("_FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
           dPrint(syzterm, r, r, 0);
         }
 

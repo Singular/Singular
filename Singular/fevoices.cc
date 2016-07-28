@@ -105,7 +105,7 @@ void Voice::Next()
   }
   p->prev=currentVoice;
   currentVoice=p;
-  //Print("Next:");
+  //PrintS("Next:");
 }
 
 feBufferTypes Voice::Typ()
@@ -157,14 +157,14 @@ BOOLEAN newFile(char *fname,FILE* f)
   }
   yylineno=currentVoice->start_lineno;
   //Voice *p=currentVoice;
-  //Print("-----------------\ncurr:");
+  //PrintS("-----------------\ncurr:");
   //do
   //{
   //Print("voice fn:%s\n",p->filename);
   //p=p->prev;
   //}
   //while (p!=NULL);
-  //Print("----------------\n");
+  //PrintS("----------------\n");
   return FALSE;
 }
 
@@ -224,14 +224,14 @@ void newBuffer(char* s, feBufferTypes t, procinfo* pi, int lineno)
   currentVoice->start_lineno = yylineno;
   //printf("start buffer typ %d\n",t);
   //Voice *p=currentVoice;
-  //Print("-----------------\ncurr:");
+  //PrintS("-----------------\ncurr:");
   //do
   //{
   //Print("voice fn:%s\n",p->filename);
   //p=p->prev;
   //}
   //while (p!=NULL);
-  //Print("----------------\n");
+  //PrintS("----------------\n");
 }
 
 /*2
@@ -243,14 +243,14 @@ BOOLEAN exitBuffer(feBufferTypes typ)
   //printf("exitBuffer: %d(%s),(%x)\n",
   //  typ,BT_name[typ], currentVoice);
   //Voice *p=currentVoice;
-  //Print("-----------------\ncurr:");
+  //PrintS("-----------------\ncurr:");
   //do
   //{
   //Print("voice fn:%s\n",p->filename);
   //p=p->prev;
   //}
   //while (p!=NULL);
-  //Print("----------------\n");
+  //PrintS("----------------\n");
   if (typ == BT_break)  // valid inside for, while. may skip if, else
   {
     /*4 first check for valid buffer type, skip if/else*/
@@ -349,14 +349,14 @@ BOOLEAN exitVoice()
   //  currentVoice->typ,BT_name[currentVoice->typ], currentVoice);
   //{
   //Voice *p=currentVoice;
-  //Print("-----------------\ncurr:");
+  //PrintS("-----------------\ncurr:");
   //do
   //{
   //Print("voice fn:%s\n",p->filename);
   //p=p->prev;
   //}
   //while (p!=NULL);
-  //Print("----------------\n");
+  //PrintS("----------------\n");
   //}
   if (currentVoice!=NULL)
   {

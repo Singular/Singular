@@ -445,9 +445,10 @@ number nrnXExtGcd(number a, number b, number *s, number *t, number *u, number *v
   Print("%s\n", StringEndS());
 #endif
   nrnDelete(&xx, r);
-  if (!nrnIsOne(ui, r)) {
+  if (!nrnIsOne(ui, r))
+  {
 #ifdef CF_DEB
-    Print("Scaling\n");
+    PrintS("Scaling\n");
 #endif
     number uii = nrnInvers(ui, r);
     nrnDelete(&ui, r);

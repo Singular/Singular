@@ -38,7 +38,7 @@ ideal twostd(ideal I) // works in currRing only!
 #ifdef PDEBUG
       p_Test(p, currRing);
 #if 0
-      Print("p: "); // !
+      PrintS("p: "); // !
       p_Write(p, currRing);
 #endif
 #endif
@@ -56,9 +56,9 @@ ideal twostd(ideal I) // works in currRing only!
         p_Test(p, currRing);
         p_Test(q, currRing);
 #if 0
-        Print("Reducing p: "); // !
+        PrintS("Reducing p: "); // !
         p_Write(p, currRing);
-        Print("With q: "); // !
+        PrintS("With q: "); // !
         p_Write(q, currRing);
 #endif
 #endif
@@ -72,7 +72,7 @@ ideal twostd(ideal I) // works in currRing only!
           Print("Reducing q[j = %d]: ", j); // !
           p_Write(q, currRing);
 
-          Print("With p:");
+          PrintS("With p:");
           p_Write(p, currRing);
 
 #endif
@@ -86,10 +86,10 @@ ideal twostd(ideal I) // works in currRing only!
 #ifdef PDEBUG
           p_Test(q, currRing);
 #if 0
-          Print("reductum q/p: ");
+          PrintS("reductum q/p: ");
           p_Write(q, currRing);
 
-          // Print("With J!\n");
+          // PrintS("With J!\n");
 #endif
 #endif
 
@@ -99,7 +99,7 @@ ideal twostd(ideal I) // works in currRing only!
 #ifdef PDEBUG
           p_Test(q, currRing);
 #if 0
-          Print("NF(J/currRing->qideal)=> q: "); // !
+          PrintS("NF(J/currRing->qideal)=> q: "); // !
           p_Write(q, currRing);
 #endif
 #endif
@@ -150,7 +150,7 @@ ideal twostd(ideal I) // works in currRing only!
 #ifdef PDEBUG
     idTest(J); // in currRing!
 #if 0
-    Print("J:");
+    PrintS("J:");
     idPrint(J);
     PrintLn();
 #endif // debug
@@ -161,7 +161,7 @@ ideal twostd(ideal I) // works in currRing only!
 #ifdef PDEBUG
     idTest(K); // in currRing!
 #if 0
-    Print("+K:");
+    PrintS("+K:");
     idPrint(K);
     PrintLn();
 #endif // debug
@@ -190,7 +190,7 @@ ideal twostd(ideal I) // works in currRing only!
 #ifdef PDEBUG
     idTest(J); // in currRing!
 #if 0
-    Print("J:");
+    PrintS("J:");
     idPrint(J);
     PrintLn();
 #endif // debug
@@ -207,7 +207,7 @@ static ideal idPrepareStd(ideal T, ideal s,  int k)
 #ifdef PDEBUG
   if (IDELEMS(s)!=IDELEMS(T))
   {
-    Print("ideals of diff. size!!!");
+    PrintS("ideals of diff. size!!!");
   }
 #endif
   ideal t = idCopy(T);
@@ -343,7 +343,7 @@ ideal Approx_Step(ideal L)
       idDelete(&s_h2);
       s_h2=idCopy(s_h3);
       idDelete(&s_h3);
-      Print("...computing Syz");
+      PrintS("...computing Syz");
       s_h3 = kStd(s_h2, currRing->qideal,(tHomog)FALSE,NULL,NULL,syzcomp,idI);
       SI_RESTORE_OPT1(save1);
       //idShow(s_h3);
@@ -379,7 +379,7 @@ ideal Approx_Step(ideal L)
   }
   if (flagcnt == N)
   {
-    Print("the input is a two--sided ideal");
+    PrintS("the input is a two--sided ideal");
     return(I);
   }
   if (syzcnt >0)
@@ -406,14 +406,14 @@ ideal Approx_Step(ideal L)
       }
       res->m[i-1]=p;
     }
-    Print("final std");
+    PrintS("final std");
     res = kStd(res, currRing->qideal,testHomog,NULL,NULL,0,0,NULL);
     idSkipZeroes(res);
     return(res);
   }
   else
   {
-    Print("No syzygies");
+    PrintS("No syzygies");
     return(I);
   }
 }

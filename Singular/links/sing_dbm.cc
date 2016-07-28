@@ -122,12 +122,12 @@ LINKAGE leftv dbRead2(si_link l, leftv key)
     {
       if (!SI_LINK_CLOSE_P(l))
       {
-        if (!dbClose(l)) {Print("cannot close link!\n");}
+        if (!dbClose(l)) {PrintS("cannot close link!\n");}
       }
       //(SI_LINK_CLOSE_P(l)) automatically
       if (dbOpen(l, SI_LINK_READ)) return NULL;
     }
-  if (SI_LINK_RW_OPEN_P(l)) {Print("I/O Error!\n");}
+  if (SI_LINK_RW_OPEN_P(l)) {PrintS("I/O Error!\n");}
 
   if(key!=NULL)
   {
@@ -209,7 +209,7 @@ LINKAGE BOOLEAN dbWrite(si_link l, leftv key)
 
   if (strcmp(l->mode,"rw")!=0) // r-mode
     {
-      Print("Write error on readonly source\n");
+      PrintS("Write error on readonly source\n");
     }
   else //rw-mode
     {
@@ -217,9 +217,9 @@ LINKAGE BOOLEAN dbWrite(si_link l, leftv key)
       {
         if (!SI_LINK_CLOSE_P(l))
         {
-          if (!dbClose(l)) {Print("close error\n");};
+          if (!dbClose(l)) {PrintS("close error\n");};
         }
-        if (!dbOpen(l,SI_LINK_WRITE)) {Print("open_for_write error\n");}
+        if (!dbOpen(l,SI_LINK_WRITE)) {PrintS("open_for_write error\n");}
       }
     }
 
@@ -237,7 +237,7 @@ LINKAGE BOOLEAN dbWrite(si_link l, leftv key)
         d_value.dsize = strlen(d_value.dptr)+1;
         ret  = gdbm_store(db->db, d_key, d_value, GDBM_REPLACE);
 //         db->actual=d_key;
-        if (ret==-1) {Print("reader calls gdbm_store!");}
+        if (ret==-1) {PrintS("reader calls gdbm_store!");}
         if (ret==0)
           { b=FALSE; }
         else

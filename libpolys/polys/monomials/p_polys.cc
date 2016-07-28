@@ -290,11 +290,11 @@ void p_Setm_General(poly p, const ring r)
 
           p->exp[o->data.wp64.place]=a_1;
           p->exp[o->data.wp64.place+1]=a_0;
-//            if(p_Setm_error) Print("***************************\n
-//                                    ***************************\n
-//                                    **WARNING: overflow error**\n
-//                                    ***************************\n
-//                                    ***************************\n");
+//            if(p_Setm_error) PrintS("***************************\n"
+//                                    "***************************\n"
+//                                    "**WARNING: overflow error**\n"
+//                                    "***************************\n"
+//                                    "***************************\n");
           break;
         }
         case ro_cp:
