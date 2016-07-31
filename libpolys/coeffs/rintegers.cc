@@ -36,7 +36,6 @@ int     nrzSize        (number a, const coeffs r);
 void    nrzDelete      (number *a, const coeffs r);
 BOOLEAN nrzGreaterZero (number k, const coeffs r);
 number  nrzMult        (number a, number b, const coeffs r);
-number  nrzInit        (long i, const coeffs r);
 long    nrzInt         (number &n, const coeffs r);
 number  nrzAdd         (number a, number b, const coeffs r);
 number  nrzSub         (number a, number b, const coeffs r);
