@@ -18,6 +18,8 @@ struct snumber; typedef struct snumber *   number;
 typedef struct { mpz_ptr base;  unsigned long exp; } ZnmInfo;
 
 BOOLEAN nrnInitChar    (coeffs r, void*);
+number nrnMapGMP(number from, const coeffs /*src*/, const coeffs dst);
+nMapFunc nrnSetMap(const coeffs src, const coeffs dst);
 
 #endif
 
