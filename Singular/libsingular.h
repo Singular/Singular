@@ -28,8 +28,6 @@
 
 void siInit(char *);
 
-/* we need this function in Sage*/
-number nr2mMapZp(number from); // TODO: replace with something else...
 
 
 #endif // #ifndef LIBSINGULAR__H

@@ -13,6 +13,9 @@
 
 struct snumber; typedef struct snumber  *number;
 
+number   nlGetDenom(number &n, const coeffs r);
+number   nlGetNumerator(number &n, const coeffs r);
+
 /*-----------------------------------------------------------------*/
 /**
 **  'SR_INT' is the type of those integers small enough to fit into  29  bits.

@@ -28,6 +28,8 @@ BOOLEAN nrzInitChar    (coeffs r,  void * parameter);
 // will be reused by rmodulon.cc
 void    nrzWrite       (number a, const coeffs r);
 
+number  nrzInit        (long i, const coeffs r);
+
 #endif
 
 #endif
