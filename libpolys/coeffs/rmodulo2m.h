@@ -16,6 +16,8 @@ struct snumber; typedef struct snumber *   number;
 #ifdef HAVE_RINGS
 
 BOOLEAN nr2mInitChar    (coeffs r, void*);
+number  nr2mMapZp       (number from, const coeffs /*src*/, const coeffs dst);
+/*for SAGE, better: use the result of n_SetMap*/
 
 #endif
 #endif
