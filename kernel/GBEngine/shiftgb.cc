@@ -163,15 +163,15 @@ poly pLPshift(poly p, int sh, int uptodeg, int lV)
   if (sh == 0) return(p); /* the zero shift */
 
   poly q  = NULL;
-  poly pp = p; // pCopy(p);
+  poly pp = p;
   while (pp!=NULL)
   {
-    q = p_Add_q(q, pmLPshift(pp,sh,uptodeg,lV),currRing);
+    poly h=pp;
     pIter(pp);
+    pNext(h)=NULL;
+    h=pmLPshift(h,sh,uptodeg,lV);
+    q = p_Add_q(q, h,currRing);
   }
-  /* delete pp? */
-  p_Delete(&p,currRing);
-  /* int version: returns TRUE if it was successful */
   return(q);
 }
 
@@ -201,7 +201,6 @@ poly pmLPshift(poly p, int sh, int uptodeg, int lV)
   int *e=(int *)omAlloc0((currRing->N+1)*sizeof(int));
   int *s=(int *)omAlloc0((currRing->N+1)*sizeof(int));
   pGetExpV(p,e);
-  number c = pGetCoeff(p);
   int j;
   for (j=1; j<=currRing->N; j++)
   {
@@ -210,14 +209,11 @@ poly pmLPshift(poly p, int sh, int uptodeg, int lV)
       s[j + (sh*lV)] = e[j]; /* actually 1 */
     }
   }
-  poly m = pOne();
-  pSetExpV(m,s);
+  pSetExpV(p,s);
   /*  pSetm(m); */ /* done in the pSetExpV */
-  /* think on the component */
-  pSetCoeff0(m,c);
   freeT(e, currRing->N);
   freeT(s, currRing->N);
-  return(m);
+  return(p);
 }
 
 int pLastVblock(poly p, int lV)
