@@ -99,19 +99,15 @@ poly p_mLPshift(poly p, int sh, int uptodeg, int lV, const ring r)
 
   if (sh < 0 )
   {
-#ifdef PDEBUG
-    PrintS("pmLPshift: negative shift requested\n");
-#endif
-    return(NULL); /* violation, 2check */
+    WerrorS("p_mLPshift: negative shift requested\n");
+    return(NULL); /* violation */
   }
 
   int L = p_mLastVblock(p,lV,r);
   if (L+sh-1 > uptodeg)
   {
-#ifdef PDEBUG
-    PrintS("p_mLPshift: too big shift requested\n");
-#endif
-    return(NULL); /* violation, 2check */
+    WerrorS("p_mLPshift: too big shift requested\n");
+    return(NULL); /* violation */
   }
   int *e=(int *)omAlloc0((r->N+1)*sizeof(int));
   int *s=(int *)omAlloc0((r->N+1)*sizeof(int));
@@ -184,19 +180,15 @@ poly pmLPshift(poly p, int sh, int uptodeg, int lV)
 
   if (sh < 0 )
   {
-#ifdef PDEBUG
-    PrintS("pmLPshift: negative shift requested\n");
-#endif
-    return(NULL); /* violation, 2check */
+    WerrorS("pmLPshift: negative shift requested\n");
+    return(NULL); /* violation */
   }
 
   int L = pmLastVblock(p,lV);
   if (L+sh-1 > uptodeg)
   {
-#ifdef PDEBUG
-    PrintS("pmLPshift: too big shift requested\n");
-#endif
-    return(NULL); /* violation, 2check */
+    WerrorS("pmLPshift: too big shift requested\n");
+    return(NULL); /* violation */
   }
   int *e=(int *)omAlloc0((currRing->N+1)*sizeof(int));
   int *s=(int *)omAlloc0((currRing->N+1)*sizeof(int));
