@@ -369,11 +369,11 @@ static proc inf_P (poly f)
       {
         // the point is non-rational and a field extension with minpoly=aux
         // is needed
-        ring r_ext=(char(basering),@a),(x,y,z),lp;
-        poly F=imap(r_auxz,F);
-        poly f_xz=subst(F,y,1);
+        ring r_ext=(char(basering),@a),(x,y,z),lp;        
         poly aux=imap(base_r,aux);
         minpoly=number(subst(aux,x,@a));
+        poly F=imap(r_auxz,F);
+        poly f_xz=subst(F,y,1);
         map phi=r_ext,x+@a,0,z;
         poly f_origin=phi(f_xz);
         if ( subst(subst(diff(f_origin,x),x,0),z,0)==0 &&
