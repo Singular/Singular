@@ -13,8 +13,8 @@
 
 struct snumber; typedef struct snumber  *number;
 
-number   nlGetDenom(number &n, const coeffs r);
-number   nlGetNumerator(number &n, const coeffs r);
+number   nlGetDenom(number &n, const coeffs r); /*for SAGE,, better: n_GetDenom */
+number   nlGetNumerator(number &n, const coeffs r); /*for SAGE, better: n_GetNumerator*/
 
 /*-----------------------------------------------------------------*/
 /**
