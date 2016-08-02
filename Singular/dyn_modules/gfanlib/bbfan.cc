@@ -422,20 +422,24 @@ BOOLEAN insertCone(leftv res, leftv args)
 
 bool containsInCollection(gfan::ZFan* zf, gfan::ZCone* zc)
 {
+  int ld = zf->getLinealityDimension();
+  int d = zc->dimension()-ld;
   gfan::ZVector zv=zc->getRelativeInteriorPoint();
-  for (int d=0; d<=zf->getAmbientDimension(); d++)
+  std::cout << "zc:" << std::endl << zc->toString() << std::endl;
+  std::cout << "zv:" << std::endl << zv.toString() << std::endl;
+  for (int i=0; i<zf->numberOfConesOfDimension(d,0,0); i++)
   {
-    for (int i=0; i<zf->numberOfConesOfDimension(d,0,1); i++)
+    gfan::ZCone zd = zf->getCone(d,i,0,0);
+    std::cout << "zd " << i << std::endl << zd.toString() << std::endl;
+    std::cout << "containsRelatively " << zd.containsRelatively(zv) << std::endl;
+    if (zd.containsRelatively(zv))
     {
-      gfan::ZCone zd = zf->getCone(d,i,0,1);
       zd.canonicalize();
-      if (zd.containsRelatively(zv))
-      {
-        gfan::ZCone temp = *zc;
-        temp.canonicalize();
-        return (!(zd != temp));
-      }
+      zc->canonicalize();
+      return (!(zd != *zc));
     }
+    else
+      break;
   }
   return 0;
 }

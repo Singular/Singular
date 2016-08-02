@@ -29,7 +29,7 @@ if test "x$ENABLE_POLYMAKE" != xno; then
    AC_CHECK_PROG([PMCONFIG],[polymake-config],[1],[0])
    if test $PMCONFIG = "1"; then
 ##    AC_MSG_CHECKING([whether polymake is up-to-date])
-    SUPPORTEDPOLYMAKEVERSION="212"
+    SUPPORTEDPOLYMAKEVERSION="30"
     CURRENTPOLYMAKEVERSION=`polymake-config --version | cut -c -4 -| sed s'/\.//'`
     if test $CURRENTPOLYMAKEVERSION -ge $SUPPORTEDPOLYMAKEVERSION; then
       AC_MSG_RESULT([yes])
