@@ -26,11 +26,13 @@ poly p_mLPshift(poly p, int sh, int uptodeg, int lV,const ring r);
 int p_mLastVblock(poly p, int lV,const ring r);
 int p_LastVblock(poly p, int lV, const ring r);
 
-poly pLPshift(poly p, int sh, int uptodeg, int lV);
-poly pmLPshift(poly p, int sh, int uptodeg, int lV);
+//poly pLPshift(poly p, int sh, int uptodeg, int lV);
+#define pLPshift(p,sh,uptodeg,lV) p_LPshift(p,sh,uptodeg,lV,currRing)
 
-int pLastVblock(poly p, int lV);
-int pmLastVblock(poly p, int lV);
+//int pLastVblock(poly p, int lV);
+#define pLastVblock(p,lV) p_LastVblock(p,lV,currRing)
+//int pmLastVblock(poly p, int lV);
+#define pmLastVblock(p,lV) p_mLastVblock(p,lV,currRing)
 
 int pFirstVblock(poly p, int lV);
 int pmFirstVblock(poly p, int lV);

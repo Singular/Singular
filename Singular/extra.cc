@@ -309,7 +309,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       {
         char tbuf[MAXPATHLEN];
         char *s=omFindExec((char*)h->Data(),tbuf);
-	if(s==NULL) s=(char*)"";
+        if(s==NULL) s=(char*)"";
         res->data=(void *)omStrDup(s);
         res->rtyp=STRING_CMD;
         return FALSE;
@@ -1097,6 +1097,17 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         int uptodeg=(int)((long)(h->Data()));
         h=h->next;
         int lVblock=(int)((long)(h->Data()));
+        if (sh<0)
+        {
+          WerrorS("negative shift for pLPshift");
+          return TRUE;
+        }
+        int L = pmLastVblock(p,lVblock);
+        if (L+sh-1 > uptodeg)
+        {
+          WerrorS("pLPshift: too big shift requested\n");
+          return TRUE;
+        }
         res->data = pLPshift(p,sh,uptodeg,lVblock);
         res->rtyp = POLY_CMD;
         return FALSE;
@@ -3375,10 +3386,10 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
             return FALSE;
           }
           else
-	  {
-	    WerrorS("expected `system(\"HNF\",<matrix|intmat|bigintmat>)`");
-	    return TRUE;
-	  }
+          {
+            WerrorS("expected `system(\"HNF\",<matrix|intmat|bigintmat>)`");
+            return TRUE;
+          }
         }
         else return TRUE;
       }
