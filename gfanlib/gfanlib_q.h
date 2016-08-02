@@ -10,6 +10,7 @@
 
 #include <string.h>
 #include <ostream>
+#include <assert.h>
 #include "gmp.h"
 
 #include "gfanlib_z.h"
@@ -159,24 +160,14 @@ public:
   {
     return mpq_sgn(value);
   }
-  static Rational gcd(Rational const &a, Rational const /*&b*/, Rational /*&s*/, Rational /*&t*/)
+  static Rational gcd(Rational const &a, Rational const &b, Rational &s, Rational &t)
   {
 /*    mpz_t r;
     mpz_init(r);
     mpz_gcdext(r,s.value,t.value,a.value,b.value);
     Integer ret(r);
     mpz_clear(r);*/
-    assert(0);
-    return a;
-  }
-  static Rational gcd(Rational const &a, Rational const /*&b*/)
-  {
-/*    mpz_t r;
-    mpz_init(r);
-    mpz_gcdext(r,s.value,t.value,a.value,b.value);
-    Integer ret(r);
-    mpz_clear(r);*/
-    assert(0);
+    assert(0 && "gcd for Rational not defined");
     return a;
   }
   /**

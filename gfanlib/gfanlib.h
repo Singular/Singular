@@ -15,5 +15,6 @@
 #include "gfanlib_symmetry.h"
 #include "gfanlib_polyhedralfan.h"
 #include "gfanlib_zfan.h"
+#include "gfanlib_mixedvolume.h"
 
 #endif /* GFANLIB_H_ */
