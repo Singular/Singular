@@ -39,6 +39,7 @@ if test "x$ENABLE_POLYMAKE" != xno; then
       PM_LIBS=`polymake-config --libs`
       PM_LDFLAGS=`polymake-config --ldflags`
 
+      AC_DEFINE_UNQUOTED(POLYMAKEVERSION,"$CURRENTPOLYMAKEVERSION",[check the polymake version])
       AC_SUBST(PM_INC)
       AC_SUBST(PM_CFLAGS)
       AC_SUBST(PM_LIBS)
