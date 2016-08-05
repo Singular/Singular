@@ -1,7 +1,7 @@
 #ifndef AEP_H
 #define AEP_H
 
-#include <misc/auxiliary.h>
+#include <singularconfig.h>
 #include "si_gmp.h"
 
 #ifdef SINGULAR_4_1

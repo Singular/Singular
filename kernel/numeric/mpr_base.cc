@@ -13,7 +13,6 @@
 
 #include <kernel/mod2.h>
 
-#include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
 
 #include <misc/mylimits.h>

@@ -14,7 +14,7 @@
  *******************************************************************/
 
 #include <reporter/reporter.h>
-#include <libpolys/libpolysconfig.h>
+#include <misc/auxiliary.h>
 
 // extract p_Procs properties from a ring
 static inline p_Field p_FieldIs(ring r)

@@ -7,7 +7,6 @@
 
 #include <factory/factory.h> // :(
 
-#include <misc/auxiliary.h>
 #include <misc/intvec.h>
 #include <misc/int64vec.h>
 #include <misc/mylimits.h>

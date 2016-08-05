@@ -7,8 +7,8 @@
 * ABSTRACT: class intvec: lists/vectors of int64
 */
 #include <string.h>
-#include <omalloc/omallocClass.h>
 #include <misc/auxiliary.h>
+#include <omalloc/omallocClass.h>
 #include <misc/intvec.h>
 
 class int64vec :public omallocClass

@@ -3,7 +3,8 @@
 
 #include <math.h> // Why this?
 
-#include <misc/auxiliary.h>
+#include <singularconfig.h>
+#include <kernel/mod2.h>
 #include <kernel/structs.h>
 #include <kernel/polys.h>
 #include <coeffs/numbers.h>

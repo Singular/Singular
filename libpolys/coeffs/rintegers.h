@@ -7,7 +7,6 @@
 * ABSTRACT: numbers modulo n
 */
 #include <misc/auxiliary.h>
-#include <coeffs/coeffs.h>
 
 #ifdef HAVE_RINGS
 

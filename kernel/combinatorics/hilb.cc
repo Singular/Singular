@@ -8,7 +8,6 @@
 #include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
-#include <misc/auxiliary.h>
 #include <misc/mylimits.h>
 #include <misc/intvec.h>
 

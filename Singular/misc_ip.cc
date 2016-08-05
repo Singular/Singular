@@ -14,7 +14,6 @@
 #define PLURAL_INTERNAL_DECLARATIONS 1
 
 #include <kernel/mod2.h>
-#include <misc/auxiliary.h>
 #include <misc/sirandom.h>
 
 #include <reporter/si_signals.h>

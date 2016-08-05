@@ -1,7 +1,7 @@
 #ifndef NUMBER2_H
 #define NUMBER2_H
 
-#include <misc/auxiliary.h>
+#include <kernel/mod2.h>
 
 #ifdef SINGULAR_4_1
 #include <omalloc/omalloc.h>

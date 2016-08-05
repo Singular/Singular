@@ -8,7 +8,7 @@
 #ifndef GMS_H
 #define GMS_H
 
-#include <misc/auxiliary.h>
+#include <kernel/mod2.h>
 #include <polys/matpol.h>
 
 #include <kernel/structs.h>

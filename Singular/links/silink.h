@@ -7,7 +7,7 @@
 * ABSTRACT: general interface to links
 */
 
-#include <misc/auxiliary.h>
+#include <singularconfig.h>
 #include <kernel/structs.h>
 
 #include <Singular/links/sing_dbm.h>

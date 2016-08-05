@@ -7,6 +7,7 @@
 * ABSTRACT: numbers modulo n
 */
 #include <misc/auxiliary.h>
+#include <coeffs/coeffs.h>
 
 struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
 struct snumber; typedef struct snumber *   number;

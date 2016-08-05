@@ -7,6 +7,7 @@
 * ABSTRACT
 */
 
+#include <kernel/mod2.h>
 /* for omBin */
 #include <omalloc/omalloc.h>
 #ifdef HAVE_RINGS
@@ -19,7 +20,6 @@
 
 /* C++-part */
 #ifdef __cplusplus
-#include <misc/auxiliary.h>
 #include <kernel/polys.h>
 #include <polys/coeffrings.h>
 

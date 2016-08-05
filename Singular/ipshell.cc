@@ -11,7 +11,6 @@
 
 #include <factory/factory.h>
 
-#include <misc/auxiliary.h>
 #include <misc/options.h>
 #include <misc/mylimits.h>
 #include <misc/intvec.h>
