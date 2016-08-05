@@ -384,7 +384,7 @@ gfan::ZVector intStar2ZVectorWithLeadingOne(const int d, const int* i)
 gfan::ZCone newtonPolytope(poly p, ring r)
 {
   int N = rVar(r);
-  gfan::ZMatrix zm(1,N+1);
+  gfan::ZMatrix zm(0,N+1);
   int *leadexpv = (int*)omAlloc((N+1)*sizeof(int));
   while (p!=NULL)
   {
@@ -394,7 +394,8 @@ gfan::ZCone newtonPolytope(poly p, ring r)
     pIter(p);
   }
   omFreeSize(leadexpv,(N+1)*sizeof(int));
-  return gfan::ZCone();
+  gfan::ZCone Delta = gfan::ZCone::givenByRays(zm,gfan::ZMatrix(0, zm.getWidth()));
+  return Delta;
 }
 
 BOOLEAN newtonPolytope(leftv res, leftv args)
@@ -465,24 +466,22 @@ BOOLEAN mixedVolume(leftv res, leftv args)
     std::vector<gfan::IntMatrix> P(k);
     for (int i=0; i<k; i++)
     {
-      if (l->m[i].Typ() != polytopeID)
+      if (l->m[i].Typ() == polytopeID)
       {
         gfan::ZCone* p = (gfan::ZCone*) l->m[i].Data();
         gfan::ZMatrix pv = p->extremeRays();
         int r = pv.getHeight();
         int c = pv.getWidth();
-        gfan::IntMatrix pw(c,r);
-        for (int n=0; n<c; n++)
-          for (int m=0; m<r; m++)
-          {
-            pw[n][m] = pv[m][n].toInt();
-          }
-        P[i]=pw;
-      } else if (l->m[i].Typ() != POLY_CMD)
+        gfan::IntMatrix pw(r,c-1);
+        for (int n=0; n<r; n++)
+          for (int m=1; m<c; m++)
+            pw[n][m-1] = pv[n][m].toInt();
+        P[i]=pw.transposed();
+      } else if (l->m[i].Typ() == POLY_CMD)
       {
         poly p = (poly) l->m[i].Data();
         int N = rVar(currRing);
-        gfan::IntMatrix pw(0,N+1);
+        gfan::IntMatrix pw(0,N);
         int *leadexpv = (int*)omAlloc((N+1)*sizeof(int));
         while (p!=NULL)
         {
@@ -493,7 +492,7 @@ BOOLEAN mixedVolume(leftv res, leftv args)
           pw.appendRow(zv);
           pIter(p);
         }
-        P[i]=pw;
+        P[i]=pw.transposed();
         omFreeSize(leadexpv,(N+1)*sizeof(int));
       }
       else
@@ -532,6 +531,7 @@ void bbpolytope_setup(SModulFunctions* p)
   p->iiAddCproc("","newtonPolytope",FALSE,newtonPolytope);
   p->iiAddCproc("","scalePolytope",FALSE,scalePolytope);
   p->iiAddCproc("","dualPolytope",FALSE,dualPolytope);
+  p->iiAddCproc("","mixedVolume",FALSE,mixedVolume);
   /********************************************************/
   /* the following functions are implemented in bbcone.cc */
   // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);
