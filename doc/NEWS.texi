@@ -37,6 +37,8 @@ Changed libraries:
 Changes in the kernel:
 @itemize
 @item improved mapping of polynomials/ideals/...
+@item port to gcc 6
+@item port to polymake 3.0
 @end itemize
 
 @heading News for version 4-0-3
