@@ -43,7 +43,6 @@ _config.h.in
 /libpolys/libpolys-config
 /libpolys/libpolysconfig.h
 /libpolys/libpolysconfig.h.in
-/libpolys/misc/auxiliary.h
 /libpolys/polys/m4/
 /libpolys/polys/templates/p_Procs_Generate
 /libpolys/polys/templates/p_Procs.inc

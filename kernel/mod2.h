@@ -3,7 +3,6 @@
  *  Computer Algebra System SINGULAR
  *
  *  mod2.h: Main configuration file for Singular
- *          DO NOT EDIT!
  *
  *******************************************************************/
 #ifndef MOD2_H
@@ -11,7 +10,6 @@
 
 /* please include singularconfig.h exclusively via <kernel/mod2.h> and before any other header */
 # include <singularconfig.h>
-
 # include <misc/auxiliary.h>
 
 #define SINGULAR_MAJOR_VERSION 4
