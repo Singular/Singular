@@ -971,7 +971,7 @@ BOOLEAN PMlatticePoints(leftv res, leftv args)
     try
     {
       polymake::perl::Object* p = ZPolytope2PmPolytope(zp);
-      #if (POLYMAKEVERSION >=300)
+      #if (POLYMAKEVERSION >=214)
       polymake::Matrix<polymake::Integer> lp = p->CallPolymakeMethod("LATTICE_POINTS");
       #elif (POLYMAKEVERSION >=212)
       polymake::Matrix<polymake::Integer> lp = p->give("LATTICE_POINTS");
@@ -1181,7 +1181,7 @@ BOOLEAN PMhilbertBasis(leftv res, leftv args)
     try
     {
       polymake::perl::Object* p = ZPolytope2PmPolytope(zp);
-      #if (POLYMAKEVERSION >=300)
+      #if (POLYMAKEVERSION >=214)
       polymake::Matrix<polymake::Integer> lp = p->CallPolymakeMethod("HILBERT_BASIS");
       #elif (POLYMAKEVERSION >=212)
       polymake::Matrix<polymake::Integer> lp = p->give("HILBERT_BASIS");
