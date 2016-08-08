@@ -42,12 +42,12 @@ std::set<gfan::ZCone> tropicalVariety(const poly g, const ring r, const tropical
       for (int j=i+1; j<l; j++)
       {
         gfan::ZMatrix equation = gfan::ZMatrix(0,n);
-        equation.appendRow(exponents[i]-exponents[j]);
+        equation.appendRow(exponents[i].toVector()-exponents[j].toVector());
         gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
         if (currentCase->restrictToLowerHalfSpace())
           inequalities.appendRow(lowerHalfSpaceCondition);
         for (int k=0; k<l; k++)
-          if (k!=i && k!=j) inequalities.appendRow(exponents[i]-exponents[k]);
+          if (k!=i && k!=j) inequalities.appendRow(((gfan::ZVector)exponents[i])-exponents[k]);
         gfan::ZCone zc = gfan::ZCone(inequalities,equation);
         if (zc.dimension()>=n-1)
         {
@@ -84,12 +84,12 @@ ZConesSortedByDimension tropicalVarietySortedByDimension(const poly g, const rin
       for (int j=i+1; j<l; j++)
       {
         gfan::ZMatrix equation = gfan::ZMatrix(0,n);
-        equation.appendRow(exponents[i]-exponents[j]);
+        equation.appendRow(exponents[i].toVector()-exponents[j].toVector());
         gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
         if (currentCase->restrictToLowerHalfSpace())
           inequalities.appendRow(lowerHalfSpaceCondition);
         for (int k=0; k<l; k++)
-          if (k!=i && k!=j) inequalities.appendRow(exponents[i]-exponents[k]);
+          if (k!=i && k!=j) inequalities.appendRow(exponents[i].toVector()-exponents[k].toVector());
         gfan::ZCone zc = gfan::ZCone(inequalities,equation);
         if (zc.dimension()>=n-1)
         {

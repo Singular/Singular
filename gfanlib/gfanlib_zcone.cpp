@@ -25,16 +25,58 @@
 #endif //HAVE_CDDLIB_SETOPER_H
 #endif //HAVE_CDD_SETOPER_H
 
-namespace gfan{
 
-  static void cddinitGmp()
+namespace gfan{
+        bool isCddlibRequired()
+        {
+                return true;
+        }
+        void initializeCddlibIfRequired() // calling this frequently will cause memory leaks because deinitialisation is not possible with old versions of cddlib.
+        {
+                dd_set_global_constants();
+        }
+        void deinitializeCddlibIfRequired()
+        {
+        #ifdef HAVE_DD_FREE_GLOBAL_CONSTANTS
+                dd_free_global_constants();
+        #endif
+        }
+  static void ensureCddInitialisation()
   {
-    static bool initialized;
-    if(!initialized)
+          // A more complicated initialisation than the following (meaning attempts to count the number of times
+          // cddlib was requested to be initialised) would require cddlib to be thread aware.
+          // The error below is implemented with an assert(0) because throwing an exception may leave the impression that
+          // it is possible to recover from this error. While that may be true, it would not work in full generality,
+          // as the following if statement cannot test whether dd_free_global_constants() has also been called.
+          // Moverover, in multithreaded environments it would be quite difficult to decide if cddlib was initialised.
+          if(!dd_one[0]._mp_num._mp_d)
+          {
+                  std::cerr<<"CDDLIB HAS NOT BEEN INITIALISED!\n"
+                                  "\n"
+                                  "Fix this problem by calling the following function in your initialisation code:\n"
+                                  "dd_set_global_constants();\n"
+                                  "(after possibly setting the gmp allocators) and\n"
+                                  "dd_free_global_constants()\n"
+                                  "in your deinitialisation code (only available for cddlib version>=094d).\n"
+                                  "This requires the header includes:\n"
+                                  "#include \"cdd/setoper.h\"\n"
+                                  "#include \"cdd/cdd.h\"\n"
+                                  "\n"
+                                  "Alternatively, you may call gfan:initializeCddlibIfRequired() and deinitializeCddlibIfRequired()\n"
+                                  "if gfanlib is the only code using cddlib. If at some point cddlib is no longer required by gfanlib\n"
+                                  "these functions may do nothing.\n"
+                                  "Because deinitialisation is not possible in cddlib <094d, the functions may leak memory and should not be called often.\n"
+                                  "\n"
+                                  "This error message will never appear if the initialisation was done properly, and therefore never appear in a shipping version of your software.\n";
+                  assert(0);
+          }
+          /*
+          static bool initialized;
+          if(!initialized)
       {
-        dd_set_global_constants();  /* First, this must be called. */
-        initialized=true;
-      }
+                        dd_set_global_constants();
+                        initialized=true;
+      }*/
   }
 
 
@@ -84,7 +126,7 @@ class LpSolver
     int numberOfInequalities=inequalities.getHeight();
     int numberOfRows=g.getHeight();
     dd_MatrixPtr A=NULL;
-    cddinitGmp();
+    ensureCddInitialisation();
     A=ZMatrix2MatrixGmp(g, err);
     for(int i=numberOfInequalities;i<numberOfRows;i++)
       set_addelem(A->linset,i+1);
@@ -120,14 +162,15 @@ class LpSolver
     // dd_DataFileType inputfile;
     FILE *reading=NULL;
 
-    cddinitGmp();
+    ensureCddInitialisation();
 
     M=ZMatrix2MatrixGmp(g, &err);
     if (err!=dd_NoError) goto _L99;
 
     // d=M->colsize;
 
-    static dd_Arow temp;
+    //static dd_Arow temp;
+    dd_Arow temp;
     dd_InitializeArow(g.getWidth()+1,&temp);
 
     ret= !dd_Redundant(M,index+1,temp,&err);
@@ -267,8 +310,8 @@ class LpSolver
 
     for(int i=0;i<a.getHeight();i++)
       {
-        assert(!(a[i].isZero()));
-        b.insert(a[i].normalized());
+        assert(!(a[i].toVector().isZero()));
+        b.insert(a[i].toVector().normalized());
       }
 
       {
@@ -301,7 +344,7 @@ class LpSolver
 
     for(int i=0;i!=original.getHeight();i++)
       for(int j=0;j!=a.getHeight();j++)
-        if(!dependent(original[i],a[j]))
+        if(!dependent(original[i].toVector(),a[j].toVector()))
             {
               ZVector const &I=original[i];
               ZVector const &J=a[j];
@@ -336,7 +379,7 @@ public:
   }
   void removeRedundantRows(ZMatrix &inequalities, ZMatrix &equations, bool removeInequalityRedundancies)
   {
-    cddinitGmp();
+          ensureCddInitialisation();
 
     int numberOfEqualities=equations.getHeight();
     int numberOfInequalities=inequalities.getHeight();
@@ -402,7 +445,7 @@ public:
   ZVector relativeInteriorPoint(const ZMatrix &inequalities, const ZMatrix &equations)
   {
     QVector retUnscaled(inequalities.getWidth());
-    cddinitGmp();
+    ensureCddInitialisation();
     int numberOfEqualities=equations.getHeight();
     int numberOfInequalities=inequalities.getHeight();
     int numberOfRows=numberOfEqualities+numberOfInequalities;
@@ -458,7 +501,7 @@ _L99:
     dd_MatrixPtr A=NULL;
     dd_ErrorType err=dd_NoError;
 
-        cddinitGmp();
+    ensureCddInitialisation();
 
     A=ZMatrix2MatrixGmp(inequalities, equations, &err);
 
@@ -566,7 +609,7 @@ _L99:
     dd_MatrixPtr A=NULL;
     dd_ErrorType err=dd_NoError;
 
-    cddinitGmp();
+    ensureCddInitialisation();
     A=ZMatrix2MatrixGmp(inequalities, &err);
 
     dd_PolyhedraPtr poly;
@@ -750,36 +793,6 @@ std::string ZCone::toString()const
         std::stringstream f;
         f<<*this;
         return f.str();
-// =======
-//   std::stringstream s;
-//   s<<"AMBIENT_DIM"<<std::endl;
-//   s<<this->ambientDimension()<<std::endl;
-
-//   gfan::ZMatrix i=this->getInequalities();
-//   if (this->areFacetsKnown())
-//     s<<"FACETS"<<std::endl;
-//   else
-//     s<<"INEQUALITIES"<<std::endl;
-//   s<<i<<std::endl;
-
-//   gfan::ZMatrix e=this->getEquations();
-//   if (this->areImpliedEquationsKnown())
-//     s<<"LINEAR_SPAN"<<std::endl;
-//   else
-//     s<<"EQUATIONS"<<std::endl;
-//   s<<e<<std::endl;
-
-//   gfan::ZMatrix r=this->extremeRays();
-//   s<<"RAYS"<<std::endl;
-//   s<<r<<std::endl;
-
-//   gfan::ZMatrix l=this->generatorsOfLinealitySpace();
-//   s<<"LINEALITY_SPACE"<<std::endl;
-//   s<<l<<std::endl;
-
-//   std::cout << s.str();
-//   return;
-// >>>>>>> chg: status update 17.07.
 }
 
 ZCone::ZCone(int ambientDimension):
@@ -1237,9 +1250,9 @@ ZMatrix ZCone::quotientLatticeBasis()const
   ZMatrix ret(0,n);
 
   for(int i=0;i<M.getHeight();i++)
-    if(M[i].subvector(0,a).isZero()&&!M[i].subvector(a,a+b).isZero())
+    if(M[i].toVector().subvector(0,a).isZero()&&!M[i].toVector().subvector(a,a+b).isZero())
       {
-        ret.appendRow(M[i].subvector(a+b,a+b+n));
+        ret.appendRow(M[i].toVector().subvector(a+b,a+b+n));
       }
 
   return ret;
@@ -1251,9 +1264,9 @@ ZVector ZCone::semiGroupGeneratorOfRay()const
   ZMatrix temp=quotientLatticeBasis();
   assert(temp.getHeight()==1);
   for(int i=0;i<inequalities.getHeight();i++)
-    if(dot(temp[0],inequalities[i]).sign()<0)
+    if(dot(temp[0].toVector(),inequalities[i].toVector()).sign()<0)
       {
-        temp[0]=-temp[0];
+        temp[0]=-temp[0].toVector();
         break;
       }
   return temp[0];
@@ -1337,4 +1350,4 @@ ZMatrix ZCone::generatorsOfLinealitySpace()const
   return QToZMatrixPrimitive(l.reduceAndComputeKernel());
 }
 
-};
+}

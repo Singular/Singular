@@ -128,10 +128,10 @@ BOOLEAN positiveTropicalStartingPoint(leftv res, leftv args)
         gfan::ZMatrix ray = zc->extremeRays();
         for (int i=0; i<ray.getHeight(); i++)
         {
-          if (ray[i].isPositive())
+          if (ray[i].toVector().isPositive())
           {
             res->rtyp = BIGINTMAT_CMD;
-            res->data = (void*) zVectorToBigintmat(ray[i]);
+            res->data = (void*) zVectorToBigintmat(ray[i].toVector());
             return FALSE;
           }
         }
@@ -163,10 +163,10 @@ BOOLEAN nonNegativeTropicalStartingPoint(leftv res, leftv args)
         gfan::ZMatrix ray = zc->extremeRays();
         for (int i=0; i<ray.getHeight(); i++)
         {
-          if (ray[i].isNonNegative())
+          if (ray[i].toVector().isNonNegative())
           {
             res->rtyp = BIGINTMAT_CMD;
-            res->data = (void*) zVectorToBigintmat(ray[i]);
+            res->data = (void*) zVectorToBigintmat(ray[i].toVector());
             return FALSE;
           }
         }
@@ -198,11 +198,11 @@ BOOLEAN negativeTropicalStartingPoint(leftv res, leftv args)
         gfan::ZMatrix ray = zc->extremeRays();
         for (int i=0; i<ray.getHeight(); i++)
         {
-          gfan::ZVector negatedRay = gfan::Integer(-1)*ray[i];
+          gfan::ZVector negatedRay = gfan::Integer(-1)*ray[i].toVector();
           if (negatedRay.isPositive())
           {
             res->rtyp = BIGINTMAT_CMD;
-            res->data = (void*) zVectorToBigintmat(ray[i]);
+            res->data = (void*) zVectorToBigintmat(ray[i].toVector());
             return FALSE;
           }
         }
@@ -234,7 +234,7 @@ BOOLEAN nonPositiveTropicalStartingPoint(leftv res, leftv args)
         gfan::ZMatrix ray = zc->extremeRays();
         for (int i=0; i<ray.getHeight(); i++)
         {
-          gfan::ZVector negatedRay = gfan::Integer(-1)*ray[i];
+          gfan::ZVector negatedRay = gfan::Integer(-1)*ray[i].toVector();
           if (negatedRay.isNonNegative())
           {
             res->rtyp = BIGINTMAT_CMD;

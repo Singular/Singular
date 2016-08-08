@@ -70,16 +70,14 @@ bool PolyhedralFan::isEmpty()const
 
 int PolyhedralFan::getMaxDimension()const
 {
-  if (cones.empty())
-    return -1;
+  assert(!cones.empty());
 
   return cones.begin()->dimension();
 }
 
 int PolyhedralFan::getMinDimension()const
 {
-  if (cones.empty())
-    return -1;
+  assert(!cones.empty());
 
   return cones.rbegin()->dimension();
 }
@@ -354,7 +352,7 @@ ZMatrix generatorsOfLinealitySpace=cones.begin()->generatorsOfLinealitySpace();/
 
       bool notAll=false;
       for(unsigned j=0;j<theCone.indices.size();j++)
-        if(dot(rays[theCone.indices[j]],facetCandidates[i]).sign()==0)
+        if(dot(rays[theCone.indices[j]].toVector(),facetCandidates[i].toVector()).sign()==0)
           indices.insert(theCone.indices[j]);
         else
           notAll=true;
@@ -863,8 +861,7 @@ int PolyhedralFan::size()const
 
 int PolyhedralFan::dimensionOfLinealitySpace()const
 {
-  if (cones.empty())
-    return n;
+  assert(cones.size());//slow!
   return cones.begin()->dimensionOfLinealitySpace();
 }
 

@@ -9,7 +9,6 @@
 #define LIB_Z_H_
 
 #include <string.h>
-#include <iostream>
 #include <ostream>
 
 #define OLD 1
@@ -40,7 +39,7 @@ public:
   {
     mpz_init_set(value,value_.value);
   }
-  Integer(mpz_t value_)
+  Integer(mpz_t const value_)
   {
     mpz_init_set(value,value_);
   }
@@ -60,9 +59,6 @@ public:
   bool isZero()const{
     return mpz_sgn(value)==0;
   }
-  bool isOne()const{
-    return mpz_cmp_si(value,1);
-  }
   friend std::ostream &operator<<(std::ostream &f, Integer const &a)
   {
     void (*freefunc)(void *, size_t);
@@ -71,15 +67,6 @@ public:
     f<<str;
     freefunc(str,strlen(str)+1);
     return f;
-  }
-  void debugPrint() const
-  {
-    void (*freefunc)(void *, size_t);
-    mp_get_memory_functions(0,0,&freefunc);
-    char *str=mpz_get_str(0,10,value);
-    std::cout << str;
-    freefunc(str,strlen(str)+1);
-    return;
   }
   Integer& operator+=(const Integer& a)
     {
@@ -160,17 +147,6 @@ public:
     mpz_t r;
     mpz_init(r);
     mpz_gcdext(r,s.value,t.value,a.value,b.value);
-    Integer ret(r);
-    mpz_clear(r);
-    return ret;
-  }
-  static Integer gcd(Integer const &a, Integer const &b)
-  {
-    if (a.isOne() || b.isOne())
-      return Integer(1);
-    mpz_t r;
-    mpz_init(r);
-    mpz_gcd(r,a.value,b.value);
     Integer ret(r);
     mpz_clear(r);
     return ret;
@@ -352,11 +328,6 @@ namespace gfan{
           f<<valueToWord();
         }
       return f;
-    }
-    friend void debugPrint(IntegerTemplate const &a)
-    {
-      std::cout << a << std::endl;
-      return;
     }
     LimbWord signExtension(LimbWord a)
     {

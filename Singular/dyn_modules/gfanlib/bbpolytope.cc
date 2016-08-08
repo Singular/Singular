@@ -184,6 +184,7 @@ static BOOLEAN ppCONERAYS3(leftv res, leftv u, leftv v)
 
 BOOLEAN polytopeViaVertices(leftv res, leftv args)
 {
+  gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && ((u->Typ() == BIGINTMAT_CMD) || (u->Typ() == INTMAT_CMD)))
   {
@@ -318,6 +319,7 @@ static BOOLEAN ppCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
 
 BOOLEAN polytopeViaNormals(leftv res, leftv args)
 {
+  gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && ((u->Typ() == BIGINTMAT_CMD) || (u->Typ() == INTMAT_CMD)))
   {
@@ -339,6 +341,7 @@ BOOLEAN polytopeViaNormals(leftv res, leftv args)
 
 BOOLEAN vertices(leftv res, leftv args)
 {
+  gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
     {
@@ -378,27 +381,32 @@ gfan::ZVector intStar2ZVectorWithLeadingOne(const int d, const int* i)
   return zv;
 }
 
+gfan::ZCone newtonPolytope(poly p, ring r)
+{
+  int N = rVar(r);
+  gfan::ZMatrix zm(0,N+1);
+  int *leadexpv = (int*)omAlloc((N+1)*sizeof(int));
+  while (p!=NULL)
+  {
+    p_GetExpV(p,leadexpv,r);
+    gfan::ZVector zv = intStar2ZVectorWithLeadingOne(N, leadexpv);
+    zm.appendRow(zv);
+    pIter(p);
+  }
+  omFreeSize(leadexpv,(N+1)*sizeof(int));
+  gfan::ZCone Delta = gfan::ZCone::givenByRays(zm,gfan::ZMatrix(0, zm.getWidth()));
+  return Delta;
+}
+
 BOOLEAN newtonPolytope(leftv res, leftv args)
 {
+  gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == POLY_CMD))
   {
     poly p = (poly)u->Data();
-    int N = rVar(currRing);
-    gfan::ZMatrix zm(1,N+1);
-    int *leadexpv = (int*)omAlloc((N+1)*sizeof(int));
-    while (p!=NULL)
-    {
-      pGetExpV(p,leadexpv);
-      gfan::ZVector zv = intStar2ZVectorWithLeadingOne(N, leadexpv);
-      zm.appendRow(zv);
-      pIter(p);
-    }
-    omFreeSize(leadexpv,(N+1)*sizeof(int));
-    gfan::ZCone* zc = new gfan::ZCone();
-    *zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
     res->rtyp = polytopeID;
-    res->data = (void*) zc;
+    res->data = (void*) new gfan::ZCone(newtonPolytope(p,currRing));
     return FALSE;
   }
   WerrorS("newtonPolytope: unexpected parameters");
@@ -407,6 +415,7 @@ BOOLEAN newtonPolytope(leftv res, leftv args)
 
 BOOLEAN scalePolytope(leftv res, leftv args)
 {
+  gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == INT_CMD))
   {
@@ -432,6 +441,7 @@ BOOLEAN scalePolytope(leftv res, leftv args)
 
 BOOLEAN dualPolytope(leftv res, leftv args)
 {
+  gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
@@ -444,6 +454,64 @@ BOOLEAN dualPolytope(leftv res, leftv args)
   WerrorS("dualPolytope: unexpected parameters");
   return TRUE;
 }
+
+BOOLEAN mixedVolume(leftv res, leftv args)
+{
+  gfan::initializeCddlibIfRequired();
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == LIST_CMD))
+  {
+    lists l = (lists) u->Data();
+    int k = lSize(l)+1;
+    std::vector<gfan::IntMatrix> P(k);
+    for (int i=0; i<k; i++)
+    {
+      if (l->m[i].Typ() == polytopeID)
+      {
+        gfan::ZCone* p = (gfan::ZCone*) l->m[i].Data();
+        gfan::ZMatrix pv = p->extremeRays();
+        int r = pv.getHeight();
+        int c = pv.getWidth();
+        gfan::IntMatrix pw(r,c-1);
+        for (int n=0; n<r; n++)
+          for (int m=1; m<c; m++)
+            pw[n][m-1] = pv[n][m].toInt();
+        P[i]=pw.transposed();
+      } else if (l->m[i].Typ() == POLY_CMD)
+      {
+        poly p = (poly) l->m[i].Data();
+        int N = rVar(currRing);
+        gfan::IntMatrix pw(0,N);
+        int *leadexpv = (int*)omAlloc((N+1)*sizeof(int));
+        while (p!=NULL)
+        {
+          p_GetExpV(p,leadexpv,currRing);
+          gfan::IntVector zv(N);
+          for (int i=0; i<N; i++)
+            zv[i] = leadexpv[i+1];
+          pw.appendRow(zv);
+          pIter(p);
+        }
+        P[i]=pw.transposed();
+        omFreeSize(leadexpv,(N+1)*sizeof(int));
+      }
+      else
+      {
+        WerrorS("mixedVolume: entries of unsupported type in list");
+        return TRUE;
+      }
+    }
+    gfan::Integer mv = gfan::mixedVolume(P);
+
+    res->rtyp = BIGINT_CMD;
+    res->data = (void*) integerToNumber(mv);
+    return FALSE;
+  }
+  WerrorS("mixedVolume: unexpected parameters");
+  return TRUE;
+}
+
+
 
 void bbpolytope_setup(SModulFunctions* p)
 {
@@ -463,6 +531,7 @@ void bbpolytope_setup(SModulFunctions* p)
   p->iiAddCproc("","newtonPolytope",FALSE,newtonPolytope);
   p->iiAddCproc("","scalePolytope",FALSE,scalePolytope);
   p->iiAddCproc("","dualPolytope",FALSE,dualPolytope);
+  p->iiAddCproc("","mixedVolume",FALSE,mixedVolume);
   /********************************************************/
   /* the following functions are implemented in bbcone.cc */
   // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);

@@ -9,10 +9,22 @@
 #define LIB_CONE_H_
 
 #include "gfanlib_matrix.h"
-#include <sstream>
 
 namespace gfan{
-
+/**
+ * Returns true if cddlib is needed for the ZCone implementation.
+ */
+        bool isCddlibRequired();
+        /**
+         * Only call this function if gfanlib is the only code in your program using cddlib.
+         * Should be paired with a deinitializeCddlibIfRequired() call.
+         * Calling the function repeatedly may cause memory leaks even if deinitializeCddlibIfRequired() is also called.
+         */
+        void initializeCddlibIfRequired();
+        /**
+         * This function may do nothing.
+         */
+        void deinitializeCddlibIfRequired();
 
 /**
 A PolyhedralCone is represented by linear inequalities and equations. The inequalities are non-strict
@@ -357,7 +369,9 @@ public:
     std::string toString()const;
 };
 
-};
+}
+
+
 
 
 #endif /* LIB_CONE_H_ */

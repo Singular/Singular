@@ -184,7 +184,7 @@ void SymmetricComplex::insert(Cone const &c)
 
 int SymmetricComplex::getLinDim()const
 {
-  return linealitySpace.getHeight();
+        return linealitySpace.getHeight();
 }
 
 int SymmetricComplex::getMaxDim()const
@@ -594,11 +594,9 @@ IntegerMatrix SymmetricComplex::boundaryMap(int d)
 
 
     if(flags&FPF_cones)polymakeFile.writeStringProperty("CONES",toStringJustCones(getMinDim(),getMaxDim(),false,flags&FPF_group, 0,false,flags&FPF_tPlaneSort));
-    std::stringstream multiplicities;
-    if(flags&FPF_maximalCones)polymakeFile.writeStringProperty("MAXIMAL_CONES",toStringJustCones(getMinDim(),getMaxDim(),true,flags&FPF_group, &multiplicities,false,flags&FPF_tPlaneSort));
+    if(flags&FPF_maximalCones)polymakeFile.writeStringProperty("MAXIMAL_CONES",toStringJustCones(getMinDim(),getMaxDim(),true,flags&FPF_group, 0,false,flags&FPF_tPlaneSort));
     if(flags&FPF_conesCompressed)polymakeFile.writeStringProperty("CONES_ORBITS",toStringJustCones(getMinDim(),getMaxDim(),false,flags&FPF_group, 0,true,flags&FPF_tPlaneSort));
     if((flags&FPF_conesCompressed) && (flags&FPF_maximalCones))polymakeFile.writeStringProperty("MAXIMAL_CONES_ORBITS",toStringJustCones(getMinDim(),getMaxDim(),true,flags&FPF_group, 0,true,flags&FPF_tPlaneSort));
-    if(flags&FPF_multiplicities)polymakeFile.writeStringProperty("MULTIPLICITIES",multiplicities.str());
 
     if(!sym.isTrivial())
       {
@@ -636,6 +634,7 @@ IntegerMatrix SymmetricComplex::boundaryMap(int d)
   //          log1 fprintf(Stderr,"Producing list of maximal cones.\n");
             stringstream multiplicities;
             polymakeFile.writeStringProperty("MAXIMAL_CONES",symCom.toString(symCom.getMinDim(),symCom.getMaxDim(),true,flags&FPF_group, &multiplicities,false,flags&FPF_tPlaneSort));
+            if(flags&FPF_multiplicities)polymakeFile.writeStringProperty("MULTIPLICITIES",multiplicities.str());
   //          log1 fprintf(Stderr,"Done producing list of maximal cones.\n");
           }
       }

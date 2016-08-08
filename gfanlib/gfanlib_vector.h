@@ -71,20 +71,21 @@ public:
   //--------
   // Access
   //--------
-  typ& operator[](int n)
+  typ& operator[](int n)__attribute__((always_inline))
     {
       if(!(n>=0 && n<(int)v.size()))outOfRange(n,v.size());
       return (v[n]);
     }
-  const typ& operator[](int n)const{assert(n>=0 && n<(int)v.size());return (v[n]);}
-  const typ& UNCHECKEDACCESS(int n)const{return (v[n]);}
+  const typ& operator[](int n)const __attribute__((always_inline)){assert(n>=0 && n<(int)v.size());return (v[n]);}
+  typ& UNCHECKEDACCESS(int n)__attribute__((always_inline)){return (v[n]);}
+  const typ& UNCHECKEDACCESS(int n)const __attribute__((always_inline)){return (v[n]);}
 
   //-------------
   // STL related
   //-------------
   unsigned int size()const{return v.size();};
   void resize(int n){v.resize(n,typ());};
-  void grow(int i){if((int)size()<i)resize(i);}
+  void grow(int i){if(size()<i)resize(i);}
   void push_back(typ a)
   {
     v.push_back(a);
@@ -292,36 +293,23 @@ public:
 
   std::string toString()const
   {
-    std::stringstream f;
-    f<<*this;
-    return f.str();
+          std::stringstream f;
+          f<<*this;
+          return f.str();
   }
 
   typ gcd()const
   {
+    typ temp1,temp2;
     typ ret(1);
     for(unsigned i=0;i<size();i++)
-      ret=typ::gcd(ret,v[i]);
+      ret=typ::gcd(ret,v[i],temp1,temp2);
     return ret;
   }
   Vector normalized()const
   {
     assert(!typ::isField());
     return (*this)/gcd();
-  }
-
-  void debugPrint()const
-  {
-    std::stringstream s;
-    s<<"(";
-    for(typename std::vector<typ>::const_iterator i=this->v.begin();i!=this->v.end();i++)
-    {
-      if(i!=this->v.begin()) s<<",";
-      s<<*i;
-    }
-    s<<")"<<std::endl;
-    std::cout << s.str();
-    return;
   }
 };
 
@@ -414,8 +402,8 @@ inline ZVector QToZVectorPrimitive(QVector const &v)
     mpz_clear(lcm);
 
     return ret;
-};
+}
 
-};
+}
 
 #endif /* LIB_ZVECTOR_H_ */

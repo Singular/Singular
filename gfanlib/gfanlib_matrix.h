@@ -8,7 +8,6 @@
 #ifndef LIB_ZMATRIX_H_
 #define LIB_ZMATRIX_H_
 
-#include <sstream>
 #include <vector>
 #include <algorithm>
 #include "gfanlib_vector.h"
@@ -17,28 +16,28 @@ namespace gfan{
 
 template <class typ> class Matrix{
   int width,height;
-  std::vector<Vector<typ> > rows;
+//  std::vector<Vector<typ> > rows;
+  std::vector<typ> data;
 public:
   // rowIterator;
  // std::vector<Vector<typ> >::iterator rowsBegin(){return rows.begin();}
 //  std::vector<Vector<typ> >::iterator rowsEnd(){return rows.end();}
   inline int getHeight()const{return height;};
   inline int getWidth()const{return width;};
-  Matrix(const Matrix &a):width(a.getWidth()),height(a.getHeight()),rows(a.rows){
+  Matrix(const Matrix &a):width(a.getWidth()),height(a.getHeight()),data(a.data){
   }
-  Matrix(int height_, int width_):width(width_),height(height_),rows(height_){
+  Matrix(int height_, int width_):width(width_),height(height_),data(width_*height_){
     assert(height>=0);
     assert(width>=0);
-    for(int i=0;i<getHeight();i++)rows[i]=Vector<typ>(width);
   };
   ~Matrix(){
   };
   Matrix():width(0),height(0){
   };
-  Matrix rowVectorMatrix(Vector<typ> const &v)
+  static Matrix rowVectorMatrix(Vector<typ> const &v)
   {
     Matrix ret(1,v.size());
-    for(unsigned i=0;i<v.size();i++)ret[0][i]=v[i];
+    for(int i=0;i<v.size();i++)ret[0][i]=v[i];
     return ret;
   }
   Vector<typ> column(int i)const
@@ -46,46 +45,47 @@ public:
       assert(i>=0);
       assert(i<getWidth());
       Vector<typ> ret(getHeight());
-      for(int j=0;j<getHeight();j++)ret[j]=rows[j][i];
+      for(int j=0;j<getHeight();j++)ret[j]=(*this)[j][i];
       return ret;
     }
   Matrix transposed()const
     {
       Matrix ret(getWidth(),getHeight());
       for(int i=0;i<getWidth();i++)
-        ret.rows[i]=column(i);
+          for(int j=0;j<getHeight();j++)
+                  ret[i][j]=(*this)[j][i];
       return ret;
     }
   static Matrix identity(int n)
     {
       Matrix m(n,n);
-      for(int i=0;i<n;i++)m.rows[i]=Vector<typ>::standardVector(n,i);
+      for(int i=0;i<n;i++)m[i][i]=typ(1);
       return m;
     }
   void append(Matrix const &m)
     {
+      assert(m.getWidth()==width);
+          data.resize((height+m.height)*width);
+          int oldHeight=height;
+      height+=m.height;
       for(int i=0;i<m.height;i++)
         {
-          rows.push_back(m[i]);
+          for(int j=0;j<m.width;j++)
+                  (*this)[i+oldHeight][j]=m[i][j];
         }
-      height+=m.height;
     }
   void appendRow(Vector<typ> const &v)
-  {
-    assert((int)v.size()==width);
-    rows.push_back(v);
-    height++;
-  }
-  void prependRow(Vector<typ> const &v)
-  {
-    assert((int)v.size()==width);
-    rows.insert(rows.begin(),v);
-    height++;
-  }
+    {
+          assert(v.size()==width);
+          data.resize((height+1)*width);
+          height++;
+          for(int j=0;j<width;j++)
+                  (*this)[height-1][j]=v[j];
+    }
   void eraseLastRow()
   {
-    assert(rows.size()>0);
-    rows.pop_back();
+    assert(height>0);
+    data.resize((height-1)*width);
     height--;
   }
   /*IntegerVector vectormultiply(IntegerVector const &v)const
@@ -110,7 +110,9 @@ public:
   friend Matrix operator*(const typ &s, const Matrix& q)
     {
       Matrix p=q;
-      for(int i=0;i<q.height;i++)p[i]=s*(q[i]);
+      for(int i=0;i<q.height;i++)
+          for(int j=0;j<q.width;j++)
+                  p[i][j]=s*(q[i][j]);
       return p;
     }
   friend Matrix operator*(const Matrix& a, const Matrix& b)
@@ -146,12 +148,172 @@ public:
     Matrix ret(endRow-startRow,endColumn-startColumn);
     for(int i=startRow;i<endRow;i++)
       for(int j=startColumn;j<endColumn;j++)
-        ret[i-startRow][j-startColumn]=rows[i][j];
+        ret[i-startRow][j-startColumn]=(*this)[i][j];
     return ret;
   }
-  const Vector<typ>& operator[](int n)const{assert(n>=0 && n<getHeight());return (rows[n]);}
-// Bugfix for gcc4.5 (passing assertion to the above operator):
-  Vector<typ>& operator[](int n){if(!(n>=0 && n<getHeight())){(*(const Matrix<typ>*)(this))[n];}return (rows[n]);}
+
+  class RowRef;
+  class const_RowRef{
+    int rowNumM;
+    Matrix const &matrix;
+    friend class RowRef;
+  public:
+  inline const_RowRef(const Matrix  &matrix_, int rowNum_)__attribute__((always_inline)):
+    rowNumM(rowNum_*matrix_.width),
+      matrix(matrix_)
+      {
+      }
+  inline typ const &operator[](int j)const __attribute__((always_inline))
+    {
+        assert(j>=0);
+        assert(j<matrix.width);
+        return matrix.data[rowNumM+j];
+    }
+  inline typ const &UNCHECKEDACCESS(int j)const __attribute__((always_inline))
+    {
+        return matrix.data[rowNumM+j];
+    }
+    const Vector<typ> toVector()const
+    {
+      Vector<typ> ret(matrix.width);
+      for(int j=0;j<matrix.width;j++)
+              ret[j]=matrix.data[rowNumM+j];
+      return ret;
+    }
+    operator Vector<typ>()const
+                {
+                        return toVector();
+                }
+    bool operator==(Vector<typ> const &b)const
+                {
+                        return toVector()==b;
+                }
+/*    typ dot(Vector<typ> const &b)const
+                {
+                        return dot(toVector(),b);
+                }*/
+    Vector<typ> operator-()const
+    {
+            return -toVector();
+    }
+  };
+  class RowRef{
+    int rowNumM;
+    Matrix &matrix;
+  public:
+  inline RowRef(Matrix &matrix_, int rowNum_):
+    rowNumM(rowNum_*matrix_.width),
+      matrix(matrix_)
+      {
+      }
+    inline typ &operator[](int j) __attribute__((always_inline))
+      {
+            assert(j>=0);
+            assert(j<matrix.width);
+            return matrix.data[rowNumM+j];
+      }
+    inline typ &UNCHECKEDACCESS(int j)
+      {
+            return matrix.data[rowNumM+j];
+      }
+    RowRef &operator=(Vector<typ> const &v)
+    {
+        assert(v.size()==matrix.width);
+        for(int j=0;j<matrix.width;j++)
+                matrix.data[rowNumM+j]=v[j];
+
+            return *this;
+    }
+    RowRef &operator=(RowRef const &v)
+    {
+        assert(v.matrix.width==matrix.width);
+        for(int j=0;j<matrix.width;j++)
+                matrix.data[rowNumM+j]=v.matrix.data[v.rowNumM+j];
+
+            return *this;
+    }
+/*    RowRef &operator+=(Vector<typ> const &v)
+    {
+        assert(v.size()==matrix.width);
+        for(int j=0;j<matrix.width;j++)
+                matrix.data[rowNumM+j]+=v.v[j];
+
+            return *this;
+    }*/
+    RowRef &operator+=(RowRef const &v)
+    {
+        assert(v.matrix.width==matrix.width);
+        for(int j=0;j<matrix.width;j++)
+                matrix.data[rowNumM+j]+=v.matrix.data[v.rowNumM+j];
+
+            return *this;
+    }
+    RowRef &operator+=(const_RowRef const &v)
+    {
+        assert(v.matrix.width==matrix.width);
+        for(int j=0;j<matrix.width;j++)
+                matrix.data[rowNumM+j]+=v.matrix.data[v.rowNumM+j];
+
+            return *this;
+    }
+    RowRef &operator=(const_RowRef const &v)
+    {
+        assert(v.matrix.width==matrix.width);
+        for(int j=0;j<matrix.width;j++)
+                matrix.data[rowNumM+j]=v.matrix.data[v.rowNumM+j];
+
+            return *this;
+    }
+    const Vector<typ> toVector()const
+    {
+      Vector<typ> ret(matrix.width);
+      for(int j=0;j<matrix.width;j++)
+              ret[j]=matrix.data[rowNumM+j];
+      return ret;
+    }
+    operator Vector<typ>()const
+                {
+                        return toVector();
+                }
+/*    typ dot(Vector<typ> const &b)const
+                {
+                        return dot(toVector(),b);
+                }*/
+    bool isZero()const
+        {
+          for(int j=0;j<matrix.width;j++)if(!(matrix.data[rowNumM+j].isZero()))return false;
+          return true;
+        }
+  };
+
+
+  inline RowRef operator[](int i) __attribute__((always_inline))
+  {
+    assert(i>=0);
+    assert(i<height);
+    return RowRef(*this,i);
+  }
+  inline const_RowRef operator[](int i)const __attribute__((always_inline))
+  {
+    assert(i>=0);
+    assert(i<height);
+    return const_RowRef(*this,i);
+  }
+
+
+  const typ& UNCHECKEDACCESS(int i,int j)const __attribute__((always_inline)){
+/*            assert(i>=0);
+            assert(i<height);
+            assert(j>=0);
+            assert(j<width);*/
+          return data[i*width+j];}
+  typ& UNCHECKEDACCESS(int i,int j) __attribute__((always_inline)){
+/*            assert(i>=0);
+            assert(i<height);
+            assert(j>=0);
+            assert(j<width);*/
+            return data[i*width+j];}
+
 
 
   bool operator<(const Matrix & b)const
@@ -163,8 +325,8 @@ public:
 
     for(int i=0;i<getHeight();i++)
       {
-        if((*this)[i]<b[i])return true;
-        if(b[i]<(*this)[i])return false;
+        if((*this)[i].toVector()<b[i].toVector())return true;
+        if(b[i].toVector()<(*this)[i].toVector())return false;
       }
     return false;
   }
@@ -179,8 +341,8 @@ public:
 
     if(!a.isZero())
     for(int k=0;k<width;k++)
-      if(!rows[i][k].isZero())
-        rows[j][k].madd(rows[i][k],a);
+      if(!(*this)[i][k].isZero())
+              (*this)[j][k].madd((*this)[i][k],a);
   }
 
   friend std::ostream &operator<<(std::ostream &f, Matrix const &a){
@@ -188,7 +350,7 @@ public:
     for(int i=0;i<a.getHeight();i++)
       {
         if(i)f<<","<<std::endl;
-        f<<a.rows[i];
+        f<<a[i].toVector();
       }
     f<<"}"<<std::endl;
     return f;
@@ -206,7 +368,7 @@ public:
    */
   void swapRows(int i, int j)
   {
-    std::swap(rows[i],rows[j]);
+    for(int a=0;a<width;a++)std::swap((*this)[i][a],(*this)[j][a]);
   }
   /**
      This method is used for iterating through the pivots in a matrix
@@ -221,7 +383,7 @@ public:
     if(i>=height)return false;
     while(++j<width)
       {
-        if(!rows[i][j].isZero()) return true;
+        if(!(*this)[i][j].isZero()) return true;
       }
     return false;
   }
@@ -294,11 +456,11 @@ public:
     int best=-1;
     int bestNumberOfNonZero=0;
     for(int i=currentRow;i<height;i++)
-      if(!rows[i][column].isZero())
+      if(!(*this)[i][column].isZero())
         {
           int nz=0;
           for(int k=column+1;k<width;k++)
-            if(!rows[i][k].isZero())nz++;
+            if(!(*this)[i][k].isZero())nz++;
           if(best==-1)
             {
               best=i;
@@ -344,26 +506,26 @@ public:
               }
             if(makePivotsOne)
               {//THE PIVOT SHOULD BE SET TO ONE IF INTEGRAL IS FALSE
-                if(rows[currentRow][i].sign()>=0)retSwaps++;
-                typ inverse=typ(1)/rows[currentRow][i];
+                if((*this)[currentRow][i].sign()>=0)retSwaps++;
+                typ inverse=typ(1)/(*this)[currentRow][i];
                 //                if(!rows[currentRow][i].isOne())
                   {
                     for(int k=0;k<width;k++)
-                      if(!rows[currentRow][k].isZero())
-                        rows[currentRow][k]*=inverse;
+                      if(!(*this)[currentRow][k].isZero())
+                        (*this)[currentRow][k]*=inverse;
                   }
               }
             for(int j=currentRow+1;j<height;j++)
               if(integral)
                 {
-                  if(!rows[j][i].isZero())
+                  if(!(*this)[j][i].isZero())
                     {
                       typ s;
                       typ t;
 
-                      typ g=typ::gcd(rows[currentRow][i],rows[j][i],s,t);
-                      typ u=-rows[j][i]/g;
-                      typ v=rows[currentRow][i]/g;
+                      typ g=typ::gcd((*this)[currentRow][i],(*this)[j][i],s,t);
+                      typ u=-(*this)[j][i]/g;
+                      typ v=(*this)[currentRow][i]/g;
                         /* We want the (s,t) vector to be as small as possible.
                          * We are allowed to adjust by multiples of (u,v).
                          * The following computes the correct multiplier (in most cases).
@@ -377,18 +539,18 @@ public:
                         }*/
                         for(int k=0;k<width;k++)
                           {
-                            typ A=rows[currentRow][k];
-                            typ B=rows[j][k];
+                            typ A=(*this)[currentRow][k];
+                            typ B=(*this)[j][k];
 
-                            rows[currentRow][k]=s*A+t*B;
-                            rows[j][k]=u*A+v*B;
+                            (*this)[currentRow][k]=s*A+t*B;
+                            (*this)[j][k]=u*A+v*B;
                           }
                       }
                   }
                 else
                   {
-                    if(!rows[j][i].isZero())
-                      madd(currentRow,-rows[j][i]/rows[currentRow][i],j);
+                    if(!(*this)[j][i].isZero())
+                      madd(currentRow,-(*this)[j][i]/(*this)[currentRow][i],j);
                   }
               currentRow++;
             }
@@ -411,12 +573,12 @@ public:
     int pivotJ=-1;
     while(nextPivot(pivotI,pivotJ))
       {
-        if(scalePivotsToOne)
-          rows[pivotI]=rows[pivotI]/rows[pivotI][pivotJ];
+            if(scalePivotsToOne)
+          (*this)[pivotI]=(*this)[pivotI].toVector()/(*this)[pivotI][pivotJ];
         for(int i=0;i<pivotI;i++)
-          if(!rows[i][pivotJ].isZero())
-            madd(pivotI,-rows[i][pivotJ]/rows[pivotI][pivotJ],i);
-      }
+          if(!(*this)[i][pivotJ].isZero())
+            madd(pivotI,-(*this)[i][pivotJ]/(*this)[pivotI][pivotJ],i);
+        }
     return ret;
   }
   /**
@@ -437,11 +599,11 @@ public:
     while(nextPivot(pivotI,pivotJ))
       if(!v[pivotJ].isZero())
       {
-        typ s=-v[pivotJ]/rows[pivotI][pivotJ];
+        typ s=-v[pivotJ]/(*this)[pivotI][pivotJ];
 
         for(int k=0;k<width;k++)
-          if(!rows[pivotI][k].isZero())
-            v[k].madd(rows[pivotI][k],s);
+          if(!(*this)[pivotI][k].isZero())
+            v[k].madd((*this)[pivotI][k],s);
       }
     return v;
   }
@@ -471,7 +633,7 @@ public:
         int pivot2J=-1;
         while(nextPivot(pivot2I,pivot2J))
           {
-            ret[k][pivot2J]=rows[pivot2I][j]/rows[pivot2I][pivot2J];
+            ret[k][pivot2J]=(*this)[pivot2I][j]/(*this)[pivot2I][pivot2J];
           }
         ret[k][j]=typ(-1);
         k++;
@@ -507,7 +669,7 @@ public:
       int pivot2J=-1;
       while(nextPivot(pivot2I,pivot2J))
         {
-          diagonalProduct*=rows[pivot2I][pivot2J];
+          diagonalProduct*=(*this)[pivot2I][pivot2J];
         }
     }
     {
@@ -521,7 +683,7 @@ public:
       typ lastEntry=ret[j];
       while(nextPivot(pivot2I,pivot2J))
         {
-          ret[pivot2J]=rows[pivot2I][j]/rows[pivot2I][pivot2J];
+          ret[pivot2J]=(*this)[pivot2I][j]/(*this)[pivot2I][pivot2J];
           lastEntry-=ret[pivot2J]*ret[pivot2J];
         }
       ret=(sign*(diagonalProduct*lastEntry))*ret;
@@ -545,9 +707,18 @@ public:
   /**
    * Sort the rows of the matrix.
    */
+  struct rowComparer{
+    bool operator()(std::pair<Matrix*,int> i, std::pair<Matrix*,int> j) {return ((*i.first)[i.second].toVector()<(*j.first)[j.second].toVector());}
+  } theRowComparer;
   void sortRows()
   {
-    std::sort(rows.begin(),rows.end());
+          std::vector<std::pair<Matrix*,int> > v;
+          for(int i=0;i<height;i++)v.push_back(std::pair<Matrix*,int>(this,i));
+          std::sort(v.begin(),v.end(),theRowComparer);
+          Matrix result(height,width);
+          for(int i=0;i<height;i++)
+                  result[i]=(*this)[v[i].second].toVector();
+          data=result.data;
   }
   /**
    * Sort the rows of the matrix and remove duplicate rows.
@@ -559,7 +730,7 @@ public:
     Matrix B(0,getWidth());
     B.appendRow((*this)[0]);
     for(int i=1;i<getHeight();i++)
-      if(rows[i]!=rows[i-1])B.appendRow((*this)[i]);
+      if((*this)[i].toVector()!=(*this)[i-1].toVector())B.appendRow((*this)[i].toVector());
     *this=B;
   }
   /**
@@ -572,8 +743,8 @@ public:
   {
     assert(bottom.getWidth()==top.getWidth());
     Matrix ret(top.getHeight()+bottom.getHeight(),top.getWidth());
-    for(int i=0;i<top.getHeight();i++)ret.rows[i]=top.rows[i];
-    for(int i=0;i<bottom.getHeight();i++)ret.rows[i+top.getHeight()]=bottom.rows[i];
+    for(int i=0;i<top.getHeight();i++)ret[i]=top[i];
+    for(int i=0;i<bottom.getHeight();i++)ret[i+top.getHeight()]=bottom[i];
 
     return ret;
   }
@@ -589,8 +760,8 @@ public:
     Matrix ret(left.getHeight(),left.getWidth()+right.getWidth());
     for(int i=0;i<left.getHeight();i++)
       {
-        for(int j=0;j<left.getWidth();j++)ret.rows[i][j]=left.rows[i][j];
-        for(int j=0;j<right.getWidth();j++)ret.rows[i][j+left.getWidth()]=right.rows[i][j];
+        for(int j=0;j<left.getWidth();j++)ret[i][j]=left[i][j];
+        for(int j=0;j<right.getWidth();j++)ret[i][j+left.getWidth()]=right[i][j];
       }
     return ret;
   }
