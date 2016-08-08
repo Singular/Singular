@@ -11,64 +11,71 @@
 #include <set>
 #include <sstream>
 
-//extern "C"{
-#ifdef NOCDDPREFIX
-#include "setoper.h"
-#include "cdd.h"
+#include <config.h>
+#ifdef HAVE_CDD_SETOPER_H
+#include <cdd/setoper.h>
+#include <cdd/cdd.h>
 #else
-#include "cdd/setoper.h"
-#include "cdd/cdd.h"
-#endif
-//}
+#ifdef HAVE_CDDLIB_SETOPER_H
+#include <cddlib/setoper.h>
+#include <cddlib/cdd.h>
+#else
+#include <setoper.h>
+#include <cdd.h>
+#endif //HAVE_CDDLIB_SETOPER_H
+#endif //HAVE_CDD_SETOPER_H
+
 
 namespace gfan{
-	bool isCddlibRequired()
-	{
-		return true;
-	}
-	void initializeCddlibIfRequired() // calling this frequently will cause memory leaks because deinitialisation is not possible with old versions of cddlib.
-	{
-		dd_set_global_constants();
-	}
-	void deinitializeCddlibIfRequired()
-	{
-//		dd_free_global_constants();
-	}
+        bool isCddlibRequired()
+        {
+                return true;
+        }
+        void initializeCddlibIfRequired() // calling this frequently will cause memory leaks because deinitialisation is not possible with old versions of cddlib.
+        {
+                dd_set_global_constants();
+        }
+        void deinitializeCddlibIfRequired()
+        {
+        #ifdef HAVE_DD_FREE_GLOBAL_CONSTANTS
+                dd_free_global_constants();
+        #endif
+        }
   static void ensureCddInitialisation()
   {
-	  // A more complicated initialisation than the following (meaning attempts to count the number of times
-	  // cddlib was requested to be initialised) would require cddlib to be thread aware.
-	  // The error below is implemented with an assert(0) because throwing an exception may leave the impression that
-	  // it is possible to recover from this error. While that may be true, it would not work in full generality,
-	  // as the following if statement cannot test whether dd_free_global_constants() has also been called.
-	  // Moverover, in multithreaded environments it would be quite difficult to decide if cddlib was initialised.
-	  if(!dd_one[0]._mp_num._mp_d)
-	  {
-		  std::cerr<<"CDDLIB HAS NOT BEEN INITIALISED!\n"
-				  "\n"
-				  "Fix this problem by calling the following function in your initialisation code:\n"
-				  "dd_set_global_constants();\n"
-				  "(after possibly setting the gmp allocators) and\n"
-				  "dd_free_global_constants()\n"
-				  "in your deinitialisation code (only available for cddlib version>=094d).\n"
-				  "This requires the header includes:\n"
-				  "#include \"cdd/setoper.h\"\n"
-				  "#include \"cdd/cdd.h\"\n"
-				  "\n"
-				  "Alternatively, you may call gfan:initializeCddlibIfRequired() and deinitializeCddlibIfRequired()\n"
-				  "if gfanlib is the only code using cddlib. If at some point cddlib is no longer required by gfanlib\n"
-				  "these functions may do nothing.\n"
-				  "Because deinitialisation is not possible in cddlib <094d, the functions may leak memory and should not be called often.\n"
-				  "\n"
-				  "This error message will never appear if the initialisation was done properly, and therefore never appear in a shipping version of your software.\n";
-		  assert(0);
-	  }
-	  /*
-	  static bool initialized;
-	  if(!initialized)
+          // A more complicated initialisation than the following (meaning attempts to count the number of times
+          // cddlib was requested to be initialised) would require cddlib to be thread aware.
+          // The error below is implemented with an assert(0) because throwing an exception may leave the impression that
+          // it is possible to recover from this error. While that may be true, it would not work in full generality,
+          // as the following if statement cannot test whether dd_free_global_constants() has also been called.
+          // Moverover, in multithreaded environments it would be quite difficult to decide if cddlib was initialised.
+          if(!dd_one[0]._mp_num._mp_d)
+          {
+                  std::cerr<<"CDDLIB HAS NOT BEEN INITIALISED!\n"
+                                  "\n"
+                                  "Fix this problem by calling the following function in your initialisation code:\n"
+                                  "dd_set_global_constants();\n"
+                                  "(after possibly setting the gmp allocators) and\n"
+                                  "dd_free_global_constants()\n"
+                                  "in your deinitialisation code (only available for cddlib version>=094d).\n"
+                                  "This requires the header includes:\n"
+                                  "#include \"cdd/setoper.h\"\n"
+                                  "#include \"cdd/cdd.h\"\n"
+                                  "\n"
+                                  "Alternatively, you may call gfan:initializeCddlibIfRequired() and deinitializeCddlibIfRequired()\n"
+                                  "if gfanlib is the only code using cddlib. If at some point cddlib is no longer required by gfanlib\n"
+                                  "these functions may do nothing.\n"
+                                  "Because deinitialisation is not possible in cddlib <094d, the functions may leak memory and should not be called often.\n"
+                                  "\n"
+                                  "This error message will never appear if the initialisation was done properly, and therefore never appear in a shipping version of your software.\n";
+                  assert(0);
+          }
+          /*
+          static bool initialized;
+          if(!initialized)
       {
-			dd_set_global_constants();
-			initialized=true;
+                        dd_set_global_constants();
+                        initialized=true;
       }*/
   }
 
@@ -372,7 +379,7 @@ public:
   }
   void removeRedundantRows(ZMatrix &inequalities, ZMatrix &equations, bool removeInequalityRedundancies)
   {
-	  ensureCddInitialisation();
+          ensureCddInitialisation();
 
     int numberOfEqualities=equations.getHeight();
     int numberOfInequalities=inequalities.getHeight();
@@ -783,9 +790,9 @@ std::ostream &operator<<(std::ostream &f, ZCone const &c)
 
 std::string ZCone::toString()const
 {
-	std::stringstream f;
-	f<<*this;
-	return f.str();
+        std::stringstream f;
+        f<<*this;
+        return f.str();
 }
 
 ZCone::ZCone(int ambientDimension):
@@ -988,8 +995,8 @@ ZCone ZCone::givenByRays(ZMatrix const &generators, ZMatrix const &linealitySpac
       newGenerators[i]=QToZVectorPrimitive(l.canonicalize(ZToQVector(generators[i])));
   }
 */
-//	  ZCone dual(newGenerators,linealitySpace);
-	  ZCone dual(generators,linealitySpace);
+//          ZCone dual(newGenerators,linealitySpace);
+          ZCone dual(generators,linealitySpace);
 //  dual.findFacets();
 //  dual.canonicalize();
   ZMatrix inequalities=dual.extremeRays();
