@@ -158,12 +158,12 @@ class Job {
 
 
 public:
-	bool aborting;														// Added by Anders
+        bool aborting;                                                                                                                // Added by Anders
   // Create a new Job. if first_split is not set (or it is -2), the
   // first split will be found.
   Job( vector<TraverseState>*  stack = new vector<TraverseState>(),
        int                     first_split = -2 )
-  :aborting(false)														// Added by Anders
+  :aborting(false)                                                                                                                // Added by Anders
   {
     if (first_split == -2) {
       first_split = find_first_split(stack, 0);
@@ -254,7 +254,7 @@ public:
         }
 
         int  prev_index  =  traverser->moveToNext(state.next_index, true);
-        aborting=traverser->aborting;						/* Added by Anders */
+        aborting=traverser->aborting;                                                /* Added by Anders */
         steps++;
 
         if (prev_index == 0) {
@@ -408,7 +408,7 @@ class JobCentral {
   deque<JobTransfer*>*  transfers;
 
 public:
-	bool aborting;									// Added by Anders
+        bool aborting;                                                                        // Added by Anders
   // step_count is the number of algorithm steps taken between
   // possible job transfers. This value should be high (e.g. 100) if
   // the traverser is very fast. If the traverser is slow, step_count
@@ -416,7 +416,7 @@ public:
   JobCentral( Traverser**  traversers,
               int          count,
               int          step_count )
-  :aborting(false)									// Added by Anders
+  :aborting(false)                                                                        // Added by Anders
   {
     context_count  =  count;
     contexts       =  new ThreadContext*[count];
@@ -462,7 +462,7 @@ public:
 
   bool  hasTransfer( void )
   {
-	return !transfers->empty();
+        return !transfers->empty();
   }
 
 
@@ -516,7 +516,7 @@ public:
       // We are fully done
 
       for(deque<JobTransfer*>::const_iterator tr=transfers->begin();tr!=transfers->end();tr++){
-	//      for (JobTransfer*  tr : *transfers) {
+        //      for (JobTransfer*  tr : *transfers) {
         (*tr)->setJob(NULL);
       }
     }
@@ -541,10 +541,10 @@ void  work( ThreadContext*  context )
 
     int  step_count  =  central->hasTransfer() ? 1 : context->step_count;
 
-    if(central->aborting)job->aborting=true;			// Added by Anders
+    if(central->aborting)job->aborting=true;                        // Added by Anders
 
     while (job->step(step_count)) {
-      if(job->aborting)central->aborting=true;			// Added by Anders
+      if(job->aborting)central->aborting=true;                        // Added by Anders
       JobTransfer*  transfer  =  central->getTransfer();
 
       if (transfer != NULL) {

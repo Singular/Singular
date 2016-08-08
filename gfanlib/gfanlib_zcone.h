@@ -14,17 +14,17 @@ namespace gfan{
 /**
  * Returns true if cddlib is needed for the ZCone implementation.
  */
-	bool isCddlibRequired();
-	/**
-	 * Only call this function if gfanlib is the only code in your program using cddlib.
-	 * Should be paired with a deinitializeCddlibIfRequired() call.
-	 * Calling the function repeatedly may cause memory leaks even if deinitializeCddlibIfRequired() is also called.
-	 */
-	void initializeCddlibIfRequired();
-	/**
-	 * This function may do nothing.
-	 */
-	void deinitializeCddlibIfRequired();
+        bool isCddlibRequired();
+        /**
+         * Only call this function if gfanlib is the only code in your program using cddlib.
+         * Should be paired with a deinitializeCddlibIfRequired() call.
+         * Calling the function repeatedly may cause memory leaks even if deinitializeCddlibIfRequired() is also called.
+         */
+        void initializeCddlibIfRequired();
+        /**
+         * This function may do nothing.
+         */
+        void deinitializeCddlibIfRequired();
 
 /**
 A PolyhedralCone is represented by linear inequalities and equations. The inequalities are non-strict

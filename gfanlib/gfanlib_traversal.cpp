@@ -12,12 +12,12 @@ using namespace gfan;
 
 
 static list<ZVector> rowsToList(ZMatrix const &m)
-		{
-			list<ZVector> ret;
-			for(int i=0;i<m.getHeight();i++)
-				ret.push_back(m[i]);
-			return ret;
-		}
+                {
+                        list<ZVector> ret;
+                        for(int i=0;i<m.getHeight();i++)
+                                ret.push_back(m[i]);
+                        return ret;
+                }
 
 bool FanTraverser::hasNoState()const
 {
@@ -30,17 +30,17 @@ bool FanTraverser::hasNoState()const
  */
 
 FanBuilder::FanBuilder(int n, SymmetryGroup const &sym):
-	coneCollection(n)
+        coneCollection(n)
 {
 }
 
 
 bool FanBuilder::process(FanTraverser &traverser)
 {
-	ZCone cone2=traverser.refToPolyhedralCone();
-	cone2.canonicalize();
-	coneCollection.insert(cone2);
-	return true;
+        ZCone cone2=traverser.refToPolyhedralCone();
+        cone2.canonicalize();
+        coneCollection.insert(cone2);
+        return true;
 }
 
 
@@ -127,21 +127,21 @@ public:
    */
   void removeDuplicates(ZVector const &ridge, list<ZVector> &rays, list<ZVector> *normals=0)const
   {
-	  list<ZVector> ret;
-	  list<ZVector> normalsRet;
-	  set<ZVector> representatives;
-	  list<ZVector>::const_iterator I;
+          list<ZVector> ret;
+          list<ZVector> normalsRet;
+          set<ZVector> representatives;
+          list<ZVector>::const_iterator I;
     if(normals)I=normals->begin();
     for(list<ZVector>::const_iterator i=rays.begin();i!=rays.end();i++)
       {
-	ZVector rep=sym.orbitRepresentativeFixing(*i,ridge);
-	if(representatives.count(rep)==0)
-	  {
-	    representatives.insert(rep);
-	    ret.push_back(*i);
-	    if(normals)normalsRet.push_back(*I);
-	  }
-	if(normals)I++;
+        ZVector rep=sym.orbitRepresentativeFixing(*i,ridge);
+        if(representatives.count(rep)==0)
+          {
+            representatives.insert(rep);
+            ret.push_back(*i);
+            if(normals)normalsRet.push_back(*I);
+          }
+        if(normals)I++;
       }
     rays=ret;
     if(normals)*normals=normalsRet;
@@ -151,8 +151,8 @@ public:
     cerr<< "Boundary" <<endl;
     for(map<EFirst,ESecond>::const_iterator i=theSet.begin();i!=theSet.end();i++)
       {
-    	cerr << i->first.first << i->first.second;
-    	cerr << endl;
+            cerr << i->first.first << i->first.second;
+            cerr << endl;
       }
     cerr<<endl<<endl;
   }
@@ -181,8 +181,8 @@ struct pathStepRidge
 
 struct pathStepFacet
 {
-	list<ZVector> ridges;
-	list<ZVector> ridgesRayUniqueVector;//stores the ray of the link that we came from
+        list<ZVector> ridges;
+        list<ZVector> ridgesRayUniqueVector;//stores the ray of the link that we came from
 };
 
 /**
@@ -262,35 +262,35 @@ void traverse(FanTraverser &traverser, Target &target, SymmetryGroup const *symm
   //This is because symmetricTraverse needs go BACK to compute the links of previously seen facets.
   //Alternative the links should be computed and stored the first time a facet is seen.
   //Or the conetraverse should be given more info about the ridge to make computations quicker.
-	int lastNumberOfEdges=0;
-	float averageEdge=0;
-	int n=traverser.refToPolyhedralCone().ambientDimension();//symmetryGroup->sizeOfBaseSet();
-	SymmetryGroup localSymmetryGroup(n);
-	if(!symmetryGroup)symmetryGroup=&localSymmetryGroup;
+        int lastNumberOfEdges=0;
+        float averageEdge=0;
+        int n=traverser.refToPolyhedralCone().ambientDimension();//symmetryGroup->sizeOfBaseSet();
+        SymmetryGroup localSymmetryGroup(n);
+        if(!symmetryGroup)symmetryGroup=&localSymmetryGroup;
 
-	ZMatrix linealitySpaceGenerators=traverser.refToPolyhedralCone().generatorsOfLinealitySpace();
+        ZMatrix linealitySpaceGenerators=traverser.refToPolyhedralCone().generatorsOfLinealitySpace();
 
-	int d=traverser.refToPolyhedralCone().dimension();
+        int d=traverser.refToPolyhedralCone().dimension();
 
-	  Boundary boundary(*symmetryGroup);
-	  list<pathStepFacet> facetStack;
-	  list<pathStepRidge> ridgeStack;
+          Boundary boundary(*symmetryGroup);
+          list<pathStepFacet> facetStack;
+          list<pathStepRidge> ridgeStack;
 
-	  int numberOfCompletedFacets=0;
-	  int numberOfCompletedRidges=0;
-	  int stackSize=0;
+          int numberOfCompletedFacets=0;
+          int numberOfCompletedRidges=0;
+          int stackSize=0;
 
-	  ZVector facetUniqueVector;
-	  goto entry;
-	  while(1)
-	    {
-	    L1:
-//	    printStack(facetStack,ridgeStack);
-	    //if we have more ProcessRidge calls to do
-	      if(!facetStack.front().ridges.empty())
-		{
-	    	  //ProcessRidge "called"
-		  pathStepRidge top;
+          ZVector facetUniqueVector;
+          goto entry;
+          while(1)
+            {
+            L1:
+//            printStack(facetStack,ridgeStack);
+            //if we have more ProcessRidge calls to do
+              if(!facetStack.front().ridges.empty())
+                {
+                      //ProcessRidge "called"
+                  pathStepRidge top;
 
 
                   if(traverser.hasNoState())
@@ -302,9 +302,9 @@ void traverse(FanTraverser &traverser, Target &target, SymmetryGroup const *symm
                       top.parentRay=link.getUniquePoint();
                     }
 
-		  top.parentRidge=facetStack.front().ridges.front();
-//		  AsciiPrinter(Stderr)<<top.parentRay<<"--------------------------------++++\n";
-		  list<ZVector> rays;
+                  top.parentRidge=facetStack.front().ridges.front();
+//                  AsciiPrinter(Stderr)<<top.parentRay<<"--------------------------------++++\n";
+                  list<ZVector> rays;
                   if(traverser.hasNoState())
                     {
                       rays.push_back(top.parentRay);
@@ -313,121 +313,121 @@ void traverse(FanTraverser &traverser, Target &target, SymmetryGroup const *symm
                   else
                     rays=traverser.link(facetStack.front().ridges.front());
 
-		  assert(!rays.empty());
-		  boundary.removeDuplicates(top.parentRidge,rays);
-		  ridgeStack.push_front(top);stackSize++;
-		  ZVector ridgeRidgeRidge=facetStack.front().ridges.front();
-		  for(list<ZVector>::const_iterator i=rays.begin();i!=rays.end();i++)
-		    {
-		      ridgeStack.front().rays.push_front(*i);
-		      if(boundary.containsFlip(ridgeRidgeRidge,*i,&ridgeStack.front().rays,ridgeStack.front().rays.begin(),0,ridgeStack.front().rays.begin()))
-			ridgeStack.front().rays.pop_front();
-		    }
-		  // "state saved" ready to do calls to ProcessFacet
-		  numberOfCompletedRidges++;
-		}
-	      else
-		{
-	    	  // No more calls to do - we now return from ProcessFacet
-	    	  //THIS IS THE PLACE TO CHANGE CONE BACK
-		  facetStack.pop_front();stackSize--;
-		  if(facetStack.empty())break;
-//    	 log1 cerr<<"BACK"<<endl;
-	  if(!traverser.hasNoState())traverser.changeCone(ridgeStack.front().parentRidge,ridgeStack.front().parentRay);
-		}
-	    L2:
-//	    printStack(facetStack,ridgeStack);
-	    //check if ProcessRidge needs to make more ProcessFacet calls
-	      if(!ridgeStack.front().rays.empty())
-		{
-//	    	  log1 cerr<<"FORWARD"<<endl;
-	    	  traverser.changeCone(ridgeStack.front().parentRidge,ridgeStack.front().rays.front());
-		entry:
-		//ProcessFacet()
-		averageEdge=0.99*averageEdge+0.01*(boundary.size()-lastNumberOfEdges);
-//		log1 fprintf(Stderr,"\n-------------------------------------\n");
-//		  log1 fprintf(Stderr,"Boundary edges in bipartite graph: %i, Completed ridges: %i, Completed facets: %i, Recursion depth:%i Average new edge/facet:%0.2f\n",boundary.size(),numberOfCompletedRidges,numberOfCompletedFacets,stackSize,averageEdge);
-//		  log1 fprintf(Stderr,"-------------------------------------\n");
-		  lastNumberOfEdges=boundary.size();
+                  assert(!rays.empty());
+                  boundary.removeDuplicates(top.parentRidge,rays);
+                  ridgeStack.push_front(top);stackSize++;
+                  ZVector ridgeRidgeRidge=facetStack.front().ridges.front();
+                  for(list<ZVector>::const_iterator i=rays.begin();i!=rays.end();i++)
+                    {
+                      ridgeStack.front().rays.push_front(*i);
+                      if(boundary.containsFlip(ridgeRidgeRidge,*i,&ridgeStack.front().rays,ridgeStack.front().rays.begin(),0,ridgeStack.front().rays.begin()))
+                        ridgeStack.front().rays.pop_front();
+                    }
+                  // "state saved" ready to do calls to ProcessFacet
+                  numberOfCompletedRidges++;
+                }
+              else
+                {
+                      // No more calls to do - we now return from ProcessFacet
+                      //THIS IS THE PLACE TO CHANGE CONE BACK
+                  facetStack.pop_front();stackSize--;
+                  if(facetStack.empty())break;
+//             log1 cerr<<"BACK"<<endl;
+          if(!traverser.hasNoState())traverser.changeCone(ridgeStack.front().parentRidge,ridgeStack.front().parentRay);
+                }
+            L2:
+//            printStack(facetStack,ridgeStack);
+            //check if ProcessRidge needs to make more ProcessFacet calls
+              if(!ridgeStack.front().rays.empty())
+                {
+//                      log1 cerr<<"FORWARD"<<endl;
+                      traverser.changeCone(ridgeStack.front().parentRidge,ridgeStack.front().rays.front());
+                entry:
+                //ProcessFacet()
+                averageEdge=0.99*averageEdge+0.01*(boundary.size()-lastNumberOfEdges);
+//                log1 fprintf(Stderr,"\n-------------------------------------\n");
+//                  log1 fprintf(Stderr,"Boundary edges in bipartite graph: %i, Completed ridges: %i, Completed facets: %i, Recursion depth:%i Average new edge/facet:%0.2f\n",boundary.size(),numberOfCompletedRidges,numberOfCompletedFacets,stackSize,averageEdge);
+//                  log1 fprintf(Stderr,"-------------------------------------\n");
+                  lastNumberOfEdges=boundary.size();
 
-//		  target.process(traverser);//Postponed until extrem rays have been computed
-		  ZMatrix extremeRays=traverser.refToPolyhedralCone().extremeRays(&linealitySpaceGenerators);
+//                  target.process(traverser);//Postponed until extrem rays have been computed
+                  ZMatrix extremeRays=traverser.refToPolyhedralCone().extremeRays(&linealitySpaceGenerators);
                   target.process(traverser);
 
-//		  IntegerVectorList inequalities=traverser.refToPolyhedralCone().getHalfSpaces();
+//                  IntegerVectorList inequalities=traverser.refToPolyhedralCone().getHalfSpaces();
                   ZMatrix equations=traverser.refToPolyhedralCone().getEquations();
-//		  facetUniqueVector=traverser.refToPolyhedralCone().getUniquePoint();
-		  facetUniqueVector=traverser.refToPolyhedralCone().getUniquePointFromExtremeRays(extremeRays);
-		  list<ZVector> facetNormals=rowsToList(traverser.refToPolyhedralCone().getFacets());
+//                  facetUniqueVector=traverser.refToPolyhedralCone().getUniquePoint();
+                  facetUniqueVector=traverser.refToPolyhedralCone().getUniquePointFromExtremeRays(extremeRays);
+                  list<ZVector> facetNormals=rowsToList(traverser.refToPolyhedralCone().getFacets());
 
-		  pathStepFacet stepFacet;
-		  list<ZVector> ridges;
+                  pathStepFacet stepFacet;
+                  list<ZVector> ridges;
 
-		  for(list<ZVector>::iterator i=facetNormals.begin();i!=facetNormals.end();i++)
-		    {
-			  ZVector v(n);
-//			  for(IntegerVectorList::const_iterator j=extremeRays.begin();j!=extremeRays.end();j++)
-			  for(int j=0;j<extremeRays.getHeight();j++)
-				  if(dot(*i,extremeRays[j]).isZero())v+=extremeRays[j];
-			  ridges.push_back(v);
-		    }
+                  for(list<ZVector>::iterator i=facetNormals.begin();i!=facetNormals.end();i++)
+                    {
+                          ZVector v(n);
+//                          for(IntegerVectorList::const_iterator j=extremeRays.begin();j!=extremeRays.end();j++)
+                          for(int j=0;j<extremeRays.getHeight();j++)
+                                  if(dot(*i,extremeRays[j]).isZero())v+=extremeRays[j];
+                          ridges.push_back(v);
+                    }
 
-		  ZVector temp(n);
-//		  boundary.removeDuplicates(temp,ridges);//use facetUniqueVector instead
-		  boundary.removeDuplicates(facetUniqueVector,ridges,&facetNormals);//use facetUniqueVector instead
+                  ZVector temp(n);
+//                  boundary.removeDuplicates(temp,ridges);//use facetUniqueVector instead
+                  boundary.removeDuplicates(facetUniqueVector,ridges,&facetNormals);//use facetUniqueVector instead
 
-		  facetStack.push_front(stepFacet);stackSize++;
-		  list<ZVector>::const_iterator I=facetNormals.begin();
-		  for(list<ZVector>::const_iterator i=ridges.begin();i!=ridges.end();i++,I++)
-		    {
-			  ZVector rayUniqueVector;
+                  facetStack.push_front(stepFacet);stackSize++;
+                  list<ZVector>::const_iterator I=facetNormals.begin();
+                  for(list<ZVector>::const_iterator i=ridges.begin();i!=ridges.end();i++,I++)
+                    {
+                          ZVector rayUniqueVector;
 
-			  if(d==n)
-			  {
-				rayUniqueVector =I->normalized();
-//				if(dotLong(rayUniqueVector,*I)
-			  }
-			  else
-			  {
-				  ZCone rayCone=traverser.refToPolyhedralCone().link(*i);
-				  rayCone.canonicalize();
-				  rayUniqueVector=rayCone.getUniquePoint();
-//				  debug<<traverser.refToPolyhedralCone();
-//				  debug<<rayCone;
-			  }
-		      facetStack.front().ridges.push_front(*i);
-		      if(traverser.hasNoState())facetStack.front().ridgesRayUniqueVector.push_front(rayUniqueVector);
+                          if(d==n)
+                          {
+                                rayUniqueVector =I->normalized();
+//                                if(dotLong(rayUniqueVector,*I)
+                          }
+                          else
+                          {
+                                  ZCone rayCone=traverser.refToPolyhedralCone().link(*i);
+                                  rayCone.canonicalize();
+                                  rayUniqueVector=rayCone.getUniquePoint();
+//                                  debug<<traverser.refToPolyhedralCone();
+//                                  debug<<rayCone;
+                          }
+                      facetStack.front().ridges.push_front(*i);
+                      if(traverser.hasNoState())facetStack.front().ridgesRayUniqueVector.push_front(rayUniqueVector);
 
 
-		      if(!traverser.hasNoState())
-		        {
-		        if(boundary.containsFlip(*i,rayUniqueVector,&facetStack.front().ridges,facetStack.front().ridges.begin(),0,facetStack.front().ridges.begin()))
+                      if(!traverser.hasNoState())
+                        {
+                        if(boundary.containsFlip(*i,rayUniqueVector,&facetStack.front().ridges,facetStack.front().ridges.begin(),0,facetStack.front().ridges.begin()))
                         {
                           facetStack.front().ridges.pop_front();
                         }
-		        }
-		      else
-		        {
-		      if(boundary.containsFlip(*i,rayUniqueVector,&facetStack.front().ridges,facetStack.front().ridges.begin(),&facetStack.front().ridgesRayUniqueVector,facetStack.front().ridgesRayUniqueVector.begin()))
-		        {
-		          facetStack.front().ridges.pop_front();
-	                  facetStack.front().ridgesRayUniqueVector.pop_front();
-		        }
-		        }
-		    }
-		  //"State pushed" ready to call ProcessRidge
+                        }
+                      else
+                        {
+                      if(boundary.containsFlip(*i,rayUniqueVector,&facetStack.front().ridges,facetStack.front().ridges.begin(),&facetStack.front().ridgesRayUniqueVector,facetStack.front().ridgesRayUniqueVector.begin()))
+                        {
+                          facetStack.front().ridges.pop_front();
+                          facetStack.front().ridgesRayUniqueVector.pop_front();
+                        }
+                        }
+                    }
+                  //"State pushed" ready to call ProcessRidge
 
-		  numberOfCompletedFacets++;
-		}
-	      else
-		{
-	    	  //ProcessRidge is done making its calls to ProcessFacet so we can return from ProcessRidge
-//	    	  cerr<<"BACK"<<endl;
-//		  traverser.changeCone(ridgeStack.front().parentRidge,ridgeStack.front().parentRay);
-		  ridgeStack.pop_front();stackSize--;
-		}
-	    }//goto L1
-	  //	  log1 fprintf(Stderr,"\n-------------------------------------\n");
-//	  log1 fprintf(Stderr,"Boundary edges in bipartite graph: %i, Completed ridges: %i, Completed facets: %i, Recursion depth:%i\n",boundary.size(),numberOfCompletedRidges,numberOfCompletedFacets,stackSize);
-//	  log1 fprintf(Stderr,"-------------------------------------\n");
+                  numberOfCompletedFacets++;
+                }
+              else
+                {
+                      //ProcessRidge is done making its calls to ProcessFacet so we can return from ProcessRidge
+//                      cerr<<"BACK"<<endl;
+//                  traverser.changeCone(ridgeStack.front().parentRidge,ridgeStack.front().parentRay);
+                  ridgeStack.pop_front();stackSize--;
+                }
+            }//goto L1
+          //          log1 fprintf(Stderr,"\n-------------------------------------\n");
+//          log1 fprintf(Stderr,"Boundary edges in bipartite graph: %i, Completed ridges: %i, Completed facets: %i, Recursion depth:%i\n",boundary.size(),numberOfCompletedRidges,numberOfCompletedFacets,stackSize);
+//          log1 fprintf(Stderr,"-------------------------------------\n");
 }

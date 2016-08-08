@@ -11,7 +11,7 @@ int main()
     }
     catch (...)
     {
-	cerr<<"Error - most likely an integer overflow."<<endl;
+        cerr<<"Error - most likely an integer overflow."<<endl;
     }
     return 0;
 }

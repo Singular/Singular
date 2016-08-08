@@ -53,7 +53,7 @@ public:
       Matrix ret(getWidth(),getHeight());
       for(int i=0;i<getWidth();i++)
           for(int j=0;j<getHeight();j++)
-        	  ret[i][j]=(*this)[j][i];
+                  ret[i][j]=(*this)[j][i];
       return ret;
     }
   static Matrix identity(int n)
@@ -65,22 +65,22 @@ public:
   void append(Matrix const &m)
     {
       assert(m.getWidth()==width);
-	  data.resize((height+m.height)*width);
-	  int oldHeight=height;
+          data.resize((height+m.height)*width);
+          int oldHeight=height;
       height+=m.height;
       for(int i=0;i<m.height;i++)
         {
           for(int j=0;j<m.width;j++)
-        	  (*this)[i+oldHeight][j]=m[i][j];
+                  (*this)[i+oldHeight][j]=m[i][j];
         }
     }
   void appendRow(Vector<typ> const &v)
     {
-	  assert(v.size()==width);
-	  data.resize((height+1)*width);
-	  height++;
-	  for(int j=0;j<width;j++)
-		  (*this)[height-1][j]=v[j];
+          assert(v.size()==width);
+          data.resize((height+1)*width);
+          height++;
+          for(int j=0;j<width;j++)
+                  (*this)[height-1][j]=v[j];
     }
   void eraseLastRow()
   {
@@ -112,7 +112,7 @@ public:
       Matrix p=q;
       for(int i=0;i<q.height;i++)
           for(int j=0;j<q.width;j++)
-        	  p[i][j]=s*(q[i][j]);
+                  p[i][j]=s*(q[i][j]);
       return p;
     }
   friend Matrix operator*(const Matrix& a, const Matrix& b)
@@ -165,36 +165,36 @@ public:
       }
   inline typ const &operator[](int j)const __attribute__((always_inline))
     {
-	assert(j>=0);
-	assert(j<matrix.width);
-	return matrix.data[rowNumM+j];
+        assert(j>=0);
+        assert(j<matrix.width);
+        return matrix.data[rowNumM+j];
     }
   inline typ const &UNCHECKEDACCESS(int j)const __attribute__((always_inline))
     {
-	return matrix.data[rowNumM+j];
+        return matrix.data[rowNumM+j];
     }
     const Vector<typ> toVector()const
     {
       Vector<typ> ret(matrix.width);
       for(int j=0;j<matrix.width;j++)
-    	  ret[j]=matrix.data[rowNumM+j];
+              ret[j]=matrix.data[rowNumM+j];
       return ret;
     }
     operator Vector<typ>()const
-		{
-			return toVector();
-		}
+                {
+                        return toVector();
+                }
     bool operator==(Vector<typ> const &b)const
-		{
-			return toVector()==b;
-		}
+                {
+                        return toVector()==b;
+                }
 /*    typ dot(Vector<typ> const &b)const
-		{
-			return dot(toVector(),b);
-		}*/
+                {
+                        return dot(toVector(),b);
+                }*/
     Vector<typ> operator-()const
     {
-    	return -toVector();
+            return -toVector();
     }
   };
   class RowRef{
@@ -208,77 +208,77 @@ public:
       }
     inline typ &operator[](int j) __attribute__((always_inline))
       {
-    	assert(j>=0);
-    	assert(j<matrix.width);
-    	return matrix.data[rowNumM+j];
+            assert(j>=0);
+            assert(j<matrix.width);
+            return matrix.data[rowNumM+j];
       }
     inline typ &UNCHECKEDACCESS(int j)
       {
-    	return matrix.data[rowNumM+j];
+            return matrix.data[rowNumM+j];
       }
     RowRef &operator=(Vector<typ> const &v)
     {
         assert(v.size()==matrix.width);
         for(int j=0;j<matrix.width;j++)
-        	matrix.data[rowNumM+j]=v[j];
+                matrix.data[rowNumM+j]=v[j];
 
-    	return *this;
+            return *this;
     }
     RowRef &operator=(RowRef const &v)
     {
         assert(v.matrix.width==matrix.width);
         for(int j=0;j<matrix.width;j++)
-        	matrix.data[rowNumM+j]=v.matrix.data[v.rowNumM+j];
+                matrix.data[rowNumM+j]=v.matrix.data[v.rowNumM+j];
 
-    	return *this;
+            return *this;
     }
 /*    RowRef &operator+=(Vector<typ> const &v)
     {
         assert(v.size()==matrix.width);
         for(int j=0;j<matrix.width;j++)
-        	matrix.data[rowNumM+j]+=v.v[j];
+                matrix.data[rowNumM+j]+=v.v[j];
 
-    	return *this;
+            return *this;
     }*/
     RowRef &operator+=(RowRef const &v)
     {
         assert(v.matrix.width==matrix.width);
         for(int j=0;j<matrix.width;j++)
-        	matrix.data[rowNumM+j]+=v.matrix.data[v.rowNumM+j];
+                matrix.data[rowNumM+j]+=v.matrix.data[v.rowNumM+j];
 
-    	return *this;
+            return *this;
     }
     RowRef &operator+=(const_RowRef const &v)
     {
         assert(v.matrix.width==matrix.width);
         for(int j=0;j<matrix.width;j++)
-        	matrix.data[rowNumM+j]+=v.matrix.data[v.rowNumM+j];
+                matrix.data[rowNumM+j]+=v.matrix.data[v.rowNumM+j];
 
-    	return *this;
+            return *this;
     }
     RowRef &operator=(const_RowRef const &v)
     {
         assert(v.matrix.width==matrix.width);
         for(int j=0;j<matrix.width;j++)
-        	matrix.data[rowNumM+j]=v.matrix.data[v.rowNumM+j];
+                matrix.data[rowNumM+j]=v.matrix.data[v.rowNumM+j];
 
-    	return *this;
+            return *this;
     }
     const Vector<typ> toVector()const
     {
       Vector<typ> ret(matrix.width);
       for(int j=0;j<matrix.width;j++)
-    	  ret[j]=matrix.data[rowNumM+j];
+              ret[j]=matrix.data[rowNumM+j];
       return ret;
     }
     operator Vector<typ>()const
-		{
-			return toVector();
-		}
+                {
+                        return toVector();
+                }
 /*    typ dot(Vector<typ> const &b)const
-		{
-			return dot(toVector(),b);
-		}*/
+                {
+                        return dot(toVector(),b);
+                }*/
     bool isZero()const
         {
           for(int j=0;j<matrix.width;j++)if(!(matrix.data[rowNumM+j].isZero()))return false;
@@ -302,17 +302,17 @@ public:
 
 
   const typ& UNCHECKEDACCESS(int i,int j)const __attribute__((always_inline)){
-/*	    assert(i>=0);
-	    assert(i<height);
-	    assert(j>=0);
-	    assert(j<width);*/
-	  return data[i*width+j];}
+/*            assert(i>=0);
+            assert(i<height);
+            assert(j>=0);
+            assert(j<width);*/
+          return data[i*width+j];}
   typ& UNCHECKEDACCESS(int i,int j) __attribute__((always_inline)){
-/*	    assert(i>=0);
-	    assert(i<height);
-	    assert(j>=0);
-	    assert(j<width);*/
-	    return data[i*width+j];}
+/*            assert(i>=0);
+            assert(i<height);
+            assert(j>=0);
+            assert(j<width);*/
+            return data[i*width+j];}
 
 
 
@@ -342,7 +342,7 @@ public:
     if(!a.isZero())
     for(int k=0;k<width;k++)
       if(!(*this)[i][k].isZero())
-    	  (*this)[j][k].madd((*this)[i][k],a);
+              (*this)[j][k].madd((*this)[i][k],a);
   }
 
   friend std::ostream &operator<<(std::ostream &f, Matrix const &a){
@@ -358,9 +358,9 @@ public:
 
   std::string toString()const
   {
-	  std::stringstream f;
-	  f<<*this;
-	  return f.str();
+          std::stringstream f;
+          f<<*this;
+          return f.str();
   }
 
   /**
@@ -573,7 +573,7 @@ public:
     int pivotJ=-1;
     while(nextPivot(pivotI,pivotJ))
       {
-    	if(scalePivotsToOne)
+            if(scalePivotsToOne)
           (*this)[pivotI]=(*this)[pivotI].toVector()/(*this)[pivotI][pivotJ];
         for(int i=0;i<pivotI;i++)
           if(!(*this)[i][pivotJ].isZero())
@@ -712,13 +712,13 @@ public:
   } theRowComparer;
   void sortRows()
   {
-	  std::vector<std::pair<Matrix*,int> > v;
-	  for(int i=0;i<height;i++)v.push_back(std::pair<Matrix*,int>(this,i));
-	  std::sort(v.begin(),v.end(),theRowComparer);
-	  Matrix result(height,width);
-	  for(int i=0;i<height;i++)
-		  result[i]=(*this)[v[i].second].toVector();
-	  data=result.data;
+          std::vector<std::pair<Matrix*,int> > v;
+          for(int i=0;i<height;i++)v.push_back(std::pair<Matrix*,int>(this,i));
+          std::sort(v.begin(),v.end(),theRowComparer);
+          Matrix result(height,width);
+          for(int i=0;i<height;i++)
+                  result[i]=(*this)[v[i].second].toVector();
+          data=result.data;
   }
   /**
    * Sort the rows of the matrix and remove duplicate rows.
