@@ -39,6 +39,7 @@ Changes in the kernel:
 @item improved mapping of polynomials/ideals/...
 @item port to gcc 6
 @item port to polymake 3.0
+@item port to gfanlib 0.6
 @end itemize
 
 @heading News for version 4-0-3
