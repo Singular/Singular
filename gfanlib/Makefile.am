@@ -11,7 +11,7 @@ AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -DGMPRATIONAL
 # forcefully enable exceptions
 CXXFLAGS+= $(FEXCEPTIONSFRTTI_CXXFLAGS)
 
-AM_CXXFLAGS = -std=c++11
+AM_CXXFLAGS = @CXX11_FLAG@
 
 
 SOURCES = gfanlib_circuittableint.cpp gfanlib_mixedvolume.cpp gfanlib_paralleltraverser.cpp gfanlib_polyhedralfan.cpp gfanlib_polymakefile.cpp gfanlib_symmetriccomplex.cpp gfanlib_symmetry.cpp gfanlib_traversal.cpp gfanlib_zcone.cpp gfanlib_zfan.cpp
