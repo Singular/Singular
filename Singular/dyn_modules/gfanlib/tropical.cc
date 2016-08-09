@@ -299,15 +299,19 @@ gfan::ZCone maximalGroebnerCone(const ideal &I, const ring &r)
   gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
   for (int i=0; i<IDELEMS(I); i++)
   {
-    g = (poly) I->m[i]; pGetExpV(g,leadexpv);
-    leadexpw = intStar2ZVector(n, leadexpv);
-    pIter(g);
-    while (g != NULL)
+    g = (poly) I->m[i];
+    if (g != NULL && pNext(g) != NULL)
     {
-      pGetExpV(g,tailexpv);
-      tailexpw = intStar2ZVector(n, tailexpv);
-      inequalities.appendRow(leadexpw-tailexpw);
+      pGetExpV(g,leadexpv);
+      leadexpw = intStar2ZVector(n, leadexpv);
       pIter(g);
+      while (g != NULL)
+      {
+        pGetExpV(g,tailexpv);
+        tailexpw = intStar2ZVector(n, tailexpv);
+        inequalities.appendRow(leadexpw-tailexpw);
+        pIter(g);
+      }
     }
   }
   omFreeSize(leadexpv,(n+1)*sizeof(int));
