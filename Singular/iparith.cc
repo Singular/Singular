@@ -5513,10 +5513,6 @@ static BOOLEAN jjCOUNT_RES(leftv res, leftv v)
 }
 static BOOLEAN jjDIM_R(leftv res, leftv v)
 {
-  if (rHasMixedOrdering(currRing))
-  {
-     Warn("dim(%s) may be wrong because the mixed monomial ordering",v->Name());
-  }
   res->data = (char *)(long)syDim((syStrategy)v->Data());
   return FALSE;
 }
