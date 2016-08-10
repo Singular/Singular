@@ -1020,7 +1020,7 @@ void missingAxis (int* last,kStrategy strat)
   int   k = 0;
 
   *last = 0;
-  if (!currRing->MixedOrder)
+  if (!rHasMixedOrdering(currRing))
   {
     loop
     {
@@ -1633,7 +1633,7 @@ loop_count = 1;
   int hilbeledeg=1,hilbcount=0;
   BITSET save1;
   SI_SAVE_OPT1(save1);
-  if (currRing->MixedOrder)
+  if (rHasMixedOrdering(currRing))
   {
     si_opt_1 &= ~Sy_bit(OPT_REDSB);
     si_opt_1 &= ~Sy_bit(OPT_REDTAIL);
