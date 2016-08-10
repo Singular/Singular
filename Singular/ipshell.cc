@@ -11,7 +11,6 @@
 
 #include <factory/factory.h>
 
-#include <misc/auxiliary.h>
 #include <misc/options.h>
 #include <misc/mylimits.h>
 #include <misc/intvec.h>
@@ -2218,7 +2217,7 @@ void rComposeC(lists L, ring R)
   // 0: char/ cf - ring
   if ((L->m[0].rtyp!=INT_CMD) || (L->m[0].data!=(char *)0))
   {
-    Werror("invald coeff. field description, expecting 0");
+    WerrorS("invalid coeff. field description, expecting 0");
     return;
   }
 //  R->cf->ch=0;
@@ -2226,7 +2225,7 @@ void rComposeC(lists L, ring R)
   // 1:
   if (L->m[1].rtyp!=LIST_CMD)
   {
-    Werror("invald coeff. field description, expecting precision list");
+    WerrorS("invalid coeff. field description, expecting precision list");
     return;
   }
   lists LL=(lists)L->m[1].data;
@@ -2236,7 +2235,7 @@ void rComposeC(lists L, ring R)
   && ((LL->nr!=1)
     || (LL->m[0].rtyp!=INT_CMD)))
   {
-    Werror("invald coeff. field description list");
+    WerrorS("invalid coeff. field description list");
     return;
   }
   int r1=(int)(long)LL->m[0].data;
@@ -2272,7 +2271,7 @@ void rComposeC(lists L, ring R)
     //R->cf->extRing->N=1;
     if (L->m[2].rtyp!=STRING_CMD)
     {
-      Werror("invald coeff. field description, expecting parameter name");
+      WerrorS("invalid coeff. field description, expecting parameter name");
       return;
     }
     //(rParameter(R))=(char**)omAlloc0(rPar(R)*sizeof(char_ptr));
@@ -2301,7 +2300,7 @@ void rComposeRing(lists L, ring R)
   // 1:
   else
   {
-    if (L->m[1].rtyp!=LIST_CMD) Werror("invald data, expecting list of numbers");
+    if (L->m[1].rtyp!=LIST_CMD) WerrorS("invalid data, expecting list of numbers");
     lists LL=(lists)L->m[1].data;
     if ((LL->nr >= 0) && LL->m[0].rtyp == BIGINT_CMD)
     {
@@ -2329,12 +2328,12 @@ void rComposeRing(lists L, ring R)
   // ----------------------------------------
   if ((mpz_cmp_ui(modBase, 1) == 0) && (mpz_cmp_ui(modBase, 0) < 0))
   {
-    Werror("Wrong ground ring specification (module is 1)");
+    WerrorS("Wrong ground ring specification (module is 1)");
     return;
   }
   if (modExponent < 1)
   {
-    Werror("Wrong ground ring specification (exponent smaller than 1");
+    WerrorS("Wrong ground ring specification (exponent smaller than 1)");
     return;
   }
   // module is 0 ---> integers
@@ -5631,8 +5630,7 @@ ring rInit(leftv pn, leftv rv, leftv ord)
       }
     }
 
-//    if (cf==NULL) goto rInitError;
-    assume( cf != NULL );
+    //if (cf==NULL) ->Error: Invalid ground field specification
   }
   else if ((pn->name != NULL)
   && ((strcmp(pn->name,"real")==0) || (strcmp(pn->name,"complex")==0)))
@@ -5716,12 +5714,12 @@ ring rInit(leftv pn, leftv rv, leftv ord)
 
     if ((mpz_cmp_ui(modBase, 1) == 0) && (mpz_cmp_ui(modBase, 0) < 0))
     {
-      Werror("Wrong ground ring specification (module is 1)");
+      WerrorS("Wrong ground ring specification (module is 1)");
       goto rInitError;
     }
     if (modExponent < 1)
     {
-      Werror("Wrong ground ring specification (exponent smaller than 1");
+      WerrorS("Wrong ground ring specification (exponent smaller than 1");
       goto rInitError;
     }
     // module is 0 ---> integers ringtype = 4;
@@ -5784,8 +5782,9 @@ ring rInit(leftv pn, leftv rv, leftv ord)
   }
   else
   {
-    Werror("Wrong or unknown ground field specification");
-#ifndef SING_NDEBUG
+    WerrorS("Wrong or unknown ground field specification");
+#if 0 
+// debug stuff for unknown cf descriptions:
     sleftv* p = pn;
     while (p != NULL)
     {
@@ -5811,7 +5810,7 @@ ring rInit(leftv pn, leftv rv, leftv ord)
   */
   if (cf==NULL)
   {
-    Werror("Invalid ground field specification");
+    WerrorS("Invalid ground field specification");
     goto rInitError;
 //    const int ch=32003;
 //    cf=nInitChar(n_Zp, (void*)(long)ch);

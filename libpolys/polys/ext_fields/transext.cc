@@ -215,16 +215,16 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
       if( p_IsConstant(den, ntRing) )
       {
         Print("ERROR in %s:%d: constant den. poly / Zp\n",f,l);
-        Print("NUM: ");  p_Write(num, ntRing);
-        Print("DEN: ");  p_Write(den, ntRing);
+        PrintS("NUM: ");  p_Write(num, ntRing);
+        PrintS("DEN: ");  p_Write(den, ntRing);
         return FALSE;
       }
 
       if( !n_IsOne(pGetCoeff(den), ntCoeffs) )
       {
         Print("ERROR in %s:%d: non-monic den. poly / Zp\n",f,l);
-        Print("NUM: ");  p_Write(num, ntRing);
-        Print("DEN: ");  p_Write(den, ntRing);
+        PrintS("NUM: ");  p_Write(num, ntRing);
+        PrintS("DEN: ");  p_Write(den, ntRing);
         return FALSE;
       }
     }
@@ -237,9 +237,9 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
         if((gcd!=NULL) && !p_IsOne(gcd, ntRing) )
         {
           Print("ERROR in %s:%d: 1 != GCD between num. & den. poly\n",f,l);
-          Print("GCD: ");  p_Write(gcd, ntRing);
-          Print("NUM: ");  p_Write(num, ntRing);
-          Print("DEN: ");  p_Write(den, ntRing);
+          PrintS("GCD: ");  p_Write(gcd, ntRing);
+          PrintS("NUM: ");  p_Write(num, ntRing);
+          PrintS("DEN: ");  p_Write(den, ntRing);
           return FALSE;
         }
         p_Delete( &gcd, ntRing );

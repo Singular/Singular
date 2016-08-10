@@ -145,7 +145,7 @@ LINKAGE BOOLEAN pipeWrite(si_link l, leftv data)
     }
     else
     {
-      Werror("cannot convert to string");
+      WerrorS("cannot convert to string");
       err=TRUE;
     }
     if (pipeLastLink==NULL) return TRUE;

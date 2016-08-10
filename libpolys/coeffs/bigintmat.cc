@@ -1676,7 +1676,7 @@ void bigintmat::hnf()
 
 #if 0
     char * s;
-    ::Print("mat over Z is \n");
+    ::PrintS("mat over Z is \n");
     ::Print("%s\n", s = nCoeffString(basecoeffs()));
     omFree(s);
     Print();
@@ -1743,7 +1743,7 @@ void bigintmat::hnf()
               // CF: use the 2x2 matrix (co1, co2)(co3, co4) to
               // get the gcd in position and the 0 in the other:
 #ifdef CF_DEB
-              ::Print("applying trafo\n");
+              ::PrintS("applying trafo\n");
               StringSetS("");
               n_Write(co1, basecoeffs()); StringAppendS("\t");
               n_Write(co2, basecoeffs()); StringAppendS("\t");
@@ -1805,7 +1805,7 @@ void bigintmat::hnf()
   n_Delete(&minusone, basecoeffs());
 
 #if 0
-    ::Print("hnf over Z is \n");
+    ::PrintS("hnf over Z is \n");
     Print();
     ::Print("\n(%d x %d)\n", rows(), cols());
 #endif
@@ -1964,9 +1964,9 @@ static void reduce_mod_howell(bigintmat *A, bigintmat *b, bigintmat * eps, bigin
   //to be triagonal in the same direction.
   //b can have multiple columns.
 #if 0
-  Print("reduce_mod_howell: A:\n");
+  PrintS("reduce_mod_howell: A:\n");
   A->Print();
-  Print("\nb:\n");
+  PrintS("\nb:\n");
   b->Print();
 #endif
 
@@ -1980,11 +1980,11 @@ static void reduce_mod_howell(bigintmat *A, bigintmat *b, bigintmat * eps, bigin
     eps->copy(b);
 
 #if 0
-    Print("\nx:\n");
+    PrintS("\nx:\n");
     x->Print();
-    Print("\neps:\n");
+    PrintS("\neps:\n");
     eps->Print();
-    Print("\n****************************************\n");
+    PrintS("\n****************************************\n");
 #endif
     return;
   }
@@ -2035,11 +2035,11 @@ static void reduce_mod_howell(bigintmat *A, bigintmat *b, bigintmat * eps, bigin
   }
   delete B;
 #if 0
-  Print("\nx:\n");
+  PrintS("\nx:\n");
   x->Print();
-  Print("\neps:\n");
+  PrintS("\neps:\n");
   eps->Print();
-  Print("\n****************************************\n");
+  PrintS("\n****************************************\n");
 #endif
 }
 
@@ -2093,9 +2093,9 @@ static number bimFarey(bigintmat *A, number N, bigintmat *L)
         L->skalmult(dz, Z);
         n_InpMult(den, dz, Z);
 #if 0
-        Print("den increasing to ");
+        PrintS("den increasing to ");
         n_Print(den, Z);
-        Print("\n");
+        PrintLn();
 #endif
       }
       n_Delete(&dz, Z);
@@ -2107,9 +2107,9 @@ static number bimFarey(bigintmat *A, number N, bigintmat *L)
   PrintS("bimFarey worked\n");
 #if 0
   L->Print();
-  Print("\n * 1/");
+  PrintS("\n * 1/");
   n_Print(den, Z);
-  Print("\n");
+  PrintLn();
 #endif
   return den;
 }
@@ -2428,11 +2428,11 @@ static number solveAx_howell(bigintmat *A, bigintmat *b, bigintmat *x, bigintmat
   delete y;
   x->simplifyContentDen(&den);
 #if 0
-  Print("sol = 1/");
+  PrintS("sol = 1/");
   n_Print(den, R);
-  Print(" *\n");
+  PrintS(" *\n");
   x->Print();
-  Print("\n");
+  PrintLn();
 #endif
   return den;
 }
@@ -2440,13 +2440,13 @@ static number solveAx_howell(bigintmat *A, bigintmat *b, bigintmat *x, bigintmat
 number solveAx(bigintmat *A, bigintmat *b, bigintmat *x)
 {
 #if 0
-  Print("Solve Ax=b for A=\n");
+  PrintS("Solve Ax=b for A=\n");
   A->Print();
-  Print("\nb = \n");
+  PrintS("\nb = \n");
   b->Print();
-  Print("\nx = \n");
+  PrintS("\nx = \n");
   x->Print();
-  Print("\n");
+  PrintLn();
 #endif
 
   coeffs R = A->basecoeffs();
@@ -2564,7 +2564,7 @@ void diagonalForm(bigintmat *A, bigintmat ** S, bigintmat ** T)
       X->Print();
       Print("\n2:x: %ld\n", x);
       x->Print();
-      Print("\n");
+      PrintLn();
 #endif
     }
     else
@@ -2585,9 +2585,9 @@ void diagonalForm(bigintmat *A, bigintmat ** S, bigintmat ** T)
       }
     }
 #if 0
-    Print("Diag ? %d\n", diag);
+    PrintS("Diag ? %d\n", diag);
     a->Print();
-    Print("\n");
+    PrintLn();
 #endif
     if (diag) break;
 
@@ -2610,24 +2610,24 @@ void diagonalForm(bigintmat *A, bigintmat ** S, bigintmat ** T)
 int kernbase (bigintmat *a, bigintmat *c, number p, coeffs q)
 {
 #if 0
-  Print("Kernel of ");
+  PrintS("Kernel of ");
   a->Print();
-  Print(" modulo ");
+  PrintS(" modulo ");
   n_Print(p, q);
-  Print("\n");
+  PrintLn();
 #endif
 
   coeffs coe = numbercoeffs(p, q);
   bigintmat *m = bimChangeCoeff(a, coe), *U, *V;
   diagonalForm(m, &U, &V);
 #if 0
-  Print("\ndiag form: ");
+  PrintS("\ndiag form: ");
   m->Print();
-  Print("\nU:\n");
+  PrintS("\nU:\n");
   U->Print();
-  Print("\nV:\n");
+  PrintS("\nV:\n");
   V->Print();
-  Print("\n");
+  PrintLn();
 #endif
 
   int rg = 0;

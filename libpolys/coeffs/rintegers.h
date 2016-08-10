@@ -7,7 +7,6 @@
 * ABSTRACT: numbers modulo n
 */
 #include <misc/auxiliary.h>
-#include <coeffs/coeffs.h>
 
 #ifdef HAVE_RINGS
 
@@ -25,8 +24,9 @@
 
 BOOLEAN nrzInitChar    (coeffs r,  void * parameter);
 
-// will be reused by rmodulon.cc
-void    nrzWrite       (number a, const coeffs r);
+void    nrzWrite       (number a, const coeffs r); /*for rmodulon.cc*/
+
+number  nrzInit        (long i, const coeffs r); /*for SAGE, better: n_Init*/
 
 #endif
 

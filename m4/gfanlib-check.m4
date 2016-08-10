@@ -54,6 +54,8 @@ if test "x$ENABLE_GFANLIB" != "xno"; then
  )
  AC_LANG_POP()
 
+ AC_CHECK_FUNCS(dd_free_global_constants)
+
  LIBS=$BACKUP_LIBS
 
  if test "x$PASSED_ALL_TESTS_FOR_GFANLIB" = x1; then

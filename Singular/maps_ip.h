@@ -7,7 +7,7 @@
 * ABSTRACT - the mapping of polynomials to other rings
 */
 
-#include <misc/auxiliary.h>
+#include <kernel/mod2.h>
 #include <polys/matpol.h>
 
 #include <kernel/structs.h>

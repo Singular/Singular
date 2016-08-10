@@ -29,8 +29,8 @@ if test "x$ENABLE_POLYMAKE" != xno; then
    AC_CHECK_PROG([PMCONFIG],[polymake-config],[1],[0])
    if test $PMCONFIG = "1"; then
 ##    AC_MSG_CHECKING([whether polymake is up-to-date])
-    SUPPORTEDPOLYMAKEVERSION="212"
-    CURRENTPOLYMAKEVERSION=`polymake-config --version | cut -c -4 -| sed s'/\.//'`
+    SUPPORTEDPOLYMAKEVERSION="21"
+    CURRENTPOLYMAKEVERSION=`polymake-config --version | cut -c -3 -| sed s'/\.//'`
     if test $CURRENTPOLYMAKEVERSION -ge $SUPPORTEDPOLYMAKEVERSION; then
       AC_MSG_RESULT([yes])
 
@@ -38,7 +38,9 @@ if test "x$ENABLE_POLYMAKE" != xno; then
       PM_CFLAGS=`polymake-config --cflags`
       PM_LIBS=`polymake-config --libs`
       PM_LDFLAGS=`polymake-config --ldflags`
+      POLYMAKEVERSION=`polymake-config --version | cut -c -4 -| sed s'/\./*100+/'`
 
+      AC_DEFINE_UNQUOTED(POLYMAKEVERSION,$POLYMAKEVERSION,[check the polymake version])
       AC_SUBST(PM_INC)
       AC_SUBST(PM_CFLAGS)
       AC_SUBST(PM_LIBS)

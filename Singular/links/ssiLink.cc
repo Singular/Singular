@@ -407,7 +407,7 @@ number ssiReadNumber_CF(const ssiInfo *d, const coeffs cf)
     // poly
     return (number)ssiReadPoly_R(d,cf->extRing);
   }
-  else Werror("coeffs not implemented in ssiReadNumber");
+  else WerrorS("coeffs not implemented in ssiReadNumber");
   return NULL;
 }
 

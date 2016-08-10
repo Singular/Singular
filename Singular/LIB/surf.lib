@@ -155,7 +155,7 @@ EXAMPLE: example plot; shows an example
     {
       surf_call = "surf ";
       surf_call = surf_call + l + ">/dev/null 2>&1";
-      surf_call = surf_call + " && cygopen /tmp/surf.jpg";
+      surf_call = surf_call + " && cygstart /tmp/surf.jpg.jpg";
       i = system("sh", surf_call);
       if (i != 0)
       {
@@ -182,7 +182,7 @@ EXAMPLE: example plot; shows an example
       ERROR(err_mes);
     }
   }
-  system("sh", "command rm " + l +" /tmp/surf.jpg");
+  system("sh", "command rm -f " + l +" /tmp/surf.jpg /tmp/surf.jpg.jpg");
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -470,7 +470,7 @@ static proc FindDisplayProgram()
  }
  s=system("executable","xdg-open");
  if (s!="") { return(s); }
- s=system("executable","cygopen"); // windows
+ s=system("executable","cygstart"); // windows
  if (s!="") { return(s); }
  s=system("executable","open"); // osx
  if (s!="") { return(s); }

@@ -12,8 +12,5 @@ libmisc_la_SOURCES   = int64vec.cc options.c sirandom.c intvec.cc prime.cc
 
 libmisc_la_includedir = $(includedir)/singular/misc
 libmisc_la_include_HEADERS = mylimits.h options.h intvec.h int64vec.h \
-                             sirandom.h prime.h
-
-nodist_libmisc_la_include_HEADERS = auxiliary.h
-nodist_libmisc_la_SOURCES   = auxiliary.h
+                             sirandom.h prime.h auxiliary.h
 

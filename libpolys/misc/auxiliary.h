@@ -19,50 +19,11 @@
 /* please include libpolysconfig.h exclusively via <misc/auxiliary.h> and before any other header */
 #include "libpolysconfig.h"
 
-// ----------------- which parts/extensions of Singular to build
-#ifndef HAVE_RINGS
-#undef HAVE_RINGS
-#endif
-
-#ifndef HAVE_PLURAL
-#undef HAVE_PLURAL
-#endif
-
-#ifndef HAVE_DL
-#undef HAVE_DL
-#endif
-
-#ifndef HAVE_NTL
-#undef HAVE_NTL
-#endif
-
-/* letterplace gb:*/
-#ifndef HAVE_SHIFTBBA
-#undef HAVE_SHIFTBBA
-#endif
-
-#ifndef HAVE_POLYEXTENSIONS
-#undef HAVE_POLYEXTENSIONS
-#endif
-
-#ifndef DISABLE_GMP_CPP
-#undef DISABLE_GMP_CPP
-#endif
-
-#ifndef SINGULAR
-#undef SINGULAR
-#endif
-
-#ifndef NOSTREAMIO
-#undef NOSTREAMIO
-#endif
-
 /* the following cunstruct is to make it painless to add -DHAVE_NUMSTATS to CPPFLAGS for configure */
 #ifndef HAVE_NUMSTATS
 /* #define HAVE_NUMSTATS */
 #undef HAVE_NUMSTATS
 #endif /* HAVE_NUMSTATS */
-// ----------------  end of parts/extensions
 
 // ---------------- Singular standard types etc.
 /* SI_INTEGER_VARIANT: 1: from longrat.cc
@@ -173,18 +134,6 @@ static inline unsigned long si_min(const unsigned long a, const unsigned long b)
 #define SSI_BASE 16
 
 // ---------------- defines which depend on the settings above
-
-#ifndef HAVE_MULT_MOD
-#undef HAVE_MULT_MOD
-#endif
-
-#ifndef HAVE_DIV_MOD
-#undef HAVE_DIV_MOD
-#endif
-
-#ifndef HAVE_GENERIC_ADD
-#undef HAVE_GENERIC_ADD
-#endif
 
 /*******************************************************************
  * DEBUG OPTIONS

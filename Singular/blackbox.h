@@ -1,7 +1,7 @@
 #ifndef BLACKBOX_H
 #define BLACKBOX_H
 
-#include <misc/auxiliary.h>
+#include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
 
 #include <kernel/structs.h>

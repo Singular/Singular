@@ -75,7 +75,7 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
         int d2 = zq->ambientDimension();
         if (d1 != d2)
         {
-          Werror("mismatching ambient dimensions");
+          WerrorS("mismatching ambient dimensions");
           return TRUE;
         }
         gfan::ZCone* zs = new gfan::ZCone();
@@ -96,7 +96,7 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
         int d2 = zq->ambientDimension();
         if (d1 != d2)
         {
-          Werror("mismatching ambient dimensions");
+          WerrorS("mismatching ambient dimensions");
           return TRUE;
         }
         gfan::ZMatrix rays = zp->extremeRays();
@@ -971,7 +971,13 @@ BOOLEAN PMlatticePoints(leftv res, leftv args)
     try
     {
       polymake::perl::Object* p = ZPolytope2PmPolytope(zp);
+      #if (POLYMAKEVERSION >=214)
+      polymake::Matrix<polymake::Integer> lp = p->CallPolymakeMethod("LATTICE_POINTS");
+      #elif (POLYMAKEVERSION >=212)
       polymake::Matrix<polymake::Integer> lp = p->give("LATTICE_POINTS");
+      #else
+        #error polymake version too old
+      #endif
       delete p;
       iv = PmMatrixInteger2Intvec(&lp,ok);
     }
@@ -1175,7 +1181,13 @@ BOOLEAN PMhilbertBasis(leftv res, leftv args)
     try
     {
       polymake::perl::Object* p = ZPolytope2PmPolytope(zp);
+      #if (POLYMAKEVERSION >=214)
+      polymake::Matrix<polymake::Integer> lp = p->CallPolymakeMethod("HILBERT_BASIS");
+      #elif (POLYMAKEVERSION >=212)
       polymake::Matrix<polymake::Integer> lp = p->give("HILBERT_BASIS");
+      #else
+        #error polymake version too old
+      #endif
       delete p;
       iv = PmMatrixInteger2Intvec(&lp,ok);
     }

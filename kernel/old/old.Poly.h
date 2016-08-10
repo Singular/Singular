@@ -89,7 +89,7 @@ class PolyImpl{
   }
   PolyImpl& operator+=(const PolyImpl & p2){
     if (r!=p2.r){
-      Werror("not the same ring");
+      WerrorS("not the same ring");
       return *this;
     }
     if (this==&p2){
@@ -103,7 +103,7 @@ class PolyImpl{
   }
   PolyImpl& operator*=(const PolyImpl & p2){
     if (r!=p2.r){
-      Werror("not the same ring");
+      WerrorS("not the same ring");
       return *this;
     }
     if (this==&p2){
@@ -116,7 +116,7 @@ class PolyImpl{
   }
   PolyImpl& operator*=(const Number & n){
     if (r!=n.r){
-      Werror("not the same ring");
+      WerrorS("not the same ring");
       return *this;
     }
 
@@ -125,7 +125,7 @@ class PolyImpl{
   }
   PolyImpl& operator-=(const PolyImpl & p2){
     if (r!=p2.r){
-      Werror("not the same ring");
+      WerrorS("not the same ring");
       return *this;
     }
     if (this==&p2){

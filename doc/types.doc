@@ -1815,6 +1815,8 @@ computers. Ssi tcp links can be opened in four different modes:
 
 @item tcp <host>:<program>
 @sc{Singular} acts as a client, launching an application as server.
+This reuires @code{ssh}/@code{sshd} to be installed an the computers
+(and preferably an automatic login via @code{.ssh/authorized_keys}).
 
 @item fork
 @sc{Singular} acts as a client, forking another @sc{Singular} as

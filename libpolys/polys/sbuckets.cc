@@ -8,12 +8,7 @@
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
  *******************************************************************/
-//#include <kernel/mod2.h>
-
 #include <omalloc/omalloc.h>
-
-
-
 
 #include <misc/auxiliary.h>
 

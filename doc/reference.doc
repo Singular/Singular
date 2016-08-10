@@ -6144,7 +6144,7 @@ default
 @item 1
 consider only the leading term and do no tail reduction.
 @item 2
-reduce also with bad ecart (in the local case)
+tail reduction:n the local/mixed ordering case: reduce also with bad ecart
 @item 4
 reduce without division, return possibly a non-zero constant multiple of the remainder
 @end itemize

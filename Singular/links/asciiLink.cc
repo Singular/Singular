@@ -32,8 +32,8 @@ static const char* GetIdString(idhdl h);
 static int DumpRhs(FILE *fd, idhdl h);
 static BOOLEAN DumpQring(FILE *fd, idhdl h, const char *type_str);
 static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl);
-static BOOLEAN CollectLibs(FILE *fd, char *name, char ***list_of_libs);
-static BOOLEAN DumpLibs(FILE *fd, char ***list_of_libs);
+static BOOLEAN CollectLibs(char *name, char ***list_of_libs);
+//static BOOLEAN DumpLibs(FILE *fd, char ***list_of_libs);
 
 extern si_link_extension si_link_root;
 
@@ -183,7 +183,7 @@ BOOLEAN slWriteAscii(si_link l, leftv v)
       }
       else
       {
-        Werror("cannot convert to string");
+        WerrorS("cannot convert to string");
         err=TRUE;
       }
     }
@@ -314,7 +314,7 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h, char ***list_of_libs)
   if ((type_id == PROC_CMD)
   && (IDPROC(h)->language == LANG_SINGULAR)
   && (IDPROC(h)->libname!=NULL))
-    return CollectLibs(fd,IDPROC(h)->libname,list_of_libs);
+    return CollectLibs(IDPROC(h)->libname,list_of_libs);
 
   // put type and name
   if (fprintf(fd, "%s %s", type_str, IDID(h)) == EOF)
@@ -413,7 +413,7 @@ static BOOLEAN DumpQring(FILE *fd, idhdl h, const char *type_str)
   }
 }
 
-static BOOLEAN CollectLibs(FILE *fd, char *name, char *** list_of_libs)
+static BOOLEAN CollectLibs(char *name, char *** list_of_libs)
 {
   if (*list_of_libs==NULL)
   {
@@ -530,7 +530,7 @@ BOOLEAN slGetDumpAscii(si_link l)
 {
   if (l->name[0] == '\0')
   {
-    Werror("getdump: Can not get dump from stdin");
+    WerrorS("getdump: Can not get dump from stdin");
     return TRUE;
   }
   else

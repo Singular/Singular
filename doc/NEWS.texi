@@ -37,6 +37,9 @@ Changed libraries:
 Changes in the kernel:
 @itemize
 @item improved mapping of polynomials/ideals/...
+@item port to gcc 6
+@item port to polymake 3.0
+@item port to gfanlib 0.6 (requires C++11, i.e. gcc >=4.3)
 @end itemize
 
 @heading News for version 4-0-3

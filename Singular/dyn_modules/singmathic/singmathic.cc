@@ -2,7 +2,7 @@
 
 #ifdef HAVE_MATHICGB
 
-#include <misc/auxiliary.h>
+#include <kernel/mod2.h>
 
 #include <misc/options.h>
 

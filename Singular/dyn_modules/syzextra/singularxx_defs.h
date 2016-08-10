@@ -57,7 +57,7 @@
 #ifndef HAVE_THROW
 #  define SINGULARXX_THROW(type) throw type();
 #else
-#  define SINGULARXX_THROW(type) Werror(type().what());
+#  define SINGULARXX_THROW(type) WerrorS(type().what());
 #endif
 
 /// For optimizing if-branches

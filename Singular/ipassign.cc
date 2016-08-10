@@ -13,7 +13,6 @@
 
 #include <kernel/mod2.h>
 
-#include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
 
 #define TRANSEXT_PRIVATES
@@ -259,7 +258,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   ideal q = idInit(1,1);
   if ((p==NULL) ||(NUM((fraction)p)==NULL))
   {
-    Werror("Could not construct the alg. extension: minpoly==0");
+    WerrorS("Could not construct the alg. extension: minpoly==0");
     // cleanup A: TODO
     rDelete( A.r );
     return TRUE;
@@ -300,7 +299,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
 
   if (new_cf==NULL)
   {
-    Werror("Could not construct the alg. extension: llegal minpoly?");
+    WerrorS("Could not construct the alg. extension: llegal minpoly?");
     // cleanup A: TODO
     rDelete( A.r );
     return TRUE;

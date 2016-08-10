@@ -146,5 +146,5 @@ AC_CONFIG_FILES([reporter/Makefile])
 AC_CONFIG_FILES([coeffs/Makefile])
 AC_CONFIG_FILES([polys/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
-AC_CONFIG_FILES([libpolys-config libpolys.pc  misc/auxiliary.h])
+AC_CONFIG_FILES([libpolys-config libpolys.pc])
 AC_OUTPUT

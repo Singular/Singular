@@ -1018,7 +1018,7 @@ static BOOLEAN heDummyInit(int /*warn*/, int /*br*/)
 }
 static void heDummyHelp(heEntry /*hentry*/, int /*br*/)
 {
-  Werror("No functioning help browser available.");
+  WerrorS("No functioning help browser available.");
 }
 
 static BOOLEAN heEmacsInit(int /*warn*/, int /*br*/)

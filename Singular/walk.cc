@@ -1,7 +1,6 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: Implementation of the Groebner walk
 */
@@ -1999,7 +1998,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
   if(mpz_cmp(t_nenner, t_null) == 0)
   {
 #ifndef SING_NDEBUG
-    Print("\n//MwalkNextWeightCC: t_nenner=0\n");
+    PrintS("\n//MwalkNextWeightCC: t_nenner=0\n");
 #endif
     delete diff_weight;
     diff_weight = ivCopy(curr_weight);//take memory
@@ -2094,7 +2093,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
     PrintS("(");
     mpz_out_str( stdout, 10, t_nenner);
     Print(" * %d)", (*curr_weight)[j]);
-    Print(" + ("); mpz_out_str( stdout, 10, t_zaehler);
+    PrintS(" + ("); mpz_out_str( stdout, 10, t_zaehler);
     Print(" * %d) =  ",  (*diff_weight)[j]);
     mpz_out_str( stdout, 10, s_nenner);
     PrintS(" + ");
@@ -2394,7 +2393,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
   if(mpz_cmp(t_nenner, t_null) == 0)
   {
 #ifndef SING_NDEBUG
-    Print("\n//MwalkNextWeightCC: t_nenner=0\n");
+    PrintS("\n//MwalkNextWeightCC: t_nenner=0\n");
 #endif
     delete diff_weight;
     diff_weight = ivCopy(curr_weight);//take memory
@@ -2478,7 +2477,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
     PrintS("(");
     mpz_out_str( stdout, 10, t_nenner);
     Print(" * %d)", (*curr_weight)[j]);
-    Print(" + ("); mpz_out_str( stdout, 10, t_zaehler);
+    PrintS(" + ("); mpz_out_str( stdout, 10, t_zaehler);
     Print(" * %d) =  ",  (*diff_weight)[j]);
     mpz_out_str( stdout, 10, s_nenner);
     PrintS(" + ");
@@ -5530,14 +5529,14 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
   //check that weight radius is valid
   if(weight_rad < 0)
   {
-    Werror("Invalid radius.\n");
+    WerrorS("Invalid radius.\n");
     return NULL;
   }
 
   //check that perturbation degree is valid
   if(pert_deg > nV || pert_deg < 1)
   {
-    Werror("Invalid perturbation degree.\n");
+    WerrorS("Invalid perturbation degree.\n");
     return NULL;
   }
 
@@ -5875,7 +5874,7 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
   //check that perturbation degree is valid
   if(op_deg < 1 || tp_deg < 1 || op_deg > nV || tp_deg > nV)
   {
-    Werror("Invalid perturbation degree.\n");
+    WerrorS("Invalid perturbation degree.\n");
     return NULL;
   }
 
@@ -6310,14 +6309,14 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
   //check that weight radius is valid
   if(weight_rad < 0)
   {
-    Werror("Invalid radius.\n");
+    WerrorS("Invalid radius.\n");
     return NULL;
   }
 
   //check that perturbation degree is valid
   if(op_deg < 1 || tp_deg < 1 || op_deg > nV || tp_deg > nV)
   {
-    Werror("Invalid perturbation degree.\n");
+    WerrorS("Invalid perturbation degree.\n");
     return NULL;
   }
 
@@ -6654,7 +6653,7 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
     {
       if(printout > 1)
       {
-        Print("\n Mpwalk: there is a polynomial in Gomega with at least 3 monomials.\n");
+        PrintS("\n Mpwalk: there is a polynomial in Gomega with at least 3 monomials.\n");
       }
       // low-dimensional facet of the cone
       delete next_weight;
@@ -7102,7 +7101,7 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
       {
         if(printout > 0)
         {
-          Print("\n//** rec_fractal_call: Wrong cone. Tau doesn't stay in the correct cone.\n");
+          PrintS("\n//** rec_fractal_call: Wrong cone. Tau doesn't stay in the correct cone.\n");
         }
 
 #ifndef  MSTDCC_FRACTAL
@@ -7124,7 +7123,7 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
         {
           if(printout > 0)
           {
-            Print("\n//** rec_fractal_call: Updated vectors are equal to the old vectors.\n");
+            PrintS("\n//** rec_fractal_call: Updated vectors are equal to the old vectors.\n");
           }
           delete Xtautmp;
           goto FRACTAL_MSTDCC;
@@ -7277,7 +7276,7 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
     {
       if(printout > 1)
       {
-        Print("\n//** rec_fractal_call: Maximal recursion depth.\n");
+        PrintS("\n//** rec_fractal_call: Maximal recursion depth.\n");
       }
 #ifdef TIME_TEST
       to=clock();
@@ -8112,7 +8111,7 @@ ideal Mfrwalk(ideal G, intvec* ivstart, intvec* ivtarget,
   //check that weight radius is valid
   if(weight_rad < 0)
   {
-    Werror("Invalid radius.\n");
+    WerrorS("Invalid radius.\n");
     return NULL;
   }
   if(reduction == 0)
@@ -9218,7 +9217,7 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
   //check that perturbation degree is valid
   if(tp_deg < 1 || tp_deg > nV)
   {
-    Werror("Invalid perturbation degree.\n");
+    WerrorS("Invalid perturbation degree.\n");
     return NULL;
   }
 

@@ -1,7 +1,7 @@
 #ifndef SINGULAR_FGLM_H
 #define SINGULAR_FGLM_H
 
-#include <misc/auxiliary.h>
+#include <kernel/mod2.h>
 
 #include <kernel/ideals.h>
 #include <kernel/structs.h>

@@ -10,7 +10,6 @@
 
 #include <kernel/mod2.h>
 
-#include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
 
 //#ifdef HAVE_MPR

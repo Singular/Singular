@@ -6,9 +6,6 @@
 */
 #include <ctype.h> /* isdigit*/
 
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
 #include <misc/auxiliary.h>
 
 #ifdef SINGULAR_4_1

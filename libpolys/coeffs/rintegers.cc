@@ -36,7 +36,6 @@ int     nrzSize        (number a, const coeffs r);
 void    nrzDelete      (number *a, const coeffs r);
 BOOLEAN nrzGreaterZero (number k, const coeffs r);
 number  nrzMult        (number a, number b, const coeffs r);
-number  nrzInit        (long i, const coeffs r);
 long    nrzInt         (number &n, const coeffs r);
 number  nrzAdd         (number a, number b, const coeffs r);
 number  nrzSub         (number a, number b, const coeffs r);
@@ -1411,11 +1410,11 @@ static number nrzFarey(number r, number N, const coeffs R)
   number b1 = nrzInit(1, R);
   number two = nrzInit(2, R);
 #if 0
-  Print("Farey start with ");
+  PrintS("Farey start with ");
   n_Print(r, R);
-  Print(" mod ");
+  PrintS(" mod ");
   n_Print(N, R);
-  Print("\n");
+  PrintLn();
 #endif
   while (1)
   {

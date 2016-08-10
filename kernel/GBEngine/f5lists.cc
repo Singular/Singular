@@ -391,18 +391,19 @@ LNode* LNode::getNext(LNode* l) {
 }
 
 // for debugging
-void LNode::print() {
+void LNode::print()
+{
     LNode* temp = this;
-    Print("___________________List of S-polynomials______________________:\n");
+    PrintS("___________________List of S-polynomials______________________:\n");
     while(NULL != temp && NULL != temp->data) {
         Print("Index: %d\n",temp->getIndex());
-        Print("Term: ");
+        PrintS("Term: ");
         pWrite(temp->getTerm());
-        Print("Poly: ");
+        PrintS("Poly: ");
         pWrite(temp->getPoly());
         temp = temp->next;
     }
-    Print("_______________________________________________________________\n");
+    PrintS("_______________________________________________________________\n");
 }
 
 int LNode::count(LNode* l) {
@@ -882,28 +883,30 @@ RuleOld* CNode::getTestedRuleOld() {
 }
 
 // for debugging
-void CNode::print() {
+void CNode::print()
+{
     CNode* temp = this;
-    Print("___________________List of critical pairs______________________:\n");
-    while(NULL != temp) {
+    PrintS("___________________List of critical pairs______________________:\n");
+    while(NULL != temp)
+    {
         pWrite(ppMult_qq(temp->getT1(),temp->getLp1Term()));
         Print("LP1 Index: %d\n",temp->getLp1Index());
-        Print("T1: ");
+        PrintS("T1: ");
         pWrite(temp->getT1());
         Print("%p\n",temp->getT1());
-        Print("LP1 Term: ");
+        PrintS("LP1 Term: ");
         pWrite(temp->getLp1Term());
-        Print("LP1 Poly: ");
+        PrintS("LP1 Poly: ");
         pWrite(temp->getLp1Poly());
         Print("LP2 Index: %d\n",temp->getLp2Index());
-        Print("T2: ");
+        PrintS("T2: ");
         pWrite(temp->getT2());
         Print("%p\n",temp->getT2());
-        Print("LP2 Term: ");
+        PrintS("LP2 Term: ");
         pWrite(temp->getLp2Term());
-        Print("LP2 Poly: ");
+        PrintS("LP2 Poly: ");
         pWrite(temp->getLp2Poly());
-        Print("\n");
+        PrintLn();
         temp = temp->next;
     }
 }

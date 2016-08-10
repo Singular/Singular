@@ -4085,10 +4085,10 @@ void rDebugPrint(const ring r)
         PrintS("(NULL)");
       else
       {
-        Print("{");
+        PrintS("{");
         for( i=0; i <= limit; i++ )
           Print("%d ", syz_index[i]);
-        Print("}");
+        PrintS("}");
       }
 
     }
@@ -4210,7 +4210,7 @@ void rDebugPrint(const ring r)
 
   {
       PrintLn();
-      Print("pFDeg   : ");
+      PrintS("pFDeg   : ");
 #define pFDeg_CASE(A) if(r->pFDeg == A) PrintS( "" #A "" )
       pFDeg_CASE(p_Totaldegree); else
       pFDeg_CASE(p_WFirstTotalDegree); else
@@ -4223,7 +4223,7 @@ void rDebugPrint(const ring r)
     Print("pLDeg   : (%p)", r->pLDeg);
     PrintLn();
   }
-  Print("pSetm:");
+  PrintS("pSetm:");
   void p_Setm_Dummy(poly p, const ring r);
   void p_Setm_TotalDegree(poly p, const ring r);
   void p_Setm_WFirstTotalDegree(poly p, const ring r);

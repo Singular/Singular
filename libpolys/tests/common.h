@@ -8,10 +8,6 @@
 #include <cxxtest/TestSuite.h>
 #include <cxxtest/GlobalFixture.h>
 
-
-
-
-
 #include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
 

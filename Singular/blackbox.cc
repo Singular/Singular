@@ -1,8 +1,4 @@
-
-
-
 #include <kernel/mod2.h>
-#include <misc/auxiliary.h>
 
 #include "tok.h"
 #include "subexpr.h"

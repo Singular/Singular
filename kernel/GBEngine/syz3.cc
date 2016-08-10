@@ -1003,7 +1003,7 @@ static ideal kosz_std(ideal new_generators,ideal new_repr,syStrategy syzstr,
   ideal syzygies=idInit(16,syzstr->res[index]->rank+1);
   if ((idIs0(new_generators)) || (new_generators->m[0]==NULL))
   {
-    Werror("Hier ist was faul!\n");
+    WerrorS("Hier ist was faul!\n");
     return NULL;
   }
   SSet resPairs=(SSet)omAlloc0(l_pairs*sizeof(SObject));

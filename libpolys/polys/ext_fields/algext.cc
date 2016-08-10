@@ -1496,7 +1496,7 @@ void npolyCoeffWrite(const coeffs cf, BOOLEAN details)
   const ring A = cf->extRing;
 
   assume( A != NULL );
-  Print("// polynomial ring as coefficient ring :\n");
+  PrintS("// polynomial ring as coefficient ring :\n");
   rWrite(A);
   PrintLn();
 }

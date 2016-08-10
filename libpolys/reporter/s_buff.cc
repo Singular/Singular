@@ -8,7 +8,6 @@
 #include <fcntl.h>
 #include <signal.h>
 
-//#include <kernel/mod2.h>
 #include <gmp.h>
 
 #include <omalloc/omalloc.h>

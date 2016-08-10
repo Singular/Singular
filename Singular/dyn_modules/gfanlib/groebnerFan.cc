@@ -71,7 +71,7 @@ gfan::ZFan* groebnerFanOfPolynomial(poly g, ring r, bool onlyLowerHalfSpace=fals
       for (int j=0; j<l; j++)
       {
         if (i!=j)
-          inequalities.appendRow(exponents[i]-exponents[j]);
+          inequalities.appendRow(exponents[i].toVector()-exponents[j].toVector());
       }
       gfan::ZCone zc = gfan::ZCone(inequalities,gfan::ZMatrix(0,inequalities.getWidth()));
       zc.canonicalize();

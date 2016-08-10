@@ -9,7 +9,7 @@
 #ifndef COEFFS_H
 #define COEFFS_H
 
-#include <misc/auxiliary.h>
+# include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
 
 #include <misc/sirandom.h>

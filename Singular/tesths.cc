@@ -12,7 +12,6 @@
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
 
-#include <misc/auxiliary.h>
 #include <misc/options.h>
 
 #include <factory/factory.h>

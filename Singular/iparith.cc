@@ -2005,6 +2005,10 @@ static BOOLEAN jjDIFF_ID_ID(leftv res, leftv u, leftv v)
 static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
 {
   assumeStdFlag(v);
+  if (rHasMixedOrdering(currRing))
+  {
+     Warn("dim(%s,...) may be wrong because the mixed monomial ordering",v->Name());
+  }
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
@@ -2459,8 +2463,8 @@ static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
     uuAsLeftv.data = uu; uuAsLeftv.next = NULL;
     if (hasFlag(u, FLAG_STD)) setFlag(&uuAsLeftv,FLAG_STD);
     assumeStdFlag(&uuAsLeftv);
-    Print("// NOTE: computation of Hilbert series etc. is being\n");
-    Print("//       performed for generic fibre, that is, over Q\n");
+    PrintS("// NOTE: computation of Hilbert series etc. is being\n");
+    PrintS("//       performed for generic fibre, that is, over Q\n");
     intvec *module_w=(intvec*)atGet(&uuAsLeftv,"isHomog",INTVEC_CMD);
     intvec *iv=hFirstSeries(uu,module_w,currRing->qideal);
     int returnWithTrue = 1;
@@ -3923,8 +3927,8 @@ static BOOLEAN jjDEGREE(leftv res, leftv v)
     vvAsLeftv.data = vv; vvAsLeftv.next = NULL;
     if (hasFlag(v, FLAG_STD)) setFlag(&vvAsLeftv,FLAG_STD);
     assumeStdFlag(&vvAsLeftv);
-    Print("// NOTE: computation of degree is being performed for\n");
-    Print("//       generic fibre, that is, over Q\n");
+    PrintS("// NOTE: computation of degree is being performed for\n");
+    PrintS("//       generic fibre, that is, over Q\n");
     intvec *module_w=(intvec*)atGet(&vvAsLeftv,"isHomog",INTVEC_CMD);
     scDegree(vv,module_w,currRing->qideal);
     idDelete(&vv);
@@ -4051,6 +4055,10 @@ static BOOLEAN jjDET_S(leftv res, leftv v)
 static BOOLEAN jjDIM(leftv res, leftv v)
 {
   assumeStdFlag(v);
+  if (rHasMixedOrdering(currRing))
+  {
+     Warn("dim(%s) may be wrong because the mixed monomial ordering",v->Name());
+  }
   if (rField_is_Ring(currRing))
   {
     ideal vid = (ideal)v->Data();
@@ -4295,8 +4303,8 @@ static BOOLEAN jjHILBERT(leftv, leftv v)
     vvAsLeftv.data = vv; vvAsLeftv.next = NULL;
     if (hasFlag(v, FLAG_STD)) setFlag(&vvAsLeftv,FLAG_STD);
     assumeStdFlag(&vvAsLeftv);
-    Print("// NOTE: computation of Hilbert series etc. is being\n");
-    Print("//       performed for generic fibre, that is, over Q\n");
+    PrintS("// NOTE: computation of Hilbert series etc. is being\n");
+    PrintS("//       performed for generic fibre, that is, over Q\n");
     intvec *module_w=(intvec*)atGet(&vvAsLeftv,"isHomog",INTVEC_CMD);
     //scHilbertPoly(vv,currRing->qideal);
     hLookSeries(vv,module_w,currRing->qideal);
@@ -4315,8 +4323,8 @@ static BOOLEAN jjHILBERT_IV(leftv res, leftv v)
 {
   if (rField_is_Ring_Z(currRing))
   {
-    Print("// NOTE: computation of Hilbert series etc. is being\n");
-    Print("//       performed for generic fibre, that is, over Q\n");
+    PrintS("// NOTE: computation of Hilbert series etc. is being\n");
+    PrintS("//       performed for generic fibre, that is, over Q\n");
   }
   res->data=(void *)hSecondSeries((intvec *)v->Data());
   return FALSE;
@@ -5505,6 +5513,10 @@ static BOOLEAN jjCOUNT_RES(leftv res, leftv v)
 }
 static BOOLEAN jjDIM_R(leftv res, leftv v)
 {
+  if (rHasMixedOrdering(currRing))
+  {
+     Warn("dim(%s) may be wrong because the mixed monomial ordering",v->Name());
+  }
   res->data = (char *)(long)syDim((syStrategy)v->Data());
   return FALSE;
 }
@@ -5931,8 +5943,8 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
     uuAsLeftv.data = uu; uuAsLeftv.next = NULL;
     if (hasFlag(u, FLAG_STD)) setFlag(&uuAsLeftv,FLAG_STD);
     assumeStdFlag(&uuAsLeftv);
-    Print("// NOTE: computation of Hilbert series etc. is being\n");
-    Print("//       performed for generic fibre, that is, over Q\n");
+    PrintS("// NOTE: computation of Hilbert series etc. is being\n");
+    PrintS("//       performed for generic fibre, that is, over Q\n");
     intvec *module_w=(intvec*)atGet(&uuAsLeftv,"isHomog",INTVEC_CMD);
     intvec *iv=hFirstSeries(uu,module_w,currRing->qideal,wdegree);
     int returnWithTrue = 1;
@@ -9118,7 +9130,7 @@ int iiArithFindCmd(const char *szName)
   }
   //if(i>=0 && i<sArithBase.nCmdUsed)
   //  return i;
-  //Print("RET-2\n");
+  //PrintS("RET-2\n");
   return -2;
 }
 

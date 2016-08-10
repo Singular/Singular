@@ -366,7 +366,7 @@ void killid(const char * id, idhdl * ih)
     killhdl2(h,ih,currRing);
   }
   else
-    Werror("kill what ?");
+    WerrorS("kill what ?");
 }
 
 void killhdl(idhdl h, package proot)

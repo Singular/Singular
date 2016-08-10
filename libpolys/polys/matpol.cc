@@ -698,10 +698,10 @@ static poly mp_Select (poly fro, poly what, const ring R)
 *  {
 *    for(i=1;i<=c;i++)
 *    {
-*      if(MATELEM(a,j,i)!=NULL) Print("X");
-*      else Print("0");
+*      if(MATELEM(a,j,i)!=NULL) PrintS("X");
+*      else PrintS("0");
 *    }
-*    Print("\n");
+*    PrintLn();
 *  }
 *}
 */

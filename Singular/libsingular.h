@@ -3,7 +3,8 @@
 
 #include <math.h> // Why this?
 
-#include <misc/auxiliary.h>
+#include <singularconfig.h>
+#include <kernel/mod2.h>
 #include <kernel/structs.h>
 #include <kernel/polys.h>
 #include <coeffs/numbers.h>
@@ -28,8 +29,6 @@
 
 void siInit(char *);
 
-/* we need this function in Sage*/
-number nr2mMapZp(number from); // TODO: replace with something else...
 
 
 #endif // #ifndef LIBSINGULAR__H

@@ -201,7 +201,7 @@ public:
       Py_XINCREF(m_ptr);
       IDTYP(handle) =  PythonInterpreter::id();
     }
-    else { Werror("Importing pyobject to Singular failed"); }
+    else { WerrorS("Importing pyobject to Singular failed"); }
   }
 
   int compare(int op, const self& arg) const
@@ -421,16 +421,18 @@ PythonObject get_attrib_name(leftv arg)
 }
 
 /// Evaluate string in python
-PythonObject python_eval(const char* arg) {
-
+PythonObject python_eval(const char* arg)
+{
   PyObject* globals = PyModule_GetDict(PyImport_Import(PyString_FromString("__main__")));
   return PyRun_String(arg, Py_eval_input, globals, globals);
 }
 
 /// Evaluate string in python from Singular
-BOOLEAN python_eval(leftv result, leftv arg) {
-  if ( !arg || (arg->Typ() != STRING_CMD) ) {
-    Werror("expected python_eval('string')");
+BOOLEAN python_eval(leftv result, leftv arg)
+{
+  if ( !arg || (arg->Typ() != STRING_CMD) )
+  {
+    WerrorS("expected python_eval('string')");
     return TRUE;
   }
 
@@ -441,8 +443,9 @@ BOOLEAN python_eval(leftv result, leftv arg) {
 /// Execute string in python from Singular
 BOOLEAN python_run(leftv result, leftv arg)
 {
-  if ( !arg || (arg->Typ() != STRING_CMD) ) {
-    Werror("expected python_run('string')");
+  if ( !arg || (arg->Typ() != STRING_CMD) )
+  {
+    WerrorS("expected python_run('string')");
     return TRUE;
   }
 
@@ -472,10 +475,11 @@ void from_module_import_all(const char* module_name)
 }
 
 /// import python module and export identifiers in Singular namespace
-BOOLEAN python_import(leftv result, leftv value) {
-
-  if ((value == NULL) || (value->Typ()!= STRING_CMD)) {
-    Werror("expected python_import('string')");
+BOOLEAN python_import(leftv result, leftv value)
+{
+  if ((value == NULL) || (value->Typ()!= STRING_CMD))
+  {
+    WerrorS("expected python_import('string')");
     return TRUE;
   }
 
@@ -530,8 +534,9 @@ BOOLEAN pyobject_Op1(int op, leftv res, leftv head)
     case INT_CMD:               // built-in return types first
     {
       long value = PyInt_AsLong(PythonCastStatic<>(head));
-      if( (value == -1) &&  PyErr_Occurred() ) {
-        Werror("'pyobject` cannot be converted to integer");
+      if( (value == -1) &&  PyErr_Occurred() )
+      {
+        WerrorS("'pyobject` cannot be converted to integer");
         PyErr_Clear();
         return TRUE;
       }
@@ -611,17 +616,20 @@ BOOLEAN pyobject_OpM(int op, leftv res, leftv args)
       unsigned long len = obj.size();
 
       intvec* vec = new intvec(len);
-      for(unsigned long idx = 0; idx != len; ++idx) {
+      for(unsigned long idx = 0; idx != len; ++idx)
+      {
         long value = PyInt_AsLong(obj[idx]);
         (*vec)[idx] = static_cast<int>(value);
 
-        if ((value == -1) &&  PyErr_Occurred()) {
+        if ((value == -1) &&  PyErr_Occurred())
+        {
           value = 0;
           PyErr_Clear();
         }
-        if (value != long((*vec)[idx])) {
+        if (value != long((*vec)[idx]))
+        {
           delete vec;
-          Werror("'pyobject` cannot be converted to intvec");
+          WerrorS("'pyobject` cannot be converted to intvec");
           return TRUE;
         }
       }
@@ -695,7 +703,7 @@ blackbox* pyobject_blackbox(int& tok) {
   if(blackboxIsCmd("pyobject", tok) != ROOT_DECL)
   {
     tok = setBlackboxStuff((blackbox*)omAlloc0(sizeof(blackbox)),
-			   "pyobject");
+                           "pyobject");
   }
   return getBlackboxStuff(tok);
 }

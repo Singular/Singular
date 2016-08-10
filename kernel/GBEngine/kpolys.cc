@@ -4,7 +4,6 @@
 #include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
-#include <misc/auxiliary.h>
 
 #include <kernel/polys.h>
 

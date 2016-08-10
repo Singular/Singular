@@ -23,7 +23,7 @@
 #ifndef MISC_H
 #define MISC_H
 
-#include <misc/auxiliary.h>
+#include <kernel/mod2.h>
 
 #include <coeffs/si_gmp.h>
 #include <coeffs/coeffs.h>

@@ -39,6 +39,11 @@ LB_CHECK_GMP(4.0,,AC_MSG_ERROR([Unable to find GMP on your machine: please use -
 
 SING_CHECK_GFANLIB
 
+AC_LANG_PUSH(C++)
+AX_CHECK_COMPILE_FLAG([-std=c++11], [CXX11_FLAG="-std=c++11"], [CXX11_FLAG="-std=c++0x"], [])
+AC_SUBST(CXX11_FLAG)
+AC_LANG_POP()
+
 #AC_MSG_RESULT($ac_cv_singuname)
 #if test "$ac_cv_singuname" = unknown; then
 #  AC_MSG_WARN(Unknown architecture: Check singuname.sh)

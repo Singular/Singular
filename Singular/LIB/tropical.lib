@@ -596,7 +596,7 @@ EXAMPLE: example tropicalLifting;   shows an example"
         // test now if the LIFT has the correct valuation !!!
         // note: it may happen, that when resubstituting PARA into
         //       the replacement rules
-        //       there occurred some unexpected cancellation;
+        //       there occured some unexpected cancellation;
         //       we only know that for SOME
         //       solution of the zero-dimensional reduction NO
         //       canellation will occur,
@@ -2490,7 +2490,11 @@ NOTE:        if # is empty, then the valuation of t will be 1,
 @*           the latter supposes that we consider the maximum of the
              computed linear forms, the former that we consider their minimum
 EXAMPLE:     example tropicalise;   shows an example"
-{
+{ 
+  if (npars(basering)==0)
+  {
+    ERROR("The basering has no paramter t.");
+  }
   int order,j;
   list tropicalf;
   intvec exp;
@@ -4108,16 +4112,19 @@ NOTE:        needs the libraries random.lib and primdec.lib;
           randomp=t^(A[1,j2])*randomp1;// make a random constant
                                        // --- first we try small numbers
         }
-        if ((j3==2) and ((char(basering)==0) or (char(basering)>100)))
-        {
-          randomp1=random(1,100);
-          randomp=t^(A[1,j2])*randomp1;// make a random constant
-                                       // --- next we try bigger numbers
-        }
         else
         {
-          randomp1=random(1,char(basering)-1);
-          randomp=t^(A[1,j2])*randomp1;//make a random constant
+          if ((j3==2) and ((char(basering)==0) or (char(basering)>100)))
+          {
+            randomp1=random(1,100);
+            randomp=t^(A[1,j2])*randomp1;// make a random constant
+                                         // --- next we try bigger numbers
+          }
+          else
+          {
+            randomp1=random(1,char(basering)-1);
+            randomp=t^(A[1,j2])*randomp1;//make a random constant
+          }
         }
         ergl[A[2,j2]]=randomp;//and save the constant in a list
         erglini[A[2,j2]]=randomp1;
@@ -4708,7 +4715,7 @@ NOTE:    - the procedure is also called recursively by itself, and
         // read the result from gfan and store it to a string,
         // which in a later version
         // should be interpreded by Singular
-        intvec wneu=choosegfanvector(read("/tmp/gfanoutput"),0)[1];
+        intvec wneu=choosegfanvector(read("/tmp/gfanoutput"),0,anzahlvariablen)[1];
         setring PREGFANRING;
       }
     }
@@ -5431,7 +5438,7 @@ NOTE:        the procedure is called from displaypoly"
 
 /////////////////////////////////////////////////////////////////////////
 
-static proc choosegfanvector (string s,int findall)
+static proc choosegfanvector (string s,int findall,int anzahlvariablen)
 "USAGE:   choosegfanvector(s); s string
 RETURN:   list, the jth entry is the jth integer vector contained in s
 NOTE:     the procedure is called from tropicalparametrise"
@@ -5446,7 +5453,12 @@ NOTE:     the procedure is called from tropicalparametrise"
       i++;
     }
     execute("intvec ww="+w+";");
-    ww=ww[1..size(ww)-1];
+    // the last entry in ww should correspond to the homogenisation variable
+    // (and can be omitted), unless the input to gfan was already homogeneous
+    if (anzahlvariablen==size(ww)-1)
+    {
+      ww=ww[1..size(ww)-1];
+    }
     return(list(ww));
   }
   else
@@ -5473,7 +5485,14 @@ NOTE:     the procedure is called from tropicalparametrise"
       if (size(s)!=0)
       {
         execute("www=intvec("+w+");");
-        ww[i]=intvec(www[1..size(www)-1]);
+        if (anzahlvariablen==size(ww)-1)
+        {
+          ww[i]=intvec(www[1..size(www)-1]);
+        }
+        else
+        {
+          ww[i]=www;
+        }
         w="";
         i++;
       }
@@ -5596,7 +5615,7 @@ NOTE:    - the procedure is also called recursively by itself, and
   def BASERING=basering;
   int recursively; // is set 1 if the procedure is called recursively by itself
   int ii,jj,kk,ll,jjj,kkk,lll;
-  if (typeof(#[1])=="int") // this means the precedure has been
+  if (typeof(#[1])=="int") // this means the procedure has been
   { // called recursively
     // how many variables are true variables, and how many come
     // from the field extension
@@ -5754,7 +5773,7 @@ NOTE:    - the procedure is also called recursively by itself, and
             // read the result from gfan and store it to a string,
             // which in a later version
             // should be interpreded by Singular
-            wneulist=choosegfanvector(read("/tmp/gfanoutput"),findall);
+            wneulist=choosegfanvector(read("/tmp/gfanoutput"),findall,anzahlvariablen);
             setring PREGFANRING;
           }
           kill GFANRING;
