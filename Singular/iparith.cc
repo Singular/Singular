@@ -2005,6 +2005,10 @@ static BOOLEAN jjDIFF_ID_ID(leftv res, leftv u, leftv v)
 static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
 {
   assumeStdFlag(v);
+  if (rHasMixedOrdering(currRing))
+  {
+     Warn("dim(%s,...) may be wrong because the mixed monomial ordering",v->Name());
+  }
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
@@ -4051,6 +4055,10 @@ static BOOLEAN jjDET_S(leftv res, leftv v)
 static BOOLEAN jjDIM(leftv res, leftv v)
 {
   assumeStdFlag(v);
+  if (rHasMixedOrdering(currRing))
+  {
+     Warn("dim(%s) may be wrong because the mixed monomial ordering",v->Name());
+  }
   if (rField_is_Ring(currRing))
   {
     ideal vid = (ideal)v->Data();
@@ -5505,6 +5513,10 @@ static BOOLEAN jjCOUNT_RES(leftv res, leftv v)
 }
 static BOOLEAN jjDIM_R(leftv res, leftv v)
 {
+  if (rHasMixedOrdering(currRing))
+  {
+     Warn("dim(%s) may be wrong because the mixed monomial ordering",v->Name());
+  }
   res->data = (char *)(long)syDim((syStrategy)v->Data());
   return FALSE;
 }
