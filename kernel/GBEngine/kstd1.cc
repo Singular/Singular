@@ -1538,7 +1538,10 @@ void initSba(ideal F,kStrategy strat)
   }
   // for sig-safe reductions in signature-based
   // standard basis computations
-  strat->red          = redSig;
+  if(rField_is_Ring(currRing))
+    strat->red = redSigRing;
+  else
+    strat->red        = redSig;
   //strat->sbaOrder  = 1;
   strat->currIdx      = 1;
 }
@@ -2519,6 +2522,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
       }
       else
       {
+        strat->sigdrop = FALSE;
         if (w!=NULL)
           r=sba(F,Q,*w,hilb,strat);
         else
@@ -2543,6 +2547,8 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
   else
   {
     //--------------------------RING CASE-------------------------
+    assume(sbaOrder == 1);
+    assume(arri == 0);
     if(idIs0(F))
       return idInit(1,F->rank);
     ideal r;

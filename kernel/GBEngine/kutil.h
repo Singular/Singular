@@ -520,6 +520,7 @@ ideal createG0();
 int redLazy (LObject* h,kStrategy strat);
 int redHomog (LObject* h,kStrategy strat);
 int redSig (LObject* h,kStrategy strat);
+int redSigRing (LObject* h,kStrategy strat);
 //adds hSig to be able to check with F5's criteria when entering pairs!
 void enterpairsSig (poly h, poly hSig, int from, int k, int ec, int pos,kStrategy strat, int atR = -1);
 void enterpairs (poly h, int k, int ec, int pos,kStrategy strat, int atR = -1);
@@ -576,6 +577,7 @@ void kFreeStrat(kStrategy strat);
 void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR);
 void enterOnePairLift (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR);
 void enterOnePairSig (int i,poly p,poly pSig,int ecart, int isFromQ,kStrategy strat, int atR);
+void enterOnePairSigRing (int i,poly p,poly pSig,int ecart, int isFromQ,kStrategy strat, int atR);
 void chainCritNormal (poly p,int ecart,kStrategy strat);
 void chainCritOpt_1 (poly,int,kStrategy strat);
 void chainCritSig (poly p,int ecart,kStrategy strat);
@@ -711,6 +713,13 @@ int ksReducePoly(LObject* PR,
 //         -1 tailRing change could not be performed due to exceeding exp
 //            bound of currRing
 int ksReducePolySig(LObject* PR,
+                 TObject* PW,
+                 long idx,
+                 poly spNoether = NULL,
+                 number *coef = NULL,
+                 kStrategy strat = NULL);
+                 
+int ksReducePolySigRing(LObject* PR,
                  TObject* PW,
                  long idx,
                  poly spNoether = NULL,

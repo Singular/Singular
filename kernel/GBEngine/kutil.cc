@@ -2382,6 +2382,263 @@ void enterOnePairSig (int i, poly p, poly pSig, int from, int ecart, int isFromQ
 void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kStrategy strat, int atR = -1)
 #endif
 {
+  assume(i<=strat->sl);
+
+  int      l;
+  poly m1 = NULL,m2 = NULL; // we need the multipliers for the s-polynomial to compute
+              // the corresponding signatures for criteria checks
+  LObject  Lp;
+  poly pSigMult = p_Copy(pSig,currRing);
+  poly sSigMult = p_Copy(strat->sig[i],currRing);
+  unsigned long pSigMultNegSev,sSigMultNegSev;
+  Lp.i_r = -1;
+
+#ifdef KDEBUG
+  Lp.ecart=0; Lp.length=0;
+#endif
+  /*- computes the lcm(s[i],p) -*/
+  Lp.lcm = pInit();
+  k_GetLeadTerms(p,strat->S[i],currRing,m1,m2,currRing);
+#ifndef HAVE_RATGRING
+  pLcm(p,strat->S[i],Lp.lcm);
+#elif defined(HAVE_RATGRING)
+  //  if (rIsRatGRing(currRing))
+  pLcmRat(p,strat->S[i],Lp.lcm, currRing->real_var_start); // int rat_shift
+#endif
+  pSetm(Lp.lcm);
+
+  // set coeffs of multipliers m1 and m2
+  pSetCoeff0(m1, nInit(1));
+  pSetCoeff0(m2, nInit(1));
+//#if 1
+#ifdef DEBUGF5
+  Print("P1  ");
+  pWrite(pHead(p));
+  Print("P2  ");
+  pWrite(pHead(strat->S[i]));
+  Print("M1  ");
+  pWrite(m1);
+  Print("M2  ");
+  pWrite(m2);
+#endif
+  // get multiplied signatures for testing
+  pSigMult = currRing->p_Procs->pp_Mult_mm(pSigMult,m1,currRing);
+  pSigMultNegSev = ~p_GetShortExpVector(pSigMult,currRing);
+  sSigMult = currRing->p_Procs->pp_Mult_mm(sSigMult,m2,currRing);
+  sSigMultNegSev = ~p_GetShortExpVector(sSigMult,currRing);
+
+//#if 1
+#ifdef DEBUGF5
+  Print("----------------\n");
+  pWrite(pSigMult);
+  pWrite(sSigMult);
+  Print("----------------\n");
+  Lp.checked  = 0;
+#endif
+  int sigCmp = p_LmCmp(pSigMult,sSigMult,currRing);
+//#if 1
+#if DEBUGF5
+  Print("IN PAIR GENERATION - COMPARING SIGS: %d\n",sigCmp);
+  pWrite(pSigMult);
+  pWrite(sSigMult);
+#endif
+  if(sigCmp==0)
+  {
+    // printf("!!!!   EQUAL SIGS   !!!!\n");
+    // pSig = sSig, delete element due to Rewritten Criterion
+    pDelete(&pSigMult);
+    pDelete(&sSigMult);
+    if (rField_is_Ring(currRing))
+      pLmDelete(Lp.lcm);
+    else
+      pLmFree(Lp.lcm);
+    Lp.lcm=NULL;
+    pDelete (&m1);
+    pDelete (&m2);
+    return;
+  }
+  // testing by syzCrit = F5 Criterion
+  // testing by rewCrit1 = Rewritten Criterion
+  // NOTE: Arri's Rewritten Criterion is tested below, we need Lp.p for it!
+  if  ( strat->syzCrit(pSigMult,pSigMultNegSev,strat) ||
+        strat->syzCrit(sSigMult,sSigMultNegSev,strat)
+        || strat->rewCrit1(sSigMult,sSigMultNegSev,Lp.lcm,strat,i+1)
+      )
+  {
+    pDelete(&pSigMult);
+    pDelete(&sSigMult);
+    if (rField_is_Ring(currRing))
+      pLmDelete(Lp.lcm);
+    else
+      pLmFree(Lp.lcm);
+    Lp.lcm=NULL;
+    pDelete (&m1);
+    pDelete (&m2);
+    return;
+  }
+  /*
+  *the pair (S[i],p) enters B if the spoly != 0
+  */
+  /*-  compute the short s-polynomial -*/
+  if (strat->fromT && !TEST_OPT_INTSTRATEGY)
+    pNorm(p);
+
+  if ((strat->S[i]==NULL) || (p==NULL))
+    return;
+
+  if ((strat->fromQ!=NULL) && (isFromQ!=0) && (strat->fromQ[i]!=0))
+    Lp.p=NULL;
+  else
+  {
+    #ifdef HAVE_PLURAL
+    if ( rIsPluralRing(currRing) )
+    {
+      if(pHasNotCF(p, strat->S[i]))
+      {
+        if(ncRingType(currRing) == nc_lie)
+        {
+          // generalized prod-crit for lie-type
+          strat->cp++;
+          Lp.p = nc_p_Bracket_qq(pCopy(p),strat->S[i], currRing);
+        }
+        else
+        if( ALLOW_PROD_CRIT(strat) )
+        {
+          // product criterion for homogeneous case in SCA
+          strat->cp++;
+          Lp.p = NULL;
+        }
+        else
+        {
+          Lp.p = // nc_CreateSpoly(strat->S[i],p,currRing);
+                nc_CreateShortSpoly(strat->S[i], p, currRing);
+
+          assume(pNext(Lp.p)==NULL); // TODO: this may be violated whenever ext.prod.crit. for Lie alg. is used
+          pNext(Lp.p) = strat->tail; // !!!
+        }
+      }
+      else
+      {
+        Lp.p = // nc_CreateSpoly(strat->S[i],p,currRing);
+              nc_CreateShortSpoly(strat->S[i], p, currRing);
+
+        assume(pNext(Lp.p)==NULL); // TODO: this may be violated whenever ext.prod.crit. for Lie alg. is used
+        pNext(Lp.p) = strat->tail; // !!!
+      }
+    }
+    else
+    #endif
+    {
+      assume(!rIsPluralRing(currRing));
+      Lp.p = ksCreateShortSpoly(strat->S[i], p, strat->tailRing);
+    }
+  }
+  // store from which element this pair comes from for further tests
+  //Lp.from = strat->sl+1;
+  if(sigCmp==currRing->OrdSgn)
+  {
+    // pSig > sSig
+    pDelete (&sSigMult);
+    Lp.sig    = pSigMult;
+    Lp.sevSig = ~pSigMultNegSev;
+  }
+  else
+  {
+    // pSig < sSig
+    pDelete (&pSigMult);
+    Lp.sig    = sSigMult;
+    Lp.sevSig = ~sSigMultNegSev;
+  }
+  if (Lp.p == NULL)
+  {
+    if (Lp.lcm!=NULL) pLmFree(Lp.lcm);
+    int pos = posInSyz(strat, Lp.sig);
+    enterSyz(Lp, strat, pos);
+  }
+  else
+  {
+    // testing by rewCrit3 = Arris Rewritten Criterion (for F5 nothing happens!)
+    if (strat->rewCrit3(Lp.sig,~Lp.sevSig,Lp.p,strat,strat->sl+1))
+    {
+      pLmFree(Lp.lcm);
+      pDelete(&Lp.sig);
+      Lp.lcm=NULL;
+      pDelete (&m1);
+      pDelete (&m2);
+      return;
+    }
+    // in any case Lp is checked up to the next strat->P which is added
+    // to S right after this critical pair creation.
+    // NOTE: this even holds if the 2nd generator gives the bigger signature
+    //       moreover, this improves rewCriterion,
+    //       i.e. strat->checked > strat->from if and only if the 2nd generator
+    //       gives the bigger signature.
+    Lp.checked = strat->sl+1;
+    // at this point it is clear that the pair will be added to L, since it has
+    // passed all tests up to now
+
+  // adds buchberger's first criterion
+    if (pLmCmp(m2,pHead(p)) == 0)
+    {
+      Lp.prod_crit = TRUE; // Product Criterion
+#if 0
+      int pos = posInSyz(strat, Lp.sig);
+      enterSyz(Lp, strat, pos);
+      Lp.lcm=NULL;
+      pDelete (&m1);
+      pDelete (&m2);
+      return;
+#endif
+    }
+    pDelete (&m1);
+    pDelete (&m2);
+#if DEBUGF5
+    PrintS("SIGNATURE OF PAIR:  ");
+    pWrite(Lp.sig);
+#endif
+    /*- the pair (S[i],p) enters B -*/
+    Lp.p1 = strat->S[i];
+    Lp.p2 = p;
+
+    if (
+        (!rIsPluralRing(currRing))
+//      ||  (rIsPluralRing(currRing) && (ncRingType(currRing) != nc_lie))
+       )
+    {
+      assume(pNext(Lp.p)==NULL); // TODO: this may be violated whenever ext.prod.crit. for Lie alg. is used
+      pNext(Lp.p) = strat->tail; // !!!
+    }
+
+    if (atR >= 0)
+    {
+      Lp.i_r1 = strat->S_2_R[i];
+      Lp.i_r2 = atR;
+    }
+    else
+    {
+      Lp.i_r1 = -1;
+      Lp.i_r2 = -1;
+    }
+    strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
+
+    if (TEST_OPT_INTSTRATEGY)
+    {
+      if (!rIsPluralRing(currRing))
+        nDelete(&(Lp.p->coef));
+    }
+
+    l = strat->posInLSba(strat->B,strat->Bl,&Lp,strat);
+    enterL(&strat->B,&strat->Bl,&strat->Bmax,Lp,l);
+  }
+}
+
+
+#ifdef DEBUGF5
+void enterOnePairSigRing (int i, poly p, poly pSig, int from, int ecart, int isFromQ, kStrategy strat, int atR = -1)
+#else
+void enterOnePairSigRing (int i, poly p, poly pSig, int, int ecart, int isFromQ, kStrategy strat, int atR = -1)
+#endif
+{
   #ifdef ADIDEBUG
   printf("\nTrying to add p and S[%i]\n",i);
   pWrite(p);pWrite(pSig);
@@ -3585,7 +3842,68 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
 *(s[0],h),...,(s[k],h) will be put to the pairset L
 *using signatures <= only for signature-based standard basis algorithms
 */
+
 void initenterpairsSig (poly h,poly hSig,int hFrom,int k,int ecart,int isFromQ,kStrategy strat, int atR = -1)
+{
+
+  if ((strat->syzComp==0)
+  || (pGetComp(h)<=strat->syzComp))
+  {
+    int j;
+    BOOLEAN new_pair=FALSE;
+
+    if (pGetComp(h)==0)
+    {
+      /* for Q!=NULL: build pairs (f,q),(f1,f2), but not (q1,q2)*/
+      if ((isFromQ)&&(strat->fromQ!=NULL))
+      {
+        for (j=0; j<=k; j++)
+        {
+          if (!strat->fromQ[j])
+          {
+            new_pair=TRUE;
+            enterOnePairSig(j,h,hSig,hFrom,ecart,isFromQ,strat, atR);
+          //Print("j:%d, Ll:%d\n",j,strat->Ll);
+          }
+        }
+      }
+      else
+      {
+        new_pair=TRUE;
+        for (j=0; j<=k; j++)
+        {
+          enterOnePairSig(j,h,hSig,hFrom,ecart,isFromQ,strat, atR);
+          //Print("j:%d, Ll:%d\n",j,strat->Ll);
+        }
+      }
+    }
+    else
+    {
+      for (j=0; j<=k; j++)
+      {
+        if ((pGetComp(h)==pGetComp(strat->S[j]))
+        || (pGetComp(strat->S[j])==0))
+        {
+          new_pair=TRUE;
+          enterOnePairSig(j,h,hSig,hFrom,ecart,isFromQ,strat, atR);
+        //Print("j:%d, Ll:%d\n",j,strat->Ll);
+        }
+      }
+    }
+
+    if (new_pair)
+    {
+#ifdef HAVE_RATGRING
+      if (currRing->real_var_start>0)
+        chainCritPart(h,ecart,strat);
+      else
+#endif
+      strat->chainCrit(h,ecart,strat);
+    }
+  }
+}
+
+void initenterpairsSigRing (poly h,poly hSig,int hFrom,int k,int ecart,int isFromQ,kStrategy strat, int atR = -1)
 {
 
   if ((strat->syzComp==0)
@@ -3604,7 +3922,7 @@ void initenterpairsSig (poly h,poly hSig,int hFrom,int k,int ecart,int isFromQ,k
           if (!strat->fromQ[j])
           {
             new_pair=TRUE;
-            enterOnePairSig(j,h,hSig,hFrom,ecart,isFromQ,strat, atR);
+            enterOnePairSigRing(j,h,hSig,hFrom,ecart,isFromQ,strat, atR);
           //Print("j:%d, Ll:%d\n",j,strat->Ll);
           }
         }
@@ -3614,7 +3932,7 @@ void initenterpairsSig (poly h,poly hSig,int hFrom,int k,int ecart,int isFromQ,k
         new_pair=TRUE;
         for (j=0; j<=k && !strat->sigdrop; j++)
         {
-          enterOnePairSig(j,h,hSig,hFrom,ecart,isFromQ,strat, atR);
+          enterOnePairSigRing(j,h,hSig,hFrom,ecart,isFromQ,strat, atR);
           //Print("j:%d, Ll:%d\n",j,strat->Ll);
         }
       }
@@ -3627,7 +3945,7 @@ void initenterpairsSig (poly h,poly hSig,int hFrom,int k,int ecart,int isFromQ,k
         || (pGetComp(strat->S[j])==0))
         {
           new_pair=TRUE;
-          enterOnePairSig(j,h,hSig,hFrom,ecart,isFromQ,strat, atR);
+          enterOnePairSigRing(j,h,hSig,hFrom,ecart,isFromQ,strat, atR);
         //Print("j:%d, Ll:%d\n",j,strat->Ll);
         }
       }
@@ -4549,7 +4867,7 @@ void superenterpairsSig (poly h,poly hSig,int hFrom,int k,int ecart,int pos,kStr
   #ifdef ADIDEBUG
   printf("\n      Trying to add spolys\n");
   #endif
-  initenterpairsSig(h, hSig, hFrom, k, ecart, 0, strat, atR);
+  initenterpairsSigRing(h, hSig, hFrom, k, ecart, 0, strat, atR);
   if(strat->sigdrop) return;
   #ifdef ADIDEBUG
   printf("\n      Trying to add gcd-polys\n");
@@ -6859,8 +7177,7 @@ BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly /*lm*/, kSt
     pWrite(strat->sig[k]);
     pWrite(pHead(strat->S[k]));
 #endif
-    if (p_LmShortDivisibleBy(strat->sig[k], strat->sevSig[k], sig, not_sevSig, currRing)
-    && (!rField_is_Ring(currRing) || (n_DivBy(pGetCoeff(sig),pGetCoeff(strat->sig[k]),currRing)  && pLmCmp(sig,strat->sig[k]) == 1 )))
+    if (p_LmShortDivisibleBy(strat->sig[k], strat->sevSig[k], sig, not_sevSig, currRing))
     {
 //#if 1
 #ifdef DEBUGF5
@@ -9050,7 +9367,7 @@ void enterT(LObject &p, kStrategy strat, int atT)
   strat->T[atT] = (TObject) p;
   #ifdef ADIDEBUG
   printf("\nenterT: add in position %i\n",atT);
-  pWrite(p.p);pWrite(p.sig);
+  p_Write(p.p,strat->tailRing);p_Write(p.sig,currRing);
   #endif
   //printf("\nenterT: neue hingefügt: länge = %i, ecart = %i\n",p.length,p.ecart);
 
