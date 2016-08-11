@@ -11,7 +11,7 @@
 
 #define MYTEST 0
 
-#define ADIDEBUG 1
+//#define ADIDEBUG 1
 //All vs Just strategy over rings: 
 // 1 - Just 
 // 0 - All
@@ -7223,7 +7223,9 @@ BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly /*lm*/, kSt
 //        completely.
 BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, poly /*lm*/, kStrategy strat, int start=0)
 {
+  #ifdef ADIDEBUG
   printf("\narriRewCrit\n");
+  #endif
   if(rField_is_Ring(currRing))
     return FALSE;
   poly p1 = pOne();
@@ -7239,7 +7241,6 @@ BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, poly /*lm*/
         #ifdef ADIDEBUG
         printf("\narriRewCrit deleted: sig, P.sig\n");
         #endif
-        printf("\nDelete!\n");
         pDelete(&p1);
         pDelete(&p2);
         return TRUE;
@@ -7253,7 +7254,9 @@ BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, poly /*lm*/
 
 BOOLEAN arriRewCriterionPre(poly sig, unsigned long not_sevSig, poly lm, kStrategy strat, int /*start=0*/)
 {
+  #ifdef ADIDEBUG
   printf("\narriRewCritPre\n");
+  #endif
   //Over Rings, there are still some changes to do: considering coeffs
   if(rField_is_Ring(currRing))
     return FALSE;
@@ -7270,11 +7273,15 @@ BOOLEAN arriRewCriterionPre(poly sig, unsigned long not_sevSig, poly lm, kStrate
     if (pLmCmp(lm,strat->B[found].GetLmCurrRing()) == -1)
     {
       deleteInL(strat->B,&strat->Bl,found,strat);
+      #ifdef ADIDEBUG
       printf("\nDelete!\n");
+      #endif
     }
     else
     {
+      #ifdef ADIDEBUG
       printf("\nDelete this one!\n");
+      #endif
       return TRUE;
     }
   }
@@ -7290,7 +7297,9 @@ BOOLEAN arriRewCriterionPre(poly sig, unsigned long not_sevSig, poly lm, kStrate
       {
         pDelete(&p1);
         pDelete(&p2);
+        #ifdef ADIDEBUG
         printf("\nDelete this one!\n");
+        #endif
         return TRUE;
       }
     }
