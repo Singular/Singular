@@ -9,7 +9,7 @@
 
 #include <kernel/mod2.h>
 
-//#define ADIDEBUG 0
+#define ADIDEBUG 1
 #define GCD_SBA 1
 
 // define if no buckets should be used
@@ -2286,6 +2286,54 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)
   {
+  #ifdef ADIDEBUG
+    printf("\n      ------------------------NEW LOOP\n");
+    printf("\nShdl = \n");
+    #if 0
+    idPrint(strat->Shdl);
+    #else
+    for(int ii = 0; ii<=strat->sl;ii++)
+    {
+      printf("\nS[%i]:  ",ii);p_Write(strat->S[ii],strat->tailRing);
+      printf("sig:   ");pWrite(strat->sig[ii]);
+    }
+    #endif
+    #if 0
+    for(int iii = 0; iii< strat->syzl; iii++)
+    {
+        printf("\nsyz[%i]:\n",iii);
+        p_Write(strat->syz[iii], currRing);
+    }
+    #endif
+    #if 0
+    for(int iii = 0; iii<= strat->tl; iii++)
+    {
+        printf("\nT[%i]:\n",iii);
+        p_Write(strat->T[iii].p, currRing);
+    }
+    #endif
+    printf("\n   list   L\n");
+    int iii;
+    #if 1
+    for(iii = 0; iii<= strat->Ll; iii++)
+    {
+        printf("\nL[%i]:\n",iii);
+        p_Write(strat->L[iii].p, strat->tailRing);
+        p_Write(strat->L[iii].p1, strat->tailRing);
+        p_Write(strat->L[iii].p2, strat->tailRing);
+        p_Write(strat->L[iii].sig, currRing);
+    }
+    #else
+    {
+        printf("L[%i]:",strat->Ll);
+        p_Write(strat->L[strat->Ll].p, strat->tailRing);
+        p_Write(strat->L[strat->Ll].p1, strat->tailRing);
+        p_Write(strat->L[strat->Ll].p2, strat->tailRing);
+        p_Write(strat->L[strat->Ll].sig, currRing);
+    }
+    #endif
+    getchar();
+    #endif
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
     #ifdef KDEBUG
       loop_count++;
