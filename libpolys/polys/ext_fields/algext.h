@@ -44,6 +44,7 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst);
 
 /// Initialize the coeffs object
 BOOLEAN  naInitChar(coeffs cf, void* infoStruct);
+BOOLEAN n2pInitChar(coeffs cf, void * infoStruct);
 
 /// if m == var(i)/1 => return i,
 int naIsParam(number, const coeffs);

@@ -32,6 +32,7 @@ enum n_coeffType
   n_R,  /**< single prescision (6,6) real numbers */
   n_GF, /**< \GF{p^n < 2^16} */
   n_long_R, /**< real floating point (GMP) numbers */
+  n_polyExt, /**< used to represent polys as coeffcients */
   n_algExt,  /**< used for all algebraic extensions, i.e.,
                 the top-most extension in an extension tower
                 is algebraic */

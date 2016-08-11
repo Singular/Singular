@@ -5645,7 +5645,7 @@ int n_IsParam(const number m, const ring r)
 
   const n_coeffType _filed_type = getCoeffType(C);
 
-  if( _filed_type == n_algExt )
+  if(( _filed_type == n_algExt )||( _filed_type == n_polyExt ))
     return naIsParam(m, C);
 
   if( _filed_type == n_transExt )

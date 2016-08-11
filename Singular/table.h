@@ -917,8 +917,8 @@ cmdnames cmds[] =
   { "cleardenom",  0, CONTENT_CMD ,       CMD_1},
   { "close",       0, CLOSE_CMD ,         CMD_1},
 #ifdef SINGULAR_4_1
-  { "cmatrix",     0, CMATRIX_CMD ,       ROOT_DECL_LIST},
-  { "cnumber",     0, CNUMBER_CMD ,       ROOT_DECL_LIST},
+  { "Matrix",     0, CMATRIX_CMD ,       ROOT_DECL_LIST},
+  { "Number",     0, CNUMBER_CMD ,       ROOT_DECL_LIST},
 #endif
   { "coef",        0, COEF_CMD ,          CMD_M},
   { "coeffs",      0, COEFFS_CMD ,        CMD_23},
