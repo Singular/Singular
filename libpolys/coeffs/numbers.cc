@@ -304,6 +304,7 @@ cfInitCharProc nInitCharTableDefault[]=
  naInitChar,  /* n_algExt */
  ntInitChar,  /* n_transExt */
  #else
+ NULL,        /* n_polyExt */
  NULL,        /* n_algExt */
  NULL,        /* n_transExt */
  #endif
