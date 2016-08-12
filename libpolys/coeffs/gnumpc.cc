@@ -67,15 +67,11 @@ BOOLEAN  ngcDBTest(number a, const char *f, const int l, const coeffs r);
 // Why is this here? who needs it?
 // number ngcMapQ(number from, const coeffs r, const coeffs aRing);
 
-/// Our Type!
-static const n_coeffType ID = n_long_C;
-
-
 #ifdef LDEBUG
 // not yet implemented
 BOOLEAN ngcDBTest(number, const char *, const int, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
 
   return TRUE;
 }
@@ -83,7 +79,7 @@ BOOLEAN ngcDBTest(number, const char *, const int, const coeffs r)
 
 number   ngcParameter(int i, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
   assume(i==1);
 
   if( i == 1 )
@@ -97,7 +93,7 @@ number   ngcParameter(int i, const coeffs r)
 */
 number ngcInit (long i, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
 
   gmp_complex* n= new gmp_complex( (long)i, 0L );
 
@@ -109,7 +105,7 @@ number ngcInit (long i, const coeffs r)
 */
 long ngcInt(number &i, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
 
   return ((gmp_complex*)i)->real();
 }
@@ -134,7 +130,7 @@ int ngcSize(number n, const coeffs R)
 */
 void ngcDelete (number * a, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
 
   if ( *a != NULL )
   {
@@ -148,7 +144,7 @@ void ngcDelete (number * a, const coeffs r)
 */
 number ngcCopy(number a, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
 
   gmp_complex* b= new gmp_complex( *(gmp_complex*)a );
   return (number)b;
@@ -160,7 +156,7 @@ number ngcCopy(number a, const coeffs r)
 */
 number ngcNeg (number a, const coeffs R)
 {
-  assume( getCoeffType(R) == ID );
+  assume( getCoeffType(R) == n_long_C );
 
   gmp_complex* r=(gmp_complex*)a;
   (*r).neg();
@@ -172,7 +168,7 @@ number ngcNeg (number a, const coeffs R)
 */
 number ngcInvers(number a, const coeffs R)
 {
-  assume( getCoeffType(R) == ID );
+  assume( getCoeffType(R) == n_long_C );
 
   gmp_complex* r = NULL;
   if (((gmp_complex*)a)->isZero())
@@ -191,7 +187,7 @@ number ngcInvers(number a, const coeffs R)
 */
 number ngcAdd (number a, number b, const coeffs R)
 {
-  assume( getCoeffType(R) == ID );
+  assume( getCoeffType(R) == n_long_C );
 
   gmp_complex* r= new gmp_complex( (*(gmp_complex*)a) + (*(gmp_complex*)b) );
   return (number)r;
@@ -202,7 +198,7 @@ number ngcAdd (number a, number b, const coeffs R)
 */
 number ngcSub (number a, number b, const coeffs R)
 {
-  assume( getCoeffType(R) == ID );
+  assume( getCoeffType(R) == n_long_C );
 
   gmp_complex* r= new gmp_complex( (*(gmp_complex*)a) - (*(gmp_complex*)b) );
   return (number)r;
@@ -213,7 +209,7 @@ number ngcSub (number a, number b, const coeffs R)
 */
 number ngcMult (number a, number b, const coeffs R)
 {
-  assume( getCoeffType(R) == ID );
+  assume( getCoeffType(R) == n_long_C );
 
   gmp_complex* r= new gmp_complex( (*(gmp_complex*)a) * (*(gmp_complex*)b) );
   return (number)r;
@@ -224,7 +220,7 @@ number ngcMult (number a, number b, const coeffs R)
 */
 number ngcDiv (number a, number b, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
 
   if (((gmp_complex*)b)->isZero())
   {
@@ -241,7 +237,7 @@ number ngcDiv (number a, number b, const coeffs r)
 */
 void ngcPower ( number x, int exp, number * u, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
 
   if ( exp == 0 )
   {
@@ -286,14 +282,14 @@ void ngcPower ( number x, int exp, number * u, const coeffs r)
 
 BOOLEAN ngcIsZero (number a, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
 
   return ( ((gmp_complex*)a)->real().isZero() && ((gmp_complex*)a)->imag().isZero());
 }
 
 number ngcRePart(number a, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
 
   gmp_complex* n = new gmp_complex(((gmp_complex*)a)->real());
   return (number)n;
@@ -301,7 +297,7 @@ number ngcRePart(number a, const coeffs r)
 
 number ngcImPart(number a, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
 
   gmp_complex* n = new gmp_complex(((gmp_complex*)a)->imag());
   return (number)n;
@@ -312,7 +308,7 @@ number ngcImPart(number a, const coeffs r)
 */
 BOOLEAN ngcGreaterZero (number a, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
 
   if ( ! ((gmp_complex*)a)->imag().isZero() )
     return ( abs( *(gmp_complex*)a).sign() >= 0 );
@@ -325,7 +321,7 @@ BOOLEAN ngcGreaterZero (number a, const coeffs r)
 */
 BOOLEAN ngcGreater (number a, number b, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
 
   gmp_complex *aa=(gmp_complex*)a;
   gmp_complex *bb=(gmp_complex*)b;
@@ -337,7 +333,7 @@ BOOLEAN ngcGreater (number a, number b, const coeffs r)
 */
 BOOLEAN ngcEqual (number a, number b, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
 
   gmp_complex *aa=(gmp_complex*)a;
   gmp_complex *bb=(gmp_complex*)b;
@@ -349,7 +345,7 @@ BOOLEAN ngcEqual (number a, number b, const coeffs r)
 */
 BOOLEAN ngcIsOne (number a, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
 
   return (((gmp_complex*)a)->real().isOne() && ((gmp_complex*)a)->imag().isZero());
   //return (((gmp_complex*)a)->real().isOne());
@@ -360,7 +356,7 @@ BOOLEAN ngcIsOne (number a, const coeffs r)
 */
 BOOLEAN ngcIsMOne (number a, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
 
   return (((gmp_complex*)a)->real().isMOne() && ((gmp_complex*)a)->imag().isZero());
   //return (((gmp_complex*)a)->real().isMOne());
@@ -371,7 +367,7 @@ BOOLEAN ngcIsMOne (number a, const coeffs r)
 */
 const char * ngcRead (const char * s, number * a, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
   const char * const complex_parameter = n_ParameterNames(r)[0];
   assume( complex_parameter != NULL );
   const int N = strlen(complex_parameter);
@@ -404,7 +400,7 @@ const char * ngcRead (const char * s, number * a, const coeffs r)
 */
 void ngcWrite (number a, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
 
   if (a==NULL)
     StringAppendS("0");
@@ -420,7 +416,7 @@ void ngcWrite (number a, const coeffs r)
 
 BOOLEAN ngcCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
 {
-  if (n==ID)
+  if (n==n_long_C)
   {
     LongComplexInfo* p = (LongComplexInfo *)(parameter);
 
@@ -463,7 +459,7 @@ static char* ngcCoeffString(const coeffs r)
 
 BOOLEAN ngcInitChar(coeffs n, void* parameter)
 {
-  assume( getCoeffType(n) == ID );
+  assume( getCoeffType(n) == n_long_C );
   n->is_field=TRUE;
   n->is_domain=TRUE;
   n->rep=n_rep_gmp_complex;
@@ -612,7 +608,7 @@ void ngcSetChar(const coeffs r)
 
 number ngcMapQ(number from, const coeffs aRing, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
   assume( aRing->rep == n_rep_gap_rat);
 
   if ( from != NULL )
@@ -626,7 +622,7 @@ number ngcMapQ(number from, const coeffs aRing, const coeffs r)
 
 number ngcMapZ(number from, const coeffs aRing, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
   assume( aRing->rep == n_rep_gap_gmp);
 
   if ( from != NULL )
@@ -647,7 +643,7 @@ number ngcMapZ(number from, const coeffs aRing, const coeffs r)
 
 static number ngcMapLongR(number from, const coeffs aRing, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
   assume( getCoeffType(aRing) == n_long_R );
 
   if ( from != NULL )
@@ -661,7 +657,7 @@ static number ngcMapLongR(number from, const coeffs aRing, const coeffs r)
 
 static number ngcMapR(number from, const coeffs aRing, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
   assume( getCoeffType(aRing) == n_R );
 
   if ( from != NULL )
@@ -675,7 +671,7 @@ static number ngcMapR(number from, const coeffs aRing, const coeffs r)
 
 static number ngcMapP(number from, const coeffs aRing, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_long_C );
   assume( getCoeffType(aRing) ==  n_Zp );
 
   if ( from != NULL )
@@ -686,8 +682,8 @@ static number ngcMapP(number from, const coeffs aRing, const coeffs r)
 
 static number ngcCopyMap(number from, const coeffs aRing, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
-  assume( getCoeffType(aRing) ==  ID );
+  assume( getCoeffType(r) == n_long_C );
+  assume( getCoeffType(aRing) ==  n_long_C );
 
   gmp_complex* b = NULL;
 
@@ -700,7 +696,7 @@ static number ngcCopyMap(number from, const coeffs aRing, const coeffs r)
 
 nMapFunc ngcSetMap(const coeffs src, const coeffs dst)
 {
-  assume( getCoeffType(dst) == ID );
+  assume( getCoeffType(dst) == n_long_C );
 
   if (src->rep==n_rep_gap_rat) /* Q, Z*/
   {

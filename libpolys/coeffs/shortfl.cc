@@ -23,9 +23,6 @@
 #include <string.h>
 #include <math.h>
 
-/// Our Type!
-static const n_coeffType ID = n_R;
-
 // Private interface should be hidden!!!
 
 BOOLEAN nrGreaterZero (number k, const coeffs r);
@@ -83,21 +80,21 @@ float nrFloat(number n)
 
 void    nrCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
   PrintS("//   characteristic : 0 (real)\n");  /* R */
 }
 
 
 BOOLEAN nrGreaterZero (number k, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
 
   return nf(k).F() >= 0.0;
 }
 
 number nrMult (number a,number b, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
 
   return nf(nf(a).F() * nf(b).F()).N();
 }
@@ -107,7 +104,7 @@ number nrMult (number a,number b, const coeffs r)
 */
 number nrInit (long i, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
 
   float f = (float)i;
   return nf(nf(f).F()).N();
@@ -118,7 +115,7 @@ number nrInit (long i, const coeffs r)
 */
 long nrInt(number &n, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
 
   long i;
   float f = nf(n).F();
@@ -143,7 +140,7 @@ int nrSize(number n, const coeffs)
 
 number nrAdd (number a, number b, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
 
   float x = nf(a).F();
   float y = nf(b).F();
@@ -175,7 +172,7 @@ number nrAdd (number a, number b, const coeffs r)
 
 number nrSub (number a, number b, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
 
   float x = nf(a).F();
   float y = nf(b).F();
@@ -207,14 +204,14 @@ number nrSub (number a, number b, const coeffs r)
 
 BOOLEAN nrIsZero (number  a, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
 
   return (0.0 == nf(a).F());
 }
 
 BOOLEAN nrIsOne (number a, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
 
   float aa=nf(a).F()-1.0;
   if (aa<0.0) aa=-aa;
@@ -223,7 +220,7 @@ BOOLEAN nrIsOne (number a, const coeffs r)
 
 BOOLEAN nrIsMOne (number a, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
 
   float aa=nf(a).F()+1.0;
   if (aa<0.0) aa=-aa;
@@ -232,7 +229,7 @@ BOOLEAN nrIsMOne (number a, const coeffs r)
 
 number nrDiv (number a,number b, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
 
   float n = nf(b).F();
   if (n == 0.0)
@@ -246,7 +243,7 @@ number nrDiv (number a,number b, const coeffs r)
 
 number  nrInvers (number c, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
 
   float n = nf(c).F();
   if (n == 0.0)
@@ -259,21 +256,21 @@ number  nrInvers (number c, const coeffs r)
 
 number nrNeg (number c, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
 
   return nf(-nf(c).F()).N();
 }
 
 BOOLEAN nrGreater (number a,number b, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
 
   return nf(a).F() > nf(b).F();
 }
 
 BOOLEAN nrEqual (number a,number b, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
 
   number x = nrSub(a,b,r);
   return nf(x).F() == nf((float)0.0).F();
@@ -281,7 +278,7 @@ BOOLEAN nrEqual (number a,number b, const coeffs r)
 
 void nrWrite (number a, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
 
   char ch[11];
   int n = sprintf(ch,"%9.3e", nf(a).F());
@@ -303,7 +300,7 @@ void nrWrite (number a, const coeffs r)
 #if 0
 void nrPower (number a, int i, number * result, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
 
   if (i==0)
   {
@@ -344,7 +341,7 @@ namespace {
 const char * nrRead (const char *s, number *a, const coeffs r)
 {
 
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
 
   static const char *nIllegalChar="illegal character in number";
 
@@ -414,7 +411,7 @@ const char * nrRead (const char *s, number *a, const coeffs r)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 BOOLEAN  nrDBTest(number a, const char *f, const int l, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
 
   return TRUE;
 }
@@ -422,7 +419,7 @@ BOOLEAN  nrDBTest(number a, const char *f, const int l, const coeffs r)
 
 static number nrMapP(number from, const coeffs aRing, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
   assume( getCoeffType(aRing) ==  n_Zp );
 
   int i = (int)((long)from);
@@ -432,7 +429,7 @@ static number nrMapP(number from, const coeffs aRing, const coeffs r)
 
 static number nrMapLongR(number from, const coeffs aRing, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
   assume( getCoeffType(aRing) == n_long_R );
 
   float t =(float)mpf_get_d((mpf_srcptr)from);
@@ -441,7 +438,7 @@ static number nrMapLongR(number from, const coeffs aRing, const coeffs r)
 
 static number nrMapC(number from, const coeffs aRing, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
   assume( getCoeffType(aRing) == n_long_C );
 
   gmp_float h = ((gmp_complex*)from)->real();
@@ -462,7 +459,7 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
 #define GET_NOM(A) ((A)->z)
 #define GET_DENOM(A) ((A)->n)
 
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
   assume( aRing->rep == n_rep_gap_rat );
 
   mpz_ptr z;
@@ -537,7 +534,7 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
 
 number nrMapZ(number from, const coeffs aRing, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_R );
   assume( aRing->rep == n_rep_gap_gmp );
 
   mpz_ptr z;
@@ -598,7 +595,7 @@ number nrMapZ(number from, const coeffs aRing, const coeffs r)
 // #define MPZ_INIT mpz_init
 // #define MPZ_CLEAR mpz_clear
 
-//   assume( getCoeffType(r) == ID );
+//   assume( getCoeffType(r) == n_R );
 //   assume( getCoeffType(aRing) == n_Q );
 
 //   mpz_t h;
@@ -696,7 +693,7 @@ number nrMapZ(number from, const coeffs aRing, const coeffs r)
 
 nMapFunc nrSetMap(const coeffs src, const coeffs dst)
 {
-  assume( getCoeffType(dst) == ID );
+  assume( getCoeffType(dst) == n_R );
 
   if (src->rep==n_rep_gap_rat) /*Q, Z */
   {
@@ -732,7 +729,7 @@ static char* nrCoeffString(const coeffs r)
 
 BOOLEAN nrInitChar(coeffs n, void* p)
 {
-  assume( getCoeffType(n) == ID );
+  assume( getCoeffType(n) == n_R );
 
   assume( p == NULL );
 

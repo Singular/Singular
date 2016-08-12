@@ -24,9 +24,6 @@
 
 #include <string.h>
 
-/// Our Type!
-static const n_coeffType ID = n_Zp;
-
 BOOLEAN npGreaterZero (number k, const coeffs r);
 number  npMult        (number a, number b, const coeffs r);
 number  npInit        (long i, const coeffs r);
@@ -75,7 +72,7 @@ extern unsigned short *npLogTable;
 #pragma GCC diagnostic ignored "-Wlong-long"
 static inline number nvMultM(number a, number b, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_Zp );
 
 #if SIZEOF_LONG == 4
 #define ULONG64 (unsigned long long)(unsigned long)
@@ -497,7 +494,7 @@ static number npRandom(siRandProc p, number, number, const coeffs cf)
 
 BOOLEAN npInitChar(coeffs r, void* p)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_Zp );
   const int c = (int) (long) p;
 
   assume( c > 0 );

@@ -24,9 +24,6 @@
 
 #ifdef HAVE_RINGS
 
-/// Our Type!
-static const n_coeffType ID = n_Z2m;
-
 number  nr2mCopy        (number a, const coeffs r);
 BOOLEAN nr2mGreaterZero (number k, const coeffs r);
 number  nr2mMult        (number a, number b, const coeffs r);
@@ -159,7 +156,7 @@ static number nr2mAnn(number b, const coeffs r);
 /* for initializing function pointers */
 BOOLEAN nr2mInitChar (coeffs r, void* p)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == n_Z2m );
   nr2mInitExp((int)(long)(p), r);
 
   r->is_field=FALSE;

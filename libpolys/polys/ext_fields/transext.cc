@@ -76,9 +76,6 @@ BOOLEAN  ntDBTest(number a, const char *f, const int l, const coeffs r);
 
 #define ntTest(a) n_Test(a, cf)
 
-/// Our own type!
-static const n_coeffType ID = n_transExt;
-
 /* polynomial ring in which the numerators and denominators of our
    numbers live */
 #define ntRing cf->extRing
@@ -174,7 +171,7 @@ void check_normalized(number t,const coeffs cf, const char *f, int l)
 #ifdef LDEBUG
 BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
 {
-  assume(getCoeffType(cf) == ID);
+  assume(getCoeffType(cf) == n_transExt);
 
   if (IS0(a)) return TRUE;
 
@@ -1593,7 +1590,7 @@ void ntNormalize (number &a, const coeffs cf)
 /* expects *param to be castable to TransExtInfo */
 static BOOLEAN ntCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
 {
-  if (ID != n) return FALSE;
+  if (n_transExt != n) return FALSE;
   TransExtInfo *e = (TransExtInfo *)param;
   /* for rational function fields we expect the underlying
      polynomial rings to be IDENTICAL, i.e. the SAME OBJECT;
@@ -2106,7 +2103,7 @@ number ntMapUP(number a, const coeffs src, const coeffs dst)
 nMapFunc ntSetMap(const coeffs src, const coeffs dst)
 {
   /* dst is expected to be a rational function field */
-  assume(getCoeffType(dst) == ID);
+  assume(getCoeffType(dst) == n_transExt);
 
   if( src == dst ) return ndCopyMap;
 
@@ -2217,7 +2214,7 @@ static int ntParDeg(number a, const coeffs cf)
 /// return the specified parameter as a number in the given trans.ext.
 static number ntParameter(const int iParameter, const coeffs cf)
 {
-  assume(getCoeffType(cf) == ID);
+  assume(getCoeffType(cf) == n_transExt);
 
   const ring R = cf->extRing;
   assume( R != NULL );
@@ -2240,7 +2237,7 @@ static number ntParameter(const int iParameter, const coeffs cf)
 int ntIsParam(number m, const coeffs cf)
 {
   ntTest(m);
-  assume(getCoeffType(cf) == ID);
+  assume(getCoeffType(cf) == n_transExt);
 
   const ring R = cf->extRing;
   assume( R != NULL );
@@ -2266,7 +2263,7 @@ struct NTNumConverter
 static void ntClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
 {
   assume(cf != NULL);
-  assume(getCoeffType(cf) == ID);
+  assume(getCoeffType(cf) == n_transExt);
   // all coeffs are given by fractions of polynomails over integers!!!
   // without denominators!!!
 
@@ -2355,7 +2352,7 @@ static void ntClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
 static void ntClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
 {
   assume(cf != NULL);
-  assume(getCoeffType(cf) == ID); // both over Q(a) and Zp(a)!
+  assume(getCoeffType(cf) == n_transExt); // both over Q(a) and Zp(a)!
   // all coeffs are given by fractions of polynomails over integers!!!
 
   numberCollectionEnumerator.Reset();
@@ -2548,7 +2545,7 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   assume( e->r->qideal == NULL );
 
   assume( cf != NULL );
-  assume(getCoeffType(cf) == ID);                // coeff type;
+  assume(getCoeffType(cf) == n_transExt);                // coeff type;
 
   ring R = e->r;
   assume(R != NULL);

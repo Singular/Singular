@@ -23,10 +23,6 @@
 
 #ifdef HAVE_RINGS
 
-/// Our Type!
-static const n_coeffType ID = n_Zn;
-static const n_coeffType ID2 = n_Znm;
-
 number  nrnCopy        (number a, const coeffs r);
 int     nrnSize        (number a, const coeffs r);
 void    nrnDelete      (number *a, const coeffs r);
@@ -162,7 +158,7 @@ coeffs nrnQuot1(number c, const coeffs r)
 /* for initializing function pointers */
 BOOLEAN nrnInitChar (coeffs r, void* p)
 {
-  assume( (getCoeffType(r) == ID) || (getCoeffType (r) == ID2) );
+  assume( (getCoeffType(r) == n_Zn) || (getCoeffType (r) == n_Znm) );
   ZnmInfo * info= (ZnmInfo *) p;
   r->modBase= (mpz_ptr)nrnCopy((number)info->base, r); //this circumvents the problem
   //in bigintmat.cc where we cannot create a "legal" nrn that can be freed.
