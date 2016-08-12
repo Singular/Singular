@@ -300,6 +300,7 @@ cfInitCharProc nInitCharTableDefault[]=
  nfInitChar,   /* n_GF */
  ngfInitChar,  /* n_long_R */
  #ifdef HAVE_POLYEXTENSIONS
+ n2pInitChar, /* n_polyExt */
  naInitChar,  /* n_algExt */
  ntInitChar,  /* n_transExt */
  #else
