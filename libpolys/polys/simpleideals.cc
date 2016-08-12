@@ -468,12 +468,15 @@ static int p_Comp_RevLex(poly a, poly b,BOOLEAN nolex, const ring R)
 
   if (nolex)
   {
-    int r=p_LmCmp(a,b,R);
+    int r=p_LtCmp(a,b,R);
+    return r;
+    #if 0
     if (r!=0) return r;
     number h=n_Sub(pGetCoeff(a),pGetCoeff(b),R->cf);
     r = -1+n_IsZero(h,R->cf)+2*n_GreaterZero(h,R->cf); /* -1: <, 0:==, 1: > */
     n_Delete(&h, R->cf);
     return r;
+    #endif
   }
   int l=rVar(R);
   while ((l>0) && (p_GetExp(a,l,R)==p_GetExp(b,l,R))) l--;
@@ -647,6 +650,27 @@ BOOLEAN idInsertPoly (ideal h1, poly h2)
     IDELEMS(h1)+=16;
   }
   h1->m[j]=h2;
+  return TRUE;
+}
+
+/// insert p into I on position pos
+BOOLEAN idInsertPolyOnPos (ideal I, poly p,int pos)
+{
+  if (p==NULL) return FALSE;
+  assume (I != NULL);
+
+  int j = IDELEMS(I) - 1;
+
+  while ((j >= 0) && (I->m[j] == NULL)) j--;
+  j++;
+  if (j==IDELEMS(I))
+  {
+    pEnlargeSet(&(I->m),IDELEMS(I),IDELEMS(I)+1);
+    IDELEMS(I)+=1;
+  }
+  for(j = IDELEMS(I)-1;j>pos;j--)
+    I->m[j] = I->m[j-1];
+  I->m[pos]=p;
   return TRUE;
 }
 

@@ -1476,17 +1476,33 @@ poly p_Div_nn(poly p, const number n, const ring r)
 {
   pAssume(!n_IsZero(n,r->cf));
   p_Test(p, r);
-
-  poly q = p;
-  while (p != NULL)
+  poly result = p;
+  poly prev = NULL;
+  while (p!=NULL)
   {
-    number nc = pGetCoeff(p);
-    pSetCoeff0(p, n_Div(nc, n, r->cf));
-    n_Delete(&nc, r->cf);
-    pIter(p);
+    number nc = n_Div(pGetCoeff(p),n,r->cf);
+    if (!n_IsZero(nc,r->cf))
+    {
+      p_SetCoeff(p,nc,r);
+      prev=p;
+      pIter(p);
+    }
+    else
+    {
+      if (prev==NULL)
+      {
+        p_LmDelete(&result,r);
+        p=result;
+      }
+      else
+      {
+        p_LmDelete(&pNext(prev),r);
+        p=pNext(prev);
+      }
+    }
   }
-  p_Test(q, r);
-  return q;
+  p_Test(result,r);
+  return(result);
 }
 
 /*2
@@ -1539,10 +1555,10 @@ poly p_DivideM(poly a, poly b, const ring r)
   }
   else
   {
-    p_Div_nn(result,inv,r);
+    result = p_Div_nn(result,inv,r);
   }
 #else
-  p_Mult_nn(result,inv,r);
+  result = p_Mult_nn(result,inv,r);
   n_Delete(&inv, r->cf);
 #endif
   p_Delete(&b, r);

@@ -22,6 +22,8 @@
 #include <kernel/polys.h>
 #endif
 
+//#define ADIDEBUG 0
+
 #ifdef KDEBUG
 int red_count = 0;
 int create_count = 0;
@@ -172,6 +174,7 @@ int ksReducePoly(LObject* PR,
  * Assumes PR != NULL, PW != NULL, Lm(PW) divides Lm(PR)
  *
  ***************************************************************/
+ 
 int ksReducePolySig(LObject* PR,
                  TObject* PW,
                  long /*idx*/,
@@ -361,6 +364,261 @@ int ksReducePolySig(LObject* PR,
   }
 #endif
 
+#if defined(KDEBUG) && defined(TEST_OPT_DEBUG_RED)
+  if (TEST_OPT_DEBUG)
+  {
+    Print(" to: "); PR->wrp(); Print("\n");
+  }
+#endif
+  return ret;
+}
+ 
+int ksReducePolySigRing(LObject* PR,
+                 TObject* PW,
+                 long /*idx*/,
+                 poly spNoether,
+                 number *coef,
+                 kStrategy strat)
+{
+#ifdef ADIDEBUG
+printf("\nksReducePolySig\n");
+pWrite(PR->p);pWrite(PR->sig);
+pWrite(PW->p);pWrite(PW->sig);
+#endif
+#ifdef KDEBUG
+  red_count++;
+#ifdef TEST_OPT_DEBUG_RED
+  if (TEST_OPT_DEBUG)
+  {
+    Print("Red %d:", red_count); PR->wrp(); Print(" with:");
+    PW->wrp();
+  }
+#endif
+#endif
+  int ret = 0;
+  ring tailRing = PR->tailRing;
+  kTest_L(PR);
+  kTest_T(PW);
+
+  // signature-based stuff:
+  // checking for sig-safeness first
+  // NOTE: This has to be done in the current ring
+  //
+  /**********************************************
+   *
+   * TODO:
+   * --------------------------------------------
+   * if strat->sbaOrder == 1
+   * Since we are subdividing lower index and
+   * current index reductions it is enough to
+   * look at the polynomial part of the signature
+   * for a check. This should speed-up checking
+   * a lot!
+   * if !strat->sbaOrder == 0
+   * We are not subdividing lower and current index
+   * due to the fact that we are using the induced
+   * Schreyer order
+   *
+   * nevertheless, this different behaviour is
+   * taken care of by is_sigsafe
+   * => one reduction procedure can be used for
+   * both, the incremental and the non-incremental
+   * attempt!
+   * --------------------------------------------
+   *
+   *********************************************/
+  //printf("COMPARE IDX: %ld -- %ld\n",idx,strat->currIdx);
+  if (!PW->is_sigsafe)
+  {
+    poly sigMult = pCopy(PW->sig);   // copy signature of reducer
+//#if 1
+#ifdef DEBUGF5
+    printf("IN KSREDUCEPOLYSIG: \n");
+    pWrite(pHead(f1));
+    pWrite(pHead(f2));
+    pWrite(sigMult);
+    printf("--------------\n");
+#endif
+    p_ExpVectorAddSub(sigMult,PR->GetLmCurrRing(),PW->GetLmCurrRing(),currRing);
+    //I have also to set the leading coeficient for sigMult (in the case of rings)
+    if(rField_is_Ring(currRing))
+    {
+      pSetCoeff(sigMult,nMult(nDiv(pGetCoeff(PR->p),pGetCoeff(PW->p)), pGetCoeff(sigMult)));
+      if(nIsZero(pGetCoeff(sigMult)))
+      {
+        sigMult = NULL;
+      }
+    }
+//#if 1
+#ifdef DEBUGF5
+    printf("------------------- IN KSREDUCEPOLYSIG: --------------------\n");
+    pWrite(pHead(f1));
+    pWrite(pHead(f2));
+    pWrite(sigMult);
+    pWrite(PR->sig);
+    printf("--------------\n");
+#endif
+    int sigSafe;
+    if(!rField_is_Ring(currRing))
+      sigSafe = p_LmCmp(PR->sig,sigMult,currRing);
+    // now we can delete the copied polynomial data used for checking for
+    // sig-safeness of the reduction step
+//#if 1
+#ifdef DEBUGF5
+    printf("%d -- %d sig\n",sigSafe,PW->is_sigsafe);
+
+#endif
+    if(rField_is_Ring(currRing))
+    {
+      // Set the sig
+      poly origsig = pCopy(PR->sig);
+      if(sigMult != NULL)
+        PR->sig = pHead(pSub(PR->sig, sigMult));
+      //The sigs have the same lm, have to substract
+      //It may happen that now the signature is 0 (drop)
+      if(PR->sig == NULL)
+      {
+        #ifdef ADIDEBUG
+        printf("\nPossible sigdrop in ksreducepolysig (lost signature)\n");
+        #endif
+        strat->sigdrop=TRUE;
+      }
+      else
+      {
+        if(pLtCmp(PR->sig,origsig) == 1)
+        {
+          // do not allow this reduction - it will increase it's signature
+          // and the partially standard basis is just till the old sig, not the new one
+          PR->is_redundant = TRUE;
+          pDelete(&PR->sig);
+          PR->sig = origsig;
+          strat->blockred++;
+          return 3;
+        }
+        if(pLtCmp(PR->sig,origsig) == -1)
+        {
+          #ifdef ADIDEBUG
+          printf("\nSigdrop in ksreducepolysig from * to *\n");pWrite(origsig);pWrite(PR->sig);
+          #endif
+          strat->sigdrop=TRUE;
+        }
+      }
+      pDelete(&origsig);
+    }
+    //pDelete(&f1);
+    // go on with the computations only if the signature of p2 is greater than the
+    // signature of fm*p1
+    if(sigSafe != 1 && !rField_is_Ring(currRing))
+    {
+      PR->is_redundant = TRUE;
+      return 3;
+    }
+    //PW->is_sigsafe  = TRUE;
+  }
+  PR->is_redundant = FALSE;
+  poly p1 = PR->GetLmTailRing();   // p2 | p1
+  poly p2 = PW->GetLmTailRing();   // i.e. will reduce p1 with p2; lm = LT(p1) / LM(p2)
+  poly t2 = pNext(p2), lm = p1;    // t2 = p2 - LT(p2); really compute P = LC(p2)*p1 - LT(p1)/LM(p2)*p2
+  assume(p1 != NULL && p2 != NULL);// Attention, we have rings and there LC(p2) and LC(p1) are special
+  p_CheckPolyRing(p1, tailRing);
+  p_CheckPolyRing(p2, tailRing);
+
+  pAssume1(p2 != NULL && p1 != NULL &&
+      p_DivisibleBy(p2,  p1, tailRing));
+
+  pAssume1(p_GetComp(p1, tailRing) == p_GetComp(p2, tailRing) ||
+      (p_GetComp(p2, tailRing) == 0 &&
+       p_MaxComp(pNext(p2),tailRing) == 0));
+
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(currRing))
+  {
+    // for the time being: we know currRing==strat->tailRing
+    // no exp-bound checking needed
+    // (only needed if exp-bound(tailring)<exp-b(currRing))
+    if (PR->bucket!=NULL)  nc_kBucketPolyRed(PR->bucket, p2,coef);
+    else
+    {
+      poly _p = (PR->t_p != NULL ? PR->t_p : PR->p);
+      assume(_p != NULL);
+      nc_PolyPolyRed(_p, p2, coef, currRing);
+      if (PR->t_p!=NULL) PR->t_p=_p; else PR->p=_p;
+      PR->pLength=0; // usaully not used, GetpLength re-comoutes it if needed
+    }
+    return 0;
+  }
+#endif
+
+  if (t2==NULL)           // Divisor is just one term, therefore it will
+  {                       // just cancel the leading term
+    PR->LmDeleteAndIter();
+    if (coef != NULL) *coef = n_Init(1, tailRing);
+    return 0;
+  }
+
+  p_ExpVectorSub(lm, p2, tailRing); // Calculate the Monomial we must multiply to p2
+
+  if (tailRing != currRing)
+  {
+    // check that reduction does not violate exp bound
+    while (PW->max != NULL && !p_LmExpVectorAddIsOk(lm, PW->max, tailRing))
+    {
+      // undo changes of lm
+      p_ExpVectorAdd(lm, p2, tailRing);
+      if (strat == NULL) return 2;
+      if (! kStratChangeTailRing(strat, PR, PW)) return -1;
+      tailRing = strat->tailRing;
+      p1 = PR->GetLmTailRing();
+      p2 = PW->GetLmTailRing();
+      t2 = pNext(p2);
+      lm = p1;
+      p_ExpVectorSub(lm, p2, tailRing);
+      ret = 1;
+    }
+  }
+  // take care of coef buisness
+  if(rField_is_Ring(currRing))
+  {
+    p_SetCoeff(lm, nDiv(pGetCoeff(lm),pGetCoeff(p2)), tailRing);
+    if (coef != NULL) *coef = n_Init(1, tailRing);
+  }
+  else
+  {
+    if (! n_IsOne(pGetCoeff(p2), tailRing))
+    {
+      number bn = pGetCoeff(lm);
+      number an = pGetCoeff(p2);
+      int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
+      p_SetCoeff(lm, bn, tailRing);
+      if (((ct == 0) || (ct == 2)))
+        PR->Tail_Mult_nn(an);
+      if (coef != NULL) *coef = an;
+      else n_Delete(&an, tailRing);
+    }
+    else
+    {
+      if (coef != NULL) *coef = n_Init(1, tailRing);
+    }
+  }
+
+  // and finally,
+  PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
+  assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
+  PR->LmDeleteAndIter();
+
+  // the following is commented out: shrinking
+#ifdef HAVE_SHIFTBBA_NONEXISTENT
+  if ( (currRing->isLPring) && (!strat->homog) )
+  {
+    // assume? h->p in currRing
+    PR->GetP();
+    poly qq = p_Shrink(PR->p, currRing->isLPring, currRing);
+    PR->Clear(); // does the right things
+    PR->p = qq;
+    PR->t_p = NULL;
+    PR->SetShortExpVector();
+  }
+#endif
 #if defined(KDEBUG) && defined(TEST_OPT_DEBUG_RED)
   if (TEST_OPT_DEBUG)
   {

@@ -121,6 +121,7 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
  ***************************************************************/
 
 #define pLtCmp(p,q)            p_LtCmp(p,q,currRing)
+#define pLtCmpNoAbs(p,q)       p_LtCmpNoAbs(p,q,currRing)
 #define pLtCmpOrdSgnDiffM(p,q) p_LtCmpOrdSgnDiffM(p,q,currRing)
 #define pLtCmpOrdSgnDiffP(p,q) p_LtCmpOrdSgnDiffP(p,q,currRing)
 #define pLtCmpOrdSgnEqM(p,q)   p_LtCmpOrdSgnEqM(p,q,currRing)

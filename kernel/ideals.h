@@ -73,6 +73,7 @@ inline ideal idAdd (ideal h1, ideal h2)
 }
 
 BOOLEAN idInsertPoly (ideal h1,poly h2);  /* h1 + h2 */
+BOOLEAN idInsertPolyOnPos (ideal I,poly p,int pos);  /* inserts p in I on pos */
 inline BOOLEAN idInsertPolyWithTests (ideal h1, const int validEntries, const poly h2, const bool zeroOk, const bool duplicateOk)
 {
   return id_InsertPolyWithTests (h1, validEntries, h2, zeroOk, duplicateOk, currRing);

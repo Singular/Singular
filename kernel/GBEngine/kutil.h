@@ -354,6 +354,15 @@ public:
   int lastAxis;
   int newIdeal;
   int minim;
+  #ifdef HAVE_RINGS
+  bool sigdrop; //This is used to check sigdrop in sba over Z
+  int nrsyzcrit; // counts how many pairs are deleted by SyzCrit
+  int nrrewcrit; // counts how many pairs are deleted by FaugereRewCrit
+  int sbaEnterS; // sba over Z strategy: if sigdrop element has _*gen(sbaEnterS+1), then 
+                 // add directly sbaEnterS elements into S
+  int blockred;  // counter for blocked reductions in redSig
+  int blockredmax;
+  #endif
   #ifdef HAVE_SHIFTBBA
   int lV;
   int cv; // in shift bases: counting V criterion
@@ -418,6 +427,9 @@ void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 void initEcartPairMora (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 int posInS (const kStrategy strat, const int length, const poly p,
             const int ecart_p);
+int posInSMonFirst (const kStrategy strat, const int length, const poly p,
+            const int ecart_p);
+int posInIdealMonFirst (const ideal F, const poly p,int start = 0,int end = -1);
 int posInT0 (const TSet set,const int length,LObject &p);
 int posInT1 (const TSet set,const int length,LObject &p);
 int posInT2 (const TSet set,const int length,LObject &p);
@@ -446,6 +458,8 @@ int posInLF5C (const LSet set, const int length,
                LObject* L,const kStrategy strat);
 int posInLSig (const LSet set, const int length,
                LObject* L,const kStrategy strat);
+int posInLSigRing (const LSet set, const int length,
+               LObject* L,const kStrategy strat);
 int posInLRing (const LSet set, const int length,
                LObject* L,const kStrategy strat);
 int posInSyz (const kStrategy strat, const poly sig);
@@ -454,6 +468,8 @@ int posInL0 (const LSet set, const int length,
 int posInL11 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 int posInL11Ring (const LSet set, const int length,
+             LObject* L,const kStrategy strat);
+int posInLF5CRing (const LSet set, int start , const int length,
              LObject* L,const kStrategy strat);
 int posInL11Ringls (const LSet set, const int length,
              LObject* L,const kStrategy strat);
@@ -491,7 +507,9 @@ int redHoney (LObject* h, kStrategy strat);
 int redRing (LObject* h,kStrategy strat);
 int redRiloc (LObject* h,kStrategy strat);
 void enterExtendedSpoly(poly h,kStrategy strat);
+void enterExtendedSpolySig(poly h,poly hSig,kStrategy strat);
 void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR = -1);
+void superenterpairsSig (poly h,poly hSig,int hFrom,int k,int ecart,int pos,kStrategy strat, int atR = -1);
 poly kCreateZeroPoly(long exp[], long cabsind, poly* t_p, ring leadRing, ring tailRing);
 long ind2(long arg);
 
@@ -502,14 +520,18 @@ ideal createG0();
 int redLazy (LObject* h,kStrategy strat);
 int redHomog (LObject* h,kStrategy strat);
 int redSig (LObject* h,kStrategy strat);
+int redSigRing (LObject* h,kStrategy strat);
 //adds hSig to be able to check with F5's criteria when entering pairs!
 void enterpairsSig (poly h, poly hSig, int from, int k, int ec, int pos,kStrategy strat, int atR = -1);
 void enterpairs (poly h, int k, int ec, int pos,kStrategy strat, int atR = -1);
 void entersets (LObject h);
 void pairs ();
 BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrategy strat, int atR = -1, bool enterTstrong = FALSE);
+BOOLEAN sbaCheckGcdPair (LObject* h,kStrategy strat);
+BOOLEAN enterOneStrongPolySig (int i,poly p,poly sig,int /*ecart*/, int /*isFromQ*/,kStrategy strat, int atR = -1);
 void message (int i,int* reduc,int* olddeg,kStrategy strat,int red_result);
 void messageStat (int hilbcount,kStrategy strat);
+void messageStatSBA (int hilbcount,kStrategy strat);
 #ifdef KDEBUG
 void messageSets (kStrategy strat);
 #else
@@ -555,6 +577,7 @@ void kFreeStrat(kStrategy strat);
 void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR);
 void enterOnePairLift (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR);
 void enterOnePairSig (int i,poly p,poly pSig,int ecart, int isFromQ,kStrategy strat, int atR);
+void enterOnePairSigRing (int i,poly p,poly pSig,int ecart, int isFromQ,kStrategy strat, int atR);
 void chainCritNormal (poly p,int ecart,kStrategy strat);
 void chainCritOpt_1 (poly,int,kStrategy strat);
 void chainCritSig (poly p,int ecart,kStrategy strat);
@@ -695,6 +718,13 @@ int ksReducePolySig(LObject* PR,
                  poly spNoether = NULL,
                  number *coef = NULL,
                  kStrategy strat = NULL);
+                 
+int ksReducePolySigRing(LObject* PR,
+                 TObject* PW,
+                 long idx,
+                 poly spNoether = NULL,
+                 number *coef = NULL,
+                 kStrategy strat = NULL);
 
 // Reduces PR at Current->next with PW
 // Assumes PR != NULL, Current contained in PR
@@ -750,6 +780,7 @@ BOOLEAN kCheckSpolyCreation(LObject* L, kStrategy strat, poly &m1, poly &m2);
 BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat);
 poly preIntegerCheck(ideal F, ideal Q);
 void postReduceByMon(LObject* h, kStrategy strat);
+void postReduceByMonSig(LObject* h, kStrategy strat);
 void finalReduceByMon(kStrategy strat);
 #endif
 // change strat->tailRing and adjust all data in strat, L, and T:
