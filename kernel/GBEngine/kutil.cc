@@ -580,6 +580,58 @@ void cleanT (kStrategy strat)
         }
         else
         {
+          pDelete(&p);
+          p = NULL;
+        }
+        break;
+      }
+      if (p == strat->S[i])
+      {
+        if (strat->T[j].t_p != NULL)
+        {
+          assume(p_shallow_copy_delete != NULL);
+          pNext(p) = p_shallow_copy_delete(pNext(p),strat->tailRing,currRing,
+                                           currRing->PolyBin);
+          p_LmFree(strat->T[j].t_p, strat->tailRing);
+        }
+        break;
+      }
+    }
+  }
+  strat->tl=-1;
+}
+
+void cleanTSbaRing (kStrategy strat)
+{
+  int i,j;
+  poly  p;
+  assume(currRing == strat->tailRing || strat->tailRing != NULL);
+
+  pShallowCopyDeleteProc p_shallow_copy_delete =
+    (strat->tailRing != currRing ?
+     pGetShallowCopyDeleteProc(strat->tailRing, currRing) :
+     NULL);
+  for (j=0; j<=strat->tl; j++)
+  {
+    p = strat->T[j].p;
+    strat->T[j].p=NULL;
+    if (strat->T[j].max != NULL)
+    {
+      p_LmFree(strat->T[j].max, strat->tailRing);
+    }
+    i = -1;
+    loop
+    {
+      i++;
+      if (i>strat->sl)
+      {
+        if (strat->T[j].t_p != NULL)
+        {
+          p_Delete(&(strat->T[j].t_p), strat->tailRing);
+          p_LmFree(p, currRing);
+        }
+        else
+        {
           //pDelete(&p);
           p = NULL;
         }
@@ -8024,7 +8076,6 @@ void initSL (ideal F, ideal Q,kStrategy strat)
   }
   for (i=0; i<IDELEMS(F); i++)
   {
-    break;
     if (F->m[i]!=NULL)
     {
       LObject h;
@@ -10206,7 +10257,10 @@ void initSbaBuchMora (ideal F,ideal Q,kStrategy strat)
 void exitSba (kStrategy strat)
 {
   /*- release temp data -*/
-  cleanT(strat);
+  if(rField_is_Ring(currRing))
+    cleanTSbaRing(strat);
+  else
+    cleanT(strat);
   omFreeSize(strat->T,(strat->tmax)*sizeof(TObject));
   omFreeSize(strat->R,(strat->tmax)*sizeof(TObject*));
   omFreeSize(strat->sevT, (strat->tmax)*sizeof(unsigned long));
@@ -11462,7 +11516,7 @@ skStrategy::~skStrategy()
 {
   if (lmBin != NULL)
     omMergeStickyBinIntoBin(lmBin, currRing->PolyBin);
-  if (tailBin != NULL && !rField_is_Ring(currRing))
+  if (tailBin != NULL)// && !rField_is_Ring(currRing))
     omMergeStickyBinIntoBin(tailBin,
                             (tailRing != NULL ? tailRing->PolyBin:
                              currRing->PolyBin));
