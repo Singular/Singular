@@ -1264,7 +1264,7 @@ void siInit(char *name)
     n_coeffType type = nRegister(n_polyExt, naInitChar);
     assume(type == n_algExt);
 
-    n_coeffType type = nRegister(n_algExt, naInitChar);
+    type = nRegister(n_algExt, naInitChar);
     assume(type == n_algExt);
 
     type = nRegister(n_transExt, ntInitChar);
