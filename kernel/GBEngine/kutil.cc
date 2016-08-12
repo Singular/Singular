@@ -8024,6 +8024,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
   }
   for (i=0; i<IDELEMS(F); i++)
   {
+    break;
     if (F->m[i]!=NULL)
     {
       LObject h;
@@ -9864,13 +9865,11 @@ void initBuchMoraPosRing (kStrategy strat)
     }
     else if (currRing->pLexOrder && !TEST_OPT_INTSTRATEGY)
     {
-      //printf("\nHere 1\n");
       strat->posInL = posInL11Ring;
       strat->posInT = posInT11;
     }
     else if (TEST_OPT_INTSTRATEGY)
     {
-      //printf("\nHere 2\n");
       strat->posInL = posInL11Ring;
       strat->posInT = posInT11;
     }

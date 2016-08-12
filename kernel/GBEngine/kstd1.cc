@@ -1667,6 +1667,8 @@ loop_count = 1;
   {
     kDebugPrint(strat);
   }
+//deleteInL(strat->L,&strat->Ll,1,strat);
+//deleteInL(strat->L,&strat->Ll,0,strat);
 
   /*- compute-------------------------------------------*/
   while (strat->Ll >= 0)
@@ -1762,9 +1764,7 @@ loop_count = 1;
       printf("\nThis is P vor red:\n");p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.p1,strat->tailRing);p_Write(strat->P.p2,strat->tailRing);
       printf("\nBefore Ll = %i\n", strat->Ll);
       #endif
-      if(rField_is_Ring(strat->tailRing) && rHasLocalOrMixedOrdering(currRing))
-        red_result = strat->red(&strat->P,strat);
-      else
+      if(!rField_is_Ring(strat->tailRing) || rHasLocalOrMixedOrdering(currRing))
         red_result = strat->red(&strat->P,strat);
       #ifdef ADIDEBUG
       printf("\nThis is P nach red:\n");p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.p1,strat->tailRing);p_Write(strat->P.p2,strat->tailRing);
