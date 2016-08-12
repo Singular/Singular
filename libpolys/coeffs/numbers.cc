@@ -517,7 +517,6 @@ void nKillChar(coeffs r)
   }
 }
 
-
 n_coeffType nRegister(n_coeffType n, cfInitCharProc p)
 {
   if (n==n_unknown)

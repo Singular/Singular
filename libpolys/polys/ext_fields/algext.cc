@@ -1520,7 +1520,7 @@ BOOLEAN  n2pDBTest(number a, const char *f, const int l, const coeffs r);
 BOOLEAN n2pDBTest(number a, const char *f, const int l, const coeffs cf)
 {
   if (a == NULL) return TRUE;
-  return p_DBTest((poly)a, n2pRing,f,l);
+  return p_Test((poly)a, n2pRing);
 }
 #endif
 
@@ -1583,12 +1583,6 @@ static BOOLEAN n2pCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
     return TRUE;
   }
   return FALSE;
-}
-
-void n2pKillChar(coeffs cf)
-{
-   if ((--cf->extRing->ref) == 0)
-     rDelete(cf->extRing);
 }
 
 char* n2pCoeffString(const coeffs r) // currently also for tranext.
