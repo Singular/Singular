@@ -12,8 +12,8 @@
 #define MYTEST 0
 
 //#define ADIDEBUG 1
-//All vs Just strategy over rings: 
-// 1 - Just 
+//All vs Just strategy over rings:
+// 1 - Just
 // 0 - All
 #define ALL_VS_JUST 0
 //Extended Spoly Strategy:
@@ -581,7 +581,6 @@ void cleanT (kStrategy strat)
         else
         {
           pDelete(&p);
-          p = NULL;
         }
         break;
       }
@@ -1768,7 +1767,7 @@ BOOLEAN enterOneStrongPolySig (int i,poly p,poly sig,int /*ecart*/, int /*isFrom
 #endif
 
   pNext(gcd) = p_Add_q(pp_Mult_mm(pNext(p), m1, strat->tailRing), pp_Mult_mm(pNext(si), m2, strat->tailRing), strat->tailRing);
-  
+
 #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
@@ -1856,7 +1855,7 @@ BOOLEAN enterOneStrongPolySig (int i,poly p,poly sig,int /*ecart*/, int /*isFrom
     h.sig = pNeg(h.sig);
     h.p = pNeg(h.p);
   }
-  
+
     if(rField_is_Ring(currRing) &&  pLtCmp(h.sig,sig) == -1)
     {
       #ifdef ADIDEBUG
@@ -2767,7 +2766,7 @@ void enterOnePairSigRing (int i, poly p, poly pSig, int, int ecart, int isFromQ,
   Print("M2  ");
   pWrite(m2);
 #endif
-  
+
   // get multiplied signatures for testing
   pSigMult = pp_Mult_mm(pSigMult,m1,currRing);
   if(pSigMult != NULL)
@@ -2874,8 +2873,8 @@ void enterOnePairSigRing (int i, poly p, poly pSig, int, int ecart, int isFromQ,
     }
     Lp.sevSig = p_GetShortExpVector(Lp.sig,currRing);
   }
-  
-  #if 0  
+
+  #if 0
   if(sigCmp==0)
   {
     // printf("!!!!   EQUAL SIGS   !!!!\n");
@@ -4830,7 +4829,7 @@ void enterExtendedSpolySig(poly h,poly hSig,kStrategy strat)
           #endif
           return;
         }
-        
+
       }
       #else
       Lp.sig = pOne();
@@ -5226,7 +5225,7 @@ int posInSMonFirst (const kStrategy strat, const int length,const poly p,
     }
     int o = p_Deg(p,currRing);
     int op = p_Deg(set[mon],currRing);
-    
+
     if ((op < o)
     || ((op == o) && (pLtCmp(set[mon],p) == -1)))
       return length+1;
@@ -5256,7 +5255,7 @@ int posInSMonFirst (const kStrategy strat, const int length,const poly p,
   {
     int o = p_Deg(p,currRing);
     int op = p_Deg(set[length],currRing);
-    
+
     if ((op < o)
     || ((op == o) && (pLtCmp(set[length],p) == -1)))
       return length+1;
@@ -7137,7 +7136,7 @@ BOOLEAN syzCriterion(poly sig, unsigned long not_sevSig, kStrategy strat)
     pWrite(pHead(strat->syz[k]));
 #endif
     if (p_LmShortDivisibleBy(strat->syz[k], strat->sevSyz[k], sig, not_sevSig, currRing)
-    && (!rField_is_Ring(currRing) || 
+    && (!rField_is_Ring(currRing) ||
     (n_DivBy(pGetCoeff(sig), pGetCoeff(strat->syz[k]),currRing) && pLtCmp(sig,strat->syz[k]) == 1)))
     {
 //#if 1
@@ -7194,7 +7193,7 @@ BOOLEAN syzCriterionInc(poly sig, unsigned long not_sevSig, kStrategy strat)
       pWrite(pHead(strat->syz[k]));
 #endif
       if (p_LmShortDivisibleBy(strat->syz[k], strat->sevSyz[k], sig, not_sevSig, currRing)
-      && (!rField_is_Ring(currRing) || 
+      && (!rField_is_Ring(currRing) ||
       (n_DivBy(pGetCoeff(sig), pGetCoeff(strat->syz[k]),currRing) && pLtCmp(sig,strat->syz[k]) == 1)))
       {
         #ifdef ADIDEBUG
@@ -9614,7 +9613,7 @@ void enterSyz(LObject &p, kStrategy strat, int atT)
     if (p_LmShortDivisibleBy( strat->syz[atT], strat->sevSyz[atT],
                               strat->L[cc].sig, ~strat->L[cc].sevSig, currRing)
                               #ifdef HAVE_RINGS
-                              &&((!rField_is_Ring(currRing)) 
+                              &&((!rField_is_Ring(currRing))
                               || (n_DivBy(pGetCoeff(strat->L[cc].sig),pGetCoeff(strat->syz[atT]),currRing) && (pLtCmp(strat->L[cc].sig,strat->syz[atT])==1)))
                               #endif
                               )
@@ -11070,7 +11069,7 @@ void postReduceByMonSig(LObject* h, kStrategy strat)
   h->SetLmCurrRing();
   if(deleted)
     strat->initEcart(h);
-  
+
 }
 
 /*!
@@ -11886,7 +11885,7 @@ poly pCopyL2p(LObject H, kStrategy strat)
   /* we're here if h.p != NULL and h.t_p != NULL */
   // clean h.p, get poly from t_p
   pNext(h.p)=NULL;
-  pDelete(&h.p);
+  pLmDelete(&h.p);
   p = prMoveR(h.t_p, /* source ring: */ strat->tailRing,
                      /* dest. ring: */ currRing);
   // no need to clean h: we re-used the polys

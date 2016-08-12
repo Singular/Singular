@@ -1764,8 +1764,7 @@ loop_count = 1;
       printf("\nThis is P vor red:\n");p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.p1,strat->tailRing);p_Write(strat->P.p2,strat->tailRing);
       printf("\nBefore Ll = %i\n", strat->Ll);
       #endif
-      if(!rField_is_Ring(strat->tailRing) || rHasLocalOrMixedOrdering(currRing))
-        red_result = strat->red(&strat->P,strat);
+      red_result = strat->red(&strat->P,strat);
       #ifdef ADIDEBUG
       printf("\nThis is P nach red:\n");p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.p1,strat->tailRing);p_Write(strat->P.p2,strat->tailRing);
       printf("\nAfter Ll = %i\n", strat->Ll);
@@ -1840,7 +1839,7 @@ loop_count = 1;
       // clear strat->P
       if (strat->P.lcm!=NULL)
       {
-        if (rField_is_Ring(currRing)) 
+        if (rField_is_Ring(currRing))
           pLmDelete(strat->P.lcm);
         else
           pLmFree(strat->P.lcm);
@@ -2560,7 +2559,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
     #endif
     //This is how we set the SBA algorithm;
     int totalsbaruns = 1,blockedreductions = 20,blockred = 0,loops = 0;
-    while(sigdrop && (loops < totalsbaruns || totalsbaruns == -1) 
+    while(sigdrop && (loops < totalsbaruns || totalsbaruns == -1)
                   && (blockred <= blockedreductions))
     {
       loops++;
@@ -2678,7 +2677,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
           if (w!=NULL)
             r=sba(r,Q,*w,hilb,strat);
           else
-          { 
+          {
             r=sba(r,Q,NULL,hilb,strat);
           }
           #ifdef ADIDEBUG
