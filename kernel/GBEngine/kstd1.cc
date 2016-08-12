@@ -2416,11 +2416,10 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intvec *hilb,int syzComp,
           int newIdeal, intvec *vw)
 {
+  if(idIs0(F))
+    return idInit(1,F->rank);
   if(!rField_is_Ring(currRing))
   {
-    if(idIs0(F))
-      return idInit(1,F->rank);
-
     ideal r;
     BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
     BOOLEAN delete_w=(w==NULL);
@@ -2442,7 +2441,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
     if(!TEST_OPT_RETURN_SB)
       strat->syzComp = syzComp;
     if (TEST_OPT_SB_1)
-      if(!rField_is_Ring(currRing))
+      //if(!rField_is_Ring(currRing)) // always true here
         strat->newIdeal = newIdeal;
     if (rField_has_simple_inverse(currRing))
       strat->LazyPass=20;
@@ -2548,8 +2547,6 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
     //--------------------------RING CASE-------------------------
     assume(sbaOrder == 1);
     assume(arri == 0);
-    if(idIs0(F))
-      return idInit(1,F->rank);
     ideal r;
     r = idCopy(F);
     int sbaEnterS = -1;
