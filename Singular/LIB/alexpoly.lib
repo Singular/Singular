@@ -124,7 +124,6 @@ EXAMPLE: example totalmultiplicities;  shows an example
   int i,j,s,e,ii;
   intmat helpmati,helpmatii;
   intvec helpvec;
-  int inputispoly=0;
   /////////////////////////////////////////////////////////////////////////////////
   // Decide, which kind of input we have, and define the contact matrix
   /////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +141,6 @@ EXAMPLE: example totalmultiplicities;  shows an example
     list I@N@V=invariants(f);
     */
     list I@N@V=invariants(INPUT);
-    inputispoly=1;
   }
   else
   {
@@ -314,7 +312,7 @@ EXAMPLE: example totalmultiplicities;  shows an example
     return(list(graphs,multipl,contact));
   }
   /////////////////////////////////////////////////////////////////////////////////////
-  // Sort the branches in such a way, that in the blowing up procedure whenever two branches
+  // Sort the branches in such a way, that in the blowing up procedure whenever to branches
   // C_i and C_j have contact k (i.e. after k steps they are separated) and one of the following
   // situations occurs:
   // A) some exceptional divisor E_l (l<k) still intersects C_i after k steps of blowing up
@@ -360,11 +358,6 @@ EXAMPLE: example totalmultiplicities;  shows an example
   intvec connections_i,connections_j;
   int n_i,n_j;
   int bad_contact;
-  list newpos;  // when reordering the branches, here we save the new order of the old branches
-  for (ii=1;ii<=r;ii++)
-  {
-    newpos[ii]=ii;
-  }
   while (i<r)
   {
     // Test graphs[i] with graphs[j] for bad contact.
@@ -418,8 +411,6 @@ EXAMPLE: example totalmultiplicities;  shows an example
     {
       bad_contact=1;
       // Move the graph (etc.) of C_j into the position i.
-      newpos=insert(newpos,j,i-1);
-      newpos=delete(newpos,j+1);
       graphs=insert(graphs,graphs[j],i-1);
       graphs=delete(graphs,j+1);
       totmult=insert(totmult,totmult[j],i-1);
@@ -567,32 +558,8 @@ EXAMPLE: example totalmultiplicities;  shows an example
       rtm[1..e,i]=adjust_tot_mult(intvec(rtm[1..e,s]),intvec(rtm[1..e,i]),intvec(rmt[1..e,s]),intvec(rmt[1..e,i]),p,q,stricttransforms,s);
     }
   }
-  if (inputispoly==1) // if the input was a polynomial the ordering of the branches is fine
-  {
-    list result=rgraph,rtm,rmt;
-    return(result);
-  }
-  else // reorder the branches according to the ordering of the input
-  {
-    // reordered total multiplicities, multiplicities and resolution graph
-    intmat rtmro[nrows(rtm)][ncols(rtm)];
-    intmat rmtro[nrows(rmt)][ncols(rmt)];
-    intmat rgraphro=rgraph;
-    for (i=1;i<=r;i++)
-    {
-      rtmro[1..nrows(rtm),newpos[i]]=rtm[1..nrows(rtm),i];
-      rmtro[1..nrows(rmt),newpos[i]]=rmt[1..nrows(rmt),i];
-      for (j=1;j<=nrows(rgraph);j++)
-      {
-        if (rgraph[j,j]==-i)
-        {
-          rgraphro[j,j]=-newpos[i];
-        }
-      }
-    }
-    list result=rgraphro,rtmro,rmtro;
-    return(result);
-  }
+  list result=rgraph,rtm,rmt;
+  return(result);
 }
 example
 {
@@ -867,10 +834,10 @@ EXAMPLE:  example semigroup;  shows an example
     intmat contact=I@N@V[size(I@N@V)][1];        // contact matrix
     intmat intersecmult=I@N@V[size(I@N@V)][2];   // intersection multiplicities
     for(i=1;i<=n;i++)
-    {
-      conductor[i]=I@N@V[i][5];
+        {
+          conductor[i]=I@N@V[i][5];
       charexp[i]=I@N@V[i][1];
-    }
+        }
   }
   /////////////////////////////////////////////////////////////////////////////////////
   // If we have come so far, the curve is reducible!
@@ -880,9 +847,9 @@ EXAMPLE:  example semigroup;  shows an example
   for(i=1;i<=size(conductor);i++)
   {
     for(j=1;j<=size(conductor);j++)
-    {
-      conductor[i]=conductor[i]+intersecmult[i,j];
-    }
+        {
+          conductor[i]=conductor[i]+intersecmult[i,j];
+        }
   }
   /////////////////////////////////////////////////////////////////////////////////////
   /// The total multiplicity vectors of the exceptional divisors generate the semigroup,
