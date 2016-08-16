@@ -465,7 +465,11 @@ void    nrzCoeffWrite  (const coeffs, BOOLEAN /*details*/)
 
 static char* nrzCoeffString(const coeffs)
 {
+#ifdef SINGULAR_4_1
+  return omStrDup("ZZ");
+#else
   return omStrDup("integer");
+#endif  
 }
 
 coeffs nrzQuot1(number c, const coeffs r)

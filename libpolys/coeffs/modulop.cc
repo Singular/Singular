@@ -469,8 +469,13 @@ number npConvFactoryNSingN( const CanonicalForm n, const coeffs r)
 
 static char* npCoeffString(const coeffs r)
 {
+#ifdef SINGULAR_4_1
+  char *s=(char*)omAlloc(14);
+  snprintf(s,14,"ZZ/%d",r->ch);
+#else
   char *s=(char*)omAlloc(11);
   snprintf(s,11,"%d",r->ch);
+#endif  
   return s;
 }
 

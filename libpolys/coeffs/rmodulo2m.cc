@@ -106,8 +106,13 @@ BOOLEAN nr2mCoeffIsEqual(const coeffs r, n_coeffType n, void * p)
 
 static char* nr2mCoeffString(const coeffs r)
 {
+  // r->modExponent <=bitsize(long)
   char* s = (char*) omAlloc(11+11);
+#ifdef SINGULAR_4_1
+  sprintf(s,"ZZ/(2^%lu)",r->modExponent);
+#else
   sprintf(s,"integer,2,%lu",r->modExponent);
+#endif
   return s;
 }
 

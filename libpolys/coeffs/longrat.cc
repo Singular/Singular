@@ -3148,8 +3148,13 @@ char * nlCoeffName(const coeffs r)
 static char* nlCoeffString(const coeffs r)
 {
   //return omStrDup(nlCoeffName(r));
+#ifdef SINGULAR_4_1
+  if (r->cfDiv==nlDiv) return omStrDup("QQ");
+  else                 return omStrDup("ZZ");
+#else
   if (r->cfDiv==nlDiv) return omStrDup("0");
   else                 return omStrDup("integer");
+#endif
 }
 
 static void nlWriteFd(number n,FILE* f, const coeffs)

@@ -95,9 +95,15 @@ static char* nrnCoeffString(const coeffs r)
   size_t l = (size_t)mpz_sizeinbase(r->modBase, 10) +2;
   char* b = (char*) omAlloc(l);
   b= mpz_get_str (b, 10, r->modBase);
+  #ifdef SINGULAR_4_1
+  char* s = (char*) omAlloc(15+l);
+  if (nCoeff_is_Ring_ModN(r)) sprintf(s,"ZZ/bigint(%s)",b);
+  else /*if (nCoeff_is_Ring_PtoM(r))*/ sprintf(s,"ZZ/(bigint(%s)^%lu)",b,r->modExponent);
+  #else
   char* s = (char*) omAlloc(7+2+10+l);
   if (nCoeff_is_Ring_ModN(r)) sprintf(s,"integer,%s",b);
   else /*if (nCoeff_is_Ring_PtoM(r))*/ sprintf(s,"integer,%s^%lu",b,r->modExponent);
+  #endif
   omFreeSize(b,l);
   return s;
 }
