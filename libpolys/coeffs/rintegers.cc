@@ -460,7 +460,11 @@ const char * nrzRead (const char *s, number *a, const coeffs)
 
 void    nrzCoeffWrite  (const coeffs, BOOLEAN /*details*/)
 {
-  PrintS("//   coeff. ring is : Integers\n");
+#ifdef SINGULAR_4_1
+  PrintS("//   coeff. ring is : ZZ\n");
+#else
+  PrintS("//   coeff. ring is : integer\n");
+#endif
 }
 
 static char* nrzCoeffString(const coeffs)
