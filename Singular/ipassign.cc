@@ -469,7 +469,7 @@ static BOOLEAN jiA_NUMBER2_I(leftv res, leftv a, Subexpr e)
     }
     else
     {
-      WerrorS("no (c)ring avialable for conversion from int");
+      WerrorS("no Ring avialable for conversion from int");
       return TRUE;
     }
   }

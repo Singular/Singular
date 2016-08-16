@@ -120,7 +120,6 @@ BOOLEAN iiApply(leftv res,leftv a, int op, leftv proc);
 typedef BOOLEAN (*proc1)(leftv,leftv);
 
 #ifdef GENTABLE
-typedef char * (*Proc1)(char *);
 struct sValCmd1
 {
   proc1 p;

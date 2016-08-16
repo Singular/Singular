@@ -1,9 +1,8 @@
-/* A Bison parser, made by GNU Bison 2.4.3.  */
+/* A Bison parser, made by GNU Bison 3.0.4.  */
 
-/* Skeleton interface for Bison's Yacc-like parsers in C
+/* Bison interface for Yacc-like parsers in C
 
-      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2009, 2010 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,107 +30,111 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
+#ifndef YY_YY_GRAMMAR_HH_INCLUDED
+# define YY_YY_GRAMMAR_HH_INCLUDED
+/* Debug traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 1
+#endif
+#if YYDEBUG
+extern int yydebug;
+#endif
 
-/* Tokens.  */
+/* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     DOTDOT = 258,
-     EQUAL_EQUAL = 259,
-     GE = 260,
-     LE = 261,
-     MINUSMINUS = 262,
-     NOT = 263,
-     NOTEQUAL = 264,
-     PLUSPLUS = 265,
-     COLONCOLON = 266,
-     ARROW = 267,
-     GRING_CMD = 268,
-     BIGINTMAT_CMD = 269,
-     INTMAT_CMD = 270,
-     PROC_CMD = 271,
-     RING_CMD = 272,
-     BEGIN_RING = 273,
-     IDEAL_CMD = 274,
-     MAP_CMD = 275,
-     MATRIX_CMD = 276,
-     MODUL_CMD = 277,
-     NUMBER_CMD = 278,
-     POLY_CMD = 279,
-     RESOLUTION_CMD = 280,
-     VECTOR_CMD = 281,
-     BETTI_CMD = 282,
-     E_CMD = 283,
-     FETCH_CMD = 284,
-     FREEMODULE_CMD = 285,
-     KEEPRING_CMD = 286,
-     IMAP_CMD = 287,
-     KOSZUL_CMD = 288,
-     MAXID_CMD = 289,
-     MONOM_CMD = 290,
-     PAR_CMD = 291,
-     PREIMAGE_CMD = 292,
-     VAR_CMD = 293,
-     VALTVARS = 294,
-     VMAXDEG = 295,
-     VMAXMULT = 296,
-     VNOETHER = 297,
-     VMINPOLY = 298,
-     END_RING = 299,
-     CMD_1 = 300,
-     CMD_2 = 301,
-     CMD_3 = 302,
-     CMD_12 = 303,
-     CMD_13 = 304,
-     CMD_23 = 305,
-     CMD_123 = 306,
-     CMD_M = 307,
-     ROOT_DECL = 308,
-     ROOT_DECL_LIST = 309,
-     RING_DECL = 310,
-     RING_DECL_LIST = 311,
-     EXAMPLE_CMD = 312,
-     EXPORT_CMD = 313,
-     HELP_CMD = 314,
-     KILL_CMD = 315,
-     LIB_CMD = 316,
-     LISTVAR_CMD = 317,
-     SETRING_CMD = 318,
-     TYPE_CMD = 319,
-     STRINGTOK = 320,
-     BLOCKTOK = 321,
-     INT_CONST = 322,
-     UNKNOWN_IDENT = 323,
-     RINGVAR = 324,
-     PROC_DEF = 325,
-     APPLY = 326,
-     ASSUME_CMD = 327,
-     BREAK_CMD = 328,
-     CONTINUE_CMD = 329,
-     ELSE_CMD = 330,
-     EVAL = 331,
-     QUOTE = 332,
-     FOR_CMD = 333,
-     IF_CMD = 334,
-     SYS_BREAK = 335,
-     WHILE_CMD = 336,
-     RETURN = 337,
-     PARAMETER = 338,
-     SYSVAR = 339,
-     UMINUS = 340
-   };
+  enum yytokentype
+  {
+    DOTDOT = 258,
+    EQUAL_EQUAL = 259,
+    GE = 260,
+    LE = 261,
+    MINUSMINUS = 262,
+    NOT = 263,
+    NOTEQUAL = 264,
+    PLUSPLUS = 265,
+    COLONCOLON = 266,
+    ARROW = 267,
+    GRING_CMD = 268,
+    BIGINTMAT_CMD = 269,
+    INTMAT_CMD = 270,
+    PROC_CMD = 271,
+    RING_CMD = 272,
+    BEGIN_RING = 273,
+    IDEAL_CMD = 274,
+    MAP_CMD = 275,
+    MATRIX_CMD = 276,
+    MODUL_CMD = 277,
+    NUMBER_CMD = 278,
+    POLY_CMD = 279,
+    RESOLUTION_CMD = 280,
+    VECTOR_CMD = 281,
+    BETTI_CMD = 282,
+    E_CMD = 283,
+    FETCH_CMD = 284,
+    FREEMODULE_CMD = 285,
+    KEEPRING_CMD = 286,
+    IMAP_CMD = 287,
+    KOSZUL_CMD = 288,
+    MAXID_CMD = 289,
+    MONOM_CMD = 290,
+    PAR_CMD = 291,
+    PREIMAGE_CMD = 292,
+    VAR_CMD = 293,
+    VALTVARS = 294,
+    VMAXDEG = 295,
+    VMAXMULT = 296,
+    VNOETHER = 297,
+    VMINPOLY = 298,
+    END_RING = 299,
+    CMD_1 = 300,
+    CMD_2 = 301,
+    CMD_3 = 302,
+    CMD_12 = 303,
+    CMD_13 = 304,
+    CMD_23 = 305,
+    CMD_123 = 306,
+    CMD_M = 307,
+    ROOT_DECL = 308,
+    ROOT_DECL_LIST = 309,
+    RING_DECL = 310,
+    RING_DECL_LIST = 311,
+    EXAMPLE_CMD = 312,
+    EXPORT_CMD = 313,
+    HELP_CMD = 314,
+    KILL_CMD = 315,
+    LIB_CMD = 316,
+    LISTVAR_CMD = 317,
+    SETRING_CMD = 318,
+    TYPE_CMD = 319,
+    STRINGTOK = 320,
+    BLOCKTOK = 321,
+    INT_CONST = 322,
+    UNKNOWN_IDENT = 323,
+    RINGVAR = 324,
+    PROC_DEF = 325,
+    APPLY = 326,
+    ASSUME_CMD = 327,
+    BREAK_CMD = 328,
+    CONTINUE_CMD = 329,
+    ELSE_CMD = 330,
+    EVAL = 331,
+    QUOTE = 332,
+    FOR_CMD = 333,
+    IF_CMD = 334,
+    SYS_BREAK = 335,
+    WHILE_CMD = 336,
+    RETURN = 337,
+    PARAMETER = 338,
+    SYSVAR = 339,
+    UMINUS = 340
+  };
 #endif
 
-
-
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-
-# define yystype YYSTYPE /* obsolescent; will be withdrawn */
-# define YYSTYPE_IS_DECLARED 1
-#endif
+/* Value type.  */
 
 
 
+int yyparse (void);
 
+#endif /* !YY_YY_GRAMMAR_HH_INCLUDED  */

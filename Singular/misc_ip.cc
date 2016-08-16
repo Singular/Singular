@@ -1261,8 +1261,11 @@ void siInit(char *name)
    // def HAVE_POLYEXTENSIONS
   if(TRUE)
   {
-    n_coeffType type = nRegister(n_polyExt, naInitChar);
-    assume(type == n_algExt);
+    n_coeffType type;
+    #ifdef SINGULAR_4_1
+    type = nRegister(n_polyExt, naInitChar);
+    assume(type == n_polyExt);
+    #endif
 
     type = nRegister(n_algExt, naInitChar);
     assume(type == n_algExt);

@@ -1325,6 +1325,20 @@ ringcmd:
             yyInRingConstruction = FALSE;
             if (iiAssignCR(&$2,&$4)) YYERROR;
           }
+	| ringcmd1 elemexpr cmdeq elemexpr '[' exprlist ']'
+	{
+	  #ifdef SINGULAR_4_1
+	  yyInRingConstruction = FALSE;
+	  sleftv tmp;
+	  $4.next=(leftv)omAlloc(sizeof(sleftv));
+	  memcpy($4.next,&$6,sizeof(sleftv));
+	  memset(&$6,0,sizeof(sleftv));
+	  if (iiExprArithM(&tmp,&$4,'[')) YYERROR;
+          if (iiAssignCR(&$2,&tmp)) YYERROR;
+	  #else
+	  YYERROR;
+	  #endif
+	}
         ;
 
 scriptcmd:

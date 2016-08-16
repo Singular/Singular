@@ -146,8 +146,6 @@ struct _scmdnames
 };
 typedef struct _scmdnames cmdnames;
 
-
-typedef char * (*Proc1)(char *);
 struct sValCmd1
 {
   proc1 p;
@@ -8037,6 +8035,29 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
   return FALSE;
 }
 
+#ifdef SINGULAR_4_1
+static BOOLEAN jjRING_PL(leftv res, leftv a)
+{
+  Print("construct ring\n");
+  if (a->Typ()!=CRING_CMD)
+  {
+    WerrorS("expected `Ring` [ `id` ... ]");
+    return TRUE;
+  }
+  assume(a->next!=NULL);
+  leftv names=a->next;
+  int N=names->listLength();
+  char **n=(char**)omAlloc0(N*sizeof(char*));
+  for(int i=0; i<N;i++,names=names->next)
+  {
+    n[i]=(char *)names->Name();
+  }
+  coeffs cf=(coeffs)a->CopyD();
+  res->data=rDefault(cf,N,n, ringorder_dp);
+  omFreeSize(n,N*sizeof(char*));
+  return FALSE;
+}
+#endif
 
 static Subexpr jjMakeSub(leftv e)
 {
@@ -8700,7 +8721,7 @@ BOOLEAN iiExprArith3Tab(leftv res, leftv a, int op,
 /* must be ordered: first operations for chars (infix ops),
  * then alphabetically */
 
-BOOLEAN jjANY2LIST(leftv res, leftv v, int cnt)
+static BOOLEAN jjANY2LIST(leftv res, leftv v, int cnt)
 {
   // cnt = 0: all
   // cnt = 1: only first one
@@ -8962,7 +8983,7 @@ const char * Tok2Cmdname(int tok)
   //if (tok==PRINT_EXPR) return "print_expr";
   if (tok==IDHDL) return "identifier";
   #ifdef SINGULAR_4_1
-  if (tok==CRING_CMD) return "(c)ring";
+  if (tok==CRING_CMD) return "Ring";
   #endif
   if (tok==QRING_CMD) return "ring";
   if (tok>MAX_TOK) return getBlackboxName(tok);

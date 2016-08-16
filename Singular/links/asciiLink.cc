@@ -294,9 +294,20 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h, char ***list_of_libs)
 
   if (type_id == PACKAGE_CMD)
   {
-    if (strcmp(IDID(h),"Top")==0) return FALSE;
+    if (strcmp(IDID(h),"Top")==0) return FALSE; // do not dump "Top"
     if (IDPACKAGE(h)->language==LANG_SINGULAR) return FALSE;
   }
+#ifdef SINGULAR_4_1
+  if (type_id == CRING_CMD)
+  {
+    // do not dump the default CRINGs:
+    if (strcmp(IDID(h),"QQ")==0) return FALSE;
+    if (strcmp(IDID(h),"ZZ")==0) return FALSE;
+    if (strcmp(IDID(h),"AE")==0) return FALSE;
+    if (strcmp(IDID(h),"QAE")==0) return FALSE;
+    if (strcmp(IDID(h),"flint_poly_Q")==0) return FALSE;
+  }
+#endif
 
   // we do not throw an error if a wrong type was attempted to be dumped
   if (type_str == NULL)

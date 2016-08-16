@@ -71,6 +71,52 @@ typedef enum
 }
 ro_typ;
 
+/// order stuff
+typedef enum rRingOrder_t
+{
+  ringorder_no = 0,
+  ringorder_a,
+  ringorder_a64, ///< for int64 weights
+  ringorder_c,
+  ringorder_C,
+  ringorder_M,
+  ringorder_S, ///< S?
+  ringorder_s, ///< s?
+  ringorder_lp,
+  ringorder_dp,
+  ringorder_rp,
+  ringorder_Dp,
+  ringorder_wp,
+  ringorder_Wp,
+  ringorder_ls,
+  ringorder_ds,
+  ringorder_Ds,
+  ringorder_ws,
+  ringorder_Ws,
+  ringorder_am,
+  ringorder_L,
+  // the following are only used internally
+  ringorder_aa, ///< for idElimination, like a, except pFDeg, pWeigths ignore it
+  ringorder_rs, ///< opposite of ls
+  ringorder_IS, ///< Induced (Schreyer) ordering
+  ringorder_unspec
+} rRingOrder_t;
+
+typedef enum rOrderType_t
+{
+  rOrderType_General = 0, ///< non-simple ordering as specified by currRing
+  rOrderType_CompExp,     ///< simple ordering, component has priority
+  rOrderType_ExpComp,     ///< simple ordering, exponent vector has priority
+                          ///< component not compatible with exp-vector order
+  rOrderType_Exp,         ///< simple ordering, exponent vector has priority
+                          ///< component is compatible with exp-vector order
+  rOrderType_Syz,         ///< syzygy ordering
+  rOrderType_Schreyer,    ///< Schreyer ordering
+  rOrderType_Syz2dpc,     ///< syzcomp2dpc
+  rOrderType_ExpNoComp    ///< simple ordering, differences in component are
+                          ///< not considered
+} rOrderType_t;
+
 // ordering is a degree ordering
 struct sro_dp
 {
@@ -340,7 +386,7 @@ struct ip_sring
 /////// void   rChangeCurrRing(ring r);
 
 ring   rDefault(int ch, int N, char **n);
-ring   rDefault(const coeffs cf, int N, char **n);
+ring   rDefault(const coeffs cf, int N, char **n, const rRingOrder_t o=ringorder_lp);
 ring   rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1, int **wvhdl=NULL);
 ring   rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1, int **wvhdl=NULL);
 
@@ -658,52 +704,6 @@ static inline BOOLEAN rMinpolyIsNULL(const ring r)
 }
 
 
-
-/// order stuff
-typedef enum rRingOrder_t
-{
-  ringorder_no = 0,
-  ringorder_a,
-  ringorder_a64, ///< for int64 weights
-  ringorder_c,
-  ringorder_C,
-  ringorder_M,
-  ringorder_S, ///< S?
-  ringorder_s, ///< s?
-  ringorder_lp,
-  ringorder_dp,
-  ringorder_rp,
-  ringorder_Dp,
-  ringorder_wp,
-  ringorder_Wp,
-  ringorder_ls,
-  ringorder_ds,
-  ringorder_Ds,
-  ringorder_ws,
-  ringorder_Ws,
-  ringorder_am,
-  ringorder_L,
-  // the following are only used internally
-  ringorder_aa, ///< for idElimination, like a, except pFDeg, pWeigths ignore it
-  ringorder_rs, ///< opposite of ls
-  ringorder_IS, ///< Induced (Schreyer) ordering
-  ringorder_unspec
-} rRingOrder_t;
-
-typedef enum rOrderType_t
-{
-  rOrderType_General = 0, ///< non-simple ordering as specified by currRing
-  rOrderType_CompExp,     ///< simple ordering, component has priority
-  rOrderType_ExpComp,     ///< simple ordering, exponent vector has priority
-                          ///< component not compatible with exp-vector order
-  rOrderType_Exp,         ///< simple ordering, exponent vector has priority
-                          ///< component is compatible with exp-vector order
-  rOrderType_Syz,         ///< syzygy ordering
-  rOrderType_Schreyer,    ///< Schreyer ordering
-  rOrderType_Syz2dpc,     ///< syzcomp2dpc
-  rOrderType_ExpNoComp    ///< simple ordering, differences in component are
-                          ///< not considered
-} rOrderType_t;
 
 static inline BOOLEAN rIsSyzIndexRing(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return r->order[0] == ringorder_s;}

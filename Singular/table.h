@@ -824,6 +824,9 @@ const struct sValCmdM dArithM[]=
 // operations:
 // proc            cmd               res        number_of_args   context
  {D(jjKLAMMER_PL),  '(',           ANY_TYPE,           -2      , ALLOW_PLURAL |ALLOW_RING}
+#ifdef SINGULAR_4_1
+,{D(jjRING_PL),   '[',             RING_CMD,           -2      , ALLOW_PLURAL |ALLOW_RING}
+#endif
 ,{D(jjBREAK0),    BREAKPOINT_CMD,  NONE,               0       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBREAK1),    BREAKPOINT_CMD,  NONE,               -2      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(iiBranchTo),  BRANCHTO_CMD,    NONE,               -2      , ALLOW_PLURAL |ALLOW_RING}
@@ -925,9 +928,6 @@ cmdnames cmds[] =
   { "continue",    0, CONTINUE_CMD ,      CONTINUE_CMD},
   { "contract",    0, CONTRACT_CMD ,      CMD_2},
   { "convhull",    0, NEWTONPOLY_CMD,     CMD_1},
-#ifdef SINGULAR_4_1
-  { "cring",       0, CRING_CMD,          ROOT_DECL},
-#endif
   { "dbprint",     0, DBPRINT_CMD ,       CMD_M},
   { "def",         0, DEF_CMD ,           ROOT_DECL},
   { "defined",     0, DEFINED_CMD ,       CMD_1},
@@ -1013,6 +1013,9 @@ cmdnames cmds[] =
   { "lusolve",     0, LUS_CMD ,           CMD_M},
   { "map",         0, MAP_CMD ,           RING_DECL},
   { "matrix",      0, MATRIX_CMD ,        MATRIX_CMD},
+#ifdef SINGULAR_4_1
+  { "Matrix",     0, CMATRIX_CMD ,       ROOT_DECL_LIST},
+#endif
   { "maxideal",    0, MAXID_CMD ,         CMD_1},
   { "memory",      0, MEMORY_CMD ,        CMD_1},
   { "minbase",     0, MINBASE_CMD ,       CMD_1},
@@ -1048,6 +1051,9 @@ cmdnames cmds[] =
   #endif
   { "nrows",       0, ROWS_CMD ,          CMD_1},
   { "number",      0, NUMBER_CMD ,        RING_DECL},
+#ifdef SINGULAR_4_1
+  { "Number",     0, CNUMBER_CMD ,       ROOT_DECL_LIST},
+#endif
   { "numerator",   0, NUMERATOR_CMD ,     CMD_1},
   { "nvars",       0, NVARS_CMD ,         CMD_1},
   { "open",        0, OPEN_CMD ,          CMD_1},
@@ -1088,6 +1094,9 @@ cmdnames cmds[] =
   { "return",      0, RETURN ,            RETURN},
   { "RETURN",      0, END_GRAMMAR ,       RETURN},
   { "ring",        0, RING_CMD ,          RING_CMD},
+#ifdef SINGULAR_4_1
+  { "Ring",        0, CRING_CMD,          ROOT_DECL},
+#endif
   { "ringlist",    0, RINGLIST_CMD ,      CMD_1},
   #ifdef SINGULAR_4_1
   { "ring_list",   0, RING_LIST_CMD ,     CMD_1},
