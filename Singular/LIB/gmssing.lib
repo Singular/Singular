@@ -138,7 +138,7 @@ EXAMPLE:  example gmsring; shows examples
 "
 {
   def @R=basering;
-  if(charstr(@R)!="0")
+  if((charstr(@R)!="0")&&(charstr(@R)!="QQ"))
   {
     ERROR("characteristic 0 expected");
   }

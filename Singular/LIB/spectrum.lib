@@ -29,7 +29,7 @@ KEYWORDS: singularities; Gauss-Manin connection; spectrum
 EXAMPLE:  example spectrumnd; shows an example
 "
 {
-  if(charstr(basering)!="0")
+  if((charstr(basering)!="0")&&(charstr(basering)!="QQ"))
   {
     ERROR("characteristic 0 expected");
   }

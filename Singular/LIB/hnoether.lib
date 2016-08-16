@@ -49,6 +49,7 @@ KEYWORDS: Hamburger-Noether expansion; Puiseux expansion; curve singularities
 LIB "primitiv.lib";
 LIB "inout.lib";
 LIB "sing.lib";
+LIB "ring.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -364,13 +365,9 @@ EXAMPLE: example allsquarefree;  shows an example
  def altring = basering;
  string mipl="0";
  if (size(parstr(altring))==1) { mipl=string(minpoly); }
- if ((char(basering)!=0) and (charstr(basering)!=string(char(basering)))) {
-   string tststr=charstr(basering);
-   tststr=tststr[1..find(tststr,",")-1];           //-> "p^k" bzw. "p"
-   if (tststr!=string(char(basering))) {
-     " Sorry -- not implemented for this ring (gcd doesn't work)";
-     return(l);
-   }
+ if (hasGFCoefficient(basering))
+ {
+   ERROR(" Sorry -- not implemented for this ring (gcd doesn't work)");
  }
  execute("ring rsqrf = ("+charstr(altring)+"),(x,y),dp;");
  if (mipl!="0") { execute("minpoly="+mipl+";"); }
@@ -906,6 +903,7 @@ example
   // (the term -t^109 in y may have a wrong coefficient)
   displayHNE(Hne);
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //               procedures to extract information out of HNE                //

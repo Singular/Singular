@@ -1416,8 +1416,8 @@ BOOLEAN iiExport (leftv v, int toLev)
 BOOLEAN iiExport (leftv v, int toLev, package pack)
 {
 #ifdef SINGULAR_4_1
-  if ((pack==basePack)&&(pack!=currPack))
-  { Warn("'exportto' to Top is depreciated in >>%s<<",my_yylinebuf);}
+//  if ((pack==basePack)&&(pack!=currPack))
+//  { Warn("'exportto' to Top is depreciated in >>%s<<",my_yylinebuf);}
 #endif
   BOOLEAN nok=FALSE;
   leftv rv=v;
