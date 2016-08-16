@@ -138,7 +138,7 @@ std(i);
 facstd(i);
 
 
-ring r= 23003,(t,u,w,x,y,z),lp;
+ring r= 32003,(t,u,w,x,y,z),lp;
 ideal i=
 2x2+2y2+2z2+2t2+u2-u,
 xy+2yz+2zt+2tu-t,
