@@ -13,6 +13,7 @@
 
 #define OLD 1
 #if OLD
+#include <stddef.h>
 #include "gmp.h"
 
 namespace gfan{
