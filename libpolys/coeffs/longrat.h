@@ -113,6 +113,8 @@ static FORCE_INLINE BOOLEAN nlIsInteger(number q, const coeffs r)
 number nlModP(number q, const coeffs Q, const coeffs Zp);
 void   nlNormalize(number &x, const coeffs r);
 void   nlInpGcd(number &a, number b, const coeffs r);
+void   nlDelete(number *a, const coeffs r);  /*for SAGE,, better: n_Delete */
+
 
 
 /// create a rational i/j (implicitly) over Q
