@@ -304,6 +304,7 @@ Non-reserved attributes may be used, however, in procedures and can
 considerably speed up computations.
 @sp 1
 @item @strong{Reserved attributes:}
+@cindex cf_class
 @cindex global
 @cindex isSB
 @cindex isHomg
@@ -318,26 +319,28 @@ considerably speed up computations.
 @cindex withRes
 @cindex withDim
 @cindex withMult
-(isSB, isHomog, rank, ring_cf, rowShift are used by the kernel, the other are used by libraries)
+(cf_class, global, isSB, isHomog, rank, ring_cf, rowShift are used by the kernel, the other are used by libraries)
 @table @code
-@item global
+@item cf_class (for ring)
+the internal type of the coefficients (see @code{n_coeffType})
+@item global (for ring)
 1, if the ordering is global
-@item isSB
+@item isSB (for ideal, module)
 the standard basis property is set by all commands computing a standard
 basis like
 @code{groebner}, @code{std}, @code{stdhilb} etc.; used by @code{lift}, @code{dim},
 @code{degree}, @code{mult}, @code{hilb}, @code{vdim}, @code{kbase}
-@item isHomog
+@item isHomog (for ideal, module)
 the weight vector for homogeneous or quasihomogeneous ideals/modules
 @item isCI
 complete intersection property
 @item isCM
 Cohen-Macaulay property
-@item maxExp
+@item maxExp (for ring)
 limit for each exponent (32767 by default)
-@item rank
+@item rank (for module)
 set/get the rank of a module (see @ref{nrows})
-@item ring_cf
+@item ring_cf (for ring)
 the coefficients of the polynomial ring are considered to be a ring
 @item withSB
 value of type ideal, resp.@: module, is std

@@ -25,13 +25,13 @@ PROCEDURES:
  optionIsSet(opt)         check if as a string given option is set or not.
  hasFieldCoefficient      check if the coefficient ring is considered a field
  hasGFCoefficient         check if the coefficient ring is GF(p,k)
- hasAlgECoefficient       check if the coefficient ring is an algebaric extension
  hasNumericCoeffs(rng)    check for use of floating point numbers
  hasCommutativeVars(rng)  non-commutive or commnuative polynomial ring
  hasGlobalOrdering(rng)   global versus mixed/local monomial ordering
  hasMixedOrdering()       mixed versus global/local ordering
  hasFieldCoefficient(rng) coefficients are a field
  hasAlgExtensionCoefficient(r) coefficients are an algebraic extension
+ hasTransExtensionCoefficient(r) coefficients are rational functions
  isQuotientRing(rng)      ring is a qotient ring
  isSubModule(I,J)         check if I is in J as submodule
 
@@ -1021,16 +1021,12 @@ example
 
 proc hasAlgExtensionCoefficient(def rng )
 "USAGE: hasAlgExtensionCoefficient ( rng );
-RETURN:  1 if the coeffcients are an gelebrai extension, 0 otherwise.
+RETURN:  1 if the coeffcients are an algebraic extension, 0 otherwise.
 KEYWORDS: ring coefficients
 EXAMPLE: example hasAlgExtensionCoefficient; shows an example
 "
 {
-  def savering=basering;
-  setring rng;
-  int r=(string(minpoly)!="0");
-  setring savering;
-  return(r);
+  return(attrib(rng,"cf_class")==7);
 }
 example
 {
@@ -1039,6 +1035,28 @@ example
   hasAlgExtensionCoefficient(rng); //no
   ring rng2 = (0,a), x, dp; minpoly=a2-1;
   hasAlgExtensionCoefficient(rng2);  // yes
+  ring rng3=(49,a),x,dp;
+  hasAlgExtensionCoefficient(rng3);  // no
+}
+
+proc hasTransExtensionCoefficient(def rng )
+"USAGE: hasTransExtensionCoefficient ( rng );
+RETURN:  1 if the coeffcients are rational functions, 0 otherwise.
+KEYWORDS: ring coefficients
+EXAMPLE: example hasTransExtensionCoefficient; shows an example
+"
+{
+  return(attrib(rng,"cf_class")==8);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring rng = integer,x,dp;
+  hasTransExtensionCoefficient(rng); //no
+  ring rng2 = (0,a), x, dp;
+  hasTransExtensionCoefficient(rng2);  // yes
+  ring rng3=(49,a),x,dp;
+  hasTransExtensionCoefficient(rng3);  // no
 }
 
 proc hasGFCoefficient(def rng )
@@ -1048,11 +1066,12 @@ KEYWORDS: ring coefficients
 EXAMPLE: example hasGFCoefficient; shows an example
 "
 {
-  return((charstr(rng)!=string(char(rng))) &&
-  (npars(rng)==1) &&
-  (find(charstr(rng),string(char(rng)))!=1) &&
-  (charstr(basering)<>"real")&&
-  (charstr(basering)<>"complex") );
+  //return((charstr(rng)!=string(char(rng))) &&
+  //(npars(rng)==1) &&
+  //(find(charstr(rng),string(char(rng)))!=1) &&
+  //(charstr(basering)<>"real")&&
+  //(charstr(basering)<>"complex") );
+  return(attrib(rng,"cf_class")==4);
 }
 example
 {
@@ -1145,28 +1164,6 @@ EXAMPLE: example hasMixedOrdering(); shows an example
    }
    if((p > 0) && (m > 0)) { return(1); }
    return(0);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring R1 = 0,(x,y,z),dp;
-   hasMixedOrdering();
-   ring R2 = 31,(x(1..4),y(1..3)),(ds(4),lp(3));
-   hasMixedOrdering();
-   ring R3 = 181,x(1..9),(dp(5),lp(4));
-   hasMixedOrdering();
-}
-
-proc hasAlgECoefficient(def rng)
-"USAGE:  hasAlgECoefficient(rng);
-RETURN:  1 if the coefficient filed is an algebraic extension
-EXAMPLE: example hasAlgECoefficient(); shows an example
-"
-{
-  return((charstr(rng)!=string(char(rng))) &&
-  (npars(rng)==1) &&
-  (find(charstr(rng),string(char(rng)))==1) &&
-  (charstr(basering)<>"real")&&
-  (charstr(basering)<>"complex") );
 }
 example
 { "EXAMPLE:"; echo = 2;

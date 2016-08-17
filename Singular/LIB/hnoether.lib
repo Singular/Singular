@@ -539,16 +539,15 @@ EXAMPLES: example develop;         shows an example
                      // denn : map from characteristic -1 to -1 not implemented
   return(return_error);
  }
- if ((char(basering)!=0) and (charstr(basering)!=string(char(basering)))) {
+ if (((char(basering)!=0)
+   and ((hasAlgExtensionCoefficient(basering)
+     ||(hasTransExtensionCoefficient(basering)))))
+ || (npars(basering)>1))
+ {
  //-- teste, ob char = (p^k,a) (-> a primitiv; erlaubt) oder (p,a[,b,...]) ----
-    string tststr=charstr(basering);
-    tststr=tststr[1..find(tststr,",")-1];           //-> "p^k" bzw. "p"
-    int primit=(tststr==string(char(basering)));
-    if (primit!=0) {
       " Such extensions of Z/p are not implemented.";
       " Please try (p^k,a) as ground field or use `hnexpansion'.";
       return(return_error);
-    }
  }
  //---- Ende der unzulaessigen Ringe; Ringwechsel in einen guenstigen Ring: ---
 

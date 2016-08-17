@@ -40,10 +40,10 @@ enum n_coeffType
                   the top-most extension in an extension tower
                   is transcendental */
   n_long_C, /**< complex floating point (GMP) numbers */
-  n_Z, /**< only used if HAVE_RINGS is defined: ? */
-  n_Zn, /**< only used if HAVE_RINGS is defined: ? */
-  n_Znm, /**< only used if HAVE_RINGS is defined: ? */
-  n_Z2m, /**< only used if HAVE_RINGS is defined: ? */
+  n_Z, /**< only used if HAVE_RINGS is defined  */
+  n_Zn, /**< only used if HAVE_RINGS is defined */
+  n_Znm, /**< only used if HAVE_RINGS is defined */
+  n_Z2m, /**< only used if HAVE_RINGS is defined */
   n_CF /**< ? */
 };
 
