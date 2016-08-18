@@ -324,7 +324,7 @@ EXAMPLE:  example graalMixed; shows an example
   /***
    * store ring A and ideal L
    **/
-  Gr.A = qring(basering); Gr.L = L;
+  Gr.A = basering; Gr.L = L;
   int s = size(L); Gr.s = s;
 
   /***
@@ -441,14 +441,14 @@ EXAMPLE:  example graalMixed; shows an example
   ideal scriptIin = Q0yToKy(inI);
   ASSUME(2,isStandardBasis(scriptIin));
   scriptIin = std(scriptIin);
-  Gr.Ky = qring(Ky);
+  Gr.Ky = Ky;
   Gr.scriptIin = scriptIin;
 
   /***
    * construct Graal
    **/
   qring Graal = scriptIin;
-  Gr.Graal = qring(Graal);
+  Gr.Graal = Graal;
   map in_a = Al,imap(Ky,G);
   Gr.ina = in_a;
 
