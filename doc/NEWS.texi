@@ -46,7 +46,7 @@ Changes in the kernel:
 
 Experimental stuff:
 @itemize
-@item module @nref{customstd_so}: modify @code{std} (@nref{satstd))
+@item module @nref{customstd_so}: modify @code{std} (@nref{satstd})
 @end itemize
 
 @heading News for version 4-0-3
