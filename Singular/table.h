@@ -214,7 +214,6 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjPRUNE),      PRUNE_CMD,       MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(kQHWeight),    QHWEIGHT_CMD,    INTVEC_CMD,     IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(kQHWeight),    QHWEIGHT_CMD,    INTVEC_CMD,     MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDUMMY),      QRING_CMD,       QRING_CMD,      RING_CMD       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjRANK1),      RANK_CMD,        INT_CMD,        MATRIX_CMD    , ALLOW_PLURAL |NO_RING}
 ,{D(jjREAD),       READ_CMD,        STRING_CMD,     LINK_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjREGULARITY), REGULARITY_CMD,  INT_CMD,        LIST_CMD      , NO_PLURAL |ALLOW_RING}
@@ -1252,8 +1251,6 @@ const struct sConvertTypes dConvertTypes[] =
    { RESOLUTION_CMD,  LIST_CMD,       NULL_VAL , D(iiR2L_l) },
 // list -> resolution
    { LIST_CMD,        RESOLUTION_CMD, NULL_VAL ,  D(iiL2R) },
-// qring -> ring
-   { QRING_CMD,       RING_CMD,       D(iiDummy), NULL_VAL},
 //  end of list
    { 0,               0,              NULL_VAL , NULL_VAL }
 };
@@ -1278,9 +1275,7 @@ const struct sValAssign dAssign[]=
 ,{D(jiA_POLY),     POLY_CMD,       POLY_CMD }
 ,{D(jiA_1x1MATRIX),POLY_CMD,       MATRIX_CMD }
 ,{D(jiA_RING),     RING_CMD,       RING_CMD }
-,{D(jiA_QRING),    QRING_CMD,      IDEAL_CMD }
-,{D(jiA_RING),     QRING_CMD,      QRING_CMD }
-,{D(jiA_RING),     QRING_CMD,      RING_CMD }
+,{D(jiA_QRING),    RING_CMD,       IDEAL_CMD }
 ,{D(jiA_STRING),   STRING_CMD,     STRING_CMD }
 ,{D(jiA_PROC),     PROC_CMD,       STRING_CMD }
 ,{D(jiA_PROC),     PROC_CMD,       PROC_CMD }

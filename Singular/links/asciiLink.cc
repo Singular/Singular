@@ -314,7 +314,7 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h, char ***list_of_libs)
     return FALSE;
 
   // handle qrings separately
-  if (type_id == QRING_CMD)
+  if ((type_id == RING_CMD)&&(IDRING(h)->qideal!=NULL))
     return DumpQring(fd, h, type_str);
 
   // C-proc not to be dumped

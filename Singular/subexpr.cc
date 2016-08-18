@@ -910,7 +910,8 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           if (typed)
           {
             char* ns;
-            if (t/*Typ()*/ == QRING_CMD)
+            ring r=(ring)d;
+            if (r->qideal!=NULL)
             {
               char* id = iiStringMatrix((matrix) ((ring) d)->qideal, dim,
                               currRing);

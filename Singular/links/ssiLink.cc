@@ -1260,10 +1260,7 @@ leftv ssiRead1(si_link l)
              d->r=ssiReadRing(d);
              if (d->r==NULL) return NULL;
              res->data=(char*)d->r;
-             if (d->r->qideal==NULL)
-               res->rtyp=RING_CMD;
-             else
-               res->rtyp=QRING_CMD;
+             res->rtyp=RING_CMD;
              // we are in the top-level, so set the basering to d->r:
              if (d->r!=NULL)
              {

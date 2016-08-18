@@ -13,6 +13,7 @@
 
 //#include <Singular/ipid.h>
 
+#include <kernel/mod2.h>
 #include <Singular/grammar.h>
 #include <Singular/tok.h>
 #include <Singular/attrib.h>

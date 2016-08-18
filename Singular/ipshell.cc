@@ -1141,6 +1141,8 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
   }
   else
   {
+    if (t==QRING_CMD) t=RING_CMD; // qring is always RING_CMD
+
     if (TEST_V_ALLWARN
     && (name->rtyp!=0)
     && (name->rtyp!=IDHDL)
