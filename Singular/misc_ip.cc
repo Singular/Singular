@@ -969,8 +969,7 @@ void listall(int showproc)
           else PrintS("   ");
           Print("::%s, typ %s level %d data %lx",
                  IDID(hh),Tok2Cmdname(IDTYP(hh)),IDLEV(hh),(long)IDDATA(hh));
-          if ((IDTYP(hh)==RING_CMD)
-          || (IDTYP(hh)==QRING_CMD))
+          if (IDTYP(hh)==RING_CMD)
             Print(" ref: %d\n",IDRING(hh)->ref);
           else
             PrintLn();
@@ -985,7 +984,6 @@ void listall(int showproc)
           IDID(hh),Tok2Cmdname(IDTYP(hh)),IDLEV(hh),(long)IDDATA(hh));
         else
         if ((IDTYP(hh)==RING_CMD)
-        || (IDTYP(hh)==QRING_CMD)
         || (IDTYP(hh)==PACKAGE_CMD))
         {
           Print("====== %s ==============\n",IDID(hh));
@@ -995,7 +993,7 @@ void listall(int showproc)
             if (showproc || (IDTYP(h2)!=PROC_CMD))
             {
               if ((IDDATA(h2)==(void *)currRing)
-              && ((IDTYP(h2)==RING_CMD)||(IDTYP(h2)==QRING_CMD)))
+              && (IDTYP(h2)==RING_CMD))
                 PrintS("(R)");
               else if (IDDATA(h2)==(void *)currPack) PrintS("(P)");
               else PrintS("   ");

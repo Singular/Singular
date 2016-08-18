@@ -61,8 +61,7 @@ void debug_list(leftv v)
   while (r!=NULL)
   {
     if ((IDTYP(r)==PACKAGE_CMD)
-    || (IDTYP(r)==RING_CMD)
-    || (IDTYP(r)==QRING_CMD))
+    || (IDTYP(r)==RING_CMD))
     {
       h=IDPACKAGE(r)->idroot->get(nn,myynest);
       if (h!=NULL)
@@ -1357,7 +1356,7 @@ setringcmd:
             if (($1==KEEPRING_CMD) && (myynest==0))
                MYYERROR("only inside a proc allowed");
             const char * n=$2.Name();
-            if ((($2.Typ()==RING_CMD)||($2.Typ()==QRING_CMD))
+            if (($2.Typ()==RING_CMD)
             && ($2.rtyp==IDHDL))
             {
               idhdl h=(idhdl)$2.data;

@@ -1099,7 +1099,6 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
   {
     if (TEST_V_ALLWARN
     && (rt!=RING_CMD)
-    && (rt!=QRING_CMD)
     && (l->name!=NULL)
     && (l->e==NULL)
     && (iiCurrArgs==NULL) /* not in proc header */
@@ -1132,7 +1131,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
   leftv ld=l;
   if (l->rtyp==IDHDL)
   {
-    if ((lt!=QRING_CMD)&&(lt!=RING_CMD))
+    if (lt!=RING_CMD)
       ld=(leftv)l->data;
   }
   else if (toplevel)
@@ -1408,7 +1407,7 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
       //listall();
       goto err;
     }
-    //if ((rt==RING_CMD)||(rt==QRING_CMD))
+    //if (rt==RING_CMD)
     //{
     //  L->m[i].rtyp=rt;
     //  L->m[i].data=h->Data();
@@ -1970,7 +1969,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
     case MAP_CMD:
     {
       // first element in the list sl (r) must be a ring
-      if (((rt == RING_CMD)||(rt == QRING_CMD))&&(r->e==NULL))
+      if ((rt == RING_CMD)&&(r->e==NULL))
       {
         omFree((ADDRESS)IDMAP((idhdl)l->data)->preimage);
         IDMAP((idhdl)l->data)->preimage = omStrDup (r->Fullname());

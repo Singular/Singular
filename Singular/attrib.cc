@@ -158,7 +158,6 @@ void atSet(idhdl root,const char * name,void * data,int typ)
   if (root!=NULL)
   {
     if ((IDTYP(root)!=RING_CMD)
-    && (IDTYP(root)!=QRING_CMD)
     && (!RingDependend(IDTYP(root)))&&(RingDependend(typ)))
       WerrorS("cannot set ring-dependend objects at this type");
     else
@@ -175,7 +174,6 @@ void atSet(leftv root,const char * name,void * data,int typ)
     if (a==NULL)
       WerrorS("cannot set attributes of this object");
     else if ((rt!=RING_CMD)
-    && (rt!=QRING_CMD)
     && (!RingDependend(rt))&&(RingDependend(typ)))
       WerrorS("cannot set ring-dependend objects at this type");
     else
@@ -240,7 +238,6 @@ void at_KillAll(leftv root, const ring r)
 
 BOOLEAN atATTRIB1(leftv res,leftv v)
 {
-  int t;
   attr *aa=(v->Attribute());
   if (aa==NULL)
   {
@@ -261,7 +258,7 @@ BOOLEAN atATTRIB1(leftv res,leftv v)
       PrintS("attr:qringNF, type int\n");
       haveNoAttribute=FALSE;
     }
-    if (((t=v->Typ())==RING_CMD)||(t==QRING_CMD))
+    if (v->Typ()==RING_CMD)
     {
       PrintS("attr:cf_class, type int\n");
       PrintS("attr:global, type int\n");
@@ -286,7 +283,7 @@ BOOLEAN atATTRIB1(leftv res,leftv v)
 BOOLEAN atATTRIB2(leftv res,leftv v,leftv b)
 {
   char *name=(char *)b->Data();
-  int t;
+  int t=v->Typ();
   leftv at=NULL;
   if (v->e!=NULL)
     at=v->LData();
@@ -296,31 +293,31 @@ BOOLEAN atATTRIB2(leftv res,leftv v,leftv b)
     res->data=(void *)(long)hasFlag(v,FLAG_STD);
     if (at!=NULL) res->data=(void *)(long)(hasFlag(v,FLAG_STD)||(hasFlag(at,FLAG_STD)));
   }
-  else if ((strcmp(name,"rank")==0)&&(v->Typ()==MODUL_CMD))
+  else if ((strcmp(name,"rank")==0)&&(/*v->Typ()*/t==MODUL_CMD))
   {
     res->rtyp=INT_CMD;
     res->data=(void *)(((ideal)v->Data())->rank);
   }
   else if ((strcmp(name,"global")==0)
-  &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))
+  &&(/*v->Typ()*/t==RING_CMD))
   {
     res->rtyp=INT_CMD;
     res->data=(void *)(((ring)v->Data())->OrdSgn==1);
   }
   else if ((strcmp(name,"maxExp")==0)
-  &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))
+  &&(/*v->Typ()*/t==RING_CMD))
   {
     res->rtyp=INT_CMD;
     res->data=(void *)(long)(((ring)v->Data())->bitmask/2);
   }
   else if ((strcmp(name,"ring_cf")==0)
-  &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))
+  &&(/*v->Typ()*/t==RING_CMD))
   {
     res->rtyp=INT_CMD;
     res->data=(void *)(long)(rField_is_Ring((ring)v->Data()));
   }
   else if ((strcmp(name,"cf_class")==0)
-  &&(((t=v->Typ())==RING_CMD)||(t==CRING_CMD)))
+  &&(/*v->Typ()*/t==RING_CMD))
   {
     res->rtyp=INT_CMD;
     coeffs cf;
@@ -336,7 +333,7 @@ BOOLEAN atATTRIB2(leftv res,leftv v,leftv b)
   }
 #ifdef HAVE_SHIFTBBA
   else if ((strcmp(name,"isLPring")==0)
-  &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))
+  &&(/*v->Typ()*/t==RING_CMD))
   {
     res->rtyp=INT_CMD;
     res->data=(void *)(long)(((ring)v->Data())->isLPring);
@@ -368,7 +365,6 @@ BOOLEAN atATTRIB2(leftv res,leftv v,leftv b)
 BOOLEAN atATTRIB3(leftv /*res*/,leftv v,leftv b,leftv c)
 {
   idhdl h=(idhdl)v->data;
-  int t;
   if (v->e!=NULL)
   {
     v=v->LData();
@@ -376,6 +372,7 @@ BOOLEAN atATTRIB3(leftv /*res*/,leftv v,leftv b,leftv c)
     h=NULL;
   }
   else if (v->rtyp!=IDHDL) h=NULL;
+  int t=v->Typ();
 
   char *name=(char *)b->Data();
   if (strcmp(name,"isSB")==0)
@@ -414,7 +411,7 @@ BOOLEAN atATTRIB3(leftv /*res*/,leftv v,leftv b,leftv c)
       resetFlag(v,FLAG_QRING);
     }
   }
-  else if ((strcmp(name,"rank")==0)&&(v->Typ()==MODUL_CMD))
+  else if ((strcmp(name,"rank")==0)&&(/*v->Typ()*/t==MODUL_CMD))
   {
     if (c->Typ()!=INT_CMD)
     {
@@ -429,14 +426,14 @@ BOOLEAN atATTRIB3(leftv /*res*/,leftv v,leftv b,leftv c)
     || (strcmp(name,"cf_class")==0)
     || (strcmp(name,"ring_cf")==0)
     || (strcmp(name,"maxExp")==0))
-  &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))
+  &&(/*v->Typ()*/t==RING_CMD))
   {
     Werror("can not set attribute `%s`",name);
     return TRUE;
   }
 #ifdef HAVE_SHIFTBBA
   else if ((strcmp(name,"isLPring")==0)
-  &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))
+  &&(/*v->Typ()*/t==RING_CMD))
   {
     if (c->Typ()==INT_CMD)
       ((ring)v->Data())->isLPring=(int)(long)c->Data();

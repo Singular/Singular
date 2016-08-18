@@ -5,9 +5,6 @@
 * ABSTRACT: interpreter: printing
 */
 
-
-
-
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
 
@@ -295,7 +292,6 @@ BOOLEAN jjPRINT(leftv res, leftv u)
         break;
 
       case RING_CMD:
-      case QRING_CMD:
         bo=ipPrint_RING(u);
         break;
 

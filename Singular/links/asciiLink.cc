@@ -247,12 +247,12 @@ static BOOLEAN DumpAscii(FILE *fd, idhdl h, char ***list_of_libs)
 
   // need to set the ring before writing it, otherwise we get in
   // trouble with minpoly
-  if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
+  if (IDTYP(h) == RING_CMD)
     rSetHdl(h);
 
   if (DumpAsciiIdhdl(fd, h,list_of_libs)) return TRUE;
 
-  if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
+  if (IDTYP(h) == RING_CMD)
     return DumpAscii(fd, IDRING(h)->idroot,list_of_libs);
   else
     return FALSE;
@@ -263,7 +263,7 @@ static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl)
   if (h == NULL) return FALSE;
   if (DumpAsciiMaps(fd, IDNEXT(h), rhdl)) return TRUE;
 
-  if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
+  if (IDTYP(h) == RING_CMD)
     return DumpAsciiMaps(fd, IDRING(h)->idroot, h);
   else if (IDTYP(h) == MAP_CMD)
   {
@@ -523,7 +523,7 @@ static int DumpRhs(FILE *fd, idhdl h)
     if (fprintf(fd, "%s", rhs) == EOF) return EOF;
     omFree(rhs);
 
-    if ((type_id == RING_CMD || type_id == QRING_CMD) &&
+    if ((type_id == RING_CMD) &&
         IDRING(h)->cf->type==n_algExt)
     {
       StringSetS("");

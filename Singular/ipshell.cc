@@ -214,7 +214,6 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                    }
     case LIST_CMD: Print(", size: %d",IDLIST(h)->nr+1);
                    break;
-    case QRING_CMD:
     case RING_CMD:
                    if ((IDRING(h)==currRing) && (currRingHdl!=h))
                      PrintS("(*)"); /* this is an alias to currRing */
@@ -266,8 +265,7 @@ void type_cmd(leftv v)
 
     case PROC_CMD:
     case RING_CMD:
-    case IDEAL_CMD:
-    case QRING_CMD: PrintLn(); break;
+    case IDEAL_CMD: PrintLn(); break;
 
     //case INT_CMD:
     //case STRING_CMD:
@@ -338,8 +336,7 @@ void killlocals_rec(idhdl *root,int v, ring r)
         killlocals_rec(&(IDRING(h)->idroot),v,r);
       h=IDNEXT(h);
     }
-    else if ((IDTYP(h)==RING_CMD)
-    ||(IDTYP(h)==QRING_CMD))
+    else if (IDTYP(h)==RING_CMD)
     {
       if ((IDRING(h)!=NULL) && (IDRING(h)->idroot!=NULL))
       // we have to test IDRING(h)!=NULL: qring Q=groebner(...): killlocals
@@ -365,7 +362,7 @@ BOOLEAN killlocals_list(int v, lists L)
   {
     leftv h=&(L->m[n]);
     void *d=h->data;
-    if (((h->rtyp==RING_CMD) || (h->rtyp==QRING_CMD))
+    if ((h->rtyp==RING_CMD)
     && (((ring)d)->idroot!=NULL))
     {
       if (d!=currRing) {changed=TRUE;rChangeCurrRing((ring)d);}
@@ -389,8 +386,7 @@ void killlocals(int v)
   if (iiRETURNEXPR_len > myynest)
   {
     int t=iiRETURNEXPR.Typ();
-    if ((/*iiRETURNEXPR.Typ()*/ t==RING_CMD)
-    || (/*iiRETURNEXPR.Typ()*/ t==QRING_CMD))
+    if (/*iiRETURNEXPR.Typ()*/ t==RING_CMD)
     {
       leftv h=&iiRETURNEXPR;
       if (((ring)h->data)->idroot!=NULL)
@@ -440,7 +436,6 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
         if (iterate) list1(prefix,h,TRUE,fullname);
         if (IDTYP(h)==ALIAS_CMD) PrintS("A");
         if ((IDTYP(h)==RING_CMD)
-            || (IDTYP(h)==QRING_CMD)
             //|| (IDTYP(h)==PACKE_CMD)
         )
         {
@@ -487,13 +482,11 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
     || (typ == IDTYP(h))
     #ifdef SINGULAR_4_1
     || ((IDTYP(h)==CRING_CMD) && (typ==RING_CMD))
-    #else
-    || ((IDTYP(h)==QRING_CMD) && (typ==RING_CMD))
     #endif
     )
     {
       list1(prefix,h,start==currRingHdl, fullname);
-      if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
+      if ((IDTYP(h)==RING_CMD)
         && (really_all || (all && (h==currRingHdl)))
         && ((IDLEV(h)==0)||(IDLEV(h)==myynest)))
       {
@@ -622,14 +615,14 @@ leftv iiMap(map theMap, const char * what)
 
   r=IDROOT->get(theMap->preimage,myynest);
   if ((currPack!=basePack)
-  &&((r==NULL) || ((r->typ != RING_CMD) && (r->typ != QRING_CMD))))
+  &&((r==NULL) || ((r->typ != RING_CMD) )))
     r=basePack->idroot->get(theMap->preimage,myynest);
   if ((r==NULL) && (currRingHdl!=NULL)
   && (strcmp(theMap->preimage,IDID(currRingHdl))==0))
   {
     r=currRingHdl;
   }
-  if ((r!=NULL) && ((r->typ == RING_CMD) || (r->typ== QRING_CMD)))
+  if ((r!=NULL) && (r->typ == RING_CMD))
   {
     ring src_ring=IDRING(r);
     if ((nMap=n_SetMap(src_ring->cf, currRing->cf))==NULL)
@@ -1313,7 +1306,7 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
     {
       if (IDTYP(h)==v->Typ())
       {
-        if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
+        if ((IDTYP(h)==RING_CMD)
         && (v->Data()==IDDATA(h)))
         {
           IDRING(h)->ref++;
@@ -5775,13 +5768,13 @@ ring rInit(leftv pn, leftv rv, leftv ord)
     extParam.r = (ring)pn->Data();
     cf = nInitChar(n_transExt, &extParam);
   }
-  else if ((pn->Typ()==QRING_CMD) && (P == 1)) // same for qrings - which should be fields!?
-  {
-    AlgExtInfo extParam;
-    extParam.r = (ring)pn->Data();
+  //else if ((pn->Typ()==QRING_CMD) && (P == 1)) // same for qrings - which should be fields!?
+  //{
+  //  AlgExtInfo extParam;
+  //  extParam.r = (ring)pn->Data();
 
-    cf = nInitChar(n_algExt, &extParam);   // Q[a]/<minideal>
-  }
+  //  cf = nInitChar(n_algExt, &extParam);   // Q[a]/<minideal>
+  //}
   else
   {
     WerrorS("Wrong or unknown ground field specification");
@@ -6130,7 +6123,7 @@ idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n)
   idhdl h=root;
   while (h!=NULL)
   {
-    if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
+    if ((IDTYP(h)==RING_CMD)
     && (h!=n)
     && (IDRING(h)==r)
     )
@@ -6408,9 +6401,9 @@ BOOLEAN iiARROW(leftv r, char* a, char *s)
 
 BOOLEAN iiAssignCR(leftv r, leftv arg)
 {
-  int t=arg->Typ();
   char* ring_name=omStrDup((char*)r->Name());
-  if ((t==RING_CMD) ||(t==QRING_CMD))
+  int t=arg->Typ();
+  if (t==RING_CMD)
   {
     sleftv tmp;
     memset(&tmp,0,sizeof(tmp));

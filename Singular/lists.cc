@@ -202,8 +202,7 @@ BOOLEAN lRingDependend(lists L)
   int i=0;
   while (i<=L->nr)
   {
-    if ((L->m[i].rtyp!=QRING_CMD)
-    && (BEGIN_RING<L->m[i].rtyp)
+    if ((BEGIN_RING<L->m[i].rtyp)
     && (L->m[i].rtyp<END_RING))
       return TRUE;
     if ((L->m[i].rtyp==LIST_CMD)&&lRingDependend((lists)L->m[i].data))

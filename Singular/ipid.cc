@@ -372,7 +372,7 @@ void killid(const char * id, idhdl * ih)
 void killhdl(idhdl h, package proot)
 {
   int t=IDTYP(h);
-  if (((BEGIN_RING<t) && (t<END_RING) && (t!=QRING_CMD))
+  if (((BEGIN_RING<t) && (t<END_RING))
   || ((t==LIST_CMD) && (lRingDependend((lists)IDDATA(h)))))
     killhdl2(h,&currRing->idroot,currRing);
   else
@@ -449,7 +449,7 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
     if (currPackHdl==h) currPackHdl=packFindHdl(currPack);
     iiCheckPack(currPack);
   }
-  else if ((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
+  else if (IDTYP(h)==RING_CMD)
     rKill(h);
   else if (IDDATA(h)!=NULL)
     s_internalDelete(IDTYP(h),IDDATA(h),r);
@@ -605,7 +605,7 @@ void  ipMoveId(idhdl tomove)
 {
   if ((currRing!=NULL)&&(tomove!=NULL))
   {
-    if (((QRING_CMD!=IDTYP(tomove)) && RingDependend(IDTYP(tomove)))
+    if (RingDependend(IDTYP(tomove))
     || ((IDTYP(tomove)==LIST_CMD) && (lRingDependend(IDLIST(tomove)))))
     {
       /*move 'tomove' to ring id's*/

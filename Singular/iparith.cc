@@ -5177,19 +5177,7 @@ static BOOLEAN jjENVELOPE(leftv res, leftv a)
   ring    r = (ring)a->Data();
   if (rIsPluralRing(r))
   {
-    //    ideal   i;
-//     if (a->rtyp == QRING_CMD)
-//     {
-//       i = r->qideal;
-//       r->qideal = NULL;
-//     }
     ring s = rEnvelope(r);
-//     if (a->rtyp == QRING_CMD)
-//     {
-//       ideal is  = idOppose(r,i); /* twostd? */
-//       is        = idAdd(is,i);
-//       s->qideal = i;
-//     }
     res->data = s;
   }
   else  res->data = rCopy(r);
@@ -5224,7 +5212,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
     case MAP_CMD:
     case PROC_CMD:
     case RING_CMD:
-    case QRING_CMD:
+    //case QRING_CMD:
     case INTMAT_CMD:
     case BIGINTMAT_CMD:
     case NUMBER_CMD:
@@ -6996,7 +6984,7 @@ static BOOLEAN jjFETCH_M(leftv res, leftv u)
   leftv perm_par_l=v->next->next;
   if ((perm_var_l->Typ()!=INTVEC_CMD)
   ||((perm_par_l!=NULL)&&(perm_par_l->Typ()!=INTVEC_CMD))
-  ||((u->Typ()!=RING_CMD)&&(u->Typ()!=QRING_CMD)))
+  ||(u->Typ()!=RING_CMD))
   {
     WerrorS("fetch(<ring>,<name>[,<intvec>[,<intvec>])");
     return TRUE;
@@ -7528,7 +7516,7 @@ BOOLEAN jjLIST_PL(leftv res, leftv v)
         Werror("`%s` is undefined",h->Fullname());
         return TRUE;
       }
-      if ((rt==RING_CMD)||(rt==QRING_CMD))
+      if (rt==RING_CMD)
       {
         L->m[i].rtyp=rt;  L->m[i].data=h->Data();
         ((ring)L->m[i].data)->ref++;

@@ -1447,7 +1447,6 @@ BOOLEAN ssiWrite(si_link l, leftv data)
                           fputs("3 ",d->f_write);
                           ssiWriteNumber(d,(number)dd);
                         break;
-          case QRING_CMD:
           case RING_CMD:fputs("5 ",d->f_write);
                         ssiWriteRing(d,(ring)dd);
                         break;
@@ -2021,10 +2020,6 @@ static BOOLEAN DumpSsiIdhdl(si_link l, idhdl h)
     }
   }
 
-  // handle qrings separately
-  //if (type_id == QRING_CMD)
-  //  return DumpSsiQringQring(l, h);
-
   // put type and name
   //Print("generic dump:%s,%s\n",IDID(h),Tok2Cmdname(IDTYP(h)));
   D->op='=';
@@ -2045,14 +2040,14 @@ static BOOLEAN ssiDumpIter(si_link l, idhdl h)
 
   // need to set the ring before writing it, otherwise we get in
   // trouble with minpoly
-  if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
+  if (IDTYP(h) == RING_CMD)
     rSetHdl(h);
 
   if (DumpSsiIdhdl(l, h)) return TRUE;
 
   // do not dump ssi internal rings: ssiRing*
   // but dump objects of all other rings
-  if ((IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
+  if ((IDTYP(h) == RING_CMD)
   && (strncmp(IDID(h),"ssiRing",7)!=0))
     return ssiDumpIter(l, IDRING(h)->idroot);
   else

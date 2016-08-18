@@ -133,7 +133,6 @@ void sleftv::Print(leftv store, int spaces)
           ((intvec *)d)->show(t,spaces);
           break;
         case RING_CMD:
-        case QRING_CMD:
         {
           PrintNSpaces(spaces);
           const ring r = (const ring)d;
@@ -392,7 +391,7 @@ void sleftv::CleanUp(ring r)
 BOOLEAN sleftv::RingDependend()
 {
   int rt=Typ();
-  if(::RingDependend(rt) && (rt!=QRING_CMD))
+  if(::RingDependend(rt))
     return TRUE;
   if (rt==LIST_CMD)
     return lRingDependend((lists)Data());
@@ -448,7 +447,6 @@ static inline void * s_internalCopy(const int t,  void *d)
     case LINK_CMD:
       return (void *)slCopy((si_link) d);
     case RING_CMD:
-    case QRING_CMD:
       {
         ring r=(ring)d;
         if (r!=NULL)
@@ -566,7 +564,6 @@ void s_internalDelete(const int t,  void *d, const ring r)
       break;
     }
     case RING_CMD:
-    case QRING_CMD:
     {
       ring R=(ring)d;
       if ((R!=currRing)||(R->ref>=0))
@@ -904,7 +901,6 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
         }
 
         case RING_CMD:
-        case QRING_CMD:
           s  = rString((ring)d);
 
           if (typed)
