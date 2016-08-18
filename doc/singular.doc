@@ -1165,9 +1165,7 @@ Todos/Issues:
 @c ----------------------------------------------------------
 @node deRham_lib
 @subsection deRham_lib
-
 @c lib deRham.lib
-
 @c ----------------------------------------------------------
 @node convex geometry, toric geometry, , SINGULAR libraries
 @section convex geometry
