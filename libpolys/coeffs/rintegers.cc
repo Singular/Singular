@@ -473,7 +473,7 @@ static char* nrzCoeffString(const coeffs)
   return omStrDup("ZZ");
 #else
   return omStrDup("integer");
-#endif  
+#endif
 }
 
 coeffs nrzQuot1(number c, const coeffs r)

@@ -5778,7 +5778,7 @@ ring rInit(leftv pn, leftv rv, leftv ord)
   else
   {
     WerrorS("Wrong or unknown ground field specification");
-#if 0 
+#if 0
 // debug stuff for unknown cf descriptions:
     sleftv* p = pn;
     while (p != NULL)

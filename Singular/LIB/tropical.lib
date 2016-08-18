@@ -2490,7 +2490,7 @@ NOTE:        if # is empty, then the valuation of t will be 1,
 @*           the latter supposes that we consider the maximum of the
              computed linear forms, the former that we consider their minimum
 EXAMPLE:     example tropicalise;   shows an example"
-{ 
+{
   if (npars(basering)==0)
   {
     ERROR("The basering has no paramter t.");

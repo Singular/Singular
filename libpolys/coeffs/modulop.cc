@@ -475,7 +475,7 @@ static char* npCoeffString(const coeffs r)
 #else
   char *s=(char*)omAlloc(11);
   snprintf(s,11,"%d",r->ch);
-#endif  
+#endif
   return s;
 }
 

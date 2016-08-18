@@ -358,7 +358,7 @@ public:
   bool sigdrop; //This is used to check sigdrop in sba over Z
   int nrsyzcrit; // counts how many pairs are deleted by SyzCrit
   int nrrewcrit; // counts how many pairs are deleted by FaugereRewCrit
-  int sbaEnterS; // sba over Z strategy: if sigdrop element has _*gen(sbaEnterS+1), then 
+  int sbaEnterS; // sba over Z strategy: if sigdrop element has _*gen(sbaEnterS+1), then
                  // add directly sbaEnterS elements into S
   int blockred;  // counter for blocked reductions in redSig
   int blockredmax;
@@ -718,7 +718,7 @@ int ksReducePolySig(LObject* PR,
                  poly spNoether = NULL,
                  number *coef = NULL,
                  kStrategy strat = NULL);
-                 
+
 int ksReducePolySigRing(LObject* PR,
                  TObject* PW,
                  long idx,

@@ -872,7 +872,7 @@ int redSigRing (LObject* h,kStrategy strat)
   #ifdef ADIDEBUG
   printf("\nBefore sbaCheckGcdPair ");pWrite(h->p);
   #endif
-  while(sbaCheckGcdPair(h,strat)) 
+  while(sbaCheckGcdPair(h,strat))
   {
     #ifdef ADIDEBUG
     printf("\nIntermidiate sbaCheckGcdPair ");pWrite(h->p);
@@ -885,7 +885,7 @@ int redSigRing (LObject* h,kStrategy strat)
   #endif
   poly beforeredsig;
   beforeredsig = pCopy(h->sig);
-    
+
   if (strat->tl<0) return 1;
   //if (h->GetLmTailRing()==NULL) return 0; // HS: SHOULD NOT BE NEEDED!
   //printf("FDEGS: %ld -- %ld\n",h->FDeg, h->pFDeg());
@@ -928,7 +928,7 @@ int redSigRing (LObject* h,kStrategy strat)
       #ifdef ADIDEBUG
       printf("\nBefore sbaCheckGcdPair ");pWrite(h->p);
       #endif
-      while(sbaCheckGcdPair(h,strat)) 
+      while(sbaCheckGcdPair(h,strat))
       {
         #ifdef ADIDEBUG
         printf("\nIntermidiate sbaCheckGcdPair ");pWrite(h->p);
@@ -1018,7 +1018,7 @@ int redSigRing (LObject* h,kStrategy strat)
         ii = i;
       }
     }
-    
+
     start = ii+1;
 
     /*
@@ -2194,7 +2194,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   sba_operations                = 0;
   sba_interreduction_operations = 0;
 #endif
-  
+
   ideal F1 = F0;
   ring sRing, currRingOld;
   currRingOld  = currRing;
@@ -2350,7 +2350,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       enterT(strat->L[strat->Ll-(i)],strat);
       strat->enterS(strat->L[strat->Ll-(i)], strat->sl+1, strat, strat->tl);
     }
-    strat->Ll = strat->Ll - strat->sbaEnterS; 
+    strat->Ll = strat->Ll - strat->sbaEnterS;
     strat->sbaEnterS = -1;
   }
   kTest_TS(strat);
@@ -2451,10 +2451,10 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     /* picks the last element from the lazyset L */
     strat->P = strat->L[strat->Ll];
     strat->Ll--;
-    
+
     if(rField_is_Ring(currRing))
       strat->sbaEnterS = pGetComp(strat->P.sig) - 1;
-    
+
     #ifdef ADIDEBUG
     printf("\n-------------------------\nThis is the current element P\n");
     p_Write(strat->P.p,strat->tailRing);
@@ -2603,7 +2603,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       strat->sigdrop = TRUE;
       break;
     }
-    
+
     if (errorreported)  break;
 
 //#if 1
@@ -2662,7 +2662,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       #endif
 #if SBA_TAIL_RED
       if(rField_is_Ring(currRing))
-      {  
+      {
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
           strat->P.p = redtailSba(&(strat->P),pos-1,strat, withT);
       }
@@ -2687,9 +2687,9 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         }
       }
       // It may happen that we have lost the sig in redtailsba
-      // It cannot reduce to 0 since here we are doing just tail reduction. 
+      // It cannot reduce to 0 since here we are doing just tail reduction.
       // Best case scenerio: remains the leading term
-      if(rField_is_Ring(currRing) && strat->sigdrop)     
+      if(rField_is_Ring(currRing) && strat->sigdrop)
       {
         #ifdef ADIDEBUG
         printf("\n Still sigdrop after redtailSba - it reduced to \n");pWrite(strat->P.p);
@@ -3119,7 +3119,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   //Never do this - you will damage S
   //idSkipZeroes(strat->Shdl);
   //idPrint(strat->Shdl);
-  
+
   if ((strat->sbaOrder == 1 || strat->sbaOrder == 3) && sRing!=currRingOld)
   {
     rChangeCurrRing (currRingOld);

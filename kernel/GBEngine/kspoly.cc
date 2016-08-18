@@ -174,7 +174,7 @@ int ksReducePoly(LObject* PR,
  * Assumes PR != NULL, PW != NULL, Lm(PW) divides Lm(PR)
  *
  ***************************************************************/
- 
+
 int ksReducePolySig(LObject* PR,
                  TObject* PW,
                  long /*idx*/,
@@ -372,7 +372,7 @@ int ksReducePolySig(LObject* PR,
 #endif
   return ret;
 }
- 
+
 int ksReducePolySigRing(LObject* PR,
                  TObject* PW,
                  long /*idx*/,

@@ -1552,7 +1552,7 @@ number n2pDiv(number a, number b, const coeffs cf)
 void n2pPower(number a, int exp, number *b, const coeffs cf)
 {
   n2pTest(a);
-  
+
   *b= (number)p_Power((poly)a,exp,n2pRing);
 }
 
