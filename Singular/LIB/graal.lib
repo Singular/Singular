@@ -46,16 +46,16 @@ proc mod_init()
    * ring Q      polynomial ring of the ambient space
    * ideal H     ideal such that A=Q/H
    * ideal J     preimage of L
-   * qring Q0y   Q^0[Y1,...,Ys]
+   * ring Q0y    Q^0[Y1,...,Ys]
    * ideal scriptI <Y1-f1,...,Ys-fs>, where f1,...,fs are the generators of L
-   * qring Al    the ring A_L = Q0y/scriptI
-   * qring Ky    K[Y1,...,Ys], where K quotient field of A/L
+   * ring Al     the ring A_L = Q0y/scriptI
+   * ring Ky     K[Y1,...,Ys], where K quotient field of A/L
    * ideal scriptIin I_in
-   * qring Graal associated graded ring, isomorphic to Ky/scriptIin
+   * ring Graal associated graded ring, isomorphic to Ky/scriptIin
    * map ina     Al -> Graal, maps standard basis of ideals
    *               to standard basis of their respective initial ideals
    **/
-  newstruct("graalBearer","int s, qring A, ideal L, ring Q, ideal H, ideal J, ring Q0, ideal J0, ring Q0y, ideal scriptI, qring Al, qring Ky, ideal scriptIin, map Q0yToKy, qring Graal, map ina");
+  newstruct("graalBearer","int s, ring A, ideal L, ring Q, ideal H, ideal J, ring Q0, ideal J0, ring Q0y, ideal scriptI, ring Al, ring Ky, ideal scriptIin, map Q0yToKy, ring Graal, map ina");
   system("install","graalBearer","print",graalBearer_print,1);
 
   /***
