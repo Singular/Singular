@@ -555,7 +555,7 @@ BOOLEAN newstruct_CheckAssign(blackbox */*b*/, leftv L, leftv R)
 {
   int lt=L->Typ();
   int rt=R->Typ();
-  if (((lt!=DEF_CMD)&&(lt!=rt))
+  if ((lt!=DEF_CMD)&&(lt!=rt))
   {
     const char *rt1=Tok2Cmdname(rt);
     const char *lt1=Tok2Cmdname(lt);
