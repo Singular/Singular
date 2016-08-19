@@ -441,7 +441,7 @@ static BOOLEAN satstd(leftv res, leftv args)
 
 //------------------------------------------------------------------------
 // initialisation of the module
-extern "C" int SI_MOD_INIT(std_demo)(SModulFunctions* p)
+extern "C" int SI_MOD_INIT(customstd)(SModulFunctions* p)
 {
   // p->iiAddCproc("std_demo","std_with_display",FALSE,std_with_display);
   p->iiAddCproc("customstd.so","satstd",FALSE,satstd);
