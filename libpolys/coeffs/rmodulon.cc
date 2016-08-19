@@ -511,6 +511,7 @@ BOOLEAN nrnIsMOne(number a, const coeffs r)
 #ifdef LDEBUG
   if (a == NULL) return FALSE;
 #endif
+  if(nrnIsOne(a,r)) return FALSE; // for char 2
   mpz_t t; mpz_init_set(t, (mpz_ptr)a);
   mpz_add_ui(t, t, 1);
   bool erg = (0 == mpz_cmp(t, r->modNumber));

@@ -387,7 +387,7 @@ BOOLEAN nr2mIsOne(number a, const coeffs)
 
 BOOLEAN nr2mIsMOne(number a, const coeffs r)
 {
-  return (r->mod2mMask  == (unsigned long)a);
+  return ((r->mod2mMask  == (unsigned long)a) &&(1L!=(long)a))/*for char 2^1*/;
 }
 
 BOOLEAN nr2mEqual(number a, number b, const coeffs)
