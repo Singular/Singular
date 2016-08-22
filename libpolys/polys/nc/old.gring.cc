@@ -404,10 +404,10 @@ poly gnc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r)
       {
         expOut=expP;
 #ifdef PDEBUG
-        if (side)
-        {
-          PrintS("gnc_p_Mult_mm: Multiplication in the left module from the right");
-        }
+//        if (side)
+//        {
+//          PrintS("gnc_p_Mult_mm: Multiplication in the left module from the right");
+//        }
 #endif
       }
       else
