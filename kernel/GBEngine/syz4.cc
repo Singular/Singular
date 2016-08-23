@@ -89,9 +89,6 @@ static poly TraverseNF_test(const poly a, ideal m_idLeads_test,
 #define CACHE 1
 
 #if CACHE
-typedef poly TCacheKey_test;
-typedef poly TCacheValue_test;
-
 bool my_p_LmCmp_test (poly a, poly b, const ring r)
 {
   return p_LmCmp(a, b, r) == -1;
@@ -108,14 +105,14 @@ struct CCacheCompare_test
   {
     return (const_cast<CCacheCompare_test&>(lhs));
   }
-  inline bool operator() (const TCacheKey_test& l, const TCacheKey_test& r)
+  inline bool operator() (const poly& l, const poly& r)
     const
   {
     return my_p_LmCmp_test(l, r, m_ring_test);
   }
 };
 
-typedef std::map<TCacheKey_test, TCacheValue_test, CCacheCompare_test>
+typedef std::map<poly, poly, CCacheCompare_test>
   TP2PCache_test;
 typedef std::map<int, TP2PCache_test> TCache_test;
 
