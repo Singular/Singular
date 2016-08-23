@@ -342,36 +342,26 @@ poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
   if (m_current == m_finish) {
     return NULL;
   }
-  long c = 0;
-  if (syzterm != NULL)
-    c = p_GetComp(syzterm, r) - 1;
-  const BOOLEAN to_check = !syz_checker->empty();
   const poly q = p_New(r);
   pNext(q) = NULL;
   const unsigned long m_not_sev = ~p_GetShortExpVector(multiplier, t, r);
-  while (true) {
-    for( ; m_current != m_finish; ++m_current) {
-      if ( !((*m_current)->sev & m_not_sev)
-          && _p_LmDivisibleByNoComp((*m_current)->lt, multiplier, t, r)) {
-        break;
-      }
-    }
-    if (m_current == m_finish) {
-      break;
+  for( ; m_current != m_finish; ++m_current) {
+    if ( ((*m_current)->sev & m_not_sev)
+        || !(_p_LmDivisibleByNoComp((*m_current)->lt, multiplier, t, r))) {
+      continue;
     }
     const poly p = (*m_current)->lt;
     const int k  = (*m_current)->label;
-    ++m_current;
     p_ExpVectorSum(q, multiplier, t, r); // q == product == multiplier * t
     p_ExpVectorDiff(q, q, p, r); // (LM(product) / LM(L[k]))
     p_SetComp(q, k + 1, r);
     p_Setm(q, r);
     // cannot allow something like: a*gen(i) - a*gen(i)
-    if (syzterm != NULL && (k == c))
-    if (p_ExpVectorEqual(syzterm, q, r)) {
+    if (syzterm != NULL && (k == p_GetComp(syzterm, r) - 1)
+        && p_ExpVectorEqual(syzterm, q, r)) {
       continue;
     }
-    if (to_check && IsDivisible(syz_checker, q)) {
+    if (IsDivisible(syz_checker, q)) {
       continue;
     }
     number n = n_Mult(p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
