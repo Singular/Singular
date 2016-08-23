@@ -199,65 +199,56 @@ static poly TraverseTail_test(poly multiplier, const int tail,
 #endif   // CACHE
 }
 
-static poly ComputeImage_test(poly multiplier, const int tail,
-    const ideal m_idTails_test, const std::vector<bool> &m_lcm,
-    const CReducersHash_test *m_div, const CReducersHash_test *m_checker)
-{
-  const poly t = m_idTails_test->m[tail];
-  if(t != NULL)
-  {
-    const poly p = TraverseTail_test(multiplier, t, m_idTails_test, m_lcm,
-        m_div, m_checker);
-    return p;
-  }
-  return NULL;
-}
-
 #define BUCKETS 1
 /* 0: use original code (not implemented)
  * 1: use Singular's SBuckets
  * 2: use Singular's polynomial arithmetic
  */
 
-static poly TraverseTail_test(poly multiplier, poly tail,
+static poly ComputeImage_test(poly multiplier, const int t,
     const ideal m_idTails_test, const std::vector<bool> &m_lcm,
     const CReducersHash_test *m_div, const CReducersHash_test *m_checker)
 {
-  const ring r = currRing;
-  if( !CLCM_test_Check(m_lcm, multiplier) )
+  const poly tail = m_idTails_test->m[t];
+  if(tail != NULL)
   {
-    return NULL;
+    const ring r = currRing;
+    if( !CLCM_test_Check(m_lcm, multiplier) )
+    {
+      return NULL;
+    }
+#if BUCKETS == 0
+    SBucketWrapper sum(r, m_sum_bucket_factory);
+#elif BUCKETS == 1
+    sBucket_pt sum = sBucketCreate(currRing);
+#else   // BUCKETS == 2
+    poly s = NULL;
+#endif   // BUCKETS
+    for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
+    {
+      const poly rt = ReduceTerm_test(multiplier, p, NULL, m_idTails_test,
+          m_lcm, m_div, m_checker);
+#if BUCKETS == 0
+      sum.Add(rt);
+#elif BUCKETS == 1
+      sBucket_Add_p(sum, rt, pLength(rt));
+#else   // BUCKETS == 2
+      s = p_Add_q(s, rt, r);
+#endif   // BUCKETS
+    }
+#if BUCKETS == 0
+    const poly s = sum.ClearAdd();
+#elif BUCKETS == 1
+    poly s;
+    int l;
+    sBucketClearAdd(sum, &s, &l);
+    sBucketDestroy(&sum);
+#else   // BUCKETS == 2
+    // nothing to do
+#endif   // BUCKETS
+    return s;
   }
-#if BUCKETS == 0
-  SBucketWrapper sum(r, m_sum_bucket_factory);
-#elif BUCKETS == 1
-  sBucket_pt sum = sBucketCreate(currRing);
-#else   // BUCKETS == 2
-  poly s = NULL;
-#endif   // BUCKETS
-  for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
-  {
-    const poly rt = ReduceTerm_test(multiplier, p, NULL, m_idTails_test, m_lcm,
-        m_div, m_checker);
-#if BUCKETS == 0
-    sum.Add(rt);
-#elif BUCKETS == 1
-    sBucket_Add_p(sum, rt, pLength(rt));
-#else   // BUCKETS == 2
-    s = p_Add_q(s, rt, r);
-#endif   // BUCKETS
-  }
-#if BUCKETS == 0
-  const poly s = sum.ClearAdd();
-#elif BUCKETS == 1
-  poly s;
-  int l;
-  sBucketClearAdd(sum, &s, &l);
-  sBucketDestroy(&sum);
-#else   // BUCKETS == 2
-  // nothing to do
-#endif   // BUCKETS
-  return s;
+  return NULL;
 }
 
 static poly leadmonom_test(const poly p, const ring r, const bool bSetZeroComp)
