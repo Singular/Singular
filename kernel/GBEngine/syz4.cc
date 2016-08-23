@@ -326,7 +326,25 @@ static void deleteCRH(CReducersHash_test *C)
     C->erase(C->begin(), C->end());
 }
 
-bool IsDivisible(const CReducersHash_test *C, const poly product);
+bool IsDivisible(const CReducersHash_test *C, const poly product)
+{
+    CReducersHash_test::const_iterator m_itr
+        = C->find(p_GetComp(product, currRing));
+    if (m_itr == C->end()) {
+        return false;
+    }
+    TReducers_test::const_iterator m_current = (m_itr->second).begin();
+    TReducers_test::const_iterator m_finish  = (m_itr->second).end();
+    const unsigned long m_not_sev = ~p_GetShortExpVector(product, currRing);
+    for ( ; m_current != m_finish; ++m_current) {
+        if (p_LmShortDivisibleByNoComp((*m_current)->lt, (*m_current)->sev,
+            product, m_not_sev, currRing)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
     const CReducersHash_test *syz_checker, const CReducersHash_test *m_div)
@@ -370,25 +388,6 @@ poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
   }
   p_LmFree(q, r);
   return NULL;
-}
-
-bool IsDivisible(const CReducersHash_test *C, const poly product)
-{
-    CReducersHash_test::const_iterator m_itr
-        = C->find(p_GetComp(product, currRing));
-    if (m_itr == C->end()) {
-        return false;
-    }
-    TReducers_test::const_iterator m_current = (m_itr->second).begin();
-    TReducers_test::const_iterator m_finish  = (m_itr->second).end();
-    const unsigned long m_not_sev = ~p_GetShortExpVector(product, currRing);
-    for ( ; m_current != m_finish; ++m_current) {
-        if (p_LmShortDivisibleByNoComp((*m_current)->lt, (*m_current)->sev,
-            product, m_not_sev, currRing)) {
-            return true;
-        }
-    }
-    return false;
 }
 
 static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
