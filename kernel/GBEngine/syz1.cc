@@ -1514,8 +1514,8 @@ void syKillComputation(syStrategy syzstr, ring r)
             if (syzstr->minres[i]->m[j]!=NULL)
               p_Delete(&(syzstr->minres[i]->m[j]),r);
           }
+          id_Delete(&(syzstr->minres[i]),r);
         }
-        id_Delete(&(syzstr->minres[i]),r);
       }
       omFreeSize((ADDRESS)syzstr->minres,(syzstr->length+1)*sizeof(ideal));
     }
@@ -1530,8 +1530,8 @@ void syKillComputation(syStrategy syzstr, ring r)
             if (syzstr->fullres[i]->m[j]!=NULL)
               p_Delete(&(syzstr->fullres[i]->m[j]),r);
           }
+          id_Delete(&(syzstr->fullres[i]),r);
         }
-        id_Delete(&(syzstr->fullres[i]),r);
       }
       omFreeSize((ADDRESS)syzstr->fullres,(syzstr->length+1)*sizeof(ideal));
     }

@@ -1034,8 +1034,10 @@ syStrategy sySchreyer(ideal arg, int maxlength)
   for (int i=rl /*result->length*/-1;i>=0;i--)
   {
     if (fr[i]!=NULL)
+    {
       result->fullres[i] = fr[i];
       fr[i] = NULL;
+    }
   }
   if (currRing->qideal!=NULL)
   {
