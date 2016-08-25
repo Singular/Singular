@@ -672,30 +672,38 @@ static void sortPolysTails(const resolvente res, const int index)
 static int computeResolution(resolvente &res, const int length,
     const syzHeadFunction *syzHead)
 {
+    int max_index = length-1;
     int index = 0;
-    if (!idIs0(res[index]) && index < length) {
+    if (!idIs0(res[index]) && index < max_index) {
         index++;
         res[index] = computeFrame(res[index-1], syzM_i_unsorted, syzHead);
-    }
-    while (!idIs0(res[index]) && index < length) {
+        while (!idIs0(res[index])) {
 #if 1
-        computeLiftings(res, index);
-        sortPolysTails(res, index);
+            computeLiftings(res, index);
+            sortPolysTails(res, index);
 #endif   // LIFT
-        index++;
-        res[index] = computeFrame(res[index-1], syzM_i_sorted, syzHead);
+            if (index < max_index) {
+                index++;
+                res[index] = computeFrame(res[index-1], syzM_i_sorted,
+                    syzHead);
+            }
+            else {
+                break;
+            }
+        }
     }
-    if (index < length) {
+    max_index = index+1;
+    if (max_index < length) {
         res = (resolvente)omReallocSize(res, (length+1)*sizeof(ideal),
-            (index+1)*sizeof(ideal));
+            (max_index+1)*sizeof(ideal));
     }
-    return index;
+    return max_index;
 }
 
 static void sortPolys(const resolvente res, const int length)
 {
     const ring r = currRing;
-    for (int i = length; i > 0; i--) {
+    for (int i = length-1; i > 0; i--) {
         for (int j = res[i]->ncols-1; j >= 0; j--) {
             res[i]->m[j] = p_SortAdd(res[i]->m[j], r, TRUE);
         }
@@ -730,7 +738,7 @@ syStrategy syFrank(const ideal arg, int &length, const char *method)
 #endif   // CACHE
 
     result->fullres = res;
-    result->length = length+1;
+    result->length = length;
     return result;
 }
 

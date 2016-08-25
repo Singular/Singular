@@ -2208,12 +2208,11 @@ static BOOLEAN jjFRES3(leftv res, leftv u, leftv v, leftv w)
         WerrorS("length for fres must not be negative");
         return TRUE;
     }
-    maxl--;
-    if (maxl == -1) {
-        maxl = currRing->N;
+    if (maxl == 0) {
+        maxl = currRing->N+1;
         if (currRing->qideal != NULL) {
             Warn("full resolution in a qring may be infinite, "
-                "setting max length to %d", maxl+1);
+                "setting max length to %d", maxl);
         }
     }
     char* method = (char *)w->Data();
@@ -2225,7 +2224,7 @@ static BOOLEAN jjFRES3(leftv res, leftv u, leftv v, leftv w)
     }
     syStrategy r;
     r = syFrank(id, maxl, method);
-    r->list_length = maxl+1;
+    r->list_length = maxl;
     if (r == NULL) return TRUE;
     assume( (r->minres != NULL) || (r->fullres != NULL) );
     res->data = (void *)r;
