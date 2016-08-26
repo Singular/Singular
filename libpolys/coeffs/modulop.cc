@@ -479,12 +479,12 @@ static char* npCoeffString(const coeffs r)
   return s;
 }
 
-static void npWriteFd(number n, FILE* f, const coeffs r)
+static void npWriteFd(number n, FILE* f, const coeffs)
 {
   fprintf(f,"%d ",(int)(long)n);
 }
 
-static number npReadFd(s_buff f, const coeffs r)
+static number npReadFd(s_buff f, const coeffs)
 {
   // read int
   int dd;

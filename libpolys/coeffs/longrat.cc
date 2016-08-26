@@ -948,7 +948,7 @@ int nlDivComp(number a, number b, const coeffs r)
   return 0;
 }
 
-number  nlGetUnit (number n, const coeffs r)
+number  nlGetUnit (number, const coeffs)
 {
   return INT_TO_SR(1);
 }
@@ -1420,7 +1420,7 @@ number nlNormalizeHelper(number a, number b, const coeffs r)
 
 // Map q \in QQ or ZZ \to Zp or an extension of it
 // src = Q or Z, dst = Zp (or an extension of Zp)
-number nlModP(number q, const coeffs Q, const coeffs Zp)
+number nlModP(number q, const coeffs /*Q*/, const coeffs Zp)
 {
   const int p = n_GetChar(Zp);
   assume( p > 0 );
@@ -2293,7 +2293,7 @@ number _nlMult_aNoImm_OR_bNoImm(number a, number b)
 /*2
 * copy a to b for mapping
 */
-number nlCopyMap(number a, const coeffs src, const coeffs dst)
+number nlCopyMap(number a, const coeffs /*src*/, const coeffs /*dst*/)
 {
   if ((SR_HDL(a) & SR_INT)||(a==NULL))
   {
@@ -2302,7 +2302,7 @@ number nlCopyMap(number a, const coeffs src, const coeffs dst)
   return _nlCopy_NoImm(a);
 }
 
-nMapFunc nlSetMap(const coeffs src, const coeffs dst)
+nMapFunc nlSetMap(const coeffs src, const coeffs /*dst*/)
 {
   if (src->rep==n_rep_gap_rat)  /*Q, coeffs_BIGINT */
   {
