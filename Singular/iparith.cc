@@ -193,9 +193,9 @@ typedef struct
   struct sValCmd2 *psValCmd2;
   struct sValCmd3 *psValCmd3;
   struct sValCmdM *psValCmdM;
-  int nCmdUsed;      /**< number of commands used */
-  int nCmdAllocated; /**< number of commands-slots allocated */
-  int nLastIdentifier; /**< valid indentifieres are slot 1..nLastIdentifier */
+  unsigned nCmdUsed;      /**< number of commands used */
+  unsigned nCmdAllocated; /**< number of commands-slots allocated */
+  unsigned nLastIdentifier; /**< valid indentifieres are slot 1..nLastIdentifier */
 } SArithBase;
 
 /*---------------------------------------------------------------------*
@@ -241,7 +241,7 @@ poly pHeadProc(poly p)
 
 int iiTokType(int op)
 {
-  for (int i=0;i<sArithBase.nCmdUsed;i++)
+  for (unsigned i=0;i<sArithBase.nCmdUsed;i++)
   {
     if (sArithBase.sCmds[i].tokval==op)
       return sArithBase.sCmds[i].toktype;
@@ -1290,7 +1290,7 @@ static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
   int r=m->rows();
   int c=m->cols();
   matrix mm=mpNew(r,c);
-  int i,j;
+  unsigned i,j;
   for(i=r;i>0;i--)
   {
     for(j=c;j>0;j--)
@@ -2054,18 +2054,18 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
   ideal vi=(ideal)v->Data();
   int vl= IDELEMS(vi);
   ideal ui=(ideal)u->Data();
-  int ul= IDELEMS(ui);
+  unsigned ul= IDELEMS(ui);
   ideal R; matrix U;
   ideal m = idLift(vi,ui,&R, FALSE,hasFlag(v,FLAG_STD),TRUE,&U);
   if (m==NULL) return TRUE;
   // now make sure that all matices have the corect size:
   matrix T = id_Module2formatedMatrix(m,vl,ul,currRing);
   int i;
-  if (MATCOLS(U) != ul)
+  if (MATCOLS(U) != (int)ul)
   {
-    int mul=si_min(ul,MATCOLS(U));
+    unsigned mul=si_min(ul,MATCOLS(U));
     matrix UU=mpNew(ul,ul);
-    int j;
+    unsigned j;
     for(i=mul;i>0;i--)
     {
       for(j=mul;j>0;j--)
@@ -2329,20 +2329,20 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
       }
       else
       {
-        int i;
+        unsigned i;
         if (par_perm_size!=0)
-          for(i=si_min(rPar(r),rPar(currRing))-1;i>=0;i--) par_perm[i]=-(i+1);
+          for(i=si_min(rPar(r),rPar(currRing));i>0;i--) par_perm[i-1]=-i;
         for(i=si_min(r->N,currRing->N);i>0;i--) perm[i]=i;
       }
     }
     if ((iiOp==FETCH_CMD) &&(BVERBOSE(V_IMAP)))
     {
-      int i;
-      for(i=0;i<si_min(r->N,currRing->N);i++)
+      unsigned i;
+      for(i=0;i<(unsigned)si_min(r->N,currRing->N);i++)
       {
         Print("// var nr %d: %s -> %s\n",i,r->names[i],currRing->names[i]);
       }
-      for(i=0;i<si_min(rPar(r),rPar(currRing));i++) // possibly empty loop
+      for(i=0;i<(unsigned)si_min(rPar(r),rPar(currRing));i++) // possibly empty loop
       {
         Print("// par nr %d: %s -> %s\n",
               i,rParameter(r)[i],rParameter(currRing)[i]);
@@ -2794,9 +2794,9 @@ static BOOLEAN jjMONOM(leftv res, leftv v)
 {
   intvec *iv=(intvec *)v->Data();
   poly p=pOne();
-  int i,e;
+  int e;
   BOOLEAN err=FALSE;
-  for(i=si_min(currRing->N,iv->length()); i>0; i--)
+  for(unsigned i=si_min(currRing->N,iv->length()); i>0; i--)
   {
     e=(*iv)[i-1];
     if (e>=0) pSetExp(p,i,e);
@@ -3622,7 +3622,7 @@ static BOOLEAN jjWAITALL2(leftv res, leftv u, leftv v)
   int t = getRTimer()/TIMER_RESOLUTION;  // in seconds
   int i;
   int ret = -1;
-  for(int nfinished = 0; nfinished < Lforks->nr+1; nfinished++)
+  for(unsigned nfinished = 0; nfinished < ((unsigned)Lforks->nr)+1; nfinished++)
   {
     i = slStatusSsiL(Lforks, timeout);
     if(i > 0) /* Lforks[i] is ready */
@@ -4010,9 +4010,11 @@ static BOOLEAN jjDET_N2(leftv res, leftv v)
   }
   else
   {
+    omFreeSize(r,sizeof(*r));
     Werror("det of %d x %d cmatrix",i,j);
     return TRUE;
   }
+  res->data=(void*)r;
   return FALSE;
 }
 #endif
@@ -4081,21 +4083,21 @@ static BOOLEAN jjDIM(leftv res, leftv v)
     }
     //Anne's Idea for std(4,2x) = 0 bug
     long dcurr = d;
-    for(i=0;i<IDELEMS(vv);i++)
+    for(unsigned ii=0;ii<(unsigned)IDELEMS(vv);ii++)
     {
-      if(vv->m[i] != NULL && !n_IsUnit(pGetCoeff(vv->m[i]),currRing->cf))
+      if(vv->m[ii] != NULL && !n_IsUnit(pGetCoeff(vv->m[ii]),currRing->cf))
       {
         ideal vc = idCopy(vv);
         poly c = pInit();
-        pSetCoeff0(c,nCopy(pGetCoeff(vv->m[i])));
+        pSetCoeff0(c,nCopy(pGetCoeff(vv->m[ii])));
         idInsertPoly(vc,c);
         idSkipZeroes(vc);
-        for(j = 0;j<IDELEMS(vc)-1;j++)
+        for(unsigned jj = 0;jj<(unsigned)IDELEMS(vc)-1;jj++)
         {
-          if((vc->m[j]!=NULL)
-          && (n_DivBy(pGetCoeff(vc->m[j]),pGetCoeff(c),currRing->cf)))
+          if((vc->m[jj]!=NULL)
+          && (n_DivBy(pGetCoeff(vc->m[jj]),pGetCoeff(c),currRing->cf)))
           {
-            pDelete(&vc->m[j]);
+            pDelete(&vc->m[jj]);
           }
         }
         idSkipZeroes(vc);
@@ -4855,8 +4857,7 @@ static BOOLEAN jjP2N(leftv res, leftv v)
 static BOOLEAN jjRESERVEDNAME(leftv res, leftv v)
 {
   char *s= (char *)v->Data();
-  int i = 1;
-  for(i=0; i<sArithBase.nCmdUsed; i++)
+  for(unsigned i=0; i<sArithBase.nCmdUsed; i++)
   {
     //Print("test %d, >>%s<<, tab:>>%s<<\n",i,s,sArithBase.sCmds[i].name);
     if (strcmp(s, sArithBase.sCmds[i].name) == 0)
@@ -5452,11 +5453,13 @@ static BOOLEAN jjidMinBase(leftv res, leftv v)
   res->data = (char *)idMinBase((ideal)v->Data());
   return FALSE;
 }
+#if 0 // unused
 static BOOLEAN jjsyMinBase(leftv res, leftv v)
 {
   res->data = (char *)syMinBase((ideal)v->Data());
   return FALSE;
 }
+#endif
 static BOOLEAN jjpMaxComp(leftv res, leftv v)
 {
   res->data = (char *)pMaxComp((poly)v->Data());
@@ -6366,7 +6369,7 @@ static BOOLEAN jjRANDOM_Im(leftv res, leftv u, leftv v, leftv w)
 static BOOLEAN jjRANDOM_CF(leftv res, leftv u, leftv v, leftv w)
 // <coeff>, par1, par2 -> number2
 {
-  coeffs cf=(coeffs)w->Data();
+  coeffs cf=(coeffs)u->Data();
   if ((cf==NULL) ||(cf->cfRandom==NULL))
   {
     Werror("no random function defined for coeff %d",cf->type);
@@ -7656,8 +7659,8 @@ static BOOLEAN jjREDUCE5(leftv res, leftv u)
 }
 static BOOLEAN jjRESERVED0(leftv, leftv)
 {
-  int i=1;
-  int nCount = (sArithBase.nCmdUsed-1)/3;
+  unsigned i=1;
+  unsigned nCount = (sArithBase.nCmdUsed-1)/3;
   if((3*nCount)<sArithBase.nCmdUsed) nCount++;
   //Print("CMDS: %d/%d\n", sArithBase.nCmdUsed,
   //      sArithBase.nCmdAllocated);
@@ -8704,6 +8707,7 @@ BOOLEAN iiExprArith3Tab(leftv res, leftv a, int op,
 /* must be ordered: first operations for chars (infix ops),
  * then alphabetically */
 
+#if 0 // unused
 static BOOLEAN jjANY2LIST(leftv res, leftv v, int cnt)
 {
   // cnt = 0: all
@@ -8718,6 +8722,7 @@ static BOOLEAN jjANY2LIST(leftv res, leftv v, int cnt)
   v->next = next;             // writeback next-pointer
   return failed;
 }
+#endif
 
 BOOLEAN iiExprArithM(leftv res, leftv a, int op)
 {
@@ -8969,7 +8974,7 @@ const char * Tok2Cmdname(int tok)
   //if (tok==CRING_CMD) return "Ring";
   #endif
   if (tok>MAX_TOK) return getBlackboxName(tok);
-  int i;
+  unsigned i;
   for(i=0; i<sArithBase.nCmdUsed; i++)
     //while (sArithBase.sCmds[i].tokval!=0)
   {
@@ -9136,7 +9141,7 @@ int iiArithFindCmd(const char *szName)
 char *iiArithGetCmd( int nPos )
 {
   if(nPos<0) return NULL;
-  if(nPos<sArithBase.nCmdUsed)
+  if(nPos<(int)sArithBase.nCmdUsed)
     return sArithBase.sCmds[nPos].name;
   return NULL;
 }
@@ -9147,7 +9152,7 @@ int iiArithRemoveCmd(const char *szName)
   if(szName==NULL) return -1;
 
   nIndex = iiArithFindCmd(szName);
-  if(nIndex<0 || nIndex>=sArithBase.nCmdUsed)
+  if(nIndex<0 || nIndex>=(int)sArithBase.nCmdUsed)
   {
     Print("'%s' not found (%d)\n", szName, nIndex);
     return -1;
@@ -9181,7 +9186,7 @@ int iiArithAddCmd(
   if(nPos>=0)
   {
     // no checks: we rely on a correct generated code in iparith.inc
-    assume(nPos < sArithBase.nCmdAllocated);
+    assume((unsigned)nPos < sArithBase.nCmdAllocated);
     assume(szName!=NULL);
     sArithBase.sCmds[nPos].name    = omStrDup(szName);
     sArithBase.sCmds[nPos].alias   = nAlias;
