@@ -1343,7 +1343,7 @@ leftv ssiRead1(si_link l)
                 n98_o2=s_readint(d->f_read);
                 if ((n98_v!=SSI_VERSION) ||(n98_m!=MAX_TOK))
                 {
-                  Print("incompatible versions of ssi: %d/%d vs %d/%d",
+                  Print("incompatible versions of ssi: %d/%d vs %d/%d\n",
                                   SSI_VERSION,MAX_TOK,n98_v,n98_m);
                 }
                 #ifndef SING_NDEBUG
