@@ -18,6 +18,7 @@ struct omInfo_s
   long UsedBytes;           /* set in omUpdateInfo() */
   long AvailBytes;          /* set in omUpdateInfo() */
   long UsedBytesMalloc;     /* set in omUpdateInfo(), needs malloc support */
+  long InternalUsedBytesMalloc;
   long AvailBytesMalloc;    /* set in omUpdateInfo(), needs malloc support */
   long MaxBytesFromMalloc;      /* always kept up-to-date */
   long CurrentBytesFromMalloc;  /* always kept up-to-date */

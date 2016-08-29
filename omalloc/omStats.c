@@ -10,7 +10,7 @@
 #include "omMalloc.h"
 #include "omalloc.h"
 
-omInfo_t om_Info = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+omInfo_t om_Info = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 unsigned long om_SbrkInit = 0;
 
@@ -38,7 +38,8 @@ void omUpdateInfo()
 #ifdef OM_MALLOC_USED_BYTES
   om_Info.UsedBytesMalloc = OM_MALLOC_USED_BYTES;
 #else
-  om_Info.UsedBytesMalloc = om_Info.CurrentBytesFromMalloc;
+  om_Info.UsedBytesMalloc = om_Info.CurrentBytesFromMalloc
+                            -om_Info.InternalUsedBytesMalloc;
 #endif
 #ifdef OM_MALLOC_AVAIL_BYTES
   om_Info.AvailBytesMalloc = OM_MALLOC_AVAIL_BYTES;
@@ -114,13 +115,14 @@ omInfo_t omGetInfo()
 void omPrintStats(FILE* fd)
 {
   omUpdateInfo();
-  fprintf(fd, "System %ldk:%ldk Appl %ldk/%ldk Malloc %ldk/%ldk Valloc %ldk/%ldk Pages %ld/%ld Regions %ld:%ld\n",
+  fprintf(fd, "System %ldk:%ldk Appl %ldk/%ldk Malloc %ldk/%ldk Valloc %ldk/%ldk Pages %ld/%ld Regions %ld:%ld Internal: %ld\n",
           om_Info.CurrentBytesSystem/1024, om_Info.MaxBytesSystem/1024,
           om_Info.UsedBytes/1024, om_Info.AvailBytes/1024,
           om_Info.UsedBytesMalloc/1024, om_Info.AvailBytesMalloc/1024,
           om_Info.CurrentBytesFromValloc/1024, om_Info.AvailBytesFromValloc/1024,
           om_Info.UsedPages, om_Info.AvailPages,
-          om_Info.CurrentRegionsAlloc, om_Info.MaxRegionsAlloc);
+          om_Info.CurrentRegionsAlloc, om_Info.MaxRegionsAlloc,
+	  InternalUsedBytesMalloci/1024);
 }
 
 
