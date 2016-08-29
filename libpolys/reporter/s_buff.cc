@@ -25,7 +25,7 @@
 
 //typedef struct s_buff_s * s_buff;
 
-#define S_BUFF_LEN 4096
+#define S_BUFF_LEN (4096-SIZEOF_LONG)
 
 s_buff s_open(int fd)
 {
