@@ -354,6 +354,7 @@ static void omBinPageIndexFault(unsigned long low_index, unsigned long high_inde
   if (om_BinPageIndicies == NULL)
   {
     om_BinPageIndicies = (unsigned long*) omAllocFromSystem((index_diff + 1)*SIZEOF_LONG);
+    om_Info.InternalUsedBytesMalloc+=(index_diff + 1)*SIZEOF_LONG;
     om_MaxBinPageIndex = high_index;
     om_MinBinPageIndex = low_index;
     for (i=0; i<=index_diff; i++) om_BinPageIndicies[i] = 0;
@@ -366,6 +367,7 @@ static void omBinPageIndexFault(unsigned long low_index, unsigned long high_inde
                                 high_index - om_MinBinPageIndex) + 1;
     om_BinPageIndicies  = (unsigned long*) omReallocSizeFromSystem(om_BinPageIndicies, old_length*SIZEOF_LONG,
                                                                    new_length*SIZEOF_LONG);
+    om_Info.InternalUsedBytesMalloc+= (new_length-old_length)*SIZEOF_LONG;
     if (low_index < om_MinBinPageIndex)
     {
       unsigned long offset = new_length - old_length;
