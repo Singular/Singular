@@ -186,7 +186,7 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level);
 /*2
 * returns the length of a polynomial (numbers of monomials)
 */
-static inline int pLength(poly a)
+static inline unsigned pLength(poly a)
 {
   unsigned l = 0;
   while (a!=NULL)
@@ -194,7 +194,7 @@ static inline int pLength(poly a)
     pIter(a);
     l++;
   }
-  return (int)l;
+  return l;
 }
 
 // returns the length of a polynomial (numbers of monomials) and the last mon.
