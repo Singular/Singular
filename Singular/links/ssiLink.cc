@@ -820,7 +820,6 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
             SI_LINK_SET_CLOSE_P(hh->l);
             ssiInfo *dd=(ssiInfo*)hh->l->data;
             s_close(dd->f_read);
-            s_free(dd->f_read);
             fclose(dd->f_write);
             if (dd->r!=NULL) rKill(dd->r);
             omFreeSize((ADDRESS)dd,(sizeof *dd));
@@ -1199,7 +1198,7 @@ BOOLEAN ssiClose(si_link l)
           }
         }
       }
-      if (d->f_read!=NULL) { s_close(d->f_read);s_free(d->f_read);d->f_read=NULL;}
+      if (d->f_read!=NULL) { s_close(d->f_read);d->f_read=NULL;}
       if (d->f_write!=NULL) { fclose(d->f_write); d->f_write=NULL; }
       if ((strcmp(l->mode,"tcp")==0)
       || (strcmp(l->mode,"fork")==0))

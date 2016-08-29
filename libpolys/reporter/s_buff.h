@@ -17,7 +17,6 @@ typedef struct s_buff_s * s_buff;
 
 s_buff s_open(int fd);
 s_buff s_open_by_name(const char *n);
-int    s_free(s_buff &f);
 int    s_close(s_buff &f);
 
 int s_getc(s_buff F);
