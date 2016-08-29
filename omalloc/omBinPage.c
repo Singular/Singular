@@ -292,6 +292,7 @@ static void* omTakeOutConsecutivePages(omBinPageRegion region, int pages)
 static omBinPageRegion omAllocNewBinPagesRegion(int min_pages)
 {
   omBinPageRegion region = omAllocFromSystem(sizeof(omBinPageRegion_t));
+  om_Info.InternalUsedBytesMalloc+=sizeof(omBinPageRegion_t);
   void* addr;
   int pages = (min_pages>om_Opts.PagesPerRegion ? min_pages : om_Opts.PagesPerRegion);
   size_t size = pages*SIZEOF_SYSTEM_PAGE;
@@ -334,6 +335,7 @@ static void omFreeBinPagesRegion(omBinPageRegion region)
   omUnregisterBinPages(region->addr, region->pages);
   omVfreeToSystem(region->addr, region->pages*SIZEOF_SYSTEM_PAGE);
   omFreeSizeToSystem(region, sizeof(omBinPageRegion_t));
+  om_Info.InternalUsedBytesMalloc-=sizeof(omBinPageRegion_t);
 }
 
 /*******************************************************************

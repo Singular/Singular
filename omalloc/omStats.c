@@ -122,7 +122,7 @@ void omPrintStats(FILE* fd)
           om_Info.CurrentBytesFromValloc/1024, om_Info.AvailBytesFromValloc/1024,
           om_Info.UsedPages, om_Info.AvailPages,
           om_Info.CurrentRegionsAlloc, om_Info.MaxRegionsAlloc,
-	  InternalUsedBytesMalloci/1024);
+	  om_Info.InternalUsedBytesMalloc/1024);
 }
 
 
