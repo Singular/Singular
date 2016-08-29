@@ -57,7 +57,6 @@ int    s_close(s_buff &F)
   if (F!=NULL)
   {
     int r=close(F->fd);
-    omFreeSize(F,sizeof(*F));
     return r;
   }
   return 0;
