@@ -6,9 +6,11 @@
 #include <coeffs/rmodulon.h> // ZnmInfo
 #include <coeffs/bigintmat.h> // bigintmat
 #include <coeffs/longrat.h> // BIGINTs: nlGMP
+#include <polys/ext_fields/algext.h> // AlgExtInfo
 #include <misc/prime.h> // IsPrime
 #include <Singular/blackbox.h> // blackbox type
 #include <Singular/ipshell.h> // IsPrime
+#include <Singular/ipconv.h> // iiConvert etc.
 
 #include <Singular/ipid.h> // for SModulFunctions, leftv
 
@@ -75,6 +77,15 @@ BOOLEAN jjCRING_Zm(leftv res, leftv a, leftv b)
 // -----------------------------------------------------------
 // interpreter stuff for Number/number2
 // -----------------------------------------------------------
+BOOLEAN jjNUMBER2_POW(leftv res, leftv a, leftv b)
+{
+  number2 a2=(number2)a->Data();
+  if (a2->cf==NULL) return TRUE;
+  number2 r=(number2)omAlloc0(sizeof(*r));
+  r->cf=a2->cf;
+  n_Power(a2->n,(int)(long)b->Data(),&(r->n),r->cf);
+  return FALSE;
+}
 BOOLEAN jjNUMBER2_OP2(leftv res, leftv a, leftv b)
 {
   int op=iiOp;
@@ -83,65 +94,67 @@ BOOLEAN jjNUMBER2_OP2(leftv res, leftv a, leftv b)
   number aa=NULL;
   number2 b2=NULL;
   number bb=NULL;
-  if (a->Typ()==CNUMBER_CMD)
+  leftv an = (leftv)omAlloc0Bin(sleftv_bin);
+  leftv bn = (leftv)omAlloc0Bin(sleftv_bin);
+  int ai,bi;
+  int at=a->Typ();
+  int bt=b->Typ();
+  if ((ai=iiTestConvert(at,CNUMBER_CMD,dConvertTypes))!=0)
   {
-    a2=(number2)a->Data();
-    aa=a2->n;
-  }
-  if (b->Typ()==CNUMBER_CMD)
-  {
-    b2=(number2)b->Data();
-    if ((a2!=NULL) && (a2->cf!=b2->cf))
+    if ((bi=iiTestConvert(bt,CNUMBER_CMD,dConvertTypes))!=0)
     {
-      WerrorS("Number not compatible");
+      iiConvert(at,CNUMBER_CMD,ai,a,an);
+      iiConvert(bt,CNUMBER_CMD,bi,b,bn);
+      a2=(number2)an->Data();
+      b2=(number2)bn->Data();
+      if (((a2!=NULL) && (b2!=NULL) && (a2->cf!=b2->cf))
+      || (a2==NULL)
+      || (b2==NULL))
+      {
+        an->CleanUp();
+        bn->CleanUp();
+        omFreeBin((ADDRESS)an, sleftv_bin);
+        omFreeBin((ADDRESS)bn, sleftv_bin);
+        WerrorS("Number not compatible");
+        return TRUE;
+      }
+      aa=a2->n;
+      bb=b2->n;
+      number2 r=(number2)omAlloc0(sizeof(*r));
+      r->cf=a2->cf;
+      if (r->cf==NULL) op=0; // force error
+      switch(op)
+      {
+        case '+': r->n=n_Add(aa,bb,r->cf);break;
+        case '-': r->n=n_Sub(aa,bb,r->cf);break;
+        case '*': r->n=n_Mult(aa,bb,r->cf);break;
+        case '/': r->n=n_Div(aa,bb,r->cf);break;
+        case '%': r->n=n_IntMod(aa,bb,r->cf);break;
+        default: Werror("unknown binary operation %s(%d)",Tok2Cmdname(op),op);
+             omFree(r);
+             an->CleanUp();
+             bn->CleanUp();
+             omFreeBin((ADDRESS)an, sleftv_bin);
+             omFreeBin((ADDRESS)bn, sleftv_bin);
+             return TRUE;
+      }
+      res->data=(void*)r;
+      r->cf->ref++;
+      return FALSE;
+    }
+    else
+    {
+      an->CleanUp();
+      omFreeBin((ADDRESS)an, sleftv_bin);
+      Werror("cannot convert second operand (%s) to Number",b->Name());
       return TRUE;
     }
-    bb=b2->n;
   }
-  number2 r=(number2)omAlloc(sizeof(*r));
-  if (a2!=NULL) r->cf=a2->cf;
-  else          r->cf=b2->cf;
-  if (r->cf==NULL) op=0; // force error
   else
-  if (a2==NULL)
   {
-    if (a->Typ()==INT_CMD) aa=n_Init((long)a->Data(),r->cf);
-    else if (a->Typ()==BIGINT_CMD)
-    {
-      //aa=n_Init_bigint((number)a->Data(),coeffs_BIGINT,r->cf);
-      nMapFunc nMap=n_SetMap(coeffs_BIGINT,r->cf);
-      aa=nMap((number)a->Data(),coeffs_BIGINT,r->cf);
-    }
-    else op=0;
+    Werror("cannot convert first operand (%s) to Number",a->Name());
+    return TRUE;
   }
-  if ((b2==NULL) &&(op!='^') &&(op!=0))
-  {
-    if (b->Typ()==INT_CMD) bb=n_Init((long)b->Data(),r->cf);
-    else if (b->Typ()==BIGINT_CMD)
-    {
-      //bb=n_Init_bigint((number)b->Data(),coeffs_BIGINT,r->cf);
-      nMapFunc nMap=n_SetMap(coeffs_BIGINT,r->cf);
-      bb=nMap((number)b->Data(),coeffs_BIGINT,r->cf);
-    }
-    else op=0;
-  }
-  switch(op)
-  {
-    case '+': r->n=n_Add(aa,bb,r->cf);break;
-    case '-': r->n=n_Sub(aa,bb,r->cf);break;
-    case '*': r->n=n_Mult(aa,bb,r->cf);break;
-    case '/': r->n=n_Div(aa,bb,r->cf);break;
-    case '%': r->n=n_IntMod(aa,bb,r->cf);break;
-
-    case '^': n_Power(aa,(int)(long)b->Data(),&(r->n),r->cf); break;
-
-    default: Werror("unknown binary operation %s(%d)",Tok2Cmdname(op),op);
-             omFree(r);
-             return TRUE;
-  }
-  res->data=(void*)r;
-  r->cf->ref++;
-  return FALSE;
 }
 BOOLEAN jjNUMBER2_OP1(leftv res, leftv a)
 {
@@ -154,6 +167,105 @@ BOOLEAN jjNUMBER2_OP1(leftv res, leftv a)
   switch(op)
   {
     case '-': r->n=n_Copy(a2->n,a2->cf);r->n=n_InpNeg(r->n,a2->cf);break;
+    default: Werror("unknown unary operation %s(%d)",Tok2Cmdname(op),op);
+             omFree(r);
+             return TRUE;
+  }
+  res->data=(void*)r;
+  r->cf->ref++;
+  return FALSE;
+}
+
+BOOLEAN jjPOLY2_POW(leftv res, leftv a, leftv b)
+{
+  poly2 a2=(poly2)a->Data();
+  if (a2->cf==NULL) return TRUE;
+  poly2 r=(poly2)omAlloc0(sizeof(*r));
+  r->cf=a2->cf;
+  r->n=p_Power(p_Copy(a2->n,r->cf),(int)(long)b->Data(),r->cf);
+  return FALSE;
+}
+BOOLEAN jjPOLY2_OP2(leftv res, leftv a, leftv b)
+{
+  int op=iiOp;
+  // binary operations for poly2
+  poly2 a2=NULL;
+  poly aa=NULL;
+  poly2 b2=NULL;
+  poly bb=NULL;
+  leftv an = (leftv)omAlloc0Bin(sleftv_bin);
+  leftv bn = (leftv)omAlloc0Bin(sleftv_bin);
+  int ai,bi;
+  int at=a->Typ();
+  int bt=b->Typ();
+  if ((ai=iiTestConvert(at,CPOLY_CMD,dConvertTypes))!=0)
+  {
+    if ((bi=iiTestConvert(bt,CPOLY_CMD,dConvertTypes))!=0)
+    {
+      iiConvert(at,CPOLY_CMD,ai,a,an);
+      iiConvert(bt,CPOLY_CMD,bi,b,bn);
+      a2=(poly2)an->Data();
+      b2=(poly2)bn->Data();
+      if (((a2!=NULL) && (b2!=NULL) && (a2->cf!=b2->cf))
+      || (a2==NULL)
+      || (b2==NULL))
+      {
+        an->CleanUp();
+        bn->CleanUp();
+        omFreeBin((ADDRESS)an, sleftv_bin);
+        omFreeBin((ADDRESS)bn, sleftv_bin);
+        WerrorS("Poly not compatible");
+        return TRUE;
+      }
+      aa=a2->n;
+      bb=b2->n;
+      poly2 r=(poly2)omAlloc0(sizeof(*r));
+      r->cf=a2->cf;
+      if (r->cf==NULL) op=0; // force error
+      switch(op)
+      {
+        case '+': r->n=p_Add_q(p_Copy(aa,r->cf),p_Copy(bb,r->cf),r->cf);break;
+        case '-': r->n=p_Sub(p_Copy(aa,r->cf),p_Copy(bb,r->cf),r->cf);break;
+        case '*': r->n=pp_Mult_qq(aa,bb,r->cf);break;
+        //case '/': r->n=n_Div(aa,bb,r->cf);break;
+        //case '%': r->n=n_IntMod(aa,bb,r->cf);break;
+        default: Werror("unknown binary operation %s(%d)",Tok2Cmdname(op),op);
+             omFree(r);
+             an->CleanUp();
+             bn->CleanUp();
+             omFreeBin((ADDRESS)an, sleftv_bin);
+             omFreeBin((ADDRESS)bn, sleftv_bin);
+             return TRUE;
+      }
+      res->data=(void*)r;
+      r->cf->ref++;
+      return FALSE;
+    }
+    else
+    {
+      an->CleanUp();
+      omFreeBin((ADDRESS)an, sleftv_bin);
+      Werror("cannot convert second operand (%s) to Poly",b->Name());
+      return TRUE;
+    }
+  }
+  else
+  {
+    Werror("cannot convert first operand (%s) to Poly",a->Name());
+    return TRUE;
+  }
+}
+BOOLEAN jjPOLY2_OP1(leftv res, leftv a)
+{
+  int op=iiOp;
+  // unary operations for poly2
+  poly2 a2=(poly2)a->Data();
+  poly2 r=(poly2)omAlloc(sizeof(*r));
+  r->cf=a2->cf;
+  if (a2->cf==NULL) op=0; // force error
+  switch(op)
+  {
+    case '-': r->n=p_Copy(a2->n,a2->cf);r->n=p_Neg(r->n,a2->cf);break;
     default: Werror("unknown unary operation %s(%d)",Tok2Cmdname(op),op);
              omFree(r);
              return TRUE;
@@ -215,6 +327,14 @@ BOOLEAN jjNUMBER2CR(leftv res, leftv a, leftv b)
 BOOLEAN jjN2_CR(leftv res, leftv a)              // number2 ->cring
 {
   number2 n=(number2)a->Data();
+  n->cf->ref++;
+  res->data=(void*)n->cf;
+  return FALSE;
+}
+
+BOOLEAN jjP2_R(leftv res, leftv a)              // poly2 ->ring
+{
+  poly2 n=(poly2)a->Data();
   n->cf->ref++;
   res->data=(void*)n->cf;
   return FALSE;
@@ -315,11 +435,65 @@ void n2Print(number2 d)
   omFree(s);
 }
 
+// -----------------------------------------------------------
+// operations with Poly/poly2
+// -----------------------------------------------------------
+
+poly2 p2Copy(const poly2 d)
+{
+  poly2 r=NULL;
+  if ((d!=NULL)&&(d->cf!=NULL))
+  {
+    r=(poly2)omAlloc(sizeof(*r));
+    d->cf->ref++;
+    r->cf=d->cf;
+    if (d->cf!=NULL)
+      r->n=p_Copy(d->n,d->cf);
+    else
+      r->n=NULL;
+  }
+  return r;
+}
+void p2Delete(poly2 &d)
+{
+  if (d!=NULL)
+  {
+    if (d->cf!=NULL)
+    {
+      p_Delete(&d->n,d->cf);
+      rKill(d->cf);
+    }
+    omFreeSize(d,sizeof(*d));
+    d=NULL;
+  }
+}
+char *p2String(poly2 d, BOOLEAN typed)
+{
+  StringSetS("");
+  if ((d!=NULL) && (d->cf!=NULL))
+  {
+    if (typed) StringAppendS("Poly(");
+    p_Write0(d->n,d->cf);
+    if (typed) StringAppendS(")");
+  }
+  else StringAppendS("oo");
+  return StringEndS();
+}
+
+void p2Print(poly2 d)
+{
+  char *s=p2String(d,FALSE);
+  PrintS(s);
+  omFree(s);
+}
+
+// ---------------------------------------------------------------------
 #include <coeffs/bigintmat.h>
 BOOLEAN jjBIM2_CR(leftv res, leftv a)              // bigintmat ->cring
 {
   bigintmat *b=(bigintmat*)a->Data();
   coeffs cf=b->basecoeffs();
+  if (cf==NULL) return TRUE;
   cf->ref++;
   res->data=(void*)cf;
   return FALSE;
@@ -328,8 +502,9 @@ BOOLEAN jjBIM2_CR(leftv res, leftv a)              // bigintmat ->cring
 BOOLEAN jjR2_CR(leftv res, leftv a)              // ring ->cring
 {
   ring r=(ring)a->Data();
-  coeffs cf=r->cf;
-  cf->ref++;
+  AlgExtInfo extParam;
+  extParam.r = r;
+  coeffs cf=nInitChar(n_polyExt,&extParam);
   res->data=(void*)cf;
   return FALSE;
 }

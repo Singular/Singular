@@ -56,6 +56,12 @@ static char* ndCoeffString(const coeffs r)
   char *s=(char *)omAlloc(11);snprintf(s,11,"Coeffs(%d)",r->type);
   return s;
 }
+static char* ndCoeffName(const coeffs r)
+{
+  static char s[20];
+  snprintf(s,11,"Coeffs(%d)",r->type);
+  return s;
+}
 static void   ndInpMult(number &a, number b, const coeffs r)
 {
   number n=r->cfMult(a,b,r);
@@ -150,7 +156,6 @@ static number ndIntMod(number, number, const coeffs r) { return r->cfInit(0,r); 
 static number ndGetDenom(number &, const coeffs r)     { return r->cfInit(1,r); }
 static number ndGetNumerator(number &a,const coeffs r) { return r->cfCopy(a,r); }
 static int    ndSize(number a, const coeffs r)         { return (int)r->cfIsZero(a,r)==FALSE; }
-static char * ndCoeffName(const coeffs r)              { return r->cfCoeffString(r); }
 
 static void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs r)
 {
@@ -350,6 +355,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfDelete= ndDelete;
     n->cfAnn = ndAnn;
     n->cfCoeffString = ndCoeffString; // should alway be changed!
+    n->cfCoeffName = ndCoeffName; // should alway be changed!
     n->cfInpMult=ndInpMult;
     n->cfInpAdd=ndInpAdd;
     n->cfCopy = ndCopy;
@@ -361,7 +367,6 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfInitMPZ = ndInitMPZ;
     n->cfMPZ = ndMPZ;
     n->cfPower = ndPower;
-    n->cfCoeffName = ndCoeffName;
 
     n->cfKillChar = ndKillChar; /* dummy */
     n->cfSetChar = ndSetChar; /* dummy */
@@ -418,6 +423,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     assume(n->nCoeffIsEqual!=NULL);
     assume(n->cfSetChar!=NULL);
     assume(n->cfCoeffString!=ndCoeffString);
+    assume(n->cfCoeffName!=ndCoeffName);
     assume(n->cfMult!=NULL);
     assume(n->cfSub!=NULL);
     assume(n->cfAdd!=NULL);

@@ -38,9 +38,9 @@ typedef struct _scmdnames cmdnames;
 
 
 typedef struct {
-  unsigned long nCmdUsed;      /**< number of commands used */
-  unsigned long nCmdAllocated; /**< number of commands-slots allocated */
-  unsigned long nLastIdentifier;
+  unsigned  nCmdUsed;          /**< number of commands used */
+  unsigned nCmdAllocated;      /**< number of commands-slots allocated */
+  unsigned nLastIdentifier;
   cmdnames *sCmds;             /**< array of existing commands */
 
 #ifndef GENTABLE

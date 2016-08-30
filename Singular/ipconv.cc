@@ -184,8 +184,21 @@ static void * iiI2NN(void *data)
     return NULL;
   }
   number n=nInit((int)(long)data);
-  number2 nn=(number2)omAlloc(sizeof*nn);
+  number2 nn=(number2)omAlloc(sizeof(*nn));
   nn->cf=currRing->cf; nn->cf->ref++;
+  nn->n=n;
+  return (void *)nn;
+}
+static void * iiI2CP(void *data)
+{
+  if (currRing==NULL)
+  {
+    WerrorS("missing basering while converting int to Poly");
+    return NULL;
+  }
+  poly n=pISet((int)(long)data);
+  poly2 nn=(poly2)omAlloc(sizeof(*nn));
+  nn->cf=currRing; nn->cf->ref++;
   nn->n=n;
   return (void *)nn;
 }
@@ -221,8 +234,36 @@ static void * iiBI2NN(void *data)
   }
   number n=nMap((number)data,coeffs_BIGINT,currRing->cf);
   n_Delete((number *)&data, coeffs_BIGINT);
-  number2 nn=(number2)omAlloc(sizeof*nn);
+  number2 nn=(number2)omAlloc(sizeof(*nn));
   nn->cf=currRing->cf; nn->cf->ref++;
+  nn->n=n;
+  return (void*)nn;
+}
+static void * iiBI2CP(void *data)
+{
+  if (currRing==NULL)
+  {
+    WerrorS("missing basering while converting bigint to Poly");
+    return NULL;
+  }
+  nMapFunc nMap=n_SetMap(coeffs_BIGINT,currRing->cf);
+  if (nMap==NULL)
+  {
+    Werror("no conversion from bigint to %s",currRing->cf->cfCoeffString(currRing->cf));
+    return NULL;
+  }
+  number n=nMap((number)data,coeffs_BIGINT,currRing->cf);
+  n_Delete((number *)&data, coeffs_BIGINT);
+  poly2 nn=(poly2)omAlloc(sizeof(*nn));
+  nn->cf=currRing; nn->cf->ref++;
+  nn->n=pNSet(n);
+  return (void*)nn;
+}
+static void * iiP2CP(void *data)
+{
+  poly2 nn=(poly2)omAlloc(sizeof(*nn));
+  nn->cf=currRing; nn->cf->ref++;
+  nn->n=(poly)data;
   return (void*)nn;
 }
 #endif

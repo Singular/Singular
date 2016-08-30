@@ -137,6 +137,8 @@ void *idrecDataInit(int t)
 #ifdef SINGULAR_4_1
     case CNUMBER_CMD:
       return (void*)n2Init(0,NULL);
+    case CPOLY_CMD:
+      return (void*)p2Init(0,NULL);
     case CMATRIX_CMD:
 #endif
     case BIGINTMAT_CMD:

@@ -511,25 +511,35 @@ static BOOLEAN jiA_NUMBER2_N(leftv res, leftv a, Subexpr e)
     if (res->data!=NULL)
     {
       number2 nn=(number2)res->data;
-      if (currRing->cf==nn->cf)
-      {
-        number2 n=(number2)omAlloc(sizeof(*n));
-        n->cf=currRing->cf; n->cf++;
-        n->n=(number)a->CopyD(NUMBER_CMD);
-        n2Delete(nn);
-        res->data=(void *)n;
-      }
-      else
-      {
-        WerrorS("different base");
-        return TRUE;
-      }
+      number2 n=(number2)omAlloc(sizeof(*n));
+      n->cf=currRing->cf; n->cf->ref++;
+      n->n=(number)a->CopyD(NUMBER_CMD);
+      n2Delete(nn);
+      res->data=(void *)n;
     }
     else
     {
-      WerrorS("no (c)ring avialable for conversion from number");
-      return TRUE;
+      number2 n=(number2)omAlloc(sizeof(*n));
+      n->cf=currRing->cf; n->cf->ref++;
+      n->n=(number)a->CopyD(NUMBER_CMD);
+      res->data=(void *)n;
     }
+  }
+  else return TRUE; // TODO: list elements
+  return FALSE;
+}
+static BOOLEAN jiA_POLY2(leftv res, leftv a, Subexpr e)
+{
+  poly2 n=(poly2)a->CopyD(CPOLY_CMD);
+  if (e==NULL)
+  {
+    if (res->data!=NULL)
+    {
+      poly2 nn=(poly2)res->data;
+      p2Delete(nn);
+    }
+    res->data=(void *)n;
+    jiAssignAttr(res,a);
   }
   else
   {
@@ -539,32 +549,34 @@ static BOOLEAN jiA_NUMBER2_N(leftv res, leftv a, Subexpr e)
       Werror("index[%d] must be positive",i+1);
       return TRUE;
     }
-    bigintmat *iv=(bigintmat *)res->data;
-    if (e->next==NULL)
+    WerrorS("not yet"); // TODO: list elem
+    return TRUE;
+  }
+  jiAssignAttr(res,a);
+  return FALSE;
+}
+static BOOLEAN jiA_POLY2_P(leftv res, leftv a, Subexpr e)
+{
+  if (e==NULL)
+  {
+    if (res->data!=NULL)
     {
-      WerrorS("only one index given");
-      return TRUE;
+      poly2 nn=(poly2)res->data;
+      poly2 n=(poly2)omAlloc(sizeof(*n));
+      n->cf=currRing; n->cf->ref++;
+      n->n=(poly)a->CopyD(POLY_CMD);
+      p2Delete(nn);
+      res->data=(void *)n;
     }
     else
     {
-      int c=e->next->start;
-      if ((i>=iv->rows())||(c<1)||(c>iv->cols()))
-      {
-        Werror("wrong range [%d,%d] in cmatrix %s(%d,%d)",i+1,c,res->Name(),iv->rows(),iv->cols());
-        return TRUE;
-      }
-      else if (iv->basecoeffs()==currRing->cf)
-      {
-        n_Delete((number *)&BIMATELEM(*iv,i+1,c),iv->basecoeffs());
-        BIMATELEM(*iv,i+1,c) = (number)(a->CopyD(NUMBER_CMD));
-      }
-      else
-      {
-        WerrorS("different base");
-        return TRUE;
-      }
+      poly2 n=(poly2)omAlloc(sizeof(*n));
+      n->cf=currRing; n->cf->ref++;
+      n->n=(poly)a->CopyD(POLY_CMD);
+      res->data=(void *)n;
     }
   }
+  else return TRUE; // TODO: list elements
   return FALSE;
 }
 #endif

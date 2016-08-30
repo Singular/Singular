@@ -112,6 +112,9 @@ void sleftv::Print(leftv store, int spaces)
         case CNUMBER_CMD:
           n2Print((number2)d);
           break;
+        case CPOLY_CMD:
+          p2Print((poly2)d);
+          break;
         case CMATRIX_CMD: // like BIGINTMAT
 #endif
         case BIGINTMAT_CMD:
@@ -413,6 +416,8 @@ static inline void * s_internalCopy(const int t,  void *d)
       }
     case CNUMBER_CMD:
       return (void*)n2Copy((number2)d);
+    case CPOLY_CMD:
+      return (void*)p2Copy((poly2)d);
     case CMATRIX_CMD: // like BIGINTMAT
 #endif
     case BIGINTMAT_CMD:
@@ -492,6 +497,12 @@ void s_internalDelete(const int t,  void *d, const ring r)
       {
         number2 n=(number2)d;
         n2Delete(n);
+        break;
+      }
+    case CPOLY_CMD:
+      {
+        poly2 n=(poly2)d;
+        p2Delete(n);
         break;
       }
     case CMATRIX_CMD: //like BIGINTMAT

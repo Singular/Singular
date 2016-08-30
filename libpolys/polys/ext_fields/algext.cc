@@ -1360,6 +1360,29 @@ char* naCoeffString(const coeffs r) // currently also for tranext.
   return s;
 }
 
+char* naCoeffName(const coeffs r) // currently also for tranext.
+{
+  const char* const* p=n_ParameterNames(r);
+  int l=0;
+  int i;
+  for(i=0; i<n_NumberOfParameters(r);i++)
+  {
+    l+=(strlen(p[i])+1);
+  }
+  static char s[200];
+  s[0]='\0';
+  snprintf(s,10+1,"%d",r->ch); /* Fp(a) or Q(a) */
+  char tt[2];
+  tt[0]=',';
+  tt[1]='\0';
+  for(i=0; i<n_NumberOfParameters(r);i++)
+  {
+    strcat(s,tt);
+    strcat(s,p[i]);
+  }
+  return s;
+}
+
 number  naChineseRemainder(number *x, number *q,int rl, BOOLEAN /*sym*/,CFArray &inv_cache,const coeffs cf)
 {
   poly *P=(poly*)omAlloc(rl*sizeof(poly*));
@@ -1413,7 +1436,8 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   p_Test((poly)naMinpoly, naRing);
   #endif
 
-  cf->cfCoeffString = naCoeffString;
+  cf->cfCoeffString  = naCoeffString;
+  cf->cfCoeffName    = naCoeffName;
 
   cf->cfGreaterZero  = naGreaterZero;
   cf->cfGreater      = naGreater;
@@ -1585,25 +1609,58 @@ static BOOLEAN n2pCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
   return FALSE;
 }
 
-char* n2pCoeffString(const coeffs r) // currently also for tranext.
+char* n2pCoeffString(const coeffs cf)
 {
-  const char* const* p=n_ParameterNames(r);
+  const char* const* p=n_ParameterNames(cf);
   int l=0;
   int i;
-  for(i=0; i<n_NumberOfParameters(r);i++)
+  for(i=0; i<rVar(n2pRing);i++)
   {
     l+=(strlen(p[i])+1);
   }
-  char *s=(char *)omAlloc(l+10+1);
+  char *cf_s=nCoeffString(n2pRing->cf);
+  char *s=(char *)omAlloc(l+5+strlen(cf_s));
   s[0]='\0';
-  snprintf(s,10+1,"%d",r->ch); /* Fp(a) or Q(a) */
+  snprintf(s,strlen(cf_s)+2,"%s",cf_s);
+  omFree(cf_s);
   char tt[2];
-  tt[0]=',';
+  tt[0]='[';
   tt[1]='\0';
-  for(i=0; i<n_NumberOfParameters(r);i++)
+  strcat(s,tt);
+  tt[0]=',';
+  for(i=0; i<rVar(n2pRing);i++)
   {
-    strcat(s,tt);
     strcat(s,p[i]);
+    if (i+1!=rVar(n2pRing)) strcat(s,tt);
+    else { tt[0]=']'; strcat(s,tt); }
+  }
+  return s;
+}
+
+char* n2pCoeffName(const coeffs cf)
+{
+  const char* const* p=n_ParameterNames(cf);
+  int l=0;
+  int i;
+  for(i=0; i<rVar(n2pRing);i++)
+  {
+    l+=(strlen(p[i])+1);
+  }
+  char *cf_s=nCoeffString(n2pRing->cf);
+  char s[200];
+  s[0]='\0';
+  snprintf(s,strlen(cf_s)+2,"%s",cf_s);
+  omFree(cf_s);
+  char tt[2];
+  tt[0]='[';
+  tt[1]='\0';
+  strcat(s,tt);
+  tt[0]=',';
+  for(i=0; i<rVar(n2pRing);i++)
+  {
+    strcat(s,p[i]);
+    if (i+1!=rVar(n2pRing)) strcat(s,tt);
+    else { tt[0]=']'; strcat(s,tt); }
   }
   return s;
 }
@@ -1658,7 +1715,8 @@ BOOLEAN n2pInitChar(coeffs cf, void * infoStruct)
   cf->is_field=FALSE;
   cf->is_domain=TRUE;
 
-  cf->cfCoeffString = n2pCoeffString;
+  cf->cfCoeffString  = n2pCoeffString;
+  cf->cfCoeffName    = n2pCoeffName;
 
   cf->cfGreaterZero  = naGreaterZero;
   cf->cfGreater      = naGreater;

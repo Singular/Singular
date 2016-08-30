@@ -1261,7 +1261,7 @@ void siInit(char *name)
   {
     n_coeffType type;
     #ifdef SINGULAR_4_1
-    type = nRegister(n_polyExt, naInitChar);
+    type = nRegister(n_polyExt, n2pInitChar);
     assume(type == n_polyExt);
     #endif
 
