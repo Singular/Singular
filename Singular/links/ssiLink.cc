@@ -533,11 +533,21 @@ ring ssiReadRing(const ssiInfo *d)
     else
     {
       Werror("ssi: read unknown coeffs type (%d)",ch);
+      for(i=0;i<N;i++)
+      {
+        omFree(names[i]);
+      }
+      omFreeSize(names,N*sizeof(char*));
       return NULL;
     }
     ideal q=ssiReadIdeal_R(d,r);
     if (IDELEMS(q)==0) omFreeBin(q,sip_sideal_bin);
     else r->qideal=q;
+    for(i=0;i<N;i++)
+    {
+      omFree(names[i]);
+    }
+    omFreeSize(names,N*sizeof(char*));
     return r;
   }
 }
