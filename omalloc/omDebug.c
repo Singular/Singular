@@ -304,7 +304,6 @@ omError_t _omDebugBin(omBin bin, OM_CFL_DECL)
 static void* __omDebugAlloc(void* size_bin, omTrackFlags_t flags, char track, OM_FLR_DECL)
 {
   void* o_addr;
-  size_t o_size = (flags & OM_FBIN ? ((omBin)size_bin)->sizeW << LOG_SIZEOF_LONG : (size_bin != NULL ? (size_t) size_bin: 1));
 
 #ifdef OM_HAVE_TRACK
   if (track > 0)
@@ -325,6 +324,7 @@ static void* __omDebugAlloc(void* size_bin, omTrackFlags_t flags, char track, OM
     }
     else
     {
+      size_t o_size = (flags & OM_FBIN ? ((omBin)size_bin)->sizeW << LOG_SIZEOF_LONG : (size_bin != NULL ? (size_t) size_bin: 1));
       if (flags & OM_FZERO)
       {
 #ifdef OM_ALIGNMENT_NEEDS_WORK

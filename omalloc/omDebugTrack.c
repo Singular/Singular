@@ -287,7 +287,7 @@ void* omAllocTrackAddr(void* bin_size,
   omTrackAddr d_addr;
   size_t d_size;
   if (track <= 0) track = 1;
-  if (track >  5) track = 5;
+  else if (track >  5) track = 5;
 
   if ((flags & OM_FBIN) && !omIsStaticNormalBin((omBin)bin_size))
     /* Need to set track >= 3 such that bin_size is kept: Needed
