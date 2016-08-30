@@ -45,7 +45,7 @@ void omUpdateInfo()
   om_Info.AvailBytesMalloc = OM_MALLOC_AVAIL_BYTES;
 #endif
 
-  om_Info.UsedBytes = om_Info.UsedBytesMalloc + om_Info.UsedBytesFromValloc;
+  om_Info.UsedBytes = om_Info.UsedBytesMalloc + om_Info.UsedBytesFromValloc - om_Info.InternalUsedBytesMalloc;
   om_Info.AvailBytes = om_Info.AvailBytesMalloc + om_Info.AvailBytesFromValloc;
 
 #ifdef OM_HAVE_VALLOC_MMAP

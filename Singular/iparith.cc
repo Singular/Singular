@@ -4617,6 +4617,10 @@ static BOOLEAN jjLU_DECOMP(leftv res, leftv v)
 }
 static BOOLEAN jjMEMORY(leftv res, leftv v)
 {
+  // clean out "_":
+  sLastPrinted.CleanUp();
+  memset(&sLastPrinted,0,sizeof(sleftv));
+  // collect all info:
   omUpdateInfo();
   switch(((int)(long)v->Data()))
   {

@@ -332,7 +332,7 @@ void ssiWriteProc(const ssiInfo *d,procinfov p)
 void ssiWriteList(si_link l,lists dd)
 {
   ssiInfo *d=(ssiInfo*)l->data;
-  int Ll=lSize(dd);
+  int Ll=dd->nr;
   fprintf(d->f_write,"%d ",Ll+1);
   int i;
   for(i=0;i<=Ll;i++)
@@ -375,9 +375,9 @@ char *ssiReadString(const ssiInfo *d)
   int l;
   l=s_readint(d->f_read);
   buf=(char*)omAlloc0(l+1);
-  int c =s_getc(d->f_read); /* skip ' '*/
-  int ll=s_readbytes(buf,l,d->f_read);
-  //if (ll!=l) printf("want %d, got %d bytes\n",l,ll);
+  int throwaway =s_getc(d->f_read); /* skip ' '*/
+  throwaway=s_readbytes(buf,l,d->f_read);
+  //if (throwaway!=l) printf("want %d, got %d bytes\n",l,throwaway);
   buf[l]='\0';
   return buf;
 }
@@ -439,7 +439,11 @@ ring ssiReadRing(const ssiInfo *d)
     char *cf_name=ssiReadString(d);
     cf=nFindCoeffByName(cf_name);
     if (cf==NULL)
-    { Werror("cannot find cf:%s",cf_name);return NULL;}
+    {
+      Werror("cannot find cf:%s",cf_name);
+      omFree(cf_name);
+      return NULL;
+    }
   }
   if (N!=0)
   {
@@ -664,12 +668,12 @@ lists ssiReadList(si_link l)
   ssiInfo *d=(ssiInfo*)l->data;
   int nr;
   nr=s_readint(d->f_read);
-  lists L=(lists)omAlloc(sizeof(*L));
+  lists L=(lists)omAlloc0Bin(slists_bin);
   L->Init(nr);
 
   int i;
   leftv v;
-  for(i=0;i<nr;i++)
+  for(i=0;i<=L->nr;i++)
   {
     v=ssiRead1(l);
     memcpy(&(L->m[i]),v,sizeof(*v));
@@ -716,8 +720,7 @@ bigintmat* ssiReadBigintmat(const ssiInfo *d)
 void ssiReadBlackbox(leftv res, si_link l)
 {
   ssiInfo *d=(ssiInfo*)l->data;
-  int throwaway;
-  throwaway=s_readint(d->f_read);
+  int throwaway=s_readint(d->f_read);
   char *name=ssiReadString(d);
   int tok;
   blackboxIsCmd(name,tok);
@@ -731,6 +734,7 @@ void ssiReadBlackbox(leftv res, si_link l)
   {
     Werror("blackbox %s not found",name);
   }
+  omFree(name);
 }
 
 void ssiReadAttrib(leftv res, si_link l)
@@ -747,7 +751,7 @@ void ssiReadAttrib(leftv res, si_link l)
   leftv tmp=ssiRead1(l);
   memcpy(res,tmp,sizeof(sleftv));
   memset(tmp,0,sizeof(sleftv));
-  omFreeSize(tmp,sizeof(sleftv));
+  omFreeBin(tmp,sleftv_bin);
   if (nr_of_attr>0)
   {
   }
@@ -777,6 +781,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
 
 
     SI_LINK_SET_OPEN_P(l, flag);
+    if(l->data!=NULL) omFreeSize(l->data,sizeof(ssiInfo));
     l->data=d;
     omFree(l->mode);
     l->mode = omStrDup(mode);
@@ -1236,7 +1241,7 @@ BOOLEAN ssiClose(si_link l)
 leftv ssiRead1(si_link l)
 {
   ssiInfo *d = (ssiInfo *)l->data;
-  leftv res=(leftv)omAlloc0(sizeof(sleftv));
+  leftv res=(leftv)omAlloc0Bin(sleftv_bin);
   int t=0;
   t=s_readint(d->f_read);
   //Print("got type %d\n",t);
@@ -1266,7 +1271,11 @@ leftv ssiRead1(si_link l)
                d->r->ref++;
                ssiSetCurrRing(d->r);
              }
-             if (t==15) return ssiRead1(l);
+             if (t==15) // setring
+             {
+               omFreeBin(res,sleftv_bin);
+               return ssiRead1(l);
+             }
            }
            break;
     case 6:res->rtyp=POLY_CMD;
@@ -1351,9 +1360,10 @@ leftv ssiRead1(si_link l)
                 #endif
                 si_opt_1=n98_o1;
                 si_opt_2=n98_o2;
+                omFreeBin(res,sleftv_bin);
                 return ssiRead1(l);
              }
-    case 99: ssiClose(l); m2_end(0);
+    case 99: omFreeBin(res,sleftv_bin); ssiClose(l); m2_end(0);
     case 0: if (s_iseof(d->f_read))
             {
               ssiClose(l);
@@ -1361,7 +1371,7 @@ leftv ssiRead1(si_link l)
             res->rtyp=DEF_CMD;
             break;
     default: Werror("not implemented (t:%d)",t);
-             omFreeSize(res,sizeof(sleftv));
+             omFreeBin(res,sleftv_bin);
              res=NULL;
              break;
   }
@@ -1375,7 +1385,7 @@ leftv ssiRead1(si_link l)
   }
   return res;
 no_ring: WerrorS("no ring");
-  omFreeSize(res,sizeof(sleftv));
+  omFreeBin(res,sleftv_bin);
   return NULL;
 }
 //**************************************************************************/
@@ -1784,6 +1794,7 @@ int ssiBatch(const char *host, const char * port)
   char *buf=(char*)omAlloc(256);
   sprintf(buf,"ssi:connect %s:%s",host,port);
   slInit(l, buf);
+  omFreeSize(buf,256);
   if (slOpen(l,SI_LINK_OPEN,NULL)) return 1;
   SI_LINK_SET_RW_OPEN_P(l);
 
