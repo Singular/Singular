@@ -77,7 +77,7 @@ poly ssiReadPoly_R(const ssiInfo *D, const ring r);
 ideal ssiReadIdeal_R(const ssiInfo *d,const ring r);
 
 // the helper functions:
-void ssiSetCurrRing(const ring r)
+BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
 {
   //  if (currRing!=NULL)
   //  Print("need to change the ring, currRing:%s, switch to: ssiRing%d\n",IDID(currRingHdl),nr);
@@ -94,6 +94,12 @@ void ssiSetCurrRing(const ring r)
     IDRING(h)=r;
     r->ref++;
     rSetHdl(h);
+    return FALSE;
+  }
+  else
+  {
+    rKill(r);
+    return TRUE;
   }
 }
 // the implementation of the functions:
@@ -1268,8 +1274,7 @@ leftv ssiRead1(si_link l)
              // we are in the top-level, so set the basering to d->r:
              if (d->r!=NULL)
              {
-               d->r->ref++;
-               ssiSetCurrRing(d->r);
+               if(ssiSetCurrRing(d->r)) { d->r=currRing; d->r->ref++; }
              }
              if (t==15) // setring
              {
@@ -1381,7 +1386,7 @@ leftv ssiRead1(si_link l)
   && (currRing!=d->r)
   && (res->RingDependend()))
   {
-    ssiSetCurrRing(d->r);
+    if(ssiSetCurrRing(d->r)) { d->r=currRing; d->r->ref++; }
   }
   return res;
 no_ring: WerrorS("no ring");
