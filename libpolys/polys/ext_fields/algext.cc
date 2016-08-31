@@ -1647,7 +1647,7 @@ char* n2pCoeffName(const coeffs cf)
     l+=(strlen(p[i])+1);
   }
   char *cf_s=nCoeffString(n2pRing->cf);
-  char s[200];
+  static char s[200];
   s[0]='\0';
   snprintf(s,strlen(cf_s)+2,"%s",cf_s);
   omFree(cf_s);
