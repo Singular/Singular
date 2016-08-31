@@ -36,10 +36,7 @@
 #define SI_BIGINT_VARIANT 1
 
 /* preparation for versio 4.1.0: */
-#ifndef SINGULAR_4_1
-/* #define SINGULAR_4_1 */
 #undef SINGULAR_4_1
-#endif /* SINGULAR_4_1 */
 
 #ifndef SIZEOF_LONG
 
