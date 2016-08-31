@@ -497,7 +497,7 @@ void s_internalDelete(const int t,  void *d, const ring r)
         ((cf->type <=n_long_R)
           ||((cf->type >=n_long_C)&&(cf->type <=n_CF))))
         {
-          Werror("cannot kill %s",n_CoeffName(cf));
+          Werror("cannot kill %s",nCoeffName(cf));
         }
         else
           nKillChar((coeffs)d);
