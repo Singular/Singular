@@ -66,7 +66,7 @@ typedef struct omOpts_s omOpts_t;
 extern int om_sing_opt_show_mem;
 
 static inline void * omalloc(size_t s)
-{ if (d!=0) {long *d=(long*)malloc(s+sizeof(long)); *d=s;d++;return d; }
+{ if (s!=0) {long *d=(long*)malloc(s+sizeof(long)); *d=s;d++;return d; }
   else return NULL;
 }
 static inline void * omAlloc(size_t s)
