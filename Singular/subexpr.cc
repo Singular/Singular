@@ -491,8 +491,18 @@ void s_internalDelete(const int t,  void *d, const ring r)
   {
 #ifdef SINGULAR_4_1
     case CRING_CMD:
-      nKillChar((coeffs)d);
-      break;
+      {
+        coeffs cf=(coeffs)d;
+        if ((cf->ref<=1)&&
+        ((cf->type <=n_long_R)
+          ||((cf->type >=n_long_C)&&(cf->type <=n_CF))))
+        {
+          Werror("cannot kill %s",n_CoeffName(cf));
+        }
+        else
+          nKillChar((coeffs)d);
+        break;
+      }
     case CNUMBER_CMD:
       {
         number2 n=(number2)d;
