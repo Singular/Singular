@@ -908,40 +908,43 @@ PrintLn();
 static void syReOrdResult_Hilb(syStrategy syzstr,int maxindex,int maxdeg)
 {
   ideal reor,toreor;
-  int i,j,k,l,m,togo;
+  int k,l,m,togo;
   syzstr->betti = new intvec(maxdeg,maxindex+1,0);
-  (*syzstr->betti)[0] = 1;
-  for (i=1;i<=syzstr->length;i++)
+  if (syzstr->betti->length()>0)
   {
-    if ((syzstr->orderedRes[i]!=NULL) && !idIs0(syzstr->orderedRes[i]))
+    (*syzstr->betti)[0] = 1;
+    for (int i=1;i<=syzstr->length;i++)
     {
-      toreor = syzstr->orderedRes[i];
-      k = IDELEMS(toreor);
-      while ((k>0) && (toreor->m[k-1]==NULL)) k--;
-      reor = idInit(k,toreor->rank);
-      togo = IDELEMS(syzstr->res[i]);
-      for (j=0;j<k;j++)
+      if ((syzstr->orderedRes[i]!=NULL) && !idIs0(syzstr->orderedRes[i]))
       {
-        if (toreor->m[j]!=NULL) (IMATELEM(*syzstr->betti,p_FDeg(toreor->m[j],currRing)-i+1,i+1))++;
-        reor->m[j] = toreor->m[j];
-        toreor->m[j] = NULL;
-      }
-      m = 0;
-      for (j=0;j<togo;j++)
-      {
-        if (syzstr->res[i]->m[j]!=NULL)
+        toreor = syzstr->orderedRes[i];
+        k = IDELEMS(toreor);
+        while ((k>0) && (toreor->m[k-1]==NULL)) k--;
+        reor = idInit(k,toreor->rank);
+        togo = IDELEMS(syzstr->res[i]);
+        for (int j=0;j<k;j++)
         {
-          l = 0;
-          while ((l<k) && (syzstr->res[i]->m[j]!=reor->m[l])) l++;
-          if (l<k)
+          if (toreor->m[j]!=NULL) (IMATELEM(*syzstr->betti,p_FDeg(toreor->m[j],currRing)-i+1,i+1))++;
+          reor->m[j] = toreor->m[j];
+          toreor->m[j] = NULL;
+        }
+        m = 0;
+        for (int j=0;j<togo;j++)
+        {
+          if (syzstr->res[i]->m[j]!=NULL)
           {
-            toreor->m[m] = reor->m[l];
-            reor->m[l] = NULL;
-            m++;
+            l = 0;
+            while ((l<k) && (syzstr->res[i]->m[j]!=reor->m[l])) l++;
+            if (l<k)
+            {
+              toreor->m[m] = reor->m[l];
+              reor->m[l] = NULL;
+              m++;
+            }
           }
         }
+        idDelete(&reor);
       }
-      idDelete(&reor);
     }
   }
 }
