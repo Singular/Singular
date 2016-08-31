@@ -255,7 +255,7 @@ BOOLEAN nrzDivBy (number a,number b, const coeffs)
   return mpz_divisible_p((mpz_ptr) a, (mpz_ptr) b) != 0;
 }
 
-number nrzDiv (number a,number b, const coeffs R)
+number nrzDiv (number a,number b, const coeffs)
 {
   mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -467,13 +467,18 @@ void    nrzCoeffWrite  (const coeffs, BOOLEAN /*details*/)
 #endif
 }
 
-static char* nrzCoeffString(const coeffs)
+static char* nrzCoeffName(const coeffs)
 {
 #ifdef SINGULAR_4_1
-  return omStrDup("ZZ");
+  return (char*)"ZZ";
 #else
-  return omStrDup("integer");
+  return (char*)"integer";
 #endif
+}
+
+static char* nrzCoeffString(const coeffs cf)
+{
+  return omStrDup(nrzCoeffName(cf));
 }
 
 coeffs nrzQuot1(number c, const coeffs r)
@@ -499,6 +504,8 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
 
   //r->nCoeffIsEqual = ndCoeffIsEqual;
   r->cfCoeffString = nrzCoeffString;
+  r->cfCoeffName = nrzCoeffName;
+  r->cfCoeffWrite = nrzCoeffWrite;
   //r->cfKillChar = ndKillChar;
   r->cfMult  = nrzMult;
   r->cfSub   = nrzSub;
@@ -532,7 +539,6 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfLcm  = nrzLcm;
   r->cfDelete= nrzDelete;
   r->cfSetMap = nrzSetMap;
-  r->cfCoeffWrite = nrzCoeffWrite;
   r->cfQuot1 = nrzQuot1;
   r->convSingNFactoryN=nrzConvSingNFactoryN;
   r->convFactoryNSingN=nrzConvFactoryNSingN;
