@@ -367,30 +367,30 @@ void Test(const ring r)
 
      if( cf == NULL )
        TS_FAIL("Could not get needed coeff. domain");
+     else
+     {
+       ring r = rDefault( cf, 1, n);  // now cf belongs to r!
+       TS_ASSERT_DIFFERS( r, NULLp );
 
-     TS_ASSERT_DIFFERS( cf, NULLp );
+       PrintRing(r);
 
-     ring r = rDefault( cf, 1, n);  // now cf belongs to r!
-     TS_ASSERT_DIFFERS( r, NULLp );
+       TS_ASSERT( rField_is_Domain(r) );
+       TS_ASSERT( !rField_is_Q(r) );
 
-     PrintRing(r);
+       TS_ASSERT( !rField_is_Zp(r) );
+       TS_ASSERT( !rField_is_Zp(r, 11) );
+       TS_ASSERT( !rField_is_Zp(r, 13) );
+       TS_ASSERT( rField_is_GF(r) );
 
-     TS_ASSERT( rField_is_Domain(r) );
-     TS_ASSERT( !rField_is_Q(r) );
+       TS_ASSERT( rField_is_GF(r, 5) );
+       TS_ASSERT( !rField_is_GF(r, 25) );
 
-     TS_ASSERT( !rField_is_Zp(r) );
-     TS_ASSERT( !rField_is_Zp(r, 11) );
-     TS_ASSERT( !rField_is_Zp(r, 13) );
-     TS_ASSERT( rField_is_GF(r) );
+       TS_ASSERT_EQUALS( rVar(r), 1);
 
-     TS_ASSERT( rField_is_GF(r, 5) );
-     TS_ASSERT( !rField_is_GF(r, 25) );
+       Test(r);
 
-     TS_ASSERT_EQUALS( rVar(r), 1);
-
-     Test(r);
-
-     rDelete(r); // kills 'cf' as well!
+       rDelete(r); // kills 'cf' as well!
+     }
    }
 
 
