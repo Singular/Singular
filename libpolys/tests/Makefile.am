@@ -22,6 +22,7 @@ ${top_builddir}/reporter/libreporter.la ${top_builddir}/misc/libmisc.la \
 $(FACTORY_LIBS) $(RESOURCES_LIBS) $(OMALLOC_LIBS) \
 $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS)
 
+simple_test_LDADD = ${top_builddir}/polys/libpolys.la $(coeffs_test_LDADD)
 polys_test_LDADD = ${top_builddir}/polys/libpolys.la $(coeffs_test_LDADD)
 rings_test_LDADD = $(polys_test_LDADD)
 
