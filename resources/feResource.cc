@@ -5,7 +5,7 @@
 * ABSTRACT: management of resources
 */
 
-#include "resourcesconfig.h"
+#include "singular_resourcesconfig.h"
 #include "feResource.h"
 #include "omFindExec.h"
 

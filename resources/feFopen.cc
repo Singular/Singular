@@ -1,4 +1,4 @@
-#include "resourcesconfig.h"
+#include "singular_resourcesconfig.h"
 #include "feResource.h"
 #include "feFopen.h"
 

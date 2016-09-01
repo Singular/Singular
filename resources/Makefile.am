@@ -1,24 +1,24 @@
 ACLOCAL_AMFLAGS = -I ../m4
 
-libresources_LTLIBRARIES = libresources.la
+libsingular_resources_LTLIBRARIES = libsingular_resources.la
 
-libresourcesdir = $(libdir)
+libsingular_resourcesdir = $(libdir)
 
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir}
 
 
 SOURCES  = omFindExec.c feResource.cc feFopen.cc
-libresources_la_SOURCES   = $(SOURCES)
+libsingular_resources_la_SOURCES   = $(SOURCES)
 
-libresources_la_LDFLAGS   = -release ${PACKAGE_VERSION}
+libsingular_resources_la_LDFLAGS   = -release ${PACKAGE_VERSION}
 
-libresources_includedir  =$(includedir)/resources
+libsingular_resources_includedir  =$(includedir)/resources
 
-libresources_include_HEADERS = omFindExec.h feResource.h feFopen.h
+libsingular_resources_include_HEADERS = omFindExec.h feResource.h feFopen.h
 
-nodist_libresources_include_HEADERS = resourcesconfig.h
-DISTCLEANFILES = $(nodist_libresources_include_HEADERS)
+nodist_libsingular_resources_include_HEADERS = singular_resourcesconfig.h
+DISTCLEANFILES = $(nodist_libsingular_resources_include_HEADERS)
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = resources.pc
+pkgconfig_DATA = singular_resources.pc

@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([libgfan], [0.1], [ren@mathematik.uni-kl.de])
+AC_INIT([libgfan], [0.6], [ren@mathematik.uni-kl.de])
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([../build-aux])
 AC_CONFIG_SRCDIR([gfanlib.h])

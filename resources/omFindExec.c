@@ -6,7 +6,7 @@
  *******************************************************************/
 
 
-#include "resourcesconfig.h"
+#include "singular_resourcesconfig.h"
 
 
 #if defined(HAVE_UNISTD_H) && defined(STDC_HEADERS)

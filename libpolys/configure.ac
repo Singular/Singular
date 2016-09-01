@@ -90,10 +90,10 @@ SING_CHECK_OMALLOC()
 
 ENABLE_RESOURCES="yes"
 
-AC_ARG_VAR( [RESOURCES_INCLUDES], [INCLUDES for libresources] )
-AC_ARG_VAR( [RESOURCES_LIBS], [LIBS for libresources] )
+AC_ARG_VAR( [RESOURCES_INCLUDES], [INCLUDES for libsingular_resources] )
+AC_ARG_VAR( [RESOURCES_LIBS], [LIBS for libsingular_resources] )
 
-AC_MSG_CHECKING(whether libresources should be used)
+AC_MSG_CHECKING(whether libsingular_resources should be used)
 
 if test "x$ENABLE_RESOURCES" = xyes;
 then
@@ -105,7 +105,7 @@ then
   AC_MSG_CHECKING([  RESOURCES_LIBS?..])
   AC_MSG_RESULT(${RESOURCES_LIBS:-unset})
 
-  PKG_REQUIRE="$PKG_REQUIRE resources"
+  PKG_REQUIRE="$PKG_REQUIRE singular_resources"
   AC_SUBST(PKG_REQUIRE)
 else
   AC_MSG_RESULT(no)

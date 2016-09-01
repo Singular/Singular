@@ -1,4 +1,4 @@
-AC_INIT([resources], [4.0.3])
+AC_INIT([singular_resources], [4.0.3])
 
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([../build-aux])
@@ -14,7 +14,7 @@ dnl Check if build env is sane
 AM_SANITY_CHECK
 
 # Add pre'prefixed config
-AX_PREFIX_CONFIG_H([resourcesconfig.h],[],[_config.h])
+AX_PREFIX_CONFIG_H([singular_resourcesconfig.h],[],[_config.h])
 
 SING_RESET_FLAGS()
 SING_CHECK_SET_ARGS()
@@ -70,5 +70,5 @@ AX_RECURSIVE_EVAL([[$]datadir], [config_datadir])
 AX_NORMALIZE_PATH([config_datadir],['/'])
 AC_DEFINE_UNQUOTED([DATA_DIR],"$config_datadir",[datadir])
 
-AC_CONFIG_FILES([resources.pc Makefile])
+AC_CONFIG_FILES([singular_resources.pc Makefile])
 AC_OUTPUT

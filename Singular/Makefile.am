@@ -176,7 +176,7 @@ ESingular_CPPFLAGS = ${AM_CPPFLAGS} -DESINGULAR -DPROTO
 # ESingular_LDFLAGS = -static ${AM_LDFLAGS}
 ESingular_LDADD =  ${top_builddir}/libpolys/reporter/libreporter.la \
 ${top_builddir}/libpolys/misc/libmisc.la ${top_builddir}/omalloc/libomalloc.la \
-${top_builddir}/resources/libresources.la
+${top_builddir}/resources/libsingular_resources.la
 
 
 ESingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptES.inc feOpt.cc
@@ -186,7 +186,7 @@ TSingular_CPPFLAGS = ${AM_CPPFLAGS} -DTSINGULAR -DPROTO
 # TSingular_LDFLAGS = -static ${AM_LDFLAGS}
 TSingular_LDADD = ${top_builddir}/libpolys/reporter/libreporter.la \
 ${top_builddir}/libpolys/misc/libmisc.la ${top_builddir}/omalloc/libomalloc.la \
-${top_builddir}/resources/libresources.la
+${top_builddir}/resources/libsingular_resources.la
 
 TSingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptTS.inc feOpt.cc
 # utils.cc utils.h

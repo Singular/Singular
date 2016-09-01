@@ -150,19 +150,19 @@ AC_DEFUN([SING_USE_OMALLOC],
 
 AC_DEFUN([SING_USE_RESOURCES],
 [
- AC_ARG_ENABLE(resources,
-  [AS_HELP_STRING([--disable-resources], [do NOT use libresources within the factory])],
+ AC_ARG_ENABLE(singular_resources,
+  [AS_HELP_STRING([--disable-singular_resources], [do NOT use libsingular_resources within the factory])],
   [if test "x$enableval"  = "xyes"; then
     ENABLE_RESOURCES=yes
    fi],
     ENABLE_RESOURCES=yes)
 
- AC_MSG_CHECKING(whether to use libresources in factory and co.)
+ AC_MSG_CHECKING(whether to use libsingular_resources in factory and co.)
  if test "x$ENABLE_RESOURCES" = xyes; then
   AC_MSG_RESULT(yes)
   RESOURCES_INCLUDES="-I$ac_abs_top_srcdir "
 
-  RESOURCES_LIBS="$ac_abs_top_builddir/resources/libresources.la"
+  RESOURCES_LIBS="$ac_abs_top_builddir/resources/libsingular_resources.la"
 
   AC_SUBST(RESOURCES_INCLUDES)
   AC_SUBST(RESOURCES_LIBS)
@@ -171,7 +171,7 @@ AC_DEFUN([SING_USE_RESOURCES],
 
   ac_configure_args="$ac_configure_args $ENABLE_ARG"
 
-  PKG_REQUIRE="$PKG_REQUIRE resources"
+  PKG_REQUIRE="$PKG_REQUIRE singular_resources"
   AC_SUBST(PKG_REQUIRE)
  else
   AC_MSG_RESULT(no)
