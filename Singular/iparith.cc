@@ -8104,8 +8104,6 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
         {
           break;// leave loop, goto error handling
         }
-        a->CleanUp();
-        b->CleanUp();
         //Print("op: %d,result typ:%d\n",op,res->rtyp);
         return FALSE;
       }
@@ -8159,8 +8157,6 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
               bn->CleanUp();
               omFreeBin((ADDRESS)an, sleftv_bin);
               omFreeBin((ADDRESS)bn, sleftv_bin);
-              a->CleanUp();
-              b->CleanUp();
               return FALSE;
             }
           }
@@ -8222,8 +8218,6 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
     }
     res->rtyp = UNKNOWN;
   }
-  a->CleanUp();
-  b->CleanUp();
   return TRUE;
 }
 BOOLEAN iiExprArith2Tab(leftv res, leftv a, int op,
@@ -8515,9 +8509,6 @@ static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv 
         {
           break;// leave loop, goto error handling
         }
-        a->CleanUp();
-        b->CleanUp();
-        c->CleanUp();
         return FALSE;
       }
       i++;
@@ -8568,9 +8559,6 @@ static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv 
                 omFreeBin((ADDRESS)an, sleftv_bin);
                 omFreeBin((ADDRESS)bn, sleftv_bin);
                 omFreeBin((ADDRESS)cn, sleftv_bin);
-                a->CleanUp();
-                b->CleanUp();
-                c->CleanUp();
         //Print("op: %d,result typ:%d\n",op,res->rtyp);
                 return FALSE;
               }
@@ -8632,9 +8620,6 @@ static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv 
     }
     res->rtyp = UNKNOWN;
   }
-  a->CleanUp();
-  b->CleanUp();
-  c->CleanUp();
         //Print("op: %d,result typ:%d\n",op,res->rtyp);
   return TRUE;
 }
