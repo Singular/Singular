@@ -2267,7 +2267,6 @@ static BOOLEAN jjFAREY_ID(leftv res, leftv u, leftv v)
   ideal uu=(ideal)u->Data();
   number vv=(number)v->Data();
   res->data=(void*)id_Farey(uu,vv,currRing);
-  res->rtyp=u->Typ();
   return FALSE;
 }
 static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
