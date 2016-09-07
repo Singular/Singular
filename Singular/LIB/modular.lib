@@ -39,6 +39,7 @@ PROCEDURES:
                 back to characteristic zero
 ";
 
+LIB "general.lib";
 LIB "resources.lib";
 LIB "tasks.lib";
 LIB "parallel.lib";
@@ -156,6 +157,12 @@ EXAMPLE:  example modular; shows an example"
 
         // delete unlucky primes
         indices = deleteUnluckyPrimes(modresults);
+        indices = sort(indices)[1];
+        for (i = size(indices); i > 1; i--) {
+            if (indices[i] == indices[i-1]) {
+                indices = delete(indices, i);
+            }
+        }
         for (i = size(indices); i > 0; i--) {
             modresults = delete(modresults, indices[i]);
             primes = delete(primes, indices[i]);
@@ -163,10 +170,10 @@ EXAMPLE:  example modular; shows an example"
 
         // lift result
         if (N == 1) {
-            result_lift = chinrem(modresults, primes);
+            result_lift = chinrem_recursive(modresults, primes);
         }
         else {
-            result_lift = chinrem(list(result_lift)+modresults,
+            result_lift = chinrem_recursive(list(result_lift)+modresults,
                 list(N)+primes);
         }
         modresults = list();
@@ -210,6 +217,35 @@ example
     ring R = 0, (x,y), dp;
     ideal I = x9y2+x10, x2y7-y8;
     modular("std", list(I));
+}
+
+static proc chinrem_recursive(list modresults, list moduli)
+{
+    if (typeof(modresults[1]) != "list") {
+        return(chinrem(modresults, moduli));
+    }
+    // if typeof(modresults[1]) == "list", then we assume
+    // size(modresults[1]) == size(modresults[k])
+    // for k = 2, ..., size(modresults)
+    int n_sublists = size(modresults[1]);
+    int i, j;
+    list modresults_sublists;
+    for (j = n_sublists; j > 0; j--) {
+        modresults_sublists[j] = list();
+        for (i = size(modresults); i > 0; i--) {
+            modresults_sublists[j][i] = modresults[i][j];
+        }
+        task t(j) = "Modular::chinrem_recursive",
+            list(modresults_sublists[j], moduli);
+    }
+    startTasks(t(1..n_sublists));
+    waitAllTasks(t(1..n_sublists));
+    list result;
+    for (j = n_sublists; j > 0; j--) {
+        result[j] = getResult(t(j));
+        killTask(t(j));
+    }
+    return(result);
 }
 
 static proc primeList(int n, int pmax)
@@ -289,9 +325,24 @@ static proc finalTest_default(string command, alias list args, def result)
 static proc farey_parallel(def farey_arg, bigint farey_N)
 {
     arg_type = typeof(farey_arg);
-    if (arg_type != "bigint" && arg_type != "ideal"
-        && arg_type != "module" && arg_type != "matrix") {
+    if (arg_type != "bigint" && arg_type != "ideal" && arg_type != "module"
+        && arg_type != "matrix" && arg_type != "list") {
         ERROR("wrong input type");
+    }
+    int i;
+    if (arg_type == "list") {
+        int size_farey_arg = size(farey_arg);
+        for (i = size_farey_arg; i > 0; i--) {
+            task t(i) = "Modular::farey_parallel", list(farey_arg[i], farey_N);
+        }
+        startTasks(t(1..size_farey_arg));
+        waitAllTasks(t(1..size_farey_arg));
+        list result;
+        for (i = size_farey_arg; i > 0; i--) {
+            result[i] = getResult(t(i));
+            killTask(t(i));
+        }
+        return(result);
     }
     if (arg_type == "bigint" || arg_type == "matrix") {
         return(farey(farey_arg, farey_N));
@@ -301,7 +352,6 @@ static proc farey_parallel(def farey_arg, bigint farey_N)
     int size_arg = ncols(farey_arg);
     int chunks = par_range(size_arg);
     intvec range;
-    int i;
     for (i = chunks; i > 0; i--) {
         range = par_range(size_arg, i);
         task t(i) = "Modular::farey_task", list(range);
