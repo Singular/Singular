@@ -738,25 +738,6 @@ KINLINE void sLObject::Copy()
   TObject::Copy();
 }
 
-KINLINE poly sLObject::CopyGetP()
-{
-  if (bucket != NULL)
-  {
-    int i = kBucketCanonicalize(bucket);
-    poly bp = p_Copy(bucket->buckets[i], tailRing);
-    pLength = bucket->buckets_length[i] + 1;
-    if (bp != NULL)
-    {
-      assume(t_p != NULL || p != NULL);
-      if (t_p != NULL) pNext(t_p) = bp;
-      else pNext(p) = bp;
-    }
-    bucket = NULL;
-  }
-  return sLObject::GetP();
-}
-
-
 KINLINE long sLObject::pLDeg()
 {
   poly tp = GetLmTailRing();

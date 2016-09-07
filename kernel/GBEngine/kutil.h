@@ -229,8 +229,6 @@ public:
 
   // makes a copy of the poly of L
   KINLINE void Copy();
-  // gets the poly and makes a copy of it
-  KINLINE poly CopyGetP();
 
   KINLINE int GetpLength();
   KINLINE long pLDeg(BOOLEAN use_last);
