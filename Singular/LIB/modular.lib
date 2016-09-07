@@ -39,6 +39,7 @@ PROCEDURES:
                 back to characteristic zero
 ";
 
+LIB "general.lib";
 LIB "resources.lib";
 LIB "tasks.lib";
 LIB "parallel.lib";
@@ -156,6 +157,12 @@ EXAMPLE:  example modular; shows an example"
 
         // delete unlucky primes
         indices = deleteUnluckyPrimes(modresults);
+        indices = sort(indices)[1];
+        for (i = size(indices); i > 1; i--) {
+            if (indices[i] == indices[i-1]) {
+                indices = delete(indices, i);
+            }
+        }
         for (i = size(indices); i > 0; i--) {
             modresults = delete(modresults, indices[i]);
             primes = delete(primes, indices[i]);
