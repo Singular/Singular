@@ -711,6 +711,7 @@ See
 @*@code{chinrem (} intvec, intvec @code{)}
 @item @strong{Type:}
 the same type as the elements of the first argument
+@*If the elements of the first argument are lists again, chinrem is applied recusively.
 @item @strong{Purpose:}
 applies chinese remainder theorem to the first argument w.r.t. the moduli given in the second.
 The elements in the first list must be of same type which can be @code{bigint}/@code{int},
@@ -727,6 +728,7 @@ The moduli, if given by a list, must be of type @code{bigint} or @code{int}.
   ideal i2=2x-3y,2x2+4y2+5xy;
   chinrem(list(i1,i2),intvec(7,11));
   chinrem(list(i1,i2),list(bigint(7),bigint(11)));
+  chinrem(list(list(i1,i2),list(i1,i2)),list(bigint(7),bigint(11)));
 @c example
 @end smallexample
 @end table
@@ -1994,8 +1996,9 @@ See
 @*@code{farey (} ideal_expression @code{,} bigint_expression @code{)}
 @*@code{farey (} module_expression @code{,} bigint_expression @code{)}
 @*@code{farey (} matrix_expression @code{,} bigint_expression @code{)}
+@*@code{farey (} list_expression @code{,} bigint_expression @code{)}
 @item @strong{Type:}
-type of the first argument
+type of the first argument (unless it is @code{list})
 @item @strong{Purpose:}
 lift the first argument modulo the second to the rationals.@*
 The (coeffients of the) result a/b is the best approximation under the condition
@@ -2005,6 +2008,7 @@ The (coeffients of the) result a/b is the best approximation under the condition
 @tex
 $|a|,|b|<=\sqrt{(N-1)/2}$
 @end tex
+@code{farey(list(a,b,..),B)} is equivalent to @code{list(farey(a,B),farey(b,B),...)}.
 @item @strong{Note:}
 The current coefficient field must be the rationals.
 @item @strong{Example:}

@@ -95,7 +95,6 @@
 
 ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
 
-
 // defaults for all commands: NO_PLURAL | NO_RING | ALLOW_ZERODIVISOR
 
 #ifdef HAVE_PLURAL
@@ -1763,154 +1762,7 @@ static BOOLEAN jjALIGN_M(leftv res, leftv u, leftv v)
   res->data=M;
   return FALSE;
 }
-static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
-{
-  coeffs cf;
-  lists c=(lists)u->CopyD(); // list of ideal or bigint/int
-  lists pl=NULL;
-  intvec *p=NULL;
-  if (v->Typ()==LIST_CMD) pl=(lists)v->Data();
-  else                    p=(intvec*)v->Data();
-  int rl=c->nr+1;
-  ideal result;
-  ideal *x=(ideal *)omAlloc(rl*sizeof(ideal));
-  number *xx=NULL;
-  int i;
-  int return_type=c->m[0].Typ();
-  if ((return_type!=IDEAL_CMD)
-  && (return_type!=MODUL_CMD)
-  && (return_type!=MATRIX_CMD)
-  && (return_type!=POLY_CMD))
-  {
-    if((return_type!=BIGINT_CMD)&&(return_type!=INT_CMD))
-    {
-      WerrorS("poly/ideal/module/matrix expected");
-      omFree(x); // delete c
-      return TRUE;
-    }
-    else
-      return_type=BIGINT_CMD;
-  }
-  if (return_type==BIGINT_CMD)
-    cf=coeffs_BIGINT;
-  else
-  {
-    cf=currRing->cf;
-    if (nCoeff_is_Extension(cf) && (cf->extRing!=NULL))
-      cf=cf->extRing->cf;
-  }
-  nMapFunc nMap=n_SetMap(coeffs_BIGINT,cf);
-  if (return_type!=BIGINT_CMD)
-  {
-    for(i=rl-1;i>=0;i--)
-    {
-      if (c->m[i].Typ()!=return_type)
-      {
-        Werror("%s expected at pos %d",Tok2Cmdname(return_type),i+1);
-        omFree(x); // delete c
-        return TRUE;
-      }
-      if (return_type==POLY_CMD)
-      {
-        x[i]=idInit(1,1);
-        x[i]->m[0]=(poly)c->m[i].CopyD();
-      }
-      else
-      {
-        x[i]=(ideal)c->m[i].CopyD();
-      }
-      //c->m[i].Init();
-    }
-  }
-  else
-  {
-    if (nMap==NULL)
-    {
-      Werror("not implemented: map bigint -> %s", nCoeffString(cf));
-      return TRUE;
-    }
-    xx=(number *)omAlloc(rl*sizeof(number));
-    for(i=rl-1;i>=0;i--)
-    {
-      if (c->m[i].Typ()==INT_CMD)
-      {
-        xx[i]=n_Init(((int)(long)c->m[i].Data()),cf);
-      }
-      else if (c->m[i].Typ()==BIGINT_CMD)
-      {
-        xx[i]=nMap((number)c->m[i].Data(),coeffs_BIGINT,cf);
-      }
-      else
-      {
-        Werror("bigint expected at pos %d",i+1);
-        omFree(x); // delete c
-        omFree(xx); // delete c
-        return TRUE;
-      }
-    }
-  }
-  number *q=(number *)omAlloc(rl*sizeof(number));
-  if (p!=NULL)
-  {
-    for(i=rl-1;i>=0;i--)
-    {
-      q[i]=n_Init((*p)[i], cf);
-    }
-  }
-  else
-  {
-    for(i=rl-1;i>=0;i--)
-    {
-      if (pl->m[i].Typ()==INT_CMD)
-      {
-        q[i]=n_Init((int)(long)pl->m[i].Data(),cf);
-      }
-      else if (pl->m[i].Typ()==BIGINT_CMD)
-      {
-        q[i]=nMap((number)(pl->m[i].Data()),coeffs_BIGINT,cf);
-      }
-      else
-      {
-        Werror("bigint expected at pos %d",i+1);
-        for(i++;i<rl;i++)
-        {
-          n_Delete(&(q[i]),cf);
-        }
-        omFree(x); // delete c
-        omFree(q); // delete pl
-        if (xx!=NULL) omFree(xx); // delete c
-        return TRUE;
-      }
-    }
-  }
-  if (return_type==BIGINT_CMD)
-  {
-    CFArray i_v(rl);
-    number n=n_ChineseRemainderSym(xx,q,rl,TRUE,i_v,coeffs_BIGINT);
-    res->data=(char *)n;
-  }
-  else
-  {
-    result=id_ChineseRemainder(x,q,rl,currRing);
-    // deletes also x
-    c->Clean();
-    if ((return_type==POLY_CMD) &&(result!=NULL))
-    {
-      res->data=(char *)result->m[0];
-      result->m[0]=NULL;
-      idDelete(&result);
-    }
-    else
-      res->data=(char *)result;
-  }
-  for(i=rl-1;i>=0;i--)
-  {
-    n_Delete(&(q[i]),cf);
-  }
-  omFree(q);
-  res->rtyp=return_type;
-  return result==NULL;
-}
+static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v);
 static BOOLEAN jjCOEF(leftv res, leftv u, leftv v)
 {
   poly p=(poly)v->Data();
@@ -2269,6 +2121,7 @@ static BOOLEAN jjFAREY_ID(leftv res, leftv u, leftv v)
   res->data=(void*)id_Farey(uu,vv,currRing);
   return FALSE;
 }
+static BOOLEAN jjFAREY_LI(leftv res, leftv u, leftv v);
 static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
 {
   ring r=(ring)u->Data();
@@ -9259,4 +9112,192 @@ static BOOLEAN check_valid(const int p, const int op)
     }
   }
   return FALSE;
+}
+// --------------------------------------------------------------------
+static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
+{
+  coeffs cf;
+  lists c=(lists)u->CopyD(); // list of ideal or bigint/int
+  int rl=c->nr+1;
+  int return_type=c->m[0].Typ();
+  if ((return_type!=IDEAL_CMD)
+  && (return_type!=MODUL_CMD)
+  && (return_type!=MATRIX_CMD)
+  && (return_type!=POLY_CMD))
+  {
+    if((return_type==BIGINT_CMD)
+    ||(return_type==INT_CMD))
+      return_type=BIGINT_CMD;
+    else if (return_type==LIST_CMD)
+    {
+      // create a tmp list of the correct size
+      lists res_l=(lists)omAllocBin(slists_bin);
+      res_l->Init(rl /*c->nr+1*/);
+      BOOLEAN bo=FALSE;
+      int tab_pos=iiTabIndex(dArithTab2,JJTAB2LEN,CHINREM_CMD);
+      for (unsigned i=0;i<=(unsigned)c->nr;i++)
+      {
+        sleftv tmp;
+        tmp.Copy(v);
+        bo=iiExprArith2TabIntern(&res_l->m[i],&c->m[i],CHINREM_CMD,&tmp,TRUE,dArith2+tab_pos,c->m[i].rtyp,tmp.rtyp,dConvertTypes);
+	tmp.CleanUp();
+        if (bo) { Werror("chinrem failed for list entry %d",i+1); break;}
+      }
+      c->Clean();
+      res->data=res_l;
+      res->rtyp=LIST_CMD;
+      return bo;
+    }
+    else
+    {
+      c->Clean();
+      WerrorS("poly/ideal/module/matrix/list expected");
+      return TRUE;
+    }
+  }
+  if (return_type==BIGINT_CMD)
+    cf=coeffs_BIGINT;
+  else
+  {
+    cf=currRing->cf;
+    if (nCoeff_is_Extension(cf) && (cf->extRing!=NULL))
+      cf=cf->extRing->cf;
+  }
+  lists pl=NULL;
+  intvec *p=NULL;
+  if (v->Typ()==LIST_CMD) pl=(lists)v->Data();
+  else                    p=(intvec*)v->Data();
+  ideal result;
+  ideal *x=(ideal *)omAlloc(rl*sizeof(ideal));
+  number *xx=NULL;
+  nMapFunc nMap=n_SetMap(coeffs_BIGINT,cf);
+  int i;
+  if (return_type!=BIGINT_CMD)
+  {
+    for(i=rl-1;i>=0;i--)
+    {
+      if (c->m[i].Typ()!=return_type)
+      {
+        Werror("%s expected at pos %d",Tok2Cmdname(return_type),i+1);
+        omFree(x); // delete c
+        return TRUE;
+      }
+      if (return_type==POLY_CMD)
+      {
+        x[i]=idInit(1,1);
+        x[i]->m[0]=(poly)c->m[i].CopyD();
+      }
+      else
+      {
+        x[i]=(ideal)c->m[i].CopyD();
+      }
+      //c->m[i].Init();
+    }
+  }
+  else
+  {
+    if (nMap==NULL)
+    {
+      Werror("not implemented: map bigint -> %s", nCoeffString(cf));
+      return TRUE;
+    }
+    xx=(number *)omAlloc(rl*sizeof(number));
+    for(i=rl-1;i>=0;i--)
+    {
+      if (c->m[i].Typ()==INT_CMD)
+      {
+        xx[i]=n_Init(((int)(long)c->m[i].Data()),cf);
+      }
+      else if (c->m[i].Typ()==BIGINT_CMD)
+      {
+        xx[i]=nMap((number)c->m[i].Data(),coeffs_BIGINT,cf);
+      }
+      else
+      {
+        Werror("bigint expected at pos %d",i+1);
+        omFree(x); // delete c
+        omFree(xx); // delete c
+        return TRUE;
+      }
+    }
+  }
+  number *q=(number *)omAlloc(rl*sizeof(number));
+  if (p!=NULL)
+  {
+    for(i=rl-1;i>=0;i--)
+    {
+      q[i]=n_Init((*p)[i], cf);
+    }
+  }
+  else
+  {
+    for(i=rl-1;i>=0;i--)
+    {
+      if (pl->m[i].Typ()==INT_CMD)
+      {
+        q[i]=n_Init((int)(long)pl->m[i].Data(),cf);
+      }
+      else if (pl->m[i].Typ()==BIGINT_CMD)
+      {
+        q[i]=nMap((number)(pl->m[i].Data()),coeffs_BIGINT,cf);
+      }
+      else
+      {
+        Werror("bigint expected at pos %d",i+1);
+        for(i++;i<rl;i++)
+        {
+          n_Delete(&(q[i]),cf);
+        }
+        omFree(x); // delete c
+        omFree(q); // delete pl
+        if (xx!=NULL) omFree(xx); // delete c
+        return TRUE;
+      }
+    }
+  }
+  if (return_type==BIGINT_CMD)
+  {
+    CFArray i_v(rl);
+    number n=n_ChineseRemainderSym(xx,q,rl,TRUE,i_v,coeffs_BIGINT);
+    res->data=(char *)n;
+  }
+  else
+  {
+    result=id_ChineseRemainder(x,q,rl,currRing); // deletes also x
+    c->Clean();
+    if ((return_type==POLY_CMD) &&(result!=NULL))
+    {
+      res->data=(char *)result->m[0];
+      result->m[0]=NULL;
+      idDelete(&result);
+    }
+    else
+      res->data=(char *)result;
+  }
+  for(i=rl-1;i>=0;i--)
+  {
+    n_Delete(&(q[i]),cf);
+  }
+  omFree(q);
+  res->rtyp=return_type;
+  return result==NULL;
+}
+static BOOLEAN jjFAREY_LI(leftv res, leftv u, leftv v)
+{
+  lists c=(lists)u->CopyD();
+  lists res_l=(lists)omAllocBin(slists_bin);
+  res_l->Init(c->nr+1);
+  BOOLEAN bo=FALSE;
+  int tab_pos=iiTabIndex(dArithTab2,JJTAB2LEN,FAREY_CMD);
+  for (unsigned i=0;i<=(unsigned)c->nr;i++)
+  {
+    sleftv tmp;
+    tmp.Copy(v);
+    bo=iiExprArith2TabIntern(&res_l->m[i],&c->m[i],FAREY_CMD,&tmp,TRUE,dArith2+tab_pos,c->m[i].rtyp,tmp.rtyp,dConvertTypes);
+    tmp.CleanUp();
+    if (bo) { Werror("farey failed for list entry %d",i+1); break;}
+  }
+  c->Clean();
+  res->data=res_l;
+  return bo;
 }
