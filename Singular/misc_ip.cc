@@ -780,7 +780,7 @@ char * versionString(/*const bool bShowDetails = false*/ )
   StringSetS("");
   StringAppend("Singular for %s version %s (%d, %d bit) %s #%s",
                S_UNAME, VERSION, // SINGULAR_VERSION,
-               SINGULAR_VERSION, SIZEOF_VOIDP*8,
+               SINGULAR_VERSION, sizeof(void*)*8,
 #ifdef MAKE_DISTRIBUTION
 	       VERSION_DATE, GIT_VERSION);
 #else

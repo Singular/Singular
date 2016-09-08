@@ -10,7 +10,7 @@ AC_INIT([xmalloc],[4.0])
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([../build-aux])
 AC_CONFIG_SRCDIR(dummy.c)
-AC_CONFIG_HEADER([_config.h])
+#AC_CONFIG_HEADER([_config.h])
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -25,11 +25,11 @@ m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 AM_SANITY_CHECK
 
 # Add pre'prefixed config
-AX_PREFIX_CONFIG_H([omConfig.h],[],[_config.h])
+#AX_PREFIX_CONFIG_H([omConfig.h],[],[_config.h])
 
 # SING_CHECK_SET_ARGS()
 
-AC_SUBST(VERSION)
+#AC_SUBST(VERSION)
 
 CPPFLAGS="-I.. -I. $CPPFLAGS"
 AC_PROG_MAKE_SET

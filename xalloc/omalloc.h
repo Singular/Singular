@@ -8,8 +8,6 @@
 */
 #include <stdlib.h>
 #include <string.h>
-#include <omalloc/omConfig.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
