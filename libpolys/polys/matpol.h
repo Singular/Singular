@@ -92,4 +92,5 @@ char * iiStringMatrix(matrix im, int dim, const ring r, char ch=',');
 
 extern omBin ip_smatrix_bin;
 
+int mp_Compare(matrix a, matrix b, const ring r);
 #endif/* MATPOL_H */
