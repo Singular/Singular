@@ -2020,5 +2020,8 @@ int   p_LowVar (poly p, const ring r);
 /*----------------------------------------------------*/
 /// shifts components of the vector p by i
 void p_Shift (poly * p,int i, const ring r);
+/*----------------------------------------------------*/
+
+int p_Compare(const poly a, const poly b, const ring R);
 #endif // P_POLYS_H
 

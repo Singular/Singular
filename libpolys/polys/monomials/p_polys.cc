@@ -4707,3 +4707,40 @@ unsigned long p_GetShortExpVector(const poly p, const poly pp, const ring r)
 
 #include <polys/templates/p_Delete__T.cc>
 
+/***************************************************************/
+/*
+* compare the leading terms of a and b
+*/
+static int tCompare(const poly a, const poly b, const ring R)
+{
+  if (b == NULL) return(a != NULL);
+  if (a == NULL) return(-1);
+
+  /* a != NULL && b != NULL */
+  int r = p_LmCmp(a, b,R);
+  if (r != 0) return(r);
+  number h = n_Sub(pGetCoeff(a), pGetCoeff(b),R->cf);
+  r = -1 + n_IsZero(h,R->cf) + 2*n_GreaterZero(h,R->cf);   /* -1: <, 0:==, 1: > */
+  n_Delete(&h,R->cf);
+  return(r);
+}
+
+/*
+* compare a and b
+*/
+int p_Compare(const poly a, const poly b, const ring R)
+{
+  int r = tCompare(a, b,R);
+  if (r != 0) return(r);
+
+  poly aa = a;
+  poly bb = b;
+  while (r == 0 && aa != NULL && bb != NULL)
+  {
+    pIter(aa);
+    pIter(bb);
+    r = tCompare(aa, bb,R);
+  }
+  return(r);
+}
+
