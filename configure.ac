@@ -202,12 +202,12 @@ AC_DEFINE_UNQUOTED([BIN_DIR],"$config_bindir",[bindir])
 AX_RECURSIVE_EVAL([[$]datadir], [config_datadir])
 AX_NORMALIZE_PATH([config_datadir],['/'])
 AC_DEFINE_UNQUOTED([DATA_DIR],"$config_datadir",[datadir])
-AC_SUBST(DATA_DIR)
+AC_SUBST(DATA_DIR, "$config_datadir")
 
 AX_RECURSIVE_EVAL([[$]docdir], [config_docdir])
 AX_NORMALIZE_PATH([config_docdir],['/'])
 AC_DEFINE_UNQUOTED([DOC_DIR],"$config_docdir",[docdir])
-AC_SUBST(DOC_DIR)
+AC_SUBST(DOC_DIR, "$config_docdir")
 
 SING_SHOW_FLAGS([Compiler/linker flags: ])
 
