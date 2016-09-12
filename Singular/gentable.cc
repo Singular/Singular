@@ -42,6 +42,8 @@ int produce_convert_table=0;
 
 // bit 4 for warning, if used at toplevel
 #define WARN_RING        16
+// bit 5: do no try automatic conversions
+#define NO_CONVERSION    32
 
 /*=============== types =====================*/
 struct _scmdnames

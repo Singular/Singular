@@ -124,6 +124,8 @@ ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
 
 // bit 4 for warning, if used at toplevel
 #define WARN_RING        16
+// bit 5: do no try automatic conversions
+#define NO_CONVERSION    32
 
 static BOOLEAN check_valid(const int p, const int op);
 
@@ -7973,43 +7975,46 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
       while (dA2[i].cmd==op)
       {
         //Print("test %s %s\n",Tok2Cmdname(dA2[i].arg1),Tok2Cmdname(dA2[i].arg2));
-        if ((ai=iiTestConvert(at,dA2[i].arg1,dConvertTypes))!=0)
+        if ((dA2[i].valid_for & NO_CONVERSION)==0)
         {
-          if ((bi=iiTestConvert(bt,dA2[i].arg2,dConvertTypes))!=0)
+          if ((ai=iiTestConvert(at,dA2[i].arg1,dConvertTypes))!=0)
           {
-            res->rtyp=dA2[i].res;
-            if (currRing!=NULL)
+            if ((bi=iiTestConvert(bt,dA2[i].arg2,dConvertTypes))!=0)
             {
-              if (check_valid(dA2[i].valid_for,op)) break;
-            }
-            else
-            {
-              if (RingDependend(dA2[i].res))
+              res->rtyp=dA2[i].res;
+              if (currRing!=NULL)
               {
-                WerrorS("no ring active");
+                if (check_valid(dA2[i].valid_for,op)) break;
+              }
+              else
+              {
+                if (RingDependend(dA2[i].res))
+                {
+                  WerrorS("no ring active");
+                  break;
+                }
+              }
+              if (traceit&TRACE_CALL)
+                Print("call %s(%s,%s)\n",iiTwoOps(op),
+                Tok2Cmdname(dA2[i].arg1),Tok2Cmdname(dA2[i].arg2));
+              failed= ((iiConvert(at,dA2[i].arg1,ai,a,an))
+              || (iiConvert(bt,dA2[i].arg2,bi,b,bn))
+              || (call_failed=dA2[i].p(res,an,bn)));
+              // everything done, clean up temp. variables
+              if (failed)
+              {
+                // leave loop, goto error handling
                 break;
               }
-            }
-            if (traceit&TRACE_CALL)
-              Print("call %s(%s,%s)\n",iiTwoOps(op),
-              Tok2Cmdname(dA2[i].arg1),Tok2Cmdname(dA2[i].arg2));
-            failed= ((iiConvert(at,dA2[i].arg1,ai,a,an))
-            || (iiConvert(bt,dA2[i].arg2,bi,b,bn))
-            || (call_failed=dA2[i].p(res,an,bn)));
-            // everything done, clean up temp. variables
-            if (failed)
-            {
-              // leave loop, goto error handling
-              break;
-            }
-            else
-            {
-              // everything ok, clean up and return
-              an->CleanUp();
-              bn->CleanUp();
-              omFreeBin((ADDRESS)an, sleftv_bin);
-              omFreeBin((ADDRESS)bn, sleftv_bin);
-              return FALSE;
+              else
+              {
+                // everything ok, clean up and return
+                an->CleanUp();
+                bn->CleanUp();
+                omFreeBin((ADDRESS)an, sleftv_bin);
+                omFreeBin((ADDRESS)bn, sleftv_bin);
+                return FALSE;
+              }
             }
           }
         }
@@ -8197,43 +8202,46 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, const struct sValCmd1* dA1, 
       {
         int ai;
         //Print("test %s\n",Tok2Cmdname(dA1[i].arg));
-        if ((ai=iiTestConvert(at,dA1[i].arg,dConvertTypes))!=0)
-        {
-          if (currRing!=NULL)
+        if ((dA1[i].valid_for & NO_CONVERSION)==0)
+	{
+          if ((ai=iiTestConvert(at,dA1[i].arg,dConvertTypes))!=0)
           {
-            if (check_valid(dA1[i].valid_for,op)) break;
-          }
-          else
-          {
-            if (RingDependend(dA1[i].res))
+            if (currRing!=NULL)
             {
-              WerrorS("no ring active");
+              if (check_valid(dA1[i].valid_for,op)) break;
+            }
+            else
+            {
+              if (RingDependend(dA1[i].res))
+              {
+                WerrorS("no ring active");
+                break;
+              }
+            }
+            if (traceit&TRACE_CALL)
+              Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(dA1[i].arg));
+            res->rtyp=dA1[i].res;
+            failed= ((iiConvert(at,dA1[i].arg,ai,a,an,dConvertTypes))
+            || (call_failed=dA1[i].p(res,an)));
+            // everything done, clean up temp. variables
+            if (failed)
+            {
+              // leave loop, goto error handling
               break;
             }
-          }
-          if (traceit&TRACE_CALL)
-            Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(dA1[i].arg));
-          res->rtyp=dA1[i].res;
-          failed= ((iiConvert(at,dA1[i].arg,ai,a,an,dConvertTypes))
-          || (call_failed=dA1[i].p(res,an)));
-          // everything done, clean up temp. variables
-          if (failed)
-          {
-            // leave loop, goto error handling
-            break;
-          }
-          else
-          {
-            if (an->Next() != NULL)
+            else
             {
-              res->next = (leftv)omAllocBin(sleftv_bin);
-              failed=iiExprArith1(res->next,an->next,op);
+              if (an->Next() != NULL)
+              {
+                res->next = (leftv)omAllocBin(sleftv_bin);
+                failed=iiExprArith1(res->next,an->next,op);
+              }
+              // everything ok, clean up and return
+              an->CleanUp();
+              omFreeBin((ADDRESS)an, sleftv_bin);
+              a->CleanUp();
+              return failed;
             }
-            // everything ok, clean up and return
-            an->CleanUp();
-            omFreeBin((ADDRESS)an, sleftv_bin);
-            a->CleanUp();
-            return failed;
           }
         }
         i++;
@@ -8377,42 +8385,45 @@ static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv 
       //while ((dA3[i].cmd!=op)&&(dA3[i].cmd!=0)) i++;
       while (dA3[i].cmd==op)
       {
-        if ((ai=iiTestConvert(at,dA3[i].arg1,dConvertTypes))!=0)
-        {
-          if ((bi=iiTestConvert(bt,dA3[i].arg2,dConvertTypes))!=0)
+        if ((dA3[i].valid_for & NO_CONVERSION)==0)
+	{
+          if ((ai=iiTestConvert(at,dA3[i].arg1,dConvertTypes))!=0)
           {
-            if ((ci=iiTestConvert(ct,dA3[i].arg3,dConvertTypes))!=0)
+            if ((bi=iiTestConvert(bt,dA3[i].arg2,dConvertTypes))!=0)
             {
-              res->rtyp=dA3[i].res;
-              if (currRing!=NULL)
+              if ((ci=iiTestConvert(ct,dA3[i].arg3,dConvertTypes))!=0)
               {
-                if (check_valid(dA3[i].valid_for,op)) break;
-              }
-              if (traceit&TRACE_CALL)
-                Print("call %s(%s,%s,%s)\n",
-                  iiTwoOps(op),Tok2Cmdname(dA3[i].arg1),
-                  Tok2Cmdname(dA3[i].arg2),Tok2Cmdname(dA3[i].arg3));
-              failed= ((iiConvert(at,dA3[i].arg1,ai,a,an,dConvertTypes))
-                || (iiConvert(bt,dA3[i].arg2,bi,b,bn,dConvertTypes))
-                || (iiConvert(ct,dA3[i].arg3,ci,c,cn,dConvertTypes))
-                || (call_failed=dA3[i].p(res,an,bn,cn)));
-              // everything done, clean up temp. variables
-              if (failed)
-              {
-                // leave loop, goto error handling
-                break;
-              }
-              else
-              {
-                // everything ok, clean up and return
-                an->CleanUp();
-                bn->CleanUp();
-                cn->CleanUp();
-                omFreeBin((ADDRESS)an, sleftv_bin);
-                omFreeBin((ADDRESS)bn, sleftv_bin);
-                omFreeBin((ADDRESS)cn, sleftv_bin);
-        //Print("op: %d,result typ:%d\n",op,res->rtyp);
-                return FALSE;
+                res->rtyp=dA3[i].res;
+                if (currRing!=NULL)
+                {
+                  if (check_valid(dA3[i].valid_for,op)) break;
+                }
+                if (traceit&TRACE_CALL)
+                  Print("call %s(%s,%s,%s)\n",
+                    iiTwoOps(op),Tok2Cmdname(dA3[i].arg1),
+                    Tok2Cmdname(dA3[i].arg2),Tok2Cmdname(dA3[i].arg3));
+                failed= ((iiConvert(at,dA3[i].arg1,ai,a,an,dConvertTypes))
+                  || (iiConvert(bt,dA3[i].arg2,bi,b,bn,dConvertTypes))
+                  || (iiConvert(ct,dA3[i].arg3,ci,c,cn,dConvertTypes))
+                  || (call_failed=dA3[i].p(res,an,bn,cn)));
+                // everything done, clean up temp. variables
+                if (failed)
+                {
+                  // leave loop, goto error handling
+                  break;
+                }
+                else
+                {
+                  // everything ok, clean up and return
+                  an->CleanUp();
+                  bn->CleanUp();
+                  cn->CleanUp();
+                  omFreeBin((ADDRESS)an, sleftv_bin);
+                  omFreeBin((ADDRESS)bn, sleftv_bin);
+                  omFreeBin((ADDRESS)cn, sleftv_bin);
+                  //Print("op: %d,result typ:%d\n",op,res->rtyp);
+                  return FALSE;
+                }
               }
             }
           }

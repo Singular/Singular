@@ -454,6 +454,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjCOMPARE_IV),LE,             INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCOMPARE_P), LE,             INT_CMD,        POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCOMPARE_P), LE,             INT_CMD,        VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjCOMPARE_MA),LE,             INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING | NO_CONVERSION }
 ,{D(jjLT_I),      '<',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjLT_BI),     '<',            INT_CMD,        BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjLT_N),      '<',            INT_CMD,        NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -462,23 +463,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjCOMPARE_S), '<',            INT_CMD,        STRING_CMD, STRING_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCOMPARE_P), '<',            INT_CMD,        POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCOMPARE_P), '<',            INT_CMD,        VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
-#if 0
-,{D(jjCOMPARE_MA),'<',            INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjWRONG2),    '<',            INT_CMD,        MATRIX_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjWRONG2),    '<',            INT_CMD,        INTVEC_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjWRONG2),    '<',            INT_CMD,        MATRIX_CMD, INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjWRONG2),    '<',            INT_CMD,        INTMAT_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjWRONG2),    '<',            INT_CMD,        MATRIX_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjWRONG2),    '<',            INT_CMD,        NUMBER_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjWRONG2),    '<',            INT_CMD,        MATRIX_CMD, POLY_CMD,   ALLOW_PLURAL | ALLOW_RING}
-,{D(jjWRONG2),    '<',            INT_CMD,        POLY_CMD,   MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjWRONG2),    '<',            INT_CMD,        MATRIX_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjWRONG2),    '<',            INT_CMD,        VECTOR_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjWRONG2),    '<',            INT_CMD,        MATRIX_CMD, IDEAL_CMD,  ALLOW_PLURAL | ALLOW_RING}
-,{D(jjWRONG2),    '<',            INT_CMD,        IDEAL_CMD,  MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjWRONG2),    '<',            INT_CMD,        MATRIX_CMD, MODUL_CMD,  ALLOW_PLURAL | ALLOW_RING}
-,{D(jjWRONG2),    '<',            INT_CMD,        MODUL_CMD,  MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
-#endif
+,{D(jjCOMPARE_MA),'<',            INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING | NO_CONVERSION }
 ,{D(jjGE_I),      GE,             INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjGE_BI),     GE,             INT_CMD,        BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjGE_N),      GE,             INT_CMD,        NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -487,6 +472,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjCOMPARE_IV),GE,             INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCOMPARE_P), GE,             INT_CMD,        POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCOMPARE_P), GE,             INT_CMD,        VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjCOMPARE_MA),GE,             INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING | NO_CONVERSION }
 ,{D(jjGT_I),      '>',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjGT_BI),     '>',            INT_CMD,        BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjGT_N),      '>',            INT_CMD,        NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -495,6 +481,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjCOMPARE_IV),'>',            INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCOMPARE_P), '>',            INT_CMD,        POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCOMPARE_P), '>',            INT_CMD,        VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjCOMPARE_MA),'>',            INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING | NO_CONVERSION }
 ,{D(jjAND_I),     '&',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjOR_I),      '|',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjEQUAL_I),   EQUAL_EQUAL,    INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
