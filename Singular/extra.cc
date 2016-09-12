@@ -3804,6 +3804,16 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+/*==================== sort =================*/
+    if(strcmp(sys_cmd,"sort")==0)
+    {
+      extern BOOLEAN jjSORTLIST(leftv,leftv);
+      if (h->Typ()==LIST_CMD)
+        return jjSORTLIST(res,h);
+      else
+        return TRUE;
+    }
+    else
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }

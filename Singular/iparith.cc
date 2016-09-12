@@ -8203,7 +8203,7 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, const struct sValCmd1* dA1, 
         int ai;
         //Print("test %s\n",Tok2Cmdname(dA1[i].arg));
         if ((dA1[i].valid_for & NO_CONVERSION)==0)
-	{
+        {
           if ((ai=iiTestConvert(at,dA1[i].arg,dConvertTypes))!=0)
           {
             if (currRing!=NULL)
@@ -8386,7 +8386,7 @@ static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv 
       while (dA3[i].cmd==op)
       {
         if ((dA3[i].valid_for & NO_CONVERSION)==0)
-	{
+        {
           if ((ai=iiTestConvert(at,dA3[i].arg1,dConvertTypes))!=0)
           {
             if ((bi=iiTestConvert(bt,dA3[i].arg2,dConvertTypes))!=0)
@@ -9151,7 +9151,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
         sleftv tmp;
         tmp.Copy(v);
         bo=iiExprArith2TabIntern(&res_l->m[i],&c->m[i],CHINREM_CMD,&tmp,TRUE,dArith2+tab_pos,c->m[i].rtyp,tmp.rtyp,dConvertTypes);
-	tmp.CleanUp();
+        tmp.CleanUp();
         if (bo) { Werror("chinrem failed for list entry %d",i+1); break;}
       }
       c->Clean();
@@ -9311,4 +9311,47 @@ static BOOLEAN jjFAREY_LI(leftv res, leftv u, leftv v)
   c->Clean();
   res->data=res_l;
   return bo;
+}
+// --------------------------------------------------------------------
+static int jjCOMPARE_ALL(const void * aa, const void * bb)
+{
+  leftv a=(leftv)aa;
+  int at=a->Typ();
+  leftv b=(leftv)bb;
+  int bt=b->Typ();;
+  if (at < bt) return -1;
+  if (at > bt) return 1;
+  int tab_pos=iiTabIndex(dArithTab2,JJTAB2LEN,'<');
+  sleftv tmp;
+  memset(&tmp,0,sizeof(sleftv));
+  iiOp='<';
+  BOOLEAN bo=iiExprArith2TabIntern(&tmp,a,'<',b,FALSE,dArith2+tab_pos,at,bt,dConvertTypes);
+  if (bo)
+  {
+    Werror(" no `<` for %s",Tok2Cmdname(at));
+    return -1;
+  }
+  else if (tmp.data==NULL) /* not < */
+  {
+    iiOp=EQUAL_EQUAL;
+    tab_pos=iiTabIndex(dArithTab2,JJTAB2LEN,EQUAL_EQUAL);
+    bo=iiExprArith2TabIntern(&tmp,a,EQUAL_EQUAL,b,FALSE,dArith2+tab_pos,at,bt,dConvertTypes);
+    if (bo)
+    {
+      Werror(" no `==` for %s",Tok2Cmdname(at));
+      return -1;
+    }
+    else if (tmp.data==NULL) /* not <,== */ return 1;
+    else return 0;
+  }
+  else return -1;
+}
+BOOLEAN jjSORTLIST(leftv, leftv arg)
+{
+  lists l=(lists)arg->Data();
+  if (l->nr>0)
+  {
+    qsort(l->m,l->nr+1,sizeof(sleftv),jjCOMPARE_ALL);
+  }
+  return FALSE;
 }
