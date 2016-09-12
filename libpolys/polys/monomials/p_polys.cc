@@ -4709,37 +4709,38 @@ unsigned long p_GetShortExpVector(const poly p, const poly pp, const ring r)
 
 /***************************************************************/
 /*
-* compare the leading terms of a and b
-*/
-static int tCompare(const poly a, const poly b, const ring R)
-{
-  if (b == NULL) return(a != NULL);
-  if (a == NULL) return(-1);
-
-  /* a != NULL && b != NULL */
-  int r = p_LmCmp(a, b,R);
-  if (r != 0) return(r);
-  number h = n_Sub(pGetCoeff(a), pGetCoeff(b),R->cf);
-  r = -1 + n_IsZero(h,R->cf) + 2*n_GreaterZero(h,R->cf);   /* -1: <, 0:==, 1: > */
-  n_Delete(&h,R->cf);
-  return(r);
-}
-
-/*
 * compare a and b
 */
 int p_Compare(const poly a, const poly b, const ring R)
 {
-  int r = tCompare(a, b,R);
-  if (r != 0) return(r);
-
-  poly aa = a;
-  poly bb = b;
-  while (r == 0 && aa != NULL && bb != NULL)
+  int r=p_Cmp(a,b,R);
+  if ((r==0)&&(a!=NULL))
   {
-    pIter(aa);
-    pIter(bb);
-    r = tCompare(aa, bb,R);
+    number h=n_Sub(pGetCoeff(a),pGetCoeff(b),R->cf);
+    /* compare lead coeffs */
+    r = -1+n_IsZero(h,R->cf)+2*n_GreaterZero(h,R->cf); /* -1: <, 0:==, 1: > */
+    n_Delete(&h,R->cf);
+  }
+  else if (a==NULL)
+  {
+    if (b==NULL)
+    {
+      /* compare 0, 0 */
+      r=0;
+    }
+    else if(p_IsConstant(b,R))
+    {
+      /* compare 0, const */
+      r = 1-2*n_GreaterZero(pGetCoeff(b),R->cf); /* -1: <, 1: > */
+    }
+  }
+  else if (b==NULL)
+  {
+    if (p_IsConstant(a,R))
+    {
+      /* compare const, 0 */
+      r = -1+2*n_GreaterZero(pGetCoeff(a),R->cf); /* -1: <, 1: > */
+    }
   }
   return(r);
 }

@@ -575,6 +575,49 @@ void mp_Coef2(poly v, poly mon, matrix *c, matrix *m, const ring R)
   }
 }
 
+int mp_Compare(matrix a, matrix b, const ring R)
+{
+  if (MATCOLS(a)<MATCOLS(b)) return -1;
+  else if (MATCOLS(a)>MATCOLS(b)) return 1;
+  if (MATROWS(a)<MATROWS(b)) return -1;
+  else if (MATROWS(a)<MATROWS(b)) return 1;
+
+  unsigned ii=MATCOLS(a)*MATROWS(b)-1;
+  unsigned j=0;
+  int r=0;
+  while (j<=ii)
+  {
+    r=p_Compare(a->m[j],b->m[j],R);
+    if (r!=0) return r;
+    j++;
+  }
+  return r;
+}
+
+BOOLEAN mp_Equal(matrix a, matrix b, const ring R)
+{
+  if ((MATCOLS(a)!=MATCOLS(b)) || (MATROWS(a)!=MATROWS(b)))
+    return FALSE;
+  int i=MATCOLS(a)*MATROWS(a)-1;
+  while (i>=0)
+  {
+    if (a->m[i]==NULL)
+    {
+      if (b->m[i]!=NULL) return FALSE;
+    }
+    else if (b->m[i]==NULL) return FALSE;
+    else if (p_Cmp(a->m[i],b->m[i], R)!=0) return FALSE;
+    i--;
+  }
+  i=MATCOLS(a)*MATROWS(a)-1;
+  while (i>=0)
+  {
+    if(!p_EqualPolys(a->m[i],b->m[i], R)) return FALSE;
+    i--;
+  }
+  return TRUE;
+}
+
 /*2
 * insert a monomial into a list, avoid duplicates
 * arguments are destroyed
@@ -1667,41 +1710,3 @@ matrix mp_Wedge(matrix a, int ar, const ring R)
   id_Delete((ideal *) &tmp, R);
   return (result);
 }
-int mp_Compare(matrix a, matrix b, const ring R)
-{
-  if (MATCOLS(a)<MATCOLS(b)) return -1;
-  else if (MATCOLS(a)>MATCOLS(b)) return 1;
-  if (MATROWS(a)<MATROWS(b)) return -1;
-  else if (MATROWS(a)<MATROWS(b)) return 1;
-
-  int i=MATCOLS(a)*MATROWS(b)-1;
-  int c;
-  while (i>=0)
-  {
-    if (a->m[i]==NULL)
-    {
-      if (b->m[i]!=NULL) return -1;
-    }
-    else
-      if (b->m[i]==NULL) return 1;
-      else if ((c=p_Cmp(a->m[i],b->m[i], R))!=0) return c;
-    i--;
-  }
-  unsigned ii=MATCOLS(a)*MATROWS(b)-1;
-  unsigned j=0;
-  int r=0;
-  while (j<=ii)
-  {
-    r=p_Compare(a->m[j],b->m[j],R);
-    if (r!=0) return r;
-    j++;
-  }
-  return r;
-}
-
-BOOLEAN mp_Equal(matrix a, matrix b, const ring R)
-{
-  int r=mp_Compare(a,b,R);
-  return (r==0);
-}
-

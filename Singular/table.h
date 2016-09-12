@@ -462,6 +462,23 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjCOMPARE_S), '<',            INT_CMD,        STRING_CMD, STRING_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCOMPARE_P), '<',            INT_CMD,        POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCOMPARE_P), '<',            INT_CMD,        VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
+#if 0
+,{D(jjCOMPARE_MA),'<',            INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjWRONG2),    '<',            INT_CMD,        MATRIX_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjWRONG2),    '<',            INT_CMD,        INTVEC_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjWRONG2),    '<',            INT_CMD,        MATRIX_CMD, INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjWRONG2),    '<',            INT_CMD,        INTMAT_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjWRONG2),    '<',            INT_CMD,        MATRIX_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjWRONG2),    '<',            INT_CMD,        NUMBER_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjWRONG2),    '<',            INT_CMD,        MATRIX_CMD, POLY_CMD,   ALLOW_PLURAL | ALLOW_RING}
+,{D(jjWRONG2),    '<',            INT_CMD,        POLY_CMD,   MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjWRONG2),    '<',            INT_CMD,        MATRIX_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjWRONG2),    '<',            INT_CMD,        VECTOR_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjWRONG2),    '<',            INT_CMD,        MATRIX_CMD, IDEAL_CMD,  ALLOW_PLURAL | ALLOW_RING}
+,{D(jjWRONG2),    '<',            INT_CMD,        IDEAL_CMD,  MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjWRONG2),    '<',            INT_CMD,        MATRIX_CMD, MODUL_CMD,  ALLOW_PLURAL | ALLOW_RING}
+,{D(jjWRONG2),    '<',            INT_CMD,        MODUL_CMD,  MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
+#endif
 ,{D(jjGE_I),      GE,             INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjGE_BI),     GE,             INT_CMD,        BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjGE_N),      GE,             INT_CMD,        NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}

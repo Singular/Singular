@@ -430,39 +430,39 @@ static BOOLEAN jjCOMPARE_IV_I(leftv res, leftv u, leftv v)
   jjEQUAL_REST(res,u,v);
   return FALSE;
 }
+static BOOLEAN jjCOMPARE_MA(leftv res, leftv u, leftv v)
+{
+  //Print("in: >>%s<<\n",my_yylinebuf);
+  matrix a=(matrix)u->Data();
+  matrix b=(matrix)v->Data();
+  int r=mp_Compare(a,b,currRing);
+  switch  (iiOp)
+  {
+    case '<':
+      res->data  = (char *) (long)(r < 0);
+      break;
+    case '>':
+      res->data  = (char *) (long)(r > 0);
+      break;
+    case LE:
+      res->data  = (char *) (long)(r <= 0);
+      break;
+    case GE:
+      res->data  = (char *) (long)(r >= 0);
+      break;
+    case EQUAL_EQUAL:
+    case NOTEQUAL: /* negation handled by jjEQUAL_REST */
+      res->data  = (char *)(long) (r == 0);
+      break;
+  }
+  jjEQUAL_REST(res,u,v);
+  return FALSE;
+}
 static BOOLEAN jjCOMPARE_P(leftv res, leftv u, leftv v)
 {
   poly p=(poly)u->Data();
   poly q=(poly)v->Data();
-  int r=pCmp(p,q);
-  if (r==0)
-  {
-    number h=nSub(pGetCoeff(p),pGetCoeff(q));
-    /* compare lead coeffs */
-    r = -1+nIsZero(h)+2*nGreaterZero(h); /* -1: <, 0:==, 1: > */
-    nDelete(&h);
-  }
-  else if (p==NULL)
-  {
-    if (q==NULL)
-    {
-      /* compare 0, 0 */
-      r=0;
-    }
-    else if(pIsConstant(q))
-    {
-      /* compare 0, const */
-      r = 1-2*nGreaterZero(pGetCoeff(q)); /* -1: <, 1: > */
-    }
-  }
-  else if (q==NULL)
-  {
-    if (pIsConstant(p))
-    {
-      /* compare const, 0 */
-      r = -1+2*nGreaterZero(pGetCoeff(p)); /* -1: <, 1: > */
-    }
-  }
+  int r=p_Compare(p,q,currRing);
   switch  (iiOp)
   {
     case '<':

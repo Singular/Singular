@@ -2548,8 +2548,7 @@ typedef struct
 
 int pCompare_qsort(const void *a, const void *b)
 {
-  int res = p_Compare(((poly_sort *)a)->p, ((poly_sort *)b)->p,currRing);
-  return(res);
+  return (p_Compare(((poly_sort *)a)->p, ((poly_sort *)b)->p,currRing));
 }
 
 void idSort_qsort(poly_sort *id_sort, int idsize)
