@@ -4,8 +4,11 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
-* ABSTRACT
+* ABSTRACT: omalloc simulation
 */
+/* debug routines of omalloc are not implemented, but as dummies provided: */
+#define OM_NDEBUG 1
+
 #include <stdlib.h>
 #include <string.h>
 #ifdef __cplusplus
