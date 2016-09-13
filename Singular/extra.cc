@@ -3814,6 +3814,16 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return TRUE;
     }
     else
+/*==================== uniq =================*/
+    if(strcmp(sys_cmd,"uniq")==0)
+    {
+      extern BOOLEAN jjUNIQLIST(leftv, leftv);
+      if (h->Typ()==LIST_CMD)
+        return jjUNIQLIST(res,h);
+      else
+        return TRUE;
+    }
+    else
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }

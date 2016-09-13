@@ -9329,7 +9329,11 @@ static int jjCOMPARE_ALL(const void * aa, const void * bb)
   if (bo)
   {
     Werror(" no `<` for %s",Tok2Cmdname(at));
-    return -1;
+    unsigned long ad=(unsigned long)a->Data();
+    unsigned long bd=(unsigned long)b->Data();
+    if (ad<bd) return -1;
+    else if (ad==bd) return 0;
+    else return 1;
   }
   else if (tmp.data==NULL) /* not < */
   {
@@ -9339,7 +9343,11 @@ static int jjCOMPARE_ALL(const void * aa, const void * bb)
     if (bo)
     {
       Werror(" no `==` for %s",Tok2Cmdname(at));
-      return -1;
+      unsigned long ad=(unsigned long)a->Data();
+      unsigned long bd=(unsigned long)b->Data();
+      if (ad<bd) return -1;
+      else if (ad==bd) return 0;
+      else return 1;
     }
     else if (tmp.data==NULL) /* not <,== */ return 1;
     else return 0;
@@ -9352,6 +9360,32 @@ BOOLEAN jjSORTLIST(leftv, leftv arg)
   if (l->nr>0)
   {
     qsort(l->m,l->nr+1,sizeof(sleftv),jjCOMPARE_ALL);
+  }
+  return FALSE;
+}
+BOOLEAN jjUNIQLIST(leftv, leftv arg)
+{
+  lists l=(lists)arg->Data();
+  if (l->nr>0)
+  {
+    qsort(l->m,l->nr+1,sizeof(sleftv),jjCOMPARE_ALL);
+    int i, j, len;
+    len=l->nr;
+    i=0;
+    while(i<len)
+    {
+      if(jjCOMPARE_ALL(&(l->m[i]),&(l->m[i+1]))==0)
+      {
+        l->m[i].CleanUp();
+        for(j=i; j<len;j++) l->m[j]=l->m[j+1];
+        memset(&(l->m[len]),0,sizeof(sleftv));
+        l->m[len].rtyp=DEF_CMD;
+        len--;
+      }
+      else
+        i++;
+    }
+    //Print("new len:%d\n",len);
   }
   return FALSE;
 }
