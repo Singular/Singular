@@ -614,15 +614,8 @@ static void setGlobalVariables(const resolvente res, const int index,
 #endif   // CACHE
 }
 
-#define MYLIFT 0
-
 static void computeLiftings(const resolvente res, const int index)
 {
-#if MYLIFT
-    for (int j = res[index]->ncols-1; j >= 0; j--) {
-        liftTree(res[index]->m[j], res[index-1]);
-    }
-#else
     ideal m_idTails_test = idInit(IDELEMS(res[index-1]), res[index-1]->rank);
     for (int i = IDELEMS(res[index-1])-1; i >= 0; i--) {
         m_idTails_test->m[i] = pCopy(res[index-1]->m[i]->next);
@@ -651,7 +644,6 @@ static void computeLiftings(const resolvente res, const int index)
     m_lcm.clear();
     idDelete(&m_idTails_test);
     idDelete(&m_syzLeads_test);
-#endif   // MYLIFT
 }
 
 static void sortPolysTails(const resolvente res, const int index)
