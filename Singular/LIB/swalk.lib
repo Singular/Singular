@@ -20,6 +20,9 @@ THEORY: The concept of SAGBI ( Subalgebra Analog to Groebner Basis for Ideals)
 PROCEDURES:
  swalk(ideal[,intvec]);   Sagbi basis of subalgebra via Sagbi walk algorithm
  rswalk(ideal,int,int[,intvec]); Sagbi basis of subalgebra via Random Sagbi Walk Algorithm
+
+KEYWORDS: walk, groebner
+SEE ALSO: grwalk_lib; rwalk_lib
 ";
 
 LIB "sagbi.lib";

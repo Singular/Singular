@@ -10,6 +10,9 @@ PROCEDURES:
 prwalk(ideal,int,int[,intvec,intvec]);   standard basis of ideal via Random Perturbation Walk algorithm
 rwalk(ideal,int[,intvec,intvec]);       standard basis of ideal via Random Walk algorithm
 frandwalk(ideal,int[,intvec,intvec]);      standard basis of ideal via Random Fractal Walk algorithm
+
+KEYWORDS: walk, groebner
+SEE ALSO: grwalk_lib; swalk_lib
 ";
 
 /***********************************
