@@ -70,11 +70,10 @@ bool CLCM_test_Check(const std::vector<bool> &clcm, const poly m)
   } else return true;
 }
 
-static poly TraverseNF_test(const poly a, ideal m_idLeads_test,
+static poly TraverseNF_test(const poly a, const ideal L,
     const ideal m_idTails_test, const std::vector<bool> &m_lcm,
     const CReducersHash_test *m_div, const CReducersHash_test *m_checker)
 {
-  const ideal& L = m_idLeads_test;
   const ring R = currRing;
   const int r = p_GetComp(a, R) - 1;
   poly aa = leadmonom_test(a, R);
@@ -599,7 +598,7 @@ static ideal computeFrame(const ideal G, const syzM_i_Function syzM_i,
 }
 
 static void setGlobalVariables(const resolvente res, const int index,
-    const ideal m_idLeads_test, const ideal m_syzLeads_test)
+    const ideal m_syzLeads_test)
 {
 #if CACHE
     for (TCache_test::iterator it = m_cache_test.begin();
@@ -624,15 +623,13 @@ static void computeLiftings(const resolvente res, const int index)
         liftTree(res[index]->m[j], res[index-1]);
     }
 #else
-    ideal m_idLeads_test = idCopy(res[index-1]);
     ideal m_idTails_test = idInit(IDELEMS(res[index-1]), res[index-1]->rank);
     for (int i = IDELEMS(res[index-1])-1; i >= 0; i--) {
-        m_idTails_test->m[i] = m_idLeads_test->m[i]->next;
-        m_idLeads_test->m[i]->next = NULL;
+        m_idTails_test->m[i] = pCopy(res[index-1]->m[i]->next);
     }
-    std::vector<bool> m_lcm = CLCM_test_redefine(m_idLeads_test);
+    std::vector<bool> m_lcm = CLCM_test_redefine(res[index-1]);
     CReducersHash_test m_div;
-    initialize(m_div, m_idLeads_test);
+    initialize(m_div, res[index-1]);
     ideal m_syzLeads_test = idCopy(res[index]);
     for (int i = IDELEMS(res[index])-1; i >= 0; i--) {
         pDelete(&m_syzLeads_test->m[i]->next);
@@ -640,19 +637,18 @@ static void computeLiftings(const resolvente res, const int index)
     }
     CReducersHash_test m_checker;
     initialize(m_checker, m_syzLeads_test);
-    setGlobalVariables(res, index, m_idLeads_test, m_syzLeads_test);
+    setGlobalVariables(res, index, m_syzLeads_test);
     poly p;
     for (int j = res[index]->ncols-1; j >= 0; j--) {
         p = res[index]->m[j];
         pDelete(&res[index]->m[j]->next);
         p->next = NULL;
-        res[index]->m[j]->next = TraverseNF_test(p, m_idLeads_test,
+        res[index]->m[j]->next = TraverseNF_test(p, res[index-1],
             m_idTails_test, m_lcm, &m_div, &m_checker);
     }
     deleteCRH(&m_checker);
     deleteCRH(&m_div);
     m_lcm.clear();
-    idDelete(&m_idLeads_test);
     idDelete(&m_idTails_test);
     idDelete(&m_syzLeads_test);
 #endif   // MYLIFT
