@@ -29,9 +29,6 @@ static poly TraverseTail_test(poly multiplier, const int tail,
 static poly ComputeImage_test(poly multiplier, const int tail,
     const ideal m_idTails_test, const std::vector<bool> &m_lcm,
     const CReducersHash_test *m_div, const CReducersHash_test *m_checker);
-static poly TraverseTail_test(poly multiplier, poly tail,
-    const ideal m_idTails_test, const std::vector<bool> &m_lcm,
-    const CReducersHash_test *m_div, const CReducersHash_test *m_checker);
 static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
     poly syztermCheck, const ideal m_idTails_test,
     const std::vector<bool> &m_lcm, const CReducersHash_test *m_div,
@@ -208,13 +205,12 @@ static poly ComputeImage_test(poly multiplier, const int t,
   const poly tail = m_idTails_test->m[t];
   if(tail != NULL)
   {
-    const ring r = currRing;
     if( !CLCM_test_Check(m_lcm, multiplier) )
     {
       return NULL;
     }
 #if BUCKETS == 0
-    SBucketWrapper sum(r, m_sum_bucket_factory);
+    SBucketWrapper sum(currRing, m_sum_bucket_factory);
 #elif BUCKETS == 1
     sBucket_pt sum = sBucketCreate(currRing);
 #else   // BUCKETS == 2
@@ -229,7 +225,7 @@ static poly ComputeImage_test(poly multiplier, const int t,
 #elif BUCKETS == 1
       sBucket_Add_p(sum, rt, pLength(rt));
 #else   // BUCKETS == 2
-      s = p_Add_q(s, rt, r);
+      s = p_Add_q(s, rt, currRing);
 #endif   // BUCKETS
     }
 #if BUCKETS == 0
@@ -597,8 +593,7 @@ static ideal computeFrame(const ideal G, const syzM_i_Function syzM_i,
     return frame;
 }
 
-static void setGlobalVariables(const resolvente res, const int index,
-    const ideal m_syzLeads_test)
+static void setGlobalVariables()
 {
 #if CACHE
     for (TCache_test::iterator it = m_cache_test.begin();
@@ -630,7 +625,7 @@ static void computeLiftings(const resolvente res, const int index)
     }
     CReducersHash_test m_checker;
     initialize(m_checker, m_syzLeads_test);
-    setGlobalVariables(res, index, m_syzLeads_test);
+    setGlobalVariables();
     poly p;
     for (int j = res[index]->ncols-1; j >= 0; j--) {
         p = res[index]->m[j];
