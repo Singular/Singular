@@ -11,7 +11,7 @@ prwalk(ideal,int,int[,intvec,intvec]);   standard basis of ideal via Random Pert
 rwalk(ideal,int[,intvec,intvec]);       standard basis of ideal via Random Walk algorithm
 frandwalk(ideal,int[,intvec,intvec]);      standard basis of ideal via Random Fractal Walk algorithm
 
-KEYWORDS: walk, groebner
+KEYWORDS: walk, groebner;Groebnerwalk
 SEE ALSO: grwalk_lib; swalk_lib
 ";
 

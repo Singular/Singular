@@ -15,7 +15,7 @@ PROCEDURES:
  pwalk(ideal[,intvec]);   standard basis of ideal via perturbation walk alg
  gwalk(ideal[,intvec]);   standard basis of ideal via groebnerwalk alg
 
-KEYWORDS: walk, groebner
+KEYWORDS: walk, groebner;Groebnerwalk
 ZSEE ALSO: rwalk_lib; swalk_lib
 ";
 

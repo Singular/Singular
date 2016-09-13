@@ -21,7 +21,7 @@ PROCEDURES:
  swalk(ideal[,intvec]);   Sagbi basis of subalgebra via Sagbi walk algorithm
  rswalk(ideal,int,int[,intvec]); Sagbi basis of subalgebra via Random Sagbi Walk Algorithm
 
-KEYWORDS: walk, groebner
+KEYWORDS: walk, groebner;Groebnerwalk
 SEE ALSO: grwalk_lib; rwalk_lib
 ";
 
