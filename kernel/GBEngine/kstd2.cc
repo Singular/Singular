@@ -1795,6 +1795,161 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
   }
 }
 
+/*2
+*  reduction procedure from global case but with jet bound
+*/
+
+poly redNFBound (poly h,int &max_ind,int nonorm,kStrategy strat,int bound)
+{
+  if (h==NULL) return NULL;
+  h = pJet(h,bound);
+  int j;
+  max_ind=strat->sl;
+
+  if (0 > strat->sl)
+  {
+    return h;
+  }
+  LObject P(h);
+  P.SetShortExpVector();
+  P.bucket = kBucketCreate(currRing);
+  kBucketInit(P.bucket,P.p,pLength(P.p));
+  kbTest(P.bucket);
+#ifdef HAVE_RINGS
+  BOOLEAN is_ring = rField_is_Ring(currRing);
+#endif
+#ifdef KDEBUG
+//  if (TEST_OPT_DEBUG)
+//  {
+//    PrintS("redNF: starting S:\n");
+//    for( j = 0; j <= max_ind; j++ )
+//    {
+//      Print("S[%d] (of size: %d): ", j, pSize(strat->S[j]));
+//      pWrite(strat->S[j]);
+//    }
+//  };
+#endif
+
+  loop
+  {
+    j=kFindDivisibleByInS(strat,&max_ind,&P);
+    if (j>=0)
+    {
+#ifdef HAVE_RINGS
+      if (!is_ring)
+      {
+#endif
+        int sl=pSize(strat->S[j]);
+        int jj=j;
+        loop
+        {
+          int sll;
+          jj=kFindNextDivisibleByInS(strat,jj+1,max_ind,&P);
+          if (jj<0) break;
+          sll=pSize(strat->S[jj]);
+          if (sll<sl)
+          {
+            #ifdef KDEBUG
+            if (TEST_OPT_DEBUG) Print("better(S%d:%d -> S%d:%d)\n",j,sl,jj,sll);
+            #endif
+            //else if (TEST_OPT_PROT) { PrintS("b"); mflush(); }
+            j=jj;
+            sl=sll;
+          }
+        }
+        if ((nonorm==0) && (!nIsOne(pGetCoeff(strat->S[j]))))
+        {
+          pNorm(strat->S[j]);
+          //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
+        }
+#ifdef HAVE_RINGS
+      }
+#endif
+      nNormalize(pGetCoeff(P.p));
+#ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("red:");
+        wrp(h);
+        PrintS(" with ");
+        wrp(strat->S[j]);
+      }
+#endif
+#ifdef HAVE_PLURAL
+      if (rIsPluralRing(currRing))
+      {
+        number coef;
+        nc_kBucketPolyRed(P.bucket,strat->S[j],&coef);
+        nDelete(&coef);
+      }
+      else
+#endif
+      {
+        number coef;
+        coef=kBucketPolyRed(P.bucket,strat->S[j],pLength(strat->S[j]),strat->kNoether);
+        P.p = kBucketClear(P.bucket);
+        P.p = pJet(P.p,bound);
+        kBucketDestroy(&P.bucket);
+        P.SetShortExpVector();
+        P.bucket = kBucketCreate(currRing);
+        kBucketInit(P.bucket,P.p,pLength(P.p));
+        nDelete(&coef);
+      }
+      h = kBucketGetLm(P.bucket);   // FRAGE OLIVER
+      if (h==NULL)
+      {
+        kBucketDestroy(&P.bucket);
+
+#ifdef KDEBUG
+//        if (TEST_OPT_DEBUG)
+//        {
+//          PrintS("redNF: starting S:\n");
+//          for( j = 0; j <= max_ind; j++ )
+//          {
+//            Print("S[%d] (of size: %d): ", j, pSize(strat->S[j]));
+//            pWrite(strat->S[j]);
+//          }
+//        };
+#endif
+
+        return NULL;
+      }
+      kbTest(P.bucket);
+      P.p=h;
+      P.t_p=NULL;
+      P.SetShortExpVector();
+#ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("\nto:");
+        wrp(h);
+        PrintLn();
+      }
+#endif
+    }
+    else
+    {
+      P.p=kBucketClear(P.bucket);
+      kBucketDestroy(&P.bucket);
+      pNormalize(P.p);
+
+#ifdef KDEBUG
+//      if (TEST_OPT_DEBUG)
+//      {
+//        PrintS("redNF: starting S:\n");
+//        for( j = 0; j <= max_ind; j++ )
+//        {
+//          Print("S[%d] (of size: %d): ", j, pSize(strat->S[j]));
+//          pWrite(strat->S[j]);
+//        }
+//      };
+#endif
+
+      return P.p;
+    }
+  }
+}
+
 void kDebugPrint(kStrategy strat);
 
 ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
@@ -3270,6 +3425,76 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   return p;
 }
 
+poly kNF2Bound (ideal F,ideal Q,poly q,int bound,kStrategy strat, int lazyReduce)
+{
+  assume(q!=NULL);
+  assume(!(idIs0(F)&&(Q==NULL))); // NF(q, std(0) in polynomial ring?
+
+// lazy_reduce flags: can be combined by |
+//#define KSTD_NF_LAZY   1
+  // do only a reduction of the leading term
+//#define KSTD_NF_NONORM 4
+  // only global: avoid normalization, return a multiply of NF
+  poly   p;
+
+  //if ((idIs0(F))&&(Q==NULL))
+  //  return pCopy(q); /*F=0*/
+  //strat->ak = idRankFreeModule(F);
+  /*- creating temp data structures------------------- -*/
+  BITSET save1;
+  SI_SAVE_OPT1(save1);
+  si_opt_1|=Sy_bit(OPT_REDTAIL);
+  initBuchMoraCrit(strat);
+  strat->initEcart = initEcartBBA;
+  strat->enterS = enterSBba;
+#ifndef NO_BUCKETS
+  strat->use_buckets = (!TEST_OPT_NOT_BUCKETS) && (!rIsPluralRing(currRing));
+#endif
+  /*- set S -*/
+  strat->sl = -1;
+  /*- init local data struct.---------------------------------------- -*/
+  /*Shdl=*/initS(F,Q,strat);
+  /*- compute------------------------------------------------------- -*/
+  //if ((TEST_OPT_INTSTRATEGY)&&(lazyReduce==0))
+  //{
+  //  for (i=strat->sl;i>=0;i--)
+  //    pNorm(strat->S[i]);
+  //}
+  kTest(strat);
+  if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
+  if (BVERBOSE(23)) kDebugPrint(strat);
+  int max_ind;
+  p = redNFBound(pCopy(q),max_ind,lazyReduce & KSTD_NF_NONORM,strat,bound);
+  if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
+  {
+    if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
+    if (rField_is_Ring(currRing))
+    {
+      p = redtailBba_Z(p,max_ind,strat);
+    }
+    else
+    {
+      si_opt_1 &= ~Sy_bit(OPT_INTSTRATEGY);
+      p = redtailBbaBound(p,max_ind,strat,bound,(lazyReduce & KSTD_NF_NONORM)==0);
+      //p = redtailBba(p,max_ind,strat,(lazyReduce & KSTD_NF_NONORM)==0);
+    }
+  }
+  /*- release temp data------------------------------- -*/
+  assume(strat->L==NULL); /* strat->L unused */
+  assume(strat->B==NULL); /* strat->B unused */
+  omFree(strat->sevS);
+  omFree(strat->ecartS);
+  assume(strat->T==NULL);//omfree(strat->T);
+  assume(strat->sevT==NULL);//omfree(strat->sevT);
+  assume(strat->R==NULL);//omfree(strat->R);
+  omfree(strat->S_2_R);
+  omfree(strat->fromQ);
+  idDelete(&strat->Shdl);
+  SI_RESTORE_OPT1(save1);
+  if (TEST_OPT_PROT) PrintLn();
+  return p;
+}
+
 ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
 {
   assume(!idIs0(q));
@@ -3322,6 +3547,81 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
         else
         {
           p = redtailBba(p,max_ind,strat,(lazyReduce & KSTD_NF_NONORM)==0);
+        }
+      }
+      res->m[i]=p;
+    }
+    //else
+    //  res->m[i]=NULL;
+  }
+  /*- release temp data------------------------------- -*/
+  assume(strat->L==NULL); /* strat->L unused */
+  assume(strat->B==NULL); /* strat->B unused */
+  omFree(strat->sevS);
+  omFree(strat->ecartS);
+  assume(strat->T==NULL);//omfree(strat->T);
+  assume(strat->sevT==NULL);//omfree(strat->sevT);
+  assume(strat->R==NULL);//omfree(strat->R);
+  omfree(strat->S_2_R);
+  omfree(strat->fromQ);
+  idDelete(&strat->Shdl);
+  SI_RESTORE_OPT1(save1);
+  if (TEST_OPT_PROT) PrintLn();
+  return res;
+}
+
+ideal kNF2Bound (ideal F,ideal Q,ideal q,int bound,kStrategy strat, int lazyReduce)
+{
+  assume(!idIs0(q));
+  assume(!(idIs0(F)&&(Q==NULL)));
+// lazy_reduce flags: can be combined by |
+//#define KSTD_NF_LAZY   1
+  // do only a reduction of the leading term
+//#define KSTD_NF_NONORM 4
+  // only global: avoid normalization, return a multiply of NF
+  poly   p;
+  int   i;
+  ideal res;
+  int max_ind;
+
+  //if (idIs0(q))
+  //  return idInit(IDELEMS(q),si_max(q->rank,F->rank));
+  //if ((idIs0(F))&&(Q==NULL))
+  //  return idCopy(q); /*F=0*/
+  //strat->ak = idRankFreeModule(F);
+  /*- creating temp data structures------------------- -*/
+  BITSET save1;
+  SI_SAVE_OPT1(save1);
+  si_opt_1|=Sy_bit(OPT_REDTAIL);
+  initBuchMoraCrit(strat);
+  strat->initEcart = initEcartBBA;
+  strat->enterS = enterSBba;
+  /*- set S -*/
+  strat->sl = -1;
+#ifndef NO_BUCKETS
+  strat->use_buckets = (!TEST_OPT_NOT_BUCKETS) && (!rIsPluralRing(currRing));
+#endif
+  /*- init local data struct.---------------------------------------- -*/
+  /*Shdl=*/initS(F,Q,strat);
+  /*- compute------------------------------------------------------- -*/
+  res=idInit(IDELEMS(q),si_max(q->rank,F->rank));
+  si_opt_1 &= ~Sy_bit(OPT_INTSTRATEGY);
+  for (i=IDELEMS(q)-1; i>=0; i--)
+  {
+    if (q->m[i]!=NULL)
+    {
+      if (TEST_OPT_PROT) { PrintS("r");mflush(); }
+      p = redNFBound(pCopy(q->m[i]),max_ind,lazyReduce & KSTD_NF_NONORM,strat,bound);
+      if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
+      {
+        if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
+        if (rField_is_Ring(currRing))
+        {
+          p = redtailBba_Z(p,max_ind,strat);
+        }
+        else
+        {
+          p = redtailBbaBound(p,max_ind,strat,(lazyReduce & KSTD_NF_NONORM)==0,bound);
         }
       }
       res->m[i]=p;

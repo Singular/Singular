@@ -3190,7 +3190,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return FALSE;
       }
       else
-  /*==================== RatSpoly, noncomm rational coeffs =================*/
+        /*==================== RatSpoly, noncomm rational coeffs =================*/
       if (strcmp(sys_cmd, "ratSpoly") == 0)
       {
         poly p,q;
@@ -3824,6 +3824,60 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return TRUE;
     }
     else
+    /*========reduce procedure like the global one but with jet bounds=================*/
+        if(strcmp(sys_cmd,"reduce_bound")==0)
+        {
+          poly p;
+          ideal pid;
+          ideal q;
+          int bound;
+          int htype;
+          if(h!= NULL && (h->Typ() == POLY_CMD) ||  (h->Typ() == VECTOR_CMD) 
+                      || (h->Typ() == IDEAL_CMD) || (h->Typ() == MODUL_CMD))
+          {
+            if(h->Typ() == POLY_CMD)
+            {
+              p = (poly)h->CopyD();
+              htype = POLY_CMD;
+            }
+            if(h->Typ() == VECTOR_CMD)
+            {
+              p = (poly)h->CopyD();
+              htype = VECTOR_CMD;
+            }
+            if(h->Typ() == IDEAL_CMD)
+            {
+              pid = (ideal)h->CopyD();
+              htype = IDEAL_CMD;
+            }
+            if(h->Typ() == MODUL_CMD)
+            {
+              pid = (ideal)h->CopyD();
+              htype = MODUL_CMD;
+            }
+            h=h->next;
+          }
+          else return TRUE;
+          if(h!= NULL && (h->Typ() == IDEAL_CMD || h->Typ() == MODUL_CMD) )
+          {
+            q = (ideal)h->CopyD();
+            h=h->next;
+          }
+          else return TRUE;
+          if(h!= NULL && h->Typ() == INT_CMD)
+          {
+            bound = (long)h->CopyD();
+          }
+          else return TRUE;
+          
+          res->rtyp = htype;
+          if(htype == POLY_CMD || htype == VECTOR_CMD)
+            res->data = (char *)kNFBound(q,currRing->qideal,p,bound);
+          if(htype == IDEAL_CMD || htype == MODUL_CMD)
+            res->data = (char *)kNFBound(q,currRing->qideal,pid,bound);
+          return FALSE;
+        }
+        else
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
