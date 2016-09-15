@@ -582,7 +582,7 @@ int mp_Compare(matrix a, matrix b, const ring R)
   if (MATROWS(a)<MATROWS(b)) return -1;
   else if (MATROWS(a)<MATROWS(b)) return 1;
 
-  unsigned ii=MATCOLS(a)*MATROWS(b)-1;
+  unsigned ii=MATCOLS(a)*MATROWS(a)-1;
   unsigned j=0;
   int r=0;
   while (j<=ii)
