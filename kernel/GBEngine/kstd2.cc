@@ -1889,10 +1889,13 @@ poly redNFBound (poly h,int &max_ind,int nonorm,kStrategy strat,int bound)
         coef=kBucketPolyRed(P.bucket,strat->S[j],pLength(strat->S[j]),strat->kNoether);
         P.p = kBucketClear(P.bucket);
         P.p = pJet(P.p,bound);
-        kBucketDestroy(&P.bucket);
-        P.SetShortExpVector();
-        P.bucket = kBucketCreate(currRing);
-        kBucketInit(P.bucket,P.p,pLength(P.p));
+        if(!P.IsNull())
+        {
+          kBucketDestroy(&P.bucket);
+          P.SetShortExpVector();
+          P.bucket = kBucketCreate(currRing);
+          kBucketInit(P.bucket,P.p,pLength(P.p));
+        }
         nDelete(&coef);
       }
       h = kBucketGetLm(P.bucket);   // FRAGE OLIVER
