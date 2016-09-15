@@ -1801,8 +1801,8 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
 
 poly redNFBound (poly h,int &max_ind,int nonorm,kStrategy strat,int bound)
 {
-  if (h==NULL) return NULL;
   h = pJet(h,bound);
+  if (h==NULL) return NULL;
   int j;
   max_ind=strat->sl;
 
