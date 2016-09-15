@@ -24,13 +24,13 @@ typedef std::vector<const CLeadingTerm_struct*> TReducers_test;
 typedef std::map<long, TReducers_test> CReducersHash_test;
 
 static poly TraverseTail_test(poly multiplier, const int tail,
-   const ideal m_idTails_test, const std::vector<bool> &m_lcm,
+   const ideal previous_module, const std::vector<bool> &m_lcm,
    const CReducersHash_test *m_div, const CReducersHash_test *m_checker);
 static poly ComputeImage_test(poly multiplier, const int tail,
-    const ideal m_idTails_test, const std::vector<bool> &m_lcm,
+    const ideal previous_module, const std::vector<bool> &m_lcm,
     const CReducersHash_test *m_div, const CReducersHash_test *m_checker);
 static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
-    poly syztermCheck, const ideal m_idTails_test,
+    poly syztermCheck, const ideal previous_module,
     const std::vector<bool> &m_lcm, const CReducersHash_test *m_div,
     const CReducersHash_test *m_checker);
 static poly leadmonom_test(const poly p, const ring r, const bool bSetZeroComp = true);
@@ -67,17 +67,17 @@ bool CLCM_test_Check(const std::vector<bool> &clcm, const poly m)
   } else return true;
 }
 
-static poly TraverseNF_test(const poly a, const ideal L,
-    const ideal m_idTails_test, const std::vector<bool> &m_lcm,
-    const CReducersHash_test *m_div, const CReducersHash_test *m_checker)
+static poly TraverseNF_test(const poly a, const ideal previous_module,
+    const std::vector<bool> &m_lcm, const CReducersHash_test *m_div,
+    const CReducersHash_test *m_checker)
 {
   const ring R = currRing;
   const int r = p_GetComp(a, R) - 1;
   poly aa = leadmonom_test(a, R);
-  poly t = TraverseTail_test(aa, r, m_idTails_test, m_lcm, m_div, m_checker);
+  poly t = TraverseTail_test(aa, r, previous_module, m_lcm, m_div, m_checker);
   t = p_Add_q(t,
-      ReduceTerm_test(aa, L->m[r], a, m_idTails_test, m_lcm, m_div, m_checker),
-      R);
+      ReduceTerm_test(aa, previous_module->m[r], a, previous_module, m_lcm,
+      m_div, m_checker), R);
   p_Delete(&aa, R);
   return t;
 }
@@ -130,7 +130,7 @@ static FORCE_INLINE poly myp_Head_test(const poly p, const bool bIgnoreCoeff,
 #endif   // CACHE
 
 static poly TraverseTail_test(poly multiplier, const int tail,
-    const ideal m_idTails_test, const std::vector<bool> &m_lcm,
+    const ideal previous_module, const std::vector<bool> &m_lcm,
     const CReducersHash_test *m_div, const CReducersHash_test *m_checker)
 {
   const ring& r = currRing;
@@ -153,7 +153,7 @@ static poly TraverseTail_test(poly multiplier, const int tail,
        }
        return p;
      }
-     const poly p = ComputeImage_test(multiplier, tail, m_idTails_test, m_lcm,
+     const poly p = ComputeImage_test(multiplier, tail, previous_module, m_lcm,
          m_div, m_checker);
      itr = T.find(multiplier);
      if( itr == T.end() )
@@ -165,7 +165,7 @@ static poly TraverseTail_test(poly multiplier, const int tail,
      return p;
   }
 #endif   // CACHE
-  const poly p = ComputeImage_test(multiplier, tail, m_idTails_test, m_lcm,
+  const poly p = ComputeImage_test(multiplier, tail, previous_module, m_lcm,
       m_div, m_checker);
 #if CACHE
   top_itr = m_cache_test.find(tail);
@@ -199,10 +199,10 @@ static poly TraverseTail_test(poly multiplier, const int tail,
  */
 
 static poly ComputeImage_test(poly multiplier, const int t,
-    const ideal m_idTails_test, const std::vector<bool> &m_lcm,
+    const ideal previous_module, const std::vector<bool> &m_lcm,
     const CReducersHash_test *m_div, const CReducersHash_test *m_checker)
 {
-  const poly tail = m_idTails_test->m[t];
+  const poly tail = previous_module->m[t]->next;
   if(tail != NULL)
   {
     if( !CLCM_test_Check(m_lcm, multiplier) )
@@ -218,7 +218,7 @@ static poly ComputeImage_test(poly multiplier, const int t,
 #endif   // BUCKETS
     for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
     {
-      const poly rt = ReduceTerm_test(multiplier, p, NULL, m_idTails_test,
+      const poly rt = ReduceTerm_test(multiplier, p, NULL, previous_module,
           m_lcm, m_div, m_checker);
 #if BUCKETS == 0
       sum.Add(rt);
@@ -374,7 +374,7 @@ poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
 }
 
 static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
-    poly syztermCheck, const ideal m_idTails_test,
+    poly syztermCheck, const ideal previous_module,
     const std::vector<bool> &m_lcm, const CReducersHash_test *m_div,
     const CReducersHash_test *m_checker)
 {
@@ -392,7 +392,7 @@ static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
   poly b = leadmonom_test(s, r);
   const int c = p_GetComp(s, r) - 1;
   const poly t
-      = TraverseTail_test(b, c, m_idTails_test, m_lcm, m_div, m_checker);
+      = TraverseTail_test(b, c, previous_module, m_lcm, m_div, m_checker);
   pDelete(&b);
   if( t != NULL )
     s = p_Add_q(s, t, r);
@@ -611,10 +611,6 @@ static void setGlobalVariables()
 
 static void computeLiftings(const resolvente res, const int index)
 {
-    ideal m_idTails_test = idInit(IDELEMS(res[index-1]), res[index-1]->rank);
-    for (int i = IDELEMS(res[index-1])-1; i >= 0; i--) {
-        m_idTails_test->m[i] = pCopy(res[index-1]->m[i]->next);
-    }
     std::vector<bool> m_lcm = CLCM_test_redefine(res[index-1]);
     CReducersHash_test m_div;
     initialize(m_div, res[index-1]);
@@ -631,13 +627,12 @@ static void computeLiftings(const resolvente res, const int index)
         p = res[index]->m[j];
         pDelete(&res[index]->m[j]->next);
         p->next = NULL;
-        res[index]->m[j]->next = TraverseNF_test(p, res[index-1],
-            m_idTails_test, m_lcm, &m_div, &m_checker);
+        res[index]->m[j]->next = TraverseNF_test(p, res[index-1], m_lcm,
+            &m_div, &m_checker);
     }
     deleteCRH(&m_checker);
     deleteCRH(&m_div);
     m_lcm.clear();
-    idDelete(&m_idTails_test);
     idDelete(&m_syzLeads_test);
 }
 
