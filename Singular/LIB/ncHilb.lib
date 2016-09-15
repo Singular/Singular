@@ -2,7 +2,7 @@
 version="version nc_hilb.lib 4.0.3.3 Sep_2016 "; // $Id$
 category="Noncommutative algebra";
 info="
-LIBRARY:  nchilb.lib: A library for computing the Hilbert series of the
+LIBRARY:  ncHilb.lib: A library for computing the Hilbert series of the
                        non-commutative monomial algebras (e.g. k<x,y,z>/I,
                        where I is a two-sided ideal).
 
@@ -40,10 +40,11 @@ EXAMPLE: example nchilb; shows an example "
 {
     system("--ticks-per-sec",1000); 
     if (d<1) {"bad degree bound"; return(0);}
-    printlevel=0; 
+    printlevel=1; 
     def save = basering;
     int sz=size(#);
-   
+    int lV=nvars(save);
+    
     def R =makeLetterplaceRing(d);
     setring R;
     ideal I;
@@ -86,7 +87,7 @@ EXAMPLE: example nchilb; shows an example "
     
     tt=timer;
     rt=rtimer;
-    ideal J = system("freegb",I,d,nvars(save));
+    ideal J = system("freegb",I,d,lV);
     
     if(printlevel >=2)
     {
@@ -113,11 +114,11 @@ EXAMPLE: example nchilb; shows an example "
     rt=rtimer;
     if(sz==1)
     {
-        system("nc_hilb",I,1);
+        system("nc_hilb",I,lV,1);
     }
     else
     {
-        system("nc_hilb",I);
+        system("nc_hilb",I,lV);
     }
     if(printlevel >=2)
     {

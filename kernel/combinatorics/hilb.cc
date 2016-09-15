@@ -40,12 +40,12 @@
 # define saidebug 0
 void idprint(const ideal id)
 {
-	if( id == NULL )
+  if( id == NULL )
   PrintS("(NULL)");
   else
   {
     Print("\nNo. of polys in the ideal== %d\n",IDELEMS(id));
-	  int i;
+    int i;
     for (int i = 0; i < IDELEMS(id); i++)
     {
       Print("id[%d]:: ",i); 
@@ -1415,728 +1415,737 @@ void hLookSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree, ring ta
 ************************************************************************/
 void idInsertOneMon(ideal h1, poly h2)
 {
-	if(h2==NULL)
-	{
-		return;
-	}
-	
-	int j = IDELEMS(h1) - 1;
-	while ((j >= 0) && (h1->m[j] == NULL))
-	{
-		j--;
-	}
-	j++;
-	if (j==IDELEMS(h1))
-	{
-		pEnlargeSet(&(h1->m),IDELEMS(h1),1);
-		IDELEMS(h1)+=1;
-	}
-	h1->m[j]=h2;
+  if(h2==NULL)
+  {
+    return;
+  }
+
+  int j = IDELEMS(h1) - 1;
+  while ((j >= 0) && (h1->m[j] == NULL))
+  {
+    j--;
+  }
+  j++;
+  if (j==IDELEMS(h1))
+  {
+    pEnlargeSet(&(h1->m),IDELEMS(h1),1);
+    IDELEMS(h1)+=1;
+  }
+  h1->m[j]=h2;
 }
 
 void truncateSortedIdeal(ideal J,ideal I, int tr)
 {
-	int i;
-	for(i=0;i<IDELEMS(I);i++)
-	{
-		if(DegMon(I->m[i])<=tr)
-		{
-			idInsertOneMon(J,I->m[i]);
-		}
-		else
-			break;
-	}
+  int i;
+  for(i=0;i<IDELEMS(I);i++)
+  {
+    if(DegMon(I->m[i])<=tr)
+    {
+      idInsertOneMon(J,I->m[i]);
+    }
+    else
+      break;
+  }
 }
-
+/*
 poly p_DivideMon(poly a, poly b, const ring r)
 {
   int i;
   poly result = p_Init(r);
-	int N=r->N;
+  int N=r->N;
   for(i=1;i<=N; i++)
   p_SetExp(result,i, p_GetExp(a,i,r)- p_GetExp(b,i,r),r);
   p_SetComp(result, p_GetComp(a,r) - p_GetComp(b,r),r);
   p_Setm(result,r);
   return result;
 }
-
+*/
 void makeIdealNull(ideal h1)
 {
-	if(idIs0(h1))
-		return;
-	pEnlargeSet(&(h1->m),IDELEMS(h1),-IDELEMS(h1)+1);
-	IDELEMS(h1)=1;
-	h1->m[0]=NULL;
+  if(idIs0(h1))
+    return;
+  pEnlargeSet(&(h1->m),IDELEMS(h1),-IDELEMS(h1)+1);
+  IDELEMS(h1)=1;
+  h1->m[0]=NULL;
 }
 
 void idMakeOne(ideal h1, poly h2)
 {
-	pEnlargeSet(&(h1->m),IDELEMS(h1),-IDELEMS(h1)+1);
-	IDELEMS(h1)=1;
-	h1->m[0]=h2;
-}		
+  pEnlargeSet(&(h1->m),IDELEMS(h1),-IDELEMS(h1)+1);
+  IDELEMS(h1)=1;
+  h1->m[0]=h2;
+}
 
 static ideal SortByDeg_Mon(ideal I, poly p)
 {
-	int i,j;
-	if((I == NULL) || (idIs0(I)))
-	{
-		ideal res = idInit(1,1);
-		res->m[0] = p;
-		return(res);
-	}
-	idSkipZeroes(I);
+  int i,j;
+  if((I == NULL) || (idIs0(I)))
+  {
+    ideal res = idInit(1,1);
+    res->m[0] = p;
+    return(res);
+  }
+  idSkipZeroes(I);
 
-	for(i = 0; (i<IDELEMS(I)) && (DegMon(I->m[i])<=DegMon(p)); i++)
-	{
-		if(p_DivisibleBy( I->m[i],p, currRing))
-		{
-			return(I);
-		}
-	}
-	for(i = IDELEMS(I)-1; (i>=0) && (DegMon(I->m[i])>=DegMon(p)); i--)
-	{
-		if(p_DivisibleBy(p,I->m[i], currRing))
-		{
-			I->m[i] = NULL;
-		}
-	}
-	if(idIs0(I))
-	{
-		idSkipZeroes(I);
-		I->m[0] = p;
-		return(I);
-	}
+  for(i = 0; (i<IDELEMS(I)) && (DegMon(I->m[i])<=DegMon(p)); i++)
+  {
+    if(p_DivisibleBy( I->m[i],p, currRing))
+    {
+      return(I);
+    }
+  }
+  for(i = IDELEMS(I)-1; (i>=0) && (DegMon(I->m[i])>=DegMon(p)); i--)
+  {
+    if(p_DivisibleBy(p,I->m[i], currRing))
+    {
+      I->m[i] = NULL;
+    }
+  }
+  if(idIs0(I))
+  {
+    I->m[0] = p;
+    return(I);
+  }
 
   idSkipZeroes(I);
-  //when all generators have same degree
-	if(DegMon(I->m[0]) == DegMon(I->m[IDELEMS(I)-1]))
-	{
-		if(DegMon(p)<DegMon(I->m[0]))
-		{
-			idInsertPoly(I,p);
-			idSkipZeroes(I);
-			for(i=IDELEMS(I)-1;i>=1; i--)
-			{
-				I->m[i] = I->m[i-1];
-			}
-			I->m[0] = p;
-			return(I);
-		}
-		if(DegMon(p)>=DegMon(I->m[IDELEMS(I)-1]))
-		{
-			idInsertOneMon(I,p);
-			for(i=IDELEMS(I)-2;i>=0;i--)
-			{
-				if(p_LmCmp(I->m[i],p,currRing)==1)
-				{
-				
-					if(i==0)
-					{
-						for(int j=IDELEMS(I)-1;j>i;j--)
-						{
-							I->m[j] = I->m[j-1];
-						} 
-						I->m[0] = p;
-						return(I);
-					}
-					else
-					continue;
-				}
-				else
-				{
-				 if(i==(IDELEMS(I)-2))//if poly is already at the right pos.
-				 {
-					 return(I);
-				 }
-				 for(int j=IDELEMS(I)-1;j>i;j--)
-				 {
-           I->m[j] = I->m[j-1];
-				 }
-				 I->m[i+1] = p;
-				 return(I);
-				}
-			}
-		
-		}
-	}
+  //when all polynomials of I have same degree
+  if(DegMon(I->m[0]) == DegMon(I->m[IDELEMS(I)-1]))
+  {
+    if(DegMon(p)<DegMon(I->m[0]))
+    {
+      idInsertPoly(I,p);
+      idSkipZeroes(I);
+      for(i=IDELEMS(I)-1;i>=1; i--)
+      {
+        I->m[i] = I->m[i-1];
+      }
+      I->m[0] = p;
+      return(I);
+    }
+    if(DegMon(p)>=DegMon(I->m[IDELEMS(I)-1]))
+    {
+      idInsertOneMon(I,p);
+      for(i=IDELEMS(I)-2;i>=0;i--)
+      {
+        if(p_LmCmp(I->m[i],p,currRing)==1)
+        {        
+          if(i==0)
+          {
+            for(int j=IDELEMS(I)-1;j>i;j--)
+            {
+              I->m[j] = I->m[j-1];
+            } 
+            I->m[0] = p;
+            return(I);
+          }
+          else
+            continue;
+        }
+        else
+        {
+          if(i==(IDELEMS(I)-2))//if poly is already at the right pos.
+          {
+            return(I);
+          }
+          for(int j=IDELEMS(I)-1;j>i;j--)
+          {
+            I->m[j] = I->m[j-1];
+          }
+          I->m[i+1] = p;
+          return(I);
+        }
+      }
+    }
+  }
   if(DegMon(p)<=DegMon(I->m[0]))
-	{
-		int j;
-		idInsertOneMon(I,p);
-		for(i=0;i<IDELEMS(I); i++)
-		{
-			if(p_LmCmp(I->m[i], p, currRing)==1)
-			{
-				for(j=(IDELEMS(I)-1);j>i;j--)
-				{
-					I->m[j] = I->m[j-1];
-				}
-				I->m[i]=p;
-				return(I);
-
-			}
-		}
-	}
-	if(DegMon(p)>=DegMon(I->m[IDELEMS(I)-1]))
-	{
-		idInsertPoly(I,p);
-		idSkipZeroes(I);
-		for(i=IDELEMS(I)-2;i>=0;i--)
-		{
-			if(p_LmCmp(I->m[i], p, currRing)==1)
-			 {
-				 continue;
-			 }
-			 else
-			 {
-				 if(i==(IDELEMS(I)-2))
-				 {
-					 return(I);
-				 }
-				 for(int j=IDELEMS(I)-1;j>i;j--)
-				 {
-					 I->m[j] = I->m[j-1];
-				 }
-				 I->m[i+1] = p;
-				 return(I);
-
-			 }
-		}
-		
-	}
-	for(i = IDELEMS(I)-2; ;)
-	{
-		if(DegMon(p)==DegMon(I->m[i]))
-		{
-			idInsertPoly(I,p);
-			idSkipZeroes(I);
-			for(j = IDELEMS(I)-1; j>i+1;j--)
-			{
-				I->m[j] = I->m[j-1];
-			}
-			I->m[i+1] = p;
-			
-			for(int ii=i;ii>=0;ii--)
-			{
-				if(p_LmCmp(I->m[ii],p,currRing)==1)
-				{
-					if(ii==0)
-					{
-						for(int jj=i+1;jj>0;jj--)
-						{
-							I->m[jj] = I->m[jj-1];
-						}
-						I->m[0] = p;
-						return(I);
-					}
-					else
-					continue;
-				}
-				else
-				{
-					if(ii==i)
-					{
-						return(I);
-					}
-					for(int jj=i+1;jj>ii;jj--)
-					{
-						I->m[jj] = I->m[jj-1];
-					}
-					I->m[ii+1] = p;
-			
-					return(I);
-				}
-			}
-		}
-		if(DegMon(p)>DegMon(I->m[i]))
-		{
-			idInsertPoly(I,p);
-			idSkipZeroes(I);
-			for(j = IDELEMS(I)-1; j>=i+2;j--)
-			{
-				I->m[j] = I->m[j-1];
-			}
-			I->m[i+1] = p;
-			return(I);
-		}
-		i--;
-	}
+  {
+    int j;
+    idInsertOneMon(I,p);
+    for(i=0;i<IDELEMS(I); i++)
+    {
+      if(p_LmCmp(I->m[i], p, currRing)==1)
+      {
+        for(j=(IDELEMS(I)-1);j>i;j--)
+        {
+          I->m[j] = I->m[j-1];
+        }
+        I->m[i]=p;
+        return(I);
+      }
+    }
+  }
+  if(DegMon(p)>=DegMon(I->m[IDELEMS(I)-1]))
+  {
+    idInsertPoly(I,p);
+    idSkipZeroes(I);
+    
+    for(i=IDELEMS(I)-2;i>=0;i--)
+    {
+      if(p_LmCmp(I->m[i], p, currRing)!=1)
+      {
+        if(i==(IDELEMS(I)-2))
+        {
+          return(I);
+        }
+        for(int j=IDELEMS(I)-1;j>i;j--)
+        {
+          I->m[j] = I->m[j-1];
+        }
+        I->m[i+1] = p;
+        return(I);
+      }
+    }
+  }
+  
+  for(i = IDELEMS(I)-2; ;)
+  {
+    if(DegMon(p)==DegMon(I->m[i]))
+    {
+      idInsertPoly(I,p);
+      idSkipZeroes(I);
+      for(j = IDELEMS(I)-1; j>i+1;j--)
+      {
+        I->m[j] = I->m[j-1];
+      }
+      I->m[i+1] = p;
+      
+      for(int ii=i;ii>=0;ii--)
+      {
+        if(p_LmCmp(I->m[ii],p,currRing)==1)
+        {
+          if(ii==0)
+          {
+            for(int jj=i+1;jj>0;jj--)
+            {
+              I->m[jj] = I->m[jj-1];
+            }
+            I->m[0] = p;
+            return(I);
+          }
+          else
+          continue;
+        }
+        else
+        {
+          if(ii==i)
+          {
+            return(I);
+          }
+          for(int jj=i+1;jj>ii;jj--)
+          {
+            I->m[jj] = I->m[jj-1];
+          }
+          I->m[ii+1] = p;
+      
+          return(I);
+        }
+      }
+    }
+    if(DegMon(p)>DegMon(I->m[i]))
+    {
+      idInsertPoly(I,p);
+      idSkipZeroes(I);
+      for(j = IDELEMS(I)-1; j>=i+2;j--)
+      {
+        I->m[j] = I->m[j-1];
+      }
+      I->m[i+1] = p;
+      return(I);
+    }
+    i--;
+  }
 }
 
 static ideal SortMonoId(ideal I)
 {
-	if(idIs0(I))
-	{
-		return(I);
-	}
-	int i;
-	ideal res;
-	idSkipZeroes(I);
-	res = idInit(1,1);
-	res->m[0] = poly(0);
-	for(i = 0; i<=IDELEMS(I)-1;i++)
-	{
-	   res = SortByDeg_Mon(res, I->m[i]);
-	}
-	idSkipZeroes(res);
-	return(res);
+  if(idIs0(I))
+  {
+    return(I);
+  }
+  int i;
+  ideal res;
+  idSkipZeroes(I);
+  res = idInit(1,1);
+  for(i = 0; i<=IDELEMS(I)-1;i++)
+  {
+     res = SortByDeg_Mon(res, I->m[i]);
+  }
+  idSkipZeroes(res);
+  return(res);
 }
 
 int MonoIdBasesSame(ideal J, ideal obc)
 {
-	/*
-	 * polynomials of J and obc are assumed to
-	 * be already sorted. J and obc are
-	 * represented by the minimal generating set. 
-	 */
-	int i,j,s,cnt;
-	s=1;
-	int szj=IDELEMS(J);
-	int szo=IDELEMS(obc);
-	
-	if(idIs0(J))
-	{
-		return(1);
-	}
-	if(szj!=szo)	
+  /*
+  polynomials of J and obc are assumed to
+  be already sorted. J and obc are
+  represented by the minimal generating set. 
+  */
+  int i,j,s,cnt;
+  s=1;
+  int szj=IDELEMS(J);
+  int szo=IDELEMS(obc);
+  
+  if(idIs0(J))
   {
-		return(0);
+    return(1);
+  }
+  if(szj!=szo)  
+  {
+    return(0);
   }
 
-	for(i=0;i<szj;i++)
-	{
-		if(!(p_LmEqual(J->m[i],obc->m[i], currRing)))
-		{
-			return(0);
-		}
-	}	
+  for(i=0;i<szj;i++)
+  {
+    if(!(p_LmEqual(J->m[i],obc->m[i], currRing)))
+    {
+      return(0);
+    }
+  }  
   return(s);
 }
 
 int positionInOrbit_IG(ideal I, poly w, std::vector<ideal> idorb, std::vector<poly> polist, int trInd)
 {
+  int ps=0;
+  int i,j,s=0;
+  int sz=idorb.size();
+  if(idIs0(I))
+  {
+    return(1);
+  }
+  
+  int degw=DegMon(w);
+  int degp;
+  int dtr;
+  int dtrp; 
+  ideal Iw=idInit(1,1);
 
-	int ps=0;
-	int i,j,s=0;
-	int sz=idorb.size();
-	if(idIs0(I))
-	{
-		return(1);
-	}
-	
-	int degw=DegMon(w);
-	int degp;
-	int dtr;
-	int dtrp; 
-	ideal Iw=idInit(1,1);
-	ideal ob=idInit(1,1);
-
-	dtr= trInd-degw; 
-	truncateSortedIdeal(Iw,I, dtr);
-	if(idIs0(Iw))
-	{
-	 return(1);
-	}
-
-	bool flag2=FALSE;
-	for(i=1;i<sz;i++)
-	{
-		degp=DegMon(polist[i]);
-		
-		if(degw >degp)
-		{
-			dtr= trInd-degw;
-			makeIdealNull(ob);
-			truncateSortedIdeal(ob,idorb[i], dtr);
-			if(idIs0(ob))
-			{continue;}
-			if(flag2)
-			{
-				makeIdealNull(Iw);
-				truncateSortedIdeal(Iw,I, dtr);
-				flag2=FALSE;
-			}
-		}
-		else  
-		{
-			flag2=TRUE;
-			dtrp=trInd-degp;
-			makeIdealNull(ob);
-			truncateSortedIdeal(ob, idorb[i], dtrp);
-			makeIdealNull(Iw);
-			truncateSortedIdeal(Iw, I, dtrp);
-
-		}
-		
-		s=MonoIdBasesSame(Iw,ob);
-		
-		if(s)
+  dtr= trInd-degw; 
+  
+  // put references of polys upto degree dtr of I into Iw
+  
+  truncateSortedIdeal(Iw,I, dtr);
+  if(idIs0(Iw))
+  {
+    idDelete(&Iw);
+    return(1);
+  }
+  
+  ideal ob=idInit(1,1);
+  bool flag2=FALSE;
+  for(i=1;i<sz;i++)
+  {
+    degp=DegMon(polist[i]);
+    if(degw >degp)
     {
-			ps=i+1;
+      dtr= trInd-degw;
+      makeIdealNull(ob);
+      
+      // put references of polys upto degree dtr of idorb[i] into ob
+      
+      truncateSortedIdeal(ob,idorb[i], dtr);
+      if(idIs0(ob))
+      {continue;}
+      if(flag2)
+      {
+        makeIdealNull(Iw);
+        truncateSortedIdeal(Iw,I, dtr);
+        flag2=FALSE;
+      }
+    }
+    else  
+    {
+      flag2=TRUE;
+      dtrp=trInd-degp;
+      makeIdealNull(ob);
+      truncateSortedIdeal(ob, idorb[i], dtrp);
+      makeIdealNull(Iw);
+      truncateSortedIdeal(Iw, I, dtrp);
+    }
+    
+    /*
+     * instead of comparing I with ideals in the orbit directly, compare 
+     * truncated ideals Iw and ob
+    */
+    
+    s=MonoIdBasesSame(Iw,ob);
+    
+    if(s)
+    {
+      ps=i+1;
       break;
     }
   }
-
-	makeIdealNull(ob);
-	makeIdealNull(Iw);
-	
-	idDelete(&ob);
-	idDelete(&Iw);
-	
-	return(ps);
+  /*
+   * Caution: before destroying Iw and ob, delink them from the set of polys
+   * of I and idorb, since the I and ideals in the idorb need to be unchanged.
+  */
+  
+  makeIdealNull(ob);
+  makeIdealNull(Iw);
+  
+  idDelete(&ob);
+  idDelete(&Iw);
+  
+  return(ps);
 }
 
 int positionInOrbit_FG(ideal I, poly, std::vector<ideal> idorb, std::vector<poly>, int)
 {
-	int ps=0;
-	int i,j,s=0;
-	int sz=idorb.size();
+  int ps=0;
+  int i,j,s=0;
+  int sz=idorb.size();
 
-	if(idIs0(I))
-	{
-		return(1);
-	}
+  if(idIs0(I))
+  {
+    return(1);
+  }
 
-	for(i=1;i<sz;i++)
-	{
-		s=MonoIdBasesSame(I,idorb[i]);
+  for(i=1;i<sz;i++)
+  {
+    s=MonoIdBasesSame(I,idorb[i]);
     if(s)
     {
-			ps=i+1;
-			break;
-		}
-	}
-
-	return(ps);
+      ps=i+1;
+      break;
+    }
+  }
+  
+  return(ps);
 }
 
 ideal MinimalMonomialBasis(ideal I)
 {
-	I=SortMonoId(I);
-	ideal J=idInit(1,1);
-	int i,k;
-	int count=0;
-	int sz=IDELEMS(I);
-	
-	std::vector<BOOLEAN> checks(sz,TRUE);
+  I=SortMonoId(I);
+  ideal J=idInit(1,1);
+  int i,k;
+  int count=0;
+  int sz=IDELEMS(I);
+  
+  std::vector<BOOLEAN> checks(sz,TRUE);
   for(k=0; k<sz; k++)
   {
-		if(checks[k])
+    if(checks[k])
     {
-			idInsertOneMon(J,I->m[k]);
+      idInsertOneMon(J,I->m[k]);
       count++;
       for(i=count;i<sz;i++)
-			{
-      	if(checks[i])
+      {
+        if(checks[i])
         {
-        	if( pLmDivisibleByNoComp(J->m[count-1],I->m[i]))
+          if( pLmDivisibleByNoComp(J->m[count-1],I->m[i]))
           {
-						checks[i]=FALSE;
+            checks[i]=FALSE;
           }
         }
-			}
-		}
-	}
-	return(J);
-} 
-    
+      }
+    }
+  }
+  return(J);
+}
 
 poly shiftInMon(poly p,int i, int lV, const ring r)
-{ 
+{
   /* shift the varibles in the  i^th layer*/
-	poly smon=p_One(r);
+  poly smon=p_One(r);
   int j,sh,cnt;
   cnt=r->N;
-  sh=i*lV;               
- 
+  sh=i*lV;
   int *e=(int *)omAlloc((r->N+1)*sizeof(int));
   int *s=(int *)omAlloc0((r->N+1)*sizeof(int));
   p_GetExpV(p,e,r);
 
   for(j=1;j<=cnt;j++)
-	{
+  {
     if(e[j]==1)
     {
       s[j+sh]=e[j]; 
     }
   }
-	p_SetExpV(smon,s,r);
+  p_SetExpV(smon,s,r);
   omFree(e);
   omFree(s);
   p_SetComp(smon, p_GetComp(p,r), r);
-	return(smon);
+  return(smon);
 }
 
 poly deleteInMon(poly w, int i, int lV, const ring r)
 {
 
- /* delete the variables upto i^th block in 
- * the monomial w*/
-	poly dw = p_One(currRing);
-	int *e = (int *)omAlloc((r->N+1)*sizeof(int));
-	int *s=(int *)omAlloc0((r->N+1)*sizeof(int));
-	p_GetExpV(w,e,r);
-	int j,cnt;
-	cnt=i*lV;
- /*
-	for(j=1;j<=cnt;j++)
-	{	
-		e[j]=0; 
+  /* delete the variables upto i^th block in 
+  the monomial w */
+  
+  poly dw = p_One(currRing);
+  int *e = (int *)omAlloc((r->N+1)*sizeof(int));
+  int *s=(int *)omAlloc0((r->N+1)*sizeof(int));
+  p_GetExpV(w,e,r);
+  int j,cnt;
+  cnt=i*lV;
+  /*
+  for(j=1;j<=cnt;j++)
+  {
+    e[j]=0; 
   }*/
   for(j=(cnt+1);j<(r->N+1);j++)
-    {
-        s[j]=e[j];
-    }
+  {
+    s[j]=e[j];
+  }
   p_SetExpV(dw,s,r);//new exponents
-	omFree(e);
-	omFree(s);
-	p_SetComp(dw, p_GetComp(w,r), r);
-	return(dw);
+  omFree(e);
+  omFree(s);
+  p_SetComp(dw, p_GetComp(w,r), r);
+  return(dw);
 }
 
 void TwordMap(poly p, poly w, int lV, int d, ideal Jwi,bool &flag)
 {
-	int i;
-	//ring r=currRing;
-	poly smon,dw;
-	poly qmonp=NULL;
+  int i;
+  //ring r=currRing;
+  poly smon,dw;
+  poly qmonp=NULL;
 
-	for(i=0;i<=d-1;i++)
-	{
-		dw=deleteInMon(w,i,lV,currRing);
-		smon=shiftInMon(p,i,lV,currRing);
-   
-		if(pLmDivisibleByNoComp(smon, w))
-		{
-			flag=TRUE;
-			return(idMakeOne(Jwi,p_One(currRing)));
-		}
+  for(i=0;i<=d-1;i++)
+  {
+    dw=deleteInMon(w,i,lV,currRing);
+    smon=shiftInMon(p,i,lV,currRing);
+    
+    if(pLmDivisibleByNoComp(smon, w))
+    {
+      flag=TRUE;
+      
+      pDelete(&dw);
+      pDelete(&smon);
+      
+      return(idMakeOne(Jwi,p_One(currRing)));
+    }
 
-		if(pLmDivisibleByNoComp(dw, smon))
-		{
-			qmonp=p_Divide(smon,dw,currRing);
-			idInsertOneMon(Jwi,shiftInMon(qmonp,-d,lV,currRing));
-		}
-	}  
-	
+    if(pLmDivisibleByNoComp(dw, smon))
+    {
+      qmonp=p_Divide(smon,dw,currRing);
+      idInsertOneMon(Jwi,shiftInMon(qmonp,-d,lV,currRing));
+
+      pDelete(&dw);
+      pDelete(&smon);
+    }
+  }
+  
 } 
 
 ideal colonIdeal(ideal S, poly w, int lV,ideal Jwi)
 {
-    if(idIs0(S))
-	{
-		return(S);
-	}
-	int i,j,d;
+  if(idIs0(S))
+  {
+    return(S);
+  }
+  int i,j,d;
   d=DegMon(w);  
   bool flag=FALSE; 
   int sz=IDELEMS(S);
   int cnt=0;
-	for(i=0;i<sz;i++)
+  for(i=0;i<sz;i++)
   {
-		TwordMap(S->m[i],w,lV,d,Jwi,flag);
-		if(flag)
-		{
-			break;
-		}
-	}
-	Jwi = MinimalMonomialBasis(Jwi);
-	return(Jwi);
+    TwordMap(S->m[i],w,lV,d,Jwi,flag);
+    if(flag)
+    {
+      break;
+    }
+  }
+  Jwi = MinimalMonomialBasis(Jwi);
+  return(Jwi);
 }
 
-void HilbertSeries_OrbitData(ideal S, bool IG_CASE )
-{	
-	/* 
-	 * It is based on iterative right colon operation to the
-	 * monomial ideals of the free associative algebras.
-	 * The algorithm terminates for the monomial right
-	 * ideals whose monomials define regular formal language,
-	 * that is, all the monomials of ideal can be obtained from
-	 * finite subsets by applying the finite number
-	 * of elementary operations.  
-	 * */
+void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE )
+{  
+  /*
+  * It is based on iterative right colon operation to the
+  * monomial ideals of the free associative algebras.
+  * The algorithm terminates for the monomial right
+  * ideals whose monomials define regular formal language,
+  * that is, all the monomials of ideal can be obtained from
+  * finite subsets by applying the finite number
+  * of elementary operations.  
+  */
 
-	int lV=currRing->N/(rBlocks(currRing)-3);
-	int trInd;
-	S=SortMonoId(S);
-	int (*POS)(ideal, poly, std::vector<ideal>, std::vector<poly>, int);
-	if(IG_CASE)
-	{
-		trInd=DegMon(S->m[IDELEMS(S)-1]);
-		POS=&positionInOrbit_IG;
-	}
-	else
-	{
-		 POS=&positionInOrbit_FG;
-	}
-	
-	std::vector<ideal > idorb;
-	std::vector< poly > polist;
-	
-	ideal orb_init=idInit(1,1);
-	idorb.push_back(orb_init);
- 	
- 	polist.push_back( p_One(currRing));
+  int trInd;
+  S=SortMonoId(S);
+  int (*POS)(ideal, poly, std::vector<ideal>, std::vector<poly>, int);
+  if(IG_CASE)
+  {
+    trInd=DegMon(S->m[IDELEMS(S)-1]);
+    POS=&positionInOrbit_IG;
+  }
+  else
+  {
+    POS=&positionInOrbit_FG;
+  }
+  
+  std::vector<ideal > idorb;
+  std::vector< poly > polist;
+  
+  ideal orb_init=idInit(1,1);
+  idorb.push_back(orb_init);
+  
+  polist.push_back( p_One(currRing));
 
-	std::vector< std::vector<int> > mat;
-	std::vector<int> row;
-	row.push_back(0);
+  std::vector< std::vector<int> > mat;
+  std::vector<int> row;
+  row.push_back(0);
 
-	std::vector<int> C;
+  std::vector<int> C;
 
-	ring r=currRing;
+  ring r=currRing;
 
-	int ds,is,ps,sz;
- 	int lpcnt=0;
- 	
- 	poly w, wi;
- 	ideal Jwi;
+  int ds,is,ps,sz;
+  int lpcnt=0;
+  
+  poly w, wi;
+  ideal Jwi;
 
-	while(lpcnt < idorb.size())
-	{
-		w=NULL;
-		w=polist[lpcnt];
+  while(lpcnt < idorb.size())
+  {
+    w=NULL;
+    w=polist[lpcnt];
 
-		if(lpcnt >=1)
-		{
-			if(DegMon(idorb[lpcnt]->m[0])!=0) 
-			{
-				C.push_back(1);
-			}
-			else
-			C.push_back(0);
-		}
-		else
-			C.push_back(1);
+    if(lpcnt >=1)
+    {
+      if(DegMon(idorb[lpcnt]->m[0])!=0) 
+      {
+        C.push_back(1);
+      }
+      else
+        C.push_back(0);
+    }
+    else
+      C.push_back(1);
 
-		ds=DegMon(w);                 
-		lpcnt++;
+    ds=DegMon(w);
+    lpcnt++;
 
-		for(is=1;is<=lV;is++)             
-		{
-			wi=NULL;
-			wi=pCopy(w);
-			p_SetExp(wi,(ds*lV)+is,1,r);
-			Jwi=NULL;
-			Jwi=idInit(1,1);
+    for(is=1;is<=lV;is++)
+    {
+      wi=NULL;
+      wi=pCopy(w);
+      p_SetExp(wi,(ds*lV)+is,1,r);
+      p_Setm(wi,r);
+      Jwi=NULL;
+      Jwi=idInit(1,1);
 
-			Jwi=colonIdeal(S,wi,lV,Jwi);
-			ps=(*POS)(Jwi,wi,idorb,polist,trInd);
-						
-			if(ps==0)
-			{
-				idorb.push_back(Jwi);
-				polist.push_back(wi);
-				row.push_back(1);
-			}
-			else
-			{
-				row[ps-1]=row[ps-1]+1;
-			 idDelete(&Jwi);		
-		  }
-		}
-  mat.push_back(row);
-  sz=row.size();
-  row.clear();
-  row.resize(sz,0);
-	}
+      Jwi=colonIdeal(S,wi,lV,Jwi);
+      ps=(*POS)(Jwi,wi,idorb,polist,trInd);
+      
+      if(ps==0)
+      {
+        idorb.push_back(Jwi);
+        polist.push_back(wi);
+        row.push_back(1);
+      }
+      else
+      {
+        row[ps-1]=row[ps-1]+1;
+        idDelete(&Jwi);    
+      }
+    }
+    mat.push_back(row);
+    sz=row.size();
+    row.clear();
+    row.resize(sz,0);
+  }
 
-	for(is=idorb.size()-1;is>=0;is--)
-	{	
-		idDelete(&idorb[is]);
-	}
-	for(is=polist.size()-1;is>=0;is--)
-	{
-		pDelete(&polist[is]);
-	}
-	
-	idorb.resize(0); 
-	polist.resize(0);
+  for(is=idorb.size()-1;is>=0;is--)
+  {  
+    idDelete(&idorb[is]);
+  }
+  for(is=polist.size()-1;is>=0;is--)
+  {
+    pDelete(&polist[is]);
+  }
+  
+  idorb.resize(0); 
+  polist.resize(0);
 
-	row.resize(0);
+  row.resize(0);
 
-    int ir,ic;	
+  int ir,ic;  
 #if 0
-
-	for(ir=0;ir<mat.size();ir++)
-	{
-		for(ic=0;ic<mat[ir].size();ic++)
-		{
-			printf("%d,",mat[ir][ic]);
-		}
-		printf("\n");
-	}
-	printf("rhs column matrix::\n");
-	for(ic=0;ic<C.size();ic++)
-	printf("%d,",C[ic]);
-	printf("\nlength of the Orbit==%ld\n", C.size());
+  for(ir=0;ir<mat.size();ir++)
+  {
+    for(ic=0;ic<mat[ir].size();ic++)
+    {
+      printf("%d,",mat[ir][ic]);
+    }
+    printf("\n");
+  }
+  printf("rhs column matrix::\n");
+  for(ic=0;ic<C.size();ic++)
+  printf("%d,",C[ic]);
+  printf("\nlength of the Orbit==%ld\n", C.size());
 #endif
 
-	char** tt=(char**)omalloc(sizeof(char*));
-	tt[0]=omStrDup("t");
+  char** tt=(char**)omalloc(sizeof(char*));
+  tt[0]=omStrDup("t");
   TransExtInfo p;
-	p.r = rDefault(0, 1, tt);
- 	coeffs cf=nInitChar(n_transExt,&p);  
-	
-	char** xx=(char**)omalloc(sizeof(char*));
-	xx[0]= omStrDup("x");
+  p.r = rDefault(0, 1, tt);
+  coeffs cf=nInitChar(n_transExt,&p);  
+  
+  char** xx=(char**)omalloc(sizeof(char*));
+  xx[0]= omStrDup("x");
   ring R=rDefault(cf, 1, xx);  
-	rChangeCurrRing(R);  
-	/*
-	 * matrix corresponding to the orbit of the ideal
-	 */
-	int lO=C.size();//size of the orbit
-	matrix mR=mpNew(lO,lO);
-	matrix cMat=mpNew(lO,1);
+  rChangeCurrRing(R);  
+  /*
+   * matrix corresponding to the orbit of the ideal
+   */
+  int lO=C.size();//size of the orbit
+  matrix mR=mpNew(lO,lO);
+  matrix cMat=mpNew(lO,1);
 
-	for(ir=0;ir<lO;ir++)
-	{
-		for(ic=0;ic<mat[ir].size();ic++)
-		{
-			if(mat[ir][ic]!=0)
-			{
-				mR->m[lO*ir+ic]=p_ISet(mat[ir][ic],R);
-				p_SetCoeff(mR->m[lO*ir+ic], n_Mult(pGetCoeff(mR->m[lO*ir+ic]),n_Param(1,R->cf),R->cf),R);
-			}
-		}
-		if(C[ir]!=0)
-		{
-			cMat->m[ir]=p_ISet(C[ir],R);
-		}
-		mat[ir].resize(0);
-	}
- 	mat.resize(0);
-	C.resize(0);
-	matrix u;
-	unitMatrix(lO,u); //unit matrix
-	matrix gMat=mp_Sub(u,mR,R);
-	matrix pMat;
-	matrix lMat;
-	matrix uMat;
+  for(ir=0;ir<lO;ir++)
+  {
+    for(ic=0;ic<mat[ir].size();ic++)
+    {
+      if(mat[ir][ic]!=0)
+      {
+        mR->m[lO*ir+ic]=p_ISet(mat[ir][ic],R);
+        p_SetCoeff(mR->m[lO*ir+ic], n_Mult(pGetCoeff(mR->m[lO*ir+ic]),n_Param(1,R->cf),R->cf),R);
+      }
+    }
+    if(C[ir]!=0)
+    {
+      cMat->m[ir]=p_ISet(C[ir],R);
+    }
+    mat[ir].resize(0);
+  }
+  mat.resize(0);
+  C.resize(0);
+  matrix u;
+  unitMatrix(lO,u); //unit matrix
+  matrix gMat=mp_Sub(u,mR,R);
+  matrix pMat;
+  matrix lMat;
+  matrix uMat;
   luDecomp(gMat, pMat, lMat, uMat, R);
-	matrix H_serVec = mpNew(lO, 1);
-	matrix Hnot;
-	luSolveViaLUDecomp(pMat, lMat, uMat, cMat, H_serVec, Hnot);
-	
-	mp_Delete(&mR,R);
-	mp_Delete(&u,R);
-	mp_Delete(&pMat,R);
-	mp_Delete(&lMat,R);
-	mp_Delete(&uMat,R);
-	mp_Delete(&cMat,R);
-	mp_Delete(&gMat,R);
-	mp_Delete(&Hnot,R);
-  // print the Hilbert series and Orbit length
-  printf("\n");
+  matrix H_serVec = mpNew(lO, 1);
+  matrix Hnot;
+  luSolveViaLUDecomp(pMat, lMat, uMat, cMat, H_serVec, Hnot);
+  
+  mp_Delete(&mR,R);
+  mp_Delete(&u,R);
+  mp_Delete(&pMat,R);
+  mp_Delete(&lMat,R);
+  mp_Delete(&uMat,R);
+  mp_Delete(&cMat,R);
+  mp_Delete(&gMat,R);
+  mp_Delete(&Hnot,R);
+  //print the Hilbert series and Orbit length
+  PrintLn();
   pWrite(H_serVec->m[0]);
-  printf("\nOrbit size = %d\n", lO);
+  Print("\nOrbit size = %d\n", lO);
 
-	omFree(tt[0]);
-	omFree(tt);
+  omFree(tt[0]);
+  omFree(tt);
   omFree(xx[0]);
   omFree(xx);
-	rChangeCurrRing(r);
+  rChangeCurrRing(r);
 }
 
 
