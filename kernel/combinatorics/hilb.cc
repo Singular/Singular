@@ -228,22 +228,6 @@ static void hWDegree(intvec *wdegree)
 // ---------------------------------- ADICHANGES ---------------------------------------------
 //!!!!!!!!!!!!!!!!!!!!! Just for Monomial Ideals !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-//returns the degree of the monomial
-static int DegMon(poly p)
-{
-    #if 1
-    int i,deg;
-    deg = 0;
-    for(i=1;i<=currRing->N;i++)
-    {
-        deg = deg + p_GetExp(p, i, currRing);
-    }
-    return(deg);
-    #else
-    return(p_Deg(p, currRing));
-    #endif
-}
-
 //Tests if the ideal is sorted by degree
 static bool idDegSortTest(ideal I)
 {
@@ -253,7 +237,7 @@ static bool idDegSortTest(ideal I)
     }
     for(int i = 0; i<IDELEMS(I)-1; i++)
     {
-        if(DegMon(I->m[i])>DegMon(I->m[i+1]))
+        if(p_Totaldegree(I->m[i],currRing)>p_Totaldegree(I->m[i+1],currRing))
         {
             idPrint(I);
             WerrorS("Ideal is not deg sorted!!");
@@ -276,14 +260,14 @@ static ideal SortByDeg_p(ideal I, poly p)
     }
     idSkipZeroes(I);
     #if 1
-    for(i = 0; (i<IDELEMS(I)) && (DegMon(I->m[i])<=DegMon(p)); i++)
+    for(i = 0; (i<IDELEMS(I)) && (p_Totaldegree(I->m[i],currRing)<=p_Totaldegree(p,currRing)); i++)
     {
         if(p_DivisibleBy( I->m[i],p, currRing))
         {
             return(I);
         }
     }
-    for(i = IDELEMS(I)-1; (i>=0) && (DegMon(I->m[i])>=DegMon(p)); i--)
+    for(i = IDELEMS(I)-1; (i>=0) && (p_Totaldegree(I->m[i],currRing)>=p_Totaldegree(p,currRing)); i--)
     {
         if(p_DivisibleBy(p,I->m[i], currRing))
         {
@@ -299,9 +283,9 @@ static ideal SortByDeg_p(ideal I, poly p)
     #endif
     idSkipZeroes(I);
     //First I take the case when all generators have the same degree
-    if(DegMon(I->m[0]) == DegMon(I->m[IDELEMS(I)-1]))
+    if(p_Totaldegree(I->m[0],currRing) == p_Totaldegree(I->m[IDELEMS(I)-1],currRing))
     {
-        if(DegMon(p)<DegMon(I->m[0]))
+        if(p_Totaldegree(p,currRing)<p_Totaldegree(I->m[0],currRing))
         {
             idInsertPoly(I,p);
             idSkipZeroes(I);
@@ -312,14 +296,14 @@ static ideal SortByDeg_p(ideal I, poly p)
             I->m[0] = p;
             return(I);
         }
-        if(DegMon(p)>=DegMon(I->m[IDELEMS(I)-1]))
+        if(p_Totaldegree(p,currRing)>=p_Totaldegree(I->m[IDELEMS(I)-1],currRing))
         {
             idInsertPoly(I,p);
             idSkipZeroes(I);
             return(I);
         }
     }
-    if(DegMon(p)<=DegMon(I->m[0]))
+    if(p_Totaldegree(p,currRing)<=p_Totaldegree(I->m[0],currRing))
     {
         idInsertPoly(I,p);
         idSkipZeroes(I);
@@ -330,7 +314,7 @@ static ideal SortByDeg_p(ideal I, poly p)
         I->m[0] = p;
         return(I);
     }
-    if(DegMon(p)>=DegMon(I->m[IDELEMS(I)-1]))
+    if(p_Totaldegree(p,currRing)>=p_Totaldegree(I->m[IDELEMS(I)-1],currRing))
     {
         idInsertPoly(I,p);
         idSkipZeroes(I);
@@ -338,7 +322,7 @@ static ideal SortByDeg_p(ideal I, poly p)
     }
     for(i = IDELEMS(I)-2; ;)
     {
-        if(DegMon(p)==DegMon(I->m[i]))
+        if(p_Totaldegree(p,currRing)==p_Totaldegree(I->m[i],currRing))
         {
             idInsertPoly(I,p);
             idSkipZeroes(I);
@@ -349,7 +333,7 @@ static ideal SortByDeg_p(ideal I, poly p)
             I->m[i] = p;
             return(I);
         }
-        if(DegMon(p)>DegMon(I->m[i]))
+        if(p_Totaldegree(p,currRing)>p_Totaldegree(I->m[i],currRing))
         {
             idInsertPoly(I,p);
             idSkipZeroes(I);
@@ -423,7 +407,7 @@ ideal idQuotMon(ideal Iorig, ideal p)
             }
         }
         p_Setm(res->m[i], currRing);
-        if(DegMon(res->m[i]) == DegMon(I->m[i]))
+        if(p_Totaldegree(res->m[i],currRing) == p_Totaldegree(I->m[i],currRing))
         {
             res->m[i] = NULL; // pDelete
         }
@@ -748,7 +732,7 @@ static poly SearchP(ideal I)
 {
     int i,j,exp;
     poly res;
-    if(DegMon(I->m[IDELEMS(I)-1])<=1)
+    if(p_Totaldegree(I->m[IDELEMS(I)-1],currRing)<=1)
     {
         res = ChoosePVar(I);
         return(res);
@@ -792,7 +776,7 @@ static bool JustVar(ideal I)
     }
     return(TRUE);
     #else
-    if(DegMon(I->m[IDELEMS(I)-1])>1)
+    if(p_Totaldegree(I->m[IDELEMS(I)-1],currRing)>1)
     {
         return(FALSE);
     }
@@ -848,7 +832,7 @@ static poly SqFree (ideal I)
     int i,j;
     bool flag=TRUE;
     poly notsqrfree = NULL;
-    if(DegMon(I->m[IDELEMS(I)-1])<=1)
+    if(p_Totaldegree(I->m[IDELEMS(I)-1],currRing)<=1)
     {
         return(notsqrfree);
     }
@@ -1042,15 +1026,15 @@ void rouneslice(ideal I, ideal S, poly q, poly x, int &prune, int &moreprune, in
                 mpz_init( &hilbertcoef[NNN]);
                 mpz_set(  &hilbertcoef[NNN], ec);
                 mpz_clear(ec);
-                hilbpower[NNN] = DegMon(q);
+                hilbpower[NNN] = p_Totaldegree(q,currRing);
                 NNN++;
             }
         else
         {
             //I look if the power appears already
-            for(i = 0;(i<NNN)&&(flag == FALSE)&&(DegMon(q)>=hilbpower[i]);i++)
+            for(i = 0;(i<NNN)&&(flag == FALSE)&&(p_Totaldegree(q,currRing)>=hilbpower[i]);i++)
             {
-                if((hilbpower[i]) == (DegMon(q)))
+                if((hilbpower[i]) == (p_Totaldegree(q,currRing)))
                 {
                     flag = TRUE;
                     mpz_add(&hilbertcoef[i],&hilbertcoef[i],ec_ptr);
@@ -1068,7 +1052,7 @@ void rouneslice(ideal I, ideal S, poly q, poly x, int &prune, int &moreprune, in
                 }
                 mpz_set(  &hilbertcoef[i], ec);
                 mpz_clear(ec);
-                hilbpower[i] = DegMon(q);
+                hilbpower[i] = p_Totaldegree(q,currRing);
                 NNN++;
             }
         }
