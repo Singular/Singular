@@ -587,13 +587,8 @@ static void computeLiftings(const resolvente res, const int index,
     update_variables(variables, res[index-1]);
     CReducersHash_test m_div;
     initialize(m_div, res[index-1]);
-    ideal m_syzLeads_test = idCopy(res[index]);
-    for (int i = IDELEMS(res[index])-1; i >= 0; i--) {
-        pDelete(&m_syzLeads_test->m[i]->next);
-        m_syzLeads_test->m[i]->next = NULL;
-    }
     CReducersHash_test m_checker;
-    initialize(m_checker, m_syzLeads_test);
+    initialize(m_checker, res[index]);
     setGlobalVariables();
     poly p;
     for (int j = res[index]->ncols-1; j >= 0; j--) {
@@ -605,7 +600,6 @@ static void computeLiftings(const resolvente res, const int index,
     }
     deleteCRH(&m_checker);
     deleteCRH(&m_div);
-    idDelete(&m_syzLeads_test);
 }
 
 static void sortPolysTails(const resolvente res, const int index)
