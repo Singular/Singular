@@ -7649,9 +7649,6 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
         With->pNorm();
       }
       strat->redTailChange=TRUE;
-      pWrite(Ln.p);
-      pWrite(With->p);
-      getchar();
       if (ksReducePolyTail(L, With, &Ln))
       {
         // reducing the tail would violate the exp bound
