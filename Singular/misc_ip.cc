@@ -1083,7 +1083,11 @@ void m2_end(int i)
       {
         while (sem_acquired[j] > 0)
         {
+#if PORTABLE_SEMAPHORES
+          sem_post(semaphore[j]->sig);
+#else
           sem_post(semaphore[j]);
+#endif
           sem_acquired[j]--;
         }
       }

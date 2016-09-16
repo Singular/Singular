@@ -11,7 +11,24 @@ extern "C"
 
 #define USE_SEM_INIT 0
 
-extern sem_t *semaphore[SIPC_MAX_SEMAPHORES];
+#ifdef __APPLE__
+#define PORTABLE_SEMAPHORES 1
+#endif
+
+#if PORTABLE_SEMAPHORES
+
+#include <sys/mman.h>
+
+typedef struct {
+  sem_t *guard, *sig;
+  int count;
+} sipc_sem_t;
+#else
+typedef sem_t sipc_sem_t;
+#endif
+
+
+extern sipc_sem_t *semaphore[SIPC_MAX_SEMAPHORES];
 extern int sem_acquired[SIPC_MAX_SEMAPHORES];
 
 int sipc_semaphore_init(int id, int count);

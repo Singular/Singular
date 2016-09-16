@@ -10,6 +10,9 @@ PROCEDURES:
 prwalk(ideal,int,int[,intvec,intvec]);   standard basis of ideal via Random Perturbation Walk algorithm
 rwalk(ideal,int[,intvec,intvec]);       standard basis of ideal via Random Walk algorithm
 frandwalk(ideal,int[,intvec,intvec]);      standard basis of ideal via Random Fractal Walk algorithm
+
+KEYWORDS: walk, groebner;Groebnerwalk
+SEE ALSO: grwalk_lib; swalk_lib
 ";
 
 /***********************************
@@ -27,6 +30,12 @@ static proc OrderStringalp_NP(string Wpal,list #)
 
   intvec curr_weight = system("Mivdp",n); //define (1,1,...,1)
   intvec target_weight = system("Mivlp",n); //define (1,0,...,0)
+
+  // check if the target ring has a weighted lp ordering
+  list rl = ringlist(basering);
+  if (rl[3][1][1] == "a" and rl[3][2][1] == "lp") {
+    target_weight = rl[3][1][2];
+  }
 
   if(size(#) != 0)
   {

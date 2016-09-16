@@ -20,6 +20,9 @@ modWalk(I,#);                   standard basis conversion of I by Groebner Walk 
 modrWalk(I,radius,#);           standard basis conversion of I by Random Walk using modular methods
 modfWalk(I,#);                  standard basis conversion of I by Fractal Walk using modular methods
 modfrWalk(I,radius,#);          standard basis conversion of I by Random Fractal Walk using modular methods
+
+KEYWORDS: walk, groebner;Groebnerwalk
+SEE ALSO: grwalk_lib;swalk_lib;rwalk_lib
 ";
 
 LIB "rwalk.lib";
