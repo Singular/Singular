@@ -3869,7 +3869,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
             bound = (long)h->CopyD();
           }
           else return TRUE;
-          
           res->rtyp = htype;
           if(htype == POLY_CMD || htype == VECTOR_CMD)
             res->data = (char *)kNFBound(q,currRing->qideal,p,bound);
