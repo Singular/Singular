@@ -56,15 +56,12 @@ static std::vector<bool> CLCM_test_redefine(const ideal L)
 
 bool CLCM_test_Check(const std::vector<bool> &clcm, const poly m)
 {
-  if(m != NULL)
-  {
     const ring R = currRing;
     for (unsigned int j = currRing->N; j > 0; j--)
       if ( clcm[j-1] )
         if(p_GetExp(m, j, R) > 0)
           return true;
     return false;
-  } else return true;
 }
 
 static poly TraverseNF_test(const poly a, const ideal previous_module,
@@ -75,9 +72,11 @@ static poly TraverseNF_test(const poly a, const ideal previous_module,
   const int r = p_GetComp(a, R) - 1;
   poly aa = leadmonom_test(a, R);
   poly t = TraverseTail_test(aa, r, previous_module, m_lcm, m_div, m_checker);
-  t = p_Add_q(t,
-      ReduceTerm_test(aa, previous_module->m[r], a, previous_module, m_lcm,
-      m_div, m_checker), R);
+  if (CLCM_test_Check(m_lcm, aa)) {
+    t = p_Add_q(t,
+        ReduceTerm_test(aa, previous_module->m[r], a, previous_module, m_lcm,
+        m_div, m_checker), R);
+  }
   p_Delete(&aa, R);
   return t;
 }
@@ -245,8 +244,6 @@ static poly ComputeImage_test(poly multiplier, const int t,
 
 static poly leadmonom_test(const poly p, const ring r, const bool bSetZeroComp)
 {
-  if( p == NULL )
-    return NULL;
   poly m = p_LmInit(p, r);
   p_SetCoeff0(m, n_Copy(p_GetCoeff(p, r), r), r);
   if( bSetZeroComp )
@@ -379,12 +376,8 @@ static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
     const CReducersHash_test *m_checker)
 {
   const ring r = currRing;
-  poly s = NULL;
-  if( CLCM_test_Check(m_lcm, multiplier) )
-  {
-    s = FindReducer(multiplier, term4reduction, syztermCheck, m_checker,
+  poly s = FindReducer(multiplier, term4reduction, syztermCheck, m_checker,
         m_div);
-  }
   if( s == NULL )
   {
     return NULL;
