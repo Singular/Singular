@@ -24,58 +24,61 @@ typedef std::vector<const CLeadingTerm_struct*> TReducers_test;
 typedef std::map<long, TReducers_test> CReducersHash_test;
 
 static poly TraverseTail_test(poly multiplier, const int tail,
-   const ideal previous_module, const std::vector<bool> &m_lcm,
+   const ideal previous_module, const std::vector<bool> &variables,
    const CReducersHash_test *m_div, const CReducersHash_test *m_checker);
 static poly ComputeImage_test(poly multiplier, const int tail,
-    const ideal previous_module, const std::vector<bool> &m_lcm,
+    const ideal previous_module, const std::vector<bool> &variables,
     const CReducersHash_test *m_div, const CReducersHash_test *m_checker);
 static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
     poly syztermCheck, const ideal previous_module,
-    const std::vector<bool> &m_lcm, const CReducersHash_test *m_div,
+    const std::vector<bool> &variables, const CReducersHash_test *m_div,
     const CReducersHash_test *m_checker);
 static poly leadmonom_test(const poly p, const ring r, const bool bSetZeroComp = true);
 
-static std::vector<bool> CLCM_test_redefine(const ideal L)
-{
-  std::vector<bool> clcm;
-  const ring R = currRing;
-  if( L != NULL )
-  {
-    const int l = IDELEMS(L);
-    clcm.resize(currRing->N, false);
-    for( int k = l - 1; k >= 0; k-- )
-    {
-      const poly a = L->m[k];
-      for (unsigned int j = currRing->N; j > 0; j--)
-        if ( !clcm[j-1] )
-          clcm[j-1] = (p_GetExp(a, j, R) > 0);
-    }
-  }
-  return clcm;
-}
-
-bool CLCM_test_Check(const std::vector<bool> &clcm, const poly m)
+static inline void update_variables(std::vector<bool> &variables,
+    const ideal L)
 {
     const ring R = currRing;
-    for (unsigned int j = currRing->N; j > 0; j--)
-      if ( clcm[j-1] )
-        if(p_GetExp(m, j, R) > 0)
-          return true;
+    const int l = IDELEMS(L)-1;
+    int k;
+    for (int j = R->N; j > 0; j--) {
+        if (variables[j-1]) {
+            for (k = l; k >= 0; k--) {
+                if (p_GetExp(L->m[k], j, R) > 0) {
+                    break;
+                }
+            }
+            if (k < 0) {   // no break
+                variables[j-1] = false;
+            }
+        }
+    }
+}
+
+static inline bool check_variables(const std::vector<bool> &variables,
+    const poly m)
+{
+    const ring R = currRing;
+    for (int j = R->N; j > 0; j--) {
+        if (variables[j-1] && p_GetExp(m, j, R) > 0) {
+            return true;
+        }
+    }
     return false;
 }
 
 static poly TraverseNF_test(const poly a, const ideal previous_module,
-    const std::vector<bool> &m_lcm, const CReducersHash_test *m_div,
+    const std::vector<bool> &variables, const CReducersHash_test *m_div,
     const CReducersHash_test *m_checker)
 {
   const ring R = currRing;
   const int r = p_GetComp(a, R) - 1;
   poly aa = leadmonom_test(a, R);
-  poly t = TraverseTail_test(aa, r, previous_module, m_lcm, m_div, m_checker);
-  if (CLCM_test_Check(m_lcm, aa)) {
-    t = p_Add_q(t,
-        ReduceTerm_test(aa, previous_module->m[r], a, previous_module, m_lcm,
-        m_div, m_checker), R);
+  poly t = TraverseTail_test(aa, r, previous_module, variables, m_div,
+      m_checker);
+  if (check_variables(variables, aa)) {
+    t = p_Add_q(t, ReduceTerm_test(aa, previous_module->m[r], a,
+        previous_module, variables, m_div, m_checker), R);
   }
   p_Delete(&aa, R);
   return t;
@@ -129,7 +132,7 @@ static FORCE_INLINE poly myp_Head_test(const poly p, const bool bIgnoreCoeff,
 #endif   // CACHE
 
 static poly TraverseTail_test(poly multiplier, const int tail,
-    const ideal previous_module, const std::vector<bool> &m_lcm,
+    const ideal previous_module, const std::vector<bool> &variables,
     const CReducersHash_test *m_div, const CReducersHash_test *m_checker)
 {
   const ring& r = currRing;
@@ -152,8 +155,8 @@ static poly TraverseTail_test(poly multiplier, const int tail,
        }
        return p;
      }
-     const poly p = ComputeImage_test(multiplier, tail, previous_module, m_lcm,
-         m_div, m_checker);
+     const poly p = ComputeImage_test(multiplier, tail, previous_module,
+         variables, m_div, m_checker);
      itr = T.find(multiplier);
      if( itr == T.end() )
      {
@@ -164,8 +167,8 @@ static poly TraverseTail_test(poly multiplier, const int tail,
      return p;
   }
 #endif   // CACHE
-  const poly p = ComputeImage_test(multiplier, tail, previous_module, m_lcm,
-      m_div, m_checker);
+  const poly p = ComputeImage_test(multiplier, tail, previous_module,
+      variables, m_div, m_checker);
 #if CACHE
   top_itr = m_cache_test.find(tail);
   if ( top_itr != m_cache_test.end() )
@@ -198,13 +201,13 @@ static poly TraverseTail_test(poly multiplier, const int tail,
  */
 
 static poly ComputeImage_test(poly multiplier, const int t,
-    const ideal previous_module, const std::vector<bool> &m_lcm,
+    const ideal previous_module, const std::vector<bool> &variables,
     const CReducersHash_test *m_div, const CReducersHash_test *m_checker)
 {
   const poly tail = previous_module->m[t]->next;
   if(tail != NULL)
   {
-    if( !CLCM_test_Check(m_lcm, multiplier) )
+    if (!check_variables(variables, multiplier))
     {
       return NULL;
     }
@@ -218,7 +221,7 @@ static poly ComputeImage_test(poly multiplier, const int t,
     for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
     {
       const poly rt = ReduceTerm_test(multiplier, p, NULL, previous_module,
-          m_lcm, m_div, m_checker);
+          variables, m_div, m_checker);
 #if BUCKETS == 0
       sum.Add(rt);
 #elif BUCKETS == 1
@@ -372,7 +375,7 @@ poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
 
 static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
     poly syztermCheck, const ideal previous_module,
-    const std::vector<bool> &m_lcm, const CReducersHash_test *m_div,
+    const std::vector<bool> &variables, const CReducersHash_test *m_div,
     const CReducersHash_test *m_checker)
 {
   const ring r = currRing;
@@ -385,7 +388,7 @@ static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
   poly b = leadmonom_test(s, r);
   const int c = p_GetComp(s, r) - 1;
   const poly t
-      = TraverseTail_test(b, c, previous_module, m_lcm, m_div, m_checker);
+      = TraverseTail_test(b, c, previous_module, variables, m_div, m_checker);
   pDelete(&b);
   if( t != NULL )
     s = p_Add_q(s, t, r);
@@ -602,9 +605,10 @@ static void setGlobalVariables()
 #endif   // CACHE
 }
 
-static void computeLiftings(const resolvente res, const int index)
+static void computeLiftings(const resolvente res, const int index,
+    std::vector<bool> &variables)
 {
-    std::vector<bool> m_lcm = CLCM_test_redefine(res[index-1]);
+    update_variables(variables, res[index-1]);
     CReducersHash_test m_div;
     initialize(m_div, res[index-1]);
     ideal m_syzLeads_test = idCopy(res[index]);
@@ -620,12 +624,11 @@ static void computeLiftings(const resolvente res, const int index)
         p = res[index]->m[j];
         pDelete(&res[index]->m[j]->next);
         p->next = NULL;
-        res[index]->m[j]->next = TraverseNF_test(p, res[index-1], m_lcm,
+        res[index]->m[j]->next = TraverseNF_test(p, res[index-1], variables,
             &m_div, &m_checker);
     }
     deleteCRH(&m_checker);
     deleteCRH(&m_div);
-    m_lcm.clear();
     idDelete(&m_syzLeads_test);
 }
 
@@ -648,9 +651,11 @@ static int computeResolution(resolvente &res, const int length,
     if (!idIs0(res[index]) && index < max_index) {
         index++;
         res[index] = computeFrame(res[index-1], syzM_i_unsorted, syzHead);
+        std::vector<bool> variables;
+        variables.resize(currRing->N, true);
         while (!idIs0(res[index])) {
 #if 1
-            computeLiftings(res, index);
+            computeLiftings(res, index, variables);
             sortPolysTails(res, index);
 #endif   // LIFT
             if (index < max_index) {
@@ -662,6 +667,7 @@ static int computeResolution(resolvente &res, const int length,
                 break;
             }
         }
+        variables.clear();
     }
     max_index = index+1;
     if (max_index < length) {
