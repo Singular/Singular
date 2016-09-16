@@ -1272,7 +1272,7 @@ static inline poly p_LmInit(poly s_p, const ring s_r, const ring d_r, omBin d_bi
   p_CheckRing(d_r);
   pAssume1(d_r->N <= s_r->N);
   poly d_p = p_Init(d_r, d_bin);
-  for (int i=d_r->N; i>0; i--)
+  for (unsigned i=d_r->N; i!=0; i--)
   {
     p_SetExp(d_p, i, p_GetExp(s_p, i,s_r), d_r);
   }
@@ -1414,7 +1414,7 @@ static inline BOOLEAN p_ExpVectorEqual(poly p1, poly p2, const ring r)
   p_LmCheckPolyRing1(p1, r);
   p_LmCheckPolyRing1(p2, r);
 
-  int i = r->ExpL_Size;
+  unsigned i = r->ExpL_Size;
   unsigned long *ep = p1->exp;
   unsigned long *eq = p2->exp;
 
@@ -1423,7 +1423,7 @@ static inline BOOLEAN p_ExpVectorEqual(poly p1, poly p2, const ring r)
     i--;
     if (ep[i] != eq[i]) return FALSE;
   }
-  while (i);
+  while (i!=0);
   return TRUE;
 }
 
@@ -1433,7 +1433,7 @@ static inline long p_Totaldegree(poly p, const ring r)
   unsigned long s = p_GetTotalDegree(p->exp[r->VarL_Offset[0]],
                                      r,
                                      r->ExpPerLong);
-  for (int i=r->VarL_Size-1; i>0; i--)
+  for (unsigned i=r->VarL_Size-1; i!=0; i--)
   {
     s += p_GetTotalDegree(p->exp[r->VarL_Offset[i]], r,r->ExpPerLong);
   }
@@ -1443,7 +1443,7 @@ static inline long p_Totaldegree(poly p, const ring r)
 static inline void p_GetExpV(poly p, int *ev, const ring r)
 {
   p_LmCheckPolyRing1(p, r);
-  for (int j = r->N; j; j--)
+  for (unsigned j = r->N; j!=0; j--)
       ev[j] = p_GetExp(p, j, r);
 
   ev[0] = p_GetComp(p, r);
@@ -1451,7 +1451,7 @@ static inline void p_GetExpV(poly p, int *ev, const ring r)
 static inline void p_SetExpV(poly p, int *ev, const ring r)
 {
   p_LmCheckPolyRing1(p, r);
-  for (int j = r->N; j; j--)
+  for (unsigned j = r->N; j!=0; j--)
       p_SetExp(p, j, ev[j], r);
 
   p_SetComp(p, ev[0],r);
