@@ -129,6 +129,20 @@ static FORCE_INLINE poly myp_Head_test(const poly p, const bool bIgnoreCoeff,
   p_LmCheckPolyRing1(np, r);
   return np;
 }
+
+static void delete_cache()
+{
+    for (TCache_test::iterator it = m_cache_test.begin();
+        it != m_cache_test.end(); it++) {
+        TP2PCache_test& T = it->second;
+        for (TP2PCache_test::iterator vit = T.begin(); vit != T.end(); vit++) {
+            p_Delete((&(vit->second)), currRing);
+            p_Delete(const_cast<poly*>(&(vit->first)), currRing);
+        }
+        T.erase(T.begin(), T.end());
+    }
+    m_cache_test.erase(m_cache_test.begin(), m_cache_test.end());
+}
 #endif   // CACHE
 
 static poly TraverseTail_test(poly multiplier, const int tail,
@@ -565,22 +579,6 @@ static ideal computeFrame(const ideal G, const syzM_i_Function syzM_i,
     return frame;
 }
 
-static void setGlobalVariables()
-{
-#if CACHE
-    for (TCache_test::iterator it = m_cache_test.begin();
-        it != m_cache_test.end(); it++) {
-        TP2PCache_test& T = it->second;
-        for (TP2PCache_test::iterator vit = T.begin(); vit != T.end(); vit++) {
-            p_Delete((&(vit->second)), currRing);
-            p_Delete(const_cast<poly*>(&(vit->first)), currRing);
-        }
-        T.erase(T.begin(), T.end());
-    }
-    m_cache_test.erase(m_cache_test.begin(), m_cache_test.end());
-#endif   // CACHE
-}
-
 static void computeLiftings(const resolvente res, const int index,
     std::vector<bool> &variables)
 {
@@ -589,7 +587,6 @@ static void computeLiftings(const resolvente res, const int index,
     initialize(m_div, res[index-1]);
     CReducersHash_test m_checker;
     initialize(m_checker, res[index]);
-    setGlobalVariables();
     poly p;
     for (int j = res[index]->ncols-1; j >= 0; j--) {
         p = res[index]->m[j];
@@ -600,6 +597,9 @@ static void computeLiftings(const resolvente res, const int index,
     }
     deleteCRH(&m_checker);
     deleteCRH(&m_div);
+#if CACHE
+    delete_cache();
+#endif   // CACHE
 }
 
 static void sortPolysTails(const resolvente res, const int index)
@@ -671,19 +671,6 @@ syStrategy syFrank(const ideal arg, int &length, const char *method)
     }
     length = computeResolution(res, length, syzHead);
     sortPolys(res, length);
-#if CACHE
-    for (TCache_test::iterator it = m_cache_test.begin();
-        it != m_cache_test.end(); it++) {
-        TP2PCache_test& T = it->second;
-        for (TP2PCache_test::iterator vit = T.begin(); vit != T.end(); vit++) {
-            p_Delete((&(vit->second)), currRing);
-            p_Delete(const_cast<poly*>(&(vit->first)), currRing);
-        }
-        T.erase(T.begin(), T.end());
-    }
-    m_cache_test.erase(m_cache_test.begin(), m_cache_test.end());
-#endif   // CACHE
-
     result->fullres = res;
     result->length = length;
     return result;
