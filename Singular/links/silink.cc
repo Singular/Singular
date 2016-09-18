@@ -191,7 +191,7 @@ const char* slStatus(si_link l, const char *request)
 }
 
 //--------------------------------------------------------------------------
-BOOLEAN slSetRingDummy(si_link, ring r, BOOLEAN send)
+BOOLEAN slSetRingDummy(si_link, ring r, BOOLEAN)
 {
   if (currRing!=r) rChangeCurrRing(r);
   return FALSE;

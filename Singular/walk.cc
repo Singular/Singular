@@ -95,8 +95,10 @@ void Set_Error( BOOLEAN f) { pSetm_error=f; }
 
 BOOLEAN Overflow_Error =  FALSE;
 
+#ifdef TIME_TEST
 clock_t xtif, xtstd, xtlift, xtred, xtnw;
 clock_t xftostd, xtextra, xftinput, to;
+#endif
 
 /****************************
  * utilities for TSet, LSet *
@@ -1619,7 +1621,6 @@ intvec* Mfpertvector(ideal G, intvec* ivtarget)
   mpz_init_set_ui(sing_int,  2147483647);
 
   intvec* result = new intvec(niv);
-  intvec* result1 = new intvec(niv);
   BOOLEAN nflow = FALSE;
 
   // computes gcd
@@ -1766,7 +1767,7 @@ static void checkidealCC(ideal G, char* Ch)
   int i,nmon=0,ntmp;
   int nG = IDELEMS(G);
   int n = nG-1;
-  Print("\n//** Ideal %s besteht aus %d Polynomen mit ", Ch, nG);
+  Print("\n// ** Ideal %s besteht aus %d Polynomen mit ", Ch, nG);
 
   for(i=0; i<nG; i++)
   {
@@ -1783,7 +1784,7 @@ static void checkidealCC(ideal G, char* Ch)
     }
   }
   PrintS(" Monomen.\n");
-  Print("//** %s besitzt %d Monome.", Ch, nmon);
+  Print("// ** %s besitzt %d Monome.", Ch, nmon);
   PrintLn();
 }
 */
@@ -2906,7 +2907,7 @@ static ring VMatrRefine(intvec* va, intvec* vb)
 static void VMrDefaultlp(void)
 {
   ring r = rCopy0(currRing,FALSE,FALSE);
-  int i, nv = currRing->N;
+  int nv = currRing->N;
 
   int nb = rBlocks(currRing) + 1;
 
@@ -2946,7 +2947,7 @@ static void VMrDefaultlp(void)
 ****************************************************/
 static void DefRingPar(intvec* va)
 {
-  int i, nv = currRing->N;
+  int nv = currRing->N;
   int nb = rBlocks(currRing) + 1;
 
   ring res=rCopy0(currRing,FALSE,FALSE);
@@ -2954,7 +2955,7 @@ static void DefRingPar(intvec* va)
   /*weights: entries for 3 blocks: NULL Made:???*/
   res->wvhdl = (int **)omAlloc0(nb * sizeof(int_ptr));
   res->wvhdl[0] = (int*) omAlloc(nv*sizeof(int));
-  for(i=0; i<nv; i++)
+  for(int i=0; i<nv; i++)
     res->wvhdl[0][i] = (*va)[i];
 
   /* order: a,lp,C,0 */
@@ -2995,7 +2996,7 @@ static void DefRingPar(intvec* va)
 
 static void DefRingParlp(void)
 {
-  int i, nv = currRing->N;
+  int nv = currRing->N;
 
   ring r=rCopy0(currRing,FALSE,FALSE);
 
@@ -3031,7 +3032,7 @@ static void DefRingParlp(void)
 //     int l=rPar(currRing);
 //     r->cf->extRing->names=(char **)omAlloc(l*sizeof(char_ptr));
 //
-//     for(i=l-1;i>=0;i--)
+//     for(int i=l-1;i>=0;i--)
 //     {
 //       rParameter(r)[i]=omStrDup(rParameter(currRing)[i]);
 //     }
@@ -3215,10 +3216,14 @@ static ideal LastGB(ideal G, intvec* curr_weight,int tp_deg)
   {
     nwalk++;
     nstep++;
+#ifdef TIME_TEST
     to=clock();
+#endif
    // compute a next weight vector
     next_weight = MkInterRedNextWeight(curr_weight,target_weight, G);
+#ifdef TIME_TEST
     xtnw=xtnw+clock()-to;
+#endif
 
 #ifdef PRINT_VECTORS
     MivString(curr_weight, target_weight, next_weight);
@@ -3261,10 +3266,14 @@ static ideal LastGB(ideal G, intvec* curr_weight,int tp_deg)
       (*curr_weight)[i] = (*next_weight)[i];
     }
     oldRing = currRing;
+#ifdef TIME_TEST
     to=clock();
+#endif
     // compute an initial form ideal of <G> w.r.t. "curr_vector"
     Gomega = MwalkInitialForm(G, curr_weight);
+#ifdef TIME_TEST
     xtif=xtif+clock()-to;
+#endif
 
 #ifdef ENDWALKS
     if(endwalks == 1)
@@ -3301,7 +3310,9 @@ static ideal LastGB(ideal G, intvec* curr_weight,int tp_deg)
     newRing = currRing;
     Gomega1 = idrMoveR(Gomega, oldRing,currRing);
 
+#ifdef TIME_TEST
     to=clock();
+#endif
     /* compute a reduced Groebner basis of <Gomega> w.r.t. "newRing" */
 #ifdef  BUCHBERGER_ALG
     M = MstdhomCC(Gomega1);
@@ -3309,16 +3320,22 @@ static ideal LastGB(ideal G, intvec* curr_weight,int tp_deg)
     M=kStd(Gomega1,NULL,isHomog,NULL,hilb_func,0,NULL,curr_weight);
     delete hilb_func;
 #endif // BUCHBERGER_ALG
+#ifdef TIME_TEST
     xtstd=xtstd+clock()-to;
+#endif
     /* change the ring to oldRing */
     rChangeCurrRing(oldRing);
     M1 =  idrMoveR(M, newRing,currRing);
     Gomega2 =  idrMoveR(Gomega1, newRing,currRing);
 
+#ifdef TIME_TEST
     to=clock();
+#endif
     /* compute a reduced Groebner basis of <G> w.r.t. "newRing" */
     F = MLifttwoIdeal(Gomega2, M1, G);
+#ifdef TIME_TEST
     xtlift=xtlift+clock()-to;
+#endif
 
     idDelete(&M1);
     idDelete(&G);
@@ -3327,10 +3344,14 @@ static ideal LastGB(ideal G, intvec* curr_weight,int tp_deg)
     rChangeCurrRing(newRing);
     F1 = idrMoveR(F, oldRing,currRing);
 
+#ifdef TIME_TEST
     to=clock();
+#endif
     /* reduce the Groebner basis <G> w.r.t. new ring */
     G = kInterRedCC(F1, NULL);
+#ifdef TIME_TEST
     xtred=xtred+clock()-to;
+#endif
     idDelete(&F1);
 
     if(endwalks == 1)
@@ -3925,8 +3946,10 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
   Overflow_Error = FALSE;
   // BOOLEAN nOverflow_Error = FALSE;
 
+#ifdef TIME_TEST
   clock_t tproc=0;
   clock_t tinput = clock();
+#endif
 
   int i,  nV = currRing->N;
   int nwalk=0, endwalks=0, nnwinC=1;
@@ -4018,10 +4041,14 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
     {
       goto FIRST_STEP;
     }
+#ifdef TIME_TEST
     to=clock();
+#endif
     // compute an initial form ideal of <G> w.r.t. "curr_vector"
     Gomega = MwalkInitialForm(G, curr_weight);
+#ifdef TIME_TEST
     xtif=xtif+clock()-to;
+#endif
 
 #ifndef  BUCHBERGER_ALG
     if(isNolVector(curr_weight) == 0)
@@ -4047,7 +4074,9 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
     }
     newRing = currRing;
     Gomega1 = idrMoveR(Gomega, oldRing,currRing);
+#ifdef TIME_TEST
     to=clock();
+#endif
     // compute a reduced Groebner basis of <Gomega> w.r.t. "newRing"
 #ifdef  BUCHBERGER_ALG
     M = MstdhomCC(Gomega1);
@@ -4055,16 +4084,22 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
     M=kStd(Gomega1,NULL,isHomog,NULL,hilb_func,0,NULL,curr_weight);
     delete hilb_func;
 #endif // BUCHBERGER_ALG
+#ifdef TIME_TEST
     xtstd=xtstd+clock()-to;
+#endif
     // change the ring to oldRing
     rChangeCurrRing(oldRing);
     M1 =  idrMoveR(M, newRing,currRing);
     Gomega2 =  idrMoveR(Gomega1, newRing,currRing);
 
+#ifdef TIME_TEST
      to=clock();
+#endif
     // compute a reduced Groebner basis of <G> w.r.t. "newRing" by the lifting process
     F = MLifttwoIdeal(Gomega2, M1, G);
+#ifdef TIME_TEST
     xtlift=xtlift+clock()-to;
+#endif
     idDelete(&M1);
     idDelete(&Gomega2);
     idDelete(&G);
@@ -4073,10 +4108,14 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
     rChangeCurrRing(newRing);
     F1 = idrMoveR(F, oldRing,currRing);
 
+#ifdef TIME_TEST
     to=clock();
+#endif
     // reduce the Groebner basis <G> w.r.t. new ring
     G = kInterRedCC(F1, NULL);
+#ifdef TIME_TEST
     xtred=xtred+clock()-to;
+#endif
     idDelete(&F1);
 
     if(endwalks == 1)
@@ -4084,11 +4123,15 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
       break;
     }
   FIRST_STEP:
+#ifdef TIME_TEST
     to=clock();
+#endif
     Overflow_Error = FALSE;
     // compute a next weight vector
     next_weight = MkInterRedNextWeight(curr_weight,target_weight, G);
+#ifdef TIME_TEST
     xtnw=xtnw+clock()-to;
+#endif
 #ifdef PRINT_VECTORS
     MivString(curr_weight, target_weight, next_weight);
 #endif
@@ -4125,7 +4168,9 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
       {
         // REC_LAST_GB_ALT2:
         //nOverflow_Error = Overflow_Error;
+#ifdef TIME_TEST
         tproc=tproc+clock()-tinput;
+#endif
 
         /*Print("\n// takes %d steps and calls \"Rec_LastGB\" (%d):",
         nwalk, tp_deg+1);
@@ -4164,7 +4209,9 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
     {
       // nOverflow_Error = Overflow_Error;
       //Print("\n//  takes %d steps and calls \"Rec_LastGB (%d):", tp_deg+1);
+#ifdef TIME_TEST
       tproc=tproc+clock()-tinput;
+#endif
       F1 = Rec_LastGB(F1,curr_weight, orig_target_weight, tp_deg+1,nnwinC);
     }
     delete target_weight;
@@ -4197,11 +4244,15 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
       {
         F1 = G;
       }
+#ifdef TIME_TEST
       to=clock();
+#endif
       // Print("\n// apply the Buchberger's alg in ring = %s",rString(currRing));
       // idElements(F1, "F1");
       G = MstdCC(F1);
+#ifdef TIME_TEST
       xtextra=xtextra+clock()-to;
+#endif
 
 
       idDelete(&F1);
@@ -4493,7 +4544,6 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* orig_M, intvec* target_wei
   intvec* next_weight;
   intvec* next_weight1 = MkInterRedNextWeight(curr_weight,target_weight,G);
   intvec* next_weight2 = new intvec(nV);
-  intvec* next_weight22 = new intvec(nV);
   intvec* result = new intvec(nV);
   intvec* curr_weight1;
   ideal G_test, G_test1, G_test2;
@@ -4757,10 +4807,14 @@ static ideal REC_GB_Mwalk(ideal G, intvec* curr_weight, intvec* orig_target_weig
       goto NEXT_STEP;
     }
     //Print("\n//REC_GB_Mwalk: Entering the %d-th step in the %d-th recursive:\n",nwalk,tp_deg);
+#ifdef TIME_TEST
     to = clock();
+#endif
     // compute an initial form ideal of <G> w.r.t. "curr_vector"
     Gomega = MwalkInitialForm(G, curr_weight);
+#ifdef TIME_TEST
     xtif = xtif + clock()-to;
+#endif
 
 #ifndef  BUCHBERGER_ALG
     if(isNolVector(curr_weight) == 0)
@@ -4787,7 +4841,9 @@ static ideal REC_GB_Mwalk(ideal G, intvec* curr_weight, intvec* orig_target_weig
     newRing = currRing;
     Gomega1 = idrMoveR(Gomega, oldRing,currRing);
 
+#ifdef TIME_TEST
     to = clock();
+#endif
     // compute a reduced Groebner basis of <Gomega> w.r.t. "newRing"
 #ifdef  BUCHBERGER_ALG
     M = MstdhomCC(Gomega1);
@@ -4795,7 +4851,9 @@ static ideal REC_GB_Mwalk(ideal G, intvec* curr_weight, intvec* orig_target_weig
     M=kStd(Gomega1,NULL,isHomog,NULL,hilb_func,0,NULL,curr_weight);
     delete hilb_func;
 #endif
+#ifdef TIME_TEST
     xtstd = xtstd + clock() - to;
+#endif
 
     // change the ring to oldRing
     rChangeCurrRing(oldRing);
@@ -4803,9 +4861,13 @@ static ideal REC_GB_Mwalk(ideal G, intvec* curr_weight, intvec* orig_target_weig
     M1 =  idrMoveR(M, newRing,currRing);
     Gomega2 =  idrMoveR(Gomega1, newRing,currRing);
 
+#ifdef TIME_TEST
     to = clock();
+#endif
     F = MLifttwoIdeal(Gomega2, M1, G);
+#ifdef TIME_TEST
     xtlift = xtlift + clock() -to;
+#endif
 
     idDelete(&M1);
     idDelete(&Gomega2);
@@ -4816,10 +4878,14 @@ static ideal REC_GB_Mwalk(ideal G, intvec* curr_weight, intvec* orig_target_weig
     rChangeCurrRing(newRing);
     F1 = idrMoveR(F, oldRing,currRing);
 
+#ifdef TIME_TEST
     to = clock();
+#endif
     // reduce the Groebner basis <G> w.r.t. new ring
     G = kInterRedCC(F1, NULL);
+#ifdef TIME_TEST
     xtred = xtred + clock() -to;
+#endif
 
     idDelete(&F1);
 
@@ -4828,12 +4894,16 @@ static ideal REC_GB_Mwalk(ideal G, intvec* curr_weight, intvec* orig_target_weig
       break;
     }
   NEXT_STEP:
+#ifdef TIME_TEST
     to = clock();
+#endif
     // compute a next weight vector
     intvec* next_weight = MkInterRedNextWeight(curr_weight,target_weight, G);
 
 
+#ifdef TIME_TEST
     xtnw = xtnw + clock() - to;
+#endif
 
 #ifdef PRINT_VECTORS
     MivString(curr_weight, target_weight, next_weight);
@@ -4933,10 +5003,14 @@ static ideal REC_GB_Mwalk(ideal G, intvec* curr_weight, intvec* orig_target_weig
       {
         F1 = G;
       }
+#ifdef TIME_TEST
       to=clock();
+#endif
       // apply Buchberger alg to compute a red. GB of F1
       G = MstdCC(F1);
+#ifdef TIME_TEST
       xtextra=clock()-to;
+#endif
       idDelete(&F1);
       newRing = currRing;
     }
@@ -4965,10 +5039,12 @@ ideal MwalkAlt(ideal Go, intvec* curr_weight, intvec* target_weight)
   Overflow_Error = FALSE;
   //Print("// pSetm_Error = (%d)", ErrorCheck());
 
+#ifdef TIME_TEST
   clock_t tinput, tostd, tif=0, tstd=0, tlift=0, tred=0, tnw=0;
-  xtif=0; xtstd=0; xtlift=0; xtred=0; xtnw=0;
   tinput = clock();
   clock_t tim;
+  xtif=0; xtstd=0; xtlift=0; xtred=0; xtnw=0;
+#endif
   nstep=0;
   int i;
   int nV = currRing->N;
@@ -4995,10 +5071,14 @@ ideal MwalkAlt(ideal Go, intvec* curr_weight, intvec* target_weight)
 
   ring XXRing = currRing;
 
+#ifdef TIME_TEST
   to = clock();
+#endif
   // the monomial ordering of this current ring would be "dp"
   G = MstdCC(Go);
+#ifdef TIME_TEST
   tostd = clock()-to;
+#endif
 
   if(currRing->order[0] == ringorder_a)
     goto NEXT_VECTOR;
@@ -5007,17 +5087,23 @@ ideal MwalkAlt(ideal Go, intvec* curr_weight, intvec* target_weight)
   {
     nwalk ++;
     nstep ++;
+#ifdef TIME_TEST
     to = clock();
+#endif
     // compute an initial form ideal of <G> w.r.t. "curr_vector"
     Gomega = MwalkInitialForm(G, curr_weight);
+#ifdef TIME_TEST
     tif = tif + clock()-to;
+#endif
     oldRing = currRing;
 
     if(endwalks == 1)
     {
       /* compute a reduced Groebner basis of Gomega w.r.t. >>_cw by
          the recursive changed perturbation walk alg. */
+#ifdef TIME_TEST
       tim = clock();
+#endif
 #ifdef CHECK_IDEAL_MWALK
         Print("\n// **** Groebnerwalk took %d steps and ", nwalk);
         PrintS("\n// **** call the rec. Pert. Walk to compute a red GB of:");
@@ -5040,9 +5126,13 @@ ideal MwalkAlt(ideal Go, intvec* curr_weight, intvec* target_weight)
       //headidString(M, "M");
 #endif
 */
+#ifdef TIME_TEST
       to = clock();
+#endif
       F = MLifttwoIdeal(Gomega, M, G);
+#ifdef TIME_TEST
       xtlift = xtlift + clock() - to;
+#endif
 
       idDelete(&Gomega);
       idDelete(&M);
@@ -5088,7 +5178,9 @@ ideal MwalkAlt(ideal Go, intvec* curr_weight, intvec* target_weight)
       newRing = currRing;
       Gomega1 = idrMoveR(Gomega, oldRing,currRing);
 
+#ifdef TIME_TEST
       to = clock();
+#endif
       // compute a reduced Groebner basis of <Gomega> w.r.t. "newRing"
 #ifdef  BUCHBERGER_ALG
       M = MstdhomCC(Gomega1);
@@ -5096,19 +5188,25 @@ ideal MwalkAlt(ideal Go, intvec* curr_weight, intvec* target_weight)
       M=kStd(Gomega1,NULL,isHomog,NULL,hilb_func,0,NULL,curr_weight);
       delete hilb_func;
 #endif
+#ifdef TIME_TEST
       tstd = tstd + clock() - to;
+#endif
 
       // change the ring to oldRing
       rChangeCurrRing(oldRing);
       M1 =  idrMoveR(M, newRing,currRing);
       Gomega2 =  idrMoveR(Gomega1, newRing,currRing);
 
+#ifdef TIME_TEST
       to = clock();
+#endif
       // compute a representation of the generators of submod (M) with respect
       // to those of mod (Gomega).
       // Gomega is a reduced Groebner basis w.r.t. the current ring.
       F = MLifttwoIdeal(Gomega2, M1, G);
+#ifdef TIME_TEST
       tlift = tlift + clock() - to;
+#endif
 
       idDelete(&M1);
       idDelete(&Gomega2);
@@ -5119,9 +5217,12 @@ ideal MwalkAlt(ideal Go, intvec* curr_weight, intvec* target_weight)
       F1 = idrMoveR(F, oldRing,currRing);
     }
 
+#ifdef TIME_TEST
     to = clock();
+#endif
     // reduce the Groebner basis <G> w.r.t. new ring
     G = kInterRedCC(F1, NULL);
+#ifdef TIME_TEST
     if(endwalks != 1)
     {
       tred = tred + clock() - to;
@@ -5130,16 +5231,21 @@ ideal MwalkAlt(ideal Go, intvec* curr_weight, intvec* target_weight)
     {
       xtred = xtred + clock() - to;
     }
+#endif
     idDelete(&F1);
     if(endwalks == 1)
     {
       break;
     }
   NEXT_VECTOR:
+#ifdef TIME_TEST
     to = clock();
+#endif
     // compute a next weight vector
     intvec* next_weight = MkInterRedNextWeight(curr_weight,target_weight,G);
+#ifdef TIME_TEST
     tnw = tnw + clock() - to;
+#endif
 #ifdef PRINT_VECTORS
     MivString(curr_weight, target_weight, next_weight);
 #endif
@@ -5515,7 +5621,6 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
 
   Set_Error(FALSE);
   Overflow_Error = FALSE;
-  BOOLEAN endwalks = FALSE;
 #ifdef TIME_TEST
   clock_t tinput, tostd, tif=0, tstd=0, tlift=0, tred=0, tnw=0;
   xtif=0; xtstd=0; xtlift=0; xtred=0; xtnw=0;
@@ -6074,11 +6179,13 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
       xtstd = xtstd+clock()-to;
 #endif
 #ifdef ENDWALKS
+#ifdef TIME_TEST
       if(printout > 1)
       {
         Print("\n// time for the last std(Gw)  = %.2f sec\n",
             ((double) clock())/1000000 -((double)tim) /1000000);
       }
+#endif
 #endif
     }
     else
@@ -6226,7 +6333,9 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
         //idElements(F1, "G");
       }
       // LastGB is "better" than the kStd subroutine
+#ifdef TIME_TEST
       to=clock();
+#endif
       ideal eF1;
       if(nP == 0 || tp_deg == 1 || MivSame(orig_target, exivlp) != 1){
         // PrintS("\n// ** calls \"std\" to compute a GB");
@@ -6240,7 +6349,9 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
         eF1 = LastGB(F2, curr_weight, tp_deg-1);
         F2=NULL;
       }
+#ifdef TIME_TEST
       xtextra=clock()-to;
+#endif
       ring exTargetRing = currRing;
 
       rChangeCurrRing(XXRing);
@@ -6634,7 +6745,7 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
 #ifdef TIME_TEST
     to = clock();
 #endif
-    next_weight = next_weight = MkInterRedNextWeight(curr_weight,target_weight, G);
+    next_weight = MkInterRedNextWeight(curr_weight,target_weight, G);
 #ifdef TIME_TEST
     tnw = tnw + clock() - to;
 #endif
@@ -6857,7 +6968,7 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
   int i, nV = currRing->N;
   ring new_ring, testring;
   //ring extoRing;
-  ideal Gomega, Gomega1, Gomega2, FF, F, F1, Gresult, Gresult1, G1, Gt;
+  ideal Gomega, Gomega1, Gomega2, FF, F, Gresult, Gresult1, G1, Gt;
   int nwalks = 0;
   intvec* Mwlp;
 #ifndef BUCHBERGER_ALG
@@ -7331,7 +7442,7 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
     rChangeCurrRing(new_ring);
     G = idrMoveR(F,oRing,currRing);
 /*
-    F1 = idrMoveR(F, oRing,currRing);
+    ideal F1 = idrMoveR(F, oRing,currRing);
 #ifdef TIME_TEST
     to=clock();
 #endif
@@ -7357,7 +7468,10 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
   int nwalks = 0,i,nV=currRing->N;//polylength
   ring new_ring, testring;
   //ring extoRing;
-  ideal Gomega, Gomega1, Gomega2, F, FF, F1, Gresult, Gresult1, G1, Gt;
+  ideal Gomega, Gomega1, Gomega2, F, FF, Gresult, Gresult1, G1, Gt;
+#ifdef TIME_TEST
+  ideal F1;
+#endif
   intvec* Mwlp;
 #ifndef BUCHBERGER_ALG
   intvec* hilb_func;
@@ -8298,8 +8412,8 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
   //Print("// pSetm_Error = (%d)", ErrorCheck());
   //Print("\n// ring ro = %s;", rString(currRing));
 
-  clock_t tostd, tif=0, tstd=0, tlift=0, tred=0, tnw=0, textra=0;
 #ifdef TIME_TEST
+  clock_t tostd, tif=0, tstd=0, tlift=0, tred=0, tnw=0, textra=0;
   clock_t tinput = clock();
 #endif
   int nsteppert=0, i, nV = currRing->N, nwalk=0, npert_tmp=0;
@@ -8314,7 +8428,7 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
   ideal H0;
   //ideal  H1;
   ideal H2, Glp;
-  int nGB, endwalks = 0,  nwalkpert=0,  npertstep=0;
+  int nGB, endwalks = 0,  nwalkpert=0;
   intvec* Mlp =  MivMatrixOrderlp(nV);
   intvec* vector_tmp = new intvec(nV);
 #ifndef BUCHBERGER_ALG
@@ -8334,7 +8448,9 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
   ring XXRing = currRing;
   newRing = currRing;
 
+#ifdef TIME_TEST
   to=clock();
+#endif
   // compute a red. GB w.r.t. the help ring
   if(MivComp(curr_weight, iv_dp) == 1) //rOrdStr(currRing) = "dp"
     G = MstdCC(G);
@@ -8348,7 +8464,9 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
     G = idrMoveR(G, XXRing,currRing);
     G = MstdCC(G);
   }
+#ifdef TIME_TEST
   tostd=clock()-to;
+#endif
 
 #ifdef REPRESENTATION_OF_SIGMA
   ideal Gw = MwalkInitialForm(G, curr_weight);
@@ -8371,11 +8489,15 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
       DefRingPar(curr_weight);
     else
       rChangeCurrRing(VMrDefault(curr_weight));
+#ifdef TIME_TEST
     to=clock();
+#endif
     Gw = idrMoveR(G, exring,currRing);
     G = MstdCC(Gw);
     Gw = NULL;
+#ifdef TIME_TEST
     tostd=tostd+clock()-to;
+#endif
     //ivString(curr_weight,"rep. sigma");
     goto COMPUTE_NEW_VECTOR;
   }
@@ -8387,10 +8509,14 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
 
   while(1)
   {
+#ifdef TIME_TEST
     to=clock();
+#endif
     /* compute an initial form ideal of <G> w.r.t. "curr_vector" */
     Gomega = MwalkInitialForm(G, curr_weight);
+#ifdef TIME_TEST
     tif=tif+clock()-to;
+#endif
 
 #ifndef  BUCHBERGER_ALG
     if(isNolVector(curr_weight) == 0)
@@ -8410,7 +8536,9 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
     newRing = currRing;
     Gomega1 = idrMoveR(Gomega, oldRing,currRing);
 
+#ifdef TIME_TEST
     to=clock();
+#endif
     /* compute a reduced Groebner basis of <Gomega> w.r.t. "newRing" */
 #ifdef  BUCHBERGER_ALG
     M = MstdhomCC(Gomega1);
@@ -8418,19 +8546,25 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
     M=kStd(Gomega1,NULL,isHomog,NULL,hilb_func,0,NULL,curr_weight);
     delete hilb_func;
 #endif // BUCHBERGER_ALG
+#ifdef TIME_TEST
     tstd=tstd+clock()-to;
+#endif
 
     /* change the ring to oldRing */
     rChangeCurrRing(oldRing);
     M1 =  idrMoveR(M, newRing,currRing);
     Gomega2 =  idrMoveR(Gomega1, newRing,currRing);
 
+#ifdef TIME_TEST
     to=clock();
+#endif
     /* compute a representation of the generators of submod (M)
        with respect to those of mod (Gomega).
        Gomega is a reduced Groebner basis w.r.t. the current ring */
     F = MLifttwoIdeal(Gomega2, M1, G);
+#ifdef TIME_TEST
     tlift=tlift+clock()-to;
+#endif
 
     idDelete(&M1);
     idDelete(&Gomega2);
@@ -8440,10 +8574,14 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
     rChangeCurrRing(newRing);
     F1 = idrMoveR(F, oldRing,currRing);
 
+#ifdef TIME_TEST
     to=clock();
+#endif
     /* reduce the Groebner basis <G> w.r.t. new ring */
     G = kInterRedCC(F1, NULL);
+#ifdef TIME_TEST
     tred=tred+clock()-to;
+#endif
     idDelete(&F1);
 
 
@@ -8451,10 +8589,14 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
     newRing = currRing;
     nwalk++;
     nwalkpert++;
+#ifdef TIME_TEST
     to=clock();
+#endif
     // compute a next weight vector
     next_weight = MwalkNextWeightCC(curr_weight,target_weight, G);
+#ifdef TIME_TEST
     tnw=tnw+clock()-to;
+#endif
 #ifdef PRINT_VECTORS
     MivString(curr_weight, target_weight, next_weight);
 #endif
@@ -8494,7 +8636,9 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
       lpRing = currRing;
       G1 = idrMoveR(G, newRing,currRing);
 
+#ifdef TIME_TEST
       to=clock();
+#endif
       /*apply kStd or LastGB to compute  a lex. red. Groebner basis of <G>*/
       if(nP == 0 || MivSame(target_tmp, iv_lp) == 0){
         //Print("\n\n// calls \"std in ring r_%d = %s;", nwalk, rString(currRing));
@@ -8510,7 +8654,9 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
         rChangeCurrRing(lpRing);
         G = idrMoveR(G, newRing,currRing);
       }
+#ifdef TIME_TEST
       textra=clock()-to;
+#endif
       npert[endwalks]=nwalk-npert_tmp;
       npert_tmp = nwalk;
       endwalks ++;
@@ -8629,7 +8775,6 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
       }
 
 
-      npertstep = nwalk;
       nwalkpert = 1;
       nsteppert ++;
 
@@ -8697,8 +8842,8 @@ ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, i
   //Print("// pSetm_Error = (%d)", ErrorCheck());
   //Print("\n// ring ro = %s;", rString(currRing));
 
-  clock_t tostd, tif=0, tstd=0, tlift=0, tred=0, tnw=0, textra=0;
 #ifdef TIME_TEST
+  clock_t tostd, tif=0, tstd=0, tlift=0, tred=0, tnw=0, textra=0;
   clock_t tinput = clock();
 #endif
   int nsteppert=0, i, nV = currRing->N, nwalk=0, npert_tmp=0;
@@ -8736,7 +8881,9 @@ ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, i
   ring XXRing = currRing;
   newRing = currRing;
 
+#ifdef TIME_TEST
   to=clock();
+#endif
   // compute a red. GB w.r.t. the help ring
   if(MivComp(curr_weight, iv_dp) == 1)
   {
@@ -8757,7 +8904,9 @@ ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, i
     G = idrMoveR(G, XXRing,currRing);
     G = MstdCC(G);
   }
+#ifdef TIME_TEST
   tostd=clock()-to;
+#endif
 
 #ifdef REPRESENTATION_OF_SIGMA
   ideal Gw = MwalkInitialForm(G, curr_weight);
@@ -8787,11 +8936,15 @@ ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, i
     {
       rChangeCurrRing(VMrDefault(curr_weight));
     }
+#ifdef TIME_TEST
     to=clock();
+#endif
     Gw = idrMoveR(G, exring,currRing);
     G = MstdCC(Gw);
     Gw = NULL;
+#ifdef TIME_TEST
     tostd=tostd+clock()-to;
+#endif
     //ivString(curr_weight,"rep. sigma");
     goto COMPUTE_NEW_VECTOR;
   }
@@ -8803,10 +8956,14 @@ ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, i
 
   while(1)
   {
+#ifdef TIME_TEST
     to=clock();
+#endif
     // compute an initial form ideal of <G> w.r.t. "curr_vector"
     Gomega = MwalkInitialForm(G, curr_weight);
+#ifdef TIME_TEST
     tif=tif+clock()-to;
+#endif
 
 #ifndef  BUCHBERGER_ALG
     if(isNolVector(curr_weight) == 0)
@@ -8833,7 +8990,9 @@ ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, i
     newRing = currRing;
     Gomega1 = idrMoveR(Gomega, oldRing,currRing);
 
+#ifdef TIME_TEST
     to=clock();
+#endif
     // compute a reduced Groebner basis of <Gomega> w.r.t. "newRing"
 #ifdef  BUCHBERGER_ALG
     M = MstdhomCC(Gomega1);
@@ -8841,18 +9000,24 @@ ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, i
     M=kStd(Gomega1,NULL,isHomog,NULL,hilb_func,0,NULL,curr_weight);
     delete hilb_func;
 #endif
+#ifdef TIME_TEST
     tstd=tstd+clock()-to;
+#endif
 
     // change the ring to oldRing
     rChangeCurrRing(oldRing);
     M1 =  idrMoveR(M, newRing,currRing);
     Gomega2 =  idrMoveR(Gomega1, newRing,currRing);
 
+#ifdef TIME_TEST
     to=clock();
+#endif
     // compute a representation of the generators of submod (M) with respect to those of mod (Gomega).
     // Gomega is a reduced Groebner basis w.r.t. the current ring
     F = MLifttwoIdeal(Gomega2, M1, G);
+#ifdef TIME_TEST
     tlift=tlift+clock()-to;
+#endif
 
     idDelete(&M1);
     idDelete(&Gomega2);
@@ -8862,17 +9027,23 @@ ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, i
     rChangeCurrRing(newRing);
     F1 = idrMoveR(F, oldRing,currRing);
 
+#ifdef TIME_TEST
     to=clock();
+#endif
     // reduce the Groebner basis <G> w.r.t. new ring
     G = kInterRedCC(F1, NULL);
+#ifdef TIME_TEST
     tred=tred+clock()-to;
+#endif
     idDelete(&F1);
 
   COMPUTE_NEW_VECTOR:
     newRing = currRing;
     nwalk++;
     nwalkpert++;
+#ifdef TIME_TEST
     to=clock();
+#endif
     // compute a next weight vector
     //next_weight = MwalkNextWeightCC(curr_weight,target_weight, G);
     next_weight = MWalkRandomNextWeight(G, curr_weight, target_weight, weight_rad, pert_deg);
@@ -8952,7 +9123,9 @@ ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, i
       idDelete(&G_test1);
     }*/
 
+#ifdef TIME_TEST
     tnw=tnw+clock()-to;
+#endif
 #ifdef PRINT_VECTORS
     MivString(curr_weight, target_weight, next_weight);
 #endif
@@ -9003,7 +9176,9 @@ ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, i
       lpRing = currRing;
       G1 = idrMoveR(G, newRing,currRing);
 
+#ifdef TIME_TEST
       to=clock();
+#endif
       // apply kStd or LastGB to compute  a lex. red. Groebner basis of <G>
       if(nP == 0 || MivSame(target_tmp, iv_lp) == 0)
       {
@@ -9021,7 +9196,9 @@ ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, i
         rChangeCurrRing(lpRing);
         G = idrMoveR(G, newRing,currRing);
       }
+#ifdef TIME_TEST
       textra=clock()-to;
+#endif
       npert[endwalks]=nwalk-npert_tmp;
       npert_tmp = nwalk;
       endwalks ++;
@@ -9210,8 +9387,10 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
 {
   Overflow_Error = FALSE;
  // BOOLEAN nOverflow_Error = FALSE;
+#ifdef TIME_TEST
   clock_t tproc=0;
   clock_t tinput=clock();
+#endif
   int i, nV = currRing->N;
 
   //check that perturbation degree is valid
@@ -9300,10 +9479,14 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
     {
       goto FIRST_STEP;
     }
+#ifdef TIME_TEST
     to=clock();
+#endif
     // compute an initial form ideal of <G> w.r.t. "curr_vector"
     Gomega = MwalkInitialForm(G, curr_weight);
+#ifdef TIME_TEST
     xtif=xtif+clock()-to;
+#endif
 
 #ifndef  BUCHBERGER_ALG
     if(isNolVector(curr_weight) == 0)
@@ -9335,7 +9518,9 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
     }
 #endif
 */
+#ifdef TIME_TEST
     to=clock();
+#endif
     // compute a reduced Groebner basis of <Gomega> w.r.t. "newRing"
 #ifdef  BUCHBERGER_ALG
     M = MstdhomCC(Gomega1);
@@ -9343,19 +9528,25 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
     M=kStd(Gomega1,NULL,isHomog,NULL,hilb_func,0,NULL,curr_weight);
     delete hilb_func;
 #endif // BUCHBERGER_ALG
+#ifdef TIME_TEST
     xtstd=xtstd+clock()-to;
+#endif
 
     // change the ring to oldRing
     rChangeCurrRing(oldRing);
     M1 =  idrMoveR(M, newRing,currRing);
     Gomega2 =  idrMoveR(Gomega1, newRing,currRing);
+#ifdef TIME_TEST
     to=clock();
+#endif
 
     // if(endwalks == 1){PrintS("\n//  Lifting is still working:");}
 
     // compute a reduced Groebner basis of <G> w.r.t. "newRing" by the lifting process
     F = MLifttwoIdeal(Gomega2, M1, G);
+#ifdef TIME_TEST
     xtlift=xtlift+clock()-to;
+#endif
 
     idDelete(&M1);
     idDelete(&Gomega2);
@@ -9364,11 +9555,15 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
     // change the ring to newRing
     rChangeCurrRing(newRing);
     F1 = idrMoveR(F, oldRing,currRing);
+#ifdef TIME_TEST
     to=clock();
+#endif
     //if(endwalks == 1){ PrintS("\n//  InterRed is still working:");}
     // reduce the Groebner basis <G> w.r.t. the new ring
     G = kInterRedCC(F1, NULL);
+#ifdef TIME_TEST
     xtred=xtred+clock()-to;
+#endif
     idDelete(&F1);
 
     if(endwalks == 1)
@@ -9376,10 +9571,14 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
 
   FIRST_STEP:
     Overflow_Error=FALSE;
+#ifdef TIME_TEST
     to=clock();
+#endif
     // compute a next weight vector
     next_weight = MkInterRedNextWeight(curr_weight,target_weight, G);
+#ifdef TIME_TEST
     xtnw=xtnw+clock()-to;
+#endif
 #ifdef PRINT_VECTORS
     MivString(curr_weight, target_weight, next_weight);
 #endif
@@ -9389,7 +9588,9 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
       delete next_weight;
       if(tp_deg > 1){
         //nOverflow_Error = Overflow_Error;
+#ifdef TIME_TEST
         tproc = tproc+clock()-tinput;
+#endif
         //Print("\n// A subroutine takes %d steps and calls \"Mpwalk\" (1,%d):", nwalk, tp_deg-1);
         G1 = Mpwalk_MAltwalk1(G, curr_weight, tp_deg-1);
         goto MPW_Finish;
@@ -9438,9 +9639,13 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
     if(tp_deg == 1)
     {
       //Print("\n// subroutine takes %d steps and applys \"std\"", nwalk);
+#ifdef TIME_TEST
       to=clock();
+#endif
       ideal G2 = MstdCC(G1);
+#ifdef TIME_TEST
       xtextra=xtextra+clock()-to;
+#endif
       idDelete(&G1);
       G1 = G2;
       G2 = NULL;
@@ -9448,7 +9653,9 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
     else
     {
       //nOverflow_Error = Overflow_Error;
+#ifdef TIME_TEST
       tproc = tproc+clock()-tinput;
+#endif
       // Print("\n// B subroutine takes %d steps and calls \"Mpwalk\" (1,%d) :", nwalk,  tp_deg-1);
       G1 = Mpwalk_MAltwalk1(G1, curr_weight, tp_deg-1);
     }
@@ -9480,9 +9687,11 @@ ideal MAltwalk1(ideal Go, int op_deg, int tp_deg, intvec* curr_weight,
 #endif
   // Print("// pSetm_Error = (%d)", ErrorCheck());
 
+#ifdef TIME_TEST
   xtif=0; xtstd=0; xtlift=0; xtred=0; xtnw=0; xtextra=0;
   xftinput = clock();
   clock_t tostd, tproc;
+#endif
 
   nstep = 0;
   int i, nV = currRing->N;
@@ -9511,7 +9720,9 @@ ideal MAltwalk1(ideal Go, int op_deg, int tp_deg, intvec* curr_weight,
 
   ring XXRing = currRing;
 
+#ifdef TIME_TEST
   to=clock();
+#endif
   /* compute a pertubed weight vector of the original weight vector.
      The perturbation degree is recursive decrease until that vector
      stays inn the correct cone. */
@@ -9568,7 +9779,9 @@ ideal MAltwalk1(ideal Go, int op_deg, int tp_deg, intvec* curr_weight,
     Overflow_Error = TRUE;
     op_deg --;
   }
+#ifdef TIME_TEST
   tostd=clock()-to;
+#endif
 
   if(op_tmp != 1 )
     delete iv_M_dp;
@@ -9582,10 +9795,14 @@ ideal MAltwalk1(ideal Go, int op_deg, int tp_deg, intvec* curr_weight,
     nwalk ++;
     nstep ++;
 
+#ifdef TIME_TEST
     to = clock();
+#endif
     // compute an initial form ideal of <G> w.r.t. "curr_vector"
     Gomega = MwalkInitialForm(G, curr_weight);
+#ifdef TIME_TEST
     xtif=xtif+clock()-to;
+#endif
 #if 0
     if(Overflow_Error == TRUE)
     {
@@ -9622,7 +9839,9 @@ ideal MAltwalk1(ideal Go, int op_deg, int tp_deg, intvec* curr_weight,
     newRing = currRing;
     Gomega1 = idrMoveR(Gomega, oldRing,currRing);
 
+#ifdef TIME_TEST
     to=clock();
+#endif
     // compute a reduced Groebner basis of <Gomega> w.r.t. "newRing"
 #ifdef  BUCHBERGER_ALG
     M = MstdhomCC(Gomega1);
@@ -9630,17 +9849,23 @@ ideal MAltwalk1(ideal Go, int op_deg, int tp_deg, intvec* curr_weight,
     M=kStd(Gomega1,NULL,isHomog,NULL,hilb_func,0,NULL,curr_weight);
     delete hilb_func;
 #endif // BUCHBERGER_ALG
+#ifdef TIME_TEST
     xtstd=xtstd+clock()-to;
+#endif
 
     // change the ring to oldRing
     rChangeCurrRing(oldRing);
     M1 =  idrMoveR(M, newRing,currRing);
     Gomega2 =  idrMoveR(Gomega1, newRing,currRing);
 
+#ifdef TIME_TEST
     to=clock();
+#endif
     // compute a reduced Groebner basis of <G> w.r.t. "newRing" by the lifting process
     F = MLifttwoIdeal(Gomega2, M1, G);
+#ifdef TIME_TEST
     xtlift=xtlift+clock()-to;
+#endif
 
     idDelete(&M1);
     idDelete(&Gomega2);
@@ -9652,10 +9877,14 @@ ideal MAltwalk1(ideal Go, int op_deg, int tp_deg, intvec* curr_weight,
     if (oldRing!=IDRING(currRingHdl)) rDelete(oldRing); // do not delete the global currRing
     oldRing=NULL;
 
+#ifdef TIME_TEST
     to=clock();
+#endif
     // reduce the Groebner basis <G> w.r.t. new ring
     G = kInterRedCC(F1, NULL);
+#ifdef TIME_TEST
     xtred=xtred+clock()-to;
+#endif
     idDelete(&F1);
 
     if(endwalks == 1)
@@ -9663,10 +9892,14 @@ ideal MAltwalk1(ideal Go, int op_deg, int tp_deg, intvec* curr_weight,
       break;
     }
   NEXT_VECTOR:
+#ifdef TIME_TEST
     to=clock();
+#endif
     // compute a next weight vector
     next_weight = MkInterRedNextWeight(curr_weight,target_weight, G);
+#ifdef TIME_TEST
     xtnw=xtnw+clock()-to;
+#endif
 #ifdef PRINT_VECTORS
     MivString(curr_weight, target_weight, next_weight);
 #endif
@@ -9707,8 +9940,8 @@ ideal MAltwalk1(ideal Go, int op_deg, int tp_deg, intvec* curr_weight,
        // MSTD_ALT1:
 #ifdef TIME_TEST
         nOverflow_Error = Overflow_Error;
-#endif
         tproc = clock()-xftinput;
+#endif
 
         //Print("\n//  main routine takes %d steps and calls \"Mpwalk\" (1,%d):", nwalk,  tp_deg);
 

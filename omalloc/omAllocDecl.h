@@ -110,8 +110,8 @@
 #endif
 
 #if !defined(OM_T_FREE2)
-#define omFreeSize(addr,size)   _omDebugFree(addr,(void*)(size),OM_FSIZE|_OM_FKEEP,OM_CFL)
-#define omfreeSize(addr,size)   _omDebugFree(addr,(void*)(size),OM_FSIZE|OM_FSLOPPY|_OM_FKEEP,OM_CFL)
+#define omFreeSize(addr,size)   _omDebugFree(addr,(void*)(long)(size),OM_FSIZE|_OM_FKEEP,OM_CFL)
+#define omfreeSize(addr,size)   _omDebugFree(addr,(void*)(long)(size),OM_FSIZE|OM_FSLOPPY|_OM_FKEEP,OM_CFL)
 #else
 #define omFreeSize(addr,size)   __omFreeSize(addr,size)
 #define omfreeSize(addr,size)   do {if (addr && size) omFreeSize(addr, size);} while (0)

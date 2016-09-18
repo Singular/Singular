@@ -1507,7 +1507,7 @@ template class IAccessor<snumber*>;
 
 #ifndef SINGULAR_4_1
 BOOLEAN n2pInitChar(coeffs cf, void * infoStruct)
-{}
+{ return 1; }
 #endif
 #ifdef SINGULAR_4_1
 /* --------------------------------------------------------------------*/

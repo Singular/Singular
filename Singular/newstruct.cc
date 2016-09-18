@@ -637,9 +637,9 @@ BOOLEAN newstruct_serialize(blackbox *b, void *d, si_link f)
   return FALSE;
 }
 
-BOOLEAN newstruct_deserialize(blackbox **b, void **d, si_link f)
+BOOLEAN newstruct_deserialize(blackbox **, void **d, si_link f)
 {
-  // newstruct is serialiazed as analog to a list,
+  // newstruct is serialized as analog to a list,
   // just read a list and take data,
   // rtyp must be set correctly (to the blackbox id) by routine calling
   // newstruct_deserialize
