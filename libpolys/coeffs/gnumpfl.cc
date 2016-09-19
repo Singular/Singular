@@ -437,6 +437,17 @@ static char* ngfCoeffString(const coeffs r)
   return s;
 }
 
+static char* ngfCoeffName(const coeffs r)
+{
+  static char ngfCoeffName_buf[27];
+#ifdef SINGULAR_4_1
+  snprintf(ngfCoeffName_buf,27,"real,%d,%d",r->float_len,r->float_len2);
+#else
+  snprintf(ngfCoeffName_buf,27,"RR(%d,%d)",r->float_len,r->float_len2);
+#endif
+  return ngfCoeffName_buf;
+}
+
 BOOLEAN ngfInitChar(coeffs n, void *parameter)
 {
   assume( getCoeffType(n) == n_long_R );
@@ -450,6 +461,7 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
   n->cfSetChar = ngfSetChar;
   n->ch = 0;
   n->cfCoeffString=ngfCoeffString;
+  n->cfCoeffName=ngfCoeffName;
 
   n->cfDelete  = ngfDelete;
   //n->cfNormalize=ndNormalize;
