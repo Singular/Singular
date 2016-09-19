@@ -185,11 +185,11 @@ static inline poly sca_m_Mult_mm( poly pMonomM, const poly pMonomMM, const ring 
     number nCoeffM = p_GetCoeff(pMonomM, rRing); // no new copy! should be deleted!
 
     if( (tpower) != 0 ) // degree is odd => negate coeff.
-      nCoeffM = n_InpNeg(nCoeffM, rRing); // negate nCoeff (will destroy the original number)
+      nCoeffM = n_InpNeg(nCoeffM, rRing->cf); // negate nCoeff (will destroy the original number)
 
     const number nCoeffMM = p_GetCoeff(pMonomMM, rRing); // no new copy!
 
-    number nCoeff = n_Mult(nCoeffM, nCoeffMM, rRing); // new number!
+    number nCoeff = n_Mult(nCoeffM, nCoeffMM, rRing->cf); // new number!
 
     p_SetCoeff(pMonomM, nCoeff, rRing); // delete lc(pMonomM) and set lc(pMonomM) = nCoeff
 
@@ -249,11 +249,11 @@ static inline poly sca_mm_Mult_m( const poly pMonomMM, poly pMonomM, const ring 
     number nCoeffM = p_GetCoeff(pMonomM, rRing); // no new copy! should be deleted!
 
     if( (tpower) != 0 ) // degree is odd => negate coeff.
-      nCoeffM = n_InpNeg(nCoeffM, rRing); // negate nCoeff (will destroy the original number), creates new number!
+      nCoeffM = n_InpNeg(nCoeffM, rRing->cf); // negate nCoeff (will destroy the original number), creates new number!
 
     const number nCoeffMM = p_GetCoeff(pMonomMM, rRing); // no new copy!
 
-    number nCoeff = n_Mult(nCoeffM, nCoeffMM, rRing); // new number!
+    number nCoeff = n_Mult(nCoeffM, nCoeffMM, rRing->cf); // new number!
 
     p_SetCoeff(pMonomM, nCoeff, rRing); // delete lc(pMonomM) and set lc(pMonomM) = nCoeff
 
@@ -317,10 +317,10 @@ static inline poly sca_mm_Mult_mm( poly pMonom1, const poly pMonom2, const ring 
     const number nCoeff1 = p_GetCoeff(pMonom1, rRing); // no new copy!
     const number nCoeff2 = p_GetCoeff(pMonom2, rRing); // no new copy!
 
-    number nCoeff = n_Mult(nCoeff1, nCoeff2, rRing); // new number!
+    number nCoeff = n_Mult(nCoeff1, nCoeff2, rRing->cf); // new number!
 
     if( (tpower) != 0 ) // degree is odd => negate coeff.
-      nCoeff = n_InpNeg(nCoeff, rRing); // negate nCoeff (will destroy the original number)
+      nCoeff = n_InpNeg(nCoeff, rRing->cf); // negate nCoeff (will destroy the original number)
 
     p_SetCoeff0(pResult, nCoeff, rRing); // set lc(pResult) = nCoeff, no destruction!
 
@@ -362,10 +362,10 @@ static inline poly sca_xi_Mult_mm(short i, const poly pMonom, const ring rRing)
     p_SetExp(pResult, i, 1, rRing); // pResult*=X_i &&
     p_Setm(pResult, rRing);         // addjust degree after previous step!
 
-    number nCoeff = n_Copy(p_GetCoeff(pMonom, rRing), rRing); // new number!
+    number nCoeff = n_Copy(pGetCoeff(pMonom), rRing->cf); // new number!
 
     if( cpower != 0 ) // degree is odd => negate coeff.
-      nCoeff = n_InpNeg(nCoeff, rRing); // negate nCoeff (will destroy the original number)
+      nCoeff = n_InpNeg(nCoeff, rRing->cf); // negate nCoeff (will destroy the original number)
 
     p_SetCoeff0(pResult, nCoeff, rRing); // set lc(pResult) = nCoeff, no destruction!
 
@@ -790,18 +790,18 @@ poly sca_SPoly( const poly p1, const poly p2, const ring r )
 
   p_Delete(&pL,r);
 
-  number C1  = n_Copy(p_GetCoeff(p1,r),r);      // C1 = lc(p1)
-  number C2  = n_Copy(p_GetCoeff(p2,r),r);      // C2 = lc(p2)
+  number C1  = n_Copy(pGetCoeff(p1),r->cf);      // C1 = lc(p1)
+  number C2  = n_Copy(pGetCoeff(p2),r->cf);      // C2 = lc(p2)
 
-  number C = n_Gcd(C1,C2,r);                     // C = gcd(C1, C2)
+  number C = n_Gcd(C1,C2,r->cf);                     // C = gcd(C1, C2)
 
-  if (!n_IsOne(C, r))                              // if C != 1
+  if (!n_IsOne(C, r->cf))                              // if C != 1
   {
-    C1=n_Div(C1, C, r);                              // C1 = C1 / C
-    C2=n_Div(C2, C, r);                              // C2 = C2 / C
+    C1=n_Div(C1, C, r->cf);                              // C1 = C1 / C
+    C2=n_Div(C2, C, r->cf);                              // C2 = C2 / C
   }
 
-  n_Delete(&C,r); // destroy the number C
+  n_Delete(&C,r->cf); // destroy the number C
 
   const int iSignSum = sca_Sign_mm_Mult_mm (m1, p1, r) + sca_Sign_mm_Mult_mm (m2, p2, r);
   // zero if different signs
@@ -809,7 +809,7 @@ poly sca_SPoly( const poly p1, const poly p2, const ring r )
   assume( (iSignSum*iSignSum == 0) || (iSignSum*iSignSum == 4) );
 
   if( iSignSum != 0 ) // the same sign!
-    C2=n_InpNeg (C2, r);
+    C2=n_InpNeg (C2, r->cf);
 
   p_SetCoeff(m1, C2, r);                           // lc(m1) = C2!!!
   p_SetCoeff(m2, C1, r);                           // lc(m2) = C1!!!
@@ -864,23 +864,23 @@ poly sca_ReduceSpoly(const poly p1, poly p2, const ring r)
   p_Test (m,r);
 #endif
 
-  number C1 = n_Copy( p_GetCoeff(p1, r), r);
-  number C2 = n_Copy( p_GetCoeff(p2, r), r);
+  number C1 = n_Copy( pGetCoeff(p1), r->cf);
+  number C2 = n_Copy( pGetCoeff(p2), r->cf);
 
   /* GCD stuff */
-  number C = n_Gcd(C1, C2, r);
+  number C = n_Gcd(C1, C2, r->cf);
 
-  if (!n_IsOne(C, r))
+  if (!n_IsOne(C, r->cf))
   {
-    C1 = n_Div(C1, C, r);
-    C2 = n_Div(C2, C, r);
+    C1 = n_Div(C1, C, r->cf);
+    C2 = n_Div(C2, C, r->cf);
   }
-  n_Delete(&C,r);
+  n_Delete(&C,r->cf);
 
   const int iSign = sca_Sign_mm_Mult_mm( m, p1, r );
 
   if(iSign == 1)
-    C2 = n_InpNeg(C2,r);
+    C2 = n_InpNeg(C2,r->cf);
 
   p_SetCoeff(m, C2, r);
 
@@ -891,7 +891,7 @@ poly sca_ReduceSpoly(const poly p1, poly p2, const ring r)
   p2 = p_LmDeleteAndNext( p2, r );
 
   p2 = p_Mult_nn(p2, C1, r); // p2 !!!
-  n_Delete(&C1,r);
+  n_Delete(&C1,r->cf);
 
   poly T = nc_mm_Mult_pp(m, pNext(p1), r);
   p_Delete(&m, r);
@@ -1006,7 +1006,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
       assume(MATELEM(C,i,j) != NULL); // after CallPlural!
       number c = p_GetCoeff(MATELEM(C,i,j), rBase);
 
-      if( n_IsMOne(c, rBase) ) // !!!???
+      if( n_IsMOne(c, rBase->cf) ) // !!!???
       {
         if( i < iAltVarStart)
           iAltVarStart = i;
@@ -1015,7 +1015,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
           iAltVarEnd = j;
       } else
       {
-        if( !n_IsOne(c, rBase) )
+        if( !n_IsOne(c, rBase->cf) )
         {
 #if ((defined(PDEBUG) && OUTPUT) || MYTEST)
           Print("Wrong Coeff at: [%d, %d]\n", i, j);
@@ -1044,16 +1044,17 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
 
       if( (iAltVarStart <= i) && (j <= iAltVarEnd) ) // S <= i < j <= E
       { // anticommutative part
-        if( !n_IsMOne(c, rBase) )
+        if( !n_IsMOne(c, rBase->cf) )
         {
 #if ((defined(PDEBUG) && OUTPUT) || MYTEST)
           Print("Wrong Coeff at: [%d, %d]\n", i, j);
 #endif
           return false;
         }
-      } else
+      }
+      else
       { // should commute
-        if( !n_IsOne(c, rBase) )
+        if( !n_IsOne(c, rBase->cf) )
         {
 #if ((defined(PDEBUG) && OUTPUT) || MYTEST)
           Print("Wrong Coeff at: [%d, %d]\n", i, j);

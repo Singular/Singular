@@ -123,14 +123,14 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, CFArray &inv_cach
         xx[j]=hh;
       }
       else
-        x[j]=n_Init(0, R);
+        x[j]=n_Init(0, R->cf);
     }
     number n=n_ChineseRemainderSym(x,q,rl,TRUE,inv_cache,R->cf);
     for(j=rl-1;j>=0;j--)
     {
       x[j]=NULL; // n_Init(0...) takes no memory
     }
-    if (n_IsZero(n,R)) p_Delete(&h,R);
+    if (n_IsZero(n,R->cf)) p_Delete(&h,R);
     else
     {
       //Print("new mon:");pWrite(h);
@@ -2540,7 +2540,7 @@ static number p_InitContent(poly ph, const ring r)
     s=mpz_size1(d->z);
   }
   else
-    s=n_Size(d,r);
+    s=n_Size(d,r->cf);
   number d2=d;
   loop
   {
@@ -2570,7 +2570,7 @@ static number p_InitContent(poly ph, const ring r)
     }
     else
     {
-      int ns=n_Size(pGetCoeff(ph),r);
+      int ns=n_Size(pGetCoeff(ph),r->cf);
       if (ns<=3)
       {
         s2=s;
@@ -4398,28 +4398,28 @@ BOOLEAN p_ComparePolys(poly p1,poly p2, const ring r)
   #ifdef HAVE_RINGS
   if (rField_is_Ring(r))
   {
-    if (!n_DivBy(p_GetCoeff(p1, r), p_GetCoeff(p2, r), r)) return FALSE;
+    if (!n_DivBy(pGetCoeff(p1), pGetCoeff(p2), r->cf)) return FALSE;
   }
   #endif
-  n=n_Div(p_GetCoeff(p1,r),p_GetCoeff(p2,r),r);
+  n=n_Div(pGetCoeff(p1),pGetCoeff(p2),r->cf);
   while ((p1 != NULL) /*&& (p2 != NULL)*/)
   {
     if ( ! p_LmEqual(p1, p2,r))
     {
-        n_Delete(&n, r);
+        n_Delete(&n, r->cf);
         return FALSE;
     }
-    if (!n_Equal(p_GetCoeff(p1, r), nn = n_Mult(p_GetCoeff(p2, r),n, r->cf), r->cf))
+    if (!n_Equal(pGetCoeff(p1), nn = n_Mult(pGetCoeff(p2),n, r->cf), r->cf))
     {
-      n_Delete(&n, r);
-      n_Delete(&nn, r);
+      n_Delete(&n, r->cf);
+      n_Delete(&nn, r->cf);
       return FALSE;
     }
-    n_Delete(&nn, r);
+    n_Delete(&nn, r->cf);
     pIter(p1);
     pIter(p2);
   }
-  n_Delete(&n, r);
+  n_Delete(&n, r->cf);
   return TRUE;
 }
 

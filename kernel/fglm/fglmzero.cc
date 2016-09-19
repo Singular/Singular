@@ -153,7 +153,7 @@ idealFunctionals::map( ring source )
     int * perm = (int *)omAlloc0( (_nfunc+1)*sizeof( int ) );
     maFindPerm( source->names, source->N, NULL, 0, currRing->names,
                 currRing->N, NULL, 0, perm, NULL , currRing->cf->type);
-    nMapFunc nMap=n_SetMap( source, currRing);
+    nMapFunc nMap=n_SetMap( source->cf, currRing->cf);
 
     matHeader ** temp = (matHeader **)omAlloc( _nfunc*sizeof( matHeader * ));
     for ( var= 0; var < _nfunc; var ++ ) {

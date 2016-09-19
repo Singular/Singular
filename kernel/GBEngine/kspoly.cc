@@ -96,7 +96,7 @@ int ksReducePoly(LObject* PR,
   if (t2==NULL)           // Divisor is just one term, therefore it will
   {                       // just cancel the leading term
     PR->LmDeleteAndIter();
-    if (coef != NULL) *coef = n_Init(1, tailRing);
+    if (coef != NULL) *coef = n_Init(1, tailRing->cf);
     return 0;
   }
 
@@ -122,7 +122,7 @@ int ksReducePoly(LObject* PR,
   }
 
   // take care of coef buisness
-  if (! n_IsOne(pGetCoeff(p2), tailRing))
+  if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
   {
     number bn = pGetCoeff(lm);
     number an = pGetCoeff(p2);
@@ -131,11 +131,11 @@ int ksReducePoly(LObject* PR,
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
-    else n_Delete(&an, tailRing);
+    else n_Delete(&an, tailRing->cf);
   }
   else
   {
-    if (coef != NULL) *coef = n_Init(1, tailRing);
+    if (coef != NULL) *coef = n_Init(1, tailRing->cf);
   }
 
 
@@ -302,7 +302,7 @@ int ksReducePolySig(LObject* PR,
   if (t2==NULL)           // Divisor is just one term, therefore it will
   {                       // just cancel the leading term
     PR->LmDeleteAndIter();
-    if (coef != NULL) *coef = n_Init(1, tailRing);
+    if (coef != NULL) *coef = n_Init(1, tailRing->cf);
     return 0;
   }
 
@@ -328,7 +328,7 @@ int ksReducePolySig(LObject* PR,
   }
 
   // take care of coef buisness
-  if (! n_IsOne(pGetCoeff(p2), tailRing))
+  if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
   {
     number bn = pGetCoeff(lm);
     number an = pGetCoeff(p2);
@@ -337,11 +337,11 @@ int ksReducePolySig(LObject* PR,
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
-    else n_Delete(&an, tailRing);
+    else n_Delete(&an, tailRing->cf);
   }
   else
   {
-    if (coef != NULL) *coef = n_Init(1, tailRing);
+    if (coef != NULL) *coef = n_Init(1, tailRing->cf);
   }
 
 
@@ -552,7 +552,7 @@ pWrite(PW->p);pWrite(PW->sig);
   if (t2==NULL)           // Divisor is just one term, therefore it will
   {                       // just cancel the leading term
     PR->LmDeleteAndIter();
-    if (coef != NULL) *coef = n_Init(1, tailRing);
+    if (coef != NULL) *coef = n_Init(1, tailRing->cf);
     return 0;
   }
 
@@ -580,11 +580,11 @@ pWrite(PW->p);pWrite(PW->sig);
   if(rField_is_Ring(currRing))
   {
     p_SetCoeff(lm, nDiv(pGetCoeff(lm),pGetCoeff(p2)), tailRing);
-    if (coef != NULL) *coef = n_Init(1, tailRing);
+    if (coef != NULL) *coef = n_Init(1, tailRing->cf);
   }
   else
   {
-    if (! n_IsOne(pGetCoeff(p2), tailRing))
+    if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
     {
       number bn = pGetCoeff(lm);
       number an = pGetCoeff(p2);
@@ -593,11 +593,11 @@ pWrite(PW->p);pWrite(PW->sig);
       if (((ct == 0) || (ct == 2)))
         PR->Tail_Mult_nn(an);
       if (coef != NULL) *coef = an;
-      else n_Delete(&an, tailRing);
+      else n_Delete(&an, tailRing->cf);
     }
     else
     {
-      if (coef != NULL) *coef = n_Init(1, tailRing);
+      if (coef != NULL) *coef = n_Init(1, tailRing->cf);
     }
   }
 
@@ -771,7 +771,7 @@ int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
 
   if (!ret)
   {
-    if (! n_IsOne(coef, currRing))
+    if (! n_IsOne(coef, currRing->cf))
     {
       pNext(Current) = NULL;
       if (Current == PR->p && PR->t_p != NULL)
@@ -779,7 +779,7 @@ int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
       PR->Mult_nn(coef);
     }
 
-    n_Delete(&coef, currRing);
+    n_Delete(&coef, currRing->cf);
     pNext(Current) = Red.GetLmTailRing();
     if (Current == PR->p && PR->t_p != NULL)
       pNext(PR->t_p) = pNext(Current);

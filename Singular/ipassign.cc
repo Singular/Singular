@@ -229,7 +229,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
 
   if (n_IsZero(p, currRing->cf))
   {
-    n_Delete(&p, currRing);
+    n_Delete(&p, currRing->cf);
     if( nCoeff_is_transExt(currRing->cf) )
     {
 #ifndef SING_NDEBUG

@@ -24,7 +24,7 @@ static void find_subst_for_map(const ring preimage_r, const ring image_r, const 
     if (image->m[i]!=NULL)
     {
       if ((pNext(image->m[i])==NULL)
-      && (n_IsOne(pGetCoeff(image->m[i]),image_r)))
+      && (n_IsOne(pGetCoeff(image->m[i]),image_r->cf)))
       {
         v=p_IsUnivariate(image->m[i],image_r);
         if ((v<=0) /*not univariate */

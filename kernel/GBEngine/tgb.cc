@@ -82,7 +82,7 @@ int slim_nsize (number n, ring r)
   }
   else
   {
-    return n_Size (n, r);
+    return n_Size (n, r->cf);
   }
 }
 
@@ -142,7 +142,7 @@ static inline poly p_Init_Special (const ring r)
 static inline poly pOne_Special (const ring r = currRing)
 {
   poly rc = p_Init_Special (r);
-  pSetCoeff0 (rc, n_Init (1, r));
+  pSetCoeff0 (rc, n_Init (1, r->cf));
   return rc;
 }
 

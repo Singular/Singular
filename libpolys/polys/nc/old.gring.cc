@@ -62,9 +62,9 @@
 // #include <polys/ratgring.h>
 // #endif
 
-static poly NF_Proc_Dummy(ideal, ideal, poly, int, int, const ring _currRing)
+static poly NF_Proc_Dummy(ideal, ideal, poly, int, int, const ring)
 { WerrorS("nc_NF not defined"); return NULL; }
-static ideal BBA_Proc_Dummy (const ideal, const ideal, const intvec *, const intvec *, kStrategy strat, const ring)
+static ideal BBA_Proc_Dummy (const ideal, const ideal, const intvec *, const intvec *, kStrategy, const ring)
 { WerrorS("nc_NF not defined"); return NULL; }
 
 // the following funtion poiters are quasi-static:
@@ -423,8 +423,8 @@ poly gnc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r)
       }
     }
     p_GetExpV(p,P,r);
-    cP=p_GetCoeff(p,r);
-    cOut=n_Mult(cP,cM,r);
+    cP=pGetCoeff(p);
+    cOut=n_Mult(cP,cM,r->cf);
     if (side==1)
     {
       v = gnc_mm_Mult_nn(P, M, r);
@@ -434,7 +434,7 @@ poly gnc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r)
       v = gnc_mm_Mult_nn(M, P, r);
     }
     v = p_Mult_nn(v,cOut,r);
-    n_Delete(&cOut,r);
+    n_Delete(&cOut,r->cf);
     p_SetCompP(v,expOut,r);
 
     sum += v;
@@ -517,7 +517,7 @@ poly gnc_mm_Mult_nn(int *F0, int *G0, const ring r)
     return(out);
   }
 
-  number cff=n_Init(1,r);
+  number cff=n_Init(1,r->cf);
   number tmp_num=NULL;
   int cpower=0;
 
@@ -539,14 +539,14 @@ poly gnc_mm_Mult_nn(int *F0, int *G0, const ring r)
           tpower = tpower + cpower;
         }
       }
-      cff = n_Copy(p_GetCoeff(MATELEM(r->GetNC()->COM,1,2),r),r);
-      n_Power(cff,tpower,&tmp_num, r);
-      n_Delete(&cff,r);
+      cff = n_Copy(pGetCoeff(MATELEM(r->GetNC()->COM,1,2)),r->cf);
+      n_Power(cff,tpower,&tmp_num, r->cf);
+      n_Delete(&cff,r->cf);
       cff = tmp_num;
     }
     else /* skew commutative with nonequal coeffs */
     {
-      number totcff=n_Init(1,r);
+      number totcff=n_Init(1,r->cf);
       for(j=jG; j<=iG; j++)
       {
         if (G[j]!=0)
@@ -557,13 +557,13 @@ poly gnc_mm_Mult_nn(int *F0, int *G0, const ring r)
             if (F[i]!=0)
             {
               cpower = F[i]*G[j]; // bug! overflow danger!!!
-              cff = n_Copy(p_GetCoeff(MATELEM(r->GetNC()->COM,j,i),r),r);
-              n_Power(cff,cpower,&tmp_num, r);
-              cff = n_Mult(totcff,tmp_num, r);
-              n_Delete(&totcff, r);
-              n_Delete(&tmp_num, r);
-              totcff = n_Copy(cff,r);
-              n_Delete(&cff,r);
+              cff = n_Copy(pGetCoeff(MATELEM(r->GetNC()->COM,j,i)),r->cf);
+              n_Power(cff,cpower,&tmp_num, r->cf);
+              cff = n_Mult(totcff,tmp_num, r->cf);
+              n_Delete(&totcff, r->cf);
+              n_Delete(&tmp_num, r->cf);
+              totcff = n_Copy(cff,r->cf);
+              n_Delete(&cff,r->cf);
             }
           } /* end 2nd for */
         }
@@ -632,7 +632,7 @@ poly gnc_mm_Mult_nn(int *F0, int *G0, const ring r)
   poly D=NULL;
   poly Rout=NULL;
   number *c=(number *)omAlloc0((rN+1)*sizeof(number));
-  c[0]=n_Init(1,r);
+  c[0]=n_Init(1,r->cf);
 
   int *Op=Nxt;
   int *On=G;
@@ -653,7 +653,7 @@ poly gnc_mm_Mult_nn(int *F0, int *G0, const ring r)
      t=log[cnt];
 
      w=gnc_mm_Mult_uu(Op,t,On[t],r);
-     c[cnt]=n_Mult(c[cnt-1],p_GetCoeff(w,r),r);
+     c[cnt]=n_Mult(c[cnt-1],pGetCoeff(w),r->cf);
      D = pNext(w);  /* getting coef and rest D */
      p_LmDelete(&w,r);
      w=NULL;
@@ -868,7 +868,7 @@ poly gnc_mm_Mult_uu(int *F,int jG,int bG, const ring r)
   poly D=NULL;
   poly Rout=NULL;
   number *c=(number *)omAlloc0((cnt+2)*sizeof(number));
-  c[cnt+1]=n_Init(1,r);
+  c[cnt+1]=n_Init(1,r->cf);
   i=cnt+2;         /* later in freeN */
   int *Op=Nxt;
 
@@ -897,7 +897,7 @@ poly gnc_mm_Mult_uu(int *F,int jG,int bG, const ring r)
      t=lF[cnt];   /* cnt as it was computed */
 
      poly w=gnc_uu_Mult_ww(t,Op[t],jG,bG,r);
-     c[cnt]=n_Copy(p_GetCoeff(w,r),r);
+     c[cnt]=n_Copy(pGetCoeff(w),r->cf);
      D = pNext(w);  /* getting coef and rest D */
      p_LmDelete(&w,r);
      w=NULL;
@@ -942,8 +942,8 @@ poly gnc_mm_Mult_uu(int *F,int jG,int bG, const ring r)
      p_Test(Pp,r);
 #endif
      p_Delete(&Pp,r);
-     num=n_Mult(c[cnt+1],c[cnt],r);
-     n_Delete(&c[cnt],r);
+     num=n_Mult(c[cnt+1],c[cnt],r->cf);
+     n_Delete(&c[cnt],r->cf);
      c[cnt]=num;
      Rout=p_Mult_nn(Rout,c[cnt+1],r); /* Rest is ready */
      out=p_Add_q(out,Rout,r);
@@ -1118,14 +1118,14 @@ poly gnc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
     p_SetExp(out,i,a,r);
     p_AddExp(out,j,b,r);
     p_Setm(out,r);
-    if (n_IsOne(p_GetCoeff(MATELEM(r->GetNC()->COM,j,i),r),r)) /* commutative case */
+    if (n_IsOne(pGetCoeff(MATELEM(r->GetNC()->COM,j,i)),r->cf)) /* commutative case */
     {
       return(out);
     }
     else
     {
-      number tmp_number=p_GetCoeff(MATELEM(r->GetNC()->COM,j,i),r); /* quasicommutative case */
-      n_Power(tmp_number,a*b,&tmp_number, r); // BUG! ;-(
+      number tmp_number=pGetCoeff(MATELEM(r->GetNC()->COM,j,i)); /* quasicommutative case */
+      n_Power(tmp_number,a*b,&tmp_number, r->cf); // BUG! ;-(
       p_SetCoeff(out,tmp_number,r);
       return(out);
     }
@@ -1423,25 +1423,25 @@ poly gnc_ReduceSpolyOld(const poly p1, poly p2/*,poly spNoether*/, const ring r)
   number cF =  p_GetCoeff(p2, r);
   /* GCD stuff */
   number cG = n_SubringGcd(C, cF, r->cf);
-  if ( !n_IsOne(cG,r) )
+  if ( !n_IsOne(cG,r->cf) )
   {
-    cF = n_Div(cF, cG, r); n_Normalize(cF, r);
-    C  = n_Div(C,  cG, r); n_Normalize(C, r);
+    cF = n_Div(cF, cG, r->cf); n_Normalize(cF, r->cf);
+    C  = n_Div(C,  cG, r->cf); n_Normalize(C, r->cf);
   }
   else
   {
-    cF = n_Copy(cF, r);
-    C  = n_Copy(C, r);
+    cF = n_Copy(cF, r->cf);
+    C  = n_Copy(C, r->cf);
   }
-  n_Delete(&cG,r);
+  n_Delete(&cG,r->cf);
   p2 = p_Mult_nn(p2, C, r);
   poly out = nc_mm_Mult_pp(m, pNext(p1), r);
   N = p_Add_q(N, out, r);
   p_Test(p2,r);
   p_Test(N,r);
-  if (!n_IsMOne(cF,r))
+  if (!n_IsMOne(cF,r->cf))
   {
-    cF = n_InpNeg(cF,r);
+    cF = n_InpNeg(cF,r->cf);
     N  = p_Mult_nn(N, cF, r);
     p_Test(N,r);
   }
@@ -1449,8 +1449,8 @@ poly gnc_ReduceSpolyOld(const poly p1, poly p2/*,poly spNoether*/, const ring r)
   p_Test(out,r);
   if ( out!=NULL ) p_Content(out,r);
   p_Delete(&m,r);
-  n_Delete(&cF,r);
-  n_Delete(&C,r);
+  n_Delete(&cF,r->cf);
+  n_Delete(&C,r->cf);
   return(out);
 }
 
@@ -1485,22 +1485,22 @@ poly gnc_ReduceSpolyNew(const poly p1, poly p2, const ring r)
   /* GCD stuff */
   number cG = n_SubringGcd(C, cF, r->cf);
 
-  if (!n_IsOne(cG, r))
+  if (!n_IsOne(cG, r->cf))
   {
-    cF = n_Div(cF, cG, r); n_Normalize(cF, r);
-    C  = n_Div(C,  cG, r); n_Normalize(C, r);
+    cF = n_Div(cF, cG, r->cf); n_Normalize(cF, r->cf);
+    C  = n_Div(C,  cG, r->cf); n_Normalize(C, r->cf);
   }
   else
   {
-    cF = n_Copy(cF, r);
-    C  = n_Copy(C, r);
+    cF = n_Copy(cF, r->cf);
+    C  = n_Copy(C, r->cf);
   }
-  n_Delete(&cG,r);
+  n_Delete(&cG,r->cf);
 
   p2 = p_Mult_nn(p2, C, r); // p2 !!!
   p_Test(p2,r);
-  n_Delete(&C,r);
-  n_Delete(&cG,r);
+  n_Delete(&C,r->cf);
+  n_Delete(&cG,r->cf);
 
   poly out = nc_mm_Mult_pp(m, pNext(p1), r);
   p_Delete(&m,r);
@@ -1508,13 +1508,13 @@ poly gnc_ReduceSpolyNew(const poly p1, poly p2, const ring r)
   N = p_Add_q(N, out, r);
   p_Test(N,r);
 
-  if (!n_IsMOne(cF,r)) // ???
+  if (!n_IsMOne(cF,r->cf)) // ???
   {
-    cF = n_InpNeg(cF,r);
+    cF = n_InpNeg(cF,r->cf);
     N  = p_Mult_nn(N, cF, r);
     p_Test(N,r);
   }
-  n_Delete(&cF,r);
+  n_Delete(&cF,r->cf);
 
   out = p_Add_q(p2,N,r); // delete N, p2
   p_Test(out,r);
@@ -1570,26 +1570,26 @@ poly gnc_CreateSpolyOld(poly p1, poly p2/*,poly spNoether*/, const ring r)
   number C2  = p_GetCoeff(M2,r);
   /* GCD stuff */
   number C = n_SubringGcd(C1,C2,r->cf);
-  if (!n_IsOne(C,r))
+  if (!n_IsOne(C,r->cf))
   {
-    C1=n_Div(C1,C, r);n_Normalize(C1,r);
-    C2=n_Div(C2,C, r);n_Normalize(C2,r);
+    C1=n_Div(C1,C, r->cf);n_Normalize(C1,r->cf);
+    C2=n_Div(C2,C, r->cf);n_Normalize(C2,r->cf);
   }
   else
   {
-    C1=n_Copy(C1, r);
-    C2=n_Copy(C2, r);
+    C1=n_Copy(C1, r->cf);
+    C2=n_Copy(C2, r->cf);
   }
-  n_Delete(&C,r);
+  n_Delete(&C,r->cf);
   M1=p_Mult_nn(M1,C2,r);
   p_SetCoeff(m1,C2,r);
-  if (n_IsMOne(C1,r))
+  if (n_IsMOne(C1,r->cf))
   {
     M2=p_Add_q(M1,M2,r);
   }
   else
   {
-    C1=n_InpNeg(C1,r);
+    C1=n_InpNeg(C1,r->cf);
     M2=p_Mult_nn(M2,C1,r);
     M2=p_Add_q(M1,M2,r);
     p_SetCoeff(m2,C1,r);
@@ -1753,20 +1753,20 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
   /* GCD stuff */
   number C = n_SubringGcd(C1, C2, r->cf);           // C = gcd(C1, C2)
 
-  if (!n_IsOne(C, r))                              // if C != 1
+  if (!n_IsOne(C, r->cf))                              // if C != 1
   {
-    C1=n_Div(C1, C, r);n_Normalize(C1,r);            // C1 = C1 / C
-    C2=n_Div(C2, C, r);n_Normalize(C2,r);            // C2 = C2 / C
+    C1=n_Div(C1, C, r->cf);n_Normalize(C1,r->cf);            // C1 = C1 / C
+    C2=n_Div(C2, C, r->cf);n_Normalize(C2,r->cf);            // C2 = C2 / C
   }
   else
   {
-    C1=n_Copy(C1,r);
-    C2=n_Copy(C2,r);
+    C1=n_Copy(C1,r->cf);
+    C2=n_Copy(C2,r->cf);
   }
 
-  n_Delete(&C,r); // destroy the number C
+  n_Delete(&C,r->cf); // destroy the number C
 
-  C1=n_InpNeg(C1,r);
+  C1=n_InpNeg(C1,r->cf);
 
 //   number MinusOne=n_Init(-1,r);
 //   if (n_Equal(C1,MinusOne,r))                   // lc(M1) / gcd( lc(M1), lc(M2)) == -1 ????
@@ -1914,8 +1914,8 @@ void gnc_ReduceSpolyTail(poly p1, poly q, poly q2, poly spNoether, const ring r)
   number C=p_GetCoeff(M,r);
   M=p_Add_q(M,nc_mm_Mult_p(m,p_LmDeleteAndNext(p_Copy(p1,r),r),r),r); // _pp?
   q=p_Mult_nn(q,C,r);
-  number MinusOne=n_Init(-1,r);
-  if (!n_Equal(cQ,MinusOne,r))
+  number MinusOne=n_Init(-1,r->cf);
+  if (!n_Equal(cQ,MinusOne,r->cf))
   {
     cQ=nInpNeg(cQ);
     M=p_Mult_nn(M,cQ,r);
@@ -1924,9 +1924,9 @@ void gnc_ReduceSpolyTail(poly p1, poly q, poly q2, poly spNoether, const ring r)
   pNext(q2)=Q;
 
   p_Delete(&m,r);
-  n_Delete(&C,r);
-  n_Delete(&cQ,r);
-  n_Delete(&MinusOne,r);
+  n_Delete(&C,r->cf);
+  n_Delete(&cQ,r->cf);
+  n_Delete(&MinusOne,r->cf);
   /*  return(q); */
 }
 #endif
@@ -1967,7 +1967,7 @@ poly nc_CreateShortSpoly(poly p1, poly p2, const ring r)
     m = p_Lcm(p1, p2, si_max(lCompP1, lCompP2), r);
   }
 
-//  n_Delete(&p_GetCoeff(m, r), r);
+//  n_Delete(&p_GetCoeff(m, r), r->cf);
 //  pSetCoeff0(m, NULL);
 
 #ifdef PDEBUG
@@ -1982,7 +1982,7 @@ void gnc_kBucketPolyRedOld(kBucket_pt b, poly p, number *c)
   const ring r = b->bucket_ring;
   // b will not be multiplied by any constant in this impl.
   // ==> *c=1
-  if (c!=NULL) *c=n_Init(1, r);
+  if (c!=NULL) *c=n_Init(1, r->cf);
   poly m=p_One(r);
   p_ExpVectorDiff(m,kBucketGetLm(b),p, r);
   //pSetm(m);
@@ -1992,15 +1992,15 @@ void gnc_kBucketPolyRedOld(kBucket_pt b, poly p, number *c)
   poly pp= nc_mm_Mult_pp(m,p, r);
   assume(pp!=NULL);
   p_Delete(&m, r);
-  number n=p_GetCoeff(pp, r);
+  number n=pGetCoeff(pp);
   number nn;
-  if (!n_IsMOne(n, r))
+  if (!n_IsMOne(n, r->cf))
   {
-    nn=n_InpNeg(n_Invers(n, r), r);
-    n= n_Mult(nn,p_GetCoeff(kBucketGetLm(b), r), r);
-    n_Delete(&nn, r);
+    nn=n_InpNeg(n_Invers(n, r->cf), r->cf);
+    n= n_Mult(nn,pGetCoeff(kBucketGetLm(b)), r->cf);
+    n_Delete(&nn, r->cf);
     pp=p_Mult_nn(pp,n,r);
-    n_Delete(&n, r);
+    n_Delete(&n, r->cf);
   }
   else
   {
@@ -2030,7 +2030,7 @@ void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c)
 
   // b will not be multiplied by any constant in this impl.
   // ==> *c=1
-  if (c!=NULL) *c=n_Init(1, r);
+  if (c!=NULL) *c=n_Init(1, r->cf);
   poly m = p_One(r);
   const poly pLmB = kBucketGetLm(b); // no new copy!
 
@@ -2058,16 +2058,16 @@ void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c)
   p_Delete(&m, r);
 
   assume( pp != NULL );
-  const number n = p_GetCoeff(pp, r); // bug!
+  const number n = pGetCoeff(pp); // bug!
 
-  if (!n_IsMOne(n, r) ) // does this improve performance??!? also see below... // TODO: check later on.
+  if (!n_IsMOne(n, r->cf) ) // does this improve performance??!? also see below... // TODO: check later on.
   // if n == -1 => nn = 1 and -1/n
   {
-    number nn=n_InpNeg(n_Invers(n, r), r);
-    number t = n_Mult(nn,p_GetCoeff(pLmB, r), r);
-    n_Delete(&nn, r);
+    number nn=n_InpNeg(n_Invers(n, r->cf), r->cf);
+    number t = n_Mult(nn,pGetCoeff(pLmB), r->cf);
+    n_Delete(&nn, r->cf);
     pp = p_Mult_nn(pp,t,r);
-    n_Delete(&t, r);
+    n_Delete(&t, r->cf);
   }
   else
   {
@@ -2115,12 +2115,12 @@ void gnc_kBucketPolyRed_ZOld(kBucket_pt b, poly p, number *c)
     ctmp = kBucketPolyRed(b,pp,pLength(pp),NULL);
     //cc=*c;
     //*c=nMult(*c,c2);
-    n_Delete(&c2, r);
+    n_Delete(&c2, r->cf);
     //nDelete(&cc);
     p_Delete(&pp, r);
   }
   if (c!=NULL) *c=ctmp;
-  else n_Delete(&ctmp, r);
+  else n_Delete(&ctmp, r->cf);
 }
 
 void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c)
@@ -2149,12 +2149,12 @@ void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c)
     ctmp = kBucketPolyRed(b,pp,pLength(pp),NULL);
     //cc=*c;
     //*c=nMult(*c,c2);
-    n_Delete(&c2, r);
+    n_Delete(&c2, r->cf);
     //nDelete(&cc);
     p_Delete(&pp, r);
   }
   if (c!=NULL) *c=ctmp;
-  else n_Delete(&ctmp, r);
+  else n_Delete(&ctmp, r->cf);
 }
 
 
@@ -2163,7 +2163,7 @@ inline void nc_PolyPolyRedOld(poly &b, poly p, number *c, const ring r)
 {
   // b will not by multiplied by any constant in this impl.
   // ==> *c=1
-  if (c!=NULL) *c=n_Init(1, r);
+  if (c!=NULL) *c=n_Init(1, r->cf);
   poly m=p_One(r);
   p_ExpVectorDiff(m,p_Head(b, r),p, r);
   //pSetm(m);
@@ -2174,15 +2174,15 @@ inline void nc_PolyPolyRedOld(poly &b, poly p, number *c, const ring r)
   assume(pp!=NULL);
 
   p_Delete(&m, r);
-  number n=p_GetCoeff(pp, r);
+  number n=pGetCoeff(pp);
   number nn;
-  if (!n_IsMOne(n, r))
+  if (!n_IsMOne(n, r->cf))
   {
-    nn=n_InpNeg(n_Invers(n, r), r);
-    n =n_Mult(nn,p_GetCoeff(b, r), r);
-    n_Delete(&nn, r);
+    nn=n_InpNeg(n_Invers(n, r->cf), r->cf);
+    n =n_Mult(nn,pGetCoeff(b), r->cf);
+    n_Delete(&nn, r->cf);
     pp=p_Mult_nn(pp,n,r);
-    n_Delete(&n, r);
+    n_Delete(&n, r->cf);
   }
   else
   {
@@ -2210,7 +2210,7 @@ inline void nc_PolyPolyRedNew(poly &b, poly p, number *c, const ring r)
 
   // b will not by multiplied by any constant in this impl.
   // ==> *c=1
-  if (c!=NULL) *c=n_Init(1, r);
+  if (c!=NULL) *c=n_Init(1, r->cf);
 
   poly pp = NULL;
 
@@ -2270,17 +2270,17 @@ inline void nc_PolyPolyRedNew(poly &b, poly p, number *c, const ring r)
 
   assume(pp != NULL);
 
-  const number n = p_GetCoeff(pp, r); // no new copy
+  const number n = pGetCoeff(pp); // no new copy
 
   number nn;
 
-  if (!n_IsMOne(n, r)) // TODO: as above.
+  if (!n_IsMOne(n, r->cf)) // TODO: as above.
   {
-    nn=n_InpNeg(n_Invers(n, r), r);
-    number t = n_Mult(nn, p_GetCoeff(b, r), r);
-    n_Delete(&nn, r);
+    nn=n_InpNeg(n_Invers(n, r->cf), r->cf);
+    number t = n_Mult(nn, pGetCoeff(b), r->cf);
+    n_Delete(&nn, r->cf);
     pp=p_Mult_nn(pp, t, r);
-    n_Delete(&t, r);
+    n_Delete(&t, r->cf);
   }
   else
   {
@@ -2331,11 +2331,11 @@ poly nc_p_Bracket_qq(poly p, const poly q, const ring r)
       pres=nc_mm_Bracket_nn(p,Q, r); /* since no coeffs are taken into account there */
       if (pres!=NULL)
       {
-        coef = n_Mult(p_GetCoeff(p, r),p_GetCoeff(Q, r), r);
+        coef = n_Mult(pGetCoeff(p),pGetCoeff(Q), r->cf);
         pres = p_Mult_nn(pres,coef,r);
 
         sum += pres;
-        n_Delete(&coef, r);
+        n_Delete(&coef, r->cf);
       }
       pIter(Q);
     }
@@ -2377,19 +2377,19 @@ poly nc_mm_Bracket_nn(poly m1, poly m2, const ring r)
           bres=NULL;
           /* compute [ x_j^M1[j],x_i^M2[i] ] */
           if (i<j) {nMax=j;  nMin=i;} else {nMax=i;  nMin=j;}
-          if ( (i==j) || ((MATELEM(r->GetNC()->COM,nMin,nMax)!=NULL) && n_IsOne(p_GetCoeff(MATELEM(r->GetNC()->C,nMin,nMax), r), r) )) /* not (the same exp. or commuting exps)*/
+          if ( (i==j) || ((MATELEM(r->GetNC()->COM,nMin,nMax)!=NULL) && n_IsOne(pGetCoeff(MATELEM(r->GetNC()->C,nMin,nMax)), r->cf) )) /* not (the same exp. or commuting exps)*/
           { bres=NULL; }
           else
           {
             if (i<j) { bres=gnc_uu_Mult_ww(j,M1[j],i,M2[i], r); }
             else bres=gnc_uu_Mult_ww(i,M2[i],j,M1[j], r);
-            if (n_IsOne(p_GetCoeff(bres, r), r))
+            if (n_IsOne(pGetCoeff(bres), r->cf))
             {
               bres=p_LmDeleteAndNext(bres, r);
             }
             else
             {
-              nTmp=n_Sub(p_GetCoeff(bres, r),n_Init(1, r), r);
+              nTmp=n_Sub(pGetCoeff(bres),n_Init(1, r->cf), r->cf);
               p_SetCoeff(bres,nTmp, r); /* only lc ! */
             }
 #ifdef PDEBUG
@@ -2510,11 +2510,11 @@ matrix nc_PrintMat(int a, int b, ring r, int metric)
             totdeg=totdeg+p_Deg(p,r);
             pIter(p);
           }
-          number ntd = n_Init(totdeg, r);
-          number nln = n_Init(length, r);
-          number nres= n_Div(ntd,nln, r);
-          n_Delete(&ntd, r);
-          n_Delete(&nln, r);
+          number ntd = n_Init(totdeg, r->cf);
+          number nln = n_Init(length, r->cf);
+          number nres= n_Div(ntd,nln, r->cf);
+          n_Delete(&ntd, r->cf);
+          n_Delete(&nln, r->cf);
           MATELEM(res,s,t)=p_NSet(nres,r);
         }
       }
@@ -2883,8 +2883,8 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
     }
     assume(p_IsConstant(CN,curr));
 
-    nN = p_GetCoeff(CN, curr);
-    if (n_IsZero(nN, curr))
+    nN = pGetCoeff(CN);
+    if (n_IsZero(nN, curr->cf))
     {
       WerrorS("Incorrect input : zero coefficients are not allowed");
 
@@ -2893,7 +2893,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
       return TRUE;
     }
 
-    if (n_IsOne(nN, curr))
+    if (n_IsOne(nN, curr->cf))
       nctype = nc_lie;
     else
       nctype = nc_general;
@@ -2967,7 +2967,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
 
     IsSkewConstant = tmpIsSkewConstant;
 
-    if ( tmpIsSkewConstant && n_IsOne(pN, curr) )
+    if ( tmpIsSkewConstant && n_IsOne(pN, curr->cf) )
       nctype = nc_lie;
     else
       nctype = nc_general;
@@ -3153,7 +3153,7 @@ BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient)
       /* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
       p = p_One(r);
       if (MATELEM(r->GetNC()->C,i,j)!=NULL)
-        p_SetCoeff(p,n_Copy(pGetCoeff(MATELEM(r->GetNC()->C,i,j)),r),r);
+        p_SetCoeff(p,n_Copy(pGetCoeff(MATELEM(r->GetNC()->C,i,j)),r->cf),r);
       p_SetExp(p,i,1,r);
       p_SetExp(p,j,1,r);
       p_Setm(p,r);

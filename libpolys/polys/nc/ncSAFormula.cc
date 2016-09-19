@@ -116,7 +116,7 @@ static inline BOOLEAN AreCommutingVariables(const ring r, int i, int j/*, number
   {
     const number q = p_GetCoeff(GetC(r, i, j), r);
 
-    if( !n_IsOne(q, r) )
+    if( !n_IsOne(q, r->cf) )
       return FALSE;
   }
 
@@ -145,7 +145,7 @@ static inline Enum_ncSAType AnalyzePairType(const ring r, int i, int j)
 
 
   const poly c = GetC(r, i, j);
-  const number q = p_GetCoeff(c, r);
+  const number q = pGetCoeff(c);
   const poly d = GetD(r, i, j);
 
 #if 0 && OUTPUT
@@ -158,16 +158,16 @@ static inline Enum_ncSAType AnalyzePairType(const ring r, int i, int j)
   if( d == NULL)
   {
 
-    if( n_IsOne(q, r) ) // commutative
+    if( n_IsOne(q, r->cf) ) // commutative
       return _ncSA_1xy0x0y0;
 
-    if( n_IsMOne(q, r) ) // anti-commutative
+    if( n_IsMOne(q, r->cf) ) // anti-commutative
       return _ncSA_Mxy0x0y0;
 
     return _ncSA_Qxy0x0y0; // quasi-commutative
   } else
   {
-    if( n_IsOne(q, r) ) // "Lie" case
+    if( n_IsOne(q, r->cf) ) // "Lie" case
     {
       if( pNext(d) == NULL ) // Our Main Special Case: d is only a term!
       {
@@ -193,9 +193,9 @@ static inline Enum_ncSAType AnalyzePairType(const ring r, int i, int j)
 //            number qi, qj;
             if (AreCommutingVariables(r, k, i/*, &qi*/) && AreCommutingVariables(r, k, j/*, &qj*/) ) // [x, t] = [Dx, t] = 0?
             {
-              const number g = p_GetCoeff(d, r);
+              const number g = pGetCoeff(d);
 
-              if (n_IsOne(g, r))
+              if (n_IsOne(g, r->cf))
                 return _ncSA_1xy0x0yT2; // save k!?, G = LC(d) == qi == qj == 1!!!
             }
           }
@@ -305,7 +305,8 @@ static inline poly ncSA_Qxy0x0y0(const int i, const int j, const int n, const in
   {
     min = n;
     max = m;
-  } else
+  }
+  else
   {
     min = m;
     max = n;
@@ -314,16 +315,16 @@ static inline poly ncSA_Qxy0x0y0(const int i, const int j, const int n, const in
   number qN;
 
   if( max == 1 )
-    qN = n_Copy(m_q, r);
+    qN = n_Copy(m_q, r->cf);
   else
   {
     number t;
-    n_Power(m_q, max, &t, r);
+    n_Power(m_q, max, &t, r->cf);
 
     if( min > 1 )
     {
-      n_Power(t, min, &qN, r);
-      n_Delete(&t, r);
+      n_Power(t, min, &qN, r->cf);
+      n_Delete(&t, r->cf);
     }
     else
       qN = t;
@@ -345,15 +346,15 @@ static inline poly ncSA_1xy0x0yG(const int i, const int j, const int n, const in
 {
 #if OUTPUT
   Print("ncSA_1xy0x0yG(var(%d)^{%d}, var(%d)^{%d}, G, r)!\n", j, m, i, n);
-  number t = n_Copy(m_g, r);
-  PrintS("Parameter G: "); n_Write(t, r);
-  n_Delete(&t, r);
+  number t = n_Copy(m_g, r->cf);
+  PrintS("Parameter G: "); n_Write(t, r->cf);
+  n_Delete(&t, r->cf);
 #endif
 
   int kn = n;
   int km = m;
 
-  number c = n_Init(1, r);
+  number c = n_Init(1, r->cf);
 
   poly p = p_One( r);
 
@@ -372,22 +373,22 @@ static inline poly ncSA_1xy0x0yG(const int i, const int j, const int n, const in
 
   for(; k < min; k++ )
   {
-    number t = n_Init(km + 1, r);
-    n_InpMult(t, m_g, r); // t = ((m - k) + 1) * gamma
-    n_InpMult(c, t, r);   // c = c'* ((m - k) + 1) * gamma
-    n_Delete(&t, r);
+    number t = n_Init(km + 1, r->cf);
+    n_InpMult(t, m_g, r->cf); // t = ((m - k) + 1) * gamma
+    n_InpMult(c, t, r->cf);   // c = c'* ((m - k) + 1) * gamma
+    n_Delete(&t, r->cf);
 
-    t = n_Init(kn + 1, r);
-    n_InpMult(c, t, r);   // c = (c'* ((m - k) + 1) * gamma) * ((n - k) + 1)
-    n_Delete(&t, r);
+    t = n_Init(kn + 1, r->cf);
+    n_InpMult(c, t, r->cf);   // c = (c'* ((m - k) + 1) * gamma) * ((n - k) + 1)
+    n_Delete(&t, r->cf);
 
-    t = n_Init(k, r);
-    c = n_Div(c, t, r);
-    n_Delete(&t, r);
+    t = n_Init(k, r->cf);
+    c = n_Div(c, t, r->cf);
+    n_Delete(&t, r->cf);
 
-//    n_Normalize(c, r);
+//    n_Normalize(c, r->cf);
 
-    t = n_Copy(c, r); // not the last!
+    t = n_Copy(c, r->cf); // not the last!
 
     p = p_NSet(t, r);
 
@@ -404,25 +405,25 @@ static inline poly ncSA_1xy0x0yG(const int i, const int j, const int n, const in
   assume((km == 0) || (kn == 0) );
 
   {
-    n_InpMult(c, m_g, r);   // c = c'* gamma
+    n_InpMult(c, m_g, r->cf);   // c = c'* gamma
 
     if( km > 0 )
     {
-      number t = n_Init(km + 1, r);
-      n_InpMult(c, t, r);   // c = (c'* gamma) * (m - k + 1)
-      n_Delete(&t, r);
+      number t = n_Init(km + 1, r->cf);
+      n_InpMult(c, t, r->cf);   // c = (c'* gamma) * (m - k + 1)
+      n_Delete(&t, r->cf);
     }
 
     if( kn > 0 )
     {
-      number t = n_Init(kn + 1, r);
-      n_InpMult(c, t, r);   // c = (c'* gamma) * (n - k + 1)
-      n_Delete(&t, r);
+      number t = n_Init(kn + 1, r->cf);
+      n_InpMult(c, t, r->cf);   // c = (c'* gamma) * (n - k + 1)
+      n_Delete(&t, r->cf);
     }
 
-    number t = n_Init(k, r); // c = ((c'* gamma) * ((n - k + 1) * (m - k + 1))) / k;
-    c = n_Div(c, t, r);
-    n_Delete(&t, r);
+    number t = n_Init(k, r->cf); // c = ((c'* gamma) * ((n - k + 1) * (m - k + 1))) / k;
+    c = n_Div(c, t, r->cf);
+    n_Delete(&t, r->cf);
   }
 
   p = p_NSet(c, r);
@@ -450,7 +451,7 @@ static inline poly ncSA_1xy0x0yT2(const int i, const int j, const int n, const i
   int km = m;
 
   // k == 0!
-  number c = n_Init(1, r);
+  number c = n_Init(1, r->cf);
 
   poly p = p_One( r );
 
@@ -470,22 +471,22 @@ static inline poly ncSA_1xy0x0yT2(const int i, const int j, const int n, const i
 
   for(; k < min; k++ )
   {
-    number t = n_Init(km + 1, r);
-//    n_InpMult(t, m_g, r); // t = ((m - k) + 1) * gamma
-    n_InpMult(c, t, r);   // c = c'* ((m - k) + 1) * gamma
-    n_Delete(&t, r);
+    number t = n_Init(km + 1, r->cf);
+//    n_InpMult(t, m_g, r->cf); // t = ((m - k) + 1) * gamma
+    n_InpMult(c, t, r->cf);   // c = c'* ((m - k) + 1) * gamma
+    n_Delete(&t, r->cf);
 
-    t = n_Init(kn + 1, r);
-    n_InpMult(c, t, r);   // c = (c'* ((m - k) + 1) * gamma) * ((n - k) + 1)
-    n_Delete(&t, r);
+    t = n_Init(kn + 1, r->cf);
+    n_InpMult(c, t, r->cf);   // c = (c'* ((m - k) + 1) * gamma) * ((n - k) + 1)
+    n_Delete(&t, r->cf);
 
-    t = n_Init(k, r);
-    c = n_Div(c, t, r);
-    n_Delete(&t, r);
+    t = n_Init(k, r->cf);
+    c = n_Div(c, t, r->cf);
+    n_Delete(&t, r->cf);
 
 // //    n_Normalize(c, r);
 
-    t = n_Copy(c, r); // not the last!
+    t = n_Copy(c, r->cf); // not the last!
 
     p = p_NSet(t, r);
 
@@ -508,21 +509,21 @@ static inline poly ncSA_1xy0x0yT2(const int i, const int j, const int n, const i
 
     if( km > 0 )
     {
-      number t = n_Init(km + 1, r);
-      n_InpMult(c, t, r);   // c = (c'* gamma) * (m - k + 1)
-      n_Delete(&t, r);
+      number t = n_Init(km + 1, r->cf);
+      n_InpMult(c, t, r->cf);   // c = (c'* gamma) * (m - k + 1)
+      n_Delete(&t, r->cf);
     }
 
     if( kn > 0 )
     {
-      number t = n_Init(kn + 1, r);
-      n_InpMult(c, t, r);   // c = (c'* gamma) * (n - k + 1)
-      n_Delete(&t, r);
+      number t = n_Init(kn + 1, r->cf);
+      n_InpMult(c, t, r->cf);   // c = (c'* gamma) * (n - k + 1)
+      n_Delete(&t, r->cf);
     }
 
-    number t = n_Init(k, r); // c = ((c'* gamma) * ((n - k + 1) * (m - k + 1))) / k;
-    c = n_Div(c, t, r);
-    n_Delete(&t, r);
+    number t = n_Init(k, r->cf); // c = ((c'* gamma) * ((n - k + 1) * (m - k + 1))) / k;
+    c = n_Div(c, t, r->cf);
+    n_Delete(&t, r->cf);
   }
 
   p = p_NSet(c, r);
@@ -551,7 +552,7 @@ static inline poly ncSA_ShiftAx(int i, int j, int n, int m, const number m_shift
 
   int k = m; // to 0
 
-  number c = n_Init(1, r); // k = m, C_k = 1
+  number c = n_Init(1, r->cf); // k = m, C_k = 1
   poly p = p_One( r);
 
   p_SetExp(p, j, k, r); // Y^{k}
@@ -563,8 +564,8 @@ static inline poly ncSA_ShiftAx(int i, int j, int n, int m, const number m_shift
   poly pResult = p;
   poly pLast = p;
 
-  number nn =  n_Init(n, r); // number(n)!
-  n_InpMult(nn, m_shiftCoef, r); // nn = (alpha*n)
+  number nn =  n_Init(n, r->cf); // number(n)!
+  n_InpMult(nn, m_shiftCoef, r->cf); // nn = (alpha*n)
 
   --k;
 
@@ -572,18 +573,18 @@ static inline poly ncSA_ShiftAx(int i, int j, int n, int m, const number m_shift
 
   for(; k > 0; k-- )
   {
-    number t = n_Init(k + 1, r);  // t = k+1
-    n_InpMult(c, t, r);           // c = c' * (k+1)
-    n_InpMult(c, nn, r);          // c = (c' * (k+1)) * (alpha * n)
+    number t = n_Init(k + 1, r->cf);  // t = k+1
+    n_InpMult(c, t, r->cf);           // c = c' * (k+1)
+    n_InpMult(c, nn, r->cf);          // c = (c' * (k+1)) * (alpha * n)
 
-    n_Delete(&t, r);
-    t = n_Init(mk++, r);
-    c = n_Div(c, t, r);           // c = ((c' * (k+1))  * (alpha * n)) / (m-k);
-    n_Delete(&t, r);
+    n_Delete(&t, r->cf);
+    t = n_Init(mk++, r->cf);
+    c = n_Div(c, t, r->cf);           // c = ((c' * (k+1))  * (alpha * n)) / (m-k);
+    n_Delete(&t, r->cf);
 
-//    n_Normalize(c, r);
+//    n_Normalize(c, r->cf);
 
-    t = n_Copy(c, r); // not the last!
+    t = n_Copy(c, r->cf); // not the last!
 
     p = p_NSet(t, r);
 
@@ -599,14 +600,14 @@ static inline poly ncSA_ShiftAx(int i, int j, int n, int m, const number m_shift
   assume(k == 0);
 
   {
-    n_InpMult(c, nn, r);          // c = (c' * (0+1)) * (alpha * n)
+    n_InpMult(c, nn, r->cf);          // c = (c' * (0+1)) * (alpha * n)
 
-    number t = n_Init(m, r);
-    c = n_Div(c, t, r);           // c = ((c' * (0+1))  * (alpha * n)) / (m-0);
-    n_Delete(&t, r);
+    number t = n_Init(m, r->cf);
+    c = n_Div(c, t, r->cf);           // c = ((c' * (0+1))  * (alpha * n)) / (m-0);
+    n_Delete(&t, r->cf);
   }
 
-  n_Delete(&nn, r);
+  n_Delete(&nn, r->cf);
 
   p = p_NSet(c, r);
 

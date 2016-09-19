@@ -3808,7 +3808,7 @@ static BOOLEAN jjDEFINED(leftv res, leftv v)
 static BOOLEAN jjDENOMINATOR(leftv res, leftv v)
 {
   number n = reinterpret_cast<number>(v->Data());
-  res->data = reinterpret_cast<void*>(n_GetDenom(n, currRing));
+  res->data = reinterpret_cast<void*>(n_GetDenom(n, currRing->cf));
   return FALSE;
 }
 
@@ -3817,7 +3817,7 @@ static BOOLEAN jjDENOMINATOR(leftv res, leftv v)
 static BOOLEAN jjNUMERATOR(leftv res, leftv v)
 {
   number n = reinterpret_cast<number>(v->Data());
-  res->data = reinterpret_cast<void*>(n_GetNumerator(n, currRing));
+  res->data = reinterpret_cast<void*>(n_GetNumerator(n, currRing->cf));
   return FALSE;
 }
 
@@ -4607,7 +4607,7 @@ static BOOLEAN jjPAR1(leftv res, leftv v)
 static BOOLEAN jjPARDEG(leftv res, leftv v)
 {
   number nn=(number)v->Data();
-  res->data = (char *)(long)n_ParDeg(nn, currRing);
+  res->data = (char *)(long)n_ParDeg(nn, currRing->cf);
   return FALSE;
 }
 static BOOLEAN jjPARSTR1(leftv res, leftv v)

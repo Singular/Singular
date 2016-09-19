@@ -1129,7 +1129,7 @@ KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
   {
     if (!pLmShortDivisibleBy(p,p_sev, strat->S[*at], ~ strat->sevS[*at]))
       return;
-    if(!n_DivBy(pGetCoeff(strat->S[*at]), pGetCoeff(p), currRing))
+    if(!n_DivBy(pGetCoeff(strat->S[*at]), pGetCoeff(p), currRing->cf))
       return;
   }
   else

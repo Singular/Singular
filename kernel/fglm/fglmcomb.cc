@@ -113,7 +113,7 @@ fglmReductionStep( poly * pptr, ideal source, int * w )
         p2= pMult( m, p2 );
 
         number temp = nDiv( n1, n2 );
-        n_Normalize( temp, currRing );
+        n_Normalize( temp, currRing->cf );
         nDelete( & n1 );
         n1= temp;
         n1= nInpNeg( n1 );

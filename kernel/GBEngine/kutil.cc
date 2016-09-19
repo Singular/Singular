@@ -4039,7 +4039,7 @@ void chainCritRing (poly p,int, kStrategy strat)
         {
           for (i=strat->Bl; i>=0; i--)
           {
-            if (pDivisibleBy(strat->S[j],strat->B[i].lcm) && n_DivBy(strat->B[i].lcm->coef, strat->S[j]->coef,currRing))
+            if (pDivisibleBy(strat->S[j],strat->B[i].lcm) && n_DivBy(pGetCoeff(strat->B[i].lcm), pGetCoeff(strat->S[j]),currRing->cf))
             {
 #ifdef KDEBUG
               if (TEST_OPT_DEBUG)
@@ -7137,7 +7137,7 @@ BOOLEAN syzCriterion(poly sig, unsigned long not_sevSig, kStrategy strat)
 #endif
     if (p_LmShortDivisibleBy(strat->syz[k], strat->sevSyz[k], sig, not_sevSig, currRing)
     && (!rField_is_Ring(currRing) ||
-    (n_DivBy(pGetCoeff(sig), pGetCoeff(strat->syz[k]),currRing) && pLtCmp(sig,strat->syz[k]) == 1)))
+    (n_DivBy(pGetCoeff(sig), pGetCoeff(strat->syz[k]),currRing->cf) && pLtCmp(sig,strat->syz[k]) == 1)))
     {
 //#if 1
 #ifdef DEBUGF5
@@ -7194,7 +7194,7 @@ BOOLEAN syzCriterionInc(poly sig, unsigned long not_sevSig, kStrategy strat)
 #endif
       if (p_LmShortDivisibleBy(strat->syz[k], strat->sevSyz[k], sig, not_sevSig, currRing)
       && (!rField_is_Ring(currRing) ||
-      (n_DivBy(pGetCoeff(sig), pGetCoeff(strat->syz[k]),currRing) && pLtCmp(sig,strat->syz[k]) == 1)))
+      (n_DivBy(pGetCoeff(sig), pGetCoeff(strat->syz[k]),currRing->cf) && pLtCmp(sig,strat->syz[k]) == 1)))
       {
         #ifdef ADIDEBUG
         printf("\nsyzCrit:\n");pWrite(strat->syz[k]);pWrite(sig);
@@ -7410,14 +7410,14 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
         if (j > pos) return NULL;
   #if defined(PDEBUG) || defined(PDIV_DEBUG)
         if (strat->S[j]!= NULL && p_LmShortDivisibleBy(strat->S[j], sev[j], p, not_sev, r) &&
-            (ecart== LONG_MAX || ecart>= strat->ecartS[j]) && n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), r))
+            (ecart== LONG_MAX || ecart>= strat->ecartS[j]) && n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), r->cf))
         {
           break;
         }
   #else
         if (!(sev[j] & not_sev) &&
             (ecart== LONG_MAX || ecart>= strat->ecartS[j]) &&
-            p_LmDivisibleBy(strat->S[j], p, r) && n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), r))
+            p_LmDivisibleBy(strat->S[j], p, r) && n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), r->cf))
         {
           break;
         }
@@ -7482,7 +7482,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
         t = strat->S_2_T(j);
         assume(t != NULL && t->t_p != NULL && t->tailRing == r);
         if (p_LmShortDivisibleBy(t->t_p, sev[j], p, not_sev, r) &&
-            (ecart== LONG_MAX || ecart>= strat->ecartS[j]) && n_DivBy(pGetCoeff(p), pGetCoeff(t->t_p), r))
+            (ecart== LONG_MAX || ecart>= strat->ecartS[j]) && n_DivBy(pGetCoeff(p), pGetCoeff(t->t_p), r->cf))
         {
           return t;
         }
@@ -7491,7 +7491,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
         {
           t = strat->S_2_T(j);
           assume(t != NULL && t->t_p != NULL && t->tailRing == r && t->p == strat->S[j]);
-          if (p_LmDivisibleBy(t->t_p, p, r) && n_DivBy(pGetCoeff(p), pGetCoeff(t->t_p), r))
+          if (p_LmDivisibleBy(t->t_p, p, r) && n_DivBy(pGetCoeff(p), pGetCoeff(t->t_p), r->cf))
           {
             return t;
           }
@@ -9614,7 +9614,7 @@ void enterSyz(LObject &p, kStrategy strat, int atT)
                               strat->L[cc].sig, ~strat->L[cc].sevSig, currRing)
                               #ifdef HAVE_RINGS
                               &&((!rField_is_Ring(currRing))
-                              || (n_DivBy(pGetCoeff(strat->L[cc].sig),pGetCoeff(strat->syz[atT]),currRing) && (pLtCmp(strat->L[cc].sig,strat->syz[atT])==1)))
+                              || (n_DivBy(pGetCoeff(strat->L[cc].sig),pGetCoeff(strat->syz[atT]),currRing->cf) && (pLtCmp(strat->L[cc].sig,strat->syz[atT])==1)))
                               #endif
                               )
     {
@@ -10352,7 +10352,7 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
             if ((Q->m[q]!=NULL)
             &&(pLmDivisibleBy(Q->m[q],r->m[l])))
             {
-              if(n_DivBy(r->m[l]->coef, Q->m[q]->coef, currRing))
+              if(n_DivBy(r->m[l]->coef, Q->m[q]->coef, currRing->cf))
               {
                 if (TEST_OPT_REDSB)
                 {
@@ -10415,7 +10415,7 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
         {
           for(q=IDELEMS(Q)-1; q>=0;q--)
           {
-            if(n_DivBy(r->m[l]->coef, Q->m[q]->coef, currRing))
+            if(n_DivBy(r->m[l]->coef, Q->m[q]->coef, currRing->cf))
             {
               if ((Q->m[q]!=NULL)&&(pLmEqual(Q->m[q],r->m[l])) && pDivisibleBy(Q->m[q],r->m[l]))
               {
@@ -10452,12 +10452,12 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
               if ((l!=q)
               && (r->m[q]!=NULL)
               &&(pLmDivisibleBy(r->m[l],r->m[q]))
-              &&(n_DivBy(r->m[q]->coef, r->m[l]->coef, currRing))
+              &&(n_DivBy(r->m[q]->coef, r->m[l]->coef, currRing->cf))
               )
               {
                 //If they are equal then take the one with the smallest length
                 if(pLmDivisibleBy(r->m[q],r->m[l])
-                && n_DivBy(r->m[q]->coef, r->m[l]->coef, currRing)
+                && n_DivBy(r->m[q]->coef, r->m[l]->coef, currRing->cf)
                 && (pLength(r->m[q]) < pLength(r->m[l]) ||
                 (pLength(r->m[q]) == pLength(r->m[l]) && nGreaterZero(r->m[q]->coef))))
                 {

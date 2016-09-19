@@ -44,7 +44,7 @@ class CMultiplier
     inline poly LM(const poly pTerm, const ring r, int i = 1) const
     {
       poly pMonom = p_LmInit(pTerm, r);
-      pSetCoeff0(pMonom, n_Init(i, r));
+      pSetCoeff0(pMonom, n_Init(i, r->cf));
       return pMonom;
     }
 

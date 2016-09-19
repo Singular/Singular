@@ -165,7 +165,7 @@ static FORCE_INLINE poly p_VectorProductLT( poly s,  const ideal& L, const ideal
     const poly nxt = pNext(s);
     pNext(s) = NULL;
 
-    if( !n_IsZero( p_GetCoeff(s, R), R) )
+    if( !n_IsZero( pGetCoeff(s), R->cf) )
     {
       const int i = p_GetComp(s, R) - 1;
       assume( i >= 0 ); assume( i < IDELEMS(L) );
@@ -479,7 +479,7 @@ poly leadmonom(const poly p, const ring r, const bool bSetZeroComp)
     p_LmTest(p, r);
 
     poly m = p_LmInit(p, r);
-    p_SetCoeff0(m, n_Copy(p_GetCoeff(p, r), r), r);
+    p_SetCoeff0(m, n_Copy(pGetCoeff(p), r->cf), r);
 
     if( bSetZeroComp )
       p_SetComp(m, 0, r);
@@ -646,7 +646,7 @@ int CReducerFinder::PreProcessTerm(const poly t, CReducerFinder& syzChecker) con
       if( bSyzCheck && coprime )
       {
         poly ss = p_LmInit(t, r);
-        p_SetCoeff0(ss, n_Init(1, r), r); // for delete & printout only!...
+        p_SetCoeff0(ss, n_Init(1, r->cf), r); // for delete & printout only!...
         p_SetComp(ss, (*vit)->label() + 1, r); // coeff?
         p_Setm(ss, r);
 
@@ -1639,14 +1639,14 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
 
        p_Test(multiplier, r);
 
-       if( !n_Equal( pGetCoeff(multiplier), pGetCoeff(itr->first), r) ) // normalize coeffs!?
+       if( !n_Equal( pGetCoeff(multiplier), pGetCoeff(itr->first), r->cf) ) // normalize coeffs!?
        {
-         number n = n_Div( pGetCoeff(multiplier), pGetCoeff(itr->first), r); // new number
+         number n = n_Div( pGetCoeff(multiplier), pGetCoeff(itr->first), r->cf); // new number
 
          if( UNLIKELY( OPT__TREEOUTPUT ) )
          {
            StringSetS("");
-           n_Write(n, r);
+           n_Write(n, r->cf);
            char* s = StringEndS();
            Print("\"recale\": \"%s\", ", s);
            omFree(s);
@@ -1655,7 +1655,7 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
          if( UNLIKELY( OPT__PROT ) ) ++ m_stat[7]; // PrintS("l*"); // lookup & rescale
 
          p = p_Mult_nn(p, n, r); // !
-         n_Delete(&n, r);
+         n_Delete(&n, r->cf);
        } else
          if( UNLIKELY( OPT__PROT ) ) ++ m_stat[6]; // PrintS("l"); // lookup no rescale
 
@@ -2215,7 +2215,7 @@ bool CLeadingTerm::DivisibilityCheck(const poly product, const unsigned long not
   // may have no coeff yet
 //  assume ( !n_IsZero( p_GetCoeff(product, r), r ) );
 
-  assume ( !n_IsZero( p_GetCoeff(lt(), r), r ) );
+  assume ( !n_IsZero( pGetCoeff(lt()), r->cf ) );
   assume( sev() == p_GetShortExpVector(lt(), r) );
 
   assume( product != NULL );
@@ -2237,13 +2237,13 @@ bool CLeadingTerm::DivisibilityCheck(const poly product, const unsigned long not
 /// and a module term 't'
 bool CLeadingTerm::DivisibilityCheck(const poly m, const poly t, const unsigned long not_sev, const ring r) const
 {
-  assume ( !n_IsZero( p_GetCoeff(lt(), r), r ) );
+  assume ( !n_IsZero( pGetCoeff(lt()), r->cf ) );
   assume( sev() == p_GetShortExpVector(lt(), r) );
 
   assume( m != NULL );
   assume( t != NULL );
-  assume ( !n_IsZero( p_GetCoeff(m, r), r ) );
-  assume ( !n_IsZero( p_GetCoeff(t, r), r ) );
+  assume ( !n_IsZero( pGetCoeff(m), r->cf ) );
+  assume ( !n_IsZero( pGetCoeff(t), r->cf ) );
 
 // assume( p_GetComp(m, r) == 0 );
   assume( (p_GetComp(lt(), r) == p_GetComp(t, r))  || (p_GetComp(lt(), r) == 0)  );
@@ -2520,8 +2520,8 @@ class CDivisorEnumerator2: public SchreyerSyzygyComputationFlags
 
       assume( m != NULL );
       assume( t != NULL );
-      assume ( !n_IsZero( p_GetCoeff(m, m_rBaseRing), m_rBaseRing ) );
-      assume ( !n_IsZero( p_GetCoeff(t, m_rBaseRing), m_rBaseRing ) );
+      assume ( !n_IsZero( pGetCoeff(m), m_rBaseRing->cf ) );
+      assume ( !n_IsZero( pGetCoeff(t), m_rBaseRing->cf ) );
 
       p_Test(m, m_rBaseRing);
 
@@ -2704,17 +2704,17 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
       continue;
     }
 
-    number n = n_Mult( p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
+    number n = n_Mult( pGetCoeff(multiplier), pGetCoeff(t), r->cf);
 
 #if NODIVISION
     // we assume all leading coeffs to be 1!
-    assume( n_IsOne(p_GetCoeff(p, r), r->cf) );
+    assume( n_IsOne(pGetCoeff(p), r->cf) );
 #else
-    if( !n_IsOne( p_GetCoeff(p, r), r ) )
-      n = n_Div(n, p_GetCoeff(p, r), r);
+    if( !n_IsOne( pGetCoeff(p), r ) )
+      n = n_Div(n, pGetCoeff(p), r->cf);
 #endif
 
-    p_SetCoeff0(q, n_InpNeg(n, r), r);
+    p_SetCoeff0(q, n_InpNeg(n, r->cf), r);
 //    n_Delete(&n, r);
 
 #ifndef SING_NDEBUG
@@ -2920,9 +2920,9 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
 
 #if NODIVISION
     assume( n_IsOne(p_GetCoeff(p, r), r->cf) );
-    p_SetCoeff0(q, n_InpNeg( n_Copy(p_GetCoeff(product, r), r), r), r);
+    p_SetCoeff0(q, n_InpNeg( n_Copy(pGetCoeff(product), r->cf), r->cf), r);
 #else
-    p_SetCoeff0(q, n_InpNeg( n_Div( p_GetCoeff(product, r), p_GetCoeff(p, r), r), r), r);
+    p_SetCoeff0(q, n_InpNeg( n_Div( pGetCoeff(product), p_GetCoeff(p), r->cf), r->cf), r);
 #endif
 
     assume( itr.Current().CheckLT( L ) ); // ???

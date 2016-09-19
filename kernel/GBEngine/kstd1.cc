@@ -442,7 +442,7 @@ int redRiloc (LObject* h,kStrategy strat)
             &&
             p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i], h->GetLmTailRing(), ~h->sev, strat->tailRing)
             &&
-            n_DivBy(h->p->coef,strat->T[i].p->coef,strat->tailRing))
+            n_DivBy(h->p->coef,strat->T[i].p->coef,strat->tailRing->cf))
 #else
           j = kFindDivisibleByInT(strat, h, i);
         if (j < 0) break;
@@ -858,7 +858,7 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
     printf("\nSearching for a reducer...\n");
     #endif
     if (p_LmShortDivisibleBy(strat->T[j].GetLmTailRing(), strat->sevT[j], H.GetLmTailRing(), not_sev, strat->tailRing)
-        && (n_DivBy(H.p->coef, strat->T[j].p->coef,strat->tailRing))
+        && (n_DivBy(H.p->coef, strat->T[j].p->coef,strat->tailRing->cf))
         )
     {
       /*- remember the found T-poly -*/
@@ -884,7 +884,7 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
           || ((strat->T[j].ecart == ei)
         && (strat->T[j].length < li)))
         && pLmShortDivisibleBy(strat->T[j].p,strat->sevT[j], H.p, not_sev)
-        && (n_DivBy(H.p->coef, strat->T[j].p->coef,strat->tailRing))
+        && (n_DivBy(H.p->coef, strat->T[j].p->coef,strat->tailRing->cf))
         )
         {
           /*

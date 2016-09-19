@@ -509,7 +509,7 @@ void tgb_matrix::print()
     for(j=0;j<columns;j++)
     {
       StringSetS("");
-      n_Write(n[i][j],currRing);
+      n_Write(n[i][j],currRing->cf);
       char *s=StringEndS();
       PrintS(s);
       omFree(s);
@@ -710,7 +710,7 @@ void tgb_sparse_matrix::print()
     {
       StringSetS("");
       number n=get(i,j);
-      n_Write(n,currRing);
+      n_Write(n,currRing->cf);
       char *s=StringEndS();
       PrintS(s);
       omFree(s);
@@ -841,7 +841,7 @@ void tgb_sparse_matrix::row_normalize(int row)
       #ifndef SING_NDEBUG
       if (currRing==r) {nTest(m->coef);}
       #endif
-      n_Normalize(m->coef,r);
+      n_Normalize(m->coef,r->cf);
       m=m->next;
     }
   }

@@ -563,7 +563,7 @@ void s_internalDelete(const int t,  void *d, const ring r)
     case NUMBER_CMD:
     {
       number n=(number)d;
-      n_Delete(&n,r);
+      n_Delete(&n,r->cf);
       break;
     }
     case BIGINT_CMD:

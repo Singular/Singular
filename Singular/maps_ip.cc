@@ -280,20 +280,20 @@ poly pSubstPar(poly p, int par, poly image)
     {
       memset(v,0,sizeof(sleftv));
 
-      number d = n_GetDenom(p_GetCoeff(p, currRing), currRing);
+      number d = n_GetDenom(pGetCoeff(p), currRing->cf);
       p_Test((poly)NUM((fraction)d), R);
 
       if ( n_IsOne (d, currRing->cf) )
       {
-        n_Delete(&d, currRing); d = NULL;
+        n_Delete(&d, currRing->cf); d = NULL;
       }
       else if (!p_IsConstant((poly)NUM((fraction)d), R))
       {
         WarnS("ignoring denominators of coefficients...");
-        n_Delete(&d, currRing); d = NULL;
+        n_Delete(&d, currRing->cf); d = NULL;
       }
 
-      number num = n_GetNumerator(p_GetCoeff(p, currRing), currRing);
+      number num = n_GetNumerator(pGetCoeff(p), currRing->cf);
       memset(&tmpW,0,sizeof(sleftv));
       tmpW.rtyp = POLY_CMD;
       p_Test((poly)NUM((fraction)num), R);
@@ -306,14 +306,14 @@ poly pSubstPar(poly p, int par, poly image)
         WerrorS("map failed");
         v->data=NULL;
       }
-      n_Delete(&num, currRing);
+      n_Delete(&num, currRing->cf);
       //TODO check for memory leaks
       poly pp = pHead(p);
       //PrintS("map:");pWrite(pp);
       if( d != NULL )
       {
         pSetCoeff(pp, n_Invers(d, currRing->cf));
-        n_Delete(&d, currRing); // d = NULL;
+        n_Delete(&d, currRing->cf); // d = NULL;
       }
       else
         pSetCoeff(pp, nInit(1));
@@ -331,7 +331,7 @@ poly pSubstPar(poly p, int par, poly image)
     {
       memset(v,0,sizeof(sleftv));
 
-      number num = n_GetNumerator(p_GetCoeff(p, currRing), currRing);
+      number num = n_GetNumerator(pGetCoeff(p), currRing->cf);
       memset(&tmpW,0,sizeof(sleftv));
       tmpW.rtyp = POLY_CMD;
       p_Test((poly)num, R);
@@ -345,11 +345,11 @@ poly pSubstPar(poly p, int par, poly image)
         WerrorS("map failed");
         v->data=NULL;
       }
-      if (num!=(number)R->qideal->m[0]) n_Delete(&num, currRing);
+      if (num!=(number)R->qideal->m[0]) n_Delete(&num, currRing->cf);
       //TODO check for memory leaks
       poly pp = pHead(p);
       //PrintS("map:");pWrite(pp);
-      pSetCoeff(pp,n_Init(1,currRing));
+      pSetCoeff(pp,n_Init(1,currRing->cf));
       //PrintS("cf->");pWrite((poly)(v->data));
       poly ppp = pMult((poly)(v->data),pp);
       //PrintS("->");pWrite(ppp);
