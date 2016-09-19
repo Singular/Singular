@@ -31,7 +31,6 @@
 #include "monomials/ring.h"
 #include "monomials/p_polys.h"
 
-#include "coeffrings.h"
 #include "simpleideals.h"
 #include "matpol.h"
 #include "prCopy.h"

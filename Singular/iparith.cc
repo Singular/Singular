@@ -26,7 +26,6 @@
 #include <polys/prCopy.h>
 #include <polys/matpol.h>
 #include <polys/monomials/maps.h>
-#include <polys/coeffrings.h>
 #include <polys/sparsmat.h>
 #include <polys/weight.h>
 #include <polys/ext_fields/transext.h>

@@ -51,7 +51,6 @@
 #include "nc/sca.h"
 #endif
 
-#include "coeffrings.h"
 #include "clapsing.h"
 
 #define ADIDEBUG 0

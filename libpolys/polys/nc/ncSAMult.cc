@@ -37,7 +37,6 @@
 
 #include <misc/options.h>
 #include <coeffs/numbers.h>
-#include "coeffrings.h"
 
 
 // #include <kernel/p_Procs.h>

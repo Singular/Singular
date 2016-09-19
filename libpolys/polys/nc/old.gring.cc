@@ -31,7 +31,6 @@
 #include <polys/monomials/ring.h>
 
 #include <coeffs/numbers.h>
-#include <polys/coeffrings.h>
 
 // #include <polys/febase.h>
 #include <misc/options.h>

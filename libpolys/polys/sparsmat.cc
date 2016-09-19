@@ -20,7 +20,6 @@
 #include <misc/intvec.h>
 
 #include <coeffs/numbers.h>
-#include "coeffrings.h"
 
 #include "monomials/ring.h"
 #include "monomials/p_polys.h"

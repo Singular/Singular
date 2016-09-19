@@ -35,7 +35,6 @@
 #include <reporter/reporter.h>
 
 #include <coeffs/numbers.h>
-#include "coeffrings.h"
 
 #include "nc/ncSAFormula.h"
 // for CFormulaPowerMultiplier

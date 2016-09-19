@@ -36,7 +36,6 @@ namespace
 #endif
 
 #include <coeffs/numbers.h>
-#include "coeffrings.h"
 
 #include "nc/ncSACache.h" // for CCacheHash etc classes
 
