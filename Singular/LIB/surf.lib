@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version surf.lib 4.0.3.2 Jun_2016 "; // $Id$
+version="version surf.lib 4.0.3.3 Sep_2016 "; // $Id$
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
@@ -359,7 +359,7 @@ back_material_diffuse_intensity=0.8");
       "*!* Sorry: calling `surfer` failed ['"+surf_call+"']" + newline
       + " (The shell returned the error code " + string(i) + "." + newline
       + "But since we are on Mac OS X, let us try to open SURFER.app instead..." + newline
-      + "Appropriate SURFER.app is available for instance at http://www.mathematik.uni-kl.de/~motsak/files/SURFER.dmg";
+      + "Appropriate SURFER.app is available for instance at ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/SURFER.dmg";
 
       // fallback, will only work if SURFER.app is available (e.g. in /Applications)
       // get SURFER.app e.g. from http://www.mathematik.uni-kl.de/~motsak/files/SURFER.dmg
