@@ -452,25 +452,14 @@ gmp_float numberFieldToFloat( number num, int k, const coeffs src)
       }
       else
       {
-        if ( num->s == 0 )
+        if ( num->s != 3 )
         {
-          nlNormalize( num, src ); // FIXME? TODO? // extern void     nlNormalize(number &x, const coeffs r); // FIXME
-        }
-        if (SR_HDL(num) & SR_INT)
-        {
-          r = gmp_float(SR_TO_INT(num));
+          r= gmp_float(num->z);
+          r/= gmp_float(num->n);
         }
         else
         {
-          if ( num->s != 3 )
-          {
-            r= num->z;
-            r/= (gmp_float)num->n;
-          }
-          else
-          {
-            r= num->z;
-          }
+          r= num->z;
         }
       }
     }
