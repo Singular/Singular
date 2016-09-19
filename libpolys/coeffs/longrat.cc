@@ -467,14 +467,16 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
 #endif
   dest = res->z;
 
+  void* (*allocfunc) (size_t);
+  mp_get_memory_functions (&allocfunc,NULL, NULL);
   if (e<0)
   {
     al = dest->_mp_size = size;
     if (al<2) al = 2;
-    dd = (mp_ptr)omAlloc(sizeof(mp_limb_t)*al);
+    dd = (mp_ptr)allocfunc(sizeof(mp_limb_t)*al);
     for (i=0;i<size;i++) dd[i] = qp[i];
     bl = 1-e;
-    nn = (mp_ptr)omAlloc0(sizeof(mp_limb_t)*bl);
+    nn = (mp_ptr)allocfunc(sizeof(mp_limb_t)*bl);
     nn[bl-1] = 1;
     ndest = res->n;
     ndest->_mp_d = nn;
@@ -485,7 +487,7 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
   {
     al = dest->_mp_size = size+e;
     if (al<2) al = 2;
-    dd = (mp_ptr)omAlloc(sizeof(mp_limb_t)*al);
+    dd = (mp_ptr)allocfunc(sizeof(mp_limb_t)*al);
     for (i=0;i<size;i++) dd[i+e] = qp[i];
     for (i=0;i<e;i++) dd[i] = 0;
     res->s = 3;
