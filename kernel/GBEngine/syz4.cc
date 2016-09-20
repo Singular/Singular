@@ -601,17 +601,6 @@ static void computeLiftings(const resolvente res, const int index,
 #endif   // CACHE
 }
 
-static void sortPolysTails(const resolvente res, const int index)
-{
-    const ring r = currRing;
-    for (int j = res[index]->ncols-1; j >= 0; j--) {
-        if (res[index]->m[j]->next != NULL) {
-            res[index]->m[j]->next->next
-                = p_SortAdd(res[index]->m[j]->next->next, r);
-        }
-    }
-}
-
 static int computeResolution(resolvente &res, const int length,
     const syzHeadFunction *syzHead)
 {
@@ -627,7 +616,6 @@ static int computeResolution(resolvente &res, const int length,
         while (!idIs0(res[index])) {
 #if 1
             computeLiftings(res, index, variables, hash_previous_module);
-            sortPolysTails(res, index);
 #endif   // LIFT
             if (index < max_index) {
                 index++;
@@ -650,12 +638,19 @@ static int computeResolution(resolvente &res, const int length,
     return max_index;
 }
 
-static void sortPolys(const resolvente res, const int length)
+static void insert_induced_LTs(const resolvente res, const int length)
 {
     const ring r = currRing;
-    for (int i = length-1; i > 0; i--) {
+    poly p, q;
+    for (int i = length-2; i > 0; i--) {
         for (int j = res[i]->ncols-1; j >= 0; j--) {
-            res[i]->m[j] = p_SortAdd(res[i]->m[j], r, TRUE);
+            p = res[i]->m[j];
+            q = res[i]->m[j]->next;
+            if (p_LmCmp(p, q, r) == 1) continue;
+            while (q->next != NULL && p_LmCmp(p, q->next, r) == -1) pIter(q);
+            res[i]->m[j] = p->next;
+            p->next = q->next;
+            q->next = p;
         }
     }
 }
@@ -673,7 +668,7 @@ syStrategy syFrank(const ideal arg, int &length, const char *method)
         syzHead = syzHeadExtFrame;
     }
     length = computeResolution(res, length, syzHead);
-    sortPolys(res, length);
+    insert_induced_LTs(res, length);
     result->fullres = res;
     result->length = length;
     return result;
