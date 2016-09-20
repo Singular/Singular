@@ -952,7 +952,7 @@ CanonicalForm firstLC(const CanonicalForm & f)
 }
 
 #ifndef HAVE_NTL
-static void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm & M, CanonicalForm & result, CanonicalForm & s, CanonicalForm & t, bool & fail )
+void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm & M, CanonicalForm & result, CanonicalForm & s, CanonicalForm & t, bool & fail )
 { // F, G are univariate polynomials (i.e. they have exactly one polynomial variable)
   // F and G must have the same level AND level > 0
   // we try to calculate gcd(F,G) = s*F + t*G
