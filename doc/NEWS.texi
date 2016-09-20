@@ -23,6 +23,7 @@
 
 New libraries:
 @itemize
+@item new library: classifyMapGerms.lib: standard basis of the tangent space at the orbit of an algebraic group action (@nref{classifyMapGerms_lib})
 @item new library: ffmodstd.lib:  Groebner bases of ideals in polynomial rings over algebraic function fields(@nref{ffmodstd_lib})
 @item new library: nfmodsyz.lib: syzygy modules of submodules of free modules
       over algebraic number fields(@nref{nfmodsyz_lib})
@@ -30,6 +31,7 @@ New libraries:
 
 Changed libraries:
 @itemize
+@item classify_aeq.lib: new procedures (@nref{classify_aeq_lib})
 @item ncfactor.lib: factorization in some noncommuative algebras (@nref{ncfactor_lib}) with new routine ncfactor (@nref{ncfactor})
 @item primdec.lib: new option "subsystem" (@nref{primdec_lib})
 @end itemize

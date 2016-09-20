@@ -1047,6 +1047,7 @@ Comments should be send to the author of the library directly.
 * brillnoether_lib:: Riemann-Roch spaces of divisors on curves
 * chern_lib:: Symbolic Computations with Chern classes
 * cimonom_lib:: complete intersection for toric ideals
+* classifyMapGerms_lib:: standard basis of the tangent space at the orbit of an algebraic group action
 * deRham_lib:: Computation of deRham cohomology
 * divisors_lib:: Divisors and P-Divisors
 * ffmodstd_lib::  Groebner bases in polynomial rings over algebraic function fields
@@ -1077,6 +1078,10 @@ Comments should be send to the author of the library directly.
 @node cimonom_lib
 @subsection cimonom_lib
 @c lib cimonom.lib
+@c ----------------------------------------------------------
+@node classifyMapGerms_lib
+@subsection classifyMapGerms_lib
+@c lib classifyMapGerms.lib
 @c ----------------------------------------------------------
 @node divisors_lib
 @subsection divisors_lib
