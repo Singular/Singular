@@ -580,23 +580,22 @@ static ideal computeFrame(const ideal G, const syzM_i_Function syzM_i,
 }
 
 static void computeLiftings(const resolvente res, const int index,
-    std::vector<bool> &variables)
+    std::vector<bool> &variables, CReducersHash_test *&hash_previous_module)
 {
     update_variables(variables, res[index-1]);
-    CReducersHash_test m_div;
-    initialize(m_div, res[index-1]);
-    CReducersHash_test m_checker;
-    initialize(m_checker, res[index]);
+    CReducersHash_test *hash_current_module = new CReducersHash_test();
+    initialize(*hash_current_module, res[index]);
     poly p;
     for (int j = res[index]->ncols-1; j >= 0; j--) {
         p = res[index]->m[j];
         pDelete(&res[index]->m[j]->next);
         p->next = NULL;
         res[index]->m[j]->next = TraverseNF_test(p, res[index-1], variables,
-            &m_div, &m_checker);
+            hash_previous_module, hash_current_module);
     }
-    deleteCRH(&m_checker);
-    deleteCRH(&m_div);
+    deleteCRH(hash_previous_module);
+    delete(hash_previous_module);
+    hash_previous_module = hash_current_module;
 #if CACHE
     delete_cache();
 #endif   // CACHE
@@ -623,9 +622,11 @@ static int computeResolution(resolvente &res, const int length,
         res[index] = computeFrame(res[index-1], syzM_i_unsorted, syzHead);
         std::vector<bool> variables;
         variables.resize(currRing->N, true);
+        CReducersHash_test *hash_previous_module = new CReducersHash_test();
+        initialize(*hash_previous_module, res[index-1]);
         while (!idIs0(res[index])) {
 #if 1
-            computeLiftings(res, index, variables);
+            computeLiftings(res, index, variables, hash_previous_module);
             sortPolysTails(res, index);
 #endif   // LIFT
             if (index < max_index) {
@@ -637,6 +638,8 @@ static int computeResolution(resolvente &res, const int length,
                 break;
             }
         }
+        deleteCRH(hash_previous_module);
+        delete(hash_previous_module);
         variables.clear();
     }
     max_index = index+1;
