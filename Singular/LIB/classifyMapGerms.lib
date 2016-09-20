@@ -1,0 +1,1204 @@
+///////////////////////////////////////////////////////////////////////////////
+version="version classifyMapGerms.lib  4.0.3.3 Sep_2016 "; // $Id$
+category="Singularities";
+info="
+LIBRARY:   classifyMapGerms.lib
+AUTHORS:   Gerhard Pfister, pfister@mathematik.uni-kl.de
+           Deeba Afzal,     deebafzal@gmail.com
+           Shamsa Kanwal,   lotus_zone16@yahoo.com
+
+OVERVIEW:
+ A library for computing the standard basis of the tangent space at the orbit
+ of an algebraic group action. The tangent space is usually described as the sum
+ of two modules over different rings. It computes the standard basis using
+ modular methods and parallel modular methods. It also computes the normal form
+ of the germ given by Riegers classification.
+
+REFERENCES:
+[1] Idrees N.; Pfister, G.; Steidel, S.: Parallelization of modular algorithms.
+  J. Symbolic Comput. 46(2011), no. 6, 672-684.
+[2] Gibson,C.G; Hobbs,C.A.: Simple SIngularities of Space Curves.
+  Math.Proc. Comb.Phil.Soc.(1993),113,297.
+[3] Bruce, J.W.,Gaffney, T.J.: Simple singularities of mappings (C, 0) ->(C2,0).
+  J. London Math. Soc. (2) 26 (1982), 465-474.
+[4] Rieger, J. H.: Families of maps from the plane to the plane. J. London Math.
+Soc. (2)36(1987), no. 2. 351-369.
+
+PROCEDURES:
+ coDimMap(I);    computes a bound of the A-determinacy of the map germ defined by I
+ coDim(M,N,I,b); computes the K-vectorspace dimension of A^r/M+N+maxideal(b)*A^r
+ vStd(M,N,I,b);      computes a standard basis of M+N+maxideal(b)*A^r
+ modVStd(M,N,I,b);   computes a standard basis of M+N+maxideal(bound)*A^r (modular)
+ modVStd0(M,N,I,b);  computes a standard basis of M+N+maxideal(bound)*A^r (parallel)
+ classifySimpleMaps(I);  computes the normal form of a germ in Riegers classification
+ classifySimpleMaps1(I); computes the normal form of a germ in Riegers classification
+";
+
+LIB "general.lib";
+LIB "modstd.lib";
+LIB "teachstd.lib";
+LIB "algebra.lib";
+
+//===================================================================================
+proc coDimMap(ideal I, list #)
+"USAGE:   coDimMap(I, #);  I=ideal, #=list
+COMPUTE:  a bound of the A-determinacy of the map germ defined by I.
+RETURN:   a list in which 1st entry gives the bound of the A-determinancy and
+          the second entry gives the codimension of the map germ defined by I.
+NOTE:     if # is empty it computes A^e-codimension(the extended codimension).
+EXAMPLE:  example coDimMap; shows an example"
+{
+   int bound=10;
+   module M=jacob(I);
+   module N=freemodule(ncols(I));
+   if(size(#)==0){return(coDim(M,N,I,bound,0));}
+   M=maxideal(1)*M;
+   N=I*N;
+   list L=coDim(M,N,I,bound,0);
+   L[2]=L[2]-nvars(basering);
+   return(L);
+}
+example
+{
+ "EXAMPLE"; echo=2;
+  ring R=0,(x,y),(c,ds);
+  poly f1=x;
+  poly f2=xy+y5+y7;
+  poly f11=f1+f2*f1;
+  poly f22=f2+f1^2;
+  map phi=basering,x+y,y+y2;
+  f1=phi(f11);
+  f2=phi(f22);
+  ideal I=f1,f2;
+  coDimMap(I);
+  coDimMap(I,1);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc coDim(module M, module N, ideal I,int bound, list #)
+"USAGE:   coDim(module M, module N, ideal I,int bound, list #); M is a submodule
+          in A^r over the basering=:A, N is a submodule in R^r over the subring
+          R of the basering genrated by the entries of I
+COMPUTE:  computes the K-vectorspace dimension of A^r/M+N+maxideal(bound)*A^r
+RETURN:   an integer
+NOTE:     if # is not empty the bound is corrected by computing determinacy
+EXAMPLE:  example coDim; shows an example"
+{
+//---------------------------- initialisation ---------------------------------
+   int r=nrows(M);
+   int k;
+   int oldbound=bound;
+   module M0=M;
+   module N0=N;
+   if(size(#)!=0)
+   {
+      if(#[1]==0)
+      {
+         k=boundK(M,N,I);
+         if(k<0){return(list(-1,-1));}
+      }
+      else
+      {
+         k=#[1];
+      }
+      bound=bound+k;
+   }
+   list S=vStd(M,N,I,bound);
+   M=S[1];
+   module L=S[2];
+   L=simplify(reduce(lead(L),std(lead(M)+maxideal(bound)*freemodule(r))),1);
+   L=simplify(L,6);
+   if(size(#)==0){
+   return(vdim(std(lead(M)+maxideal(bound)*freemodule(r)))-size(L));
+   }
+   if(correctBound(M,L,bound,oldbound))
+   {
+      int co=vdim(std(lead(M)+maxideal(bound)*freemodule(r)))-size(L);
+      return(list(bound,co));
+   }
+   bound++;
+   return(coDim(M0,N0,I,bound,k));
+}
+example
+{
+  "EXAMPLE"; echo=2;
+   ring R=0,(x,y),(c,ds);
+   poly f1=x;
+   poly f2=xy+y5+y7;
+   poly f11=f1+f2*f1;
+   poly f22=f2+f1^2;
+   map phi=basering,x+y,y+y2;
+   f1=phi(f11);
+   f2=phi(f22);
+   ideal I=f1,f2;
+   module M=maxideal(1)*jacob(I);
+   module N=I*freemodule(2);
+   coDim(M,N,I,15);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc vStd(module M, module N, ideal I,int bound)
+"USAGE:    vStd(M, N, I, bound);M is a submodule  in A^r over the basering=:A,
+           N ist a submodule in R^r over the subring R of the basering genrated
+           by the entries of I
+COMPUTE:  a standard basis of M+N+maxideal(bound)*A^r
+RETURN:   a list whose ist entry gives a list where each entry is a  genrator of
+          standard basis and second entry gives a list of generators after the
+          reduced echelon form
+EXAMPLE:  example vStd; shows an example"
+{
+   if(size(M)!=1)
+   {
+      M=jet(std(M+maxideal(bound)*freemodule(nrows(M))),bound);
+   }
+   N=myReduceM(N,M,bound);
+   //N=system("reduce_bound",N,M,bound);  //später aktivieren
+   N=echelon(M,N,bound);
+   module L=computeN(M,N,I,bound-1);
+   L=echelon(M,L,bound);
+   return(list(M,L));
+}
+example
+{
+  "EXAMPLE"; echo=2;
+   ring R=0,(x,y),(c,ds);
+   poly f1=x;
+   poly f2=xy+y5+y7;
+   poly f11=f1+f2*f1;
+   poly f22=f2+f1^2;
+   map phi=basering,x+y,y+y2;
+   f1=phi(f11);
+   f2=phi(f22);
+   ideal I=f1,f2;
+   module M=maxideal(1)*jacob(I);
+   module N=I*freemodule(2);
+   vStd(M,N,I,15);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc vStd_size1(module M, module N, ideal I, int bound)
+"USAGE:    vStd(M, N, I, bound);M is a submodule generated by one element in A^r over the
+           basering=:A, N ist a submodule in R^r over the subring R of the basering
+           genrated by the entries of I
+COMPUTE:  a standard basis of M+N+maxideal(bound)*A^r
+RETURN:   a list whose ist entry gives a list where each entry is a  genrator of
+          standard basis and second entry gives a list of generators after the
+          reduced echelon form
+EXAMPLE:  example vStd_size1; shows an example"
+{
+   if(size(M)!=1)
+   {
+      M=jet(std(M+maxideal(bound)*freemodule(nrows(M))),bound);
+   }
+   N=myReduceM(N,M,bound);
+   //N=system("reduce_bound",N,M,bound);
+   N=echelon(M,N,bound);
+   module L=computeN(M,N,I,bound-1);
+   L=echelon(M,L,bound);
+   return(L);
+}
+example
+{
+  "EXAMPLE"; echo=2;
+   ring R=0,(x,y),(c,ds);
+   poly f1=x;
+   poly f2=xy+y5+y7;
+   poly f11=f1+f2*f1;
+   poly f22=f2+f1^2;
+   map phi=basering,x+y,y+y2;
+   f1=phi(f11);
+   f2=phi(f22);
+   ideal I=f1,f2;
+   module M=maxideal(1)*jacob(I);
+   module N=I*freemodule(2);
+   vStd_size1(M,N,I,15);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc boundK(module M,module N, ideal I)
+"USAGE:    boundK(M, N, I);
+COMPUTE:  Let T=freemodule(nrows(M)), computes k such that
+          maxideal(k)*T<=M+I*T+maxideal(k+1)*T
+RETURN:   an integer
+REMARk:   needed to compute the determinacy
+"
+{
+   int i;
+   module T=freemodule(nrows(M));
+   module M0=M+I*T;
+   while(1)
+   {
+      i++;
+      T=maxideal(1)*T;
+
+      M=std(jet(M0,i)+maxideal(1)*T);
+      if(size(reduce(T,M,1))==0){return(i);}
+      if(i>100){M0=std(M0);if(vdim(M0)==-1){break;}}
+   }
+   return(-1);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc correctBound(module M,module L,int bound,int oldbound)
+"USAGE:     correctBound(M, L, bound, oldbound)
+COMPUTE:    let T=freemodule(nrows(M)),test if
+            maxideal(old bound)*T<=M+L+maxideal(bound)*T
+RETURN:     0 or 1
+REMARK:     needed to compute the A-determinacy and codimension
+"
+{
+   int i;
+   L=jet(L+std(lead(M)),bound-1);
+   module T=maxideal(oldbound)*freemodule(nrows(M));
+   while(i<bound-oldbound)
+   {
+      T=jet(myReduceM(T,M,bound),bound-1);
+      if(size(reduceV(M,T,L,bound))!=0)
+      {
+         return(0);
+      }
+      T=maxideal(1)*T;
+      i++;
+   }
+   return(1);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc reduceV(module M,module T, module L,int bound)
+"USAGE:     reduceV(M, T, L, bound)
+COMPUTE:    special reduction procedure for correctBound (reduction modulo a sum
+            of modules over different rings
+RETURN:     a list
+"
+{
+   int i,j;
+   vector f,g;
+   for(i=1;i<=ncols(T);i++)
+   {
+     f=T[i];
+     while(1)
+     {
+        g=reducer(f,L);
+        if(g==0){break;}
+        f=f-leadcoef(f)/leadcoef(g)*g;
+        //f=jet(system("reduce_bound",f,M,bound),bound-1);
+        f=jet(myReduce(f,M,bound),bound-1);
+        if(f==0){break;}
+     }
+     T[i]=f;
+   }
+   return(T);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc reducer(vector f, module L)
+"USAGE:     reducer(f, module L)
+COMPUTE:    find the reductor for reduceV
+RETURN:     a vector
+"
+{
+   vector g;
+   int i;
+   for(i=1;i<=size(L);i++)
+   {
+      if(leadmonom(f)==leadmonom(L[i]))
+      {
+         g=L[i];
+         break;
+      }
+   }
+   return(g);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc computeN(module M, module N, ideal I, int bound)
+"USAGE:   computeN(M, N, I, bound) M is a submodule  in A^r over the basering=:A
+          N ist a submodule in R^r over the subring R of the basering
+          genrated by the entries of I
+COMPUTE:  all products of powers of generators of I with N
+"
+{
+   I=jet(I,bound);
+   I=simplify(I,2);
+   module L;
+   int j,k;
+   int r=size(I);
+   ideal F=1;
+   ideal G;
+
+   while(F!=0)
+   {
+      for(k=1;k<=size(N);k++)
+      {
+         for(j=1;j<=size(F);j++)
+         {
+            L[size(L)+1]=jet(myReduce(F[j]*N[k],M,bound),bound);
+            //L[ncols(L)+1]=jet(system("reduce_bound",F[j]*N[k],M,bound),bound);
+         }
+      }
+      G=F;
+      F=0;
+      for(j=1;j<=size(G);j++)
+      {
+         for(k=1;k<=r;k++)
+         {
+            F=F,jet(jet(G[j],bound-ord(I[k]))*I[k],bound);
+         }
+      }
+      F=simplify(F,2);
+      F=simplify(F,4);
+      F=simplify(F,2);
+   }
+   return(L);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc myReduceM(module N, module M, int bound)
+"USAGE:   myReduceM(N, M, bound) M is a submodule  in A^r over the basering=:A
+          N ist a submodule in R^r over the subring R of the basering
+          genrated by the entries of I
+COMPUTE:  myReduce for ideals
+"
+{
+   int i;
+   for(i=1;i<=ncols(N);i++)
+   {
+      N[i]=myReduce(N[i],M,bound);
+   }
+   return(N);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc myReduce(vector f, module M, int bound)
+{
+   f=jet(f,bound);
+   if(f==0){return(f);}
+   vector g, vv,ww;
+   poly p;
+   number c;
+   int i;
+   vector re;
+   while(f!=0)
+   {
+      for(i=1;i<=size(M);i++)
+      {
+         if(reduce(lead(f),std(lead(M[i])))==0)
+         {
+            c=leadcoef(f)/leadcoef(M[i]);
+            vv=lead(f);ww=lead(M[i]);
+            p=quotient(vv,ww)[1];
+            g=M[i];break;
+         }
+      }
+      while((f!=0)&&(g!=0))
+      {
+         f=f-c*p*g;
+         f=jet(f,bound);
+         if(f==0){break;}
+         g=0;
+         for(i=1;i<=size(M);i++)
+         {
+            if(reduce(lead(f),std(lead(M[i])))==0)
+            {
+               c=leadcoef(f)/leadcoef(M[i]);
+               vv=lead(f);ww=lead(M[i]);
+               p=quotient(vv,ww)[1];
+               g=M[i];break;
+            }
+         }
+      }
+      re=re+lead(f);
+      f=f-lead(f);
+   }
+   return(re);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc echelon(module M, module N, int b)
+"USAGE:   echelon(M, N, b)
+COMPUTE:  the echelon form of N modulo M
+RETURN:   the echelon form of N modulo M
+"
+{
+   int i,j,d;
+   N=simplify(N,4);
+   N=simplify(N,3);
+   N=sort(N)[1];
+   d=size(N);
+   i=d;
+   while(i>=2)
+   {
+      for(j=i-1;j>=1;j=j-1)
+      {
+         if(lead(N[i])==lead(N[j]))
+         {
+            N[j]=N[j]-N[i];
+
+         }
+      }
+      N=simplify(N,4);
+      N=simplify(N,3);
+      N=sort(N)[1];
+      i=i-(d-size(N))-1;
+      d=size(N);
+   }
+   N=simplify(N,6);
+   return(N);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc normalMap(ideal I, int bound)
+"USAGE:    classify(f);  f=poly
+RETURN:   (x,h) A-equivalent to I modulo <x,y>^bound+1
+NOTE:      if jet(I,1)=0, (0,0)is returned.
+"
+{
+   I=jet(I,bound);
+   if(size(jet(I,1))==0){return(ideal(0,0));}
+   if(vdim(std(jet(I,1)))==1){return(maxideal(1));}
+   def R=basering;
+   map phi;
+   poly p;
+   if(jet(I[1],1)==0){p=I[1];I[1]=I[2];I[2]=p;}
+   I[1]=simplify(I[1],1);
+   if(lead(I[1])==var(2)){phi=R,var(2),var(1);}
+   else{phi=R,var(1)-I[1][2],var(2);}
+   I=phi(I);
+   while(I[1]!=var(1))
+   {
+      phi=R,2*var(1)-I[1],var(2);
+      I=jet(phi(I),bound);
+   }
+   while((leadmonom(I[2])==var(1))||(leadmonom(I[2])==var(1)^2)||(leadmonom(I[2]
+   )==var(1)^3))
+   {
+      I[2]=I[2]-lead(I[2]);
+   }
+   I[2]=simplify(I[2],1);
+   p=lead(I[2])+reduc(I[2]-lead(I[2]),I,bound);
+   I[2]=p;
+   return(I);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc reduc(poly f,ideal I, int b)
+"USAGE:   reduc(f, I, b)
+COMPUTE:  the normal form of f with respect to the algebra generated by I
+"
+{
+   list L=1;
+   map psi;
+   f=jet(f,b);
+   if(f==0){return(f);}
+   while((f!=0) && (L[1]!=0))
+   {
+     L= algebra_containment(lead(f),lead(I),1);
+     if (L[1]==1)
+     {
+        def S= L[2];
+        psi= S,maxideal(1),I;
+        f=jet(f-psi(check),b);
+        kill S;
+     }
+   }
+   return (lead(f)+reduc(f-lead(f),I,b));
+}
+///////////////////////////////////////////////////////////////////////////////
+proc classifySimpleMaps(ideal I)
+"USAGE:   classifySimpleMaps(I);  I=an ideal with 2 generators in a polynomial
+         ring with 2 variables and local ordering defining a map germ C^2 to C^2
+COMPUTE:  The normal form of the germ in Riegers classification if it is
+          simple
+RETURN:   normal form of I, of type ideal
+NOTE:     If I is not simple it returns (0,0)
+EXAMPLE:  example classifySimpleMaps; shows an example"
+{
+   if(size(jet(I,1))==0){return(ideal(0,0));}
+   list L=coDimMap(I,1);
+   int determinacy=L[1];
+   int codimension=L[2];
+   if(determinacy<0){return(ideal(0,0));}
+   I=normalMap(I,determinacy);
+   poly p=lead(I[2]);
+   if(p==0){return(ideal(0,0));}
+   if(p==var(2)){return(maxideal(1));}
+   if(p==var(2)^2){return(ideal(var(1),var(2)^2));}
+   if(p==var(1)*var(2))
+   {
+      if(codimension==2){return(ideal(var(1),p+var(2)^3));}
+      if(codimension==3){return(ideal(var(1),p+var(2)^4));}
+      if(codimension==4){return(ideal(var(1),p+var(2)^5+var(2)^7));}
+      if(codimension==5){return(ideal(var(1),p+var(2)^5));}
+      return(ideal(0,0));
+   }
+   if(p==var(2)^3)
+   {
+      return(ideal(var(1),p+var(1)^(codimension-1)*var(2)));
+   }
+   if(p==var(1)*var(2)^2)
+   {
+      if(vdim(std(I))==4)
+      {
+         return(ideal(var(1),p+var(2)^4+var(2)^(2*codimension-3)));
+      }
+      if(codimension==5){return(ideal(var(1),p+var(2)^5+var(2)^6));}
+      if(codimension==6){return(ideal(var(1),p+var(2)^5+var(2)^9));}
+      if(codimension==7){return(ideal(var(1),p+var(2)^5));}
+      return(ideal(0,0));
+   }
+   if(p==var(1)^2*var(2))
+   {
+      if(codimension==3){return(ideal(var(1),p+var(2)^3));}
+      if(codimension==5){return(ideal(var(1),p+var(2)^4+var(2)^5));}
+      if(codimension==6){return(ideal(var(1),p+var(2)^4));}
+      return(ideal(0,0));
+   }
+   return(ideal(0,0));
+}
+example
+{
+  "EXAMPLE"; echo=2;
+   ring R=0,(x,y),(c,ds);
+   poly f1=x;
+   poly f2=xy+y5+y7;
+   poly f11=f1+f2*f1;
+   poly f22=f2+f1^2;
+   map phi=basering,x+y,y+y2;
+   f1=phi(f11);
+   f2=phi(f22);
+   ideal I=f1,f2;
+   classifySimpleMaps(I);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc classifySimpleMaps1(ideal I)
+"USAGE:   classifySimpleMaps1(I);  I=an ideal with 2 generators in a polynomial
+         ring with 2 variables and local ordering defining a map germ C^2 to C^2
+COMPUTE:  The normal form of the germ in Riegers classification if it is
+          simple
+RETURN:   normal form of I, of type ideal
+NOTE:     If I is not simple it returns (0,0)
+EXAMPLE:  example classifySimpleMaps1; shows an example"
+{
+   if(size(jet(I,1))==0){return(ideal(0,0));}
+   list L=coDimMap(I,1);
+   int determinacy=L[1];
+   int c=L[2];
+   if(determinacy<0){return(ideal(0,0));}
+   I=normalMap(I,determinacy);
+   int m =vdim(std(I));
+   int mu=vdim(std(jacob(diff(I[2],var(2)))));
+
+   if((mu==-1)&&(m>=2)){return(ideal(0,0));}
+   if(m==1){return(maxideal(1));}
+
+   if(mu==0)
+   {
+      if(m==2){return(ideal(var(1),var(2)^2));}
+      if(m==3){return(ideal(var(1),var(1)*var(2)+var(2)^3));}
+      if(m==4){return(ideal(var(1),var(1)*var(2)+var(2)^4));}
+      if(m==5)
+      {
+        if(c==4)
+        {
+           return(ideal(var(1),var(1)*var(2)+var(2)^5+var(2)^7));
+        }
+        if(c==5)
+        {
+           return(ideal(var(1),var(1)*var(2)+var(2)^5));
+        }
+      }
+      return(ideal(0,0));
+   }
+   if(mu==1)
+   {
+      if(m==3){return(ideal(var(1),var(1)^2*var(2)+var(2)^3));}
+      if(m==4){return(ideal(var(1),var(1)*var(2)^2+var(2)^4+var(2)^(2*c-3)));}
+      if(m==5)
+      {
+        if(c==5)
+        {
+           return(ideal(var(1),var(1)*var(2)^2+var(2)^5+var(2)^6));
+        }
+        if(c==6)
+        {
+           return(ideal(var(1),var(1)*var(2)^2+var(2)^5+var(2)^9));
+        }
+        if(c==7)
+        {
+           return(ideal(var(1),var(1)*var(2)^2+var(2)^5));
+        }
+      }
+      return(ideal(0,0));
+    }
+   if(mu==2)
+   {
+      if(m==3){return(ideal(var(1),var(2)^3+var(1)^3*var(2)));}
+      if(m==4)
+      {
+        if(c==5)
+        {
+           return(ideal(var(1),var(1)^2*var(2)+var(2)^4+var(2)^5));
+        }
+        if(c==6)
+        {
+           return(ideal(var(1),var(1)^2*var(2)+var(2)^4));
+        }
+      }
+      return(ideal(0,0));
+    }
+   if(mu>2)
+   {
+      if(m==3)
+      {
+         return(ideal(var(1),var(2)^3+var(1)^(c+1)*var(2)));
+      }
+      return(ideal(0,0));
+   }
+   return(ideal(0,0));
+}
+example
+{
+  "EXAMPLE"; echo=2;
+   ring R=0,(x,y),(c,ds);
+   poly f1=x;
+   poly f2=xy+y5+y7;
+   poly f11=f1+f2*f1;
+   poly f22=f2+f1^2;
+   map phi=basering,x+y,y+y2;
+   f1=phi(f11);
+   f2=phi(f22);
+   ideal I=f1,f2;
+   classifySimpleMaps1(I);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc modVStd0(module M, module N, ideal I, int bound)
+"USAGE:   modVStd0((M, N, I,bound, #); M is a submodule
+          in A^r over the basering=:A, N ist a submodule in R^r over the subring
+          R of the basering genrated by the entries of I
+COMPUTE:  a standard basis of M+N+maxideal(bound)*A^r using the parallel modular
+          version
+RETURN:   a list whose ist entry gives a list where each entry is a  genrator of
+          standard basis and second entry gives a list of generators after the
+          reduced echelon form
+NOTE:     if # is not empty the bound is corrected by computing determinacy
+EXAMPLE:  example modVStd0; shows an example"
+{
+    /* call modular() */
+    if (size(M) > 1) {
+        list W = modular("vStd", list(M, N, I, bound),
+            Modular::primeTest_default, deleteUnluckyPrimesM0,
+            pTestSBM0, finalTestM0);
+        attrib(W[1], "isSB", 1);
+    }
+    else {
+        module L = modular("vStd_size1", list(M, N, I, bound),
+            Modular::primeTest_default, Modstd::deleteUnluckyPrimes_std,
+            pTestSBM0_size1, finalTestM0_size1);
+        attrib(M, "isSB", 1);
+        list W = list(M, L);
+    }
+
+    /* return the result */
+    return(W);
+}
+example
+{
+  "EXAMPLE"; echo=2;
+   ring R=0,(x,y),(c,ds);
+   poly f1=x;
+   poly f2=xy+y5+y7;
+   poly f11=f1+f2*f1;
+   poly f22=f2+f1^2;
+   map phi=basering,x+y,y+y2;
+   f1=phi(f11);
+   f2=phi(f22);
+   ideal I=f1,f2;
+   module M=maxideal(1)*jacob(I);
+   module N=I*freemodule(2);
+   modVStd0(M,N,I,15);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc modVStd(module M, module N, ideal I,int bound,list #)
+"USAGE:   modVStd((M, N, I,bound, #); M is a submodule
+          in A^r over the basering=:A, N ist a submodule in R^r over the subring
+          R of the basering genrated by the entries of I
+COMPUTE:  a standard basis of A^r/M+N+maxideal(bound)*A^r using modular version
+RETURN:   a list whose ist entry gives a list where each entry is a  genrator of
+          standard basis and second entry gives a list of generators after the
+          reduced echelon form
+NOTE:     if # is not empty the bound is corrected by computing determinacy
+EXAMPLE:  example modVStd; shows an example"
+{
+//---------------------------- initialisation --------------------------------
+   int np=10;
+   bigint H;
+   if(size(#)>0){np=#[1];}
+   list P=2134567879;
+   int j,cc;
+   def R0 = basering;
+   module L;
+   module M0=M;
+   module N0=N;
+   list T1,T2,L1,L2;
+   list rl = ringlist(R0);
+
+   while(1)
+   {
+      cc=timer;
+      for(j = 1; j <= np; j++)
+      {
+         P[size(P)+1]=prime(P[size(P)]-1);
+      }
+      for(j = 1; j <= size(P); j++)
+      {
+         rl[1] = P[j];
+         def @r = ring(rl);
+         setring @r;
+         ideal I  = fetch(R0,I);
+         module M = fetch(R0,M0);
+         module N = fetch(R0,N0);
+         list W = vStd(M,N,I,bound);
+         setring R0;
+         list W = fetch(@r,W);
+         T1[j]=W[1];
+         T2[j]=W[2];
+         kill W;
+         kill @r;
+      }
+      L1 = deleteUnluckyPrimesM(T1,P);
+      L2 = deleteUnluckyPrimesM(T2,P);
+      if(size(M0)>1)
+      {
+         H=1;
+         for(j = 1; j <= size(L1[2]); j++)
+         {
+            H = H*L1[2][j];
+         }
+         M=  chinrem(L1[1],L1[2]);
+         M = farey(M,H);
+         attrib(M,"isSB",1);
+      }
+      else
+      {
+         M=M0;
+      }
+      H=1;
+      for(j = 1; j <= size(L2[2]); j++)
+      {
+         H = H*L2[2][j];
+      }
+      L=  chinrem(L2[1],L2[2]);
+      L = farey(L,H);
+
+      if(pTestSBM(M0,N0,I,M,L,P,bound))
+      {
+         //int bb=timer;
+         if(finalTestM(M0,N0,I,M,L,bound))
+         {
+          // "time for final test";timer-bb;
+           return(list(M,L));
+         }
+         // "time for final test";timer-bb;
+        // "final test failed";
+      }
+     // "pTest failed";size(P);
+   }
+}
+example
+{
+  "EXAMPLE"; echo=2;
+   ring R=0,(x,y),(c,ds);
+   poly f1=x;
+   poly f2=xy+y5+y7;
+   poly f11=f1+f2*f1;
+   poly f22=f2+f1^2;
+   map phi=basering,x+y,y+y2;
+   f1=phi(f11);
+   f2=phi(f22);
+   ideal I=f1,f2;
+   module M=maxideal(1)*jacob(I);
+   module N=I*freemodule(2);
+   modVStd(M,N,I,15);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc deleteUnluckyPrimesM(list T, list L)
+{
+   int j,k,c;
+   intvec hl,hc;
+   module cT,lT,cK;
+   lT = lead(T[size(T)]);
+   attrib(lT,"isSB",1);
+      for(j = 1; j < size(T); j++)
+      {
+         cT = lead(T[j]);
+         attrib(cT,"isSB",1);
+         if((size(reduce(cT,lT))!=0)||(size(reduce(lT,cT))!=0))
+         {
+            cK = cT;
+            c++;
+         }
+      }
+      if(c > size(T) div 2){ lT = cK; }
+
+   int addList;
+   j = 1;
+   attrib(lT,"isSB",1);
+   while((j <= size(T))&&(c > 0))
+   {
+      cT = lead(T[j]);
+      attrib(cT,"isSB",1);
+      if((size(reduce(cT,lT)) != 0)||(size(reduce(lT,cT)) != 0))
+      {
+         T = delete(T,j);
+         if(j == 1)
+         {
+            L = L[2..size(L)];
+            if(addList == 1) { M = M[2..size(M)]; }
+         }
+         else
+         {
+            if(j == size(L))
+            {
+               L = L[1..size(L)-1];
+               if(addList == 1) { M = M[1..size(M)-1]; }
+            }
+            else
+            {
+               L = L[1..j-1],L[j+1..size(L)];
+               if(addList == 1) { M = M[1..j-1],M[j+1..size(M)]; }
+            }
+         }
+         j--;
+      }
+      j++;
+   }
+
+   for(j = 1; j <= size(L); j++)
+   {
+      L[j] = bigint(L[j]);
+   }
+
+   if(addList == 0) { return(list(T,L,lT)); }
+   if(addList == 1) { return(list(T,L,M,lT)); }
+}
+
+static proc deleteUnluckyPrimesM0(alias list modresults)
+{
+    list T1, T2;
+    int i;
+    for (i = size(modresults); i > 0; i--) {
+        T1[i] = modresults[i][1];
+        T2[i] = modresults[i][2];
+    }
+    list indices1 = Modstd::deleteUnluckyPrimes_std(T1);
+    list indices2 = Modstd::deleteUnluckyPrimes_std(T2);
+    return(indices1+indices2);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc pTestSBM(module M0, module N0, ideal I, module M, module L, list P,
+int bound)
+{
+   int i,j,k,p;
+   def R0 = basering;
+   list r = ringlist(R0);
+
+   while(!j)
+   {
+      j = 1;
+      p = prime(random(1000000000,2134567879));
+      for(i = 1; i <= size(P); i++)
+      {
+         if(p == P[i]) { j = 0; break; }
+      }
+
+   }
+   r[1] = p;
+   def @R = ring(r);
+   setring @R;
+   ideal I  = fetch(R0,I);
+   module M0 = fetch(R0,M0);
+   module N0 = fetch(R0,N0);
+   list W = vStd(M0,N0,I,bound);
+   module M = fetch(R0,M);
+   module L = fetch(R0,L);
+   attrib(M,"isSB",1);
+   attrib(L,"isSB",1);
+   j=size(reduce(W[1],M))+size(reduce(W[2],L));
+   setring R0;
+   return(!j);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc pTestSBM0(string command, alias list args, def result, int p)
+{
+    def R0 = basering;
+    list r = ringlist(R0);
+    r[1] = p;
+    def @R = ring(r);
+    setring @R;
+    list args = fetch(R0, args);
+    list W = vStd(args[1..4]);
+    def result = fetch(R0, result);
+    attrib(result[1],"isSB",1);
+    attrib(result[2],"isSB",1);
+    int j=size(reduce(W[1],result[1]))+size(reduce(W[2],result[2]));
+    setring R0;
+    return(!j);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc pTestSBM0_size1(string command, alias list args, def result, int p)
+{
+    // adjusted copy of pTestSBM0() for the case size(args[1]) <= 1
+    def R0 = basering;
+    list r = ringlist(R0);
+    r[1] = p;
+    def @R = ring(r);
+    setring @R;
+    list args = fetch(R0, args);
+    module L = vStd_size1(args[1..4]);
+    def result = fetch(R0, result);
+    attrib(result,"isSB",1);
+    int j = size(reduce(L, result));
+    setring R0;
+
+    return(!j);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc finalTestM(module M0, module N0, ideal I, module M, module L,
+int bound)
+{
+   attrib(M,"isSB",1);
+   int a=size(myReduceM(M0,M,bound));
+   int b=testSBM(M,bound);
+   int c=size(reduceV(M,myReduceM(N0,M,bound),L,bound));
+   return(!(a+b+c));
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc testSBM(module M, int bound)
+{
+   int i,j;
+   vector f;
+   for(i=1;i<size(M);i++)
+   {
+      for(j=i+1;j<=size(M);j++)
+      {
+         f=jet(spoly(M[i],M[j],1),bound);
+         f=myReduce(f,M,bound);
+         if(f!=0){return(1);}
+      }
+   }
+   return(0);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc finalTestM0(string command, alias list args, def result)
+{
+    attrib(result[1], "isSB", 1);
+    if (size(myReduceM(args[1], result[1], args[4]))) {
+        return(0);
+    }
+    if(testSBM(result[1],args[4])){return(0);}
+    if (size(reduceV(result[1], myReduceM(args[2], result[1], args[4]),
+        result[2], args[4]))) {
+        return(0);
+    }
+    return(1);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc finalTestM0_size1(string command, list args, def result)
+{
+    attrib(args[1], "isSB", 1);
+    if (size(reduceV(args[1], myReduceM(args[2], args[1], args[4]),
+        result, args[4]))) {
+        return(0);
+    }
+    return(1);
+}
+///////////////////////////////////////////////////////////////////////////////
+/*
+============================== examples of Rieger  ==============
+
+ring R=0,(x,y),(c,ds);
+poly f1=x;
+
+poly f2=xy+y3;     //2
+poly f2=y3+x2y;    //3
+poly f2=xy+y4;     //3
+poly f2=xy+y5+y7;  //4
+poly f2=xy+y5;     //5
+poly f2=xy2+y4+y5; //4
+poly f2=xy2+y5+y6; //5
+poly f2=xy2+y5+y9; //6
+poly f2=xy2+y5;    //7
+poly f2=x2y+y4+y5; //5
+poly f2=x2y+y4;    //6
+
+poly f11=f1+f2*f1;
+poly f22=f2+f1^2;
+map phi=basering,x+y,y+y2;
+f1=phi(f11);
+f2=phi(f22);
+ideal I=f1,f2;
+coDimMap(I,1);
+classifySimpleMaps(I);
+
+==================== Examples of Gibson and Hobbs =============
+
+ring R=0,t,(c,ds);
+poly f1=t4;
+poly f2=t7+t9;
+poly f3=t17;
+ideal I=f1,f2,f3;
+map phi=R,t+2t2+3t3+7t4;
+I=phi(I);
+coDimMap(I);
+
+ring R=0,t,(c,ds);
+int k=12;
+poly f1=t4;
+poly f2=t6+t^(2*k-7);
+poly f3=t^(2*k+1);
+f1=f1+f2*f3;
+f2=f2+f3^2;
+f3=f3+f1*f2*f3;
+ideal I=f1,f2,f3;
+map phi=R,t+t2+2t3+5t4;
+I=phi(I);
+coDimMap(I);
+
+ring R=0,t,(c,ds);
+int k=8;
+poly f1=t4;
+poly f2=t6+t^(2*k+1);
+f1=f1+f2*f1;
+f2=f2+f1^2;
+ideal I=f1,f2,0;
+map phi=R,t+t2+3t3+5t4;
+I=phi(I);
+coDimMap(I);
+
+ring R=0,t,(c,ds);
+int k=8;
+poly f1=t2;
+poly f2=t^(2*k+1);
+f1=f1+f2*f1;
+f2=f2+f1^2;
+ideal I=f1,f2,0;
+map phi=R,t+t2+3t3+5t4;
+I=phi(I);
+coDimMap(I);
+
+ring R=0,t,(c,ds);
+int k=8;
+int p=11;
+poly f1=t3;
+poly f2=t^(3*k+1)+t^(3*p+2);
+f1=f1+f2*f1;
+f2=f2+f1^2;
+ideal I=f1,f2,0;
+map phi=R,t+t2+3t3+5t4;
+I=phi(I);
+coDimMap(I);
+
+============================  more examples ======================
+
+ring R=0,t,(c,ds);
+poly f1=t8;
+poly f2=t10+t13;
+poly f3=t12+2t15;
+f1=f1+231*f2*f1+311*f1*f3+71*f1^2+611*f1*f2*f3;
+f2=f2+911*f1^2+511*f2*f3+f1^2*f2^2;
+f3=f3+731*f1*f2*f3+1171*f3^2+f2^3;
+ideal I=f1,f2,f3;
+map phi=R,t+t2+3t3+5t4+7t6;
+I=phi(I);
+coDimMap(I);
+
+ring R=0,t,(c,ds);
+poly f1=t12;
+poly f2=t20+t30+t35;
+f1=f1+231*f2*f1+71*f1^2;
+f2=f2+911*f1^2+f1^2*f2^2;
+ideal I=f1,f2;
+map phi=R,t+t2+3t3+5t4+7t6;
+I=phi(I);
+coDimMap(I);
+
+ring R=0,t,(c,ds);
+poly f1=t16;
+poly f2=t24+t28+t30+t35;
+f1=f1+231*f2*f1+71*f1^2;
+f2=f2+911*f1^2+f1^2*f2^2;
+ideal I=f1,f2;
+map phi=R,t+t2+3t3+5t4+7t6;
+I=phi(I);
+coDimMap(I);
+
+ring R=0,t,(c,ds);
+int k=7;
+poly f1=t^(8*k);
+poly f2=t^(10*k)+t^(13*k);
+poly f3=t^(12*k)+2t^(15*k);
+poly f4=t101;
+f1=f1+231*f2*f1+311*f1*f3+71*f1^2+611*f1*f2*f3;
+f2=f2+911*f1^2+511*f2*f3+f1^2*f2^2;
+f3=f3+731*f1*f2*f3+1171*f3^2+f2^3;
+ideal I=f1,f2,f3,f4;
+map phi=R,t+22t2+323t3+555t4+777t6;
+I=phi(I);
+module M=jacob(I);
+module N=freemodule(ncols(I));
+list Re=modVStd(M,N,I,250);
+Re=modVStd0(M,N,I,250);
+
+ring R=0,(x,y),(c,ds);
+ideal I=x,xy2+y5+y9;
+map phi=R,x+xy4,y+x2+y11;
+I=phi(I);
+module M=maxideal(1)*jacob(I);
+module N=I*freemodule(2);
+list Re=modVStd(M,N,I,15);
+
+ ring R=0,(x,y),(c,ds);
+ poly f1=x;
+ poly f2=xy+y5+y7;
+ poly f11=f1+f2*f1;
+ poly f22=f2+f1^2;
+ map phi=basering,x+y,y+y2;
+ f1=phi(f11);
+ f2=phi(f22);
+ ideal I=f1,f2;
+ map si=R,x+xy3+y11,y+x3+y14+xy17;
+ I=si(I);
+ module M=maxideal(1)*jacob(I);
+ module N=I*freemodule(2);
+ list Re=modVStd(M,N,I,15);
+
+ ring R=0,(x,y),(c,ds);
+ ideal I=x,x2y+y4;
+ map phi=R,x+xy4,y+x2+y11;
+ I=phi(I);
+ module M=maxideal(1)*jacob(I);
+ module N=I*freemodule(2);
+ list Re=modVStd(M,N,I,15);
+
+ring R=0,t,(c,ds);
+int k=5;
+poly f1=t^(16*k);
+poly f2=t^(24*k)+t^(28*k)+t^(30*k)+t^(35*k);
+poly f3=t181;
+f1=f1+231*f2*f1+71*f1^2;
+f2=f2+911*f1^2+f1^2*f2^2;
+f3=f3+f1*f2;
+ideal I=f1,f2,f3;
+map phi=R,t+55t2+366t3+577t4+788t6;
+I=phi(I);
+module M=jacob(I);
+module N=freemodule(ncols(I));
+list Re=modVStd(M,N,I,300);
+
+ring R=0,t,(c,ds);
+int k=7;
+poly f1=t^(12*k);
+poly f2=t^(20*k)+t^(30*k)+t^(35*k);
+poly f3=t139;
+f1=f1+231*f2*f1+715*f1^2;
+f2=f2+911*f1^2+4567*f1^2*f2^2;
+f3=f3+333*f1*f2;
+ideal I=f1,f2;
+map phi=R,t+22t2+333t3+544t4+755t6+567t7;
+I=phi(I);
+module M=jacob(I);
+module N=freemodule(ncols(I));
+list Re=modVStd(M,N,I,350);
+*/
+
