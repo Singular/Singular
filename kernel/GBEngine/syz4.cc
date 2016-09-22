@@ -23,6 +23,59 @@ typedef struct {
 typedef std::vector<const CLeadingTerm_struct*> TReducers_test;
 typedef std::map<long, TReducers_test> CReducersHash_test;
 
+static void initialize(CReducersHash_test &C, const ideal L)
+{
+  if( L != NULL )
+  {
+    const ring R = currRing;
+    for( int k = IDELEMS(L) - 1; k >= 0; k-- )
+    {
+      const poly a = L->m[k];
+      if( a != NULL )
+      {
+        CLeadingTerm_struct *CLT
+            = (CLeadingTerm_struct*)omalloc(sizeof(CLeadingTerm_struct));
+        CLT->lt = a;
+        CLT->sev = p_GetShortExpVector(a, R);
+        CLT->label = k;
+        C[p_GetComp(a, R)].push_back( CLT );
+      }
+    }
+  }
+}
+
+static void deleteCRH(CReducersHash_test *C)
+{
+    for (CReducersHash_test::iterator it = C->begin(); it != C->end(); it++) {
+        TReducers_test& v = it->second;
+        for (TReducers_test::const_iterator vit = v.begin(); vit != v.end();
+            vit++) {
+            omfree(const_cast<CLeadingTerm_struct*>(*vit));
+        }
+        v.erase(v.begin(), v.end());
+    }
+    C->erase(C->begin(), C->end());
+}
+
+bool IsDivisible(const CReducersHash_test *C, const poly product)
+{
+    CReducersHash_test::const_iterator m_itr
+        = C->find(p_GetComp(product, currRing));
+    if (m_itr == C->end()) {
+        return false;
+    }
+    TReducers_test::const_iterator m_current = (m_itr->second).begin();
+    TReducers_test::const_iterator m_finish  = (m_itr->second).end();
+    const unsigned long m_not_sev = ~p_GetShortExpVector(product, currRing);
+    for ( ; m_current != m_finish; ++m_current) {
+        if (p_LmShortDivisibleByNoComp((*m_current)->lt, (*m_current)->sev,
+            product, m_not_sev, currRing)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 static poly TraverseTail_test(poly multiplier, const int tail,
    const ideal previous_module, const std::vector<bool> &variables,
    const CReducersHash_test *m_div, const CReducersHash_test *m_checker);
@@ -286,39 +339,6 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(const poly a, const poly b, const p
   return TRUE;
 }
 
-static void deleteCRH(CReducersHash_test *C)
-{
-    for (CReducersHash_test::iterator it = C->begin(); it != C->end(); it++) {
-        TReducers_test& v = it->second;
-        for (TReducers_test::const_iterator vit = v.begin(); vit != v.end();
-            vit++) {
-            omfree(const_cast<CLeadingTerm_struct*>(*vit));
-        }
-        v.erase(v.begin(), v.end());
-    }
-    C->erase(C->begin(), C->end());
-}
-
-bool IsDivisible(const CReducersHash_test *C, const poly product)
-{
-    CReducersHash_test::const_iterator m_itr
-        = C->find(p_GetComp(product, currRing));
-    if (m_itr == C->end()) {
-        return false;
-    }
-    TReducers_test::const_iterator m_current = (m_itr->second).begin();
-    TReducers_test::const_iterator m_finish  = (m_itr->second).end();
-    const unsigned long m_not_sev = ~p_GetShortExpVector(product, currRing);
-    for ( ; m_current != m_finish; ++m_current) {
-        if (p_LmShortDivisibleByNoComp((*m_current)->lt, (*m_current)->sev,
-            product, m_not_sev, currRing)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-
 poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
     const CReducersHash_test *syz_checker, const CReducersHash_test *m_div)
 {
@@ -383,27 +403,6 @@ static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
   if( t != NULL )
     s = p_Add_q(s, t, r);
   return s;
-}
-
-static void initialize(CReducersHash_test &C, const ideal L)
-{
-  if( L != NULL )
-  {
-    const ring R = currRing;
-    for( int k = IDELEMS(L) - 1; k >= 0; k-- )
-    {
-      const poly a = L->m[k];
-      if( a != NULL )
-      {
-        CLeadingTerm_struct *CLT
-            = (CLeadingTerm_struct*)omalloc(sizeof(CLeadingTerm_struct));
-        CLT->lt = a;
-        CLT->sev = p_GetShortExpVector(a, R);
-        CLT->label = k;
-        C[p_GetComp(a, R)].push_back( CLT );
-      }
-    }
-  }
 }
 
 /*****************************************************************************/
