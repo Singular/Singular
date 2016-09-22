@@ -347,12 +347,12 @@ static void omFreeBinPagesRegion(omBinPageRegion region)
 static void omBinPageIndexFault(unsigned long low_index, unsigned long high_index)
 {
   unsigned long index_diff = high_index - low_index;
-  long i;
   omAssume(low_index <= high_index &&
            (high_index > om_MaxBinPageIndex || low_index < om_MinBinPageIndex));
 
   if (om_BinPageIndicies == NULL)
   {
+    unsigned long i;
     om_BinPageIndicies = (unsigned long*) omAllocFromSystem((index_diff + 1)*SIZEOF_LONG);
     om_Info.InternalUsedBytesMalloc+=(index_diff + 1)*SIZEOF_LONG;
     om_MaxBinPageIndex = high_index;
@@ -370,13 +370,15 @@ static void omBinPageIndexFault(unsigned long low_index, unsigned long high_inde
     om_Info.InternalUsedBytesMalloc+= (new_length-old_length)*SIZEOF_LONG;
     if (low_index < om_MinBinPageIndex)
     {
+      long i;
       unsigned long offset = new_length - old_length;
       for (i=old_length - 1; i >= 0; i--) om_BinPageIndicies[i+offset] = om_BinPageIndicies[i];
-      for (i=0; i<offset; i++)  om_BinPageIndicies[i] = 0;
+      for (i=offset-1; i>=0; i--)  om_BinPageIndicies[i] = 0;
       om_MinBinPageIndex = low_index;
     }
     else
     {
+      unsigned long i;
       for (i=old_length; i<new_length; i++) om_BinPageIndicies[i] = 0;
       om_MaxBinPageIndex = high_index;
     }
