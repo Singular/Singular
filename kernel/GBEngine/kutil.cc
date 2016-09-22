@@ -7688,6 +7688,122 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
   return L->GetLmCurrRing();
 }
 
+poly redtailBbaBound (LObject* L, int pos, kStrategy strat, int bound, BOOLEAN withT, BOOLEAN normalize)
+{
+#define REDTAIL_CANONICALIZE 100
+  strat->redTailChange=FALSE;
+  if (strat->noTailReduction) return L->GetLmCurrRing();
+  poly h, p;
+  p = h = L->GetLmTailRing();
+  if ((h==NULL) || (pNext(h)==NULL))
+    return L->GetLmCurrRing();
+
+  TObject* With;
+  // placeholder in case strat->tl < 0
+  TObject  With_s(strat->tailRing);
+
+  LObject Ln(pNext(h), strat->tailRing);
+  Ln.pLength = L->GetpLength() - 1;
+
+  pNext(h) = NULL;
+  if (L->p != NULL) pNext(L->p) = NULL;
+  L->pLength = 1;
+
+  Ln.PrepareRed(strat->use_buckets);
+
+  int cnt=REDTAIL_CANONICALIZE;
+  while(!Ln.IsNull())
+  {
+    loop
+    {
+      if (TEST_OPT_IDLIFT)
+      {
+        if (Ln.p!=NULL)
+        {
+          if (p_GetComp(Ln.p,currRing)> strat->syzComp) break;
+        }
+        else
+        {
+          if (p_GetComp(Ln.t_p,strat->tailRing)> strat->syzComp) break;
+        }
+      }
+      Ln.SetShortExpVector();
+      if (withT)
+      {
+        int j;
+        j = kFindDivisibleByInT(strat, &Ln);
+        if (j < 0) break;
+        With = &(strat->T[j]);
+      }
+      else
+      {
+        With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
+        if (With == NULL) break;
+      }
+      cnt--;
+      if (cnt==0)
+      {
+        cnt=REDTAIL_CANONICALIZE;
+        /*poly tmp=*/Ln.CanonicalizeP();
+        if (normalize)
+        {
+          Ln.Normalize();
+          //pNormalize(tmp);
+          //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
+        }
+      }
+      if (normalize && (!TEST_OPT_INTSTRATEGY) && (!nIsOne(pGetCoeff(With->p))))
+      {
+        With->pNorm();
+      }
+      strat->redTailChange=TRUE;
+      if (ksReducePolyTail(L, With, &Ln))
+      {
+        // reducing the tail would violate the exp bound
+        //  set a flag and hope for a retry (in bba)
+        strat->completeReduce_retry=TRUE;
+        if ((Ln.p != NULL) && (Ln.t_p != NULL)) Ln.p=NULL;
+        do
+        {
+          pNext(h) = Ln.LmExtractAndIter();
+          pIter(h);
+          L->pLength++;
+        } while (!Ln.IsNull());
+        goto all_done;
+      }
+      if(!Ln.IsNull())
+      {
+        Ln.GetP();
+        Ln.p = pJet(Ln.p,bound);
+      }
+      if (Ln.IsNull()) 
+      {  
+        goto all_done;
+      }  
+      if (! withT) With_s.Init(currRing);
+    }
+    pNext(h) = Ln.LmExtractAndIter();
+    pIter(h);
+    pNormalize(h);
+    L->pLength++;
+  }
+
+  all_done:
+  Ln.Delete();
+  if (L->p != NULL) pNext(L->p) = pNext(p);
+
+  if (strat->redTailChange)
+  {
+    L->length = 0;
+    L->pLength = 0;
+  }
+
+  //if (TEST_OPT_PROT) { PrintS("N"); mflush(); }
+  //L->Normalize(); // HANNES: should have a test
+  kTest_L(L);
+  return L->GetLmCurrRing();
+}
+
 #ifdef HAVE_RINGS
 poly redtailBba_Z (LObject* L, int pos, kStrategy strat )
 // normalize=FALSE, withT=FALSE, coeff=Z

@@ -3014,6 +3014,48 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
   return res;
 }
 
+poly kNFBound(ideal F, ideal Q, poly p,int bound,int syzComp, int lazyReduce)
+{
+  if (p==NULL)
+     return NULL;
+
+  poly pp = p;
+
+#ifdef HAVE_PLURAL
+  if(rIsSCA(currRing))
+  {
+    const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
+    const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
+    pp = p_KillSquares(pp, m_iFirstAltVar, m_iLastAltVar, currRing);
+
+    if(Q == currRing->qideal)
+      Q = SCAQuotient(currRing);
+  }
+#endif
+
+  if ((idIs0(F))&&(Q==NULL))
+  {
+#ifdef HAVE_PLURAL
+    if(p != pp)
+      return pp;
+#endif
+    return pCopy(p); /*F+Q=0*/
+  }
+
+  kStrategy strat=new skStrategy;
+  strat->syzComp = syzComp;
+  strat->ak = si_max(id_RankFreeModule(F,currRing),pMaxComp(p));
+  poly res;
+  res=kNF2Bound(F,Q,pp,bound,strat,lazyReduce);
+  delete(strat);
+
+#ifdef HAVE_PLURAL
+  if(pp != p)
+    p_Delete(&pp, currRing);
+#endif
+  return res;
+}
+
 ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
 {
   ideal res;
@@ -3058,6 +3100,57 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
     res=kNF1(F,Q,pp,strat,lazyReduce);
   else
     res=kNF2(F,Q,pp,strat,lazyReduce);
+  delete(strat);
+
+#ifdef HAVE_PLURAL
+  if(pp != p)
+    id_Delete(&pp, currRing);
+#endif
+
+  return res;
+}
+
+ideal kNFBound(ideal F, ideal Q, ideal p,int bound,int syzComp,int lazyReduce)
+{
+  ideal res;
+  if (TEST_OPT_PROT)
+  {
+    Print("(S:%d)",IDELEMS(p));mflush();
+  }
+  if (idIs0(p))
+    return idInit(IDELEMS(p),si_max(p->rank,F->rank));
+
+  ideal pp = p;
+#ifdef HAVE_PLURAL
+  if(rIsSCA(currRing))
+  {
+    const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
+    const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
+    pp = id_KillSquares(pp, m_iFirstAltVar, m_iLastAltVar, currRing, false);
+
+    if(Q == currRing->qideal)
+      Q = SCAQuotient(currRing);
+  }
+#endif
+
+  if ((idIs0(F))&&(Q==NULL))
+  {
+#ifdef HAVE_PLURAL
+    if(p != pp)
+      return pp;
+#endif
+    return idCopy(p); /*F+Q=0*/
+  }
+
+  kStrategy strat=new skStrategy;
+  strat->syzComp = syzComp;
+  strat->ak = si_max(id_RankFreeModule(F,currRing),id_RankFreeModule(p,currRing));
+  if (strat->ak>0) // only for module case, see Tst/Short/bug_reduce.tst
+  {
+    strat->ak = si_max(strat->ak,(int)F->rank);
+  }
+
+  res=kNF2Bound(F,Q,pp,bound,strat,lazyReduce);
   delete(strat);
 
 #ifdef HAVE_PLURAL

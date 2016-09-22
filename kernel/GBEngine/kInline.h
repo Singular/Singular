@@ -1100,6 +1100,12 @@ KINLINE poly redtailBba (poly p,int pos,kStrategy strat,BOOLEAN normalize)
   return redtailBba(&L, pos, strat,FALSE, normalize);
 }
 
+KINLINE poly redtailBbaBound (poly p,int pos,kStrategy strat,int bound,BOOLEAN normalize)
+{
+  LObject L(p, currRing, strat->tailRing);
+  return redtailBbaBound(&L, pos, strat,bound, FALSE, normalize);
+}
+
 #ifdef HAVE_RINGS
 KINLINE poly redtailBba_Z (poly p,int pos,kStrategy strat)
 {

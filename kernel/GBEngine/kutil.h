@@ -486,11 +486,14 @@ int posInL10Ring (const LSet set, const int length,
 int posInL110 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 KINLINE poly redtailBba (poly p,int pos,kStrategy strat,BOOLEAN normalize=FALSE);
+KINLINE poly redtailBbaBound (poly p,int pos,kStrategy strat,int bound,BOOLEAN normalize=FALSE);
 #ifdef HAVE_RINGS
 KINLINE poly redtailBba_Z (poly p,int pos,kStrategy strat);
 poly redtailBba_Z (LObject* L, int pos, kStrategy strat );
 #endif
 poly redtailBba (LObject *L, int pos,kStrategy strat,
+                 BOOLEAN withT = FALSE,BOOLEAN normalize=FALSE);
+poly redtailBbaBound (LObject *L, int pos,kStrategy strat,int bound,
                  BOOLEAN withT = FALSE,BOOLEAN normalize=FALSE);
 poly redtailSba (LObject *L, int pos,kStrategy strat,
                  BOOLEAN withT = FALSE,BOOLEAN normalize=FALSE);
@@ -666,6 +669,8 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
 ideal sba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
 poly kNF2 (ideal F, ideal Q, poly q, kStrategy strat, int lazyReduce);
 ideal kNF2 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce);
+poly kNF2Bound (ideal F, ideal Q, poly q,int bound, kStrategy strat, int lazyReduce);
+ideal kNF2Bound (ideal F,ideal Q,ideal q,int bound, kStrategy strat, int lazyReduce);
 void initBba(kStrategy strat);
 void initSba(ideal F,kStrategy strat);
 void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
@@ -692,6 +697,13 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
 //            bound of currRing
 int ksReducePoly(LObject* PR,
                  TObject* PW,
+                 poly spNoether = NULL,
+                 number *coef = NULL,
+                 kStrategy strat = NULL);
+                 
+int ksReducePolyBound(LObject* PR,
+                 TObject* PW,
+                 int bound,
                  poly spNoether = NULL,
                  number *coef = NULL,
                  kStrategy strat = NULL);
