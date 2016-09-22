@@ -889,7 +889,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
   tmpR.N=k;
   tmpR.names=names;
   /* ordering *======================================================== */
-  tmpR.OrdSgn=1;
+  tmpR.OrdSgn=0;
   if ((dp_dp==2)
   && (r1->OrdSgn==1)
   && (r2->OrdSgn==1)
@@ -1341,7 +1341,6 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   //memset: res->ref=0; /* reference counter to the ring */
 
   res->N=rVar(r);      /* number of vars */
-  //res->OrdSgn=r->OrdSgn; /* 1 for polynomial rings, -1 otherwise */
 
   res->firstBlockEnds=r->firstBlockEnds;
 #ifdef HAVE_PLURAL
@@ -1482,7 +1481,6 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
   //memset: res->ref=0; /* reference counter to the ring */
 
   res->N=rVar(r);      /* number of vars */
-  //res->OrdSgn=r->OrdSgn; /* 1 for polynomial rings, -1 otherwise */
 
   res->firstBlockEnds=r->firstBlockEnds;
 #ifdef HAVE_PLURAL
@@ -1965,6 +1963,12 @@ BOOLEAN rDBTest(ring r, const char* fn, const int l)
 
 
   if (r->N == 0) return TRUE;
+
+  if ((r->OrdSgn!=1) && (r->OrdSgn!= -1))
+  {
+    dReportError("missing OrdSgn in %s:%d", fn, l);
+    return FALSE;
+  }
 
 //  omCheckAddrSize(r,sizeof(ip_sring));
 #if OM_CHECK > 0
@@ -3471,12 +3475,14 @@ BOOLEAN rComplete(ring r, int force)
       case ringorder_aa:
         rO_WDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i],
                    r->wvhdl[i]);
+        rCheckOrdSgn(r,i);
         typ_i++;
         break;
 
       case ringorder_am:
         rO_WMDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i],
                    r->wvhdl[i]);
+        rCheckOrdSgn(r,i);
         typ_i++;
         break;
 
@@ -3507,6 +3513,7 @@ BOOLEAN rComplete(ring r, int force)
                        r->wvhdl[i]+(r->block1[i]-r->block0[i]+1)*l);
             typ_i++;
           }
+          rCheckOrdSgn(r,i);
           break;
         }
 
@@ -3874,7 +3881,7 @@ static void rCheckOrdSgn(ring r,int b/*current block*/)
     }
   }
   // no local var found in 1..N:
-  //r->OrdSgn=1;
+  r->OrdSgn=1;
 }
 
 void rUnComplete(ring r)
