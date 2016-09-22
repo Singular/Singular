@@ -1341,7 +1341,7 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   //memset: res->ref=0; /* reference counter to the ring */
 
   res->N=rVar(r);      /* number of vars */
-  res->OrdSgn=r->OrdSgn; /* 1 for polynomial rings, -1 otherwise */
+  //res->OrdSgn=r->OrdSgn; /* 1 for polynomial rings, -1 otherwise */
 
   res->firstBlockEnds=r->firstBlockEnds;
 #ifdef HAVE_PLURAL
@@ -1464,8 +1464,7 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
 {
   if (r == NULL) return NULL;
   int i,j;
-  ring res=(ring)omAllocBin(sip_sring_bin);
-  memset(res,0,sizeof(ip_sring));
+  ring res=(ring)omAlloc0Bin(sip_sring_bin);
   //memcpy(res,r,sizeof(ip_sring));
   //memset: res->idroot=NULL; /* local objects */
   //ideal      minideal;
@@ -1483,7 +1482,7 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
   //memset: res->ref=0; /* reference counter to the ring */
 
   res->N=rVar(r);      /* number of vars */
-  res->OrdSgn=r->OrdSgn; /* 1 for polynomial rings, -1 otherwise */
+  //res->OrdSgn=r->OrdSgn; /* 1 for polynomial rings, -1 otherwise */
 
   res->firstBlockEnds=r->firstBlockEnds;
 #ifdef HAVE_PLURAL

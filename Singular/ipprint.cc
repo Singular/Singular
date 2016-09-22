@@ -203,7 +203,9 @@ static BOOLEAN ipPrint_RING(leftv u)
     else                     PrintS("ring (with zero-divisors)");
   }
   else PrintS("field");
-  if (r->OrdSgn==1) PrintS(", global"); else PrintS(", local/mixed");
+  if (r->OrdSgn==1)          PrintS(", global");
+  else if (r->MixedOrder==1) PrintS(", mixed");
+  else                       PrintS(", local");
   PrintS(" ordering\n");
   rWrite(r, TRUE);
   return FALSE;
