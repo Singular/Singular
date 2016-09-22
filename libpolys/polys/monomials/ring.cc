@@ -1356,8 +1356,6 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   res->VectorOut=r->VectorOut;
   res->ShortOut=r->ShortOut;
   res->CanShortOut=r->CanShortOut;
-  res->LexOrder=r->LexOrder; // TRUE if the monomial ordering has polynomial and power series blocks
-  res->MixedOrder=r->MixedOrder; // TRUE for mixed (global/local) ordering, FALSE otherwise,
   // 2 for diffenerent signs within one block
   res->ComponentOrder=r->ComponentOrder;
 
@@ -1399,6 +1397,8 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
 
   if (copy_ordering == TRUE)
   {
+    res->LexOrder=r->LexOrder; // TRUE if the monomial ordering has polynomial and power series blocks
+    res->MixedOrder=r->MixedOrder; // TRUE for mixed (global/local) ordering, FALSE otherwise,
     i=rBlocks(r);
     res->wvhdl   = (int **)omAlloc(i * sizeof(int *));
     res->order   = (int *) omAlloc(i * sizeof(int));
