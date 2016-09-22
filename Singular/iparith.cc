@@ -7462,6 +7462,8 @@ static BOOLEAN jjREDUCE4(leftv res, leftv u)
   else
   {
     Werror("%s(`poly`,`ideal`,`int`,`intvec`) expected",Tok2Cmdname(iiOp));
+    Werror("%s(`ideal`,`matrix`,`ideal`,`int`) expected",Tok2Cmdname(iiOp));
+    Werror("%s(`poly`,`poly`,`ideal`,`int`) expected",Tok2Cmdname(iiOp));
     return TRUE;
   }
 }
