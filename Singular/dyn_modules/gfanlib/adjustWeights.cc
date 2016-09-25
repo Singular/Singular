@@ -1,6 +1,6 @@
-#include <gfanlib/gfanlib_vector.h>
 #include <kernel/mod2.h>
 
+#include <gfanlib/gfanlib_vector.h>
 
 #ifndef NDEBUG
 static bool checkForNonPositiveEntries(const gfan::ZVector &w)
