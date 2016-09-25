@@ -6,6 +6,8 @@
 #include <tropical.h>
 #include <std_wrapper.h>
 #include <tropicalCurves.h>
+#include <tropicalDebug.h>
+
 
 // for various commands in dim(ideal I, ring r):
 #include <kernel/ideals.h>
@@ -115,6 +117,7 @@ static bool noExtraReduction(ideal I, ring r, number /*p*/)
   for (int i=0; i<k; i++)
     J->m[i] = p_PermPoly(JShortcut->m[i],NULL,rShortcut,r,outofShortcut,NULL,0);
 
+  assume(areIdealsEqual(J,r,I,r));
   swapElements(I,J);
   id_Delete(&IShortcut,rShortcut);
   id_Delete(&JShortcut,rShortcut);
@@ -750,6 +753,7 @@ std::pair<ideal,ring> tropicalStrategy::computeFlip(const ideal Ir, const ring r
 {
   assume(isValuationTrivial() || interiorPoint[0].sign()<0);
   assume(checkForUniformizingBinomial(Ir,r));
+  assume(checkWeightVector(Ir,r,interiorPoint));
 
   // get a generating system of the initial ideal
   // and compute a standard basis with respect to adjacent ordering
@@ -777,7 +781,11 @@ std::pair<ideal,ring> tropicalStrategy::computeFlip(const ideal Ir, const ring r
   for (int i=0; i<k; i++)
     Js->m[i] = p_PermPoly(Jr->m[i],NULL,r,s,identity,NULL,0);
 
-  // this->reduce(Jr,r);
+  reduce(Js,s);
+  assume(areIdealsEqual(Js,s,Ir,r));
+  assume(isValuationTrivial() || isOrderingLocalInT(s));
+  assume(checkWeightVector(Js,s,interiorPoint));
+
   // cleanup
   id_Delete(&inIsAdjusted,sAdjusted);
   id_Delete(&inJsAdjusted,sAdjusted);

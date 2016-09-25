@@ -20,52 +20,9 @@
 // #include <flip.h>
 #include <tropicalCurves.h>
 #include <bbcone.h>
+#include <tropicalDebug.h>
 
 #ifndef NDEBUG
-static bool checkPolynomialInput(const ideal I, const ring r)
-{
-  if (r) rTest(r);
-  if (I && r) id_Test(I,r);
-  return ((!I) || (I && r));
-}
-
-static bool checkOrderingAndCone(const ring r, const gfan::ZCone zc)
-{
-  return true;
-  if (r)
-  {
-    int n = rVar(r); int* w = r->wvhdl[0];
-    gfan::ZVector v = wvhdlEntryToZVector(n,w);
-    if (r->order[0]==ringorder_ws)
-      v = gfan::Integer((long)-1)*v;
-    if (!zc.contains(v))
-    {
-      std::cout << "ERROR: weight of ordering not inside Groebner cone!" << std::endl
-                << "cone: " << std::endl
-                << toString(&zc)
-                << "weight: " << std::endl
-                << v << std::endl;
-      return false;
-    }
-    return true;
-  }
-  return (zc.dimension()==0);
-}
-
-static bool checkPolyhedralInput(const gfan::ZCone zc, const gfan::ZVector p)
-{
-  return zc.containsRelatively(p);
-}
-
-#if 0 /*unused*/
-static bool checkOrderingAndWeight(const ideal I, const ring r, const gfan::ZVector w, const tropicalStrategy& currentCase)
-{
-  groebnerCone sigma(I,r,currentCase);
-  gfan::ZCone zc = sigma.getPolyhedralCone();
-  return zc.contains(w);
-}
-#endif
-
 bool groebnerCone::checkFlipConeInput(const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const
 {
   /* check first whether interiorPoint lies on the boundary of the cone */
@@ -237,6 +194,7 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& u, 
   polynomialRing(NULL),
   currentStrategy(&currentCase)
 {
+  assume(checkWeightVector(I,r,u));
   assume(checkPolynomialInput(I,r));
   if (r) polynomialRing = rCopy(r);
   if (I)
@@ -428,6 +386,7 @@ gfan::ZVector groebnerCone::tropicalPoint() const
 groebnerCone groebnerCone::flipCone(const gfan::ZVector &interiorPoint, const gfan::ZVector &facetNormal) const
 {
   assume(this->checkFlipConeInput(interiorPoint,facetNormal));
+  assume(checkWeightVector(polynomialIdeal,polynomialRing,interiorPoint));
   /* Note: the polynomial ring created will have a weighted ordering with respect to interiorPoint
    *   and with a weighted ordering with respect to facetNormal as tiebreaker.
    *   Hence it is sufficient to compute the initial form with respect to facetNormal,

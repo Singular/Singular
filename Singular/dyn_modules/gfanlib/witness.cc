@@ -2,6 +2,7 @@
 #include <Singular/lists.h>
 #include <polys/monomials/p_polys.h>
 #include <callgfanlib_conversion.h>
+#include <tropicalDebug.h>
 #include <initial.h>
 #include <tropicalStrategy.h>
 
@@ -64,6 +65,8 @@ ideal witness(const ideal inI, const ideal J, const ring r)
     I->m[i] = p_Add_q(p_Copy(inI->m[i],r),p_Neg(NFinI->m[i],r),r);
     NFinI->m[i] = NULL;
   }
+
+  assume(areIdealsEqual(I,r,J,r));
 
   return I;
 }
