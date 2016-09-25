@@ -41,7 +41,7 @@ std::vector<int> satstdSaturatingVariables;
 //------------------------------------------------------------------------
 // routine that simplifies the new element by dividing it with the maximal possible
 // partially saturating the ideal with respect to all variables doing so
-static BOOLEAN sat_vars_sp(kStrategy strat)
+BOOLEAN sat_vars_sp(kStrategy strat)
 {
   BOOLEAN b = FALSE; // set b to TRUE, if spoly was changed,
                      // let it remain FALSE otherwise
