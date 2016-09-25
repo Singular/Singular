@@ -1,4 +1,5 @@
 #include <callgfanlib_conversion.h>
+#include <singularWishlist.h>
 #include <containsMonomial.h>
 #include <tropical.h>
 #include <initial.h>

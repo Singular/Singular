@@ -1,4 +1,5 @@
 #include <tropicalStrategy.h>
+#include <singularWishlist.h>
 #include <adjustWeights.h>
 #include <ppinitialReduction.h>
 // #include <ttinitialReduction.h>
@@ -681,27 +682,6 @@ ideal tropicalStrategy::computeLift(const ideal inJs, const ring s, const ideal 
   for (int i=0; i<k; i++)
     Js->m[i] = p_PermPoly(Jr->m[i],NULL,r,s,identityrs,NULL,0);
   return Js;
-}
-
-static void deleteOrdering(ring r)
-{
-  if (r->order != NULL)
-  {
-    int i=rBlocks(r);
-    assume(r->block0 != NULL && r->block1 != NULL && r->wvhdl != NULL);
-    /* delete order */
-    omFreeSize((ADDRESS)r->order,i*sizeof(int));
-    omFreeSize((ADDRESS)r->block0,i*sizeof(int));
-    omFreeSize((ADDRESS)r->block1,i*sizeof(int));
-    /* delete weights */
-    for (int j=0; j<i; j++)
-      if (r->wvhdl[j]!=NULL)
-        omFree(r->wvhdl[j]);
-    omFreeSize((ADDRESS)r->wvhdl,i*sizeof(int *));
-  }
-  else
-    assume(r->block0 == NULL && r->block1 == NULL && r->wvhdl == NULL);
-  return;
 }
 
 ring tropicalStrategy::copyAndChangeOrderingWP(const ring r, const gfan::ZVector &w, const gfan::ZVector &v) const

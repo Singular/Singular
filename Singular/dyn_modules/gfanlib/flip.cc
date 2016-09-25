@@ -2,31 +2,9 @@
 #include <kernel/GBEngine/kstd1.h>
 #include <gfanlib/gfanlib_vector.h>
 #include <callgfanlib_conversion.h>
+#include <singularWishlist.h>
 #include <initial.h>
 #include <lift.h>
-#include <tropicalStrategy.h>
-
-
-static void deleteOrdering(ring r)
-{
-  if (r->order != NULL)
-  {
-    int i=rBlocks(r);
-    assume(r->block0 != NULL && r->block1 != NULL && r->wvhdl != NULL);
-    /* delete order */
-    omFreeSize((ADDRESS)r->order,i*sizeof(int));
-    omFreeSize((ADDRESS)r->block0,i*sizeof(int));
-    omFreeSize((ADDRESS)r->block1,i*sizeof(int));
-    /* delete weights */
-    for (int j=0; j<i; j++)
-      if (r->wvhdl[j]!=NULL)
-        omFree(r->wvhdl[j]);
-    omFreeSize((ADDRESS)r->wvhdl,i*sizeof(int *));
-  }
-  else
-    assume(r->block0 == NULL && r->block1 == NULL && r->wvhdl == NULL);
-  return;
-}
 
 /***
  * Given a Groebner basis I of an ideal in r, an interior Point
