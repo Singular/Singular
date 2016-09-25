@@ -105,7 +105,7 @@ std::pair<ideal,ring> flip(const ideal I, const ring r,
   s->block0[1] = 1;
   s->block1[1] = n;
   s->wvhdl[1] = ZVectorToIntStar(facetNormal,ok);
-  s->order[2] = ringorder_dp;
+  s->order[2] = ringorder_lp;
   s->block0[2] = 1;
   s->block1[2] = n;
   s->order[3] = ringorder_C;
