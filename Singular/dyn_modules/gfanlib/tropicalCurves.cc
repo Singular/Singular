@@ -119,11 +119,13 @@ ZConesSortedByDimension tropicalStar(ideal inI, const ring r, const gfan::ZVecto
   /* Compute the common refinement over all tropical varieties
    * of the polynomials in the generating set */
   ZConesSortedByDimension C = tropicalVarietySortedByDimension(inI->m[0],r,currentStrategy);
+  int PayneOsserman = rVar(r)-1;
   for (int i=1; i<k; i++)
   {
     if(inI->m[i]!=NULL)
     {
-      C = intersect(C,tropicalVarietySortedByDimension(inI->m[i],r,currentStrategy),d);
+      PayneOsserman--;
+      C = intersect(C,tropicalVarietySortedByDimension(inI->m[i],r,currentStrategy),si_max(PayneOsserman,d));
     }
   }
 
