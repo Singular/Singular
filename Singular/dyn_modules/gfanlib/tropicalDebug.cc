@@ -91,6 +91,8 @@ bool checkOrderingAndCone(const ring r, const gfan::ZCone zc)
 {
   if (r)
   {
+    if (r->order[0]==ringorder_dp)
+      return true;
     int n = rVar(r);
     int* w = r->wvhdl[0];
     gfan::ZVector v = wvhdlEntryToZVector(n,w);
