@@ -463,7 +463,7 @@ groebnerCones groebnerCone::groebnerNeighbours() const
       if (w[0].sign()==0 && v[0].sign()>0)
         continue;
     }
-    neighbours.insert(flipCone(interiorPoints[i],facetNormals[i]));
+    neighbours.insert(flipCone(w,v));
   }
   return neighbours;
 }
