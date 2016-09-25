@@ -4,7 +4,6 @@
 #include <callgfanlib_conversion.h>
 #include <initial.h>
 #include <tropicalStrategy.h>
-#include <utility>
 
 matrix divisionDiscardingRemainder(const poly f, const ideal G, const ring r)
 {
