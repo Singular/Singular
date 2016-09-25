@@ -120,7 +120,7 @@ ZConesSortedByDimension tropicalStar(ideal inI, const ring r, const gfan::ZVecto
    * of the polynomials in the generating set */
   ZConesSortedByDimension C = tropicalVarietySortedByDimension(inI->m[0],r,currentStrategy);
   int PayneOsserman = rVar(r)-1;
-  for (int i=1; i<k; i++)
+  for (int i=0; i<k; i++)
   {
     if(inI->m[i]!=NULL)
     {
