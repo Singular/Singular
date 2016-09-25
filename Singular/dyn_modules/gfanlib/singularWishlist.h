@@ -2,16 +2,7 @@
 #define SINGULARWISHLIST_H
 
 #include <polys/monomials/p_polys.h>
-
-/* #ifndef NDEBUG */
-/* void z_Write(number p, ring r) */
-/* { */
-/*   poly g = p_One(r); */
-/*   p_SetCoeff(g,p,r); */
-/*   p_Write(g,r); */
-/*   return; */
-/* } */
-/* #endif */
+#include <libpolys/polys/simpleideals.h>
 
 static inline BOOLEAN _p_LeadmonomDivisibleByNoComp(poly a, poly b, const ring r)
 {
@@ -85,5 +76,11 @@ inline void idShallowDelete (ideal *h)
   }
   return;
 }
+
+
+
+void z_Write(number p, ring r);
+void id_Write(const ideal I, const ring r);
+
 
 #endif
