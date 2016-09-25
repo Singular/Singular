@@ -21,7 +21,10 @@ std::vector<bool> checkNecessaryTropicalFlips(const groebnerCones &tropicalVarie
       for (int i=0; i<k; i++)
       {
         if (needToFlip[i] && sigma->contains(testVectors[i]))
+        {
           needToFlip[i] = false;
+          break;
+        }
       }
     }
   }
@@ -33,7 +36,10 @@ std::vector<bool> checkNecessaryTropicalFlips(const groebnerCones &tropicalVarie
       for (int i=0; i<k; i++)
       {
         if (needToFlip[i] && sigma->contains(testVectors[i]))
+        {
           needToFlip[i] = false;
+          break;
+        }
       }
     }
   }
