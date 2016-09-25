@@ -10,9 +10,6 @@
 #include <tropicalVarietyOfPolynomials.h>
 #include <tropicalCurves.h>
 #include <set>
-#ifndef NDEBUG
-#include <bbfan.h>
-#endif
 
 /***
  * Given two sets of cones A,B and a dimensional bound d,
@@ -320,39 +317,3 @@ gfan::ZMatrix raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector &u, 
   }
   return raysOfC;
 }
-
-
-/***
- * Computes the tropical curve of an x-homogeneous ideal I
- * which is weighted homogeneous with respect to weight w in ring r
- **/
-#ifndef NDEBUG
-BOOLEAN tropicalStarDebug(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
-  {
-    leftv v = u->next;
-    if ((v!=NULL) && (v->Typ()==BIGINTMAT_CMD))
-    {
-      omUpdateInfo();
-      Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-      ideal inI = (ideal) u->CopyD();
-      bigintmat* u = (bigintmat*) v->CopyD();
-      tropicalStrategy currentCase(inI,currRing);
-      gfan::ZVector* v = bigintmatToZVector(u);
-      ZConesSortedByDimension C = tropicalStar(inI,currRing,*v,&currentCase);
-      id_Delete(&inI,currRing);
-      delete u;
-      delete v;
-      res->rtyp = NONE;
-      res->data = NULL;
-      // res->rtyp = fanID;
-      // res->data = (char*) toFanStar(C);
-      return FALSE;
-    }
-  }
-  WerrorS("tropicalStarDebug: unexpected parameters");
-  return TRUE;
-}
-#endif

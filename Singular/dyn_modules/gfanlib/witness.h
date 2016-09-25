@@ -40,10 +40,4 @@ poly witness(const poly m, const ideal I, const ideal inI, const ring r);
  */
 ideal witness(const ideal inI, const ideal J, const ring r);
 
-#ifndef NDEBUG
-#include <Singular/ipid.h>
-BOOLEAN dwrDebug(leftv res, leftv args);
-BOOLEAN witnessDebug(leftv res, leftv args);
-#endif
-
 #endif

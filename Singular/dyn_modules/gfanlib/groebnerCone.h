@@ -122,10 +122,4 @@ struct groebnerCone_compare
 
 gfan::ZFan* toFanStar(groebnerCones setOfCones);
 
-#ifndef NDEBUG
-BOOLEAN flipConeDebug(leftv res, leftv args);
-BOOLEAN groebnerNeighboursDebug(leftv res, leftv args);
-BOOLEAN tropicalNeighboursDebug(leftv res, leftv args);
-#endif
-
 #endif

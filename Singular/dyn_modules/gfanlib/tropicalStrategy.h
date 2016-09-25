@@ -133,11 +133,6 @@ public:
   tropicalStrategy(const tropicalStrategy& currentStrategy);
 
 
-#ifndef NDEBUG
-  tropicalStrategy();
-  static tropicalStrategy debugStrategy(const ideal startIdeal, number unifParameter, ring startRing);
-#endif
-
   /**
    * destructor
    */
@@ -331,10 +326,5 @@ public:
    */
   std::pair<ideal,ring> computeFlip(const ideal Ir, const ring r, const gfan::ZVector &interiorPoint, const gfan::ZVector &facetNormal) const;
 };
-
-#ifndef NDEBUG
-BOOLEAN computeWitnessDebug(leftv res, leftv args);
-BOOLEAN computeFlipDebug(leftv res, leftv args);
-#endif
 
 #endif
