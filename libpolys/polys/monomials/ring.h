@@ -328,7 +328,7 @@ struct ip_sring
   BOOLEAN   MixedOrder; // TRUE for global/local mixed orderings, FALSE otherwise
   BOOLEAN   pLexOrder; /* TRUE if the monomial ordering is not compatible with pFDeg */
 
-  BOOLEAN   ComponentOrder; // ???
+  BOOLEAN   ComponentOrder; // 1 if ringorder_c, -1 for ringorder_C,ringorder_S,ringorder_s
 
   // what follows below here should be set by rComplete, _only_
   // contains component, but no weight fields in E */
