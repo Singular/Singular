@@ -555,8 +555,8 @@ LIB[ \t]*"(\"" { quote++; brace2++;
               #endif
               if(check)
               {
-                printf("Procedure %s (line %d) has OLD-STYLE-HELP!\n",
-                       pi->procname, pi->data.s.proc_lineno);
+                printf("Procedure %s has OLD-STYLE-HELP!\n",
+                       pi->procname);
               }
               SET_HELP_START(mode, pi, current_pos(0));
               BEGIN(poldhelp);
@@ -572,8 +572,8 @@ LIB[ \t]*"(\"" { quote++; brace2++;
 <phead>{escstrings}+"{" {
               if(check && yyleng>2)
               {
-                printf("Procedure %s (line %d) has OLD-STYLE-HELP!\n",
-                       pi->procname, pi->data.s.proc_lineno);
+                printf("Procedure %s has OLD-STYLE-HELP!\n",
+                       pi->procname);
               }
               #if YYLPDEBUG
               if(lpverbose>2 && yyleng>2)

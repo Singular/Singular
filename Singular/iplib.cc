@@ -881,26 +881,15 @@ BOOLEAN iiLoadLIB(FILE *fp, const char *libnamebuf, const char*newlib,
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
-              const char *procname, int line, long pos, BOOLEAN pstatic)
+              const char *procname, int, long pos, BOOLEAN pstatic)
 {
+  memset(pi,0,sizeof(*pi));
   pi->libname = omStrDup(libname);
   pi->procname = omStrDup(procname);
   pi->language = LANG_SINGULAR;
   pi->ref = 1;
-  pi->pack = NULL;
   pi->is_static = pstatic;
   pi->data.s.proc_start = pos;
-  pi->data.s.def_end    = 0L;
-  pi->data.s.help_start = 0L;
-  pi->data.s.help_end   = 0L;
-  pi->data.s.body_start = 0L;
-  pi->data.s.body_end   = 0L;
-  pi->data.s.example_start = 0L;
-  pi->data.s.proc_lineno = line;
-  pi->data.s.body_lineno = 0;
-  pi->data.s.example_lineno = 0;
-  pi->data.s.body = NULL;
-  pi->data.s.help_chksum = 0;
   return(pi);
 }
 
@@ -920,11 +909,24 @@ int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
   }
   #endif
 
-  h = enterid(procname,0, PROC_CMD, &IDROOT, TRUE);
+  h=IDROOT->get(procname,0);
+  if ((h!=NULL)
+  && (IDTYP(h)==PROC_CMD))
+  {
+    pi = IDPROC(h);
+    if (pi->language == LANG_SINGULAR)
+      Warn("extend `%s`",procname);
+  }
+  else
+  {
+    h = enterid(procname,0, PROC_CMD, &IDROOT, TRUE);
+  }
   if ( h!= NULL )
   {
     pi = IDPROC(h);
+    omfree(pi->libname);
     pi->libname = omStrDup(libname);
+    omfree(pi->procname);
     pi->procname = omStrDup(procname);
     pi->language = LANG_C;
     pi->ref = 1;
@@ -934,7 +936,7 @@ int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
   }
   else
   {
-    PrintS("iiAddCproc: failed.\n");
+    WarnS("iiAddCproc: failed.");
   }
   return(0);
 }
@@ -984,24 +986,25 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
   }
   pl = basePack->idroot->get(plib,0); /* packages only in top level
                                         (see enterid) */
-  if (pl==NULL)
+  if ((pl!=NULL)
+  &&(IDTYP(pl)==PACKAGE_CMD))
   {
-    pl = enterid( plib,0, PACKAGE_CMD, &IDROOT,
-                  TRUE );
-    IDPACKAGE(pl)->language = LANG_C;
-    IDPACKAGE(pl)->libname=omStrDup(newlib);
+    if(IDPACKAGE(pl)->language==LANG_C)
+    {
+      if (BVERBOSE(V_LOAD_LIB)) Warn( "%s already loaded as package", newlib);
+      omFree(plib);
+      return FALSE;
+    }
   }
   else
   {
-    if(IDTYP(pl)!=PACKAGE_CMD)
-    {
-      Warn("not of type package.");
-      goto load_modules_end;
-    }
+    pl = enterid( plib,0, PACKAGE_CMD, &IDROOT, TRUE );
+    IDPACKAGE(pl)->libname=omStrDup(newlib);
   }
+  IDPACKAGE(pl)->language = LANG_C;
   if (dynl_check_opened(FullName))
   {
-    if (BVERBOSE(V_LOAD_LIB)) Warn( "%s already loaded", fullname);
+    if (BVERBOSE(V_LOAD_LIB)) Warn( "%s already loaded as C library", fullname);
     return FALSE;
   }
   if((IDPACKAGE(pl)->handle=dynl_open(FullName))==(void *)NULL)
@@ -1064,18 +1067,23 @@ BOOLEAN load_builtin(const char *newlib, BOOLEAN autoexport, SModulFunc_t init)
   // BOOLEAN RET=TRUE;
   // int token;
 
-  pl = IDROOT->get(plib,0);
-  if (pl!=NULL)
+  pl = basePack->idroot->get(plib,0); // search PACKAGE only in Top
+  if ((pl!=NULL)
+  &&(IDTYP(pl)==PACKAGE_CMD))
   {
-    if (BVERBOSE(V_LOAD_LIB)) Warn( "(builtin) %s already loaded", newlib);
-    omFree(plib);
-    return FALSE;
+    if(IDPACKAGE(pl)->language==LANG_C)
+    {
+      if (BVERBOSE(V_LOAD_LIB)) Warn( "(builtin) %s already loaded", newlib);
+      omFree(plib);
+      return FALSE;
+    }
   }
-
-  pl = enterid( plib,0, PACKAGE_CMD, &IDROOT,
-                TRUE );
+  else
+  {
+    pl = enterid( plib,0, PACKAGE_CMD, &IDROOT, TRUE );
+    IDPACKAGE(pl)->libname=omStrDup(newlib);
+  }
   IDPACKAGE(pl)->language = LANG_C;
-  IDPACKAGE(pl)->libname=omStrDup(newlib);
 
   IDPACKAGE(pl)->handle=(void *)NULL;
   SModulFunctions sModulFunctions;
@@ -1132,15 +1140,13 @@ void module_help_proc(const char *newlib,const char *p, const char *help)
 }
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
+#ifdef HAVE_DYNAMIC_LOADING
 // loads a dynamic module from the binary path and returns a named function
 // returns NULL, if something fails
 void* binary_module_function(const char* newlib, const char* funcname)
 {
   void* result = NULL;
 
-#if defined(HAVE_STATIC) || !defined(HAVE_DYNAMIC_LOADING)
-  WerrorS("static version can not load function from dynamic modules");
-#else
   const char* bin_dir = feGetResource('b');
   if (!bin_dir)  { return NULL; }
 
@@ -1155,11 +1161,10 @@ void* binary_module_function(const char* newlib, const char* funcname)
   }
   result = dynl_sym(openlib, funcname);
   if (!result) Werror("%s: %s\n", funcname, dynl_error());
-#endif
 
   return result;
 }
-
+#endif
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 char mytoupper(char c)
@@ -1224,8 +1229,8 @@ void piShowProcList()
         Print( "%d %-15s  %20s ", proc->is_static ? 1 : 0, proc->libname,
                proc->procname);
       if(proc->language==LANG_SINGULAR)
-        Print("line %4d,%-5ld  %4d,%-5ld  %4d,%-5ld\n",
-              proc->data.s.proc_lineno, proc->data.s.proc_start,
+        Print("line %-5ld  %4d,%-5ld  %4d,%-5ld\n",
+              proc->data.s.proc_start,
               proc->data.s.body_lineno, proc->data.s.body_start,
               proc->data.s.example_lineno, proc->data.s.example_start);
       else if(proc->language==LANG_C)

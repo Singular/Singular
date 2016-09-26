@@ -279,15 +279,21 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
     {
       if ((IDTYP(h) == t)||(t==DEF_CMD))
       {
-        if ((IDTYP(h)==PACKAGE_CMD)
-        && (strcmp(s,"Top")==0))
+        if (IDTYP(h)==PACKAGE_CMD)
         {
-          goto errlabel;
+          if (strcmp(s,"Top")==0)
+          {
+            goto errlabel;
+          }
+          else return *root;
         }
-        if (BVERBOSE(V_REDEFINE))
-          Warn("redefining %s (%s)",s,my_yylinebuf);
-        if (s==IDID(h)) IDID(h)=NULL;
-        killhdl2(h,root,currRing);
+        else
+        {
+          if (BVERBOSE(V_REDEFINE))
+            Warn("redefining %s (%s)",s,my_yylinebuf);
+          if (s==IDID(h)) IDID(h)=NULL;
+          killhdl2(h,root,currRing);
+        }
       }
       else
         goto errlabel;
@@ -648,19 +654,19 @@ const char * piProcinfo(procinfov pi, const char *request)
 
 BOOLEAN piKill(procinfov pi)
 {
-  Voice *p=currentVoice;
-  while (p!=NULL)
-  {
-    if (p->pi==pi && pi->ref <= 1)
-    {
-      Warn("`%s` in use, can not be killed",pi->procname);
-      return TRUE;
-    }
-    p=p->next;
-  }
   (pi->ref)--;
   if (pi->ref <= 0)
   {
+    Voice *p=currentVoice;
+    while (p!=NULL)
+    {
+      if (p->pi==pi && pi->ref <= 1)
+      {
+        Warn("`%s` in use, can not be killed",pi->procname);
+        return TRUE;
+      }
+      p=p->next;
+    }
     if (pi->libname != NULL) // OB: ????
       omFree((ADDRESS)pi->libname);
     if (pi->procname != NULL) // OB: ????

@@ -191,6 +191,8 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
     case PROC_CMD: if((IDPROC(h)->libname!=NULL)
                    && (strlen(IDPROC(h)->libname)>0))
                      Print(" from %s",IDPROC(h)->libname);
+                   if(IDPROC(h)->language==LANG_C)
+                     PrintS(" (C)");
                    if(IDPROC(h)->is_static)
                      PrintS(" (static)");
                    break;
