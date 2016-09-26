@@ -103,9 +103,8 @@ bool checkOrderingAndCone(const ring r, const gfan::ZCone zc)
       std::cout << "ERROR: weight of ordering not inside Groebner cone!" << std::endl;
       return false;
     }
-    return true;
   }
-  return (zc.dimension()==0);
+  return true;
 }
 
 bool checkPolynomialInput(const ideal I, const ring r)
