@@ -1355,8 +1355,6 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   res->VectorOut=r->VectorOut;
   res->ShortOut=r->ShortOut;
   res->CanShortOut=r->CanShortOut;
-  // 2 for diffenerent signs within one block
-  res->ComponentOrder=r->ComponentOrder;
 
   //memset: res->ExpL_Size=0;
   //memset: res->CmpL_Size=0;
@@ -1497,8 +1495,6 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
   res->CanShortOut=r->CanShortOut;
   res->LexOrder=r->LexOrder; // TRUE if the monomial ordering has polynomial and power series blocks
   res->MixedOrder=r->MixedOrder; // TRUE for mixed (global/local) ordering, FALSE otherwise,
-  // 2 for diffenerent signs within one block
-  res->ComponentOrder=r->ComponentOrder;
 
   //memset: res->ExpL_Size=0;
   //memset: res->CmpL_Size=0;
@@ -3134,10 +3130,6 @@ static void rSetDegStuff(ring r)
     && (order[2]==0))
     )
   {
-    if ((order[0]!=ringorder_unspec)
-    && ((order[1]==ringorder_C)||(order[1]==ringorder_S)||
-        (order[1]==ringorder_s)))
-      r->ComponentOrder=-1;
     if (r->OrdSgn == -1) r->pLDeg = pLDeg0c;
     if ((order[0] == ringorder_lp)
     || (order[0] == ringorder_ls)
@@ -3177,9 +3169,6 @@ static void rSetDegStuff(ring r)
   && (order[1]!=ringorder_M)
   &&  (order[2]==0))
   {
-    if ((order[0]==ringorder_C)||(order[0]==ringorder_S)||
-        order[0]==ringorder_s)
-      r->ComponentOrder=-1;
     if ((order[1] == ringorder_lp)
     || (order[1] == ringorder_ls)
     || (order[1] == ringorder_rp)
