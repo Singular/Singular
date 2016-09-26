@@ -281,7 +281,7 @@ void pReduce(ideal &I, const number p, const ring r)
     if (I->m[i]!=NULL)
     {
       number c = p_GetCoeff(I->m[i],r);
-      if (!n_Equal(p,c,r->cf))
+      if (!n_DivBy(p,c,r->cf))
         pReduce(I->m[i],p,r);
     }
   }
