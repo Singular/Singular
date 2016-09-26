@@ -44,3 +44,19 @@ ideal gfanlib_satStd_wrapper(ideal I, ring r, tHomog h=testHomog)
 
   return stdI;
 }
+
+ideal gfanlib_monomialabortStd_wrapper(ideal I, ring r, tHomog h=testHomog)
+{
+  ring origin = currRing;
+  if (origin != r)
+    rChangeCurrRing(r);
+
+  ideal stdI = kStd(I,currRing->qideal,h,NULL,NULL,0,0,NULL,abort_if_monomial_sp);
+  id_DelDiv(stdI,currRing);
+  idSkipZeroes(stdI);
+
+  if (origin != r)
+    rChangeCurrRing(origin);
+
+  return stdI;
+}

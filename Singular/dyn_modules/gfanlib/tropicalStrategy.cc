@@ -7,6 +7,7 @@
 #include <std_wrapper.h>
 #include <tropicalCurves.h>
 #include <tropicalDebug.h>
+#include <containsMonomial.h>
 
 
 // for various commands in dim(ideal I, ring r):
@@ -524,9 +525,16 @@ std::pair<poly,int> tropicalStrategy::checkInitialIdealForMonomial(const ideal I
     inIShortcut = I;
   }
 
+  gfan::ZCone C0 = homogeneitySpace(inIShortcut,rShortcut);
+  gfan::ZCone pos = gfan::ZCone::positiveOrthant(C0.ambientDimension());
+  gfan::ZCone C0pos = intersection(C0,pos);
+  C0pos.canonicalize();
+  gfan::ZVector wpos = C0pos.getRelativeInteriorPoint();
+  assume(checkForNonPositiveEntries(wpos));
+
   // check initial ideal for monomial and
   // if it exsists, return a copy of the monomial in the input ring
-  poly p = checkForMonomialViaSuddenSaturation(inIShortcut,rShortcut);
+  poly p = searchForMonomialViaStepwiseSaturation(inIShortcut,rShortcut,wpos);
   poly monomial = NULL;
   if (p!=NULL)
   {

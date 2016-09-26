@@ -6,5 +6,6 @@
 
 ideal gfanlib_kStd_wrapper(ideal I, ring r, tHomog h=testHomog);
 ideal gfanlib_satStd_wrapper(ideal I, ring r, tHomog h=testHomog);
+ideal gfanlib_monomialabortStd_wrapper(ideal I, ring r, tHomog h=testHomog);
 
 #endif
