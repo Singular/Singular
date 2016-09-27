@@ -1,35 +1,9 @@
-#include <gfanlib/gfanlib_vector.h>
 #include <kernel/mod2.h>
 
+#include <gfanlib/gfanlib_vector.h>
 
 #ifndef NDEBUG
-static bool checkForNonPositiveEntries(const gfan::ZVector &w)
-{
-  for (unsigned i=0; i<w.size(); i++)
-  {
-    if (w[i].sign()<=0)
-    {
-      std::cout << "ERROR: non-positive weight in weight vector" << std::endl
-                << "weight: " << w << std::endl;
-      return false;
-    }
-  }
-  return true;
-}
-
-static bool checkForNonPositiveLaterEntries(const gfan::ZVector &w)
-{
-  for (unsigned i=1; i<w.size(); i++)
-  {
-    if (w[i].sign()<=0)
-    {
-      std::cout << "ERROR: non-positive weight in weight vector later entries" << std::endl
-                << "weight: " << w << std::endl;
-      return false;
-    }
-  }
-  return true;
-}
+#include <tropicalDebug.h>
 #endif //NDEBUG
 
 /***

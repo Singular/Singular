@@ -1,4 +1,6 @@
 #include <callgfanlib_conversion.h>
+#include <singularWishlist.h>
+#include <tropicalDebug.h>
 #include <containsMonomial.h>
 #include <tropical.h>
 #include <initial.h>
@@ -10,6 +12,7 @@
 #include <tropicalVarietyOfPolynomials.h>
 #include <tropicalVariety.h>
 #include <tropicalStrategy.h>
+#include <std_wrapper.h>
 
 
 groebnerCone groebnerStartingCone(const tropicalStrategy& currentStrategy)
@@ -329,6 +332,40 @@ static gfan::ZCone linealitySpaceOfGroebnerFan(const ideal I, const ring r)
   return gfan::ZCone(gfan::ZMatrix(0,n),equations);
 }
 
+
+ring createTraversalStartingRing(const ring s, const gfan::ZMatrix &startingPoints, const tropicalStrategy& currentStrategy)
+{
+  // copy r except qideal (which should be 0) and ordering
+  ring s0 = rCopy0(s);
+  int n = rVar(s);
+  deleteOrdering(s0);
+  bool ok;
+
+  // adjust weight and create new ordering
+  int h = startingPoints.getHeight();
+  s0->order = (int*) omAlloc0((h+3)*sizeof(int));
+  s0->block0 = (int*) omAlloc0((h+3)*sizeof(int));
+  s0->block1 = (int*) omAlloc0((h+3)*sizeof(int));
+  s0->wvhdl = (int**) omAlloc0((h+3)*sizeof(int**));
+  for (int i=0; i<h; i++)
+  {
+    s0->order[i] = ringorder_a;
+    s0->block0[i] = 1;
+    s0->block1[i] = n;
+    s0->wvhdl[i] = ZVectorToIntStar(startingPoints[i],ok);
+  }
+  s0->order[h] = ringorder_lp;
+  s0->block0[h] = 1;
+  s0->block1[h] = n;
+  s0->order[h+1] = ringorder_C;
+
+  rComplete(s0);
+  rTest(s0);
+
+  return s0;
+}
+
+
 /***
  * Computes a starting cone in the tropical variety.
  **/
@@ -358,7 +395,8 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
     // and check whether the dimension of its homogeneity space
     // equals the dimension of the tropical variety
     gfan::ZCone zc = linealitySpaceOfGroebnerFan(inI,s);
-    gfan::ZVector startingPoint; groebnerCone ambientMaximalCone;
+    gfan::ZMatrix startingPoints(0,rVar(r));
+    groebnerCone ambientMaximalCone;
     if (zc.dimension()>=currentStrategy.getExpectedDimension())
     {
       // check whether the lineality space is contained in the tropical variety
@@ -379,7 +417,8 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
     {
       // compute a point in the tropical variety outside the lineality space
       std::pair<gfan::ZVector,groebnerCone> startingData = tropicalStartingDataViaGroebnerFan(inI,s,currentStrategy);
-      startingPoint = startingData.first;
+      gfan::ZVector startingPoint = startingData.first;
+      startingPoints.appendRow(startingPoint);
       ambientMaximalCone = groebnerCone(startingData.second);
 
       id_Delete(&inI,s); rDelete(s);
@@ -396,12 +435,30 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
     // in the relative interior of a maximal cone in the tropical variety
     // from this we can read of the inequalities and equations
 
+    ring s0 = createTraversalStartingRing(s,startingPoints,currentStrategy);
+    nMapFunc identity = n_SetMap(s->cf,s0->cf);
+    k = IDELEMS(inI);
+    ideal inI0 = idInit(k);
+    for (int i=0; i<k; i++)
+      inI0->m[i] = p_PermPoly(inI->m[i],NULL,s,s0,identity,NULL,0);
+
+    identity = n_SetMap(r->cf,s0->cf);
+    k = IDELEMS(I);
+    ideal I0 = idInit(k);
+    for (int i=0; i<k; i++)
+      I0->m[i] = p_PermPoly(I->m[i],NULL,r,s0,identity,NULL,0);
+
+
     // but before doing so, we must lift the generating set of inI
     // to a generating set of I
-    ideal J = lift(I,r,inI,s); // todo: use computeLift from tropicalStrategy
-    groebnerCone startingCone(J,inI,s,currentStrategy);
-    id_Delete(&inI,s);
-    id_Delete(&J,s);
+    // ideal J0 = lift(I,r,inI0,s0); // todo: use computeLift from tropicalStrategy
+    ideal J0 = gfanlib_kStd_wrapper(I0,s0);
+    assume(areIdealsEqual(J0,s0,I,r));
+    id_Delete(&I0,s0);
+    groebnerCone startingCone(J0,inI0,s0,currentStrategy);
+    id_Delete(&J0,s0);
+    id_Delete(&inI0,s0);
+    rDelete(s0);
 
     // assume(checkContainmentInTropicalVariety(startingCone));
     return startingCone;

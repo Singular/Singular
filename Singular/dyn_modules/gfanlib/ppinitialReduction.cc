@@ -273,31 +273,6 @@ BOOLEAN ptNormalize(leftv res, leftv args)
 }
 #endif //NDEBUG
 
-#ifndef NDEBUG
-BOOLEAN pReduceDebug(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == POLY_CMD))
-  {
-    poly g; number p = n_Init(3,currRing->cf);
-    omUpdateInfo();
-    Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-    g = (poly) u->CopyD();
-    (void) pReduce(g,p,currRing);
-    p_Delete(&g,currRing);
-    omUpdateInfo();
-    Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
-    g = (poly) u->CopyD();
-    (void) pReduce(g,p,currRing);
-    n_Delete(&p,currRing->cf);
-    res->rtyp = POLY_CMD;
-    res->data = (char*) g;
-    return FALSE;
-  }
-  return TRUE;
-}
-#endif //NDEBUG
-
 void pReduce(ideal &I, const number p, const ring r)
 {
   int k = IDELEMS(I);
@@ -306,7 +281,7 @@ void pReduce(ideal &I, const number p, const ring r)
     if (I->m[i]!=NULL)
     {
       number c = p_GetCoeff(I->m[i],r);
-      if (!n_Equal(p,c,r->cf))
+      if (!n_DivBy(p,c,r->cf))
         pReduce(I->m[i],p,r);
     }
   }
@@ -351,39 +326,6 @@ bool ppreduceInitially(poly* hStar, const poly g, const ring r)
   p_Test(g,r);
   return false;
 }
-
-
-#ifndef NDEBUG
-BOOLEAN ppreduceInitially0(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == POLY_CMD))
-  {
-    leftv v = u->next;
-    if ((v != NULL) && (v->Typ() == POLY_CMD))
-    {
-      poly g,h;
-      omUpdateInfo();
-      Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-      h = (poly) u->CopyD();
-      g = (poly) v->CopyD();
-      (void)ppreduceInitially(&h,g,currRing);
-      p_Delete(&h,currRing);
-      p_Delete(&g,currRing);
-      omUpdateInfo();
-      Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
-      h = (poly) u->CopyD();
-      g = (poly) v->CopyD();
-      (void)ppreduceInitially(&h,g,currRing);
-      p_Delete(&g,currRing);
-      res->rtyp = POLY_CMD;
-      res->data = (char*) h;
-      return FALSE;
-    }
-  }
-  return TRUE;
-}
-#endif //NDEBUG
 
 
 /***
@@ -435,39 +377,6 @@ bool ppreduceInitially(ideal I, const number p, const ring r)
   idSkipZeroes(I);
   return false;
 }
-
-
-#ifndef NDEBUG
-BOOLEAN ppreduceInitially1(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
-  {
-    leftv v = u->next;
-    if ((v != NULL) && (v->Typ() == NUMBER_CMD))
-    {
-      ideal I; number p;
-      omUpdateInfo();
-      Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-      I = (ideal) u->CopyD();
-      p = (number) v->CopyD();
-      (void) ppreduceInitially(I,p,currRing);
-      id_Delete(&I,currRing);
-      n_Delete(&p,currRing->cf);
-      omUpdateInfo();
-      Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
-      I = (ideal) u->CopyD();
-      p = (number) v->CopyD();
-      (void) ppreduceInitially(I,p,currRing);
-      n_Delete(&p,currRing->cf);
-      res->rtyp = IDEAL_CMD;
-      res->data = (char*) I;
-      return FALSE;
-    }
-  }
-  return TRUE;
-}
-#endif //NDEBUG
 
 
 /***
@@ -531,45 +440,6 @@ int ppreduceInitially(ideal I, const number p, const poly g, const ring r)
   id_Test(I,r);
   return j;
 }
-
-
-#ifndef NDEBUG
-BOOLEAN ppreduceInitially2(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
-  {
-    leftv v = u->next;
-    if ((v != NULL) && (v->Typ() == NUMBER_CMD))
-    {
-      leftv w = v->next;
-      if ((w != NULL) && (w->Typ() == POLY_CMD))
-      {
-        ideal I; number p; poly g;
-        omUpdateInfo();
-        Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-        I = (ideal) u->CopyD();
-        p = (number) v->CopyD();
-        g = (poly) w->CopyD();
-        (void) ppreduceInitially(I,p,g,currRing);
-        id_Delete(&I,currRing);
-        n_Delete(&p,currRing->cf);
-        omUpdateInfo();
-        Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
-        I = (ideal) u->CopyD();
-        p = (number) v->CopyD();
-        g = (poly) w->CopyD();
-        (void) ppreduceInitially(I,p,g,currRing);
-        n_Delete(&p,currRing->cf);
-        res->rtyp = IDEAL_CMD;
-        res->data = (char*) I;
-        return FALSE;
-      }
-    }
-  }
-  return TRUE;
-}
-#endif //NDEBUG
 
 
 static poly ppNext(poly p, int l)
@@ -735,37 +605,6 @@ bool ppreduceInitially(ideal &H, const number p, const ideal G, const ring r)
 }
 
 
-#ifndef NDEBUG
-BOOLEAN ppreduceInitially3(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
-  {
-    leftv v = u->next;
-    if ((v != NULL) && (v->Typ() == NUMBER_CMD))
-    {
-      leftv w = v->next;
-      if ((w != NULL) && (w->Typ() == IDEAL_CMD))
-      {
-        ideal H,G; number p;
-        omUpdateInfo();
-        Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-        H = (ideal) u->CopyD();
-        p = (number) v->CopyD();
-        G = (ideal) w->CopyD();
-        (void) ppreduceInitially(H,p,G,currRing);
-        n_Delete(&p,currRing->cf);
-        id_Delete(&G,currRing);
-        res->rtyp = IDEAL_CMD;
-        res->data = (char*) H;
-        return FALSE;
-      }
-    }
-  }
-  return TRUE;
-}
-#endif //NDEBUG
-
 /**
  * reduces I initially with respect to itself.
  * assumes that the generators of I are homogeneous in x and that p-t is in I.
@@ -870,30 +709,6 @@ bool ppreduceInitially(ideal I, const ring r, const number p)
   idShallowDelete(&G);
   return false;
 }
-
-
-#ifndef NDEBUG
-BOOLEAN reduceInitiallyDebug(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
-  {
-    leftv v = u->next;
-    if ((v != NULL) && (v->Typ() == NUMBER_CMD))
-    {
-      omUpdateInfo();
-      Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-      ideal I = (ideal) u->CopyD();
-      number p = (number) v->Data();
-      (void) ppreduceInitially(I,currRing,p);
-      res->rtyp = IDEAL_CMD;
-      res->data = (char*) I;
-      return FALSE;
-    }
-  }
-  return TRUE;
-}
-#endif
 
 
 // BOOLEAN ppreduceInitially(leftv res, leftv args)

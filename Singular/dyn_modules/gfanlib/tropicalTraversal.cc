@@ -1,6 +1,7 @@
 #include <bbcone.h>
 #include <groebnerCone.h>
 #include <tropicalCurves.h>
+#include <std_wrapper.h>
 
 std::vector<bool> checkNecessaryTropicalFlips(const groebnerCones &tropicalVariety, const groebnerCones &workingList,
                                               const gfan::ZVector &interiorPoint, const gfan::ZMatrix &normalVectors)
@@ -21,7 +22,10 @@ std::vector<bool> checkNecessaryTropicalFlips(const groebnerCones &tropicalVarie
       for (int i=0; i<k; i++)
       {
         if (needToFlip[i] && sigma->contains(testVectors[i]))
+        {
           needToFlip[i] = false;
+          break;
+        }
       }
     }
   }
@@ -33,7 +37,10 @@ std::vector<bool> checkNecessaryTropicalFlips(const groebnerCones &tropicalVarie
       for (int i=0; i<k; i++)
       {
         if (needToFlip[i] && sigma->contains(testVectors[i]))
+        {
           needToFlip[i] = false;
+          break;
+        }
       }
     }
   }
@@ -70,11 +77,13 @@ groebnerCones tropicalTraversalMinimizingFlips(const groebnerCone startingCone)
       if (!(currentStrategy->restrictToLowerHalfSpace() && interiorPoint[0].sign()==0))
       {
         ideal inI = initial(sigma.getPolynomialIdeal(),sigma.getPolynomialRing(),interiorPoint);
-        gfan::ZMatrix normalVectors = raysOfTropicalStar(inI,
+        ideal inISTD = gfanlib_satStd_wrapper(inI,sigma.getPolynomialRing());
+        id_Delete(&inI,sigma.getPolynomialRing());
+        gfan::ZMatrix normalVectors = raysOfTropicalStar(inISTD,
                                                          sigma.getPolynomialRing(),
                                                          interiorPoint,
                                                          sigma.getTropicalStrategy());
-        id_Delete(&inI,sigma.getPolynomialRing());
+        id_Delete(&inISTD,sigma.getPolynomialRing());
 
         std::vector<bool> needToFlip = checkNecessaryTropicalFlips(tropicalVariety,workingList,interiorPoint,normalVectors);
         for (int j=0; j<normalVectors.getHeight(); j++)

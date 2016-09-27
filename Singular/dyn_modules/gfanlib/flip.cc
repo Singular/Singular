@@ -2,31 +2,9 @@
 #include <kernel/GBEngine/kstd1.h>
 #include <gfanlib/gfanlib_vector.h>
 #include <callgfanlib_conversion.h>
+#include <singularWishlist.h>
 #include <initial.h>
 #include <lift.h>
-#include <tropicalStrategy.h>
-
-
-static void deleteOrdering(ring r)
-{
-  if (r->order != NULL)
-  {
-    int i=rBlocks(r);
-    assume(r->block0 != NULL && r->block1 != NULL && r->wvhdl != NULL);
-    /* delete order */
-    omFreeSize((ADDRESS)r->order,i*sizeof(int));
-    omFreeSize((ADDRESS)r->block0,i*sizeof(int));
-    omFreeSize((ADDRESS)r->block1,i*sizeof(int));
-    /* delete weights */
-    for (int j=0; j<i; j++)
-      if (r->wvhdl[j]!=NULL)
-        omFree(r->wvhdl[j]);
-    omFreeSize((ADDRESS)r->wvhdl,i*sizeof(int *));
-  }
-  else
-    assume(r->block0 == NULL && r->block1 == NULL && r->wvhdl == NULL);
-  return;
-}
 
 /***
  * Given a Groebner basis I of an ideal in r, an interior Point
@@ -48,19 +26,23 @@ std::pair<ideal,ring> flip(const ideal I, const ring r,
   ring sAdjusted = rCopy0(r);
   int n = rVar(sAdjusted);
   deleteOrdering(sAdjusted);
-  sAdjusted->order = (int*) omAlloc0(4*sizeof(int));
-  sAdjusted->block0 = (int*) omAlloc0(4*sizeof(int));
-  sAdjusted->block1 = (int*) omAlloc0(4*sizeof(int));
-  sAdjusted->wvhdl = (int**) omAlloc0(4*sizeof(int**));
+  sAdjusted->order = (int*) omAlloc0(5*sizeof(int));
+  sAdjusted->block0 = (int*) omAlloc0(5*sizeof(int));
+  sAdjusted->block1 = (int*) omAlloc0(5*sizeof(int));
+  sAdjusted->wvhdl = (int**) omAlloc0(5*sizeof(int**));
   sAdjusted->order[0] = ringorder_a;
   sAdjusted->block0[0] = 1;
   sAdjusted->block1[0] = n;
   sAdjusted->wvhdl[0] = ZVectorToIntStar(adjustedInteriorPoint,ok);
-  sAdjusted->order[1] = ringorder_wp;
+  sAdjusted->order[1] = ringorder_a;
   sAdjusted->block0[1] = 1;
   sAdjusted->block1[1] = n;
   sAdjusted->wvhdl[1] = ZVectorToIntStar(adjustedFacetNormal,ok);
-  sAdjusted->order[2] = ringorder_C;
+  sAdjusted->order[2] = ringorder_lp;
+  sAdjusted->block0[2] = 1;
+  sAdjusted->block1[2] = n;
+  sAdjusted->wvhdl[2] = ZVectorToIntStar(adjustedFacetNormal,ok);
+  sAdjusted->order[3] = ringorder_C;
   rComplete(sAdjusted);
   rTest(sAdjusted);
   nMapFunc identity = n_SetMap(r->cf,sAdjusted->cf);
@@ -101,7 +83,7 @@ std::pair<ideal,ring> flip(const ideal I, const ring r,
   s->block0[1] = 1;
   s->block1[1] = n;
   s->wvhdl[1] = ZVectorToIntStar(facetNormal,ok);
-  s->order[2] = ringorder_dp;
+  s->order[2] = ringorder_lp;
   s->block0[2] = 1;
   s->block1[2] = n;
   s->order[3] = ringorder_C;

@@ -13,11 +13,4 @@ void pReduceInhomogeneous(poly &g, const number p, const ring r);
 bool ppreduceInitially(ideal I, const ring r, const number p);
 /* BOOLEAN ppreduceInitially(leftv res, leftv args); */
 
-#ifndef NDEBUG
-BOOLEAN pReduceDebug(leftv res, leftv args);
-BOOLEAN reduceInitiallyDebug(leftv res, leftv args);
-BOOLEAN ptNormalize(leftv res, leftv args);
-BOOLEAN ppreduceInitially3(leftv res, leftv args);
-#endif
-
 #endif

@@ -2,16 +2,7 @@
 #define SINGULARWISHLIST_H
 
 #include <polys/monomials/p_polys.h>
-
-/* #ifndef NDEBUG */
-/* void z_Write(number p, ring r) */
-/* { */
-/*   poly g = p_One(r); */
-/*   p_SetCoeff(g,p,r); */
-/*   p_Write(g,r); */
-/*   return; */
-/* } */
-/* #endif */
+#include <libpolys/polys/simpleideals.h>
 
 static inline BOOLEAN _p_LeadmonomDivisibleByNoComp(poly a, poly b, const ring r)
 {
@@ -85,5 +76,31 @@ inline void idShallowDelete (ideal *h)
   }
   return;
 }
+
+inline void deleteOrdering(ring r)
+{
+  if (r->order != NULL)
+  {
+    int i=rBlocks(r);
+    assume(r->block0 != NULL && r->block1 != NULL && r->wvhdl != NULL);
+    /* delete order */
+    omFreeSize((ADDRESS)r->order,i*sizeof(int));
+    omFreeSize((ADDRESS)r->block0,i*sizeof(int));
+    omFreeSize((ADDRESS)r->block1,i*sizeof(int));
+    /* delete weights */
+    for (int j=0; j<i; j++)
+      if (r->wvhdl[j]!=NULL)
+        omFree(r->wvhdl[j]);
+    omFreeSize((ADDRESS)r->wvhdl,i*sizeof(int *));
+  }
+  else
+    assume(r->block0 == NULL && r->block1 == NULL && r->wvhdl == NULL);
+  return;
+}
+
+
+void z_Write(number p, ring r);
+void id_Write(const ideal I, const ring r);
+
 
 #endif

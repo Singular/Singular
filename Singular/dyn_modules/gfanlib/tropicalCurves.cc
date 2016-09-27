@@ -10,9 +10,6 @@
 #include <tropicalVarietyOfPolynomials.h>
 #include <tropicalCurves.h>
 #include <set>
-#ifndef NDEBUG
-#include <bbfan.h>
-#endif
 
 /***
  * Given two sets of cones A,B and a dimensional bound d,
@@ -122,11 +119,13 @@ ZConesSortedByDimension tropicalStar(ideal inI, const ring r, const gfan::ZVecto
   /* Compute the common refinement over all tropical varieties
    * of the polynomials in the generating set */
   ZConesSortedByDimension C = tropicalVarietySortedByDimension(inI->m[0],r,currentStrategy);
-  for (int i=1; i<k; i++)
+  int PayneOsserman = rVar(r)-1;
+  for (int i=0; i<k; i++)
   {
     if(inI->m[i]!=NULL)
     {
-      C = intersect(C,tropicalVarietySortedByDimension(inI->m[i],r,currentStrategy),d);
+      PayneOsserman--;
+      C = intersect(C,tropicalVarietySortedByDimension(inI->m[i],r,currentStrategy),si_max(PayneOsserman,d));
     }
   }
 
@@ -320,39 +319,3 @@ gfan::ZMatrix raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector &u, 
   }
   return raysOfC;
 }
-
-
-/***
- * Computes the tropical curve of an x-homogeneous ideal I
- * which is weighted homogeneous with respect to weight w in ring r
- **/
-#ifndef NDEBUG
-BOOLEAN tropicalStarDebug(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
-  {
-    leftv v = u->next;
-    if ((v!=NULL) && (v->Typ()==BIGINTMAT_CMD))
-    {
-      omUpdateInfo();
-      Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-      ideal inI = (ideal) u->CopyD();
-      bigintmat* u = (bigintmat*) v->CopyD();
-      tropicalStrategy currentCase(inI,currRing);
-      gfan::ZVector* v = bigintmatToZVector(u);
-      ZConesSortedByDimension C = tropicalStar(inI,currRing,*v,&currentCase);
-      id_Delete(&inI,currRing);
-      delete u;
-      delete v;
-      res->rtyp = NONE;
-      res->data = NULL;
-      // res->rtyp = fanID;
-      // res->data = (char*) toFanStar(C);
-      return FALSE;
-    }
-  }
-  WerrorS("tropicalStarDebug: unexpected parameters");
-  return TRUE;
-}
-#endif

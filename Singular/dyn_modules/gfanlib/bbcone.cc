@@ -1656,6 +1656,41 @@ BOOLEAN facetContaining(leftv res, leftv args)
 }
 
 
+BOOLEAN faceContaining(leftv res, leftv args)
+{
+  gfan::initializeCddlibIfRequired();
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*) u->Data();
+
+      bigintmat* point1;
+      if (v->Typ() == INTVEC_CMD)
+      {
+        intvec* point0 = (intvec*) v->Data();
+        point1 = iv2bim(point0,coeffs_BIGINT)->transpose();
+      }
+      else
+        point1 = (bigintmat*) v->Data();
+      gfan::ZVector* point = bigintmatToZVector(*point1);
+
+      res->rtyp = coneID;
+      res->data = (void*) new gfan::ZCone(zc->faceContaining(*point));
+
+      delete point;
+      if (v->Typ() == INTVEC_CMD)
+        delete point1;
+      return FALSE;
+    }
+  }
+  WerrorS("facetContaining: unexpected parameters");
+  return TRUE;
+}
+
+
 /***
  * Computes a relative interior point for each facet of zc
  **/
@@ -1926,6 +1961,7 @@ void bbcone_setup(SModulFunctions* p)
   p->iiAddCproc("","listContainsCone",FALSE,containsCone);
   p->iiAddCproc("","listOfFacets",FALSE,listOfFacets);
   p->iiAddCproc("","facetContaining",FALSE,facetContaining);
+  p->iiAddCproc("","faceContaining",FALSE,faceContaining);
   coneID=setBlackboxStuff(b,"cone");
 }
 

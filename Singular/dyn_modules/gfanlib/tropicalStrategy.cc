@@ -1,10 +1,14 @@
 #include <tropicalStrategy.h>
+#include <singularWishlist.h>
 #include <adjustWeights.h>
 #include <ppinitialReduction.h>
 // #include <ttinitialReduction.h>
 #include <tropical.h>
 #include <std_wrapper.h>
 #include <tropicalCurves.h>
+#include <tropicalDebug.h>
+#include <containsMonomial.h>
+
 
 // for various commands in dim(ideal I, ring r):
 #include <kernel/ideals.h>
@@ -114,6 +118,7 @@ static bool noExtraReduction(ideal I, ring r, number /*p*/)
   for (int i=0; i<k; i++)
     J->m[i] = p_PermPoly(JShortcut->m[i],NULL,rShortcut,r,outofShortcut,NULL,0);
 
+  assume(areIdealsEqual(J,r,I,r));
   swapElements(I,J);
   id_Delete(&IShortcut,rShortcut);
   id_Delete(&JShortcut,rShortcut);
@@ -520,9 +525,16 @@ std::pair<poly,int> tropicalStrategy::checkInitialIdealForMonomial(const ideal I
     inIShortcut = I;
   }
 
+  gfan::ZCone C0 = homogeneitySpace(inIShortcut,rShortcut);
+  gfan::ZCone pos = gfan::ZCone::positiveOrthant(C0.ambientDimension());
+  gfan::ZCone C0pos = intersection(C0,pos);
+  C0pos.canonicalize();
+  gfan::ZVector wpos = C0pos.getRelativeInteriorPoint();
+  assume(checkForNonPositiveEntries(wpos));
+
   // check initial ideal for monomial and
   // if it exsists, return a copy of the monomial in the input ring
-  poly p = checkForMonomialViaSuddenSaturation(inIShortcut,rShortcut);
+  poly p = searchForMonomialViaStepwiseSaturation(inIShortcut,rShortcut,wpos);
   poly monomial = NULL;
   if (p!=NULL)
   {
@@ -683,27 +695,6 @@ ideal tropicalStrategy::computeLift(const ideal inJs, const ring s, const ideal 
   return Js;
 }
 
-static void deleteOrdering(ring r)
-{
-  if (r->order != NULL)
-  {
-    int i=rBlocks(r);
-    assume(r->block0 != NULL && r->block1 != NULL && r->wvhdl != NULL);
-    /* delete order */
-    omFreeSize((ADDRESS)r->order,i*sizeof(int));
-    omFreeSize((ADDRESS)r->block0,i*sizeof(int));
-    omFreeSize((ADDRESS)r->block1,i*sizeof(int));
-    /* delete weights */
-    for (int j=0; j<i; j++)
-      if (r->wvhdl[j]!=NULL)
-        omFree(r->wvhdl[j]);
-    omFreeSize((ADDRESS)r->wvhdl,i*sizeof(int *));
-  }
-  else
-    assume(r->block0 == NULL && r->block1 == NULL && r->wvhdl == NULL);
-  return;
-}
-
 ring tropicalStrategy::copyAndChangeOrderingWP(const ring r, const gfan::ZVector &w, const gfan::ZVector &v) const
 {
   // copy shortcutRing and change to desired ordering
@@ -770,6 +761,7 @@ std::pair<ideal,ring> tropicalStrategy::computeFlip(const ideal Ir, const ring r
 {
   assume(isValuationTrivial() || interiorPoint[0].sign()<0);
   assume(checkForUniformizingBinomial(Ir,r));
+  assume(checkWeightVector(Ir,r,interiorPoint));
 
   // get a generating system of the initial ideal
   // and compute a standard basis with respect to adjacent ordering
@@ -797,7 +789,11 @@ std::pair<ideal,ring> tropicalStrategy::computeFlip(const ideal Ir, const ring r
   for (int i=0; i<k; i++)
     Js->m[i] = p_PermPoly(Jr->m[i],NULL,r,s,identity,NULL,0);
 
-  // this->reduce(Jr,r);
+  reduce(Js,s);
+  assume(areIdealsEqual(Js,s,Ir,r));
+  assume(isValuationTrivial() || isOrderingLocalInT(s));
+  assume(checkWeightVector(Js,s,interiorPoint));
+
   // cleanup
   id_Delete(&inIsAdjusted,sAdjusted);
   id_Delete(&inJsAdjusted,sAdjusted);
@@ -889,131 +885,3 @@ bool tropicalStrategy::checkForUniformizingParameter(const ideal inI, const ring
   p_Delete(&p,r);
   return false;
 }
-
-#ifndef NDEBUG
-tropicalStrategy::tropicalStrategy():
-  originalRing(NULL),
-  originalIdeal(NULL),
-  expectedDimension(NULL),
-  linealitySpace(gfan::ZCone()),
-  startingRing(NULL),
-  startingIdeal(NULL),
-  uniformizingParameter(NULL),
-  shortcutRing(NULL),
-  onlyLowerHalfSpace(false)
-{
-  weightAdjustingAlgorithm1=NULL;
-  weightAdjustingAlgorithm2=NULL;
-  extraReductionAlgorithm=NULL;
-}
-
-tropicalStrategy tropicalStrategy::debugStrategy(const ideal startIdeal, number unifParameter, ring startRing)
-{
-  tropicalStrategy debug;
-  debug.originalRing = rCopy(startRing);
-  debug.originalIdeal = id_Copy(startIdeal,startRing);
-  debug.startingRing = rCopy(startRing);
-  debug.startingIdeal = id_Copy(startIdeal,startRing);
-  debug.uniformizingParameter = n_Copy(unifParameter,startRing->cf);
-
-  debug.shortcutRing = rCopy0(startRing);
-  nKillChar(debug.shortcutRing->cf);
-  debug.shortcutRing->cf = nInitChar(n_Zp,(void*)(long)IsPrime(n_Int(unifParameter,startRing->cf)));
-  rComplete(debug.shortcutRing);
-  rTest(debug.shortcutRing);
-
-  debug.onlyLowerHalfSpace = true;
-  debug.weightAdjustingAlgorithm1 = valued_adjustWeightForHomogeneity;
-  debug.weightAdjustingAlgorithm2 = valued_adjustWeightUnderHomogeneity;
-  debug.extraReductionAlgorithm = ppreduceInitially;
-
-  return debug;
-}
-
-BOOLEAN computeWitnessDebug(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
-  {
-    leftv v = u->next;
-    if ((v!=NULL) && (v->Typ()==IDEAL_CMD))
-    {
-      leftv w = v->next;
-      if ((w!=NULL) && (w->Typ()==IDEAL_CMD))
-      {
-        leftv x = w->next;
-        if ((x!=NULL) && (x->Typ()==NUMBER_CMD))
-        {
-          omUpdateInfo();
-          Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-
-          ideal inJ = (ideal) u->CopyD();
-          ideal inI = (ideal) v->CopyD();
-          ideal I = (ideal) w->CopyD();
-          number p = (number) x->CopyD();
-          tropicalStrategy debug = tropicalStrategy::debugStrategy(I,p,currRing);
-          ideal J = debug.computeWitness(inJ,inI,I,currRing);
-          id_Delete(&inJ,currRing);
-          id_Delete(&inI,currRing);
-          id_Delete(&I,currRing);
-          n_Delete(&p,currRing->cf);
-          res->rtyp = IDEAL_CMD;
-          res->data = (char*) J;
-          return FALSE;
-        }
-      }
-    }
-  }
-  return TRUE;
-}
-
-BOOLEAN computeFlipDebug(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
-  {
-    leftv v = u->next;
-    if ((v!=NULL) && (v->Typ()==NUMBER_CMD))
-    {
-      leftv w = v->next;
-      if ((w!=NULL) && (w->Typ()==BIGINTMAT_CMD))
-      {
-        leftv x = w->next;
-        if ((x!=NULL) && (x->Typ()==BIGINTMAT_CMD))
-        {
-          omUpdateInfo();
-          Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-
-          ideal I = (ideal) u->CopyD();
-          number p = (number) v->CopyD();
-          bigintmat* interiorPoint0 = (bigintmat*) w->CopyD();
-          bigintmat* facetNormal0 = (bigintmat*) x->CopyD();
-          tropicalStrategy debug = tropicalStrategy::debugStrategy(I,p,currRing);
-
-          gfan::ZVector* interiorPoint = bigintmatToZVector(interiorPoint0);
-          gfan::ZVector* facetNormal = bigintmatToZVector(facetNormal0);
-          std::pair<ideal,ring> Js = debug.computeFlip(I,currRing,*interiorPoint,*facetNormal);
-          ideal J = Js.first;
-          ring s = Js.second;
-
-          id_Delete(&J,s);
-          rDelete(s);
-
-          id_Delete(&I,currRing);
-          n_Delete(&p,currRing->cf);
-          delete interiorPoint0;
-          delete facetNormal0;
-          delete interiorPoint;
-          delete facetNormal;
-
-          res->rtyp = NONE;
-          res->data = NULL;
-          return FALSE;
-        }
-      }
-    }
-  }
-  WerrorS("computeFlipDebug: unexpected parameters");
-  return TRUE;
-}
-#endif

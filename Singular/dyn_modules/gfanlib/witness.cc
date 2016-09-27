@@ -2,9 +2,9 @@
 #include <Singular/lists.h>
 #include <polys/monomials/p_polys.h>
 #include <callgfanlib_conversion.h>
+#include <tropicalDebug.h>
 #include <initial.h>
 #include <tropicalStrategy.h>
-#include <utility>
 
 matrix divisionDiscardingRemainder(const poly f, const ideal G, const ring r)
 {
@@ -66,46 +66,7 @@ ideal witness(const ideal inI, const ideal J, const ring r)
     NFinI->m[i] = NULL;
   }
 
+  assume(areIdealsEqual(I,r,J,r));
+
   return I;
 }
-
-#ifndef NDEBUG
-BOOLEAN dwrDebug(leftv res, leftv args)
-{
-  leftv u = args;
-  leftv v = u->next;
-  ideal F = (ideal) u->CopyD();
-  ideal G = (ideal) v->CopyD();
-  omUpdateInfo();
-  Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-  matrix Q = divisionDiscardingRemainder(F,G,currRing);
-  id_Delete(&F,currRing);
-  id_Delete(&G,currRing);
-  res->rtyp = MATRIX_CMD;
-  res->data = (char*) Q;
-  return FALSE;
-}
-
-BOOLEAN witnessDebug(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
-  {
-    leftv v = u->next;
-    if ((v!=NULL) && (v->Typ()==IDEAL_CMD))
-    {
-      omUpdateInfo();
-      Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-      ideal inI = (ideal) u->CopyD();
-      ideal J = (ideal) v->CopyD();
-      ideal I = witness(inI,J,currRing);
-      id_Delete(&inI,currRing);
-      id_Delete(&J,currRing);
-      res->rtyp = IDEAL_CMD;
-      res->data = (char*) I;
-      return FALSE;
-    }
-  }
-  return TRUE;
-}
-#endif

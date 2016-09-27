@@ -41,7 +41,7 @@ std::vector<int> satstdSaturatingVariables;
 //------------------------------------------------------------------------
 // routine that simplifies the new element by dividing it with the maximal possible
 // partially saturating the ideal with respect to all variables doing so
-static BOOLEAN sat_vars_sp(kStrategy strat)
+BOOLEAN sat_vars_sp(kStrategy strat)
 {
   BOOLEAN b = FALSE; // set b to TRUE, if spoly was changed,
                      // let it remain FALSE otherwise
@@ -204,62 +204,50 @@ static BOOLEAN satstd(leftv res, leftv args)
   return TRUE;
 }
 
-// static BOOLEAN abortIfMonomial_sp(kStrategy strat)
-// {
-//   BOOLEAN b = FALSE; // set b to TRUE, if spoly was changed,
-//                      // let it remain FALSE otherwise
-//   if (strat->P.t_p==NULL)
-//   {
-//     poly p=strat->P.p;
-//     if (pNext(p)==NULL)
-//     {
-//       // if a term is contained in the ideal, abort std computation
-//       // and store the output in idealCache to be returned
-//       while ((strat->Ll >= 0))
-//         deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
-//       std::cout << "aborting!" << std::endl;
-//       return FALSE;
-//     }
-//   }
-//   else
-//   {
-//     poly p=strat->P.t_p;
-//     if (pNext(p)==NULL)
-//     {
-//       // if a term is contained in the ideal, abort std computation
-//       // and store the output in idealCache to be returned
-//       while ((strat->Ll >= 0))
-//         deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
-//       std::cout << "aborting!" << std::endl;
-//       return FALSE;
-//     }
-//   }
-//   return b; // return TRUE if sp was changed, FALSE if not
-// }
-// static BOOLEAN abortifmonomialstd(leftv res, leftv args)
-// {
-//   if (args!=NULL)
-//   {
-//     if ((args->Typ()==IDEAL_CMD) && (args->next==NULL))
-//     {
-//       ideal I=(ideal)args->Data();
-//       idealCache = NULL;
-//       I=kStd(I,currRing->qideal,testHomog,NULL,NULL,0,0,NULL,abortIfMonomial_sp);
-//       res->rtyp=IDEAL_CMD;
-//       if (idealCache)
-//         res->data=(char*)idealCache;
-//       else
-//       {
-//         idSkipZeroes(I);
-//         res->data=(char*)I;
-//       }
-//       return FALSE;
-//     }
-//   }
-//   WerrorS("abortifmonomialstd: unexpected parameters");
-//   return TRUE;
-// }
+BOOLEAN abort_if_monomial_sp(kStrategy strat)
+{
+  BOOLEAN b = FALSE; // set b to TRUE, if spoly was changed,
+                     // let it remain FALSE otherwise
+  if (strat->P.t_p==NULL)
+  {
+    poly p=strat->P.p;
+    if (pNext(p)==NULL)
+    {
+      while ((strat->Ll >= 0))
+        deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+      return FALSE;
+    }
+  }
+  else
+  {
+    poly p=strat->P.t_p;
+    if (pNext(p)==NULL)
+    {
+      while ((strat->Ll >= 0))
+        deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+      return FALSE;
+    }
+  }
+  return b; // return TRUE if sp was changed, FALSE if not
+}
 
+BOOLEAN monomialabortstd(leftv res, leftv args)
+{
+  if (args!=NULL)
+  {
+    if ((args->Typ()==IDEAL_CMD) && (args->next==NULL))
+    {
+      ideal I=(ideal)args->Data();
+      I=kStd(I,currRing->qideal,testHomog,NULL,NULL,0,0,NULL,abort_if_monomial_sp);
+      idSkipZeroes(I);
+      res->rtyp=IDEAL_CMD;
+      res->data=(char*)I;
+      return FALSE;
+    }
+  }
+  WerrorS("monomialabortstd: unexpected parameters");
+  return TRUE;
+}
 
 // static long wDeg(const poly p, const ring r)
 // {
@@ -446,7 +434,7 @@ extern "C" int SI_MOD_INIT(customstd)(SModulFunctions* p)
   // p->iiAddCproc("std_demo","std_with_display",FALSE,std_with_display);
   p->iiAddCproc("customstd.so","satstd",FALSE,satstd);
   // p->iiAddCproc("std_demo","satstdWithInitialCheck",FALSE,satstdWithInitialCheck);
-  // p->iiAddCproc("std_demo","abortifmonomialstd",FALSE,abortifmonomialstd);
+  p->iiAddCproc("std_demo","monomialabortstd",FALSE,monomialabortstd);
   // PrintS("init of std_demo - type `listvar(Std_demo);` to its contents\n");
   return (MAX_TOK);
 }

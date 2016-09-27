@@ -1,7 +1,10 @@
-#include <bbcone.h>
 #include <kernel/polys.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <polys/prCopy.h>
+
+#include <callgfanlib_conversion.h>
+#include <bbcone.h>
+#include <std_wrapper.h>
 
 poly checkForMonomialViaSuddenSaturation(const ideal I, const ring r)
 {
@@ -49,6 +52,162 @@ poly checkForMonomialViaSuddenSaturation(const ideal I, const ring r)
   return monom;
 }
 
+poly searchForMonomialViaStepwiseSaturation(const ideal I, const ring r, const gfan::ZVector w0)
+{
+  gfan::ZVector w = w0;
+
+  ring origin = currRing;
+  if (currRing != r)
+    rChangeCurrRing(r);
+
+  // copy ring including qideal but without ordering
+  // set ordering to be wp(w)
+  int n = rVar(r);
+  ring rGraded = rCopy0(r,TRUE,FALSE);
+  rGraded->order = (int*) omAlloc0(3*sizeof(int));
+  rGraded->block0 = (int*) omAlloc0(3*sizeof(int));
+  rGraded->block1 = (int*) omAlloc0(3*sizeof(int));
+  rGraded->wvhdl = (int**) omAlloc0(3*sizeof(int**));
+  rGraded->order[0] = ringorder_wp;
+  rGraded->block0[0] = 1;
+  rGraded->block1[0] = n;
+  bool overflow;
+  rGraded->wvhdl[0] = ZVectorToIntStar(w,overflow);
+  rGraded->order[1] = ringorder_C;
+  rComplete(rGraded);
+  rTest(rGraded);
+
+  // map I into the new ring so that it becomes a graded ideal
+  int k = IDELEMS(I);
+  nMapFunc identity = n_SetMap(r->cf,rGraded->cf);
+  ideal Jold = idInit(k);
+  for (int i=0; i<k; i++)
+    Jold->m[i] = p_PermPoly(I->m[i],NULL,r,rGraded,identity,NULL,0);
+
+  // compute std and check whether result contains a monomial,
+  // wrap up computation if it does
+  ideal Jnew = gfanlib_monomialabortStd_wrapper(Jold,rGraded);
+  id_Delete(&Jold,rGraded);
+  k = IDELEMS(Jnew);
+  for (int i=0; i<k; i++)
+  {
+    poly g = Jnew->m[i];
+    if (g!=NULL && pNext(g)==NULL && n_IsUnit(p_GetCoeff(g,r),r->cf))
+    {
+      poly monomial = p_One(r);
+      for (int j=1; j<=rVar(r); j++)
+        p_SetExp(monomial,j,p_GetExp(g,j,rGraded),r);
+      p_Setm(monomial,r);
+
+      id_Delete(&Jnew,rGraded);
+      rDelete(rGraded);
+      if (currRing != origin)
+        rChangeCurrRing(origin);
+      return monomial;
+    }
+  }
+
+  // prepare permutation to cycle all variables
+  int* cycleAllVariables = (int*) omAlloc0((n+1)*sizeof(int));
+  for (int i=1; i<n; i++)
+    cycleAllVariables[i]=i+1;
+  cycleAllVariables[n]=1;
+  // prepare storage of maximal powers that are being divided with
+  int* maxPowers = (int*) omAlloc0((n+1)*sizeof(int));
+
+  for(int currentSaturationVariable=n-1; currentSaturationVariable>0; currentSaturationVariable--)
+  {
+    // divide out the maximal power in the last variable,
+    // storing the maximum of all powers.
+    for (int i=0; i<k; i++)
+    {
+      poly g = Jnew->m[i];
+      int d = p_GetExp(g,n,rGraded);
+      if (d>0)
+      {
+        for (; g!=NULL; pIter(g))
+        {
+          p_SubExp(g,n,d,rGraded);
+          p_Setm(g,rGraded);
+        }
+        if (d>maxPowers[currentSaturationVariable+1])
+          maxPowers[currentSaturationVariable+1]=d;
+      }
+    }
+
+    // cycle all variables, i.e. x_1->x_2, x_2->x_3, ..., x_n->x_1
+    // so that a new variable is at the last position
+    gfan::Integer cache = w[n-1];
+    for (int i=n-1; i>0; i--)
+      w[i] = w[i-1];
+    w[0] = cache;
+
+    ring rGradedNew = rCopy0(r,TRUE,FALSE);
+    rGradedNew->order = (int*) omAlloc0(3*sizeof(int));
+    rGradedNew->block0 = (int*) omAlloc0(3*sizeof(int));
+    rGradedNew->block1 = (int*) omAlloc0(3*sizeof(int));
+    rGradedNew->wvhdl = (int**) omAlloc0(3*sizeof(int**));
+    rGradedNew->order[0] = ringorder_wp;
+    rGradedNew->block0[0] = 1;
+    rGradedNew->block1[0] = n;
+    bool overflow;
+    rGradedNew->wvhdl[0] = ZVectorToIntStar(w,overflow);
+    rGradedNew->order[1] = ringorder_C;
+    rComplete(rGradedNew);
+    rTest(rGradedNew);
+
+    identity = n_SetMap(rGraded->cf,rGradedNew->cf);
+    Jold = idInit(k);
+    for (int i=0; i<k; i++)
+      Jold->m[i] = p_PermPoly(Jnew->m[i],cycleAllVariables,rGraded,rGradedNew,identity,NULL,0);
+    id_Delete(&Jnew,rGraded);
+    rDelete(rGraded);
+
+    rGraded = rGradedNew;
+    rGradedNew = NULL;
+
+    // compute std and check whether result contains a monomial,
+    // wrap up computation if it does
+    // adjust for the powers already divided out of the ideal
+    // and the shift of variables!
+    Jnew = gfanlib_monomialabortStd_wrapper(Jold,rGraded);
+    id_Delete(&Jold,rGraded);
+
+    k = IDELEMS(Jnew);
+    for (int i=0; i<k; i++)
+    {
+      poly g = Jnew->m[i];
+      if (g!=NULL && pNext(g)==NULL && n_IsUnit(p_GetCoeff(g,rGraded),rGraded->cf))
+      {
+        poly monomial = p_One(r);
+        for (int j=1; j<=rVar(r); j++)
+        {
+          int jDeshifted = (j-currentSaturationVariable)%n;
+          if (jDeshifted<=0) jDeshifted = jDeshifted+n;
+          p_SetExp(monomial,j,p_GetExp(g,jDeshifted,rGraded)+maxPowers[j],r);
+        }
+        p_Setm(monomial,r);
+
+        id_Delete(&Jnew,rGraded);
+        rDelete(rGraded);
+        omFree(cycleAllVariables);
+        omFree(maxPowers);
+        if (currRing != origin)
+          rChangeCurrRing(origin);
+        return monomial;
+      }
+    }
+  }
+
+  if (currRing != origin)
+    rChangeCurrRing(origin);
+
+  id_Delete(&Jnew,rGraded);
+  rDelete(rGraded);
+  omFree(cycleAllVariables);
+  omFree(maxPowers);
+  return NULL;
+}
 
 BOOLEAN checkForMonomial(leftv res, leftv args)
 {
@@ -72,163 +231,36 @@ BOOLEAN checkForMonomial(leftv res, leftv args)
   return TRUE;
 }
 
-#if 0
-// /***
-//  * Creates an int* representing the transposition of the last two variables
-//  **/
-// static inline int* createPermutationVectorForSaturation(static const ring &r)
-// {
-//   int* w = (int*) omAlloc0((rVar(r)+1)*sizeof(int));
-//   for (int i=1; i<=rVar(r)-2; i++)
-//     w[i] = i;
-//   w[rVar(r)-1] = rVar(r);
-//   w[rVar(r)] = rVar(r)-1;
-// }
-
-
-/***
- * Creates an int* representing the permutation
- * 1 -> 1, ..., i-1 -> i-1, i -> n, i+1 -> n-1, ... , n -> i
- **/
-static inline int* createPermutationVectorForSaturation(const ring &r, const int i)
+BOOLEAN searchForMonomialViaStepwiseSaturation(leftv res, leftv args)
 {
-  int* sigma = (int*) omAlloc0((rVar(r)+1)*sizeof(int));
-  int j;
-  for (j=1; j<i; j++)
-    sigma[j] = j;
-  for (; j<=rVar(r); j++)
-    sigma[j] = rVar(r)-j+i;
-  return(sigma);
-}
-
-
-/***
- * Changes the int* representing the permutation
- * 1 -> 1, ..., i -> i, i+1 -> n, i+2 -> n-1, ... , n -> i+1
- * to an int* representing the permutation
- * 1 -> 1, ..., i-1 -> i-1, i -> n, i+1 -> n-1, ... , n -> i
- **/
-static void changePermutationVectorForSaturation(int* sigma, const ring &r, const int i)
-{
-  for (int j=i; j<rVar(r); j++)
-    sigma[j] = rVar(r)-j+i;
-  sigma[rVar(r)] = i;
-}
-
-
-/***
- * returns a ring in which the weights of the ring variables are permuted
- * if handed over a poly in which the variables are permuted, this is basically
- * as good as permuting the variables of the ring itself.
- **/
-static ring permuteWeighstOfRingVariables(const ring &r, const int* const sigma)
-{
-  ring s = rCopy0(r);
-  for (int j=0; j<rVar(r); j++)
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
   {
-    s->wvhdl[0][j] = r->wvhdl[0][sigma[j+1]];
-    s->wvhdl[1][j] = r->wvhdl[1][sigma[j+1]];
-  }
-  rComplete(s,1);
-  rTest(s);
-  return s;
-}
-
-
-/***
- * creates a ring s that is a copy of r except with ordering wp(w)
- **/
-static inline ring createInitialRingForSaturation(const ring &r, const gfan::ZVector &w, bool &ok)
-{
-  assume(rVar(r) == (int) w.size());
-
-  ring s = rCopy0(r); int i;
-  for (i=0; s->order[i]; i++)
-    omFreeSize(s->wvhdl[i],rVar(r)*sizeof(int));
-  i++;
-  omFreeSize(s->order,i*sizeof(int));
-  s->order  = (int*) omAlloc0(3*sizeof(int));
-  omFreeSize(s->block0,i*sizeof(int));
-  s->block0 = (int*) omAlloc0(3*sizeof(int));
-  omFreeSize(s->block1,i*sizeof(int));
-  s->block1 = (int*) omAlloc0(3*sizeof(int));
-  omFreeSize(s->wvhdl,i*sizeof(int*));
-  s->wvhdl  = (int**) omAlloc0(3*sizeof(int*));
-
-  s->order[0]  = ringorder_wp;
-  s->block0[0] = 1;
-  s->block1[0] = rVar(r);
-  s->wvhdl[0]  = ZVectorToIntStar(w,ok);
-  s->order[1]=ringorder_C;
-
-  rComplete(s,1);
-  rTest(s);
-  return s;
-}
-
-
-/***
- * Given an weighted homogeneous ideal I with respect to weight w
- * that in standard basis form with respect to the ordering ws(-w),
- * derives the standard basis of I:<x_n>^\infty
- * and returns a long k such that I:<x_n>^\infty=I:<x_n>^k
- **/
-static long deriveStandardBasisOfSaturation(ideal &I, ring &r)
-{
-  long k=0, l; poly current;
-  for (int i=0; i<IDELEMS(I); i++)
-  {
-    current = I->m[i];
-    l = p_GetExp(current,rVar(r),r);
-    if (k<l) k=l;
-    while (current)
+    leftv v = u->next;
+    if ((v != NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
     {
-      p_SubExp(current,rVar(r),l,r); p_Setm(current,r);
-      pIter(current);
+      ideal I = (ideal) u->Data();
+      bigintmat* w0=NULL;
+      if (v->Typ() == INTVEC_CMD)
+      {
+        intvec* w00 = (intvec*) v->Data();
+        bigintmat* w0t = iv2bim(w00,coeffs_BIGINT);
+        w0 = w0t->transpose();
+        delete w0t;
+      }
+      else
+        w0 = (bigintmat*) v->Data();
+      gfan::ZVector* w = bigintmatToZVector(w0);
+
+      res->rtyp = POLY_CMD;
+      res->data = (char*) searchForMonomialViaStepwiseSaturation(I,currRing,*w);
+      delete w;
+      if (v->Typ() == INTVEC_CMD)
+        delete w0;
+
+      return FALSE;
     }
   }
-  return k;
+  WerrorS("searchForMonomialViaStepwiseSaturation: unexpected parameters");
+  return TRUE;
 }
-
-
-/***
- * Given a weighted homogeneous ideal I with respect to weight w
- * with constant first element,
- * returns NULL if I does not contain a monomial
- * otherwise returns the monomial contained in I
- **/
-poly checkForMonomialsViaStepwiseSaturation(const ideal &I, const gfan::ZVector &w)
-{
-  // assume(rField_is_Ring_Z(currRing));
-
-  // first we switch to the ground field currRing->cf / I->m[0]
-  ring r = rCopy0(currRing);
-  nKillChar(r->cf);
-  r->cf = nInitChar(n_Zp,(void*)(long)n_Int(p_GetCoeff(I->m[0],currRing),currRing->cf));
-  rComplete(r);
-  rTest(r);
-
-  ideal J = id_Copy(I, currRing); poly cache; number temp;
-  for (int i=0; i<IDELEMS(I); i++)
-  {
-    cache = J->m[i];
-    while (cache)
-    {
-      // TODO: temp = npMapGMP(p_GetCoeff(cache,currRing),currRing->cf,r->cf);
-      p_SetCoeff(cache,temp,r); pIter(cache);
-    }
-  }
-
-  J = kStd(J,NULL,isHomog,NULL);
-
-  bool b = false;
-  ring s = createInitialRingForSaturation(currRing, w, b);
-  if (b)
-  {
-    WerrorS("containsMonomial: overflow in weight vector");
-    return NULL;
-  }
-
-  return NULL;
-}
-#endif //0

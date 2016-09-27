@@ -280,7 +280,11 @@ namespace gfan
     if(complex)
       return complex->getAmbientDimension()-complex->getMaxDim();
     if(coneCollection)
+    {
+      if(coneCollection->isEmpty())
+        return -1;
       return coneCollection->getAmbientDimension()-coneCollection->getMaxDimension();
+    }
     assert(0);
     return 0;
   }
@@ -289,7 +293,11 @@ namespace gfan
     if(complex)
       return complex->getMaxDim();
     if(coneCollection)
+    {
+      if(coneCollection->isEmpty())
+        return -1;
       return coneCollection->getMaxDimension();
+    }
     assert(0);
     return 0;
   }

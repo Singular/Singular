@@ -12,8 +12,4 @@ ZConesSortedByDimension tropicalStar(const ideal I, const ring r, const gfan::ZV
 gfan::ZMatrix raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector &u,
                                  const tropicalStrategy* currentStrategy);
 
-#ifndef NDEBUG
-BOOLEAN tropicalStarDebug(leftv res, leftv args);
-#endif
-
 #endif
