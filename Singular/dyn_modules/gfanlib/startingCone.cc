@@ -15,6 +15,9 @@
 #include <std_wrapper.h>
 
 
+gfan::ZMatrix tropicalStartingPoints;
+
+
 groebnerCone groebnerStartingCone(const tropicalStrategy& currentStrategy)
 {
   groebnerCone sigma(currentStrategy.getStartingIdeal(), currentStrategy.getStartingRing(), currentStrategy);
@@ -395,7 +398,6 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
     // and check whether the dimension of its homogeneity space
     // equals the dimension of the tropical variety
     gfan::ZCone zc = linealitySpaceOfGroebnerFan(inI,s);
-    gfan::ZMatrix startingPoints(0,rVar(r));
     groebnerCone ambientMaximalCone;
     if (zc.dimension()>=currentStrategy.getExpectedDimension())
     {
@@ -418,7 +420,7 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
       // compute a point in the tropical variety outside the lineality space
       std::pair<gfan::ZVector,groebnerCone> startingData = tropicalStartingDataViaGroebnerFan(inI,s,currentStrategy);
       gfan::ZVector startingPoint = startingData.first;
-      startingPoints.appendRow(startingPoint);
+      tropicalStartingPoints.appendRow(startingPoint);
       ambientMaximalCone = groebnerCone(startingData.second);
 
       id_Delete(&inI,s); rDelete(s);
@@ -435,7 +437,7 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
     // in the relative interior of a maximal cone in the tropical variety
     // from this we can read of the inequalities and equations
 
-    ring s0 = createTraversalStartingRing(s,startingPoints,currentStrategy);
+    ring s0 = createTraversalStartingRing(s,tropicalStartingPoints,currentStrategy);
     nMapFunc identity = n_SetMap(s->cf,s0->cf);
     k = IDELEMS(inI);
     ideal inI0 = idInit(k);
@@ -502,6 +504,7 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
     // compute the initial ideal with respect to the weight
     std::pair<gfan::ZVector,groebnerCone> startingData = tropicalStartingDataViaGroebnerFan(inJ,s,currentStrategy);
     gfan::ZVector startingPoint = startingData.first;
+    tropicalStartingPoints.appendRow(startingPoint);
     groebnerCone ambientMaximalCone = groebnerCone(startingData.second);
     id_Delete(&inJ,s); rDelete(s);
     inJ = ambientMaximalCone.getPolynomialIdeal();
@@ -581,11 +584,26 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
       }
     }
 
-    ideal J = currentStrategy.computeLift(inJ,s,inI,I,r);
+    ring s0 = createTraversalStartingRing(s,tropicalStartingPoints,currentStrategy);
+    nMapFunc identity = n_SetMap(s->cf,s0->cf);
+    k = IDELEMS(inJ);
+    ideal inI0 = idInit(k);
+    for (int i=0; i<k; i++)
+      inI0->m[i] = p_PermPoly(inJ->m[i],NULL,s,s0,identity,NULL,0);
+
+    identity = n_SetMap(r->cf,s0->cf);
+    k = IDELEMS(I);
+    ideal I0 = idInit(k);
+    for (int i=0; i<k; i++)
+      I0->m[i] = p_PermPoly(I->m[i],NULL,r,s0,identity,NULL,0);
+    ideal J0 = gfanlib_kStd_wrapper(I0,s0);
+    groebnerCone startingCone(J0,inI0,s0,currentStrategy);
+
+    // ideal J = currentStrategy.computeLift(inJ,s,inI,I,r);
     // currentStrategy.reduce(J,s);
-    groebnerCone startingCone(J,inJ,s,currentStrategy);
+    // groebnerCone startingCone(J,inJ,s,currentStrategy);
     id_Delete(&inJ,s);
-    id_Delete(&J,s);
+    // id_Delete(&J,s);
     rDelete(s);
     id_Delete(&inI,r);
 
