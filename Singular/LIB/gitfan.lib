@@ -30,6 +30,7 @@ LIB "parallel.lib"; // for parallelWaitAll
 ////////////////////////////////////////////////////
 proc mod_init()
 {
+  LIB"customstd.so";
   LIB"gfanlib.so";
 }
 

@@ -92,6 +92,7 @@ LIB "random.lib";
 
 static proc mod_init ()
 {
+  LIB "customstd.so";
   LIB "gfanlib.so";
   LIB "polymake.so";
 }
