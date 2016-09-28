@@ -1505,6 +1505,43 @@ BOOLEAN canonicalizeCone(leftv res, leftv args)
   return TRUE;
 }
 
+BOOLEAN containsCone(leftv res, leftv args)
+{
+  gfan::initializeCddlibIfRequired();
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == LIST_CMD))
+  {
+    leftv v=u->next;
+    if ((v != NULL) && (v->Typ() == coneID))
+    {
+      lists l = (lists) u->Data();
+      gfan::ZCone* zc = (gfan::ZCone*) v->Data();
+      zc->canonicalize();
+      int b = 0;
+      for (int i=0; i<=lSize(l); i++)
+      {
+        if (l->m[i].Typ() != coneID)
+        {
+          WerrorS("containsCone: entries of wrong type in list");
+          return TRUE;
+        }
+        gfan::ZCone* ll = (gfan::ZCone*) l->m[i].Data();
+        ll->canonicalize();
+        if (!((*ll) != (*zc)))
+        {
+          b = 1;
+          break;
+        }
+      }
+      res->rtyp = INT_CMD;
+      res->data = (char*) (long) b;
+      return FALSE;
+    }
+  }
+  WerrorS("containsCone: unexpected parameters");
+  return TRUE;
+}
+
 BOOLEAN faceContaining(leftv res, leftv args)
 {
   gfan::initializeCddlibIfRequired();
@@ -1776,7 +1813,7 @@ void bbcone_setup(SModulFunctions* p)
   b->blackbox_deserialize=bbcone_deserialize;
   p->iiAddCproc("gfan.lib","coneViaInequalities",FALSE,coneViaNormals);
   p->iiAddCproc("gfan.lib","coneViaPoints",FALSE,coneViaRays);
-
+  p->iiAddCproc("","listContainsCone",FALSE,containsCone);
   // iiAddCproc("gfan.lib","makePolytope",FALSE,coneToPolytope);
   p->iiAddCproc("gfan.lib","ambientDimension",FALSE,ambientDimension);
   p->iiAddCproc("gfan.lib","canonicalizeCone",FALSE,canonicalizeCone);
