@@ -1,0 +1,1007 @@
+///////////////////////////////////////////////////////////////////////////////
+version="version polymakeInterface.lib 4.0.3.3 Oct_2016 ";
+category = "Convex Geometry";
+info="
+LIBRARY:  polymakeInterface.lib   low level interface to polymake
+AUTHORS:  Yue Ren,                email: ren@mathematik.uni-kl.de
+";
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc boundaryLatticePoints()
+"USAGE:   boundaryLatticePoints(p);  p polytope
+ASSUME:  isBounded(p)==1
+RETURN:  intmat, all lattice points on the relative boundary of p
+EXAMPLE: example boundaryLatticePoints; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[3][3]=
+    1,2,-1,
+    1,-1,2,
+    1,-1,-1;
+  polytope p = polytopeViaPoints(M);
+  boundaryLatticePoints(p);
+  intmat N[2][3]=
+    1,2,0,
+    1,0,2;
+  polytope q = polytopeViaPoints(N);
+  boundaryLatticePoints(q);
+}
+
+proc ehrhartPolynomialCoeff()
+"USAGE:   ehrhartPolynomialCoeff(p);  p polytope
+ASSUME:  isBounded(p)==1
+RETURN:  intvec, all lattice points on the relative boundary of p
+EXAMPLE: example ehrhartPolynomialCoeff; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[6][4]=
+    1,1,1,2,
+    1,-1,-1,-2,
+    1,1,0,0,
+    1,-1,0,0,
+    1,0,1,0,
+    1,0,-1,0;
+  polytope p = polytopeViaPoints(M);
+  ehrhartPolynomialCoeff(p);
+}
+
+proc fVectorP()
+"USAGE:   fVectorP(p);  p polytope
+RETURN:  intvec, the f-vector or p
+EXAMPLE: example fVectorP; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[6][4]=
+    1,1,1,2,
+    1,-1,-1,-2,
+    1,1,0,0,
+    1,-1,0,0,
+    1,0,1,0,
+    1,0,-1,0;
+  polytope p = polytopeViaPoints(M);
+  fVectorP(p);
+}
+
+proc facetVertexLatticeDistances()
+"USAGE:   facetVertexLatticeDistances(p);  p polytope
+RETURN:  intmat, encodes the lattice distances between vertices (columns) and facets (rows) of p.
+EXAMPLE: example facetVertexLatticeDistances; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[4][3]=
+    1,2,0,
+    1,0,1,
+    1,2,1,
+    1,0,0;
+  polytope p = polytopeViaPoints(M);
+  facetVertexLatticeDistances(p);
+}
+
+proc facetWidth()
+"USAGE:   facetWidth(p);  p polytope
+ASSUME:  isBounded(p)==1
+RETURN:  int, maximal integral width going over all facet normals
+EXAMPLE: example facetWidth; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[4][3]=
+    1,2,0,
+    1,0,1,
+    1,2,1,
+    1,0,0;
+  polytope p = polytopeViaPoints(M);
+  facetWidth(p);
+}
+
+proc facetWidths()
+"USAGE:   facetWidths(p);  p polytope
+ASSUME:  isBounded(p)==1
+RETURN:  intvec, vector with the integral widths of all facet normals
+EXAMPLE: example facetWidths; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[4][3]=
+    1,2,0,
+    1,0,1,
+    1,2,1,
+    1,0,0;
+  polytope p = polytopeViaPoints(M);
+  facetWidths(p);
+}
+
+proc gorensteinIndex()
+"USAGE:   gorensteinIndex(p);  p polytope
+ASSUME:  isGorenstein(p)==1
+RETURN:  int, a factor n such that n*p+v is reflexive for some translation v
+NOTE:    the translation v can be computed via gorensteinVector(p)
+EXAMPLE: example gorensteinIndex; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[4][3]=1,1,0, 1,0,1, 1,0,0, 1,1,1;
+  polytope p = polytopeViaPoints(M);
+  gorensteinIndex(p);
+}
+
+proc gorensteinVector()
+"USAGE:   gorensteinVector(p);  p polytope
+ASSUME:  isGorenstein(p)==1
+RETURN:  intvec, a vector v such that n*p+v is reflexive for some factor n
+NOTE:    the factor n can be computed via gorensteinIndex(p)
+EXAMPLE: example gorensteinVector; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[4][3]=1,1,0, 1,0,1, 1,0,0, 1,1,1;
+  polytope p = polytopeViaPoints(M);
+  gorensteinVector(p);
+}
+
+proc hStarVector()
+"USAGE:   hStarVector(p);  p polytope
+RETURN:  intvec, the h* vector of p
+EXAMPLE: example hStarVector; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat
+  M[6][4]=
+    1,1,1,2,
+    1,-1,-1,-2,
+    1,1,0,0,
+    1,-1,0,0,
+    1,0,1,0,
+    1,0,-1,0;
+  polytope p = polytopeViaPoints(M);
+  hStarVector(p);
+}
+
+proc hVector()
+"USAGE:   hVector(p);  p polytope
+RETURN:  intvec, the h vector of p
+EXAMPLE: example hVector; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat
+  M[6][4]=
+    1,1,1,2,
+    1,-1,-1,-2,
+    1,1,0,0,
+    1,-1,0,0,
+    1,0,1,0,
+    1,0,-1,0;
+  polytope p = polytopeViaPoints(M);
+  hVector(p);
+}
+
+proc hilbertBasis()
+"USAGE:   hilbertBasis(c);  c cone
+RETURN:  intmat, the Hilbert basis of c intersected with Z^n
+EXAMPLE: example hilbertBasis; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[3][3]=
+    1,2,-1,
+    1,-1,2,
+    1,-1,-1;
+  cone c = coneViaPoints(M);
+  hilbertBasis(c);
+}
+
+proc interiorLatticePoints()
+"USAGE:   interiorLatticePoints(p);  p polytope
+ASSUME:  isBounded(p)==1
+RETURN:  intmat, all lattice points in the relative interior of p
+EXAMPLE: example interiorLatticePoints; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[3][3]=
+    1,2,-1,
+    1,-1,2,
+    1,-1,-1;
+  polytope p = polytopeViaPoints(M);
+  interiorLatticePoints(p);
+  intmat N[2][3]=
+    1,2,0,
+    1,0,2;
+  polytope q = polytopeViaPoints(N);
+  interiorLatticePoints(q);
+}
+
+proc isBounded()
+"USAGE:   isBounded(p);  p polytope
+RETURN:  1, if p is bounded; 0 otherwise
+EXAMPLE: example isBounded; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[4][4]=
+    1,1,0,0,
+    1,0,1,0,
+    1,0,0,1,
+    1,-1,-1,-1;
+  polytope p = polytopeViaPoints(M);
+  isBounded(p);
+  M=
+    1,1,0,0,
+    1,0,1,0,
+    0,0,0,1,
+    1,-1,-1,-1;
+  p = polytopeViaPoints(M);
+  isBounded(p);
+}
+
+proc isCanonical()
+"USAGE:   isCanonical(p);  p polytope
+RETURN:  1, if p has exactly one interior lattice point; 0 otherwise
+EXAMPLE: example isCanonical; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[6][4]=
+    1,1,1,2,
+    1,-1,-1,-2,
+    1,1,0,0,
+    1,-1,0,0,
+    1,0,1,0,
+    1,0,-1,0;
+  polytope p = polytopeViaPoints(M);
+  isCanonical(p);
+  isReflexive(p);
+  intmat N[3][3]=
+    1,2,0,
+    1,0,2,
+    1,-2,-2;
+  polytope q = polytopeViaPoints(N);
+  isCanonical(q);
+}
+
+proc isCompressed()
+"USAGE:   isCompressed(p);  p polytope
+RETURN:  1, if p has maximal facet width 1; 0 otherwise
+EXAMPLE: example isCompressed; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[4][3]=
+    1,2,0,
+    1,0,1,
+    1,2,1,
+    1,0,0;
+  polytope p = polytopeViaPoints(M);
+  isCompressed(p);
+  intmat N[4][3]=
+    1,1,0,
+    1,0,1,
+    1,1,1,
+    1,0,0;
+  polytope q = polytopeViaPoints(N);
+  isCompressed(q);
+}
+
+proc isGorenstein()
+"USAGE:   isGorenstein(p);  p polytope
+RETURN:  1, if p is Gorenstein, i.e. reflexive modulo dilatation and translation; 0 otherwise
+EXAMPLE: example isGorenstein; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[4][3]=
+    1,1,0,
+    1,0,1,
+    1,0,0,
+    1,1,1;
+  polytope p = polytopeViaPoints(M);
+  isGorenstein(p);
+  intmat N[3][3]=
+    1,2,0,
+    1,0,2,
+    1,-2,-2;
+  polytope q = polytopeViaPoints(N);
+  isGorenstein(q);
+}
+
+proc isLatticeEmpty()
+"USAGE:   isLatticeEmpty(p);  p polytope
+RETURN:  1, if p contains no lattice points other than the vertices; 0 otherwise
+EXAMPLE: example isLatticeEmpty; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[4][3]=
+    1,1,0,
+    1,1,1,
+    1,0,1,
+    1,0,0;
+  polytope p = polytopeViaPoints(M);
+  isLatticeEmpty(p);
+  intmat N[4][3]=
+    1,1,0,
+    1,2,1,
+    1,0,1,
+    1,0,0;
+  polytope q = polytopeViaPoints(N);
+  isLatticeEmpty(q);
+}
+
+proc isNormal()
+"USAGE:   isNormal(p);  p polytope
+RETURN:  1, if the projective toric variety defined by p is projectively normal; 0 otherwise
+EXAMPLE: example isNormal; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[6][4]=
+    1,1,1,2,
+    1,-1,-1,-2,
+    1,1,0,0,
+    1,-1,0,0,
+    1,0,1,0,
+    1,0,-1,0;
+  polytope p = polytopeViaPoints(M);
+  isNormal(p);
+}
+
+proc isReflexive()
+"USAGE:   isReflexive(p);  p polytope
+RETURN:  1, if p is reflexive; 0 otherwise
+EXAMPLE: example isReflexive; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[4][4]=
+    1,1,0,0,
+    1,0,1,0,
+    1,0,0,1,
+    1,-1,-1,-1;
+  polytope p = polytopeViaPoints(M);
+  isReflexive(p);
+  intmat N[4][4]=
+    1,2,0,0,
+    1,0,2,0,
+    1,0,0,2,
+    1,-2,-2,-2;
+  polytope q = polytopeViaPoints(M);
+  isReflexive(q);
+}
+
+proc isSmooth()
+"USAGE:   isSmooth(c);  c cone
+         isSmooth(f);  f fan
+         isSmooth(p);  p polytope
+RETURN:  1, if the input is smooth; 0 otherwise
+EXAMPLE: example isSmooth; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M1[2][2]=
+    1,0,
+    0,1;
+  cone c1 = coneViaPoints(M1);
+  isSmooth(c1);
+  intmat M2[3][3]=
+    1,0,
+    1,2;
+  cone c2 = coneViaPoints(M2);
+  fan F1 = emptyFan(2);
+  insertCone(F1,c1);
+  isSmooth(F1);
+  fan F2 = emptyFan(2);
+  insertCone(F2,c2);
+  isSmooth(F2);
+  intmat Mq[3][3]=
+    1,-2,-3,
+    1,1,0,
+    1,0,1;
+  polytope q = polytopeViaPoints(Mq);
+  fan F = normalFan(q);
+  isSmooth(F);
+  intmat Np[4][3]=
+    1,2,0,
+    1,0,1,
+    1,2,1,
+    1,0,0;
+  polytope p = polytopeViaPoints(Np);
+  isSmooth(p);
+  intmat Nq[3][3]=
+    1,-2,-3,
+    1,1,0,
+    1,0,1;
+  polytope q = polytopeViaPoints(Nq);
+  isSmooth(q);
+}
+
+proc isTerminal()
+"USAGE:   isTerminal(p);  p polytope
+RETURN:  1, if p has exactly one interior lattice point and all other lattice points are vertices; 0 otherwise
+EXAMPLE: example isTerminal; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[6][4]=
+    1,1,1,2,
+    1,-1,-1,-2,
+    1,1,0,0,
+    1,-1,0,0,
+    1,0,1,0,
+    1,0,-1,0;
+  polytope p = polytopeViaPoints(M);
+  isTerminal(p);
+  isReflexive(p);
+  intmat N[6][4]=
+    1,1,1,2,
+    1,-1,-1,-2,
+    1,1,1,0,
+    1,-1,-1,0,
+    1,-1,1,0,
+    1,1,-1,0;
+  polytope q = polytopeViaPoints(N);
+  isTerminal(q);
+  isCanonical(q);
+}
+
+proc isVeryAmple()
+"USAGE:   isVeryAmple(p);  p polytope
+RETURN:  1, if p is very ample; 0 otherwise
+EXAMPLE: example isVeryAmple; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[3][3]=
+    1,1,0,
+    1,0,1,
+    1,-1,-1;
+  polytope p = polytopeViaPoints(M);
+  isVeryAmple(p);
+  intmat N[3][4]=
+    1,1,0,0,
+    1,0,1,0,
+    1,1,1,2;
+  polytope q = polytopeViaPoints(N);
+  isVeryAmple(q);
+}
+
+proc latticeCodegree()
+"USAGE:   latticeCodegree(p);  p polytope
+RETURN:  int, the smalles number n such that n*p has a relative interior lattice point
+NOTE:    dimension(p)+1==latticeDegree(p)+latticeCodegree(p)
+EXAMPLE: example latticeCodegree; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[4][3]=
+    1,1,0,
+    1,1,1,
+    1,0,1,
+    1,0,0;
+  polytope p = polytopeViaPoints(M);
+  latticeCodegree(p);
+  intmat N[4][4]=
+    1,1,0,0,
+    1,0,1,0,
+    1,0,0,1,
+    1,0,0,0;
+  polytope q = polytopeViaPoints(N);
+  latticeCodegree(q);
+}
+
+proc latticeDegree()
+"USAGE:   latticeDegree(p);  p polytope
+RETURN:  int, the degree of the Ehrhart polynomial of p
+NOTE:    dimension(p)+1==latticeDegree(p)+latticeCodegree(p)
+EXAMPLE: example latticeDegree; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[4][3]=
+    1,1,0,
+    1,1,1,
+    1,0,1,
+    1,0,0;
+  polytope p = polytopeViaPoints(M);
+  latticeDegree(p);
+  intmat N[4][4]=
+    1,1,0,0,
+    1,0,1,0,
+    1,0,0,1,
+    1,0,0,0;
+  polytope q = polytopeViaPoints(N);
+  latticeDegree(q);
+}
+
+proc latticePoints()
+"USAGE:   latticePoints(p);  p polytope
+ASSUME:  isBounded(p)==1
+RETURN:  intmat, all lattice points in p
+EXAMPLE: example latticePoints; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[3][3]=
+    1,2,-1,
+    1,-1,2,
+    1,-1,-1;
+  polytope p = polytopeViaPoints(M);
+  latticePoints(p);
+  intmat N[2][3]=
+    1,2,0,
+    1,0,2;
+  polytope q = polytopeViaPoints(N);
+  latticePoints(q);
+}
+
+proc latticeVolume()
+"USAGE:   latticeVolume(p);  p polytope
+ASSUME:  isBounded(p)==1
+RETURN:  int, the lattice volume of p
+EXAMPLE: example latticeVolume; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[4][3]=
+    1,1,0,
+    1,1,1,
+    1,0,1,
+    1,0,0;
+  polytope p = polytopeViaPoints(M);
+  latticeVolume(p);
+  intmat N[4][3]=
+    1,1,0,
+    1,2,1,
+    1,0,1,
+    1,0,0;
+  polytope q = polytopeViaPoints(N);
+  latticeVolume(q);
+  intmat W[4][4]=
+    1,1,0,0,
+    1,0,1,0,
+    1,0,0,1,
+    1,0,0,0;
+  polytope r = polytopeViaPoints(W);
+  latticeVolume(r);
+}
+
+proc maximalFace()
+"USAGE:   maximalFace(p,v);  p polytope, v intvec
+ASSUME:  v lies in the negative dual tail cone of p
+RETURN:  intmat, vertices of the face of p on which the linear form v is maximal
+NOTE:    the maximal face is independent of the first coordinate of v
+         since p is considered as a polytope in the plane (first coordinate) = 1.
+EXAMPLE: example maximalFace; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[3][3]=
+    1,1,0,
+    1,0,1,
+    1,-1,-1;
+  intvec v = 0,1,1;
+  polytope p = polytopeViaPoints(M);
+  maximalFace(p,v);
+  intvec w = -5,1,1;
+  maximalFace(p,w);
+}
+
+proc maximalValue()
+"USAGE:   maximalValue(p,v);  p polytope, v intvec
+ASSUME:  v lies in the negative dual tail cone of p
+RETURN:  intmat, vertices of the face of p on which the linear form v is maximal
+NOTE:    first coordinate of v corresponds to a shift of the maximal value
+         since p is considered as a polytope in the plane (first coordinate) = 1.
+EXAMPLE: example maximalValue; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[3][3]=
+    1,1,0,
+    1,0,1,
+    1,-1,-1;
+  intvec v = 0,1,1;
+  polytope p = polytopeViaPoints(M);
+  maximalValue(p,v);
+  intvec w = -5,1,1;
+  maximalValue(p,w);
+}
+
+proc minimalFace()
+"USAGE:   minimalFace(p,v);  p polytope, v intvec
+ASSUME:  v lies in the dual tail cone of p
+RETURN:  intmat, vertices of the face of p on which the linear form v is minimal
+NOTE:    the minimal face is independent of the first coordinate of v
+         since p is considered as a polytope in the plane (first coordinate) = 1.
+EXAMPLE: example minimalFace; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[3][3]=
+    1,1,0,
+    1,0,1,
+    1,-1,-1;
+  intvec v = 0,-1,-1;
+  polytope p = polytopeViaPoints(M);
+  minimalFace(p,v);
+  intvec w = 5,-1,-1;
+  minimalFace(p,w);
+}
+
+proc minimalValue()
+"USAGE:   minimalValue(p,v);  p polytope, v intvec
+ASSUME:  v lies in the negative dual tail cone of p
+RETURN:  intmat, vertices of the face of p on which the linear form v is minimal
+NOTE:    first coordinate of v corresponds to a shift of the minimal value
+         since p is considered as a polytope in the plane (first coordinate) = 1.
+EXAMPLE: example minimalValue; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[3][3]=
+    1,1,0,
+    1,0,1,
+    1,-1,-1;
+  intvec v = 0,-1,-1;
+  polytope p = polytopeViaPoints(M);
+  minimalValue(p,v);
+  intvec w = 5,-1,-1;
+  minimalValue(p,w);
+}
+
+proc minkowskiSum()
+"USAGE:   minkowskiSum(c,d);  c cone, d cone
+         minkowskiSum(c,q);  c cone, q polytope
+         minkowskiSum(p,d);  p polytope, d cone
+         minkowskiSum(p,q);  p polytope, q polytope
+ASSUME:  input arguments have the same ambient dimension
+RETURN:  cone, if both inputs are cones; polytope, otherwise
+         the minkowski sum of the two input arguments
+EXAMPLE: example minkowskiSum; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[3][4]=
+    1,1,0,0,
+    1,0,1,0,
+    1,0,0,0;
+  intmat N[3][4]=
+    1,0,0,1,
+    1,-1,-1,-1,
+    1,0,0,0;
+  polytope p = polytopeViaPoints(M);
+  polytope q = polytopeViaPoints(N);
+  vertices(minkowskiSum(p,q));
+}
+
+proc nBoundaryLatticePoints()
+"USAGE:   nBoundaryLatticePoints(p);  p polytope
+ASSUME:  isBounded(p)==1
+RETURN:  int, the number of lattice points in the relative boundary of p
+EXAMPLE: example nBoundaryLatticePoints; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[3][3]=
+    1,2,-1,
+    1,-1,2,
+    1,-1,-1;
+  polytope p = polytopeViaPoints(M);
+  nBoundaryLatticePoints(p);
+  intmat N[2][3]=
+    1,2,0,
+    1,0,2;
+  polytope q = polytopeViaPoints(N);
+  nBoundaryLatticePoints(q);
+}
+
+proc nHilbertBasis()
+"USAGE:   nHilbertBasis(c);  c cone
+RETURN:  int, the number of elements in the Hilbert basis of c intersected with Z^n
+EXAMPLE: example nHilbertBasis; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[3][3]=
+    1,2,-1,
+    1,-1,2,
+    1,-1,-1;
+  cone c = coneViaPoints(M);
+  nHilbertBasis(c);
+}
+
+proc nInteriorLatticePoints()
+"USAGE:   nInteriorLatticePoints(p);  p polytope
+ASSUME:  isBounded(p)==1
+RETURN:  int, the number of lattice points in the relative interior of p
+EXAMPLE: example nInteriorLatticePoints; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[3][3]=
+    1,2,-1,
+    1,-1,2,
+    1,-1,-1;
+  polytope p = polytopeViaPoints(M);
+  nInteriorLatticePoints(p);
+  intmat N[2][3]=
+    1,2,0,
+    1,0,2;
+  polytope q = polytopeViaPoints(N);
+  nInteriorLatticePoints(q);
+}
+
+proc nLatticePoints()
+"USAGE:   nLatticePoints(p);  p polytope
+ASSUME:  isBounded(p)==1
+RETURN:  intmat, the number of lattice points in p
+EXAMPLE: example nLatticePoints; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[3][3]=
+    1,2,-1,
+    1,-1,2,
+    1,-1,-1;
+  polytope p = polytopeViaPoints(M);
+  nLatticePoints(p);
+  intmat N[2][3]=
+    1,2,0,
+    1,0,2;
+  polytope q = polytopeViaPoints(N);
+  nLatticePoints(q);
+}
+
+proc normalFan()
+"USAGE:   normalFan(p);  p polytope
+RETURN:  fan, the normal fan of p
+EXAMPLE: example normalFan; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[6][4] =
+    1,1,0,0,
+    1,0,1,0,
+    1,0,-1,0,
+    1,0,0,1,
+    1,0,0,-1,
+    1,-1,0,0;
+  polytope p = polytopeViaPoints(M);
+  normalFan(p);
+}
+
+proc vertexAdjacencyGraph()
+"USAGE:   vertexAdjacencyGraph(p);  p polytope
+RETURN:  list, the first entry is a bigintmat containing all vertices as row vectors, and therefore assigning all vertices an integer.
+               the second entry is a list of intvecs representing the adjacency graph of the vertices of p,
+               the intvec in position i contains all vertices j which are connected to vertex i via an edge of p.
+EXAMPLE: example vertexAdjacencyGraph; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[6][4] =
+    1,1,0,0,
+    1,0,1,0,
+    1,0,-1,0,
+    1,0,0,1,
+    1,0,0,-1,
+    1,-1,0,0;
+  polytope p = polytopeViaPoints(M);
+  vertexAdjacencyGraph(p);
+}
+
+proc vertexEdgeGraph()
+"USAGE:   vertexEdgeGraph(p);  p polytope
+RETURN:  list, the first entry is a bigintmat containing all vertices as row vectors, and therefore assigning all vertices an integer.
+               the second entry is a list of intvecs representing the edge graph of the vertices of p,
+               each intvec represents an edge of p connecting vertex i with vertex j.
+EXAMPLE: example vertexEdgeGraph; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[6][4] =
+    1,1,0,0,
+    1,0,1,0,
+    1,0,-1,0,
+    1,0,0,1,
+    1,0,0,-1,
+    1,-1,0,0;
+  polytope p = polytopeViaPoints(M);
+  vertexEdgeGraph(p);
+}
+
+
+proc visual()
+"USAGE:   visual(f);  f fan
+         visual(p);  p polytope
+ASSUME:  ambientDimension(f) resp ambientDimension(p) less or equal 3
+RETURN:  none
+EXAMPLE: example visual; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[6][4] =
+    1,1,0,0,
+    1,0,1,0,
+    1,0,-1,0,
+    1,0,0,1,
+    1,0,0,-1,
+    1,-1,0,0;
+  polytope p = polytopeViaPoints(M);
+  // visual(p);
+  fan f = normalFan(p);
+  // visual(f);
+}
+
+
+static proc mod_init()
+{
+  intvec save=option(get);
+  option(noredefine);
+  LIB "customstd.so";
+  LIB "gfanlib.so";
+  LIB "polymake.so";
+  option(set,save);
+}
