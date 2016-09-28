@@ -27,7 +27,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   cone c = fullSpace(2);
-  generatorsOfLinealityspace(c);
+  generatorsOfLinealitySpace(c);
 }
 
 proc origin(int n)
