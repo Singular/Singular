@@ -33,7 +33,7 @@ PROCEDURES:
   inVar(I);       computes for the parametrization defined by Is
                   semi group, semi module of differentials,
                   Zariski number and moduli
-  normalForm(I);  computes for the parametrization defined by I
+  HHnormalForm(I);  computes for the parametrization defined by I
                   normal form, semi group, semi module of differentials,
                   Zariski number and moduli
 ";
@@ -2056,8 +2056,8 @@ static proc reduc(poly f,ideal I, int b)
    return (lead(f)+reduc(f-lead(f),I,b));
 }
 
-proc normalForm(ideal I, list #)
-"USAGE:   normalForm(I), I=<x(t),y(t)> an ideal, # optional, a bound for the
+proc HHnormalForm(ideal I, list #)
+"USAGE:   HHnormalForm(I), I=<x(t),y(t)> an ideal, # optional, a bound for the
           conductor
 COMPUTE:  computes the Hefez-Hernandez normal form of the ideal I=<x(t),y(t)>
 RETURN:  a list L with 5 entries
@@ -2066,7 +2066,7 @@ RETURN:  a list L with 5 entries
    L[3] the semi module Lambda
    L[4] 0 if Lambda=Gamma or lambda=min(Lambda-Gamma) -n, the Zariski number
    L[5] the integers i, i>lambda, i+n not in Lambda, 0 if this set is empty
-EXAMPLE:  example normalForm; shows an example"
+EXAMPLE:  example HHnormalForm; shows an example"
 {
    int b,i,l,k;
    poly p;
@@ -2171,7 +2171,7 @@ example
  "EXAMPLE"; echo=2;
   ring r=0,t,Ds;
   ideal I=t6+3t7,t8+t13+t19;
-  normalForm(I);
+  HHnormalForm(I);
 }
 
 static proc findTrafo(ideal I, int i)
@@ -2248,23 +2248,23 @@ static proc findTrafo(ideal I, int i)
 /*
   ring r=0,t,(c,ds);
   ideal I=t4+t7,t6+t7;
-  normalForm(I);
+  HHnormalForm(I);
 
   ring r=0,t,(c,ds);
   ideal I=t4+t7+t9,t6+t11;
-  normalForm(I);
+  HHnormalForm(I);
 
   ring r=0,t,(c,ds);
   ideal I=t4+t5,t9+t10;
-  normalForm(I);
+  HHnormalForm(I);
 
   ring r=0,t,Ds;
   ideal I=t6+3t7,t8+t13+t19;
-  normalForm(I);
+  HHnormalForm(I);
 
   ring r=32003,t,Ds;
   ideal I=t8,t12+3t15+7t19;
-  normalForm(I);
+  HHnormalForm(I);
 */
 ////////////////////////////////////////////////////////////////////////////////
 /*
