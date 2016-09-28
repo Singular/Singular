@@ -1505,157 +1505,6 @@ BOOLEAN canonicalizeCone(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN containsCone(leftv res, leftv args)
-{
-  gfan::initializeCddlibIfRequired();
-  leftv u=args;
-  if ((u != NULL) && (u->Typ() == LIST_CMD))
-  {
-    leftv v=u->next;
-    if ((v != NULL) && (v->Typ() == coneID))
-    {
-      lists l = (lists) u->Data();
-      gfan::ZCone* zc = (gfan::ZCone*) v->Data();
-      zc->canonicalize();
-      int b = 0;
-      for (int i=0; i<=lSize(l); i++)
-      {
-        if (l->m[i].Typ() != coneID)
-        {
-          WerrorS("containsCone: entries of wrong type in list");
-          return TRUE;
-        }
-        gfan::ZCone* ll = (gfan::ZCone*) l->m[i].Data();
-        ll->canonicalize();
-        if (!((*ll) != (*zc)))
-        {
-          b = 1;
-          break;
-        }
-      }
-      res->rtyp = INT_CMD;
-      res->data = (char*) (long) b;
-      return FALSE;
-    }
-  }
-  WerrorS("containsCone: unexpected parameters");
-  return TRUE;
-}
-
-
-lists listOfFacets(const gfan::ZCone &zc)
-{
-  gfan::ZMatrix inequalities = zc.getFacets();
-  gfan::ZMatrix equations = zc.getImpliedEquations();
-  lists L = (lists)omAllocBin(slists_bin);
-  int r = inequalities.getHeight();
-  int c = inequalities.getWidth();
-  L->Init(r);
-
-  /* next we iterate over each of the r facets, build the respective cone and add it to the list */
-  /* this is the i=0 case */
-  gfan::ZMatrix newInequalities = inequalities.submatrix(1,0,r,c);
-  gfan::ZMatrix newEquations = equations;
-  newEquations.appendRow(inequalities[0]);
-  L->m[0].rtyp = coneID; L->m[0].data=(void*) new gfan::ZCone(newInequalities,newEquations);
-
-  /* these are the cases i=1,...,r-2 */
-  for (int i=1; i<r-1; i++)
-  {
-    newInequalities = inequalities.submatrix(0,0,i-1,c);
-    newInequalities.append(inequalities.submatrix(i+1,0,r,c));
-    newEquations = equations;
-    newEquations.appendRow(inequalities[i]);
-    L->m[i].rtyp = coneID; L->m[i].data=(void*) new gfan::ZCone(newInequalities,newEquations);
-  }
-
-  /* this is the i=r-1 case */
-  newInequalities = inequalities.submatrix(0,0,r-1,c);
-  newEquations = equations;
-  newEquations.appendRow(inequalities[r]);
-  L->m[r-1].rtyp = coneID; L->m[r-1].data=(void*) new gfan::ZCone(newInequalities,newEquations);
-
-  return L;
-}
-
-
-BOOLEAN listOfFacets(leftv res, leftv args)
-{
-  gfan::initializeCddlibIfRequired();
-  leftv u=args;
-  if ((u != NULL) && (u->Typ() == coneID))
-  {
-    gfan::ZCone* zc = (gfan::ZCone*) u->Data();
-    lists L = listOfFacets(*zc);
-    res->rtyp = LIST_CMD;
-    res->data = (void*) L;
-    return FALSE;
-  }
-  WerrorS("listOfFacets: unexpected parameters");
-  return TRUE;
-}
-
-
-/***
- * Given a cone and a point in its boundary,
- * returns the inner normal vector of a facet
- * containing the point.
- * Unless the point is in the relative interior of the facet
- * the facet is not unique.
- * In case no facet contains the point,
- * then 0 is returned.
- **/
-gfan::ZVector* facetContaining(gfan::ZCone* zc, gfan::ZVector* zv)
-{
-  gfan::ZMatrix facets = zc->getFacets();
-  for (int i=0; i<facets.getHeight(); i++)
-  {
-    gfan::ZVector facet = facets[i];
-    if (dot(facet,*zv) == (long) 0)
-      return new gfan::ZVector(facet);
-  }
-  return new gfan::ZVector(zc->ambientDimension());
-}
-
-
-BOOLEAN facetContaining(leftv res, leftv args)
-{
-  gfan::initializeCddlibIfRequired();
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
-  {
-    leftv v = u->next;
-    if ((v != NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*) u->Data();
-
-      bigintmat* point1;
-      if (v->Typ() == INTVEC_CMD)
-      {
-        intvec* point0 = (intvec*) v->Data();
-        point1 = iv2bim(point0,coeffs_BIGINT)->transpose();
-      }
-      else
-        point1 = (bigintmat*) v->Data();
-
-      gfan::ZVector* point = bigintmatToZVector(*point1);
-      gfan::ZVector* facet = facetContaining(zc, point);
-
-      res->rtyp = BIGINTMAT_CMD;
-      res->data = (void*) zVectorToBigintmat(*facet);
-
-      delete facet;
-      delete point;
-      if (v->Typ() == INTVEC_CMD)
-        delete point1;
-      return FALSE;
-    }
-  }
-  WerrorS("facetContaining: unexpected parameters");
-  return TRUE;
-}
-
-
 BOOLEAN faceContaining(leftv res, leftv args)
 {
   gfan::initializeCddlibIfRequired();
@@ -1677,6 +1526,11 @@ BOOLEAN faceContaining(leftv res, leftv args)
         point1 = (bigintmat*) v->Data();
       gfan::ZVector* point = bigintmatToZVector(*point1);
 
+      if (!zc->contains(*point))
+      {
+        WerrorS("faceContaining: point not in cone");
+        return TRUE;
+      }
       res->rtyp = coneID;
       res->data = (void*) new gfan::ZCone(zc->faceContaining(*point));
 
@@ -1686,7 +1540,7 @@ BOOLEAN faceContaining(leftv res, leftv args)
       return FALSE;
     }
   }
-  WerrorS("facetContaining: unexpected parameters");
+  WerrorS("faceContaining: unexpected parameters");
   return TRUE;
 }
 
@@ -1958,9 +1812,6 @@ void bbcone_setup(SModulFunctions* p)
   p->iiAddCproc("gfan.lib","setMultiplicity",FALSE,setMultiplicity);
   p->iiAddCproc("gfan.lib","span",FALSE,impliedEquations);
   p->iiAddCproc("gfan.lib","uniquePoint",FALSE,uniquePoint);
-  p->iiAddCproc("gfan.lib","listContainsCone",FALSE,containsCone);
-  p->iiAddCproc("gfan.lib","listOfFacets",FALSE,listOfFacets);
-  p->iiAddCproc("gfan.lib","facetContaining",FALSE,facetContaining);
   p->iiAddCproc("gfan.lib","faceContaining",FALSE,faceContaining);
   coneID=setBlackboxStuff(b,"cone");
 }

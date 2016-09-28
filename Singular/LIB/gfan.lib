@@ -433,6 +433,28 @@ example
   print(E2);
 }
 
+proc faceContaining()
+"USAGE:   faceContaining(c,w);  c cone, w intvec/bigintmat
+ASSUME:  containsInSupport(c,w)==1
+RETURN:  cone, the face of c containing w in its relative interior
+EXAMPLE: example faceContaining; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat M[2][2]=
+    1,0,
+    0,1;
+  cone c=coneViaPoints(M);
+  faceContaining(c,intvec(1,0));
+  faceContaining(c,intvec(0,1));
+  faceContaining(c,intvec(1,1));
+  faceContaining(c,intvec(0,0));
+}
+
 proc facets()
 "USAGE:   facets(c);  c cone
          facets(p);  p polytope
