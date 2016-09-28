@@ -17,13 +17,13 @@
 typedef struct {
     poly lt;
     unsigned long sev;
-    unsigned int label;
-} CLeadingTerm_struct;
+    unsigned int comp;
+} lt_struct;
 
-typedef std::vector<const CLeadingTerm_struct*> TReducers_test;
-typedef std::map<long, TReducers_test> CReducersHash_test;
+typedef std::vector<const lt_struct*> lts_vector;
+typedef std::map<long, lts_vector> lts_hash;
 
-static void initialize(CReducersHash_test &C, const ideal L)
+static void initialize(lts_hash &C, const ideal L)
 {
   if( L != NULL )
   {
@@ -33,39 +33,37 @@ static void initialize(CReducersHash_test &C, const ideal L)
       const poly a = L->m[k];
       if( a != NULL )
       {
-        CLeadingTerm_struct *CLT
-            = (CLeadingTerm_struct*)omalloc(sizeof(CLeadingTerm_struct));
+        lt_struct *CLT = (lt_struct*)omalloc(sizeof(lt_struct));
         CLT->lt = a;
         CLT->sev = p_GetShortExpVector(a, R);
-        CLT->label = k;
+        CLT->comp = k;
         C[p_GetComp(a, R)].push_back( CLT );
       }
     }
   }
 }
 
-static void deleteCRH(CReducersHash_test *C)
+static void deleteCRH(lts_hash *C)
 {
-    for (CReducersHash_test::iterator it = C->begin(); it != C->end(); it++) {
-        TReducers_test& v = it->second;
-        for (TReducers_test::const_iterator vit = v.begin(); vit != v.end();
-            vit++) {
-            omfree(const_cast<CLeadingTerm_struct*>(*vit));
+    for (lts_hash::iterator it = C->begin(); it != C->end(); it++) {
+        lts_vector& v = it->second;
+        for (lts_vector::const_iterator vit = v.begin(); vit != v.end();
+                vit++) {
+            omfree(const_cast<lt_struct*>(*vit));
         }
         v.erase(v.begin(), v.end());
     }
     C->erase(C->begin(), C->end());
 }
 
-bool IsDivisible(const CReducersHash_test *C, const poly product)
+bool IsDivisible(const lts_hash *C, const poly product)
 {
-    CReducersHash_test::const_iterator m_itr
-        = C->find(p_GetComp(product, currRing));
+    lts_hash::const_iterator m_itr = C->find(p_GetComp(product, currRing));
     if (m_itr == C->end()) {
         return false;
     }
-    TReducers_test::const_iterator m_current = (m_itr->second).begin();
-    TReducers_test::const_iterator m_finish  = (m_itr->second).end();
+    lts_vector::const_iterator m_current = (m_itr->second).begin();
+    lts_vector::const_iterator m_finish  = (m_itr->second).end();
     const unsigned long m_not_sev = ~p_GetShortExpVector(product, currRing);
     for ( ; m_current != m_finish; ++m_current) {
         if (p_LmShortDivisibleByNoComp((*m_current)->lt, (*m_current)->sev,
@@ -78,14 +76,14 @@ bool IsDivisible(const CReducersHash_test *C, const poly product)
 
 static poly TraverseTail_test(poly multiplier, const int tail,
    const ideal previous_module, const std::vector<bool> &variables,
-   const CReducersHash_test *m_div, const CReducersHash_test *m_checker);
+   const lts_hash *m_div, const lts_hash *m_checker);
 static poly ComputeImage_test(poly multiplier, const int tail,
     const ideal previous_module, const std::vector<bool> &variables,
-    const CReducersHash_test *m_div, const CReducersHash_test *m_checker);
+    const lts_hash *m_div, const lts_hash *m_checker);
 static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
     poly syztermCheck, const ideal previous_module,
-    const std::vector<bool> &variables, const CReducersHash_test *m_div,
-    const CReducersHash_test *m_checker);
+    const std::vector<bool> &variables, const lts_hash *m_div,
+    const lts_hash *m_checker);
 static poly leadmonom_test(const poly p, const ring r, const bool bSetZeroComp = true);
 
 static inline void update_variables(std::vector<bool> &variables,
@@ -121,8 +119,8 @@ static inline bool check_variables(const std::vector<bool> &variables,
 }
 
 static poly TraverseNF_test(const poly a, const ideal previous_module,
-    const std::vector<bool> &variables, const CReducersHash_test *m_div,
-    const CReducersHash_test *m_checker)
+    const std::vector<bool> &variables, const lts_hash *m_div,
+    const lts_hash *m_checker)
 {
   const ring R = currRing;
   const int r = p_GetComp(a, R) - 1;
@@ -200,7 +198,7 @@ static void delete_cache()
 
 static poly TraverseTail_test(poly multiplier, const int tail,
     const ideal previous_module, const std::vector<bool> &variables,
-    const CReducersHash_test *m_div, const CReducersHash_test *m_checker)
+    const lts_hash *m_div, const lts_hash *m_checker)
 {
   const ring& r = currRing;
 #if CACHE
@@ -263,7 +261,7 @@ static poly TraverseTail_test(poly multiplier, const int tail,
 
 static poly ComputeImage_test(poly multiplier, const int t,
     const ideal previous_module, const std::vector<bool> &variables,
-    const CReducersHash_test *m_div, const CReducersHash_test *m_checker)
+    const lts_hash *m_div, const lts_hash *m_checker)
 {
   const poly tail = previous_module->m[t]->next;
   if(tail != NULL)
@@ -340,16 +338,15 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(const poly a, const poly b, const p
 }
 
 poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
-    const CReducersHash_test *syz_checker, const CReducersHash_test *m_div)
+    const lts_hash *syz_checker, const lts_hash *m_div)
 {
   const ring r = currRing;
-  CReducersHash_test::const_iterator m_itr
-      = m_div->find(p_GetComp(t, currRing));
+  lts_hash::const_iterator m_itr = m_div->find(p_GetComp(t, currRing));
   if (m_itr == m_div->end()) {
     return NULL;
   }
-  TReducers_test::const_iterator m_current = (m_itr->second).begin();
-  TReducers_test::const_iterator m_finish  = (m_itr->second).end();
+  lts_vector::const_iterator m_current = (m_itr->second).begin();
+  lts_vector::const_iterator m_finish  = (m_itr->second).end();
   if (m_current == m_finish) {
     return NULL;
   }
@@ -362,7 +359,7 @@ poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
       continue;
     }
     const poly p = (*m_current)->lt;
-    const int k  = (*m_current)->label;
+    const int k  = (*m_current)->comp;
     p_ExpVectorSum(q, multiplier, t, r); // q == product == multiplier * t
     p_ExpVectorDiff(q, q, p, r); // (LM(product) / LM(L[k]))
     p_SetComp(q, k + 1, r);
@@ -385,8 +382,8 @@ poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
 
 static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
     poly syztermCheck, const ideal previous_module,
-    const std::vector<bool> &variables, const CReducersHash_test *m_div,
-    const CReducersHash_test *m_checker)
+    const std::vector<bool> &variables, const lts_hash *m_div,
+    const lts_hash *m_checker)
 {
   const ring r = currRing;
   poly s = FindReducer(multiplier, term4reduction, syztermCheck, m_checker,
@@ -579,10 +576,10 @@ static ideal computeFrame(const ideal G, const syzM_i_Function syzM_i,
 }
 
 static void computeLiftings(const resolvente res, const int index,
-    std::vector<bool> &variables, CReducersHash_test *&hash_previous_module)
+    std::vector<bool> &variables, lts_hash *&hash_previous_module)
 {
     update_variables(variables, res[index-1]);
-    CReducersHash_test *hash_current_module = new CReducersHash_test();
+    lts_hash *hash_current_module = new lts_hash();
     initialize(*hash_current_module, res[index]);
     poly p;
     for (int j = res[index]->ncols-1; j >= 0; j--) {
@@ -610,7 +607,7 @@ static int computeResolution(resolvente &res, const int length,
         res[index] = computeFrame(res[index-1], syzM_i_unsorted, syzHead);
         std::vector<bool> variables;
         variables.resize(currRing->N, true);
-        CReducersHash_test *hash_previous_module = new CReducersHash_test();
+        lts_hash *hash_previous_module = new lts_hash();
         initialize(*hash_previous_module, res[index-1]);
         while (!idIs0(res[index])) {
 #if 1
