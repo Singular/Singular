@@ -1505,157 +1505,6 @@ BOOLEAN canonicalizeCone(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN containsCone(leftv res, leftv args)
-{
-  gfan::initializeCddlibIfRequired();
-  leftv u=args;
-  if ((u != NULL) && (u->Typ() == LIST_CMD))
-  {
-    leftv v=u->next;
-    if ((v != NULL) && (v->Typ() == coneID))
-    {
-      lists l = (lists) u->Data();
-      gfan::ZCone* zc = (gfan::ZCone*) v->Data();
-      zc->canonicalize();
-      int b = 0;
-      for (int i=0; i<=lSize(l); i++)
-      {
-        if (l->m[i].Typ() != coneID)
-        {
-          WerrorS("containsCone: entries of wrong type in list");
-          return TRUE;
-        }
-        gfan::ZCone* ll = (gfan::ZCone*) l->m[i].Data();
-        ll->canonicalize();
-        if (!((*ll) != (*zc)))
-        {
-          b = 1;
-          break;
-        }
-      }
-      res->rtyp = INT_CMD;
-      res->data = (char*) (long) b;
-      return FALSE;
-    }
-  }
-  WerrorS("containsCone: unexpected parameters");
-  return TRUE;
-}
-
-
-lists listOfFacets(const gfan::ZCone &zc)
-{
-  gfan::ZMatrix inequalities = zc.getFacets();
-  gfan::ZMatrix equations = zc.getImpliedEquations();
-  lists L = (lists)omAllocBin(slists_bin);
-  int r = inequalities.getHeight();
-  int c = inequalities.getWidth();
-  L->Init(r);
-
-  /* next we iterate over each of the r facets, build the respective cone and add it to the list */
-  /* this is the i=0 case */
-  gfan::ZMatrix newInequalities = inequalities.submatrix(1,0,r,c);
-  gfan::ZMatrix newEquations = equations;
-  newEquations.appendRow(inequalities[0]);
-  L->m[0].rtyp = coneID; L->m[0].data=(void*) new gfan::ZCone(newInequalities,newEquations);
-
-  /* these are the cases i=1,...,r-2 */
-  for (int i=1; i<r-1; i++)
-  {
-    newInequalities = inequalities.submatrix(0,0,i-1,c);
-    newInequalities.append(inequalities.submatrix(i+1,0,r,c));
-    newEquations = equations;
-    newEquations.appendRow(inequalities[i]);
-    L->m[i].rtyp = coneID; L->m[i].data=(void*) new gfan::ZCone(newInequalities,newEquations);
-  }
-
-  /* this is the i=r-1 case */
-  newInequalities = inequalities.submatrix(0,0,r-1,c);
-  newEquations = equations;
-  newEquations.appendRow(inequalities[r]);
-  L->m[r-1].rtyp = coneID; L->m[r-1].data=(void*) new gfan::ZCone(newInequalities,newEquations);
-
-  return L;
-}
-
-
-BOOLEAN listOfFacets(leftv res, leftv args)
-{
-  gfan::initializeCddlibIfRequired();
-  leftv u=args;
-  if ((u != NULL) && (u->Typ() == coneID))
-  {
-    gfan::ZCone* zc = (gfan::ZCone*) u->Data();
-    lists L = listOfFacets(*zc);
-    res->rtyp = LIST_CMD;
-    res->data = (void*) L;
-    return FALSE;
-  }
-  WerrorS("listOfFacets: unexpected parameters");
-  return TRUE;
-}
-
-
-/***
- * Given a cone and a point in its boundary,
- * returns the inner normal vector of a facet
- * containing the point.
- * Unless the point is in the relative interior of the facet
- * the facet is not unique.
- * In case no facet contains the point,
- * then 0 is returned.
- **/
-gfan::ZVector* facetContaining(gfan::ZCone* zc, gfan::ZVector* zv)
-{
-  gfan::ZMatrix facets = zc->getFacets();
-  for (int i=0; i<facets.getHeight(); i++)
-  {
-    gfan::ZVector facet = facets[i];
-    if (dot(facet,*zv) == (long) 0)
-      return new gfan::ZVector(facet);
-  }
-  return new gfan::ZVector(zc->ambientDimension());
-}
-
-
-BOOLEAN facetContaining(leftv res, leftv args)
-{
-  gfan::initializeCddlibIfRequired();
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
-  {
-    leftv v = u->next;
-    if ((v != NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*) u->Data();
-
-      bigintmat* point1;
-      if (v->Typ() == INTVEC_CMD)
-      {
-        intvec* point0 = (intvec*) v->Data();
-        point1 = iv2bim(point0,coeffs_BIGINT)->transpose();
-      }
-      else
-        point1 = (bigintmat*) v->Data();
-
-      gfan::ZVector* point = bigintmatToZVector(*point1);
-      gfan::ZVector* facet = facetContaining(zc, point);
-
-      res->rtyp = BIGINTMAT_CMD;
-      res->data = (void*) zVectorToBigintmat(*facet);
-
-      delete facet;
-      delete point;
-      if (v->Typ() == INTVEC_CMD)
-        delete point1;
-      return FALSE;
-    }
-  }
-  WerrorS("facetContaining: unexpected parameters");
-  return TRUE;
-}
-
-
 BOOLEAN faceContaining(leftv res, leftv args)
 {
   gfan::initializeCddlibIfRequired();
@@ -1677,6 +1526,11 @@ BOOLEAN faceContaining(leftv res, leftv args)
         point1 = (bigintmat*) v->Data();
       gfan::ZVector* point = bigintmatToZVector(*point1);
 
+      if (!zc->contains(*point))
+      {
+        WerrorS("faceContaining: point not in cone");
+        return TRUE;
+      }
       res->rtyp = coneID;
       res->data = (void*) new gfan::ZCone(zc->faceContaining(*point));
 
@@ -1686,7 +1540,7 @@ BOOLEAN faceContaining(leftv res, leftv args)
       return FALSE;
     }
   }
-  WerrorS("facetContaining: unexpected parameters");
+  WerrorS("faceContaining: unexpected parameters");
   return TRUE;
 }
 
@@ -1920,48 +1774,45 @@ void bbcone_setup(SModulFunctions* p)
   b->blackbox_Op2=bbcone_Op2;
   b->blackbox_serialize=bbcone_serialize;
   b->blackbox_deserialize=bbcone_deserialize;
-  p->iiAddCproc("","coneViaInequalities",FALSE,coneViaNormals);
-  p->iiAddCproc("","coneViaPoints",FALSE,coneViaRays);
+  p->iiAddCproc("gfan.lib","coneViaInequalities",FALSE,coneViaNormals);
+  p->iiAddCproc("gfan.lib","coneViaPoints",FALSE,coneViaRays);
 
-  // iiAddCproc("","makePolytope",FALSE,coneToPolytope);
-  p->iiAddCproc("","ambientDimension",FALSE,ambientDimension);
-  p->iiAddCproc("","canonicalizeCone",FALSE,canonicalizeCone);
-  p->iiAddCproc("","codimension",FALSE,codimension);
-  p->iiAddCproc("","coneLink",FALSE,coneLink);
-  p->iiAddCproc("","containsAsFace",FALSE,hasFace);
-  p->iiAddCproc("","containsInSupport",FALSE,containsInSupport);
-  p->iiAddCproc("","containsPositiveVector",FALSE,containsPositiveVector);
-  p->iiAddCproc("","containsRelatively",FALSE,containsRelatively);
-  p->iiAddCproc("","convexHull",FALSE,convexHull);
-  p->iiAddCproc("","convexIntersection",FALSE,intersectCones);
-  p->iiAddCproc("","dimension",FALSE,dimension);
-  p->iiAddCproc("","dualCone",FALSE,dualCone);
-  p->iiAddCproc("","equations",FALSE,equations);
-  p->iiAddCproc("","facets",FALSE,facets);
-  p->iiAddCproc("","generatorsOfLinealitySpace",FALSE,generatorsOfLinealitySpace);
-  p->iiAddCproc("","generatorsOfSpan",FALSE,generatorsOfSpan);
-  p->iiAddCproc("","getLinearForms",FALSE,getLinearForms);
-  p->iiAddCproc("","getMultiplicity",FALSE,getMultiplicity);
-  p->iiAddCproc("","inequalities",FALSE,inequalities);
-  p->iiAddCproc("","isFullSpace",FALSE,isFullSpace);
-  p->iiAddCproc("","isOrigin",FALSE,isOrigin);
-  p->iiAddCproc("","isSimplicial",FALSE,isSimplicial);
-  p->iiAddCproc("","linealityDimension",FALSE,linealityDimension);
-  p->iiAddCproc("","linealitySpace",FALSE,linealitySpace);
-  p->iiAddCproc("","negatedCone",FALSE,negatedCone);
-  p->iiAddCproc("","quotientLatticeBasis",FALSE,quotientLatticeBasis);
-  p->iiAddCproc("","randomPoint",FALSE,randomPoint);
-  p->iiAddCproc("","rays",FALSE,rays);
-  p->iiAddCproc("","relativeInteriorPoint",FALSE,relativeInteriorPoint);
-  p->iiAddCproc("","semigroupGenerator",FALSE,semigroupGenerator);
-  p->iiAddCproc("","setLinearForms",FALSE,setLinearForms);
-  p->iiAddCproc("","setMultiplicity",FALSE,setMultiplicity);
-  p->iiAddCproc("","span",FALSE,impliedEquations);
-  p->iiAddCproc("","uniquePoint",FALSE,uniquePoint);
-  p->iiAddCproc("","listContainsCone",FALSE,containsCone);
-  p->iiAddCproc("","listOfFacets",FALSE,listOfFacets);
-  p->iiAddCproc("","facetContaining",FALSE,facetContaining);
-  p->iiAddCproc("","faceContaining",FALSE,faceContaining);
+  // iiAddCproc("gfan.lib","makePolytope",FALSE,coneToPolytope);
+  p->iiAddCproc("gfan.lib","ambientDimension",FALSE,ambientDimension);
+  p->iiAddCproc("gfan.lib","canonicalizeCone",FALSE,canonicalizeCone);
+  p->iiAddCproc("gfan.lib","codimension",FALSE,codimension);
+  p->iiAddCproc("gfan.lib","coneLink",FALSE,coneLink);
+  p->iiAddCproc("gfan.lib","containsAsFace",FALSE,hasFace);
+  p->iiAddCproc("gfan.lib","containsInSupport",FALSE,containsInSupport);
+  p->iiAddCproc("gfan.lib","containsPositiveVector",FALSE,containsPositiveVector);
+  p->iiAddCproc("gfan.lib","containsRelatively",FALSE,containsRelatively);
+  p->iiAddCproc("gfan.lib","convexHull",FALSE,convexHull);
+  p->iiAddCproc("gfan.lib","convexIntersection",FALSE,intersectCones);
+  p->iiAddCproc("gfan.lib","dimension",FALSE,dimension);
+  p->iiAddCproc("gfan.lib","dualCone",FALSE,dualCone);
+  p->iiAddCproc("gfan.lib","equations",FALSE,equations);
+  p->iiAddCproc("gfan.lib","facets",FALSE,facets);
+  p->iiAddCproc("gfan.lib","generatorsOfLinealitySpace",FALSE,generatorsOfLinealitySpace);
+  p->iiAddCproc("gfan.lib","generatorsOfSpan",FALSE,generatorsOfSpan);
+  p->iiAddCproc("gfan.lib","getLinearForms",FALSE,getLinearForms);
+  p->iiAddCproc("gfan.lib","getMultiplicity",FALSE,getMultiplicity);
+  p->iiAddCproc("gfan.lib","inequalities",FALSE,inequalities);
+  p->iiAddCproc("gfan.lib","isFullSpace",FALSE,isFullSpace);
+  p->iiAddCproc("gfan.lib","isOrigin",FALSE,isOrigin);
+  p->iiAddCproc("gfan.lib","isSimplicial",FALSE,isSimplicial);
+  p->iiAddCproc("gfan.lib","linealityDimension",FALSE,linealityDimension);
+  p->iiAddCproc("gfan.lib","linealitySpace",FALSE,linealitySpace);
+  p->iiAddCproc("gfan.lib","negatedCone",FALSE,negatedCone);
+  p->iiAddCproc("gfan.lib","quotientLatticeBasis",FALSE,quotientLatticeBasis);
+  p->iiAddCproc("gfan.lib","randomPoint",FALSE,randomPoint);
+  p->iiAddCproc("gfan.lib","rays",FALSE,rays);
+  p->iiAddCproc("gfan.lib","relativeInteriorPoint",FALSE,relativeInteriorPoint);
+  p->iiAddCproc("gfan.lib","semigroupGenerator",FALSE,semigroupGenerator);
+  p->iiAddCproc("gfan.lib","setLinearForms",FALSE,setLinearForms);
+  p->iiAddCproc("gfan.lib","setMultiplicity",FALSE,setMultiplicity);
+  p->iiAddCproc("gfan.lib","span",FALSE,impliedEquations);
+  p->iiAddCproc("gfan.lib","uniquePoint",FALSE,uniquePoint);
+  p->iiAddCproc("gfan.lib","faceContaining",FALSE,faceContaining);
   coneID=setBlackboxStuff(b,"cone");
 }
 
