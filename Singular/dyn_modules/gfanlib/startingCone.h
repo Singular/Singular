@@ -4,6 +4,8 @@
 #include <groebnerCone.h>
 #include <tropicalStrategy.h>
 
+extern gfan::ZMatrix tropicalStartingPoints;
+
 groebnerCone groebnerStartingCone(const tropicalStrategy& currentStrategy);
 groebnerCone tropicalStartingCone(const tropicalStrategy& currentCase);
 
