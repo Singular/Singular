@@ -124,7 +124,7 @@ example
     0,9,5;
   cone c=coneViaInequalities(M);
   c;
-  cone c=canonicalizeCone(c);
+  cone cc=canonicalizeCone(c);
   cc;
   // computes a unique representation of c
   c == cc;
@@ -1065,7 +1065,6 @@ example
   insertCone(f,c);
   getCone(f,2,1,0,0);
   getCone(f,2,2,0,0);
-  fan f=emptyFan(2);
 }
 
 proc insertCone()
