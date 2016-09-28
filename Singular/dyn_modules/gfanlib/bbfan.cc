@@ -38,6 +38,7 @@ char* bbfan_String(blackbox* /*b*/, void *d)
   if (d==NULL) return omStrDup("invalid object");
   else
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZFan* zf = (gfan::ZFan*)d;
     std::string s = zf->toString(2+4+8+128);
     return omStrDup(s.c_str());

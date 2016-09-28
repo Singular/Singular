@@ -393,6 +393,7 @@ gfan::ZFan* PmFan2ZFan (polymake::perl::Object* pf)
       {
         polymake::perl::Object pmcone=pf->CallPolymakeMethod("cone",i);
         gfan::ZCone* zc=PmCone2ZCone(&pmcone);
+        gfan::initializeCddlibIfRequired();
         zf->insert(*zc);
       }
     return zf;
@@ -522,4 +523,3 @@ polymake::perl::Object* ZFan2PmFan (gfan::ZFan* zf)
 }
 
 #endif
-
