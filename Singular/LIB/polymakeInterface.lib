@@ -476,28 +476,23 @@ example
   fan F1 = emptyFan(2);
   insertCone(F1,c1);
   isSmooth(F1);
-  fan F2 = emptyFan(2);
+  fan F2 = emptyFan(3);
   insertCone(F2,c2);
   isSmooth(F2);
-  intmat Mq[3][3]=
+  intmat Mp[3][3]=
     1,-2,-3,
     1,1,0,
     1,0,1;
-  polytope q = polytopeViaPoints(Mq);
-  fan F = normalFan(q);
+  polytope p = polytopeViaPoints(Mp);
+  isSmooth(p);
+  fan F = normalFan(p);
   isSmooth(F);
-  intmat Np[4][3]=
+  intmat Mq[4][3]=
     1,2,0,
     1,0,1,
     1,2,1,
     1,0,0;
-  polytope p = polytopeViaPoints(Np);
-  isSmooth(p);
-  intmat Nq[3][3]=
-    1,-2,-3,
-    1,1,0,
-    1,0,1;
-  polytope q = polytopeViaPoints(Nq);
+  polytope q = polytopeViaPoints(Mq);
   isSmooth(q);
 }
 
