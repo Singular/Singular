@@ -432,9 +432,9 @@ BOOLEAN monomialabortstd(leftv res, leftv args)
 extern "C" int SI_MOD_INIT(customstd)(SModulFunctions* p)
 {
   // p->iiAddCproc("std_demo","std_with_display",FALSE,std_with_display);
-  p->iiAddCproc("customstd.so","satstd",FALSE,satstd);
+  p->iiAddCproc("customstd.lib","satstd",FALSE,satstd);
   // p->iiAddCproc("std_demo","satstdWithInitialCheck",FALSE,satstdWithInitialCheck);
-  p->iiAddCproc("std_demo","monomialabortstd",FALSE,monomialabortstd);
+  p->iiAddCproc("customstd.lib","monomialabortstd",FALSE,monomialabortstd);
   // PrintS("init of std_demo - type `listvar(Std_demo);` to its contents\n");
   return (MAX_TOK);
 }
