@@ -33,14 +33,7 @@ static void initialize_lts_hash(lts_hash &C, const ideal L)
     }
 }
 
-static void deleteCRH(lts_hash *C)
-{
-    for (lts_hash::iterator it = C->begin(); it != C->end(); it++) {
-        lts_vector& v = it->second;
-        v.erase(v.begin(), v.end());
-    }
-    C->erase(C->begin(), C->end());
-}
+#define delete_lts_hash(C) C->clear()
 
 bool IsDivisible(const lts_hash *C, const poly product)
 {
@@ -575,7 +568,7 @@ static void computeLiftings(const resolvente res, const int index,
         res[index]->m[j]->next = TraverseNF_test(p, res[index-1], variables,
             hash_previous_module, hash_current_module);
     }
-    deleteCRH(hash_previous_module);
+    delete_lts_hash(hash_previous_module);
     delete(hash_previous_module);
     hash_previous_module = hash_current_module;
 #if CACHE
@@ -608,7 +601,7 @@ static int computeResolution(resolvente &res, const int length,
                 break;
             }
         }
-        deleteCRH(hash_previous_module);
+        delete_lts_hash(hash_previous_module);
         delete(hash_previous_module);
         variables.clear();
     }
