@@ -1,0 +1,664 @@
+///////////////////////////////////////////////////////////////////////////////////
+version="version curveInv.lib 1.0.0.5 Aug_2015";
+category="Algebraic geometry";
+info="
+LIBRARY:    curveInv.lib A library for computing invariants of curves
+AUTHOR:     Peter Chini, chini@rhrk.uni-kl.de
+
+OVERVIEW:
+This library provides a collection of procedures for computing invariants
+of curve singularities. Invariants that can be computed are:
+    - the delta invariant
+    - the multiplicity of the conductor: the length of Normalization(R)/C,
+      where C denotes the conductor
+    - the Deligne number
+    - the colength of derivations along the normalization - the length of
+      Der(Normalization(R/I)) / R/I
+
+In addition, it is possible to compute the conductor of a ring S = R/I,
+where R is a (localized) polynomial ring.
+
+THEORY: Computing the Deligne number of curve singularities and an algorithmic framework for
+        differential algebras in SINGULAR;
+        Chapter 5 - Master's Thesis of Peter Chini - August 2015
+
+PROCEDURES:
+    curveDeltaInv(ideal);   computes the delta invariant of R/I for a given ideal I
+    curveConductorMult(ideal);  returns the multiplicity of the conductor of R/I
+    curveDeligneNumber(ideal);          computes the Deligne number of R/I
+    curveColengthDerivations(ideal);    returns the colength of derivations,
+                                        the length of Der(Normalization(R/I))/Der(R/I)
+
+KEYWORDS:   curve singularity;invariants;deligne number
+";
+
+LIB "homolog.lib";
+LIB "normal.lib";
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
+//                                  Computation of invariants                                 //
+////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------- Delta invariant -------------------------------------//
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+proc curveDeltaInv(ideal I, list #)
+"USAGE:     curveDeltaInv(I); I ideal
+ASSUME:     I is a radical ideal, dim(R/I) = 1
+RETURN:     the delta invariant of R/I
+NOTE:       - output -1 means: delta invariant is infinite
+            - the optional parameter can be used if the normalization has already
+            been computed. If a list L contains the output of the procedure
+            normal (with options prim, wd and usering if the ring has a mixed ordering),
+            apply curveDeltaInv(I,L)
+KEYWORDS:   delta invariant; normalization
+SEE ALSO:   curveConductorMult; curveDeligneNumber
+EXAMPLE:    example curveDeltaInv; shows an example"
+{
+
+    if(size(#) > 0){
+        list norma = #;
+    }else{
+        // Compute the normalization with delta invariants
+        list norma = normal(I,"useRing","prim","wd");
+    }
+
+    // Pick the total delta invariant
+        int delt = norma[3][2];
+    return(delt);
+
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+ring R = 0,(x,y,z),ds;
+
+////////////////////////////
+// Finite delta invariant //
+////////////////////////////
+
+ideal I = x2y-y2z,x2-y2+z2;
+curveDeltaInv(radical(I));
+
+//////////////////////////////
+// Infinite delta invariant //
+//////////////////////////////
+
+ideal J = xyz;
+curveDeltaInv(radical(J));
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+//-------------------------------- Conductor and multiplicity --------------------------------//
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+static proc conductorMinPrime(def S)
+"USAGE:     conductorMinPrime(S); S ring
+ASSUME:     S is a polynomial ring with ideal norid and S/norid is the normalization of R/P,
+            where P is a minimal prime of I
+RETURN:     the ideal P
+REMARKS:    The algorithm computes norid intersect R - it eliminates the new
+            variables that were added by the command normal.
+NOTE:       the algorithm is for interior use only. We apply it to avoid a second computation
+            of the minimal primes
+KEYWORDS:   minimal primes; normalization
+SEE ALSO:   conductorIdealIntersect"
+{
+
+        // Variables of basering as product
+        int n = nvars(basering);
+    int i;
+        poly var_base = 1;
+        for(i = 1; i <= n; i++){
+                var_base = var_base*var(i);
+        }
+
+    // Switch to normalization
+    def savering = basering;
+    setring S;
+        poly var_base = imap(savering,var_base);
+
+        // Variables of S as product
+        poly var_ext = 1;
+        n = nvars(basering);
+        for(i = 1; i <= n ; i++){
+                var_ext = var_ext*var(i);
+        }
+
+        // Variables to eliminate
+        poly var_elim = var_ext/var_base;
+
+        // Compute norid intersect basering = minimal prime
+        ideal min_prime = eliminate(norid,var_elim);
+
+    // Switch to R and return
+    setring savering;
+    ideal min_prime = imap(S,min_prime);
+    return(min_prime);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+static proc conductorIdealIntersect(list id, int miss)
+"USAGE:     conductorIdealIntersect(id,miss); id list, miss int
+ASSUME:     id is a list of ideals
+RETURN:     the intersection of all ideals in id except the one chosen via miss
+NOTE:       - the index can be chosen outside the list
+            - the empty intersection is the whole ring
+KEYWORDS:   intersection"
+{
+
+        int n = size(id);
+        ideal in_sect = 1;
+        int i;
+
+        // Intersect ideals
+        for(i = 1; i <= n; i++){
+                if(i != miss){
+            in_sect = intersect(in_sect,id[i]);
+                }
+        }
+
+        return(in_sect);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+proc curveConductorMult(ideal I, list #)
+"USAGE:     curveConductorMult(I); I ideal
+ASSUME:     I is a radical ideal, dim(R/I) = 1
+RETURN:     the multiplicity of the conductor
+NOTE:       the optional parameter can be used if the normalization has already
+            been computed. If a list L contains the output of the procedure
+            normal (with options prim, wd and usering if the ring has a mixed ordering),
+            apply curveConductorMult(I,L)
+KEYWORDS:   conductor; multiplicity
+SEE ALSO:   normalConductor
+EXAMPLE:    example curveConductorMult; shows an example"
+{
+
+    if(size(#) > 0){
+        list norma = #;
+    }else{
+        // Compute the normalization with delta invariants
+        list norma = normal(I,"useRing","prim","wd");
+    }
+
+    // delta invariant
+    int delta = curveDeltaInv(I,norma);
+        // If the delta invariant is infinite, the conductor multiplicity is as well
+        if(delta == -1){
+                return(-1);
+        }
+
+    // Conductor
+    ideal C = normalConductor(I,norma);
+    int c_dim = vdim(std(C));
+    if(c_dim == -1){
+        return(-1);
+    }
+
+        // Return conductor multiplicity
+        return(vdim(std(C)) + delta);
+
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+
+//////////////////////////////////////////////
+// Mutltiplicity of the conductor of curves //
+//////////////////////////////////////////////
+
+ring R = 0,(x,y,z),ds;
+
+// Example 1:
+ideal I = x2-y4z,z3y2+xy2;
+I = std(radical(I));
+curveConductorMult(I);
+
+// Example 2:
+ideal I = x*(y+z)^3 - y3, x2y2 + z5;
+I = std(radical(I));
+curveConductorMult(I);
+
+kill R;
+
+////////////////////////////////////////////////////////
+// Mutltiplicity of the conductor of Gorenstein curve //
+////////////////////////////////////////////////////////
+
+ring R = 0,(x,y),ds;
+ideal I = xy;
+
+// In such a case, the conductor multiplicity c satisfies: c = 2*delta
+// Delta invariant:
+curveDeltaInv(I);
+// Conductor Multiplicity:
+curveConductorMult(I);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------- Deligne number --------------------------------------//
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+proc curveDeligneNumber(ideal I, list #)
+"USAGE:     curveDeligneNumber(I); I ideal
+ASSUME:     I is a radical ideal, dim(R/I) = 1
+RETURN:     the Deligne number of R/I
+REMARKS:    The Deligne number e satisfies by definition: e = 3delta - m.
+            So the algorithm splits the computation into two parts: one part computes the delta
+            invariant, the other part the colength of derivations m.
+NOTE:       the optional parameter can be used if the normalization has already
+            been computed. If a list L contains the output of the procedure
+            normal (with options prim, wd and usering if the ring has a mixed ordering),
+            apply curveDeligneNumber(I,L)
+KEYWORDS:   deligne number; invariant
+SEE ALSO:   curveColengthDerivations, curveDeltaInv
+EXAMPLE:    example curveDeligneNumber; shows an example"
+{
+
+    if(size(#) > 0){
+        list norma = #;
+    }else{
+        // Compute the normalization with delta invariants
+        list norma = normal(I,"useRing","prim","wd");
+    }
+
+    int delt = curveDeltaInv(I,norma);
+    int m = curveColengthDerivations(I,norma);
+    return(3*delt - m);
+
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+
+//////////////////////////////
+// Deligne number of curves //
+//////////////////////////////
+
+// Example 1:
+ring R = 0,(x,y,z),ds;
+ideal I = x2-y4z,z3y2+xy2;
+I = std(radical(I));
+curveDeligneNumber(I);
+
+// Example 2:
+ring S = 0,(x,y),ds;
+ideal I = (x+y)*(x2-y3);
+curveDeligneNumber(I);
+
+// Example 3:
+ideal J = (x2-y3)*(x2+y2)*(x-y);
+curveDeligneNumber(J);
+// Let us also compute the milnor number of this complete intersection:
+milnor(J);
+
+// We see that the Milnor number is bigger than the Deligne number. Hence, this
+// curve cannot be quasi homogeneous. This can also be verified by Saitos criterion:
+reduce(J[1],std(jacob(J[1])));
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+proc curveColengthDerivations(ideal I, list #)
+"USAGE:     curveColengthDerivations(I); I ideal
+ASSUME:     I is a radical ideal
+RETURN:     the colength of derivations of R/I
+REMARKS:    The procedure goes through all branches and computes the colength of
+            derivations there. Then the d-dimension of the minimal primes is computed.
+            After that, everything is summed up.
+NOTE:       the optional parameter can be used if the normalization has already
+            been computed. If a list L contains the output of the procedure
+            normal (with options prim, wd and usering if the ring has a mixed ordering),
+            apply curveColengthDerivations(I,L)
+KEYWORDS:   deligne number; invariants; colength of derivations
+SEE ALSO:   curveColengthDerivationsComp, curve Ddim
+EXAMPLE:    example curveColengthDerivations; shows an example"
+{
+
+    if(size(#) > 0){
+        list norma = #;
+    }else{
+        // Compute the normalization with delta invariants
+        list norma = normal(I,"useRing","prim","wd");
+    }
+
+    int r = size(norma[1]);
+    int i,j;
+    ideal U,A,B;
+    module Der_P;
+    def S;
+    def savering = basering;
+
+    // List of minimal primes and their derivation modules
+    list min_prime;
+    list der_mod;
+
+    // Colength of derivations of any branch, m_delta and total colength of derivations
+    int m_i;
+    int m_delta;
+    int ext_number;
+
+    // Go through the irreducible components and compute thecolength of derivations m_i
+    for(i = 1; i <= r; i++){
+        // Derivations preserving the minimal primes
+        S = norma[1][i];
+        U = norma[2][i];
+
+        min_prime[i] = conductorMinPrime(S);
+        der_mod[i] = find_der(min_prime[i]);
+        Der_P = der_mod[i];
+
+        // Switch to normalization of R/P and compute colength of derivations
+        setring S;
+        ideal U = imap(savering,U);
+        module Der_P = imap(savering,Der_P);
+
+        m_i = curveColengthDerivationsComp(Der_P,U,norid);
+
+        // Add colength of derivations of this branch to total colength of derivations
+        ext_number = ext_number + m_i;
+        setring savering;
+    }
+
+    // Now compute m_delta via curveDdim
+    A = min_prime[1];
+    B = std(1);
+
+    for(i = 2; i <= r; i++){
+        A = intersect(A,B);
+        B = min_prime[i];
+        m_delta = m_delta + curveDdim(A,find_der(A),B,find_der(B));
+    }
+
+    // Add this to the colength of derivations
+    ext_number = ext_number + m_delta;
+    return(ext_number);
+
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+
+///////////////////////////////////////
+// colength of derivations of curves //
+///////////////////////////////////////
+
+// Example 1:
+ring R = 0,(x,y,z),ds;
+ideal I = x2-y4z,z3y2+xy2;
+I = std(radical(I));
+curveColengthDerivations(I);
+
+// Example 2:
+ring S = 0,(x,y),ds;
+ideal I = (x+y)*(x2-y3);
+curveColengthDerivations(I);
+
+// Example 3:
+ideal J = (x2-y3)*(x2+y2)*(x-y);
+curveColengthDerivations(J);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+static proc curveColengthDerivationsComp(module Der_P, ideal U, ideal relid)
+"USAGE:     curveColengthDerivationsComp(Der_P,U,relid); Der_P module, U ideal, relid ideal
+ASSUME:     - the basering is the normalization of R/P, where P is a prime
+            - Der_P is the module of P-preserving derivations
+            - U containts the generators of the normalization of R/P
+            - relid is the ideal of relations that hold in the normalization of R/P
+RETURN:     the colength of derivations of R/P
+NOTE:       the procedure is for interior use only - it is part of the computation of
+            the total colength of derivations
+KEYWORDS:   colength of derivations
+SEE ALSO:   curveAdjustModule, curveExtDerModule"
+{
+
+    int k;
+
+    // Adjust the generators of Der_P to the new variables T(1),...,T(k),x(1),...,x(n)
+    // if there are new variables - check number of blocks
+    if(size(ringlist(basering)[3]) >= 3){
+        k = size(ringlist(basering)[3][1][2]);
+        Der_P = curveAdjustModule(Der_P,k);
+    }
+
+    // Extend the derivation module to the normalization
+    Der_P = curveExtDerModule(Der_P,U,relid);
+
+    // Derivations preserving the relation ideal
+    module Der_relid = find_der(relid);
+
+    // Quotient module with relations given by relid
+    Der_P = Der_P + relid*freemodule(nvars(basering));
+    module quotient_mod = modulo(Der_relid,Der_P);
+    k = vdim(std(quotient_mod));
+
+    if(k == -1){
+        ERROR("Colength of derivations not finite !");
+    }
+
+    return(k);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+static proc curveExtDerModule(module Der_P, ideal U, ideal relid)
+"USAGE:     curveExtDerModule(Der_P,U,relid); Der_P module, U ideal, relid ideal
+ASSUME:     - the basering is the normalization of R/P, where P is prime
+            - Der_P is the module of P-preserving derivations (with adjusted generators)
+            - U containts the generators of the normalization of R/P
+            - relid is the ideal of relations that hold in the normalization of R/P
+RETURN:     The derivation module lifted to the normalization
+REMARKS:    the generators of Der_P are extended via the quotient rule
+NOTE:       the procedure is for interior use only - it is part of the computation of
+            the total colength of derivations
+KEYWORDS:   derivations; extend derivations
+SEE ALSO:   curveColengthDerivationsComp"
+{
+
+    int k = size(Der_P);
+    int n = size(U) - 1;
+    int i,j;
+
+    module M_ext;
+    vector delt;
+    vector delt_ext;
+
+    poly g = (U[n+1])^2;
+    poly f;
+    poly Un = 1;
+    matrix D[k][n];
+    matrix G[k][n];
+    list temp_div;
+
+    for(i = 1; i <= k; i++){
+        delt = Der_P[i];
+
+        // Extend to new variables by quotient rule
+        for(j = 1; j <= n; j++){
+            f = vecDerivationEval(delt,U[j])*U[n+1] - vecDerivationEval(delt,U[n+1])*U[j];
+
+            // Division
+            temp_div = division(f,ideal(g) + relid);
+
+            // Units
+            D[i,j] = temp_div[3][1,1];
+            // Unit Un is product of all D[i][j]
+            Un = Un*D[i,j];
+
+            // Factor of dividing by g
+            G[i,j] = temp_div[1][1,1];
+        }
+    }
+
+    // Extension of the generating derivations
+    for(i = 1; i <= k; i++){
+        delt_ext = Un*Der_P[i];
+
+        // Now add the images of the new variables multiplied by the units
+        for(j = 1; j <= n; j++){
+            delt_ext = delt_ext + (Un / D[i,j])*G[i,j]*gen(j);
+        }
+
+        M_ext[i] = delt_ext;
+    }
+
+    return(M_ext);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+static proc curveAdjustModule(module M, int k)
+"USAGE:     curveAdjustModule(M,k); M module, k int
+RETURN:     the module M with shifted (by k) generators
+NOTE:       the procedure is for interior use only - it is part of the computation of
+            the total colength of derivations
+KEYWORDS:   adjust module
+SEE ALSO:   curveColengthDerivationsComp"
+{
+
+    module M_copy = M;
+    int n = size(M);
+    int vs,i,j;
+    vector v,w;
+
+    // Adjust dimension of generators
+    for(i = 1; i <= n; i++){
+        v = M_copy[i];
+        vs = nrows(v);
+
+        for(j = 1; j <= vs; j++){
+            w = w + v[j]*gen(j+k);
+        }
+
+        M[i] = w;
+        w = 0;
+    }
+
+    return(M);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+static proc curveDdim(ideal I, module DI, ideal J, module DJ)
+"USAGE:     curveDdim(I,DI,J,DJ); I,J ideal, DI,DJ module
+ASSUME:     DI are the I-preserving derivations and DJ are the J-preserving derivations
+RETURN:     d(I,J) = dim_k (DI + DJ / (I+J)*Der(R))
+NOTE:       the procedure is part of the computations of the colength of derivations.
+            It computes the d-dimension
+KEYWORDS:   derivation module; logarithmic derivations
+SEE ALSO:   curveColengthDerivations"
+{
+
+    module M = DI+DJ;
+    module N = (I+J)*freemodule(nvars(basering));
+    module H = modulo(M,N);
+    int k = vdim(std(H));
+
+    if(k == -1){
+        ERROR("d-dimension not finite !");
+    }
+
+    return(k);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+static proc vecDerivationEval(vector delt, poly f)
+"USAGE:     vecDerivationEval(delt,f); delt vector, f poly
+ASSUME:     delt does not have more rows than the number of variables in the basering
+RETURN:     the image of f under delt, if we consider delt as derivation
+REMARKS:    We identify derivations as vectors
+NOTE:       - the procedure is for interior use only - it is part of the computation of
+            the total colength of derivations
+            - it is used to apply the quotient rule
+KEYWORDS:   derivation
+SEE ALSO:   curveExtDerModule"
+{
+
+    int n = nrows(delt);
+    int i;
+    poly eval_;
+
+    for(i = 1; i <= n; i++){
+        eval_ = eval_ + delt[i]*diff(f,var(i));
+    }
+
+    return(eval_);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+static proc find_der(ideal I)
+"USAGE: find_der(I); I ideal
+RETURN: generators of the module of logarithmic derivations
+REMARK: Algorithm by R. Epure - Homogeneity and Derivations on Analytic Algebras"
+{
+    // Dummy variables and Initialization:
+    int k,i,n,m;
+
+    //generating matrix for syzygie computation:
+    n = nvars(basering);
+    m = size(I);
+    ideal j = jacob(I);
+
+    matrix M=matrix(j,m,n);
+    for (i = 1; i <= m; i++){
+        M = concat(M,diag(I[i],m));
+    }
+    module C = syz(M);
+    module D;
+
+    for(i = 1; i <= size(C); i++){
+        D = D + C[i][1..n];
+    }
+
+    //Clearing memory
+    kill j;
+    kill C;
+    kill M;
+    return(D);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////

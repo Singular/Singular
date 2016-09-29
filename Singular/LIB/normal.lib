@@ -24,6 +24,7 @@ PROCEDURES:
  getSmallest(J);     computes the polynomial of smallest degree of J
  getOneVar(J, vari); computes a polynomial of J in the variable vari
  changeDenominator(U1, c1, c2, I); computes ideal U2 such that 1/c1*U1=1/c2*U2
+ normalConductor(ideal); computation of the conductor as ideal in the basering
 
 SEE ALSO: locnormal_lib;modnormal_lib
 ";
@@ -6787,6 +6788,108 @@ example
    nor = normalP(i,"withRing");
    norTest(i,nor);               //1,1,1 means that normalP was correct
    printlevel = prl;
+}
+
+proc normalConductor(ideal I, list #)
+"USAGE:     normalConductor(I); I ideal
+ASSUME:     I is a radical ideal
+RETURN:     the conductor of R/I as ideal in R
+REMARKS:    The procedures makes use of the minimal primes and
+            the generators of the normalization given by the normalization algorithm.
+NOTE:       the optional parameter can be used if the normalization has already
+            been computed. If a list L contains the output of the procedure
+            normal (with options prim, wd and usering if the ring has a mixed ordering),
+            apply normalConductor(I,L)
+KEYWORDS:   conductor; normalization
+SEE ALSO:   conductorIdealIntersect, conductorMinPrime, curveConductorMult
+EXAMPLE:    example normalConductor; shows an example"
+{
+
+    if(size(#) > 0){
+        list norma = #;
+    }else{
+        // Compute the normalization with delta invariants
+        list norma = normal(I,"useRing","prim","wd");
+    }
+
+    // Prepare computation
+        int r = size(norma[1]);
+        int i;
+        def savering = basering;
+        list min_prime;
+    list DEN;
+    def S;
+
+    // List of all minimal primes
+    for(i = 1; i <= r; i++){
+        S = norma[1][i];
+        min_prime[i] = conductorMinPrime(S);
+    }
+
+        // List of ideals U generating Norm(R/P_i)
+        list U = norma[2];
+
+        // List of denominators DEN
+    r = size(U);
+        for(i = 1; i <= r; i++){
+                DEN[i] = U[i][size(U[i])];
+        }
+
+        // Compute the conductor C
+        ideal C = 1;
+        ideal C_current;
+        ideal min_prime_isect;
+
+        for(i = 1; i <= r; i++){
+
+                // Intersection of min_prime_j, j!=i
+                min_prime_isect = conductorIdealIntersect(min_prime,i);
+
+                // Compute the quotient
+                C_current = std(quotient(min_prime[i] + DEN[i]*min_prime_isect, U[i]));
+
+                // Intersect it with previous computation
+                C = intersect(C,C_current);
+        }
+
+        return(std(C));
+
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+
+///////////////////////////////////////////
+// Computation of small conductor ideals //
+///////////////////////////////////////////
+
+ring R = 0,(x,y,z),ds;
+ideal I = x2y2 - z;
+normalConductor(I);
+// The conductor is the whole ring - so the ring is normal
+// We can also see this using the delta invariant:
+curveDeltaInv(I);
+
+ring S = 0,(a,b,c),dp;
+ideal J = abc;
+normalConductor(J);
+// The conductor is not the whole ring - so it is not normal
+// We can also see this using the delta invariant, which is even infinite
+curveDeltaInv(J);
+
+kill R,S;
+
+/////////////////////////////////////
+// Computation of a bigger example //
+/////////////////////////////////////
+
+ring R = 0,(x,y,z,t),ds;
+ideal I = xyz - yzt, x2y3 - z2t4;
+I = std(radical(I));
+// Ideal I
+I;
+// Conductor
+normalConductor(I);
 }
 
 ///////////////////////////////////////////////////////////////////////////
