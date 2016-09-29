@@ -23,21 +23,14 @@ typedef struct {
 typedef std::vector<lt_struct> lts_vector;
 typedef std::map<long, lts_vector> lts_hash;
 
-static void initialize(lts_hash &C, const ideal L)
+static void initialize_lts_hash(lts_hash &C, const ideal L)
 {
-  if( L != NULL )
-  {
     const ring R = currRing;
-    for( int k = IDELEMS(L) - 1; k >= 0; k-- )
-    {
-      const poly a = L->m[k];
-      if( a != NULL )
-      {
-        C[p_GetComp(a, R)].push_back({a, p_GetShortExpVector(a, R),
-            (unsigned int)k});
-      }
+    const unsigned int n_elems = IDELEMS(L);
+    for (unsigned int k = 0; k < n_elems; k++) {
+        const poly a = L->m[k];
+        C[p_GetComp(a, R)].push_back({a, p_GetShortExpVector(a, R), k});
     }
-  }
 }
 
 static void deleteCRH(lts_hash *C)
@@ -573,7 +566,7 @@ static void computeLiftings(const resolvente res, const int index,
 {
     update_variables(variables, res[index-1]);
     lts_hash *hash_current_module = new lts_hash();
-    initialize(*hash_current_module, res[index]);
+    initialize_lts_hash(*hash_current_module, res[index]);
     poly p;
     for (int j = res[index]->ncols-1; j >= 0; j--) {
         p = res[index]->m[j];
@@ -601,7 +594,7 @@ static int computeResolution(resolvente &res, const int length,
         std::vector<bool> variables;
         variables.resize(currRing->N, true);
         lts_hash *hash_previous_module = new lts_hash();
-        initialize(*hash_previous_module, res[index-1]);
+        initialize_lts_hash(*hash_previous_module, res[index-1]);
         while (!idIs0(res[index])) {
 #if 1
             computeLiftings(res, index, variables, hash_previous_module);
