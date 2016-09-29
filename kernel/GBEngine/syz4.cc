@@ -20,7 +20,7 @@ typedef struct {
     unsigned int comp;
 } lt_struct;
 
-typedef std::vector<const lt_struct*> lts_vector;
+typedef std::vector<lt_struct> lts_vector;
 typedef std::map<long, lts_vector> lts_hash;
 
 static void initialize(lts_hash &C, const ideal L)
@@ -33,11 +33,8 @@ static void initialize(lts_hash &C, const ideal L)
       const poly a = L->m[k];
       if( a != NULL )
       {
-        lt_struct *CLT = (lt_struct*)omalloc(sizeof(lt_struct));
-        CLT->lt = a;
-        CLT->sev = p_GetShortExpVector(a, R);
-        CLT->comp = k;
-        C[p_GetComp(a, R)].push_back( CLT );
+        C[p_GetComp(a, R)].push_back({a, p_GetShortExpVector(a, R),
+            (unsigned int)k});
       }
     }
   }
@@ -47,10 +44,6 @@ static void deleteCRH(lts_hash *C)
 {
     for (lts_hash::iterator it = C->begin(); it != C->end(); it++) {
         lts_vector& v = it->second;
-        for (lts_vector::const_iterator vit = v.begin(); vit != v.end();
-                vit++) {
-            omfree(const_cast<lt_struct*>(*vit));
-        }
         v.erase(v.begin(), v.end());
     }
     C->erase(C->begin(), C->end());
@@ -66,7 +59,7 @@ bool IsDivisible(const lts_hash *C, const poly product)
     lts_vector::const_iterator m_finish  = (m_itr->second).end();
     const unsigned long m_not_sev = ~p_GetShortExpVector(product, currRing);
     for ( ; m_current != m_finish; ++m_current) {
-        if (p_LmShortDivisibleByNoComp((*m_current)->lt, (*m_current)->sev,
+        if (p_LmShortDivisibleByNoComp(m_current->lt, m_current->sev,
             product, m_not_sev, currRing)) {
             return true;
         }
@@ -354,12 +347,12 @@ poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
   pNext(q) = NULL;
   const unsigned long m_not_sev = ~p_GetShortExpVector(multiplier, t, r);
   for( ; m_current != m_finish; ++m_current) {
-    if ( ((*m_current)->sev & m_not_sev)
-        || !(_p_LmDivisibleByNoComp((*m_current)->lt, multiplier, t, r))) {
+    if ( (m_current->sev & m_not_sev)
+        || !(_p_LmDivisibleByNoComp(m_current->lt, multiplier, t, r))) {
       continue;
     }
-    const poly p = (*m_current)->lt;
-    const int k  = (*m_current)->comp;
+    const poly p = m_current->lt;
+    const int k  = m_current->comp;
     p_ExpVectorSum(q, multiplier, t, r); // q == product == multiplier * t
     p_ExpVectorDiff(q, q, p, r); // (LM(product) / LM(L[k]))
     p_SetComp(q, k + 1, r);
