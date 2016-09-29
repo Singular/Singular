@@ -35,18 +35,19 @@ static void initialize_lts_hash(lts_hash &C, const ideal L)
 
 #define delete_lts_hash(C) C->clear()
 
-bool IsDivisible(const lts_hash *C, const poly product)
+bool is_divisible(const lts_hash *C, const poly p)
 {
-    lts_hash::const_iterator m_itr = C->find(p_GetComp(product, currRing));
-    if (m_itr == C->end()) {
+    const ring R = currRing;
+    lts_hash::const_iterator itr = C->find(p_GetComp(p, R));
+    if (itr == C->end()) {
         return false;
     }
-    lts_vector::const_iterator m_current = (m_itr->second).begin();
-    lts_vector::const_iterator m_finish  = (m_itr->second).end();
-    const unsigned long m_not_sev = ~p_GetShortExpVector(product, currRing);
-    for ( ; m_current != m_finish; ++m_current) {
-        if (p_LmShortDivisibleByNoComp(m_current->lt, m_current->sev,
-            product, m_not_sev, currRing)) {
+    lts_vector::const_iterator v_current = itr->second.begin();
+    lts_vector::const_iterator v_finish  = itr->second.end();
+    const unsigned long not_sev = ~p_GetShortExpVector(p, R);
+    for ( ; v_current != v_finish; ++v_current) {
+        if (p_LmShortDivisibleByNoComp(v_current->lt, v_current->sev,
+                p, not_sev, R)) {
             return true;
         }
     }
@@ -348,7 +349,7 @@ poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
         && p_ExpVectorEqual(syzterm, q, r)) {
       continue;
     }
-    if (IsDivisible(syz_checker, q)) {
+    if (is_divisible(syz_checker, q)) {
       continue;
     }
     number n = n_Mult(p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
