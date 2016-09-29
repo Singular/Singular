@@ -136,7 +136,7 @@ p;
 @end smallexample
 @end table
 @c --------------------------------------------------------------------------------
-@node polytopeViaInequalities,polytope related functions,polytopeViaPoints,polytope
+@node polytopeViaInequalities
 @subsection polytopeViaInequalities
 @cindex polytopeViaInequalities
 @table @code
