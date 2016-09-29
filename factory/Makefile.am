@@ -176,7 +176,7 @@ nodist_libfactory_include_HEADERS = cplusplus.h factory.h factoryconf.h
 
 ####################################################
 # Documentation
-include $(srcdir)/aminclude.am
+@DX_RULES@
 
 ####################################################
 # the precomputed GF(q)-tables
