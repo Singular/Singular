@@ -578,7 +578,7 @@ int nlSize(number a, const coeffs)
   if (a==INT_TO_SR(0))
      return 0; /* rational 0*/
   if (SR_HDL(a) & SR_INT)
-     return 1; /* immidiate int */
+     return 1; /* immediate int */
   int s=a->z[0]._mp_alloc;
 //  while ((s>0) &&(a->z._mp_d[s]==0L)) s--;
 //#if SIZEOF_LONG == 8
