@@ -2198,7 +2198,7 @@ BOOLEAN jjIMPORTFROM(leftv, leftv u, leftv v)
     idhdl t=basePack->idroot->get(vn /*v->Name()*/, myynest);
     if (t!=NULL)
     {
-      Warn("redefining %s (%s)",vn,my_yylinebuf);
+      if (BVERBOSE(V_REDEFINE)) Warn("redefining %s (%s)",vn,my_yylinebuf);
       killhdl(t);
     }
     sleftv tmp_expr;

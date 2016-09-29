@@ -914,7 +914,8 @@ int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
   && (IDTYP(h)==PROC_CMD))
   {
     pi = IDPROC(h);
-    if (pi->language == LANG_SINGULAR)
+    if ((pi->language == LANG_SINGULAR)
+    &&(BVERBOSE(V_REDEFINE)))
       Warn("extend `%s`",procname);
   }
   else
