@@ -86,17 +86,6 @@ bool is_divisible(const lts_hash *C, const poly p)
     return false;
 }
 
-static poly leadmonom_test(const poly p, const ring r,
-    const bool bSetZeroComp = true)
-{
-  poly m = p_LmInit(p, r);
-  p_SetCoeff0(m, n_Copy(p_GetCoeff(p, r), r), r);
-  if( bSetZeroComp )
-    p_SetComp(m, 0, r);
-  p_Setm(m, r);
-  return m;
-}
-
 // _p_LmDivisibleByNoComp for a | b*c
 static inline BOOLEAN _p_LmDivisibleByNoComp(const poly a, const poly b, const poly c, const ring r)
 {
@@ -197,11 +186,9 @@ static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
   {
     return NULL;
   }
-  poly b = leadmonom_test(s, r);
   const int c = p_GetComp(s, r) - 1;
   const poly t
-      = TraverseTail_test(b, c, previous_module, variables, m_div, m_checker);
-  pDelete(&b);
+      = TraverseTail_test(s, c, previous_module, variables, m_div, m_checker);
   if( t != NULL )
     s = p_Add_q(s, t, r);
   return s;
@@ -364,14 +351,12 @@ static poly TraverseNF_test(const poly a, const ideal previous_module,
 {
   const ring R = currRing;
   const int r = p_GetComp(a, R) - 1;
-  poly aa = leadmonom_test(a, R);
-  poly t = TraverseTail_test(aa, r, previous_module, variables, m_div,
+  poly t = TraverseTail_test(a, r, previous_module, variables, m_div,
       m_checker);
-  if (check_variables(variables, aa)) {
-    t = p_Add_q(t, ReduceTerm_test(aa, previous_module->m[r], a,
+  if (check_variables(variables, a)) {
+    t = p_Add_q(t, ReduceTerm_test(a, previous_module->m[r], a,
         previous_module, variables, m_div, m_checker), R);
   }
-  p_Delete(&aa, R);
   return t;
 }
 
