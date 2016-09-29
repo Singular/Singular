@@ -3667,7 +3667,7 @@ respect to G} if no monomial of f is contained in L(G).
 
 @subheading Left Normal Form
 @cindex Left normal form
-@table @asis
+
 @tex
 A map $\hbox{NF} : A^r \times \{G \mid G\ \hbox{ a (left) Groebner
 basis}\} \to A^r, (f|G) \mapsto \hbox{NF}(f|G)$, is called a {\bf (left) normal form}
@@ -3700,7 +3700,6 @@ holds:
 NF(f|G) is called a @strong{left normal form of} f @strong{with respect to}
  G (note that such a map is not unique).
 @end ifinfo
-@end table
 
 @*@strong{ Remark:}
 As we have already mentioned in the definitions @code{ideal} and @code{module} (see
@@ -3709,7 +3708,7 @@ As we have already mentioned in the definitions @code{ideal} and @code{module} (
 
 @subheading Left ideal membership
 @cindex Left ideal membership
-@table @asis
+
 @tex
 For a left Groebner basis $G$ of $I$ the following holds:
 $f \in I$ if and only if the left normal form $\hbox{NF}(f|G) = 0$.
@@ -3719,7 +3718,6 @@ $f \in I$ if and only if the left normal form $\hbox{NF}(f|G) = 0$.
 For a leftGroebner basis G of I the following holds:
 f is in I if and only if left the normal form NF(f|G) = 0.
 @end ifinfo
-@end table
 
 @c ---------------------------------------------------------------------------
 @node Syzygies and resolutions BR_PLURAL_BR, References BR_PLURAL_BR, Groebner bases in G-algebras, Mathematical background BR_PLURAL_BR
