@@ -14,6 +14,38 @@
 #include <vector>
 #include <map>
 
+static inline void update_variables(std::vector<bool> &variables,
+    const ideal L)
+{
+    const ring R = currRing;
+    const int l = IDELEMS(L)-1;
+    int k;
+    for (int j = R->N; j > 0; j--) {
+        if (variables[j-1]) {
+            for (k = l; k >= 0; k--) {
+                if (p_GetExp(L->m[k], j, R) > 0) {
+                    break;
+                }
+            }
+            if (k < 0) {   // no break
+                variables[j-1] = false;
+            }
+        }
+    }
+}
+
+static inline bool check_variables(const std::vector<bool> &variables,
+    const poly m)
+{
+    const ring R = currRing;
+    for (int j = R->N; j > 0; j--) {
+        if (variables[j-1] && p_GetExp(m, j, R) > 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 typedef struct {
     poly lt;
     unsigned long sev;
@@ -54,65 +86,152 @@ bool is_divisible(const lts_hash *C, const poly p)
     return false;
 }
 
+static poly leadmonom_test(const poly p, const ring r,
+    const bool bSetZeroComp = true)
+{
+  poly m = p_LmInit(p, r);
+  p_SetCoeff0(m, n_Copy(p_GetCoeff(p, r), r), r);
+  if( bSetZeroComp )
+    p_SetComp(m, 0, r);
+  p_Setm(m, r);
+  return m;
+}
+
+// _p_LmDivisibleByNoComp for a | b*c
+static inline BOOLEAN _p_LmDivisibleByNoComp(const poly a, const poly b, const poly c, const ring r)
+{
+  int i=r->VarL_Size - 1;
+  unsigned long divmask = r->divmask;
+  unsigned long la, lb;
+
+  if (r->VarL_LowIndex >= 0)
+  {
+    i += r->VarL_LowIndex;
+    do
+    {
+      la = a->exp[i];
+      lb = b->exp[i] + c->exp[i];
+      if ((la > lb) ||
+          (((la & divmask) ^ (lb & divmask)) != ((lb - la) & divmask)))
+      {
+        return FALSE;
+      }
+      i--;
+    }
+    while (i>=r->VarL_LowIndex);
+  }
+  else
+  {
+    do
+    {
+      la = a->exp[r->VarL_Offset[i]];
+      lb = b->exp[r->VarL_Offset[i]] + c->exp[r->VarL_Offset[i]];
+      if ((la > lb) ||
+          (((la & divmask) ^ (lb & divmask)) != ((lb - la) & divmask)))
+      {
+        return FALSE;
+      }
+      i--;
+    }
+    while (i>=0);
+  }
+  return TRUE;
+}
+
+poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
+    const lts_hash *syz_checker, const lts_hash *m_div)
+{
+  const ring r = currRing;
+  lts_hash::const_iterator m_itr = m_div->find(p_GetComp(t, currRing));
+  if (m_itr == m_div->end()) {
+    return NULL;
+  }
+  lts_vector::const_iterator m_current = (m_itr->second).begin();
+  lts_vector::const_iterator m_finish  = (m_itr->second).end();
+  if (m_current == m_finish) {
+    return NULL;
+  }
+  const poly q = p_New(r);
+  pNext(q) = NULL;
+  const unsigned long m_not_sev = ~p_GetShortExpVector(multiplier, t, r);
+  for( ; m_current != m_finish; ++m_current) {
+    if ( (m_current->sev & m_not_sev)
+        || !(_p_LmDivisibleByNoComp(m_current->lt, multiplier, t, r))) {
+      continue;
+    }
+    const poly p = m_current->lt;
+    const int k  = m_current->comp;
+    p_ExpVectorSum(q, multiplier, t, r); // q == product == multiplier * t
+    p_ExpVectorDiff(q, q, p, r); // (LM(product) / LM(L[k]))
+    p_SetComp(q, k + 1, r);
+    p_Setm(q, r);
+    // cannot allow something like: a*gen(i) - a*gen(i)
+    if (syzterm != NULL && (k == p_GetComp(syzterm, r) - 1)
+        && p_ExpVectorEqual(syzterm, q, r)) {
+      continue;
+    }
+    if (is_divisible(syz_checker, q)) {
+      continue;
+    }
+    number n = n_Mult(p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
+    p_SetCoeff0(q, n_InpNeg(n, r), r);
+    return q;
+  }
+  p_LmFree(q, r);
+  return NULL;
+}
+
 static poly TraverseTail_test(poly multiplier, const int tail,
    const ideal previous_module, const std::vector<bool> &variables,
    const lts_hash *m_div, const lts_hash *m_checker);
-static poly ComputeImage_test(poly multiplier, const int tail,
-    const ideal previous_module, const std::vector<bool> &variables,
-    const lts_hash *m_div, const lts_hash *m_checker);
+
 static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
     poly syztermCheck, const ideal previous_module,
     const std::vector<bool> &variables, const lts_hash *m_div,
-    const lts_hash *m_checker);
-static poly leadmonom_test(const poly p, const ring r, const bool bSetZeroComp = true);
-
-static inline void update_variables(std::vector<bool> &variables,
-    const ideal L)
-{
-    const ring R = currRing;
-    const int l = IDELEMS(L)-1;
-    int k;
-    for (int j = R->N; j > 0; j--) {
-        if (variables[j-1]) {
-            for (k = l; k >= 0; k--) {
-                if (p_GetExp(L->m[k], j, R) > 0) {
-                    break;
-                }
-            }
-            if (k < 0) {   // no break
-                variables[j-1] = false;
-            }
-        }
-    }
-}
-
-static inline bool check_variables(const std::vector<bool> &variables,
-    const poly m)
-{
-    const ring R = currRing;
-    for (int j = R->N; j > 0; j--) {
-        if (variables[j-1] && p_GetExp(m, j, R) > 0) {
-            return true;
-        }
-    }
-    return false;
-}
-
-static poly TraverseNF_test(const poly a, const ideal previous_module,
-    const std::vector<bool> &variables, const lts_hash *m_div,
     const lts_hash *m_checker)
 {
-  const ring R = currRing;
-  const int r = p_GetComp(a, R) - 1;
-  poly aa = leadmonom_test(a, R);
-  poly t = TraverseTail_test(aa, r, previous_module, variables, m_div,
-      m_checker);
-  if (check_variables(variables, aa)) {
-    t = p_Add_q(t, ReduceTerm_test(aa, previous_module->m[r], a,
-        previous_module, variables, m_div, m_checker), R);
+  const ring r = currRing;
+  poly s = FindReducer(multiplier, term4reduction, syztermCheck, m_checker,
+        m_div);
+  if( s == NULL )
+  {
+    return NULL;
   }
-  p_Delete(&aa, R);
-  return t;
+  poly b = leadmonom_test(s, r);
+  const int c = p_GetComp(s, r) - 1;
+  const poly t
+      = TraverseTail_test(b, c, previous_module, variables, m_div, m_checker);
+  pDelete(&b);
+  if( t != NULL )
+    s = p_Add_q(s, t, r);
+  return s;
+}
+
+static poly ComputeImage_test(poly multiplier, const int t,
+    const ideal previous_module, const std::vector<bool> &variables,
+    const lts_hash *m_div, const lts_hash *m_checker)
+{
+  const poly tail = previous_module->m[t]->next;
+  if(tail != NULL)
+  {
+    if (!check_variables(variables, multiplier))
+    {
+      return NULL;
+    }
+    sBucket_pt sum = sBucketCreate(currRing);
+    for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
+    {
+      const poly rt = ReduceTerm_test(multiplier, p, NULL, previous_module,
+          variables, m_div, m_checker);
+      sBucket_Add_p(sum, rt, pLength(rt));
+    }
+    poly s;
+    int l;
+    sBucketClearAdd(sum, &s, &l);
+    sBucketDestroy(&sum);
+    return s;
+  }
+  return NULL;
 }
 
 #define CACHE 1
@@ -239,147 +358,21 @@ static poly TraverseTail_test(poly multiplier, const int tail,
 #endif   // CACHE
 }
 
-static poly ComputeImage_test(poly multiplier, const int t,
-    const ideal previous_module, const std::vector<bool> &variables,
-    const lts_hash *m_div, const lts_hash *m_checker)
-{
-  const poly tail = previous_module->m[t]->next;
-  if(tail != NULL)
-  {
-    if (!check_variables(variables, multiplier))
-    {
-      return NULL;
-    }
-    sBucket_pt sum = sBucketCreate(currRing);
-    for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
-    {
-      const poly rt = ReduceTerm_test(multiplier, p, NULL, previous_module,
-          variables, m_div, m_checker);
-      sBucket_Add_p(sum, rt, pLength(rt));
-    }
-    poly s;
-    int l;
-    sBucketClearAdd(sum, &s, &l);
-    sBucketDestroy(&sum);
-    return s;
-  }
-  return NULL;
-}
-
-static poly leadmonom_test(const poly p, const ring r, const bool bSetZeroComp)
-{
-  poly m = p_LmInit(p, r);
-  p_SetCoeff0(m, n_Copy(p_GetCoeff(p, r), r), r);
-  if( bSetZeroComp )
-    p_SetComp(m, 0, r);
-  p_Setm(m, r);
-  return m;
-}
-
-// _p_LmDivisibleByNoComp for a | b*c
-static inline BOOLEAN _p_LmDivisibleByNoComp(const poly a, const poly b, const poly c, const ring r)
-{
-  int i=r->VarL_Size - 1;
-  unsigned long divmask = r->divmask;
-  unsigned long la, lb;
-
-  if (r->VarL_LowIndex >= 0)
-  {
-    i += r->VarL_LowIndex;
-    do
-    {
-      la = a->exp[i];
-      lb = b->exp[i] + c->exp[i];
-      if ((la > lb) ||
-          (((la & divmask) ^ (lb & divmask)) != ((lb - la) & divmask)))
-      {
-        return FALSE;
-      }
-      i--;
-    }
-    while (i>=r->VarL_LowIndex);
-  }
-  else
-  {
-    do
-    {
-      la = a->exp[r->VarL_Offset[i]];
-      lb = b->exp[r->VarL_Offset[i]] + c->exp[r->VarL_Offset[i]];
-      if ((la > lb) ||
-          (((la & divmask) ^ (lb & divmask)) != ((lb - la) & divmask)))
-      {
-        return FALSE;
-      }
-      i--;
-    }
-    while (i>=0);
-  }
-  return TRUE;
-}
-
-poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
-    const lts_hash *syz_checker, const lts_hash *m_div)
-{
-  const ring r = currRing;
-  lts_hash::const_iterator m_itr = m_div->find(p_GetComp(t, currRing));
-  if (m_itr == m_div->end()) {
-    return NULL;
-  }
-  lts_vector::const_iterator m_current = (m_itr->second).begin();
-  lts_vector::const_iterator m_finish  = (m_itr->second).end();
-  if (m_current == m_finish) {
-    return NULL;
-  }
-  const poly q = p_New(r);
-  pNext(q) = NULL;
-  const unsigned long m_not_sev = ~p_GetShortExpVector(multiplier, t, r);
-  for( ; m_current != m_finish; ++m_current) {
-    if ( (m_current->sev & m_not_sev)
-        || !(_p_LmDivisibleByNoComp(m_current->lt, multiplier, t, r))) {
-      continue;
-    }
-    const poly p = m_current->lt;
-    const int k  = m_current->comp;
-    p_ExpVectorSum(q, multiplier, t, r); // q == product == multiplier * t
-    p_ExpVectorDiff(q, q, p, r); // (LM(product) / LM(L[k]))
-    p_SetComp(q, k + 1, r);
-    p_Setm(q, r);
-    // cannot allow something like: a*gen(i) - a*gen(i)
-    if (syzterm != NULL && (k == p_GetComp(syzterm, r) - 1)
-        && p_ExpVectorEqual(syzterm, q, r)) {
-      continue;
-    }
-    if (is_divisible(syz_checker, q)) {
-      continue;
-    }
-    number n = n_Mult(p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
-    p_SetCoeff0(q, n_InpNeg(n, r), r);
-    return q;
-  }
-  p_LmFree(q, r);
-  return NULL;
-}
-
-static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
-    poly syztermCheck, const ideal previous_module,
+static poly TraverseNF_test(const poly a, const ideal previous_module,
     const std::vector<bool> &variables, const lts_hash *m_div,
     const lts_hash *m_checker)
 {
-  const ring r = currRing;
-  poly s = FindReducer(multiplier, term4reduction, syztermCheck, m_checker,
-        m_div);
-  if( s == NULL )
-  {
-    return NULL;
+  const ring R = currRing;
+  const int r = p_GetComp(a, R) - 1;
+  poly aa = leadmonom_test(a, R);
+  poly t = TraverseTail_test(aa, r, previous_module, variables, m_div,
+      m_checker);
+  if (check_variables(variables, aa)) {
+    t = p_Add_q(t, ReduceTerm_test(aa, previous_module->m[r], a,
+        previous_module, variables, m_div, m_checker), R);
   }
-  poly b = leadmonom_test(s, r);
-  const int c = p_GetComp(s, r) - 1;
-  const poly t
-      = TraverseTail_test(b, c, previous_module, variables, m_div, m_checker);
-  pDelete(&b);
-  if( t != NULL )
-    s = p_Add_q(s, t, r);
-  return s;
+  p_Delete(&aa, R);
+  return t;
 }
 
 /*****************************************************************************/
