@@ -1990,13 +1990,13 @@ orderings.
 
 @item Module orderings
 @table @asis
-@itemx @code{(} ordering@code{,} @dots{}@code{, C )}
-@item @code{(} ordering@code{,} @dots{}@code{, c )}
+@item @code{(} ordering@code{,} @dots{}@code{, C )}
+@itemx @code{(} ordering@code{,} @dots{}@code{, c )}
 sort polynomial vectors by the monomial ordering first, then by
 components
 
-@itemx @code{( C,} ordering@code{,} @dots{} @code{)}
-@item @code{( c,} ordering@code{,} @dots{} @code{)}
+@item @code{( C,} ordering@code{,} @dots{} @code{)}
+@itemx @code{( c,} ordering@code{,} @dots{} @code{)}
 sort polynomial vectors by components first, then by the monomial
 ordering
 @end table

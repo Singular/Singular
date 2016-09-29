@@ -4483,14 +4483,10 @@ If there are duplicate member names, the last one wins.
 @item Operations:
 the only operations of user defined types are:
 @table @asis
-@item
-assignment (between objects of the same or extended type)
-@item
-@code{typeof}
-@item
-@code{string} and printing
-@item
-operator @code{.} to access the elements
+@item assignment (between objects of the same or extended type)
+@item @code{typeof}
+@item @code{string} and printing
+@item operator @code{.} to access the elements
 @end table
 
 @item Example:
