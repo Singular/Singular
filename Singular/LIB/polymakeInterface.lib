@@ -4,6 +4,47 @@ category = "Convex Geometry";
 info="
 LIBRARY:  polymakeInterface.lib   low level interface to polymake
 AUTHORS:  Yue Ren,                email: ren@mathematik.uni-kl.de
+
+PROCEDURES:
+    boundaryLatticePoints();
+    ehrhartPolynomialCoeff();
+    fVectorP();
+    facetVertexLatticeDistances();
+    facetWidth();
+    facetWidths();
+    gorensteinIndex();
+    gorensteinVector();
+    hStarVector();
+    hVector();
+    hilbertBasis();
+    interiorLatticePoints();
+    isBounded();
+    isCanonical();
+    isCompressed();
+    isGorenstein();
+    isLatticeEmpty();
+    isNormal();
+    isReflexive();
+    isSmooth();
+    isTerminal();
+    isVeryAmple();
+    latticeCodegree();
+    latticeDegree();
+    latticePoints();
+    latticeVolume();
+    maximalFace();
+    maximalValue();
+    minimalFace();
+    minimalValue();
+    minkowskiSum();
+    nBoundaryLatticePoints();
+    nHilbertBasis();
+    nInteriorLatticePoints();
+    nLatticePoints();
+    normalFan();
+    vertexAdjacencyGraph();
+    vertexEdgeGraph();
+    visual();
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
