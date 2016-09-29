@@ -40,6 +40,7 @@ LIB "ring.lib";
 LIB "hnoether.lib";
 LIB "reesclos.lib";
 LIB "algebra.lib";
+LIB "curveInv.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
