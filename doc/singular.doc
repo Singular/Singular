@@ -1005,7 +1005,7 @@ but not for serious computations.
 @c lib tropical.lib no_ex
 
 @c ----------------------------------------------------------------------------
-@node  Miscellaneous libraries,Experimental libraries,Tropical Geometry, SINGULAR libraries
+@node  Miscellaneous libraries
 @section  Miscellaneous libraries
 @cindex  Miscellaneous libraries
 
@@ -1031,7 +1031,7 @@ but not for serious computations.
 @c lib polybori.lib tag:pyobject
 
 @c ----------------------------------------------------------------------------
-@node Experimental libraries,,Miscellaneous libraries, SINGULAR libraries
+@node Experimental libraries
 @section Experimental libraries
 @cindex Experimental libraries
 
@@ -1049,6 +1049,7 @@ Comments should be send to the author of the library directly.
 * cimonom_lib:: complete intersection for toric ideals
 * classify_aeq_lib:: Simple Space Curve singularities in characteristic 0
 * classifyMapGerms_lib:: standard basis of the tangent space at the orbit of an algebraic group action
+* curveInv_lib:: invariants of curves
 * deRham_lib:: Computation of deRham cohomology
 * divisors_lib:: Divisors and P-Divisors
 * ffmodstd_lib::  Groebner bases in polynomial rings over algebraic function fields
@@ -1087,6 +1088,10 @@ Comments should be send to the author of the library directly.
 @node classifyMapGerms_lib
 @subsection classifyMapGerms_lib
 @c lib classifyMapGerms.lib
+@c ----------------------------------------------------------
+@node curveInv_lib
+@subsection curveInv_lib
+@c lib curveInv.lib
 @c ----------------------------------------------------------
 @node divisors_lib
 @subsection divisors_lib

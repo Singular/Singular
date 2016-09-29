@@ -83,7 +83,7 @@ satisfying a system rational, and hence integer, linear inequalities and equatio
 It is internally realised as a cone in R^(n+1) intersected with the hyperplane,
 in which the first coordinate equals 1.
 
-See @ref{polymakeInterace_lib} for details.
+See @ref{polymakeInterface_lib} for details.
 
 @menu
 * polytopeViaPoints::
