@@ -205,10 +205,10 @@ GF2X convertFacCF2NTLGF2X(const CanonicalForm & f)
     if (!i.coeff().isImm())
     {
       #ifndef NOSTREAMIO
-      cout<<"convertFacCF2NTLGF2X: coefficient not immidiate! : " << f << "\n";
+      cout<<"convertFacCF2NTLGF2X: coefficient not immediate! : " << f << "\n";
       #else
       //NTL_SNS
-      printf("convertFacCF2NTLGF2X: coefficient not immidiate!");
+      printf("convertFacCF2NTLGF2X: coefficient not immediate!");
       #endif
       NTL_SNS exit(1);
     }
