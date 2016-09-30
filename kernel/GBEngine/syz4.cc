@@ -315,19 +315,17 @@ static poly TraverseTail_test(poly multiplier, const int tail,
 #endif   // CACHE
 }
 
-static poly TraverseNF_test(const poly a, const ideal previous_module,
+static poly lift_ext_LT(const poly a, const ideal previous_module,
     const std::vector<bool> &variables, const lts_hash *m_div,
     const lts_hash *m_checker)
 {
   const ring R = currRing;
-  const int r = p_GetComp(a, R) - 1;
-  poly t = TraverseTail_test(a, r, previous_module, variables, m_div,
-      m_checker);
-  if (check_variables(variables, a)) {
-    t = p_Add_q(t, ReduceTerm_test(a, previous_module->m[r], a,
-        previous_module, variables, m_div, m_checker), R);
-  }
-  return t;
+  poly t1 = TraverseTail_test(a, p_GetComp(a, R)-1,
+      previous_module, variables, m_div, m_checker);
+  poly t2 = TraverseTail_test(a->next, p_GetComp(a->next, R)-1,
+      previous_module, variables, m_div, m_checker);
+  t1 = p_Add_q(t1, t2, R);
+  return t1;
 }
 
 /*****************************************************************************/
@@ -509,13 +507,10 @@ static void computeLiftings(const resolvente res, const int index,
     update_variables(variables, res[index-1]);
     lts_hash *hash_current_module = new lts_hash();
     initialize_lts_hash(*hash_current_module, res[index]);
-    poly p;
     for (int j = res[index]->ncols-1; j >= 0; j--) {
-        p = res[index]->m[j];
-        pDelete(&res[index]->m[j]->next);
-        p->next = NULL;
-        res[index]->m[j]->next = TraverseNF_test(p, res[index-1], variables,
-            hash_previous_module, hash_current_module);
+        res[index]->m[j]->next->next = lift_ext_LT(res[index]->m[j],
+            res[index-1], variables, hash_previous_module,
+            hash_current_module);
     }
     delete_lts_hash(hash_previous_module);
     delete(hash_previous_module);
@@ -562,19 +557,30 @@ static int computeResolution(resolvente &res, const int length,
     return max_index;
 }
 
-static void insert_induced_LTs(const resolvente res, const int length)
+#define insert_first_term(r, p, q, R)                             \
+do                                                                \
+{                                                                 \
+    p = r;                                                        \
+    q = p->next;                                                  \
+    if (p_LmCmp(p, q, R) != 1) {                                  \
+        while (q->next != NULL && p_LmCmp(p, q->next, R) == -1) { \
+            pIter(q);                                             \
+        }                                                         \
+        r = p->next;                                              \
+        p->next = q->next;                                        \
+        q->next = p;                                              \
+    }                                                             \
+}                                                                 \
+while (0)
+
+static void insert_ext_induced_LTs(const resolvente res, const int length)
 {
-    const ring r = currRing;
+    const ring R = currRing;
     poly p, q;
     for (int i = length-2; i > 0; i--) {
         for (int j = res[i]->ncols-1; j >= 0; j--) {
-            p = res[i]->m[j];
-            q = res[i]->m[j]->next;
-            if (p_LmCmp(p, q, r) == 1) continue;
-            while (q->next != NULL && p_LmCmp(p, q->next, r) == -1) pIter(q);
-            res[i]->m[j] = p->next;
-            p->next = q->next;
-            q->next = p;
+            insert_first_term(res[i]->m[j]->next, p, q, R);
+            insert_first_term(res[i]->m[j], p, q, R);
         }
     }
 }
@@ -592,7 +598,7 @@ syStrategy syFrank(const ideal arg, int &length, const char *method)
         syzHead = syzHeadExtFrame;
     }
     length = computeResolution(res, length, syzHead);
-    insert_induced_LTs(res, length);
+    insert_ext_induced_LTs(res, length);
     result->fullres = res;
     result->length = length;
     return result;
