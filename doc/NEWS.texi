@@ -27,6 +27,9 @@ New libraries:
 @item new library: ffmodstd.lib:  Groebner bases of ideals in polynomial rings over algebraic function fields(@nref{ffmodstd_lib})
 @item new library: nfmodsyz.lib: syzygy modules of submodules of free modules
       over algebraic number fields(@nref{nfmodsyz_lib})
+@item new library: curveInv.lib: invariants of curves (@nref{curveInv_lib})
+@item new library: gfan.lib: interface to gfanlib (@nref{gfan_lib})
+@item new library: polymakeInterface.lib: interface to polymake (@nref{polymakeInterface_lib})
 @end itemize
 
 Changed libraries:
@@ -97,8 +100,8 @@ New libraries:
 
 Changed libraries:
 @itemize
-@item revised polymake interface (@nref{polymake_lib},@nref{polymakeInterface_lib})
-@item revised gfanlib interface (@nref{gfan_lib})
+@item revised polymake interface (polymake.so})
+@item revised gfanlib interface (gfanlib.so)
 @item Presolve::findvars (@nref{findvars}, @nref{variables})
 @item Ring::addvarsTo (@nref{addvarsTo})
 @item Ring::addNvarsTo (@nref{addNvarsTo})
