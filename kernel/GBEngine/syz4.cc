@@ -14,6 +14,14 @@
 #include <vector>
 #include <map>
 
+#ifdef __GNUC__
+#define likely(X)   (__builtin_expect(X, 1))
+#define unlikely(X) (__builtin_expect(X, 0))
+#else
+#define likely(X)   (X)
+#define unlikely(X) (X)
+#endif
+
 static inline void update_variables(std::vector<bool> &variables,
     const ideal L)
 {
@@ -86,47 +94,6 @@ bool is_divisible(const lts_hash *C, const poly p)
     return false;
 }
 
-// _p_LmDivisibleByNoComp for a | b*c
-static inline BOOLEAN _p_LmDivisibleByNoComp(const poly a, const poly b, const poly c, const ring r)
-{
-  int i=r->VarL_Size - 1;
-  unsigned long divmask = r->divmask;
-  unsigned long la, lb;
-
-  if (r->VarL_LowIndex >= 0)
-  {
-    i += r->VarL_LowIndex;
-    do
-    {
-      la = a->exp[i];
-      lb = b->exp[i] + c->exp[i];
-      if ((la > lb) ||
-          (((la & divmask) ^ (lb & divmask)) != ((lb - la) & divmask)))
-      {
-        return FALSE;
-      }
-      i--;
-    }
-    while (i>=r->VarL_LowIndex);
-  }
-  else
-  {
-    do
-    {
-      la = a->exp[r->VarL_Offset[i]];
-      lb = b->exp[r->VarL_Offset[i]] + c->exp[r->VarL_Offset[i]];
-      if ((la > lb) ||
-          (((la & divmask) ^ (lb & divmask)) != ((lb - la) & divmask)))
-      {
-        return FALSE;
-      }
-      i--;
-    }
-    while (i>=0);
-  }
-  return TRUE;
-}
-
 poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
     const lts_hash *syz_checker, const lts_hash *m_div)
 {
@@ -144,13 +111,16 @@ poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
   pNext(q) = NULL;
   const unsigned long m_not_sev = ~p_GetShortExpVector(multiplier, t, r);
   for( ; m_current != m_finish; ++m_current) {
-    if ( (m_current->sev & m_not_sev)
-        || !(_p_LmDivisibleByNoComp(m_current->lt, multiplier, t, r))) {
-      continue;
+    if (m_current->sev & m_not_sev) {
+        continue;
+    }
+    p_MemSum_LengthGeneral(q->exp, multiplier->exp, t->exp, r->ExpL_Size);
+    if (unlikely(!(_p_LmDivisibleByNoComp(m_current->lt, q, r)))) {
+        continue;
     }
     const poly p = m_current->lt;
     const int k  = m_current->comp;
-    p_ExpVectorSum(q, multiplier, t, r); // q == product == multiplier * t
+    p_MemAdd_NegWeightAdjust(q, r);
     p_ExpVectorDiff(q, q, p, r); // (LM(product) / LM(L[k]))
     p_SetComp(q, k + 1, r);
     p_Setm(q, r);
