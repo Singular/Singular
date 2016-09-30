@@ -333,9 +333,9 @@ NOTE:       the optional parameter can be used if the normalization has already
             normal (with options prim, wd and usering if the ring has a mixed ordering),
             apply curveColengthDerivations(I,L)
 KEYWORDS:   deligne number; invariants; colength of derivations
-SEE ALSO:   curveColengthDerivationsComp
 EXAMPLE:    example curveColengthDerivations; shows an example"
 {
+//SEE ALSO:   curveColengthDerivationsComp
 
     if(size(#) > 0){
         list norma = #;
@@ -546,8 +546,9 @@ RETURN:     the module M with shifted (by k) generators
 NOTE:       the procedure is for interior use only - it is part of the computation of
             the total colength of derivations
 KEYWORDS:   adjust module
-SEE ALSO:   curveColengthDerivationsComp"
+"
 {
+//SEE ALSO:   curveColengthDerivationsComp"
 
     module M_copy = M;
     int n = size(M);

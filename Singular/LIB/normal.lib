@@ -6802,9 +6802,10 @@ NOTE:       the optional parameter can be used if the normalization has already
             normal (with options prim, wd and usering if the ring has a mixed ordering),
             apply normalConductor(I,L)
 KEYWORDS:   conductor; normalization
-SEE ALSO:   conductorIdealIntersect, conductorMinPrime, curveConductorMult
+SEE ALSO:   curveConductorMult
 EXAMPLE:    example normalConductor; shows an example"
 {
+//SEE ALSO:   conductorIdealIntersect, conductorMinPrime, curveConductorMult
 
     if(size(#) > 0){
         list norma = #;
