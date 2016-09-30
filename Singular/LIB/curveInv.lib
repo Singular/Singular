@@ -110,8 +110,9 @@ REMARKS:    The algorithm computes norid intersect R - it eliminates the new
 NOTE:       the algorithm is for interior use only. We apply it to avoid a second computation
             of the minimal primes
 KEYWORDS:   minimal primes; normalization
-SEE ALSO:   conductorIdealIntersect"
+"
 {
+//SEE ALSO:   conductorIdealIntersect
 
         // Variables of basering as product
         int n = nvars(basering);
@@ -332,7 +333,7 @@ NOTE:       the optional parameter can be used if the normalization has already
             normal (with options prim, wd and usering if the ring has a mixed ordering),
             apply curveColengthDerivations(I,L)
 KEYWORDS:   deligne number; invariants; colength of derivations
-SEE ALSO:   curveColengthDerivationsComp, curve Ddim
+SEE ALSO:   curveColengthDerivationsComp
 EXAMPLE:    example curveColengthDerivations; shows an example"
 {
 
@@ -480,8 +481,9 @@ REMARKS:    the generators of Der_P are extended via the quotient rule
 NOTE:       the procedure is for interior use only - it is part of the computation of
             the total colength of derivations
 KEYWORDS:   derivations; extend derivations
-SEE ALSO:   curveColengthDerivationsComp"
+"
 {
+//SEE ALSO:   curveColengthDerivationsComp
 
     int k = size(Der_P);
     int n = size(U) - 1;
