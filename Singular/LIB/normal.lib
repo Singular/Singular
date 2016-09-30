@@ -6,6 +6,7 @@ LIBRARY:  normal.lib     Normalization of Affine Rings
 AUTHORS:  G.-M. Greuel,  greuel@mathematik.uni-kl.de,
 @*        S. Laplagne,   slaplagn@dm.uba.ar,
 @*        G. Pfister,    pfister@mathematik.uni-kl.de
+@*        Peter Chini,   chini@rhrk.uni-kl.de (normalConductor)
 
 
 PROCEDURES:
