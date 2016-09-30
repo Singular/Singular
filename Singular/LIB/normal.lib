@@ -6824,7 +6824,7 @@ EXAMPLE:    example normalConductor; shows an example"
     // List of all minimal primes
     for(i = 1; i <= r; i++){
         S = norma[1][i];
-        min_prime[i] = Curveinv::conductorMinPrime(S);
+        min_prime[i] = CurveInv::conductorMinPrime(S);
     }
 
         // List of ideals U generating Norm(R/P_i)
@@ -6844,7 +6844,7 @@ EXAMPLE:    example normalConductor; shows an example"
         for(i = 1; i <= r; i++){
 
                 // Intersection of min_prime_j, j!=i
-                min_prime_isect = Curveinv::conductorIdealIntersect(min_prime,i);
+                min_prime_isect = CurveInv::conductorIdealIntersect(min_prime,i);
 
                 // Compute the quotient
                 C_current = std(quotient(min_prime[i] + DEN[i]*min_prime_isect, U[i]));
