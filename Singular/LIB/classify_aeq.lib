@@ -1714,40 +1714,40 @@ static proc sagbiNFMODO(poly p, ideal G, ideal I,int b)
     int m=ncols(I);
     ideal G1=lead(G);
     ideal I1=lead(I);
-     poly p1=lead(p);
+    poly p1=lead(p);
     //create new ring with extra variables -
     execute
     ("ring T=("+charstr(br)+",x(1),z(1..n)),(x(2),y(1..m)),dp;");
-     execute
+    execute
     ("ring R=("+charstr(br)+"),(x(1..2),y(1..m),z(1..n)),(lp(2),dp(m),dp(n));");
 
-     map phi = br,x(1);
-     ideal P = phi(G1);
-     ideal S = phi(I1);
-     poly check = phi(p1);
-     poly keep=S[1];
-     S=S/keep;
+    map phi = br,x(1);
+    ideal P = phi(G1);
+    ideal S = phi(I1);
+    poly check = phi(p1);
+    poly keep=S[1];
+    S=S/keep;
 
-     check=check/keep;
-     ideal M;
-     poly q;
-     for (int i=1;i<=m;i=i+1)
-     {
+    check=check/keep;
+    ideal M;
+    poly q;
+    for (int i=1;i<=m;i=i+1)
+    {
          M[i]=S[i]-y(i);
-     }
-     for (i=1;i<=n;i=i+1)
-     {
+    }
+    for (i=1;i<=n;i=i+1)
+    {
         M[m+i]=P[i]-z(i);
-     }
-     M[size(M)+1]=check-x(2);
-     check=check*keep;
+    }
+    M[size(M)+1]=check-x(2);
+    check=check*keep;
 
-     option(redSB);
-     M=std(M);
-     int j,s;
+    option(redSB);
+    M=std(M);
+    int j,s;
 
-     for(i=1;i<=size(M);i++)
-     {
+    for(i=1;i<=size(M);i++)
+    {
          if((deg(M[i]/x(2))==0)&&(M[i]/x(1)==0))
          {
                q=subst(M[i],x(2),0);
@@ -1756,17 +1756,17 @@ static proc sagbiNFMODO(poly p, ideal G, ideal I,int b)
                   q=subst(q,y(j),0);
                }
                M[i]=M[i]-q+q*y(1);
-             q=M[i];
+               q=M[i];
                setring T;
                poly q=imap(R,q);
-             s=deg(q);
+               s=deg(q);
                setring R;
                if(s==1){check=simplify(q,1);break;}
          }
-     }
-     setring br;
-     map psi=R,maxideal(1),p,I,G;
-     return(psi(check));
+    }
+    setring br;
+    map psi=R,maxideal(1),p,I,G;
+    return(psi(check));
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1780,7 +1780,7 @@ static proc sagbiNFMOD(poly p, ideal G, ideal I, int b)
          h=f;
          f=sagbiNFMODO(f,G,I,b);
     }
-    return(lead(f)+sagbiNFMOD(p-lead(p),G,I,b));
+    return(lead(f)+sagbiNFMOD(f-lead(f),G,I,b));
 }
 ////////////////////////////////////////////////////////////////////////////////
 static proc createP(ideal I)
@@ -2143,6 +2143,7 @@ EXAMPLE:  example HHnormalForm; shows an example"
          {
             phi=R,var(1)-1/number(m)*I[2][i]/var(1)^(m-1);
             I=phi(I);
+            G=sagbiAlg(I,b);
             I[1]=lead(I[1])+reduc(I[1]-lead(I[1]),G,b);
             I=normalMap(I,b);
             i--;
@@ -2155,6 +2156,7 @@ EXAMPLE:  example HHnormalForm; shows an example"
                g=jet(g,b-m+1);
                phi=R,g;
                I=phi(I);
+               G=sagbiAlg(I,b);
                I[1]=lead(I[1])+reduc(I[1]-lead(I[1]),G,b);
                I[2]=lead(I[2])+reduc(I[2]-lead(I[2]),G,b);
                I=normalMap(I,b);
@@ -2162,7 +2164,6 @@ EXAMPLE:  example HHnormalForm; shows an example"
             }
          }
       }
-      G=sagbiAlg(I,b);
    }
    return(list(I,v,w,l,moduli));
 }
