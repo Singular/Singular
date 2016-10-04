@@ -440,14 +440,14 @@ BOOLEAN initial(leftv res, leftv args)
 
 void tropical_setup(SModulFunctions* p)
 {
-  p->iiAddCproc("","groebnerCone",FALSE,groebnerCone);
-  p->iiAddCproc("","maximalGroebnerCone",FALSE,maximalGroebnerCone);
-  p->iiAddCproc("","homogeneitySpace",FALSE,homogeneitySpace);
-  p->iiAddCproc("","lowerHomogeneitySpace",FALSE,lowerHomogeneitySpace);
-  p->iiAddCproc("","initial",FALSE,initial);
-  p->iiAddCproc("","tropicalVariety",FALSE,tropicalVariety);
-  p->iiAddCproc("","groebnerFan",FALSE,groebnerFan);
-  p->iiAddCproc("","groebnerComplex",FALSE,groebnerComplex);
+  p->iiAddCproc("tropical.lib","groebnerCone",FALSE,groebnerCone);
+  p->iiAddCproc("tropical.lib","maximalGroebnerCone",FALSE,maximalGroebnerCone);
+  p->iiAddCproc("tropical.lib","homogeneitySpace",FALSE,homogeneitySpace);
+  // p->iiAddCproc("","lowerHomogeneitySpace",FALSE,lowerHomogeneitySpace);
+  p->iiAddCproc("tropical.lib","initial",FALSE,initial);
+  p->iiAddCproc("tropical.lib","tropicalVariety",FALSE,tropicalVariety);
+  p->iiAddCproc("tropical.lib","groebnerFan",FALSE,groebnerFan);
+  p->iiAddCproc("tropical.lib","groebnerComplex",FALSE,groebnerComplex);
   // p->iiAddCproc("","ppreduceInitially",FALSE,ppreduceInitially);
   // p->iiAddCproc("","ttreduceInitially",FALSE,ttreduceInitially);
 }

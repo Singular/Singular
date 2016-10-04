@@ -7,6 +7,8 @@ LIBRARY:         tropical.lib  Computations in Tropical Geometry
 AUTHORS:         Anders Jensen Needergard, email: jensen@math.tu-berlin.de
 @*               Hannah Markwig,  email: hannah@uni-math.gwdg.de
 @*               Thomas Markwig,  email: keilen@mathematik.uni-kl.de
+@*               Yue Ren,         email: ren@mathematik.uni-kl.de
+
 
 WARNING:
 - tropicalLifting will only work with LINUX and if in addition gfan is installed.
@@ -8562,3 +8564,189 @@ proc nsdScaleFactor (list graphs)
   return(minOfPolys(scalefactors));
 }
 
+/////////////////////////////////////////////////////////////////////////
+//
+//  Functions from binary libraries
+//
+/////////////////////////////////////////////////////////////////////////
+
+
+proc groebnerCone()
+"USAGE:      groebnerCone(I,w); I ideal or poly, w intvec or bigintmat
+ASSUME:      I a reduced standard basis and w contained in the maximal Groebner cone
+RETURN:      cone, the Groebner cone of I with respect to w
+EXAMPLE:     example groebnerCone;  shows an example"
+{
+
+}
+example
+{
+   "EXAMPLE:"; echo=2;
+   LIB "poly.lib";
+   ring r = 0,(x,y,z),dp;
+   ideal I = cyclic(3);
+   option(redSB);
+   ideal stdI = std(I);
+   // w lies in the interior of a maximal Groebner cone
+   intvec w = 3,2,1;
+   cone CwI = groebnerCone(stdI,w);
+   print(rays(CwI));
+   // v lies on a facet of a maximal Groebner cone
+   intvec v = 2,1,0;
+   cone CvI = groebnerCone(stdI,v);
+   print(rays(CvI));
+   // v lies on a ray of a maximal Groebner cone
+   intvec u = 1,1,1;
+   cone CuI = groebnerCone(stdI,u);
+   print(rays(CuI));
+}
+
+
+proc maximalGroebnerCone()
+"USAGE:      maximalGroebnerCone(I); I ideal or poly
+ASSUME:      I a reduced standard basis
+RETURN:      cone, the maximal Groebner cone of I with respect to the current ordering
+EXAMPLE:     example maximalGroebnerCone;  shows an example"
+{
+
+}
+example
+{
+   "EXAMPLE:"; echo=2;
+   LIB "poly.lib";
+   ring r = 0,(x,y,z),dp;
+   ideal I = cyclic(3);
+   option(redSB);
+   ideal stdI = std(I);
+   cone CI = maximalGroebnerCone(stdI);
+   print(rays(CI));
+
+   ring s = 0,(x,y,z,u),dp;
+   ideal Ih = homog(cyclic(3),u);
+   ideal stdI = std(Ih);
+   cone CIh = maximalGroebnerCone(stdI);
+   print(rays(CIh));
+   print(generatorsOfLinealitySpace(CIh));
+
+   ring rw = 0,(x,y,z),(a(1,0,1),lp);
+   ideal I = cyclic(3);
+   ideal stdI = std(I);
+   CI = maximalGroebnerCone(stdI);
+   print(rays(CI));
+}
+
+
+proc homogeneitySpace()
+"USAGE:      homogeneitySpace(I); I ideal or poly
+ASSUME:      I a reduced standard basis
+RETURN:      cone, the set of all weight vectors with respect to whom I is weighted homogeneous
+EXAMPLE:     example homogeneitySpace;  shows an example"
+{
+
+}
+example
+{
+   "EXAMPLE:"; echo=2;
+   LIB "poly.lib";
+   ring r = 0,(x,y,z),dp;
+   ideal I = cyclic(3);
+   option(redSB);
+   ideal stdI = std(I);
+   cone C0I = homogeneitySpace(stdI);
+   print(generatorsOfLinealitySpace(C0I));
+
+   ring s = 0,(x,y,z,u),dp;
+   ideal Ih = homog(cyclic(3),u);
+   ideal stdI = std(Ih);
+   cone C0Ih = homogeneitySpace(stdI);
+   print(generatorsOfLinealitySpace(C0Ih));
+}
+
+
+proc initial()
+"USAGE:      initial(f,w); f poly, w intvec or bigintmat
+             initial(I,w); I ideal, w intvec or bigintmat
+ASSUME:      I reduced Groebner basis,
+             w in the maximal Groebner cone of I with respect to the current ordering
+RETURN:      poly or ideal, the initial form of f or the initial ideal of I with respect to w
+EXAMPLE:     example initial;  shows an example"
+{
+
+}
+example
+{
+   "EXAMPLE:"; echo=2;
+   LIB "poly.lib";
+   ring r = 0,(x,y,z),dp;
+   ideal I = cyclic(3);
+   intvec w = 1,1,1;
+   option(redSB);
+   ideal stdI = std(I);
+   stdI;
+   ideal inI = initial(stdI,w);
+   inI;
+}
+
+
+proc tropicalVariety()
+"USAGE:      tropicalVariety(f[,p]); f poly, p optional number
+             tropicalVariety(I[,p]); I ideal, p optional number
+ASSUME:      I homogeneous, p prime number
+RETURN:      fan, the tropical variety of f resp. I with respect to the trivial valuation or the p-adic valuation
+NOTE:        set printlevel=1 for output during traversal
+EXAMPLE:     example tropicalVariety;  shows an example"
+{
+
+}
+example
+{
+   "EXAMPLE:"; echo=2;
+   ring r = 0,(x,y,z,w),dp;
+   ideal I = x-2y+3z,3y-4z+5w;
+   tropicalVariety(I);
+   tropicalVariety(I,number(2));
+   tropicalVariety(I,number(3));
+   tropicalVariety(I,number(5));
+   tropicalVariety(I,number(7));
+}
+
+
+proc groebnerFan()
+"USAGE:      groebnerFan(f); f poly
+             groebnerFan(I); I ideal
+ASSUME:      I homogeneous
+RETURN:      fan, the Groebner fan of f resp. I
+NOTE:        set printlevel=1 for output during traversal
+EXAMPLE:     example groebnerFan;  shows an example"
+{
+
+}
+example
+{
+   "EXAMPLE:"; echo=2;
+   ring r = 0,(x,y,z,w),dp;
+   ideal I = x-2y+3z,3y-4z+5w;
+   groebnerFan(I);
+}
+
+
+proc groebnerComplex()
+"USAGE:      groebnerComplex(f,p); f poly, p number
+             groebnerComplex(I,p); I ideal, p number
+ASSUME:      I homogeneous, p prime number
+RETURN:      fan, the Groebner complex of f resp. I with respect to the p-adic valuation
+NOTE:        set printlevel=1 for output during traversal
+EXAMPLE:     example groebnerComplex;  shows an example"
+{
+
+}
+example
+{
+   "EXAMPLE:"; echo=2;
+   ring r = 0,(x,y,z,w),dp;
+   ideal I = x-2y+3z,3y-4z+5w;
+   groebnerComplex(I,number(2));
+   groebnerComplex(I,number(3));
+   groebnerComplex(I,number(5));
+   groebnerComplex(I,number(7));
+}
