@@ -149,8 +149,14 @@ EXAMPLE:  example vStd; shows an example"
    {
       M=jet(std(M+maxideal(bound)*freemodule(nrows(M))),bound);
    }
-   N=myReduceM(N,M,bound);
-   //N=system("reduce_bound",N,M,bound);  //später aktivieren
+   if (system("version")>4033)
+   {
+     N=system("reduce_bound",N,M,bound);
+   }
+   else
+   {
+     N=myReduceM(N,M,bound);
+   }
    N=echelon(M,N,bound);
    module L=computeN(M,N,I,bound-1);
    L=echelon(M,L,bound);
@@ -187,8 +193,14 @@ EXAMPLE:  example vStd_size1; shows an example"
    {
       M=jet(std(M+maxideal(bound)*freemodule(nrows(M))),bound);
    }
-   N=myReduceM(N,M,bound);
-   //N=system("reduce_bound",N,M,bound);
+   if (system("version")>4033)
+   {
+     N=system("reduce_bound",N,M,bound);
+   }
+   else
+   {
+     N=myReduceM(N,M,bound);
+   }
    N=echelon(M,N,bound);
    module L=computeN(M,N,I,bound-1);
    L=echelon(M,L,bound);
