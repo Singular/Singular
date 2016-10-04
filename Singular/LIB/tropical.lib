@@ -4726,7 +4726,7 @@ NOTE:    - the procedure is also called recursively by itself, and
         // read the result from gfan and store it to a string,
         // which in a later version
         // should be interpreded by Singular
-        intvec wneu=choosegfanvector(read("/tmp/gfanoutput"),0,anzahlvariablen)[1];
+        intvec wneu=choosegfanvector(read("/tmp/gfanoutput"),0,homogentest)[1];
         setring PREGFANRING;
       }
     }
@@ -5449,8 +5449,8 @@ NOTE:        the procedure is called from displaypoly"
 
 /////////////////////////////////////////////////////////////////////////
 
-static proc choosegfanvector (string s,int findall,int anzahlvariablen)
-"USAGE:   choosegfanvector(s); s string
+static proc choosegfanvector (string s,int findall,int homogentest)
+"USAGE:   choosegfanvector(s,fa,h); s string, fa,h int
 RETURN:   list, the jth entry is the jth integer vector contained in s
 NOTE:     the procedure is called from tropicalparametrise"
 {
@@ -5466,7 +5466,7 @@ NOTE:     the procedure is called from tropicalparametrise"
     execute("intvec ww="+w+";");
     // the last entry in ww should correspond to the homogenisation variable
     // (and can be omitted), unless the input to gfan was already homogeneous
-    if (anzahlvariablen==size(ww)-1)
+    if (homogentest==0)
     {
       ww=ww[1..size(ww)-1];
     }
@@ -5496,7 +5496,7 @@ NOTE:     the procedure is called from tropicalparametrise"
       if (size(s)!=0)
       {
         execute("www=intvec("+w+");");
-        if (anzahlvariablen==size(ww)-1)
+        if (homogentest==0)
         {
           ww[i]=intvec(www[1..size(www)-1]);
         }
@@ -5666,6 +5666,7 @@ NOTE:    - the procedure is also called recursively by itself, and
   deletedvariables[anzahlvariablen-1]=0; // initialise this vector
   int numberdeletedvariables;  // the number of deleted variables
   int oldanzahlvariablen=anzahlvariablen; // anzahlvariablen for later reference
+  int homogentest=0;
   list liftings,partliftings;  // the computed liftings (all resp. partly)
   // consider each ring which has been returned when computing the zeros of the
   // the t-initial ideal, equivalently, consider
@@ -5717,6 +5718,7 @@ NOTE:    - the procedure is also called recursively by itself, and
           // but for the tropical variety (says Anders)
           // it suffices to homogenise an arbitrary system of generators
           // II=groebner(II);
+          homogentest=homog(II);
           II=homog(II,maxideal(1)[nvars(PREGFANRING)+1]);
           // if gfan version >= 0.3.0 is used and the characteristic
           // is not zero, then write the basering to the output
@@ -5784,7 +5786,7 @@ NOTE:    - the procedure is also called recursively by itself, and
             // read the result from gfan and store it to a string,
             // which in a later version
             // should be interpreded by Singular
-            wneulist=choosegfanvector(read("/tmp/gfanoutput"),findall,anzahlvariablen);
+            wneulist=choosegfanvector(read("/tmp/gfanoutput"),findall,homogentest);
             setring PREGFANRING;
           }
           kill GFANRING;
