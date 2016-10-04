@@ -10,7 +10,7 @@ In order to use convex objects in Singular, Singular uses gfanlib,
 a C++ library for convex geometry by Anders N. Jensen.
 Please check the readme file for installation instructions.
 The library @ref{gfan_lib} provides this C++ library and an interface to it.
-Some functions require @code{polymake}: @ref{polymakeInterface_lib} provides
+Some functions require @code{polymake}: @ref{polymake_lib} provides
 an interface to it.
 
 In the finite dimensional real vector space R^n, a convex rational polyhedral
@@ -42,7 +42,7 @@ In order to use convex objects in Singular, Singular uses gfanlib,
 a C++ library for convex geometry by Anders N. Jensen.
 Please check the readme file for installation instructions.
 The library @ref{gfan_lib} provides this C++ library and an interface to it.
-Some functions require @code{polymake}: @ref{polymakeInterface_lib} provides
+Some functions require @code{polymake}: @ref{polymake_lib} provides
 an interface to it.
 
 A polyhedral fan is a collection of cones closed under taking intersections and
@@ -82,7 +82,7 @@ In order to use convex objects in Singular, Singular uses gfanlib,
 a C++ library for convex geometry by Anders N. Jensen.
 Please check the readme file for installation instructions.
 The library @ref{gfan_lib} provides this C++ library and an interface to it.
-Some functions require @code{polymake}: @ref{polymakeInterface_lib} provides
+Some functions require @code{polymake}: @ref{polymake_lib} provides
 an interface to it.
 
 In R^n, a rational convex polytope (in short ``polytope'') is a set of points
