@@ -992,7 +992,7 @@ but not for serious computations.
 @c ----------------------------------------------------------
 @node polymake_lib
 @subsection polymake_lib
-@c lib polymake.lib no_ex
+@c lib polymake.lib
 
 @c ----------------------------------------------------------
 @node realizationMatroids_lib
@@ -1188,7 +1188,6 @@ Todos/Issues:
 
 @menu
 * gfan_lib:: A gfanlib interface for Singular
-* polymakeInterface_lib:: A polymake interface for Singular
 @end menu
 
  ---------------------------------------------------------
@@ -1196,12 +1195,6 @@ Todos/Issues:
 @subsection gfan_lib
 
 @c lib gfan.lib
-
-@c ---------------------------------------------------------
-@node polymakeInterface_lib
-@subsection polymakeInterface_lib
-
-@c lib polymakeInterface.lib
 
 @c ---------------------------------------------------------
 @node toric geometry, , convex geometry, SINGULAR libraries

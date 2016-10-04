@@ -29,7 +29,8 @@ New libraries:
       over algebraic number fields(@nref{nfmodsyz_lib})
 @item new library: curveInv.lib: invariants of curves (@nref{curveInv_lib})
 @item new library: gfan.lib: interface to gfanlib (@nref{gfan_lib})
-@item new library: polymakeInterface.lib: interface to polymake (@nref{polymakeInterface_lib})
+@item new library: polymakeInterface.lib: interface to polymake (@code{polymakeInterface_lib})
+      merged into @nref{polymake_lib}
 @end itemize
 
 Changed libraries:
@@ -111,7 +112,7 @@ Changed libraries:
    AddCons  AddConsP.
 @item normaliz.lib (for normaliz >=2.8) (@nref{normaliz_lib})
 @item renamed groebnerFan to groebnerFanP in polymake.lib (@nref{polymake_lib})
-@item renamed fVector to fVectorP in polymake.lib (@nref{polymake_lib},@nref{polymakeInterface_lib})
+@item renamed fVector to fVectorP in polymake.lib (@nref{polymake_lib},@code{polymakeInterface_lib})
 @end itemize
 
 @heading News for version 4-0-1

@@ -64,7 +64,7 @@ PROCEDURES CONERNED WITH PLANAR POLYGONS:
   ellipticNF()     computes the normal form of an elliptic polygon
   ellipticNFDB()   displays the 16 normal forms of elliptic polygons
 
-PROCEDURES USING POLYMAKE (LOW LEVEL INTERFACE)
+PROCEDURES USING LIBPOLYMAKE:
   boundaryLatticePoints()
   ehrhartPolynomialCoeff()
   fVectorP()
