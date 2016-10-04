@@ -337,47 +337,27 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     if(strcmp(sys_cmd,"reduce_bound")==0)
     {
       poly p;
-      ideal pid;
-      ideal q;
-      int bound;
-      int htype;
+      ideal pid=NULL;
       const short t1[]={3,POLY_CMD,IDEAL_CMD,INT_CMD};
       const short t2[]={3,IDEAL_CMD,IDEAL_CMD,INT_CMD};
       const short t3[]={3,VECTOR_CMD,MODUL_CMD,INT_CMD};
-      const short t4[]={3,VECTOR_CMD,MODUL_CMD,INT_CMD};
-      if (iiCheckTypes(h,t1,0))
+      const short t4[]={3,MODUL_CMD,MODUL_CMD,INT_CMD};
+      if ((iiCheckTypes(h,t1,0))||((iiCheckTypes(h,t3,0))))
       {
         p = (poly)h->CopyD();
-        htype = POLY_CMD;
-        q = (ideal)h-->next->CopyD();
-        bound = (long)h->next->next->CopyD();
       }
-      else if  (iiCheckTypes(h,t2,0))
+      else if  ((iiCheckTypes(h,t2,0))||(iiCheckTypes(h,t4,1)))
       {
         pid = (ideal)h->CopyD();
-        htype = IDEAL_CMD;
-        q = (ideal)h-->next->CopyD();
-        bound = (long)h->next->next->CopyD();
-      }
-      else if (iiCheckTypes(h,t3,0))
-      {
-        p = (poly)h->CopyD();
-        htype = VECTOR_CMD;
-        q = (ideal)h-->next->CopyD();
-        bound = (long)h->next->next->CopyD();
-      }
-      else if  (iiCheckTypes(h,t4,1))
-      {
-        pid = (ideal)h->CopyD();
-        htype = IDEAL_CMD;
-        q = (ideal)h-->next->CopyD();
-        bound = (long)h->next->next->CopyD();
       }
       else return TRUE;
-      res->rtyp = htype;
-      if(htype == POLY_CMD || htype == VECTOR_CMD)
+      //int htype;
+      res->rtyp= h->Typ(); /*htype*/
+      ideal q = (ideal)h->next->CopyD();
+      int bound = (int)(long)h->next->next->Data();
+      if (pid==NULL) /*(htype == POLY_CMD || htype == VECTOR_CMD)*/
         res->data = (char *)kNFBound(q,currRing->qideal,p,bound);
-      if(htype == IDEAL_CMD || htype == MODUL_CMD)
+      else /*(htype == IDEAL_CMD || htype == MODUL_CMD)*/
         res->data = (char *)kNFBound(q,currRing->qideal,pid,bound);
       return FALSE;
     }
