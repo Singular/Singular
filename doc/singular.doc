@@ -246,13 +246,6 @@ See also @ref{Non-commutative libraries}.
 @xref{Non-commutative libraries}.
 @end ifset
 
-@strong{Binary libraries:}
-@menu
-* convex geometry::
-* toric geometry::
-@end menu
-
-
 @c ----------------------------------------------------------
 @node standard_lib, General purpose, SINGULAR libraries, SINGULAR libraries
 @section standard_lib
@@ -922,7 +915,7 @@ of autonomy degrees.
 @subsection findifs_lib
 @c lib findifs.lib
 @c ----------------------------------------------------------------------------
-@node Teaching, Tropical Geometry, System and Control theory, SINGULAR libraries
+@node Teaching
 @section Teaching
 @cindex Teaching
 
@@ -980,15 +973,20 @@ but not for serious computations.
 @c lib rootsur.lib
 
 @c ----------------------------------------------------------------------------
-@node Tropical Geometry, Miscellaneous libraries, Teaching, SINGULAR libraries
+@node Tropical Geometry
 @section Tropical Geometry
 @cindex Tropical Geometry
 
 @menu
+* gfan_lib:: A gfanlib interface for Singular
 * polymake_lib:: interface to polymake and TOPCOM
 * realizationMatroids_lib:: Realizability for Tropical Fan Curves
 * tropical_lib:: interface to gfan
 @end menu
+@c ----------------------------------------------------------
+@node gfan_lib
+@subsection gfan_lib
+@c lib gfan.lib
 @c ----------------------------------------------------------
 @node polymake_lib
 @subsection polymake_lib
@@ -1011,6 +1009,7 @@ but not for serious computations.
 
 @menu
 * arr_lib:: algorithms for arrangements of hyperplanes
+* customstd_lib:: additional variants of std
 * phindex_lib::
 * polybori_lib::
 @end menu
@@ -1018,6 +1017,10 @@ but not for serious computations.
 @node arr_lib
 @subsection arr_lib
 @c lib arr.lib
+@c ---------------------------------------------------------
+@node customstd_lib
+@subsection customstd_lib
+@c lib customstd.lib
 @c ----------------------------------------------------------
 @node phindex_lib
 @subsection phindex_lib
@@ -1181,34 +1184,8 @@ Todos/Issues:
 @node deRham_lib
 @subsection deRham_lib
 @c lib deRham.lib
-@c ----------------------------------------------------------
-@node convex geometry, toric geometry, , SINGULAR libraries
-@section convex geometry
-@cindex convex geometry
-
-@menu
-* gfan_lib:: A gfanlib interface for Singular
-@end menu
-
- ---------------------------------------------------------
-@node gfan_lib
-@subsection gfan_lib
-
-@c lib gfan.lib
-
 @c ---------------------------------------------------------
-@node toric geometry, , convex geometry, SINGULAR libraries
-@section toric geometry
-@cindex toric geometry
 
-@menu
-* customstd_lib:: additional variants of std
-@end menu
-
-@c ---------------------------------------------------------
-@node customstd_lib
-@subsection customstd_lib
-@c lib customstd.lib
 @c ----------------------------------------------------------
 @node Release Notes, Index, SINGULAR libraries, Top
 @chapter Release Notes
