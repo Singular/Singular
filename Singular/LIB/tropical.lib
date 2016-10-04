@@ -137,6 +137,15 @@ AUXILARY PROCEDURES:
   randomPolyInT()         computes a polynomial with random coefficients
   cleanTmp()              clears /tmp from files created by other procedures
 
+PROCEDURES FROM BINARY LIBRARY:
+  groebnerCone()          constructs the Groebner cone with respect to a weight vector
+  maximalGroebnerCone()   constructs the Groebner cone with respect to the current ordering
+  homogeneitySpace()      constructs the homogeneity space
+  initial()               constructs the initial form resp. ideal
+  tropicalVariety()       computes the tropical variety of a poly or ideal
+  groebnerFan()           computes the Groebner fan of a poly or ideal
+  groebnerComplex()       computes the Groebner complex of a poly or ideal
+
 KEYWORDS:        tropical curves; tropical polynomials
 
 ";
