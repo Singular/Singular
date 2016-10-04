@@ -176,7 +176,7 @@ void scan_info(int *l)
       if (have_PROCEDURES!=0)
         printf("error: only KEYWORDS/SEE ALSO may follow PROCEDURES\n");
     }
-    else if ((p=strstr(buf,"PROCEDURES:"))!=NULL)
+    else if ((p=strstr(buf,"PROCEDURES"))!=NULL)
     {
       unsigned char *pp=buf;
       while (pp!=p)
