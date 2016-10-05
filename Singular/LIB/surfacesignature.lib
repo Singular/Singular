@@ -333,15 +333,15 @@ static proc fracPart(number n)
 //=== i.e. n2 is not in Z but n-n2 is in Z
 {
    number a,b;
-   int r;
+   bigint r;
    a = numerator(n);
    b = denominator(n);
-   int z = int(number(a));
-   int y = int(number(b));
+   bigint z = bigint(a);
+   bigint y = bigint(b);
    r = z mod y;
-   int q = (z-r) div y;
-   number n1 = q;
-   number n2 = n-n1;
+   bigint q = (z-r) div y;
+   number n1 = number(q);
+   number n2 = number(n-n1);
    return(n2);
 }
 
