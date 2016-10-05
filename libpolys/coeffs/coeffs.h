@@ -584,15 +584,15 @@ static FORCE_INLINE void   n_Normalize(number& n, const coeffs r)
 
 /// write to the output buffer of the currently used reporter
 //CF: the "&" should be removed, as one wants to write constants as well
-static FORCE_INLINE void   n_WriteLong(number& n,  const coeffs r)
+static FORCE_INLINE void   n_WriteLong(number n,  const coeffs r)
 { STATISTIC(n_WriteLong); assume(r != NULL); assume(r->cfWriteLong!=NULL); r->cfWriteLong(n,r); }
 
 /// write to the output buffer of the currently used reporter
 /// in a shortest possible way, e.g. in K(a): a2 instead of a^2
-static FORCE_INLINE void   n_WriteShort(number& n,  const coeffs r)
+static FORCE_INLINE void   n_WriteShort(number n,  const coeffs r)
 { STATISTIC(n_WriteShort); assume(r != NULL); assume(r->cfWriteShort!=NULL); r->cfWriteShort(n,r); }
 
-static FORCE_INLINE void   n_Write(number& n,  const coeffs r, const BOOLEAN bShortOut = TRUE)
+static FORCE_INLINE void   n_Write(number n,  const coeffs r, const BOOLEAN bShortOut = TRUE)
 { STATISTIC(n_Write); if (bShortOut) n_WriteShort(n, r); else n_WriteLong(n, r); }
 
 
