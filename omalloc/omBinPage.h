@@ -64,7 +64,7 @@ extern unsigned long *om_BinPageIndicies;
   (((unsigned long) addr) >> (LOG_BIT_SIZEOF_LONG + LOG_BIT_SIZEOF_SYSTEM_PAGE))
 
 
-#if defined(OM_INLINE) || defined(OM_INTERNAL_DEBUG)
+#if !defined(OM_INLINE) || defined(OM_INTERNAL_DEBUG)
 #define omIsBinPageAddr(addr) _omIsBinPageAddr(addr)
 #else
 /* let's hope the compiler can eliminate common subexpressions well */      \
