@@ -234,20 +234,29 @@ void sleftv::Print(leftv store, int spaces)
             ::Print("// write: %s", slStatus(l, "write"));
           break;
           }
-        case NUMBER_CMD:
         case BIGINT_CMD:
-          if (t==NUMBER_CMD)
-          {
-            number n=(number)d;
-            nNormalize(n);
-            d=n;
-          }
           s=String(d);
           if (s==NULL) return;
           PrintNSpaces(spaces);
           PrintS(s);
           omFree((ADDRESS)s);
           break;
+        case NUMBER_CMD:
+          {
+            number n=(number)d;
+            nNormalize(n);
+            if ((number)d !=n)
+            {
+              d=n;
+              if (rtyp==IDHDL) IDNUMBER(((idhdl)data))=n;
+              else if(rtyp==NUMBER_CMD) data=(void*)n;
+            }
+            s=String(d);
+            if (s==NULL) return;
+            PrintS(s);
+            omFree((ADDRESS)s);
+            break;
+          }
         case LIST_CMD:
         {
           lists l=(lists)d;
@@ -821,25 +830,13 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
 
         case NUMBER_CMD:
           StringSetS((char*) (typed ? "number(" : ""));
-          if ((rtyp==IDHDL)&&(IDTYP((idhdl)data)==NUMBER_CMD))
-          {
-            nWrite(IDNUMBER((idhdl)data));
-          }
-          else if (rtyp==NUMBER_CMD)
-          {
-            number n=(number)data;
-            nWrite(n);
-            data=(char *)n;
-          }
-          else if((rtyp==VMINPOLY)&&(rField_is_GF(currRing)))
+          if((rtyp==VMINPOLY)&&(rField_is_GF(currRing)))
           {
             nfShowMipo(currRing->cf);
           }
           else
           {
-            number n=nCopy((number)d);
-            nWrite(n);
-            nDelete(&n);
+            nWrite((number)d);
           }
           StringAppendS((char*) (typed ? ")" : ""));
           return StringEndS();
