@@ -158,7 +158,7 @@ char * StringEndS()
   feBufferStart=feBufferStart_save[feBuffer_cnt];
   if (strlen(r)<1024)
   {
-    // if the used buffer is a "smal block",
+    // if the used buffer is a "small block",
     // substitue the "large" initial block by a small one
     char *s=omStrDup(r); omFree(r); r=s;
   }
