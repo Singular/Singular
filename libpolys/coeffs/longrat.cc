@@ -1704,8 +1704,8 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
           return INT_TO_SR(1);
         }
         mpz_init_set(u->n,b->n);
+        u->s = 0;
         if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
-        else u->s = 0;
         break;
       }
       case 3:
@@ -1755,8 +1755,8 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
                FREE_RNUMBER(u);
                return INT_TO_SR(1);
             }
+            u->s = 0;
             if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
-            else u->s = 0;
             break;
           }
           case 3: /* a:1 b:3 */
@@ -1776,8 +1776,8 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
               return INT_TO_SR(1);
             }
             mpz_init_set(u->n,a->n);
+            u->s = 0;
             if (GCD_NORM_COND(a,u)) { nlNormalize_Gcd(u); }
-            else u->s = 0;
             break;
           }
         } /*switch (b->s) */
@@ -1805,8 +1805,8 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
               return INT_TO_SR(1);
             }
             mpz_init_set(u->n,b->n);
+            u->s = 0;
             if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
-            else u->s = 0;
             break;
           }
           case 3:
@@ -1874,8 +1874,9 @@ void _nlInpAdd_aNoImm_OR_bNoImm(number &a, number b)
         mpz_clear(x);
         // result cannot be 0, if coeffs are normalized
         mpz_init_set(u->n,b->n);
+        u->s=0;
         if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
-        else { u->s = 0; u=nlShort1(u); }
+        else { u=nlShort1(u); }
         break;
       }
       case 3:
@@ -1914,8 +1915,9 @@ void _nlInpAdd_aNoImm_OR_bNoImm(number &a, number b)
             mpz_clear(x);
             mpz_clear(y);
             mpz_mul(a->n,a->n,b->n);
+            a->s=0;
             if (GCD_NORM_COND(b,a)) { nlNormalize_Gcd(a); }
-            else { a->s = 0;a=nlShort1(a);}
+            else { a=nlShort1(a);}
             break;
           }
           case 3: /* a:1 b:3 */
@@ -1925,8 +1927,9 @@ void _nlInpAdd_aNoImm_OR_bNoImm(number &a, number b)
             mpz_mul(x,b->z,a->n);
             mpz_add(a->z,a->z,x);
             mpz_clear(x);
+            a->s=0;
             if (GCD_NORM_COND(b,a)) { nlNormalize_Gcd(a); }
-            else { a->s = 0; a=nlShort1(a);}
+            else { a=nlShort1(a);}
             break;
           }
         } /*switch (b->s) */
@@ -1945,8 +1948,9 @@ void _nlInpAdd_aNoImm_OR_bNoImm(number &a, number b)
             mpz_add(a->z,b->z,x);
             mpz_clear(x);
             mpz_init_set(a->n,b->n);
+            a->s=0;
             if (GCD_NORM_COND(b,a)) { nlNormalize_Gcd(a); }
-            else { a->s = 0; a=nlShort1(a);}
+            else { a=nlShort1(a);}
             break;
           }
           case 3:
@@ -1995,8 +1999,8 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
           return INT_TO_SR(1);
         }
         mpz_init_set(u->n,b->n);
+        u->s=0;
         if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
-        else u->s = 0;
         break;
       }
       case 3:
@@ -2042,8 +2046,8 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
           return INT_TO_SR(1);
         }
         mpz_init_set(u->n,a->n);
+        u->s=0;
         if (GCD_NORM_COND(a,u)) { nlNormalize_Gcd(u); }
-        else u->s = 0;
         break;
       }
       case 3:
@@ -2098,8 +2102,8 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
               FREE_RNUMBER(u);
               return INT_TO_SR(1);
             }
+            u->s=0;
             if (GCD_NORM_COND(a,u)) { nlNormalize_Gcd(u); }
-            else u->s = 0;
             break;
           }
           case 3: /* a:1, b:3 */
@@ -2122,8 +2126,8 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
               return INT_TO_SR(1);
             }
             mpz_init_set(u->n,a->n);
+            u->s=0;
             if (GCD_NORM_COND(a,u)) { nlNormalize_Gcd(u); }
-            else u->s = 0;
             break;
           }
         }
@@ -2154,8 +2158,8 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
               return INT_TO_SR(1);
             }
             mpz_init_set(u->n,b->n);
+            u->s=0;
             if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
-            else u->s = 0;
             break;
           }
           case 3: /* a:3 , b:3 */
