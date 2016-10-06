@@ -2275,29 +2275,38 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (TEST_OPT_REDSB)
   {
     completeReduce(strat);
-#ifdef HAVE_TAIL_RING
     if (strat->completeReduce_retry)
     {
       // completeReduce needed larger exponents, retry
       // to reduce with S (instead of T)
       // and in currRing (instead of strat->tailRing)
-      cleanT(strat);strat->tailRing=currRing;
-      int i;
-      for(i=strat->sl;i>=0;i--) strat->S_2_R[i]=-1;
-      completeReduce(strat);
-    }
+#ifdef HAVE_TAIL_RING
+      if(currRing->bitmask>strat->tailRing->bitmask)
+      {
+        strat->completeReduce_retry=FALSE;
+        cleanT(strat);strat->tailRing=currRing;
+        int i;
+        for(i=strat->sl;i>=0;i--) strat->S_2_R[i]=-1;
+        completeReduce(strat);
+      }
+      if (strat->completeReduce_retry)
 #endif
+        Werror("exponent bound is %ld",currRing->bitmask);
+    }
   }
   else if (TEST_OPT_PROT) PrintLn();
-  if(nCoeff_is_Ring_Z(currRing->cf))
-    finalReduceByMon(strat);
-  if(rField_is_Ring(currRing))
+  if (!errorreported)
   {
-    for(int i = 0;i<=strat->sl;i++)
+    if(nCoeff_is_Ring_Z(currRing->cf))
+      finalReduceByMon(strat);
+    if(rField_is_Ring(currRing))
     {
-      if(!nGreaterZero(pGetCoeff(strat->S[i])))
+      for(int i = 0;i<=strat->sl;i++)
       {
-        strat->S[i] = pNeg(strat->S[i]);
+        if(!nGreaterZero(pGetCoeff(strat->S[i])))
+        {
+          strat->S[i] = pNeg(strat->S[i]);
+        }
       }
     }
   }
@@ -2314,7 +2323,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 //  }
   if ((TEST_OPT_PROT) || (TEST_OPT_DEBUG)) messageStat(hilbcount,strat);
   SI_RESTORE_OPT1(save);
-  if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
+  if ((Q!=NULL)&&(!errorreported)) updateResult(strat->Shdl,Q,strat);
 
   idTest(strat->Shdl);
 
