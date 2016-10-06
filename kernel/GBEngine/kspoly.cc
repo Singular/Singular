@@ -102,7 +102,7 @@ int ksReducePoly(LObject* PR,
 
   p_ExpVectorSub(lm, p2, tailRing); // Calculate the Monomial we must multiply to p2
 
-  if (tailRing != currRing)
+  //if (tailRing != currRing)
   {
     // check that reduction does not violate exp bound
     while (PW->max != NULL && !p_LmExpVectorAddIsOk(lm, PW->max, tailRing))

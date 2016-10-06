@@ -3208,18 +3208,24 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (TEST_OPT_REDSB)
   {
     completeReduce(strat);
-#ifdef HAVE_TAIL_RING
     if (strat->completeReduce_retry)
     {
       // completeReduce needed larger exponents, retry
       // to reduce with S (instead of T)
       // and in currRing (instead of strat->tailRing)
-      cleanT(strat);strat->tailRing=currRing;
-      int i;
-      for(i=strat->sl;i>=0;i--) strat->S_2_R[i]=-1;
-      completeReduce(strat);
-    }
+#ifdef HAVE_TAIL_RING
+      if(currRing->bitmask>strat->tailRing->bitmask)
+      {
+        strat->completeReduce_retry=FALSE;
+        cleanT(strat);strat->tailRing=currRing;
+        int i;
+        for(i=strat->sl;i>=0;i--) strat->S_2_R[i]=-1;
+        completeReduce(strat);
+      }
+      if (strat->completeReduce_retry)
 #endif
+        Werror("exponent bound is %ld",currRing->bitmask);
+    }
   }
   else if (TEST_OPT_PROT) PrintLn();
 
@@ -4305,10 +4311,18 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       // completeReduce needed larger exponents, retry
       // to reduce with S (instead of T)
       // and in currRing (instead of strat->tailRing)
-      cleanT(strat);strat->tailRing=currRing;
-      int i;
-      for(i=strat->sl;i>=0;i--) strat->S_2_R[i]=-1;
-      completeReduce(strat, TRUE);
+#ifdef HAVE_TAIL_RING
+      if(currRing->bitmask>strat->tailRing->bitmask)
+      {
+        strat->completeReduce_retry=FALSE;
+        cleanT(strat);strat->tailRing=currRing;
+        int i;
+        for(i=strat->sl;i>=0;i--) strat->S_2_R[i]=-1;
+        completeReduce(strat);
+      }
+      if (strat->completeReduce_retry)
+#endif
+        Werror("exponent bound is %ld",currRing->bitmask);
     }
   }
   else if (TEST_OPT_PROT) PrintLn();
