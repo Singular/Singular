@@ -3500,6 +3500,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
       cleanT(strat);strat->tailRing=currRing;
       int i;
       for(i=strat->sl;i>=0;i--) strat->S_2_R[i]=-1;
+      strat->completeReduce_retry=FALSE;
       completeReduce(strat);
       if (strat->completeReduce_retry)
       {
