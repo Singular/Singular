@@ -7776,10 +7776,10 @@ poly redtailBbaBound (LObject* L, int pos, kStrategy strat, int bound, BOOLEAN w
         Ln.GetP();
         Ln.p = pJet(Ln.p,bound);
       }
-      if (Ln.IsNull()) 
-      {  
+      if (Ln.IsNull())
+      {
         goto all_done;
-      }  
+      }
       if (! withT) With_s.Init(currRing);
     }
     pNext(h) = Ln.LmExtractAndIter();

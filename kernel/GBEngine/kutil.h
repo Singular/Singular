@@ -700,7 +700,7 @@ int ksReducePoly(LObject* PR,
                  poly spNoether = NULL,
                  number *coef = NULL,
                  kStrategy strat = NULL);
-                 
+
 int ksReducePolyBound(LObject* PR,
                  TObject* PW,
                  int bound,
