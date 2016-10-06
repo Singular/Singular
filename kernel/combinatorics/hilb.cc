@@ -1643,11 +1643,11 @@ static int positionInOrbit_FG_Case(ideal I, poly, std::vector<ideal> idorb, std:
   return(ps);
 }
 
-static int monCompare(const void  *m, const void *n)
+static int monCompare( const void *m, const void *n)
 {
   /* compares monomials */
 
-  return (p_Compare(*(poly*)m, *(poly*)n, currRing));
+ return(p_Compare(*(poly*) m, *(poly*)n, currRing));
 }
 
 static void sortMonoIdeal_totalDegOrder(ideal I)
@@ -2060,8 +2060,8 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE )
   omFree(tt);
   omFree(xx[0]);
   omFree(xx);
-  rKill(R);
   rChangeCurrRing(r);
+  rKill(R);
 }
 
 
