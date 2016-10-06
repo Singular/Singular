@@ -46,13 +46,13 @@ int ksReducePoly(LObject* PR,
 #ifdef KDEBUG
   red_count++;
 #ifdef TEST_OPT_DEBUG_RED
-  if (TEST_OPT_DEBUG)
-  {
-    Print("Red %d:", red_count); PR->wrp(); Print(" with:");
-    PW->wrp();
-    //printf("\necart(PR)-ecart(PW): %i\n",PR->ecart-PW->ecart);
-    //pWrite(PR->p);
-  }
+//  if (TEST_OPT_DEBUG)
+//  {
+//    Print("Red %d:", red_count); PR->wrp(); Print(" with:");
+//    PW->wrp();
+//    //printf("\necart(PR)-ecart(PW): %i\n",PR->ecart-PW->ecart);
+//    //pWrite(PR->p);
+//  }
 #endif
 #endif
   int ret = 0;
