@@ -1000,7 +1000,7 @@ but not for serious computations.
 @node tropical_lib
 @subsection tropical_lib
 
-@c lib tropical.lib no_ex
+@c lib tropical.lib
 
 @c ----------------------------------------------------------------------------
 @node  Miscellaneous libraries
