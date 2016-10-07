@@ -1456,19 +1456,19 @@ static proc sortlistideals(list L)
 //    the Crep of V(N) \ V(M)
 // Assumed to be called in the ring @R or the ring @P or a ring ring Q[a]
 proc Crep(ideal N, ideal M)
- "USAGE:  Crep(N,M);
+"USAGE:  Crep(N,M);
           ideal N (null ideal) (not necessarily radical nor maximal)
           ideal M (hole ideal) (not necessarily containing N)
- RETURN:  The canonical C-representation of the locally closed set.
+RETURN:  The canonical C-representation of the locally closed set.
            [ P,Q ], a pair of radical ideals with P included in Q,
            representing the set V(P) \ V(Q) = V(N) \ V(M)
- NOTE:   Operates in a ring R=Q[a] (a=parameters)
+NOTE:   Operates in a ring R=Q[a] (a=parameters)
            If the user want to call the routine Crep on a parametric
            ideal Q[a][x] for locally closed sets on Q[a], setglobalrings()
            must be called previously.
 
- KEYWORDS: locally closed set; canoncial form
- EXAMPLE:  Crep; shows an example"
+KEYWORDS: locally closed set; canoncial form
+EXAMPLE: example Crep; shows an example"
 {
   int te;
   def RR=basering;
@@ -1548,18 +1548,18 @@ static proc Crep0(ideal N, ideal M)
 //    the Prep of V(N) \ V(M)
 // Assumed to be called in the ring @R or the ring @P or a ring ring Q[a]
 proc Prep(ideal N, ideal M)
- "USAGE:  Prep(N,M);
+"USAGE:  Prep(N,M);
           ideal N (null ideal) (not necessarily radical nor maximal)
           ideal M (hole ideal) (not necessarily containing N)
- RETURN: The canonical P-representation of the locally closed set V(N) \ V(M)
+RETURN: The canonical P-representation of the locally closed set V(N) \ V(M)
            Output: [ Comp_1, .. , Comp_s ] where
               Comp_i=[p_i,[p_i1,..,p_is_i]]
- NOTE:   To be called from the ring @R or @P or a ring Q[a]
+NOTE:   To be called from the ring @R or @P or a ring Q[a]
            If the user want to call the routine Prep on a parametric
            ideal Q[a][x] for locally closed sets on Q[a], setglobalrings()
            must be called previously.
- KEYWORDS: Locally closed set; Canoncial form
- EXAMPLE:  Prep; shows an example"
+KEYWORDS: Locally closed set; Canoncial form
+EXAMPLE: example Prep; shows an example"
 {
   int te;
   def RR=basering;
@@ -1641,12 +1641,12 @@ proc PtoCrep(list L)
           L: list  [ Comp_1, .. , Comp_s ] where
           Comp_i=[p_i,[p_i1,..,p_is_i] ], is
           the P-representation of a locally closed set V(N) \ V(M)
- RETURN:  The canonical C-representation of the locally closed set
+RETURN:  The canonical C-representation of the locally closed set
           [ P,Q ], a pair of radical ideals with P included in Q,
           representing the set V(P) \ V(Q)
- NOTE: To be called from the ring @R or @P or a ring Q[a]
- KEYWORDS: locally closed set; canoncial form
- EXAMPLE:  PtoCrep; shows an example"
+NOTE: To be called from the ring @R or @P or a ring Q[a]
+KEYWORDS: locally closed set; canoncial form
+EXAMPLE: example PtoCrep; shows an example"
 {
   int te;
   def RR=basering;
@@ -1710,46 +1710,45 @@ static proc PtoCrep0(list L)
 //      It uses Kapur-Sun-Wang algorithm, and with the options
 //      can compute the homogenization before  (('can',0) or ( 'can',1))
 //      and dehomogenize the result.
+
 proc cgsdr(ideal F, list #)
 "USAGE: cgsdr(F,options]);
-          F: ideal in Q[a][x] (a=parameters, x=variables) to be discussed.
-          To compute a disjoint, reduced Comprehensive Groebner System (CGS).
-          cgsdr is the starting point of the fundamental routine grobcov.
-          Inside grobcov it is used with options 'can' set to 0,1 and
-          not with options ('can',2).
-          It is to be used if only a disjoint reduced CGS is required.
-
-          Options: To modify the default options, pairs of arguments
-          -option name, value- of valid options must be added to the call.
-
-OPTIONS:
-            \"can\",0-1-2: The default value is \"can\",2. In this case no
-                homogenization is done. With option (\"can\",0) the given
-                basis is homogenized, and with option (\"can\",1) the
-                whole given ideal is homogenized before computing the
-                cgs and dehomogenized after.
-                with option (\"can\",0) the homogenized basis is used
-                with option (\"can\",1) the homogenized ideal is used
-                with option (\"can\",2) the given basis is used
-            \"null\",ideal E: The default is (\"null\",ideal(0)).
-            \"nonnull\",ideal N: The default (\"nonnull\",ideal(1)).
-                When options \"null\" and/or \"nonnull\" are given, then
-                the parameter space is restricted to V(E) \ V(N).
-            \"comment\",0-1: The default is (\"comment\",0). Setting (\"comment\",1)
-                will provide information about the development of the
-                computation.
-            \"out\",0-1: 1 (default) the output segments are given as
-                as difference of varieties.
-                0: the output segments are given in P-representation
-                and the segments grouped by lpp
-                With options (\"can\",0) and (\"can\",1) the option (\"out\",1)
-                is set to (\"out\",0) because it is not compatible.
-          One can give none or whatever of these options.
-          With the default options (\"can\",2,\"out\",1), only the
-          Kapur-Sun-Wang algorithm is computed. This is very efficient
-          but is only the starting point for the computation of grobcov.
-          When grobcov is computed, the call to cgsdr inside uses
-          specific options that are more expensive ("can",0-1,"out",0).
+   F: ideal in Q[a][x] (a=parameters, x=variables) to be discussed.
+   To compute a disjoint, reduced Comprehensive Groebner System (CGS).
+   cgsdr is the starting point of the fundamental routine grobcov.
+   Inside grobcov it is used with options \"can\" set to 0,1 and
+   not with options (\"can\",2).
+   It is to be used if only a disjoint reduced CGS is required.
+OPTIONS: To modify the default options, pairs of arguments
+   -option name, value- of valid options must be added to the call.
+   Options:
+   \"can\",0-1-2: The default value is \"can\",2. In this case no
+   homogenization is done. With option (\"can\",0) the given
+   basis is homogenized, and with option (\"can\",1) the
+   whole given ideal is homogenized before computing the
+   cgs and dehomogenized after.
+   with option (\"can\",0) the homogenized basis is used
+   with option (\"can\",1) the homogenized ideal is used
+   with option (\"can\",2) the given basis is used
+   \"null\",ideal E: The default is (\"null\",ideal(0)).
+   \"nonnull\",ideal N: The default (\"nonnull\",ideal(1)).
+   When options \"null\" and/or \"nonnull\" are given, then
+   the parameter space is restricted to V(E) \ V(N).
+   \"comment\",0-1: The default is (\"comment\",0). Setting (\"comment\",1)
+   will provide information about the development of the
+   computation.
+   \"out\",0-1: 1 (default) the output segments are given as
+   as difference of varieties.
+   0: the output segments are given in P-representation
+   and the segments grouped by lpp
+   With options (\"can\",0) and (\"can\",1) the option (\"out\",1)
+   is set to (\"out\",0) because it is not compatible.
+   One can give none or whatever of these options.
+   With the default options (\"can\",2,\"out\",1), only the
+   Kapur-Sun-Wang algorithm is computed. This is very efficient
+   but is only the starting point for the computation of grobcov.
+   When grobcov is computed, the call to cgsdr inside uses
+   specific options that are more expensive (\"can\",0-1,\"out\",0).
 RETURN: Returns a list T describing a reduced and disjoint
           Comprehensive Groebner System (CGS),
           With option (\"out\",0)
@@ -1764,13 +1763,11 @@ RETURN: Returns a list T describing a reduced and disjoint
            )
           The bases are the reduced Groebner bases (after normalization)
           for each point of the corresponding segment.
-
           The third element of each lpp segment is the lpp of the
           used ideal in the CGS as a string:
             with option (\"can\",0) the homogenized basis is used
             with option (\"can\",1) the homogenized ideal is used
             with option (\"can\",2) the given basis is used
-
           With option (\"out\",1) (default)
           only KSW is applied and segments are given as
           difference of varieties and are not grouped
@@ -1782,12 +1779,11 @@ RETURN: Returns a list T describing a reduced and disjoint
           N is the nonnull variety
           segment = V(E) \ V(N)
           B is the reduced Groebner basis
-
 NOTE:  The basering R, must be of the form Q[a][x], (a=parameters,
           x=variables), and should be defined previously, and the ideal
           defined on R.
 KEYWORDS: CGS; disjoint; reduced; Comprehensive Groebner System
-EXAMPLE:  cgsdr; shows an example"
+EXAMPLE: example cgsdr; shows an example"
 {
   int te;
   def RR=basering;
@@ -2485,12 +2481,10 @@ proc grobcov(ideal F,list #)
           pairs(S_i,B_i), where the S_i are disjoint locally closed
           segments of the parameter space, and the B_i are the reduced
           Groebner bases of the ideal on every point of S_i.
-
           The ideal F must be defined on a parametric ring Q[a][x].
           (a=parameters, x=variables)
           Options: To modify the default options, pair of arguments
           -option name, value- of valid options must be added to the call.
-
 OPTIONS:
             \"null\",ideal E: The default is (\"null\",ideal(0)).
             \"nonnull\",ideal N: The default is (\"nonnull\",ideal(1)).
@@ -2730,40 +2724,37 @@ example
 // Output The grobcov in full representation.
 // Option ("comment",1) shows the time.
 // Can be called from the top
-proc extend(list GC, list #);
+proc extend(list GC, list #)
 "USAGE: extend(GC[,options]);
-          The default option of grobcov provides
-          the bases in generic representation (the I-regular functions
-          of the bases are given by a single polynomial. It can specialize
-          to zero for some points of the segments, but in general, it
-          is sufficient for many pouposes. Nevertheless the I-regular
-          functions allow a full representation given by a set of
-          polynomials specializing to the value of the function (after normalization)
-          or to zero, but at least one of the polynomials specializes to non-zero.
-          The full representation can be obtained by computing the
-          grobcov with option \"ext\",1. The default option is \"ext\",0.
-          With option \"ext\",1 the computation can be much more
-          time consuming, even if the result can be simpler.
-          Alternatively, one can compute the full representation of the
-          bases after computing grobcov with the defaoult option \"ext\",0
-          and the option \"rep\",2, that outputs both the Prep and the Crep
-          of the segments and then call \"extend\" to the output.
-
+   The default option of grobcov provides
+   the bases in generic representation (the I-regular functions
+   of the bases are given by a single polynomial. It can specialize
+   to zero for some points of the segments, but in general, it
+   is sufficient for many pouposes. Nevertheless the I-regular
+   functions allow a full representation given by a set of
+   polynomials specializing to the value of the function (after normalization)
+   or to zero, but at least one of the polynomials specializes to non-zero.
+   The full representation can be obtained by computing the
+   grobcov with option \"ext\",1. The default option is \"ext\",0.
+   With option \"ext\",1 the computation can be much more
+   time consuming, even if the result can be simpler.
+   Alternatively, one can compute the full representation of the
+   bases after computing grobcov with the defaoult option \"ext\",0
+   and the option \"rep\",2, that outputs both the Prep and the Crep
+   of the segments and then call \"extend\" to the output.
 RETURN: When calling extend(grobcov(S,\"rep\",2)) the result is of the form
-              (
-                 (lpp_1,basis_1,segment_1,lpph_1),
-                  ...
-                 (lpp_s,basis_s,segment_s,lpph_s)
-              )
-          where each function of the basis can be given by an ideal
-          of representants.
-
+   (
+     (lpp_1,basis_1,segment_1,lpph_1),
+     ...
+     (lpp_s,basis_s,segment_s,lpph_s)
+   )
+   where each function of the basis can be given by an ideal
+   of representants.
 NOTE: The basering R, must be of the form Q[a][x], (a=parameters,
-          x=variables), and should be defined previously. The ideal must
-          be defined on R.
-KEYWORDS: Groebner cover; parametric ideal; canonical, discussion of
-          parametric ideal; full representation
-EXAMPLE:  extend; shows an example"
+   x=variables), and should be defined previously. The ideal must
+   be defined on R.
+KEYWORDS: Groebner cover; parametric ideal; canonical; discussion of parametric ideal; full representation
+EXAMPLE: example extend; shows an example"
 {
   list L=#;
   list S=GC;
@@ -4758,70 +4749,70 @@ static proc locus0(list GG, list #)
 //          The components are given in canonical P-representation of the subset.
 //               If all levels of a class of locus are 1, then the set is locally closed. Otherwise the level
 //               gives the depth of the component of the constructible set.
+
 proc locus(list GG, list #)
 "USAGE: locus(G[,options]);
-        Calling sequence:
-              locus(grobcov(S));
-        The input must be the grobcov  of a parametrical ideal in Q[a][x],
-        (a=parameters, x=variables). In practice a must be the tracer coordinates
-        and x the mover coordinates and remaining auxiliary variables.
-        For a parametric locus computation 'a' can contain some extra parameters.
-        Special routine for determining the locus of points
-        of  geometrical constructions. Given a parametric ideal J
-        representing the system determining the locus of points (a)
-        who verify certain properties, the call to locus on the output of grobcov(J)
-        determines the different classes of locus components, following
-        the taxonomy defined in
-        Abanades, Botana, Montes, Recio:
-        \"An Algebraic Taxonomy for Locus Computation in Dynamic Geometry\".
-        Computer-Aided Design 56 (2014) 22-33.
-        The components can be Normal, Special, Accumulation or Degenerate.
+   Calling sequence:
+     locus(grobcov(S));
+   The input must be the grobcov  of a parametrical ideal in Q[a][x],
+   (a=parameters, x=variables). In practice a must be the tracer coordinates
+   and x the mover coordinates and remaining auxiliary variables.
+   For a parametric locus computation \"a\" can contain some extra parameters.
+   Special routine for determining the locus of points
+   of  geometrical constructions. Given a parametric ideal J
+   representing the system determining the locus of points (a)
+   who verify certain properties, the call to locus on the output of grobcov(J)
+   determines the different classes of locus components, following
+   the taxonomy defined in
+   Abanades, Botana, Montes, Recio:
+   \"An Algebraic Taxonomy for Locus Computation in Dynamic Geometry\".
+   Computer-Aided Design 56 (2014) 22-33.
+   The components can be Normal, Special, Accumulation or Degenerate.
 OPTIONS: The algorithm allows the following options as pair of arguments:
-         \"vmov\", ideal(mover variables)  : by default vmov are the last n variables,
-         where n is the number of parameters of the ring (tracer variables plus extra
-         parameters). Thus, if the mover coordinates are not indicated, locus
-         algorithm will assume that they are the last n ring variables.
-         When locus is called internallt by envelop, by default, the mover variables
-         are assumed to be all the ring variables.
-         \"version\", v   :  There are two versions of the algorithm. (\"version\",1) is
-         a full algorithm that always distinguishes correctly between 'Normal'
-         and 'Special' components, whereas \("version\",0) can declare a component
-         to be 'Normal' being in fact 'Special', but it is more effective. By default,
-         (version,1) is used when the number of variables is less than 4 and 0 if not.
-         The user can force to use one or other version, but it is not recommended.
-         \"comments\", c: by default it is 0, but it can be set to 1.
-         Usually locus problems have mover coordinates, variables and tracer coordinates.
-         Example of option call:
-         > locus(S,\"version\",1,\"vmov\",ideal(x1,y1))
+   \"vmov\", ideal(mover variables)  : by default vmov are the last n variables,
+   where n is the number of parameters of the ring (tracer variables plus extra
+   parameters). Thus, if the mover coordinates are not indicated, locus
+   algorithm will assume that they are the last n ring variables.
+   When locus is called internallt by envelop, by default, the mover variables
+   are assumed to be all the ring variables.
+   \"version\", v   :  There are two versions of the algorithm. (\"version\",1) is
+   a full algorithm that always distinguishes correctly between NORMAL
+   and SPECIAL components, whereas (\"version\",0) can declare a component
+   to be NORMAL being in fact SPECIAL, but it is more effective. By default,
+   (version,1) is used when the number of variables is less than 4 and 0 if not.
+   The user can force to use one or other version, but it is not recommended.
+   \"comments\", c: by default it is 0, but it can be set to 1.
+   Usually locus problems have mover coordinates, variables and tracer coordinates.
+   Example of option call:
+     locus(S,\"version\",1,\"vmov\",ideal(x1,y1))
 RETURN:  The output is a list of the components (C_1, .. , C_n ) of the locus.
-          The locus is divided into two class of subsets: the normal and the non-normal
-          locus.
-            The Normal locus has two kind of components: Normal and Special.
-            The Non-normal locus has two kind of components: Accumulation and Degenerate.
-         Each component is given by
-              Ci=((pi,(pi1,..pis_i),type_i,level_i)
-         where
-           the first element is the canonical P-representation of the subset.
-           The type can be : \"Normal\", \"Special\", \"Accumulation\", \"Degenerate\".
-         Normal component:
-           - the component has non-zero antiimage
-           - each point in the component has 0-dimensional antiimage.
-         Special component:
-           - Non-zero dimensional component whose antiimage is 0-dimensional.
-           The Special components return more information, namely the antiimage of
-           the component, that is 0-dimensional for these kind of components.
-         Accumulation points:
-           - Zero-dimensional  component whose anti-image is non-zero-dimensional.
-         Degenerate components:
-           - Non-zero-dimensional component
-           - each point in the component has non-zero-dimensional anti-image.
-        The level is the depth of the segment of the constructible locus subset
-        (normal and non-normal subsets).
-        If all levels of a locus are 1, then both subsets are locally closed.
+   The locus is divided into two class of subsets: the normal and the non-normal
+   locus.
+   The Normal locus has two kind of components: Normal and Special.
+   The Non-normal locus has two kind of components: Accumulation and Degenerate.
+   Each component is given by
+     Ci=((pi,(pi1,..pis_i),type_i,level_i)
+   where the first element is the canonical P-representation of the subset.
+   The type can be : \"Normal\", \"Special\", \"Accumulation\", \"Degenerate\".
+   Normal component:
+   - the component has non-zero antiimage
+   - each point in the component has 0-dimensional antiimage.
+   Special component:
+   - Non-zero dimensional component whose antiimage is 0-dimensional.
+   The Special components return more information, namely the antiimage of
+   the component, that is 0-dimensional for these kind of components.
+   Accumulation points:
+   - Zero-dimensional  component whose anti-image is non-zero-dimensional.
+   Degenerate components:
+   - Non-zero-dimensional component
+   - each point in the component has non-zero-dimensional anti-image.
+   The level is the depth of the segment of the constructible locus subset
+   (normal and non-normal subsets).
+   If all levels of a locus are 1, then both subsets are locally closed.
 NOTE: The input must be the grobcov of the locus system in generic
-        representation ('ext',0), which is the default.
+   representation (\"ext\",0), which is the default.
 KEYWORDS: geometrical locus; locus; loci.
-EXAMPLE: locus; shows an example"
+EXAMPLE: example locus; shows an example"
 {
   int tes=0; int i;
   def R=basering;
@@ -4884,7 +4875,7 @@ EXAMPLE: locus; shows an example"
     else
     {
       " ";string("Warning! Problem with more than one mover.");
-      string("Try option 'vmov',ideal(of mover variables) to avoid some point of the mover");
+      string("Try option \"vmov\",ideal(of mover variables) to avoid some point of the mover");
       " ";"Elements of the basis of the generic segment in mover variables=";  N;" ";
       list L; return(L);
     }
@@ -4919,14 +4910,15 @@ example
 //          The components are given in canonical P-representation of the subset.
 //               If all levels of a class of locus are 1, then the set is locally closed. Otherwise the level
 //               gives the depth of the component of the constructible set.
+
 proc locusdg(list L)
 "USAGE: locusdg(L);
            Calling sequence:
                 locusdg(locus(grobcov(S))).
-RETURN: The output is the list of the 'Relevant' components of the locus
+RETURN: The output is the list of the RELEVANT components of the locus
            in Dynamic Geometry:(C1,..,C:m), where
-                 C_i= ( p_i,(p_i1,..p_is_i), 'Relevant', level_i )
-           The 'Relevant' components are the 'Normal' and 'Accumulation' components
+                 C_i= ( p_i,(p_i1,..p_is_i), RELEVANT, level_i )
+           The RELEVANT components are the NORMAL and ACCUMULATION components
            of the locus. (See help for locus).
 KEYWORDS: geometrical locus; locus; loci; dynamic geometry
 EXAMPLE: example locusdg; shows an example"
@@ -5045,41 +5037,42 @@ example
 //   ideal C=g1,..,g_{n-1}:  the set of constraints;
 //   options.
 // Output: the components of the envolvent;
+
 proc envelop(poly F, ideal C, list #)
-"USAGE: envelop(F,C);
-          The first argument poly F must be the family of hypersurfaces for which
-          on want to compute its envelop.
-          The second argument C must be the ideal of restrictions on
-          the variables, and should contain less polynomials
-          than the number of variables
-          (x_1,..,x_n) are the variables of the hypersurfaces of F, that are considered
-          as parameters of the parametric ring.
-          (u_1,..,u_m) are the parameteres of the hypersurfaces, that are considered
-          as variables of the parametric ring.
-          Calling sequence:
-              ring R=(0,x_1,..,x_n),(u_1,..,u_m),lp;
-              poly F=F(x_1,..,x_n,u_1,..,u_m);
-              ideal C=g_1(u_1,..u_m),..,g_s(u_1,..u_m);
-              envelop(F,C,#options);
-           where s<m.
+"USAGE: envelop(F,C,[,options]);
+   The first argument poly F must be the family of hypersurfaces for which
+   on want to compute its envelop.
+   The second argument C must be the ideal of restrictions on
+   the variables, and should contain less polynomials
+   than the number of variables
+   (x_1,..,x_n) are the variables of the hypersurfaces of F, that are considered
+   as parameters of the parametric ring.
+   (u_1,..,u_m) are the parameteres of the hypersurfaces, that are considered
+   as variables of the parametric ring.
+   Calling sequence:
+     ring R=(0,x_1,..,x_n),(u_1,..,u_m),lp;
+     poly F=F(x_1,..,x_n,u_1,..,u_m);
+     ideal C=g_1(u_1,..u_m),..,g_s(u_1,..u_m);
+     envelop(F,C,#options);
+   where s<m.
 OPTIONS: The algorithm allows the following options as pair of arguments:
-         \"vmov\", ideal(mover variables)  : by default vmov are  u_1,..,u_m.
-         But it can be restricted by the user to the more convenient ones.
-         \"version\", v   :  There are two versions of the algorithm. (\"version\",1) is
-         a full algorithm that always distinguishes correctly between 'Normal'
-         and 'Special' components, whereas \("version\",0) can decalre a component
-         as 'Normal' being really 'Special', but is more effective. By default (\"version\",1)
-         is used when the number of variables is less than 4 and 0 if not.
-         The user can force to use one or other version, but it is not recommended.
-         \"comments\", c: by default it is 0, but it can be set to 1.
+   \"vmov\", ideal(mover variables)  : by default vmov are  u_1,..,u_m.
+   But it can be restricted by the user to the more convenient ones.
+   \"version\", v   :  There are two versions of the algorithm. (\"version\",1) is
+   a full algorithm that always distinguishes correctly between NORMAL
+   and SPECIAL components, whereas (\"version\",0) can declare a component
+   as NORMAL being really SPECIAL, but is more effective. By default (\"version\",1)
+   is used when the number of variables is less than 4 and 0 if not.
+   The user can force to use one or other version, but it is not recommended.
+   \"comments\", c: by default it is 0, but it can be set to 1.
 RETURN: The components of the envelop with its taxonomy:
-           (see locus help). envelop uses locus.
-           The taxonomy distinguishes \"Normal\",
-          \"Special\", \"Accumulation\", \"Degenerate\" components.
-          In the case of \"Special\" components, it also
-          outputs the anti-image of the component
+   (see locus help). envelop uses locus.
+   The taxonomy distinguishes \"Normal\",
+   \"Special\", \"Accumulation\", \"Degenerate\" components.
+   In the case of \"Special\" components, it also
+   outputs the anti-image of the component
 NOTE: grobcov is called internally.
-          The basering R, must be of the form Q[a][x] (a=parameters, x=variables).
+   The basering R, must be of the form Q[a][x] (a=parameters, x=variables).
 KEYWORDS: geometrical locus; locus; loci; envelop
 EXAMPLE:  example envelop; shows an example"
 {
@@ -5276,41 +5269,40 @@ example
   envelop(F,C);
 }
 
-proc AssocTanToEnv(poly F,ideal C, poly E, list #)
-"USAGE: AssocTanToEnv(F,C,E);
-          The first argument poly F must be the family of hypersurfaces for which
-          on want to compute its envelop.
-          The second argument C must be the ideal of restrictions on
-          the variables, and should contain s  polynomials
-          being s<n,
-          (x_1,..,x_n) are the variables of the hypersurfaces of F, that are considered
-          as parameters of the parametric ring.
-          (u_1,..,u_m) are the parameteres of the hypersurfaces, that are considered
-          as variables of the parametric ring.
-          The third parameter poly E must be the equation of a component of the
-          envelop of (F,C) previously determined by envelop.
-          Calling sequence:
-              ring R=(0,x_1,..,x_n),(u_1,..,u_m),lp;
-              poly F=F(x_1,..,x_n,u_1,..,u_m);
-              ideal C=g_1(u_1,..u_m),..,g_s(u_1,..u_m);
-              poly E(x_1,..,x_n);
-              AssocTanToEnv(F,C,E,#options);
-
+proc AssocTanToEnv(poly F,ideal C,poly E,list #)
+"USAGE: AssocTanToEnv(F,C,E,[options]);
+   The first argument poly F must be the family of hypersurfaces for which
+   on want to compute its envelop.
+   The second argument C must be the ideal of restrictions on
+   the variables, and should contain s  polynomials
+   being s<n,
+   (x_1,..,x_n) are the variables of the hypersurfaces of F, that are considered
+   as parameters of the parametric ring.
+   (u_1,..,u_m) are the parameteres of the hypersurfaces, that are considered
+   as variables of the parametric ring.
+   The third parameter poly E must be the equation of a component of the
+   envelop of (F,C) previously determined by envelop.
+   Calling sequence:
+     ring R=(0,x_1,..,x_n),(u_1,..,u_m),lp;
+     poly F=F(x_1,..,x_n,u_1,..,u_m);
+     ideal C=g_1(u_1,..u_m),..,g_s(u_1,..u_m);
+     poly E(x_1,..,x_n);
+     AssocTanToEnv(F,C,E,#options);
 OPTIONS: The algorithm allows the following options as pair of arguments:
-         \"vmov\", ideal(mover variables)  : by default vmov are  u_1,..,u_m.
-         But it can be restricted by the user to the more convenient ones.
-         \"version\", v   :  There are two versions of the algorithm. (\"version\",1) is
-         a full algorithm that always distinguishes correctly between 'Normal'
-         and 'Special' components, whereas \("version\",0) can decalre a component
-         as 'Normal' being really 'Special', but is more effective. By default (\"version\",1)
-         is used when the number of variables is less than 4 and 0 if not.
-         The user can force to use one or other version, but it is not recommended.
-         \"comments\", c: by default it is 0, but it can be set to 1.
+     \"vmov\", ideal(mover variables)  : by default vmov are  u_1,..,u_m.
+     But it can be restricted by the user to the more convenient ones.
+     \"version\", v   :  There are two versions of the algorithm. (\"version\",1) is
+     a full algorithm that always distinguishes correctly between NORMAL
+     and SPECIAL components, whereas (\"version\",0) can decalre a component
+     as NORMAL being really SPECIAL, but is more effective. By default (\"version\",1)
+     is used when the number of variables is less than 4 and 0 if not.
+     The user can force to use one or other version, but it is not recommended.
+     \"comments\", c: by default it is 0, but it can be set to 1.
 RETURN: The interesting segments of the grobcov each one with (lpp,basis,segment).
-        Fixing the values of (x_1,..,x_n) inside E, the basis allows to detemine the values of the parameters
-        u_1,..u_m.
+     Fixing the values of (x_1,..,x_n) inside E, the basis allows to detemine the values of the parameters
+     u_1,..u_m.
 NOTE: grobcov is called internally.
-          The basering R, must be of the form Q[a][x] (a=parameters, x=variables).
+     The basering R, must be of the form Q[a][x] (a=parameters, x=variables).
 KEYWORDS: geometrical locus; locus; loci; envelop, associated tangent
 EXAMPLE:  example AssocTanToEnv; shows an example"
 {
@@ -5424,7 +5416,7 @@ example
   subst(F,t,(5/12)*y0);
 }
 
-proc FamElemsAtEnvCompPoints(poly F,ideal C, poly E, list #)
+proc FamElemsAtEnvCompPoints(poly F,ideal C,poly E,list #)
 "USAGE: FamElemsAtEnvCompPoints(F,C,E[,options]);
           The first argument poly F must be the family of hypersurfaces for which
           on want to compute its envelop.
@@ -5504,7 +5496,7 @@ example
 }
 
 // discrim
-proc discrim(poly F0, poly x0)
+proc discrim(poly F0,poly x0)
 "USAGE: discrim(f,x);
           poly f: the polynomial in Q[a][x] or Q[x] of degree 2 in x
           poly x: a variable in the ring.
@@ -5644,7 +5636,8 @@ static proc LocusConsLevels(list L)
 //          F is a generating ideal in V(a);
 // output:  ideal b in @R but depending only on parameters
 //              ideal G=GBasis(F) in V(a) \ V(b)
-proc WLemma(ideal F,ideal a, list #)
+
+proc WLemma(ideal F,ideal a,list #)
 "USAGE: WLemma(F,A,#);
           The first argument ideal F in K[a][x];
           The second argument ideal A in K[a]
@@ -5663,7 +5656,7 @@ RETURN: The list of (lpp,B,S) = (leading power product, basis, segment)
               of the specialized ideal F on the
               segment S given in P- or C-representation
 NOTE: The basering R, must be of the form Q[a][x] (a=parameters, x=variables).
-KEYWORDS: Wibmer's Lemma
+KEYWORDS: Wibmers Lemma
 EXAMPLE:  WLemma; shows an example"
 {
   list L=#;
