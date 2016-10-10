@@ -110,7 +110,7 @@ int ksReducePoly(LObject* PR,
   //if (tailRing != currRing)
   {
     // check that reduction does not violate exp bound
-    while (PW->max != NULL && !p_LmExpVectorAddIsOk(lm, PW->max, tailRing))
+    while (PW->max_exp != NULL && !p_LmExpVectorAddIsOk(lm, PW->max_exp, tailRing))
     {
       // undo changes of lm
       p_ExpVectorAdd(lm, p2, tailRing);
@@ -242,7 +242,7 @@ int ksReducePolyBound(LObject* PR,
   if (tailRing != currRing)
   {
     // check that reduction does not violate exp bound
-    while (PW->max != NULL && !p_LmExpVectorAddIsOk(lm, PW->max, tailRing))
+    while (PW->max_exp != NULL && !p_LmExpVectorAddIsOk(lm, PW->max_exp, tailRing))
     {
       // undo changes of lm
       p_ExpVectorAdd(lm, p2, tailRing);
@@ -448,7 +448,7 @@ int ksReducePolySig(LObject* PR,
   if (tailRing != currRing)
   {
     // check that reduction does not violate exp bound
-    while (PW->max != NULL && !p_LmExpVectorAddIsOk(lm, PW->max, tailRing))
+    while (PW->max_exp != NULL && !p_LmExpVectorAddIsOk(lm, PW->max_exp, tailRing))
     {
       // undo changes of lm
       p_ExpVectorAdd(lm, p2, tailRing);
@@ -698,7 +698,7 @@ pWrite(PW->p);pWrite(PW->sig);
   if (tailRing != currRing)
   {
     // check that reduction does not violate exp bound
-    while (PW->max != NULL && !p_LmExpVectorAddIsOk(lm, PW->max, tailRing))
+    while (PW->max_exp != NULL && !p_LmExpVectorAddIsOk(lm, PW->max_exp, tailRing))
     {
       // undo changes of lm
       p_ExpVectorAdd(lm, p2, tailRing);

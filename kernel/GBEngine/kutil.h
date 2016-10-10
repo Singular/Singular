@@ -74,7 +74,7 @@ public:
   poly sig;   // the signature of the element
   poly p;       // Lm(p) \in currRing Tail(p) \in tailRing
   poly t_p;     // t_p \in tailRing: as monomials Lm(t_p) == Lm(p)
-  poly max;     // p_GetMaxExpP(pNext(p))
+  poly max_exp;     // p_GetMaxExpP(pNext(p))
   ring tailRing;
   long FDeg;    // pFDeg(p)
   int ecart,

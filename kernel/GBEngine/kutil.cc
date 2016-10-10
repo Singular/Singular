@@ -278,10 +278,10 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
             assume(L->p != NULL && p == L->t_p);
             pNext(L->p) = NULL;
           }
-          L->max  = NULL;
+          L->max_exp  = NULL;
         }
         else if (fromNext)
-          L->max  = p_GetMaxExpP(pNext(L->p), L->tailRing ); // p1;
+          L->max_exp  = p_GetMaxExpP(pNext(L->p), L->tailRing ); // p1;
         //if (L->pLength != 0)
         L->pLength = l;
         // Hmmm when called from updateT, then only
@@ -387,7 +387,7 @@ void cancelunit (LObject* L,BOOLEAN inNF)
         L->length = 1;
         //if (L->pLength > 0)
         L->pLength = 1;
-        L->max = NULL;
+        L->max_exp = NULL;
 
         if (L->t_p != NULL && pNext(L->t_p) != NULL)
           p_Delete(&pNext(L->t_p),r);
@@ -447,7 +447,7 @@ void cancelunit (LObject* L,BOOLEAN inNF)
         L->length = 1;
         //if (L->pLength > 0)
         L->pLength = 1;
-        L->max = NULL;
+        L->max_exp = NULL;
 
         if (L->t_p != NULL && pNext(L->t_p) != NULL)
           p_Delete(&pNext(L->t_p),r);
@@ -563,9 +563,9 @@ void cleanT (kStrategy strat)
   {
     p = strat->T[j].p;
     strat->T[j].p=NULL;
-    if (strat->T[j].max != NULL)
+    if (strat->T[j].max_exp != NULL)
     {
-      p_LmFree(strat->T[j].max, strat->tailRing);
+      p_LmFree(strat->T[j].max_exp, strat->tailRing);
     }
     i = -1;
     loop
@@ -614,9 +614,9 @@ void cleanTSbaRing (kStrategy strat)
   {
     p = strat->T[j].p;
     strat->T[j].p=NULL;
-    if (strat->T[j].max != NULL)
+    if (strat->T[j].max_exp != NULL)
     {
-      p_LmFree(strat->T[j].max, strat->tailRing);
+      p_LmFree(strat->T[j].max_exp, strat->tailRing);
     }
     i = -1;
     loop
@@ -803,25 +803,25 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
     {
       if (pNext(T->t_p) == NULL)
       {
-        if (T->max != NULL)
-          return dReportError("%c[%d].max is not NULL as it should be", TN, i);
+        if (T->max_exp != NULL)
+          return dReportError("%c[%d].max_exp is not NULL as it should be", TN, i);
       }
       else
       {
-        if (T->max == NULL)
-          return dReportError("%c[%d].max is NULL", TN, i);
-        if (pNext(T->max) != NULL)
-          return dReportError("pNext(%c[%d].max) != NULL", TN, i);
+        if (T->max_exp == NULL)
+          return dReportError("%c[%d].max_exp is NULL", TN, i);
+        if (pNext(T->max_exp) != NULL)
+          return dReportError("pNext(%c[%d].max_exp) != NULL", TN, i);
 
-        pFalseReturn(p_CheckPolyRing(T->max, tailRing));
-        omCheckBinAddrSize(T->max, (omSizeWOfBin(tailRing->PolyBin))*SIZEOF_LONG);
+        pFalseReturn(p_CheckPolyRing(T->max_exp, tailRing));
+        omCheckBinAddrSize(T->max_exp, (omSizeWOfBin(tailRing->PolyBin))*SIZEOF_LONG);
 #if KDEBUG > 0
         if (! sloppy_max)
         {
           poly test_max = p_GetMaxExpP(pNext(T->t_p), tailRing);
-          p_Setm(T->max, tailRing);
+          p_Setm(T->max_exp, tailRing);
           p_Setm(test_max, tailRing);
-          BOOLEAN equal = p_ExpVectorEqual(T->max, test_max, tailRing);
+          BOOLEAN equal = p_ExpVectorEqual(T->max_exp, test_max, tailRing);
           if (! equal)
             return dReportError("%c[%d].max out of sync", TN, i);
           p_LmFree(test_max, tailRing);
@@ -9545,10 +9545,10 @@ void enterT(LObject &p, kStrategy strat, int atT)
   #endif
   //printf("\nenterT: neue hingefügt: länge = %i, ecart = %i\n",p.length,p.ecart);
 
-  if (strat->tailRing != currRing && pNext(p.p) != NULL)
-    strat->T[atT].max = p_GetMaxExpP(pNext(p.p), strat->tailRing);
+  if (pNext(p.p) != NULL)
+    strat->T[atT].max_exp = p_GetMaxExpP(pNext(p.p), strat->tailRing);
   else
-    strat->T[atT].max = NULL;
+    strat->T[atT].max_exp = NULL;
 
   strat->tl++;
   strat->R[strat->tl] = &(strat->T[atT]);
@@ -9631,10 +9631,10 @@ void enterT_strong(LObject &p, kStrategy strat, int atT)
   #endif
   //printf("\nenterT_strong: neue hingefügt: länge = %i, ecart = %i\n",p.length,p.ecart);
 
-  if (strat->tailRing != currRing && pNext(p.p) != NULL)
-    strat->T[atT].max = p_GetMaxExpP(pNext(p.p), strat->tailRing);
+  if (pNext(p.p) != NULL)
+    strat->T[atT].max_exp = p_GetMaxExpP(pNext(p.p), strat->tailRing);
   else
-    strat->T[atT].max = NULL;
+    strat->T[atT].max_exp = NULL;
 
   strat->tl++;
   strat->R[strat->tl] = &(strat->T[atT]);
@@ -10674,13 +10674,13 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
       }
       #endif
 
-      if (strat->redTailChange && strat->tailRing != currRing)
+      if (strat->redTailChange)
       {
-        if (T_j->max != NULL) p_LmFree(T_j->max, strat->tailRing);
+        if (T_j->max_exp != NULL) p_LmFree(T_j->max_exp, strat->tailRing);
         if (pNext(T_j->p) != NULL)
-          T_j->max = p_GetMaxExpP(pNext(T_j->p), strat->tailRing);
+          T_j->max_exp = p_GetMaxExpP(pNext(T_j->p), strat->tailRing);
         else
-          T_j->max = NULL;
+          T_j->max_exp = NULL;
       }
       if (TEST_OPT_INTSTRATEGY)
         T_j->pCleardenom();
@@ -10826,8 +10826,8 @@ BOOLEAN kCheckSpolyCreation(LObject *L, kStrategy strat, poly &m1, poly &m2)
   {
     return TRUE;
   }
-  poly p1_max = (strat->R[L->i_r1])->max;
-  poly p2_max = (strat->R[L->i_r2])->max;
+  poly p1_max = (strat->R[L->i_r1])->max_exp;
+  poly p2_max = (strat->R[L->i_r2])->max_exp;
 
   if (((p1_max != NULL) && !p_LmExpVectorAddIsOk(m1, p1_max, strat->tailRing)) ||
       ((p2_max != NULL) && !p_LmExpVectorAddIsOk(m2, p2_max, strat->tailRing)))
@@ -10853,8 +10853,8 @@ BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat
   assume(strat->S_2_R[atS] >= -1 && strat->S_2_R[atS] <= strat->tl);
   //assume(strat->tailRing != currRing);
 
-  poly p1_max = (strat->R[atR])->max;
-  poly p2_max = (strat->R[strat->S_2_R[atS]])->max;
+  poly p1_max = (strat->R[atR])->max_exp;
+  poly p2_max = (strat->R[strat->S_2_R[atS]])->max_exp;
 
   if (((p1_max != NULL) && !p_LmExpVectorAddIsOk(m1, p1_max, strat->tailRing)) ||
       ((p2_max != NULL) && !p_LmExpVectorAddIsOk(m2, p2_max, strat->tailRing)))
@@ -11322,7 +11322,7 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
       L->tailRing = new_tailRing;
       L->p = t_l->p;
       L->t_p = t_l->t_p;
-      L->max = t_l->max;
+      L->max_exp = t_l->max_exp;
     }
   }
 
@@ -12735,7 +12735,7 @@ void enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV)
   {
     qq      = p; //qq.Copy();
     qq.p    = NULL;
-    qq.max  = NULL;
+    qq.max_exp  = NULL;
     qq.t_p = p_LPshift(p_Copy(p.t_p,strat->tailRing), i, uptodeg, lV, strat->tailRing); // direct shift
     qq.GetP();
     // update q.sev

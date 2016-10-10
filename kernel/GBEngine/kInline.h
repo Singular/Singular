@@ -375,19 +375,13 @@ sTObject::ShallowCopyDelete(ring new_tailRing, omBin new_tailBin,
       pNext(t_p) = pNext(p);
     }
   }
-  if (max != NULL)
+  if (max_exp != NULL)
   {
-    if (new_tailRing == currRing)
-    {
-      p_LmFree(max, tailRing);
-      max = NULL;
-    }
-    else
-      max = p_shallow_copy_delete(max,tailRing,new_tailRing,new_tailBin);
+    max_exp = p_shallow_copy_delete(max_exp,tailRing,new_tailRing,new_tailBin);
   }
-  else if (set_max && new_tailRing != currRing && pNext(t_p) != NULL)
+  else if (set_max && pNext(t_p) != NULL)
   {
-    max = p_GetMaxExpP(pNext(t_p), new_tailRing);
+    max_exp = p_GetMaxExpP(pNext(t_p), new_tailRing);
   }
   tailRing = new_tailRing;
 }

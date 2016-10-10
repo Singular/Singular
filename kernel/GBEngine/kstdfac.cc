@@ -56,7 +56,7 @@ static void copyT (kStrategy o,kStrategy n)
       }
     }
     t[j].t_p = NULL; // ?? or t[j].p ??
-    t[j].max = NULL; // ?? or p_GetMaxExpP(t[j].t_p,o->tailRing); ??
+    t[j].max_exp = NULL; // ?? or p_GetMaxExpP(t[j].t_p,o->tailRing); ??
     t[j].pLength =  pLength(p);
   }
   n->T=t;
