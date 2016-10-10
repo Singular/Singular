@@ -36,6 +36,11 @@ int create_count = 0;
  * Reduces PR with PW
  * Assumes PR != NULL, PW != NULL, Lm(PW) divides Lm(PR)
  *
+ * returns 0: okay
+ *         1: tailRing changed
+ *         -1: cannot change tailRing
+ *         2: cannot change tailRing: strat==NULL
+ *
  ***************************************************************/
 int ksReducePoly(LObject* PR,
                  TObject* PW,
