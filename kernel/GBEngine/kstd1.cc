@@ -3495,21 +3495,16 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
     if (strat->completeReduce_retry)
     {
       // completeReduce needed larger exponents, retry
-      // to reduce with S (instead of T)
-      // and in currRing (instead of strat->tailRing)
-      cleanT(strat);strat->tailRing=currRing;
-      int i;
-      for(i=strat->sl;i>=0;i--) strat->S_2_R[i]=-1;
+      // hopefully: kStratChangeTailRing already provided a larger tailRing
+      //    (otherwise: it will fail again)
       strat->completeReduce_retry=FALSE;
       completeReduce(strat);
       if (strat->completeReduce_retry)
       {
-        // completeReduce needed larger exponents, retry
-        // to reduce with S (instead of T)
-        // and in currRing (instead of strat->tailRing)
 #ifdef HAVE_TAIL_RING
         if(currRing->bitmask>strat->tailRing->bitmask)
         {
+	  // retry without T
           strat->completeReduce_retry=FALSE;
           cleanT(strat);strat->tailRing=currRing;
           int i;

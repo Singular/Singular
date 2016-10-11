@@ -1090,13 +1090,13 @@ void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether, ring r)
 
 KINLINE poly redtailBba (poly p,int pos,kStrategy strat,BOOLEAN normalize)
 {
-  LObject L(p, currRing, strat->tailRing);
+  LObject L(p);
   return redtailBba(&L, pos, strat,FALSE, normalize);
 }
 
 KINLINE poly redtailBbaBound (poly p,int pos,kStrategy strat,int bound,BOOLEAN normalize)
 {
-  LObject L(p, currRing, strat->tailRing);
+  LObject L(p, currRing, strat->tailRing); // ? L(p); ??
   return redtailBbaBound(&L, pos, strat,bound, FALSE, normalize);
 }
 
