@@ -172,13 +172,13 @@ example
     nchilb(ll,7,1);
     
     ring r=0,(x,y,z),dp;
-    module p1=[0]; //zero ideal
-    list l1=list(p1);
-    nchilb(l1,2);
+    module p1=[1,x,z,y,z,x,z];
+    module p2=[1,x,z,x];
+    module p3=[1,x,z,y,z,z,x,z];
+    module p4=[1,y,z];
+    module p5=[1,x,z,z,x,z];
     
-    ring r=0,(x,y,z),dp;
-    module p1=[1]; //unit ideal
-    list l1=list(p1);
-    nchilb(l1,2);
+    list l1=list(p1,p2,p3,p4,p5);
+    nchilb(l1,7);
 }
 
