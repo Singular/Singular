@@ -504,7 +504,9 @@ static ideal computeFrame(const ideal G, const syzM_i_Function syzM_i,
 static void computeLiftings(const resolvente res, const int index,
     std::vector<bool> &variables, lts_hash *&hash_previous_module)
 {
-    update_variables(variables, res[index-1]);
+    if (index > 1) {   // we don't know if the input is a reduced SB
+        update_variables(variables, res[index-1]);
+    }
     lts_hash *hash_current_module = new lts_hash();
     initialize_lts_hash(*hash_current_module, res[index]);
     for (int j = res[index]->ncols-1; j >= 0; j--) {
