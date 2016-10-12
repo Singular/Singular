@@ -667,7 +667,13 @@ Voice * feInitStdin(Voice *pp)
   {
     p->files=freopen("/dev/tty","r",stdin);
     //stdin=p->files;
-    p->sw = BI_stdin;
+    if (p->files==NULL)
+    {
+      p->files = stdin;
+      p->sw = BI_file;
+    }
+    else
+      p->sw = BI_stdin;
   }
   p->filename   = omStrDup("STDIN");
   p->start_lineno   = 1;

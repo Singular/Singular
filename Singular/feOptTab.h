@@ -72,7 +72,7 @@ struct fe_option feOptSpec[] =
 #endif
 
   {"batch",             no_argument,        'b',
-   0,          "Run in batch mode",                                    feOptBool,    0,     0},
+   0,          "Run in batch mode (requires --link/--MPhost/--MPport)",                                    feOptBool,    0,     0},
 
   {"execute",           required_argument,  'c',
    "STRING",   "Execute STRING on start-up",                           feOptString, 0,   0},

@@ -224,10 +224,8 @@ static const char* feOptAction(feOptIndex opt)
         return NULL;
 
       case FE_OPT_NO_TTY:
-#if defined(HAVE_FEREAD) || defined(HAVE_READLINE)
         if (feOptSpec[FE_OPT_NO_TTY].value)
           fe_fgets_stdin=fe_fgets;
-#endif
         return NULL;
 
       case FE_OPT_SDB:

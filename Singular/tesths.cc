@@ -156,12 +156,6 @@ int main(          /* main entry to Singular */
 #ifdef SI_COUNTEDREF_AUTOLOAD
   countedref_init();
 #endif
-// #ifdef HAVE_FANS
-//   bbcone_setup();
-//   bbpolytope_setup();
-//   bbfan_setup();
-//   gitfan_setup();
-// #endif /* HAVE_FANS */
   errorreported = 0;
 
   // -- example for "static" modules ------
@@ -227,6 +221,11 @@ int main(          /* main entry to Singular */
       return ssiBatch((char*) feOptValue(FE_OPT_MPHOST),(char*) feOptValue(FE_OPT_MPPORT));
       //Print("batch: p:%s, h:%s\n",(char*) feOptValue(FE_OPT_MPPORT),(char*) feOptValue(FE_OPT_MPHOST));
       //exit(0);
+    }
+    else
+    {
+      Print("** missing arguments: -b requires --link/--MPhost/--MPport\n");
+      return 1;
     }
   }
   setjmp(si_start_jmpbuf);
