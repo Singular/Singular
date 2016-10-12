@@ -562,7 +562,7 @@ do                                                                \
 {                                                                 \
     p = r;                                                        \
     q = p->next;                                                  \
-    if (p_LmCmp(p, q, R) != 1) {                                  \
+    if (q != NULL && p_LmCmp(p, q, R) != 1) {                     \
         while (q->next != NULL && p_LmCmp(p, q->next, R) == -1) { \
             pIter(q);                                             \
         }                                                         \
