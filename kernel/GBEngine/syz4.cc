@@ -84,9 +84,6 @@ poly FindReducer(const poly multiplier, const poly t, const lts_hash *m_div)
   }
   lts_vector::const_iterator m_current = (m_itr->second).begin();
   lts_vector::const_iterator m_finish  = (m_itr->second).end();
-  if (m_current == m_finish) {
-    return NULL;
-  }
   const poly q = p_New(r);
   pNext(q) = NULL;
   const unsigned long m_not_sev = ~p_GetShortExpVector(multiplier, t, r);
