@@ -75,27 +75,8 @@ static void initialize_lts_hash(lts_hash &C, const ideal L)
 
 #define delete_lts_hash(C) C->clear()
 
-bool is_divisible(const lts_hash *C, const poly p)
-{
-    const ring R = currRing;
-    lts_hash::const_iterator itr = C->find(p_GetComp(p, R));
-    if (itr == C->end()) {
-        return false;
-    }
-    lts_vector::const_iterator v_current = itr->second.begin();
-    lts_vector::const_iterator v_finish  = itr->second.end();
-    const unsigned long not_sev = ~p_GetShortExpVector(p, R);
-    for ( ; v_current != v_finish; ++v_current) {
-        if (p_LmShortDivisibleByNoComp(v_current->lt, v_current->sev,
-                p, not_sev, R)) {
-            return true;
-        }
-    }
-    return false;
-}
-
 poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
-    const lts_hash *syz_checker, const lts_hash *m_div)
+    const lts_hash *m_div)
 {
   const ring r = currRing;
   lts_hash::const_iterator m_itr = m_div->find(p_GetComp(t, currRing));
@@ -129,9 +110,6 @@ poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
         && p_ExpVectorEqual(syzterm, q, r)) {
       continue;
     }
-    if (is_divisible(syz_checker, q)) {
-      continue;
-    }
     number n = n_Mult(p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
     p_SetCoeff0(q, n_InpNeg(n, r), r);
     return q;
@@ -142,23 +120,21 @@ poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
 
 static poly TraverseTail_test(poly multiplier, const int tail,
    const ideal previous_module, const std::vector<bool> &variables,
-   const lts_hash *m_div, const lts_hash *m_checker);
+   const lts_hash *m_div);
 
 static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
     poly syztermCheck, const ideal previous_module,
-    const std::vector<bool> &variables, const lts_hash *m_div,
-    const lts_hash *m_checker)
+    const std::vector<bool> &variables, const lts_hash *m_div)
 {
   const ring r = currRing;
-  poly s = FindReducer(multiplier, term4reduction, syztermCheck, m_checker,
-        m_div);
+  poly s = FindReducer(multiplier, term4reduction, syztermCheck, m_div);
   if( s == NULL )
   {
     return NULL;
   }
   const int c = p_GetComp(s, r) - 1;
   const poly t
-      = TraverseTail_test(s, c, previous_module, variables, m_div, m_checker);
+      = TraverseTail_test(s, c, previous_module, variables, m_div);
   if( t != NULL )
     s = p_Add_q(s, t, r);
   return s;
@@ -166,7 +142,7 @@ static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
 
 static poly ComputeImage_test(poly multiplier, const int t,
     const ideal previous_module, const std::vector<bool> &variables,
-    const lts_hash *m_div, const lts_hash *m_checker)
+    const lts_hash *m_div)
 {
   const poly tail = previous_module->m[t]->next;
   if(tail != NULL)
@@ -179,7 +155,7 @@ static poly ComputeImage_test(poly multiplier, const int t,
     for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
     {
       const poly rt = ReduceTerm_test(multiplier, p, NULL, previous_module,
-          variables, m_div, m_checker);
+          variables, m_div);
       sBucket_Add_p(sum, rt, pLength(rt));
     }
     poly s;
@@ -254,7 +230,7 @@ static void delete_cache()
 
 static poly TraverseTail_test(poly multiplier, const int tail,
     const ideal previous_module, const std::vector<bool> &variables,
-    const lts_hash *m_div, const lts_hash *m_checker)
+    const lts_hash *m_div)
 {
   const ring& r = currRing;
 #if CACHE
@@ -277,7 +253,7 @@ static poly TraverseTail_test(poly multiplier, const int tail,
        return p;
      }
      const poly p = ComputeImage_test(multiplier, tail, previous_module,
-         variables, m_div, m_checker);
+         variables, m_div);
      itr = T.find(multiplier);
      if( itr == T.end() )
      {
@@ -289,7 +265,7 @@ static poly TraverseTail_test(poly multiplier, const int tail,
   }
 #endif   // CACHE
   const poly p = ComputeImage_test(multiplier, tail, previous_module,
-      variables, m_div, m_checker);
+      variables, m_div);
 #if CACHE
   top_itr = m_cache_test.find(tail);
   if ( top_itr != m_cache_test.end() )
@@ -316,14 +292,13 @@ static poly TraverseTail_test(poly multiplier, const int tail,
 }
 
 static poly lift_ext_LT(const poly a, const ideal previous_module,
-    const std::vector<bool> &variables, const lts_hash *m_div,
-    const lts_hash *m_checker)
+    const std::vector<bool> &variables, const lts_hash *m_div)
 {
   const ring R = currRing;
   poly t1 = TraverseTail_test(a, p_GetComp(a, R)-1,
-      previous_module, variables, m_div, m_checker);
+      previous_module, variables, m_div);
   poly t2 = TraverseTail_test(a->next, p_GetComp(a->next, R)-1,
-      previous_module, variables, m_div, m_checker);
+      previous_module, variables, m_div);
   t1 = p_Add_q(t1, t2, R);
   return t1;
 }
@@ -502,21 +477,19 @@ static ideal computeFrame(const ideal G, const syzM_i_Function syzM_i,
 }
 
 static void computeLiftings(const resolvente res, const int index,
-    std::vector<bool> &variables, lts_hash *&hash_previous_module)
+    std::vector<bool> &variables)
 {
     if (index > 1) {   // we don't know if the input is a reduced SB
         update_variables(variables, res[index-1]);
     }
-    lts_hash *hash_current_module = new lts_hash();
-    initialize_lts_hash(*hash_current_module, res[index]);
+    lts_hash *hash_previous_module = new lts_hash();
+    initialize_lts_hash(*hash_previous_module, res[index-1]);
     for (int j = res[index]->ncols-1; j >= 0; j--) {
         res[index]->m[j]->next->next = lift_ext_LT(res[index]->m[j],
-            res[index-1], variables, hash_previous_module,
-            hash_current_module);
+            res[index-1], variables, hash_previous_module);
     }
     delete_lts_hash(hash_previous_module);
     delete(hash_previous_module);
-    hash_previous_module = hash_current_module;
 #if CACHE
     delete_cache();
 #endif   // CACHE
@@ -532,11 +505,9 @@ static int computeResolution(resolvente &res, const int length,
         res[index] = computeFrame(res[index-1], syzM_i_unsorted, syzHead);
         std::vector<bool> variables;
         variables.resize(currRing->N, true);
-        lts_hash *hash_previous_module = new lts_hash();
-        initialize_lts_hash(*hash_previous_module, res[index-1]);
         while (!idIs0(res[index])) {
 #if 1
-            computeLiftings(res, index, variables, hash_previous_module);
+            computeLiftings(res, index, variables);
 #endif   // LIFT
             if (index < max_index) {
                 index++;
@@ -547,8 +518,6 @@ static int computeResolution(resolvente &res, const int length,
                 break;
             }
         }
-        delete_lts_hash(hash_previous_module);
-        delete(hash_previous_module);
         variables.clear();
     }
     max_index = index+1;
