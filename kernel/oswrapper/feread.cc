@@ -341,7 +341,7 @@ static char * fe_fgets_stdin_init(const char *pr,char *s, int size)
     #ifdef atarist
       rl_outstream = fopen( "/dev/tty", "w" );
     #else
-      rl_outstream = fopen( ttyname(fileno(stdin)), "w" );
+      rl_outstream = fopen( ttyname(fileno(stdout)), "w" );
     #endif
   }
 
@@ -394,7 +394,7 @@ static char * fe_fgets_stdin_init(const char *pr,char *s, int size)
     #ifdef atarist
       *fe_rl_outstream = fopen( "/dev/tty", "w" );
     #else
-      *fe_rl_outstream = fopen( ttyname(fileno(stdin)), "w" );
+      *fe_rl_outstream = fopen( ttyname(fileno(stdout)), "w" );
     #endif
   }
 
