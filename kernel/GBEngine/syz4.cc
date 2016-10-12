@@ -75,8 +75,7 @@ static void initialize_lts_hash(lts_hash &C, const ideal L)
 
 #define delete_lts_hash(C) C->clear()
 
-poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
-    const lts_hash *m_div)
+poly FindReducer(const poly multiplier, const poly t, const lts_hash *m_div)
 {
   const ring r = currRing;
   lts_hash::const_iterator m_itr = m_div->find(p_GetComp(t, currRing));
@@ -105,11 +104,6 @@ poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
     p_ExpVectorDiff(q, q, p, r); // (LM(product) / LM(L[k]))
     p_SetComp(q, k + 1, r);
     p_Setm(q, r);
-    // cannot allow something like: a*gen(i) - a*gen(i)
-    if (syzterm != NULL && (k == p_GetComp(syzterm, r) - 1)
-        && p_ExpVectorEqual(syzterm, q, r)) {
-      continue;
-    }
     number n = n_Mult(p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
     p_SetCoeff0(q, n_InpNeg(n, r), r);
     return q;
@@ -123,11 +117,11 @@ static poly TraverseTail_test(poly multiplier, const int tail,
    const lts_hash *m_div);
 
 static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
-    poly syztermCheck, const ideal previous_module,
-    const std::vector<bool> &variables, const lts_hash *m_div)
+    const ideal previous_module, const std::vector<bool> &variables,
+    const lts_hash *m_div)
 {
   const ring r = currRing;
-  poly s = FindReducer(multiplier, term4reduction, syztermCheck, m_div);
+  poly s = FindReducer(multiplier, term4reduction, m_div);
   if( s == NULL )
   {
     return NULL;
@@ -154,7 +148,7 @@ static poly ComputeImage_test(poly multiplier, const int t,
     sBucket_pt sum = sBucketCreate(currRing);
     for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
     {
-      const poly rt = ReduceTerm_test(multiplier, p, NULL, previous_module,
+      const poly rt = ReduceTerm_test(multiplier, p, previous_module,
           variables, m_div);
       sBucket_Add_p(sum, rt, pLength(rt));
     }
