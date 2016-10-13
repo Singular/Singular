@@ -803,10 +803,10 @@ int fe_init_dyn_rl()
     if (fe_using_history==NULL) { res=13; break; }
     fe_read_history=dynl_sym(fe_rl_hdl,"read_history");
     if (fe_read_history==NULL) { res=14; break; }
-    return 0;
+    break;
   }
-  dynl_close(fe_rl_hdl);
-  if (res==0)
+  if (res!=0) dynl_close(fe_rl_hdl);
+  else
   {
     char *p;
     /* more init stuff: */

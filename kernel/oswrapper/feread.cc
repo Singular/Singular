@@ -341,19 +341,28 @@ static char * fe_fgets_stdin_init(const char *pr,char *s, int size)
     #ifdef atarist
       rl_outstream = fopen( "/dev/tty", "w" );
     #else
-      rl_outstream = fopen( ttyname(fileno(stdout)), "w" );
+      char *fn=ttyname(fileno(stdin));//if stdout is not a tty, maybe stdin is?
+      if (fn!=NULL) rl_outstream = fopen( fn, "w" );
     #endif
   }
 
-  /* try to read a history */
-  using_history();
-  char *p = getenv("SINGULARHIST");
-  if (p != NULL)
+  if(isatty(fileno(stdin)))
   {
-    read_history (p);
+    /* try to read a history */
+    using_history();
+    char *p = getenv("SINGULARHIST");
+    if (p != NULL)
+    {
+      read_history (p);
+    }
+    fe_fgets_stdin=fe_fgets_stdin_rl;
+    return(fe_fgets_stdin_rl(pr,s,size));
   }
-  fe_fgets_stdin=fe_fgets_stdin_rl;
-  return(fe_fgets_stdin_rl(pr,s,size));
+  else
+  {
+    fe_fgets_stdin=fe_fgets;
+    return(fe_fgets(pr,s,size));
+  }
 #endif
 #ifdef HAVE_DYN_RL
   /* do dynamic loading */
@@ -373,7 +382,7 @@ static char * fe_fgets_stdin_init(const char *pr,char *s, int size)
     #endif
     return fe_fgets_stdin(pr,s,size);
   }
-  else /* could load libreadline: */
+  else if (isatty(STDIN_FILENO))/*and could load libreadline: */
   {
     /* Allow conditional parsing of the ~/.inputrc file. */
     *fe_rl_readline_name = "Singular";
@@ -386,20 +395,25 @@ static char * fe_fgets_stdin_init(const char *pr,char *s, int size)
     {
       (*fe_read_history) (p);
     }
-  }
 
-  /* set the output stream */
-  if(!isatty(STDOUT_FILENO))
+    /* set the output stream */
+    if(!isatty(STDOUT_FILENO))
+    {
+      #ifdef atarist
+        *fe_rl_outstream = fopen( "/dev/tty", "w" );
+      #else
+        char *fn=ttyname(fileno(stdin));//if stdout is not a tty, maybe stdin is?
+        if (fn!=NULL) *fe_rl_outstream = fopen( fn, "w" );
+      #endif
+    }
+    fe_fgets_stdin=fe_fgets_stdin_drl;
+    return fe_fgets_stdin_drl(pr,s,size);
+  }
+  else
   {
-    #ifdef atarist
-      *fe_rl_outstream = fopen( "/dev/tty", "w" );
-    #else
-      *fe_rl_outstream = fopen( ttyname(fileno(stdout)), "w" );
-    #endif
+    fe_fgets_stdin=fe_fgets;
+    return fe_fgets(pr,s,size);
   }
-
-  fe_fgets_stdin=fe_fgets_stdin_drl;
-  return fe_fgets_stdin_drl(pr,s,size);
 #else
   #if !defined(HAVE_READLINE) && defined(HAVE_FEREAD)
     fe_fgets_stdin=fe_fgets_stdin_emu;
