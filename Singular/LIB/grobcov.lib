@@ -732,7 +732,7 @@ RETURN: After its call the rings Grobcov::@R=Q[a][x], Grobcov::@P=Q[a],  Grobcov
 NOTE: It is called internally by many basic routines of the library grobcov, cgsdr, extendGC, pdivi, pnormalf, locus,
           locusdg, envelop, WLemma, and killed before the output. The user does not need to call it.
           The basering R, must be of the form Q[a][x], (a=parameters, x=variables), and should be defined previously.
-KEYWORDS: ring; rings;
+KEYWORDS: ring
 EXAMPLE:  setglobalrings; shows an example"
 {
   if (defined(@P))
@@ -836,7 +836,7 @@ RETURN: A list (poly r, ideal q, poly m). r is the remainder of the pseudodivisi
 NOTE: pseudodivision of a poly f by an ideal F in Q[a][x]. Returns a list (r,q,m) such that
           m*f=r+sum(q.F),
           and no lpp of a divisor divides a pp of r.
-KEYWORDS: division; reduce;
+KEYWORDS: division; reduce
 EXAMPLE:  pdivi; shows an example"
 {
   F=simplify(F,2);
@@ -1064,7 +1064,7 @@ proc pnormalf(poly f, ideal E, ideal N)
           N: the non-null conditions in Q[a]
 RETURN: a reduced polynomial g of f, whose coefficients are reduced modulo E and having no factor in N.
 NOTE: Should be called from ring Q[a][x]. Ideals E and N must be given by polynomials in Q[a].
-KEYWORDS: division; pdivi; reduce;
+KEYWORDS: division; pdivi; reduce
 EXAMPLE: pnormalf; shows an example"
 {
     def RR=basering;
@@ -1371,7 +1371,7 @@ proc Crep(ideal N, ideal M)
            To be called in a ring Q[a][x] or a ring Q[a]. But the ideals can contain only the parameters in Q[a].
 RETURN: The canonical C-representation [P,Q] of the locally closed set, formed by a pair of radical ideals with P
            included in Q, representing the set V(P) - V(Q) = V(N) - V(M)
- KEYWORDS: locally closed set; canoncial form;
+ KEYWORDS: locally closed set; canoncial form
  EXAMPLE:  Crep; shows an example"
 {
   int te;
@@ -1460,7 +1460,7 @@ proc Prep(ideal N, ideal M)
  RETURN: The canonical P-representation of the locally closed set V(N) - V(M)
            Output: [Comp_1, .. , Comp_s ] where
            Comp_i=[p_i,[p_i1,..,p_is_i]]
- KEYWORDS: locally closed set; canoncial form;
+ KEYWORDS: locally closed set; canoncial form
  EXAMPLE:  Prep; shows an example"
 {
   int te;
@@ -1549,7 +1549,7 @@ proc PtoCrep(list L)
           To be called in a ring Q[a][x] or a ring Q[a]. But the ideals can contain only the parameters in Q[a].
  RETURN:The canonical C-representation [P,Q] of the locally closed set. A pair of radical ideals with P included in Q,
           representing the set V(P) - V(Q)
- KEYWORDS: locally closed set; canoncial form;
+ KEYWORDS: locally closed set; canoncial form
  EXAMPLE:  PtoCrep; shows an example"
 {
   int te;
@@ -1664,7 +1664,7 @@ OPTIONS: An option is a pair of arguments: string, integer. To modify the defaul
           of grobcov. When grobcov is computed, the call to cgsdr inside uses specific options that are more
           expensive (\"can\",0-1,\"out\",0).
 
-KEYWORDS: CGS; disjoint; reduced; Comprehensive Groebner System;
+KEYWORDS: CGS; disjoint; reduced; Comprehensive Groebner System
 EXAMPLE:  cgsdr; shows an example"
 {
   int te;
@@ -2408,7 +2408,7 @@ OPTIONS: An option is a pair of arguments: string, integer. To modify the defaul
          One can give none or whatever of these options.
 NOTE: The basering R, must be of the form Q[a][x], (a=parameters, x=variables), and should be defined previously.
           The ideal must be defined on R.
-KEYWORDS: Groebner cover; parametric ideal; canonical; discussion of parametric ideal;
+KEYWORDS: Groebner cover; parametric ideal; canonical; discussion of parametric ideal
 EXAMPLE:  grobcov; shows an example"
 {
   list S; int i; int ish=1; list GBR; list BR; int j; int k;
@@ -2590,7 +2590,7 @@ RETURN: the extended representation of F in S.
 NOTE: The basering R, must be of the form Q[a][x], (a=parameters,x=variables), and should be defined previously.
           The ideals must be defined on R.
 KEYWORDS: Groebner cover; parametric ideal; locally closed set; parametric ideal; generic representation;
-           full representation;
+           full representation
 EXAMPLE:  extendpoly; shows an example"
 {
   int te=0;
@@ -2726,7 +2726,7 @@ RETURN: When calling extendGC(grobcov(S,\"rep\",2)) the result is of the form
           where each function of the basis can be given by an ideal of representants.
 NOTE: The basering R, must be of the form Q[a][x], (a=parameters, x=variables), and should be defined previously.
           The ideal must be defined on R.
-KEYWORDS: Groebner cover; parametric ideal; canonical, discussion of parametric ideal; full representation;
+KEYWORDS: Groebner cover; parametric ideal; canonical, discussion of parametric ideal; full representation
 EXAMPLE:  extendGC; shows an example"
 {
   list L=#;
@@ -4118,7 +4118,7 @@ NOTE: Th ring can be Q[a][x] or Q[a], but the ideals can only contain parmeters 
          The algorithm is described in
          J.M. Brunat, A. Montes. \"Computing the canonical representation of constructible sets.\"
          Math.  Comput. Sci. (2016) 19: 165-178.
-KEYWORDS: constructible set; locally closed set; canonical form;
+KEYWORDS: constructible set; locally closed set; canonical form
 EXAMPLE:  ConsLevels; shows an example"
 {
   def RR=basering;
@@ -4179,7 +4179,7 @@ proc ConsLevelsToLevels(list L)
           To be called in a ring Q[a][x] or a ring Q[a]. But the ideals can contain only the parameters in Q[a].
 RETURN: The levels of the constructible set:
           Lc=[ [1,[a1,a2]],[3,[a3,a4]],..,[2l-1,[a_{2l-1},a_{2l}]] ] the list of  Levels of S
-KEYWORDS: constructible sets; canonical form;
+KEYWORDS: constructible sets; canonical form
 EXAMPLE:  ConsLevelsToLevels shows an example"
 {
   int n=size(L) div 2;
@@ -4711,7 +4711,7 @@ RETURN:The output is a list of the components [C_1, .. , C_n] of the locus. Each
           The level is the depth of the segment of the constructible locus subset (normal and non-normal subsets).
           If all levels of a locus are 1, then all subsets are locally closed.
 NOTE: The input must be the grobcov of the locus system in generic representation (\"ext\",0), which is the default.
-KEYWORDS: geometrical locus; locus; dynamic geometry;
+KEYWORDS: geometrical locus; locus; dynamic geometry
 EXAMPLE: locus; shows an example"
 {
   int tes=0; int i;
@@ -4819,7 +4819,7 @@ RETURN: The output is the list of the \"Relevant\" components of the locus in Dy
            C_i= [p_i,[p_i1,..p_is_i], \"Relevant\", level_i]
            The \"Relevant\" components are the \"Normal\" and \"Accumulation\" components of the locus. (See help for
            locus).
-KEYWORDS: geometrical locus; locus; dynamic geometry;
+KEYWORDS: geometrical locus; locus; dynamic geometry
 EXAMPLE: locusdg; shows an example"
 {
   list LL;
@@ -4861,7 +4861,7 @@ NOTE: It can only be called after computing either
            - locus(grobcov(F))                -> locusto( locus(grobcov(F)) )
            - locusdg(locus(grobcov(F)))  -> locusto( locusdg(locus(grobcov(F))) )
            - envelop(F,C)                       -> locusto( envelop(F,C) )
-KEYWORDS: geometrical locus; locus; envelop; string;
+KEYWORDS: geometrical locus; locus; envelop; string
 EXAMPLE:  locusto; shows an example"
 {
   int i; int j; int k;
@@ -4982,7 +4982,7 @@ NOTE: grobcov and locus are called internally.
           The basering R, must be of the form Q[a][x] (a=parameters, x=variables).
           This routine uses the generalized definition of envelop introduced in the book
            A. Montes. \"Discussing Parametric Polynomial Systems: The Groebner Cover\" not yet published.
-KEYWORDS: geometrical locus; locus; envelop;
+KEYWORDS: geometrical locus; locus; envelop
 EXAMPLE:  envelop; shows an example"
 {
   def R=basering;
@@ -5199,7 +5199,7 @@ RETURN: list [lpp,basis,segment]. The basis determines the associated tangent hy
           component E. The segment is given in Prep. See the not yet published book
           A. Montes. \"Discussing Parametric Polynomial Systems: The Groebner Cover\".
 NOTE: grobcov is called internally. The basering R, must be of the form Q[a][x] (a=parameters, x=variables).
-KEYWORDS: geometrical locus; locus; envelop; associated tangent;
+KEYWORDS: geometrical locus; locus; envelop; associated tangent
 EXAMPLE:  AssocTanToEnv; shows an example"
 {
   def R=basering;
@@ -5353,7 +5353,7 @@ RETURN: list [lpp,basis,segment]. The basis determines the parameter values of t
           A. Montes. \"Discussing Parametric Polynomial Systems: The Groebner Cover\"
 NOTE: grobcov is called internally.
           The basering R, must be of the form Q[a][x] (a=parameters, x=variables).
-KEYWORDS: geometrical locus; locus; envelop; associated tangent;
+KEYWORDS: geometrical locus; locus; envelop; associated tangent
 EXAMPLE:  FamElemsAtEnvCompPoints; shows an example"
 {
   int i;
@@ -5404,7 +5404,7 @@ proc discrim(poly F0, poly x0)
           poly f: the polynomial in Q[a][x] or Q[x] of degree 2 in x
           poly x: can be a variable or a parameter of the ring.
 RETURN: the factorized discriminant of f wrt x for discussing its sign
-KEYWORDS: second degree; solve;
+KEYWORDS: second degree; solve
 EXAMPLE:  discrim; shows an example"
 {
   def RR=basering;
@@ -5565,7 +5565,7 @@ RETURN: list of [lpp,B,S] = [leading power product, basis, segment],
           A. Montes. \"Discussing Parametric Polynomial Systems: The Groebner Cover\"
 
 NOTE: The basering R, must be of the form Q[a][x] (a=parameters, x=variables).
-KEYWORDS: Wibmer's Lemma;
+KEYWORDS: Wibmer's Lemma
 EXAMPLE:  WLemma; shows an example"
 {
   list L=#;
