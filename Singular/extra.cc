@@ -316,6 +316,35 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return TRUE;
     }
     else
+/*===== nc_hilb ===============================================*/
+   // Hilbert series of non-commutative monomial algebras
+    if(strcmp(sys_cmd,"nc_hilb") == 0)
+    {
+      ideal i;
+      int lV;
+      bool ig = FALSE;
+      if((h != NULL)&&(h->Typ() == IDEAL_CMD))
+        i = (ideal)h->Data();
+      else
+      {
+        WerrorS("ideal expected");
+        return TRUE;
+      }
+      h = h->next;
+      if((h != NULL)&&(h->Typ() == INT_CMD))
+        lV = (int)(long)h->Data();
+      else
+      {
+        WerrorS("int expected");
+        return TRUE;
+      }
+      h = h->next;
+      if(h != NULL)
+        ig = TRUE;
+      HilbertSeries_OrbitData(i,lV,ig);
+      return(FALSE);
+    }
+    else
 /*==================== sh ==================================*/
     if(strcmp(sys_cmd,"sh")==0)
     {
@@ -3045,38 +3074,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-    /*======================================================
-     * Hilbert series of non-commutative monomial algebras
-     *======================================================*/
-      if(strcmp(sys_cmd,"nc_hilb") == 0)
-      {
-        ideal i;
-        int lV;
-        bool ig = FALSE;
-        if((h != NULL)&&(h->Typ() == IDEAL_CMD))
-          i = (ideal)h->Data();
-        else
-        {
-          WerrorS("ideal expected");
-          return TRUE;
-        }
-        h = h->next;
-        if((h != NULL)&&(h->Typ() == INT_CMD))
-          lV = (int)(long)h->Data();
-        else 
-        { 
-          WerrorS("int expected"); 
-          return TRUE;
-        }
-        h = h->next;
-        if(h != NULL)
-          ig = TRUE;
-        HilbertSeries_OrbitData(i,lV,ig);
-        return(FALSE);
-      }
-      else
-
-    /*==================== sca?AltVar ==================================*/
+    /*==================== sca:AltVar ==================================*/
   #ifdef HAVE_PLURAL
       if ( (strcmp(sys_cmd, "AltVarStart") == 0) || (strcmp(sys_cmd, "AltVarEnd") == 0) )
       {

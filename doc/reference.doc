@@ -7390,6 +7390,11 @@ returns the number of blocks of the given ring, or
 of the current basering, if no second argument is given. The return type
 is int.
 @c ..........................
+@item @code{system("nc_hilb")}, ideal, int, [,...] @code{)}
+@cindex nc_hilb
+@cindex system, nc_hilb
+internal support for ncHilb.lib, return nothing
+@c ..........................
 @item @code{system("newstruct")}
 @cindex system, newstruct
 list all newstruct data types.

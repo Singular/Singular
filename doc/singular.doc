@@ -1064,6 +1064,7 @@ Comments should be send to the author of the library directly.
 * hess_lib:: Riemann-Roch space of divisors on function fields and curves
 * modwalk_lib:: Groebner basis convertion
 * multigrading_lib:: Multigradings and related computations
+* ncHilb_lib:: Hilbert functio for non-commutative rings
 * nfmodstd_lib:: Groebner bases of ideals in rings over algebraic number fields
 * nfmodsyz_lib:: Syzygy modules of submodules of free modules over algebraic number fields
 * realclassify_lib:: Classification of real singularities
@@ -1155,6 +1156,10 @@ Todos/Issues:
 @end itemize
 
 @c lib multigrading.lib
+@c ----------------------------------------------------------
+@node ncHilb_lib
+@subsection ncHilb_lib
+@c lib ncHilb.lib
 @c ----------------------------------------------------------
 @node nfmodstd_lib
 @subsection nfmodstd_lib
