@@ -3849,7 +3849,7 @@ static BOOLEAN jjDET_BI(leftv res, leftv v)
   }
   return FALSE;
 }
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
 static BOOLEAN jjDET_N2(leftv res, leftv v)
 {
   bigintmat * m=(bigintmat*)v->Data();
@@ -5074,7 +5074,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
     case INTMAT_CMD:
     case BIGINTMAT_CMD:
     case NUMBER_CMD:
-    #ifdef SINGULAR_4_1
+    #ifdef SINGULAR_4_2
     case CNUMBER_CMD:
     #endif
     case BIGINT_CMD:
@@ -6222,7 +6222,7 @@ static BOOLEAN jjRANDOM_Im(leftv res, leftv u, leftv v, leftv w)
   res->data = (char *)iv;
   return FALSE;
 }
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
 static BOOLEAN jjRANDOM_CF(leftv res, leftv u, leftv v, leftv w)
 // <coeff>, par1, par2 -> number2
 {
@@ -7883,7 +7883,7 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
 #ifdef SINGULAR_4_1
 static BOOLEAN jjRING_PL(leftv res, leftv a)
 {
-  Print("construct ring\n");
+  //Print("construct ring\n");
   if (a->Typ()!=CRING_CMD)
   {
     WerrorS("expected `Ring` [ `id` ... ]");
@@ -8823,9 +8823,6 @@ const char * Tok2Cmdname(int tok)
   //if (tok==OBJECT) return "object";
   //if (tok==PRINT_EXPR) return "print_expr";
   if (tok==IDHDL) return "identifier";
-  #ifdef SINGULAR_4_1
-  //if (tok==CRING_CMD) return "Ring";
-  #endif
   if (tok>MAX_TOK) return getBlackboxName(tok);
   unsigned i;
   for(i=0; i<sArithBase.nCmdUsed; i++)

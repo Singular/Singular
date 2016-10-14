@@ -175,7 +175,7 @@ static void * iiI2BI(void *data)
   return (void *)n;
 }
 
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
 static void * iiI2NN(void *data)
 {
   if (currRing==NULL)
@@ -218,7 +218,7 @@ static void * iiBI2N(void *data)
   return (void*)n;
 }
 
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
 static void * iiBI2NN(void *data)
 {
   if (currRing==NULL)
@@ -268,7 +268,7 @@ static void * iiP2CP(void *data)
 }
 #endif
 
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
 static void * iiNN2N(void *data)
 {
   number2 d=(number2)data;
@@ -284,7 +284,7 @@ static void * iiNN2N(void *data)
 }
 #endif
 
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
 static void * iiNN2P(void *data)
 {
   number2 d=(number2)data;

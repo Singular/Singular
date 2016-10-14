@@ -134,7 +134,7 @@ void *idrecDataInit(int t)
   switch (t)
   {
     //the type with init routines:
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
     case CNUMBER_CMD:
       return (void*)n2Init(0,NULL);
     case CPOLY_CMD:

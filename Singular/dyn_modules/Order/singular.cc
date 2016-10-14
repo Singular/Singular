@@ -11,7 +11,7 @@
 #include "nforder_ideal.h"
 #include <coeffs/bigintmat.h>
 
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
 static int nforder_type_id=0;
 n_coeffType nforder_type =n_unknown;
 

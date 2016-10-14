@@ -1,5 +1,4 @@
 #include "kernel/mod2.h" // general settings/macros
-
 #ifdef SINGULAR_4_1
 #include <reporter/reporter.h>  // for Print, WerrorS
 #include <coeffs/numbers.h> // nRegister, coeffs.h
@@ -74,6 +73,15 @@ BOOLEAN jjCRING_Zm(leftv res, leftv a, leftv b)
   return TRUE;
 }
 
+BOOLEAN jjEQUAL_CR(leftv res, leftv a, leftv b)
+{
+  coeffs a2=(coeffs)a->Data();
+  coeffs b2=(coeffs)b->Data();
+  res->data=(void*)(long)(a2==b2);
+  return FALSE;
+}
+
+#ifdef SINGULAR_4_2
 // -----------------------------------------------------------
 // interpreter stuff for Number/number2
 // -----------------------------------------------------------
@@ -377,13 +385,6 @@ BOOLEAN jjN2_N(leftv res, leftv a)              // number2 ->number
   return bo;
 }
 
-BOOLEAN jjEQUAL_CR(leftv res, leftv a, leftv b)
-{
-  coeffs a2=(coeffs)a->Data();
-  coeffs b2=(coeffs)b->Data();
-  res->data=(void*)(long)(a2==b2);
-  return FALSE;
-}
 // -----------------------------------------------------------
 // operations with Number/number2
 // -----------------------------------------------------------
@@ -509,4 +510,5 @@ BOOLEAN jjR2_CR(leftv res, leftv a)              // ring ->cring
   return FALSE;
 }
 
+#endif
 #endif

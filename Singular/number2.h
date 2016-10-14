@@ -3,10 +3,10 @@
 
 #include <kernel/mod2.h>
 
-#ifdef SINGULAR_4_1
 #include <omalloc/omalloc.h>
 #include <coeffs/coeffs.h>
 #include <kernel/structs.h>
+#ifdef SINGULAR_4_2
 struct snumber2;
 struct spoly2;
 typedef struct snumber2 *   number2;
@@ -26,15 +26,6 @@ static inline number2 n2Init(long i, coeffs c)
 
 static inline poly2 p2Init(long i, ring c)
 { poly2 N=(poly2)omAlloc0(sizeof(spoly2)); if (c!=NULL) { N->cf=c; N->n=p_ISet(i,c);} return N;}
-
-char *crString(coeffs c);
-
-void crPrint(coeffs cf);
-
-BOOLEAN jjCRING_Zp(leftv res, leftv a, leftv b);
-BOOLEAN jjCRING_Zm(leftv res, leftv a, leftv b);
-
-BOOLEAN jjEQUAL_CR(leftv res, leftv a, leftv b); // compare cring
 
 // type conversion:
 BOOLEAN jjNUMBER2CR(leftv res, leftv a, leftv b); // <any>,cring ->number2
@@ -64,4 +55,15 @@ void p2Print(poly2 d);
 
 BOOLEAN jjCMATRIX_3(leftv, leftv, leftv,leftv);
 #endif
+#ifdef SINGULAR_4_1
+char *crString(coeffs c);
+
+void crPrint(coeffs cf);
+
+BOOLEAN jjCRING_Zp(leftv res, leftv a, leftv b);
+BOOLEAN jjCRING_Zm(leftv res, leftv a, leftv b);
+
+BOOLEAN jjEQUAL_CR(leftv res, leftv a, leftv b); // compare cring
+#endif
+
 #endif

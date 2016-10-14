@@ -35,8 +35,9 @@
  *                    2: given by SI_INTEGER_VARIANT */
 #define SI_BIGINT_VARIANT 1
 
-/* preparation for versio 4.1.0: */
+/* preparation for versio 4.1.0: cring (4_1), cpoly, cnumber, cmatrix (4_2) */
 #undef SINGULAR_4_1
+#undef SINGULAR_4_2
 
 #ifndef SIZEOF_LONG
 

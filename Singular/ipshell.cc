@@ -73,6 +73,8 @@
 
 #ifdef SINGULAR_4_1
 #include <Singular/number2.h>
+#endif
+#ifdef SINGULAR_4_2
 #include <coeffs/bigintmat.h>
 #endif
 leftv iiCurrArgs=NULL;
@@ -224,7 +226,7 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                      Print(" <%lx>",(long)(IDRING(h)));
 #endif
                    break;
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
     case CNUMBER_CMD:
                    {  number2 n=(number2)IDDATA(h);
                       Print(" (%s)",nCoeffName(n->cf));

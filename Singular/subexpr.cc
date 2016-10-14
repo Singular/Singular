@@ -109,6 +109,8 @@ void sleftv::Print(leftv store, int spaces)
         case CRING_CMD:
           crPrint((coeffs)d);
           break;
+#endif
+#ifdef SINGULAR_4_2
         case CNUMBER_CMD:
           n2Print((number2)d);
           break;
@@ -423,6 +425,8 @@ static inline void * s_internalCopy(const int t,  void *d)
         cf->ref++;
         return (void*)d;
       }
+#endif
+#ifdef SINGULAR_4_2
     case CNUMBER_CMD:
       return (void*)n2Copy((number2)d);
     case CPOLY_CMD:
@@ -512,6 +516,8 @@ void s_internalDelete(const int t,  void *d, const ring r)
           nKillChar((coeffs)d);
         break;
       }
+#endif
+#ifdef SINGULAR_4_2
     case CNUMBER_CMD:
       {
         number2 n=(number2)d;
@@ -817,10 +823,12 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             return pString((poly)d);
 
         #ifdef SINGULAR_4_1
-        case CNUMBER_CMD:
-          return n2String((number2)d,typed);
         case CRING_CMD:
           return nCoeffString((coeffs)d);
+        #endif
+        #ifdef SINGULAR_4_2
+        case CNUMBER_CMD:
+          return n2String((number2)d,typed);
         case CMATRIX_CMD:
           {
             bigintmat *b=(bigintmat*)d;
@@ -1038,7 +1046,7 @@ int  sleftv::Typ()
   { idhdl h=(idhdl)IDDATA((idhdl)data); t=IDTYP(h);d=IDDATA(h); }
   switch (t)
   {
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
     case CMATRIX_CMD:
     {
       bigintmat *b=(bigintmat*)d;
@@ -1132,7 +1140,7 @@ int  sleftv::LTyp()
   return Typ();
 }
 
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
 static snumber2 iiNumber2Data[4];
 static int iiCmatrix_index=0;
 #endif
@@ -1246,7 +1254,7 @@ void * sleftv::Data()
         r=(char *)(BIMATELEM((*m),index,e->next->start));
       break;
     }
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
     case CMATRIX_CMD:
     {
       bigintmat *m=(bigintmat *)d;

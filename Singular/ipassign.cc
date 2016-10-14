@@ -405,7 +405,7 @@ static BOOLEAN jiA_NUMBER(leftv res, leftv a, Subexpr)
   jiAssignAttr(res,a);
   return FALSE;
 }
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
 static BOOLEAN jiA_NUMBER2(leftv res, leftv a, Subexpr e)
 {
   number2 n=(number2)a->CopyD(CNUMBER_CMD);
