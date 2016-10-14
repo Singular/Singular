@@ -131,6 +131,7 @@ void sleftv::Print(leftv store, int spaces)
           PrintNSpaces(spaces);
           paPrint(n,(package)d);
           break;
+	case LIB_CMD:
         case NONE:
           return;
         case INTVEC_CMD:
@@ -367,7 +368,6 @@ void sleftv::CleanUp(ring r)
         case VSHORTOUT:
         case VNOETHER:
         case VMINPOLY:
-        case LIB_CMD:
         case 0:
           //attribute=NULL; // will be done by Init() at the end
           break;
@@ -644,7 +644,6 @@ void s_internalDelete(const int t,  void *d, const ring r)
     case VSHORTOUT:
     case VNOETHER:
     case VMINPOLY:
-    case LIB_CMD:
     case 0: /* type in error case */
       break; /* error recovery: do nothing */
     //case COMMAND:
@@ -739,7 +738,7 @@ void * sleftv::CopyD(int t)
 //void * sleftv::CopyD()
 //{
   //if ((rtyp!=IDHDL)&&(e==NULL)
-  //&&(rtyp!=VNOETHER)&&(rtyp!=LIB_CMD)&&(rtyp!=VMINPOLY))
+  //&&(rtyp!=VNOETHER)&&(rtyp!=VMINPOLY))
   //{
   //  void *x=data;
   //  data=NULL;
