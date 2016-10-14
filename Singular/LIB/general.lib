@@ -310,8 +310,9 @@ EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
   {
     for ( @joni=size(@marie); @joni>0; @joni-- )
     {
-      if( @marie[@joni]!="LIB" and typeof(`@marie[@joni]`)!="proc"
-      and typeof(`@marie[@joni]`)!="package")
+      if( typeof(`@marie[@joni]`)!="proc"
+      and typeof(`@marie[@joni]`)!="package"
+      and typeof(`@marie[@joni]`)!="cring")
       { kill `@marie[@joni]`; }
     }
   }
