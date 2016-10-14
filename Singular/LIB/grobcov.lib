@@ -732,7 +732,7 @@ RETURN: After its call the rings Grobcov::@R=Q[a][x], Grobcov::@P=Q[a],  Grobcov
 NOTE: It is called internally by many basic routines of the library grobcov, cgsdr, extendGC, pdivi, pnormalf, locus,
           locusdg, envelop, WLemma, and killed before the output. The user does not need to call it.
           The basering R, must be of the form Q[a][x], (a=parameters, x=variables), and should be defined previously.
-KEYWORDS: ring
+KEYWORDS: ring; rings
 EXAMPLE:  setglobalrings; shows an example"
 {
   if (defined(@P))
@@ -2387,25 +2387,25 @@ RETURN:   The list  [ [ lpp_1,basis_1,segment_1],  ...,  [lpp_s,basis_s,segment_
           The C-representation of a segment is of the form
           (E,N) representing V(E) - V(N), and the ideals E and N are radical and N contains E.
 OPTIONS: An option is a pair of arguments: string, integer. To modify the default options, pairs of arguments
-         -option name, value- of valid options must be added to the call.@*
-          \"null\",ideal E: The default is (\"null\",ideal(0)).@*
-          \"nonnull\",ideal N: The default is (\"nonnull\",ideal(1)).@*
-          When options \"null\" and/or \"nonnull\" are given, then the parameter space is restricted to V(E) - V(N).@*
+          -option name, value- of valid options must be added to the call.
+          \"null\",ideal E: The default is (\"null\",ideal(0)).
+          \"nonnull\",ideal N: The default is (\"nonnull\",ideal(1)).
+          When options \"null\" and/or \"nonnull\" are given, then the parameter space is restricted to V(E) - V(N).
           \"can\",0-1: The default is (\"can\",1). With the default option the homogenized ideal is computed before
           obtaining the Groebner Cover, so that the result is the canonical Groebner Cover. Setting (\"can\",0) only
-          homogenizes the basis so the result is not exactly canonical, but the computation is shorter.@*
+          homogenizes the basis so the result is not exactly canonical, but the computation is shorter.
           \"ext\",0-1: The default is (\"ext\",0). With the default (\"ext\",0), only the generic representation of the bases is
-          computed (single polynomials, but not specializing to non-zero for every point of the segment.@*
+          computed (single polynomials, but not specializing to non-zero for every point of the segment.
           With option (\"ext\",1) the full representation of the bases is computed (possible sheaves) and sometimes a
-          simpler result is obtained, but the computation is more time consuming.@*
+          simpler result is obtained, but the computation is more time consuming.
           \"rep\",0-1-2: The default is (\"rep\",0) and then the segments are given in canonical P-representation.
           Option (\"rep\",1) represents the segments in canonical C-representation, and option (\"rep\",2) gives
-          both representations.@*
-         \"comment\",0-3: The default is (\"comment\",0). Setting \"comment\" higher will provide information about the
-         development of the computation.@*
-         \"showhom\",0-1: The default is (\"showhom\",0). Setting \"showhom\",1 will output the set of lpp of the
-         homogenized ideal of each segment as last element.
-         One can give none or whatever of these options.
+          both representations.
+          \"comment\",0-3: The default is (\"comment\",0). Setting \"comment\" higher will provide information about the
+          development of the computation.
+          \"showhom\",0-1: The default is (\"showhom\",0). Setting \"showhom\",1 will output the set of lpp of the
+          homogenized ideal of each segment as last element.
+          One can give none or whatever of these options.
 NOTE: The basering R, must be of the form Q[a][x], (a=parameters, x=variables), and should be defined previously.
           The ideal must be defined on R.
 KEYWORDS: Groebner cover; parametric ideal; canonical; discussion of parametric ideal
@@ -2488,60 +2488,27 @@ EXAMPLE:  grobcov; shows an example"
   kill S;
   def S=gcover(F,LL);
   // NOW extendGC
-  if (size(S[1])==5){hom=1;}
   if(extop)
   {
     S=extendGC(S,LL);
   }
-  // NOW representation of the segments by option repop
+  // NOW repop and showhom
   list Si; list nS;
-  if (repop==0)
+  for(i=1;i<=size(S);i++)
   {
-    for(i=1;i<=size(S);i++)
-    {
-      Si=list(S[i][1],S[i][2],S[i][3]);
-      if(hom){Si[size(Si)+1]=S[i][5];}
-      nS[size(nS)+1]=Si;
-    }
-    S=nS;
+    if(repop==0){Si=list(S[i][1],S[i][2],S[i][3]);}
+    if(repop==1){Si=list(S[i][1],S[i][2],S[i][4]);}
+    if(repop==2){Si=list(S[i][1],S[i][2],S[i][3],S[i][4]);}
+    if(showhom==1){Si[size(Si)+1]=S[i][5];}
+    nS[size(nS)+1]=Si;
   }
-  else
-  {
-    if (repop==1)
-    {
-      for(i=1;i<=size(S);i++)
-      {
-        Si=list(S[i][1],S[i][2],S[i][4]);
-        if(hom){Si[size(Si)+1]=S[i][5];}
-        nS[size(nS)+1]=Si;
-      }
-      S=nS;
-    }
-    else
-    {
-      for(i=1;i<=size(S);i++)
-      {
-        Si=list(S[i][1],S[i][2],S[i][3],S[i][4]);
-        if(hom){Si[size(Si)+1]=S[i][5];}
-        nS[size(nS)+1]=Si;
-      }
-    }
-  }
+  S=nS;
   if (comment>=1)
   {
     string("Time in grobcov = ", timer-start);
     string("Number of segments of grobcov = ", size(S));
   }
   if(defined(@P)==1){kill @R; kill @P; kill @RP;}
-  if (hom and showhom==0)
-  {
-    for(i=1;i<=size(S);i++)
-    {
-      Se=S[i];
-      Se=delete(Se,size(Se));
-      S[i]=Se;
-    }
-  }
   return(S);
 }
 example
@@ -2701,13 +2668,22 @@ example
   extendpoly(f,p,q);
 }
 
+// if L is a list(ideal,ideal)  return 1 else returns 0;
+static proc typeofCrep(L)
+{
+  if(typeof(L)!="list"){return(0);}
+  if(size(L)!=2){return(0);}
+  if((typeof(L[1])!="ideal") or (typeof(L[2])!="ideal")){return(0);}
+  return(1);
+}
+
 // Input. GC the grobcov of an ideal in generic representation of the
 //        bases computed with option option ("rep",2).
 // Output The grobcov in full representation.
 // Option ("comment",1) shows the time.
 // Can be called from the top
-proc extendGC(list GC, list #)
-"USAGE: extendGC(list GC)[,options]);
+proc extendGC(list GC)
+"USAGE: extendGC(list GC);
           list GC must the grobcov of a parametric ideal computed with option \"rep\",2.
           It determines the full representation.
           The default option of grobcov provides the bases in generic representation (the I-regular functions forming
@@ -2729,48 +2705,44 @@ NOTE: The basering R, must be of the form Q[a][x], (a=parameters, x=variables), 
 KEYWORDS: Groebner cover; parametric ideal; canonical, discussion of parametric ideal; full representation
 EXAMPLE:  extendGC; shows an example"
 {
-  list L=#;
+  int te;
+  if(defined(@P)){te=1;}
+  else{setglobalrings();}
   list S=GC;
   ideal idp;
   ideal idq;
-  int i; int j; int m; int s;
+  int i; int j; int m; int s; int k;
   m=0; i=1;
   while((i<=size(S)) and (m==0))
   {
     if(typeof(S[i][2])=="list"){m=1;}
     i++;
   }
-  int hom;
-  if(m==1){"Warning! grobcov has already extended bases"; return(S);}
-  if(not(size(GC[1])==5 or (size(GC[1])==4 and typeof(GC[1][4])=="list")))
-  {"Warning! extendGC make sense only when grobcov has been called with options  'rep',2,'ext',0"; " "; return();}
-  if(size(GC[1])==5){hom=1;}
-  int repop=0;
-  int start3=timer;
-  int comment;
-  for(i=1;i<=size(L) div 2;i++)
+  if(m==1)
   {
-    if(L[2*i-1]=="comment"){comment=L[2*i];}
-    else
-    {
-      if(L[2*i-1]=="rep"){repop=L[2*i];}
-    }
+    "Warning! grobcov has already extended bases";
+    if(te==0){kill @R; kill @RP; kill @P;}
+    return(S);
+  }
+  if(typeofCrep(S[1][3])){k=3;}
+  else{if(typeofCrep(S[1][4])){k=4;};}
+  if(k==0)
+  {
+    "Warning! extendGC make sense only when grobcov has been called with option 'rep',1 or 'rep',2";
+    if(te==0){kill @R; kill @RP; kill @P;}
+    return(S);
   }
   poly leadc;
   poly ext;
-  int te=0;
   list SS;
-  def R=basering;
-  if (defined(@R)){te=1;}
-  else{setglobalrings();}
   // Now extendGC
   for (i=1;i<=size(S);i++)
   {
     m=size(S[i][2]);
      for (j=1;j<=m;j++)
     {
-      idp=S[i][4][1];
-      idq=S[i][4][2];
+      idp=S[i][k][1];
+      idq=S[i][k][2];
       if (size(idp)>0)
       {
         leadc=leadcoef(S[i][2][j]);
@@ -2804,41 +2776,6 @@ EXAMPLE:  extendGC; shows an example"
       }
     }
   }
-  // NOW representation of the segments by option repop
-  list Si; list nS;
-  if (repop==0)
-  {
-    for(i=1;i<=size(S);i++)
-    {
-      Si=list(S[i][1],S[i][2],S[i][3]);
-      if(hom){Si[size(Si)+1]=S[i][5];}
-      nS[size(nS)+1]=Si;
-    }
-    S=nS;
-  }
-  else
-  {
-    if (repop==1)
-    {
-      for(i=1;i<=size(S);i++)
-      {
-        Si=list(S[i][1],S[i][2],S[i][4]);
-        if(hom){Si[size(Si)+1]=S[i][5];}
-        nS[size(nS)+1]=Si;
-      }
-      S=nS;
-    }
-    else
-    {
-      for(i=1;i<=size(S);i++)
-      {
-        Si=list(S[i][1],S[i][2],S[i][3],S[i][4]);
-        if(hom){Si[size(Si)+1]=S[i][5];}
-        nS[size(nS)+1]=Si;
-      }
-    }
-  }
-  if(comment>=1){string("Time in extendGC = ",timer-start3);}
   if(te==0){kill @R; kill @RP; kill @P;}
   return(S);
 }
