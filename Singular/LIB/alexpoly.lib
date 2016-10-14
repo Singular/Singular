@@ -360,7 +360,7 @@ EXAMPLE: example totalmultiplicities;  shows an example
   intvec connections_i,connections_j;
   int n_i,n_j;
   int bad_contact;
-  list newpos;  // when reordering the branches, here we save the new order of the old branches 
+  list newpos;  // when reordering the branches, here we save the new order of the old branches
   for (ii=1;ii<=r;ii++)
   {
     newpos[ii]=ii;
@@ -420,8 +420,8 @@ EXAMPLE: example totalmultiplicities;  shows an example
       // Move the graph (etc.) of C_j into the position i.
       newpos=insert(newpos,newpos[j],i-1);
       newpos=delete(newpos,j+1);
-      // BE AWARE: after this reordering the graphs do not have the correct weight for the 
-      //           strict transform any more; this will be adjusted further down  
+      // BE AWARE: after this reordering the graphs do not have the correct weight for the
+      //           strict transform any more; this will be adjusted further down
       graphs=insert(graphs,graphs[j],i-1);
       graphs=delete(graphs,j+1);
       totmult=insert(totmult,totmult[j],i-1);
@@ -439,8 +439,8 @@ EXAMPLE: example totalmultiplicities;  shows an example
       j=i+2;
       i=i+1;
     }
-  } 
-  // Here we adjust the weights of the strict transforms in the graphs!!! 
+  }
+  // Here we adjust the weights of the strict transforms in the graphs!!!
   for (i=1;i<=size(graphs);i++)
   {
     graphs[i][nrows(graphs[i]),ncols(graphs[i])]=-i;
@@ -577,11 +577,11 @@ EXAMPLE: example totalmultiplicities;  shows an example
   if (inputispoly==1) // if the input was a polynomial the ordering of the branches is fine
   {
     list result=rgraph,rtm,rmt;
-    return(result); 
+    return(result);
   }
   else // reorder the branches according to the ordering of the input
   {
-    // reordered total multiplicities, multiplicities and resolution graph 
+    // reordered total multiplicities, multiplicities and resolution graph
     intmat rtmro[nrows(rtm)][ncols(rtm)];
     intmat rmtro[nrows(rmt)][ncols(rmt)];
     intmat rgraphro=rgraph;

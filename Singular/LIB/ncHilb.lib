@@ -21,8 +21,8 @@ LIB "freegb.lib";
 
 proc nchilb(list L_wp, int d, list #)
 "USAGE:  nchilb(list of relations, an integer, optional);
-         L is a list of modules (each module represents a free-polynomial), 
-         d is an integer for the degree bound, 
+         L is a list of modules (each module represents a free-polynomial),
+         d is an integer for the degree bound,
          # != NULL for non-finitely generated ideals;
 NOTE  : The input ideal needs to be given in special form. It is a list
         of modules, where each generator of every module represents a
@@ -30,42 +30,42 @@ NOTE  : The input ideal needs to be given in special form. It is a list
         The first entry, in each generator, represents a coefficient and
         every next entry is a variable.
         Ex. module p1=[1,y,z],[-1,z,y] represents the poly y*z-z*y;
-            module p2=[1,x,z,x],[-1,z,x,z] represents the poly x*z*x-z*x*z 
+            module p2=[1,x,z,x],[-1,z,x,z] represents the poly x*z*x-z*x*z
         for more details about the input, see examples.
 EXAMPLE: example nchilb; shows an example "
 {
 
-    if (d<1) 
+    if (d<1)
     {
       ERROR("bad degree bound");
     }
-    
+
     def save = basering;
     int sz=size(#);
     int lV=nvars(save);
-    
+
     def R =makeLetterplaceRing(d);
     setring R;
     ideal I;
     poly p;
     poly q=0;
-    // convert list L_wp of free-poly to letterPlace-poly format 
+    // convert list L_wp of free-poly to letterPlace-poly format
     setring save;
     module M;
     int i,j,k,sw,sm,slm;
     vector w;
     poly pc=0;
-    intvec v; 
+    intvec v;
     slm = size(L_wp);                  // number of polys in the given ideal
-    
+
     for (i=1; i<=slm; i++)
-    {   
+    {
         M  = L_wp[i];
         sm = ncols(M);                 // number of words in the free-poly M
         for (j=1; j<=sm; j++)
         {
             w  = M[j];
-            sw = size(w); 
+            sw = size(w);
             for (k=2; k<=sw; k++)
             {
               v[k-1]=rvar(w[k]);
@@ -82,29 +82,29 @@ EXAMPLE: example nchilb; shows an example "
         }
         setring R;
         I = I,q; //lp-polynomial added to I
-        q=0;   //ready for the next polynomial  
+        q=0;   //ready for the next polynomial
         setring save;
     }
     setring R;
 
     ideal J = system("freegb",I,d,lV);
-    
+
     //Groebner Basis is computed for the given ideal.
     //now compute the leading monomials of the Groebner Basis
-    
+
     ideal J_lm;
     for(i=1;i<=size(J);i++)
     {
         J_lm[i]=leadmonom(J[i]);
     }
-    
+
     setring save;
     def A =makeLetterplaceRing(2*d);
     setring A;
     ideal I=imap(R, J_lm);
-    
+
     //compute the Hilbert series
-    
+
     if(sz==1)                     // non-finitely generated case
     {
         system("nc_hilb",I,lV,1);
@@ -115,14 +115,14 @@ EXAMPLE: example nchilb; shows an example "
     }
 }
 example
-{ 
+{
 "EXAMPLE:"; echo = 2;
     ring r=0,(x,y,z),dp;
     module p1=[1,y,z],[-1,z,y];           //represents the poly y*z-z*y
     module p2=[1,x,z,x],[-1,z,x,z];    //represents the poly x*z*x-z*x*z
     list l1=list(p1,p2);
     nchilb(l1,6,1); //third argument is for non-finitely generated case
-    
+
     ring r=0,(x,y,z,w),dp;
     module p1=[1,y,x],[-1,x,y];            //represents the poly y*x-x*y
     module p2=[1,z,x],[-1,x,z];
@@ -132,7 +132,7 @@ example
     module p6=[1,w,z],[-1,z,w];
     list l2=list(p1,p2,p3,p4,p5,p6);
     nchilb(l2,5);
-        
+
     ring r=0,(X,Y,Z),dp;
     module p1 =[1,Y,Z];                //represents the poly Y*Z
     module p2 =[1,Y,Z,X];
@@ -144,7 +144,7 @@ example
     module p8 =[1,Y,Z,Z,Z,Z,Z,Z,Z,X,Z];
     list l3=list(p1,p2,p3,p4,p5,p6,p7,p8);
     nchilb(l3,10);
-    
+
     ring r=0,U(1..3),dp;
     module p1=[1,U(2),U(3),U(3)];
     module p2=[1,U(2),U(2),U(3)];
@@ -170,14 +170,14 @@ example
     list ll=list(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,
     p14,p15,p16,p17,p18,p19,p20,p21);
     nchilb(ll,7,1);
-    
+
     ring r=0,(x,y,z),dp;
     module p1=[1,x,z,y,z,x,z];
     module p2=[1,x,z,x];
     module p3=[1,x,z,y,z,z,x,z];
     module p4=[1,y,z];
     module p5=[1,x,z,z,x,z];
-    
+
     list l1=list(p1,p2,p3,p4,p5);
     nchilb(l1,7);
 }
