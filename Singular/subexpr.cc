@@ -367,6 +367,7 @@ void sleftv::CleanUp(ring r)
         case VSHORTOUT:
         case VNOETHER:
         case VMINPOLY:
+        case LIB_CMD:
         case 0:
           //attribute=NULL; // will be done by Init() at the end
           break;
@@ -643,6 +644,7 @@ void s_internalDelete(const int t,  void *d, const ring r)
     case VSHORTOUT:
     case VNOETHER:
     case VMINPOLY:
+    case LIB_CMD:
     case 0: /* type in error case */
       break; /* error recovery: do nothing */
     //case COMMAND:
@@ -737,7 +739,7 @@ void * sleftv::CopyD(int t)
 //void * sleftv::CopyD()
 //{
   //if ((rtyp!=IDHDL)&&(e==NULL)
-  //&&(rtyp!=VNOETHER)&&(rtyp!=VMINPOLY))
+  //&&(rtyp!=VNOETHER)&&(rtyp!=LIB_CMD)&&(rtyp!=VMINPOLY))
   //{
   //  void *x=data;
   //  data=NULL;
