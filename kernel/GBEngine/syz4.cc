@@ -159,26 +159,12 @@ static poly ComputeImage_test(poly multiplier, const int t,
 #define CACHE 1
 
 #if CACHE
-bool my_p_LmCmp_test (poly a, poly b, const ring r)
-{
-  return p_LmCmp(a, b, r) == -1;
-}
-
 struct CCacheCompare_test
 {
-  const ring& m_ring_test;
-  CCacheCompare_test(): m_ring_test(currRing) {}
-  CCacheCompare_test(const ring& r): m_ring_test(r) {}
-  CCacheCompare_test(const CCacheCompare_test& lhs):
-    m_ring_test(lhs.m_ring_test) {}
-  CCacheCompare_test& operator=(const CCacheCompare_test& lhs)
-  {
-    return (const_cast<CCacheCompare_test&>(lhs));
-  }
   inline bool operator() (const poly& l, const poly& r)
     const
   {
-    return my_p_LmCmp_test(l, r, m_ring_test);
+    return (p_LmCmp(l, r, currRing) == -1);
   }
 };
 
@@ -188,19 +174,7 @@ typedef std::map<int, TP2PCache_test> TCache_test;
 
 static TCache_test m_cache_test;
 
-static FORCE_INLINE poly myp_Head_test(const poly p, const bool bIgnoreCoeff,
-  const ring r)
-{
-  p_LmCheckPolyRing1(p, r);
-  poly np;
-  omTypeAllocBin(poly, np, r->PolyBin);
-  p_SetRingOfLm(np, r);
-  memcpy(np->exp, p->exp, r->ExpL_Size*sizeof(long));
-  pNext(np) = NULL;
-  pSetCoeff0(np, (bIgnoreCoeff)? NULL : n_Copy(pGetCoeff(p), r->cf));
-  p_LmCheckPolyRing1(np, r);
-  return np;
-}
+// note: we don't need to keep the coeffs of those terms which are lifted to 0
 
 static void delete_cache()
 {
@@ -211,9 +185,9 @@ static void delete_cache()
             p_Delete((&(vit->second)), currRing);
             p_Delete(const_cast<poly*>(&(vit->first)), currRing);
         }
-        T.erase(T.begin(), T.end());
+        T.clear();
     }
-    m_cache_test.erase(m_cache_test.begin(), m_cache_test.end());
+    m_cache_test.clear();
 }
 #endif   // CACHE
 
@@ -246,7 +220,7 @@ static poly TraverseTail_test(poly multiplier, const int tail,
      itr = T.find(multiplier);
      if( itr == T.end() )
      {
-       T.insert(TP2PCache_test::value_type(myp_Head_test(multiplier, (p==NULL),
+       T.insert(TP2PCache_test::value_type(p_Head(multiplier,
          r), p) );
        return p_Copy(p, r);
      }
@@ -263,15 +237,14 @@ static poly TraverseTail_test(poly multiplier, const int tail,
     TP2PCache_test::iterator itr = T.find(multiplier);
     if( itr == T.end() )
     {
-      T.insert(TP2PCache_test::value_type(myp_Head_test(multiplier, (p==NULL),
+      T.insert(TP2PCache_test::value_type(p_Head(multiplier,
           r), p));
       return p_Copy(p, r);
     }
     return p;
   }
-  CCacheCompare_test o(r);
-  TP2PCache_test T(o);
-  T.insert(TP2PCache_test::value_type(myp_Head_test(multiplier, (p==NULL), r),
+  TP2PCache_test T;
+  T.insert(TP2PCache_test::value_type(p_Head(multiplier, r),
     p));
   m_cache_test.insert( TCache_test::value_type(tail, T) );
   return p_Copy(p, r);
