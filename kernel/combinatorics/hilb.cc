@@ -2061,7 +2061,7 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE )
   omFree(xx[0]);
   omFree(xx);
   rChangeCurrRing(r);
-  rKill(R);
+  rDelete(R);
 }
 
 
