@@ -13,7 +13,7 @@
 #include <polys/monomials/p_polys.h>
 
 // #include <kernel/ideals.h>
-// #include <kernel/polys.h>
+#include <kernel/polys.h>
 #include <kernel/combinatorics/hutil.h>
 
 scfmon hexist, hstc, hrad, hwork;

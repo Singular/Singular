@@ -14,8 +14,6 @@ struct sip_sideal; typedef struct sip_sideal                        * ideal;
 struct spolyrec  ; typedef struct spolyrec polyrec; typedef polyrec * poly;
 typedef                                                     poly    * polyset;
 
-extern ring currRing;
-
 typedef int * scmon;
 typedef scmon * scfmon;
 typedef int * varset;

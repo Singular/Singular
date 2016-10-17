@@ -11,8 +11,6 @@
 #include <polys/monomials/p_polys.h>
 #include <polys/simpleideals.h>
 
-extern ring currRing;
-
 #include <kernel/structs.h> // for tHomog
 
 //typedef struct sip_sideal *        ideal;
