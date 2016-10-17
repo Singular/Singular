@@ -284,7 +284,7 @@ static poly lift_ext_LT(const poly a, const ideal previous_module,
     const std::vector<bool> &variables, const lts_hash *m_div)
 {
   const ring R = currRing;
-  poly t1 = TraverseTail_test(a, p_GetComp(a, R)-1,
+  poly t1 = ComputeImage_test(a, p_GetComp(a, R)-1,
       previous_module, variables, m_div);
   poly t2 = TraverseTail_test(a->next, p_GetComp(a->next, R)-1,
       previous_module, variables, m_div);
