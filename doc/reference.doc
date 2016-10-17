@@ -5602,6 +5602,8 @@ See
 @node prime, primefactors, preimage, Functions
 @subsection prime
 @cindex prime
+@cindex factor
+@cindex factorize
 @table @code
 @item @strong{Syntax:}
 @code{prime (} int_expression @code{)}
