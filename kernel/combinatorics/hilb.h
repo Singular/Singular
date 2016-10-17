@@ -22,6 +22,7 @@ intvec * hSecondSeries(intvec *hseries1);
 
 void hLookSeries(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegree=NULL, ring tailRing = currRing);
 
+void sortMonoIdeal_pCompare(ideal I);
 #endif
 
 

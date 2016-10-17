@@ -1650,7 +1650,7 @@ static int monCompare( const void *m, const void *n)
  return(p_Compare(*(poly*) m, *(poly*)n, currRing));
 }
 
-static void sortMonoIdeal_totalDegOrder(ideal I)
+void sortMonoIdeal_pCompare(ideal I)
 {
   /*
    * sorts the monomial ideal in ascending order
@@ -1673,7 +1673,7 @@ static ideal  minimalMonomialsGenSet(ideal I)
 
   idSkipZeroes(I);
 
-  sortMonoIdeal_totalDegOrder(I);
+  sortMonoIdeal_pCompare(I);
 
   ideal J = idInit(1, 1);
   int i, k;
