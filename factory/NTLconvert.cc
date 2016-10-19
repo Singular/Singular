@@ -505,8 +505,10 @@ convertZZ2CF (const ZZ & a)
     const long * rep =
 #if NTL_MAJOR_VERSION <= 6
       static_cast<long *>( a.rep );
-#else
+#elif NTL_MAJOR_VERSION <=9
       static_cast<long *>( a.rep.rep ); // what about NTL7?
+#else
+      (long*)( a.rep.rep );
 #endif
     long sizeofrep= rep[1];
     bool lessZero= false;
@@ -547,7 +549,6 @@ convertZZ2CF (const ZZ & a)
 
     result= CanonicalForm (cf_stringtemp2, 16);
     delete [] cf_stringtemp2;
-    return result;
   }
   return result;
 }
