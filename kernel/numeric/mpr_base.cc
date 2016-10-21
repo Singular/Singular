@@ -1354,7 +1354,7 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
       if ( !remapXiToPoint( LP->iposv[i+1], pQ, &(optSum[c].set), &(optSum[c].pnt) ) )
       {
         Werror(" resMatrixSparse::RC: Found bad solution in LP: %d!",LP->iposv[i+1]);
-        WerrorS(" resMatrixSparse::RC: remapXiToPoint faild!");
+        WerrorS(" resMatrixSparse::RC: remapXiToPoint failed!");
         return -1;
       }
       bucket[optSum[c].set]++;
