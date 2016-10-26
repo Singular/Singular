@@ -9,8 +9,7 @@ p_FDeg: a degree for use in GB computations:
        Requirement: there are only finitely many monomials of the same degree
 p_Totaldegree: the sum of all exponents (the usual total degree)
 p_WTotaldegree: the weighted sum of all exponents (the usual weigthed degree)
-p_WDegree: the weighthed degree of the first block
-           +total degree of all other aǘariables
+p_WDegree: the weighted sum of all exponents (obsolete)
 p_WFirstTotalDegree: the weighted sum of the exponents of the first block
 
 Degree function for a polynomial
