@@ -1,0 +1,27 @@
+Degree functions for the leading term (wrt. the monomial ordering)
+==================================================================
+
+p_Deg: a degree that is compatible with the monomial ordering
+       (i.e. for dp: totaldegree, for lp(lex): exponent of first variable, etc.)
+p_FDeg: a degree for use in GB computations:
+       (i.e. p_Deg for degree orderings, p_Totaldegree for block orderings (lex)
+        or mixed orderings).
+       Requirement: there are only finitely many monomials of the same degree
+p_Totaldegree: the sum of all exponents (the usual total degree)
+p_WTotaldegree: the weighted sum of all exponents (the usual weigthed degree)
+p_WDegree: the weighthed degree of the first block
+           +total degree of all other aǘariables
+p_WFirstTotalDegree: the weighted sum of the exponents of the first block
+
+Degree function for a polynomial
+==================================
+p_LDeg: return the length and the maximal degree wrt. p_FDeg
+
+Ring properties wrt. monomial orderings
+=======================================
+OrdSgn: 1 for well ordering (i.e. 1 is the smallest monomial)
+        -1 otherwise
+MixedOrder: 0 for well orderings 
+         and local orderings (i.e. 1 is the largest monomial)
+LexOrder: 1 for block orderings (incl. lex), 0 otherwise
+
