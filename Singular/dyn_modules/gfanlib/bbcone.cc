@@ -1236,6 +1236,62 @@ BOOLEAN intersectCones(leftv res, leftv args)
       return FALSE;
     }
   }
+  if ((u != NULL) && (u->Typ() == LIST_CMD))
+  {
+    if (u->next == NULL)
+    {
+      lists l = (lists) u->Data();
+
+      // find the total number of inequalities and equations
+      int r1=0; // total number of inequalities
+      int r2=0; // total number of equations
+      int c=0;  // ambient dimension
+      for (int i=0; i<=lSize(l); i++)
+      {
+        if (l->m[i].Typ() != coneID)
+        {
+          WerrorS("convexIntersection: entries of wrong type in list");
+          return TRUE;
+        }
+        gfan::ZCone* ll = (gfan::ZCone*) l->m[i].Data();
+        r1 = r1 + ll->getInequalities().getHeight();
+        r2 = r2 + ll->getEquations().getHeight();
+      }
+      if (lSize(l)>=0)
+      {
+        gfan::ZCone* ll = (gfan::ZCone*) l->m[0].Data();
+        c = ll->getInequalities().getWidth();
+      }
+      gfan::ZMatrix totalIneqs(r1,c);
+      gfan::ZMatrix totalEqs(r2,c);
+
+      // concat all inequalities and equations
+      r1=0; // counter for inequalities
+      r2=0; // counter for equations
+      for (int i=0; i<=lSize(l); i++)
+      {
+        gfan::ZCone* ll = (gfan::ZCone*) l->m[i].Data();
+        gfan::ZMatrix ineqs = ll->getInequalities();
+        for (int j=0; j<ineqs.getHeight(); j++)
+        {
+          totalIneqs[r1]=ineqs[j];
+          r1 = r1+1;
+        }
+        gfan::ZMatrix eqs = ll->getEquations();
+        for (int j=0; j<eqs.getHeight(); j++)
+        {
+          totalEqs[r2]=eqs[j];
+          r2 = r2+1;
+        }
+      }
+
+      gfan::ZCone* zc = new gfan::ZCone(totalIneqs,totalEqs);
+      zc->canonicalize();
+      res->rtyp = coneID;
+      res->data = (void *) zc;
+      return FALSE;
+    }
+  }
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     leftv v = u->next;
