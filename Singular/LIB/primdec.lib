@@ -4214,15 +4214,14 @@ static proc algeRad(ideal i)
    def R=basering;
    int n=nvars(R);
 
-   string mp="poly p="+string(minpoly)+";";
+   string mp="poly @p="+string(minpoly)+";";
    string gnir="ring RH="+string(char(R))+",("+varstr(R)+","+string(par(1))
                 +"),dp;";
    execute(gnir);
    execute(mp);
    ideal i=imap(R,i);
-   i=i,p;
+   i=i,@p;
    ideal ra=radical(i);
-
    gnir="ring RS="+string(char(R))+",("+varstr(RH)
                 +"),(dp("+string(n)+"),lp);";
    execute(gnir);
@@ -4234,6 +4233,7 @@ static proc algeRad(ideal i)
 
    return( ra );
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
