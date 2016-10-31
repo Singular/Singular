@@ -48,18 +48,18 @@ matrix mpNew(int r, int c)
 {
   int rr=r;
   if (rr<=0) rr=1;
-  if ( (((int)(MAX_INT_VAL/sizeof(poly))) / rr) <= c)
-  {
-    Werror("internal error: creating matrix[%d][%d]",r,c);
-    return NULL;
-  }
+  //if ( (((int)(MAX_INT_VAL/sizeof(poly))) / rr) <= c)
+  //{
+  //  Werror("internal error: creating matrix[%d][%d]",r,c);
+  //  return NULL;
+  //}
   matrix rc = (matrix)omAllocBin(sip_sideal_bin);
   rc->nrows = r;
   rc->ncols = c;
   rc->rank = r;
   if ((c != 0)&&(r!=0))
   {
-    int s=r*c*sizeof(poly);
+    size_t s=r*c*sizeof(poly);
     rc->m = (poly*)omAlloc0(s);
     //if (rc->m==NULL)
     //{
