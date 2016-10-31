@@ -3321,12 +3321,10 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       {
         if (h==NULL)
         {
-#ifdef HAVE_PLURAL
           Print("EZGCD:%d (use EZGCD for gcd of polynomials in char 0)\n",isOn(SW_USE_EZGCD));
           Print("EZGCD_P:%d (use EZGCD_P for gcd of polynomials in char p)\n",isOn(SW_USE_EZGCD_P));
           Print("CRGCD:%d (use chinese Remainder for gcd of polynomials in char 0)\n",isOn(SW_USE_CHINREM_GCD));
           Print("QGCD:%d (use QGCD for gcd of polynomials in alg. ext.)\n",isOn(SW_USE_QGCD));
-#endif
           Print("homog:%d (use homog. test for factorization of polynomials)\n",singular_homog_flag);
           return FALSE;
         }
