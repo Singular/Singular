@@ -1500,7 +1500,7 @@ BOOLEAN coneLink(leftv res, leftv args)
       res->data = (void *) zd;
 
       delete zv;
-      if (v->Typ() == INTMAT_CMD)
+      if (v->Typ() == INTVEC_CMD)
         delete iv;
       gfan::deinitializeCddlibIfRequired();
       return FALSE;
@@ -1564,7 +1564,7 @@ BOOLEAN containsInSupport(leftv res, leftv args)
       res->data = (void*) (long) b;
 
       delete zv;
-      if (v->Typ() == INTMAT_CMD)
+      if (v->Typ() == INTVEC_CMD)
         delete iv;
       gfan::deinitializeCddlibIfRequired();
       return FALSE;
@@ -1601,13 +1601,13 @@ BOOLEAN containsRelatively(leftv res, leftv args)
         res->rtyp = INT_CMD;
         res->data = (void *) b;
         delete zv;
-        if (v->Typ() == INTMAT_CMD)
+        if (v->Typ() == INTVEC_CMD)
           delete iv;
         gfan::deinitializeCddlibIfRequired();
         return FALSE;
       }
       delete zv;
-      if (v->Typ() == INTMAT_CMD)
+      if (v->Typ() == INTVEC_CMD)
         delete iv;
       gfan::deinitializeCddlibIfRequired();
       Werror("expected ambient dim of cone and size of vector\n"
