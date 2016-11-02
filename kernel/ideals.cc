@@ -1448,12 +1448,12 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
       if (pGetExp(delVar,j+1)!=0) wv[0][j]=1;
     BOOLEAN wp=FALSE;
     for (j=0;j<rVar(origR);j++)
-      if (pWeight(j+1,origR)!=1) { wp=TRUE;break; }
+      if (p_Weight(j+1,origR)!=1) { wp=TRUE;break; }
     if (wp)
     {
       wv[1]=(int*)omAlloc0((rVar(origR) + 1)*sizeof(int));
       for (j=0;j<rVar(origR);j++)
-        wv[1][j]=pWeight(j+1,origR);
+        wv[1][j]=p_Weight(j+1,origR);
       ord[1] = ringorder_wp;
     }
     else

@@ -259,8 +259,7 @@ typedef poly*   polyset;
  * Degree stuff -- see p_polys.cc for explainations
  *
  ***************************************************************/
-inline int pWeight(int i, const ring R = currRing){ return p_Weight(i, R); }
-
+#define pWeight(i)       p_Weight(i,currRing)
 
 static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
 #define pWTotaldegree(p) p_WTotaldegree(p,currRing)
