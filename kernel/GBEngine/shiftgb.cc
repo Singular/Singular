@@ -241,7 +241,7 @@ int pmFirstVblock(poly p, int lV)
 int isInV(poly p, int lV)
 {
   /* investigate only the leading monomial of p in currRing */
-  if ( pIsConstant(p) ) return(1);
+  if ( pTotaldegree(p)==0 ) return(1);
   if (lV <= 0) return(0);
   /* returns 1 iff p is in V */
   /* that is in each block up to a certain one there is only one nonzero exponent */
