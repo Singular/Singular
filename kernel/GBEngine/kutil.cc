@@ -1428,7 +1428,10 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
     if(pm1 == NULL)
     {
       if(h.lcm != NULL)
-        pDelete(&h.lcm);
+      {
+        pLmDelete(h.lcm);
+	h.lcm=NULL;
+      }
       h.Clear();
       if (strat->pairtest==NULL) initPairtest(strat);
       strat->pairtest[i] = TRUE;
@@ -1690,7 +1693,7 @@ BOOLEAN sbaCheckGcdPair (LObject* h,kStrategy strat)
         h->i_r1 = -1;h->i_r2 = -1;
         if(h->lcm != NULL)
         {
-          pDelete(&h->lcm);
+          pLmDelete(h->lcm);
           h->lcm = NULL;
         }
         if (currRing!=strat->tailRing)
