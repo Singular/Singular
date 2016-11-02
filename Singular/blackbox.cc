@@ -93,7 +93,9 @@ BOOLEAN blackboxDefaultOpM(int op,leftv res, leftv args)
   if (op==LIST_CMD)
   {
     res->rtyp=LIST_CMD;
-    return jjLIST_PL(res,args);
+    BOOLEAN bo=jjLIST_PL(res,args);
+    args->CleanUp();
+    return bo;
   }
   else if(op==STRING_CMD)
   {
