@@ -7959,6 +7959,8 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
         {
           break;// leave loop, goto error handling
         }
+        a->CleanUp();
+        b->CleanUp();
         //Print("op: %d,result typ:%d\n",op,res->rtyp);
         return FALSE;
       }
@@ -8074,6 +8076,8 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
         }
       }
     }
+    a->CleanUp();
+    b->CleanUp();
     res->rtyp = UNKNOWN;
   }
   return TRUE;
@@ -8088,7 +8092,7 @@ BOOLEAN iiExprArith2Tab(leftv res, leftv a, int op,
   int bt=b->Typ();
   BOOLEAN bo=iiExprArith2TabIntern(res,a,op,b,TRUE,dA2,at,bt,dConvertTypes);
   a->next=b;
-  a->CleanUp();
+  a->CleanUp(); // to clean up the chain, content already done in iiExprArith2TabIntern
   return bo;
 }
 BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
@@ -8103,9 +8107,9 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
       //Print("siq:%d\n",siq);
       command d=(command)omAlloc0Bin(sip_command_bin);
       memcpy(&d->arg1,a,sizeof(sleftv));
-      //a->Init();
+      a->Init();
       memcpy(&d->arg2,b,sizeof(sleftv));
-      //b->Init();
+      b->Init();
       d->argc=2;
       d->op=op;
       res->data=(char *)d;
@@ -8293,7 +8297,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
       //Print("siq:%d\n",siq);
       command d=(command)omAlloc0Bin(sip_command_bin);
       memcpy(&d->arg1,a,sizeof(sleftv));
-      //a->Init();
+      a->Init();
       d->op=op;
       d->argc=1;
       res->data=(char *)d;
@@ -8370,6 +8374,9 @@ static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv 
         {
           break;// leave loop, goto error handling
         }
+        a->CleanUp();
+        b->CleanUp();
+        c->CleanUp();
         return FALSE;
       }
       i++;
@@ -8423,6 +8430,9 @@ static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv 
                   omFreeBin((ADDRESS)bn, sleftv_bin);
                   omFreeBin((ADDRESS)cn, sleftv_bin);
                   //Print("op: %d,result typ:%d\n",op,res->rtyp);
+                  a->CleanUp();
+                  b->CleanUp();
+                  c->CleanUp();
                   return FALSE;
                 }
               }
@@ -8484,7 +8494,10 @@ static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv 
     }
     res->rtyp = UNKNOWN;
   }
-        //Print("op: %d,result typ:%d\n",op,res->rtyp);
+  a->CleanUp();
+  b->CleanUp();
+  c->CleanUp();
+  //Print("op: %d,result typ:%d\n",op,res->rtyp);
   return TRUE;
 }
 BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
@@ -8499,11 +8512,11 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
       //Print("siq:%d\n",siq);
       command d=(command)omAlloc0Bin(sip_command_bin);
       memcpy(&d->arg1,a,sizeof(sleftv));
-      //a->Init();
+      a->Init();
       memcpy(&d->arg2,b,sizeof(sleftv));
-      //b->Init();
+      b->Init();
       memcpy(&d->arg3,c,sizeof(sleftv));
-      //c->Init();
+      c->Init();
       d->op=op;
       d->argc=3;
       res->data=(char *)d;
@@ -8536,7 +8549,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
   a->CleanUp();
   b->CleanUp();
   c->CleanUp();
-        //Print("op: %d,result typ:%d\n",op,res->rtyp);
+  //Print("op: %d,result typ:%d\n",op,res->rtyp);
   return TRUE;
 }
 BOOLEAN iiExprArith3Tab(leftv res, leftv a, int op,
@@ -8553,7 +8566,7 @@ BOOLEAN iiExprArith3Tab(leftv res, leftv a, int op,
   BOOLEAN bo=iiExprArith3TabIntern(res,op,a,b,c,dA3,at,bt,ct,dConvertTypes);
   b->next=c;
   a->next=b;
-  a->CleanUp();
+  a->CleanUp(); // to cleanup the chain, content already done
   return bo;
 }
 /*==================== operations with many arg. ===============================*/
@@ -9149,7 +9162,6 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
         sleftv tmp;
         tmp.Copy(v);
         bo=iiExprArith2TabIntern(&res_l->m[i],&c->m[i],CHINREM_CMD,&tmp,TRUE,dArith2+tab_pos,c->m[i].rtyp,tmp.rtyp,dConvertTypes);
-        tmp.CleanUp();
         if (bo) { Werror("chinrem failed for list entry %d",i+1); break;}
       }
       c->Clean();
@@ -9303,7 +9315,6 @@ static BOOLEAN jjFAREY_LI(leftv res, leftv u, leftv v)
     sleftv tmp;
     tmp.Copy(v);
     bo=iiExprArith2TabIntern(&res_l->m[i],&c->m[i],FAREY_CMD,&tmp,TRUE,dArith2+tab_pos,c->m[i].rtyp,tmp.rtyp,dConvertTypes);
-    tmp.CleanUp();
     if (bo) { Werror("farey failed for list entry %d",i+1); break;}
   }
   c->Clean();
