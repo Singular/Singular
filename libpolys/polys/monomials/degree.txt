@@ -2,15 +2,28 @@ Degree functions for the leading term (wrt. the monomial ordering)
 ==================================================================
 
 p_Deg: a degree that is compatible with the monomial ordering
-       (i.e. for dp: totaldegree, for lp(lex): exponent of first variable, etc.)
+       (i.e. for dp: totaldegree, for lp(lex): exponent of first variable(s), etc.)
 p_FDeg: a degree for use in GB computations:
        (i.e. p_Deg for degree orderings, p_Totaldegree for block orderings (lex)
         or mixed orderings).
        Requirement: there are only finitely many monomials of the same degree
+       Remark: A weight 0 (or positive and negative weights) allow infinitely
+       many monomials of the same degree which lead to infinite cycles in GB
+       computations - p_FDeg uses p_Totaldegree in this case
 p_Totaldegree: the sum of all exponents (the usual total degree)
-p_WTotaldegree: the weighted sum of all exponents (the usual weigthed degree)
-p_WDegree: the weighted sum of all exponents (obsolete)
+p_WTotaldegree: the weighted sum of all exponents(the usual weigthed degree)*OrdSgn
+                For matrix orderings this is the scalar product of the first row
+                of the ordering matrix with the exponent vector
+p_WDegree: the weighted sum of all exponents (obsolete, currently not used):
+           Difference to p_WTotaldegree:
+           - does not muliply by OrdSgn
+           - uses p_WFirstTotalDegree for the first block
+           - for all but the first block: use the first non-zero entry in each
+             column of the ordering matrix as weight (and not the entry in the
+             first row)
 p_WFirstTotalDegree: the weighted sum of the exponents of the first block
+             (scalar product of the first row of the ordering matrix
+             with the exponent vector)
 
 Degree function for a polynomial
 ==================================
@@ -18,9 +31,10 @@ p_LDeg: return the length and the maximal degree wrt. p_FDeg
 
 Ring properties wrt. monomial orderings
 =======================================
-OrdSgn: 1 for well ordering (i.e. 1 is the smallest monomial)
+OrdSgn: 1 for well orderings (i.e. 1 is the smallest monomial)
         -1 otherwise
 MixedOrder: 0 for well orderings 
          and local orderings (i.e. 1 is the largest monomial)
+        1 otherwise
 LexOrder: 1 for block orderings (incl. lex), 0 otherwise
 
