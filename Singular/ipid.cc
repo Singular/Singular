@@ -657,15 +657,18 @@ BOOLEAN piKill(procinfov pi)
   (pi->ref)--;
   if (pi->ref <= 0)
   {
-    Voice *p=currentVoice;
-    while (p!=NULL)
+    if (pi->language==LANG_SINGULAR)
     {
-      if (p->pi==pi && pi->ref <= 1)
+      Voice *p=currentVoice;
+      while (p!=NULL)
       {
-        Warn("`%s` in use, can not be killed",pi->procname);
-        return TRUE;
+        if (p->pi==pi && pi->ref <= 1)
+        {
+          Warn("`%s` in use, can not be killed",pi->procname);
+          return TRUE;
+        }
+        p=p->next;
       }
-      p=p->next;
     }
     if (pi->libname != NULL) // OB: ????
       omFree((ADDRESS)pi->libname);
@@ -681,7 +684,7 @@ BOOLEAN piKill(procinfov pi)
     {
     }
     memset((void *) pi, 0, sizeof(procinfo));
-    pi->language=LANG_NONE;
+    //pi->language=LANG_NONE;
     omFreeBin((ADDRESS)pi,  procinfo_bin);
   }
   return FALSE;
