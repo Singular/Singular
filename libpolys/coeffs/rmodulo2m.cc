@@ -52,7 +52,7 @@ static char* nr2mCoeffName(const coeffs cf)
 {
   static char n2mCoeffName_buf[22];
 #ifdef SINGULAR_4_1
-  snprintf(n2mCoeffName_buf,21,"ZZ/(2^%lu)",cf->modExponent); 
+  snprintf(n2mCoeffName_buf,21,"ZZ/(2^%lu)",cf->modExponent);
 #else
   snprintf(n2mCoeffName_buf,21,"integer,2,%lu",cf->modExponent);
 #endif
@@ -111,8 +111,6 @@ static coeffs nr2mQuot1(number c, const coeffs r)
     }
     else
     {
-        ZnmInfo info;
-        info.base = r->modBase;
         int kNew = 1;
         mpz_t baseTokNew;
         mpz_init(baseTokNew);
@@ -122,7 +120,6 @@ static coeffs nr2mQuot1(number c, const coeffs r)
           kNew++;
           mpz_mul(baseTokNew, baseTokNew, r->modBase);
         }
-        info.exp = kNew;
         mpz_clear(baseTokNew);
         rr = nInitChar(n_Z2m, (void*)(long)kNew);
     }
@@ -532,6 +529,8 @@ static number nr2mMod(number a, number b, const coeffs r)
   return (number)rr;
 }
 
+#if 0
+// unused
 static number nr2mIntDiv(number a, number b, const coeffs r)
 {
   if ((unsigned long)a == 0)
@@ -561,6 +560,7 @@ static number nr2mIntDiv(number a, number b, const coeffs r)
     return (number)((unsigned long) a / (unsigned long) b);
   }
 }
+#endif
 
 static number nr2mAnn(number b, const coeffs r)
 {
