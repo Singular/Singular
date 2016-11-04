@@ -24,45 +24,6 @@
 
 #ifdef HAVE_RINGS
 
-number  nr2mCopy        (number a, const coeffs r);
-BOOLEAN nr2mGreaterZero (number k, const coeffs r);
-number  nr2mMult        (number a, number b, const coeffs r);
-number  nr2mInit        (long i, const coeffs r);
-long    nr2mInt         (number &n, const coeffs r);
-number  nr2mAdd         (number a, number b, const coeffs r);
-number  nr2mSub         (number a, number b, const coeffs r);
-void    nr2mPower       (number a, int i, number * result, const coeffs r);
-BOOLEAN nr2mIsZero      (number a, const coeffs r);
-BOOLEAN nr2mIsOne       (number a, const coeffs r);
-BOOLEAN nr2mIsMOne      (number a, const coeffs r);
-BOOLEAN nr2mIsUnit      (number a, const coeffs r);
-number  nr2mGetUnit     (number a, const coeffs r);
-number  nr2mDiv         (number a, number b, const coeffs r);
-number  nr2mIntDiv      (number a,number b, const coeffs r);
-number  nr2mMod         (number a,number b, const coeffs r);
-number  nr2mNeg         (number c, const coeffs r);
-number  nr2mInvers      (number c, const coeffs r);
-BOOLEAN nr2mGreater     (number a, number b, const coeffs r);
-BOOLEAN nr2mDivBy       (number a, number b, const coeffs r);
-int     nr2mDivComp     (number a, number b, const coeffs r);
-BOOLEAN nr2mEqual       (number a, number b, const coeffs r);
-number  nr2mLcm         (number a, number b, const coeffs r);
-number  nr2mGcd         (number a, number b, const coeffs r);
-number  nr2mExtGcd      (number a, number b, number *s, number *t, const coeffs r);
-nMapFunc nr2mSetMap     (const coeffs src, const coeffs dst);
-void    nr2mWrite       (number a, const coeffs r);
-const char *  nr2mRead  (const char *s, number *a, const coeffs r);
-char *  nr2mName        (number n, const coeffs r);
-void    nr2mCoeffWrite  (const coeffs r, BOOLEAN details);
-coeffs  nr2mQuot1(number c, const coeffs r);
-#ifdef LDEBUG
-BOOLEAN nr2mDBTest      (number a, const char *f, const int l, const coeffs r);
-#endif
-void    nr2mSetExp(int c, const coeffs r);
-void    nr2mInitExp(int c, const coeffs r);
-
-number nr2mMapQ(number from, const coeffs src, const coeffs dst);
-
 static inline number nr2mMultM(number a, number b, const coeffs r)
 {
   return (number)
@@ -87,13 +48,24 @@ static inline number nr2mSubM(number a, number b, const coeffs r)
 
 extern omBin gmp_nrz_bin; /* init in rintegers*/
 
-void    nr2mCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
+static char* nr2mCoeffName(const coeffs cf)
+{
+  static char n2mCoeffName_buf[22];
+#ifdef SINGULAR_4_1
+  snprintf(n2mCoeffName_buf,21,"ZZ/(2^%lu)",cf->modExponent); 
+#else
+  snprintf(n2mCoeffName_buf,21,"integer,2,%lu",cf->modExponent);
+#endif
+  return n2mCoeffName_buf;
+}
+
+static void    nr2mCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
   PrintS("//   coeff. ring is : ");
   Print("Z/2^%lu\n", r->modExponent);
 }
 
-BOOLEAN nr2mCoeffIsEqual(const coeffs r, n_coeffType n, void * p)
+static BOOLEAN nr2mCoeffIsEqual(const coeffs r, n_coeffType n, void * p)
 {
   if (n==n_Z2m)
   {
@@ -116,7 +88,7 @@ static char* nr2mCoeffString(const coeffs r)
   return s;
 }
 
-coeffs nr2mQuot1(number c, const coeffs r)
+static coeffs nr2mQuot1(number c, const coeffs r)
 {
     coeffs rr;
     long ch = r->cfInt(c, r);
@@ -157,73 +129,18 @@ coeffs nr2mQuot1(number c, const coeffs r)
     return(rr);
 }
 
-static number nr2mAnn(number b, const coeffs r);
-/* for initializing function pointers */
-BOOLEAN nr2mInitChar (coeffs r, void* p)
+/* TRUE iff 0 < k <= 2^m / 2 */
+static BOOLEAN nr2mGreaterZero(number k, const coeffs r)
 {
-  assume( getCoeffType(r) == n_Z2m );
-  nr2mInitExp((int)(long)(p), r);
-
-  r->is_field=FALSE;
-  r->is_domain=FALSE;
-  r->rep=n_rep_int;
-
-  //r->cfKillChar    = ndKillChar; /* dummy*/
-  r->nCoeffIsEqual = nr2mCoeffIsEqual;
-  r->cfCoeffString = nr2mCoeffString;
-
-  r->modBase = (mpz_ptr) omAllocBin (gmp_nrz_bin);
-  mpz_init_set_si (r->modBase, 2L);
-  r->modNumber= (mpz_ptr) omAllocBin (gmp_nrz_bin);
-  mpz_init (r->modNumber);
-  mpz_pow_ui (r->modNumber, r->modBase, r->modExponent);
-
-  /* next cast may yield an overflow as mod2mMask is an unsigned long */
-  r->ch = (int)r->mod2mMask + 1;
-
-  r->cfInit        = nr2mInit;
-  //r->cfCopy        = ndCopy;
-  r->cfInt         = nr2mInt;
-  r->cfAdd         = nr2mAdd;
-  r->cfSub         = nr2mSub;
-  r->cfMult        = nr2mMult;
-  r->cfDiv         = nr2mDiv;
-  r->cfAnn         = nr2mAnn;
-  r->cfIntMod      = nr2mMod;
-  r->cfExactDiv    = nr2mDiv;
-  r->cfInpNeg         = nr2mNeg;
-  r->cfInvers      = nr2mInvers;
-  r->cfDivBy       = nr2mDivBy;
-  r->cfDivComp     = nr2mDivComp;
-  r->cfGreater     = nr2mGreater;
-  r->cfEqual       = nr2mEqual;
-  r->cfIsZero      = nr2mIsZero;
-  r->cfIsOne       = nr2mIsOne;
-  r->cfIsMOne      = nr2mIsMOne;
-  r->cfGreaterZero = nr2mGreaterZero;
-  r->cfWriteLong       = nr2mWrite;
-  r->cfRead        = nr2mRead;
-  r->cfPower       = nr2mPower;
-  r->cfSetMap      = nr2mSetMap;
-//  r->cfNormalize   = ndNormalize; // default
-  r->cfLcm         = nr2mLcm;
-  r->cfGcd         = nr2mGcd;
-  r->cfIsUnit      = nr2mIsUnit;
-  r->cfGetUnit     = nr2mGetUnit;
-  r->cfExtGcd      = nr2mExtGcd;
-  r->cfCoeffWrite  = nr2mCoeffWrite;
-  r->cfQuot1       = nr2mQuot1;
-#ifdef LDEBUG
-  r->cfDBTest      = nr2mDBTest;
-#endif
-  r->has_simple_Alloc=TRUE;
-  return FALSE;
+  if ((unsigned long)k == 0) return FALSE;
+  if ((unsigned long)k > ((r->mod2mMask >> 1) + 1)) return FALSE;
+  return TRUE;
 }
 
 /*
  * Multiply two numbers
  */
-number nr2mMult(number a, number b, const coeffs r)
+static number nr2mMult(number a, number b, const coeffs r)
 {
   if (((unsigned long)a == 0) || ((unsigned long)b == 0))
     return (number)0;
@@ -231,10 +148,11 @@ number nr2mMult(number a, number b, const coeffs r)
     return nr2mMultM(a, b, r);
 }
 
+static number nr2mAnn(number b, const coeffs r);
 /*
  * Give the smallest k, such that a * x = k = b * y has a solution
  */
-number nr2mLcm(number a, number b, const coeffs)
+static number nr2mLcm(number a, number b, const coeffs)
 {
   unsigned long res = 0;
   if ((unsigned long)a == 0) a = (number) 1;
@@ -257,7 +175,7 @@ number nr2mLcm(number a, number b, const coeffs)
  * Give the largest k, such that a = x * k, b = y * k has
  * a solution.
  */
-number nr2mGcd(number a, number b, const coeffs)
+static number nr2mGcd(number a, number b, const coeffs)
 {
   unsigned long res = 0;
   if ((unsigned long)a == 0 && (unsigned long)b == 0) return (number)1;
@@ -277,200 +195,11 @@ number nr2mGcd(number a, number b, const coeffs)
 //  }
 }
 
-/*
- * Give the largest k, such that a = x * k, b = y * k has
- * a solution.
- */
-number nr2mExtGcd(number a, number b, number *s, number *t, const coeffs r)
-{
-  unsigned long res = 0;
-  if ((unsigned long)a == 0 && (unsigned long)b == 0) return (number)1;
-  while ((unsigned long)a % 2 == 0 && (unsigned long)b % 2 == 0)
-  {
-    a = (number)((unsigned long)a / 2);
-    b = (number)((unsigned long)b / 2);
-    res++;
-  }
-  if ((unsigned long)b % 2 == 0)
-  {
-    *t = NULL;
-    *s = nr2mInvers(a,r);
-    return (number)((1L << res)); // * (unsigned long) a);  // (2**res)*a    a is a unit
-  }
-  else
-  {
-    *s = NULL;
-    *t = nr2mInvers(b,r);
-    return (number)((1L << res)); // * (unsigned long) b);  // (2**res)*b    b is a unit
-  }
-}
-
-void nr2mPower(number a, int i, number * result, const coeffs r)
-{
-  if (i == 0)
-  {
-    *(unsigned long *)result = 1;
-  }
-  else if (i == 1)
-  {
-    *result = a;
-  }
-  else
-  {
-    nr2mPower(a, i-1, result, r);
-    *result = nr2mMultM(a, *result, r);
-  }
-}
-
-/*
- * create a number from int
- */
-number nr2mInit(long i, const coeffs r)
-{
-  if (i == 0) return (number)(unsigned long)i;
-
-  long ii = i;
-  unsigned long j = (unsigned long)1;
-  if (ii < 0) { j = r->mod2mMask; ii = -ii; }
-  unsigned long k = (unsigned long)ii;
-  k = k & r->mod2mMask;
-  /* now we have: i = j * k mod 2^m */
-  return (number)nr2mMult((number)j, (number)k, r);
-}
-
-/*
- * convert a number to an int in ]-k/2 .. k/2],
- * where k = 2^m; i.e., an int in ]-2^(m-1) .. 2^(m-1)];
- */
-long nr2mInt(number &n, const coeffs r)
-{
-  unsigned long nn = (unsigned long)(unsigned long)n & r->mod2mMask;
-  unsigned long l = r->mod2mMask >> 1; l++; /* now: l = 2^(m-1) */
-  if ((unsigned long)nn > l)
-    return (long)((unsigned long)nn - r->mod2mMask - 1);
-  else
-    return (long)((unsigned long)nn);
-}
-
-number nr2mAdd(number a, number b, const coeffs r)
-{
-  return nr2mAddM(a, b, r);
-}
-
-number nr2mSub(number a, number b, const coeffs r)
-{
-  return nr2mSubM(a, b, r);
-}
-
-BOOLEAN nr2mIsUnit(number a, const coeffs)
-{
-  return ((unsigned long)a % 2 == 1);
-}
-
-number nr2mGetUnit(number k, const coeffs)
-{
-  if (k == NULL) return (number)1;
-  unsigned long erg = (unsigned long)k;
-  while (erg % 2 == 0) erg = erg / 2;
-  return (number)erg;
-}
-
-BOOLEAN nr2mIsZero(number a, const coeffs)
-{
-  return 0 == (unsigned long)a;
-}
-
-BOOLEAN nr2mIsOne(number a, const coeffs)
-{
-  return 1 == (unsigned long)a;
-}
-
-BOOLEAN nr2mIsMOne(number a, const coeffs r)
-{
-  return ((r->mod2mMask  == (unsigned long)a) &&(1L!=(long)a))/*for char 2^1*/;
-}
-
-BOOLEAN nr2mEqual(number a, number b, const coeffs)
-{
-  return (a == b);
-}
-
-BOOLEAN nr2mGreater(number a, number b, const coeffs r)
-{
-  return nr2mDivBy(a, b,r);
-}
-
-/* Is 'a' divisible by 'b'? There are two cases:
-   1) a = 0 mod 2^m; then TRUE iff b = 0 or b is a power of 2
-   2) a, b <> 0; then TRUE iff b/gcd(a, b) is a unit mod 2^m */
-BOOLEAN nr2mDivBy (number a, number b, const coeffs r)
-{
-  if (a == NULL)
-  {
-    unsigned long c = r->mod2mMask + 1;
-    if (c != 0) /* i.e., if no overflow */
-      return (c % (unsigned long)b) == 0;
-    else
-    {
-      /* overflow: we need to check whether b
-         is zero or a power of 2: */
-      c = (unsigned long)b;
-      while (c != 0)
-      {
-        if ((c % 2) != 0) return FALSE;
-        c = c >> 1;
-      }
-      return TRUE;
-    }
-  }
-  else
-  {
-    number n = nr2mGcd(a, b, r);
-    n = nr2mDiv(b, n, r);
-    return nr2mIsUnit(n, r);
-  }
-}
-
-int nr2mDivComp(number as, number bs, const coeffs)
-{
-  unsigned long a = (unsigned long)as;
-  unsigned long b = (unsigned long)bs;
-  assume(a != 0 && b != 0);
-  while (a % 2 == 0 && b % 2 == 0)
-  {
-    a = a / 2;
-    b = b / 2;
-  }
-  if (a % 2 == 0)
-  {
-    return -1;
-  }
-  else
-  {
-    if (b % 2 == 1)
-    {
-      return 2;
-    }
-    else
-    {
-      return 1;
-    }
-  }
-}
-
-/* TRUE iff 0 < k <= 2^m / 2 */
-BOOLEAN nr2mGreaterZero(number k, const coeffs r)
-{
-  if ((unsigned long)k == 0) return FALSE;
-  if ((unsigned long)k > ((r->mod2mMask >> 1) + 1)) return FALSE;
-  return TRUE;
-}
-
 /* assumes that 'a' is odd, i.e., a unit in Z/2^m, and computes
    the extended gcd of 'a' and 2^m, in order to find some 's'
    and 't' such that a * s + 2^m * t = gcd(a, 2^m) = 1;
    this code will always find a positive 's' */
-void specialXGCD(unsigned long& s, unsigned long a, const coeffs r)
+static void specialXGCD(unsigned long& s, unsigned long a, const coeffs r)
 {
   mpz_ptr u = (mpz_ptr)omAlloc(sizeof(mpz_t));
   mpz_init_set_ui(u, a);
@@ -528,16 +257,15 @@ void specialXGCD(unsigned long& s, unsigned long a, const coeffs r)
   mpz_clear(rr); omFree((ADDRESS)rr);
 }
 
-unsigned long InvMod(unsigned long a, const coeffs r)
+static unsigned long InvMod(unsigned long a, const coeffs r)
 {
   assume((unsigned long)a % 2 != 0);
   unsigned long s;
   specialXGCD(s, a, r);
   return s;
 }
-//#endif
 
-inline number nr2mInversM(number c, const coeffs r)
+static inline number nr2mInversM(number c, const coeffs r)
 {
   assume((unsigned long)c % 2 != 0);
   // Table !!!
@@ -546,7 +274,135 @@ inline number nr2mInversM(number c, const coeffs r)
   return (number)inv;
 }
 
-number nr2mDiv(number a, number b, const coeffs r)
+static number nr2mInvers(number c, const coeffs r)
+{
+  if ((unsigned long)c % 2 == 0)
+  {
+    WerrorS("division by zero divisor");
+    return (number)0;
+  }
+  return nr2mInversM(c, r);
+}
+
+/*
+ * Give the largest k, such that a = x * k, b = y * k has
+ * a solution.
+ */
+static number nr2mExtGcd(number a, number b, number *s, number *t, const coeffs r)
+{
+  unsigned long res = 0;
+  if ((unsigned long)a == 0 && (unsigned long)b == 0) return (number)1;
+  while ((unsigned long)a % 2 == 0 && (unsigned long)b % 2 == 0)
+  {
+    a = (number)((unsigned long)a / 2);
+    b = (number)((unsigned long)b / 2);
+    res++;
+  }
+  if ((unsigned long)b % 2 == 0)
+  {
+    *t = NULL;
+    *s = nr2mInvers(a,r);
+    return (number)((1L << res)); // * (unsigned long) a);  // (2**res)*a    a is a unit
+  }
+  else
+  {
+    *s = NULL;
+    *t = nr2mInvers(b,r);
+    return (number)((1L << res)); // * (unsigned long) b);  // (2**res)*b    b is a unit
+  }
+}
+
+static void nr2mPower(number a, int i, number * result, const coeffs r)
+{
+  if (i == 0)
+  {
+    *(unsigned long *)result = 1;
+  }
+  else if (i == 1)
+  {
+    *result = a;
+  }
+  else
+  {
+    nr2mPower(a, i-1, result, r);
+    *result = nr2mMultM(a, *result, r);
+  }
+}
+
+/*
+ * create a number from int
+ */
+static number nr2mInit(long i, const coeffs r)
+{
+  if (i == 0) return (number)(unsigned long)i;
+
+  long ii = i;
+  unsigned long j = (unsigned long)1;
+  if (ii < 0) { j = r->mod2mMask; ii = -ii; }
+  unsigned long k = (unsigned long)ii;
+  k = k & r->mod2mMask;
+  /* now we have: i = j * k mod 2^m */
+  return (number)nr2mMult((number)j, (number)k, r);
+}
+
+/*
+ * convert a number to an int in ]-k/2 .. k/2],
+ * where k = 2^m; i.e., an int in ]-2^(m-1) .. 2^(m-1)];
+ */
+static long nr2mInt(number &n, const coeffs r)
+{
+  unsigned long nn = (unsigned long)(unsigned long)n & r->mod2mMask;
+  unsigned long l = r->mod2mMask >> 1; l++; /* now: l = 2^(m-1) */
+  if ((unsigned long)nn > l)
+    return (long)((unsigned long)nn - r->mod2mMask - 1);
+  else
+    return (long)((unsigned long)nn);
+}
+
+static number nr2mAdd(number a, number b, const coeffs r)
+{
+  return nr2mAddM(a, b, r);
+}
+
+static number nr2mSub(number a, number b, const coeffs r)
+{
+  return nr2mSubM(a, b, r);
+}
+
+static BOOLEAN nr2mIsUnit(number a, const coeffs)
+{
+  return ((unsigned long)a % 2 == 1);
+}
+
+static number nr2mGetUnit(number k, const coeffs)
+{
+  if (k == NULL) return (number)1;
+  unsigned long erg = (unsigned long)k;
+  while (erg % 2 == 0) erg = erg / 2;
+  return (number)erg;
+}
+
+static BOOLEAN nr2mIsZero(number a, const coeffs)
+{
+  return 0 == (unsigned long)a;
+}
+
+static BOOLEAN nr2mIsOne(number a, const coeffs)
+{
+  return 1 == (unsigned long)a;
+}
+
+static BOOLEAN nr2mIsMOne(number a, const coeffs r)
+{
+  return ((r->mod2mMask  == (unsigned long)a) &&(1L!=(long)a))/*for char 2^1*/;
+}
+
+static BOOLEAN nr2mEqual(number a, number b, const coeffs)
+{
+  return (a == b);
+}
+
+static number nr2mDiv(number a, number b, const coeffs r)
 {
   if ((unsigned long)a == 0) return (number)0;
   else if ((unsigned long)b % 2 == 0)
@@ -569,7 +425,70 @@ number nr2mDiv(number a, number b, const coeffs r)
   return (number)nr2mMult(a, nr2mInversM(b,r),r);
 }
 
-number nr2mMod(number a, number b, const coeffs r)
+/* Is 'a' divisible by 'b'? There are two cases:
+   1) a = 0 mod 2^m; then TRUE iff b = 0 or b is a power of 2
+   2) a, b <> 0; then TRUE iff b/gcd(a, b) is a unit mod 2^m */
+static BOOLEAN nr2mDivBy (number a, number b, const coeffs r)
+{
+  if (a == NULL)
+  {
+    unsigned long c = r->mod2mMask + 1;
+    if (c != 0) /* i.e., if no overflow */
+      return (c % (unsigned long)b) == 0;
+    else
+    {
+      /* overflow: we need to check whether b
+         is zero or a power of 2: */
+      c = (unsigned long)b;
+      while (c != 0)
+      {
+        if ((c % 2) != 0) return FALSE;
+        c = c >> 1;
+      }
+      return TRUE;
+    }
+  }
+  else
+  {
+    number n = nr2mGcd(a, b, r);
+    n = nr2mDiv(b, n, r);
+    return nr2mIsUnit(n, r);
+  }
+}
+
+static BOOLEAN nr2mGreater(number a, number b, const coeffs r)
+{
+  return nr2mDivBy(a, b,r);
+}
+
+static int nr2mDivComp(number as, number bs, const coeffs)
+{
+  unsigned long a = (unsigned long)as;
+  unsigned long b = (unsigned long)bs;
+  assume(a != 0 && b != 0);
+  while (a % 2 == 0 && b % 2 == 0)
+  {
+    a = a / 2;
+    b = b / 2;
+  }
+  if (a % 2 == 0)
+  {
+    return -1;
+  }
+  else
+  {
+    if (b % 2 == 1)
+    {
+      return 2;
+    }
+    else
+    {
+      return 1;
+    }
+  }
+}
+
+static number nr2mMod(number a, number b, const coeffs r)
 {
   /*
     We need to return the number rr which is uniquely determined by the
@@ -613,7 +532,7 @@ number nr2mMod(number a, number b, const coeffs r)
   return (number)rr;
 }
 
-number nr2mIntDiv(number a, number b, const coeffs r)
+static number nr2mIntDiv(number a, number b, const coeffs r)
 {
   if ((unsigned long)a == 0)
   {
@@ -664,29 +583,19 @@ static number nr2mAnn(number b, const coeffs r)
   }
 }
 
-number nr2mInvers(number c, const coeffs r)
-{
-  if ((unsigned long)c % 2 == 0)
-  {
-    WerrorS("division by zero divisor");
-    return (number)0;
-  }
-  return nr2mInversM(c, r);
-}
-
-number nr2mNeg(number c, const coeffs r)
+static number nr2mNeg(number c, const coeffs r)
 {
   if ((unsigned long)c == 0) return c;
   return nr2mNegM(c, r);
 }
 
-number nr2mMapMachineInt(number from, const coeffs /*src*/, const coeffs dst)
+static number nr2mMapMachineInt(number from, const coeffs /*src*/, const coeffs dst)
 {
   unsigned long i = ((unsigned long)from) % dst->mod2mMask ;
   return (number)i;
 }
 
-number nr2mMapProject(number from, const coeffs /*src*/, const coeffs dst)
+static number nr2mMapProject(number from, const coeffs /*src*/, const coeffs dst)
 {
   unsigned long i = ((unsigned long)from) % (dst->mod2mMask + 1);
   return (number)i;
@@ -703,7 +612,7 @@ number nr2mMapZp(number from, const coeffs /*src*/, const coeffs dst)
   return (number)nr2mMult((number)i, (number)j, dst);
 }
 
-number nr2mMapGMP(number from, const coeffs /*src*/, const coeffs dst)
+static number nr2mMapGMP(number from, const coeffs /*src*/, const coeffs dst)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -719,7 +628,7 @@ number nr2mMapGMP(number from, const coeffs /*src*/, const coeffs dst)
   return (number)res;
 }
 
-number nr2mMapQ(number from, const coeffs src, const coeffs dst)
+static number nr2mMapQ(number from, const coeffs src, const coeffs dst)
 {
   mpz_ptr gmp = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_init(gmp);
@@ -729,7 +638,7 @@ number nr2mMapQ(number from, const coeffs src, const coeffs dst)
   return res;
 }
 
-number nr2mMapZ(number from, const coeffs src, const coeffs dst)
+static number nr2mMapZ(number from, const coeffs src, const coeffs dst)
 {
   if (SR_HDL(from) & SR_INT)
   {
@@ -739,7 +648,7 @@ number nr2mMapZ(number from, const coeffs src, const coeffs dst)
   return nr2mMapGMP(from,src,dst);
 }
 
-nMapFunc nr2mSetMap(const coeffs src, const coeffs dst)
+static nMapFunc nr2mSetMap(const coeffs src, const coeffs dst)
 {
   if ((src->rep==n_rep_int) && nCoeff_is_Ring_2toM(src)
      && (src->mod2mMask == dst->mod2mMask))
@@ -786,7 +695,7 @@ nMapFunc nr2mSetMap(const coeffs src, const coeffs dst)
  * set the exponent
  */
 
-void nr2mSetExp(int m, coeffs r)
+static void nr2mSetExp(int m, coeffs r)
 {
   if (m > 1)
   {
@@ -804,7 +713,7 @@ void nr2mSetExp(int m, coeffs r)
   }
 }
 
-void nr2mInitExp(int m, coeffs r)
+static void nr2mInitExp(int m, coeffs r)
 {
   nr2mSetExp(m, r);
   if (m < 2)
@@ -812,7 +721,7 @@ void nr2mInitExp(int m, coeffs r)
 }
 
 #ifdef LDEBUG
-BOOLEAN nr2mDBTest (number a, const char *, const int, const coeffs r)
+static BOOLEAN nr2mDBTest (number a, const char *, const int, const coeffs r)
 {
   //if ((unsigned long)a < 0) return FALSE; // is unsigned!
   if (((unsigned long)a & r->mod2mMask) != (unsigned long)a) return FALSE;
@@ -820,7 +729,7 @@ BOOLEAN nr2mDBTest (number a, const char *, const int, const coeffs r)
 }
 #endif
 
-void nr2mWrite (number a, const coeffs r)
+static void nr2mWrite (number a, const coeffs r)
 {
   long i = nr2mInt(a, r);
   StringAppend("%ld", i);
@@ -845,7 +754,7 @@ static const char* nr2mEati(const char *s, int *i, const coeffs r)
   return s;
 }
 
-const char * nr2mRead (const char *s, number *a, const coeffs r)
+static const char * nr2mRead (const char *s, number *a, const coeffs r)
 {
   int z;
   int n=1;
@@ -862,5 +771,69 @@ const char * nr2mRead (const char *s, number *a, const coeffs r)
       *a = nr2mDiv((number)(long)z,(number)(long)n,r);
   return s;
 }
+
+/* for initializing function pointers */
+BOOLEAN nr2mInitChar (coeffs r, void* p)
+{
+  assume( getCoeffType(r) == n_Z2m );
+  nr2mInitExp((int)(long)(p), r);
+
+  r->is_field=FALSE;
+  r->is_domain=FALSE;
+  r->rep=n_rep_int;
+
+  //r->cfKillChar    = ndKillChar; /* dummy*/
+  r->nCoeffIsEqual = nr2mCoeffIsEqual;
+  r->cfCoeffString = nr2mCoeffString;
+
+  r->modBase = (mpz_ptr) omAllocBin (gmp_nrz_bin);
+  mpz_init_set_si (r->modBase, 2L);
+  r->modNumber= (mpz_ptr) omAllocBin (gmp_nrz_bin);
+  mpz_init (r->modNumber);
+  mpz_pow_ui (r->modNumber, r->modBase, r->modExponent);
+
+  /* next cast may yield an overflow as mod2mMask is an unsigned long */
+  r->ch = (int)r->mod2mMask + 1;
+
+  r->cfInit        = nr2mInit;
+  //r->cfCopy        = ndCopy;
+  r->cfInt         = nr2mInt;
+  r->cfAdd         = nr2mAdd;
+  r->cfSub         = nr2mSub;
+  r->cfMult        = nr2mMult;
+  r->cfDiv         = nr2mDiv;
+  r->cfAnn         = nr2mAnn;
+  r->cfIntMod      = nr2mMod;
+  r->cfExactDiv    = nr2mDiv;
+  r->cfInpNeg         = nr2mNeg;
+  r->cfInvers      = nr2mInvers;
+  r->cfDivBy       = nr2mDivBy;
+  r->cfDivComp     = nr2mDivComp;
+  r->cfGreater     = nr2mGreater;
+  r->cfEqual       = nr2mEqual;
+  r->cfIsZero      = nr2mIsZero;
+  r->cfIsOne       = nr2mIsOne;
+  r->cfIsMOne      = nr2mIsMOne;
+  r->cfGreaterZero = nr2mGreaterZero;
+  r->cfWriteLong       = nr2mWrite;
+  r->cfRead        = nr2mRead;
+  r->cfPower       = nr2mPower;
+  r->cfSetMap      = nr2mSetMap;
+//  r->cfNormalize   = ndNormalize; // default
+  r->cfLcm         = nr2mLcm;
+  r->cfGcd         = nr2mGcd;
+  r->cfIsUnit      = nr2mIsUnit;
+  r->cfGetUnit     = nr2mGetUnit;
+  r->cfExtGcd      = nr2mExtGcd;
+  r->cfCoeffWrite  = nr2mCoeffWrite;
+  r->cfCoeffName   = nr2mCoeffName;
+  r->cfQuot1       = nr2mQuot1;
+#ifdef LDEBUG
+  r->cfDBTest      = nr2mDBTest;
+#endif
+  r->has_simple_Alloc=TRUE;
+  return FALSE;
+}
+
 #endif
 /* #ifdef HAVE_RINGS */
