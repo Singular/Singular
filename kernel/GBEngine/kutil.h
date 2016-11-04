@@ -425,8 +425,7 @@ void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 void initEcartPairMora (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 int posInS (const kStrategy strat, const int length, const poly p,
             const int ecart_p);
-int posInSMonFirst (const kStrategy strat, const int length, const poly p,
-            const int ecart_p);
+int posInSMonFirst (const kStrategy strat, const int length, const poly p);
 int posInIdealMonFirst (const ideal F, const poly p,int start = 0,int end = -1);
 int posInT0 (const TSet set,const int length,LObject &p);
 int posInT1 (const TSet set,const int length,LObject &p);

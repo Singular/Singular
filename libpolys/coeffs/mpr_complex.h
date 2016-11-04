@@ -167,7 +167,7 @@ gmp_float exp( const gmp_float & );
 gmp_float max( const gmp_float &, const gmp_float & );
 
 gmp_float numberToFloat( number num, const coeffs src );
-gmp_float numberFieldToFloat( number num, int k, const coeffs src );
+gmp_float numberFieldToFloat( number num, int src );
 //char *floatToStr( const gmp_float & r, const unsigned int oprec );
 //<-
 

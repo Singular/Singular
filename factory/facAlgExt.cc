@@ -36,6 +36,8 @@ TIMING_DEFINE_PRINT(fac_alg_sqrf)
 TIMING_DEFINE_PRINT(fac_alg_factor_sqrf)
 TIMING_DEFINE_PRINT(fac_alg_time_shift)
 
+#if 0
+// unused
 // squarefree part of F
 static CanonicalForm uniSqrfPart (const CanonicalForm& F)
 {
@@ -45,6 +47,7 @@ static CanonicalForm uniSqrfPart (const CanonicalForm& F)
   G= gcd (F, G);
   return F/G;
 }
+#endif
 
 static CanonicalForm Norm (const CanonicalForm& F, const Variable& alpha)
 {
@@ -69,6 +72,8 @@ static CanonicalForm Norm (const CanonicalForm& F, const Variable& alpha)
   return norm;
 }
 
+#if 0
+// unused
 // i is an integer such that Norm (F (x-i*alpha)) is squarefree
 static CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, int& i)
 {
@@ -138,6 +143,7 @@ static CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, in
     i++;
   } while (1);
 }
+#endif
 
 CFList AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
 {

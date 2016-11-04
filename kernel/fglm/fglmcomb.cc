@@ -151,8 +151,7 @@ fglmReduce( poly * pptr, fglmVector & v, polyset m, int numMonoms, ideal source,
     }
 }
 
-static poly
-fglmNewLinearCombination( ideal source, poly monset )
+poly fglmNewLinearCombination( ideal source, poly monset )
 {
     polyset m = NULL;
     polyset nf = NULL;
@@ -415,8 +414,7 @@ fglmNewLinearCombination( ideal source, poly monset )
 }
 
 
-static poly
-fglmLinearCombination( ideal source, poly monset )
+poly fglmLinearCombination( ideal source, poly monset )
 {
     int k;
     poly temp;

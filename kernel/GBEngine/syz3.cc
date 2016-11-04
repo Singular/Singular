@@ -568,6 +568,8 @@ static poly syRedTailSyz(poly tored,ideal red,ideal sec_red,int crit_comp,syStra
   return tored;
 }
 
+#if 0
+// unused
 /*3
 * the complete reduction of a single pair which is just stored
 * in bucket and syz_bucket
@@ -598,6 +600,7 @@ static BOOLEAN syRedSyzPair(syStrategy syzstr,int index,int* g_l,int* orp_l)
   }
   return isChanged;
 }
+#endif
 
 /*3
 * the tailreduction for generators (which includes the correction of

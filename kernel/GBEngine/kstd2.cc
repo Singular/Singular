@@ -3828,7 +3828,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
       if(!rField_is_Ring(currRing))
         pos = posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
       else
-        pos = posInSMonFirst(strat,strat->sl,strat->P.p,strat->P.ecart);
+        pos = posInSMonFirst(strat,strat->sl,strat->P.p);
       #else
       pos = posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
       #endif

@@ -940,7 +940,7 @@ void rouneslice(ideal I, ideal S, poly q, poly x, int &prune, int &moreprune, in
     int i,j;
     int dummy;
     poly m;
-    ideal p, koszsimp;
+    ideal p;
     //----------- PRUNING OF S ---------------
     //S SHOULD IN THIS POINT BE ORDERED BY DEGREE
     for(i=IDELEMS(S)-1;i>=0;i--)
@@ -1448,7 +1448,7 @@ static int isMonoIdBasesSame(ideal J, ideal Ob)
    * be already sorted. J and Ob are
    * represented by the minimal generating set
    */
-  int i, j, s, cnt;
+  int i, s;
   s = 1;
   int JCount = IDELEMS(J);
   int ObCount = IDELEMS(Ob);
@@ -1508,7 +1508,7 @@ static int isMonoIdBasesSame_IG_Case(ideal J, int JCount, ideal Ob, int ObCount)
    * checks if J and Ob are same in polys upto deg <=tr
    */
 
-  int i, j, s, cnt;
+  int i, s;
   s = 1;
   //when J is null
   if(JCount == 0)
@@ -1545,7 +1545,7 @@ static int positionInOrbit_IG_Case(ideal I, poly w, std::vector<ideal> idorb, st
    */
 
   int ps = 0;
-  int i, j, s = 0;
+  int i, s = 0;
   int orbCount = idorb.size();
 
   if(idIs0(I))
@@ -1622,7 +1622,7 @@ static int positionInOrbit_FG_Case(ideal I, poly, std::vector<ideal> idorb, std:
    * in the Orbit else returns position of the matched ideal
    */
   int ps = 0;
-  int i, j, s = 0;
+  int i, s = 0;
   int OrbCount = idorb.size();
 
   if(idIs0(I))
@@ -1675,9 +1675,7 @@ static ideal  minimalMonomialsGenSet(ideal I)
 
   sortMonoIdeal_pCompare(I);
 
-  ideal J = idInit(1, 1);
   int i, k;
-  int count = 0;
   int ICount = IDELEMS(I);
 
   for(k = ICount - 1; k >=1; k--)
@@ -1841,11 +1839,10 @@ static ideal colonIdeal(ideal S, poly w, int lV, ideal Jwi)
     return(S);
   }
 
-  int i, j, d;
+  int i, d;
   d = p_Totaldegree(w, currRing);
   bool flag = FALSE;
   int SCount = IDELEMS(S);
-  int cnt = 0;
   for(i = 0; i < SCount; i++)
   {
     TwordMap(S->m[i], w, lV, d, Jwi, flag);

@@ -102,18 +102,22 @@ public:
   {
     int k;
     for(k = N; k > 0; k--)
+    {
       if(!nIsZero (getconstelem (k)))
           return 0;
-      return 1;
+    }
+    return 1;
   }
   int numNonZeroElems () const
   {
     int num = 0;
     int k;
     for(k = N; k > 0; k--)
+    {
       if(!nIsZero (getconstelem (k)))
           num++;
-      return num;
+    }
+    return num;
   }
   void setelem (int i, number n)
   {

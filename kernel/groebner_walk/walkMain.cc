@@ -145,7 +145,7 @@ WalkState firstWalkStep64(ideal & G,int64vec* currw64, ring destRing){
 //idInterRed, mStd, idCopy, idrMoveR
 ///////////////////////////////////////////////////////////////////
 
-WalkState walkStep64(ideal & G,int64vec* currw64, int step)
+WalkState walkStep64(ideal & G,int64vec* currw64)
 {
   WalkState state=WalkOk;
 
@@ -271,7 +271,7 @@ int64vec* destVec64,ideal  & destIdeal,BOOLEAN sourceIsSB)
       PrintS("walk step:"); currw64->show(); PrintLn();
     }
 
-    state=walkStep64(nextG,currw64,step);
+    state=walkStep64(nextG,currw64);
     //uppdates nextG if all is OK
 
     if(overflow_error)

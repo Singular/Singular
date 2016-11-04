@@ -613,7 +613,7 @@ number ngcMapQ(number from, const coeffs aRing, const coeffs r)
 
   if ( from != NULL )
   {
-    gmp_complex *res=new gmp_complex(numberFieldToFloat(from,QTOF,aRing));
+    gmp_complex *res=new gmp_complex(numberFieldToFloat(from,QTOF));
     return (number)res;
   }
   else

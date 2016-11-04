@@ -1273,7 +1273,7 @@ static inline BOOLEAN sugarDivisibleBy(int ecart1, int ecart2)
 /*2
 * put the pair (s[i],p)  into the set B, ecart=ecart(p) (ring case)
 */
-void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR = -1)
+void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy strat, int atR = -1)
 {
   assume(atR >= 0);
   assume(i<=strat->sl);
@@ -1297,7 +1297,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
     nDelete(&t);
   }
   #endif
-  int      l,j,compare,compareCoeff;
+  int      j,compare,compareCoeff;
   LObject  h;
 
 #ifdef KDEBUG
@@ -3150,7 +3150,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
     }
   }
 
-  int      l,j,compare;
+  int      l;
   LObject  Lp;
   Lp.i_r = -1;
 
@@ -3964,7 +3964,6 @@ void initenterpairsSigRing (poly h,poly hSig,int hFrom,int k,int ecart,int isFro
   || (pGetComp(h)<=strat->syzComp))
   {
     int j;
-    BOOLEAN new_pair=FALSE;
 
     if (pGetComp(h)==0)
     {
@@ -3975,7 +3974,6 @@ void initenterpairsSigRing (poly h,poly hSig,int hFrom,int k,int ecart,int isFro
         {
           if (!strat->fromQ[j])
           {
-            new_pair=TRUE;
             enterOnePairSigRing(j,h,hSig,hFrom,ecart,isFromQ,strat, atR);
           //Print("j:%d, Ll:%d\n",j,strat->Ll);
           }
@@ -3983,7 +3981,6 @@ void initenterpairsSigRing (poly h,poly hSig,int hFrom,int k,int ecart,int isFro
       }
       else
       {
-        new_pair=TRUE;
         for (j=0; j<=k && !strat->sigdrop; j++)
         {
           enterOnePairSigRing(j,h,hSig,hFrom,ecart,isFromQ,strat, atR);
@@ -3998,7 +3995,6 @@ void initenterpairsSigRing (poly h,poly hSig,int hFrom,int k,int ecart,int isFro
         if ((pGetComp(h)==pGetComp(strat->S[j]))
         || (pGetComp(strat->S[j])==0))
         {
-          new_pair=TRUE;
           enterOnePairSigRing(j,h,hSig,hFrom,ecart,isFromQ,strat, atR);
         //Print("j:%d, Ll:%d\n",j,strat->Ll);
         }
@@ -4633,7 +4629,7 @@ void initenterstrongPairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, i
   }
 }
 
-void initenterstrongPairsSig (poly h,poly hSig, int hFrom, int k,int ecart,int isFromQ,kStrategy strat, int atR = -1)
+static void initenterstrongPairsSig (poly h,poly hSig, int k,int ecart,int isFromQ,kStrategy strat, int atR = -1)
 {
   const int iCompH = pGetComp(h);
   if (!nIsOne(pGetCoeff(h)))
@@ -4926,7 +4922,7 @@ void superenterpairsSig (poly h,poly hSig,int hFrom,int k,int ecart,int pos,kStr
   #ifdef ADIDEBUG
   printf("\n      Trying to add gcd-polys\n");
   #endif
-  initenterstrongPairsSig(h, hSig, hFrom,k, ecart, 0, strat, atR);
+  initenterstrongPairsSig(h, hSig, k, ecart, 0, strat, atR);
   if(strat->sigdrop) return;
   clearSbatch(h, k, pos, strat);
 }
@@ -5213,8 +5209,7 @@ int posInS (const kStrategy strat, const int length,const poly p,
 
 // sorts by degree and pLtCmp
 // but puts pure monomials at the beginning
-int posInSMonFirst (const kStrategy strat, const int length,const poly p,
-            const int ecart_p)
+int posInSMonFirst (const kStrategy strat, const int length,const poly p)
 {
   if (length<0) return 0;
   polyset set=strat->S;
@@ -5254,7 +5249,7 @@ int posInSMonFirst (const kStrategy strat, const int length,const poly p,
         en=i;
     }
   }
-  if(pNext(p) != NULL)
+  else /*if(pNext(p) != NULL)*/
   {
     int o = p_Deg(p,currRing);
     int op = p_Deg(set[length],currRing);
@@ -6444,7 +6439,7 @@ int posInL11 (const LSet set, const int length,
 * be put at the end and smalles coefficents
 */
 int posInL11Ring (const LSet set, const int length,
-              LObject* p,const kStrategy strat)
+              LObject* p,const kStrategy)
 {
   if (length<0) return 0;
 
@@ -6478,7 +6473,7 @@ int posInL11Ring (const LSet set, const int length,
 }
 
 int posInLF5CRing (const LSet set, int start,const int length,
-              LObject* p,const kStrategy strat)
+              LObject* p,const kStrategy)
 {
   if (length<0) return 0;
   if(start == (length +1)) return (length+1);
@@ -6514,7 +6509,7 @@ int posInLF5CRing (const LSet set, int start,const int length,
 
 #ifdef HAVE_RINGS
 int posInL11Ringls (const LSet set, const int length,
-              LObject* p,const kStrategy strat)
+              LObject* p,const kStrategy)
 {
   if (length < 0) return 0;
   int an,en,i;

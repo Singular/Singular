@@ -78,12 +78,12 @@ BOOLEAN blackboxDefaultOp1(int op,leftv l, leftv r)
   return TRUE;
 }
 
-BOOLEAN blackboxDefaultOp2(int op,leftv /*l*/, leftv r1, leftv /*r2*/)
+BOOLEAN blackboxDefaultOp2(int /*op*/,leftv /*l*/, leftv /*r1*/, leftv /*r2*/)
 {
   return TRUE;
 }
 
-BOOLEAN blackboxDefaultOp3(int op,leftv /*l*/, leftv r1,leftv /*r2*/, leftv /*r3*/)
+BOOLEAN blackboxDefaultOp3(int /*op*/,leftv /*l*/, leftv /*r1*/,leftv /*r2*/, leftv /*r3*/)
 {
   return TRUE;
 }

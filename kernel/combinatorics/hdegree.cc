@@ -1336,7 +1336,6 @@ static ideal scIdKbase(poly q, const int rank)
 {
   ideal res = idInit(pLength(q), rank);
   polyset mm = res->m;
-  int i = 0;
   do
   {
     *mm = q; ++mm;

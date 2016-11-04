@@ -257,7 +257,7 @@ void ssiWriteRing(ssiInfo *d,const ring r)
   }
   ssiWriteRing_R(d,r);
 }
-void ssiWritePoly_R(const ssiInfo *d, int typ, poly p, const ring r)
+void ssiWritePoly_R(const ssiInfo *d, int /*typ*/, poly p, const ring r)
 {
   fprintf(d->f_write,"%d ",pLength(p));//number of terms
 

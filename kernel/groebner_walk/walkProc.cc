@@ -131,14 +131,15 @@ walkConsistency( ring sring, ring dring, int * vperm )
 
     //remove this to if you want to allow permutations of parameters
     for ( k= npar; (k > 0) && (state == WalkOk); k-- )
+    {
       if ( pperm[k-1] != (-k) )
       {
         WerrorS( "orders of parameters do not agree" );
         state= WalkIncompatibleRings;
       }
-
-      if (pperm != NULL)
-        omFreeSize( (ADDRESS)pperm, (npar+1)*sizeof( int ) );
+    }
+    if (pperm != NULL)
+      omFreeSize( (ADDRESS)pperm, (npar+1)*sizeof( int ) );
 
     if ( state != WalkOk ) return state;
 

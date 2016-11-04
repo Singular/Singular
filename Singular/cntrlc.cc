@@ -63,7 +63,6 @@
    static void debug_stop (char *const*args);
  #endif
  #ifndef __OPTIMIZE__
-   static void stack_trace_sigchld (int);
    static void stack_trace (char *const*args);
  #endif
 #endif

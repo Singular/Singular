@@ -1310,8 +1310,8 @@ void siInit(char *name)
 
 // default coeffs
   {
+#ifdef SINGULAR_4_1
     idhdl h;
-#ifdef SINGULAR_4_1    
     h=enterid(omStrDup("QQ"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
     IDDATA(h)=(char*)nInitChar(n_Q,NULL);
     h=enterid(omStrDup("ZZ"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);

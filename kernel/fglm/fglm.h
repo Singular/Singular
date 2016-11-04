@@ -82,4 +82,6 @@ fglmzero( ring sourceRing, ideal & sourceIdeal, ring destRing, ideal & destideal
 
 BOOLEAN fglmquot( ideal sourceIdeal, poly quot, ideal & destIdeal );
 
+poly fglmLinearCombination( ideal source, poly monset );
+poly fglmNewLinearCombination( ideal source, poly monset );
 #endif

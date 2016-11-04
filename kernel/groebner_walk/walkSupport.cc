@@ -1026,7 +1026,6 @@ int64vec* rGetGlobalOrderMatrix(ring r)
   if (rHasLocalOrMixedOrdering(r)) return res;
   int pos1=0;
   int pos2=0;
-  int temp;
   int i=0;
   while(r->order[i]!=0 && pos2<n)
   {
@@ -1034,7 +1033,6 @@ int64vec* rGetGlobalOrderMatrix(ring r)
 
     if(r->order[i]==ringorder_lp)
     {
-      temp=pos1;
       for(int j=pos1; j<=pos2; j++)
         (*res)[j*n+j]=(int64)1;
     }

@@ -167,6 +167,8 @@ void syCompactify1(SSet sPairs, int* sPlength, int first)
 * exp[0]
 */
 
+#if 0
+// unused
 #ifdef PDEBUG
 static int syzcomp2dpc_test(poly p1, poly p2)
 {
@@ -227,6 +229,7 @@ static int syzcomp2dpc_test(poly p1, poly p2)
   return -1;
 }
 #endif // PDEBUG
+#endif
 
 poly syRedtail (poly p, syStrategy syzstr, int index)
 {
@@ -1295,6 +1298,8 @@ SSet syChosePairs(syStrategy syzstr, int *index, int *howmuch, int * actdeg)
   return syChosePairsPutIn(syzstr,index,howmuch,actdeg,0,syzstr->length);
 }
 
+#if 0
+// unused
 /*3
 * FOR THE INHOMOGENEOUS CASE ONLY!
 * looks through the pair set and the given module for
@@ -1316,6 +1321,7 @@ static SSet syChosePairsIH(syStrategy syzstr, int *index,
   }
   return result;
 }
+#endif
 
 /*3
 * looks through the pair set and the given module for
@@ -2033,6 +2039,8 @@ void syPrint(syStrategy syzstr, const char *sn)
   if (syzstr->resolution == NULL) syzstr->resolution = resolution;
 }
 
+#if 0
+// unused
 /*2
 * deleting all monomials the component of which correspond
 * to non-minimal generators
@@ -2057,6 +2065,7 @@ static poly syStripOut(poly p,intvec * toStrip)
   }
   return p;
 }
+#endif
 
 /*2
 * copies only those monomials the component of which correspond

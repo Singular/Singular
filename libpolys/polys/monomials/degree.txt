@@ -33,7 +33,7 @@ Ring properties wrt. monomial orderings
 =======================================
 OrdSgn: 1 for well orderings (i.e. 1 is the smallest monomial)
         -1 otherwise
-MixedOrder: 0 for well orderings 
+MixedOrder: 0 for well orderings
          and local orderings (i.e. 1 is the largest monomial)
         1 otherwise
 LexOrder: 1 for block orderings (incl. lex), 0 otherwise

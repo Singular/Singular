@@ -437,11 +437,11 @@ gmp_float numberToFloat( number num, const coeffs src)
   return r;
 }
 
-gmp_float numberFieldToFloat( number num, int k, const coeffs src)
+gmp_float numberFieldToFloat( number num, int cf)
 {
   gmp_float r;
 
-  switch (k)
+  switch (cf)
   {
   case QTOF:
     if ( num != NULL )

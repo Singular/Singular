@@ -517,7 +517,7 @@ number ngfMapQ(number from, const coeffs src, const coeffs dst)
   assume( getCoeffType(dst) == n_long_R );
   assume( src->rep == n_rep_gap_rat );
 
-  gmp_float *res=new gmp_float(numberFieldToFloat(from,QTOF,dst));
+  gmp_float *res=new gmp_float(numberFieldToFloat(from,QTOF));
   return (number)res;
 }
 number ngfMapZ(number from, const coeffs aRing, const coeffs r)

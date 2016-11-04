@@ -498,13 +498,13 @@ void* pyobject_Init(blackbox*)
 }
 
 /// blackbox support - convert to string representation
-char* pyobject_String(blackbox *b, void* ptr)
+char* pyobject_String(blackbox *, void* ptr)
 {
   return PythonCastStatic<>(ptr).repr();
 }
 
 /// blackbox support - copy element
-void* pyobject_Copy(blackbox*b, void* ptr)
+void* pyobject_Copy(blackbox*, void* ptr)
 {
     Py_XINCREF(ptr);
     return ptr;
@@ -646,7 +646,7 @@ BOOLEAN pyobject_OpM(int op, leftv res, leftv args)
 }
 
 /// blackbox support - destruction
-void pyobject_destroy(blackbox *b, void* ptr)
+void pyobject_destroy(blackbox *, void* ptr)
 {
   Py_XDECREF(ptr);
 }

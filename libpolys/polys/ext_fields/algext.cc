@@ -1506,7 +1506,7 @@ template class CRecursivePolyCoeffsEnumerator<NAConverter>;
 template class IAccessor<snumber*>;
 
 #ifndef SINGULAR_4_1
-BOOLEAN n2pInitChar(coeffs cf, void * infoStruct)
+BOOLEAN n2pInitChar(coeffs, void *)
 { return 1; }
 #endif
 #ifdef SINGULAR_4_1
