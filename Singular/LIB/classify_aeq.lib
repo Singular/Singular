@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version classify_aeq.lib 4.0.3.2 Sep_2016 "; // $Id$
+version="version classify_aeq.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="Singularities";
 info="
 LIBRARY: classifyAeq.lib         Simple Space Curve singularities in characteristic 0
@@ -24,18 +24,12 @@ REFERENCES:
   J. London Math. Soc. (2) 26 (1982), 465-474.
   [5] Ishikawa,G; Janeczko,S.: The Complex Symplectic Moduli Spaces of Unimodal Parametric Plane Curve  NEU Singularities. Insitute of Mathematics of the Polish Academy of Sciences,Preprint 664(2006)
 PROCEDURES:
-  sagbiAlg(G);    Compute the Sagbi-basis of the Algebra.
-  sagbiMod(I,A);  Compute the Sagbi- basis of the Module.
-  semiGroup(G);   Compute the Semi-Group of the Algebra provided the input is Sagbi Bases of the Algebra.
-  semiMod(I,A);   Compute the Semi-Module provided that the input are the Sagbi Bases of the Algebra resp.Module.
-  planeCur(I);    Compute the type of the Simple Plane Curve singularity.
-  spaceCur(I);    Compute the type of the simple Space Curve singularity.
-  inVar(I);       computes for the parametrization defined by Is
-                  semi group, semi module of differentials,
-                  Zariski number and moduli
-  HHnormalForm(I);  computes for the parametrization defined by I
-                  normal form, semi group, semi module of differentials,
-                  Zariski number and moduli
+          sagbiAlg(G);    Compute the Sagbi-basis of the Algebra.
+          sagbiMod(I,A);  Compute the Sagbi- basis of the Module.
+          semiGroup(G);   Compute the Semi-Group of the Algebra provided the input is Sagbi Bases of the Algebra.
+          semiMod(I,A);   Compute the Semi-Module provided that the input are the Sagbi Bases of the Algebra resp.Module.
+          planeCur(I);    Compute the type of the Simple Plane Curve singularity.
+          spaceCur(I);    Compute the type of the simple Space Curve singularity.
 ";
 LIB "algebra.lib";
 LIB "curvepar.lib";
@@ -668,65 +662,65 @@ ideal I=t3+3t4+3t5+t6,t13+14t14+92t15+377t16+1079t17+2288t18+3718t19+4719t20+471
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-proc sagbiAlg(ideal I,list #)
+proc sagbiAlg(ideal I,list #)             //AENDERUNG
 "USAGE":  sagbiAlg(I);  I ideal
 RETURN: An ideal.The sagbi bases of I.
 EXAMPLE: example sagbiAlg;  shows an example
 {
-  def R=basering;
-  def O=changeord(list(list("Ds",nvars(R))));
-  setring O;
-  ideal I=imap(R,I);
-  ideal L,S;
-  poly h;
-  int z,n;
+    def R=basering;
+    def O=changeord(list(list("Ds",nvars(R))));
+    setring O;
+    ideal I=imap(R,I);
+    ideal L;
+    poly h;
+    int z,n;
 
-  if(size(I)==0){return(I);}
-  if(size(#)==0)
-  {
-    int b=ConductorBound(I);
-    S=interReduceSagbi(I,b) ;
-    b=ConductorBound(S);
-    // int b=200;
-    // b=correctBound(I,b);
-  }
-  else
-  {
-    int b=#[1];
-  }
-  S=interReduceSagbi(I,b) ;
-  // b=correctBound(S,b);
-  while(size(S)!=n)
-  {
-    n=size(S);
-    L=sagbiSP(S);
-    for (z=1;z<=size(L);z++)
+    if(size(I)==0){return(I);}
+    if(size(#)==0)              // AENDERUNG ANFANG
     {
-      h=sagbiNF(L[z],S,b);
-      if(h!=0)
-      {
-        S=insertOne(h,S,b);
-      }
+       int b=ConductorBound(I);
+    // int b=200;
+  //   b=correctBound(I,b);
     }
-  }
-  setring R;
-  ideal S=imap(O,S);
-  return(S);
+    else
+    {
+       int b=#[1];
+    } 
+                          //AENERUNG ENDE
+   ideal S=interReduceSagbi(I,b) ;
+  // b=correctBound(S,b);
+   while(size(S)!=n)
+   {
+       n=size(S);
+       L=sagbiSP(S);
+       for (z=1;z<=size(L);z++)
+       {
+             h=sagbiNF(L[z],S,b);
+             if(h!=0)
+             {
+                  S=insertOne(h,S,b);
+             }
+        }
+   }
+   b=semiGroup(S)[2]+1;
+   S=jet(S,b);
+   setring R;
+   ideal S=imap(O,S);
+   return(S);
 }
 example
 {
   "EXAMPLE:"; echo=2;
-  ring R=0,t,ds;
-  ideal I=t8,t10+t13,t12+t15;
-  sagbiAlg(I);
-  I=t8,t10+t13,t12+2t15;
-  sagbiAlg(I);
+ring R=0,t,ds;
+ideal I=t8,t10+t13,t12+t15;
+sagbiAlg(I);
+I=t8,t10+t13,t12+2t15;
+sagbiAlg(I);
 }
-
 //////////////////////////////////////////////////////////////////////////////// NEU
 proc reducedSagbiAlg(ideal I,list #)
 {
-
+   
    I=sagbiAlg(I,#);
    intvec L=semiGroup(I)[3];
    if(size(#)==0)
@@ -821,10 +815,12 @@ EXAMPLE: example classifyAEQunimodal;  shows an example
              }
           }
           G[2]=sagbiNF(G[2],ideal(G[1]),15);
-          //arrange the coefficient of t10 to become 1
+          //arrange the coefficient of t10 to become 1 
           number m=leadcoef(G[2]-lead(G[2]));
           G[2]=m^9*subst(G[2],t,1/m*t);
           J=G;
+          
+          
        }
        if(K[4]==intvec(3,8,13,18))
        {
@@ -865,12 +861,12 @@ EXAMPLE: example classifyAEQunimodal;  shows an example
              }
           }
           G[2]=sagbiNF(G[2],ideal(G[1]),21);
-          //arrange the coefficient of t14 to become 1
+          //arrange the coefficient of t14 to become 1 
           number m=leadcoef(G[2]-lead(G[2]));
           number l=leadcoef(G[2][4]);
           //lambda^2=l^3/m^10
           J=G;
-
+          
 
        }
        if(K[4]==intvec(3,10,17,24))
@@ -913,7 +909,7 @@ EXAMPLE: example classifyAEQunimodal;  shows an example
              }
           }
           G[2]=sagbiNF(G[2],ideal(G[1]),9);
-          //arrange the coefficient of t8 to become 1
+          //arrange the coefficient of t8 to become 1 
           number m=leadcoef(G[2]-lead(G[2]));
           number l=leadcoef(G[2][3]);
           //lambda^2=l^2/m^3
@@ -943,7 +939,7 @@ EXAMPLE: example classifyAEQunimodal;  shows an example
              }
           }
           G[2]=sagbiNF(G[2],ideal(G[1]),11);
-          //arrange the coefficient of t8 to become 1
+          //arrange the coefficient of t8 to become 1 
           number m=leadcoef(G[2]-lead(G[2]));
           G[2]=m^7*subst(G[2],t,1/m*t);
           J=G;
@@ -965,7 +961,7 @@ EXAMPLE: example classifyAEQunimodal;  shows an example
              }
           }
           G[2]=sagbiNF(G[2],ideal(G[1]),14);
-          //arrange the coefficient of t11 to become 1
+          //arrange the coefficient of t11 to become 1 
           number m=leadcoef(G[2]-lead(G[2]));
           number l=leadcoef(G[2][3]);
           //lambda^2=l^2/m^3
@@ -995,7 +991,7 @@ EXAMPLE: example classifyAEQunimodal;  shows an example
              }
           }
           G[2]=sagbiNF(G[2],ideal(G[1]),12);
-          //arrange the coefficient of t9 to become 1
+          //arrange the coefficient of t9 to become 1 
           number m=leadcoef(G[2]-lead(G[2]));
           G[2]=m^8*subst(G[2],t,1/m*t);
           J=G;
@@ -1018,7 +1014,7 @@ EXAMPLE: example classifyAEQunimodal;  shows an example
              }
           }
           G[2]=sagbiNF(G[2],ideal(G[1]),14);
-          //arrange the coefficient of t12 to become 1
+          //arrange the coefficient of t12 to become 1 
           number m=leadcoef(G[2]-lead(G[2]));
           number l=leadcoef(G[2][3]);
           //lambda^2=l^2/m^3
@@ -1042,7 +1038,7 @@ EXAMPLE: example classifyAEQunimodal;  shows an example
              }
           }
           G[2]=sagbiNF(G[2],ideal(G[1]),17);
-          //arrange the coefficient of t12 to become 1
+          //arrange the coefficient of t12 to become 1 
           number m=leadcoef(G[2]-lead(G[2]));
           number l=leadcoef(G[2][3]);
           //lambda^2=l^2/m^3
@@ -1164,11 +1160,12 @@ EXAMPLE: example sagbiMod;  shows an example
   if(deg(lead(I[1]))<=1)
   { setring R;
     return(imap(O,I));}
-  int b=ConductorBound(lead(G))+deg(lead(I[1]));
+  int b=semiGroup(lead(G))[2]+deg(lead(I[1]));  //AENDERUNG11.16
   list P;int i;
   P=createP(I);
   while(size(P)!=0)
   {
+//size(P);
       J=P[1][1],P[1][2];
       P=delete(P,1);
       S=SpolyMOD(J,G);
@@ -1182,6 +1179,11 @@ EXAMPLE: example sagbiMod;  shows an example
              I[size(I)+1]=h;
          }
       }
+      //I=sortMOD(I);
+      //b=semiMod(I,G)[5]+1;
+//"clean";
+//      I=cleanI(I,G,b);
+//lead(I);
   }
   I=sortMOD(I);
   setring R;
@@ -1197,6 +1199,21 @@ example
   sagbiMod(I,G);
 }
 
+static proc cleanI(ideal I, ideal G, int b)
+{
+   int i;
+   ideal J;
+   I=jet(I,b);
+   I=simplify(I,2);
+   int n=size(I);
+   for(i=n;i>1;i--)
+   { 
+      J=I[1..i-1]; 
+      I[i]=sagbiNFMOD(I[i],G,J,b);
+   }
+   I=simplify(I,2);
+   return(I);
+}
 ////////////////////////////////////////////////////////////////////////////////
 proc semiGroup(ideal I)
 "USAGE": semiGroup(I);  I ideal the sagbi bases of Algebra.
@@ -1702,6 +1719,8 @@ ideal I=4t3,7t6+10t9;
 ideal J=t4,t7+t10;
 sortSagbi(SpolyMOD(I,J));
 */
+
+
 ////////////////////////////////////////////////////////////////////////////////
 static proc sagbiNFMODO(poly p, ideal G, ideal I,int b)
 {
@@ -1710,44 +1729,54 @@ static proc sagbiNFMODO(poly p, ideal G, ideal I,int b)
     def br=basering;
     p=jet(p,b);
     if(p==0){return(p);}
+    int i;
+    for(i=1;i<=size(I);i++)
+    {
+       if(leadmonom(p)==leadmonom(I[i]))
+       {
+          return(p-leadcoef(p)/leadcoef(I[i])*I[i]);
+       }
+    }
     int n=ncols(G);
     int m=ncols(I);
     ideal G1=lead(G);
     ideal I1=lead(I);
-    poly p1=lead(p);
+     poly p1=lead(p);
     //create new ring with extra variables -
     execute
     ("ring T=("+charstr(br)+",x(1),z(1..n)),(x(2),y(1..m)),dp;");
-    execute
-    ("ring R=("+charstr(br)+"),(x(1..2),y(1..m),z(1..n)),(lp(2),dp(m),dp(n));");
+     execute
+    ("ring R=("+charstr(br)+"),(x(1..2),y(1..m),z(1..n)),(lp(2),dp(m),dp(n));");  //AENDERUNG
+ 
+     map phi = br,x(1);
+     ideal G = phi(G);
+     ideal I = phi(I);
+     ideal P = phi(G1);
+     ideal S = phi(I1);
+     poly p=phi(p);
+     ideal J=var(1),p,I,G;
+     poly check = phi(p1);
+     poly keep=S[1];
+     S=S/keep;
 
-    map phi = br,x(1);
-    ideal P = phi(G1);
-    ideal S = phi(I1);
-    poly check = phi(p1);
-    poly keep=S[1];
-    S=S/keep;
-
-    check=check/keep;
-    ideal M;
-    poly q;
-    for (int i=1;i<=m;i=i+1)
-    {
+     check=check/keep;
+     ideal M;
+     poly q;
+     for ( i=1;i<=m;i=i+1)
+     {
          M[i]=S[i]-y(i);
-    }
-    for (i=1;i<=n;i=i+1)
-    {
+     }
+     for (i=1;i<=n;i=i+1)
+     {
         M[m+i]=P[i]-z(i);
-    }
-    M[size(M)+1]=check-x(2);
-    check=check*keep;
-
-    option(redSB);
-    M=std(M);
-    int j,s;
-
-    for(i=1;i<=size(M);i++)
-    {
+     }
+     M[size(M)+1]=check-x(2);
+     check=check*keep;
+     option(redSB);
+     M=std(M);
+     int j,s;
+     for(i=1;i<=size(M);i++)
+     {
          if((deg(M[i]/x(2))==0)&&(M[i]/x(1)==0))
          {
                q=subst(M[i],x(2),0);
@@ -1756,31 +1785,54 @@ static proc sagbiNFMODO(poly p, ideal G, ideal I,int b)
                   q=subst(q,y(j),0);
                }
                M[i]=M[i]-q+q*y(1);
-               q=M[i];
+             q=M[i];
                setring T;
                poly q=imap(R,q);
-               s=deg(q);
+             s=deg(q);
                setring R;
                if(s==1){check=simplify(q,1);break;}
          }
-    }
-    setring br;
-    map psi=R,maxideal(1),p,I,G;
-    return(psi(check));
+     }
+     poly check1=specialSubst(check,J,b);
+     setring br;
+//     map psi=R,maxideal(1),p,I,G;
+     map psi1=R,var(1);
+     return(psi1(check1));
 }
 ////////////////////////////////////////////////////////////////////////////////
-
-static proc sagbiNFMOD(poly p, ideal G, ideal I, int b)
+static proc specialSubst(poly check,ideal J,int b)
+{
+   poly resu,mon,r;
+   int i,j,k;
+   intvec v;
+   for(i=1;i<=size(check);i++)
+   {
+      mon=check[i];
+      v=leadexp(mon);
+      r=1;
+      for(j=1;j<=nvars(basering);j++)
+      {
+         for(k=1;k<=v[j];k++)
+         {
+            r=jet(r*J[j],b);
+         }
+      }
+      resu=resu+r*leadcoef(mon);
+   }
+   return(jet(resu,b));
+}
+////////////////////////////////////////////////////////////////////////////////
+proc sagbiNFMOD(poly p, ideal G, ideal I, int b)
 {
     poly f=jet(p,b);
     if(f==0){return(f);}
     poly h;
-    while(f!=h)
+    while(leadmonom(f)!=leadmonom(h))
     {
          h=f;
          f=sagbiNFMODO(f,G,I,b);
     }
-    return(lead(f)+sagbiNFMOD(f-lead(f),G,I,b));
+    return(lead(h)+sagbiNFMOD(h-lead(h),G,I,b));  //AENDERUNG
 }
 ////////////////////////////////////////////////////////////////////////////////
 static proc createP(ideal I)
@@ -1816,7 +1868,6 @@ ideal I=4t3,7t6+10t9;
 ideal G=t4,t7+t10;
 sagbiMod(I,G,18);
 */
-
 ////////////////////////////////////////////////////////////////////////////////
 static proc sortIntvec(intvec L)
 {
@@ -1926,28 +1977,26 @@ static proc Guess(ideal I)
    list K=semiMod(H,I);
    return(K);
 }
+////////////////////////////////////////////////////////////////////////////////
 
 proc inVar(ideal I)
-"USAGE:   inVar(I);  I=ideal, I=<x(t),y(t)>, ord(x(t))=n<ord(y(t))=m,
-          n does not divide m
-COMPUTE:  for the parametrization defined by I semi group, semi module
-          of differentials, Zariski number and moduli
-RETURN:  a list L with 5 entries
-   L[1] the semi group Gamma
-   L[2] the semi module Lambda
-   L[3] 0 if Lambda=Gamma or lambda=min(Lambda-Gamma) -n, the Zariski number
-   L[4] the integers i, i>lambda, i+n not in Lambda, 0 if this set is empty
-   L[5] 0 or the smallest integer i, i not in Gamma, i+m-n not in Gamma
-        i-lambda not in Gamma but i+n in Lambda
-EXAMPLE:  example inVar; shows an example"
 {
+// I=<x(t),y(t)>, ord(x(t))=n<ord(y(t))=m, n does not divide m
+// returns a list L with 5 entries
+// L[1] the semi group Gamma
+// L[2] the semi module Lambda
+// L[3] 0 if Lambda=Gamma or lambda=min(Lambda-Gamma) -n
+// L[4] the integers i, i>lambda, i+n not in Lambda, 0 if this set is empty
+// L[5] 0 or the smallest integer i, i not in Gamma, i+m-n not in Gamma
+//      i-lambda not in Gamma but i+n in Lambda
+
    ideal G=sagbiAlg(I);
    ideal M=diff(I,t);
    ideal K=sagbiMod(M,G);
    list L=semiMod(K,G);
    intvec v=L[3];   //semi group Gamma
    intvec w=L[6]+1;
-   w=0,w;           //semin module Lambda
+   w=0,w;           //semi module Lambda
    intvec mo;
    int i,l,k;
    l=-1;
@@ -1991,14 +2040,7 @@ EXAMPLE:  example inVar; shows an example"
    }
    return(list(v,w,l,mo,0));
 }
-example
-{
- "EXAMPLE"; echo=2;
-  ring r=0,t,Ds;
-  ideal I=t6+3t7,t8+t13+t19;
-  inVar(I);
-}
-
+////////////////////////////////////////////////////////////////////////////////
 static proc ivec(int a, intvec v)
 {
    int i;
@@ -2009,8 +2051,8 @@ static proc ivec(int a, intvec v)
    }
    return(0);
 }
-
-proc normalMap(ideal I, int bound)
+////////////////////////////////////////////////////////////////////////////////
+static proc normalMap(ideal I, int bound)
 {
 // returns (t^n,h) A-equivalent to I modulo <t>^bound+1
 
@@ -2020,21 +2062,22 @@ proc normalMap(ideal I, int bound)
    poly p;
    if(ord(I[1])>ord(I[2])){p=I[1];I[1]=I[2];I[2]=p;}
    I[1]=simplify(I[1],1);
-   int n=ord(I[1]);
+   int n=ord(I[1]);  
    phi=R,var(1)-1/number(n)*I[1][2]/var(1)^(n-1);
    I=phi(I);
+   I=jet(I,bound);
    while(size(I[1])>1)
    {
       phi=R,var(1)-1/number(n)*I[1][2]/var(1)^(n-1);
-
-      I=jet(phi(I),bound);
+      I=phi(I);
+      I=jet(I,bound);
    }
    I[2]=simplify(I[2],1);
    p=lead(I[2])+reduc(I[2]-lead(I[2]),I,bound);
    I[2]=p;
    return(I);
 }
-
+////////////////////////////////////////////////////////////////////////////////
 static proc reduc(poly f,ideal I, int b)
 {
 // computes the normal form of f with respect to the algebra generated by I
@@ -2055,19 +2098,14 @@ static proc reduc(poly f,ideal I, int b)
    }
    return (lead(f)+reduc(f-lead(f),I,b));
 }
-
-proc HHnormalForm(ideal I, list #)
-"USAGE:   HHnormalForm(I), I=<x(t),y(t)> an ideal, # optional, a bound for the
-          conductor
-COMPUTE:  computes the Hefez-Hernandez normal form of the ideal I=<x(t),y(t)>
-RETURN:  a list L with 5 entries
-   L[1] the Hefei-Hernandez normal form of the ideal I=<x(t),y(t)>
-   L[2] the semi group Gamma
-   L[3] the semi module Lambda
-   L[4] 0 if Lambda=Gamma or lambda=min(Lambda-Gamma) -n, the Zariski number
-   L[5] the integers i, i>lambda, i+n not in Lambda, 0 if this set is empty
-EXAMPLE:  example HHnormalForm; shows an example"
+////////////////////////////////////////////////////////////////////////////////
+proc normalForm(ideal I, list #)
 {
+//computes the Hefez-Hernandez normal form of the ideal I=<x(t),y(t)>
+//returns a list with the normal form, the semi group Gamma, the semi module 
+//Lambda, the Zariski number lambda, the moduli 
+//(the integers i, i>lambda, i+n not in Lambda, 0 if this set is empty)
+
    int b,i,l,k;
    poly p;
    map phi;
@@ -2143,7 +2181,7 @@ EXAMPLE:  example HHnormalForm; shows an example"
          {
             phi=R,var(1)-1/number(m)*I[2][i]/var(1)^(m-1);
             I=phi(I);
-            G=sagbiAlg(I,b);
+            G=sagbiAlg(I);  //Aenderung
             I[1]=lead(I[1])+reduc(I[1]-lead(I[1]),G,b);
             I=normalMap(I,b);
             i--;
@@ -2154,9 +2192,9 @@ EXAMPLE:  example HHnormalForm; shows an example"
             {
                g=findTrafo(I,i);
                g=jet(g,b-m+1);
-               phi=R,g;
+               phi=R,g;        
                I=phi(I);
-               G=sagbiAlg(I,b);
+               G=sagbiAlg(I);  //AENDERUNG
                I[1]=lead(I[1])+reduc(I[1]-lead(I[1]),G,b);
                I[2]=lead(I[2])+reduc(I[2]-lead(I[2]),G,b);
                I=normalMap(I,b);
@@ -2167,21 +2205,13 @@ EXAMPLE:  example HHnormalForm; shows an example"
    }
    return(list(I,v,w,l,moduli));
 }
-example
-{
- "EXAMPLE"; echo=2;
-  ring r=0,t,Ds;
-  ideal I=t6+3t7,t8+t13+t19;
-  HHnormalForm(I);
-}
-
+////////////////////////////////////////////////////////////////////////////////
 static proc findTrafo(ideal I, int i)
 {
 //I[2][i]=a*t^k, I[1]=x{t}=t^n, I[2]=y(t)=t^m+c*t^lambda+...+a*t^k+...
 //find the map to kill the term a*t^k of y(t) for k+n in Lambda
 //find g,h such that a*t^k*x'(t)=h(x(t),y(t))*x'(t)-g(x(t),y(t))*y'(t) mod t^(k+n)
 //return the map t---> t+g(x(t),y(t))/x'(t) mod t^(k+1)
-
    def R0=basering;
    int p=char(R0);
    int k=ord(I[2][i]);
@@ -2208,7 +2238,7 @@ static proc findTrafo(ideal I, int i)
       if((@z*diff(J[i],@z)+@u*diff(J[i],@u)+@v*diff(J[i],@v)==J[i])&&(deg(diff(J[i],@z))==0))
       {
          poly f=J[i]/(-diff(J[i],@z)); //the element is in the standard basis
-         break;
+         break; 
       }
    }
    poly g;
@@ -2221,16 +2251,17 @@ static proc findTrafo(ideal I, int i)
       for(i=1;i<ncols(J);i++)
       {
           g=lead(J[i]);
-          if(((g==diff(g,@u)*@u)&&(diff(g,@v)==0))||((g==diff(g,@v)*@v)&&(diff(g,@u)==0)))
+          if(((g==diff(g,@u)*@u)&&(diff(g,@v)==0))||((g==diff(g,@v)*@v)&&(diff(g,@u)==0))||
+             (g==subst(g,@u,0,@v,0)))
           {
              K[size(K)+1]=J[i];
           }
       }
       ring S1=p,(@z,@u,@v,@x,@y),(a(-1,-1,-1,0,0),dp(1),dp(2),dp(2));
       ideal K=imap(S,K);
-      attrib(K,"isSB",1);
+      K=specialInterred(K);
       poly f=imap(S,f);
-      f=reduce(f,K);
+      f=specialReduce(f,K);
       setring S;
       f=imap(S1,f);
       f=f/(-diff(f,@z));  //f=@z-@u*h(@x,@y)-@v*g(@x,@y)
@@ -2244,30 +2275,85 @@ static proc findTrafo(ideal I, int i)
    g=g/diff(I[1],var(1));
    return(var(1)-g);
 }
-
+////////////////////////////////////////////////////////////////////////////////
+static proc specialInterred(ideal K)
+{
+   int i,j;
+   int d=1;
+   poly p;
+   while(d)
+   {
+      d=0;
+      K=simplify(K,3);
+      K=sort(K)[1];
+      for(i=ncols(K);i>1;i--)
+      {
+         for(j=1;j<i;j++)
+         {
+            p=lead(K[i])/lead(K[j]);
+            if((p!=0)&&(p==subst(p,var(1),0,var(2),0)))
+            {
+               K[i]=K[i]-p*K[j];
+               d=1;
+               break;
+            }
+         }
+         if(d==1){break;}
+      }
+   }
+   return(K);
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc specialReduce(poly f, ideal K)
+{
+   int i;
+   int d=1;
+   poly p;
+   while(d)
+   {
+      d=0;
+      for(i=1;i<=size(K);i++)
+      {
+         p=lead(f)/lead(K[i]);
+         if((p!=0)&&(p==subst(p,var(1),0,var(2),0)))
+         {
+            f=f-p*K[i];
+            d=1;
+            break;
+         }
+      }
+   }
+   return(f);
+}
+////////////////////////////////////////////////////////////////////////////////
 //============================ Examples========================
 /*
   ring r=0,t,(c,ds);
   ideal I=t4+t7,t6+t7;
-  HHnormalForm(I);
+  normalForm(I);
 
   ring r=0,t,(c,ds);
   ideal I=t4+t7+t9,t6+t11;
-  HHnormalForm(I);
+  normalForm(I);
 
   ring r=0,t,(c,ds);
   ideal I=t4+t5,t9+t10;
-  HHnormalForm(I);
+  normalForm(I);
 
   ring r=0,t,Ds;
   ideal I=t6+3t7,t8+t13+t19;
-  HHnormalForm(I);
+  normalForm(I);
 
   ring r=32003,t,Ds;
   ideal I=t8,t12+3t15+7t19;
-  HHnormalForm(I);
+  normalForm(I);
+
+  ring r=32003,t,Ds;
+  ideal I=t16,t24+t28+t30+t31;
+  normalForm(I);
+
 */
-////////////////////////////////////////////////////////////////////////////////
+
 /*
 ===============================   Examples==========================================
 ideal I=t4+4t5+6t6+8t7+13t8+12t9+10t10+12t11+6t12+4t13+4t14+t16,t7+7t8+22t9+51t10+113t11+219t12+366t13+589t14+876t15+1170t16+1514t17+1828t1
