@@ -2099,6 +2099,16 @@ static proc reduc(poly f,ideal I, int b)
 }
 ////////////////////////////////////////////////////////////////////////////////
 proc HHnormalForm(ideal I, list #)
+"USAGE:   HHnormalForm(I), I=<x(t),y(t)> an ideal, # optional, a bound for the
+          conductor
+COMPUTE:  computes the Hefez-Hernandez normal form of the ideal I=<x(t),y(t)>
+RETURN:  a list L with 5 entries
+   L[1] the Hefei-Hernandez normal form of the ideal I=<x(t),y(t)>
+   L[2] the semi group Gamma
+   L[3] the semi module Lambda
+   L[4] 0 if Lambda=Gamma or lambda=min(Lambda-Gamma) -n, the Zariski number
+   L[5] the integers i, i>lambda, i+n not in Lambda, 0 if this set is empty
+EXAMPLE:  example HHnormalForm; shows an example"
 {
 //computes the Hefez-Hernandez normal form of the ideal I=<x(t),y(t)>
 //returns a list with the normal form, the semi group Gamma, the semi module
@@ -2203,6 +2213,13 @@ proc HHnormalForm(ideal I, list #)
       }
    }
    return(list(I,v,w,l,moduli));
+}
+example
+{
+ "EXAMPLE"; echo=2;
+  ring r=0,t,Ds;
+  ideal I=t6+3t7,t8+t13+t19;
+  HHnormalForm(I);
 }
 ////////////////////////////////////////////////////////////////////////////////
 static proc findTrafo(ideal I, int i)
