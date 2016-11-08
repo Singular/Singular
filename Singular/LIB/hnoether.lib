@@ -2646,7 +2646,7 @@ EXAMPLE: example factorfirst;  shows an example
      if (defined(HNDebugOn)) {e," -> ",eps,"*",p,"^",l;}
      delt = koeff(f,(M div e)*p^l,(N div e)*p^l*(eps-1)) / (-1*eps*c);
 
-     if ((charstr(basering) != string(p)) and (delt != 0)) {
+     if ((!hasZpCoefficient(basering)) and (delt != 0)) {
  //------ coefficient field is not Z/pZ => (p^l)th root is not identity -------
        delt=0;
        if (defined(HNDebugOn)) {
@@ -2884,15 +2884,15 @@ RETURN: list:  first entry = HNEring  (containing list hne, poly f)
  intvec hne_conj;
 
  //-------------------- Tests auf Zulaessigkeit von basering ------------------
- if (charstr(basering)=="real") {
+ if (hasNumericCoeffs(basering)) {
    " Singular cannot factorize over 'real' as ground field";
    return(list());
  }
- if (size(maxideal(1))<2) {
+ if (nvars(basering)<2) {
    " A univariate polynomial ring makes no sense !";
    return(list());
  }
- if (size(maxideal(1))>2) {
+ if (nvars(basering)>2) {
    dbprint(printlevel-voice+2,
    " Warning: all variables except the first two will be ignored!");
  }
@@ -2906,7 +2906,7 @@ RETURN: list:  first entry = HNEring  (containing list hne, poly f)
  }
  //----------------- Definition eines neuen Ringes: HNEring -------------------
  string namex=varstr(1); string namey=varstr(2);
- if ((npars(altring)==0)&&(find(charstr(altring),"real")==0)) { // kein Parameter, nicht 'real'
+ if ((npars(altring)==0)&&(!hasNumericCoeffs(basering))) { // kein Parameter, nicht 'real'
    ring HNEring = char(altring),(x,y),ls;
    map m=altring,x,y;
    poly f=m(f);
@@ -2983,7 +2983,7 @@ RETURN: list:  first entry = HNEring  (containing list hne, poly f)
 
  //-----------------------  Test auf Quadratfreiheit --------------------------
 
- if ((p==0) and (size(charstr(basering))==1)) {
+ if (hasQQCoefficient(basering)) {
 
  //-------- Fall basering==0,... : Wechsel in Ring mit char >0 ----------------
  // weil squarefree eine Standardbasis berechnen muss (verwendet Syzygien)
@@ -3468,7 +3468,7 @@ RETURN: list: first entry = list of HNErings,
     needext=0;
     if (delt==0) {
      //---------- Sonderbehandlung: faktorisiere einige Polynome ueber Q(a): --
-     if ((charstr(basering)=="0,a") and (essential==0)) {
+     if ((char(basering)==0) and (hasAlgExtensionCoefficient(basering)) and (essential==0)) {
         // ====================================================
         // neu CL:  06.10.05
         poly CHPOLY=charPoly(leitf,M,N);

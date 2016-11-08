@@ -1184,8 +1184,19 @@ KEYWORDS: floating point
 EXAMPLE: example hasNumericCoeffs; shows an example
 "
 {
-  ERROR("not yet implemented");
+  return((attrib(rng,"cf_class")==3) /*real*/
+  or     (attrib(rng,"cf_class")==5) /*gmp real*/
+  or     (attrib(rng,"cf_class")==9) /*gmp complex*/);
 }
+example
+{
+  "EXAMPLE:";echo=2;
+  ring r1 = integer,x,dp;
+  hasNumericCoeffs(r1);
+  ring r2 = complex,x,dp;
+  hasNumericCoeffs(r2);
+}
+
 
 proc isSubModule(def I,def J)
 "USAGE: isSubModule(I,J): I, J: ideal or module
