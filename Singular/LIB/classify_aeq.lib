@@ -2108,7 +2108,9 @@ RETURN:  a list L with 5 entries
    L[3] the semi module Lambda
    L[4] 0 if Lambda=Gamma or lambda=min(Lambda-Gamma) -n, the Zariski number
    L[5] the integers i, i>lambda, i+n not in Lambda, 0 if this set is empty
-EXAMPLE:  example HHnormalForm; shows an example"
+EXAMPLE:  example HHnormalForm; shows an example
+KEYWORDS: normalform
+"
 {
 //computes the Hefez-Hernandez normal form of the ideal I=<x(t),y(t)>
 //returns a list with the normal form, the semi group Gamma, the semi module
