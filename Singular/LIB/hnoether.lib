@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version hnoether.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version hnoether.lib 4.0.3.5 Nov_2016 "; // $Id$
 
 category="Singularities";
 info="
@@ -587,12 +587,10 @@ EXAMPLES: example develop;         shows an example
 
  number c,delt;
  int p = char(basering);
- string ringchar=charstr(basering);
  map xytausch = basering,y,x;
- if ((p!=0) and (ringchar != string(p))) {
+ if ((p!=0) and (hasGFCoefficient(basering))) {
                             // coefficient field is extension of Z/pZ
-   execute("int n_elements="+
-           ringchar[1,size(ringchar)-size(parstr(basering))-1]+";");
+   int n_elements=size(basering);
                             // number of elements of actual ring
    number generat=par(1);   // generator of the coefficient field of the ring
  }
@@ -774,7 +772,7 @@ EXAMPLES: example develop;         shows an example
         if (defined(HNDebugOn)) {e," -> ",eps,"*",p,"^",l;}
         delt = koeff(f,(M div e)*p^l,(N div e)*p^l*(eps-1)) / (-1*eps*c);
 
-        if ((ringchar != string(p)) and (delt != 0)) {
+        if ((!hasZpCoefficient(basering)) and (delt != 0)) {
  //- coeff. field is not Z/pZ => we`ve to correct delta by taking (p^l)th root-
           if (delt == generat) {exponent=1;}
           else {
@@ -2635,7 +2633,6 @@ EXAMPLE: example factorfirst;  shows an example
  number delt;
  int eps,l;
  int p=char(basering);
- string ringchar=charstr(basering);
 
  if (c == 0) {"Something has gone wrong! I didn't get N correctly!"; exit;}
  int e = gcd(M,N);
