@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version realclassify.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version realclassify.lib 4.0.3.5 Nov_2016 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:  realclassify.lib   Classification of real singularities
@@ -91,7 +91,7 @@ EXAMPLE:  example realclassify; shows an example"
   }
 
   /* error check */
-  if(charstr(br) != "0")
+  if(!hasQQCoefficient(br))
   {
     ERROR("The ground field must be Q (the rational numbers).");
   }

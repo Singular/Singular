@@ -27,11 +27,11 @@ PROCEDURES:
  hasGFCoefficient         check if the coefficient ring is GF(p,k)
  hasZpCoefficient         check if the coefficient ring is ZZ/p
  hasZp_aCoefficient       check if the coefficient ring is an elag. ext. of ZZ/p
+ hasQQCoefficient         check if the coefficient ring is QQ
  hasNumericCoeffs(rng)    check for use of floating point numbers
  hasCommutativeVars(rng)  non-commutive or commnuative polynomial ring
  hasGlobalOrdering(rng)   global versus mixed/local monomial ordering
  hasMixedOrdering()       mixed versus global/local ordering
- hasFieldCoefficient(rng) coefficients are a field
  hasAlgExtensionCoefficient(r) coefficients are an algebraic extension
  hasTransExtensionCoefficient(r) coefficients are rational functions
  isQuotientRing(rng)      ring is a qotient ring
@@ -1063,7 +1063,7 @@ example
 
 proc hasGFCoefficient(def rng )
 "USAGE: hasGFCoefficient ( rng );
-RETURN:  1 if the coeffcients form GF(p,k), 0 otherwise.
+RETURN:  1 if the coeffcients are of the form GF(p,k), 0 otherwise.
 KEYWORDS: ring coefficients
 EXAMPLE: example hasGFCoefficient; shows an example
 "
@@ -1089,7 +1089,7 @@ example
 
 proc hasZp_aCoefficient(def rng )
 "USAGE: hasZp_aCoefficient ( rng );
-RETURN:  1 if the coeffcients form Zp_a(p,k), 0 otherwise.
+RETURN:  1 if the coeffcients are of the form Zp_a(p,k), 0 otherwise.
 KEYWORDS: ring coefficients
 EXAMPLE: example hasZp_aCoefficient; shows an example
 "
@@ -1110,16 +1110,11 @@ example
 
 proc hasZpCoefficient(def rng )
 "USAGE: hasZpCoefficient ( rng );
-RETURN:  1 if the coeffcients form ZZ/p, 0 otherwise.
+RETURN:  1 if the coeffcients are of the form ZZ/p, 0 otherwise.
 KEYWORDS: ring coefficients
 EXAMPLE: example hasZpCoefficient; shows an example
 "
 {
-  //return((charstr(rng)!=string(char(rng))) &&
-  //(npars(rng)==1) &&
-  //(find(charstr(rng),string(char(rng)))!=1) &&
-  //(charstr(basering)<>"real")&&
-  //(charstr(basering)<>"complex") );
   return(attrib(rng,"cf_class")==1);
 }
 example
@@ -1129,6 +1124,24 @@ example
   hasZpCoefficient(r1);
   ring r2 = 7,x,dp;
   hasZpCoefficient(r2);
+}
+
+proc hasQQCoefficient(def rng )
+"USAGE: hasQQCoefficient ( rng );
+RETURN:  1 if the coeffcients are QQ, 0 otherwise.
+KEYWORDS: ring coefficients
+EXAMPLE: example hasQQCoefficient; shows an example
+"
+{
+  return(attrib(rng,"cf_class")==2);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring r1 = integer,x,dp;
+  hasQQCoefficient(r1);
+  ring r2 = QQ,x,dp;
+  hasQQCoefficient(r2);
 }
 
 proc hasGlobalOrdering (def rng)
