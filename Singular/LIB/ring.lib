@@ -25,6 +25,8 @@ PROCEDURES:
  optionIsSet(opt)         check if as a string given option is set or not.
  hasFieldCoefficient      check if the coefficient ring is considered a field
  hasGFCoefficient         check if the coefficient ring is GF(p,k)
+ hasZpCoefficient         check if the coefficient ring is ZZ/p
+ hasZp_aCoefficient       check if the coefficient ring is an elag. ext. of ZZ/p
  hasNumericCoeffs(rng)    check for use of floating point numbers
  hasCommutativeVars(rng)  non-commutive or commnuative polynomial ring
  hasGlobalOrdering(rng)   global versus mixed/local monomial ordering
@@ -1075,10 +1077,58 @@ EXAMPLE: example hasGFCoefficient; shows an example
 }
 example
 {
+  "EXAMPLE:";echo=2;
   ring r1 = integer,x,dp;
-  hasGF(r1);
+  hasGFCoefficient(r1);
   ring r2 = (4,a),x,dp;
-  hasGF(r2);
+  hasGFCoefficient(r2);
+  ring r3 = (2,a),x,dp;
+  minpoly=a2+a+1;
+  hasGFCoefficient(r2);
+}
+
+proc hasZp_aCoefficient(def rng )
+"USAGE: hasZp_aCoefficient ( rng );
+RETURN:  1 if the coeffcients form Zp_a(p,k), 0 otherwise.
+KEYWORDS: ring coefficients
+EXAMPLE: example hasZp_aCoefficient; shows an example
+"
+{
+  return((attrib(rng,"cf_class")==7) and (char(rng)>0));
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring r1 = integer,x,dp;
+  hasZp_aCoefficient(r1);
+  ring r2 = (4,a),x,dp;
+  hasZp_aCoefficient(r2);
+  ring r3 = (2,a),x,dp;
+  minpoly=a2+a+1;
+  hasZp_aCoefficient(r2);
+}
+
+proc hasZpCoefficient(def rng )
+"USAGE: hasZpCoefficient ( rng );
+RETURN:  1 if the coeffcients form ZZ/p, 0 otherwise.
+KEYWORDS: ring coefficients
+EXAMPLE: example hasZpCoefficient; shows an example
+"
+{
+  //return((charstr(rng)!=string(char(rng))) &&
+  //(npars(rng)==1) &&
+  //(find(charstr(rng),string(char(rng)))!=1) &&
+  //(charstr(basering)<>"real")&&
+  //(charstr(basering)<>"complex") );
+  return(attrib(rng,"cf_class")==1);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring r1 = integer,x,dp;
+  hasZpCoefficient(r1);
+  ring r2 = 7,x,dp;
+  hasZpCoefficient(r2);
 }
 
 proc hasGlobalOrdering (def rng)
