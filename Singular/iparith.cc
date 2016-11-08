@@ -3727,7 +3727,8 @@ static BOOLEAN jjCOUNT_RG(leftv res, leftv v)
 {
   ring r=(ring)v->Data();
   int elems=-1;
-  if (rField_is_Zp(r)||rField_is_GF(r)) elems=r->cf->ch;
+  if (rField_is_Zp(r))      elems=r->cf->ch;
+  else if (rField_is_GF(r)) elems=r->cf->m_nfCharQ;
   else if (rField_is_Zp_a(r) && (r->cf->type==n_algExt))
   {
     extern int ipower ( int b, int n ); /* factory/cf_util */
