@@ -184,6 +184,7 @@ static BOOLEAN ppCONERAYS3(leftv res, leftv u, leftv v)
 
 BOOLEAN polytopeViaVertices(leftv res, leftv args)
 {
+  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && ((u->Typ() == BIGINTMAT_CMD) || (u->Typ() == INTMAT_CMD)))
@@ -319,6 +320,7 @@ static BOOLEAN ppCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
 
 BOOLEAN polytopeViaNormals(leftv res, leftv args)
 {
+  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && ((u->Typ() == BIGINTMAT_CMD) || (u->Typ() == INTMAT_CMD)))
@@ -341,6 +343,7 @@ BOOLEAN polytopeViaNormals(leftv res, leftv args)
 
 BOOLEAN vertices(leftv res, leftv args)
 {
+  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
@@ -400,6 +403,7 @@ gfan::ZCone newtonPolytope(poly p, ring r)
 
 BOOLEAN newtonPolytope(leftv res, leftv args)
 {
+  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == POLY_CMD))
@@ -415,6 +419,7 @@ BOOLEAN newtonPolytope(leftv res, leftv args)
 
 BOOLEAN scalePolytope(leftv res, leftv args)
 {
+  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == INT_CMD))
@@ -441,6 +446,7 @@ BOOLEAN scalePolytope(leftv res, leftv args)
 
 BOOLEAN dualPolytope(leftv res, leftv args)
 {
+  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
@@ -457,6 +463,7 @@ BOOLEAN dualPolytope(leftv res, leftv args)
 
 BOOLEAN mixedVolume(leftv res, leftv args)
 {
+  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == LIST_CMD))
