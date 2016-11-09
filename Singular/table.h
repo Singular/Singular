@@ -539,6 +539,9 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjINDEX_P_IV),'[',            POLY_CMD,       POLY_CMD,   INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjINDEX_V),   '[',            POLY_CMD,       VECTOR_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjINDEX_V_IV),'[',            VECTOR_CMD,     VECTOR_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
+#ifdef SINGULAR_4_1
+,{D(jjRING_1),    '[',            RING_CMD,     CRING_CMD, ANY_TYPE, ALLOW_PLURAL | ALLOW_RING}
+#endif
 ,{D(jjPROC),      '(',            ANY_TYPE/*set by p*/,PROC_CMD, DEF_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjMAP),       '(',            ANY_TYPE/*set by p*/,MAP_CMD, DEF_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjLOAD2),     '(',            NONE,             LIB_CMD,    STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -733,6 +736,9 @@ const struct sValCmd3 dArith3[]=
 ,{D(jjBRACK_Ma_I_IV),  '[',        POLY_CMD,   MATRIX_CMD, INT_CMD,    INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBRACK_Ma_IV_I),  '[',        POLY_CMD,   MATRIX_CMD, INTVEC_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBRACK_Ma_IV_IV), '[',        POLY_CMD,   MATRIX_CMD, INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
+#ifdef SINGULAR_4_1
+,{D(jjRING_2),         '[',        RING_CMD,   CRING_CMD,  ANY_TYPE,   ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
+#endif
 #ifdef SINGULAR_4_2
 ,{D(jjBRACK_Bim),      '[',        CNUMBER_CMD, CMATRIX_CMD, INT_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 #endif

@@ -1653,6 +1653,17 @@ static BOOLEAN jjMAP(leftv res, leftv u, leftv v)
   omFreeBin((ADDRESS)sl, sleftv_bin);
   return FALSE;
 }
+#ifdef SINGULAR_4_1
+static BOOLEAN jjRING_1(leftv res, leftv u, leftv v)
+{
+  u->next=(leftv)omAlloc(sizeof(sleftv));
+  memcpy(u->next,v,sizeof(sleftv));
+  memset(v,0,sizeof(sleftv));
+  BOOLEAN bo=iiExprArithM(res,u,'[');
+  u->next=NULL;
+  return bo;
+}
+#endif
 static BOOLEAN jjCHINREM_BI(leftv res, leftv u, leftv v)
 {
   intvec *c=(intvec*)u->Data();
@@ -5637,6 +5648,20 @@ static BOOLEAN jjPROC3(leftv res, leftv u, leftv v, leftv w)
   memset(w,0,sizeof(sleftv));
   return jjPROC(res,u,v);
 }
+#ifdef SINGULAR_4_1
+static BOOLEAN jjRING_2(leftv res, leftv u, leftv v, leftv w)
+{
+  u->next=(leftv)omAlloc(sizeof(sleftv));
+  memcpy(u->next,v,sizeof(sleftv));
+  memset(v,0,sizeof(sleftv));
+  u->next->next=(leftv)omAlloc(sizeof(sleftv));
+  memcpy(u->next->next,w,sizeof(sleftv));
+  memset(w,0,sizeof(sleftv));
+  BOOLEAN bo=iiExprArithM(res,u,'[');
+  u->next=NULL;
+  return bo;
+}
+#endif
 static BOOLEAN jjBAREISS3(leftv res, leftv u, leftv v, leftv w)
 {
   intvec *iv;
@@ -7887,7 +7912,7 @@ static BOOLEAN jjRING_PL(leftv res, leftv a)
   //Print("construct ring\n");
   if (a->Typ()!=CRING_CMD)
   {
-    WerrorS("expected `Ring` [ `id` ... ]");
+    WerrorS("expected `cring` [ `id` ... ]");
     return TRUE;
   }
   assume(a->next!=NULL);
