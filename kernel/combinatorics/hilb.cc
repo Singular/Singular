@@ -36,7 +36,6 @@
 #include<kernel/linear_algebra/linearAlgebra.h>
 #include <coeffs/numbers.h>
 #include <vector>
-#include <Singular/ipshell.h>
 
 #endif
 
