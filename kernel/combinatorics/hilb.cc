@@ -78,7 +78,7 @@ static void hHilbEst(scfmon stc, int Nstc, varset var, int Nvar)
     {
       if (z>(MAX_INT_VAL)/2)
       {
-       WerrorS("interal arrays too big");
+       WerrorS("internal arrays too big");
        return;
       }
       p = (int *)omAlloc((unsigned long)z * sizeof(int));
