@@ -655,7 +655,7 @@ const char * piProcinfo(procinfov pi, const char *request)
 BOOLEAN piKill(procinfov pi)
 {
   (pi->ref)--;
-  if (pi->ref <= 0)
+  if (pi->ref == 0)
   {
     if (pi->language==LANG_SINGULAR)
     {

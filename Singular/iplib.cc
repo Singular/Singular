@@ -925,14 +925,38 @@ int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
   if ( h!= NULL )
   {
     pi = IDPROC(h);
-    omfree(pi->libname);
-    pi->libname = omStrDup(libname);
-    omfree(pi->procname);
-    pi->procname = omStrDup(procname);
-    pi->language = LANG_C;
-    pi->ref = 1;
-    pi->is_static = pstatic;
-    pi->data.o.function = func;
+    if((pi->language == LANG_SINGULAR)
+    ||(pi->language == LANG_NONE))
+    {
+      omfree(pi->libname);
+      pi->libname = omStrDup(libname);
+      omfree(pi->procname);
+      pi->procname = omStrDup(procname);
+      pi->language = LANG_C;
+      pi->ref = 1;
+      pi->is_static = pstatic;
+      pi->data.o.function = func;
+    }
+    else if(pi->language == LANG_C)
+    {
+      if(pi->data.o.function == func)
+      {
+        pi->ref++;
+      }
+      else
+      {
+        omfree(pi->libname);
+        pi->libname = omStrDup(libname);
+        omfree(pi->procname);
+        pi->procname = omStrDup(procname);
+        pi->language = LANG_C;
+        pi->ref = 1;
+        pi->is_static = pstatic;
+        pi->data.o.function = func;
+      }
+    }
+    else
+      Warn("internal error: unknown procedure type %d",pi->language);
     return(1);
   }
   else
