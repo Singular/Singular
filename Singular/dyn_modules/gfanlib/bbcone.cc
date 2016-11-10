@@ -352,7 +352,6 @@ static BOOLEAN jjCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
 
 BOOLEAN coneViaNormals(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && ((u->Typ() == BIGINTMAT_CMD) || (u->Typ() == INTMAT_CMD)))
@@ -509,7 +508,6 @@ static BOOLEAN jjCONERAYS3(leftv res, leftv u, leftv v, leftv w)
 
 BOOLEAN coneViaRays(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && ((u->Typ() == BIGINTMAT_CMD) || (u->Typ() == INTMAT_CMD)))
@@ -532,7 +530,6 @@ BOOLEAN coneViaRays(leftv res, leftv args)
 
 BOOLEAN inequalities(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID || u->Typ() == polytopeID))
@@ -550,7 +547,6 @@ BOOLEAN inequalities(leftv res, leftv args)
 
 BOOLEAN equations(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID || u->Typ() == polytopeID))
@@ -567,7 +563,6 @@ BOOLEAN equations(leftv res, leftv args)
 
 BOOLEAN facets(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID || u->Typ() == polytopeID))
@@ -584,7 +579,6 @@ BOOLEAN facets(leftv res, leftv args)
 
 BOOLEAN impliedEquations(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID || u->Typ() == polytopeID))
@@ -601,7 +595,6 @@ BOOLEAN impliedEquations(leftv res, leftv args)
 
 BOOLEAN generatorsOfSpan(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID || u->Typ() == polytopeID))
@@ -618,7 +611,6 @@ BOOLEAN generatorsOfSpan(leftv res, leftv args)
 
 BOOLEAN generatorsOfLinealitySpace(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID || u->Typ() == polytopeID))
@@ -635,7 +627,6 @@ BOOLEAN generatorsOfLinealitySpace(leftv res, leftv args)
 
 BOOLEAN rays(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -660,7 +651,6 @@ BOOLEAN rays(leftv res, leftv args)
 
 BOOLEAN quotientLatticeBasis(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -677,7 +667,6 @@ BOOLEAN quotientLatticeBasis(leftv res, leftv args)
 
 BOOLEAN getLinearForms(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -694,7 +683,6 @@ BOOLEAN getLinearForms(leftv res, leftv args)
 
 BOOLEAN ambientDimension(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -724,7 +712,6 @@ BOOLEAN ambientDimension(leftv res, leftv args)
 
 BOOLEAN dimension(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -754,7 +741,6 @@ BOOLEAN dimension(leftv res, leftv args)
 
 BOOLEAN codimension(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -784,7 +770,6 @@ BOOLEAN codimension(leftv res, leftv args)
 
 BOOLEAN linealityDimension(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -807,7 +792,6 @@ BOOLEAN linealityDimension(leftv res, leftv args)
 
 BOOLEAN getMultiplicity(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -824,7 +808,6 @@ BOOLEAN getMultiplicity(leftv res, leftv args)
 
 BOOLEAN isOrigin(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -841,7 +824,6 @@ BOOLEAN isOrigin(leftv res, leftv args)
 
 BOOLEAN isFullSpace(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -858,7 +840,6 @@ BOOLEAN isFullSpace(leftv res, leftv args)
 
 BOOLEAN isSimplicial(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -883,7 +864,6 @@ BOOLEAN isSimplicial(leftv res, leftv args)
 
 BOOLEAN containsPositiveVector(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -900,7 +880,6 @@ BOOLEAN containsPositiveVector(leftv res, leftv args)
 
 BOOLEAN linealitySpace(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -917,7 +896,6 @@ BOOLEAN linealitySpace(leftv res, leftv args)
 
 BOOLEAN dualCone(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -934,7 +912,6 @@ BOOLEAN dualCone(leftv res, leftv args)
 
 BOOLEAN negatedCone(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -951,7 +928,6 @@ BOOLEAN negatedCone(leftv res, leftv args)
 
 BOOLEAN semigroupGenerator(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -975,7 +951,6 @@ BOOLEAN semigroupGenerator(leftv res, leftv args)
 
 BOOLEAN relativeInteriorPoint(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -992,7 +967,6 @@ BOOLEAN relativeInteriorPoint(leftv res, leftv args)
 
 BOOLEAN uniquePoint(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -1030,7 +1004,6 @@ gfan::ZVector randomPoint(const gfan::ZCone* zc)
 
 BOOLEAN randomPoint(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -1047,7 +1020,6 @@ BOOLEAN randomPoint(leftv res, leftv args)
 
 BOOLEAN setMultiplicity(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -1069,7 +1041,6 @@ BOOLEAN setMultiplicity(leftv res, leftv args)
 
 BOOLEAN setLinearForms(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -1123,7 +1094,6 @@ gfan::ZCone liftUp(const gfan::ZCone &zc)
 
 BOOLEAN coneToPolytope(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -1142,7 +1112,6 @@ BOOLEAN coneToPolytope(leftv res, leftv args)
 
 BOOLEAN intersectCones(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -1233,7 +1202,6 @@ BOOLEAN intersectCones(leftv res, leftv args)
 
 BOOLEAN convexHull(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -1341,7 +1309,6 @@ BOOLEAN convexHull(leftv res, leftv args)
 
 BOOLEAN coneLink(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -1388,7 +1355,6 @@ BOOLEAN coneLink(leftv res, leftv args)
 
 BOOLEAN containsInSupport(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -1448,7 +1414,6 @@ BOOLEAN containsInSupport(leftv res, leftv args)
 
 BOOLEAN containsRelatively(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -1491,7 +1456,6 @@ BOOLEAN containsRelatively(leftv res, leftv args)
 
 BOOLEAN hasFace(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -1526,7 +1490,6 @@ BOOLEAN hasFace(leftv res, leftv args)
 
 BOOLEAN canonicalizeCone(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -1544,7 +1507,6 @@ BOOLEAN canonicalizeCone(leftv res, leftv args)
 
 BOOLEAN containsCone(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == LIST_CMD))
@@ -1582,7 +1544,6 @@ BOOLEAN containsCone(leftv res, leftv args)
 
 BOOLEAN faceContaining(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))

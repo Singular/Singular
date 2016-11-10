@@ -19,7 +19,6 @@ template class gfan::Matrix<gfan::Rational>;
 
 extern "C" int SI_MOD_INIT(gfanlib)(SModulFunctions* p)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   bbcone_setup(p);
   bbfan_setup(p);

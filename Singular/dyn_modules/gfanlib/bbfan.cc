@@ -38,7 +38,6 @@ char* bbfan_String(blackbox* /*b*/, void *d)
   if (d==NULL) return omStrDup("invalid object");
   else
   {
-    gfan::deinitializeCddlibIfRequired();
     gfan::initializeCddlibIfRequired();
     gfan::ZFan* zf = (gfan::ZFan*)d;
     std::string s = zf->toString(2+4+8+128);
@@ -176,7 +175,6 @@ static BOOLEAN jjFANEMPTY_IM(leftv res, leftv v)
 
 BOOLEAN emptyFan(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if (u == NULL)
@@ -230,7 +228,6 @@ static BOOLEAN jjFANFULL_IM(leftv res, leftv v)
 
 BOOLEAN fullFan(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u = args;
   if (u == NULL)
@@ -269,7 +266,6 @@ int getLinealityDimension(gfan::ZFan* zf)
 
 BOOLEAN numberOfConesOfDimension(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
@@ -315,7 +311,6 @@ BOOLEAN numberOfConesOfDimension(leftv res, leftv args)
 
 BOOLEAN ncones(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
@@ -337,7 +332,6 @@ BOOLEAN ncones(leftv res, leftv args)
 
 BOOLEAN nmaxcones(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
@@ -377,7 +371,6 @@ bool isCompatible(const gfan::ZFan* zf, const gfan::ZCone* zc)
 
 BOOLEAN isCompatible(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
@@ -399,7 +392,6 @@ BOOLEAN isCompatible(leftv res, leftv args)
 
 BOOLEAN insertCone(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->rtyp==IDHDL) && (u->e==NULL) && (u->Typ() == fanID))
@@ -458,7 +450,6 @@ bool containsInCollection(gfan::ZFan* zf, gfan::ZCone* zc)
 
 BOOLEAN containsInCollection(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
@@ -518,7 +509,6 @@ BOOLEAN containsInCollection(leftv res, leftv args)
 
 BOOLEAN removeCone(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
@@ -556,7 +546,6 @@ BOOLEAN removeCone(leftv res, leftv args)
 
 BOOLEAN getCone(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
@@ -633,7 +622,6 @@ BOOLEAN getCone(leftv res, leftv args)
 
 BOOLEAN getCones(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
@@ -709,7 +697,6 @@ int isSimplicial(gfan::ZFan* zf)
 
 BOOLEAN isPure(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
@@ -741,7 +728,6 @@ BOOLEAN isPure(leftv res, leftv args)
 
 BOOLEAN fVector(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
@@ -758,7 +744,6 @@ BOOLEAN fVector(leftv res, leftv args)
 
 gfan::ZMatrix rays(const gfan::ZFan* const zf)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   gfan::ZMatrix rays(0,zf->getAmbientDimension());
   for (int i=0; i<zf->numberOfConesOfDimension(1,0,0); i++)
@@ -771,7 +756,6 @@ gfan::ZMatrix rays(const gfan::ZFan* const zf)
 
 int numberOfConesWithVector(gfan::ZFan* zf, gfan::ZVector* v)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   int count = 0;
   int ambientDim = zf->getAmbientDimension();
@@ -790,7 +774,6 @@ int numberOfConesWithVector(gfan::ZFan* zf, gfan::ZVector* v)
 
 BOOLEAN numberOfConesWithVector(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
@@ -820,7 +803,6 @@ BOOLEAN numberOfConesWithVector(leftv res, leftv args)
 
 BOOLEAN fanFromString(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == STRING_CMD))
@@ -838,7 +820,6 @@ BOOLEAN fanFromString(leftv res, leftv args)
 
 BOOLEAN fanViaCones(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == LIST_CMD))
@@ -990,7 +971,6 @@ gfan::ZFan commonRefinement(gfan::ZFan zf, gfan::ZFan zg)
 
 BOOLEAN commonRefinement(leftv res, leftv args)
 {
-  gfan::deinitializeCddlibIfRequired();
   gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
