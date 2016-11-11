@@ -7364,6 +7364,11 @@ static BOOLEAN jjKLAMMER_PL(leftv res, leftv u)
   }
   else // p(1,2), p undefined
   {
+    if (v->Typ()!=INT_CMD)
+    {
+      Werror("`int` expected while building `%s(`",u->name);
+      return TRUE;
+    }
     int l=u->listLength();
     char * nn = (char *)omAlloc(strlen(u->name) + 12*l);
     sprintf(nn,"%s(%d",u->name,(int)(long)v->Data());
