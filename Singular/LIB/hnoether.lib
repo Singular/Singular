@@ -2446,12 +2446,16 @@ EXAMPLE: example extdevelop;  shows an example
   def altring = basering;
   int p = char(basering);
   //if (charstr(basering)!=string(p))
-  if(!hasQQCoefficient(basering) and !hasZpCoefficient(basering))
+  if(hasAlgExtensionCoefficient(basering)
+  or hasTransExtensionCoefficient(basering)i
+  or hasGFCoefficient(basering))
   {
      string tststr=charstr(basering);
      tststr=tststr[1..find(tststr,",")-1];     //-> "p^k" bzw. "p"
-     if (tststr==string(p)) {
-       if (size(parstr(basering))>1) {         // ring (p,a,..),...
+     //if (tststr==string(p))
+     if (!hasGFCoefficient(basering))
+     {
+       if (npars(basering)>1) {         // ring (p,a,..),...
         execute("ring extdguenstig=("+charstr(basering)+"),(x,y),ls;");
        }
        else {                                  // ring (p,a),...
