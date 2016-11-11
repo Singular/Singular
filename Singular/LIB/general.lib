@@ -355,7 +355,8 @@ EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
         for ( @joni=size(@marie); @joni>2; @joni-- )
         {
           if(typeof(`@marie[@joni]`)==#[1] and @marie[@joni]!="LIB"
-             and typeof(`@marie[@joni]`)!="proc")
+             and typeof(`@marie[@joni]`)!="proc"
+             and typeof(`@marie[@joni]`)!="cring")
           { kill `@marie[@joni]`; }
         }
       }
@@ -366,7 +367,8 @@ EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
       for ( @joni=size(@marie); @joni>2; @joni-- )
       {
         if ( @marie[@joni] != "LIB" && @marie[@joni] != "Top"
-             && typeof(`@marie[@joni]`) != "proc")
+             && typeof(`@marie[@joni]`) != "proc"
+	     && typeof(`@marie[@joni]`) != "cring")
         {
           no_kill = 0;
           for (j=2; j<= size(#); j++)
