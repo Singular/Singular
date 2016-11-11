@@ -471,9 +471,17 @@ elemexpr:
           }
         | elemexpr '(' exprlist ')'
           {
-            $1.next=(leftv)omAllocBin(sleftv_bin);
-            memcpy($1.next,&$3,sizeof(sleftv));
-            if(iiExprArithM(&$$,&$1,'(')) YYERROR;
+            if ($1.next==NULL)
+            {
+              $1.next=(leftv)omAllocBin(sleftv_bin);
+              memcpy($1.next,&$3,sizeof(sleftv));
+              if(iiExprArithM(&$$,&$1,'(')) YYERROR;
+            }
+            else if ($1.rtyp==UNKNOWN)
+            { // for x(i)(j)
+              if(iiExprArith2(&$$,&$1,'(',&$3)) YYERROR;
+            }
+            else YYERROR;
           }
         | '[' exprlist ']'
           {
