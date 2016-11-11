@@ -2447,7 +2447,7 @@ EXAMPLE: example extdevelop;  shows an example
   int p = char(basering);
   //if (charstr(basering)!=string(p))
   if(hasAlgExtensionCoefficient(basering)
-  or hasTransExtensionCoefficient(basering)i
+  or hasTransExtensionCoefficient(basering)
   or hasGFCoefficient(basering))
   {
      string tststr=charstr(basering);
