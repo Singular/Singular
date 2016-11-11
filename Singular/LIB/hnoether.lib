@@ -275,20 +275,15 @@ EXAMPLE: example squarefree; shows some examples.
   { ERROR("basering must have exactly 2 variables for Hnoether::squarefree"); }
   def altring = basering;
   int e;
-  int gcd_ok=1;
   string mipl="0";
   if (size(parstr(altring))==1) { mipl=string(minpoly); }
  //---- test: char = (p^k,a) (-> gcd not implemented) or (p,a) (gcd works) ----
   //if ((char(basering)!=0) and (charstr(basering)!=string(char(basering))))
-  gcd_ok= ! hasGFCoefficient(basering);
+  int gcd_ok= ! hasGFCoefficient(basering);
   execute("ring rsqrf = ("+charstr(altring)+"),(x,y),dp;");
   if ((gcd_ok!=0) && (mipl!="0")) { execute("minpoly="+mipl+";"); }
   poly f=fetch(altring,f);
   poly dif,g,l;
-  if ((char(basering)==0) and (charstr(basering)!=string(char(basering)))
-      and (mipl!="0")) {
-    gcd_ok=0;                   // since Singular 1.2 gcd no longer implemented
-  }
   if (gcd_ok!=0) {
  //--------------------- Berechne f/ggT(f,df/dx,df/dy) ------------------------
     dif=diff(f,x);
@@ -2450,7 +2445,9 @@ EXAMPLE: example extdevelop;  shows an example
  if (ringwechsel) {
   def altring = basering;
   int p = char(basering);
-  if (charstr(basering)!=string(p)) {
+  //if (charstr(basering)!=string(p))
+  if(!hasQQCoefficient(basering) and !hasZpCoefficient(basering))
+  {
      string tststr=charstr(basering);
      tststr=tststr[1..find(tststr,",")-1];     //-> "p^k" bzw. "p"
      if (tststr==string(p)) {
