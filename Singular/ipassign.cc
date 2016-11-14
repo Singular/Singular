@@ -1067,6 +1067,9 @@ static BOOLEAN jiA_DEF(leftv res, leftv, Subexpr)
 #ifdef SINGULAR_4_1
 static BOOLEAN jiA_CRING(leftv res, leftv a, Subexpr e)
 {
+  coeffs r=(coeffs)a->Data();
+  if (r==NULL) return TRUE;
+  if (res->data!=NULL) nKillChar((coeffs)res->data);
   res->data=(void *)a->CopyD(CRING_CMD);
   jiAssignAttr(res,a);
   return FALSE;

@@ -228,6 +228,7 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjRINGLIST),   RINGLIST_CMD,    LIST_CMD,       RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
 #ifdef SINGULAR_4_1
 ,{D(jjRINGLIST_C), RING_LIST_CMD,   LIST_CMD,       CRING_CMD     , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjRING_LIST),  RING_LIST_CMD,   LIST_CMD,       RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
 #endif
 ,{D(jjDUMMY),      RING_CMD,        RING_CMD,       RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLISTRING),   RING_CMD,        RING_CMD,       LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
@@ -1289,6 +1290,7 @@ const struct sValAssign dAssign[]=
 ,{D(jiA_1x1MATRIX),POLY_CMD,       MATRIX_CMD }
 ,{D(jiA_RING),     RING_CMD,       RING_CMD }
 ,{D(jiA_QRING),    RING_CMD,       IDEAL_CMD }
+,{D(jiA_CRING),    CRING_CMD,      CRING_CMD }
 ,{D(jiA_STRING),   STRING_CMD,     STRING_CMD }
 ,{D(jiA_PROC),     PROC_CMD,       STRING_CMD }
 ,{D(jiA_PROC),     PROC_CMD,       PROC_CMD }
