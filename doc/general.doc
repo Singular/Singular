@@ -1381,6 +1381,10 @@ in the minibuffer area.)
 @node Rings and orderings, Implemented algorithms, Emacs user interface, General concepts
 @section Rings and orderings
 @cindex Rings and orderings
+@cindex QQ
+@cindex ZZ
+@cindex ZZ/p
+@cindex ZZ/m
 
 All non-trivial algorithms in @sc{Singular} require the prior definition of
 a ring. Such a ring can be
@@ -1409,13 +1413,13 @@ The coefficient field of the rings may be
 @cindex complex
 @enumerate
 @item
-the field of rational numbers @math{Q},
+the field of rational numbers @math{Q} (@code{QQ}),
 @item
 @tex
 finite fields $Z/p$, $p$ a prime $\le 2147483647$,
 @end tex
 @ifinfo
-finite fields Z/p, p a prime <= 2147483647,
+finite fields Z/p, p a prime <= 2147483647 (@code{(ZZ/p)}),
 @end ifinfo
 @item
 @tex
@@ -1435,7 +1439,7 @@ numbers of a user defined precision,
 the field of complex numbers represented by (pairs of) floating point
 numbers of a user defined precision,
 @item
-the ring of integers,
+the ring of integers (@code{ZZ}),
 @item
 finite rings @math{Z/m} with @math{m\in Z}.
 @end enumerate
@@ -1447,7 +1451,7 @@ are guaranteed to work:
 @item
 - basic polynomial arithmetic, i.e. addition, multiplication, division, exponentation
 @item
-- std, i.e. computing standard bases
+- std, i.e. computing standard bases (and related: syz, etc.)
 @item
 - interred
 @item
@@ -1499,8 +1503,10 @@ ordering.  The exact ring declaration may be omitted in the first
 example since this is the default ring:
 
 @smallexample
-ring r;
-ring r = 32003,(x,y,z),dp;
+ring r1;
+ring r2 = 32003,(x,y,z),dp;
+ring r3=(ZZ/32003)[x,y,z];
+ring r4 = (ZZ/32003),(x,y,z),dp;
 @end smallexample
 
 @item
@@ -1511,13 +1517,16 @@ x(1)(2), ..., x(1)(8), x(2)(1), ..., x(5)(8):
 @smallexample
 ring r1 = 32003,(x(1..10)),dp;
 ring r2 = 32003,(x(1..5)(1..8)),dp;
+ring r3 = (ZZ/32003)[x(1..5)(1..8)];
+ring r4 = (ZZ/32003),(x(1..5)(1..8)),dp;
 @end smallexample
 
 @item
 the ring @math{Q[a,b,c,d]} with lexicographical ordering:
 
 @smallexample
-ring r = 0,(a,b,c,d),lp;
+ring r1 = 0,(a,b,c,d),lp;
+ring r2 = QQ,(a,b,c,d),lp;
 @end smallexample
 
 @item
@@ -1526,8 +1535,9 @@ ordering.  The non-prime 10 is converted to the next lower prime in the
 second example:
 
 @smallexample
-ring r = 7,(x,y,z),ds;
-ring r = 10,(x,y,z),ds;
+ring r1 = 7,(x,y,z),ds;
+ring r2 = 10,(x,y,z),ds;
+ring r3 = (ZZ/7),(x,y,z),ds;
 @end smallexample
 
 @item
@@ -1554,7 +1564,8 @@ x4,x5,x6:
 @end ifinfo
 
 @smallexample
-ring r = 7,(x(1..6)),(lp(3),dp);
+ring r1 = 7,(x(1..6)),(lp(3),dp);
+ring r2 = (ZZ/7),(x(1..6)),(lp(3),dp);
 @end smallexample
 
 @item
@@ -1562,7 +1573,8 @@ the localization of @math{(Q[a,b,c])[x,y,z]} at the maximal ideal
 @math{(x,y,z)}:
 
 @smallexample
-ring r = 0,(x,y,z,a,b,c),(ds(3), dp(3));
+ring r1 = 0,(x,y,z,a,b,c),(ds(3), dp(3));
+ring r2 = QQ,(x,y,z,a,b,c),(ds(3), dp(3));
 @end smallexample
 
 @item
@@ -1571,7 +1583,8 @@ The variables @math{x}, @math{y}, and @math{z} have the weights 2, 1,
 and 3, respectively, and  vectors are first ordered by components (in
 descending order) and then by monomials:
 @smallexample
-ring r = 0,(x,y,z),(c,wp(2,1,3));
+ring r1 = 0,(x,y,z),(c,wp(2,1,3));
+ring r2 = QQ,(x,y,z),(c,wp(2,1,3));
 @end smallexample
 For ascending component order, the component ordering @code{C} has to be
 used.
@@ -1697,14 +1710,22 @@ ring R = (integer, 100),(x,y,z), dp;
 @code{ring} name @code{=} @code{(}coefficients@code{),}
   @code{(} names_of_ring_variables @code{),}
   @code{(} ordering @code{);}
+or@*
+@code{ring} name @code{=} cring
+  @code{[} names_of_ring_variables @code{]}
 @item Default:
-@code{32003,(x,y,z),(dp,C);}
+@code{(ZZ/32003)[x,y,z];}
 @item Purpose:
 declares a ring and sets it as the current basering.
+The second form sets the ordering to @code{(dp,C)}.
+@code{cring} stands currently for @code{QQ} (the rationals), @code{ZZ} (the integers)
+or @code{(ZZ/m)} (the field (m prime and <2147483648) resp. ring of the integers modulo m).
 @end table
 
-The coefficients are given by one of the following:
+The coefficients (for the first form) are given by one of the following:
 @enumerate
+@item
+a @code{cring} as given above
 @item
 a non-negative int_expression less than 2147483648 (2^31).
 @* The int_expression should either be 0, specifying the field of
@@ -1840,7 +1861,7 @@ Operations based on standard bases (e.g. @code{std},@code{groebner}, etc., @code
 @smallexample
 @c example
   // defintion and usage:
-  ring r=32003,(x,y),dp;
+  ring r=(ZZ/32003)[x,y];
   poly f=x3+yx2+3y+4;
   qring q=std(maxideal(2));
   basering;
@@ -1848,7 +1869,7 @@ Operations based on standard bases (e.g. @code{std},@code{groebner}, etc., @code
   g;
   reduce(g,std(0));
   // polynomial and residue class:
-  ring R=0,(x,y),dp;
+  ring R=QQ[x,y];
   qring Q=std(y);
   poly p1=x;
   poly p2=x+y;
@@ -2608,6 +2629,7 @@ terminates @sc{Singular}
 @cindex indexed names
 @cindex Variables, indexed
 @cindex multi indices
+@cindex indices, multi
 @cindex Identifiers, syntax of
 
 @sc{Singular} is a strongly typed language.  This means that all names
@@ -2645,6 +2667,9 @@ int_expression in parentheses.  A list of indexed names can be built as
 a name followed by an intvec_expression in parentheses.
 For multi-indices, append an int_expression in parentheses to an
 indexed name.
+An alternative multi-index construction is
+@code{name_prefix(} index_1, index_2,... @code{)} where the @code{name_prefix}
+must be an undefined name.
 
 @smallexample
 @c example
@@ -2656,6 +2681,8 @@ indexed name.
   j(2..3);
   ring r=0,(x(1..2)(1..3)(1..2)),dp;
   r;
+  int i(1,2),i(2,3);
+  i(2,3);
 @c example
 @end smallexample
 

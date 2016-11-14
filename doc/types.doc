@@ -2950,7 +2950,7 @@ of leading terms (see @ref{vdim})
 @cindex finite field
 @cindex parameter, as numbers
 
-Numbers are elements from the coefficient field (or ground field).
+Numbers are elements from the coefficient ring (or ground ring).
 They can only be defined or accessed with respect to a basering
 which determines the coefficient field. See @ref{ring declarations} for
 declarations of coefficient fields.
@@ -3806,14 +3806,24 @@ See
 @code{ring} name @code{= (} coefficients @code{),}
   @code{(} names_of_ring_variables @code{),}
   @code{(} ordering @code{);}
+or@*
+@code{ring} name @code{=} cring
+  @code{[} names_of_ring_variables @code{]}
 @item Default:
-@code{32003,(x,y,z),(dp,C);}
+@code{(ZZ/32003)[x,y,z]}
 @item Purpose:
 declares a ring and sets it as the actual basering.
+The second form sets the ordering to @code{(dp,C)}.
 @end table
 
-The coefficients are given by one of the following:
+
+For the second form: @code{cring} stands currently for @code{QQ} (the rationals), @code{ZZ} (the integers)
+or @code{(ZZ/m)} (the field (m prime and <2147483648) resp. ring of the integers modulo m).
+
+The coefficients for the first form are given by one of the following:
 @enumerate
+@item
+a @code{cring} as given above
 @item
 a non-negative int_expression less or equal 2147483647.
 @item

@@ -21,6 +21,21 @@
 
 @heading News for version @value{VERSION}
 
+Syntax changes:
+@itemize
+@item new (additional) form of ring definitions: (for example @code{ring R=QQ[x,y,z];})
+      (@nref{General syntax of a ring declaration})
+@item new (additional) form of multi-indicies: (for example @code{i(1,2,3,4,5)})
+      (@nref{Names})
+@item changed behaviour of @code{charstr} (@nref{charstr})
+@item new data type @code{cring} to describe the coeffient rings, to be used
+      for the new definitions for (polynomial) rings (@nref{General syntax of a ring declaration})
+@item new command @code{ring_list} to decompose polynomial rings (@nref{ring_list})
+@item extended polynomial ring construction: also from lists produce by @code{ring_list}
+@item new attribute @code{ring_cf} for @code{ring} (@nref{attrib})
+@item printing of rings changed to match @code{cring} names (@nref{charstr})
+@end itemize
+
 New libraries:
 @itemize
 @item new library: classifyMapGerms.lib: standard basis of the tangent space at the orbit of an algebraic group action (@nref{classifyMapGerms_lib})
@@ -122,7 +137,7 @@ Changed libraries:
 
 Version 4-0-1 is a bug fix release.
 
-New feature: attribute @code{ring_cf} for @code{ring}.
+New feature: attribute @code{ring_cf} for @code{ring} (@nref{attrib})
 
 @heading News for version 4-0-0
 
