@@ -51,11 +51,7 @@ extern omBin gmp_nrz_bin; /* init in rintegers*/
 static char* nr2mCoeffName(const coeffs cf)
 {
   static char n2mCoeffName_buf[22];
-#ifdef SINGULAR_4_1
   snprintf(n2mCoeffName_buf,21,"ZZ/(2^%lu)",cf->modExponent);
-#else
-  snprintf(n2mCoeffName_buf,21,"integer,2,%lu",cf->modExponent);
-#endif
   return n2mCoeffName_buf;
 }
 
@@ -80,11 +76,7 @@ static char* nr2mCoeffString(const coeffs r)
 {
   // r->modExponent <=bitsize(long)
   char* s = (char*) omAlloc(11+11);
-#ifdef SINGULAR_4_1
   sprintf(s,"ZZ/(2^%lu)",r->modExponent);
-#else
-  sprintf(s,"integer,2,%lu",r->modExponent);
-#endif
   return s;
 }
 

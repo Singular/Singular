@@ -470,11 +470,7 @@ number npConvFactoryNSingN( const CanonicalForm n, const coeffs r)
 static char* npCoeffName(const coeffs cf)
 {
   static char npCoeffName_buf[15];
-#ifdef SINGULAR_4_1
   snprintf(npCoeffName_buf,14,"ZZ/%d",cf->ch);
-#else
-  snprintf(npCoeffName_buf,11,"%d",cf->ch);
-#endif
   return npCoeffName_buf;
 }
 

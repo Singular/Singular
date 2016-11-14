@@ -4,7 +4,7 @@
 #include <misc/auxiliary.h>
 #include "si_gmp.h"
 
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
 
 class Q_poly // Klasse von Q_polynomen mit Typ (Grad, Koeffizienten ganzzahlig)
 {

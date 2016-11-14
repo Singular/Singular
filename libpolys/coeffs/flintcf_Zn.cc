@@ -8,7 +8,6 @@
 
 #include <misc/auxiliary.h>
 
-#ifdef SINGULAR_4_1
 #ifdef HAVE_FLINT
 
 #include <flint/flint.h>
@@ -541,5 +540,4 @@ BOOLEAN flintZn_InitChar(coeffs cf, void * infoStruct)
 
   return FALSE;
 }
-#endif
 #endif

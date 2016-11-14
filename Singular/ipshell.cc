@@ -71,10 +71,8 @@
 
 #include <kernel/maps/gen_maps.h>
 
-#ifdef SINGULAR_4_1
-#include <Singular/number2.h>
-#endif
 #ifdef SINGULAR_4_2
+#include <Singular/number2.h>
 #include <coeffs/bigintmat.h>
 #endif
 leftv iiCurrArgs=NULL;
@@ -479,14 +477,10 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
     if ((all
       && (IDTYP(h)!=PROC_CMD)
       &&(IDTYP(h)!=PACKAGE_CMD)
-      #ifdef SINGULAR_4_1
       &&(IDTYP(h)!=CRING_CMD)
-      #endif
       )
     || (typ == IDTYP(h))
-    #ifdef SINGULAR_4_1
     || ((IDTYP(h)==CRING_CMD) && (typ==RING_CMD))
-    #endif
     )
     {
       list1(prefix,h,start==currRingHdl, fullname);
@@ -1414,10 +1408,8 @@ BOOLEAN iiExport (leftv v, int toLev)
 /*assume root!=idroot*/
 BOOLEAN iiExport (leftv v, int toLev, package pack)
 {
-#ifdef SINGULAR_4_1
 //  if ((pack==basePack)&&(pack!=currPack))
 //  { Warn("'exportto' to Top is depreciated in >>%s<<",my_yylinebuf);}
-#endif
   BOOLEAN nok=FALSE;
   leftv rv=v;
   while (v!=NULL)
@@ -1683,7 +1675,6 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
   }
   // ----------------------------------------
 }
-#ifdef SINGULAR_4_1
 static void rDecomposeC_41(leftv h,const coeffs C)
 /* field is R or C */
 {
@@ -1718,7 +1709,6 @@ static void rDecomposeC_41(leftv h,const coeffs C)
   }
   // ----------------------------------------
 }
-#endif
 static void rDecomposeC(leftv h,const ring R)
 /* field is R or C */
 {
@@ -1754,7 +1744,6 @@ static void rDecomposeC(leftv h,const ring R)
   // ----------------------------------------
 }
 
-#ifdef SINGULAR_4_1
 #ifdef HAVE_RINGS
 void rDecomposeRing_41(leftv h,const coeffs C)
 /* field is R or C */
@@ -1782,7 +1771,6 @@ void rDecomposeRing_41(leftv h,const coeffs C)
   L->m[1].rtyp=LIST_CMD;
   L->m[1].data=(void *)LL;
 }
-#endif
 #endif
 
 void rDecomposeRing(leftv h,const ring R)
@@ -1817,7 +1805,6 @@ void rDecomposeRing(leftv h,const ring R)
 }
 
 
-#ifdef SINGULAR_4_1
 BOOLEAN rDecompose_CF(leftv res,const coeffs C)
 {
   assume( C != NULL );
@@ -1888,9 +1875,7 @@ BOOLEAN rDecompose_CF(leftv res,const coeffs C)
   // ----------------------------------------
   return FALSE;
 }
-#endif
 
-#ifdef SINGULAR_4_1
 lists rDecompose_list_cf(const ring r)
 {
   assume( r != NULL );
@@ -2021,7 +2006,6 @@ lists rDecompose_list_cf(const ring r)
 #endif
   return L;
 }
-#endif
 
 lists rDecompose(const ring r)
 {
@@ -2729,14 +2713,12 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
 
   // ------------------------------------------------------------------
   // 0: char:
-#ifdef SINGULAR_4_1
   if (L->m[0].Typ()==CRING_CMD)
   {
     R->cf=(coeffs)L->m[0].Data();
     R->cf->ref++;
   }
   else
-#endif
   if (L->m[0].Typ()==INT_CMD)
   {
     int ch = (int)(long)L->m[0].Data();
@@ -5526,7 +5508,6 @@ ring rInit(leftv pn, leftv rv, leftv ord)
   assume( pn != NULL );
   const int P = pn->listLength();
 
-  #ifdef SINGULAR_4_1
   if (pn->Typ()==CRING_CMD)
   {
     cf=(coeffs)pn->CopyD();
@@ -5557,9 +5538,7 @@ ring rInit(leftv pn, leftv rv, leftv ord)
     }
     assume( cf != NULL );
   }
-  else
-  #endif
-  if (pn->Typ()==INT_CMD)
+  else if (pn->Typ()==INT_CMD)
   {
     int ch = (int)(long)pn->Data();
     leftv pnn=pn;
@@ -6423,7 +6402,6 @@ BOOLEAN iiAssignCR(leftv r, leftv arg)
     else
       return TRUE;
   }
-  #ifdef SINGULAR_4_1
   else if (t==CRING_CMD)
   {
     sleftv tmp;
@@ -6436,7 +6414,6 @@ BOOLEAN iiAssignCR(leftv r, leftv arg)
     //Print("from %s(%d)\n",Tok2Cmdname(arg->Typ()),arg->Typ());
     return FALSE;
   }
-  #endif
   //Print("create %s\n",r->Name());
   //Print("from %s(%d)\n",Tok2Cmdname(arg->Typ()),arg->Typ());
   return TRUE;// not handled -> error for now

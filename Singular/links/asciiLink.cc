@@ -297,7 +297,6 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h, char ***list_of_libs)
     if (strcmp(IDID(h),"Top")==0) return FALSE; // do not dump "Top"
     if (IDPACKAGE(h)->language==LANG_SINGULAR) return FALSE;
   }
-#ifdef SINGULAR_4_1
   if (type_id == CRING_CMD)
   {
     // do not dump the default CRINGs:
@@ -307,7 +306,6 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h, char ***list_of_libs)
     if (strcmp(IDID(h),"QAE")==0) return FALSE;
     if (strcmp(IDID(h),"flint_poly_Q")==0) return FALSE;
   }
-#endif
 
   // we do not throw an error if a wrong type was attempted to be dumped
   if (type_str == NULL)
@@ -373,8 +371,8 @@ static const char* GetIdString(idhdl h)
       for (i=0; i<nl; i++)
         if (GetIdString((idhdl) &(l->m[i])) == NULL) return NULL;
     }
-    #ifdef SINGULAR_4_1
     case CRING_CMD:
+    #ifdef SINGULAR_4_2
     case CNUMBER_CMD:
     case CMATRIX_CMD:
     #endif

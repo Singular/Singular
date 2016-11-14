@@ -19,7 +19,6 @@
  *
  * REQUIREMENTS:
  * - agreement about the interface to LLL
- * - SINGULAR_4_1
  * - FLINT providing LLL
  * (none of the above is currently true, but all of them is required)
  *

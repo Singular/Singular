@@ -211,7 +211,6 @@ static BOOLEAN ipPrint_RING(leftv u)
   return FALSE;
 }
 
-#ifdef SINGULAR_4_1
 static BOOLEAN ipPrint_CRING(leftv u)
 {
   coeffs r=(coeffs)u->Data();
@@ -224,7 +223,6 @@ static BOOLEAN ipPrint_CRING(leftv u)
   PrintS(nCoeffName(r));
   return FALSE;
 }
-#endif
 /*2
 * print for: vector
 */
@@ -297,11 +295,9 @@ BOOLEAN jjPRINT(leftv res, leftv u)
         bo=ipPrint_RING(u);
         break;
 
-      #ifdef SINGULAR_4_1
       case CRING_CMD:
         bo=ipPrint_CRING(u);
         break;
-      #endif
 
       default:
         u->Print();

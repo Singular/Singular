@@ -21,7 +21,7 @@
 
 #include <string.h>
 
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
 
 BOOLEAN nAECoeffIsEqual     (number a, number b, const coeffs r);
 number  nAEMult        (number a, number b, const coeffs r);

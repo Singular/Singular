@@ -1064,7 +1064,6 @@ static BOOLEAN jiA_DEF(leftv res, leftv, Subexpr)
   res->data=(void *)0;
   return FALSE;
 }
-#ifdef SINGULAR_4_1
 static BOOLEAN jiA_CRING(leftv res, leftv a, Subexpr e)
 {
   coeffs r=(coeffs)a->Data();
@@ -1074,7 +1073,6 @@ static BOOLEAN jiA_CRING(leftv res, leftv a, Subexpr e)
   jiAssignAttr(res,a);
   return FALSE;
 }
-#endif
 
 /*=================== table =================*/
 #define IPASSIGN

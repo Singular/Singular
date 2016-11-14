@@ -37,7 +37,7 @@
 #include <Singular/blackbox.h>
 #include <Singular/number2.h>
 
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
 #include <Singular/number2.h>
 #endif
 #ifdef HAVE_DYNAMIC_LOADING
@@ -190,9 +190,7 @@ void *idrecDataInit(int t)
     case RESOLUTION_CMD:
       return  (void *)omAlloc0(sizeof(ssyStrategy));
     //other types: without init (int,script,poly,def,package)
-    #ifdef SINGULAR_4_1
     case CRING_CMD:
-    #endif
     case INT_CMD:
     case DEF_CMD:
     case POLY_CMD:
@@ -777,11 +775,9 @@ BOOLEAN iiAlias(leftv p)
   idhdl pp=(idhdl)p->data;
   switch(pp->typ)
   {
-#ifdef SINGULAR_4_1
       case CRING_CMD:
         nKillChar((coeffs)pp);
         break;
-#endif
       case DEF_CMD:
       case INT_CMD:
         break;

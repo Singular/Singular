@@ -8,7 +8,7 @@
 struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
 struct snumber; typedef struct snumber *   number;
 
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
 BOOLEAN n_QAEInitChar(coeffs , void *);
 #endif
 

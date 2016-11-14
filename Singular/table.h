@@ -226,10 +226,8 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjL2R),        RESOLUTION_CMD,  RESOLUTION_CMD, LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDUMMY),      RESOLUTION_CMD,  RESOLUTION_CMD, RESOLUTION_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjRINGLIST),   RINGLIST_CMD,    LIST_CMD,       RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
-#ifdef SINGULAR_4_1
 ,{D(jjRINGLIST_C), RING_LIST_CMD,   LIST_CMD,       CRING_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjRING_LIST),  RING_LIST_CMD,   LIST_CMD,       RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
-#endif
 ,{D(jjDUMMY),      RING_CMD,        RING_CMD,       RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLISTRING),   RING_CMD,        RING_CMD,       LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
 //,{  jjWRONG ,      ROWS_CMD,        0,              POLY_CMD    , ALLOW_PLURAL |ALLOW_RING}
@@ -412,10 +410,8 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjDIV_BI),    '/',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjOP_IV_I),   '/',            INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjOP_IV_I),   '/',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-#ifdef SINGULAR_4_1
 ,{D(jjCRING_Zp),  '/',            CRING_CMD,      CRING_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCRING_Zm),  '/',            CRING_CMD,      CRING_CMD,  BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-#endif
 #ifdef SINGULAR_4_2
 ,{D(jjNUMBER2_OP2),'/',           CNUMBER_CMD,    CNUMBER_CMD,CNUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjNUMBER2_OP2),'/',           CNUMBER_CMD,    INT_CMD,    CNUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -501,9 +497,7 @@ const struct sValCmd2 dArith2[]=
 #ifdef SINGULAR_4_2
 ,{D(jjCOMPARE_BIM),EQUAL_EQUAL,   INT_CMD,        CMATRIX_CMD, CMATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
 #endif
-#ifdef SINGULAR_4_1
 ,{D(jjEQUAL_CR),  EQUAL_EQUAL,    INT_CMD,        CRING_CMD,  CRING_CMD, ALLOW_PLURAL | ALLOW_RING}
-#endif
 ,{D(jjEQUAL_Ma),  EQUAL_EQUAL,    INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjEQUAL_R),   EQUAL_EQUAL,    INT_CMD,        RING_CMD,   RING_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{  jjWRONG2 ,    EQUAL_EQUAL,    0,              IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -540,9 +534,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjINDEX_P_IV),'[',            POLY_CMD,       POLY_CMD,   INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjINDEX_V),   '[',            POLY_CMD,       VECTOR_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjINDEX_V_IV),'[',            VECTOR_CMD,     VECTOR_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-#ifdef SINGULAR_4_1
 ,{D(jjRING_1),    '[',            RING_CMD,     CRING_CMD, ANY_TYPE, ALLOW_PLURAL | ALLOW_RING}
-#endif
 ,{D(jjPROC),      '(',            ANY_TYPE/*set by p*/,PROC_CMD, DEF_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjMAP),       '(',            ANY_TYPE/*set by p*/,MAP_CMD, DEF_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjLOAD2),     '(',            NONE,             LIB_CMD,    STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -737,9 +729,7 @@ const struct sValCmd3 dArith3[]=
 ,{D(jjBRACK_Ma_I_IV),  '[',        POLY_CMD,   MATRIX_CMD, INT_CMD,    INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBRACK_Ma_IV_I),  '[',        POLY_CMD,   MATRIX_CMD, INTVEC_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBRACK_Ma_IV_IV), '[',        POLY_CMD,   MATRIX_CMD, INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
-#ifdef SINGULAR_4_1
 ,{D(jjRING_2),         '[',        RING_CMD,   CRING_CMD,  ANY_TYPE,   ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
-#endif
 #ifdef SINGULAR_4_2
 ,{D(jjBRACK_Bim),      '[',        CNUMBER_CMD, CMATRIX_CMD, INT_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 #endif
@@ -837,9 +827,7 @@ const struct sValCmdM dArithM[]=
 // operations:
 // proc            cmd               res        number_of_args   context
  {D(jjKLAMMER_PL),  '(',           ANY_TYPE,           -2      , ALLOW_PLURAL |ALLOW_RING}
-#ifdef SINGULAR_4_1
 ,{D(jjRING_PL),   '[',             RING_CMD,           -2      , ALLOW_PLURAL |ALLOW_RING}
-#endif
 ,{D(jjBREAK0),    BREAKPOINT_CMD,  NONE,               0       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBREAK1),    BREAKPOINT_CMD,  NONE,               -2      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(iiBranchTo),  BRANCHTO_CMD,    NONE,               -2      , ALLOW_PLURAL |ALLOW_RING}
@@ -943,9 +931,7 @@ cmdnames cmds[] =
   { "continue",    0, CONTINUE_CMD ,      CONTINUE_CMD},
   { "contract",    0, CONTRACT_CMD ,      CMD_2},
   { "convhull",    0, NEWTONPOLY_CMD,     CMD_1},
-#ifdef SINGULAR_4_1
   { "cring",        0, CRING_CMD,          ROOT_DECL},
-#endif
   { "dbprint",     0, DBPRINT_CMD ,       CMD_M},
   { "def",         0, DEF_CMD ,           ROOT_DECL},
   { "defined",     0, DEFINED_CMD ,       CMD_1},
@@ -1107,9 +1093,7 @@ cmdnames cmds[] =
   { "RETURN",      0, END_GRAMMAR ,       RETURN},
   { "ring",        0, RING_CMD ,          RING_CMD},
   { "ringlist",    0, RINGLIST_CMD ,      CMD_1},
-  #ifdef SINGULAR_4_1
   { "ring_list",   0, RING_LIST_CMD ,     CMD_1},
-  #endif
   { "rvar",        0, IS_RINGVAR ,        CMD_1},
   { "sba",         0, SBA_CMD ,           CMD_123},
   { "setring",     0, SETRING_CMD ,       SETRING_CMD},
@@ -1290,9 +1274,7 @@ const struct sValAssign dAssign[]=
 ,{D(jiA_1x1MATRIX),POLY_CMD,       MATRIX_CMD }
 ,{D(jiA_RING),     RING_CMD,       RING_CMD }
 ,{D(jiA_QRING),    RING_CMD,       IDEAL_CMD }
-#ifdef SINGULAR_4_1
 ,{D(jiA_CRING),    CRING_CMD,      CRING_CMD }
-#endif
 ,{D(jiA_STRING),   STRING_CMD,     STRING_CMD }
 ,{D(jiA_PROC),     PROC_CMD,       STRING_CMD }
 ,{D(jiA_PROC),     PROC_CMD,       PROC_CMD }

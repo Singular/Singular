@@ -1,5 +1,4 @@
 #include "kernel/mod2.h" // general settings/macros
-#ifdef SINGULAR_4_1
 #include <reporter/reporter.h>  // for Print, WerrorS
 #include <coeffs/numbers.h> // nRegister, coeffs.h
 #include <coeffs/rmodulon.h> // ZnmInfo
@@ -510,5 +509,4 @@ BOOLEAN jjR2_CR(leftv res, leftv a)              // ring ->cring
   return FALSE;
 }
 
-#endif
 #endif

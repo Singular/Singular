@@ -55,7 +55,6 @@ void p2Print(poly2 d);
 
 BOOLEAN jjCMATRIX_3(leftv, leftv, leftv,leftv);
 #endif
-#ifdef SINGULAR_4_1
 char *crString(coeffs c);
 
 void crPrint(coeffs cf);
@@ -64,6 +63,5 @@ BOOLEAN jjCRING_Zp(leftv res, leftv a, leftv b);
 BOOLEAN jjCRING_Zm(leftv res, leftv a, leftv b);
 
 BOOLEAN jjEQUAL_CR(leftv res, leftv a, leftv b); // compare cring
-#endif
 
 #endif

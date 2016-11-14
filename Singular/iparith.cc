@@ -69,9 +69,7 @@
 #include <Singular/misc_ip.h>
 #include <Singular/linearAlgebra_ip.h>
 
-#ifdef SINGULAR_4_1
 #include <Singular/number2.h>
-#endif
 
 #  include <Singular/fglm.h>
 
@@ -80,9 +78,6 @@
 #include <Singular/ipshell.h>
 //#include <kernel/mpr_inout.h>
 #include <reporter/si_signals.h>
-
-#include <Singular/number2.h>
-
 
 #include <stdlib.h>
 #include <string.h>
@@ -1653,7 +1648,6 @@ static BOOLEAN jjMAP(leftv res, leftv u, leftv v)
   omFreeBin((ADDRESS)sl, sleftv_bin);
   return FALSE;
 }
-#ifdef SINGULAR_4_1
 static BOOLEAN jjRING_1(leftv res, leftv u, leftv v)
 {
   u->next=(leftv)omAlloc(sizeof(sleftv));
@@ -1663,7 +1657,6 @@ static BOOLEAN jjRING_1(leftv res, leftv u, leftv v)
   u->next=NULL;
   return bo;
 }
-#endif
 static BOOLEAN jjCHINREM_BI(leftv res, leftv u, leftv v)
 {
   intvec *c=(intvec*)u->Data();
@@ -4766,7 +4759,6 @@ static BOOLEAN jjRINGLIST(leftv res, leftv v)
     res->data = (char *)rDecompose((ring)v->Data());
   return (r==NULL)||(res->data==NULL);
 }
-#ifdef SINGULAR_4_1
 static BOOLEAN jjRINGLIST_C(leftv res, leftv v)
 {
   coeffs r=(coeffs)v->Data();
@@ -4781,7 +4773,6 @@ static BOOLEAN jjRING_LIST(leftv res, leftv v)
     res->data = (char *)rDecompose_list_cf((ring)v->Data());
   return (r==NULL)||(res->data==NULL);
 }
-#endif
 static BOOLEAN jjROWS(leftv res, leftv v)
 {
   ideal i = (ideal)v->Data();
@@ -5068,9 +5059,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
   int t=(int)(long)v->data;
   switch (t)
   {
-    #ifdef SINGULAR_4_1
     case CRING_CMD:
-    #endif
     case INT_CMD:
     case POLY_CMD:
     case VECTOR_CMD:
@@ -5648,7 +5637,6 @@ static BOOLEAN jjPROC3(leftv res, leftv u, leftv v, leftv w)
   memset(w,0,sizeof(sleftv));
   return jjPROC(res,u,v);
 }
-#ifdef SINGULAR_4_1
 static BOOLEAN jjRING_2(leftv res, leftv u, leftv v, leftv w)
 {
   u->next=(leftv)omAlloc(sizeof(sleftv));
@@ -5661,7 +5649,6 @@ static BOOLEAN jjRING_2(leftv res, leftv u, leftv v, leftv w)
   u->next=NULL;
   return bo;
 }
-#endif
 static BOOLEAN jjBAREISS3(leftv res, leftv u, leftv v, leftv w)
 {
   intvec *iv;
@@ -7937,7 +7924,6 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
   return FALSE;
 }
 
-#ifdef SINGULAR_4_1
 static BOOLEAN jjRING_PL(leftv res, leftv a)
 {
   //Print("construct ring\n");
@@ -7959,7 +7945,6 @@ static BOOLEAN jjRING_PL(leftv res, leftv a)
   omFreeSize(n,N*sizeof(char*));
   return FALSE;
 }
-#endif
 
 static Subexpr jjMakeSub(leftv e)
 {

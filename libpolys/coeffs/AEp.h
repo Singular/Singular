@@ -4,7 +4,7 @@
 #include <singularconfig.h>
 #include "si_gmp.h"
 
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
 
 class p_poly // Klasse von p_polynomen mit Typ (Grad, Koeffizienten ganzzahlig)
 {

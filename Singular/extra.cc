@@ -3779,7 +3779,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 /*==================== LU for bigintmat =================*/
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
     if(strcmp(sys_cmd,"LU")==0)
     {
       if ((h!=NULL) && (h->Typ()==CMATRIX_CMD))

@@ -8,7 +8,7 @@
 
 #include <misc/auxiliary.h>
 
-#ifdef SINGULAR_4_1
+#ifdef SINGULAR_4_2
 
 #include <omalloc/omalloc.h>
 #include <factory/factory.h>
