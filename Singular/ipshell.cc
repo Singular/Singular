@@ -1899,8 +1899,7 @@ lists rDecompose_list_cf(const ring r)
 
   // sanity check: require currRing==r for rings with polynomial data
   if ( (r!=currRing) && (
-           (nCoeff_is_algExt(C) && (C != currRing->cf))
-        || (r->qideal != NULL)
+        (r->qideal != NULL)
 #ifdef HAVE_PLURAL
         || (rIsPluralRing(r))
 #endif

@@ -1290,7 +1290,9 @@ const struct sValAssign dAssign[]=
 ,{D(jiA_1x1MATRIX),POLY_CMD,       MATRIX_CMD }
 ,{D(jiA_RING),     RING_CMD,       RING_CMD }
 ,{D(jiA_QRING),    RING_CMD,       IDEAL_CMD }
+#ifdef SINGULAR_4_1
 ,{D(jiA_CRING),    CRING_CMD,      CRING_CMD }
+#endif
 ,{D(jiA_STRING),   STRING_CMD,     STRING_CMD }
 ,{D(jiA_PROC),     PROC_CMD,       STRING_CMD }
 ,{D(jiA_PROC),     PROC_CMD,       PROC_CMD }
