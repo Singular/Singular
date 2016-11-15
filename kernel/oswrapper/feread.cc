@@ -327,8 +327,12 @@ char * fe_fgets(const char *pr,char *s, int size)
     {
       case 0:     return NULL;           /*EOF */
       case EINTR: return strcpy(s,"\n"); /* CTRL-C or other signal */
-      default:    fprintf(stderr,"fgets() failed with errno %d\n",errno);
-                  return NULL;
+      default:                           /* other error */
+      {
+	int errsv = errno;
+        fprintf(stderr,"fgets() failed with errno %d\n",errsv);
+        return NULL;
+      }
     }
   }
   return line;
