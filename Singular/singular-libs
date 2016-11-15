@@ -50,7 +50,7 @@ SLIB1 = classifyceq.lib classifyci.lib classify_aeq.lib \
 	schubert.lib tasks.lib tropical.lib hdepth.lib gradedModules.lib \
 	arr.lib brillnoether.lib chern.lib cimonom.lib GND.lib \
 	graal.lib hess.lib modwalk.lib rwalk.lib swalk.lib \
-	classifyMapGerms.lib
+	classifyMapGerms.lib tropicalNewton.lib
 
 PLIBS = bimodules.lib bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib\
         fpadim.lib \
