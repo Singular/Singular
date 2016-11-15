@@ -19,7 +19,7 @@ REFERENCES: Hofmann, Ren: Computing tropical points and tropical links, arXiv:16
             (WARNING: this library follows the max convention instead
                       and triangular sets follow the definition of the Singular book)
 
-SEE ALSO: tropicalVariety, tropical.lib
+SEE ALSO: tropicalVariety, tropical_lib
 
 KEYWORDS: tropical geometry; tropical varieties; Newton polygons
 
@@ -715,7 +715,6 @@ EXAMPLE: example tropicalVarietyNewton; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-  LIB "poly.lib";
   ring r = (0,t),(z,y,x),lp;
   number uniformizingParameter = t;
   export(uniformizingParameter);
