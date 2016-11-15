@@ -314,9 +314,23 @@ char * fe_fgets(const char *pr,char *s, int size)
     fprintf(stdout,"%s",pr);
   }
   mflush();
+  errno=0;
   char *line=fgets(s,size,stdin);
   if (line!=NULL)
+  {
     for (int i=strlen(line)-1;i>=0;i--) line[i]=line[i]&127;
+  }
+  else
+  {
+    /* NULL can mean various things... */
+    switch(errno)
+    {
+      case 0:     return NULL;           /*EOF */
+      case EINTR: return strcpy(s,"\n"); /* CTRL-C or other signal */
+      default:    fprintf(stderr,"fgets() failed with errno %d\n",errno);
+                  return NULL;
+    }
+  }
   return line;
 }
 
