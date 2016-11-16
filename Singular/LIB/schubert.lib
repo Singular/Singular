@@ -64,9 +64,9 @@ PROCEDURES:
     symmetricPowerSheaf(sheaf,int)      make the k-th symmetric power of a sheaf
     quotSheaf(sheaf,sheaf)              make the quotient of two sheaves
     addSheaf(sheaf,sheaf)               make the direct sum of two sheaves
-    makeGraph(list,list)                create a graph from a list of vertices
+    makeGraphVE(list,list)              create a graph from a list of vertices
                                         and a list of edges
-    printGraph(graph)                   print procedure for graphs
+    printGraphG(graph)                   print procedure for graphs
     moduliSpace(variety,int)            create a moduli space of stable maps as
                                         an algebraic stack
     printStack(stack)                   print procedure for stacks
@@ -88,9 +88,9 @@ PROCEDURES:
                                         curves on a general Calabi-Yau threefold
     sumofquotients(stack,list)          prepare a command for parallel
                                         computation
-    part(poly,int)                      compute a homogeneous component of a
+    homog_part(poly,int)                compute a homogeneous component of a
                                         polynomial.
-    parts(poly,int,int)                 compute the sum of homogeneous
+    homog_parts(poly,int,int)           compute the sum of homogeneous
                                         components of a polynomial
     logg(poly,int)                      compute Chern characters from total
                                         Chern classes.
@@ -135,7 +135,7 @@ EXAMPLE:    example mod_init(); shows an example
     system("install","sheaf","+",addSheaf,2);
     system("install","sheaf","-",quotSheaf,2);
     system("install","sheaf","^",symmetricPowerSheaf,2);
-    system("install","graph","print",printGraph,1);
+    system("install","graph","print",printGraphG,1);
     system("install","stack","print",printStack,1);
 }
 example
@@ -950,12 +950,12 @@ example
 /////////// Procedures concerned with graphs ///////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-proc printGraph(graph G)
-"USAGE:     printGraph(G); G graph
+proc printGraphG(graph G)
+"USAGE:     printGraphG(G); G graph
 ASSUME:     G is a graph.
 THEORY:     This is the print function used by Singular to print a graph.
 KEYWORDS:   graph
-EXAMPLE:    example printGraph; shows an example
+EXAMPLE:    example printGraphG; shows an example
 "
 {
     "A graph with", size(G.vertices), "vertices and", size(G.edges), "edges";
@@ -964,18 +964,18 @@ example
 {
     "EXAMPLE:"; echo=2;
     ring r = 0,x,dp;
-    graph G = makeGraph(list(list(0,1,list(0,1,2)),list(1,1,list(1,0,2))),
+    graph G = makeGraphVE(list(list(0,1,list(0,1,2)),list(1,1,list(1,0,2))),
     list(list(0,1,2)));
     G;
 }
 
-proc makeGraph(list v, list e)
-"USAGE:     makeGraph(v,e); v list, e list
+proc makeGraphVE(list v, list e)
+"USAGE:     makeGraphVE(v,e); v list, e list
 ASSUME:     v is a list of vertices, e is a list of edges.
 RETURN:     graph with vertices v and edges e.
 THEORY:     Creates a graph from a list of vertices and edges.
 KEYWORDS:   graph
-EXAMPLE:    example makeGraph; shows an example
+EXAMPLE:    example makeGraphVE; shows an example
 {
     graph G;
     G.vertices = v;
@@ -986,7 +986,7 @@ example
 {
     "EXAMPLE:"; echo=2;
     ring r = 0,x,dp;
-    graph G = makeGraph(list(list(0,1,list(0,1,2)),list(1,1,list(1,0,2))),
+    graph G = makeGraphVE(list(list(0,1,list(0,1,2)),list(1,1,list(1,0,2))),
     list(list(0,1,2)));
     G;
 }
@@ -1558,11 +1558,11 @@ static proc graph611(list d, int i, int j, int k, int h, int m, int n, int p)
     return (G);
 }
 
-proc part(poly f, int n)
-"USAGE:     part(f,n); f poly, n int
+proc homog_part(poly f, int n)
+"USAGE:     homog_part(f,n); f poly, n int
 RETURN:     poly
 PURPOSE:    computing the homogeneous component of a polynomial.
-EXAMPLE:    example part; shows examples
+EXAMPLE:    example homog_part; shows examples
 "
 {
     int i;
@@ -1578,28 +1578,28 @@ example
     "EXAMPLE:"; echo=2;
     ring r = 0,(x,y,z),wp(1,2,3);
     poly f = 1+x+x2+x3+x4+y+y2+y3+z+z2+xy+xz+yz+xyz;
-    part(f,0);
-    part(f,1);
-    part(f,2);
-    part(f,3);
-    part(f,4);
-    part(f,5);
-    part(f,6);
+    homog_part(f,0);
+    homog_part(f,1);
+    homog_part(f,2);
+    homog_part(f,3);
+    homog_part(f,4);
+    homog_part(f,5);
+    homog_part(f,6);
 }
 
-proc parts(poly f, int i, int j)
-"USAGE:     parts(f,i,j); f poly, i int, j int
+proc homog_parts(poly f, int i, int j)
+"USAGE:     homog_parts(f,i,j); f poly, i int, j int
 RETURN:     poly
 THEORY:     computing a polynomial which is the sum of the homogeneous
             components of a polynomial.
-EXAMPLE:    example parts; shows examples
+EXAMPLE:    example homog_parts; shows examples
 "
 {
     int k;
     poly p;
     for (k=i;k<=j;k++)
     {
-        p=p+part(f,k);
+        p=p+homog_part(f,k);
     }
     return (p);
 }
@@ -1608,7 +1608,7 @@ example
     "EXAMPLE:"; echo=2;
     ring r = 0,(x,y,z),wp(1,2,3);
     poly f = 1+x+x2+x3+x4+y+y2+y3+z+z2+xy+xz+yz+xyz;
-    parts(f,2,4);
+    homog_parts(f,2,4);
 }
 
 proc logg(poly f, int n)
@@ -1621,18 +1621,18 @@ EXAMPLE:    example logg; shows examples
     poly p;
     int i,j,k,m;
     if (n==0) {p=0;}
-    if (n==1) {p=part(f,1);}
+    if (n==1) {p=homog_part(f,1);}
     else
     {
-        list l=-part(f,1);
+        list l=-homog_part(f,1);
         for (j=2;j<=n;j++)
         {
             poly q;
             for (k=1;k<j;k++)
             {
-                q=q+part(f,k)*l[j-k];
+                q=q+homog_part(f,k)*l[j-k];
             }
-            q=-j*part(f,j)-q;
+            q=-j*homog_part(f,j)-q;
             l=insert(l,q,size(l));
             kill q;
         }
@@ -1669,7 +1669,7 @@ EXAMPLE:    example expp; shows examples
             poly q;
             for (j=1;j<=i;j++)
             {
-                q=q+factorial(j)*(-1)^(j-1)*l[i-j+1]*part(f,j)/i;
+                q=q+factorial(j)*(-1)^(j-1)*l[i-j+1]*homog_part(f,j)/i;
             }
             l=insert(l,q,size(l));
             kill q;
@@ -1695,7 +1695,7 @@ static proc adams(poly f, int n)
     int i;
     for (i=0;i<=deg(f);i++)
     {
-        p=p+n^i*part(f,i);
+        p=p+n^i*homog_part(f,i);
     }
     return (p);
 }
@@ -1714,7 +1714,7 @@ static proc wedges(int n, poly f, int d)
             poly q;
             for (j=1;j<=i;j++)
             {
-                q=q+((-1)^(i-j))*parts(l[j]*adams(f,i-j+1),0,d)/i;
+                q=q+((-1)^(i-j))*homog_parts(l[j]*adams(f,i-j+1),0,d)/i;
             }
             l=insert(l,q,size(l));
             kill q;
@@ -1732,7 +1732,7 @@ static proc schur(list p, poly f)
     {
         for (j=1;j<=n;j++)
         {
-            M[i,j] = part(f,p[i]+j-i);
+            M[i,j] = homog_part(f,p[i]+j-i);
         }
     }
     return (det(M));
@@ -1972,7 +1972,7 @@ EXAMPLE:    example projectiveBundle; shows examples
     ideal rels = imap(R,rels);
     poly g = var(1)^r;
     int i;
-    for (i=1;i<=r;i++) {g=g+var(1)^(r-i)*part(c,i);}
+    for (i=1;i<=r;i++) {g=g+var(1)^(r-i)*homog_part(c,i);}
     A.relations = rels,g;
     poly u = 1 + var(1);
     poly f = logg(u,A.dimension)+1;
@@ -2194,7 +2194,7 @@ EXAMPLE:    example rankSheaf; shows an example
     def R = V.baseRing;
     setring R;
     poly f = S.ChernCharacter;
-    return (int(part(f,0)));
+    return (int(homog_part(f,0)));
 }
 example
 {
@@ -2248,7 +2248,7 @@ SEE ALSO:   topChernClass, totalChernClass
 EXAMPLE:    example ChernClass; shows an example
 "
 {
-    return (part(totalChernClass(S),i));
+    return (homog_part(totalChernClass(S),i));
 }
 example
 {
@@ -2313,7 +2313,7 @@ EXAMPLE:    example totalSegreClass; shows an example
         poly t,h;
         int i,j;
         for (i=0;i<=d;i++) {t = t + (1-f)^i;}
-        for (j=0;j<=d;j++) {h = h + part(t,j);}
+        for (j=0;j<=d;j++) {h = h + homog_part(t,j);}
         return (reduce(h,rels));
     }
 }
@@ -2378,7 +2378,7 @@ EXAMPLE:    example tensorSheaf; shows examples
     {
         S.currentVariety = V2;
         poly c = imap(R1,c1);
-        poly f = parts(c*c2,0,V2.dimension);
+        poly f = homog_parts(c*c2,0,V2.dimension);
         S.ChernCharacter = f;
         return (S);
     }
@@ -2387,7 +2387,7 @@ EXAMPLE:    example tensorSheaf; shows examples
         setring R1;
         S.currentVariety = V1;
         poly c = imap(R2,c2);
-        poly f = parts(c1*c,0,V1.dimension);
+        poly f = homog_parts(c1*c,0,V1.dimension);
         S.ChernCharacter = f;
         return (S);
     }
@@ -2434,7 +2434,7 @@ EXAMPLE:    example symmetricPowerSheaf; shows examples
             poly q;
             for (j=1;j<=m;j++)
             {
-                q = q + ((-1)^(j+1))*parts(w[j+1]*s[i-j+1],0,d);
+                q = q + ((-1)^(j+1))*homog_parts(w[j+1]*s[i-j+1],0,d);
             }
             s = insert(s,q,size(s));
             kill q;
