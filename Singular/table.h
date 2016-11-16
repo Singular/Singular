@@ -110,7 +110,7 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjE),          E_CMD,           VECTOR_CMD,     INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjEXECUTE),    EXECUTE_CMD,     NONE,           STRING_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjERROR),      ERROR_CMD,       NONE,           STRING_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjFAC_P),      FAC_CMD,         LIST_CMD,       POLY_CMD      , NO_PLURAL |NO_RING}
+,{D(jjFAC_P),      FAC_CMD,         LIST_CMD,       POLY_CMD      , NO_PLURAL |ALLOW_ZZ}
 ,{D(findUniProc),  FINDUNI_CMD,     IDEAL_CMD,      IDEAL_CMD     , NO_PLURAL |NO_RING}
 ,{D(jjidFreeModule),FREEMODULE_CMD, MODUL_CMD,      INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjFACSTD),     FACSTD_CMD,      LIST_CMD,       IDEAL_CMD     , NO_PLURAL |NO_RING}

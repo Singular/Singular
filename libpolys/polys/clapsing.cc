@@ -863,7 +863,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
   number old_lead_coeff=n_Copy(pGetCoeff(f), r->cf);
 
   Variable a;
-  if (!rField_is_Zp(r) && !rField_is_Zp_a(r)) /* Q, Q(a) */
+  if (!rField_is_Zp(r) && !rField_is_Zp_a(r) && !rField_is_Z(r)) /* Q, Q(a) */
   {
     //if (f!=NULL) // already tested at start of routine
     {
@@ -901,7 +901,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
       }
     }
   }
-  if (rField_is_Q(r) || rField_is_Zp(r))
+  if (rField_is_Q(r) || rField_is_Zp(r) || (rField_is_Z(r)))
   {
     setCharacteristic( rChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) );
@@ -961,7 +961,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
     for ( ; J.hasItem(); J++, j++ )
     {
       if (with_exps!=1) (**v)[j] = J.getItem().exp();
-      if (rField_is_Zp(r) || rField_is_Q(r))           /* Q, Fp */
+      if (rField_is_Zp(r) || rField_is_Q(r)||  rField_is_Z(r))           /* Q, Fp, Z */
       {
         //count_Factors(res,*v,f, j, convFactoryPSingP( J.getItem().factor() );
         res->m[j] = convFactoryPSingP( J.getItem().factor(),r );

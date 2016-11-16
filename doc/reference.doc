@@ -1964,8 +1964,8 @@ the multiplicities (as an intvec) depending on the second argument:
     2: returns non-constant factors and multiplicities.
 @end format
 @item @strong{Note:}
-Not implemented for the coefficient fields real and finite fields of
-type @code{(p^n,a)}.
+Not implemented for the coefficient fields real, finite fields of
+type @code{(p^n,a)} and ZZ/m.
 @item @strong{Example:}
 @smallexample
 @c example

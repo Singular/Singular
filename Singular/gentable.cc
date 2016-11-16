@@ -40,6 +40,8 @@ int produce_convert_table=0;
 #define ALLOW_ZERODIVISOR  0
 #define ZERODIVISOR_MASK 8
 
+#define ALLOW_ZZ (ALLOW_RING|NO_ZERODIVISOR)
+
 // bit 4 for warning, if used at toplevel
 #define WARN_RING        16
 // bit 5: do no try automatic conversions
