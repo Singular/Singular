@@ -7334,6 +7334,10 @@ Not all functions work on every platform.
 @item @strong{Functions:}
 @table @asis
 @c ..........................
+@item @code{system("alarm",} int @code{)}
+@cindex system, alarm
+abort the Singular process after computing for that many seconds (system+user cpu time).
+@c ..........................
 @item @code{system("absFact",} poly @code{)}
 @cindex system, absFact
 absolute factorization of the polynomial
@@ -7458,10 +7462,14 @@ returns the number of blocks of the given ring, or
 of the current basering, if no second argument is given. The return type
 is int.
 @c ..........................
-@item @code{system("nc_hilb")}, ideal, int, [,...] @code{)}
+@item @code{system("nc_hilb",} ideal, int, [,...] @code{)}
 @cindex nc_hilb
 @cindex system, nc_hilb
 internal support for ncHilb.lib, return nothing
+@c ..........................
+@item @code{system("neworder",} ideal @code{)}
+@cindex system, neworder
+string of the ring variables in an heurically good order for @code{char_series}
 @c ..........................
 @item @code{system("newstruct")}
 @cindex system, newstruct

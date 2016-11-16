@@ -287,6 +287,26 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
+/*==================== alarm ==================================*/
+  #ifdef unix
+      if(strcmp(sys_cmd,"alarm")==0)
+      {
+        if ((h!=NULL) &&(h->Typ()==INT_CMD))
+        {
+          // standard variant -> SIGALARM (standard: abort)
+          //alarm((unsigned)h->next->Data());
+          // process time (user +system): SIGVTALARM
+          struct itimerval t,o;
+          memset(&t,0,sizeof(t));
+          t.it_value.tv_sec     =(unsigned)((unsigned long)h->Data());
+          setitimer(ITIMER_VIRTUAL,&t,&o);
+          return FALSE;
+        }
+        else
+          WerrorS("int expected");
+      }
+      else
+  #endif
 /*==================== cpu ==================================*/
     if(strcmp(sys_cmd,"cpu")==0)
     {
@@ -314,6 +334,19 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         return FALSE;
       }
       return TRUE;
+    }
+    else
+  /*==================== neworder =============================*/
+    if(strcmp(sys_cmd,"neworder")==0)
+    {
+      if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
+      {
+        res->rtyp=STRING_CMD;
+        res->data=(void *)singclap_neworder((ideal)h->Data(), currRing);
+        return FALSE;
+      }
+      else
+        WerrorS("ideal expected");
     }
     else
 /*===== nc_hilb ===============================================*/
@@ -2602,26 +2635,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-  /*==================== alarm ==================================*/
-  #ifdef unix
-      if(strcmp(sys_cmd,"alarm")==0)
-      {
-        if ((h!=NULL) &&(h->Typ()==INT_CMD))
-        {
-          // standard variant -> SIGALARM (standard: abort)
-          //alarm((unsigned)h->next->Data());
-          // process time (user +system): SIGVTALARM
-          struct itimerval t,o;
-          memset(&t,0,sizeof(t));
-          t.it_value.tv_sec     =(unsigned)((unsigned long)h->Data());
-          setitimer(ITIMER_VIRTUAL,&t,&o);
-          return FALSE;
-        }
-        else
-          WerrorS("int expected");
-      }
-      else
-  #endif
   /*==================== red =============================*/
   #if 0
       if(strcmp(sys_cmd,"red")==0)
@@ -3597,19 +3610,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         WerrorS( "expected argument list (int, int, poly, poly, poly, int)");
         return TRUE;
       }
-    }
-    else
-  /*==================== neworder =============================*/
-    if(strcmp(sys_cmd,"neworder")==0)
-    {
-      if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
-      {
-        res->rtyp=STRING_CMD;
-        res->data=(void *)singclap_neworder((ideal)h->Data(), currRing);
-        return FALSE;
-      }
-      else
-        WerrorS("ideal expected");
     }
     else
   /*==================== Approx_Step  =================*/
