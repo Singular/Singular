@@ -45,9 +45,8 @@ New libraries:
 @item new library: curveInv.lib: invariants of curves (@nref{curveInv_lib})
 @item new library: gfan.lib: interface to gfanlib (@nref{gfan_lib})
 @item extended library: interface to polymake merged into @nref{polymake_lib}
-@item new library: tropicalNewton.lib: Newton polygon methods in tropical geometry
-@item new library: schubert.lib: some procedures for intersction theory
-(@nref{tropicalNewton_lib})
+@item new library: tropicalNewton.lib: Newton polygon methods in tropical geometry (@nref{tropicalNewton_lib})
+@item new library: schubert.lib: some procedures for intersction theory (@nref{schubert_lib})
 @end itemize
 
 Changed libraries:
