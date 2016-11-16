@@ -12,6 +12,7 @@
 # include <singularconfig.h>
 # include <misc/auxiliary.h>
 
+#undef VERSION
 #define VERSION "4.1.0"
 #define SINGULAR_MAJOR_VERSION 4
 #define SINGULAR_MINOR_VERSION 1
