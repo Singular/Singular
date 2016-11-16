@@ -44,7 +44,6 @@ REFERENCES:
     Maxim Kontsevich, Enumeration of rational curves via torus actions, 1995.
 
 PROCEDURES:
-    mod_init()                          create new objects in this library
     makeVariety(int,ideal)              create a variety
     printVariety(variety)               print procedure for a variety
     productVariety(variety,variety)     make the product of two varieties
@@ -116,7 +115,7 @@ LIB "parallel.lib";
 /////////// create new objects in this library  ////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-proc mod_init()
+static proc mod_init()
 "USAGE:     mod_init();
 THEORY:     This is to create new objects in this library such as variety,
             sheaf, stack, and graph.
