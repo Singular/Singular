@@ -22,6 +22,7 @@
 @menu
 * News and changes::
 * Singular 3 and Singular 4::
+* libSingular::
 * Download instructions::
 * Unix installation instructions::
 * Windows installation instructions::
@@ -29,7 +30,7 @@
 @end menu
 
 @c ----------------------------------------------------------
-@node News and changes, Singular 3 and Singular 4,,Release Notes
+@node News and changes
 @section News and changes
 @cindex news
 @cindex changes
@@ -37,14 +38,40 @@
 @include NEWS.texi
 
 @c ----------------------------------------------------------
-@node Singular 3 and Singular 4, Download instructions,News and changes,Release Notes
+@node Singular 3 and Singular 4
 @section Singular 3 and Singular 4
 @cindex Singular 3 and Singular 4
 
 @include changes_in_singular4.texi
 
+@c ----------------------------------------------
+@node libSingular
+@section libSingular
+@cindex libSingular
+@cindex GMP
+@cindex signal handler
+
+@code{libSingular} is the C++-library version of @sc{Singular}.@*
+@code{Singular/libsingular.h} is the main include file,
+@code{-lSingular} the link parameter,@*
+@code{lib/pkgconfig/Singular.pc} provides all parameters in the pkconfig format.
+
+It contains all parts of @sc{Singular} with two exceptions:
+@enumerate
+@item
+memory allocation functions for GMP
+(see @code{mmInit} in @code{Singular/tesths.cc})
+@item
+signal handlers
+(see @code{init_signals} in @code{Singular/cntrlc.cc}).@*
+At least a handler for @code{SIGCHLD} must be installed
+for the routines from @ref{parallel_lib}, @ref{modstd_lib}, @ref{modnormal_lib}, @ref{tasks_lib}.@*
+If the child was started by @code{libSingular} the handler
+has to call @code{sig_chld_hdl} from @code{Singular/links/ssiLink.cc}
+or implement something similiar (call @code{slClose(l)} for ssi links).
+@end enumerate
 @c ----------------------------------------------------------
-@node Download instructions, Unix installation instructions, Singular 3 and Singular 4, Release Notes
+@node Download instructions
 @section Download instructions
 @cindex downloading
 @cindex instructions, downloading
@@ -67,7 +94,7 @@ from our FTP site
 @c @include README_download.texi
 
 @c ----------------------------------------------------------
-@node Unix installation instructions, Windows installation instructions, Download instructions, Release Notes
+@node Unix installation instructions
 @section Unix installation instructions
 @cindex Unix installation
 @cindex instructions, Unix installation
@@ -97,7 +124,7 @@ Install the necessary packages:
   libcdd
   @end itemize
 @item
-Install flint 2.4:
+Install flint 2.5:
 @code{./configure --with-gmp=/usr --prefix=$HOME/tmp --disable-shared}
 @*@code{make && make install}
 @item
@@ -118,7 +145,7 @@ See also
 which includes instructions adapted for debian and fedora based systems.
 
 @c ----------------------------------------------------------
-@node Windows installation instructions, Macintosh installation instructions, Unix installation instructions, Release Notes
+@node Windows installation instructions
 @section Windows installation instructions
 @cindex Windows installation
 @cindex instructions, Windows installation
@@ -130,7 +157,7 @@ There is a 32bit and a 64bit version of Cygwin.
 @url{http://www.singular.uni-kl.de/index.php/singular-download/install-windows.html}
 
 @c ----------------------------------------------------------
-@node Macintosh installation instructions,,Windows installation instructions, Release Notes
+@node Macintosh installation instructions
 @section Macintosh installation instructions
 @cindex Macintosh installation
 @cindex instructions, Macintosh installation
