@@ -1952,8 +1952,8 @@ holonomic rank		sing_760.htm#IDX378
 holonomicRank		sing_764.htm#SEC816	41306
 hom_kernel		sing_1158.htm#SEC1234	32604
 homog		sing_254.htm#SEC294	
-homog_part		sing_2529.htm#SEC2605	
-homog_parts		sing_2530.htm#SEC2606	
+homog_part		sing_2529.htm#SEC2605	20875
+homog_parts		sing_2530.htm#SEC2606	12854
 homogeneitySpace		sing_2151.htm#SEC2227	48243
 homogfacFirstQWeyl		sing_693.htm#SEC745	32751
 homogfacFirstQWeyl_all	homogfacFirstQWeyl_all	sing_695.htm#SEC747	9014
@@ -2418,8 +2418,8 @@ m_merkle_hellman_transformation	m_merkle_hellman_transformation	sing_1913.htm#SE
 magnitude		sing_1837.htm#SEC1913	37967
 makeDivisor		sing_2318.htm#SEC2394	3414
 makeFormalDivisor		sing_2328.htm#SEC2404	54579
-makeGraph		sing_1126.htm#SEC1202	sprintf
-makeGraphVE		sing_2517.htm#SEC2593	
+makeGraph		sing_1126.htm#SEC1202	21758
+makeGraphVE		sing_2517.htm#SEC2593	sprintf
 makeHeisenberg		sing_711.htm#SEC763	2050
 makeLetterplaceRing		sing_625.htm#SEC677	41789
 makeMalgrange		sing_592.htm#SEC644	41377
@@ -2901,7 +2901,7 @@ paraplanecurves.lib		sing_1357.htm#SEC1433
 paraplanecurves_lib		sing_1357.htm#SEC1433	
 pardeg		sing_311.htm#SEC351	
 parstr		sing_312.htm#SEC352	
-part		sing_2284.htm#SEC2360	27325
+part		sing_2284.htm#SEC2360	31485
 partOver		sing_2287.htm#SEC2363	25555
 partUnder		sing_2288.htm#SEC2364	13123
 partial_molien		sing_1630.htm#SEC1706	21772
@@ -3039,8 +3039,8 @@ primparam		sing_1497.htm#SEC1573	35357
 principal intersection		sing_497.htm#IDX317	
 print		sing_316.htm#SEC356	
 print 		sing_2162.htm#IDX811	
-printGraph		sing_1127.htm#SEC1203	31529
-printGraphG		sing_2518.htm#SEC2594	
+printGraph		sing_1127.htm#SEC1203	45041
+printGraphG		sing_2518.htm#SEC2594	48742
 printGroup		sing_2433.htm#SEC2509	6791
 printMoebius		sing_2201.htm#SEC2277	45828
 printSheaf		sing_2506.htm#SEC2582	31762
