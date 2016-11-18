@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version = "version goettsche.lib 0.9 Sep_2016";      //$Id$
+version = "version goettsche.lib 0.9 Sep_2016 ";      //$Id$
 category = "Betti numbers";
 info="
 LIBRARY:  goettsche.lib     Goettsche's formula for the Betti numbers of the Hilbert scheme

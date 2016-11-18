@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version = "version chern.lib 0.7 Nov_2016";      //$Id$
+version = "version chern.lib 0.7 Nov_2016 ";      //$Id$
 category = "Chern classes";
 info="
 LIBRARY:  chern.lib    Symbolic Computations with Chern classes,
@@ -112,7 +112,7 @@ PROCEDURES:
 ";
 
 LIB "general.lib";
-//LIB "lrcalc.lib"; // needed for chProdM(..) and chProdMP(..)
+LIB "lrcalc.lib"; // needed for chProdM(..) and chProdMP(..)
 //----------------------------------------------------------
 
 proc symm(list l, list #)
