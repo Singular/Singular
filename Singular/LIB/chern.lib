@@ -1,18 +1,27 @@
 ////////////////////////////////////////////////////////////////
-version = "version chern.lib 0.615 Feb_2015 ";      //$Id$
+version = "version chern.lib 0.7 Nov_2016";      //$Id$
 category = "Chern classes";
 info="
-LIBRARY:  chern.lib    Symbolic Computations with Chern classes
+LIBRARY:  chern.lib    Symbolic Computations with Chern classes,
+                       Computation of Chern classes
 
-AUTHOR:  Oleksandr Iena,      oleksandr.iena@uni.lu,  yena@mathematik.uni-kl.de
+AUTHOR:  Oleksandr Iena,      o.g.yena@gmail.com,  yena@mathematik.uni-kl.de
+
+OVERVIEW:
+  A toolbox for symbolic computations with Chern classes.
+  The Aluffi's algorithms for computation of characteristic classes of algebraic varieties
+  (Segre, Fulton, Chern-Schwartz-MacPherson classes) are implemented as well.
+
 
 REFERENCES:
-  [1] Iena, Oleksandr,  On symbolic computations with Chern classes:
+  [1] Aluffi, Paolo     Computing characteristic classes of projective schemes.
+                        Journal of Symbolic Computation, 35 (2003), 3-19.
+  [2] Iena, Oleksandr,  On symbolic computations with Chern classes:
                         remarks on the library chern.lib for Singular,
                         http://hdl.handle.net/10993/22395, 2015.
-  [2] Lascoux, Alain,   Classes de Chern d'un produit tensoriel.
+  [3] Lascoux, Alain,   Classes de Chern d'un produit tensoriel.
                         C. R. Acad. Sci., Paris, Ser. A 286, 385-387 (1978).
-  [3] Manivel, Laurent  Chern classes of tensor products, arXiv 1012.0014, 2010.
+  [4] Manivel, Laurent  Chern classes of tensor products, arXiv 1012.0014, 2010.
 
 PROCEDURES:
   symm(l [,N]);             symmetric functions in the entries of l
@@ -94,10 +103,16 @@ PROCEDURES:
   PartC(I, m);              the complement of a partition with respect to m
   partOver(n, J);           partitions over a given partition J with summands not exceeding n
   partUnder(J);             partitions under a given partition J
+  SegreA(I);                Segre class of the projective subscheme defined by I
+  FultonA(I);               Fulton class of the projective subscheme defined by I
+  CSMA(I);                  Chern-Schwartz-MacPherson class of the
+                            projective subscheme defined by I
+  EulerAff(I);              Euler characteristic of the affine subvariety defined by I
+  EulerProj(I);             Euler characteristic of the projective subvariety defined by I
 ";
 
 LIB "general.lib";
-LIB "lrcalc.lib"; // needed for chProdM(..) and chProdMP(..)
+//LIB "lrcalc.lib"; // needed for chProdM(..) and chProdMP(..)
 //----------------------------------------------------------
 
 proc symm(list l, list #)
@@ -1361,8 +1376,8 @@ proc chHom(def r,  list c, def R, list C, list #)
 "USAGE:   chHom(r, c, R, C [, N]);  r, R polynomials (integers);
           c, C lists of polynomials, N integer
 RETURN:   list of polynomials
-PURPOSE:  computes [up to degree N] the list of Chern classe of the vector bundle Hom(E, F)
-          in terms of the ranks and the Chern clases of E and F
+PURPOSE:  computes [up to degree N] the list of Chern classes of the vector bundle Hom(E, F)
+          in terms of the ranks and the Chern classes of E and F
 EXAMPLE:  example chHom; shows an example
 NOTE:
 "
@@ -2150,7 +2165,7 @@ example
   // in the same situation compute only first two terms
   print( todd(l, 2) );
 
-  // compute the first 5 terms corresponding to the Chern clases c(1), c(2)
+  // compute the first 5 terms corresponding to the Chern classes c(1), c(2)
   l=c(1..2);
   print( todd(l, 5) );
 }
@@ -3027,6 +3042,320 @@ example
   list I = 0, 1, 1;
   print( partUnder(I) );
 }
+//-------------------------------------------------------------------------------------------
+
+proc SegreA(ideal I)
+"USAGE:   SegreA(I);  I an ideal
+RETURN:   list of integers
+PURPOSE:  computes the Segre classes of the subscheme defined by I
+EXAMPLE:  example SegreA; shows an example
+NOTE:
+"
+{
+  if( !homog(I) ) // if the ideal is not homogeneous
+  {
+    print("You are trying to compute the Segre class of a non-homogeneous ideal!");
+    print("The ideal must be homogeneous, an empty list is returned.");
+    return( list() );
+  }
+  // modify the generators of the ideal so that all of them are of the same degree
+  I=equal_deg(I);
+  int d=deg(I[1]); // this degree is stored in this variable
+  int i;
+  list rez; // define the variable for the result
+  int n=nvars(basering)-1; // the dimension of the projective space
+  if(d==-1) // if the ideal is zero
+  {
+    for(i=0;i<=n;i++)
+    {
+      rez=rez+ list( int((-1)^i*binomial(n+i, i)) );
+    }
+    return(rez);
+  }
+  int sz=ncols(I); // the number of new generators is stored here
+  def br@=basering; // remember the base ring
+  // add additional variables t@(1), ... , t@(sz) and u@ to the base ring
+  execute("ring r@=("+ charstr(basering) +"),("+varstr(basering)+",t@(1..sz),u@), dp;");
+  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
+  ideal I=F(I); // the ideal generated by I in the new ring
+  ideal J(0..n); // define n+1 ideals J(0), ... , J(n)
+  // compute the ideal of the Rees algebra of the ideal I:
+  for(i=1; i<=sz; i++) // consider the ideal generated by t@(i)-u@*I[i]
+  {
+    J(0)=J(0) + ideal( t@(i)-u@*I[i] );
+  }
+  J(0)=eliminate(J(0), u@); // and eliminate the variable u@
+  ideal T=t@(1..sz); // define the ideal generated by the additional variables t@(1), ... , t@(sz)
+  for(i=1;i<=n;i++)// for all i=1, ... n define J(j) as in 3.6 of the Aluffi's paper
+  {
+    // add a random general linear form in variables t@(1), ... , t@(n) to J(i-1)
+    J(i)=sat( random_hypersurf(J(i-1), T)   , T)[1]; // and saturate with respect to T
+  }
+  poly prd=product(T); // compute the product of t@(i)
+  poly cl;
+  poly mlt;
+  for(i=0;i<=n;i++)
+  {
+    // eliminate all t@(i) from J(i)
+    // compute the degree of the scheme defined by this ideal
+    // and use it to compute the class corresponding to c(O(d))^n * G\otimes O(d)
+    cl=cl+mult(std(eliminate(J(i), prd)))*u@^i*(1+d*u@)^(n-i);
+    // the (n+1)-st power of the inverse of the Chern class of O(d)
+    mlt=mlt+binomial(n+i, i)*(-d*u@)^i;
+  }
+  poly resPoly;
+  // compute the Segre class by the Aluffi's formula from Proposition 3.1 as polynomial in u@
+  resPoly= NF( 1-cl*mlt, u@^(n+1));
+  matrix cf=coeffs(resPoly, u@); // coefficients of the Segre class
+  rez=list(); // empty the list
+  for(i=0;i<=n;i++) // fill the list with the the Segre classes in positive degrees
+  {
+    if( i < nrows(cf) ) // if i is not bigger than the maximal degree of non-zero Segre classes
+    {
+      rez=rez+list(int(cf[i+1,1]));
+    }
+    else // otherwise fill the list with zeroes
+    {
+      rez=rez+list( int(0) );
+    }
+  }
+  return(rez);
+}
+example
+{
+  "EXAMPLE:";echo =2;
+  // Consider a 3-dimensional projective space
+  ring r = 0, (x, y, z, w), dp;
+  // Consider 3 non-coplanar lines trough one point and compute the Segre class
+  ideal I=xy, xz, yz;
+  I;
+  SegreA(I);
+  // Now consider 3 coplanar lines trough one point and its Segre class
+  ideal J=w, x*y*(x+y);
+  J;
+  SegreA(J);
+}
+//-------------------------------------------------------------------------------------------
+
+proc FultonA(ideal I)
+"USAGE:   FultonA(I);  I an ideal
+RETURN:   list of integers
+PURPOSE:  computes the Fulton classes of the subscheme defined by I
+EXAMPLE:  example FultonA; shows an example
+NOTE:
+"
+{
+  if( !homog(I) ) // if the ideal is not homogeneous
+  {
+    print("You are trying to compute the Segre class of a non-homogeneous ideal!");
+    print("The ideal must be homogeneous, an empty list is returned.");
+    return( list() );
+  }
+  // modify the generators of the ideal so that all of them are of the same degree
+  I=equal_deg(I);
+  int d=deg(I[1]); // this degree is stored in this variable
+  int i;
+  list rez; // define the variable for the result
+  int n=nvars(basering)-1; // the dimension of the projective space
+  if(d==-1) // if the ideal is zero
+  {
+    rez=rez+list(int(1));
+    for(i=1;i<=n;i++)
+    {
+      rez=rez+ list( int(0) );
+    }
+    return(rez);
+  }
+  int sz=ncols(I); // the number of new generators is stored here
+  def br@=basering; // remember the base ring
+  // add additional variables t@(1), ... , t@(sz) and u@ to the base ring
+  execute("ring r@=("+ charstr(basering) +"),("+varstr(basering)+",t@(1..sz),u@), dp;");
+  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
+  ideal I=F(I); // the ideal generated by I in the new ring
+  ideal J(0..n); // define n+1 ideals J(0), ... , J(n)
+  // compute the ideal of the Rees algebra of the ideal I:
+  for(i=1; i<=sz; i++) // consider the ideal generated by t@(i)-u@*I[i]
+  {
+    J(0)=J(0) + ideal( t@(i)-u@*I[i] );
+  }
+  J(0)=eliminate(J(0), u@); // and eliminate the variable u@
+  ideal T=t@(1..sz); // define the ideal generated by the additional variables t@(1), ... , t@(sz)
+  for(i=1;i<=n;i++)// for all i=1, ... n define J(j) as in 3.6 of the Aluffi's paper
+  {
+    // add a random general linear form in variables t@(1), ... , t@(n) to J(i-1)
+    J(i)=sat(   random_hypersurf(J(i-1), T)  , T)[1]; // and saturate with respect to T
+  }
+  poly prd=product(T); // compute the product of t@(i)
+  poly cl;
+  poly mlt;
+  for(i=0;i<=n;i++)
+  {
+    // eliminate all t@(i) from J(i)
+    // compute the degree of the scheme defined by this ideal
+    // the class corresponding to c(O(d))^n * G\otimes O(d)
+    cl=cl+ mult(std( eliminate( J(i),  prd) ))*u@^i*(1+d*u@)^(n-i);
+    // the (n+1)-st power of the inverse of the Chern class of O(d)
+    mlt=mlt+binomial(n+i, i)*(-d*u@)^i;
+  }
+  poly resPoly;
+  // compute the Fulton class using the Aluffi's formula for the Segre class and
+  // multiplying it by the Chern class of the projective space (1+u@)^(n+1)
+  resPoly= NF( (1+u@)^(n+1)*(1-cl*mlt), u@^(n+1) );
+  matrix cf=coeffs(resPoly, u@); // coefficients of the Fulton class
+  rez=list(); // empty the list
+  for(i=0;i<=n;i++) // fill the list with the the Fulton classes in positive degrees
+  {
+    if( i < nrows(cf) ) // if i is not bigger than the maximal degree of non-zero Fulton classes
+    {
+      rez=rez+list(int(cf[i+1,1]));
+    }
+    else // otherwise fill the list with zeroes
+    {
+      rez=rez+list( int(0) );
+    }
+  }
+  return(rez);
+}
+example
+{
+  "EXAMPLE:";echo =2;
+  // Consider a 3-dimensional projective space
+  ring r = 0, (x, y, z, w), dp;
+  // Consider 3 non-coplanar lines trough one point and compute the Fulton class
+  ideal I=xy, xz, yz;
+  I;
+  FultonA(I);
+  // Now consider 3 coplanar lines trough one point and its Fulton class
+  ideal J=w, x*y*(x+y);
+  J;
+  FultonA(J);
+}
+//-------------------------------------------------------------------------------------------
+
+proc CSMA(ideal I)
+"USAGE:   CSMA(I);  I an ideal
+RETURN:   list of integers
+PURPOSE:  computes the Chern-Schwartz-MacPherson classes of the variety defined by I
+EXAMPLE:  example CSMA; shows an example
+NOTE:
+"
+{
+  if( !homog(I) ) // if the ideal is not homogeneous
+  {
+    print("You are trying to compute the Chern-Schwartz-MacPherson class.");
+    print("However the input ideal is not homogeneous!");
+    print("The ideal must be homogeneous, an empty list is returned.");
+    return( list() );
+  }
+  int sz=ncols(I);
+  int i;
+  int n=nvars(basering)-1;
+  bigintmat REZ[1][n+1];
+  int j;
+  int szpr;
+  list pr;
+  int sgn=-1;
+  for(i=1;i<=sz;i++)
+  {
+    sgn=-sgn;
+    pr=prds(i,I);
+    szpr=size(pr);
+    for(j=1;j<=szpr;j++)
+    {
+      REZ=REZ+sgn*CSM_hypersurf(pr[j]);
+    }
+  }
+  list rez;
+  for(i=0;i<=n;i++)
+  {
+    rez=rez+list(REZ[1,i+1]);
+  }
+  return(rez);
+}
+example
+{
+  "EXAMPLE:";echo =2;
+  // consider the projective plane with homogeneous coordinates x, y, z
+  ring r = 0, (x, y, z), dp;
+  // the Chern-Schwartz-MacPherson class of a smooth cubic:
+  ideal I=x3+y3+z3;
+  I;
+  CSMA(I);
+  // the Chern-Schwartz-MacPherson class of singular cubic
+  // that is a union of 3 non-collinear lines:
+  ideal J=x*y*z;
+  J;
+  CSMA(J);
+  // the Chern-Schwartz-MacPherson class of singular cubic
+  // that is a union of 3 lines passing through one point
+  ideal K=x*y*(x+y);
+  K;
+  CSMA(K);
+}
+//-------------------------------------------------------------------------------------------
+
+proc EulerAff(ideal I)
+"USAGE:   EulerAff(I);  I an ideal
+RETURN:   integer
+PURPOSE:  computes the Euler characteristic of the affine variety defined by I
+EXAMPLE:  example EulerAff; shows an example
+NOTE:
+"
+{
+  int n=nvars(basering);
+  def br@=basering; // remember the base ring
+  execute("ring r@=("+ charstr(basering) +"),("+varstr(basering)+",homvar@), dp;");
+  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
+  ideal I=F(I);
+  ideal J=homog(I, homvar@);
+  ideal JJ=J, homvar@;
+  return( CSMA(J)[n]-CSMA(JJ)[n] );
+}
+example
+{
+  "EXAMPLE:";echo =2;
+  ring r = 0, (x, y), dp;
+  // compute the Euler characteristic of the affine ellipric curve y^2=x^3+x+1;
+  ideal I=y2-x3-x-1;
+  EulerAff(I);
+}
+//-------------------------------------------------------------------------------------------
+
+proc EulerProj(ideal I)
+"USAGE:   EulerProj(I);  I an ideal
+RETURN:   integer
+PURPOSE:  computes the highest degree term of the Chern-Schwartz-MacPherson class
+          of the variety defined by I, which equals the Euler characteristic
+EXAMPLE:  example EulerProj; shows an example
+NOTE:     uses CSMA(...)
+"
+{
+  if( !homog(I) ) // if the ideal is not homogeneous
+  {
+    print("The ideal must be homogeneous, zero is returned.");
+    return( int(0) );
+  }
+  int n=nvars(basering)-1;
+  return( CSMA(I)[n] );
+}
+example
+{
+  "EXAMPLE:";echo =2;
+  // consider the projective plane with homogeneous coordinates x, y, z
+  ring r = 0, (x, y, z), dp;
+  // Euler characteristic of a smooth cubic:
+  ideal I=x3+y3+z3;
+  I;
+  EulerProj(I);
+  // Euler characteritic of 3 non-collinear lines:
+  ideal J=x*y*z;
+  J;
+  EulerProj(J);
+  // Euler characteristic of 3 lines passing through one point
+  ideal K=x*y*(x+y);
+  K;
+  EulerProj(K);
+}
 //----------------------------------------------------------------------------------------
 // The procedures below are for the internal usage only
 //----------------------------------------------------------------------------------------
@@ -3430,3 +3759,286 @@ example
 }
 //---------------------------------------------------------------------------------------
 
+static proc max_deg(ideal I)
+"USAGE:   max_deg(I);  I an ideal
+RETURN:   integer
+PURPOSE:  computes the maximal degree of the generators of I
+EXAMPLE:  example max_deg; shows an example
+NOTE:
+"
+{
+  int rez=0;
+  int i;
+  int sz = ncols(I);
+  for(i=1;i<=sz;i++)
+  {
+    rez=max(rez, deg(I[i]) );
+  }
+  return(rez);
+}
+example
+{
+  "EXAMPLE:";echo =2;
+  // the maximal degree of the ideal in k[x, y]:
+  ring r = 0, (x, y), dp;
+  ideal I= x4, y7, x2y3;
+  print(max_deg(I));
+}
+//-------------------------------------------------------------------------------------------
+
+static proc var_pow(int n)
+"USAGE:   var_pow(n);  n an integer
+RETURN:   ideal
+PURPOSE:  computes the ideal generated by the n-th powers of the variables of the base ring
+EXAMPLE:  example var_pow; shows an example
+NOTE:
+"
+{
+  ideal I=maxideal(1);
+  int sz=ncols(I);
+  int i;
+  ideal J;
+  for(i=1; i<=sz; i++)
+  {
+    J=J+ideal(I[i]^n);
+  }
+  return(J);
+}
+example
+{
+  "EXAMPLE:";echo =2;
+  // the 3-rd powers of the variables in k[x, y]:
+  ring r = 0, (x, y), dp;
+  print(var_pow(3));
+}
+//-------------------------------------------------------------------------------------------
+
+static proc equal_deg(ideal I)
+"USAGE:   equal_deg(I);  I an ideal
+RETURN:   ideal
+PURPOSE:  computes an ideal generated by elements of the same degree
+          that defines the same projective subscheme as I
+EXAMPLE:  example equal_deg; shows an example
+NOTE:
+"
+{
+  I=simplify(I, 8+2);
+  int sz=ncols(I);
+  int mxd=max_deg(I);
+  int i;
+  ideal J;
+  for(i=1;i<=sz;i++)
+  {
+    J=J+I[i]*var_pow( mxd-deg(I[i]) );
+  }
+
+  return(sort( simplify(J, 8+2) )[1]);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  // change the ideal (x, y^2) in k[x, y, z]:
+  ring r = 0, (x, y, z), dp;
+  ideal I=x, y*z;
+  // the ideal defines a two points subscheme in the projective plane
+  // and is generated by elements of different degrees
+  print(I);
+  ideal J=equal_deg(I);
+  // now the ideal is generated by elemets of degree 2
+  // and defines the same subscheme in the projective plane
+  J;
+  // notice that both ideals have the same saturation
+  // with respect to the irrelevant ideal (x, y, z)
+  // the saturation of the initial ideal coincides with the ideal itself
+  sat(I, maxideal(1))[1];
+  // the saturation of the modified ideal
+  sat(J, maxideal(1))[1];
+}
+//-------------------------------------------------------------------------------------------
+
+static proc CSM_hypersurf(poly f)
+"USAGE:   CSM_hypersurf(f);  f a polynomial
+RETURN:   list of integers
+PURPOSE:  computes the Chern-Schwartz-MacPherson classes of the hypersurface defined by f
+EXAMPLE:  example CSM_hypersurf; shows an example
+NOTE:
+"
+{
+  ideal I=jacob(f);
+  I=simplify(I, 8+2); // ignore repetitions and zero generators
+  I=sort(I)[1]; // sort the generators, it speeds up the computations
+  int d=deg(I[1]); // the degree of the generators of the Jacobian ideal
+  int i;
+  int n=nvars(basering)-1; // the dimension of the projective space
+  bigintmat REZ[1][n+1];
+  if(d==-1) // if the Jacobian ideal is zero
+  {
+    for(i=0;i<=n;i++)
+    {
+      REZ[1,i+1]=binomial(n+1,i);
+    }
+    return(REZ);
+  }
+  //TODO need to check the zero ideal and I==1;
+  int sz=ncols(I);
+  def br@=basering; // remember the base ring
+  execute("ring r@=("+ charstr(basering) +"),("+varstr(basering)+",t@(1..sz),u@), dp;");
+  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
+  ideal I=F(I);
+  ideal J(0..n);
+  for(i=1; i<=sz; i++)
+  {
+    J(0)=J(0) + ideal( t@(i)-u@*I[i] );
+  }
+  J(0)=eliminate(J(0), u@);
+  ideal T=t@(1..sz);
+  for(i=1;i<=n;i++)
+  {
+    J(i) = sat( random_hypersurf(J(i-1), T), T )[1];
+  }
+  poly prd=product(T);
+  poly cl;
+  poly mlt;
+  for(i=0;i<=n;i++)
+  {
+    cl=cl+  mult( std(eliminate( J(i),  prd)) ) *(-u@)^i*(1+u@)^(n-i);
+  }
+  cl=(1+u@)^(n+1)-cl;
+  poly resPoly=NF( cl, u@^(n+1) );
+  matrix cf=coeffs(resPoly, u@);
+  for(i=0;i<=n;i++)
+  {
+    if( i < nrows(cf) )
+    {
+      REZ[1,i+1]=int(cf[i+1,1]);
+    }
+    else
+    {
+      REZ[1,i+1]=int(0);
+    }
+  }
+  return(REZ);
+}
+example
+{
+  "EXAMPLE:";echo =2;
+  // consider the projective plane with homogeneous coordinates x, y, z
+  ring r = 0, (x, y, z), dp;
+  // the Chern-Schwartz-MacPherson class of a smooth cubic:
+  poly f=x3+y3+z3;
+  f;
+  CSM_hypersurf(f);
+  // the Chern-Schwartz-MacPherson class of singular cubic
+  // that is a union of 3 non-collinear lines:
+  poly g=x*y*z;
+  g;
+  CSM_hypersurf(g);
+  // the Chern-Schwartz-MacPherson class of singular cubic
+  // that is a union of 3 lines passing through one point
+  poly h=x*y*(x+y);
+  h;
+  CSM_hypersurf(h);
+}
+//-------------------------------------------------------------------------------------------
+
+static proc random_hypersurf(ideal I, ideal V)
+"USAGE:   random_hypersurf(I, V);  I, V ideals
+RETURN:   ideal
+PURPOSE:  computes the sum of I with the ideal generated by a random
+          linear combination of the generators of V such that the dimension decreases
+EXAMPLE:  example random_hypersurf; shows an example
+NOTE:     if the ideal I=1 (the whole ring), then I is returned
+"
+{
+  ideal H;
+  ideal J;
+ // if(isSubModule(ideal(1), I)) // if I equals 1 (the whole ring);
+  if( is_zero(I) )
+  {
+    return(I);
+  }
+  // otherwise
+  int ok=0;
+  int ntries; // number of tries
+  while( !ok ) // give two tries for every b in randomid(V, 1, b)
+  {
+    H=randomid(V, 1, ntries div 2 +1);
+    ntries++; // increase by 1
+    if( isSubModule( quotient(I, ideal(H) ), I) )
+    {
+      J=I + H;
+      ok=1;
+    }
+  }
+  return(J);
+}
+example
+{
+  "EXAMPLE:";echo =2;
+  // Consider an ideal in  k[x, y, z, s, t] and find its intersection with a general hyperplane
+  // given by as+bt=0
+  ring r = 0, (x, y, z, s, t), dp;
+  ideal I=x2, yz, s+t;
+  I;
+  ideal V= s, t;
+  V;
+  // the ideal of the intersection with the random general hyperplane
+  random_hypersurf(I, V);
+}
+//-------------------------------------------------------------------------------------------
+
+static proc prds(int n, def l)
+"USAGE:   prds(n, l);  n an integer, l list of polynomials or ideal
+RETURN:   list of polynomials
+PURPOSE:  computes all possible products of length n (without repetitions) of the entries of l
+EXAMPLE:  example prds; shows an example
+NOTE:
+"
+{
+  int sz;
+  if(typeof(l)=="ideal")
+  {
+    sz=ncols(l);
+  }
+  else
+  {
+    sz=size(l);
+  }
+  if( (n>sz)||(sz==0)||(n<0) )
+  {
+    return( list() );
+  }
+  // otherwise
+  if(n==0)
+  {
+    return( list(int(1)) );
+  }
+  if(sz==n)
+  {
+    return(product(l));
+  }
+  list L, LL, ll;
+  ll=l[2..sz];
+  poly f=l[1];
+  L=prds(n, ll );
+  LL=prds(n-1,ll);
+  int i;
+  sz=size(LL);
+  for(i=1;i<=sz;i++)
+  {
+    LL[i]=f*LL[i];
+  }
+  return(L+LL);
+}
+example
+{
+  "EXAMPLE:";echo =2;
+  ring r = 0, (x, y, z, w), dp;
+  // compute all possible 2-products between the variables x,y,z,w
+  list l=x,y,z,w;
+  prds(2, l);
+  // compute all possible 3-products between the variables x,y,z,w
+  ideal I=x,y,z,w;
+  prds(3, l);
+}
+//-------------------------------------------------------------------------------------------

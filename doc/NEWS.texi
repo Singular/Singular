@@ -21,6 +21,19 @@
 
 @heading News for version @value{VERSION}
 
+New libraries:
+@itemize
+@item goettsche.lia:b Goettsche's formula for the Betti numbers of the Hilbert scheme
+of points on a surface, Macdonald's formula for the symmetric product (@nref{goettsche_lib})
+@end itemize
+
+Changed libraries:
+@itemize
+@item chern.lib:  new version (@nref{chern_lib})
+@end itemize
+
+@heading News for version 4-0-3
+
 Syntax changes:
 @itemize
 @item new (additional) form of ring definitions: (for example @code{ring R=QQ[x,y,z];})

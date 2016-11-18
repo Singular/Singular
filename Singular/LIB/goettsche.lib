@@ -1,0 +1,466 @@
+////////////////////////////////////////////////////////////////
+version = "version goettsche.lib 0.9 Sep_2016";      //$Id$
+category = "Betti numbers";
+info="
+LIBRARY:  goettsche.lib     Goettsche's formula for the Betti numbers of the Hilbert scheme
+                            of points on a surface,
+                            Macdonald's formula for the symmetric product
+
+AUTHOR:  Oleksandr Iena,    o.g.yena@gmail.com,  yena@mathematik.uni-kl.de
+
+REFERENCES:
+  [1] Goettsche, Lothar,    The Betti numbers of the Hilbert scheme of ponts
+                            on a smooth projective surface.
+                            Mathematische Annalen: 286, 193-208, (1990).
+
+  [2] Macdonald, I. G.,     The Poincare polynomial of a symmetric product,
+                            Mathematical proceedings of the Cambridge Philosophical Society:
+                            58, 563 - 568, (1962).
+
+PROCEDURES:
+  GoettscheF(z, t, n, b);   The Goettsche's formula up to n-th degree
+  PPolyH(z, n, b);          Poincare Polynomial of the Hilbert scheme of n points on a surface
+  BettiNumsH(n, b);         Betti numbers of the Hilbert scheme of n points on a surface
+  MacdonaldF(z, t, n, b);   The Macdonald's formula up to n-th degree
+  PPolyS(z, n, b);          Poincare Polynomial of the n-th symmetric power of a variety
+  BettiNumsS(n, b);         Betti numbers of the n-th symmetric power of a variety
+";
+LIB "control.lib";
+//----------------------------------------------------------
+
+proc GoettscheF(poly z, poly t, int n, list b)
+"USAGE:   GoettscheF(z, t, n, b);  z, t polynomials, n integer, b list of non-negative integers
+RETURN:   polynomial in z and t
+PURPOSE:  computes the Goettsche's formula up to degree n in t
+EXAMPLE:  example GoettscheF; shows an example
+NOTE:     zero is returned if n<0 or b is not a list of non-negative integers
+          or if there are not enough Betti numbers
+"
+{
+  // check the input data
+  if( !checkBetti(b) )
+  {
+    print("the Betti numbers must be non-negative integers");
+    print("zero polynomial is returned");
+    return( poly(0) );
+  }
+  if(n<0)
+  {
+    print("the number of points must be non-negative");
+    print("zero polynomial is returned");
+    return( poly(0) );
+  }
+  // now is non-negative and b is a list of non-negative integers
+  if(size(b) < 5) // if there are not enough Betti numbers
+  {
+    print("a surface must habe 5 Betti numbers b_0, b_1, b_2, b_3, b_4");
+    print("zero polynomial is returned");
+    return( poly(0) );
+  }
+  // now there are at least 5 non-negative Betti numbers b_0, b_1, b_2, b_3, b_4
+  def br@=basering; // remember the base ring
+  // add additional variables z@, t@ to the base ring
+  execute("ring r@= (" + charstr(basering) + "),("+varstr(basering)+", z@, t@), dp;" );
+  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
+  // compute the generating function by the Goettsche's formula up to degree n in t@
+  poly rez=1;
+  int k,i;
+  for(k=1;k<=n;k++)
+  {
+    for(i=0;i<=4;i++)
+    {
+      rez=rez*generFactor( z@^(2*k-2+i)*t@^k, k, i, b[i+1], n);
+    }
+  }
+  ideal I=std(t@^(n+1));
+  rez=NF(rez,I);
+  setring br@; // come back to the initial base ring
+  // define the specialization homomorphism z@=z, t@=t
+  execute( "map FF= r@,"+varstr(br@)+", z, t;" );
+  poly rez=FF(rez); // bring the result to the base ring
+  return(rez);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r=0, (t, z), ls;
+  // consider the projective plane with Betti numbers 1,0,1,0,1
+  list b=1,0,1,0,1;
+  // get the Goettsche's formula up to degree 3
+  print( GoettscheF(z, t, 3, b) );
+}
+//----------------------------------------------------------
+
+proc PPolyH(poly z, int n, list b)
+"USAGE:   PPolyH(z, n, b);  z polynomial, n integer, b list of non-negative integers
+RETURN:   polynomial in z
+PURPOSE:  computes the Poincare polynomial of the Hilbert scheme
+          of n points on a surface with Betti numbers b
+EXAMPLE:  example PPolyH; shows an example
+NOTE:     zero is returned if n<0 or b is not a list of non-negative integers
+          or if there are not enough Betti numbers
+"
+{
+  // check the input data
+  if( !checkBetti(b) )
+  {
+    print("the Betti numbers must be non-negative integers");
+    print("zero polynomial is returned");
+    return( poly(0) );
+  }
+  if(n<0)
+  {
+    print("the number of points must be non-negative");
+    print("zero polynomial is returned");
+    return( poly(0) );
+  }
+  // now is non-negative and b is a list of non-negative integers
+  if(size(b) < 5) // if there are not enough Betti numbers
+  {
+    print("a surface must habe 5 Betti numbers b_0, b_1, b_2, b_3, b_4");
+    print("zero polynomial is returned");
+    return( poly(0) );
+  }
+  // now there are at least 5 non-negative Betti numbers b_0, b_1, b_2, b_3, b_4
+  def br@=basering; // remember the base ring
+  // add additional variables z@, t@ to the base ring
+  execute("ring r@= (" + charstr(basering) + "),("+varstr(basering)+", z@, t@), dp;" );
+  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
+  // compute the generating function by the Goettsche's formula up to degree n in t@
+  poly rez=1;
+  int k,i;
+  for(k=1;k<=n;k++)
+  {
+    for(i=0;i<=4;i++)
+    {
+      rez=rez*generFactor( z@^(2*k-2+i)*t@^k, k  ,i,b[i+1], n);
+    }
+  }
+  ideal I=std(t@^(n+1));
+  rez=NF(rez,I);
+  rez= coeffs(rez, t@)[n+1, 1]; // take the coefficient of the n-th power of t@
+  setring br@; // come back to the initial base ring
+  // define the specialization homomorphism z@=z, t@=0
+  execute( "map FF= r@,"+varstr(br@)+",z, 0;" );
+  poly rez=FF(rez); // bring the result to the base ring
+  return(rez);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r=0, (z), ls;
+  // consider the projective plane P_2 with Betti numbers 1,0,1,0,1
+  list b=1,0,1,0,1;
+  // get the Poincare polynomial of the Hilbert scheme of 3 points on P_2
+  print( PPolyH(z, 3, b) );
+}
+//----------------------------------------------------------
+
+proc BettiNumsH(int n, list b)
+"USAGE:   BettiNumsH(n, b);  n integer, b list of non-negative integers
+RETURN:   list of non-negative integers
+PURPOSE:  computes the Betti numbers of the Hilbert scheme
+          of n points on a surface with Betti numbers b
+EXAMPLE:  example BettiNumsH; shows an example
+NOTE:     an empty list is returned if n<0 or b is not a list of non-negative integers
+          or if there are not enough Betti numbers
+"
+{
+  // check the input data
+  if( !checkBetti(b) )
+  {
+    print("the Betti numbers must be non-negative integers");
+    print("an empty list is returned");
+    return( list() );
+  }
+  if(n<0)
+  {
+    print("the number of points must be non-negative");
+    print("an empty list is returned");
+    return(list());
+  }
+  // now is non-negative and b is a list of non-negative integers
+  if(size(b) < 5) // if there are not enough Betti numbers
+  {
+    print("a surface must habe 5 Betti numbers b_0, b_1, b_2, b_3, b_4");
+    print("an empty list is returned");
+    return( list() );
+  }
+  // now there are at least 5 non-negative Betti numbers b_0, b_1, b_2, b_3, b_4
+  def br@=basering; // remember the base ring
+  // add additional variables z@, t@ to the base ring
+  execute("ring r@= (" + charstr(basering) + "),("+varstr(basering)+", z@, t@), dp;" );
+  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
+  poly rez=1;
+  int k,i;
+  for(k=1;k<=n;k++)
+  {
+    for(i=0;i<=4;i++)
+    {
+      rez=rez*generFactor( z@^(2*k-2+i)*t@^k, k  ,i,b[i+1], n);
+    }
+  }
+  ideal I=std(t@^(n+1));
+  rez=NF(rez,I);
+  rez= coeffs(rez, t@)[n+1, 1]; // take the coefficient of the n-th power of t@
+  matrix CF=coeffs(rez, z@); // take the matrix of the coefficients
+  list res; // and transform it to a list
+  int d=size(CF);
+  for(i=1; i<=d; i++)
+  {
+    res=res+ list(int(CF[i, 1])) ;
+  }
+  setring br@; // come back to the initial base ring
+  return(res);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r=0, (z), ls;
+  // consider the projective plane P_2 with Betti numbers 1,0,1,0,1
+  list b=1,0,1,0,1;
+  // get the Betti numbers of the Hilbert scheme of 3 points on P_2
+  print( BettiNumsH(3, b) );
+}
+//----------------------------------------------------------
+
+proc MacdonaldF(poly z, poly t, int n, list b)
+"USAGE:   MacdonaldF(z, t, n, b);  z, t polynomials, n integer, b list of non-negative integers
+RETURN:   polynomial in z and t with integer coefficients
+PURPOSE:  computes the Macdonalds's formula up to degree n in t
+EXAMPLE:  example MacdonaldF; shows an example
+NOTE:     zero is returned if n<0 or b is not a list of non-negative integers
+"
+{
+  // check the input data
+  if( !checkBetti(b) )
+  {
+    print("the Betti numbers must be non-negative integers");
+    print("zero polynomial is returned");
+    return( poly(0) );
+  }
+  if(n<0)
+  {
+    print("the exponent of the symmetric power must be non-negative");
+    print("zero polynomial is returned");
+    return( poly(0) );
+  }
+  int d=size(b);
+  def br@=basering; // remember the base ring
+  // add additional variables z@, t@ to the base ring
+  execute("ring r@= (" + charstr(basering) + "),("+varstr(basering)+", z@, t@), dp;" );
+  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
+  poly rez=1;
+  int i;
+  for(i=0;i<d;i++)
+  {
+      rez=rez*generFactor( z@^i*t@, 1, i, b[i+1], n);
+  }
+  ideal I=std(t@^(n+1));
+  rez=NF(rez,I);
+  setring br@; // come back to the initial base ring
+  // define the specialization homomorphism z@=z, t@=t
+  execute( "map FF= r@,"+varstr(br@)+",z, t;" );
+  poly rez=FF(rez); // bring the result to the base ring
+  return(rez);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r=0, (t, z), ls;
+  // consider the projective plane with Betti numbers 1,0,1,0,1
+  list b=1,0,1,0,1;
+  // get the Macdonald's formula up to degree 3
+  print( MacdonaldF(z, t, 3, b) );
+}
+//----------------------------------------------------------
+
+proc PPolyS(poly z, int n, list b)
+"USAGE:   PPolyS(z, n, b);  z polynomial, n integer, b list of non-negative integers
+RETURN:   polynomial in z with integer coefficients
+PURPOSE:  computes the Poincare polynomial of the n-th symmetric power
+          of a variety with Betti numbers b
+EXAMPLE:  example PPolyS; shows an example
+NOTE:     zero is returned if n<0 or b is not a list of non-negative integers
+"
+{
+  // check the input data
+  if( !checkBetti(b) )
+  {
+    print("the Betti numbers must be non-negative integers");
+    print("zero polynomial is returned");
+    return( poly(0) );
+  }
+  if(n<0)
+  {
+    print("the exponent of the symmetric power must be non-negative");
+    print("zero polynomial is returned");
+    return( poly(0) );
+  }
+  int d=size(b);
+  def br@=basering; // remember the base ring
+  // add additional variables z@, t@ to the base ring
+  execute("ring r@= (" + charstr(basering) + "),("+varstr(basering)+", z@, t@), dp;" );
+  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
+  poly rez=1;
+  int i;
+  for(i=0;i<d;i++)
+  {
+      rez=rez*generFactor( z@^i*t@, 1, i, b[i+1], n);
+  }
+  ideal I=std(t@^(n+1));
+  rez=NF(rez,I);
+  rez= coeffs(rez, t@)[n+1, 1]; // take the coefficient of the n-th power of t@
+  setring br@; // come back to the initial base ring
+  // define the specialization homomorphism z@=z, t@=0
+  execute( "map FF= r@,"+varstr(br@)+",z, 0;" );
+  poly rez=FF(rez); // bring the result to the base ring
+  return(rez);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r=0, (z), ls;
+  // consider the projective plane P_2 with Betti numbers 1,0,1,0,1
+  list b=1,0,1,0,1;
+  // get the Poincare polynomial of the third symmetric power of P_2
+  print( PPolyS(z, 3, b) );
+}
+//----------------------------------------------------------
+
+proc BettiNumsS(int n, list b)
+"USAGE:   BettiNumsS(n, b);  n integer, b list of non-negative integers
+RETURN:   list of non-negative integers
+PURPOSE:  computes the Betti numbers of the n-th symmetric power of a variety with Betti numbers b
+EXAMPLE:  example BettiNumsS; shows an example
+NOTE:     an empty list is returned if n<0 or b is not a list of non-negative integers
+"
+{
+  // check the input data
+  if( !checkBetti(b) )
+  {
+    print("the Betti numbers must be non-negative integers");
+    print("an empty list is returned");
+    return( list() );
+  }
+  if(n<0)
+  {
+    print("the exponent of the symmetric power must be non-negative");
+    print("an empty list is returned");
+    return(list());
+  }
+  int d=size(b);
+  def br@=basering; // remember the base ring
+  // add additional variables z@, t@ to the base ring
+  execute("ring r@= (" + charstr(basering) + "),("+varstr(basering)+", z@, t@), dp;" );
+  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
+  poly rez=1;
+  int i;
+  for(i=0;i<d;i++)
+  {
+      rez=rez*generFactor( z@^i*t@, 1, i, b[i+1], n);
+  }
+  ideal I=std(t@^(n+1));
+  rez=NF(rez,I); // throw away the terms of higher degrees in t@
+  rez= coeffs(rez, t@)[n+1, 1]; // take the coefficient of the n-th power of t@
+  matrix CF=coeffs(rez, z@); // take the matrix of the coefficients
+  list res; // and transform it to a list
+  d=size(CF);
+  for(i=1; i<=d; i++)
+  {
+    res=res+ list(int(CF[i, 1])) ;
+  }
+  setring br@; // come back to the initial base ring
+  return(res);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r=0, (z), ls;
+  // consider the projective plane P_2 with Betti numbers 1,0,1,0,1
+  list b=1,0,1,0,1;
+  // get the Betti numbers of the third symmetric power of P_2
+  print( BettiNumsS(3, b) );
+}
+//----------------------------------------------------------------------------------------
+// The procedures below are for the internal usage only
+//----------------------------------------------------------------------------------------
+
+static proc checkBetti(list b)
+"USAGE:   checkBetti(b);  b list of integers
+RETURN:   integer 1 or 0
+PURPOSE:  checks whether all entries of b are non-negative integers
+EXAMPLE:  example checkBetti; shows an example
+NOTE:
+"
+{
+  int i;
+  int sz=size(b);
+  for(i=1;i<=sz;i++)
+  {
+    if( typeof(b[i])!="int" )
+    {
+      return(int(0));
+    }
+    if( b[i]<0 )
+    {
+      return(int(0));
+    }
+  }
+  return(int(1));
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r=0, (t), dp;
+  // not all entries are integers
+  list b=1,0,t,0,1;
+  print(checkBetti(b));
+  // all entries are integers but not all are non-negative
+  list b=1,0,-1,0,1;
+  print(checkBetti(b));
+  // all entries are non-negative integers
+  list b=1,0,1,0,1;
+  print(checkBetti(b));
+}
+//----------------------------------------------------------
+
+static proc generFactor(poly X, int k, int i, int b, int n)
+"USAGE:   generFactor;  X polynomial, k, b, n integers
+RETURN:   polynomial
+PURPOSE:  computes the corresponding factor from Goettsche's formula
+EXAMPLE:  example generFactor; shows an example
+NOTE:
+"
+{
+  poly rez=0;
+  int j;
+  int pow;
+  pow=(-1)^(i+1)*b;
+  if(pow > 0)
+  {
+    rez=(1-X)^pow;
+  }
+  else
+  {
+    int m=n div k + 1;
+    for(j=0;j<m;j++)
+    {
+      rez=rez+ X^j;
+    }
+    rez=rez^(-pow);
+  }
+ //ideal I=std(t^(n+1));
+  //rez=NF(rez,I);
+  return(rez);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r=0, (t), ds;
+  // get the polynomial expansion of 1/(1-t)^2
+  // using the Taylor expansion of 1/(1-t) up to degree 11
+  // and assuming that the degree of t is 3
+  print( generFactor(t, 3, 0, 2, 11) );
+}
+//----------------------------------------------------------
