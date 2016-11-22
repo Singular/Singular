@@ -23,7 +23,7 @@
 
 New libraries:
 @itemize
-@item goettsche.lia:b Goettsche's formula for the Betti numbers of the Hilbert scheme
+@item goettsche.lib: Goettsche's formula for the Betti numbers of the Hilbert scheme
 of points on a surface, Macdonald's formula for the symmetric product (@nref{goettsche_lib})
 @end itemize
 
