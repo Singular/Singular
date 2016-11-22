@@ -30,6 +30,7 @@ The following topics are treated:
 * Commutative Algebra::saturation, elimination, free resolution, factorization, primary decomposition, normalization, etc.
 * Singularity Theory::singular and critical points, invariants of hypersurface singularities, classification, resolution of singularities, etc.
 * Invariant Theory:: G_a-invariants, invariants of finite groups
+* Geometric Invariant Theory:: Geometric Invariant Theory
 * Non-commutative Algebra:: Groebner bases and applications in G-algebras
 * Applications:: Solving systems of polynomial equations, AG codes
 @end menu
@@ -3110,7 +3111,7 @@ iD;                               // show the output
 @end smallexample
 
 @c ----------------------------------------------------------------------------
-@node Invariant Theory, Non-commutative Algebra, Singularity Theory, Examples
+@node Invariant Theory, Geometric Invariant Theory, Singularity Theory, Examples
 @section Invariant Theory
 @cindex Invariant Theory
 
@@ -3163,6 +3164,28 @@ sum x(i)*d/dx(i+1).
 @end smallexample
 @c kill n,i,s,q;
 @end ifset
+
+@c ----------------------------------------------------------------------------
+@node Geometric Invariant Theory, Non-commutative Algebra, Invariant Theory, Examples
+@section Geometric Invariant Theory
+@cindex Geometric Invariant Theory
+
+@ifset singularmanual
+@menu
+* GIT-fans::
+@end menu
+@end ifset
+
+
+@c ----------------------------------------------------------------------------
+@ifset singularmanual
+@node GIT-fans
+@subsection GIT-fans
+@cindex GIT-fans
+
+@end ifset
+
+
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
