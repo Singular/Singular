@@ -1513,9 +1513,9 @@ static inline int p_LtCmp(poly p, poly q, const ring r)
       qc = n_InpNeg(qc,r->cf);
     if(n_Greater(pc,qc,r->cf))
       res = 1;
-    if(n_Greater(qc,pc,r->cf))
+    else if(n_Greater(qc,pc,r->cf))
       res = -1;
-    if(n_Equal(pc,qc,r->cf))
+    else if(n_Equal(pc,qc,r->cf))
       res = 0;
     n_Delete(&pc,r->cf);
     n_Delete(&qc,r->cf);
@@ -1550,7 +1550,7 @@ static inline int p_LtCmpOrdSgnDiffM(poly p, poly q, const ring r)
 {
   if(r->OrdSgn == 1)
   {
-    return(p_LtCmp(p,q,r) != -1);
+    return(p_LtCmp(p,q,r) == 1);
   }
   else
   {
