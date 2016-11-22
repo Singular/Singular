@@ -341,8 +341,8 @@ example
 }
 
 
-static proc applyPermutationToIntvec(intvec v, intvec g){
-  intvec gv = composeIntvecs(g,v);
+static proc applyPermutationToIntvec(intvec v, permutation g){
+  intvec gv = composeIntvecs(permutationToIntvec(g),v);
   //for (int i=1;i<=size(v);i++){
   //  gv[i]=g[v[i]];
   //}
@@ -369,8 +369,8 @@ static proc computeSimplexOrbit(intvec v, list G){
 
 
 proc computeAfaceOrbits(list AF, list G)
-  "USAGE: computeAfaceOrbits(AF,G); AF list of intvecs, G: list of intvecs
-PURPOSE: Computes the orbits of the afaces in the list AF under the group action in G, where G is a list of intvecs describing images of the permutations. We assume that the elements of G form a group and the first entry corresponds to the neutral element.
+  "USAGE: computeAfaceOrbits(AF,G); AF list of intvecs, G: list of permutations
+PURPOSE: Computes the orbits of the afaces in the list AF under the group action in G, where G is a list of permutations. We assume that the elements of G form a group and the first entry corresponds to the neutral element.
 RETURN: a list of lists of intvecs
 EXAMPLE: example computeAfaceOrbits; shows an example
 "
@@ -556,7 +556,7 @@ example
 
 proc orbitConeOrbits(list F, intmat Q)
 "USAGE: orbitConeOrbits(F, Q); F: list, Q: intmat
-PURPOSE: Projects a list F of a-face orbits to the orbit cones with respect to Q. The functions checks whether the projections are of full dimension and returns an error otherwise.
+PURPOSE: Projects a list F of a-face orbits to the orbit cones with respect to Q. The function checks whether the projections are of full dimension and returns an error otherwise.
 RETURN: a list of lists of cones
 EXAMPLE: example orbitConeOrbits; shows an example
 "
@@ -820,7 +820,7 @@ static proc pivotIndices(matrix H)
 
 
 proc groupActionOnQImage(list G,intmat Q)
-"USAGE: groupActionOnQImage(G,Q); G: list, Q: intmat
+"USAGE: groupActionOnQImage(G,Q); G: list of permutations, Q: intmat
 PURPOSE: Given the group G of permutations acting on the simplex on ncols(Q) objects, computes the corresponding group action on the image of Q. We assume that the basering has characteristic 0.
 RETURN: list of matrices
 EXAMPLE: example groupActionOnQImage; shows an example
@@ -834,7 +834,7 @@ EXAMPLE: example groupActionOnQImage; shows an example
   list L;
   intmat Qt = transpose(Q);
   for(int i = 1; i <= size(G); i++){
-    intvec sig = G[i];
+    intvec sig = permutationToIntvec(G[i]);
     intmat Bsig = perm2mat(sig, indices,Qt);
     matrix Asig = Bsig * QbasisInv;
     L[size(L)+1] = matrixToIntmat(Asig);
@@ -893,8 +893,8 @@ static proc matrixToIntmat(matrix A){
 
 proc groupActionOnHashes(list Asigma, list OCmov)
 "USAGE: groupActionOnHashes(Asigma,OCmov); Asigma: list, OCmov: list of list of cones
-PURPOSE: From the list of orbits of orbitcones, and the symmetry group represenation given by the matrices in Asigma, compute the corresponding permutation representation of the symmetry group on the orbit cones. The permutations are specified in a map representation as intvecs of length the sum of the size of the orbits of OCmov.
-RETURN: list of matrices
+PURPOSE: From the list of orbits of orbitcones, and the symmetry group represenation given by the matrices in Asigma, compute the corresponding permutation representation of the symmetry group on the orbit cones. The permutations are specified in a map representation of length the sum of the size of the orbits of OCmov.
+RETURN: list of permutations
 EXAMPLE: example groupActionOnHashes; shows an example
 "
 {
@@ -931,7 +931,7 @@ EXAMPLE: example groupActionOnHashes; shows an example
 
       sizepreviousorbits=size(vA);
     }
-    Ind[size(Ind)+1] = vA;
+    Ind[size(Ind)+1] = permutationFromIntvec(vA);
     dbprint("vA: "+string(vA));
   }
   return(Ind);
@@ -1052,7 +1052,7 @@ RETURN: nothing
   string s = "list actionOnOrbitconeIndices;";
   for(int i =1; i <= size(Ind); i++){
     s = s + "intvec v = " + string(Ind[i]) + ";" + newline;
-    s = s + "actionOnOrbitconeIndices[size(actionOnOrbitconeIndices)+1] = v;" + newline + "kill v;" + newline;
+    s = s + "actionOnOrbitconeIndices[size(actionOnOrbitconeIndices)+1] = permutationFromIntvec(v);" + newline + "kill v;" + newline;
   }
   write(":w "+fn, s);
 }
@@ -1107,12 +1107,13 @@ static proc getNeighborHash(list OC, bigintmat w, bigintmat v, int mu)
 proc GITfanSymmetric(list OC, bigintmat Q, cone Qgamma, list actiononorbitcones, list #)
   "USAGE: GITfanSymmetric(OC, Q, Qgamma, actiononorbitcones [, file1, file2]); OC:list, Q:bigintmat, Qgamma:cone, actiononorbitcones: list of intvec, file1:string, file2:string
 PURPOSE: Returns the common refinement of the cones given in
-the list OC which is supposed to contain the orbit cones intersected with Qgamma. The list actiononorbitcones is supposed to contain a symmetry group action of the GIT-quotient, where the elements are represented by permutations specified in a map representation as intvec. The optional argument can be used to specify one or two strings with file names, where the first file will contain the hashes of the GIT-cones and the second argument the actual cones in their H-representation.
+the list OC which is supposed to contain the orbit cones intersected with Qgamma. The list actiononorbitcones is supposed to contain the symmetry group acting as permutations of on the list of orbit cones in OC. The optional argument can be used to specify one or two strings with file names, where the first file will contain the hashes of the GIT-cones and the second argument the actual cones in their H-representation.
 To obtain the whole GIT-fan Qgamma has to be take the cone generated by the columns of Q.
 RETURN: a list containing the bigint hashes of the GIT cones.
 EXAMPLE: example GITfanSymmetric; shows an example
 "
 {
+  actiononorbitcones=apply(actiononorbitcones,permutationToIntvec);
   /**
    * stores the hashes of all maximal GIT cones computed
    */
@@ -1226,13 +1227,14 @@ EXAMPLE: example GITfanSymmetric; shows an example
 proc GITfanParallelSymmetric(list OC, bigintmat Q, cone Qgamma, list actiononorbitcones, list #)
   "USAGE: GITfanParallelSymmetric(OC, Q, Qgamma, actiononorbitcones [, file1, file2]); OC:list, Q:bigintmat, Qgamma:cone, actiononorbitcones: list of intvec, file1:string, file2:string
 PURPOSE: Returns the common refinement of the cones given in
-the list OC which is supposed to contain the orbit cones intersected with Qgamma. The list actiononorbitcones is supposed to contain a symmetry group action of the GIT-quotient, where the elements are represented by permutations specified in a map representation as intvec. The optional argument can be used to specify one or two strings with file names, where the first file will contain the hashes of the GIT-cones and the second argument the actual cones in their H-representation.
+the list OC which is supposed to contain the orbit cones intersected with Qgamma. The list actiononorbitcones is supposed to contain the symmetry group acting as permutations of on the list of orbit cones in OC. The optional argument can be used to specify one or two strings with file names, where the first file will contain the hashes of the GIT-cones and the second argument the actual cones in their H-representation.
 To obtain the whole GIT-fan Qgamma has to be take the cone generated by the columns of Q.
 RETURN: a list containing the bigint hashes of the GIT cones.
 NOTE: The proceduce uses parallel computation for the construction of the GIT-cones.
 EXAMPLE: example GITfanParallelSymmetric; shows an example
 "
 {
+  actiononorbitcones=apply(actiononorbitcones,permutationToIntvec);
   /**
    * stores the hashes of all maximal GIT cones computed
    */
