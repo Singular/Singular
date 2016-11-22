@@ -3165,27 +3165,6 @@ sum x(i)*d/dx(i+1).
 @c kill n,i,s,q;
 @end ifset
 
-@c ----------------------------------------------------------------------------
-@node Geometric Invariant Theory, Non-commutative Algebra, Invariant Theory, Examples
-@section Geometric Invariant Theory
-@cindex Geometric Invariant Theory
-
-@ifset singularmanual
-@menu
-* GIT-fans::
-@end menu
-@end ifset
-
-
-@c ----------------------------------------------------------------------------
-@ifset singularmanual
-@node GIT-fans
-@subsection GIT-fans
-@cindex GIT-fans
-
-@end ifset
-
-
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -3244,8 +3223,40 @@ Theory 2.3.7":
 @end smallexample
 @end ifset
 
+
 @c ----------------------------------------------------------------------------
-@node Non-commutative Algebra, Applications, Invariant Theory, Examples
+@node Geometric Invariant Theory, Non-commutative Algebra, Invariant Theory, Examples
+@section Geometric Invariant Theory
+@cindex Geometric Invariant Theory
+
+@ifset singularmanual
+@menu
+* GIT-Fans::
+@end menu
+@end ifset
+
+
+@c ----------------------------------------------------------------------------
+@ifset singularmanual
+@node GIT-Fans, Left and two-sided Groebner bases, Invariants of a finite group, Geometric Invariant Theory
+@subsection GIT-Fans
+@cindex GIT-Fans
+
+The GIT-Fan of M05bar without using symmetries:
+
+
+The GIT-Fan of M05bar using symmetries:
+
+
+The GIT-Fan of M06bar without using symmetries:
+
+@end ifset
+
+
+
+
+@c ----------------------------------------------------------------------------
+@node Non-commutative Algebra, Applications, Geometric Invariant Theory, Examples
 @section Non-commutative Algebra
 @cindex Non-commutative algebra
 
