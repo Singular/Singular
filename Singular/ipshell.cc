@@ -1235,6 +1235,7 @@ BOOLEAN iiBranchTo(leftv, leftv args)
     }
     err=iiAllStart(pi,pi->data.s.body,BT_proc,pi->data.s.body_lineno-(iiCurrArgs==NULL));
     exitBuffer(BT_proc);
+    myynest--;
     if (iiCurrArgs!=NULL)
     {
       if (err==0) Warn("too many arguments for %s",IDID(iiCurrProc));
