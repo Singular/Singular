@@ -1237,12 +1237,12 @@ BOOLEAN iiBranchTo(leftv, leftv args)
     exitBuffer(BT_proc);
     if (iiCurrArgs!=NULL)
     {
-      if (!err) Warn("too many arguments for %s",IDID(iiCurrProc));
+      if (err==0) Warn("too many arguments for %s",IDID(iiCurrProc));
       iiCurrArgs->CleanUp();
       omFreeBin((ADDRESS)iiCurrArgs, sleftv_bin);
       iiCurrArgs=NULL;
     }
-    return 2-err;
+    return (err!=0);
   }
   return FALSE;
 }
