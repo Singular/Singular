@@ -32,7 +32,7 @@ Changed libraries:
 @item chern.lib:  new version (@nref{chern_lib})
 @end itemize
 
-@heading News for version 4-0-3
+@heading News for version 4-1-0
 
 Syntax changes:
 @itemize
