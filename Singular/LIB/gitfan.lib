@@ -76,9 +76,30 @@ proc mod_init()
   newstruct("permutation","intvec image");
   system("install","permutation","*",composePermutations,2);
   system("install","permutation","^",permutationPower,2);
+  system("install","permutation","print",printPermutation,1);
 }
 
+proc emptyString(int n)
+{
+string st;
+for (int i = 1; i<=n;i++){
+  st=st+" ";
+}
+return(st);}
 
+proc printPermutation(permutation sigma)
+{
+intvec v = permutationToIntvec(sigma);
+string vsrc,vimg;
+for (int i = 1; i<=size(v);i++){
+   vsrc=vsrc+emptyString(1+size(string(size(v)))-size(string(i)))+string(i);
+}
+for (i = 1; i<=size(v);i++){
+   vimg=vimg+emptyString(1+size(string(size(v)))-size(string(v[i])))+string(v[i]);
+}
+print("|"+vsrc+"|");
+print("|"+vimg+"|");
+}
 
 
 ////////////////////////////////////////////////////
