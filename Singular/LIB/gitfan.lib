@@ -405,11 +405,38 @@ EXAMPLE: example computeAfaceOrbits; shows an example
 example
 {
   echo = 2;
-  list G =
-    intvec(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25),
-    intvec(1,2,3,5,4,6,7,9,8,10,12,11,14,13,15,16,17,19,18,20,22,21,24,23,25);
-  list AF = intvec(1,2,3,4,5,6,7,8,10,11,14,16,17,19,20,22,23);
-  computeAfaceOrbits(AF,G);
+  // Note that simplexOrbitRepresentatives and simplexSymmetryGroup are subsets of the actual sets for G25. For the full example see the examples in the source code documentation.
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list simplexOrbitRepresentatives = intvec( 1, 2, 3, 4, 5 ),
+    intvec( 1, 2, 3, 5, 6 ),
+    intvec( 1, 2, 3, 5, 7 ),
+    intvec( 1, 2, 3, 5, 10 ),
+    intvec( 1, 2, 3, 7, 9 ),
+    intvec( 1, 2, 3, 4, 5, 6, 9, 10 ),
+    intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9 ),
+    intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
+  list afaceOrbitRepresentatives=afaces(J,simplexOrbitRepresentatives);
+  list simplexSymmetryGroup = permutationFromIntvec(intvec( 1 .. 10 )),
+    permutationFromIntvec(intvec( 1, 2, 4, 3, 5, 7, 6, 9, 8, 10 )),
+    permutationFromIntvec(intvec( 1, 3, 2, 4, 6, 5, 7, 8, 10, 9 )),
+    permutationFromIntvec(intvec( 1, 3, 4, 2, 6, 7, 5, 10, 8, 9 )),
+    permutationFromIntvec(intvec( 1, 4, 2, 3, 7, 5, 6, 9, 10, 8 )),
+    permutationFromIntvec(intvec( 1, 4, 3, 2, 7, 6, 5, 10, 9, 8 ));
+  list fulldimAfaceOrbitRepresentatives=fullDimImages(afaceOrbitRepresentatives,Q);
+  list afaceOrbits=computeAfaceOrbits(fulldimAfaceOrbitRepresentatives,simplexSymmetryGroup);
+  apply(afaceOrbits,size);
 }
 
 
@@ -490,19 +517,40 @@ EXAMPLE: example minimalAfaceOrbits; shows an example
 example
 {
   echo = 2;
-  list afaceOrbits =
-    list(intvec(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25)),
-    list(intvec(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24),
-         intvec(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,25),
-         intvec(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24,25),
-         intvec(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,23,24,25),
-         intvec(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,22,23,24,25),
-         intvec(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23,24,25),
-         intvec(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,22,23,24,25),
-         intvec(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19,20,21,22,23,24,25),
-         intvec(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25),
-         intvec(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17,18,19,20,21,22,23,24,25));
-  minimalAfaceOrbits(afaceOrbits);
+  // Note that simplexOrbitRepresentatives and simplexSymmetryGroup are subsets of the actual sets for G25. For the full example see the examples in the documentation
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list simplexOrbitRepresentatives = intvec( 1, 2, 3, 4, 5 ),
+    intvec( 1, 2, 3, 5, 6 ),
+    intvec( 1, 2, 3, 5, 7 ),
+    intvec( 1, 2, 3, 5, 10 ),
+    intvec( 1, 2, 3, 7, 9 ),
+    intvec( 1, 2, 3, 4, 5, 6, 9, 10 ),
+    intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9 ),
+    intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
+  list afaceOrbitRepresentatives=afaces(J,simplexOrbitRepresentatives);
+  list simplexSymmetryGroup = permutationFromIntvec(intvec( 1 .. 10 )),
+    permutationFromIntvec(intvec( 1, 2, 4, 3, 5, 7, 6, 9, 8, 10 )),
+    permutationFromIntvec(intvec( 1, 3, 2, 4, 6, 5, 7, 8, 10, 9 )),
+    permutationFromIntvec(intvec( 1, 3, 4, 2, 6, 7, 5, 10, 8, 9 )),
+    permutationFromIntvec(intvec( 1, 4, 2, 3, 7, 5, 6, 9, 10, 8 )),
+    permutationFromIntvec(intvec( 1, 4, 3, 2, 7, 6, 5, 10, 9, 8 ));
+  list fulldimAfaceOrbitRepresentatives=fullDimImages(afaceOrbitRepresentatives,Q);
+  list afaceOrbits=computeAfaceOrbits(fulldimAfaceOrbitRepresentatives,simplexSymmetryGroup);
+  apply(afaceOrbits,size);
+  list minAfaceOrbits = minimalAfaceOrbits(afaceOrbits);
+  apply(minAfaceOrbits,size);
 }
 
 
@@ -519,7 +567,7 @@ static proc list2string(list L){
 
 
 proc fullDimImages(list afaces,intmat Q)
-  "USAGE: fullDimImages(afaces, Q); afaces: list, Q: intmat
+"USAGE: fullDimImages(afaces, Q); afaces: list, Q: intmat
 PURPOSE: Determines the a-faces (represented as intvecs) from the list afaces have a full-dimensional projection with respect to Q.
 RETURN: a list of intvecs
 EXAMPLE: example fullDimImages; shows an example
@@ -540,36 +588,24 @@ EXAMPLE: example fullDimImages; shows an example
 }
 example
 {
-  echo = 2;
-  list afaces = intvec(1,2,3,4,5,6,7,8,10,11,14,16,17,19,20,22,23), intvec(1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17);
-  intmat Qt[25][16] =
-    0,-1,0,0,0,-1,0,-1,-1,-1,0,0,0,0,0,0,
-    -1,0,-1,-1,-1,-1,-1,0,0,0,-1,-1,-1,0,0,0,
-    -1,-1,0,0,-1,0,0,-1,0,0,-1,0,0,0,0,0,
-    -1,-1,0,-1,0,0,0,0,-1,0,0,-1,0,0,0,0,
-    -1,-1,-1,0,0,0,0,0,0,-1,0,0,-1,0,0,0,
-    1,1,0,0,0,-1,0,0,0,0,0,0,0,-1,-1,-1,
-    1,0,1,1,0,0,1,-1,0,0,0,0,0,0,0,-1,
-    1,0,1,0,1,0,1,0,-1,0,0,0,0,0,-1,0,
-    1,0,0,1,1,0,1,0,0,-1,0,0,0,-1,0,0,
-    0,1,0,0,-1,0,0,0,0,0,-1,0,0,0,0,-1,
-    0,1,0,-1,0,0,0,0,0,0,0,-1,0,0,-1,0,
-    0,1,-1,0,0,0,0,0,0,0,0,0,-1,-1,0,0,
-    0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1;
-  intmat Q25 = transpose(Qt);
-  fullDimImages(afaces,Q25);
+  echo=2;
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+
+  list AF= afaces(J,nrows(Q));
+  size(AF);
+  size(fullDimImages(AF,Q));
 }
 
 
@@ -607,7 +643,45 @@ EXAMPLE: example orbitConeOrbits; shows an example
   }
   return(OC);
 }
-
+example 
+{
+  echo = 2;
+  // Note that simplexOrbitRepresentatives and simplexSymmetryGroup are subsets of the actual sets for G25. For the full example see the examples in the documentation
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list simplexOrbitRepresentatives = intvec( 1, 2, 3, 4, 5 ),
+    intvec( 1, 2, 3, 5, 6 ),
+    intvec( 1, 2, 3, 5, 7 ),
+    intvec( 1, 2, 3, 5, 10 ),
+    intvec( 1, 2, 3, 7, 9 ),
+    intvec( 1, 2, 3, 4, 5, 6, 9, 10 ),
+    intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9 ),
+    intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
+  list afaceOrbitRepresentatives=afaces(J,simplexOrbitRepresentatives);
+  list simplexSymmetryGroup = permutationFromIntvec(intvec( 1 .. 10 )),
+    permutationFromIntvec(intvec( 1, 2, 4, 3, 5, 7, 6, 9, 8, 10 )),
+    permutationFromIntvec(intvec( 1, 3, 2, 4, 6, 5, 7, 8, 10, 9 )),
+    permutationFromIntvec(intvec( 1, 3, 4, 2, 6, 7, 5, 10, 8, 9 )),
+    permutationFromIntvec(intvec( 1, 4, 2, 3, 7, 5, 6, 9, 10, 8 )),
+    permutationFromIntvec(intvec( 1, 4, 3, 2, 7, 6, 5, 10, 9, 8 ));
+  list fulldimAfaceOrbitRepresentatives=fullDimImages(afaceOrbitRepresentatives,Q);
+  list afaceOrbits=computeAfaceOrbits(fulldimAfaceOrbitRepresentatives,simplexSymmetryGroup);
+  apply(afaceOrbits,size);
+  list minAfaceOrbits = minimalAfaceOrbits(afaceOrbits);
+  apply(minAfaceOrbits,size);
+  list listOfOrbitConeOrbits = orbitConeOrbits(minAfaceOrbits,Q);
+}
 
 
 proc minimalOrbitConeOrbits(list listOfOrbits)
@@ -644,6 +718,47 @@ EXAMPLE: example minimalOrbitConeOrbits; shows an example
     }
   }
   return(L);
+}
+example 
+{
+  echo = 2;
+  // Note that simplexOrbitRepresentatives and simplexSymmetryGroup are subsets of the actual sets for G25. For the full example see the examples in the documentation
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list simplexOrbitRepresentatives = intvec( 1, 2, 3, 4, 5 ),
+    intvec( 1, 2, 3, 5, 6 ),
+    intvec( 1, 2, 3, 5, 7 ),
+    intvec( 1, 2, 3, 5, 10 ),
+    intvec( 1, 2, 3, 7, 9 ),
+    intvec( 1, 2, 3, 4, 5, 6, 9, 10 ),
+    intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9 ),
+    intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
+  list afaceOrbitRepresentatives=afaces(J,simplexOrbitRepresentatives);
+  list simplexSymmetryGroup = permutationFromIntvec(intvec( 1 .. 10 )),
+    permutationFromIntvec(intvec( 1, 2, 4, 3, 5, 7, 6, 9, 8, 10 )),
+    permutationFromIntvec(intvec( 1, 3, 2, 4, 6, 5, 7, 8, 10, 9 )),
+    permutationFromIntvec(intvec( 1, 3, 4, 2, 6, 7, 5, 10, 8, 9 )),
+    permutationFromIntvec(intvec( 1, 4, 2, 3, 7, 5, 6, 9, 10, 8 )),
+    permutationFromIntvec(intvec( 1, 4, 3, 2, 7, 6, 5, 10, 9, 8 ));
+  list fulldimAfaceOrbitRepresentatives=fullDimImages(afaceOrbitRepresentatives,Q);
+  list afaceOrbits=computeAfaceOrbits(fulldimAfaceOrbitRepresentatives,simplexSymmetryGroup);
+  apply(afaceOrbits,size);
+  list minAfaceOrbits = minimalAfaceOrbits(afaceOrbits);
+  apply(minAfaceOrbits,size);
+  list listOfOrbitConeOrbits = orbitConeOrbits(minAfaceOrbits,Q);
+  list listOfMinimalOrbitConeOrbits = minimalOrbitConeOrbits(listOfOrbitConeOrbits);
+  size(listOfMinimalOrbitConeOrbits);
 }
 
 
