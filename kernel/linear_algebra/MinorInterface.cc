@@ -267,11 +267,19 @@ ideal getMinorIdeal (const matrix mat, const int minorSize, const int k,
 
   /* copy all polynomials and reduce them w.r.t. iSB
      (if iSB is present, i.e., not the NULL pointer) */
-  for (int i = 0; i < length; i++)
+  if (iSB != NULL)
   {
-    nfPolyMatrix[i] = pCopy(myPolyMatrix[i]);
-    if (iSB != 0) nfPolyMatrix[i] = kNF(iSB, currRing->qideal,
-                                        nfPolyMatrix[i]);
+    for (int i = 0; i < length; i++)
+    {
+      nfPolyMatrix[i] = kNF(iSB, currRing->qideal,myPolyMatrix[i]);
+    }
+  }
+  else
+  {
+    for (int i = 0; i < length; i++)
+    {
+      nfPolyMatrix[i] = pCopy(myPolyMatrix[i]);
+    }
   }
 
   if ((k == 0) && (strcmp(algorithm, "Bareiss") == 0)
