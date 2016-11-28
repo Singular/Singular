@@ -1157,6 +1157,7 @@ killcmd:
             if (v->name!=NULL)
             {
                Werror("`%s` is undefined in kill",v->name);
+	       omFree((ADDRESS)v->name); v->name=NULL;
             }
             else               WerrorS("kill what ?");
           }
@@ -1173,6 +1174,7 @@ killcmd:
             if (v->name!=NULL)
             {
                Werror("`%s` is undefined in kill",v->name);
+	       omFree((ADDRESS)v->name); v->name=NULL;
             }
             else               WerrorS("kill what ?");
           }
