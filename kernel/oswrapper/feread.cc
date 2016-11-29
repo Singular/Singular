@@ -6,6 +6,7 @@
 */
 
 #include <kernel/mod2.h>
+#include <errno.h>
 
 // ----------------------------------------
 // system settings:
@@ -100,7 +101,6 @@ char *command_generator (char *text, int state)
 #include <sys/types.h>
 #include <sys/file.h>
 #include <sys/stat.h>
-#include <sys/errno.h>
 
 // #undef READLINE_READLINE_H_OK
 
