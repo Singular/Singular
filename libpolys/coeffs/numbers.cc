@@ -296,6 +296,12 @@ static BOOLEAN ndCoeffIsEqual(const coeffs r, n_coeffType n, void *)
   return (n==r->type);
 }
 
+static number ndQuotRem (number a, number b, number * r, const coeffs R)
+{
+  // implementation for a field: r: 0, result: n_Div
+  *r=n_Init(0,R);
+  return n_Div(a,b,R);
+}
 static n_coeffType nLastCoeffs=n_CF;
 cfInitCharProc nInitCharTableDefault[]=
 { NULL,        /*n_unknown */
@@ -367,6 +373,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfInitMPZ = ndInitMPZ;
     n->cfMPZ = ndMPZ;
     n->cfPower = ndPower;
+    n->cfQuotRem = ndQuotRem;
 
     n->cfKillChar = ndKillChar; /* dummy */
     n->cfSetChar = ndSetChar; /* dummy */
