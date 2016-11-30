@@ -3341,8 +3341,8 @@ BOOLEAN nlInitChar(coeffs r, void*p)
     r->cfLcm = nlLcm;
     r->cfXExtGcd=nlXExtGcd;
     r->cfQuotRem=nlQuotRem;
+    r->cfExactDiv= nlExactDiv;
   }
-  r->cfExactDiv= nlExactDiv;
   r->cfInit = nlInit;
   r->cfSize  = nlSize;
   r->cfInt  = nlInt;
