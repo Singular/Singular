@@ -6,7 +6,7 @@ AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_b
 
 all-local: feOpt.inc feOptTS.inc feOptES.inc iparith.inc all.lib gftables MOD ${abs_builddir}/LIB Singular$(EXEEXT) ESingular$(EXEEXT) TSingular$(EXEEXT)
 
-SUBDIRS = dyn_modules
+SUBDIRS = . dyn_modules
 
 ########################### Possible builtin modules... #########################
 BUILTIN_FLAGS = ${BUILTIN_LIBS}
