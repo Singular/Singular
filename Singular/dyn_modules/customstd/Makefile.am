@@ -22,7 +22,8 @@ endif
 customstd_la_SOURCES  = $(SOURCES)
 
 customstd_la_CPPFLAGS = ${MY_CPPFLAGS} ${P_PROCS_CPPFLAGS_COMMON} ${CDDGMPCPPFLAGS}
-customstd_la_LDFLAGS  = ${P_PROCS_MODULE_LDFLAGS}
+customstd_la_LDFLAGS  = ${P_PROCS_MODULE_LDFLAGS} $(SINGULAR_LDFLAGS)
+customstd_la_LIBADD   = ${top_builddir}/Singular/libSingular.la
 
 #AM_COLOR_TESTS=always
 #

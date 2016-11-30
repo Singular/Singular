@@ -6,6 +6,7 @@ noinst_LTLIBRARIES = libreporter.la
 #### libreporterdir = $(libdir)/singular
 
 libreporter_la_SOURCES  = dError.cc reporter.cc s_buff.cc
+libreporter_la_LDFLAGS = $(SINGULAR_LDFLAGS)
 ## libreporter_la_LDFLAGS  = -release ${PACKAGE_VERSION}
 ## libreporter_la_LIBADD   = ${top_builddir}/misc/libmisc.la
 

@@ -20,7 +20,8 @@ endif
 SOURCES = mod_main.cc DebugPrint.cc DebugPrint.h myNF.cc myNF.h singularxx_defs.h syzextra.cc syzextra.h
 syzextra_la_SOURCES   = $(SOURCES)
 syzextra_la_CPPFLAGS  = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
-syzextra_la_LDFLAGS   = ${AM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS} ${GOOGLE_PERFTOOL_LDFLAGS}
+syzextra_la_LDFLAGS   = ${AM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS} ${GOOGLE_PERFTOOL_LDFLAGS} $(SINGULAR_LDFLAGS)
+syzextra_la_LIBADD    = ${top_builddir}/Singular/libSingular.la
 
 AM_COLOR_TESTS=always
 

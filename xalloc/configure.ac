@@ -43,7 +43,9 @@ AM_PROG_CC_C_O
 AC_C_CONST
 AC_C_INLINE
 
-LT_INIT
+LT_INIT([win32-dll])
+
+SING_WIN_FLAGS
 
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll

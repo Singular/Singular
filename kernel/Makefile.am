@@ -15,6 +15,7 @@ SOURCES = polys.cc \
 libkernelCommon_la_SOURCES  = $(SOURCES)
 libkernelCommon_la_LIBADD   = ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} \
 ${abs_top_builddir}/libpolys/polys/libpolys.la
+libkernelCommon_la_LDFLAGS = $(SINGULAR_LDFLAGS)
 
 ###### libkerneldir = $(libdir)/singular
 
@@ -22,6 +23,7 @@ KERNELHEADERS = mod2.h structs.h polys.h ideals.h \
 	preimage.h fast_mult.h digitech.h
 
 libkernel_la_SOURCES=$(KERNELHEADERS)
+libkernel_la_LDFLAGS = $(SINGULAR_LDFLAGS)
 
 libkernel_la_includedir=${includedir}/singular/kernel
 libkernel_la_include_HEADERS=$(KERNELHEADERS)

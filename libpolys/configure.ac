@@ -29,9 +29,11 @@ AC_PROG_INSTALL
 
 # Turn off shared libraries during beta-testing, since they
 # make the build process take too long.
-LT_INIT
+LT_INIT([win32-dll])
 # ([shared])
-# LT_INIT(dlopen disable-static) # doesn't work on PowerPC!
+# LT_INIT([win32-dll])(dlopen disable-static) # doesn't work on PowerPC!
+
+SING_WIN_FLAGS
 
 # Checks for libraries.
 LB_CHECK_GMP(3.1.1,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))

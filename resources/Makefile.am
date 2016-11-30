@@ -11,7 +11,7 @@ AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir}
 SOURCES  = omFindExec.c feResource.cc feFopen.cc
 libsingular_resources_la_SOURCES   = $(SOURCES)
 
-libsingular_resources_la_LDFLAGS   = -release ${PACKAGE_VERSION}
+libsingular_resources_la_LDFLAGS   = $(SINGULAR_LDFLAGS) -release ${PACKAGE_VERSION}
 
 libsingular_resources_includedir  =$(includedir)/resources
 

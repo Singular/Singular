@@ -17,6 +17,8 @@ AC_PROG_CXX
 
 SING_RESET_FLAGS()
 
+SING_WIN_FLAGS
+
 AM_MAINTAINER_MODE([enable])
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -113,7 +115,7 @@ AM_PROG_CC_C_O
 AC_C_CONST
 AC_C_INLINE
 
-LT_INIT
+LT_INIT([win32-dll])
 
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll

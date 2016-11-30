@@ -49,7 +49,7 @@ if test -z "$DOXYGEN";
 fi
 AM_CONDITIONAL([HAVE_DOXYGEN], [test -n "$DOXYGEN"])
 
-LT_INIT
+LT_INIT([win32-dll])
 
 link_all_deplibs=yes
 link_all_deplibs_CXX=yes
@@ -106,12 +106,7 @@ AC_FUNC_MALLOC
 AC_CHECK_SIZEOF(long,4)
 SING_CHECK_CPU
 
-#check for host:
-AC_CANONICAL_HOST
-
-case $host_os in
-  *cygwin* ) AX_APPEND_LINK_FLAGS([-Wl,-Bdynamic]);;
-esac
+SING_WIN_FLAGS
 
 PKG_REQUIRE="$PKG_REQUIRE"
 AC_SUBST(PKG_REQUIRE)

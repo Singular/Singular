@@ -32,6 +32,8 @@ libcoeffs_la_LIBADD = ${top_builddir}/reporter/libreporter.la ${top_builddir}/mi
 $(FACTORY_LIBS) $(RESOURCES_LIBS) $(OMALLOC_LIBS) \
 $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS)
 
+libcoeffs_la_LDFLAGS = $(SINGULAR_LDFLAGS)
+
 TESTS_ENVIRONMENT = SINGULARPATH='${top_srcdir}/../factory:${top_builddir}/../factory'
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='$(top_builddir)'
 

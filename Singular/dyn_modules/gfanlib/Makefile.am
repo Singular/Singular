@@ -27,13 +27,14 @@ endif
 gfanlib_la_SOURCES  = $(SOURCES)
 
 gfanlib_la_CPPFLAGS = ${MY_CPPFLAGS} ${P_PROCS_CPPFLAGS_COMMON} ${CDDGMPCPPFLAGS}
-gfanlib_la_LDFLAGS  = ${P_PROCS_MODULE_LDFLAGS}
+gfanlib_la_LDFLAGS  = ${P_PROCS_MODULE_LDFLAGS} $(SINGULAR_LDFLAGS)
 
 # forcefully enable exceptions for polymake
 CXXFLAGS+= $(FEXCEPTIONSFRTTI_CXXFLAGS)
 
+gfanlib_la_LIBADD = ${top_builddir}/Singular/libSingular.la
 if HAVE_GFANLIB
- gfanlib_la_LIBADD   = ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
+ gfanlib_la_LIBADD   += ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
 endif
 
 #AM_COLOR_TESTS=always
