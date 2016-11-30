@@ -79,7 +79,7 @@ proc mod_init()
   system("install","permutation","print",printPermutation,1);
 }
 
-proc emptyString(int n)
+static proc emptyString(int n)
 {
 string st;
 for (int i = 1; i<=n;i++){
@@ -145,7 +145,7 @@ example
 ////////////////////////////////////////////////////
 
 proc afaces(ideal a, list #)
-  "USAGE: afaces(a [,L]); a: ideal, L: list of intvecs
+"USAGE: afaces(a [,L]); a: ideal, L: list of intvecs
 PURPOSE: Returns a list of all a-faces (considered as intvecs of 0 and 1, where the i-th entry is 1 if the cone has the i-th unit basis vector as a generator), if L is specified only the faces of the simplex listed in L are considered (e.g. representatives with respect to a group action).
 RETURN: a list of intvecs
 EXAMPLE: example afaces; shows an example
@@ -226,7 +226,6 @@ example
     T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
   list F4 = afaces(J);
   print(size(F4));
-
 }
 
 
@@ -295,7 +294,7 @@ static proc stepwiseSaturation(ideal I)
 
 proc isAface(ideal a, intvec gam0)
   "USAGE: isAface(a,gam0); a: ideal, gam0:intvec
-PURPOSE: Checks whether gam0 is an a-face w.r.t. the ideal RL.
+PURPOSE: Checks whether gam0 is an a-face w.r.t. the ideal a.
 RETURN: int
 EXAMPLE: example isaface; shows an example
 "
@@ -568,7 +567,7 @@ static proc list2string(list L){
 
 proc fullDimImages(list afaces,intmat Q)
 "USAGE: fullDimImages(afaces, Q); afaces: list, Q: intmat
-PURPOSE: Determines the a-faces (represented as intvecs) from the list afaces have a full-dimensional projection with respect to Q.
+PURPOSE: Determines the a-faces (represented as intvecs) from the list afaces which have a full-dimensional projection with respect to Q.
 RETURN: a list of intvecs
 EXAMPLE: example fullDimImages; shows an example
 "
@@ -1645,7 +1644,7 @@ static proc insertToList(list L, def elementToInsert, int posToInsert){
 proc GITcone(list OCcones, bigintmat w)
 "USAGE: GITcone(OCcones, w); OCcones: list of orbit cones, w: bigintmat with one row
 PURPOSE: Returns the intersection of all orbit cones containing w.
-RETURN: cone
+RETURN: cone,intvec with the GIT cone containing w, and the hash of this cone (the indices of the orbit cones contributing to the intersection)
 EXAMPLE: example GITcone; shows an example
 "
 {
@@ -1660,6 +1659,33 @@ EXAMPLE: example GITcone; shows an example
   Hash = intvec(Hash[2..size(Hash)]);
   return(convexIntersection(OCrelcones),Hash);
 }
+example {
+  echo=2;
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+
+  list AF= afaces(J,nrows(Q));
+  AF=fullDimImages(AF,Q);
+  AF = minimalAfaces(AF);
+  list OC = orbitCones(AF,Q);
+  bigintmat w[1][ncols(Q)];
+  for(int i = 1; i <= nrows(Q); i++){
+    w = w + Q[i,1..ncols(Q)];
+  }
+  GITcone(OC,w);
+}
+
 
 static proc gitConeFromHash(list OC, intvec Hash)
 {
@@ -2139,7 +2165,30 @@ EXAMPLE: example minimalAfaces; shows an example
   }
   return(listOfAfaces);
 }
-
+example 
+{
+  echo=2;
+  setcores(4);
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list AF= afaces(J,nrows(Q));
+  size(AF);
+  AF=fullDimImages(AF,Q);
+  size(AF);
+  AF=minimalAfaces(AF);
+  size(AF);
+}
 
 
 
