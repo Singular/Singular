@@ -8,6 +8,8 @@
 #include "nforder.h"
 #include <coeffs/bigintmat.h>
 
+
+#ifdef SINGULAR_4_2
 extern n_coeffType nforder_type;
 
 static void WriteRing(const coeffs r, BOOLEAN details)
@@ -265,5 +267,6 @@ BOOLEAN n_nfOrderInit(coeffs r,  void * parameter)
 #endif
   return FALSE;
 }
+#endif /* SINGULAR_4_2 */
 
 
