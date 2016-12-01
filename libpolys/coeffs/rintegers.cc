@@ -128,6 +128,37 @@ number  nrzExtGcd (number a, number b, number *s, number *t, const coeffs)
   return (number) erg;
 }
 
+number  nrzXExtGcd (number a, number b, number *s, number *t, number *u, number *v, const coeffs )
+{
+  mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
+  mpz_ptr bs = (mpz_ptr) omAllocBin(gmp_nrz_bin);
+  mpz_ptr bt = (mpz_ptr) omAllocBin(gmp_nrz_bin);
+  mpz_init(erg);
+  mpz_init(bs);
+  mpz_init(bt);
+
+  mpz_gcdext(erg, bs, bt, (mpz_ptr)a, (mpz_ptr)b);
+
+  mpz_ptr bu = (mpz_ptr) omAllocBin(gmp_nrz_bin);
+  mpz_ptr bv = (mpz_ptr) omAllocBin(gmp_nrz_bin);
+
+  mpz_init_set(bu, (mpz_ptr) b);
+  mpz_init_set(bv, (mpz_ptr) a);
+
+  assume(mpz_cmp_si(erg, 0));
+
+  mpz_div(bu, bu, erg);
+  mpz_div(bv, bv, erg);
+
+  mpz_mul_si(bu, bu, -1);
+  *u = (number) bu;
+  *v = (number) bv;
+
+  *s = (number) bs;
+  *t = (number) bt;
+  return (number) erg;
+}
+
 void nrzPower (number a, int i, number * result, const coeffs)
 {
   mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
@@ -278,6 +309,15 @@ number nrzExactDiv (number a,number b, const coeffs)
   mpz_init(erg);
   mpz_tdiv_q(erg, (mpz_ptr) a, (mpz_ptr) b);
   return (number) erg;
+}
+
+number nrzQuotRem (number a, number b, number * r, const coeffs )
+{
+  mpz_ptr qq = (mpz_ptr) omAllocBin(gmp_nrz_bin);
+  mpz_init(qq);
+  mpz_init((mpz_ptr)(*r));
+  mpz_fdiv_qr(qq, (mpz_ptr)(*r), (mpz_ptr) a, (mpz_ptr) b);
+  return (number) qq;
 }
 
 number nrzIntMod (number a,number b, const coeffs)
@@ -508,13 +548,12 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfInit = nrzInit;
   r->cfSize  = nrzSize;
   r->cfInt  = nrzInt;
-  //#ifdef HAVE_RINGS
-  r->cfDivComp = nrzDivComp; // only for ring stuff
-  r->cfIsUnit = nrzIsUnit; // only for ring stuff
-  r->cfGetUnit = nrzGetUnit; // only for ring stuff
-  r->cfExtGcd = nrzExtGcd; // only for ring stuff
-  r->cfDivBy = nrzDivBy; // only for ring stuff
-  //#endif
+  r->cfDivComp = nrzDivComp;
+  r->cfIsUnit = nrzIsUnit;
+  r->cfGetUnit = nrzGetUnit;
+  r->cfExtGcd = nrzExtGcd;
+  r->cfXExtGcd = nrzXExtGcd;
+  r->cfDivBy = nrzDivBy;
   r->cfInpNeg   = nrzNeg;
   r->cfInvers= nrzInvers;
   r->cfCopy  = nrzCopy;
