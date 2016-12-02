@@ -299,7 +299,7 @@ static BOOLEAN ndCoeffIsEqual(const coeffs r, n_coeffType n, void *)
 static number ndQuotRem (number a, number b, number * r, const coeffs R)
 {
   // implementation for a field: r: 0, result: n_Div
-  assume(r->is_field);
+  assume(R->is_field);
   *r=n_Init(0,R);
   return n_Div(a,b,R);
 }
