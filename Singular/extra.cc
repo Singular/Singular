@@ -353,28 +353,39 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
    // Hilbert series of non-commutative monomial algebras
     if(strcmp(sys_cmd,"nc_hilb") == 0)
     {
-      ideal i;
-      int lV;
+      ideal i; int lV;
       bool ig = FALSE;
+      bool mgrad = FALSE;
+      bool autop = FALSE;
       if((h != NULL)&&(h->Typ() == IDEAL_CMD))
         i = (ideal)h->Data();
-      else
-      {
+      else{
         WerrorS("ideal expected");
         return TRUE;
       }
       h = h->next;
       if((h != NULL)&&(h->Typ() == INT_CMD))
         lV = (int)(long)h->Data();
-      else
-      {
+      else{
         WerrorS("int expected");
         return TRUE;
       }
       h = h->next;
-      if(h != NULL)
-        ig = TRUE;
-      HilbertSeries_OrbitData(i,lV,ig);
+      while((h != NULL)&&(h->Typ() == INT_CMD))
+      {
+        if((int)(long)h->Data() == 1)
+          ig = TRUE;
+        else if((int)(long)h->Data() == 2)
+          mgrad = TRUE;
+        else if((int)(long)h->Data() == 3)
+           autop = TRUE;
+        h = h->next;
+      }
+      if(h != NULL){
+        WerrorS("int 1,2,3 are expected");
+        return TRUE;
+      }
+      HilbertSeries_OrbitData(i, lV, ig, mgrad, autop);
       return(FALSE);
     }
     else

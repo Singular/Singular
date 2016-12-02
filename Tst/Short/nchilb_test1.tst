@@ -1,10 +1,15 @@
 LIB "tst.lib";
 tst_init();
 LIB"ncHilb.lib";
-
-  ring r=0,(x,y,z),dp;
-  module p1=[1,y,z],[-1,z,y];
-  module p2=[1,x,z,x],[-1,z,x,z];
-  list l1=list(p1,p2);
-  nchilb(l1,6,1);
+    ring r=0,(X,Y,Z),dp;
+    module p1 =[1,Y,Z];
+    module p2 =[1,Y,Z,X];
+    module p3 =[1,Y,Z,Z,X,Z];
+    module p4 =[1,Y,Z,Z,Z,X,Z];
+    module p5 =[1,Y,Z,Z,Z,Z,X,Z];
+    module p6 =[1,Y,Z,Z,Z,Z,Z,X,Z];
+    module p7 =[1,Y,Z,Z,Z,Z,Z,Z,X,Z];
+    module p8 =[1,Y,Z,Z,Z,Z,Z,Z,Z,X,Z];
+    list l1=list(p1,p2,p3,p4,p5,p6,p7,p8);
+    nchilb(l1,10);
 tst_status(1);$
