@@ -14,6 +14,7 @@
 #include <reporter/reporter.h>
 
 #include "coeffs.h"
+#include "longrat.h"
 #include "numbers.h"
 
 #include "si_gmp.h"
@@ -279,7 +280,7 @@ static number nrzQuotRem (number a, number b, number * r, const coeffs )
   }
   else
   {
-    *r=rr;
+    *r=(number)rr;
   }
   return (number) qq;
 }
@@ -544,6 +545,7 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfQuot1 = nrzQuot1;
   r->convSingNFactoryN=nrzConvSingNFactoryN;
   r->convFactoryNSingN=nrzConvFactoryNSingN;
+  r->cfChineseRemainder=nlChineseRemainderSym;
   // debug stuff
 
 #ifdef LDEBUG
@@ -1781,6 +1783,8 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfFarey = nrzFarey;
 
   r->cfQuot1 = nrzQuot1;
+  // requires conversion to factory:
+  r->cfChineseRemainder=nlChineseRemainderSym;
   // debug stuff
 
 #ifdef LDEBUG
