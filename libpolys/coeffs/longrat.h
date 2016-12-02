@@ -130,6 +130,9 @@ number   nlInit2gmp (mpz_t i, mpz_t j, const coeffs r);
 void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(number n, number &i,const coeffs r)???
 number nlMapGMP(number from, const coeffs src, const coeffs dst);
 #  endif
+// for ring similiar to Q/Z (char 0 required):
+number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, CFArray &inv_cache,const coeffs CF);
+
 
 #endif
 

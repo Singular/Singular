@@ -72,7 +72,6 @@ const char *   nlRead (const char *s, number *a, const coeffs r);
 void     nlWrite(number a, const coeffs r);
 
 void     nlCoeffWrite(const coeffs r, BOOLEAN details);
-number   nlChineseRemainder(number *x, number *q,int rl, const coeffs C);
 number   nlFarey(number nN, number nP, const coeffs CF);
 
 #ifdef LDEBUG
@@ -2941,24 +2940,28 @@ number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, CFArray
   if (sym)
   {
     number p=CF->convFactoryNSingN(qnew,CF);
-    number p2=nlIntDiv(p,nlInit(2, CF),CF);
-    if (nlGreater(n,p2,CF))
+    number p2;
+    if (getCoeffType(CF) == n_Q) p2=nlIntDiv(p,nlInit(2, CF),CF);
+    else                         p2=CF->cfDiv(p,CF->cfInit(2, CF),CF);
+    if (CF->cfGreater(n,p2,CF))
     {
-       number n2=nlSub(n,p,CF);
-       nlDelete(&n,CF);
+       number n2=CF->cfSub(n,p,CF);
+       CF->cfDelete(&n,CF);
        n=n2;
     }
-    nlDelete(&p2,CF);
-    nlDelete(&p,CF);
+    CF->cfDelete(&p2,CF);
+    CF->cfDelete(&p,CF);
   }
-  nlNormalize(n,CF);
+  CF->cfNormalize(n,CF);
   return n;
 }
-number   nlChineseRemainder(number *x, number *q,int rl, const coeffs C)
+#if 0
+number nlChineseRemainder(number *x, number *q,int rl, const coeffs C)
 {
   CFArray inv(rl);
   return nlChineseRemainderSym(x,q,rl,TRUE,inv,C);
 }
+#endif
 
 static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
 {
