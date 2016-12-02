@@ -269,8 +269,18 @@ static number nrzQuotRem (number a, number b, number * r, const coeffs )
 {
   mpz_ptr qq = (mpz_ptr) omAllocBin(gmp_nrz_bin);
   mpz_init(qq);
-  mpz_init((mpz_ptr)(*r));
-  mpz_fdiv_qr(qq, (mpz_ptr)(*r), (mpz_ptr) a, (mpz_ptr) b);
+  mpz_ptr rr = (mpz_ptr) omAllocBin(gmp_nrz_bin);
+  mpz_init(rr);
+  mpz_tdiv_qr(qq, rr, (mpz_ptr) a, (mpz_ptr) b);
+  if (r==NULL)
+  {
+    mpz_clear(rr);
+    omFreeBin(rr,gmp_nrz_bin);
+  }
+  else
+  {
+    *r=rr;
+  }
   return (number) qq;
 }
 
