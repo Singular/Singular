@@ -27,8 +27,8 @@
 
 // ---------------- Singular standard types etc.
 /* SI_INTEGER_VARIANT: 1: from longrat.cc
- *                     2: GMP
- *                     3: rintegers.cc */
+ *                     2: GMP (in rintegers.cc)
+ *                     3: CF (in rintegers.cc) */
 #define SI_INTEGER_VARIANT 2
 
 /* SI_BIGINT_VARIANT: 1: from longrat.cc
