@@ -86,6 +86,23 @@ void    nrnCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
   omFreeSize((ADDRESS)s, l);
 }
 
+static char* nrnCoeffName_buff=NULL;
+static char* nrnCoeffName(const coeffs r)
+{
+  if(nrnCoeffName_buff==NULL) omFree(nrnCoeffName_buff);
+  size_t l = (size_t)mpz_sizeinbase(r->modBase, 10) + 2;
+  nrnCoeffName_buff=(char*)omAlloc(l+6);
+  char* s = (char*) omAlloc(l);
+  s= mpz_get_str (s, 10, r->modBase);
+  if (nCoeff_is_Ring_ModN(r))
+    snprintf(nrnCoeffName_buff,l+6,"ZZ/%s",s);
+  else if (nCoeff_is_Ring_PtoM(r))
+    snprintf(nrnCoeffName_buff,l+6,"ZZ/%s^lu",s,r->modExponent);
+  omFreeSize((ADDRESS)s, l);
+  return nrnCoeffName_buff;
+}
+
+
 static BOOLEAN nrnCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
 {
   /* test, if r is an instance of nInitCoeffs(n,parameter) */
@@ -213,6 +230,7 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->cfExtGcd      = nrnExtGcd;
   r->cfXExtGcd     = nrnXExtGcd;
   r->cfQuotRem     = nrnQuotRem;
+  r->cfCoeffName   = nrnCoeffName;
   r->cfCoeffWrite  = nrnCoeffWrite;
   r->nCoeffIsEqual = nrnCoeffsEqual;
   r->cfKillChar    = nrnKillChar;
