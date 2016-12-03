@@ -1176,8 +1176,14 @@ BOOLEAN iiDefaultParameter(leftv p)
   tmp.data=at->CopyA();
   return iiAssign(p,&tmp);
 }
-BOOLEAN iiBranchTo(leftv, leftv args)
+BOOLEAN iiBranchTo(leftv res, leftv args)
 {
+  // must be inside a proc, as we simultae an proc_end at the end
+  if (myynest==0)
+  {
+    WerrorS("branchTo can only occur in a proc");
+    return TRUE;
+  }
   // <string1...stringN>,<proc>
   // known: args!=NULL, l>=1
   int l=args->listLength();
@@ -1185,6 +1191,7 @@ BOOLEAN iiBranchTo(leftv, leftv args)
   if (iiCurrArgs!=NULL) ll=iiCurrArgs->listLength();
   if (ll!=(l-1)) return FALSE;
   leftv h=args;
+  // set up the table for type test:
   short *t=(short*)omAlloc(l*sizeof(short));
   t[0]=l-1;
   int b;
@@ -1210,22 +1217,23 @@ BOOLEAN iiBranchTo(leftv, leftv args)
   if (h->Typ()!=PROC_CMD)
   {
     omFree(t);
-    Werror("last arg (%d) is not a proc",i);
+    Werror("last arg (%d) is not a proc(%d), nest=%d",i,h->Typ(),myynest);
     return TRUE;
   }
   b=iiCheckTypes(iiCurrArgs,t,0);
   omFree(t);
   if (b && (h->rtyp==IDHDL) && (h->e==NULL))
   {
-    BOOLEAN err;
-    //Print("branchTo: %s\n",h->Name());
+    // get the proc:
     iiCurrProc=(idhdl)h->data;
     procinfo * pi=IDPROC(iiCurrProc);
+    // already loaded ?
     if( pi->data.s.body==NULL )
     {
       iiGetLibProcBuffer(pi);
       if (pi->data.s.body==NULL) return TRUE;
     }
+    // set currPackHdl/currPack
     if ((pi->pack!=NULL)&&(currPack!=pi->pack))
     {
       currPack=pi->pack;
@@ -1233,9 +1241,18 @@ BOOLEAN iiBranchTo(leftv, leftv args)
       currPackHdl=packFindHdl(currPack);
       //Print("set pack=%s\n",IDID(currPackHdl));
     }
-    err=iiAllStart(pi,pi->data.s.body,BT_proc,pi->data.s.body_lineno-(iiCurrArgs==NULL));
-    exitBuffer(BT_proc);
-    myynest--;
+    // see iiAllStart:
+    BITSET save1=si_opt_1;
+    BITSET save2=si_opt_2;
+    newBuffer( omStrDup(pi->data.s.body), BT_proc,
+               pi, pi->data.s.body_lineno-(iiCurrArgs==NULL) );
+    BOOLEAN err=yyparse();
+    si_opt_1=save1;
+    si_opt_2=save2;
+    // now save the return-expr.
+    memcpy(res,&iiRETURNEXPR,sizeof(sleftv));
+    iiRETURNEXPR.Init();
+    // warning about args.:
     if (iiCurrArgs!=NULL)
     {
       if (err==0) Warn("too many arguments for %s",IDID(iiCurrProc));
@@ -1243,6 +1260,17 @@ BOOLEAN iiBranchTo(leftv, leftv args)
       omFreeBin((ADDRESS)iiCurrArgs, sleftv_bin);
       iiCurrArgs=NULL;
     }
+    // similate proc_end:
+    // - leave input
+    void myychangebuffer();
+    myychangebuffer();
+    // - set the current buffer to its end (this is a pointer in a buffer,
+    //   not a file ptr) "branchTo" is only valid in proc)
+    currentVoice->fptr=strlen(currentVoice->buffer);
+    // - kill local vars
+    killlocals(myynest);
+    // - return
+    newBuffer(omStrDup("\n;return();\n"),BT_execute);
     return (err!=0);
   }
   return FALSE;

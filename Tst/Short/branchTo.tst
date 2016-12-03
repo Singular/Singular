@@ -13,6 +13,10 @@ tst_init();
   p(1);
   p("hu");
   p("ha","ha");
+// returning stuff:
+proc square(int i){return(i^2);};
+proc tst(){branchTo("int",square); ERROR("No method found");}
+tst(2);
 
 tst_status(1);$;
 
