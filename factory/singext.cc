@@ -69,12 +69,12 @@ int gf_value (const CanonicalForm & f )
 
 CanonicalForm make_cf ( const mpz_ptr n )
 {
-    if (ABS(n->_mp_size)<=1)
-    {
-      long value=mpz_get_si(n);
-      if(value >= MINIMMEDIATE && value <= MAXIMMEDIATE )
-        return CanonicalForm(int2imm( value ));
-    }
+    //if (ABS(n->_mp_size)<=1)
+    //{
+    //  long value=mpz_get_si(n);
+    //  if(value >= MINIMMEDIATE && value <= MAXIMMEDIATE )
+    //    return CanonicalForm(int2imm( value ));
+    //}
     return CanonicalForm( CFFactory::basic( n ) );
 }
 
