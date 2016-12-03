@@ -821,7 +821,7 @@ const struct sValCmd3 dArith3[]=
 ,{NULL_VAL,            0,          0,          0,          0,          0        , NO_PLURAL |NO_RING}
 };
 /*=================== operations with many arg.: table =================*/
-/* number_of_args:  -1: any), -2: any >0, .. */
+/* number_of_args:  -1: any, -2: any >0, 1: 1, 2: 2, .. */
 const struct sValCmdM dArithM[]=
 {
 // operations:
@@ -830,7 +830,7 @@ const struct sValCmdM dArithM[]=
 ,{D(jjRING_PL),   '[',             RING_CMD,           -2      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBREAK0),    BREAKPOINT_CMD,  NONE,               0       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBREAK1),    BREAKPOINT_CMD,  NONE,               -2      , ALLOW_PLURAL |ALLOW_RING}
-,{D(iiBranchTo),  BRANCHTO_CMD,    NONE,               -2      , ALLOW_PLURAL |ALLOW_RING}
+,{D(iiBranchTo),  BRANCHTO_CMD,    ANY_TYPE,           -2      , ALLOW_PLURAL |ALLOW_RING}
 #ifdef SINGULAR_4_2
 ,{D(jjCALL3ARG),  CMATRIX_CMD,     CMATRIX_CMD,        3       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL2ARG),  CNUMBER_CMD,     CNUMBER_CMD,        2       , ALLOW_PLURAL |ALLOW_RING}
