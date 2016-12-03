@@ -2330,4 +2330,11 @@ void myyoldbuffer(void * oldb)
   //yy_flush_buffer((YY_BUFFER_STATE)oldb);
 }
 
+void myychangebuffer()
+{
+  yy_flush_buffer((YY_BUFFER_STATE)YY_CURRENT_BUFFER);
+  yy_delete_buffer(YY_CURRENT_BUFFER);
+  yy_switch_to_buffer(yy_create_buffer(NULL, YY_BUF_SIZE));
+}
+
 void my_yy_flush() { YY_FLUSH_BUFFER;BEGIN(0); }
