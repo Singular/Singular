@@ -23,58 +23,19 @@
 
 #ifdef HAVE_RINGS
 
-number  nrnCopy        (number a, const coeffs r);
-int     nrnSize        (number a, const coeffs r);
-void    nrnDelete      (number *a, const coeffs r);
-BOOLEAN nrnGreaterZero (number k, const coeffs r);
-number  nrnMult        (number a, number b, const coeffs r);
-number  nrnInit        (long i, const coeffs r);
-long    nrnInt         (number &n, const coeffs r);
-number  nrnAdd         (number a, number b, const coeffs r);
-number  nrnSub         (number a, number b, const coeffs r);
-void    nrnPower       (number a, int i, number * result, const coeffs r);
-BOOLEAN nrnIsZero      (number a, const coeffs r);
-BOOLEAN nrnIsOne       (number a, const coeffs r);
-BOOLEAN nrnIsMOne      (number a, const coeffs r);
-BOOLEAN nrnIsUnit      (number a, const coeffs r);
-number  nrnGetUnit     (number a, const coeffs r);
-number  nrnAnn         (number a, const coeffs r);
-number  nrnDiv         (number a, number b, const coeffs r);
-number  nrnMod         (number a,number b, const coeffs r);
-number  nrnIntDiv      (number a,number b, const coeffs r);
-number  nrnNeg         (number c, const coeffs r);
-number  nrnInvers      (number c, const coeffs r);
-BOOLEAN nrnGreater     (number a, number b, const coeffs r);
-BOOLEAN nrnDivBy       (number a, number b, const coeffs r);
-int     nrnDivComp     (number a, number b, const coeffs r);
-BOOLEAN nrnEqual       (number a, number b, const coeffs r);
-number  nrnLcm         (number a,number b, const coeffs r);
-number  nrnGcd         (number a,number b, const coeffs r);
-number  nrnExtGcd      (number a, number b, number *s, number *t, const coeffs r);
-number  nrnXExtGcd      (number a, number b, number *s, number *t, number *u, number *v, const coeffs r);
-number  nrnQuotRem      (number a, number b, number *s, const coeffs r);
-nMapFunc nrnSetMap     (const coeffs src, const coeffs dst);
 #if SI_INTEGER_VARIANT==2
 // FIXME? TODO? // extern void    nrzWrite       (number &a, const coeffs r); // FIXME
 # define  nrnWrite      nrzWrite
 #else
 void nrnWrite (number a, const coeffs);
 #endif
-const char *  nrnRead  (const char *s, number *a, const coeffs r);
-void     nrnCoeffWrite (const coeffs r, BOOLEAN details);
 #ifdef LDEBUG
 BOOLEAN nrnDBTest      (number a, const char *f, const int l, const coeffs r);
 #endif
-void    nrnSetExp(unsigned long c, const coeffs r);
-void    nrnInitExp(unsigned long c, const coeffs r);
-coeffs  nrnQuot1(number c, const coeffs r);
-
-number nrnMapQ(number from, const coeffs src, const coeffs dst);
-
 
 extern omBin gmp_nrz_bin;
 
-void    nrnCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
+static void nrnCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
   size_t l = (size_t)mpz_sizeinbase(r->modBase, 10) + 2;
   char* s = (char*) omAlloc(l);
@@ -129,7 +90,7 @@ static void nrnKillChar(coeffs r)
   omFreeBin((void *) r->modNumber, gmp_nrz_bin);
 }
 
-coeffs nrnQuot1(number c, const coeffs r)
+static coeffs nrnQuot1(number c, const coeffs r)
 {
     coeffs rr;
     long ch = r->cfInt(c, r);
@@ -174,77 +135,17 @@ coeffs nrnQuot1(number c, const coeffs r)
     return(rr);
 }
 
-/* for initializing function pointers */
-BOOLEAN nrnInitChar (coeffs r, void* p)
+static number nrnCopy(number a, const coeffs)
 {
-  assume( (getCoeffType(r) == n_Zn) || (getCoeffType (r) == n_Znm) );
-  ZnmInfo * info= (ZnmInfo *) p;
-  r->modBase= (mpz_ptr)nrnCopy((number)info->base, r); //this circumvents the problem
-  //in bigintmat.cc where we cannot create a "legal" nrn that can be freed.
-  //If we take a copy, we can do whatever we want.
-
-  nrnInitExp (info->exp, r);
-
-  /* next computation may yield wrong characteristic as r->modNumber
-     is a GMP number */
-  r->ch = mpz_get_ui(r->modNumber);
-
-  r->is_field=FALSE;
-  r->is_domain=FALSE;
-  r->rep=n_rep_gmp;
-
-
-  r->cfCoeffString = nrnCoeffString;
-
-  r->cfInit        = nrnInit;
-  r->cfDelete      = nrnDelete;
-  r->cfCopy        = nrnCopy;
-  r->cfSize        = nrnSize;
-  r->cfInt         = nrnInt;
-  r->cfAdd         = nrnAdd;
-  r->cfSub         = nrnSub;
-  r->cfMult        = nrnMult;
-  r->cfDiv         = nrnDiv;
-  r->cfAnn         = nrnAnn;
-  r->cfIntMod      = nrnMod;
-  r->cfExactDiv    = nrnDiv;
-  r->cfInpNeg         = nrnNeg;
-  r->cfInvers      = nrnInvers;
-  r->cfDivBy       = nrnDivBy;
-  r->cfDivComp     = nrnDivComp;
-  r->cfGreater     = nrnGreater;
-  r->cfEqual       = nrnEqual;
-  r->cfIsZero      = nrnIsZero;
-  r->cfIsOne       = nrnIsOne;
-  r->cfIsMOne      = nrnIsMOne;
-  r->cfGreaterZero = nrnGreaterZero;
-  r->cfWriteLong   = nrnWrite;
-  r->cfRead        = nrnRead;
-  r->cfPower       = nrnPower;
-  r->cfSetMap      = nrnSetMap;
-  //r->cfNormalize   = ndNormalize;
-  r->cfLcm         = nrnLcm;
-  r->cfGcd         = nrnGcd;
-  r->cfIsUnit      = nrnIsUnit;
-  r->cfGetUnit     = nrnGetUnit;
-  r->cfExtGcd      = nrnExtGcd;
-  r->cfXExtGcd     = nrnXExtGcd;
-  r->cfQuotRem     = nrnQuotRem;
-  r->cfCoeffName   = nrnCoeffName;
-  r->cfCoeffWrite  = nrnCoeffWrite;
-  r->nCoeffIsEqual = nrnCoeffsEqual;
-  r->cfKillChar    = nrnKillChar;
-  r->cfQuot1       = nrnQuot1;
-#ifdef LDEBUG
-  r->cfDBTest      = nrnDBTest;
-#endif
-  return FALSE;
+  mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
+  mpz_init_set(erg, (mpz_ptr) a);
+  return (number) erg;
 }
 
 /*
  * create a number from int
  */
-number nrnInit(long i, const coeffs r)
+static number nrnInit(long i, const coeffs r)
 {
   mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
   mpz_init_set_si(erg, i);
@@ -252,7 +153,7 @@ number nrnInit(long i, const coeffs r)
   return (number) erg;
 }
 
-void nrnDelete(number *a, const coeffs)
+static void nrnDelete(number *a, const coeffs)
 {
   if (*a == NULL) return;
   mpz_clear((mpz_ptr) *a);
@@ -260,14 +161,7 @@ void nrnDelete(number *a, const coeffs)
   *a = NULL;
 }
 
-number nrnCopy(number a, const coeffs)
-{
-  mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
-  mpz_init_set(erg, (mpz_ptr) a);
-  return (number) erg;
-}
-
-int nrnSize(number a, const coeffs)
+static int nrnSize(number a, const coeffs)
 {
   if (a == NULL) return 0;
   return sizeof(mpz_t);
@@ -276,7 +170,7 @@ int nrnSize(number a, const coeffs)
 /*
  * convert a number to int
  */
-long nrnInt(number &n, const coeffs)
+static long nrnInt(number &n, const coeffs)
 {
   return mpz_get_si((mpz_ptr) n);
 }
@@ -284,7 +178,7 @@ long nrnInt(number &n, const coeffs)
 /*
  * Multiply two numbers
  */
-number nrnMult(number a, number b, const coeffs r)
+static number nrnMult(number a, number b, const coeffs r)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -293,7 +187,7 @@ number nrnMult(number a, number b, const coeffs r)
   return (number) erg;
 }
 
-void nrnPower(number a, int i, number * result, const coeffs r)
+static void nrnPower(number a, int i, number * result, const coeffs r)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -301,7 +195,7 @@ void nrnPower(number a, int i, number * result, const coeffs r)
   *result = (number) erg;
 }
 
-number nrnAdd(number a, number b, const coeffs r)
+static number nrnAdd(number a, number b, const coeffs r)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -310,7 +204,7 @@ number nrnAdd(number a, number b, const coeffs r)
   return (number) erg;
 }
 
-number nrnSub(number a, number b, const coeffs r)
+static number nrnSub(number a, number b, const coeffs r)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -319,7 +213,15 @@ number nrnSub(number a, number b, const coeffs r)
   return (number) erg;
 }
 
-number nrnNeg(number c, const coeffs r)
+static BOOLEAN nrnIsZero(number a, const coeffs)
+{
+#ifdef LDEBUG
+  if (a == NULL) return FALSE;
+#endif
+  return 0 == mpz_cmpabs_ui((mpz_ptr)a, 0);
+}
+
+static number nrnNeg(number c, const coeffs r)
 {
   if( !nrnIsZero(c, r) )
     // Attention: This method operates in-place.
@@ -327,7 +229,7 @@ number nrnNeg(number c, const coeffs r)
   return c;
 }
 
-number nrnInvers(number c, const coeffs r)
+static number nrnInvers(number c, const coeffs r)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -336,23 +238,10 @@ number nrnInvers(number c, const coeffs r)
 }
 
 /*
- * Give the smallest k, such that a * x = k = b * y has a solution
- * TODO: lcm(gcd,gcd) better than gcd(lcm) ?
- */
-number nrnLcm(number a, number b, const coeffs r)
-{
-  number erg = nrnGcd(NULL, a, r);
-  number tmp = nrnGcd(NULL, b, r);
-  mpz_lcm((mpz_ptr)erg, (mpz_ptr)erg, (mpz_ptr)tmp);
-  nrnDelete(&tmp, r);
-  return (number)erg;
-}
-
-/*
  * Give the largest k, such that a = x * k, b = y * k has
  * a solution.
  */
-number nrnGcd(number a, number b, const coeffs r)
+static number nrnGcd(number a, number b, const coeffs r)
 {
   if ((a == NULL) && (b == NULL)) return nrnInit(0,r);
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
@@ -365,6 +254,19 @@ number nrnGcd(number a, number b, const coeffs r)
     omFreeBin((ADDRESS)erg,gmp_nrz_bin);
     return nrnInit(0,r);
   }
+  return (number)erg;
+}
+
+/*
+ * Give the smallest k, such that a * x = k = b * y has a solution
+ * TODO: lcm(gcd,gcd) better than gcd(lcm) ?
+ */
+static number nrnLcm(number a, number b, const coeffs r)
+{
+  number erg = nrnGcd(NULL, a, r);
+  number tmp = nrnGcd(NULL, b, r);
+  mpz_lcm((mpz_ptr)erg, (mpz_ptr)erg, (mpz_ptr)tmp);
+  nrnDelete(&tmp, r);
   return (number)erg;
 }
 
@@ -392,7 +294,7 @@ number nrnGcd(number a, number b, const coeffs r)
  * the gcdext will return 5 = 1*5 + 0*10
  * however, mod 12, the gcd should be 1
  */
-number nrnExtGcd(number a, number b, number *s, number *t, const coeffs r)
+static number nrnExtGcd(number a, number b, number *s, number *t, const coeffs r)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_ptr bs  = (mpz_ptr)omAllocBin(gmp_nrz_bin);
@@ -407,6 +309,57 @@ number nrnExtGcd(number a, number b, number *s, number *t, const coeffs r)
   *t = (number)bt;
   return (number)erg;
 }
+
+static BOOLEAN nrnIsOne(number a, const coeffs)
+{
+#ifdef LDEBUG
+  if (a == NULL) return FALSE;
+#endif
+  return 0 == mpz_cmp_si((mpz_ptr)a, 1);
+}
+
+static BOOLEAN nrnEqual(number a, number b, const coeffs)
+{
+  return 0 == mpz_cmp((mpz_ptr)a, (mpz_ptr)b);
+}
+
+static number nrnGetUnit(number k, const coeffs r)
+{
+  if (mpz_divisible_p(r->modNumber, (mpz_ptr)k)) return nrnInit(1,r);
+
+  mpz_ptr unit = (mpz_ptr)nrnGcd(k, 0, r);
+  mpz_tdiv_q(unit, (mpz_ptr)k, unit);
+  mpz_ptr gcd = (mpz_ptr)nrnGcd((number)unit, 0, r);
+  if (!nrnIsOne((number)gcd,r))
+  {
+    mpz_ptr ctmp;
+    // tmp := unit^2
+    mpz_ptr tmp = (mpz_ptr) nrnMult((number) unit,(number) unit,r);
+    // gcd_new := gcd(tmp, 0)
+    mpz_ptr gcd_new = (mpz_ptr) nrnGcd((number) tmp, 0, r);
+    while (!nrnEqual((number) gcd_new,(number) gcd,r))
+    {
+      // gcd := gcd_new
+      ctmp = gcd;
+      gcd = gcd_new;
+      gcd_new = ctmp;
+      // tmp := tmp * unit
+      mpz_mul(tmp, tmp, unit);
+      mpz_mod(tmp, tmp, r->modNumber);
+      // gcd_new := gcd(tmp, 0)
+      mpz_gcd(gcd_new, tmp, r->modNumber);
+    }
+    // unit := unit + modNumber / gcd_new
+    mpz_tdiv_q(tmp, r->modNumber, gcd_new);
+    mpz_add(unit, unit, tmp);
+    mpz_mod(unit, unit, r->modNumber);
+    nrnDelete((number*) &gcd_new, NULL);
+    nrnDelete((number*) &tmp, NULL);
+  }
+  nrnDelete((number*) &gcd, NULL);
+  return (number)unit;
+}
+
 /* XExtGcd  returns a unimodular matrix ((s,t)(u,v)) sth.
  * (a,b)^t ((st)(uv)) = (g,0)^t
  * Beware, the ExtGcd will not necessaairly do this.
@@ -416,7 +369,7 @@ number nrnExtGcd(number a, number b, number *s, number *t, const coeffs r)
  */
 
 //#define CF_DEB;
-number nrnXExtGcd(number a, number b, number *s, number *t, number *u, number *v, const coeffs r)
+static number nrnXExtGcd(number a, number b, number *s, number *t, number *u, number *v, const coeffs r)
 {
   number xx;
 #ifdef CF_DEB
@@ -507,24 +460,7 @@ number nrnXExtGcd(number a, number b, number *s, number *t, number *u, number *v
   return (number)erg;
 }
 
-
-BOOLEAN nrnIsZero(number a, const coeffs)
-{
-#ifdef LDEBUG
-  if (a == NULL) return FALSE;
-#endif
-  return 0 == mpz_cmpabs_ui((mpz_ptr)a, 0);
-}
-
-BOOLEAN nrnIsOne(number a, const coeffs)
-{
-#ifdef LDEBUG
-  if (a == NULL) return FALSE;
-#endif
-  return 0 == mpz_cmp_si((mpz_ptr)a, 1);
-}
-
-BOOLEAN nrnIsMOne(number a, const coeffs r)
+static BOOLEAN nrnIsMOne(number a, const coeffs r)
 {
 #ifdef LDEBUG
   if (a == NULL) return FALSE;
@@ -537,22 +473,17 @@ BOOLEAN nrnIsMOne(number a, const coeffs r)
   return erg;
 }
 
-BOOLEAN nrnEqual(number a, number b, const coeffs)
-{
-  return 0 == mpz_cmp((mpz_ptr)a, (mpz_ptr)b);
-}
-
-BOOLEAN nrnGreater(number a, number b, const coeffs)
+static BOOLEAN nrnGreater(number a, number b, const coeffs)
 {
   return 0 < mpz_cmp((mpz_ptr)a, (mpz_ptr)b);
 }
 
-BOOLEAN nrnGreaterZero(number k, const coeffs)
+static BOOLEAN nrnGreaterZero(number k, const coeffs)
 {
   return 0 < mpz_cmp_si((mpz_ptr)k, 0);
 }
 
-BOOLEAN nrnIsUnit(number a, const coeffs r)
+static BOOLEAN nrnIsUnit(number a, const coeffs r)
 {
   number tmp = nrnGcd(a, (number)r->modNumber, r);
   bool res = nrnIsOne(tmp, r);
@@ -560,44 +491,7 @@ BOOLEAN nrnIsUnit(number a, const coeffs r)
   return res;
 }
 
-number nrnGetUnit(number k, const coeffs r)
-{
-  if (mpz_divisible_p(r->modNumber, (mpz_ptr)k)) return nrnInit(1,r);
-
-  mpz_ptr unit = (mpz_ptr)nrnGcd(k, 0, r);
-  mpz_tdiv_q(unit, (mpz_ptr)k, unit);
-  mpz_ptr gcd = (mpz_ptr)nrnGcd((number)unit, 0, r);
-  if (!nrnIsOne((number)gcd,r))
-  {
-    mpz_ptr ctmp;
-    // tmp := unit^2
-    mpz_ptr tmp = (mpz_ptr) nrnMult((number) unit,(number) unit,r);
-    // gcd_new := gcd(tmp, 0)
-    mpz_ptr gcd_new = (mpz_ptr) nrnGcd((number) tmp, 0, r);
-    while (!nrnEqual((number) gcd_new,(number) gcd,r))
-    {
-      // gcd := gcd_new
-      ctmp = gcd;
-      gcd = gcd_new;
-      gcd_new = ctmp;
-      // tmp := tmp * unit
-      mpz_mul(tmp, tmp, unit);
-      mpz_mod(tmp, tmp, r->modNumber);
-      // gcd_new := gcd(tmp, 0)
-      mpz_gcd(gcd_new, tmp, r->modNumber);
-    }
-    // unit := unit + modNumber / gcd_new
-    mpz_tdiv_q(tmp, r->modNumber, gcd_new);
-    mpz_add(unit, unit, tmp);
-    mpz_mod(unit, unit, r->modNumber);
-    nrnDelete((number*) &gcd_new, NULL);
-    nrnDelete((number*) &tmp, NULL);
-  }
-  nrnDelete((number*) &gcd, NULL);
-  return (number)unit;
-}
-
-number nrnAnn(number k, const coeffs r)
+static number nrnAnn(number k, const coeffs r)
 {
   mpz_ptr tmp = (mpz_ptr) omAllocBin(gmp_nrz_bin);
   mpz_init(tmp);
@@ -610,7 +504,7 @@ number nrnAnn(number k, const coeffs r)
   return (number) tmp;
 }
 
-BOOLEAN nrnDivBy(number a, number b, const coeffs r)
+static BOOLEAN nrnDivBy(number a, number b, const coeffs r)
 {
   if (a == NULL)
     return mpz_divisible_p(r->modNumber, (mpz_ptr)b);
@@ -624,7 +518,7 @@ BOOLEAN nrnDivBy(number a, number b, const coeffs r)
   }
 }
 
-int nrnDivComp(number a, number b, const coeffs r)
+static int nrnDivComp(number a, number b, const coeffs r)
 {
   if (nrnEqual(a, b,r)) return 2;
   if (mpz_divisible_p((mpz_ptr) a, (mpz_ptr) b)) return -1;
@@ -632,7 +526,7 @@ int nrnDivComp(number a, number b, const coeffs r)
   return 0;
 }
 
-number nrnDiv(number a, number b, const coeffs r)
+static number nrnDiv(number a, number b, const coeffs r)
 {
   if (a == NULL) a = (number)r->modNumber;
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
@@ -665,7 +559,7 @@ number nrnDiv(number a, number b, const coeffs r)
   }
 }
 
-number nrnMod(number a, number b, const coeffs r)
+static number nrnMod(number a, number b, const coeffs r)
 {
   /*
     We need to return the number rr which is uniquely determined by the
@@ -697,7 +591,7 @@ number nrnMod(number a, number b, const coeffs r)
   return (number)rr;
 }
 
-number nrnIntDiv(number a, number b, const coeffs r)
+static number nrnIntDiv(number a, number b, const coeffs r)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -721,7 +615,7 @@ number nrnIntDiv(number a, number b, const coeffs r)
  * Thus we 1st compute the remainder (similar to nrnMod) and then
  * the exact quotient.
  */
-number nrnQuotRem(number a, number b, number  * rem, const coeffs r)
+static number nrnQuotRem(number a, number b, number  * rem, const coeffs r)
 {
   mpz_t g, aa, bb;
   mpz_ptr qq = (mpz_ptr)omAllocBin(gmp_nrz_bin);
@@ -757,14 +651,14 @@ number nrnQuotRem(number a, number b, number  * rem, const coeffs r)
  * Helper function for computing the module
  */
 
-mpz_ptr nrnMapCoef = NULL;
+static mpz_ptr nrnMapCoef = NULL;
 
-number nrnMapModN(number from, const coeffs /*src*/, const coeffs dst)
+static number nrnMapModN(number from, const coeffs /*src*/, const coeffs dst)
 {
   return nrnMult(from, (number) nrnMapCoef, dst);
 }
 
-number nrnMap2toM(number from, const coeffs /*src*/, const coeffs dst)
+static number nrnMap2toM(number from, const coeffs /*src*/, const coeffs dst)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -773,7 +667,7 @@ number nrnMap2toM(number from, const coeffs /*src*/, const coeffs dst)
   return (number)erg;
 }
 
-number nrnMapZp(number from, const coeffs /*src*/, const coeffs dst)
+static number nrnMapZp(number from, const coeffs /*src*/, const coeffs dst)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -792,7 +686,7 @@ number nrnMapGMP(number from, const coeffs /*src*/, const coeffs dst)
 }
 
 #if SI_INTEGER_VARIANT==3
-number nrnMapZ(number from, const coeffs /*src*/, const coeffs dst)
+static number nrnMapZ(number from, const coeffs /*src*/, const coeffs dst)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   if (n_Z_IS_SMALL(from))
@@ -804,7 +698,7 @@ number nrnMapZ(number from, const coeffs /*src*/, const coeffs dst)
 }
 #elif SI_INTEGER_VARIANT==2
 
-number nrnMapZ(number from, const coeffs src, const coeffs dst)
+static number nrnMapZ(number from, const coeffs src, const coeffs dst)
 {
   if (SR_HDL(from) & SR_INT)
   {
@@ -814,13 +708,13 @@ number nrnMapZ(number from, const coeffs src, const coeffs dst)
   return nrnMapGMP(from,src,dst);
 }
 #elif SI_INTEGER_VARIANT==1
-number nrnMapZ(number from, const coeffs src, const coeffs dst)
+static number nrnMapZ(number from, const coeffs src, const coeffs dst)
 {
   return nrnMapQ(from,src,dst);
 }
 #endif
 #if SI_INTEGER_VARIANT!=2
-void nrnWrite (number a, const coeffs)
+static void nrnWrite (number a, const coeffs)
 {
   char *s,*z;
   if (a==NULL)
@@ -838,7 +732,7 @@ void nrnWrite (number a, const coeffs)
 }
 #endif
 
-number nrnMapQ(number from, const coeffs src, const coeffs dst)
+static number nrnMapQ(number from, const coeffs src, const coeffs dst)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -932,7 +826,7 @@ nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
  * set the exponent (allocate and init tables) (TODO)
  */
 
-void nrnSetExp(unsigned long m, coeffs r)
+static void nrnSetExp(unsigned long m, coeffs r)
 {
   /* clean up former stuff */
   if (r->modNumber != NULL) mpz_clear(r->modNumber);
@@ -944,7 +838,7 @@ void nrnSetExp(unsigned long m, coeffs r)
 }
 
 /* We expect this ring to be Z/n^m for some m > 0 and for some n > 2 which is not a prime. */
-void nrnInitExp(unsigned long m, coeffs r)
+static void nrnInitExp(unsigned long m, coeffs r)
 {
   nrnSetExp(m, r);
   assume (r->modNumber != NULL);
@@ -993,7 +887,7 @@ static const char * nlCPEatLongC(char *s, mpz_ptr i)
   return s;
 }
 
-const char * nrnRead (const char *s, number *a, const coeffs r)
+static const char * nrnRead (const char *s, number *a, const coeffs r)
 {
   mpz_ptr z = (mpz_ptr) omAllocBin(gmp_nrz_bin);
   {
@@ -1003,5 +897,73 @@ const char * nrnRead (const char *s, number *a, const coeffs r)
   *a = (number) z;
   return s;
 }
+
+/* for initializing function pointers */
+BOOLEAN nrnInitChar (coeffs r, void* p)
+{
+  assume( (getCoeffType(r) == n_Zn) || (getCoeffType (r) == n_Znm) );
+  ZnmInfo * info= (ZnmInfo *) p;
+  r->modBase= (mpz_ptr)nrnCopy((number)info->base, r); //this circumvents the problem
+  //in bigintmat.cc where we cannot create a "legal" nrn that can be freed.
+  //If we take a copy, we can do whatever we want.
+
+  nrnInitExp (info->exp, r);
+
+  /* next computation may yield wrong characteristic as r->modNumber
+     is a GMP number */
+  r->ch = mpz_get_ui(r->modNumber);
+
+  r->is_field=FALSE;
+  r->is_domain=FALSE;
+  r->rep=n_rep_gmp;
+
+
+  r->cfCoeffString = nrnCoeffString;
+
+  r->cfInit        = nrnInit;
+  r->cfDelete      = nrnDelete;
+  r->cfCopy        = nrnCopy;
+  r->cfSize        = nrnSize;
+  r->cfInt         = nrnInt;
+  r->cfAdd         = nrnAdd;
+  r->cfSub         = nrnSub;
+  r->cfMult        = nrnMult;
+  r->cfDiv         = nrnDiv;
+  r->cfAnn         = nrnAnn;
+  r->cfIntMod      = nrnMod;
+  r->cfExactDiv    = nrnDiv;
+  r->cfInpNeg         = nrnNeg;
+  r->cfInvers      = nrnInvers;
+  r->cfDivBy       = nrnDivBy;
+  r->cfDivComp     = nrnDivComp;
+  r->cfGreater     = nrnGreater;
+  r->cfEqual       = nrnEqual;
+  r->cfIsZero      = nrnIsZero;
+  r->cfIsOne       = nrnIsOne;
+  r->cfIsMOne      = nrnIsMOne;
+  r->cfGreaterZero = nrnGreaterZero;
+  r->cfWriteLong   = nrnWrite;
+  r->cfRead        = nrnRead;
+  r->cfPower       = nrnPower;
+  r->cfSetMap      = nrnSetMap;
+  //r->cfNormalize   = ndNormalize;
+  r->cfLcm         = nrnLcm;
+  r->cfGcd         = nrnGcd;
+  r->cfIsUnit      = nrnIsUnit;
+  r->cfGetUnit     = nrnGetUnit;
+  r->cfExtGcd      = nrnExtGcd;
+  r->cfXExtGcd     = nrnXExtGcd;
+  r->cfQuotRem     = nrnQuotRem;
+  r->cfCoeffName   = nrnCoeffName;
+  r->cfCoeffWrite  = nrnCoeffWrite;
+  r->nCoeffIsEqual = nrnCoeffsEqual;
+  r->cfKillChar    = nrnKillChar;
+  r->cfQuot1       = nrnQuot1;
+#ifdef LDEBUG
+  r->cfDBTest      = nrnDBTest;
+#endif
+  return FALSE;
+}
+
 #endif
 /* #ifdef HAVE_RINGS */
