@@ -831,7 +831,7 @@ static char* nfCoeffName(const coeffs r)
 {
   const char *p=n_ParameterNames(r)[0];
   nfCoeffName_buf[31]='\0';
-  snprintf(nfCoeffName_buf,31,"ZZ/%ds[%s]",r->m_nfCharQ,p);
+  snprintf(nfCoeffName_buf,31,"ZZ/%d[%s]",r->m_nfCharQ,p);
   return nfCoeffName_buf;
 }
 
@@ -977,16 +977,15 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
 void    nfCoeffWrite  (const coeffs r, BOOLEAN details)
 {
   // m_nfCharQ = p^k where p is the characteristic (r->CharP) and k is GFDegree
-  Print("//   # ground field : %d\n",r->m_nfCharQ);
-  Print("//   primitive element : %s\n", n_ParameterNames(r)[0]);
+  Print("ZZ/%d[%s]",r->m_nfCharQ,n_ParameterNames(r)[0]);
   if ( details )
   {
-    StringSetS("//   minpoly        : ");
+    StringSetS("\n//   minpoly        : ");
     nfShowMipo(r);
-    StringAppendS("\n");
+    StringAppendS("");
     char *s=StringEndS(); PrintS(s); omFree(s);
   }
-  else PrintS("//   minpoly        : ...\n");
+  else PrintS("//   minpoly        : ...");
 }
 
 static BOOLEAN nfCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)

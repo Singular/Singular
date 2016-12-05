@@ -1,4 +1,4 @@
-1 >> tst_memory_0 :: 1401874129:4.0.0, 32 bit:4.0.0:i686-Linux:mamawutz:969464
-1 >> tst_memory_1 :: 1401874129:4.0.0, 32 bit:4.0.0:i686-Linux:mamawutz:11137024
-1 >> tst_memory_2 :: 1401874129:4.0.0, 32 bit:4.0.0:i686-Linux:mamawutz:11137024
-1 >> tst_timer_1 :: 1401874129:4.0.0, 32 bit:4.0.0:i686-Linux:mamawutz:3635
+1 >> tst_memory_0 :: 1480942444:4100, 64 bit:4.1.0:x86_64-Linux:nepomuck:752040
+1 >> tst_memory_1 :: 1480942444:4100, 64 bit:4.1.0:x86_64-Linux:nepomuck:13430784
+1 >> tst_memory_2 :: 1480942444:4100, 64 bit:4.1.0:x86_64-Linux:nepomuck:13430784
+1 >> tst_timer_1 :: 1480942444:4100, 64 bit:4.1.0:x86_64-Linux:nepomuck:871

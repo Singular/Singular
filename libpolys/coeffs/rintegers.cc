@@ -464,7 +464,7 @@ static const char * nrzRead (const char *s, number *a, const coeffs)
 
 static void nrzCoeffWrite  (const coeffs, BOOLEAN /*details*/)
 {
-  PrintS("//   coeff. ring is : ZZ\n");
+  PrintS("ZZ");
 }
 
 static char* nrzCoeffName(const coeffs)

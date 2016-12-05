@@ -786,14 +786,17 @@ void ntCoeffWrite(const coeffs cf, BOOLEAN details)
   const int P = rVar(A);
   assume( P > 0 );
 
-  Print("//   %d parameter    : ", P);
+  PrintS("(");
 
   for (int nop=0; nop < P; nop ++)
-    Print("%s ", rRingVar(nop, A));
+  {
+    Print("%s", rRingVar(nop, A));
+    if (nop!=P-1) PrintS(", ");
+  }
+
+  PrintS(")");
 
   assume( A->qideal == NULL );
-
-  PrintS("\n//   minpoly        : 0\n");
 
 /*
   PrintS("//   Coefficients live in the rational function field\n");

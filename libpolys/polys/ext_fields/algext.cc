@@ -407,12 +407,15 @@ void naCoeffWrite(const coeffs cf, BOOLEAN details)
   const int P = rVar(A);
   assume( P > 0 );
 
-  Print("//   %d parameter    : ", P);
+  PrintS("[");
 
   for (int nop=0; nop < P; nop ++)
-    Print("%s ", rRingVar(nop, A));
+  {
+    Print("%s", rRingVar(nop, A));
+    if (nop!=P-1) PrintS(", ");
+  }
 
-  PrintLn();
+  PrintS("]/(");
 
   const ideal I = A->qideal;
 
@@ -422,14 +425,11 @@ void naCoeffWrite(const coeffs cf, BOOLEAN details)
 
   if ( details )
   {
-    PrintS("//   minpoly        : (");
     p_Write0( I->m[0], A);
     PrintS(")");
   }
   else
-    PrintS("//   minpoly        : ...");
-
-  PrintLn();
+    PrintS("...)");
 
 /*
   char *x = rRingVar(0, A);

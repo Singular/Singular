@@ -2913,9 +2913,9 @@ number nlExtGcd(number a, number b, number *s, number *t, const coeffs)
 void    nlCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
   if (r->is_field)
-  PrintS("//   characteristic : 0\n");
+  PrintS("QQ");
   else
-  PrintS("//   coeff. ring is : Integers\n");
+  PrintS("ZZ");
 }
 
 int n_SwitchChinRem=0;

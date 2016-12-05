@@ -81,7 +81,7 @@ float nrFloat(number n)
 void    nrCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
   assume( getCoeffType(r) == n_R );
-  PrintS("//   characteristic : 0 (real)\n");  /* R */
+  PrintS("float");  /* R */
 }
 
 

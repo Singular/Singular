@@ -597,6 +597,6 @@ nMapFunc ngfSetMap(const coeffs src, const coeffs dst)
 
 void    ngfCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
-  Print("//   characteristic : 0 (real:%d digits, additional %d digits)\n",
+  Print("float(real:%d digits, additional %d digits)",
                r->float_len,r->float_len2);  /* long R */
 }

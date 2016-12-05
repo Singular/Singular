@@ -57,8 +57,7 @@ static char* nr2mCoeffName(const coeffs cf)
 
 static void    nr2mCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
-  PrintS("//   coeff. ring is : ");
-  Print("Z/2^%lu\n", r->modExponent);
+  Print("Z/2^%lu", r->modExponent);
 }
 
 static BOOLEAN nr2mCoeffIsEqual(const coeffs r, n_coeffType n, void * p)

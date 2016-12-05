@@ -254,6 +254,7 @@ void   rWrite(ring r, BOOLEAN details)
   nblocks--;
 
 
+  PrintS("// coefficients: ");
   if( nCoeff_is_algExt(C) )
   {
     // NOTE: the following (non-thread-safe!) UGLYNESS
@@ -269,6 +270,7 @@ void   rWrite(ring r, BOOLEAN details)
   }
   else
     n_CoeffWrite(C, details);
+  PrintLn();
 //   {
 //     PrintS("//   characteristic : ");
 //
@@ -307,7 +309,7 @@ void   rWrite(ring r, BOOLEAN details)
 //       //}
 //     }
 //   }
-  Print("//   number of vars : %d",r->N);
+  Print("// number of vars : %d",r->N);
 
   //for (nblocks=0; r->order[nblocks]; nblocks++);
   nblocks=rBlocks(r)-1;
@@ -387,7 +389,7 @@ void   rWrite(ring r, BOOLEAN details)
 #ifdef HAVE_PLURAL
   if(rIsPluralRing(r))
   {
-    PrintS("\n//   noncommutative relations:");
+    PrintS("\n// noncommutative relations:");
     if( details )
     {
       poly pl=NULL;
@@ -410,8 +412,8 @@ void   rWrite(ring r, BOOLEAN details)
       PrintS(" ...");
 
 #if MYTEST  /*Singularg should not differ from Singular except in error case*/
-    Print("\n//   noncommutative type:%d", (int)ncRingType(r));
-    Print("\n//      is skew constant:%d",r->GetNC()->IsSkewConstant);
+    Print("\n// noncommutative type:%d", (int)ncRingType(r));
+    Print("\n//    is skew constant:%d",r->GetNC()->IsSkewConstant);
     if( rIsSCA(r) )
     {
       Print("\n//   alternating variables: [%d, %d]", scaFirstAltVar(r), scaLastAltVar(r));

@@ -80,8 +80,8 @@ void    nrnCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
   char* s = (char*) omAlloc(l);
   s= mpz_get_str (s, 10, r->modBase);
 
-  if (nCoeff_is_Ring_ModN(r)) Print("//   coeff. ring is : ZZ/%s\n", s);
-  else if (nCoeff_is_Ring_PtoM(r)) Print("//   coeff. ring is : ZZ/%s^%lu\n", s, r->modExponent);
+  if (nCoeff_is_Ring_ModN(r)) Print("ZZ/bigint(%s)", s);
+  else if (nCoeff_is_Ring_PtoM(r)) Print("ZZ/(bigint(%s)^%lu)", s, r->modExponent);
 
   omFreeSize((ADDRESS)s, l);
 }
@@ -89,7 +89,7 @@ void    nrnCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 static char* nrnCoeffName_buff=NULL;
 static char* nrnCoeffName(const coeffs r)
 {
-  if(nrnCoeffName_buff==NULL) omFree(nrnCoeffName_buff);
+  if(nrnCoeffName_buff!=NULL) omFree(nrnCoeffName_buff);
   size_t l = (size_t)mpz_sizeinbase(r->modBase, 10) + 2;
   nrnCoeffName_buff=(char*)omAlloc(l+6);
   char* s = (char*) omAlloc(l);
@@ -97,7 +97,7 @@ static char* nrnCoeffName(const coeffs r)
   if (nCoeff_is_Ring_ModN(r))
     snprintf(nrnCoeffName_buff,l+6,"ZZ/%s",s);
   else if (nCoeff_is_Ring_PtoM(r))
-    snprintf(nrnCoeffName_buff,l+6,"ZZ/%s^lu",s,r->modExponent);
+    snprintf(nrnCoeffName_buff,l+6,"ZZ/%s^%lu",s,r->modExponent);
   omFreeSize((ADDRESS)s, l);
   return nrnCoeffName_buff;
 }
@@ -359,6 +359,12 @@ number nrnGcd(number a, number b, const coeffs r)
   mpz_init_set(erg, r->modNumber);
   if (a != NULL) mpz_gcd(erg, erg, (mpz_ptr)a);
   if (b != NULL) mpz_gcd(erg, erg, (mpz_ptr)b);
+  if(mpz_cmp(erg,r->modNumber)==0)
+  {
+    mpz_clear(erg);
+    omFreeBin((ADDRESS)erg,gmp_nrz_bin);
+    return nrnInit(0,r);
+  }
   return (number)erg;
 }
 

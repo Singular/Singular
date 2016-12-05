@@ -2230,9 +2230,10 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
   }
   return TRUE;
 err_fetch:
-  Werror("no identity map from %s (%s -> %s)",u->Fullname(),
-         nCoeffString(r->cf),
-         nCoeffString(currRing->cf));
+  char *s1=nCoeffString(r->cf);
+  char *s2=nCoeffString(currRing->cf);
+  Werror("no identity map from %s (%s -> %s)",u->Fullname(),s1,s2);
+  omFree(s2); omFree(s1);
   return TRUE;
 }
 static BOOLEAN jjFIND2(leftv res, leftv u, leftv v)
@@ -3644,7 +3645,7 @@ static BOOLEAN jjBI2N(leftv res, leftv u)
     res->data=nMap(n,coeffs_BIGINT,currRing->cf);
   else
   {
-    Werror("cannot convert bigint to cring %s", nCoeffString(currRing->cf));
+    Werror("cannot convert bigint to cring %s", nCoeffName(currRing->cf));
     bo=TRUE;
   }
   n_Delete(&n,coeffs_BIGINT);
@@ -6975,9 +6976,10 @@ static BOOLEAN jjFETCH_M(leftv res, leftv u)
   }
   return TRUE;
 err_fetch:
-  Werror("no identity map from %s (%s -> %s)",u->Fullname(),
-         nCoeffString(r->cf),
-         nCoeffString(currRing->cf));
+  char *s1=nCoeffString(r->cf);
+  char *s2=nCoeffString(currRing->cf);
+  Werror("no identity map from %s (%s -> %s)",u->Fullname(),s1,s2);
+  omFree(s2);omFree(s1);
   return TRUE;
 }
 static BOOLEAN jjINTERSECT_PL(leftv res, leftv v)
@@ -9264,7 +9266,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   {
     if (nMap==NULL)
     {
-      Werror("not implemented: map bigint -> %s", nCoeffString(cf));
+      Werror("not implemented: map bigint -> %s", nCoeffName(cf));
       return TRUE;
     }
     xx=(number *)omAlloc(rl*sizeof(number));
