@@ -826,6 +826,15 @@ static char* nfCoeffString(const coeffs r)
   return s;
 }
 
+static char nfCoeffName_buf[32];
+static char* nfCoeffName(const coeffs r)
+{
+  const char *p=n_ParameterNames(r)[0];
+  nfCoeffName_buf[31]='\0';
+  snprintf(nfCoeffName_buf,31,"ZZ/%ds[%s]",r->m_nfCharQ,p);
+  return nfCoeffName_buf;
+}
+
 static number nfRandom(siRandProc p,number ,number, const coeffs cf)
 {
   return (number)(long)(p() %(cf->m_nfCharQ+1));
@@ -840,6 +849,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   r->cfKillChar=nfKillChar;
   r->nCoeffIsEqual=nfCoeffIsEqual;
   r->cfCoeffString=nfCoeffString;
+  r->cfCoeffName=nfCoeffName;
 
   r->cfMult  = nfMult;
   r->cfSub   = nfSub;
