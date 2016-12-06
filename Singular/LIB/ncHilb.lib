@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version nc_hilb.lib 4.0.3.3 Nov_2016 "; // $Id$
+version="version nc_hilb.lib 4.1.0.0 Nov_2016 "; // $Id$
 category="Noncommutative algebra";
 info="
 LIBRARY:  ncHilb.lib: A library for computing graded and multi-graded Hilbert
@@ -22,7 +22,7 @@ LIB "freegb.lib";
 proc nchilb(list L_wp, int d, list #)
 "USAGE:  nchilb(list of relations, an integer, optional);
          L is a list of modules (each module represents a free-polynomial),
-         d is an integer for the degree bound (maximal total degree of the 
+         d is an integer for the degree bound (maximal total degree of the
             polynomials of generating set of input ideal),
          #[]=1 represents the case of non-finitely generated ideals,
          #[]=2 is for the computation of multi-graded Hilbert series, and
@@ -48,7 +48,7 @@ EXAMPLE: example nchilb; shows an example "
     int lV=nvars(save);
     int ig, mgrad, odp;
     int i=1;
-    
+
     while(typeof(#[i])=="int" && i<=sz)
     {
       if(#[i] == 1)
@@ -127,7 +127,7 @@ EXAMPLE: example nchilb; shows an example "
         J_lm[i]=leadmonom(I[i]);
     }
     //compute the Hilbert series
-    
+
     system("nc_hilb", J_lm, lV, ig, mgrad, odp);
 }
 example
@@ -153,14 +153,14 @@ example
     module p3=[1,x,z,z,x,z],[-1,z,x,z,z,x];   // x*z^2*x*z-z*x*z^2*x
     module p4=[1,x,z,z,z,x,z];[-1,z,x,z,z,x,x]; // x*z^3*x*z-z*x*z^2*x^2
     list l2=list(p1,p2,p3,p4);
-    
+
     nchilb(l2,6,1); //third argument '1' is for non-finitely generated case
 
     ring r=0,(a,b),dp;
     module p1=[1,a,a,a];
     module p2=[1,a,b,b];
     module p3=[1,a,a,b];
-    
+
     list l3=list(p1,p2,p3);
     nchilb(l3,5,2);//third argument '2' is to compute multi-graded HS
 

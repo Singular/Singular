@@ -8,6 +8,6 @@ LIB"ncHilb.lib";
     module p3=[1,x,z,z,x,z],[-1,z,x,z,z,x];
     module p4=[1,x,z,z,z,x,z];[-1,z,x,z,z,x,x];
     list l2=list(p1,p2,p3,p4);
-    
-    nchilb(l2,6,1); 
+
+    nchilb(l2,6,1);
 tst_status(1);$

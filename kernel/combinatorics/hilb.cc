@@ -1895,8 +1895,8 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp
 
   polist.push_back( p_One(currRing));
 
-  std::vector< std::vector<int> > posMat; 
-  std::vector<int> posRow(lV,0);         
+  std::vector< std::vector<int> > posMat;
+  std::vector<int> posRow(lV,0);
   std::vector<int> C;
 
   int ds, is, ps;
@@ -1945,7 +1945,7 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp
 
       Jwi = colonIdeal(S, wi, lV, Jwi);
       ps = (*POS)(Jwi, wi, idorb, polist, trInd);
-      
+
       if(ps == 0)  // finds a new ideal
       {
         posRow[is-1] = idorb.size();
@@ -1955,20 +1955,20 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp
       }
       else // ideal is already there  in the orbit
       {
-        posRow[is-1]=ps-1;      
+        posRow[is-1]=ps-1;
         idDelete(&Jwi);
         pDelete(&wi);
       }
     }
-    posMat.push_back(posRow); 
-    posRow.resize(lV,0);  
+    posMat.push_back(posRow);
+    posRow.resize(lV,0);
   }
-  int lO = C.size();//size of the orbit 
+  int lO = C.size();//size of the orbit
   PrintLn();
   Print("Maximal length of words = %ld\n", p_Totaldegree(polist[lO-1], currRing));
   Print("\nOrbit length = %d\n", lO);
   PrintLn();
- 
+
   if(odp)
   {
     Print("Words description of the Orbit: \n");
@@ -1991,7 +1991,7 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp
 
   idorb.resize(0);
   polist.resize(0);
-  
+
   int adjMatrix[lO][lO];
   memset(adjMatrix, 0, lO*lO*sizeof(int));
   int rowCount, colCount;
@@ -2007,7 +2007,7 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp
       }
     }
   }
-  
+
   ring r = currRing;
   int npar;
   char** tt;
@@ -2041,7 +2041,7 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp
   matrix mR = mpNew(lO, lO);
   matrix cMat = mpNew(lO,1);
   poly rc;
-  
+
   if(!mgrad)
   {
     for(rowCount = 0; rowCount < lO; rowCount++)
@@ -2062,8 +2062,8 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp
      {
        for(colCount = 0; colCount < lV; colCount++)
        {
-          rc=NULL; 
-          rc=p_One(R); 
+          rc=NULL;
+          rc=p_One(R);
           p_SetCoeff(rc, n_Mult(pGetCoeff(rc), n_Param(colCount+1, R->cf),R->cf), R);
           MATELEM(mR, rowCount +1, posMat[rowCount][colCount]+1)=p_Add_q(rc,MATELEM(mR, rowCount +1, posMat[rowCount][colCount]+1), R);
        }
@@ -2077,7 +2077,7 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp
       MATELEM(cMat, rowCount + 1, 1) = p_ISet(C[rowCount], R);
     }
   }
-  
+
   matrix u;
   unitMatrix(lO, u); //unit matrix
   matrix gMat = mp_Sub(u, mR, R);
@@ -2091,7 +2091,7 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp
       {
         Print("H(%d) = ", rowCount+1);
         for(colCount = 0; colCount < lV; colCount++)
-        {   
+        {
           StringSetS(""); nWrite(n_Param(1, R->cf));
           s = StringEndS(); PrintS(s);
           Print("*"); omFree(s);
