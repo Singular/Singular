@@ -36,6 +36,7 @@
 #include<kernel/linear_algebra/linearAlgebra.h>
 #include <coeffs/numbers.h>
 #include <vector>
+#include <Singular/ipshell.h>
 
 #endif
 
@@ -1684,7 +1685,7 @@ static ideal  minimalMonomialsGenSet(ideal I)
 
       if(p_LmDivisibleBy(I->m[i], I->m[k], currRing))
       {
-        pDelete(&(I->m[k]));//this is not req.
+        pDelete(&(I->m[k]));
         break;
       }
     }
@@ -1855,8 +1856,7 @@ static ideal colonIdeal(ideal S, poly w, int lV, ideal Jwi)
   return(Jwi);
 }
 
-
-void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE )
+void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp)
 {
   /*
    * It is based on iterative right colon operation to the
@@ -1874,6 +1874,11 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE )
   int (*POS)(ideal, poly, std::vector<ideal>, std::vector<poly>, int);
   if(IG_CASE)
   {
+    if(idIs0(S))
+    {
+      WerrorS("wrong input:not the infinitely gen. case");
+        return;
+    }
     trInd = p_Totaldegree(S->m[IDELEMS(S)-1], currRing);
     POS = &positionInOrbit_IG_Case;
   }
@@ -1890,13 +1895,11 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE )
 
   polist.push_back( p_One(currRing));
 
-  std::vector< std::vector<int> > mat;
-  std::vector<int> row;
-  row.push_back(0);
-
+  std::vector< std::vector<int> > posMat; 
+  std::vector<int> posRow(lV,0);         
   std::vector<int> C;
 
-  int ds, is, ps, sz;
+  int ds, is, ps;
   int lpcnt = 0;
 
   poly w, wi;
@@ -1942,25 +1945,39 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE )
 
       Jwi = colonIdeal(S, wi, lV, Jwi);
       ps = (*POS)(Jwi, wi, idorb, polist, trInd);
-
-      if(ps == 0)  // found new colon ideal
+      
+      if(ps == 0)  // finds a new ideal
       {
+        posRow[is-1] = idorb.size();
 
         idorb.push_back(Jwi);
         polist.push_back(wi);
-        row.push_back(1);
       }
-      else // there is a same ideal in the orbit
+      else // ideal is already there  in the orbit
       {
-        row[ps-1] = row[ps-1] + 1;
+        posRow[is-1]=ps-1;      
         idDelete(&Jwi);
         pDelete(&wi);
       }
     }
-    mat.push_back(row);
-    sz = row.size();
-    row.clear();
-    row.resize(sz, 0);
+    posMat.push_back(posRow); 
+    posRow.resize(lV,0);  
+  }
+  int lO = C.size();//size of the orbit 
+  PrintLn();
+  Print("Maximal length of words = %ld\n", p_Totaldegree(polist[lO-1], currRing));
+  Print("\nOrbit length = %d\n", lO);
+  PrintLn();
+ 
+  if(odp)
+  {
+    Print("Words description of the Orbit: \n");
+    for(is = 0; is < lO; is++)
+    {
+      pWrite0(polist[is]);
+      PrintS("    ");
+    }
+    PrintLn();
   }
 
   for(is = idorb.size()-1; is >= 0; is--)
@@ -1974,63 +1991,137 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE )
 
   idorb.resize(0);
   polist.resize(0);
-
-  row.resize(0);
-
+  
+  int adjMatrix[lO][lO];
+  memset(adjMatrix, 0, lO*lO*sizeof(int));
   int rowCount, colCount;
-#if 0
-  for(rowCount = 0; rowCount < mat.size(); rowCount++)
+  int tm = 0;
+  if(!mgrad)
   {
-    for(colCount = 0; colCount  < mat[rowCount].size(); colCount++)
+    for(rowCount = 0; rowCount < lO; rowCount++)
     {
-      Print("%d,",mat[rowCount][colCount]);
+      for(colCount = 0; colCount < lV; colCount++)
+      {
+        tm = posMat[rowCount][colCount];
+        adjMatrix[rowCount][tm] = adjMatrix[rowCount][tm] + 1;
+      }
     }
-    PrintLn();
   }
-  printf("rhs column matrix::\n");
-  for(colCount = 0; colCount < C.size(); colCount++)
-  printf("%d,",C[colCount]);
-  //printf("\nlength of the Orbit==%ld\n", C.size());
-#endif
+  
   ring r = currRing;
-  char** tt=(char**)omalloc(sizeof(char*));
-  tt[0] = omStrDup("t");
+  int npar;
+  char** tt;
   TransExtInfo p;
-  p.r = rDefault(0, 1, tt);
-  coeffs cf = nInitChar(n_transExt,&p);
+  if(!mgrad)
+  {
+    tt=(char**)omalloc(sizeof(char*));
+    tt[0] = omStrDup("t");
+    npar = 1;
+  }
+  else
+  {
+    tt=(char**)omalloc(lV*sizeof(char*));
+    for(is = 0; is < lV; is++)
+    {
+      tt[is] = (char*)omalloc(7*sizeof(char)); //if required enlarge it later
+      sprintf (tt[is], "t(%d)", is+1);
+    }
+    npar = lV;
+  }
 
+  p.r = rDefault(0, npar, tt);
+  coeffs cf = nInitChar(n_transExt, &p);
   char** xx = (char**)omalloc(sizeof(char*));
   xx[0] = omStrDup("x");
   ring R = rDefault(cf, 1, xx);
-  rChangeCurrRing(R);
+  rChangeCurrRing(R);//rWrite(R);
   /*
    * matrix corresponding to the orbit of the ideal
    */
-  int lO = C.size();//size of the orbit
   matrix mR = mpNew(lO, lO);
   matrix cMat = mpNew(lO,1);
+  poly rc;
+  
+  if(!mgrad)
+  {
+    for(rowCount = 0; rowCount < lO; rowCount++)
+    {
+      for(colCount = 0; colCount < lO; colCount++)
+      {
+        if(adjMatrix[rowCount][colCount] != 0)
+        {
+          MATELEM(mR, rowCount + 1, colCount + 1) = p_ISet(adjMatrix[rowCount][colCount], R);
+          p_SetCoeff(MATELEM(mR, rowCount + 1, colCount + 1), n_Mult(pGetCoeff(mR->m[lO*rowCount+colCount]),n_Param(1, R->cf), R->cf), R);
+        }
+      }
+    }
+  }
+  else
+  {
+     for(rowCount = 0; rowCount < lO; rowCount++)
+     {
+       for(colCount = 0; colCount < lV; colCount++)
+       {
+          rc=NULL; 
+          rc=p_One(R); 
+          p_SetCoeff(rc, n_Mult(pGetCoeff(rc), n_Param(colCount+1, R->cf),R->cf), R);
+          MATELEM(mR, rowCount +1, posMat[rowCount][colCount]+1)=p_Add_q(rc,MATELEM(mR, rowCount +1, posMat[rowCount][colCount]+1), R);
+       }
+     }
+  }
 
   for(rowCount = 0; rowCount < lO; rowCount++)
   {
-    for(colCount = 0; colCount < mat[rowCount].size(); colCount++)
-    {
-      if(mat[rowCount][colCount] != 0)
-      {
-       MATELEM(mR, rowCount + 1, colCount + 1) = p_ISet(mat[rowCount][colCount], R);
-        p_SetCoeff(MATELEM(mR, rowCount + 1, colCount + 1), n_Mult(pGetCoeff(mR->m[lO*rowCount+colCount]),n_Param(1, R->cf), R->cf), R);
-      }
-    }
     if(C[rowCount] != 0)
     {
-      cMat->m[rowCount] = p_ISet(C[rowCount], R);
+      MATELEM(cMat, rowCount + 1, 1) = p_ISet(C[rowCount], R);
     }
-    mat[rowCount].resize(0);
   }
-  mat.resize(0);
-  C.resize(0);
+  
   matrix u;
-  unitMatrix(lO,u); //unit matrix
-  matrix gMat=mp_Sub(u,mR,R);
+  unitMatrix(lO, u); //unit matrix
+  matrix gMat = mp_Sub(u, mR, R);
+  char* s;
+  if(odp)
+  {
+    PrintS("\nlinear system:\n");
+    if(!mgrad)
+    {
+      for(rowCount = 0; rowCount < lO; rowCount++)
+      {
+        Print("H(%d) = ", rowCount+1);
+        for(colCount = 0; colCount < lV; colCount++)
+        {   
+          StringSetS(""); nWrite(n_Param(1, R->cf));
+          s = StringEndS(); PrintS(s);
+          Print("*"); omFree(s);
+          Print("H(%d) + ", posMat[rowCount][colCount] + 1);
+        }
+        Print(" %d\n", C[rowCount] );
+      }
+      PrintS("where H(1) represents the series corresp. to input ideal\n");
+      PrintS("and i^th summand in the rhs of an eqn. is according\n");
+      PrintS("to the right colon map corresp. to the i^th variable\n");
+    }
+    else
+    {
+      for(rowCount = 0; rowCount < lO; rowCount++)
+      {
+        Print("H(%d) = ", rowCount+1);
+        for(colCount = 0; colCount < lV; colCount++)
+        {
+           StringSetS(""); nWrite(n_Param(colCount+1, R->cf));
+           s = StringEndS(); PrintS(s);
+           Print("*");omFree(s);
+           Print("H(%d) + ", posMat[rowCount][colCount] + 1);
+        }
+        Print(" %d\n", C[rowCount] );
+      }
+      PrintS("where H(1) represents the series corresp. to input ideal\n");
+    }
+  }
+  posMat.resize(0);
+  C.resize(0);
   matrix pMat;
   matrix lMat;
   matrix uMat;
@@ -2039,25 +2130,33 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE )
   matrix Hnot;
   luSolveViaLUDecomp(pMat, lMat, uMat, cMat, H_serVec, Hnot);
 
-  mp_Delete(&mR,R);
-  mp_Delete(&u,R);
-  mp_Delete(&pMat,R);
-  mp_Delete(&lMat,R);
-  mp_Delete(&uMat,R);
-  mp_Delete(&cMat,R);
-  mp_Delete(&gMat,R);
-  mp_Delete(&Hnot,R);
+  mp_Delete(&mR, R);
+  mp_Delete(&u, R);
+  mp_Delete(&pMat, R);
+  mp_Delete(&lMat, R);
+  mp_Delete(&uMat, R);
+  mp_Delete(&cMat, R);
+  mp_Delete(&gMat, R);
+  mp_Delete(&Hnot, R);
   //print the Hilbert series and Orbit length
   PrintLn();
+  Print("Hilbert series:");
+  PrintLn();
   pWrite(H_serVec->m[0]);
-  Print("\nOrbit size = %d\n", lO);
+  PrintLn();
+  if(!mgrad)
+  {
+    omFree(tt[0]);
+  }
+  else
+  {
+    for(is = lV-1; is >= 0; is--)
 
-  omFree(tt[0]);
+      omFree( tt[is]);
+  }
   omFree(tt);
   omFree(xx[0]);
   omFree(xx);
   rChangeCurrRing(r);
-  rDelete(R);
+  rKill(R);
 }
-
-

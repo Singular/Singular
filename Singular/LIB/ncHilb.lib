@@ -1,10 +1,10 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version nc_hilb.lib 4.0.3.3 Sep_2016 "; // $Id$
+version="version nc_hilb.lib 4.0.3.3 Nov_2016 "; // $Id$
 category="Noncommutative algebra";
 info="
-LIBRARY:  ncHilb.lib: A library for computing the Hilbert series of the
-                       non-commutative monomial algebras (e.g. k<x,y,z>/I,
-                       where I is a two-sided ideal).
+LIBRARY:  ncHilb.lib: A library for computing graded and multi-graded Hilbert
+                      series of the non-commutative monomial algebras
+                      (e.g. k<x,y,z>/I, where I is a two-sided ideal).
 
 AUTHOR:   Sharwan K. Tiwari   stiwari@mathematik.uni-kl.de
 
@@ -13,7 +13,7 @@ REFERENCES:
           non-commutative modules, J. of Symb. Comp. (2016).
 
 PROCEDURES:
-          nchilb(L, d, #); Hilbert series of a non-commutative monomial algebra
+          nchilb(L,d,#); Hilbert series of a non-commutative monomial algebra
 
 ";
 
@@ -22,19 +22,22 @@ LIB "freegb.lib";
 proc nchilb(list L_wp, int d, list #)
 "USAGE:  nchilb(list of relations, an integer, optional);
          L is a list of modules (each module represents a free-polynomial),
-         d is an integer for the degree bound,
-         # != NULL for non-finitely generated ideals;
-NOTE  : The input ideal needs to be given in special form. It is a list
-        of modules, where each generator of every module represents a
-        monomial times a coefficient in the free associative algebra.
-        The first entry, in each generator, represents a coefficient and
-        every next entry is a variable.
-        Ex. module p1=[1,y,z],[-1,z,y] represents the poly y*z-z*y;
+         d is an integer for the degree bound (maximal total degree of the 
+            polynomials of generating set of input ideal),
+         #[]=1 represents the case of non-finitely generated ideals,
+         #[]=2 is for the computation of multi-graded Hilbert series, and
+         #[]=3 is to print the details about the orbit and system of equation.
+
+NOTE  : The generating set of input ideal should be a Groebner basis and needs
+        to be given in a special form. It is a list of modules, where each
+        generator of every module represents a monomial times a coefficient
+        in the free associative algebra. The first entry, in each generator,
+        represents a coefficient and every next entry is a variable.
+        Ex: module p1=[1,y,z],[-1,z,y] represents the poly y*z-z*y;
             module p2=[1,x,z,x],[-1,z,x,z] represents the poly x*z*x-z*x*z
         for more details about the input, see examples.
 EXAMPLE: example nchilb; shows an example "
 {
-
     if (d<1)
     {
       ERROR("bad degree bound");
@@ -43,8 +46,40 @@ EXAMPLE: example nchilb; shows an example "
     def save = basering;
     int sz=size(#);
     int lV=nvars(save);
-
-    def R =makeLetterplaceRing(d);
+    int ig, mgrad, odp;
+    int i=1;
+    
+    while(typeof(#[i])=="int" && i<=sz)
+    {
+      if(#[i] == 1)
+      {
+        ig = 1;
+      }
+      else
+      {
+        if(#[i] == 2)
+        {
+          mgrad = 2;
+        }
+        else
+        {
+          if(#[i] == 3)
+          {
+            odp = 3;
+          }
+          else
+          {
+            ERROR("error:only int 1,2,3 are allowed as optional parameters");
+          }
+        }
+      }
+      i = i + 1;
+    }
+    if( i <= sz)
+    {
+      ERROR("error:only int 1,2,3 are allowed as optional parameters");
+    }
+    def R = makeLetterplaceRing(2*d);
     setring R;
     ideal I;
     poly p;
@@ -52,16 +87,15 @@ EXAMPLE: example nchilb; shows an example "
     // convert list L_wp of free-poly to letterPlace-poly format
     setring save;
     module M;
-    int i,j,k,sw,sm,slm;
+    int j,k,sw,sm,slm;
     vector w;
     poly pc=0;
     intvec v;
-    slm = size(L_wp);                  // number of polys in the given ideal
-
+    slm = size(L_wp);              // number of polys in the given ideal
     for (i=1; i<=slm; i++)
     {
         M  = L_wp[i];
-        sm = ncols(M);                 // number of words in the free-poly M
+        sm = ncols(M);            // number of words in the free-poly M
         for (j=1; j<=sm; j++)
         {
             w  = M[j];
@@ -86,90 +120,49 @@ EXAMPLE: example nchilb; shows an example "
         setring save;
     }
     setring R;
-
-    ideal J = system("freegb",I,d,lV);
-
-    //Groebner Basis is computed for the given ideal.
-    //now compute the leading monomials of the Groebner Basis
-
+    I=simplify(I,2);
     ideal J_lm;
-    for(i=1;i<=size(J);i++)
+    for(i=1;i<=size(I);i++)
     {
-        J_lm[i]=leadmonom(J[i]);
+        J_lm[i]=leadmonom(I[i]);
     }
-
-    setring save;
-    def A =makeLetterplaceRing(2*d);
-    setring A;
-    ideal I=imap(R, J_lm);
-
     //compute the Hilbert series
-
-    if(sz==1)                     // non-finitely generated case
-    {
-        system("nc_hilb",I,lV,1);
-    }
-    else                         // finitely generated case
-    {
-        system("nc_hilb",I,lV);
-    }
+    
+    system("nc_hilb", J_lm, lV, ig, mgrad, odp);
 }
 example
 {
 "EXAMPLE:"; echo = 2;
-    ring r=0,(x,y,z),dp;
-    module p1=[1,y,z],[-1,z,y];           //represents the poly y*z-z*y
-    module p2=[1,x,z,x],[-1,z,x,z];    //represents the poly x*z*x-z*x*z
-    list l1=list(p1,p2);
-    nchilb(l1,6,1); //third argument is for non-finitely generated case
-
-    ring r=0,(x,y,z,w),dp;
-    module p1=[1,y,x],[-1,x,y];            //represents the poly y*x-x*y
-    module p2=[1,z,x],[-1,x,z];
-    module p3=[1,w,x],[-1,x,w];
-    module p4=[1,z,y],[-1,y,z];
-    module p5=[1,w,y],[-1,y,w];
-    module p6=[1,w,z],[-1,z,w];
-    list l2=list(p1,p2,p3,p4,p5,p6);
-    nchilb(l2,5);
 
     ring r=0,(X,Y,Z),dp;
-    module p1 =[1,Y,Z];                //represents the poly Y*Z
-    module p2 =[1,Y,Z,X];
+    module p1 =[1,Y,Z];             //represents the poly Y*Z
+    module p2 =[1,Y,Z,X];          //represents the poly Y*Z*X
     module p3 =[1,Y,Z,Z,X,Z];
     module p4 =[1,Y,Z,Z,Z,X,Z];
     module p5 =[1,Y,Z,Z,Z,Z,X,Z];
     module p6 =[1,Y,Z,Z,Z,Z,Z,X,Z];
     module p7 =[1,Y,Z,Z,Z,Z,Z,Z,X,Z];
     module p8 =[1,Y,Z,Z,Z,Z,Z,Z,Z,X,Z];
-    list l3=list(p1,p2,p3,p4,p5,p6,p7,p8);
-    nchilb(l3,10);
+    list l1=list(p1,p2,p3,p4,p5,p6,p7,p8);
+    nchilb(l1,10);
 
-    ring r=0,U(1..3),dp;
-    module p1=[1,U(2),U(3),U(3)];
-    module p2=[1,U(2),U(2),U(3)];
-    module p3=[1,U(1),U(3),U(3)];
-    module p4=[1,U(1),U(3),U(2)];
-    module p5=[1,U(1),U(2),U(3)];
-    module p6=[1,U(1),U(2),U(2)];
-    module p7=[1,U(1),U(1),U(3)];
-    module p8=[1,U(1),U(1),U(2)];
-    module p9=[1,U(2),U(3),U(2),U(3)];
-    module p10=[1,U(2),U(3),U(1),U(3)];
-    module p11=[1,U(2),U(3),U(1),U(2)];
-    module p12=[1,U(1),U(3),U(1),U(3)];
-    module p13=[1,U(1),U(3),U(1),U(2)];
-    module p14=[1,U(1),U(2),U(1),U(3)];
-    module p15=[1,U(1),U(2),U(1),U(2)];
-    module p16=[1,U(2),U(3),U(2),U(1),U(3)];
-    module p17=[1,U(2),U(3),U(2),U(1),U(2)];
-    module p18=[1,U(2),U(3),U(2),U(2),U(1),U(3)];
-    module p19=[1,U(2),U(3),U(2),U(2),U(1),U(2)];
-    module p20=[1,U(2),U(3),U(2),U(2),U(2),U(1),U(3)];
-    module p21=[1,U(2),U(3),U(2),U(2),U(2),U(1),U(2)];
-    list ll=list(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,
-    p14,p15,p16,p17,p18,p19,p20,p21);
-    nchilb(ll,7,1);
+    ring r=0,(x,y,z),dp;
+
+    module p1=[1,y,z],[-1,z,y];               //y*z-z*y
+    module p2=[1,x,z,x],[-1,z,x,z];           // x*z*x-z*x*z
+    module p3=[1,x,z,z,x,z],[-1,z,x,z,z,x];   // x*z^2*x*z-z*x*z^2*x
+    module p4=[1,x,z,z,z,x,z];[-1,z,x,z,z,x,x]; // x*z^3*x*z-z*x*z^2*x^2
+    list l2=list(p1,p2,p3,p4);
+    
+    nchilb(l2,6,1); //third argument '1' is for non-finitely generated case
+
+    ring r=0,(a,b),dp;
+    module p1=[1,a,a,a];
+    module p2=[1,a,b,b];
+    module p3=[1,a,a,b];
+    
+    list l3=list(p1,p2,p3);
+    nchilb(l3,5,2);//third argument '2' is to compute multi-graded HS
 
     ring r=0,(x,y,z),dp;
     module p1=[1,x,z,y,z,x,z];
@@ -178,7 +171,36 @@ example
     module p4=[1,y,z];
     module p5=[1,x,z,z,x,z];
 
-    list l1=list(p1,p2,p3,p4,p5);
-    nchilb(l1,7);
+    list l4=list(p1,p2,p3,p4,p5);
+    nchilb(l4,7,3); //third argument '3' is to print the details
+                    // of the orbit and system
+
+    ring r=0,(x,y,z),dp;
+
+    module p1=[1,y,z,z];
+    module p2=[1,y,y,z];
+    module p3=[1,x,z,z];
+    module p4=[1,x,z,y];
+    module p5=[1,x,y,z];
+    module p6=[1,x,y,y];
+    module p7=[1,x,x,z];
+    module p8=[1,x,x,y];
+    module p9=[1,y,z,y,z];
+    module p10=[1,y,z,x,z];
+    module p11=[1,y,z,x,y];
+    module p12=[1,x,z,x,z];
+    module p13=[1,x,z,x,y];
+    module p14=[1,x,y,x,z];
+    module p15=[1,x,y,x,y];
+    module p16=[1,y,z,y,x,z];
+    module p17=[1,y,z,y,x,y];
+    module p18=[1,y,z,y,y,x,z];
+    module p19=[1,y,z,y,y,x,y];
+    module p20=[1,y,z,y,y,y,x,z];
+    module p21=[1,y,z,y,y,y,x,y];
+
+    list l5=list(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,
+    p14,p15,p16,p17,p18,p19,p20,p21);
+    nchilb(l5,7,1,2,3);
 }
 

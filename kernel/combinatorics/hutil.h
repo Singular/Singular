@@ -83,5 +83,5 @@ void hDegreeSeries(intvec *s1, intvec *s2, int *co, int *mu);
 
 scfmon hInit(ideal S, ideal Q, int * Nexist, ring tailRing);
 void slicehilb(ideal I);
-void HilbertSeries_OrbitData(ideal S, int lV, bool ig);
+void HilbertSeries_OrbitData(ideal S, int lV, bool ig, bool mgrad, bool odp);
 #endif
