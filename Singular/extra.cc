@@ -359,15 +359,17 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       bool autop = FALSE;
       if((h != NULL)&&(h->Typ() == IDEAL_CMD))
         i = (ideal)h->Data();
-      else{
-        WerrorS("ideal expected");
+      else
+      {
+        WerrorS("nc_Hilb:ideal expected");
         return TRUE;
       }
       h = h->next;
       if((h != NULL)&&(h->Typ() == INT_CMD))
         lV = (int)(long)h->Data();
-      else{
-        WerrorS("int expected");
+      else
+      {
+        WerrorS("nc_Hilb:int expected");
         return TRUE;
       }
       h = h->next;
@@ -381,8 +383,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
            autop = TRUE;
         h = h->next;
       }
-      if(h != NULL){
-        WerrorS("int 1,2,3 are expected");
+      if(h != NULL)
+      {
+        WerrorS("nc_Hilb:int 1,2 or 3 are expected");
         return TRUE;
       }
       HilbertSeries_OrbitData(i, lV, ig, mgrad, autop);
