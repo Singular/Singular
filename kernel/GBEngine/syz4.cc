@@ -69,7 +69,8 @@ static void initialize_lts_hash(lts_hash &C, const ideal L)
     const unsigned int n_elems = IDELEMS(L);
     for (unsigned int k = 0; k < n_elems; k++) {
         const poly a = L->m[k];
-        C[p_GetComp(a, R)].push_back({a, p_GetShortExpVector(a, R), k});
+        C[p_GetComp(a, R)].push_back((lt_struct){a, p_GetShortExpVector(a, R),
+            k});
     }
 }
 
@@ -317,7 +318,7 @@ static poly syzHeadExtFrame(const ideal G, const int i, const int j)
 typedef ideal syzM_i_Function(ideal, int, syzHeadFunction);
 
 static ideal syzM_i_unsorted(const ideal G, const int i,
-    const syzHeadFunction *syzHead)
+    syzHeadFunction *syzHead)
 {
     ideal M_i = NULL;
     int comp = pGetComp(G->m[i]);
@@ -341,7 +342,7 @@ static ideal syzM_i_unsorted(const ideal G, const int i,
 }
 
 static ideal syzM_i_sorted(const ideal G, const int i,
-    const syzHeadFunction *syzHead)
+    syzHeadFunction *syzHead)
 {
     ideal M_i = NULL;
     int comp = pGetComp(G->m[i]);
@@ -417,8 +418,8 @@ static int compare_Mi(const void* a, const void *b)
 }
 #endif   // SORT_MI
 
-static ideal computeFrame(const ideal G, const syzM_i_Function syzM_i,
-    const syzHeadFunction *syzHead)
+static ideal computeFrame(const ideal G, syzM_i_Function syzM_i,
+    syzHeadFunction *syzHead)
 {
     ideal* M = (ideal *)omalloc((G->ncols-1)*sizeof(ideal));
     for (int i = G->ncols-2; i >= 0; i--) {
@@ -458,7 +459,7 @@ static void computeLiftings(const resolvente res, const int index,
 }
 
 static int computeResolution(resolvente &res, const int length,
-    const syzHeadFunction *syzHead)
+    syzHeadFunction *syzHead)
 {
     int max_index = length-1;
     int index = 0;
