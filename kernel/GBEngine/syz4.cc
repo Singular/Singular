@@ -392,15 +392,15 @@ static int compare_Mi(const void* a, const void *b)
     poly p_a = *((poly *)a);
     poly p_b = *((poly *)b);
     int cmp;
-    int deg_a = p_Deg(p_a, r);
-    int deg_b = p_Deg(p_b, r);
-    cmp = (deg_a > deg_b) - (deg_a < deg_b);
-    if (cmp != 0) {
-         return cmp;
-    }
     int comp_a = p_GetComp(p_a, r);
     int comp_b = p_GetComp(p_b, r);
     cmp = (comp_a > comp_b) - (comp_a < comp_b);
+    if (cmp != 0) {
+         return cmp;
+    }
+    int deg_a = p_Deg(p_a, r);
+    int deg_b = p_Deg(p_b, r);
+    cmp = (deg_a > deg_b) - (deg_a < deg_b);
     if (cmp != 0) {
          return cmp;
     }
