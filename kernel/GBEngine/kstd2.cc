@@ -1475,7 +1475,7 @@ int redHoney (LObject* h, kStrategy strat)
     ii = j;
     /*
      * the polynomial to reduce with (up to the moment) is;
-     * pi with ecart ei
+     * pi with ecart ei (T[ii])
      */
     i = j;
     if (TEST_OPT_LENGTH)
@@ -1536,7 +1536,7 @@ int redHoney (LObject* h, kStrategy strat)
     {
       PrintS("red:");
       h->wrp();
-      PrintS(" with ");
+      Print("\nwith T[%d]:",ii);
       strat->T[ii].wrp();
     }
 #endif
@@ -2147,7 +2147,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         strat->P.pCleardenom();
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
         {
-          strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
+          strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT,!TEST_OPT_CONTENTSB);
           strat->P.pCleardenom();
         }
       }
@@ -4424,7 +4424,7 @@ int redFirstShift (LObject* h,kStrategy strat)
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
-      PrintS(" to ");
+      PrintS("\nto ");
       wrp(h->p);
       PrintLn();
     }
