@@ -2899,6 +2899,7 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
 
     return;
   }
+  if (TEST_OPT_CONTENTSB) { c=n_Init(1,C); return; }
 
   assume( pNext(p) != NULL );
 
