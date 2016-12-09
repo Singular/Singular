@@ -2880,8 +2880,15 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
 
   if( pNext(p) == NULL )
   {
-    c=n_Invers(pGetCoeff(p), C);
-    p_SetCoeff(p, n_Init(1, C), r);
+    if(!TEST_OPT_CONTENTSB)
+    {
+      c=n_Invers(pGetCoeff(p), C);
+      p_SetCoeff(p, n_Init(1, C), r);
+    }
+    else
+    {
+      c=n_Init(1,C);
+    }
 
     assume( n_GreaterZero(pGetCoeff(ph),C) );
     if(!n_GreaterZero(pGetCoeff(ph),C))
