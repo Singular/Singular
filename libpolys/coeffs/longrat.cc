@@ -765,6 +765,8 @@ number   nlExactDiv(number a, number b, const coeffs r)
   mpz_init(u->z);
   /* u=a/b */
   u->s = 3;
+  assume(a->s==3);
+  assume(b->s==3);
   mpz_divexact(u->z,a->z,b->z);
   if (bb!=NULL)
   {
@@ -3323,6 +3325,7 @@ BOOLEAN nlInitChar(coeffs r, void*p)
   r->cfMult  = nlMult;
   r->cfSub   = nlSub;
   r->cfAdd   = nlAdd;
+  r->cfExactDiv= nlExactDiv;
   if (p==NULL) /* Q */
   {
     r->is_field=TRUE;
@@ -3344,7 +3347,6 @@ BOOLEAN nlInitChar(coeffs r, void*p)
     r->cfLcm = nlLcm;
     r->cfXExtGcd=nlXExtGcd;
     r->cfQuotRem=nlQuotRem;
-    r->cfExactDiv= nlExactDiv;
   }
   r->cfInit = nlInit;
   r->cfSize  = nlSize;
