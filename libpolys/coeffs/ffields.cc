@@ -15,48 +15,21 @@
 #include "coeffs.h"
 #include "numbers.h"
 #include "longrat.h"
+#include "ffields.h"
 
 #include <string.h>
 #include <math.h>
 #include <errno.h>
 
-BOOLEAN nfGreaterZero (number k, const coeffs r);
-number  nfMult        (number a, number b, const coeffs r);
-number  nfInit        (long i, const coeffs r);
-number  nfParameter   (int i, const coeffs r);
-long    nfInt         (number &n, const coeffs r);
-number  nfAdd         (number a, number b, const coeffs r);
-number  nfSub         (number a, number b, const coeffs r);
-void    nfPower       (number a, int i, number * result, const coeffs r);
-BOOLEAN nfIsZero      (number a, const coeffs r);
-BOOLEAN nfIsOne       (number a, const coeffs r);
-BOOLEAN nfIsMOne      (number a, const coeffs r);
-number  nfDiv         (number a, number b, const coeffs r);
-number  nfNeg         (number c, const coeffs r);
-number  nfInvers      (number c, const coeffs r);
-BOOLEAN nfGreater     (number a, number b, const coeffs r);
-BOOLEAN nfEqual       (number a, number b, const coeffs r);
-const char *  nfRead  (const char *s, number *a, const coeffs r);
 #ifdef LDEBUG
 BOOLEAN nfDBTest      (number a, const char *f, const int l, const coeffs r);
 #endif
-//void    nfSetChar     (const coeffs r);
-
-nMapFunc nfSetMap     (const coeffs src, const coeffs dst);
-char *  nfName        (number n, const coeffs r);
-void    nfReadTable   (const int c, const coeffs r);
-
-void    nfCoeffWrite(const coeffs r, BOOLEAN details);
-void    nfShowMipo(const coeffs r);
-
-
 
 /// Our Type!
 static const n_coeffType ID = n_GF;
 
 //unsigned short *nfPlus1Table=NULL; /* the table i=log(z^i) -> log(z^i+1) */
 
-const double sixteenlog2= 11.09035489;
 /* the q's from the table 'fftable' */
 const unsigned short fftable[]={
     4,  8, 16, 32, 64, 128, 256, 512,1024,2048,4096,8192,16384, 32768,
@@ -162,9 +135,32 @@ BOOLEAN nfDBTest (number a, const char *f, const int l, const coeffs r)
 #endif
 
 /*2
+* a == 0 ?
+*/
+static BOOLEAN nfIsZero (number  a, const coeffs r)
+{
+#ifdef LDEBUG
+  nfTest(a, r);
+#endif
+  return (long)r->m_nfCharQ == (long)a;
+}
+
+/*2
+* a == -1 ?
+*/
+static BOOLEAN nfIsMOne (number a, const coeffs r)
+{
+#ifdef LDEBUG
+  nfTest(a, r);
+#endif
+  if (0L == (long)a) return FALSE; /* special handling of char 2*/
+  return (long)r->m_nfM1 == (long)a;
+}
+
+/*2
 * k >= 0 ?
 */
-BOOLEAN nfGreaterZero (number k, const coeffs r)
+static BOOLEAN nfGreaterZero (number k, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(k, r);
@@ -175,7 +171,7 @@ BOOLEAN nfGreaterZero (number k, const coeffs r)
 /*2
 * a*b
 */
-number nfMult (number a,number b, const coeffs r)
+static number nfMult (number a,number b, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(a, r);
@@ -195,7 +191,7 @@ number nfMult (number a,number b, const coeffs r)
 /*2
 * int -> number
 */
-number nfInit (long i, const coeffs r)
+static number nfInit (long i, const coeffs r)
 {
   assume( r->m_nfPlus1Table != NULL );
   // Hmm .. this is just to prevent initialization
@@ -219,7 +215,7 @@ number nfInit (long i, const coeffs r)
 /*
 * the generating element `z`
 */
-number nfParameter (int i, const coeffs)
+static number nfParameter (int i, const coeffs)
 {
   assume(i==1);
 
@@ -244,7 +240,7 @@ static int nfParDeg(number n, const coeffs r)
 /*2
 * number -> int
 */
-long nfInt (number &n, const coeffs )
+static long nfInt (number &n, const coeffs )
 {
   return (long)n;
 }
@@ -252,7 +248,7 @@ long nfInt (number &n, const coeffs )
 /*2
 * a + b
 */
-number nfAdd (number a, number b, const coeffs R)
+static number nfAdd (number a, number b, const coeffs R)
 {
 /*4 z^a+z^b=z^b*(z^(a-b)+1), if a>=b; *
 *          =z^a*(z^(b-a)+1)  if a<b  */
@@ -289,29 +285,36 @@ number nfAdd (number a, number b, const coeffs R)
 }
 
 /*2
+* -c
+*/
+static number nfNeg (number c, const coeffs r)
+{
+/*4 -z^c=z^c*(-1)=z^c*nfM1*/
+#ifdef LDEBUG
+  nfTest(c, r);
+#endif
+  if ((long)r->m_nfCharQ == (long)c) return c;
+  long i=(long)c+(long)r->m_nfM1;
+  if (i>=(long)r->m_nfCharQ1) i-=(long)r->m_nfCharQ1;
+#ifdef LDEBUG
+  nfTest((number)i, r);
+#endif
+  return (number)i;
+}
+
+/*2
 * a - b
 */
-number nfSub (number a, number b, const coeffs r)
+static number nfSub (number a, number b, const coeffs r)
 {
   number mb = nfNeg(b, r);
   return nfAdd(a,mb,r);
 }
 
 /*2
-* a == 0 ?
-*/
-BOOLEAN nfIsZero (number  a, const coeffs r)
-{
-#ifdef LDEBUG
-  nfTest(a, r);
-#endif
-  return (long)r->m_nfCharQ == (long)a;
-}
-
-/*2
 * a == 1 ?
 */
-BOOLEAN nfIsOne (number a, const coeffs r)
+static BOOLEAN nfIsOne (number a, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(a, r);
@@ -320,21 +323,9 @@ BOOLEAN nfIsOne (number a, const coeffs r)
 }
 
 /*2
-* a == -1 ?
-*/
-BOOLEAN nfIsMOne (number a, const coeffs r)
-{
-#ifdef LDEBUG
-  nfTest(a, r);
-#endif
-  if (0L == (long)a) return FALSE; /* special handling of char 2*/
-  return (long)r->m_nfM1 == (long)a;
-}
-
-/*2
 * a / b
 */
-number nfDiv (number a,number b, const coeffs r)
+static number nfDiv (number a,number b, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(b, r);
@@ -362,7 +353,7 @@ number nfDiv (number a,number b, const coeffs r)
 /*2
 * 1 / c
 */
-number  nfInvers (number c, const coeffs r)
+static number  nfInvers (number c, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(c, r);
@@ -379,27 +370,9 @@ number  nfInvers (number c, const coeffs r)
 }
 
 /*2
-* -c
-*/
-number nfNeg (number c, const coeffs r)
-{
-/*4 -z^c=z^c*(-1)=z^c*nfM1*/
-#ifdef LDEBUG
-  nfTest(c, r);
-#endif
-  if ((long)r->m_nfCharQ == (long)c) return c;
-  long i=(long)c+(long)r->m_nfM1;
-  if (i>=(long)r->m_nfCharQ1) i-=(long)r->m_nfCharQ1;
-#ifdef LDEBUG
-  nfTest((number)i, r);
-#endif
-  return (number)i;
-}
-
-/*2
 * a > b ?
 */
-BOOLEAN nfGreater (number a,number b, const coeffs r)
+static BOOLEAN nfGreater (number a,number b, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(a, r);
@@ -411,7 +384,7 @@ BOOLEAN nfGreater (number a,number b, const coeffs r)
 /*2
 * a == b ?
 */
-BOOLEAN nfEqual (number a,number b, const coeffs r)
+static BOOLEAN nfEqual (number a,number b, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(a, r);
@@ -464,31 +437,9 @@ static void nfWriteShort (number a, const coeffs r)
 }
 
 /*2
-*
-*/
-char * nfName(number a, const coeffs r)
-{
-#ifdef LDEBUG
-  nfTest(a, r);
-#endif
-  char *s;
-  const char * const nf_Parameter=n_ParameterNames(r)[0];
-  if (((long)a==(long)r->m_nfCharQ) || ((long)a==0L)) return NULL;
-  else if ((long)a==1L)
-  {
-    return omStrDup(nf_Parameter);
-  }
-  else
-  {
-    s=(char *)omAlloc(4+strlen(nf_Parameter));
-    sprintf(s,"%s%d",nf_Parameter,(int)((long)a));
-  }
-  return s;
-}
-/*2
 * c ^ i with i>=0
 */
-void nfPower (number a, int i, number * result, const coeffs r)
+static void nfPower (number a, int i, number * result, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(a, r);
@@ -537,7 +488,7 @@ static const char* nfEati(const char *s, int *i, const coeffs r)
 /*2
 * read a number
 */
-const char * nfRead (const char *s, number *a, const coeffs r)
+static const char * nfRead (const char *s, number *a, const coeffs r)
 {
   int i;
   number z;
@@ -574,10 +525,10 @@ const char * nfRead (const char *s, number *a, const coeffs r)
   return s;
 }
 
-int gf_tab_numdigits62 ( int q );
-int convertback62 ( char * p, int n );
+int gf_tab_numdigits62 ( int q ); /*factory/gf_tabitil.cc */
+int convertback62 ( char * p, int n ); /*factory/gf_tabitil.cc */
 
-int nfMinPoly[16];
+static int nfMinPoly[16];
 
 void nfShowMipo(const coeffs r)
 {
@@ -620,7 +571,7 @@ static void nfReadMipo(char *s)
 /*2
 * init global variables from files 'gftables/%d'
 */
-void nfReadTable(const int c, const coeffs r)
+static void nfReadTable(const int c, const coeffs r)
 {
   //Print("GF(%d)\n",c);
   if ((c==r->m_nfCharQ)||(c==-r->m_nfCharQ))
@@ -720,7 +671,7 @@ err:
 /*2
 * map Z/p -> GF(p,n)
 */
-number nfMapP(number c, const coeffs, const coeffs dst)
+static number nfMapP(number c, const coeffs, const coeffs dst)
 {
   return nfInit((int)((long)c), dst);
 }
@@ -728,8 +679,8 @@ number nfMapP(number c, const coeffs, const coeffs dst)
 /*2
 * map GF(p,n1) -> GF(p,n2), n1 < n2, n1 | n2
 */
-int nfMapGG_factor;
-number nfMapGG(number c, const coeffs src, const coeffs)
+static int nfMapGG_factor;
+static number nfMapGG(number c, const coeffs src, const coeffs)
 {
   int i=(long)c;
   i*= nfMapGG_factor;
@@ -739,7 +690,7 @@ number nfMapGG(number c, const coeffs src, const coeffs)
 /*2
 * map GF(p,n1) -> GF(p,n2), n1 > n2, n2 | n1
 */
-number nfMapGGrev(number c, const coeffs src, const coeffs)
+static number nfMapGGrev(number c, const coeffs src, const coeffs)
 {
   int ex=(int)((long)c);
   if ((ex % nfMapGG_factor)==0)
@@ -751,7 +702,7 @@ number nfMapGGrev(number c, const coeffs src, const coeffs)
 /*2
 * set map function nMap ... -> GF(p,n)
 */
-nMapFunc nfSetMap(const coeffs src, const coeffs dst)
+static nMapFunc nfSetMap(const coeffs src, const coeffs dst)
 {
   if (nCoeff_is_GF(src,src->m_nfCharQ))
   {
@@ -840,6 +791,30 @@ static number nfRandom(siRandProc p,number ,number, const coeffs cf)
   return (number)(long)(p() %(cf->m_nfCharQ+1));
 }
 
+static void nfCoeffWrite  (const coeffs r, BOOLEAN details)
+{
+  // m_nfCharQ = p^k where p is the characteristic (r->CharP) and k is GFDegree
+  Print("ZZ/%d[%s]",r->m_nfCharQ,n_ParameterNames(r)[0]);
+  if ( details )
+  {
+    StringSetS("\n//   minpoly        : ");
+    nfShowMipo(r);
+    StringAppendS("");
+    char *s=StringEndS(); PrintS(s); omFree(s);
+  }
+  else PrintS("//   minpoly        : ...");
+}
+
+static BOOLEAN nfCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
+{
+  if (n==n_GF) {
+    GFInfo* p = (GFInfo *)(parameter);
+    int c = pow (p->GFChar, p->GFDegree);
+    if ((c == r->m_nfCharQ) && (strcmp(n_ParameterNames(r)[0], p->GFPar_name) == 0))
+      return TRUE;
+  }
+  return FALSE;
+}
 BOOLEAN nfInitChar(coeffs r,  void * parameter)
 {
   r->is_field=TRUE;
@@ -947,6 +922,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
 
   const double check= log ((double) (p->GFChar));
 
+  static const double sixteenlog2= 11.09035489;
   if( (p->GFDegree * check) > sixteenlog2 )
   {
 #ifndef SING_NDEBUG
@@ -974,27 +950,3 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
 
 }
 
-void    nfCoeffWrite  (const coeffs r, BOOLEAN details)
-{
-  // m_nfCharQ = p^k where p is the characteristic (r->CharP) and k is GFDegree
-  Print("ZZ/%d[%s]",r->m_nfCharQ,n_ParameterNames(r)[0]);
-  if ( details )
-  {
-    StringSetS("\n//   minpoly        : ");
-    nfShowMipo(r);
-    StringAppendS("");
-    char *s=StringEndS(); PrintS(s); omFree(s);
-  }
-  else PrintS("//   minpoly        : ...");
-}
-
-static BOOLEAN nfCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
-{
-  if (n==n_GF) {
-    GFInfo* p = (GFInfo *)(parameter);
-    int c = pow (p->GFChar, p->GFDegree);
-    if ((c == r->m_nfCharQ) && (strcmp(n_ParameterNames(r)[0], p->GFPar_name) == 0))
-      return TRUE;
-  }
-  return FALSE;
-}
