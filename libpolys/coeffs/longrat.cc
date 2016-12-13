@@ -752,7 +752,13 @@ number   nlExactDiv(number a, number b, const coeffs r)
     long bb=SR_TO_INT(b);
     return INT_TO_SR(aa/bb);
   }
+  number aa=NULL;
   number bb=NULL;
+  if (SR_HDL(a) & SR_INT)
+  {
+    aa=nlRInit(SR_TO_INT(a));
+    a=aa;
+  }
   if (SR_HDL(b) & SR_INT)
   {
     bb=nlRInit(SR_TO_INT(b));
@@ -768,6 +774,14 @@ number   nlExactDiv(number a, number b, const coeffs r)
   assume(a->s==3);
   assume(b->s==3);
   mpz_divexact(u->z,a->z,b->z);
+  if (aa!=NULL)
+  {
+    mpz_clear(aa->z);
+#if defined(LDEBUG)
+    aa->debug=654324;
+#endif
+    FREE_RNUMBER(aa); // omFreeBin((void *)aa, rnumber_bin);
+  }
   if (bb!=NULL)
   {
     mpz_clear(bb->z);
