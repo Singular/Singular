@@ -67,7 +67,7 @@ static bool noExtraReduction(ideal I, ring r, number /*p*/)
   gfan::ZVector allOnes(n);
   for (int i=0; i<n; i++)
     allOnes[i] = 1;
-  ring rShortcut = rCopy0(r,FALSE,FALSE);
+  ring rShortcut = rCopy0(r);
 
   rRingOrder_t* order = rShortcut->order;
   int* block0 = rShortcut->block0;
@@ -441,7 +441,7 @@ void tropicalStrategy::pReduce(ideal I, const ring r) const
 
 ring tropicalStrategy::getShortcutRingPrependingWeight(const ring r, const gfan::ZVector &v) const
 {
-  ring rShortcut = rCopy0(r);
+  ring rShortcut = rCopy0(r,FALSE); // do not copy q-ideal
 
   // save old ordering
   rRingOrder_t* order = rShortcut->order;
