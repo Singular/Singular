@@ -258,7 +258,7 @@ struct ip_sring
 // general ordering: pointer/structs, long, int, short, BOOLEAN/char/enum
 // general defining procedures: rInit, rComplete, interpreter, ??
   idhdl      idroot; /* local objects , interpreter*/
-  int*       order;  /* array of orderings, rInit/rSleftvOrdering2Ordering */
+  rRingOrder_t* order;  /* array of orderings, rInit/rSleftvOrdering2Ordering */
   int*       block0; /* starting pos., rInit/rSleftvOrdering2Ordering*/
   int*       block1; /* ending pos., rInit/rSleftvOrdering2Ordering*/
 //  char**     parameter; /* names of parameters, rInit */
@@ -387,8 +387,8 @@ struct ip_sring
 
 ring   rDefault(int ch, int N, char **n);
 ring   rDefault(const coeffs cf, int N, char **n, const rRingOrder_t o=ringorder_lp);
-ring   rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1, int **wvhdl=NULL);
-ring   rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1, int **wvhdl=NULL);
+ring   rDefault(int ch, int N, char **n,int ord_size, rRingOrder_t *ord, int *block0, int *block1, int **wvhdl=NULL);
+ring   rDefault(const coeffs cf, int N, char **n,int ord_size, rRingOrder_t *ord, int *block0, int *block1, int **wvhdl=NULL);
 
 // #define rIsRingVar(A) r_IsRingVar(A,currRing)
 int    r_IsRingVar(const char *n, char**names, int N);
@@ -431,7 +431,7 @@ void rGetSComps(int** currComponents, long** currShiftedComponents, int *length,
 
 
 const char * rSimpleOrdStr(int ord);
-int rOrderName(char * ordername);
+rRingOrder_t rOrderName(char * ordername);
 char * rOrdStr(ring r);
 char * rVarStr(ring r);
 char * rCharStr(ring r);

@@ -26,7 +26,7 @@ std::pair<ideal,ring> flip(const ideal I, const ring r,
   ring sAdjusted = rCopy0(r);
   int n = rVar(sAdjusted);
   deleteOrdering(sAdjusted);
-  sAdjusted->order = (int*) omAlloc0(5*sizeof(int));
+  sAdjusted->order = (rRingOrder_t*) omAlloc0(5*sizeof(rRingOrder_t));
   sAdjusted->block0 = (int*) omAlloc0(5*sizeof(int));
   sAdjusted->block1 = (int*) omAlloc0(5*sizeof(int));
   sAdjusted->wvhdl = (int**) omAlloc0(5*sizeof(int**));
@@ -71,7 +71,7 @@ std::pair<ideal,ring> flip(const ideal I, const ring r,
   ring s = rCopy0(r);
   n = rVar(s);
   deleteOrdering(s);
-  s->order = (int*) omAlloc0(5*sizeof(int));
+  s->order = (rRingOrder_t*) omAlloc0(5*sizeof(rRingOrder_t));
   s->block0 = (int*) omAlloc0(5*sizeof(int));
   s->block1 = (int*) omAlloc0(5*sizeof(int));
   s->wvhdl = (int**) omAlloc0(5*sizeof(int**));

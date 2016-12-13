@@ -1572,7 +1572,7 @@ idhdl rDefault(const char *s)
   /*weights: entries for 3 blocks: NULL*/
   r->wvhdl = (int **)omAlloc0(3 * sizeof(int_ptr));
   /*order: dp,C,0*/
-  r->order = (int *) omAlloc(3 * sizeof(int *));
+  r->order = (rRingOrder_t *) omAlloc(3 * sizeof(rRingOrder_t *));
   r->block0 = (int *)omAlloc0(3 * sizeof(int *));
   r->block1 = (int *)omAlloc0(3 * sizeof(int *));
   /* ringorder dp for the first block: var 1..3 */
@@ -1582,7 +1582,7 @@ idhdl rDefault(const char *s)
   /* ringorder C for the second block: no vars */
   r->order[1]  = ringorder_C;
   /* the last block: everything is 0 */
-  r->order[2]  = 0;
+  r->order[2]  = (rRingOrder_t)0;
 
   /* complete ring intializations */
   rComplete(r);
@@ -2507,13 +2507,13 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
     if (bitmask!=0) n--;
 
     // initialize fields of R
-    R->order=(int *)omAlloc0(n*sizeof(int));
+    R->order=(rRingOrder_t *)omAlloc0(n*sizeof(rRingOrder_t));
     R->block0=(int *)omAlloc0(n*sizeof(int));
     R->block1=(int *)omAlloc0(n*sizeof(int));
     R->wvhdl=(int**)omAlloc0(n*sizeof(int_ptr));
     // init order, so that rBlocks works correctly
     for (j_in_R= n-2; j_in_R>=0; j_in_R--)
-      R->order[j_in_R] = (int) ringorder_unspec;
+      R->order[j_in_R] = ringorder_unspec;
     // orderings
     for(j_in_R=0,j_in_L=0;j_in_R<n-1;j_in_R++,j_in_L++)
     {
@@ -2700,7 +2700,7 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
       }
       if (!comp_order)
       {
-        R->order=(int*)omRealloc0Size(R->order,n*sizeof(int),(n+1)*sizeof(int));
+        R->order=(rRingOrder_t*)omRealloc0Size(R->order,n*sizeof(rRingOrder_t),(n+1)*sizeof(rRingOrder_t));
         R->block0=(int*)omRealloc0Size(R->block0,n*sizeof(int),(n+1)*sizeof(int));
         R->block1=(int*)omRealloc0Size(R->block1,n*sizeof(int),(n+1)*sizeof(int));
         R->wvhdl=(int**)omRealloc0Size(R->wvhdl,n*sizeof(int_ptr),(n+1)*sizeof(int_ptr));
@@ -5234,7 +5234,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
   }
 
   // initialize fields of R
-  R->order=(int *)omAlloc0(n*sizeof(int));
+  R->order=(rRingOrder_t *)omAlloc0(n*sizeof(rRingOrder_t));
   R->block0=(int *)omAlloc0(n*sizeof(int));
   R->block1=(int *)omAlloc0(n*sizeof(int));
   R->wvhdl=(int**)omAlloc0(n*sizeof(int_ptr));
@@ -5243,7 +5243,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
 
   // init order, so that rBlocks works correctly
   for (j=0; j < n-1; j++)
-    R->order[j] = (int) ringorder_unspec;
+    R->order[j] = ringorder_unspec;
   // set last _C order, if no c/C order was given
   if (i == 0) R->order[n-2] = ringorder_C;
 
@@ -5263,7 +5263,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
        *  iv[1]: ordering
        *  iv[2..end]: weights
        */
-      R->order[n] = (*iv)[1];
+      R->order[n] = (rRingOrder_t)((*iv)[1]);
       typ=1;
       switch ((*iv)[1])
       {

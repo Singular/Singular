@@ -263,7 +263,7 @@ ring sm_RingChange(const ring origR, long bound)
 {
 //  *origR =currRing;
   ring tmpR=rCopy0(origR,FALSE,FALSE);
-  int *ord=(int*)omAlloc0(3*sizeof(int));
+  rRingOrder_t *ord=(rRingOrder_t*)omAlloc0(3*sizeof(rRingOrder_t));
   int *block0=(int*)omAlloc(3*sizeof(int));
   int *block1=(int*)omAlloc(3*sizeof(int));
   ord[0]=ringorder_c;

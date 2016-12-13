@@ -11394,7 +11394,7 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
       return r;
     }
     ring res = rCopy0(r, TRUE, FALSE);
-    res->order  = (int *)omAlloc0((n+1)*sizeof(int));
+    res->order  = (rRingOrder_t *)omAlloc0((n+1)*sizeof(rRingOrder_t));
     res->block0 = (int *)omAlloc0((n+1)*sizeof(int));
     res->block1 = (int *)omAlloc0((n+1)*sizeof(int));
     int **wvhdl = (int **)omAlloc0((n+1)*sizeof(int*));
@@ -11414,7 +11414,7 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
     {
       if (res->order[i] == ringorder_C || res->order[i] == ringorder_c)
       {
-        res->order[i] = 0;
+        res->order[i] = (rRingOrder_t)0;
       }
     }
     rComplete(res, 1);
@@ -11442,7 +11442,7 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
   if (strat->sbaOrder == 3)
   {
     ring res = rCopy0(r, TRUE, FALSE);
-    res->order  = (int *)omAlloc0((n+2)*sizeof(int));
+    res->order  = (rRingOrder_t*)omAlloc0((n+2)*sizeof(rRingOrder_t));
     res->block0 = (int *)omAlloc0((n+2)*sizeof(int));
     res->block1 = (int *)omAlloc0((n+2)*sizeof(int));
     int **wvhdl = (int **)omAlloc0((n+2)*sizeof(int*));
@@ -11470,7 +11470,7 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
     {
       if (res->order[i] == ringorder_C || res->order[i] == ringorder_c)
       {
-        res->order[i] = 0;
+        res->order[i] = (rRingOrder_t)0;
       }
     }
     rComplete(res, 1);

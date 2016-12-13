@@ -56,7 +56,7 @@ static ring genericlyWeightedOrdering(const ring r, const gfan::ZVector &u, cons
   /* create a copy s of r and delete its ordering */
   ring s = rCopy0(r);
   omFree(s->order);
-  s->order  = (int*) omAlloc0((h+4)*sizeof(int));
+  s->order  = (rRingOrder_t*) omAlloc0((h+4)*sizeof(rRingOrder_t));
   omFree(s->block0);
   s->block0 = (int*) omAlloc0((h+4)*sizeof(int));
   omFree(s->block1);

@@ -145,7 +145,7 @@ ideal idSectWithElim (ideal h1,ideal h2)
   r->block0[0]=1;
   r->block1[0]= r->N;
   omFree(r->order);
-  r->order=(int*)omAlloc0(3*sizeof(int*));
+  r->order=(rRingOrder_t*)omAlloc0(3*sizeof(rRingOrder_t));
   r->order[0]=ringorder_dp;
   r->order[1]=ringorder_C;
   char **names=(char**)omAlloc0(rVar(r) * sizeof(char_ptr));
@@ -1354,7 +1354,8 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
 {
   int    i,j=0,k,l;
   ideal  h,hh, h3;
-  int    *ord,*block0,*block1;
+  rRingOrder_t    *ord;
+  int    *block0,*block1;
   int    ordersize=2;
   int    **wv;
   tHomog hom;
@@ -1434,7 +1435,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
     // aa(1,1,1,...,0,0,0),wp(...),C
     // this seems to be better than version 2 below,
     // according to Tst/../elimiate_[3568].tat (- 17 %)
-    ord=(int*)omAlloc0(4*sizeof(int));
+    ord=(rRingOrder_t*)omAlloc0(4*sizeof(rRingOrder_t));
     block0=(int*)omAlloc0(4*sizeof(int));
     block1=(int*)omAlloc0(4*sizeof(int));
     wv=(int**) omAlloc0(4*sizeof(int**));
@@ -1477,13 +1478,13 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
       if (pGetExp(delVar,j+1)!=0) wv[1][j]=1;
     #endif
     ord[2] = ringorder_C;
-    ord[3] = 0;
+    ord[3] = (rRingOrder_t)0;
   }
   else
   {
     // we change to an ordering:
     // aa(....),orig_ordering
-    ord=(int*)omAlloc0(ordersize*sizeof(int));
+    ord=(rRingOrder_t*)omAlloc0(ordersize*sizeof(rRingOrder_t));
     block0=(int*)omAlloc0(ordersize*sizeof(int));
     block1=(int*)omAlloc0(ordersize*sizeof(int));
     wv=(int**) omAlloc0(ordersize*sizeof(int**));

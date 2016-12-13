@@ -110,7 +110,7 @@ static void rOptimizeLDeg(ring r);
 //  return FALSE;
 //}
 
-ring rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1, int** wvhdl)
+ring rDefault(const coeffs cf, int N, char **n,int ord_size, rRingOrder_t *ord, int *block0, int *block1, int** wvhdl)
 {
   assume( cf != NULL);
   ring r=(ring) omAlloc0Bin(sip_sring_bin);
@@ -137,7 +137,7 @@ ring rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *bloc
   rComplete(r);
   return r;
 }
-ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1,int ** wvhdl)
+ring rDefault(int ch, int N, char **n,int ord_size, rRingOrder_t *ord, int *block0, int *block1,int ** wvhdl)
 {
   coeffs cf;
   if (ch==0) cf=nInitChar(n_Q,NULL);
@@ -149,7 +149,7 @@ ring rDefault(const coeffs cf, int N, char **n,  const rRingOrder_t o)
 {
   assume( cf != NULL);
   /*order: o=lp,0*/
-  int *order = (int *) omAlloc(2* sizeof(int));
+  rRingOrder_t *order = (rRingOrder_t *) omAlloc(2* sizeof(rRingOrder_t));
   int *block0 = (int *)omAlloc0(2 * sizeof(int));
   int *block1 = (int *)omAlloc0(2 * sizeof(int));
   /* ringorder o=lp for the first block: var 1..N */
@@ -157,7 +157,7 @@ ring rDefault(const coeffs cf, int N, char **n,  const rRingOrder_t o)
   block0[0] = 1;
   block1[0] = N;
   /* the last block: everything is 0 */
-  order[1]  = 0;
+  order[1]  = (rRingOrder_t)0;
 
   return rDefault(cf,N,n,2,order,block0,block1);
 }
@@ -478,7 +478,7 @@ void rDelete(ring r)
     i=rBlocks(r);
     assume(r->block0 != NULL && r->block1 != NULL && r->wvhdl != NULL);
     // delete order
-    omFreeSize((ADDRESS)r->order,i*sizeof(int));
+    omFreeSize((ADDRESS)r->order,i*sizeof(rRingOrder_t));
     omFreeSize((ADDRESS)r->block0,i*sizeof(int));
     omFreeSize((ADDRESS)r->block1,i*sizeof(int));
     // delete weights
@@ -507,7 +507,7 @@ void rDelete(ring r)
   omFreeBin(r, sip_sring_bin);
 }
 
-int rOrderName(char * ordername)
+rRingOrder_t rOrderName(char * ordername)
 {
   int order=ringorder_unspec;
   while (order!= 0)
@@ -518,7 +518,7 @@ int rOrderName(char * ordername)
   }
   if (order==0) Werror("wrong ring order `%s`",ordername);
   omFree((ADDRESS)ordername);
-  return order;
+  return (rRingOrder_t)order;
 }
 
 char * rOrdStr(ring r)
@@ -900,7 +900,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 #endif
      )
   {
-    tmpR.order=(int*)omAlloc0(4*sizeof(int));
+    tmpR.order=(rRingOrder_t*)omAlloc0(4*sizeof(rRingOrder_t));
     tmpR.block0=(int*)omAlloc0(4*sizeof(int));
     tmpR.block1=(int*)omAlloc0(4*sizeof(int));
     tmpR.wvhdl=(int**) omAlloc0(4*sizeof(int**));
@@ -923,7 +923,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 #endif
      )
   {
-    tmpR.order=(int*)omAlloc(4*sizeof(int));
+    tmpR.order=(rRingOrder_t*)omAlloc(4*sizeof(rRingOrder_t));
     tmpR.block0=(int*)omAlloc0(4*sizeof(int));
     tmpR.block1=(int*)omAlloc0(4*sizeof(int));
     tmpR.wvhdl=(int**)omAlloc0(4*sizeof(int *));
@@ -954,20 +954,20 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     tmpR.block0[1]=rVar(r1)+1;
     tmpR.block1[1]=rVar(r1)+rVar(r2);
     tmpR.order[2]=ringorder_C;
-    tmpR.order[3]=0;
+    tmpR.order[3]=(rRingOrder_t)0;
   }
   else
   {
     if ((r1->order[0]==ringorder_unspec)
         && (r2->order[0]==ringorder_unspec))
     {
-      tmpR.order=(int*)omAlloc(3*sizeof(int));
+      tmpR.order=(rRingOrder_t*)omAlloc(3*sizeof(rRingOrder_t));
       tmpR.block0=(int*)omAlloc(3*sizeof(int));
       tmpR.block1=(int*)omAlloc(3*sizeof(int));
       tmpR.wvhdl=(int**)omAlloc0(3*sizeof(int *));
       tmpR.order[0]=ringorder_unspec;
       tmpR.order[1]=ringorder_C;
-      tmpR.order[2]=0;
+      tmpR.order[2]=(rRingOrder_t)0;
       tmpR.block0[0]=1;
       tmpR.block1[0]=tmpR.N;
     }
@@ -994,7 +994,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         b=rBlocks(r1)+rBlocks(r2)-2; /* for only one order C, only one 0 */
         rb=NULL;
       }
-      tmpR.order=(int*)omAlloc0(b*sizeof(int));
+      tmpR.order=(rRingOrder_t*)omAlloc0(b*sizeof(rRingOrder_t));
       tmpR.block0=(int*)omAlloc0(b*sizeof(int));
       tmpR.block1=(int*)omAlloc0(b*sizeof(int));
       tmpR.wvhdl=(int**)omAlloc0(b*sizeof(int *));
@@ -1054,7 +1054,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     {
       int b=rBlocks(r1);
 
-      tmpR.order=(int*)omAlloc0(b*sizeof(int));
+      tmpR.order=(rRingOrder_t*)omAlloc0(b*sizeof(rRingOrder_t));
       tmpR.block0=(int*)omAlloc0(b*sizeof(int));
       tmpR.block1=(int*)omAlloc0(b*sizeof(int));
       tmpR.wvhdl=(int**)omAlloc0(b*sizeof(int *));
@@ -1400,7 +1400,7 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
     res->MixedOrder=r->MixedOrder; // TRUE for mixed (global/local) ordering, FALSE otherwise,
     i=rBlocks(r);
     res->wvhdl   = (int **)omAlloc(i * sizeof(int *));
-    res->order   = (int *) omAlloc(i * sizeof(int));
+    res->order   = (rRingOrder_t *) omAlloc(i * sizeof(rRingOrder_t));
     res->block0  = (int *) omAlloc(i * sizeof(int));
     res->block1  = (int *) omAlloc(i * sizeof(int));
     for (j=0; j<i; j++)
@@ -1412,7 +1412,7 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
       else
         res->wvhdl[j]=NULL;
     }
-    memcpy(res->order,r->order,i * sizeof(int));
+    memcpy(res->order,r->order,i * sizeof(rRingOrder_t));
     memcpy(res->block0,r->block0,i * sizeof(int));
     memcpy(res->block1,r->block1,i * sizeof(int));
   }
@@ -1538,7 +1538,7 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
   {
     i=rBlocks(r)+1; // DIFF to rCopy0
     res->wvhdl   = (int **)omAlloc(i * sizeof(int *));
-    res->order   = (int *) omAlloc(i * sizeof(int));
+    res->order   = (rRingOrder_t *) omAlloc(i * sizeof(rRingOrder_t));
     res->block0  = (int *) omAlloc(i * sizeof(int));
     res->block1  = (int *) omAlloc(i * sizeof(int));
     for (j=0; j<i-1; j++)
@@ -1550,7 +1550,7 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
       else
         res->wvhdl[j+1]=NULL; //DIFF
     }
-    memcpy(&(res->order[1]),r->order,(i-1) * sizeof(int)); //DIFF
+    memcpy(&(res->order[1]),r->order,(i-1) * sizeof(rRingOrder_t)); //DIFF
     memcpy(&(res->block0[1]),r->block0,(i-1) * sizeof(int)); //DIFF
     memcpy(&(res->block1[1]),r->block1,(i-1) * sizeof(int)); //DIFF
   }
@@ -2611,7 +2611,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   need_other_ring = (exp_limit != r->bitmask);
 
   int nblocks=rBlocks(r);
-  int *order=(int*)omAlloc0((nblocks+1)*sizeof(int));
+  rRingOrder_t *order=(rRingOrder_t*)omAlloc0((nblocks+1)*sizeof(rRingOrder_t));
   int *block0=(int*)omAlloc0((nblocks+1)*sizeof(int));
   int *block1=(int*)omAlloc0((nblocks+1)*sizeof(int));
   int **wvhdl=(int**)omAlloc0((nblocks+1)*sizeof(int *));
@@ -2619,7 +2619,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   int i=0;
   int j=0; /*  i index in r, j index in res */
 
-  for( int r_ord=r->order[i]; (r_ord != 0) && (i < nblocks); j++, r_ord=r->order[++i])
+  for( rRingOrder_t r_ord=r->order[i]; (r_ord != (rRingOrder_t)0) && (i < nblocks); j++, r_ord=r->order[++i])
   {
     BOOLEAN copy_block_index=TRUE;
 
@@ -2736,7 +2736,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   }
   if(!need_other_ring)
   {
-    omFreeSize(order,(nblocks+1)*sizeof(int));
+    omFreeSize(order,(nblocks+1)*sizeof(rRingOrder_t));
     omFreeSize(block0,(nblocks+1)*sizeof(int));
     omFreeSize(block1,(nblocks+1)*sizeof(int));
     omFreeSize(wvhdl,(nblocks+1)*sizeof(int *));
@@ -2853,7 +2853,7 @@ ring rModifyRing_Wp(ring r, int* weights)
   /*weights: entries for 3 blocks: NULL*/
   res->wvhdl = (int **)omAlloc0(3 * sizeof(int *));
   /*order: Wp,C,0*/
-  res->order = (int *) omAlloc(3 * sizeof(int *));
+  res->order = (rRingOrder_t *) omAlloc(3 * sizeof(rRingOrder_t *));
   res->block0 = (int *)omAlloc0(3 * sizeof(int *));
   res->block1 = (int *)omAlloc0(3 * sizeof(int *));
   /* ringorder Wp for the first block: var 1..r->N */
@@ -2864,7 +2864,7 @@ ring rModifyRing_Wp(ring r, int* weights)
   /* ringorder C for the second block: no vars */
   res->order[1]  = ringorder_C;
   /* the last block: everything is 0 */
-  res->order[2]  = 0;
+  res->order[2]  = (rRingOrder_t)0;
 
   //int tmpref=r->cf->ref;
   rComplete(res, 1);
@@ -2903,7 +2903,7 @@ ring rModifyRing_Simple(ring r, BOOLEAN ommit_degree, BOOLEAN ommit_comp, unsign
     exp_limit=rGetExpSize(exp_limit, bits, r->N);
 
     int nblocks=1+(ommit_comp!=0);
-    int *order=(int*)omAlloc0((nblocks+1)*sizeof(int));
+    rRingOrder_t *order=(rRingOrder_t*)omAlloc0((nblocks+1)*sizeof(rRingOrder_t));
     int *block0=(int*)omAlloc0((nblocks+1)*sizeof(int));
     int *block1=(int*)omAlloc0((nblocks+1)*sizeof(int));
     int **wvhdl=(int**)omAlloc0((nblocks+1)*sizeof(int *));
@@ -3022,7 +3022,7 @@ static void rSetOutParams(ring r)
   assume( !( !r->CanShortOut && r->ShortOut ) );
 }
 
-static void rSetFirstWv(ring r, int i, int* order, int* block1, int** wvhdl)
+static void rSetFirstWv(ring r, int i, rRingOrder_t* order, int* block1, int** wvhdl)
 {
   // cheat for ringorder_aa
   if (order[i] == ringorder_aa)
@@ -3084,7 +3084,7 @@ static void rOptimizeLDeg(ring r)
 // set pFDeg, pLDeg, requires OrdSgn already set
 static void rSetDegStuff(ring r)
 {
-  int* order = r->order;
+  rRingOrder_t* order = r->order;
   int* block0 = r->block0;
   int* block1 = r->block1;
   int** wvhdl = r->wvhdl;
@@ -4363,7 +4363,7 @@ ring rAssure_SyzComp(const ring r, BOOLEAN complete)
   int i=rBlocks(r);
   int j;
 
-  res->order=(int *)omAlloc((i+1)*sizeof(int));
+  res->order=(rRingOrder_t *)omAlloc((i+1)*sizeof(rRingOrder_t));
   res->block0=(int *)omAlloc0((i+1)*sizeof(int));
   res->block1=(int *)omAlloc0((i+1)*sizeof(int));
   int ** wvhdl =(int **)omAlloc0((i+1)*sizeof(int**));
@@ -4539,10 +4539,10 @@ ring rAssure_HasComp(const ring r)
   ring new_r = rCopy0(r, FALSE, FALSE);
   i+=2;
   new_r->wvhdl=(int **)omAlloc0(i * sizeof(int *));
-  new_r->order   = (int *) omAlloc0(i * sizeof(int));
+  new_r->order   = (rRingOrder_t *) omAlloc0(i * sizeof(rRingOrder_t));
   new_r->block0   = (int *) omAlloc0(i * sizeof(int));
   new_r->block1   = (int *) omAlloc0(i * sizeof(int));
-  memcpy(new_r->order,r->order,(i-1) * sizeof(int));
+  memcpy(new_r->order,r->order,(i-1) * sizeof(rRingOrder_t));
   memcpy(new_r->block0,r->block0,(i-1) * sizeof(int));
   memcpy(new_r->block1,r->block1,(i-1) * sizeof(int));
   for (int j=0; j<=last_block; j++)
@@ -4699,7 +4699,7 @@ static ring rAssure_Global(rRingOrder_t b1, rRingOrder_t b2, const ring r)
       (r->order[2] == 0))
     return r;
   ring res = rCopy0(r, TRUE, FALSE);
-  res->order = (int*)omAlloc0(3*sizeof(int));
+  res->order = (rRingOrder_t*)omAlloc0(3*sizeof(rRingOrder_t));
   res->block0 = (int*)omAlloc0(3*sizeof(int));
   res->block1 = (int*)omAlloc0(3*sizeof(int));
   res->wvhdl = (int**)omAlloc0(3*sizeof(int*));
@@ -4749,7 +4749,7 @@ ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete = TRUE, int 
   int n = rBlocks(r); // Including trailing zero!
 
   // Create 2 more blocks for prefix/suffix:
-  res->order=(int *)omAlloc0((n+2)*sizeof(int)); // 0  ..  n+1
+  res->order=(rRingOrder_t *)omAlloc0((n+2)*sizeof(rRingOrder_t)); // 0  ..  n+1
   res->block0=(int *)omAlloc0((n+2)*sizeof(int));
   res->block1=(int *)omAlloc0((n+2)*sizeof(int));
   int ** wvhdl =(int **)omAlloc0((n+2)*sizeof(int**));
@@ -5115,12 +5115,12 @@ void rSetWeightVec(ring r, int64 *wv)
 
 static int rRealloc1(ring r, int size, int pos)
 {
-  r->order=(int*)omReallocSize(r->order, size*sizeof(int), (size+1)*sizeof(int));
+  r->order=(rRingOrder_t*)omReallocSize(r->order, size*sizeof(rRingOrder_t), (size+1)*sizeof(rRingOrder_t));
   r->block0=(int*)omReallocSize(r->block0, size*sizeof(int), (size+1)*sizeof(int));
   r->block1=(int*)omReallocSize(r->block1, size*sizeof(int), (size+1)*sizeof(int));
   r->wvhdl=(int **)omReallocSize(r->wvhdl,size*sizeof(int *), (size+1)*sizeof(int *));
   for(int k=size; k>pos; k--) r->wvhdl[k]=r->wvhdl[k-1];
-  r->order[size]=0;
+  r->order[size]=(rRingOrder_t)0;
   size++;
   return size;
 }

@@ -346,9 +346,13 @@ ring createTraversalStartingRing(const ring s, const gfan::ZMatrix &startingPoin
 
   // adjust weight and create new ordering
   int h = startingPoints.getHeight();
-  s0->order = (int*) omAlloc0((h+3)*sizeof(int));
+  omFree(s0->order);
+  s0->order = (rRingOrder_t*) omAlloc0((h+3)*sizeof(rRingOrder_t));
+  omFree(s0->block0);
   s0->block0 = (int*) omAlloc0((h+3)*sizeof(int));
+  omFree(s0->block1);
   s0->block1 = (int*) omAlloc0((h+3)*sizeof(int));
+  omFree(s0->wvhdl);
   s0->wvhdl = (int**) omAlloc0((h+3)*sizeof(int**));
   for (int i=0; i<h; i++)
   {

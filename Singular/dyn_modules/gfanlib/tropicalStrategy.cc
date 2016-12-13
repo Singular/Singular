@@ -69,13 +69,13 @@ static bool noExtraReduction(ideal I, ring r, number /*p*/)
     allOnes[i] = 1;
   ring rShortcut = rCopy0(r);
 
-  int* order = rShortcut->order;
+  rRingOrder_t* order = rShortcut->order;
   int* block0 = rShortcut->block0;
   int* block1 = rShortcut->block1;
   int** wvhdl = rShortcut->wvhdl;
 
   int h = rBlocks(r);
-  rShortcut->order = (int*) omAlloc0((h+1)*sizeof(int));
+  rShortcut->order = (rRingOrder_t*) omAlloc0((h+1)*sizeof(rRingOrder_t));
   rShortcut->block0 = (int*) omAlloc0((h+1)*sizeof(int));
   rShortcut->block1 = (int*) omAlloc0((h+1)*sizeof(int));
   rShortcut->wvhdl = (int**) omAlloc0((h+1)*sizeof(int*));
@@ -178,7 +178,7 @@ static ring constructStartingRing(ring r)
     s->names[i] = oldNames[i-1];
   omFree(oldNames);
 
-  s->order = (int*) omAlloc0(3*sizeof(int));
+  s->order = (rRingOrder_t*) omAlloc0(3*sizeof(rRingOrder_t));
   s->block0 = (int*) omAlloc0(3*sizeof(int));
   s->block1 = (int*) omAlloc0(3*sizeof(int));
   s->wvhdl = (int**) omAlloc0(3*sizeof(int**));
@@ -444,7 +444,7 @@ ring tropicalStrategy::getShortcutRingPrependingWeight(const ring r, const gfan:
   ring rShortcut = rCopy0(r);
 
   // save old ordering
-  int* order = rShortcut->order;
+  rRingOrder_t* order = rShortcut->order;
   int* block0 = rShortcut->block0;
   int* block1 = rShortcut->block1;
   int** wvhdl = rShortcut->wvhdl;
@@ -452,7 +452,7 @@ ring tropicalStrategy::getShortcutRingPrependingWeight(const ring r, const gfan:
   // adjust weight and create new ordering
   gfan::ZVector w = adjustWeightForHomogeneity(v);
   int h = rBlocks(r); int n = rVar(r);
-  rShortcut->order = (int*) omAlloc0((h+1)*sizeof(int));
+  rShortcut->order = (rRingOrder_t*) omAlloc0((h+1)*sizeof(rRingOrder_t));
   rShortcut->block0 = (int*) omAlloc0((h+1)*sizeof(int));
   rShortcut->block1 = (int*) omAlloc0((h+1)*sizeof(int));
   rShortcut->wvhdl = (int**) omAlloc0((h+1)*sizeof(int*));
@@ -704,7 +704,7 @@ ring tropicalStrategy::copyAndChangeOrderingWP(const ring r, const gfan::ZVector
   deleteOrdering(s);
   gfan::ZVector wAdjusted = adjustWeightForHomogeneity(w);
   gfan::ZVector vAdjusted = adjustWeightUnderHomogeneity(v,wAdjusted);
-  s->order = (int*) omAlloc0(5*sizeof(int));
+  s->order = (rRingOrder_t*) omAlloc0(5*sizeof(rRingOrder_t));
   s->block0 = (int*) omAlloc0(5*sizeof(int));
   s->block1 = (int*) omAlloc0(5*sizeof(int));
   s->wvhdl = (int**) omAlloc0(5*sizeof(int**));
@@ -733,7 +733,7 @@ ring tropicalStrategy::copyAndChangeOrderingLS(const ring r, const gfan::ZVector
   ring s = rCopy0(r);
   int n = rVar(s);
   deleteOrdering(s);
-  s->order = (int*) omAlloc0(5*sizeof(int));
+  s->order = (rRingOrder_t*) omAlloc0(5*sizeof(rRingOrder_t));
   s->block0 = (int*) omAlloc0(5*sizeof(int));
   s->block1 = (int*) omAlloc0(5*sizeof(int));
   s->wvhdl = (int**) omAlloc0(5*sizeof(int**));

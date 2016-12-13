@@ -462,13 +462,13 @@ ring ssiReadRing(const ssiInfo *d)
   // read the orderings:
   int num_ord; // number of orderings
   num_ord=s_readint(d->f_read);
-  int *ord=(int *)omAlloc0((num_ord+1)*sizeof(int));
+  rRingOrder_t *ord=(rRingOrder_t *)omAlloc0((num_ord+1)*sizeof(rRingOrder_t));
   int *block0=(int *)omAlloc0((num_ord+1)*sizeof(int));
   int *block1=(int *)omAlloc0((num_ord+1)*sizeof(int));
   int **wvhdl=(int**)omAlloc0((num_ord+1)*sizeof(int*));
   for(i=0;i<num_ord;i++)
   {
-    ord[i]=s_readint(d->f_read);
+    ord[i]=(rRingOrder_t)s_readint(d->f_read);
     block0[i]=s_readint(d->f_read);
     block1[i]=s_readint(d->f_read);
     switch(ord[i])
