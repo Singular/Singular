@@ -142,14 +142,10 @@ poly searchForMonomialViaStepwiseSaturation(const ideal I, const ring r, const g
       w[i] = w[i-1];
     w[0] = cache;
 
-    ring rGradedNew = rCopy0(r,TRUE,FALSE);
-    omFree(rGradedNew->order);
+    ring rGradedNew = rCopy0(r,FALSE,FALSE); // cannot copy q-ideal without ordering
     rGradedNew->order = (rRingOrder_t*) omAlloc0(3*sizeof(rRingOrder_t));
-    omFree(rGradedNew->block0);
     rGradedNew->block0 = (int*) omAlloc0(3*sizeof(int));
-    omFree(rGradedNew->block1);
     rGradedNew->block1 = (int*) omAlloc0(3*sizeof(int));
-    omFree(rGradedNew->wvhdl);
     rGradedNew->wvhdl = (int**) omAlloc0(3*sizeof(int**));
     rGradedNew->order[0] = ringorder_wp;
     rGradedNew->block0[0] = 1;

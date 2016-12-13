@@ -1972,6 +1972,11 @@ BOOLEAN rDBTest(ring r, const char* fn, const int l)
   omCheckAddrSize(r->order,i*sizeof(int));
   omCheckAddrSize(r->block0,i*sizeof(int));
   omCheckAddrSize(r->block1,i*sizeof(int));
+  for(int j=0;j<=i;j++)
+  {
+    if((r->order[j]<0)||(r->order[j]>ringorder_unspec))
+      dError("wrong order in r->order");
+  }
   if (r->wvhdl!=NULL)
   {
     omCheckAddrSize(r->wvhdl,i*sizeof(int *));

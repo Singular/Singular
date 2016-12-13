@@ -69,10 +69,10 @@ static bool noExtraReduction(ideal I, ring r, number /*p*/)
     allOnes[i] = 1;
   ring rShortcut = rCopy0(r);
 
-  rRingOrder_t* order = r->order;
-  int* block0 = r->block0;
-  int* block1 = r->block1;
-  int** wvhdl = r->wvhdl;
+  rRingOrder_t* order = rShortcut->order;
+  int* block0 = rShortcut->block0;
+  int* block1 = rShortcut->block1;
+  int** wvhdl = rShortcut->wvhdl;
 
   int h = rBlocks(r);
   rShortcut->order = (rRingOrder_t*) omAlloc0((h+2)*sizeof(rRingOrder_t));
