@@ -63,7 +63,7 @@ static inline BOOLEAN p_LeadmonomDivisibleBy(poly a, poly b, const ring r)
 /**
  * id_ShallowDelete deletes the monomials of the polynomials stored inside of it
  **/
-inline void idShallowDelete (ideal *h)
+static inline void idShallowDelete (ideal *h)
 {
   if (*h != NULL)
   {
