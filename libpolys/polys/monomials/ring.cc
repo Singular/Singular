@@ -1324,9 +1324,7 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
 {
   if (r == NULL) return NULL;
   int i,j;
-  ring res=(ring)omAllocBin(sip_sring_bin);
-  memset(res,0,sizeof(ip_sring));
-  //memcpy(res,r,sizeof(ip_sring));
+  ring res=(ring)omAlloc0Bin(sip_sring_bin);
   //memset: res->idroot=NULL; /* local objects */
   //ideal      minideal;
   res->options=r->options; /* ring dependent options */

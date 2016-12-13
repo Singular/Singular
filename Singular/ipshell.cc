@@ -2970,14 +2970,14 @@ rCompose_err:
     if (R->names!=NULL)
     {
       i=R->N-1;
-      while (i>=0) { if (R->names[i]!=NULL) omFree(R->names[i]); i--; }
+      while (i>=0) { omfree(R->names[i]); i--; }
       omFree(R->names);
     }
   }
-  if (R->order!=NULL) omFree(R->order);
-  if (R->block0!=NULL) omFree(R->block0);
-  if (R->block1!=NULL) omFree(R->block1);
-  if (R->wvhdl!=NULL) omFree(R->wvhdl);
+  omfree(R->order);
+  omfree(R->block0);
+  omfree(R->block1);
+  omfree(R->wvhdl);
   omFree(R);
   return NULL;
 }

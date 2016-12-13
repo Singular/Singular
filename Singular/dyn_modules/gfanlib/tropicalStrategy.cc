@@ -67,7 +67,7 @@ static bool noExtraReduction(ideal I, ring r, number /*p*/)
   gfan::ZVector allOnes(n);
   for (int i=0; i<n; i++)
     allOnes[i] = 1;
-  ring rShortcut = rCopy0(r);
+  ring rShortcut = rCopy0(r,FALSE,FALSE);
 
   rRingOrder_t* order = rShortcut->order;
   int* block0 = rShortcut->block0;
@@ -302,7 +302,7 @@ tropicalStrategy::tropicalStrategy(ideal J, number q, ring s):
   linealitySpace = homogeneitySpace(startingIdeal,startingRing);
 
   /* construct the shorcut ring */
-  shortcutRing = rCopy0(startingRing);
+  shortcutRing = rCopy0(startingRing,FALSE); // do not copy q-ideal
   nKillChar(shortcutRing->cf);
   shortcutRing->cf = nInitChar(n_Zp,(void*)(long)IsPrime(n_Int(uniformizingParameter,startingRing->cf)));
   rComplete(shortcutRing);
@@ -557,7 +557,7 @@ std::pair<poly,int> tropicalStrategy::checkInitialIdealForMonomial(const ideal I
 
 ring tropicalStrategy::copyAndChangeCoefficientRing(const ring r) const
 {
-  ring rShortcut = rCopy0(r);
+  ring rShortcut = rCopy0(r,FALSE); // do not copy q-ideal
   nKillChar(rShortcut->cf);
   rShortcut->cf = nCopyCoeff(shortcutRing->cf);
   rComplete(rShortcut);
@@ -699,9 +699,8 @@ ring tropicalStrategy::copyAndChangeOrderingWP(const ring r, const gfan::ZVector
 {
   // copy shortcutRing and change to desired ordering
   bool ok;
-  ring s = rCopy0(r);
+  ring s = rCopy0(r,FALSE,FALSE);
   int n = rVar(s);
-  deleteOrdering(s);
   gfan::ZVector wAdjusted = adjustWeightForHomogeneity(w);
   gfan::ZVector vAdjusted = adjustWeightUnderHomogeneity(v,wAdjusted);
   s->order = (rRingOrder_t*) omAlloc0(5*sizeof(rRingOrder_t));
@@ -730,9 +729,8 @@ ring tropicalStrategy::copyAndChangeOrderingLS(const ring r, const gfan::ZVector
 {
   // copy shortcutRing and change to desired ordering
   bool ok;
-  ring s = rCopy0(r);
+  ring s = rCopy0(r,FALSE,FALSE);
   int n = rVar(s);
-  deleteOrdering(s);
   s->order = (rRingOrder_t*) omAlloc0(5*sizeof(rRingOrder_t));
   s->block0 = (int*) omAlloc0(5*sizeof(int));
   s->block1 = (int*) omAlloc0(5*sizeof(int));

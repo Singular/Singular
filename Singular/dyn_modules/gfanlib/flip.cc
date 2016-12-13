@@ -23,9 +23,8 @@ std::pair<ideal,ring> flip(const ideal I, const ring r,
 {
   /* create a ring with weighted ordering  */
   bool ok;
-  ring sAdjusted = rCopy0(r);
+  ring sAdjusted = rCopy0(r,FALSE,FALSE);
   int n = rVar(sAdjusted);
-  deleteOrdering(sAdjusted);
   sAdjusted->order = (rRingOrder_t*) omAlloc0(5*sizeof(rRingOrder_t));
   sAdjusted->block0 = (int*) omAlloc0(5*sizeof(int));
   sAdjusted->block1 = (int*) omAlloc0(5*sizeof(int));
@@ -68,9 +67,8 @@ std::pair<ideal,ring> flip(const ideal I, const ring r,
   id_Delete(&inIsAdjusted,sAdjusted);
   id_Delete(&inIsAdjustedGB,sAdjusted);
 
-  ring s = rCopy0(r);
+  ring s = rCopy0(r,FALSE,FALSE);
   n = rVar(s);
-  deleteOrdering(s);
   s->order = (rRingOrder_t*) omAlloc0(5*sizeof(rRingOrder_t));
   s->block0 = (int*) omAlloc0(5*sizeof(int));
   s->block1 = (int*) omAlloc0(5*sizeof(int));

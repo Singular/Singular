@@ -54,15 +54,10 @@ static ring genericlyWeightedOrdering(const ring r, const gfan::ZVector &u, cons
   int h = W.getHeight();
 
   /* create a copy s of r and delete its ordering */
-  ring s = rCopy0(r);
-  omFree(s->order);
+  ring s = rCopy0(r,FALSE,FALSE);
   s->order  = (rRingOrder_t*) omAlloc0((h+4)*sizeof(rRingOrder_t));
-  omFree(s->block0);
   s->block0 = (int*) omAlloc0((h+4)*sizeof(int));
-  omFree(s->block1);
   s->block1 = (int*) omAlloc0((h+4)*sizeof(int));
-  for (int j=0; s->wvhdl[j]; j++) omFree(s->wvhdl[j]);
-  omFree(s->wvhdl);
   s->wvhdl  = (int**) omAlloc0((h+4)*sizeof(int*));
 
   /* construct a new ordering as describe above */

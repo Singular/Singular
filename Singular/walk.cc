@@ -2695,18 +2695,14 @@ static ring VMrDefault(intvec* va)
   int nb = 4;
 
   /*weights: entries for 3 blocks: NULL Made:???*/
-  omFree(r->wvhdl);
   r->wvhdl = (int **)omAlloc0(nb * sizeof(int_ptr));
   r->wvhdl[0] = (int*) omAlloc(nv*sizeof(int));
   for(i=0; i<nv; i++)
     r->wvhdl[0][i] = (*va)[i];
 
   /* order: a,lp,C,0 */
-  omFree(r->order);
   r->order = (rRingOrder_t *) omAlloc(nb * sizeof(rRingOrder_t *));
-  omFree(r->block0);
   r->block0 = (int *)omAlloc0(nb * sizeof(int *));
-  omFree(r->block1);
   r->block1 = (int *)omAlloc0(nb * sizeof(int *));
 
   // ringorder a for the first block: var 1..nv
@@ -2750,7 +2746,6 @@ static ring VMrRefine(intvec* va, intvec* vb)
   int nb = 5;
 
   //weights: entries for 3 blocks: NULL Made:???
-  omFree(r->wvhdl);
   r->wvhdl = (int **)omAlloc0(nb * sizeof(int_ptr));
   r->wvhdl[0] = (int*) omAlloc(nv*sizeof(int));
   r->wvhdl[1] = (int*) omAlloc(nv*sizeof(int));
@@ -2762,11 +2757,8 @@ static ring VMrRefine(intvec* va, intvec* vb)
   }
 
   // order: (1..1),a,lp,C
-  omFree(r->order);
   r->order = (rRingOrder_t *) omAlloc(nb * sizeof(rRingOrder_t *));
-  omFree(r->block0);
   r->block0 = (int *)omAlloc0(nb * sizeof(int *));
-  omFree(r->block1);
   r->block1 = (int *)omAlloc0(nb * sizeof(int *));
 
   // ringorder a for the first block: var 1..nv
@@ -2813,7 +2805,6 @@ static ring VMatrDefault(intvec* va)
   int nb = 4;
 
   /*weights: entries for 3 blocks: NULL Made:???*/
-  omFree(r->wvhdl);
   r->wvhdl = (int **)omAlloc0(nb * sizeof(int_ptr));
   r->wvhdl[0] = (int*) omAlloc(nv*nv*sizeof(int));
   r->wvhdl[1] =NULL; // (int*) omAlloc(nv*sizeof(int));
@@ -2823,11 +2814,8 @@ static ring VMatrDefault(intvec* va)
     r->wvhdl[0][i] = (*va)[i];
 
   /* order: a,lp,C,0 */
-  omFree(r->order);
   r->order = (rRingOrder_t*) omAlloc(nb * sizeof(rRingOrder_t*));
-  omFree(r->block0);
   r->block0 = (int *)omAlloc0(nb * sizeof(int *));
-  omFree(r->block1);
   r->block1 = (int *)omAlloc0(nb * sizeof(int *));
 
   // ringorder a for the first block: var 1..nv
@@ -2869,7 +2857,6 @@ static ring VMatrRefine(intvec* va, intvec* vb)
   int nb = 4;
 
   /*weights: entries for 3 blocks: NULL Made:???*/
-  omFree(r->wvhdl);
   r->wvhdl = (int **)omAlloc0(nb * sizeof(int_ptr));
   r->wvhdl[0] = (int*) omAlloc(nv*sizeof(int));
   r->wvhdl[1] = (int*) omAlloc(nvs*sizeof(int));
@@ -2884,11 +2871,8 @@ static ring VMatrRefine(intvec* va, intvec* vb)
     r->wvhdl[0][i] = (*vb)[i];
   }
   /* order: a,lp,C,0 */
-  omFree(r->order);
   r->order = (rRingOrder_t *) omAlloc(nb * sizeof(rRingOrder_t *));
-  omFree(r->block0);
   r->block0 = (int *)omAlloc0(nb * sizeof(int *));
-  omFree(r->block1);
   r->block1 = (int *)omAlloc0(nb * sizeof(int *));
 
   // ringorder a for the first block: var 1..nv
@@ -2929,15 +2913,11 @@ static void VMrDefaultlp(void)
 
   /*weights: entries for 3 blocks: NULL Made:???*/
 
- omFree(r->wvhdl);
   r->wvhdl = (int **)omAlloc0(nb * sizeof(int_ptr));
 
   /* order: lp,C,0 */
- omFree(r->order);
   r->order = (rRingOrder_t *) omAlloc(nb * sizeof(rRingOrder_t *));
- omFree(r->block0);
   r->block0 = (int *)omAlloc0(nb * sizeof(int *));
- omFree(r->block1);
   r->block1 = (int *)omAlloc0(nb * sizeof(int *));
 
   /* ringorder lp for the first block: var 1..nv */
@@ -2973,7 +2953,6 @@ static void DefRingPar(intvec* va)
   ring res=rCopy0(currRing,FALSE,FALSE);
 
   /*weights: entries for 3 blocks: NULL Made:???*/
-  omFree(res->wvhdl);
   res->wvhdl = (int **)omAlloc0(nb * sizeof(int_ptr));
   res->wvhdl[0] = (int*) omAlloc(nv*sizeof(int));
   for(int i=0; i<nv; i++)
@@ -2981,11 +2960,8 @@ static void DefRingPar(intvec* va)
 
   /* order: a,lp,C,0 */
 
-  omFree(res->order);
   res->order = (rRingOrder_t *) omAlloc(nb * sizeof(rRingOrder_t *));
-  omFree(res->block0);
   res->block0 = (int *)omAlloc0(nb * sizeof(int *));
-  omFree(res->block1);
   res->block1 = (int *)omAlloc0(nb * sizeof(int *));
 
   // ringorder a for the first block: var 1..nv
@@ -3028,15 +3004,11 @@ static void DefRingParlp(void)
 
   /*weights: entries for 3 blocks: NULL Made:???*/
 
-  omFree(r->wvhdl);
   r->wvhdl = (int **)omAlloc0(nb * sizeof(int_ptr));
 
   /* order: lp,C,0 */
-  omFree(r->order);
   r->order = (rRingOrder_t *) omAlloc(nb * sizeof(rRingOrder_t *));
-  omFree(r->block0);
   r->block0 = (int *)omAlloc0(nb * sizeof(int *));
-  omFree(r->block1);
   r->block1 = (int *)omAlloc0(nb * sizeof(int *));
 
   /* ringorder lp for the first block: var 1..nv */

@@ -77,25 +77,23 @@ inline void idShallowDelete (ideal *h)
   return;
 }
 
-inline void deleteOrdering(ring r)
+static inline void deleteOrdering(ring r)
 {
   if (r->order != NULL)
   {
     int i=rBlocks(r);
     assume(r->block0 != NULL && r->block1 != NULL && r->wvhdl != NULL);
     /* delete order */
-    omFreeSize((ADDRESS)r->order,i*sizeof(int));
+    omFreeSize((ADDRESS)r->order,i*sizeof(rRingOrder_t));
     omFreeSize((ADDRESS)r->block0,i*sizeof(int));
     omFreeSize((ADDRESS)r->block1,i*sizeof(int));
     /* delete weights */
     for (int j=0; j<i; j++)
-      if (r->wvhdl[j]!=NULL)
-        omFree(r->wvhdl[j]);
+      omfree(r->wvhdl[j]);
     omFreeSize((ADDRESS)r->wvhdl,i*sizeof(int *));
   }
   else
     assume(r->block0 == NULL && r->block1 == NULL && r->wvhdl == NULL);
-  return;
 }
 
 
