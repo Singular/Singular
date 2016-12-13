@@ -69,16 +69,16 @@ static bool noExtraReduction(ideal I, ring r, number /*p*/)
     allOnes[i] = 1;
   ring rShortcut = rCopy0(r);
 
-  rRingOrder_t* order = rShortcut->order;
-  int* block0 = rShortcut->block0;
-  int* block1 = rShortcut->block1;
-  int** wvhdl = rShortcut->wvhdl;
+  rRingOrder_t* order = r->order;
+  int* block0 = r->block0;
+  int* block1 = r->block1;
+  int** wvhdl = r->wvhdl;
 
   int h = rBlocks(r);
-  rShortcut->order = (rRingOrder_t*) omAlloc0((h+1)*sizeof(rRingOrder_t));
-  rShortcut->block0 = (int*) omAlloc0((h+1)*sizeof(int));
-  rShortcut->block1 = (int*) omAlloc0((h+1)*sizeof(int));
-  rShortcut->wvhdl = (int**) omAlloc0((h+1)*sizeof(int*));
+  rShortcut->order = (rRingOrder_t*) omAlloc0((h+2)*sizeof(rRingOrder_t));
+  rShortcut->block0 = (int*) omAlloc0((h+2)*sizeof(int));
+  rShortcut->block1 = (int*) omAlloc0((h+2)*sizeof(int));
+  rShortcut->wvhdl = (int**) omAlloc0((h+2)*sizeof(int*));
   rShortcut->order[0] = ringorder_a;
   rShortcut->block0[0] = 1;
   rShortcut->block1[0] = n;
@@ -91,6 +91,10 @@ static bool noExtraReduction(ideal I, ring r, number /*p*/)
     rShortcut->block1[i] = block1[i-1];
     rShortcut->wvhdl[i] = wvhdl[i-1];
   }
+  //rShortcut->order[h+1] = (rRingOrder_t)0; -- done by omAlloc0
+  //rShortcut->block0[h+1] = 0;
+  //rShortcut->block1[h+1] = 0;
+  //rShortcut->wvhdl[h+1] = NULL;
 
   rComplete(rShortcut);
   rTest(rShortcut);
@@ -452,10 +456,10 @@ ring tropicalStrategy::getShortcutRingPrependingWeight(const ring r, const gfan:
   // adjust weight and create new ordering
   gfan::ZVector w = adjustWeightForHomogeneity(v);
   int h = rBlocks(r); int n = rVar(r);
-  rShortcut->order = (rRingOrder_t*) omAlloc0((h+1)*sizeof(rRingOrder_t));
-  rShortcut->block0 = (int*) omAlloc0((h+1)*sizeof(int));
-  rShortcut->block1 = (int*) omAlloc0((h+1)*sizeof(int));
-  rShortcut->wvhdl = (int**) omAlloc0((h+1)*sizeof(int*));
+  rShortcut->order = (rRingOrder_t*) omAlloc0((h+2)*sizeof(rRingOrder_t));
+  rShortcut->block0 = (int*) omAlloc0((h+2)*sizeof(int));
+  rShortcut->block1 = (int*) omAlloc0((h+2)*sizeof(int));
+  rShortcut->wvhdl = (int**) omAlloc0((h+2)*sizeof(int*));
   rShortcut->order[0] = ringorder_a;
   rShortcut->block0[0] = 1;
   rShortcut->block1[0] = n;
