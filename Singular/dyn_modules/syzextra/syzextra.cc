@@ -547,8 +547,6 @@ void Sort_c_ds(const ideal id, const ring r)
 /// Clean up all the accumulated data
 void SchreyerSyzygyComputation::CleanUp()
 {
-  extern void id_Delete (ideal*, const ring);
-
   id_Delete(const_cast<ideal*>(&m_idTails), m_rBaseRing); // TODO!!!
 
 /*if( m_sum_bucket != NULL )

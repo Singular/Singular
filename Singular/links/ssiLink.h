@@ -31,5 +31,7 @@ BOOLEAN ssiClose(si_link l);
 const char* slStatusSsi(si_link l, const char* request);
 si_link_extension slInitSsiExtension(si_link_extension s);
 
+si_link ssiCommandLink();
+
 void sig_chld_hdl(int sig);
 #endif

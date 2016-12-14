@@ -23,6 +23,7 @@
 
 // include basic definitions
 #include "singularxx_defs.h"
+#include "kernel/ideals.h"
 
 struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
 struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* const_ring;
@@ -360,7 +361,6 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
     void operator=(const CReducerFinder&);
 };
 
-extern ideal id_Copy (const ideal, const ring);
 bool my_p_LmCmp (poly, poly, const ring);
 
 typedef poly TCacheKey;

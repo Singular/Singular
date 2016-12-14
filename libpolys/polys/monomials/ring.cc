@@ -4734,7 +4734,7 @@ static ring rAssure_Global(rRingOrder_t b1, rRingOrder_t b2, const ring r)
   return res;
 }
 
-ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete = TRUE, int sgn = 1)
+ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete/* = TRUE*/, int sgn/* = 1*/)
 { // TODO: ???? Add leading Syz-comp ordering here...????
 
 #if MYTEST

@@ -100,6 +100,7 @@
 #include "attrib.h"
 
 #include "links/silink.h"
+#include "links/ssiLink.h"
 #include "walk.h"
 #include <Singular/newstruct.h>
 #include <Singular/blackbox.h>
@@ -926,7 +927,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 /*==================== reserved link =================*/
     if (strcmp(sys_cmd,"reservedLink")==0)
     {
-      extern si_link ssiCommandLink();
       res->rtyp=LINK_CMD;
       si_link p=ssiCommandLink();
       res->data=(void*)p;

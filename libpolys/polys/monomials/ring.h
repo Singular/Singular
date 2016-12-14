@@ -720,6 +720,7 @@ void   rSetSyzComp(int k, const ring r);
 ring   rAssure_HasComp(const ring r);
 ring   rAssure_SyzOrder(const ring r, BOOLEAN complete);
 ring   rAssure_SyzComp(const ring r, BOOLEAN complete = TRUE);
+ring   rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete = TRUE, int sgn = 1);
 
 ring   rAssure_dp_S(const ring r);
 ring   rAssure_dp_C(const ring r);
@@ -817,6 +818,7 @@ BOOLEAN rSetISReference(const ring r, const ideal F, const int i = 0, const int 
 
 /// return the position of the p^th IS block order block in r->typ[]...
 int rGetISPos(const int p, const ring r);
+void pISUpdateComponents(ideal F, const intvec *const V, const int MIN, const ring r);
 
 BOOLEAN rCheckIV(const intvec *iv);
 int rTypeOfMatrixOrder(const intvec *order);

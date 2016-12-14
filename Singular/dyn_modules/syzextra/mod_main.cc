@@ -49,13 +49,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "polys/monomials/ring.h"
 
-
-
-extern void pISUpdateComponents(ideal F, const intvec *const V, const int MIN, const ring r);
-// extern ring rCurrRingAssure_SyzComp();
-extern ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete, int sign);
-extern int rGetISPos(const int p, const ring r);
 
 // USING_NAMESPACE_SINGULARXX;
 
