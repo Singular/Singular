@@ -42,8 +42,9 @@ static char * omFindExec_link (const char *name, char* executable)
 
   if (ABSOLUTE_FILENAME_P(name))
   {
-      /* If we can execute the named file then return it. */
-      if (! access (name, X_OK))
+      /* If the named file exists then return it. */
+      if (! access (name, F_OK)) //think of libSingular.so as main binary
+                                 // r or x is required
       {
         strcpy(executable, name);
         return executable;
@@ -65,7 +66,7 @@ static char * omFindExec_link (const char *name, char* executable)
 #endif
       strcat (tbuf, "/");
       strcat (tbuf, name);
-      if (! access(tbuf, X_OK))
+      if (! access(tbuf, F_OK))
       {
         strcpy(executable, tbuf);
         return executable;
