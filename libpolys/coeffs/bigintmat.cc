@@ -290,11 +290,9 @@ bigintmat * bimMult(bigintmat * a, bigintmat * b)
       {
         number prod = n_Mult( BIMATELEM(*a, i, k), BIMATELEM(*b, k, j), basecoeffs);
 
-        number sum2 = n_Add(sum, prod, basecoeffs); // no inplace add :(
+        n_InpAdd(sum, prod, basecoeffs);
 
-        n_Delete(&sum, basecoeffs); n_Delete(&prod, basecoeffs);
-
-        sum = sum2;
+        n_Delete(&prod, basecoeffs);
       }
       bim->rawset(i, j, sum, basecoeffs);
     }
