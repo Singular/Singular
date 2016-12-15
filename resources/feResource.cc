@@ -174,7 +174,7 @@ void feInitResources(const char* argv0)
     //WarnS("illegal argv[0]==NULL");
     feArgv0 = (char*)malloc(MAXPATHLEN+strlen("/Singular"));
     getcwd(feArgv0, MAXPATHLEN);
-    strcpy(feArgv0+strlen(feArgv0),"/Singular");
+    strcat(feArgv0,"/Singular");
   }
   else
     feArgv0 = strdup(argv0);
