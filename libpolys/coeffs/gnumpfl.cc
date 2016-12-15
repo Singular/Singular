@@ -19,40 +19,10 @@
 #include "longrat.h"
 #include "shortfl.h"
 #include "gnumpfl.h"
+#include "gnumpc.h"
 #include "modulop.h"
 
-//ring ngfMapRing; // to be used also in gnumpc.cc
-
-/// Get a mapping function from src into the domain of this type:
-nMapFunc  ngfSetMap(const coeffs src, const coeffs dst);
-
 const char *   ngfRead (const char *s, number *a, const coeffs r);
-
- // Private interface should be hidden!!!
-/// Note: MAY NOT WORK AS EXPECTED!
-BOOLEAN  ngfGreaterZero(number za, const coeffs r);
-BOOLEAN  ngfGreater(number a, number b, const coeffs r);
-BOOLEAN  ngfEqual(number a, number b, const coeffs r);
-BOOLEAN  ngfIsOne(number a, const coeffs r);
-BOOLEAN  ngfIsMOne(number a, const coeffs r);
-BOOLEAN  ngfIsZero(number za, const coeffs r);
-number   ngfInit(long i, const coeffs r);
-long     ngfInt(number &n, const coeffs r);
-number   ngfNeg(number za, const coeffs r);
-number   ngfInvers(number a, const coeffs r);
-number   ngfAdd(number la, number li, const coeffs r);
-number   ngfSub(number la, number li, const coeffs r);
-number   ngfMult(number a, number b, const coeffs r);
-number   ngfDiv(number a, number b, const coeffs r);
-void     ngfPower(number x, int exp, number *lu, const coeffs r);
-number   ngfCopy(number a, const coeffs r);
-number   ngf_Copy(number a, coeffs r);
-void     ngfWrite(number a, const coeffs r);
-void     ngfCoeffWrite(const coeffs r, BOOLEAN details);
-
-void     ngfDelete(number *a, const coeffs r);
-
-number ngfMapQ(number from, const coeffs src, const coeffs r);
 
 union nf
 {
@@ -67,7 +37,7 @@ union nf
 /*2
 * n := i
 */
-number ngfInit (long i, const coeffs r)
+static number ngfInit (long i, const coeffs r)
 {
   assume( getCoeffType(r) == n_long_R );
 
@@ -78,7 +48,7 @@ number ngfInit (long i, const coeffs r)
 /*2
 * convert number to int
 */
-long ngfInt(number &i, const coeffs r)
+static long ngfInt(number &i, const coeffs r)
 {
   assume( getCoeffType(r) == n_long_R );
 
@@ -89,7 +59,14 @@ long ngfInt(number &i, const coeffs r)
     return (long)(d+0.5);
 }
 
-int ngfSize(number n, const coeffs r)
+static BOOLEAN ngfIsZero (number a, const coeffs r)
+{
+  assume( getCoeffType(r) == n_long_R );
+
+  return ( ((gmp_float*)a)->isZero() );
+}
+
+static int ngfSize(number n, const coeffs r)
 {
   long i = ngfInt(n, r);
   /* basically return the largest integer in n;
@@ -97,13 +74,13 @@ int ngfSize(number n, const coeffs r)
      return 1;
      (this code ensures that zero has the size zero) */
   if ((i == 0) && (ngfIsZero(n,r) == FALSE)) i = 1;
-  return i;
+  return ABS(i);
 }
 
 /*2
 * delete a
 */
-void ngfDelete (number * a, const coeffs r)
+static void ngfDelete (number * a, const coeffs r)
 {
   assume( getCoeffType(r) == n_long_R );
 
@@ -117,7 +94,7 @@ void ngfDelete (number * a, const coeffs r)
 /*2
 * copy a to b
 */
-number ngfCopy(number a, const coeffs r)
+static number ngfCopy(number a, const coeffs r)
 {
   assume( getCoeffType(r) == n_long_R );
 
@@ -143,7 +120,7 @@ static number ngfCopyMap(number a, const coeffs r1, const coeffs r2)
 /*2
 * za:= - za
 */
-number ngfNeg (number a, const coeffs r)
+static number ngfNeg (number a, const coeffs r)
 {
   assume( getCoeffType(r) == n_long_R );
 
@@ -154,7 +131,7 @@ number ngfNeg (number a, const coeffs r)
 /*
 * 1/a
 */
-number ngfInvers(number a, const coeffs r)
+static number ngfInvers(number a, const coeffs r)
 {
   assume( getCoeffType(r) == n_long_R );
 
@@ -173,7 +150,7 @@ number ngfInvers(number a, const coeffs r)
 /*2
 * u:= a + b
 */
-number ngfAdd (number a, number b, const coeffs R)
+static number ngfAdd (number a, number b, const coeffs R)
 {
   assume( getCoeffType(R) == n_long_R );
 
@@ -184,7 +161,7 @@ number ngfAdd (number a, number b, const coeffs R)
 /*2
 * u:= a - b
 */
-number ngfSub (number a, number b, const coeffs R)
+static number ngfSub (number a, number b, const coeffs R)
 {
   assume( getCoeffType(R) == n_long_R );
 
@@ -195,7 +172,7 @@ number ngfSub (number a, number b, const coeffs R)
 /*2
 * u := a * b
 */
-number ngfMult (number a, number b, const coeffs R)
+static number ngfMult (number a, number b, const coeffs R)
 {
   assume( getCoeffType(R) == n_long_R );
 
@@ -206,7 +183,7 @@ number ngfMult (number a, number b, const coeffs R)
 /*2
 * u := a / b
 */
-number ngfDiv (number a, number b, const coeffs r)
+static number ngfDiv (number a, number b, const coeffs r)
 {
   assume( getCoeffType(r) == n_long_R );
 
@@ -223,7 +200,7 @@ number ngfDiv (number a, number b, const coeffs r)
 /*2
 * u:= x ^ exp
 */
-number ngfPower (number x, int exp, const coeffs r)
+static number ngfPower (number x, int exp, const coeffs r)
 {
   assume( getCoeffType(r) == n_long_R );
 
@@ -244,22 +221,15 @@ number ngfPower (number x, int exp, const coeffs r)
 }
 
 /* kept for compatibility reasons, to be deleted */
-void ngfPower ( number x, int exp, number * u, const coeffs r )
+static void ngfPower ( number x, int exp, number * u, const coeffs r )
 {
   *u = ngfPower(x, exp, r);
-}
-
-BOOLEAN ngfIsZero (number a, const coeffs r)
-{
-  assume( getCoeffType(r) == n_long_R );
-
-  return ( ((gmp_float*)a)->isZero() );
 }
 
 /*2
 * za > 0 ?
 */
-BOOLEAN ngfGreaterZero (number a, const coeffs r)
+static BOOLEAN ngfGreaterZero (number a, const coeffs r)
 {
   assume( getCoeffType(r) == n_long_R );
 
@@ -269,7 +239,7 @@ BOOLEAN ngfGreaterZero (number a, const coeffs r)
 /*2
 * a > b ?
 */
-BOOLEAN ngfGreater (number a, number b, const coeffs r)
+static BOOLEAN ngfGreater (number a, number b, const coeffs r)
 {
   assume( getCoeffType(r) == n_long_R );
 
@@ -279,7 +249,7 @@ BOOLEAN ngfGreater (number a, number b, const coeffs r)
 /*2
 * a = b ?
 */
-BOOLEAN ngfEqual (number a, number b, const coeffs r)
+static BOOLEAN ngfEqual (number a, number b, const coeffs r)
 {
   assume( getCoeffType(r) == n_long_R );
 
@@ -289,7 +259,7 @@ BOOLEAN ngfEqual (number a, number b, const coeffs r)
 /*2
 * a == 1 ?
 */
-BOOLEAN ngfIsOne (number a, const coeffs r)
+static BOOLEAN ngfIsOne (number a, const coeffs r)
 {
   assume( getCoeffType(r) == n_long_R );
 
@@ -299,7 +269,7 @@ BOOLEAN ngfIsOne (number a, const coeffs r)
 /*2
 * a == -1 ?
 */
-BOOLEAN ngfIsMOne (number a, const coeffs r)
+static BOOLEAN ngfIsMOne (number a, const coeffs r)
 {
   assume( getCoeffType(r) == n_long_R );
 
@@ -394,7 +364,7 @@ const char * ngfRead (const char * start, number * a, const coeffs r)
 /*2
 * write a floating point number
 */
-void ngfWrite (number a, const coeffs r)
+static void ngfWrite (number a, const coeffs r)
 {
   assume( getCoeffType(r) == n_long_R );
 
@@ -412,7 +382,7 @@ void ngfWrite (number a, const coeffs r)
   }
 }
 
-BOOLEAN ngfCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
+static BOOLEAN ngfCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
 {
   if (n==n_long_R)
   {
@@ -425,7 +395,7 @@ BOOLEAN ngfCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
   return FALSE;
 }
 
-void ngfSetChar(const coeffs r)
+static void ngfSetChar(const coeffs r)
 {
   setGMPFloatDigits(r->float_len, r->float_len2);
 }
@@ -442,6 +412,98 @@ static char* ngfCoeffName(const coeffs r)
   static char ngfCoeffName_buf[27];
   snprintf(ngfCoeffName_buf,27,"RR(%d,%d)",r->float_len,r->float_len2);
   return ngfCoeffName_buf;
+}
+
+static number ngfMapQ(number from, const coeffs src, const coeffs dst)
+{
+  assume( getCoeffType(dst) == n_long_R );
+  assume( src->rep == n_rep_gap_rat );
+
+  gmp_float *res=new gmp_float(numberFieldToFloat(from,QTOF));
+  return (number)res;
+}
+static number ngfMapZ(number from, const coeffs aRing, const coeffs r)
+{
+  assume( getCoeffType(r) == n_long_R );
+  assume( aRing->rep == n_rep_gap_gmp);
+
+  if ( from != NULL )
+  {
+    if (SR_HDL(from) & SR_INT)
+    {
+      gmp_float f_i= gmp_float(SR_TO_INT(from));
+      gmp_float *res=new gmp_float(f_i);
+      return (number)res;
+    }
+    gmp_float f_i=(mpz_ptr)from;
+    gmp_float *res=new gmp_float(f_i);
+    return (number)res;
+  }
+  else
+    return NULL;
+}
+
+static number ngfMapR(number from, const coeffs src, const coeffs dst)
+{
+  assume( getCoeffType(dst) == n_long_R );
+  assume( getCoeffType(src) == n_R );
+
+  gmp_float *res=new gmp_float((double)nf(from).F());
+  return (number)res;
+}
+
+static number ngfMapP(number from, const coeffs src, const coeffs dst)
+{
+  assume( getCoeffType(dst) == n_long_R );
+  assume( getCoeffType(src) ==  n_Zp );
+
+  return ngfInit(npInt(from,src), dst); // FIXME? TODO? // extern int     npInt         (number &n, const coeffs r);
+}
+
+static number ngfMapC(number from, const coeffs src, const coeffs dst)
+{
+  assume( getCoeffType(dst) == n_long_R );
+  assume( getCoeffType(src) ==  n_long_C );
+
+  gmp_float *res=new gmp_float(((gmp_complex*)from)->real());
+  return (number)res;
+}
+
+static nMapFunc ngfSetMap(const coeffs src, const coeffs dst)
+{
+  assume( getCoeffType(dst) == n_long_R );
+
+  if (src->rep==n_rep_gap_rat) /*Q, Z*/
+  {
+    return ngfMapQ;
+  }
+  if (src->rep==n_rep_gap_gmp) /*Q, Z*/
+  {
+    return ngfMapZ;
+  }
+  if ((src->rep==n_rep_gmp_float) && nCoeff_is_long_R(src))
+  {
+    return ndCopyMap; //ngfCopyMap;
+  }
+  if ((src->rep==n_rep_float) && nCoeff_is_R(src))
+  {
+    return ngfMapR;
+  }
+  if ((src->rep==n_rep_gmp_complex) && nCoeff_is_long_C(src))
+  {
+    return ngfMapC;
+  }
+  if ((src->rep==n_rep_int) && nCoeff_is_Zp(src))
+  {
+    return ngfMapP;
+  }
+  return NULL;
+}
+
+static void ngfCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
+{
+  Print("float(real:%d digits, additional %d digits)",
+               r->float_len,r->float_len2);  /* long R */
 }
 
 BOOLEAN ngfInitChar(coeffs n, void *parameter)
@@ -506,97 +568,4 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
   assume( n_ParameterNames(n) == NULL );
 
   return FALSE;
-}
-
-number ngfMapQ(number from, const coeffs src, const coeffs dst)
-{
-  assume( getCoeffType(dst) == n_long_R );
-  assume( src->rep == n_rep_gap_rat );
-
-  gmp_float *res=new gmp_float(numberFieldToFloat(from,QTOF));
-  return (number)res;
-}
-number ngfMapZ(number from, const coeffs aRing, const coeffs r)
-{
-  assume( getCoeffType(r) == n_long_R );
-  assume( aRing->rep == n_rep_gap_gmp);
-
-  if ( from != NULL )
-  {
-    if (SR_HDL(from) & SR_INT)
-    {
-      gmp_float f_i= gmp_float(SR_TO_INT(from));
-      gmp_float *res=new gmp_float(f_i);
-      return (number)res;
-    }
-    gmp_float f_i=(mpz_ptr)from;
-    gmp_float *res=new gmp_float(f_i);
-    return (number)res;
-  }
-  else
-    return NULL;
-}
-
-
-static number ngfMapR(number from, const coeffs src, const coeffs dst)
-{
-  assume( getCoeffType(dst) == n_long_R );
-  assume( getCoeffType(src) == n_R );
-
-  gmp_float *res=new gmp_float((double)nf(from).F());
-  return (number)res;
-}
-
-static number ngfMapP(number from, const coeffs src, const coeffs dst)
-{
-  assume( getCoeffType(dst) == n_long_R );
-  assume( getCoeffType(src) ==  n_Zp );
-
-  return ngfInit(npInt(from,src), dst); // FIXME? TODO? // extern int     npInt         (number &n, const coeffs r);
-}
-
-static number ngfMapC(number from, const coeffs src, const coeffs dst)
-{
-  assume( getCoeffType(dst) == n_long_R );
-  assume( getCoeffType(src) ==  n_long_C );
-
-  gmp_float *res=new gmp_float(((gmp_complex*)from)->real());
-  return (number)res;
-}
-
-nMapFunc ngfSetMap(const coeffs src, const coeffs dst)
-{
-  assume( getCoeffType(dst) == n_long_R );
-
-  if (src->rep==n_rep_gap_rat) /*Q, Z*/
-  {
-    return ngfMapQ;
-  }
-  if (src->rep==n_rep_gap_gmp) /*Q, Z*/
-  {
-    return ngfMapZ;
-  }
-  if ((src->rep==n_rep_gmp_float) && nCoeff_is_long_R(src))
-  {
-    return ndCopyMap; //ngfCopyMap;
-  }
-  if ((src->rep==n_rep_float) && nCoeff_is_R(src))
-  {
-    return ngfMapR;
-  }
-  if ((src->rep==n_rep_gmp_complex) && nCoeff_is_long_C(src))
-  {
-    return ngfMapC;
-  }
-  if ((src->rep==n_rep_int) && nCoeff_is_Zp(src))
-  {
-    return ngfMapP;
-  }
-  return NULL;
-}
-
-void    ngfCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
-{
-  Print("float(real:%d digits, additional %d digits)",
-               r->float_len,r->float_len2);  /* long R */
 }
