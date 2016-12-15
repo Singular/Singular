@@ -17,9 +17,6 @@
 #include "numbers.h"
 #include "longrat.h"
 
-/// Our Type!
-static const n_coeffType ID = n_Q;
-
 omBin rnumber_bin = omGetSpecBin(sizeof(snumber)); // TODO: move this into coeffs-struct (for Q)?!
 
 
@@ -172,4 +169,3 @@ void nlDebugWrite (number a)
   }
 }
 #endif
-
