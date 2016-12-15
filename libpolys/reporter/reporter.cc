@@ -253,7 +253,7 @@ void SPrintStart()
   sprint = omStrDup("");
 }
 
-static void SPrintS(const char* s)
+static inline void SPrintS(const char* s)
 {
   omCheckAddr(sprint);
   if ((s == NULL)||(*s == '\0')) return;

@@ -19,7 +19,7 @@ struct omErrorString_s
 };
 
 /* strings describing omErrors */
-static struct omErrorString_s om_ErrorStrings[] =
+static const struct omErrorString_s om_ErrorStrings[] =
 {
   {omError_NoError,                     "omError_NoError",                     "no error"},
   {omError_Unknown,                     "omError_Unknown",                     "unknown error" },

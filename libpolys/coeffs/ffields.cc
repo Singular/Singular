@@ -25,9 +25,6 @@
 BOOLEAN nfDBTest      (number a, const char *f, const int l, const coeffs r);
 #endif
 
-/// Our Type!
-static const n_coeffType ID = n_GF;
-
 //unsigned short *nfPlus1Table=NULL; /* the table i=log(z^i) -> log(z^i+1) */
 
 /* the q's from the table 'fftable' */
@@ -922,7 +919,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
 
   const double check= log ((double) (p->GFChar));
 
-  static const double sixteenlog2= 11.09035489;
+  #define sixteenlog2 11.09035489
   if( (p->GFDegree * check) > sixteenlog2 )
   {
 #ifndef SING_NDEBUG
