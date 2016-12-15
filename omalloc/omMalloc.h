@@ -25,9 +25,5 @@
 #include "omalloc/gmalloc.h"
 #endif
 
-#ifdef OMALLOC_USES_DLMALLOC
-#include "omalloc/dlmalloc.h"
-#endif
-
 #endif /* OM_MALLOC_H */
 
