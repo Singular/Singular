@@ -103,7 +103,6 @@ SingularHEADERS = \
    pcv.h \
    links/pipeLink.h \
    pyobject_setup.h \
-   run.h \
    sdb.h \
    links/silink.h \
    links/sing_dbm.h \
