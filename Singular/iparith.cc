@@ -6647,7 +6647,7 @@ static BOOLEAN jjCALL3ARG(leftv res, leftv u)
 
 static BOOLEAN jjCOEF_M(leftv, leftv v)
 {
-  short t[]={5,VECTOR_CMD,POLY_CMD,MATRIX_CMD,MATRIX_CMD,IDHDL};
+  const short t[]={5,VECTOR_CMD,POLY_CMD,MATRIX_CMD,MATRIX_CMD,IDHDL};
   if (iiCheckTypes(v,t))
      return TRUE;
   idhdl c=(idhdl)v->next->next->data;
@@ -7072,8 +7072,8 @@ static BOOLEAN jjLU_INVERSE(leftv res, leftv v)
      inspect the first entry of the returned list to see
      whether A is invertible. */
   matrix iMat; int invertible;
-  short t1[]={1,MATRIX_CMD};
-  short t2[]={3,MATRIX_CMD,MATRIX_CMD,MATRIX_CMD};
+  const short t1[]={1,MATRIX_CMD};
+  const short t2[]={3,MATRIX_CMD,MATRIX_CMD,MATRIX_CMD};
   if (iiCheckTypes(v,t1))
   {
     matrix aMat = (matrix)v->Data();
@@ -7155,7 +7155,7 @@ static BOOLEAN jjLU_SOLVE(leftv res, leftv v)
         H is the matrix with column vectors spanning the homogeneous
         solution space.
      The method produces an error if matrix and vector sizes do not fit. */
-  short t[]={4,MATRIX_CMD,MATRIX_CMD,MATRIX_CMD,MATRIX_CMD};
+  const short t[]={4,MATRIX_CMD,MATRIX_CMD,MATRIX_CMD,MATRIX_CMD};
   if (!iiCheckTypes(v,t))
   {
     WerrorS("expected exactly three matrices and one vector as input");
@@ -7253,10 +7253,10 @@ static BOOLEAN jjINTVEC_PL(leftv res, leftv v)
 }
 static BOOLEAN jjJET4(leftv res, leftv u)
 {
-  short t1[]={4,POLY_CMD,POLY_CMD,POLY_CMD,INTVEC_CMD};
-  short t2[]={4,VECTOR_CMD,POLY_CMD,POLY_CMD,INTVEC_CMD};
-  short t3[]={4,IDEAL_CMD,MATRIX_CMD,INT_CMD,INTVEC_CMD};
-  short t4[]={4,MODUL_CMD,MATRIX_CMD,INT_CMD,INTVEC_CMD};
+  const short t1[]={4,POLY_CMD,POLY_CMD,POLY_CMD,INTVEC_CMD};
+  const short t2[]={4,VECTOR_CMD,POLY_CMD,POLY_CMD,INTVEC_CMD};
+  const short t3[]={4,IDEAL_CMD,MATRIX_CMD,INT_CMD,INTVEC_CMD};
+  const short t4[]={4,MODUL_CMD,MATRIX_CMD,INT_CMD,INTVEC_CMD};
   leftv u1=u;
   leftv u2=u1->next;
   leftv u3=u2->next;

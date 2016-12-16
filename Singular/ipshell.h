@@ -159,10 +159,10 @@ struct sValCmdM
   short number_of_args; /* -1: any, -2: any >0, .. */
   short valid_for;
 };
-extern struct sValCmd2 dArith2[];
-extern struct sValCmd1 dArith1[];
-extern struct sValCmd3 dArith3[];
-extern struct sValCmdM dArithM[];
+extern const struct sValCmd2 dArith2[];
+extern const struct sValCmd1 dArith1[];
+extern const struct sValCmd3 dArith3[];
+extern const struct sValCmdM dArithM[];
 #endif
 
 /* ================================================================== */

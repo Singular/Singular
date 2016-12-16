@@ -70,7 +70,7 @@ lists pcvPMulL(poly p,lists l1)
 
 BOOLEAN pcvLAddL(leftv res,leftv h)
 {
-  short t[]={2,LIST_CMD,LIST_CMD};
+  const short t[]={2,LIST_CMD,LIST_CMD};
   if (iiCheckTypes(h,t,1))
   {
     lists l1=(lists)h->Data();
@@ -85,7 +85,7 @@ BOOLEAN pcvLAddL(leftv res,leftv h)
 
 BOOLEAN pcvPMulL(leftv res,leftv h)
 {
-  short t[]={2,POLY_CMD,LIST_CMD};
+  const short t[]={2,POLY_CMD,LIST_CMD};
   if (iiCheckTypes(h,t,1))
   {
     poly p=(poly)h->Data();
@@ -318,7 +318,7 @@ BOOLEAN pcvP2CV(leftv res,leftv h)
 {
   if(currRing)
   {
-    short t[]={3,LIST_CMD,INT_CMD,INT_CMD};
+    const short t[]={3,LIST_CMD,INT_CMD,INT_CMD};
     if (iiCheckTypes(h,t,1))
     {
       lists p=(lists)h->Data();
@@ -340,7 +340,7 @@ BOOLEAN pcvCV2P(leftv res,leftv h)
 {
   if(currRing)
   {
-    short t[]={3,LIST_CMD,INT_CMD,INT_CMD};
+    const short t[]={3,LIST_CMD,INT_CMD,INT_CMD};
     if (iiCheckTypes(h,t,1))
     {
       lists pl=(lists)h->Data();
@@ -372,7 +372,7 @@ BOOLEAN pcvDim(leftv res,leftv h)
 {
   if(currRing)
   {
-    short t[]={2,INT_CMD,INT_CMD};
+    const short t[]={2,INT_CMD,INT_CMD};
     if (iiCheckTypes(h,t,1))
     {
       int d0=(int)(long)h->Data();
@@ -425,7 +425,7 @@ BOOLEAN pcvBasis(leftv res,leftv h)
 {
   if(currRing)
   {
-    short t[]={2,INT_CMD,INT_CMD};
+    const short t[]={2,INT_CMD,INT_CMD};
     if (iiCheckTypes(h,t,1))
     {
       int d0=(int)(long)h->Data();
