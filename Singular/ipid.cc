@@ -63,7 +63,6 @@ idhdl basePackHdl = NULL;
 package currPack =NULL;
 package basePack =NULL;
 idhdl currRingHdl = NULL;
-const char* iiNoName="_";
 
 void paCleanUp(package pack);
 

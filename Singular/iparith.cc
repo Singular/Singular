@@ -2905,7 +2905,7 @@ static BOOLEAN jjREAD2(leftv res, leftv u, leftv v)
   {
     const char *s;
     if ((l!=NULL)&&(l->name!=NULL)) s=l->name;
-    else                            s=sNoName;
+    else                            s=sNoName_fe;
     Werror("cannot read from `%s`",s);
     return TRUE;
   }
@@ -3991,7 +3991,7 @@ static BOOLEAN jjDUMP(leftv, leftv v)
   {
     const char *s;
     if ((l!=NULL)&&(l->name!=NULL)) s=l->name;
-    else                            s=sNoName;
+    else                            s=sNoName_fe;
     Werror("cannot dump to `%s`",s);
     return TRUE;
   }
@@ -4082,7 +4082,7 @@ static BOOLEAN jjGETDUMP(leftv, leftv v)
   {
     const char *s;
     if ((l!=NULL)&&(l->name!=NULL)) s=l->name;
-    else                            s=sNoName;
+    else                            s=sNoName_fe;
     Werror("cannot get dump from `%s`",s);
     return TRUE;
   }
@@ -8079,11 +8079,11 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
     const char *s=NULL;
     if (!errorreported)
     {
-      if ((at==0) && (a->Fullname()!=sNoName))
+      if ((at==0) && (a->Fullname()!=sNoName_fe))
       {
         s=a->Fullname();
       }
-      else if ((bt==0) && (b->Fullname()!=sNoName))
+      else if ((bt==0) && (b->Fullname()!=sNoName_fe))
       {
         s=b->Fullname();
       }
@@ -8304,7 +8304,7 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, const struct sValCmd1* dA1, 
     // error handling
     if (!errorreported)
     {
-      if ((at==0) && (a->Fullname()!=sNoName))
+      if ((at==0) && (a->Fullname()!=sNoName_fe))
       {
         Werror("`%s` is not defined",a->Fullname());
       }
@@ -8499,15 +8499,15 @@ static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv 
     if (!errorreported)
     {
       const char *s=NULL;
-      if ((at==0) && (a->Fullname()!=sNoName))
+      if ((at==0) && (a->Fullname()!=sNoName_fe))
       {
         s=a->Fullname();
       }
-      else if ((bt==0) && (b->Fullname()!=sNoName))
+      else if ((bt==0) && (b->Fullname()!=sNoName_fe))
       {
         s=b->Fullname();
       }
-      else if ((ct==0) && (c->Fullname()!=sNoName))
+      else if ((ct==0) && (c->Fullname()!=sNoName_fe))
       {
         s=c->Fullname();
       }
@@ -8727,7 +8727,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
     // error handling
     if (!errorreported)
     {
-      if ((args>0) && (a->rtyp==0) && (a->Name()!=sNoName))
+      if ((args>0) && (a->rtyp==0) && (a->Name()!=sNoName_fe))
       {
         Werror("`%s` is not defined",a->Fullname());
       }

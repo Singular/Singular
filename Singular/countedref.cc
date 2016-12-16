@@ -362,7 +362,7 @@ void countedref_Print(blackbox */*b*/, void* ptr)
 /// blackbox support - convert to string representation
 char* countedref_String(blackbox */*b*/, void* ptr)
 {
-  if (ptr == NULL) return omStrDup(sNoName);
+  if (ptr == NULL) return omStrDup(sNoName_fe);
   return (*CountedRef::cast(ptr))->String();
 }
 

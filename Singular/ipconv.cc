@@ -375,7 +375,7 @@ static void iiR2L_l(leftv out, leftv in)
 
 static void iiL2R(leftv out, leftv in)
 {
-  int add_row_shift = 0;
+  //int add_row_shift = 0;
   lists l=(lists)in->Data();
   intvec *ww=NULL;
   if (l->nr>=0) ww=(intvec *)atGet(&(l->m[0]),"isHomog",INTVEC_CMD);

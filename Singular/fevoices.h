@@ -44,6 +44,7 @@ enum noeof_t
 
 extern int yylineno;
 extern char my_yylinebuf[80];
+extern const char sNoName_fe[];
 
 #ifdef __cplusplus
 

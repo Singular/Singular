@@ -597,7 +597,7 @@ BOOLEAN iiWRITE(leftv,leftv v)
   {
     const char *s;
     if ((l!=NULL)&&(l->name!=NULL)) s=l->name;
-    else                            s=sNoName;
+    else                            s=sNoName_fe;
     Werror("cannot write to %s",s);
   }
   vf.CleanUp();

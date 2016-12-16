@@ -44,7 +44,7 @@ FILE *File_Profiling=NULL;
 // this is an upper limit for the size of monomials/numbers read via the interpreter
 #define MAX_FILE_BUFFER 4*4096
 // static long feBufferLength=INITIAL_PRINT_BUFFER;
-static char * feBuffer=(char *)omAlloc(INITIAL_PRINT_BUFFER);
+//static char * feBuffer=(char *)omAlloc(INITIAL_PRINT_BUFFER);
 
 /**************************************************************************
 * handling of 'voices'
@@ -62,7 +62,7 @@ Voice  *currentVoice = NULL;
 /*2
 * the name of the current 'Voice': the procname (or filename)
 */
-const char * sNoName_fe="_";
+const char sNoName_fe[]="_";
 const char * VoiceName()
 {
   if ((currentVoice!=NULL)

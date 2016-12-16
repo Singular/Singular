@@ -53,7 +53,6 @@ omBin libstack_bin = omGetSpecBin(sizeof(libstack));
 static omBin size_two_bin = omGetSpecBin(2);
 
 sleftv     sLastPrinted;
-const char sNoName[]="_";
 #ifdef SIQ
 BOOLEAN siq=FALSE;
 #endif
@@ -334,7 +333,7 @@ void sleftv::CleanUp(ring r)
 {
   if (rtyp!=IDHDL)
   {
-    if ((name!=NULL) && (name!=sNoName) && (rtyp!=ALIAS_CMD))
+    if ((name!=NULL) && (name!=sNoName_fe) && (rtyp!=ALIAS_CMD))
     {
       //::Print("free %x (%s)\n",name,name);
       omFree((ADDRESS)name);

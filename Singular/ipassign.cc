@@ -1064,7 +1064,7 @@ static BOOLEAN jiA_DEF(leftv res, leftv, Subexpr)
   res->data=(void *)0;
   return FALSE;
 }
-static BOOLEAN jiA_CRING(leftv res, leftv a, Subexpr e)
+static BOOLEAN jiA_CRING(leftv res, leftv a, Subexpr)
 {
   coeffs r=(coeffs)a->Data();
   if (r==NULL) return TRUE;

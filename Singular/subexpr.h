@@ -17,6 +17,7 @@
 #include <Singular/grammar.h>
 #include <Singular/tok.h>
 #include <Singular/attrib.h>
+#include <Singular/fevoices.h> /* for sNoName_fe*/
 
 typedef enum { LANG_NONE, LANG_TOP, LANG_SINGULAR, LANG_C, LANG_MAX} language_defs;
 class proc_singular
@@ -72,7 +73,6 @@ struct _ssubexpr
 
 typedef struct _ssubexpr *Subexpr;
 
-extern const char sNoName[];
 extern BOOLEAN siq;
 extern const char *iiSleftv2name(leftv v);
 
@@ -121,12 +121,12 @@ class sleftv
     inline const char * Name()
     {
       if ((name!=NULL) && (e==NULL)) return name;
-      else return sNoName;
+      else return sNoName_fe;
     }
     inline const char * Fullname()
     {
       if ((name!=NULL) && (e==NULL)) return(iiSleftv2name(this));
-      else return sNoName;
+      else return sNoName_fe;
     }
     int  Typ();
     int  LTyp(); /* returns LIST_CMD for l[i], otherwise returns Typ() */
