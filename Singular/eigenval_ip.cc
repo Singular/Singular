@@ -30,7 +30,7 @@ BOOLEAN evSwap(leftv res,leftv h)
 {
   if(currRing)
   {
-    short t[]={3,MATRIX_CMD,INT_CMD,INT_CMD};
+    const short t[]={3,MATRIX_CMD,INT_CMD,INT_CMD};
     if (iiCheckTypes(h,t,1))
     {
       matrix M=(matrix)h->Data();
@@ -52,7 +52,7 @@ BOOLEAN evRowElim(leftv res,leftv h)
 {
   if(currRing)
   {
-    short t[]={4,MATRIX_CMD,INT_CMD,INT_CMD,INT_CMD};
+    const short t[]={4,MATRIX_CMD,INT_CMD,INT_CMD,INT_CMD};
     if (iiCheckTypes(h,t,1))
     {
       matrix M=(matrix)h->CopyD();
@@ -76,7 +76,7 @@ BOOLEAN evColElim(leftv res,leftv h)
 {
   if(currRing)
   {
-    short t[]={4,MATRIX_CMD,INT_CMD,INT_CMD,INT_CMD};
+    const short t[]={4,MATRIX_CMD,INT_CMD,INT_CMD,INT_CMD};
     if (iiCheckTypes(h,t,1))
     {
       matrix M=(matrix)h->Data();
