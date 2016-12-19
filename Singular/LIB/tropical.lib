@@ -13,7 +13,7 @@ AUTHORS:         Anders Jensen Needergard, email: jensen@math.tu-berlin.de
 WARNING:
 - tropicalLifting will only work with LINUX and if in addition gfan is installed.
 @*- drawTropicalCurve and drawTropicalNewtonSubdivision will only display the
-@*  tropical curve with LINUX and if in addition latex and kghostview
+@*  tropical curve with LINUX and if in addition latex and xdg-open
 @*  are installed.
 @*- For tropicalLifting in the definition of the basering the parameter t
 @*  from the Puiseux series field C{{t}} must be defined as a variable,
@@ -1677,14 +1677,14 @@ RETURN:      NONE
 NOTE:        - the procedure creates the files /tmp/tropicalcurveNUMBER.tex and
                /tmp/tropicalcurveNUMBER.ps, where NUMBER is a random four
                digit integer;
-               moreover it displays the tropical curve via kghostview;
+               moreover it displays the tropical curve via xdg-open;
                if you wish to remove all these files from /tmp,
                call the procedure cleanTmp
 @*           - edges with multiplicity greater than one carry this multiplicity
 @*           - if # is empty, then the tropical curve is computed w.r.t. minimum,
                if #[1] is the string 'max', then it is computed w.r.t. maximum
 @*           - if the last optional argument is 'onlytexfile' then only the
-               latex file is produced; this option should be used if kghostview
+               latex file is produced; this option should be used if xdg-utils
                is not installed on your system
 @*           - note that lattice points in the Newton subdivision which are
                black correspond to markings of the marked subdivision,
@@ -1777,6 +1777,18 @@ EXAMPLE:     example drawTropicalCurve  shows an example"
 \\setlength{\\evensidemargin}{\\oddsidemargin}
 \\setlength{\\textwidth}{170mm}
 
+\\makeatletter
+\\def\\old@comma{,}
+\\catcode`\\,=13
+\\def,{%
+  \\ifmmode%
+    \\old@comma\\discretionary{}{}{}%
+  \\else%
+    \\old@comma%
+  \\fi%
+\}
+\\makeatother
+
 \\begin{document}
    \\parindent0cm
    \\begin{center}
@@ -1813,7 +1825,7 @@ EXAMPLE:     example drawTropicalCurve  shows an example"
   {
     int rdnum=random(1000,9999);
     write(":w /tmp/tropicalcurve"+string(rdnum)+".tex",TEXBILD);
-    system("sh","cd /tmp; latex /tmp/tropicalcurve"+string(rdnum)+".tex; dvips /tmp/tropicalcurve"+string(rdnum)+".dvi -o; command rm tropicalcurve"+string(rdnum)+".log;  command rm tropicalcurve"+string(rdnum)+".aux;  command rm tropicalcurve"+string(rdnum)+".ps?;  command rm tropicalcurve"+string(rdnum)+".dvi; kghostview tropicalcurve"+string(rdnum)+".ps &");
+    system("sh","cd /tmp; latex /tmp/tropicalcurve"+string(rdnum)+".tex; dvips /tmp/tropicalcurve"+string(rdnum)+".dvi -o; command rm tropicalcurve"+string(rdnum)+".log;  command rm tropicalcurve"+string(rdnum)+".aux;  command rm tropicalcurve"+string(rdnum)+".ps?;  command rm tropicalcurve"+string(rdnum)+".dvi; xdg-open tropicalcurve"+string(rdnum)+".ps &");
   }
   else
   {
@@ -1827,7 +1839,7 @@ example
    ring r=(0,t),(x,y),dp;
    poly f=t*(x3+y3+1)+1/t*(x2+y2+x+y+x2y+xy2)+1/t2*xy;
 // the command drawTropicalCurve(f) computes the graph of the tropical curve
-// given by f and displays a post script image, provided you have kghostview
+// given by f and displays a post script image, provided you have xdg-open
    drawTropicalCurve(f);
 // we can instead apply the procedure to a tropical polynomial and use "maximum"
    poly g=1/t3*(x7+y7+1)+t3*(x4+y4+x2+y2+x3y+xy3)+t21*x2y2;
@@ -1851,7 +1863,7 @@ RETURN:   NONE
 NOTE:     - the procedure creates the files /tmp/newtonsubdivisionNUMBER.tex,
             and /tmp/newtonsubdivisionNUMBER.ps, where NUMBER is a random
             four digit integer;
-            moreover it desplays the tropical curve defined by f via kghostview;
+            moreover it desplays the tropical curve defined by f via xdg-open;
             if you wish to remove all these files from /tmp, call the procedure
             cleanTmp;
 @*          if # is empty, then the tropical curve is computed w.r.t. minimum,
@@ -1911,7 +1923,7 @@ EXAMPLE:     example drawNewtonSubdivision;   shows an example"
 \\end{document}";
   int rdnum=random(1000,9999);
   write(":w /tmp/newtonsubdivision"+string(rdnum)+".tex",TEXBILD);
-  system("sh","cd /tmp; latex /tmp/newtonsubdivision"+string(rdnum)+".tex; dvips /tmp/newtonsubdivision"+string(rdnum)+".dvi -o; command rm newtonsubdivision"+string(rdnum)+".log;  command rm newtonsubdivision"+string(rdnum)+".aux;  command rm newtonsubdivision"+string(rdnum)+".ps?;  command rm newtonsubdivision"+string(rdnum)+".dvi; kghostview newtonsubdivision"+string(rdnum)+".ps &");
+  system("sh","cd /tmp; latex /tmp/newtonsubdivision"+string(rdnum)+".tex; dvips /tmp/newtonsubdivision"+string(rdnum)+".dvi -o; command rm newtonsubdivision"+string(rdnum)+".log;  command rm newtonsubdivision"+string(rdnum)+".aux;  command rm newtonsubdivision"+string(rdnum)+".ps?;  command rm newtonsubdivision"+string(rdnum)+".dvi; xdg-open newtonsubdivision"+string(rdnum)+".ps &");
 //  return(TEXBILD);
 }
 example
@@ -1921,7 +1933,7 @@ example
    ring r=(0,t),(x,y),dp;
    poly f=t*(x3+y3+1)+1/t*(x2+y2+x+y+x2y+xy2)+1/t2*xy;
 // the command drawTropicalCurve(f) computes the graph of the tropical curve
-// given by f and displays a post script image, provided you have kghostview
+// given by f and displays a post script image, provided you have xdg-open
    drawNewtonSubdivision(f);
 // we can instead apply the procedure to a tropical polynomial
    poly g=x+y+x2y+xy2+1/t*xy;
@@ -2478,10 +2490,10 @@ example
    conic[7];
 // conic[8] contains the latex code to draw the tropical conic and
 //          its tropicalised tangents; it can written in a file, processed and
-//          displayed via kghostview
+//          displayed via xdg-open
    write(":w /tmp/conic.tex",conic[8]);
    system("sh","cd /tmp; latex /tmp/conic.tex; dvips /tmp/conic.dvi -o;
-            kghostview conic.ps &");
+            xdg-open conic.ps &");
 // with an optional argument the same information for the dual conic is computed
 //         and saved in conic[9]
    conic=conicWithTangents(points,1);
@@ -8190,14 +8202,14 @@ RETURN:      NONE
 NOTE:        - the procedure creates the files /tmp/tropicalcurveNUMBER.tex and
                /tmp/tropicalcurveNUMBER.ps, where NUMBER is a random four
                digit integer;
-               moreover it displays the tropical curve via kghostview;
+               moreover it displays the tropical curve via xdg-open;
                if you wish to remove all these files from /tmp,
                call the procedure cleanTmp
 @*           - edges with multiplicity greater than one carry this multiplicity
 @*           - if # is empty, then the tropical curve is computed w.r.t. minimum,
                if #[1] is the string 'max', then it is computed w.r.t. maximum
 @*           - if the last optional argument is 'onlytexfile' then only the
-               latex file is produced; this option should be used if kghostview
+               latex file is produced; this option should be used if xdg-open
                is not installed on your system
 @*           - note that lattice points in the Newton subdivision which are
                black correspond to markings of the marked subdivision,
@@ -8429,7 +8441,7 @@ EXAMPLE:     example drawTropicalCurve  shows an example"
   {
     int rdnum=random(1000,9999);
     write(":w /tmp/tropicalcurve"+string(rdnum)+".tex",TEXBILD);
-    system("sh","cd /tmp; latex /tmp/tropicalcurve"+string(rdnum)+".tex; dvips /tmp/tropicalcurve"+string(rdnum)+".dvi -o; command rm tropicalcurve"+string(rdnum)+".log;  command rm tropicalcurve"+string(rdnum)+".aux;  command rm tropicalcurve"+string(rdnum)+".ps?;  command rm tropicalcurve"+string(rdnum)+".dvi; kghostview tropicalcurve"+string(rdnum)+".ps &");
+    system("sh","cd /tmp; latex /tmp/tropicalcurve"+string(rdnum)+".tex; dvips /tmp/tropicalcurve"+string(rdnum)+".dvi -o; command rm tropicalcurve"+string(rdnum)+".log;  command rm tropicalcurve"+string(rdnum)+".aux;  command rm tropicalcurve"+string(rdnum)+".ps?;  command rm tropicalcurve"+string(rdnum)+".dvi; xdg-open tropicalcurve"+string(rdnum)+".ps &");
   }
   else
   {
@@ -8444,7 +8456,7 @@ example
 //   poly f=t*(x3+y3+1)+1/t*(x2+y2+x+y+x2y+xy2)+1/t2*xy;
    poly f=x+y+1;
 // the command drawTropicalCurve(f) computes the graph of the tropical curve
-// given by f and displays a post script image, provided you have kghostview
+// given by f and displays a post script image, provided you have xdg-open
 // we can instead apply the procedure to a tropical polynomial and use "maximum"
    poly g=t3*(x7+y7+1)+1/t3*(x4+y4+x2+y2+x3y+xy3)+1/t21*x2y2;
 //   list tropical_g=tropicalise(g);
