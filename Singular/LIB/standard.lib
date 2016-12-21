@@ -881,7 +881,7 @@ EXAMPLE: example groebner;  shows an example"
   else {ideal i=i_par; } // int, poly, number, ideal
   kill i_par;
 // check for integer etc coefficients
-  if (charstr(basering)[1]=="i") // either integer or integer,q
+  if (attrib(basering,"ring_cf")==1) // either integer or integer,q
   {
     if (find(option(),"prot"))  { "calling std for ideals in ring with ring coefficients"; }
     return (std(i));
