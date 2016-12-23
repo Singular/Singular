@@ -2314,12 +2314,14 @@ static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
     nKillChar(tempR->cf);
     tempR->cf=new_cf;
     rComplete(tempR);
-    ideal uid = (ideal)u->Data();
+    sleftv uAsLeftv; memset(&uAsLeftv, 0, sizeof(uAsLeftv));
+    uAsLeftv.rtyp=u->Typ();
+    uAsLeftv.data=u->CopyD();
     rChangeCurrRing(tempR);
-    ideal uu = idrCopyR(uid, origR, currRing);
     sleftv uuAsLeftv; memset(&uuAsLeftv, 0, sizeof(uuAsLeftv));
-    uuAsLeftv.rtyp = IDEAL_CMD;
-    uuAsLeftv.data = uu; uuAsLeftv.next = NULL;
+    nMapFunc nMap=n_SetMap(origR->cf,tempR->cf);
+    maApplyFetch(FETCH_CMD,NULL,&uuAsLeftv,&uAsLeftv,origR,NULL,NULL,0,nMap);
+    ideal uu=(ideal)uuAsLeftv.data;
     if (hasFlag(u, FLAG_STD)) setFlag(&uuAsLeftv,FLAG_STD);
     assumeStdFlag(&uuAsLeftv);
     PrintS("// NOTE: computation of Hilbert series etc. is being\n");
@@ -2342,8 +2344,9 @@ static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
       WerrorS(feNotImplemented);
       delete iv;
     }
-    idDelete(&uu);
+    uuAsLeftv.CleanUp(tempR);
     rChangeCurrRing(origR);
+    uAsLeftv.CleanUp(origR);
     rDelete(tempR);
     if (returnWithTrue) return TRUE; else return FALSE;
   }
@@ -5789,12 +5792,14 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
     nKillChar(tempR->cf);
     tempR->cf=new_cf;
     rComplete(tempR);
-    ideal uid = (ideal)u->Data();
+    sleftv uAsLeftv; memset(&uAsLeftv, 0, sizeof(uAsLeftv));
+    uAsLeftv.rtyp=u->Typ();
+    uAsLeftv.data=u->CopyD();
     rChangeCurrRing(tempR);
-    ideal uu = idrCopyR(uid, origR, currRing);
+    nMapFunc nMap=n_SetMap(origR->cf,tempR->cf);
     sleftv uuAsLeftv; memset(&uuAsLeftv, 0, sizeof(uuAsLeftv));
-    uuAsLeftv.rtyp = IDEAL_CMD;
-    uuAsLeftv.data = uu; uuAsLeftv.next = NULL;
+    maApplyFetch(FETCH_CMD,NULL,&uuAsLeftv,&uAsLeftv,origR,NULL,NULL,0,nMap);
+    ideal uu=(ideal)uuAsLeftv.data;
     if (hasFlag(u, FLAG_STD)) setFlag(&uuAsLeftv,FLAG_STD);
     assumeStdFlag(&uuAsLeftv);
     PrintS("// NOTE: computation of Hilbert series etc. is being\n");
@@ -5817,8 +5822,9 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
       WerrorS(feNotImplemented);
       delete iv;
     }
-    idDelete(&uu);
+    uuAsLeftv.CleanUp(tempR);
     rChangeCurrRing(origR);
+    uAsLeftv.CleanUp(origR);
     rDelete(tempR);
     if (returnWithTrue) return TRUE; else return FALSE;
   }
