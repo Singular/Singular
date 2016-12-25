@@ -1870,12 +1870,6 @@ static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
-    //ring origR = currRing;
-    //ring tempR = rCopy(origR);
-    //coeffs new_cf=nInitChar(n_Q,NULL);
-    //nKillChar(tempR->cf);
-    //tempR->cf=new_cf;
-    //rComplete(tempR);
     ideal vid = (ideal)v->Data();
     int i = idPosConstant(vid);
     if ((i != -1) && (n_IsUnit(pGetCoeff(vid->m[i]),currRing->cf)))
@@ -1883,10 +1877,7 @@ static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
       res->data = (char *)-1;
       return FALSE;
     }
-    //rChangeCurrRing(tempR);
-    //ideal vv = idrCopyR(vid, origR, currRing);
     ideal vv = id_Copy(vid, currRing);
-    //ideal ww = idrCopyR((ideal)w->Data(), origR, currRing);
     ideal ww = id_Copy((ideal)w->Data(), currRing);
     /* drop degree zero generator from vv (if any) */
     if (i != -1) pDelete(&vv->m[i]);
@@ -1894,8 +1885,6 @@ static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
     if (rField_is_Ring_Z(currRing) && (i == -1)) d++;
     res->data = (char *)d;
     idDelete(&vv); idDelete(&ww);
-    //rChangeCurrRing(origR);
-    //rDelete(tempR);
     return FALSE;
   }
 #endif
@@ -2308,47 +2297,8 @@ static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
 #ifdef HAVE_RINGS
   if (rField_is_Ring_Z(currRing))
   {
-    ring origR = currRing;
-    ring tempR = rCopy(origR);
-    coeffs new_cf=nInitChar(n_Q,NULL);
-    nKillChar(tempR->cf);
-    tempR->cf=new_cf;
-    rComplete(tempR);
-    sleftv uAsLeftv; memset(&uAsLeftv, 0, sizeof(uAsLeftv));
-    uAsLeftv.rtyp=u->Typ();
-    uAsLeftv.data=u->CopyD();
-    rChangeCurrRing(tempR);
-    sleftv uuAsLeftv; memset(&uuAsLeftv, 0, sizeof(uuAsLeftv));
-    nMapFunc nMap=n_SetMap(origR->cf,tempR->cf);
-    maApplyFetch(FETCH_CMD,NULL,&uuAsLeftv,&uAsLeftv,origR,NULL,NULL,0,nMap);
-    ideal uu=(ideal)uuAsLeftv.data;
-    if (hasFlag(u, FLAG_STD)) setFlag(&uuAsLeftv,FLAG_STD);
-    assumeStdFlag(&uuAsLeftv);
     PrintS("// NOTE: computation of Hilbert series etc. is being\n");
     PrintS("//       performed for generic fibre, that is, over Q\n");
-    intvec *module_w=(intvec*)atGet(&uuAsLeftv,"isHomog",INTVEC_CMD);
-    intvec *iv=hFirstSeries(uu,module_w,currRing->qideal);
-    int returnWithTrue = 1;
-    switch((int)(long)v->Data())
-    {
-      case 1:
-        res->data=(void *)iv;
-        returnWithTrue = 0;
-      case 2:
-        res->data=(void *)hSecondSeries(iv);
-        delete iv;
-        returnWithTrue = 0;
-    }
-    if (returnWithTrue)
-    {
-      WerrorS(feNotImplemented);
-      delete iv;
-    }
-    uuAsLeftv.CleanUp(tempR);
-    rChangeCurrRing(origR);
-    uAsLeftv.CleanUp(origR);
-    rDelete(tempR);
-    if (returnWithTrue) return TRUE; else return FALSE;
   }
 #endif
   assumeStdFlag(u);
@@ -3770,30 +3720,13 @@ static BOOLEAN jjDEG_M(leftv res, leftv u)
 static BOOLEAN jjDEGREE(leftv res, leftv v)
 {
   SPrintStart();
+#ifdef HAVE_RINGS
   if (rField_is_Ring_Z(currRing))
   {
-    ring origR = currRing;
-    ring tempR = rCopy(origR);
-    coeffs new_cf=nInitChar(n_Q,NULL);
-    nKillChar(tempR->cf);
-    tempR->cf=new_cf;
-    rComplete(tempR);
-    ideal vid = (ideal)v->Data();
-    rChangeCurrRing(tempR);
-    ideal vv = idrCopyR(vid, origR, currRing);
-    sleftv vvAsLeftv; memset(&vvAsLeftv, 0, sizeof(vvAsLeftv));
-    vvAsLeftv.rtyp = IDEAL_CMD;
-    vvAsLeftv.data = vv; vvAsLeftv.next = NULL;
-    if (hasFlag(v, FLAG_STD)) setFlag(&vvAsLeftv,FLAG_STD);
-    assumeStdFlag(&vvAsLeftv);
     PrintS("// NOTE: computation of degree is being performed for\n");
     PrintS("//       generic fibre, that is, over Q\n");
-    intvec *module_w=(intvec*)atGet(&vvAsLeftv,"isHomog",INTVEC_CMD);
-    scDegree(vv,module_w,currRing->qideal);
-    idDelete(&vv);
-    rChangeCurrRing(origR);
-    rDelete(tempR);
   }
+#endif
   assumeStdFlag(v);
   intvec *module_w=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
   scDegree((ideal)v->Data(),module_w,currRing->qideal);
@@ -3920,6 +3853,7 @@ static BOOLEAN jjDIM(leftv res, leftv v)
   {
      Warn("dim(%s) may be wrong because the mixed monomial ordering",v->Name());
   }
+#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     ideal vid = (ideal)v->Data();
@@ -3984,6 +3918,7 @@ static BOOLEAN jjDIM(leftv res, leftv v)
     idDelete(&vv);
     return FALSE;
   }
+#endif
   res->data = (char *)(long)scDimInt((ideal)(v->Data()),currRing->qideal);
   return FALSE;
 }
@@ -4148,32 +4083,13 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
 }
 static BOOLEAN jjHILBERT(leftv, leftv v)
 {
+#ifdef HAVE_RINGS
   if (rField_is_Ring_Z(currRing))
   {
-    ring origR = currRing;
-    ring tempR = rCopy(origR);
-    coeffs new_cf=nInitChar(n_Q,NULL);
-    nKillChar(tempR->cf);
-    tempR->cf=new_cf;
-    rComplete(tempR);
-    ideal vid = (ideal)v->Data();
-    rChangeCurrRing(tempR);
-    ideal vv = idrCopyR(vid, origR, currRing);
-    sleftv vvAsLeftv; memset(&vvAsLeftv, 0, sizeof(vvAsLeftv));
-    vvAsLeftv.rtyp = IDEAL_CMD;
-    vvAsLeftv.data = vv; vvAsLeftv.next = NULL;
-    if (hasFlag(v, FLAG_STD)) setFlag(&vvAsLeftv,FLAG_STD);
-    assumeStdFlag(&vvAsLeftv);
     PrintS("// NOTE: computation of Hilbert series etc. is being\n");
     PrintS("//       performed for generic fibre, that is, over Q\n");
-    intvec *module_w=(intvec*)atGet(&vvAsLeftv,"isHomog",INTVEC_CMD);
-    //scHilbertPoly(vv,currRing->qideal);
-    hLookSeries(vv,module_w,currRing->qideal);
-    idDelete(&vv);
-    rChangeCurrRing(origR);
-    rDelete(tempR);
-    return FALSE;
   }
+#endif
   assumeStdFlag(v);
   intvec *module_w=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
   //scHilbertPoly((ideal)v->Data(),currRing->qideal);
@@ -4182,11 +4098,13 @@ static BOOLEAN jjHILBERT(leftv, leftv v)
 }
 static BOOLEAN jjHILBERT_IV(leftv res, leftv v)
 {
+#ifdef HAVE_RINGS
   if (rField_is_Ring_Z(currRing))
   {
     PrintS("// NOTE: computation of Hilbert series etc. is being\n");
     PrintS("//       performed for generic fibre, that is, over Q\n");
   }
+#endif
   res->data=(void *)hSecondSeries((intvec *)v->Data());
   return FALSE;
 }
@@ -4295,8 +4213,10 @@ static BOOLEAN jjINDEPSET(leftv res, leftv v)
 static BOOLEAN jjINTERRED(leftv res, leftv v)
 {
   ideal result=kInterRed((ideal)(v->Data()), currRing->qideal);
+#ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
-    Warn("interred: this command is experimental over the integers");
+    WarnS("interred: this command is experimental over the integers");
+#endif
   if (TEST_OPT_PROT) { PrintLn(); mflush(); }
   res->data = result;
   return FALSE;
@@ -5784,50 +5704,13 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
            currRing->N,wdegree->length());
     return TRUE;
   }
+#ifdef HAVE_RINGS
   if (rField_is_Ring_Z(currRing))
   {
-    ring origR = currRing;
-    ring tempR = rCopy(origR);
-    coeffs new_cf=nInitChar(n_Q,NULL);
-    nKillChar(tempR->cf);
-    tempR->cf=new_cf;
-    rComplete(tempR);
-    sleftv uAsLeftv; memset(&uAsLeftv, 0, sizeof(uAsLeftv));
-    uAsLeftv.rtyp=u->Typ();
-    uAsLeftv.data=u->CopyD();
-    rChangeCurrRing(tempR);
-    nMapFunc nMap=n_SetMap(origR->cf,tempR->cf);
-    sleftv uuAsLeftv; memset(&uuAsLeftv, 0, sizeof(uuAsLeftv));
-    maApplyFetch(FETCH_CMD,NULL,&uuAsLeftv,&uAsLeftv,origR,NULL,NULL,0,nMap);
-    ideal uu=(ideal)uuAsLeftv.data;
-    if (hasFlag(u, FLAG_STD)) setFlag(&uuAsLeftv,FLAG_STD);
-    assumeStdFlag(&uuAsLeftv);
     PrintS("// NOTE: computation of Hilbert series etc. is being\n");
     PrintS("//       performed for generic fibre, that is, over Q\n");
-    intvec *module_w=(intvec*)atGet(&uuAsLeftv,"isHomog",INTVEC_CMD);
-    intvec *iv=hFirstSeries(uu,module_w,currRing->qideal,wdegree);
-    int returnWithTrue = 1;
-    switch((int)(long)v->Data())
-    {
-      case 1:
-        res->data=(void *)iv;
-        returnWithTrue = 0;
-      case 2:
-        res->data=(void *)hSecondSeries(iv);
-        delete iv;
-        returnWithTrue = 0;
-    }
-    if (returnWithTrue)
-    {
-      WerrorS(feNotImplemented);
-      delete iv;
-    }
-    uuAsLeftv.CleanUp(tempR);
-    rChangeCurrRing(origR);
-    uAsLeftv.CleanUp(origR);
-    rDelete(tempR);
-    if (returnWithTrue) return TRUE; else return FALSE;
   }
+#endif
   assumeStdFlag(u);
   intvec *module_w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   intvec *iv=hFirstSeries((ideal)u->Data(),module_w,currRing->qideal,wdegree);
@@ -5841,8 +5724,8 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
       delete iv;
       return FALSE;
   }
-  WerrorS(feNotImplemented);
   delete iv;
+  WerrorS(feNotImplemented);
   return TRUE;
 }
 static BOOLEAN jjHOMOG_ID_W(leftv res, leftv u, leftv v, leftv /*w*/)
@@ -5928,14 +5811,6 @@ static BOOLEAN jjJET_ID_M(leftv res, leftv u, leftv v, leftv w)
   res->data = (char *)idSeries((int)(long)w->Data(),(ideal)u->CopyD(),
                                (matrix)v->CopyD());
   return FALSE;
-}
-static BOOLEAN currRingIsOverIntegralDomain ()
-{
-  /* true for fields and Z, false otherwise */
-  if (rField_is_Ring_PtoM(currRing)) return FALSE;
-  if (rField_is_Ring_2toM(currRing)) return FALSE;
-  if (rField_is_Ring_ModN(currRing)) return FALSE;
-  return TRUE;
 }
 static BOOLEAN jjMINOR_M(leftv res, leftv v)
 {
@@ -6099,7 +5974,7 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
     return TRUE;
   }
   if ((!noAlgorithm) && (strcmp(algorithm, "Bareiss") == 0)
-      && (!currRingIsOverIntegralDomain()))
+      && (!rField_is_Domain(currRing)))
   {
     Werror("Bareiss algorithm not defined over coefficient rings %s",
            "with zero divisors.");
@@ -9166,6 +9041,7 @@ static BOOLEAN check_valid(const int p, const int op)
     /* else, ALLOW_PLURAL */
   }
   #endif
+#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     if ((p & RING_MASK)==0 /*NO_RING*/)
@@ -9186,6 +9062,7 @@ static BOOLEAN check_valid(const int p, const int op)
       WarnS("considering the image in Q[...]");
     }
   }
+#endif
   return FALSE;
 }
 // --------------------------------------------------------------------
