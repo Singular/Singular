@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version standard.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version standard.lib 4.1.0.0 Dec_2016 "; // $Id$
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
