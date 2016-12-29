@@ -60,8 +60,6 @@
 #include <polys/monomials/maps.h>
 #include <polys/matpol.h>
 
-// #include <kernel/longalg.h>
-#include <polys/prCopy.h>
 #include <polys/weight.h>
 
 #include <coeffs/bigintmat.h>

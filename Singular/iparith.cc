@@ -23,7 +23,6 @@
 #include <misc/sirandom.h>
 #include <misc/prime.h>
 
-#include <polys/prCopy.h>
 #include <polys/matpol.h>
 #include <polys/monomials/maps.h>
 #include <polys/sparsmat.h>
