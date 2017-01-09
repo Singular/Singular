@@ -326,11 +326,12 @@ char * fe_fgets(const char *pr,char *s, int size)
     switch(errno)
     {
       case 0:     return NULL;           /*EOF */
+      case EBADF: return NULL;           /* stdin got closed */
       case EINTR: return strcpy(s,"\n"); /* CTRL-C or other signal */
       default:                           /* other error */
       {
-	int errsv = errno;
-        fprintf(stderr,"fgets() failed with errno %d\n",errsv);
+        int errsv = errno;
+        fprintf(stderr,"fgets() failed with errno %d\n%s\n",errsv,strerror(errsv));
         return NULL;
       }
     }
