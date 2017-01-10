@@ -86,7 +86,7 @@ static inline void *omRealloc(void *d, size_t ns)
   }
 }
 #define omReallocAligned(A,B) omRealloc(A,B)
-static inline void *omReallocSize(void *d, size_t os, size_t ns)
+static inline void *omReallocSize(void *d, __attribute__((unused)) size_t os, size_t ns)
 { if (d==NULL) return omAlloc(ns);
   else
   {
@@ -113,7 +113,7 @@ static inline void *omRealloc0(void *d, size_t ns)
   }
   return n;
 }
-static inline void omFreeSize(void *d, size_t s)
+static inline void omFreeSize(void *d, __attribute__((unused)) size_t s)
 { if (d!=NULL) { long *dd=(long*)d; dd--; free(dd);}}
 
 static inline char * omStrDup(const char *s)
@@ -184,7 +184,6 @@ enum omError_e
 #define omPrintBinStats(F)
 #define omMarkMemoryAsStatic()
 #define omfree(P)                omFree(P)
-#define omFree(P)                omFree(P)
 #define omFreeBin(P,B)           omFree(P)
 #define omfreeSize(P,S)          omFreeSize(P,S)
 #define omFreeFunc               omFree
@@ -207,7 +206,7 @@ enum omError_e
 #define omTypeRealloc0AlignedSize    omTypeRealloc0Size
 #define omReallocAlignedSize         omReallocSize
 #define omRealloc0AlignedSize        omRealloc0Size
-#define omMemDupAligned     omMemDup
+#define omMemDupAligned              omMemDup
 #define omCheckIf(cond, test)                    do {} while (0)
 #define omCheckBinAddr(addr)                     do {} while (0)
 #define omCheckAddrBin(addr,bin)                 do {} while (0)
