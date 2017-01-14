@@ -702,7 +702,7 @@ static BOOLEAN heOnlineHelp(char* s)
     return FALSE;
   }
 
-  char libnamebuf[128];
+  char libnamebuf[1024];
   FILE *fp=NULL;
   // first, search for library of that name
   if ((str[1]!='\0') &&

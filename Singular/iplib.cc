@@ -656,7 +656,7 @@ iiGetBuiltinModInit(const char* libname)
 BOOLEAN iiTryLoadLib(leftv v, const char *id)
 {
   BOOLEAN LoadResult = TRUE;
-  char libnamebuf[128];
+  char libnamebuf[1024];
   char *libname = (char *)omAlloc(strlen(id)+5);
   const char *suffix[] = { "", ".lib", ".so", ".sl", NULL };
   int i = 0;
@@ -672,7 +672,7 @@ BOOLEAN iiTryLoadLib(leftv v, const char *id)
     {
       char *s=omStrDup(libname);
       #ifdef HAVE_DYNAMIC_LOADING
-      char libnamebuf[256];
+      char libnamebuf[1024];
       #endif
 
       if (LT==LT_SINGULAR)
@@ -717,7 +717,7 @@ BOOLEAN iiLocateLib(const char* lib, char* where)
 
 BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN force )
 {
-  char libnamebuf[128];
+  char libnamebuf[1024];
   // procinfov pi;
   // idhdl h;
   idhdl pl;
