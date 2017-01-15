@@ -41,6 +41,7 @@ char* bbfan_String(blackbox* /*b*/, void *d)
     gfan::initializeCddlibIfRequired();
     gfan::ZFan* zf = (gfan::ZFan*)d;
     std::string s = zf->toString(2+4+8+128);
+    gfan::deinitializeCddlibIfRequired();
     return omStrDup(s.c_str());
 // =======
 //     std::stringstream s;
@@ -175,7 +176,6 @@ static BOOLEAN jjFANEMPTY_IM(leftv res, leftv v)
 
 BOOLEAN emptyFan(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u = args;
   if (u == NULL)
   {
@@ -266,7 +266,6 @@ int getLinealityDimension(gfan::ZFan* zf)
 
 BOOLEAN numberOfConesOfDimension(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
   {
@@ -279,6 +278,7 @@ BOOLEAN numberOfConesOfDimension(leftv res, leftv args)
         leftv x=w->next;
         if ((x != NULL) && (x->Typ() == INT_CMD))
         {
+          gfan::initializeCddlibIfRequired();
           gfan::ZFan* zf = (gfan::ZFan*) u->Data();
           int d = (int)(long)v->Data();
           int o = (int)(long)w->Data();
@@ -295,10 +295,12 @@ BOOLEAN numberOfConesOfDimension(leftv res, leftv args)
               int n = zf->numberOfConesOfDimension(d-ld,oo,mm);
               res->rtyp = INT_CMD;
               res->data = (void*) (long) n;
+              gfan::deinitializeCddlibIfRequired();
               return FALSE;
             }
             res->rtyp = INT_CMD;
             res->data = (void*) (long) 0;
+            gfan::deinitializeCddlibIfRequired();
             return FALSE;
           }
         }
@@ -311,10 +313,10 @@ BOOLEAN numberOfConesOfDimension(leftv res, leftv args)
 
 BOOLEAN ncones(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZFan* zf = (gfan::ZFan*)u->Data();
     int d = zf->getAmbientDimension();
     int n = 0;
@@ -324,6 +326,7 @@ BOOLEAN ncones(leftv res, leftv args)
 
     res->rtyp = INT_CMD;
     res->data = (void*) (long) n;
+    gfan::deinitializeCddlibIfRequired();
     return FALSE;
   }
   WerrorS("ncones: unexpected parameters");
@@ -332,10 +335,10 @@ BOOLEAN ncones(leftv res, leftv args)
 
 BOOLEAN nmaxcones(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZFan* zf = (gfan::ZFan*)u->Data();
 
     int n = 0;
@@ -344,6 +347,7 @@ BOOLEAN nmaxcones(leftv res, leftv args)
 
     res->rtyp = INT_CMD;
     res->data = (void*) (long) n;
+    gfan::deinitializeCddlibIfRequired();
     return FALSE;
   }
   WerrorS("nmaxcones: unexpected parameters");
@@ -371,18 +375,19 @@ bool isCompatible(const gfan::ZFan* zf, const gfan::ZCone* zc)
 
 BOOLEAN isCompatible(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
   {
     leftv v=u->next;
     if ((v != NULL) && (v->Typ() == coneID))
     {
+      gfan::initializeCddlibIfRequired();
       gfan::ZFan* zf = (gfan::ZFan*)u->Data();
       gfan::ZCone* zc = (gfan::ZCone*)v->Data();
       int b = isCompatible(zf,zc);
       res->rtyp = INT_CMD;
       res->data = (void*) (long) b;
+      gfan::deinitializeCddlibIfRequired();
       return FALSE;
     }
   }
@@ -392,13 +397,13 @@ BOOLEAN isCompatible(leftv res, leftv args)
 
 BOOLEAN insertCone(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->rtyp==IDHDL) && (u->e==NULL) && (u->Typ() == fanID))
   {
     leftv v=u->next;
     if ((v != NULL) && (v->Typ() == coneID))
     {
+      gfan::initializeCddlibIfRequired();
       gfan::ZFan* zf = (gfan::ZFan*)u->Data();
       gfan::ZCone* zc = (gfan::ZCone*)v->Data();
       zc->canonicalize();
@@ -413,6 +418,7 @@ BOOLEAN insertCone(leftv res, leftv args)
         if (!isCompatible(zf,zc))
         {
           WerrorS("insertCone: cone and fan not compatible");
+          gfan::deinitializeCddlibIfRequired();
           return TRUE;
         }
       }
@@ -421,6 +427,7 @@ BOOLEAN insertCone(leftv res, leftv args)
       res->rtyp = NONE;
       res->data = NULL;
       IDDATA((idhdl)u->data) = (char*) zf;
+      gfan::deinitializeCddlibIfRequired();
       return FALSE;
     }
   }
@@ -450,21 +457,23 @@ bool containsInCollection(gfan::ZFan* zf, gfan::ZCone* zc)
 
 BOOLEAN containsInCollection(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
   {
     leftv v=u->next;
     if ((v != NULL) && (v->Typ() == coneID))
     {
+      gfan::initializeCddlibIfRequired();
       gfan::ZFan* zf = (gfan::ZFan*)u->Data();
       gfan::ZCone* zc = (gfan::ZCone*)v->Data();
       if((zf->getAmbientDimension() == zc->ambientDimension()))
       {
         res->rtyp = INT_CMD;
         res->data = (void*) (long) (int) containsInCollection(zf,zc);
+        gfan::deinitializeCddlibIfRequired();
         return FALSE;
       }
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("containsInCollection: mismatching ambient dimensions");
       return TRUE;
     }
@@ -509,13 +518,13 @@ BOOLEAN containsInCollection(leftv res, leftv args)
 
 BOOLEAN removeCone(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
   {
     leftv v=u->next;
     if ((v != NULL) && (v->Typ() == coneID))
     {
+      gfan::initializeCddlibIfRequired();
       gfan::ZFan* zf = (gfan::ZFan*)u->Data();
       gfan::ZCone* zc = (gfan::ZCone*)v->Data();
       zc->canonicalize();
@@ -529,6 +538,7 @@ BOOLEAN removeCone(leftv res, leftv args)
         if (!containsInCollection(zf,zc))
         {
           WerrorS("removeCone: cone not contained in fan");
+          gfan::deinitializeCddlibIfRequired();
           return TRUE;
         }
       }
@@ -537,6 +547,7 @@ BOOLEAN removeCone(leftv res, leftv args)
       res->rtyp = NONE;
       res->data = NULL;
       IDDATA((idhdl)u->data) = (char*) zf;
+      gfan::deinitializeCddlibIfRequired();
       return FALSE;
     }
   }
@@ -546,7 +557,6 @@ BOOLEAN removeCone(leftv res, leftv args)
 
 BOOLEAN getCone(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
   {
@@ -556,6 +566,7 @@ BOOLEAN getCone(leftv res, leftv args)
       leftv w=v->next;
       if ((w != NULL) && (w->Typ() == INT_CMD))
       {
+        gfan::initializeCddlibIfRequired();
         gfan::ZFan* zf = (gfan::ZFan*) u->Data();
         int d = (int)(long)v->Data();
         int i = (int)(long)w->Data();
@@ -588,29 +599,34 @@ BOOLEAN getCone(leftv res, leftv args)
                 gfan::ZCone zc = zf->getCone(d-ld,i,oo,mm);
                 res->rtyp = coneID;
                 res->data = (void*)new gfan::ZCone(zc);
+                gfan::deinitializeCddlibIfRequired();
                 return FALSE;
               }
               else
               {
                 WerrorS("getCone: invalid dimension; no cones in this dimension");
+                gfan::deinitializeCddlibIfRequired();
                 return TRUE;
               }
             }
             else
             {
               WerrorS("getCone: invalid index");
+              gfan::deinitializeCddlibIfRequired();
               return TRUE;
             }
           }
           else
           {
             WerrorS("getCone: invalid dimension");
+            gfan::deinitializeCddlibIfRequired();
             return TRUE;
           }
         }
         else
         {
           WerrorS("getCone: invalid specifier for orbit or maximal");
+          gfan::deinitializeCddlibIfRequired();
           return TRUE;
         }
       }
@@ -622,13 +638,13 @@ BOOLEAN getCone(leftv res, leftv args)
 
 BOOLEAN getCones(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
   {
     leftv v=u->next;
     if ((v != NULL) && (v->Typ() == INT_CMD))
     {
+      gfan::initializeCddlibIfRequired();
       gfan::ZFan* zf = (gfan::ZFan*) u->Data();
       int d = (int)(long)v->Data();
       int o = -1;
@@ -664,23 +680,27 @@ BOOLEAN getCones(leftv res, leftv args)
             }
             res->rtyp = LIST_CMD;
             res->data = (void*) L;
+            gfan::deinitializeCddlibIfRequired();
             return FALSE;
           }
           else
           {
             WerrorS("getCones: invalid dimension; no cones in this dimension");
+            gfan::deinitializeCddlibIfRequired();
             return TRUE;
           }
         }
         else
         {
           WerrorS("getCones: invalid dimension");
+          gfan::deinitializeCddlibIfRequired();
           return TRUE;
         }
       }
       else
       {
         WerrorS("getCones: invalid specifier for orbit or maximal");
+        gfan::deinitializeCddlibIfRequired();
         return TRUE;
       }
     }
@@ -697,14 +717,15 @@ int isSimplicial(gfan::ZFan* zf)
 
 BOOLEAN isPure(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZFan* zf = (gfan::ZFan*) u->Data();
     int b = zf->isPure();
     res->rtyp = INT_CMD;
     res->data = (void*) (long) b;
+    gfan::deinitializeCddlibIfRequired();
     return FALSE;
   }
   WerrorS("isPure: unexpected parameters");
@@ -728,14 +749,15 @@ BOOLEAN isPure(leftv res, leftv args)
 
 BOOLEAN fVector(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZFan* zf = (gfan::ZFan*) u->Data();
     gfan::ZVector zv=zf->getFVector();
     res->rtyp = BIGINTMAT_CMD;
     res->data = (void*) zVectorToBigintmat(zv);
+    gfan::deinitializeCddlibIfRequired();
     return FALSE;
   }
   WerrorS("fVector: unexpected parameters");
@@ -744,7 +766,6 @@ BOOLEAN fVector(leftv res, leftv args)
 
 gfan::ZMatrix rays(const gfan::ZFan* const zf)
 {
-  gfan::initializeCddlibIfRequired();
   gfan::ZMatrix rays(0,zf->getAmbientDimension());
   for (int i=0; i<zf->numberOfConesOfDimension(1,0,0); i++)
   {
@@ -756,7 +777,6 @@ gfan::ZMatrix rays(const gfan::ZFan* const zf)
 
 int numberOfConesWithVector(gfan::ZFan* zf, gfan::ZVector* v)
 {
-  gfan::initializeCddlibIfRequired();
   int count = 0;
   int ambientDim = zf->getAmbientDimension();
   for (int i=0; i<zf->numberOfConesOfDimension(ambientDim, 0, 0); i++)
@@ -774,19 +794,20 @@ int numberOfConesWithVector(gfan::ZFan* zf, gfan::ZVector* v)
 
 BOOLEAN numberOfConesWithVector(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
   {
     leftv v=u->next;
     if ((v != NULL) && (v->Typ() == BIGINTMAT_CMD))
     {
+      gfan::initializeCddlibIfRequired();
       gfan::ZFan* zf = (gfan::ZFan*) u->Data();
       bigintmat* v0 = (bigintmat*) v->Data();
       int ambientDim = zf->getAmbientDimension();
       if (ambientDim != v0->cols())
       {
         WerrorS("numberOfConesWithVector: mismatching dimensions");
+        gfan::deinitializeCddlibIfRequired();
         return TRUE;
       }
       gfan::ZVector* v1 = bigintmatToZVector(*v0);
@@ -794,6 +815,7 @@ BOOLEAN numberOfConesWithVector(leftv res, leftv args)
       delete v1;
       res->rtyp = INT_CMD;
       res->data = (void*) (long) count;
+      gfan::deinitializeCddlibIfRequired();
       return FALSE;
     }
   }
@@ -803,30 +825,31 @@ BOOLEAN numberOfConesWithVector(leftv res, leftv args)
 
 BOOLEAN fanFromString(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == STRING_CMD))
-    {
-      std::string fanInString = (char*) u->Data();
-      std::istringstream s(fanInString);
-      gfan::ZFan* zf = new gfan::ZFan(s);
-      res->rtyp = fanID;
-      res->data = (void*) zf;
-      return FALSE;
-    }
+  {
+    gfan::initializeCddlibIfRequired();
+    std::string fanInString = (char*) u->Data();
+    std::istringstream s(fanInString);
+    gfan::ZFan* zf = new gfan::ZFan(s);
+    res->rtyp = fanID;
+    res->data = (void*) zf;
+    gfan::deinitializeCddlibIfRequired();
+    return FALSE;
+  }
   WerrorS("fanFromString: unexpected parameters");
   return TRUE;
 }
 
 BOOLEAN fanViaCones(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == LIST_CMD))
   {
     lists L = (lists) u->Data();
     if (lSize(L)>-1)
     {
+      gfan::initializeCddlibIfRequired();
       if (L->m[0].Typ() != coneID)
       {
         WerrorS("fanViaCones: list contains entries of wrong type");
@@ -840,18 +863,21 @@ BOOLEAN fanViaCones(leftv res, leftv args)
         if (L->m[i].Typ() != coneID)
         {
           WerrorS("fanViaCones: entries of wrong type in list");
+          gfan::deinitializeCddlibIfRequired();
           return TRUE;
         }
         gfan::ZCone* zc = (gfan::ZCone*) L->m[i].Data();
         if (zc->ambientDimension() != zf->getAmbientDimension())
         {
           WerrorS("fanViaCones: inconsistent ambient dimensions amongst cones in list");
+          gfan::deinitializeCddlibIfRequired();
           return TRUE;
         }
         zf->insert(*zc);
       }
       res->rtyp = fanID;
       res->data = (void*) zf;
+      gfan::deinitializeCddlibIfRequired();
       return FALSE;
     }
     res->rtyp = fanID;
@@ -860,6 +886,7 @@ BOOLEAN fanViaCones(leftv res, leftv args)
   }
   if ((u != NULL) && (u->Typ() == coneID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zc = (gfan::ZCone*) u->Data();
     gfan::ZFan* zf = new gfan::ZFan(zc->ambientDimension());
     zf->insert(*zc);
@@ -869,18 +896,23 @@ BOOLEAN fanViaCones(leftv res, leftv args)
       if (u->Typ() != coneID)
       {
         WerrorS("fanViaCones: arguments of wrong type");
+        gfan::deinitializeCddlibIfRequired();
+        delete zf;
         return TRUE;
       }
       gfan::ZCone* zc = (gfan::ZCone*) u->Data();
       if (zc->ambientDimension() != zf->getAmbientDimension())
       {
         WerrorS("fanViaCones: inconsistent ambient dimensions amongst input cones");
+        gfan::deinitializeCddlibIfRequired();
+        delete zf;
         return TRUE;
       }
       zf->insert(*zc);
     }
     res->rtyp = fanID;
     res->data = (void*) zf;
+    gfan::deinitializeCddlibIfRequired();
     return FALSE;
   }
   if (u == NULL)
@@ -971,18 +1003,19 @@ gfan::ZFan commonRefinement(gfan::ZFan zf, gfan::ZFan zg)
 
 BOOLEAN commonRefinement(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
   {
     leftv v=u->next;
     if ((v != NULL) && (v->Typ() == fanID))
     {
+      gfan::initializeCddlibIfRequired();
       gfan::ZFan* zf = (gfan::ZFan*) u->Data();
       gfan::ZFan* zg = (gfan::ZFan*) v->Data();
       gfan::ZFan* zr = new gfan::ZFan(commonRefinement(*zf,*zg));
       res->rtyp = fanID;
       res->data = (void*) zr;
+      gfan::deinitializeCddlibIfRequired();
       return FALSE;
     }
   }
