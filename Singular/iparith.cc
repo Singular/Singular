@@ -5116,7 +5116,7 @@ BOOLEAN jjWAITALL1(leftv res, leftv u)
 
 BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
 {
-  char libnamebuf[256];
+  char libnamebuf[1024];
   lib_types LT = type_of_LIB(s, libnamebuf);
 
 #ifdef HAVE_DYNAMIC_LOADING
@@ -5151,7 +5151,7 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
         package savepack=currPack;
         currPack=IDPACKAGE(pl);
         IDPACKAGE(pl)->loaded=TRUE;
-        char libnamebuf[256];
+        char libnamebuf[1024];
         FILE * fp = feFopen( s, "r", libnamebuf, TRUE );
         BOOLEAN bo=iiLoadLIB(fp, libnamebuf, s, pl, autoexport, TRUE);
         currPack=savepack;

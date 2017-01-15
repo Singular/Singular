@@ -1093,7 +1093,7 @@ BOOLEAN p_static = FALSE;
 int old_state = 0;
 lib_cmds last_cmd = LP_NONE;
 
-char libnamebuf[128];
+char libnamebuf[1024];
 char *text_buffer=NULL;
 long string_start;
 
