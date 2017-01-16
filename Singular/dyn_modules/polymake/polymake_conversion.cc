@@ -390,12 +390,11 @@ gfan::ZFan* PmFan2ZFan (polymake::perl::Object* pf)
 
     int n = pf->give("N_MAXIMAL_CONES");
     for (int i=0; i<n; i++)
-      {
-        polymake::perl::Object pmcone=pf->CallPolymakeMethod("cone",i);
-        gfan::ZCone* zc=PmCone2ZCone(&pmcone);
-        gfan::initializeCddlibIfRequired();
-        zf->insert(*zc);
-      }
+    {
+      polymake::perl::Object pmcone=pf->CallPolymakeMethod("cone",i);
+      gfan::ZCone* zc=PmCone2ZCone(&pmcone);
+      zf->insert(*zc);
+    }
     return zf;
   }
   WerrorS("PmFan2ZFan: unexpected parameters");
