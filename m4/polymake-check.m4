@@ -38,7 +38,7 @@ if test "x$ENABLE_POLYMAKE" != xno; then
       PM_CFLAGS=`polymake-config --cflags`
       PM_LIBS=`polymake-config --libs`
       PM_LDFLAGS=`polymake-config --ldflags`
-      POLYMAKEVERSION=`polymake-config --version | cut -c -4 -| sed s'/\./*100+/'`
+      POLYMAKEVERSION=`polymake-config --version | cut -c -6 -| sed s'/\./*100+/'|sed s'/\./*10+/'`
 
       AC_DEFINE_UNQUOTED(POLYMAKEVERSION,$POLYMAKEVERSION,[check the polymake version])
       AC_SUBST(PM_INC)
