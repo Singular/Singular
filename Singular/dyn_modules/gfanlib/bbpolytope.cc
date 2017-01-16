@@ -184,15 +184,26 @@ static BOOLEAN ppCONERAYS3(leftv res, leftv u, leftv v)
 
 BOOLEAN polytopeViaVertices(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && ((u->Typ() == BIGINTMAT_CMD) || (u->Typ() == INTMAT_CMD)))
   {
-    if (u->next == NULL) return ppCONERAYS1(res, u);
+    if (u->next == NULL)
+    {
+      gfan::initializeCddlibIfRequired();
+      BOOLEAN bo = ppCONERAYS1(res, u);
+      gfan::deinitializeCddlibIfRequired();
+      return bo;
+    }
     leftv v = u->next;
     if ((v != NULL) && (v->Typ() == INT_CMD))
     {
-      if (v->next == NULL) return ppCONERAYS3(res, u, v);
+      if (v->next == NULL)
+      {
+        gfan::initializeCddlibIfRequired();
+        BOOLEAN bo = ppCONERAYS3(res, u, v);
+        gfan::deinitializeCddlibIfRequired();
+        return bo;
+      }
     }
   }
   WerrorS("polytopeViaPoints: unexpected parameters");
@@ -319,21 +330,38 @@ static BOOLEAN ppCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
 
 BOOLEAN polytopeViaNormals(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && ((u->Typ() == BIGINTMAT_CMD) || (u->Typ() == INTMAT_CMD)))
   {
-    if (u->next == NULL) return ppCONENORMALS1(res, u);
+    if (u->next == NULL)
+    {
+      gfan::initializeCddlibIfRequired();
+      BOOLEAN bo = ppCONENORMALS1(res, u);
+      gfan::deinitializeCddlibIfRequired();
+      return bo;
+    }
   }
   leftv v = u->next;
   if ((v != NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTMAT_CMD)))
   {
-    if (v->next == NULL) return ppCONENORMALS2(res, u, v);
+    if (v->next == NULL)
+    {
+      gfan::initializeCddlibIfRequired();
+      BOOLEAN bo = ppCONENORMALS2(res, u, v);
+      gfan::deinitializeCddlibIfRequired();
+      return bo;
+    }
   }
   leftv w = v->next;
   if ((w != NULL) && (w->Typ() == INT_CMD))
   {
-    if (w->next == NULL) return ppCONENORMALS3(res, u, v, w);
+    if (w->next == NULL)
+    {
+      gfan::initializeCddlibIfRequired();
+      BOOLEAN bo = ppCONENORMALS3(res, u, v, w);
+      gfan::deinitializeCddlibIfRequired();
+      return bo;
+    }
   }
   WerrorS("polytopeViaInequalities: unexpected parameters");
   return TRUE;
@@ -341,16 +369,17 @@ BOOLEAN polytopeViaNormals(leftv res, leftv args)
 
 BOOLEAN vertices(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-      gfan::ZMatrix zmat = zc->extremeRays();
-      res->rtyp = BIGINTMAT_CMD;
-      res->data = (void*)zMatrixToBigintmat(zmat);
-      return FALSE;
-    }
+  {
+    gfan::initializeCddlibIfRequired();
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    gfan::ZMatrix zmat = zc->extremeRays();
+    res->rtyp = BIGINTMAT_CMD;
+    res->data = (void*)zMatrixToBigintmat(zmat);
+    gfan::deinitializeCddlibIfRequired();
+    return FALSE;
+  }
   WerrorS("vertices: unexpected parameters");
   return TRUE;
 }
@@ -400,13 +429,14 @@ gfan::ZCone newtonPolytope(poly p, ring r)
 
 BOOLEAN newtonPolytope(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == POLY_CMD))
   {
+    gfan::initializeCddlibIfRequired();
     poly p = (poly)u->Data();
     res->rtyp = polytopeID;
     res->data = (void*) new gfan::ZCone(newtonPolytope(p,currRing));
+    gfan::deinitializeCddlibIfRequired();
     return FALSE;
   }
   WerrorS("newtonPolytope: unexpected parameters");
@@ -415,13 +445,13 @@ BOOLEAN newtonPolytope(leftv res, leftv args)
 
 BOOLEAN scalePolytope(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == INT_CMD))
   {
     leftv v = u->next;
     if ((v != NULL) && (v->Typ() == polytopeID))
     {
+      gfan::initializeCddlibIfRequired();
       int s = (int)(long) u->Data();
       gfan::ZCone* zp = (gfan::ZCone*) v->Data();
       gfan::ZMatrix zm = zp->extremeRays();
@@ -432,6 +462,7 @@ BOOLEAN scalePolytope(leftv res, leftv args)
       *zq = gfan::ZCone::givenByRays(zm,gfan::ZMatrix(0, zm.getWidth()));
       res->rtyp = polytopeID;
       res->data = (void*) zq;
+      gfan::deinitializeCddlibIfRequired();
       return FALSE;
     }
   }
@@ -441,14 +472,15 @@ BOOLEAN scalePolytope(leftv res, leftv args)
 
 BOOLEAN dualPolytope(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*) u->Data();
     gfan::ZCone* zq = new gfan::ZCone(zp->dualCone());
     res->rtyp = polytopeID;
     res->data = (void*) zq;
+    gfan::deinitializeCddlibIfRequired();
     return FALSE;
   }
   WerrorS("dualPolytope: unexpected parameters");
@@ -457,10 +489,10 @@ BOOLEAN dualPolytope(leftv res, leftv args)
 
 BOOLEAN mixedVolume(leftv res, leftv args)
 {
-  gfan::initializeCddlibIfRequired();
   leftv u = args;
   if ((u != NULL) && (u->Typ() == LIST_CMD))
   {
+    gfan::initializeCddlibIfRequired();
     lists l = (lists) u->Data();
     int k = lSize(l)+1;
     std::vector<gfan::IntMatrix> P(k);
@@ -498,6 +530,7 @@ BOOLEAN mixedVolume(leftv res, leftv args)
       else
       {
         WerrorS("mixedVolume: entries of unsupported type in list");
+        gfan::deinitializeCddlibIfRequired();
         return TRUE;
       }
     }
@@ -505,6 +538,7 @@ BOOLEAN mixedVolume(leftv res, leftv args)
 
     res->rtyp = BIGINT_CMD;
     res->data = (void*) integerToNumber(mv);
+    gfan::deinitializeCddlibIfRequired();
     return FALSE;
   }
   WerrorS("mixedVolume: unexpected parameters");
