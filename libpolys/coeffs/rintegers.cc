@@ -158,7 +158,7 @@ number nrzCopyMap(number a, const coeffs /*src*/, const coeffs dst)
 static int nrzSize(number a, const coeffs)
 {
   if (a == NULL) return 0;
-  return ABS(((mpz_ptr)a)->_mp_size);
+  return (((mpz_ptr)a)->_mp_alloc);
 }
 
 /*

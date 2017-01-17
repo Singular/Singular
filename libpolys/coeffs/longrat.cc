@@ -965,9 +965,10 @@ int nlDivComp(number a, number b, const coeffs r)
   return 0;
 }
 
-number  nlGetUnit (number, const coeffs)
+number  nlGetUnit (number n, const coeffs cf)
 {
-  return INT_TO_SR(1);
+  if (nlGreaterZero(n,cf)) return INT_TO_SR(1);
+  else                     return INT_TO_SR(-1);
 }
 
 coeffs nlQuot1(number c, const coeffs r)
@@ -2476,7 +2477,7 @@ LINLINE BOOLEAN nlIsZero (number a, const coeffs)
   }
   return FALSE;
   #else
-  return (a==INT_TO_SR(0));
+  return (a==NULL)|| (a==INT_TO_SR(0));
   #endif
 }
 
@@ -3325,8 +3326,6 @@ BOOLEAN nlInitChar(coeffs r, void*p)
 {
   r->is_domain=TRUE;
   r->rep=n_rep_gap_rat;
-
-  //const int ch = (int)(long)(p);
 
   r->nCoeffIsEqual=nlCoeffIsEqual;
   //r->cfKillChar = ndKillChar; /* dummy */
