@@ -453,6 +453,12 @@ int redRing (LObject* h,kStrategy strat)
     {
       // over ZZ: cleanup coefficients by complete reduction with monomials
       postReduceByMon(h, strat);
+      if(h->p == NULL)
+      {
+        if (h->lcm!=NULL) pLmDelete(h->lcm);
+        h->Clear();
+        return 0;
+      }
       if(nIsZero(pGetCoeff(h->p))) return 2;
       j = kFindDivisibleByInT(strat, h);
       if(j < 0)
@@ -2297,9 +2303,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   else if (TEST_OPT_PROT) PrintLn();
   if (!errorreported)
   {
-    if(nCoeff_is_Ring_Z(currRing->cf))
-      finalReduceByMon(strat);
-    if(rField_is_Ring(currRing))
+    if(rField_is_Ring_Z(currRing))
     {
       for(int i = 0;i<=strat->sl;i++)
       {
@@ -2308,7 +2312,17 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           strat->S[i] = pNeg(strat->S[i]);
         }
       }
+      finalReduceByMon(strat);
+      for(int i = 0;i<=strat->sl;i++)
+      {
+        if(!nGreaterZero(pGetCoeff(strat->S[i])))
+        {
+          strat->S[i] = pNeg(strat->S[i]);
+        }
+      }
     }
+    else if (rField_is_Ring(currRing))
+      finalReduceByMon(strat);
   }
   /* release temp data-------------------------------- */
   exitBuchMora(strat);

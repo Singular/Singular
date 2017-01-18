@@ -1430,7 +1430,7 @@ void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy strat, 
       if(h.lcm != NULL)
       {
         pLmDelete(h.lcm);
-	h.lcm=NULL;
+        h.lcm=NULL;
       }
       h.Clear();
       if (strat->pairtest==NULL) initPairtest(strat);
@@ -11070,18 +11070,26 @@ void postReduceByMon(LObject* h, kStrategy strat)
           ok = TRUE;
         }
       }
-      pp = pNext(p);
-      while(pp != NULL)
+      if (p!=NULL)
       {
-        if(pLmDivisibleBy(strat->S[i], pp))
+        pp = pNext(p);
+        while(pp != NULL)
         {
-          number dummy = n_IntMod(pp->coef, strat->S[i]->coef, currRing->cf);
-          p_SetCoeff(pp,dummy,currRing);
-          if(nIsZero(pp->coef))
+          if(pLmDivisibleBy(strat->S[i], pp))
           {
-            pLmDelete(&pNext(p));
-            pp = pNext(p);
-            deleted = TRUE;
+            number dummy = n_IntMod(pp->coef, strat->S[i]->coef, currRing->cf);
+            p_SetCoeff(pp,dummy,currRing);
+            if(nIsZero(pp->coef))
+            {
+              pLmDelete(&pNext(p));
+              pp = pNext(p);
+              deleted = TRUE;
+            }
+            else
+            {
+              p = pp;
+              pp = pNext(p);
+            }
           }
           else
           {
@@ -11089,16 +11097,11 @@ void postReduceByMon(LObject* h, kStrategy strat)
             pp = pNext(p);
           }
         }
-        else
-        {
-          p = pp;
-          pp = pNext(p);
-        }
       }
     }
   }
   h->SetLmCurrRing();
-  if(deleted)
+  if((deleted)&&(h->p!=NULL))
     strat->initEcart(h);
 }
 
