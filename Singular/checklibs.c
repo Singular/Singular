@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
+
 
 #define NUM_PROC 200
 #define LINE_LEN 200
