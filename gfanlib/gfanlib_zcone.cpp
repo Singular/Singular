@@ -12,6 +12,8 @@
 #include <sstream>
 
 #include <config.h>
+extern "C"
+{
 #ifdef HAVE_CDD_SETOPER_H
 #include <cdd/setoper.h>
 #include <cdd/cdd.h>
@@ -24,7 +26,8 @@
 #include <cdd.h>
 #endif //HAVE_CDDLIB_SETOPER_H
 #endif //HAVE_CDD_SETOPER_H
-
+}
+extern "C" time_t dd_statStartTime; /*cddlib*/
 
 namespace gfan{
         bool isCddlibRequired()
@@ -33,12 +36,16 @@ namespace gfan{
         }
         void initializeCddlibIfRequired() // calling this frequently will cause memory leaks because deinitialisation is not possible with old versions of cddlib.
         {
+	  if (dd_statStartTime==0)
+	  {
                 dd_set_global_constants();
+		printf("dd_set_global_constansts\n");
+          }
         }
         void deinitializeCddlibIfRequired()
         {
         #ifdef HAVE_DD_FREE_GLOBAL_CONSTANTS
-                dd_free_global_constants();
+        //        dd_free_global_constants();
         #endif
         }
   static void ensureCddInitialisation()

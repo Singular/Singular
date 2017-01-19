@@ -26,6 +26,7 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
     {
       if (i2->Typ()==polytopeID || i2->Typ()==coneID)
       {
+        gfan::initializeCddlibIfRequired();
         gfan::ZCone* zq = (gfan::ZCone*) i2->Data();
         gfan::ZCone* ms;
         try
@@ -40,9 +41,11 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
         }
         catch (const std::exception& ex)
         {
+          gfan::deinitializeCddlibIfRequired();
           WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
           return TRUE;
         }
+        gfan::deinitializeCddlibIfRequired();
         res->rtyp = polytopeID;
         res->data = (void*) ms;
         return FALSE;
@@ -53,6 +56,7 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
     {
       if (i2->Typ()==INT_CMD)
       {
+        gfan::initializeCddlibIfRequired();
         int s = (int)(long) i2->Data();
         gfan::ZMatrix zm = zp->extremeRays();
         for (int i=0; i<zm.getHeight(); i++)
@@ -60,6 +64,7 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
             zm[i][j] *= s;
         gfan::ZCone* zs = new gfan::ZCone();
         *zs = gfan::ZCone::givenByRays(zm,gfan::ZMatrix(0, zm.getWidth()));
+        gfan::deinitializeCddlibIfRequired();
         res->rtyp = polytopeID;
         res->data = (void*) zs;
         return FALSE;
@@ -70,17 +75,20 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
     {
       if (i2->Typ()==polytopeID)
       {
+        gfan::initializeCddlibIfRequired();
         gfan::ZCone* zq = (gfan::ZCone*) i2->Data();
         int d1 = zp->ambientDimension();
         int d2 = zq->ambientDimension();
         if (d1 != d2)
         {
+          gfan::deinitializeCddlibIfRequired();
           WerrorS("mismatching ambient dimensions");
           return TRUE;
         }
         gfan::ZCone* zs = new gfan::ZCone();
         *zs = gfan::intersection(*zp, *zq);
         zs->canonicalize();
+        gfan::deinitializeCddlibIfRequired();
         res->rtyp = polytopeID;
         res->data = (void*) zs;
         return FALSE;
@@ -91,11 +99,13 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
     {
       if(i2->Typ()==polytopeID)
       {
+        gfan::initializeCddlibIfRequired();
         gfan::ZCone* zq = (gfan::ZCone*) i2->Data();
         int d1 = zp->ambientDimension();
         int d2 = zq->ambientDimension();
         if (d1 != d2)
         {
+          gfan::deinitializeCddlibIfRequired();
           WerrorS("mismatching ambient dimensions");
           return TRUE;
         }
@@ -106,6 +116,7 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
         gfan::ZCone* zs = new gfan::ZCone();
         *zs = gfan::ZCone::givenByRays(rays,lineality);
         zs->canonicalize();
+        gfan::deinitializeCddlibIfRequired();
         res->rtyp = polytopeID;
         res->data = (void*) zs;
         return FALSE;
@@ -116,10 +127,12 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
     {
       if(i2->Typ()==polytopeID)
       {
+        gfan::initializeCddlibIfRequired();
         gfan::ZCone* zq = (gfan::ZCone*) i2->Data();
         zp->canonicalize();
         zq->canonicalize();
         bool b = !((*zp)!=(*zq));
+        gfan::deinitializeCddlibIfRequired();
         res->rtyp = INT_CMD;
         res->data = (char*) (long) b;
         return FALSE;
@@ -202,6 +215,7 @@ BOOLEAN PMisLatticePolytope(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     bool b;
     try
@@ -212,9 +226,11 @@ BOOLEAN PMisLatticePolytope(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = INT_CMD;
     res->data = (char*) (long) b;
     return FALSE;
@@ -229,6 +245,7 @@ BOOLEAN PMisBounded(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     bool b;
     try
@@ -239,9 +256,11 @@ BOOLEAN PMisBounded(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = INT_CMD;
     res->data = (char*) (long) b;
     return FALSE;
@@ -256,6 +275,7 @@ BOOLEAN PMisReflexive(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     bool b;
     try
@@ -266,9 +286,11 @@ BOOLEAN PMisReflexive(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = INT_CMD;
     res->data = (char*) (long) b;
     return FALSE;
@@ -283,6 +305,7 @@ BOOLEAN PMisGorenstein(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     bool b;
     try
@@ -293,9 +316,11 @@ BOOLEAN PMisGorenstein(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = INT_CMD;
     res->data = (char*) (long) b;
     return FALSE;
@@ -310,6 +335,7 @@ BOOLEAN PMgorensteinIndex(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     int gi;
     bool ok = true;
@@ -326,15 +352,18 @@ BOOLEAN PMgorensteinIndex(leftv res, leftv args)
       else
       {
         delete p;
+        gfan::deinitializeCddlibIfRequired();
         WerrorS("gorensteinIndex: input polytope not gorenstein");
         return TRUE;
       }
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("overflow while converting polymake::Integer to int");
@@ -354,6 +383,7 @@ BOOLEAN PMgorensteinVector(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     intvec* gv;
     bool ok = true;
@@ -370,15 +400,18 @@ BOOLEAN PMgorensteinVector(leftv res, leftv args)
       else
       {
         delete p;
+        gfan::deinitializeCddlibIfRequired();
         WerrorS("gorensteinVector: input polytope not gorenstein");
         return TRUE;
       }
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("gorensteinVector: overflow in PmVectorInteger2Intvec");
@@ -398,6 +431,7 @@ BOOLEAN PMisCanonical(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     bool b;
     try
@@ -408,9 +442,11 @@ BOOLEAN PMisCanonical(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = INT_CMD;
     res->data = (char*) (long) b;
     return FALSE;
@@ -425,6 +461,7 @@ BOOLEAN PMisTerminal(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     bool b;
     try
@@ -435,9 +472,11 @@ BOOLEAN PMisTerminal(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = INT_CMD;
     res->data = (char*) (long) b;
     return FALSE;
@@ -452,6 +491,7 @@ BOOLEAN PMisLatticeEmpty(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     bool b;
     try
@@ -462,9 +502,11 @@ BOOLEAN PMisLatticeEmpty(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = INT_CMD;
     res->data = (char*) (long) b;
     return FALSE;
@@ -479,6 +521,7 @@ BOOLEAN PMlatticeVolume(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     int lv;
     bool ok = true;
@@ -491,9 +534,11 @@ BOOLEAN PMlatticeVolume(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("overflow while converting polymake::Integer to int");
@@ -513,6 +558,7 @@ BOOLEAN PMlatticeDegree(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     int ld;
     bool ok = true;
@@ -525,9 +571,11 @@ BOOLEAN PMlatticeDegree(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("overflow while converting polymake::Integer to int");
@@ -547,6 +595,7 @@ BOOLEAN PMlatticeCodegree(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     int lc;
     bool ok = true;
@@ -559,9 +608,11 @@ BOOLEAN PMlatticeCodegree(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("overflow while converting polymake::Integer to int");
@@ -581,6 +632,7 @@ BOOLEAN PMehrhartPolynomialCoeff(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     intvec* ec;
     bool ok = true;
@@ -593,9 +645,11 @@ BOOLEAN PMehrhartPolynomialCoeff(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("ehrhartPolynomialCoeff: overflow in PmVectorInteger2Intvec");
@@ -615,6 +669,7 @@ BOOLEAN PMfVector(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     intvec* hv;
     bool ok = true;
@@ -627,9 +682,11 @@ BOOLEAN PMfVector(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("fVectorP: overflow in PmVectorInteger2Intvec");
@@ -649,6 +706,7 @@ BOOLEAN PMhVector(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     intvec* hv;
     bool ok = true;
@@ -661,9 +719,11 @@ BOOLEAN PMhVector(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("hVector: overflow in PmVectorInteger2Intvec");
@@ -683,6 +743,7 @@ BOOLEAN PMhStarVector(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     intvec* hv;
     bool ok = true;
@@ -695,9 +756,11 @@ BOOLEAN PMhStarVector(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("hStarVector: overflow in PmVectorInteger2Intvec");
@@ -717,6 +780,7 @@ BOOLEAN PMisNormal(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     bool b;
     try
@@ -727,9 +791,11 @@ BOOLEAN PMisNormal(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = INT_CMD;
     res->data = (char*) (long) b;
     return FALSE;
@@ -744,6 +810,7 @@ BOOLEAN PMfacetWidths(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     intvec* fw;
     bool ok = true;
@@ -756,9 +823,11 @@ BOOLEAN PMfacetWidths(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("facetWidths: overflow in PmVectorInteger2Intvec");
@@ -778,6 +847,7 @@ BOOLEAN PMfacetWidth(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     int fw;
     bool ok = true;
@@ -790,9 +860,11 @@ BOOLEAN PMfacetWidth(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("overflow while converting polymake::Integer to int");
@@ -812,6 +884,7 @@ BOOLEAN PMfacetVertexLatticeDistances(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     intvec* ld;
     bool ok=true;
@@ -824,9 +897,11 @@ BOOLEAN PMfacetVertexLatticeDistances(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("overflow while converting polymake::Integer to int");
@@ -846,6 +921,7 @@ BOOLEAN PMisCompressed(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     bool b;
     try
@@ -856,9 +932,11 @@ BOOLEAN PMisCompressed(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = INT_CMD;
     res->data = (char*) (long) b;
     return FALSE;
@@ -873,6 +951,7 @@ BOOLEAN PMisSmooth(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     bool b;
     try
@@ -883,15 +962,18 @@ BOOLEAN PMisSmooth(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = INT_CMD;
     res->data = (char*) (long) b;
     return FALSE;
   }
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     bool b;
     try
@@ -902,15 +984,18 @@ BOOLEAN PMisSmooth(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = INT_CMD;
     res->data = (char*) (long) b;
     return FALSE;
   }
   if ((u != NULL) && (u->Typ() == fanID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZFan* zf = (gfan::ZFan*)u->Data();
     bool b;
     try
@@ -921,9 +1006,11 @@ BOOLEAN PMisSmooth(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = INT_CMD;
     res->data = (char*) (long) b;
     return FALSE;
@@ -938,6 +1025,7 @@ BOOLEAN PMisVeryAmple(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     bool b;
     try
@@ -948,9 +1036,11 @@ BOOLEAN PMisVeryAmple(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = INT_CMD;
     res->data = (char*) (long) b;
     return FALSE;
@@ -965,6 +1055,7 @@ BOOLEAN PMlatticePoints(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     intvec* iv;
     bool ok = true;
@@ -983,9 +1074,11 @@ BOOLEAN PMlatticePoints(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("overflow while converting polymake::Integer to int");
@@ -1005,6 +1098,7 @@ BOOLEAN PMnLatticePoints(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     int n;
     bool ok = true;
@@ -1017,9 +1111,11 @@ BOOLEAN PMnLatticePoints(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("overflow while converting polymake::Integer to int");
@@ -1039,6 +1135,7 @@ BOOLEAN PMinteriorLatticePoints(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     intvec* iv;
     bool ok = true;
@@ -1051,9 +1148,11 @@ BOOLEAN PMinteriorLatticePoints(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("overflow while converting polymake::Integer to int");
@@ -1073,6 +1172,7 @@ BOOLEAN PMnInteriorLatticePoints(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     int n;
     bool ok = true;
@@ -1085,9 +1185,11 @@ BOOLEAN PMnInteriorLatticePoints(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("overflow while converting polymake::Integer to int");
@@ -1107,6 +1209,7 @@ BOOLEAN PMboundaryLatticePoints(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     intvec* iv;
     bool ok = true;
@@ -1119,9 +1222,11 @@ BOOLEAN PMboundaryLatticePoints(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("overflow while converting polymake::Integer to int");
@@ -1141,6 +1246,7 @@ BOOLEAN PMnBoundaryLatticePoints(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     int n;
     bool ok = true;
@@ -1153,9 +1259,11 @@ BOOLEAN PMnBoundaryLatticePoints(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("overflow while converting polymake::Integer to int");
@@ -1175,6 +1283,7 @@ BOOLEAN PMhilbertBasis(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     intvec* iv;
     bool ok = true;
@@ -1193,9 +1302,11 @@ BOOLEAN PMhilbertBasis(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("overflow while converting polymake::Integer to int");
@@ -1215,6 +1326,7 @@ BOOLEAN PMnHilbertBasis(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     int n;
     bool ok = true;
@@ -1227,9 +1339,11 @@ BOOLEAN PMnHilbertBasis(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     if (!ok)
     {
       WerrorS("overflow while converting polymake::Integer to int");
@@ -1252,6 +1366,7 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
     leftv v = u->next;
     if ((v != NULL) && (v->Typ() == polytopeID))
     {
+      gfan::initializeCddlibIfRequired();
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
       gfan::ZCone* zq = (gfan::ZCone*)v->Data();
       gfan::ZCone* ms;
@@ -1267,15 +1382,18 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
       }
       catch (const std::exception& ex)
       {
+        gfan::deinitializeCddlibIfRequired();
         WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
         return TRUE;
       }
+      gfan::deinitializeCddlibIfRequired();
       res->rtyp = polytopeID;
       res->data = (char*) ms;
       return FALSE;
     }
     if ((v != NULL) && (v->Typ() == coneID))
     {
+      gfan::initializeCddlibIfRequired();
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
       gfan::ZCone* zc = (gfan::ZCone*)v->Data();
       gfan::ZCone* zq = new gfan::ZCone(liftUp(*zc));
@@ -1292,13 +1410,15 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
       }
       catch (const std::exception& ex)
       {
-        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
         delete zq;
+        gfan::deinitializeCddlibIfRequired();
+        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
         return TRUE;
       }
+      delete zq;
+      gfan::deinitializeCddlibIfRequired();
       res->rtyp = polytopeID;
       res->data = (char*) ms;
-      delete zq;
       return FALSE;
     }
   }
@@ -1307,6 +1427,7 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
     leftv v = u->next;
     if ((v != NULL) && (v->Typ() == polytopeID))
     {
+      gfan::initializeCddlibIfRequired();
       gfan::ZCone* zc = (gfan::ZCone*)u->Data();
       gfan::ZCone* zp = new gfan::ZCone(liftUp(*zc));
       gfan::ZCone* zq = (gfan::ZCone*)v->Data();
@@ -1323,17 +1444,20 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
       }
       catch (const std::exception& ex)
       {
-        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
         delete zp;
+        gfan::deinitializeCddlibIfRequired();
+        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
         return TRUE;
       }
+      delete zp;
+      gfan::deinitializeCddlibIfRequired();
       res->rtyp = polytopeID;
       res->data = (char*) ms;
-      delete zp;
       return FALSE;
     }
     if ((v != NULL) && (v->Typ() == coneID))
     {
+      gfan::initializeCddlibIfRequired();
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
       gfan::ZCone* zq = (gfan::ZCone*)v->Data();
       gfan::ZCone* ms;
@@ -1350,8 +1474,10 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
       catch (const std::exception& ex)
       {
         WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+        gfan::deinitializeCddlibIfRequired();
         return TRUE;
       }
+      gfan::deinitializeCddlibIfRequired();
       res->rtyp = coneID;
       res->data = (char*) ms;
       return FALSE;
@@ -1388,6 +1514,7 @@ BOOLEAN PMmaximalFace(leftv res, leftv args)
     leftv v = u->next;
     if ((v != NULL) && (v->Typ() == INTVEC_CMD))
     {
+      gfan::initializeCddlibIfRequired();
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
       intvec* iv = (intvec*) v->Data();
       intvec* maxface;
@@ -1406,8 +1533,10 @@ BOOLEAN PMmaximalFace(leftv res, leftv args)
       catch (const std::exception& ex)
       {
         WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+        gfan::deinitializeCddlibIfRequired();
         return TRUE;
       }
+      gfan::deinitializeCddlibIfRequired();
       if (!ok)
       {
         WerrorS("overflow while converting polymake::Integer to int");
@@ -1431,6 +1560,7 @@ BOOLEAN PMminimalFace(leftv res, leftv args)
     leftv v = u->next;
     if ((v != NULL) && (v->Typ() == INTVEC_CMD))
     {
+      gfan::initializeCddlibIfRequired();
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
       intvec* iv = (intvec*) v->Data();
       intvec* minface;
@@ -1449,8 +1579,10 @@ BOOLEAN PMminimalFace(leftv res, leftv args)
       catch (const std::exception& ex)
       {
         WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+        gfan::deinitializeCddlibIfRequired();
         return TRUE;
       }
+      gfan::deinitializeCddlibIfRequired();
       if (!ok)
       {
         WerrorS("overflow while converting polymake::Integer to int");
@@ -1474,6 +1606,7 @@ BOOLEAN PMmaximalValue(leftv res, leftv args)
     leftv v = u->next;
     if ((v != NULL) && (v->Typ() == INTVEC_CMD))
     {
+      gfan::initializeCddlibIfRequired();
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
       intvec* iv = (intvec*) v->Data();
       if (iv->rows()==zp->ambientDimension())
@@ -1494,8 +1627,10 @@ BOOLEAN PMmaximalValue(leftv res, leftv args)
         catch (const std::exception& ex)
         {
           WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+          gfan::deinitializeCddlibIfRequired();
           return TRUE;
         }
+        gfan::deinitializeCddlibIfRequired();
         if (!ok)
         {
           WerrorS("overflow while converting polymake::Integer to int");
@@ -1521,6 +1656,7 @@ BOOLEAN PMminimalValue(leftv res, leftv args)
     leftv v = u->next;
     if ((v != NULL) && (v->Typ() == INTVEC_CMD))
     {
+      gfan::initializeCddlibIfRequired();
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
       intvec* iv = (intvec*) v->Data();
       if (iv->rows()==zp->ambientDimension())
@@ -1541,8 +1677,10 @@ BOOLEAN PMminimalValue(leftv res, leftv args)
         catch (const std::exception& ex)
         {
           WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+          gfan::deinitializeCddlibIfRequired();
           return TRUE;
         }
+        gfan::deinitializeCddlibIfRequired();
         if (!ok)
         {
           WerrorS("overflow while converting polymake::Integer to int");
@@ -1566,6 +1704,7 @@ BOOLEAN visual(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     try
     {
@@ -1576,14 +1715,17 @@ BOOLEAN visual(leftv res, leftv args)
     catch (const std::exception& ex)
     {
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+      gfan::deinitializeCddlibIfRequired();
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = NONE;
     res->data = NULL;
     return FALSE;
   }
   if ((u != NULL) && (u->Typ() == fanID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZFan* zf = (gfan::ZFan*)u->Data();
     try
     {
@@ -1592,9 +1734,11 @@ BOOLEAN visual(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = NONE;
     res->data = NULL;
     return FALSE;
@@ -1608,6 +1752,7 @@ BOOLEAN normalFan(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     gfan::ZFan* zf = new gfan::ZFan(0);
     try
@@ -1620,9 +1765,11 @@ BOOLEAN normalFan(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = fanID;
     res->data = (char*) zf;
     return FALSE;
@@ -1636,6 +1783,7 @@ BOOLEAN PMconeViaRays(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == INTMAT_CMD))
   {
+    gfan::initializeCddlibIfRequired();
     polymake::perl::Object pc("Cone<Rational>");
     intvec* hlines = (intvec*) u->Data(); // these will are half lines in the cone
     polymake::Matrix<polymake::Integer> pmhlines = Intvec2PmMatrixInteger(hlines);
@@ -1656,6 +1804,7 @@ BOOLEAN PMconeViaRays(leftv res, leftv args)
       // }
     }
     gfan::ZCone* zc = PmCone2ZCone(&pc);
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = coneID;
     res->data = (char*) zc;
     return FALSE;
@@ -1670,6 +1819,7 @@ BOOLEAN PMpolytopeViaVertices(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == INTMAT_CMD))
   {
+    gfan::initializeCddlibIfRequired();
     polymake::perl::Object pp("Polytope<Rational>");
     intvec* points = (intvec*) u->Data(); // these will be vertices of or points in the polytope
     polymake::Matrix<polymake::Integer> pmpoints = Intvec2PmMatrixInteger(points);
@@ -1689,6 +1839,7 @@ BOOLEAN PMpolytopeViaVertices(leftv res, leftv args)
       pp.take("POINTS") << pmpoints;              // by default, we assume that matrix may contain non-vertices
 
     gfan::ZCone* zp = PmPolytope2ZPolytope(&pp);
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = polytopeID;
     res->data = (char*) zp;
     return FALSE;
@@ -1703,6 +1854,7 @@ BOOLEAN PMvertexAdjacencyGraph(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*) u->Data();
     lists output=(lists)omAllocBin(slists_bin); output->Init(2);
     try
@@ -1722,9 +1874,11 @@ BOOLEAN PMvertexAdjacencyGraph(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = LIST_CMD;
     res->data = (void*) output;
     return FALSE;
@@ -1739,6 +1893,7 @@ BOOLEAN PMvertexEdgeGraph(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
+    gfan::initializeCddlibIfRequired();
     gfan::ZCone* zp = (gfan::ZCone*) u->Data();
     lists output=(lists)omAllocBin(slists_bin); output->Init(2);
     try
@@ -1758,9 +1913,11 @@ BOOLEAN PMvertexEdgeGraph(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
+      gfan::deinitializeCddlibIfRequired();
       WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
+    gfan::deinitializeCddlibIfRequired();
     res->rtyp = LIST_CMD;
     res->data = (void*) output;
     return FALSE;
