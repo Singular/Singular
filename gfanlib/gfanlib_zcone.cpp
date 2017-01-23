@@ -39,7 +39,6 @@ namespace gfan{
 	  if (dd_statStartTime==0)
 	  {
                 dd_set_global_constants();
-		printf("dd_set_global_constansts\n");
           }
         }
         void deinitializeCddlibIfRequired()
