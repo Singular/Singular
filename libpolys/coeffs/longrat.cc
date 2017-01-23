@@ -209,7 +209,6 @@ number nlMapGMP(number from, const coeffs /*src*/, const coeffs /*dst*/)
   z->debug=123456;
 #endif
   mpz_init_set(z->z,(mpz_ptr) from);
-  //mpz_init_set_ui(&z->n,1);
   z->s = 3;
   z=nlShort3(z);
   return z;
@@ -673,7 +672,7 @@ number nlInvers(number a, const coeffs r)
     n->s=1;
     if (((long)a)>0L)
     {
-      mpz_init_set_si(n->z,1L);
+      mpz_init_set_ui(n->z,1L);
       mpz_init_set_si(n->n,(long)SR_TO_INT(a));
     }
     else
@@ -718,7 +717,7 @@ number nlInvers(number a, const coeffs r)
               }
               else
               {
-                mpz_init_set_si(n->z,1L);
+                mpz_init_set_ui(n->z,1L);
               }
               break;
     }
@@ -1417,8 +1416,8 @@ number nlNormalizeHelper(number a, number b, const coeffs r)
   if (mpz_cmp_si(gcd,1L)!=0)
   {
     mpz_t bt;
-    mpz_init_set(bt,b->n);
-    mpz_divexact(bt,bt,gcd);
+    mpz_init(bt);
+    mpz_divexact(bt,b->n,gcd);
     if (SR_HDL(a) & SR_INT)
       mpz_mul_si(result->z,bt,SR_TO_INT(a));
     else
@@ -1581,8 +1580,8 @@ BOOLEAN _nlEqual_aNoImm_OR_bNoImm(number a, number b)
     if ((((long)a) < 0L) && (!mpz_isNeg(b->z)))
       return FALSE;
     mpz_t  bb;
-    mpz_init_set(bb,b->n);
-    mpz_mul_si(bb,bb,(long)SR_TO_INT(a));
+    mpz_init(bb);
+    mpz_mul_si(bb,b->n,(long)SR_TO_INT(a));
     bo=(mpz_cmp(bb,b->z)==0);
     mpz_clear(bb);
     return bo;
@@ -2759,7 +2758,7 @@ number nlQuotRem (number a, number b, number * r, const coeffs R)
       *r = INT_TO_SR(rr);
     if (SR_TO_INT(b)<0)
     {
-      mpz_mul_si(qq, qq, -1);
+      mpz_neg(qq, qq);
     }
     return nlInitMPZ(qq,R);
   }
