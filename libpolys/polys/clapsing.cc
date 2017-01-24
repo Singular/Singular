@@ -203,7 +203,6 @@ poly singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
     g=p_Div_nn(g,G,r);
     return p_NSet(G,r);
   }
-  if ((pNext(f)==NULL)||(pNext(g)==NULL)) printf("L");
 
   Off(SW_RATIONAL);
   CanonicalForm F,G,GCD;
