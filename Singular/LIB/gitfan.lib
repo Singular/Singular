@@ -22,6 +22,9 @@ For notation, background, and algorithms see [BKR16].
 
 Functions produce debug output if printlevel is positive.
 
+Elements of the symmetric group Sn of type permutation can be created by the function permutationFromIntvec. The images of 1,...,n can be obtained by permutationToIntvec. Composition of permutations can be done by the *-Operator, also powers can be computed in the usual way.
+
+
 REFERENCES:
 
 [BKR16] J. Boehm, S. Keicher, Y. Ren: Computing GIT-Fans with Symmetry and the Mori Chamber Decomposition of M06bar,  https://arxiv.org/abs/1603.09241
@@ -57,6 +60,8 @@ PROCEDURES (using group action):
   GITfanSymmetric(list, intmat, cone, list); Compute GIT-fan from orbit cones by determining a minimal representing set for the orbits of maximal dimensional GIT-cones.
   GITfanParallelSymmetric(list, intmat, cone, list); Compute GIT-fan in parallel from orbit cones by determining a minimal representing set for the orbits of maximal dimensional GIT-cones.
   bigintToBinary(bigint, int); Convert bigint into a sparse binary represenation specifying the indices of the one-entries
+  binaryToBigint(intvec); Convert sparse binary represenation specifying the indices of the one-entries to bigint
+  applyPermutationToIntvec(intvec, permutation); Apply permutation to a set of integers represented as an intvec
   hashToCone(bigint, list); Convert a bigint hash to a GIT-cone
   hashesToFan(list hashes, list OC)
 
@@ -361,12 +366,23 @@ example
 }
 
 
-static proc applyPermutationToIntvec(intvec v, permutation g){
+proc applyPermutationToIntvec(intvec v, permutation g)
+"USAGE: applyPermutationToIntvec(v,g); v: intvec, g:permutation
+PURPOSE: Apply g to the set of entries of v. The result is a sorted intvec. We assume that the entries of v are valid arguments of g. We do not require that the input is sorted.
+RETURN: intvec.
+EXAMPLE: example applyPermutationToIntvec; shows an example
+"
+{
   intvec gv = composeIntvecs(permutationToIntvec(g),v);
   //for (int i=1;i<=size(v);i++){
   //  gv[i]=g[v[i]];
   //}
   return(sort(gv)[1]);
+}
+example
+{
+permutation g = permutationFromIntvec(intvec(10, 9, 7, 4, 8, 6, 3, 5, 2, 1));
+applyPermutationToIntvec(intvec(1, 3, 4, 6, 8),g);
 }
 
 static proc isContained(intvec v, list orbit){
@@ -1021,23 +1037,15 @@ EXAMPLE: example groupActionOnQImage; shows an example
 }
 example {
   echo=2;
+  ring R = 0,(x),dp;
   intmat Q[5][10] =
     1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
     1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
     0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
     0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
     0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
-list generatorsG = permutationFromIntvec(intvec( 16, 21, 22, 23, 24, 17, 18, 19, 20, 25, 26, 27, 28, 29,
- 30, 31, 32, 33, 34, 40, 39, 38, 37, 36, 35 )),
-permutationFromIntvec(intvec( 17, 16, 18, 19, 20, 21, 25, 26, 27, 22, 23, 24, 28, 29,
- 30, 31, 35, 36, 37, 32, 33, 34, 38, 39, 40 )),
-permutationFromIntvec(intvec( 16, 18, 17, 19, 20, 22, 21, 23, 24, 25, 28, 29, 26, 27,
- 30, 32, 31, 33, 34, 35, 38, 39, 36, 37, 40 )),
-permutationFromIntvec(intvec( 16, 17, 19, 18, 20, 21, 23, 22, 24, 26, 25, 27, 28, 30,
- 29, 31, 33, 32, 34, 36, 35, 37, 38, 40, 39 )),
-permutationFromIntvec(intvec( 16, 17, 18, 20, 19, 21, 22, 24, 23, 25, 27, 26, 29, 28,
- 30, 31, 32, 34, 33, 35, 37, 36, 39, 38, 40 ));
-apply(generatorsG,print);
+list generatorsG = permutationFromIntvec(intvec( 1, 3, 2, 4, 6, 5, 7, 8, 10, 9 )),
+permutationFromIntvec(intvec( 5, 7, 1, 6, 9, 2, 8, 4, 10, 3 ));
 groupActionOnQImage(generatorsG,Q);
 }
 
@@ -1131,7 +1139,28 @@ EXAMPLE: example groupActionOnHashes; shows an example
   }
   return(Ind);
 }
-
+example
+{
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list AF= afaces(J);
+  list OC = orbitCones(AF,Q);
+  list generatorsG = permutationFromIntvec(intvec( 1, 3, 2, 4, 6, 5, 7, 8, 10, 9 )),
+                     permutationFromIntvec(intvec( 5, 7, 1, 6, 9, 2, 8, 4, 10, 3 ));
+  list Asigmagens = groupActionOnQImage(generatorsG,Q);
+groupActionOnHashes(Asigmagens,OC);
+}
 
 
 
@@ -1217,6 +1246,31 @@ EXAMPLE: example evaluateProduct; shows an example
   }
   execute("permutation sigma = "+st);
   return(sigma);}
+example
+{
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list AF= afaces(J);
+  list OC = orbitCones(AF,Q);
+  list generatorsG = permutationFromIntvec(intvec( 1, 3, 2, 4, 6, 5, 7, 8, 10, 9 )),
+                     permutationFromIntvec(intvec( 5, 7, 1, 6, 9, 2, 8, 4, 10, 3 ));
+  list Asigmagens = groupActionOnQImage(generatorsG,Q);
+list actionOnOrbitconeIndicesForGenerators = groupActionOnHashes(Asigmagens,OC);
+string elementInTermsOfGenerators = 
+"(x2^-1*x1^-1)^3*x1^-1";
+evaluateProduct(actionOnOrbitconeIndicesForGenerators, elementInTermsOfGenerators);
+}
 
 
 proc permutationToIntvec(permutation sigma)
@@ -1226,6 +1280,10 @@ RETURN: intvec
 EXAMPLE: example permutationToIntvec; shows an example
 "
 {return(sigma.image);}
+example
+{
+///// todo
+}
 
 
 
@@ -1415,6 +1473,11 @@ EXAMPLE: example GITfanSymmetric; shows an example
   }
   return(hashesOfCones);
 }
+example
+{
+///// todo
+}
+
 
 proc GITfanParallelSymmetric(list OC, bigintmat Q, cone Qgamma, list actiononorbitcones, list #)
   "USAGE: GITfanParallelSymmetric(OC, Q, Qgamma, actiononorbitcones [, file1]); OC:list, Q:bigintmat, Qgamma:cone, actiononorbitcones: list of intvec, file1:string
@@ -1544,6 +1607,11 @@ EXAMPLE: example GITfanParallelSymmetric; shows an example
   }
   return(hashesOfCones);
 }
+example
+{
+///// todo
+}
+
 
 // not static to be used in parallel.lib
 proc computeNeighbourMinimalHashes(intvec lambdaHash, list OC, cone Qgamma, list actiononorbitcones)
@@ -1691,7 +1759,7 @@ static proc findPosToInsertSymmetric(list hashesOfCones, intvec J, list actionon
 //////////////////////
 
 // insert n at position pos and move bigger elements by one index
-static proc insertToList(list L, def elementToInsert, int posToInsert){
+proc insertToList(list L, def elementToInsert, int posToInsert){
   if(posToInsert == 1){
     return(list(elementToInsert)+L);
   }
@@ -2411,7 +2479,7 @@ example
 /////////////////////////////////////
 
 proc gkzFan(intmat Q) 
-"USAGE: gkzFan(Q); a: ideal, Q:bigintmat
+"USAGE: gkzFan(Q); a: ideal, Q:intmat
 PURPOSE: Returns the GKZ-fan of the matrix Q.
 RETURN: a fan.
 EXAMPLE: example gkzFan; shows an example
@@ -2421,8 +2489,7 @@ EXAMPLE: example gkzFan; shows an example
   // it suffices to consider all faces
   // that are simplicial:
   list OC = simplicialToricOrbitCones(Q); 
-  //"number of simplicial orbitcones:";
-  //print(size(OC));
+  print(size(OC));
   cone Qgamma = coneViaPoints(transpose(Q));
   list GIT = GITfanParallel(OC,Q,Qgamma);
   fan Sigma = hashesToFan(GIT,OC);
@@ -2499,4 +2566,203 @@ example
 }
 
 
+proc G25Action()
+"USAGE: G25Action(Q);
+PURPOSE: Returns a representation of S5 as a subgroup of S10 with the action on the Grassmannian G25.
+RETURN: list of with elements of type permutation.
+EXAMPLE: example G25Action; shows an example
+"
+{
+list simplexSymmetryGroup = permutationFromIntvec(intvec( 1 .. 10 )),
+permutationFromIntvec(intvec( 1, 2, 4, 3, 5, 7, 6, 9, 8, 10 )),
+permutationFromIntvec(intvec( 1, 3, 2, 4, 6, 5, 7, 8, 10, 9 )),
+permutationFromIntvec(intvec( 1, 3, 4, 2, 6, 7, 5, 10, 8, 9 )),
+permutationFromIntvec(intvec( 1, 4, 2, 3, 7, 5, 6, 9, 10, 8 )),
+permutationFromIntvec(intvec( 1, 4, 3, 2, 7, 6, 5, 10, 9, 8 )),
+permutationFromIntvec(intvec( 1, 5, 6, 7, 2, 3, 4, 8, 9, 10 )),
+permutationFromIntvec(intvec( 1, 5, 7, 6, 2, 4, 3, 9, 8, 10 )),
+permutationFromIntvec(intvec( 1, 6, 5, 7, 3, 2, 4, 8, 10, 9 )),
+permutationFromIntvec(intvec( 1, 6, 7, 5, 3, 4, 2, 10, 8, 9 )),
+permutationFromIntvec(intvec( 1, 7, 5, 6, 4, 2, 3, 9, 10, 8 )),
+permutationFromIntvec(intvec( 1, 7, 6, 5, 4, 3, 2, 10, 9, 8 )),
+permutationFromIntvec(intvec( 2, 1, 3, 4, 5, 8, 9, 6, 7, 10 )),
+permutationFromIntvec(intvec( 2, 1, 4, 3, 5, 9, 8, 7, 6, 10 )),
+permutationFromIntvec(intvec( 2, 3, 1, 4, 8, 5, 9, 6, 10, 7 )),
+permutationFromIntvec(intvec( 2, 3, 4, 1, 8, 9, 5, 10, 6, 7 )),
+permutationFromIntvec(intvec( 2, 4, 1, 3, 9, 5, 8, 7, 10, 6 )),
+permutationFromIntvec(intvec( 2, 4, 3, 1, 9, 8, 5, 10, 7, 6 )),
+permutationFromIntvec(intvec( 2, 5, 8, 9, 1, 3, 4, 6, 7, 10 )),
+permutationFromIntvec(intvec( 2, 5, 9, 8, 1, 4, 3, 7, 6, 10 )),
+permutationFromIntvec(intvec( 2, 8, 5, 9, 3, 1, 4, 6, 10, 7 )),
+permutationFromIntvec(intvec( 2, 8, 9, 5, 3, 4, 1, 10, 6, 7 )),
+permutationFromIntvec(intvec( 2, 9, 5, 8, 4, 1, 3, 7, 10, 6 )),
+permutationFromIntvec(intvec( 2, 9, 8, 5, 4, 3, 1, 10, 7, 6 )),
+permutationFromIntvec(intvec( 3, 1, 2, 4, 6, 8, 10, 5, 7, 9 )),
+permutationFromIntvec(intvec( 3, 1, 4, 2, 6, 10, 8, 7, 5, 9 )),
+permutationFromIntvec(intvec( 3, 2, 1, 4, 8, 6, 10, 5, 9, 7 )),
+permutationFromIntvec(intvec( 3, 2, 4, 1, 8, 10, 6, 9, 5, 7 )),
+permutationFromIntvec(intvec( 3, 4, 1, 2, 10, 6, 8, 7, 9, 5 )),
+permutationFromIntvec(intvec( 3, 4, 2, 1, 10, 8, 6, 9, 7, 5 )),
+permutationFromIntvec(intvec( 3, 6, 8, 10, 1, 2, 4, 5, 7, 9 )),
+permutationFromIntvec(intvec( 3, 6, 10, 8, 1, 4, 2, 7, 5, 9 )),
+permutationFromIntvec(intvec( 3, 8, 6, 10, 2, 1, 4, 5, 9, 7 )),
+permutationFromIntvec(intvec( 3, 8, 10, 6, 2, 4, 1, 9, 5, 7 )),
+permutationFromIntvec(intvec( 3, 10, 6, 8, 4, 1, 2, 7, 9, 5 )),
+permutationFromIntvec(intvec( 3, 10, 8, 6, 4, 2, 1, 9, 7, 5 )),
+permutationFromIntvec(intvec( 4, 1, 2, 3, 7, 9, 10, 5, 6, 8 )),
+permutationFromIntvec(intvec( 4, 1, 3, 2, 7, 10, 9, 6, 5, 8 )),
+permutationFromIntvec(intvec( 4, 2, 1, 3, 9, 7, 10, 5, 8, 6 )),
+permutationFromIntvec(intvec( 4, 2, 3, 1, 9, 10, 7, 8, 5, 6 )),
+permutationFromIntvec(intvec( 4, 3, 1, 2, 10, 7, 9, 6, 8, 5 )),
+permutationFromIntvec(intvec( 4, 3, 2, 1, 10, 9, 7, 8, 6, 5 )),
+permutationFromIntvec(intvec( 4, 7, 9, 10, 1, 2, 3, 5, 6, 8 )),
+permutationFromIntvec(intvec( 4, 7, 10, 9, 1, 3, 2, 6, 5, 8 )),
+permutationFromIntvec(intvec( 4, 9, 7, 10, 2, 1, 3, 5, 8, 6 )),
+permutationFromIntvec(intvec( 4, 9, 10, 7, 2, 3, 1, 8, 5, 6 )),
+permutationFromIntvec(intvec( 4, 10, 7, 9, 3, 1, 2, 6, 8, 5 )),
+permutationFromIntvec(intvec( 4, 10, 9, 7, 3, 2, 1, 8, 6, 5 )),
+permutationFromIntvec(intvec( 5, 1, 6, 7, 2, 8, 9, 3, 4, 10 )),
+permutationFromIntvec(intvec( 5, 1, 7, 6, 2, 9, 8, 4, 3, 10 )),
+permutationFromIntvec(intvec( 5, 2, 8, 9, 1, 6, 7, 3, 4, 10 )),
+permutationFromIntvec(intvec( 5, 2, 9, 8, 1, 7, 6, 4, 3, 10 )),
+permutationFromIntvec(intvec( 5, 6, 1, 7, 8, 2, 9, 3, 10, 4 )),
+permutationFromIntvec(intvec( 5, 6, 7, 1, 8, 9, 2, 10, 3, 4 )),
+permutationFromIntvec(intvec( 5, 7, 1, 6, 9, 2, 8, 4, 10, 3 )),
+permutationFromIntvec(intvec( 5, 7, 6, 1, 9, 8, 2, 10, 4, 3 )),
+permutationFromIntvec(intvec( 5, 8, 2, 9, 6, 1, 7, 3, 10, 4 )),
+permutationFromIntvec(intvec( 5, 8, 9, 2, 6, 7, 1, 10, 3, 4 )),
+permutationFromIntvec(intvec( 5, 9, 2, 8, 7, 1, 6, 4, 10, 3 )),
+permutationFromIntvec(intvec( 5, 9, 8, 2, 7, 6, 1, 10, 4, 3 )),
+permutationFromIntvec(intvec( 6, 1, 5, 7, 3, 8, 10, 2, 4, 9 )),
+permutationFromIntvec(intvec( 6, 1, 7, 5, 3, 10, 8, 4, 2, 9 )),
+permutationFromIntvec(intvec( 6, 3, 8, 10, 1, 5, 7, 2, 4, 9 )),
+permutationFromIntvec(intvec( 6, 3, 10, 8, 1, 7, 5, 4, 2, 9 )),
+permutationFromIntvec(intvec( 6, 5, 1, 7, 8, 3, 10, 2, 9, 4 )),
+permutationFromIntvec(intvec( 6, 5, 7, 1, 8, 10, 3, 9, 2, 4 )),
+permutationFromIntvec(intvec( 6, 7, 1, 5, 10, 3, 8, 4, 9, 2 )),
+permutationFromIntvec(intvec( 6, 7, 5, 1, 10, 8, 3, 9, 4, 2 )),
+permutationFromIntvec(intvec( 6, 8, 3, 10, 5, 1, 7, 2, 9, 4 )),
+permutationFromIntvec(intvec( 6, 8, 10, 3, 5, 7, 1, 9, 2, 4 )),
+permutationFromIntvec(intvec( 6, 10, 3, 8, 7, 1, 5, 4, 9, 2 )),
+permutationFromIntvec(intvec( 6, 10, 8, 3, 7, 5, 1, 9, 4, 2 )),
+permutationFromIntvec(intvec( 7, 1, 5, 6, 4, 9, 10, 2, 3, 8 )),
+permutationFromIntvec(intvec( 7, 1, 6, 5, 4, 10, 9, 3, 2, 8 )),
+permutationFromIntvec(intvec( 7, 4, 9, 10, 1, 5, 6, 2, 3, 8 )),
+permutationFromIntvec(intvec( 7, 4, 10, 9, 1, 6, 5, 3, 2, 8 )),
+permutationFromIntvec(intvec( 7, 5, 1, 6, 9, 4, 10, 2, 8, 3 )),
+permutationFromIntvec(intvec( 7, 5, 6, 1, 9, 10, 4, 8, 2, 3 )),
+permutationFromIntvec(intvec( 7, 6, 1, 5, 10, 4, 9, 3, 8, 2 )),
+permutationFromIntvec(intvec( 7, 6, 5, 1, 10, 9, 4, 8, 3, 2 )),
+permutationFromIntvec(intvec( 7, 9, 4, 10, 5, 1, 6, 2, 8, 3 )),
+permutationFromIntvec(intvec( 7, 9, 10, 4, 5, 6, 1, 8, 2, 3 )),
+permutationFromIntvec(intvec( 7, 10, 4, 9, 6, 1, 5, 3, 8, 2 )),
+permutationFromIntvec(intvec( 7, 10, 9, 4, 6, 5, 1, 8, 3, 2 )),
+permutationFromIntvec(intvec( 8, 2, 5, 9, 3, 6, 10, 1, 4, 7 )),
+permutationFromIntvec(intvec( 8, 2, 9, 5, 3, 10, 6, 4, 1, 7 )),
+permutationFromIntvec(intvec( 8, 3, 6, 10, 2, 5, 9, 1, 4, 7 )),
+permutationFromIntvec(intvec( 8, 3, 10, 6, 2, 9, 5, 4, 1, 7 )),
+permutationFromIntvec(intvec( 8, 5, 2, 9, 6, 3, 10, 1, 7, 4 )),
+permutationFromIntvec(intvec( 8, 5, 9, 2, 6, 10, 3, 7, 1, 4 )),
+permutationFromIntvec(intvec( 8, 6, 3, 10, 5, 2, 9, 1, 7, 4 )),
+permutationFromIntvec(intvec( 8, 6, 10, 3, 5, 9, 2, 7, 1, 4 )),
+permutationFromIntvec(intvec( 8, 9, 2, 5, 10, 3, 6, 4, 7, 1 )),
+permutationFromIntvec(intvec( 8, 9, 5, 2, 10, 6, 3, 7, 4, 1 )),
+permutationFromIntvec(intvec( 8, 10, 3, 6, 9, 2, 5, 4, 7, 1 )),
+permutationFromIntvec(intvec( 8, 10, 6, 3, 9, 5, 2, 7, 4, 1 )),
+permutationFromIntvec(intvec( 9, 2, 5, 8, 4, 7, 10, 1, 3, 6 )),
+permutationFromIntvec(intvec( 9, 2, 8, 5, 4, 10, 7, 3, 1, 6 )),
+permutationFromIntvec(intvec( 9, 4, 7, 10, 2, 5, 8, 1, 3, 6 )),
+permutationFromIntvec(intvec( 9, 4, 10, 7, 2, 8, 5, 3, 1, 6 )),
+permutationFromIntvec(intvec( 9, 5, 2, 8, 7, 4, 10, 1, 6, 3 )),
+permutationFromIntvec(intvec( 9, 5, 8, 2, 7, 10, 4, 6, 1, 3 )),
+permutationFromIntvec(intvec( 9, 7, 4, 10, 5, 2, 8, 1, 6, 3 )),
+permutationFromIntvec(intvec( 9, 7, 10, 4, 5, 8, 2, 6, 1, 3 )),
+permutationFromIntvec(intvec( 9, 8, 2, 5, 10, 4, 7, 3, 6, 1 )),
+permutationFromIntvec(intvec( 9, 8, 5, 2, 10, 7, 4, 6, 3, 1 )),
+permutationFromIntvec(intvec( 9, 10, 4, 7, 8, 2, 5, 3, 6, 1 )),
+permutationFromIntvec(intvec( 9, 10, 7, 4, 8, 5, 2, 6, 3, 1 )),
+permutationFromIntvec(intvec( 10, 3, 6, 8, 4, 7, 9, 1, 2, 5 )),
+permutationFromIntvec(intvec( 10, 3, 8, 6, 4, 9, 7, 2, 1, 5 )),
+permutationFromIntvec(intvec( 10, 4, 7, 9, 3, 6, 8, 1, 2, 5 )),
+permutationFromIntvec(intvec( 10, 4, 9, 7, 3, 8, 6, 2, 1, 5 )),
+permutationFromIntvec(intvec( 10, 6, 3, 8, 7, 4, 9, 1, 5, 2 )),
+permutationFromIntvec(intvec( 10, 6, 8, 3, 7, 9, 4, 5, 1, 2 )),
+permutationFromIntvec(intvec( 10, 7, 4, 9, 6, 3, 8, 1, 5, 2 )),
+permutationFromIntvec(intvec( 10, 7, 9, 4, 6, 8, 3, 5, 1, 2 )),
+permutationFromIntvec(intvec( 10, 8, 3, 6, 9, 4, 7, 2, 5, 1 )),
+permutationFromIntvec(intvec( 10, 8, 6, 3, 9, 7, 4, 5, 2, 1 )),
+permutationFromIntvec(intvec( 10, 9, 4, 7, 8, 3, 6, 2, 5, 1 )),
+permutationFromIntvec(intvec( 10, 9, 7, 4, 8, 6, 3, 5, 2, 1 ));
+return(simplexSymmetryGroup);
+}
+example
+{
+  echo = 2;
+  G25Action();
+}
+
+
+proc findOrbits(list G, int d)
+"USAGE: findOrbits(G,d); G list of permutations in a subgroup of the symmetric group; d int minimum cardinality of simplices to be considered
+PURPOSE: Computes the orbit decomposition of the action of G.
+RETURN: list of intvec.
+EXAMPLE: example findOrbits; shows an example
+"
+{
+int n = size(permutationToIntvec(G[1]));
+list listOrbits;
+list finished;
+int tst;
+bigint startel;
+intvec startelbin;
+list neworbit,neworbitint;
+int i,posToInsert;
+bigint nn;
+while (size(finished)<2^n){
+   startel=0;
+   if (size(finished)>0){
+      tst=0;
+      while ((tst==0) and (startel+1<=size(finished))){
+        if (finished[int(startel+1)]<>startel){
+          tst=1;
+        } else {
+          startel=startel+1;
+        }
+      }
+   }
+   if (startel==0){
+     neworbit[1]= list();
+     neworbitint[1]=0;
+   } else {
+      startelbin=bigintToBinary(startel,n);
+       neworbitint=list(startel);
+       for (i=2;i<=size(G);i++){
+         nn=binaryToBigint(applyPermutationToIntvec(startelbin,G[i]));
+         //nn;neworbitint;
+         //"place to insert";
+         posToInsert = findPlaceToInsert(neworbitint,nn);
+         //"pos";posToInsert;
+         if(posToInsert > 0)
+         {
+          //"vorher";neworbitint;
+          neworbitint = insertToList(neworbitint,nn,posToInsert);
+          //"nachher";neworbitint;
+         }
+       } 
+       for (i=1;i<=size(neworbitint);i++){
+          neworbit[i]=bigintToBinary(neworbitint[i],n);
+       } 
+   }
+   if (size(neworbit[1])>=d){
+     listOrbits[size(listOrbits)+1]=neworbit;
+   }
+   finished=sort(finished+neworbitint)[1];
+}
+return(listOrbits);}
+example
+{
+list G = G25Action();
+list orb = findOrbits(G);
+for (int i=1;i<=size(orb);i++){orb[i][1];}
+}
 
