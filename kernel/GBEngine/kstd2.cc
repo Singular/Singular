@@ -1659,8 +1659,10 @@ int redHoney (LObject* h, kStrategy strat)
 
 poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
 {
+#define REDNF_CANONICALIZE 8
   if (h==NULL) return NULL;
   int j;
+  int cnt=REDNF_CANONICALIZE;
   max_ind=strat->sl;
 
   if (0 > strat->sl)
@@ -1745,6 +1747,12 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
         number coef;
         coef=kBucketPolyRed(P.bucket,strat->S[j],pLength(strat->S[j]),strat->kNoether);
         nDelete(&coef);
+      }
+      cnt--;
+      if (cnt==0)
+      {
+        cnt=REDNF_CANONICALIZE;
+	kBucketCanonicalize(P.bucket);
       }
       h = kBucketGetLm(P.bucket);   // FRAGE OLIVER
       if (h==NULL)
