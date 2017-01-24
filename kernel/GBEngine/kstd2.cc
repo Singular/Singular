@@ -1659,7 +1659,7 @@ int redHoney (LObject* h, kStrategy strat)
 
 poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
 {
-#define REDNF_CANONICALIZE 8
+#define REDNF_CANONICALIZE 60
   if (h==NULL) return NULL;
   int j;
   int cnt=REDNF_CANONICALIZE;
