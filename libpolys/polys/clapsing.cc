@@ -163,6 +163,47 @@ poly singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
     g=p_One (r);
     return res;
   }
+  if (p_IsConstant(g, r))
+  {
+    coeffs cf=r->cf;
+    number G=pGetCoeff(g);
+    G=n_Copy(G,cf);
+    if(n_IsOne(G,cf)) return p_NSet(G,r);;
+    poly ff=f;
+    do
+    {
+      number n=n_SubringGcd(G,pGetCoeff(ff),cf);
+      n_Delete(&G,cf);
+      G=n;
+      if (n_IsOne(G,cf)) break;
+      pIter(ff);
+    } while(ff!=NULL);
+    if(n_IsOne(G,cf)) return p_NSet(G,r);
+    f=p_Div_nn(f,G,r); p_Normalize(f,r);
+    g=p_Div_nn(g,G,r); p_Normalize(g,r);
+    return p_NSet(G,r);
+  }
+  else if (p_IsConstant(f, r))
+  {
+    coeffs cf=r->cf;
+    number G=pGetCoeff(f);
+    G=n_Copy(G,cf);
+    if(n_IsOne(G,cf)) return p_NSet(G,r);;
+    poly ff=g;
+    do
+    {
+      number n=n_SubringGcd(G,pGetCoeff(ff),cf);
+      n_Delete(&G,cf);
+      G=n;
+      if (n_IsOne(G,cf)) break;
+      pIter(ff);
+    } while(ff!=NULL);
+    if(n_IsOne(G,cf)) return p_NSet(G,r);
+    f=p_Div_nn(f,G,r);
+    g=p_Div_nn(g,G,r);
+    return p_NSet(G,r);
+  }
+  if ((pNext(f)==NULL)||(pNext(g)==NULL)) printf("L");
 
   Off(SW_RATIONAL);
   CanonicalForm F,G,GCD;
