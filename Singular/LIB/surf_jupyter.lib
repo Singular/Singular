@@ -142,7 +142,7 @@ EXAMPLE: example plot; shows an example
   string surf_call; i = 0;
 
     surf_call = "singularsurf_jupyter ";
-    surf_call = surf_call + l + " " + current_pid + " >/dev/null 2>&1";
+    surf_call = surf_call + l + " " + current_pid + " 2>&1";
     i = system("sh", surf_call);
     if (i != 0)
     {
