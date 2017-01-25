@@ -15,6 +15,7 @@
 #include "variable.h"
 
 #include <factory/cf_gmp.h>
+#include <factory/cf_assert.h>
 
 class InternalCF;
 class CanonicalForm;
@@ -25,7 +26,11 @@ private:
     static int currenttype;
 public:
     static int gettype () { return currenttype; }
-    static void settype ( int type );
+    static void settype ( int type )
+    {
+      ASSERT( type==FiniteFieldDomain || type==GaloisFieldDomain || type==IntegerDomain || type==RationalDomain, "illegal basic domain!" );
+      currenttype = type;
+    };
     static InternalCF * basic ( long value );
     static InternalCF * basic ( int type, long value );
     static InternalCF * basic ( const char * str );

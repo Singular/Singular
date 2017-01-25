@@ -17,13 +17,6 @@
 
 int CFFactory::currenttype = IntegerDomain;
 
-void
-CFFactory::settype ( int type )
-{
-    ASSERT( type==FiniteFieldDomain || type==GaloisFieldDomain || type==IntegerDomain || type==RationalDomain, "illegal basic domain!" );
-    currenttype = type;
-}
-
 InternalCF *
 CFFactory::basic ( long value )
 {
