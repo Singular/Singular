@@ -1751,8 +1751,8 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
       cnt--;
       if (cnt==0)
       {
+        kBucketCanonicalize(P.bucket);
         cnt=REDNF_CANONICALIZE;
-	kBucketCanonicalize(P.bucket);
       }
       h = kBucketGetLm(P.bucket);   // FRAGE OLIVER
       if (h==NULL)
