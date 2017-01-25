@@ -1321,10 +1321,11 @@ static proc sagbiNF(poly f,ideal I,int b)
 {
 //computes the Sagbi normal form
    list L=1;
+   poly re;
    map psi;
    f=jet(f,b);
    if(f==0){return(f);}
-   while((f!=0) && (L[1]!=0))
+   while(f!=0)
    {
      L= algebra_containment(lead(f),lead(I),1);
      if (L[1]==1)
@@ -1334,8 +1335,13 @@ static proc sagbiNF(poly f,ideal I,int b)
         f=jet(f-psi(check),b);
         kill S;
      }
+     else
+     {
+        re=re+lead(f);
+        f=f-lead(f);
+     }
    }
-   return (lead(f)+sagbiNF(f-lead(f),I,b));
+   return (re);
 }
 
 /*
