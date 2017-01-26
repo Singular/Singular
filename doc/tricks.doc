@@ -562,7 +562,7 @@ listvar(K);
 @end enumerate
 
 @c ----------------------------------------------
-@node Identifier resolution
+@node Identifier resolution,,Miscellaneous oddities,Tricks and pitfalls
 @section Identifier resolution
 @cindex identifier
 

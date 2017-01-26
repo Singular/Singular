@@ -34,6 +34,11 @@ Changed libraries:
 @item chern.lib:  new version (@nref{chern_lib})
 @end itemize
 
+Changes in the kernel/build system:
+@itemize
+@item port to polymake 3.x.x
+@end itemize
+
 @heading News for version 4-1-0
 
 Syntax changes:
