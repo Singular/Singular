@@ -1504,6 +1504,42 @@ poly p_Div_nn(poly p, const number n, const ring r)
   return(result);
 }
 
+poly p_Div_mm(poly p, const poly m, const ring r)
+{
+  p_Test(p, r);
+  p_Test(m, r);
+  poly result = p;
+  poly prev = NULL;
+  number n=pGetCoeff(m);
+  while (p!=NULL)
+  {
+    number nc = n_Div(pGetCoeff(p),n,r->cf);
+    n_Normalize(nc,r->cf);
+    if (!n_IsZero(nc,r->cf))
+    {
+      p_SetCoeff(p,nc,r);
+      prev=p;
+      p_ExpVectorSub(p,m,r);
+      pIter(p);
+    }
+    else
+    {
+      if (prev==NULL)
+      {
+        p_LmDelete(&result,r);
+        p=result;
+      }
+      else
+      {
+        p_LmDelete(&pNext(prev),r);
+        p=pNext(prev);
+      }
+    }
+  }
+  p_Test(result,r);
+  return(result);
+}
+
 /*2
 * divides a by the monomial b, ignores monomials which are not divisible
 * assumes that b is not NULL, destroyes b
@@ -4762,7 +4798,6 @@ poly p_GcdMon(poly f, poly g, const ring r)
   loop
   {
     if (h==NULL) break;
-    one_coeff=TRUE;
     if(!one_coeff)
     {
       number n=n_SubringGcd(pGetCoeff(G),pGetCoeff(h),r->cf);

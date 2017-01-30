@@ -118,45 +118,27 @@ poly singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
     g=p_One (r);
     return res;
   }
-  if (p_IsConstant(g, r))
+  if (pNext(g)==NULL)
   {
-    coeffs cf=r->cf;
-    number G=pGetCoeff(g);
-    G=n_Copy(G,cf);
-    if(n_IsOne(G,cf)) return p_NSet(G,r);;
-    poly ff=f;
-    do
+    poly G=p_GcdMon(g,f,r);
+    if (!n_IsOne(pGetCoeff(G),r->cf)
+    || (!p_IsConstant(G,r)))
     {
-      number n=n_SubringGcd(G,pGetCoeff(ff),cf);
-      n_Delete(&G,cf);
-      G=n;
-      if (n_IsOne(G,cf)) break;
-      pIter(ff);
-    } while(ff!=NULL);
-    if(n_IsOne(G,cf)) return p_NSet(G,r);
-    f=p_Div_nn(f,G,r); p_Normalize(f,r);
-    g=p_Div_nn(g,G,r); p_Normalize(g,r);
-    return p_NSet(G,r);
+      f=p_Div_mm(f,G,r);
+      g=p_Div_mm(g,G,r);
+    }
+    return G;
   }
-  else if (p_IsConstant(f, r))
+  else if (pNext(f)==NULL)
   {
-    coeffs cf=r->cf;
-    number G=pGetCoeff(f);
-    G=n_Copy(G,cf);
-    if(n_IsOne(G,cf)) return p_NSet(G,r);;
-    poly ff=g;
-    do
+    poly G=p_GcdMon(f,g,r);
+    if (!n_IsOne(pGetCoeff(G),r->cf)
+    || (!p_IsConstant(G,r)))
     {
-      number n=n_SubringGcd(G,pGetCoeff(ff),cf);
-      n_Delete(&G,cf);
-      G=n;
-      if (n_IsOne(G,cf)) break;
-      pIter(ff);
-    } while(ff!=NULL);
-    if(n_IsOne(G,cf)) return p_NSet(G,r);
-    f=p_Div_nn(f,G,r);
-    g=p_Div_nn(g,G,r);
-    return p_NSet(G,r);
+      f=p_Div_mm(f,G,r);
+      g=p_Div_mm(g,G,r);
+    }
+    return G;
   }
 
   Off(SW_RATIONAL);
