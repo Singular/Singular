@@ -1373,8 +1373,8 @@ static inline void p_ExpVectorSub(poly p1, poly p2, const ring r)
 
   p_MemSub_LengthGeneral(p1->exp, p2->exp, r->ExpL_Size);
   p_MemSub_NegWeightAdjust(p1, r);
-
 }
+
 // ExpVector(p1) += ExpVector(p2) - ExpVector(p3)
 static inline void p_ExpVectorAddSub(poly p1, poly p2, poly p3, const ring r)
 {

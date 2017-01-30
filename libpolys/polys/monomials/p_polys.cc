@@ -1513,7 +1513,6 @@ poly p_DivideM(poly a, poly b, const ring r)
   if (a==NULL) { p_Delete(&b,r); return NULL; }
   poly result=a;
   poly prev=NULL;
-  int i;
 #ifdef HAVE_RINGS
   number inv=pGetCoeff(b);
 #else
@@ -1524,10 +1523,7 @@ poly p_DivideM(poly a, poly b, const ring r)
   {
     if (p_DivisibleBy(b,a,r))
     {
-      for(i=(int)r->N; i; i--)
-         p_SubExp(a,i, p_GetExp(b,i,r),r);
-      p_SubComp(a, p_GetComp(b,r),r);
-      p_Setm(a,r);
+      p_ExpVectorSub(a,b,r);
       prev=a;
       pIter(a);
     }
