@@ -2023,5 +2023,8 @@ void p_Shift (poly * p,int i, const ring r);
 /*----------------------------------------------------*/
 
 int p_Compare(const poly a, const poly b, const ring R);
+
+/// polynomial gcd for f=mon
+poly p_GcdMon(poly f, poly g, const ring r);
 #endif // P_POLYS_H
 

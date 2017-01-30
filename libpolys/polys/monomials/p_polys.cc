@@ -4751,3 +4751,41 @@ int p_Compare(const poly a, const poly b, const ring R)
   return(r);
 }
 
+poly p_GcdMon(poly f, poly g, const ring r)
+{
+  assume(f!=NULL);
+  assume(g!=NULL);
+  assume(pNext(f)==NULL);
+  poly G=p_Head(f,r);
+  poly h=g;
+  int *mf=(int*)omAlloc((r->N+1)*sizeof(int));
+  p_GetExpV(f,mf,r);
+  int *mh=(int*)omAlloc((r->N+1)*sizeof(int));
+  BOOLEAN const_mon;
+  BOOLEAN one_coeff=n_IsOne(pGetCoeff(G),r->cf);
+  loop
+  {
+    if (h==NULL) break;
+    one_coeff=TRUE;
+    if(!one_coeff)
+    {
+      number n=n_SubringGcd(pGetCoeff(G),pGetCoeff(h),r->cf);
+      one_coeff=n_IsOne(n,r->cf);
+      p_SetCoeff(G,n,r);
+    }
+    p_GetExpV(h,mh,r);
+    const_mon=TRUE;
+    for(unsigned j=r->N;j!=0;j--)
+    {
+      if (mh[j]<mf[j]) mf[j]=mh[j];
+      if (mf[j]>0) const_mon=FALSE;
+    }
+    if (one_coeff && const_mon) break;
+    pIter(h);
+  }
+  mf[0]=0;
+  p_SetExpV(G,mf,r); // included is p_SetComp, p_Setm
+  omFreeSize(mf,(r->N+1)*sizeof(int));
+  omFreeSize(mh,(r->N+1)*sizeof(int));
+  return G;
+}
