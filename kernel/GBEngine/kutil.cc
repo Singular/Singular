@@ -396,12 +396,12 @@ void cancelunit (LObject* L,BOOLEAN inNF)
 
         return;
       }
-      i = 0;
+      i = rVar(r);
       loop
       {
-        i++;
-        if (p_GetExp(p,i,r) > p_GetExp(h,i,r)) return ; // does not divide
-        if (i == r->N) break; // does divide, try next monom
+        if (p_GetExp(p,i,r) > p_GetExp(h,i,r)) return; // does not divide
+        i--;
+        if (i == 0) break; // does divide, try next monom
       }
       //wrp(p); PrintS(" divide ");wrp(h); PrintLn();
       // Note: As long as qring j forbidden if j contains integer (i.e. ground rings are
@@ -456,12 +456,12 @@ void cancelunit (LObject* L,BOOLEAN inNF)
 
         return;
       }
-      i = 0;
+      i = rVar(r);
       loop
       {
-        i++;
-        if (p_GetExp(p,i,r) > p_GetExp(h,i,r)) return ; // does not divide
-        if (i == r->N) break; // does divide, try next monom
+        if (p_GetExp(p,i,r) > p_GetExp(h,i,r)) return; // does not divide
+        i--;
+        if (i == 0) break; // does divide, try next monom
       }
       //wrp(p); PrintS(" divide ");wrp(h); PrintLn();
       pIter(h);
