@@ -1250,7 +1250,8 @@ BOOLEAN iiBranchTo(leftv res, leftv args)
     si_opt_1=save1;
     si_opt_2=save2;
     // now save the return-expr.
-    memcpy(res,&iiRETURNEXPR,sizeof(sleftv));
+    sLastPrinted.CleanUp(currRing);
+    memcpy(&sLastPrinted,&iiRETURNEXPR,sizeof(sleftv));
     iiRETURNEXPR.Init();
     // warning about args.:
     if (iiCurrArgs!=NULL)
@@ -1270,7 +1271,7 @@ BOOLEAN iiBranchTo(leftv res, leftv args)
     // - kill local vars
     killlocals(myynest);
     // - return
-    newBuffer(omStrDup("\n;return();\n"),BT_execute);
+    newBuffer(omStrDup("\n;return(_);\n"),BT_execute);
     return (err!=0);
   }
   return FALSE;

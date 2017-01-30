@@ -1427,20 +1427,6 @@ static void idInsertMonomials(ideal I, poly p)
   I->m[j] = p;
 }
 
-/*
-poly p_DivideMon(poly a, poly b, const ring r)
-{
-  int i;
-  poly result = p_Init(r);
-  int N=r->N;
-  for(i=1;i<=N; i++)
-  p_SetExp(result,i, p_GetExp(a,i,r)- p_GetExp(b,i,r),r);
-  p_SetComp(result, p_GetComp(a,r) - p_GetComp(b,r),r);
-  p_Setm(result,r);
-  return result;
-}
-*/
-
 static int isMonoIdBasesSame(ideal J, ideal Ob)
 {
   /*

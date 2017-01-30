@@ -17,6 +17,33 @@ tst_init();
 proc square(int i){return(i^2);};
 proc tst(){branchTo("int",square); ERROR("No method found");}
 tst(2);
+//---------------------------------------------------------------
+newstruct("Net","list rows");
+
+proc printNet(Net N)
+{
+  list L = N.rows;
+  for (int j=1; j<=size(L); j++)
+  {
+    print(L[j]);
+  }
+}
+
+system("install","Net","print",printNet,1);
+
+proc netString(string M)
+{
+  Net N;
+  list L;
+  L[1]=M;
+  N.rows=L;
+  return(N);
+}
+
+proc net() {branchTo("string",netString);}
+
+typeof(net("abc"));
+Net N = net("abc");
 
 tst_status(1);$;
 
