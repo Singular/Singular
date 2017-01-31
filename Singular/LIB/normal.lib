@@ -2724,9 +2724,8 @@ EXAMPLE: example deltaLoc;  shows an example
       poly p=beta(p);
 
       execute("ring C=("+charstr(S)+",a),(x,y),ds;");
-      number p=number(imap(B,p));
 
-      minpoly=p;
+      minpoly=number(imap(B,p));
       map iota=S,a,a;
       number c=number(iota(c));
       number co=iota(co);
