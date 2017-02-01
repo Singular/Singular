@@ -59,9 +59,9 @@ AC_C_INLINE
 #
 AC_ARG_ENABLE(
   cf-inline,
-  [AS_HELP_STRING([--enable-cf-inline],[build Factory with \"configurable inline methods\" enabled.])],
+  [AS_HELP_STRING([--disable-cf-inline],[build Factory with \"configurable inline methods\" disabled.])],
   [enable_cf_inline=$enableval],
-  [enable_cf_inline=no])
+  [enable_cf_inline=yes])
 
 AC_ARG_ENABLE(
   assertions,
