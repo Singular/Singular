@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version normal.lib 4.0.1.1 Dec_2014 "; // $Id$
+version="version normal.lib 4.1.0.0 Jan_2017 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -2724,8 +2724,8 @@ EXAMPLE: example deltaLoc;  shows an example
       poly p=beta(p);
 
       execute("ring C=("+charstr(S)+",a),(x,y),ds;");
-
       minpoly=number(imap(B,p));
+
       map iota=S,a,a;
       number c=number(iota(c));
       number co=iota(co);
@@ -2749,7 +2749,6 @@ EXAMPLE: example deltaLoc;  shows an example
    int tau=vdim(fstd);
    int o=ord(f);
    int delt,nb;
-
    if(tau==0)                 //smooth case
    {
       setring R;
@@ -2783,7 +2782,6 @@ EXAMPLE: example deltaLoc;  shows an example
       list NP=newtonpoly(g);
       if(w>=1){"Newton-Polygon:";NP;"";}
       int s=size(NP);
-
       if(is_NND(f,mu,NP))
       { // the Newton-polygon is non-degenerate
         // compute nb, the number of branches
@@ -2835,6 +2833,11 @@ EXAMPLE: example deltaLoc;  shows an example
       f=jet(f,deg(hc)+2);
       if(w>=1){"now we have to use Hamburger-Noether (Puiseux) expansion";}
       ideal fac=factorize(f,1);
+      for(i=1;i<=ncols(fac);i++)
+      {
+         if(deg(lead(fac[i]))==0){fac[i]=0;}
+      }
+      fac=simplify(fac,2);
       if(size(fac)>1)
       {
          nb=0;
