@@ -45,5 +45,19 @@ for (i =1;i<=size(dl);i++)
    ASSUME(0, dl[i]==dlf[i] );
 }
 
+// Any plane curve consisting of d rational components has genus 1-d.
+// We study a nodal cubic, combined with 3 resp. 4 lines.
+// The genus then has to be -3 resp. -4
+ring rdp = 0,(x,y),dp;
+poly NC = (3*x^2*y+4*y^3-x^2-3*y+1);   // nodal cubic
+genus(NC);      // 0
+poly F = (x-1) * (x+1) * (3*y-1)* NC;  // 3A_5 + 4A_1
+genus(F);     // -3
+genus(F*y);   // -4
+genus(F/(x-1));  // -2
+genus(F/(x-1)*y);  // -3
+genus(F*(y+1));  // -4
+genus(F*(y+x));  // -4
+
 tst_status(1); $
 
