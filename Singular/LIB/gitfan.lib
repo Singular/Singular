@@ -5,9 +5,9 @@ category = "Algebraic Geometry";
 info = "
 LIBRARY:   gitfan.lib       Compute GIT-fans.
 
-AUTHORS: Janko Boehm, boehm at mathematik.uni-kl.de @*
-         Simon Keicher, keicher at mail.mathematik.uni-tuebingen.de @*
-         Yue Ren, ren at mathematik.uni-kl.de @*
+AUTHORS: Janko Boehm,   boehm@mathematik.uni-kl.de @*
+         Simon Keicher, keicher@mail.mathematik.uni-tuebingen.de @*
+         Yue Ren,       ren@mathematik.uni-kl.de @*
 
 OVERVIEW:
 This library allows you to calculate GIT-fans, torus orbits and GKZ-fans.
@@ -33,37 +33,37 @@ TYPES:
   permutation; Permutation in map representation.
 
 PROCEDURES (not using group action):
-  isAface(ideal, intvec); Checks whether the given face is an a-face.
-  afaces(ideal); Returns a list of intvecs that correspond to the set of all a-faces, optionally for given list of simplex faces.
-  fullDimImages(list, intmat); Finds the afaces which have a full-dimensional projection.
-  minimalAfaces(list); compute the minimal a-faces among the a-faces with full dimensional projection.
-  orbitCones(list, intmat); Returns the list of all orbit cones.
-  GITcone(list, bigintmat); Returns the GIT-cone containing the given weight vector.
-  GITfan(ideal, intmat); Compute GIT-fan.
-  GITfanFromOrbitCones(list, intmat, cone); Compute GIT-fan from orbit cones.
-  GITfanParallel(list, intmat, cone); Compute GIT-fan in parallel from orbit cones.
-  GKZfan(intmat); Returns the GKZ-fan of the matrix Q.
-  movingCone(intmat); Compute the moving cone.
+  isAface(ideal,intvec);                       Checks whether the given face is an a-face.
+  afaces(ideal);                               Returns a list of intvecs that correspond to the set of all a-faces, optionally for given list of simplex faces.
+  fullDimImages(list,intmat);                  Finds the afaces which have a full-dimensional projection.
+  minimalAfaces(list);                         Computes the minimal a-faces among the a-faces with full dimensional projection.
+  orbitCones(list,intmat);                     Returns the list of all orbit cones.
+  GITcone(list,bigintmat);                     Returns the GIT-cone containing the given weight vector.
+  GITfan(ideal,intmat);                        Computes the GIT-fan.
+  GITfanFromOrbitCones(list,intmat,cone);      Computes the GIT-fan from orbit cones.
+  GITfanParallel(list,intmat,cone);            Computes the GIT-fan in parallel from orbit cones.
+  GKZfan(intmat);                              Returns the GKZ-fan of the matrix Q.
+  movingCone(intmat);                          Computes the moving cone.
 
 PROCEDURES (using group action):
-  computeAfaceOrbits(list, list); Compute orbits of a-faces under a permutation group action.
-  minimalAfaceOrbits(list); Find the minimal a-face orbits.
-  orbitConeOrbits(list, intmat); Project the a-face orbits to orbit cone orbits.
-  minimalOrbitConeOrbits(list); Find the minimal orbit cone orbits.
-  intersectOrbitsWithMovingCone(list, cone); Intersect orbit cone orbits with moving cone.
-  groupActionOnQImage(list, intmat); Determine the induced group action in the target of the grading matrix.
-  groupActionOnHashes(list, list); Determine the induced group action on the set of orbit cones.
-  storeActionOnOrbitConeIndices(list, string); Write the group action on the set of orbit cones to a file.
-  permutationFromIntvec(intvec); Create a permutation from an intvec of images.
-  permutationToIntvec(permutation); Return the intvec of images.
-  evaluateProduct(list,list); Evaluate a list of products of group elements in terms of a given representation of the elements as permutations.
-  GITfanSymmetric(list, intmat, cone, list); Compute GIT-fan from orbit cones by determining a minimal representing set for the orbits of maximal dimensional GIT-cones.
-  GITfanParallelSymmetric(list, intmat, cone, list); Compute GIT-fan in parallel from orbit cones by determining a minimal representing set for the orbits of maximal dimensional GIT-cones.
-  bigintToBinary(bigint, int); Convert bigint into a sparse binary represenation specifying the indices of the one-entries
-  binaryToBigint(intvec); Convert sparse binary represenation specifying the indices of the one-entries to bigint
-  applyPermutationToIntvec(intvec, permutation); Apply permutation to a set of integers represented as an intvec
-  hashToCone(bigint, list); Convert a bigint hash to a GIT-cone
-  hashesToFan(list hashes, list OC)
+  computeAfaceOrbits(list,list);               Computes orbits of a-faces under a permutation group action.
+  minimalAfaceOrbits(list);                    Finds the minimal a-face orbits.
+  orbitConeOrbits(list,intmat);                Projects the a-face orbits to orbit cone orbits.
+  minimalOrbitConeOrbits(list);                Finds the minimal orbit cone orbits.
+  intersectOrbitsWithMovingCone(list,cone);    Intersects orbit cone orbits with moving cone.
+  groupActionOnQImage(list,intmat);            Determines the induced group action in the target of the grading matrix.
+  groupActionOnHashes(list,list);              Determines the induced group action on the set of orbit cones.
+  storeActionOnOrbitConeIndices(list,string);  Writes the group action on the set of orbit cones to a file.
+  permutationFromIntvec(intvec);               Creates a permutation from an intvec of images.
+  permutationToIntvec(permutation);            Returns the intvec of images.
+  evaluateProduct(list,list);                  Evaluates a list of products of group elements in terms of a given representation of the elements as permutations.
+  GITfanSymmetric(list,intmat,cone,list);      Computes GIT-fan from orbit cones by determining a minimal representing set for the orbits of maximal dimensional GIT-cones.
+  GITfanParallelSymmetric(list,intmat,cone,list); Compute GIT-fan in parallel from orbit cones by determining a minimal representing set for the orbits of maximal dimensional GIT-cones.
+  bigintToBinary(bigint,int);                  Convert bigint into a sparse binary represenation specifying the indices of the one-entries
+  binaryToBigint(intvec);                      Convert sparse binary represenation specifying the indices of the one-entries to bigint
+  applyPermutationToIntvec(intvec,permutation);Apply permutation to a set of integers represented as an intvec
+  hashToCone(bigint,list);                     Convert a bigint hash to a GIT-cone
+  hashesToFan(list,list);                      Compute fan from hashes of cones and orbit cones
 
 KEYWORDS: library, gitfan, GIT, geometric invariant theory, quotients
 ";
@@ -74,10 +74,10 @@ LIB "linalg.lib";
 LIB "multigrading.lib";
 LIB "parallel.lib";
 
-proc mod_init()
+static proc mod_init()
 {
-  LIB "~ren/murrumesh/gfanlib.so";
-  LIB "~ren/murrumesh/gitfan.so";
+  LIB "gfanlib.so";
+  LIB "gitfan.so";
   newstruct("permutation","intvec image");
   system("install","permutation","*",composePermutations,2);
   system("install","permutation","^",permutationPower,2);
@@ -2613,11 +2613,11 @@ example
 
 /////////////////////////////////////
 
-proc gkzFan(intmat Q) 
-"USAGE: gkzFan(Q); a: ideal, Q:intmat
+proc GKZfan(intmat Q) 
+"USAGE: GKZfan(Q); a: ideal, Q:intmat
 PURPOSE: Returns the GKZ-fan of the matrix Q.
 RETURN: a fan.
-EXAMPLE: example gkzFan; shows an example
+EXAMPLE: example GKZfan; shows an example
 "
 {
   // only difference to gitFan:
@@ -2638,7 +2638,7 @@ example
     0,1,0,1,
     0,0,1,1;
 
-  gkzFan(Q);
+  GKZfan(Q);
 }
 
 
