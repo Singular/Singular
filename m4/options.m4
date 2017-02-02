@@ -328,6 +328,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
       L="${L} add($a)"
       LL="${LL} $a"
       BUILTIN_LIBS="${BUILTIN_LIBS} dyn_modules/$a/$a.la"
+      BUILTIN_MODULES="${BUILTIN_MODULES} dyn_modules/$a"
       AC_MSG_RESULT(yes)
 
 # *) AC_MSG_ERROR([bad value ${enableval} for	    --enable-debug]) ;;
@@ -366,6 +367,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
 
  AC_DEFINE_UNQUOTED([SI_BUILTINMODULES_ADD(add)],[$L],[Add(list) for Builtin modules])
  AC_SUBST(BUILTIN_LIBS)
+ AC_SUBST(BUILTIN_MODULES)
 
  AM_CONDITIONAL([SI_BUILTIN_STATICDEMO], [test x$bi_staticdemo = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_SYZEXTRA], [test x$bi_syzextra = xtrue])

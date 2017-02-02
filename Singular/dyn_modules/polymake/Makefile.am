@@ -20,7 +20,13 @@ else
 # Add under Mac OS X: -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
 endif
 
-polymake_la_LIBADD = ${top_builddir}/Singular/libSingular.la
+polymake_la_LIBADD =
+if SING_WIN
+if !SI_BUILTIN_POLYMAKE
+ polymake_la_LIBADD += ${top_builddir}/Singular/libSingular.la
+endif
+endif
+
 if SING_HAVE_POLYMAKE
 # forcefully enable exceptions for polymake
  CXXFLAGS+= $(FEXCEPTIONSFRTTI_CXXFLAGS)

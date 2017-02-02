@@ -6,16 +6,17 @@ dnl To ensure that $enable_shared is defined
 
 dnl Maybe necessary for mingw as well but haven't tested
   case $host_os in
-    *cygwin* ) AX_APPEND_LINK_FLAGS([-Wl,-Bdynamic]);;
+    *cygwin* | *mingw*) os_win32=yes;;
+    *) os_win32=no;;
   esac
 
-dnl libtool requires "-no-undefined" for win32 dll
   AC_SUBST(SINGULAR_LDFLAGS)
-  case $host_os in
-    *cygwin* | *mingw*)
-      if test x"$enable_shared" = xyes; then
-        SINGULAR_LDFLAGS="$SINGULAR_LDFLAGS -no-undefined"
-      fi
-    ;;
-  esac
+
+  if test x$os_win32 = xyes; then
+    AX_APPEND_LINK_FLAGS([-Wl,-Bdynamic])
+dnl libtool requires "-no-undefined" for win32 dll
+    SINGULAR_LDFLAGS="$SINGULAR_LDFLAGS -no-undefined"
+  fi
+
+  AM_CONDITIONAL([SING_WIN], [test x$os_win32 = xyes])
 ])
