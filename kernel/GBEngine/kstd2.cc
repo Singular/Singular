@@ -4262,11 +4262,13 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       // the default value for atT = -1 as in bba
       /*   strat->P.GetP(); */
       // because shifts are counted with .p structure // done before, but ?
+      int atR=strat->tl+1; // enterTShift introduces T[tl+1], T[tl+2]...
+                           // with T[tl+1]=P.p
       enterTShift(strat->P,strat,-1,uptodeg, lV);
-      enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl,uptodeg,lV);
+      enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, atR,uptodeg,lV);
       //      enterpairsShift(vw,strat->sl,strat->P.ecart,pos,strat, strat->tl,uptodeg,lV);
       // posInS only depends on the leading term
-      strat->enterS(strat->P, pos, strat, strat->tl);
+      strat->enterS(strat->P, pos, strat, atR);
 
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);
