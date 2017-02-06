@@ -2459,7 +2459,7 @@ proc GITfan(ideal J, intmat Q, list #)
 "USAGE: GITfan(J,Q [, G]); J:ideal, Q:intmat, G:list 
 PURPOSE: Computes the GIT fan associated to J and Q. Optionally a symmetry group action on the column space of Q can be specified.
 RETURN: a fan, the GIT fan.
-NOTE: The proceduce uses parallel computation for the construction of the GIT-cones. The a-faces are not computed in parallel. This can be done by calling the aface procedure specifying a list of simplex faces. If used with the optional argument G, the orbit decomposition of the simplex of columns of Q is computed. Refer to the Singular documentation how to do this more efficiently using GAP.
+NOTE: The proceduce uses parallel computation for the construction of the GIT-cones. The a-faces are not computed in parallel. This can be done by calling the aface procedure specifying a list of simplex faces. If used with the optional argument G, the orbit decomposition of the simplex of columns of Q is computed. Refer to the Singular documentation on how to do this more efficiently using GAP.
 EXAMPLE: example GITfan; shows an example
 "
 {
