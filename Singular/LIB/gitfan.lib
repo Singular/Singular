@@ -94,16 +94,16 @@ return(st);}
 
 proc printPermutation(permutation sigma)
 {
-intvec v = permutationToIntvec(sigma);
-string vsrc,vimg;
-for (int i = 1; i<=size(v);i++){
+ intvec v = permutationToIntvec(sigma);
+ string vsrc,vimg;
+ for (int i = 1; i<=size(v);i++){
    vsrc=vsrc+emptyString(1+size(string(size(v)))-size(string(i)))+string(i);
-}
-for (i = 1; i<=size(v);i++){
+ }
+ for (i = 1; i<=size(v);i++){
    vimg=vimg+emptyString(1+size(string(size(v)))-size(string(v[i])))+string(v[i]);
-}
-print("|"+vsrc+"|");
-print("|"+vimg+"|");
+ }
+ print("|"+vsrc+"|");
+ print("|"+vimg+"|");
 }
 
 
