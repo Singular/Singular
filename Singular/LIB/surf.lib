@@ -140,6 +140,16 @@ EXAMPLE: example plot; shows an example
   }
 
   string surf_call; i = 0;
+  if (isInteractiveShell())
+  {
+    surf_call = "surf-alggeo ";
+    surf_call = surf_call + l + " >/dev/null 2>&1";
+    "plotting with surf, image will appear in pop-up.";
+
+    i = system("sh", surf_call);
+    ">>SPECIAL_EVENT_START>>/tmp/surf.jpg<<SPECIAL_EVENT_END<<";
+    return();
+  }
   if (isWindows())
   {
     string surferPath = getShellOutput("which surf");
@@ -429,6 +439,14 @@ static proc isMacOSX()
     }
   }
   return (0);
+}
+
+static proc isInteractiveShell()
+"returns 1 if this SINGULAR instance runs in some container inside interactive shell;
+0 otherwise"
+{
+  string s = getShellOutput("whoami");
+  return (s=="singularUser");
 }
 
 static proc getShellOutput(string shellCommand)
