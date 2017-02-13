@@ -38,11 +38,13 @@ AC_TYPE_SIZE_T
 
 # Turn off shared libraries during beta-testing, since they
 # make the build process take too long.
-LT_INIT
+LT_INIT([win32-dll])
 # ([shared])
-# LT_INIT(dlopen disable-static) # doesn't work on PowerPC!
+# LT_INIT([win32-dll])(dlopen disable-static) # doesn't work on PowerPC!
 
 # SING_CHECK_PIPE
+
+SING_WIN_FLAGS
 
 ##### SEE http://www.gnu.org/prep/standards/html_node/Directory-Variables.html
 

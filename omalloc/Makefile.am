@@ -30,7 +30,7 @@ AM_CPPFLAGS =-I${top_srcdir}/.. -I${top_builddir}/..
 
 libomalloc_la_SOURCES=$(SOURCES) $(noinst_HEADERS)
 
-libomalloc_la_LDFLAGS    = -release ${PACKAGE_VERSION}
+libomalloc_la_LDFLAGS    = $(SINGULAR_LDFLAGS) -release ${PACKAGE_VERSION}
 
 nodist_libomalloc_la_SOURCES = omTables.inc omTables.h mylimits.h
 nodist_libomalloc_include_HEADERS = omConfig.h mylimits.h omTables.h

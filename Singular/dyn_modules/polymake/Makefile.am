@@ -20,12 +20,19 @@ else
 # Add under Mac OS X: -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
 endif
 
+polymake_la_LIBADD =
+if SING_WIN
+if !SI_BUILTIN_POLYMAKE
+ polymake_la_LIBADD += ${top_builddir}/Singular/libSingular.la
+endif
+endif
+
 if SING_HAVE_POLYMAKE
 # forcefully enable exceptions for polymake
  CXXFLAGS+= $(FEXCEPTIONSFRTTI_CXXFLAGS)
  PM_CXXFLAGS= ${FEXCEPTIONSFRTTI_CXXFLAGS}
  P_PROCS_MODULE_LDFLAGS+= ${PM_LDFLAGS}
- polymake_la_LIBADD= ${PM_LIBS}
+ polymake_la_LIBADD+= ${PM_LIBS}
 endif
 
 SOURCES = polymake_conversion.h polymake_conversion.cc \
@@ -38,4 +45,4 @@ polymake_la_CPPFLAGS = ${AM_CPPFLAGS} ${P_PROCS_CPPFLAGS_COMMON} ${PM_CXXFLAGS}
 polymake_la_CXXFLAGS = ${PM_CXXFLAGS}
 polymake_la_CFLAGS   = ${PM_CXXFLAGS}
 
-polymake_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
+polymake_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS} $(SINGULAR_LDFLAGS)

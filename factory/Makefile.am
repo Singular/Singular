@@ -11,7 +11,7 @@ lib_LTLIBRARIES = libfactory.la
 libfactory_la_LIBADD     =$(RESOURCES_LIBS) $(OMALLOC_LIBS) \
 $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS)
 
-libfactory_la_LDFLAGS    = -release ${PACKAGE_VERSION}
+libfactory_la_LDFLAGS    = $(SINGULAR_LDFLAGS) -release ${PACKAGE_VERSION}
 
 # factory source files
 SOURCES = \

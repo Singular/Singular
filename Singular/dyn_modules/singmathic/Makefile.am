@@ -19,7 +19,13 @@ $(FLINT_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS) $(CPPFLAGS)
 
 singmathic_la_SOURCES  = singmathic.cc
 singmathic_la_CPPFLAGS = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
-singmathic_la_LDFLAGS  = ${P_PROCS_MODULE_LDFLAGS} ${MATHIC_LIBS}
+singmathic_la_LDFLAGS  = ${P_PROCS_MODULE_LDFLAGS} ${MATHIC_LIBS} $(SINGULAR_LDFLAGS)
+
+if SING_WIN
+if !SI_BUILTIN_SINGMATHIC
+ singmathic_la_LIBADD = ${top_srcdir}/Singular/libSingular.la
+endif
+endif
 
 # AM_COLOR_TESTS=always
 #

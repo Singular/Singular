@@ -6,7 +6,11 @@ AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_b
 
 all-local: feOpt.inc feOptTS.inc feOptES.inc iparith.inc all.lib gftables MOD ${abs_builddir}/LIB Singular$(EXEEXT) ESingular$(EXEEXT) TSingular$(EXEEXT)
 
-SUBDIRS = dyn_modules
+if SING_WIN
+SUBDIRS = ${BUILTIN_MODULES} . dyn_modules
+else
+SUBDIRS = dyn_modules .
+endif
 
 ########################### Possible builtin modules... #########################
 BUILTIN_FLAGS = ${BUILTIN_LIBS}
@@ -122,7 +126,7 @@ SingularHEADERS = \
 # plural_cmd.inc
 nodist_libSingular_la_SOURCES = feOpt.inc iparith.inc
 
-libSingular_la_LDFLAGS    =${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION} ${PTHREAD_LDFLAGS}
+libSingular_la_LDFLAGS    =$(SINGULAR_LDFLAGS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION} ${PTHREAD_LDFLAGS}
 libSingular_la_LIBADD     =${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${BUILTIN_FLAGS} ${top_builddir}/kernel/libkernel.la ${PTHREAD_LIBS}
 
 libSingular_includedir = ${includedir}/singular/Singular

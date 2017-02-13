@@ -12,7 +12,7 @@ AM_CPPFLAGS =-I${top_srcdir}/.. -I${top_builddir}/..
 
 libomalloc_la_SOURCES=$(SOURCES) $(noinst_HEADERS)
 
-libomalloc_la_LDFLAGS    = -release ${PACKAGE_VERSION}
+libomalloc_la_LDFLAGS    = $(SINGULAR_LDFLAGS) -release ${PACKAGE_VERSION}
 
 libomalloc_la_CPPFLAGS  = ${AM_CPPFLAGS}
 

@@ -27,7 +27,9 @@ AC_PROG_LN_S
 #AC_PROG_INSTALL
 
 # Checks for libraries.
-LT_INIT
+LT_INIT([win32-dll])
+
+SING_WIN_FLAGS
 
 # Checks for header files.
 AC_HEADER_STDC

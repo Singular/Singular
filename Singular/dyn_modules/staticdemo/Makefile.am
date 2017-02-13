@@ -12,7 +12,7 @@ if SI_BUILTIN_STATICDEMO
 
   staticdemo_la_SOURCES   = staticdemo.cc
   staticdemo_la_CPPFLAGS  = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
-  staticdemo_la_LDFLAGS   = ${AM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS}
+  staticdemo_la_LDFLAGS   = ${AM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS} $(SINGULAR_LDFLAGS)
 else
   EXTRA_DIST=staticdemo.cc
 endif

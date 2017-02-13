@@ -44,7 +44,7 @@ AC_PROG_LN_S
 AC_PROG_INSTALL
 ## AC_DISABLE_STATIC
 AC_PROG_YACC
-LT_INIT
+LT_INIT([win32-dll])
 AC_PROG_MAKE_SET
 AC_CHECK_PROG(AR, ar, ar, where-is-your-ar)
 AC_CHECK_PROG(M4, m4, m4, where-is-your-m4)
@@ -52,6 +52,9 @@ AC_CHECK_PROG(BISON, bison, bison, where-is-your-bison)
 AC_CHECK_SIZEOF(long,4)
 AC_C_CONST
 AC_C_INLINE
+
+
+SING_WIN_FLAGS
 
 
 #

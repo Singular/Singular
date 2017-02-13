@@ -20,7 +20,12 @@ $(FLINT_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS)
 
 bigintm_la_SOURCES  = mod_main.cc bigintm.cc bigintm.h
 bigintm_la_CPPFLAGS = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
-bigintm_la_LDFLAGS  = ${P_PROCS_MODULE_LDFLAGS}
+bigintm_la_LDFLAGS  = ${P_PROCS_MODULE_LDFLAGS} $(SINGULAR_LDFLAGS)
+if SING_WIN
+if !SI_BUILTIN_BIGINTM
+bigintm_la_LIBADD   = ${top_builddir}/Singular/libSingular.la
+endif
+endif
 
 # AM_COLOR_TESTS=always
 #

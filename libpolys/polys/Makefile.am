@@ -65,7 +65,7 @@ p_Procs_FieldIndep_la_CPPFLAGS = -Dp_Procs_FieldIndep ${P_PROCS_CPPFLAGS_COMMON}
 p_Procs_FieldQ_la_CPPFLAGS = -Dp_Procs_FieldQ ${P_PROCS_CPPFLAGS_COMMON}
 p_Procs_FieldZp_la_CPPFLAGS = -Dp_Procs_FieldZp ${P_PROCS_CPPFLAGS_COMMON}
 
-P_PROCS_MODULE_LDFLAGS = -shared -module -dynamic -export-dynamic -avoid-version -weak_reference_mismatches weak -undefined dynamic_lookup -Wl,-undefined -Wl,dynamic_lookup -flat_namespace
+P_PROCS_MODULE_LDFLAGS = -shared -module -dynamic -export-dynamic -avoid-version -weak_reference_mismatches weak -undefined dynamic_lookup -Wl,-undefined -Wl,dynamic_lookup -flat_namespace $(SINGULAR_LDFLAGS)
 
 p_Procs_FieldGeneral_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
 p_Procs_FieldIndep_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
@@ -94,7 +94,7 @@ libpolys_la_SOURCES = ${SOURCES}
 
 EXTRA_libpolys_la_SOURCES = templates/p_Procs_Static.cc templates/p_Procs_Dynamic.cc
 
-libpolys_la_LDFLAGS= ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION}
+libpolys_la_LDFLAGS= $(SINGULAR_LDFLAGS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION}
 libpolys_la_LIBADD = ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${top_builddir}/coeffs/libcoeffs.la
 
 
