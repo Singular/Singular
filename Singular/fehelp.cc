@@ -110,8 +110,6 @@ void feHelp(char *str)
 
   BOOLEAN key_is_regexp = (strchr(str, '*') != NULL);
 
-  // try proc help and library help
-  if (! key_is_regexp && heOnlineHelp(str)) return;
 
   heEntry_s hentry;
   memset(&hentry,0,sizeof(hentry));
@@ -133,9 +131,13 @@ void feHelp(char *str)
     StringSetS("");
     int found = heReKey2Entry(idxfile, str, &hentry);
 
-    // Try to match with str*
+
     if (found == 0)
     {
+      // try proc help and library help
+      if (! key_is_regexp && heOnlineHelp(str)) return;
+
+      // Try to match with str*
       char mkey[MAX_HE_ENTRY_LENGTH];
       strcpy(mkey, str);
       strcat(mkey, "*");
