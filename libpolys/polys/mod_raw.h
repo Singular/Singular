@@ -13,7 +13,7 @@
  *           dunl_close()
 */
 
-typedef enum { LT_NONE, LT_NOTFOUND, LT_SINGULAR, LT_ELF, LT_HPUX, LT_MACH_O, LT_BUILTIN} lib_types;
+typedef enum { LT_NONE, LT_NOTFOUND, LT_SINGULAR, LT_ELF, LT_HPUX, LT_MACH_O, LT_BUILTIN, LT_DLL} lib_types;
 
 
 #if defined(HAVE_DL)

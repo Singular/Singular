@@ -36,6 +36,7 @@ lib_types type_of_LIB(const char *newlib, char *libnamebuf)
   const unsigned char utf16le[]={0xff,0xfe,0};
   const unsigned char utf8ms[]={0xEF,0xBB,0xBF,0};
 
+  const unsigned char dll[]={'M','Z',0};
   int i=0;
   while(si_builtin_libs[i]!=NULL)
   {
@@ -128,6 +129,11 @@ lib_types type_of_LIB(const char *newlib, char *libnamebuf)
   {
     WarnS("UTF-8 detected - may not work");
     LT=LT_SINGULAR;
+    goto lib_type_end;
+  }
+  if (strncmp(buf,(const char *)dll,2)==0)
+  {
+    LT=LT_DLL;
     goto lib_type_end;
   }
   if(isprint(buf[0]) || buf[0]=='\n')
