@@ -906,6 +906,8 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
   else if (tlength > 0 && T != NULL && (lpos >=0))
   {
     // now p1 and p2 must be != NULL and must be contained in T
+    // unless for SHIFTGB: here each p_i must be in T or
+    // be shifted from an element in T -> to difficult to test
     int i;
     i = kFindInT(L->p1, T, tlength);
     if (i < 0)
@@ -1273,7 +1275,7 @@ static inline BOOLEAN sugarDivisibleBy(int ecart1, int ecart2)
 /*2
 * put the pair (s[i],p)  into the set B, ecart=ecart(p) (ring case)
 */
-void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy strat, int atR = -1)
+static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy strat, int atR)
 {
   assume(atR >= 0);
   assume(i<=strat->sl);
@@ -1513,7 +1515,7 @@ void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy strat, 
 * put the  lcm(s[i],p)  into the set B
 */
 
-BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrategy strat, int atR, bool enterTstrong)
+static BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrategy strat, int atR, bool enterTstrong)
 {
   number d, s, t;
   assume(atR >= 0);
@@ -1708,7 +1710,7 @@ BOOLEAN sbaCheckGcdPair (LObject* h,kStrategy strat)
   return FALSE;
 }
 
-BOOLEAN enterOneStrongPolySig (int i,poly p,poly sig,int /*ecart*/, int /*isFromQ*/,kStrategy strat, int atR)
+static BOOLEAN enterOneStrongPolySig (int i,poly p,poly sig,int /*ecart*/, int /*isFromQ*/,kStrategy strat, int atR)
 {
   number d, s, t;
   assume(atR >= 0);
@@ -2217,7 +2219,7 @@ static BOOLEAN p_HasNotCF_Lift(poly p1, poly p2, const ring r)
 * put the pair (s[i],p)  into the set B, ecart=ecart(p) for idLift(I,T)
 */
 
-void enterOnePairLift (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR = -1)
+static void enterOnePairLift (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR = -1)
 {
   assume(ALLOW_PROD_CRIT(strat));
   assume(!rIsPluralRing(currRing));
@@ -2431,9 +2433,9 @@ void enterOnePairLift (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
 */
 
 #ifdef DEBUGF5
-void enterOnePairSig (int i, poly p, poly pSig, int from, int ecart, int isFromQ, kStrategy strat, int atR = -1)
+static void enterOnePairSig (int i, poly p, poly pSig, int from, int ecart, int isFromQ, kStrategy strat, int atR = -1)
 #else
-void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kStrategy strat, int atR = -1)
+static void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kStrategy strat, int atR = -1)
 #endif
 {
   assume(i<=strat->sl);
@@ -2688,9 +2690,9 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
 
 
 #ifdef DEBUGF5
-void enterOnePairSigRing (int i, poly p, poly pSig, int from, int ecart, int isFromQ, kStrategy strat, int atR = -1)
+static void enterOnePairSigRing (int i, poly p, poly pSig, int from, int ecart, int isFromQ, kStrategy strat, int atR = -1)
 #else
-void enterOnePairSigRing (int i, poly p, poly pSig, int, int ecart, int isFromQ, kStrategy strat, int atR = -1)
+static void enterOnePairSigRing (int i, poly p, poly pSig, int, int ecart, int isFromQ, kStrategy strat, int atR = -1)
 #endif
 {
   #ifdef ADIDEBUG
@@ -12173,7 +12175,7 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
 /*1
 * put the pairs (sh \dot s[i],p)  into the set B, ecart=ecart(p)
 */
-void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy strat, int /*atR*/, int uptodeg, int lV)
+void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV)
 {
   /* p comes from strat->P.p, that is LObject with LM in currRing and Tail in tailRing */
 
@@ -12238,6 +12240,7 @@ void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy st
     //      PrintS("ManyShifts: calling enterOnePairShift(q,p)");      PrintLn();
     //}
 #endif
+    //kFindInTShift(q,atR,strat);
     enterOnePairShift(q, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, j, i, uptodeg, lV);
   }
 }
