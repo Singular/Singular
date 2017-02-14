@@ -168,8 +168,10 @@ BOOLEAN slWriteAscii(si_link l, leftv v)
         ideal I=(ideal)v->Data();
         for(int i=0;i<IDELEMS(I);i++)
         {
-          fprintf(outfile,"%s",pString(I->m[i]));
-          if (i<IDELEMS(I)-1) fprintf(outfile,",");
+          char *s=pString(I->m[i]);
+          fwrite(s,strlen(s),1,outfile);
+          omFree(s);
+          if (i<IDELEMS(I)-1) fwrite(",",1,1,outfile);
         }
         break;
       }
