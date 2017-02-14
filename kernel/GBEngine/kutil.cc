@@ -12175,7 +12175,7 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
 /*1
 * put the pairs (sh \dot s[i],p)  into the set B, ecart=ecart(p)
 */
-void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV)
+static void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV)
 {
   /* p comes from strat->P.p, that is LObject with LM in currRing and Tail in tailRing */
 
@@ -12604,37 +12604,6 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 #endif
 
 #ifdef HAVE_SHIFTBBA
-/*2
-*(s[0],h),...,(s[k],h) will be put to the pairset L(via initenterpairs)
-*superfluous elements in S will be deleted
-*/
-void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR,int uptodeg, int lV)
-{
-  /* h is strat->P.p, that is LObject with LM in currRing and Tail in tailRing */
-  /* Q: what is exactly the strat->fromT ? A: a local case trick; don't need it yet*/
-  int j=pos;
-
-  assume (!rField_is_Ring(currRing));
-  initenterpairsShift(h,k,ecart,0,strat, atR,uptodeg,lV);
-  if ( (!strat->fromT)
-  && ((strat->syzComp==0)
-    ||(pGetComp(h)<=strat->syzComp)))
-  {
-    //Print("start clearS k=%d, pos=%d, sl=%d\n",k,pos,strat->sl);
-    unsigned long h_sev = pGetShortExpVector(h);
-    loop
-    {
-      if (j > k) break;
-      clearS(h,h_sev, &j,&k,strat);
-      j++;
-    }
-    //Print("end clearS sl=%d\n",strat->sl);
-  }
- // PrintS("end enterpairs\n");
-}
-#endif
-
-#ifdef HAVE_SHIFTBBA
 /*3
 *(s[0], s \dot h),...,(s[k],s \dot h) will be put to the pairset L
 * also the pairs (h, s\dot s[0]), ..., (h, s\dot s[k]) enter L
@@ -12705,6 +12674,37 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
     }
 
   }
+}
+#endif
+
+#ifdef HAVE_SHIFTBBA
+/*2
+*(s[0],h),...,(s[k],h) will be put to the pairset L(via initenterpairs)
+*superfluous elements in S will be deleted
+*/
+void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR,int uptodeg, int lV)
+{
+  /* h is strat->P.p, that is LObject with LM in currRing and Tail in tailRing */
+  /* Q: what is exactly the strat->fromT ? A: a local case trick; don't need it yet*/
+  int j=pos;
+
+  assume (!rField_is_Ring(currRing));
+  initenterpairsShift(h,k,ecart,0,strat, atR,uptodeg,lV);
+  if ( (!strat->fromT)
+  && ((strat->syzComp==0)
+    ||(pGetComp(h)<=strat->syzComp)))
+  {
+    //Print("start clearS k=%d, pos=%d, sl=%d\n",k,pos,strat->sl);
+    unsigned long h_sev = pGetShortExpVector(h);
+    loop
+    {
+      if (j > k) break;
+      clearS(h,h_sev, &j,&k,strat);
+      j++;
+    }
+    //Print("end clearS sl=%d\n",strat->sl);
+  }
+ // PrintS("end enterpairs\n");
 }
 #endif
 

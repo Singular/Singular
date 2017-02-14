@@ -824,15 +824,11 @@ void enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV);
 
 void initBuchMoraShift (ideal F,ideal Q,kStrategy strat);
 
-void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV); // ok
-
 void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV);
 
 void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS, int uptodeg, int lV); // ok
 
 void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR,int uptodeg, int lV);
-
-void initenterpairsShift (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR,int uptodeg, int lV);
 
 void updateSShift(kStrategy strat,int uptodeg,int lV);
 
