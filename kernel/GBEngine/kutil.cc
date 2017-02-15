@@ -903,6 +903,7 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
     // L->p2 either NULL or "normal" poly
     pFalseReturn(pp_Test(L->p2, currRing, L->tailRing));
   }
+#ifndef HAVE_SHIFTBBA
   else if (tlength > 0 && T != NULL && (lpos >=0))
   {
     // now p1 and p2 must be != NULL and must be contained in T
@@ -916,6 +917,7 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
     if (i < 0)
       return dReportError("L[%d].p2 not in T",lpos);
   }
+#endif
   return TRUE;
 }
 
@@ -1008,6 +1010,7 @@ BOOLEAN kTest_TS(kStrategy strat)
                             i, strat->S_2_R[i], j, strat->T[j].i_r);
     }
   }
+#ifndef HAVE_SHIFTBBA
   // test strat->L[i].i_r1
   for (i=0; i<=strat->Ll; i++)
   {
@@ -1032,6 +1035,7 @@ BOOLEAN kTest_TS(kStrategy strat)
     if (strat->L[i].i_r != -1)
       return dReportError("L[%d].i_r out of sync", i);
   }
+#endif
   return TRUE;
 }
 
