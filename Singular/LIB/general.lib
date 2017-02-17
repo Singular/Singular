@@ -36,6 +36,15 @@ PROCEDURES:
 LIB "inout.lib";
 LIB "poly.lib";
 LIB "matrix.lib";
+
+static proc mod_init()
+{
+  intvec save=option(get);
+  option(noredefine);
+  LIB "general.so";
+  option(set,save);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 proc A_Z (string s,int n)
@@ -1280,4 +1289,20 @@ example
   //factorize(p);  //slow
   system("random",992851262);
   factorH(p);
+}
+
+proc subsets()
+"USAGE:  subsets(n,k)  n int, k int
+RETURN:  list, a list of lists,
+           representing subsets of {1,...,n} of cardinality k
+NOTE:    the lists will be sorted lexicographically
+         and the elements in each of the lists are sorted naturally
+EXAMPLE: example subsets; shows an example
+"
+{
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  print(subsets(4,1));
+  print(subsets(4,2));
 }

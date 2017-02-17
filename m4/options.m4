@@ -311,7 +311,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
   bi_singmathic=false
   bi_bigintm=false
   bi_Order=false
-  bi_customstd=false
+  bi_general=false
 
 
  if test -z "$with_builtinmodules"; then
@@ -343,7 +343,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
        singmathic ) bi_singmathic=true ;;
        bigintm ) bi_bigintm=true ;;
        Order ) bi_Order=true ;;
-       customstd ) bi_customstd=true ;;
+       general ) bi_general=true ;;
       esac
 
 ###### In case of out-of tree building: the build dir is empty in configure time!!!
@@ -378,7 +378,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
  AM_CONDITIONAL([SI_BUILTIN_SINGMATHIC], [test x$bi_singmathic = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_BIGINTM], [test x$bi_bigintm = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_ORDER], [test x$bi_Order = xtrue])
- AM_CONDITIONAL([SI_BUILTIN_CUSTOMSTD], [test x$bi_customstd = xtrue])
+ AM_CONDITIONAL([SI_BUILTIN_GENERAL], [test x$bi_general = xtrue])
 
  AC_MSG_CHECKING([BUILTIN_LIBS...])
  AC_MSG_RESULT(${BUILTIN_LIBS:-unset})
