@@ -80,6 +80,16 @@ BOOLEAN jjEQUAL_CR(leftv res, leftv a, leftv b)
   return FALSE;
 }
 
+BOOLEAN jjR2_CR(leftv res, leftv a)              // ring ->cring
+{
+  ring r=(ring)a->Data();
+  AlgExtInfo extParam;
+  extParam.r = r;
+  coeffs cf=nInitChar(n_transExt,&extParam);
+  res->data=(void*)cf;
+  return FALSE;
+}
+
 #ifdef SINGULAR_4_2
 // -----------------------------------------------------------
 // interpreter stuff for Number/number2
@@ -495,16 +505,6 @@ BOOLEAN jjBIM2_CR(leftv res, leftv a)              // bigintmat ->cring
   coeffs cf=b->basecoeffs();
   if (cf==NULL) return TRUE;
   cf->ref++;
-  res->data=(void*)cf;
-  return FALSE;
-}
-
-BOOLEAN jjR2_CR(leftv res, leftv a)              // ring ->cring
-{
-  ring r=(ring)a->Data();
-  AlgExtInfo extParam;
-  extParam.r = r;
-  coeffs cf=nInitChar(n_polyExt,&extParam);
   res->data=(void*)cf;
   return FALSE;
 }
