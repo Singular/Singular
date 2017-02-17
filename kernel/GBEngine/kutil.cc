@@ -885,7 +885,7 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
         pNext(L->p) = NULL;
       }
     }
-    kFalseReturn(kTest_T(L, strat_tailRing, lpos, 'L'));
+    if (testp!=2) kFalseReturn(kTest_T(L, strat_tailRing, lpos, 'L'));
     if (pn != NULL)
       pNext(L->p) = pn;
 
@@ -903,7 +903,7 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
     // L->p2 either NULL or "normal" poly
     pFalseReturn(pp_Test(L->p2, currRing, L->tailRing));
   }
-  else if (tlength > 0 && T != NULL && (lpos >=0))
+  else if (tlength > 0 && T != NULL && (lpos >=0) && (testp!=2))
   {
     // now p1 and p2 must be != NULL and must be contained in T
     // unless for SHIFTGB: here each p_i must be in T or
@@ -941,6 +941,18 @@ BOOLEAN kTest (kStrategy strat)
   // test L
   if (strat->L != NULL)
   {
+  #ifdef HAVE_SHIFTBBA
+    if (strat->red==redFirstShift) // is this in bbaShift ?
+    {
+      for (i=0; i<=strat->Ll; i++)
+      {
+        kFalseReturn(kTest_L(&(strat->L[i]), strat->tailRing,
+                           2, i,
+                           strat->T, strat->tl));
+      }
+    }
+    else
+  #endif
     for (i=0; i<=strat->Ll; i++)
     {
       kFalseReturn(kTest_L(&(strat->L[i]), strat->tailRing,
@@ -1009,6 +1021,9 @@ BOOLEAN kTest_TS(kStrategy strat)
     }
   }
   // test strat->L[i].i_r1
+  #ifdef HAVE_SHIFTBBA
+  if (strat->red!=redFirstShift) // not from bbaShift
+  #endif
   for (i=0; i<=strat->Ll; i++)
   {
     if (strat->L[i].p1 != NULL && strat->L[i].p2)
