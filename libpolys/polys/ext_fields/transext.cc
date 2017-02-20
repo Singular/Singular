@@ -780,11 +780,7 @@ static long ntInt(number &a, const coeffs cf)
   return n_Int(p_GetCoeff(aAsPoly, ntRing), ntCoeffs);
 }
 
-/* this method will only consider the numerator of a, without cancelling
-   the gcd before;
-   returns TRUE iff the leading coefficient of the numerator of a is > 0
-                    or the leading term of the numerator of a is not a
-                    constant */
+/* return FALSE, if a is a constant <=0 */
 static BOOLEAN ntGreaterZero(number a, const coeffs cf)
 {
   //check_N(a,cf);
@@ -795,12 +791,6 @@ static BOOLEAN ntGreaterZero(number a, const coeffs cf)
   return (!p_LmIsConstant(g,ntRing)|| n_GreaterZero(pGetCoeff(g), ntCoeffs));
 }
 
-/* This method will only consider the numerators of a and b, without
-   cancelling gcd's before.
-   Moreover it may return TRUE only if one or both numerators
-   are zero or if their degrees are equal. Then TRUE is returned iff
-   coeff(numerator(a)) > coeff(numerator(b));
-   In all other cases, FALSE will be returned. */
 static BOOLEAN ntGreater(number a, number b, const coeffs cf)
 {
   //check_N(a,cf);
@@ -811,30 +801,34 @@ static BOOLEAN ntGreater(number a, number b, const coeffs cf)
   number aDenCoeff = NULL; int aDenDeg = 0;
   number bNumCoeff = NULL; int bNumDeg = 0;
   number bDenCoeff = NULL; int bDenDeg = 0;
-  if (!IS0(a))
+  if (IS0(a))
+  {
+    if (IS0(b)) return FALSE;
+    fraction fb = (fraction)b;
+    return (!n_GreaterZero(pGetCoeff(NUM(fb)), ntCoeffs));
+  }
+  if (IS0(b))
   {
     fraction fa = (fraction)a;
-    aNumDeg = p_Totaldegree(NUM(fa), ntRing);
-    aNumCoeff = p_GetCoeff(NUM(fa), ntRing);
-    if (DEN(fa)!=NULL)
-    {
-      aDenDeg = p_Totaldegree(DEN(fa), ntRing);
-      aDenCoeff=p_GetCoeff(DEN(fa),ntRing);
-    }
+    return (n_GreaterZero(pGetCoeff(NUM(fa)), ntCoeffs));
   }
-  else return !(ntGreaterZero (b,cf));
-  if (!IS0(b))
+  // now: a!=0, b!=0
+  fraction fa = (fraction)a;
+  aNumDeg = p_Totaldegree(NUM(fa), ntRing);
+  aNumCoeff = p_GetCoeff(NUM(fa), ntRing);
+  if (DEN(fa)!=NULL)
   {
-    fraction fb = (fraction)b;
-    bNumDeg = p_Totaldegree(NUM(fb), ntRing);
-    bNumCoeff = p_GetCoeff(NUM(fb), ntRing);
-    if (DEN(fb)!=NULL)
-    {
-      bDenDeg = p_Totaldegree(DEN(fb), ntRing);
-      bDenCoeff=p_GetCoeff(DEN(fb),ntRing);
-    }
+    aDenDeg = p_Totaldegree(DEN(fa), ntRing);
+    aDenCoeff=p_GetCoeff(DEN(fa),ntRing);
   }
-  else return ntGreaterZero(a,cf);
+  fraction fb = (fraction)b;
+  bNumDeg = p_Totaldegree(NUM(fb), ntRing);
+  bNumCoeff = p_GetCoeff(NUM(fb), ntRing);
+  if (DEN(fb)!=NULL)
+  {
+    bDenDeg = p_Totaldegree(DEN(fb), ntRing);
+    bDenCoeff=p_GetCoeff(DEN(fb),ntRing);
+  }
   if (aNumDeg-aDenDeg > bNumDeg-bDenDeg) return TRUE;
   if (aNumDeg-aDenDeg < bNumDeg-bDenDeg) return FALSE;
   number aa;
