@@ -203,7 +203,7 @@ void TestGBEngine()
 
 
   const int D = 3;
-  int *order = (int *) omAlloc0(D* sizeof(int));
+  rRingOrder_t *order = (rRingOrder_t *) omAlloc0(D* sizeof(rRingOrder_t));
   int *block0 = (int *)omAlloc0(D * sizeof(int));
   int *block1 = (int *)omAlloc0(D * sizeof(int));
 

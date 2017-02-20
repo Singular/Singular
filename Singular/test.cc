@@ -194,7 +194,6 @@
 #include <Singular/newstruct.h>
 #include <Singular/pcv.h>
 #include <Singular/links/pipeLink.h>
-#include <Singular/run.h>
 #include <Singular/sdb.h>
 #include <Singular/links/silink.h>
 #include <Singular/links/sing_dbm.h>

@@ -208,7 +208,7 @@ public:
 
      const int D = 2;
      /*order: lp,0*/
-     int *order = (int *) omAlloc0(D* sizeof(int));
+     rRingOrder_t *order = (rRingOrder_t *) omAlloc0(D* sizeof(rRingOrder_t));
      int *block0 = (int *)omAlloc0(D * sizeof(int));
      int *block1 = (int *)omAlloc0(D * sizeof(int));
      /* ringorder dp for the first block: var 1..N */

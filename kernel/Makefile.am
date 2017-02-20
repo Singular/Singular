@@ -51,7 +51,7 @@ TESTS = test
 check_PROGRAMS = $(TESTS)
 
 test_SOURCES = test.cc
-test_LDADD   = libkernel.la
+test_LDADD   = libkernel.la ${builddir}/../Singular/libSingular.la
 
 # These files are built first
 # BUILT_SOURCES = MOD
