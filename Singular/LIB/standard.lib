@@ -831,7 +831,7 @@ HINT:    Since there exists no uniform best method for computing standard
          examples, first various methods on a simplified example (e.g. use
          characteristic 32003 instead of 0 or substitute a subset of
          parameters/variables by integers, etc.). @*
-SEE ALSO: stdhilb, stdfglm, std, slimgb
+SEE ALSO: stdhilb, stdfglm, std, slimgb, modstd_lib, ffmodstd_lib, nfmodstd_lib
 KEYWORDS: groebner basis computations
 EXAMPLE: example groebner;  shows an example"
 

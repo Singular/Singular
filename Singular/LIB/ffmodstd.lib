@@ -3,7 +3,7 @@ version="version ffmodstd.lib 4.0.3.0 May_2016 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:   ffmodstd.lib  Groebner bases of ideals in polynomial rings
-                           over algebraic function fields
+                           over rational function fields
 AUTHORS:   D.K. Boku       boku@mathematik.uni-kl.de
 @*         W. Decker       decker@mathematik.uni-kl.de
 @*         C. Fieker       fieker@mathematik.uni-kl.de

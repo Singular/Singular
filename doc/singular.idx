@@ -212,7 +212,7 @@ Bigatti-La Scala-Robbiano algorithm	Bigatti and La Scala and Robbiano	sing_857.h
 BlowingUp		sing_1493.htm#SEC1569	43153
 Blowupcenter		sing_1373.htm#SEC1449	3423
 BorelCheck		sing_1448.htm#SEC1524	48787
-Bott's formula		sing_2508.htm#IDX977	
+Bott's formula		sing_2510.htm#IDX979	
 Branches of space curve singularities	Branches of space curve singularities	sing_821.htm#SEC873	
 Briancon-Maisonobe algorithm		sing_532.htm#IDX337	
 Brieskorn lattice		sing_1514.htm#IDX643	
@@ -234,7 +234,7 @@ Brill-Noether algorithm		sing_1775.htm#IDX765
 BrillNoether		sing_1778.htm#SEC1854	39919
 Buchberger algorithm for toric ideals	Buchberger algorithm	sing_858.htm#SEC915	
 Budur-Mustata-Saito approach		sing_588.htm#IDX357	
-Building Singular		sing_2562.htm#SEC2652	
+Building Singular		sing_2567.htm#SEC2657	
 C programming language	Major differences to the C programming language	sing_401.htm#SEC441	
 C, module ordering		sing_840.htm#IDX411	
 CGS		sing_903.htm#IDX426	
@@ -253,7 +253,7 @@ CentralSaturation		sing_681.htm#SEC733	31585
 Change of rings		sing_9.htm#SEC15	
 Characteristic sets		sing_848.htm#SEC905	
 CharacteristicExponents	CharacteristicExponents	sing_1499.htm#SEC1575	21795
-ChernClass		sing_2521.htm#SEC2597	32965
+ChernClass		sing_2523.htm#SEC2599	32965
 ChernRootsDual		sing_2247.htm#SEC2323	40100
 ChernRootsHom		sing_2256.htm#SEC2332	48446
 ChernRootsProd		sing_2249.htm#SEC2325	13967
@@ -262,14 +262,14 @@ ChernRootsSymm		sing_2258.htm#SEC2334	59304
 ChernRootsWedge		sing_2259.htm#SEC2335	7239
 Chevalley-Rosenlicht theorem		sing_1351.htm#IDX577	
 Chevalley-Rosenlicht theorem 		sing_1352.htm#IDX580	
-Chow ring, abstract variety, projective space, Grassmannian	ChowRing	sing_2512.htm#IDX982	
-ChowRing		sing_2512.htm#SEC2588	57977
+Chow ring, abstract variety, projective space, Grassmannian	ChowRing	sing_2514.htm#IDX984	
+ChowRing		sing_2514.htm#SEC2590	57977
 Classification of hypersurface singularities	Classification of hypersurface singularities	sing_822.htm#SEC874	
-Classification of singularities		sing_2504.htm#IDX969	
+Classification of singularities		sing_2497.htm#IDX962	
 Code	Codes and the decoding problem	sing_863.htm#SEC921	
 Codes and the decoding problem	Codes and the decoding problem	sing_863.htm#SEC920	
 Coding theory		sing_1774.htm#SEC1850	
-Coefficient rings	Notes for Singular users	sing_2560.htm#SEC2644	
+Coefficient rings	Notes for Singular users	sing_2565.htm#SEC2649	
 Command line options	Command line options	sing_19.htm#SEC26	
 Commands	Functions and system variables	sing_201.htm#SEC241	
 Commands for user defined types	Commands for user defined types	sing_181.htm#SEC221	
@@ -331,7 +331,7 @@ Delta		sing_1420.htm#SEC1496	33497
 DeltaList		sing_1421.htm#SEC1497	65148
 Demo mode		sing_24.htm#SEC35	
 Depth		sing_808.htm#SEC860	
-Determinacy		sing_2507.htm#IDX973	
+Determinacy		sing_2500.htm#IDX966	
 Di Biase-Urbanke algorithm	Di Biase and Urbanke	sing_856.htm#SEC913	
 Distributed computing		sing_931.htm#IDX478	
 Dlocalization		sing_761.htm#SEC813	22140
@@ -361,7 +361,7 @@ Emacs, overview	A quick guide to Emacs	sing_22.htm#SEC29
 Emacs, running Singular under	Running SINGULAR under Emacs	sing_23.htm#SEC30	
 Emacs, user interface	Emacs user interface	sing_21.htm#SEC28	
 Emaxcont		sing_1381.htm#SEC1457	47312
-Enumerative geometry		sing_2508.htm#IDX975	
+Enumerative geometry		sing_2510.htm#IDX977	
 Equal		sing_1335.htm#SEC1411	19984
 Eresol		sing_1371.htm#SEC1447	12842
 EulerAff		sing_2292.htm#SEC2368	54325
@@ -389,7 +389,7 @@ Free resolution		sing_805.htm#SEC857
 Free resolution, graded	Handling graded modules	sing_806.htm#SEC858	
 FultonA		sing_2290.htm#SEC2366	33688
 Functions		sing_202.htm#SEC242	
-Future benefits of Singular 4	Notes for Singular users	sing_2560.htm#SEC2650	
+Future benefits of Singular 4	Notes for Singular users	sing_2565.htm#SEC2655	
 G-algebra		sing_478.htm#SEC518	
 G-algebra 		sing_478.htm#SEC520	
 G-algebra, setup		sing_478.htm#SEC522	
@@ -399,7 +399,7 @@ GIT		sing_2386.htm#IDX949
 GKZsystem		sing_678.htm#SEC730	20528
 GKdim		sing_651.htm#SEC703	9814
 GMP		sing_1.htm#IDX3	
-GMP 		sing_2564.htm#SEC2654	
+GMP 		sing_2569.htm#SEC2659	
 GND.lib		sing_2393.htm#SEC2469	
 GND_lib		sing_2393.htm#SEC2469	
 GTZmod		sing_1197.htm#SEC1273	30091
@@ -435,8 +435,8 @@ Getting started		sing_5.htm#SEC11
 Global orderings		sing_838.htm#SEC890	
 GoettscheF		sing_2373.htm#SEC2449	27881
 Graded commutative algebras	Graded commutative algebras (SCA)	sing_482.htm#SEC534	
-Grassmannian		sing_2513.htm#SEC2589	43898
-Grassmannian, abstract variety, Schubert calculus	Grassmannian	sing_2513.htm#IDX983	
+Grassmannian		sing_2515.htm#SEC2591	43898
+Grassmannian, abstract variety, Schubert calculus	Grassmannian	sing_2515.htm#IDX985	
 Greuel, Gert-Martin		sing_1.htm#IDX18	
 Groebner Bases	Computing Groebner and Standard Bases	sing_797.htm#SEC849	
 Groebner bases in G-algebras	Groebner bases in G-algebras	sing_479.htm#SEC523	
@@ -450,20 +450,20 @@ Groebner cover  		sing_910.htm#IDX441
 Groebner fan		sing_2052.htm#IDX793	
 Groebner walk		sing_1140.htm#IDX535	
 Groebner walk 		sing_1142.htm#IDX537	
-Groebner walk  		sing_2497.htm#IDX964	
-Groebner walk   		sing_2498.htm#IDX965	
+Groebner walk  		sing_2507.htm#IDX973	
+Groebner walk   		sing_2508.htm#IDX974	
 Groebnerwalk		sing_1136.htm#IDX531	
 Groebnerwalk 		sing_2432.htm#IDX958	
-Groebnerwalk  		sing_2496.htm#IDX963	
-Groebnerwalk   		sing_2500.htm#IDX968	
+Groebnerwalk  		sing_2506.htm#IDX972	
+Groebnerwalk   		sing_2549.htm#IDX1001	
 Gromov-Witten invariants		sing_1125.htm#IDX511	
 Gromov-Witten invariants 		sing_1131.htm#IDX520	
 Gromov-Witten invariants  		sing_1132.htm#IDX524	
-Gromov-Witten invariants, lines on hypersurfaces	linesHypersurface	sing_2538.htm#IDX995	
-Gromov-Witten invariants, multiple covers		sing_2537.htm#IDX994	
-Gromov-Witten invariants, rational curves on Calabi-Yau threefolds	sumofquotients	sing_2539.htm#IDX996	
-Gromov-Witten invariants, rational curves on Calabi-Yau threefolds 		sing_2540.htm#IDX997	
-Gromov-Witten invariants.		sing_2508.htm#IDX978	
+Gromov-Witten invariants, lines on hypersurfaces	linesHypersurface	sing_2540.htm#IDX997	
+Gromov-Witten invariants, multiple covers		sing_2539.htm#IDX996	
+Gromov-Witten invariants, rational curves on Calabi-Yau threefolds	sumofquotients	sing_2541.htm#IDX998	
+Gromov-Witten invariants, rational curves on Calabi-Yau threefolds 		sing_2542.htm#IDX999	
+Gromov-Witten invariants.		sing_2510.htm#IDX980	
 Gweights		sing_706.htm#SEC758	651
 H2basis		sing_1571.htm#SEC1647	3414
 HHnormalForm		sing_2305.htm#SEC2381	33972
@@ -497,13 +497,13 @@ ImageVariety		sing_1668.htm#SEC1744	15252
 Imap, option		sing_307.htm#IDX175	
 Implemented algorithms	Implemented algorithms	sing_33.htm#SEC47	
 Incl		sing_1334.htm#SEC1410	7621
-Index		sing_2569.htm#SEC2659	
+Index		sing_2574.htm#SEC2664	
 Info string		sing_52.htm#SEC89	
 InterDiv		sing_1402.htm#SEC1478	46142
 Interactive use		sing_13.htm#SEC19	
 Interrupting SINGULAR	Interrupting SINGULAR	sing_17.htm#SEC24	
 IntersectWithSub		sing_683.htm#SEC735	56289
-Intersection theory		sing_2508.htm#IDX974	
+Intersection theory		sing_2510.htm#IDX976	
 IntersectionMatrix		sing_1500.htm#SEC1576	29351
 Introduction		sing_2.htm#SEC4	
 Invariant Theory		sing_824.htm#SEC876	
@@ -523,6 +523,8 @@ JMarkedScheme		sing_1449.htm#SEC1525	60696
 Jacobi		sing_1871.htm#SEC1947	29843
 Jacobson form		sing_1826.htm#IDX777	
 Jacobson normal form		sing_1826.htm#IDX778	
+Janet basis		sing_2505.htm#IDX970	
+Janet division, Janet basis		sing_2504.htm#IDX969	
 JuReTopDim		sing_1344.htm#SEC1420	sprintf
 JuReZeroDim		sing_1345.htm#SEC1421	sprintf
 KScoef		sing_1564.htm#SEC1640	sprintf
@@ -551,7 +553,7 @@ Lexicographic Groebner bases, computation of	Groebner basis conversion	sing_799.
 Libraries	Writing procedures and libraries	sing_48.htm#SEC85	
 Libraries 		sing_789.htm#SEC841	
 Libraries in the SINGULAR Documentation	Libraries in the SINGULAR Documentation	sing_49.htm#SEC86	
-Library versioning	Notes for Singular users	sing_2560.htm#SEC2648	
+Library versioning	Notes for Singular users	sing_2565.htm#SEC2653	
 Lie algebra		sing_1352.htm#IDX578	
 Lie group		sing_1355.htm#IDX583	
 Lie group 		sing_1356.htm#IDX586	
@@ -568,7 +570,7 @@ Long coefficients		sing_791.htm#SEC843
 M, ordering		sing_841.htm#SEC893	
 MVComplex		sing_2321.htm#SEC2397	62126
 MacdonaldF		sing_2376.htm#SEC2452	12751
-Macintosh installation	Macintosh installation instructions	sing_2568.htm#SEC2658	
+Macintosh installation	Macintosh installation instructions	sing_2573.htm#SEC2663	
 Mathematical background	Mathematical background	sing_844.htm#SEC896	
 Mathematical background (plural)	Mathematical background (plural)	sing_477.htm#SEC517	
 Matrix orderings		sing_841.htm#SEC893	
@@ -577,7 +579,7 @@ Maximus		sing_1444.htm#SEC1520	10010
 Maxord		sing_1385.htm#SEC1461	14124
 MillerRabin		sing_1881.htm#SEC1957	15740
 Milnor number	Milnor and Tjurina number	sing_815.htm#SEC867	
-Milnor number 		sing_2506.htm#IDX972	
+Milnor number 		sing_2499.htm#IDX965	
 Min		sing_1581.htm#SEC1657	29622
 MinMult		sing_2296.htm#SEC2372	39835
 MinimalDecomposition	MinimalDecomposition	sing_1675.htm#SEC1751	24161
@@ -591,7 +593,7 @@ Modules and and their annihilator	Modules and their annihilator	sing_10.htm#SEC1
 Monodromy		sing_1566.htm#IDX750	
 Monomial orderings		sing_835.htm#SEC887	
 Monomial orderings, Term orderings		sing_31.htm#SEC44	
-Morse lemma		sing_2505.htm#IDX970	
+Morse lemma		sing_2498.htm#IDX963	
 MultiplicitySequence	MultiplicitySequence	sing_1498.htm#SEC1574	1309
 NF		sing_326.htm#SEC366	
 NF 		sing_469.htm#SEC509	
@@ -603,12 +605,12 @@ NTL		sing_1.htm#IDX4
 Names		sing_37.htm#SEC65	
 Names in procedures		sing_46.htm#SEC83	
 Names, indexed		sing_37.htm#SEC65	
-New libraries depending on Singular 4	Notes for Singular users	sing_2560.htm#SEC2646	
-New orderings for modules	Notes for Singular users	sing_2560.htm#SEC2649	
+New libraries depending on Singular 4	Notes for Singular users	sing_2565.htm#SEC2651	
+New orderings for modules	Notes for Singular users	sing_2565.htm#SEC2654	
 Newton non-degenerate		sing_1553.htm#IDX748	
 Newton polygon		sing_1552.htm#IDX747	
 Newton polygon 		sing_1553.htm#IDX749	
-Newton polygons		sing_2547.htm#IDX1000	
+Newton polygons		sing_2552.htm#IDX1004	
 Newton polytope		sing_2052.htm#IDX792	
 NoetherPosition		sing_1211.htm#SEC1287	18735
 Non-commutative LIBs	Non-commutative libraries	sing_489.htm#SEC541	
@@ -619,8 +621,8 @@ Non-commutative subsystem	Non-commutative subsystem	sing_412.htm#SEC452
 Nonhyp		sing_1374.htm#SEC1450	sprintf
 Normal form		sing_845.htm#IDX415	
 Normalization		sing_811.htm#SEC863	
-Notes for Singular users	Notes for Singular users	sing_2560.htm#SEC2643	
-Notes for developers	Notes for developers	sing_2561.htm#SEC2651	
+Notes for Singular users	Notes for Singular users	sing_2565.htm#SEC2648	
+Notes for developers	Notes for developers	sing_2566.htm#SEC2656	
 NullCone		sing_1676.htm#SEC1752	64635
 NumIrrDecom		sing_1348.htm#SEC1424	sprintf
 NumLocalDim		sing_1337.htm#SEC1413	1739
@@ -650,7 +652,7 @@ Parametrization		sing_1357.htm#IDX590
 Parametrization, image.		sing_1367.htm#IDX602	
 PartC		sing_2286.htm#SEC2362	54120
 PartitionVar		sing_2366.htm#SEC2442	41350
-Path names	Notes for Singular users	sing_2560.htm#SEC2647	
+Path names	Notes for Singular users	sing_2565.htm#SEC2652	
 PerfectPowerTest		sing_1844.htm#SEC1920	17450
 Perturbation walk		sing_1141.htm#IDX536	
 Pfister, Gerhard		sing_1.htm#IDX19	
@@ -705,7 +707,7 @@ ReJunkUseHomo		sing_1343.htm#SEC1419	10186
 ReesAlgebra		sing_1310.htm#SEC1386	59951
 References		sing_869.htm#SEC943	
 References (plural)		sing_481.htm#SEC531	
-Release Notes		sing_2556.htm#SEC2632	
+Release Notes		sing_2561.htm#SEC2637	
 ResTree		sing_1403.htm#SEC1479	58727
 Resolution		sing_11.htm#SEC17	
 Resolution of singularities	Resolution of singularities	sing_823.htm#SEC875	
@@ -715,7 +717,7 @@ ReynoldsOperator		sing_1678.htm#SEC1754	14986
 RiemannRochBN		sing_2231.htm#SEC2307	20085
 RiemannRochHess		sing_2431.htm#SEC2507	sprintf
 Right Groebner bases and syzygies	Right Groebner bases and syzygies	sing_829.htm#SEC881	
-Ring-dependent options	Notes for Singular users	sing_2560.htm#SEC2645	
+Ring-dependent options	Notes for Singular users	sing_2565.htm#SEC2650	
 Rings and orderings		sing_28.htm#SEC39	
 Rings and standard bases	Rings and standard bases	sing_7.htm#SEC13	
 Running SINGULAR under Emacs	Running SINGULAR under Emacs	sing_23.htm#SEC30	
@@ -740,8 +742,8 @@ Sch@"onemann, Hans		sing_1.htm#IDX20
 Schoof		sing_1895.htm#SEC1971	49281
 Schreyer ordering		sing_1006.htm#IDX492	
 Schreyer resolution		sing_1006.htm#IDX493	
-Schubert calculus		sing_2508.htm#IDX976	
-SchubertClass		sing_2545.htm#SEC2621	62336
+Schubert calculus		sing_2510.htm#IDX978	
+SchubertClass		sing_2547.htm#SEC2623	62336
 SchurCh		sing_2283.htm#SEC2359	58575
 SchurS		sing_2282.htm#SEC2358	46004
 Scontinue		sing_1010.htm#SEC1086	11534
@@ -751,7 +753,7 @@ Setting up a G-algebra		sing_478.htm#SEC522
 ShanksMestre		sing_1894.htm#SEC1970	12973
 SimplifyIdeal		sing_1679.htm#SEC1755	sprintf
 Singular		sing_350.htm#IDX255	
-Singular 3 and Singular 4	Singular 3 and Singular 4	sing_2558.htm#SEC2641	
+Singular 3 and Singular 4	Singular 3 and Singular 4	sing_2563.htm#SEC2646	
 Singular, customization of Emacs user interface	Customization of the Emacs interface	sing_25.htm#SEC36	
 Singular, demo mode		sing_24.htm#SEC35	
 Singular, editing input files with Emacs	Editing SINGULAR input files with Emacs	sing_26.htm#SEC37	
@@ -769,7 +771,7 @@ Solving systems of polynomial equations	Solving systems of polynomial equations	
 Source code debugger, invocation	Command line options	sing_19.htm#IDX33	
 Space curve singularities, branches of	Branches of space curve singularities	sing_821.htm#SEC873	
 Special characters		sing_36.htm#SEC64	
-Splitting lemma		sing_2505.htm#IDX971	
+Splitting lemma		sing_2498.htm#IDX964	
 Sres		sing_1008.htm#SEC1084	60186
 Ssi file links		sing_114.htm#SEC154	
 Ssi links		sing_113.htm#SEC153	
@@ -805,7 +807,7 @@ TestJMark		sing_1446.htm#SEC1522	41314
 The SINGULAR language	The SINGULAR language	sing_34.htm#SEC56	
 The Tran algorithm		sing_1138.htm#IDX533	
 The fractal walk algorithm		sing_1137.htm#IDX532	
-The fractal walk algorithm 		sing_2499.htm#IDX966	
+The fractal walk algorithm 		sing_2509.htm#IDX975	
 The online help system	The online help system	sing_16.htm#SEC22	
 Tjurina		sing_1596.htm#SEC1672	11249
 Tjurina number	Milnor and Tjurina number	sing_815.htm#SEC867	
@@ -819,7 +821,7 @@ Type casting	Type conversion and casting	sing_39.htm#SEC69
 Type conversion	Type conversion and casting	sing_39.htm#SEC68	
 Typesetting of help and info strings	Typesetting of help and info strings	sing_61.htm#SEC98	
 U_D_O		sing_1078.htm#SEC1154	26192
-Unix installation	Unix installation instructions	sing_2566.htm#SEC2656	
+Unix installation	Unix installation instructions	sing_2571.htm#SEC2661	
 UpOneMatrix		sing_724.htm#SEC776	63020
 UpperMonomials		sing_1579.htm#SEC1655	20941
 UseBertini		sing_1340.htm#SEC1416	43362
@@ -835,8 +837,8 @@ V-filtration       		sing_1536.htm#IDX717
 V-filtration        		sing_1538.htm#IDX728	
 VarToPar		sing_2368.htm#SEC2444	10508
 Variables, indexed		sing_37.htm#SEC65	
-Version number	Version schema for Singular	sing_2559.htm#SEC2642	
-Version schema for Singular	Version schema for Singular	sing_2559.htm#SEC2642	
+Version number	Version schema for Singular	sing_2564.htm#SEC2647	
+Version schema for Singular	Version schema for Singular	sing_2564.htm#SEC2647	
 Version string		sing_50.htm#SEC87	
 Visualization		sing_1746.htm#SEC1822	
 WLemma		sing_920.htm#SEC996	3921
@@ -851,7 +853,7 @@ Weyl closure		sing_760.htm#IDX383
 WeylClosure		sing_762.htm#SEC814	23845
 WeylClosure1		sing_763.htm#SEC815	15759
 Wibmer's Lemma		sing_920.htm#IDX473	
-Windows installation	Windows installation instructions	sing_2567.htm#SEC2657	
+Windows installation	Windows installation instructions	sing_2572.htm#SEC2662	
 WitSet		sing_1347.htm#SEC1423	39803
 WitSupSet		sing_1346.htm#SEC1422	47758
 Ws, local ordering		sing_839.htm#IDX410	
@@ -883,13 +885,13 @@ absValue		sing_882.htm#SEC958	54595
 absfact.lib		sing_1090.htm#SEC1166	
 absfact_lib		sing_1090.htm#SEC1166	
 absolute factorization.		sing_1090.htm#IDX504	
-abstract variety, projective space, Grassmannian	printVariety	sing_2509.htm#IDX979	
-abstract variety, projective space, Grassmannian 		sing_2510.htm#IDX980	
+abstract variety, projective space, Grassmannian	printVariety	sing_2511.htm#IDX981	
+abstract variety, projective space, Grassmannian 		sing_2512.htm#IDX982	
 abstractR		sing_1429.htm#SEC1505	22284
 actionIsProper		sing_1659.htm#SEC1735	52474
 addNvarsTo		sing_1005.htm#SEC1081	63123
 addRat		sing_781.htm#SEC833	4768
-addSheaf		sing_2528.htm#SEC2604	27062
+addSheaf		sing_2530.htm#SEC2606	27062
 addcol		sing_1047.htm#SEC1123	52204
 addcores		sing_974.htm#SEC1050	41254
 addrow		sing_1048.htm#SEC1124	47055
@@ -1080,6 +1082,7 @@ boolean_poly		sing_2214.htm#SEC2290	41652
 boolean_poly_ring		sing_2212.htm#SEC2288	sprintf
 boolean_set		sing_2218.htm#SEC2294	58235
 boolean_std		sing_2211.htm#SEC2287	5921
+borderBasis		sing_2502.htm#SEC2578	33172
 boundBuFou		sing_1979.htm#SEC2055	26589
 boundDes		sing_1981.htm#SEC2057	35149
 boundaryLatticePoints	boundaryLatticePoints	sing_2070.htm#SEC2146	6238
@@ -1121,7 +1124,7 @@ cantormult		sing_1938.htm#SEC2014	57569
 cantorred		sing_1936.htm#SEC2012	46502
 cardGroup		sing_1113.htm#SEC1189	5553
 case	No case or switch statement	sing_404.htm#SEC444	
-cccMatrixToPositiveIntvec	cccMatrixToPositiveIntvec	sing_2551.htm#SEC2627	55393
+cccMatrixToPositiveIntvec	cccMatrixToPositiveIntvec	sing_2556.htm#SEC2632	55393
 cdd		sing_1.htm#IDX10	
 cddlib		sing_1.htm#IDX11	
 center		sing_511.htm#IDX320	65108
@@ -1178,7 +1181,7 @@ changeDenominator		sing_1237.htm#SEC1313	21094
 changechar		sing_979.htm#SEC1055	65454
 changeord		sing_980.htm#SEC1056	55156
 changeordTo		sing_1003.htm#SEC1079	41903
-changes		sing_2557.htm#SEC2633	
+changes		sing_2562.htm#SEC2638	
 changevar		sing_981.htm#SEC1057	32829
 char		sing_207.htm#SEC247	
 charInfo		sing_572.htm#SEC624	11034
@@ -1311,8 +1314,8 @@ continue	Behavior of continue	sing_373.htm#SEC413
 continue 		sing_407.htm#SEC447	
 contraHom		sing_754.htm#SEC806	24706
 contract		sing_215.htm#SEC255	
-contribution bundle, graph, multiple cover, rational curve,	contributionBundle	sing_2535.htm#IDX992	
-contributionBundle		sing_2535.htm#SEC2611	32874
+contribution bundle, graph, multiple cover, rational curve,	contributionBundle	sing_2537.htm#IDX994	
+contributionBundle		sing_2537.htm#SEC2613	32874
 contributors		sing_350.htm#IDX200	
 control		sing_1811.htm#SEC1887	44498
 control.lib		sing_1810.htm#SEC1886	
@@ -1444,7 +1447,7 @@ desingularization 		sing_2394.htm#SEC2470
 det		sing_223.htm#SEC263	
 det_B		sing_1073.htm#SEC1149	60143
 detadj		sing_1567.htm#SEC1643	5914
-determinacy		sing_2507.htm#SEC2583	44818
+determinacy		sing_2500.htm#SEC2576	44818
 determinecenter		sing_1372.htm#SEC1448	44496
 detropicalise		sing_2142.htm#SEC2218	38025
 develop		sing_1541.htm#SEC1617	48457
@@ -1459,10 +1462,10 @@ dim (plural)		sing_449.htm#SEC489
 dimGradedPart		sing_1440.htm#SEC1516	11262
 dimH		sing_1439.htm#SEC1515	38534
 dimMon		sing_1188.htm#SEC1264	39971
-dimStack		sing_2533.htm#SEC2609	47772
+dimStack		sing_2535.htm#SEC2611	47772
 dim_slocus		sing_1585.htm#SEC1661	47218
 dimension		sing_2009.htm#SEC2085	35262
-dimension, moduli space of stable maps, rational curves	dimStack	sing_2533.htm#IDX990	
+dimension, moduli space of stable maps, rational curves	dimStack	sing_2535.htm#IDX992	
 dimensionOfLocalization	dimensionOfLocalization	sing_2381.htm#SEC2457	25632
 direct_boolean_poly		sing_2215.htm#SEC2291	49893
 direct_from_boolean_poly	direct_from_boolean_poly	sing_2221.htm#SEC2297	36941
@@ -1528,18 +1531,18 @@ dmodvar.lib		sing_588.htm#SEC640
 dmodvar_lib		sing_588.htm#SEC640	
 double		sing_1937.htm#SEC2013	34697
 doubleExt		sing_746.htm#SEC798	56896
-downloading	Download instructions	sing_2565.htm#SEC2655	
+downloading	Download instructions	sing_2570.htm#SEC2660	
 dp, global ordering		sing_838.htm#IDX392	
-drawNewtonSubdivision	drawNewtonSubdivision	sing_2120.htm#SEC2196	61060
-drawTropicalCurve		sing_2119.htm#SEC2195	27590
+drawNewtonSubdivision	drawNewtonSubdivision	sing_2120.htm#SEC2196	50904
+drawTropicalCurve		sing_2119.htm#SEC2195	10441
 ds, local ordering		sing_839.htm#IDX402	
 dsum		sing_1034.htm#SEC1110	1303
 dualCone		sing_2010.htm#SEC2086	61460
 dualConic		sing_2144.htm#SEC2220	31080
 dualPart		sing_2285.htm#SEC2361	13279
-dualPartition		sing_2546.htm#SEC2622	24739
+dualPartition		sing_2548.htm#SEC2624	24739
 dualPolytope		sing_2049.htm#SEC2125	32081
-dualSheaf		sing_2524.htm#SEC2600	633
+dualSheaf		sing_2526.htm#SEC2602	633
 dual_code		sing_1786.htm#SEC1862	57229
 dump		sing_227.htm#SEC267	
 dynamic geometry		sing_913.htm#IDX452	
@@ -1645,7 +1648,7 @@ exponents		sing_2189.htm#IDX862
 export		sing_375.htm#SEC415	
 exportNuminvs		sing_1251.htm#SEC1327	10423
 exportto		sing_376.htm#SEC416	
-expp		sing_2544.htm#SEC2620	15751
+expp		sing_2546.htm#SEC2622	15751
 expression list		sing_72.htm#IDX128	
 expression list 		sing_414.htm#IDX297	
 ext-module	purityfiltration_lib	sing_738.htm#IDX366	
@@ -1740,8 +1743,8 @@ finvar_lib		sing_1619.htm#SEC1695
 first index is 1		sing_409.htm#SEC449	
 firstoct		sing_1745.htm#SEC1821	11498
 fitting		sing_1150.htm#SEC1226	20661
-fixed points, moduli space of stable maps, graph	fixedPoints	sing_2534.htm#IDX991	
-fixedPoints		sing_2534.htm#SEC2610	25366
+fixed points, moduli space of stable maps, graph	fixedPoints	sing_2536.htm#IDX993	
+fixedPoints		sing_2536.htm#SEC2612	25366
 fl2poly		sing_582.htm#SEC634	51682
 flatten		sing_1035.htm#SEC1111	55617
 flatteningStrat		sing_1151.htm#SEC1227	15622
@@ -1754,7 +1757,7 @@ fouriersystem		sing_2365.htm#SEC2441	43681
 fpadim.lib		sing_593.htm#SEC645	
 fpadim_lib		sing_593.htm#SEC645	
 fprintf		sing_244.htm#SEC284	13662
-frandwalk		sing_2499.htm#SEC2575	25555
+frandwalk		sing_2509.htm#SEC2585	25555
 free		sing_2188.htm#IDX859	
 free 		sing_2189.htm#IDX861	
 free associative algebra, tensor algebra	Free associative algebras	sing_484.htm#SEC536	
@@ -1873,8 +1876,8 @@ gradedModules_lib		sing_2395.htm#SEC2471
 gradiator		sing_2484.htm#SEC2560	53802
 graph		sing_1126.htm#IDX516	
 graph 		sing_1127.htm#IDX517	
-graph  		sing_2529.htm#IDX986	
-graph   		sing_2530.htm#IDX987	
+graph  		sing_2531.htm#IDX988	
+graph   		sing_2532.htm#IDX989	
 graphics.lib		sing_1747.htm#SEC1823	
 graphics_lib		sing_1747.htm#SEC1823	
 graphviz		sing_1.htm#IDX13	
@@ -1965,8 +1968,8 @@ holonomic rank		sing_760.htm#IDX378
 holonomicRank		sing_764.htm#SEC816	41306
 hom_kernel		sing_1158.htm#SEC1234	32604
 homog		sing_254.htm#SEC294	
-homog_part		sing_2541.htm#SEC2617	20875
-homog_parts		sing_2542.htm#SEC2618	12854
+homog_part		sing_2543.htm#SEC2619	20875
+homog_parts		sing_2544.htm#SEC2620	12854
 homogeneitySpace		sing_2151.htm#SEC2227	48243
 homogfacFirstQWeyl		sing_693.htm#SEC745	32751
 homogfacFirstQWeyl_all	homogfacFirstQWeyl_all	sing_695.htm#SEC747	9014
@@ -1975,10 +1978,10 @@ homogfacNthQWeyl_all	homogfacNthQWeyl_all	sing_694.htm#SEC746	62161
 homolog.lib		sing_1143.htm#SEC1219	
 homolog_lib		sing_1143.htm#SEC1219	
 homology		sing_1153.htm#SEC1229	15040
-howto, download	Download instructions	sing_2565.htm#SEC2655	
-howto, install on Macintosh	Macintosh installation instructions	sing_2568.htm#SEC2658	
-howto, install on Unix	Unix installation instructions	sing_2566.htm#SEC2656	
-howto, install on Windows	Windows installation instructions	sing_2567.htm#SEC2657	
+howto, download	Download instructions	sing_2570.htm#SEC2660	
+howto, install on Macintosh	Macintosh installation instructions	sing_2573.htm#SEC2663	
+howto, install on Unix	Unix installation instructions	sing_2571.htm#SEC2661	
+howto, install on Windows	Windows installation instructions	sing_2572.htm#SEC2662	
 hres		sing_255.htm#SEC295	
 html, default help	The online help system	sing_16.htm#IDX24	
 hyperel.lib		sing_1926.htm#SEC2002	
@@ -2042,10 +2045,10 @@ insert		sing_121.htm#SEC161
 insert 		sing_259.htm#SEC299	
 insertCone		sing_2042.htm#SEC2118	13858
 insertGenerator		sing_583.htm#SEC635	13951
-instructions, Macintosh installation	Macintosh installation instructions	sing_2568.htm#SEC2658	
-instructions, Unix installation	Unix installation instructions	sing_2566.htm#SEC2656	
-instructions, Windows installation	Windows installation instructions	sing_2567.htm#SEC2657	
-instructions, downloading	Download instructions	sing_2565.htm#SEC2655	
+instructions, Macintosh installation	Macintosh installation instructions	sing_2573.htm#SEC2663	
+instructions, Unix installation	Unix installation instructions	sing_2571.htm#SEC2661	
+instructions, Windows installation	Windows installation instructions	sing_2572.htm#SEC2662	
+instructions, downloading	Download instructions	sing_2570.htm#SEC2660	
 int		sing_90.htm#SEC130	
 int declarations		sing_91.htm#SEC131	
 int expressions		sing_92.htm#SEC132	
@@ -2061,7 +2064,7 @@ intclMonIdeal		sing_1244.htm#SEC1320	22338
 intclToricRing		sing_1240.htm#SEC1316	62143
 integer division	Miscellaneous oddities	sing_410.htm#IDX286	
 integer programming		sing_859.htm#SEC916	
-integral		sing_2516.htm#SEC2592	62683
+integral		sing_2518.htm#SEC2594	62683
 integral basis		sing_1165.htm#IDX538	
 integral basis 		sing_1358.htm#IDX594	
 integral closure		sing_1224.htm#IDX551	
@@ -2313,7 +2316,7 @@ letterplace correspondence	Letterplace correspondence	sing_486.htm#SEC538
 lex_solve		sing_1713.htm#SEC1789	48692
 lexicographical ordering		sing_838.htm#IDX388	
 lib2doc		sing_60.htm#SEC97	
-libSingular		sing_2564.htm#SEC2654	
+libSingular		sing_2569.htm#SEC2659	
 libcdd		sing_1.htm#IDX12	
 libfac		sing_1.htm#IDX6	
 libparse		sing_69.htm#SEC109	
@@ -2351,7 +2354,7 @@ linearMapKernel		sing_525.htm#SEC577	43761
 linear_relations		sing_1055.htm#SEC1131	45983
 linearlyEquivalent		sing_2331.htm#SEC2407	28351
 linearpart		sing_1699.htm#SEC1775	2162
-linesHypersurface		sing_2538.htm#SEC2614	9129
+linesHypersurface		sing_2540.htm#SEC2616	9129
 link	Parallelization with ssi links	sing_108.htm#SEC148	
 link 		sing_795.htm#SEC847	
 link declarations		sing_109.htm#SEC149	
@@ -2397,7 +2400,7 @@ locusdg		sing_914.htm#SEC990	62891
 locusto		sing_916.htm#SEC992	17047
 log2		sing_1843.htm#SEC1919	40703
 logarithmic annihilator ideal		sing_532.htm#IDX332	
-logg		sing_2543.htm#SEC2619	38736
+logg		sing_2545.htm#SEC2621	38736
 lp, global ordering		sing_838.htm#IDX387	
 lp2iv		sing_621.htm#SEC673	26909
 lp2ivId		sing_622.htm#SEC674	15628
@@ -2432,7 +2435,7 @@ magnitude		sing_1837.htm#SEC1913	37967
 makeDivisor		sing_2323.htm#SEC2399	3414
 makeFormalDivisor		sing_2333.htm#SEC2409	54579
 makeGraph		sing_1126.htm#SEC1202	21758
-makeGraphVE		sing_2529.htm#SEC2605	sprintf
+makeGraphVE		sing_2531.htm#SEC2607	sprintf
 makeHeisenberg		sing_711.htm#SEC763	2050
 makeLetterplaceRing		sing_625.htm#SEC677	41789
 makeMalgrange		sing_592.htm#SEC644	41377
@@ -2441,7 +2444,7 @@ makePDivisor		sing_2339.htm#SEC2415	45273
 makeQsl2		sing_675.htm#SEC727	3997
 makeQsl3		sing_676.htm#SEC728	41249
 makeQso3		sing_674.htm#SEC726	58910
-makeSheaf		sing_2517.htm#SEC2593	10497
+makeSheaf		sing_2519.htm#SEC2595	10497
 makeUe6		sing_671.htm#SEC723	58585
 makeUe7		sing_672.htm#SEC724	61849
 makeUe8		sing_673.htm#SEC725	64987
@@ -2463,7 +2466,7 @@ makeUsp2		sing_665.htm#SEC717	18017
 makeUsp3		sing_666.htm#SEC718	57445
 makeUsp4		sing_667.htm#SEC719	51690
 makeUsp5		sing_668.htm#SEC720	35951
-makeVariety		sing_2509.htm#SEC2585	23915
+makeVariety		sing_2511.htm#SEC2587	23915
 makeWeyl		sing_710.htm#SEC762	8554
 map		sing_123.htm#SEC163	
 map (plural)		sing_420.htm#SEC460	
@@ -2530,7 +2533,7 @@ merkle_hellman_encryption	merkle_hellman_encryption	sing_1916.htm#SEC1992	13645
 midpoint		sing_2359.htm#SEC2435	29391
 milnor		sing_1592.htm#SEC1668	23173
 milnorcode		sing_1476.htm#SEC1552	13849
-milnornumber		sing_2506.htm#SEC2582	21855
+milnornumber		sing_2499.htm#SEC2575	21855
 min		sing_287.htm#SEC327	56342
 minAssChar		sing_1278.htm#SEC1354	18758
 minAssCharE		sing_1279.htm#SEC1355	31570
@@ -2570,7 +2573,9 @@ mod 		sing_93.htm#SEC133
 mod  		sing_142.htm#SEC182	
 mod2id		sing_954.htm#SEC1030	27927
 mod2str		sing_635.htm#SEC687	35236
+modBorder		sing_2503.htm#SEC2579	19224
 modDec		sing_1195.htm#SEC1271	48578
+modJanet		sing_2505.htm#SEC2581	8550
 modNPos		sing_1218.htm#SEC1294	17130
 modNormal		sing_1171.htm#SEC1247	39654
 modNpos_test		sing_1216.htm#SEC1292	34326
@@ -2610,7 +2615,7 @@ module ordering c		sing_840.htm#IDX414
 module related functions	module related functions	sing_138.htm#SEC178	
 module related functions (plural)	module related functions (plural)	sing_429.htm#SEC469	
 module_containment		sing_1095.htm#SEC1171	31620
-moduliSpace		sing_2531.htm#SEC2607	37013
+moduliSpace		sing_2533.htm#SEC2609	37013
 modulo		sing_291.htm#SEC331	
 modulo (plural)		sing_460.htm#SEC500	
 moduloSlim		sing_718.htm#SEC770	52636
@@ -2686,7 +2691,7 @@ multidimensional_knapsack	multidimensional_knapsack	sing_1909.htm#SEC1985	15647
 multigrading, multidegree, multiweights, multigraded-homogeneous, integral linear algebra	multigrading_lib	sing_2437.htm#IDX961	
 multigrading.lib		sing_2437.htm#IDX959	
 multigrading_lib		sing_2437.htm#IDX960	
-multipleCover		sing_2537.htm#SEC2613	55988
+multipleCover		sing_2539.htm#SEC2615	55988
 multiplicities, sequence of		sing_1545.htm#IDX742	
 multiplicity		sing_2316.htm#IDX920	
 multiplicity sequence		sing_1458.htm#IDX621	
@@ -2724,7 +2729,7 @@ ncdetection		sing_646.htm#SEC698	24994
 ncfactor		sing_685.htm#SEC737	53809
 ncfactor.lib		sing_684.htm#SEC736	
 ncfactor_lib		sing_684.htm#SEC736	
-nchilb		sing_2490.htm#SEC2566	36922
+nchilb		sing_2490.htm#SEC2566	9026
 nchomolog.lib		sing_750.htm#IDX371	
 nchomolog_lib		sing_750.htm#IDX372	
 ncols		sing_300.htm#SEC340	
@@ -2743,11 +2748,11 @@ negativeformaldivisor	negativeformaldivisor	sing_2336.htm#SEC2412	55026
 net access	Command line options	sing_19.htm#IDX40	
 newTest		sing_1851.htm#SEC1927	36655
 newline		sing_166.htm#SEC206	
-news		sing_2557.htm#SEC2633	
+news		sing_2562.htm#SEC2638	
 newstruct		sing_177.htm#SEC217	
 newstruct 		sing_2210.htm#IDX894	
 newtonDiag		sing_958.htm#SEC1034	56652
-newtonPolygonNegSlopes	newtonPolygonNegSlopes	sing_2550.htm#SEC2626	22052
+newtonPolygonNegSlopes	newtonPolygonNegSlopes	sing_2555.htm#SEC2631	22052
 newtonPolytope		sing_2050.htm#SEC2126	56291
 newtonPolytopeLP		sing_2055.htm#SEC2131	36186
 newtonPolytopeP		sing_2054.htm#SEC2130	29927
@@ -2772,9 +2777,9 @@ none, option		sing_307.htm#IDX150
 norTest		sing_1234.htm#SEC1310	sprintf
 norm		sing_1930.htm#SEC2006	31143
 normal		sing_1224.htm#SEC1300	61073
-normal bundle, graph, rational curves, mutiple covers, lines on	normalBundle	sing_2536.htm#IDX993	
+normal bundle, graph, rational curves, mutiple covers, lines on	normalBundle	sing_2538.htm#IDX995	
 normal.lib		sing_1223.htm#SEC1299	
-normalBundle		sing_2536.htm#SEC2612	sprintf
+normalBundle		sing_2538.htm#SEC2614	sprintf
 normalC		sing_1226.htm#SEC1302	34842
 normalConductor		sing_1238.htm#SEC1314	26085
 normalFan		sing_2105.htm#SEC2181	39216
@@ -2862,6 +2867,8 @@ orbitparam.lib		sing_1351.htm#SEC1427
 orbitparam_lib		sing_1351.htm#SEC1427	
 ord		sing_308.htm#SEC348	
 ord_test		sing_989.htm#SEC1065	36532
+order ideal, border basis		sing_2502.htm#IDX967	
+order ideal, border basis 		sing_2503.htm#IDX968	
 orderings	General definitions for orderings	sing_837.htm#SEC889	
 orderings introduction	Introduction to orderings	sing_836.htm#SEC888	
 orderings, M		sing_841.htm#SEC893	
@@ -3053,13 +3060,13 @@ principal intersection		sing_497.htm#IDX317
 print		sing_316.htm#SEC356	
 print 		sing_2162.htm#IDX811	
 printGraph		sing_1127.htm#SEC1203	45041
-printGraphG		sing_2530.htm#SEC2606	48742
+printGraphG		sing_2532.htm#SEC2608	48742
 printGroup		sing_2445.htm#SEC2521	6791
 printMoebius		sing_2201.htm#SEC2277	45828
-printSheaf		sing_2518.htm#SEC2594	31762
-printStack		sing_2532.htm#SEC2608	3692
+printSheaf		sing_2520.htm#SEC2596	31762
+printStack		sing_2534.htm#SEC2610	3692
 printTask		sing_1019.htm#SEC1095	54549
-printVariety		sing_2510.htm#SEC2586	2846
+printVariety		sing_2512.htm#SEC2588	2846
 printf		sing_317.htm#SEC357	2294
 printlevel		sing_392.htm#SEC432	
 proc		sing_152.htm#SEC192	
@@ -3073,18 +3080,18 @@ procedures, static	Procedure definition	sing_43.htm#SEC78
 procs with different argument types	procs with different argument types	sing_155.htm#SEC195	
 prodcrit		sing_1948.htm#SEC2024	56231
 product		sing_892.htm#SEC968	54431
-product variety, abstract variety		sing_2511.htm#IDX981	
-productVariety		sing_2511.htm#SEC2587	54191
+product variety, abstract variety		sing_2513.htm#IDX983	
+productVariety		sing_2513.htm#SEC2589	54191
 productgroup		sing_2466.htm#SEC2542	55937
 progress watch		sing_307.htm#IDX163	
 projectLattice		sing_2458.htm#SEC2534	28463
-projective bundle, abstract variety, sheaf, enumeration of conics	projectiveBundle	sing_2515.htm#IDX985	
+projective bundle, abstract variety, sheaf, enumeration of conics	projectiveBundle	sing_2517.htm#IDX987	
 projective dimension	purityfiltration_lib	sing_738.htm#IDX368	
 projective limes		sing_32.htm#SEC46	
-projective space, abstract variety		sing_2514.htm#IDX984	
-projectiveBundle		sing_2515.htm#SEC2591	13791
+projective space, abstract variety		sing_2516.htm#IDX986	
+projectiveBundle		sing_2517.htm#SEC2593	13791
 projectiveDimension		sing_739.htm#SEC791	8165
-projectiveSpace		sing_2514.htm#SEC2590	21729
+projectiveSpace		sing_2516.htm#SEC2592	21729
 prompt		sing_15.htm#SEC21	
 prompt, option		sing_307.htm#IDX182	
 propagator		sing_1125.htm#IDX513	42460
@@ -3093,7 +3100,7 @@ prot, option		sing_307.htm#IDX161
 protocol of computations		sing_307.htm#IDX162	
 proximitymatrix		sing_1456.htm#SEC1532	58403
 prune		sing_318.htm#SEC358	
-prwalk		sing_2497.htm#SEC2573	46963
+prwalk		sing_2507.htm#SEC2583	46963
 psigncnd		sing_1744.htm#SEC1820	57734
 puiseux2generators		sing_1555.htm#SEC1631	64508
 puiseuxExpansion		sing_2116.htm#SEC2192	46277
@@ -3141,7 +3148,7 @@ quadraticSieve		sing_1886.htm#SEC1962	58557
 quantMat		sing_733.htm#SEC785	56227
 quickclass		sing_1478.htm#SEC1554	14018
 quit		sing_382.htm#SEC422	
-quotSheaf		sing_2527.htm#SEC2603	49619
+quotSheaf		sing_2529.htm#SEC2605	49619
 quote		sing_321.htm#SEC361	
 quotient		sing_322.htm#SEC362	
 quotient (plural)		sing_468.htm#SEC508	
@@ -3150,6 +3157,7 @@ quotientMain		sing_1736.htm#SEC1812	39870
 quotientMon		sing_1181.htm#SEC1257	57149
 quotients		sing_2386.htm#IDX951	
 rHRR		sing_2281.htm#SEC2357	20131
+rJanet		sing_2504.htm#SEC2580	30716
 rMacaulay		sing_925.htm#SEC1001	45499
 rad_con		sing_952.htm#SEC1028	21777
 radical		sing_1282.htm#SEC1358	1407
@@ -3175,7 +3183,7 @@ randomid		sing_962.htm#SEC1038	7815
 randommat		sing_963.htm#SEC1039	33569
 rank		sing_204.htm#IDX137	
 rank 		sing_324.htm#SEC364	
-rankSheaf		sing_2519.htm#SEC2595	11850
+rankSheaf		sing_2521.htm#SEC2597	11850
 ratSol		sing_768.htm#SEC820	62488
 ratgb.lib		sing_758.htm#IDX373	
 ratgb_lib		sing_758.htm#IDX374	
@@ -3185,7 +3193,7 @@ rational normal curve, projection. 		sing_1364.htm#IDX599
 rational normal curve, projection.  		sing_1365.htm#IDX600	
 rational solutions		sing_760.htm#IDX385	
 rational univariate projection		sing_1968.htm#IDX784	
-rationalCurve		sing_2539.htm#SEC2615	61201
+rationalCurve		sing_2541.htm#SEC2617	61201
 rationalPointConic		sing_1362.htm#SEC1438	9761
 ratstd		sing_759.htm#SEC811	61346
 rays		sing_2029.htm#SEC2105	44445
@@ -3198,14 +3206,14 @@ real		sing_28.htm#IDX74
 real roots, univariate polynomial		sing_1975.htm#IDX786	
 real roots, univariate projection		sing_1959.htm#IDX782	
 real roots,sign conditions		sing_1742.htm#IDX762	
-realclassify		sing_2504.htm#SEC2580	60279
-realclassify.lib		sing_2503.htm#SEC2579	
-realclassify_lib		sing_2503.htm#SEC2579	
+realclassify		sing_2497.htm#SEC2573	60279
+realclassify.lib		sing_2496.htm#SEC2572	
+realclassify_lib		sing_2496.htm#SEC2572	
 realizationDim		sing_2110.htm#SEC2186	37756
 realizationDimPoly		sing_2112.htm#SEC2188	3611
 realizationMatroids.lib	realizationMatroids_lib	sing_2109.htm#SEC2185	
 realizationMatroids_lib	realizationMatroids_lib	sing_2109.htm#SEC2185	
-realmorsesplit		sing_2505.htm#SEC2581	16318
+realmorsesplit		sing_2498.htm#SEC2574	16318
 realpoly		sing_1306.htm#SEC1382	9453
 realrad		sing_1308.htm#SEC1384	43381
 realrad.lib		sing_1305.htm#SEC1381	
@@ -3351,13 +3359,15 @@ rowShift		sing_204.htm#IDX141
 rowShift 		sing_206.htm#SEC246	
 rowred		sing_1053.htm#SEC1129	63416
 rp, global ordering		sing_838.htm#IDX389	
-rswalk		sing_2502.htm#SEC2578	50903
+rstandard.lib		sing_2501.htm#SEC2577	
+rstandard_lib		sing_2501.htm#SEC2577	
+rswalk		sing_2551.htm#SEC2627	50903
 rtimer		sing_396.htm#SEC436	
 rvalue	No rvalue of increments and assignments	sing_402.htm#SEC442	
 rvar		sing_334.htm#SEC374	
-rwalk		sing_2498.htm#SEC2574	42525
-rwalk.lib		sing_2496.htm#SEC2572	
-rwalk_lib		sing_2496.htm#SEC2572	
+rwalk		sing_2508.htm#SEC2584	42525
+rwalk.lib		sing_2506.htm#SEC2582	
+rwalk_lib		sing_2506.htm#SEC2582	
 s_res		sing_1007.htm#SEC1083	47429
 sa_poly_reduce		sing_520.htm#SEC572	60856
 sa_reduce		sing_519.htm#SEC571	55799
@@ -3380,8 +3390,8 @@ scalarProd		sing_509.htm#SEC561	54488
 scheme		sing_2351.htm#SEC2427	15722
 schreyer.lib		sing_1006.htm#SEC1082	
 schreyer_lib		sing_1006.htm#SEC1082	
-schubert.lib		sing_2508.htm#SEC2584	
-schubert_lib		sing_2508.htm#SEC2584	
+schubert.lib		sing_2510.htm#SEC2586	
+schubert_lib		sing_2510.htm#SEC2586	
 sdb, source code debugger	Source code debugger	sing_66.htm#SEC103	
 second degree		sing_919.htm#IDX471	
 secondary fan		sing_2052.htm#IDX789	
@@ -3421,7 +3431,7 @@ setNmzDataPath		sing_1259.htm#SEC1335	18123
 setNmzExecPath		sing_1255.htm#SEC1331	38993
 setNmzFilename		sing_1258.htm#SEC1334	20206
 setNmzOption		sing_1252.htm#SEC1328	9012
-setUniformizingParameter	setUniformizingParameter	sing_2548.htm#SEC2624	63635
+setUniformizingParameter	setUniformizingParameter	sing_2553.htm#SEC2629	63635
 set_is_injective		sing_1922.htm#SEC1998	8429
 setcores		sing_975.htm#SEC1051	49704
 setenv		sing_350.htm#IDX250	
@@ -3450,7 +3460,7 @@ showNuminvs		sing_1250.htm#SEC1326	18934
 showgrades		sing_743.htm#SEC795	48081
 showrecursive		sing_927.htm#SEC1003	6127
 sickle		sing_616.htm#SEC668	17166
-signal handler		sing_2564.htm#SEC2654	
+signal handler		sing_2569.htm#SEC2659	
 signatureBrieskorn		sing_1615.htm#SEC1691	26283
 signatureL		sing_2206.htm#SEC2282	65493
 signatureLqf		sing_2207.htm#SEC2283	18811
@@ -3570,8 +3580,8 @@ squareRoot		sing_1876.htm#SEC1952	17446
 squarefree		sing_1557.htm#SEC1633	48485
 sres		sing_344.htm#SEC384	
 ssi	Parallelization with ssi links	sing_795.htm#SEC847	
-stack, moduli space of stable maps		sing_2532.htm#IDX989	
-stack, moduli space of stable maps, rational curves	moduliSpace	sing_2531.htm#IDX988	
+stack, moduli space of stable maps		sing_2534.htm#IDX991	
+stack, moduli space of stable maps, rational curves	moduliSpace	sing_2533.htm#IDX990	
 staircase		sing_1748.htm#SEC1824	49781
 standard		sing_1952.htm#SEC2028	14067
 standard bases.		sing_2203.htm#IDX883	
@@ -3616,7 +3626,7 @@ sugarCrit, option		sing_307.htm#IDX169
 sum		sing_894.htm#SEC970	555
 sum_of_powers		sing_2240.htm#SEC2316	12170
 sumlist		sing_1396.htm#SEC1472	59918
-sumofquotients		sing_2540.htm#SEC2616	4569
+sumofquotients		sing_2542.htm#SEC2618	4569
 super-commutative algebras	Graded commutative algebras (SCA)	sing_482.htm#SEC534	
 superCommutative		sing_714.htm#SEC766	45528
 super_increasing_knapsack	super_increasing_knapsack	sing_1918.htm#SEC1994	9177
@@ -3630,13 +3640,13 @@ surfex		sing_1.htm#IDX7
 surfex.lib		sing_1768.htm#SEC1844	
 surfex_lib		sing_1768.htm#SEC1844	
 suspend		sing_345.htm#SEC385	
-swalk		sing_2501.htm#SEC2577	16794
-swalk.lib		sing_2500.htm#SEC2576	
-swalk_lib		sing_2500.htm#SEC2576	
+swalk		sing_2550.htm#SEC2626	16794
+swalk.lib		sing_2549.htm#SEC2625	
+swalk_lib		sing_2549.htm#SEC2625	
 swap		sing_1483.htm#SEC1559	15408
 swap 		sing_2165.htm#IDX819	
 switch	No case or switch statement	sing_404.htm#SEC444	
-switchRingsAndComputeInitialIdeal	switchRingsAndComputeInitialIdeal	sing_2553.htm#SEC2629	1827
+switchRingsAndComputeInitialIdeal	switchRingsAndComputeInitialIdeal	sing_2558.htm#SEC2634	1827
 syModStd		sing_1328.htm#SEC1404	50246
 symNsym		sing_2234.htm#SEC2310	55230
 sym_gauss		sing_1067.htm#SEC1143	5121
@@ -3647,7 +3657,7 @@ symmetric basis		sing_1059.htm#IDX498
 symmetric power		sing_1061.htm#IDX500	
 symmetricBasis		sing_1059.htm#SEC1135	sprintf
 symmetricPower		sing_1061.htm#SEC1137	6542
-symmetricPowerSheaf		sing_2526.htm#SEC2602	56922
+symmetricPowerSheaf		sing_2528.htm#SEC2604	56922
 symmfunc		sing_1972.htm#SEC2048	45575
 symodstd.lib		sing_1322.htm#SEC1398	
 symodstd_lib		sing_1322.htm#SEC1398	
@@ -3754,7 +3764,7 @@ template_lib 		sing_55.htm#IDX121
 tensor		sing_490.htm#IDX309	65451
 tensor 		sing_1043.htm#SEC1119	
 tensorMod		sing_1162.htm#SEC1238	21961
-tensorSheaf		sing_2525.htm#SEC2601	24072
+tensorSheaf		sing_2527.htm#SEC2603	24072
 term orderings	General definitions for orderings	sing_837.htm#SEC889	
 term orderings introduction	Introduction to orderings	sing_836.htm#SEC888	
 testNCfac		sing_688.htm#SEC740	60394
@@ -3792,7 +3802,7 @@ todd		sing_2266.htm#SEC2342	25618
 toddE		sing_2267.htm#SEC2343	17823
 toddPoly		sing_2280.htm#SEC2356	65066
 tolessvars		sing_1700.htm#SEC1776	56590
-topChernClass		sing_2522.htm#SEC2598	17374
+topChernClass		sing_2524.htm#SEC2600	17374
 topological invariants		sing_1451.htm#IDX615	
 topological invariants 		sing_1458.htm#IDX622	
 topological invariants  		sing_1459.htm#IDX626	
@@ -3807,8 +3817,8 @@ toric_std		sing_1331.htm#SEC1407	26141
 torusInvariants		sing_1245.htm#SEC1321	911
 total divisors		sing_490.htm#IDX306	
 total multiplicities		sing_1451.htm#IDX618	
-totalChernClass		sing_2520.htm#SEC2596	6153
-totalSegreClass		sing_2523.htm#SEC2599	3291
+totalChernClass		sing_2522.htm#SEC2598	6153
+totalSegreClass		sing_2525.htm#SEC2601	3291
 totalmultiplicities		sing_1453.htm#SEC1529	58264
 trace		sing_352.htm#SEC392	
 tracemult		sing_1966.htm#SEC2042	58303
@@ -3829,21 +3839,21 @@ triang_solve		sing_1718.htm#SEC1794	64404
 triangulations		sing_2058.htm#SEC2134	61888
 tropical curves		sing_2113.htm#IDX796	
 tropical geometry		sing_1125.htm#IDX508	
-tropical geometry 		sing_2547.htm#IDX998	
+tropical geometry 		sing_2552.htm#IDX1002	
 tropical mirror symmetry		sing_1125.htm#IDX510	
 tropical polynomials		sing_2113.htm#IDX797	
-tropical varieties		sing_2547.htm#IDX999	
+tropical varieties		sing_2552.htm#IDX1003	
 tropical.lib		sing_2113.htm#IDX794	
 tropicalCurve		sing_2118.htm#SEC2194	16865
 tropicalJInvariant		sing_2121.htm#SEC2197	40395
 tropicalLifting		sing_2114.htm#SEC2190	7052
-tropicalLinkNewton		sing_2555.htm#SEC2631	63886
-tropicalNewton.lib		sing_2547.htm#SEC2623	
-tropicalNewton_lib		sing_2547.htm#SEC2623	
-tropicalPointNewton		sing_2552.htm#SEC2628	18572
+tropicalLinkNewton		sing_2560.htm#SEC2636	63886
+tropicalNewton.lib		sing_2552.htm#SEC2628	
+tropicalNewton_lib		sing_2552.htm#SEC2628	
+tropicalPointNewton		sing_2557.htm#SEC2633	18572
 tropicalSubst		sing_2146.htm#SEC2222	49846
 tropicalVariety		sing_2153.htm#SEC2229	39087
-tropicalVarietyNewton	tropicalVarietyNewton	sing_2554.htm#SEC2630	28532
+tropicalVarietyNewton	tropicalVarietyNewton	sing_2559.htm#SEC2635	28532
 tropical_lib		sing_2113.htm#IDX795	
 tropicalise		sing_2125.htm#SEC2201	49739
 tropicaliseSet		sing_2126.htm#SEC2202	35136
@@ -3884,7 +3894,7 @@ uressolve		sing_357.htm#SEC397
 usage, option		sing_307.htm#IDX185	
 user interface, Emacs	Emacs user interface	sing_21.htm#SEC28	
 vStd		sing_2309.htm#SEC2385	12321
-val		sing_2549.htm#SEC2625	62171
+val		sing_2554.htm#SEC2630	62171
 valvars		sing_1704.htm#SEC1780	15723
 vandermonde		sing_358.htm#SEC398	
 vanishId		sing_1805.htm#SEC1881	49148
@@ -3929,8 +3939,8 @@ waitall		sing_363.htm#SEC403
 waitfirst		sing_364.htm#SEC404	
 walk, groebner		sing_1136.htm#IDX530	
 walk, groebner 		sing_2432.htm#IDX957	
-walk, groebner  		sing_2496.htm#IDX962	
-walk, groebner   		sing_2500.htm#IDX967	
+walk, groebner  		sing_2506.htm#IDX971	
+walk, groebner   		sing_2549.htm#IDX1000	
 warkedPreimageStd		sing_2384.htm#SEC2460	14759
 warn, option		sing_70.htm#SEC110	
 warn, option 		sing_307.htm#IDX151	

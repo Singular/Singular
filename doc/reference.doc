@@ -7714,7 +7714,8 @@ See
 @ref{mres};
 @ref{nres};
 @ref{res};
-@ref{sres}.
+@ref{sres};
+@ref{nfmodsyz_lib}.
 @c ref
 @c ---------------------------------------
 @node trace, transpose, syz, Functions
