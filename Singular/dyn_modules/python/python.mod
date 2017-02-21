@@ -1,9 +1,3 @@
-%{
-/*
- *
- *  Python module
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,15 +6,6 @@
 #include <wrapper.h>
 
 void mbpython(char* in);
-%}
-
-// some comments here
-
-category="tests";
-package="python_module";
-version	= "$Id$";
-info	="LIBRARY: kernel.lib  PROCEDURES OF GENERAL TYPE WRITEN IN C python(input); eval a string  in python";
-//files= wrapper.cc;
 %modinitial
   Py_Initialize();
   initSingular();
@@ -38,25 +23,9 @@ none python(string a)
 {
   %declaration;
   %typecheck;
-  mbpython(a);
+  PyRun_SimpleString(a);
   %return();
 }
-example
-{
-  python("print 1+1");
-}
-
-
-
-%%
 %C
-
-void mbpython(char* inp){
-
-  PyRun_SimpleString(inp);
-
-
-}
-
 
 
