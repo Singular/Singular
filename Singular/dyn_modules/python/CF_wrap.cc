@@ -1,7 +1,7 @@
 #include <sstream>
 #include <boost/python.hpp>
 #include <kernel/mod2.h>
-#include "factory.h"
+#include "factory/factory.h"
 
 using boost::python::self;
 #ifndef NOSTREAMIO

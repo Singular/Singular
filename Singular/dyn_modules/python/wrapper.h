@@ -7,9 +7,9 @@
 
 
 #include "structs.h"
-#include "numbers.h"
+#include "coeffs/numbers.h"
 
-#include "febase.h"
+//#include "febase.h"
 #include "ipid.h"
 #include "ipshell.h"
 //#include "util.h"
@@ -18,12 +18,12 @@
 #include "PowerSeries.h"
 #include "Ideal.h"
 #include "ideal_wrap.h"
-#include <factory.h>
+#include <factory/factory.h>
 #include "poly_wrap.h"
 #include "vector_wrap.h"
 #include "CF_wrap.h"
 #include "number_wrap.h"
-#include "playground.h"
+//#include "playground.h"
 #include "interpreter_support.h"
 #include "ring_wrap.h"
 #include "intvec_wrap.h"
@@ -57,7 +57,7 @@ BOOST_PYTHON_MODULE(Singular){
 
   export_number();
   export_vector();
-  export_playground();
+  //export_playground();
   export_ideal();
   export_module();
   //export_interpreter();

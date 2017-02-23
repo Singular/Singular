@@ -1,6 +1,6 @@
 #ifndef RING_WRAP_HEADER
 #define RING_WRAP_HEADER
-#include "ring.h"
+#include "polys/monomials/ring.h"
 #include "grammar.h"
 #include "subexpr.h"
 #include "ipid.h"

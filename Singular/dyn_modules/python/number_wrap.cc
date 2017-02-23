@@ -9,7 +9,7 @@ static boost::python::object Number_as_str(const Number& n)
   using boost::python::str;
   StringSetS("");
   n.write();
-  char* out=StringAppendS("");
+  char* out=StringEndS();
   return boost::python::str(out,strlen(out));
 }
 static Ring Number_get_Ring(const Number & n){

@@ -13,7 +13,7 @@
 #include <ipid.h>
 
 #include <locals.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include "python.h"
 
 #include <stdio.h>
@@ -23,16 +23,12 @@
 #include <Python.h>
 #include "wrapper.h"
 
-extern "C" {
 //int mod_init(
 //  int (*iiAddCproc)(char *libname, char *procname, BOOLEAN pstatic,
 //              BOOLEAN(*func)(leftv res, leftv v))
 //  )
-  int mod_init( SModulFunctions* psModulFunctions)
+extern "C" int mod_init( SModulFunctions* psModulFunctions)
 {
-  enter_id("category","tests", STRING_CMD);
-  enter_id("version","$Id$", STRING_CMD);
-  enter_id("info","LIBRARY: kernel.lib  PROCEDURES OF GENERAL TYPE WRITEN IN C python(input); eval a string  in python", STRING_CMD);
   Py_Initialize();
   PyRun_SimpleString("from sys import path\n\
 path.insert(0,'.')\n");
@@ -43,7 +39,7 @@ path.insert(0,'.')\n");
   return 0;
 }
 
-BOOLEAN mod_python(leftv __res, leftv __h)
+extern "C" BOOLEAN mod_python(leftv __res, leftv __h)
 {
   leftv __v = __h, __v_save;
   int __tok = NONE, __index = 0;

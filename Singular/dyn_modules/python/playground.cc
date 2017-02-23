@@ -8,11 +8,14 @@ using boost::python::make_tuple;
 using boost::python::tuple;
 using boost::python::object;
 using boost::python::list;
-object foo(){
+object foo()
+{
   list l;
-  for(int j=0;j<2;j++){
+  for(int j=0;j<2;j++)
+  {
     list row;
-    for(int i=0;i<10;i++){
+    for(int i=0;i<10;i++)
+    {
       Poly ip(i*(j+1),currRing);
       row.append(ip);
       //a[boost::python::make_tuple(i%2,i%5)]=ip;
@@ -20,17 +23,14 @@ object foo(){
     }
     l.append(row);
   }
-  array::set_module_and_type("Numeric",
+  boost::python::numeric::array::set_module_and_type("Numeric",
 			     "ArrayType"
 			     );
-  array a(l);
+  boost::python::numeric::array a(l);
   return a;
-
-
-
-
 }
-boost::python::object foo2(array f){
+object foo2(array f)
+{
   using boost::python::extract;
   object o=f.attr("shape");
 
@@ -47,7 +47,8 @@ boost::python::object foo2(array f){
 
   return boost::python::str("suc");
 }
-void export_playground(){
+void export_playground()
+{
   def("foo",foo);
   def("foo2",foo2);
 }
