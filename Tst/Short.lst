@@ -174,6 +174,7 @@ Short/finvar_s.tst
 Short/fpadim_s.tst
 Short/gaussm_ex.tst
 Short/gcd0_s.tst
+Short//gcd_integer_0_s.tst
 Short/gcdp_s.tst
 ;;;; Short/general_s.tst
 Short/gerhard_1_32003_lp.tst
