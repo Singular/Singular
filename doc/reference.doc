@@ -7514,6 +7514,14 @@ returns the process number as int (for creating unique names).
 @cindex random
 returns or sets the seed of the random generator.
 @c ..........................
+@item @code{system("reduce_bound",} poly, ideal, int @code{)}
+@*or @code{system("reduce_bound",} ideal, ideal, int @code{)}
+@*or @code{system("reduce_bound",} vector, module, int @code{)}
+@*or @code{system("reduce_bound",} module, module, int @code{)}
+@cindex reduce (up to a bound)
+@cindex normaform (up to a bound)
+returns the normalform of the first argument wrt. the second up to the given degree bound (wrt. total degree)
+@c ..........................
 @item @code{system("reserve",} int @code{)}
 @cindex system, reserve
 reserve a port and listen with the given backlog.
