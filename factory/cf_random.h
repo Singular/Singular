@@ -95,6 +95,9 @@ int factoryrandom( int n );
 /// random seed initializer
 void factoryseed( int s );
 
+/// random seed getter
+int currentFactorySeed(  );
+
 /*ENDPUBLIC*/
 
 #endif /* ! INCL_CF_RANDOM_H */
