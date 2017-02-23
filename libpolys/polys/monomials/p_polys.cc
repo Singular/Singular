@@ -3925,7 +3925,7 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
     if( !DENIS1((fraction)z) )
     {
       if (!p_IsConstant(DEN((fraction)z),srcExtRing))
-        WarnS("Not defined: Cannot map a rational fraction and make a polynomial out of it! Ignoring the denumerator.");
+        WarnS("Not defined: Cannot map a rational fraction and make a polynomial out of it! Ignoring the denominator.");
     }
   }
   else
