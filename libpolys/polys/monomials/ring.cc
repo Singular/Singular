@@ -1075,7 +1075,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     {
       for(i=0;i<k;i++) omFree((ADDRESS)tmpR.names[i]);
       omFreeSize((ADDRESS)names,tmpR.N*sizeof(char *));
-      Werror("difficulties with variables: %d,%d -> %d",rVar(r1),rVar(r2),k);
+      Werror("variables must not overlap (# of vars: %d,%d -> %d)",rVar(r1),rVar(r2),k);
       return -1;
     }
   }
