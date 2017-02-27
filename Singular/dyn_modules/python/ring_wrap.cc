@@ -3,16 +3,16 @@
 #include <kernel/mod2.h>
 #include "ring_wrap.h"
 #include "poly_wrap.h"
-#include "febase.h"
 static boost::python::object Ring_as_str(const Ring& r)
 {
   using boost::python::str;
   StringSetS("");
   rWrite(r.pimpl.get());
-  char* out=StringAppendS("");
+  char* out=StringEndS();
   return boost::python::str(out,strlen(out));
 }
-void ring_set(Ring & r){
+void ring_set(Ring & r)
+{
       //FIXME: only a hack, no solution
       char name_buffer[100];
       static int ending=0;
@@ -24,11 +24,11 @@ void ring_set(Ring & r){
       rChangeCurrRing(r.pimpl.get());
       currRingHdl=shadow_hdl;
 
-    }
-void export_ring(){
+}
+void export_ring()
+{
 boost::python::class_<Ring>("Ring", "reference to a Singular ring")
      .def("__str__", Ring_as_str)
      .def("set", ring_set,"equivalent to the singular command setring, which is not mapped as it is a command")
      .def(boost::python::init <>());
-
 }

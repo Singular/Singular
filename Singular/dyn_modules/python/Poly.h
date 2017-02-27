@@ -20,22 +20,25 @@ class DifferentDomainException: public std::exception
 {
 
 };
-class ExceptionBasedErrorHandler{
+class ExceptionBasedErrorHandler
+{
     public:
         static const bool handleErrors=true;
-        static void handleDifferentRing(ring r, ring s){
-        PrintS("throwing");
-        throw DifferentDomainException();
-    }
+        static void handleDifferentRing(ring r, ring s)
+	{
+          PrintS("throwing");
+          throw DifferentDomainException();
+        }
 };
 
 //PolyImpl is a 08/15 poly wrapper
 //Poly wraps around PolyImpl with reference counting using boost
-class TrivialErrorHandler{
+class TrivialErrorHandler
+{
     public:
     static const bool handleErrors=false;
-    static void handleDifferentRing(ring r, ring s){
-    }
+    static void handleDifferentRing(ring r, ring s)
+    {}
 };
 typedef TrivialErrorHandler MyErrorHandler;
 class PolyImpl

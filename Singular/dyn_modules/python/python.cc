@@ -9,12 +9,12 @@
 #include <Python.h>
 #include <kernel/mod2.h>
 #include <tok.h>
-#include <structs.h>
+#include <kernel/structs.h>
+#include <Singular/mod_lib.h>
 #include <ipid.h>
 
 #include <locals.h>
 #include <omalloc/omalloc.h>
-#include "python.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,23 +23,7 @@
 #include <Python.h>
 #include "wrapper.h"
 
-//int mod_init(
-//  int (*iiAddCproc)(char *libname, char *procname, BOOLEAN pstatic,
-//              BOOLEAN(*func)(leftv res, leftv v))
-//  )
-extern "C" int mod_init( SModulFunctions* psModulFunctions)
-{
-  Py_Initialize();
-  PyRun_SimpleString("from sys import path\n\
-path.insert(0,'.')\n");
-  initSingular();
-  init_Singular();
-
-  psModulFunctions->iiAddCproc(currPack->libname,"python",FALSE, mod_python);
-  return 0;
-}
-
-extern "C" BOOLEAN mod_python(leftv __res, leftv __h)
+static BOOLEAN mod_python(leftv __res, leftv __h)
 {
   leftv __v = __h, __v_save;
   int __tok = NONE, __index = 0;
@@ -67,3 +51,19 @@ extern "C" BOOLEAN mod_python(leftv __res, leftv __h)
     Werror("expected python('string')");
     return TRUE;
 }
+//int mod_init(
+//  int (*iiAddCproc)(char *libname, char *procname, BOOLEAN pstatic,
+//              BOOLEAN(*func)(leftv res, leftv v))
+//  )
+extern "C" int SI_MOD_INIT(python_module)(SModulFunctions* psModulFunctions)
+{
+  Py_Initialize();
+  PyRun_SimpleString("from sys import path\n\
+path.insert(0,'.')\n");
+  initSingular();
+  init_Singular();
+
+  psModulFunctions->iiAddCproc(currPack->libname,"python",FALSE, mod_python);
+  return MAX_TOK;
+}
+

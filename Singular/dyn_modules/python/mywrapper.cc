@@ -3,7 +3,8 @@
 #include "subexpr.h"
 #include "wrapper.h"
 
-void initPySingular() {
+void initPySingular()
+{
   initSingular();
   init_Singular();
 }

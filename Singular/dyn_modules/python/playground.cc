@@ -24,8 +24,8 @@ object foo()
     l.append(row);
   }
   boost::python::numeric::array::set_module_and_type("Numeric",
-			     "ArrayType"
-			     );
+                             "ArrayType"
+                             );
   boost::python::numeric::array a(l);
   return a;
 }

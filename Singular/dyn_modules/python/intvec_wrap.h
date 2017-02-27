@@ -1,10 +1,6 @@
 #ifndef INTVEC_WRAP_HEADER
 #define INTVEC_WRAP_HEADER
-#include <vector>
-#include <kernel/mod2.h>
-#include "misc/intvec.h"
-#include "IIntvec.h"
-void export_intvec();
 
+void export_intvec();
 
 #endif

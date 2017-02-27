@@ -17,19 +17,13 @@ using namespace boost;
 // }
 
 //typedef boosRing
-class Ring{
+class Ring
+{
    public:
      intrusive_ptr<ip_sring> pimpl;
-     Ring(ring r=currRing): pimpl(r){
-
-     }
-     Ring(const Ring& r2):pimpl(r2.pimpl){
-
-       }
-     ~Ring(){
-
-     }
-
+     Ring(ring r=currRing): pimpl(r){}
+     Ring(const Ring& r2):pimpl(r2.pimpl){}
+     ~Ring(){}
 };
 void export_ring();
 #endif

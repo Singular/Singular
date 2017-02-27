@@ -1,4 +1,3 @@
-
 #include <sstream>
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
@@ -6,41 +5,40 @@
 #include "subexpr.h"
 #include "Poly.h"
 #include "Ideal.h"
-#include "lists.h"
-#include "structs.h"
-#include "ipshell.h"
-#include "numbers.h"
+#include "kernel/structs.h"
+#include "Singular/lists.h"
+#include "Singular/ipid.h"
+#include "Singular/ipshell.h"
+#include "coeffs/numbers.h"
 
-#include "febase.h"
-#include "ipid.h"
-#include "ipshell.h"
-#include "matpol.h"
+#include "Singular/ipid.h"
+#include "Singular/ipshell.h"
+#include "polys/matpol.h"
 #include "ring_wrap.h"
 #include "intvec_wrap.h"
 #include "poly_wrap.h"
-extern BOOLEAN errorreported;
 extern int inerror;
 using namespace boost::python;
 using boost::python::numeric::array;
 using boost::python::extract;
-static void free_leftv(leftv args){
+static void free_leftv(leftv args)
+{
     args->CleanUp();
     omFreeBin(args, sleftv_bin);
 }
 
-matrix matrixFromArray(const array& f){
+matrix matrixFromArray(const boost::python::numeric::array& f)
+{
   object o=f.attr("shape");
-
   object o1=o[0];
-
   object o2=o[1];
   int l1=extract<int>(o1);
-
-
   int l2=extract<int>(o2);
   matrix m=mpNew(l1,l2);
-  for(int i=0;i<l1;i++){
-    for(int j=0;j<l2;j++){
+  for(int i=0;i<l1;i++)
+  {
+    for(int j=0;j<l2;j++)
+    {
       Poly& x = boost::python::extract<Poly&>(f[boost::python::make_tuple(i,j)]);
       poly p=x.as_poly();
       MATELEM(m,i+1,j+1)=p;
@@ -48,245 +46,284 @@ matrix matrixFromArray(const array& f){
   }
   return m;
 }
-bool is_builtin(const char* name){
+bool is_builtin(const char* name)
+{
   int cmd_n=-1;
   IsCmd(name,cmd_n);
   return (cmd_n!=-1);
 }
-class arg_list{
+class arg_list
+{
  public:
   leftv args;
-  arg_list(){
+  arg_list()
+  {
     args=(leftv) NULL;
   }
-  ~arg_list(){
-    if (args!=NULL){
+  ~arg_list()
+  {
+    if (args!=NULL)
+    {
       args->CleanUp();
       omFreeBin(args, sleftv_bin);
     }
-
   }
-  leftv pop_front(){
+  leftv pop_front()
+  {
     assume(args!=NULL);
     leftv res=args;
     args=args->next;
     res->next=NULL;
     return res;
   }
-  int length(){
+  int length()
+  {
     leftv v=args;
     int l=0;
-    while(v!=NULL){
+    while(v!=NULL)
+    {
       l++;
       v=v->next;
     }
     return l;
   }
-  void appendPoly(const Poly& p){
+  void appendPoly(const Poly& p)
+  {
     leftv v=initArg();
     v->data=p.as_poly();
     v->rtyp=POLY_CMD;
     internal_append(v);
   }
-  void appendIdeal(const Ideal& p){
+  void appendIdeal(const Ideal& p)
+  {
     leftv v=initArg();
     v->data=p.as_ideal();
     v->rtyp=IDEAL_CMD;
     internal_append(v);
   }
-  void appendModule(const Module& p){
+  void appendModule(const Module& p)
+  {
     leftv v=initArg();
     v->data=p.as_module();
     v->rtyp=MODUL_CMD;
     internal_append(v);
   }
-  void appendint(int p){
-      leftv v=initArg();
+  void appendint(int p)
+  {
+    leftv v=initArg();
     v->data=(void*)((long)p);
     v->rtyp=INT_CMD;
     internal_append(v);
   }
-  void appendNumber(const Number& p){
-      leftv v=initArg();
+  void appendNumber(const Number& p)
+  {
+    leftv v=initArg();
     v->data=(void*) p.as_number();
     v->rtyp=NUMBER_CMD;
     internal_append(v);
   }
-  void appendVector(const Vector& p){
+  void appendVector(const Vector& p)
+  {
     leftv v=initArg();
     v->data=p.as_poly();
     v->rtyp=VECTOR_CMD;
     internal_append(v);
   }
-  void appendArray(const array& f){
+  void appendArray(const boost::python::numeric::array& f)
+  {
     leftv v=initArg();
     matrix m=matrixFromArray(f);
     v->data=m;
     v->rtyp=MATRIX_CMD;
     internal_append(v);
-
   }
-  void appendString(const char* s){
+  void appendString(const char* s)
+  {
     leftv v=initArg();
     v->data=omStrDup(s);
     v->rtyp=STRING_CMD;
     internal_append(v);
   }
-  void appendRing(const Ring& r){
+  void appendRing(const Ring& r)
+  {
     leftv v=initArg();
     v->data=r.pimpl.get();
     r.pimpl->ref++;
     v->rtyp=RING_CMD;
     internal_append(v);
   }
-
-  lists dumpToLists(){
+  lists dumpToLists()
+  {
     int n=length();
-
     lists res=(lists)omAlloc0Bin(slists_bin);
     res->Init(n);
-    for(int i=0;i<n;i++){
-        leftv iv=pop_front();
-        //swap the content
-        memcpy(&res->m[i],iv,sizeof(sleftv));
-        //iv->Init();
-        omFreeBin(iv, sleftv_bin);
+    for(int i=0;i<n;i++)
+    {
+      leftv iv=pop_front();
+      //swap the content
+      memcpy(&res->m[i],iv,sizeof(sleftv));
+      //iv->Init();
+      omFreeBin(iv, sleftv_bin);
     }
     return res;
-
   }
-  void appendPrelist(arg_list& l){
+  void appendPrelist(arg_list& l)
+  {
     leftv v=initArg();
     v->data=l.dumpToLists();
-
     v->rtyp=LIST_CMD;
     internal_append(v);
   }
-  void appendIntvec(Intvec& iv){
+  void appendIntvec(Intvec& iv)
+  {
     leftv v=initArg();
     v->data=iv.allocate_legacy_intvec_copy();
-
     v->rtyp=INTVEC_CMD;
     internal_append(v);
   }
-
-   protected:
-  leftv initArg(){
+protected:
+  leftv initArg()
+  {
     leftv res=(leftv)omAllocBin(sleftv_bin);
     res->Init();
     return res;
   }
-  void internal_append(leftv v){
-    if (args!=NULL){
+  void internal_append(leftv v)
+  {
+    if (args!=NULL)
+    {
       leftv last=args;
-      while(last->next!=NULL){
+      while(last->next!=NULL)
+      {
         last=last->next;
       }
       last->next=v;
-    } else
+    }
+    else
       args=v;
   }
-
 };
 
-class idhdl_wrap{
+class idhdl_wrap
+{
  public:
   idhdl id;
-  idhdl_wrap(idhdl id){
+  idhdl_wrap(idhdl id)
+  {
     this->id=id;
   }
-  idhdl_wrap(){
+  idhdl_wrap()
+  {
     id=(idhdl) NULL;
   }
-  bool is_zero(){
+  bool is_zero()
+  {
     return id==NULL;
   }
-  bool id_is_proc(){
+  bool id_is_proc()
+  {
     return (id->typ==PROC_CMD);
   }
-  bool print_type(){
+  bool print_type()
+  {
     Print("type:%d\n",id->typ);
   }
-  void writePoly(const Poly& p){
-
-    if (id->typ==POLY_CMD){
+  void writePoly(const Poly& p)
+  {
+    if (id->typ==POLY_CMD)
+    {
       p_Delete(&id->data.p, currRing);
       id->data.p=p.as_poly();
     }
-
   }
-  void writeIdeal(const Ideal& p){
-    if (id->typ==IDEAL_CMD){
+  void writeIdeal(const Ideal& p)
+  {
+    if (id->typ==IDEAL_CMD)
+    {
       id_Delete(&id->data.uideal, currRing);
-
       id->data.uideal=p.as_ideal();
     }
   }
-  void writeModule(const Module& p){
-    if (id->typ==MODUL_CMD){
+  void writeModule(const Module& p)
+  {
+    if (id->typ==MODUL_CMD)
+    {
       id_Delete(&id->data.uideal, currRing);
-
       id->data.uideal=p.as_module();
     }
   }
-  void writeint(int p){
-    if (id->typ==INT_CMD){
+  void writeint(int p)
+  {
+    if (id->typ==INT_CMD)
+    {
       id->data.i=p;
     }
   }
-  void writeNumber(const Number& p){
-
- if (id->typ==NUMBER_CMD){
+  void writeNumber(const Number& p)
+  {
+    if (id->typ==NUMBER_CMD)
+    {
       n_Delete(&id->data.n, currRing);
       id->data.n=p.as_number();
     }
   }
-  void writeVector(const Vector& p){
-
-    if (id->typ==VECTOR_CMD){
+  void writeVector(const Vector& p)
+  {
+    if (id->typ==VECTOR_CMD)
+    {
       p_Delete(&id->data.p, currRing);
       id->data.p=p.as_poly();
     }
   }
-  void writeArray(const array& f){
-    if(id->typ=MATRIX_CMD){
+  void writeArray(const boost::python::numeric::array& f)
+  {
+    if(id->typ=MATRIX_CMD)
+    {
       matrix m=matrixFromArray(f);
       id_Delete((ideal*) &id->data.umatrix,currRing);
       id->data.umatrix=m;
     }
   }
-   void writeRing(const Ring& r){
-    if(id->typ=RING_CMD){
+  void writeRing(const Ring& r)
+  {
+    if(id->typ=RING_CMD)
+    {
       r.pimpl->ref++;
-
       ((ring) id->data.uring)->ref--;//FIXME: destruct it
       ring r2=r.pimpl.get();
             id->data.uring=r2;
     }
   }
-  void writeString(const char* s){
-    if(id->typ=STRING_CMD){
+  void writeString(const char* s)
+  {
+    if(id->typ=STRING_CMD)
+    {
         omFree((ADDRESS) id->data.ustring);
         id->data.ustring=omStrDup(s);
     }
   }
-  void writeIntvec(const Intvec& iv){
-    if(id->typ=INTVEC_CMD){
+  void writeIntvec(const Intvec& iv)
+  {
+    if(id->typ=INTVEC_CMD)
+    {
         delete id->data.iv;
         id->data.iv=iv.allocate_legacy_intvec_copy();;
     }
   }
-  void writeList(arg_list& f){
+  void writeList(arg_list& f)
+  {
     //warning f gets empty
-    if(id->typ=LIST_CMD){
+    if(id->typ=LIST_CMD)
+    {
         id->data.l->Clean(currRing);
         id->data.l=f.dumpToLists();
     }
-}
+  }
 };
 
 
-static array buildPythonMatrix(matrix m, ring r){
+static boost::python::numeric::array buildPythonMatrix(matrix m, ring r)
+{
   using boost::python::numeric::array;
   using boost::python::self;
   using boost::python::make_tuple;
@@ -295,11 +332,11 @@ static array buildPythonMatrix(matrix m, ring r){
   using boost::python::list;
 
   list l;
-
-
-  for(int i=1;i<=MATROWS(m);i++){
+  for(int i=1;i<=MATROWS(m);i++)
+  {
     list row;
-    for(int j=1;j<=MATCOLS(m);j++){
+    for(int j=1;j<=MATCOLS(m);j++)
+    {
       Poly ip(MATELEM(m,i,j),r);//copy it
       row.append(ip);
       //a[boost::python::make_tuple(i%2,i%5)]=ip;
@@ -308,18 +345,19 @@ static array buildPythonMatrix(matrix m, ring r){
     l.append(row);
   }
   //FIXME: should call this only once
-  array::set_module_and_type("Numeric",
+  boost::python::numeric::array::set_module_and_type("Numeric",
                              "ArrayType"
                              );
-
-  return array(l);
+  return boost::python::numeric::array(l);
 }
 boost::python::object buildPyObjectFromLeftv(leftv v);
-boost::python::list buildPythonList(lists l, ring r){
+boost::python::list buildPythonList(lists l, ring r)
+{
     using boost::python::list;
     list res;
 
-    for(int i=0;i<=l->nr;i++){
+    for(int i=0;i<=l->nr;i++)
+    {
         leftv lv=&l->m[i];
         object o=buildPyObjectFromLeftv(lv);
         res.append(o);
@@ -327,9 +365,11 @@ boost::python::list buildPythonList(lists l, ring r){
     return res;
 }
 
-boost::python::object buildPyObjectFromLeftv(leftv v){
+boost::python::object buildPyObjectFromLeftv(leftv v)
+{
   using boost::python::object;
-  switch (v->rtyp){
+  switch (v->rtyp)
+  {
   case INT_CMD:
     return object((int)((long)v->data));
   case POLY_CMD:
@@ -361,7 +401,8 @@ boost::python::object buildPyObjectFromIdhdl(const idhdl_wrap&  id)
 {
   using boost::python::object;
 
-  switch (id.id->typ){
+  switch (id.id->typ)
+  {
   case STRING_CMD:
     return str((const char*) id.id->data.ustring);
 
@@ -401,7 +442,8 @@ boost::python::object buildPyObjectFromIdhdl(const idhdl_wrap&  id)
   }
 }
 
-boost::python::object call_interpreter_method(const idhdl_wrap& proc, const arg_list& args){
+boost::python::object call_interpreter_method(const idhdl_wrap& proc, const arg_list& args)
+{
   //idhdl oldPackHDL=currPackHdl;
 
   //package oldPack=currPack;
@@ -409,36 +451,33 @@ boost::python::object call_interpreter_method(const idhdl_wrap& proc, const arg_
   //currPackHdl=packFindHdl(currPack);
   //FIXME: will call procedure from different package, maybe use iiMakeProc
 
-  return buildPyObjectFromLeftv(iiMake_proc(proc.id,NULL,args.args));
   int err=iiPStart(proc.id, args.args);
   //currPack=oldPack;
   //currPackHdl=oldPackHDL;
   int voice=myynest+1;
   errorreported=inerror=0;
 
-  return buildPyObjectFromLeftv(&iiRETURNEXPR[voice]);
+  return buildPyObjectFromLeftv(&iiRETURNEXPR);
 
   //return res;
 }
-boost::python::object call_builtin_method_general(const char* name, arg_list& l){
-
-
+boost::python::object call_builtin_method_general(const char* name, arg_list& l)
+{
   int cmd_n=-1;
   IsCmd(name,cmd_n);
 //     Py_INCREF(Py_None);
 
 //   return Py_None;
-  if (cmd_n<0){
-
-
-  return object();
-
-  } else {
-
-
+  if (cmd_n<0)
+  {
+    return object();
+  }
+  else
+  {
     leftv res=(leftv)omAllocBin(sleftv_bin);
     res->Init();
-    switch(l.length()){
+    switch(l.length())
+    {
     case 1:
       iiExprArith1(res,l.args,cmd_n);
       break;
@@ -456,8 +495,6 @@ boost::python::object call_builtin_method_general(const char* name, arg_list& l)
         leftv arg1=l.pop_front();
         leftv arg2=l.pop_front();
         leftv arg3=l.pop_front();
-
-
         iiExprArith3(res,cmd_n,arg1,arg2,arg3);
         free_leftv(arg1);
         free_leftv(arg2);
@@ -475,19 +512,20 @@ boost::python::object call_builtin_method_general(const char* name, arg_list& l)
     //cleanup not to forget
   }
 }
-static boost::python::str idhdl_as_str(idhdl_wrap iw){
+static boost::python::str idhdl_as_str(idhdl_wrap iw)
+{
   idhdl i=iw.id;
   using boost::python::str;
   //ring r=p.getRing();
-
 
   std::basic_stringstream<char>  s;
   s<<i;
   return boost::python::str(s.str());
 }
-static idhdl_wrap get_idhdl(const char *n){
-  //idhdl ggetid(const char *n, BOOLEAN local = FALSE);
-  return idhdl_wrap(ggetid(n, FALSE));
+static idhdl_wrap get_idhdl(const char *n)
+{
+  //idhdl ggetid(const char *n);
+  return idhdl_wrap(ggetid(n));
 }
 void export_interpreter()
 {
@@ -524,7 +562,5 @@ void export_interpreter()
   def("cbm",call_builtin_method_general);
   def("transfer_to_python",buildPyObjectFromIdhdl);
   def("is_builtin", is_builtin);
-
 }
-
 

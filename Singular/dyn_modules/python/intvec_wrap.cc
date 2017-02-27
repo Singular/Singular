@@ -1,6 +1,7 @@
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <kernel/mod2.h>
+#include "IIntvec.h"
 #include "intvec_wrap.h"
 
 
