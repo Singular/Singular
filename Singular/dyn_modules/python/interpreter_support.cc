@@ -444,22 +444,10 @@ boost::python::object buildPyObjectFromIdhdl(const idhdl_wrap&  id)
 
 boost::python::object call_interpreter_method(const idhdl_wrap& proc, const arg_list& args)
 {
-  //idhdl oldPackHDL=currPackHdl;
-
-  //package oldPack=currPack;
-  //currPack=proc.id->data.pinf->pack;
-  //currPackHdl=packFindHdl(currPack);
-  //FIXME: will call procedure from different package, maybe use iiMakeProc
-
-  int err=iiPStart(proc.id, args.args);
-  //currPack=oldPack;
-  //currPackHdl=oldPackHDL;
-  int voice=myynest+1;
+  int err=iiMake_proc(proc.id, NULL, args.args);
   errorreported=inerror=0;
 
   return buildPyObjectFromLeftv(&iiRETURNEXPR);
-
-  //return res;
 }
 boost::python::object call_builtin_method_general(const char* name, arg_list& l)
 {

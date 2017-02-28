@@ -10,7 +10,7 @@ ideal big=intersect(intersect(p1,p2),p3);
 ideal i2=cyclic(5);
 
 print(i2);
-LIB("/Users/michael/sing2/modules/python/python_module.so");
+LIB("python_module.so");
 Python_module::python("from interpreter import SingularGlobalsProxy
 #import psyco
 import sys
