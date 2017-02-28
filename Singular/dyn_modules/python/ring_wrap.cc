@@ -1,6 +1,7 @@
 
 #include <boost/python.hpp>
 #include <kernel/mod2.h>
+#include <Singular/ipshell.h>
 #include "ring_wrap.h"
 #include "poly_wrap.h"
 static boost::python::object Ring_as_str(const Ring& r)
@@ -11,19 +12,22 @@ static boost::python::object Ring_as_str(const Ring& r)
   char* out=StringEndS();
   return boost::python::str(out,strlen(out));
 }
-void ring_set(Ring & r)
+void ring_set(Ring & R)
 {
-      //FIXME: only a hack, no solution
+    ring r=R.pimpl.get();
+    idhdl h=rFindHdl(r,NULL);
+    if (h==NULL)
+    {
       char name_buffer[100];
       static int ending=0;
       ending++;
       sprintf(name_buffer, "PYTHON_RING_VAR%d",ending);
-      idhdl shadow_hdl=enterid(name_buffer,0,RING_CMD,&IDROOT);
-      r.pimpl.get()->ref++;
-      shadow_hdl->data.uring=r.pimpl.get();
-      rChangeCurrRing(r.pimpl.get());
-      currRingHdl=shadow_hdl;
-
+      h=enterid(omStrDup(name_buffer),0,RING_CMD,&IDROOT);
+      IDRING(h)=r;
+      r->ref++;
+    }
+    rSetHdl(h);
+    for(int i=myynest;i>=0;i--) iiLocalRing[i]=r;
 }
 void export_ring()
 {

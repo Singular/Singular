@@ -3554,6 +3554,28 @@ static BOOLEAN jjUMINUS_BIM(leftv res, leftv u)
   res->data = (char *)bim;
   return FALSE;
 }
+// dummy for python_module.so and similiar
+static BOOLEAN jjSetRing(leftv res, leftv u)
+{
+  if (u->rtyp==IDHDL) rSetHdl((idhdl)u->data);
+  else
+  {
+    ring r=(ring)u->Data();
+    idhdl h=rFindHdl(r,NULL);
+    if (h==NULL)
+    {
+      char name_buffer[100];
+      static int ending=1000000;
+      ending++;
+      sprintf(name_buffer, "PYTHON_RING_VAR%d",ending);
+      h=enterid(omStrDup(name_buffer),0,RING_CMD,&IDROOT);
+      IDRING(h)=r;
+      r->ref++;
+    }
+    rSetHdl(h);
+  }
+  return FALSE;
+}
 static BOOLEAN jjPROC1(leftv res, leftv u)
 {
   return jjPROC(res,u,NULL);

@@ -433,7 +433,7 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
           nh=rFindHdl(currRing,NULL);
         if (nh!=NULL)          n=nh->id;
         else                   n="none";
-        Werror("ring change during procedure call: %s -> %s (level %d)",o,n,myynest);
+        Werror("ring change during procedure call %s: %s -> %s (level %d)",pi->procname,o,n,myynest);
         iiRETURNEXPR.CleanUp();
         err=TRUE;
       }
