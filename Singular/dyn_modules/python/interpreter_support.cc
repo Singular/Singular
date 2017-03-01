@@ -2,7 +2,7 @@
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <kernel/mod2.h>
-#include "subexpr.h"
+#include "Singular/subexpr.h"
 #include "Poly.h"
 #include "Ideal.h"
 #include "kernel/structs.h"

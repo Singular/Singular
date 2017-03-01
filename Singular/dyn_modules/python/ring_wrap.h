@@ -1,9 +1,9 @@
 #ifndef RING_WRAP_HEADER
 #define RING_WRAP_HEADER
 #include "polys/monomials/ring.h"
-#include "grammar.h"
-#include "subexpr.h"
-#include "ipid.h"
+#include "Singular/grammar.h"
+#include "Singular/subexpr.h"
+#include "Singular/ipid.h"
 #include <boost/intrusive_ptr.hpp>
 #include "Number.h"
 using namespace boost;

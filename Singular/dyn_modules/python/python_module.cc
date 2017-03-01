@@ -8,12 +8,12 @@
 #include <boost/python.hpp>
 #include <Python.h>
 #include <kernel/mod2.h>
-#include <tok.h>
+#include <Singular/tok.h>
 #include <kernel/structs.h>
 #include <Singular/mod_lib.h>
-#include <ipid.h>
+#include <Singular/ipid.h>
 
-#include <locals.h>
+#include <Singular/locals.h>
 #include <omalloc/omalloc.h>
 
 #include <stdio.h>
@@ -57,6 +57,19 @@ static BOOLEAN mod_python(leftv __res, leftv __h)
 //  )
 extern "C" int SI_MOD_INIT(python_module)(SModulFunctions* psModulFunctions)
 {
+  char *py=getenv("PYTHONPATH");
+  char buf[1024];
+  if (py!=NULL)
+  {
+    strcpy(buf,py);
+    strcat(buf,":");
+    strcat(buf,feResource('s',FALSE));
+  }
+  else
+    strcpy(buf,feResource('s',FALSE));
+  Print("setting PYTHONAPTH to %s\n",buf);
+  setenv("PYTHONPATH",buf,1);
+
   Py_Initialize();
   PyRun_SimpleString("from sys import path\n\
 path.insert(0,'.')\n");
