@@ -9,9 +9,6 @@
 #include <stdio.h>
 #include <math.h>
 
-
-
-
 #include <misc/auxiliary.h>
 
 #include <omalloc/omalloc.h>
@@ -1709,3 +1706,77 @@ matrix mp_Wedge(matrix a, int ar, const ring R)
   id_Delete((ideal *) &tmp, R);
   return (result);
 }
+
+static void p_DecomposeComp(poly p, poly *a, int l, const ring r)
+{
+  poly h=p;
+  while(h!=NULL)
+  {
+    poly hh=pNext(h);
+    pNext(h)=a[p_GetComp(h,r)-1];
+    a[p_GetComp(h,r)-1]=h;
+    p_SetComp(h,0,r);
+    p_SetmComp(h,r);
+    h=hh;
+  }
+  for(int i=0;i<l;i++)
+  {
+    if(a[i]!=NULL) a[i]=pReverse(a[i]);
+  }
+}
+
+static ideal mp_MultAndShift(poly f, ideal B, int s, const ring r)
+{
+  ideal res=idInit(IDELEMS(B),B->rank+s);
+  if (f!=NULL)
+  {
+    int q=IDELEMS(B); // p x q
+    for(int j=0;j<q;j++)
+    {
+      poly h=pp_Mult_qq(f,B->m[j],r);
+      if (h!=NULL)
+      {
+        if (s>0) p_Shift(&h,s,r);
+        res->m[j]=h;
+      }
+    }
+  }
+  return res;
+}
+static ideal mp_AddSubMat(ideal res, ideal sm, int col, const ring r)
+{
+  for(int i=0;i<IDELEMS(sm);i++)
+  {
+    res->m[col+i]=p_Add_q(res->m[col+i],sm->m[i],r);
+    sm->m[i]=NULL;
+  }
+  return res;
+}
+
+ideal mp_Tensor(ideal A, ideal B, const ring r)
+{
+  // size of the result n*q x m*p
+  int n=IDELEMS(A); // m x n
+  int m=A->rank;
+  int q=IDELEMS(B); // p x q
+  int p=B->rank;
+  ideal res=idInit(n*q,m*p);
+  poly *a=(poly*)omAlloc0(m*sizeof(poly));
+  for(int i=0; i<n; i++)
+  {
+    p_DecomposeComp(p_Copy(A->m[i],r),a,m,r);
+    for(int j=0;j<m;j++)
+    {
+      ideal sm=mp_MultAndShift(a[j], // A_i_j
+                               B,
+                               j*p, // shift j*p down
+                               r);
+      res=mp_AddSubMat(res,sm,i*q,r); // add this colums to col i*q ff
+      id_Delete(&sm,r);
+    }
+    memset(a,0,m*sizeof(poly));
+  }
+  omFreeSize(a,m*sizeof(poly));
+  return res;
+}
+

@@ -93,4 +93,6 @@ char * iiStringMatrix(matrix im, int dim, const ring r, char ch=',');
 extern omBin ip_smatrix_bin;
 
 int mp_Compare(matrix a, matrix b, const ring r);
+
+ideal mp_Tensor(ideal A, ideal B, const ring r);
 #endif/* MATPOL_H */

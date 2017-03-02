@@ -3833,6 +3833,21 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return TRUE;
     }
     else
+/*==================== tensor =================*/
+    if(strcmp(sys_cmd,"tensor")==0)
+    {
+      if ((h->Typ()==MODUL_CMD)
+      && (h->next!=NULL)
+      && (h->next->Typ()==MODUL_CMD))
+      {
+        res->data=(void*)mp_Tensor((ideal)h->Data(),(ideal)h->next->Data(),currRing);
+	res->rtyp=MODUL_CMD;
+	return FALSE;
+      }
+      else
+        return TRUE;
+    }
+    else
 /*==================== power* ==================================*/
     #if 0
     if(strcmp(sys_cmd,"power1")==0)
