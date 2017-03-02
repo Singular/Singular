@@ -280,6 +280,16 @@ AC_ARG_ENABLE(factory, AS_HELP_STRING([--disable-factory], [Disable factory]),
 
 ])
 
+AC_DEFUN([SING_CHECK_PYTHON_MODULE],
+[ 
+AC_ARG_ENABLE(python_module, AS_HELP_STRING([--enable-python_module], [Enable python_module.so]),
+[if test $enableval = yes; then
+     ENABLE_PYTHON_MODULE="yes"
+ else
+     ENABLE_PYTHON_MODULE="no"
+ fi
+],[ENABLE_PYTHON_MODULE="no"])
+])
 
 
 AC_DEFUN([SING_BUILTIN_MODULES],
@@ -375,7 +385,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
  AM_CONDITIONAL([SI_BUILTIN_GFANLIB], [test x$bi_gfanlib = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_POLYMAKE], [test x$bi_polymake = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_PYTHON_MODULE], [test x$bi_python = xtrue])
- AM_CONDITIONAL([HAVE_PYTHON_MODULE], [test x$bi_python = xtrue])
+ AM_CONDITIONAL([HAVE_PYTHON_MODULE], [test x$ENABLE_PYTHON_MODULE = xyes])
  AM_CONDITIONAL([SI_BUILTIN_CUSTOMSTD], [test x$bi_customstd = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_SINGMATHIC], [test x$bi_singmathic = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_BIGINTM], [test x$bi_bigintm = xtrue])
