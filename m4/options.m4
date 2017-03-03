@@ -285,6 +285,7 @@ AC_DEFUN([SING_CHECK_PYTHON_MODULE],
 AC_ARG_ENABLE(python_module, AS_HELP_STRING([--enable-python_module], [Enable python_module.so]),
 [if test $enableval = yes; then
      ENABLE_PYTHON_MODULE="yes"
+     AC_DEFINE([HAVE_PYTON_MODULE],[1],[Enable python_module.so])
  else
      ENABLE_PYTHON_MODULE="no"
  fi

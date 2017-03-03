@@ -1,5 +1,5 @@
 #include <kernel/mod2.h>
-#ifdef HAVE_PYTHON
+#ifdef HAVE_PYTHON_MODULE
 #include <boost/python.hpp>
 #include "Poly.h"
 #include "vector_wrap.h"
