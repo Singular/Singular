@@ -1,5 +1,5 @@
 #include <kernel/mod2.h>
-#ifdef HAVE_PYTHON_MODULE
+#ifdef HAVE_PYTHON_MOD
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
