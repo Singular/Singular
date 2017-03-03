@@ -3836,13 +3836,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 /*==================== tensor =================*/
     if(strcmp(sys_cmd,"tensor")==0)
     {
-      if ((h->Typ()==MODUL_CMD)
-      && (h->next!=NULL)
-      && (h->next->Typ()==MODUL_CMD))
+      const short t[]={2,MODUL_CMD,MODUL_CMD};
+      if (iiCheckTypes(h,t,1))
       {
         res->data=(void*)mp_Tensor((ideal)h->Data(),(ideal)h->next->Data(),currRing);
-	res->rtyp=MODUL_CMD;
-	return FALSE;
+        res->rtyp=MODUL_CMD;
+        return FALSE;
       }
       else
         return TRUE;

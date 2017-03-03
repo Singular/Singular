@@ -1724,33 +1724,34 @@ static void p_DecomposeComp(poly p, poly *a, int l, const ring r)
     if(a[i]!=NULL) a[i]=pReverse(a[i]);
   }
 }
-
+// helper for mp_Tensor
+// destroyes f, keeps B
 static ideal mp_MultAndShift(poly f, ideal B, int s, const ring r)
 {
+  assume(f!=NULL);
   ideal res=idInit(IDELEMS(B),B->rank+s);
-  if (f!=NULL)
+  int q=IDELEMS(B); // p x q
+  for(int j=0;j<q;j++)
   {
-    int q=IDELEMS(B); // p x q
-    for(int j=0;j<q;j++)
+    poly h=pp_Mult_qq(f,B->m[j],r);
+    if (h!=NULL)
     {
-      poly h=pp_Mult_qq(f,B->m[j],r);
-      if (h!=NULL)
-      {
-        if (s>0) p_Shift(&h,s,r);
-        res->m[j]=h;
-      }
+      if (s>0) p_Shift(&h,s,r);
+      res->m[j]=h;
     }
   }
+  p_Delete(&f,r);
   return res;
 }
-static ideal mp_AddSubMat(ideal res, ideal sm, int col, const ring r)
+// helper for mp_Tensor
+// updates res, destroyes contents of sm
+static void mp_AddSubMat(ideal res, ideal sm, int col, const ring r)
 {
   for(int i=0;i<IDELEMS(sm);i++)
   {
     res->m[col+i]=p_Add_q(res->m[col+i],sm->m[i],r);
     sm->m[i]=NULL;
   }
-  return res;
 }
 
 ideal mp_Tensor(ideal A, ideal B, const ring r)
@@ -1761,20 +1762,23 @@ ideal mp_Tensor(ideal A, ideal B, const ring r)
   int q=IDELEMS(B); // p x q
   int p=B->rank;
   ideal res=idInit(n*q,m*p);
-  poly *a=(poly*)omAlloc0(m*sizeof(poly));
+  poly *a=(poly*)omAlloc(m*sizeof(poly));
   for(int i=0; i<n; i++)
   {
+    memset(a,0,m*sizeof(poly));
     p_DecomposeComp(p_Copy(A->m[i],r),a,m,r);
     for(int j=0;j<m;j++)
     {
-      ideal sm=mp_MultAndShift(a[j], // A_i_j
-                               B,
-                               j*p, // shift j*p down
-                               r);
-      res=mp_AddSubMat(res,sm,i*q,r); // add this colums to col i*q ff
-      id_Delete(&sm,r);
+      if (a[j]!=NULL)
+      {
+        ideal sm=mp_MultAndShift(a[j], // A_i_j
+                                 B,
+                                 j*p, // shift j*p down
+                                 r);
+        mp_AddSubMat(res,sm,i*q,r); // add this columns to col i*q ff
+        id_Delete(&sm,r); // delete the now empty ideal
+      }
     }
-    memset(a,0,m*sizeof(poly));
   }
   omFreeSize(a,m*sizeof(poly));
   return res;
