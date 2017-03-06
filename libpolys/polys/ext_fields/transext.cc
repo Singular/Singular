@@ -709,7 +709,7 @@ number ntInit(long i, const coeffs cf)
 }
 
 
-/// takes over p!
+// takes over p!
 number ntInit(poly p, const coeffs cf)
 {
   if (p == NULL) return NULL;

@@ -39,7 +39,7 @@ struct ip_sring;
 typedef struct ip_sring * ring;
 
 
-// the following is only needed _here_ due to its use in clapsing.cc!
+// restrict access to the internal represention as much as possible:
 #ifdef TRANSEXT_PRIVATES
 struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec * poly;
 
@@ -82,10 +82,11 @@ typedef struct fractionObject * fraction;
 #define DENIS1(f) (DEN(f) == NULL)
 /**< TRUE iff den. represents 1 */
 
-
+/// takes over p!
 number ntInit(poly p, const coeffs cf);
 
 #endif
+
 
 
 /// struct for passing initialization parameters to naInitChar
