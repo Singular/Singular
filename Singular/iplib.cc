@@ -398,7 +398,7 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   if (v!=NULL)
   {
     iiCurrArgs=(leftv)omAllocBin(sleftv_bin);
-    memcpy(iiCurrArgs,v,sizeof(sleftv));
+    memcpy(iiCurrArgs,v,sizeof(sleftv)); // keeps track of v->next etc.
     memset(v,0,sizeof(sleftv));
   }
   else
