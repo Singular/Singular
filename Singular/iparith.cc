@@ -7967,6 +7967,8 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
                 bn->CleanUp();
                 omFreeBin((ADDRESS)an, sleftv_bin);
                 omFreeBin((ADDRESS)bn, sleftv_bin);
+                a->CleanUp();
+                b->CleanUp();
                 return FALSE;
               }
             }

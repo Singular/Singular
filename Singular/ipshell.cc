@@ -2748,8 +2748,7 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
     R->cf=(coeffs)L->m[0].Data();
     R->cf->ref++;
   }
-  else
-  if (L->m[0].Typ()==INT_CMD)
+  else if (L->m[0].Typ()==INT_CMD)
   {
     int ch = (int)(long)L->m[0].Data();
     assume( ch >= 0 );
@@ -6060,11 +6059,6 @@ void rKill(ring r)
 #ifdef RDEBUG
     if (traceit &TRACE_SHOW_RINGS) Print("kill ring %lx\n",(long)r);
 #endif
-    if (r->qideal!=NULL)
-    {
-      id_Delete(&r->qideal, r);
-      r->qideal = NULL;
-    }
     int j;
     for (j=0;j<myynest;j++)
     {

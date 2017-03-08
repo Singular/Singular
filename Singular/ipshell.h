@@ -44,7 +44,7 @@ extern BOOLEAN yyInRingConstruction; /* 1: during ring construction */
 
 int     IsCmd(const char *n, int & tok);
 
-BOOLEAN iiPStart(idhdl pn, sleftv * sl);
+BOOLEAN iiPStart(idhdl pn, leftv sl);
 BOOLEAN iiEStart(char* example, procinfo *pi);
 BOOLEAN iiAllStart(procinfov pi, char *p,feBufferTypes t, int l);
 void    type_cmd(leftv v);
@@ -191,7 +191,7 @@ int iiTokType(int op);
 /* ================================================================== */
 int     iiDeclCommand(leftv sy, leftv name, int lev, int t, idhdl* root,
   BOOLEAN isring = FALSE, BOOLEAN init_b=TRUE);
-BOOLEAN iiMake_proc(idhdl pn, package pack, sleftv* sl);
+BOOLEAN iiMake_proc(idhdl pn, package pack, leftv sl);
 // from misc.cc:
 char *  showOption();
 BOOLEAN setOption(leftv res, leftv v);

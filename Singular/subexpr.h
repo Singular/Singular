@@ -74,7 +74,6 @@ struct _ssubexpr
 typedef struct _ssubexpr *Subexpr;
 
 extern BOOLEAN siq;
-extern const char *iiSleftv2name(leftv v);
 
 class sleftv;
 typedef sleftv * leftv;
@@ -125,7 +124,7 @@ class sleftv
     }
     inline const char * Fullname()
     {
-      if ((name!=NULL) && (e==NULL)) return(iiSleftv2name(this));
+      if ((name!=NULL) && (e==NULL)) return(this->name);
       else return sNoName_fe;
     }
     int  Typ();

@@ -368,7 +368,7 @@ BOOLEAN iiAllStart(procinfov pi, char *p,feBufferTypes t, int l)
 * TODO:interrupt
 * return FALSE on success, TRUE if an error occurs
 */
-BOOLEAN iiPStart(idhdl pn, sleftv  * v)
+BOOLEAN iiPStart(idhdl pn, leftv v)
 {
   procinfov pi=NULL;
   int old_echo=si_echo;
@@ -395,6 +395,8 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   }
   else return TRUE;
   /* generate argument list ======================================*/
+  //iiCurrArgs should be NULL here, as the assignment for the parameters
+  // of the prevouis call are already done befor calling another routine
   if (v!=NULL)
   {
     iiCurrArgs=(leftv)omAllocBin(sleftv_bin);
@@ -498,7 +500,7 @@ static void iiCheckNest()
     iiRETURNEXPR_len+=16;
   }
 }
-BOOLEAN iiMake_proc(idhdl pn, package pack, sleftv* sl)
+BOOLEAN iiMake_proc(idhdl pn, package pack, leftv sl)
 {
   int err;
   procinfov pi = IDPROC(pn);

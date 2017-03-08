@@ -1988,7 +1988,6 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
         IDMAP((idhdl)l->data)->preimage = omStrDup (r->Fullname());
         /* advance the expressionlist to get the next element after the ring */
         hh = r->next;
-        //r=hh;
       }
       else
       {

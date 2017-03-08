@@ -1949,11 +1949,6 @@ int sleftv::Eval()
   return nok;
 }
 
-const char *iiSleftv2name(leftv v)
-{
-  return(v->name);
-}
-
 void * sattr::CopyA()
 {
   omCheckAddrSize(this,sizeof(sattr));
