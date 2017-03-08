@@ -7967,8 +7967,6 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
                 bn->CleanUp();
                 omFreeBin((ADDRESS)an, sleftv_bin);
                 omFreeBin((ADDRESS)bn, sleftv_bin);
-                a->CleanUp();
-                b->CleanUp();
                 return FALSE;
               }
             }
@@ -8197,7 +8195,6 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, const struct sValCmd1* dA1, 
               // everything ok, clean up and return
               an->CleanUp();
               omFreeBin((ADDRESS)an, sleftv_bin);
-              a->CleanUp();
               return failed;
             }
           }
@@ -8383,9 +8380,6 @@ static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv 
                   omFreeBin((ADDRESS)bn, sleftv_bin);
                   omFreeBin((ADDRESS)cn, sleftv_bin);
                   //Print("op: %d,result typ:%d\n",op,res->rtyp);
-                  a->CleanUp();
-                  b->CleanUp();
-                  c->CleanUp();
                   return FALSE;
                 }
               }

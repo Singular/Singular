@@ -453,7 +453,7 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
             StringSetS("");
             number n=(pGetCoeff((poly)input->data));
             n_Write(n, currRing->cf);
-            (pGetCoeff((poly)input->data))=n;
+            (pGetCoeff((poly)input->data))=n; // n_Write may have changed n
             output->name=StringEndS();
           }
         }
@@ -463,18 +463,19 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
         StringSetS("");
         number n=(number)input->data;
         n_Write(n, currRing->cf);
-        input->data=(void*)n;
+        input->data=(void*)n; // n_Write may have changed n
         output->name=StringEndS();
       }
       else
       {
         /* no need to preserve name: use it */
         output->name=input->name;
-        memset(input,0,sizeof(*input));
+        input->name=NULL;
       }
     }
     output->next=input->next;
     input->next=NULL;
+    if (!errorreported) input->CleanUp();
     return errorreported;
   }
   if (index!=0) /* iiTestConvert does not returned 'failure' */
@@ -511,7 +512,22 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
       if (errorreported) return TRUE;
       output->next=input->next;
       input->next=NULL;
-  //if (outputType==MATRIX_CMD) Print("convert %d -> matrix\n",inputType);
+      if ((input->rtyp!=IDHDL) && (input->attribute!=NULL))
+      {
+        input->attribute->killAll(currRing);
+        input->attribute=NULL;
+      }
+      if (input->e!=NULL)
+      {
+        Subexpr h;
+        while (input->e!=NULL)
+        {
+          h=input->e->next;
+          omFreeBin((ADDRESS)input->e, sSubexpr_bin);
+          input->e=h;
+        }
+      }
+      //input->Init(); // seems that input (rtyp?) is still needed
       return FALSE;
     }
   }
