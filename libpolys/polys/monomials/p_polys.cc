@@ -4313,22 +4313,7 @@ int p_MinDeg(poly p,intvec *w, const ring R)
 }
 
 /***************************************************************/
-
-poly p_Series(int n,poly p,poly u, intvec *w, const ring R)
-{
-  short *ww=iv2array(w,R);
-  if(p!=NULL)
-  {
-    if(u==NULL)
-      p=p_JetW(p,n,ww,R);
-    else
-      p=p_JetW(p_Mult_q(p,p_Invers(n-p_MinDeg(p,w,R),u,w,R),R),n,ww,R);
-  }
-  omFreeSize((ADDRESS)ww,(rVar(R)+1)*sizeof(short));
-  return p;
-}
-
-poly p_Invers(int n,poly u,intvec *w, const ring R)
+static poly p_Invers(int n,poly u,intvec *w, const ring R)
 {
   if(n<0)
     return NULL;
@@ -4354,6 +4339,21 @@ poly p_Invers(int n,poly u,intvec *w, const ring R)
   p_Delete(&v1,R);
   omFreeSize((ADDRESS)ww,(rVar(R)+1)*sizeof(short));
   return v;
+}
+
+
+poly p_Series(int n,poly p,poly u, intvec *w, const ring R)
+{
+  short *ww=iv2array(w,R);
+  if(p!=NULL)
+  {
+    if(u==NULL)
+      p=p_JetW(p,n,ww,R);
+    else
+      p=p_JetW(p_Mult_q(p,p_Invers(n-p_MinDeg(p,w,R),u,w,R),R),n,ww,R);
+  }
+  omFreeSize((ADDRESS)ww,(rVar(R)+1)*sizeof(short));
+  return p;
 }
 
 BOOLEAN p_EqualPolys(poly p1,poly p2, const ring r)

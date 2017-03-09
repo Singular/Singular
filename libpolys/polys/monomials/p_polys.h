@@ -2008,9 +2008,6 @@ poly p_PermPoly (poly p, const int * perm,const ring OldRing, const ring dst,
 
 /*----------------------------------------------------*/
 poly p_Series(int n,poly p,poly u, intvec *w, const ring R);
-poly p_Invers(int n,poly u,intvec *w, const ring R);
-
-
 
 /*----------------------------------------------------*/
 int   p_Var(poly mi, const ring r);

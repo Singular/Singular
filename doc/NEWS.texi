@@ -37,6 +37,7 @@ Changed libraries:
 Changes in the kernel/build system:
 @itemize
 @item port to polymake 3.x.x
+@item p_Invers is only a helper for p_Series: now static
 @end itemize
 
 @heading News for version 4-1-0
