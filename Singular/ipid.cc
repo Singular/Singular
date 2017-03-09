@@ -60,8 +60,8 @@ proclevel *procstack=NULL;
 
 idhdl currPackHdl = NULL;
 idhdl basePackHdl = NULL;
-package currPack =NULL;
-package basePack =NULL;
+package currPack = NULL;
+package basePack = NULL;
 idhdl currRingHdl = NULL;
 
 void paCleanUp(package pack);

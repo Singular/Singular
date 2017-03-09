@@ -782,9 +782,9 @@ char * versionString(/*const bool bShowDetails = false*/ )
                S_UNAME, VERSION, // SINGULAR_VERSION,
                SINGULAR_VERSION, sizeof(void*)*8,
 #ifdef MAKE_DISTRIBUTION
-	       VERSION_DATE, GIT_VERSION);
+               VERSION_DATE, GIT_VERSION);
 #else
-	       singular_date, GIT_VERSION);
+               singular_date, GIT_VERSION);
 #endif
   StringAppendS("\nwith\n\t");
 
@@ -1029,7 +1029,9 @@ void checkall()
       {
         if (IDTYP(hh)==PACKAGE_CMD)
         {
-          idhdl h2=IDPACKAGE(hh)->idroot;
+          idhdl h2=NULL;
+          if (IDPACKAGE(hh)!=NULL)
+            h2=IDPACKAGE(hh)->idroot;
           if (IDPACKAGE(hh)!=basePack)
           {
             while (h2!=NULL)
@@ -1251,7 +1253,7 @@ void siInit(char *name)
   basePack=(package)omAlloc0(sizeof(*basePack));
   currPack=basePack;
   idhdl h;
-  h=enterid("Top", 0, PACKAGE_CMD, &IDROOT, FALSE);
+  h=enterid("Top", 0, PACKAGE_CMD, &IDROOT, TRUE);
   IDPACKAGE(h)=basePack;
   IDPACKAGE(h)->language = LANG_TOP;
   currPackHdl=h;
