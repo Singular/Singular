@@ -3249,7 +3249,7 @@ the same as the type of the first argument
 @item @strong{Purpose:}
 deletes from the first argument all terms of degree bigger than the second argument.
 @*If a third argument @code{w} of type intvec is given, the degree is replaced by the weighted degree defined by @code{w}.
-@*If a second argument @code{u} of type poly or matrix is given, the first argument @code{p} is replaced by @code{p/u}.
+@*If a second argument @code{u} of type poly or matrix is given, the first argument @code{p} is replaced by @code{p/u}. In this case, the coeffcient must be from a field.
 @item @strong{Example:}
 @smallexample
 @c example
