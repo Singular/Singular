@@ -19,12 +19,9 @@
 
 using namespace std;
 
-bool currRingIsOverIntegralDomain ()
+static inline bool currRingIsOverIntegralDomain ()
 {
-  if (rField_is_Ring_PtoM(currRing)) return false;
-  if (rField_is_Ring_2toM(currRing)) return false;
-  if (rField_is_Ring_ModN(currRing)) return false;
-  return true;
+  return rField_is_Domain(currRing);
 }
 
 bool currRingIsOverField ()
@@ -262,28 +259,10 @@ ideal getMinorIdeal (const matrix mat, const int minorSize, const int k,
   int columnCount = mat->ncols;
   poly* myPolyMatrix = (poly*)(mat->m);
   int length = rowCount * columnCount;
-  poly* nfPolyMatrix = new poly[length];
   ideal iii; /* the ideal to be filled and returned */
 
-  /* copy all polynomials and reduce them w.r.t. iSB
-     (if iSB is present, i.e., not the NULL pointer) */
-  if (iSB != NULL)
-  {
-    for (int i = 0; i < length; i++)
-    {
-      nfPolyMatrix[i] = kNF(iSB, currRing->qideal,myPolyMatrix[i]);
-    }
-  }
-  else
-  {
-    for (int i = 0; i < length; i++)
-    {
-      nfPolyMatrix[i] = pCopy(myPolyMatrix[i]);
-    }
-  }
-
   if ((k == 0) && (strcmp(algorithm, "Bareiss") == 0)
-      && (!rField_is_Ring_Z(currRing)) && (!allDifferent))
+      && (!rField_is_Ring(currRing)) && (!allDifferent))
   {
     /* In this case, we call an optimized procedure, dating back to
        Wilfried Pohl. It may be used whenever
@@ -291,18 +270,36 @@ ideal getMinorIdeal (const matrix mat, const int minorSize, const int k,
        - requested minors need not be mutually distinct, and
        - coefficients come from a field (i.e., the ring Z is not
          allowed for this implementation). */
-    iii = (iSB == 0 ? idMinors(mat, minorSize) : idMinors(mat, minorSize,
+    iii = (iSB == NULL ? idMinors(mat, minorSize) : idMinors(mat, minorSize,
                                                           iSB));
   }
   else
   {
+  /* copy all polynomials and reduce them w.r.t. iSB
+     (if iSB is present, i.e., not the NULL pointer) */
+
+    poly* nfPolyMatrix = new poly[length];
+    if (iSB != NULL)
+    {
+      for (int i = 0; i < length; i++)
+      {
+        nfPolyMatrix[i] = kNF(iSB, currRing->qideal,myPolyMatrix[i]);
+      }
+    }
+    else
+    {
+      for (int i = 0; i < length; i++)
+      {
+        nfPolyMatrix[i] = pCopy(myPolyMatrix[i]);
+      }
+    }
     iii = getMinorIdeal_Poly(nfPolyMatrix, rowCount, columnCount, minorSize,
                              k, algorithm, iSB, allDifferent);
-  }
 
-  /* clean up */
-  for (int j = 0; j < length; j++) pDelete(&nfPolyMatrix[j]);
-  delete [] nfPolyMatrix;
+    /* clean up */
+    for (int j = length-1; j>=0; j--) pDelete(&nfPolyMatrix[j]);
+    delete [] nfPolyMatrix;
+  }
 
   return iii;
 }

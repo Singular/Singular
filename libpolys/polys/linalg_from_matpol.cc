@@ -13,7 +13,6 @@ static int mp_PivRow(matrix, int, int, const ring);
 static float mp_PolyWeight(poly, const ring);
 static void mp_SwapRow(matrix, int, int, int, const ring);
 static void mp_SwapCol(matrix, int, int, int, const ring);
-static void mp_ElimBar(matrix, matrix, poly, int, int, const ring);
 
 /*2
 *  prepare one step of 'Bareiss' algorithm
@@ -914,60 +913,3 @@ static poly mp_Leibnitz(matrix a, const ring R)
   }
   return d;
 }
-
-static void mp_ElimBar(matrix a0, matrix re, poly div, int lr, int lc, const ring R)
-{
-  int r=lr-1, c=lc-1;
-  poly *b = a0->m, *x = re->m;
-  poly piv, elim, q1, q2, *ap, *a, *q;
-  int i, j;
-
-  ap = &b[r*a0->ncols];
-  piv = ap[c];
-  for(j=c-1; j>=0; j--)
-    if (ap[j] != NULL) ap[j] = p_Neg(ap[j], R);
-  for(i=r-1; i>=0; i--)
-  {
-    a = &b[i*a0->ncols];
-    q = &x[i*re->ncols];
-    if (a[c] != NULL)
-    {
-      elim = a[c];
-      for (j=c-1; j>=0; j--)
-      {
-        q1 = NULL;
-        if (a[j] != NULL)
-        {
-          q1 = SM_MULT(a[j], piv, div, R);
-          if (ap[j] != NULL)
-          {
-            q2 = SM_MULT(ap[j], elim, div, R);
-            q1 = p_Add_q(q1,q2, R);
-          }
-        }
-        else if (ap[j] != NULL)
-          q1 = SM_MULT(ap[j], elim, div, R);
-        if (q1 != NULL)
-        {
-          if (div)
-            SM_DIV(q1, div, R);
-          q[j] = q1;
-        }
-      }
-    }
-    else
-    {
-      for (j=c-1; j>=0; j--)
-      {
-        if (a[j] != NULL)
-        {
-          q1 = SM_MULT(a[j], piv, div, R);
-          if (div)
-            SM_DIV(q1, div, R);
-          q[j] = q1;
-        }
-      }
-    }
-  }
-}
-

@@ -1216,7 +1216,7 @@ static float mp_PolyWeight(poly p, const ring r)
   if (pNext(p) == NULL)
   {
     res = (float)n_Size(pGetCoeff(p),r->cf);
-    for (i=rVar(r);i>0;i--)
+    for (i=r->N;i>0;i--)
     {
       if(p_GetExp(p,i,r)!=0)
       {
