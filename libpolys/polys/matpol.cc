@@ -1359,7 +1359,7 @@ static void mp_ElimBar(matrix a0, matrix re, poly div, int lr, int lc, const rin
 {
   int r=lr-1, c=lc-1;
   poly *b = a0->m, *x = re->m;
-  poly piv, elim, q1, q2, *ap, *a, *q;
+  poly piv, elim, q1, *ap, *a, *q;
   int i, j;
 
   ap = &b[r*a0->ncols];
@@ -1381,7 +1381,7 @@ static void mp_ElimBar(matrix a0, matrix re, poly div, int lr, int lc, const rin
           q1 = sm_MultDiv(a[j], piv, div,R);
           if (ap[j] != NULL)
           {
-            q2 = sm_MultDiv(ap[j], elim, div, R);
+            poly q2 = sm_MultDiv(ap[j], elim, div, R);
             q1 = p_Add_q(q1,q2,R);
           }
         }
