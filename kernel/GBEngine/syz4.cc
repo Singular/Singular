@@ -528,10 +528,6 @@ static ideal computeFrame(const ideal G, syzM_i_Function syzM_i,
 static void computeLiftings(const resolvente res, const int index,
         std::vector<bool> &variables)
 {
-    update_variables(variables, res[index-1]);
-    if (index == 2) {   // we don't know if the input is a reduced SB
-        variables[currRing->N] = false;
-    }
 #if CACHE
     initialize_cache(res[index-1]->ncols);
 #endif   // CACHE
@@ -549,6 +545,35 @@ static void computeLiftings(const resolvente res, const int index,
 #if CACHE
     delete_cache(res[index-1]->ncols);
 #endif   // CACHE
+}
+
+static inline bool contains_unused_variable(const poly m,
+    const std::vector<bool> &variables)
+{
+    const ring R = currRing;
+    for (int j = R->N; j > 0; j--) {
+        if (!variables[j-1] && p_GetExp(m, j, R) > 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static void delete_variables(resolvente &res, const int index,
+    std::vector<bool> variables)
+{
+    for (int i = 0; i < res[index]->ncols; i++) {
+        poly p_iter = res[index]->m[i]->next;
+        if (p_iter != NULL) {
+            while (p_iter->next != NULL) {
+                if (contains_unused_variable(p_iter->next, variables)) {
+                    pLmDelete(&p_iter->next);
+                } else {
+                    pIter(p_iter);
+                }
+            }
+        }
+    }
 }
 
 static void delete_tails(resolvente res, const int index)
@@ -575,12 +600,22 @@ static int computeResolution(resolvente res, const int max_index,
         res[1] = computeFrame(res[0], syzM_i_unsorted, syzHead);
         std::vector<bool> variables;
         variables.resize(currRing->N+1, true);
+        if (do_lifting) {
+            update_variables(variables, res[0]);
+            delete_variables(res, 0, variables);
+        }
         while (!idIs0(res[index])) {
             if (do_lifting) {
                 computeLiftings(res, index, variables);
                 if (single_module) {
                     delete_tails(res, index-1);
                 }
+                update_variables(variables, res[index]);
+                // we don't know if the input is a reduced SB:
+                if (index == 2) {
+                    variables[currRing->N] = false;
+                }
+                delete_variables(res, index, variables);
             }
             if (index >= max_index) { break; }
             index++;
