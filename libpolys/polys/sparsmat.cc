@@ -6,9 +6,6 @@
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
 */
 
-
-
-
 #include <misc/auxiliary.h>
 
 #include <omalloc/omalloc.h>
@@ -25,7 +22,6 @@
 #include "monomials/p_polys.h"
 
 #include "simpleideals.h"
-
 
 #include "sparsmat.h"
 #include "prCopy.h"
@@ -210,12 +206,13 @@ long sm_ExpBound( ideal m, int di, int ra, int t, const ring currRing)
     {
       k = p_GetComp(p, currRing)-1;
       kr = r[k];
-      for (j=rVar(currRing);j>0;j--)
+      for (j=currRing->N;j>0;j--)
       {
-        if(p_GetExp(p,j, currRing)>kc)
-          kc=p_GetExp(p,j, currRing);
-        if(p_GetExp(p,j, currRing)>kr)
-          kr=p_GetExp(p,j, currRing);
+        long t=p_GetExp(p,j, currRing);
+        if(t /*p_GetExp(p,j, currRing)*/ >kc)
+          kc=t; /*p_GetExp(p,j, currRing);*/
+        if(t /*p_GetExp(p,j, currRing)s*/ >kr)
+          kr=t; /*p_GetExp(p,j, currRing);*/
       }
       r[k] = kr;
       pIter(p);

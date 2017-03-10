@@ -3555,7 +3555,7 @@ static BOOLEAN jjUMINUS_BIM(leftv res, leftv u)
   return FALSE;
 }
 // dummy for python_module.so and similiar
-static BOOLEAN jjSetRing(leftv res, leftv u)
+static BOOLEAN jjSetRing(leftv, leftv u)
 {
   if (u->rtyp==IDHDL) rSetHdl((idhdl)u->data);
   else
