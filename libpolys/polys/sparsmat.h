@@ -9,15 +9,15 @@
  *******************************************************************/
 
 
-poly sm_Mult(poly, poly, const ring);
-void sm_PolyDiv(poly, poly, const ring);
 poly sm_MultDiv(poly, poly, const poly, const ring);
 void sm_SpecialPolyDiv(poly, poly, const ring);
+
 /* ----------------- macros ------------------ */
 /* #define OLD_DIV 1 */
 
 #ifdef OLD_DIV
-#define SM_MULT(A,B,C, R) sm_Mult(A,B,R)
+void sm_PolyDiv(poly, poly, const ring);
+#define SM_MULT(A,B,C, R) pp_Mult_qq(A,B,R)
 #define SM_DIV sm_PolyDiv
 #else
 #define SM_MULT sm_MultDiv

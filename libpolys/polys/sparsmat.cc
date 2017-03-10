@@ -1608,6 +1608,7 @@ void sparse_mat::smInitPerm()
 }
 
 /* ----------------- arithmetic ------------------ */
+#ifdef OLD_DIV
 /*2
 * exact division a/b
 * a destroyed, b NOT destroyed
@@ -1664,7 +1665,7 @@ void sm_PolyDiv(poly a, poly b, const ring R)
   } while (a!=NULL);
   p_LmFree(dummy, R);
 }
-
+#endif
 
 //disable that, as it fails with coef buckets
 //#define X_MAS
@@ -1885,7 +1886,8 @@ poly sm_MultDiv(poly a, poly b, const poly c, const ring R)
   p_LmFree(e, R);
   return res;
 }
-#endif
+#endif /*else X_MAS*/
+
 /*n
 * exact division a/b
 * a is a result of smMultDiv
@@ -1900,7 +1902,6 @@ void sm_SpecialPolyDiv(poly a, poly b, const ring R)
   }
   sm_ExactPolyDiv(a, b, R);
 }
-
 
 /* ------------ internals arithmetic ------------- */
 static void sm_ExactPolyDiv(poly a, poly b, const ring R)
