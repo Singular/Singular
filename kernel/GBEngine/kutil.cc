@@ -1997,7 +1997,6 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
     */
       strat->cp++;
       pLmFree(Lp.lcm);
-      Lp.lcm=NULL;
       return;
     }
     else
@@ -2005,7 +2004,6 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
     if (strat->fromT && (strat->ecartS[i]>ecart))
     {
       pLmFree(Lp.lcm);
-      Lp.lcm=NULL;
       return;
       /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
     }
@@ -2066,13 +2064,11 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
       */
           strat->cp++;
           pLmFree(Lp.lcm);
-          Lp.lcm=NULL;
           return;
       }
       if (strat->fromT && (strat->ecartS[i]>ecart))
       {
         pLmFree(Lp.lcm);
-        Lp.lcm=NULL;
         return;
         /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
       }
@@ -2275,7 +2271,6 @@ static void enterOnePairLift (int i,poly p,int ecart, int isFromQ,kStrategy stra
     */
       strat->cp++;
       pLmFree(Lp.lcm);
-      Lp.lcm=NULL;
       return;
     }
     else
@@ -2283,7 +2278,6 @@ static void enterOnePairLift (int i,poly p,int ecart, int isFromQ,kStrategy stra
     if (strat->fromT && (strat->ecartS[i]>ecart))
     {
       pLmFree(Lp.lcm);
-      Lp.lcm=NULL;
       return;
       /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
     }
@@ -2340,13 +2334,11 @@ static void enterOnePairLift (int i,poly p,int ecart, int isFromQ,kStrategy stra
     */
       strat->cp++;
       pLmFree(Lp.lcm);
-      Lp.lcm=NULL;
       return;
     }
     if (strat->fromT && (strat->ecartS[i]>ecart))
     {
       pLmFree(Lp.lcm);
-      Lp.lcm=NULL;
       return;
       /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
     }
@@ -2523,7 +2515,6 @@ static void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFro
       pLmDelete(Lp.lcm);
     else
       pLmFree(Lp.lcm);
-    Lp.lcm=NULL;
     pDelete (&m1);
     pDelete (&m2);
     return;
@@ -2542,7 +2533,6 @@ static void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFro
       pLmDelete(Lp.lcm);
     else
       pLmFree(Lp.lcm);
-    Lp.lcm=NULL;
     pDelete (&m1);
     pDelete (&m2);
     return;
@@ -2633,7 +2623,6 @@ static void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFro
     {
       pLmFree(Lp.lcm);
       pDelete(&Lp.sig);
-      Lp.lcm=NULL;
       pDelete (&m1);
       pDelete (&m2);
       return;
@@ -2655,7 +2644,6 @@ static void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFro
 #if 0
       int pos = posInSyz(strat, Lp.sig);
       enterSyz(Lp, strat, pos);
-      Lp.lcm=NULL;
       pDelete (&m1);
       pDelete (&m2);
       return;
@@ -2905,7 +2893,6 @@ static void enterOnePairSigRing (int i, poly p, poly pSig, int, int ecart, int i
       pLmDelete(Lp.lcm);
     else
       pLmFree(Lp.lcm);
-    Lp.lcm=NULL;
     pDelete (&m1);
     pDelete (&m2);
     return;
@@ -2929,7 +2916,6 @@ static void enterOnePairSigRing (int i, poly p, poly pSig, int, int ecart, int i
       pLmDelete(Lp.lcm);
     else
       pLmFree(Lp.lcm);
-    Lp.lcm=NULL;
     pDelete (&m1);
     pDelete (&m2);
     return;
@@ -3038,7 +3024,6 @@ static void enterOnePairSigRing (int i, poly p, poly pSig, int, int ecart, int i
       printf("\nrewCrit3 deletes it!\n");
       #endif
       pDelete(&Lp.sig);
-      Lp.lcm=NULL;
       pDelete (&m1);
       pDelete (&m2);
       return;
@@ -3060,7 +3045,6 @@ static void enterOnePairSigRing (int i, poly p, poly pSig, int, int ecart, int i
 #if 0
       int pos = posInSyz(strat, Lp.sig);
       enterSyz(Lp, strat, pos);
-      Lp.lcm=NULL;
       pDelete (&m1);
       pDelete (&m2);
       return;
@@ -12384,7 +12368,6 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
     }
 #endif
     pLmFree(Lp.lcm);
-    Lp.lcm=NULL;
     /* + counter for applying the V criterion */
     strat->cv++;
     return;
@@ -12411,7 +12394,6 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
     */
       strat->cp++;
       pLmFree(Lp.lcm);
-      Lp.lcm=NULL;
       return;
     }
     else
@@ -12419,7 +12401,6 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
     if (strat->fromT && (ecartq>ecart))
     {
       pLmFree(Lp.lcm);
-      Lp.lcm=NULL;
       return;
       /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
     }
@@ -12480,13 +12461,11 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
       */
           strat->cp++;
           pLmFree(Lp.lcm);
-          Lp.lcm=NULL;
           return;
       }
       if (strat->fromT && (ecartq>ecart))
       {
         pLmFree(Lp.lcm);
-        Lp.lcm=NULL;
         return;
         /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
       }
