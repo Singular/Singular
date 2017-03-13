@@ -323,7 +323,7 @@ BOOLEAN nc_CallPlural(matrix cc, matrix dd, poly cn, poly dn, ring r,
                       bool bBeQuiet, //< false
                       ring curr,
                       bool dummy_ring = false
-		      /* allow to create a nc-ring with 1 variable*/);
+                      /* allow to create a nc-ring with 1 variable*/);
 
 
 // this function should be used inside QRing definition!
@@ -336,20 +336,6 @@ bool nc_rCopy(ring res, const ring r, bool bSetupQuotient);
 
 poly pOppose(ring Rop_src, poly p, const ring Rop_dst);
 ideal idOppose(ring Rop_src, ideal I, const ring Rop_dst);
-
-
-
-// returns the LCM of the head terms of a and b with the given component
-// NOTE: coeff will be created but remains undefined(zero?)
-poly p_Lcm(const poly a, const poly b, const long lCompM, const ring r);
-
-// returns the LCM of the head terms of a and b with component = max comp. of a & b
-// NOTE: coeff will be created but remains undefined(zero?)
-poly p_Lcm(const poly a, const poly b, const ring r);
-
-
-
-
 
 const int GENERICMASK = 0x000; // gnc... must do its dirty job first!
 const int SCAMASK     = 0x001;

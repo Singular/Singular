@@ -151,59 +151,6 @@ void nc_rCleanUp(ring r); // smaller than kill: just free mem
 #endif
 
 
-
-/*2
-* returns the LCM of the head terms of a and b
-* without coefficient!!!
-*/
-poly p_Lcm(const poly a, const poly b, const long lCompM, const ring r)
-{
-  poly m = // p_One( r);
-          p_Init(r);
-
-  const int pVariables = r->N;
-
-  for (int i = pVariables; i!=0; i--)
-  {
-    const int lExpA = p_GetExp (a, i, r);
-    const int lExpB = p_GetExp (b, i, r);
-
-    p_SetExp (m, i, si_max(lExpA, lExpB), r);
-  }
-
-  p_SetComp (m, lCompM, r);
-
-  p_Setm(m,r);
-
-#ifdef PDEBUG
-//  p_Test(m,r);
-#endif
-
-  n_New(&(p_GetCoeff(m, r)), r);
-
-  return(m);
-}
-
-poly p_Lcm(const poly a, const poly b, const ring r)
-{
-#ifdef PDEBUG
-  p_Test(a, r);
-  p_Test(b, r);
-#endif
-
-  const long lCompP1 = p_GetComp(a, r);
-  const long lCompP2 = p_GetComp(b, r);
-
-  const poly m = p_Lcm(a, b, si_max(lCompP1, lCompP2), r);
-
-#ifdef PDEBUG
-//  p_Test(m,r);
-#endif
-  return(m);
-}
-
-
-
 ///////////////////////////////////////////////////////////////////////////////
 poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &shorter,
                                     const poly, const ring r)
@@ -1963,7 +1910,7 @@ poly nc_CreateShortSpoly(poly p1, poly p2, const ring r)
   } else
 #endif
   {
-    m = p_Lcm(p1, p2, si_max(lCompP1, lCompP2), r);
+    m = p_Lcm(p1, p2, r);
   }
 
 //  n_Delete(&p_GetCoeff(m, r), r->cf);

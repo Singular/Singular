@@ -1613,14 +1613,20 @@ BOOLEAN p_DivisibleByRingCase(poly f, poly g, const ring r)
 // returns the LCM of the head terms of a and b in *m
 void p_Lcm(const poly a, const poly b, poly m, const ring r)
 {
-  for (int i=rVar(r); i; --i)
+  for (int i=r->N; i; --i)
     p_SetExp(m,i, si_max( p_GetExp(a,i,r), p_GetExp(b,i,r)),r);
 
   p_SetComp(m, si_max(p_GetComp(a,r), p_GetComp(b,r)),r);
   /* Don't do a pSetm here, otherwise hres/lres chockes */
 }
 
-
+poly p_Lcm(const poly a, const poly b, const ring r)
+{
+  poly m=p_Init(r);
+  p_Lcm(a, b, m, r);
+  p_Setm(m,r);
+  return(m);
+}
 
 #ifdef HAVE_RATGRING
 /*2

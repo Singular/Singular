@@ -1935,8 +1935,10 @@ poly      p_Divide(poly a, poly b, const ring r);
 poly      p_DivideM(poly a, poly b, const ring r);
 poly      p_Div_nn(poly p, const number n, const ring r);
 
-// returns the LCM of the head terms of a and b in *m
+// returns the LCM of the head terms of a and b in *m, does not p_Setm
 void p_Lcm(const poly a, const poly b, poly m, const ring r);
+// returns the LCM of the head terms of a and b, does p_Setm
+poly p_Lcm(const poly a, const poly b, const ring r);
 
 #ifdef HAVE_RATGRING
 poly p_LcmRat(const poly a, const poly b, const long lCompM, const ring r);

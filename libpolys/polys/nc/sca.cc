@@ -765,7 +765,7 @@ poly sca_SPoly( const poly p1, const poly p2, const ring r )
     return(NULL);
   }
 
-  poly pL = p_Lcm(p1, p2, si_max(lCompP1, lCompP2), r);       // pL = lcm( lm(p1), lm(p2) )
+  poly pL = p_Lcm(p1, p2, r);       // pL = lcm( lm(p1), lm(p2) )
 
   poly m1 = p_One( r);
   p_ExpVectorDiff(m1, pL, p1, r);                  // m1 = pL / lm(p1)
