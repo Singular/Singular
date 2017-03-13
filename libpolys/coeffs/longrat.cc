@@ -982,13 +982,13 @@ coeffs nlQuot1(number c, const coeffs r)
   #ifdef HAVE_RINGS
   else
   {
-    mpz_ptr dummy;
-    dummy = (mpz_ptr) omAlloc(sizeof(mpz_t));
+    mpz_t dummy;
     mpz_init_set_ui(dummy, ch);
     ZnmInfo info;
     info.base = dummy;
     info.exp = (unsigned long) 1;
     rr = nInitChar(n_Zn, (void*)&info);
+    mpz_clear(dummy);
   }
   #endif
   return(rr);
@@ -1479,21 +1479,21 @@ number nlModP(number q, const coeffs /*Q*/, const coeffs Zp)
 /*2
 * convert number i (from Q) to GMP and warn if denom != 1
 */
-void nlGMP(number &i, number n, const coeffs r)
+void nlGMP(number &i, mpz_t n, const coeffs r)
 {
   // Hier brauche ich einfach die GMP Zahl
   nlTest(i, r);
   nlNormalize(i, r);
   if (SR_HDL(i) & SR_INT)
   {
-    mpz_set_si((mpz_ptr) n, SR_TO_INT(i));
+    mpz_set_si(n, SR_TO_INT(i));
     return;
   }
   if (i->s!=3)
   {
      WarnS("Omitted denominator during coefficient mapping !");
   }
-  mpz_set((mpz_ptr) n, i->z);
+  mpz_set(n, i->z);
 }
 #endif
 

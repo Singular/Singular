@@ -332,7 +332,7 @@ static number nrzMapQ(number from, const coeffs src, const coeffs /*dst*/)
 {
   mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
-  nlGMP(from, (number) erg, src); // FIXME? TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(erg, from, src); // ?
+  nlGMP(from, erg, src); // FIXME? TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(erg, from, src); // ?
   return (number) erg;
 }
 
@@ -480,13 +480,13 @@ static char* nrzCoeffString(const coeffs cf)
 static coeffs nrzQuot1(number c, const coeffs r)
 {
     long ch = r->cfInt(c, r);
-    mpz_ptr dummy;
-    dummy = (mpz_ptr) omAlloc(sizeof(mpz_t));
+    mpz_t dummy;
     mpz_init_set_ui(dummy, ch);
     ZnmInfo info;
     info.base = dummy;
     info.exp = (unsigned long) 1;
     coeffs rr = nInitChar(n_Zn, (void*)&info);
+    mpz_clear(dummy);
     return(rr);
 }
 
@@ -1784,8 +1784,7 @@ static void nrzMPZ(mpz_t res, number &a, const coeffs)
 
 static coeffs nrzQuot1(number c, const coeffs r)
 {
-    mpz_ptr dummy;
-    dummy = (mpz_ptr) omAlloc(sizeof(mpz_t));
+    mpz_t dummy;
     if(n_Z_IS_SMALL(c))
     {
       long ch = r->cfInt(c, r);
@@ -1799,6 +1798,7 @@ static coeffs nrzQuot1(number c, const coeffs r)
     info.base = dummy;
     info.exp = (unsigned long) 1;
     coeffs rr = nInitChar(n_Zn, (void*)&info);
+    mpz_clear(dummy);
     return(rr);
 }
 

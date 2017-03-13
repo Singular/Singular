@@ -127,7 +127,7 @@ number   nlInit2gmp (mpz_t i, mpz_t j, const coeffs r);
 
 // FIXME: TODO:  why only if HAVE_RINGS? bug?
 #  ifdef HAVE_RINGS
-void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(number n, number &i,const coeffs r)???
+void   nlGMP(number &i, mpz_t n, const coeffs r); // to be replaced with n_MPZ(number n, number &i,const coeffs r)???
 number nlMapGMP(number from, const coeffs src, const coeffs dst);
 #  endif
 // for ring similiar to Q/Z (char 0 required):

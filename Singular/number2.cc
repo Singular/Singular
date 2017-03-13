@@ -45,11 +45,30 @@ BOOLEAN jjCRING_Zp(leftv res, leftv a, leftv b)
     else
     {
       ZnmInfo info;
-      mpz_ptr modBase= (mpz_ptr) omAlloc(sizeof(mpz_t));
+      mpz_t modBase;
       mpz_init_set_ui(modBase,i2);
       info.base= modBase;
       info.exp= 1;
+      if (mpz_popcount((mpz_ptr)modBase)==1) // is a power of 2
+      {
+        // is exponent <=2^(8*sizeof(unsigned long))
+        if (i2<(8*sizeof(unsigned long)))
+        {
+          mpz_clear(modBase);
+          res->data=(void *) nInitChar(n_Z2m,(void*)(long)i2);
+          return FALSE;
+        }
+        else
+        {
+          mpz_set_ui(modBase,2);
+          info.exp=i2;
+          res->data=(void *) nInitChar(n_Znm,&info);
+          mpz_clear(modBase);
+          return FALSE;
+        }
+      }
       res->data=(void *)nInitChar(n_Zn,&info);
+      mpz_clear(modBase);
     }
     return FALSE;
   }
@@ -62,11 +81,30 @@ BOOLEAN jjCRING_Zm(leftv res, leftv a, leftv b)
   if (c1->type==n_Z)
   {
     ZnmInfo info;
-    number modBase= (number) omAlloc(sizeof(mpz_t));
-    nlGMP(i2,modBase,coeffs_BIGINT); // FIXME? TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(modBase,i2,coeffs_BIGINT); // ?
+    mpz_t modBase;
+    mpz_init(modBase);
+    nlGMP(i2,modBase,coeffs_BIGINT); // FIXME? TODO? // extern void   nlGMP(number &i, mpz_t n, const coeffs r); // to be replaced with n_MPZ(modBase,i2,coeffs_BIGINT); // ?
     info.base= (mpz_ptr)modBase;
     info.exp= 1;
+    if (mpz_popcount(modBase)==1) // is a power of 2
+    {
+      // is exponent <=2^(8*sizeof(unsigned long))
+      mp_bitcnt_t l=mpz_scan1 (modBase,0);
+      if ((l>0) && (l<=8*sizeof(unsigned long)))
+      {
+        res->data=(void *) nInitChar(n_Z2m,(void*)(long)l);
+      }
+      else
+      {
+        mpz_set_ui(modBase,2);
+        info.exp= l;
+        res->data=(void *) nInitChar(n_Znm,&info);
+      }
+      mpz_clear(modBase);
+      return FALSE;
+    }
     res->data=(void *)nInitChar(n_Zn,&info);
+    mpz_clear(modBase);
     return FALSE;
   }
   return TRUE;

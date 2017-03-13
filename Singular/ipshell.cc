@@ -5689,7 +5689,7 @@ ring rInit(leftv pn, leftv rv, leftv ord)
   else if ((pn->name != NULL) && (strcmp(pn->name, "integer") == 0))
   {
     // TODO: change to use coeffs_BIGINT!?
-    modBase = (mpz_ptr) omAlloc(sizeof(mpz_t));
+    mpz_t modBase;
     mpz_init_set_si(modBase, 0);
     if (pn->next!=NULL)
     {
@@ -5712,7 +5712,7 @@ ring rInit(leftv pn, leftv rv, leftv ord)
       else if (pnn->next->Typ()==BIGINT_CMD)
       {
         number p=(number)pnn->next->CopyD();
-        nlGMP(p,(number)modBase,coeffs_BIGINT); // TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // FIXME: n_MPZ( modBase, p, coeffs_BIGINT); ?
+        nlGMP(p,modBase,coeffs_BIGINT); // TODO? // extern void   nlGMP(number &i, mpz_t n, const coeffs r); // FIXME: n_MPZ( modBase, p, coeffs_BIGINT); ?
         n_Delete(&p,coeffs_BIGINT);
       }
     }
@@ -5739,8 +5739,6 @@ ring rInit(leftv pn, leftv rv, leftv ord)
            depending on the size of a long on the respective platform */
         //ringtype = 1;       // Use Z/2^ch
         cf=nInitChar(n_Z2m,(void*)(long)modExponent);
-        mpz_clear(modBase);
-        omFreeSize (modBase, sizeof (mpz_t));
       }
       else
       {
@@ -5771,6 +5769,7 @@ ring rInit(leftv pn, leftv rv, leftv ord)
       cf=nInitChar(n_Zn,(void*) &info);
     }
     assume( cf != NULL );
+    mpz_clear(modBase);
   }
 #endif
   // ring NEW = OLD, (), (); where OLD is a polynomial ring...

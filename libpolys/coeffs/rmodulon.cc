@@ -97,41 +97,41 @@ static coeffs nrnQuot1(number c, const coeffs r)
     mpz_t a,b;
     mpz_init_set(a, r->modNumber);
     mpz_init_set_ui(b, ch);
-    mpz_ptr gcd;
-    gcd = (mpz_ptr) omAlloc(sizeof(mpz_t));
+    mpz_t gcd;
     mpz_init(gcd);
     mpz_gcd(gcd, a,b);
     if(mpz_cmp_ui(gcd, 1) == 0)
-        {
-            WerrorS("constant in q-ideal is coprime to modulus in ground ring");
-            WerrorS("Unable to create qring!");
-            return NULL;
-        }
+    {
+      WerrorS("constant in q-ideal is coprime to modulus in ground ring");
+      WerrorS("Unable to create qring!");
+      return NULL;
+    }
     if(r->modExponent == 1)
     {
-        ZnmInfo info;
-        info.base = gcd;
-        info.exp = (unsigned long) 1;
-        rr = nInitChar(n_Zn, (void*)&info);
+      ZnmInfo info;
+      info.base = gcd;
+      info.exp = (unsigned long) 1;
+      rr = nInitChar(n_Zn, (void*)&info);
     }
     else
     {
-        ZnmInfo info;
-        info.base = r->modBase;
-        int kNew = 1;
-        mpz_t baseTokNew;
-        mpz_init(baseTokNew);
-        mpz_set(baseTokNew, r->modBase);
-        while(mpz_cmp(gcd, baseTokNew) > 0)
-        {
-          kNew++;
-          mpz_mul(baseTokNew, baseTokNew, r->modBase);
-        }
-        //printf("\nkNew = %i\n",kNew);
-        info.exp = kNew;
-        mpz_clear(baseTokNew);
-        rr = nInitChar(n_Znm, (void*)&info);
+      ZnmInfo info;
+      info.base = r->modBase;
+      int kNew = 1;
+      mpz_t baseTokNew;
+      mpz_init(baseTokNew);
+      mpz_set(baseTokNew, r->modBase);
+      while(mpz_cmp(gcd, baseTokNew) > 0)
+      {
+        kNew++;
+        mpz_mul(baseTokNew, baseTokNew, r->modBase);
+      }
+      //printf("\nkNew = %i\n",kNew);
+      info.exp = kNew;
+      mpz_clear(baseTokNew);
+      rr = nInitChar(n_Znm, (void*)&info);
     }
+    mpz_clear(gcd);
     return(rr);
 }
 
@@ -689,7 +689,7 @@ static number nrnMapQ(number from, const coeffs src, const coeffs dst)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
-  nlGMP(from, (number)erg, src); // FIXME? TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(erg, from, src); // ?
+  nlGMP(from, erg, src); // FIXME? TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(erg, from, src); // ?
   mpz_mod(erg, erg, dst->modNumber);
   return (number)erg;
 }
@@ -932,7 +932,7 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->cfAnn         = nrnAnn;
   r->cfIntMod      = nrnMod;
   r->cfExactDiv    = nrnDiv;
-  r->cfInpNeg         = nrnNeg;
+  r->cfInpNeg      = nrnNeg;
   r->cfInvers      = nrnInvers;
   r->cfDivBy       = nrnDivBy;
   r->cfDivComp     = nrnDivComp;

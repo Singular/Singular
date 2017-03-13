@@ -623,7 +623,7 @@ static number nr2mMapQ(number from, const coeffs src, const coeffs dst)
 {
   mpz_ptr gmp = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_init(gmp);
-  nlGMP(from, (number)gmp, src); // FIXME? TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(erg, from, src); // ?
+  nlGMP(from, gmp, src); // FIXME? TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(erg, from, src); // ?
   number res=nr2mMapGMP((number)gmp,src,dst);
   mpz_clear(gmp); omFree((ADDRESS)gmp);
   return res;
