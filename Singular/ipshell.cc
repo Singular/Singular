@@ -3053,6 +3053,7 @@ BOOLEAN mpKoszul(leftv res,leftv c/*ip*/, leftv b/*in*/, leftv id)
     col++;
     idGetNextChoise(d,n,&bo,choise);
   }
+  omFreeSize(choise,d*sizeof(int));
   if (id==NULL) idDelete(&temp);
 
   res->data=(char *)result;
