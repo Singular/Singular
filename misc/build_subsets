@@ -1,0 +1,2 @@
+gcc -shared -DDYNAMIC_VERSION -fPIC `libsingular-config --cflags` subsets.cc -o subsets.so
+
