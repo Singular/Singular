@@ -3043,7 +3043,6 @@ static void rSetFirstWv(ring r, int i, rRingOrder_t* order, int* block1, int** w
     int j;
     for(j=block1[i]-r->block0[i];j>=0;j--)
     {
-      if (r->firstwv[j]<0) r->MixedOrder=TRUE;
       if (r->firstwv[j]==0) r->LexOrder=TRUE;
     }
   }
@@ -3106,7 +3105,6 @@ static void rSetDegStuff(ring r)
   /*======== ordering type is (am,_) ==================*/
   if (order[0]==ringorder_am)
   {
-    r->MixedOrder = FALSE;
     for(int ii=block0[0];ii<=block1[0];ii++)
       if (wvhdl[0][ii-1]<0) { r->MixedOrder=2;break;}
     r->LexOrder=FALSE;
@@ -3224,7 +3222,8 @@ static void rSetDegStuff(ring r)
     r->pFDeg = p_WTotaldegree; // may be improved: p_Totaldegree for lp/dp/ls/.. blocks
   }
 
-  if (rOrd_is_Totaldegree_Ordering(r) || rOrd_is_WeightedDegree_Ordering(r))
+  if (rOrd_is_Totaldegree_Ordering(r)
+  || rOrd_is_WeightedDegree_Ordering(r))
   {
     if(r->MixedOrder==FALSE)
       r->pFDeg = p_Deg;
