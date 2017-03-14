@@ -2299,10 +2299,9 @@ void rComposeRing(lists L, ring R)
   // ----------------------------------------
   // 0: string: integer
   // no further entries --> Z
-  mpz_ptr modBase = NULL;
+  mpz_t modBase;
   unsigned int modExponent = 1;
 
-  modBase = (mpz_ptr) omAlloc(sizeof(mpz_t));
   if (L->nr == 0)
   {
     mpz_init_set_ui(modBase,0);
@@ -2383,6 +2382,7 @@ void rComposeRing(lists L, ring R)
     info.exp= modExponent;
     R->cf=nInitChar(n_Zn,(void*) &info);
   }
+  mpz_clear(modBase);
 }
 #endif
 
@@ -5517,11 +5517,6 @@ const short MAX_SHORT = 32767; // (1 << (sizeof(short)*8)) - 1;
 //         * considers input sleftv's as read-only
 ring rInit(leftv pn, leftv rv, leftv ord)
 {
-#ifdef HAVE_RINGS
-  //unsigned int ringtype = 0;
-  mpz_ptr modBase = NULL;
-  unsigned int modExponent = 1;
-#endif
   int float_len=0;
   int float_len2=0;
   ring R = NULL;
@@ -5690,6 +5685,7 @@ ring rInit(leftv pn, leftv rv, leftv ord)
   {
     // TODO: change to use coeffs_BIGINT!?
     mpz_t modBase;
+    unsigned int modExponent = 1;
     mpz_init_set_si(modBase, 0);
     if (pn->next!=NULL)
     {
