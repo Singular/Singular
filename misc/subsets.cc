@@ -18,6 +18,11 @@ void subset(std::vector<int> &arr, int size, int left, int index, std::vector<in
   }
 }
 
+// USAGE:  subsets(n,k)  n int, k int
+// RETURN:  list, a list of lists,
+//          representing subsets of {1,...,n} of cardinality k
+// NOTE:    the lists will be sorted lexicographically
+//          and the elements in each of the lists are sorted naturally
 BOOLEAN subsets(leftv res, leftv args)
 {
   leftv u = args;
@@ -64,6 +69,6 @@ BOOLEAN subsets(leftv res, leftv args)
 // initialisation of the module
 extern "C" int SI_MOD_INIT(customstd)(SModulFunctions* p)
 {
-  p->iiAddCproc("general.lib","subsets",FALSE,subsets);
+  p->iiAddCproc("subsets.so","subsets",FALSE,subsets);
   return (MAX_TOK);
 }
