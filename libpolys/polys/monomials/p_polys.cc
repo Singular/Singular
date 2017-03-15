@@ -628,6 +628,12 @@ long p_WTotaldegree(poly p, const ring r)
           j+= p_GetExp(p,k,r)*r->wvhdl[i][k - b0 /*r->block0[i]*/]*r->OrdSgn;
         }
         break;
+      case ringorder_a:
+        for (k=b0 /*r->block0[i]*/;k<=b1 /*r->block1[i]*/;k++)
+        { // only one line
+          j+= p_GetExp(p,k,r)*r->wvhdl[i][k - b0 /*r->block0[i]*/];
+        }
+        return j*r->OrdSgn;
       case ringorder_wp:
       case ringorder_ws:
       case ringorder_Wp:
@@ -668,13 +674,6 @@ long p_WTotaldegree(poly p, const ring r)
       case ringorder_aa:
       case ringorder_IS:
         break;
-      case ringorder_a:
-        for (k=b0 /*r->block0[i]*/;k<=b1 /*r->block1[i]*/;k++)
-        { // only one line
-          j+= p_GetExp(p,k, r)*r->wvhdl[i][ k- b0 /*r->block0[i]*/];
-        }
-        //break;
-        return j;
 
 #ifndef SING_NDEBUG
       default:

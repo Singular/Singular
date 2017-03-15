@@ -3157,7 +3157,12 @@ static void rSetDegStuff(ring r)
         if (wvhdl[0][ii-1]<0) { r->MixedOrder=2;break;}
       }
       if (r->MixedOrder==0)
-        r->pFDeg = p_WFirstTotalDegree;
+      {
+        if ((block0[0]==1)&&(block1[0]==r->N))
+          r->pFDeg = p_WTotaldegree;
+        else
+          r->pFDeg = p_WFirstTotalDegree;
+      }
       else
         r->pFDeg = p_Totaldegree;
     }
