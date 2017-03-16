@@ -2317,6 +2317,7 @@ void rComposeRing(lists L, ring R)
     {
       number tmp= (number) LL->m[0].data; // never use CopyD() on list elements
                                     // assume that tmp is integer, not rational
+      mpz_init(modBase);
       n_MPZ (modBase, tmp, coeffs_BIGINT);
     }
     else if (LL->nr >= 0 && LL->m[0].rtyp == INT_CMD)
