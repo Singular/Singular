@@ -2362,7 +2362,6 @@ void rComposeRing(lists L, ring R)
       /* this branch should be active for modExponent = 2..32 resp. 2..64,
            depending on the size of a long on the respective platform */
       R->cf=nInitChar(n_Z2m,(void*)(long)modExponent);       // Use Z/2^ch
-      omFreeSize (modBase, sizeof(mpz_t));
     }
     else
     {
