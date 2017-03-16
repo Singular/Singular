@@ -14,10 +14,10 @@ void MinorKey::reset()
 {
   _numberOfRowBlocks = 0;
   _numberOfColumnBlocks = 0;
-  delete [] _rowKey;
-  delete [] _columnKey;
-  _rowKey = 0;
-  _columnKey = 0;
+  omFree(_rowKey);
+  _rowKey = NULL;
+  omFree(_columnKey);
+  _columnKey = NULL;
 }
 
 MinorKey::MinorKey (const MinorKey& mk)
@@ -26,8 +26,8 @@ MinorKey::MinorKey (const MinorKey& mk)
   _numberOfColumnBlocks = mk.getNumberOfColumnBlocks();;
 
   /* allocate memory for new entries in _rowKey and _columnKey */
-  _rowKey = new unsigned int[_numberOfRowBlocks];
-  _columnKey = new unsigned int[_numberOfColumnBlocks];
+  _rowKey = (unsigned*)omAlloc(_numberOfRowBlocks*sizeof(unsigned));
+  _columnKey = (unsigned*)omAlloc(_numberOfColumnBlocks*sizeof(unsigned));
 
   /* copying values from parameter arrays to private arrays */
   for (int r = 0; r < _numberOfRowBlocks; r++)
@@ -38,19 +38,17 @@ MinorKey::MinorKey (const MinorKey& mk)
 
 MinorKey& MinorKey::operator=(const MinorKey& mk)
 {
-  if (_numberOfRowBlocks != 0)    delete [] _rowKey;
-  if (_numberOfColumnBlocks != 0) delete [] _columnKey;
+  omfree(_rowKey); _rowKey = NULL;
+  omfree(_columnKey); _columnKey = NULL;
   _numberOfRowBlocks = 0;
   _numberOfColumnBlocks = 0;
-  _rowKey = 0;
-  _columnKey = 0;
 
   _numberOfRowBlocks = mk.getNumberOfRowBlocks();
   _numberOfColumnBlocks = mk.getNumberOfColumnBlocks();;
 
   /* allocate memory for new entries in _rowKey and _columnKey */
-  _rowKey = new unsigned int[_numberOfRowBlocks];
-  _columnKey = new unsigned int[_numberOfColumnBlocks];
+  _rowKey = (unsigned*)omalloc(_numberOfRowBlocks*sizeof(unsigned));
+  _columnKey = (unsigned*)omalloc(_numberOfColumnBlocks*sizeof(unsigned));
 
   /* copying values from parameter arrays to private arrays */
   for (int r = 0; r < _numberOfRowBlocks; r++)
@@ -66,15 +64,15 @@ void MinorKey::set(const int lengthOfRowArray, const unsigned int* rowKey,
                    const unsigned int* columnKey)
 {
   /* free memory of _rowKey and _columnKey */
-  if (_numberOfRowBlocks > 0) { delete [] _rowKey; }
-  if (_numberOfColumnBlocks > 0) { delete [] _columnKey; }
+  if (_numberOfRowBlocks > 0) { omFree(_rowKey); }
+  if (_numberOfColumnBlocks > 0) { omFree(_columnKey); }
 
   _numberOfRowBlocks = lengthOfRowArray;
   _numberOfColumnBlocks = lengthOfColumnArray;
 
   /* allocate memory for new entries in _rowKey and _columnKey; */
-  _rowKey = new unsigned int[_numberOfRowBlocks];
-  _columnKey = new unsigned int[_numberOfColumnBlocks];
+  _rowKey = (unsigned*)omAlloc(_numberOfRowBlocks*sizeof(unsigned));
+  _columnKey = (unsigned*)omAlloc(_numberOfColumnBlocks*sizeof(unsigned));
 
   /* copying values from parameter arrays to private arrays */
   for (int r = 0; r < _numberOfRowBlocks; r++)
@@ -92,8 +90,8 @@ MinorKey::MinorKey(const int lengthOfRowArray,
   _numberOfColumnBlocks = lengthOfColumnArray;
 
   /* allocate memory for new entries in _rowKey and _columnKey */
-  _rowKey = new unsigned int[_numberOfRowBlocks];
-  _columnKey = new unsigned int[_numberOfColumnBlocks];
+  _rowKey = (unsigned*)omalloc(_numberOfRowBlocks*sizeof(unsigned));
+  _columnKey = (unsigned*)omalloc(_numberOfColumnBlocks*sizeof(unsigned));
 
   /* copying values from parameter arrays to private arrays */
   for (int r = 0; r < _numberOfRowBlocks; r++)
@@ -107,10 +105,8 @@ MinorKey::~MinorKey()
 {
   _numberOfRowBlocks = 0;
   _numberOfColumnBlocks = 0;
-  delete [] _rowKey;
-  delete [] _columnKey;
-  _rowKey = 0;
-  _columnKey = 0;
+  omfree(_rowKey); _rowKey = NULL;
+  omfree(_columnKey); _columnKey = NULL;
 }
 
 //void MinorKey::print() const
@@ -486,10 +482,11 @@ void MinorKey::selectFirstRows (const int k, const MinorKey& mk)
     }
   }
   /* free old memory */
-  delete [] _rowKey; _rowKey = 0;
+  omfree(_rowKey);
+  _rowKey = NULL;
   _numberOfRowBlocks = blockIndex + 1;
   /* allocate memory for new entries in _rowKey; */
-  _rowKey = new unsigned int[_numberOfRowBlocks];
+  _rowKey = (unsigned*)omAlloc(_numberOfRowBlocks*sizeof(unsigned));
   /* copying values from mk to this MinorKey */
   for (int r = 0; r < blockIndex; r++)
     _rowKey[r] = mk.getRowKey(r);
@@ -526,10 +523,10 @@ void MinorKey::selectFirstColumns (const int k, const MinorKey& mk)
     }
   }
   /* free old memory */
-  delete [] _columnKey; _columnKey = 0;
+  omfree(_columnKey); _columnKey = NULL;
   _numberOfColumnBlocks = blockIndex + 1;
   /* allocate memory for new entries in _columnKey; */
-  _columnKey = new unsigned int[_numberOfColumnBlocks];
+  _columnKey = (unsigned*)omAlloc(_numberOfColumnBlocks*sizeof(unsigned));
   /*  copying values from mk to this MinorKey */
   for (int c = 0; c < blockIndex; c++)
     _columnKey[c] = mk.getColumnKey(c);
@@ -606,10 +603,10 @@ bool MinorKey::selectNextRows (const int k, const MinorKey& mk)
     if (blockCount - 1 < newBitBlockIndex)
     { /* In this case, _rowKey is too small. */
       /* free old memory */
-      delete [] _rowKey; _rowKey = 0;
+      omFree(_rowKey); _rowKey = NULL;
       _numberOfRowBlocks = newBitBlockIndex + 1;
       /* allocate memory for new entries in _rowKey; */
-      _rowKey = new unsigned int[_numberOfRowBlocks];
+      _rowKey = (unsigned*)omAlloc(_numberOfRowBlocks*sizeof(unsigned));
       /* initializing entries to zero */
         for (int r = 0; r < _numberOfRowBlocks; r++) _rowKey[r] = 0;
     }
@@ -738,10 +735,10 @@ bool MinorKey::selectNextColumns (const int k, const MinorKey& mk)
     if (blockCount - 1 < newBitBlockIndex)
     { /* In this case, _columnKey is too small. */
         /* free old memory */
-        delete [] _columnKey; _columnKey = 0;
+        omFree( _columnKey); _columnKey = NULL;
         _numberOfColumnBlocks = newBitBlockIndex + 1;
         /* allocate memory for new entries in _columnKey; */
-        _columnKey = new unsigned int[_numberOfColumnBlocks];
+        _columnKey = (unsigned*)omAlloc(_numberOfColumnBlocks*sizeof(unsigned));
         /* initializing entries to zero */
         for (int c = 0; c < _numberOfColumnBlocks; c++) _columnKey[c] = 0;
     }

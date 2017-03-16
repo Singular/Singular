@@ -149,9 +149,9 @@ class MinorKey
      +        columns of the minor
      */
      MinorKey (const int lengthOfRowArray = 0,
-               const unsigned int* const rowKey = 0,
+               const unsigned int* const rowKey = NULL,
                const int lengthOfColumnArray = 0,
-               const unsigned int* const columnKey = 0);
+               const unsigned int* const columnKey = NULL);
 
      /**
      * A setter method for class MinorKey.

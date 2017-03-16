@@ -141,7 +141,7 @@ void MinorProcessor::defineSubMatrix(const int numberOfRows,
   _containerRows = numberOfRows;
   int highestRowIndex = rowIndices[numberOfRows - 1];
   int rowBlockCount = (highestRowIndex / 32) + 1;
-  unsigned int *rowBlocks=new unsigned int[rowBlockCount];
+  unsigned *rowBlocks=(unsigned*)omAlloc(rowBlockCount*sizeof(unsigned));
   for (int i = 0; i < rowBlockCount; i++) rowBlocks[i] = 0;
   for (int i = 0; i < numberOfRows; i++)
   {
@@ -153,8 +153,7 @@ void MinorProcessor::defineSubMatrix(const int numberOfRows,
   _containerColumns = numberOfColumns;
   int highestColumnIndex = columnIndices[numberOfColumns - 1];
   int columnBlockCount = (highestColumnIndex / 32) + 1;
-  unsigned *columnBlocks=new unsigned[columnBlockCount];
-  for (int i = 0; i < columnBlockCount; i++) columnBlocks[i] = 0;
+  unsigned *columnBlocks=(unsigned*)omAlloc0(columnBlockCount*sizeof(unsigned));
   for (int i = 0; i < numberOfColumns; i++)
   {
     int blockIndex = columnIndices[i] / 32;
@@ -163,8 +162,8 @@ void MinorProcessor::defineSubMatrix(const int numberOfRows,
   }
 
   _container.set(rowBlockCount, rowBlocks, columnBlockCount, columnBlocks);
-  delete[] columnBlocks;
-  delete[] rowBlocks;
+  omFree(columnBlocks);
+  omFree(rowBlocks);
 }
 
 bool MinorProcessor::setNextKeys(const int k)
@@ -272,15 +271,15 @@ int MinorProcessor::NumberOfRetrievals (const int rows, const int columns,
   return result;
 }
 
-MinorProcessor::MinorProcessor ()
+MinorProcessor::MinorProcessor () :
+  _container(0, NULL, 0, NULL),
+  _minor(0, NULL, 0, NULL),
+  _containerRows(0),
+  _containerColumns(0),
+  _minorSize(0),
+  _rows(0),
+  _columns(0)
 {
-  _container = MinorKey(0, 0, 0, 0);
-  _minor = MinorKey(0, 0, 0, 0);
-  _containerRows = 0;
-  _containerColumns = 0;
-  _minorSize = 0;
-  _rows = 0;
-  _columns = 0;
 }
 
 MinorProcessor::~MinorProcessor () { }
@@ -350,14 +349,14 @@ void IntMinorProcessor::defineMatrix (const int numberOfRows,
                                       const int* matrix)
 {
   /* free memory of _intMatrix */
-  delete [] _intMatrix; _intMatrix = 0;
+  omFree(_intMatrix); _intMatrix = NULL;
 
   _rows = numberOfRows;
   _columns = numberOfColumns;
 
   /* allocate memory for new entries in _intMatrix */
   int n = _rows * _columns;
-  _intMatrix = new int[n];
+  _intMatrix = (int*)omAlloc(n*sizeof(int));
 
   /* copying values from one-dimensional method
      parameter "matrix" */
@@ -569,8 +568,10 @@ IntMinorValue IntMinorProcessor::getMinorPrivateBareiss(
 {
   assume(k > 0); /* k is the minor's dimension; the minor must be at least
                     1x1 */
-  int *theRows=new int[k]; mk.getAbsoluteRowIndices(theRows);
-  int *theColumns=new int[k]; mk.getAbsoluteColumnIndices(theColumns);
+  int *theRows=(int*)omAlloc(k*sizeof(int));
+  mk.getAbsoluteRowIndices(theRows);
+  int *theColumns=(int*)omAlloc(k*sizeof(int));
+  mk.getAbsoluteColumnIndices(theColumns);
   /* the next line provides the return value for the case k = 1 */
   int e = getEntry(theRows[0], theColumns[0]);
   if (characteristic != 0) e = e % characteristic;
@@ -579,7 +580,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivateBareiss(
   if (k > 1)
   {
     /* the matrix to perform Bareiss with */
-    long *tempMatrix=new long[k * k];
+    long *tempMatrix=(long*)omAlloc(k * k *sizeof(long));
     /* copy correct set of entries from _intMatrix to tempMatrix */
     int i = 0;
     for (int r = 0; r < k; r++)
@@ -592,7 +593,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivateBareiss(
     /* Bareiss algorithm operating on tempMatrix which is at least 2x2 */
     int sign = 1;   /* This will store the correct sign resulting
                        from permuting the rows of tempMatrix. */
-    int *rowPermutation=new int[k];
+    int *rowPermutation=(int*)omAlloc(k*sizeof(int));
                     /* This is for storing the permutation of rows
                        resulting from searching for a non-zero
                        pivot element. */
@@ -634,15 +635,15 @@ IntMinorValue IntMinorProcessor::getMinorPrivateBareiss(
           if (characteristic != 0)
             tempMatrix[e] = tempMatrix[e] % characteristic;
         }
-      delete[] rowPermutation;
-      delete[] tempMatrix;
+      omFree(rowPermutation);
+      omFree(tempMatrix);
     }
     int theValue = sign * tempMatrix[rowPermutation[k - 1] * k + k - 1];
     if (iSB != 0) theValue = getReduction(theValue, iSB);
     mv = IntMinorValue(theValue, 0, 0, 0, 0, -1, -1);
   }
-  delete [] theRows;
-  delete [] theColumns;
+  omFree(theRows);
+  omFree(theColumns);
   return mv;
 }
 
@@ -808,7 +809,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivateLaplace(
 
 PolyMinorProcessor::PolyMinorProcessor ()
 {
-  _polyMatrix = 0;
+  _polyMatrix = NULL;
 }
 
 poly PolyMinorProcessor::getEntry (const int rowIndex,
@@ -862,7 +863,7 @@ PolyMinorProcessor::~PolyMinorProcessor()
   int n = _rows * _columns;
   for (int i = 0; i < n; i++)
     p_Delete(&_polyMatrix[i], currRing);
-  delete [] _polyMatrix; _polyMatrix = 0;
+  omfree(_polyMatrix); _polyMatrix = NULL;
 }
 
 void PolyMinorProcessor::defineMatrix (const int numberOfRows,
@@ -873,14 +874,14 @@ void PolyMinorProcessor::defineMatrix (const int numberOfRows,
   int n = _rows * _columns;
   for (int i = 0; i < n; i++)
     p_Delete(&_polyMatrix[i], currRing);
-  delete [] _polyMatrix; _polyMatrix = 0;
+  omfree(_polyMatrix); _polyMatrix = NULL;
 
   _rows = numberOfRows;
   _columns = numberOfColumns;
   n = _rows * _columns;
 
   /* allocate memory for new entries in _polyMatrix */
-  _polyMatrix = new poly[n];
+  _polyMatrix = (poly*)omAlloc(n*sizeof(poly));
 
   /* copying values from one-dimensional method
      parameter "polyMatrix" */
@@ -982,7 +983,6 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(const int k,
          Using Laplace, the sign of the contributing minors must be iterating;
          the initial sign depends on the relative index of b in minorRowKey: */
       int sign = (mk.getRelativeRowIndex(b) % 2 == 0 ? 1 : -1);
-      poly signPoly = NULL;
       for (int c = 0; c < k; c++) /* This iterates over all involved columns. */
       {
         int absoluteC = mk.getAbsoluteColumnIndex(c);
@@ -998,8 +998,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(const int k,
           s += mv.getAdditions();
           am += mv.getAccumulatedMultiplications();
           as += mv.getAccumulatedAdditions();
-          pDelete(&signPoly);
-          signPoly = pISet(sign);
+          poly signPoly = pISet(sign);
           poly temp = pp_Mult_qq(mv.getResult(), getEntry(b, absoluteC),
                                  currRing);
           temp = p_Mult_q(signPoly, temp, currRing);
@@ -1009,7 +1008,6 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(const int k,
           addsPoly++;
           multsMon += pLength(mv.getResult()) * pLength(getEntry(b, absoluteC));
 #endif
-          signPoly = NULL;
           s++; m++; as++, am++; /* This is for the addition and multiplication
                                    in the previous lines of code. */
         }
@@ -1025,7 +1023,6 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(const int k,
          the initial sign depends on the relative index of b in
          minorColumnKey: */
       int sign = (mk.getRelativeColumnIndex(b) % 2 == 0 ? 1 : -1);
-      poly signPoly = NULL;
       for (int r = 0; r < k; r++) /* This iterates over all involved rows. */
       {
         int absoluteR = mk.getAbsoluteRowIndex(r);
@@ -1041,8 +1038,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(const int k,
           s += mv.getAdditions();
           am += mv.getAccumulatedMultiplications();
           as += mv.getAccumulatedAdditions();
-          pDelete(&signPoly);
-          signPoly = pISet(sign);
+          poly signPoly = pISet(sign);
           poly temp = pp_Mult_qq(mv.getResult(), getEntry(absoluteR, b),
                                  currRing);
           temp = p_Mult_q(signPoly, temp, currRing);
@@ -1052,7 +1048,6 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(const int k,
           addsPoly++;
           multsMon += pLength(mv.getResult()) * pLength(getEntry(absoluteR, b));
 #endif
-          signPoly = NULL;
           s++; m++; as++, am++; /* This is for the addition and multiplication
                                    in the previous lines of code. */
         }
@@ -1070,7 +1065,12 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(const int k,
                          addition needs to be performed */
     if (as < 0) as = 0; /* may happen when all subminors are zero and no
                            addition needs to be performed */
-    if (iSB != 0) result = kNF(iSB, currRing->qideal, result);
+    if (iSB != NULL)
+    {
+      poly tmpresult = kNF(iSB, currRing->qideal, result);
+      pDelete(&result);
+      result=tmpresult;
+    }
     PolyMinorValue newMV(result, m, s, am, as, -1, -1);
     /* "-1" is to signal that any statistics about the number of retrievals
        does not make sense, as we do not use a cache. */
@@ -1118,7 +1118,6 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(
          the initial sign depends on the relative index of b in
          minorRowKey: */
       int sign = (mk.getRelativeRowIndex(b) % 2 == 0 ? 1 : -1);
-      poly signPoly = NULL;
       for (int c = 0; c < k; c++) /* This iterates over all involved columns. */
       {
         int absoluteC = mk.getAbsoluteColumnIndex(c);
@@ -1153,8 +1152,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(
              counters: */
           am += mv.getAccumulatedMultiplications();
           as += mv.getAccumulatedAdditions();
-          pDelete(&signPoly);
-          signPoly = pISet(sign);
+          poly signPoly = pISet(sign);
           poly temp = pp_Mult_qq(mv.getResult(), getEntry(b, absoluteC),
                                  currRing);
           temp = p_Mult_q(signPoly, temp, currRing);
@@ -1164,7 +1162,6 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(
           addsPoly++;
           multsMon += pLength(mv.getResult()) * pLength(getEntry(b, absoluteC));
 #endif
-          signPoly = NULL;
           s++; m++; as++; am++; /* This is for the addition and multiplication
                                    in the previous lines of code. */
         }
@@ -1180,7 +1177,6 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(
          the initial sign depends on the relative index of b in
          minorColumnKey: */
       int sign = (mk.getRelativeColumnIndex(b) % 2 == 0 ? 1 : -1);
-      poly signPoly = NULL;
       for (int r = 0; r < k; r++) /* This iterates over all involved rows. */
       {
         int absoluteR = mk.getAbsoluteRowIndex(r);
@@ -1214,8 +1210,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(
              counters: */
           am += mv.getAccumulatedMultiplications();
           as += mv.getAccumulatedAdditions();
-          pDelete(&signPoly);
-          signPoly = pISet(sign);
+          poly signPoly = pISet(sign);
           poly temp = pp_Mult_qq(mv.getResult(), getEntry(absoluteR, b),
                                  currRing);
           temp = p_Mult_q(signPoly, temp, currRing);
@@ -1225,7 +1220,6 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(
           addsPoly++;
           multsMon += pLength(mv.getResult()) * pLength(getEntry(absoluteR, b));
 #endif
-          signPoly = NULL;
           s++; m++; as++; am++; /* This is for the addition and multiplication
                                    in the previous lines of code. */
         }
@@ -1249,7 +1243,12 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(
                          addition needs to be performed */
     if (as < 0) as = 0; /* may happen when all subminors are zero and no
                            addition needs to be performed */
-    if (iSB != 0) result = kNF(iSB, currRing->qideal, result);
+    if (iSB != NULL)
+    {
+      poly tmpresult = kNF(iSB, currRing->qideal, result);
+      pDelete(&tmpresult);
+      result=tmpresult;
+    }
     PolyMinorValue newMV(result, m, s, am, as, 1, potentialRetrievals);
     pDelete(&result); result = NULL;
     cch.put(mk, newMV); /* Here's the actual put inside the cache. */
@@ -1259,7 +1258,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(
 
 /* This can only be used in the case of coefficients coming from a field
    or at least an integral domain. */
-void addOperationBucket(poly& f1, poly& f2, kBucket_pt& bucket)
+static void addOperationBucket(poly f1, poly f2, kBucket_pt bucket)
 {
   /* fills all terms of f1 * f2 into the bucket */
   poly a = f1; poly b = f2;
@@ -1284,7 +1283,7 @@ void addOperationBucket(poly& f1, poly& f2, kBucket_pt& bucket)
    not be changed;
    This can only be used in the case of coefficients coming from a field
    or at least an integral domain. */
-void elimOperationBucketNoDiv(poly &p1, poly &p2, poly &p3, poly &p4)
+static void elimOperationBucketNoDiv(poly &p1, poly p2, poly p3, poly p4)
 {
 #ifdef COUNT_AND_PRINT_OPERATIONS
   if ((pLength(p1) != 0) && (pLength(p2) != 0))
@@ -1392,14 +1391,16 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateBareiss(const int k,
 {
   assume(k > 0); /* k is the minor's dimension; the minor must be at least
                     1x1 */
-  int *theRows=new int[k]; mk.getAbsoluteRowIndices(theRows);
-  int *theColumns=new int[k]; mk.getAbsoluteColumnIndices(theColumns);
+  int *theRows=(int*)omAlloc(k*sizeof(int));
+  mk.getAbsoluteRowIndices(theRows);
+  int *theColumns=(int*)omAlloc(k*sizeof(int));
+  mk.getAbsoluteColumnIndices(theColumns);
   if (k == 1)
   {
     PolyMinorValue tmp=PolyMinorValue(getEntry(theRows[0], theColumns[0]),
                           0, 0, 0, 0, -1, -1);
-    delete[] theColumns;
-    delete[] theRows;
+    omFree(theColumns);
+    omFree(theRows);
     return tmp;
   }
   else /* k > 0 */
@@ -1415,7 +1416,8 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateBareiss(const int k,
     /* Bareiss algorithm operating on tempMatrix which is at least 2x2 */
     int sign = 1; /* This will store the correct sign resulting from
                      permuting the rows of tempMatrix. */
-    int *rowPermutation=new int[k];   /* This is for storing the permutation of rows
+    int *rowPermutation=(int*)omAlloc(k*sizeof(int));
+                 /* This is for storing the permutation of rows
                                 resulting from searching for a non-zero pivot
                                 element. */
     for (int i = 0; i < k; i++) rowPermutation[i] = i;
@@ -1535,14 +1537,20 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateBareiss(const int k,
     }
 #endif
     poly result = tempMatrix[rowPermutation[k - 1] * k + k - 1];
+    tempMatrix[rowPermutation[k - 1] * k + k - 1]=NULL; /*value now in result*/
     if (sign == -1) result = pNeg(result);
-    if (iSB != 0) result = kNF(iSB, currRing->qideal, result);
+    if (iSB != NULL)
+    {
+      poly tmpresult = kNF(iSB, currRing->qideal, result);
+      pDelete(&result);
+      result=tmpresult;
+    }
     PolyMinorValue mv(result, 0, 0, 0, 0, -1, -1);
     for (int i = 0; i < k * k; i++) pDelete(&tempMatrix[i]);
     omFreeSize(tempMatrix, k * k * sizeof(poly));
-    delete[] rowPermutation;
-    delete[] theColumns;
-    delete[] theRows;
+    omFree(rowPermutation);
+    omFree(theColumns);
+    omFree(theRows);
     return mv;
   }
 }

@@ -19,20 +19,6 @@
 
 using namespace std;
 
-static inline bool currRingIsOverIntegralDomain ()
-{
-  return rField_is_Domain(currRing);
-}
-
-bool currRingIsOverField ()
-{
-  if (rField_is_Ring_PtoM(currRing)) return false;
-  if (rField_is_Ring_2toM(currRing)) return false;
-  if (rField_is_Ring_ModN(currRing)) return false;
-  if (rField_is_Ring_Z(currRing))    return false;
-  return true;
-}
-
 /* returns true iff the given polyArray has only number entries;
    if so, the int's corresponding to these numbers will be written
    into intArray[0..(length-1)];
@@ -52,7 +38,12 @@ bool arrayIsNumberArray (const poly* polyArray, const ideal iSB,
   for (int i = 0; i < length; i++)
   {
     nfPolyArray[i] = pCopy(polyArray[i]);
-    if (iSB != 0) nfPolyArray[i] = kNF(iSB, currRing->qideal, nfPolyArray[i]);
+    if (iSB != NULL)
+    {
+      poly tmp = kNF(iSB, currRing->qideal, nfPolyArray[i]);
+      pDelete(&nfPolyArray[i]);
+      nfPolyArray[i]=tmp;
+    }
     if (nfPolyArray[i] == NULL)
     {
       intArray[i] = 0;
@@ -90,9 +81,9 @@ ideal getMinorIdeal_Int (const int* intMatrix, const int rowCount,
   /* setting up a MinorProcessor for matrices with integer entries: */
   IntMinorProcessor mp;
   mp.defineMatrix(rowCount, columnCount, intMatrix);
-  int *myRowIndices=new int[rowCount];
+  int *myRowIndices=(int*)omAlloc(rowCount*sizeof(int));
   for (int j = 0; j < rowCount; j++) myRowIndices[j] = j;
-  int *myColumnIndices=new int[columnCount];
+  int *myColumnIndices=(int*)omAlloc(columnCount*sizeof(int));
   for (int j = 0; j < columnCount; j++) myColumnIndices[j] = j;
   mp.defineSubMatrix(rowCount, myRowIndices, columnCount, myColumnIndices);
   mp.setMinorSize(minorSize);
@@ -128,8 +119,8 @@ ideal getMinorIdeal_Int (const int* intMatrix, const int rowCount,
   if (collectedMinors == 0) jjj = idInit(1);
   else                      jjj = idCopyFirstK(iii, collectedMinors);
   idDelete(&iii);
-  delete[] myColumnIndices;
-  delete[] myRowIndices;
+  omFree(myColumnIndices);
+  omFree(myRowIndices);
   return jjj;
 }
 
@@ -145,9 +136,9 @@ ideal getMinorIdeal_Poly (const poly* polyMatrix, const int rowCount,
   /* setting up a MinorProcessor for matrices with polynomial entries: */
   PolyMinorProcessor mp;
   mp.defineMatrix(rowCount, columnCount, polyMatrix);
-  int *myRowIndices=new int[rowCount];
+  int *myRowIndices=(int*)omAlloc(rowCount*sizeof(int));
   for (int j = 0; j < rowCount; j++) myRowIndices[j] = j;
-  int *myColumnIndices=new int[columnCount];
+  int *myColumnIndices=(int*)omAlloc(columnCount*sizeof(int));
   for (int j = 0; j < columnCount; j++) myColumnIndices[j] = j;
   mp.defineSubMatrix(rowCount, myRowIndices, columnCount, myColumnIndices);
   mp.setMinorSize(minorSize);
@@ -190,8 +181,8 @@ ideal getMinorIdeal_Poly (const poly* polyMatrix, const int rowCount,
   /* before we return the result, let's omit zero generators
      in iii which come after the computed minors */
   idKeepFirstK(iii, collectedMinors);
-  delete[] myColumnIndices;
-  delete[] myRowIndices;
+  omFree(myColumnIndices);
+  omFree(myRowIndices);
   return(iii);
 }
 
@@ -207,8 +198,8 @@ ideal getMinorIdeal_toBeDone (const matrix mat, const int minorSize,
 
   /* divert to special implementations for pure number matrices and actual
      polynomial matrices: */
-  int*  myIntMatrix  = new int [rowCount * columnCount];
-  poly* nfPolyMatrix = new poly[rowCount * columnCount];
+  int*  myIntMatrix  = (int*)omAlloc(rowCount * columnCount *sizeof(int));
+  poly* nfPolyMatrix = (poly*)omAlloc(rowCount * columnCount *sizeof(poly));
   if (arrayIsNumberArray(myPolyMatrix, i, rowCount * columnCount,
                          myIntMatrix, nfPolyMatrix, zz))
     iii = getMinorIdeal_Int(myIntMatrix, rowCount, columnCount, minorSize, k,
@@ -234,9 +225,9 @@ ideal getMinorIdeal_toBeDone (const matrix mat, const int minorSize,
   }
 
   /* clean up */
-  delete [] myIntMatrix;
+  omFree(myIntMatrix);
   for (int j = 0; j < rowCount * columnCount; j++) pDelete(&nfPolyMatrix[j]);
-  delete [] nfPolyMatrix;
+  omFree(nfPolyMatrix);
 
   return iii;
 }
@@ -278,7 +269,7 @@ ideal getMinorIdeal (const matrix mat, const int minorSize, const int k,
   /* copy all polynomials and reduce them w.r.t. iSB
      (if iSB is present, i.e., not the NULL pointer) */
 
-    poly* nfPolyMatrix = new poly[length];
+    poly* nfPolyMatrix = (poly*)omAlloc(length*sizeof(poly));
     if (iSB != NULL)
     {
       for (int i = 0; i < length; i++)
@@ -298,7 +289,7 @@ ideal getMinorIdeal (const matrix mat, const int minorSize, const int k,
 
     /* clean up */
     for (int j = length-1; j>=0; j--) pDelete(&nfPolyMatrix[j]);
-    delete [] nfPolyMatrix;
+    omFree(nfPolyMatrix);
   }
 
   return iii;
@@ -319,9 +310,9 @@ ideal getMinorIdealCache_Int(const int* intMatrix, const int rowCount,
   /* setting up a MinorProcessor for matrices with integer entries: */
   IntMinorProcessor mp;
   mp.defineMatrix(rowCount, columnCount, intMatrix);
-  int *myRowIndices=new int[rowCount];
+  int *myRowIndices=(int*)omAlloc(rowCount*sizeof(int));
   for (int j = 0; j < rowCount; j++) myRowIndices[j] = j;
-  int *myColumnIndices=new int[columnCount];
+  int *myColumnIndices=(int*)omAlloc(columnCount*sizeof(int));
   for (int j = 0; j < columnCount; j++) myColumnIndices[j] = j;
   mp.defineSubMatrix(rowCount, myRowIndices, columnCount, myColumnIndices);
   mp.setMinorSize(minorSize);
@@ -359,8 +350,8 @@ ideal getMinorIdealCache_Int(const int* intMatrix, const int rowCount,
   if (collectedMinors == 0) jjj = idInit(1);
   else                      jjj = idCopyFirstK(iii, collectedMinors);
   idDelete(&iii);
-  delete[] myColumnIndices;
-  delete[] myRowIndices;
+  omFree(myColumnIndices);
+  omFree(myRowIndices);
   return jjj;
 }
 
@@ -377,9 +368,9 @@ ideal getMinorIdealCache_Poly(const poly* polyMatrix, const int rowCount,
   /* setting up a MinorProcessor for matrices with polynomial entries: */
   PolyMinorProcessor mp;
   mp.defineMatrix(rowCount, columnCount, polyMatrix);
-  int *myRowIndices=new int[rowCount];
+  int *myRowIndices=(int*)omAlloc(rowCount*sizeof(int));
   for (int j = 0; j < rowCount; j++) myRowIndices[j] = j;
-  int *myColumnIndices=new int[columnCount];
+  int *myColumnIndices=(int*)omAlloc(columnCount*sizeof(int));
   for (int j = 0; j < columnCount; j++) myColumnIndices[j] = j;
   mp.defineSubMatrix(rowCount, myRowIndices, columnCount, myColumnIndices);
   mp.setMinorSize(minorSize);
@@ -427,8 +418,8 @@ ideal getMinorIdealCache_Poly(const poly* polyMatrix, const int rowCount,
   if (collectedMinors == 0) jjj = idInit(1);
   else                      jjj = idCopyFirstK(iii, collectedMinors);
   idDelete(&iii);
-  delete[] myColumnIndices;
-  delete[] myRowIndices;
+  omFree(myColumnIndices);
+  omFree(myRowIndices);
   return jjj;
 }
 
@@ -445,8 +436,8 @@ ideal getMinorIdealCache_toBeDone (const matrix mat, const int minorSize,
 
   /* divert to special implementation when myPolyMatrix has only number
      entries: */
-  int*  myIntMatrix  = new int [rowCount * columnCount];
-  poly* nfPolyMatrix = new poly[rowCount * columnCount];
+  int*  myIntMatrix  = (int*)omAlloc(rowCount * columnCount *sizeof(int));
+  poly* nfPolyMatrix = (poly*)omAlloc(rowCount * columnCount *sizeof(poly));
   if (arrayIsNumberArray(myPolyMatrix, iSB, rowCount * columnCount,
                          myIntMatrix, nfPolyMatrix, zz))
     iii = getMinorIdealCache_Int(myIntMatrix, rowCount, columnCount,
@@ -458,9 +449,9 @@ ideal getMinorIdealCache_toBeDone (const matrix mat, const int minorSize,
                                   cacheW, allDifferent);
 
   /* clean up */
-  delete [] myIntMatrix;
+  omFree(myIntMatrix);
   for (int j = 0; j < rowCount * columnCount; j++) pDelete(&nfPolyMatrix[j]);
-  delete [] nfPolyMatrix;
+  omFree(nfPolyMatrix);
 
   return iii;
 }
@@ -479,16 +470,17 @@ ideal getMinorIdealCache (const matrix mat, const int minorSize, const int k,
   int columnCount = mat->ncols;
   poly* myPolyMatrix = (poly*)(mat->m);
   int length = rowCount * columnCount;
-  poly* nfPolyMatrix = new poly[length];
+  poly* nfPolyMatrix = (poly*)omAlloc(length*sizeof(poly));
   ideal iii; /* the ideal to be filled and returned */
 
   /* copy all polynomials and reduce them w.r.t. iSB
      (if iSB is present, i.e., not the NULL pointer) */
   for (int i = 0; i < length; i++)
   {
-    nfPolyMatrix[i] = pCopy(myPolyMatrix[i]);
-    if (iSB != 0) nfPolyMatrix[i] = kNF(iSB, currRing->qideal,
-                                        nfPolyMatrix[i]);
+    if (iSB==NULL)
+      nfPolyMatrix[i] = pCopy(myPolyMatrix[i]);
+    else
+      nfPolyMatrix[i] = kNF(iSB, currRing->qideal, myPolyMatrix[i]);
   }
 
   iii = getMinorIdealCache_Poly(nfPolyMatrix, rowCount, columnCount,
@@ -497,7 +489,7 @@ ideal getMinorIdealCache (const matrix mat, const int minorSize, const int k,
 
   /* clean up */
   for (int j = 0; j < length; j++) pDelete(&nfPolyMatrix[j]);
-  delete [] nfPolyMatrix;
+  omFree(nfPolyMatrix);
 
   return iii;
 }
@@ -533,11 +525,11 @@ ideal getMinorIdealHeuristic (const matrix mat, const int minorSize,
   bool b = false; /* Bareiss */
   bool l = false; /* Laplace without caching */
   // bool c = false; /* Laplace with caching */
-  if (currRingIsOverIntegralDomain())
+  if (rField_is_Domain(currRing))
   { /* the field case or ring Z */
     if      (minorSize <= 2)                                     b = true;
     else if (vars <= 2)                                          b = true;
-    else if (currRingIsOverField() && (vars == 3)
+    else if ((!rField_is_Ring(currRing)) && (vars == 3)
              && (currRing->cf->ch >= 2) && (currRing->cf->ch <= NV_MAX_PRIME))
           b = true;
   }
@@ -546,13 +538,7 @@ ideal getMinorIdealHeuristic (const matrix mat, const int minorSize,
     if (k != 0) /* this means, not all minors are requested */   l = true;
     else
     { /* k == 0, i.e., all minors are requested */
-      int minorCount = binom(rowCount, minorSize);
-      minorCount *= binom(columnCount, minorSize);
-      // if      ((minorSize >= 3) && (vars <= 4)
-      //          && (minorCount >= 100))                           c = true;
-      // else if ((minorSize >= 3) && (vars >= 5)
-      //          && (minorCount >= 40))                            c = true;
-      /*else*/                                                      l = true;
+      l = true;
     }
   }
 

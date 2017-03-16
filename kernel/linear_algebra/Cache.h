@@ -3,6 +3,7 @@
 
 #include <string>
 #include <list>
+#include <omalloc/omallocClass.h>
 
 // #include <assert.h>
 // using namespace std;
@@ -65,7 +66,7 @@
     <c>int ValueClass::getWeight ().</c>
     \author Frank Seelisch, http://www.mathematik.uni-kl.de/~seelisch
 */
-template<class KeyClass, class ValueClass> class Cache
+template<class KeyClass, class ValueClass> class Cache:public omallocClass
 {
   private:
      /**
