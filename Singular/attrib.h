@@ -16,7 +16,7 @@ class sattr: public omallocClass
 {
   public:
     inline void Init() { memset(this,0,sizeof(*this)); }
-    const char *  name;
+    char *  name;
     void *  data;
     attr    next;
     int     atyp; /* the type of the attribut, describes the data field
@@ -25,7 +25,7 @@ class sattr: public omallocClass
     void Print();
     attr Copy(); /* copy all arguments */
     void * CopyA(); /* copy the data of this attribute */
-    attr set(const char * s, void * data, int t);
+    attr set(char * s, void * data, int t); /* eats s, data */
     attr get(const char * s);
     void kill(const ring r);
     void killAll(const ring r);
@@ -35,8 +35,8 @@ class sattr: public omallocClass
 //void * atGet(leftv root,const char * name);
 void * atGet(idhdl root,const char * name, int t, void *defaultReturnValue = NULL);
 void * atGet(leftv root,const char * name, int t);
-void atSet(idhdl root,const char * name,void * data,int typ);
-void atSet(leftv root,const char * name,void * data,int typ);
+void atSet(idhdl root,char * name,void * data,int typ);
+void atSet(leftv root,char * name,void * data,int typ);
 void at_KillAll(idhdl root,const ring r);
 void at_KillAll(leftv root,const ring r);
 #define atKillAll(H) at_KillAll(H,currRing)

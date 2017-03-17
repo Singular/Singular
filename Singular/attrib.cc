@@ -67,10 +67,12 @@ static void attr_free(attr h, const ring r=currRing)
   {
     s_internalDelete(h->atyp,h->data,r);
     h->data=NULL;
+    omFree(h->name);
+    h->name=NULL;
   }
 }
 
-attr sattr::set(const char * s, void * d, int t)
+attr sattr::set(char * s, void * d, int t)
 {
   attr h = get(s);
   attr result=this;
@@ -153,7 +155,7 @@ void * atGet(leftv root,const char * name, int t)
   return NULL;
 }
 
-void atSet(idhdl root,const char * name,void * data,int typ)
+void atSet(idhdl root, char * name,void * data,int typ)
 {
   if (root!=NULL)
   {
@@ -165,7 +167,7 @@ void atSet(idhdl root,const char * name,void * data,int typ)
   }
 }
 
-void atSet(leftv root,const char * name,void * data,int typ)
+void atSet(leftv root, char * name,void * data,int typ)
 {
   if (root!=NULL)
   {
@@ -186,8 +188,6 @@ void atSet(leftv root,const char * name,void * data,int typ)
 void sattr::kill(const ring r)
 {
   attr_free(this,r);
-  omFree((ADDRESS)name);
-  name=NULL;
   omFreeBin((ADDRESS)this, sattr_bin);
 }
 
