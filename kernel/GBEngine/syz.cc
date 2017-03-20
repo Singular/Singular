@@ -127,7 +127,7 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
     j=IDELEMS(syz);
     while ((j>0) && (syz->m[j-1]==NULL)) j--;
     existsUnit = FALSE;
-    if (rHasGlobalOrdering_currRing())
+    if (rHasGlobalOrdering(currRing))
     {
       while ((i<j) && (!existsUnit))
       {

@@ -1513,7 +1513,7 @@ poly    iiHighCorner(ideal I, int ak)
   int i;
   if(!idIsZeroDim(I)) return NULL; // not zero-dim.
   poly po=NULL;
-  if (rHasLocalOrMixedOrdering_currRing())
+  if (rHasLocalOrMixedOrdering(currRing))
   {
     scComputeHC(I,currRing->qideal,ak,po);
     if (po!=NULL)

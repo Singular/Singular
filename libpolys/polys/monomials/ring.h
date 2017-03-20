@@ -754,9 +754,6 @@ inline BOOLEAN rHasMixedOrdering(const ring r) { return (r->MixedOrder); }
 // #define rHasGlobalOrdering(R) ((R)->OrdSgn==1)
 // #define rHasLocalOrMixedOrdering(R) ((R)->OrdSgn==-1)
 
-#define rHasGlobalOrdering_currRing() rHasGlobalOrdering(currRing)
-#define rHasLocalOrMixedOrdering_currRing() rHasLocalOrMixedOrdering(currRing)
-
 BOOLEAN rOrd_is_Totaldegree_Ordering(const ring r);
 
 /// return TRUE if p_SetComp requires p_Setm

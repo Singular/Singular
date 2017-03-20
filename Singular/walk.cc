@@ -157,7 +157,7 @@ static void initSSpecialCC (ideal F, ideal Q, ideal P,kStrategy strat)
         //  h.pNorm();
         //}
         strat->initEcart(&h);
-        if (rHasLocalOrMixedOrdering_currRing())
+        if (rHasLocalOrMixedOrdering(currRing))
         {
           deleteHC(&h,strat);
         }
@@ -304,7 +304,7 @@ static ideal kInterRedCC(ideal F, ideal Q)
   strat->T           = initT();
   strat->R           = initR();
   strat->sevT        = initsevT();
-  if(rHasLocalOrMixedOrdering_currRing())
+  if(rHasLocalOrMixedOrdering(currRing))
   {
     strat->honey = TRUE;
   }

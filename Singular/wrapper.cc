@@ -14,7 +14,7 @@
 
 static BOOLEAN jInitBasis(ideal v, jList **TT,jList **QQ)
 {
-  if (rHasLocalOrMixedOrdering_currRing())
+  if (rHasLocalOrMixedOrdering(currRing))
   {
     WerrorS("janet only for well-orderings");
     return TRUE;
