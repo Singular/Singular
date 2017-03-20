@@ -17,5 +17,5 @@
 
 
 
-ideal t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode=FALSE);
+ideal t_rep_gb(const ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode=FALSE);
 #endif

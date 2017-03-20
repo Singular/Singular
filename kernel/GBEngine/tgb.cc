@@ -3555,18 +3555,17 @@ slimgb_alg::~slimgb_alg ()
   delete c->strat;
 }
 
-ideal t_rep_gb (ring r, ideal arg_I, int syz_comp, BOOLEAN F4_mode)
+ideal t_rep_gb (const ring r, ideal arg_I, int syz_comp, BOOLEAN F4_mode)
 {
   assume (r == currRing);
   ring orig_ring = r;
   int pos;
-  ring new_ring = rAssure_TDeg (orig_ring, 1, rVar (orig_ring), pos);
+  ring new_ring = rAssure_TDeg (orig_ring, pos);
   ideal s_h;
   if(orig_ring != new_ring)
   {
     rChangeCurrRing (new_ring);
     s_h = idrCopyR_NoSort (arg_I, orig_ring, new_ring);
-    idTest (s_h);
     /*int i;
        for(i=0;i<IDELEMS(s_h);i++)
        {
@@ -3582,6 +3581,7 @@ ideal t_rep_gb (ring r, ideal arg_I, int syz_comp, BOOLEAN F4_mode)
   {
     s_h = id_Copy (arg_I, orig_ring);
   }
+  idTest (s_h);
 
   ideal s_result = do_t_rep_gb (new_ring, s_h, syz_comp, F4_mode, pos);
   ideal result;

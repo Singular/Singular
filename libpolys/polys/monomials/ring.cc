@@ -4436,7 +4436,7 @@ ring rAssure_SyzComp(const ring r, BOOLEAN complete)
   return res;
 }
 
-ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
+ring rAssure_TDeg(ring r, int &pos)
 {
   int i;
   if (r->typ!=NULL)
@@ -4444,8 +4444,8 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
     for(i=r->OrdSize-1;i>=0;i--)
     {
       if ((r->typ[i].ord_typ==ro_dp)
-      && (r->typ[i].data.dp.start==start_var)
-      && (r->typ[i].data.dp.end==end_var))
+      && (r->typ[i].data.dp.start==1)
+      && (r->typ[i].data.dp.end==r->N))
       {
         pos=r->typ[i].data.dp.place;
         //printf("no change, pos=%d\n",pos);
@@ -4459,6 +4459,10 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
   r->GetNC()=NULL;
 #endif
   ring res=rCopy(r);
+  if (res->qideal!=NULL)
+  {
+    id_Delete(&res->qideal,r);
+  }
 
   i=rBlocks(r);
   int j;
@@ -4480,11 +4484,11 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
   // the additional block for pSetm: total degree at the last word
   // but not included in the compare part
   res->typ[res->OrdSize-1].ord_typ=ro_dp;
-  res->typ[res->OrdSize-1].data.dp.start=start_var;
-  res->typ[res->OrdSize-1].data.dp.end=end_var;
+  res->typ[res->OrdSize-1].data.dp.start=1;
+  res->typ[res->OrdSize-1].data.dp.end=res->N;
   res->typ[res->OrdSize-1].data.dp.place=res->ExpL_Size-1;
   pos=res->ExpL_Size-1;
-  //if ((start_var==1) && (end_var==res->N)) res->pOrdIndex=pos;
+  res->pOrdIndex=pos;
   extern void p_Setm_General(poly p, ring r);
   res->p_Setm=p_Setm_General;
   // ----------------------------
@@ -4492,7 +4496,6 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
   res->p_Procs = (p_Procs_s*)omAlloc(sizeof(p_Procs_s));
 
   p_ProcsSet(res, res->p_Procs);
-  if (res->qideal!=NULL) id_Delete(&res->qideal,res);
 #ifdef HAVE_PLURAL
   r->GetNC()=save;
   if (rIsPluralRing(r))

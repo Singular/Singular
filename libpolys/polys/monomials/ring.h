@@ -732,7 +732,7 @@ ring   rAssure_CompLastBlock(const ring r, BOOLEAN complete = TRUE);
 
 /// makes sure that c/C ordering is last ordering and SyzIndex is first
 ring   rAssure_SyzComp_CompLastBlock(const ring r, BOOLEAN complete = TRUE);
-ring   rAssure_TDeg(const ring r, int start_var, int end_var, int &pos);
+ring   rAssure_TDeg(const ring r, int &pos);
 
 /// return the max-comonent wchich has syzIndex i
 /// Assume: i<= syzIndex_limit
