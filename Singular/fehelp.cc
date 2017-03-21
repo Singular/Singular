@@ -910,10 +910,16 @@ static void heGenHelp(heEntry hentry, int br)
                    #ifdef HAVE_VSNPRINTF
                    {
                      if (*p=='H')
+                     #ifdef SINGULAR_4_2
+                       snprintf(temp,256,"%s/%d-%d/%s", htmldir,
+                                  SINGULAR_VERSION/1000,
+                                 (SINGULAR_VERSION % 1000)/100,
+                     #else
                        snprintf(temp,256,"%s/%d-%d-%d/%s", htmldir,
                                   SINGULAR_VERSION/1000,
                                  (SINGULAR_VERSION % 1000)/100,
                                  (SINGULAR_VERSION % 100)/10,
+                     #endif
                        hentry->url);
                      else
                        snprintf(temp,256,"%s/%s", htmldir, hentry->url);
