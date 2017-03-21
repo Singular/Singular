@@ -4436,6 +4436,24 @@ ring rAssure_SyzComp(const ring r, BOOLEAN complete)
   return res;
 }
 
+BOOLEAN rHasTDeg(ring r)
+{
+  int i;
+  if (r->typ!=NULL)
+  {
+    for(i=r->OrdSize-1;i>=0;i--)
+    {
+      if ((r->typ[i].ord_typ==ro_dp)
+      && (r->typ[i].data.dp.start==1)
+      && (r->typ[i].data.dp.end==r->N))
+      {
+        return TRUE;
+      }
+    }
+  }
+  return FALSE;
+}
+
 ring rAssure_TDeg(ring r, int &pos)
 {
   int i;
@@ -4488,7 +4506,7 @@ ring rAssure_TDeg(ring r, int &pos)
   res->typ[res->OrdSize-1].data.dp.end=res->N;
   res->typ[res->OrdSize-1].data.dp.place=res->ExpL_Size-1;
   pos=res->ExpL_Size-1;
-  res->pOrdIndex=pos;
+  //res->pOrdIndex=pos; //NO: think of a(1,0),dp !
   extern void p_Setm_General(poly p, ring r);
   res->p_Setm=p_Setm_General;
   // ----------------------------
