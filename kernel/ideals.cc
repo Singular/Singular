@@ -32,6 +32,7 @@
 #include <kernel/polys.h>
 
 #include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/tgb.h>
 #include <kernel/GBEngine/syz.h>
 
 
@@ -452,7 +453,7 @@ ideal idMultSect(resolvente arg, int length)
 *if quot != NULL it computes in the quotient ring modulo "quot"
 *works always in a ring with ringorder_s
 */
-static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w)
+static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w, GbVariant alg)
 {
   ideal   h2, h3;
   int     j,k;
@@ -500,7 +501,38 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w)
 
   idTest(h2);
 
-  h3 = kStd(h2,currRing->qideal,hom,w,NULL,syzcomp);
+  if (alg==GbSlimgb) // test conditions for slimgb
+  {
+    if(rHasGlobalOrdering(currRing)
+    &&(!rIsPluralRing(currRing))
+    &&(currRing->qideal==NULL)
+    &&(!rField_is_Ring(currRing))
+    && rHasTDeg(currRing))
+    {
+      alg=GbSlimgb;
+    }
+    else
+    {
+      alg=GbStd;
+    }
+  }
+  else if (alg==GbDefault)
+    alg=GbStd; // no conditions for std
+  if (alg==GbStd)
+  {
+    if (TEST_OPT_PROT) { PrintS("std:"); mflush(); }
+    h3 = kStd(h2,currRing->qideal,hom,w,NULL,syzcomp);
+  }
+  else if (alg==GbSlimgb)
+  {
+    if (TEST_OPT_PROT) { PrintS("slimgb:"); mflush(); }
+    h3 = t_rep_gb(currRing, h2, syzcomp);
+  }
+  else
+  {
+    h3=NULL;
+    Werror("wrong algorith %d for SB",(int)alg);
+  }
 
   idDelete(&h2);
   return h3;
@@ -513,7 +545,7 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w)
 * do not change h1,  w
 */
 ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
-                  BOOLEAN setRegularity, int *deg)
+                  BOOLEAN setRegularity, int *deg, GbVariant alg)
 {
   ideal s_h1;
   int   j, k, length=0,reg;
@@ -552,7 +584,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
 
   idTest(s_h1);
 
-  ideal s_h3=idPrepare(s_h1,h,k,w); // main (syz) GB computation
+  ideal s_h3=idPrepare(s_h1,h,k,w,alg); // main (syz) GB computation
 
   if (s_h3==NULL)
   {
@@ -701,7 +733,7 @@ ideal idXXX (ideal  h1, int k)
 *computes a standard basis for h1 and stores the transformation matrix
 * in ma
 */
-ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
+ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz, GbVariant alg)
 {
   int  i, j, t, inputIsIdeal=id_RankFreeModule(h1,currRing);
   long k;
@@ -739,7 +771,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
   else
     s_h1 = h1;
 
-  ideal s_h3=idPrepare(s_h1,hi,k,&w); // main (syz) GB computation
+  ideal s_h3=idPrepare(s_h1,hi,k,&w,alg); // main (syz) GB computation
 
   ideal s_h2 = idInit(IDELEMS(s_h3), s_h3->rank);
 
@@ -889,7 +921,7 @@ static void idPrepareStd(ideal s_temp, int k)
 */
 
 ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
-             BOOLEAN isSB, BOOLEAN divide, matrix *unit)
+             BOOLEAN isSB, BOOLEAN divide, matrix *unit, GbVariant alg)
 {
   int lsmod =id_RankFreeModule(submod,currRing), j, k;
   int comps_to_add=0;
@@ -947,7 +979,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
   }
   else
   {
-    s_h3 = idPrepare(s_mod,(tHomog)FALSE,k+comps_to_add,NULL);
+    s_h3 = idPrepare(s_mod,(tHomog)FALSE,k+comps_to_add,NULL,alg);
   }
   if (!goodShape)
   {

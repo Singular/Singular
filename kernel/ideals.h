@@ -81,19 +81,19 @@ inline BOOLEAN idInsertPolyWithTests (ideal h1, const int validEntries, const po
 /* h1 + h2 */
 
 /// hh := h1 * h2
-inline ideal idMult (ideal h1, ideal h2)
+static inline ideal idMult (ideal h1, ideal h2)
 {
   return id_Mult(h1, h2, currRing);
 }
 
 BOOLEAN idIs0 (ideal h);
 
-inline BOOLEAN idHomIdeal (ideal id, ideal Q=NULL)
+static inline BOOLEAN idHomIdeal (ideal id, ideal Q=NULL)
 {
   return id_HomIdeal(id, Q, currRing);
 }
 
-inline BOOLEAN idHomModule(ideal m, ideal Q,intvec **w)
+static inline BOOLEAN idHomModule(ideal m, ideal Q,intvec **w)
 {
    return id_HomModule(m, Q, w, currRing);
 }
@@ -117,14 +117,22 @@ inline ideal idFreeModule (int i)
 ideal   idSect (ideal h1,ideal h2);
 ideal   idMultSect(resolvente arg, int length);
 
+// GB algorithm for syz computaions:
+enum GbVariant
+{
+  GbDefault=0,
+  GbStd,
+  GbSlimgb
+};
+
 //ideal   idSyzygies (ideal h1, tHomog h,intvec **w);
 ideal   idSyzygies (ideal h1, tHomog h,intvec **w, BOOLEAN setSyzComp=TRUE,
-                    BOOLEAN setRegularity=FALSE, int *deg = NULL);
-ideal   idLiftStd  (ideal h1, matrix *m, tHomog h=testHomog, ideal *syz=NULL);
+                    BOOLEAN setRegularity=FALSE, int *deg = NULL, GbVariant a=GbDefault);
+ideal   idLiftStd  (ideal h1, matrix *m, tHomog h=testHomog, ideal *syz=NULL, GbVariant a=GbDefault);
 
 ideal   idLift (ideal mod, ideal sumod,ideal * rest=NULL,
              BOOLEAN goodShape=FALSE, BOOLEAN isSB=TRUE,BOOLEAN divide=FALSE,
-             matrix *unit=NULL);
+             matrix *unit=NULL, GbVariant a=GbDefault);
 
 void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R, short *w= NULL );
 
