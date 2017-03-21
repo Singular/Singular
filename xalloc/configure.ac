@@ -65,7 +65,7 @@ AC_CHECK_HEADERS(limits.h,,
 
 AC_CHECK_HEADERS(unistd.h sys/mman.h fcntl.h /usr/include/malloc.h)
 
-AC_CHECK_FUNCS(popen mmap sbrk random)
+AC_CHECK_FUNCS(popen mmap sbrk random malloc_usable_size)
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Find out more about particularity of the system
