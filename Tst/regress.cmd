@@ -48,7 +48,7 @@ _EOM_
 $sh="/bin/sh";
 $diff = "diff";
 $gunzip = "gunzip";
-$gzip = "gzip";
+$gzip = "gzip -9";
 $rm = "rm";
 $mv = "mv";
 $cp = "cp";

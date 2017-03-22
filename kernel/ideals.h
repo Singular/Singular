@@ -121,8 +121,16 @@ ideal   idMultSect(resolvente arg, int length);
 enum GbVariant
 {
   GbDefault=0,
+  // internal variants:
   GbStd,
-  GbSlimgb
+  GbSlimgb,
+  GbSba,
+  // and the library functions:
+  GbGroebner,
+  GbModstd,
+  GbFfmod,
+  GbNfmod,
+  GbSingmatic
 };
 
 //ideal   idSyzygies (ideal h1, tHomog h,intvec **w);
@@ -192,4 +200,5 @@ ideal id_Farey(ideal x, number N, const ring r);
 
 ideal id_TensorModuleMult(const int m, const ideal M, const ring rRing); // image of certain map for BGG
 
+GbVariant syGetAlgorithm(char *n, const ring r, const ideal M);
 #endif

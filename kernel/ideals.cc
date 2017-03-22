@@ -501,23 +501,7 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w, GbVarian
 
   idTest(h2);
 
-  if (alg==GbSlimgb) // test conditions for slimgb
-  {
-    if(rHasGlobalOrdering(currRing)
-    &&(!rIsPluralRing(currRing))
-    &&(currRing->qideal==NULL)
-    &&(!rField_is_Ring(currRing))
-    && rHasTDeg(currRing))
-    {
-      alg=GbSlimgb;
-    }
-    else
-    {
-      alg=GbStd;
-    }
-  }
-  else if (alg==GbDefault)
-    alg=GbStd; // no conditions for std
+  if (alg==GbDefault) alg=GbStd;
   if (alg==GbStd)
   {
     if (TEST_OPT_PROT) { PrintS("std:"); mflush(); }
@@ -528,9 +512,14 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w, GbVarian
     if (TEST_OPT_PROT) { PrintS("slimgb:"); mflush(); }
     h3 = t_rep_gb(currRing, h2, syzcomp);
   }
+  //else if (alg==GbSba): requires order C,...
+  //{
+  //  if (TEST_OPT_PROT) { PrintS("sba:"); mflush(); }
+  //  h3 = kSba(h2,currRing->qideal,hom,w,1,0,NULL,syzcomp);
+  //}
   else
   {
-    h3=NULL;
+    h3=idInit(1,1);
     Werror("wrong algorith %d for SB",(int)alg);
   }
 
@@ -2629,3 +2618,55 @@ void idDelEquals(ideal id)
   }
   omFreeSize((ADDRESS)(id_sort), idsize*sizeof(poly_sort));
 }
+
+GbVariant syGetAlgorithm(char *n, const ring r, const ideal M)
+{
+  GbVariant alg=GbDefault;
+  if (strcmp(n,"slimgb")==0) alg=GbSlimgb;
+  else if (strcmp(n,"std")==0) alg=GbStd;
+  else if (strcmp(n,"sba")==0) alg=GbSba;
+  else if (strcmp(n,"singmatic")==0) alg=GbSingmatic;
+  else if (strcmp(n,"modstd")==0) alg=GbModstd;
+  else if (strcmp(n,"ffmod")==0) alg=GbFfmod;
+  else if (strcmp(n,"nfmod")==0) alg=GbNfmod;
+  else Warn(">>%s<< is an unknown algorithm");
+
+  if (alg==GbSlimgb) // test conditions for slimgb
+  {
+    if(rHasGlobalOrdering(r)
+    &&(!rIsPluralRing(r))
+    &&(r->qideal==NULL)
+    &&(!rField_is_Ring(r))
+    && rHasTDeg(r))
+    {
+       return GbSlimgb;
+    }
+  }
+  else if (alg==GbSba) // cond. for sba
+  {
+    if(rField_is_Domain(r)
+    &&(!rIsPluralRing(r))
+    &&(rHasGlobalOrdering(r)))
+    {
+      return GbSba;
+    }
+  }
+
+  return GbStd; // no conditions for std
+}
+//----------------------------------------------------------------------------
+// GB-algorithms and their pre-conditions
+// std   slimgb  sba singmatic modstd ffmod nfmod groebner
+// +     +       +   -         +      -     -     + coeffs: QQ
+// +     +       +   +         -      -     -     + coeffs: ZZ/p
+// +     +       +   -         -      -     +     + coeffs: K[a]/f
+// +     +       +   -         -      +     -     + coeffs: K(a)
+// +     -       +   -         -      -     -     + coeffs: domain, not field
+// +     -       -   -         -      -     -     + coeffs: zero-divisors
+// +     +       +   +         ?      ?     ?     + also for modules: C
+// +     +       -   +         ?      ?     ?     + also for modules: all orderings
+// +     +       -   -         -      -     -     + exterior algebra
+// +     +       -   -         -      -     -     + G-algebra
+// +     +       +   +         +      +     +     + degree ordering
+// +     -       +   +         +      +     +     + non-degree ordering
+// -     -       -   +         +      +     +     + parallel

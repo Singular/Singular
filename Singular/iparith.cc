@@ -3378,6 +3378,18 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   if(!TEST_OPT_DEGBOUND) setFlag(res,FLAG_STD);
   return FALSE;
 }
+static BOOLEAN jjSYZ_2(leftv res, leftv u, leftv v)
+{
+  // see jjSYZYGY
+  intvec *w=NULL;
+  ideal I=(ideal)u->Data();
+  GbVariant alg=syGetAlgorithm((char*)v->Data(),currRing,I);
+  res->data = (char *)idSyzygies(I,testHomog,&w,TRUE,FALSE,NULL,alg);
+  if (w!=NULL) delete w;
+  if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
+  return FALSE;
+
+}
 static BOOLEAN jjVARSTR2(leftv res, leftv u, leftv v)
 {
   idhdl h=(idhdl)u->data;
@@ -5170,8 +5182,8 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
           omFree(plib);
           return TRUE;
         }
-	else
-	  omFree(plib);
+        else
+          omFree(plib);
         package savepack=currPack;
         currPack=IDPACKAGE(pl);
         IDPACKAGE(pl)->loaded=TRUE;
@@ -7289,6 +7301,69 @@ static BOOLEAN jjKLAMMER_PL(leftv res, leftv u)
     b=FALSE;
   }
   return b;
+}
+static BOOLEAN jjLIFT_4(leftv res, leftv U)
+{
+  const short t1[]={4,IDEAL_CMD,IDEAL_CMD,MATRIX_CMD,STRING_CMD};
+  const short t2[]={4,MODUL_CMD,MODUL_CMD,MATRIX_CMD,STRING_CMD};
+  leftv u=U;
+  leftv v=u->next;
+  leftv w=v->next;
+  leftv u4=w->next;
+  if (w->rtyp!=IDHDL) return TRUE;
+  if (iiCheckTypes(U,t1)||iiCheckTypes(U,t2))
+  {
+    // see jjLIFT3
+    ideal I=(ideal)u->Data();
+    int ul= IDELEMS(I /*(ideal)u->Data()*/);
+    int vl= IDELEMS((ideal)v->Data());
+    GbVariant alg=syGetAlgorithm((char*)u4->Data(),currRing,I);
+    ideal m
+    = idLift(I,(ideal)v->Data(),NULL,FALSE,hasFlag(u,FLAG_STD),
+             FALSE, (matrix *)(&(IDMATRIX((idhdl)(w->data)))),alg);
+    if (m==NULL) return TRUE;
+    res->data = (char *)id_Module2formatedMatrix(m,ul,vl,currRing);
+    return FALSE;
+  }
+  else
+  {
+    Werror("%s(`ideal`,`ideal`,`matrix`,`string`)\n"
+           "or (`module`,`module`,`matrix`,`string`)expected",
+           Tok2Cmdname(iiOp));
+    return TRUE;
+  }
+}
+static BOOLEAN jjLIFTSTD_4(leftv res, leftv U)
+{
+  const short t1[]={4,IDEAL_CMD,IDEAL_CMD,MATRIX_CMD,STRING_CMD};
+  const short t2[]={4,MODUL_CMD,MODUL_CMD,MATRIX_CMD,STRING_CMD};
+  leftv u=U;
+  leftv v=u->next;
+  leftv w=v->next;
+  leftv u4=w->next;
+  if (v->rtyp!=IDHDL) return TRUE;
+  if (w->rtyp!=IDHDL) return TRUE;
+  if (iiCheckTypes(U,t1)||iiCheckTypes(U,t2))
+  {
+    // see jjLIFTSTD3
+    ideal I=(ideal)u->Data();
+    idhdl hv=(idhdl)v->data;
+    idhdl hw=(idhdl)w->data;
+    GbVariant alg=syGetAlgorithm((char*)u4->Data(),currRing,I);
+    // CopyD for IDEAL_CMD and MODUL_CMD are identical:
+    res->data = (char *)idLiftStd((ideal)u->Data(),
+                                &(hv->data.umatrix),testHomog,
+                                &(hw->data.uideal),alg);
+    setFlag(res,FLAG_STD); v->flag=0; w->flag=0;
+    return FALSE;
+  }
+  else
+  {
+    Werror("%s(`ideal`,`ideal`,`matrix`,`string`)\n"
+           "or (`module`,`module`,`matrix`,`string`)expected",
+           Tok2Cmdname(iiOp));
+    return TRUE;
+  }
 }
 BOOLEAN jjLIST_PL(leftv res, leftv v)
 {
