@@ -3714,6 +3714,8 @@ See
 @*@code{lift (} module_expression@code{,} submodule_expression @code{)}
 @*@code{lift (} ideal_expression@code{,} subideal_expression@code{,} matrix_name @code{)}
 @*@code{lift (} module_expression@code{,} submodule_expression@code{,} matrix_name @code{)}
+@*@code{lift (} ideal_expression@code{,} subideal_expression@code{,} matrix_name@code{,} string_expression @code{)}
+@*@code{lift (} module_expression@code{,} submodule_expression@code{,} matrix_name@code{,} string_expression @code{)}
 @item @strong{Type:}
 matrix
 @item @strong{Purpose:}
@@ -3731,6 +3733,8 @@ where @code{U} is a diagonal matrix of units.
 (not power series ring). @code{U} is stored in the optional third argument.
 @item @strong{Note:}
 Gives a warning if @code{sm} is not a submodule.
+@*An optional 4th argument specifies the Groebner base algorith to use.
+Possible values are @code{"std"} and @code{"slimgb"}.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3747,7 +3751,10 @@ Gives a warning if @code{sm} is not a submodule.
 See
 @ref{division};
 @ref{ideal};
-@ref{module}.
+@ref{module};
+@ref{std};
+@ref{syz};
+@ref{liftstd}.
 @c ref
 @c -----------------------------------------
 @node liftstd, listvar, lift, Functions
@@ -3759,6 +3766,8 @@ See
 @*@code{liftstd (} module_expression@code{,} matrix_name @code{)}
 @*@code{liftstd (} ideal_expression@code{,} matrix_name@code{,} module_name @code{)}
 @*@code{liftstd (} module_expression@code{,} matrix_name@code{,} module_name @code{)}
+@*@code{liftstd (} ideal_expression@code{,} matrix_name@code{,} module_name@code{,} string_expression @code{)}
+@*@code{liftstd (} module_expression@code{,} matrix_name@code{,} module_name@code{,} string_expression @code{)}
 @item @strong{Type:}
 ideal or module
 @item @strong{Purpose:}
@@ -3769,8 +3778,9 @@ basis returned by @code{liftstd}, and @code{T} the transformation matrix
 then @code{matrix(sm)=matrix(m)*T} and @code{sm=ideal(matrix(m)*T)},
 resp.@: @code{sm=module(matrix(m)*T)}.
 @*In an optional third argument the syzygy module will be returned.
-@item @strong{Note:}
 if working in a quotient ring, then @code{matrix(sm)=reduce(matrix(m)*T,0)} and @code{sm=reduce(ideal(matrix(m)*T),0)}.
+@*An optional 4th argument specifies the Groebner base algorith to use.
+Possible values are @code{"std"} and @code{"slimgb"}.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3790,10 +3800,13 @@ if working in a quotient ring, then @code{matrix(sm)=reduce(matrix(m)*T,0)} and 
 @end table
 @c ref
 See
+@ref{division};
 @ref{ideal};
 @ref{ring};
 @ref{option};
 @ref{std};
+@ref{syz};
+@ref{lift};
 @ref{matrix}.
 @c ref
 @c ---------------------------------------
@@ -7699,11 +7712,15 @@ system("--browser", "firefox");
 @item @strong{Syntax:}
 @code{syz (} ideal_expression @code{)}
 @*@code{syz (} module_expression @code{)}
+@*@code{syz (} ideal_expression@code{,} string_expression @code{)}
+@*@code{syz (} module_expression@code{,} string_expression @code{)}
 @item @strong{Type:}
 module
 @item @strong{Purpose:}
 computes the first syzygy (i.e., the module of relations of the given
 generators) of the ideal, resp.@: module.
+@*An optional second argument specifies the Groebner base algorith to use.
+Possible values are @code{"std"} and @code{"slimgb"}.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -7723,6 +7740,9 @@ See
 @ref{nres};
 @ref{res};
 @ref{sres};
+@ref{lift};
+@ref{liftstd};
+@ref{ffmodsyz_lib};
 @ref{nfmodsyz_lib}.
 @c ref
 @c ---------------------------------------

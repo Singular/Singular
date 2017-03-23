@@ -21,6 +21,11 @@
 
 @heading News for version @value{VERSION}
 
+Extended commands:
+@itemize
+@item syz (@nref{syz}), lift (@nref{lift}), liftstd (@nref{liftstd}): with a specified GB algorithm
+@end itemize
+
 New libraries:
 @itemize
 @item goettsche.lib: Goettsche's formula for the Betti numbers of the Hilbert scheme
