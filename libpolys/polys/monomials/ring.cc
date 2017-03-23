@@ -322,20 +322,18 @@ void   rWrite(ring r, BOOLEAN details)
     Print("ordering %s", rSimpleOrdStr(r->order[l]));
 
 
-    if (r->order[l] == ringorder_s)
-    {
-      assume( l == 0 );
-#ifndef SING_NDEBUG
-      Print("  syzcomp at %d",r->typ[l].data.syz.limit);
-#endif
-      continue;
-    }
-    else if (r->order[l] == ringorder_IS)
+    if (r->order[l] == ringorder_IS)
     {
       assume( r->block0[l] == r->block1[l] );
       const int s = r->block0[l];
       assume( (-2 < s) && (s < 2) );
       Print("(%d)", s); // 0 => prefix! +/-1 => suffix!
+      continue;
+    }
+    else if (r->order[l]==ringorder_s)
+    {
+      assume( l == 0 );
+      Print(" syz_comp: %d",r->block0[l]);
       continue;
     }
     else if (
@@ -533,7 +531,11 @@ char * rOrdStr(ring r)
   for (l=0; ; l++)
   {
     StringAppendS((char *)rSimpleOrdStr(r->order[l]));
-    if (
+    if (r->order[l] == ringorder_s)
+    {
+      StringAppend("(%d)",r->block0[l]);
+    }
+    else if (
            (r->order[l] != ringorder_c)
         && (r->order[l] != ringorder_C)
         && (r->order[l] != ringorder_s)
@@ -2334,7 +2336,7 @@ static void rO_Syzcomp(int &place, int &bitplace, int &prev_ord,
 }
 
 static void rO_Syz(int &place, int &bitplace, int &prev_ord,
-    long *o, sro_ord &ord_struct)
+    int syz_comp, long *o, sro_ord &ord_struct)
 {
   // ordering is derived from component number
   // let's reserve one Exponent_t for it
@@ -2342,7 +2344,7 @@ static void rO_Syz(int &place, int &bitplace, int &prev_ord,
     rO_Align(place,bitplace);
   ord_struct.ord_typ=ro_syz;
   ord_struct.data.syz.place=place;
-  ord_struct.data.syz.limit=0;
+  ord_struct.data.syz.limit=syz_comp;
   ord_struct.data.syz.syz_index = NULL;
   ord_struct.data.syz.curr_index = 1;
   o[place]= -1;
@@ -3604,7 +3606,7 @@ BOOLEAN rComplete(ring r, int force)
 
       case ringorder_s:
         assume(typ_i == 0 && j == 0);
-        rO_Syz(j, j_bits, prev_ordsgn, tmp_ordsgn, tmp_typ[typ_i]); // set syz-limit?
+        rO_Syz(j, j_bits, prev_ordsgn, r->block0[i], tmp_ordsgn, tmp_typ[typ_i]); // set syz-limit?
         need_to_add_comp=TRUE;
         r->ComponentOrder=-1;
         typ_i++;
