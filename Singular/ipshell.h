@@ -192,6 +192,7 @@ int iiTokType(int op);
 int     iiDeclCommand(leftv sy, leftv name, int lev, int t, idhdl* root,
   BOOLEAN isring = FALSE, BOOLEAN init_b=TRUE);
 BOOLEAN iiMake_proc(idhdl pn, package pack, leftv sl);
+void* iiCallLib(const char*n, void *arg, int arg_type, BOOLEAN &err);
 // from misc.cc:
 char *  showOption();
 BOOLEAN setOption(leftv res, leftv v);

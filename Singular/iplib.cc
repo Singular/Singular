@@ -586,6 +586,71 @@ BOOLEAN iiMake_proc(idhdl pn, package pack, leftv sl)
   return FALSE;
 }
 
+void* iiCallLib(const char*n, void *arg, int arg_type, BOOLEAN &err)
+{
+  idhdl h=ggetid(n);
+  if ((h==NULL)
+  || (IDTYP(h)!=PROC_CMD))
+  {
+    err=2;
+    return NULL;
+  }
+  // ring handling
+  idhdl save_ringhdl=currRingHdl;
+  ring save_ring=currRing;
+  idhdl tmp_ring=NULL;
+  if (currRing!=NULL)
+  {
+    if (IDRING(currRingHdl)!=currRing)
+    {
+      // clean up things depending on currRingHdl:
+      sLastPrinted.CleanUp(IDRING(currRingHdl));
+      sLastPrinted.Init();
+      // need to define a ring-hdl for currRingHdl
+      tmp_ring=enterid(" tmpRing",myynest,RING_CMD,&IDROOT,FALSE);
+      IDRING(tmp_ring)=currRing;
+      currRing->ref++;
+      rSetHdl(tmp_ring);
+    }
+  }
+  // argument:
+  sleftv tmp;
+  tmp.Init();
+  tmp.data=arg;
+  tmp.rtyp=arg_type;
+  // call proc
+  err=iiMake_proc(h,currPack,&tmp);
+  // clean up ring
+  if (tmp_ring!=NULL)
+  {
+    IDRING(tmp_ring)->ref--;
+    idhdl hh=IDROOT;
+    idhdl prev=NULL;
+    while((hh!=tmp_ring) && (hh!=NULL)) { prev=hh; hh=hh->next; }
+    if (hh!=NULL)
+    {
+      if (prev==NULL) IDROOT=hh->next;
+      else prev->next=hh->next;
+      omFree((ADDRESS)IDID(hh));
+      omFreeBin((ADDRESS)hh, idrec_bin);
+    }
+    else
+    {
+      WarnS("internal: lost ring in iiCallLib");
+    }
+  }
+  currRingHdl=save_ringhdl;
+  currRing=save_ring;
+  // return
+  if (err==FALSE)
+  {
+    void*r=iiRETURNEXPR.data;
+    iiRETURNEXPR.data=NULL;
+    iiRETURNEXPR.CleanUp();
+    return r;
+  }
+  return NULL;
+}
 /*2
 * start an example (as a proc),
 * destroys the string 'example'
