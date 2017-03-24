@@ -2154,11 +2154,12 @@ lists rDecompose(const ring r)
     LLL->m[0].rtyp=STRING_CMD;
     LLL->m[0].data=(void *)omStrDup(rSimpleOrdStr(r->order[i]));
 
-    if(r->order[i] == ringorder_IS) //  || r->order[i] == ringorder_s || r->order[i] == ringorder_S)
+    if((r->order[i] == ringorder_IS)
+    || (r->order[i] == ringorder_s)) //|| r->order[i] == ringorder_S)
     {
       assume( r->block0[i] == r->block1[i] );
       const int s = r->block0[i];
-      assume( -2 < s && s < 2);
+      assume( (-2 < s && s < 2)||(r->order[i] != ringorder_IS));
 
       iv=new intvec(1);
       (*iv)[0] = s;
@@ -2567,13 +2568,16 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
         else
           iv=ivCopy((intvec*)vv->m[1].Data()); //assume INTVEC
         int iv_len=iv->length();
-        R->block1[j_in_R]=si_max(R->block0[j_in_R],R->block0[j_in_R]+iv_len-1);
-        if (R->block1[j_in_R]>R->N)
+        if (R->order[j_in_R]!=ringorder_s)
         {
-          R->block1[j_in_R]=R->N;
-          iv_len=R->block1[j_in_R]-R->block0[j_in_R]+1;
+          R->block1[j_in_R]=si_max(R->block0[j_in_R],R->block0[j_in_R]+iv_len-1);
+          if (R->block1[j_in_R]>R->N)
+          {
+            R->block1[j_in_R]=R->N;
+            iv_len=R->block1[j_in_R]-R->block0[j_in_R]+1;
+          }
+          //Print("block %d from %d to %d\n",j,R->block0[j], R->block1[j]);
         }
-        //Print("block %d from %d to %d\n",j,R->block0[j], R->block1[j]);
         int i;
         switch (R->order[j_in_R])
         {
@@ -2631,6 +2635,8 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
              break;
 
            case ringorder_s:
+             R->block1[j_in_R]=R->block0[j_in_R]=(*iv)[0];
+             rSetSyzComp(R->block0[j_in_R],R);
              break;
 
            case ringorder_IS:

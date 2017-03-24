@@ -2345,7 +2345,10 @@ static void rO_Syz(int &place, int &bitplace, int &prev_ord,
   ord_struct.ord_typ=ro_syz;
   ord_struct.data.syz.place=place;
   ord_struct.data.syz.limit=syz_comp;
-  ord_struct.data.syz.syz_index = (int*) omAlloc0((syz_comp+1)*sizeof(int));
+  if (syz_comp>0)
+    ord_struct.data.syz.syz_index = (int*) omAlloc0((syz_comp+1)*sizeof(int));
+  else
+    ord_struct.data.syz.syz_index = NULL;
   ord_struct.data.syz.curr_index = 1;
   o[place]= -1;
   prev_ord=-1;
@@ -4995,6 +4998,7 @@ void rSetSyzComp(int k, const ring r)
   if (TEST_OPT_PROT) Print("{%d}", k);
   if ((r->typ!=NULL) && (r->typ[0].ord_typ==ro_syz))
   {
+    r->block0[0]=r->block1[0] = k;
     if( k == r->typ[0].data.syz.limit )
       return; // nothing to do
 
@@ -5039,8 +5043,11 @@ void rSetSyzComp(int k, const ring r)
     Warn("rSetSyzComp(%d) in an IS ring! Be careful!", k);
 #endif
   }
-  else
-  if ((r->order[0]!=ringorder_c) && (k!=0)) // ???
+  else if (r->order[0]==ringorder_s)
+  {
+    r->block0[0] = r->block1[0] = k;
+  }
+  else if (r->order[0]!=ringorder_c)
   {
     dReportError("syzcomp in incompatible ring");
   }
