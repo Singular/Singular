@@ -2626,10 +2626,11 @@ GbVariant syGetAlgorithm(char *n, const ring r, const ideal M)
   else if (strcmp(n,"std")==0) alg=GbStd;
   else if (strcmp(n,"sba")==0) alg=GbSba;
   else if (strcmp(n,"singmatic")==0) alg=GbSingmatic;
+  else if (strcmp(n,"groebner")==0) alg=GbGroebner;
   else if (strcmp(n,"modstd")==0) alg=GbModstd;
   else if (strcmp(n,"ffmod")==0) alg=GbFfmod;
   else if (strcmp(n,"nfmod")==0) alg=GbNfmod;
-  else Warn(">>%s<< is an unknown algorithm");
+  else Warn(">>%s<< is an unknown algorithm",n);
 
   if (alg==GbSlimgb) // test conditions for slimgb
   {
