@@ -664,7 +664,7 @@ poly pFastPowerMC(poly f, int n, ring r)
   omfree(exp);
   omfree(facult);
   omfree(f_terms);
-  unsigned len=0;
+  int len=0;
   poly erg;
   kBucketClear(erg_bucket,&erg, &len);
   kBucketDestroy(&erg_bucket);

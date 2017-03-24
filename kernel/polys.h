@@ -318,14 +318,14 @@ BOOLEAN   pIsHomogeneous (poly p);
 /// Splits *p into two polys: *q which consists of all monoms with
 /// component == comp and *p of all other monoms *lq == pLength(*q)
 /// On return all components pf *q == 0
-static inline void pTakeOutComp(poly *p, long comp, poly *q, unsigned *lq, const ring R = currRing)
+inline void pTakeOutComp(poly *p, long comp, poly *q, int *lq, const ring R = currRing)
 {
   return p_TakeOutComp(p, comp, q, lq, R);
 }
 
 
 /// This is something weird -- Don't use it, unless you know what you are doing
-static inline poly pTakeOutComp(poly * p, int k, const ring R = currRing)
+inline poly      pTakeOutComp(poly * p, int k, const ring R = currRing)
 {
   return p_TakeOutComp(p, k, R);
 }
@@ -342,7 +342,8 @@ static inline poly pTakeOutComp(poly * p, int k, const ring R = currRing)
 void      pSetPolyComp(poly p, int comp);
 #define   pDeleteComp(p,k) p_DeleteComp(p,k,currRing)
 
-static inline void pNorm(poly p, const ring R = currRing){ p_Norm(p, R); }
+inline void pNorm(poly p, const ring R = currRing){ p_Norm(p, R); }
+
 
 #define   pSubst(p,n,e) p_Subst(p,n,e,currRing)
 #define   ppJet(p,m) pp_Jet(p,m,currRing)
@@ -384,8 +385,8 @@ BOOLEAN pCompareChainPart (poly p, poly p1, poly p2, poly lcm, const ring R = cu
 
 /// returns the length of a polynomial (numbers of monomials)
 /// respect syzComp
-static inline poly pLast(poly a, unsigned &length) { return p_Last (a, length, currRing); }
-static inline poly pLast(poly a) { unsigned l; return pLast(a, l); }
+static inline poly pLast(poly a, int &length) { return p_Last (a, length, currRing); }
+static inline poly pLast(poly a) { int l; return pLast(a, l); }
 
 /***************************************************************
  *

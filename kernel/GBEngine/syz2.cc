@@ -399,7 +399,7 @@ inline void sySPRedSyz(syStrategy syzstr,sSObject redWith,poly q=NULL)
 {
   poly p=pDivide(q,redWith.p);
   pSetCoeff(p,nDiv(pGetCoeff(q),pGetCoeff(redWith.p)));
-  unsigned il=0;
+  int il=-1;
   kBucket_Minus_m_Mult_p(syzstr->syz_bucket,p,redWith.syz,&il,NULL);
   pLmDelete(&p);
 }
@@ -408,8 +408,7 @@ static poly syRed_Hilb(poly toRed,syStrategy syzstr,int index)
 {
   ideal redWith=syzstr->res[index];
   if (redWith==NULL) return toRed;
-  unsigned j=IDELEMS(redWith);
-  unsigned i;
+  int j=IDELEMS(redWith),i;
   poly q,result=NULL,resultp;
 
   while ((j>0) && (redWith->m[j-1]==NULL)) j--;
@@ -504,7 +503,7 @@ static void syRedNextPairs_Hilb(SSet nextPairs, syStrategy syzstr,
   int ks1=IDELEMS(syzstr->orderedRes[index+1]);
   int kres=(*syzstr->Tl)[index];
   int toGo=0;
-  unsigned il;
+  int il;
   SSet redset=syzstr->resPairs[index];
   poly q;
   intvec *spl1;

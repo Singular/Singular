@@ -39,11 +39,11 @@ void kBucketInit(kBucket_pt bucket, poly p, int length);
 
 // Converts Bpoly into a poly and clears bucket
 // i.e., afterwards Bpoly == 0
-void kBucketClear(kBucket_pt bucket, poly *p, unsigned *length);
+void kBucketClear(kBucket_pt bucket, poly *p, int *length);
 
 inline poly kBucketClear(kBucket_pt bucket)
 {
-  unsigned dummy;
+  int dummy;
   poly p;
   kBucketClear(bucket, &p, &dummy);
   return p;
@@ -80,7 +80,7 @@ void kBucketAdjust(kBucket_pt bucket, int i);
 //         pLength(p1) == l1
 // Returns: Lc(p) / gcd(Lc(p), Lc(q))
 number kBucketPolyRed(kBucket_pt bucket,
-                      poly p, unsigned l,
+                      poly p, int l,
                       poly spNoether);
 
 
@@ -94,7 +94,7 @@ number kBucketPolyRed(kBucket_pt bucket,
 
 void kBucketTakeOutComp(kBucket_pt bucket,
                         long comp,
-                        poly *p, unsigned *l);
+                        poly *p, int *l);
 
 //////////////////////////////////////////////////////////////////////////
 ///
@@ -130,7 +130,7 @@ kBucket_ExtractLarger_Add_q(kBucket_pt bucket, poly append, poly q, int *lq)
 /// Bpoly == Bpoly - m*p; where m is a monom
 /// Does not destroy p and m (TODO: rename into kBucket_Minus_mm_Mult_pp!?)
 /// assume (*l <= 0 || pLength(p) == *l)
-void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, unsigned *l,
+void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
                             poly spNother = NULL);
 
 //////////////////////////////////////////////////////////////////////////
@@ -185,8 +185,8 @@ public:
 #ifdef HAVE_COEF_BUCKETS
   poly coef[MAX_BUCKET + 1];        // coeff of polys in bucket or NULL : 2..max
 #endif
-  unsigned buckets_length[MAX_BUCKET + 1]; // length if i-th poly
-  unsigned buckets_used;                    // max number of used bucket
+  int  buckets_length[MAX_BUCKET + 1]; // length if i-th poly
+  int buckets_used;                    // max number of used bucket
 #endif
   ring bucket_ring;
 };

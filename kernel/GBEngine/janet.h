@@ -15,7 +15,7 @@ typedef struct
 {
   poly root; //poly for parent, NULL for prol
   kBucket_pt root_b;
-  unsigned root_l;
+  int root_l;
   poly history; //parent
   poly lead; //leading monomial for prolongation
   char *mult; //[multi].[prol]

@@ -854,7 +854,7 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
             if (j==pos) break;
           }
         }
-        unsigned lb;
+        int lb;
         kBucketClear(syzstr->bucket,&tso.p,&lb);
       }
       if (tso.p != NULL)
@@ -2159,9 +2159,7 @@ static poly syMinimizeP(int toMin,syStrategy syzstr,intvec * ordn,int index,
 static poly syMinimizeP1(int toMin,syStrategy syzstr,intvec * ordn,int index,
                         intvec * toStrip)
 {
-  int ii=0,i,tc;
-  unsigned ltS=0;
-  unsigned lp;
+  int ii=0,i,tc,lp,ltS=-1;
   poly p,mp=NULL,pp;
   SSet sPairs=syzstr->resPairs[index];
   poly tempStripped=NULL;
@@ -2182,7 +2180,7 @@ static poly syMinimizeP1(int toMin,syStrategy syzstr,intvec * ordn,int index,
         syStripOutCopy(syzstr->res[index+1]->m[sPairs[i].syzind],toStrip);
       tc = pGetComp(sPairs[i].isNotMinimal);
       //p = pTakeOutComp1(&tempStripped,tc);
-      unsigned lu;
+      int lu;
       pTakeOutComp(&tempStripped,tc,&p,&lu);
       kBucketTakeOutComp(syzstr->bucket,tc,&mp,&lp);
       mp = pDivideM(mp,p);
@@ -2190,7 +2188,7 @@ static poly syMinimizeP1(int toMin,syStrategy syzstr,intvec * ordn,int index,
       {
         p = pNext(mp);
         pNext(mp) = NULL;
-        ltS = 0;
+        ltS = -1;
         kBucket_Minus_m_Mult_p(syzstr->bucket,mp,tempStripped,&ltS);
         pDelete(&mp);
         mp = p;

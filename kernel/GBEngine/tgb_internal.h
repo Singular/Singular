@@ -383,7 +383,7 @@ class simple_reducer:public reduction_step
 struct find_erg
 {
   poly expand;
-  unsigned expand_length;
+  int expand_length;
   int to_reduce_u;
   int to_reduce_l;
   int reduce_by;//index of reductor

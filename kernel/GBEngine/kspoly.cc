@@ -792,8 +792,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   int co=0/*, ct = ksCheckCoeff(&lc1, &lc2, currRing->cf)*/; // gcd and zero divisors
   (void) ksCheckCoeff(&lc1, &lc2, currRing->cf);
 
-  unsigned l1=0;
-  unsigned l2=0;
+  int l1=0, l2=0;
 
   if (p_GetComp(p1, currRing)!=p_GetComp(p2, currRing))
   {
@@ -840,7 +839,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   // get m2 * a2
   if (spNoether != NULL)
   {
-    l2 = 0;
+    l2 = -1;
     a2 = tailRing->p_Procs->pp_Mult_mm_Noether(a2, m2, spNoether, l2, tailRing);
     assume(l2 == pLength(a2));
   }

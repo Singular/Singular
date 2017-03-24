@@ -1319,7 +1319,7 @@ static void elimOperationBucketNoDiv(poly &p1, poly p2, poly p3, poly p4)
    This can only be used in the case of coefficients coming from a field
    or at least an integral domain. */
 void elimOperationBucket(poly &p1, poly &p2, poly &p3, poly &p4, poly &p5,
-                         number &c5, unsigned p5Len)
+                         number &c5, int p5Len)
 {
 #ifdef COUNT_AND_PRINT_OPERATIONS
   if ((pLength(p1) != 0) && (pLength(p2) != 0))

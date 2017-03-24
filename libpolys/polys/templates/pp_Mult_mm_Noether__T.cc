@@ -16,7 +16,7 @@
  *   Const:    p, m
  *
  ***************************************************************/
-LINKAGE poly pp_Mult_mm_Noether__T(poly p, const poly m, const poly spNoether, unsigned &ll, const ring ri)
+LINKAGE poly pp_Mult_mm_Noether__T(poly p, const poly m, const poly spNoether, int &ll, const ring ri)
 {
   p_Test(p, ri);
   p_LmTest(m, ri);
@@ -37,6 +37,7 @@ LINKAGE poly pp_Mult_mm_Noether__T(poly p, const poly m, const poly spNoether, u
   const unsigned long* m_e = m->exp;
   pAssume(!n_IsZero__T(ln,ri->cf));
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
+  int l = 0;
 
   do
   {
@@ -62,6 +63,7 @@ LINKAGE poly pp_Mult_mm_Noether__T(poly p, const poly m, const poly spNoether, u
     } else
     #endif
     {
+      l++;
       q = pNext(q) = r;
       pSetCoeff0(q, n);
     }
@@ -70,7 +72,10 @@ LINKAGE poly pp_Mult_mm_Noether__T(poly p, const poly m, const poly spNoether, u
 
   } while (p != NULL);
 
-  ll = pLength(p);
+  if (ll < 0)
+    ll = l;
+  else
+    ll = pLength(p);
 
   pNext(q) = NULL;
 

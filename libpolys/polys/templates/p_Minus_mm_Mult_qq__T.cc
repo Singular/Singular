@@ -139,7 +139,7 @@ LINKAGE poly p_Minus_mm_Mult_qq__T(poly p, poly m, poly q, int& Shorter, const p
     pSetCoeff0(m, tneg);
     if (spNoether != NULL)
     {
-      unsigned ll = 0;
+      int ll = 0;
       pNext(a) = r->p_Procs->pp_Mult_mm_Noether(q, m, spNoether, ll, r);
       shorter += ll;
     }

@@ -230,8 +230,8 @@ poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp,
 
 // // for p_Plus_mm_Mult_qq in pInline2.h
 // returns p + m*q destroys p, const: q, m
-poly nc_p_Plus_mm_Mult_qq(poly p, const poly m, const poly q, unsigned &lp,
-                              const unsigned, const ring r);
+poly nc_p_Plus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp,
+                              const int, const ring r);
 
 
 

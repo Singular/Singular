@@ -25,7 +25,7 @@ struct sSObject{
                  poly  isNotMinimal;
                  int   syzind;
                  int   order;
-                 unsigned length;
+                 int   length;
                  int   reference;
                };
 typedef struct sSObject SObject;

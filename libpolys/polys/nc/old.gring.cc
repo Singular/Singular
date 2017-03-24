@@ -170,8 +170,8 @@ poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &shorter,
 }
 
 // returns p + m*q destroys p, const: q, m
-poly nc_p_Plus_mm_Mult_qq(poly p, const poly m, const poly q, unsigned &lp,
-                              const unsigned, const ring r)
+poly nc_p_Plus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp,
+                              const int, const ring r)
 {
   p = p_Add_q(p, nc_mm_Mult_pp( m, q, r ), r);
 

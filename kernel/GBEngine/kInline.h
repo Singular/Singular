@@ -567,7 +567,7 @@ KINLINE void sLObject::Tail_Mult_nn(number n)
   }
 }
 
-KINLINE void sLObject::Tail_Minus_mm_Mult_qq(poly m, poly q, unsigned lq,
+KINLINE void sLObject::Tail_Minus_mm_Mult_qq(poly m, poly q, int lq,
                                              poly spNoether)
 {
   if (bucket != NULL)
@@ -580,7 +580,7 @@ KINLINE void sLObject::Tail_Minus_mm_Mult_qq(poly m, poly q, unsigned lq,
     poly _p = (t_p != NULL ? t_p : p);
     assume(_p != NULL);
 
-    unsigned lp=pLength-1;
+    int lp=pLength-1;
     pNext(_p) = p_Minus_mm_Mult_qq( pNext(_p), m, q, lp, lq,
                                     spNoether, tailRing );
     pLength=lp+1;

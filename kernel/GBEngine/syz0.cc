@@ -510,8 +510,7 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
   while ((Fl!=0) && (arg->m[Fl-1]==NULL)) Fl--;
   ideal result=idInit(16,Fl);
   int i,j,l,k,kkk,/*rkF,*/Sl=0,syComponentOrder=currRing->ComponentOrder;
-  int wend,lini,gencQ=0;
-  unsigned ltR;
+  int /*fstart,*/wend,lini,ltR,gencQ=0;
   intvec *newmodcomp;
   int *Flength;
   polyset pairs,F=arg->m,*Shdl=&(result->m);
