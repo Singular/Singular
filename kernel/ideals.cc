@@ -34,6 +34,7 @@
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/tgb.h>
 #include <kernel/GBEngine/syz.h>
+#include <Singular/ipshell.h>
 
 
 /* #define WITH_OLD_MINOR */
@@ -513,6 +514,16 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w, GbVarian
   {
     if (TEST_OPT_PROT) { PrintS("slimgb:"); mflush(); }
     h3 = t_rep_gb(currRing, h2, syzcomp);
+  }
+  else if (alg==GbGroebner)
+  {
+    BOOLEAN err;
+    h3=(ideal)iiCallLib("groebner",idCopy(h2),MODUL_CMD,err);
+    if (err)
+    {
+      Werror("error %d in >>groebner<<",err);
+      h3=idInit(1,1);
+    }
   }
   //else if (alg==GbSba): requires order C,...
   //{
@@ -2657,6 +2668,10 @@ GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)
     {
       return GbSba;
     }
+  }
+  else if (alg==GbGroebner) // cond. for groebner
+  {
+    return GbGroebner;
   }
 
   return GbStd; // no conditions for std
