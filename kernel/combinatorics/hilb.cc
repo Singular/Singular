@@ -239,6 +239,7 @@ static void hWDegree(intvec *wdegree)
 // ---------------------------------- ADICHANGES ---------------------------------------------
 //!!!!!!!!!!!!!!!!!!!!! Just for Monomial Ideals !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+#if 0 // unused
 //Tests if the ideal is sorted by degree
 static bool idDegSortTest(ideal I)
 {
@@ -257,6 +258,7 @@ static bool idDegSortTest(ideal I)
     }
     return(TRUE);
 }
+#endif
 
 //adds the new polynomial at the coresponding position
 //and simplifies the ideal
@@ -484,6 +486,7 @@ static poly ChoosePVar (ideal I)
     return(NULL); //i.e. it is the maximal ideal
 }
 
+#if 0 // unused
 //choice XL: last entry divided by x (xy10z15 -> y9z14)
 static poly ChoosePXL(ideal I)
 {
@@ -516,7 +519,9 @@ static poly ChoosePXL(ideal I)
     m = ChoosePVar(I);
     return(m);
 }
+#endif
 
+#if 0 // unused
 //choice XF: first entry divided by x (xy10z15 -> y9z14)
 static poly ChoosePXF(ideal I)
 {
@@ -549,7 +554,9 @@ static poly ChoosePXF(ideal I)
     m = ChoosePVar(I);
     return(m);
 }
+#endif
 
+#if 0 // unused
 //choice OL: last entry the first power (xy10z15 -> xy9z15)
 static poly ChoosePOL(ideal I)
 {
@@ -579,7 +586,9 @@ static poly ChoosePOL(ideal I)
     m = ChoosePVar(I);
     return(m);
 }
+#endif
 
+#if 0 // unused
 //choice OF: first entry the first power (xy10z15 -> xy9z15)
 static poly ChoosePOF(ideal I)
 {
@@ -609,7 +618,9 @@ static poly ChoosePOF(ideal I)
     m = ChoosePVar(I);
     return(m);
 }
+#endif
 
+#if 0 // unused
 //choice VL: last entry the first variable with power (xy10z15 -> y)
 static poly ChoosePVL(ideal I)
 {
@@ -637,7 +648,9 @@ static poly ChoosePVL(ideal I)
     m = ChoosePVar(I);
     return(m);
 }
+#endif
 
+#if 0 // unused
 //choice VF: first entry the first variable with power (xy10z15 -> y)
 static poly ChoosePVF(ideal I)
 {
@@ -665,6 +678,7 @@ static poly ChoosePVF(ideal I)
     m = ChoosePVar(I);
     return(m);
 }
+#endif
 
 //choice JL: last entry just variable with power (xy10z15 -> y10)
 static poly ChoosePJL(ideal I)
@@ -694,6 +708,7 @@ static poly ChoosePJL(ideal I)
     return(m);
 }
 
+#if 0
 //choice JF: last entry just variable with power -1 (xy10z15 -> y9)
 static poly ChoosePJF(ideal I)
 {
@@ -721,6 +736,7 @@ static poly ChoosePJF(ideal I)
     m = ChoosePVar(I);
     return(m);
 }
+#endif
 
 //chooses 1 \neq p \not\in S. This choice should be made optimal
 static poly ChooseP(ideal I)

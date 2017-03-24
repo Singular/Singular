@@ -521,7 +521,7 @@ KINLINE void sLObject::PrepareRed(BOOLEAN use_bucket)
 {
   if (bucket == NULL)
   {
-    int l = GetpLength();
+    unsigned l = GetpLength();
     if (use_bucket && (l > 1))
     {
       poly tp = GetLmTailRing();

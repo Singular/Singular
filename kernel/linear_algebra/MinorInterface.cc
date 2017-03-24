@@ -498,9 +498,7 @@ ideal getMinorIdealHeuristic (const matrix mat, const int minorSize,
                               const int k, const ideal iSB,
                               const bool allDifferent)
 {
-  int vars = 0; if (currRing != 0) vars = currRing->N;
-  int rowCount = mat->nrows;
-  int columnCount = mat->ncols;
+  int vars = currRing->N;
 
   /* here comes the heuristic, as of 29 January 2010:
 
