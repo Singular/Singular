@@ -2396,7 +2396,10 @@ poly id_GCD(poly f, poly g, const ring r)
   ideal I=idInit(2,1); I->m[0]=f; I->m[1]=g;
   intvec *w = NULL;
 
-  ring save_r = currRing; rChangeCurrRing(r); ideal S=idSyzygies(I,testHomog,&w); rChangeCurrRing(save_r);
+  ring save_r = currRing;
+  rChangeCurrRing(r);
+  ideal S=idSyzygies(I,testHomog,&w);
+  rChangeCurrRing(save_r);
 
   if (w!=NULL) delete w;
   poly gg=p_TakeOutComp(&(S->m[0]), 2, r);

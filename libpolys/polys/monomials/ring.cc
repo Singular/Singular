@@ -4664,7 +4664,7 @@ ring rAssure_CompLastBlock(ring r, BOOLEAN complete)
 }
 
 // Moves _c or _C ordering to the last place AND adds _s on the 1st place
-ring rAssure_SyzComp_CompLastBlock(const ring r, BOOLEAN)
+ring rAssure_SyzComp_CompLastBlock(const ring r)
 {
   rTest(r);
 

@@ -929,7 +929,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       }
       else
       {
-        syRing = rAssure_SyzComp_CompLastBlock(origR, TRUE);
+        syRing = rAssure_SyzComp_CompLastBlock(origR);
         if (syRing != origR)
         {
           rChangeCurrRing(syRing);

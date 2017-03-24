@@ -731,7 +731,7 @@ ring   rAssure_c_dp(const ring r);
 ring   rAssure_CompLastBlock(const ring r, BOOLEAN complete = TRUE);
 
 /// makes sure that c/C ordering is last ordering and SyzIndex is first
-ring   rAssure_SyzComp_CompLastBlock(const ring r, BOOLEAN complete = TRUE);
+ring   rAssure_SyzComp_CompLastBlock(const ring r);
 ring   rAssure_TDeg(const ring r, int &pos);
 BOOLEAN rHasTDeg(const ring r);
 
