@@ -78,9 +78,9 @@ public:
   ring tailRing;
   long FDeg;    // pFDeg(p)
   int ecart,
-    length,     // as of pLDeg
-    pLength,    // either == 0, or == pLength(p)
-    i_r;        // index of TObject in R set, or -1 if not in T
+    length;     // as of pLDeg
+  unsigned  pLength;    // either == 0, or == pLength(p)
+  int  i_r;        // index of TObject in R set, or -1 if not in T
   BOOLEAN is_normalized; // true, if pNorm was called on p, false otherwise
   // used in incremental sba() with F5C:
   // we know some of the redundant elements in
@@ -216,7 +216,7 @@ public:
   KINLINE void PrepareRed(BOOLEAN use_bucket);
   KINLINE void SetLmTail(poly lm, poly new_p, int length,
                          int use_bucket, ring r);
-  KINLINE void Tail_Minus_mm_Mult_qq(poly m, poly qq, int lq, poly spNoether);
+  KINLINE void Tail_Minus_mm_Mult_qq(poly m, poly qq, unsigned lq, poly spNoether);
   KINLINE void Tail_Mult_nn(number n);
   // deletes bucket, makes sure that p and t_p exists
   KINLINE poly GetP(omBin lmBin = NULL);

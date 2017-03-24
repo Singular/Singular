@@ -52,7 +52,7 @@ static int simple_posInS (kStrategy strat, poly p,int len, wlen_type wlen);
 static int* make_connections(int from, int to, poly bound, slimgb_alg* c);
 static BOOLEAN has_t_rep(const int & arg_i, const int & arg_j, slimgb_alg* state);
 static void shorten_tails(slimgb_alg* c, poly monom);
-static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n=0);
+static poly redNF2 (poly h,slimgb_alg* c , unsigned &len, number&  m,int n=0);
 static poly redNFTail (poly h,const int sl,kStrategy strat, int len);
 static int bucket_guess(kBucket* bucket);
 
@@ -1834,7 +1834,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
   }
 }
 
-static poly redNF2 (poly h, slimgb_alg * c, int &len, number & m, int n)
+static poly redNF2 (poly h, slimgb_alg * c, unsigned &len, number & m, int n)
 {
   m = nInit (1);
   if(h == NULL)
@@ -2790,7 +2790,7 @@ static void go_on (slimgb_alg * c)
     // if(s->i>=0)
 //       now_t_rep(s->j,s->i,c);
     number coef;
-    int mlen = pLength (h);
+    unsigned mlen = pLength (h);
     p_Test (h, c->r);
     if((!c->nc) & (!(use_noro)))
     {
@@ -2931,7 +2931,7 @@ static void go_on (slimgb_alg * c)
   poly *add_those = (poly *) omalloc (i * sizeof (poly));
   for(j = 0; j < i; j++)
   {
-    int len;
+    unsigned len;
     poly p;
     buf[j].flatten ();
     kBucketClear (buf[j].bucket, &p, &len);
@@ -4702,7 +4702,7 @@ static void multi_reduction (red_object * los, int &losl, slimgb_alg * c)
       poly *p_noro = (poly *) omalloc (pn_noro * sizeof (poly));
       for(i = 0; i < pn_noro; i++)
       {
-        int dummy_len;
+        unsigned dummy_len;
         poly p;
         los[i].p = NULL;
         kBucketClear (los[i].bucket, &p, &dummy_len);
@@ -4865,7 +4865,7 @@ void red_object::validate ()
 int red_object::clear_to_poly ()
 {
   flatten ();
-  int l;
+  unsigned l;
   kBucketClear (bucket, &p, &l);
   return l;
 }
@@ -4933,7 +4933,7 @@ void multi_reduce_step (find_erg & erg, red_object * r, slimgb_alg * c)
   BOOLEAN lt_changed = FALSE;
   int rn = erg.reduce_by;
   poly red;
-  int red_len;
+  unsigned red_len;
   simple_reducer *pointer;
   BOOLEAN work_on_copy = FALSE;
   if(erg.fromS)

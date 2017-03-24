@@ -27,7 +27,7 @@ typedef poly (*pp_Mult_nn_Proc_Ptr)(poly p, const number n, const ring r);
 typedef poly (*p_Mult_mm_Proc_Ptr)(poly p, const poly m, const ring r);
 typedef poly (*pp_Mult_mm_Proc_Ptr)(poly p, const poly m, const ring r);
 typedef poly (*pp_Mult_mm_Noether_Proc_Ptr)(poly p, const poly m,
-                                            const poly spNoether, int &ll,
+                                            const poly spNoether, unsigned &ll,
                                             const ring r);
 typedef poly (*p_Add_q_Proc_Ptr)(poly p, poly q, int & shorter, const ring r);
 typedef poly (*p_Minus_mm_Mult_qq_Proc_Ptr)(poly p, poly m, poly q,

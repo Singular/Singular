@@ -471,7 +471,7 @@ PrintLn();
 /*3
 * performs the modification of a single reduction on the syzygy-level
 */
-inline void sySPRedSyz_Kosz(syStrategy syzstr,poly redWith,poly syz,poly q=NULL,int l_syz=-1)
+static inline void sySPRedSyz_Kosz(syStrategy syzstr,poly redWith,poly syz,poly q=NULL,unsigned l_syz=0)
 {
   poly p=pDivide(q,redWith);
   pSetCoeff(p,nDiv(pGetCoeff(q),pGetCoeff(redWith)));
@@ -513,9 +513,10 @@ static BOOLEAN syRedSyz(kBucket_pt bucket,ideal red,int crit_comp,int* g_l)
 * a tail reduction for the syzygies yielding new generators
 */
 static poly syRedTailSyz(poly tored,ideal red,ideal sec_red,int crit_comp,syStrategy syzstr,
-            int * gen_length,int * secgen_length,int * tored_length)
+            int * gen_length,int * secgen_length,unsigned * tored_length)
 {
-  int i=IDELEMS(red)-1,num_mon,num_tail;
+  int i=IDELEMS(red)-1,num_mon;
+  unsigned num_tail;
   poly h,hn;
   // BOOLEAN dummy;
 
@@ -658,7 +659,8 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
   ideal old_repr=syzstr->orderedRes[index];
   int og_idel=IDELEMS(old_generators),ng_place=IDELEMS(new_generators);
   int toReplace=0;
-  int i,j,syz_l;
+  int i;
+  unsigned syz_l, j;
   number /*coefgcd,*/n;
   polyset ogm=old_generators->m;
   poly p;
@@ -705,7 +707,7 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
       pLmDelete(&p);
       p = pNeg(p);
       pp = pCopy(old_repr->m[tso.ind2]);
-      int il=-1;
+      unsigned il=0;
       while (p!=NULL)
       {
         kBucket_Minus_m_Mult_p(syzstr->syz_bucket,p,pp,&il,NULL);
@@ -715,7 +717,7 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
       p = pCopy(tso.p2);
       p_Shift(&p,-1,currRing);
       pp = pCopy(old_repr->m[tso.ind1]);
-      il=-1;
+      il=0;
       while (p!=NULL)
       {
         kBucket_Minus_m_Mult_p(syzstr->syz_bucket,p,pp,&il,NULL);
@@ -1025,7 +1027,7 @@ static ideal kosz_std(ideal new_generators,ideal new_repr,syStrategy syzstr,
 * normalizes the incoming generators
 */
 static poly normalize(poly next_p,ideal add_generators, syStrategy syzstr,
-                      int * g_l,int * p_l,int crit_comp)
+                      int * g_l,unsigned * p_l,int crit_comp)
 {
   int j=0,i=IDELEMS(add_generators);
   kBucketInit(syzstr->bucket,next_p,pLength(next_p));
@@ -1191,7 +1193,7 @@ static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp,
   SObject tso = resPairs[itso];
   assume (tso.lcm!=NULL);
   int ng_place=IDELEMS(new_generators);
-  int i,j;
+  unsigned i,j;
   number n;
   poly p;
 #ifdef EXPERIMENT1
@@ -1419,7 +1421,8 @@ static void procedeNextGenerators(ideal temp_generators,ideal /*temp_repr*/,
   int i=0,j,next_new_el;
   int idel_temp=IDELEMS(temp_generators);
   int next_place_add;
-  int p_length,red_deg,l_pairs=IDELEMS(add_generators);
+  int red_deg,l_pairs=IDELEMS(add_generators);
+  unsigned p_length;
   poly next_p;
   int * gen_length=(int*)omAlloc0(IDELEMS(add_generators)*sizeof(int));
   int * secgen_length=(int*)omAlloc0(IDELEMS(syzstr->res[index])*sizeof(int));
@@ -1547,7 +1550,8 @@ static ideal normalizeOldPart(ideal new_generators,ideal new_repr,
 {
   ideal old_generators= syzstr->res[index];
   ideal old_repr= syzstr->orderedRes[index];
-  int i,j=0,ii=IDELEMS(old_generators)-1,dummy;
+  int i,j=0,ii=IDELEMS(old_generators)-1;
+  unsigned dummy;
   poly p;
   number n;
   int * g_l=(int*)omAlloc0(IDELEMS(old_generators)*sizeof(int));

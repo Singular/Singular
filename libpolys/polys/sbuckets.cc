@@ -173,13 +173,13 @@ static void sBucket_Merge_m(sBucket_pt bucket, poly p)
   if (i > bucket->max_bucket) bucket->max_bucket = i;
 }
 
-void sBucket_Merge_p(sBucket_pt bucket, poly p, int length)
+void sBucket_Merge_p(sBucket_pt bucket, poly p, unsigned length)
 {
   assume(bucket != NULL);
-  assume(length <= 0 || length == pLength(p));
+  assume(length == 0 || length == pLength(p));
 
   if (p == NULL) return;
-  if (length <= 0) length = pLength(p);
+  if (length == 0) length = pLength(p);
 
   int i = LOG2(length);
 
@@ -198,7 +198,7 @@ void sBucket_Merge_p(sBucket_pt bucket, poly p, int length)
   if (i > bucket->max_bucket) bucket->max_bucket = i;
 }
 
-void sBucket_Add_p(sBucket_pt bucket, poly p, int length)
+void sBucket_Add_p(sBucket_pt bucket, poly p, unsigned length)
 {
   assume(bucket != NULL);
   assume(length <= 0 || length == pLength(p));
@@ -270,8 +270,8 @@ void sBucketClearMerge(sBucket_pt bucket, poly *p, int *length)
 void sBucketClearAdd(sBucket_pt bucket, poly *p, int *length)
 {
   poly pr = NULL;
-  int  lr = 0;
-  int i = 0;
+  unsigned  lr = 0;
+  unsigned i = 0;
 
   while (bucket->buckets[i].p == NULL)
   {

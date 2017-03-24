@@ -199,7 +199,7 @@ static inline unsigned pLength(poly a)
 
 // returns the length of a polynomial (numbers of monomials) and the last mon.
 // respect syzComp
-poly p_Last(const poly a, int &l, const ring r);
+poly p_Last(const poly a, unsigned &l, const ring r);
 
 /*----------------------------------------------------*/
 
@@ -882,7 +882,7 @@ static inline poly p_Add_q(poly p, poly q, const ring r)
 }
 
 /// like p_Add_q, except that if lp == pLength(lp) lq == pLength(lq) then lp == pLength(p+q)
-static inline poly p_Add_q(poly p, poly q, int &lp, int lq, const ring r)
+static inline poly p_Add_q(poly p, poly q, unsigned &lp, unsigned lq, const ring r)
 {
   assume( (p != q) || (p == NULL && q == NULL) );
   int shorter;
@@ -973,8 +973,8 @@ static inline poly p_Mult_mm(poly p, poly m, const ring r)
     return r->p_Procs->p_Mult_mm(p, m, r);
 }
 
-static inline poly p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp, int lq,
-                                      const poly spNoether, const ring r)
+static inline poly p_Minus_mm_Mult_qq(poly p, const poly m, const poly q,
+           unsigned &lp, unsigned lq, const poly spNoether, const ring r)
 {
   int shorter;
   const poly res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, spNoether, r);
@@ -1103,7 +1103,7 @@ static inline poly pp_Mult_qq(poly p, poly q, const ring r)
 }
 
 // returns p + m*q destroys p, const: q, m
-static inline poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
+static inline poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, unsigned &lp, unsigned lq,
                                 const ring r)
 {
 #ifdef HAVE_PLURAL
@@ -1127,7 +1127,7 @@ static inline poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
 
 static inline poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
 {
-  int lp = 0, lq = 0;
+  unsigned lp = 0, lq = 0;
   return p_Plus_mm_Mult_qq(p, m, q, lp, lq, r);
 }
 
@@ -1974,7 +1974,7 @@ poly      p_TakeOutComp1(poly * p, int k, const ring r);
 // Splits *p into two polys: *q which consists of all monoms with
 // component == comp and *p of all other monoms *lq == pLength(*q)
 // On return all components pf *q == 0
-void p_TakeOutComp(poly *p, long comp, poly *q, int *lq, const ring r);
+void p_TakeOutComp(poly *p, long comp, poly *q, unsigned *lq, const ring r);
 
 // This is something weird -- Don't use it, unless you know what you are doing
 poly      p_TakeOutComp(poly * p, int k, const ring r);

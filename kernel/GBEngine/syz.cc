@@ -222,7 +222,7 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
 */
 void syGaussForOne(ideal syz, int elnum, int ModComp,int from,int till)
 {
-  int /*k,j,i,*/lu;
+  unsigned lu;
   poly unit1,unit2;
   poly actWith=syz->m[elnum];
 

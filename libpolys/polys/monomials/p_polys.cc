@@ -3434,7 +3434,7 @@ poly p_TakeOutComp(poly * p, int k, const ring r)
 
 // Splits *p into two polys: *q which consists of all monoms with
 // component == comp and *p of all other monoms *lq == pLength(*q)
-void p_TakeOutComp(poly *r_p, long comp, poly *r_q, int *lq, const ring r)
+void p_TakeOutComp(poly *r_p, long comp, poly *r_q, unsigned *lq, const ring r)
 {
   spolyrec pp, qq;
   poly p, q, p_prev;
@@ -4470,7 +4470,7 @@ BOOLEAN p_ComparePolys(poly p1,poly p2, const ring r)
 * returns the length of a (numbers of monomials)
 * respect syzComp
 */
-poly p_Last(const poly p, int &l, const ring r)
+poly p_Last(const poly p, unsigned &l, const ring r)
 {
   if (p == NULL)
   {

@@ -37,7 +37,7 @@ void bit_reduce(poly & f,ring r)
     p=next;
   }
 
-  int len=0;
+  unsigned len;
   poly erg;
   kBucketClear(erg_bucket,&erg, &len);
   kBucketDestroy(&erg_bucket);
@@ -79,7 +79,7 @@ poly uni_subst_bits(poly outer_uni, poly inner_multi, ring r)
     p_Delete(&potences[i],r);
   }
   omfree(potences);
-  int len=0;
+  unsigned len=0;
   poly erg;
   kBucketClear(erg_bucket,&erg, &len);
   kBucketDestroy(&erg_bucket);

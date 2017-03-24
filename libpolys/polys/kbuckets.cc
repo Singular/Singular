@@ -365,7 +365,7 @@ int kBucketCanonicalize(kBucket_pt bucket)
   kbTest(bucket);
   poly p = bucket->buckets[1];
   poly lm;
-  int pl = bucket->buckets_length[1];//, i;
+  unsigned pl = bucket->buckets_length[1];
   int i;
   bucket->buckets[1] = NULL;
   bucket->buckets_length[1] = 0;
@@ -431,7 +431,7 @@ int kBucketCanonicalize(kBucket_pt bucket)
   return i;
 }
 
-void kBucketClear(kBucket_pt bucket, poly *p, int *length)
+void kBucketClear(kBucket_pt bucket, poly *p, unsigned *length)
 {
   int i = kBucketCanonicalize(bucket);
   if (i > 0)
@@ -536,11 +536,11 @@ void kBucketShallowCopyDelete(kBucket_pt bucket,
 ///
 /// Bucket number i from bucket is out of length sync, resync
 ///
-void kBucketAdjust(kBucket_pt bucket, int i) {
-
+void kBucketAdjust(kBucket_pt bucket, int i)
+{
   MULTIPLY_BUCKET(bucket,i);
 
-  int l1 = bucket->buckets_length[i];
+  unsigned l1 = bucket->buckets_length[i];
   poly p1 = bucket->buckets[i];
   bucket->buckets[i] = NULL;
   bucket->buckets_length[i] = 0;
@@ -630,7 +630,7 @@ void kBucket_Add_q(kBucket_pt bucket, poly q, int *l)
   if (q == NULL) return;
   assume(*l <= 0 || pLength(q) == *l);
 
-  int i, l1;
+  unsigned i, l1;
   ring r = bucket->bucket_ring;
 
   if (*l <= 0)
@@ -687,15 +687,15 @@ void kBucket_Add_q(kBucket_pt bucket, poly q, int *l)
 /// Bpoly == Bpoly - m*p; where m is a monom
 /// Does not destroy p and m
 /// assume (*l <= 0 || pLength(p) == *l)
-void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
+void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, unsigned *l,
                             poly spNoether)
 {
-  assume(*l <= 0 || pLength(p) == *l);
-  int i, l1;
+  assume(*l == 0 || pLength(p) == *l);
+  unsigned i, l1;
   poly p1 = p;
   ring r = bucket->bucket_ring;
 
-  if (*l <= 0)
+  if (*l == 0)
   {
     l1 = pLength(p1);
     *l = l1;
@@ -796,7 +796,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
 {
     assume((!rIsPluralRing(bucket->bucket_ring))||p_IsConstant(m, bucket->bucket_ring));
   assume(l <= 0 || pLength(p) == l);
-  int i, l1;
+  unsigned i, l1;
   poly p1 = p;
   ring r = bucket->bucket_ring;
 
@@ -1011,10 +1011,10 @@ extern void p_TakeOutComp(poly *p, long comp, poly *q, int *lq, const ring r);
 
 void kBucketTakeOutComp(kBucket_pt bucket,
                         long comp,
-                        poly *r_p, int *l)
+                        poly *r_p, unsigned *l)
 {
   poly p = NULL, q;
-  int i, lp = 0, lq;
+  unsigned i, lp = 0, lq;
 
 #ifndef HAVE_PSEUDO_BUCKETS
   kBucketMergeLm(bucket);
@@ -1051,14 +1051,14 @@ void kBucketTakeOutComp(kBucket_pt bucket,
 extern int ksCheckCoeff(number *a, number *b);
 
 number kBucketPolyRed(kBucket_pt bucket,
-                      poly p1, int l1,
+                      poly p1, unsigned l1,
                       poly spNoether)
 {
   ring r=bucket->bucket_ring;
   assume((!rIsPluralRing(r))||p_LmEqual(p1,kBucketGetLm(bucket), r));
   assume(p1 != NULL &&
          p_DivisibleBy(p1,  kBucketGetLm(bucket), r));
-  assume(pLength(p1) == (int) l1);
+  assume(pLength(p1) == l1);
 
   poly a1 = pNext(p1), lm = kBucketExtractLm(bucket);
   BOOLEAN reset_vec=FALSE;

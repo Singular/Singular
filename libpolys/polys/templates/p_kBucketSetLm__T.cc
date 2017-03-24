@@ -37,7 +37,7 @@ LINKAGE void p_kBucketSetLm__T(kBucket_pt bucket)
   do
   {
     j = 0;
-    for (int i = 1; i<=bucket->buckets_used; i++)
+    for (unsigned i = 1; i<=bucket->buckets_used; i++)
     {
       if (bucket->buckets[i] != NULL)
       {
