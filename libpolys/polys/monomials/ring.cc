@@ -2345,7 +2345,7 @@ static void rO_Syz(int &place, int &bitplace, int &prev_ord,
   ord_struct.ord_typ=ro_syz;
   ord_struct.data.syz.place=place;
   ord_struct.data.syz.limit=syz_comp;
-  ord_struct.data.syz.syz_index = NULL;
+  ord_struct.data.syz.syz_index = (int*) omAlloc0((syz_comp+1)*sizeof(int));
   ord_struct.data.syz.curr_index = 1;
   o[place]= -1;
   prev_ord=-1;
