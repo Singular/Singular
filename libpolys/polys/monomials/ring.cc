@@ -468,8 +468,8 @@ void rDelete(ring r)
     nc_rKill(r);
 #endif
 
+  rUnComplete(r); // may need r->cf for p_Delete
   nKillChar(r->cf); r->cf = NULL;
-  rUnComplete(r);
   // delete order stuff
   if (r->order != NULL)
   {
