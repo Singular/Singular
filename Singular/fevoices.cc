@@ -669,7 +669,7 @@ Voice * feInitStdin(Voice *pp)
   Voice *p = new Voice;
   p->files = stdin;
   p->sw = (isatty(STDIN_FILENO)) ? BI_stdin : BI_file;
-  if ((pp!=NULL) && (pp->files==stdin))
+  if ((pp!=NULL) && (pp->sw==BI_stdin) && (pp->files==stdin))
   {
     p->files=freopen("/dev/tty","r",stdin);
     //stdin=p->files;
