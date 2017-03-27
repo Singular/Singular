@@ -585,19 +585,8 @@ BOOLEAN iiMake_proc(idhdl pn, package pack, leftv sl)
     return TRUE;
   return FALSE;
 }
-
-void* iiCallLib(const char*n, void *arg, int arg_type, BOOLEAN &err)
+static void iiCallLibProcBegin()
 {
-  idhdl h=ggetid(n);
-  if ((h==NULL)
-  || (IDTYP(h)!=PROC_CMD))
-  {
-    err=2;
-    return NULL;
-  }
-  // ring handling
-  idhdl save_ringhdl=currRingHdl;
-  ring save_ring=currRing;
   idhdl tmp_ring=NULL;
   if (currRing!=NULL)
   {
@@ -613,20 +602,16 @@ void* iiCallLib(const char*n, void *arg, int arg_type, BOOLEAN &err)
       rSetHdl(tmp_ring);
     }
   }
-  // argument:
-  sleftv tmp;
-  tmp.Init();
-  tmp.data=arg;
-  tmp.rtyp=arg_type;
-  // call proc
-  err=iiMake_proc(h,currPack,&tmp);
-  // clean up ring
-  if (tmp_ring!=NULL)
+}
+static void iiCallLibProcEnd(idhdl save_ringhdl, ring save_ring)
+{
+  if ((currRing!=NULL) 
+  &&(currRing!=save_ring))
   {
-    IDRING(tmp_ring)->ref--;
+    currRing->ref--;
     idhdl hh=IDROOT;
     idhdl prev=NULL;
-    while((hh!=tmp_ring) && (hh!=NULL)) { prev=hh; hh=hh->next; }
+    while((hh!=currRingHdl) && (hh!=NULL)) { prev=hh; hh=hh->next; }
     if (hh!=NULL)
     {
       if (prev==NULL) IDROOT=hh->next;
@@ -641,6 +626,80 @@ void* iiCallLib(const char*n, void *arg, int arg_type, BOOLEAN &err)
   }
   currRingHdl=save_ringhdl;
   currRing=save_ring;
+}
+
+void* iiCallLibProc1(const char*n, void *arg, int arg_type, BOOLEAN &err)
+{
+  idhdl h=ggetid(n);
+  if ((h==NULL)
+  || (IDTYP(h)!=PROC_CMD))
+  {
+    err=2;
+    return NULL;
+  }
+  // ring handling
+  idhdl save_ringhdl=currRingHdl;
+  ring save_ring=currRing;
+  iiCallLibProcBegin();
+  // argument:
+  sleftv tmp;
+  tmp.Init();
+  tmp.data=arg;
+  tmp.rtyp=arg_type;
+  // call proc
+  err=iiMake_proc(h,currPack,&tmp);
+  // clean up ring
+  iiCallLibProcEnd(save_ringhdl,save_ring);
+  // return
+  if (err==FALSE)
+  {
+    void*r=iiRETURNEXPR.data;
+    iiRETURNEXPR.data=NULL;
+    iiRETURNEXPR.CleanUp();
+    return r;
+  }
+  return NULL;
+}
+/// args: NULL terminated arry of arguments
+/// arg_types: 0 terminated array of corresponding types
+void* iiCallLibProcM(const char*n, void **args, int* arg_types, BOOLEAN &err)
+{
+  idhdl h=ggetid(n);
+  if ((h==NULL)
+  || (IDTYP(h)!=PROC_CMD))
+  {
+    err=2;
+    return NULL;
+  }
+  // ring handling
+  idhdl save_ringhdl=currRingHdl;
+  ring save_ring=currRing;
+  iiCallLibProcBegin();
+  // argument:
+  if (arg_types[0]!=0)
+  {
+    sleftv tmp;
+    leftv tt=&tmp;
+    int i=1;
+    tmp.Init();
+    tmp.data=args[0];
+    tmp.rtyp=arg_types[0];
+    while(arg_types[i]!=0)
+    {
+      tt->next=(leftv)omAlloc0(sizeof(sleftv));
+      tt=tt->next;
+      tt->rtyp=arg_types[i];
+      tt->data=args[i];
+      i++;
+    }
+    // call proc
+    err=iiMake_proc(h,currPack,&tmp);
+  }
+  else
+  // call proc
+    err=iiMake_proc(h,currPack,NULL);
+  // clean up ring
+  iiCallLibProcEnd(save_ringhdl,save_ring);
   // return
   if (err==FALSE)
   {

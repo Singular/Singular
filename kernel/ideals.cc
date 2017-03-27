@@ -518,7 +518,7 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w, GbVarian
   else if (alg==GbGroebner)
   {
     BOOLEAN err;
-    h3=(ideal)iiCallLib("groebner",idCopy(h2),MODUL_CMD,err);
+    h3=(ideal)iiCallLibProc1("groebner",idCopy(h2),MODUL_CMD,err);
     if (err)
     {
       Werror("error %d in >>groebner<<",err);
