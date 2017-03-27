@@ -375,7 +375,9 @@ BOOLEAN exitVoice()
       omFree((ADDRESS)currentVoice->buffer);
       currentVoice->buffer=NULL;
     }
-    if ((currentVoice->prev==NULL)&&(currentVoice->sw==BI_file))
+    if ((currentVoice->prev==NULL)
+    &&(currentVoice->sw==BI_file)
+    &&(currentVoice->files!=stdin))
     {
       currentVoice->prev=feInitStdin(currentVoice);
     }
