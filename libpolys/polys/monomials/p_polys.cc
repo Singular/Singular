@@ -457,7 +457,9 @@ void p_Setm_General(poly p, const ring r)
 //          const int st = o->data.isTemp.start;
 
 #ifndef SING_NDEBUG
+#if MYTEST
             Print("p_Setm_General: is(-Temp-) :: c: %d, limit: %d, [st:%d] ===>>> %ld\n", c, limit, start, p->exp[start]);
+#endif
 #endif
 
             // p_ExpVectorAdd(p, pp, r);
