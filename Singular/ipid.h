@@ -90,7 +90,7 @@ void module_help_proc(const char *newlib,const char *p, const char *help);
 
 idhdl enterid(const char * a, int lev, int t, idhdl* root, BOOLEAN init=TRUE, BOOLEAN serach=TRUE);
 idhdl ggetid(const char *n);
-idhdl ggetid(const char *n, BOOLEAN local, idhdl *packhdl);
+//idhdl ggetid(const char *n, idhdl *packhdl);
 void  killid(const char * a, idhdl * i);
 void killhdl(idhdl h, package prooti=currPack);
 void  killhdl2(idhdl h, idhdl * ih, ring r);
