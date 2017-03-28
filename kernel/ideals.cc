@@ -34,7 +34,8 @@
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/tgb.h>
 #include <kernel/GBEngine/syz.h>
-#include <Singular/ipshell.h>
+#include <Singular/ipshell.h> // iiCallLibProc1
+#include <Singular/ipid.h> // ggetid
 
 
 /* #define WITH_OLD_MINOR */
@@ -517,6 +518,7 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w, GbVarian
   }
   else if (alg==GbGroebner)
   {
+    if (TEST_OPT_PROT) { PrintS("groebner:"); mflush(); }
     BOOLEAN err;
     h3=(ideal)iiCallLibProc1("groebner",idCopy(h2),MODUL_CMD,err);
     if (err)
@@ -525,6 +527,17 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w, GbVarian
       h3=idInit(1,1);
     }
   }
+//  else if (alg==GbModstd): requires ideal, not module
+//  {
+//    if (TEST_OPT_PROT) { PrintS("modstd:"); mflush(); }
+//    BOOLEAN err;
+//    h3=(ideal)iiCallLibProc1("modStd",idCopy(h2),MODUL_CMD,err);
+//    if (err)
+//    {
+//      Werror("error %d in >>modStd<<",err);
+//      h3=idInit(1,1);
+//    }
+//  }
   //else if (alg==GbSba): requires order C,...
   //{
   //  if (TEST_OPT_PROT) { PrintS("sba:"); mflush(); }
@@ -2676,6 +2689,19 @@ GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)
   {
     return GbGroebner;
   }
+//  else if(alg==GbModstd)  // cond for modstd: requires ideal, not module
+//  {
+//    if(ggetid("modStd")==NULL)
+//    {
+//      WarnS(">>modStd<< not found");
+//    }
+//    else if(rField_is_Q(r)
+//    &&(!rIsPluralRing(r))
+//    &&(rHasGlobalOrdering(r)))
+//    {
+//      return GbModstd;
+//    }
+//  }
 
   return GbStd; // no conditions for std
 }
