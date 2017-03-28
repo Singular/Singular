@@ -375,7 +375,9 @@ BOOLEAN exitVoice()
       omFree((ADDRESS)currentVoice->buffer);
       currentVoice->buffer=NULL;
     }
-    if ((currentVoice->prev==NULL)&&(currentVoice->sw==BI_file))
+    if ((currentVoice->prev==NULL)
+    &&(currentVoice->sw==BI_file)
+    &&(currentVoice->files!=stdin))
     {
       currentVoice->prev=feInitStdin(currentVoice);
     }
@@ -595,7 +597,13 @@ int feReadLine(char* b, int l)
       fseek(currentVoice->files,currentVoice->ftellptr,SEEK_SET);
       s=fgets(currentVoice->buffer+offset,(MAX_FILE_BUFFER-1-sizeof(ADDRESS))-offset,
               currentVoice->files);
-      if (s!=NULL) currentVoice->ftellptr=ftell(currentVoice->files);
+      if (s!=NULL)
+      {
+        currentVoice->ftellptr=ftell(currentVoice->files);
+        // ftell returns -1 for non-seekable streams, such as pipes
+        if (currentVoice->ftellptr<0)
+          currentVoice->ftellptr=0;
+      }
     }
     //else /* BI_buffer */ s==NULL  => return 0
     // done by the default return
@@ -663,7 +671,7 @@ Voice * feInitStdin(Voice *pp)
   Voice *p = new Voice;
   p->files = stdin;
   p->sw = (isatty(STDIN_FILENO)) ? BI_stdin : BI_file;
-  if ((pp!=NULL) && (pp->files==stdin))
+  if ((pp!=NULL) && (pp->sw==BI_stdin) && (pp->files==stdin))
   {
     p->files=freopen("/dev/tty","r",stdin);
     //stdin=p->files;
