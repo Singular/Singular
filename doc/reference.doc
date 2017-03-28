@@ -9131,9 +9131,10 @@ The standard basis computation is stopped if the total
 (weighted) degree
 exceeds @code{degBound}.
 @* @code{degBound} should not be used for a global ordering with inhomogeneous
-input.
+input, if the ordering is not @code{dp} or @code{Dp}.
+(Remark: elimination requires always an eliminiation ordering).
 @*Reset this bound by setting @code{degBound} to 0.
-@*The exact meaning of "degree" depends on the ring odering and the command:
+@*The exact meaning of "degree" depends on the ring ordering and the command:
 @code{slimgb} uses always the total degree with weights 1,
 @code{std} does so for block orderings, only.
 @item @strong{Example:}
