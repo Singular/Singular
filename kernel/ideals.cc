@@ -2714,8 +2714,8 @@ GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)
 // +     +       +   -         -      +     -     + coeffs: K(a)
 // +     -       +   -         -      -     -     + coeffs: domain, not field
 // +     -       -   -         -      -     -     + coeffs: zero-divisors
-// +     +       +   +         ?      ?     ?     + also for modules: C
-// +     +       -   +         ?      ?     ?     + also for modules: all orderings
+// +     +       +   +         -      ?     ?     + also for modules: C
+// +     +       -   +         -      ?     ?     + also for modules: all orderings
 // +     +       -   -         -      -     -     + exterior algebra
 // +     +       -   -         -      -     -     + G-algebra
 // +     +       +   +         +      +     +     + degree ordering

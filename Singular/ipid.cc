@@ -511,12 +511,11 @@ idhdl ggetid(const char *n)
 {
   idhdl h = IDROOT->get(n,myynest);
   if ((h!=NULL)&&(IDLEV(h)==myynest)) return h;
-  idhdl h2=NULL;
   if (currRing!=NULL)
   {
-    h2 = currRing->idroot->get(n,myynest);
+    idhdl h2 = currRing->idroot->get(n,myynest);
+    if (h2!=NULL) return h2;
   }
-  if (h2!=NULL) return h2;
   if (h!=NULL) return h;
   if (basePack!=currPack)
     return basePack->idroot->get(n,myynest);
