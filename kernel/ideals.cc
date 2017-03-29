@@ -2710,8 +2710,8 @@ GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)
 // std   slimgb  sba singmatic modstd ffmod nfmod groebner
 // +     +       +   -         +      -     -     + coeffs: QQ
 // +     +       +   +         -      -     -     + coeffs: ZZ/p
-// +     +       +   -         -      -     +     + coeffs: K[a]/f
-// +     +       +   -         -      +     -     + coeffs: K(a)
+// +     +       +   -         ?      -     +     + coeffs: K[a]/f
+// +     +       +   -         ?      +     -     + coeffs: K(a)
 // +     -       +   -         -      -     -     + coeffs: domain, not field
 // +     -       -   -         -      -     -     + coeffs: zero-divisors
 // +     +       +   +         -      ?     ?     + also for modules: C
