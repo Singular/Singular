@@ -68,7 +68,7 @@ extern int om_sing_opt_show_mem;
 
 static inline void * omalloc(size_t s)
 { if (s!=0)
-#ifdef HAVE_MALLOC_USABLE_SIZE
+#if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
    { return malloc(s); }
 #else
   {long *d=(long*)malloc(s+sizeof(long)); *d=s;d++;return d; }
@@ -76,7 +76,7 @@ static inline void * omalloc(size_t s)
   else return NULL;
 }
 static inline void * omAlloc(size_t s)
-#ifdef HAVE_MALLOC_USABLE_SIZE
+#if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
 { return malloc(s); }
 #else
 { long *d=(long*)malloc(s+sizeof(long)); *d=s;d++;return d; }
@@ -89,7 +89,7 @@ static inline void * omalloc0(size_t s)
 static inline void *omRealloc(void *d, size_t ns)
 { if (d==NULL) return omAlloc(ns);
   else
-#ifdef HAVE_MALLOC_USABLE_SIZE
+#if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
   return realloc(d,ns);
 #else
   {
@@ -102,7 +102,7 @@ static inline void *omRealloc(void *d, size_t ns)
 static inline void *omReallocSize(void *d, __attribute__((unused)) size_t os, size_t ns)
 { if (d==NULL) return omAlloc(ns);
   else
-#ifdef HAVE_MALLOC_USABLE_SIZE
+#if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
   return realloc(d,ns);
 #else
   {
@@ -114,12 +114,14 @@ static inline void *omReallocSize(void *d, __attribute__((unused)) size_t os, si
 static inline long omSizeOfAddr(void *d)
 #ifdef HAVE_MALLOC_USABLE_SIZE
 { return malloc_usable_size(d); }
+#elif defined(HAVE_AMLLOC_SIZE)
+{ return malloc_size(d); }
 #else
 { long *dd=(long*)d; dd--; return *dd;}
 #endif
 
 static inline void omFree(void *d)
-#ifdef HAVE_MALLOC_USABLE_SIZE
+#if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
 { free(d); }
 #else
 { if (d!=NULL) { long *dd=(long*)d; dd--; free(dd);}}
@@ -127,7 +129,7 @@ static inline void omFree(void *d)
 
 static inline void *omRealloc0(void *d, size_t ns)
 {
-#ifdef HAVE_MALLOC_USABLE_SIZE
+#if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
   void *n=realloc(d,ns);
   memset(n,0,ns);
 #else
@@ -144,7 +146,7 @@ static inline void *omRealloc0(void *d, size_t ns)
   return n;
 }
 static inline void omFreeSize(void *d, __attribute__((unused)) size_t s)
-#ifdef HAVE_MALLOC_USABLE_SIZE
+#if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
 { free(d); }
 #else
 { if (d!=NULL) { long *dd=(long*)d; dd--; free(dd);}}
@@ -157,6 +159,12 @@ static inline char * omStrDup(const char *s)
 static inline void * omMemDup(void * s)
 #ifdef HAVE_MALLOC_USABLE_SIZE
 { size_t l=malloc_usable_size(s);
+  void *n=malloc(l);
+  memcpy(n,s,l);
+  return n;
+}
+#elif defined(HAVE_MALLOC_SIZE)
+{ size_t l=malloc_size(s);
   void *n=malloc(l);
   memcpy(n,s,l);
   return n;
