@@ -13,7 +13,14 @@
 #define OM_MALLOC_FREE     free
 #define OM_MALLOC_VALLOC   valloc
 #define OM_MALLOC_VFREE(addr, size) OM_MALLOC_FREE(addr)
+#ifdef HAVE_MALLOC_SIZE
 /* the following will work under Mac OS X */
 #define OM_MALLOC_SIZEOF_ADDR(addr)  (malloc_size(addr))
+#elif (defined(HAVE_MALLOC_USABLE_SIZE))
+/* and this will work under Linux */
+#define OM_MALLOC_SIZEOF_ADDR(addr) (malloc_usable_size(addr))
+#else
+static inline OM_MALLOC_SIZEOF_ADDR(void *d) { long*dd=(long*)d; return *(dd-1); }
+#endif
 
 #endif /* OM_MALLOC_SYSTEM_H */

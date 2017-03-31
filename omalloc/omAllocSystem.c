@@ -28,8 +28,10 @@
  *
  *******************************************************************/
 /* allocation of large addr */
-#if defined(OM_MALLOC_PROVIDES_SIZEOF_ADDR)
-#define _omSizeOfLargeAddr(addr) (OM_MALLOC_SIZEOF_ADDR(addr) & (~SIZEOF_OM_ALIGNMENT_1))
+#if defined(HAVE_MALLOC_SIZE)
+#define _omSizeOfLargeAddr(addr) (malloc_size(addr))
+#elif defined(HAVE_MALLOC_USABLE_SIZE)
+#define _omSizeOfLargeAddr(addr) (malloc_usable_size(addr))
 #else
 void* omAllocLarge(size_t size)
 {
@@ -63,7 +65,7 @@ void omFreeLarge(void* addr)
 }
 
 #define _omSizeOfLargeAddr(addr)  (*((size_t*) ((char*) addr - SIZEOF_STRICT_ALIGNMENT)))
-#endif /* OM_MALLOC_PROVIDES_SIZEOF_ADDR */
+#endif /* HAVE_MALLOC_SIZE/HAVE_MALLOC_USABLE_SIZE */
 
 void* omAlloc0Large(size_t size)
 {
@@ -96,6 +98,7 @@ size_t omSizeOfLargeAddr(void* addr)
 
 size_t omSizeOfAddr(const void* addr)
 {
+  /*if (addr==NULL) return 0; */
 
   return (omIsBinPageAddr(addr) ?
 #ifdef OM_HAVE_TRACK
@@ -193,6 +196,7 @@ void* omAllocFromSystem(size_t size)
     }
   }
 
+  size=omSizeOfAddr(ptr);
 #ifndef OM_NDEBUG
   if (((unsigned long) ptr) + size > om_MaxAddr)
     om_MaxAddr = ((unsigned long) ptr) + size;
@@ -233,6 +237,7 @@ void* omReallocSizeFromSystem(void* addr, size_t oldsize, size_t newsize)
 {
   void* res;
 
+  oldsize=omSizeOfAddr(addr);
   res = OM_REALLOC_FROM_SYSTEM(addr, newsize);
   if (res == NULL)
   {
@@ -249,6 +254,7 @@ void* omReallocSizeFromSystem(void* addr, size_t oldsize, size_t newsize)
       exit(1);
     }
   }
+  newsize=omSizeOfAddr(res);
 
 #ifndef OM_NDEBUG
   if (((unsigned long) res) + newsize > om_MaxAddr)

@@ -30,14 +30,10 @@ void* omEmulateRealloc0Size(void* o_addr, size_t o_size, size_t n_size)
 
 void* omEmulateRealloc0(void* o_addr, size_t n_size)
 {
-#ifdef OM_MALLOC_SIZEOF_ADDR
   size_t o_size = OM_MALLOC_SIZEOF_ADDR(o_addr);
-#endif
   void* addr = OM_MALLOC_REALLOC(o_addr, n_size);
-#ifdef OM_MALLOC_SIZEOF_ADDR
   if (n_size > o_size)
     memset((char *)addr + o_size, 0, n_size - o_size);
-#endif
   return addr;
 }
 #endif

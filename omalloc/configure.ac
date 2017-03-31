@@ -144,7 +144,7 @@ AC_CHECK_HEADERS(limits.h,,
 
 AC_CHECK_HEADERS(unistd.h sys/mman.h fcntl.h /usr/include/malloc.h)
 
-AC_CHECK_FUNCS(popen mmap sbrk random)
+AC_CHECK_FUNCS(popen mmap sbrk random malloc_usable_size malloc_size)
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Find out more about particularity of the system
@@ -187,7 +187,7 @@ int main()
 {
   FILE *f=fopen("conftestval", "w");
   if (!f) exit(1);
-  fprintf(f, "%d\n", omalloc_getpagesize);
+  fprintf(f, "%d\n", (int)omalloc_getpagesize);
   exit(0);
 }], ac_cv_pagesize=`cat conftestval`, ac_cv_pagesize=0, ac_cv_pagesize=0))
 # can not really handle pagesizes which are greater -- there must be a
@@ -293,41 +293,6 @@ AC_SUBST(OM_MALLOC_HEADER)
 AC_SUBST(OM_MALLOC_SOURCE)
 if test "${OM_MALLOC_SOURCE+set}" = set; then
   AC_DEFINE(OM_HAVE_MALLOC_SOURCE,1,"Whether we have the source for malloc ()")
-fi
-
-AC_MSG_CHECKING(whether malloc provides SizeOfAddr)
-if test "${ac_cv_malloc_sizeof_addr}" = no; then
-  AC_MSG_RESULT( (cached) no)
-elif test "${ac_cv_malloc_sizeof_addr}" = "${OM_MALLOC_HEADER}_${OM_MALLOC_SOURCE}"; then
-   AC_MSG_RESULT( (cached) yes)
-else
-AC_TRY_RUN([
-#include <stdlib.h>
-#include "$OM_MALLOC_HEADER"
-#ifdef OM_HAVE_MALLOC_SOURCE
-#include "$OM_MALLOC_SOURCE"
-#endif
-
-int main()
-{
-  void* addr = OM_MALLOC_MALLOC(512);
-#ifdef OM_MALLOC_SIZEOF_ADDR
-  if (OM_MALLOC_SIZEOF_ADDR(addr) < 512)
-    exit(1);
-  exit(0);
-#else
-  exit(1);
-#endif
-}
-], ac_cv_malloc_sizeof_addr="${OM_MALLOC_HEADER}_${OM_MALLOC_SOURCE}", ac_cv_malloc_sizeof_addr=no, ac_cv_malloc_sizeof_addr=no)
-if test "${ac_cv_malloc_sizeof_addr}" = no; then
-AC_MSG_RESULT(no)
-else
-AC_MSG_RESULT(yes)
-fi
-fi
-if test "$ac_cv_malloc_sizeof_addr" != no; then
-AC_DEFINE(OM_MALLOC_PROVIDES_SIZEOF_ADDR,1,"Whether malloc provides SIZEOF_ADDR")
 fi
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
