@@ -24,20 +24,12 @@
 // define if tailrings should be used
 #define HAVE_TAIL_RING
 
-#if 1
 #define setmax 16
 #define setmaxL ((4096-12)/sizeof(LObject))
 #define setmaxLinc ((4096)/sizeof(LObject))
 
-#define setmaxT 64
-#define setmaxTinc 32
-#else
-#define setmax 16
-#define setmaxL 16
-#define setmaxLinc 16
-#define setmaxT 16
-#define setmaxTinc 16
-#endif
+#define setmaxT ((4096-12)/sizeof(TObject))
+#define setmaxTinc ((4096)/sizeof(TObject))
 
 // if you want std computations as in Singular version < 2:
 // This disables RedThrough, tailReductions against T (bba),
