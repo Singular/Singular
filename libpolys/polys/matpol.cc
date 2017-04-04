@@ -56,7 +56,7 @@ matrix mpNew(int r, int c)
   rc->rank = r;
   if ((c != 0)&&(r!=0))
   {
-    size_t s=r*c*sizeof(poly);
+    size_t s=((size_t)r)*((size_t)c)*sizeof(poly);
     rc->m = (poly*)omAlloc0(s);
     //if (rc->m==NULL)
     //{
