@@ -8538,7 +8538,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
 
   if (Q!=NULL) i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
   else i=setmaxT;
-  i=((i+IDELEMS(F)+IDELEMS(P)+15)/16)*16;
+  i=((i+IDELEMS(F)+IDELEMS(P)+setmax-1)/setmax)*setmax;
   strat->ecartS=initec(i);
   strat->sevS=initsevS(i);
   strat->S_2_R=initS_2_R(i);
@@ -8683,7 +8683,7 @@ void initSSpecialSba (ideal F, ideal Q, ideal P,kStrategy strat)
 
   if (Q!=NULL) i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
   else i=setmaxT;
-  i=((i+IDELEMS(F)+IDELEMS(P)+15)/16)*16;
+  i=((i+IDELEMS(F)+IDELEMS(P)+setmax-1)/setmax)*setmax;
   strat->sevS=initsevS(i);
   strat->sevSig=initsevS(i);
   strat->S_2_R=initS_2_R(i);
@@ -9336,39 +9336,39 @@ void enterSSba (LObject &p,int atS,kStrategy strat, int atR)
   {
     strat->sevS = (unsigned long*) omRealloc0Size(strat->sevS,
                                     IDELEMS(strat->Shdl)*sizeof(unsigned long),
-                                    (IDELEMS(strat->Shdl)+setmaxTinc)
+                                    (IDELEMS(strat->Shdl)+setmax)
                                                   *sizeof(unsigned long));
     strat->sevSig = (unsigned long*) omRealloc0Size(strat->sevSig,
                                     IDELEMS(strat->Shdl)*sizeof(unsigned long),
-                                    (IDELEMS(strat->Shdl)+setmaxTinc)
+                                    (IDELEMS(strat->Shdl)+setmax)
                                                   *sizeof(unsigned long));
     strat->ecartS = (intset)omReallocSize(strat->ecartS,
                                           IDELEMS(strat->Shdl)*sizeof(int),
-                                          (IDELEMS(strat->Shdl)+setmaxTinc)
+                                          (IDELEMS(strat->Shdl)+setmax)
                                                   *sizeof(int));
     strat->S_2_R = (int*) omRealloc0Size(strat->S_2_R,
                                          IDELEMS(strat->Shdl)*sizeof(int),
-                                         (IDELEMS(strat->Shdl)+setmaxTinc)
+                                         (IDELEMS(strat->Shdl)+setmax)
                                                   *sizeof(int));
     if (strat->lenS!=NULL)
       strat->lenS=(int*)omRealloc0Size(strat->lenS,
                                        IDELEMS(strat->Shdl)*sizeof(int),
-                                       (IDELEMS(strat->Shdl)+setmaxTinc)
+                                       (IDELEMS(strat->Shdl)+setmax)
                                                  *sizeof(int));
     if (strat->lenSw!=NULL)
       strat->lenSw=(wlen_type*)omRealloc0Size(strat->lenSw,
                                        IDELEMS(strat->Shdl)*sizeof(wlen_type),
-                                       (IDELEMS(strat->Shdl)+setmaxTinc)
+                                       (IDELEMS(strat->Shdl)+setmax)
                                                  *sizeof(wlen_type));
     if (strat->fromQ!=NULL)
     {
       strat->fromQ = (intset)omReallocSize(strat->fromQ,
                                     IDELEMS(strat->Shdl)*sizeof(int),
-                                    (IDELEMS(strat->Shdl)+setmaxTinc)*sizeof(int));
+                                    (IDELEMS(strat->Shdl)+setmax)*sizeof(int));
     }
-    pEnlargeSet(&strat->S,IDELEMS(strat->Shdl),setmaxTinc);
-    pEnlargeSet(&strat->sig,IDELEMS(strat->Shdl),setmaxTinc);
-    IDELEMS(strat->Shdl)+=setmaxTinc;
+    pEnlargeSet(&strat->S,IDELEMS(strat->Shdl),setmax);
+    pEnlargeSet(&strat->sig,IDELEMS(strat->Shdl),setmax);
+    IDELEMS(strat->Shdl)+=setmax;
     strat->Shdl->m=strat->S;
   }
   // in a signature-based algorithm the following situation will never
@@ -9672,12 +9672,12 @@ void enterSyz(LObject &p, kStrategy strat, int atT)
   strat->newt = TRUE;
   if (strat->syzl == strat->syzmax-1)
   {
-    pEnlargeSet(&strat->syz,strat->syzmax,setmaxTinc);
+    pEnlargeSet(&strat->syz,strat->syzmax,setmax);
     strat->sevSyz = (unsigned long*) omRealloc0Size(strat->sevSyz,
                                     (strat->syzmax)*sizeof(unsigned long),
-                                    ((strat->syzmax)+setmaxTinc)
+                                    ((strat->syzmax)+setmax)
                                                   *sizeof(unsigned long));
-    strat->syzmax += setmaxTinc;
+    strat->syzmax += setmax;
   }
   if (atT < strat->syzl)
   {
