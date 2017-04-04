@@ -237,7 +237,7 @@ void* omReallocSizeFromSystem(void* addr, size_t oldsize, size_t newsize)
 {
   void* res;
 
-  oldsize=omSizeOfAddr(addr);
+  /*oldsize=omSizeOfLargeAddr(addr);*/
   res = OM_REALLOC_FROM_SYSTEM(addr, newsize);
   if (res == NULL)
   {
@@ -254,7 +254,7 @@ void* omReallocSizeFromSystem(void* addr, size_t oldsize, size_t newsize)
       exit(1);
     }
   }
-  newsize=omSizeOfAddr(res);
+  /*newsize=omSizeOfAddr(res);*/
 
 #ifndef OM_NDEBUG
   if (((unsigned long) res) + newsize > om_MaxAddr)
