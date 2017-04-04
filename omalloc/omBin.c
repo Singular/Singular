@@ -606,10 +606,10 @@ void omPrintMissing(omBin bin)
  * Statistics
  *
  *****************************************************************/
-static void omGetBinStat(omBin bin, int *pages_p, int *used_blocks_p,
-                          int *free_blocks_p)
+static void omGetBinStat(omBin bin, long *pages_p, long *used_blocks_p,
+                          long *free_blocks_p)
 {
-  int pages = 0, used_blocks = 0, free_blocks = 0;
+  long pages = 0, used_blocks = 0, free_blocks = 0;
   int where = 1;
 
   omBinPage page = bin->last_page;
@@ -636,11 +636,11 @@ static void omGetBinStat(omBin bin, int *pages_p, int *used_blocks_p,
   *free_blocks_p = free_blocks;
 }
 
-static void omGetTotalBinStat(omBin bin, int *pages_p, int *used_blocks_p,
-                               int *free_blocks_p)
+static void omGetTotalBinStat(omBin bin, long *pages_p, long *used_blocks_p,
+                               long *free_blocks_p)
 {
-  int t_pages = 0, t_used_blocks = 0, t_free_blocks = 0;
-  int pages = 0, used_blocks = 0, free_blocks = 0;
+  long t_pages = 0, t_used_blocks = 0, t_free_blocks = 0;
+  long pages = 0, used_blocks = 0, free_blocks = 0;
 
   while (bin != NULL)
   {
@@ -658,7 +658,7 @@ static void omGetTotalBinStat(omBin bin, int *pages_p, int *used_blocks_p,
   *free_blocks_p = t_free_blocks;
 }
 
-static void omPrintBinStat(FILE * fd, omBin bin, int track, int* pages, int* used_blocks, int* free_blocks)
+static void omPrintBinStat(FILE * fd, omBin bin, int track, long* pages, long* used_blocks, long* free_blocks)
 {
   if (track)
   {
@@ -672,14 +672,14 @@ static void omPrintBinStat(FILE * fd, omBin bin, int track, int* pages, int* use
             (long)bin->sizeW, bin->max_blocks);
   }
   omGetTotalBinStat(bin, pages, used_blocks, free_blocks);
-  fprintf(fd, "%d\t%d\t%d\n", *pages, *free_blocks, *used_blocks);
+  fprintf(fd, "%ld\t%ld\t%ld\n", *pages, *free_blocks, *used_blocks);
   if (bin->next != NULL && !omIsStickyBin(bin))
   {
-    int s_pages, s_free_blocks, s_used_blocks;
+    long s_pages, s_free_blocks, s_used_blocks;
     while (bin != NULL)
     {
       omGetBinStat(bin, &s_pages, &s_used_blocks, &s_free_blocks);
-      fprintf(fd, " \t \t%d\t%d\t%d\t%d\n", s_pages, s_free_blocks, s_used_blocks,
+      fprintf(fd, " \t \t%ld\t%ld\t%ld\t%d\n", s_pages, s_free_blocks, s_used_blocks,
               (int) bin->sticky);
       bin = bin->next;
       *pages += s_pages;
@@ -691,8 +691,9 @@ static void omPrintBinStat(FILE * fd, omBin bin, int track, int* pages, int* use
 
 void omPrintBinStats(FILE* fd)
 {
-  int i = OM_MAX_BIN_INDEX, pages=0, used_blocks=0, free_blocks=0;
-  int pages_p, used_blocks_p, free_blocks_p;
+  int i = OM_MAX_BIN_INDEX;
+  long pages=0, used_blocks=0, free_blocks=0;
+  long pages_p, used_blocks_p, free_blocks_p;
   omSpecBin s_bin = om_SpecBin;
   omBin sticky;
 
@@ -747,14 +748,14 @@ void omPrintBinStats(FILE* fd)
     free_blocks += free_blocks_p;
   }
   fprintf(fd, "----------------------------------------\n");
-  fprintf(fd, "      \t      \t%d\t%d\t%d\n", pages, free_blocks, used_blocks);
+  fprintf(fd, "      \t      \t%ld\t%ld\t%ld\n", pages, free_blocks, used_blocks);
 }
 
 static long omGetUsedBytesOfBin(omBin bin)
 {
-  int pages = 0, used_blocks = 0, free_blocks = 0;
+  long pages = 0, used_blocks = 0, free_blocks = 0;
   omGetTotalBinStat(bin, &pages, &used_blocks, &free_blocks);
-  return ((long)used_blocks)*((long)bin->sizeW)*SIZEOF_LONG;
+  return (used_blocks)*((long)bin->sizeW)*SIZEOF_LONG;
 }
 
 long omGetUsedBinBytes()
