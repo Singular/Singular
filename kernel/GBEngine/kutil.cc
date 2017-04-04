@@ -3207,10 +3207,8 @@ void kMergeBintoL(kStrategy strat)
   int j=strat->Ll+strat->Bl+1;
   if (j>strat->Lmax)
   {
-    j=((j+setmaxLinc-1)/setmaxLinc)*setmaxLinc;
-    strat->L = (LSet)omReallocSize(strat->L,strat->Lmax*sizeof(LObject),
-                                 j*sizeof(LObject));
-    strat->Lmax=j;
+    j=((j+setmaxLinc-1)/setmaxLinc)*setmaxLinc-strat->Lmax;
+    enlargeL(&(strat->L),&(strat->Lmax),j);
   }
   j = strat->Ll;
   int i;
@@ -3230,10 +3228,8 @@ void kMergeBintoLSba(kStrategy strat)
   int j=strat->Ll+strat->Bl+1;
   if (j>strat->Lmax)
   {
-    j=((j+setmaxLinc-1)/setmaxLinc)*setmaxLinc;
-    strat->L = (LSet)omReallocSize(strat->L,strat->Lmax*sizeof(LObject),
-                                 j*sizeof(LObject));
-    strat->Lmax=j;
+    j=((j+setmaxLinc-1)/setmaxLinc)*setmaxLinc-strat->Lmax;
+    enlargeL(&(strat->L),&(strat->Lmax),j);
   }
   j = strat->Ll;
   int i;
@@ -10107,7 +10103,7 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   /*- set L -*/
   strat->Lmax = ((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc;
   strat->Ll = -1;
-  strat->L = initL(((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc);
+  strat->L = initL(strat->Lmax);
   /*- set B -*/
   strat->Bmax = setmaxL;
   strat->Bl = -1;
@@ -10305,7 +10301,7 @@ void initSbaBuchMora (ideal F,ideal Q,kStrategy strat)
   /*- set L -*/
   strat->Lmax = ((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc;
   strat->Ll = -1;
-  strat->L = initL(((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc);
+  strat->L = initL(strat->Lmax);
   /*- set B -*/
   strat->Bmax = setmaxL;
   strat->Bl = -1;

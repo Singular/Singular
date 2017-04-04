@@ -24,7 +24,7 @@
 // define if tailrings should be used
 #define HAVE_TAIL_RING
 
-#define setmax 16
+#define setmax 128
 #define setmaxL ((4096-12)/sizeof(LObject))
 #define setmaxLinc ((4096)/sizeof(LObject))
 
