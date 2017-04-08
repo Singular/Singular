@@ -383,7 +383,7 @@ static void iiL2R(leftv out, leftv in)
   if (ww!=NULL)
   {
     intvec *weights=ivCopy(ww);
-    atSet(out,"isHomog",weights,INTVEC_CMD);
+    atSet(out,omStrDup("isHomog"),weights,INTVEC_CMD);
   }
 }
 
