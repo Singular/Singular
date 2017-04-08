@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="version curvepar.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version curvepar.lib 4.1.0.3 Apr_2017 "; // $Id$
 category="Singularity Theory";
 info="
 LIBRARY:  curvepar.lib  Resolution of space curve singularities, semi-group
@@ -1797,6 +1797,7 @@ static proc bound(poly x,poly y)
 /////////////////////////////////////////////////////////////////////////////////////
 static proc boundparam(poly f)
 {
+  if(f==0){return(1);}
   int i;
   int l=size(f);
   int m=leadexp(f[l])[1];
