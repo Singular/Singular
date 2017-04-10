@@ -87,12 +87,22 @@ BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
   {
     char name[20];
     int nr=0;
-    do
-    { sprintf(name,"ssiRing%d",nr); nr++; }
-    while(IDROOT->get(name, 0)!=NULL);
-    idhdl h=enterid(omStrDup(name),0,RING_CMD,&IDROOT,FALSE);
-    IDRING(h)=r;
-    r->ref++;
+    idhdl h=NULL;
+    loop
+    {
+      sprintf(name,"ssiRing%d",nr); nr++;
+      h=IDROOT->get(name, 0);
+      if (h==NULL)
+      {
+        h=enterid(omStrDup(name),0,RING_CMD,&IDROOT,FALSE);
+        IDRING(h)=r;
+        r->ref++;
+        break;
+      }
+      else if ((IDTYP(h)==RING_CMD)
+      && (rEqual(r,IDRING(h),1)))
+        break;
+    }
     rSetHdl(h);
     return FALSE;
   }
@@ -429,6 +439,7 @@ number ssiReadBigInt(const ssiInfo *d)
 
 number ssiReadNumber(const ssiInfo *d)
 {
+  if (currRing==NULL) ssiSetCurrRing(d->r);
   return ssiReadNumber_CF(d,d->r->cf);
 }
 
@@ -585,12 +596,13 @@ poly ssiReadPoly_R(const ssiInfo *D, const ring r)
 
 poly ssiReadPoly(const ssiInfo *D)
 {
-// < # of terms> < term1> < .....
+  if (currRing==NULL) ssiSetCurrRing(D->r);
   return ssiReadPoly_R(D,D->r);
 }
 
 ideal ssiReadIdeal_R(const ssiInfo *d,const ring r)
 {
+// < # of terms> < term1> < .....
   int n,i;
   ideal I;
   n=s_readint(d->f_read);
@@ -604,6 +616,7 @@ ideal ssiReadIdeal_R(const ssiInfo *d,const ring r)
 
 ideal ssiReadIdeal(const ssiInfo *d)
 {
+  if (currRing==NULL) ssiSetCurrRing(d->r);
   return ssiReadIdeal_R(d,d->r);
 }
 
@@ -1280,14 +1293,11 @@ leftv ssiRead1(si_link l)
              d->r=ssiReadRing(d);
              if (d->r==NULL) return NULL;
              res->data=(char*)d->r;
+             d->r->ref++;
              res->rtyp=RING_CMD;
-             // we are in the top-level, so set the basering to d->r:
-             if (d->r!=NULL)
-             {
-               if(ssiSetCurrRing(d->r)) { d->r=currRing; d->r->ref++; }
-             }
              if (t==15) // setring
              {
+               if(ssiSetCurrRing(d->r)) { d->r=currRing; d->r->ref++; }
                omFreeBin(res,sleftv_bin);
                return ssiRead1(l);
              }
