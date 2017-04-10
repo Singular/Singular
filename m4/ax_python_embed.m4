@@ -1,5 +1,5 @@
 # ===========================================================================
-#      http://www.gnu.org/software/autoconf-archive/ax_python_embed.html
+#     https://www.gnu.org/software/autoconf-archive/ax_python_embed.html
 # ===========================================================================
 #
 # SYNOPSIS
@@ -120,7 +120,7 @@
 #   and this notice are preserved. This file is offered as-is, without any
 #   warranty.
 
-#serial 8
+#serial 15
 
 # AX_PYTHON_DEFAULT( )
 # -----------------
@@ -139,7 +139,7 @@ AC_DEFUN([AX_PYTHON_DEFAULT],
 # Handles the various --enable-python commands.
 # Input:
 #   $1 is the optional search path for the python executable if needed
-# Ouput:
+# Output:
 #   PYTHON_USE (AM_CONDITIONAL) is true if python executable found
 #   and --enable-python was requested; otherwise false.
 #   $PYTHON contains the full executable path to python if PYTHON_ENABLE_USE
@@ -170,7 +170,7 @@ AC_DEFUN([AX_PYTHON_ENABLE],
                 then
                     # "yes" was specified, but we don't have a path
                     # for the executable.
-                    # So, let's searth the PATH Environment Variable.
+                    # So, let's search the PATH Environment Variable.
                     AC_MSG_RESULT(yes)
                     AC_PATH_PROG(
                         [PYTHON],
@@ -223,21 +223,20 @@ AC_DEFUN([AX_PYTHON_CSPEC],
     AC_ARG_VAR( [PYTHON], [Python Executable Path] )
     if test -n "$PYTHON"
     then
-        ax_python_prefix=`${PYTHON}-config --prefix`
+        ax_python_prefix=`${PYTHON} -c "import sys; print(sys.prefix)"`
         if test -z "$ax_python_prefix"
         then
             AC_MSG_ERROR([Python Prefix is not known])
         fi
-#        ax_python_execprefix=`${PYTHON}-config --exec-prefix`
-#        ax_python_version=`$PYTHON -c "import sys; print sys.version[[:3]]"`
-#        ax_python_includespec="-I${ax_python_prefix}/include/python${ax_python_version}"
-#        if test x"$python_prefix" != x"$python_execprefix"; then
-#            ax_python_execspec="-I${ax_python_execprefix}/include/python${ax_python_version}"
-#            ax_python_includespec="${ax_python_includespec} $ax_python_execspec"
-#        fi
-        ax_python_cspec=`${PYTHON}-config --cflags | sed -e 's@ -mno-fused-madd @ @g'`
-        #   or -Qunused-arguments / clang :(
-#        ax_python_cspec="${ax_python_ccshared} ${ax_python_includespec}"
+        ax_python_execprefix=`${PYTHON} -c "import sys; print(sys.exec_prefix)"`
+        ax_python_version=`$PYTHON -c "import sys; print(sys.version[[:3]])"`
+        ax_python_includespec="-I${ax_python_prefix}/include/python${ax_python_version}"
+        if test x"$python_prefix" != x"$python_execprefix"; then
+            ax_python_execspec="-I${ax_python_execprefix}/include/python${ax_python_version}"
+            ax_python_includespec="${ax_python_includespec} $ax_python_execspec"
+        fi
+        ax_python_ccshared=`${PYTHON} -c "import distutils.sysconfig; print(distutils.sysconfig.get_config_var('CFLAGSFORSHARED'))"`
+        ax_python_cspec="${ax_python_ccshared} ${ax_python_includespec}"
         AC_SUBST([PYTHON_CSPEC], [${ax_python_cspec}])
         AC_MSG_NOTICE([PYTHON_CSPEC=${ax_python_cspec}])
     fi
@@ -269,11 +268,9 @@ AC_DEFUN([AX_PYTHON_INSIST],
 
 AC_DEFUN([AX_PYTHON_LSPEC],
 [
-
     AC_ARG_VAR( [PYTHON], [Python Executable Path] )
     if test -n "$PYTHON"
     then
-
         AX_PYTHON_RUN([
 import sys
 import distutils.sysconfig
@@ -303,21 +300,15 @@ else:
     # for Frameworks which could have side-effects on
     # other included Frameworks.  However, it is necessary
     # where someone has installed more than one frameworked
-    # Python.  Frameworks are really only used in Mac OS X.
+    # Python.  Frameworks are really only used in MacOSX.
     strLibFW = dictConfig.get("PYTHONFRAMEWORKPREFIX")
     if strLibFW and (strLibFW != ""):
         strLinkSpec += " -F%s" % (strLibFW)
 strLinkSpec += " %s" % (dictConfig.get('LINKFORSHARED'))
-print strLinkSpec
+print(strLinkSpec)
         ])
-
-#        AC_SUBST([PYTHON_LSPEC], [${ax_python_output}])
-#        AC_MSG_NOTICE([PYTHON_LSPEC=${ax_python_output}])
-
-        ax_python_lspec=`${PYTHON}-config --ldflags`
-        AC_SUBST([PYTHON_LSPEC], [${ax_python_lspec}])
-        AC_MSG_NOTICE([PYTHON_LSPEC=${ax_python_lspec}])
-
+        AC_SUBST([PYTHON_LSPEC], [${ax_python_output}])
+        AC_MSG_NOTICE([PYTHON_LSPEC=${ax_python_output}])
     fi
 ])
 
@@ -354,8 +345,8 @@ AC_DEFUN([AX_PYTHON_PREFIX],
     then
         AC_MSG_ERROR([Python Executable Path is not known])
     fi
-    ax_python_prefix=`${PYTHON} -c "import sys; print sys.prefix"`
-    ax_python_execprefix=`${PYTHON} -c "import sys; print sys.exec_prefix"`
+    ax_python_prefix=`${PYTHON} -c "import sys; print(sys.prefix)"`
+    ax_python_execprefix=`${PYTHON} -c "import sys; print(sys.exec_prefix)"`
     AC_SUBST([PYTHON_PREFIX], ["${ax_python_prefix}"])
     AC_SUBST([PYTHON_EXECPREFIX], ["${ax_python_execprefix}"])
 ])
@@ -394,7 +385,7 @@ _ACEOF
 # -----------------------------------------------------------------------------
 # Run ACTION-IF-TRUE if the Python interpreter has version >= VERSION.
 # Run ACTION-IF-FALSE otherwise.
-# This test uses sys.hexversion instead of the string equivalant (first
+# This test uses sys.hexversion instead of the string equivalent (first
 # word of sys.version), in order to cope with versions such as 2.2c1.
 # hexversion has been introduced in Python 1.5.2; it's probably not
 # worth to support older versions (1.5.1 was released on October 31, 1998).
@@ -406,12 +397,15 @@ AC_DEFUN([AX_PYTHON_VERSION_CHECK],
     then
         AC_MSG_CHECKING([whether $PYTHON version >= $1])
         AX_PYTHON_RUN([
-import sys, string
+import sys
 # split strings by '.' and convert to numeric.  Append some zeros
 # because we need at least 4 digits for the hex conversion.
-minver = map(int, string.split('$1', '.')) + [[0, 0, 0]]
+# It accepts a string like "X[.Y[.Z]]" with X,Y,Z=digits
+# and [] means optional.
+minver = list(map(int, '$1'.split('.'))) + [[0, 0, 0]]
+minver[3] = 255
 minverhex = 0
-for i in xrange(0, 4): minverhex = (minverhex << 8) + minver[[i]]
+for i in range(0, 4): minverhex = (minverhex << 8) + minver[[i]]
 if sys.hexversion >= minverhex:
     sys.exit( 0 )
 else:
@@ -452,7 +446,7 @@ AC_DEFUN([AX_PYTHON_VERSION_ENSURE],
 # Handles the various --with-python commands.
 # Input:
 #   $1 is the optional search path for the python executable if needed
-# Ouput:
+# Output:
 #   PYTHON_USE (AM_CONDITIONAL) is true if python executable found
 #   and --with-python was requested; otherwise false.
 #   $PYTHON contains the full executable path to python if PYTHON_USE
@@ -483,7 +477,7 @@ AC_DEFUN([AX_PYTHON_WITH],
                 then
                     # "yes" was specified, but we don't have a path
                     # for the executable.
-                    # So, let's searth the PATH Environment Variable.
+                    # So, let's search the PATH Environment Variable.
                     AC_MSG_RESULT(yes)
                     AC_PATH_PROG(
                         [PYTHON],
