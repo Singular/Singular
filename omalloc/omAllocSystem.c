@@ -29,6 +29,7 @@
  *******************************************************************/
 /* allocation of large addr */
 #if defined(HAVE_MALLOC_SIZE)
+#include <malloc/malloc.h>
 #define _omSizeOfLargeAddr(addr) (malloc_size(addr))
 #elif defined(HAVE_MALLOC_USABLE_SIZE)
 #define _omSizeOfLargeAddr(addr) (malloc_usable_size(addr))
