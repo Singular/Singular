@@ -5404,6 +5404,8 @@ ring rOpposite(ring src)
       case ringorder_Ds:
       case ringorder_ws:
       case ringorder_Ws:
+      case ringorder_am:
+      case ringorder_a64:
       // should not occur:
       case ringorder_S:
       case ringorder_IS:

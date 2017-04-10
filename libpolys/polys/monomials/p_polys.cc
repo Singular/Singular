@@ -630,6 +630,9 @@ long p_WTotaldegree(poly p, const ring r)
           j+= p_GetExp(p,k,r)*r->wvhdl[i][k - b0 /*r->block0[i]*/]*r->OrdSgn;
         }
         break;
+      case ringorder_am:
+        b1=si_min(b1,r->N);
+	/* no break, continue as ringorder_a*/
       case ringorder_a:
         for (k=b0 /*r->block0[i]*/;k<=b1 /*r->block1[i]*/;k++)
         { // only one line
@@ -669,19 +672,19 @@ long p_WTotaldegree(poly p, const ring r)
           //break;
           return j;
         }
-      case ringorder_c:
-      case ringorder_C:
-      case ringorder_S:
-      case ringorder_s:
-      case ringorder_aa:
-      case ringorder_IS:
+      case ringorder_c: /* nothing to do*/
+      case ringorder_C: /* nothing to do*/
+      case ringorder_S: /* nothing to do*/
+      case ringorder_s: /* nothing to do*/
+      case ringorder_unspec: /* to make clang happy, does not occur*/
+      case ringorder_no: /* to make clang happy, does not occur*/
+      case ringorder_L: /* to make clang happy, does not occur*/
         break;
 
-#ifndef SING_NDEBUG
-      default:
-        Print("missing order %d in p_WTotaldegree\n",r->order[i]);
+      case ringorder_aa:
+      case ringorder_IS:
+        Warn("missing order %d in p_WTotaldegree\n",r->order[i]);
         break;
-#endif
     }
   }
   return  j;
