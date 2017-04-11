@@ -679,9 +679,9 @@ long p_WTotaldegree(poly p, const ring r)
       case ringorder_unspec: /* to make clang happy, does not occur*/
       case ringorder_no: /* to make clang happy, does not occur*/
       case ringorder_L: /* to make clang happy, does not occur*/
+      case ringorder_aa: /* ignored by p_WTotaldegree*/
         break;
 
-      case ringorder_aa:
       case ringorder_IS:
         Warn("missing order %d in p_WTotaldegree\n",r->order[i]);
         break;
