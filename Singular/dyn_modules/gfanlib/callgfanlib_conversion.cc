@@ -12,15 +12,7 @@ number integerToNumber(const gfan::Integer &I)
   mpz_init(i);
   I.setGmp(i);
 
-  long m = 268435456;
-  number j;
-  if(mpz_cmp_si(i,m))
-  {
-    int temp = (int) mpz_get_si(i);
-    j = n_Init(temp,coeffs_BIGINT);
-  }
-  else
-    j = n_InitMPZ(i,coeffs_BIGINT);
+  number j = n_InitMPZ(i,coeffs_BIGINT);
 
   mpz_clear(i);
   return j;
