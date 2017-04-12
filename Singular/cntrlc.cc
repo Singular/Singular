@@ -229,7 +229,7 @@ void sigsegv_handler(int sig, sigcontext s)
   if(si_restart<3)
   {
     si_restart++;
-    fprintf(stderr,"trying to restart...\n");
+    fputs("trying to restart...\n",stderr);
     init_signals();
     longjmp(si_start_jmpbuf,1);
   }
@@ -264,7 +264,7 @@ void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
   if(si_restart<3)
   {
     si_restart++;
-    fprintf(stderr,"trying to restart...\n");
+    fputs("trying to restart...\n",stderr);
     init_signals();
     longjmp(si_start_jmpbuf,1);
   }
@@ -296,7 +296,7 @@ void sigsegv_handler(int sig)
   if(si_restart<3)
   {
     si_restart++;
-    fprintf(stderr,"trying to restart...\n");
+    fputs("trying to restart...\n",stderr);
     init_signals();
     longjmp(si_start_jmpbuf,1);
   }
@@ -438,11 +438,11 @@ static void debug (int method)
     switch (method)
     {
       case INTERACTIVE:
-        fprintf (stderr, "\n\nquit with \"p si_stop_stack_trace_x=0\"\n\n\n");
+        fputs ("\n\nquit with \"p si_stop_stack_trace_x=0\"\n\n\n",stderr);
         debug_stop (args);
         break;
       case STACK_TRACE:
-        fprintf (stderr, "stack_trace\n");
+        fputs ("stack_trace\n",stderr);
         stack_trace (args);
         break;
       default:
@@ -542,7 +542,7 @@ static void stack_trace (char *const*args)
             if ((c == '\n') || (c == '\r'))
             {
               buffer[index] = 0;
-              fprintf (stderr, "%s", buffer);
+              fputs (buffer,stderr);
               state = 0;
               index = 0;
             }

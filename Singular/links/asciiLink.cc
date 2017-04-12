@@ -180,7 +180,8 @@ BOOLEAN slWriteAscii(si_link l, leftv v)
       // free v ??
       if (s!=NULL)
       {
-        fprintf(outfile,"%s\n",s);
+        fputs(s,outfile);
+	fputc('\n',outfile);
         omFree((ADDRESS)s);
       }
       else
@@ -233,7 +234,7 @@ BOOLEAN slDumpAscii(si_link l)
     }
     omFree(list_of_libs);
   }
-  fprintf(fd, "RETURN();\n");
+  fputs("RETURN();\n",fd);
   fflush(fd);
 
   return status;
@@ -344,17 +345,17 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h, char ***list_of_libs)
 
   if (type_id == PACKAGE_CMD)
   {
-    return (fprintf(fd, ";\n") == EOF);
+    return (fputs(";\n",fd) == EOF);
   }
 
   // write the equal sign
-  if (fprintf(fd, " = ") == EOF) return TRUE;
+  if (fputs(" = ",fd) == EOF) return TRUE;
 
   // and the right hand side
   if (DumpRhs(fd, h) == EOF) return TRUE;
 
   // semicolon und tschuess
-  if (fprintf(fd, ";\n") == EOF) return TRUE;
+  if (fputs(";\n",fd) == EOF) return TRUE;
 
   return FALSE;
 }
@@ -413,10 +414,10 @@ static BOOLEAN DumpQring(FILE *fd, idhdl h, const char *type_str)
   if (fprintf(fd, "%s temp_ideal = %s;\n", Tok2Cmdname(IDEAL_CMD),
               iiStringMatrix((matrix) IDRING(h)->qideal, 1, currRing, n_GetChar(currRing->cf)))
       == EOF) return TRUE;
-  if (fprintf(fd, "attrib(temp_ideal, \"isSB\", 1);\n") == EOF) return TRUE;
+  if (fputs("attrib(temp_ideal, \"isSB\", 1);\n",fd) == EOF) return TRUE;
   if (fprintf(fd, "%s %s = temp_ideal;\n", type_str, IDID(h)) == EOF)
     return TRUE;
-  if (fprintf(fd, "kill temp_ring;\n") == EOF) return TRUE;
+  if (fputs("kill temp_ring;\n",fd) == EOF) return TRUE;
   else
   {
     omFree(ring_str);
@@ -465,18 +466,18 @@ static int DumpRhs(FILE *fd, idhdl h)
     lists l = IDLIST(h);
     int i, nl = l->nr;
 
-    fprintf(fd, "list(");
+    fputs("list(",fd);
 
     for (i=0; i<nl; i++)
     {
       if (DumpRhs(fd, (idhdl) &(l->m[i])) == EOF) return EOF;
-      fprintf(fd, ",");
+      fputs(",",fd);
     }
     if (nl > 0)
     {
       if (DumpRhs(fd, (idhdl) &(l->m[nl])) == EOF) return EOF;
     }
-    fprintf(fd, ")");
+    fputs(")",fd);
   }
   else  if (type_id == STRING_CMD)
   {
@@ -515,12 +516,12 @@ static int DumpRhs(FILE *fd, idhdl h)
     if (rhs == NULL) return EOF;
 
     BOOLEAN need_klammer=FALSE;
-    if (type_id == INTVEC_CMD) { fprintf(fd, "intvec(");need_klammer=TRUE; }
-    else if (type_id == IDEAL_CMD) { fprintf(fd, "ideal(");need_klammer=TRUE; }
-    else if (type_id == MODUL_CMD) { fprintf(fd, "module(");need_klammer=TRUE; }
-    else if (type_id == BIGINT_CMD) { fprintf(fd, "bigint(");need_klammer=TRUE; }
+    if (type_id == INTVEC_CMD) { fputs("intvec(",fd);need_klammer=TRUE; }
+    else if (type_id == IDEAL_CMD) { fputs("ideal(",fd);need_klammer=TRUE; }
+    else if (type_id == MODUL_CMD) { fputs("module(",fd);need_klammer=TRUE; }
+    else if (type_id == BIGINT_CMD) { fputs("bigint(",fd);need_klammer=TRUE; }
 
-    if (fprintf(fd, "%s", rhs) == EOF) return EOF;
+    if (fputs(rhs,fd) == EOF) return EOF;
     omFree(rhs);
 
     if ((type_id == RING_CMD) &&
@@ -532,7 +533,7 @@ static int DumpRhs(FILE *fd, idhdl h)
       if (fprintf(fd, "; minpoly = %s", rhs) == EOF) { omFree(rhs); return EOF;}
       omFree(rhs);
     }
-    else if (need_klammer) fprintf(fd, ")");
+    else if (need_klammer) fputc(')',fd);
   }
   return 1;
 }

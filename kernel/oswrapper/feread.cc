@@ -311,7 +311,7 @@ char * fe_fgets(const char *pr,char *s, int size)
 {
   if (BVERBOSE(V_PROMPT))
   {
-    fprintf(stdout,"%s",pr);
+    fputs(pr,stdout);
   }
   mflush();
   errno=0;

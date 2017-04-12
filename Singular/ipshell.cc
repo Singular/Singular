@@ -3745,10 +3745,10 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
     if( fast==1 ) cout << "    weight optimization" << endl;
     if( fast==2 ) cout << "    symmetry optimization" << endl;
   #else
-    fprintf( stdout,"spectrumCompute\n" );
-    if( fast==0 ) fprintf( stdout,"    no optimization\n" );
-    if( fast==1 ) fprintf( stdout,"    weight optimization\n" );
-    if( fast==2 ) fprintf( stdout,"    symmetry optimization\n" );
+    fputs( "spectrumCompute\n",stdout );
+    if( fast==0 ) fputs( "    no optimization\n", stdout );
+    if( fast==1 ) fputs( "    weight optimization\n", stdout );
+    if( fast==2 ) fputs( "    symmetry optimization\n", stdout );
   #endif
   #endif
   #endif
@@ -3797,7 +3797,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   #ifdef SPECTRUM_IOSTREAM
     cout << "\n   computing the Jacobi ideal...\n";
   #else
-    fprintf( stdout,"\n   computing the Jacobi ideal...\n" );
+    fputs( "\n   computing the Jacobi ideal...\n",stdout );
   #endif
   #endif
   #endif
@@ -3811,7 +3811,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
     #ifdef SPECTRUM_IOSTREAM
       cout << "        ";
     #else
-      fprintf( stdout,"        " );
+      fputs("        ", stdout );
     #endif
       pWrite( J->m[i] );
     #endif
@@ -3828,8 +3828,8 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
     cout << endl;
     cout << "    computing a standard basis..." << endl;
   #else
-    fprintf( stdout,"\n" );
-    fprintf( stdout,"    computing a standard basis...\n" );
+    fputs( "\n", stdout );
+    fputs( "    computing a standard basis...\n", stdout );
   #endif
   #endif
   #endif
@@ -3844,7 +3844,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
       #ifdef SPECTRUM_IOSTREAM
         cout << "        ";
       #else
-        fprintf( stdout,"        " );
+        fputs( "        ",stdout );
       #endif
 
       pWrite( stdJ->m[i] );
@@ -3894,7 +3894,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   #ifdef SPECTRUM_IOSTREAM
     cout << "\n    computing the highest corner...\n";
   #else
-    fprintf( stdout,"\n    computing the highest corner...\n" );
+    fputs( "\n    computing the highest corner...\n", stdout );
   #endif
   #endif
   #endif
@@ -3923,7 +3923,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   #ifdef SPECTRUM_IOSTREAM
     cout << "       ";
   #else
-    fprintf( stdout,"       " );
+    fputs( "       ", stdout );
   #endif
     pWrite( hc );
   #endif
@@ -3938,7 +3938,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   #ifdef SPECTRUM_IOSTREAM
     cout << "\n    computing the newton polygon...\n";
   #else
-    fprintf( stdout,"\n    computing the newton polygon...\n" );
+    fputs( "\n    computing the newton polygon...\n", stdout );
   #endif
   #endif
   #endif
@@ -3960,7 +3960,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   #ifdef SPECTRUM_IOSTREAM
     cout << "\n    computing the weight corner...\n";
   #else
-    fprintf( stdout,"\n    computing the weight corner...\n" );
+    fputs( "\n    computing the weight corner...\n", stdout );
   #endif
   #endif
   #endif
@@ -3975,7 +3975,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   #ifdef SPECTRUM_IOSTREAM
     cout << "        ";
   #else
-    fprintf( stdout,"        " );
+    fputs( "        ", stdout );
   #endif
     pWrite( wc );
   #endif
@@ -3990,7 +3990,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   #ifdef SPECTRUM_IOSTREAM
     cout << "\n    computing NF...\n" << endl;
   #else
-    fprintf( stdout,"\n    computing NF...\n" );
+    fputs( "\n    computing NF...\n", stdout );
   #endif
   #endif
   #endif
@@ -4005,7 +4005,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   #ifdef SPECTRUM_IOSTREAM
     cout << endl;
   #else
-    fprintf( stdout,"\n" );
+    fputs( "\n", stdout );
   #endif
   #endif
   #endif
