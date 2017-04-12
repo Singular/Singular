@@ -11,14 +11,19 @@ number integerToNumber(const gfan::Integer &I)
   mpz_t i;
   mpz_init(i);
   I.setGmp(i);
+
   long m = 268435456;
+  number j;
   if(mpz_cmp_si(i,m))
   {
     int temp = (int) mpz_get_si(i);
-    return n_Init(temp,coeffs_BIGINT);
+    j = n_Init(temp,coeffs_BIGINT);
   }
   else
-    return n_InitMPZ(i,coeffs_BIGINT);
+    j = n_InitMPZ(i,coeffs_BIGINT);
+
+  mpz_clear(i);
+  return j;
 }
 
 bigintmat* zVectorToBigintmat(const gfan::ZVector &zv)
