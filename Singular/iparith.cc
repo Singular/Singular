@@ -4515,9 +4515,15 @@ err:
 }
 static BOOLEAN jjNAMEOF(leftv res, leftv v)
 {
-  res->data = (char *)v->name;
-  if (res->data==NULL) res->data=omStrDup("");
-  v->name=NULL;
+  if ((v->rtyp==IDHDL)||(v->rtyp==ALIAS_CMD))
+    res->data=omStrDup(v->name);
+  else if (v->name==NULL)
+    res->data=omStrDup("");
+  else
+  {
+    res->data = (char *)v->name;
+    v->name=NULL;
+  }
   return FALSE;
 }
 static BOOLEAN jjNAMES(leftv res, leftv v)
