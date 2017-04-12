@@ -11,14 +11,11 @@ number integerToNumber(const gfan::Integer &I)
   mpz_t i;
   mpz_init(i);
   I.setGmp(i);
-  long m = 268435456;
-  if(mpz_cmp_si(i,m))
-  {
-    int temp = (int) mpz_get_si(i);
-    return n_Init(temp,coeffs_BIGINT);
-  }
-  else
-    return n_InitMPZ(i,coeffs_BIGINT);
+
+  number j = n_InitMPZ(i,coeffs_BIGINT);
+
+  mpz_clear(i);
+  return j;
 }
 
 bigintmat* zVectorToBigintmat(const gfan::ZVector &zv)
@@ -81,7 +78,6 @@ gfan::ZVector* bigintmatToZVector(const bigintmat &bim)
     number temp = BIMATELEM(bim, 1, j+1);
     gfan::Integer* gi = numberToInteger(temp);
     (*zv)[j] = *gi;
-    n_Delete(&temp,coeffs_BIGINT);
     delete gi;
   }
   return zv;
