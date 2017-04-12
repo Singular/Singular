@@ -241,7 +241,7 @@ void ssiWriteRing_R(ssiInfo *d,const ring r)
   }
   else /* dummy ring r==NULL*/
   {
-    fputs("0 0 0 0 "/*,r->ch,r->N, blocks, q-ideal*/,d->f_write,);
+    fputs("0 0 0 0 "/*,r->ch,r->N, blocks, q-ideal*/,d->f_write);
   }
 }
 
