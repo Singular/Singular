@@ -236,12 +236,12 @@ void ssiWriteRing_R(ssiInfo *d,const ring r)
     }
     else
     {
-      fprintf(d->f_write,"0 "/*ideal with 0 entries */);
+      fputs("0 ",d->f_write/*ideal with 0 entries */);
     }
   }
   else /* dummy ring r==NULL*/
   {
-    fprintf(d->f_write,"0 0 0 0 "/*,r->ch,r->N, blocks, q-ideal*/);
+    fputs("0 0 0 0 "/*,r->ch,r->N, blocks, q-ideal*/,d->f_write,);
   }
 }
 
