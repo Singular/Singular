@@ -78,7 +78,6 @@ gfan::ZVector* bigintmatToZVector(const bigintmat &bim)
     number temp = BIMATELEM(bim, 1, j+1);
     gfan::Integer* gi = numberToInteger(temp);
     (*zv)[j] = *gi;
-    n_Delete(&temp,coeffs_BIGINT);
     delete gi;
   }
   return zv;
