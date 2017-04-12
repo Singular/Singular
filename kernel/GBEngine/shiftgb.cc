@@ -432,7 +432,7 @@ poly p_mShrink(poly p, int lV, const ring r)
   freeT(S, r->N);
   /*  p_Setm(s,r); // done by p_SetExpV */
   p_SetComp(s,p_GetComp(p,r),r); // component is preserved
-  p_SetCoeff(s,p_GetCoeff(p,r),r);  // coeff is preserved
+  p_SetCoeff(s,n_Copy(p_GetCoeff(p,r),r->cf),r);  // coeff is preserved
 #ifdef PDEBUG
   //  Print("p_mShrink: from "); p_wrp(p,r); Print(" to "); p_wrp(s,r); PrintLn();
 #endif
