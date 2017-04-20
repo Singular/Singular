@@ -2975,6 +2975,13 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   }
   if (r==NULL) return TRUE;
   //res->data=(void *)liMakeResolv(r,l,wmaxl,u->Typ(),weights);
+  if (r->list_length>wmaxl)
+  {
+    for(int i=wmaxl-1;i>=r->list_length;i--)
+    {
+      if (r->fullres[i]!=NULL) id_Delete(&r->fullres[i],currRing);
+      if (r->minres[i]!=NULL) id_Delete(&r->minres[i],currRing);
+  }
   r->list_length=wmaxl;
   res->data=(void *)r;
   if ((r->weights!=NULL) && (r->weights[0]!=NULL))
@@ -3091,6 +3098,14 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   }
   if (r==NULL) return TRUE;
   //res->data=(void *)liMakeResolv(r,l,wmaxl,u->Typ(),weights);
+  if (r->list_length>wmaxl)
+  {
+    for(int i=wmaxl-1;i>=r->list_length;i--)
+    {
+      if (r->fullres[i]!=NULL) id_Delete(&r->fullres[i],currRing);
+      if (r->minres[i]!=NULL) id_Delete(&r->minres[i],currRing);
+    }
+  }
   r->list_length=wmaxl;
   res->data=(void *)r;
   if ((weights!=NULL) && (ww!=NULL)) { delete ww; ww=NULL; }
