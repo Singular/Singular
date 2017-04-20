@@ -627,17 +627,10 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
 
   if( rIsSCA(currRing) )
   {
-
-#ifdef RDEBUG
-//    rWrite(currRing);
-//    rDebugPrint(currRing);
-#endif
-
     if( ncExtensions(TESTSYZSCAMASK) )
     {
       currRing->qideal = SCAQuotient(currRing);
     }
-
     const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
     const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
 
@@ -660,7 +653,8 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
     (result->weights)[0] = ivCopy(w);
     result->length = 1;
   }
-  resolvente fr = syResolvente(arg,maxlength,&(result->length),&(result->weights),minim),fr1;
+  resolvente fr = syResolvente(arg,maxlength,&(result->length),&(result->weights),minim);
+  resolvente fr1;
   if (minim)
   {
     result->minres = (resolvente)omAlloc0((result->length+1)*sizeof(ideal));
@@ -683,16 +677,13 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
 #ifdef HAVE_PLURAL
   if( rIsSCA(currRing) )
   {
-
     if( ncExtensions(TESTSYZSCAMASK) )
     {
       currRing->qideal = idSaveCurrRingQuotient;
     }
-
     id_Delete(&arg, currRing);
   }
 #endif
-
 
   return result;
 }
