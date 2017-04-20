@@ -1531,7 +1531,7 @@ void syKillComputation(syStrategy syzstr, ring r)
       }
       omFreeSize((ADDRESS)syzstr->fullres,(syzstr->length+1)*sizeof(ideal));
     }
-    if (syzstr->weights!=0)
+    if (syzstr->weights!=NULL)
     {
       for (i=0;i<syzstr->length;i++)
       {
