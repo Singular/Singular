@@ -1395,7 +1395,7 @@ BOOLEAN id_HomModule(ideal m, ideal Q, intvec **w, const ring R)
   return TRUE;
 }
 
-ideal id_Jet(ideal i,int d, const ring R)
+ideal id_Jet(const ideal i,int d, const ring R)
 {
   ideal r=idInit((i->nrows)*(i->ncols),i->rank);
   r->nrows = i-> nrows;
@@ -1408,7 +1408,7 @@ ideal id_Jet(ideal i,int d, const ring R)
   return r;
 }
 
-ideal id_JetW(ideal i,int d, intvec * iv, const ring R)
+ideal id_JetW(const ideal i,int d, intvec * iv, const ring R)
 {
   ideal r=idInit(IDELEMS(i),i->rank);
   if (ecartWeights!=NULL)
