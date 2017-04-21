@@ -84,7 +84,7 @@ static void syDeleteAbove(ideal up, int k)
 *minimizes the module mod and cancel superfluous syzygies
 *from syz
 */
-static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
+static void syMinStep(ideal mod,ideal &syz,BOOLEAN final=FALSE,ideal up=NULL,
                       tHomog h=isNotHomog)
 {
   poly Unit1,Unit2,actWith;
@@ -96,8 +96,8 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
   /*minim is TRUE, we are in the module: maxlength, maxlength <>0*/
   {
     ideal deg0=id_Jet(syz,0,currRing);
-    idSkipZeroes(deg0);
     id_Delete(&syz,currRing);
+    idSkipZeroes(deg0);
     syz=deg0;
   }
 /*--cancels empty entees and their related components above--*/
@@ -293,7 +293,6 @@ static void syMinStep1(resolvente res, int length)
 {
   int i,j,k,index=0;
   poly p;
-  ideal deg0=NULL,reddeg0=NULL;
   intvec *have_del=NULL,*to_del=NULL;
 
   while ((index<length) && (res[index]!=NULL))
@@ -301,8 +300,8 @@ static void syMinStep1(resolvente res, int length)
 /*---we take out dependend elements from syz---------------------*/
     if (res[index+1]!=NULL)
     {
-      deg0 = id_Jet(res[index+1],0,currRing);
-      reddeg0 = kInterRedOld(deg0);
+      ideal deg0 = id_Jet(res[index+1],0,currRing);
+      ideal reddeg0 = kInterRedOld(deg0);
       idDelete(&deg0);
       have_del = new intvec(IDELEMS(res[index]));
       for (i=0;i<IDELEMS(reddeg0);i++)
@@ -353,6 +352,7 @@ static void syMinStep1(resolvente res, int length)
   }
   if (TEST_OPT_PROT) PrintLn();
   syKillEmptyEntres(res,length);
+  if (to_del!=NULL) delete to_del;
 }
 
 void syMinimizeResolvente(resolvente res, int length, int first)
