@@ -87,7 +87,6 @@ static void syDeleteAbove(ideal up, int k)
 static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
                       tHomog h=isNotHomog)
 {
-  ideal deg0=NULL;
   poly Unit1,Unit2,actWith;
   int len,i,j,ModComp,m,k,l;
   BOOLEAN searchUnit,existsUnit;
@@ -96,8 +95,9 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
   if ((final) && (h==isHomog))
   /*minim is TRUE, we are in the module: maxlength, maxlength <>0*/
   {
-    deg0=id_Jet(syz,0,currRing);
+    ideal deg0=id_Jet(syz,0,currRing);
     idSkipZeroes(deg0);
+    id_Delete(&syz,currRing);
     syz=deg0;
   }
 /*--cancels empty entees and their related components above--*/
@@ -212,8 +212,6 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
   if (TEST_OPT_PROT) PrintLn();
   idSkipZeroes(mod);
   idSkipZeroes(syz);
-  if (deg0!=NULL)
-    idDelete(&deg0);
 }
 
 /*2
@@ -396,10 +394,8 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 {
   BITSET save1;
   SI_SAVE_OPT1(save1);
-  resolvente res;
   resolvente newres;
   tHomog hom=isNotHomog;
-  ideal temp=NULL;
   intvec *w = NULL,**tempW;
   int i,k,syzIndex = 0,j,rk_arg=si_max(1,(int)id_RankFreeModule(arg,currRing));
   int Kstd1_OldDeg=Kstd1_deg;
@@ -417,7 +413,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     omFreeSize((ADDRESS)*weights,wlength*sizeof(intvec*));
     *weights=wtmp;
   }
-  res = (resolvente)omAlloc0((*length)*sizeof(ideal));
+  resolvente res = (resolvente)omAlloc0((*length)*sizeof(ideal));
 
 /*--- initialize the syzygy-ring -----------------------------*/
   ring origR = currRing;
@@ -522,12 +518,11 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     if(! TEST_OPT_NO_SYZ_MINIM )
     if (minim || (syzIndex!=0))
     {
-      temp = kInterRedOld(res[syzIndex],currRing->qideal);
+      ideal temp = kInterRedOld(res[syzIndex],currRing->qideal);
       idDelete(&res[syzIndex]);
       idSkipZeroes(temp);
       res[syzIndex] = temp;
     }
-    temp = NULL;
 /*--- computing the syzygy modules --------------------------------*/
     if ((currRing->qideal==NULL)&&(syzIndex==0)&& (!TEST_OPT_DEGBOUND))
     {
