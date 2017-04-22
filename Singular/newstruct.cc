@@ -544,7 +544,11 @@ void *newstruct_Init(blackbox *b)
   {
     l->m[nm->pos].rtyp=nm->typ;
     if (RingDependend(nm->typ) ||(nm->typ==DEF_CMD)||(nm->typ==LIST_CMD))
+    {
       l->m[nm->pos-1].rtyp=RING_CMD;
+      l->m[nm->pos-1].data=currRing; //idrecDataInit may create ringdep obj.
+      if (currRing!=NULL) currRing->ref++;
+    }
     l->m[nm->pos].data=idrecDataInit(nm->typ);
     nm=nm->next;
   }
