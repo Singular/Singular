@@ -2882,131 +2882,6 @@ static BOOLEAN jjREDUCE_ID(leftv res, leftv u, leftv v)
   res->data = (char *)kNF(vi,currRing->qideal,ui);
   return FALSE;
 }
-#if 0
-static BOOLEAN jjRES(leftv res, leftv u, leftv v)
-{
-  int maxl=(int)(long)v->Data();
-  if (maxl<0)
-  {
-    WerrorS("length for res must not be negative");
-    return TRUE;
-  }
-  int l=0;
-  //resolvente r;
-  syStrategy r;
-  intvec *weights=NULL;
-  int wmaxl=maxl;
-  ideal u_id=(ideal)u->Data();
-
-  maxl--;
-  if (/*(*/ maxl==-1 /*)*/) /*&& (iiOp!=MRES_CMD)*/
-  {
-    maxl = currRing->N-1+2*(iiOp==MRES_CMD);
-    if (currRing->qideal!=NULL)
-    {
-      Warn(
-      "full resolution in a qring may be infinite, setting max length to %d",
-      maxl+1);
-    }
-  }
-  weights=(intvec*)atGet(u,"isHomog",INTVEC_CMD);
-  if (weights!=NULL)
-  {
-    if (!idTestHomModule(u_id,currRing->qideal,weights))
-    {
-      WarnS("wrong weights given:");weights->show();PrintLn();
-      weights=NULL;
-    }
-  }
-  intvec *ww=NULL;
-  int add_row_shift=0;
-  if (weights!=NULL)
-  {
-     ww=ivCopy(weights);
-     add_row_shift = ww->min_in();
-     (*ww) -= add_row_shift;
-  }
-  else
-    idHomModule(u_id,currRing->qideal,&ww);
-  weights=ww;
-
-  if ((iiOp == RES_CMD) || (iiOp == MRES_CMD))
-  {
-    r=syResolution(u_id,maxl, ww, iiOp==MRES_CMD);
-  }
-  else if (iiOp==SRES_CMD)
-  //  r=sySchreyerResolvente(u_id,maxl+1,&l);
-    r=sySchreyer(u_id,maxl+1);
-  else if (iiOp == LRES_CMD)
-  {
-    int dummy;
-    if((currRing->qideal!=NULL)||
-    (!idHomIdeal (u_id,NULL)))
-    {
-       WerrorS
-       ("`lres` not implemented for inhomogeneous input or qring");
-       return TRUE;
-    }
-    r=syLaScala3(u_id,&dummy);
-  }
-  else if (iiOp == KRES_CMD)
-  {
-    int dummy;
-    if((currRing->qideal!=NULL)||
-    (!idHomIdeal (u_id,NULL)))
-    {
-       WerrorS
-       ("`kres` not implemented for inhomogeneous input or qring");
-       return TRUE;
-    }
-    r=syKosz(u_id,&dummy);
-  }
-  else
-  {
-    int dummy;
-    if((currRing->qideal!=NULL)||
-    (!idHomIdeal (u_id,NULL)))
-    {
-       WerrorS
-       ("`hres` not implemented for inhomogeneous input or qring");
-       return TRUE;
-    }
-    r=syHilb(u_id,&dummy);
-  }
-  if (r==NULL) return TRUE;
-  //res->data=(void *)liMakeResolv(r,l,wmaxl,u->Typ(),weights);
-  if (r->list_length>wmaxl)
-  {
-    for(int i=wmaxl-1;i>=r->list_length;i--)
-    {
-      if (r->fullres[i]!=NULL) id_Delete(&r->fullres[i],currRing);
-      if (r->minres[i]!=NULL) id_Delete(&r->minres[i],currRing);
-  }
-  r->list_length=wmaxl;
-  res->data=(void *)r;
-  if ((r->weights!=NULL) && (r->weights[0]!=NULL))
-  {
-    intvec *w=ivCopy(r->weights[0]);
-    if (weights!=NULL) (*w) += add_row_shift;
-    atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
-    w=NULL;
-  }
-  else
-  {
-//#if 0
-// need to set weights for ALL components (sres)
-    if (weights!=NULL)
-    {
-      atSet(res,omStrDup("isHomog"),ivCopy(weights),INTVEC_CMD);
-      r->weights = (intvec**)omAlloc0Bin(char_ptr_bin);
-      (r->weights)[0] = ivCopy(weights);
-    }
-//#endif
-  }
-  if (ww!=NULL) { delete ww; ww=NULL; }
-  return FALSE;
-}
-#else
 static BOOLEAN jjRES(leftv res, leftv u, leftv v)
 {
   int maxl=(int)(long)v->Data();
@@ -3097,7 +2972,6 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
     idDelete(&u_id_copy);
   }
   if (r==NULL) return TRUE;
-  //res->data=(void *)liMakeResolv(r,l,wmaxl,u->Typ(),weights);
   if (r->list_length>wmaxl)
   {
     for(int i=wmaxl-1;i>=r->list_length;i--)
@@ -3134,7 +3008,6 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
 
   return FALSE;
 }
-#endif
 static BOOLEAN jjPFAC2(leftv res, leftv u, leftv v)
 {
   number n1; int i;
