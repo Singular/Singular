@@ -146,7 +146,10 @@ void *idrecDataInit(int t)
     case INTMAT_CMD:
       return (void *)new intvec();
     case NUMBER_CMD:
-      return (void *) nInit(0);
+    {
+      if (currRing!=NULL) return (void *) nInit(0);
+      else                return NULL;
+    }
     case BIGINT_CMD:
       return (void *) n_Init(0, coeffs_BIGINT);
     case IDEAL_CMD:

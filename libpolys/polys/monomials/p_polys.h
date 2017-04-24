@@ -843,6 +843,7 @@ static inline poly p_Copy(poly p, const ring lmRing, const ring tailRing)
 static inline void p_Delete(poly *p, const ring r)
 {
   assume( p!= NULL );
+  assume( r!= NULL );
   r->p_Procs->p_Delete(p, r);
 }
 
