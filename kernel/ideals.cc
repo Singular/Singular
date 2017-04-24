@@ -585,10 +585,10 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
   ring orig_ring=currRing;
   ring syz_ring=rAssure_SyzComp(orig_ring,TRUE);
   if (setSyzComp) rSetSyzComp(k,syz_ring);
-  rChangeCurrRing(syz_ring);
 
   if (orig_ring != syz_ring)
   {
+    rChangeCurrRing(syz_ring);
     s_h1=idrCopyR_NoSort(h1,orig_ring,syz_ring);
   }
   else
@@ -602,6 +602,11 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
 
   if (s_h3==NULL)
   {
+    if (orig_ring != syz_ring)
+    {
+      rChangeCurrRing(orig_ring);
+      rDelete(syz_ring);
+    }
     return idFreeModule( idElemens_h1 /*IDELEMS(h1)*/);
   }
 
@@ -662,6 +667,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
   && (!rField_is_Ring(currRing))
   )
   {
+    assume(orig_ring==syz_ring);
     ring dp_C_ring = rAssure_dp_C(syz_ring); // will do rChangeCurrRing later
     if (dp_C_ring != syz_ring)
     {
@@ -678,9 +684,9 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
     }
     omFreeSize((ADDRESS)res,length*sizeof(ideal));
     idDelete(&e);
-    if (dp_C_ring != syz_ring)
+    if (dp_C_ring != orig_ring)
     {
-      rChangeCurrRing(syz_ring);
+      rChangeCurrRing(orig_ring);
       rDelete(dp_C_ring);
     }
   }
@@ -688,6 +694,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
   {
     idDelete(&e);
   }
+  assume(orig_ring==currRing);
   idTest(s_h3);
   if (currRing->qideal != NULL)
   {

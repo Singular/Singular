@@ -1433,19 +1433,10 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   {
     if (copy_qideal)
     {
-      #ifndef SING_NDEBUG
-      if (!copy_ordering)
-        WerrorS("internal error: rCopy0(Q,TRUE,FALSE)");
-      else
-      #endif
-      {
-      #ifndef SING_NDEBUG
-        WarnS("internal bad stuff: rCopy0(Q,TRUE,TRUE)");
-      #endif
-        rComplete(res);
-        res->qideal= idrCopyR_NoSort(r->qideal, r, res);
-        rUnComplete(res);
-      }
+      assume(copy_ordering);
+      rComplete(res);
+      res->qideal= idrCopyR_NoSort(r->qideal, r, res);
+      rUnComplete(res);
     }
     //memset: else res->qideal = NULL;
   }
@@ -4396,7 +4387,6 @@ ring rAssure_SyzComp(const ring r, BOOLEAN complete)
   if (complete)
   {
     rComplete(res, 1);
-
 #ifdef HAVE_PLURAL
     if (rIsPluralRing(r))
     {
@@ -4413,22 +4403,20 @@ ring rAssure_SyzComp(const ring r, BOOLEAN complete)
 #ifdef HAVE_PLURAL
     ring old_ring = r;
 #endif
-
     if (r->qideal!=NULL)
     {
       res->qideal= idrCopyR_NoSort(r->qideal, r, res);
-
       assume(id_RankFreeModule(res->qideal, res) == 0);
-
 #ifdef HAVE_PLURAL
       if( rIsPluralRing(res) )
+      {
         if( nc_SetupQuotient(res, r, true) )
         {
 //          WarnS("error in nc_SetupQuotient"); // cleanup?      rDelete(res);       return r;  // just go on...?
         }
-
+        assume(id_RankFreeModule(res->qideal, res) == 0);
+      }
 #endif
-      assume(id_RankFreeModule(res->qideal, res) == 0);
     }
 
 #ifdef HAVE_PLURAL
@@ -5078,6 +5066,9 @@ int rGetMaxSyzComp(int i, const ring r)
   }
   else
   {
+  #ifndef SING_NDEBUG
+    WarnS("rGetMaxSyzComp: order c");
+  #endif  
     return 0;
   }
 }

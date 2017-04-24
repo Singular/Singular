@@ -6,10 +6,6 @@
 * ABSTRACT: resolutions
 */
 
-
-
-
-
 #include <kernel/mod2.h>
 #include <misc/options.h>
 #include <omalloc/omalloc.h>
@@ -617,9 +613,7 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
 {
 
 #ifdef HAVE_PLURAL
-
   const ideal idSaveCurrRingQuotient = currRing->qideal;
-
   if( rIsSCA(currRing) )
   {
     if( ncExtensions(TESTSYZSCAMASK) )
@@ -628,7 +622,6 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
     }
     const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
     const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
-
     arg = id_KillSquares(arg, m_iFirstAltVar, m_iLastAltVar, currRing, false); // kill suares in input!
   }
 #endif
@@ -667,7 +660,6 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
     fr[i] = NULL;
   }
   omFreeSize((ADDRESS)fr,(result->length)*sizeof(ideal));
-
 
 #ifdef HAVE_PLURAL
   if( rIsSCA(currRing) )
