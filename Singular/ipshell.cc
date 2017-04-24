@@ -3134,7 +3134,8 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel,int add_row_shift)
   else
     tr = fullres;
 
-  resolvente trueres=NULL; intvec ** w=NULL;
+  resolvente trueres=NULL;
+  intvec ** w=NULL;
 
   if (length>0)
   {
@@ -3160,13 +3161,6 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel,int add_row_shift)
 
   lists li = liMakeResolv(trueres, length, syzstr->list_length,typ0,
                           w, add_row_shift);
-
-  if (w != NULL)
-  {
-    for (int i=length-1;i>=0;i--)
-      if (w[i]!=NULL) delete w[i];
-    omFreeSize(w, length*sizeof(intvec*));
-  }
 
   if (toDel)
     syKillComputation(syzstr);

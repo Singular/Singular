@@ -215,6 +215,7 @@ BOOLEAN lRingDependend(lists L)
 lists liMakeResolv(resolvente r, int length, int reallen,
   int typ0, intvec ** weights, int add_row_shift)
 {
+  // re-uses r, weights[i]
   lists L=(lists)omAlloc0Bin(slists_bin);
   if (length<=0)
   {
@@ -264,7 +265,7 @@ lists liMakeResolv(resolvente r, int length, int reallen,
         L->m[i].data=(void *)r[i];
         if ((weights!=NULL) && (weights[i]!=NULL))
         {
-          intvec *w=ivCopy(weights[i]);
+          intvec *w=weights[i];
           (*w) += add_row_shift;
           atSet((idhdl)&L->m[i],omStrDup("isHomog"),w,INTVEC_CMD);
           weights[i] = NULL;
@@ -281,6 +282,7 @@ lists liMakeResolv(resolvente r, int length, int reallen,
       i++;
     }
     omFreeSize((ADDRESS)r,oldlength*sizeof(ideal));
+    if (weights!=NULL) omFreeSize(weights,oldlength*sizeof(intvec*));
     if (i==0)
     {
       L->m[0].rtyp=typ0;
