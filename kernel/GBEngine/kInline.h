@@ -362,7 +362,7 @@ sTObject::ShallowCopyDelete(ring new_tailRing, omBin new_tailBin,
       t_p = NULL;
     }
   }
-  else if (p != NULL)
+  else if (p != NULL) /* && t_p==NULL */
   {
     if (pNext(p) != NULL)
     {
@@ -426,38 +426,38 @@ KINLINE void  sTObject::pCleardenom()
 {
   assume(p != NULL);
   if (TEST_OPT_CONTENTSB)
+  {
+    number n;
+    if (t_p != NULL)
     {
-      number n;
-      if (t_p != NULL)
-        {
-          p_Cleardenom_n(t_p, tailRing, n);
-          pSetCoeff0(p, pGetCoeff(t_p));
-        }
-      else
-        {
-          p_Cleardenom_n(p, currRing, n);
-        }
-      if (!nIsOne(n))
-        {
-          denominator_list denom=(denominator_list)omAlloc(sizeof(denominator_list_s));
-          denom->n=nInvers(n);
-          denom->next=DENOMINATOR_LIST;
-          DENOMINATOR_LIST=denom;
-        }
-      nDelete(&n);
+      p_Cleardenom_n(t_p, tailRing, n);
+      pSetCoeff0(p, pGetCoeff(t_p));
     }
+    else
+    {
+      p_Cleardenom_n(p, currRing, n);
+    }
+    if (!nIsOne(n))
+    {
+      denominator_list denom=(denominator_list)omAlloc(sizeof(denominator_list_s));
+      denom->n=nInvers(n);
+      denom->next=DENOMINATOR_LIST;
+      DENOMINATOR_LIST=denom;
+    }
+    nDelete(&n);
+  }
   else
+  {
+    if (t_p != NULL)
     {
-      if (t_p != NULL)
-      {
-        p_ProjectiveUnique(t_p, tailRing);
-        pSetCoeff0(p, pGetCoeff(t_p));
-      }
-      else
-      {
-        p_ProjectiveUnique(p, currRing);
-      }
+      p_ProjectiveUnique(t_p, tailRing);
+      pSetCoeff0(p, pGetCoeff(t_p));
     }
+    else
+    {
+      p_ProjectiveUnique(p, currRing);
+    }
+  }
 }
 
 KINLINE void sTObject::pNorm() // pNorm seems to be a _bad_ method name...
