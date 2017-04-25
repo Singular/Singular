@@ -4719,7 +4719,7 @@ static ring rAssure_Global(rRingOrder_t b1, rRingOrder_t b2, const ring r)
       (r->order[1] == b2) &&
       (r->order[2] == 0))
     return r;
-  ring res = rCopy0(r, TRUE, FALSE);
+  ring res = rCopy0(r, FALSE, FALSE);
   res->order = (rRingOrder_t*)omAlloc0(3*sizeof(rRingOrder_t));
   res->block0 = (int*)omAlloc0(3*sizeof(int));
   res->block1 = (int*)omAlloc0(3*sizeof(int));
@@ -4737,6 +4737,7 @@ static ring rAssure_Global(rRingOrder_t b1, rRingOrder_t b2, const ring r)
     res->block1[0] = r->N;
   }
   rComplete(res, 1);
+  if (r->qideal!=NULL) res->qideal= idrCopyR_NoSort(r->qideal, r, res);
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
   {
