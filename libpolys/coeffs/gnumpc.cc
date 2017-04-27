@@ -418,6 +418,15 @@ static char* ngcCoeffString(const coeffs r)
   return s;
 }
 
+static char* ngcCoeffName(const coeffs r)
+{
+  static char ngcCoeffName_buf[40];
+  const char *p=n_ParameterNames(r)[0];
+  if (ngcCoeffName_buf!=NULL) omFree(ngcCoeffName_buf);
+  sprintf(ngcCoeffName_buf,"complex,%d,%d,%s",r->float_len,r->float_len2,p);
+  return ngcCoeffName_buf;
+}
+
 static void ngcCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
   Print("float[%s](complex:%d digits, additional %d digits)/(%s^2+1)",n_ParameterNames(r)[0],
@@ -553,6 +562,7 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   n->cfKillChar = ngcKillChar;
   n->ch = 0;
   n->cfCoeffString=ngcCoeffString;
+  n->cfCoeffName=ngcCoeffName;
 
   n->cfDelete  = ngcDelete;
   //n->cfNormalize=ndNormalize;

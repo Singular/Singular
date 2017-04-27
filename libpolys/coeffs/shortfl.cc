@@ -727,6 +727,11 @@ static char* nrCoeffString(const coeffs r)
   return omStrDup("real");
 }
 
+static char* nrCoeffName(const coeffs r)
+{
+  return (char*)"real";
+}
+
 BOOLEAN nrInitChar(coeffs n, void* p)
 {
   assume( getCoeffType(n) == n_R );
@@ -740,6 +745,7 @@ BOOLEAN nrInitChar(coeffs n, void* p)
   //n->cfKillChar = ndKillChar; /* dummy */
   n->ch = 0;
   n->cfCoeffString = nrCoeffString;
+  n->cfCoeffName = nrCoeffName;
 
   n->cfInit = nrInit;
   n->cfInt  = nrInt;

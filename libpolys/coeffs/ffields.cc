@@ -774,9 +774,9 @@ static char* nfCoeffString(const coeffs r)
   return s;
 }
 
-static char nfCoeffName_buf[32];
 static char* nfCoeffName(const coeffs r)
 {
+  static char nfCoeffName_buf[32];
   const char *p=n_ParameterNames(r)[0];
   nfCoeffName_buf[31]='\0';
   snprintf(nfCoeffName_buf,31,"ZZ/%d[%s]",r->m_nfCharQ,p);
