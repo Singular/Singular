@@ -27,6 +27,7 @@ PROCEDURES:
    rJanet(I);       computes a Janet basis of the ideal I
    modJanet(I);     computes a Janet basis of the ideal I using modular methods
 
+KEYWORDS: border basis; janet basis
 ";
 LIB "general.lib";
 LIB "modstd.lib";
