@@ -248,7 +248,7 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
 }
 
 // returns x where (a * x) % b == 1, inv is a cache
-static CanonicalForm chin_mul_inv(CanonicalForm a, CanonicalForm b, int ind, CFArray &inv)
+static inline CanonicalForm chin_mul_inv(CanonicalForm a, CanonicalForm b, int ind, CFArray &inv)
 {
   if (inv[ind].isZero())
   {
