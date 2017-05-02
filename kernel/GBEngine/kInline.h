@@ -876,18 +876,18 @@ KINLINE void    sLObject::T_1_2(const skStrategy* strat,
 KINLINE poly k_LmInit_currRing_2_tailRing(poly p, ring tailRing, omBin tailBin)
 {
 
-  poly np = p_LmInit(p, currRing, tailRing, tailBin);
-  pNext(np) = pNext(p);
-  pSetCoeff0(np, pGetCoeff(p));
-  return np;
+  poly t_p = p_LmInit(p, currRing, tailRing, tailBin);
+  pNext(t_p) = pNext(p);
+  pSetCoeff0(t_p, pGetCoeff(p));
+  return t_p;
 }
 
-KINLINE poly k_LmInit_tailRing_2_currRing(poly p, ring tailRing, omBin lmBin)
+KINLINE poly k_LmInit_tailRing_2_currRing(poly t_p, ring tailRing, omBin lmBin)
 {
-  poly np = p_LmInit(p, tailRing, currRing, lmBin);
-  pNext(np) = pNext(p);
-  pSetCoeff0(np, pGetCoeff(p));
-  return np;
+  poly p = p_LmInit(t_p, tailRing, currRing, lmBin);
+  pNext(p) = pNext(t_p);
+  pSetCoeff0(p, pGetCoeff(t_p));
+  return p;
 }
 
 // this should be made more efficient
