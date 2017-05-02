@@ -395,6 +395,7 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
             else
             {
               //Print("checking ring at pos %d for dat at pos %d\n",nm->pos-1,nm->pos);
+              #if 0
               if ((al->m[nm->pos-1].data!=(void *)currRing)
               &&(al->m[nm->pos-1].data!=(void*)0L))
               {
@@ -410,22 +411,27 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
 
                 return TRUE;
               }
+              #endif
             }
-            if ((currRing!=NULL)&&(al->m[nm->pos-1].data==NULL))
+            if(al->m[nm->pos-1].data!=NULL)
             {
-              // remember the ring, if not already set
-              al->m[nm->pos-1].data=(void *)currRing;
-              al->m[nm->pos-1].rtyp=RING_CMD;
-              currRing->ref++;
+              ring old=(ring)al->m[nm->pos-1].data;
+              old->ref--;
             }
+            // remember the ring, if not already set
+            al->m[nm->pos-1].data=(void *)currRing;
+            al->m[nm->pos-1].rtyp=RING_CMD;
+            if (currRing!=NULL)  currRing->ref++;
           }
           else if ((nm->typ==DEF_CMD)||(nm->typ==LIST_CMD))
           {
-            if (al->m[nm->pos-1].data==NULL)
+            if(al->m[nm->pos-1].data!=NULL)
             {
-              al->m[nm->pos-1].data=(void*)currRing;
-              if (currRing!=NULL) currRing->ref++;
+              ring old=(ring)al->m[nm->pos-1].data;
+              old->ref--;
             }
+            al->m[nm->pos-1].data=(void*)currRing;
+            if (currRing!=NULL) currRing->ref++;
           }
           Subexpr r=(Subexpr)omAlloc0Bin(sSubexpr_bin);
           r->start = nm->pos+1;
