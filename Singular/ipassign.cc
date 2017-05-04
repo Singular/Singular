@@ -2002,7 +2002,11 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
         break;
       }
       if ((hh->next==NULL)&&(hh->Typ()==IDEAL_CMD))
-        return jiAssign_1(l,hh,toplevel); /* map-assign: map f=r,i; */
+      {
+        BOOLEAN bo=jiAssign_1(l,hh,toplevel); /* map-assign: map f=r,i; */
+        omFreeBin(hh,sleftv_bin);
+        return bo;
+      }
       //no break, handle the rest like an ideal:
       map_assign=TRUE;
     }
