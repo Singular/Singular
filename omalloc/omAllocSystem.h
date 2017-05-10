@@ -8,6 +8,10 @@
 #ifndef OM_ALLOC_SYSTEM_H
 #define OM_ALLOC_SYSTEM_H
 
+#ifndef _OMALLOC_OMCONFIG_H
+#include "omalloc/omConfig.h"
+#endif
+
 size_t omSizeOfAddr(const void* addr);
 size_t omSizeWOfAddr(void* addr);
 
