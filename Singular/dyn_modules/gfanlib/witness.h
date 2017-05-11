@@ -1,8 +1,8 @@
 #ifndef WITNESS_H
 #define WITNESS_H
 
-#include <polys/monomials/monomials.h>
-#include <polys/simpleideals.h>
+#include "polys/monomials/monomials.h"
+#include "polys/simpleideals.h"
 
 /**
  * Computes a division discarding remainder of f with respect to G.

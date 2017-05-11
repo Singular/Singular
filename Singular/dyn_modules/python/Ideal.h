@@ -1,8 +1,8 @@
 #ifndef IDEAL_CPP_HEADER
 #define IDEAL_CPP_HEADER
 #include <vector>
-#include <Poly.h>
-#include <kernel/ideals.h>
+#include "Poly.h"
+#include "kernel/ideals.h"
 //base for ideals as well for modules
 //doesn't need a destructor, as Polys will destroy itself
 template <class poly_type> class IdealBase

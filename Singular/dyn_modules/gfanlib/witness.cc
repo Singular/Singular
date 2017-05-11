@@ -1,10 +1,10 @@
-#include <kernel/GBEngine/kstd1.h>
-#include <Singular/lists.h>
-#include <polys/monomials/p_polys.h>
-#include <callgfanlib_conversion.h>
-#include <tropicalDebug.h>
-#include <initial.h>
-#include <tropicalStrategy.h>
+#include "kernel/GBEngine/kstd1.h"
+#include "Singular/lists.h"
+#include "polys/monomials/p_polys.h"
+#include "callgfanlib_conversion.h"
+#include "tropicalDebug.h"
+#include "initial.h"
+#include "tropicalStrategy.h"
 
 matrix divisionDiscardingRemainder(const poly f, const ideal G, const ring r)
 {

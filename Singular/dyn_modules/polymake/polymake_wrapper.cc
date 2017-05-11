@@ -1,15 +1,15 @@
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #ifdef HAVE_POLYMAKE
 
-#include <Singular/dyn_modules/gfanlib/bbcone.h>
-#include <Singular/dyn_modules/gfanlib/bbfan.h>
-#include <Singular/dyn_modules/gfanlib/bbpolytope.h>
+#include "Singular/dyn_modules/gfanlib/bbcone.h"
+#include "Singular/dyn_modules/gfanlib/bbfan.h"
+#include "Singular/dyn_modules/gfanlib/bbpolytope.h"
 
-#include <Singular/blackbox.h>
-#include <Singular/ipshell.h>
-#include <Singular/subexpr.h>
-#include <Singular/mod_lib.h>
+#include "Singular/blackbox.h"
+#include "Singular/ipshell.h"
+#include "Singular/subexpr.h"
+#include "Singular/mod_lib.h"
 
 #include <polymake_conversion.h>
 #include <polymake_documentation.h>

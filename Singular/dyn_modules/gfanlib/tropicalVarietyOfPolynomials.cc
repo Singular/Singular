@@ -1,14 +1,14 @@
 #include <set>
-#include <gfanlib/gfanlib.h>
-#include <polys/monomials/p_polys.h>
-#include <callgfanlib_conversion.h>
+#include "gfanlib/gfanlib.h"
+#include "polys/monomials/p_polys.h"
+#include "callgfanlib_conversion.h"
 
-#include <tropicalStrategy.h>
-#include <tropicalVarietyOfPolynomials.h>
+#include "tropicalStrategy.h"
+#include "tropicalVarietyOfPolynomials.h"
 
-#ifndef NDEBUG
-#include <Singular/subexpr.h> // for leftv
-#include <bbfan.h>            // for fanID
+#ifndef SING_NDEBUG
+#include "Singular/subexpr.h" // for leftv
+#include "bbfan.h"            // for fanID
 #endif
 
 /***
@@ -103,7 +103,7 @@ ZConesSortedByDimension tropicalVarietySortedByDimension(const poly g, const rin
 }
 
 
-// #ifndef NDEBUG
+// #ifndef SING_NDEBUG
 // BOOLEAN tropicalVariety00(leftv res, leftv args)
 // {
 //   leftv u = args;

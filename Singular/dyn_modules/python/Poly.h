@@ -1,11 +1,11 @@
 #ifndef POLYCPP_HEADER
 #define POLYCPP_HEADER
-#include <kernel/mod2.h>
-#include <IIntvec.h>
-#include <coeffs/numbers.h>
-#include <Number.h>
-#include <kernel/polys.h>
-#include <polys/monomials//ring.h>
+#include "kernel/mod2.h
+#include "IIntvec.h
+#include "coeffs/numbers.h
+#include "Number.h
+#include "kernel/polys.h
+#include "polys/monomials/ring.h"
 
 
 #include <boost/shared_ptr.hpp>

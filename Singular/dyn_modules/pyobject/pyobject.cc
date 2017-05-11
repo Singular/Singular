@@ -12,22 +12,22 @@
 **/
 //*****************************************************************************
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 #ifdef HAVE_PYTHON
 
-#include <omalloc/omalloc.h>
-#include <misc/intvec.h>
+#include "omalloc/omalloc.h"
+#include "misc/intvec.h"
 
-#include <Singular/subexpr.h>
-#include <Singular/ipid.h>
-#include <Singular/blackbox.h>
-#include <Singular/lists.h>
-#include <Singular/ipid.h>
-#include <Singular/ipshell.h>
-#include <Singular/newstruct.h>
-#include <resources/feResource.h>
+#include "Singular/subexpr.h"
+#include "Singular/ipid.h"
+#include "Singular/blackbox.h"
+#include "Singular/lists.h"
+#include "Singular/ipid.h"
+#include "Singular/ipshell.h"
+#include "Singular/newstruct.h"
+#include "resources/feResource.h"
 
-#include <Singular/mod_lib.h>
+#include "Singular/mod_lib.h"
 
 #include <Python.h>
 

@@ -12,7 +12,7 @@
 #include "initial.h"
 #include "witness.h"
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 
 #include "Singular/ipshell.h" // for isPrime(int i)
 #include "adjustWeights.h"

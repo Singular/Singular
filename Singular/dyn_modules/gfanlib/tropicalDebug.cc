@@ -1,4 +1,4 @@
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 
 #include "libpolys/polys/simpleideals.h"
 #include "kernel/GBEngine/kstd1.h"

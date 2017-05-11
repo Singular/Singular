@@ -1,7 +1,7 @@
 #ifndef POLYMAKE_CONVERSION_H
 #define POLYMAKE_CONVERSION_H
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #ifdef HAVE_POLYMAKE
 
@@ -15,13 +15,13 @@
 #include <polymake/common/lattice_tools.h>
 #include <polymake/IncidenceMatrix.h>
 
-#include <gfanlib/gfanlib.h>
-#include <gfanlib/gfanlib_q.h>
+#include "gfanlib/gfanlib.h"
+#include "gfanlib/gfanlib_q.h"
 
-#include <coeffs/numbers.h>
-#include <coeffs/bigintmat.h>
-#include <misc/intvec.h>
-#include <Singular/lists.h>
+#include "coeffs/numbers.h"
+#include "coeffs/bigintmat.h"
+#include "misc/intvec.h"
+#include "Singular/lists.h"
 
 /* Functions for converting Integers, Rationals and their Matrices
    in between C++, gfan, polymake and singular */

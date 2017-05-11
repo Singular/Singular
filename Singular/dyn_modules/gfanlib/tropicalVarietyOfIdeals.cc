@@ -1,6 +1,6 @@
-#include <groebnerCone.h>
-#include <startingCone.h>
-#include <tropicalTraversal.h>
+#include "groebnerCone.h"
+#include "startingCone.h"
+#include "tropicalTraversal.h"
 
 gfan::ZFan* tropicalVariety(const tropicalStrategy currentStrategy)
 {

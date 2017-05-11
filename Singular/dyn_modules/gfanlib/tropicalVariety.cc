@@ -1,15 +1,15 @@
-#include <callgfanlib_conversion.h>
-#include <std_wrapper.h>
-#include <bbfan.h>
-#include <groebnerCone.h>
-#include <tropicalVarietyOfPolynomials.h>
-#include <tropicalVarietyOfIdeals.h>
-#include <coeffs/numbers.h>
-#include <misc/options.h>
-#include <kernel/structs.h>
+#include "callgfanlib_conversion.h"
+#include "std_wrapper.h"
+#include "bbfan.h"
+#include "groebnerCone.h"
+#include "tropicalVarietyOfPolynomials.h"
+#include "tropicalVarietyOfIdeals.h"
+#include "coeffs/numbers.h"
+#include "misc/options.h"
+#include "kernel/structs.h"
 
 #include <iostream>
-#include <gfanlib/gfanlib_zfan.h>
+#include "gfanlib/gfanlib_zfan.h"
 
 BITSET bitsetSave1, bitsetSave2;
 
