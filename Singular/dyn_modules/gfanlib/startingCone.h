@@ -1,8 +1,8 @@
 #ifndef STARTING_CONE_H
 #define STARTING_CONE_H
 
-#include <groebnerCone.h>
-#include <tropicalStrategy.h>
+#include "groebnerCone.h"
+#include "tropicalStrategy.h"
 
 extern gfan::ZMatrix tropicalStartingPoints;
 

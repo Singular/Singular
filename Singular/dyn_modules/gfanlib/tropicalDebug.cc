@@ -1,13 +1,13 @@
 #ifndef NDEBUG
 
-#include <libpolys/polys/simpleideals.h>
-#include <kernel/GBEngine/kstd1.h>
+#include "libpolys/polys/simpleideals.h"
+#include "kernel/GBEngine/kstd1.h"
 
-#include <gfanlib/gfanlib.h>
+#include "gfanlib/gfanlib.h"
 
-#include <std_wrapper.h>
-#include <callgfanlib_conversion.h>
-#include <tropical.h>
+#include "std_wrapper.h"
+#include "callgfanlib_conversion.h"
+#include "tropical.h"
 
 
 bool checkForNonPositiveEntries(const gfan::ZVector &w)

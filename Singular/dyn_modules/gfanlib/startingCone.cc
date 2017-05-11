@@ -1,18 +1,18 @@
-#include <callgfanlib_conversion.h>
-#include <singularWishlist.h>
-#include <tropicalDebug.h>
-#include <containsMonomial.h>
-#include <tropical.h>
-#include <initial.h>
-#include <lift.h>
-#include <groebnerCone.h>
-#include <tropicalStrategy.h>
-#include <tropicalCurves.h>
-#include <bbcone.h>
-#include <tropicalVarietyOfPolynomials.h>
-#include <tropicalVariety.h>
-#include <tropicalStrategy.h>
-#include <std_wrapper.h>
+#include "callgfanlib_conversion.h"
+#include "singularWishlist.h"
+#include "tropicalDebug.h"
+#include "containsMonomial.h"
+#include "tropical.h"
+#include "initial.h"
+#include "lift.h"
+#include "groebnerCone.h"
+#include "tropicalStrategy.h"
+#include "tropicalCurves.h"
+#include "bbcone.h"
+#include "tropicalVarietyOfPolynomials.h"
+#include "tropicalVariety.h"
+#include "tropicalStrategy.h"
+#include "std_wrapper.h"
 
 
 gfan::ZMatrix tropicalStartingPoints;

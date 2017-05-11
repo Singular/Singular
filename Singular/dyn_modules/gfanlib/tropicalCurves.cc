@@ -1,14 +1,14 @@
-#include <gfanlib/gfanlib_matrix.h>
-#include <gfanlib/gfanlib_zcone.h>
-#include <polys/monomials/p_polys.h>
-#include <callgfanlib_conversion.h>
-#include <std_wrapper.h>
-#include <containsMonomial.h>
-#include <initial.h>
-#include <witness.h>
-#include <tropicalStrategy.h>
-#include <tropicalVarietyOfPolynomials.h>
-#include <tropicalCurves.h>
+#include "gfanlib/gfanlib_matrix.h"
+#include "gfanlib/gfanlib_zcone.h"
+#include "polys/monomials/p_polys.h"
+#include "callgfanlib_conversion.h"
+#include "std_wrapper.h"
+#include "containsMonomial.h"
+#include "initial.h"
+#include "witness.h"
+#include "tropicalStrategy.h"
+#include "tropicalVarietyOfPolynomials.h"
+#include "tropicalCurves.h"
 #include <set>
 
 /***

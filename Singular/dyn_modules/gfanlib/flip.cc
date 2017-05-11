@@ -3,8 +3,8 @@
 #include "gfanlib/gfanlib_vector.h"
 #include "callgfanlib_conversion.h"
 #include "singularWishlist.h"
-#include <initial.h>
-#include <lift.h>
+#include "initial.h"
+#include "lift.h"
 
 /***
  * Given a Groebner basis I of an ideal in r, an interior Point

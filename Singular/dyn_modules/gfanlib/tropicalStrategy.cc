@@ -1,20 +1,20 @@
-#include <tropicalStrategy.h>
-#include <singularWishlist.h>
-#include <adjustWeights.h>
-#include <ppinitialReduction.h>
-// #include <ttinitialReduction.h>
-#include <tropical.h>
-#include <std_wrapper.h>
-#include <tropicalCurves.h>
-#include <tropicalDebug.h>
-#include <containsMonomial.h>
+#include "tropicalStrategy.h"
+#include "singularWishlist.h"
+#include "adjustWeights.h"
+#include "ppinitialReduction.h"
+// #include "ttinitialReduction.h"
+#include "tropical.h"
+#include "std_wrapper.h"
+#include "tropicalCurves.h"
+#include "tropicalDebug.h"
+#include "containsMonomial.h"
 
 
 // for various commands in dim(ideal I, ring r):
-#include <kernel/ideals.h>
-#include <kernel/combinatorics/stairc.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <misc/prime.h> // for isPrime(int i)
+#include "kernel/ideals.h"
+#include "kernel/combinatorics/stairc.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "misc/prime.h" // for isPrime(int i)
 
 /***
  * Computes the dimension of an ideal I in ring r

@@ -1,18 +1,18 @@
-#include <polys/monomials/p_polys.h>
-#include <coeffs/coeffs.h>
+#include "polys/monomials/p_polys.h"
+#include "coeffs/coeffs.h"
 
-#include <callgfanlib_conversion.h>
-#include <bbcone.h>
-#include <ppinitialReduction.h>
-#include <containsMonomial.h>
-#include <initial.h>
-#include <witness.h>
-#include <tropicalCurves.h>
-#include <tropicalStrategy.h>
-#include <startingCone.h>
-#include <groebnerFan.h>
-#include <groebnerComplex.h>
-#include <tropicalVariety.h>
+#include "callgfanlib_conversion.h"
+#include "bbcone.h"
+#include "ppinitialReduction.h"
+#include "containsMonomial.h"
+#include "initial.h"
+#include "witness.h"
+#include "tropicalCurves.h"
+#include "tropicalStrategy.h"
+#include "startingCone.h"
+#include "groebnerFan.h"
+#include "groebnerComplex.h"
+#include "tropicalVariety.h"
 
 int tropicalVerboseLevel = 0;
 

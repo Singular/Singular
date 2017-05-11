@@ -2,11 +2,8 @@
 #define TROPICALDEBUG_H
 
 #ifndef NDEBUG
-
-
-#include <libpolys/polys/simpleideals.h>
-#include <gfanlib/gfanlib.h>
-
+#include "libpolys/polys/simpleideals.h"
+#include "gfanlib/gfanlib.h"
 
 bool checkForNonPositiveEntries(const gfan::ZVector &w);
 bool checkForNonPositiveLaterEntries(const gfan::ZVector &w);

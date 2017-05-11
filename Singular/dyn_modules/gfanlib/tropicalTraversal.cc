@@ -1,7 +1,7 @@
-#include <bbcone.h>
-#include <groebnerCone.h>
-#include <tropicalCurves.h>
-#include <std_wrapper.h>
+#include "bbcone.h"
+#include "groebnerCone.h"
+#include "tropicalCurves.h"
+#include "std_wrapper.h"
 
 std::vector<bool> checkNecessaryTropicalFlips(const groebnerCones &tropicalVariety, const groebnerCones &workingList,
                                               const gfan::ZVector &interiorPoint, const gfan::ZMatrix &normalVectors)

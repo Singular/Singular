@@ -1,5 +1,5 @@
-#include <polys/monomials/p_polys.h>
-#include <libpolys/polys/simpleideals.h>
+#include "polys/monomials/p_polys.h"
+#include "libpolys/polys/simpleideals.h"
 
 #ifndef SING_NDEBUG
 void z_Write(number p, ring r)

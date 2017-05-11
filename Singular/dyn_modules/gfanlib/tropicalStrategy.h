@@ -1,22 +1,22 @@
 #ifndef GFANLIB_TROPICALSTRATEGY_H
 #define GFANLIB_TROPICALSTRATEGY_H
 
-#include <gfanlib/gfanlib_vector.h>
-#include <gfanlib/gfanlib_zcone.h>
-#include <polys/simpleideals.h>
-#include <kernel/ideals.h> // for idElem
+#include "gfanlib/gfanlib_vector.h"
+#include "gfanlib/gfanlib_zcone.h"
+#include "polys/simpleideals.h"
+#include "kernel/ideals.h" // for idElem
 #include <set>
-#include <callgfanlib_conversion.h>
-#include <containsMonomial.h>
-#include <flip.h>
-#include <initial.h>
-#include <witness.h>
+#include "callgfanlib_conversion.h"
+#include "containsMonomial.h"
+#include "flip.h"
+#include "initial.h"
+#include "witness.h"
 
 #ifndef NDEBUG
 
-#include <Singular/ipshell.h> // for isPrime(int i)
-#include <adjustWeights.h>
-#include <ppinitialReduction.h>
+#include "Singular/ipshell.h" // for isPrime(int i)
+#include "adjustWeights.h"
+#include "ppinitialReduction.h"
 
 #endif
 

@@ -1,6 +1,6 @@
 #include <vector>
 
-#include <Singular/libsingular.h>
+#include "Singular/libsingular.h"
 
 std::vector<int> gitfan_satstdSaturatingVariables;
 ideal gfanlib_kStd_wrapper(ideal I, ring r, tHomog h=testHomog)

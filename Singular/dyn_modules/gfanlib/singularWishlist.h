@@ -1,8 +1,8 @@
 #ifndef SINGULARWISHLIST_H
 #define SINGULARWISHLIST_H
 
-#include <polys/monomials/p_polys.h>
-#include <libpolys/polys/simpleideals.h>
+#include "polys/monomials/p_polys.h"
+#include "libpolys/polys/simpleideals.h"
 
 static inline BOOLEAN _p_LeadmonomDivisibleByNoComp(poly a, poly b, const ring r)
 {
