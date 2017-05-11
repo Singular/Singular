@@ -13,6 +13,13 @@
 
 #ifdef __cplusplus
 extern "C" {
+  #if __cplusplus>201402L
+  #define REGISTER
+  #else
+  #define REGISTER register
+  #endif
+#else
+  #define REGISTER register
 #endif
 
 #include "omalloc/omConfig.h"

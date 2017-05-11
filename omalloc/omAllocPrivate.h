@@ -143,7 +143,7 @@ while (0)
 #define __omTypeAllocBin(type, addr, bin)                   \
 do                                                          \
 {                                                           \
-  register omBinPage __om_page = (bin)->current_page;       \
+  REGISTER omBinPage __om_page = (bin)->current_page;       \
   if (__om_page->current != NULL)                           \
     __omTypeAllocFromNonEmptyPage(type, addr, __om_page);   \
   else                                                      \
@@ -163,8 +163,8 @@ while (0)
 #define __omFreeBinAddr(addr)                                   \
 do                                                              \
 {                                                               \
-  register void* __om_addr = (void*) (addr);                    \
-  register omBinPage __om_page = omGetBinPageOfAddr(__om_addr); \
+  REGISTER void* __om_addr = (void*) (addr);                    \
+  REGISTER omBinPage __om_page = omGetBinPageOfAddr(__om_addr); \
   __omFreeToPage(__om_addr, __om_page);                         \
 }                                                               \
 while (0)
