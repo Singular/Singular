@@ -1,8 +1,8 @@
 #ifndef PPINITIALREDUCTION_H
 #define PPINITIALREDUCTION_H
 
-#include <kernel/structs.h>
-#include <tropicalStrategy.h>
+#include "kernel/structs.h"
+#include "tropicalStrategy.h"
 
 typedef std::pair<int,int> mark;
 typedef std::vector<std::pair<int,int> > marks;

@@ -12,20 +12,20 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <reporter/si_signals.h>
-#include <Singular/fevoices.h>
+#include "reporter/si_signals.h"
+#include "Singular/fevoices.h"
 
-#include <Singular/tok.h>
-#include <Singular/ipshell.h>
-#include <Singular/cntrlc.h>
-#include <Singular/feOpt.h>
-#include <Singular/misc_ip.h>
-#include <Singular/links/silink.h>
-#include <Singular/links/ssiLink.h>
+#include "Singular/tok.h"
+#include "Singular/ipshell.h"
+#include "Singular/cntrlc.h"
+#include "Singular/feOpt.h"
+#include "Singular/misc_ip.h"
+#include "Singular/links/silink.h"
+#include "Singular/links/ssiLink.h"
 
 /* undef, if you don't want GDB to come up on error */
 

@@ -7,8 +7,8 @@
 * ABSTRACT - interupt and signal handling
 */
 #include <setjmp.h>
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
+#include "kernel/mod2.h"
+#include "kernel/structs.h"
 
 extern jmp_buf si_start_jmpbuf;
 extern short si_restart;

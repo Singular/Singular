@@ -1,4 +1,4 @@
-#include <Singular/libsingular.h>
+#include "Singular/libsingular.h"
 #include <vector>
 #include <iostream>
 

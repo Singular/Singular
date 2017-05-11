@@ -9,13 +9,13 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 //#include <vector>
 //using namespace std;
   #define SINGULAR 1
-  #include <factory/factory.h>
-  #include <factory/templates/ftmpl_list.cc>
-  #include <kernel/fglm/fglm.h>
+  #include "factory/factory.h"
+  #include "factory/templates/ftmpl_list.cc"
+  #include "kernel/fglm/fglm.h"
 
 // templates for fglm:
   template class List<fglmSelem>;
@@ -41,8 +41,8 @@
 #endif
 #endif
 
-#include <kernel/spectrum/GMPrat.h>
-#include <kernel/spectrum/kmatrix.h>
+#include "kernel/spectrum/GMPrat.h"
+#include "kernel/spectrum/kmatrix.h"
 
 template class KMatrix<Rational>;
 
@@ -59,19 +59,19 @@ template    static  void    print_rational( OSTREAM&,int,const Rational& );
 
 #ifdef HAVE_PLURAL
 
-#include <polys/nc/ncSAMult.h> // for CMultiplier etc classes
+#include "polys/nc/ncSAMult.h" // for CMultiplier etc classes
 
 template class CMultiplier<int>;
 template class CMultiplier<poly>;
 template class CMultiplier<CPower>;
 
-// #include <kernel/ncSACache.h> // for CCacheHash etc classes
+// #include "kernel/ncSACache.h" // for CCacheHash etc classes
 // template class CCacheHash<poly>;
 // template class CCacheHash<int>;
 
 #endif
 
-#include <kernel/GBEngine/tgb_internal.h>
+#include "kernel/GBEngine/tgb_internal.h"
 #ifdef HAVE_BOOST
 #include <boost/dynamic_bitset.hpp>
 #include <vector>
@@ -116,8 +116,8 @@ template void noro_step<tgb_uint32>(poly*p,int &pn,slimgb_alg* c);
 
 /* next lines are templates used in new minor code */
 #include <list>
-#include <kernel/linear_algebra/Minor.h>
-#include <kernel/linear_algebra/Cache.h>
+#include "kernel/linear_algebra/Minor.h"
+#include "kernel/linear_algebra/Cache.h"
 
 template class std::list<int>;
 template class std::list<MinorKey>;

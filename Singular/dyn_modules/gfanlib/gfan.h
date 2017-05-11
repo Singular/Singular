@@ -6,13 +6,13 @@ Author: monerjan
 #ifndef GFAN_H
 #define GFAN_H
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #if HAVE_GFANLIB
 
-#include <misc/int64vec.h>
+#include "misc/int64vec.h"
 
-#include <gfanlib/config.h>
+#include "gfanlib/config.h"
 #ifdef HAVE_CDD_SETOPER_H
 #include <cdd/setoper.h>
 #include <cdd/cdd.h>
@@ -26,8 +26,8 @@ Author: monerjan
 #include <cdd.h>
 #include <cddmp.h>
 #endif
-#include <bbfan.h>
-#include <bbcone.h>
+#include "bbfan.h"
+#include "bbcone.h"
 extern int gfanHeuristic;
 
 #ifndef USE_ZFAN
@@ -36,7 +36,7 @@ extern int gfanHeuristic;
 #ifndef USE_ZFAN
   lists grfan(ideal inputIdeal, int heuristic, bool singleCone);
 #else
-  #include <gfanlib/gfanlib.h>
+  #include "gfanlib/gfanlib.h"
   gfan::ZFan *grfan(ideal inputIdeal, int h, bool singleCone);
 #endif
 // lists grcone_by_intvec(ideal inputIdeal);

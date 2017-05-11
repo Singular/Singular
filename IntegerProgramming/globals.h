@@ -14,7 +14,7 @@
 
 // the following is not good! TODO: move to all including sources...
 
-#include <singularconfig.h>
+#include "singularconfig.h"
 
 
 #include <stdio.h>

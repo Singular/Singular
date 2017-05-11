@@ -1,15 +1,15 @@
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #if HAVE_GFANLIB
 
-#include <bbcone.h>
-#include <bbfan.h>
-#include <bbpolytope.h>
-#include <gitfan.h>
-#include <tropical.h>
+#include "bbcone.h"
+#include "bbfan.h"
+#include "bbpolytope.h"
+#include "gitfan.h"
+#include "tropical.h"
 
-#include <Singular/ipid.h>
-#include <Singular/mod_lib.h>
+#include "Singular/ipid.h"
+#include "Singular/mod_lib.h"
 
 
 template class gfan::Vector<gfan::Integer>;

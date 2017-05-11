@@ -1,15 +1,15 @@
 #ifndef BBCONE_H
 #define BBCONE_H
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #if HAVE_GFANLIB
 
-#include <misc/intvec.h>
-#include <coeffs/bigintmat.h>
-#include <Singular/ipid.h>
+#include "misc/intvec.h"
+#include "coeffs/bigintmat.h"
+#include "Singular/ipid.h"
 
-#include <gfanlib/gfanlib.h>
+#include "gfanlib/gfanlib.h"
 
 extern int coneID;
 

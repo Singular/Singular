@@ -1,9 +1,9 @@
 
 
 
-#include <kernel/mod2.h>
-#include <kernel/GBEngine/kutil.h>
-#include <Singular/lists.h>
+#include "kernel/mod2.h"
+#include "kernel/GBEngine/kutil.h"
+#include "Singular/lists.h"
 
 lists get_denom_list()
 {

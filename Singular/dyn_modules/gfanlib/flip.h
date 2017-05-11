@@ -2,8 +2,8 @@
 #define GFANLIB_FLIP_H
 
 #include <utility>
-#include <polys/simpleideals.h>
-#include <gfanlib/gfanlib_vector.h>
+#include "polys/simpleideals.h"
+#include "gfanlib/gfanlib_vector.h"
 
 std::pair<ideal,ring> flip(const ideal I, const ring r,
                            const gfan::ZVector interiorPoint,

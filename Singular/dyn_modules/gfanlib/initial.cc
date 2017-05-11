@@ -1,7 +1,7 @@
-#include <kernel/ideals.h>
-#include <polys/monomials/p_polys.h>
+#include "kernel/ideals.h"
+#include "polys/monomials/p_polys.h"
 
-#include <gfanlib/gfanlib.h>
+#include "gfanlib/gfanlib.h"
 
 #include <exception>
 

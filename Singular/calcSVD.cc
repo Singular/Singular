@@ -2,15 +2,15 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #ifdef HAVE_SVD
 
-#include <Singular/svd_si.h>
-#include <kernel/structs.h>
-#include <kernel/polys.h>
-#include <polys/matpol.h>
-#include <Singular/lists.h>
+#include "Singular/svd_si.h"
+#include "kernel/structs.h"
+#include "kernel/polys.h"
+#include "polys/matpol.h"
+#include "Singular/lists.h"
 
 template class std::vector< amp::mpfr_record* >;
 

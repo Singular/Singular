@@ -1,12 +1,12 @@
-#include <misc/options.h>
-#include <bbfan.h>
+#include "misc/options.h"
+#include "bbfan.h"
 
-#include <groebnerCone.h>
-#include <startingCone.h>
-#include <groebnerFan.h>
-#include <tropicalTraversal.h>
+#include "groebnerCone.h"
+#include "startingCone.h"
+#include "groebnerFan.h"
+#include "tropicalTraversal.h"
 
-#include <ppinitialReduction.h>
+#include "ppinitialReduction.h"
 
 gfan::ZFan* groebnerComplex(const tropicalStrategy currentStrategy)
 {

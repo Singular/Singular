@@ -1,5 +1,5 @@
-#include <polys/monomials/p_polys.h>
-#include <Singular/ipid.h>
+#include "polys/monomials/p_polys.h"
+#include "Singular/ipid.h"
 
 #include "singularWishlist.h"
 #include "ppinitialReduction.h"

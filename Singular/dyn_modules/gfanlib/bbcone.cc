@@ -1,27 +1,27 @@
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #if HAVE_GFANLIB
 
-#include <misc/intvec.h>
-#include <misc/sirandom.h>
+#include "misc/intvec.h"
+#include "misc/sirandom.h"
 
-#include <coeffs/bigintmat.h>
-#include <coeffs/longrat.h>
+#include "coeffs/bigintmat.h"
+#include "coeffs/longrat.h"
 
-#include <Singular/ipid.h>
-#include <Singular/ipshell.h>
-#include <Singular/blackbox.h>
+#include "Singular/ipid.h"
+#include "Singular/ipshell.h"
+#include "Singular/blackbox.h"
 
-#include <Singular/links/ssiLink.h>
+#include "Singular/links/ssiLink.h"
 
-#include <callgfanlib_conversion.h>
+#include "callgfanlib_conversion.h"
 #include <sstream>
 
-#include <gfanlib/gfanlib.h>
-#include <gfanlib/gfanlib_q.h>
+#include "gfanlib/gfanlib.h"
+#include "gfanlib/gfanlib_q.h"
 
-#include <bbfan.h>
-#include <bbpolytope.h>
+#include "bbfan.h"
+#include "bbpolytope.h"
 
 int coneID;
 

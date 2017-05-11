@@ -1,10 +1,10 @@
-#include <gfanlib/gfanlib.h>
+#include "gfanlib/gfanlib.h"
 
-#include <coeffs/bigintmat.h>
-#include <coeffs/longrat.h>
-#include <coeffs/numbers.h>
+#include "coeffs/bigintmat.h"
+#include "coeffs/longrat.h"
+#include "coeffs/numbers.h"
 
-#include <Singular/ipid.h> // for coeffs_BIGINT
+#include "Singular/ipid.h" // for coeffs_BIGINT
 
 number integerToNumber(const gfan::Integer &I)
 {

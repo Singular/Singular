@@ -1,12 +1,12 @@
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <Singular/mod_lib.h>
+#include "Singular/mod_lib.h"
 
-#include <Singular/blackbox.h>
+#include "Singular/blackbox.h"
 
-#include <Singular/tok.h>
-#include <Singular/ipid.h>
-#include <Singular/lists.h>
+#include "Singular/tok.h"
+#include "Singular/ipid.h"
+#include "Singular/lists.h"
 
 #include <dlfcn.h>
 

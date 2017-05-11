@@ -1,12 +1,12 @@
 #ifndef BBPOLYTOPE_H
 #define BBPOLYTOPE_H
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #if HAVE_GFANLIB
 
-#include <Singular/ipid.h>
-#include <gfanlib/gfanlib.h>
+#include "Singular/ipid.h"
+#include "gfanlib/gfanlib.h"
 
 extern int polytopeID;
 

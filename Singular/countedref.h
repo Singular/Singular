@@ -20,11 +20,11 @@
 #ifndef SINGULAR_COUNTEDREF_H_
 #define SINGULAR_COUNTEDREF_H_
 
-#include <omalloc/omalloc.h>
-#include <kernel/structs.h>
-#include <Singular/subexpr.h>
-#include <Singular/idrec.h>
-#include <Singular/ipid.h>
+#include "omalloc/omalloc.h"
+#include "kernel/structs.h"
+#include "Singular/subexpr.h"
+#include "Singular/idrec.h"
+#include "Singular/ipid.h"
 /** @class CountedRefPtr
  * This class implements a smart pointer which handles pointer-style access
  * to a reference-counted structure and destructing the latter after use.

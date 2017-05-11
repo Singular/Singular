@@ -1,6 +1,6 @@
-#include <polys/monomials/p_polys.h>
+#include "polys/monomials/p_polys.h"
 
-#include <witness.h>
+#include "witness.h"
 
 /***
  * Suppose r and s are the same ring but with two adjacent orderings,

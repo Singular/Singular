@@ -1,15 +1,15 @@
 #include "kernel/mod2.h" // general settings/macros
 #include "Singular/mod_lib.h"
-//#include"kernel/febase.h"  // for Print, WerrorS
-#include"Singular/ipid.h" // for SModulFunctions, leftv
-#include"Singular/number2.h" // for SModulFunctions, leftv
-#include<coeffs/numbers.h> // nRegister, coeffs.h
-#include <coeffs/coeffs.h>
-#include"Singular/blackbox.h" // blackbox type
+//#include "kernel/febase.h"  // for Print, WerrorS
+#include "Singular/ipid.h" // for SModulFunctions, leftv
+#include "Singular/number2.h" // for SModulFunctions, leftv
+#include "coeffs/numbers.h" // nRegister, coeffs.h
+#include "coeffs/coeffs.h"
+#include "Singular/blackbox.h" // blackbox type
 #include "nforder.h"
 #include "nforder_elt.h"
 #include "nforder_ideal.h"
-#include <coeffs/bigintmat.h>
+#include "coeffs/bigintmat.h"
 
 #ifdef SINGULAR_4_2
 static int nforder_type_id=0;

@@ -6,22 +6,22 @@
 * ABSTRACT: attributes to leftv and idhdl
 */
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <misc/options.h>
-#include <misc/intvec.h>
+#include "misc/options.h"
+#include "misc/intvec.h"
 
-#include <polys/matpol.h>
+#include "polys/matpol.h"
 
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
 
-#include <Singular/tok.h>
-#include <Singular/ipid.h>
-#include <Singular/ipshell.h>
-#include <Singular/attrib.h>
+#include "Singular/tok.h"
+#include "Singular/ipid.h"
+#include "Singular/ipshell.h"
+#include "Singular/attrib.h"
 
 #include <stdlib.h>
 #include <stdio.h>

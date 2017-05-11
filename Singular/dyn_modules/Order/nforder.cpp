@@ -1,8 +1,8 @@
-#include <coeffs/bigintmat.h>
+#include "coeffs/bigintmat.h"
 #include "nforder.h"
-#include <reporter/reporter.h>
-#include<coeffs/numbers.h>
-#include <coeffs/coeffs.h>
+#include "reporter/reporter.h"
+#include "coeffs/numbers.h"
+#include "coeffs/coeffs.h"
 #include "Singular/ipid.h"
 
 

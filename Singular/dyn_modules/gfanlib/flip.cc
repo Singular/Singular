@@ -1,8 +1,8 @@
 #include <utility>
-#include <kernel/GBEngine/kstd1.h>
-#include <gfanlib/gfanlib_vector.h>
-#include <callgfanlib_conversion.h>
-#include <singularWishlist.h>
+#include "kernel/GBEngine/kstd1.h"
+#include "gfanlib/gfanlib_vector.h"
+#include "callgfanlib_conversion.h"
+#include "singularWishlist.h"
 #include <initial.h>
 #include <lift.h>
 

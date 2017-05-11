@@ -1,26 +1,25 @@
 #include <utility>
 
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/ideals.h>
-#include <Singular/ipid.h>
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/ideals.h"
+#include "Singular/ipid.h"
 
-#include <polys/monomials/p_polys.h>
-#include <polys/monomials/ring.h>
-#include <polys/prCopy.h>
+#include "polys/monomials/p_polys.h"
+#include "polys/monomials/ring.h"
+#include "polys/prCopy.h"
 
-#include <gfanlib/gfanlib.h>
-#include <gfanlib/gfanlib_matrix.h>
+#include "gfanlib/gfanlib.h"
+#include "gfanlib/gfanlib_matrix.h"
 
-#include <initial.h>
-#include <tropicalStrategy.h>
-#include <groebnerCone.h>
-#include <callgfanlib_conversion.h>
-#include <containsMonomial.h>
-#include <initial.h>
-// #include <flip.h>
-#include <tropicalCurves.h>
-#include <bbcone.h>
-#include <tropicalDebug.h>
+#include "initial.h"
+#include "tropicalStrategy.h"
+#include "groebnerCone.h"
+#include "callgfanlib_conversion.h"
+#include "containsMonomial.h"
+// #include "flip.h"
+#include "tropicalCurves.h"
+#include "bbcone.h"
+#include "tropicalDebug.h"
 
 #ifndef NDEBUG
 bool groebnerCone::checkFlipConeInput(const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const

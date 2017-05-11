@@ -1,8 +1,8 @@
-#include <coeffs/bigintmat.h>
+#include "coeffs/bigintmat.h"
 #include "lattice.h"
 //#include "kernel/febase.h"  // for Print, WerrorS
-#include <coeffs/numbers.h>
-#include <coeffs/coeffs.h>
+#include "coeffs/numbers.h"
+#include "coeffs/coeffs.h"
 #include "Singular/ipid.h"
 #include <iostream>
 #include <vector>

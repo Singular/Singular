@@ -7,8 +7,8 @@
 * ABSTRACT: attributes to leftv and idhdl
 */
 #include <string.h>
-#include <kernel/structs.h>
-#include <omalloc/omallocClass.h>
+#include "kernel/structs.h"
+#include "omalloc/omallocClass.h"
 
 class sattr;
 typedef sattr * attr;

@@ -1,13 +1,13 @@
 #ifndef BLACKBOX_H
 #define BLACKBOX_H
 
-#include <kernel/mod2.h>
-#include <omalloc/omalloc.h>
+#include "kernel/mod2.h"
+#include "omalloc/omalloc.h"
 
-#include <kernel/structs.h>
+#include "kernel/structs.h"
 
-#include <Singular/lists.h>
-#include <Singular/links/silink.h>
+#include "Singular/lists.h"
+#include "Singular/links/silink.h"
 
 void removeBlackboxStuff(const int rt);
 

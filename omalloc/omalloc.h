@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-#include <omalloc/omConfig.h>
+#include "omalloc/omConfig.h"
 
 #if defined(OM_NDEBUG) && !defined(OM_ALLOC_INTERNAL)
 #if (SIZEOF_LONG == 8)

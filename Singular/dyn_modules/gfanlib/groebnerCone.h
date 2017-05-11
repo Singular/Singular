@@ -1,16 +1,16 @@
 #ifndef CALLGFANLIB_GROEBNERCONE_H
 #define CALLGFANLIB_GROEBNERCONE_H
 
-#include <kernel/polys.h>
-#include <Singular/ipid.h>
+#include "kernel/polys.h"
+#include "Singular/ipid.h"
 
-#include <polys/monomials/ring.h>
-#include <polys/simpleideals.h>
-#include <kernel/ideals.h>
-#include <gfanlib/gfanlib.h>
+#include "polys/monomials/ring.h"
+#include "polys/simpleideals.h"
+#include "kernel/ideals.h"
+#include "gfanlib/gfanlib.h"
 #include <set>
 
-#include <tropicalStrategy.h>
+#include "tropicalStrategy.h"
 
 /** \file
  * implementation of the class groebnerCone

@@ -2,18 +2,18 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
-#include <coeffs/coeffs.h>
+#include "omalloc/omalloc.h"
+#include "coeffs/coeffs.h"
 
-#include <Singular/ipid.h>
-#include <Singular/subexpr.h>
-#include <Singular/tok.h>
-#include <Singular/blackbox.h>
-#include <Singular/ipshell.h>
+#include "Singular/ipid.h"
+#include "Singular/subexpr.h"
+#include "Singular/tok.h"
+#include "Singular/blackbox.h"
+#include "Singular/ipshell.h"
 
-#include <Singular/ipid.h>
+#include "Singular/ipid.h"
 // extern coeffs coeffs_BIGINT
 
 

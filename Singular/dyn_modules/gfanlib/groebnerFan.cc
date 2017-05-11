@@ -1,9 +1,9 @@
-#include <misc/options.h>
-#include <bbfan.h>
+#include "misc/options.h"
+#include "bbfan.h"
 
-#include <groebnerCone.h>
-#include <startingCone.h>
-#include <tropicalTraversal.h>
+#include "groebnerCone.h"
+#include "startingCone.h"
+#include "tropicalTraversal.h"
 
 
 BITSET groebnerBitsetSave1, groebnerBitsetSave2;
