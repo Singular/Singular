@@ -1,6 +1,7 @@
 #include "kernel/mod2.h"
 
 #ifdef HAVE_POLYMAKE
+#include "resources/feFopen.h"
 
 void init_polymake_help()
 {

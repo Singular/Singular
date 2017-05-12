@@ -10,23 +10,23 @@
 
 
 
-#include <misc/auxiliary.h>
-#include <omalloc/omalloc.h>
+#include "misc/auxiliary.h"
+#include "omalloc/omalloc.h"
 
-#include <factory/factory.h>
+#include "factory/factory.h"
 
-#include <coeffs/coeffs.h>
+#include "coeffs/coeffs.h"
 
-#include <coeffs/longrat.h> // snumber is necessary
+#include "coeffs/longrat.h" // snumber is necessary
 
-#include <polys/monomials/p_polys.h>
-#include <polys/sbuckets.h>
-#include <polys/clapconv.h>
+#include "polys/monomials/p_polys.h"
+#include "polys/sbuckets.h"
+#include "polys/clapconv.h"
 
 #include "simpleideals.h"
 
 #define TRANSEXT_PRIVATES
-#include <polys/ext_fields/transext.h>
+#include "polys/ext_fields/transext.h"
 
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
