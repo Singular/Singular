@@ -8,8 +8,8 @@
 */
 
 #ifndef UMINUS
-#include <kernel/mod2.h>
-#include <Singular/grammar.h>
+#include "kernel/mod2.h"
+#include "Singular/grammar.h"
 #endif
 
 extern int      yylineno;

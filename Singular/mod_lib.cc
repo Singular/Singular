@@ -1,10 +1,10 @@
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <resources/feFopen.h>
-#include <reporter/reporter.h>
-#include <polys/mod_raw.h>
+#include "resources/feFopen.h"
+#include "reporter/reporter.h"
+#include "polys/mod_raw.h"
 
-#include <Singular/mod_lib.h>
+#include "Singular/mod_lib.h"
 
 #include <stdio.h>
 #include <string.h>

@@ -8,19 +8,19 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #ifdef HAVE_PCV
 
-#include <Singular/tok.h>
-#include <Singular/ipid.h>
-#include <coeffs/numbers.h>
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <Singular/lists.h>
-#include <polys/matpol.h>
-#include <Singular/ipshell.h>
-#include <Singular/pcv.h>
+#include "Singular/tok.h"
+#include "Singular/ipid.h"
+#include "coeffs/numbers.h"
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
+#include "Singular/lists.h"
+#include "polys/matpol.h"
+#include "Singular/ipshell.h"
+#include "Singular/pcv.h"
 
 static int pcvMaxDegree;
 static int pcvTableSize;

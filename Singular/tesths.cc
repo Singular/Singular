@@ -9,16 +9,16 @@
 
 
 
-#include <kernel/mod2.h>
-#include <omalloc/omalloc.h>
+#include "kernel/mod2.h"
+#include "omalloc/omalloc.h"
 
-#include <misc/options.h>
+#include "misc/options.h"
 
-#include <factory/factory.h>
+#include "factory/factory.h"
 
-#include <kernel/oswrapper/feread.h>
-#include <Singular/fevoices.h>
-#include <kernel/oswrapper/timer.h>
+#include "kernel/oswrapper/feread.h"
+#include "Singular/fevoices.h"
+#include "kernel/oswrapper/timer.h"
 
 // #ifdef HAVE_FANS
 // #include <callgfanlib/bbcone.h>
@@ -38,8 +38,8 @@
 #include "tok.h"
 #include "fegetopt.h"
 
-#include <Singular/countedref.h>
-#include <Singular/pyobject_setup.h>
+#include "Singular/countedref.h"
+#include "Singular/pyobject_setup.h"
 
 #include <unistd.h>
 #include <string.h>

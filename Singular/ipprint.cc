@@ -5,15 +5,15 @@
 * ABSTRACT: interpreter: printing
 */
 
-#include <kernel/mod2.h>
-#include <omalloc/omalloc.h>
+#include "kernel/mod2.h"
+#include "omalloc/omalloc.h"
 
-#include <misc/intvec.h>
+#include "misc/intvec.h"
 
-#include <polys/matpol.h>
+#include "polys/matpol.h"
 
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
 
 #include "tok.h"
 #include "ipid.h"

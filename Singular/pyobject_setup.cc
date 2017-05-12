@@ -12,10 +12,10 @@
 **/
 //*****************************************************************************
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <Singular/blackbox.h>
-#include <Singular/ipshell.h>
+#include "Singular/blackbox.h"
+#include "Singular/ipshell.h"
 
 static BOOLEAN pyobject_load()
 {

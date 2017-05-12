@@ -9,9 +9,9 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
 /* we provide these functions, so that the settings of OM_CHECK
 * and OM_TRACK are used, but only provide them if omalloc is not based
@@ -28,10 +28,10 @@
 * as static, i.e. not metioned by omPrintUsedAddr*/
 #define OM_MALLOC_MARK_AS_STATIC
 #define strdup_ strdup__
-#include <omalloc/omalloc.c> /// UGLY!!!!!!!!!!!!!!!!
+#include "omalloc/omalloc.c" /// UGLY!!!!!!!!!!!!!!!!
 
 #else
-#include <Singular/mmalloc.h>
+#include "Singular/mmalloc.h"
 
 void freeSize(void* addr, size_t size)
 {

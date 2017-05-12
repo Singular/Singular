@@ -10,15 +10,15 @@
 
 
 
-#include <kernel/mod2.h>
-#include <Singular/tok.h>
+#include "kernel/mod2.h"
+#include "Singular/tok.h"
 //#include "ipid.h"
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <Singular/attrib.h>
-#include <Singular/ipshell.h>
-#include <misc/intvec.h>
-#include <Singular/lists.h>
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
+#include "Singular/attrib.h"
+#include "Singular/ipshell.h"
+#include "misc/intvec.h"
+#include "Singular/lists.h"
 
 omBin slists_bin = omGetSpecBin(sizeof(slists));
 

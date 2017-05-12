@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: interpreter: printing
 */
-#include <kernel/structs.h>
+#include "kernel/structs.h"
 
 class sleftv; typedef sleftv * leftv;
 

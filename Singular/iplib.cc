@@ -9,18 +9,18 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <Singular/tok.h>
-#include <misc/options.h>
-#include <Singular/ipid.h>
-#include <omalloc/omalloc.h>
-#include <polys/monomials/ring.h>
-#include <Singular/subexpr.h>
-#include <Singular/ipid.h>
-#include <Singular/ipshell.h>
-#include <Singular/fevoices.h>
-#include <Singular/lists.h>
+#include "Singular/tok.h"
+#include "misc/options.h"
+#include "Singular/ipid.h"
+#include "omalloc/omalloc.h"
+#include "polys/monomials/ring.h"
+#include "Singular/subexpr.h"
+#include "Singular/ipid.h"
+#include "Singular/ipshell.h"
+#include "Singular/fevoices.h"
+#include "Singular/lists.h"
 
 //#include <stdlib.h>
 #include <stdio.h>
@@ -62,7 +62,7 @@ procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
 extern int iiArithAddCmd(const char *szName, short nAlias, short nTokval,
                          short nToktype, short nPos);
 
-#include <Singular/mod_lib.h>
+#include "Singular/mod_lib.h"
 
 #ifdef HAVE_LIBPARSER
 void yylprestart (FILE *input_file );

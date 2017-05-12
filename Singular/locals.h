@@ -2,15 +2,15 @@
  * part of modgen
  */
 
-// #include <kernel/mod2.h>
-#include <Singular/tok.h>
-#include <Singular/ipid.h>
-//#include <mmemory.h>
-#include <Singular/subexpr.h>
-//#include <utils.h>
+// #include "kernel/mod2.h"
+#include "Singular/tok.h"
+#include "Singular/ipid.h"
+//#include "mmemory.h"
+#include "Singular/subexpr.h"
+//#include "utils.h"
 
-#include <kernel/structs.h>
-#include <Singular/ipconv.h>
+#include "kernel/structs.h"
+#include "Singular/ipconv.h"
 
 BOOLEAN jjANY2LIST(leftv res, leftv v, int cnt);
 

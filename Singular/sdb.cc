@@ -5,17 +5,17 @@
 * ABSTRACT: Singular debugger
 */
 
-#include <kernel/mod2.h>
-#include <omalloc/omalloc.h>
-#include <misc/options.h>
-#include <reporter/si_signals.h>
+#include "kernel/mod2.h"
+#include "omalloc/omalloc.h"
+#include "misc/options.h"
+#include "reporter/si_signals.h"
 
-#include <Singular/tok.h>
-#include <Singular/ipshell.h>
-#include <Singular/ipid.h>
-#include <Singular/fevoices.h>
-#include <kernel/oswrapper/feread.h>
-#include <Singular/sdb.h>
+#include "Singular/tok.h"
+#include "Singular/ipshell.h"
+#include "Singular/ipid.h"
+#include "Singular/fevoices.h"
+#include "kernel/oswrapper/feread.h"
+#include "Singular/sdb.h"
 
 #include <unistd.h>   // for unlink,fork,execlp,getpid
 #include <sys/wait.h> // for wait

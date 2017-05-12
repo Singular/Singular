@@ -1,11 +1,11 @@
 #ifndef NUMBER2_H
 #define NUMBER2_H
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
-#include <coeffs/coeffs.h>
-#include <kernel/structs.h>
+#include "omalloc/omalloc.h"
+#include "coeffs/coeffs.h"
+#include "kernel/structs.h"
 #ifdef SINGULAR_4_2
 struct snumber2;
 struct spoly2;

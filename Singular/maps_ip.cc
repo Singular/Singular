@@ -6,27 +6,24 @@
 */
 #define TRANSEXT_PRIVATES
 
+#include "kernel/mod2.h"
+#include "omalloc/omalloc.h"
 
+#include "coeffs/numbers.h"
+#include "coeffs/coeffs.h"
 
+#include "polys/monomials/ring.h"
+#include "polys/monomials/maps.h"
+#include "polys/matpol.h"
+#include "polys/prCopy.h"
+#include "polys/ext_fields/transext.h"
 
-#include <kernel/mod2.h>
-#include <omalloc/omalloc.h>
+//#include "polys/ext_fields/longtrans.h"
+// #include "kernel/longalg.h"
 
-#include <coeffs/numbers.h>
-#include <coeffs/coeffs.h>
-
-#include <polys/monomials/ring.h>
-#include <polys/monomials/maps.h>
-#include <polys/matpol.h>
-#include <polys/prCopy.h>
-#include <polys/ext_fields/transext.h>
-
-//#include <polys/ext_fields/longtrans.h>
-// #include <kernel/longalg.h>
-
-#include <misc/options.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/maps/gen_maps.h>
+#include "misc/options.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/maps/gen_maps.h"
 
 #include "maps_ip.h"
 #include "ipid.h"

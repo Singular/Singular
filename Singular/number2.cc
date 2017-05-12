@@ -1,18 +1,18 @@
 #include "kernel/mod2.h" // general settings/macros
-#include <reporter/reporter.h>  // for Print, WerrorS
-#include <coeffs/numbers.h> // nRegister, coeffs.h
-#include <coeffs/rmodulon.h> // ZnmInfo
-#include <coeffs/bigintmat.h> // bigintmat
-#include <coeffs/longrat.h> // BIGINTs: nlGMP
-#include <polys/ext_fields/algext.h> // AlgExtInfo
-#include <misc/prime.h> // IsPrime
-#include <Singular/blackbox.h> // blackbox type
-#include <Singular/ipshell.h> // IsPrime
-#include <Singular/ipconv.h> // iiConvert etc.
+#include "reporter/reporter.h"  // for Print, WerrorS
+#include "coeffs/numbers.h" // nRegister, coeffs.h
+#include "coeffs/rmodulon.h" // ZnmInfo
+#include "coeffs/bigintmat.h" // bigintmat
+#include "coeffs/longrat.h" // BIGINTs: nlGMP
+#include "polys/ext_fields/algext.h" // AlgExtInfo
+#include "misc/prime.h" // IsPrime
+#include "Singular/blackbox.h" // blackbox type
+#include "Singular/ipshell.h" // IsPrime
+#include "Singular/ipconv.h" // iiConvert etc.
 
-#include <Singular/ipid.h> // for SModulFunctions, leftv
+#include "Singular/ipid.h" // for SModulFunctions, leftv
 
-#include <Singular/number2.h>
+#include "Singular/number2.h"
 
 char *crString(coeffs c)
 {
@@ -536,7 +536,6 @@ void p2Print(poly2 d)
 }
 
 // ---------------------------------------------------------------------
-#include <coeffs/bigintmat.h>
 BOOLEAN jjBIM2_CR(leftv res, leftv a)              // bigintmat ->cring
 {
   bigintmat *b=(bigintmat*)a->Data();

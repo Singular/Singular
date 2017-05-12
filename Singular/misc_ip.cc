@@ -13,27 +13,30 @@
 // include header files
 #define PLURAL_INTERNAL_DECLARATIONS 1
 
-#include <kernel/mod2.h>
-#include <misc/sirandom.h>
+#include "kernel/mod2.h"
+#include "misc/sirandom.h"
 
-#include <reporter/si_signals.h>
+#include "omalloc/omalloc.h"
+#include "misc/mylimits.h"
 
-#include <factory/factory.h>
+#include "reporter/si_signals.h"
 
-#include <coeffs/si_gmp.h>
-#include <coeffs/coeffs.h>
-#include <coeffs/OPAE.h>
-#include <coeffs/OPAEQ.h>
-#include <coeffs/OPAEp.h>
-#include <coeffs/flintcf_Q.h>
-#include <coeffs/flintcf_Zn.h>
+#include "factory/factory.h"
 
-#include <polys/ext_fields/algext.h>
-#include <polys/ext_fields/transext.h>
-#include <polys/nc/gb_hack.h>
+#include "coeffs/si_gmp.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/OPAE.h"
+#include "coeffs/OPAEQ.h"
+#include "coeffs/OPAEp.h"
+#include "coeffs/flintcf_Q.h"
+#include "coeffs/flintcf_Zn.h"
+
+#include "polys/ext_fields/algext.h"
+#include "polys/ext_fields/transext.h"
+#include "polys/nc/gb_hack.h"
 
 #ifdef HAVE_SIMPLEIPC
-#include <Singular/links/simpleipc.h>
+#include "Singular/links/simpleipc.h"
 #endif
 
 #include "misc_ip.h"
@@ -41,7 +44,24 @@
 #include "feOpt.h"
 #include "links/silink.h"
 #include "mod_lib.h"
-#include <Singular/distrib.h>
+#include "Singular/distrib.h"
+
+#include "misc/options.h"
+#include "misc/intvec.h"
+
+#include "polys/monomials/ring.h"
+#include "polys/templates/p_Procs.h"
+
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/oswrapper/timer.h"
+#include "resources/feResource.h"
+#include "kernel/oswrapper/feread.h"
+
+#include "subexpr.h"
+#include "cntrlc.h"
+#include "ipshell.h"
+
+#include "fehelp.h"
 
 static FORCE_INLINE void number2mpz(number n, mpz_t m){ number2mpz(n, coeffs_BIGINT, m); }
 static FORCE_INLINE number mpz2number(mpz_t m){ return mpz2number(m, coeffs_BIGINT); }
@@ -380,27 +400,6 @@ lists primeFactorisation(const number n, const int pBound)
 
   return L;
 }
-
-#include <omalloc/omalloc.h>
-#include <misc/mylimits.h>
-
-#include <misc/options.h>
-#include <misc/intvec.h>
-
-#include <polys/monomials/ring.h>
-#include <polys/templates/p_Procs.h>
-
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/oswrapper/timer.h>
-#include <resources/feResource.h>
-#include <kernel/oswrapper/feread.h>
-
-#include "subexpr.h"
-#include "cntrlc.h"
-#include "ipid.h"
-#include "ipshell.h"
-
-#include "fehelp.h"
 
 #ifdef HAVE_STATIC
 #undef HAVE_DYN_RL
@@ -1139,6 +1138,9 @@ void m2_end(int i)
     {
       if (i<=0)
       {
+        //extern long all_farey;
+        //extern long farey_cnt;
+        //if (all_farey!=0L) printf("farey:%ld, cnt=%ld\n",all_farey,farey_cnt);
         if (TEST_V_QUIET)
         {
           if (i==0)

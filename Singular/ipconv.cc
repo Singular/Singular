@@ -8,27 +8,27 @@
 
 
 
-#include <kernel/mod2.h>
-#include <Singular/tok.h>
-#include <Singular/ipid.h>
-#include <misc/intvec.h>
-#include <misc/options.h>
-#include <omalloc/omalloc.h>
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <Singular/subexpr.h>
-#include <coeffs/numbers.h>
-#include <coeffs/coeffs.h>
-#include <coeffs/bigintmat.h>
-//#include <polys/ext_fields/longalg.h>
-#include <polys/matpol.h>
-#include <Singular/links/silink.h>
-#include <kernel/GBEngine/syz.h>
-#include <Singular/attrib.h>
-#include <polys/monomials/ring.h>
-#include <Singular/ipshell.h>
-#include <Singular/number2.h>
-#include <Singular/ipconv.h>
+#include "kernel/mod2.h"
+#include "Singular/tok.h"
+#include "Singular/ipid.h"
+#include "misc/intvec.h"
+#include "misc/options.h"
+#include "omalloc/omalloc.h"
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
+#include "Singular/subexpr.h"
+#include "coeffs/numbers.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/bigintmat.h"
+//#include "polys/ext_fields/longalg.h"
+#include "polys/matpol.h"
+#include "Singular/links/silink.h"
+#include "kernel/GBEngine/syz.h"
+#include "Singular/attrib.h"
+#include "polys/monomials/ring.h"
+#include "Singular/ipshell.h"
+#include "Singular/number2.h"
+#include "Singular/ipconv.h"
 
 typedef void *   (*iiConvertProc)(void * data);
 typedef void    (*iiConvertProcL)(leftv out,leftv in);

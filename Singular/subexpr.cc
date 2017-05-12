@@ -5,40 +5,40 @@
 * ABSTRACT: handling of leftv
 */
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <misc/intvec.h>
-#include <misc/options.h>
+#include "misc/intvec.h"
+#include "misc/options.h"
 
-#include <coeffs/numbers.h>
-#include <coeffs/bigintmat.h>
+#include "coeffs/numbers.h"
+#include "coeffs/bigintmat.h"
 
-#include <coeffs/ffields.h> // nfShowMipo // minpoly printing...
+#include "coeffs/ffields.h" // nfShowMipo // minpoly printing...
 
-#include <polys/monomials/maps.h>
-#include <polys/matpol.h>
-#include <polys/monomials/ring.h>
+#include "polys/monomials/maps.h"
+#include "polys/matpol.h"
+#include "polys/monomials/ring.h"
 
-// #include <coeffs/longrat.h>
+// #include "coeffs/longrat.h"
 
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/GBEngine/syz.h>
-#include <kernel/oswrapper/timer.h>
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/syz.h"
+#include "kernel/oswrapper/timer.h"
 
-#include <Singular/tok.h>
-#include <Singular/ipid.h>
-#include <Singular/ipshell.h>
-#include <Singular/lists.h>
-#include <Singular/attrib.h>
-#include <Singular/links/silink.h>
-#include <Singular/attrib.h>
-#include <Singular/subexpr.h>
-#include <Singular/blackbox.h>
-#include <Singular/number2.h>
+#include "Singular/tok.h"
+#include "Singular/ipid.h"
+#include "Singular/ipshell.h"
+#include "Singular/lists.h"
+#include "Singular/attrib.h"
+#include "Singular/links/silink.h"
+#include "Singular/attrib.h"
+#include "Singular/subexpr.h"
+#include "Singular/blackbox.h"
+#include "Singular/number2.h"
 
 #include <stdlib.h>
 #include <stdio.h>

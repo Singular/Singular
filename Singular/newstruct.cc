@@ -1,11 +1,11 @@
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <Singular/ipid.h>
-#include <Singular/blackbox.h>
-#include <Singular/lists.h>
-#include <Singular/ipid.h>
-#include <Singular/ipshell.h>
-#include <Singular/newstruct.h>
+#include "Singular/ipid.h"
+#include "Singular/blackbox.h"
+#include "Singular/lists.h"
+#include "Singular/ipid.h"
+#include "Singular/ipshell.h"
+#include "Singular/newstruct.h"
 
 #include <ctype.h>
 

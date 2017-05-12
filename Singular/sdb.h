@@ -10,7 +10,7 @@
 #define HAVE_SDB
 
 #ifdef HAVE_SDB
-#include <kernel/structs.h>
+#include "kernel/structs.h"
 
 extern int    sdb_lines[];
 extern char * sdb_files[];

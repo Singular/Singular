@@ -32,47 +32,47 @@
 
 /* includes */
 
-#include <kernel/mod2.h>
-#include <misc/intvec.h>
-#include <Singular/cntrlc.h>
-#include <misc/options.h>
-#include <omalloc/omalloc.h>
-#include <Singular/ipshell.h>
-#include <Singular/ipconv.h>
-#include <coeffs/ffields.h>
-#include <coeffs/coeffs.h>
-#include <Singular/subexpr.h>
-#include <polys/templates/p_Procs.h>
+#include "kernel/mod2.h"
+#include "misc/intvec.h"
+#include "Singular/cntrlc.h"
+#include "misc/options.h"
+#include "omalloc/omalloc.h"
+#include "Singular/ipshell.h"
+#include "Singular/ipconv.h"
+#include "coeffs/ffields.h"
+#include "coeffs/coeffs.h"
+#include "Singular/subexpr.h"
+#include "polys/templates/p_Procs.h"
 
-#include <polys/monomials/maps.h>
+#include "polys/monomials/maps.h"
 
 /* include Hilbert-function */
-#include <kernel/combinatorics/stairc.h>
+#include "kernel/combinatorics/stairc.h"
 
 /** kstd2.cc */
-#include <kernel/GBEngine/kutil.h>
-#include <kernel/GBEngine/khstd.h>
+#include "kernel/GBEngine/kutil.h"
+#include "kernel/GBEngine/khstd.h"
 
-#include <Singular/walk.h>
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <Singular/ipid.h>
-#include <Singular/tok.h>
-#include <coeffs/numbers.h>
-#include <Singular/ipid.h>
-#include <polys/monomials/ring.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <polys/matpol.h>
-#include <polys/weight.h>
-#include <misc/intvec.h>
-#include <kernel/GBEngine/syz.h>
-#include <Singular/lists.h>
-#include <polys/prCopy.h>
-#include <polys/monomials/ring.h>
-//#include <polys/ext_fields/longalg.h>
-#include <polys/clapsing.h>
+#include "Singular/walk.h"
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
+#include "Singular/ipid.h"
+#include "Singular/tok.h"
+#include "coeffs/numbers.h"
+#include "Singular/ipid.h"
+#include "polys/monomials/ring.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "polys/matpol.h"
+#include "polys/weight.h"
+#include "misc/intvec.h"
+#include "kernel/GBEngine/syz.h"
+#include "Singular/lists.h"
+#include "polys/prCopy.h"
+#include "polys/monomials/ring.h"
+//#include "polys/ext_fields/longalg.h"
+#include "polys/clapsing.h"
 
-#include <coeffs/mpr_complex.h>
+#include "coeffs/mpr_complex.h"
 
 #include <stdio.h>
 // === Zeit & System (Holger Croeni ===
@@ -82,7 +82,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <float.h>
-#include <misc/mylimits.h>
+#include "misc/mylimits.h"
 #include <sys/types.h>
 
 int nstep;

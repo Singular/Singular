@@ -23,12 +23,12 @@
 #ifndef MISC_H
 #define MISC_H
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <coeffs/si_gmp.h>
-#include <coeffs/coeffs.h>
+#include "coeffs/si_gmp.h"
+#include "coeffs/coeffs.h"
 
-#include <Singular/lists.h>
+#include "Singular/lists.h"
 
 /**
  * Factorises a given bigint number n into its prime factors less
@@ -63,9 +63,9 @@ lists primeFactorisation(
 
 #ifdef PDEBUG
 #if (OM_TRACK > 2) && defined(OM_TRACK_CUSTOM)
-// #include <kernel/polys.h>
+// #include "kernel/polys.h"
 /* Needed for debug Version of p_SetRingOfLeftv, Oliver */
-#include <kernel/structs.h>
+#include "kernel/structs.h"
 void p_SetRingOfLeftv(leftv l, ring r);
 #endif
 #endif
