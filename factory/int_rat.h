@@ -25,7 +25,6 @@
 #include "canonicalform.h"
 #include "int_cf.h"
 #include "imm.h"
-// #include <factory/cf_gmp.h>
 
 /**
  * factory's class for rationals

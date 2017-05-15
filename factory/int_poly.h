@@ -27,7 +27,7 @@
 #include "canonicalform.h"
 
 #ifdef HAVE_OMALLOC
-#  include <omalloc/omalloc.h>
+#  include "omalloc/omalloc.h"
 #endif
 
 class term {

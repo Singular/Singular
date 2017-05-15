@@ -7,7 +7,7 @@
  *******************************************************************/
 #ifndef OM_ALLOC_PRIVATE_H
 #define OM_ALLOC_PRIVATE_H
-#include <omalloc/omAllocSystem.h>
+#include "omalloc/omAllocSystem.h"
 
 /*******************************************************************
  *

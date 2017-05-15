@@ -1,7 +1,6 @@
 
 #include "config.h"
 
-
 #include "cf_assert.h"
 
 #include "cf_defs.h"
@@ -9,8 +8,6 @@
 #include "cf_iter.h"
 #include "fac_sqrfree.h"
 #include "cf_algorithm.h"
-
-#include <factory/cf_gmp.h>
 
 #ifdef HAVE_NTL
 #ifndef NOSTREAMIO

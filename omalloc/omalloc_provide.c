@@ -9,8 +9,8 @@
 
 #if OM_PROVIDE_MALLOC > 0
 #if OM_PROVIDE_MALLOC > 1
-#include <omalloc/omalloc_debug.c>
+#include "omalloc/omalloc_debug.c"
 #else
-#include <omalloc/omalloc.c>
+#include "omalloc/omalloc.c"
 #endif
 #endif

@@ -14,7 +14,7 @@
 #include "imm.h"
 #include "cf_factory.h"
 
-#include <factory/cf_gmp.h>
+#include "factory/cf_gmp.h"
 
 
 void gmp_numerator ( const CanonicalForm & f, mpz_ptr result )

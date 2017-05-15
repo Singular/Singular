@@ -16,7 +16,6 @@
 #include "config.h"
 
 
-// #include <factory/factoryconf.h>
 // #include "factory.h"
 #include "cf_iter.h"
 #include "canonicalform.h"

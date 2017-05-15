@@ -24,11 +24,10 @@
 #include "cf_assert.h"
 
 #include "int_cf.h"
-// #include <factory/cf_gmp.h>
 #include "gmpext.h"
 
 #ifdef HAVE_OMALLOC
-#  include <omalloc/omalloc.h>
+#  include "omalloc/omalloc.h"
 #endif
 
 /**

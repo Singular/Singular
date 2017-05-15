@@ -1,7 +1,7 @@
-#include <factory/factory.h>
+#include "factory/factory.h"
 #ifdef SINGULAR
-#include <resources/feFopen.h>
-#include <resources/feResource.h>
+#include "resources/feFopen.h"
+#include "resources/feResource.h"
 #endif
 #include "cf_assert.h"
 

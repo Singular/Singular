@@ -11,10 +11,10 @@
 // #include "config.h"
 
 #include "canonicalform.h"
-#include <factory/cf_gmp.h>
+#include "factory/cf_gmp.h"
 
 #ifdef SINGULAR
-#include <resources/feFopen.h>
+#include "resources/feFopen.h"
 #endif
 
 //TODO make these functions members of CanonicalForm?

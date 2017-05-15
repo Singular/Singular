@@ -49,7 +49,7 @@ extern "C" {
 #include "omOpts.h"
 #include "omBinPage.h"
 #include "omAllocSystem.h"
-#include <omalloc/omTables.h>
+#include "omalloc/omTables.h"
 #include "omAllocPrivate.h"
 #include "omDebug.h"
 #include "omInline.h"

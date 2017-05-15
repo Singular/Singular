@@ -9,7 +9,7 @@
 
 #include <new>
 #include <stdlib.h>
-#include <omalloc/omallocClass.h>
+#include "omalloc/omallocClass.h"
 
 // The C++ standard has ratified a change to the new operator.
 //

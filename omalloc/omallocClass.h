@@ -12,7 +12,7 @@
 
 #include <new>
 #include <stdlib.h>
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
 class omallocClass
 {

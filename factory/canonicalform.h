@@ -26,14 +26,14 @@
 
 #include "cf_defs.h"
 #include "variable.h"
-#include <factory/cf_gmp.h>
-#include <factory/templates/ftmpl_list.h>
-#include <factory/templates/ftmpl_array.h>
-#include <factory/templates/ftmpl_afactor.h>
-#include <factory/templates/ftmpl_factor.h>
-#include <factory/templates/ftmpl_matrix.h>
+#include "factory/cf_gmp.h"
+#include "factory/templates/ftmpl_list.h"
+#include "factory/templates/ftmpl_array.h"
+#include "factory/templates/ftmpl_afactor.h"
+#include "factory/templates/ftmpl_factor.h"
+#include "factory/templates/ftmpl_matrix.h"
 #ifdef HAVE_OMALLOC
-#include <omalloc/omallocClass.h>
+#include "omalloc/omallocClass.h"
 #endif
 
 /*BEGINPUBLIC*/

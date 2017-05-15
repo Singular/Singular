@@ -9,8 +9,6 @@
 
 #ifdef HAVE_NTL
 
-// #include <factory/cf_gmp.h>
-
 #include "cf_defs.h"
 #include "canonicalform.h"
 #include "cf_iter.h"

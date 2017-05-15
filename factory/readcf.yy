@@ -5,7 +5,7 @@
 
 #include "config.h"
 
-#include <factory/factoryconf.h>
+#include "factory/factoryconf.h"
 
 #if defined(WINNT) && ! defined(__GNUC__)
 # include <malloc.h>

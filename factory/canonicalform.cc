@@ -18,8 +18,6 @@
 #include "facMul.h"
 #include "FLINTconvert.h"
 
-#include <factory/cf_gmp.h>
-
 #ifndef NOSTREAMIO
 CanonicalForm readCF( ISTREAM& );
 #endif /* NOSTREAMIO */
@@ -1723,11 +1721,11 @@ bextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, C
         } else
             // stupid special cases
             if ( ! f.isZero() ) {
-                a = 1/f; b = 0; return CanonicalForm( 1 );
+                a = 1/f; b = 0; return CanonicalForm( 1L );
             } else if ( ! g.isZero() ) {
-                a = 0; b = 1/g; return CanonicalForm( 1 );
+                a = 0; b = 1/g; return CanonicalForm( 1L );
             } else {
-                a = 0; b = 0; return CanonicalForm( 0 );
+                a = 0; b = 0; return CanonicalForm( 0L );
             }
     }
     else if ( what )
@@ -1759,7 +1757,7 @@ CanonicalForm
 blcm ( const CanonicalForm & f, const CanonicalForm & g )
 {
     if ( f.isZero() || g.isZero() )
-        return CanonicalForm( 0 );
+        return CanonicalForm( 0L );
 /*
     else if (f.isOne())
         return g;
@@ -1840,18 +1838,18 @@ power ( const CanonicalForm & f, int n )
 {
   ASSERT( n >= 0, "illegal exponent" );
   if ( f.isZero() )
-    return 0;
+    return CanonicalForm(0L);
   else  if ( f.isOne() )
     return f;
   else  if ( f == -1 )
   {
     if ( n % 2 == 0 )
-      return 1;
+      return CanonicalForm(1L);
     else
-      return -1;
+      return CanonicalForm(-1L);
   }
   else  if ( n == 0 )
-    return 1;
+    return CanonicalForm(1L);
 
   //else if (f.inGF())
   //{

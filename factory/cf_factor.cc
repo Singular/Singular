@@ -36,7 +36,7 @@
 #include "NTLconvert.h"
 #endif
 
-#include <factory/cf_gmp.h>
+#include "factory/cf_gmp.h"
 #ifdef HAVE_FLINT
 #include "FLINTconvert.h"
 #endif

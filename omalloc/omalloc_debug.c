@@ -15,4 +15,4 @@
 #define OM_CHECK 1
 #endif
 
-#include <omalloc/omalloc.c>
+#include "omalloc/omalloc.c"

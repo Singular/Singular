@@ -24,7 +24,7 @@
 
 #include "variable.h"
 #include "canonicalform.h"
-#include <factory/templates/ftmpl_list.h>
+#include "factory/templates/ftmpl_list.h"
 
 /*BEGINPUBLIC*/
 

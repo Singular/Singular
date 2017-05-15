@@ -17,7 +17,7 @@
 omBinPage_t om_ZeroPage[] = {{0, NULL, NULL, NULL, NULL}};
 omSpecBin om_SpecBin = NULL;
 
-#include <omalloc/omTables.inc>
+#include "omalloc/omTables.inc"
 
 
 /*******************************************************************
