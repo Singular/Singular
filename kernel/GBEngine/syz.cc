@@ -6,22 +6,22 @@
 * ABSTRACT: resolutions
 */
 
-#include <kernel/mod2.h>
-#include <misc/options.h>
-#include <omalloc/omalloc.h>
-#include <kernel/polys.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/GBEngine/kutil.h>
-#include <kernel/combinatorics/stairc.h>
-#include <misc/intvec.h>
-#include <coeffs/numbers.h>
-#include <kernel/ideals.h>
-#include <misc/intvec.h>
-#include <polys/monomials/ring.h>
-#include <kernel/GBEngine/syz.h>
-#include <polys/prCopy.h>
+#include "kernel/mod2.h"
+#include "misc/options.h"
+#include "omalloc/omalloc.h"
+#include "kernel/polys.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/kutil.h"
+#include "kernel/combinatorics/stairc.h"
+#include "misc/intvec.h"
+#include "coeffs/numbers.h"
+#include "kernel/ideals.h"
+#include "misc/intvec.h"
+#include "polys/monomials/ring.h"
+#include "kernel/GBEngine/syz.h"
+#include "polys/prCopy.h"
 
-#include <polys/nc/sca.h>
+#include "polys/nc/sca.h"
 
 static intvec * syPrepareModComp(ideal arg,intvec ** w)
 {
@@ -117,13 +117,15 @@ static void syMinStep(ideal mod,ideal &syz,BOOLEAN final=FALSE,ideal up=NULL,
 * in the module below--*/
   searchUnit = TRUE;
   int curr_syz_limit = rGetCurrSyzLimit(currRing);
+  BOOLEAN bHasGlobalOrdering=rHasGlobalOrdering(currRing);
+  BOOLEAN bField_has_simple_inverse=rField_has_simple_inverse(currRing);
   while (searchUnit)
   {
     i=0;
     j=IDELEMS(syz);
     while ((j>0) && (syz->m[j-1]==NULL)) j--;
     existsUnit = FALSE;
-    if (rHasGlobalOrdering(currRing))
+    if (bHasGlobalOrdering)
     {
       while ((i<j) && (!existsUnit))
       {
@@ -159,7 +161,7 @@ static void syMinStep(ideal mod,ideal &syz,BOOLEAN final=FALSE,ideal up=NULL,
 //--takes out the founded syzygy--
       if (TEST_OPT_PROT) PrintS("f");
       actWith = syz->m[i];
-      if (!rField_has_simple_inverse(currRing)) p_Cleardenom(actWith, currRing);
+      if (!bField_has_simple_inverse) p_Cleardenom(actWith, currRing);
 //Print("actWith: ");pWrite(actWith);
       syz->m[i] = NULL;
       for (k=i;k<j-1;k++)  syz->m[k] = syz->m[k+1];
@@ -357,7 +359,7 @@ void syMinimizeResolvente(resolvente res, int length, int first)
   intvec *dummy;
 
   if (syzIndex<1) syzIndex=1;
-  if ((syzIndex==1) && (idHomModule(res[0],currRing->qideal,&dummy)) && (!rIsPluralRing(currRing)))
+  if ((syzIndex==1) && (!rIsPluralRing(currRing)) && (idHomModule(res[0],currRing->qideal,&dummy)))
   {
     syMinStep1(res,length);
     delete dummy;

@@ -3285,10 +3285,8 @@ BOOLEAN   p_VectorHasUnitB(poly p, int * k, const ring r)
         *k = i;
         return TRUE;
       }
-      else
-        pIter(q);
     }
-    else pIter(q);
+    pIter(q);
   }
   return FALSE;
 }
