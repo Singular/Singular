@@ -32,30 +32,30 @@
 */
 #define TRANSEXT_PRIVATES
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-#include <omalloc/omalloc.h>
-#include <factory/factory.h>
+#include "omalloc/omalloc.h"
+#include "factory/factory.h"
 
-#include <reporter/reporter.h>
+#include "reporter/reporter.h"
 
-#include <coeffs/coeffs.h>
-#include <coeffs/numbers.h>
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
 
-#include <coeffs/longrat.h>
+#include "coeffs/longrat.h"
 
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
-#include <polys/simpleideals.h>
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
+#include "polys/simpleideals.h"
 
-#include <polys/clapsing.h>
-#include <polys/clapconv.h>
+#include "polys/clapsing.h"
+#include "polys/clapconv.h"
 
-#include <polys/prCopy.h>
+#include "polys/prCopy.h"
 #include "transext.h"
 #include "algext.h"
 
-#include <polys/PolyEnumerator.h>
+#include "polys/PolyEnumerator.h"
 
 
 /* constants for controlling the complexity of numbers */

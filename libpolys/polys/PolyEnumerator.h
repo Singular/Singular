@@ -16,9 +16,9 @@
 #define POLYENUMERATOR_H
 
 // include basic definitions
-#include <coeffs/Enumerator.h>
-#include <polys/monomials/monomials.h>
-#include <reporter/reporter.h> // for assume etc.
+#include "coeffs/Enumerator.h"
+#include "polys/monomials/monomials.h"
+#include "reporter/reporter.h" // for assume etc.
 
 /** @class CBasePolyEnumerator
  *

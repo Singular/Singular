@@ -2,18 +2,13 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-#include <omalloc/omalloc.h>
-#include <misc/auxiliary.h>
+#include "omalloc/omalloc.h"
+#include "misc/auxiliary.h"
 
-#include <polys/monomials/p_polys.h>
-//#include <kernel/pShallowCopyDelete.h>
-#include <coeffs/coeffs.h>
-#include <polys/monomials/ring.h>
-//#include <kernel/GBEngine/kutil.h>
-#include <polys/kbuckets.h>
-
-// #include <polys/operations/pShallowCopyDelete.h>
-
+#include "polys/monomials/p_polys.h"
+#include "coeffs/coeffs.h"
+#include "polys/monomials/ring.h"
+#include "polys/kbuckets.h"
 
 #ifdef HAVE_COEF_BUCKETS
 #define USE_COEF_BUCKETS

@@ -6,13 +6,13 @@
 */
 
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
 
 
-#include <misc/int64vec.h>
-#include <misc/intvec.h>
-#include <omalloc/omalloc.h>
+#include "misc/int64vec.h"
+#include "misc/intvec.h"
+#include "omalloc/omalloc.h"
 
 /*0 implementation*/
 

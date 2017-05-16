@@ -1,4 +1,4 @@
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
 #include <unistd.h>
 #include <stdio.h>
@@ -9,9 +9,9 @@
 
 #include <gmp.h>
 
-#include <omalloc/omalloc.h>
-#include <reporter/s_buff.h>
-#include <reporter/si_signals.h>
+#include "omalloc/omalloc.h"
+#include "reporter/s_buff.h"
+#include "reporter/si_signals.h"
 
 //struct s_buff_s
 //{

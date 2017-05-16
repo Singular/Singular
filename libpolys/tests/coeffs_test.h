@@ -1,24 +1,24 @@
-#include <misc/auxiliary.h>
-#include <omalloc/omalloc.h>
+#include "misc/auxiliary.h"
+#include "omalloc/omalloc.h"
 
 
-#include <reporter/reporter.h>
-#include <resources/feResource.h>
+#include "reporter/reporter.h"
+#include "resources/feResource.h"
 
-#include <coeffs/coeffs.h>
-#include <coeffs/numbers.h>
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
 
 
 // the following headers are private...
-#include <coeffs/longrat.h>
-#include <coeffs/gnumpfl.h>
-#include <coeffs/gnumpc.h>
-#include <coeffs/shortfl.h>
-#include <coeffs/ffields.h>
-#include <coeffs/modulop.h>
-#include <coeffs/rmodulon.h>
-#include <coeffs/rmodulo2m.h>
-#include <coeffs/rintegers.h>
+#include "coeffs/longrat.h"
+#include "coeffs/gnumpfl.h"
+#include "coeffs/gnumpc.h"
+#include "coeffs/shortfl.h"
+#include "coeffs/ffields.h"
+#include "coeffs/modulop.h"
+#include "coeffs/rmodulon.h"
+#include "coeffs/rmodulo2m.h"
+#include "coeffs/rintegers.h"
 
 
 #include "common.h"

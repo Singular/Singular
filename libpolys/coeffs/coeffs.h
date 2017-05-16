@@ -9,18 +9,18 @@
 #ifndef COEFFS_H
 #define COEFFS_H
 
-# include <misc/auxiliary.h>
-#include <omalloc/omalloc.h>
+#include "misc/auxiliary.h"
+#include "omalloc/omalloc.h"
 
-#include <misc/sirandom.h>
+#include "misc/sirandom.h"
 /* for assume: */
-#include <reporter/reporter.h>
-#include <reporter/s_buff.h>
-#include <factory/factory.h>
+#include "reporter/reporter.h"
+#include "reporter/s_buff.h"
+#include "factory/factory.h"
 
-#include <coeffs/si_gmp.h>
-#include <coeffs/Enumerator.h>
-#include <coeffs/numstats.h> // for STATISTIC(F) counting macro
+#include "coeffs/si_gmp.h"
+#include "coeffs/Enumerator.h"
+#include "coeffs/numstats.h" // for STATISTIC(F) counting macro
 
 class CanonicalForm;
 

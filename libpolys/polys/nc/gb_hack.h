@@ -4,7 +4,7 @@
 #ifdef HAVE_PLURAL
 
 #ifdef PLURAL_INTERNAL_DECLARATIONS
-#include <polys/nc/nc.h>
+#include "polys/nc/nc.h"
 
 struct  spolyrec; typedef struct spolyrec    polyrec; typedef polyrec *          poly;
 struct ip_sring; typedef struct ip_sring *         ring;

@@ -1,4 +1,4 @@
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
 class SimplestTestSuite : public CxxTest::TestSuite
 {

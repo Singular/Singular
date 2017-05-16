@@ -22,13 +22,13 @@
 
 
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <reporter/reporter.h>
+#include "reporter/reporter.h"
 
-#include <resources/feResource.h>
+#include "resources/feResource.h"
 
 #include "mod_raw.h"
 

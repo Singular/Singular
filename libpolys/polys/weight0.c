@@ -6,8 +6,8 @@
 * ABSTRACT:
 */
 
-#include <misc/auxiliary.h>
-#include <omalloc/omalloc.h>
+#include "misc/auxiliary.h"
+#include "omalloc/omalloc.h"
 
 #include <math.h>
 #include <string.h>

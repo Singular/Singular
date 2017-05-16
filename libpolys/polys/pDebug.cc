@@ -18,7 +18,7 @@
 
 
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
 
 #ifdef PDEBUG
@@ -27,12 +27,12 @@
 // #undef PDEBUG
 // #define PDEBUG 2
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
 
-#include <coeffs/coeffs.h>
+#include "coeffs/coeffs.h"
 
 /***************************************************************
  *

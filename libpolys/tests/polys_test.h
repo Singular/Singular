@@ -4,21 +4,21 @@ using namespace std;
 // the following headers are private...
 
 
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
 
-#include <polys/simpleideals.h>
+#include "polys/simpleideals.h"
 
 #if 0 //ifdef HAVE_FACTORY
-#include <polys/clapsing.h>
-#include <factory/factory.h>
+#include "polys/clapsing.h"
+#include "factory/factory.h"
 #endif
 
 
 #define TRANSEXT_PRIVATES
 
-#include <polys/ext_fields/algext.h>
-#include <polys/ext_fields/transext.h>
+#include "polys/ext_fields/algext.h"
+#include "polys/ext_fields/transext.h"
 
 
 class MyGlobalPrintingFixture : public GlobalPrintingFixture

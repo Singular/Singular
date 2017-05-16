@@ -364,12 +364,12 @@ sub writePreamble() {
   foreach my $header (@headers) {
     print "#include $header\n";
   }
-  print "#include <cxxtest/TestListener.h>\n";
-  print "#include <cxxtest/TestTracker.h>\n";
-  print "#include <cxxtest/TestRunner.h>\n";
-  print "#include <cxxtest/RealDescriptions.h>\n";
-  print "#include <cxxtest/$runner.h>\n" if $runner;
-  print "#include <cxxtest/$gui.h>\n" if $gui;
+  print "#include \"cxxtest/TestListener.h\"\n";
+  print "#include \"cxxtest/TestTracker.h\"\n";
+  print "#include \"cxxtest/TestRunner.h\"\n";
+  print "#include \"cxxtest/RealDescriptions.h\"\n";
+  print "#include \"cxxtest/$runner.h\"\n" if $runner;
+  print "#include \"cxxtest/$gui.h\"\n" if $gui;
   print "\n";
   $didPreamble = 1;
 }
@@ -503,7 +503,7 @@ sub writeStaticDescription() {
 }
 
 sub writeRoot() {
-  print "#include <cxxtest/Root.cpp>\n";
+  print "#include \"cxxtest/Root.cpp\"\n";
 }
 
 sub writeInitialize() {

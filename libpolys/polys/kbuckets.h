@@ -16,8 +16,8 @@ class  kBucket; typedef kBucket* kBucket_pt;
 struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
 struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* const_ring;
 
-#include <polys/monomials/ring.h> // for ring->p_Procs->p_kBucketSetLm!
-#include <polys/templates/p_Procs.h> // for p_kBucketSetLm_Proc_Ptr
+#include "polys/monomials/ring.h" // for ring->p_Procs->p_kBucketSetLm!
+#include "polys/templates/p_Procs.h" // for p_kBucketSetLm_Proc_Ptr
 
 //////////////////////////////////////////////////////////////////////////
 // Creation/Destruction of buckets

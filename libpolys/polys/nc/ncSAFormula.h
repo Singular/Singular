@@ -5,12 +5,10 @@
  *****************************************/
 #ifdef HAVE_PLURAL
 
-// #include <ncSAFormula.h> // for CFormulaPowerMultiplier and enum Enum_ncSAType
-
 // //////////////////////////////////////////////////////////////////////// //
 
-#include <polys/monomials/ring.h>
-#include <polys/nc/nc.h>
+#include "polys/monomials/ring.h"
+#include "polys/nc/nc.h"
 
 bool ncInitSpecialPowersMultiplication(ring r);
 

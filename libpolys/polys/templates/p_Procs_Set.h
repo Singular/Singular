@@ -13,8 +13,8 @@
  *  Created: 12/00
  *******************************************************************/
 
-#include <reporter/reporter.h>
-#include <misc/auxiliary.h>
+#include "reporter/reporter.h"
+#include "misc/auxiliary.h"
 
 // extract p_Procs properties from a ring
 static inline p_Field p_FieldIs(ring r)

@@ -6,17 +6,17 @@
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
 */
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-#include <omalloc/omalloc.h>
-#include <misc/mylimits.h>
+#include "omalloc/omalloc.h"
+#include "misc/mylimits.h"
 
-#include <misc/options.h>
+#include "misc/options.h"
 
-#include <reporter/reporter.h>
-#include <misc/intvec.h>
+#include "reporter/reporter.h"
+#include "misc/intvec.h"
 
-#include <coeffs/numbers.h>
+#include "coeffs/numbers.h"
 
 #include "monomials/ring.h"
 #include "monomials/p_polys.h"

@@ -8,15 +8,14 @@
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
  *******************************************************************/
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-#include <polys/sbuckets.h>
+#include "polys/sbuckets.h"
 
-#include <polys/monomials/ring.h>
-//#include <kernel/p_Procs.h>
-#include <polys/monomials/p_polys.h>
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
 
 
 

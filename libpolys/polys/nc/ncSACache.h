@@ -4,11 +4,9 @@
  *  Computer Algebra System SINGULAR     *
  *****************************************/
 
-// #include <ncSACache.h> // for CCacheHash etc classes
-
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
-#include <reporter/reporter.h> // for Print!
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
+#include "reporter/reporter.h" // for Print!
 // //////////////////////////////////////////////////////////////////////// //
 //
 

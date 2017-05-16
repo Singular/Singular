@@ -33,7 +33,7 @@
 *           - if the denominator is a constant - by a polynomial over Q.
 */
 
-#include <coeffs/coeffs.h>
+#include "coeffs/coeffs.h"
 
 struct ip_sring;
 typedef struct ip_sring * ring;

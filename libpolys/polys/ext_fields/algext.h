@@ -30,7 +30,7 @@
 *               computing in K[a_1, ..., a_s] / I.
 */
 
-#include <coeffs/coeffs.h>
+#include "coeffs/coeffs.h"
 
 // Forward declarations
 struct ip_sring; typedef struct ip_sring * ring;

@@ -1,9 +1,9 @@
 #ifndef COEFFRINGS_H
 #define COEFFRINGS_H
 
-#include <misc/auxiliary.h>
-#include <coeffs/coeffs.h>
-#include <polys/monomials/ring.h>
+#include "misc/auxiliary.h"
+#include "coeffs/coeffs.h"
+#include "polys/monomials/ring.h"
 
 static FORCE_INLINE number n_Copy(number n, const ring r){ return n_Copy(n, r->cf); }
 static FORCE_INLINE void n_Delete(number* p, const ring r){ n_Delete(p, r->cf); }

@@ -5,18 +5,18 @@
 * ABSTRACT: output system
 */
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <reporter/reporter.h>
-#include <resources/feResource.h>
-#include <resources/feFopen.h>
+#include "reporter/reporter.h"
+#include "resources/feResource.h"
+#include "resources/feFopen.h"
 //#include "options.h"
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <misc/mylimits.h>
+#include "misc/mylimits.h"
 #include <stdarg.h>
 #include <sys/stat.h>
 #include <ctype.h>

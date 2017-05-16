@@ -20,7 +20,7 @@
 
 
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
 #ifdef HAVE_PLURAL
 
@@ -35,11 +35,10 @@
 #include "nc/nc.h"
 #include "nc/sca.h"
 
-#include <misc/options.h>
-#include <coeffs/numbers.h>
+#include "misc/options.h"
+#include "coeffs/numbers.h"
 
 
-// #include <kernel/p_Procs.h>
 #include "monomials/ring.h"
 #include "monomials/p_polys.h"
 

@@ -10,11 +10,11 @@
 #ifndef DERROR_C
 #define DERROR_C
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <reporter/reporter.h>
+#include "reporter/reporter.h"
 
 #include <stdarg.h>
 #include <stdio.h>

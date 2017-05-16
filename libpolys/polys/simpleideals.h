@@ -6,9 +6,9 @@
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
-#include <omalloc/omalloc.h>
-#include <polys/monomials/ring.h>
-#include <polys/matpol.h>
+#include "omalloc/omalloc.h"
+#include "polys/monomials/ring.h"
+#include "polys/matpol.h"
 
 /// The following sip_sideal structure has many different uses
 /// thoughout Singular. Basic use-cases for it are:

@@ -7,8 +7,7 @@
 * ABSTRACT
 */
 
-// #include <kernel/structs.h>
-#include <polys/monomials/ring.h>
+#include "polys/monomials/ring.h"
 
 // THIS IS REALLY DIRTY: ip_smatrix HAS TO BE IDENTICAL TO ip_sideal
 // SO, DON'T CHANGE THE DECLARATION OF ip_smatrix

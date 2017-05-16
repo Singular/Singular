@@ -7,8 +7,8 @@
 * ABSTRACT: class intvec: lists/vectors of integers
 */
 #include <string.h>
-#include <omalloc/omallocClass.h>
-#include <reporter/reporter.h>
+#include "omalloc/omallocClass.h"
+#include "reporter/reporter.h"
 
 
 class intvec :public omallocClass

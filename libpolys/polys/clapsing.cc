@@ -8,23 +8,15 @@
 
 //#define FACTORIZE2_DEBUG
 
-
-
-
-
-
-
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 #include "clapsing.h"
 
-#include <factory/factory.h>
+#include "factory/factory.h"
 
-#include <omalloc/omalloc.h>
-#include <coeffs/numbers.h>
-#include <coeffs/coeffs.h>
-#include <coeffs/bigintmat.h>
-
-// #include <kernel/ffields.h>
+#include "omalloc/omalloc.h"
+#include "coeffs/numbers.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/bigintmat.h"
 
 #include "monomials/ring.h"
 #include "simpleideals.h"
@@ -37,14 +29,13 @@
 
 
 #include "clapconv.h"
-// #include <kernel/clapconv.h>
 
-#include <polys/monomials/p_polys.h>
-#include <polys/monomials/ring.h>
-#include <polys/simpleideals.h>
-#include <misc/intvec.h>
-#include <polys/matpol.h>
-#include <coeffs/bigintmat.h>
+#include "polys/monomials/p_polys.h"
+#include "polys/monomials/ring.h"
+#include "polys/simpleideals.h"
+#include "misc/intvec.h"
+#include "polys/matpol.h"
+#include "coeffs/bigintmat.h"
 
 
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);

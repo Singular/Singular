@@ -19,7 +19,7 @@
 
 
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
 #ifdef HAVE_PLURAL
 
@@ -28,29 +28,24 @@
 #include "sca.h"
 #include "gb_hack.h"
 
-#include <polys/monomials/ring.h>
+#include "polys/monomials/ring.h"
 
-#include <coeffs/numbers.h>
+#include "coeffs/numbers.h"
 
-// #include <polys/febase.h>
-#include <misc/options.h>
+#include "misc/options.h"
 
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
 
-#include <polys/simpleideals.h>
-#include <polys/matpol.h>
+#include "polys/simpleideals.h"
+#include "polys/matpol.h"
 
-#include <polys/kbuckets.h>
-#include <polys/sbuckets.h>
+#include "polys/kbuckets.h"
+#include "polys/sbuckets.h"
 
-// #include <polys/kstd1.h>
-#include <polys/prCopy.h>
+#include "polys/prCopy.h"
 
-#include <polys/operations/p_Mult_q.h>
-
-// #include <polys/pInline1.h>
-
+#include "polys/operations/p_Mult_q.h"
 
 #include "summator.h"
 
@@ -58,7 +53,7 @@
 #include "ncSAFormula.h" // for CFormulaPowerMultiplier and enum Enum_ncSAType
 
 // #ifdef HAVE_RATGRING
-// #include <polys/ratgring.h>
+// #include "polys/ratgring.h"
 // #endif
 
 static poly NF_Proc_Dummy(ideal, ideal, poly, int, int, const ring)

@@ -7,12 +7,11 @@
 #ifndef INTVEC_CC
 #define INTVEC_CC
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-// #include <resources/feFopen.h>
-#include <misc/intvec.h>
-#include <misc/options.h>
-#include <omalloc/omalloc.h>
+#include "misc/intvec.h"
+#include "misc/options.h"
+#include "omalloc/omalloc.h"
 
 #pragma GCC push_options
 #pragma GCC optimize ("wrapv")

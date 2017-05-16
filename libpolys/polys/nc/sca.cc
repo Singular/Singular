@@ -21,45 +21,36 @@
 
 
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
 #ifdef HAVE_PLURAL
 
 // for
 #define PLURAL_INTERNAL_DECLARATIONS
 
-#include <polys/nc/sca.h>
-#include <polys/nc/nc.h>
-#include <polys/nc/gb_hack.h>
-// #include <polys/gring.h>
+#include "polys/nc/sca.h"
+#include "polys/nc/nc.h"
+#include "polys/nc/gb_hack.h"
 
+#include "coeffs/numbers.h"
 
-#include <coeffs/numbers.h>
+#include "misc/options.h"
 
-// #include <polys/febase.h>
-#include <misc/options.h>
+#include "polys/monomials/p_polys.h"
 
-#include <polys/monomials/p_polys.h>
+#include "polys/simpleideals.h"
+#include "misc/intvec.h"
 
-// #include <polys/kutil.h>
-#include <polys/simpleideals.h>
-#include <misc/intvec.h>
+#include "polys/monomials/ring.h"
+#include "polys/kbuckets.h"
+#include "polys/sbuckets.h"
 
-#include <polys/monomials/ring.h>
-#include <polys/kbuckets.h>
-// #include <polys/kstd1.h>
-#include <polys/sbuckets.h>
+#include "polys/prCopy.h"
 
-#include <polys/prCopy.h>
+#include "polys/operations/p_Mult_q.h"
+#include "polys/templates/p_MemAdd.h"
 
-#include <polys/operations/p_Mult_q.h>
-#include <polys/templates/p_MemAdd.h>
-
-// #include <polys/kutil.h>
-// #include <polys/kstd1.h>
-
-#include <polys/weight.h>
-
+#include "polys/weight.h"
 
 // poly functions defined in p_Procs :
 

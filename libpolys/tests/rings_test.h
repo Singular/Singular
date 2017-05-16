@@ -4,8 +4,8 @@ using namespace std;
 // the following headers are private...
 
 
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
 
 
 

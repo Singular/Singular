@@ -7,7 +7,7 @@
 * ABSTRACT
 */
 
-#include <polys/monomials/ring.h>
+#include "polys/monomials/ring.h"
 
 extern short * ecartWeights;
 //extern pFDegProc pFDegOld;

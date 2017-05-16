@@ -10,14 +10,13 @@
 
 
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <misc/options.h>
-#include <misc/intvec.h>
+#include "misc/options.h"
+#include "misc/intvec.h"
 
-// #include <coeffs/longrat.h>
 #include "matpol.h"
 
 #include "monomials/p_polys.h"

@@ -20,7 +20,7 @@
 
 
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
 #ifdef HAVE_PLURAL
 
@@ -32,9 +32,9 @@
 #define OUTPUT 0
 #endif
 
-#include <reporter/reporter.h>
+#include "reporter/reporter.h"
 
-#include <coeffs/numbers.h>
+#include "coeffs/numbers.h"
 
 #include "nc/ncSAFormula.h"
 // for CFormulaPowerMultiplier

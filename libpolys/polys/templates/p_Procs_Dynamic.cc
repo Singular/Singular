@@ -7,24 +7,23 @@
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
  *******************************************************************/
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-#include <factory/factory.h>
+#include "factory/factory.h"
 
-#include <reporter/reporter.h>
+#include "reporter/reporter.h"
 
-// #include <polys/structs.h>
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
 
-#include <polys/kbuckets.h>
+#include "polys/kbuckets.h"
 
-#include <polys/templates/p_Numbers.h>
+#include "polys/templates/p_Numbers.h"
 
-#include <polys/templates/p_Procs.h>
-#include <polys/templates/p_MemCmp.h>
-#include <polys/templates/p_MemAdd.h>
-#include <polys/templates/p_MemCopy.h>
+#include "polys/templates/p_Procs.h"
+#include "polys/templates/p_MemCmp.h"
+#include "polys/templates/p_MemAdd.h"
+#include "polys/templates/p_MemCopy.h"
 
 
 #ifdef HAVE_DL
@@ -145,7 +144,7 @@ static void* GetGeneralProc(p_Proc proc)
 }
 
 #ifdef RDEBUG
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
 static const char* GetGeneralProcName(p_Proc proc)
 {

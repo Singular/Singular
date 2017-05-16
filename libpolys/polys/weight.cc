@@ -10,17 +10,17 @@
 
 
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <misc/options.h>
-#include <misc/intvec.h>
+#include "misc/options.h"
+#include "misc/intvec.h"
 
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
 
-#include <polys/weight.h>
+#include "polys/weight.h"
 
 #include <math.h>
 

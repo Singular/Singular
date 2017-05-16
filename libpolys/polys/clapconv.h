@@ -10,8 +10,8 @@
 #ifndef INCL_SINGCONV_H
 #define INCL_SINGCONV_H
 
-#include <polys/monomials/ring.h>
-#include <factory/factory.h>
+#include "polys/monomials/ring.h"
+#include "factory/factory.h"
 
 
 poly convFactoryPSingP ( const CanonicalForm & f, const ring r );

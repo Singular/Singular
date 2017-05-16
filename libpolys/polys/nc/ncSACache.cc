@@ -20,7 +20,7 @@
 
 
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
 #ifndef SING_NDEBUG
 #define OUTPUT MYTEST
@@ -35,7 +35,7 @@ namespace
 }
 #endif
 
-#include <coeffs/numbers.h>
+#include "coeffs/numbers.h"
 
 #include "nc/ncSACache.h" // for CCacheHash etc classes
 

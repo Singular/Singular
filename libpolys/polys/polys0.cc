@@ -8,13 +8,11 @@
 
 /* includes */
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-// #include <polys/structs.h>
-#include <coeffs/numbers.h>
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
-// #include <???/febase.h>
+#include "coeffs/numbers.h"
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
 
 /*2
 * writes a monomial (p),

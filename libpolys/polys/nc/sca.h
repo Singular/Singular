@@ -3,8 +3,8 @@
 
 #ifdef HAVE_PLURAL
 
-#include <polys/nc/nc.h>
-#include <misc/intvec.h>
+#include "polys/nc/nc.h"
+#include "misc/intvec.h"
 
 // we must always have this test!
 inline ideal SCAQuotient(const ring r)

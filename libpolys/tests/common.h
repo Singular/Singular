@@ -5,23 +5,23 @@
 #include <fstream>
 #include <string.h>
 
-#include <cxxtest/TestSuite.h>
-#include <cxxtest/GlobalFixture.h>
+#include "cxxtest/TestSuite.h"
+#include "cxxtest/GlobalFixture.h"
 
-#include <misc/auxiliary.h>
-#include <omalloc/omalloc.h>
+#include "misc/auxiliary.h"
+#include "omalloc/omalloc.h"
 
-#include <coeffs/coeffs.h>
-#include <coeffs/numbers.h>
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
 
-#include <reporter/reporter.h>
-#include <resources/feResource.h>
+#include "reporter/reporter.h"
+#include "resources/feResource.h"
 
 #ifndef PLURAL_INTERNAL_DECLARATIONS
 #define PLURAL_INTERNAL_DECLARATIONS
 #endif
 
-#include <polys/nc/gb_hack.h>
+#include "polys/nc/gb_hack.h"
 
 // #pragma GCC diagnostic ignored "-Wwrite-strings"
 namespace

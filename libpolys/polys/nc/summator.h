@@ -4,8 +4,6 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-// #include <polys/nc/summator.h> // for CPolynomialSummator class
-
 #define HAVE_SUMMATOR 1
 
 #ifdef HAVE_SUMMATOR

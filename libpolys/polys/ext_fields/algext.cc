@@ -28,34 +28,29 @@
   *               computing in K[a_1, ..., a_s] / I.
   **/
 
+#include "misc/auxiliary.h"
 
+#include "omalloc/omalloc.h"
 
+#include "reporter/reporter.h"
 
-#include <misc/auxiliary.h>
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
+#include "coeffs/longrat.h"
 
-#include <omalloc/omalloc.h>
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
+#include "polys/simpleideals.h"
+#include "polys/PolyEnumerator.h"
 
-#include <reporter/reporter.h>
+#include "factory/factory.h"
+#include "polys/clapconv.h"
+#include "polys/clapsing.h"
+#include "polys/prCopy.h"
 
-#include <coeffs/coeffs.h>
-#include <coeffs/numbers.h>
-
-#include <coeffs/longrat.h>
-
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
-#include <polys/simpleideals.h>
-
-#include <polys/PolyEnumerator.h>
-
-#include <factory/factory.h>
-#include <polys/clapconv.h>
-#include <polys/clapsing.h>
-#include <polys/prCopy.h>
-
-#include <polys/ext_fields/algext.h>
+#include "polys/ext_fields/algext.h"
 #define TRANSEXT_PRIVATES 1
-#include <polys/ext_fields/transext.h>
+#include "polys/ext_fields/transext.h"
 
 #ifdef LDEBUG
 #define naTest(a) naDBTest(a,__FILE__,__LINE__,cf)

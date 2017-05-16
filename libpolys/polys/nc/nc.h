@@ -1,8 +1,8 @@
 #ifndef POLYS_NC_H
 #define POLYS_NC_H
 
-#include <polys/monomials/ring.h>
-#include <polys/kbuckets.h>
+#include "polys/monomials/ring.h"
+#include "polys/kbuckets.h"
 
 #ifdef HAVE_PLURAL
 
@@ -376,7 +376,7 @@ bool ncExtensions(int iMask); //  = 0x0FFFF
 void nc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs);
 
 
-#include <polys/matpol.h>
+#include "polys/matpol.h"
 
 // read only access to NC matrices C/D:
 // get C_{i,j}, 1 <= row = i < j = col <= N

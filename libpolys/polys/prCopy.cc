@@ -6,15 +6,14 @@
 */
 
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-#include <omalloc/omalloc.h>
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
-#include <coeffs/numbers.h>
-#include <polys/monomials/ring.h>
-#include <polys/simpleideals.h>
-// #include <polys/sbuckets.h>
+#include "omalloc/omalloc.h"
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
+#include "coeffs/numbers.h"
+#include "polys/monomials/ring.h"
+#include "polys/simpleideals.h"
 
 static inline void
 prCopyEvector(poly dest, ring dest_r, poly src, ring src_r,int max)
@@ -30,7 +29,7 @@ prCopyEvector(poly dest, ring dest_r, poly src, ring src_r,int max)
   p_Setm(dest, dest_r);
 }
 
-#include <polys/prCopy.inc>
+#include "polys/prCopy.inc"
 
 /////////////////////////////////////////////////////////////////////////
 poly prCopyR(poly p, ring src_r, ring dest_r)

@@ -15,18 +15,18 @@
 #include <string.h>
 
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-#include <reporter/reporter.h>
+#include "reporter/reporter.h"
 
 
 #ifdef p_Procs_Static
-#include <polys/templates/p_Procs_Static.h>
+#include "polys/templates/p_Procs_Static.h"
 #else
-#include <polys/templates/p_Procs_Dynamic.h>
+#include "polys/templates/p_Procs_Dynamic.h"
 #endif
 
-#include <polys/templates/p_Procs_Impl.h>
+#include "polys/templates/p_Procs_Impl.h"
 
 #ifndef p_Procs_Static
 int FieldGeneralProcs = 0,

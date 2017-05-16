@@ -2,7 +2,7 @@
 
 
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
 #include "PolyEnumerator.h"
 

@@ -8,19 +8,17 @@
 
 
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 #include "flintconv.h"
 
 #ifdef HAVE_FLINT
 #if __FLINT_RELEASE >= 20500
-#include <coeffs/coeffs.h>
-#include <polys/monomials/p_polys.h>
+#include "coeffs/coeffs.h"
+#include "polys/monomials/p_polys.h"
 
-#include <omalloc/omalloc.h>
-// #include <coeffs/longrat.h>
-// #include <coeffs/modulop.h>
-#include <polys/sbuckets.h>
-#include <polys/clapconv.h>
+#include "omalloc/omalloc.h"
+#include "polys/sbuckets.h"
+#include "polys/clapconv.h"
 
 #include "simpleideals.h"
 

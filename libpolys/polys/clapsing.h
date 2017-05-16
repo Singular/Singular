@@ -21,9 +21,6 @@ class ip_smatrix; typedef ip_smatrix *       matrix;
 
 struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
 
-//#include <polys/clapconv.h>
-//#include <kernel/longtrans.h>
-
 /// destroys f and g
 poly singclap_gcd ( poly f, poly g, const ring r );
 

@@ -28,8 +28,8 @@
 #include <flint/flint.h>
 
 #if __FLINT_RELEASE >= 20500
-#include <polys/matpol.h>
-#include <coeffs/bigintmat.h>
+#include "polys/matpol.h"
+#include "coeffs/bigintmat.h"
 #include <flint/fmpz.h>
 #include <flint/fmpq.h>
 #include <flint/fmpz_poly.h>

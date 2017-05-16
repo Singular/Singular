@@ -9,20 +9,15 @@
 #include <stdio.h>
 #include <math.h>
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-#include <omalloc/omalloc.h>
-#include <misc/mylimits.h>
+#include "omalloc/omalloc.h"
+#include "misc/mylimits.h"
 
+#include "misc/intvec.h"
+#include "coeffs/numbers.h"
 
-// #include <kernel/structs.h>
-// #include <kernel/GBEngine/kstd1.h>
-// #include <kernel/polys.h>
-
-#include <misc/intvec.h>
-#include <coeffs/numbers.h>
-
-#include <reporter/reporter.h>
+#include "reporter/reporter.h"
 
 
 #include "monomials/ring.h"

@@ -10,10 +10,10 @@
 #ifndef P_NUMBERS_H
 #define P_NUMBERS_H
 
-#include <misc/auxiliary.h>
-#include <coeffs/coeffs.h>
-#include <coeffs/numbers.h>
-#include <polys/monomials/ring.h>
+#include "misc/auxiliary.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
+#include "polys/monomials/ring.h"
 
 static FORCE_INLINE number n_Copy_FieldGeneral(number n,  const coeffs r)
 { return n_Copy(n,r); }
@@ -61,7 +61,7 @@ static FORCE_INLINE void n_InpAdd_RingGeneral(number &n1, number n2, const coeff
 {  assume(nCoeff_is_Ring(r)); n_InpAdd(n1, n2, r); }
 #endif
 
-#include <coeffs/modulop.h>
+#include "coeffs/modulop.h"
 
 #define n_Copy_FieldZp(n, r)        n
 #define n_Delete_FieldZp(n, r)      do {} while (0)
@@ -118,7 +118,7 @@ static FORCE_INLINE void n_InpAdd_FieldZp(number &n1, number n2, const coeffs r)
 #endif
 
 #define DO_LFORCE_INLINE
-#include <coeffs/longrat.cc> // for inlining... TODO: fix this Uglyness?!!!
+#include "coeffs/longrat.cc" // for inlining... TODO: fix this Uglyness?!!!
 
 static FORCE_INLINE number n_Copy_FieldQ(number n, const coeffs r)
 { STATISTIC(n_Copy); return nlCopy(n, r); }

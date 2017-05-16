@@ -3,14 +3,14 @@
 #include <sstream>
 #include <string.h>
 
-#include <misc/auxiliary.h>
-#include <omalloc/omalloc.h>
+#include "misc/auxiliary.h"
+#include "omalloc/omalloc.h"
 
-#include <coeffs/coeffs.h>
-#include <coeffs/numbers.h>
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
 
-#include <reporter/reporter.h>
-#include <resources/feResource.h>
+#include "reporter/reporter.h"
+#include "resources/feResource.h"
 
 #ifndef PLURAL_INTERNAL_DECLARATIONS
 #define PLURAL_INTERNAL_DECLARATIONS
@@ -20,15 +20,15 @@
 #define TRANSEXT_PRIVATES
 #endif
 
-#include <polys/nc/gb_hack.h>
+#include "polys/nc/gb_hack.h"
 
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
 
-#include <polys/simpleideals.h>
+#include "polys/simpleideals.h"
 
-#include <polys/ext_fields/algext.h>
-#include <polys/ext_fields/transext.h>
+#include "polys/ext_fields/algext.h"
+#include "polys/ext_fields/transext.h"
 
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 

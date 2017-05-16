@@ -6,17 +6,14 @@
 
 #ifdef HAVE_PLURAL
 
-// #include <ncSAMult.h> // for CMultiplier etc classes
+#include "misc/options.h"
+#include "polys/monomials/ring.h"
+#include "polys/nc/summator.h"// for CPolynomialSummator class
+#include "reporter/reporter.h" // for Print!
+#include "polys/monomials/p_polys.h"
+#include "polys/operations/p_Mult_q.h"
 
-#include <misc/options.h>
-#include <polys/monomials/ring.h>
-#include <polys/nc/summator.h>// for CPolynomialSummator class
-#include <reporter/reporter.h> // for Print!
-#include <polys/monomials/p_polys.h>
-#include <polys/operations/p_Mult_q.h>
-
-//#include <polys/nc/ncSACache.h> // for CCacheHash etc classes
-#include <polys/nc/ncSAFormula.h> // for CFormulaPowerMultiplier and enum Enum_ncSAType
+#include "polys/nc/ncSAFormula.h" // for CFormulaPowerMultiplier and enum Enum_ncSAType
 
 // //////////////////////////////////////////////////////////////////////// //
 //

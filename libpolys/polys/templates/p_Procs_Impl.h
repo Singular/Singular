@@ -10,7 +10,7 @@
 #ifndef P_PROCS_IMPL_H
 #define P_PROCS_IMPL_H
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
 /***************************************************************
  *
