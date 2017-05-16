@@ -4,11 +4,11 @@
 /*
 * ABSTRACT: numbers modulo n
 */
-#include <misc/auxiliary.h>
-#include <omalloc/omalloc.h>
+#include "misc/auxiliary.h"
+#include "omalloc/omalloc.h"
 
-#include <misc/mylimits.h>
-#include <reporter/reporter.h>
+#include "misc/mylimits.h"
+#include "reporter/reporter.h"
 
 #include "si_gmp.h"
 #include "coeffs.h"

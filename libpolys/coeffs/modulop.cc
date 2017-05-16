@@ -5,19 +5,19 @@
 * ABSTRACT: numbers modulo p (<=32749)
 */
 
-#include <misc/auxiliary.h>
-#include <omalloc/omalloc.h>
+#include "misc/auxiliary.h"
+#include "omalloc/omalloc.h"
 
-#include <factory/factory.h>
+#include "factory/factory.h"
 
-#include <misc/mylimits.h>
-#include <misc/sirandom.h>
+#include "misc/mylimits.h"
+#include "misc/sirandom.h"
 
-#include <reporter/reporter.h>
+#include "reporter/reporter.h"
 
-#include <coeffs/coeffs.h>
-#include <coeffs/numbers.h>
-#include <coeffs/mpr_complex.h>
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
+#include "coeffs/mpr_complex.h"
 
 #include "longrat.h"
 #include "modulop.h"

@@ -1,7 +1,7 @@
 #ifndef AE_H
 #define AE_H
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 #include "si_gmp.h"
 
 #ifdef SINGULAR_4_2

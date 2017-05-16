@@ -6,8 +6,8 @@
 #ifndef NUMSTATS_H
 #define NUMSTATS_H
 
-#include <misc/auxiliary.h>
-#include <reporter/reporter.h>
+#include "misc/auxiliary.h"
+#include "reporter/reporter.h"
 
 #ifndef HAVE_NUMSTATS
 

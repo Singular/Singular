@@ -1,11 +1,10 @@
-#include <misc/auxiliary.h>
-#include <omalloc/omalloc.h>
+#include "misc/auxiliary.h"
+#include "omalloc/omalloc.h"
 
-#include "AE.h"
-
-#include <math.h>
 
 #ifdef SINGULAR_4_2
+#include "AE.h"
+#include <math.h>
 
 using namespace std;
 

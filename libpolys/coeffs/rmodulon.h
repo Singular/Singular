@@ -6,15 +6,14 @@
 /*
 * ABSTRACT: numbers modulo n
 */
-#include <misc/auxiliary.h>
-#include <coeffs/coeffs.h>
+#include "misc/auxiliary.h"
+#include "coeffs/coeffs.h"
 
 struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
 struct snumber; typedef struct snumber *   number;
 
-#include <coeffs/rintegers.h>
-
 #ifdef HAVE_RINGS
+#include "coeffs/rintegers.h"
 
 typedef struct { mpz_ptr base;  unsigned long exp; } ZnmInfo;
 

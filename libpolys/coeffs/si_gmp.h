@@ -5,7 +5,7 @@
 
 // just assume that factory have been built (cplusplus.h!)
 // instead of duplicating cf_gmp.h here for now...
-#include <factory/cf_gmp.h>
+#include "factory/cf_gmp.h"
 
 #ifndef mpz_size1
 // This is taken from longrat.h: it seems to be generally GMP-related

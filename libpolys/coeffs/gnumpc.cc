@@ -6,11 +6,11 @@
 *
 * ngc == number gnu complex
 */
-#include <misc/auxiliary.h>
-#include <omalloc/omalloc.h>
+#include "misc/auxiliary.h"
+#include "omalloc/omalloc.h"
 
-#include <misc/mylimits.h>
-#include <reporter/reporter.h>
+#include "misc/mylimits.h"
+#include "reporter/reporter.h"
 
 #include "coeffs.h"
 #include "numbers.h"

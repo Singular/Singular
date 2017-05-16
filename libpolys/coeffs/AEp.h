@@ -1,10 +1,10 @@
 #ifndef AEP_H
 #define AEP_H
 
-#include <singularconfig.h>
-#include "si_gmp.h"
+#include "singularconfig.h"
 
 #ifdef SINGULAR_4_2
+#include "si_gmp.h"
 
 class p_poly // Klasse von p_polynomen mit Typ (Grad, Koeffizienten ganzzahlig)
 {

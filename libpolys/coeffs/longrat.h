@@ -6,10 +6,10 @@
 /*
 * ABSTRACT: computation with long rational numbers
 */
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-#include <coeffs/si_gmp.h>
-#include <coeffs/coeffs.h>
+#include "coeffs/si_gmp.h"
+#include "coeffs/coeffs.h"
 
 struct snumber; typedef struct snumber  *number;
 

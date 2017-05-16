@@ -9,8 +9,8 @@
 #ifndef FLINTCF_ZN_H
 #define FLINTCF_ZN_H
 
-#include <singularconfig.h>
-#include <misc/auxiliary.h>
+#include "singularconfig.h"
+#include "misc/auxiliary.h"
 
 #ifdef HAVE_FLINT
 typedef struct

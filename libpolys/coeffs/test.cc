@@ -1,11 +1,11 @@
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-#include <factory/factory.h>
+#include "factory/factory.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <reporter/reporter.h>
-#include <resources/feResource.h>
+#include "reporter/reporter.h"
+#include "resources/feResource.h"
 
 #include "coeffs.h"
 #include "numbers.h"

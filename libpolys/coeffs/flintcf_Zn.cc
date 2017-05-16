@@ -6,21 +6,21 @@
 */
 #include <ctype.h> /* isdigit*/
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
 #ifdef HAVE_FLINT
 
 #include <flint/flint.h>
 #include <flint/nmod_poly.h>
-#include <factory/factory.h>
+#include "factory/factory.h"
 
-#include <omalloc/omalloc.h>
-#include <coeffs/coeffs.h>
+#include "omalloc/omalloc.h"
+#include "coeffs/coeffs.h"
 
-#include <coeffs/numbers.h>
-#include <coeffs/longrat.h>
-#include <coeffs/modulop.h>
-#include <coeffs/flintcf_Zn.h>
+#include "coeffs/numbers.h"
+#include "coeffs/longrat.h"
+#include "coeffs/modulop.h"
+#include "coeffs/flintcf_Zn.h"
 
 typedef nmod_poly_struct *nmod_poly_ptr;
 

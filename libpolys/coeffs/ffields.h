@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
 struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
 

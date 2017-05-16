@@ -7,10 +7,10 @@
 * ngf == number gnu floats
 */
 
-#include <misc/auxiliary.h>
-#include <omalloc/omalloc.h>
+#include "misc/auxiliary.h"
+#include "omalloc/omalloc.h"
 
-#include <reporter/reporter.h>
+#include "reporter/reporter.h"
 
 #include "coeffs.h"
 #include "numbers.h"

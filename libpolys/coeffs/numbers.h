@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: compatility interface to coeffs
 */
-#include <coeffs/coeffs.h>
+#include "coeffs/coeffs.h"
 
 // the access methods
 //

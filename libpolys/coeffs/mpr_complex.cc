@@ -11,16 +11,15 @@
 // WARNING! ALWAYS use omAlloc and FreeL when alloc. memory for some char* !!
 
 
-#include <misc/auxiliary.h>
-#include <omalloc/omalloc.h>
+#include "misc/auxiliary.h"
+#include "omalloc/omalloc.h"
 
-#include <reporter/reporter.h>
+#include "reporter/reporter.h"
 
-//#ifdef HAVE_MPR
-#include <coeffs/coeffs.h>
-#include <coeffs/numbers.h>
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
 
-#include <coeffs/mpr_complex.h>
+#include "coeffs/mpr_complex.h"
 
 #include "longrat.h"
 
@@ -805,8 +804,6 @@ void gmp_complex::SmallToZero()
 }
 
 //%e
-
-//#endif // HAVE_MPR
 
 // local Variables: ***
 // folded-file: t ***

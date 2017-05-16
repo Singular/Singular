@@ -12,13 +12,13 @@
 #ifndef POLYS_H
 #define POLYS_H
 
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
 
 extern ring currRing;
 void rChangeCurrRing(ring r);
 
-#include <coeffs/numbers.h>
+#include "coeffs/numbers.h"
 
 /***************************************************************
  *

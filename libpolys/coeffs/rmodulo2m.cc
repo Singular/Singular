@@ -4,12 +4,12 @@
 /*
 * ABSTRACT: numbers modulo 2^m
 */
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <misc/mylimits.h>
-#include <reporter/reporter.h>
+#include "misc/mylimits.h"
+#include "reporter/reporter.h"
 
 #include "si_gmp.h"
 #include "coeffs.h"

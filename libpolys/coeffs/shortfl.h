@@ -6,7 +6,7 @@
 /*
 * ABSTRACT
 */
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
 struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
 struct snumber; typedef struct snumber *   number;

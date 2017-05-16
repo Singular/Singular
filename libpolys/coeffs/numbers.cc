@@ -9,31 +9,31 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <misc/auxiliary.h>
-#include <omalloc/omalloc.h>
-#include <factory/factory.h>
+#include "misc/auxiliary.h"
+#include "omalloc/omalloc.h"
+#include "factory/factory.h"
 
-#include <reporter/reporter.h>
+#include "reporter/reporter.h"
 
-#include <coeffs/coeffs.h>
-#include <coeffs/numbers.h>
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
 
-#include <coeffs/longrat.h>
-#include <coeffs/modulop.h>
-#include <coeffs/gnumpfl.h>
-#include <coeffs/gnumpc.h>
-#include <coeffs/ffields.h>
-#include <coeffs/shortfl.h>
+#include "coeffs/longrat.h"
+#include "coeffs/modulop.h"
+#include "coeffs/gnumpfl.h"
+#include "coeffs/gnumpc.h"
+#include "coeffs/ffields.h"
+#include "coeffs/shortfl.h"
 
 #ifdef HAVE_RINGS
-# include <coeffs/rmodulo2m.h>
-# include <coeffs/rmodulon.h>
-# include <coeffs/rintegers.h>
+#include "coeffs/rmodulo2m.h"
+#include "coeffs/rmodulon.h"
+#include "coeffs/rintegers.h"
 #endif
 
 #ifdef HAVE_POLYEXTENSIONS
-#include <polys/ext_fields/algext.h>
-#include <polys/ext_fields/transext.h>
+#include "polys/ext_fields/algext.h"
+#include "polys/ext_fields/transext.h"
 #endif
 
 

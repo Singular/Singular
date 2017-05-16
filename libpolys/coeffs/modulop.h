@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: numbers modulo p (<=32749)
 */
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
 // defines are in struct.h
 // define if a*b is with mod instead of tables

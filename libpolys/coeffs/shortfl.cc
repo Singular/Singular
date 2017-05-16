@@ -8,10 +8,10 @@
 
 
 
-#include <misc/auxiliary.h>
-#include <misc/mylimits.h>
+#include "misc/auxiliary.h"
+#include "misc/mylimits.h"
 
-#include <reporter/reporter.h>
+#include "reporter/reporter.h"
 
 #include "numbers.h"
 #include "coeffs.h"

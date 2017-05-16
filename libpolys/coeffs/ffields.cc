@@ -4,13 +4,13 @@
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
-#include <misc/auxiliary.h>
-#include <omalloc/omalloc.h>
+#include "misc/auxiliary.h"
+#include "omalloc/omalloc.h"
 
-#include <misc/mylimits.h>
-#include <misc/sirandom.h>
+#include "misc/mylimits.h"
+#include "misc/sirandom.h"
 
-#include <reporter/reporter.h>
+#include "reporter/reporter.h"
 
 #include "coeffs.h"
 #include "numbers.h"

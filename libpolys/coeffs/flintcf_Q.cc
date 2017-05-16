@@ -6,19 +6,19 @@
 */
 #include <ctype.h> /* isdigit*/
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
 #ifdef HAVE_FLINT
 
 #include <flint/flint.h>
 #include <flint/fmpq_poly.h>
-#include <factory/factory.h>
+#include "factory/factory.h"
 
-#include <omalloc/omalloc.h>
-#include <coeffs/coeffs.h>
+#include "omalloc/omalloc.h"
+#include "coeffs/coeffs.h"
 
-#include <coeffs/numbers.h>
-#include <coeffs/longrat.h>
+#include "coeffs/numbers.h"
+#include "coeffs/longrat.h"
 
 typedef fmpq_poly_struct *fmpq_poly_ptr;
 typedef fmpz *fmpz_ptr;
