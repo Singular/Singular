@@ -18,24 +18,24 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
-#include <misc/options.h>
+#include "omalloc/omalloc.h"
+#include "misc/options.h"
 
-#include <polys/monomials/ring.h>
-#include <polys/monomials/maps.h>
+#include "polys/monomials/ring.h"
+#include "polys/monomials/maps.h"
 
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
 
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/fglm/fglm.h>
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/fglm/fglm.h"
 
-#include <Singular/fglm.h>
-#include <Singular/ipid.h>
-#include <Singular/ipshell.h>
-#include <Singular/tok.h>
+#include "Singular/fglm.h"
+#include "Singular/ipid.h"
+#include "Singular/ipshell.h"
+#include "Singular/tok.h"
 
 
 // internal Version: 1.18.1.6

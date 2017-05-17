@@ -8,10 +8,10 @@
 
 
 
-#include <kernel/mod2.h>
-#include <omalloc/omalloc.h>
-#include <resources/feResource.h>
-#include <Singular/feOpt.h>
+#include "kernel/mod2.h"
+#include "omalloc/omalloc.h"
+#include "resources/feResource.h"
+#include "Singular/feOpt.h"
 
 #ifdef __CYGWIN__
 #define BOOLEAN boolean

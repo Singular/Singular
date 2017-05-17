@@ -7,9 +7,9 @@
 * ABSTRACT interpreter type for variables
 */
 
-#include <Singular/lists.h>
-#include <Singular/attrib.h>
-#include <Singular/links/silink.h>
+#include "Singular/lists.h"
+#include "Singular/attrib.h"
+#include "Singular/links/silink.h"
 
 class bigintmat;
 typedef union uutypes      utypes;

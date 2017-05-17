@@ -11,10 +11,10 @@
 
 
 
-#include <kernel/mod2.h>
-#include <Singular/links/silink.h>
-#include <Singular/links/slInit.h>
-#include <Singular/mod_lib.h>
+#include "kernel/mod2.h"
+#include "Singular/links/silink.h"
+#include "Singular/links/slInit.h"
+#include "Singular/mod_lib.h"
 
 #ifdef HAVE_DL
 

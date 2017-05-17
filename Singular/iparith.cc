@@ -77,7 +77,7 @@
 #include "Singular/blackbox.h"
 #include "Singular/newstruct.h"
 #include "Singular/ipshell.h"
-//#include <kernel/mpr_inout.h"
+//#include "kernel/mpr_inout.h"
 #include "reporter/si_signals.h"
 
 #include <stdlib.h>

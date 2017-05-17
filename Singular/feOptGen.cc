@@ -11,7 +11,7 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #define FE_OPT_STRUCTURE
 

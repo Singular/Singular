@@ -87,7 +87,7 @@ IntList neworderint (const CFList & PolyList);
 // next function reorders the variables in PS:
 // a code segment to use:
 // ...
-// #include <tmpl_inst.h> // for typedef's
+// #include "tmpl_inst.h" // for typedef's
 // CFList PS= <setup-your-list-of-CanonicalForms>;
 // Varlist betterorder= neworder(PS);
 // PS= reorder(betterorder,PS); // reorder variables in PS from oldorder

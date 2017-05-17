@@ -17,7 +17,7 @@
 #include "int_cf.h"
 #include "int_int.h"
 #include "int_rat.h"
-#include <factory/cf_gmp.h>
+#include "factory/cf_gmp.h"
 #include "gmpext.h"
 #include "templates/ftmpl_functions.h"
 

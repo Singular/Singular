@@ -7,9 +7,9 @@
 * ABSTRACT: Declarations for working with Options
 */
 
-#include <Singular/fegetopt.h>
+#include "Singular/fegetopt.h"
 
-#include <Singular/feOptTab.h>
+#include "Singular/feOptTab.h"
 
 extern const char SHORT_OPTS_STRING[];
 
@@ -20,11 +20,11 @@ extern struct fe_option feOptSpec[];
 #if ! defined(GENERATE_DEPEND)
 
 # ifdef ESINGULAR
-#  include <Singular/feOptES.inc>
+#  include "Singular/feOptES.inc"
 # elif defined(TSINGULAR)
-#  include <Singular/feOptTS.inc>
+#  include "Singular/feOptTS.inc"
 # else
-#  include <Singular/feOpt.inc>
+#  include "Singular/feOpt.inc"
 # endif
 
 #else

@@ -393,7 +393,7 @@ static void iiL2R(leftv out, leftv in)
 #define IPCONV
 #define D(A)     A
 #define NULL_VAL NULL
-#include <Singular/table.h>
+#include "Singular/table.h"
 /*2
 * try to convert 'input' of type 'inputType' to 'output' of type 'outputType'
 * return FALSE on success

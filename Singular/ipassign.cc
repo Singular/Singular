@@ -11,36 +11,36 @@
 #include <ctype.h>
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
 #define TRANSEXT_PRIVATES
-#include <polys/ext_fields/transext.h>
+#include "polys/ext_fields/transext.h"
 
-#include <misc/options.h>
-#include <misc/intvec.h>
+#include "misc/options.h"
+#include "misc/intvec.h"
 
-#include <coeffs/coeffs.h>
-#include <coeffs/numbers.h>
-#include <coeffs/bigintmat.h>
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
+#include "coeffs/bigintmat.h"
 
 
-#include <polys/ext_fields/algext.h>
+#include "polys/ext_fields/algext.h"
 
-#include <polys/monomials/ring.h>
-#include <polys/matpol.h>
-#include <polys/monomials/maps.h>
-#include <polys/nc/nc.h>
-#include <polys/nc/sca.h>
-#include <polys/prCopy.h>
+#include "polys/monomials/ring.h"
+#include "polys/matpol.h"
+#include "polys/monomials/maps.h"
+#include "polys/nc/nc.h"
+#include "polys/nc/sca.h"
+#include "polys/prCopy.h"
 
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/oswrapper/timer.h>
-#include <kernel/combinatorics/stairc.h>
-#include <kernel/GBEngine/syz.h>
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/oswrapper/timer.h"
+#include "kernel/combinatorics/stairc.h"
+#include "kernel/GBEngine/syz.h"
 
 //#include "weight.h"
 #include "tok.h"

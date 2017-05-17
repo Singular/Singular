@@ -4,20 +4,20 @@
 /*
 * ABSTRACT: i/o system
 */
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 /* I need myfread in standalone_parser */
 #ifndef STANDALONE_PARSER
 
-#include <omalloc/omalloc.h>
-#include <reporter/reporter.h>
-#include <misc/options.h>
+#include "omalloc/omalloc.h"
+#include "reporter/reporter.h"
+#include "misc/options.h"
 
-//#include <Singular/febase.h>
+//#include "Singular/febase.h"
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <misc/mylimits.h>
+#include "misc/mylimits.h"
 #include <stdarg.h>
 #include <sys/stat.h>
 #include <ctype.h>

@@ -1,7 +1,7 @@
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 #ifdef HAVE_PYTHON_MOD
 #include <boost/python.hpp>
-#include <Singular/ipshell.h>
+#include "Singular/ipshell.h"
 #include "ring_wrap.h"
 #include "poly_wrap.h"
 static boost::python::object Ring_as_str(const Ring& r)

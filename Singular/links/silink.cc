@@ -6,28 +6,29 @@
 * ABSTRACT: general interface to links
 */
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
-#include <misc/options.h>
-#include <misc/intvec.h>
-#include <reporter/si_signals.h>
-#include <coeffs/numbers.h>
+#include "omalloc/omalloc.h"
+#include "misc/options.h"
+#include "misc/intvec.h"
+#include "reporter/si_signals.h"
+#include "coeffs/numbers.h"
 
-#include <polys/matpol.h>
-#include <polys/monomials/ring.h>
+#include "polys/matpol.h"
+#include "polys/monomials/ring.h"
 
-#include <kernel/ideals.h>
+#include "kernel/ideals.h"
 
-#include <Singular/lists.h>
-#include <Singular/cntrlc.h>
-#include <Singular/links/ssiLink.h>
-#include <Singular/links/pipeLink.h>
-#include <Singular/tok.h>
-#include <Singular/subexpr.h>
-#include <Singular/ipid.h>
-#include <Singular/links/silink.h>
-#include <Singular/ipshell.h>
+#include "Singular/lists.h"
+#include "Singular/cntrlc.h"
+#include "Singular/links/ssiLink.h"
+#include "Singular/links/pipeLink.h"
+#include "Singular/tok.h"
+#include "Singular/subexpr.h"
+#include "Singular/ipid.h"
+#include "Singular/links/silink.h"
+#include "Singular/links/slInit.h"
+#include "Singular/ipshell.h"
 #include "feOpt.h"
 
 #include <stdio.h>
@@ -410,7 +411,6 @@ BOOLEAN slGetDump(si_link l)
 
 /*------------Initialization at Start-up time------------------------*/
 
-#include <Singular/links/slInit.h>
 
 static si_link_extension slTypeInit(si_link_extension s, const char* type)
 {

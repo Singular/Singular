@@ -10,11 +10,11 @@
 
 #define HAVE_WALK 1
 
-#include <kernel/mod2.h>
-#include <misc/sirandom.h>
-#include <resources/omFindExec.h>
+#include "kernel/mod2.h"
+#include "misc/sirandom.h"
+#include "resources/omFindExec.h"
 
-#include <factory/factory.h>
+#include "factory/factory.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -40,11 +40,11 @@
 
 #include <unistd.h>
 
-#include <misc/options.h>
+#include "misc/options.h"
 
-// #include <coeffs/ffields.h>
-#include <coeffs/coeffs.h>
-#include <coeffs/mpr_complex.h>
+// #include "coeffs/ffields.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/mpr_complex.h"
 #include "coeffs/AE.h"
 // #include "coeffs/OPAE.h"
 #include "coeffs/AEp.h"
@@ -53,35 +53,35 @@
 // #include "coeffs/OPAEQ.h"
 
 
-#include <resources/feResource.h>
-#include <polys/monomials/ring.h>
-#include <kernel/polys.h>
+#include "resources/feResource.h"
+#include "polys/monomials/ring.h"
+#include "kernel/polys.h"
 
-#include <polys/monomials/maps.h>
-#include <polys/matpol.h>
+#include "polys/monomials/maps.h"
+#include "polys/matpol.h"
 
-#include <polys/weight.h>
+#include "polys/weight.h"
 
-#include <coeffs/bigintmat.h>
-#include <kernel/fast_mult.h>
-#include <kernel/digitech.h>
-#include <kernel/combinatorics/stairc.h>
-#include <kernel/ideals.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/GBEngine/syz.h>
-#include <kernel/GBEngine/kutil.h>
+#include "coeffs/bigintmat.h"
+#include "kernel/fast_mult.h"
+#include "kernel/digitech.h"
+#include "kernel/combinatorics/stairc.h"
+#include "kernel/ideals.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/syz.h"
+#include "kernel/GBEngine/kutil.h"
 
-#include <kernel/GBEngine/shiftgb.h>
-#include <kernel/linear_algebra/linearAlgebra.h>
+#include "kernel/GBEngine/shiftgb.h"
+#include "kernel/linear_algebra/linearAlgebra.h"
 
-#include <kernel/combinatorics/hutil.h>
+#include "kernel/combinatorics/hutil.h"
 
 // for tests of t-rep-GB
-#include <kernel/GBEngine/tgb.h>
+#include "kernel/GBEngine/tgb.h"
 
-#include <kernel/linear_algebra/minpoly.h>
+#include "kernel/linear_algebra/minpoly.h"
 
-#include <numeric/mpr_base.h>
+#include "numeric/mpr_base.h"
 
 #include "tok.h"
 #include "ipid.h"
@@ -100,17 +100,17 @@
 #include "links/silink.h"
 #include "links/ssiLink.h"
 #include "walk.h"
-#include <Singular/newstruct.h>
-#include <Singular/blackbox.h>
-#include <Singular/pyobject_setup.h>
+#include "Singular/newstruct.h"
+#include "Singular/blackbox.h"
+#include "Singular/pyobject_setup.h"
 
 
 #ifdef HAVE_RINGS
-#include <kernel/GBEngine/ringgb.h>
+#include "kernel/GBEngine/ringgb.h"
 #endif
 
 #ifdef HAVE_F5
-#include <kernel/GBEngine/f5gb.h>
+#include "kernel/GBEngine/f5gb.h"
 #endif
 
 #ifdef HAVE_WALK
@@ -118,24 +118,24 @@
 #endif
 
 #ifdef HAVE_SPECTRUM
-#include <kernel/spectrum/spectrum.h>
+#include "kernel/spectrum/spectrum.h"
 #endif
 
 #ifdef HAVE_PLURAL
-#include <polys/nc/nc.h>
-#include <polys/nc/ncSAMult.h> // for CMultiplier etc classes
-#include <polys/nc/sca.h>
-#include <kernel/GBEngine/nc.h>
+#include "polys/nc/nc.h"
+#include "polys/nc/ncSAMult.h" // for CMultiplier etc classes
+#include "polys/nc/sca.h"
+#include "kernel/GBEngine/nc.h"
 #include "ipconv.h"
 #ifdef HAVE_RATGRING
-#include <kernel/GBEngine/ratgring.h>
+#include "kernel/GBEngine/ratgring.h"
 #endif
 #endif
 
 #ifdef __CYGWIN__ /* only for the DLLTest */
 /* #include "WinDllTest.h" */
 #ifdef HAVE_DL
-#include <polys/mod_raw.h>
+#include "polys/mod_raw.h"
 #endif
 #endif
 
@@ -145,11 +145,11 @@
 #define HAVE_EXTENDED_SYSTEM 1
 #endif
 
-#include <polys/flintconv.h>
-#include <polys/clapconv.h>
-#include <kernel/GBEngine/kstdfac.h>
+#include "polys/flintconv.h"
+#include "polys/clapconv.h"
+#include "kernel/GBEngine/kstdfac.h"
 
-#include <polys/clapsing.h>
+#include "polys/clapsing.h"
 
 #ifdef HAVE_EIGENVAL
 #include "eigenval_ip.h"
@@ -167,18 +167,8 @@
 #include "pcv.h"
 #endif
 
-
-#ifdef __CYGWIN__
-//#include <Python.h>
-//#include <python_wrapper.h>
-#endif
-
 #ifndef MAKE_DISTRIBUTION
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h);
-#endif
-
-#ifdef __CYGWIN__  /* PySingular initialized? */
-static int PyInitialized = 0;
 #endif
 
 /* expects a SINGULAR square matrix with number entries
@@ -2322,14 +2312,14 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
 #ifdef HAVE_EXTENDED_SYSTEM
   // You can put your own system calls here
-#  include <kernel/fglm/fglm.h>
+#  include "kernel/fglm/fglm.h"
 #  ifdef HAVE_NEWTON
-#    include <hc_newton.h>
+#    include "hc_newton.h"
 #  endif
-#  include <polys/mod_raw.h>
-#  include <polys/monomials/ring.h>
-#  include <kernel/GBEngine/shiftgb.h>
-#  include <kernel/GBEngine/kutil.h>
+#  include "polys/mod_raw.h"
+#  include "polys/monomials/ring.h"
+#  include "kernel/GBEngine/shiftgb.h"
+#  include "kernel/GBEngine/kutil.h"
 
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
@@ -3431,61 +3421,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         else return TRUE;
       }
       else
-  #endif
-  #ifdef __CYGWIN__
-  /*==================== Python Singular =================*/
-      if (strcmp(sys_cmd, "python") == 0)
-      {
-        const char* c;
-        if ((h!=NULL) && (h->Typ()==STRING_CMD))
-        {
-          c=(const char*)h->Data();
-          if (!PyInitialized) {
-            PyInitialized = 1;
-  //          Py_Initialize();
-  //          initPySingular();
-          }
-  //      PyRun_SimpleString(c);
-          return FALSE;
-        }
-        else return TRUE;
-      }
-      else
-  /*==================== Python Singular =================
-      if (strcmp(sys_cmd, "ipython") == 0)
-      {
-        const char* c;
-        {
-          if (!PyInitialized)
-          {
-            PyInitialized = 1;
-            Py_Initialize();
-            initPySingular();
-          }
-    PyRun_SimpleString(
-  "try:                                                                                       \n\
-      __IPYTHON__                                                                             \n\
-  except NameError:                                                                           \n\
-      argv = ['']                                                                             \n\
-      banner = exit_msg = ''                                                                  \n\
-  else:                                                                                       \n\
-      # Command-line options for IPython (a list like sys.argv)                               \n\
-      argv = ['-pi1','In <\\#>:','-pi2','   .\\D.:','-po','Out<\\#>:']                        \n\
-      banner = '*** Nested interpreter ***'                                                   \n\
-      exit_msg = '*** Back in main IPython ***'                                               \n\
-                            \n\
-  # First import the embeddable shell class                                                   \n\
-  from IPython.Shell import IPShellEmbed                                                      \n\
-  # Now create the IPython shell instance. Put ipshell() anywhere in your code                \n\
-  # where you want it to open.                                                                \n\
-  ipshell = IPShellEmbed(argv,banner=banner,exit_msg=exit_msg)                                \n\
-  ipshell()");
-          return FALSE;
-        }
-      }
-      else
-                */
-
   #endif
   /*==================== mpz_t loader ======================*/
     if(strcmp(sys_cmd, "GNUmpLoad")==0)

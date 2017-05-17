@@ -6,7 +6,7 @@
 //
 //}}}
 
-#include <factory.h>
+#include "factory.h"
 #include <iostream.h>
 
 int

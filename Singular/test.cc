@@ -68,8 +68,6 @@
 #include "kernel/groebner_walk/walkMain.h"
 #include "kernel/groebner_walk/walkSupport.h"
 #include "kernel/GBEngine/khstd.h"
-/// #include <kernel/sparsmat.h> // TODO: install polys/this!
-//+
 
 #include "kernel/fglm/fglm.h"
 #include "kernel/GBEngine/kstd1.h"
@@ -91,9 +89,6 @@
 
 #include "kernel/GBEngine/kutil.h"
 
-// #include <kernel/dbm_sl.h> // TODO: needs si_link// already moved to Singular/!
-
-// #include "CCRing.h" // Too old!
 #include "kernel/digitech.h"
 #include "kernel/linear_algebra/eigenval.h"
 #include "kernel/maps/fast_maps.h"
@@ -109,11 +104,10 @@
 #include "kernel/GBEngine/f5data.h"
 #include "kernel/GBEngine/f5gb.h"
 #include "kernel/GBEngine/f5lists.h"
-////////#include <kernel/F5cLists.h"
+////////#include "kernel/F5cLists.h"
 
 #include "kernel/spectrum/GMPrat.h"
 #include "kernel/combinatorics/hutil.h"
-// #include <kernel/Ideal.h> // Too old?
 
 #include "kernel/ideals.h"
 
@@ -126,12 +120,8 @@
 
 
 
-// #include "lplist.h" // Too old!
 #include "kernel/spectrum/multicnt.h"
 #include "kernel/spectrum/npolygon.h"
-// #include <kernel/Number.h> // Too old?
-// #include <kernel/Poly.h> // Too old?
-// #include <kernel/PowerSeries.h> // Too old?
 
 #include "kernel/preimage.h"
 
@@ -146,7 +136,7 @@
 #include "kernel/spectrum/splist.h"
 #include "kernel/structs.h"
 #include "kernel/GBEngine/syz.h"
-// #include <kernel/testpoly.h> // Too old?
+// #include "kernel/testpoly.h" // Too old?
 
 #include "kernel/GBEngine/tgbgauss.h"
 #include "kernel/GBEngine/tgb.h"
@@ -159,15 +149,13 @@
 #include "kernel/groebner_walk/walkSupport.h"
 
 
-// #include <polys/clapconv.h> // due to factory? :(
-// #include <kernel/tgb_internal.h> // :(
-// #include <kernel/F4.h> // uses tgb_internal // :(
-// #include <kernel/IIntvec.h> // :(
+// #include "polys/clapconv.h" // due to factory? :(
+// #include "kernel/tgb_internal.h" // :(
+// #include "kernel/F4.h" // uses tgb_internal // :(
 
 
 // headers in Singular/
 #include "Singular/mmalloc.h"
-//#include <Singular/idrec.h> // moved to Singular
 #include "Singular/attrib.h"
 #include "Singular/blackbox.h"
 #include "Singular/cntrlc.h"

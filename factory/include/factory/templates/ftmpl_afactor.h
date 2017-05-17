@@ -3,8 +3,6 @@
 #ifndef INCL_AFACTOR_H
 #define INCL_AFACTOR_H
 
-// #include <factory/factoryconf.h>
-
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
 #include <iostream>

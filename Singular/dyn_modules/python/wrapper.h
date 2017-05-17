@@ -3,7 +3,7 @@
 #include <Python.h>
 #include <boost/python.hpp>
 #include <sstream>
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 
 #include "kernel/structs.h"
@@ -16,7 +16,7 @@
 #include "PowerSeries.h"
 #include "Ideal.h"
 #include "ideal_wrap.h"
-#include <factory/factory.h>
+#include "factory/factory.h"
 #include "poly_wrap.h"
 #include "vector_wrap.h"
 #include "CF_wrap.h"

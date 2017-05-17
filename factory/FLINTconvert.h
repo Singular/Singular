@@ -45,7 +45,7 @@ extern "C"
 }
 #endif
 
-#include <factory/cf_gmp.h>
+#include "factory/cf_gmp.h"
 
 /// conversion of a factory integer to fmpz_t
 void

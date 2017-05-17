@@ -14,52 +14,31 @@
  **/
 /*****************************************************************************/
 
-
-
-
-
 // include header file
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-
-#include <omalloc/omalloc.h>
-
-#include <misc/intvec.h>
-
-#include <misc/options.h>
-
-#include <polys/monomials/p_polys.h>
-#include <polys/kbuckets.h>
-
-
-#include <kernel/structs.h>
-
-
-
-#include <kernel/ideals.h>
-
-#include <kernel/GBEngine/syz.h>
-// #include <kernel/longrat.h>
-#include <kernel/GBEngine/kutil.h>
-#include <kernel/GBEngine/kstd1.h>
-
-
-
-#include <kernel/polys.h>
-// #include <kernel/pInline2.h>
+#include "omalloc/omalloc.h"
+#include "misc/intvec.h"
+#include "misc/options.h"
+#include "polys/monomials/p_polys.h"
+#include "polys/kbuckets.h"
+#include "kernel/structs.h"
+#include "kernel/ideals.h"
+#include "kernel/GBEngine/syz.h"
+#include "kernel/GBEngine/kutil.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/polys.h"
+// #include "kernel/pInline2.h"
 
 #include "myNF.h"
-
 
 #ifdef HAVE_PLURAL
 #define PLURAL_INTERNAL_DECLARATIONS 1
 #endif
 
-#include <polys/nc/sca.h>
-#include <polys/nc/nc.h>
-#include <kernel/GBEngine/nc.h>
-
-
+#include "polys/nc/sca.h"
+#include "polys/nc/nc.h"
+#include "kernel/GBEngine/nc.h"
 
 BEGIN_NAMESPACE()
 

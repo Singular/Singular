@@ -1,16 +1,16 @@
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #ifdef HAVE_MATHICGB
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <misc/options.h>
+#include "misc/options.h"
 
-#include <kernel/ideals.h>
-#include <kernel/polys.h>
+#include "kernel/ideals.h"
+#include "kernel/polys.h"
 
-#include <Singular/ipid.h>
-#include <Singular/mod_lib.h>
+#include "Singular/ipid.h"
+#include "Singular/mod_lib.h"
 
 #include <mathicgb.h>
 

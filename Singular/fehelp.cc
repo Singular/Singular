@@ -15,17 +15,17 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
-#include <misc/mylimits.h>
+#include "omalloc/omalloc.h"
+#include "misc/mylimits.h"
 
-#include <resources/feResource.h>
-#include <reporter/reporter.h>
+#include "resources/feResource.h"
+#include "reporter/reporter.h"
 
-#include <resources/omFindExec.h>
+#include "resources/omFindExec.h"
 
-#include <reporter/si_signals.h>
+#include "reporter/si_signals.h"
 
 #include "ipid.h"
 #include "ipshell.h"

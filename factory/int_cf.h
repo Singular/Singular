@@ -26,7 +26,7 @@
 #include "variable.h"
 
 #ifdef HAVE_OMALLOC
-#include <omalloc/omallocClass.h>
+#include "omalloc/omallocClass.h"
 #endif
 
 class CanonicalForm;

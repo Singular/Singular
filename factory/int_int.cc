@@ -8,7 +8,7 @@
 #include "imm.h"
 #include "int_int.h"
 #include "int_rat.h"
-#include <factory/cf_gmp.h>
+#include "factory/cf_gmp.h"
 #include "gmpext.h"
 
 #ifdef HAVE_OMALLOC
@@ -22,7 +22,7 @@ InternalInteger::InternalInteger()
 
 InternalInteger::InternalInteger( const int i )
 {
-    mpz_init_set_si( thempi, i );
+    mpz_init_set_si( thempi, (long)i );
 }
 
 InternalInteger::InternalInteger( const long i )

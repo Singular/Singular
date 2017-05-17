@@ -8,14 +8,14 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #ifdef HAVE_GMS
 
 #include "gms.h"
 
-#include <coeffs/numbers.h>
-#include <kernel/polys.h>
+#include "coeffs/numbers.h"
+#include "kernel/polys.h"
 
 #include "ipid.h"
 

@@ -8,22 +8,22 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #ifdef HAVE_EIGENVAL
 
-#include <Singular/tok.h>
-#include <Singular/ipid.h>
-#include <misc/intvec.h>
-#include <coeffs/numbers.h>
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <Singular/lists.h>
-#include <polys/matpol.h>
-#include <polys/clapsing.h>
-#include <kernel/linear_algebra/eigenval.h>
-#include <Singular/ipshell.h>
-#include <Singular/eigenval_ip.h>
+#include "Singular/tok.h"
+#include "Singular/ipid.h"
+#include "misc/intvec.h"
+#include "coeffs/numbers.h"
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
+#include "Singular/lists.h"
+#include "polys/matpol.h"
+#include "polys/clapsing.h"
+#include "kernel/linear_algebra/eigenval.h"
+#include "Singular/ipshell.h"
+#include "Singular/eigenval_ip.h"
 
 
 BOOLEAN evSwap(leftv res,leftv h)

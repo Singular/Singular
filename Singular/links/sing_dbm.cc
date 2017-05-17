@@ -8,7 +8,7 @@
 //
 //**************************************************************************/
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #  include <stdio.h>
 #  include <fcntl.h>
@@ -16,11 +16,11 @@
 
 #ifdef HAVE_DBM
 
-#  include <omalloc/omalloc.h>
-#  include <Singular/tok.h>
-#  include <Singular/ipid.h>
-#  include <Singular/links/silink.h>
-#  include <Singular/links/sing_dbm.h>
+#  include "omalloc/omalloc.h"
+#  include "Singular/tok.h"
+#  include "Singular/ipid.h"
+#  include "Singular/links/silink.h"
+#  include "Singular/links/sing_dbm.h"
 
 // #ifdef __CYGWIN__
 // #  define USE_GDBM

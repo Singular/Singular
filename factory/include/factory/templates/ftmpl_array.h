@@ -3,8 +3,6 @@
 #ifndef INCL_ARRAY_H
 #define INCL_ARRAY_H
 
-// #include <factory/factoryconf.h>
-
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
 #include <iostream>

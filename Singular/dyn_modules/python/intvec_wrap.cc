@@ -1,4 +1,4 @@
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 #ifdef HAVE_PYTHON_MOD
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>

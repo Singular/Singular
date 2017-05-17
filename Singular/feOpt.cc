@@ -8,19 +8,19 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #include <string.h>
 #include <stdlib.h>
 
-#include <factory/factory.h>
+#include "factory/factory.h"
 
 #define FE_OPT_STRUCTURE
 #include "feOpt.h"
 
 #if !defined(GENERATE_OPTION_INDEX) && !defined(ESINGULAR) && !defined(TSINGULAR)
-#include <misc/options.h>
-#include <misc/sirandom.h>
+#include "misc/options.h"
+#include "misc/sirandom.h"
 #endif
 
 #include "fehelp.h"
@@ -137,10 +137,10 @@ feOptIndex feGetOptIndex(int optc)
 // Return: NULL -- everything ok
 //         "error-string" on error
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
-#include <omalloc/omalloc.h>
-#include <resources/feResource.h>
-#include <kernel/oswrapper/feread.h>
-#include <kernel/oswrapper/timer.h>
+#include "omalloc/omalloc.h"
+#include "resources/feResource.h"
+#include "kernel/oswrapper/feread.h"
+#include "kernel/oswrapper/timer.h"
 
 #include "ipshell.h"
 #include "tok.h"

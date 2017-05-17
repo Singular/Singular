@@ -1,4 +1,4 @@
-#include <Singular/libsingular.h>
+#include "Singular/libsingular.h"
 
 static void makepartition(int vars,int actvar,int deg,int monomdeg, lists L, int &idpowerpoint)
 {

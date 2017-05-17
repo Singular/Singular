@@ -7,11 +7,11 @@
  * * ABSTRACT: class Voice
  * */
 
-#include <reporter/reporter.h>
+#include "reporter/reporter.h"
 
-#include <resources/feResource.h>
+#include "resources/feResource.h"
 
-#include <kernel/structs.h>
+#include "kernel/structs.h"
 
 enum   feBufferTypes
 {

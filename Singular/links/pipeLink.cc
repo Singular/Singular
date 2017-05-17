@@ -6,10 +6,10 @@
  *  Purpose: declaration of sl_link routines for pipe
  ***************************************************************/
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
-#include <reporter/si_signals.h>
+#include "omalloc/omalloc.h"
+#include "reporter/si_signals.h"
 
 #include "tok.h"
 #include "ipid.h"

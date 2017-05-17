@@ -19,16 +19,12 @@
 
 
 // include header file
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #include "DebugPrint.h"
-
-#include <omalloc/omalloc.h>
-#include <polys/monomials/p_polys.h>
-
-#include <kernel/ideals.h>
-
-
+#include "omalloc/omalloc.h"
+#include "polys/monomials/p_polys.h"
+#include "kernel/ideals.h"
 
 BEGIN_NAMESPACE()
 /// debug-print monomial poly/vector p, assuming that it lives in the ring R

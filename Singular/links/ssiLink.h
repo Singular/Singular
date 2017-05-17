@@ -8,7 +8,7 @@
 #ifndef SSILINK_H
 #define SSILINK_H
 
-#include <Singular/links/silink.h>
+#include "Singular/links/silink.h"
 
 typedef struct
 {

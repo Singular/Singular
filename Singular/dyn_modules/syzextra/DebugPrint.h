@@ -19,7 +19,7 @@
 
 // include basic definitions
 #include "singularxx_defs.h"
-#include <kernel/polys.h>
+#include "kernel/polys.h"
 
 BEGIN_NAMESPACE_SINGULARXX    BEGIN_NAMESPACE(DEBUG)
 

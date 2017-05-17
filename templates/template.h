@@ -18,7 +18,7 @@
 #define TEMPLATE_H
 
 // include basic definitions
-#include <singularxx_defs.h>
+#include "singularxx_defs.h"
 
 BEGIN_NAMESPACE_SINGULARXX
 

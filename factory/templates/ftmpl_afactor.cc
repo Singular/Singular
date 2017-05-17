@@ -1,6 +1,6 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-#include <factory/templates/ftmpl_afactor.h>
+#include "factory/templates/ftmpl_afactor.h"
 
 template <class T>
 AFactor<T>& AFactor<T>::operator= ( const AFactor<T>& f )

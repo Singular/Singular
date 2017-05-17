@@ -5,7 +5,7 @@
 
 // #include "config.h"
 
-#include <factory/cf_gmp.h>
+#include "factory/cf_gmp.h"
 
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM

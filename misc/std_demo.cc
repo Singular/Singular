@@ -1,4 +1,4 @@
-#include <Singular/libsingular.h>
+#include "Singular/libsingular.h"
 
 // example of a routine which changes nothing
 static BOOLEAN display_sp(kStrategy strat)

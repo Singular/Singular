@@ -26,8 +26,6 @@
  *
 **/
 
-// #include <factory/factoryconf.h>
-
 /** template <class T> inline T tmax ( const T & a, const T & b )
  *
  * tmax() - return the maximum of `a' and `b'.

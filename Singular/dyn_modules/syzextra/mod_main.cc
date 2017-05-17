@@ -1,32 +1,31 @@
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <misc/intvec.h>
-#include <misc/options.h>
+#include "misc/intvec.h"
+#include "misc/options.h"
 
-#include <coeffs/coeffs.h>
+#include "coeffs/coeffs.h"
 
-#include <polys/PolyEnumerator.h>
+#include "polys/PolyEnumerator.h"
 
-#include <polys/monomials/p_polys.h>
-#include <polys/monomials/ring.h>
-#include <polys/simpleideals.h>
+#include "polys/monomials/p_polys.h"
+#include "polys/monomials/ring.h"
+#include "polys/simpleideals.h"
 
-// #include <kernel/longrat.h>
-#include <kernel/GBEngine/kstd1.h>
+#include "kernel/GBEngine/kstd1.h"
 
-#include <kernel/polys.h>
+#include "kernel/polys.h"
 
-#include <kernel/GBEngine/syz.h>
+#include "kernel/GBEngine/syz.h"
 
-#include <Singular/tok.h>
-#include <Singular/ipid.h>
-#include <Singular/lists.h>
-#include <Singular/attrib.h>
+#include "Singular/tok.h"
+#include "Singular/ipid.h"
+#include "Singular/lists.h"
+#include "Singular/attrib.h"
 
-#include <Singular/ipid.h>
-#include <Singular/ipshell.h> // For iiAddCproc
+#include "Singular/ipid.h"
+#include "Singular/ipshell.h" // For iiAddCproc
 
 // extern coeffs coeffs_BIGINT
 
@@ -37,7 +36,7 @@
 #include "syzextra.h"
 
 
-#include <Singular/mod_lib.h>
+#include "Singular/mod_lib.h"
 
 
 #if GOOGLE_PROFILE_ENABLED

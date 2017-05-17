@@ -1,4 +1,4 @@
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 #ifdef HAVE_PYTHON_MOD
 #include <stdlib.h>
 #include <stdio.h>
@@ -9,13 +9,13 @@
 #include <sys/stat.h>
 #include <boost/python.hpp>
 #include <Python.h>
-#include <Singular/tok.h>
-#include <kernel/structs.h>
-#include <Singular/mod_lib.h>
-#include <Singular/ipid.h>
+#include "Singular/tok.h"
+#include "kernel/structs.h"
+#include "Singular/mod_lib.h"
+#include "Singular/ipid.h"
 
-#include <Singular/locals.h>
-#include <omalloc/omalloc.h>
+#include "Singular/locals.h"
+#include "omalloc/omalloc.h"
 
 #include <stdio.h>
 #include <stdlib.h>

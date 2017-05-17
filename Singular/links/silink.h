@@ -7,12 +7,12 @@
 * ABSTRACT: general interface to links
 */
 
-#include <singularconfig.h>
-#include <kernel/structs.h>
+#include "singularconfig.h"
+#include "kernel/structs.h"
 
-#include <Singular/links/sing_dbm.h>
-#include <Singular/lists.h>
-#include <Singular/attrib.h>
+#include "Singular/links/sing_dbm.h"
+#include "Singular/lists.h"
+#include "Singular/attrib.h"
 
 struct sip_link;
 typedef struct sip_link    ip_link;
@@ -90,14 +90,14 @@ BOOLEAN slInit(si_link l, char *str);
 void slKill(si_link l);
 void slCleanUp(si_link l);
 void slStandardInit();
-inline si_link slCopy(si_link l)
+static inline si_link slCopy(si_link l)
 {
   l->ref++;
   return l;
 }
 
-#include <omalloc/omalloc.h>
-inline char* slString(si_link l)
+#include "omalloc/omalloc.h"
+static inline char* slString(si_link l)
 {
   if (l->name != NULL)
   {

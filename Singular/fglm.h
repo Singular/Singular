@@ -1,10 +1,10 @@
 #ifndef SINGULAR_FGLM_H
 #define SINGULAR_FGLM_H
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <kernel/ideals.h>
-#include <kernel/structs.h>
+#include "kernel/ideals.h"
+#include "kernel/structs.h"
 
 // fglmproc(...):
 // The procedure which has to be called from the interpreter for fglm.

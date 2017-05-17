@@ -71,7 +71,7 @@ version number and the configuration options in your bug reports.  You may
 either use the UNIX utility `what' to get this information (`what libcf.a')
 or compile and run something similar to this:
 
-  #include <factory.h>
+  #include "factory.h"
   main() { cout << factoryVersion << "; " << factoryConfiguration << endl; }
 
 3. Installation

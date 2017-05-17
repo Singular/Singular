@@ -45,7 +45,7 @@
 #include "cf_map_ext.h"
 
 #ifdef HAVE_NTL
-#include <NTLconvert.h>
+#include "NTLconvert.h"
 #endif
 
 #ifdef HAVE_FLINT

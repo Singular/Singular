@@ -1,4 +1,4 @@
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #ifdef HAVE_SIMPLEIPC
 #include <semaphore.h>
@@ -12,8 +12,8 @@
 
 # include "simpleipc.h"
 
-#include <Singular/cntrlc.h>
-#include <reporter/si_signals.h>
+#include "Singular/cntrlc.h"
+#include "reporter/si_signals.h"
 
 
 

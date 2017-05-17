@@ -10,7 +10,7 @@
 #ifndef SL_INIT_H
 #define SL_INIT_H
 
-#include <Singular/links/silink.h>
+#include "Singular/links/silink.h"
 
 #ifdef HAVE_DBM
 si_link_extension slInitDBMExtension(si_link_extension s);

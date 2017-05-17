@@ -7,41 +7,41 @@
  ***************************************************************/
 #define TRANSEXT_PRIVATES 1 /* allow access to transext internals */
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <misc/intvec.h>
-#include <misc/options.h>
+#include "misc/intvec.h"
+#include "misc/options.h"
 
-#include <reporter/si_signals.h>
-#include <reporter/s_buff.h>
+#include "reporter/si_signals.h"
+#include "reporter/s_buff.h"
 
-#include <coeffs/bigintmat.h>
-#include <coeffs/longrat.h>
+#include "coeffs/bigintmat.h"
+#include "coeffs/longrat.h"
 
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
-#include <polys/ext_fields/transext.h>
-#include <polys/simpleideals.h>
-#include <polys/matpol.h>
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
+#include "polys/ext_fields/transext.h"
+#include "polys/simpleideals.h"
+#include "polys/matpol.h"
 
-#include <kernel/oswrapper/timer.h>
-#include <kernel/oswrapper/feread.h>
-#include <kernel/oswrapper/rlimit.h>
+#include "kernel/oswrapper/timer.h"
+#include "kernel/oswrapper/feread.h"
+#include "kernel/oswrapper/rlimit.h"
 
-#include <Singular/tok.h>
-#include <Singular/ipid.h>
-#include <Singular/ipshell.h>
-#include <Singular/subexpr.h>
-#include <Singular/links/silink.h>
-#include <Singular/cntrlc.h>
-#include <Singular/lists.h>
-#include <Singular/blackbox.h>
-#include <Singular/links/ssiLink.h>
+#include "Singular/tok.h"
+#include "Singular/ipid.h"
+#include "Singular/ipshell.h"
+#include "Singular/subexpr.h"
+#include "Singular/links/silink.h"
+#include "Singular/cntrlc.h"
+#include "Singular/lists.h"
+#include "Singular/blackbox.h"
+#include "Singular/links/ssiLink.h"
 
 #ifdef HAVE_SIMPLEIPC
-#include <Singular/links/simpleipc.h>
+#include "Singular/links/simpleipc.h"
 #endif
 
 #include <stdio.h>

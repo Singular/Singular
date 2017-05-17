@@ -11,17 +11,17 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <Singular/links/silink.h>
-#include <Singular/links/slInit.h>
+#include "Singular/links/silink.h"
+#include "Singular/links/slInit.h"
 
 #ifdef HAVE_DBM
 
 # ifndef USE_GDBM
-#   include <Singular/links/dbm_sl.h>
+#   include "Singular/links/dbm_sl.h"
 # else
-#   include <Singular/links/sing_dbm.h>
+#   include "Singular/links/sing_dbm.h"
 #endif
 
 si_link_extension slInitDBMExtension(si_link_extension s)

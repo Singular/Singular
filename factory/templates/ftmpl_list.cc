@@ -1,6 +1,6 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-#include <factory/templates/ftmpl_list.h>
+#include "factory/templates/ftmpl_list.h"
 
 template <class T>
 ListItem<T>::ListItem( const ListItem<T>& i )

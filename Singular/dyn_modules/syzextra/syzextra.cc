@@ -13,7 +13,7 @@
  **/
 /*****************************************************************************/
 // include header file
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE  /*for qsort_r on cygwin, must be before system includes*/
 #endif
@@ -25,37 +25,36 @@
 
 #include "DebugPrint.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <misc/intvec.h>
-#include <misc/options.h>
+#include "misc/intvec.h"
+#include "misc/options.h"
 
-#include <coeffs/coeffs.h>
+#include "coeffs/coeffs.h"
 
-#include <polys/monomials/p_polys.h>
-#include <polys/monomials/ring.h>
-#include <polys/simpleideals.h>
+#include "polys/monomials/p_polys.h"
+#include "polys/monomials/ring.h"
+#include "polys/simpleideals.h"
 
-#include <polys/kbuckets.h> // for kBucket*
-#include <polys/sbuckets.h> // for sBucket*
-//#include <polys/nc/summator.h> // for CPolynomialSummator
-#include <polys/operations/p_Mult_q.h> // for MIN_LENGTH_BUCKET
+#include "polys/kbuckets.h" // for kBucket*
+#include "polys/sbuckets.h" // for sBucket*
+//#include "polys/nc/summator.h" // for CPolynomialSummator
+#include "polys/operations/p_Mult_q.h" // for MIN_LENGTH_BUCKET
 
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/polys.h>
-#include <kernel/GBEngine/syz.h>
-#include <kernel/ideals.h>
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/polys.h"
+#include "kernel/GBEngine/syz.h"
+#include "kernel/ideals.h"
 
-#include <kernel/oswrapper/timer.h>
+#include "kernel/oswrapper/timer.h"
 
+#include "Singular/tok.h"
+#include "Singular/ipid.h"
+#include "Singular/lists.h"
+#include "Singular/attrib.h"
 
-#include <Singular/tok.h>
-#include <Singular/ipid.h>
-#include <Singular/lists.h>
-#include <Singular/attrib.h>
-
-#include <Singular/ipid.h>
-#include <Singular/ipshell.h> // For iiAddCproc
+#include "Singular/ipid.h"
+#include "Singular/ipshell.h" // For iiAddCproc
 
 #include <stdio.h>
 #include <stdlib.h>
