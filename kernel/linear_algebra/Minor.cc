@@ -1,12 +1,12 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <kernel/linear_algebra/Minor.h>
+#include "kernel/linear_algebra/Minor.h"
 
-#include <kernel/structs.h>
-#include <kernel/polys.h>
+#include "kernel/structs.h"
+#include "kernel/polys.h"
 
 using namespace std;
 

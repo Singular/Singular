@@ -5,38 +5,36 @@
 *  ABSTRACT -  Hilbert series
 */
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
-#include <misc/mylimits.h>
-#include <misc/intvec.h>
+#include "omalloc/omalloc.h"
+#include "misc/mylimits.h"
+#include "misc/intvec.h"
 
-#include <kernel/combinatorics/hilb.h>
-#include <kernel/combinatorics/stairc.h>
-#include <kernel/combinatorics/hutil.h>
+#include "kernel/combinatorics/hilb.h"
+#include "kernel/combinatorics/stairc.h"
+#include "kernel/combinatorics/hutil.h"
 
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
-#include <polys/simpleideals.h>
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
+#include "polys/simpleideals.h"
 
 
-// #include <kernel/structs.h>
-// #include <kernel/polys.h>
+// #include "kernel/structs.h"
+// #include "kernel/polys.h"
 //ADICHANGES:
-#include <kernel/ideals.h>
-// #include <kernel/GBEngine/kstd1.h>
-// #include<gmp.h>
-// #include<vector>
+#include "kernel/ideals.h"
+// #include "kernel/GBEngine/kstd1.h"
 
 # define omsai 1
 #if omsai
 
-#include<libpolys/polys/ext_fields/transext.h>
-#include<libpolys/coeffs/coeffs.h>
-#include<kernel/linear_algebra/linearAlgebra.h>
-#include <coeffs/numbers.h>
+#include "libpolys/polys/ext_fields/transext.h"
+#include "libpolys/coeffs/coeffs.h"
+#include "kernel/linear_algebra/linearAlgebra.h"
+#include "coeffs/numbers.h"
 #include <vector>
-#include <Singular/ipshell.h>
+#include "Singular/ipshell.h"
 
 #endif
 

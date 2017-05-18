@@ -8,26 +8,26 @@
 */
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 //#ifdef HAVE_MPR
 
 //-> includes
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <misc/mylimits.h>
-#include <misc/options.h>
-#include <misc/intvec.h>
+#include "misc/mylimits.h"
+#include "misc/options.h"
+#include "misc/intvec.h"
 
-#include <coeffs/numbers.h>
-#include <coeffs/mpr_global.h>
+#include "coeffs/numbers.h"
+#include "coeffs/mpr_global.h"
 
-#include <polys/matpol.h>
+#include "polys/matpol.h"
 
 
-#include <kernel/structs.h>
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
+#include "kernel/structs.h"
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
 
 
 #include <math.h>
@@ -40,7 +40,7 @@
 #ifdef MPR_TIMING
 #define TIMING
 #endif
-#include <factory/timing.h>
+#include "factory/timing.h"
 TIMING_DEFINE_PRINT(mpr_overall)
 TIMING_DEFINE_PRINT(mpr_check)
 TIMING_DEFINE_PRINT(mpr_constr)

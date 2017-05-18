@@ -10,7 +10,7 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #ifdef HAVE_SPECTRUM
 
@@ -23,7 +23,7 @@
 #endif
 #endif
 
-#include <kernel/spectrum/multicnt.h>
+#include "kernel/spectrum/multicnt.h"
 
 // ----------------------------------------------------------------------------
 //  allocate counter memory

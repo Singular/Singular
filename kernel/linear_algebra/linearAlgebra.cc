@@ -18,21 +18,21 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <coeffs/coeffs.h>
-#include <coeffs/numbers.h>
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
 
-#include <coeffs/mpr_complex.h>
-#include <polys/monomials/p_polys.h>
-#include <polys/simpleideals.h>
-#include <polys/matpol.h>
+#include "coeffs/mpr_complex.h"
+#include "polys/monomials/p_polys.h"
+#include "polys/simpleideals.h"
+#include "polys/matpol.h"
 
-// #include <kernel/polys.h>
+// #include "kernel/polys.h"
 
-#include <kernel/structs.h>
-#include <kernel/ideals.h>
-#include <kernel/linear_algebra/linearAlgebra.h>
+#include "kernel/structs.h"
+#include "kernel/ideals.h"
+#include "kernel/linear_algebra/linearAlgebra.h"
 
 /**
  * The returned score is based on the implementation of 'nSize' for

@@ -7,11 +7,11 @@
 * ABSTRACT - all basic methods to manipulate ideals
 */
 
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
-#include <polys/simpleideals.h>
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
+#include "polys/simpleideals.h"
 
-#include <kernel/structs.h> // for tHomog
+#include "kernel/structs.h" // for tHomog
 
 //typedef struct sip_sideal *        ideal;
 //typedef struct sip_smap *          map;

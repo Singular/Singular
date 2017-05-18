@@ -5,7 +5,7 @@
 * ABSTRACT: input from ttys, simulating fgets
 */
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 #include <errno.h>
 
 // ----------------------------------------
@@ -17,10 +17,10 @@
 #ifdef __CYGWIN__
 #define READLINE_STATIC
 #endif
-#include <omalloc/omalloc.h>
-#include <misc/options.h>
+#include "omalloc/omalloc.h"
+#include "misc/options.h"
 
-#include <kernel/oswrapper/feread.h>
+#include "kernel/oswrapper/feread.h"
 
 #ifdef HAVE_STATIC
 #undef HAVE_DYN_RL
@@ -49,7 +49,7 @@ extern char *iiArithGetCmd(int);
 *   to start from scratch; without any state (i.e. STATE == 0), then we
 *   start at the top of the list.
 */
-#include <Singular/ipid.h>
+#include "Singular/ipid.h"
 extern "C"
 char *command_generator (char *text, int state)
 {

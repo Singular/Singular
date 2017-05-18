@@ -7,11 +7,11 @@
 * ABSTRACT
 */
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 /* for omBin */
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 #ifdef HAVE_RINGS
-#include <coeffs/si_gmp.h>
+#include "coeffs/si_gmp.h"
 #endif
 
 /* standard types */
@@ -20,8 +20,8 @@
 
 /* C++-part */
 #ifdef __cplusplus
-#include <kernel/polys.h>
-#include <polys/coeffrings.h>
+#include "kernel/polys.h"
+#include "polys/coeffrings.h"
 
 class Voice;
 class sleftv;

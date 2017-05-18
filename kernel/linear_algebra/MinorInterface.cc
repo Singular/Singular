@@ -1,21 +1,21 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 // include before anything to avoid clashes with stdio.h included elsewhere
 // #include <cstdio>
 
-#include <kernel/linear_algebra/MinorInterface.h>
-#include <kernel/linear_algebra/MinorProcessor.h>
+#include "kernel/linear_algebra/MinorInterface.h"
+#include "kernel/linear_algebra/MinorProcessor.h"
 
-#include <polys/simpleideals.h>
-#include <coeffs/modulop.h> // for NV_MAX_PRIME
+#include "polys/simpleideals.h"
+#include "coeffs/modulop.h" // for NV_MAX_PRIME
 
-#include <kernel/polys.h>
-#include <kernel/structs.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/ideals.h>
+#include "kernel/polys.h"
+#include "kernel/structs.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/ideals.h"
 
 using namespace std;
 

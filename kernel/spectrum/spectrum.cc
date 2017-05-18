@@ -10,7 +10,7 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #ifdef HAVE_SPECTRUM
 
@@ -21,23 +21,23 @@
 #endif
 #endif
 
-#include <misc/mylimits.h>
+#include "misc/mylimits.h"
 
-#include <coeffs/numbers.h>
-#include <polys/monomials/p_polys.h>
-#include <polys/simpleideals.h>
-#include <misc/intvec.h>
-#include <polys/monomials/ring.h>
+#include "coeffs/numbers.h"
+#include "polys/monomials/p_polys.h"
+#include "polys/simpleideals.h"
+#include "misc/intvec.h"
+#include "polys/monomials/ring.h"
 //extern ring currRing;
 
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/combinatorics/stairc.h>
-#include <kernel/spectrum/multicnt.h>
-#include <kernel/spectrum/GMPrat.h>
-#include <kernel/spectrum/kmatrix.h>
-#include <kernel/spectrum/npolygon.h>
-#include <kernel/spectrum/splist.h>
-#include <kernel/spectrum/semic.h>
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/combinatorics/stairc.h"
+#include "kernel/spectrum/multicnt.h"
+#include "kernel/spectrum/GMPrat.h"
+#include "kernel/spectrum/kmatrix.h"
+#include "kernel/spectrum/npolygon.h"
+#include "kernel/spectrum/splist.h"
+#include "kernel/spectrum/semic.h"
 
 // ----------------------------------------------------------------------------
 //  test if the polynomial  h  has a term of total degree d

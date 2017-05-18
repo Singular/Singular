@@ -10,12 +10,12 @@
 
 
 
-#include <kernel/mod2.h>
-#include <omalloc/omalloc.h>
-#include <polys/monomials/p_polys.h>
-#include <kernel/ideals.h>
-#include <polys/monomials/ring.h>
-#include <kernel/maps/find_perm.h>
+#include "kernel/mod2.h"
+#include "omalloc/omalloc.h"
+#include "polys/monomials/p_polys.h"
+#include "kernel/ideals.h"
+#include "polys/monomials/ring.h"
+#include "kernel/maps/find_perm.h"
 
 static int* find_perm_for_map(const ring preimage_r, const ring image_r, const ideal image)
 {

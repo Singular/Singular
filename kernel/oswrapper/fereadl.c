@@ -9,11 +9,8 @@
 
 
 
-#include <kernel/mod2.h>
-#include <omalloc/omalloc.h>
-
-// #include <kernel/structs.h>
-
+#include "kernel/mod2.h"
+#include "omalloc/omalloc.h"
 
 #ifdef HAVE_FEREAD
   #include <unistd.h>
@@ -710,14 +707,7 @@ char * fe_fgets_stdin_fe(char *pr,char *s, int size)
 /* ================================================================ */
 #if defined(HAVE_DYN_RL)
 #include <unistd.h>
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <sys/types.h>
-//#include <sys/file.h>
-//#include <sys/stat.h>
-//#include <sys/errno.h>
-//#include <dlfcn.h>
-#include <kernel/mod_raw.h>
+#include "kernel/mod_raw.h"
 
   typedef char **CPPFunction ();
 

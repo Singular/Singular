@@ -10,15 +10,15 @@
 
 
 
-#include <kernel/mod2.h>
-#include <omalloc/omalloc.h>
-#include <misc/options.h>
-#include <polys/monomials/p_polys.h>
-#include <polys/prCopy.h>
-#include <kernel/ideals.h>
-#include <polys/monomials/ring.h>
-#include <polys/sbuckets.h>
-#include <kernel/maps/fast_maps.h>
+#include "kernel/mod2.h"
+#include "omalloc/omalloc.h"
+#include "misc/options.h"
+#include "polys/monomials/p_polys.h"
+#include "polys/prCopy.h"
+#include "kernel/ideals.h"
+#include "polys/monomials/ring.h"
+#include "polys/sbuckets.h"
+#include "kernel/maps/fast_maps.h"
 
 // define if you want to use special dest_ring
 #define HAVE_DEST_R 1

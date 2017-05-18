@@ -10,7 +10,7 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #ifdef HAVE_SPECTRUM
 
@@ -21,13 +21,13 @@
 #endif
 #endif
 
-#include <kernel/structs.h>
-#include <kernel/spectrum/GMPrat.h>
-#include <coeffs/numbers.h>
-#include <polys/monomials/p_polys.h>
-#include <kernel/spectrum/npolygon.h>
-#include <kernel/spectrum/splist.h>
-#include <misc/intvec.h>
+#include "kernel/structs.h"
+#include "kernel/spectrum/GMPrat.h"
+#include "coeffs/numbers.h"
+#include "polys/monomials/p_polys.h"
+#include "kernel/spectrum/npolygon.h"
+#include "kernel/spectrum/splist.h"
+#include "misc/intvec.h"
 
 // ------------------------
 //  class spectrumPolyNode

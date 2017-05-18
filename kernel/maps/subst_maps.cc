@@ -1,9 +1,9 @@
-#include <kernel/mod2.h>
-#include <polys/monomials/p_polys.h>
-#include <kernel/ideals.h>
-#include <polys/monomials/ring.h>
-#include <polys/monomials/maps.h>
-#include <kernel/maps/gen_maps.h>
+#include "kernel/mod2.h"
+#include "polys/monomials/p_polys.h"
+#include "kernel/ideals.h"
+#include "polys/monomials/ring.h"
+#include "polys/monomials/maps.h"
+#include "kernel/maps/gen_maps.h"
 
 static poly p_SubstMon(poly p, int var, poly image, const ring preimage_r, const ring image_r, const nMapFunc nMap, matrix cache)
 {

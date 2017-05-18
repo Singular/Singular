@@ -12,9 +12,9 @@
 #ifndef FGLM_H
 #define FGLM_H
 
-#include <kernel/polys.h>
-#include <kernel/structs.h>
-#include <kernel/fglm/fglmvec.h>
+#include "kernel/polys.h"
+#include "kernel/structs.h"
+#include "kernel/fglm/fglmvec.h"
 
 #define PROT(msg)
 #define STICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)

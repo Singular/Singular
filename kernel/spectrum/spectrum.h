@@ -7,8 +7,8 @@
 
 #ifndef SPECTRUM_H
 #define SPECTRUM_H
-#include <kernel/spectrum/npolygon.h>
-#include <kernel/spectrum/splist.h>
+#include "kernel/spectrum/npolygon.h"
+#include "kernel/spectrum/splist.h"
 
 /*BOOLEAN    spectrumProc ( leftv,leftv );
 BOOLEAN    spectrumfProc( leftv,leftv );

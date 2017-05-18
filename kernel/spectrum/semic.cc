@@ -10,7 +10,7 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #ifdef HAVE_SPECTRUM
 
@@ -24,10 +24,10 @@
 
 #include <string.h>
 
-#include <misc/intvec.h>
-#include <misc/mylimits.h>
-#include <kernel/spectrum/GMPrat.h>
-#include <kernel/spectrum/semic.h>
+#include "misc/intvec.h"
+#include "misc/mylimits.h"
+#include "kernel/spectrum/GMPrat.h"
+#include "kernel/spectrum/semic.h"
 
 // ----------------------------------------------------------------------------
 //  Copy constructor for  spectrum

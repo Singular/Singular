@@ -1,18 +1,18 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-#include <kernel/mod2.h>
-#include <omalloc/omalloc.h>
-#include <misc/options.h>
-#include <polys/monomials/p_polys.h>
-#include <polys/prCopy.h>
-#include <kernel/ideals.h>
-#include <polys/monomials/ring.h>
-#include <polys/monomials/maps.h>
-#include <polys/sbuckets.h>
-#include <kernel/maps/fast_maps.h>
-#include <kernel/maps/find_perm.h>
-#include <kernel/maps/gen_maps.h>
+#include "kernel/mod2.h"
+#include "omalloc/omalloc.h"
+#include "misc/options.h"
+#include "polys/monomials/p_polys.h"
+#include "polys/prCopy.h"
+#include "kernel/ideals.h"
+#include "polys/monomials/ring.h"
+#include "polys/monomials/maps.h"
+#include "polys/sbuckets.h"
+#include "kernel/maps/fast_maps.h"
+#include "kernel/maps/find_perm.h"
+#include "kernel/maps/gen_maps.h"
 
 static void find_subst_for_map(const ring preimage_r, const ring image_r, const ideal image, int &var,poly &p)
 {

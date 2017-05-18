@@ -5,16 +5,16 @@
 * ABSTRACT: Utilities for staircase operations
 */
 
-#include <kernel/mod2.h>
-// #include <kernel/structs.h>
-#include <omalloc/omalloc.h>
+#include "kernel/mod2.h"
+// #include "kernel/structs.h"
+#include "omalloc/omalloc.h"
 
-#include <polys/simpleideals.h>
-#include <polys/monomials/p_polys.h>
+#include "polys/simpleideals.h"
+#include "polys/monomials/p_polys.h"
 
-// #include <kernel/ideals.h>
-#include <kernel/polys.h>
-#include <kernel/combinatorics/hutil.h>
+// #include "kernel/ideals.h"
+#include "kernel/polys.h"
+#include "kernel/combinatorics/hutil.h"
 
 scfmon hexist, hstc, hrad, hwork;
 scmon hpure, hpur0;

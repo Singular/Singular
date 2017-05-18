@@ -5,14 +5,12 @@
  ************************************************/
 
 
-#include<cmath>
+#include <cmath>
 #include <cstdlib>
 
 
 
-#include<kernel/mod2.h>
-
-//#include<iomanip>
+#include "kernel/mod2.h"
 
 #include "minpoly.h"
 

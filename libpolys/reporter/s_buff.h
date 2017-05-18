@@ -1,7 +1,7 @@
 #ifndef S_BUFFIO_H
 #define S_BUFFIO_H
 
-#include<gmp.h>
+#include <gmp.h>
 
 struct s_buff_s
 {

@@ -8,18 +8,18 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #ifdef HAVE_EIGENVAL
 
-#include <kernel/structs.h>
-#include <misc/intvec.h>
-#include <coeffs/numbers.h>
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <polys/matpol.h>
-#include <polys/clapsing.h>
-#include <kernel/linear_algebra/eigenval.h>
+#include "kernel/structs.h"
+#include "misc/intvec.h"
+#include "coeffs/numbers.h"
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
+#include "polys/matpol.h"
+#include "polys/clapsing.h"
+#include "kernel/linear_algebra/eigenval.h"
 
 
 matrix evSwap(matrix M,int i,int j)

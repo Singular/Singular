@@ -3,8 +3,8 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-#include <coeffs/coeffs.h>
-#include <polys/matpol.h>
+#include "coeffs/coeffs.h"
+#include "polys/matpol.h"
 /// helper function for maMapIdeal
 /// mapping ideal/matrix/module for the case of a permutation:
 /// maps the ideal/module/matrix to_map via the map from preimage_r with image image

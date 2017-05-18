@@ -9,7 +9,7 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #include <sys/resource.h>
 #include <time.h>
@@ -51,8 +51,8 @@ void SetMinDisplayTime(double mtime)
 #endif
 
 
-#include <reporter/reporter.h>
-#include <kernel/oswrapper/timer.h>
+#include "reporter/reporter.h"
+#include "kernel/oswrapper/timer.h"
 
 /*3
 * the start time of the timer

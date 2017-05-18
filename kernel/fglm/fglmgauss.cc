@@ -11,12 +11,12 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <kernel/structs.h>
-#include <coeffs/numbers.h>
-#include <polys/monomials/ring.h>
-#include <omalloc/omalloc.h>
+#include "kernel/structs.h"
+#include "coeffs/numbers.h"
+#include "polys/monomials/ring.h"
+#include "omalloc/omalloc.h"
 
 #include "fglmvec.h"
 #include "fglmgauss.h"

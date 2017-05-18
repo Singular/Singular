@@ -1,49 +1,49 @@
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
-#include <factory/factory.h> // :(
+#include "omalloc/omalloc.h"
+#include "factory/factory.h" // :(
 
-#include <misc/intvec.h>
-#include <misc/int64vec.h>
-#include <misc/mylimits.h>
-#include <misc/options.h>
+#include "misc/intvec.h"
+#include "misc/int64vec.h"
+#include "misc/mylimits.h"
+#include "misc/options.h"
 
-#include <reporter/reporter.h>
+#include "reporter/reporter.h"
 
-#include <resources/feFopen.h>
-#include <resources/feResource.h>
+#include "resources/feFopen.h"
+#include "resources/feResource.h"
 
-#include <coeffs/coeffs.h>
+#include "coeffs/coeffs.h"
 
-#include <coeffs/si_gmp.h>
+#include "coeffs/si_gmp.h"
 
-#include <polys/kbuckets.h>
-#include <polys/matpol.h>
-#include <polys/mod_raw.h>
-#include <polys/prCopy.h>
-#include <polys/sbuckets.h>
-#include <polys/simpleideals.h>
-#include <polys/weight.h>
+#include "polys/kbuckets.h"
+#include "polys/matpol.h"
+#include "polys/mod_raw.h"
+#include "polys/prCopy.h"
+#include "polys/sbuckets.h"
+#include "polys/simpleideals.h"
+#include "polys/weight.h"
 
-#include <polys/monomials/maps.h>
-#include <polys/monomials/monomials.h>
-#include <polys/monomials/p_polys.h>
-#include <polys/monomials/ring.h>
+#include "polys/monomials/maps.h"
+#include "polys/monomials/monomials.h"
+#include "polys/monomials/p_polys.h"
+#include "polys/monomials/ring.h"
 
-#include <polys/nc/nc.h>
-#include <polys/nc/ncSACache.h>
-#include <polys/nc/ncSAFormula.h>
-#include <polys/nc/ncSAMult.h>
-#include <polys/nc/sca.h>
-#include <polys/nc/summator.h>
+#include "polys/nc/nc.h"
+#include "polys/nc/ncSACache.h"
+#include "polys/nc/ncSAFormula.h"
+#include "polys/nc/ncSAMult.h"
+#include "polys/nc/sca.h"
+#include "polys/nc/summator.h"
 
 
-#include <polys/templates/p_MemAdd.h>
-#include <polys/templates/p_Procs.h>
+#include "polys/templates/p_MemAdd.h"
+#include "polys/templates/p_Procs.h"
 
-#include <polys/operations/pShallowCopyDelete.h>
+#include "polys/operations/pShallowCopyDelete.h"
 
-#include <polys/clapsing.h>
+#include "polys/clapsing.h"
 
 
 // // TODO: DUE to the use of HALT in npolygon.cc :(((
@@ -56,129 +56,116 @@ char * showOption(){return NULL;}
 char *iiArithGetCmd(int nPos){return NULL; }
 
 
-#include <coeffs/numbers.h>
+#include "coeffs/numbers.h"
 
 #include "structs.h"
 
 
 // HEADERS:
-#include <kernel/combinatorics/hutil.h>
-#include <kernel/combinatorics/stairc.h>
-#include <kernel/ideals.h>
-#include <kernel/GBEngine/syz.h>
-#include <kernel/maps/fast_maps.h>
-#include <kernel/groebner_walk/walkProc.h>
-#include <kernel/groebner_walk/walkMain.h>
-#include <kernel/groebner_walk/walkSupport.h>
-#include <kernel/GBEngine/khstd.h>
-/// #include <kernel/sparsmat.h> // TODO: install polys/this!
+#include "kernel/combinatorics/hutil.h"
+#include "kernel/combinatorics/stairc.h"
+#include "kernel/ideals.h"
+#include "kernel/GBEngine/syz.h"
+#include "kernel/maps/fast_maps.h"
+#include "kernel/groebner_walk/walkProc.h"
+#include "kernel/groebner_walk/walkMain.h"
+#include "kernel/groebner_walk/walkSupport.h"
+#include "kernel/GBEngine/khstd.h"
+/// #include "kernel/sparsmat.h" // TODO: install polys/this!
 //+
 
-#include <kernel/fglm/fglm.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/fglm/fglmgauss.h>
-#include <kernel/fglm/fglmvec.h>
-#include <kernel/GBEngine/kstdfac.h>
-#include <kernel/spectrum/kmatrix.h>
-#include <kernel/spectrum/GMPrat.h>
-#include <kernel/spectrum/multicnt.h>
-#include <kernel/spectrum/npolygon.h>
-#include <kernel/spectrum/semic.h>
-#include <kernel/spectrum/spectrum.h>
-#include <kernel/spectrum/splist.h>
-#include <kernel/spectrum/multicnt.h>
-#include <kernel/linear_algebra/eigenval.h>
-#include <kernel/GBEngine/units.h>
-#include <kernel/GBEngine/ratgring.h>
-#include <kernel/GBEngine/shiftgb.h>
+#include "kernel/fglm/fglm.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/fglm/fglmgauss.h"
+#include "kernel/fglm/fglmvec.h"
+#include "kernel/GBEngine/kstdfac.h"
+#include "kernel/spectrum/kmatrix.h"
+#include "kernel/spectrum/GMPrat.h"
+#include "kernel/spectrum/multicnt.h"
+#include "kernel/spectrum/npolygon.h"
+#include "kernel/spectrum/semic.h"
+#include "kernel/spectrum/spectrum.h"
+#include "kernel/spectrum/splist.h"
+#include "kernel/spectrum/multicnt.h"
+#include "kernel/linear_algebra/eigenval.h"
+#include "kernel/GBEngine/units.h"
+#include "kernel/GBEngine/ratgring.h"
+#include "kernel/GBEngine/shiftgb.h"
 
 
-#include <kernel/GBEngine/kutil.h>
+#include "kernel/GBEngine/kutil.h"
 
 // #include "CCRing.h" // Too old!
-#include <kernel/digitech.h>
-#include <kernel/linear_algebra/eigenval.h>
-#include <kernel/maps/fast_maps.h>
-#include <kernel/fast_mult.h>
+#include "kernel/digitech.h"
+#include "kernel/linear_algebra/eigenval.h"
+#include "kernel/maps/fast_maps.h"
+#include "kernel/fast_mult.h"
 
-#include <kernel/fglm/fglmgauss.h>
-#include <kernel/fglm/fglm.h>
-#include <kernel/fglm/fglmvec.h>
+#include "kernel/fglm/fglmgauss.h"
+#include "kernel/fglm/fglm.h"
+#include "kernel/fglm/fglmvec.h"
 
-////////#include <kernel/F5cData.h>
-#include <kernel/GBEngine/f5c.h>
-#include <kernel/GBEngine/f5data.h>
-#include <kernel/GBEngine/f5gb.h>
-#include <kernel/GBEngine/f5lists.h>
-////////#include <kernel/F5cLists.h>
-
-
-// #include "Ideal.h" // Too old?
+////////#include "kernel/F5cData.h"
+#include "kernel/GBEngine/f5c.h"
+#include "kernel/GBEngine/f5data.h"
+#include "kernel/GBEngine/f5gb.h"
+#include "kernel/GBEngine/f5lists.h"
+////////#include "kernel/F5cLists.h"
 
 
-#include <kernel/ideals.h>
+#include "kernel/ideals.h"
 
-#include <kernel/spectrum/kmatrix.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/GBEngine/kstdfac.h>
-#include <kernel/GBEngine/khstd.h>
+#include "kernel/spectrum/kmatrix.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/kstdfac.h"
+#include "kernel/GBEngine/khstd.h"
 
-#include <kernel/linear_algebra/linearAlgebra.h>
+#include "kernel/linear_algebra/linearAlgebra.h"
 
+#include "kernel/spectrum/multicnt.h"
+#include "kernel/spectrum/npolygon.h"
+#include "kernel/preimage.h"
 
+#include "kernel/GBEngine/nc.h"
 
-// #include <kernel/lplist.h> // Too old!
-#include <kernel/spectrum/multicnt.h>
-#include <kernel/spectrum/npolygon.h>
-// #include "Number.h" // Too old?
-// #include "Poly.h" // Too old?
-// #include "PowerSeries.h" // Too old?
+#include "kernel/GBEngine/ratgring.h"
+#include "kernel/GBEngine/ringgb.h"
+#include "kernel/spectrum/semic.h"
+#include "kernel/GBEngine/shiftgb.h"
+#include "kernel/spectrum/spectrum.h"
+#include "kernel/spectrum/splist.h"
+#include "kernel/structs.h"
+#include "kernel/GBEngine/syz.h"
+// #include "kernel/testpoly.h" // Too old?
 
-#include <kernel/preimage.h>
-
-#include <kernel/GBEngine/nc.h>
-
-#include <kernel/GBEngine/ratgring.h>
-#include <kernel/GBEngine/ringgb.h>
-#include <kernel/spectrum/semic.h>
-#include <kernel/GBEngine/shiftgb.h>
-#include <kernel/spectrum/spectrum.h>
-#include <kernel/spectrum/splist.h>
-#include <kernel/structs.h>
-#include <kernel/GBEngine/syz.h>
-// #include <kernel/testpoly.h> // Too old?
-
-#include <kernel/GBEngine/tgbgauss.h>
-#include <kernel/GBEngine/tgb.h>
+#include "kernel/GBEngine/tgbgauss.h"
+#include "kernel/GBEngine/tgb.h"
 
 
-#include <kernel/GBEngine/units.h>
-#include <kernel/groebner_walk/walkMain.h>
-#include <kernel/groebner_walk/walkProc.h>
-#include <kernel/groebner_walk/walkSupport.h>
+#include "kernel/GBEngine/units.h"
+#include "kernel/groebner_walk/walkMain.h"
+#include "kernel/groebner_walk/walkProc.h"
+#include "kernel/groebner_walk/walkSupport.h"
 
-#include <kernel/GBEngine/janet.h>
-#include <kernel/linear_algebra/interpolation.h>
-#include <kernel/linear_algebra/minpoly.h>
+#include "kernel/GBEngine/janet.h"
+#include "kernel/linear_algebra/interpolation.h"
+#include "kernel/linear_algebra/minpoly.h"
 
-#include <kernel/linear_algebra/Minor.h>
-#include <kernel/linear_algebra/MinorInterface.h>
-#include <kernel/linear_algebra/MinorProcessor.h>
-#include <kernel/linear_algebra/Cache.h>
-#include <kernel/linear_algebra/CacheImplementation.h>
+#include "kernel/linear_algebra/Minor.h"
+#include "kernel/linear_algebra/MinorInterface.h"
+#include "kernel/linear_algebra/MinorProcessor.h"
+#include "kernel/linear_algebra/Cache.h"
+#include "kernel/linear_algebra/CacheImplementation.h"
 
-// #include <polys/clapconv.h> // due to factory? :(
-// #include <kernel/tgb_internal.h> // :(
+// #include "polys/clapconv.h" // due to factory? :(
+// #include "kernel/tgb_internal.h" // :(
+
+// #include "kernel/fglm/fglmzero.cc" // looks like <factory/templates/ftmpl_list.h> must be installed!
+// TODO: looks like "coeffs/mpr_complex.h" must be installed!
 
 
 
-
-// #include <kernel/fglm/fglmzero.cc> // looks like <factory/templates/ftmpl_list.h> must be installed!
-// TODO: looks like <coeffs/mpr_complex.h> must be installed!
-
-
-
-#include <kernel/polys.h>
+#include "kernel/polys.h"
 
 void TestGBEngine()
 {

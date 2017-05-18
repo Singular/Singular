@@ -2,19 +2,19 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <factory/factory.h>
+#include "factory/factory.h"
 
-#include <misc/options.h>
-#include <misc/intvec.h>
+#include "misc/options.h"
+#include "misc/intvec.h"
 
-#include <coeffs/longrat.h> // snumber ...
+#include "coeffs/longrat.h" // snumber ...
 
-#include <polys/monomials/ring.h>
+#include "polys/monomials/ring.h"
 
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
 
 #include "interpolation.h"
 

@@ -15,7 +15,7 @@
 #ifdef HAVE_SPECTRUM
 
 
-#include <kernel/spectrum/GMPrat.h>
+#include "kernel/spectrum/GMPrat.h"
 
 typedef enum
 {

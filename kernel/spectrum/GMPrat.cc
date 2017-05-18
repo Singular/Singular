@@ -11,7 +11,7 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #ifdef HAVE_SPECTRUM
 
@@ -27,7 +27,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#include <kernel/spectrum/GMPrat.h>
+#include "kernel/spectrum/GMPrat.h"
 
 // ----------------------------------------------------------------------------
 //  disconnect a rational from its reference

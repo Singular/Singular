@@ -63,8 +63,6 @@
 #ifndef MINPOLY_H
 #define MINPOLY_H
 
-//#include<iostream>
-
 class NewVectorMatrix;
 
 class LinearDependencyMatrix {

@@ -7,7 +7,7 @@
  * ABSTRACT: terminal input
  */
 
-#include <kernel/structs.h>
+#include "kernel/structs.h"
 
 extern char    prompt_char; /*1 either '>' or '.'*/
 

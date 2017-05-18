@@ -11,9 +11,9 @@
 */
 
 //-> include & define stuff
-#include <coeffs/numbers.h>
-#include <coeffs/mpr_global.h>
-#include <coeffs/mpr_complex.h>
+#include "coeffs/numbers.h"
+#include "coeffs/mpr_global.h"
+#include "coeffs/mpr_complex.h"
 
 // define polish mode when finding roots
 #define PM_NONE    0

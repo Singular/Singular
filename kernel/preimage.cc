@@ -1,22 +1,22 @@
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
-#include <misc/options.h>
-#include <misc/intvec.h>
+#include "omalloc/omalloc.h"
+#include "misc/options.h"
+#include "misc/intvec.h"
 
-#include <kernel/polys.h>
-#include <polys/monomials/ring.h>
+#include "kernel/polys.h"
+#include "polys/monomials/ring.h"
 
 
-#include <kernel/ideals.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/GBEngine/khstd.h>
+#include "kernel/ideals.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/khstd.h"
 
-#include <kernel/GBEngine/kutil.h>
+#include "kernel/GBEngine/kutil.h"
 
 
 #ifdef HAVE_PLURAL
-#include <polys/nc/nc.h>
+#include "polys/nc/nc.h"
 #endif
 
 /*2

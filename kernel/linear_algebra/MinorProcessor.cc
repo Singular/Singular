@@ -1,17 +1,17 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <kernel/linear_algebra/MinorProcessor.h>
+#include "kernel/linear_algebra/MinorProcessor.h"
 
-#include <polys/kbuckets.h>
+#include "polys/kbuckets.h"
 
-#include <kernel/structs.h>
-#include <kernel/polys.h>
-#include <kernel/GBEngine/kstd1.h>
+#include "kernel/structs.h"
+#include "kernel/polys.h"
+#include "kernel/GBEngine/kstd1.h"
 
-#include <kernel/ideals.h>
+#include "kernel/ideals.h"
 
 using namespace std;
 

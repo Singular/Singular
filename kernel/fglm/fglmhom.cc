@@ -12,29 +12,29 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 #if 0
-#include <factoryconf.h>
+#include "factoryconf.h"
 #ifndef NOSTREAMIO
-#include <iostream.h>
+#include "iostream.h"
 #endif
-// #include <Singular/tok.h>
-#include <kernel/structs.h>
-#include <kernel/subexpr.h>
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <polys/monomials/ring.h>
-#include <kernel/ipid.h>
-#include <kernel/ipshell.h>
-#include <polys/monomials/maps.h>
-#include <omalloc/omalloc.h>
+// #include "Singular/tok.h"
+#include "kernel/structs.h"
+#include "kernel/subexpr.h"
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
+#include "polys/monomials/ring.h"
+#include "kernel/ipid.h"
+#include "kernel/ipshell.h"
+#include "polys/monomials/maps.h"
+#include "omalloc/omalloc.h"
 #include "fglm.h"
 #include "fglmvec.h"
 #include "fglmgauss.h"
-#include <misc/intvec.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/combinatorics/stairc.h>
-#include <factory/templates/ftmpl_list.h>
+#include "misc/intvec.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/combinatorics/stairc.h"
+#include "factory/templates/ftmpl_list.h"
 
 // obachman: Got rid off those "redefiende messages by includeing fglm.h
 #include "fglm.h"

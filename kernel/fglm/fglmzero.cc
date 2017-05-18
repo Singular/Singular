@@ -20,28 +20,28 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 
 // assumes, that NOSTREAMIO is set in factoryconf.h, which is included
 // by templates/list.h.
 
-#include <factory/factory.h>
+#include "factory/factory.h"
 
-#include <factory/templates/ftmpl_list.h>
-#include <factory/templates/ftmpl_list.cc>
+#include "factory/templates/ftmpl_list.h"
+#include "factory/templates/ftmpl_list.cc"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <misc/options.h>
-#include <misc/intvec.h>
+#include "misc/options.h"
+#include "misc/intvec.h"
 
-#include <polys/monomials/maps.h>
-#include <polys/monomials/ring.h>
+#include "polys/monomials/maps.h"
+#include "polys/monomials/ring.h"
 
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <kernel/GBEngine/kstd1.h>
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
+#include "kernel/GBEngine/kstd1.h"
 
 #include "fglm.h"
 #include "fglmvec.h"

@@ -4,12 +4,12 @@
 
 
 
-#include <kernel/mod2.h>
-#include <polys/monomials/ring.h>
+#include "kernel/mod2.h"
+#include "polys/monomials/ring.h"
 
-#include <kernel/digitech.h>
-#include <polys/kbuckets.h>
-#include <kernel/ideals.h>
+#include "kernel/digitech.h"
+#include "polys/kbuckets.h"
+#include "kernel/ideals.h"
 static ideal zero_ideal;
 
 void bit_reduce(poly & f,ring r)

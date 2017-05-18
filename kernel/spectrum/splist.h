@@ -15,7 +15,7 @@
 #ifndef SPLIST_H
 #define SPLIST_H
 
-#include <kernel/spectrum/npolygon.h>
+#include "kernel/spectrum/npolygon.h"
 
 /*enum    spectrumState
 {

@@ -11,25 +11,25 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <misc/mylimits.h>
-#include <misc/options.h>
-#include <misc/intvec.h>
-#include <misc/sirandom.h>
+#include "misc/mylimits.h"
+#include "misc/options.h"
+#include "misc/intvec.h"
+#include "misc/sirandom.h"
 
-#include <coeffs/numbers.h>
-#include <coeffs/mpr_global.h>
+#include "coeffs/numbers.h"
+#include "coeffs/mpr_global.h"
 
-#include <polys/matpol.h>
-#include <polys/sparsmat.h>
+#include "polys/matpol.h"
+#include "polys/sparsmat.h"
 
-#include <polys/clapsing.h>
+#include "polys/clapsing.h"
 
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
 
 #include "mpr_base.h"
 #include "mpr_numeric.h"

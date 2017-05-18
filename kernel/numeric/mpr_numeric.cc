@@ -8,31 +8,29 @@
 *            ( root finder, vandermonde system solver, simplex )
 */
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
 //#ifdef HAVE_MPR
 
 //#define mprDEBUG_ALL
 
 //-> includes
-#include <misc/mylimits.h>
-#include <misc/options.h>
-#include <misc/intvec.h>
+#include "misc/mylimits.h"
+#include "misc/options.h"
+#include "misc/intvec.h"
 
-#include <coeffs/numbers.h>
-#include <coeffs/mpr_global.h>
+#include "coeffs/numbers.h"
+#include "coeffs/mpr_global.h"
 
-#include <polys/matpol.h>
+#include "polys/matpol.h"
 
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
 
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-
-//#include "longrat.h"
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
 
 #include "mpr_base.h"
 #include "mpr_numeric.h"

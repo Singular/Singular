@@ -10,7 +10,7 @@
 
 
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #ifdef HAVE_SPECTRUM
 
@@ -21,14 +21,13 @@
 #endif
 #endif
 
-//#include <kernel/polys.h>
-#include <polys/monomials/p_polys.h>
-#include <polys/monomials/ring.h>
+#include "polys/monomials/p_polys.h"
+#include "polys/monomials/ring.h"
 
-#include <kernel/spectrum/GMPrat.h>
-#include <kernel/spectrum/kmatrix.h>
-#include <kernel/spectrum/npolygon.h>
-#include <kernel/structs.h>
+#include "kernel/spectrum/GMPrat.h"
+#include "kernel/spectrum/kmatrix.h"
+#include "kernel/spectrum/npolygon.h"
+#include "kernel/structs.h"
 
 // ----------------------------------------------------------------------------
 //  Allocate memory for a linear form of  k  terms
