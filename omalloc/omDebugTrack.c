@@ -601,29 +601,33 @@ void omPrintTrackAddrInfo(FILE* fd, void* addr, int max_frames)
   omTrackAddr d_addr = omOutAddr_2_TrackAddr(addr);
   omAssume(d_addr->track > 0);
   if (max_frames <= 0) return;
-  if (! (d_addr->flags & OM_FUSED)) return;
+  if (! (d_addr->flags & OM_FUSED))
+  {
+    fputs(" freed\n",fd);
+    return;
+  }
 
   if (max_frames > OM_MAX_KEPT_FRAMES) max_frames = OM_MAX_KEPT_FRAMES;
 
-  fprintf(fd, " allocated at ");
+  fputs(" allocated at ",fd);
   if (! _omPrintBackTrace((void **)OM_ALLOC_FRAMES(d_addr),
                           (d_addr->track > 1 ? max_frames : 0),
                           fd,
                           OM_FLR_ARG(d_addr->alloc_file, d_addr->alloc_line, d_addr->alloc_r)))
-    fprintf(fd," ??");
+    fputs(" ??",fd);
   if (d_addr->track > 1)
   {
     if (d_addr->track > 3 && ! (d_addr->flags & OM_FUSED))
     {
-      fprintf(fd, "\n freed at ");
+      fputs("\n freed at ",fd);
       if (! _omPrintBackTrace(OM_FREE_FRAMES(d_addr),
                           (d_addr->track > 4 ? max_frames : 0),
                           fd,
                           OM_FLR_ARG(d_addr->free_file, d_addr->free_line, d_addr->free_r)))
-        fprintf(fd," ??");
+        fputs(" ??",fd);
     }
   }
-  fprintf(fd, "\n");
+  fputc('\n',fd);
   fflush(fd);
 }
 

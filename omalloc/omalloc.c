@@ -41,14 +41,14 @@ void free(void* addr)
 
 void* valloc(size_t size)
 {
-  fprintf(stderr, "omalloc Warning: valloc not yet implemented\n");
+  fputs("omalloc Warning: valloc not yet implemented\n",stderr);
   fflush(NULL);
   return NULL;
 }
 
 void* memalign(size_t size_1, size_t size_2)
 {
-  fprintf(stderr, "omalloc Warning: memalign not yet implemented\n");
+  fputs("omalloc Warning: memalign not yet implemented\n",stderr);
   fflush(NULL);
   return NULL;
 }

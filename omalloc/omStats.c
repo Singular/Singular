@@ -129,7 +129,7 @@ void omPrintStats(FILE* fd)
 void omPrintInfo(FILE* fd)
 {
   omUpdateInfo();
-  fprintf(fd, "                  Current:       Max:\n");
+  fputs("                  Current:       Max:\n",fd);
   fprintf(fd, "BytesSystem:     %8ldk  %8ldk\n", om_Info.CurrentBytesSystem/1024, om_Info.MaxBytesSystem/1024);
   fprintf(fd, "BytesSbrk:       %8ldk  %8ldk\n", om_Info.CurrentBytesSbrk/1024, om_Info.MaxBytesSbrk/1024);
   fprintf(fd, "BytesMmap:       %8ldk  %8ldk\n", om_Info.CurrentBytesMmap/1024, om_Info.MaxBytesMmap/1024);
@@ -137,7 +137,7 @@ void omPrintInfo(FILE* fd)
   fprintf(fd, "BytesFromValloc: %8ldk  %8ldk\n", om_Info.CurrentBytesFromValloc/1024, om_Info.MaxBytesFromValloc/1024);
   fprintf(fd, "PagesAlloc:      %8ld   %8ld \n", om_Info.UsedPages, om_Info.MaxPages);
   fprintf(fd, "RegionsAlloc:    %8ld   %8ld \n", om_Info.CurrentRegionsAlloc, om_Info.MaxRegionsAlloc);
-  fprintf(fd, "                     Used:     Avail:\n");
+  fputs("                     Used:     Avail:\n",fd);
   fprintf(fd, "BytesAppl:       %8ldk  %8ldk\n", om_Info.UsedBytes/1024, om_Info.AvailBytes/1024);
   fprintf(fd, "BytesMalloc:     %8ldk  %8ldk\n", om_Info.UsedBytesMalloc/1024, om_Info.AvailBytesMalloc/1024);
   fprintf(fd, "BytesValloc:     %8ldk  %8ldk\n", om_Info.UsedBytesFromValloc/1024, om_Info.AvailBytesFromValloc/1024);

@@ -662,7 +662,7 @@ static void omPrintBinStat(FILE * fd, omBin bin, int track, long* pages, long* u
 {
   if (track)
   {
-    fprintf(fd, "T \t \t");
+    fputs("T \t \t",fd);
   }
   else
   {
@@ -697,7 +697,7 @@ void omPrintBinStats(FILE* fd)
   omSpecBin s_bin = om_SpecBin;
   omBin sticky;
 
-  fprintf(fd, " SizeW\tBlocks\tUPages\tFBlocks\tUBlocks\tSticky\n");
+  fputs(" SizeW\tBlocks\tUPages\tFBlocks\tUBlocks\tSticky\n",fd);
   fflush(fd);
   while (s_bin != NULL || i >= 0)
   {
@@ -747,7 +747,7 @@ void omPrintBinStats(FILE* fd)
     used_blocks += used_blocks_p;
     free_blocks += free_blocks_p;
   }
-  fprintf(fd, "----------------------------------------\n");
+  fputs("----------------------------------------\n",fd);
   fprintf(fd, "      \t      \t%ld\t%ld\t%ld\n", pages, free_blocks, used_blocks);
 }
 

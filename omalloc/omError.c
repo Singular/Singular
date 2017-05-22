@@ -106,7 +106,7 @@ omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,
     {
       va_list ap;
       va_start(ap, fmt);
-      fprintf(stderr, ": ");
+      fputs( ": ",stderr);
       vfprintf(stderr, fmt, ap);
       va_end(ap);
     }
@@ -114,12 +114,12 @@ omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,
     if (om_Opts.HowToReportErrors > 1)
     {
 #ifndef OM_NDEBUG
-      fprintf(stderr, "\n occurred at: ");
+      fputs("\n occurred at: ",stderr);
       if (! _omPrintCurrentBackTrace(stderr, OM_FLR_VAL))
-        fprintf(stderr, " ??");
+        fputs(" ??",stderr);
 #endif
     }
-    fprintf(stderr, "\n");
+    fputc('\n',stderr);
     fflush(stderr);
   }
   if (om_CallErrorHook)
