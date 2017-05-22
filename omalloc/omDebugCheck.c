@@ -417,24 +417,31 @@ omError_t omReportAddrError(omError_t error, omError_t report_error, void* addr,
   return om_ErrorStatus;
 }
 
-void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omTrackFlags_t flags, int frames, const char* s)
+static void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omTrackFlags_t flags, int frames, const char* s)
 {
   int x;
-  if (! (x=omCheckPtr(addr, omError_MaxError, OM_FLR)))
+  if ((! (x=omCheckPtr(addr, omError_MaxError, OM_FLR)))
+  ||(x==omError_UnalignedAddr))
   {
     fprintf(fd, "%s addr:%p size:%ld", s, addr, (long)omSizeOfAddr(addr));
 
-  if (error == omError_WrongSize && (flags & OM_FSIZE))
-    fprintf(fd, " specified size:%ld", (long) bin_size);
+    if (error == omError_UnalignedAddr)
+      fputs(" unaligned",fd);
 
-  if (error == omError_WrongBin && (flags & OM_FBIN))
-    fprintf(fd, " specified bin is of size:%ld",
+    if (error == omError_WrongSize && (flags & OM_FSIZE))
+      fprintf(fd, " specified size:%ld", (long) bin_size);
+
+    if (error == omError_WrongBin && (flags & OM_FBIN))
+      fprintf(fd, " specified bin is of size:%ld",
                  (long)((omBin) bin_size)->sizeW << LOG_SIZEOF_LONG);
 
-  if (omIsTrackAddr(addr))
-    omPrintTrackAddrInfo(fd, addr, frames);
-  else
-    fprintf(fd, "\n");
+    if (omIsTrackAddr(addr))
+      omPrintTrackAddrInfo(fd, addr, frames);
+    else
+    {
+      fputs(" !omIsTrackAddr\n",fd);
+      omPrintTrackAddrInfo(fd, addr, frames);
+    }
   }
   else
   {
@@ -549,7 +556,7 @@ static void _omPrintUsedAddr(void* addr)
     if (om_print_frames > 0)
     {
       _omPrintAddrInfo(om_print_used_addr_fd, omError_NoError, addr, NULL, 0, om_print_frames, "");
-      fprintf(om_print_used_addr_fd, "\n");
+      fputc('\n',om_print_used_addr_fd);
     }
   }
 }
