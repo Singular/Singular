@@ -56,7 +56,6 @@ char * newstruct_String(blackbox *b, void *d)
 
     if (p!=NULL)
     {
-      BOOLEAN sl;
       sleftv tmp;
       memset(&tmp,0,sizeof(tmp));
       tmp.rtyp=ad->id;
@@ -67,12 +66,11 @@ char * newstruct_String(blackbox *b, void *d)
       hh.id=Tok2Cmdname(p->t);
       hh.typ=PROC_CMD;
       hh.data.pinf=p->p;
-      sl=iiMake_proc(&hh,NULL,&tmp);
+      BOOLEAN sl=iiMake_proc(&hh,NULL,&tmp);
 
       if ((!sl)&& (iiRETURNEXPR.Typ() == STRING_CMD))
       {
-        char *res = omStrDup((char*)iiRETURNEXPR.CopyD());
-        iiRETURNEXPR.CleanUp();
+        char *res = (char*)iiRETURNEXPR.CopyD();
         iiRETURNEXPR.Init();
         return res;
       }
@@ -254,20 +252,16 @@ BOOLEAN newstruct_Op1(int op, leftv res, leftv arg)
 
   if (p!=NULL)
   {
-    BOOLEAN sl;
-    sleftv tmp;
-    memset(&tmp,0,sizeof(sleftv));
-    tmp.Copy(arg);
     idrec hh;
     memset(&hh,0,sizeof(hh));
     hh.id=Tok2Cmdname(p->t);
     hh.typ=PROC_CMD;
     hh.data.pinf=p->p;
-    sl=iiMake_proc(&hh,NULL,&tmp);
+    BOOLEAN sl=iiMake_proc(&hh,NULL,arg);
     if (sl) return TRUE;
     else
     {
-      res->Copy(&iiRETURNEXPR);
+      memcpy(res,&iiRETURNEXPR,sizeof(sleftv));
       iiRETURNEXPR.Init();
       return FALSE;
     }
@@ -464,7 +458,6 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
   while((p!=NULL) && ( (p->t!=op) || (p->args!=2) )) p=p->next;
   if (p!=NULL)
   {
-    BOOLEAN sl;
     sleftv tmp;
     memset(&tmp,0,sizeof(sleftv));
     tmp.Copy(a1);
@@ -475,11 +468,13 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
     hh.id=Tok2Cmdname(p->t);
     hh.typ=PROC_CMD;
     hh.data.pinf=p->p;
-    sl=iiMake_proc(&hh,NULL,&tmp);
+    BOOLEAN sl=iiMake_proc(&hh,NULL,&tmp);
+    a1->CleanUp();
+    a2->CleanUp();
     if (sl) return TRUE;
     else
     {
-      res->Copy(&iiRETURNEXPR);
+      memcpy(res,&iiRETURNEXPR,sizeof(sleftv));
       iiRETURNEXPR.Init();
       return FALSE;
     }
@@ -523,7 +518,7 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
     if (sl) return TRUE;
     else
     {
-      res->Copy(&iiRETURNEXPR);
+      memcpy(res,&iiRETURNEXPR,sizeof(sleftv));
       iiRETURNEXPR.Init();
       return FALSE;
     }
