@@ -370,6 +370,8 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
               if (r!=NULL) r->ref++;
               else WerrorS("ring of this member is not set and no basering found");
             }
+            a1->CleanUp();
+            a2->CleanUp();
             return r==NULL;
           }
           else if (RingDependend(nm->typ)
@@ -438,6 +440,8 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
             while (sh->next != NULL) sh=sh->next;
             sh->next=r;
           }
+          //a1->CleanUp();// see memset above
+          a2->CleanUp();
           return FALSE;
         }
         else
@@ -494,6 +498,7 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
     {
       res->data=(void *)a->blackbox_String(a,args->Data());
       res->rtyp=STRING_CMD;
+      args->CleanUp();
       return FALSE;
     }
     default:
@@ -505,16 +510,13 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
 
   if (p!=NULL)
   {
-    BOOLEAN sl;
-    sleftv tmp;
-    memset(&tmp,0,sizeof(sleftv));
-    tmp.Copy(args);
     idrec hh;
     memset(&hh,0,sizeof(hh));
     hh.id=Tok2Cmdname(p->t);
     hh.typ=PROC_CMD;
     hh.data.pinf=p->p;
-    sl=iiMake_proc(&hh,NULL,&tmp);
+    BOOLEAN sl=iiMake_proc(&hh,NULL,args);
+    args->CleanUp();
     if (sl) return TRUE;
     else
     {
@@ -637,6 +639,7 @@ BOOLEAN newstruct_serialize(blackbox *b, void *d, si_link f)
     }
     f->m->Write(f,&(ll->m[i]));
   }
+  omFreeSize(rings,Ll+1);
   if (ring_changed)
     f->m->SetRing(f,save_ring,FALSE);
   return FALSE;
@@ -650,14 +653,14 @@ BOOLEAN newstruct_deserialize(blackbox **, void **d, si_link f)
   // newstruct_deserialize
   leftv l=f->m->Read(f); // int: length of list
   int Ll=(int)(long)(l->data);
-  omFree(l);
+  omFreeBin(l,sleftv_bin);
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(Ll+1);
   for(int i=0;i<=Ll;i++)
   {
     l=f->m->Read(f);
     memcpy(&(L->m[i]),l,sizeof(sleftv));
-    omFree(l);
+    omFreeBin(l,sleftv_bin);
   }
   //newstruct_desc n=(newstruct_desc)b->data;
   //TODO: check compatibility of list l->data with description in n
