@@ -8055,10 +8055,10 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
       if (bb!=NULL)
       {
         if (!bb->blackbox_Op2(op,res,a,b)) return FALSE;
-        if (errorreported) return TRUE;
         // else: no op defined
       }
-      else          return TRUE;
+      /*else*/
+      return TRUE;
     }
     else if ((bt>MAX_TOK)&&(op!='('))
     {
@@ -8066,10 +8066,10 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
       if (bb!=NULL)
       {
         if(!bb->blackbox_Op2(op,res,a,b)) return FALSE;
-        if (errorreported) return TRUE;
         // else: no op defined
       }
-      else          return TRUE;
+      /*else*/
+      return TRUE;
     }
     int i=iiTabIndex(dArithTab2,JJTAB2LEN,op);
     return iiExprArith2TabIntern(res,a,op,b,proccall,dArith2+i,at,bt,dConvertTypes);
@@ -8243,9 +8243,9 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
         res->rtyp=op;
         res->data=bb->blackbox_Init(bb);
         if(!bb->blackbox_Assign(res,a)) return FALSE;
-        if (errorreported) return TRUE;
       }
-      else          return TRUE;
+      /*else*/
+      return TRUE;
     }
     else if (at>MAX_TOK) // argument is of bb-type
     {
@@ -8253,10 +8253,10 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
       if (bb!=NULL)
       {
         if(!bb->blackbox_Op1(op,res,a)) return FALSE;
-        if (errorreported) return TRUE;
         // else: no op defined
       }
-      else          return TRUE;
+      /*else*/
+      return TRUE;
     }
 
     iiOp=op;
@@ -8457,10 +8457,10 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
       if (bb!=NULL)
       {
         if(!bb->blackbox_Op3(op,res,a,b,c)) return FALSE;
-        if (errorreported) return TRUE;
         // else: no op defined
       }
-      else          return TRUE;
+      /*else*/
+      return TRUE;
       if (errorreported) return TRUE;
     }
     int bt=b->Typ();
@@ -8568,10 +8568,10 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
       if (bb!=NULL)
       {
         if(!bb->blackbox_OpM(op,res,a)) return FALSE;
-        if (errorreported) return TRUE;
         // else: no op defined
       }
-      else          return TRUE;
+      /*else*/
+      return TRUE;
     }
     int args=0;
     if (a!=NULL) args=a->listLength();
