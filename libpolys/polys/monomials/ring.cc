@@ -8,41 +8,31 @@
 /* includes */
 #include <math.h>
 
+#include "omalloc/omalloc.h"
 
+#include "misc/auxiliary.h"
+#include "misc/mylimits.h"
+#include "misc/options.h"
+#include "misc/int64vec.h"
 
+#include "coeffs/numbers.h"
+#include "coeffs/coeffs.h"
 
+#include "polys/monomials/p_polys.h"
+#include "polys/simpleideals.h"
+#include "polys/monomials/ring.h"
+#include "polys/monomials/maps.h"
+#include "polys/prCopy.h"
+#include "polys/templates/p_Procs.h"
 
-#include <omalloc/omalloc.h>
+#include "polys/matpol.h"
 
-#include <misc/auxiliary.h>
-#include <misc/mylimits.h>
-#include <misc/options.h>
-#include <misc/int64vec.h>
-
-#include <coeffs/numbers.h>
-#include <coeffs/coeffs.h>
-
-#include <polys/monomials/p_polys.h>
-#include <polys/simpleideals.h>
-// #include <???/febase.h>
-// #include <???/intvec.h>
-// #include <coeffs/ffields.h>
-#include <polys/monomials/ring.h>
-#include <polys/monomials/maps.h>
-#include <polys/prCopy.h>
-// #include "../Singular/ipshell.h"
-#include <polys/templates/p_Procs.h>
-
-#include <polys/matpol.h>
-
-#include <polys/monomials/ring.h>
+#include "polys/monomials/ring.h"
 
 #ifdef HAVE_PLURAL
-#include <polys/nc/nc.h>
-#include <polys/nc/sca.h>
+#include "polys/nc/nc.h"
+#include "polys/nc/sca.h"
 #endif
-// #include <???/maps.h>
-// #include <???/matpol.h>
 
 
 #include "ext_fields/algext.h"

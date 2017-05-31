@@ -6,8 +6,8 @@
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
-#include <coeffs/coeffs.h>
-#include <polys/monomials/ring.h>
+#include "coeffs/coeffs.h"
+#include "polys/monomials/ring.h"
 
 // poly maEval(map theMap, poly p, ring dst_ring, nMapFunc nMap, ideal s=NULL);
 poly maEval(map theMap, poly p,ring preimage_r,nMapFunc nMap, ideal s, const ring dst_r);

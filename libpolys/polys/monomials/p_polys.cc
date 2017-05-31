@@ -10,41 +10,34 @@
 
 #include <ctype.h>
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-#include <misc/options.h>
-#include <misc/intvec.h>
+#include "misc/options.h"
+#include "misc/intvec.h"
 
 
-#include <coeffs/longrat.h> // snumber is needed...
-#include <coeffs/numbers.h> // ndCopyMap
+#include "coeffs/longrat.h> // snumber is needed...
+#include "coeffs/numbers.h> // ndCopyMap
 
-#include <polys/PolyEnumerator.h>
+#include "polys/PolyEnumerator.h"
 
 #define TRANSEXT_PRIVATES
 
-#include <polys/ext_fields/transext.h>
-#include <polys/ext_fields/algext.h>
+#include "polys/ext_fields/transext.h"
+#include "polys/ext_fields/algext.h"
 
-#include <polys/weight.h>
-#include <polys/simpleideals.h>
+#include "polys/weight.h"
+#include "polys/simpleideals.h"
 
 #include "ring.h"
 #include "p_polys.h"
 
-#include <polys/templates/p_MemCmp.h>
-#include <polys/templates/p_MemAdd.h>
-#include <polys/templates/p_MemCopy.h>
+#include "polys/templates/p_MemCmp.h"
+#include "polys/templates/p_MemAdd.h"
+#include "polys/templates/p_MemCopy.h"
 
-
-// #include <???/ideals.h>
-// #include <???/int64vec.h>
-
-#ifndef SING_NDEBUG
-// #include <???/febase.h>
-#endif
 
 #ifdef HAVE_PLURAL
 #include "nc/nc.h"
@@ -4749,7 +4742,7 @@ unsigned long p_GetShortExpVector(const poly p, const poly pp, const ring r)
 #undef n_Delete__T
 #define n_Delete__T(n, r) do {} while (0)
 
-#include <polys/templates/p_Delete__T.cc>
+#include "polys/templates/p_Delete__T.cc"
 
 /***************************************************************/
 /*

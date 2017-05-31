@@ -7,8 +7,8 @@
 * ABSTRACT
 */
 
-#include <omalloc/omalloc.h>
-#include <reporter/reporter.h> // for assume etc.
+#include "omalloc/omalloc.h"
+#include "reporter/reporter.h" // for assume etc.
 
 struct snumber;
 typedef struct snumber *   number;

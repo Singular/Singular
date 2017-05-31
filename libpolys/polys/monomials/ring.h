@@ -8,10 +8,10 @@
 */
 
 /* includes */
-#include <omalloc/omalloc.h>
-#include <misc/auxiliary.h>
-#include <coeffs/coeffs.h>
-//#include <polys/monomials/polys-impl.h>
+#include "omalloc/omalloc.h"
+#include "misc/auxiliary.h"
+#include "coeffs/coeffs.h"
+//#include "polys/monomials/polys-impl.h"
 //
 
 /* forward declaration of types */

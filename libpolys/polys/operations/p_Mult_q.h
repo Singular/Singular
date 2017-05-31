@@ -12,7 +12,7 @@
 #ifndef P_MULT_Q_H
 #define P_MULT_Q_H
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
 struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
 

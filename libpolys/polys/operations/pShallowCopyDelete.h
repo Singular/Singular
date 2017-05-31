@@ -10,8 +10,8 @@
 #ifndef PSHALLOWCOPYDELETE_H
 #define PSHALLOWCOPYDELETE_H
 
-#include <polys/monomials/p_polys.h>
-#include <polys/monomials/ring.h>
+#include "polys/monomials/p_polys.h"
+#include "polys/monomials/ring.h"
 
 pShallowCopyDeleteProc pGetShallowCopyDeleteProc(ring source_r, ring dest_r);
 

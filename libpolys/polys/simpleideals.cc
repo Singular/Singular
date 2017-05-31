@@ -1602,7 +1602,7 @@ int id_MinDegW(ideal M,intvec *w, const ring r)
   return d;
 }
 
-// #include <kernel/clapsing.h>
+// #include "kernel/clapsing.h"
 
 /*2
 * transpose a module

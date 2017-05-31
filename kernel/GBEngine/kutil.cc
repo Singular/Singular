@@ -92,9 +92,9 @@ denominator_list DENOMINATOR_LIST=NULL;
 #ifdef ENTER_USE_MYMEMMOVE
 inline void _my_memmove_d_gt_s(unsigned long* d, unsigned long* s, long l)
 {
-  register unsigned long* _dl = (unsigned long*) d;
-  register unsigned long* _sl = (unsigned long*) s;
-  register long _i = l - 1;
+  REGISTER unsigned long* _dl = (unsigned long*) d;
+  REGISTER unsigned long* _sl = (unsigned long*) s;
+  REGISTER long _i = l - 1;
 
   do
   {
@@ -106,10 +106,10 @@ inline void _my_memmove_d_gt_s(unsigned long* d, unsigned long* s, long l)
 
 inline void _my_memmove_d_lt_s(unsigned long* d, unsigned long* s, long l)
 {
-  register long _ll = l;
-  register unsigned long* _dl = (unsigned long*) d;
-  register unsigned long* _sl = (unsigned long*) s;
-  register long _i = 0;
+  REGISTER long _ll = l;
+  REGISTER unsigned long* _dl = (unsigned long*) d;
+  REGISTER unsigned long* _sl = (unsigned long*) s;
+  REGISTER long _i = 0;
 
   do
   {

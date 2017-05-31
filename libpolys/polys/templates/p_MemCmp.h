@@ -18,8 +18,8 @@
 #define _p_MemCmp_Declare(s1, s2)                   \
   const unsigned long* _s1 = ((unsigned long*) s1); \
   const unsigned long* _s2 = ((unsigned long*) s2); \
-  register unsigned long _v1;                       \
-  register unsigned long _v2
+  REGISTER unsigned long _v1;                       \
+  REGISTER unsigned long _v2
 
 #define _p_MemCmp_Equal(i, s1, s2, actionE) \
   do {  _v1=((unsigned long*)s1)[i]; _v2=((unsigned long*)s2)[i]; if (_v1==_v2) actionE; }while (0)
@@ -46,7 +46,7 @@
 do                                                                  \
 {                                                                   \
                                                                     \
-  register unsigned long _i = (unsigned long) i;                    \
+  REGISTER unsigned long _i = (unsigned long) i;                    \
   const unsigned long _l =                                          \
          (unsigned long) length + (unsigned long)i ;                \
                                                                     \
@@ -590,9 +590,9 @@ while (0)
 #define _p_MemCmp_OrdGeneral_Declare(s1, s2)            \
   const unsigned long* _s1 = ((unsigned long*) s1);     \
   const unsigned long* _s2 = ((unsigned long*) s2);     \
-  register unsigned long _v1;                           \
-  register unsigned long _v2;                           \
-  register unsigned long _i
+  REGISTER unsigned long _v1;                           \
+  REGISTER unsigned long _v2;                           \
+  REGISTER unsigned long _i
 
 #define _p_MemCmp_OrdGeneral_NotEqual(ordsgn, actionG, actionS) \
 do                                                              \
@@ -771,10 +771,10 @@ while (0)
 #define _p_MemCmp_Bitmask_Declare(s1, s2, bitmask)  \
   const unsigned long* _s1 = ((unsigned long*) s1); \
   const unsigned long* _s2 = ((unsigned long*) s2); \
-  register const unsigned long _bitmask = bitmask;  \
-  register unsigned long _v1;                       \
-  register unsigned long _v2;                       \
-  register unsigned long _i                         \
+  REGISTER const unsigned long _bitmask = bitmask;  \
+  REGISTER unsigned long _v1;                       \
+  REGISTER unsigned long _v2;                       \
+  REGISTER unsigned long _i                         \
 
 
 #define p_MemCmp_Bitmask_LengthGeneral(s1, s2, bitmask, length, actionG, actionS)   \

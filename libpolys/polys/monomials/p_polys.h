@@ -16,23 +16,23 @@
 #ifndef P_POLYS_H
 #define P_POLYS_H
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <misc/mylimits.h>
-#include <misc/intvec.h>
-#include <coeffs/coeffs.h>
+#include "misc/mylimits.h"
+#include "misc/intvec.h"
+#include "coeffs/coeffs.h"
 
-#include <polys/monomials/monomials.h>
-#include <polys/monomials/ring.h>
+#include "polys/monomials/monomials.h"
+#include "polys/monomials/ring.h"
 
-#include <polys/templates/p_MemAdd.h>
-#include <polys/templates/p_MemCmp.h>
-#include <polys/templates/p_Procs.h>
+#include "polys/templates/p_MemAdd.h"
+#include "polys/templates/p_MemCmp.h"
+#include "polys/templates/p_Procs.h"
 
-#include <polys/sbuckets.h>
+#include "polys/sbuckets.h"
 
 #ifdef HAVE_PLURAL
-#include <polys/nc/nc.h>
+#include "polys/nc/nc.h"
 #endif
 
 poly p_Farey(poly p, number N, const ring r);
@@ -487,10 +487,10 @@ static inline unsigned long p_SetExp(poly p, const unsigned long e, const unsign
   pAssume2((VarOffset >> (24 + 6)) == 0);
 
   // shift e to the left:
-  register int shift = VarOffset >> 24;
+  REGISTER int shift = VarOffset >> 24;
   unsigned long ee = e << shift /*(VarOffset >> 24)*/;
   // find the bits in the exponent vector
-  register int offset = (VarOffset & 0xffffff);
+  REGISTER int offset = (VarOffset & 0xffffff);
   // clear the bits in the exponent vector:
   p->exp[offset]  &= ~( iBitmask << shift );
   // insert e with |
@@ -531,12 +531,12 @@ static inline long p_SetExp(poly p, const long e, const unsigned long iBitmask, 
   pAssume2(e <= BitMask(iBitmask, VarOffset >> 30));
 
   // shift e to the left:
-  register int hbyte = VarOffset >> 24;
+  REGISTER int hbyte = VarOffset >> 24;
   int bitmask = BitMask(iBitmask, hbyte >> 6);
-  register int shift = hbyte & 0x3f;
+  REGISTER int shift = hbyte & 0x3f;
   long ee = e << shift;
   // find the bits in the exponent vector
-  register int offset = (VarOffset & 0xffffff);
+  REGISTER int offset = (VarOffset & 0xffffff);
   // clear the bits in the exponent vector:
   p->exp[offset]  &= ~( bitmask << shift );
   // insert e with |
@@ -1472,11 +1472,11 @@ static inline int p_LmCmp(poly p, poly q, const ring r)
 
   const unsigned long* _s1 = ((unsigned long*) p->exp);
   const unsigned long* _s2 = ((unsigned long*) q->exp);
-  register unsigned long _v1;
-  register unsigned long _v2;
+  REGISTER unsigned long _v1;
+  REGISTER unsigned long _v2;
   const unsigned long _l = r->CmpL_Size;
 
-  register unsigned long _i=0;
+  REGISTER unsigned long _i=0;
 
   LengthGeneral_OrdGeneral_LoopTop:
   _v1 = _s1[_i];

@@ -23,8 +23,8 @@
 #ifndef BIGINTMAT_H
 #define BIGINTMAT_H
 
-#include <omalloc/omalloc.h>
-#include <coeffs/coeffs.h>
+#include "omalloc/omalloc.h"
+#include "coeffs/coeffs.h"
 
 /**
  * @class bigintmat bigintmat.h <coeffs/bigintmat.h>
