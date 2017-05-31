@@ -26,7 +26,7 @@ libpolys_LTLIBRARIES = libpolys.la
 libpolysdir = $(libdir)
 
 SOURCES = \
-	monomials/monomials.cc monomials/p_polys.cc monomials/ring.cc monomials/maps.cc \
+	monomials/p_polys.cc monomials/ring.cc monomials/maps.cc \
 	operations/pShallowCopyDelete.cc operations/p_Mult_q.cc \
 	nc/sca.cc nc/summator.cc nc/ncSAFormula.cc nc/ncSACache.cc nc/ncSAMult.cc \
 	pDebug.cc polys0.cc prCopy.cc prCopyMacros.h \
