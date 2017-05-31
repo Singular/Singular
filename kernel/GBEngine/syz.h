@@ -6,10 +6,10 @@
 /*
 * ABSTRACT: Resolutions
 */
-#include <misc/mylimits.h>
-#include <kernel/structs.h>
-#include <polys/monomials/ring.h>
-#include <kernel/ideals.h>
+#include "misc/mylimits.h"
+#include "kernel/structs.h"
+#include "polys/monomials/ring.h"
+#include "kernel/ideals.h"
 
 // Logarithm of estimate of maximal number of new components
 #define SYZ_SHIFT_MAX_NEW_COMP_ESTIMATE 8

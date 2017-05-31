@@ -15,33 +15,31 @@
 //#define ADIDEBUG_NF 0
 #define PRE_INTEGER_CHECK 0
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <misc/options.h>
-#include <misc/intvec.h>
+#include "misc/options.h"
+#include "misc/intvec.h"
 
-#include <polys/weight.h>
-#include <kernel/polys.h>
+#include "polys/weight.h"
+#include "kernel/polys.h"
 
-#include <kernel/GBEngine/kutil.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/GBEngine/khstd.h>
-#include <kernel/combinatorics/stairc.h>
-//#include "cntrlc.h"
-#include <kernel/ideals.h>
-//#include "../Singular/ipid.h"
+#include "kernel/GBEngine/kutil.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/khstd.h"
+#include "kernel/combinatorics/stairc.h"
+#include "kernel/ideals.h"
 
 //#include "ipprint.h"
 
 #ifdef HAVE_PLURAL
-#include <polys/nc/nc.h>
-#include <polys/nc/sca.h>
-#include <kernel/GBEngine/nc.h>
+#include "polys/nc/nc.h"
+#include "polys/nc/sca.h"
+#include "kernel/GBEngine/nc.h"
 #endif
 
-#include <kernel/GBEngine/kInline.h>
+#include "kernel/GBEngine/kInline.h"
 
 
 /* the list of all options which give a warning by test */

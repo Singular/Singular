@@ -18,8 +18,8 @@
 #include "misc/intvec.h"
 
 
-#include "coeffs/longrat.h> // snumber is needed...
-#include "coeffs/numbers.h> // ndCopyMap
+#include "coeffs/longrat.h" // snumber is needed...
+#include "coeffs/numbers.h" // ndCopyMap
 
 #include "polys/PolyEnumerator.h"
 

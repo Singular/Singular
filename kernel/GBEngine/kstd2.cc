@@ -7,7 +7,7 @@
 
 // #define PDEBUG 2
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 //#define ADIDEBUG 1
 #define GCD_SBA 1
@@ -59,25 +59,24 @@ long sba_interreduction_operations;
  * SBA stuff -- done
 ***********************************************/
 
-#include <kernel/GBEngine/kutil.h>
-#include <misc/options.h>
-#include <omalloc/omalloc.h>
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/GBEngine/khstd.h>
-#include <polys/kbuckets.h>
-#include <polys/prCopy.h>
-//#include "cntrlc.h"
-#include <polys/weight.h>
-#include <misc/intvec.h>
+#include "kernel/GBEngine/kutil.h"
+#include "misc/options.h"
+#include "omalloc/omalloc.h"
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/khstd.h"
+#include "polys/kbuckets.h"
+#include "polys/prCopy.h"
+#include "polys/weight.h"
+#include "misc/intvec.h"
 #ifdef HAVE_PLURAL
-#include <polys/nc/nc.h>
+#include "polys/nc/nc.h"
 #endif
 // #include "timer.h"
 
 /* shiftgb stuff */
-#include <kernel/GBEngine/shiftgb.h>
+#include "kernel/GBEngine/shiftgb.h"
 
   int (*test_PosInT)(const TSet T,const int tl,LObject &h);
   int (*test_PosInL)(const LSet set, const int length,
@@ -2156,6 +2155,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // reduce the tail and normalize poly
       // in the ring case we cannot expect LC(f) = 1,
       // therefore we call pContent instead of pNorm
+      strat->redTailChange=FALSE;
       if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
       {
         strat->P.pCleardenom();
@@ -2163,13 +2163,17 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         {
           strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT,!TEST_OPT_CONTENTSB);
           strat->P.pCleardenom();
+          if (strat->redTailChange) { strat->P.t_p=NULL; }
         }
       }
       else
       {
         strat->P.pNorm();
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+        {
           strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
+          if (strat->redTailChange) { strat->P.t_p=NULL; }
+        }
       }
 
 #ifdef KDEBUG

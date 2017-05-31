@@ -2,23 +2,20 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-
-
-
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
-#include <kernel/structs.h>
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <polys/monomials/ring.h>
-#include <polys/monomials/maps.h>
-#include <omalloc/omalloc.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/fglm/fglm.h>
-#include <kernel/groebner_walk/walkMain.h>
-#include <kernel/groebner_walk/walkSupport.h>
-#include <kernel/groebner_walk/walkProc.h>
-#include <polys/prCopy.h>
+#include "kernel/mod2.h"
+#include "kernel/structs.h"
+#include "kernel/structs.h"
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
+#include "polys/monomials/ring.h"
+#include "polys/monomials/maps.h"
+#include "omalloc/omalloc.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/fglm/fglm.h"
+#include "kernel/groebner_walk/walkMain.h"
+#include "kernel/groebner_walk/walkSupport.h"
+#include "kernel/groebner_walk/walkProc.h"
+#include "polys/prCopy.h"
 
 ///////////////////////////////////////////////////////////////////
 //Frame procedures for Groebner Walk and Fractal Walk

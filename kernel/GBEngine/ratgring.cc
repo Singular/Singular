@@ -10,22 +10,22 @@
 
 
 
-#include <kernel/mod2.h>
-#include <kernel/GBEngine/ratgring.h>
+#include "kernel/mod2.h"
 #ifdef HAVE_RATGRING
-#include <polys/nc/nc.h>
-#include <polys/monomials/ring.h>
-#include <kernel/polys.h>
-#include <coeffs/numbers.h>
-#include <kernel/ideals.h>
-#include <polys/matpol.h>
-#include <polys/kbuckets.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <polys/sbuckets.h>
-#include <polys/prCopy.h>
-#include <polys/operations/p_Mult_q.h>
-#include <polys/clapsing.h>
-#include <misc/options.h>
+#include "kernel/GBEngine/ratgring.h"
+#include "polys/nc/nc.h"
+#include "polys/monomials/ring.h"
+#include "kernel/polys.h"
+#include "coeffs/numbers.h"
+#include "kernel/ideals.h"
+#include "polys/matpol.h"
+#include "polys/kbuckets.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "polys/sbuckets.h"
+#include "polys/prCopy.h"
+#include "polys/operations/p_Mult_q.h"
+#include "polys/clapsing.h"
+#include "misc/options.h"
 
 void pLcmRat(poly a, poly b, poly m, int rat_shift)
 {

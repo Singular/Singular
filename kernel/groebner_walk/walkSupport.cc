@@ -1,16 +1,16 @@
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <misc/intvec.h>
-#include <misc/int64vec.h>
+#include "misc/intvec.h"
+#include "misc/int64vec.h"
 
-#include <polys/monomials/ring.h>
-#include <polys/prCopy.h>
-#include <polys/matpol.h>
+#include "polys/monomials/ring.h"
+#include "polys/prCopy.h"
+#include "polys/matpol.h"
 
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <kernel/groebner_walk/walkSupport.h>
-#include <kernel/GBEngine/kstd1.h>
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
+#include "kernel/groebner_walk/walkSupport.h"
+#include "kernel/GBEngine/kstd1.h"
 
 #include <string.h>
 #include <math.h>

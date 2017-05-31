@@ -9,17 +9,15 @@
 
 
 
-#include <kernel/mod2.h>
-#include <misc/options.h>
-#include <kernel/GBEngine/kutil.h>
-#include <coeffs/numbers.h>
-#include <polys/monomials/p_polys.h>
-#include <polys/templates/p_Procs.h>
-#include <polys/nc/nc.h>
-#ifdef KDEBUG
-#endif
+#include "kernel/mod2.h"
+#include "misc/options.h"
+#include "kernel/GBEngine/kutil.h"
+#include "coeffs/numbers.h"
+#include "polys/monomials/p_polys.h"
+#include "polys/templates/p_Procs.h"
+#include "polys/nc/nc.h"
 #ifdef HAVE_RINGS
-#include <kernel/polys.h>
+#include "kernel/polys.h"
 #endif
 
 //#define ADIDEBUG 0

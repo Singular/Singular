@@ -53,9 +53,9 @@
 #define BYTESIZ 8
 #undef setbit
 
-static  void dbm_access(register DBM *db, long hash);
-static  int getbit(register DBM *db);
-static  void setbit(register DBM *db);
+static  void dbm_access(DBM *db, long hash);
+static  int getbit(DBM *db);
+static  void setbit(DBM *db);
 static  datum makdatum(char buf[PBLKSIZ], int n);
 static  int finddatum(char buf[PBLKSIZ], datum item);
 static  long dcalchash(datum item);
@@ -67,7 +67,7 @@ extern "C" int singular_fstat(int fd, struct stat *buf);
 DBM * dbm_open(char *file, int flags, int mode)
 {
   struct stat statb;
-  register DBM *db;
+  DBM *db;
 
   if ((db = (DBM *)malloc(sizeof *db)) == 0)
   {
@@ -109,7 +109,7 @@ void dbm_close(DBM *db)
   free((char *)db);
 }
 
-long dbm_forder(register DBM *db, datum key)
+long dbm_forder(DBM *db, datum key)
 {
   long hash;
 
@@ -124,9 +124,9 @@ long dbm_forder(register DBM *db, datum key)
   return (db->dbm_blkno);
 }
 
-datum dbm_fetch(register DBM *db, datum key)
+datum dbm_fetch(DBM *db, datum key)
 {
-  register int i;
+  int i;
   datum item;
 
   if (dbm_error(db))
@@ -144,9 +144,9 @@ err:
   return (item);
 }
 
-int dbm_delete(register DBM *db, datum key)
+int dbm_delete(DBM *db, datum key)
 {
-  register int i;
+  int i;
   // datum item;
 
   if (dbm_error(db))
@@ -172,9 +172,9 @@ int dbm_delete(register DBM *db, datum key)
   return (0);
 }
 
-int dbm_store(register DBM *db, datum key, datum dat, int replace)
+int dbm_store(DBM *db, datum key, datum dat, int replace)
 {
-  register int i;
+  int i;
   int ret;
   datum item, item1;
   char ovfbuf[PBLKSIZ];
@@ -265,7 +265,7 @@ datum dbm_firstkey(DBM *db)
   return (dbm_nextkey(db));
 }
 
-datum dbm_nextkey(register DBM *db)
+datum dbm_nextkey(DBM *db)
 {
   struct stat statb;
   datum item;
@@ -307,7 +307,7 @@ err:
   return (item);
 }
 
-static void dbm_access(register DBM *db, long hash)
+static void dbm_access(DBM *db, long hash)
 {
   for (db->dbm_hmask=0;; db->dbm_hmask=(db->dbm_hmask<<1)+1)
   {
@@ -329,10 +329,10 @@ static void dbm_access(register DBM *db, long hash)
   }
 }
 
-static int getbit(register DBM *db)
+static int getbit(DBM *db)
 {
   long bn;
-  register int b, i, n;
+  int b, i, n;
 
 
   if (db->dbm_bitno > db->dbm_maxbno)
@@ -351,10 +351,10 @@ static int getbit(register DBM *db)
   return (db->dbm_dirbuf[i] & (1<<n));
 }
 
-static void setbit(register DBM *db)
+static void setbit(DBM *db)
 {
   long bn;
-  register int i, n, b;
+  int i, n, b;
 
   if (db->dbm_bitno > db->dbm_maxbno)
     db->dbm_maxbno = db->dbm_bitno;
@@ -378,8 +378,8 @@ static void setbit(register DBM *db)
 
 static datum makdatum(char buf[PBLKSIZ], int n)
 {
-  register short *sp;
-  register int t;
+  short *sp;
+  int t;
   datum item;
 
   sp = (short *)buf;
@@ -399,8 +399,8 @@ static datum makdatum(char buf[PBLKSIZ], int n)
 
 static int finddatum(char buf[PBLKSIZ], datum item)
 {
-  register short *sp;
-  register int i, n, j;
+  short *sp;
+  int i, n, j;
 
   sp = (short *)buf;
   n = PBLKSIZ;
@@ -447,10 +447,10 @@ static  long hltab[64]
 
 static long dcalchash(datum item)
 {
-  register int s, c, j;
-  register char *cp;
-  register unsigned long hashl;
-  register unsigned int hashi;
+  int s, c, j;
+  char *cp;
+  unsigned long hashl;
+  unsigned int hashi;
 
   hashl = 0;
   hashi = 0;
@@ -472,8 +472,8 @@ static long dcalchash(datum item)
  */
 static int delitem(char buf[PBLKSIZ], int n)
 {
-  register short *sp, *sp1;
-  register int i1, i2;
+  short *sp, *sp1;
+  int i1, i2;
 
   sp = (short *)buf;
   i2 = sp[0];
@@ -504,8 +504,8 @@ static int delitem(char buf[PBLKSIZ], int n)
  */
 static int additem(char buf[PBLKSIZ], datum item, datum item1)
 {
-  register short *sp;
-  register int i1, i2, tmp;
+  short *sp;
+  int i1, i2, tmp;
 
   sp = (short *)buf;
   i1 = PBLKSIZ;
@@ -526,8 +526,8 @@ static int additem(char buf[PBLKSIZ], datum item, datum item1)
 #ifdef DEBUG
 static chkblk(char buf[PBLKSIZ])
 {
-  register short *sp;
-  register t, i;
+  short *sp;
+  int t, i;
 
   sp = (short *)buf;
   t = PBLKSIZ;

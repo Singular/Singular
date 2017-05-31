@@ -8,21 +8,19 @@
 
 
 
-#include <kernel/mod2.h>
-#include <omalloc/omalloc.h>
-#include <misc/options.h>
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <kernel/GBEngine/kutil.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/GBEngine/khstd.h>
-//#include "cntrlc.h"
-#include <polys/weight.h>
-//#include "ipshell.h"
-#include <misc/intvec.h>
-#include <polys/clapsing.h>
-#include <kernel/ideals.h>
-#include <kernel/GBEngine/kstdfac.h>
+#include "kernel/mod2.h"
+#include "omalloc/omalloc.h"
+#include "misc/options.h"
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
+#include "kernel/GBEngine/kutil.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/khstd.h"
+#include "polys/weight.h"
+#include "misc/intvec.h"
+#include "polys/clapsing.h"
+#include "kernel/ideals.h"
+#include "kernel/GBEngine/kstdfac.h"
 
 int strat_nr=0;
 /*3

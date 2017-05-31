@@ -5,29 +5,29 @@
 * ABSTRACT: resolutions
 */
 
-#include <kernel/mod2.h>
-#include <omalloc/omalloc.h>
+#include "kernel/mod2.h"
+#include "omalloc/omalloc.h"
 
-#include <misc/mylimits.h>
-#include <misc/options.h>
-#include <misc/intvec.h>
+#include "misc/mylimits.h"
+#include "misc/options.h"
+#include "misc/intvec.h"
 
-#include <coeffs/numbers.h>
+#include "coeffs/numbers.h"
 
-#include <polys/monomials/ring.h>
-#include <polys/kbuckets.h>
-#include <polys/prCopy.h>
-#include <polys/matpol.h>
+#include "polys/monomials/ring.h"
+#include "polys/kbuckets.h"
+#include "polys/prCopy.h"
+#include "polys/matpol.h"
 
-#include <kernel/combinatorics/stairc.h>
-#include <kernel/combinatorics/hilb.h>
+#include "kernel/combinatorics/stairc.h"
+#include "kernel/combinatorics/hilb.h"
 
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/GBEngine/kutil.h>
-#include <kernel/GBEngine/syz.h>
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/kutil.h"
+#include "kernel/GBEngine/syz.h"
 
-#include <kernel/ideals.h>
-#include <kernel/polys.h>
+#include "kernel/ideals.h"
+#include "kernel/polys.h"
 
 //#define SHOW_PROT
 //#define SHOW_RED

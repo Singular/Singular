@@ -9,9 +9,9 @@
 // #define HAVE_RATGRING to activate
 
 #ifdef HAVE_RATGRING
-#include <kernel/structs.h>
-#include <polys/nc/nc.h>
-#include <polys/monomials/p_polys.h>
+#include "kernel/structs.h"
+#include "polys/nc/nc.h"
+#include "polys/monomials/p_polys.h"
 
 /* MACROS */
 

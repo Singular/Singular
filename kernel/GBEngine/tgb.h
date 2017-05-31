@@ -11,11 +11,9 @@
 //#define OM_CHECK 3
 //#define OM_TRACK 5
 
-#include <polys/monomials/ring.h>
+#include "polys/monomials/ring.h"
 
-#include <kernel/structs.h>
-
-
+#include "kernel/structs.h"
 
 ideal t_rep_gb(const ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode=FALSE);
 #endif

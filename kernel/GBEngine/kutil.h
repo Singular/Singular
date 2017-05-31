@@ -10,16 +10,16 @@
 
 #include <string.h>
 
-#include <omalloc/omalloc.h>
-#include <omalloc/omallocClass.h>
-#include <misc/mylimits.h>
+#include "omalloc/omalloc.h"
+#include "omalloc/omallocClass.h"
+#include "misc/mylimits.h"
 
 
-#include <kernel/polys.h>
-#include <polys/operations/pShallowCopyDelete.h>
+#include "kernel/polys.h"
+#include "polys/operations/pShallowCopyDelete.h"
 
-#include <kernel/structs.h>
-#include <kernel/GBEngine/kstd1.h>   /* for s_poly_proc_t */
+#include "kernel/structs.h"
+#include "kernel/GBEngine/kstd1.h"   /* for s_poly_proc_t */
 
 // define if tailrings should be used
 #define HAVE_TAIL_RING
@@ -801,10 +801,10 @@ ring sbaRing(kStrategy strat, const ring r=currRing, BOOLEAN complete=TRUE, int 
 KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
   kStrategy strat);
 
-#include <kernel/GBEngine/kInline.h>
+#include "kernel/GBEngine/kInline.h"
 
 /* shiftgb stuff */
-#include <kernel/GBEngine/shiftgb.h>
+#include "kernel/GBEngine/shiftgb.h"
 
 poly pMove2CurrTail(poly p, kStrategy strat);
 

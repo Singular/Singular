@@ -8,8 +8,8 @@
 #define F5_HEADER
 
 #ifdef HAVE_F5
-#include <kernel/GBEngine/f5data.h>
-#include <kernel/GBEngine/f5lists.h>
+#include "kernel/GBEngine/f5data.h"
+#include "kernel/GBEngine/f5lists.h"
 
 
 /*

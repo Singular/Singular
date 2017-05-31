@@ -5,25 +5,21 @@
 * ABSTRACT:utils for hilbert driven kStd
 */
 
+#include "kernel/mod2.h"
 
+#include "misc/options.h"
+#include "misc/intvec.h"
 
+#include "polys/simpleideals.h"
 
+#include "kernel/combinatorics/stairc.h"
+#include "kernel/combinatorics/hilb.h"
 
-#include <kernel/mod2.h>
+#include "kernel/GBEngine/kutil.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/khstd.h"
 
-#include <misc/options.h>
-#include <misc/intvec.h>
-
-#include <polys/simpleideals.h>
-
-#include <kernel/combinatorics/stairc.h>
-#include <kernel/combinatorics/hilb.h>
-
-#include <kernel/GBEngine/kutil.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/GBEngine/khstd.h>
-
-#include <kernel/polys.h>
+#include "kernel/polys.h"
 
 #define ADIDEBUG 0
 

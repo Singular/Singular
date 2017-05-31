@@ -93,11 +93,11 @@ typedef struct {
 
 DBM        *dbm_open(char *file, int flags, int mode);
 void        dbm_close(DBM *db);
-datum        dbm_fetch(register DBM *db, datum key);
+datum        dbm_fetch(DBM *db, datum key);
 datum        dbm_firstkey(DBM *db);
-datum        dbm_nextkey(register DBM *db);
-long        dbm_forder(register DBM *db, datum key);
-int        dbm_delete(register DBM *db, datum key);
-int        dbm_store(register DBM *db, datum key, datum dat, int replace);
+datum        dbm_nextkey(DBM *db);
+long        dbm_forder(DBM *db, datum key);
+int        dbm_delete(DBM *db, datum key);
+int        dbm_store(DBM *db, datum key, datum dat, int replace);
 
 #endif /* NDBM_H */

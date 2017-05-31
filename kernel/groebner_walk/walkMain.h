@@ -1,8 +1,8 @@
 #ifndef WALKMAIN_H
 #define WALKMAIN_H
 
-#include <misc/intvec.h>
-#include <misc/int64vec.h>
+#include "misc/intvec.h"
+#include "misc/int64vec.h"
 
 enum WalkState{
     WalkNoIdeal,

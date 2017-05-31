@@ -1,26 +1,26 @@
 #ifndef KERNEL_NC_H
 #define KERNEL_NC_H
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #ifdef HAVE_PLURAL
 
 #ifdef PLURAL_INTERNAL_DECLARATIONS
 
-# include <polys/nc/gb_hack.h>
+# include "polys/nc/gb_hack.h"
 
 #else // #ifdef PLURAL_INTERNAL_DECLARATIONS
 
 # define PLURAL_INTERNAL_DECLARATIONS
-# include <polys/nc/gb_hack.h>
+# include "polys/nc/gb_hack.h"
 # undef PLURAL_INTERNAL_DECLARATIONS
 
 #endif // #ifdef PLURAL_INTERNAL_DECLARATIONS
 
-#include <polys/nc/nc.h>
-#include <polys/simpleideals.h>
+#include "polys/nc/nc.h"
+#include "polys/simpleideals.h"
 
-#include <kernel/polys.h>
+#include "kernel/polys.h"
 
 
 

@@ -1,24 +1,18 @@
 
 
+#include "kernel/mod2.h"
+#include "omalloc/omalloc.h"
 
+#include "coeffs/numbers.h"
 
-#include <kernel/mod2.h>
-#include <omalloc/omalloc.h>
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
+#include "polys/kbuckets.h"
 
-#include <coeffs/numbers.h>
-// #include <coeffs/longrat.h>
-
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
-#include <polys/kbuckets.h>
-
-#include <kernel/ideals.h>
-#include <kernel/polys.h>
-#include <kernel/GBEngine/kutil.h>
-
-// #include "subexpr.h"
-
-#include <kernel/GBEngine/janet.h>
+#include "kernel/ideals.h"
+#include "kernel/polys.h"
+#include "kernel/GBEngine/kutil.h"
+#include "kernel/GBEngine/janet.h"
 
 
 #include <stdio.h>

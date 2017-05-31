@@ -1,22 +1,19 @@
 #define PLURAL_INTERNAL_DECLARATIONS
 
+#include "kernel/mod2.h"
 
+#include "misc/options.h"
 
+#include "polys/simpleideals.h"
+#include "polys/prCopy.h"
+#include "polys/nc/gb_hack.h"
 
-#include <kernel/mod2.h>
+#include "kernel/polys.h"
 
-#include <misc/options.h>
+#include "kernel/ideals.h"
+#include "kernel/GBEngine/kstd1.h"
 
-#include <polys/simpleideals.h>
-#include <polys/prCopy.h>
-#include <polys/nc/gb_hack.h>
-
-#include <kernel/polys.h>
-
-#include <kernel/ideals.h>
-#include <kernel/GBEngine/kstd1.h>
-
-#include <kernel/GBEngine/nc.h>
+#include "kernel/GBEngine/nc.h"
 
 ideal twostd(ideal I) // works in currRing only!
 {

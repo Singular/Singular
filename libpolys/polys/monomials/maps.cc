@@ -5,26 +5,22 @@
 * ABSTRACT - the mapping of polynomials to other rings
 */
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
+#include "misc/auxiliary.h"
+#include "misc/options.h"
 
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
 
-
-#include <misc/auxiliary.h>
-#include <misc/options.h>
-
-#include <coeffs/coeffs.h>
-#include <coeffs/numbers.h>
-
-#include <polys/monomials/p_polys.h>
-#include <polys/monomials/ring.h>
-#include <polys/simpleideals.h>
-#include <polys/prCopy.h>
-// #include <polys/ext_fields/longtrans.h>
-#include <polys/monomials/maps.h>
+#include "polys/monomials/p_polys.h"
+#include "polys/monomials/ring.h"
+#include "polys/simpleideals.h"
+#include "polys/prCopy.h"
+#include "polys/monomials/maps.h"
 
 #ifdef HAVE_PLURAL
-#include <polys/nc/nc.h>
+#include "polys/nc/nc.h"
 #endif
 
 // This is a very dirty way to "normalize" numbers w.r.t. a

@@ -5,18 +5,15 @@
 * ABSTRACT: procedures to compute with units
 */
 
-
-
-
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
-#include <coeffs/numbers.h>
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <misc/intvec.h>
-#include <polys/matpol.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/GBEngine/units.h>
+#include "kernel/mod2.h"
+#include "kernel/structs.h"
+#include "coeffs/numbers.h"
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
+#include "misc/intvec.h"
+#include "polys/matpol.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/units.h"
 
 ideal redNF(ideal N,ideal M,matrix U,int d,intvec *w)
 {

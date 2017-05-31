@@ -1,24 +1,21 @@
 #define PLURAL_INTERNAL_DECLARATIONS
 
+#include "kernel/mod2.h"
 
+#include "misc/options.h"
 
+#include "polys/simpleideals.h"
+#include "polys/prCopy.h"
 
-#include <kernel/mod2.h>
+#include "polys/nc/sca.h"
+#include "polys/nc/gb_hack.h"
 
-#include <misc/options.h>
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/kutil.h"
 
-#include <polys/simpleideals.h>
-#include <polys/prCopy.h>
-
-#include <polys/nc/sca.h>
-#include <polys/nc/gb_hack.h>
-
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/GBEngine/kutil.h>
-
-#include <kernel/GBEngine/nc.h>
+#include "kernel/GBEngine/nc.h"
 
 /// nc_gr_initBba is needed for sca_gr_bba and gr_bba.
 void nc_gr_initBba(ideal F, kStrategy strat); // from gr_kstd2.cc!

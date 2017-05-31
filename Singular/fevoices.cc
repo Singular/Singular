@@ -507,13 +507,13 @@ int feReadLine(char* b, int l)
     && (currentVoice->buffer[currentVoice->fptr]!='\0'))
     {
   NewBuff:
-      register int i=0;
+      REGISTER int i=0;
       long startfptr=currentVoice->fptr;
       long tmp_ptr=currentVoice->fptr;
       l--;
       loop
       {
-        register char c=
+        REGISTER char c=
         b[i]=currentVoice->buffer[tmp_ptr/*currentVoice->fptr*/];
         i++;
         if (yy_noeof==noeof_block)

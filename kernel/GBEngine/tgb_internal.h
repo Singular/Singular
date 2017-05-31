@@ -9,7 +9,7 @@
 */
 #define USE_NORO 1
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
 //#define TGB_DEBUG
 #define FULLREDUCTIONS
@@ -52,20 +52,20 @@ using std::vector;
 #endif
 #include <stdlib.h>
 
-#include <misc/options.h>
+#include "misc/options.h"
 
-#include <coeffs/modulop.h>
+#include "coeffs/modulop.h"
 
-#include <polys/monomials/p_polys.h>
-#include <polys/monomials/ring.h>
-#include <polys/kbuckets.h>
+#include "polys/monomials/p_polys.h"
+#include "polys/monomials/ring.h"
+#include "polys/kbuckets.h"
 
-#include <kernel/ideals.h>
-#include <kernel/polys.h>
+#include "kernel/ideals.h"
+#include "kernel/polys.h"
 
-#include <kernel/GBEngine/kutil.h>
-#include <kernel/GBEngine/kInline.h>
-#include <kernel/GBEngine/kstd1.h>
+#include "kernel/GBEngine/kutil.h"
+#include "kernel/GBEngine/kInline.h"
+#include "kernel/GBEngine/kstd1.h"
 
 
 #if 1

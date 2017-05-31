@@ -1,44 +1,44 @@
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <omalloc/omalloc.h>
+#include "omalloc/omalloc.h"
 
-#include <resources/feFopen.h>
-#include <resources/feResource.h>
+#include "resources/feFopen.h"
+#include "resources/feResource.h"
 
-#include <factory/factory.h> // :(
+#include "factory/factory.h" // :(
 
-#include <misc/intvec.h>
-#include <misc/int64vec.h>
-#include <misc/mylimits.h>
-#include <misc/options.h>
+#include "misc/intvec.h"
+#include "misc/int64vec.h"
+#include "misc/mylimits.h"
+#include "misc/options.h"
 
-#include <reporter/reporter.h>
+#include "reporter/reporter.h"
 
-#include <coeffs/si_gmp.h>
-#include <coeffs/coeffs.h>
-#include <coeffs/numbers.h>
+#include "coeffs/si_gmp.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
 
-#include <polys/kbuckets.h>
-#include <polys/matpol.h>
-#include <polys/mod_raw.h>
-#include <polys/prCopy.h>
-#include <polys/sbuckets.h>
-#include <polys/simpleideals.h>
-#include <polys/weight.h>
-#include <polys/monomials/maps.h>
-#include <polys/monomials/monomials.h>
-#include <polys/monomials/p_polys.h>
-#include <polys/monomials/ring.h>
-#include <polys/nc/nc.h>
-#include <polys/nc/ncSACache.h>
-#include <polys/nc/ncSAFormula.h>
-#include <polys/nc/ncSAMult.h>
-#include <polys/nc/sca.h>
-#include <polys/nc/summator.h>
-#include <polys/templates/p_MemAdd.h>
-#include <polys/templates/p_Procs.h>
-#include <polys/operations/pShallowCopyDelete.h>
-#include <polys/clapsing.h>
+#include "polys/kbuckets.h"
+#include "polys/matpol.h"
+#include "polys/mod_raw.h"
+#include "polys/prCopy.h"
+#include "polys/sbuckets.h"
+#include "polys/simpleideals.h"
+#include "polys/weight.h"
+#include "polys/monomials/maps.h"
+#include "polys/monomials/monomials.h"
+#include "polys/monomials/p_polys.h"
+#include "polys/monomials/ring.h"
+#include "polys/nc/nc.h"
+#include "polys/nc/ncSACache.h"
+#include "polys/nc/ncSAFormula.h"
+#include "polys/nc/ncSAMult.h"
+#include "polys/nc/sca.h"
+#include "polys/nc/summator.h"
+#include "polys/templates/p_MemAdd.h"
+#include "polys/templates/p_Procs.h"
+#include "polys/operations/pShallowCopyDelete.h"
+#include "polys/clapsing.h"
 
 
 // // TODO: DUE to the use of HALT in npolygon.cc :(((
@@ -47,28 +47,28 @@
 // TODO: DUE to its use in kutil.cc :(((
 char * showOption(){return NULL;}
 
-#include <kernel/combinatorics/stairc.h>
-#include <kernel/GBEngine/syz.h>
-#include <kernel/GBEngine/khstd.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/GBEngine/kstdfac.h>
-#include <kernel/GBEngine/units.h>
-#include <kernel/GBEngine/ratgring.h>
-#include <kernel/GBEngine/shiftgb.h>
-#include <kernel/GBEngine/kutil.h>
-#include <kernel/GBEngine/f5c.h>
-#include <kernel/GBEngine/f5data.h>
-#include <kernel/GBEngine/f5gb.h>
-#include <kernel/GBEngine/f5lists.h>
-#include <kernel/GBEngine/nc.h>
-#include <kernel/GBEngine/ratgring.h>
-#include <kernel/GBEngine/ringgb.h>
-#include <kernel/GBEngine/shiftgb.h>
-#include <kernel/GBEngine/syz.h>
-#include <kernel/GBEngine/tgbgauss.h>
-#include <kernel/GBEngine/tgb.h>
-#include <kernel/GBEngine/units.h>
-#include <kernel/GBEngine/janet.h>
+#include "kernel/combinatorics/stairc.h"
+#include "kernel/GBEngine/syz.h"
+#include "kernel/GBEngine/khstd.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/kstdfac.h"
+#include "kernel/GBEngine/units.h"
+#include "kernel/GBEngine/ratgring.h"
+#include "kernel/GBEngine/shiftgb.h"
+#include "kernel/GBEngine/kutil.h"
+#include "kernel/GBEngine/f5c.h"
+#include "kernel/GBEngine/f5data.h"
+#include "kernel/GBEngine/f5gb.h"
+#include "kernel/GBEngine/f5lists.h"
+#include "kernel/GBEngine/nc.h"
+#include "kernel/GBEngine/ratgring.h"
+#include "kernel/GBEngine/ringgb.h"
+#include "kernel/GBEngine/shiftgb.h"
+#include "kernel/GBEngine/syz.h"
+#include "kernel/GBEngine/tgbgauss.h"
+#include "kernel/GBEngine/tgb.h"
+#include "kernel/GBEngine/units.h"
+#include "kernel/GBEngine/janet.h"
 
 void TestGBEngine()
 {

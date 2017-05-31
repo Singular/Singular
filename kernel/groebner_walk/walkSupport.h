@@ -1,8 +1,8 @@
 #ifndef WALKSUPPORT_H
 #define WALKSUPPORT_H
 
-#include <misc/intvec.h>
-#include <misc/int64vec.h>
+#include "misc/intvec.h"
+#include "misc/int64vec.h"
 
 int tdeg(poly p);
 int getMaxTdeg(ideal I);

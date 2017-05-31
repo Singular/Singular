@@ -6,36 +6,33 @@
 */
 #define PLURAL_INTERNAL_DECLARATIONS
 
-
-
-
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #ifdef HAVE_PLURAL
 
 
-#include <omalloc/omalloc.h>
-#include <misc/options.h>
-#include <misc/intvec.h>
+#include "omalloc/omalloc.h"
+#include "misc/options.h"
+#include "misc/intvec.h"
 
-#include <polys/weight.h>
-#include <kernel/polys.h>
-#include <polys/monomials/ring.h>
+#include "polys/weight.h"
+#include "kernel/polys.h"
+#include "polys/monomials/ring.h"
 
-#include <polys/nc/gb_hack.h>
-#include <polys/nc/nc.h>
-#include <polys/nc/sca.h>
+#include "polys/nc/gb_hack.h"
+#include "polys/nc/nc.h"
+#include "polys/nc/sca.h"
 
 
-#include <kernel/ideals.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/GBEngine/khstd.h>
+#include "kernel/ideals.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/khstd.h"
 //#include "spolys.h"
 //#include "cntrlc.h"
-#include <kernel/GBEngine/ratgring.h>
-#include <kernel/GBEngine/kutil.h>
+#include "kernel/GBEngine/ratgring.h"
+#include "kernel/GBEngine/kutil.h"
 
-#include <kernel/GBEngine/nc.h>
+#include "kernel/GBEngine/nc.h"
 
 #if 0
 /*3

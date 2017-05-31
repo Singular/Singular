@@ -7,7 +7,7 @@
 * ABSTRACT:hilbert driven std
 */
 
-#include <kernel/structs.h>
+#include "kernel/structs.h"
 
 void khCheck(ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
              kStrategy strat);

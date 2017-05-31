@@ -1,12 +1,12 @@
+#ifndef F5LISTS_HEADER
+#define F5LISTS_HEADER
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
 * ABSTRACT: list interface
 */
-#include <kernel/GBEngine/f5data.h>
-#ifndef F5LISTS_HEADER
-#define F5LISTS_HEADER
+#include "kernel/GBEngine/f5data.h"
 
 #ifdef HAVE_F5
 /*

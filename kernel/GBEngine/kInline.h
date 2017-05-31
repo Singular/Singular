@@ -17,13 +17,13 @@
  * (remark: NO_KINLINE is defined by KDEBUG, i.e. in the debug version)
  */
 
-#include <omalloc/omalloc.h>
-#include <misc/options.h>
+#include "omalloc/omalloc.h"
+#include "misc/options.h"
 
-#include <polys/monomials/p_polys.h>
-#include <polys/kbuckets.h>
+#include "polys/monomials/p_polys.h"
+#include "polys/kbuckets.h"
 
-#include <kernel/polys.h>
+#include "kernel/polys.h"
 
 
 #define HAVE_TAIL_BIN

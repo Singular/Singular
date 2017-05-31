@@ -5,35 +5,32 @@
 * ABSTRACT: kernel: utils for shift GB and free GB
 */
 
-
-
-
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
 #ifdef HAVE_SHIFTBBA
-#include <polys/monomials/ring.h>
-#include <kernel/polys.h>
-#include <coeffs/numbers.h>
-#include <kernel/ideals.h>
-#include <polys/matpol.h>
-#include <polys/kbuckets.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <polys/sbuckets.h>
-#include <polys/operations/p_Mult_q.h>
-#include <kernel/GBEngine/kutil.h>
-#include <kernel/structs.h>
-#include <omalloc/omalloc.h>
-#include <kernel/GBEngine/khstd.h>
-#include <polys/kbuckets.h>
-#include <polys/weight.h>
-#include <misc/intvec.h>
-#include <kernel/structs.h>
-#include <kernel/GBEngine/kInline.h>
-#include <kernel/combinatorics/stairc.h>
-#include <polys/weight.h>
-#include <misc/intvec.h>
-#include <kernel/GBEngine/shiftgb.h>
-#include <polys/nc/sca.h>
+#include "polys/monomials/ring.h"
+#include "kernel/polys.h"
+#include "coeffs/numbers.h"
+#include "kernel/ideals.h"
+#include "polys/matpol.h"
+#include "polys/kbuckets.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "polys/sbuckets.h"
+#include "polys/operations/p_Mult_q.h"
+#include "kernel/GBEngine/kutil.h"
+#include "kernel/structs.h"
+#include "omalloc/omalloc.h"
+#include "kernel/GBEngine/khstd.h"
+#include "polys/kbuckets.h"
+#include "polys/weight.h"
+#include "misc/intvec.h"
+#include "kernel/structs.h"
+#include "kernel/GBEngine/kInline.h"
+#include "kernel/combinatorics/stairc.h"
+#include "polys/weight.h"
+#include "misc/intvec.h"
+#include "kernel/GBEngine/shiftgb.h"
+#include "polys/nc/sca.h"
 
 
 #define freeT(A,v) omFreeSize((ADDRESS)A,(v+1)*sizeof(int))

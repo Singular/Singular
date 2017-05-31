@@ -21,13 +21,13 @@
 // 1 - ann*old sig
 #define EXT_POLY_NEW 0
 
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <misc/mylimits.h>
-#include <misc/options.h>
-#include <polys/nc/nc.h>
-#include <polys/nc/sca.h>
-#include <polys/weight.h> /* for kDebugPrint: maxdegreeWecart*/
+#include "misc/mylimits.h"
+#include "misc/options.h"
+#include "polys/nc/nc.h"
+#include "polys/nc/sca.h"
+#include "polys/weight.h" /* for kDebugPrint: maxdegreeWecart*/
 
 #include <stdlib.h>
 #include <string.h>
@@ -43,7 +43,7 @@
 #endif
 
 #ifdef HAVE_RINGS
-#include <kernel/ideals.h>
+#include "kernel/ideals.h"
 #endif
 
 // define if enterL, enterT should use memmove instead of doing it manually
@@ -56,24 +56,23 @@
 // system memmove -- it does not seem to pay off, though
 // #define ENTER_USE_MYMEMMOVE
 
-#include <kernel/GBEngine/kutil.h>
-#include <polys/kbuckets.h>
-#include <omalloc/omalloc.h>
-#include <coeffs/numbers.h>
-#include <kernel/polys.h>
-#include <polys/monomials/ring.h>
-#include <kernel/ideals.h>
-//#include "cntrlc.h"
-#include <kernel/combinatorics/stairc.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <polys/operations/pShallowCopyDelete.h>
+#include "kernel/GBEngine/kutil.h"
+#include "polys/kbuckets.h"
+#include "omalloc/omalloc.h"
+#include "coeffs/numbers.h"
+#include "kernel/polys.h"
+#include "polys/monomials/ring.h"
+#include "kernel/ideals.h"
+#include "kernel/combinatorics/stairc.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "polys/operations/pShallowCopyDelete.h"
 
 /* shiftgb stuff */
-#include <kernel/GBEngine/shiftgb.h>
-#include <polys/prCopy.h>
+#include "kernel/GBEngine/shiftgb.h"
+#include "polys/prCopy.h"
 
 #ifdef HAVE_RATGRING
-#include <kernel/GBEngine/ratgring.h>
+#include "kernel/GBEngine/ratgring.h"
 #endif
 
 #ifdef KDEBUG

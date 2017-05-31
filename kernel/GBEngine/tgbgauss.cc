@@ -5,15 +5,13 @@
 * ABSTRACT: gauss implementation for F4
 */
 
-
-
-#include <kernel/mod2.h>
-#include <misc/options.h>
-#include <kernel/GBEngine/tgbgauss.h>
-#include <omalloc/omalloc.h>
+#include "kernel/mod2.h"
+#include "misc/options.h"
+#include "kernel/GBEngine/tgbgauss.h"
+#include "omalloc/omalloc.h"
 #include <stdlib.h>
-#include <kernel/GBEngine/kutil.h>
-#include <kernel/polys.h>
+#include "kernel/GBEngine/kutil.h"
+#include "kernel/polys.h"
 static const int bundle_size=100;
 
 mac_poly mac_p_add_ff_qq(mac_poly a, number f,mac_poly b)

@@ -13,19 +13,19 @@
 ///@TODO: delay nur auf Sugarvergr?erung
 ///@TODO: grade aus ecartS, setze dazu strat->honey; und nutze p.ecart
 ///@TODO: no tail reductions in syz comp
-#include <kernel/mod2.h>
+#include "kernel/mod2.h"
 
-#include <kernel/GBEngine/tgb.h>
-#include <kernel/GBEngine/tgb_internal.h>
-#include <kernel/GBEngine/tgbgauss.h>
+#include "kernel/GBEngine/tgb.h"
+#include "kernel/GBEngine/tgb_internal.h"
+#include "kernel/GBEngine/tgbgauss.h"
 
-#include <misc/options.h>
-#include <kernel/digitech.h>
-#include <polys/nc/nc.h>
-#include <polys/nc/sca.h>
-#include <polys/prCopy.h>
+#include "misc/options.h"
+#include "kernel/digitech.h"
+#include "polys/nc/nc.h"
+#include "polys/nc/sca.h"
+#include "polys/prCopy.h"
 
-#include <coeffs/longrat.h> // nlQlogSize
+#include "coeffs/longrat.h" // nlQlogSize
 
 #include <stdlib.h>
 #include <stdio.h>

@@ -6,15 +6,14 @@
 /*
 * ABSTRACT: gauss implementation for F4 header
 */
-// #include <kernel/mod2.h>
-#include <coeffs/numbers.h>
-#include <polys/monomials/p_polys.h>
-#include <omalloc/omallocClass.h>
-//#include "tgb_internal.h"
+#include "coeffs/numbers.h"
+#include "polys/monomials/p_polys.h"
+#include "omalloc/omallocClass.h"
 
 class slimgb_alg;
 
-class tgb_matrix{
+class tgb_matrix
+{
  private:
   number** n;
   int columns;
@@ -52,7 +51,8 @@ public:
 
 typedef mac_poly_r* mac_poly;
 
-class tgb_sparse_matrix{
+class tgb_sparse_matrix
+{
  private:
   ring r;
   mac_poly* mp;
@@ -90,7 +90,6 @@ class tgb_sparse_matrix{
 };
 void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* c);
 void simple_gauss2(tgb_matrix* mat);
-
 
 
 mac_poly mac_p_add_ff_qq(mac_poly a, number f,mac_poly b);
