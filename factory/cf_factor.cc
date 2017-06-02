@@ -150,7 +150,7 @@ void out_cf(const char *s1,const CanonicalForm &f,const char *s2)
         gmp_numerator(f,m);
         char * str = new char[mpz_sizeinbase( m, 10 ) + 2];
         str = mpz_get_str( str, 10, m );
-        printf("%s",str);
+        puts(str);
         delete[] str;
         mpz_clear(m);
       }
@@ -160,13 +160,13 @@ void out_cf(const char *s1,const CanonicalForm &f,const char *s2)
         gmp_numerator(f,m);
         char * str = new char[mpz_sizeinbase( m, 10 ) + 2];
         str = mpz_get_str( str, 10, m );
-        printf("%s/",str);
+        puts(str);putchar('/');
         delete[] str;
         mpz_clear(m);
         gmp_denominator(f,m);
         str = new char[mpz_sizeinbase( m, 10 ) + 2];
         str = mpz_get_str( str, 10, m );
-        printf("%s",str);
+        puts(str);
         delete[] str;
         mpz_clear(m);
       }
