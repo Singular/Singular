@@ -872,7 +872,6 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
 #endif
 
   // the variables:
-  r->nNULL = (number)0;
   assume( getCoeffType(r) == n_GF );
 
   GFInfo* p = (GFInfo *)(parameter);

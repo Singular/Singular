@@ -525,7 +525,6 @@ BOOLEAN gInitChar(coeffs r, void* p)
   r->cfRandom=gRandom;
   r->cfWriteFd=gWriteFd;
   r->cfReadFd=gReadFd;
-  r->nNULL = gInit(0,r);
   r->type=n_Z;
   #ifdef LDEBUG
   r->cfDBTest=gDBTest;

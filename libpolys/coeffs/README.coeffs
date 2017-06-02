@@ -101,7 +101,6 @@ optional:
  Use?
 
 automatic:
--nNULL (by nInitChar)
 -ref (by nInitChar,nKillChar)
 -type (by nInitChar)
 to describe:

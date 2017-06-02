@@ -29,7 +29,7 @@ omBin rnumber_bin = omGetSpecBin(sizeof(snumber)); // TODO: move this into coeff
 /*2
 * extracts a long integer from s, returns the rest
 */
-static const char * nlEatLong(char *s, mpz_ptr i)
+const char * nlEatLong(char *s, mpz_ptr i)
 {
   const char * start=s;
 

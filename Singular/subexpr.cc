@@ -1169,7 +1169,7 @@ void * sleftv::Data()
           return (void *)A->qideal->m[0];
         }
         else
-          return (void *)currRing->cf->nNULL;
+          return (void *)nInit(0);
 
       case VNOETHER:   return (void *) (currRing->ppNoether);
       case IDHDL:

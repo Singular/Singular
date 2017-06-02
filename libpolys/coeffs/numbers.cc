@@ -491,9 +491,6 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     if(n->cfWriteShort==NULL) Warn("cfWriteShort is NULL for coeff %d",t);
     if(n->cfCoeffString==ndCoeffString) Warn("cfCoeffString is undefined for coeff %d",t);
 #endif
-
-   if( n->nNULL == NULL )
-     n->nNULL = n->cfInit(0, n); // may still remain NULL
   }
   else
   {
@@ -518,7 +515,6 @@ void nKillChar(coeffs r)
       {
         n->next=n->next->next;
         if (cf_root==r) cf_root=n->next;
-        n_Delete(&(r->nNULL),r);
         assume (r->cfKillChar!=NULL); r->cfKillChar(r); // STATISTIC(nKillChar);
         omFreeSize((void *)r, sizeof(n_Procs_s));
         r=NULL;

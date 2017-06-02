@@ -601,9 +601,6 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
 
   n->cfSetChar=ngcSetChar;
 
-// we need to initialize n->nNULL at least for minpoly printing
-  n->nNULL  = n->cfInit(0,n);
-
 /*
   //r->cfInitChar=nlInitChar;
   r->cfKillChar=NULL;
@@ -656,7 +653,6 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
 #endif
 
   // the variables:
-  r->nNULL = INT_TO_SR(0);
   r->type = n_Q;
   r->ch = 0;
   r->has_simple_Alloc=FALSE;

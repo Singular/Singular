@@ -384,8 +384,6 @@ BOOLEAN n_QAEInitChar(coeffs r, void *)
     r->cfCoeffWrite=nAEQCoeffWrite; //????
 
 
-    // the variables:
-    r->nNULL = (number) 0;
     //r->type = n_AE;
     r->has_simple_Alloc=TRUE;
     r->has_simple_Inverse=TRUE;

@@ -392,8 +392,6 @@ BOOLEAN n_AEInitChar(coeffs r, void *)
     r->cfCoeffWrite=nAECoeffWrite; //????
 
 
-    // the variables:
-    r->nNULL = (number) 0;
     //r->type = n_AE;
     r->ch = 0;
     r->has_simple_Alloc=TRUE;

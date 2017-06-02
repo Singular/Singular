@@ -180,7 +180,7 @@ NTL_CLIENT
 
 #endif
 
-long InvMod(long a, const coeffs R)
+static inline long InvMod(long a, const coeffs R)
 {
    long d, s, t;
 
@@ -215,7 +215,7 @@ long InvMod(long a, const coeffs R)
 }
 #endif
 
-inline number npInversM (number c, const coeffs r)
+static inline number npInversM (number c, const coeffs r)
 {
   n_Test(c, r);
 #ifndef HAVE_DIV_MOD
@@ -557,7 +557,6 @@ BOOLEAN npInitChar(coeffs r, void* p)
   r->cfReadFd=npReadFd;
 
   // the variables:
-  r->nNULL = (number)0;
   r->type = n_Zp;
   r->has_simple_Alloc=TRUE;
   r->has_simple_Inverse=TRUE;
@@ -807,7 +806,7 @@ void   nvInpMult(number &a, number b, const coeffs r)
 }
 
 
-inline long nvInvMod(long a, const coeffs R)
+static inline long nvInvMod(long a, const coeffs R)
 {
 #ifdef HAVE_DIV_MOD
   return InvMod(a, R);
@@ -847,7 +846,7 @@ inline long nvInvMod(long a, const coeffs R)
 #endif
 }
 
-inline number nvInversM (number c, const coeffs r)
+static inline number nvInversM (number c, const coeffs r)
 {
   long inv=nvInvMod((long)c,r);
   return (number)inv;

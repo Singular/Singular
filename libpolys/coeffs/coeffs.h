@@ -315,10 +315,6 @@ struct n_Procs_s
    number (*convFactoryNSingN)( const CanonicalForm n, const coeffs r);
    CanonicalForm (*convSingNFactoryN)( number n, BOOLEAN setChar, const coeffs r );
 
-
-   /// the 0 as constant, NULL by default
-   number nNULL;
-
    /// Number of Parameters in the coeffs (default 0)
    int iNumberOfParameters;
 

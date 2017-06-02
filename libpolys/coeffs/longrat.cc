@@ -3408,8 +3408,6 @@ BOOLEAN nlInitChar(coeffs r, void*p)
   r->cfWriteFd=nlWriteFd;
   r->cfReadFd=nlReadFd;
 
-  // the variables: general stuff (required)
-  r->nNULL = INT_TO_SR(0);
   //r->type = n_Q;
   r->ch = 0;
   r->has_simple_Alloc=FALSE;

@@ -625,7 +625,6 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfDBTest=nrzDBTest;
 #endif
 
-  r->nNULL = 0;
   r->ch = 0;
   r->has_simple_Alloc=FALSE;
   r->has_simple_Inverse=FALSE;
@@ -1864,7 +1863,6 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfDBTest=nrzDBTest;
 #endif
 
-  r->nNULL = 0;
   r->ch = 0;
   r->has_simple_Alloc=FALSE;
   r->has_simple_Inverse=FALSE;

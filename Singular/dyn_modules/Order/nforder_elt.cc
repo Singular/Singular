@@ -260,8 +260,6 @@ BOOLEAN n_nfOrderInit(coeffs r,  void * parameter)
   r->cfGreaterZero = EltGreaterZero;
   r->cfDelete = EltDelete;
   r->cfSetMap = EltSetMap;
-  if (parameter)
-    r->nNULL = EltInit(0, r);
 #ifdef LDEBUG
   r->cfDBTest = EltDBTest;
 #endif

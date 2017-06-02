@@ -1047,7 +1047,7 @@ static void checkComplexity(ideal G, char* cG)
   int nG = IDELEMS(G);
   intvec* ivUnit = Mivdp(nV);
   int i, tmpdeg, maxdeg=0;
-  number tmpcoeff , maxcoeff=currRing->cf->nNULL;
+  number tmpcoeff , maxcoeff=nInit(0);
   poly p;
   for(i=nG-1; i>=0; i--)
   {

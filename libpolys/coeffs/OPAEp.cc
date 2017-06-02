@@ -400,9 +400,6 @@ BOOLEAN n_pAEInitChar(coeffs r, void *p)
     r->cfInpMult=nAEpInpMult; //????
     r->cfCoeffWrite=nAEpCoeffWrite; //????
 
-
-    // the variables:
-    r->nNULL = (number) 0;
     //r->type = n_AE;
     r->ch = c;
     r->has_simple_Alloc=TRUE;
