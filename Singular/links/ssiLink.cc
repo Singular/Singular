@@ -1446,13 +1446,16 @@ BOOLEAN ssiWrite(si_link l, leftv data)
     void *dd=data->Data();
     attr *aa=data->Attribute();
     BOOLEAN with_attr=FALSE;
-    if (((*aa)!=NULL)||(data->flag!=0))
+    if ((aa!=NULL) && ((*aa)!=NULL))
     {
       attr a=*aa;
       int n=0;
       while(a!=NULL) { n++; a=a->next;}
       fprintf(d->f_write,"21 %d %d ",data->flag,n);
-      a=*aa;
+    }
+    else if (data->flag!=0)
+    {
+      fprintf(d->f_write,"21 %d 0 ",data->flag);
     }
     if ((dd==NULL) && (data->name!=NULL) && (tt==0)) tt=DEF_CMD;
       // return pure undefined names as def
