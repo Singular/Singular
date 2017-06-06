@@ -263,7 +263,7 @@ static inline CanonicalForm chin_mul_inv(CanonicalForm a, CanonicalForm b, int i
 
 void chineseRemainderCached(CFArray &a, CFArray &n, CanonicalForm &xnew, CanonicalForm &prod, CFArray &inv)
 {
-  CanonicalForm p, sum = 0; prod=1;
+  CanonicalForm p, sum(0L); prod(1L);
   int i;
   int len=n.size();
 

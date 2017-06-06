@@ -63,28 +63,28 @@ const FACTORY_INT64 MAXIMMEDIATELL = 268435454LL;
 //#ifdef HAS_ARITHMETIC_SHIFT
 #if 1
 
-inline long imm2int ( const InternalCF * const imm )
+static inline long imm2int ( const InternalCF * const imm )
 {
     return ((intptr_t)imm) >> 2;
 }
 
-inline InternalCF * int2imm ( long i )
+static inline InternalCF * int2imm ( long i )
 {
     return (InternalCF*)((i << 2) | INTMARK );
 }
 
 #else
 
-inline int imm2int ( const InternalCF * const imm )
+static inline long imm2int ( const InternalCF * const imm )
 {
     // this could be better done by masking the sign bit
-    if ( ((int)((intptr_t)imm)) < 0 )
-        return -((-(intptr_t)imm) >> 2);
+    if ( ((long)(intptr_t)imm)) < 0 )
+        return -((-(long)(intptr_t)imm) >> 2);
     else
-        return (intptr_t)imm >> 2;
+        return (long)(intptr_t)imm >> 2;
 }
 
-inline InternalCF * int2imm ( long i )
+static inline InternalCF * int2imm ( long i )
 {
     if ( i < 0 )
         return (InternalCF*)(-(((-i) << 2) | INTMARK));

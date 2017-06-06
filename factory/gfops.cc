@@ -53,7 +53,7 @@ char gf_name = 'Z';
 
 unsigned short * gf_table = 0;
 
-CanonicalForm gf_mipo(0);
+CanonicalForm gf_mipo(0L);
 
 static CanonicalForm intVec2CF ( int degree, int * coeffs, int level )
 {
