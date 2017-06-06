@@ -1763,6 +1763,9 @@ ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring r)
   number *x=(number *)omAlloc(rl*sizeof(number));
   poly *p=(poly *)omAlloc(rl*sizeof(poly));
   CFArray inv_cache(rl);
+  extern int n_SwitchChinRem; //TEST
+  int save_n_SwitchChinRem=n_SwitchChinRem;
+  n_SwitchChinRem=1;
   for(i=cnt-1;i>=0;i--)
   {
     for(j=rl-1;j>=0;j--)
@@ -1778,6 +1781,7 @@ ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring r)
       if(i<IDELEMS(xx[j])*xx[j]->nrows) xx[j]->m[i]=p[j];
     }
   }
+  n_SwitchChinRem=save_n_SwitchChinRem;
   omFreeSize(p,rl*sizeof(poly));
   omFreeSize(x,rl*sizeof(number));
   for(i=rl-1;i>=0;i--) id_Delete(&(xx[i]),r);
