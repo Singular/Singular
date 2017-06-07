@@ -684,10 +684,10 @@ int tgb_pair_better_gen2 (const void *ap, const void *bp)
 
 int kFindDivisibleByInS_easy (kStrategy strat, const red_object & obj)
 {
-  int i;
-  long not_sev = ~obj.sev;
   poly p = obj.p;
-  for(i = 0; i <= strat->sl; i++)
+  if ((strat->syzComp>0) && (pGetComp(p)>strat->syzComp)) return -1;
+  long not_sev = ~obj.sev;
+  for(int i = 0; i <= strat->sl; i++)
   {
     if(pLmShortDivisibleBy (strat->S[i], strat->sevS[i], p, not_sev))
       return i;
@@ -697,9 +697,9 @@ int kFindDivisibleByInS_easy (kStrategy strat, const red_object & obj)
 
 int kFindDivisibleByInS_easy (kStrategy strat, poly p, long sev)
 {
-  int i;
+  if ((strat->syzComp>0) && (pGetComp(p)>strat->syzComp)) return -1;
   long not_sev = ~sev;
-  for(i = 0; i <= strat->sl; i++)
+  for(int i = 0; i <= strat->sl; i++)
   {
     if(pLmShortDivisibleBy (strat->S[i], strat->sevS[i], p, not_sev))
       return i;
@@ -2971,7 +2971,6 @@ static void go_on (slimgb_alg * c)
 
 static poly redNFTail (poly h, const int sl, kStrategy strat, int len)
 {
-  BOOLEAN nc = rIsPluralRing (currRing);
   if(h == NULL)
     return NULL;
   pTest (h);
@@ -2979,6 +2978,7 @@ static poly redNFTail (poly h, const int sl, kStrategy strat, int len)
     return h;
   if(pNext (h) == NULL)
     return h;
+  BOOLEAN nc = rIsPluralRing (currRing);
 
   int j;
   poly res = h;
@@ -3279,7 +3279,7 @@ slimgb_alg::slimgb_alg (ideal I, int syz_comp, BOOLEAN F4, int deg_pos)
   strat = new skStrategy;
   if(eliminationProblem)
     strat->honey = TRUE;
-  strat->syzComp = 0;
+  strat->syzComp = syz_comp;
   initBuchMoraCrit (strat);
   initBuchMoraPos (strat);
   strat->initEcart = initEcartBBA;
@@ -3609,7 +3609,7 @@ do_t_rep_gb (ring /*r*/, ideal arg_I, int syz_comp, BOOLEAN F4_mode, int deg_pos
 
   if(TEST_OPT_PROT)
     if(F4_mode)
-      PrintS ("F4 Modus \n");
+      PrintS ("F4 Modus\n");
 
   //debug_Ideal=arg_debug_Ideal;
   //if (debug_Ideal) PrintS("DebugIdeal received\n");
