@@ -286,7 +286,7 @@ ideal idSect (ideal h1,ideal h2)
   for (i=0;i<IDELEMS(temp1);i++)
   {
     if ((temp1->m[i]!=NULL)
-    && (p_GetComp(temp1->m[i],syz_ring)>length))
+    && (__p_GetComp(temp1->m[i],syz_ring)>length))
     {
       if(syz_ring==orig_ring)
       {
@@ -428,7 +428,7 @@ ideal idMultSect(resolvente arg, int length)
   k = 0;
   for (j=0;j<IDELEMS(tempstd);j++)
   {
-    if ((tempstd->m[j]!=NULL) && (p_GetComp(tempstd->m[j],syz_ring)>syzComp))
+    if ((tempstd->m[j]!=NULL) && (__p_GetComp(tempstd->m[j],syz_ring)>syzComp))
     {
       if (syz_ring==orig_ring)
         p = pCopy(tempstd->m[j]);
