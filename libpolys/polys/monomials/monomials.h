@@ -63,7 +63,6 @@ static inline number& pGetCoeff(poly p)
 
 
 //
-// deletes old coeff before setting the new one???
 #define pSetCoeff0(p,n)     (p)->coef=(n)
 #define p_SetCoeff0(p,n,r)  pSetCoeff0(p,n)
 

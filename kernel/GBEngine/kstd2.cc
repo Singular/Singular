@@ -2656,7 +2656,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     p_Write(strat->P.sig,currRing);
     #endif
     /* reduction of the element chosen from L */
-    if (!strat->rewCrit2(strat->P.sig, ~strat->P.sevSig, strat->P.GetLmCurrRing(), strat, strat->P.checked+1)) {
+    if (!strat->rewCrit2(strat->P.sig, ~strat->P.sevSig, strat->P.GetLmCurrRing(), strat, strat->P.checked+1))
+    {
       //#if 1
 #ifdef DEBUGF5
       PrintS("SIG OF NEXT PAIR TO HANDLE IN SIG-BASED ALGORITHM\n");
@@ -2721,7 +2722,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         pWrite(strat->P.sig);
 #endif
 #if SBA_PRODUCT_CRITERION
-        if (strat->P.prod_crit) {
+        if (strat->P.prod_crit)
+        {
 #if SBA_PRINT_PRODUCT_CRITERION
           product_criterion++;
 #endif
@@ -2730,14 +2732,18 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           if (strat->P.lcm!=NULL)
             pLmFree(strat->P.lcm);
           red_result = 2;
-        } else {
+        }
+        else
+        {
           red_result = strat->red(&strat->P,strat);
         }
 #else
         red_result = strat->red(&strat->P,strat);
 #endif
       }
-    } else {
+    }
+    else
+    {
       /*
       if (strat->P.lcm != NULL)
         pLmFree(strat->P.lcm);
@@ -2801,7 +2807,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
 //#if 1
 #ifdef DEBUGF5
-    if (red_result != 0) {
+    if (red_result != 0)
+    {
         PrintS("Poly after red: ");
         pWrite(pHead(strat->P.p));
         pWrite(strat->P.GetLmCurrRing());
@@ -2861,7 +2868,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
       else
       {
-        if (strat->sbaOrder != 2) {
+        if (strat->sbaOrder != 2)
+        {
           if (TEST_OPT_INTSTRATEGY)
           {
             strat->P.pCleardenom();
@@ -3066,11 +3074,13 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         pGetExpV (strat->P.p,vv);
         LObject Q;
         int pos;
-        int idx = p_GetComp(strat->P.sig,currRing);
+        int idx = __p_GetComp(strat->P.sig,currRing);
         //printf("++ -- adding syzygies -- ++\n");
         // if new element is the first one in this index
-        if (strat->currIdx < idx) {
-          for (int i=0; i<strat->sl; ++i) {
+        if (strat->currIdx < idx)
+        {
+          for (int i=0; i<strat->sl; ++i)
+          {
             Q.sig = p_Copy(strat->P.sig,currRing);
             p_ExpVectorAdd(Q.sig,strat->S[i],currRing);
             poly help = p_Copy(strat->sig[i],currRing);
@@ -3081,18 +3091,24 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
             enterSyz(Q, strat, pos);
           }
           strat->currIdx = idx;
-        } else {
+        }
+        else
+        {
           // if the element is not the first one in the given index we build all
           // possible syzygies with elements of higher index
-          for (int i=cmp+1; i<=max_cmp; ++i) {
+          for (int i=cmp+1; i<=max_cmp; ++i)
+          {
             pos = -1;
-            for (int j=0; j<strat->sl; ++j) {
-              if (p_GetComp(strat->sig[j],currRing) == i) {
+            for (int j=0; j<strat->sl; ++j)
+            {
+              if (__p_GetComp(strat->sig[j],currRing) == i)
+              {
                 pos = j;
                 break;
               }
             }
-            if (pos != -1) {
+            if (pos != -1)
+            {
               Q.sig = p_One(currRing);
               p_SetExpV(Q.sig, vv, currRing);
               // F->m[i-1] corresponds to index i
@@ -3101,12 +3117,16 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
               poly help = p_Copy(strat->P.sig,currRing);
               p_ExpVectorAdd(help,strat->S[pos],currRing);
               Q.sig = p_Add_q(Q.sig,help,currRing);
-              if (strat->sbaOrder == 0) {
-                if (p_LmCmp(Q.sig,strat->syz[strat->syzl-1],currRing) == -currRing->OrdSgn) {
+              if (strat->sbaOrder == 0)
+              {
+                if (p_LmCmp(Q.sig,strat->syz[strat->syzl-1],currRing) == -currRing->OrdSgn)
+                {
                   pos = posInSyz(strat, Q.sig);
                   enterSyz(Q, strat, pos);
                 }
-              } else {
+              }
+              else
+              {
                 pos = posInSyz(strat, Q.sig);
                 enterSyz(Q, strat, pos);
               }
@@ -3159,7 +3179,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // syzygy and can be used in syzCriterion()
       // the signature is added if and only if the
       // pair was not detected by the rewritten criterion in strat->red = redSig
-      if (red_result!=2) {
+      if (red_result!=2)
+      {
 #if SBA_PRINT_ZERO_REDUCTIONS
         zeroreductions++;
 #endif

@@ -2206,7 +2206,7 @@ intvec * kModW, * kHomW;
 long kModDeg(poly p, ring r)
 {
   long o=p_WDegree(p, r);
-  long i=p_GetComp(p, r);
+  long i=__p_GetComp(p, r);
   if (i==0) return o;
   //assume((i>0) && (i<=kModW->length()));
   if (i<=kModW->length())
@@ -2221,7 +2221,7 @@ long kHomModDeg(poly p, ring r)
   for (i=r->N;i>0;i--)
     j+=p_GetExp(p,i,r)*(*kHomW)[i-1];
   if (kModW == NULL) return j;
-  i = p_GetComp(p,r);
+  i = __p_GetComp(p,r);
   if (i==0) return j;
   return j+(*kModW)[i-1];
 }

@@ -147,7 +147,8 @@ static poly redBba (poly h,int maxIndex,kStrategy strat);
      else return pDivComp_INCOMP */
 static inline int pDivCompRing(poly p, poly q)
 {
-  if (pGetComp(p) == pGetComp(q))
+  if ((currRing->pCompIndex < 0)
+  || (__p_GetComp(p,currRing) == __p_GetComp(q,currRing)))
   {
     BOOLEAN a=FALSE, b=FALSE;
     int i;
@@ -185,7 +186,8 @@ static inline int pDivCompRing(poly p, poly q)
 
 static inline int pDivComp(poly p, poly q)
 {
-  if (pGetComp(p) == pGetComp(q))
+  if ((currRing->pCompIndex < 0)
+  || (__p_GetComp(p,currRing) == __p_GetComp(q,currRing)))
   {
 #ifdef HAVE_RATGRING
     if (rIsRatGRing(currRing))
@@ -330,8 +332,6 @@ void deleteHC(poly* p, int* e, int* l,kStrategy strat)
 */
 void cancelunit (LObject* L,BOOLEAN inNF)
 {
-  int  i;
-  poly h;
   number lc;
 
   if(rHasGlobalOrdering (currRing)) return;
@@ -339,6 +339,7 @@ void cancelunit (LObject* L,BOOLEAN inNF)
 
   ring r = L->tailRing;
   poly p = L->GetLmTailRing();
+  if(p_GetComp(p, r) != 0 && !p_OneComp(p, r)) return;
 
   if (rField_is_Ring(r) /*&& (rHasLocalOrMixedOrdering(r))*/)
     lc = pGetCoeff(p);
@@ -353,13 +354,13 @@ void cancelunit (LObject* L,BOOLEAN inNF)
   //if ( !(n_IsUnit(pGetCoeff(p), r->cf)) ) return;
 #endif
 
-  if(p_GetComp(p, r) != 0 && !p_OneComp(p, r)) return;
 
 //    for(i=r->N;i>0;i--)
 //    {
 //      if ((p_GetExp(p,i,r)>0) && (rIsPolyVar(i, r)==TRUE)) return;
 //    }
-  h = pNext(p);
+  poly h = pNext(p);
+  int  i;
 
   if(rField_is_Ring(currRing))
   {
@@ -392,7 +393,6 @@ void cancelunit (LObject* L,BOOLEAN inNF)
           p_Delete(&pNext(L->t_p),r);
         if (L->p != NULL && pNext(L->p) != NULL)
           pNext(L->p) = NULL;
-
         return;
       }
       i = rVar(r);
@@ -4693,7 +4693,7 @@ void enterExtendedSpoly(poly h,kStrategy strat)
       }
       if (rRing_has_Comp(currRing) && rRing_has_Comp(strat->tailRing))
       {
-        p_SetComp(tmp, p_GetComp(p, strat->tailRing), currRing);
+        p_SetComp(tmp, __p_GetComp(p, strat->tailRing), currRing);
       }
       p_Setm(tmp, currRing);
       p = p_LmFreeAndNext(p, strat->tailRing);
@@ -4775,7 +4775,7 @@ void enterExtendedSpolySig(poly h,poly hSig,kStrategy strat)
       }
       if (rRing_has_Comp(currRing) && rRing_has_Comp(strat->tailRing))
       {
-        p_SetComp(tmp, p_GetComp(p, strat->tailRing), currRing);
+        p_SetComp(tmp, __p_GetComp(p, strat->tailRing), currRing);
       }
       p_Setm(tmp, currRing);
       p = p_LmFreeAndNext(p, strat->tailRing);
@@ -7155,7 +7155,7 @@ BOOLEAN syzCriterionInc(poly sig, unsigned long not_sevSig, kStrategy strat)
   PrintS("--- syzygy criterion checks:  ");
   pWrite(sig);
 #endif
-  int comp = p_GetComp(sig, currRing);
+  int comp = __p_GetComp(sig, currRing);
   int min, max;
   if (comp<=1)
     return FALSE;
@@ -7600,11 +7600,11 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
       {
         if (Ln.p!=NULL)
         {
-          if (p_GetComp(Ln.p,currRing)> strat->syzComp) break;
+          if (__p_GetComp(Ln.p,currRing)> strat->syzComp) break;
         }
         else
         {
-          if (p_GetComp(Ln.t_p,strat->tailRing)> strat->syzComp) break;
+          if (__p_GetComp(Ln.t_p,strat->tailRing)> strat->syzComp) break;
         }
       }
       Ln.SetShortExpVector();
@@ -7708,11 +7708,11 @@ poly redtailBbaBound (LObject* L, int pos, kStrategy strat, int bound, BOOLEAN w
       {
         if (Ln.p!=NULL)
         {
-          if (p_GetComp(Ln.p,currRing)> strat->syzComp) break;
+          if (__p_GetComp(Ln.p,currRing)> strat->syzComp) break;
         }
         else
         {
-          if (p_GetComp(Ln.t_p,strat->tailRing)> strat->syzComp) break;
+          if (__p_GetComp(Ln.t_p,strat->tailRing)> strat->syzComp) break;
         }
       }
       Ln.SetShortExpVector();
@@ -8456,7 +8456,7 @@ void initSyzRules (kStrategy strat)
             p_SetCoeff(q,nCopy(p_GetCoeff(strat->S[i],currRing)),currRing);
           p_ExpVectorCopy(q,strat->S[i],currRing);
           q               = p_Neg (q, currRing);
-          p_SetCompP (q, p_GetComp(strat->sig[k], currRing), currRing);
+          p_SetCompP (q, __p_GetComp(strat->sig[k], currRing), currRing);
           Q.sig = p_Add_q (Q.sig, q, currRing);
           Q.sevSig  = p_GetShortExpVector(Q.sig,currRing);
           pos = posInSyz(strat, Q.sig);
@@ -8500,7 +8500,7 @@ void initSyzRules (kStrategy strat)
         p_SetCoeff(q,nCopy(p_GetCoeff(strat->L[strat->Ll].p,currRing)),currRing);
       p_ExpVectorCopy(q,strat->L[strat->Ll].p,currRing);
       q               = p_Neg (q, currRing);
-      p_SetCompP (q, p_GetComp(strat->sig[k], currRing), currRing);
+      p_SetCompP (q, __p_GetComp(strat->sig[k], currRing), currRing);
       Q.sig = p_Add_q (Q.sig, q, currRing);
       Q.sevSig = p_GetShortExpVector(Q.sig,currRing);
       pos = posInSyz(strat, Q.sig);
