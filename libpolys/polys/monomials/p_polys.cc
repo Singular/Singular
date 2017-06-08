@@ -300,7 +300,7 @@ void p_Setm_General(poly p, const ring r)
         }
         case ro_syzcomp:
         {
-          long c=p_GetComp(p,r);
+          long c=__p_GetComp(p,r);
           long sc = c;
           int* Components = (_componentsExternal ? _components :
                              o->data.syzcomp.Components);
@@ -318,7 +318,7 @@ void p_Setm_General(poly p, const ring r)
         }
         case ro_syz:
         {
-          const unsigned long c = p_GetComp(p, r);
+          const unsigned long c = __p_GetComp(p, r);
           const short place = o->data.syz.place;
           const int limit = o->data.syz.limit;
 
@@ -738,7 +738,7 @@ long pLDeg0(poly p,int *l, const ring r)
 
   if (k > 0)
   {
-    while ((pNext(p)!=NULL) && (p_GetComp(pNext(p), r)==k))
+    while ((pNext(p)!=NULL) && (__p_GetComp(pNext(p), r)==k))
     {
       pIter(p);
       ll++;
@@ -784,7 +784,7 @@ long pLDeg0c(poly p,int *l, const ring r)
     poly pp = p;
     while ((p=pNext(p))!=NULL)
     {
-      if (p_GetComp(p, r)<=curr_limit/*syzComp*/)
+      if (__p_GetComp(p, r)<=curr_limit/*syzComp*/)
         ll++;
       else break;
       pp = p;
@@ -811,7 +811,7 @@ long pLDegb(poly p,int *l, const ring r)
 
   if (k != 0)
   {
-    while (((p=pNext(p))!=NULL) && (p_GetComp(p, r)==k))
+    while (((p=pNext(p))!=NULL) && (__p_GetComp(p, r)==k))
     {
       ll++;
     }
@@ -842,7 +842,7 @@ long pLDeg1(poly p,int *l, const ring r)
   max=r->pFDeg(p, r);
   if (k > 0)
   {
-    while (((p=pNext(p))!=NULL) && (p_GetComp(p, r)==k))
+    while (((p=pNext(p))!=NULL) && (__p_GetComp(p, r)==k))
     {
       t=r->pFDeg(p, r);
       if (t>max) max=t;
@@ -880,7 +880,7 @@ long pLDeg1c(poly p,int *l, const ring r)
     long limit = rGetCurrSyzLimit(r);
     while ((p=pNext(p))!=NULL)
     {
-      if (p_GetComp(p, r)<=limit)
+      if (__p_GetComp(p, r)<=limit)
       {
         if ((t=r->pFDeg(p, r))>max) max=t;
         ll++;
@@ -912,7 +912,7 @@ long pLDeg1_Deg(poly p,int *l, const ring r)
   max=p_GetOrder(p, r);
   if (k > 0)
   {
-    while (((p=pNext(p))!=NULL) && (p_GetComp(p, r)==k))
+    while (((p=pNext(p))!=NULL) && (__p_GetComp(p, r)==k))
     {
       t=p_GetOrder(p, r);
       if (t>max) max=t;
@@ -945,7 +945,7 @@ long pLDeg1c_Deg(poly p,int *l, const ring r)
     long limit = rGetCurrSyzLimit(r);
     while ((p=pNext(p))!=NULL)
     {
-      if (p_GetComp(p, r)<=limit)
+      if (__p_GetComp(p, r)<=limit)
       {
         if ((t=p_GetOrder(p, r))>max) max=t;
         ll++;
@@ -976,7 +976,7 @@ long pLDeg1_Totaldegree(poly p,int *l, const ring r)
   max=p_Totaldegree(p, r);
   if (k > 0)
   {
-    while (((p=pNext(p))!=NULL) && (p_GetComp(p, r)==k))
+    while (((p=pNext(p))!=NULL) && (__p_GetComp(p, r)==k))
     {
       t=p_Totaldegree(p, r);
       if (t>max) max=t;
@@ -1008,7 +1008,7 @@ long pLDeg1c_Totaldegree(poly p,int *l, const ring r)
     long limit = rGetCurrSyzLimit(r);
     while ((p=pNext(p))!=NULL)
     {
-      if (p_GetComp(p, r)<=limit)
+      if (__p_GetComp(p, r)<=limit)
       {
         if ((t=p_Totaldegree(p, r))>max) max=t;
         ll++;
@@ -1039,7 +1039,7 @@ long pLDeg1_WFirstTotalDegree(poly p,int *l, const ring r)
   max=p_WFirstTotalDegree(p, r);
   if (k > 0)
   {
-    while (((p=pNext(p))!=NULL) && (p_GetComp(p, r)==k))
+    while (((p=pNext(p))!=NULL) && (__p_GetComp(p, r)==k))
     {
       t=p_WFirstTotalDegree(p, r);
       if (t>max) max=t;
@@ -1071,7 +1071,7 @@ long pLDeg1c_WFirstTotalDegree(poly p,int *l, const ring r)
     long limit = rGetCurrSyzLimit(r);
     while ((p=pNext(p))!=NULL)
     {
-      if (p_GetComp(p, r)<=limit)
+      if (__p_GetComp(p, r)<=limit)
       {
         if ((t=p_Totaldegree(p, r))>max) max=t;
         ll++;
@@ -3270,9 +3270,9 @@ BOOLEAN   p_VectorHasUnitB(poly p, int * k, const ring r)
   {
     if (p_LmIsConstantComp(q,r))
     {
-      i = p_GetComp(q,r);
+      i = __p_GetComp(q,r);
       qq = p;
-      while ((qq != q) && (p_GetComp(qq,r) != i)) pIter(qq);
+      while ((qq != q) && (__p_GetComp(qq,r) != i)) pIter(qq);
       if (qq == q)
       {
         *k = i;
@@ -3294,15 +3294,15 @@ void   p_VectorHasUnit(poly p, int * k, int * len, const ring r)
   {
     if (p_LmIsConstantComp(q,r))
     {
-      i = p_GetComp(q,r);
+      i = __p_GetComp(q,r);
       qq = p;
-      while ((qq != q) && (p_GetComp(qq,r) != i)) pIter(qq);
+      while ((qq != q) && (__p_GetComp(qq,r) != i)) pIter(qq);
       if (qq == q)
       {
        j = 0;
        while (qq!=NULL)
        {
-         if (p_GetComp(qq,r)==i) j++;
+         if (__p_GetComp(qq,r)==i) j++;
         pIter(qq);
        }
        if ((*len == 0) || (j<*len))
@@ -3324,10 +3324,10 @@ poly p_TakeOutComp1(poly * p, int k, const ring r)
 
   poly qq=NULL,result = NULL;
 
-  if (p_GetComp(q,r)==k)
+  if (__p_GetComp(q,r)==k)
   {
     result = q; /* *p */
-    while ((q!=NULL) && (p_GetComp(q,r)==k))
+    while ((q!=NULL) && (__p_GetComp(q,r)==k))
     {
       p_SetComp(q,0,r);
       p_SetmComp(q,r);
@@ -3341,7 +3341,7 @@ poly p_TakeOutComp1(poly * p, int k, const ring r)
 //  if (pGetComp(q) > k) pGetComp(q)--;
   while (pNext(q)!=NULL)
   {
-    if (p_GetComp(pNext(q),r)==k)
+    if (__p_GetComp(pNext(q),r)==k)
     {
       if (result==NULL)
       {
@@ -3373,7 +3373,7 @@ poly p_TakeOutComp(poly * p, int k, const ring r)
 
   if (q==NULL) return NULL;
   BOOLEAN use_setmcomp=rOrd_SetCompRequiresSetm(r);
-  if (p_GetComp(q,r)==k)
+  if (__p_GetComp(q,r)==k)
   {
     result = q;
     do
@@ -3383,12 +3383,12 @@ poly p_TakeOutComp(poly * p, int k, const ring r)
       qq = q;
       pIter(q);
     }
-    while ((q!=NULL) && (p_GetComp(q,r)==k));
+    while ((q!=NULL) && (__p_GetComp(q,r)==k));
     *p = q;
     pNext(qq) = NULL;
   }
   if (q==NULL) return result;
-  if (p_GetComp(q,r) > k)
+  if (__p_GetComp(q,r) > k)
   {
     p_SubComp(q,1,r);
     if (use_setmcomp) p_SetmComp(q,r);
@@ -3396,7 +3396,7 @@ poly p_TakeOutComp(poly * p, int k, const ring r)
   poly pNext_q;
   while ((pNext_q=pNext(q))!=NULL)
   {
-    if (p_GetComp(pNext_q,r)==k)
+    if (__p_GetComp(pNext_q,r)==k)
     {
       if (result==NULL)
       {
@@ -3416,7 +3416,7 @@ poly p_TakeOutComp(poly * p, int k, const ring r)
     else
     {
       /*pIter(q);*/ q=pNext_q;
-      if (p_GetComp(q,r) > k)
+      if (__p_GetComp(q,r) > k)
       {
         p_SubComp(q,1,r);
         if (use_setmcomp) p_SetmComp(q,r);
@@ -3445,7 +3445,7 @@ void p_TakeOutComp(poly *r_p, long comp, poly *r_q, int *lq, const ring r)
 
   while(p != NULL)
   {
-    while (p_GetComp(p,r) == comp)
+    while (__p_GetComp(p,r) == comp)
     {
       pNext(q) = p;
       pIter(q);
@@ -3480,22 +3480,22 @@ void p_DeleteComp(poly * p,int k, const ring r)
 {
   poly q;
 
-  while ((*p!=NULL) && (p_GetComp(*p,r)==k)) p_LmDelete(p,r);
+  while ((*p!=NULL) && (__p_GetComp(*p,r)==k)) p_LmDelete(p,r);
   if (*p==NULL) return;
   q = *p;
-  if (p_GetComp(q,r)>k)
+  if (__p_GetComp(q,r)>k)
   {
     p_SubComp(q,1,r);
     p_SetmComp(q,r);
   }
   while (pNext(q)!=NULL)
   {
-    if (p_GetComp(pNext(q),r)==k)
+    if (__p_GetComp(pNext(q),r)==k)
       p_LmDelete(&(pNext(q)),r);
     else
     {
       pIter(q);
-      if (p_GetComp(q,r)>k)
+      if (__p_GetComp(q,r)>k)
       {
         p_SubComp(q,1,r);
         p_SetmComp(q,r);
@@ -3520,7 +3520,7 @@ void  p_Vec2Polys(poly v, poly* *p, int *len, const ring r)
   while (v!=NULL)
   {
     h=p_Head(v,r);
-    k=p_GetComp(h,r);
+    k=__p_GetComp(h,r);
     p_SetComp(h,0,r);
     (*p)[k-1]=p_Add_q((*p)[k-1],h,r);
     pIter(v);
@@ -3561,7 +3561,7 @@ static BOOLEAN pOldLexOrder;
 static long pModDeg(poly p, ring r)
 {
   long d=pOldFDeg(p, r);
-  int c=p_GetComp(p, r);
+  int c=__p_GetComp(p, r);
   if ((c>0) && ((r->pModW)->range(c-1))) d+= (*(r->pModW))[c-1];
   return d;
   //return pOldFDeg(p, r)+(*pModW)[p_GetComp(p, r)-1];
@@ -4489,7 +4489,7 @@ poly p_Last(const poly p, int &l, const ring r)
     poly pp = a;
     while ((a=pNext(a))!=NULL)
     {
-      if (p_GetComp(a,r)<=curr_limit/*syzComp*/)
+      if (__p_GetComp(a,r)<=curr_limit/*syzComp*/)
         l++;
       else break;
       pp = a;
@@ -4557,7 +4557,7 @@ void p_Shift (poly * p,int i, const ring r)
   if (j+i < 0) return ;
   while (qp1 != NULL)
   {
-    if ((p_GetComp(qp1,r)+i > 0) || ((j == -i) && (j == k)))
+    if ((__p_GetComp(qp1,r)+i > 0) || ((j == -i) && (j == k)))
     {
       p_AddComp(qp1,i,r);
       p_SetmComp(qp1,r);
