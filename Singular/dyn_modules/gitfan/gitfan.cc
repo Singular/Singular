@@ -13,9 +13,10 @@
 
 #if HAVE_GFANLIB
 
-#include "callgfanlib_conversion.h"
-#include "bbcone.h"
-#include "bbfan.h"
+#include "Singular/dyn_modules/gfanlib/callgfanlib_conversion.h"
+#include "Singular/dyn_modules/gfanlib/bbcone.h"
+#include "Singular/dyn_modules/gfanlib/bbfan.h"
+#include "Singular/iplib.cc"
 #include "gitfan.h"
 
 #include "Singular/ipid.h"
@@ -611,7 +612,7 @@ BOOLEAN subsets(leftv res, leftv args)
 }
 
 
-extern "C" int SI_MOD_INIT(customstd)(SModulFunctions* p)
+extern "C" int SI_MOD_INIT(gitfan) (SModulFunctions* p)
 {
   gfan::initializeCddlibIfRequired();
   p->iiAddCproc("gitfan.lib","refineCones",FALSE,refineCones);

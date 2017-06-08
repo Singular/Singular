@@ -5,7 +5,6 @@
 #include "bbcone.h"
 #include "bbfan.h"
 #include "bbpolytope.h"
-#include "gitfan.h"
 #include "tropical.h"
 
 #include "Singular/ipid.h"
