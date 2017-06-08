@@ -3,7 +3,7 @@
 
 dnl LB_CHECK_GMP ([MINIMUM-VERSION [, ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
 dnl
-dnl Test for the GNU Multiprecision library and define GMP_CFLAGS and GMP_LIBS
+dnl Test for the GNU Multiprecision library and define GMP_CPPFLAGS and GMP_LIBS
 
 AC_DEFUN([LB_CHECK_GMP],
 [
@@ -39,14 +39,14 @@ for GMP_HOME in ${GMP_HOME_PATH}
 #	if test -r "$GMP_HOME/include/gmp.h"; then
 
 		if test "x$GMP_HOME" != "x/usr"; then
-			GMP_CFLAGS="-I${GMP_HOME}/include"
+			GMP_CPPFLAGS="-I${GMP_HOME}/include"
 			GMP_LIBS="-L${GMP_HOME}/lib -Wl,-rpath -Wl,${GMP_HOME}/lib -lgmp"
 		else
-			GMP_CFLAGS=""
+			GMP_CPPFLAGS=""
 			GMP_LIBS="-lgmp"
 		fi
 
-		CFLAGS="${BACKUP_CFLAGS} ${GMP_CFLAGS}"
+		CFLAGS="${BACKUP_CFLAGS} ${GMP_CPPFLAGS}"
 		LIBS="${BACKUP_LIBS} ${GMP_LIBS}"
 
     # According to C. Fieker this would link but would not RUN
@@ -61,7 +61,7 @@ for GMP_HOME in ${GMP_HOME_PATH}
 			 int main () {  if (__GNU_MP_VERSION < 3) return -1; else return 0; }
 		  	],[
 				AC_MSG_RESULT(found)
-				AC_SUBST(GMP_CFLAGS)
+				AC_SUBST(GMP_CPPFLAGS)
 		  		AC_SUBST(GMP_LIBS)
 				AC_DEFINE(HAVE_GMP,1,[Define if GMP is installed])
 				# See if we are running GMP 4.0
@@ -87,13 +87,13 @@ for GMP_HOME in ${GMP_HOME_PATH}
 				break
 			],[
 				gmp_problem="$gmp_problem $GMP_HOME"
-				unset GMP_CFLAGS
+				unset GMP_CPPFLAGS
 				unset GMP_LIBS
 			],[
 				AC_MSG_RESULT(unknown)
 				echo "WARNING: You appear to be cross compiling, so there is no way to determine"
 				echo "whether your GMP version is new enough. I am assuming it is."
-				AC_SUBST(GMP_CFLAGS)
+				AC_SUBST(GMP_CPPFLAGS)
 				AC_SUBST(GMP_LIBS)
 				AC_SUBST(GMP_HOME)
 				HAVE_GMP=yes
@@ -103,7 +103,7 @@ for GMP_HOME in ${GMP_HOME_PATH}
 			])
 		],[
 		gmp_found="no"
-		unset GMP_CFLAGS
+		unset GMP_CPPFLAGS
 		unset GMP_LIBS
 		])
 

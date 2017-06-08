@@ -60,7 +60,7 @@ for FLINT_HOME in ${FLINT_HOME_PATH}
 	# we suppose that mpfr and mpir to be in the same place or available by default
 	FLINT_LIBS="$FLINT_LIBS -lflint -lmpfr"
 
-	CFLAGS="${BACKUP_CFLAGS} ${FLINT_CFLAGS} ${GMP_CFLAGS}"
+	CFLAGS="${BACKUP_CFLAGS} ${FLINT_CFLAGS} ${GMP_CPPFLAGS}"
 	LIBS="${BACKUP_LIBS} ${FLINT_LIBS} ${GMP_LIBS}"
 
 	AC_TRY_LINK(

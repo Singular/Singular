@@ -4,7 +4,7 @@ AM_CPPFLAGS =  -I${top_srcdir} -I${top_builddir} \
 -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
 $(PM_INC) $(PM_CFLAGS) \
 ${FACTORY_INCLUDES} ${RESOURCES_INCLUDES} ${OMALLOC_INCLUDES} \
-${FLINT_CFLAGS} ${NTL_CFLAGS} ${GMP_CFLAGS}
+${FLINT_CFLAGS} ${NTL_CPPFLAGS} ${GMP_CPPFLAGS}
 # $(FEXCEPTIONSFRTTI_CXXFLAGS) ??
 
 if SI_BUILTIN_POLYMAKE

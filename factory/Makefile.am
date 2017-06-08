@@ -4,7 +4,7 @@ SUBDIRS=include/factory
 
 AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include -I${srcdir} \
 $(OMALLOC_INCLUDES) $(RESOURCES_INCLUDES) \
-$(FLINT_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS) $(SINGULAR_CFLAGS)
+$(FLINT_CFLAGS) $(NTL_CPPFLAGS) $(GMP_CPPFLAGS) $(SINGULAR_CFLAGS)
 
 lib_LTLIBRARIES = libfactory.la
 

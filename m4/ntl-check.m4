@@ -11,7 +11,7 @@
 dnl LB_CHECK_NTL ([MINIMUM-VERSION [, ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
 dnl
 dnl Test for Victor Shoup's NTL (Number Theory Library) and define
-dnl NTL_CFLAGS and NTL_LIBS
+dnl NTL_CPPFLAGS and NTL_LIBS
 
 AC_DEFUN([LB_CHECK_NTL],
 [
@@ -51,14 +51,14 @@ for NTL_HOME in ${NTL_HOME_PATH}
 if test -r "$NTL_HOME/include/NTL/ZZ.h"; then
 
 	if test "x$NTL_HOME" != "x/usr"; then
-		NTL_CFLAGS="-I${NTL_HOME}/include"
+		NTL_CPPFLAGS="-I${NTL_HOME}/include"
 		NTL_LIBS="-L${NTL_HOME}/lib -lntl"
 	else
-		NTL_CFLAGS=
+		NTL_CPPFLAGS=
 		NTL_LIBS="-lntl"
 	fi
-###	CFLAGS="${BACKUP_CFLAGS} ${NTL_CFLAGS} ${GMP_CFLAGS}"
-	CXXFLAGS="${BACKUP_CXXFLAGS} ${NTL_CFLAGS} ${GMP_CFLAGS}"
+###	CFLAGS="${BACKUP_CFLAGS} ${NTL_CPPFLAGS} ${GMP_CPPFLAGS}"
+	CXXFLAGS="${BACKUP_CXXFLAGS} ${NTL_CPPFLAGS} ${GMP_CPPFLAGS}"
 	LIBS="${BACKUP_LIBS} ${NTL_LIBS} ${GMP_LIBS}"
 
 	AC_TRY_LINK(
@@ -78,7 +78,7 @@ if test -r "$NTL_HOME/include/NTL/ZZ.h"; then
 	break
 	],[
 	ntl_problem="$problem $NTL_HOME"
-	unset NTL_CFLAGS
+	unset NTL_CPPFLAGS
 	unset NTL_LIBS
 	],[
 	ntl_found="yes"
@@ -89,7 +89,7 @@ if test -r "$NTL_HOME/include/NTL/ZZ.h"; then
 	[
 	ntl_found="no"
 	ntl_checked="$checked $NTL_HOME"
-	unset NTL_CFLAGS
+	unset NTL_CPPFLAGS
 	unset NTL_LIBS
 	])
 else
@@ -98,7 +98,7 @@ fi
 done
 
 if test "x$ntl_found" = "xyes" ; then
-	AC_SUBST(NTL_CFLAGS)
+	AC_SUBST(NTL_CPPFLAGS)
 	AC_SUBST(NTL_LIBS)
 	AC_DEFINE(HAVE_NTL,1,[Define if NTL is installed])
 	HAVE_NTL=yes
