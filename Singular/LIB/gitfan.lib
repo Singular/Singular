@@ -32,7 +32,7 @@ REFERENCES:
 TYPES:
   permutation; Permutation in map representation.
 
-PROCEDURES (not using group action):
+PROCEDURES:
   isAface(ideal, intvec); Checks whether the given face is an a-face.
   afaces(ideal); Returns a list of intvecs that correspond to the set of all a-faces, optionally for given list of simplex faces.
   fullDimImages(list, intmat); Finds the afaces which have a full-dimensional projection.
@@ -44,8 +44,6 @@ PROCEDURES (not using group action):
   GITfanParallel(list, intmat, cone); Compute GIT-fan in parallel from orbit cones.
   GKZfan(intmat); Returns the GKZ-fan of the matrix Q.
   movingCone(intmat); Compute the moving cone.
-
-PROCEDURES (using group action):
   computeAfaceOrbits(list, list); Compute orbits of a-faces under a permutation group action.
   minimalAfaceOrbits(list); Find the minimal a-face orbits.
   orbitConeOrbits(list, intmat); Project the a-face orbits to orbit cone orbits.
@@ -361,7 +359,6 @@ example
   intvec v = 1,2,4;
 
   isAface(I,w); // should be 0
-  "-----------";
   isAface(I,v); // should be 1
 }
 
@@ -1050,7 +1047,6 @@ EXAMPLE: example groupActionOnQImage; shows an example
   list L;
   intmat Qt = transpose(Q);
   for(int i = 1; i <= size(G); i++){
-    i;
     intvec sig = permutationToIntvec(G[i]);
     intmat Bsig = perm2mat(sig, indices,Qt);
     matrix Asig = Bsig * QbasisInv;
@@ -1185,8 +1181,24 @@ example
   list generatorsG = permutationFromIntvec(intvec( 1, 3, 2, 4, 6, 5, 7, 8, 10, 9 )),
                      permutationFromIntvec(intvec( 5, 7, 1, 6, 9, 2, 8, 4, 10, 3 ));
   list Asigmagens = groupActionOnQImage(generatorsG,Q);
-groupActionOnHashes(Asigmagens,OC);
+groupActionOnHashes(Asigmagens,list(OC));
+
+
+  list orb = findOrbits(simplexSymmetryGroup,nrows(Q));
+  list simplexOrbitRepresentatives;
+  for (int i=1;i<=size(orb);i++){simplexOrbitRepresentatives[i]=orb[i][1];}
+  list afaceOrbitRepresentatives=afaces(J,simplexOrbitRepresentatives);
+  list fulldimAfaceOrbitRepresentatives=fullDimImages(afaceOrbitRepresentatives,Q);
+  list afaceOrbits=computeAfaceOrbits(fulldimAfaceOrbitRepresentatives,simplexSymmetryGroup);
+  list minAfaceOrbits = minimalAfaceOrbits(afaceOrbits);
+  list listOfOrbitConeOrbits = orbitConeOrbits(minAfaceOrbits,Q);
+  list listOfMinimalOrbitConeOrbits = minimalOrbitConeOrbits(listOfOrbitConeOrbits);
+  list Asigma = groupActionOnQImage(simplexSymmetryGroup,Q);
+  groupActionOnHashes(Asigma,listOfOrbitConeOrbits);
+
 }
+
+
 
 
 
@@ -1976,7 +1988,7 @@ static proc randConeEl(bigintmat Q, int bound){
 
 
 
-proc subdividelist(list OC,int ncores){
+static proc subdividelist(list OC,int ncores){
   if (ncores>size(OC)){ncores=size(OC);}
   int percore = size(OC) div (ncores);
   int lastcore = size(OC) mod (ncores);
@@ -2471,9 +2483,9 @@ EXAMPLE: example GITfan; shows an example
   list AF= afaces(J,nrows(Q));
   AF=fullDimImages(AF,Q);
   AF = minimalAfaces(AF);
-  list OC = orbitCones(AF,Q);
+  OC = orbitCones(AF,Q);
   cone Qgamma = coneViaPoints(transpose(Q));
-  list GIT = GITfanParallel(OC,Q,Qgamma);
+  GIT = GITfanParallel(OC,Q,Qgamma);
   }
   fan Sigma = hashesToFan(GIT,OC);
   return(Sigma);
