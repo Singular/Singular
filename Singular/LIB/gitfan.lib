@@ -74,8 +74,8 @@ LIB "parallel.lib";
 
 proc mod_init()
 {
-  LIB "~ren/murrumesh/gfanlib.so";
-  LIB "~ren/murrumesh/gitfan.so";
+  LIB "gfanlib.so";
+  LIB "gitfan.so";
   newstruct("permutation","intvec image");
   system("install","permutation","*",composePermutations,2);
   system("install","permutation","^",permutationPower,2);
