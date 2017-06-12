@@ -5,8 +5,8 @@
 
 #if HAVE_GFANLIB
 
-#include "bbcone.h"
-#include "bbfan.h"
+#include "Singular/dyn_modules/gfanlib/bbcone.h"
+#include "Singular/dyn_modules/gfanlib/bbfan.h"
 
 #include "Singular/ipid.h"
 

@@ -13,9 +13,10 @@
 
 #if HAVE_GFANLIB
 
-#include "callgfanlib_conversion.h"
-#include "bbcone.h"
-#include "bbfan.h"
+#include "Singular/dyn_modules/gfanlib/callgfanlib_conversion.h"
+#include "Singular/dyn_modules/gfanlib/bbcone.h"
+#include "Singular/dyn_modules/gfanlib/bbfan.h"
+#include "Singular/iplib.cc"
 #include "gitfan.h"
 
 #include "Singular/ipid.h"
@@ -23,7 +24,10 @@
 #include "Singular/ipshell.h"
 
 #include "coeffs/bigintmat.h"
+#include "coeffs/coeffs.h"
 
+#include <iostream>
+#include <list>
 
 namespace gitfan
 {
@@ -368,11 +372,258 @@ BOOLEAN nextAfaceToCheck(leftv res, leftv args)
 }
 
 
-void gitfan_setup(SModulFunctions* p)
+BOOLEAN checkSigns(leftv res, leftv args)
 {
-  p->iiAddCproc("","refineCones",FALSE,refineCones);
-  p->iiAddCproc("","listOfAfacesToCheck",FALSE,listOfAfacesToCheck);
-  p->iiAddCproc("","nextAfaceToCheck",FALSE,nextAfaceToCheck);
+  leftv u = args;
+  if ((u != NULL) && (u->Typ()==BIGINTMAT_CMD || u->Typ()==INTMAT_CMD))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == INTVEC_CMD) && (v->next == NULL))
+    {
+      bigintmat* interiorPoint = NULL;
+      if (u->Typ() == INTMAT_CMD)
+      {
+        intvec* p0 = (intvec*) u->Data();
+        interiorPoint = iv2bim(p0,coeffs_BIGINT);
+      }
+      else
+        interiorPoint = (bigintmat*) u->Data();
+      intvec* hash = (intvec*) v->Data();
+      res->rtyp = INT_CMD;
+      for (int i=0; i<hash->length(); i++)
+      {
+        if ( (*hash)[i]<0 && n_GreaterZero((*interiorPoint)[i],interiorPoint->basecoeffs()) )
+        {
+          res->data = (void*) (long) 0;
+          return FALSE;
+        }
+        if ( (*hash)[i]>0 && !n_IsZero((*interiorPoint)[i],interiorPoint->basecoeffs()) )
+        {
+          number neg = n_Copy((*interiorPoint)[i],interiorPoint->basecoeffs());
+          neg = n_InpNeg(neg,interiorPoint->basecoeffs());
+          if (n_GreaterZero(neg,interiorPoint->basecoeffs()))
+          {
+            n_Delete(&neg,interiorPoint->basecoeffs());
+            res->data = (void*) (long) 0;
+            return FALSE;
+          }
+          n_Delete(&neg,interiorPoint->basecoeffs());
+        }
+      }
+      res->data = (void*) (long) 1;
+      if (v->Typ() == INTMAT_CMD)
+        delete interiorPoint;
+      return FALSE;
+    }
+  }
+  WerrorS("checkSigns: unexpected parameter");
+  return TRUE;
+}
+
+
+BOOLEAN binaryToBigint(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == INTVEC_CMD) && (u->next == NULL))
+  {
+    intvec* iv = (intvec*) u->Data();
+    const int l = (iv->rows())*(iv->cols());
+    number base = n_Init(2,coeffs_BIGINT);
+    number endResult;
+    n_Power(base,(*iv)[0]-1,&endResult,coeffs_BIGINT);
+    for (int i=1; i<l; i++)
+    {
+      number endResultCache;
+      number currentBit;
+      n_Power(base,(*iv)[i]-1,&currentBit,coeffs_BIGINT);
+      endResultCache = n_Add(endResult,currentBit,coeffs_BIGINT);
+      n_Delete(&endResult,coeffs_BIGINT);
+      n_Delete(&currentBit,coeffs_BIGINT);
+      endResult = endResultCache;
+      endResultCache = NULL;
+    }
+    n_Delete(&base,coeffs_BIGINT);
+    res->rtyp = BIGINT_CMD;
+    res->data = (void*) endResult;
+    return FALSE;
+  }
+  WerrorS("binaryToBigint: unexpected parameter");
+  return TRUE;
+}
+
+
+BOOLEAN composeIntvecs(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u!=NULL) && (u->Typ()==INTVEC_CMD))
+  {
+    leftv v = u->next;
+    if ((v!=NULL) && (v->Typ()==INTVEC_CMD) && (v->next==NULL))
+    {
+      intvec* iv1 = (intvec*) u->Data();
+      intvec* iv2 = (intvec*) v->Data();
+      int k = iv2->length();
+      intvec* composedIntvec = new intvec(k);
+      for (int i=0; i<k; i++)
+        (*composedIntvec)[i] = (*iv1)[(*iv2)[i]-1];
+      res->rtyp = INTVEC_CMD;
+      res->data = (void*) composedIntvec;
+      return FALSE;
+    }
+  }
+  WerrorS("composeIntvecs: unexpected parameter");
+  return TRUE;
+}
+
+
+BOOLEAN findPlaceToInsert(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u!=NULL) && (u->Typ()==LIST_CMD))
+  {
+    leftv v = u->next;
+    if ((v!=NULL) && (v->Typ()==BIGINT_CMD) && (v->next==NULL))
+    {
+      lists listOfNumbers = (lists) u->Data();
+      number numberToInsert = (number) v->Data();
+      int lowerBound = 0;
+      int upperBound = lSize(listOfNumbers);
+      if (upperBound<0)
+      {
+        res->rtyp = INT_CMD;
+        res->data = (void*) (long) (lowerBound+1);
+        return FALSE;
+      }
+
+      number lowerNumber = (number) listOfNumbers->m[lowerBound].Data();
+      if (n_Equal(lowerNumber,numberToInsert,coeffs_BIGINT))
+      {
+        res->rtyp = INT_CMD;
+        res->data = (void*) (long) (-1);
+        return FALSE;
+      }
+      if (n_Greater(lowerNumber,numberToInsert,coeffs_BIGINT))
+      {
+        res->rtyp = INT_CMD;
+        res->data = (void*) (long) (lowerBound+1);
+        return FALSE;
+      }
+
+      number upperNumber = (number) listOfNumbers->m[upperBound].Data();
+      if (n_Equal(numberToInsert,upperNumber,coeffs_BIGINT))
+      {
+        res->rtyp = INT_CMD;
+        res->data = (void*) (long) (-1);
+        return FALSE;
+      }
+      if (n_Greater(numberToInsert,upperNumber,coeffs_BIGINT))
+      {
+        res->rtyp = INT_CMD;
+        res->data = (void*) (long) (upperBound+2);
+        return FALSE;
+      }
+
+      while (lowerBound+1<upperBound)
+      {
+        int middle = lowerBound + (upperBound-lowerBound) / 2;
+        number lowerNumber = (number) listOfNumbers->m[lowerBound].Data();
+        number upperNumber = (number) listOfNumbers->m[upperBound].Data();
+        number middleNumber = (number) listOfNumbers->m[middle].Data();
+        if ((n_Equal(lowerNumber,numberToInsert,coeffs_BIGINT)) ||
+            (n_Equal(middleNumber,numberToInsert,coeffs_BIGINT)) ||
+            (n_Equal(upperNumber,numberToInsert,coeffs_BIGINT)))
+        {
+          res->rtyp = INT_CMD;
+          res->data = (void*) (long) -1;
+          return FALSE;
+        }
+        if (n_Greater(numberToInsert,middleNumber,coeffs_BIGINT))
+          lowerBound = middle;
+        if (n_Greater(middleNumber,numberToInsert,coeffs_BIGINT))
+          upperBound = middle;
+      }
+
+      res->rtyp = INT_CMD;
+      res->data = (void*) (long) (upperBound+1);
+      return FALSE;
+    }
+  }
+  WerrorS("findPlaceToInsert: unexpected parameter");
+  return TRUE;
+}
+
+
+void subset(std::vector<int> &arr, int size, int left, int index, std::vector<int> &l, std::vector<std::vector<int> > &L)
+{
+  if(left==0)
+  {
+    L.push_back(l);
+    return;
+  }
+
+  for(int i=index; i<size;i++)
+  {
+    l.push_back(arr[i]);
+    subset(arr,size,left-1,i+1,l,L);
+    l.pop_back();
+  }
+}
+
+BOOLEAN subsets(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u!=NULL) && (u->Typ()==INT_CMD))
+  {
+    leftv v = u->next;
+    if ((v!=NULL) && (v->Typ()==INT_CMD) && (v->next==NULL))
+    {
+      int n = (int)(long) u->Data();
+      int k = (int)(long) v->Data();
+      std::vector<int> array(n);
+      for (int i=0; i<n; i++)
+        array[i]=i+1;
+      std::vector<int> ltemp;
+      std::vector<std::vector<int> > lt;
+      subset(array,n,k,0,ltemp,lt);
+
+      lists Lt = (lists) omAllocBin(slists_bin);
+      Lt->Init(lt.size());
+      for (int i=0; i<lt.size(); i++)
+      {
+        std::vector<int> lti = lt[i];
+        lists Lti = (lists) omAllocBin(slists_bin);
+        Lti->Init(k);
+        for(int j=0; j<lti.size(); j++)
+        {
+          Lti->m[j].rtyp = INT_CMD;
+          Lti->m[j].data = (void*)(long)lti[j];
+        }
+        Lt->m[i].rtyp = LIST_CMD;
+        Lt->m[i].data = (void*) Lti;
+      }
+
+      res->rtyp = LIST_CMD;
+      res->data = (void*) Lt;
+      return FALSE;
+    }
+  }
+  WerrorS("subsets: unexpected parameter");
+  return TRUE;
+}
+
+
+extern "C" int SI_MOD_INIT(gitfan) (SModulFunctions* p)
+{
+  gfan::initializeCddlibIfRequired();
+  p->iiAddCproc("gitfan.lib","refineCones",FALSE,refineCones);
+  p->iiAddCproc("gitfan.lib","listOfAfacesToCheck",FALSE,listOfAfacesToCheck);
+  p->iiAddCproc("gitfan.lib","nextAfaceToCheck",FALSE,nextAfaceToCheck);
+  p->iiAddCproc("gitfan.lib","checkSigns",FALSE,checkSigns);
+  p->iiAddCproc("gitfan.lib","binaryToBigint",FALSE,binaryToBigint);
+  p->iiAddCproc("gitfan.lib","composeIntvecs",FALSE,composeIntvecs);
+  p->iiAddCproc("gitfan.lib","findPlaceToInsert",FALSE,findPlaceToInsert);
+  p->iiAddCproc("gitfan.lib","subsets",FALSE,subsets);
+  return (MAX_TOK);
 }
 
 #endif

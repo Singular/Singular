@@ -30,6 +30,7 @@ The following topics are treated:
 * Commutative Algebra::saturation, elimination, free resolution, factorization, primary decomposition, normalization, etc.
 * Singularity Theory::singular and critical points, invariants of hypersurface singularities, classification, resolution of singularities, etc.
 * Invariant Theory:: G_a-invariants, invariants of finite groups
+* Geometric Invariant Theory:: Geometric Invariant Theory
 * Non-commutative Algebra:: Groebner bases and applications in G-algebras
 * Applications:: Solving systems of polynomial equations, AG codes
 @end menu
@@ -3110,7 +3111,7 @@ iD;                               // show the output
 @end smallexample
 
 @c ----------------------------------------------------------------------------
-@node Invariant Theory, Non-commutative Algebra, Singularity Theory, Examples
+@node Invariant Theory, Geometric Invariant Theory, Singularity Theory, Examples
 @section Invariant Theory
 @cindex Invariant Theory
 
@@ -3163,6 +3164,7 @@ sum x(i)*d/dx(i+1).
 @end smallexample
 @c kill n,i,s,q;
 @end ifset
+
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
@@ -3221,8 +3223,162 @@ Theory 2.3.7":
 @end smallexample
 @end ifset
 
+
 @c ----------------------------------------------------------------------------
-@node Non-commutative Algebra, Applications, Invariant Theory, Examples
+@node Geometric Invariant Theory, Non-commutative Algebra, Invariant Theory, Examples
+@section Geometric Invariant Theory
+@cindex Geometric Invariant Theory
+
+@ifset singularmanual
+@menu
+* GIT-Fans::
+@end menu
+@end ifset
+
+
+@c ----------------------------------------------------------------------------
+@ifset singularmanual
+@node GIT-Fans, Geometric Invariant Theory, Geometric Invariant Theory, Geometric Invariant Theory
+@subsection GIT-Fans
+@cindex GIT-Fans
+
+
+Dolgachev/Hu and Thaddeus assigned to an algebraic variety with the action of
+an algebraic group the GIT-fan, a polyhedral fan enumerating the GIT-quotients in the sense
+of Mumford. The case of the action of an algebraic torus H on an ane variety X has
+been treated by Berchtold/Hausen. Based on their construction, an algorithm to compute
+the GIT-fan in this setting has been proposed be Keicher. Note that this setting is essential for
+many applications, since the torus case can be used to investigate the GIT-variation of the
+action of a connected reductive group G.
+In many important examples, X is symmetric under the action of a fnite group which
+either is known directly from its geometry or can be computed. A prominent
+instance is the Deligne-Mumford compactification M06bar of the moduli space of 6-pointed
+stable curves of genus zero, which has a natural action of the symmetric group S6. The library gitfan.lib
+implements an efficient algorithm for computing GIT-fans, which makes use of symmetries. We have
+applied this algorithm to determine the Mori chamber decomposition of the cone of movable divisor classes of M06bar.
+Each cone is represented by a single integer. The algorithm relies on Groebner basis techniques, convex geometry and actions of finite symmetry groups. It demonstrates the strength of cross-boarder methods in computer algebra, and the
+efficiency of the algorithms implemented in all involved areas. The algorithm is also suitable
+for parallel computations.
+
+As an example we address in the following the computation of the GIT-Fan of M05bar.
+
+We first compute the GIT-fan using the single line command provided by the library:
+
+@smallexample
+  LIB "gitfan.lib";
+  setcores(4);
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  fan GIT = GITfan(J,Q);
+  fVector(GIT);
+@end smallexample
+
+The GIT-Fan can be computed using symmetries as follows:
+
+@smallexample
+  LIB "gitfan.lib";
+  setcores(4);
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list simplexSymmetryGroup = G25Action();
+  fan GIT2 = GITfan(J,Q,simplexSymmetryGroup);
+  GIT2;
+@end smallexample
+
+Although we provide a procedure to compute the orbit decomposition of the group action on the simplex of variables
+this is not fast in Singular. In the following we describe how to use GAP to obtain the orbit decomposition and then continue
+with this data in Singular. This is particularily useful for more complicated examples.
+
+The file orbits.gp in the directory doc of the Singular source tree contains GAP code to do this computation.
+This result is provided in the file doc/simplexOrbitRepresentativesG25.sing. 
+
+The file doc/simplexSymmetryGroupG25.sing contains the symmetry group (which here is S5).
+
+Moreover the file doc/elementsInTermsOfGeneratorsG25.sing contains a representation of the elements of the symmetry group
+in terms of generators.
+
+
+@smallexample
+LIB "gitfan.lib";
+setcores(4);
+ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+ideal J =
+  T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+  T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+  T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+  T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+  T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+intmat Q[5][10] =
+  1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+  1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+  0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+  0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+  0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+intmat Qt = transpose(Q);
+<"doc/simplexOrbitRepresentativesG25.sing";
+list afaceOrbitRepresentatives=afaces(J,simplexOrbitRepresentatives);
+<"doc/simplexSymmetryGroupG25.sing";
+list fulldimAfaceOrbitRepresentatives=fullDimImages(afaceOrbitRepresentatives,Q);
+list afaceOrbits=computeAfaceOrbits(fulldimAfaceOrbitRepresentatives,simplexSymmetryGroup);
+apply(afaceOrbits,size);
+list minAfaceOrbits = minimalAfaceOrbits(afaceOrbits);
+apply(minAfaceOrbits,size);
+list listOfOrbitConeOrbits = orbitConeOrbits(minAfaceOrbits,Q);
+apply(listOfOrbitConeOrbits,size);
+list listOfMinimalOrbitConeOrbits = minimalOrbitConeOrbits(listOfOrbitConeOrbits);
+size(listOfMinimalOrbitConeOrbits);
+cone mov = coneViaPoints(transpose(Q));
+mov = canonicalizeCone(mov);
+list OC =  listOfOrbitConeOrbits;
+<"doc/elementsInTermsOfGeneratorsG25.sing";
+list Asigmagens = groupActionOnQImage(generatorsG,Q);
+list actionOnOrbitconeIndicesForGenerators = groupActionOnHashes(Asigmagens,OC);
+list actionOnOrbitconeIndices;
+for (int i =1; i<=size(elementsInTermsOfGenerators);i++){
+  actionOnOrbitconeIndices[i]=evaluateProduct(actionOnOrbitconeIndicesForGenerators, elementsInTermsOfGenerators[i]);
+}
+list OClist = OC[1];
+for (i =2;i<=size(OC);i++){
+OClist = OClist + OC[i];
+}
+list SigmaHashes = GITfanParallelSymmetric(OClist, Q, mov, actionOnOrbitconeIndices);
+SigmaHashes;
+fan Sigma = hashesToFan(SigmaHashes,OClist);
+
+@end smallexample
+
+Note that the result is not the complete fan but only the fan generated by a minimal set of representatives of maximal cones 
+for the group action (by the group generated by Asigmagens).
+
+@end ifset
+
+
+
+
+@c ----------------------------------------------------------------------------
+@node Non-commutative Algebra, Applications, Geometric Invariant Theory, Examples
 @section Non-commutative Algebra
 @cindex Non-commutative algebra
 

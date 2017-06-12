@@ -409,9 +409,9 @@ BOOLEAN insertCone(leftv res, leftv args)
       zc->canonicalize();
 
       leftv w=v->next;
-      int n;
+      int n=1;
       if ((w != NULL) && (w->Typ() == INT_CMD))
-        n = (int)(long) w;
+        n = (int)(long) w->Data();
 
       if (n != 0)
       {

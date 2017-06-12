@@ -5,7 +5,6 @@
 #include "bbcone.h"
 #include "bbfan.h"
 #include "bbpolytope.h"
-#include "gitfan.h"
 #include "tropical.h"
 
 #include "Singular/ipid.h"
@@ -23,7 +22,6 @@ extern "C" int SI_MOD_INIT(gfanlib)(SModulFunctions* p)
   bbcone_setup(p);
   bbfan_setup(p);
   bbpolytope_setup(p);
-  gitfan_setup(p);
   tropical_setup(p);
   return MAX_TOK;
 }
