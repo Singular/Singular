@@ -24,8 +24,8 @@
 #include "Singular/ipshell.h"
 
 #include "coeffs/bigintmat.h"
+#include "coeffs/coeffs.h"
 
-#include <coeffs/coeffs.h>
 #include <iostream>
 #include <list>
 
