@@ -72,7 +72,7 @@ LIB "linalg.lib";
 LIB "multigrading.lib";
 LIB "parallel.lib";
 
-proc mod_init()
+static proc mod_init()
 {
   LIB "gfanlib.so";
   LIB "gitfan.so";
