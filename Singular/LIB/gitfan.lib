@@ -1184,6 +1184,7 @@ example
 groupActionOnHashes(Asigmagens,list(OC));
 
 
+  list simplexSymmetryGroup = G25Action();
   list orb = findOrbits(simplexSymmetryGroup,nrows(Q));
   list simplexOrbitRepresentatives;
   for (int i=1;i<=size(orb);i++){simplexOrbitRepresentatives[i]=orb[i][1];}
