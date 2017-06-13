@@ -478,7 +478,7 @@ sub HandleRef
     $line++;
     last if (/^\@c\s*ref\s*$/);
 
-    while (/\@ref{(.*?)}[;\.]/)
+    while (/\@ref\{(.*?)\}[;\.]/)
     {
       $refs{$1} = 1;
       $_ = $';
