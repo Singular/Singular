@@ -63,6 +63,14 @@
 
 #include "fehelp.h"
 
+#ifdef HAVE_READLINE
+#ifdef READLINE_READLINE_H_OK
+#include <readline/readline.h>
+#else
+#define RL_VERSION_MAJOR 0
+#endif
+#endif
+
 static FORCE_INLINE void number2mpz(number n, mpz_t m){ number2mpz(n, coeffs_BIGINT, m); }
 static FORCE_INLINE number mpz2number(mpz_t m){ return mpz2number(m, coeffs_BIGINT); }
 
@@ -809,7 +817,7 @@ char * versionString(/*const bool bShowDetails = false*/ )
               else if (fe_fgets_stdin==fe_fgets)
                 StringAppendS("fgets,");
               if (fe_fgets_stdin==fe_fgets_stdin_drl)
-                StringAppendS("dynamic readline,");
+                StringAppend("dynamic readline%d),",RL_VERSION_MAJOR);
               #ifdef HAVE_FEREAD
               else if (fe_fgets_stdin==fe_fgets_stdin_emu)
                 StringAppendS("emulated readline,");
@@ -818,7 +826,7 @@ char * versionString(/*const bool bShowDetails = false*/ )
                 StringAppendS("unknown fgets method,");
 #else
   #if defined(HAVE_READLINE) && !defined(FEREAD)
-              StringAppendS("static readline,");
+              StringAppend("static readline(%d),",RL_VERSION_MAJOR);
   #else
     #ifdef HAVE_FEREAD
               StringAppendS("emulated readline,");
