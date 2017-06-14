@@ -3319,7 +3319,6 @@ The file doc/simplexSymmetryGroupG25.sing contains the symmetry group (which her
 Moreover the file doc/elementsInTermsOfGeneratorsG25.sing contains a representation of the elements of the symmetry group
 in terms of generators.
 
-
 @smallexample
 LIB "gitfan.lib";
 setcores(4);
@@ -3356,13 +3355,15 @@ list OC =  listOfOrbitConeOrbits;
 list Asigmagens = groupActionOnQImage(generatorsG,Q);
 list actionOnOrbitconeIndicesForGenerators = groupActionOnHashes(Asigmagens,OC);
 list actionOnOrbitconeIndices;
-for (int i =1; i<=size(elementsInTermsOfGenerators);i++){
+for (int i =1; i<=size(elementsInTermsOfGenerators);i++)
+@{
   actionOnOrbitconeIndices[i]=evaluateProduct(actionOnOrbitconeIndicesForGenerators, elementsInTermsOfGenerators[i]);
-}
+@}
 list OClist = OC[1];
-for (i =2;i<=size(OC);i++){
+for (i =2;i<=size(OC);i++)
+@{
 OClist = OClist + OC[i];
-}
+@}
 list SigmaHashes = GITfanParallelSymmetric(OClist, Q, mov, actionOnOrbitconeIndices);
 SigmaHashes;
 fan Sigma = hashesToFan(SigmaHashes,OClist);
