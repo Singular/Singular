@@ -7,7 +7,7 @@ LIBRARY: freegb.lib   Compute two-sided Groebner bases in free algebras via
 AUTHORS: Viktor Levandovskyy,     viktor.levandovskyy@math.rwth-aachen.de
 @*       Grischa Studzinski,      grischa.studzinski@math.rwth-aachen.de
 
-OVERVIEW: For the theory, see chapter 'Letterplace' in the Singular Manual
+OVERVIEW: For the theory, see chapter 'Letterplace' in the @sc{Singular} Manual
 
 PROCEDURES:
 makeLetterplaceRing(d);    creates a ring with d blocks of shifted original
@@ -3185,7 +3185,7 @@ EXAMPLE: example lpNF; shows examples
  checkAssumptions(p,G);
  G = sort(G)[1];
  list L = makeDVecI(G);
- return(normalize(lpNormalForm1(p,G,L)));
+ return(normalize(lpNormalForm2(p,G,L)));
 }
 example
 {
@@ -3312,7 +3312,8 @@ ASSUME: V,W are DVecs of monomials contained in V'
  int k = size(V) - size(W) + 1;
  if (intvec(V[1..size(W)])-W == 0){R[1]=0;}
  for (i =2; i <=k; i++)
- {r = 0; kill T; intvec T;
+ {// printf("dShiftDiv: for (i=%p, k=%p)", i, k);
+r = 0; kill T; intvec T;
   for (j =1; j <= i; j++) {r = r + V[j];}
   //if (i==1) {T[1] = r-(i-1)*n;} else
   T[1] = r-(i-1)*n; if (size(W)>1) {T[2..size(W)] = V[(i+1)..(size(W)+i-1)];}
@@ -3354,6 +3355,63 @@ NOTE: Taking the first possible reduction
 }
 
 
+// new VL
+proc lpNormalForm2(poly pp, ideal G, list L)
+"USUAGE:lpNormalForm2(p,G);
+RETURN:poly
+PURPOSE:computation of the normalform of p w.r.t. G
+ASSUME: p is a Letterplace polynomial, G is a set of Letterplace polynomials
+NOTE: Taking the first possible reduction
+"
+{
+ print("lpNormalForm2");
+ poly one = 1;
+ if ( (pp == 0) || (leadmonom(pp) == one) ) { return(p); }  
+ poly p = pp; poly q;
+ int i; int s; intvec V;
+ while ( (p != 0) && (leadmonom(p) != one) )
+ {
+   printf("while1 (p=%p)", p);
+   printf("while1 (lm(p)=%p)", leadmonom(p));
+   //"entered while with p="; p;
+   V = makeDVec(delSupZero(leadexp(p)));
+   i = 0;
+   s = -1; 
+   //"look for divisor";
+   while ( (s == -1) && (i<size(L)) )
+   {
+     printf("while2 (s=%p, i=%p, sizeL=%p)", s, i, size(L));
+     i = i+1;
+     s = dShiftDiv(V, L[i])[1];
+   }
+   printf("s=%p", s);
+ // now, out of here: either i=size(L) and s==-1 => no reduction
+ // otherwise: i<=size(L) and s!= -1 => reduction
+    //"out of divisor search: s="; s; "i="; i;
+    if (s != -1)
+	{
+    printf("G[%p]=%p", i, G[i]);
+    //"start reducing with G[i]:";
+    p = lpReduce(p,G[i],s); // lm-reduction
+	  //"reduced to p="; p;
+	}
+	else
+    {
+	  // ie no lm-reduction possible; proceed with the tail reduction
+	  q = p-lead(p);
+	  p = lead(p); 
+	  if (q!=0)
+	  {
+	    p = p + lpNormalForm2(q,G,L);
+	  }
+      return(p); 
+    }
+ }
+ // out of while when p==0 or p == const
+ return(p);
+}
+
+
 
 
 //secundary procedures, all static
@@ -3383,6 +3441,7 @@ static proc lpReduce(poly p, poly g, int s)
 "NOTE: shift can not exceed the degree bound, because s*g | p
 "
 {poly l,r,qt; int i;
+ printf("reduce p=%p, g=%p, s=%p", p,g,s);
  g = shiftPoly(g,s);
  list K = getlpCoeffs(lead(g),lead(p));
  l = K[1]; r = K[2];
@@ -3390,7 +3449,9 @@ static proc lpReduce(poly p, poly g, int s)
  for (i = 1; i <= size(g); i++)
  {qt = qt + lpMult(lpMult(l,g[i]),r);
  }
- return((leadcoef(qt)*p - leadcoef(p)*qt));
+ poly reduced = leadcoef(qt)*p - leadcoef(p)*qt;
+ printf("reduced poly = %p", reduced);
+ return (reduced);
 }
 
 
@@ -3610,4 +3671,397 @@ static proc checkWeightedExampleLP()
   poly a = x(1)*y(2)+x(1)+y(1); poly b = y(1)+3;
   lpMultX(b,a);
   lpMultX(a,b); // seems to work properly
+}
+
+
+// copied following from freegb_wrkcp.lib by Karim Abou Zeid on 07.04.2017:
+// proc makeLetterplaceRingElim(int d)
+// proc makeLetterplaceRingNDO(int d)
+// proc setLetterplaceAttributesElim(def R, int uptodeg, int lV)
+// proc lpElimIdeal(ideal I)
+// proc makeLetterplaceRingWt(int d, intvec W)
+
+proc makeLetterplaceRingElim(int d)
+"USAGE:  makeLetterplaceRingElim(d); d integers
+RETURN:  ring
+PURPOSE: creates a ring with an elimination ordering
+NOTE: the matrix for the ordering looks as follows: first row is 1,..,0,1,0,..
+@* then 0,1,0,...,0,0,1,0... and so on, lastly its lp
+@* this ordering is only correct if only polys with same shift are compared
+EXAMPLE: example makeLetterplaceRingElim; shows examples
+"
+{
+
+  // ToDo future: inherit positive weights in the orig ring
+  // complain on nonpositive ones
+
+  // d = up to degree, will be shifted to d+1
+  if (d<1) {"bad d"; return(0);}
+
+  int uptodeg = d; int lV = nvars(basering);
+
+  int ppl = printlevel-voice+2;
+  string err = "";
+
+  int i,j,s; intvec iV,iVl;
+  def save = basering;
+  int D = d-1;
+  list LR  = ringlist(save);
+  list L, tmp, tmp2, tmp3;
+  L[1] = LR[1]; // ground field
+  L[4] = LR[4]; // quotient ideal
+  tmp  = LR[2]; // varnames
+  s = size(LR[2]);
+  for (i=1; i<=D; i++)
+  {
+    for (j=1; j<=s; j++)
+    {
+      tmp[i*s+j] = string(tmp[j])+"("+string(i+1)+")";
+    }
+  }
+  for (i=1; i<=s; i++)
+  {
+    tmp[i] = string(tmp[i])+"("+string(1)+")";
+  }
+  L[2] = tmp;
+  L[3] = list();
+  list OrigNames = LR[2];
+  s = size(LR[3]);
+  //creation of first block
+
+  if (s==2)
+  {
+    // not a blockord, 1 block + module ord
+    tmp = LR[3][s]; // module ord
+    for (i = 1; i <= lV;  i++)
+    {
+      iV = (0: lV);
+      iV[i] = 1;
+      iVl = iV;
+      for (j = 1; j <= D; j++) 
+       { iVl = iVl,iV; }
+      L[3][i] = list("a",iVl);
+    }
+//    for (i=1; i<=d; i++)
+//    {
+//      LR[3][s-1+i] = LR[3][1];
+//    }
+    //    LR[3][s+D] = tmp;
+    //iV = (1:(d*lV));
+    L[3][lV+1] = list("lp",(1:(d*lV)));
+    L[3][lV+2] = tmp;
+  }
+  else {ERROR("Please set the ordering of basering to dp");}
+//  if (s>2)
+//  {
+//    // there are s-1 blocks
+//    int nb = s-1;
+//    tmp = LR[3][s]; // module ord to place at the very end
+//   tmp2 = LR[3]; tmp2 = tmp2[1..nb];
+//    LR[3][1] = list("a",LTO);
+//    //tmp3[1] = list("a",intvec(1: int(d*lV))); // deg-ord, insert as the 1st
+//    for (i=1; i<=d; i++)
+//    {
+//      tmp3 = tmp3 + tmp2;
+//    }
+//    tmp3 = tmp3 + list(tmp);
+//    LR[3] = tmp3;
+//     for (i=1; i<=d; i++)
+//     {
+//       for (j=1; j<=nb; j++)
+//       {
+//         //        LR[3][i*nb+j+1]= LR[3][j];
+//         LR[3][i*nb+j+1]= tmp2[j];
+//       }
+//     }
+//     //    size(LR[3]);
+//     LR[3][(s-1)*d+2] = tmp;
+//     LR[3] = list("a",intvec(1: int(d*lV))) + LR[3]; // deg-ord, insert as the 1st
+    // remove everything behind nb*(D+1)+1 ?
+    //    tmp = LR[3];
+    //    LR[3] = tmp[1..size(tmp)-1];
+ // }
+ // L[3] = LR[3];
+  def @R = ring(L);
+  //  setring @R;
+  //  int uptodeg = d; int lV = nvars(basering); // were defined before
+  def @@R = setLetterplaceAttributesElim(@R,uptodeg,lV);
+  return (@@R);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),lp;
+  def A = makeLetterplaceRingElim(2);
+  setring A;
+  A;
+  attrib(A,"isLetterplaceRing");
+  attrib(A,"uptodeg");  // degree bound
+  attrib(A,"lV"); // number of variables in the main block
+}
+
+
+
+proc makeLetterplaceRingNDO(int d)
+"USAGE:  makeLetterplaceRingNDO(d); d an integer
+RETURN:  ring
+PURPOSE: creates a ring with a non-degree first ordering, suitable for
+@* the use of non-homogeneous letterplace
+NOTE: the matrix for the ordering looks as follows: 
+@*    'd' blocks of shifted original variables
+EXAMPLE: example makeLetterplaceRingNDO; shows examples
+"
+{
+
+  // ToDo future: inherit positive weights in the orig ring
+  // complain on nonpositive ones
+
+  // d = up to degree, will be shifted to d+1
+  if (d<1) {"bad d"; return(0);}
+
+  int uptodeg = d; int lV = nvars(basering);
+
+  int ppl = printlevel-voice+2;
+  string err = "";
+
+  int i,j,s;
+  def save = basering;
+  int D = d-1;
+  list LR  = ringlist(save);
+  list L, tmp, tmp2, tmp3;
+  L[1] = LR[1]; // ground field
+  L[4] = LR[4]; // quotient ideal
+  tmp  = LR[2]; // varnames
+  s = size(LR[2]);
+  for (i=1; i<=D; i++)
+  {
+    for (j=1; j<=s; j++)
+    {
+      tmp[i*s+j] = string(tmp[j])+"("+string(i+1)+")";
+    }
+  }
+  for (i=1; i<=s; i++)
+  {
+    tmp[i] = string(tmp[i])+"("+string(1)+")";
+  }
+  L[2] = tmp;
+  list OrigNames = LR[2];
+  // ordering: one 1..1 a above
+  // ordering: d blocks of the ord on r
+  // try to get whether the ord on r is blockord itself
+  // TODO: make L(2) ordering! exponent is maximally 2
+  s = size(LR[3]);
+  if (s==2)
+  {
+    // not a blockord, 1 block + module ord
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=d; i++)
+    {
+      LR[3][i] = LR[3][1];
+    }
+    //    LR[3][s+D] = tmp;
+    LR[3][d+1] = tmp;
+    //LR[3][1] = list("a",intvec(1: int(d*lV))); // deg-ord not wanted here
+  }
+  if (s>2)
+  {
+    // there are s-1 blocks
+    int nb = s-1;
+    tmp = LR[3][s]; // module ord to place at the very end
+    tmp2 = LR[3]; tmp2 = tmp2[1..nb];
+    //tmp3[1] = list("a",intvec(1: int(d*lV))); // deg-ord not wanted here
+    for (i=1; i<=d; i++)
+    {
+      tmp3 = tmp3 + tmp2;
+    }
+    tmp3 = tmp3 + list(tmp);
+    LR[3] = tmp3;
+//     for (i=1; i<=d; i++)
+//     {
+//       for (j=1; j<=nb; j++)
+//       {
+//         //        LR[3][i*nb+j+1]= LR[3][j];
+//         LR[3][i*nb+j+1]= tmp2[j];
+//       }
+//     }
+//     //    size(LR[3]);
+//     LR[3][(s-1)*d+2] = tmp;
+//     LR[3] = list("a",intvec(1: int(d*lV))) + LR[3]; // deg-ord, insert as the 1st
+    // remove everything behind nb*(D+1)+1 ?
+    //    tmp = LR[3];
+    //    LR[3] = tmp[1..size(tmp)-1];
+  }
+  L[3] = LR[3];
+  def @R = ring(L);
+  //  setring @R;
+  //  int uptodeg = d; int lV = nvars(basering); // were defined before
+  def @@R = setLetterplaceAttributes(@R,uptodeg,lV);
+  return (@@R);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),lp;
+  def A = makeLetterplaceRingNDO(2);
+  setring A;
+  A;
+  attrib(A,"isLetterplaceRing");
+  attrib(A,"uptodeg");  // degree bound
+  attrib(A,"lV"); // number of variables in the main block
+}
+
+proc setLetterplaceAttributesElim(def R, int uptodeg, int lV)
+"USAGE: setLetterplaceAttributesElim(R, d, b, eV); R a ring, b,d, eV integers
+RETURN: ring with special attributes set
+PURPOSE: sets attributes for a letterplace ring:
+@*      'isLetterplaceRing' = true, 'uptodeg' = d, 'lV' = b, 'eV' = eV, where
+@*      'uptodeg' stands for the degree bound,
+@*      'lV' for the number of variables in the block 0
+@*      'eV' for the number of elimination variables
+NOTE: Activate the resulting ring by using @code{setring}
+"
+{
+  if (uptodeg*lV != nvars(R))
+  {
+    ERROR("uptodeg and lV do not agree on the basering!");
+  }
+  
+
+    // Set letterplace-specific attributes for the output ring!
+  attrib(R, "uptodeg", uptodeg);
+  attrib(R, "lV", lV);
+  attrib(R, "isLetterplaceRing", 1);
+  attrib(R, "HasElimOrd", 1);
+  return (R);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp;
+  def R = setLetterplaceAttributesElim(r, 4, 2, 1); setring R;
+  attrib(R,"isLetterplaceRing");
+  lieBracket(x(1),y(1),2);
+}
+
+
+proc lpElimIdeal(ideal I)
+"
+does not work for degree reasons (deg function does not work for lp rings -> newone!)
+"
+{
+  def lpring = attrib(basering,"isLetterplaceRing");
+  def lpEO =  attrib(basering,"HasElimOrd");
+  if ( typeof(lpring)!="int" && typeof(lpEO)!="int")
+  {
+    ERROR("Ring is not a lp-ring with an elimination ordering");
+  }
+  
+  //int nE = attrib(basering, "eV");
+  
+  return(letplaceGBasis(I));
+}
+
+
+proc makeLetterplaceRingWt(int d, intvec W)
+"USAGE:  makeLetterplaceRingWt(d,W); d an integer, W a vector of positive integers
+RETURN:  ring
+PURPOSE: creates a ring with a special ordering, suitable for
+@* the use of non-homogeneous letterplace
+NOTE: the matrix for the ordering looks as follows: first row is W,W,W,...
+@* then there come 'd' blocks of shifted original variables
+EXAMPLE: example makeLetterplaceRing2; shows examples
+"
+{
+
+  // ToDo future: inherit positive weights in the orig ring
+  // complain on nonpositive ones
+
+  // d = up to degree, will be shifted to d+1
+  if (d<1) {"bad d"; return(0);}
+
+  int uptodeg = d; int lV = nvars(basering);
+
+  //check weightvector
+  if (size(W) <> lV) {"bad weights"; return(0);}
+
+  int i;
+  for (i = 1; i <= size(W); i++) {if (W[i] < 0) {"bad weights"; return(0);}}
+  intvec Wt = W;
+  for (i = 2; i <= d; i++) {Wt = Wt, W;}
+  kill i;
+
+  int ppl = printlevel-voice+2;
+  string err = "";
+
+  int i,j,s;
+  def save = basering;
+  int D = d-1;
+  list LR  = ringlist(save);
+  list L, tmp, tmp2, tmp3;
+  L[1] = LR[1]; // ground field
+  L[4] = LR[4]; // quotient ideal
+  tmp  = LR[2]; // varnames
+  s = size(LR[2]);
+  for (i=1; i<=D; i++)
+  {
+    for (j=1; j<=s; j++)
+    {
+      tmp[i*s+j] = string(tmp[j])+"("+string(i+1)+")";
+    }
+  }
+  for (i=1; i<=s; i++)
+  {
+    tmp[i] = string(tmp[i])+"("+string(1)+")";
+  }
+  L[2] = tmp;
+  list OrigNames = LR[2];
+  // ordering: one 1..1 a above
+  // ordering: d blocks of the ord on r
+  // try to get whether the ord on r is blockord itself
+  // TODO: make L(2) ordering! exponent is maximally 2
+  s = size(LR[3]);
+  if (s==2)
+  {
+    // not a blockord, 1 block + module ord
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=d; i++)
+    {
+      LR[3][s-1+i] = LR[3][1];
+    }
+    //    LR[3][s+D] = tmp;
+    LR[3][s+1+D] = tmp;
+    LR[3][1] = list("a",Wt); // deg-ord
+  }
+  if (s>2)
+  {
+    // there are s-1 blocks
+    int nb = s-1;
+    tmp = LR[3][s]; // module ord to place at the very end
+    tmp2 = LR[3]; tmp2 = tmp2[1..nb];
+    tmp3[1] = list("a",Wt); // deg-ord, insert as the 1st
+    for (i=1; i<=d; i++)
+    {
+      tmp3 = tmp3 + tmp2;
+    }
+    tmp3 = tmp3 + list(tmp);
+    LR[3] = tmp3;
+
+  }
+  L[3] = LR[3];
+  def @R = ring(L);
+  //  setring @R;
+  //  int uptodeg = d; int lV = nvars(basering); // were defined before
+  def @@R = setLetterplaceAttributes(@R,uptodeg,lV);
+  return (@@R);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),(dp(1),dp(2));
+  def A = makeLetterplaceRingWt(2,intvec(1,2,3));
+  setring A;
+  A;
+  attrib(A,"isLetterplaceRing");
+  attrib(A,"uptodeg");  // degree bound
+  attrib(A,"lV"); // number of variables in the main block
 }
