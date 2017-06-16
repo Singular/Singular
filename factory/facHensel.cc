@@ -1022,7 +1022,7 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
   two= bufFactors [1];
   if (degBuf0 > 0 && degBuf1 > 0)
   {
-    for (k= 1; k <= (int) ceil (j/2.0); k++)
+    for (k= 1; k <= (j+1)/2; k++)
     {
       if (k != j - k + 1)
       {
@@ -1109,7 +1109,7 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
     }
     if (degBuf > 0 && degPi > 0)
     {
-      for (k= 1; k <= (int) ceil (j/2.0); k++)
+      for (k= 1; k <= (j+1)/2; k++)
       {
         if (k != j - k + 1)
         {
@@ -1527,7 +1527,7 @@ henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
   two= bufFactors [1];
   if (degBuf0 > 0 && degBuf1 > 0)
   {
-    for (k= 1; k <= (int) ceil (j/2.0); k++)
+    for (k= 1; k <= (j+1)/2; k++)
     {
       if (k != j - k + 1)
       {
@@ -1613,7 +1613,7 @@ henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
     }
     if (degBuf > 0 && degPi > 0)
     {
-      for (k= 1; k <= (int) ceil (j/2.0); k++)
+      for (k= 1; k <= (j+1)/2; k++)
       {
         if (k != j - k + 1)
         {
@@ -1867,7 +1867,7 @@ nonMonicHenselStep12 (const CanonicalForm& F, const CFList& factors,
   {
     while (one.hasTerms() && one.exp() > j) one++;
     while (two.hasTerms() && two.exp() > j) two++;
-    for (k= 1; k <= (int) ceil (j/2.0); k++)
+    for (k= 1; k <= (j+1)/2; k++)
     {
       if (k != j - k + 1)
       {
@@ -1956,7 +1956,7 @@ nonMonicHenselStep12 (const CanonicalForm& F, const CFList& factors,
     {
       while (one.hasTerms() && one.exp() > j) one++;
       while (two.hasTerms() && two.exp() > j) two++;
-      for (k= 1; k <= (int) ceil (j/2.0); k++)
+      for (k= 1; k <= (j+1)/2; k++)
       {
         if (k != j - k + 1)
         {
@@ -2259,7 +2259,7 @@ nonMonicHenselStep (const CanonicalForm& F, const CFList& factors,
   {
     while (one.hasTerms() && one.exp() > j) one++;
     while (two.hasTerms() && two.exp() > j) two++;
-    for (k= 1; k <= (int) ceil (j/2.0); k++)
+    for (k= 1; k <= (j+1)/2; k++)
     {
       if (k != j - k + 1)
       {
@@ -2352,7 +2352,7 @@ nonMonicHenselStep (const CanonicalForm& F, const CFList& factors,
     {
       while (one.hasTerms() && one.exp() > j) one++;
       while (two.hasTerms() && two.exp() > j) two++;
-      for (k= 1; k <= (int) ceil (j/2.0); k++)
+      for (k= 1; k <= (j+1)/2; k++)
       {
         if (k != j - k + 1)
         {
