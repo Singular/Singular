@@ -64,11 +64,12 @@
 #include "fehelp.h"
 
 #ifdef HAVE_READLINE
-#ifdef READLINE_READLINE_H_OK
-#include <readline/readline.h>
-#else
-#define RL_VERSION_MAJOR 0
-#endif
+  #ifdef READLINE_READLINE_H_OK
+    #include <readline/readline.h>
+  #endif
+  #ifndef RL_VERSION_MAJOR
+    #define RL_VERSION_MAJOR 0
+  #endif
 #endif
 
 static FORCE_INLINE void number2mpz(number n, mpz_t m){ number2mpz(n, coeffs_BIGINT, m); }

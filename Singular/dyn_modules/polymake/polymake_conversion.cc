@@ -120,7 +120,11 @@ int PmInteger2Int(const polymake::Integer& pi, bool &ok)
   int i=0;
   try
   {
+#if POLYMAKE_VERSION >= 301 /* 3.1 */
+    i=int(pi);
+#else
     i = pi.to_int();
+#endif
   }
   catch (const std::exception& ex)
   {
@@ -158,7 +162,11 @@ intvec* PmMatrixInteger2Intvec (polymake::Matrix<polymake::Integer>* mi, bool &o
   int rows = mi->rows();
   int cols = mi->cols();
   intvec* iv = new intvec(rows,cols,0);
+#if POLYMAKE_VERSION >= 301 /*3.1*/
+  pm::array_traits<pm::Integer>::iterator pi = concat_rows(*mi).begin();
+#else
   const polymake::Integer* pi = concat_rows(*mi).begin();
+#endif
   for (int r = 1; r <= rows; r++)
     for (int c = 1; c <= cols; c++)
     {
@@ -173,7 +181,11 @@ bigintmat* PmMatrixInteger2Bigintmat (polymake::Matrix<polymake::Integer>* mi)
   int rows = mi->rows();
   int cols = mi->cols();
   bigintmat* bim= new bigintmat(rows,cols,coeffs_BIGINT);
+#if POLYMAKE_VERSION >= 301 /*3.1*/
+  pm::array_traits<pm::Integer>::iterator pi = concat_rows(*mi).begin();
+#else
   const polymake::Integer* pi = concat_rows(*mi).begin();
+#endif
   for (int r = 1; r <= rows; r++)
     for (int c = 1; c <= cols; c++)
     {

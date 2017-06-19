@@ -119,8 +119,8 @@ parname        #
 %x asstring
 
 %%
-\/\/[^\n]*               { }
-^#![^\n]*                { }
+\/\/[^\n]*               
+^[ \r\t\n]*#![^\n]*      
 "/*"                     {
                            yy_noeof=noeof_comment;
                            loop
