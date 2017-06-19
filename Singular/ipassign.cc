@@ -266,7 +266,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   if (DEN((fraction)(p)) != NULL) // minpoly must be a fraction with poly numerator...!!
   {
     poly n=DEN((fraction)(p));
-    if(!o_IsConstantPoly(n,currRing->cf->extRing))
+    if(!p_IsConstantPoly(n,currRing->cf->extRing))
     {
       WarnS("denominator must be constant - ignoring it");
     }
