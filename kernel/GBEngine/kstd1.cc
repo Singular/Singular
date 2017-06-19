@@ -2353,12 +2353,12 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
         }
         strat->homog=h;
       }
+      #ifdef ADIDEBUG
       else
       {
-        #ifdef ADIDEBUG
         printf("\npreIntegerCheck didn't found any new information\n");
-        #endif
       }
+      #endif
       omTestMemory(1);
       if(w == NULL)
       {
