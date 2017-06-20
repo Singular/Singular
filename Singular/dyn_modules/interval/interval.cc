@@ -281,7 +281,7 @@ interval* intervalMultiply(interval *I, interval *J)
     number nums[4];
     nums[0] = nMult(I->lower, J->lower);
     nums[1] = nMult(I->lower, J->upper);
-    nums[2] = nMult(I->upper, J->lower),
+    nums[2] = nMult(I->upper, J->lower);
     nums[3] = nMult(I->upper, J->upper);
 
     int i, imax = 0, imin = 0;
