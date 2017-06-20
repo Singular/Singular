@@ -265,12 +265,13 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   }
   if (DEN((fraction)(p)) != NULL) // minpoly must be a fraction with poly numerator...!!
   {
-    poly z=NUM((fraction)p);
     poly n=DEN((fraction)(p));
-    z=p_Mult_nn(z,pGetCoeff(n),currRing->cf->extRing);
-    NUM((fraction)p)=z;
-    DEN((fraction)(p))=NULL;
+    if(!p_IsConstantPoly(n,currRing->cf->extRing))
+    {
+      WarnS("denominator must be constant - ignoring it");
+    }
     p_Delete(&n,currRing->cf->extRing);
+    DEN((fraction)(p))=NULL;
   }
 
   q->m[0] = NUM((fraction)p);
@@ -287,16 +288,13 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   // :(
 //  NUM((fractionObject *)p) = NULL; // makes 0/ NULL fraction - which should not happen!
 //  n_Delete(&p, currRing->cf); // doesn't expect 0/ NULL :(
-  if(true)
   {
     extern omBin fractionObjectBin;
     NUM((fractionObject *)p) = NULL; // not necessary, but still...
     omFreeBin((ADDRESS)p, fractionObjectBin);
   }
 
-
   coeffs new_cf = nInitChar(n_algExt, &A);
-
   if (new_cf==NULL)
   {
     WerrorS("Could not construct the alg. extension: llegal minpoly?");
@@ -308,9 +306,9 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   {
     nKillChar(currRing->cf); currRing->cf=new_cf;
   }
-
   return FALSE;
 }
+
 static BOOLEAN jjNOETHER(leftv, leftv a)
 {
   poly p=(poly)a->CopyD(POLY_CMD);
