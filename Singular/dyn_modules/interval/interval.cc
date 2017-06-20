@@ -1231,15 +1231,13 @@ extern "C" int mod_init(SModulFunctions* psModulFunctions)
 
     boxID = setBlackboxStuff(b_bx, "box");
 
-    // debug
-    Print("Created type interval with id %d\n", intervalID);
-    Print("Created type box with id %d\n", boxID);
-
     // add additional functions
-    psModulFunctions->iiAddCproc("interval.lib", "length", FALSE, length);
-    psModulFunctions->iiAddCproc("interval.lib", "boxSet", FALSE, boxSet);
-    psModulFunctions->iiAddCproc("interval.lib", "evalPolyAtBox", FALSE,
+    psModulFunctions->iiAddCproc("interval.so", "length", FALSE, length);
+    psModulFunctions->iiAddCproc("interval.so", "boxSet", FALSE, boxSet);
+    psModulFunctions->iiAddCproc("interval.so", "evalPolyAtBox", FALSE,
         evalPolyAtBox);
+
+    // TODO add help strings
 
     return MAX_TOK;
 }
