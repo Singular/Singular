@@ -324,6 +324,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
   bi_bigintm=false
   bi_Order=false
   bi_gitfan=false
+  bi_interval=false
 
 
  if test -z "$with_builtinmodules"; then
@@ -357,6 +358,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
        bigintm ) bi_bigintm=true ;;
        Order ) bi_Order=true ;;
        gitfan ) bi_gitfan=true ;;
+       interval ) bi_interval=true ;;
       esac
 
 ###### In case of out-of tree building: the build dir is empty in configure time!!!
@@ -394,6 +396,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
  AM_CONDITIONAL([SI_BUILTIN_BIGINTM], [test x$bi_bigintm = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_ORDER], [test x$bi_Order = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_GITFAN], [test x$bi_gitfan = xtrue])
+ AM_CONDITIONAL([SI_BUILTIN_INTERVAL], [test x$bi_interval = xtrue])
 
  AC_MSG_CHECKING([BUILTIN_LIBS...])
  AC_MSG_RESULT(${BUILTIN_LIBS:-unset})
