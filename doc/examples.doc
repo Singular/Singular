@@ -3071,12 +3071,7 @@ on the Hilbert polynomial of the Milnor algebra is made.
 @end smallexample
 @end ifset
 @c ----------------------------------------------------------------------------
-@ifset singularmanual
-@node Resolution of singularities, G_a -Invariants, Classification of hypersurface singularities, Singularity Theory
-@end ifset
-@ifclear singularmanual
-@node Resolution of singularities, Solving systems of polynomial equations, Invariants of plane curve singularities, Singularity Theory
-@end ifclear
+@node Resolution of singularities
 @subsection Resolution of singularities
 @cindex Resolution of singularities
 @cindex singularities, resolution of
@@ -3111,7 +3106,7 @@ iD;                               // show the output
 @end smallexample
 
 @c ----------------------------------------------------------------------------
-@node Invariant Theory, Geometric Invariant Theory, Singularity Theory, Examples
+@node Invariant Theory
 @section Invariant Theory
 @cindex Invariant Theory
 
@@ -3225,7 +3220,7 @@ Theory 2.3.7":
 
 
 @c ----------------------------------------------------------------------------
-@node Geometric Invariant Theory, Non-commutative Algebra, Invariant Theory, Examples
+@node Geometric Invariant Theory
 @section Geometric Invariant Theory
 @cindex Geometric Invariant Theory
 
