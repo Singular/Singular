@@ -683,7 +683,7 @@ NOTE:   These procedures return the standard basis of the toric ideal of A
   @ref{Toric ideals and integer programming}.
   @end texinfo
 EXAMPLE:  example toric_ideal; shows an example
-SEE ALSO: toric_std, toric_lib, intprog_lib, Toric ideals
+SEE ALSO: toric_std, intprog_lib, Toric ideals
 "
 {
   if(size(#)==2)
