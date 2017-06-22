@@ -42,6 +42,7 @@ ivmatInit(m, n);        returns m x n [0,0]-matrix
 ivmatSet(A,i,j,I);      returns matrix A where A[i][j]=I
 unitMatrix(m);          returns m x m unit matrix where 1 = [1,1]
 ivmatGaussian(M);       computes M^(-1) using Gaussian elimination for intervals
+evalJacobianAtBox(A,B); jacobian matrix of A where polynomials are evaluated at B
 
 rootIsolationNoPreprocessing(I,L,e);
                         computes boxes containing unique roots of I lying in L
@@ -502,7 +503,7 @@ static proc ivmatMultiplyGeneral(ivmat A, B)
 
 // POLYNOMIAL APPLICATIONS
 
-static proc evalJacobianAtBox(ideal I, box B)
+proc evalJacobianAtBox(ideal I, box B)
 "USAGE: evalJacobianAtBox(I, B); I ideal B box
 RETURN: jacobian matrix of I where polynomials are evaluated at B
 EXAMPLE: example evalJacobianAtBox; evalate Jacobian at box"
