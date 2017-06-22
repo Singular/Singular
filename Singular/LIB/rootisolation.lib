@@ -51,8 +51,8 @@ rootIsolation(I,B,e);   slims down input box B and calls rootIsolationNoPreproce
 
 static proc mod_init()
 {
-    //LIB "interval.so"; // use this if integrated into Singular Sources
-    LIB "dyn_modules/interval.so";
+    LIB "interval.so"; // use this if integrated into Singular Sources
+    //LIB "dyn_modules/interval.so";
     LIB "atkins.lib"; // for round (tmp?)
 
     newstruct("ivmat", "list rows");

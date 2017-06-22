@@ -28,16 +28,16 @@ struct box
     box& setInterval(int, interval*);
 };
 
-extern int intervalID;
-extern int boxID;
+//extern int intervalID;
+//extern int boxID;
 
 // helpful functions
-interval* intervalScalarMultiply(number, interval*);
-interval* intervalMultiply(interval*, interval*);
-interval* intervalAdd(interval*, interval*);
-interval* intervalSubtract(interval*, interval*);
-bool intervalEqual(interval*, interval*);
-bool intervalContainsZero(interval*);
+//interval* intervalScalarMultiply(number, interval*);
+//interval* intervalMultiply(interval*, interval*);
+//interval* intervalAdd(interval*, interval*);
+//interval* intervalSubtract(interval*, interval*);
+//bool intervalEqual(interval*, interval*);
+//bool intervalContainsZero(interval*);
 
 extern "C" int mod_init(SModulFunctions*);
 
