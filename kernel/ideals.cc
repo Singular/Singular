@@ -201,7 +201,7 @@ ideal idSectWithElim (ideal h1,ideal h2)
 /*2
 * h3 := h1 intersect h2
 */
-ideal idSect (ideal h1,ideal h2)
+ideal idSect (ideal h1,ideal h2, GbVariant alg)
 {
   int i,j,k,length;
   int flength = id_RankFreeModule(h1,currRing);
@@ -275,9 +275,32 @@ ideal idSect (ideal h1,ideal h2)
     }
   }
   intvec *w=NULL;
-  temp1 = kStd(temp,currRing->qideal,testHomog,&w,NULL,length);
-  if (w!=NULL) delete w;
-  idDelete(&temp);
+  if (alg==GbDefault) alg=GbStd;
+  if (alg==GbStd)
+  {
+    if (TEST_OPT_PROT) { PrintS("std:"); mflush(); }
+    temp1 = kStd(temp,currRing->qideal,testHomog,&w,NULL,length);
+    if (w!=NULL) delete w;
+    idDelete(&temp);
+  }
+  else if (alg==GbSlimgb)
+  {
+    if (TEST_OPT_PROT) { PrintS("slimgb:"); mflush(); }
+    temp1 = t_rep_gb(currRing, temp, temp->rank);
+    idDelete(&temp);
+  }
+  else if (alg==GbGroebner)
+  {
+    if (TEST_OPT_PROT) { PrintS("groebner:"); mflush(); }
+    BOOLEAN err;
+    temp1=(ideal)iiCallLibProc1("groebner",temp,MODUL_CMD,err);
+    if (err)
+    {
+      Werror("error %d in >>groebner<<",err);
+      temp1=idInit(1,1);
+    }
+  }
+
   if(syz_ring!=orig_ring)
     rChangeCurrRing(orig_ring);
 
@@ -341,7 +364,7 @@ ideal idSect (ideal h1,ideal h2)
 * ideal/module intersection for a list of objects
 * given as 'resolvente'
 */
-ideal idMultSect(resolvente arg, int length)
+ideal idMultSect(resolvente arg, int length, GbVariant alg)
 {
   int i,j=0,k=0,syzComp,l,maxrk=-1,realrki;
   ideal bigmat,tempstd,result;
@@ -416,9 +439,53 @@ ideal idMultSect(resolvente arg, int length)
     }
   }
   /* std computation --------------------------------------------*/
-  tempstd = kStd(bigmat,currRing->qideal,testHomog,&w,NULL,syzComp);
-  if (w!=NULL) delete w;
-  idDelete(&bigmat);
+  if (alg==GbDefault) alg=GbStd;
+  if (alg==GbStd)
+  {
+    if (TEST_OPT_PROT) { PrintS("std:"); mflush(); }
+    tempstd = kStd(bigmat,currRing->qideal,testHomog,&w,NULL,syzComp);
+    if (w!=NULL) delete w;
+    idDelete(&bigmat);
+  }
+  else if (alg==GbSlimgb)
+  {
+    if (TEST_OPT_PROT) { PrintS("slimgb:"); mflush(); }
+    tempstd = t_rep_gb(currRing, bigmat, syzComp);
+    idDelete(&bigmat);
+  }
+  else if (alg==GbGroebner)
+  {
+    if (TEST_OPT_PROT) { PrintS("groebner:"); mflush(); }
+    BOOLEAN err;
+    tempstd=(ideal)iiCallLibProc1("groebner",bigmat,MODUL_CMD,err);
+    if (err)
+    {
+      Werror("error %d in >>groebner<<",err);
+      tempstd=idInit(1,1);
+    }
+  }
+//  else if (alg==GbModstd): requires ideal, not module
+//  {
+//    if (TEST_OPT_PROT) { PrintS("modstd:"); mflush(); }
+//    BOOLEAN err;
+//    tempstd=(ideal)iiCallLibProc1("modStd",bigmat,MODUL_CMD,err);
+//    if (err)
+//    {
+//      Werror("error %d in >>modStd<<",err);
+//      tempstd=idInit(1,1);
+//    }
+//  }
+  //else if (alg==GbSba): requires order C,...
+  //{
+  //  if (TEST_OPT_PROT) { PrintS("sba:"); mflush(); }
+  //  tempstd = kSba(bigmat,currRing->qideal,hom,w,1,0,NULL,syzComp);
+  //  idDelete(&bigmat);
+  //}
+  else
+  {
+    tempstd=idInit(1,1);
+    Werror("wrong algorith %d for SB",(int)alg);
+  }
 
   if(syz_ring!=orig_ring)
     rChangeCurrRing(orig_ring);
@@ -2682,6 +2749,7 @@ GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)
     {
        return GbSlimgb;
     }
+    if (TEST_OPT_PROT) PrintS("slimgb not possible here\n");
   }
   else if (alg==GbSba) // cond. for sba
   {
@@ -2691,6 +2759,7 @@ GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)
     {
       return GbSba;
     }
+    if (TEST_OPT_PROT) PrintS("sba not possible here\n");
   }
   else if (alg==GbGroebner) // cond. for groebner
   {
