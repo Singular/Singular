@@ -3106,7 +3106,7 @@ iD;                               // show the output
 @end smallexample
 
 @c ----------------------------------------------------------------------------
-@node Invariant Theory
+@node Invariant Theory, Geometric Invariant Theory, Singularity Theory, Examples
 @section Invariant Theory
 @cindex Invariant Theory
 
@@ -3119,7 +3119,7 @@ iD;                               // show the output
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node G_a -Invariants, Invariants of a finite group, Resolution of singularities, Invariant Theory
+@node G_a -Invariants, Invariants of a finite group, , Invariant Theory
 @subsection G_a -Invariants
 @cindex G_a -Invariants
 
@@ -3220,7 +3220,7 @@ Theory 2.3.7":
 
 
 @c ----------------------------------------------------------------------------
-@node Geometric Invariant Theory
+@node Geometric Invariant Theory, Non-commutative Algebra,Invariant Theory, Examples
 @section Geometric Invariant Theory
 @cindex Geometric Invariant Theory
 
@@ -3233,7 +3233,7 @@ Theory 2.3.7":
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node GIT-Fans, Geometric Invariant Theory, Geometric Invariant Theory, Geometric Invariant Theory
+@node GIT-Fans, , , Geometric Invariant Theory
 @subsection GIT-Fans
 @cindex GIT-Fans
 
