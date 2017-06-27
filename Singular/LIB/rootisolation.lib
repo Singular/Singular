@@ -1,22 +1,26 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version rootIsolation.lib 0.2 Jun_2017 ";
+version="version rootisolation.lib 4.1.0.0 Jun_2017 ";
 info="
-LIBRARY:    rootIsolation.lib implements an algorithm for real root isolation
+LIBRARY:    rootisolation.lib implements an algorithm for real root isolation
             using interval arithmetic
-AUTHORS:    Dominik Bendle
-@*          Clara Petroll
+AUTHORS:    Dominik Bendle (bendle@rhrk.uni-kl.de)
+@*          Clara Petroll (petroll@rhrk.uni-kl.de)
 
-OVERVIEW:   In this library the interval arithmetic from interval.so is used.
-            The new type 'ivmat', a matrix consiting of intervals is
-            implemented as newstruct. There are various functions for
-            computations with interval matrices implemented, such as Gaussian
-            elimination for interval matrices.
-            Interval arithmetic, the interval Newton Step and exclusion methods
-            are used to implement the procedure 'realRootIsolation', an
+OVERVIEW:   In this library the interval arithmetic from \"@code{interval.so}\"
+            is used. The new type \"@code{ivmat}\", a matrix consiting of
+            intervals is implemented as \"@code{newstruct}\". There are various
+            functions for computations with interval matrices implemented, such
+            as Gaussian elimination for interval matrices.
+
+@*          Interval arithmetic, the interval Newton Step and exclusion methods
+            are used to implement the procedure \"@code{rootIsolation}\", an
             algorithm which finds boxes containing elements of the vanishing
             locus of an ideal. This algorithm is specialised for
             zero-dimensional radical ideals. The theory about the interval
             Newton Step is detailed in [2].
+
+@*          Note that interval arithmetic and the aforementioned procedures are
+            intended for rational or real polynomial rings.
 
 REFERENCES: [1] Cloud, Kearfott, Moore: Introduction to Interval Analysis,
                 Society for Industrial and Applied Mathematics, 2009
@@ -28,12 +32,10 @@ REFERENCES: [1] Cloud, Kearfott, Moore: Introduction to Interval Analysis,
                 Science, World Scientific Publishing Co. Pte. Ltd., 2005
 
 OVERLOADS:
-// interval matrices
 [           ivmatGet              indexing
 print       ivmatPrint            printing
 nrows       ivmatNrows            number of rows
-ncols       ivmatNcols            number of columns
-det         determinant           determinant
+ncols       ivmatNcols            number of columns@*
 *           ivmatMultiplyGeneral  matrix multiplication
 
 PROCEDURES:
@@ -52,8 +54,7 @@ rootIsolation(I,B,e);   slims down input box B and calls rootIsolationNoPreproce
 
 static proc mod_init()
 {
-    LIB "interval.so"; // use this if integrated into Singular Sources
-    //LIB "dyn_modules/interval.so";
+    LIB "interval.so";
     LIB "atkins.lib"; // for round (tmp?)
 
     newstruct("ivmat", "list rows");
@@ -70,9 +71,10 @@ static proc mod_init()
 
 // helper function for assignment
 proc bounds(number a, list #)
-"USAGE:  bounds(a); a number;
-@*      bounds(a, b); a, b number;
-RETURN: if size(#)==0 it returns the interval [a,a], else the interval [a,#[1]]
+"USAGE:  @code{bounds(a)}; @code{a number};
+@*      @code{bounds(a, b)}; @code{a, b number};
+RETURN: interval: if @code{size(#)==0} it returns the interval @code{[a, a]},
+        else the interval @code{[a,#[1]]}
 EXAMPLE: example bounds; create two intervals"
 {
     interval I;
@@ -234,8 +236,10 @@ example
 // MATRIX FUNCTIONS
 
 proc ivmatInit(numrows, numcols)
-"USAGE: ivmatInit(m, n); m, n int
-RETURN: mxn matrix of [0,0]-intervals
+"USAGE: @code{ivmatInit(m, n)}; @code{m, n int}
+RETURN: @code{m}x@code{n} matrix of [0,0]-intervals
+PURPOSE: initialises an interval matrix with [0,0] intervals to ensure the
+        proper structure of the @code{ivmat} type
 EXAMPLE: example ivmatInit; initialises an interval matrix"
 {
     ivmat A;
@@ -300,8 +304,9 @@ RETURN: list A[i] of i-th row of A"
 }
 
 proc ivmatSet(ivmat A, int i, int j, interval I)
-"USAGE: ivmatSet(A, i, j, I), A ivmat, i, j, int, I interval
-RETURN: ivmat A where A[i][j] == I
+"USAGE: @code{ivmatSet(A, i, j, I)}; @code{A ivmat, i, j, int, I interval}
+RETURN: interval matrix @code{A} where @code{A[i][j] == I}
+PURPOSE: modify a single entry of an @code{ivmat}
 EXAMPLE: example ivmatSet; assign values to A"
 {
     A.rows[i][j] = I;
@@ -334,11 +339,18 @@ example
     ivmat A = diagMatrix(2, bounds(1, 2)); A;
 }
 
-static proc unitMatrix(int n)
-"USAGE: unitMatrix(n)
-RETURN: nxn unit matrix"
+proc unitMatrix(int n)
+"USAGE: @code{unitMatrix(n)}; @code{n int}
+RETURN: @code{n}x@code{n} unit interval matrix
+EXAMPLE: example unitMatrix; generate a unit matrix"
 {
     return(diagMatrix(n, 1));
+}
+example
+{
+    ring R = 0,(x,y),lp;
+    unitMatrix(2);
+    unitMatrix(3);
 }
 
 static proc ivmatMultiply(ivmat A, ivmat B)
@@ -373,11 +385,12 @@ static proc ivmatMultiply(ivmat A, ivmat B)
 }
 
 proc ivmatGaussian(ivmat A)
-"USAGE:  ivmatGaussian(A); A ivmat
-RETURN: 0 if A not invertible, 1,Ainv if A invertible
-NOTE:   Inverts an interval matrix using Gussian elimination in the setting
-        of interval arithmetic. Pivotting is handled as a special case as
-        I/I != [1,1]  and I-I != [0,0] in general.
+"USAGE:  @code{ivmatGaussian(A)}; @code{A ivmat}
+RETURN: 0 if @code{A} not invertible, @code{(1, Ainv)} if @code{A} invertible
+        where @code{Ainv} is the inverse matrix
+PURPOSE: Inverts an interval matrix using Gaussian elimination in the setting
+        of interval arithmetic. Pivoting is handled as a special case as
+        @code{I/I != [1,1]}  and @code{I-I != [0,0]} in general.
 EXAMPLE: example ivmatGaussian; inverts a matrix"
 {
     int n = nrows(A);
@@ -504,8 +517,10 @@ static proc ivmatMultiplyGeneral(ivmat A, B)
 // POLYNOMIAL APPLICATIONS
 
 proc evalJacobianAtBox(ideal I, box B)
-"USAGE: evalJacobianAtBox(I, B); I ideal B box
-RETURN: jacobian matrix of I where polynomials are evaluated at B
+"USAGE: @code{evalJacobianAtBox(I, B)}; @code{I ideal B box}
+RETURN: Jacobian matrix of @code{I} where polynomials are evaluated at @code{B}
+PURPOSE: evaluates each polynomial of the Jacobian matrix of @code{I} using
+        interval arithmetic
 EXAMPLE: example evalJacobianAtBox; evalate Jacobian at box"
 {
     matrix J = jacob(I);
@@ -685,18 +700,19 @@ example
 }
 
 proc rootIsolationNoPreprocessing(ideal I, def start, number eps)
-"USAGE:  rootIsolationNoPreprocessing(I, B, eps); I ideal, B box/list of boxes,
-        eps number;
-ASSUME: I is a zero-dimensional radical ideal
-RETURN: L1, L2, where L1 contains boxes smaller than eps which may contain an
-        element of V(I), i.e. a root and L2 contains boxes which contain
-        exactly one element of V(I)
-PURPOSE: Given input box(es) start we try to find all roots of I lying in start
-        by computing boxes that contain exactly on root. If eps > 0 then boxes
-        that become smaller than eps will be returned.
+"USAGE:  @code{rootIsolationNoPreprocessing(I, B, eps)}; @code{I ideal, B box/list of boxes,
+        eps number};
+ASSUME: @code{I} is a zero-dimensional radical ideal
+RETURN: @code{(L1, L2)}, where @code{L1} contains boxes smaller than eps which may contain an
+        element of V(@code{I}), i.e. a root and @code{L2} contains boxes which contain
+        exactly one element of V(@code{I})
+PURPOSE: Given input box(es) @code{start} we try to find all roots of @code{I}
+        lying in @code{start} by computing boxes that contain exactly one root.
+        If @code{eps} > 0 then boxes that become smaller than @code{eps} will
+        be returned.
 THEORY: We first check for every box if it contains no roots by interval
-        arithmetic. If this is inconclusive we apply the Newton step, which as
-        outlined in [2] and [3] converges to a root lying in the starting box.
+        arithmetic. If this is inconclusive we apply the Newton step which, as
+        outlined in [2] and [3], converges to a root lying in the starting box.
         If the result of the Newton step is already contained in the interior
         of the starting box, it contains a unique root.
 EXAMPLE: example rootIsolationNoPreprocessing; exclusion test for intersection
@@ -732,7 +748,7 @@ EXAMPLE: example rootIsolationNoPreprocessing; exclusion test for intersection
     int zeroTest;
 
     // debug
-    int cnt;
+    //int cnt;
 
     while (size(B) <> 0)
     {
@@ -767,8 +783,8 @@ EXAMPLE: example rootIsolationNoPreprocessing; exclusion test for intersection
         }
 
         // debug
-        cnt++;
-        print(string(cnt, " ", s, " ", int(memory(0)/1024), "k"));
+        //cnt++;
+        //print(string(cnt, " ", s, " ", int(memory(0)/1024), "k"));
 
         B = B_prime;
     }
@@ -841,19 +857,19 @@ example
 
 //im Moment geht das nur mit eingegebener eliminationsordnung
 proc rootIsolation(ideal I, box start, number eps)
-"USAGE:  rootIsolation(I, start, eps); I ideal, start box, eps number
-ASSUME: I is a zero-dimensional radical ideal
-        and basering is defined with an elimination ordering;
-RETURN: L1, L2, where L1 contains boxes smaller than eps which may contain an
-        element of V(I), i.e. a root and L2 contains boxes which contain
-        exactly one element of V(I)
-PURPOSE: same as rootIsolationNoPreprocessing, but speeds up computation by
+"USAGE:  @code{rootIsolation(I, start, eps)}; @code{I ideal, start box, eps number}
+ASSUME: @code{I} is a zero-dimensional radical ideal
+        and @code{basering} is defined with an elimination ordering.
+RETURN: @code{(L1, L2)}, where @code{L1} contains boxes smaller than eps which may contain an
+        element of V(@code{I}), i.e. a root and @code{L2} contains boxes which contain
+        exactly one element of V(@code{I})
+PURPOSE: same as @code{rootIsolationNoPreprocessing}, but speeds up computation by
         preprocessing starting box
-THEORY: As every root of I is a root of the polynomials I[i], we use Groebner
-        elimination to find univariate polynomials for every variable which
-        have these roots as well. Applying root isolation to these univariate
-        polynomials then provides smaller starting boxes which speed up
-        computations in the multivariate case.
+THEORY: As every root of @code{I} is a root of the polynomials @code{I[i]}, we
+        use Groebner elimination to find univariate polynomials for every
+        variable which have these roots as well. Applying root isolation to
+        these univariate polynomials then provides smaller starting boxes which
+        speed up computations in the multivariate case.
 EXAMPLE: example rootIsolation; for intersection of two ellipses"
 {
     int N = nvars(basering);
