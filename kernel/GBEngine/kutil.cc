@@ -7678,7 +7678,6 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
 
 poly redtailBbaBound (LObject* L, int pos, kStrategy strat, int bound, BOOLEAN withT, BOOLEAN normalize)
 {
-#define REDTAIL_CANONICALIZE 100
   strat->redTailChange=FALSE;
   if (strat->noTailReduction) return L->GetLmCurrRing();
   poly h, p;
