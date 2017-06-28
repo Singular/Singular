@@ -23,6 +23,8 @@ int star_nl=0;
 int footer=0;
 int header=0;
 int crlf=0;
+int proc_help_lines=0;
+int proc_help_texinfo=0;
 
 void get_next()
 {
@@ -128,6 +130,23 @@ void scan_keywords(int *l)
     }
   }
   printf("error: seperate keywords by ; but do not have ; after the last keyword\n");
+}
+void scan_proc_help(const char *s)
+{
+  while(!feof(f))
+  {
+    proc_help_lines++;
+    if (strstr(buf,"\";")!=NULL) break;
+    if (buf[0]=='{') break;
+    if (strstr(buf,"@")!=NULL)
+    {
+      proc_help_texinfo++;
+      buf[strlen(buf)-1]='\0';
+      strcat(buf,"<<\n");
+      printf("texinfo in proc help(%s): >>%s",s,buf);
+    }
+    get_next();
+  }
 }
 void scan_info(int *l)
 {
@@ -387,6 +406,8 @@ int main(int argc, char** argv)
         p=buf;
         while(*p==' ') p++;
         if (*p == '"') have_doc[i]=1;
+	/* scan proc help*/
+	scan_proc_help(proc[i]);
         /* serach for example */
         while(!feof(f))
         {
@@ -437,6 +458,8 @@ int main(int argc, char** argv)
   }
   printf("%d lines parsed\n",lines);
   printf("%d proc found in header\n",proc_cnt);
+  printf("%d lines found in proc help\n",proc_help_lines);
+  printf("%d lines found in proc help with texinfo commands (should be very small)\n",proc_help_texinfo);
   fclose(f);
   return 0;
 }
