@@ -7354,7 +7354,7 @@ BOOLEAN arriRewCriterionPre(poly sig, unsigned long not_sevSig, poly lm, kStrate
  *
  ***************************************************************/
 TObject*
-kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
+kFindDivisibleByInS(kStrategy strat, int end_pos, LObject* L, TObject *T,
                     long ecart)
 {
   int j = 0;
@@ -7372,7 +7372,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
     {
       loop
       {
-        if (j > pos) return NULL;
+        if (j > end_pos) return NULL;
   #if defined(PDEBUG) || defined(PDIV_DEBUG)
         if (strat->S[j]!= NULL && p_LmShortDivisibleBy(strat->S[j], sev[j], p, not_sev, r) &&
             (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
@@ -7395,7 +7395,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
     {
       loop
       {
-        if (j > pos) return NULL;
+        if (j > end_pos) return NULL;
   #if defined(PDEBUG) || defined(PDIV_DEBUG)
         if (strat->S[j]!= NULL && p_LmShortDivisibleBy(strat->S[j], sev[j], p, not_sev, r) &&
             (ecart== LONG_MAX || ecart>= strat->ecartS[j]) && n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), r->cf))
@@ -7435,7 +7435,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
     {
       loop
       {
-        if (j > pos) return NULL;
+        if (j > end_pos) return NULL;
         assume(strat->S_2_R[j] != -1);
   #if defined(PDEBUG) || defined(PDIV_DEBUG)
         t = strat->S_2_T(j);
@@ -7464,7 +7464,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
     {
       loop
       {
-        if (j > pos) return NULL;
+        if (j > end_pos) return NULL;
         assume(strat->S_2_R[j] != -1);
   #if defined(PDEBUG) || defined(PDIV_DEBUG)
         t = strat->S_2_T(j);
@@ -7492,7 +7492,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
   }
 }
 
-poly redtail (LObject* L, int pos, kStrategy strat)
+poly redtail (LObject* L, int end_pos, kStrategy strat)
 {
   poly h, hn;
   strat->redTailChange=FALSE;
@@ -7525,9 +7525,9 @@ poly redtail (LObject* L, int pos, kStrategy strat)
       Ln.Set(hn, strat->tailRing);
       Ln.sev = p_GetShortExpVector(hn, strat->tailRing);
       if (strat->kHEdgeFound)
-        With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
+        With = kFindDivisibleByInS(strat, end_pos, &Ln, &With_s);
       else
-        With = kFindDivisibleByInS(strat, pos, &Ln, &With_s, e);
+        With = kFindDivisibleByInS(strat, end_pos, &Ln, &With_s, e);
       if (With == NULL) break;
       With->length=0;
       With->pLength=0;
@@ -7538,7 +7538,7 @@ poly redtail (LObject* L, int pos, kStrategy strat)
         if (kStratChangeTailRing(strat, L))
         {
           strat->kHEdgeFound = save_HE;
-          return redtail(L, pos, strat);
+          return redtail(L, end_pos, strat);
         }
         else
           return NULL;
@@ -7562,13 +7562,13 @@ poly redtail (LObject* L, int pos, kStrategy strat)
   return p;
 }
 
-poly redtail (poly p, int pos, kStrategy strat)
+poly redtail (poly p, int end_pos, kStrategy strat)
 {
   LObject L(p, currRing);
-  return redtail(&L, pos, strat);
+  return redtail(&L, end_pos, strat);
 }
 
-poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN normalize)
+poly redtailBba (LObject* L, int end_pos, kStrategy strat, BOOLEAN withT, BOOLEAN normalize)
 {
 #define REDTAIL_CANONICALIZE 100
   strat->redTailChange=FALSE;
@@ -7617,7 +7617,7 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
       }
       else
       {
-        With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
+        With = kFindDivisibleByInS(strat, end_pos, &Ln, &With_s);
         if (With == NULL) break;
       }
       cnt--;
@@ -7676,7 +7676,7 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
   return L->GetLmCurrRing();
 }
 
-poly redtailBbaBound (LObject* L, int pos, kStrategy strat, int bound, BOOLEAN withT, BOOLEAN normalize)
+poly redtailBbaBound (LObject* L, int end_pos, kStrategy strat, int bound, BOOLEAN withT, BOOLEAN normalize)
 {
   strat->redTailChange=FALSE;
   if (strat->noTailReduction) return L->GetLmCurrRing();
@@ -7724,7 +7724,7 @@ poly redtailBbaBound (LObject* L, int pos, kStrategy strat, int bound, BOOLEAN w
       }
       else
       {
-        With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
+        With = kFindDivisibleByInS(strat, end_pos, &Ln, &With_s);
         if (With == NULL) break;
       }
       cnt--;
@@ -7792,7 +7792,7 @@ poly redtailBbaBound (LObject* L, int pos, kStrategy strat, int bound, BOOLEAN w
 }
 
 #ifdef HAVE_RINGS
-poly redtailBba_Z (LObject* L, int pos, kStrategy strat )
+poly redtailBba_Z (LObject* L, int end_pos, kStrategy strat )
 // normalize=FALSE, withT=FALSE, coeff=Z
 {
   strat->redTailChange=FALSE;
@@ -7821,7 +7821,7 @@ poly redtailBba_Z (LObject* L, int pos, kStrategy strat )
     loop
     {
       Ln.SetShortExpVector();
-      With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
+      With = kFindDivisibleByInS(strat, end_pos, &Ln, &With_s);
       if (With == NULL) break;
       cnt--;
       if (cnt==0)

@@ -476,21 +476,21 @@ int posInL10Ring (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 int posInL110 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
-KINLINE poly redtailBba (poly p,int pos,kStrategy strat,BOOLEAN normalize=FALSE);
-KINLINE poly redtailBbaBound (poly p,int pos,kStrategy strat,int bound,BOOLEAN normalize=FALSE);
+KINLINE poly redtailBba (poly p,int end_pos,kStrategy strat,BOOLEAN normalize=FALSE);
+KINLINE poly redtailBbaBound (poly p,int end_pos,kStrategy strat,int bound,BOOLEAN normalize=FALSE);
 #ifdef HAVE_RINGS
-KINLINE poly redtailBba_Z (poly p,int pos,kStrategy strat);
-poly redtailBba_Z (LObject* L, int pos, kStrategy strat );
+KINLINE poly redtailBba_Z (poly p,int end_pos,kStrategy strat);
+poly redtailBba_Z (LObject* L, int end_pos, kStrategy strat );
 #endif
-poly redtailBba (LObject *L, int pos,kStrategy strat,
+poly redtailBba (LObject *L, int end_pos,kStrategy strat,
                  BOOLEAN withT = FALSE,BOOLEAN normalize=FALSE);
-poly redtailBbaBound (LObject *L, int pos,kStrategy strat,int bound,
+poly redtailBbaBound (LObject *L, int end_pos,kStrategy strat,int bound,
                  BOOLEAN withT = FALSE,BOOLEAN normalize=FALSE);
-poly redtailSba (LObject *L, int pos,kStrategy strat,
+poly redtailSba (LObject *L, int end_pos,kStrategy strat,
                  BOOLEAN withT = FALSE,BOOLEAN normalize=FALSE);
-poly redtailBba (TObject *T, int pos,kStrategy strat);
-poly redtail (poly p,int pos,kStrategy strat);
-poly redtail (LObject *L,int pos,kStrategy strat);
+poly redtailBba (TObject *T, int end_pos,kStrategy strat);
+poly redtail (poly p,int end_pos,kStrategy strat);
+poly redtail (LObject *L,int end_pos,kStrategy strat);
 poly redNF (poly h,int & max_ind,int nonorm,kStrategy strat);
 int redNF0 (LObject *P,kStrategy strat);
 poly redNFTail (poly h,const int sl,kStrategy strat);
@@ -591,7 +591,7 @@ int kFindDivisibleByInS(const kStrategy strat, int *max_ind, LObject* L);
 
 int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObject* L);
 TObject*
-kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
+kFindDivisibleByInS(kStrategy strat, int end_pos, LObject* L, TObject *T,
                     long ecart = LONG_MAX);
 
 /***************************************************************
