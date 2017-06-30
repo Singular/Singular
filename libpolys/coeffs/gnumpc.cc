@@ -489,7 +489,7 @@ static number ngcMapR(number from, const coeffs aRing, const coeffs r)
 
   if ( from != NULL )
   {
-    gmp_complex *res=new gmp_complex((double)nrFloat(from)); // FIXME? TODO? // extern float   nrFloat(number n);
+    gmp_complex *res=new gmp_complex((double)nrFloat(from));
     return (number)res;
   }
   else

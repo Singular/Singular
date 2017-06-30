@@ -8,17 +8,18 @@
 
 
 
-#include "misc/auxiliary.h"
-#include "misc/mylimits.h"
+#include "libpolys/misc/auxiliary.h"
+#include "libpolys/misc/mylimits.h"
 
-#include "reporter/reporter.h"
+#include "libpolys/reporter/reporter.h"
+#include "omalloc/omalloc.h"
 
-#include "numbers.h"
-#include "coeffs.h"
-#include "mpr_complex.h"
+#include "libpolys/coeffs/numbers.h"
+#include "libpolys/coeffs/coeffs.h"
+#include "libpolys/coeffs/mpr_complex.h"
 
-#include "shortfl.h"
-#include "longrat.h"
+#include "libpolys/coeffs/shortfl.h"
+#include "libpolys/coeffs/longrat.h"
 
 #include <string.h>
 #include <math.h>
@@ -54,25 +55,25 @@ nMapFunc nrSetMap(const coeffs src, const coeffs dst);
 // int     nrGetChar();
 number nrMapQ(number from, const coeffs r, const coeffs aRing);
 
-static const float nrEps = 1.0e-3;
+static const SI_FLOAT nrEps = 1.0e-3;
 
 union nf
 {
-  float _f;
+  SI_FLOAT _f;
   number _n;
 
-  nf(float f): _f(f){};
+  nf(SI_FLOAT f): _f(f){};
 
   nf(number n): _n(n){};
 
-  inline float F() const {return _f;}
+  inline SI_FLOAT F() const {return _f;}
   inline number N() const {return _n;}
 };
 
 
 
 
-float nrFloat(number n)
+SI_FLOAT nrFloat(number n)
 {
   return nf(n).F();
 }
@@ -106,7 +107,7 @@ number nrInit (long i, const coeffs r)
 {
   assume( getCoeffType(r) == n_R );
 
-  float f = (float)i;
+  SI_FLOAT f = (SI_FLOAT)i;
   return nf(nf(f).F()).N();
 }
 
@@ -118,8 +119,8 @@ long nrInt(number &n, const coeffs r)
   assume( getCoeffType(r) == n_R );
 
   long i;
-  float f = nf(n).F();
-  if (((float)(-MAX_INT_VAL-1) <= f) || ((float)MAX_INT_VAL >= f))
+  SI_FLOAT f = nf(n).F();
+  if (((SI_FLOAT)(-MAX_INT_VAL-1) <= f) || ((SI_FLOAT)MAX_INT_VAL >= f))
     i = (long)f;
   else
     i = 0;
@@ -128,7 +129,7 @@ long nrInt(number &n, const coeffs r)
 
 int nrSize(number n, const coeffs)
 {
-  float f = nf(n).F();
+  SI_FLOAT f = nf(n).F();
   int i = (int)f;
   /* basically return the largest integer in n;
      only if this happens to be zero although n != 0,
@@ -142,9 +143,9 @@ number nrAdd (number a, number b, const coeffs r)
 {
   assume( getCoeffType(r) == n_R );
 
-  float x = nf(a).F();
-  float y = nf(b).F();
-  float f = x + y;
+  SI_FLOAT x = nf(a).F();
+  SI_FLOAT y = nf(b).F();
+  SI_FLOAT f = x + y;
   if (x > 0.0)
   {
     if (y < 0.0)
@@ -174,9 +175,9 @@ number nrSub (number a, number b, const coeffs r)
 {
   assume( getCoeffType(r) == n_R );
 
-  float x = nf(a).F();
-  float y = nf(b).F();
-  float f = x - y;
+  SI_FLOAT x = nf(a).F();
+  SI_FLOAT y = nf(b).F();
+  SI_FLOAT f = x - y;
   if (x > 0.0)
   {
     if (y > 0.0)
@@ -213,7 +214,7 @@ BOOLEAN nrIsOne (number a, const coeffs r)
 {
   assume( getCoeffType(r) == n_R );
 
-  float aa=nf(a).F()-1.0;
+  SI_FLOAT aa=nf(a).F()-1.0;
   if (aa<0.0) aa=-aa;
   return (aa<nrEps);
 }
@@ -222,7 +223,7 @@ BOOLEAN nrIsMOne (number a, const coeffs r)
 {
   assume( getCoeffType(r) == n_R );
 
-  float aa=nf(a).F()+1.0;
+  SI_FLOAT aa=nf(a).F()+1.0;
   if (aa<0.0) aa=-aa;
   return (aa<nrEps);
 }
@@ -231,11 +232,11 @@ number nrDiv (number a,number b, const coeffs r)
 {
   assume( getCoeffType(r) == n_R );
 
-  float n = nf(b).F();
+  SI_FLOAT n = nf(b).F();
   if (n == 0.0)
   {
     WerrorS(nDivBy0);
-    return nf((float)0.0).N();
+    return nf((SI_FLOAT)0.0).N();
   }
   else
     return nf(nf(a).F() / n).N();
@@ -245,11 +246,11 @@ number  nrInvers (number c, const coeffs r)
 {
   assume( getCoeffType(r) == n_R );
 
-  float n = nf(c).F();
+  SI_FLOAT n = nf(c).F();
   if (n == 0.0)
   {
     WerrorS(nDivBy0);
-    return nf((float)0.0).N();
+    return nf((SI_FLOAT)0.0).N();
   }
   return nf(1.0 / n).N();
 }
@@ -273,7 +274,7 @@ BOOLEAN nrEqual (number a,number b, const coeffs r)
   assume( getCoeffType(r) == n_R );
 
   number x = nrSub(a,b,r);
-  return nf(x).F() == nf((float)0.0).F();
+  return nf(x).F() == nf((SI_FLOAT)0.0).F();
 }
 
 void nrWrite (number a, const coeffs r)
@@ -318,7 +319,7 @@ void nrPower (number a, int i, number * result, const coeffs r)
 #endif
 
 namespace {
-  static const char* nrEatr(const char *s, float *r)
+  static const char* nrEatr(const char *s, SI_FLOAT *r)
   {
     int i;
 
@@ -329,7 +330,7 @@ namespace {
       {
         *r *= 10.0;
         i = *s++ - '0';
-        *r += (float)i;
+        *r += (SI_FLOAT)i;
       }
       while (*s >= '0' && *s <= '9');
     }
@@ -347,8 +348,8 @@ const char * nrRead (const char *s, number *a, const coeffs r)
 
   const char *t;
   const char *start=s;
-  float z1,z2;
-  float n=1.0;
+  SI_FLOAT z1,z2;
+  SI_FLOAT n=1.0;
 
   s = nrEatr(s, &z1);
   if (*s == '/')
@@ -423,7 +424,7 @@ static number nrMapP(number from, const coeffs aRing, const coeffs r)
   assume( getCoeffType(aRing) ==  n_Zp );
 
   int i = (int)((long)from);
-  float f = (float)i;
+  SI_FLOAT f = (SI_FLOAT)i;
   return nf(f).N();
 }
 
@@ -432,7 +433,7 @@ static number nrMapLongR(number from, const coeffs aRing, const coeffs r)
   assume( getCoeffType(r) == n_R );
   assume( getCoeffType(aRing) == n_long_R );
 
-  float t =(float)mpf_get_d((mpf_srcptr)from);
+  SI_FLOAT t =(SI_FLOAT)mpf_get_d((mpf_srcptr)from);
   return nf(t).N();
 }
 
@@ -442,7 +443,7 @@ static number nrMapC(number from, const coeffs aRing, const coeffs r)
   assume( getCoeffType(aRing) == n_long_C );
 
   gmp_float h = ((gmp_complex*)from)->real();
-  float t =(float)mpf_get_d((mpf_srcptr)&h);
+  SI_FLOAT t =(SI_FLOAT)mpf_get_d((mpf_srcptr)&h);
   return nf(t).N();
 }
 
@@ -493,13 +494,13 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
   {
     if(i>4)
     {
-      WerrorS("float overflow");
+      WerrorS("SI_FLOAT overflow");
       return nf(0.0).N();
     }
     double basis;
     signed long int exp;
     basis = mpf_get_d_2exp(&exp, e);
-    float f= sign*ldexp(basis,exp);
+    SI_FLOAT f= sign*ldexp(basis,exp);
     mpf_clear(e);
     return nf(f).N();
   }
@@ -509,7 +510,7 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
   int j = mpz_size1(n);
   if(j-i>4)
   {
-    WerrorS("float overflow");
+    WerrorS("SI_FLOAT overflow");
     mpf_clear(e);
     return nf(0.0).N();
   }
@@ -525,7 +526,7 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
   double basis;
   signed long int exp;
   basis = mpf_get_d_2exp(&exp, q);
-  float f = sign*ldexp(basis,exp);
+  SI_FLOAT f = sign*ldexp(basis,exp);
   mpf_clear(e);
   mpf_clear(d);
   mpf_clear(q);
@@ -571,7 +572,7 @@ number nrMapZ(number from, const coeffs aRing, const coeffs r)
   double basis;
   signed long int exp;
   basis = mpf_get_d_2exp(&exp, e);
-  float f= sign*ldexp(basis,exp);
+  SI_FLOAT f= sign*ldexp(basis,exp);
   mpf_clear(e);
   return nf(f).N();
 }
@@ -601,13 +602,13 @@ number nrMapZ(number from, const coeffs aRing, const coeffs r)
 //   mpz_t h;
 //   mpz_ptr g,z,n;
 //   int i,j,t,s;
-//   float ba,rr,rn,y;
+//   SI_FLOAT ba,rr,rn,y;
 
 //   if (IS_IMM(from))
-//     return nf((float)nlInt(from,NULL /* dummy for nlInt*/)).N();
+//     return nf((SI_FLOAT)nlInt(from,NULL /* dummy for nlInt*/)).N();
 //   z=GET_NOM(from);
 //   s=0X10000;
-//   ba=(float)s;
+//   ba=(SI_FLOAT)s;
 //   ba*=ba;
 //   rr=0.0;
 //   i=mpz_size1(z);
@@ -615,15 +616,15 @@ number nrMapZ(number from, const coeffs aRing, const coeffs r)
 //   {
 //     if(i>4)
 //     {
-//       WerrorS("float overflow");
+//       WerrorS("SI_FLOAT overflow");
 //       return nf(rr).N();
 //     }
 //     i--;
-//     rr=(float)mpz_limb_d(z)[i];
+//     rr=(SI_FLOAT)mpz_limb_d(z)[i];
 //     while(i>0)
 //     {
 //       i--;
-//       y=(float)mpz_limb_d(z)[i];
+//       y=(SI_FLOAT)mpz_limb_d(z)[i];
 //       rr=rr*ba+y;
 //     }
 //     if(mpz_isNeg(z))
@@ -641,7 +642,7 @@ number nrMapZ(number from, const coeffs aRing, const coeffs r)
 //   if(t>4)
 //   {
 //     if(j==s)
-//       WerrorS("float overflow");
+//       WerrorS("SI_FLOAT overflow");
 //     return nf(rr).N();
 //   }
 //   if(t>1)
@@ -654,15 +655,15 @@ number nrMapZ(number from, const coeffs aRing, const coeffs r)
 //     {
 //       MPZ_CLEAR(g);
 //       if(j==s)
-//         WerrorS("float overflow");
+//         WerrorS("SI_FLOAT overflow");
 //       return nf(rr).N();
 //     }
 //     t--;
-//     rr=(float)mpz_limb_d(g)[t];
+//     rr=(SI_FLOAT)mpz_limb_d(g)[t];
 //     while(t)
 //     {
 //       t--;
-//       y=(float)mpz_limb_d(g)[t];
+//       y=(SI_FLOAT)mpz_limb_d(g)[t];
 //       rr=rr*ba+y;
 //     }
 //     MPZ_CLEAR(g);
@@ -672,16 +673,16 @@ number nrMapZ(number from, const coeffs aRing, const coeffs r)
 //       rr=-rr;
 //     return nf(rr).N();
 //   }
-//   rn=(float)mpz_limb_d(n)[j-1];
-//   rr=(float)mpz_limb_d(z)[i-1];
+//   rn=(SI_FLOAT)mpz_limb_d(n)[j-1];
+//   rr=(SI_FLOAT)mpz_limb_d(z)[i-1];
 //   if(j>1)
 //   {
-//     rn=rn*ba+(float)mpz_limb_d(n)[j-2];
-//     rr=rr*ba+(float)mpz_limb_d(z)[i-2];
+//     rn=rn*ba+(SI_FLOAT)mpz_limb_d(n)[j-2];
+//     rr=rr*ba+(SI_FLOAT)mpz_limb_d(z)[i-2];
 //     i--;
 //   }
 //   if(t!=0)
-//     rr=rr*ba+(float)mpz_limb_d(z)[i-2];
+//     rr=rr*ba+(SI_FLOAT)mpz_limb_d(z)[i-2];
 //   if(j==s)
 //     rr=rr/rn;
 //   else
