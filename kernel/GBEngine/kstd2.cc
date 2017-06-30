@@ -1206,7 +1206,7 @@ poly redtailSba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
       }
       else
       {
-        With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
+        With = kFindDivisibleByInS_T(strat, pos, &Ln, &With_s);
         if (With == NULL) break;
       }
       cnt--;

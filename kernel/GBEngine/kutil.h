@@ -590,9 +590,7 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
 int kFindDivisibleByInS(const kStrategy strat, int *max_ind, LObject* L);
 
 int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObject* L);
-TObject*
-kFindDivisibleByInS(kStrategy strat, int end_pos, LObject* L, TObject *T,
-                    long ecart = LONG_MAX);
+TObject* kFindDivisibleByInS_T(kStrategy strat, int end_pos, LObject* L, TObject *T, long ecart = LONG_MAX);
 
 /***************************************************************
  *

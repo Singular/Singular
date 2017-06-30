@@ -7353,9 +7353,7 @@ BOOLEAN arriRewCriterionPre(poly sig, unsigned long not_sevSig, poly lm, kStrate
  * Tail reductions
  *
  ***************************************************************/
-TObject*
-kFindDivisibleByInS(kStrategy strat, int end_pos, LObject* L, TObject *T,
-                    long ecart)
+TObject* kFindDivisibleByInS_T(kStrategy strat, int end_pos, LObject* L, TObject *T, long ecart)
 {
   int j = 0;
   const unsigned long not_sev = ~L->sev;
@@ -7525,9 +7523,9 @@ poly redtail (LObject* L, int end_pos, kStrategy strat)
       Ln.Set(hn, strat->tailRing);
       Ln.sev = p_GetShortExpVector(hn, strat->tailRing);
       if (strat->kHEdgeFound)
-        With = kFindDivisibleByInS(strat, end_pos, &Ln, &With_s);
+        With = kFindDivisibleByInS_T(strat, end_pos, &Ln, &With_s);
       else
-        With = kFindDivisibleByInS(strat, end_pos, &Ln, &With_s, e);
+        With = kFindDivisibleByInS_T(strat, end_pos, &Ln, &With_s, e);
       if (With == NULL) break;
       With->length=0;
       With->pLength=0;
@@ -7617,7 +7615,7 @@ poly redtailBba (LObject* L, int end_pos, kStrategy strat, BOOLEAN withT, BOOLEA
       }
       else
       {
-        With = kFindDivisibleByInS(strat, end_pos, &Ln, &With_s);
+        With = kFindDivisibleByInS_T(strat, end_pos, &Ln, &With_s);
         if (With == NULL) break;
       }
       cnt--;
@@ -7724,7 +7722,7 @@ poly redtailBbaBound (LObject* L, int end_pos, kStrategy strat, int bound, BOOLE
       }
       else
       {
-        With = kFindDivisibleByInS(strat, end_pos, &Ln, &With_s);
+        With = kFindDivisibleByInS_T(strat, end_pos, &Ln, &With_s);
         if (With == NULL) break;
       }
       cnt--;
@@ -7821,7 +7819,7 @@ poly redtailBba_Z (LObject* L, int end_pos, kStrategy strat )
     loop
     {
       Ln.SetShortExpVector();
-      With = kFindDivisibleByInS(strat, end_pos, &Ln, &With_s);
+      With = kFindDivisibleByInS_T(strat, end_pos, &Ln, &With_s);
       if (With == NULL) break;
       cnt--;
       if (cnt==0)
@@ -12772,7 +12770,7 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
       }
       else
       {
-        With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
+        With = kFindDivisibleByInS_T(strat, pos, &Ln, &With_s);
         if (With == NULL) break;
       }
       if (normalize && (!TEST_OPT_INTSTRATEGY) && (!nIsOne(pGetCoeff(With->p))))
