@@ -1,8 +1,9 @@
 #include "kernel/mod2.h"
 #include "Singular/blackbox.h"
-#include "interval.h"
+#include "Singular/dyn_modules/interval/interval.h"
 #include "Singular/ipshell.h" // for iiCheckTypes
 #include "Singular/links/ssiLink.h"
+#include "Singular/mod_lib.h"
 
 /*
  * CONSTRUCTORS & DESTRUCTORS
@@ -1203,7 +1204,7 @@ static BOOLEAN evalPolyAtBox(leftv result, leftv args)
  * INIT MODULE
  */
 
-extern "C" int mod_init(SModulFunctions* psModulFunctions)
+extern "C" int SI_MOD_INIT(interval)(SModulFunctions* psModulFunctions)
 {
     blackbox *b_iv = (blackbox*) omAlloc0(sizeof(blackbox)),
              *b_bx = (blackbox*) omAlloc0(sizeof(blackbox));
