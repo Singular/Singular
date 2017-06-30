@@ -6,7 +6,8 @@
 /*
 * ABSTRACT: compatility interface to coeffs
 */
-#include "coeffs/coeffs.h"
+#include "libpolys/coeffs/coeffs.h"
+#include "omalloc/omalloc.h" /* for SIZEOF_DOUBLE, SIZEOF_LONG*/
 
 // the access methods
 //
@@ -51,7 +52,11 @@
 // --------------------------------------------------------------
 // internal to coeffs, but public for all realizations
 
-#define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits
+#if SIZEOF_DOUBE == SIZEOF_LONG
+#define SHORT_REAL_LENGTH 16 // use double for real <= 15 digits
+#else
+#define SHORT_REAL_LENGTH 6 // use float for real <= 6 digits
+#endif
 
 /* the dummy routines: */
 // void nDummy1(number* d);

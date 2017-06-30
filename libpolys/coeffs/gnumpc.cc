@@ -382,8 +382,8 @@ static BOOLEAN ngcCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
     LongComplexInfo* p = (LongComplexInfo *)(parameter);
 
     if ((p==NULL)
-      && (6==r->float_len)
-      && (6==r->float_len2)
+      && (SHORT_REAL_LENGTH==r->float_len)
+      && (SHORT_REAL_LENGTH==r->float_len2)
       && (strcmp("i",n_ParameterNames(r)[0]) == 0)
       )
         return TRUE;
@@ -429,7 +429,7 @@ static char* ngcCoeffName(const coeffs r)
 
 static void ngcCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
-  Print("float[%s](complex:%d digits, additional %d digits)/(%s^2+1)",n_ParameterNames(r)[0],
+  Print("real[%s](complex:%d digits, additional %d digits)/(%s^2+1)",n_ParameterNames(r)[0],
         r->float_len, r->float_len2, n_ParameterNames(r)[0]);  /* long C */
 }
 

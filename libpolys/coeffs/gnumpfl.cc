@@ -502,7 +502,7 @@ static nMapFunc ngfSetMap(const coeffs src, const coeffs dst)
 
 static void ngfCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
-  Print("float(real:%d digits, additional %d digits)",
+  Print("real:%d digits, additional %d digits",
                r->float_len,r->float_len2);  /* long R */
 }
 
