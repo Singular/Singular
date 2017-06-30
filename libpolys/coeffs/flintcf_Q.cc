@@ -6,7 +6,7 @@
 */
 #include <ctype.h> /* isdigit*/
 
-#include "misc/auxiliary.h"
+#include "libpolys/misc/auxiliary.h"
 
 #ifdef HAVE_FLINT
 
@@ -15,10 +15,10 @@
 #include "factory/factory.h"
 
 #include "omalloc/omalloc.h"
-#include "coeffs/coeffs.h"
+#include "libpolys/coeffs/coeffs.h"
 
-#include "coeffs/numbers.h"
-#include "coeffs/longrat.h"
+#include "libpolys/coeffs/numbers.h"
+#include "libpolys/coeffs/longrat.h"
 
 typedef fmpq_poly_struct *fmpq_poly_ptr;
 typedef fmpz *fmpz_ptr;

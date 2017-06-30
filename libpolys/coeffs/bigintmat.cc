@@ -7,12 +7,12 @@
  *    */
 
 
-#include <misc/auxiliary.h>
+#include "libpolys/misc/auxiliary.h"
 
-#include "bigintmat.h"
-#include <misc/intvec.h>
+#include "libpolys/coeffs/bigintmat.h"
+#include "libpolys/misc/intvec.h"
 
-#include "rmodulon.h"
+#include "libpolys/coeffs/rmodulon.h"
 
 #include <math.h>
 #include <string.h>

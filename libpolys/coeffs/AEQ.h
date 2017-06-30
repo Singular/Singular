@@ -1,8 +1,8 @@
 #ifndef QPOLY
 #define QPOLY
 
-#include "misc/auxiliary.h"
-#include "si_gmp.h"
+#include "libpolys/misc/auxiliary.h"
+#include "libpolys/coeffs/si_gmp.h"
 
 #ifdef SINGULAR_4_2
 

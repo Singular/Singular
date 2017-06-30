@@ -4,18 +4,18 @@
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
-#include "misc/auxiliary.h"
+#include "libpolys/misc/auxiliary.h"
 #include "omalloc/omalloc.h"
 
-#include "misc/mylimits.h"
-#include "misc/sirandom.h"
+#include "libpolys/misc/mylimits.h"
+#include "libpolys/misc/sirandom.h"
 
-#include "reporter/reporter.h"
+#include "libpolys/reporter/reporter.h"
 
-#include "coeffs.h"
-#include "numbers.h"
-#include "longrat.h"
-#include "ffields.h"
+#include "libpolys/coeffs/coeffs.h"
+#include "libpolys/coeffs/numbers.h"
+#include "libpolys/coeffs/longrat.h"
+#include "libpolys/coeffs/ffields.h"
 
 #include <string.h>
 #include <math.h>

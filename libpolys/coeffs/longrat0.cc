@@ -9,13 +9,13 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "misc/auxiliary.h"
+#include "libpolys/misc/auxiliary.h"
 #include "omalloc/omalloc.h"
-#include "reporter/reporter.h"
+#include "libpolys/reporter/reporter.h"
 
-#include "coeffs.h"
-#include "numbers.h"
-#include "longrat.h"
+#include "libpolys/coeffs/coeffs.h"
+#include "libpolys/coeffs/numbers.h"
+#include "libpolys/coeffs/longrat.h"
 
 omBin rnumber_bin = omGetSpecBin(sizeof(snumber)); // TODO: move this into coeffs-struct (for Q)?!
 

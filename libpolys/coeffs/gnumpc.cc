@@ -6,22 +6,22 @@
 *
 * ngc == number gnu complex
 */
-#include "misc/auxiliary.h"
+#include "libpolys/misc/auxiliary.h"
 #include "omalloc/omalloc.h"
 
-#include "misc/mylimits.h"
-#include "reporter/reporter.h"
+#include "libpolys/misc/mylimits.h"
+#include "libpolys/reporter/reporter.h"
 
-#include "coeffs.h"
-#include "numbers.h"
+#include "libpolys/coeffs/coeffs.h"
+#include "libpolys/coeffs/numbers.h"
 
-#include "mpr_complex.h"
+#include "libpolys/coeffs/mpr_complex.h"
 
-#include "gnumpc.h"
-#include "longrat.h"
-#include "gnumpfl.h"
-#include "modulop.h"
-#include "shortfl.h"
+#include "libpolys/coeffs/gnumpc.h"
+#include "libpolys/coeffs/longrat.h"
+#include "libpolys/coeffs/gnumpfl.h"
+#include "libpolys/coeffs/modulop.h"
+#include "libpolys/coeffs/shortfl.h"
 
 #ifdef LDEBUG
 BOOLEAN  ngcDBTest(number a, const char *f, const int l, const coeffs r);

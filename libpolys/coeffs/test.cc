@@ -1,24 +1,24 @@
-#include "misc/auxiliary.h"
+#include "libpolys/misc/auxiliary.h"
 
 #include "factory/factory.h"
 
 #include "omalloc/omalloc.h"
 
-#include "reporter/reporter.h"
+#include "libpolys/reporter/reporter.h"
 #include "resources/feResource.h"
 
-#include "coeffs.h"
-#include "numbers.h"
+#include "libpolys/coeffs/coeffs.h"
+#include "libpolys/coeffs/numbers.h"
 
-#include "longrat.h"
-#include "gnumpfl.h"
-#include "gnumpc.h"
-#include "shortfl.h"
-#include "ffields.h"
-#include "modulop.h"
-#include "rmodulon.h"
-#include "rmodulo2m.h"
-#include "rintegers.h"
+#include "libpolys/coeffs/longrat.h"
+#include "libpolys/coeffs/gnumpfl.h"
+#include "libpolys/coeffs/gnumpc.h"
+#include "libpolys/coeffs/shortfl.h"
+#include "libpolys/coeffs/ffields.h"
+#include "libpolys/coeffs/modulop.h"
+#include "libpolys/coeffs/rmodulon.h"
+#include "libpolys/coeffs/rmodulo2m.h"
+#include "libpolys/coeffs/rintegers.h"
 
 
 #include <iostream>

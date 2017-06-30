@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: numbers modulo n
 */
-#include "misc/auxiliary.h"
+#include "libpolys/misc/auxiliary.h"
 
 #ifdef HAVE_RINGS
 

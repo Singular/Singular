@@ -4,21 +4,21 @@
 /*
 * ABSTRACT: numbers modulo 2^m
 */
-#include "misc/auxiliary.h"
+#include "libpolys/misc/auxiliary.h"
 
 #include "omalloc/omalloc.h"
 
-#include "misc/mylimits.h"
-#include "reporter/reporter.h"
+#include "libpolys/misc/mylimits.h"
+#include "libpolys/reporter/reporter.h"
 
-#include "si_gmp.h"
-#include "coeffs.h"
-#include "numbers.h"
-#include "longrat.h"
-#include "mpr_complex.h"
+#include "libpolys/coeffs/si_gmp.h"
+#include "libpolys/coeffs/coeffs.h"
+#include "libpolys/coeffs/numbers.h"
+#include "libpolys/coeffs/longrat.h"
+#include "libpolys/coeffs/mpr_complex.h"
 
-#include "rmodulo2m.h"
-#include "rmodulon.h"
+#include "libpolys/coeffs/rmodulo2m.h"
+#include "libpolys/coeffs/rmodulon.h"
 
 #include <string.h>
 

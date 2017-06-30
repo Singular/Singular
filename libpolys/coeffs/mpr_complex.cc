@@ -11,17 +11,17 @@
 // WARNING! ALWAYS use omAlloc and FreeL when alloc. memory for some char* !!
 
 
-#include "misc/auxiliary.h"
+#include "libpolys/misc/auxiliary.h"
 #include "omalloc/omalloc.h"
 
-#include "reporter/reporter.h"
+#include "libpolys/reporter/reporter.h"
 
-#include "coeffs/coeffs.h"
-#include "coeffs/numbers.h"
+#include "libpolys/coeffs/coeffs.h"
+#include "libpolys/coeffs/numbers.h"
 
-#include "coeffs/mpr_complex.h"
+#include "libpolys/coeffs/mpr_complex.h"
 
-#include "longrat.h"
+#include "libpolys/coeffs/longrat.h"
 
 #include <math.h>
 

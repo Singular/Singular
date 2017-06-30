@@ -5,19 +5,25 @@
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
 
-#include "misc/auxiliary.h"
+#include "libpolys/misc/auxiliary.h"
 #include "omalloc/omalloc.h"
 
 #include "factory/factory.h"
 
-#include "misc/sirandom.h"
-#include "misc/prime.h"
-#include "reporter/reporter.h"
+#include "libpolys/misc/sirandom.h"
+#include "libpolys/misc/prime.h"
+#include "libpolys/reporter/reporter.h"
 
-#include "rmodulon.h" // ZnmInfo
-#include "longrat.h"
-#include "shortfl.h"
-#include "modulop.h"
+#include "libpolys/coeffs/coeffs.h"
+#include "libpolys/coeffs/numbers.h"
+#include "libpolys/coeffs/rmodulon.h" // ZnmInfo
+#include "libpolys/coeffs/longrat.h"
+#include "libpolys/coeffs/shortfl.h"
+#include "libpolys/coeffs/modulop.h"
+#include "libpolys/coeffs/mpr_complex.h"
+
+#include <string.h>
+#include <float.h>
 
 // allow inlining only from p_Numbers.h and if ! LDEBUG
 #if defined(DO_LINLINE) && defined(P_NUMBERS_H) && !defined(LDEBUG)
@@ -131,14 +137,6 @@ static inline number nlShort3(number x) // assume x->s==3
 
 #ifndef LONGRAT_CC
 #define LONGRAT_CC
-
-#include <string.h>
-#include <float.h>
-
-#include "coeffs/coeffs.h"
-
-#include "coeffs/numbers.h"
-#include "coeffs/mpr_complex.h"
 
 #ifndef BYTES_PER_MP_LIMB
 #define BYTES_PER_MP_LIMB sizeof(mp_limb_t)

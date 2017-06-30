@@ -4,20 +4,20 @@
 /*
 * ABSTRACT: numbers modulo n
 */
-#include "misc/auxiliary.h"
+#include "libpolys/misc/auxiliary.h"
 #include "omalloc/omalloc.h"
 
-#include "misc/mylimits.h"
-#include "reporter/reporter.h"
+#include "libpolys/misc/mylimits.h"
+#include "libpolys/reporter/reporter.h"
 
-#include "si_gmp.h"
-#include "coeffs.h"
-#include "numbers.h"
+#include "libpolys/coeffs/si_gmp.h"
+#include "libpolys/coeffs/coeffs.h"
+#include "libpolys/coeffs/numbers.h"
 
-#include "mpr_complex.h"
+#include "libpolys/coeffs/mpr_complex.h"
 
-#include "longrat.h"
-#include "rmodulon.h"
+#include "libpolys/coeffs/longrat.h"
+#include "libpolys/coeffs/rmodulon.h"
 
 #include <string.h>
 

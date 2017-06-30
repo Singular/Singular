@@ -10,7 +10,7 @@
 #define FLINTCF_ZN_H
 
 #include "singularconfig.h"
-#include "misc/auxiliary.h"
+#include "libpolys/misc/auxiliary.h"
 
 #ifdef HAVE_FLINT
 typedef struct

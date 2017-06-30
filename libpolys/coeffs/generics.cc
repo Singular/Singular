@@ -5,26 +5,25 @@
 * ABSTRACT: numbers (integers)
 */
 
-#include "misc/auxiliary.h"
+#include "libpolys/misc/auxiliary.h"
 #include "omalloc/omalloc.h"
 
 #include "factory/factory.h"
 
-#include "misc/mylimits.h"
-#include "reporter/reporter.h"
+#include "libpolys/misc/mylimits.h"
+#include "libpolys/reporter/reporter.h"
 
-#include "coeffs.h"
-#include "longrat.h"
-#include "numbers.h"
+#include "libpolys/coeffs/coeffs.h"
+#include "libpolys/coeffs/longrat.h"
+#include "libpolys/coeffs/numbers.h"
 
-#include "si_gmp.h"
+#include "libpolys/coeffs/si_gmp.h"
 
-#include "generics.h"
-#include <string.h>
+#include "libpolys/coeffs/generics.h"
  
-#include "longrat.h"
-#include "rintegers.h"
+#include "libpolys/coeffs/rintegers.h"
 
+#include <string.h>
 
 struct generic_pair
 {

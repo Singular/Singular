@@ -8,7 +8,7 @@
 */
 
 #include "singularconfig.h"
-#include "misc/auxiliary.h"
+#include "libpolys/misc/auxiliary.h"
 
 
 struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
