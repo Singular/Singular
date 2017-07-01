@@ -1,10 +1,10 @@
 #include "kernel/mod2.h"
 
-#include "tok.h"
-#include "subexpr.h"
-#include "ipshell.h"
+#include "Singular/tok.h"
+#include "Singular/subexpr.h"
+#include "Singular/ipshell.h"
 
-#include "blackbox.h"
+#include "Singular/blackbox.h"
 
 #define MAX_BB_TYPES 256
 // #define BLACKBOX_DEVEL 1
@@ -151,13 +151,14 @@ int setBlackboxStuff(blackbox *bb, const char *n)
     {
       if ((blackboxName[i]!=NULL) && (strcmp(blackboxName[i],n)==0))
       {
-        Warn("redefining blackbox type %s (%d -> %d)",n,i+BLACKBOX_OFFSET,where+BLACKBOX_OFFSET);
+        Warn("not redefining blackbox type %s (%d)",n,i+BLACKBOX_OFFSET);
+        return 0;
       }
     }
     blackboxTable[where]=bb;
     blackboxName[where]=omStrDup(n);
 #ifdef BLACKBOX_DEVEL
-  Print("setBlackboxStuff: define bb:name=%s:rt=%d (table:cnt=%d)\n",blackboxName[where],where+BLACKBOX_OFFSET,where);
+    Print("setBlackboxStuff: define bb:name=%s:rt=%d (table:cnt=%d)\n",blackboxName[where],where+BLACKBOX_OFFSET,where);
 #endif
     if (bb->blackbox_destroy==NULL) bb->blackbox_destroy=blackbox_default_destroy;
     if (bb->blackbox_String==NULL)  bb->blackbox_String=blackbox_default_String;
