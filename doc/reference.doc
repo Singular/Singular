@@ -6320,6 +6320,7 @@ int
 @item @strong{Purpose:}
 prints a list of all reserved identifiers (first form) or tests
 whether the string is a reserved identifier (second form).
+This includes blackbox/newstruct types.
 @item @strong{Example:}
 @smallexample
 reservedName();

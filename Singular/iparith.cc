@@ -4582,6 +4582,7 @@ static BOOLEAN jjP2N(leftv res, leftv v)
 static BOOLEAN jjRESERVEDNAME(leftv res, leftv v)
 {
   char *s= (char *)v->Data();
+  // try system keywords
   for(unsigned i=0; i<sArithBase.nCmdUsed; i++)
   {
     //Print("test %d, >>%s<<, tab:>>%s<<\n",i,s,sArithBase.sCmds[i].name);
@@ -4591,7 +4592,13 @@ static BOOLEAN jjRESERVEDNAME(leftv res, leftv v)
       return FALSE;
     }
   }
-  //res->data = (char *)0;
+  // try blackbox names
+  int id;
+  blackboxIsCmd(s,id);
+  if (id>0)
+  {
+    res->data = (char *)1;
+  }
   return FALSE;
 }
 static BOOLEAN jjRANK1(leftv res, leftv v)
