@@ -50,19 +50,22 @@ rootIsolationNoPreprocessing(I,L,e);
                         computes boxes containing unique roots of I lying in L
 rootIsolation(I,B,e);   slims down input box B and calls rootIsolationNoPreprocessing
 ";
+LIB "atkins.lib"; // for round (tmp?)
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc mod_init()
 {
     LIB "interval.so";
-    LIB "atkins.lib"; // for round (tmp?)
 
-    newstruct("ivmat", "list rows");
-    system("install", "ivmat", "print", ivmatPrint,           1);
-    system("install", "ivmat", "[",     ivmatGet,             2);
-    system("install", "ivmat", "nrows", ivmatNrows,           1);
-    system("install", "ivmat", "ncols", ivmatNcols,           1);
-    system("install", "ivmat", "*",     ivmatMultiplyGeneral, 2);
+    if (!reservedName("ivmat"))
+    {
+      newstruct("ivmat", "list rows");
+      system("install", "ivmat", "print", ivmatPrint,           1);
+      system("install", "ivmat", "[",     ivmatGet,             2);
+      system("install", "ivmat", "nrows", ivmatNrows,           1);
+      system("install", "ivmat", "ncols", ivmatNcols,           1);
+      system("install", "ivmat", "*",     ivmatMultiplyGeneral, 2);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
