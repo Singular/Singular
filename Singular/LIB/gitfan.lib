@@ -423,7 +423,6 @@ EXAMPLE: example computeAfaceOrbits; shows an example
 example
 {
   echo = 2;
-LIB "gitfan.lib";
   ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
   ideal J =
     T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
