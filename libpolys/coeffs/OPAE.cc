@@ -6,17 +6,17 @@
 */
 //Schauen was hier überhaupt sinn macht
 
-#include "libpolys/misc/auxiliary.h"
+#include "misc/auxiliary.h"
 
 #ifdef SINGULAR_4_2
 #include "omalloc/omalloc.h"
 #include "factory/factory.h"
-#include "libpolys/misc/mylimits.h"
-#include "libpolys/reporter/reporter.h"
+#include "misc/mylimits.h"
+#include "reporter/reporter.h"
 
-#include "libpolys/coeffs/coeffs.h"
-#include "libpolys/coeffs/numbers.h"
-#include "libpolys/coeffs/mpr_complex.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
+#include "coeffs/mpr_complex.h"
 
 #include "OPAE.h"
 #include "AE.h"

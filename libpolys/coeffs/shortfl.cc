@@ -8,18 +8,18 @@
 
 
 
-#include "libpolys/misc/auxiliary.h"
-#include "libpolys/misc/mylimits.h"
+#include "misc/auxiliary.h"
+#include "misc/mylimits.h"
 
-#include "libpolys/reporter/reporter.h"
+#include "reporter/reporter.h"
 #include "omalloc/omalloc.h"
 
-#include "libpolys/coeffs/numbers.h"
-#include "libpolys/coeffs/coeffs.h"
-#include "libpolys/coeffs/mpr_complex.h"
+#include "coeffs/numbers.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/mpr_complex.h"
 
-#include "libpolys/coeffs/shortfl.h"
-#include "libpolys/coeffs/longrat.h"
+#include "coeffs/shortfl.h"
+#include "coeffs/longrat.h"
 
 #include <string.h>
 #include <math.h>

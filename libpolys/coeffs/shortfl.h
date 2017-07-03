@@ -6,7 +6,7 @@
 /*
 * ABSTRACT
 */
-#include "libpolys/misc/auxiliary.h"
+#include "misc/auxiliary.h"
 #include "omalloc/omalloc.h" /* for SIZEOF_DOUBLE */
 
 #if SIZEOF_DOUBLE == SIZEOF_LONG

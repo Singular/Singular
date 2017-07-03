@@ -29,8 +29,8 @@
 # define omsai 1
 #if omsai
 
-#include "libpolys/polys/ext_fields/transext.h"
-#include "libpolys/coeffs/coeffs.h"
+#include "polys/ext_fields/transext.h"
+#include "coeffs/coeffs.h"
 #include "kernel/linear_algebra/linearAlgebra.h"
 #include "coeffs/numbers.h"
 #include <vector>

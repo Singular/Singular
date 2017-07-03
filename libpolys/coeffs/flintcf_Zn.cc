@@ -6,7 +6,7 @@
 */
 #include <ctype.h> /* isdigit*/
 
-#include "libpolys/misc/auxiliary.h"
+#include "misc/auxiliary.h"
 
 #ifdef HAVE_FLINT
 
@@ -15,12 +15,12 @@
 #include "factory/factory.h"
 
 #include "omalloc/omalloc.h"
-#include "libpolys/coeffs/coeffs.h"
+#include "coeffs/coeffs.h"
 
-#include "libpolys/coeffs/numbers.h"
-#include "libpolys/coeffs/longrat.h"
-#include "libpolys/coeffs/modulop.h"
-#include "libpolys/coeffs/flintcf_Zn.h"
+#include "coeffs/numbers.h"
+#include "coeffs/longrat.h"
+#include "coeffs/modulop.h"
+#include "coeffs/flintcf_Zn.h"
 
 typedef nmod_poly_struct *nmod_poly_ptr;
 

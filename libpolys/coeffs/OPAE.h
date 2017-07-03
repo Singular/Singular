@@ -4,7 +4,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-#include "libpolys/misc/auxiliary.h"
+#include "misc/auxiliary.h"
 
 #ifdef SINGULAR_4_2
 struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;

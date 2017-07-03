@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: compatility interface to coeffs
 */
-#include "libpolys/coeffs/coeffs.h"
+#include "coeffs/coeffs.h"
 #include "omalloc/omalloc.h" /* for SIZEOF_DOUBLE, SIZEOF_LONG*/
 
 // the access methods

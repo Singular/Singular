@@ -5,23 +5,23 @@
 * ABSTRACT: numbers (integers)
 */
 
-#include "libpolys/misc/auxiliary.h"
+#include "misc/auxiliary.h"
 #include "omalloc/omalloc.h"
 
 #include "factory/factory.h"
 
-#include "libpolys/misc/mylimits.h"
-#include "libpolys/reporter/reporter.h"
+#include "misc/mylimits.h"
+#include "reporter/reporter.h"
 
-#include "libpolys/coeffs/coeffs.h"
-#include "libpolys/coeffs/longrat.h"
-#include "libpolys/coeffs/numbers.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/longrat.h"
+#include "coeffs/numbers.h"
 
-#include "libpolys/coeffs/si_gmp.h"
+#include "coeffs/si_gmp.h"
 
-#include "libpolys/coeffs/generics.h"
+#include "coeffs/generics.h"
  
-#include "libpolys/coeffs/rintegers.h"
+#include "coeffs/rintegers.h"
 
 #include <string.h>
 

@@ -6,7 +6,7 @@
 */
 //Schauen was hier überhaupt sinn macht
 
-#include "libpolys/misc/auxiliary.h"
+#include "misc/auxiliary.h"
 
 #ifdef SINGULAR_4_2
 

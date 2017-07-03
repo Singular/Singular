@@ -5,22 +5,22 @@
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
 
-#include "libpolys/misc/auxiliary.h"
+#include "misc/auxiliary.h"
 #include "omalloc/omalloc.h"
 
 #include "factory/factory.h"
 
-#include "libpolys/misc/sirandom.h"
-#include "libpolys/misc/prime.h"
-#include "libpolys/reporter/reporter.h"
+#include "misc/sirandom.h"
+#include "misc/prime.h"
+#include "reporter/reporter.h"
 
-#include "libpolys/coeffs/coeffs.h"
-#include "libpolys/coeffs/numbers.h"
-#include "libpolys/coeffs/rmodulon.h" // ZnmInfo
-#include "libpolys/coeffs/longrat.h"
-#include "libpolys/coeffs/shortfl.h"
-#include "libpolys/coeffs/modulop.h"
-#include "libpolys/coeffs/mpr_complex.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
+#include "coeffs/rmodulon.h" // ZnmInfo
+#include "coeffs/longrat.h"
+#include "coeffs/shortfl.h"
+#include "coeffs/modulop.h"
+#include "coeffs/mpr_complex.h"
 
 #include <string.h>
 #include <float.h>
