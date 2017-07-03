@@ -1137,6 +1137,37 @@ example
 
 proc lpUfGkDim(ideal G)
 {
+  G = lead(G);
+
+  int l = 0;
+  for (int i = 1; i <= size(G); i++) {
+    // find the max degree in G
+    int d = deg(G[i]);
+    if (d > l) {
+      l = d;
+    }
+
+    // also if G is the whole ring return minus infinity
+    if (leadmonom(G[i]) == 1) {
+      return(-2); // minus infinity
+    }
+  }
+  // if longet word has length 1 we handle it as a special case
+  if (l == 1) {
+    int n = attrib(basering, "lV"); // variable count
+    int k = size(G);
+    if (k == n) {
+      return(0);
+    }
+    if (k == n-1) {
+      return(1);
+    }
+    if (k <= n-2) {
+      return(-1);
+    }
+  }
+
+  // otherwise count cycles in the Ufnarovskij Graph
   return(UfGraphGrowth(lpUfGraph(G)));
 }
 
