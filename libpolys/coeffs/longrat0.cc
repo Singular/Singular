@@ -13,9 +13,9 @@
 #include "omalloc/omalloc.h"
 #include "reporter/reporter.h"
 
-#include "coeffs.h"
-#include "numbers.h"
-#include "longrat.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
+#include "coeffs/longrat.h"
 
 omBin rnumber_bin = omGetSpecBin(sizeof(snumber)); // TODO: move this into coeffs-struct (for Q)?!
 

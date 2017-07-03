@@ -12,10 +12,10 @@
 
 #include "reporter/reporter.h"
 
-#include "coeffs.h"
-#include "numbers.h"
-#include "longrat.h"
-#include "ffields.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
+#include "coeffs/longrat.h"
+#include "coeffs/ffields.h"
 
 #include <string.h>
 #include <math.h>

@@ -13,16 +13,16 @@
 #include "misc/mylimits.h"
 #include "reporter/reporter.h"
 
-#include "coeffs.h"
-#include "longrat.h"
-#include "numbers.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/longrat.h"
+#include "coeffs/numbers.h"
 
-#include "si_gmp.h"
+#include "coeffs/si_gmp.h"
 
-#include "mpr_complex.h"
-#include "rintegers.h"
-#include "rmodulon.h"
-#include "longrat.h"
+#include "coeffs/mpr_complex.h"
+#include "coeffs/rintegers.h"
+#include "coeffs/rmodulon.h"
+#include "coeffs/longrat.h"
 
 #include <string.h>
 

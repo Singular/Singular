@@ -26,7 +26,6 @@
 #include "polys/monomials/p_polys.h"
 #include "kernel/ideals.h"
 
-BEGIN_NAMESPACE()
 /// debug-print monomial poly/vector p, assuming that it lives in the ring R
 static inline void m_DebugPrint(const poly p, const ring R)
 {
@@ -38,9 +37,7 @@ static inline void m_DebugPrint(const poly p, const ring R)
   for(int i = 1; i <= R->N; i++) Print(" v%d:%5ld",i, p_GetExp(p, i, R));
   PrintLn();
 }
-END_NAMESPACE
 
-BEGIN_NAMESPACE_SINGULARXX    BEGIN_NAMESPACE(DEBUG)
 
 // debug-print at most nTerms (2 by default) terms from poly/vector p,
 // assuming that lt(p) lives in lmRing and tail(p) lives in tailRing.
@@ -95,8 +92,5 @@ void dPrint(const ideal id, const ring lmRing, const ring tailRing, const int nT
     }
   }
 }
-
-END_NAMESPACE               END_NAMESPACE_SINGULARXX
-
 
 // Vi-modeline: vim: filetype=c:syntax:shiftwidth=2:tabstop=8:textwidth=0:expandtab

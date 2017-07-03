@@ -13,18 +13,17 @@
 #include "misc/mylimits.h"
 #include "reporter/reporter.h"
 
-#include "coeffs.h"
-#include "longrat.h"
-#include "numbers.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/longrat.h"
+#include "coeffs/numbers.h"
 
-#include "si_gmp.h"
+#include "coeffs/si_gmp.h"
 
-#include "generics.h"
-#include <string.h>
+#include "coeffs/generics.h"
  
-#include "longrat.h"
-#include "rintegers.h"
+#include "coeffs/rintegers.h"
 
+#include <string.h>
 
 struct generic_pair
 {

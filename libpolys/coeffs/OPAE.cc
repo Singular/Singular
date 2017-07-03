@@ -7,21 +7,22 @@
 //Schauen was hier überhaupt sinn macht
 
 #include "misc/auxiliary.h"
+
+#ifdef SINGULAR_4_2
 #include "omalloc/omalloc.h"
 #include "factory/factory.h"
 #include "misc/mylimits.h"
 #include "reporter/reporter.h"
 
-#include "coeffs.h"
-#include "numbers.h"
-#include "mpr_complex.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
+#include "coeffs/mpr_complex.h"
 
 #include "OPAE.h"
 #include "AE.h"
 
 #include <string.h>
 
-#ifdef SINGULAR_4_2
 
 BOOLEAN nAECoeffIsEqual     (number a, number b, const coeffs r);
 number  nAEMult        (number a, number b, const coeffs r);

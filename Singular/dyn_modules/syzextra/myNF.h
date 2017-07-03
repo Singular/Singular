@@ -30,12 +30,8 @@ typedef struct ip_sring *         ring;
 struct sip_sideal;
 typedef struct sip_sideal *       ideal;
 
-BEGIN_NAMESPACE_SINGULARXX    BEGIN_NAMESPACE(NF)
-
 /// high-level functio, which calls kNF2Length(redNFLength)
 poly kNFLength(ideal F, ideal Q, poly p, int syzComp, int lazyReduce);
-
-END_NAMESPACE               END_NAMESPACE_SINGULARXX
 
 #endif
 /* #ifndef MYNF_H */

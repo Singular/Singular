@@ -4582,6 +4582,7 @@ static BOOLEAN jjP2N(leftv res, leftv v)
 static BOOLEAN jjRESERVEDNAME(leftv res, leftv v)
 {
   char *s= (char *)v->Data();
+  // try system keywords
   for(unsigned i=0; i<sArithBase.nCmdUsed; i++)
   {
     //Print("test %d, >>%s<<, tab:>>%s<<\n",i,s,sArithBase.sCmds[i].name);
@@ -4591,7 +4592,13 @@ static BOOLEAN jjRESERVEDNAME(leftv res, leftv v)
       return FALSE;
     }
   }
-  //res->data = (char *)0;
+  // try blackbox names
+  int id;
+  blackboxIsCmd(s,id);
+  if (id>0)
+  {
+    res->data = (char *)1;
+  }
   return FALSE;
 }
 static BOOLEAN jjRANK1(leftv res, leftv v)
@@ -5714,6 +5721,27 @@ static BOOLEAN jjINTMAT3(leftv res, leftv u, leftv v,leftv w)
   }
 
   res->data = (char *)im;
+  return FALSE;
+}
+static BOOLEAN jjINTERSECT3(leftv res, leftv u, leftv v, leftv w)
+{
+  ideal I1=(ideal)u->Data();
+  ideal I2=(ideal)v->Data();
+  ideal I3=(ideal)w->Data();
+  resolvente r=(resolvente)omAlloc0(3*sizeof(ideal));
+  r[0]=I1;
+  r[1]=I2;
+  r[2]=I3;
+  res->data=(char *)idMultSect(r,3);
+  omFreeSize((ADDRESS)r,3*sizeof(ideal));
+  return FALSE;
+}
+static BOOLEAN jjINTERSEC3S(leftv res, leftv u, leftv v, leftv w)
+{
+  ideal I=(ideal)u->Data();
+  GbVariant alg=syGetAlgorithm((char*)w->Data(),currRing,I);
+  res->data=(char *)idSect(I,(ideal)v->Data(),alg);
+  if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
   return FALSE;
 }
 static BOOLEAN jjJET_P_IV(leftv res, leftv u, leftv v, leftv w)

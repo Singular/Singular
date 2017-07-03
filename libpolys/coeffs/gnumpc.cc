@@ -12,16 +12,16 @@
 #include "misc/mylimits.h"
 #include "reporter/reporter.h"
 
-#include "coeffs.h"
-#include "numbers.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
 
-#include "mpr_complex.h"
+#include "coeffs/mpr_complex.h"
 
-#include "gnumpc.h"
-#include "longrat.h"
-#include "gnumpfl.h"
-#include "modulop.h"
-#include "shortfl.h"
+#include "coeffs/gnumpc.h"
+#include "coeffs/longrat.h"
+#include "coeffs/gnumpfl.h"
+#include "coeffs/modulop.h"
+#include "coeffs/shortfl.h"
 
 #ifdef LDEBUG
 BOOLEAN  ngcDBTest(number a, const char *f, const int l, const coeffs r);
@@ -382,8 +382,8 @@ static BOOLEAN ngcCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
     LongComplexInfo* p = (LongComplexInfo *)(parameter);
 
     if ((p==NULL)
-      && (6==r->float_len)
-      && (6==r->float_len2)
+      && (SHORT_REAL_LENGTH==r->float_len)
+      && (SHORT_REAL_LENGTH==r->float_len2)
       && (strcmp("i",n_ParameterNames(r)[0]) == 0)
       )
         return TRUE;
@@ -429,7 +429,7 @@ static char* ngcCoeffName(const coeffs r)
 
 static void ngcCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
-  Print("float[%s](complex:%d digits, additional %d digits)/(%s^2+1)",n_ParameterNames(r)[0],
+  Print("real[%s](complex:%d digits, additional %d digits)/(%s^2+1)",n_ParameterNames(r)[0],
         r->float_len, r->float_len2, n_ParameterNames(r)[0]);  /* long C */
 }
 
@@ -489,7 +489,7 @@ static number ngcMapR(number from, const coeffs aRing, const coeffs r)
 
   if ( from != NULL )
   {
-    gmp_complex *res=new gmp_complex((double)nrFloat(from)); // FIXME? TODO? // extern float   nrFloat(number n);
+    gmp_complex *res=new gmp_complex((double)nrFloat(from));
     return (number)res;
   }
   else

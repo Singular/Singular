@@ -21,7 +21,7 @@
 
 #include "coeffs/mpr_complex.h"
 
-#include "longrat.h"
+#include "coeffs/longrat.h"
 
 #include <math.h>
 

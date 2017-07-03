@@ -49,7 +49,8 @@ SLIB1 = arr.lib \
 	nfmodstd.lib nfmodsyz.lib numerAlg.lib numerDecom.lib \
         orbitparam.lib \
 	parallel.lib polymake.lib polybori.lib \
-	realizationMatroids.lib resources.lib ringgb.lib rwalk.lib rstandard.lib \
+	realizationMatroids.lib resources.lib ringgb.lib \
+	rootisolation.lib rwalk.lib rstandard.lib \
 	schreyer.lib symodstd.lib schubert.lib swalk.lib \
 	tasks.lib tropical.lib tropicalNewton.lib
 

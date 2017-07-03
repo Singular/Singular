@@ -14,10 +14,16 @@
 #include "misc/prime.h"
 #include "reporter/reporter.h"
 
-#include "rmodulon.h" // ZnmInfo
-#include "longrat.h"
-#include "shortfl.h"
-#include "modulop.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
+#include "coeffs/rmodulon.h" // ZnmInfo
+#include "coeffs/longrat.h"
+#include "coeffs/shortfl.h"
+#include "coeffs/modulop.h"
+#include "coeffs/mpr_complex.h"
+
+#include <string.h>
+#include <float.h>
 
 // allow inlining only from p_Numbers.h and if ! LDEBUG
 #if defined(DO_LINLINE) && defined(P_NUMBERS_H) && !defined(LDEBUG)
@@ -131,14 +137,6 @@ static inline number nlShort3(number x) // assume x->s==3
 
 #ifndef LONGRAT_CC
 #define LONGRAT_CC
-
-#include <string.h>
-#include <float.h>
-
-#include "coeffs/coeffs.h"
-
-#include "coeffs/numbers.h"
-#include "coeffs/mpr_complex.h"
 
 #ifndef BYTES_PER_MP_LIMB
 #define BYTES_PER_MP_LIMB sizeof(mp_limb_t)

@@ -5047,28 +5047,35 @@ void rSetHdl(idhdl h)
       omCheckAddr((ADDRESS)IDID(h));
     rTest(rg);
   }
+  else return;
 
   // clean up history
-  if (sLastPrinted.RingDependend())
+  if (currRing!=NULL)
   {
-    sLastPrinted.CleanUp();
-    memset(&sLastPrinted,0,sizeof(sleftv));
-  }
-
-  if ((rg!=currRing)&&(currRing!=NULL))
-  {
-    denominator_list dd=DENOMINATOR_LIST;
-    if (DENOMINATOR_LIST!=NULL)
+    if(sLastPrinted.RingDependend())
     {
-      if (TEST_V_ALLWARN)
-        Warn("deleting denom_list for ring change to %s",IDID(h));
-      do
+      sLastPrinted.CleanUp();
+      //memset(&sLastPrinted,0,sizeof(sleftv)); // done by Cleanup,Init
+    }
+
+    if (rg!=currRing)/*&&(currRing!=NULL)*/
+    {
+      if (rg->cf!=currRing->cf)
       {
-        n_Delete(&(dd->n),currRing->cf);
-        dd=dd->next;
-        omFree(DENOMINATOR_LIST);
-        DENOMINATOR_LIST=dd;
-      } while(DENOMINATOR_LIST!=NULL);
+        denominator_list dd=DENOMINATOR_LIST;
+        if (DENOMINATOR_LIST!=NULL)
+        {
+          if (TEST_V_ALLWARN)
+            Warn("deleting denom_list for ring change to %s",IDID(h));
+          do
+          {
+            n_Delete(&(dd->n),currRing->cf);
+            dd=dd->next;
+            omFree(DENOMINATOR_LIST);
+            DENOMINATOR_LIST=dd;
+          } while(DENOMINATOR_LIST!=NULL);
+        }
+      }
     }
   }
 
@@ -6113,6 +6120,23 @@ void rKill(idhdl h)
       sLastPrinted.CleanUp(r);
     }
     ref=r->ref;
+    if ((ref<=0)&&(r==currRing))
+    {
+      // cleanup DENOMINATOR_LIST
+      if (DENOMINATOR_LIST!=NULL)
+      {
+        denominator_list dd=DENOMINATOR_LIST;
+        if (TEST_V_ALLWARN)
+          Warn("deleting denom_list for ring change from %s",IDID(h));
+        do
+        {
+          n_Delete(&(dd->n),currRing->cf);
+          dd=dd->next;
+          omFree(DENOMINATOR_LIST);
+          DENOMINATOR_LIST=dd;
+        } while(DENOMINATOR_LIST!=NULL);
+      }
+    }
     rKill(r);
   }
   if (h==currRingHdl)

@@ -43,8 +43,6 @@ class kBucket; typedef kBucket* kBucket_pt;
 # define NODIVISION 1
 #endif
 
-BEGIN_NAMESPACE_SINGULARXX    BEGIN_NAMESPACE(SYZEXTRA)
-
 poly leadmonom(const poly p, const ring r, const bool bSetZeroComp = true);
 
 /// return the tail of a given polynomial or vector
@@ -626,10 +624,6 @@ static inline poly SchreyerSyzygyNF(poly syz_lead, poly syz_2,
   SchreyerSyzygyComputation syz(L, T, LS, A);
   return syz.SchreyerSyzygyNF(syz_lead, syz_2);
 }
-
-END_NAMESPACE
-
-END_NAMESPACE_SINGULARXX
 
 #endif
 /* #ifndef SYZEXTRA_H */

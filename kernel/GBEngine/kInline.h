@@ -1108,17 +1108,6 @@ KINLINE poly redtailBba_Z (poly p,int pos,kStrategy strat)
 }
 #endif
 
-KINLINE poly redtailBba(TObject *T, int pos,kStrategy strat)
-{
-  LObject L;
-  L = *T;
-  poly p = redtailBba(&L, pos, strat, FALSE);
-  *T = L;
-  //kTest_T(T);
-  assume( p == T->p);
-  return p;
-}
-
 KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
                     kStrategy strat)
 {

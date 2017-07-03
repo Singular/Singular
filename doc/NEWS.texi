@@ -23,7 +23,7 @@
 
 Extended commands:
 @itemize
-@item syz (@nref{syz}), lift (@nref{lift}), liftstd (@nref{liftstd}): with a specified GB algorithm
+@item syz (@nref{syz}), lift (@nref{lift}), liftstd (@nref{liftstd}), intersect(@nref{intersect}): with a specified GB algorithm
 @end itemize
 
 New libraries:
@@ -31,12 +31,14 @@ New libraries:
 @item goettsche.lib: Goettsche's formula for the Betti numbers of the Hilbert scheme
 of points on a surface, Macdonald's formula for the symmetric product (@nref{goettsche_lib})
 @item ncHilb.lib: Hilbert series of non-commutative monomial algebras (@nref{ncHilb_lib})
+@item rootisolation.lib: real root isolation using interval arithmetic(@nref{rootisolation_lib})
 @item rstandard.lib: Janet bases and border bases for ideals (@nref{rstandard_lib})
 @end itemize
 
 Changed libraries:
 @itemize
 @item chern.lib:  new version (@nref{chern_lib})
+@item grobcov.lib:  new version (@nref{grobcov_lib})
 @end itemize
 
 Changes in the kernel/build system:

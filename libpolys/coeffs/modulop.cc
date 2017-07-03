@@ -19,8 +19,8 @@
 #include "coeffs/numbers.h"
 #include "coeffs/mpr_complex.h"
 
-#include "longrat.h"
-#include "modulop.h"
+#include "coeffs/longrat.h"
+#include "coeffs/modulop.h"
 
 #include <string.h>
 

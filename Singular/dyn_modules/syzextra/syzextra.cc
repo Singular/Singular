@@ -63,15 +63,6 @@
 # define RTIMER_BENCHMARKING 0
 #endif
 
-// USING_NAMESPACE_SINGULARXX;
-USING_NAMESPACE( SINGULARXXNAME :: DEBUG )
-
-
-BEGIN_NAMESPACE_SINGULARXX     BEGIN_NAMESPACE(SYZEXTRA)
-
-
-BEGIN_NAMESPACE_NONAME
-
 #ifndef SING_NDEBUG
 ring SBucketFactory::_GetBucketRing(const SBucketFactory::Bucket& bt)
 {
@@ -188,10 +179,6 @@ static FORCE_INLINE int atGetInt(idhdl rootRingHdl, const char* attribute, long 
 {
   return ((int)(long)(atGet(rootRingHdl, attribute, INT_CMD, (void*)def)));
 }
-
-END_NAMESPACE
-
-BEGIN_NAMESPACE(SORT_c_ds)
 
 #if (defined(HAVE_QSORT_R) && (defined __APPLE__ || defined __MACH__ || defined __DARWIN__ || defined __FreeBSD__ || defined __BSD__ || defined OpenBSD3_1 || defined OpenBSD3_9))
 static int cmp_c_ds(void *R, const void *p1, const void *p2){
@@ -327,7 +314,6 @@ static int cmp_poly(const poly &a, const poly &b)
 }
 */
 
-END_NAMESPACE
 /* namespace SORT_c_ds */
 
 /// writes a monomial (p),
@@ -3092,8 +3078,5 @@ template class std::map<TCacheKey, TCacheValue, struct CCacheCompare>;
 template class std::map<int, TP2PCache>;
 
 template class std::stack <sBucket_pt>;
-
-END_NAMESPACE               END_NAMESPACE_SINGULARXX
-
 
 // Vi-modeline: vim: filetype=c:syntax:shiftwidth=2:tabstop=8:textwidth=0:expandtab

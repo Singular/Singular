@@ -3133,6 +3133,8 @@ ideal, resp.@: module
 computes the intersection of ideals, resp.@: modules.
 @item @strong{Note:}
 If the option @code{prot} is enabled then the result the used method (elimination/syzygies) is displayed.
+@*An optional last argument specifies the Groebner base algorith to use.
+Possible values are @code{"std"} and @code{"slimgb"}.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3144,7 +3146,9 @@ If the option @code{prot} is enabled then the result the used method (eliminatio
   ideal id1=maxideal(3);
   ideal id2=x2+xyz,y2-z3y,z3+y5xz;
   ideal id3=intersect(id1,id2,ideal(x,y));
+  ideal id4=intersect(id1,id2,"slimgb");
   id3;
+  id4;
 @c example
 @end smallexample
 @end table
@@ -6316,6 +6320,7 @@ int
 @item @strong{Purpose:}
 prints a list of all reserved identifiers (first form) or tests
 whether the string is a reserved identifier (second form).
+This includes blackbox/newstruct types.
 @item @strong{Example:}
 @smallexample
 reservedName();

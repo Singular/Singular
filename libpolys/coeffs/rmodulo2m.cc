@@ -11,14 +11,14 @@
 #include "misc/mylimits.h"
 #include "reporter/reporter.h"
 
-#include "si_gmp.h"
-#include "coeffs.h"
-#include "numbers.h"
-#include "longrat.h"
-#include "mpr_complex.h"
+#include "coeffs/si_gmp.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
+#include "coeffs/longrat.h"
+#include "coeffs/mpr_complex.h"
 
-#include "rmodulo2m.h"
-#include "rmodulon.h"
+#include "coeffs/rmodulo2m.h"
+#include "coeffs/rmodulon.h"
 
 #include <string.h>
 

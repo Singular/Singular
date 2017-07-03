@@ -2,17 +2,17 @@
  *  Computer Algebra System SINGULAR      *
  *****************************************/
 /*
- *  * ABSTRACT: class bigintmat: matrices of numbers.
- *   * a few functinos might be limited to bigint or euclidean rings.
- *    */
+ * ABSTRACT: class bigintmat: matrices of numbers.
+ * a few functinos might be limited to bigint or euclidean rings.
+ */
 
 
-#include <misc/auxiliary.h>
+#include "misc/auxiliary.h"
 
-#include "bigintmat.h"
-#include <misc/intvec.h>
+#include "coeffs/bigintmat.h"
+#include "misc/intvec.h"
 
-#include "rmodulon.h"
+#include "coeffs/rmodulon.h"
 
 #include <math.h>
 #include <string.h>

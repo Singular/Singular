@@ -2,7 +2,7 @@
 #define AE_H
 
 #include "misc/auxiliary.h"
-#include "si_gmp.h"
+#include "coeffs/si_gmp.h"
 
 #ifdef SINGULAR_4_2
 

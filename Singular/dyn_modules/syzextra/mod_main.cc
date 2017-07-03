@@ -51,15 +51,6 @@
 #include "polys/monomials/ring.h"
 
 
-// USING_NAMESPACE_SINGULARXX;
-
-USING_NAMESPACE( SINGULARXXNAME :: DEBUG )
-USING_NAMESPACE( SINGULARXXNAME :: NF )
-USING_NAMESPACE( SINGULARXXNAME :: SYZEXTRA )
-
-
-BEGIN_NAMESPACE_NONAME
-
 // returns TRUE, if idRankFreeModule(m) > 0 ???
 /// test whether this input has vectors among entries or no enties
 /// result must be FALSE for only 0-entries
@@ -1988,8 +1979,6 @@ static BOOLEAN _NumberStatsPrint(leftv res, leftv h)
   NoReturn(res);
   return FALSE;
 }
-
-END_NAMESPACE
 
 extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
 {

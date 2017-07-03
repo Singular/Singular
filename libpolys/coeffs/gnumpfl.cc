@@ -12,25 +12,25 @@
 
 #include "reporter/reporter.h"
 
-#include "coeffs.h"
-#include "numbers.h"
-#include "mpr_complex.h"
+#include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
+#include "coeffs/mpr_complex.h"
 
-#include "longrat.h"
-#include "shortfl.h"
-#include "gnumpfl.h"
-#include "gnumpc.h"
-#include "modulop.h"
+#include "coeffs/longrat.h"
+#include "coeffs/shortfl.h"
+#include "coeffs/gnumpfl.h"
+#include "coeffs/gnumpc.h"
+#include "coeffs/modulop.h"
 
 const char *   ngfRead (const char *s, number *a, const coeffs r);
 
 union nf
 {
-  float _f;
+  SI_FLOAT _f;
   number _n;
-  nf(float f) {_f = f;}
+  nf(SI_FLOAT f) {_f = f;}
   nf(number n) {_n = n;}
-  float F() const {return _f;}
+  SI_FLOAT F() const {return _f;}
   number N() const {return _n;}
 };
 
@@ -502,7 +502,7 @@ static nMapFunc ngfSetMap(const coeffs src, const coeffs dst)
 
 static void ngfCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
-  Print("float(real:%d digits, additional %d digits)",
+  Print("real:%d digits, additional %d digits",
                r->float_len,r->float_len2);  /* long R */
 }
 
