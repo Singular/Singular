@@ -2593,8 +2593,7 @@ NOTE:    The basering R, must be of the form Q[a][x],
        (a=parameters, x=variables), and
        should be defined previously. The ideal
        must be defined on R.
-KEYWORDS: Groebner cover; parametric ideal; canonical;
-       discussion of parametric ideal
+KEYWORDS: Groebner cover; parametric ideal; canonical; discussion of parametric ideal
 EXAMPLE:  grobcov; shows an example"
 {
   list S; int i; int ish=1; list GBR; list BR; int j; int k;
@@ -2754,7 +2753,7 @@ NOTE: The basering R, must be of the form Q[a][x],
        defined previously. The ideals must be defined on R.
 KEYWORDS: Groebner cover; parametric ideal; locally closed set;
        parametric ideal; generic representation; full representation;
-       I-regular function;
+       I-regular function
 EXAMPLE:  extendpoly; shows an example"
 {
   int te=0;
@@ -2914,8 +2913,7 @@ NOTE: The basering R, must be of the form Q[a][x],
        (a=parameters, x=variables),
        and should be defined previously. The ideal
        must be defined on R.
-KEYWORDS: Groebner cover; parametric ideal; canonical,
-       discussion of parametric ideal; full representation
+KEYWORDS: Groebner cover; parametric ideal; canonical; discussion of parametric ideal; full representation
 EXAMPLE:  extendGC; shows an example"
 {
   int te;
@@ -4330,8 +4328,7 @@ NOTE: The algorithm was described in
        J.M. Brunat, A. Montes. \"Computing the canonical
        representation of constructible sets.\"
        Math.  Comput. Sci. (2016) 19: 165-178.
-KEYWORDS: constructible set; locally closed set; canonical
-       form
+KEYWORDS: constructible set; locally closed set; canonical form
 EXAMPLE:  ConsLevels; shows an example"
 {
   int te;
@@ -5568,7 +5565,7 @@ proc stdlocus(ideal F)
 RETURN:The output is a list of the tops of the components [C_1, .. , C_n] of the locus.
        Each component is given its top ideal p_i.
 NOTE: The input must be the locus system.
-KEYWORDS: geometrical locus; locus;
+KEYWORDS: geometrical locus; locus
 EXAMPLE: stdlocus; shows an example"
 {
   int i; int te;
@@ -5933,7 +5930,7 @@ NOTE: It can only be called after computing either
         - locus(F)                -> locusto( locus(F) )
         - locusdg(locus(F))  -> locusto( locusdg(locus(F)) )
         - envelop(F,C)         -> locusto( envelop(F,C) )
-KEYWORDS: geometrical locus; locus; envelop;
+KEYWORDS: geometrical locus; locus; envelop
 EXAMPLE:  locusto; shows an example"
 {
   int i; int j; int k;
@@ -6056,7 +6053,7 @@ NOTE: grobcov and locus are called internally.
        introduced in the book
        A. Montes. \"The Groebner Cover\" (Discussing Parametric
        Polynomial Systems) not yet published.
-KEYWORDS: geometrical locus; locus; envelop;
+KEYWORDS: geometrical locus; locus; envelop
 EXAMPLE:  envelop; shows an example"
 {
   def RR=basering;
