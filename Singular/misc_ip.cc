@@ -1226,6 +1226,67 @@ static BOOLEAN ii_FlintZn_init(leftv res,leftv a)
   }
 }
 #endif
+
+static BOOLEAN iiFloat(leftv res, leftv pnn)
+{
+  short float_len=3;
+  short float_len2=SHORT_REAL_LENGTH;
+  coeffs cf=NULL;
+  if ((pnn!=NULL) && (pnn->Typ()==INT_CMD))
+  {
+    float_len=(int)(long)pnn->Data();
+    float_len2=float_len;
+    pnn=pnn->next;
+    if ((pnn!=NULL) && (pnn->Typ()==INT_CMD))
+    {
+      float_len2=(int)(long)pnn->Data();
+      pnn=pnn->next;
+    }
+  }
+  if (float_len2 <= (short)SHORT_REAL_LENGTH)
+       cf=nInitChar(n_R, NULL);
+  else // longR or longC?
+  {
+    LongComplexInfo param;
+    param.float_len = si_min (float_len, 32767);
+    param.float_len2 = si_min (float_len2, 32767);
+    cf = nInitChar(n_long_R, (void*)&param);
+  }
+  res->rtyp=CRING_CMD;
+  res->data=cf;
+  return cf==NULL;
+}
+static BOOLEAN iiCrossProd(leftv res, leftv args)
+{
+  leftv h=args;
+  coeffs *c=NULL;
+  coeffs cf=NULL;
+  int i=0;
+  if (h==NULL) goto crossprod_error;
+  while (h!=NULL)
+  {
+    if (h->Typ()!=CRING_CMD) goto crossprod_error;
+    i++;
+    h=h->next;
+  }
+  c=(coeffs*)omAlloc0((i+1)*sizeof(coeffs));
+  h=args;
+  i=0;
+  while (h!=NULL)
+  {
+    c[i]=(coeffs)h->CopyD();
+    i++;
+    h=h->next;
+  }
+  cf=nInitChar(n_nTupel,c);
+  res->data=cf;
+  res->rtyp=CRING_CMD;
+  return FALSE;
+
+  crossprod_error:
+    WerrorS("expected `crossprod(coeffs, ...)`");
+    return TRUE;
+}
 /*2
 * initialize components of Singular
 */
@@ -1326,6 +1387,8 @@ void siInit(char *name)
     IDDATA(h)=(char*)nInitChar(n_Q,NULL);
     h=enterid(omStrDup("ZZ"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
     IDDATA(h)=(char*)nInitChar(n_Z,NULL);
+    iiAddCproc("kernel","crossprod",FALSE,iiCrossProd);
+    iiAddCproc("kernel","Float",FALSE,iiFloat);
     //h=enterid(omStrDup("RR"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
     //IDDATA(h)=(char*)nInitChar(n_R,NULL);
     //h=enterid(omStrDup("CC"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);

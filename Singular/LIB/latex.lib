@@ -1070,7 +1070,7 @@ EXAMPLE: example texring; shows an example
     cf="\\Z";
     if (char(r)>0) { cf=cf+"_{"+string(char(r))+"}";}
   }
-  if(find(charstr(r),"real")){cf="\\R";}
+  if(find(charstr(r),"Float(")){cf="\\R";}
   if(find(charstr(r),"complex")){cf="\\C"; nopar=1;}   // 28.10.06
   if(char(r)==prime(char(r))){cf="\\Z_{"+string(char(r))+"}";}
   if(char(r)>0 and !intT)
@@ -1421,7 +1421,7 @@ EXAMPLE: example texpoly; shows an example
   }
 
   parT = npars(@r);
-  realT = (charstr(@r)=="real");
+  realT = find(charstr(@r),"Float(");
   complT = find(charstr(@r),"complex");   // 28.10.06
   if (complT) {parT=0;}
   i = find(charstr(@r),",");

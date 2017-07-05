@@ -24,6 +24,7 @@
 #include "coeffs/gnumpc.h"
 #include "coeffs/ffields.h"
 #include "coeffs/shortfl.h"
+#include "coeffs/ntupel.h"
 
 #ifdef HAVE_RINGS
 #include "coeffs/rmodulo2m.h"
@@ -321,6 +322,7 @@ cfInitCharProc nInitCharTableDefault[]=
  NULL,        /* n_transExt */
  #endif
  ngcInitChar,  /* n_long_C */
+ nnInitChar,   /* n_nTupel */
  #ifdef HAVE_RINGS
  nrzInitChar,  /* n_Z */
  nrnInitChar,  /* n_Zn */

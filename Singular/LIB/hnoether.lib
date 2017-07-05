@@ -529,8 +529,8 @@ EXAMPLES: example develop;         shows an example
  // dass ein Fehler aufgetreten ist: return_error.
  //----------------------------------------------------------------------------
 
- if (charstr(basering)=="real") {
-  " The algorithm doesn't work with 'real' as coefficient field.";
+ if (find(charstr(basering),"Float(")) {
+  " The algorithm doesn't work with 'Float' as coefficient field.";
                      // denn : map from characteristic -1 to -1 not implemented
   return(return_error);
  }

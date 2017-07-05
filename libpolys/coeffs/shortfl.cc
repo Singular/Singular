@@ -63,7 +63,7 @@ SI_FLOAT nrFloat(number n)
 static void nrCoeffWrite (const coeffs r, BOOLEAN /*details*/)
 {
   assume( getCoeffType(r) == n_R );
-  PrintS("real");  /* R */
+  PrintS("Float()");  /* R */
 }
 
 
@@ -262,13 +262,13 @@ static void nrWrite (number a, const coeffs r)
 {
   assume( getCoeffType(r) == n_R );
 
-  #if SIZEOF_DOUBLE == SIZEOF_LONG
-  char ch[16];
-  int n = sprintf(ch,"%12.6e", nf(a).F());
-  #else
+  //#if SIZEOF_DOUBLE == SIZEOF_LONG
+  //char ch[16];
+  //int n = sprintf(ch,"%12.6e", nf(a).F());
+  //#else
   char ch[11];
   int n = sprintf(ch,"%9.3e", nf(a).F());
-  #endif
+  //#endif
   if (ch[0] == '-')
   {
     char* chbr = new char[n+3];
@@ -711,12 +711,12 @@ static nMapFunc nrSetMap(const coeffs src, const coeffs dst)
 
 static char* nrCoeffString(const coeffs r)
 {
-  return omStrDup("real");
+  return omStrDup("Float()");
 }
 
 static char* nrCoeffName(const coeffs r)
 {
-  return (char*)"real";
+  return (char*)"Float()";
 }
 
 BOOLEAN nrInitChar(coeffs n, void* p)
