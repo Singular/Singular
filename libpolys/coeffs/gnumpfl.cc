@@ -402,15 +402,15 @@ static void ngfSetChar(const coeffs r)
 
 static char* ngfCoeffString(const coeffs r)
 {
-  char *s=(char*)omAlloc(27);
-  snprintf(s,27,"real,%d,%d",r->float_len,r->float_len2);
+  char *s=(char*)omAlloc(30);
+  snprintf(s,30,"Float(%d,%d)",r->float_len,r->float_len2);
   return s;
 }
 
 static char* ngfCoeffName(const coeffs r)
 {
-  static char ngfCoeffName_buf[27];
-  snprintf(ngfCoeffName_buf,27,"RR(%d,%d)",r->float_len,r->float_len2);
+  static char ngfCoeffName_buf[30];
+  snprintf(ngfCoeffName_buf,30,"Float(%d,%d)",r->float_len,r->float_len2);
   return ngfCoeffName_buf;
 }
 
@@ -502,8 +502,7 @@ static nMapFunc ngfSetMap(const coeffs src, const coeffs dst)
 
 static void ngfCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
-  Print("real:%d digits, additional %d digits",
-               r->float_len,r->float_len2);  /* long R */
+  Print("Float(%d,%d)", r->float_len,r->float_len2);  /* long R */
 }
 
 BOOLEAN ngfInitChar(coeffs n, void *parameter)
