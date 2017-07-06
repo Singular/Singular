@@ -12,7 +12,7 @@ omList.h		omGetBackTrace.h	\
 omRet2Info.h		omStats.h		omOpts.h		\
 omBinPage.h		omAllocSystem.h		\
 omAllocPrivate.h	omDebug.h		omInline.h		\
-omAllocFunc.h 		mylimits.h
+omAllocFunc.h
 
 noinst_HEADERS= omPage.h omDefaultConfig.h omReturn.h omGetPageSize.h \
   omMalloc.h omMallocSystem.h
