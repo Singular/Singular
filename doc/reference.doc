@@ -66,6 +66,7 @@ and @code{LIB} no brackets are allowed.
 * coef::
 * coeffs::
 * contract::
+* crossprod::
 * datetime::
 * dbprint::
 * defined::
@@ -94,6 +95,7 @@ and @code{LIB} no brackets are allowed.
 * filecmd::
 * find::
 * finduni::
+* Float::
 * fprintf::
 * freemodule::
 * frwalk::
@@ -1113,7 +1115,7 @@ See
 @ref{kbase}.
 @c ref
 @c ---------------------------------------
-@node contract, datetime, coeffs, Functions
+@node contract, crossprod, coeffs, Functions
 @subsection contract
 @cindex contract
 
@@ -1169,7 +1171,31 @@ See
 @c ref
 
 @c ---------------------------------------
-@node datetime, dbprint, contract, Functions
+@node crossprod, datetime, contract, Functions
+@subsection crossprod
+@cindex crossprod
+
+@table @code
+@item @strong{Syntax:}
+@code{crossprod (} cring_expression@code{,} ... @code{)}
+@item @strong{Type:}
+cring
+@item @strong{Purpose:}
+crooss product of several objects of type cring
+@item @strong{Example:}
+@smallexample
+@c example
+  crossprod(ZZ/32003,Float());
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{cring}.
+@c ref
+
+@c ---------------------------------------
+@node datetime, dbprint, crossprod, Functions
 @subsection datetime
 @cindex datetime
 @c lib standard.lib:datetime lib_fun lib_ex subsection
@@ -2234,7 +2260,7 @@ See
 @ref{string}.
 @c ref
 @c ---------------------------------------
-@node finduni, fprintf, find, Functions
+@node finduni, Float, find, Functions
 @subsection finduni
 @cindex finduni
 @table @code
@@ -2270,7 +2296,37 @@ See
 @c ref
 
 @c ---------------------------------------
-@node fprintf, freemodule, finduni, Functions
+@node Float, fprintf, finduni, Functions
+@subsection Float
+@cindex Float
+@table @code
+@item @strong{Syntax:}
+@code{Float (} @code{)}
+@*@code{Float (} int_expression @code{)}
+@*@code{Float (} int_expression @code{,} int_expression @code{)}
+@item @strong{Type:}
+cring
+@item @strong{Purpose:}
+returns a coefficient ring of floating point (inexect) real number
+to be used in ring definitions.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring R1=Float(),(x,y),dp;
+  R1;
+  ring R2=Float(10,20),(a,b),dp;
+  R2;
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ring};
+@ref{cring}.
+@c ref
+
+@c ---------------------------------------
+@node fprintf, freemodule, Float, Functions
 @subsection fprintf
 @cindex fprintf
 @c lib standard.lib:fprintf lib_fun lib_ex subsection
