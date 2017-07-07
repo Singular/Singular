@@ -96,7 +96,7 @@ EXAMPLE: example bounds; create two intervals"
 example
 {
     "EXAMPLE:"; echo = 2;
-    ring R = 0,x,lp;
+    ring R = 0,x,dp;
     interval I = bounds(1);
     I;
 
@@ -198,7 +198,7 @@ EXAMPLE: example splitBox; splits two-dimensional interval into two"
 example
 {
     "EXAMPLE:"; echo = 2;
-    ring R = 0,(x,y),lp;
+    ring R = 0,(x,y),dp;
 
     box B = list(bounds(0,1),
                  bounds(0,2));
@@ -264,7 +264,7 @@ EXAMPLE: example ivmatInit; initialises an interval matrix"
 example
 {
     "EXAMPLE:"; echo = 2;
-    ring R = 0,x(1..5),lp;
+    ring R = 0,x(1..5),dp;
 
     ivmat A = ivmatInit(4, 5); A;
 }
@@ -279,7 +279,7 @@ EXAMPLE: example ivmatNrows; return number of rows"
 example
 {
     "EXAMPLE:"; echo = 2;
-    ring R = 0,x,lp;
+    ring R = 0,x,dp;
 
     ivmat A = ivmatInit(2,3);
     nrows(A);
@@ -318,7 +318,7 @@ EXAMPLE: example ivmatSet; assign values to A"
 example
 {
     "EXAMPLE:"; echo = 2;
-    ring R = 0,x,lp;
+    ring R = 0,x,dp;
     ivmat A = ivmatInit(2,2);             A;
     A = ivmatSet(A, 1, 2, bounds(1, 2));  A;
 }
@@ -338,7 +338,7 @@ EXAMPLE: example diagMatrix; create diagonal matrix"
 example
 {
     "EXAMPLE:"; echo = 2;
-    ring R = 0,x,lp;
+    ring R = 0,x,dp;
     ivmat A = diagMatrix(2, bounds(1, 2)); A;
 }
 
@@ -351,7 +351,8 @@ EXAMPLE: example unitMatrix; generate a unit matrix"
 }
 example
 {
-    ring R = 0,(x,y),lp;
+    "EXAMPLE:"; echo = 2;
+    ring R = 0,(x,y),dp;
     unitMatrix(2);
     unitMatrix(3);
 }
@@ -462,7 +463,7 @@ EXAMPLE: example ivmatGaussian; inverts a matrix"
 example
 {
     "EXAMPLE:"; echo = 2;
-    ring R = 0,(x,y),lp;
+    ring R = 0,(x,y),dp;
 
     ideal I = 2x2-xy+2y2-2,2x2-3xy+3y2-2;
     box B = list(bounds(7/8, 9/8), bounds(-1/10, 1/20));
@@ -520,7 +521,7 @@ static proc ivmatMultiplyGeneral(ivmat A, B)
 // POLYNOMIAL APPLICATIONS
 
 proc evalJacobianAtBox(ideal I, box B)
-"USAGE: @code{evalJacobianAtBox(I, B)}; @code{I ideal B box}
+"USAGE: @code{evalJacobianAtBox(I, B)}; @code{I ideal, B box}
 RETURN: Jacobian matrix of @code{I} where polynomials are evaluated at @code{B}
 PURPOSE: evaluates each polynomial of the Jacobian matrix of @code{I} using
         interval arithmetic
@@ -545,7 +546,7 @@ EXAMPLE: example evalJacobianAtBox; evalate Jacobian at box"
 example
 {
     "EXAMPLE:"; echo = 2;
-    ring R = 0,(x,y),lp;
+    ring R = 0,(x,y),dp;
     ideal I = 2x2-xy+2y2-2, 2x2-3xy+3y2-2;
 
     interval J = bounds(-1,1);
@@ -559,11 +560,13 @@ RETURN: list(int, box):
         1, if unique zero in given box
         0 if test is inconclusive;
         box is intersection of Newton step and supplied box if applicable
-NOTE:   rounding is performed on fractions obtained by intersecting to prevent
-        the size of denominators and numerators from increasing dramatically
+NOTE:   rounding is performed on fractions obtained by matrix inversion to
+        prevent the size of denominators and numerators from increasing
+        dramatically
 EXAMPLE: example testPolyBox; tests the above for intersection of ellipses."
 {
     int N = nvars(basering);
+    int isreal = find(charstr(basering), "Float(");
     int i;
 
     interval tmp;
@@ -613,43 +616,48 @@ EXAMPLE: example testPolyBox; tests the above for intersection of ellipses."
             return(-1, B);
         }
 
-        // in this case, fB may have horrible fractions, so try to simplify
-        //B = Bint;
-
-        // attempt simplification of fractions
-        // add check if we work over reals
-        list bb;
-        for (i = 1; i <= N; i++)
+        if (isreal)
         {
-            lo = B[i][1];
-            up = B[i][2];
-
-            // modify numerators of B to tighten box
-            if (lo < Bint[i][1])
-            {
-                n = denominator(lo);
-                // floor
-                lo = round(Bint[i][1]*n - 1/2)/n;
-            }
-            if (up > Bint[i][2])
-            {
-                n = denominator(up);
-                // ceil
-                up = round(Bint[i][2]*n + 1/2)/n;
-            }
-
-            // make sure box does not grow
-            if (lo >= B[i][1] && up <= B[i][2])
-            {
-                bb[i] = bounds(lo, up);
-            }
-            else
-            {
-                bb[i] = Bint[i];
-            }
+            // fraction simplification over real basering is pointless
+            B = Bint;
         }
+        else
+        {
+            // attempt simplification of fractions
+            // add check if we work over reals
+            list bb;
+            for (i = 1; i <= N; i++)
+            {
+                lo = B[i][1];
+                up = B[i][2];
 
-        B = bb;
+                // modify numerators of B to tighten box
+                if (lo < Bint[i][1])
+                {
+                    n = denominator(lo);
+                    // floor
+                    lo = round(Bint[i][1]*n - 1/2)/n;
+                }
+                if (up > Bint[i][2])
+                {
+                    n = denominator(up);
+                    // ceil
+                    up = round(Bint[i][2]*n + 1/2)/n;
+                }
+
+                // make sure box does not grow
+                if (lo >= B[i][1] && up <= B[i][2])
+                {
+                    bb[i] = bounds(lo, up);
+                }
+                else
+                {
+                    bb[i] = Bint[i];
+                }
+            }
+
+            B = bb;
+        }
 
         if (laststep) { return(1, B); }
     }
@@ -660,7 +668,7 @@ EXAMPLE: example testPolyBox; tests the above for intersection of ellipses."
 example
 {
     "EXAMPLE:"; echo = 2;
-    ring R = 0,(x,y),lp;
+    ring R = 0,(x,y),dp;
     ideal I = 2x2-xy+2y2-2, 2x2-3xy+3y2-2;
 
     interval unit = bounds(0, 1);
@@ -689,7 +697,7 @@ EXAMPLE: example evalIdealAtBox; evaluates an ideal at a box"
 example
 {
     "EXAMPLE:"; echo = 2;
-    ring R = 0,(x,y),lp;
+    ring R = 0,(x,y),dp;
     interval I1 = bounds(0, 1); I1;
     interval I2 = bounds(0, 1); I2;
 
@@ -703,12 +711,12 @@ example
 }
 
 proc rootIsolationNoPreprocessing(ideal I, def start, number eps)
-"USAGE:  @code{rootIsolationNoPreprocessing(I, B, eps)}; @code{I ideal, B box/list of boxes,
-        eps number};
+"USAGE:  @code{rootIsolationNoPreprocessing(I, B, eps)}; @code{I ideal,
+        B box/list of boxes, eps number};
 ASSUME: @code{I} is a zero-dimensional radical ideal
-RETURN: @code{(L1, L2)}, where @code{L1} contains boxes smaller than eps which may contain an
-        element of V(@code{I}), i.e. a root and @code{L2} contains boxes which contain
-        exactly one element of V(@code{I})
+RETURN: @code{(L1, L2)}, where @code{L1} contains boxes smaller than eps which
+        may contain an element of V(@code{I}), i.e. a root and @code{L2}
+        contains boxes which contain exactly one element of V(@code{I})
 PURPOSE: Given input box(es) @code{start} we try to find all roots of @code{I}
         lying in @code{start} by computing boxes that contain exactly one root.
         If @code{eps} > 0 then boxes that become smaller than @code{eps} will
@@ -797,7 +805,7 @@ example
 {
     "EXAMPLE:"; echo = 2;
 
-    ring R = 0,(x,y),lp;
+    ring R = 0,(x,y),dp;
     ideal I = 2x2-xy+2y2-2,2x2-3xy+3y2-2;  // V(I) has four elements
 
     interval i = bounds(-3/2,3/2);
@@ -847,7 +855,7 @@ EXAMPLE: example noRootsOnBoundary; tests boxes for roots"
 example
 {
     "EXAMPLE:"; echo = 2;
-    ring R = 0,(x,y),lp;
+    ring R = 0,(x,y),dp;
 
     ideal I = x+1,y-2;
 
@@ -860,19 +868,24 @@ example
 
 //im Moment geht das nur mit eingegebener eliminationsordnung
 proc rootIsolation(ideal I, box start, number eps)
-"USAGE:  @code{rootIsolation(I, start, eps)}; @code{I ideal, start box, eps number}
+"USAGE:  @code{rootIsolation(I, start, eps)}; @code{I ideal, start box,
+        eps number}
 ASSUME: @code{I} is a zero-dimensional radical ideal
-        and @code{basering} is defined with an elimination ordering.
-RETURN: @code{(L1, L2)}, where @code{L1} contains boxes smaller than eps which may contain an
-        element of V(@code{I}), i.e. a root and @code{L2} contains boxes which contain
-        exactly one element of V(@code{I})
-PURPOSE: same as @code{rootIsolationNoPreprocessing}, but speeds up computation by
-        preprocessing starting box
+RETURN: @code{(L1, L2)}, where @code{L1} contains boxes smaller than eps which
+        may contain an element of V(@code{I}), i.e. a root and @code{L2}
+        contains boxes which contain exactly one element of V(@code{I})
+PURPOSE: same as @code{rootIsolationNoPreprocessing}, but speeds up computation
+        by preprocessing starting box
 THEORY: As every root of @code{I} is a root of the polynomials @code{I[i]}, we
         use Groebner elimination to find univariate polynomials for every
-        variable which have these roots as well. Applying root isolation to
-        these univariate polynomials then provides smaller starting boxes which
-        speed up computations in the multivariate case.
+        variable which have these roots as well. Using that @code{I} is
+        zero-dimensional these Groebner bases may be quickly computed using
+        FGLM. Applying root isolation to these univariate polynomials then
+        provides smaller starting boxes which speed up computations in the
+        multivariate case.
+NOTE:   This algorithm and some procedures used therein perform Groebner basis
+        computations in @code{basering}. It is thus advised to define @code{I}
+        w.r.t. a fast monomial ordering.
 EXAMPLE: example rootIsolation; for intersection of two ellipses"
 {
     int N = nvars(basering);
@@ -906,54 +919,66 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
         return(rootIsolationNoPreprocessing(I, start, eps));
     }
 
-    // construct single variable ring from basering
+    // compute reduced GB in (hopefully) fast ordering
+    option(redSB);
+    ideal fastGB = groebner(I);
+
     ring rSource = basering;
     list rList = ringlist(rSource);
-    // delete all but first variable
+    // first construct univariate ring
+    int numords = size(rList[3]);
+    // remove all but first variables
     rList[2] = list(rList[2][1]);
-    // adjust weight vector
-    rList[3][1][2] = intvec(1);
+    // change ordering accordingly (keep last block)
+    rList[3] = list( list(rList[3][1][1], intvec(1)), rList[3][numords] );
 
-    // compute reduced groebner bases
-    option(redSB);
-
-    ideal gbUnivarPolys, gbTemp, Ipermutation;
-    intvec perm;
-
-    // permute every variable to the end once and compute Groebner basis to
-    // find univariate polynomial in that variable
-    for (i = 1; i <= N; i++)
-    {
-        perm = 1..N;
-        perm[i] = N;
-        perm[N] = i;
-
-        Ipermutation = fetch(rSource, I, perm);
-        gbTemp = groebner(Ipermutation);
-
-        // first poly in GB now only depends on last variable
-        gbUnivarPolys[i] = gbTemp[1];
-    }
-
-    // do computations in univariate ring
+    // construct and switch to univariate ring
     ring rUnivar = ring(rList);
-    setring rUnivar;
 
-    // gbUnivarPoly only contains var(N),
-    // make sure variables are properly mapped
-    ideal gbUnivarPolys = fetch(rSource, gbUnivarPolys, intvec(0:(N-1),1));
+    // some necessary variables
+    ideal gbUnivar;
+    // maps var(N) in rElimOrd(i) to var(1) in rUnivar
+    intvec varmap = (0:(N-1)),1;
     number eps = fetch(rSource, eps);
     list univarResult, startBoxesPerDim;
 
+    // now prepare lp-ring
+    setring rSource;
+    rList = ringlist(rSource);
+    // set ordering to lp
+    rList[3] = list( list( "lp", 1:N ), list( "C", 0 ) );
+    // save variable order for later
+    list varstrs = rList[2];
+
     for (i = 1; i <= N; i++)
     {
-        univarResult = rootIsolationNoPreprocessing(ideal(gbUnivarPolys[i]),
+        // permute variables in ringlist,
+        // create and switch to ring with elimination ordering
+        rList[2][i] = varstrs[N];
+        rList[2][N] = varstrs[i];
+        ring rElimOrd = ring(rList);
+        // get GB in elimination ordering, note that GB[1] only depends on
+        // var(i) of rSource, which is var(N) in rElimOrd
+        ideal GB = fglm(rSource, fastGB);
+        GB = GB[1];
+
+        setring rUnivar;
+        gbUnivar = fetch(rElimOrd, GB, varmap);
+        // clean up ring and its elements
+        kill rElimOrd;
+
+        // get boxes containing roots of univariate polynomial
+        univarResult = rootIsolationNoPreprocessing(gbUnivar,
             box(list(start[i])), eps);
         // maybe result[1] is not empty, so take both
         startBoxesPerDim[i] = univarResult[1] + univarResult[2];
         // debug:
-        print(string("Sieved variable ", varstr(rSource, i), " to ",
+        print(string("Sieved variable ", varstrs[i], " to ",
             size(startBoxesPerDim[i]), " intervals."));
+
+        // reset ring variable order
+        setring rSource;
+        rList[2] = varstrs;
     }
 
     intvec sizes, repCount = 0:N, 1:N;
@@ -972,6 +997,7 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
 
     list startBoxes, sbTemp;
 
+    // prepare a list of lists
     for (i = 1; i <= numBoxes; i++)
     {
         sbTemp[i] = list();
@@ -996,8 +1022,7 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
         }
     }
 
-    // switch back for final computation and so that boxes have proper size
-    setring rSource;
+    // since we're back in rSource box(...) will return box of proper size
     for (i = 1; i <= size(sbTemp); i++)
     {
         startBoxes[i] = box(sbTemp[i]);
@@ -1009,15 +1034,13 @@ example
 {
     "EXAMPLE:"; echo = 2;
 
-    ring R = 0,(x,y),lp;
+    ring R = 0,(x,y),dp;
     ideal I = 2x2-xy+2y2-2,2x2-3xy+3y2-2;  // V(I) has four elements
 
     interval i = bounds(-3/2,3/2);
     box B = list(i, i);
 
-    list result = rootIsolation(I, B, 1/512);
-    size(result[1]);
-    size(result[2]);
+    list result = rootIsolation(I, B, 0);
 
     result;
 }
