@@ -1,49 +1,130 @@
-///////////////////////////////////////////////////////////////////
-version="version gitfan.lib 4.0.2.0 Apr_2015 ";  // $Id$
+////////////////////////////////////////////////////////////////////
+version="version gitfan.lib 4-1-0-3 Jun_2017 ";
 category="Algebraic Geometry";
 info="
-LIBRARY:  gitfan.lib       Compute GIT-fans.
+LIBRARY:   gitfan.lib       Compute GIT-fans.
 
-AUTHORS:  Janko Boehm      boehm@mathematik.uni-kl.de
-@*        Simon Keicher    keicher@mail.mathematik.uni-tuebingen.de
-@*        Yue Ren          ren@mathematik.uni-kl.de
+AUTHORS: Janko Boehm, boehm at mathematik.uni-kl.de @*
+         Simon Keicher, keicher at mail.mathematik.uni-tuebingen.de @*
+         Yue Ren, ren at mathematik.uni-kl.de @*
 
 OVERVIEW:
-This library computes GIT-fans, torus orbits and GKZ-fans.
-It uses the package 'gfanlib' by Anders N. Jensen
-and some algorithms have been outsourced to C++ to improve the performance.
-Check https://github.com/skeicher/gitfan_singular for updates.
+This library allows you to calculate GIT-fans, torus orbits and GKZ-fans.
 
-KEYWORDS: library; gitfan; GIT; geometric invariant theory; quotients
+In provides features to make use of symmetries of the torus action under consideration.
+
+The main procedure is GITfan which can be directly applied to an ideal and a grading matrix
+encoding the torus action, and returns a fan, the associated GIT-fan.
+We also provide various procedures implementing substeps of the algorithm
+to deal with large computations.
+
+The library uses the package 'gfanlib' by Anders N. Jensen.
+
+For notation, background, and algorithms see [BKR16].
+
+Functions produce debug output if printlevel is positive.
+
+Elements of the symmetric group Sn of type permutation can be created by
+the function permutationFromIntvec.
+The images of 1,...,n can be obtained by permutationToIntvec.
+Composition of permutations can be done by the *-Operator,
+also powers can be computed in the usual way.
+
+
+REFERENCES:
+
+[BKR16] J. Boehm, S. Keicher, Y. Ren: Computing GIT-Fans with Symmetry and the Mori Chamber Decomposition of M06bar,  https://arxiv.org/abs/1603.09241
+
+TYPES:
+  permutation; Permutation in map representation.
 
 PROCEDURES:
-afaces(ideal);                      Returns a list of intvecs that correspond to all a-faces
+  isAface(ideal,intvec); Checks whether the given face is an a-face.
+  afaces(ideal); Returns a list of intvecs that correspond to the set of all a-faces, optionally for given list of simplex faces.
+  fullDimImages(list,intmat); Finds the afaces which have a full-dimensional projection.
+  minimalAfaces(list); compute the minimal a-faces among the a-faces with full dimensional projection.
+  orbitCones(list,intmat); Returns the list of all orbit cones.
+  GITcone(list,bigintmat); Returns the GIT-cone containing the given weight vector.
+  GITfan(ideal,intmat); Compute GIT-fan.
+  GITfanFromOrbitCones(list,intmat,cone); Compute GIT-fan from orbit cones.
+  GITfanParallel(list,intmat,cone); Compute GIT-fan in parallel from orbit cones.
+  GKZfan(intmat); Returns the GKZ-fan of the matrix Q.
+  movingCone(intmat); Compute the moving cone.
+  computeAfaceOrbits(list,list); Compute orbits of a-faces under a permutation group action.
+  minimalAfaceOrbits(list); Find the minimal a-face orbits.
+  orbitConeOrbits(list,intmat); Project the a-face orbits to orbit cone orbits.
+  minimalOrbitConeOrbits(list); Find the minimal orbit cone orbits.
+  intersectOrbitsWithMovingCone(list,cone); Intersect orbit cone orbits with moving cone.
+  groupActionOnQImage(list,intmat); Determine the induced group action in the target of the grading matrix.
+  groupActionOnHashes(list,list); Determine the induced group action on the set of orbit cones.
+  storeActionOnOrbitConeIndices(list, string); Write the group action on the set of orbit cones to a file.
+  permutationFromIntvec(intvec); Create a permutation from an intvec of images.
+  permutationToIntvec(permutation); Return the intvec of images.
+  evaluateProduct(list,list); Evaluate a list of products of group elements in terms of a given representation of the elements as permutations.
+  GITfanSymmetric(list,intmat,cone,list); Compute GIT-fan from orbit cones by determining a minimal representing set for the orbits of maximal dimensional GIT-cones.
+  GITfanParallelSymmetric(list, intmat, cone, list); Compute GIT-fan in parallel from orbit cones by determining a minimal representing set for the orbits of maximal dimensional GIT-cones.
+  bigintToBinary(bigint,int); Convert bigint into a sparse binary represenation specifying the indices of the one-entries
+  binaryToBigint(intvec); Convert sparse binary represenation specifying the indices of the one-entries to bigint
+  applyPermutationToIntvec(intvec,permutation); Apply permutation to a set of integers represented as an intvec
+  hashToCone(bigint,list); Convert a bigint hash to a GIT-cone
+  hashesToFan(list hashes,list OC)
 gitCone(ideal,bigintmat,bigintmat); Returns the GIT-cone around the given weight vector w
-gitFan(ideal,bigintmat);            Returns the GIT-fan of the H-action defined by Q on V(a)
-gkzFan(bigintmat);                  Returns the GKZ-fan of the matrix Q
-isAface(ideal,intvec);              Checks whether intvec corresponds to an ideal-face
-orbitCones(ideal,bigintmat);        Returns the list of all projected a-faces
+
+KEYWORDS: library, gitfan, GIT, geometric invariant theory, quotients
 ";
 
-LIB "parallel.lib"; // for parallelWaitAll
 
-////////////////////////////////////////////////////
-proc mod_init()
+LIB "customstd.lib";
+LIB "linalg.lib";
+LIB "multigrading.lib";
+LIB "parallel.lib";
+
+static proc mod_init()
 {
-  LIB"customstd.so";
-  LIB"gfanlib.so";
+  LIB "gfanlib.so";
+  LIB "gitfan.so";
+  newstruct("permutation","intvec image");
+  system("install","permutation","*",composePermutations,2);
+  system("install","permutation","^",permutationPower,2);
+  system("install","permutation","print",printPermutation,1);
 }
 
+static proc emptyString(int n)
+{
+string st;
+for (int i = 1; i<=n;i++){
+  st=st+" ";
+}
+return(st);}
+
+proc printPermutation(permutation sigma)
+{
+ intvec v = permutationToIntvec(sigma);
+ string vsrc,vimg;
+ for (int i = 1; i<=size(v);i++){
+   vsrc=vsrc+emptyString(1+size(string(size(v)))-size(string(i)))+string(i);
+ }
+ for (i = 1; i<=size(v);i++){
+   vimg=vimg+emptyString(1+size(string(size(v)))-size(string(v[i])))+string(v[i]);
+ }
+ print("|"+vsrc+"|");
+ print("|"+vimg+"|");
+}
+
+
+////////////////////////////////////////////////////
+// converts e.g. n=5 to its binary representation, i.e. 0,1,0,1
+// if r = 3.
+// and stores it in an intvec.
+// r gives the bound for n <= 2^r:
 static proc int2face(int n, int r)
 {
   int k = r-1;
   intvec v;
   int n0 = n;
 
-  while(n0 > 0)
-  {
-    while(2^k > n0)
-    {
+  while(n0 > 0){
+    while(2^k > n0){
       k--;
       //v[size(v)+1] = 0;
     }
@@ -55,81 +136,224 @@ static proc int2face(int n, int r)
   v = v[1..size(v)-1];
   return(v);
 }
+example
+{
+  echo = 2;
+  int n = 5;
+  int r = 4;
+  int2face(n, r);
 
-/////////////////////////////////
+  n = 1;
+  r = 1;
+  int2face(n,r);
+}
+
+////////
+
+
+
+////////////////////////////////////////////////////
+
+proc afaces(ideal a, list #)
+"USAGE: afaces(a [,L]); a: ideal, L: list of intvecs
+PURPOSE: Returns a list of all a-faces (considered as intvecs of 0 and 1, where the i-th entry is 1 if the cone has the i-th unit basis vector as a generator), if L is specified only the faces of the simplex listed in L are considered (e.g. representatives with respect to a group action).
+RETURN: a list of intvecs
+EXAMPLE: example afaces; shows an example
+"
+{
+  list AF;
+  if ((size(#)>0) and (typeof(#[1])=="intvec")){
+    list L = #;
+    for(int i = 1; i<=size(L); i++ ){
+      dbprint("representative "+string(i)+" of "+string(size(L)));
+      if (isAface(a,L[i])){
+        AF[size(AF) + 1] = L[i];
+      }
+    }
+    return(AF);
+  }
+
+  intvec gam0;
+  int r = nvars(basering);
+
+  // check if 0 is an a-face:
+  int bd;
+  if (size(#)>0){bd=#[1];}
+  gam0 = 0;
+  if (size(gam0)>=bd){
+    if (isAface(a,gam0)){
+      AF[size(AF) + 1] = gam0;
+    }
+  }
+  // check for other a-faces:
+  for(int i = 1; i < 2^r; i++ ){
+    gam0 = int2face(i,r);
+    if (size(gam0)>=bd){
+      if (isAface(a,gam0)){
+        AF[size(AF) + 1] = gam0;
+      }
+    }
+  }
+
+  //"done checking a-faces!";
+  return(AF);
+}
+example
+{
+
+  echo = 2;
+  ring R = 0,T(1..3),dp;
+  ideal a = T(1)+T(2)+T(3);
+
+  list F = afaces(a);
+  print(F);
+  print(size(F));
+
+  // 2nd ex //
+  ring R2 = 0,T(1..3),dp;
+  ideal a2 = T(2)^2*T(3)^2+T(1)*T(3);
+
+  list F2 = afaces(a2);
+  print(F2);
+  print(size(F2));
+
+  // 3rd ex //
+  ring R3 = 0,T(1..3),dp;
+  ideal a3 = 0;
+
+  list F3 = afaces(a3);
+  print(F3);
+  print(size(F3));
+
+
+  // 4th ex //
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  list F4 = afaces(J);
+  print(size(F4));
+}
+
+
+
+static proc saturateWithRespectToVariable(ideal I, int k)
+{
+  // "saturating with respect to variable "+string(k);
+  ASSUME(1,k>=1);
+  ASSUME(1,k<=nvars(basering));
+
+  def origin = basering;
+  int n = nvars(basering);
+  intvec weightVector = ringlist(origin)[3][1][2];
+
+  string newVars;
+  intvec newWeightVector;
+  for (int i=1; i<k; i++)
+  {
+    newVars = newVars+string(var(i))+",";
+    newWeightVector[i]=weightVector[i];
+  }
+  for (i=k+1; i<=n; i++)
+  {
+    newVars = newVars+string(var(i))+",";
+    newWeightVector[i-1]=weightVector[i];
+  }
+  newVars = newVars+string(var(k));
+  newWeightVector[n]=weightVector[k];
+  execute("ring ringForSaturation = ("+charstr(origin)+"),("+newVars+"),(wp(newWeightVector));");
+
+  ideal I = satstd(imap(origin,I));
+  I = simplify(I,2+4+32);
+
+  // "finished saturating with respect to variable "+string(k);
+  setring origin;
+  return (imap(ringForSaturation,I));
+}
+
+static proc stepwiseSaturation(ideal I)
+{
+  if (I!=1)
+  {
+    list variablesToBeSaturated;
+    int l = nvars(basering);
+    for (int i=1; i<=l; i++)
+    { variablesToBeSaturated[i]=l-i+1; }
+
+    while (size(variablesToBeSaturated)>0)
+    {
+      I = saturateWithRespectToVariable(I,variablesToBeSaturated[1]);
+      variablesToBeSaturated = delete(variablesToBeSaturated,1);
+      if ((I==1) || (I==-1))
+      {
+        break;
+      }
+    }
+  }
+
+  return (I);
+}
+
+
+
+
+
 
 proc isAface(ideal a, intvec gam0)
-"USAGE:  isAface(a,gam0); a: ideal, gam0:intvec
-PURPOSE: Checks whether the face of the positive orthant,
-         that is spanned by all i-th unit vectors,
-         where i ranges amongst the entries of gam0,
-         is an a-face.
-RETURN:  int
+  "USAGE: isAface(a,gam0); a: ideal, gam0:intvec
+PURPOSE: Checks whether gam0 is an a-face w.r.t. the ideal a.
+RETURN: int
 EXAMPLE: example isaface; shows an example
 "
 {
-  poly pz;
-
   // special case: gam0 is the zero-cone:
-  if (size(gam0) == 1 and gam0[1] == 0)
-  {
+  if (size(gam0) == 1 and gam0[1] == 0){
+    poly pz;
     ideal G;
-
-    // is an a-face if and only if RL0(0,...,0) = const
-    // set all entries to 0:
     int i;
-    for (int k = 1; k <= ncols(a); k++)
-    {
+    for (int k = 1; k <= size(a); k++) {
       pz = subst(a[k], var(1), 0);
-      for (i = 2; i <= nvars(basering); i++)
-      {
+      for (i = 2; i <= nvars(basering); i++) {
         pz = subst(pz, var(i), 0);
       }
       G = G, pz;
     }
-
     G = std(G);
-
     // monomial inside?:
-    if(1 == G)
-    {
+    if(G == 1){
       return(0);
     }
-
     return(1);
   }
 
-
-  // ring is too big: Switch to KK[T_i; e_i\in gam0] instead:
-  def R = basering;
   string initNewRing = "ring Rgam0 = 0,(";
+
+  intvec w = ringlist(basering)[3][1][2];
+  intvec w0;
   for (int i=1; i<size(gam0); i++)
   {
+    // take only entries i of w0 with i in gam0
     initNewRing = initNewRing + string(var(gam0[i])) + ",";
+    w0[i] = w[gam0[i]];
   }
-  initNewRing = initNewRing + string(var(gam0[size(gam0)])) + "),dp;";
+  w0[size(gam0)] = w[gam0[size(gam0)]];
+
+  initNewRing = initNewRing + string(var(gam0[size(gam0)])) + "),wp(w0);";
+  def R = basering;
   execute(initNewRing);
-  kill i;
 
   ideal agam0 = imap(R,a);
 
-  poly p = var(1); // first entry of g; p = prod T_i with i element of g
-  for (int i = 2; i <= nvars(basering); i++ )
+  ideal G = stepwiseSaturation(agam0);
+
+  if(G == 1)
   {
-    p = p * var(i);
+    return(0); // true
   }
-  // p is now the product over all T_i, with e_i in gam0
-
-  agam0 = agam0, p - 1; // rad-membership
-  ideal G = std(agam0);
-
-  // does G contain 1?, i.e. is G = 1?
-  if(G <> 1)
-  {
-    return(1); // true
-  }
-
-  return(0); // false
+  return(1); // false
 }
 example
 {
@@ -142,183 +366,2658 @@ example
   intvec v = 1,2,4;
 
   isAface(I,w); // should be 0
-  "-----------";
   isAface(I,v); // should be 1
 }
 
-////////////////////////////////////////////////////
 
-proc afacesPart(ideal a, int d, int start, int end, int r)
+proc applyPermutationToIntvec(intvec v, permutation g)
+"USAGE: applyPermutationToIntvec(v,g); v: intvec, g:permutation
+PURPOSE: Apply g to the set of entries of v. The result is a sorted intvec. We assume that the entries of v are valid arguments of g. We do not require that the input is sorted.
+RETURN: intvec.
+EXAMPLE: example applyPermutationToIntvec; shows an example
+"
 {
-  intvec gam0;
-  int i;
-  list AF;
+  intvec gv = composeIntvecs(permutationToIntvec(g),v);
+  //for (int i=1;i<=size(v);i++){
+  //  gv[i]=g[v[i]];
+  //}
+  return(sort(gv)[1]);
+}
+example
+{
+permutation g = permutationFromIntvec(intvec(10, 9, 7, 4, 8, 6, 3, 5, 2, 1));
+applyPermutationToIntvec(intvec(1, 3, 4, 6, 8),g);
+}
 
-  for(i = start; i <= end; i++)
+static proc isContained(intvec v, list orbit){
+  for (int i=1;i<=size(orbit);i++){
+    if (v==orbit[i]){return(1);}
+  }
+  return(0);
+}
+
+
+static proc computeSimplexOrbit(intvec v, list G){
+  list orbit;
+  intvec gv;
+  for (int i=1;i<=size(G);i++){
+    gv=applyPermutationToIntvec(v,G[i]);
+    if (isContained(gv,orbit)==0){orbit[size(orbit)+1]=gv;}
+  }
+  return(orbit);
+}
+
+
+proc computeAfaceOrbits(list AF, list G)
+  "USAGE: computeAfaceOrbits(AF,G); AF list of intvecs, G: list of permutations
+PURPOSE: Computes the orbits of the afaces in the list AF under the group action in G, where G is a list of permutations. We assume that the elements of G form a group and the first entry corresponds to the neutral element.
+RETURN: a list of lists of intvecs
+EXAMPLE: example computeAfaceOrbits; shows an example
+"
+{
+  list listorbits;
+  for (int i=1;i<=size(AF);i++){
+    dbprint(i);
+    listorbits[i]=computeSimplexOrbit(AF[i],G);
+  }
+  return(listorbits);}
+example
+{
+  echo = 2;
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list simplexSymmetryGroup = G25Action();
+  list simplexOrbitRepresentatives = intvec( 1, 2, 3, 4, 5 ),
+  intvec( 1, 2, 3, 5, 6 ),
+  intvec( 1, 2, 3, 5, 7 ),
+  intvec( 1, 2, 3, 5, 10 ),
+  intvec( 1, 2, 3, 7, 9 ),
+  intvec( 1, 2, 6, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6 ),
+  intvec( 1, 2, 3, 4, 5, 10 ),
+  intvec( 1, 2, 3, 5, 6, 8 ),
+  intvec( 1, 2, 3, 5, 6, 9 ),
+  intvec( 1, 2, 3, 5, 7, 10 ),
+  intvec( 1, 2, 3, 7, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7 ),
+  intvec( 1, 2, 3, 4, 5, 6, 8 ),
+  intvec( 1, 2, 3, 4, 5, 6, 9 ),
+  intvec( 1, 2, 3, 5, 6, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7, 8 ),
+  intvec( 1, 2, 3, 4, 5, 6, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
+  list afaceOrbitRepresentatives=afaces(J,simplexOrbitRepresentatives);
+  list fulldimAfaceOrbitRepresentatives=fullDimImages(afaceOrbitRepresentatives,Q);
+  list afaceOrbits=computeAfaceOrbits(fulldimAfaceOrbitRepresentatives,simplexSymmetryGroup);
+  apply(afaceOrbits,size);}
+
+
+
+
+static proc isSubset(intvec v, intvec w)
+{
+  int i,j;
+  int jStart=1;
+  for (i=1; i<=size(v); i++)
   {
-    if(i < 2^r)
+    for (j=jStart; j<=size(w); j++)
     {
-      gam0 = int2face(i,r);
-
-      // take gam0 only if it has
-      // at least d rays:
-      if(size(gam0) >= d)
+      if (v[i]==w[j])
       {
-        if (isAface(a,gam0))
+        break;
+      }
+    }
+    if (j<=size(w))
+    {
+      jStart = j+1;
+    }
+    else
+    {
+      return (0);
+    }
+  }
+  return (1);
+}
+
+
+
+static proc containsOrbitd(list A, list B)
+{
+  intvec a = A[1];
+  for (int i=1; i<=size(B); i++)
+  {
+    if (isSubset(a,B[i]))
+    {
+      return (1);
+    }
+  }
+  return (0);
+}
+
+
+proc minimalAfaceOrbits(list listOfOrbits)
+"USAGE: minimalAfaceOrbits(afaceOrbits); afaceOrbits: list
+PURPOSE: Returns a list of all minimal a-face orbits.
+RETURN: a list of intvecs
+EXAMPLE: example minimalAfaceOrbits; shows an example
+"
+{
+  int i,j;
+  list L = listOfOrbits;
+  for (i=1; i<=size(L); i++)
+  {
+    dbprint(string(i)+" of "+string(size(L)));
+    for (j=1; j<=size(L); j++)
+    {
+      if (i!=j)
+      {
+        if (containsOrbitd(L[i],L[j]))
         {
-          AF[size(AF) + 1] = gam0;
+          dbprint("werfe raus (Laenge):  " + string(size(L[j])));
+          L = delete(L,j);
+          if (j<i)
+          {
+            i = i-1;
+          }
+          j = j-1;
         }
       }
     }
   }
-  return(AF);
+  return(L);
+}
+example
+{
+  echo = 2;
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list simplexSymmetryGroup = G25Action();
+  list simplexOrbitRepresentatives = intvec( 1, 2, 3, 4, 5 ),
+  intvec( 1, 2, 3, 5, 6 ),
+  intvec( 1, 2, 3, 5, 7 ),
+  intvec( 1, 2, 3, 5, 10 ),
+  intvec( 1, 2, 3, 7, 9 ),
+  intvec( 1, 2, 6, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6 ),
+  intvec( 1, 2, 3, 4, 5, 10 ),
+  intvec( 1, 2, 3, 5, 6, 8 ),
+  intvec( 1, 2, 3, 5, 6, 9 ),
+  intvec( 1, 2, 3, 5, 7, 10 ),
+  intvec( 1, 2, 3, 7, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7 ),
+  intvec( 1, 2, 3, 4, 5, 6, 8 ),
+  intvec( 1, 2, 3, 4, 5, 6, 9 ),
+  intvec( 1, 2, 3, 5, 6, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7, 8 ),
+  intvec( 1, 2, 3, 4, 5, 6, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
+  list afaceOrbitRepresentatives=afaces(J,simplexOrbitRepresentatives);
+  list fulldimAfaceOrbitRepresentatives=fullDimImages(afaceOrbitRepresentatives,Q);
+  list afaceOrbits=computeAfaceOrbits(fulldimAfaceOrbitRepresentatives,simplexSymmetryGroup);
+  apply(afaceOrbits,size);
+  list minAfaceOrbits = minimalAfaceOrbits(afaceOrbits);
+  apply(minAfaceOrbits,size);
 }
 
-////////////////////////////////////////////////////
 
-proc afaces(ideal a, list #)
-"USAGE:  afaces(a, b, c); a: ideal, d: int, c: int
-PURPOSE: Returns a list of all a-faces (represented by intvecs).
-         Moreover, it is possible to specify a dimensional bound b,
-         upon which only cones of that dimension and above are returned.
-         Lastly, as the computation is parallizable, one can specify c,
-         the number of cores to be used by the computation.
-RETURN:  a list of intvecs
-EXAMPLE: example afaces; shows an example
+static proc list2string(list L){
+  string s = "";
+
+  for(int i = 1; i <=size(L); i++){
+    s = s + string(size(L[i])) + ", ";
+  }
+
+  return(s);
+}
+
+
+
+proc fullDimImages(list afaces,intmat Q)
+"USAGE: fullDimImages(afaces, Q); afaces: list, Q: intmat
+PURPOSE: Determines the a-faces (represented as intvecs) from the list afaces which have a full-dimensional projection with respect to Q.
+RETURN: a list of intvecs
+EXAMPLE: example fullDimImages; shows an example
 "
 {
-  int d = 1;
-  int ncores = 1;
-
-  if ((size(#) > 0) and (typeof(#[1]) == "int"))
+  list L;
+  for (int i=1; i<=size(afaces); i++)
   {
-    d = #[1];
+          intvec gam0 = afaces[i];
+          intmat Qgam0[nrows(Q)][size(gam0)] = Q[intvec(1..nrows(Q)),gam0];
+          //cone c = coneViaPoints(Qgam0);
+          if(rank(Qgam0) == nrows(Q)){
+      L[size(L)+1]=afaces[i];
+    }
+    kill gam0,Qgam0;
   }
+  return(L);
+}
+example
+{
+  echo=2;
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
 
-  if ((size(#) > 1) and (typeof(#[2]) == "int"))
-  {
-    ncores = #[2];
+  list AF= afaces(J,nrows(Q));
+  size(AF);
+  size(fullDimImages(AF,Q));
+}
+
+
+
+
+proc orbitConeOrbits(list F, intmat Q)
+"USAGE: orbitConeOrbits(F, Q); F: list, Q: intmat
+PURPOSE: Projects a list F of a-face orbits to the orbit cones with respect to Q. The function checks whether the projections are of full dimension and returns an error otherwise.
+RETURN: a list of lists of cones
+EXAMPLE: example orbitConeOrbits; shows an example
+"
+{
+  list OC;
+  int j;
+  intmat Qt = transpose(Q);
+  for(int i = 1; i <= size(F); i++){
+    list Orbit = F[i];
+    list U;
+    for(j = 1; j <= size(Orbit); j++){
+      intvec aface = Orbit[j];
+      intmat Qgam0[size(aface)][ncols(Qt)] = Qt[aface,intvec(1..ncols(Qt))];
+      cone c = coneViaPoints(Qgam0);
+      if (dimension(c)!=ncols(Qt)){ERROR("cone should have full dimension");}
+      // insert it even if it is already inside (mincones will take care of this)
+      U[size(U)+1] = c;
+      kill aface;
+      kill Qgam0;
+      kill c;
+    }
+    OC[size(OC)+1] = U;
+    dbprint("current size of OC:");
+    dbprint(size(OC));
+    kill U;
+    kill Orbit;
   }
+  return(OC);
+}
+example
+{
+  echo = 2;
+  // Note that simplexOrbitRepresentatives and simplexSymmetryGroup are subsets of the actual sets for G25. For the full example see the examples in the documentation
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list simplexOrbitRepresentatives = intvec( 1, 2, 3, 4, 5 ),
+    intvec( 1, 2, 3, 5, 6 ),
+    intvec( 1, 2, 3, 5, 7 ),
+    intvec( 1, 2, 3, 5, 10 ),
+    intvec( 1, 2, 3, 7, 9 ),
+    intvec( 1, 2, 3, 4, 5, 6, 9, 10 ),
+    intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9 ),
+    intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
+  list afaceOrbitRepresentatives=afaces(J,simplexOrbitRepresentatives);
+  list simplexSymmetryGroup = permutationFromIntvec(intvec( 1 .. 10 )),
+    permutationFromIntvec(intvec( 1, 2, 4, 3, 5, 7, 6, 9, 8, 10 )),
+    permutationFromIntvec(intvec( 1, 3, 2, 4, 6, 5, 7, 8, 10, 9 )),
+    permutationFromIntvec(intvec( 1, 3, 4, 2, 6, 7, 5, 10, 8, 9 )),
+    permutationFromIntvec(intvec( 1, 4, 2, 3, 7, 5, 6, 9, 10, 8 )),
+    permutationFromIntvec(intvec( 1, 4, 3, 2, 7, 6, 5, 10, 9, 8 ));
+  list fulldimAfaceOrbitRepresentatives=fullDimImages(afaceOrbitRepresentatives,Q);
+  list afaceOrbits=computeAfaceOrbits(fulldimAfaceOrbitRepresentatives,simplexSymmetryGroup);
+  apply(afaceOrbits,size);
+  list minAfaceOrbits = minimalAfaceOrbits(afaceOrbits);
+  apply(minAfaceOrbits,size);
+  list listOfOrbitConeOrbits = orbitConeOrbits(minAfaceOrbits,Q);
+}
 
-  list AF;
-  intvec gam0;
-  int r = nvars(basering);
 
-  // check if 0 is an a-face:
-  gam0 = 0;
-  if (isAface(a,gam0))
+proc minimalOrbitConeOrbits(list listOfOrbits)
+"USAGE: minimalOrbitConeOrbits(listOfOrbits); listOfOrbits: list of lists of cones
+PURPOSE: Minimizes a list of orbit cone orbits.
+RETURN: a list of lists of cones
+EXAMPLE: example minimalOrbitConeOrbits; shows an example
+"
+{
+  int i,j;
+  list L = listOfOrbits;
+
+
+  for (i=1; i<=size(L); i++)
   {
-      AF[size(AF) + 1] = gam0;
-  }
+    dbprint("::::: " + string(i)+" of "+string(size(L)));
 
-  // check for other a-faces:
-  // make ncores processes:
-  int step = 2^r div ncores;
-  int i;
-
-  list args;
-  for(int k = 0; k < ncores; k++)
-  {
-    args[size(args) + 1] = list(a, d, k * step + 1, (k+1) * step, r);
-  }
-
-  string command = "afacesPart";
-  list out = parallelWaitAll(command, args);
-
-  // do remaining ones:
-  for(i = ncores * step +1; i < 2^r; i++)
-  {
-    "another one needed";
-    gam0 = int2face(i,r);
-
-    // take gam0 only if it has
-    // at least d rays:
-    if(size(gam0) >= d)
+    for (j=1; j<=size(L); j++)
     {
-      if (isAface(a,gam0))
+      dbprint("outer: "+string(i)+"  inner: " + string(j));
+      if (i!=j)
       {
-        AF[size(AF) + 1] = gam0;
+        if (containsOrbitdCone(L[i],L[j]))
+        {
+          dbprint("werfe raus, i="+string(i)+",  j="+string(j)+" (Laenge):  " + string(size(L[j])));
+          L = delete(L,j);
+          if (j<i)
+          {
+            i = i-1;
+          }
+          j = j-1;
+        }
+      }
+    }
+  }
+  return(L);
+}
+example
+{
+  echo = 2;
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list simplexSymmetryGroup = G25Action();
+  list simplexOrbitRepresentatives = intvec( 1, 2, 3, 4, 5 ),
+  intvec( 1, 2, 3, 5, 6 ),
+  intvec( 1, 2, 3, 5, 7 ),
+  intvec( 1, 2, 3, 5, 10 ),
+  intvec( 1, 2, 3, 7, 9 ),
+  intvec( 1, 2, 6, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6 ),
+  intvec( 1, 2, 3, 4, 5, 10 ),
+  intvec( 1, 2, 3, 5, 6, 8 ),
+  intvec( 1, 2, 3, 5, 6, 9 ),
+  intvec( 1, 2, 3, 5, 7, 10 ),
+  intvec( 1, 2, 3, 7, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7 ),
+  intvec( 1, 2, 3, 4, 5, 6, 8 ),
+  intvec( 1, 2, 3, 4, 5, 6, 9 ),
+  intvec( 1, 2, 3, 5, 6, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7, 8 ),
+  intvec( 1, 2, 3, 4, 5, 6, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
+  list afaceOrbitRepresentatives=afaces(J,simplexOrbitRepresentatives);
+  list fulldimAfaceOrbitRepresentatives=fullDimImages(afaceOrbitRepresentatives,Q);
+  list afaceOrbits=computeAfaceOrbits(fulldimAfaceOrbitRepresentatives,simplexSymmetryGroup);
+  apply(afaceOrbits,size);
+  list minAfaceOrbits = minimalAfaceOrbits(afaceOrbits);
+  apply(minAfaceOrbits,size);
+  list listOfOrbitConeOrbits = orbitConeOrbits(minAfaceOrbits,Q);
+  apply(listOfOrbitConeOrbits,size);
+  list listOfMinimalOrbitConeOrbits = minimalOrbitConeOrbits(listOfOrbitConeOrbits);
+  size(listOfMinimalOrbitConeOrbits);
+}
+
+
+static proc containsOrbitdCone(list A, list B)
+{
+  cone a = A[1];
+  for (int i=1; i<=size(B); i++)
+  {
+    if (isSubcone(a,B[i]))
+    {
+      dbprint("found subcone i="+string(i));
+      return (1);
+    }
+  }
+  return (0);
+}
+
+static proc isSubcone(cone c1, cone c2)
+{
+  return(containsInSupport(c2, c1));
+}
+
+
+
+
+
+
+proc intersectOrbitsWithMovingCone(list OCmin,cone mov)
+"USAGE: intersectOrbitsWithMovingCone(OCmin, mov); OCmin: list of lists of cones, mov: cone
+PURPOSE: Intersects all cones in the orbits in OCmin with mov discarting all orbits of cones which are not of full dimension. The resulting orbits are duplicate free.
+RETURN: a list of lists of cones
+EXAMPLE: example intersectOrbitsWithMovingCone; shows an example
+"
+{
+  list OCmov;
+  cone ocmov;
+  int i,j;
+  int fulldim=dimension(mov);
+  for (i=1; i<=size(OCmin); i++)
+  {
+    dbprint("intersecting orbit "+string(i)+" with moving cone");
+    ocmov = convexIntersection(OCmin[i][1],mov);
+    if (dimension(ocmov)==fulldim)
+    {
+      list currentOrbit;
+      for (j=1; j<=size(OCmin[i]); j++)
+      {
+        dbprint("checking cone "+string(j)+" of "+string(size(OCmin[i])));
+        ocmov = convexIntersection(OCmin[i][j],mov);
+        ocmov = canonicalizeCone(ocmov);
+        if (!listContainsCone(currentOrbit,ocmov))
+        {
+          dbprint("inserting cone");
+          currentOrbit[size(currentOrbit)+1] = ocmov;
+        }
+      }
+      OCmov[size(OCmov)+1] = currentOrbit;
+      kill currentOrbit;
+    }
+    else
+    {
+      dbprint("intersection with moving cone lower-dimensional, abandoning orbit");
+    }
+  }
+  return(OCmov);
+}
+example {
+  echo=2;
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list simplexSymmetryGroup = G25Action();
+  list simplexOrbitRepresentatives = intvec( 1, 2, 3, 4, 5 ),
+  intvec( 1, 2, 3, 5, 6 ),
+  intvec( 1, 2, 3, 5, 7 ),
+  intvec( 1, 2, 3, 5, 10 ),
+  intvec( 1, 2, 3, 7, 9 ),
+  intvec( 1, 2, 6, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6 ),
+  intvec( 1, 2, 3, 4, 5, 10 ),
+  intvec( 1, 2, 3, 5, 6, 8 ),
+  intvec( 1, 2, 3, 5, 6, 9 ),
+  intvec( 1, 2, 3, 5, 7, 10 ),
+  intvec( 1, 2, 3, 7, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7 ),
+  intvec( 1, 2, 3, 4, 5, 6, 8 ),
+  intvec( 1, 2, 3, 4, 5, 6, 9 ),
+  intvec( 1, 2, 3, 5, 6, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7, 8 ),
+  intvec( 1, 2, 3, 4, 5, 6, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
+  list afaceOrbitRepresentatives=afaces(J,simplexOrbitRepresentatives);
+  list fulldimAfaceOrbitRepresentatives=fullDimImages(afaceOrbitRepresentatives,Q);
+  list afaceOrbits=computeAfaceOrbits(fulldimAfaceOrbitRepresentatives,simplexSymmetryGroup);
+  apply(afaceOrbits,size);
+  list minAfaceOrbits = minimalAfaceOrbits(afaceOrbits);
+  apply(minAfaceOrbits,size);
+  list listOfOrbitConeOrbits = orbitConeOrbits(minAfaceOrbits,Q);
+  cone mov = movingCone(Q);
+  intersectOrbitsWithMovingCone(listOfOrbitConeOrbits,mov);
+}
+
+
+static proc coneToString(cone C){
+  bigintmat F = facets(C);
+  ring R=0,(x),dp;
+  matrix FF[nrows(F)][ncols(F)];
+  int i,j;
+  for (i=1; i<=nrows(F);i++){
+    for (j=1; j<=ncols(F);j++){
+      FF[i,j]=number(F[i,j]);
+    }
+  }
+  return("bigintmat F["+string(nrows(F))+"]["+string(ncols(F))+"]="+string(FF)+";cone C=canonicalizeCone(coneViaInequalities(F));");
+}
+
+proc storeOrbitConeOrbits(list OC, string fn)
+"USAGE: storeOrbitConeOrbits(OC, fn); OC: list of lists of cones, fn: string
+PURPOSE: Writes OC to file fn in Singular readable format. Can be importet using <.
+RETURN: nothing
+"
+{
+  int i,j;
+  write(":w "+fn,"list OC;");
+  for (i=1;i<=size(OC);i++){
+    write(":a "+fn,"list OCj;");
+    for (j=1;j<=size(OC[i]);j++){
+      write(":a "+fn,coneToString(OC[i][j]));
+      write(":a "+fn,"OCj[size(OCj)+1]=C;");
+      write(":a "+fn,"kill C;kill F;");
+    }
+    write(":a "+fn,"OC[size(OC)+1]=OCj;");
+    write(":a "+fn,"kill OCj;");
+  }
+}
+
+static proc storeCone(cone C,string fn){
+  intmat H = intmat(inequalities(C));
+  write(":w "+fn,"bigintmat H["+string(nrows(H))+"]["+string(ncols(H))+"] =");
+  write(":w "+fn,string(H)+";");
+  write(":a "+fn,"cone C= coneViaInequalities(H); kill H;");
+}
+
+static proc listToIntvec(list L){
+  intvec v;
+  for (int i = 1;i<=size(L);i++){
+    v[i]=L[i];}
+  return(v);
+}
+
+static proc intvecToList(intvec L){
+  list v;
+  for (int i = 1;i<=size(L);i++){
+    v[i]=L[i];}
+  return(v);
+}
+
+static proc stackMatrices(bigintmat M, bigintmat N){
+  if (ncols(M)!=ncols(N)){ERROR("matrices should have the same number of columns");}
+  bigintmat MN[nrows(M)+nrows(N)][ncols(N)];
+  MN[1..nrows(M),1..ncols(M)]=M[1..nrows(M),1..ncols(M)];
+  MN[(nrows(M)+1)..(nrows(M)+nrows(N)),1..ncols(M)]=N[1..nrows(N),1..ncols(N)];
+  return(MN);
+}
+
+
+proc movingCone(intmat Q)
+"USAGE: movingCone(Q); Q: intmat
+PURPOSE: Computes the moving cone from the grading matrix, with the degrees in the columns of Q.
+RETURN: a cone
+EXAMPLE: example movingCone; shows an example
+"
+{
+  cone Qgammadual = coneViaInequalities(transpose(Q));
+  bigintmat R = facets(Qgammadual);
+  list idx1=intvecToList(intvec(1..nrows(R)));
+  intvec idx2=1..ncols(R);
+  intvec idx1iv;
+  bigintmat Ri[nrows(R)-1][ncols(R)];
+  list C;
+  for (int i = 1; i<=nrows(R);i++){
+    idx1iv = listToIntvec(delete(idx1,i));
+    Ri=R[idx1iv,idx2];
+    C[i]=coneViaPoints(Ri);
+    dbprint(string(i)+"   "+string(nrows(facets(C[i]))));
+  }
+  cone mov = convexIntersection(C);
+  return(mov);
+}
+example
+{
+  echo=2;
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  cone mov = movingCone(Q);
+  mov;
+  rays(mov);
+}
+
+
+static proc pivotIndices(matrix H)
+{
+  intvec p;
+  int pp;
+  int i,j;
+  int l=1;
+  for (i=1; i<=ncols(H); i++)
+  {
+    for (j=nrows(H); j>=0; j--)
+    {
+      if (H[j,i]!=0)
+      {
+        if (j>pp)
+        {
+          p[l] = i;
+          l++;
+          pp = j;
+        }
+        break;
+      }
+    }
+  }
+  return (p);
+}
+
+
+
+proc groupActionOnQImage(list G,intmat Q)
+"USAGE: groupActionOnQImage(G,Q); G: list of permutations, Q: intmat
+PURPOSE: Given the group G of permutations acting on the simplex on ncols(Q) objects, computes the corresponding group action on the image of Q. We assume that the basering has characteristic 0.
+RETURN: list of matrices
+EXAMPLE: example groupActionOnQImage; shows an example
+"
+{
+  matrix Qmat = transpose(matrix(Q));
+  matrix H = gauss_nf(Qmat);
+  intvec indices = pivotIndices(H);
+  intmat Qbasis[nrows(Q)][size(indices)]=Q[1..nrows(Q),indices];
+  matrix QbasisInv = inverse(Qbasis);
+  list L;
+  intmat Qt = transpose(Q);
+  for(int i = 1; i <= size(G); i++){
+    intvec sig = permutationToIntvec(G[i]);
+    intmat Bsig = perm2mat(sig, indices,Qt);
+    matrix Asig = Bsig * QbasisInv;
+    L[size(L)+1] = matrixToIntmat(Asig);
+    kill sig;
+    kill Bsig;
+    kill Asig;
+  }
+  return(L);
+}
+example {
+  echo=2;
+  ring R = 0,(x),dp;
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+list generatorsG = permutationFromIntvec(intvec( 1, 3, 2, 4, 6, 5, 7, 8, 10, 9 )),
+permutationFromIntvec(intvec( 5, 7, 1, 6, 9, 2, 8, 4, 10, 3 ));
+groupActionOnQImage(generatorsG,Q);
+}
+
+
+
+static proc perm2mat(intvec sig, intvec indices, intmat Q){
+  intvec sigind = 1:size(indices);
+  for(int i = 1; i <= size(indices); i++){
+    if(indices[i] > size(sig)){
+      sigind[i] = indices[i];
+    } else {
+      sigind[i] = sig[indices[i]];
+    }
+  }
+  intmat Asig[size(indices)][ncols(Q)];
+  for(i = 1; i <= size(sigind); i++){
+    Asig[i,1..ncols(Q)] = Q[sigind[i], 1..ncols(Q)];
+  }
+  // the new basis must be in the cols:
+  return(transpose(Asig));
+}
+
+///////
+
+
+
+
+static proc imageCone(cone c, intmat A){
+  bigintmat ineqs = inequalities(c);
+  cone cc = coneViaInequalities (ineqs * A);
+  return(cc);
+}
+
+
+static proc matrixToIntmat(matrix A){
+  int i,j;
+  intmat Aint[nrows(A)][ncols(A)];
+  for(i = 1; i<=nrows(A); i++){
+    for(j = 1; j<=ncols(A); j++){
+      if (deg(A[i,j])>0){ERROR("entries should be constants");}
+      if (denominator(number(A[i,j]))!=1){ERROR("entries should be integers");}
+      Aint[i,j]=int(number(A[i,j]));
+    }
+  }
+  return(Aint);
+}
+
+
+proc groupActionOnHashes(list Asigma, list OCmov)
+"USAGE: groupActionOnHashes(Asigma,OCmov); Asigma: list, OCmov: list of list of cones
+PURPOSE: From the list of orbits of orbitcones, and the symmetry group represenation given by the matrices in Asigma, compute the corresponding permutation representation of the symmetry group on the orbit cones. The permutations are specified in a map representation of length the sum of the size of the orbits of OCmov.
+RETURN: list of permutations
+EXAMPLE: example groupActionOnHashes; shows an example
+"
+{
+// for each A in S6:
+// for each c in OC90:
+// store index of A*c
+// --> intvec v_A
+// store this in the list Ind
+  list Ind;
+  int i,j,b,k,sizepreviousorbits;
+  list remaining;
+  intmat A;
+  cone c,Ac;
+  for(i = 1; i<=size(Asigma); i++){
+    intvec vA;
+    A = intmat(Asigma[i]);
+    dbprint("element "+string(i)+" of symmetry group");
+    sizepreviousorbits=0;
+    for(b = 1; b <= size(OCmov); b++){
+      remaining = intvecToList(intvec(1..size(OCmov[b])));
+      for(j = 1; j <= size(OCmov[b]); j++){
+        Ac = imageCone(OCmov[b][j], A);
+
+        // find out index:
+        for(k= 1; k <= size(remaining); k++){
+          if(OCmov[b][remaining[k]] == Ac){
+            vA[j+sizepreviousorbits] = remaining[k]+sizepreviousorbits;
+            remaining = delete(remaining,k);
+            break;
+          }
+        }
+      }
+
+      sizepreviousorbits=size(vA);
+    }
+    Ind[size(Ind)+1] = permutationFromIntvec(vA);
+    dbprint("vA: "+string(vA));
+    kill vA;
+  }
+  return(Ind);
+}
+example
+{
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list AF= afaces(J);
+  list OC = orbitCones(AF,Q);
+  list generatorsG = permutationFromIntvec(intvec( 1, 3, 2, 4, 6, 5, 7, 8, 10, 9 )),
+                     permutationFromIntvec(intvec( 5, 7, 1, 6, 9, 2, 8, 4, 10, 3 ));
+  list Asigmagens = groupActionOnQImage(generatorsG,Q);
+groupActionOnHashes(Asigmagens,list(OC));
+
+
+  list simplexSymmetryGroup = G25Action();
+  list orb = findOrbits(simplexSymmetryGroup,nrows(Q));
+  list simplexOrbitRepresentatives;
+  for (int i=1;i<=size(orb);i++){simplexOrbitRepresentatives[i]=orb[i][1];}
+  list afaceOrbitRepresentatives=afaces(J,simplexOrbitRepresentatives);
+  list fulldimAfaceOrbitRepresentatives=fullDimImages(afaceOrbitRepresentatives,Q);
+  list afaceOrbits=computeAfaceOrbits(fulldimAfaceOrbitRepresentatives,simplexSymmetryGroup);
+  list minAfaceOrbits = minimalAfaceOrbits(afaceOrbits);
+  list listOfOrbitConeOrbits = orbitConeOrbits(minAfaceOrbits,Q);
+  list listOfMinimalOrbitConeOrbits = minimalOrbitConeOrbits(listOfOrbitConeOrbits);
+  list Asigma = groupActionOnQImage(simplexSymmetryGroup,Q);
+  groupActionOnHashes(Asigma,listOfOrbitConeOrbits);
+
+}
+
+
+
+
+
+
+
+
+static proc composePermutationsGAP(permutation sigma, permutation tau){
+  intvec sigmaTauImage;
+
+  for (int i=1;i<=size(sigma.image);i++){
+    sigmaTauImage[i]=tau.image[sigma.image[i]];
+  }
+
+  permutation sigmaTau;
+  sigmaTau.image = sigmaTauImage;
+  return(sigmaTau);
+}
+
+static proc composePermutations(permutation sigma, permutation tau){
+  intvec sigmaTauImage;
+
+  for (int i=1;i<=size(sigma.image);i++){
+    sigmaTauImage[i]=sigma.image[tau.image[i]];
+  }
+
+  permutation sigmaTau;
+  sigmaTau.image = sigmaTauImage;
+  return(sigmaTau);
+}
+
+
+static proc permutationPower(permutation sigma, int k){
+  int i;
+  if (k==0)
+  {
+    permutation identity;
+    identity.image = intvec(1..size(sigma.image));
+    return (identity);
+  }
+  if (k<0)
+  {
+    // if k<0 invert sigma and replace k with -k
+    intvec sigmaImage = sigma.image;
+    for (i=1; i<=size(sigmaImage); i++)
+    {
+      sigma.image[sigmaImage[i]] = i;
+    }
+    k = -k;
+  }
+  permutation sigmaToPowerK = sigma;
+  for (i=2; i<=k; i++)
+  {
+    sigmaToPowerK = composePermutations(sigmaToPowerK, sigma);
+  }
+  return (sigmaToPowerK);
+}
+
+proc permutationFromIntvec(intvec sigmaImage)
+"USAGE: permutationFromIntvec(sigmaImage); sigmaImage: intvec
+PURPOSE: Create a permutation from an intvec of images.
+RETURN: permutation
+EXAMPLE: example permutationFromIntvec; shows an example
+"
+{
+  permutation sigma;
+  sigma.image = sigmaImage;
+  return (sigma);
+}
+
+
+proc evaluateProduct(list generatorsGperm, string st)
+"USAGE: evaluateProduct(generatorsGperm,st); generatorsGperm: list, st: string
+PURPOSE: Evaluates a formal product of variables xi in st, where xi corresponds to the permutation generatorsGperm[i].
+RETURN: permutation
+EXAMPLE: example evaluateProduct; shows an example
+"
+{
+  for (int i=1;i<=size(generatorsGperm);i++){
+    execute("permutation x"+string(i)+"= generatorsGperm[i];");
+  }
+  if (st==""){
+    st="x1^0";
+  }
+  execute("permutation sigma = "+st);
+  return(sigma);}
+example
+{
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list AF= afaces(J);
+  list OC = orbitCones(AF,Q);
+  list generatorsG = permutationFromIntvec(intvec( 1, 3, 2, 4, 6, 5, 7, 8, 10, 9 )),
+                     permutationFromIntvec(intvec( 5, 7, 1, 6, 9, 2, 8, 4, 10, 3 ));
+  list Asigmagens = groupActionOnQImage(generatorsG,Q);
+//list actionOnOrbitconeIndicesForGenerators = groupActionOnHashes(Asigmagens,OC);
+string elementInTermsOfGenerators =
+"(x2^-1*x1^-1)^3*x1^-1";
+//evaluateProduct(actionOnOrbitconeIndicesForGenerators, elementInTermsOfGenerators);
+}
+
+
+proc permutationToIntvec(permutation sigma)
+"USAGE: permutationToIntvec(sigma); sigma: permutation
+PURPOSE: Convert a permutation to an intvec of images.
+RETURN: intvec
+EXAMPLE: example permutationToIntvec; shows an example
+"
+{return(sigma.image);}
+example
+{
+permutation sigma = permutationFromIntvec(intvec( 1, 2, 4, 3, 5, 7, 6, 9, 8, 10 ));
+sigma;
+permutationToIntvec(sigma);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+proc storeActionOnOrbitConeIndices(list Ind,string fn)
+"USAGE: storeActionOnOrbitConeIndices(generatorsGperm,st); generatorsGperm: list, fn: string
+PURPOSE: Write the action on the set of orbit cones to the file fn in Singular readable format.
+RETURN: nothing
+"
+{
+  string s = "list actionOnOrbitconeIndices;";
+  for(int i =1; i <= size(Ind); i++){
+    s = s + "intvec v = " + string(Ind[i]) + ";" + newline;
+    s = s + "actionOnOrbitconeIndices[size(actionOnOrbitconeIndices)+1] = permutationFromIntvec(v);" + newline + "kill v;" + newline;
+  }
+  write(":w "+fn, s);
+}
+
+
+
+
+
+static proc getNeighborHash(list OC, bigintmat w, bigintmat v, int mu)
+{
+  int success = 0;
+  int zz;
+  intvec Jtmp;
+  bigintmat wtmp;
+
+  while(!success)
+  {
+    mu = mu*2;
+    wtmp = mu*w - v;
+    success = 1;
+    for(zz = 1; zz <= size(OC); zz++)
+    {
+      if(containsInSupport(OC[zz], wtmp))
+      {
+        if(!containsInSupport(OC[zz], w))
+        {
+          success = 0;
+          Jtmp = 0;
+          break;
+        }
+        // insert index zz:
+        if(size(Jtmp) ==1 && Jtmp[1] == 0)
+        {
+          Jtmp[1] = zz;
+        }
+        else
+        {
+          Jtmp[size(Jtmp)+1] = zz;
+        }
       }
     }
   }
 
-  // read out afaces of out into AF:
-  for(i = 1; i <= size(out); i++)
-  {
-    AF = AF + out[i];
-  }
-
-  return(AF);
+  return(Jtmp);
 }
-example
-{
 
-  echo = 2;
-  ring R = 0,T(1..3),dp;
-  ideal a = T(1)+T(2)+T(3);
 
-  list F = afaces(a,3,4);
-  print(F);
-  print(size(F));
 
-  // 2nd ex //
-  ring R2 = 0,T(1..3),dp;
-  ideal a2 = T(2)^2*T(3)^2+T(1)*T(3);
-
-  list F2 = afaces(a2,3,4);
-  print(F2);
-  print(size(F2));
-
-  // 3rd ex //
-  ring R3 = 0,T(1..3),dp;
-  ideal a3 = 0;
-
-  list F3 = afaces(a3,3,4);
-  print(F3);
-  print(size(F3));
-
-  // bigger example //
-  ring R = 0,T(1..15),dp;
-  ideal a =
-    T(1)*T(10)-T(2)*T(7)+T(3)*T(6),
-    T(1)*T(11)-T(2)*T(8)+T(4)*T(6),
-    T(1)*T(12)-T(2)*T(9)+T(5)*T(6),
-    T(1)*T(13)-T(3)*T(8)+T(4)*T(7),
-    T(1)*T(14)-T(3)*T(9)+T(5)*T(7),
-    T(1)*T(15)-T(4)*T(9)+T(5)*T(8),
-    T(2)*T(13)-T(3)*T(11)+T(4)*T(10),
-    T(2)*T(14)-T(3)*T(12)+T(5)*T(10),
-    T(2)*T(15)-T(4)*T(12)+T(5)*T(11),
-    T(3)*T(15)-T(4)*T(14)+T(5)*T(13),
-    T(6)*T(13)-T(7)*T(11)+T(8)*T(10),
-    T(6)*T(14)-T(7)*T(12)+T(9)*T(10),
-    T(6)*T(15)-T(8)*T(12)+T(9)*T(11),
-    T(7)*T(15)-T(8)*T(14)+T(9)*T(13),
-    T(10)*T(15)-T(11)*T(14)+T(12)*T(13);
-
-  int t = timer;
-  list F4 = afaces(a,0,2);
-  print(size(F4));
-  timer - t;
-
-  int t = timer;
-  list F4 = afaces(a,0);
-  print(size(F4));
-  timer - t;
-
-}
 
 ///////////////////////////////////////
 
-proc orbitCones(ideal a, bigintmat Q, list #)
-"USAGE:  orbitCones(a, Q, b, c); a: ideal, Q: bigintmat, b: int, c: int
+proc GITfanSymmetric(list OC, bigintmat Q, cone Qgamma, list actiononorbitcones, list #)
+  "USAGE: GITfanSymmetric(OC, Q, Qgamma, actiononorbitcones [, file1, file2]); OC:list, Q:bigintmat, Qgamma:cone, actiononorbitcones: list of intvec, file1:string, file2:string
+PURPOSE: Returns the common refinement of the cones given in
+the list OC which is supposed to contain the orbit cones intersected with Qgamma. The list actiononorbitcones is supposed to contain the symmetry group acting as permutations of on the list of orbit cones in OC. The optional argument can be used to specify one or two strings with file names, where the first file will contain the hashes of the GIT-cones and the second argument the actual cones in their H-representation.
+To obtain the whole GIT-fan Qgamma has to be take the cone generated by the columns of Q.
+RETURN: a list containing the bigint hashes of the GIT cones.
+EXAMPLE: example GITfanSymmetric; shows an example
+"
+{
+  actiononorbitcones=apply(actiononorbitcones,permutationToIntvec);
+  /**
+   * stores the hashes of all maximal GIT cones computed
+   */
+  list hashesOfCones;
+  /**
+   * stores to the corresponding maximal GIT cone in hashesOfCones
+   * - 0, if guaranteed that all adjacent GIT cones are known
+   *        or are to be computed in the next iteration       (*)
+   * - hash as intvec, otherwise
+   */
+  list workingList;
+
+
+  /**
+   * compute starting cone
+   */
+  bigintmat w,v;
+  cone lambda;
+  intvec lambdaHash;
+  while(dimension(lambda) <> nrows(Q)){
+    w = randConeEl(transpose(Q),100);
+    dbprint("testing "+string(w));
+    if (containsRelatively(Qgamma,w)) {
+      lambda,lambdaHash = GITcone(OC,w);
+      dbprint("computed cone of dimension "+string(dimension(lambda)));
+    }
+  }
+  int nCones = 1;     // essentially size(hashesOfCones)
+  int nConesOpen = 1; // essentially size(workingList)+1, see (*) above
+
+
+  /**
+   * initialize lists
+   */
+  int posToInsert = 1;
+  bigint hashToInsert = binaryToBigint(lambdaHash);
+  intvec sigLambdaHash;
+  for(int i = 2; i <= size(actiononorbitcones); i++){
+    sigLambdaHash = composeIntvecs(actiononorbitcones[i],lambdaHash);
+    hashToInsert = min(hashToInsert,binaryToBigint(sigLambdaHash));
+  }
+  hashesOfCones[1] = hashToInsert;
+  workingList[1] = int(0);
+  if (size(#)>0) {write(":w "+#[1],string(hashesOfCones[1]) + ",");}
+  if (size(#)>1) {write(":w "+#[2],"");writeGitconeToFile(lambda,#[2]);}
+
+
+  /**
+   * traverse fan
+   */
+  int t,tt;
+  list FL;
+  intvec neighbourHash;
+  int mu = 1024;
+  while (lambdaHash>0)
+  {
+    tt=timer;
+
+    /**
+     * compute all facets of lambda
+     */
+    t = timer;
+    FL = listOfFacetsAndInteriorVectors(lambda, Qgamma);
+    dbprint("time for facets: "+string(timer - t));
+
+    /**
+     * compute all neighbours of lambda
+     */
+    for (i=size(FL[1]); i>0; i--)
+    {
+      v = FL[1][i][1]; // interior facet normal
+      w = FL[1][i][2]; // interior facet point
+      neighbourHash = getNeighborHash(OC,w,v,mu);
+      posToInsert,hashToInsert = findPosToInsertSymmetric(hashesOfCones,neighbourHash,actiononorbitcones);
+      if(posToInsert > 0)
+      {
+        if (size(#)>0){write(":a "+#[1],string(binaryToBigint(neighbourHash)) + ",");}
+        hashesOfCones = insertToList(hashesOfCones,hashToInsert,posToInsert);
+        workingList = insertToList(workingList,neighbourHash,posToInsert);
+        nConesOpen++;
+        nCones++;
+      }
+    }
+
+    /**
+     * pick lambdaHash and lambda for next iteration,
+     * set respective entry in workingList to 0
+     */
+    lambdaHash = 0;
+    for (i=size(workingList); i>0; i--)
+    {
+      if (typeof(workingList[i])=="intvec")
+      {
+        lambdaHash = workingList[i];
+        lambda = gitConeFromHash(OC,lambdaHash);
+        if (size(#)>1) {writeGitconeToFile(lambda,#[2]);}
+        workingList[i] = int(0);
+        break;
+      }
+    }
+    nConesOpen--;
+
+    dbprint("overall: "+string(nCones)+"   open: "+string(nConesOpen)+"   time for loop: "+string(timer-tt));
+  }
+  return(hashesOfCones);
+}
+example
+{
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list simplexSymmetryGroup = G25Action();
+  list simplexOrbitRepresentatives = intvec( 1, 2, 3, 4, 5 ),
+  intvec( 1, 2, 3, 5, 6 ),
+  intvec( 1, 2, 3, 5, 7 ),
+  intvec( 1, 2, 3, 5, 10 ),
+  intvec( 1, 2, 3, 7, 9 ),
+  intvec( 1, 2, 6, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6 ),
+  intvec( 1, 2, 3, 4, 5, 10 ),
+  intvec( 1, 2, 3, 5, 6, 8 ),
+  intvec( 1, 2, 3, 5, 6, 9 ),
+  intvec( 1, 2, 3, 5, 7, 10 ),
+  intvec( 1, 2, 3, 7, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7 ),
+  intvec( 1, 2, 3, 4, 5, 6, 8 ),
+  intvec( 1, 2, 3, 4, 5, 6, 9 ),
+  intvec( 1, 2, 3, 5, 6, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7, 8 ),
+  intvec( 1, 2, 3, 4, 5, 6, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
+  list afaceOrbitRepresentatives=afaces(J,simplexOrbitRepresentatives);
+  list fulldimAfaceOrbitRepresentatives=fullDimImages(afaceOrbitRepresentatives,Q);
+  list afaceOrbits=computeAfaceOrbits(fulldimAfaceOrbitRepresentatives,simplexSymmetryGroup);
+  apply(afaceOrbits,size);
+  list minAfaceOrbits = minimalAfaceOrbits(afaceOrbits);
+  apply(minAfaceOrbits,size);
+  list listOfOrbitConeOrbits = orbitConeOrbits(minAfaceOrbits,Q);
+  apply(listOfOrbitConeOrbits,size);
+  list listOfMinimalOrbitConeOrbits = minimalOrbitConeOrbits(listOfOrbitConeOrbits);
+  size(listOfMinimalOrbitConeOrbits);
+  list Asigma = groupActionOnQImage(simplexSymmetryGroup,Q);
+  list actionOnOrbitconeIndices = groupActionOnHashes(Asigma,listOfOrbitConeOrbits);
+  list OClist = listOfOrbitConeOrbits[1];
+  for (int i =2;i<=size(listOfOrbitConeOrbits);i++){
+    OClist = OClist + listOfOrbitConeOrbits[i];
+  }
+cone mov = coneViaPoints(transpose(Q));
+mov = canonicalizeCone(mov);
+printlevel = 3;
+list Sigma = GITfanSymmetric(OClist, Q, mov, actionOnOrbitconeIndices);
+Sigma;
+}
+
+
+proc GITfanParallelSymmetric(list OC, bigintmat Q, cone Qgamma, list actiononorbitcones, list #)
+  "USAGE: GITfanParallelSymmetric(OC, Q, Qgamma, actiononorbitcones [, file1]); OC:list, Q:bigintmat, Qgamma:cone, actiononorbitcones: list of intvec, file1:string
+PURPOSE: Returns the common refinement of the cones given in
+the list OC which is supposed to contain the orbit cones intersected with Qgamma. The list actiononorbitcones is supposed to contain the symmetry group acting as permutations of on the list of orbit cones in OC. The optional argument can be used to specify a name for a file which will contain the hashes of the GIT-cones.
+To obtain the whole GIT-fan Qgamma has to be take the cone generated by the columns of Q.
+RETURN: a list containing the bigint hashes of the GIT cones.
+NOTE: The proceduce uses parallel computation for the construction of the GIT-cones.
+EXAMPLE: example GITfanParallelSymmetric; shows an example
+"
+{
+  actiononorbitcones=apply(actiononorbitcones,permutationToIntvec);
+  /**
+   * stores the hashes of all maximal GIT cones computed
+   */
+  list hashesOfCones;
+  /**
+   * stores to the corresponding maximal GIT cone in hashesOfCones
+   * - 0, if guaranteed that all adjacent GIT cones are known
+   *        or are to be computed in the next iteration       (*)
+   * - hash as intvec, otherwise
+   */
+  list workingList;
+
+
+  /**
+   * compute starting cone
+   */
+  bigintmat w,v;
+  cone lambda;
+  intvec lambdaHash;
+  while(dimension(lambda) <> nrows(Q)){
+    w = randConeEl(transpose(Q),100);
+    dbprint("testing "+string(w));
+    if (containsRelatively(Qgamma,w)) {
+      lambda,lambdaHash = GITcone(OC,w);
+      dbprint("computed cone of dimension "+string(dimension(lambda)));
+    }
+  }
+  int nCones = 1;     // essentially size(hashesOfCones)
+  int nConesOpen = 1; // essentially size(workingList)+1, see (*) above
+
+
+  /**
+   * initialize lists
+   */
+  bigint hashToInsert = binaryToBigint(lambdaHash);
+  int posToInsert = 1;
+  intvec sigLambdaHash;
+  for(int i = 2; i <= size(actiononorbitcones); i++){
+    sigLambdaHash = composeIntvecs(actiononorbitcones[i],lambdaHash);
+    hashToInsert = min(hashToInsert,binaryToBigint(sigLambdaHash));
+  }
+  hashesOfCones[1] = hashToInsert;
+  workingList[1] = int(0);
+  if (size(#)>0) {write(":w "+#[1],string(binaryToBigint(lambdaHash)) + ",");}
+  //if (size(#)>1) {write(":w "+#[2],"list listOfMaximalCones;");writeGitconeToFile(lambda,#[2]);}
+
+
+  list iterationArgs = list(list(lambdaHash,OC,Qgamma,actiononorbitcones));
+  list iterationRes;
+
+  /**
+   * traverse fan
+   */
+  int j,t,tloop;
+  list FL;
+  list neighbourHashes;
+  intvec neighbourHash;
+  while (size(iterationArgs)>0)
+  {
+    tloop=rtimer;
+
+    /**
+     * compute all neighbours of lambda
+     */
+    t = rtimer;
+    iterationRes = parallelWaitAll("computeNeighbourMinimalHashes",iterationArgs);
+    dbprint("time neighbours: "+string(rtimer - t));
+
+    /**
+     * central book keeping
+     */
+    t = rtimer;
+    for (i=1; i<=size(iterationRes); i++)
+    {
+      neighbourHashes = iterationRes[i];
+      for (j=1; j<=size(neighbourHashes); j++)
+      {
+        neighbourHash = neighbourHashes[j];
+        hashToInsert = binaryToBigint(neighbourHash);
+        posToInsert = findPlaceToInsert(hashesOfCones,hashToInsert);
+        if(posToInsert > 0)
+        {
+          if (size(#)>0){write(":a "+#[1],string(binaryToBigint(neighbourHash)) + ",");}
+          hashesOfCones = insertToList(hashesOfCones,hashToInsert,posToInsert);
+          workingList = insertToList(workingList,neighbourHash,posToInsert);
+          nConesOpen++;
+          nCones++;
+        }
+      }
+    }
+    nConesOpen = nConesOpen - size(iterationArgs);
+    dbprint("time bookkeeping: "+string(rtimer - t));
+
+    /**
+     * pick arguments for next iteration,
+     * set respective entry in workingList to 0
+     */
+    t = rtimer;
+    iterationArgs = list();
+    for (i=size(workingList); i>0; i--)
+    {
+      if (typeof(workingList[i])=="intvec")
+      {
+        iterationArgs[size(iterationArgs)+1] = list(workingList[i],OC,Qgamma,actiononorbitcones);
+        workingList[i] = int(0);
+        if (size(iterationArgs) >= getcores())
+        {
+          break;
+        }
+      }
+    }
+    dbprint("time preparation: "+string(rtimer - t));
+
+    dbprint("overall: "+string(nCones)+"   open: "+string(nConesOpen)+"   time loop: "+string(rtimer-tloop));
+  }
+  return(hashesOfCones);
+}
+example
+{
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list simplexSymmetryGroup = G25Action();
+  list simplexOrbitRepresentatives = intvec( 1, 2, 3, 4, 5 ),
+  intvec( 1, 2, 3, 5, 6 ),
+  intvec( 1, 2, 3, 5, 7 ),
+  intvec( 1, 2, 3, 5, 10 ),
+  intvec( 1, 2, 3, 7, 9 ),
+  intvec( 1, 2, 6, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6 ),
+  intvec( 1, 2, 3, 4, 5, 10 ),
+  intvec( 1, 2, 3, 5, 6, 8 ),
+  intvec( 1, 2, 3, 5, 6, 9 ),
+  intvec( 1, 2, 3, 5, 7, 10 ),
+  intvec( 1, 2, 3, 7, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7 ),
+  intvec( 1, 2, 3, 4, 5, 6, 8 ),
+  intvec( 1, 2, 3, 4, 5, 6, 9 ),
+  intvec( 1, 2, 3, 5, 6, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7, 8 ),
+  intvec( 1, 2, 3, 4, 5, 6, 9, 10 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9 ),
+  intvec( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
+  list afaceOrbitRepresentatives=afaces(J,simplexOrbitRepresentatives);
+  list fulldimAfaceOrbitRepresentatives=fullDimImages(afaceOrbitRepresentatives,Q);
+  list afaceOrbits=computeAfaceOrbits(fulldimAfaceOrbitRepresentatives,simplexSymmetryGroup);
+  apply(afaceOrbits,size);
+  list minAfaceOrbits = minimalAfaceOrbits(afaceOrbits);
+  apply(minAfaceOrbits,size);
+  list listOfOrbitConeOrbits = orbitConeOrbits(minAfaceOrbits,Q);
+  apply(listOfOrbitConeOrbits,size);
+  list listOfMinimalOrbitConeOrbits = minimalOrbitConeOrbits(listOfOrbitConeOrbits);
+  size(listOfMinimalOrbitConeOrbits);
+  list Asigma = groupActionOnQImage(simplexSymmetryGroup,Q);
+  list actionOnOrbitconeIndices = groupActionOnHashes(Asigma,listOfOrbitConeOrbits);
+  list OClist = listOfOrbitConeOrbits[1];
+  for (int i =2;i<=size(listOfOrbitConeOrbits);i++){
+    OClist = OClist + listOfOrbitConeOrbits[i];
+  }
+  cone mov = coneViaPoints(transpose(Q));
+  mov = canonicalizeCone(mov);
+  list Sigma = GITfanParallelSymmetric(OClist, Q, mov, actionOnOrbitconeIndices);
+  Sigma;
+}
+
+
+// not static to be used in parallel.lib
+proc computeNeighbourMinimalHashes(intvec lambdaHash, list OC, cone Qgamma, list actiononorbitcones)
+{
+  /**
+   * compute all facets of lambda
+   */
+  cone lambda = gitConeFromHash(OC,lambdaHash);
+  list FL = listOfFacetsAndInteriorVectors(lambda, Qgamma);
+
+  /**
+   * compute all minimal hashes of neighbours of lambda
+   */
+  int i,j;
+  bigintmat v,w;
+  intvec neighbourHash;
+  intvec neighbourHashPerm;
+  bigint nPerm;
+  intvec neighbourHashMin;
+  bigint nMin;
+  list neighbourHashes;
+  for (i=size(FL[1]); i>0; i--)
+  {
+    v = FL[1][i][1]; // interior facet normal
+    w = FL[1][i][2]; // interior facet point
+    neighbourHash = getNeighborHash(OC,w,v,1024);
+    neighbourHashMin = neighbourHash;
+    nMin = binaryToBigint(neighbourHash);
+    for (j=size(actiononorbitcones); j>1; j--)
+    {
+      neighbourHashPerm = composeIntvecs(actiononorbitcones[j],neighbourHash);
+      nPerm = binaryToBigint(neighbourHashPerm);
+      if (nPerm < nMin)
+      {
+        nMin = nPerm;
+        neighbourHashMin = neighbourHashPerm;
+      }
+    }
+    neighbourHashes[i] = neighbourHashMin;
+  }
+
+  return (neighbourHashes);
+}
+
+
+
+static proc writeGitconeToFile(cone lambda,string fn)
+{
+  bigintmat H = facets(lambda);
+
+  int rows = nrows(H);
+  int cols = ncols(H);
+  string toBeWritten = "bigintmat H["+string(rows)+"]["+string(cols)+"]=";
+  int i,j;
+  for (i=1; i<=rows; i++)
+  {
+    for (j=1; j<=cols; j++)
+    {
+      toBeWritten = toBeWritten + string(H[i,j]) + ",";
+    }
+  }
+  toBeWritten = toBeWritten[1..size(toBeWritten)-1];
+  toBeWritten = toBeWritten + ";";
+  write(":a "+fn,toBeWritten);
+
+  toBeWritten = "listOfMaximalCones[size(listOfMaximalCones)+1] = coneViaInequalities(V);";
+  write(":a "+fn,toBeWritten);
+
+  toBeWritten = "kill V;";
+  write(":a "+fn,toBeWritten);
+
+  toBeWritten = "";
+  write(":a "+fn,toBeWritten);
+}
+
+
+
+static proc listOfFacetsAndInteriorVectors(cone lambda, cone Qgamma, list #){
+  list FL;
+  int numboundary;
+
+  bigintmat FL0 = facets(lambda);
+  bigintmat H[1][ncols(FL0)];
+  bigintmat FL1[nrows(FL0)-1][ncols(FL0)]; // delete row of H from FL0
+
+  bigintmat w;
+  cone facetCone;
+  for(int i = 1; i <= nrows(FL0); i++){
+    H = FL0[i,1..ncols(FL0)];
+
+    if(i > 1 and i < nrows(FL0)){
+      FL1 = FL0[1..i-1, 1..ncols(FL0)], FL0[i+1..nrows(FL0), 1..ncols(FL0)];
+    } else {
+      if(i == nrows(FL0)){
+        FL1 = FL0[1..i-1, 1..ncols(FL0)];
+      } else { // i = 1:
+        FL1 = FL0[2..nrows(FL0), 1..ncols(FL0)];
+      }
+    }
+
+    facetCone = coneViaInequalities(FL1, H);
+
+    if (size(#)>0)
+    {
+      if (containsInSupport(facetCone,#[1]))
+      {
+        i++;
+        continue;
+      }
+    }
+
+    w = relativeInteriorPoint(facetCone);
+
+    if(containsRelatively(Qgamma,w)){
+      FL[size(FL) + 1] = list(H,w);
+    } else {
+      numboundary=numboundary+1;
+    }
+  }
+
+  return(list(FL,numboundary));
+}
+
+
+
+
+
+////////////////////////////////
+
+// CAREFUL: we assume that actiononorbitcones[1] = id.
+static proc findPosToInsertSymmetric(list hashesOfCones, intvec J, list actiononorbitcones){
+
+  // 1.: compute minimal hash sigJ
+  bigint n = binaryToBigint(J);
+  intvec sigJ;
+  for(int i = 2; i <= size(actiononorbitcones); i++){
+    sigJ = composeIntvecs(actiononorbitcones[i],J);
+    n = min(n,binaryToBigint(sigJ));
+  }
+
+  // 2.:check if minimal hash is already in list
+  return(findPlaceToInsert(hashesOfCones,n),n);
+}
+
+//////////////////////
+
+// insert n at position pos and move bigger elements by one index
+proc insertToList(list L, def elementToInsert, int posToInsert){
+  if(posToInsert == 1){
+    return(list(elementToInsert)+L);
+  }
+  if(posToInsert == size(L)+1){
+    return(L+list(elementToInsert));
+  }
+  return(list(L[1..(posToInsert-1)],elementToInsert,L[posToInsert..size(L)]));
+}
+
+proc GITcone(list OCcones, bigintmat w)
+"USAGE: GITcone(OCcones, w); OCcones: list of orbit cones, w: bigintmat with one row
+PURPOSE: Returns the intersection of all orbit cones containing w.
+RETURN: cone,intvec with the GIT cone containing w, and the hash of this cone (the indices of the orbit cones contributing to the intersection)
+EXAMPLE: example GITcone; shows an example
+"
+{
+  list OCrelcones;
+  intvec Hash;
+  for(int i = 1; i <= size(OCcones); i++){
+    if(containsInSupport(OCcones[i], w)){
+      OCrelcones[size(OCrelcones)+1]=OCcones[i];
+      Hash[size(Hash)+1] = i;
+    }
+  }
+  Hash = intvec(Hash[2..size(Hash)]);
+  return(convexIntersection(OCrelcones),Hash);
+}
+example {
+  echo=2;
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+
+  list AF= afaces(J,nrows(Q));
+  AF=fullDimImages(AF,Q);
+  AF = minimalAfaces(AF);
+  list OC = orbitCones(AF,Q);
+  bigintmat w[1][nrows(Q)];
+  for(int i = 1; i <= nrows(Q); i++){
+    w = w + Q[1..nrows(Q),i];
+  }
+  GITcone(OC,w);
+}
+
+
+static proc gitConeFromHash(list OC, intvec Hash)
+{
+  list OCtoIntersect = OC[Hash];
+  return (convexIntersection(OCtoIntersect));
+}
+
+
+
+
+
+static proc randConeEl(bigintmat Q, int bound){
+  bigintmat w[1][ncols(Q)];
+
+  for(int i = 1; i <= nrows(Q); i++){
+    bigintmat v[1][ncols(Q)] = Q[i,1..ncols(Q)];
+
+    w = w + random(1,bound) * v;
+
+    kill v;
+  }
+
+  return(w);
+}
+
+
+
+static proc subdividelist(list OC,int ncores){
+  if (ncores>size(OC)){ncores=size(OC);}
+  int percore = size(OC) div (ncores);
+  int lastcore = size(OC) mod (ncores);
+  list OCLL;
+  int j=1;
+  int starti=1;
+  int endi;
+  for (int i=1;i<=ncores;i++){
+    endi = starti+percore-1;
+    if (i<=lastcore) {endi=endi+1;}
+    list OCLLi=OC[starti..endi];
+    starti=endi+1;
+    OCLL[i]=OCLLi;
+    kill OCLLi;
+  }
+  return(OCLL);
+}
+//list OC = 1,2,3,4,5,6,7,8,9,10,11,12;
+//subdividelist(OC,4);
+
+
+
+
+
+
+
+
+
+
+
+
+proc orbitCones(list AF, intmat Q, list #)
+"USAGE: orbitCones(AF, Q[, d]); AF: list of intvecs, Q: intmat, d: int
+PURPOSE: Returns the list consisting of all cones Q(gam0) where gam0 in AF. If the optional argument d is given then the function returns only the orbit cones of dimension at least d
+RETURN: a list of cones
+EXAMPLE: example orbitCones; shows an example
+"
+{
+  list OC;
+  intvec gam0;
+  int j;
+  cone c;
+  int d = 0;
+  if (size(#)>0) {
+    d = #[1];
+  }
+
+  for(int i = 1; i <= size(AF); i++){
+    gam0 = AF[i];
+
+    if(gam0 == 0){
+      bigintmat M[1][nrows(Q)];
+    } else {
+      bigintmat M[size(gam0)][nrows(Q)];
+
+      for (j = 1; j <= size(gam0); j++){
+        M[j,1..ncols(M)] = Q[1..nrows(Q),gam0[j]];
+      }
+    }
+
+    c = coneViaPoints(M);
+
+    if(listContainsCone(OC, c) == 0 && dimension(c)>=d){
+      OC[size(OC)+1] = c;
+    }
+
+    kill M;
+  }
+
+  return(OC);
+}
+example
+{
+  echo=2;
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+
+  list AF= afaces(J);
+  print(size(AF));
+  list OC = orbitCones(AF,Q);
+  size(OC);
+}
+
+
+
+///////////////////////////////////////
+
+proc GITfanFromOrbitCones(list OC, bigintmat Q, cone Qgamma, list #)
+  "USAGE: GITfanFromOrbitCones(OC, Q, Qgamma [, file1, file2]); OC:list, Q:bigintmat, Qgamma:cone, file1:string, file2:string
+PURPOSE: Returns the common refinement of the cones given in
+the list OC which is supposed to contain the orbit cones intersected with Qgamma. The optional argument can be used
+to specify one or two strings with file names, where the first file will contain the hashes of the
+GIT-cones and the second argument the actual cones in their H-representation.
+To obtain the whole GIT-fan Qgamma has to be take the cone generated by the columns of Q.
+RETURN: a list containing the bigint hashes of the GIT cones.
+EXAMPLE: example GITfanFromOrbitCones; shows an example
+"
+{
+  /**
+   * stores the hashes of all maximal GIT cones computed
+   */
+  list hashesOfCones;
+  /**
+   * stores to the corresponding maximal GIT cone in hashesOfCones
+   * - 0, if guaranteed that all adjacent GIT cones are known
+   *        or are to be computed in the next iteration       (*)
+   * - hash as intvec, otherwise
+   */
+  list workingList;
+
+
+  /**
+   * compute starting cone
+   */
+  bigintmat w,v;
+  cone lambda;
+  intvec lambdaHash;
+  while(dimension(lambda) <> nrows(Q)){
+    w = randConeEl(transpose(Q),100);
+    dbprint("testing "+string(w));
+    if (containsRelatively(Qgamma,w)) {
+      lambda,lambdaHash = GITcone(OC,w);
+      dbprint("computed cone of dimension "+string(dimension(lambda)));
+    }
+  }
+  int nCones = 1;     // essentially size(hashesOfCones)
+  int nConesOpen = 1; // essentially size(workingList)+1, see (*) above
+
+
+  /**
+   * initialize lists
+   */
+  int posToInsert = 1;
+  bigint hashToInsert = binaryToBigint(lambdaHash);
+  hashesOfCones[1] = hashToInsert;
+  workingList[1] = int(0);
+  if (size(#)>0) {write(":w "+#[1],string(hashesOfCones[1]) + ",");}
+  if (size(#)>1) {write(":w "+#[2],"list listOfMaximalCones;");writeGitconeToFile(lambda,#[2]);}
+
+
+  /**
+   * traverse fan
+   */
+  int i,t,tt;
+  list FL;
+  intvec neighbourHash;
+  int mu = 1024;
+  while (lambdaHash>0)
+  {
+    tt=timer;
+
+    /**
+     * compute all facets of lambda
+     */
+    t = timer;
+    FL = listOfFacetsAndInteriorVectors(lambda, Qgamma);
+    dbprint("time for facets: "+string(timer - t));
+
+    /**
+     * compute all neighbours of lambda
+     */
+    for (i=size(FL[1]); i>0; i--)
+    {
+      v = FL[1][i][1]; // interior facet normal
+      w = FL[1][i][2]; // interior facet point
+      neighbourHash = getNeighborHash(OC,w,v,mu);
+      hashToInsert = binaryToBigint(neighbourHash);
+      posToInsert = findPlaceToInsert(hashesOfCones,hashToInsert);
+
+      if(posToInsert > 0)
+      {
+        if (size(#)>0){write(":a "+#[1],string(binaryToBigint(neighbourHash)) + ",");}
+        hashesOfCones = insertToList(hashesOfCones,hashToInsert,posToInsert);
+        workingList = insertToList(workingList,neighbourHash,posToInsert);
+        nConesOpen++;
+        nCones++;
+      }
+    }
+
+    /**
+     * pick lambdaHash and lambda for next iteration,
+     * set respective entry in workingList to 0
+     */
+    lambdaHash = 0;
+    for (i=size(workingList); i>0; i--)
+    {
+      if (typeof(workingList[i])=="intvec")
+      {
+        lambdaHash = workingList[i];
+        lambda = gitConeFromHash(OC,lambdaHash);
+        if (size(#)>1) {writeGitconeToFile(lambda,#[2]);}
+        workingList[i] = int(0);
+        break;
+      }
+    }
+    nConesOpen--;
+
+    dbprint("overall: "+string(nCones)+"   open: "+string(nConesOpen)+"   time for loop: "+string(timer-tt));
+  }
+  return(hashesOfCones);
+}
+example
+{
+  echo=2;
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+
+  list AF= afaces(J,nrows(Q));
+  AF=fullDimImages(AF,Q);
+  AF = minimalAfaces(AF);
+  list OC = orbitCones(AF,Q);
+  cone Qgamma = coneViaPoints(transpose(Q));
+  list GIT = GITfanFromOrbitCones(OC,Q,Qgamma);
+  size(GIT);
+}
+
+
+
+
+
+proc GITfanParallel(list OC, intmat Q, cone Qgamma, list #)
+  "USAGE: GITfanParallel(OC, Q, Qgamma [, file1]); OC:list, Q:intmat, Qgamma:cone, file1:string
+PURPOSE: Returns the common refinement of the cones given in
+the list OC which is supposed to contain the orbit cones intersected with Qgamma. The optional argument can be used to specify a name for a file which will contain the hashes of the GIT-cones.
+To obtain the whole GIT-fan Qgamma has to be take the cone generated by the columns of Q.
+RETURN: a list containing the bigint hashes of the GIT cones.
+NOTE: The proceduce uses parallel computation for the construction of the GIT-cones.
+EXAMPLE: example GITfanParallel; shows an example
+"
+{
+  /**
+   * stores the hashes of all maximal GIT cones computed
+   */
+  list hashesOfCones;
+  /**
+   * stores to the corresponding maximal GIT cone in hashesOfCones
+   * - 0, if guaranteed that all adjacent GIT cones are known
+   *        or are to be computed in the next iteration       (*)
+   * - hash as intvec, otherwise
+   */
+  list workingList;
+
+
+  /**
+   * compute starting cone
+   */
+  bigintmat w,v;
+  cone lambda;
+  intvec lambdaHash;
+  while(dimension(lambda) <> nrows(Q)){
+    w = randConeEl(transpose(Q),100);
+    dbprint("testing "+string(w));
+    if (containsRelatively(Qgamma,w)) {
+      lambda,lambdaHash = GITcone(OC,w);
+      dbprint("computed cone of dimension "+string(dimension(lambda)));
+    }
+  }
+  int nCones = 1;     // essentially size(hashesOfCones)
+  int nConesOpen = 1; // essentially size(workingList)+1, see (*) above
+
+
+  /**
+   * initialize lists
+   */
+  bigint hashToInsert = binaryToBigint(lambdaHash);
+  int posToInsert = 1;
+  hashesOfCones[1] = hashToInsert;
+  workingList[1] = int(0);
+  if (size(#)>0) {write(":w "+#[1],string(binaryToBigint(lambdaHash)) + ",");}
+  //if (size(#)>1) {write(":w "+#[2],"list listOfMaximalCones;");writeGitconeToFile(lambda,#[2]);}
+
+
+  list iterationArgs = list(list(lambdaHash,OC,Qgamma));
+  list iterationRes;
+
+  /**
+   * traverse fan
+   */
+  int i,j,t,tloop;
+  list FL;
+  list neighbourHashes;
+  intvec neighbourHash;
+  while (size(iterationArgs)>0)
+  {
+    tloop=rtimer;
+
+    /**
+     * compute all neighbours of lambda
+     */
+    t = rtimer;
+    iterationRes = parallelWaitAll("computeNeighbourHashes",iterationArgs);
+    dbprint("time neighbours: "+string(rtimer - t));
+
+    /**
+     * central book keeping
+     */
+    t = rtimer;
+    for (i=1; i<=size(iterationRes); i++)
+    {
+      neighbourHashes = iterationRes[i];
+      for (j=1; j<=size(neighbourHashes); j++)
+      {
+        neighbourHash = neighbourHashes[j];
+        hashToInsert = binaryToBigint(neighbourHash);
+        posToInsert = findPlaceToInsert(hashesOfCones,hashToInsert);
+        if(posToInsert > 0)
+        {
+          if (size(#)>0){write(":a "+#[1],string(binaryToBigint(neighbourHash)) + ",");}
+          hashesOfCones = insertToList(hashesOfCones,hashToInsert,posToInsert);
+          workingList = insertToList(workingList,neighbourHash,posToInsert);
+          nConesOpen++;
+          nCones++;
+        }
+      }
+    }
+    nConesOpen = nConesOpen - size(iterationArgs);
+    dbprint("time bookkeeping: "+string(rtimer - t));
+
+    /**
+     * pick arguments for next iteration,
+     * set respective entry in workingList to 0
+     */
+    t = rtimer;
+    iterationArgs = list();
+    for (i=size(workingList); i>0; i--)
+    {
+      if (typeof(workingList[i])=="intvec")
+      {
+        iterationArgs[size(iterationArgs)+1] = list(workingList[i],OC,Qgamma);
+        workingList[i] = int(0);
+        if (size(iterationArgs) >= getcores())
+        {
+          break;
+        }
+      }
+    }
+    dbprint("time preparation: "+string(rtimer - t));
+
+    dbprint("overall: "+string(nCones)+"   open: "+string(nConesOpen)+"   time loop: "+string(rtimer-tloop));
+  }
+
+  if (size(#)==0)
+  {
+    return(hashesOfCones);
+  }
+}
+example
+{
+  echo=2;
+  setcores(4);
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+
+  list AF= afaces(J);
+  print(size(AF));
+  list OC = orbitCones(AF,Q);
+  cone Qgamma = coneViaPoints(transpose(Q));
+  list GIT = GITfanParallel(OC,Q,Qgamma);
+  size(GIT);
+}
+
+// not static to be used in parallel.lib
+proc computeNeighbourHashes(intvec lambdaHash, list OC, cone Qgamma)
+{
+  /**
+   * compute all facets of lambda
+   */
+  cone lambda = gitConeFromHash(OC,lambdaHash);
+  list FL = listOfFacetsAndInteriorVectors(lambda, Qgamma);
+
+  /**
+   * compute all minimal hashes of neighbours of lambda
+   */
+  bigintmat v,w;
+  intvec neighbourHash;
+  list neighbourHashes;
+  for (int i=size(FL[1]); i>0; i--)
+  {
+    v = FL[1][i][1]; // interior facet normal
+    w = FL[1][i][2]; // interior facet point
+    neighbourHash = getNeighborHash(OC,w,v,1024);
+    neighbourHashes[i] = neighbourHash;
+  }
+
+  return (neighbourHashes);
+}
+
+
+
+proc minimalAfaces(list listOfAfaces)
+"USAGE: minimalAfaces(listOfAfaces); listOfAfaces: list
+PURPOSE: Returns a list of all minimal a-faces. Note that listOfAfaces must only contain
+afaces which project to full dimension.
+RETURN: a list of intvecs
+EXAMPLE: example minimalAfaces; shows an example
+"
+{
+  int i,j;
+  for (i=1; i<=size(listOfAfaces); i++)
+  {
+    for (j=1; j<=size(listOfAfaces); j++)
+    {
+      if (i!=j)
+      {
+        if (isSubset(listOfAfaces[i],listOfAfaces[j]))
+        {
+          listOfAfaces = delete(listOfAfaces,j);
+          if (j<i)
+          {
+            i = i-1;
+          }
+          j = j-1;
+        }
+      }
+    }
+  }
+  return(listOfAfaces);
+}
+example
+{
+  echo=2;
+  setcores(4);
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list AF= afaces(J,nrows(Q));
+  size(AF);
+  AF=fullDimImages(AF,Q);
+  size(AF);
+  AF=minimalAfaces(AF);
+  size(AF);
+}
+
+
+
+proc GITfan(ideal J, intmat Q, list #)
+"USAGE: GITfan(J,Q [, G]); J:ideal, Q:intmat, G:list
+PURPOSE: Computes the GIT fan associated to J and Q. Optionally a symmetry group action on the column space of Q can be specified.
+RETURN: a fan, the GIT fan.
+NOTE: The proceduce uses parallel computation for the construction of the GIT-cones. The a-faces are not computed in parallel. This can be done by calling the aface procedure specifying a list of simplex faces. If used with the optional argument G, the orbit decomposition of the simplex of columns of Q is computed. Refer to the Singular documentation on how to do this more efficiently using GAP.
+EXAMPLE: example GITfan; shows an example
+"
+{
+  list GIT;
+  list OC;
+  if (size(#)>0){
+      (GIT,OC) = GITfanWrapperWithSymmetry(J,Q,#);
+  } else {
+  list AF= afaces(J,nrows(Q));
+  AF=fullDimImages(AF,Q);
+  AF = minimalAfaces(AF);
+  OC = orbitCones(AF,Q);
+  cone Qgamma = coneViaPoints(transpose(Q));
+  GIT = GITfanParallel(OC,Q,Qgamma);
+  }
+  fan Sigma = hashesToFan(GIT,OC);
+  return(Sigma);
+}
+example
+{
+  echo=2;
+  setcores(4);
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  fan GIT = GITfan(J,Q);
+
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list simplexSymmetryGroup = G25Action();
+  fan GIT2 = GITfan(J,Q,simplexSymmetryGroup);
+
+}
+
+
+proc hashToCone(bigint v, list OC)
+"USAGE: hashToCone(v, OC): v bigint, OC list of cones.
+ASSUME: the elements of OC are the orbit cones used in the hash representation of the GIT cones.
+RETURN: a cone, the intersection of the cones in OC according to the binary representation of the hash v.
+EXAMPLE: example hashToCone; shows an example
+"
+{
+  intvec J = bigintToBinary(v, size(OC));
+  return(convexIntersection(list(OC[J])));
+}
+example
+{
+  echo = 2;
+  setcores(4);
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list AF= afaces(J,nrows(Q));
+  AF=fullDimImages(AF,Q);
+  AF = minimalAfaces(AF);
+  list OC = orbitCones(AF,Q);
+  bigint v = 21300544;
+  hashToCone(v, OC);
+}
+
+
+proc bigintToBinary(bigint n, int r)
+"
+USAGE: bigintToBinary(n, r): n bigint, r int.
+ASSUME: n is smaller then 2^r.
+RETURN: an intvec, with entries the positions of 1 in the binary representation of n with r bits.
+EXAMPLE: example bigintToBinary; shows an example
+"
+{
+  int k = r-1;
+
+  intvec v;
+  bigint n0 = n;
+
+  while(n0 > 0){
+    bigint tmp = bigint(2)^k;
+
+    while(tmp > n0){
+      k--;
+      tmp = bigint(2)^k;
+    }
+
+    v = k+1,v;
+    n0 = n0 - tmp;
+    k--;
+
+    kill tmp;
+  }
+
+  v = v[1..size(v)-1];
+  return(v);
+}
+example
+{
+  echo = 2;
+  bigintToBinary(bigint(2)^90-1, 90);
+}
+
+
+
+
+proc hashesToFan(list hashes, list OC)
+"USAGE: hashesToFan(hashes, OC): hashes list of bigint, OC list of cones.
+ASSUME: the elements of OC are the orbit cones used in the hash representation of the GIT cones.
+RETURN: a fan, with maximal cones the intersections of the cones in OC according to the binary representation of the hashes.
+EXAMPLE: example hashesToFan; shows an example
+"
+{
+  fan Sigma = emptyFan(ambientDimension(OC[1]));
+  for (int i=1;i<=size(hashes);i++){
+    insertCone(Sigma,hashToCone(hashes[i],OC),0);
+  }
+  return(Sigma);
+}
+example
+{
+  echo = 2;
+  setcores(4);
+  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ideal J =
+    T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
+    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
+    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
+    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
+    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
+  intmat Q[5][10] =
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 1, 1, 0, 0, 0, -1, 1, 0, 0,
+    0, 1, 0, 1, 0, -1, 0, 0, 1, 0,
+    0, 0, 1, 1, -1, 0, 0, 0, 0, 1;
+  list AF= afaces(J,nrows(Q));
+  AF=fullDimImages(AF,Q);
+  AF = minimalAfaces(AF);
+  list OC = orbitCones(AF,Q);
+  cone Qgamma = coneViaPoints(transpose(Q));
+  list GIT = GITfanParallel(OC,Q,Qgamma);
+  fan Sigma = hashesToFan(GIT,OC);
+}
+
+
+
+
+/////////////////////////////////////
+
+proc gkzFan(intmat Q)
+"USAGE: gkzFan(Q); a: ideal, Q:intmat
+PURPOSE: Returns the GKZ-fan of the matrix Q.
+RETURN: a fan.
+EXAMPLE: example gkzFan; shows an example
+"
+{
+  // only difference to gitFan:
+  // it suffices to consider all faces
+  // that are simplicial:
+  list OC = simplicialToricOrbitCones(Q);
+  print(size(OC));
+  cone Qgamma = coneViaPoints(transpose(Q));
+  list GIT = GITfanParallel(OC,Q,Qgamma);
+  fan Sigma = hashesToFan(GIT,OC);
+  return(Sigma);
+}
+example
+{
+  echo=2;
+  intmat Q[3][4] =
+    1,0,1,0,
+    0,1,0,1,
+    0,0,1,1;
+
+  gkzFan(Q);
+}
+
+
+
+/////////////////////////////////////
+
+// Computes all simplicial orbit cones
+// w.r.t. the 0-ideal:
+static proc simplicialToricOrbitCones(bigintmat Q){
+  intvec gam0;
+  list OC;
+  cone c;
+  int r = ncols(Q);
+  int j;
+
+  for(int i = 1; i < 2^r; i++ ){
+    gam0 = int2face(i,r);
+
+    // each simplicial cone is generated by
+    // exactly nrows(Q) many columns of Q:
+    if(size(gam0) == nrows(Q)){
+      bigintmat M[size(gam0)][nrows(Q)];
+
+      for(j = 1; j <= size(gam0); j++){
+        M[j,1..ncols(M)] = Q[1..nrows(Q),gam0[j]];
+      }
+
+      c = coneViaPoints(M);
+
+      if((dimension(c) == nrows(Q)) and (!(listContainsCone(OC, c)))){
+        OC[size(OC)+1] = c;
+      }
+
+      kill M;
+    }
+  }
+
+  return(OC);
+}
+example
+{
+  echo = 2;
+  bigintmat Q[3][4] =
+  1,0,1,0,
+  0,1,0,1,
+  0,0,1,1;
+
+  list OC = simplicialToricOrbitCones(Q);
+  print(OC);
+
+  bigintmat Q[5][15] =
+    1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,
+    0,1,0,0,0,1,0,0,0,1,1,1,0,0,0,
+    0,0,1,0,0,0,1,0,0,1,0,0,1,1,0,
+    0,0,0,1,0,0,0,1,0,0,1,0,1,0,1,
+    0,0,0,0,1,0,0,0,1,0,0,1,0,1,1;
+
+  list OC = simplicialToricOrbitCones(Q);
+  print(size(OC));
+}
+
+
+proc G25Action()
+"USAGE: G25Action(Q);
+PURPOSE: Returns a representation of S5 as a subgroup of S10 with the action on the Grassmannian G25.
+RETURN: list of with elements of type permutation.
+EXAMPLE: example G25Action; shows an example
+"
+{
+list simplexSymmetryGroup = permutationFromIntvec(intvec( 1 .. 10 )),
+permutationFromIntvec(intvec( 1, 2, 4, 3, 5, 7, 6, 9, 8, 10 )),
+permutationFromIntvec(intvec( 1, 3, 2, 4, 6, 5, 7, 8, 10, 9 )),
+permutationFromIntvec(intvec( 1, 3, 4, 2, 6, 7, 5, 10, 8, 9 )),
+permutationFromIntvec(intvec( 1, 4, 2, 3, 7, 5, 6, 9, 10, 8 )),
+permutationFromIntvec(intvec( 1, 4, 3, 2, 7, 6, 5, 10, 9, 8 )),
+permutationFromIntvec(intvec( 1, 5, 6, 7, 2, 3, 4, 8, 9, 10 )),
+permutationFromIntvec(intvec( 1, 5, 7, 6, 2, 4, 3, 9, 8, 10 )),
+permutationFromIntvec(intvec( 1, 6, 5, 7, 3, 2, 4, 8, 10, 9 )),
+permutationFromIntvec(intvec( 1, 6, 7, 5, 3, 4, 2, 10, 8, 9 )),
+permutationFromIntvec(intvec( 1, 7, 5, 6, 4, 2, 3, 9, 10, 8 )),
+permutationFromIntvec(intvec( 1, 7, 6, 5, 4, 3, 2, 10, 9, 8 )),
+permutationFromIntvec(intvec( 2, 1, 3, 4, 5, 8, 9, 6, 7, 10 )),
+permutationFromIntvec(intvec( 2, 1, 4, 3, 5, 9, 8, 7, 6, 10 )),
+permutationFromIntvec(intvec( 2, 3, 1, 4, 8, 5, 9, 6, 10, 7 )),
+permutationFromIntvec(intvec( 2, 3, 4, 1, 8, 9, 5, 10, 6, 7 )),
+permutationFromIntvec(intvec( 2, 4, 1, 3, 9, 5, 8, 7, 10, 6 )),
+permutationFromIntvec(intvec( 2, 4, 3, 1, 9, 8, 5, 10, 7, 6 )),
+permutationFromIntvec(intvec( 2, 5, 8, 9, 1, 3, 4, 6, 7, 10 )),
+permutationFromIntvec(intvec( 2, 5, 9, 8, 1, 4, 3, 7, 6, 10 )),
+permutationFromIntvec(intvec( 2, 8, 5, 9, 3, 1, 4, 6, 10, 7 )),
+permutationFromIntvec(intvec( 2, 8, 9, 5, 3, 4, 1, 10, 6, 7 )),
+permutationFromIntvec(intvec( 2, 9, 5, 8, 4, 1, 3, 7, 10, 6 )),
+permutationFromIntvec(intvec( 2, 9, 8, 5, 4, 3, 1, 10, 7, 6 )),
+permutationFromIntvec(intvec( 3, 1, 2, 4, 6, 8, 10, 5, 7, 9 )),
+permutationFromIntvec(intvec( 3, 1, 4, 2, 6, 10, 8, 7, 5, 9 )),
+permutationFromIntvec(intvec( 3, 2, 1, 4, 8, 6, 10, 5, 9, 7 )),
+permutationFromIntvec(intvec( 3, 2, 4, 1, 8, 10, 6, 9, 5, 7 )),
+permutationFromIntvec(intvec( 3, 4, 1, 2, 10, 6, 8, 7, 9, 5 )),
+permutationFromIntvec(intvec( 3, 4, 2, 1, 10, 8, 6, 9, 7, 5 )),
+permutationFromIntvec(intvec( 3, 6, 8, 10, 1, 2, 4, 5, 7, 9 )),
+permutationFromIntvec(intvec( 3, 6, 10, 8, 1, 4, 2, 7, 5, 9 )),
+permutationFromIntvec(intvec( 3, 8, 6, 10, 2, 1, 4, 5, 9, 7 )),
+permutationFromIntvec(intvec( 3, 8, 10, 6, 2, 4, 1, 9, 5, 7 )),
+permutationFromIntvec(intvec( 3, 10, 6, 8, 4, 1, 2, 7, 9, 5 )),
+permutationFromIntvec(intvec( 3, 10, 8, 6, 4, 2, 1, 9, 7, 5 )),
+permutationFromIntvec(intvec( 4, 1, 2, 3, 7, 9, 10, 5, 6, 8 )),
+permutationFromIntvec(intvec( 4, 1, 3, 2, 7, 10, 9, 6, 5, 8 )),
+permutationFromIntvec(intvec( 4, 2, 1, 3, 9, 7, 10, 5, 8, 6 )),
+permutationFromIntvec(intvec( 4, 2, 3, 1, 9, 10, 7, 8, 5, 6 )),
+permutationFromIntvec(intvec( 4, 3, 1, 2, 10, 7, 9, 6, 8, 5 )),
+permutationFromIntvec(intvec( 4, 3, 2, 1, 10, 9, 7, 8, 6, 5 )),
+permutationFromIntvec(intvec( 4, 7, 9, 10, 1, 2, 3, 5, 6, 8 )),
+permutationFromIntvec(intvec( 4, 7, 10, 9, 1, 3, 2, 6, 5, 8 )),
+permutationFromIntvec(intvec( 4, 9, 7, 10, 2, 1, 3, 5, 8, 6 )),
+permutationFromIntvec(intvec( 4, 9, 10, 7, 2, 3, 1, 8, 5, 6 )),
+permutationFromIntvec(intvec( 4, 10, 7, 9, 3, 1, 2, 6, 8, 5 )),
+permutationFromIntvec(intvec( 4, 10, 9, 7, 3, 2, 1, 8, 6, 5 )),
+permutationFromIntvec(intvec( 5, 1, 6, 7, 2, 8, 9, 3, 4, 10 )),
+permutationFromIntvec(intvec( 5, 1, 7, 6, 2, 9, 8, 4, 3, 10 )),
+permutationFromIntvec(intvec( 5, 2, 8, 9, 1, 6, 7, 3, 4, 10 )),
+permutationFromIntvec(intvec( 5, 2, 9, 8, 1, 7, 6, 4, 3, 10 )),
+permutationFromIntvec(intvec( 5, 6, 1, 7, 8, 2, 9, 3, 10, 4 )),
+permutationFromIntvec(intvec( 5, 6, 7, 1, 8, 9, 2, 10, 3, 4 )),
+permutationFromIntvec(intvec( 5, 7, 1, 6, 9, 2, 8, 4, 10, 3 )),
+permutationFromIntvec(intvec( 5, 7, 6, 1, 9, 8, 2, 10, 4, 3 )),
+permutationFromIntvec(intvec( 5, 8, 2, 9, 6, 1, 7, 3, 10, 4 )),
+permutationFromIntvec(intvec( 5, 8, 9, 2, 6, 7, 1, 10, 3, 4 )),
+permutationFromIntvec(intvec( 5, 9, 2, 8, 7, 1, 6, 4, 10, 3 )),
+permutationFromIntvec(intvec( 5, 9, 8, 2, 7, 6, 1, 10, 4, 3 )),
+permutationFromIntvec(intvec( 6, 1, 5, 7, 3, 8, 10, 2, 4, 9 )),
+permutationFromIntvec(intvec( 6, 1, 7, 5, 3, 10, 8, 4, 2, 9 )),
+permutationFromIntvec(intvec( 6, 3, 8, 10, 1, 5, 7, 2, 4, 9 )),
+permutationFromIntvec(intvec( 6, 3, 10, 8, 1, 7, 5, 4, 2, 9 )),
+permutationFromIntvec(intvec( 6, 5, 1, 7, 8, 3, 10, 2, 9, 4 )),
+permutationFromIntvec(intvec( 6, 5, 7, 1, 8, 10, 3, 9, 2, 4 )),
+permutationFromIntvec(intvec( 6, 7, 1, 5, 10, 3, 8, 4, 9, 2 )),
+permutationFromIntvec(intvec( 6, 7, 5, 1, 10, 8, 3, 9, 4, 2 )),
+permutationFromIntvec(intvec( 6, 8, 3, 10, 5, 1, 7, 2, 9, 4 )),
+permutationFromIntvec(intvec( 6, 8, 10, 3, 5, 7, 1, 9, 2, 4 )),
+permutationFromIntvec(intvec( 6, 10, 3, 8, 7, 1, 5, 4, 9, 2 )),
+permutationFromIntvec(intvec( 6, 10, 8, 3, 7, 5, 1, 9, 4, 2 )),
+permutationFromIntvec(intvec( 7, 1, 5, 6, 4, 9, 10, 2, 3, 8 )),
+permutationFromIntvec(intvec( 7, 1, 6, 5, 4, 10, 9, 3, 2, 8 )),
+permutationFromIntvec(intvec( 7, 4, 9, 10, 1, 5, 6, 2, 3, 8 )),
+permutationFromIntvec(intvec( 7, 4, 10, 9, 1, 6, 5, 3, 2, 8 )),
+permutationFromIntvec(intvec( 7, 5, 1, 6, 9, 4, 10, 2, 8, 3 )),
+permutationFromIntvec(intvec( 7, 5, 6, 1, 9, 10, 4, 8, 2, 3 )),
+permutationFromIntvec(intvec( 7, 6, 1, 5, 10, 4, 9, 3, 8, 2 )),
+permutationFromIntvec(intvec( 7, 6, 5, 1, 10, 9, 4, 8, 3, 2 )),
+permutationFromIntvec(intvec( 7, 9, 4, 10, 5, 1, 6, 2, 8, 3 )),
+permutationFromIntvec(intvec( 7, 9, 10, 4, 5, 6, 1, 8, 2, 3 )),
+permutationFromIntvec(intvec( 7, 10, 4, 9, 6, 1, 5, 3, 8, 2 )),
+permutationFromIntvec(intvec( 7, 10, 9, 4, 6, 5, 1, 8, 3, 2 )),
+permutationFromIntvec(intvec( 8, 2, 5, 9, 3, 6, 10, 1, 4, 7 )),
+permutationFromIntvec(intvec( 8, 2, 9, 5, 3, 10, 6, 4, 1, 7 )),
+permutationFromIntvec(intvec( 8, 3, 6, 10, 2, 5, 9, 1, 4, 7 )),
+permutationFromIntvec(intvec( 8, 3, 10, 6, 2, 9, 5, 4, 1, 7 )),
+permutationFromIntvec(intvec( 8, 5, 2, 9, 6, 3, 10, 1, 7, 4 )),
+permutationFromIntvec(intvec( 8, 5, 9, 2, 6, 10, 3, 7, 1, 4 )),
+permutationFromIntvec(intvec( 8, 6, 3, 10, 5, 2, 9, 1, 7, 4 )),
+permutationFromIntvec(intvec( 8, 6, 10, 3, 5, 9, 2, 7, 1, 4 )),
+permutationFromIntvec(intvec( 8, 9, 2, 5, 10, 3, 6, 4, 7, 1 )),
+permutationFromIntvec(intvec( 8, 9, 5, 2, 10, 6, 3, 7, 4, 1 )),
+permutationFromIntvec(intvec( 8, 10, 3, 6, 9, 2, 5, 4, 7, 1 )),
+permutationFromIntvec(intvec( 8, 10, 6, 3, 9, 5, 2, 7, 4, 1 )),
+permutationFromIntvec(intvec( 9, 2, 5, 8, 4, 7, 10, 1, 3, 6 )),
+permutationFromIntvec(intvec( 9, 2, 8, 5, 4, 10, 7, 3, 1, 6 )),
+permutationFromIntvec(intvec( 9, 4, 7, 10, 2, 5, 8, 1, 3, 6 )),
+permutationFromIntvec(intvec( 9, 4, 10, 7, 2, 8, 5, 3, 1, 6 )),
+permutationFromIntvec(intvec( 9, 5, 2, 8, 7, 4, 10, 1, 6, 3 )),
+permutationFromIntvec(intvec( 9, 5, 8, 2, 7, 10, 4, 6, 1, 3 )),
+permutationFromIntvec(intvec( 9, 7, 4, 10, 5, 2, 8, 1, 6, 3 )),
+permutationFromIntvec(intvec( 9, 7, 10, 4, 5, 8, 2, 6, 1, 3 )),
+permutationFromIntvec(intvec( 9, 8, 2, 5, 10, 4, 7, 3, 6, 1 )),
+permutationFromIntvec(intvec( 9, 8, 5, 2, 10, 7, 4, 6, 3, 1 )),
+permutationFromIntvec(intvec( 9, 10, 4, 7, 8, 2, 5, 3, 6, 1 )),
+permutationFromIntvec(intvec( 9, 10, 7, 4, 8, 5, 2, 6, 3, 1 )),
+permutationFromIntvec(intvec( 10, 3, 6, 8, 4, 7, 9, 1, 2, 5 )),
+permutationFromIntvec(intvec( 10, 3, 8, 6, 4, 9, 7, 2, 1, 5 )),
+permutationFromIntvec(intvec( 10, 4, 7, 9, 3, 6, 8, 1, 2, 5 )),
+permutationFromIntvec(intvec( 10, 4, 9, 7, 3, 8, 6, 2, 1, 5 )),
+permutationFromIntvec(intvec( 10, 6, 3, 8, 7, 4, 9, 1, 5, 2 )),
+permutationFromIntvec(intvec( 10, 6, 8, 3, 7, 9, 4, 5, 1, 2 )),
+permutationFromIntvec(intvec( 10, 7, 4, 9, 6, 3, 8, 1, 5, 2 )),
+permutationFromIntvec(intvec( 10, 7, 9, 4, 6, 8, 3, 5, 1, 2 )),
+permutationFromIntvec(intvec( 10, 8, 3, 6, 9, 4, 7, 2, 5, 1 )),
+permutationFromIntvec(intvec( 10, 8, 6, 3, 9, 7, 4, 5, 2, 1 )),
+permutationFromIntvec(intvec( 10, 9, 4, 7, 8, 3, 6, 2, 5, 1 )),
+permutationFromIntvec(intvec( 10, 9, 7, 4, 8, 6, 3, 5, 2, 1 ));
+return(simplexSymmetryGroup);
+}
+example
+{
+  echo = 2;
+  G25Action();
+}
+
+
+proc findOrbits(list G, int #)
+"USAGE: findOrbits(G [,d]); G list of permutations in a subgroup of the symmetric group; d int minimum cardinality of simplices to be considered; if d is not specified all orbits are computed.
+PURPOSE: Computes the orbit decomposition of the action of G.
+RETURN: list of intvec.
+EXAMPLE: example findOrbits; shows an example
+"
+{
+int d;
+if (size(#)>0){d=#;}
+int n = size(permutationToIntvec(G[1]));
+list listOrbits;
+list finished;
+int tst;
+bigint startel;
+intvec startelbin;
+list neworbit,neworbitint;
+int i,posToInsert;
+bigint nn;
+while (size(finished)<2^n){
+   startel=0;
+   if (size(finished)>0){
+      tst=0;
+      while ((tst==0) and (startel+1<=size(finished))){
+        if (finished[int(startel+1)]<>startel){
+          tst=1;
+        } else {
+          startel=startel+1;
+        }
+      }
+   }
+   if (startel==0){
+     neworbit[1]= list();
+     neworbitint[1]=0;
+   } else {
+      startelbin=bigintToBinary(startel,n);
+       neworbitint=list(startel);
+       for (i=2;i<=size(G);i++){
+         nn=binaryToBigint(applyPermutationToIntvec(startelbin,G[i]));
+         //nn;neworbitint;
+         //"place to insert";
+         posToInsert = findPlaceToInsert(neworbitint,nn);
+         //"pos";posToInsert;
+         if(posToInsert > 0)
+         {
+          //"vorher";neworbitint;
+          neworbitint = insertToList(neworbitint,nn,posToInsert);
+          //"nachher";neworbitint;
+         }
+       }
+       for (i=1;i<=size(neworbitint);i++){
+          neworbit[i]=bigintToBinary(neworbitint[i],n);
+       }
+   }
+   if (size(neworbit[1])>=d){
+     listOrbits[size(listOrbits)+1]=neworbit;
+   }
+   finished=sort(finished+neworbitint)[1];
+}
+return(listOrbits);}
+example
+{
+list G = G25Action();
+list orb = findOrbits(G);
+for (int i=1;i<=size(orb);i++){orb[i][1];}
+}
+
+
+
+static proc GITfanWrapperWithSymmetry(ideal J, intmat Q, list simplexSymmetryGroup){
+  list orb = findOrbits(simplexSymmetryGroup,nrows(Q));
+  list simplexOrbitRepresentatives;
+  for (int i=1;i<=size(orb);i++){simplexOrbitRepresentatives[i]=orb[i][1];}
+  list afaceOrbitRepresentatives=afaces(J,simplexOrbitRepresentatives);
+  list fulldimAfaceOrbitRepresentatives=fullDimImages(afaceOrbitRepresentatives,Q);
+  list afaceOrbits=computeAfaceOrbits(fulldimAfaceOrbitRepresentatives,simplexSymmetryGroup);
+  list minAfaceOrbits = minimalAfaceOrbits(afaceOrbits);
+  list listOfOrbitConeOrbits = orbitConeOrbits(minAfaceOrbits,Q);
+  list listOfMinimalOrbitConeOrbits = minimalOrbitConeOrbits(listOfOrbitConeOrbits);
+  list Asigma = groupActionOnQImage(simplexSymmetryGroup,Q);
+  list actionOnOrbitconeIndices = groupActionOnHashes(Asigma,listOfOrbitConeOrbits);
+  list OClist = listOfOrbitConeOrbits[1];
+  for (i =2;i<=size(listOfOrbitConeOrbits);i++){
+    OClist = OClist + listOfOrbitConeOrbits[i];
+  }
+  cone mov = coneViaPoints(transpose(Q));
+  mov = canonicalizeCone(mov);
+  list Sigma = GITfanParallelSymmetric(OClist, Q, mov, actionOnOrbitconeIndices);
+  return(Sigma, OClist);
+}
+///////////////////////////////////////
+
+proc gitCone(ideal a, bigintmat Q, bigintmat w)
+"USAGE: gitCone(a, Q, w); a: ideal, Q:bigintmat, w:bigintmat
+PURPOSE: Returns the GIT-cone lambda(w), i.e. the intersection of all
+orbit cones containing the vector w.
+NOTE: call this only if you are interested in a single GIT-cone.
+RETURN: a cone.
+EXAMPLE: example gitCone; shows an example
+"
+{
+  list OC =  orbitConesOld(a, intmat(Q));
+  cone lambda = nrows(Q);
+
+  for(int i = 1; i <= size(OC); i++)
+  {
+    cone c = OC[i];
+
+    if(containsInSupportOld(c, w))
+    {
+      lambda = convexIntersectionOld(lambda, c);
+    }
+
+    kill c;
+  }
+
+  return(lambda);
+}
+example
+{
+  echo=2;
+  intmat Q[3][4] =
+    1,0,1,0,
+    0,1,0,1,
+    0,0,1,1;
+
+  ring R = 0,T(1..4),dp;
+  ideal a = 0;
+
+  bigintmat w[1][3] = 3,3,1;
+  cone lambda = gitCone(a, Q, w);
+  rays(lambda);
+
+  bigintmat w2[1][3] = 1,1,1;
+  cone lambda2 = gitCone(a, Q, w2);
+  rays(lambda2);
+}
+
+proc orbitConesOld(ideal a, bigintmat Q, list #)
+"USAGE:  orbitConesOld(a, Q, b, c); a: ideal, Q: bigintmat, b: int, c: int
 PURPOSE: Returns a list consisting of all cones Q(gam0) where gam0 is an a-face.
          Moreover, it is possible to specify a dimensional bound b,
          upon which only cones of that dimension and above are returned.
          Lastly, as the computation is parallizable, one can specify c,
          the number of cores to be used by the computation.
 RETURN:  a list of cones
-EXAMPLE: example orbitCones; shows an example
+EXAMPLE: example orbitConesOld; shows an example
 "
 {
   list AF;
@@ -381,234 +3080,6 @@ example
   ring R = 0,T(1..4),dp;
   ideal a = 0;
 
-  orbitCones(a, Q);
+  orbitConesOld(a, Q);
 }
 
-///////////////////////////////////////
-
-proc gitCone(ideal a, bigintmat Q, bigintmat w)
-"USAGE: gitCone(a, Q, w); a: ideal, Q:bigintmat, w:bigintmat
-PURPOSE: Returns the GIT-cone lambda(w), i.e. the intersection of all
-orbit cones containing the vector w.
-NOTE: call this only if you are interested in a single GIT-cone.
-RETURN: a cone.
-EXAMPLE: example gitCone; shows an example
-"
-{
-  list OC =  orbitCones(a, Q);
-  cone lambda = nrows(Q);
-
-  for(int i = 1; i <= size(OC); i++)
-  {
-    cone c = OC[i];
-
-    if(containsInSupport(c, w))
-    {
-      lambda = convexIntersection(lambda, c);
-    }
-
-    kill c;
-  }
-
-  return(lambda);
-}
-example
-{
-  echo=2;
-  intmat Q[3][4] =
-    1,0,1,0,
-    0,1,0,1,
-    0,0,1,1;
-
-  ring R = 0,T(1..4),dp;
-  ideal a = 0;
-
-  bigintmat w[1][3] = 3,3,1;
-  cone lambda = gitCone(a, Q, w);
-  rays(lambda);
-
-  bigintmat w2[1][3] = 1,1,1;
-  cone lambda2 = gitCone(a, Q, w2);
-  rays(lambda2);
-}
-
-/////////////////////////////////////
-
-proc gitFan(ideal a, bigintmat Q, list #)
-"USAGE: gitFan(a, Q); a: ideal, Q:bigintmat
-PURPOSE: Returns the GIT-fan of the H-action defined by Q on V(a).
-An optional third parameter of type 'int' is interpreted as the
-number of CPU-cores you would like to use.
-Note that 'system("--cpus");' returns the number of cpu available
-in your system.
-RETURN: a fan.
-EXAMPLE: example gitFan; shows an example
-"
-{
-  list OC = orbitCones(a, Q, #);
-
-  fan f = refineCones(OC, Q);
-  return(f);
-}
-example
-{
-  echo=2;
-  intmat Q[3][4] =
-    1,0,1,0,
-    0,1,0,1,
-    0,0,1,1;
-
-  ring R = 0,T(1..4),dp;
-  ideal a = 0;
-
-  gitFan(a, Q);
-
-  // 2nd example //
-  kill Q;
-  intmat Q[3][6] =
-    1,1,0,0,-1,-1,
-    0,1,1,-1,-1,0,
-    1,1,1,1,1,1;
-
-  ring R = 0,T(1..6),dp;
-  ideal a = T(1)*T(6) + T(2)*T(5) + T(3)*T(4);
-
-  int t = rtimer;
-  fan F = gitFan(a, Q);
-  t = rtimer - t;
-
-  int tt = rtimer;
-  fan F = gitFan(a, Q, 4);
-  tt = rtimer - tt;
-
-  t;
-  tt;
-  "--------";
-  kill R, Q, t, tt;
-  // next example //
-  ring R = 0,T(1..10),dp;
-  ideal a = T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
-    T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
-    T(1)*T(8)-T(2)*T(6)+T(3)*T(5),
-    T(1)*T(10)-T(3)*T(7)+T(4)*T(6),
-    T(2)*T(10)-T(3)*T(9)+T(4)*T(8);
-
-  bigintmat Q[4][10] =
-    1,0,0,0,1,1,1,0,0,0,
-    0,1,0,0,1,0,0,1,1,0,
-    0,0,1,0,0,1,0,1,0,1,
-    0,0,0,1,0,0,1,0,1,1;
-
-  int t = rtimer;
-  fan F = gitFan(a, Q);
-  t = rtimer - t;
-
-  int tt = rtimer;
-  fan F = gitFan(a, Q, 4);
-  tt = rtimer - tt;
-
-  t;
-  tt;
-
-  "--------";
-  kill R, Q, t, tt;
-  // next example //
-  ring R = 0,T(1..15),dp;
-  ideal a =
-    T(1)*T(10)-T(2)*T(7)+T(3)*T(6),
-    T(1)*T(11)-T(2)*T(8)+T(4)*T(6),
-    T(1)*T(12)-T(2)*T(9)+T(5)*T(6),
-    T(1)*T(13)-T(3)*T(8)+T(4)*T(7),
-    T(1)*T(14)-T(3)*T(9)+T(5)*T(7),
-    T(1)*T(15)-T(4)*T(9)+T(5)*T(8),
-    T(2)*T(13)-T(3)*T(11)+T(4)*T(10),
-    T(2)*T(14)-T(3)*T(12)+T(5)*T(10);
-
-  bigintmat Q[5][15] =
-    1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,
-    0,1,0,0,0,1,0,0,0,1,1,1,0,0,0,
-    0,0,1,0,0,0,1,0,0,1,0,0,1,1,0,
-    0,0,0,1,0,0,0,1,0,0,1,0,1,0,1,
-    0,0,0,0,1,0,0,0,1,0,0,1,0,1,1;
-
-  int t = rtimer;
-  fan F = gitFan(a, Q);
-  t = rtimer - t;
-
-  int tt = rtimer;
-  fan F = gitFan(a, Q, 4);
-  tt = rtimer - tt;
-
-  t;
-  tt;
-
-}
-
-/////////////////////////////////////
-// Computes all simplicial orbit cones
-// w.r.t. the 0-ideal:
-
-static proc simplicialToricOrbitCones(bigintmat Q)
-{
-  intvec gam0;
-  list OC;
-  cone c;
-  int r = ncols(Q);
-  int j;
-
-  for(int i = 1; i < 2^r; i++ )
-  {
-    gam0 = int2face(i,r);
-
-    // each simplicial cone is generated by
-    // exactly nrows(Q) many columns of Q:
-    if(size(gam0) == nrows(Q))
-    {
-      bigintmat M[size(gam0)][nrows(Q)];
-
-      for(j = 1; j <= size(gam0); j++)
-      {
-        M[j,1..ncols(M)] = Q[1..nrows(Q),gam0[j]];
-      }
-
-      c = coneViaPoints(M);
-
-      if((dimension(c) == nrows(Q)) and (!(listContainsCone(OC, c))))
-      {
-        OC[size(OC)+1] = c;
-      }
-
-      kill M;
-    }
-  }
-
-  return(OC);
-}
-
-/////////////////////////////////////
-
-proc gkzFan(bigintmat Q)
-"USAGE: gkzFan(Q); a: ideal, Q:bigintmat
-PURPOSE: Returns the GKZ-fan of the matrix Q.
-RETURN: a fan.
-EXAMPLE: example gkzFan; shows an example
-"
-{
-  // only difference to gitFan:
-  // it suffices to consider all faces
-  // that are simplicial:
-  list OC = simplicialToricOrbitCones(Q);
-
-  fan f = refineCones(OC, Q);
-  return(f);
-}
-example
-{
-  echo=2;
-  intmat Q[3][4] =
-    1,0,1,0,
-    0,1,0,1,
-    0,0,1,1;
-
-  gkzFan(Q);
-}
