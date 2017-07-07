@@ -33,6 +33,7 @@ list of expressions.
 For the general syntax of a declaration see @ref{General command syntax}.
 
 @menu
+* cring::
 * bigint::
 * bigintmat::
 * def::
@@ -62,7 +63,113 @@ For the general syntax of a declaration see @ref{General command syntax}.
 @end menu
 
 @c ---------------------------------------
-@node bigint, bigintmat, Data types, Data types
+@node cring, bigint, Data types, Data types
+@section cring
+@cindex cring
+
+Variables of type cring represent the ring of coeffcients (see @ref{number})
+
+@menu
+* cring declarations::
+* cring expressions::
+* cring operations::
+* cring related functions::
+@end menu
+
+@c ---------------------------------------
+@node cring declarations, cring expressions, cring, cring
+@subsection cring declarations
+@cindex cring declarations
+
+@table @strong
+@item Syntax:
+@code{cring} name @code{=} cring_expression @code{;}
+
+@item Purpose:
+defines a new coefficient ring resp. field
+to be used for a ring definition (see @ref{ring}).
+Most objects of this type are predefined.
+
+@item Default:
+none
+
+@item Example:
+@smallexample
+@c example
+  ZZ;
+  ZZ/3;
+@c example
+@end smallexample
+@end table
+
+@c ------------------------------
+@node cring expressions, cring operations, cring declarations, cring
+@subsection cring expressions
+@cindex cring expressions
+
+A cring expression is:
+@enumerate
+@item
+an identifier of type cring
+@item
+a function returning cring
+@item
+an expression involving crings and the arithmetic operations
+@code{/}.
+@end enumerate
+
+@*@strong{Example:}
+@smallexample
+@c example
+ ZZ/3;
+@c example
+@end smallexample
+
+@c ref
+See
+@ref{ring}.
+@c ref
+
+@c ------------------------------
+@node cring operations, cring related functions, cring expressions, cring
+@subsection cring operations
+@cindex cring operations
+@cindex /
+
+@c remark: the following table should have style @asis, since the
+@c   commas below should not by set in style @code.
+@table @asis
+@item @code{/}
+residue class ring
+@end table
+
+@*@strong{Example:}
+@smallexample
+@c example
+ZZ/101;
+@c example
+@end smallexample
+
+@c ------------------------------
+@node cring related functions, ,cring operations, cring
+@subsection cring related functions
+@cindex cring related functions
+
+@table @code
+@item crossprod
+crooss product of several objects of type cring (see @ref{crossprod})
+@item Float
+several variants of Floating point (inexact) real and complex numbers
+(see @ref{Float}).
+@end table
+
+@c ref
+See
+@ref{crossprod};
+@c ref
+
+@c ---------------------------------------
+@node bigint, bigintmat, cring, Data types
 @section bigint
 @cindex bigint
 
