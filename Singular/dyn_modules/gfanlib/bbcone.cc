@@ -1513,9 +1513,10 @@ BOOLEAN coneLink(leftv res, leftv args)
 BOOLEAN containsInSupport(leftv res, leftv args)
 {
   leftv u=args;
+  leftv v=NULL;
   if ((u != NULL) && (u->Typ() == coneID))
   {
-    leftv v=u->next;
+    v=u->next;
     if ((v != NULL) && (v->Typ() == coneID))
     {
       gfan::initializeCddlibIfRequired();
@@ -1570,7 +1571,12 @@ BOOLEAN containsInSupport(leftv res, leftv args)
       return FALSE;
     }
   }
-  WerrorS("containsInSupport: unexpected parameters");
+  Werror("containsInSupport: unexpected parameters:%s",Tok2Cmdname(u->Typ()));
+  if (u->next!=NULL)
+  {
+    Werror(",%s",Tok2Cmdname(u->next->Typ()));
+    if (u->next->next!=NULL) Werror(",%s",Tok2Cmdname(u->next->next->Typ()));
+  }
   return TRUE;
 }
 
