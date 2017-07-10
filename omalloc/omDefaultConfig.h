@@ -21,7 +21,7 @@
   Notice that some of these parameters can also be set at run-time, using
   the global om_Opts struct.
 ********************************************************************/
-#include <mylimits.h>
+#include <limits.h>
 #include "omConfig.h"
 /* if external config was provided, 'make' makes links from it to omExternalConfig.h */
 #ifdef OM_HAVE_EXTERNAL_CONFIG_H

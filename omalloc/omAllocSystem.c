@@ -8,7 +8,7 @@
 #define OM_ALLOC_SYSTEM_C
 
 #include <unistd.h>
-#include <mylimits.h>
+#include <limits.h>
 
 
 #include "omConfig.h"

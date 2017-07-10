@@ -32,8 +32,8 @@ libomalloc_la_SOURCES=$(SOURCES) $(noinst_HEADERS)
 
 libomalloc_la_LDFLAGS    = $(SINGULAR_LDFLAGS) -release ${PACKAGE_VERSION}
 
-nodist_libomalloc_la_SOURCES = omTables.inc omTables.h mylimits.h
-nodist_libomalloc_include_HEADERS = omConfig.h mylimits.h omTables.h
+nodist_libomalloc_la_SOURCES = omTables.inc omTables.h
+nodist_libomalloc_include_HEADERS = omConfig.h omTables.h
 
 libomalloc_la_CPPFLAGS  = ${AM_CPPFLAGS} -DOM_ALLOC_INTERNAL
 
@@ -46,7 +46,7 @@ omTables.h: omTables$(EXEEXT)
 	./omTables$(EXEEXT) 1 >omTables.yy && mv omTables.yy $@
 
 noinst_PROGRAMS = omTables
-omTables_SOURCES = omAllocPrivate.h omTables.c mylimits.h
+omTables_SOURCES = omAllocPrivate.h omTables.c
 nodist_omTables_SOURCES = omConfig.h
 omTables_CPPFLAGS = ${AM_CPPFLAGS} -DOM_GENERATE_INC
 
