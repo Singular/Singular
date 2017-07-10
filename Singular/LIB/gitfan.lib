@@ -2979,7 +2979,7 @@ EXAMPLE: example gitCone; shows an example
   {
     cone c = OC[i];
 
-    if(containsInSupportOld(c, w))
+    if(containsInSupport(c, w))
     {
       lambda = convexIntersectionOld(lambda, c);
     }

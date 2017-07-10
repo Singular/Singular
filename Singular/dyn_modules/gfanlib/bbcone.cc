@@ -1513,10 +1513,9 @@ BOOLEAN coneLink(leftv res, leftv args)
 BOOLEAN containsInSupport(leftv res, leftv args)
 {
   leftv u=args;
-  leftv v=NULL;
   if ((u != NULL) && (u->Typ() == coneID))
   {
-    v=u->next;
+    leftv v=u->next;
     if ((v != NULL) && (v->Typ() == coneID))
     {
       gfan::initializeCddlibIfRequired();
@@ -1571,12 +1570,156 @@ BOOLEAN containsInSupport(leftv res, leftv args)
       return FALSE;
     }
   }
-  Werror("containsInSupport: unexpected parameters:%s",Tok2Cmdname(u->Typ()));
-  if (u->next!=NULL)
+  WerrorS("containsInSupport: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN containsInSupportOld(leftv res, leftv args)
+{
+  gfan::initializeCddlibIfRequired();
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    Werror(",%s",Tok2Cmdname(u->next->Typ()));
-    if (u->next->next!=NULL) Werror(",%s",Tok2Cmdname(u->next->next->Typ()));
+    leftv v=u->next;
+    if ((v != NULL) && (v->Typ() == coneID))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zd = (gfan::ZCone*)v->Data();
+      int d1 = zc->ambientDimension();
+      int d2 = zd->ambientDimension();
+      if (d1 != d2)
+      {
+        Werror("expected cones with same ambient dimensions\n but got"
+               " dimensions %d and %d", d1, d2);
+        return TRUE;
+      }
+      bool b = (zc->contains(*zd) ? 1 : 0);
+      res->rtyp = INT_CMD;
+      res->data = (void*) (long) b;
+      return FALSE;
+    }
+    if ((v != NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+      bigintmat* iv = NULL;
+      if (v->Typ() == INTVEC_CMD)
+      {
+        intvec* iv0 = (intvec*) v->Data();
+        iv = iv2bim(iv0,coeffs_BIGINT)->transpose();
+      }
+      else
+        iv = (bigintmat*)v->Data();
+
+      gfan::ZVector* zv = bigintmatToZVector(iv);
+      int d1 = zc->ambientDimension();
+      int d2 = zv->size();
+      if (d1 != d2)
+      {
+        Werror("expected cones with same ambient dimensions\n but got"
+               " dimensions %d and %d", d1, d2);
+        return TRUE;
+      }
+      int b = zc->contains(*zv);
+      res->rtyp = INT_CMD;
+      res->data = (void*) (long) b;
+
+      delete zv;
+      if (v->Typ() == INTMAT_CMD)
+        delete iv;
+      return FALSE;
+    }
   }
+  WerrorS("containsInSupportOld: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN convexIntersectionOld(leftv res, leftv args)
+{
+  gfan::initializeCddlibIfRequired();
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == coneID))
+    {
+      gfan::ZCone* zc1 = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
+      int d1 = zc1->ambientDimension();
+      int d2 = zc2->ambientDimension();
+      if (d1 != d2)
+      {
+        Werror("expected ambient dims of both cones to coincide\n"
+                "but got %d and %d", d1, d2);
+        return TRUE;
+      }
+      gfan::ZCone zc3 = gfan::intersection(*zc1, *zc2);
+      zc3.canonicalize();
+      res->rtyp = coneID;
+      res->data = (void *)new gfan::ZCone(zc3);
+      return FALSE;
+    }
+    if ((v != NULL) && (v->Typ() == polytopeID))
+    {
+      gfan::ZCone* zc11 = (gfan::ZCone*)u->Data();
+      gfan::ZCone zc1 = liftUp(*zc11);
+      gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
+      int d1 = zc1.ambientDimension();
+      int d2 = zc2->ambientDimension();
+      if (d1 != d2)
+      {
+        Werror("expected ambient dims of both cones to coincide\n"
+                "but got %d and %d", d1, d2);
+        return TRUE;
+      }
+      gfan::ZCone zc3 = gfan::intersection(zc1, *zc2);
+      zc3.canonicalize();
+      res->rtyp = polytopeID;
+      res->data = (void *)new gfan::ZCone(zc3);
+      return FALSE;
+    }
+  }
+  if ((u != NULL) && (u->Typ() == polytopeID))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == coneID))
+    {
+      gfan::ZCone* zc1 = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zc22 = (gfan::ZCone*)v->Data();
+      gfan::ZCone zc2 = liftUp(*zc22);
+      int d1 = zc1->ambientDimension();
+      int d2 = zc2.ambientDimension();
+      if (d1 != d2)
+      {
+        Werror("expected ambient dims of both cones to coincide\n"
+                "but got %d and %d", d1, d2);
+        return TRUE;
+      }
+      gfan::ZCone zc3 = gfan::intersection(*zc1, zc2);
+      zc3.canonicalize();
+      res->rtyp = polytopeID;
+      res->data = (void *)new gfan::ZCone(zc3);
+      return FALSE;
+    }
+    if ((v != NULL) && (v->Typ() == polytopeID))
+    {
+      gfan::ZCone* zc1 = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
+      int d1 = zc1->ambientDimension();
+      int d2 = zc2->ambientDimension();
+      if (d1 != d2)
+      {
+        Werror("expected ambient dims of both cones to coincide\n"
+                "but got %d and %d", d1, d2);
+        return TRUE;
+      }
+      gfan::ZCone zc3 = gfan::intersection(*zc1, *zc2);
+      zc3.canonicalize();
+      res->rtyp = polytopeID;
+      res->data = (void *)new gfan::ZCone(zc3);
+      return FALSE;
+    }
+  }
+  WerrorS("convexIntersectionOld: unexpected parameters");
   return TRUE;
 }
 
@@ -1998,10 +2141,12 @@ void bbcone_setup(SModulFunctions* p)
   p->iiAddCproc("gfan.lib","coneLink",FALSE,coneLink);
   p->iiAddCproc("gfan.lib","containsAsFace",FALSE,hasFace);
   p->iiAddCproc("gfan.lib","containsInSupport",FALSE,containsInSupport);
+  p->iiAddCproc("gfan.lib","containsInSupportOld",FALSE,containsInSupportOld);
   p->iiAddCproc("gfan.lib","containsPositiveVector",FALSE,containsPositiveVector);
   p->iiAddCproc("gfan.lib","containsRelatively",FALSE,containsRelatively);
   p->iiAddCproc("gfan.lib","convexHull",FALSE,convexHull);
   p->iiAddCproc("gfan.lib","convexIntersection",FALSE,intersectCones);
+  p->iiAddCproc("gfan.lib","convexIntersectionOld",FALSE,convexIntersectionOld);
   p->iiAddCproc("gfan.lib","dimension",FALSE,dimension);
   p->iiAddCproc("gfan.lib","dualCone",FALSE,dualCone);
   p->iiAddCproc("gfan.lib","equations",FALSE,equations);
