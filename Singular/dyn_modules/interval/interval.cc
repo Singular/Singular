@@ -181,7 +181,6 @@ static void interval_Destroy(blackbox*, void *d)
 // assigning values to intervals
 static BOOLEAN interval_Assign(leftv result, leftv args)
 {
-    assume(result->Typ() == intervalID);
     interval *RES;
 
     /*
@@ -823,7 +822,6 @@ static char* box_String(blackbox*, void *d)
 // assigning values to intervals
 static BOOLEAN box_Assign(leftv result, leftv args)
 {
-    assume(result->Typ() == boxID);
     box *RES;
 
     /*
@@ -1131,8 +1129,6 @@ static BOOLEAN box_deserialize(blackbox**, void **d, si_link f)
 
 static BOOLEAN boxSet(leftv result, leftv args)
 {
-    assume(result->Typ() == boxID);
-
     // check for proper types
     const short t[] = {3, (short) boxID, INT_CMD, (short) intervalID};
     if (!iiCheckTypes(args, t, 1))
@@ -1168,8 +1164,6 @@ static BOOLEAN boxSet(leftv result, leftv args)
 
 static BOOLEAN evalPolyAtBox(leftv result, leftv args)
 {
-    assume(result->Typ() == intervalID);
-
     const short t[] = {2, POLY_CMD, (short) boxID};
     if (!iiCheckTypes(args, t, 1))
     {
