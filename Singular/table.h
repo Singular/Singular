@@ -428,6 +428,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjOP_IV_I),   '%',            INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjOP_IV_I),   '%',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjMOD_N),     '%',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjMOD_P),     '%',            POLY_CMD,       POLY_CMD,   POLY_CMD, COMM_PLURAL | ALLOW_RING}
 #ifdef SINGULAR_4_2
 ,{D(jjNUMBER2_OP2),'%',           CNUMBER_CMD,    CNUMBER_CMD,CNUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjNUMBER2_OP2),'%',           CNUMBER_CMD,    INT_CMD,    CNUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}

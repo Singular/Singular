@@ -2566,6 +2566,24 @@ static BOOLEAN jjMOD_N(leftv res, leftv u, leftv v)
   res->data =(char *) n_IntMod((number)u->Data(),q,currRing->cf);
   return FALSE;
 }
+static BOOLEAN jjMOD_P(leftv res, leftv u, leftv v)
+{
+  poly q=(poly)v->Data();
+  if (q==NULL)
+  {
+    WerrorS(ii_div_by_0);
+    return TRUE;
+  }
+  poly p=(poly)(u->Data());
+  if (p==NULL)
+  {
+    res->data=NULL;
+    return FALSE;
+  }
+  res->data=(void*)(singclap_pmod(p /*(poly)(u->Data())*/ ,
+                                  q /*(poly)(v->Data())*/ ,currRing));
+  return FALSE;
+}
 static BOOLEAN jjMONITOR2(leftv res, leftv u,leftv v);
 static BOOLEAN jjMONITOR1(leftv res, leftv v)
 {

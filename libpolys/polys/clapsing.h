@@ -38,6 +38,7 @@ poly singclap_resultant ( poly f, poly g , poly x, const ring r);
 BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb , const ring r);
 
 poly singclap_pdivide ( poly f, poly g, const ring r );
+poly singclap_pmod ( poly f, poly g, const ring r );
 
 void singclap_divide_content ( poly f, const ring r);
 
