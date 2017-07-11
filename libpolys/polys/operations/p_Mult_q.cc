@@ -15,6 +15,7 @@
 
 #include "polys/monomials/p_polys.h"
 #include "polys/kbuckets.h"
+#include "polys/clapsing.h"
 
 #include "polys/templates/p_Procs.h"
 #include "polys/templates/p_MemCmp.h"
@@ -291,6 +292,16 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   }
   if (lq < MIN_LENGTH_BUCKET || TEST_OPT_NOT_BUCKETS)
     return _p_Mult_q_Normal(p, q, copy, r);
+  else if (lq >= MIN_LENGTH_FACTORY)
+  {
+    poly h=singclap_pmult(p,q,r);
+    if (!copy)
+    {
+      p_Delete(&p,r);
+      p_Delete(&q,r);
+    }
+    return h;
+  }
   else
   {
     assume(lp == pLength(p));

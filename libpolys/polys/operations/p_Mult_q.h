@@ -22,6 +22,12 @@ struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
 #define MIN_LENGTH_BUCKET 10
 #endif
 
+// Use factroy if min(pLength(p), pLength(q)) >= MIN_LENGTH_FACTORY
+// Not thoroughly tested what is best
+#ifndef MIN_LENGTH_FACTORY
+#define MIN_LENGTH_FACTORY 1000
+#endif
+
 //  return TRUE and lp == pLength(p), lq == pLength(q),
 //              if min(pLength(p), pLength(q)) >= min
 //         FALSE if min(pLength(p), pLength(q)) < min
