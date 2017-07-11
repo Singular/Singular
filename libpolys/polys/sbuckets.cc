@@ -100,7 +100,7 @@ sBucket_pt    sBucketCopy(const sBucket_pt bucket)
 static inline int LOG2(int i)
 {
   assume (i > 0);
-  int j = 0;
+  unsigned j = 0;
 
   do
   {
@@ -110,7 +110,7 @@ static inline int LOG2(int i)
   }
   while (1);
 
-  return j;
+  return (int)j;
 }
 
 //////////////////////////////////////////////////////////////////////////
