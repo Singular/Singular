@@ -3228,7 +3228,7 @@ poly p_Homogen (poly p, int varnum, const ring r)
       }
       qn = pNext(q);
       pNext(q) = NULL;
-      sBucket_Add_p(bp, q, 1);
+      sBucket_Add_m(bp, q);
       q = qn;
     }
     sBucketDestroyAdd(bp, &q, &ii);
