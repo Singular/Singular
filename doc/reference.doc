@@ -1612,7 +1612,9 @@ division(ideal(f^2),jacob(f),10);
 See
 @ref{ideal};
 @ref{lift};
-@ref{module}.
+@ref{module};
+@ref{reduce};
+@ref{poly operations}.
 @c ref
 @c ---------------------------------------
 @node dump, eliminate, division, Functions
@@ -6262,7 +6264,9 @@ See
 @ref{ideal};
 @ref{module};
 @ref{vector};
-@ref{std}.
+@ref{std};
+@ref{division};
+@ref{poly operations}.
 @c ref
 @c ---------------------------------------
 @node regularity, repart, reduce, Functions
