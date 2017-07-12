@@ -106,11 +106,13 @@ typedef short BOOLEAN;
 #define NULLp        ((void*)NULL)
 #endif
 
-// #ifdef _TRY
 #ifndef ABS
-#define ABS(x) ((x)<0?(-(x)):(x))
+static inline int ABS(int v)
+{
+  int const mask = v >> sizeof(int) * CHAR_BIT - 1;
+  return ((v + mask) ^ mask);
+}
 #endif
-// #endif
 
 typedef void* ADDRESS;
 

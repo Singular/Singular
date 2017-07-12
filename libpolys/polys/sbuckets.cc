@@ -97,20 +97,21 @@ sBucket_pt    sBucketCopy(const sBucket_pt bucket)
 // internal routines
 //
 // returns floor(log_2(i))
-static inline int LOG2(int i)
+// stolen from:
+// https://graphics.stanford.edu/~seander/bithacks.html#IntegerLog
+static inline int LOG2(int v)
 {
-  assume (i > 0);
-  unsigned j = 0;
+  assume (v > 0);
+  const unsigned int b[] = {0x2, 0xC, 0xF0, 0xFF00, 0xFFFF0000};
+  const unsigned int S[] = {1, 2, 4, 8, 16};
 
-  do
-  {
-    i = i >> 1;
-    if (i == 0) return j;
-    j++;
-  }
-  while (1);
-
-  return (int)j;
+  unsigned int r = 0; // result of log2(v) will go here
+  if (v & b[4]) { v >>= S[4]; r |= S[4]; }
+  if (v & b[3]) { v >>= S[3]; r |= S[3]; }
+  if (v & b[2]) { v >>= S[2]; r |= S[2]; }
+  if (v & b[1]) { v >>= S[1]; r |= S[1]; }
+  if (v & b[0]) { v >>= S[0]; r |= S[0]; }
+  return (int)r;
 }
 
 //////////////////////////////////////////////////////////////////////////

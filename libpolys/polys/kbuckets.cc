@@ -47,7 +47,7 @@ static int coef_start=1;
 ///
 
 // returns ceil(log_4(l))
-inline unsigned int pLogLength(unsigned int l)
+static inline unsigned int pLogLength(unsigned int l)
 {
   unsigned int i = 0;
 
@@ -62,7 +62,7 @@ inline unsigned int pLogLength(unsigned int l)
 }
 
 // returns ceil(log_4(pLength(p)))
-inline unsigned int pLogLength(poly p)
+static inline unsigned int pLogLength(poly p)
 {
   return pLogLength((unsigned int) pLength(p));
 }
