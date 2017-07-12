@@ -38,6 +38,7 @@ of points on a surface, Macdonald's formula for the symmetric product (@nref{goe
 Changed libraries:
 @itemize
 @item chern.lib:  new version (@nref{chern_lib})
+@item gitfan.lib:  new (incompatible) version (@nref{gitfan_lib})
 @item grobcov.lib:  new version (@nref{grobcov_lib})
 @end itemize
 
