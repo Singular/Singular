@@ -1230,7 +1230,7 @@ proc eliminateZerosUpTriangle(intmat G) {
           }
         }
       }
-      G = delRowCol(G,i,i); // remove vertex i
+      G = imDelRowCol(G,i,i); // remove vertex i
     }
   }
   return (G);
