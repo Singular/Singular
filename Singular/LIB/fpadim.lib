@@ -1139,6 +1139,7 @@ proc lpUfGkDim(ideal G)
 {
   G = lead(G);
 
+  // check special case 1
   int l = 0;
   for (int i = 1; i <= size(G); i++) {
     // find the max degree in G
@@ -1152,7 +1153,7 @@ proc lpUfGkDim(ideal G)
       return(-2); // minus infinity
     }
   }
-  // if longet word has length 1 we handle it as a special case
+  // if longest word has length 1 we handle it as a special case
   if (l == 1) {
     int n = attrib(basering, "lV"); // variable count
     int k = size(G);
@@ -1167,8 +1168,143 @@ proc lpUfGkDim(ideal G)
     }
   }
 
+  intmat UG = lpUfGraph(G);
+
+  // check special case 2
+  if (imIsZero(UG)) {
+    return (0);
+  }
+
+  // check special case 3
+  UG = topologicalSort(UG);
+
+  int isUpRightTriangle = isUpRightTriangleMat(UG);
+  if (isUpRightTriangle) {
+    UG = eliminateZerosUpTriangle(UG);
+    // already ensured that UG != 0
+    return(UfGraphURTNZDGrowth(UG));
+  }
+
   // otherwise count cycles in the Ufnarovskij Graph
-  return(UfGraphGrowth(lpUfGraph(G)));
+  return(UfGraphGrowth(UG));
+}
+
+proc UfGraphURTNZDGrowth(intmat UG) {
+  // URTNZD = upper right triangle non zero diagonal
+  for (int i = 1; i <= ncols(UG); i++) {
+    UG[i,i] = 0; // remove all loops
+  }
+  intmat UGk = UG;
+  int k = 1;
+  while (!imIsZero(UGk)) {
+    UGk = UGk * UG;
+    k++;
+  }
+  return (k);
+}
+
+proc imIsZero(intmat M) {
+  intmat Zero[nrows(M)][ncols(M)];
+  return (M == Zero);
+}
+
+proc imIsUpRightTriangle(intmat M) {
+  for (int i = 1; i <= nrows(M); i++) {
+    for (int j = 1; j < i; j++) {
+      if(M[i,j] != 0) { return (0); }
+    }
+  }
+  return (1);
+}
+
+proc eliminateZerosUpTriangle(intmat G) {
+  // G is expected to be an upper triangle matrix
+  for (int i = 1; i <= ncols(G); i++) {
+    if (G[i,i] == 0) { // i doesn't have a cycle
+      for (int j = 1; j < i; j++) {
+        if (G[j,i] == 1) { // j has an edge to i
+          for (int k = i + 1; k <= nrows(G); k++) {
+            if (G[i,k] == 1) {
+              G[j,k] = G[i,k]; // give j all edges from i
+            }
+          }
+        }
+      }
+      G = delRowCol(G,i,i); // remove vertex i
+    }
+  }
+  return (G);
+}
+
+proc imDelRowCol(intmat M, int row, int col) {
+  // row and col are expected to be > 0
+  int nr = nrows(M);
+  int nc = ncols(M);
+  intmat Mdel[nr - 1][nc - 1];
+  for (int i = 1; i <= nr; i++) {
+    for (int j = 1; j <= nc; j++) {
+      if(i != row && j != col) {
+        int newi = i;
+        int newj = j;
+        if (i > row) { newi = i - 1; }
+        if (j > col) { newj = j - 1; }
+        Mdel[newi,newj] = M[i,j];
+      }
+    }
+  }
+  return (Mdel);
+}
+
+proc topologicalSort(intmat G) {
+  // NOTE: ignores loops
+  // NOTE: this takes O(|V^3|), can be optimized
+  int n = ncols(G);
+  for (int i = 1; i <= n; i++) { // only use the submat at i
+    // find a vertex v in the submat at i with no incoming edges
+    int v;
+    for (int j = i; j <= n; j++) {
+      int incoming = 0;
+      for (int k = i; k <= n; k++) {
+        if (k != j && G[k,j] == 1) {
+          incoming = 1;
+        }
+      }
+      if (incoming == 0) {
+        v = j;
+        break;
+      } else {
+        if (j == n) {
+          // G contains at least one cycle, abort
+          return (G);
+        }
+      }
+    }
+
+    // swap v and i
+    if (v != i) {
+      G = imPermcol(G, v, i);
+      G = imPermrow(G, v, i);
+    }
+  }
+  return (G);
+}
+
+proc imPermcol (intmat A, int c1, int c2)
+{
+   intmat B = A;
+   int k = nrows(B);
+   B[1..k,c1] = A[1..k,c2];
+   B[1..k,c2] = A[1..k,c1];
+   return (B);
+}
+
+proc imPermrow (intmat A, int r1, int r2)
+{
+   intmat B = A;
+   int k = ncols(B);
+   B[r1,1..k] = A[r2,1..k];
+   B[r2,1..k] = A[r1,1..k];
+   return (B);
 }
 
 proc UfGraphGrowth(intmat UG)
