@@ -47,6 +47,9 @@ PROCEDURES:
  absPrimdecGTZ(I);  the absolute prime components of I
  absPrimdecGTZE(I); the absolute prime components of I. Assumes I is not unit ideal.
  sep(f,k);          the separabel part of f as polynomial in Fp(t1,...,tm)
+
+SEE ALSO: primdecint_lib
+KEYWORDS: primary decomposition
 ";
 
 LIB "general.lib";

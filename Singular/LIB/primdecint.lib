@@ -25,6 +25,9 @@ PROCEDURES:
  heightZ(I);        compute the height of I
  equidimZ(I);       compute the equidimensional part of I
  intersectZ(I,J)    compute the intersection of I and J
+
+SEE ALSO: primdec_lib
+KEYWORDS: primary decomposition
 ";
 
 LIB "primdec.lib";
