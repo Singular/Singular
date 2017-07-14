@@ -46,6 +46,40 @@ static int coef_start=1;
 /// Some internal stuff
 ///
 
+// https://graphics.stanford.edu/~seander/bithacks.html#IntegerLog
+#ifdef BUCKET_TWO_BASE
+static inline int LOG2(int v)
+{
+  assume (v > 0);
+  const unsigned int b[] = {0x2, 0xC, 0xF0, 0xFF00, 0xFFFF0000};
+  const unsigned int S[] = {1, 2, 4, 8, 16};
+
+  unsigned int r = 0; // result of log2(v) will go here
+  if (v & b[4]) { v >>= S[4]; r |= S[4]; }
+  if (v & b[3]) { v >>= S[3]; r |= S[3]; }
+  if (v & b[2]) { v >>= S[2]; r |= S[2]; }
+  if (v & b[1]) { v >>= S[1]; r |= S[1]; }
+  if (v & b[0]) { v >>= S[0]; r |= S[0]; }
+  return (int)r;
+}
+#endif
+
+#ifndef BUCKET_TWO_BASE
+static inline int LOG4(int v)
+{
+  assume (v > 0);
+  const unsigned int b[] = {0x2, 0xC, 0xF0, 0xFF00, 0xFFFF0000};
+  const unsigned int S[] = {1, 2, 4, 8, 16};
+
+  unsigned int r = 0; // result of log4(v) will go here
+  if (v & b[4]) { v >>= S[4]; r |= S[3]; }
+  if (v & b[3]) { v >>= S[3]; r |= S[2]; }
+  if (v & b[2]) { v >>= S[2]; r |= S[1]; }
+  if (v & b[1]) { v >>= S[1]; r |= S[0]; }
+  return (int)r;
+}
+#endif
+
 // returns ceil(log_4(l))
 static inline unsigned int pLogLength(unsigned int l)
 {
@@ -54,9 +88,9 @@ static inline unsigned int pLogLength(unsigned int l)
   if (l == 0) return 0;
   l--;
 #ifdef BUCKET_TWO_BASE
-  while ((l = (l >> 1))) i++;
+  i=LOG2(l);
 #else
-  while ((l = (l >> 2))) i++;
+  i=LOG4(l);
 #endif
   return i+1;
 }
