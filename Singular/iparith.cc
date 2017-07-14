@@ -4684,11 +4684,7 @@ static BOOLEAN jjRPAR(leftv res, leftv v)
 }
 static BOOLEAN jjSLIM_GB(leftv res, leftv u)
 {
-#ifdef HAVE_PLURAL
   const bool bIsSCA = rIsSCA(currRing);
-#else
-  const bool bIsSCA = false;
-#endif
 
   if ((currRing->qideal!=NULL) && !bIsSCA)
   {
