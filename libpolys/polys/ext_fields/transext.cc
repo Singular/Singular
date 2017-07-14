@@ -1797,11 +1797,7 @@ static number ntGcd(number a, number b, const coeffs cf)
 static int ntSize(number a, const coeffs cf)
 {
   ntTest(a);
-  if (IS0(a)) return -1;
-  /* this has been taken from the old implementation of field extensions,
-     where we computed the sum of the degrees and the numbers of terms in
-     the numerator and denominator of a; so we leave it at that, for the
-     time being */
+  if (IS0(a)) return 0;
   fraction f = (fraction)a;
   poly p = NUM(f);
   int noOfTerms = 0;
@@ -1818,7 +1814,7 @@ static int ntSize(number a, const coeffs cf)
     noOfTerms += pLength(DEN(f));
   }
   ntTest(a); // !!!!
-  return numDegree + denDegree + noOfTerms;
+  return (numDegree + denDegree + 1) * noOfTerms; // must be >0
 }
 
 /* assumes that src = Q or Z, dst = Q(t_1, ..., t_s) */

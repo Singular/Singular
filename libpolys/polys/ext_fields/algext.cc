@@ -715,11 +715,7 @@ static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
 
 int naSize(number a, const coeffs cf)
 {
-  if (a == NULL) return -1;
-  /* this has been taken from the old implementation of field extensions,
-     where we computed the sum of the degree and the number of terms in
-     (poly)a; so we leave it at that, for the time being;
-     maybe, the number of terms alone is a better measure? */
+  if (a == NULL) return 0;
   poly aAsPoly = (poly)a;
   int theDegree = 0; int noOfTerms = 0;
   while (aAsPoly != NULL)
@@ -729,7 +725,7 @@ int naSize(number a, const coeffs cf)
     if (d > theDegree) theDegree = d;
     pIter(aAsPoly);
   }
-  return theDegree + noOfTerms;
+  return (theDegree +1) * noOfTerms;
 }
 
 /* performs polynomial division and overrides p by the remainder
