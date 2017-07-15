@@ -63,18 +63,8 @@ int gf_value (const CanonicalForm & f )
     return ((intptr_t)ff) >>2;
 }
 
-#ifndef ABS
-#define ABS(x) ((x)<0?(-(x)):(x))
-#endif
-
 CanonicalForm make_cf ( const mpz_ptr n )
 {
-    //if (ABS(n->_mp_size)<=1)
-    //{
-    //  long value=mpz_get_si(n);
-    //  if(value >= MINIMMEDIATE && value <= MAXIMMEDIATE )
-    //    return CanonicalForm(int2imm( value ));
-    //}
     return CanonicalForm( CFFactory::basic( n ) );
 }
 
