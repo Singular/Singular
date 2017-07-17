@@ -8798,6 +8798,12 @@ const char * Tok2Cmdname(int tok)
   if (tok==ANY_TYPE) return "any_type";
   if (tok==COMMAND) return "command";
   if (tok==NONE) return "nothing";
+  static char Tok2Cmdname_buf[2]=" ";
+  if (tok < 128)
+  {
+    Tok2Cmdname_buf[1]=(char)tok;
+    return Tok2Cmdname_buf;
+  }
   //if (tok==IFBREAK) return "if_break";
   //if (tok==VECTOR_FROM_POLYS) return "vector_from_polys";
   //if (tok==ORDER_VECTOR) return "ordering";
@@ -9076,7 +9082,7 @@ static BOOLEAN check_valid(const int p, const int op)
     }
     else if ((p & PLURAL_MASK)==2 /*, COMM_PLURAL */)
     {
-      Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(op));
+      Warn("assume commutative subalgebra for cmd `%s` in >>%s<<",Tok2Cmdname(op),my_yylinebuf);
       return FALSE;
     }
     /* else, ALLOW_PLURAL */
