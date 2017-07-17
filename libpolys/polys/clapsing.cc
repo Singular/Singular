@@ -584,13 +584,7 @@ poly singclap_pdivide ( poly f, poly g, const ring r )
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g,r ) );
     res = convFactoryPSingP( F / G,r );
   }
-  else if (rField_is_Ring_Z(r))
-  {
-    Off(SW_RATIONAL);
-    setCharacteristic( rChar(r) );
-    CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g,r ) );
-    res = convFactoryPSingP( F / G,r );
-  }
+  // div is not implemented for ZZ coeffs in factory
   else if (r->cf->extRing!=NULL)
   {
     if (rField_is_Q_a(r)) setCharacteristic( 0 );
@@ -636,13 +630,7 @@ poly singclap_pmod ( poly f, poly g, const ring r )
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g,r ) );
     res = convFactoryPSingP( F % G,r );
   }
-  else if (rField_is_Ring_Z(r))
-  {
-    Off(SW_RATIONAL);
-    setCharacteristic( rChar(r) );
-    CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g,r ) );
-    res = convFactoryPSingP( F % G,r );
-  }
+  // mod is not implemented for ZZ coeffs in factory
   else if (r->cf->extRing!=NULL)
   {
     if (rField_is_Q_a(r)) setCharacteristic( 0 );
