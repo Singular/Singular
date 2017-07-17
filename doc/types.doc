@@ -3512,10 +3512,13 @@ multiplication
 
 @item @code{/}, @code{div}
 division by a polynomial, ignoring the remainder
+(only implemented for polynomials over QQ, ZZ/p and field extensions of them)@*
 (See also @ref{quotient},@ref{division},@ref{reduce})
 
 @item @code{%}, @code{mod}
 the remainder from the division by a polynomial
+(only implemented for polynomials over QQ, ZZ/p and field extensions of them)@*
+(See also @ref{quotient},@ref{division},@ref{reduce})
 
 @item @code{^}, @code{**}
 power by a positive integer
