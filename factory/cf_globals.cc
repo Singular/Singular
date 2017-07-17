@@ -13,19 +13,6 @@
 
 #include "config.h"
 
-
-
-/** extern const char factoryVersion[];
- *
- * factoryVersion - factory version string.
- *
- * factoryVersion is initialized from #define FACTORYVERSION
- * which is defined in config.h.  It is not used in factory
- * itself.
- *
-**/
-extern const char factoryVersion[] = "@(#) factoryVersion = " FACTORYVERSION;
-
 /** extern const char factoryConfiguration[];
  *
  * factoryConfiguration - factory configuration.

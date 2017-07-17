@@ -63,8 +63,8 @@ If you find bugs or if you find a strange behavior of the library, please
 let me know (e-mail: singular@mathematik.uni-kl.de>).
 Comments and questions are welcome, too.
 
-  Factory version 1.2c and newer define an external variable
-`factoryVersion' describing the version of the library.  The external
+  Factory version 1.2c and newer define an string
+`FACTORYVERSION' describing the version of the library.  The external
 variable `factoryConfiguration' (not present in versions 1.2c and 1.3a)
 describes the options Factory has been configured with.  Please include the
 version number and the configuration options in your bug reports.  You may
@@ -72,7 +72,7 @@ either use the UNIX utility `what' to get this information (`what libcf.a')
 or compile and run something similar to this:
 
   #include "factory.h"
-  main() { cout << factoryVersion << "; " << factoryConfiguration << endl; }
+  main() { cout << FACTORYVERSION << "; " << factoryConfiguration << endl; }
 
 3. Installation
 ===============
