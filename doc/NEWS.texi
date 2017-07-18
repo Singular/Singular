@@ -24,6 +24,7 @@
 Extended commands:
 @itemize
 @item @code{%},@code{mod}: also for poly operands (@xref{poly operations}).
+@item @code{delete}: extended to intvec, ideal, module (@xref{delete}).
 @item syz (@nref{syz}), lift (@nref{lift}), liftstd (@nref{liftstd}), intersect(@nref{intersect}): with a specified GB algorithm
 @end itemize
 
