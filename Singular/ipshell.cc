@@ -1176,7 +1176,7 @@ BOOLEAN iiDefaultParameter(leftv p)
   tmp.data=at->CopyA();
   return iiAssign(p,&tmp);
 }
-BOOLEAN iiBranchTo(leftv res, leftv args)
+BOOLEAN iiBranchTo(leftv, leftv args)
 {
   // must be inside a proc, as we simultae an proc_end at the end
   if (myynest==0)
@@ -2653,6 +2653,10 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
            case 0:
            case ringorder_unspec:
              break;
+           case ringorder_L: /* cannot happen */
+           case ringorder_a64: /*not implemented */
+             WerrorS("ring order not implemented");
+             return TRUE;
         }
         delete iv;
       }
