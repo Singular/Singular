@@ -1841,6 +1841,13 @@ static BOOLEAN jjDelete_IV(leftv res, leftv u, leftv v)
   res->data=(void*)iv->delete_pos(pos-1);
   return res->data==NULL;
 }
+static BOOLEAN jjDelete_ID(leftv res, leftv u, leftv v)
+{
+  int pos=(int)(long)v->Data();
+  ideal I=(ideal)u->Data();
+  res->data=(void*)id_Delete_Pos(I,pos-1,currRing);
+  return res->data==NULL;
+}
 static BOOLEAN jjDIFF_P(leftv res, leftv u, leftv v)
 {
   int i=pVar((poly)v->Data());
