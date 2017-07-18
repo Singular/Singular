@@ -1378,22 +1378,31 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{delete (} list_expression@code{,} int_expression @code{)}
+@*@code{delete (} intvec_expression@code{,} int_expression @code{)}
+@*@code{delete (} ideal_expression@code{,} int_expression @code{)}
+@*@code{delete (} module_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
-list
+type of the first argument
 @item @strong{Purpose:}
-deletes the element with the given index from a list (the input is not changed).
+deletes the element with the given index from a list/intvec/ideal/module (the input is not changed).
 @item @strong{Example:}
 @smallexample
 @c example
   list l="a","b","c";
   list l1=delete(l,2);l1;
   l;
+  delete(1..5,2);
+  ring r=0,(x,y,z),dp;
+  delete(maxideal(1),1);
 @c example
 @end smallexample
 @end table
 @c ref
 See
 @ref{list};
+@ref{intvec};
+@ref{ideal};
+@ref{module};
 @ref{insert}.
 @c ref
 @c ---------------------------------------
