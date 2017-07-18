@@ -1834,6 +1834,13 @@ static BOOLEAN jjDEG_IV(leftv res, leftv u, leftv v)
     res->data=(char *)(long)(-1);
   return FALSE;
 }
+static BOOLEAN jjDelete_IV(leftv res, leftv u, leftv v)
+{
+  int pos=(int)(long)v->Data();
+  intvec *iv=(intvec*)u->Data();
+  res->data=(void*)iv->delete_pos(pos-1);
+  return res->data==NULL;
+}
 static BOOLEAN jjDIFF_P(leftv res, leftv u, leftv v)
 {
   int i=pVar((poly)v->Data());
