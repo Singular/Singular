@@ -7896,6 +7896,21 @@ static Subexpr jjMakeSub(leftv e)
   r->start =(int)(long)e->Data();
   return r;
 }
+static BOOLEAN jjRESTART(leftv, leftv u)
+{
+  int c=(int)(long)u->Data();
+  switch(c)
+  {
+    case 0:{
+        PrintS("delete all variables\n");
+	killlocals(0);
+	WerrorS("restarting...");
+	break;
+      };
+    default: WerrorS("not implemented");
+  }
+  return FALSE;
+}
 #define D(A)    (A)
 #define NULL_VAL NULL
 #define IPARITH

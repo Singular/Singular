@@ -223,6 +223,7 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjRESERVEDNAME),RESERVEDNAME_CMD, INT_CMD,      STRING_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjL2R),        RESOLUTION_CMD,  RESOLUTION_CMD, LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDUMMY),      RESOLUTION_CMD,  RESOLUTION_CMD, RESOLUTION_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjRESTART),    RESTART_CMD,     NONE,           INT_CMD,        ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjRINGLIST),   RINGLIST_CMD,    LIST_CMD,       RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjRINGLIST_C), RING_LIST_CMD,   LIST_CMD,       CRING_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjRING_LIST),  RING_LIST_CMD,   LIST_CMD,       RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
@@ -1108,6 +1109,7 @@ cmdnames cmds[] =
   { "reservedName",0, RESERVEDNAME_CMD ,  CMD_M},
   { "resolution",  0, RESOLUTION_CMD ,    RING_DECL},
   { "resultant",   0, RESULTANT_CMD,      CMD_3},
+  { "restart",     0, RESTART_CMD,        CMD_1},
   { "return",      0, RETURN ,            RETURN},
   { "RETURN",      0, END_GRAMMAR ,       RETURN},
   { "ring",        0, RING_CMD ,          RING_CMD},
