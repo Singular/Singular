@@ -37,3 +37,6 @@ CFSwitches::CFSwitches ()
   //On(SW_USE_EZGCD_P); // still testing
   On(SW_USE_QGCD);
 }
+
+CFSwitches cf_glob_switches;
+
