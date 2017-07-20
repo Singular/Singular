@@ -50,7 +50,6 @@ static int coef_start=1;
 #ifndef BUCKET_TWO_BASE
 static inline int LOG4(int v)
 {
-  assume (v > 0);
   const unsigned int b[] = {0x2, 0xC, 0xF0, 0xFF00, 0xFFFF0000};
   const unsigned int S[] = {1, 2, 4, 8, 16};
 
