@@ -428,9 +428,10 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   }
   if (IDTYP(h) == PACKAGE_CMD)
   {
-    if (strcmp(IDID(h),"Top")==0)
+    if ((IDPACKAGE(h)->language==LANG_C)
+    || (strcmp(IDID(h),"Top")==0))
     {
-      WarnS("can not kill `Top`");
+      Warn("cannot kill `%s`",IDID(h));
       return;
     }
     // any objects defined for this package ?
