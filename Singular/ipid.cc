@@ -428,7 +428,7 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   }
   if (IDTYP(h) == PACKAGE_CMD)
   {
-    if ((IDPACKAGE(h)->language==LANG_C)
+    if (((IDPACKAGE(h)->language==LANG_C)&&(IDPACKAGE(h)->idroot!=NULL))
     || (strcmp(IDID(h),"Top")==0))
     {
       Warn("cannot kill `%s`",IDID(h));
