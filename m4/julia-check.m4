@@ -5,7 +5,7 @@ AC_DEFUN([SING_CHECK_JULIA],
 
 AC_ARG_ENABLE(julia,
  AS_HELP_STRING([--enable-julia], [Enables interface for Singular to julia]),
- [ENABLE_JULIA="$enableval"], [ENABLE_JULIA=""])
+ [ENABLE_JULIA="$enableval"], [ENABLE_JULIA="no"])
 
 AC_MSG_CHECKING(whether to check for julia interface)
 
