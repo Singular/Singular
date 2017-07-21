@@ -9,9 +9,9 @@ struct interval
     number upper;
     ring R;
 
-    interval(ring);
-    interval(number, ring);
-    interval(number, number, ring);
+    interval(const ring r=currRing);
+    interval(number, const ring r=currRing);
+    interval(number, number, const ring r=currRing);
     interval(interval*);
     ~interval();
 

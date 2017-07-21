@@ -11,7 +11,7 @@
 
 /* interval */
 
-interval::interval(ring r = currRing)
+interval::interval(const ring r)
 {
     lower = n_Init(0, r->cf);
     upper = n_Init(0, r->cf);
@@ -19,7 +19,7 @@ interval::interval(ring r = currRing)
     R->ref++;
 }
 
-interval::interval(number a, ring r = currRing)
+interval::interval(number a, const ring r)
 {
     // dangerous: check if a is in coefs r->cf
     lower = a;
@@ -28,7 +28,7 @@ interval::interval(number a, ring r = currRing)
     R->ref++;
 }
 
-interval::interval(number a, number b, ring r = currRing)
+interval::interval(number a, number b, const ring r)
 {
     lower = a;
     upper = b;
