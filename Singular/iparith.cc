@@ -6644,81 +6644,32 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
   int rank=1;
   int i=0;
   poly p;
+  int dest_type=POLY_CMD;
+  if (iiOp==MODUL_CMD) dest_type=VECTOR_CMD;
   while (h!=NULL)
   {
-    switch(h->Typ())
+    // use standard type conversions to poly/vector
+    int ri;
+    int ht=h->Typ();
+    if (ht==dest_type)
     {
-      case POLY_CMD:
-      {
-        p=(poly)h->CopyD(POLY_CMD);
-        break;
-      }
-      case INT_CMD:
-      {
-        number n=nInit((int)(long)h->Data());
-        if (!nIsZero(n))
-        {
-          p=pNSet(n);
-        }
-        else
-        {
-          p=NULL;
-          nDelete(&n);
-        }
-        break;
-      }
-      case BIGINT_CMD:
-      {
-        number b=(number)h->Data();
-        nMapFunc nMap=n_SetMap(coeffs_BIGINT,currRing->cf);
-        if (nMap==NULL) return TRUE;
-        number n=nMap(b,coeffs_BIGINT,currRing->cf);
-        if (!nIsZero(n))
-        {
-          p=pNSet(n);
-        }
-        else
-        {
-          p=NULL;
-          nDelete(&n);
-        }
-        break;
-      }
-      case NUMBER_CMD:
-      {
-        number n=(number)h->CopyD(NUMBER_CMD);
-        if (!nIsZero(n))
-        {
-          p=pNSet(n);
-        }
-        else
-        {
-          p=NULL;
-          nDelete(&n);
-        }
-        break;
-      }
-      case VECTOR_CMD:
-      {
-        p=(poly)h->CopyD(VECTOR_CMD);
-        if (iiOp!=MODUL_CMD)
-        {
-          idDelete(&id);
-          pDelete(&p);
-          return TRUE;
-        }
-        rank=si_max(rank,(int)pMaxComp(p));
-        break;
-      }
-      default:
-      {
-        idDelete(&id);
-        return TRUE;
-      }
+      p=(poly)h->CopyD();
+      if (p!=NULL) rank=si_max(rank,(int)pMaxComp(p));
     }
-    if ((iiOp==MODUL_CMD)&&(p!=NULL)&&(pGetComp(p)==0))
+    else if ((ri=iiTestConvert(ht,dest_type,dConvertTypes))!=0)
     {
-      pSetCompP(p,1);
+      sleftv tmp;
+      leftv hnext=h->next;
+      h->next=NULL;
+      iiConvert(ht,dest_type,ri,h,&tmp,dConvertTypes);
+      h->next=hnext;
+      p=(poly)tmp.data;
+      if (p!=NULL) rank=si_max(rank,(int)pMaxComp(p));
+    }
+    else
+    {
+      idDelete(&id);
+      return TRUE;
     }
     id->m[i]=p;
     i++;
