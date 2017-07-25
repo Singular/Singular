@@ -26,7 +26,7 @@ REFERENCES:
    Recovering exact results from inexact numerical data in algebraic geometry;
    Published in Experimental Mathematics 22(1) on pages 38-50 in 2013
 
-KEYWORDS: numerical algebraic geometry; hybrid algorithms; exactness recovery
+KEYWORDS: numerical algebraic geometry; hybrid algorithms; exactness recovery; solving; bertini
 
 PROCEDURES:
  substAll(v,p);           poly: ring variables in v substituted by elements of p
