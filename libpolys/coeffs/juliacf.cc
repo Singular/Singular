@@ -37,13 +37,15 @@ number jcfNew(jl_value_t* v, const coeffs cf)
 {
   jcf_number r=(jcf_number)omAlloc(sizeof(jcf_struct));
   r->val=v;
-  // ????
+  // ????: secure v against gc
+  //       set pos
   return (number)r;
 }
 
 void jcfFree(jcf_number n,  const coeffs cf)
 {
-  // ???
+  // ??? undo jcfNew
+  omFreeSize((ADDRESS)n,sizeof(jcf_struct));
 }
 
 #ifdef LDEBUG
@@ -56,8 +58,16 @@ static void jcfCoeffWrite (const coeffs r, BOOLEAN /*details*/)
 }
 
 
-static BOOLEAN jcfGreaterZero (number k, const coeffs r)
+static BOOLEAN jcfGreaterZero (number a, const coeffs r)
 {
+  // this is used in the output of polynomials:
+  // GreaterZero(a) <=> '+' is required before a monomial start with a
+  jcf_number aa=(jcf_number)a;
+  jl_value_t *bb = jl_box_int64(0);
+  jl_function_t *func = jl_get_function(jl_base_module, ">");
+  jl_value_t *res=jl_call2(func, aa->val, bb->val);
+  if (jl_unbox_bool(res)) return TRUE;
+  else                    return FALSE;
 }
 
 /*2
@@ -83,7 +93,7 @@ static long jcfInt(number &n, const coeffs r)
   return 0;
 }
 
-static void jcfDelete)(number * a, const coeffs r)
+static void jcfDelete(number * a, const coeffs r)
 {
   jcf_number aa=(jcf_number)(*a);
   jcfFree(aa,r);
@@ -194,7 +204,8 @@ static void jcfWrite (number a, const coeffs r)
   jcf_number aa=(jcf_number)a;
   jl_function_t *func = jl_get_function(jl_base_module, "string");
   jl_value_t *res=jl_call1(func, aa->val);
-  // ???
+  // ???: produce the string representaion of a
+  //      and apply it to StringAppendS
   // char *s=jl_unbox_charptr(res);
   // StringAppendS(s);
 }
