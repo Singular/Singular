@@ -127,7 +127,7 @@ static number jcfDiv (number a,number b, const coeffs r)
 {
   jcf_number aa=(jcf_number)a;
   jcf_number bb=(jcf_number)b;
-  jl_function_t *func = jl_get_function(jl_base_module, "/");
+  jl_function_t *func = jl_get_function(jl_base_module, "divexact");
   return jcfNew(jl_call2(func, aa->val, bb->val),r);
 }
 
@@ -165,7 +165,7 @@ static number jcfInvers (number c, const coeffs r)
 {
   jl_value_t *ii = jl_box_int64(1);
   jcf_number cc=(jcf_number)c;
-  jl_function_t *func = jl_get_function(jl_base_module, "/");
+  jl_function_t *func = jl_get_function(jl_base_module, "divexact");
   return jcfNew(jl_call2(func, ii, cc->val),r);
 }
 
@@ -181,6 +181,7 @@ static number jcfNeg (number c, const coeffs r)
 
 static BOOLEAN jcfGreater (number a,number b, const coeffs r)
 {
+  // if unsure, define it to "not equal"
   jcf_number aa=(jcf_number)a;
   jcf_number bb=(jcf_number)b;
   jl_function_t *func = jl_get_function(jl_base_module, ">");
@@ -204,13 +205,14 @@ static void jcfWrite (number a, const coeffs r)
   jcf_number aa=(jcf_number)a;
   jl_function_t *func = jl_get_function(jl_base_module, "string");
   jl_value_t *res=jl_call1(func, aa->val);
-  // ???: produce the string representaion of a
+  // ???: produce the string representation of a
   //      and apply it to StringAppendS
   // char *s=jl_unbox_charptr(res);
   // StringAppendS(s);
 }
 
 #if 0
+// optional:
 static void jcfPower (number a, int i, number * result, const coeffs r)
 {
 }
@@ -218,6 +220,11 @@ static void jcfPower (number a, int i, number * result, const coeffs r)
 
 static const char * jcfRead (const char *s, number *a, const coeffs r)
 {
+  // read from s and returns the new position in s,
+  // if nothing is found, initialize a to 1 and return the original s
+  // example "2x3y3" -> a=2, s="x3y3"
+  // example "x" -> a=1, s="x"
+  // s is anything that Singular recognizes as monomial
   int i=1;
   s=eati(s,&i);
   *a=jcfInit (i,r);
@@ -226,6 +233,7 @@ static const char * jcfRead (const char *s, number *a, const coeffs r)
 
 static void jcfKillChar(coeffs r)
 {
+ // clean up everything from jcfInitChar
 }
 
 static number jcfCopy(number a, const coeffs cf)
@@ -236,6 +244,7 @@ static number jcfCopy(number a, const coeffs cf)
 
 static BOOLEAN jcfCoeffIsEqual(const coeffs r, n_coeffType n, void * parameter)
 {
+  return TRUE;
 }
 
 #ifdef LDEBUG
@@ -261,17 +270,17 @@ static char* jcfCoeffString(const coeffs r)
 
 static char* jcfCoeffName(const coeffs r)
 {
-  return (char*)"Float()";
+  return (char*)"juliacf";
 }
 
 BOOLEAN jcfInitChar(coeffs n, void* p)
 {
+  // p may be a pointer to an array known to julia
   n->is_field=TRUE;
   n->is_domain=TRUE;
-  n->rep=n_rep_float;
 
   n->cfKillChar = jcfKillChar;
-  n->ch = 0;
+  n->ch = 0; //???
   n->cfCoeffString = jcfCoeffString;
   n->cfCoeffName = jcfCoeffName;
 
