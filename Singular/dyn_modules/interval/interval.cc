@@ -55,11 +55,13 @@ interval& interval::setRing(ring r)
 {
     if (R != r)
     {
+        // check if coefficient fields are equal
+        // if not pass numbers to new cf-field
         if (R->cf != r->cf)
         {
             nMapFunc fun = n_SetMap(R->cf, r->cf);
             number lo = fun(lower, R->cf, r->cf),
-                up = fun(upper, R->cf, r->cf);
+                   up = fun(upper, R->cf, r->cf);
             n_Delete(&lower, R->cf);
             n_Delete(&upper, R->cf);
             lower = lo;
@@ -116,7 +118,7 @@ box::~box()
     R->ref--;
 }
 
-// does not copy
+// note: does not copy input
 box& box::setInterval(int i, interval *I)
 {
     if (0 <= i && i < R->N)
@@ -1086,7 +1088,6 @@ static BOOLEAN box_serialize(blackbox*, void *d, si_link f)
     l.data = (void*) "box";
 
     f->m->Write(f, &l);
-
     f->m->SetRing(f, B->R, TRUE);
 
     iv.rtyp = intervalID;
@@ -1119,7 +1120,7 @@ static BOOLEAN box_deserialize(blackbox**, void **d, si_link f)
     for (i = 1; i < N; i++)
     {
         l = f->m->Read(f);
-        B->setInterval(0, (interval*) l->CopyD());
+        B->setInterval(i, (interval*) l->CopyD());
         l->CleanUp();
     }
 
@@ -1142,7 +1143,7 @@ static BOOLEAN boxSet(leftv result, leftv args)
 
     if (i < 1 || i > n)
     {
-        WerrorS("index out of range");
+        WerrorS("boxSet: index out of range");
         return TRUE;
     }
 
