@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version rootisolation.lib 4.1.0.0 Jun_2017 ";
+version="version rootisolation.lib 4.1.0.3 Jul_2017 ";
 info="
 LIBRARY:    rootisolation.lib implements an algorithm for real root isolation
             using interval arithmetic
@@ -50,9 +50,9 @@ rootIsolationNoPreprocessing(I,L,e);
                         computes boxes containing unique roots of I lying in L
 rootIsolation(I,B,e);   slims down input box B and calls rootIsolationNoPreprocessing
 ";
-LIB "atkins.lib"; // for round (tmp?)
-///////////////////////////////////////////////////////////////////////////////
+LIB "primdec.lib";
 
+///////////////////////////////////////////////////////////////////////////////
 static proc mod_init()
 {
     LIB "interval.so";
@@ -69,6 +69,21 @@ static proc mod_init()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+// HELPER FUNCTIONS
+
+static proc floor(number a)
+{
+    // a = m/n
+    bigint m, n = bigint(numerator(a)), bigint(denominator(a));
+    // div for bigint seemingly works like floor
+    return(number(m div n));
+}
+
+static proc ceil(number a)
+{
+    return(-floor(-a));
+}
 
 // INTERVAL FUNCTIONS
 
@@ -119,6 +134,17 @@ RETURN: length/size in measure sense"
     }
 
     return(maximum);
+}
+
+static proc boxVolume(box B)
+{
+    number v = 1;
+    int N = nvars(basering);
+    for (int i = 1; i <= N; i++)
+    {
+        v = v * length(B[i]);
+    }
+    return(v);
 }
 
 static proc boxCenter(box M)
@@ -604,7 +630,7 @@ EXAMPLE: example testPolyBox; tests the above for intersection of ellipses."
         box fB = evalIdealAtBox(I, Bcenter);
         fB = Bcenter - (Jinverse * fB);
 
-        // algorothm will not process box further, so do not modify
+        // algorithm will not process box further, so do not modify
         int laststep = boxIsInterior(fB, B);
 
         // else intersection is empty or non-trivial
@@ -614,6 +640,12 @@ EXAMPLE: example testPolyBox; tests the above for intersection of ellipses."
         if (typeof(Bint) == "int")
         {
             return(-1, B);
+        }
+
+        // if Newton step is a single point it is a root
+        if (lengthBox(fB) == 0)
+        {
+            return(1,fB);
         }
 
         if (isreal)
@@ -635,14 +667,12 @@ EXAMPLE: example testPolyBox; tests the above for intersection of ellipses."
                 if (lo < Bint[i][1])
                 {
                     n = denominator(lo);
-                    // floor
-                    lo = round(Bint[i][1]*n - 1/2)/n;
+                    lo = floor(Bint[i][1]*n)/n;
                 }
                 if (up > Bint[i][2])
                 {
                     n = denominator(up);
-                    // ceil
-                    up = round(Bint[i][2]*n + 1/2)/n;
+                    up = ceil(Bint[i][2]*n)/n;
                 }
 
                 // make sure box does not grow
@@ -710,9 +740,9 @@ example
     evalIdealAtBox(I, intervals);
 }
 
-proc rootIsolationNoPreprocessing(ideal I, def start, number eps)
-"USAGE:  @code{rootIsolationNoPreprocessing(I, B, eps)}; @code{I ideal,
-        B box/list of boxes, eps number};
+proc rootIsolationNoPreprocessing(ideal I, list start, number eps)
+"USAGE:  @code{rootIsolationNoPreprocessing(I, B, eps)};
+        @code{I ideal, B list of boxes, eps number};
 ASSUME: @code{I} is a zero-dimensional radical ideal
 RETURN: @code{(L1, L2)}, where @code{L1} contains boxes smaller than eps which
         may contain an element of V(@code{I}), i.e. a root and @code{L2}
@@ -726,6 +756,8 @@ THEORY: We first check for every box if it contains no roots by interval
         outlined in [2] and [3], converges to a root lying in the starting box.
         If the result of the Newton step is already contained in the interior
         of the starting box, it contains a unique root.
+NOTE:   While @code{rootIsolation} does, @code{rootIsolationNoPreprocessing}
+        does not check input ideal for necessary conditions.
 EXAMPLE: example rootIsolationNoPreprocessing; exclusion test for intersection
         of two ellipses"
 {
@@ -734,29 +766,14 @@ EXAMPLE: example rootIsolationNoPreprocessing; exclusion test for intersection
     //set of boxes which exactly contain one solution
     list B_star;
     //set of boxes initialised to input
-    list B;
-    if (typeof(start) == "box")
-    {
-        B = list(start);
-    }
-    else
-    {
-        if (typeof(start) == "list")
-        {
-            // add sanity check
-            B = start;
-        }
-        else
-        {
-            ERROR("second arg must be box or list");
-        }
-    }
+    // currently no consitency check
+    list B = start;
     //help set of boxes
     list B_prime;
 
-    list split;
-    int i, s;
+    int i, j, s;
     int zeroTest;
+    box E;
 
     // debug
     //int cnt;
@@ -772,23 +789,40 @@ EXAMPLE: example rootIsolationNoPreprocessing; exclusion test for intersection
             //case that maybe there is a root in the box
             zeroTest, B[i] = testPolyBox(I,B[i]);
 
-            // maybe refine boxes in Bstar in later steps
             if (zeroTest == 1)
             {
                 B_star[size(B_star)+1] = B[i];
             }
             if (zeroTest == 0)
             {
-                // case that box is smaller than the input limit eps
-                if (lengthBox(B[i]) < eps)
+                // check for empty interior
+                if (boxVolume(B[i]) == 0)
                 {
+                    /*
+                     * Idea for implementation: substitute ringvar by value
+                     * of singleton interval, pass to polynomial ring where
+                     * this variable is deleted
+                     *
+                     * Problem: the ideal will in general not have
+                     * nvars(newring) generators which is necessary.
+                     *
+                     * Thus we put the box into B_size for now
+                     */
                     B_size[size(B_size)+1] = B[i];
                 }
                 else
                 {
-                    // else split the box and put the smaller boxes to B_prime
-                    B_prime[s+1..s+2] = splitBox(B[i], I);
-                    s = s+2;
+                    // remove boxes smaller than limit eps
+                    if (lengthBox(B[i]) < eps)
+                    {
+                        B_size[size(B_size)+1] = B[i];
+                    }
+                    else
+                    {
+                        // else split the box and put the smaller boxes to B_prime
+                        B_prime[s+1..s+2] = splitBox(B[i], I);
+                        s = s+2;
+                    }
                 }
             }
         }
@@ -811,7 +845,7 @@ example
     interval i = bounds(-3/2,3/2);
     box B = list(i, i);
 
-    list result = rootIsolationNoPreprocessing(I, B, 1/512);
+    list result = rootIsolationNoPreprocessing(I, list(B), 1/512);
     size(result[1]);
     size(result[2]);
 
@@ -821,7 +855,7 @@ example
 static proc noRootsOnBoundary(ideal I, box B)
 "USAGE:  noZeroesOnBoundary(I, B), I ideal, B box
 RETURN: intvec iv where:
-        iv[i] == 1 if there is no root of I on the boundary of B[i], 0 else
+        iv[2*i+j-2] is 1 if there is no root of I on the boundary B[i][j], 0 else
 EXAMPLE: example noRootsOnBoundary; tests boxes for roots"
 {
     int N = nvars(basering);
@@ -866,10 +900,9 @@ example
     noRootsOnBoundary(I, box(list(I2,I3)));
 }
 
-//im Moment geht das nur mit eingegebener eliminationsordnung
 proc rootIsolation(ideal I, box start, number eps)
-"USAGE:  @code{rootIsolation(I, start, eps)}; @code{I ideal, start box,
-        eps number}
+"USAGE:  @code{rootIsolation(I, start, eps)};
+        @code{I ideal, start box, eps number}
 ASSUME: @code{I} is a zero-dimensional radical ideal
 RETURN: @code{(L1, L2)}, where @code{L1} contains boxes smaller than eps which
         may contain an element of V(@code{I}), i.e. a root and @code{L2}
@@ -891,13 +924,37 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
     int N = nvars(basering);
     int i, j, k, l;
 
+    if (N != ncols(I))
+    {
+        ERROR("rootIsolation: algorithm currently needs nvars(basering) ideal generators");
+    }
+
+    // compute reduced GB in (hopefully) fast ordering
+    option(redSB);
+    ideal fastGB = groebner(I);
+
+    if (dim(fastGB) > 0)
+    {
+        ERROR("rootIsolation: ideal not zero-dimensional");
+    }
+
+    ideal rad = radical(fastGB);
+    // since fastGB is contained in rad we only need to test one inclusion
+    rad = reduce(rad, fastGB);
+    // size counts only non-zero entries
+    if (size(rad) > 0)
+    {
+        ERROR("rootIsolation: ideal not radical");
+    }
+
     intvec noZeroes;
     // check if there are roots on the boundary of start
     while(1)
     {
         noZeroes = noRootsOnBoundary(I, start);
+
         // stop if all boundaries root-free
-        if (product(noZeroes)) { break; }
+        if (min(noZeroes[1..(2*N)])) { break; }
 
         for (i = 1; i <= N; i++)
         {
@@ -906,8 +963,8 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
                 // change offending boundary
                 if (!noZeroes[2*i+j-2])
                 {
-                    start = boxSet(start, i,
-                        start[i] + (-1)^j * bounds(0, length(start[i])/10));
+                    // simply add 1 to upper bound or subtract 1 from lower bound
+                    start = boxSet(start, i, start[i] + (-1)^j * bounds(0, 1));
                 }
             }
         }
@@ -916,12 +973,8 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
     // need at least two variables
     if (N < 2)
     {
-        return(rootIsolationNoPreprocessing(I, start, eps));
+        return(rootIsolationNoPreprocessing(I, list(start), eps));
     }
-
-    // compute reduced GB in (hopefully) fast ordering
-    option(redSB);
-    ideal fastGB = groebner(I);
 
     ring rSource = basering;
     list rList = ringlist(rSource);
@@ -933,7 +986,8 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
     rList[3] = list( list(rList[3][1][1], intvec(1)), rList[3][numords] );
 
     // construct and switch to univariate ring
-    ring rUnivar = ring(rList);
+    def rUnivar = ring(rList);
+    setring rUnivar;
 
     // some necessary variables
     ideal gbUnivar;
@@ -956,10 +1010,12 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
         // create and switch to ring with elimination ordering
         rList[2][i] = varstrs[N];
         rList[2][N] = varstrs[i];
-        ring rElimOrd = ring(rList);
+        def rElimOrd = ring(rList);
+        setring rElimOrd;
         // get GB in elimination ordering, note that GB[1] only depends on
         // var(i) of rSource, which is var(N) in rElimOrd
         ideal GB = fglm(rSource, fastGB);
+        //if (N == size(GB)) {~;}
         GB = GB[1];
 
         setring rUnivar;
@@ -969,11 +1025,11 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
 
         // get boxes containing roots of univariate polynomial
         univarResult = rootIsolationNoPreprocessing(gbUnivar,
-            box(list(start[i])), eps);
+            list(box(list(start[i]))), eps);
         // maybe result[1] is not empty, so take both
         startBoxesPerDim[i] = univarResult[1] + univarResult[2];
         // debug:
-        print(string("Sieved variable ", varstrs[i], " to ",
+        dbprint(string("Sieved variable ", varstrs[i], " to ",
             size(startBoxesPerDim[i]), " intervals."));
 
         // reset ring variable order
