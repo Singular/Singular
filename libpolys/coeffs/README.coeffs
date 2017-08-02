@@ -114,3 +114,11 @@ to describe:
 -cfClearDenominators
 -cfPower only small exponents (machine int) supported right now.
 
+----------------------------------------------------------------------------
+Howto define a new coeff type:
+// register the new class of coeffs:
+ n_coeffType type=nRegister(n_unknown,<your InitChar procedure>);
+// create the new coeff type:
+ coeffs cf=nInitChar(type,<your paramater for the InitChar procedure>);
+// cf may now be used for (polynomial) ring definitions etc.
+
