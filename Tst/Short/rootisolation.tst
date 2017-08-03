@@ -1,8 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB "~/prog/Singular/Sources/Singular/LIB/rootisolation.lib";
-//LIB "rootisolation.lib";
+LIB "rootisolation.lib";
 
 // start with examples
 example bounds;
@@ -58,14 +57,19 @@ list roots = rootIsolation(I,B,0); roots;
 kill roots, B, R;
 
 // fixed bug: fglm lookup clashes with blackbox type
-// also demonstrates boxes with no interior arising in
-// computations
 ring R = 0,(x,y),dp;
 ideal I = x2-1,y-3;
 interval fastGB = -10,10;
 box B = list(fastGB, fastGB);
 list roots = rootIsolation(I,B,0); roots;
 kill roots, fastGB, B, R;
+
+// eps > 0, some boxes land in result[1]
+ring R = 0,(x,y),dp;
+ideal I = 2x2-xy+2y2-2,2x2-3xy+3y2-2;
+box B = list(bounds(-3/2,3/2), bounds(-3/2,3/2));
+list roots = rootIsolation(I,B,1/10); roots;
+kill roots, B, R;
 
 tst_status(1);$;
 // vim: ft=singular
