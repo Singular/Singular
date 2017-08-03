@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version rootisolation.lib 4.1.0.3 Jul_2017 ";
+version="version rootisolation.lib 4.1.0.3 Aug_2017 "; // $Id$
 info="
 LIBRARY:    rootisolation.lib implements an algorithm for real root isolation
             using interval arithmetic
@@ -49,6 +49,8 @@ evalJacobianAtBox(A,B); jacobian matrix of A where polynomials are evaluated at 
 rootIsolationNoPreprocessing(I,L,e);
                         computes boxes containing unique roots of I lying in L
 rootIsolation(I,B,e);   slims down input box B and calls rootIsolationNoPreprocessing
+
+KEYWORDS:   real root isolation; interval arithmetic; Newton step
 ";
 LIB "primdec.lib";
 
@@ -771,12 +773,9 @@ EXAMPLE: example rootIsolationNoPreprocessing; exclusion test for intersection
     //help set of boxes
     list B_prime;
 
-    int i, j, s;
+    int i, j, s, cnt;
     int zeroTest;
     box E;
-
-    // debug
-    //int cnt;
 
     while (size(B) <> 0)
     {
@@ -827,9 +826,8 @@ EXAMPLE: example rootIsolationNoPreprocessing; exclusion test for intersection
             }
         }
 
-        // debug
-        //cnt++;
-        //print(string(cnt, " ", s, " ", int(memory(0)/1024), "k"));
+        cnt++;
+        dbprint(string("[", cnt, "] ", s, " boxes");
 
         B = B_prime;
     }
