@@ -2203,30 +2203,27 @@ static BOOLEAN jjFRES3(leftv res, leftv u, leftv v, leftv w)
 {
     assumeStdFlag(u);
     ideal id = (ideal)u->Data();
-    int maxl = (int)(long)v->Data();
-    if (maxl < 0) {
+    int max_length = (int)(long)v->Data();
+    if (max_length < 0) {
         WerrorS("length for fres must not be negative");
         return TRUE;
     }
-    if (maxl == 0) {
-        maxl = currRing->N+1;
+    if (max_length == 0) {
+        max_length = currRing->N+1;
         if (currRing->qideal != NULL) {
             Warn("full resolution in a qring may be infinite, "
-                "setting max length to %d", maxl);
+                "setting max length to %d", max_length);
         }
     }
-    char* method = (char *)w->Data();
-    if (strcmp(method, "complete") != 0
-            && strcmp(method, "frame") != 0
-            && strcmp(method, "extended frame") != 0
-            && strcmp(method, "linear strand") != 0) {
+    char *method = (char *)w->Data();
+    /* For the moment, only "complete" (default) is allowed. Other useful
+     * options would be "frame", "extended frame", or "linear strand".
+     */
+    if (strcmp(method, "complete") != 0) {
         WerrorS("wrong optional argument for fres");
     }
-    syStrategy r;
-    r = syFrank(id, maxl, method);
-    r->list_length = maxl;
-    if (r == NULL) return TRUE;
-    assume( (r->minres != NULL) || (r->fullres != NULL) );
+    syStrategy r = syFrank(id, max_length, method);
+    assume(r->fullres != NULL);
     res->data = (void *)r;
     return FALSE;
 }

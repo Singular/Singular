@@ -543,7 +543,7 @@ static void insert_ext_induced_LTs(const resolvente res, const int length)
     }
 }
 
-syStrategy syFrank(const ideal arg, int &length, const char *method)
+syStrategy syFrank(const ideal arg, int length, const char *method)
 {
     syStrategy result = (syStrategy)omAlloc0(sizeof(ssyStrategy));
     resolvente res = (resolvente)omAlloc0((length+1)*sizeof(ideal));
@@ -559,6 +559,7 @@ syStrategy syFrank(const ideal arg, int &length, const char *method)
     insert_ext_induced_LTs(res, length);
     result->fullres = res;
     result->length = length;
+    result->list_length = length;
     return result;
 }
 
