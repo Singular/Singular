@@ -321,7 +321,7 @@ static poly syzHeadExtFrame(const ideal G, const int i, const int j)
     poly head = p_Init(r);
     pSetCoeff0(head, n_Init(1, r->cf));
     poly head_ext = p_Init(r);
-    pSetCoeff0(head_ext, n_InpNeg(n_Div(pGetCoeff(f_j), pGetCoeff(f_i), r->cf),
+    pSetCoeff0(head_ext, n_InpNeg(n_Div(pGetCoeff(f_i), pGetCoeff(f_j), r->cf),
         r->cf));
     long exp_i, exp_j, lcm;
     for (int k = (int)r->N; k > 0; k--) {
