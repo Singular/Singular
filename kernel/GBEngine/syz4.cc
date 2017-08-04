@@ -22,8 +22,7 @@
 #define unlikely(X) (X)
 #endif
 
-static inline void update_variables(std::vector<bool> &variables,
-    const ideal L)
+static void update_variables(std::vector<bool> &variables, const ideal L)
 {
     const ring R = currRing;
     const int l = IDELEMS(L)-1;
@@ -69,8 +68,8 @@ static void initialize_lts_hash(lts_hash &C, const ideal L)
     const unsigned int n_elems = IDELEMS(L);
     for (unsigned int k = 0; k < n_elems; k++) {
         const poly a = L->m[k];
-        C[p_GetComp(a, R)].push_back((lt_struct){a, p_GetShortExpVector(a, R),
-            k});
+        const long comp = p_GetComp(a, R);
+        C[comp].push_back((lt_struct){a, p_GetShortExpVector(a, R), k});
     }
 }
 
