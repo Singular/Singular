@@ -271,8 +271,9 @@ static poly lift_ext_LT(const poly a, const ideal previous_module,
 // copied from id_DelDiv(), but without testing and without HAVE_RINGS.
 // delete id[j], if LT(j) == coeff*mon*LT(i) and vice versa, i.e.,
 // delete id[i], if LT(i) == coeff*mon*LT(j)
-static void id_DelDiv_no_test(ideal id, const ring r)
+static void id_DelDiv_no_test(ideal id)
 {
+    const ring r = currRing;
     int i, j;
     int k = IDELEMS(id)-1;
     for (i = k; i >= 0; i--) {
@@ -359,7 +360,7 @@ static ideal syzM_i_unsorted(const ideal G, const int i,
                 k--;
             }
         }
-        id_DelDiv_no_test(M_i, currRing);
+        id_DelDiv_no_test(M_i);
         idSkipZeroes(M_i);
     }
     return M_i;
@@ -379,13 +380,13 @@ static ideal syzM_i_sorted(const ideal G, const int i,
         for (int j = ncols-1; j >= 0; j--) {
             M_i->m[j] = syzHead(G, i, j+index);
         }
-        id_DelDiv_no_test(M_i, currRing);
+        id_DelDiv_no_test(M_i);
         idSkipZeroes(M_i);
     }
     return M_i;
 }
 
-static ideal idConcat(const ideal* M, const int size, const int rank)
+static ideal idConcat(const ideal *M, const int size, const int rank)
 {
     int ncols = 0;
     for (int i = size-1; i >= 0; i--) {
@@ -407,9 +408,6 @@ static ideal idConcat(const ideal* M, const int size, const int rank)
     return result;
 }
 
-#define SORT_MI 1
-
-#if SORT_MI
 static int compare_Mi(const void* a, const void *b)
 {
     const ring r = currRing;
@@ -440,12 +438,11 @@ static int compare_Mi(const void* a, const void *b)
     }
     return 0;
 }
-#endif   // SORT_MI
 
 static ideal computeFrame(const ideal G, syzM_i_Function syzM_i,
     syzHeadFunction *syzHead)
 {
-    ideal* M = (ideal *)omalloc((G->ncols-1)*sizeof(ideal));
+    ideal *M = (ideal *)omalloc((G->ncols-1)*sizeof(ideal));
     for (int i = G->ncols-2; i >= 0; i--) {
         M[i] = syzM_i(G, i+1, syzHead);
     }
@@ -457,9 +454,7 @@ static ideal computeFrame(const ideal G, syzM_i_Function syzM_i,
         }
     }
     omFree(M);
-#if SORT_MI
     qsort(frame->m, IDELEMS(frame), sizeof(poly), compare_Mi);
-#endif
     return frame;
 }
 
@@ -493,9 +488,7 @@ static int computeResolution(resolvente &res, const int length,
         std::vector<bool> variables;
         variables.resize(currRing->N, true);
         while (!idIs0(res[index])) {
-#if 1
             computeLiftings(res, index, variables);
-#endif   // LIFT
             if (index < max_index) {
                 index++;
                 res[index] = computeFrame(res[index-1], syzM_i_sorted,
@@ -549,10 +542,10 @@ syStrategy syFrank(const ideal arg, int length, const char *method)
     resolvente res = (resolvente)omAlloc0((length+1)*sizeof(ideal));
     res[0] = id_Copy(arg, currRing);
     syzHeadFunction *syzHead;
-    if (strcmp(method, "frame") == 0 || strcmp(method, "linear strand") == 0) {
+    if (strcmp(method, "frame") == 0) {
         syzHead = syzHeadFrame;
     }
-    else {
+    else {   // "complete" (default), "extended frame", or "linear strand"
         syzHead = syzHeadExtFrame;
     }
     length = computeResolution(res, length, syzHead);
