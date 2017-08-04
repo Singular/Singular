@@ -79,6 +79,7 @@ static long heKeyChksum(char* key);
 // browser functions
 static BOOLEAN heGenInit(int,int);    static void heGenHelp(heEntry hentry,int);
                                       static void heBuiltinHelp(heEntry hentry,int);
+                                      static void heBuiltinHelpUninterrupted(heEntry,int);
 static BOOLEAN heDummyInit(int,int);   static void heDummyHelp(heEntry hentry,int);
 static BOOLEAN heEmacsInit(int,int);   static void heEmacsHelp(heEntry hentry,int);
 
@@ -199,8 +200,8 @@ static void feBrowserFile()
       if ((buf[0]!='#') && (buf[0]>' ')) br++;
     }
     fseek(f,0,SEEK_SET);
-    // for the 4(!) default browsers
-    heHelpBrowsers=(heBrowser_s*)omAlloc0((br+4)*sizeof(heBrowser_s));
+    // for the 5(!) default browsers
+    heHelpBrowsers=(heBrowser_s*)omAlloc0((br+5)*sizeof(heBrowser_s));
     br = 0;
     while (fgets( buf, sizeof(buf), f))
     {
@@ -231,8 +232,8 @@ static void feBrowserFile()
   }
   else
   {
-    // for the 4(!) default browsers
-    heHelpBrowsers=(heBrowser_s*)omAlloc0(4*sizeof(heBrowser_s));
+    // for the 5(!) default browsers
+    heHelpBrowsers=(heBrowser_s*)omAlloc0(5*sizeof(heBrowser_s));
   }
   heHelpBrowsers[br].browser="builtin";
   heHelpBrowsers[br].init_proc=heGenInit;
@@ -251,7 +252,13 @@ static void feBrowserFile()
   heHelpBrowsers[br].help_proc=heEmacsHelp;
   //heHelpBrowsers[br].required=NULL;
   //heHelpBrowsers[br].action=NULL;
-  //br++;
+  br++;
+  heHelpBrowsers[br].browser="builtin-uninterrupted";
+  heHelpBrowsers[br].init_proc=heGenInit;
+  heHelpBrowsers[br].help_proc=heBuiltinHelpUninterrupted;
+  //heHelpBrowsers[br].required=NULL;
+  //heHelpBrowsers[br].action=NULL;
+  //   br++;
   //heHelpBrowsers[br].browser=NULL;
   //heHelpBrowsers[br].init_proc=NULL;
   //heHelpBrowsers[br].help_proc=NULL;
@@ -1041,15 +1048,22 @@ static void heEmacsHelp(heEntry hentry, int /*br*/)
   Warn("to enter the Singular online help. For general");
   Warn("information on Singular running under Emacs, type C-h m.");
 }
-static int singular_manual(char *str, BOOLEAN isIndexEntry);
+static int singular_manual(char *str, BOOLEAN isIndexEntry,bool uninterrupted);
+static void heBuiltinHelpUninterrupted(heEntry hentry, int /*br*/)
+{
+  char* node = omStrDup(hentry != NULL && *(hentry->key) != '\0' ?
+                       hentry->key : "Top");
+  singular_manual(node,(hentry != NULL) && (hentry->url!=NULL),1);
+  omFree(node);
+}
+
 static void heBuiltinHelp(heEntry hentry, int /*br*/)
 {
   char* node = omStrDup(hentry != NULL && *(hentry->key) != '\0' ?
                        hentry->key : "Top");
-  singular_manual(node,(hentry != NULL) && (hentry->url!=NULL));
+  singular_manual(node,(hentry != NULL) && (hentry->url!=NULL),0);
   omFree(node);
 }
-
 
 /* ========================================================================== */
 // old, stupid builtin_help
@@ -1110,7 +1124,29 @@ static int show(unsigned long offset, char *close)
 }
 
 /*************************************************/
-static int singular_manual(char *str, BOOLEAN isIndexEntry)
+static int show_uninterrupted(unsigned long offset, char *close)
+{ char buffer[BUF_LEN+1];
+  int  lines = 0;
+  FILE * help;
+
+  if( (help = fopen(feResource('i'), "rb")) == NULL)
+    return HELP_NOT_OPEN;
+  
+  fseek(help,  (long)(offset+1), (int)0);
+  while( (!feof(help))
+        && (*fgets(buffer, BUF_LEN, help) != EOF)
+        && (buffer[0] != FIN_INDEX))
+  {
+    printf("%s", buffer);
+    fflush(stdout);
+  }
+  fflush(stdout);
+  fclose(help);
+  return HELP_OK;
+}
+
+/*************************************************/
+static int singular_manual(char *str, BOOLEAN isIndexEntry, bool uninterrupted)
 { FILE *index=NULL;
   unsigned long offset;
   char *p,close=' ';
@@ -1157,12 +1193,26 @@ static int singular_manual(char *str, BOOLEAN isIndexEntry)
       (void)strcat(Index, " ");
       if( strstr(Index, String)!=NULL)
       {
-        done++; (void)show(offset, &close);
+        if(uninterrupted)
+        {
+          done++; (void)show_uninterrupted(offset, &close);
+        }
+        else
+        {
+          done++; (void)show(offset, &close);
+        }
       }
     }
     else if( strcmp(Index, String)==0)
     {
-      done++; (void)show(offset, &close);
+      if(uninterrupted)
+        {
+          done++; (void)show_uninterrupted(offset, &close);
+        }
+        else
+        {
+          done++; (void)show(offset, &close);
+        }
       break;
     }
     Index[0]='\0';
