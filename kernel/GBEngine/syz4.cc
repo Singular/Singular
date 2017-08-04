@@ -477,10 +477,9 @@ static void computeLiftings(const resolvente res, const int index,
 #endif   // CACHE
 }
 
-static int computeResolution(resolvente &res, const int length,
+static int computeResolution(resolvente &res, const int max_index,
     syzHeadFunction *syzHead)
 {
-    int max_index = length-1;
     int index = 0;
     if (!idIs0(res[index]) && index < max_index) {
         index++;
@@ -489,23 +488,13 @@ static int computeResolution(resolvente &res, const int length,
         variables.resize(currRing->N, true);
         while (!idIs0(res[index])) {
             computeLiftings(res, index, variables);
-            if (index < max_index) {
-                index++;
-                res[index] = computeFrame(res[index-1], syzM_i_sorted,
-                    syzHead);
-            }
-            else {
-                break;
-            }
+            if (index >= max_index) { break; }
+            index++;
+            res[index] = computeFrame(res[index-1], syzM_i_sorted, syzHead);
         }
         variables.clear();
     }
-    max_index = index+1;
-    if (max_index < length) {
-        res = (resolvente)omReallocSize(res, (length+1)*sizeof(ideal),
-            (max_index+1)*sizeof(ideal));
-    }
-    return max_index;
+    return index+1;
 }
 
 #define insert_first_term(r, p, q, R)                             \
@@ -536,7 +525,7 @@ static void insert_ext_induced_LTs(const resolvente res, const int length)
     }
 }
 
-syStrategy syFrank(const ideal arg, int length, const char *method)
+syStrategy syFrank(const ideal arg, const int length, const char *method)
 {
     syStrategy result = (syStrategy)omAlloc0(sizeof(ssyStrategy));
     resolvente res = (resolvente)omAlloc0((length+1)*sizeof(ideal));
@@ -548,11 +537,15 @@ syStrategy syFrank(const ideal arg, int length, const char *method)
     else {   // "complete" (default), "extended frame", or "linear strand"
         syzHead = syzHeadExtFrame;
     }
-    length = computeResolution(res, length, syzHead);
-    insert_ext_induced_LTs(res, length);
+    int new_length = computeResolution(res, length-1, syzHead);
+    if (new_length < length) {
+        res = (resolvente)omReallocSize(res, (length+1)*sizeof(ideal),
+            (new_length+1)*sizeof(ideal));
+    }
+    insert_ext_induced_LTs(res, new_length);
     result->fullres = res;
-    result->length = length;
-    result->list_length = length;
+    result->length = new_length;
+    result->list_length = new_length;
     return result;
 }
 
