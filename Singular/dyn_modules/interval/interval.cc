@@ -847,7 +847,7 @@ static BOOLEAN box_Assign(leftv result, leftv args)
 
     int i, m = lSize(l), n = currRing->N;
     // minimum
-    int M = m > n ? n : m;
+    int M = m > (n-1) ? (n-1) : m;
 
     for (i = 0; i <= M; i++)
     {
