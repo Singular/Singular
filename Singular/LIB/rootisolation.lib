@@ -7,7 +7,7 @@ AUTHORS:    Dominik Bendle (bendle@rhrk.uni-kl.de)
 @*          Clara Petroll (petroll@rhrk.uni-kl.de)
 
 OVERVIEW:   In this library the interval arithmetic from \"@code{interval.so}\"
-            is used. The new type \"@code{ivmat}\", a matrix consiting of
+            is used. The new type \"@code{ivmat}\", a matrix consisting of
             intervals is implemented as \"@code{newstruct}\". There are various
             functions for computations with interval matrices implemented, such
             as Gaussian elimination for interval matrices.
@@ -123,35 +123,39 @@ example
 
 // BOX FUNCTIONS
 
-static proc lengthBox(box B)
-"USAGE:  length(B), B box
+static proc boxLength(box B)
+"USAGE:  boxLength(B), B box
 RETURN: length/size in measure sense"
 {
-    number maximum = 0;
+    number maxLength, l = 0, 0;
     int n = nvars(basering);
 
     for (int i=1; i <= n; i++)
     {
-        maximum = max(maximum, length(B[i]));
+        l = length(B[i]);
+        if (maxLength < l)
+        {
+            maxLength = l;
+        }
     }
 
-    return(maximum);
+    return(maxLength);
 }
 
-static proc boxVolume(box B)
+static proc boxEmptyIntervals(box B)
 {
-    number v = 1;
     int N = nvars(basering);
+    intvec z;
     for (int i = 1; i <= N; i++)
     {
-        v = v * length(B[i]);
+        z[i] = length(B[i]) == 0;
     }
-    return(v);
+    return(z);
 }
 
-static proc boxCenter(box M)
-"USAGE: boxCenter(M); M ivmat
-RETURN: box containing center elements of M"
+static proc boxCenter(box B)
+"USAGE: boxCenter(B); B box
+RETURN: box containing center elements of B"
 {
     int n = nvars(basering);
 
@@ -160,7 +164,7 @@ RETURN: box containing center elements of M"
 
     for (i = 1; i <= n; i++)
     {
-        C[i] = interval((M[i][1] + M[i][2])/2);
+        C[i] = interval((B[i][1] + B[i][2])/2);
     }
 
     return(box(C));
@@ -171,8 +175,7 @@ static proc splitBox(box B, ideal I)
 RETURN: new list of smaller boxes, such that intersection of borders does not
         contain zeros of I
 NOTE:   this uses exclusion tests and Groebner bases to determine whether the
-        intersection plane contains a root of I
-EXAMPLE: example splitBox; splits two-dimensional interval into two"
+        intersection plane contains a root of I"
 {
     // at first split only at largest interval
     int imax = 1;
@@ -180,7 +183,10 @@ EXAMPLE: example splitBox; splits two-dimensional interval into two"
 
     for (int i = 2; i <= N; i++)
     {
-        if (length(B[i]) > length(B[imax])) { imax = i; }
+        if (length(B[i]) > length(B[imax]))
+        {
+            imax = i;
+        }
     }
 
     number ratio = 1/2;
@@ -197,12 +203,18 @@ EXAMPLE: example splitBox; splits two-dimensional interval into two"
         for (i = 1; i <= N; i++)
         {
             // check if any interval does not contain zero
-            if (intersection[i][1]*intersection[i][2] > 0) { break; }
+            if (intersection[i][1]*intersection[i][2] > 0)
+            {
+                break;
+            }
         }
 
         Inew = I + (var(imax) - mean);
         // check if groebner basis is trivial
-        if (std(Inew) == 1) { break; }
+        if (std(Inew) == 1)
+        {
+            break;
+        }
 
         // else there must?/might be a zero on the intersection,
         // so decrease ratio slightly
@@ -223,18 +235,6 @@ EXAMPLE: example splitBox; splits two-dimensional interval into two"
 
     return(boxLeft, boxRight);
 }
-example
-{
-    "EXAMPLE:"; echo = 2;
-    ring R = 0,(x,y),dp;
-
-    box B = list(bounds(0,1),
-                 bounds(0,2));
-
-    B;
-    splitBox(B,1);
-    splitBox(B,y-1); // contains zero on first splitting plane candidate
-}
 
 static proc boxIsInterior(box A, box B)
 "USAGE: boxIsInterior(A, B); A, B box
@@ -244,7 +244,10 @@ EXAMPLE: example boxIsInterior; check whether A is contained in int(B)"
     int N = nvars(basering);
     for (int i = 1; i <= N; i++)
     {
-        if (A[i][1] <= B[i][1] || A[i][2] >= B[i][2]) { return(0); }
+        if (A[i][1] <= B[i][1] || A[i][2] >= B[i][2])
+        {
+            return(0);
+        }
     }
     return(1);
 }
@@ -266,7 +269,7 @@ example
 
 // MATRIX FUNCTIONS
 
-proc ivmatInit(numrows, numcols)
+proc ivmatInit(int numrows, int numcols)
 "USAGE: @code{ivmatInit(m, n)}; @code{m, n int}
 RETURN: @code{m}x@code{n} matrix of [0,0]-intervals
 PURPOSE: initialises an interval matrix with [0,0] intervals to ensure the
@@ -467,7 +470,10 @@ EXAMPLE: example ivmatGaussian; inverts a matrix"
 
         for (j = 1; j <= n; j++)
         {
-            if (pos <> j) { A.rows[pos][j] = A[pos][j]/TMP; }
+            if (pos <> j)
+            {
+                A.rows[pos][j] = A[pos][j]/TMP;
+            }
             Ainv.rows[pos][j] = Ainv[pos][j]/TMP;
         }
 
@@ -480,7 +486,10 @@ EXAMPLE: example ivmatGaussian; inverts a matrix"
                 A.rows[i][pos] = interval(0);
                 for (j = 1; j <= n; j++)
                 {
-                    if (j <> pos) { A.rows[i][j] = A[i][j] - A[pos][j]*TMP; }
+                    if (j <> pos)
+                    {
+                        A.rows[i][j] = A[i][j] - A[pos][j]*TMP;
+                    }
                     Ainv.rows[i][j] = Ainv[i][j] - Ainv[pos][j]*TMP;
                 }
             }
@@ -636,16 +645,16 @@ EXAMPLE: example testPolyBox; tests the above for intersection of ellipses."
         int laststep = boxIsInterior(fB, B);
 
         // else intersection is empty or non-trivial
-        def Bint = intersect(B, fB);
+        def bInt = intersect(B, fB);
 
-        // if intersection is empty Bint == -1
-        if (typeof(Bint) == "int")
+        // if intersection is empty bInt == -1
+        if (typeof(bInt) == "int")
         {
             return(-1, B);
         }
 
         // if Newton step is a single point it is a root
-        if (lengthBox(fB) == 0)
+        if (boxLength(fB) == 0)
         {
             return(1,fB);
         }
@@ -653,7 +662,7 @@ EXAMPLE: example testPolyBox; tests the above for intersection of ellipses."
         if (isreal)
         {
             // fraction simplification over real basering is pointless
-            B = Bint;
+            B = bInt;
         }
         else
         {
@@ -666,15 +675,15 @@ EXAMPLE: example testPolyBox; tests the above for intersection of ellipses."
                 up = B[i][2];
 
                 // modify numerators of B to tighten box
-                if (lo < Bint[i][1])
+                if (lo < bInt[i][1])
                 {
                     n = denominator(lo);
-                    lo = floor(Bint[i][1]*n)/n;
+                    lo = floor(bInt[i][1]*n)/n;
                 }
-                if (up > Bint[i][2])
+                if (up > bInt[i][2])
                 {
                     n = denominator(up);
-                    up = ceil(Bint[i][2]*n)/n;
+                    up = ceil(bInt[i][2]*n)/n;
                 }
 
                 // make sure box does not grow
@@ -684,14 +693,17 @@ EXAMPLE: example testPolyBox; tests the above for intersection of ellipses."
                 }
                 else
                 {
-                    bb[i] = Bint[i];
+                    bb[i] = bInt[i];
                 }
             }
 
             B = bb;
         }
 
-        if (laststep) { return(1, B); }
+        if (laststep)
+        {
+            return(1, B);
+        }
     }
 
     // no condition could be verified
@@ -720,7 +732,8 @@ EXAMPLE: example evalIdealAtBox; evaluates an ideal at a box"
 {
     list resu;
 
-    for (int j = 1; j <= size(I); j++) {
+    for (int j = 1; j <= size(I); j++)
+    {
         resu[j] = evalPolyAtBox(I[j], B);
     }
 
@@ -740,6 +753,39 @@ example
     list intervals = I1,I2;
 
     evalIdealAtBox(I, intervals);
+}
+
+// construct box in subring that contains var(i) iff u[i]==0
+static proc boxProjection(box B, intvec v)
+{
+    box new;
+    int i, j = 1, 1;
+    for (i = 1; i <= size(v); i++)
+    {
+        if (v[i] == 0)
+        {
+            new = boxSet(new, j, B[i]);
+            j++;
+        }
+    }
+    return(new);
+}
+
+// construct box from box in subring, replacing entries corresponding to
+// variables that also exist in subring
+static proc boxEmbedding(box B, box Bproj, intvec v)
+{
+    int N = nvars(basering);
+    int i, j = 1, 1;
+    for (i = 1; i<= N; i++)
+    {
+        if (v[i] == 0)
+        {
+            B = boxSet(B, i, Bproj[j]);
+            j++;
+        }
+    }
+    return(B);
 }
 
 proc rootIsolationNoPreprocessing(ideal I, list start, number eps)
@@ -763,63 +809,103 @@ NOTE:   While @code{rootIsolation} does, @code{rootIsolationNoPreprocessing}
 EXAMPLE: example rootIsolationNoPreprocessing; exclusion test for intersection
         of two ellipses"
 {
-    //set of boxes smaller than size
-    list B_size;
-    //set of boxes which exactly contain one solution
-    list B_star;
-    //set of boxes initialised to input
-    // currently no consitency check
-    list B = start;
+    // set of boxes smaller than eps
+    list lBoxesSize;
+    // set of boxes which exactly contain one solution
+    list lBoxesUnique;
+    // set of boxes initialised to input
+    list lBoxes = start;
     //help set of boxes
-    list B_prime;
+    list lBoxesHelp;
 
     int i, j, s, cnt;
     int zeroTest;
-    box E;
+    int N = nvars(basering);
 
-    while (size(B) <> 0)
+    intvec empty;
+    def rSource = basering;
+    list lSubstBoxesSize, lSubstBoxesUnique;
+
+    ideal Isubst;
+    string rSubstString;
+
+    while (size(lBoxes) <> 0)
     {
-        // B_prime is empty set
-        B_prime = list();
+        // lBoxesHelp is empty set
+        lBoxesHelp = list();
         s = 0;
 
-        for (i=1; i<=size(B); i++)
+        for (i=1; i<=size(lBoxes); i++)
         {
             //case that maybe there is a root in the box
-            zeroTest, B[i] = testPolyBox(I,B[i]);
+            zeroTest, lBoxes[i] = testPolyBox(I,lBoxes[i]);
 
             if (zeroTest == 1)
             {
-                B_star[size(B_star)+1] = B[i];
+                lBoxesUnique[size(lBoxesUnique)+1] = lBoxes[i];
             }
             if (zeroTest == 0)
             {
                 // check for empty interior
-                if (boxVolume(B[i]) == 0)
+                empty = boxEmptyIntervals(lBoxes[i]);
+                // check if at least one interval is single number
+                if (max(empty[1..N]))
                 {
-                    /*
-                     * Idea for implementation: substitute ringvar by value
-                     * of singleton interval, pass to polynomial ring where
-                     * this variable is deleted
-                     *
-                     * Problem: the ideal will in general not have
-                     * nvars(newring) generators which is necessary.
-                     *
-                     * Thus we put the box into B_size for now
-                     */
-                    B_size[size(B_size)+1] = B[i];
+                    // If the box lBoxes[i] contains singleton intervals, i.e.
+                    // single numbers, we substitute the corresponding ring
+                    // variables with these numbers and pass to the subring
+                    // where these variables have been removed.
+                    // As rootIsolation now accpets ideals with arbitrary
+                    // generators we compute the zeros of the substituion
+                    // ideal and reassemble the boxes afterwards.
+                    //
+                    // This is probably overkill.
+                    Isubst = I;
+                    // name ring rSubst(voice) to avoid name conflicts if
+                    // we (unlikely) enter another level of recursion
+                    rSubstString = "ring rSubst(" + string(voice) + ") = 0,(";
+                    for (j = 1; j <= N; j++)
+                    {
+                        if (empty[j])
+                        {
+                            Isubst = subst(Isubst, var(j), lBoxes[i][j][1]);
+                        }
+                        else
+                        {
+                            rSubstString = rSubstString + varstr(j) + ",";
+                        }
+                    }
+                    rSubstString = string(rSubstString[1..(size(rSubstString)-1)]) + "),dp;";
+                    dbprint("passing to subring");
+                    execute(rSubstString);
+                    ideal Isubst = imap(rSource, Isubst);
+                    number eps = imap(rSource, eps);
+                    lSubstBoxesSize, lSubstBoxesUnique = rootIsolation(Isubst,
+                        boxProjection(lBoxes[i], empty), eps);
+                    setring rSource;
+                    for (j = 1; j <= size(lSubstBoxesSize); j++)
+                    {
+                        lSubstBoxesSize[j] = boxEmbedding(lBoxes[i], lSubstBoxesSize[j], empty);
+                    }
+                    lBoxesSize = lBoxesSize + lSubstBoxesSize;
+                    for (j = 1; j <= size(lSubstBoxesUnique); j++)
+                    {
+                        lSubstBoxesUnique[j] = boxEmbedding(lBoxes[i], lSubstBoxesUnique[j], empty);
+                    }
+                    lBoxesUnique = lBoxesUnique + lSubstBoxesUnique;
+                    kill rSubst(voice);
                 }
                 else
                 {
                     // remove boxes smaller than limit eps
-                    if (lengthBox(B[i]) < eps)
+                    if (boxLength(lBoxes[i]) < eps)
                     {
-                        B_size[size(B_size)+1] = B[i];
+                        lBoxesSize[size(lBoxesSize)+1] = lBoxes[i];
                     }
                     else
                     {
-                        // else split the box and put the smaller boxes to B_prime
-                        B_prime[s+1..s+2] = splitBox(B[i], I);
+                        // else split the box and put the smaller boxes to lBoxesHelp
+                        lBoxesHelp[s+1..s+2] = splitBox(lBoxes[i], I);
                         s = s+2;
                     }
                 }
@@ -827,11 +913,11 @@ EXAMPLE: example rootIsolationNoPreprocessing; exclusion test for intersection
         }
 
         cnt++;
-        dbprint(string("[", cnt, "] ", s, " boxes");
+        dbprint(string("[", cnt, "] ", s, " boxes"));
 
-        B = B_prime;
+        lBoxes = lBoxesHelp;
     }
-    return(B_size, B_star);
+    return(lBoxesSize, lBoxesUnique);
 }
 example
 {
@@ -898,6 +984,58 @@ example
     noRootsOnBoundary(I, box(list(I2,I3)));
 }
 
+// this takes a triangular decomposition of an ideal and applies rootIsolation
+// to all the ideals in the list and checks afterwards if the found boxes
+// intersect.
+static proc rootIsolationTriangL(list T, box start, number eps)
+{
+    int n = size(T);
+    int i, j, k, l;
+    list lBoxesUnique, lBoxesSize, lBoxesTemp, lIntBoxesUnique, lIntBoxesSize;
+    def bInt;
+    for (i = 1; i <= n; i++)
+    {
+        list B(i);
+        lBoxesTemp, B(i) = rootIsolation(T[i], start, eps);
+        // since we don't know anything about boxes in the first list just
+        // put them together
+        lBoxesSize = lBoxesSize + lBoxesTemp;
+    }
+
+    // check if boxes intersect
+    for (i = 1; i <= n; i++)
+    {
+        for (j = i + 1; j <= n; j++)
+        {
+            for (k = 1; k <= size(B(i)); k++)
+            {
+                for (l = 1; l <= size(B(j)); l++)
+                {
+                    bInt = intersect(B(i)[k], B(j)[l]);
+                    // if intersection non-empty
+                    if (typeof(bInt) == "box")
+                    {
+                        // check if intersection contains the root in B(i)[k]
+                        // and B(j)[l]
+                        lIntBoxesSize, lIntBoxesUnique = rootIsolation(T[i], bInt, eps);
+                        // the case size(lIntBoxesSize)>0 is not handled right now
+                        if (size(lIntBoxesUnique)>0)
+                        {
+                            // single root is in both B(i)[k] and B(j)[l]
+                            // so simply remove B(j)[l]
+                            delete(B(j),l);
+                            l--;
+                        }
+                    }
+                }
+            }
+        }
+        lBoxesUnique = lBoxesUnique + B(i);
+        kill B(i);
+    }
+    return(lBoxesSize, lBoxesUnique);
+}
+
 proc rootIsolation(ideal I, box start, number eps)
 "USAGE:  @code{rootIsolation(I, start, eps)};
         @code{I ideal, start box, eps number}
@@ -916,16 +1054,16 @@ THEORY: As every root of @code{I} is a root of the polynomials @code{I[i]}, we
         multivariate case.
 NOTE:   This algorithm and some procedures used therein perform Groebner basis
         computations in @code{basering}. It is thus advised to define @code{I}
-        w.r.t. a fast monomial ordering.
+        w.r.t. a fast monomial ordering. @*
+        The algorithm performs checks on @code{I} to prevent errors. If
+        @code{I} does not have the right number of generators, we first try to
+        find a suitable Groebner basis. If this fails we apply the algorithm
+        to the triangular decomposition of @code{I}.
 EXAMPLE: example rootIsolation; for intersection of two ellipses"
 {
     int N = nvars(basering);
     int i, j, k, l;
-
-    if (N != ncols(I))
-    {
-        ERROR("rootIsolation: algorithm currently needs nvars(basering) ideal generators");
-    }
+    int genNumIndex = 0;
 
     // compute reduced GB in (hopefully) fast ordering
     option(redSB);
@@ -938,12 +1076,79 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
 
     ideal rad = radical(fastGB);
     // since fastGB is contained in rad we only need to test one inclusion
-    rad = reduce(rad, fastGB);
     // size counts only non-zero entries
-    if (size(rad) > 0)
+    if (size(reduce(rad, fastGB)) > 0)
     {
-        ERROR("rootIsolation: ideal not radical");
+        "Warning: ideal not radical, passing to radical.";
+        I = rad;
+        fastGB = groebner(I);
     }
+
+    // create lp-rings
+    ring rSource = basering;
+    list rList = ringlist(rSource);
+    // set ordering to lp
+    rList[3] = list( list( "lp", 1:N ), list( "C", 0 ) );
+    // save variable order for later
+    list varstrs = rList[2];
+
+    for (i = 1; i <= N; i++)
+    {
+        // permute variables in ringlist,
+        // create and switch to ring with elimination ordering
+        rList[2][i] = varstrs[N];
+        rList[2][N] = varstrs[i];
+        def rElimOrd(i) = ring(rList);
+        setring rElimOrd(i);
+        // get GB in elimination ordering, note that GB[1] only depends on
+        // var(i) of rSource, which is var(N) in rElimOrd(i)
+        ideal GB = fglm(rSource, fastGB);
+        if (size(GB) == N)
+        {
+            genNumIndex = i;
+        }
+        setring rSource;
+        rList[2] = varstrs;
+    }
+
+    if (N <> ncols(I))
+    {
+        if (genNumIndex > 0)
+        {
+            // If elements of V(I) have pairwise distinct xj coordinates for
+            // some variable xj, then the reduced Groebner basis w.r.t. the
+            // monomial ordering where xj is smaller than all other variables
+            // has exactly nvars(basering) generators, see [2].
+            // As we compute all these Groebner bases anyway we can replace the
+            // input ideal with a proper generator set if necessary.
+            I = imap(rElimOrd(genNumIndex), GB);
+            dbprint("Replaced ideal with reduced Groebner basis wth proper number of generators.");
+        }
+        else
+        {
+            // the ideals in a triangular decomposition always satisfy the
+            // conditions on I
+            // apply rootIsolation to them as a last resort
+
+            // note that zero-dimensional ideals can always be generated by
+            // nvars(basering) polynomials, however the way of computing these
+            // generators is currently not known to the authors
+            setring rElimOrd(N);
+            list T = triangL(GB);
+            setring rSource;
+            list T = imap(rElimOrd(N), T);
+            // kill elimination rings to avoid name conflicts in rootIsolation
+            // called later
+            for (i = 1; i <= N; i++)
+            {
+                kill rElimOrd(i);
+            }
+            dbprint("Applying rootIsolation to triangular decomposition of input ideal.");
+            return(rootIsolationTriangL(T, start, eps));
+        }
+    }
+
+    // need nvars(basering) generators from here on
 
     intvec noZeroes;
     // check if there are roots on the boundary of start
@@ -952,7 +1157,10 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
         noZeroes = noRootsOnBoundary(I, start);
 
         // stop if all boundaries root-free
-        if (min(noZeroes[1..(2*N)])) { break; }
+        if (min(noZeroes[1..(2*N)]))
+        {
+            break;
+        }
 
         for (i = 1; i <= N; i++)
         {
@@ -974,8 +1182,7 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
         return(rootIsolationNoPreprocessing(I, list(start), eps));
     }
 
-    ring rSource = basering;
-    list rList = ringlist(rSource);
+    rList = ringlist(rSource);
     // first construct univariate ring
     int numords = size(rList[3]);
     // remove all but first variables
@@ -994,32 +1201,19 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
     number eps = fetch(rSource, eps);
     list univarResult, startBoxesPerDim;
 
-    // now prepare lp-ring
-    setring rSource;
-    rList = ringlist(rSource);
-    // set ordering to lp
-    rList[3] = list( list( "lp", 1:N ), list( "C", 0 ) );
-    // save variable order for later
-    list varstrs = rList[2];
+    intvec sizes, repCount = 0:N, 1:N;
+    int numBoxes = 1;
 
     for (i = 1; i <= N; i++)
     {
-        // permute variables in ringlist,
-        // create and switch to ring with elimination ordering
-        rList[2][i] = varstrs[N];
-        rList[2][N] = varstrs[i];
-        def rElimOrd = ring(rList);
-        setring rElimOrd;
-        // get GB in elimination ordering, note that GB[1] only depends on
-        // var(i) of rSource, which is var(N) in rElimOrd
-        ideal GB = fglm(rSource, fastGB);
-        //if (N == size(GB)) {~;}
+        setring rElimOrd(i);
+        // throw out non-univariate polys
         GB = GB[1];
 
         setring rUnivar;
-        gbUnivar = fetch(rElimOrd, GB, varmap);
+        gbUnivar = fetch(rElimOrd(i), GB, varmap);
         // clean up ring and its elements
-        kill rElimOrd;
+        kill rElimOrd(i);
 
         // get boxes containing roots of univariate polynomial
         univarResult = rootIsolationNoPreprocessing(gbUnivar,
@@ -1030,19 +1224,18 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
         dbprint(string("Sieved variable ", varstrs[i], " to ",
             size(startBoxesPerDim[i]), " intervals."));
 
-        // reset ring variable order
-        setring rSource;
-        rList[2] = varstrs;
-    }
-
-    intvec sizes, repCount = 0:N, 1:N;
-    int numBoxes = 1;
-
-    for (i = 1; i <= N; i++)
-    {
         sizes[i] = size(startBoxesPerDim[i]);
         numBoxes = numBoxes * sizes[i];
+
+        // stop early if one variable already has no roots
+        if (numBoxes == 0)
+        {
+            dbprint("No roots exist for input. Stopping.");
+            return(list(), list());
+        }
     }
+
+    setring rSource;
 
     for (i = N-1; i >= 1; i--)
     {
