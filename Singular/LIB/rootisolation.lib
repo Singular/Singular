@@ -935,54 +935,6 @@ example
   result;
 }
 
-static proc noRootsOnBoundary(ideal I, box B)
-"USAGE:  noZeroesOnBoundary(I, B), I ideal, B box
-RETURN: intvec iv where:
-        iv[2*i+j-2] is 1 if there is no root of I on the boundary B[i][j], 0 else
-EXAMPLE: example noRootsOnBoundary; tests boxes for roots"
-{
-  int N = nvars(basering);
-  int i, j, k;
-  intvec noZero = 0:(2*N);
-
-  box evalIntersection;
-
-  for (i = 1; i <= N; i++)
-  {
-    for (j = 1; j <= 2; j++)
-    {
-      evalIntersection = evalIdealAtBox(I, boxSet(B, i, bounds(B[i][j])));
-      for (k = 1; k <= N; k++)
-      {
-        if (evalIntersection[k][1]*evalIntersection[k][2] > 0)
-        {
-          noZero[2*i+j-2] = 1;
-          break;
-        }
-      }
-      if (!noZero[2*i+j-2])
-      {
-        // check if V(I + ...) is empty over CC[x(...)]
-        noZero[2*i+j-2] = std(I + (var(i) - B[i][j])) == 1;
-      }
-    }
-  }
-  return(noZero);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring R = 0,(x,y),dp;
-
-  ideal I = x+1,y-2;
-
-  interval I1, I2, I3 = bounds(0,1), bounds(-1,0), bounds(-2,2);
-
-  noRootsOnBoundary(I, box(list(I1,I2)));
-  noRootsOnBoundary(I, box(list(I2,I1)));
-  noRootsOnBoundary(I, box(list(I2,I3)));
-}
-
 // this takes a triangular decomposition of an ideal and applies rootIsolation
 // to all the ideals in the list and checks afterwards if the found boxes
 // intersect.
@@ -1145,39 +1097,13 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
     }
   }
 
-  // need nvars(basering) generators from here on
-  intvec noZeroes;
-  // check if there are roots on the boundary of start
-  while(1)
-  {
-    noZeroes = noRootsOnBoundary(I, start);
-
-    // stop if all boundaries root-free
-    if (min(noZeroes[1..(2*N)]))
-    {
-      break;
-    }
-
-    for (i = 1; i <= N; i++)
-    {
-      for (j = 1; j <= 2; j++)
-      {
-        // change offending boundary
-        if (!noZeroes[2*i+j-2])
-        {
-          // simply add 1 to upper bound or subtract 1 from lower bound
-          start = boxSet(start, i, start[i] + (-1)^j * bounds(0, 1));
-        }
-      }
-    }
-  }
-
   // need at least two variables
   if (N < 2)
   {
     return(rootIsolationNoPreprocessing(I, list(start), eps));
   }
 
+  // need nvars(basering) generators from here on
   rList = ringlist(rSource);
   // first construct univariate ring
   int numords = size(rList[3]);
@@ -1200,6 +1126,8 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
   intvec sizes, repCount = 0:N, 1:N;
   int numBoxes = 1;
 
+  number lo, up;
+
   for (i = 1; i <= N; i++)
   {
     setring rElimOrd(i);
@@ -1211,9 +1139,21 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
     // clean up ring and its elements
     kill rElimOrd(i);
 
+    // check if there are roots on the bounds of start[i]
+    // (very easy in univariate case)
+    lo, up = start[i][1], start[i][2];
+    while(subst(gbUnivar[1], var(1), lo) == 0)
+    {
+      lo = lo - 1;
+    }
+    while(subst(gbUnivar[1], var(1), up) == 0)
+    {
+      up = up + 1;
+    }
+
     // get boxes containing roots of univariate polynomial
     univarResult = rootIsolationNoPreprocessing(gbUnivar,
-        list(box(list(start[i]))), eps);
+        list(box(list(bounds(lo, up)))), eps);
     // maybe result[1] is not empty, so take both
     startBoxesPerDim[i] = univarResult[1] + univarResult[2];
     // debug:
@@ -1271,6 +1211,7 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
     startBoxes[i] = box(sbTemp[i]);
   }
 
+  // can be optimized
   return(rootIsolationNoPreprocessing(I, startBoxes, eps));
 }
 example
