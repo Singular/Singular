@@ -942,46 +942,15 @@ static proc rootIsolationTriangL(list T, box start, number eps)
 {
   int n = size(T);
   int i, j, k, l;
-  list lBoxesUnique, lBoxesSize, lBoxesTemp, lIntBoxesUnique, lIntBoxesSize;
+  list lBoxesUnique, lBoxesSize, lRoots;
   def bInt;
   for (i = 1; i <= n; i++)
   {
-    list B(i);
-    lBoxesTemp, B(i) = rootIsolation(T[i], start, eps);
+    lRoots = rootIsolation(T[i], start, eps);
     // since we don't know anything about boxes in the first list just put them
     // together
-    lBoxesSize = lBoxesSize + lBoxesTemp;
-  }
-
-  // check if boxes intersect
-  for (i = 1; i <= n; i++)
-  {
-    for (j = i + 1; j <= n; j++)
-    {
-      for (k = 1; k <= size(B(i)); k++)
-      {
-        for (l = 1; l <= size(B(j)); l++)
-        {
-          bInt = intersect(B(i)[k], B(j)[l]);
-          // if intersection non-empty
-          if (typeof(bInt) == "box")
-          {
-            // check if intersection contains the root in B(i)[k] and B(j)[l]
-            lIntBoxesSize, lIntBoxesUnique = rootIsolation(T[i], bInt, eps);
-            // the case size(lIntBoxesSize)>0 is not handled right now
-            if (size(lIntBoxesUnique)>0)
-            {
-              // single root is in both B(i)[k] and B(j)[l] so simply remove
-              // B(j)[l]
-              delete(B(j),l);
-              l--;
-            }
-          }
-        }
-      }
-    }
-    lBoxesUnique = lBoxesUnique + B(i);
-    kill B(i);
+    lBoxesSize = lBoxesSize + lRoots[1];
+    lBoxesUnique = lBoxesUnique + lRoots[2];
   }
   return(lBoxesSize, lBoxesUnique);
 }
