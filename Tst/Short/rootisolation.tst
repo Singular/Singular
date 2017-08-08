@@ -100,5 +100,19 @@ box B = list(bounds(-5,5),bounds(-5,5),bounds(-5,5));
 list roots = rootIsolation(I, B, 0); roots;
 kill roots, B, R;
 
+// no radical but zero-dimensional, |V(I)| = 2
+ring R = 0,(x,y,z),dp;
+ideal I = y2-xy-2zx,y3+z2+1,x2yz-yz;
+box B = list(bounds(-5,5), bounds(-5,5), bounds(-5,5));
+list roots = rootIsolation(I, B, 0); roots;
+kill roots, B, R;
+
+// not zero-dimensional
+ring R = 0,(x,y,z),dp;
+ideal I = x2-x,y2-1,x;
+box B = list(bounds(-1,1),bounds(-1,1),bounds(-1,1));
+list roots = rootIsolation(I, B, 0); roots;
+kill roots, B, R;
+
 tst_status(1);$;
 // vim: ft=singular
