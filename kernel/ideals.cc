@@ -2744,8 +2744,7 @@ GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)
     if(rHasGlobalOrdering(r)
     &&(!rIsPluralRing(r))
     &&(r->qideal==NULL)
-    &&(!rField_is_Ring(r))
-    && rHasTDeg(r))
+    &&(!rField_is_Ring(r)))
     {
        return GbSlimgb;
     }
