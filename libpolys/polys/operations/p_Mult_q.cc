@@ -13,6 +13,7 @@
 
 #include "misc/options.h"
 
+#include "coeffs/numbers.h"
 #include "polys/monomials/p_polys.h"
 #include "polys/kbuckets.h"
 #include "polys/clapsing.h"
@@ -292,7 +293,8 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   }
   if (lq < MIN_LENGTH_BUCKET || TEST_OPT_NOT_BUCKETS)
     return _p_Mult_q_Normal(p, q, copy, r);
-  else if (lq >= MIN_LENGTH_FACTORY)
+  else if ((lq >= MIN_LENGTH_FACTORY)
+  && (r->cf->convSingNFactoryN!=ndConvSingNFactoryN))
   {
     poly h=singclap_pmult(p,q,r);
     if (!copy)

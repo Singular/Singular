@@ -263,7 +263,7 @@ static int ndDivComp(number, number, const coeffs) { return 2; }
 static number  ndExtGcd (number, number, number *, number *, const coeffs r) { return r->cfInit(1,r); }
 #endif
 
-static CanonicalForm ndConvSingNFactoryN( number, BOOLEAN /*setChar*/, const coeffs)
+CanonicalForm ndConvSingNFactoryN( number, BOOLEAN /*setChar*/, const coeffs)
 {
   CanonicalForm term(0);
   WerrorS("no conversion to factory");

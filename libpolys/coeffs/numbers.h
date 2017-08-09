@@ -78,6 +78,7 @@ number ndCopyMap(number a, const coeffs src, const coeffs dst);
 // number  ndInit_bigint(number i, const coeffs dummy, const coeffs dst);
 
 // BOOLEAN ndCoeffIsEqual(const coeffs r, n_coeffType n, void * parameter);
+CanonicalForm ndConvSingNFactoryN( number, BOOLEAN /*setChar*/, const coeffs);
 
 /// Test whether a is a zero divisor in r
 /// i.e. not coprime with char. of r
