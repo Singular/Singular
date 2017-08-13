@@ -6,14 +6,14 @@ LIBRARY:    rootisolation.lib implements an algorithm for real root isolation
 AUTHORS:    Dominik Bendle (bendle@rhrk.uni-kl.de)
 @*          Clara Petroll (petroll@rhrk.uni-kl.de)
 
-OVERVIEW:   In this library the interval arithmetic from \"@code{interval.so}\"
-            is used. The new type \"@code{ivmat}\", a matrix consisting of
-            intervals is implemented as \"@code{newstruct}\". There are various
+OVERVIEW:   In this library the interval arithmetic from @code{interval.so}
+            is used. The new type @code{ivmat}, a matrix consisting of
+            intervals, is implemented as @code{newstruct}. There are various
             functions for computations with interval matrices implemented, such
             as Gaussian elimination for interval matrices.
 
 @*          Interval arithmetic, the interval Newton Step and exclusion methods
-            are used to implement the procedure \"@code{rootIsolation}\", an
+            are used to implement the procedure @code{rootIsolation}, an
             algorithm which finds boxes containing elements of the vanishing
             locus of an ideal. This algorithm is specialised for
             zero-dimensional radical ideals. The theory about the interval
@@ -40,10 +40,13 @@ ncols       ivmatNcols            number of columns@*
 
 PROCEDURES:
 bounds(a,#);            creates a new interval with given bounds
+length(I);              returns Euclidean length of interval
+boxSet(B,i,I);          returns box B with B[i]==I
 ivmatInit(m, n);        returns m x n [0,0]-matrix
 ivmatSet(A,i,j,I);      returns matrix A where A[i][j]=I
 unitMatrix(m);          returns m x m unit matrix where 1 = [1,1]
 ivmatGaussian(M);       computes M^(-1) using Gaussian elimination for intervals
+evalPolyAtBox(f,B);     returns evaluation of polynomial at a box
 evalJacobianAtBox(A,B); jacobian matrix of A where polynomials are evaluated at B
 
 rootIsolationNoPreprocessing(I,L,e);
@@ -57,7 +60,10 @@ LIB "primdec.lib";
 ///////////////////////////////////////////////////////////////////////////////
 static proc mod_init()
 {
+  intvec opt = option(get);
+  option(noredefine);
   LIB "interval.so";
+  option(set,opt);
 
   if (!reservedName("ivmat"))
   {
@@ -121,7 +127,40 @@ example
   J;
 }
 
+// function defined in interval.so
+proc length(interval)
+"USAGE:  @code{length(I)}; @code{I interval}
+RETURN: number, the Euclidean length of the interval
+EXAMPLE: example length; shows an example"
+{
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring R = 0,x,dp;
+  interval I = -1,3;
+  length(I);
+  I = 1/5,1/3;
+  length(I);
+}
+
 // BOX FUNCTIONS
+
+proc boxSet(box, int, interval)
+"USAGE: @code{boxSet(B, i, I)}; @code{B box, i int, I interval}
+RETURN: new box @code{C} where @code{C[i]==I}
+PURPOSE: modifies a single entry of a box
+EXAMPLE: example boxSet; shows an example"
+{
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring R = 0,(x,y,z),dp;
+  box B; B;
+  B = boxSet(B, 2, bounds(-1,1)); B;
+  B = boxSet(B, 1, B[2]); B;
+}
 
 static proc boxLength(box B)
 "USAGE:  boxLength(B), B box
@@ -421,7 +460,7 @@ static proc ivmatMultiply(ivmat A, ivmat B)
 
 proc ivmatGaussian(ivmat A)
 "USAGE:  @code{ivmatGaussian(A)}; @code{A ivmat}
-RETURN: 0 if @code{A} not invertible, @code{(1, Ainv)} if @code{A} invertible
+RETURN: 0, if @code{A} not invertible, @code{(1, Ainv)} if @code{A} invertible
         where @code{Ainv} is the inverse matrix
 PURPOSE: Inverts an interval matrix using Gaussian elimination in the setting
         of interval arithmetic. Pivoting is handled as a special case as
@@ -557,12 +596,28 @@ static proc ivmatMultiplyGeneral(ivmat A, B)
 
 // POLYNOMIAL APPLICATIONS
 
+proc evalPolyAtBox()
+"USAGE: @code{evalPolyAtBox(f, B)}; @code{f poly, B box}
+RETURN: interval, evalutaion of @code{f} at @code{B} using interval arithmetic
+PURPOSE: computes an interval extension of the polynomial
+EXAMPLE: example evalPolyAtBox; shows an example"
+{
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring R = 0,(x,y),dp;
+  poly f = x2+y-1;
+  box B = list(bounds(-1,1), bounds(1,3)/2);
+  interval I = evalPolyAtBox(f, B); I;
+}
+
 proc evalJacobianAtBox(ideal I, box B)
 "USAGE: @code{evalJacobianAtBox(I, B)}; @code{I ideal, B box}
 RETURN: Jacobian matrix of @code{I} where polynomials are evaluated at @code{B}
 PURPOSE: evaluates each polynomial of the Jacobian matrix of @code{I} using
         interval arithmetic
-EXAMPLE: example evalJacobianAtBox; evalate Jacobian at box"
+EXAMPLE: example evalJacobianAtBox; evaluate Jacobian at box"
 {
   matrix J = jacob(I);
   int m = nrows(J);
@@ -594,8 +649,8 @@ static proc testPolyBox(ideal I, box B)
 "USAGE:  testPolyBox(I, B); I ideal, B box
 RETURN: list(int, box):
         -1, if ideal has no zeros in given box,
-        1, if unique zero in given box
-        0 if test is inconclusive;
+        1, if unique zero in given box,
+        0, if test is inconclusive;
         box is intersection of Newton step and supplied box if applicable
 NOTE:   rounding is performed on fractions obtained by matrix inversion to
         prevent the size of denominators and numerators from increasing
@@ -630,7 +685,7 @@ EXAMPLE: example testPolyBox; tests the above for intersection of ellipses."
     ivmat J = evalJacobianAtBox(I, B);
     list inverse = ivmatGaussian(J);
 
-    // only continue if J is invertible , i.e. J contains no singular matrix
+    // only continue if J is invertible, i.e. J contains no singular matrix
     if (!inverse[1])
     {
       return(0, B);
