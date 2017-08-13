@@ -5,10 +5,13 @@ LIB "rootisolation.lib";
 
 // start with examples
 example bounds;
+example length;
+example boxSet;
 example ivmatInit;
 example ivmatSet;
 example unitMatrix;
 example ivmatGaussian;
+example evalPolyAtBox;
 example evalJacobianAtBox;
 example rootIsolationNoPreprocessing;
 example rootIsolation;
@@ -113,6 +116,22 @@ ideal I = x2-x,y2-1,x;
 box B = list(bounds(-1,1),bounds(-1,1),bounds(-1,1));
 list roots = rootIsolation(I, B, 0); roots;
 kill roots, B, R;
+
+// slightly longer example
+ring R = 0,(a,b,c,d,t),dp;
+ideal I =
+  a4+a2c2+3c4-1,
+  4a3b+2abc2+2a2cd+12c3d,
+  6a2b2+b2c2+4abcd+a2d2+18c2d2-1,
+  4ab3+2b2cd+2abd2+12cd3,
+  b4+b2d2+3d4-t;
+interval i = -100,100;
+interval j = 0,2;
+box B = list(i,i,i,i,j);
+list roots1 = rootIsolation(I,B,0); roots1;
+// compare to case where we use triangular decomposition
+list roots2 = rootIsolation(std(I),B,0); roots2;
+kill roots1, roots2, i, j, B, R;
 
 tst_status(1);$;
 // vim: ft=singular
