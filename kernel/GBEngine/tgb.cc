@@ -2018,41 +2018,6 @@ int exp_number_builder::get_n (poly p)
 //mac_polys exp are smaller iff they are greater by monomial ordering
 //corresponding to solving linear equations notation
 
-//! obsolete
-struct int_poly_pair
-{
-  poly p;
-  int n;
-};
-
-
-//! obsolete
-void t2ippa_rec (poly * ip, int *ia, poly_tree_node * k, int &offset)
-{
-  if(!k)
-    return;
-  t2ippa_rec (ip, ia, k->l, offset);
-  ip[offset] = k->p;
-  ia[k->n] = offset;
-  ++offset;
-
-  t2ippa_rec (ip, ia, k->r, offset);
-  delete k;
-}
-
-//! obsolete
-void t2ippa (poly * ip, int *ia, exp_number_builder & e)
-{
-
-  int o = 0;
-  t2ippa_rec (ip, ia, e.top_level, o);
-}
-
-int anti_poly_order (const void *a, const void *b)
-{
-  return -pLmCmp (((int_poly_pair *) a)->p, ((int_poly_pair *) b)->p);
-}
-
 BOOLEAN is_valid_ro (red_object & ro)
 {
   red_object r2 = ro;
