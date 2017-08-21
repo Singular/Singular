@@ -41,7 +41,7 @@ static void update_variables(std::vector<bool> &variables, const ideal L)
     }
 }
 
-static inline bool check_variables(const std::vector<bool> &variables,
+static inline bool check_variables(const std::vector<bool> variables,
         const poly m)
 {
     const ring R = currRing;
