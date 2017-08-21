@@ -56,7 +56,7 @@ static inline bool check_variables(const std::vector<bool> variables,
 typedef struct {
     poly lt;
     unsigned long sev;
-    unsigned int comp;
+    int comp;
 } lt_struct;
 
 typedef std::vector<lt_struct> lts_vector;
@@ -65,8 +65,8 @@ typedef std::map<long, lts_vector> lts_hash;
 static void initialize_lts_hash(lts_hash &C, const ideal L)
 {
     const ring R = currRing;
-    const unsigned int n_elems = IDELEMS(L);
-    for (unsigned int k = 0; k < n_elems; k++) {
+    const int n_elems = IDELEMS(L);
+    for (int k = 0; k < n_elems; k++) {
         const poly a = L->m[k];
         const long comp = p_GetComp(a, R);
         C[comp].push_back((lt_struct){a, p_GetShortExpVector(a, R), k});
