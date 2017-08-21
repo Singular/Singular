@@ -93,11 +93,9 @@ poly FindReducer(const poly multiplier, const poly t, const lts_hash *m_div)
                 || unlikely(!(_p_LmDivisibleByNoComp(m_current->lt, q, r)))) {
             continue;
         }
-        const poly p = m_current->lt;
-        const int k  = m_current->comp;
         p_MemAdd_NegWeightAdjust(q, r);
-        p_ExpVectorDiff(q, q, p, r); // (LM(product) / LM(L[k]))
-        p_SetComp(q, k + 1, r);
+        p_ExpVectorDiff(q, q, m_current->lt, r);
+        p_SetComp(q, (unsigned long)(m_current->comp)+1, r);
         p_Setm(q, r);
         number n = n_Mult(p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
         p_SetCoeff0(q, n_InpNeg(n, r), r);
