@@ -1320,7 +1320,7 @@ proc UfGraphGrowth(intmat UG)
 
   int maxCycleCount = 0;
   for (int v = 1; v <= n; v++) {
-    int cycleCount = Cycles(UG, v, visited, cyclic, 0);
+    int cycleCount = countCycles(UG, v, visited, cyclic, 0);
     if (cycleCount == -1) {
       return(-1);
     }
@@ -1331,7 +1331,14 @@ proc UfGraphGrowth(intmat UG)
   return(maxCycleCount);
 }
 
-proc Cycles(intmat G, int v, intvec visited, intvec cyclic, intvec path)
+proc countCycles(intmat G, int v, intvec visited, intvec cyclic, intvec path)
+"USAGE: countCycles(G, v, visited, cyclic, path); G a Graph, v the vertex to
+start. visited, cyclic and path should be 0.
+RETURN: int
+PURPOSE: Calculate the maximal number of distinct cycles in a single path starting at v.
+@*: Maximal number of distinct cycles
+ASSUME: Basering has to be a Letterplace ring.
+"
 {
   // Mark the current vertex as visited
   visited[v] = 1;
@@ -1373,10 +1380,10 @@ proc Cycles(intmat G, int v, intvec visited, intvec cyclic, intvec path)
           }
         }
 
-        // 3. auf jedem dieser Knoten Cycles() aufrufen
+        // 3. auf jedem dieser Knoten countCycles() aufrufen
         int maxCycleCount = 0;
         for (int j = size(path); j >= 1; j--) {
-          int cycleCount = Cycles(G, path[j], visited, cyclic, path);
+          int cycleCount = countCycles(G, path[j], visited, cyclic, path);
           if(cycleCount == -1) {
             return (-1);
           }
@@ -1391,7 +1398,7 @@ proc Cycles(intmat G, int v, intvec visited, intvec cyclic, intvec path)
           cycles = maxCycleCount + 1;
         }
       } else {
-        int cycleCount = Cycles(G, w, visited, cyclic, path);
+        int cycleCount = countCycles(G, w, visited, cyclic, path);
         if (cycleCount == -1) {
           return(-1);
         }
@@ -1401,12 +1408,12 @@ proc Cycles(intmat G, int v, intvec visited, intvec cyclic, intvec path)
       }
     }
   }
-  //printf("Path: %s Cycles: %s", path, cycles);
+  // printf("Path: %s countCycles: %s", path, cycles);
   return(cycles);
 }
 
 proc lpUfGraph(ideal G)
-"USUAGE: lpUfGraph(G); G a set of monomials in a letterplace ring
+"USAGE: lpUfGraph(G); G a set of monomials in a letterplace ring
 RETURN: intmat
 PURPOSE: Constructs the Ufnarovskij graph induced by G
 @*      the adjacency matrix of the Ufnarovskij graph induced by G
@@ -1480,10 +1487,10 @@ static proc ivdivides(list G, intvec iv) {
 }
 
 proc lpGraphOfNormalWords(ideal G)
-"USUAGE: lpGraphOfNormalWords(G); G a set of monomials in a letterplace ring
+"USAGE: lpGraphOfNormalWords(G); G a set of monomials in a letterplace ring
 RETURN: intmat
 PURPOSE: Constructs the graph of normal words induced by G
-@*      the adjacency matrix of the graph of normal words induced by G
+@*:      the adjacency matrix of the graph of normal words induced by G
 ASSUME: - basering is a Letterplace ring
         - G are the leading monomials of a Groebner basis
 "
@@ -1549,8 +1556,8 @@ ASSUME: - basering is a Letterplace ring
   return(T);
 }
 
-proc lpGkDim(ideal G)
-"USUAGE: lpGkDim(G); G an ideal in a letterplace ring
+proc lpNorGkDim(ideal G)
+"USAGE: lpNorGkDim(G); G an ideal in a letterplace ring
 RETURN: int
 PURPOSE: Determines the Gelfand Kirillov dimension of A/<G>
 @*:     -1 means it is infinite
@@ -1559,6 +1566,33 @@ ASSUME: - basering is a Letterplace ring
 "
 {
   return(growthAlg(lpGraphOfNormalWords(G)));
+}
+
+proc lpGkDim(ideal G, list#)
+"USAGE: lpGkDim(G); G an ideal in a letterplace ring, method an
+@*       optional integer. method = 0 uses the Ufnarovskij Graph
+@*       and method = 1 uses the Graph of normal words to determine
+@*       the Gelfand Kirillov dimension
+RETURN: int
+PURPOSE: Determines the Gelfand Kirillov dimension of A/<G>
+@*      -1 means it is positive infinite
+@*      -2 means it is negative infinite
+ASSUME: - basering is a Letterplace ring
+        - G is a Groebner basis
+"
+{
+  int method = 0;
+  if (size(#) > 0) {
+    if (typeof(#[1])=="int") {
+      method = #[1];
+    }
+  }
+
+  if (method == 0) {
+    return (lpUfGkDim(G));
+  } else {
+    return (lpNorGkDim(G));
+  }
 }
 example
 {
