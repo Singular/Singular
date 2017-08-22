@@ -473,7 +473,7 @@ static void computeLiftings(const resolvente res, const int index,
 }
 
 static int computeResolution(resolvente &res, const int max_index,
-        syzHeadFunction *syzHead)
+        syzHeadFunction *syzHead, bool do_lifting)
 {
     int index = 0;
     if (!idIs0(res[index]) && index < max_index) {
@@ -482,7 +482,9 @@ static int computeResolution(resolvente &res, const int max_index,
         std::vector<bool> variables;
         variables.resize(currRing->N, true);
         while (!idIs0(res[index])) {
-            computeLiftings(res, index, variables);
+            if (do_lifting) {
+                computeLiftings(res, index, variables);
+            }
             if (index >= max_index) { break; }
             index++;
             res[index] = computeFrame(res[index-1], syzM_i_sorted, syzHead);
@@ -490,6 +492,27 @@ static int computeResolution(resolvente &res, const int max_index,
         variables.clear();
     }
     return index+1;
+}
+
+static void set_options(syzHeadFunction **syzHead_ptr, bool *do_lifting_ptr,
+        const char *method)
+{
+    if (strcmp(method, "complete") == 0) {   // default
+        *syzHead_ptr = syzHeadExtFrame;
+        *do_lifting_ptr = true;
+    }
+    else if (strcmp(method, "frame") == 0) {
+        *syzHead_ptr = syzHeadFrame;
+        *do_lifting_ptr = false;
+    }
+    else if (strcmp(method, "extended frame") == 0) {
+        *syzHead_ptr = syzHeadExtFrame;
+        *do_lifting_ptr = false;
+    }
+    else {   // "linear strand" (not yet implemented)
+        *syzHead_ptr = syzHeadExtFrame;
+        *do_lifting_ptr = true;
+    }
 }
 
 #define insert_first_term(r, p, q, R)                             \
@@ -526,18 +549,16 @@ syStrategy syFrank(const ideal arg, const int length, const char *method)
     resolvente res = (resolvente)omAlloc0((length+1)*sizeof(ideal));
     res[0] = id_Copy(arg, currRing);
     syzHeadFunction *syzHead;
-    if (strcmp(method, "frame") == 0) {
-        syzHead = syzHeadFrame;
-    }
-    else {   // "complete" (default), "extended frame", or "linear strand"
-        syzHead = syzHeadExtFrame;
-    }
-    int new_length = computeResolution(res, length-1, syzHead);
+    bool do_lifting;
+    set_options(&syzHead, &do_lifting, method);
+    int new_length = computeResolution(res, length-1, syzHead, do_lifting);
     if (new_length < length) {
         res = (resolvente)omReallocSize(res, (length+1)*sizeof(ideal),
                 (new_length+1)*sizeof(ideal));
     }
-    insert_ext_induced_LTs(res, new_length);
+    if (strcmp(method, "frame") != 0) {
+        insert_ext_induced_LTs(res, new_length);
+    }
     result->fullres = res;
     result->length = new_length;
     result->list_length = new_length;

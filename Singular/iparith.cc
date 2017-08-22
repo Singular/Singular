@@ -2216,10 +2216,12 @@ static BOOLEAN jjFRES3(leftv res, leftv u, leftv v, leftv w)
         }
     }
     char *method = (char *)w->Data();
-    /* For the moment, only "complete" (default) is allowed. Other useful
-     * options would be "frame", "extended frame", or "linear strand".
+    /* For the moment, only "complete" (default), "frame", or "extended frame"
+     * are allowed. Another useful option would be "linear strand".
      */
-    if (strcmp(method, "complete") != 0) {
+    if (strcmp(method, "complete") != 0
+            && strcmp(method, "frame") != 0
+            && strcmp(method, "extended frame") != 0) {
         WerrorS("wrong optional argument for fres");
     }
     syStrategy r = syFrank(id, max_length, method);
