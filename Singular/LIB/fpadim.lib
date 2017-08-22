@@ -1168,7 +1168,9 @@ proc lpUfGkDim(ideal G)
     }
   }
 
+  int t = rtimer; // DEBUG
   intmat UG = lpUfGraph(G);
+  printf("lpUfGraph took %p", rtimer - t); // DEBUG
 
   // check special case 2
   if (imIsZero(UG)) {
@@ -1186,7 +1188,10 @@ proc lpUfGkDim(ideal G)
   }
 
   // otherwise count cycles in the Ufnarovskij Graph
-  return(UfGraphGrowth(UG));
+  int t = rtimer; // DEBUG
+  int gkdim = UfGraphGrowth(UG);
+  printf("UfGraphGrowth took %p", rtimer - t); // DEBUG
+  return gkdim;
 }
 
 proc UfGraphURTNZDGrowth(intmat UG) {
@@ -1408,7 +1413,7 @@ ASSUME: Basering has to be a Letterplace ring.
       }
     }
   }
-  // printf("Path: %s countCycles: %s", path, cycles);
+  // printf("Path: %s countCycles: %s", path, cycles); // DEBUG
   return(cycles);
 }
 
