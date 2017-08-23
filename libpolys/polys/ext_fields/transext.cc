@@ -811,21 +811,21 @@ static BOOLEAN ntGreater(number a, number b, const coeffs cf)
   // now: a!=0, b!=0
   fraction fa = (fraction)a;
   number aNumCoeff = p_GetCoeff(NUM(fa), ntRing);
-  int aNumDeg = p_Totaldegree(aNumCoeff, ntRing);
+  int aNumDeg = p_Totaldegree(NUM(fa), ntRing);
   number aDenCoeff = NULL; int aDenDeg = 0;
   if (DEN(fa)!=NULL)
   {
     aDenCoeff=p_GetCoeff(DEN(fa),ntRing);
-    aDenDeg = p_Totaldegree(aDenCoeff, ntRing);
+    aDenDeg = p_Totaldegree(DEN(fa), ntRing);
   }
   fraction fb = (fraction)b;
   number bNumCoeff = p_GetCoeff(NUM(fb), ntRing);
-  int bNumDeg = p_Totaldegree(bNumCoeff, ntRing);
+  int bNumDeg = p_Totaldegree(NUM(fb), ntRing);
   number bDenCoeff = NULL; int bDenDeg = 0;
   if (DEN(fb)!=NULL)
   {
     bDenCoeff=p_GetCoeff(DEN(fb),ntRing);
-    bDenDeg = p_Totaldegree(bDenCoeff, ntRing);
+    bDenDeg = p_Totaldegree(DEN(fb), ntRing);
   }
   if (aNumDeg-aDenDeg > bNumDeg-bDenDeg) return TRUE;
   if (aNumDeg-aDenDeg < bNumDeg-bDenDeg) return FALSE;
