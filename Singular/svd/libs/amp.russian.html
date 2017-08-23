@@ -1,0 +1,735 @@
+<html>
+<head>
+<title>Библиотека арифметики высокой точности AMP</title>
+<style type="text/css">
+<!--
+h1 { font-family: Tahoma,sans-serif; font-size : larger; }
+h2 { font-family: Arial,sans-serif; font-size : 11pt; }
+h3 { font-family: Arial,sans-serif; font-size : 9pt; }
+p { text-align: justify; }
+code { font-family: Courier New, monospace; }
+.cond  { color:blue; }
+.const { color:#222222; }
+.func  { color:#111111; font-family: Courier New, monospace; font-size : 9pt; }
+-->
+</style>
+</head>
+<body>
+<h1>Введение</h1>
+
+<p>
+Библиотека AMP (ALGLIB Muliple Precision) - это объектно-ориентированный интерфейс к библиотеке арифметики высокой точности MPFR, созданный в рамках проекта ALGLIB (см. www.alglib.net и alglib.sources.ru). Для объяснения причин, по которым потребовалось создавать ещё один интерфейс к MPFR, следует немного рассказать о проекте ALGLIB.
+</p>
+
+<p>
+Проект ALGLIB заключается в создании библиотеки численного анализа, в которой каждый алгоритм доступен в виде программ на нескольких языках программирования. В проекте ALGLIB эта задача решена за счет использования автоматического перевода. Алгоритмы хранятся в виде псевдокода, который переводится при помощи автоматического транслятора на требуемый язык. Синтаксис псевдокода позволяет осуществлять автоматический перевод на наиболее популярные языки программирования (C++, C#, Pascal и другие). Особый интерес представляет то, что в ряде случаев программа на псевдокоде может быть автоматически модифицирована таким образом, что она сможет использовать в своей работе арифметику высокой точности. Библиотека AMP при этом используется в качестве интерфейса к MPFR, заменяющего собой стандартный тип данных <code>double</code>.
+</p>
+
+<p>
+То, что программы, использующие AMP, изначально были написаны для работы с вещественной арифметикой 64-битной точности, повлияло на дизайн библиотеки. Этим были обусловлены такие особенности, как определение точности на этапе компиляции (в AMP точность задается при помощи параметризации класса-шаблона) и запрет на операции со смешанной точностью (например, сложение 256-битного и 512-битного чисел). Эти ограничения функциональности необходимы для того, чтобы библиотеку было можно использовать в проекте ALGLIB.
+</p>
+
+<p>
+Следует отметить, что хотя библиотека AMP в первую очередь предназначена для проекта ALGLIB, она может представлять интерес и в качестве "просто интерфейса к MPFR". В частности, автоматизированная сборка мусора может оказаться полезной в ряде приложений. В будущем планируется развивать библиотеку именно в этом направлении, т.к. относящаяся непосредственно к ALGLIB часть библиотеки уже достаточно проработана и не нуждается в дальнейшем расширении.
+</p>
+
+<h1>Лицензия</h1>
+
+<p>
+Библиотека AMP доступна на условиях тройной лицензии MPL 1.1 / GPL 2.0 / LGPL 2.1
+</p>
+
+<p>
+<b>Разъяснение</b>. Предоставление библиотеки на условиях тройной лицензии обозначает, что пользователь может использовать AMP на условиях любой из трех лицензий по своему выбору. При распространении AMP и/или её модификаций пользователю доступны два варианта поведения. Во-первых, он может распространять её на тех же условиях тройной лицензии, оставляя за получателями библиотеки право использовать любую из трех разрешенных лицензий по своему усмотрению. Во-вторых, он имеет право распространять библиотеку на условиях лицензии GPL 2.0 (или, по своему выбору, LGPL 2.1), запретив распространение на условиях других лицензий.
+</p>
+
+<p>
+Эти условия распространения позволяют использовать библиотеку AMP как в проприетарных или просто несвободных  программах (что допускается условиями лицензии MPL), так и в ПО, распространяющемся по лицензии GPL/LGPL. По мнению автора, это способствует максимально широкому распространению и использованию библиотеки.
+</p>
+
+<h1>Подключение и использование</h1>
+
+<p>
+Для использования библиотеки AMP необходимо:
+</p>
+
+<ul>
+<li>подключить к проекту библиотеку GMP</li>
+<li>подключить к проекту библиотеку MPFR</li>
+<li>подключить к проекту библиотеку AP (см. www.alglib.net или alglib.sources.ru)</li>
+<li>подключить к проекту главный модуль библиотеки amp.cpp</li>
+<li>включить заголовочный файл amp.h, содержащий все объявления, необходимые для работы библиотеки AMP</li>
+</ul>
+
+<h1>Основные концепции</h1>
+
+<p>
+<b>Вещественные числа</b>. MPFR (и, следовательно, AMP) практически полностью соответствует стандарту IEE-754, содержащему требования к реализации вещественной арифметики. Пользователю доступны следующие типы чисел: положительный и отрицательный нули (signed zeros), конечные числа, положительная и отрицательная бесконечности, NaN. Денормализованные числа не поддерживаются.
+</p>
+
+<p>
+<b>Операции с числами и округление</b>. Библиотека MPFR поддерживает четыре типа округления: округление вверх, вниз, к нолю и к ближайшему представимому значению. Библиотека AMP всегда использует режим округления к ближайшему представимому значению. Таким образом, все операции с вещественными числами проводятся с использованием точного округления (exact rounding). Появление в ходе вычислений специальных значений (бесконечностей и <code>NaN</code>) не приводит к генерации исключения - вычисления продолжаются в нормальном режиме. Операции с бесконечностями и нулями со знаком осуществляются по правилам арифметики пределов.
+</p>
+
+<p>
+<b>Точность</b>. Точность вещественного числа - это число бит в мантиссе, включая старший (ненулевой бит). Например, если установить точность вещественного числа равной 53, то получится тип данных, имитирующий стандартный тип <code>double</code>. Библиотека AMP позволяет устанавливать в качестве точности любое число, не меньшее 32 (размер типа данных <code>signed long</code>), включая и числа, не являющиеся степенями двойки. Это ограничение введено из соображений совместимости - многие математические программы полагаются на то, что целое значение может быть присвоено вещественному без потери точности.
+</p>
+
+<p>
+<b>Определение точности на этапе компиляции</b>. Особенностью библиотеки AMP является то, что класс, позволяющий осуществлять операции с вещественными числами высокой точности, является классом-шаблоном, параметром которого является целое число, задающее точность хранящегося значения. Таким образом, точность, с которой осуществляются вычисления, становится известна ещё на этапе компиляции - при параметризации шаблона, и не может быть изменена в ходе выполнения программы. Это существенное ограничение функциональности библиотеки было введено сознательно. Причиной является то, что основное назначение библиотеки AMP - применение в рамках проекта ALGLIB. В проекте ALGLIB библиотека AMP используется программами, являющимися результатом работы автоматического транслятора. Генерируемый транслятором код не способен работать с вещественными числами, чья точность меняется динамически, поскольку при этом возникает ряд проблем (например, какую точность следует использовать для промежуточных результатов, если одни элементы матрицы заданы с точностью 128 бит, а другие - с точностью 256 бит). По этой причине было решено ввести вышеуказанное ограничение. 
+</p>
+
+<p>
+<b>Операнды смешанной точности</b>. С++ предоставляет несколько вещественных типов: <code>float</code>, <code>double</code>, <code>long double</code>. При этом, если аргументами какой-либо операции являются два числа различного типа, то обычно осуществляется неявное преобразование от меньшего типа к большему (так, сумма <code>float</code> и <code>double</code> имеет тип <code>double</code>). Библиотека AMP не позволяет осуществлять неявное приведение типов при операциях с операндами смешанной точности. Например, сложение <code>amp::ampf&lt;128&gt;</code> и <code>amp::ampf&lt;144&gt;</code> вызовет ошибку компиляции - потребуется в явной форме привести один из типов к типу другого операнда. Отчасти это продиктовано ограничениями С++ (которые в принципе можно обойти), отчасти - убеждением разработчика в том, что в практике численного анализа потребность в подобной функциональности возникает очень редко.
+</p>
+
+<p>
+<b>Сборка мусора</b>. Поскольку в MPFR память под вещественные числа выделяется динамически, инициализация нового вещественного числа занимает сравнительно много времени. Для ускорения работы библиотека AMP не освобождает использованные переменные, а помещает их в список, из которого осуществляется выборка, когда требуется создать новое вещественное число.
+</p>
+
+<p>
+<b>Отсутствие многопоточности</b>. В настоящее время библиотека AMP не поддерживает многопоточность. Библиотека может работать в многопоточной среде, но не может использоваться двумя и более потоками одновременно.
+</p>
+
+<h1>Классы исключений</h1>
+
+<p>
+Библиотека AMP включает в себя следующие классы исключений:
+</p>
+
+<ol>
+<li><code>amp::incorrectPrecision</code> - генерируется при попытке инициализировать число с указанием недопустимой точности (менее 32 или больше ограничений, устанавливаемых библиотекой MPFR)</li>
+<li><code>amp::invalidConversion</code> - генерируется при попытке привести к целому виду при помощи функций <code>trunc</code>/<code>round</code>/<code>ceil</code>/<code>floor</code> число, не помещающееся в разрядную сетку типа данных <code>signed long</code></li>
+<li><code>amp::internalError</code> - генерируется при внутреннем сбое в библиотеке AMP (в нормальных условиях это не должно происходить)</li>
+</ol>
+
+<h1>Классы amp::mpfr_record и amp::mpfr_storage</h1>
+
+<p>
+Эти классы - служебные классы, используемые библиотекой для хранения указателя на вещественное число и как интерфейс менеджера памяти. Хотя эти классы доступны программисту, он не должен использовать их, поскольку они не предназначены для использования за пределами библиотеки AMP. Правила работы с этими классами не документированы, а несоблюдение этих правил способно разрушить систему выделения памяти или нарушить нормальный процесс вычислений.
+</p>
+
+<h1>Класс amp::ampf и операции с ним</h1>
+
+<h2>Общие принципы</h2>
+
+<p>
+Класс amp::ampf является классом-шаблоном, инкапсулирующим вещественное число в формате библиотеки MPFR. Класс полностью берет на себя такие функции, как выделение памяти для вещественного числа, освобождение памяти и уборка мусора. Для объектов этого типа определены арифметические операции и ряд функций, копирующих функциональность стандартной библиотеки языка С. В большинстве случаев, код, использующий класс <code>amp::ampf</code>, почти не отличается от кода, работающего с вещественными числами.
+</p>
+
+<h2>Члены класса amp::ampf</h2>
+
+<pre>
+<code>
+    <b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;
+    <b>class</b> ampf
+    {
+    <b>public</b>:
+        ~ampf();
+
+        ampf ();        
+        ampf (<b>long double</b> v);
+        ampf (<b>double</b> v);
+        ampf (<b>float</b> v);
+        ampf (<b>signed long</b> v);
+        ampf (<b>unsigned long</b> v);
+        ampf (<b>signed int</b> v);
+        ampf (<b>unsigned int</b> v);
+        ampf (<b>signed short</b> v);
+        ampf (<b>unsigned short</b> v);
+        ampf (<b>signed char</b> v);
+        ampf (<b>unsigned char</b> v);
+        ampf (<b>const</b> std::string &amp;s);
+        ampf (<b>const char</b> *s);
+        
+        ampf(<b>const</b> ampf&amp; r);
+        <b>template</b>&lt;<b>unsigned int</b> Precision2&gt;
+        ampf(<b>const</b> ampf&lt;Precision2&gt;&amp; r);
+
+        ampf&amp; <b>operator</b>= (<b>long double</b> v);
+        ampf&amp; <b>operator</b>= (<b>double</b> v);
+        ampf&amp; <b>operator</b>= (<b>float</b> v);
+        ampf&amp; <b>operator</b>= (<b>signed long</b> v);
+        ampf&amp; <b>operator</b>= (<b>unsigned long</b> v);
+        ampf&amp; <b>operator</b>= (<b>signed int</b> v);
+        ampf&amp; <b>operator</b>= (<b>unsigned int</b> v);
+        ampf&amp; <b>operator</b>= (<b>signed short</b> v);
+        ampf&amp; <b>operator</b>= (<b>unsigned short</b> v);
+        ampf&amp; <b>operator</b>= (<b>signed char</b> v);
+        ampf&amp; <b>operator</b>= (<b>unsigned char</b> v);
+        ampf&amp; <b>operator</b>= (<b>const char</b> *s);
+        ampf&amp; <b>operator</b>= (<b>const</b> std::string &amp;s);
+        ampf&amp; <b>operator</b>= (<b>const</b> ampf&amp; r);
+        <b>template</b>&lt;<b>unsigned int</b> Precision2&gt;
+        ampf&amp; <b>operator</b>= (<b>const</b> ampf&lt;Precision2&gt;&amp; r);
+        
+        <b>template</b>&lt;<b>class</b> T&gt;
+        ampf&amp; <b>operator</b>+=(<b>const</b> T&amp; v);
+        <b>template</b>&lt;<b>class</b> T&gt;
+        ampf&amp; <b>operator-</b>=(<b>const</b> T&amp; v);
+        <b>template</b>&lt;class T&gt;
+        ampf&amp; <b>operator</b>*=(<b>const</b> T&amp; v);
+        <b>template</b>&lt;class T&gt;
+        ampf&amp; <b>operator</b>/=(<b>const</b> T&amp; v);
+        
+        mpfr_srcptr getReadPtr() <b>const</b>;
+        mpfr_ptr getWritePtr();
+        
+        <b>bool</b> isFiniteNumber() <b>const</b>;
+        <b>bool</b> isPositiveNumber() <b>const</b>;
+        <b>bool</b> isZero() <b>const</b>;
+        <b>bool</b> isNegativeNumber() <b>const</b>;
+        <b>const</b> ampf getUlpOf();
+
+        <b>double</b> toDouble() <b>const</b>;
+        std::string toHex() <b>const</b>;
+        std::string toDec() <b>const</b>;
+        
+        <b>static const</b> ampf getUlpOf(<b>const</b> ampf &amp;x);
+        <b>static const</b> ampf getUlp();
+        <b>static const</b> ampf getUlp256();
+        <b>static const</b> ampf getUlp512();
+        <b>static const</b> ampf getMaxNumber();
+        <b>static const</b> ampf getMinNumber();
+        <b>static const</b> ampf getAlgoPascalEpsilon();
+        <b>static const</b> ampf getAlgoPascalMaxNumber();
+        <b>static const</b> ampf getAlgoPascalMinNumber();
+        <b>static const</b> ampf getRandom();
+    };
+</code>
+</pre>
+
+<h1>Объявление переменных и инициализация</h1>
+
+<p>
+Класс <code>amp::ampf</code> является классом-шаблоном, параметризируемым по точности хранящегося в нем вещественного значения. Таким образом, перед использованием этого класса необходимо определить, какая именно точность требуется. Для инициализации класса определен ряд конструкторов, принимающих как объекты того же класса, так и целые числа, вещественные числа стандартных типов (<code>float</code>, <code>double</code>, <code>long double</code>) и строки, в которых число записано в дробной (например, <code>"12.34"</code>) или экспоненциальной форме, при этом мантисса может быть как в десятичной системе исчисления, так и в шестнадцатеричной системе (см. описание библиотеки MPFR).
+</p>
+
+<p>
+Примеры:
+</p>
+
+<pre>
+<code>
+    <b>int</b> i = 3;
+    <b>double</b> d = 2.5;
+    amp::ampf&lt;128&gt; a(i), b(d), c("2.33");
+    a = "1.56E-3";
+    b = a;
+</code>
+</pre>
+
+<h2>Преобразование в текстовую форму</h2>
+
+<p>
+Для преобразования числа в текстовую форму служат функции-члены <code>toDec()</code> и <code>toHex()</code>. Они возвращают экспоненциальное представление числа в десятичной и шестнадцатеричной системе исчисления (при этом шестнадцатеричное преобразование осуществляется быстрее, чем десятичное, что делает его предпочтительным в тех случаях, когда требуется повышенное быстродействие). Какие-либо возможности по форматированию результата отсутствуют: число выдается с максимальным количеством значащих цифр.
+</p>
+
+<p>
+Пример:
+</p>
+
+<pre>
+<code>
+    amp::ampf&lt;128&gt; a;
+    a = "11";
+    printf("%s\n", amp::sqrt(a).toDec().c_str());
+</code>
+</pre>
+
+<h2>Проверка свойств</h2>
+
+<p>
+Функции-члены <code>isFiniteNumber()</code>, <code>isPositiveNumber()</code>, <code>isZero()</code>, <code>isNegativeNumber()</code> позволяют проверить, является ли число конечным значением (в противоположность одниму из специальных значений), положительным числом, нулем или отрицательным числом.
+</p>
+
+<h2>Информационные функции</h2>
+
+<p>
+Ряд функций предназначен для получения информации о числовых свойствах того или иного типа данных:
+</p>
+
+<ul>
+<li>функция-член <code>getUlpOf()</code> позволяет получить значение единицы в младшем разряде мантиссы (ulp, Unit in the Last Place) числа, для которого она вызвана (это понятие по смыслу близко к машинной точности). Статическая функция <code>getUlpOf()</code> имеет тот же функционал.</li>
+<li>статическая функция <code>getUlp()</code> по смыслу эквивалентна <code>amp::ampf&lt;Precision&gt;::getUlpOf(1)</code></li>
+<li>статическая функция <code>getMaxNumber()</code> возвращает максимальное положительное число, представимое при помощи этого типа данных</li>
+<li>статическая функция <code>getMinNumber()</code> возвращает минимальное положительное число, представимое при помощи этого типа данных</li>
+<li>функции <code>getAlgoPascalEpsilon()</code>, <code>getAlgoPascalMaxNumber()</code>, <code>getAlgoPascalMinNumber()</code> по смыслу схожи со своими аналогами, но возвращают значения "с запасом надежности". Эти функции используются программами проекта ALGLIB.</li>
+</ul>
+
+<h2>Доступ к указателю <code>mpfr_t</code></h2>
+
+<p>
+Доступ к указателю <code>mpfr_t</code> предоставляют две функции: <code>getReadPtr()</code> и <code>getWritePtr()</code>. Функция <code>getReadPtr()</code> позволяет получить указатель только для чтения, который можно передавать в функции библиотеки MPFR в качестве аргумента.  Функция <code>getWritePtr()</code> позволяет получить указатель для записи, который можно передавать в функции библиотеки MPFR в качестве места для сохранения результата вычислений.
+</p>
+
+<p>
+Следует отметить, что библиотека AMP использует технику copy-on-write, то есть указатель, полученный методом <code>getReadPtr()</code> может быть общим для нескольких объектов. Таким образом, указатель, полученный методом <code>getReadPtr()</code> ни при каких условиях не должен использоваться в операциях, которые могут модифицировать его содержимое.
+</p>
+
+<p>
+Указатель, полученный методом <code>getWritePtr()</code>, может быть использован в операциях, меняющих его содержимое, но эти операции не должны менять его точность. Следует учитывать, что из-за использования техники copy-on-write, указатель, полученный при вызове <code>getWritePtr()</code>, может отличаться от указателя, полученного ранее при вызове <code>getReadPtr()</code>.
+</p>
+
+<h2>Генерация случайных чисел</h2>
+
+<p>
+Для генерации случайных чисел служит статическая функция <code>getRandom()</code>. При первом вызове эта функция инициализирует генератор случайных чисел используя системное время.
+</p>
+
+<h2>Арифметические операции</h2>
+
+<p>
+Класс <code>amp::ampf</code> переопределяет операции сравнения, сложения, вычитания, умножения и деления. Результат округляется по правилам точного округления (exact rounding). Операндами могут быть два объекта <code>amp::ampf</code> одной и той же точности. В выражении допускается смешивать объекты типа <code>amp::ampf</code> и стандартные типы данных. Смешивать объекты типа <code>amp::ampf</code> с разной точностью можно, только если один из операндов явным образом приводится к типу другого.
+</p>
+
+<p>
+Пример:
+</p>
+
+<pre>
+<code>
+    amp::ampf&lt;128&gt; a(3), b(4), c(99);
+    amp::ampf&lt;256&gt; d(1);
+
+    a = b+c;          <i>//</i>
+    b = c+2.3;        <i>// допустимые выражения</i>
+    c = (2*a-5)/b;    <i>//</i>
+
+    a = b+d;          <i>// вызовет ошибку при компиляции -</i>
+                      <i>// аргументы имеют разный тип</i>
+
+    a = b + amp::ampf&lt;128&gt;(d); <i>// так правильно</i>
+
+    a = d;            <i>// это тоже допустимо</i>
+</code>
+</pre>
+
+<h2>Математические функции</h2>
+
+<p>
+Все приведенные в этом разделе функции являются членами пространства имен <code>amp</code>. Таким образом, при вызове, например, функции <code>sqr</code>, следует писать <code>amp::sqr</code>. Если явно не указано иное, то результат округляется по правилам точного округления.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; sqr(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция служит для возведения числа в квадрат.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> <b>int</b> sign(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция возвращает <code>+1</code>, если аргумент положителен, <code>-1</code>, если он отрицателен, <code>0</code>, если он равен нолю.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; abs(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция возвращает модуль числа.
+</p>
+
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; maximum(<b>const</b> ampf&lt;Precision&gt; &amp;x, <b>const</b> ampf&lt;Precision&gt; &amp;y)<br>
+</span>
+Эта функция возвращает большее из двух чисел.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; minimum(<b>const</b> ampf&lt;Precision&gt; &amp;x, <b>const</b> ampf&lt;Precision&gt; &amp;y)<br>
+</span>
+Эта функция возвращает меньшее из двух чисел.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; sqrt(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция возвращает квадратный корень.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> <b>signed</b> <b>long</b> trunc(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция округляет число в сторону ноля и возвращает значение типа <code>signed long</code>. Если результат округления не помещается в разрядную сетку, то генерируется исключение <code>amp::invalidConversion</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; frac(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция возвращает дробную часть числа. Дробная часть определяется, как <code>x-trunc(x)</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> <b>signed</b> <b>long</b> floor(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция округляет число вниз (в сторону минус бесконечности) и возвращает значение типа <code>signed long</code>. Если результат округления не помещается в разрядную сетку, то генерируется исключение <code>amp::invalidConversion</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> <b>signed</b> <b>long</b> ceil(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция округляет число вверх (в сторону плюс бесконечности) и возвращает значение типа <code>signed long</code>. Если результат округления не помещается в разрядную сетку, то генерируется исключение <code>amp::invalidConversion</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> <b>signed</b> <b>long</b> round(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция округляет число к ближайшему целому и возвращает значение типа <code>signed long</code>. Аргумент, располагающийся точно на границе, округляется в сторону бесконечности. Если результат округления не помещается в разрядную сетку, то генерируется исключение <code>amp::invalidConversion</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; frexp2(<b>const</b> ampf&lt;Precision&gt; &amp;x, mp_exp_t *exponent)<br>
+</span>
+Эта функция разделяет число на мантиссу и экспоненту по основанию два. Если аргумент равен нолю, то мантисса и экспонента считаются равными нолю. Если аргумент не является конечным числом, то генерируется исключение <code>amp::invalidConversion</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; ldexp2(<b>const</b> ampf&lt;Precision&gt; &amp;x, mp_exp_t exponent)<br>
+</span>
+Эта функция умножает переданный аргумент на два в степени <code>exponent</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; pi()<br>
+</span>
+Эта функция возвращает константу <code>Pi</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; halfpi()<br>
+</span>
+Эта функция возвращает половину константы <code>Pi</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; twopi()<br>
+</span>
+Эта функция возвращает удвоенную константу <code>Pi</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; sin(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция возвращает синус аргумента.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; cos(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция возвращает косинус аргумента.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; tan(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция возвращает тангенс аргумента.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; asin(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция возвращает арксинус аргумента.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; acos(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция возвращает арккосинус аргумента.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; atan(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция возвращает арктангенс аргумента.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; atan2(<b>const</b> ampf&lt;Precision&gt; &amp;y, <b>con</b>st ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция возвращает арктангенс числа, равного отношению аргументов <code>y/x</code>. Функция возвращает корректный результат, даже если <code>x</code> равно <code>0</code>.
+</p>
+    
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; log(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция возвращает натуральный логарифм <code>x</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; log2(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция возвращает двоичный логарифм <code>x</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; log10(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция возвращает десятичный логарифм <code>x</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; exp(<b>const</b> ampf&lt;Precision&gt; &amp;_x)<br>
+</span>
+Эта функция возвращает <code>е</code> в степени <code>x</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; sinh(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Эта функция возвращает гиперболический синус <code>x</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; cosh(<b>const</b> ampf&lt;Precision&gt; &amp;_x)<br>
+</span>
+Эта функция возвращает гиперболический косинус <code>x</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; tanh(<b>const</b> ampf&lt;Precision&gt; &amp;_x)<br>
+</span>
+Эта функция возвращает гиперболический тангенс <code>x</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; pow(<b>const</b> ampf&lt;Precision&gt; &amp;x, <b>const</b> ampf&lt;Precision&gt; &amp;y)<br>
+</span>
+Эта функция возвращает <code>x</code> в степени <code>y</code>.
+</p>
+
+<h1>Векторы, матрицы и базовые операции линейной алгебры</h1>
+
+<h2>Введение</h2>
+
+<p>
+Библиотека AP, входящая в состав проекта ALGLIB, включает в себя классы-шаблоны векторов и матриц, а также подпрограммы для осуществления над ними базовых операций линейной алгебры (аналог Level 1 BLAS). Поскольку библиотека AP реализует классы матриц, используя шаблоны, эти же классы можно использовать для работы с матрицами, состоящими из чисел высокой точности. По этой причине библиотека AMP не содержит классов матриц и векторов.
+Базовые операции линейной алгебры в библиотеке AP также реализованы с использованием шаблонов, но в этом случае библиотека AMP предлагает свой аналог, написанный специально для операций с числами высокой точности. Подпрограммы библиотеки AMP специально оптимизированы для снижения нагрузки на менеджер памяти, поэтому при осуществлении векторных операций над числами высокой точности следует использовать именно их.
+</p>
+
+<h2>Описание</h2>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+ampf&lt;Precision&gt; vDotProduct(ap::const_raw_vector&lt; ampf&lt;Precision&gt; &gt; v1, ap::const_raw_vector&lt; ampf&lt;Precision&gt; &gt; v2)<br>
+</span>
+Эта функция возвращает скалярное произведение двух векторов. Векторы задаются при помощи структур <code>ap::const_raw_vector</code> (эта структура определена в файле <code>ap.h</code>, более подробно см. описание библиотеки AP).
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>void</b> vMove(ap::raw_vector&lt; ampf&lt;Precision&gt; &gt; vDst, ap::const_raw_vector&lt; ampf&lt;Precision&gt; &gt; vSrc)<br>
+</span>
+Эта функция копирует вектор <code>vSrc</code> в вектор <code>vDst</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>void</b> vMoveNeg(ap::raw_vector&lt; ampf&lt;Precision&gt; &gt; vDst, ap::const_raw_vector&lt; ampf&lt;Precision&gt; &gt; vSrc)<br>
+</span>
+Эта функция копирует вектор <code>vSrc</code> в вектор <code>vDst</code>, умножая его на <code>-1</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision, <b>class</b> T2&gt;<br>
+<b>void</b> vMove(ap::raw_vector&lt; ampf&lt;Precision&gt; &gt; vDst, ap::const_raw_vector&lt; ampf&lt;Precision&gt; &gt; vSrc, T2 alpha)<br>
+</span>
+Эта функция копирует вектор <code>vSrc</code> в вектор <code>vDst</code>, умножая его на константу <code>alpha</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>void</b> vAdd(ap::raw_vector&lt; ampf&lt;Precision&gt; &gt; vDst, ap::const_raw_vector&lt; ampf&lt;Precision&gt; &gt; vSrc)<br>
+</span>
+Эта функция добавляет к вектору <code>vDst</code> вектор <code>vScr</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision, <b>class</b> T2&gt;<br>
+<b>void</b> vAdd(ap::raw_vector&lt; ampf&lt;Precision&gt; &gt; vDst, ap::const_raw_vector&lt; ampf&lt;Precision&gt; &gt; vSrc, T2 alpha)<br>
+</span>
+Эта функция добавляет к вектору <code>vDst</code> вектор <code>vScr</code>, умноженный на константу <code>alpha</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>void</b> vSub(ap::raw_vector&lt; ampf&lt;Precision&gt; &gt; vDst, ap::const_raw_vector&lt; ampf&lt;Precision&gt; &gt; vSrc)<br>
+</span>
+Эта функция вычитает из вектора <code>vDst</code> вектор <code>vScr</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision, <b>class</b> T2&gt;<br>
+<b>void</b> vSub(ap::raw_vector&lt; ampf&lt;Precision&gt; &gt; vDst, ap::const_raw_vector&lt; ampf&lt;Precision&gt; &gt; vSrc, T2 alpha)<br>
+</span>
+Эта функция вычитает из вектора <code>vDst</code> вектор <code>vScr</code>, умноженный на константу <code>alpha</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision, <b>class</b> T2&gt;<br>
+<b>void</b> vMul(ap::raw_vector&lt; ampf&lt;Precision&gt; &gt; vDst, T2 alpha)<br>
+</span>
+Эта функция умножает вектор <code>vDst</code> на константу <code>alpha</code>.
+</p>
+
+<h1>Класс amp::campf и операции с ним</h1>
+
+<h2>Общие принципы</h2>
+
+<p>
+Класс <code>amp::campf</code> реализует операции с комплексными числами высокой точности. Действительная и мнимая части хранятся в полях <code>x</code> и <code>y</code>, имеющих тип <code>amp::ampf</code>. С объектами этого типа можно осуществлять арифметические операции, операции сравнения, также для этого типа данных определены некоторые из стандартных математических функций.
+</p>
+
+<h2>Члены класса amp::ampf</h2>
+
+<pre>
+<code>
+    <b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;
+    class campf
+    {
+    public:
+        campf():x(0),y(0);
+        campf(<b>long</b> <b>double</b> v);
+        campf(<b>double</b> v);
+        campf(<b>float</b> v);
+        campf(<b>signed</b> <b>long</b> v);
+        campf(<b>unsigned</b> <b>long</b> v);
+        campf(<b>signed</b> <b>int</b> v);
+        campf(<b>unsigned</b> <b>int</b> v);
+        campf(<b>signed</b> <b>short</b> v);
+        campf(<b>unsigned</b> <b>short</b> v);
+        campf(<b>signed</b> <b>char</b> v);
+        campf(<b>unsigned</b> <b>char</b> v);
+        campf(<b>const</b> ampf&lt;Precision&gt; &amp;_x);
+        campf(<b>const</b> ampf&lt;Precision&gt; &amp;_x, <b>const</b> ampf&lt;Precision&gt; &amp;_y);
+        campf(<b>const</b> campf &amp;z):x(z.x),y(z.y);
+        <b>template</b>&lt;<b>unsigned</b> <b>int</b> Prec2&gt;
+        campf(<b>const</b> campf&lt;Prec2&gt; &amp;z);
+
+        campf&amp; <b>operator</b>= (<b>long double</b> v);
+        campf&amp; <b>operator</b>= (<b>double</b> v);
+        campf&amp; <b>operator</b>= (<b>float</b> v);
+        campf&amp; <b>operator</b>= (<b>signed long</b> v);
+        campf&amp; <b>operator</b>= (<b>unsigned long</b> v);
+        campf&amp; <b>operator</b>= (<b>signed int</b> v);
+        campf&amp; <b>operator</b>= (<b>unsigned int</b> v);
+        campf&amp; <b>operator</b>= (<b>signed short</b> v);
+        campf&amp; <b>operator</b>= (<b>unsigned short</b> v);
+        campf&amp; <b>operator</b>= (<b>signed char</b> v);
+        campf&amp; <b>operator</b>= (<b>unsigned char</b> v);
+        campf&amp; <b>operator</b>= (<b>const char</b> *s);
+        campf&amp; <b>operator</b>= (<b>const</b> std::string &amp;s);
+        campf&amp; <b>operator</b>= (<b>const</b> campf&amp; r);
+        <b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision2&gt;
+        campf&amp; <b>operator</b>= (<b>const</b> campf&lt;Precision2&gt;&amp; r);
+
+        ampf&lt;Precision&gt; x, y;
+    };
+</code>
+</pre>
+
+<h2>Арифметические операции</h2>
+
+<p>
+Класс <code>amp::campf</code> переопределяет операции сравнения, сложения, вычитания, умножения и деления. Операндами могут быть два объекта <code>amp::campf</code> одной и той же точности. В выражении допускается смешивать объекты типа <code>amp::campf</code>, объекты типа <code>amp::ampf</code> и стандартные типы данных. Смешивать объекты типа <code>amp::campf</code> с разной точностью можно, только если один из операндов явным образом приводится к типу другого.
+</p>
+
+<h2>Стандартные функции</h2>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; abscomplex(<b>const</b> campf&lt;Precision&gt; &amp;z)<br>
+</span>
+Эта функция возвращает модуль комплексного числа.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> campf&lt;Precision&gt; conj(<b>const</b> campf&lt;Precision&gt; &amp;z)<br>
+</span>
+Эта функция возвращает число, сопряженное данному
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> campf&lt;Precision&gt; csqr(<b>const</b> campf&lt;Precision&gt; &amp;z)<br>
+</span>
+Эта функция возвращает квадрат числа.
+</p>
+
+</body>
+</html>

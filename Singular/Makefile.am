@@ -69,7 +69,9 @@ SOURCES = \
    walk_ip.cc\
    wrapper.cc\
    mmstd.c claptmpl.cc\
-   febase.cc
+   febase.cc \
+   svd/libs/amp.cpp \
+   svd/libs/ap.cpp
 
 #   links/slInit_Dynamic.cc
 
@@ -118,7 +120,12 @@ SingularHEADERS = \
    table.h \
    tok.h \
    walk.h \
-   fevoices.h
+   fevoices.h \
+   svd_si.h \
+   svd/libs/amp.h  svd/libs/ap.h  svd/libs/stdafx.h \
+   svd/bdsvd.h  svd/bidiagonal.h  svd/blas.h  svd/lq.h  svd/qr.h  svd/reflections.h \
+   svd/rotations.h  svd/svd.h
+
 
 
 # -DMAKE_DISTRIBUTION
