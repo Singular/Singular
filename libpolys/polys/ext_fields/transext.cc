@@ -797,10 +797,6 @@ static BOOLEAN ntGreater(number a, number b, const coeffs cf)
   //check_N(b,cf);
   ntTest(a);
   ntTest(b);
-  number aNumCoeff = NULL; int aNumDeg = 0;
-  number aDenCoeff = NULL; int aDenDeg = 0;
-  number bNumCoeff = NULL; int bNumDeg = 0;
-  number bDenCoeff = NULL; int bDenDeg = 0;
   if (IS0(a))
   {
     if (IS0(b)) return FALSE;
@@ -814,20 +810,22 @@ static BOOLEAN ntGreater(number a, number b, const coeffs cf)
   }
   // now: a!=0, b!=0
   fraction fa = (fraction)a;
-  aNumDeg = p_Totaldegree(NUM(fa), ntRing);
-  aNumCoeff = p_GetCoeff(NUM(fa), ntRing);
+  number aNumCoeff = p_GetCoeff(NUM(fa), ntRing);
+  int aNumDeg = p_Totaldegree(aNumCoeff, ntRing);
+  number aDenCoeff = NULL; int aDenDeg = 0;
   if (DEN(fa)!=NULL)
   {
-    aDenDeg = p_Totaldegree(DEN(fa), ntRing);
     aDenCoeff=p_GetCoeff(DEN(fa),ntRing);
+    aDenDeg = p_Totaldegree(aDenCoeff, ntRing);
   }
   fraction fb = (fraction)b;
-  bNumDeg = p_Totaldegree(NUM(fb), ntRing);
-  bNumCoeff = p_GetCoeff(NUM(fb), ntRing);
+  number bNumCoeff = p_GetCoeff(NUM(fb), ntRing);
+  int bNumDeg = p_Totaldegree(bNumCoeff, ntRing);
+  number bDenCoeff = NULL; int bDenDeg = 0;
   if (DEN(fb)!=NULL)
   {
-    bDenDeg = p_Totaldegree(DEN(fb), ntRing);
     bDenCoeff=p_GetCoeff(DEN(fb),ntRing);
+    bDenDeg = p_Totaldegree(bDenCoeff, ntRing);
   }
   if (aNumDeg-aDenDeg > bNumDeg-bDenDeg) return TRUE;
   if (aNumDeg-aDenDeg < bNumDeg-bDenDeg) return FALSE;
@@ -1814,7 +1812,7 @@ static int ntSize(number a, const coeffs cf)
     noOfTerms += pLength(DEN(f));
   }
   ntTest(a); // !!!!
-  return (numDegree + denDegree + 1) * noOfTerms; // must be >0
+  return ((numDegree + denDegree)*(numDegree + denDegree) + 1) * noOfTerms; // must be >0
 }
 
 /* assumes that src = Q or Z, dst = Q(t_1, ..., t_s) */

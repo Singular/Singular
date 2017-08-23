@@ -363,11 +363,11 @@ BOOLEAN naGreater(number a, number b, const coeffs cf)
   if (naIsZero(a, cf))
   {
     if (naIsZero(b, cf)) return FALSE;
-    return !n_GreaterZero(pGetCoeff((poly)b),cf);
+    return !n_GreaterZero(pGetCoeff((poly)b),naCoeffs);
   }
   if (naIsZero(b, cf))
   {
-    return n_GreaterZero(pGetCoeff((poly)a),cf);
+    return n_GreaterZero(pGetCoeff((poly)a),naCoeffs);
   }
   int aDeg = p_Totaldegree((poly)a, naRing);
   int bDeg = p_Totaldegree((poly)b, naRing);
