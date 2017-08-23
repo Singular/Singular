@@ -6,6 +6,7 @@ bug_misc
 bug_minpoly
 bug_minpoly2
 bug_minpoly_frac
+bug_naGreater
 bug_newstruct
 bug_normalize
 bug_qring2
