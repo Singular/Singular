@@ -869,7 +869,7 @@ PURPOSE:Finding the position of v in V, returns 0, if v is not in V
 static proc isPF(intvec P, intvec I)
 "
 PURPOSE:
-checks, if a word P is a proper praefix of another word I
+checks, if a word P is a praefix of another word I
 "
 {
  int n = size(P);
@@ -877,6 +877,21 @@ checks, if a word P is a proper praefix of another word I
  if (size(I) < n) {return(0);}
  intvec IP = I[1..n];
  if (IP == P) {return(1);}
+ else {return(0);}
+}
+
+static proc isSF(intvec S, intvec I)
+"
+PURPOSE:
+checks, if a word P is a suffix of another word I
+"
+{
+ int n = size(S);
+ if (n <= 0) {return(1);}
+ int m = size(I);
+ if (m < n) {return(0);}
+ intvec IS = I[(m-n+1)..m];
+ if (IS == S) {return(1);}
  else {return(0);}
 }
 
@@ -1173,15 +1188,15 @@ proc lpUfGkDim(ideal G)
   printf("lpUfGraph took %p", rtimer - t); // DEBUG
 
   // check special case 2
-  if (imIsZero(UG)) {
+  intmat zero[nrows(UG),ncols(UG)];
+  if (UG == zero) {
     return (0);
   }
 
   // check special case 3
   UG = topologicalSort(UG);
 
-  int isUpRightTriangle = imIsUpRightTriangle(UG);
-  if (isUpRightTriangle) {
+  if (imIsUpRightTriangle(UG)) {
     UG = eliminateZerosUpTriangle(UG);
     // already ensured that UG != 0
     return(UfGraphURTNZDGrowth(UG));
@@ -1200,17 +1215,13 @@ proc UfGraphURTNZDGrowth(intmat UG) {
     UG[i,i] = 0; // remove all loops
   }
   intmat UGk = UG;
+  intmat zero[nrows(UGk),ncols(UGk)];
   int k = 1;
-  while (!imIsZero(UGk)) {
+  while (UGk != zero) {
     UGk = UGk * UG;
     k++;
   }
   return (k);
-}
-
-proc imIsZero(intmat M) {
-  intmat Zero[nrows(M)][ncols(M)];
-  return (M == Zero);
 }
 
 proc imIsUpRightTriangle(intmat M) {
@@ -1612,6 +1623,108 @@ example
   lpGkDim(I);
   I = x(1)*y(2), x(1)*z(2), z(1)*y(2), z(1)*z(2);//gkDim = 2
   lpGkDim(I);
+}
+
+proc lpGlDimBound(ideal G)
+{
+  intmat GNC = lpGraphOfNChains(G);
+
+  // assuming GNC is connected
+
+  // TODO: maybe loop+cycle checking could be done more efficiently?
+  if (!imHasLoops(GNC) && imIsUpRightTriangle(topologicalSort(GNC))) {
+    // GNC is a DAG
+    intmat GNCk = GNC;
+    intmat zero[1][ncols(GNCk)];
+    int k = 1;
+    // while first row isn't empty
+    while (GNCk[1,1..(ncols(GNCk))] != zero[1,1..(ncols(zero))]) {
+      GNCk = GNCk * GNC;
+      k++;
+    }
+    // k-1 = number of edges in longest path starting from 1
+    return (k-1);
+  } else {
+    // GNC contains loops/cycles => there is always an n-chain
+    return (-1); // infinity
+  }
+}
+
+proc imHasLoops(intmat A) {
+  int n = ncols(A);
+  for (int i = 1; i < n; i++) {
+      if (A[i,i] == 1) {
+	return (1);
+      }
+  }
+  return (0);
+}
+
+proc lpGraphOfNChains(ideal G) // G must be reduced
+{
+  list LG = lpId2ivLi(lead(G));
+  int n = attrib(basering, "lV");
+  int degbound = attrib(basering, "uptodeg");
+
+  list V;
+  for (int i = 0; i <= n; i++) {
+    V[i+1] = i; // add 1 and all variables
+  }
+  for (int i = 1; i <= size(LG); i++) {
+    intvec u = LG[i];
+    for (int j = 2; j <= size(u); j++) {
+      intvec v = u[j..size(u)];
+      if (!contains(V, v)) {
+        V = insert(V, v, size(V)); // add subword j..size
+      }
+    }
+  }
+  int nV = size(V);
+  intmat GNC[nV][nV]; // graph of n-chains
+
+  // for vertex 1
+  for (int i = 2; i <= n + 1; i++) {
+    GNC[1,i] = 1; // 1 has an edge to all variables
+  }
+
+  // for the other vertices
+  for (int i = 2; i <= nV; i++) {
+    for (int j = 2; j <= nV; j++) {
+      intvec uv = V[i],V[j];
+
+      if (contains(LG, uv)) {
+        GNC[i,j] = 1;
+      } else {
+	// Li p. 177
+        // search for a right divisor 'w' of uv in G
+        // then check if G doesn't divide the subword uv-1
+
+	// look for a right divisor in LG
+        for (int k = 1; k <= size(LG); k++) {
+	  if (isSF(LG[k], uv)) {
+	    // w = LG[k]
+	    if(!ivdivides(LG, uv[1..(size(uv)-1)])) {
+	      // G doesn't divide uv-1
+	      GNC[i,j] = 1;
+	      break;
+	    }
+	  }
+	}
+      }
+    }
+  }
+
+  return(GNC);
+}
+
+proc contains(list L, def item)
+{
+  for (int i = 1; i <= size(L); i++) {
+    if (L[i] == item) {
+      return (1);
+    }
+  }
+  return (0);
 }
 
 
@@ -2338,7 +2451,7 @@ example
   lpDHilbertSickle(G,0); // procedure without degreebound
 }
 
-proc lpGlDimBound (ideal I)
+proc lpGlDimBound_OLD (ideal I)
 "USAGE: lpGlDimBound(I); I an ideal
 RETURN: int, an upper bound for the global dimension, -1 means infinity
 PURPOSE: computing an upper bound for the global dimension
