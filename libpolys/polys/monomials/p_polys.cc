@@ -1453,7 +1453,7 @@ poly p_NSet(number n, const ring r)
 * returns the multiplicant m,
 * leaves a and b unmodified
 */
-poly p_Divide(poly a, poly b, const ring r)
+poly p_MDivide(poly a, poly b, const ring r)
 {
   assume((p_GetComp(a,r)==p_GetComp(b,r)) || (p_GetComp(b,r)==0));
   int i;

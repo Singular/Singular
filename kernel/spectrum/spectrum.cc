@@ -355,7 +355,7 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF, const ring r
       //  compute lazy normal form
       // --------------------------
 
-      poly    multiplicant = p_Divide( m,stdJ->m[k],r );
+      poly    multiplicant = p_MDivide( m,stdJ->m[k],r );
       pGetCoeff( multiplicant ) = n_Init(1,r->cf);
 
       poly    nf = p_Mult_mm( p_Copy( stdJ->m[k],r ), multiplicant,r );

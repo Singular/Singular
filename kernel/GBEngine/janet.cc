@@ -77,7 +77,7 @@ int ReducePolyLead(Poly *x,Poly *y)
   if (!x->root || !y->root)
     return 0;
 
-/*  poly b1=pDivide(x->root,y->root);
+/*  poly b1=pMDivide(x->root,y->root);
 
   number gcd=n_Gcd(pGetCoeff(x->root),pGetCoeff(y->root),currRing->cf);
 
@@ -123,7 +123,7 @@ int ReducePoly(Poly *x,poly from,Poly *y)
   if (!x->root || !y->root)
     return 0;
 
-/*  poly b1=pDivide(from,y->root);
+/*  poly b1=pMDivide(from,y->root);
 
   number gcd=n_Gcd(pGetCoeff(from),pGetCoeff(y->root),currRing->cf);
 
@@ -308,8 +308,8 @@ int ValidatePoly(Poly *x, TreeM */*F*/)
 
   if (!g)  return 0; //if not - kill him !
 
-  poly lmX=pDivide(x->lead,g->root);
-  pGetCoeff(lmX)=nInit(1);
+  poly lmX=pMDivide(x->lead,g->root);
+  pSetCoeff0(lmX,nInit(1));
 
 /*  if ((f=is_div_(F,lmX)) != NULL)
   {

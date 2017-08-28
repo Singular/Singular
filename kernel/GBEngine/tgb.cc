@@ -117,7 +117,7 @@ static BOOLEAN polynomial_root (poly h, ring r)
     changed = monomial_root (got, r);
     if(changed)
     {
-      poly div_by = pDivide (copy, got);
+      poly div_by = pMDivide (copy, got);
       poly iter = h;
       while(iter)
       {
@@ -1436,7 +1436,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
     BOOLEAN changed = monomial_root (got, c->r);
     if(changed)
     {
-      poly div_by = pDivide (copy, got);
+      poly div_by = pMDivide (copy, got);
       poly iter = h;
       while(iter)
       {
