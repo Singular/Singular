@@ -1211,71 +1211,10 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
     return TRUE;
   }
   poly p=(poly)(u->Data());
-  if (p==NULL)
-  {
-    res->data=NULL;
-    return FALSE;
-  }
-  if ((pNext(q)!=NULL) && (!rField_is_Ring(currRing)))
-  { /* This means that q != 0 consists of at least two terms.
-       Moreover, currRing is over a field. */
-    if(pGetComp(p)==0)
-    {
-      res->data=(void*)(singclap_pdivide(p /*(poly)(u->Data())*/ ,
+  res->data=(void*)(p_Divide(p /*(poly)(u->Data())*/ ,
                                          q /*(poly)(v->Data())*/ ,currRing));
-    }
-    else
-    {
-      int comps=pMaxComp(p);
-      ideal I=idInit(comps,1);
-      p=pCopy(p);
-      poly h;
-      int i;
-      // conversion to a list of polys:
-      while (p!=NULL)
-      {
-        i=pGetComp(p)-1;
-        h=pNext(p);
-        pNext(p)=NULL;
-        pSetComp(p,0);
-        I->m[i]=pAdd(I->m[i],p);
-        p=h;
-      }
-      // division and conversion to vector:
-      h=NULL;
-      p=NULL;
-      for(i=comps-1;i>=0;i--)
-      {
-        if (I->m[i]!=NULL)
-        {
-          h=singclap_pdivide(I->m[i],q,currRing);
-          pSetCompP(h,i+1);
-          p=pAdd(p,h);
-        }
-      }
-      idDelete(&I);
-      res->data=(void *)p;
-    }
-  }
-  else
-  { /* This means that q != 0 consists of just one term,
-       or that currRing is over a coefficient ring. */
-#ifdef HAVE_RINGS
-    if (!rField_is_Domain(currRing))
-    {
-      WerrorS("division only defined over coefficient domains");
-      return TRUE;
-    }
-    if (pNext(q)!=NULL)
-    {
-      WerrorS("division over a coefficient domain only implemented for terms");
-      return TRUE;
-    }
-#endif
-    res->data = (char *)pDivideM(pCopy(p),pHead(q));
-  }
-  pNormalize((poly)res->data);
-  return FALSE;
+  if (res->data!=NULL) pNormalize((poly)res->data);
+  return errorreported; /*there may be errors in p_Divide*/
 }
 static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
 {
@@ -1922,7 +1861,7 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
   ideal R; matrix U;
   ideal m = idLift(vi,ui,&R, FALSE,hasFlag(v,FLAG_STD),TRUE,&U);
   if (m==NULL) return TRUE;
-  // now make sure that all matices have the corect size:
+  // now make sure that all matrices have the corect size:
   matrix T = id_Module2formatedMatrix(m,vl,ul,currRing);
   int i;
   if (MATCOLS(U) != (int)ul)

@@ -159,6 +159,9 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
 #define  pDivisibleByRingCase(f,g) p_DivisibleByRingCase(f,g,currRing)
 #endif
 
+/// polynomial division, ignoring the rest
+/// via singclap_pdiive resp. idLift
+poly p_Divide(poly a, poly b, const ring r);
 /***************************************************************
  *
  * Copying/Deleteion of polys: args may be NULL
