@@ -37,6 +37,7 @@ PROCEDURES:
 ";
 LIB "algebra.lib";
 LIB "curvepar.lib";
+LIB "modstd.lib";
 ///////////////////////////////////////////////////////////////////////////////
 proc planeCur(ideal I)
 "USAGE":  planeCur(I);  I ideal
