@@ -104,13 +104,11 @@ poly p_Divide(poly p, poly q, const ring r)
             ideal vi=idInit(1,1); vi->m[0]=q;
             ideal ui=idInit(1,1); ui->m[0]=I->m[i];
             ideal R; matrix U;
-            if (r!=currRing)
-            {
-              WerrorS("internal error: idLift not in currRing");
-              return NULL;
-            }
+	    ring save_ring=currRing;
+            if (r!=currRing) rChangeCurrRing(r);
             ideal m = idLift(vi,ui,&R, FALSE,TRUE,TRUE,&U);
-            matrix T = id_Module2formatedMatrix(m,1,1,currRing);
+	    if (r!=save_ring) rChangeCurrRing(save_ring);
+            matrix T = id_Module2formatedMatrix(m,1,1,r);
             h=MATELEM(T,1,1); MATELEM(T,1,1)=NULL;
             id_Delete((ideal*)&T,r);
             id_Delete((ideal*)&U,r);
