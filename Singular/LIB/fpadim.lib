@@ -1188,7 +1188,7 @@ proc lpUfGkDim(ideal G)
   printf("lpUfGraph took %p", rtimer - t); // DEBUG
 
   // check special case 2
-  intmat zero[nrows(UG),ncols(UG)];
+  intmat zero[nrows(UG)][ncols(UG)];
   if (UG == zero) {
     return (0);
   }
@@ -1215,7 +1215,7 @@ proc UfGraphURTNZDGrowth(intmat UG) {
     UG[i,i] = 0; // remove all loops
   }
   intmat UGk = UG;
-  intmat zero[nrows(UGk),ncols(UGk)];
+  intmat zero[nrows(UGk)][ncols(UGk)];
   int k = 1;
   while (UGk != zero) {
     UGk = UGk * UG;
