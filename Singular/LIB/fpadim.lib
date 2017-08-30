@@ -1627,6 +1627,12 @@ example
 
 proc lpGlDimBound(ideal G)
 {
+  for (int i = 1; i <= size(G); i++) {
+    if (ord(G[i]) < 2) {
+      ERROR("The case where G contains single variables is not yet implemented.");
+    }
+  }
+
   intmat GNC = lpGraphOfNChains(G);
 
   // assuming GNC is connected
