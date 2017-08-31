@@ -1544,11 +1544,7 @@ poly p_DivideM(poly a, poly b, const ring r)
   if (a==NULL) { p_Delete(&b,r); return NULL; }
   poly result=a;
   poly prev=NULL;
-#ifdef HAVE_RINGS
   number inv=pGetCoeff(b);
-#else
-  number inv=n_Invers(pGetCoeff(b),r->cf);
-#endif
 
   while (a!=NULL)
   {
@@ -1572,21 +1568,16 @@ poly p_DivideM(poly a, poly b, const ring r)
       }
     }
   }
-#ifdef HAVE_RINGS
-  if (n_IsUnit(inv,r->cf))
+  if ((!rField_is_Ring(r)) || n_IsUnit(inv,r->cf))
   {
     inv = n_Invers(inv,r->cf);
     p_Mult_nn(result,inv,r);
-    n_Delete(&inv, r->cf);
   }
   else
   {
     result = p_Div_nn(result,inv,r);
   }
-#else
-  result = p_Mult_nn(result,inv,r);
   n_Delete(&inv, r->cf);
-#endif
   p_Delete(&b, r);
   return result;
 }

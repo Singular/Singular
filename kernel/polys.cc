@@ -20,22 +20,17 @@ void rChangeCurrRing(ring r)
     currRing->options=si_opt_1 & TEST_RINGDEP_OPTS;
   }
   #endif
+  //------------ set global ring vars --------------------------------
+  currRing = r;
   if( r != NULL )
   {
     rTest(r);
-
-    //------------ set global ring vars --------------------------------
-    currRing = r;
     //------------ global variables related to coefficients ------------
     assume( r->cf!= NULL );
     nSetChar(r->cf);
     //------------ global variables related to polys
     p_SetGlobals(r);
     //------------ global variables related to factory -----------------
-  }
-  else
-  {
-    currRing = NULL;
   }
 }
 
@@ -55,13 +50,15 @@ poly p_Divide(poly p, poly q, const ring r)
         ideal vi=idInit(1,1); vi->m[0]=q;
         ideal ui=idInit(1,1); ui->m[0]=p;
         ideal R; matrix U;
-        if (r!=currRing)
-        {
-          WerrorS("internal error: idLift not in currRing");
-          return NULL;
-        }
+        ring save_ring=currRing;
+        if (r!=currRing) rChangeCurrRing(r);
+        int save_opt;
+        SI_SAVE_OPT1(save_opt);
+        si_opt_1 &= ~(Sy_bit(OPT_PROT));
         ideal m = idLift(vi,ui,&R, FALSE,TRUE,TRUE,&U);
-        matrix T = id_Module2formatedMatrix(m,1,1,currRing);
+        SI_RESTORE_OPT1(save_opt);
+        if (r!=save_ring) rChangeCurrRing(save_ring);
+        matrix T = id_Module2formatedMatrix(m,1,1,r);
         p=MATELEM(T,1,1); MATELEM(T,1,1)=NULL;
         id_Delete((ideal *)&T,r);
         id_Delete((ideal *)&U,r);
@@ -104,10 +101,14 @@ poly p_Divide(poly p, poly q, const ring r)
             ideal vi=idInit(1,1); vi->m[0]=q;
             ideal ui=idInit(1,1); ui->m[0]=I->m[i];
             ideal R; matrix U;
-	    ring save_ring=currRing;
+            ring save_ring=currRing;
             if (r!=currRing) rChangeCurrRing(r);
+            int save_opt;
+            SI_SAVE_OPT1(save_opt);
+            si_opt_1 &= ~(Sy_bit(OPT_PROT));
             ideal m = idLift(vi,ui,&R, FALSE,TRUE,TRUE,&U);
-	    if (r!=save_ring) rChangeCurrRing(save_ring);
+            SI_RESTORE_OPT1(save_opt);
+            if (r!=save_ring) rChangeCurrRing(save_ring);
             matrix T = id_Module2formatedMatrix(m,1,1,r);
             h=MATELEM(T,1,1); MATELEM(T,1,1)=NULL;
             id_Delete((ideal*)&T,r);
