@@ -1,6 +1,6 @@
 //
 version="version grobcov.lib 4.1.0.3 Jun_2017 "; // $Id$
-           // version N;  June_2017;
+           // version N;  Aug_2017;
 category="General purpose";
 info="
 LIBRARY:  grobcov.lib Groebner Cover for parametric ideals.
@@ -2760,6 +2760,7 @@ EXAMPLE:  extendpoly; shows an example"
   def RR=basering;
   def Rx=ringlist(RR);
   def P=ring(Rx[1]);
+  Rx[1]=0;
   def D=ring(Rx);
   def RP=D+P;
   matrix CC; poly Q; list NewMonoms;
