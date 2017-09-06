@@ -2814,7 +2814,121 @@ proc tst_fpadim()
 }
 
 
+/*proc lpSubstituteExpandRing(poly f, list s1, list s2) {*/
+  /*int minDegBound = calcSubstDegBound(f,s1,s2);*/
+/**/
+  /*def R = basering; // curr lp ring*/
+  /*setring ORIGINALRING; // non lp ring TODO*/
+  /*def R1 = makeLetterplaceRing(minDegBound);*/
+  /*setring R1;*/
+/**/
+  /*poly g = lpSubstitute(imap(R,f), imap(R,s1), imap(R,s2));*/
+/**/
+  /*return (R1); // return the new ring*/
+/*}*/
 
+proc lpSubstitute(poly f, list s1, list s2) {
+  poly fs;
+  for (int i = 1; i <= size(f); i++) {
+    poly fis = leadcoef(f[i]);
+    intvec ivfi = lp2iv(f[i]);
+    for (int j = 1; j <= size(ivfi); j++) {
+      int varindex = ivfi[j];
+      int subindex = indexof(s1, varindex);
+      if (subindex > 0) {
+	fis = lpMult(fis, s2[subindex]);
+      } else {
+	fis = lpMult(fis, iv2lp(varindex));
+      }
+    }
+    fs = fs + fis;
+  }
+  return (fs);
+}
+example {
+  LIB "fpadim.lib";
+  ring r = 0,(x,y,z),dp;
+  def R = makeLetterplaceRing(4);
+  setring R;
+
+  poly f = 3*x(1)*x(2)+y(1)*x(2);
+  list s1 = x(1), y(1);
+  list s2 = y(1)*z(2)*z(3), x(1);
+
+  int minDegBound = calcSubstDegBound(f,s1,s2);
+  setring r;
+  def R1 = makeLetterplaceRing(minDegBound);
+  setring R1;
+
+  lpSubstitute(imap(R,f), imap(R,s1), imap(R,s2));
+}
+example {
+  LIB "fpadim.lib";
+  ring r = 0,(x,y,z),dp;
+  def R = makeLetterplaceRing(4);
+  setring R;
+
+  poly f = 3*x(1)*x(2)+y(1)*x(2);
+  poly g = z(1)*x(2)+y(1);
+  poly h = 7*x(1)*z(2)+x(1);
+  list L = f,g,h;
+  list s1 = x(1), y(1);
+  list s2 = y(1)*z(2)*z(3), x(1);
+
+  int minDegBound = calcSubstDegBounds(L,s1,s2);
+  setring r;
+  def R1 = makeLetterplaceRing(minDegBound);
+  setring R1;
+  
+  list L = imap(R,L);
+  list s1 = imap(R,s1);
+  list s2 = imap(R,s2);
+  for (int i = 1; i <= size(L); i++) {
+    lpSubstitute(L[i], s1, s2);
+  }
+}
+
+proc indexof(list L, int varindex) {
+  for (int i = 1; i <= size(L); i++) {
+    if (lp2iv(L[i])[1] == varindex) {
+      return (i);
+    }
+  }
+  return (-1);
+}
+
+proc calcSubstDegBound(poly f, list s1, list s2) {
+  int maxDegBound = 0;
+  for (int i = 1; i <= size(f); i++) {
+    intvec ivfi = lp2iv(f[i]);
+    int tmpDegBound;
+    for (int j = 1; j <= size(ivfi); j++) {
+      int varindex = ivfi[j];
+      int subindex = indexof(s1, varindex);
+      if (subindex > 0) {
+	tmpDegBound = tmpDegBound + deg(s2[subindex]);
+      } else {
+	tmpDegBound = tmpDegBound + 1;
+      }
+    }
+    if (tmpDegBound > maxDegBound) {
+      maxDegBound = tmpDegBound;
+    }
+  }
+  return (maxDegBound);
+}
+
+// convenience method
+proc calcSubstDegBounds(list L, list s1, list s2) {
+  int maxDegBound = 0;
+  for (int i = 1; i <= size(L); i++) {
+    int tmpDegBound = calcSubstDegBound(L[i], s1, s2);
+    if (tmpDegBound > maxDegBound) {
+      maxDegBound = tmpDegBound;
+    }
+  }
+  return (maxDegBound);
+}
 
 
 /*
