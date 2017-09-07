@@ -106,6 +106,13 @@ static void ndPower(number a, int i, number * res, const coeffs r)
     }
   }
 }
+static number ndInvers(number a, const coeffs r)
+{
+  number one=r->cfInit(1,r);
+  number res=r->cfDiv(one,a,r);
+  r->cfDelete(&one,r);
+  return res;
+}
 
 static BOOLEAN ndIsUnit(number a, const coeffs r) { return !r->cfIsZero(a,r); }
 #ifdef LDEBUG
@@ -377,6 +384,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfMPZ = ndMPZ;
     n->cfPower = ndPower;
     n->cfQuotRem = ndQuotRem;
+    n->cfInvers = ndInvers;
 
     n->cfKillChar = ndKillChar; /* dummy */
     n->cfSetChar = ndSetChar; /* dummy */
