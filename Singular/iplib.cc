@@ -1192,7 +1192,8 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
     }
     else
     {
-      Warn("mod_init not found:: %s\nThis is probably not a dynamic module for Singular!\n", dynl_error());
+      Werror("mod_init not found:: %s\nThis is probably not a dynamic module for Singular!\n", dynl_error());
+      errorreported=0;
     }
   }
 
