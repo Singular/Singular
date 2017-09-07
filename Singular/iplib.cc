@@ -1192,8 +1192,7 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
     }
     else
     {
-      Werror("mod_init not found:: %s\nThis is probably not a dynamic module for Singular!\n", dynl_error());
-      killhdl2(pl,&(basePack->idroot),NULL); // remove package
+      Warn("mod_init not found:: %s\nThis is probably not a dynamic module for Singular!\n", dynl_error());
     }
   }
 
