@@ -3020,9 +3020,9 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         {
           int cmp = pGetComp(strat->P.sig);
           int* vv = (int*)omAlloc((currRing->N+1)*sizeof(int));
-          pGetExpV (strat->P.p,vv);
-          pSetExpV (strat->P.sig, vv);
-          pSetComp (strat->P.sig,cmp);
+          p_GetExpV (strat->P.p,vv,currRing);
+          p_SetExpV (strat->P.sig, vv,currRing);
+          p_SetComp (strat->P.sig,cmp,currRing);
 
           strat->P.sevSig = pGetShortExpVector (strat->P.sig);
           int i;
@@ -3071,7 +3071,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         int cmp     = pGetComp(strat->P.sig);
         int max_cmp = IDELEMS(F);
         int* vv = (int*)omAlloc((currRing->N+1)*sizeof(int));
-        pGetExpV (strat->P.p,vv);
+        p_GetExpV (strat->P.p,vv,currRing);
         LObject Q;
         int pos;
         int idx = __p_GetComp(strat->P.sig,currRing);

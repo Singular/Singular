@@ -1921,7 +1921,7 @@ ideal F5main(ideal id, ring r, int opt, int plus, int termination)
     /*
     int* ev = new int[r->N +1];
     for(i=0;i<IDELEMS(id);i++) {
-        pGetExpV(id->m[i],ev);
+        p_GetExpV(id->m[i],ev,currRing);
         //ev2  =   pGetExp(id->m[i],1);
         pWrite(id->m[i]);
         Print("EXP1: %d\n",ev[1]);

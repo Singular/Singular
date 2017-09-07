@@ -216,7 +216,7 @@ int pmFirstVblock(poly p, int lV)
   /* for a monomial p, returns the number of the first block */
   /* where a nonzero exponent is sitting */
   int *e=(int *)omAlloc0((currRing->N+1)*sizeof(int));
-  pGetExpV(p,e);
+  p_GetExpV(p,e,currRing);
   int j,b;
   j = 1;
   while ( (!e[j]) && (j<=currRing->N-1) ) j++;
@@ -247,7 +247,7 @@ int isInV(poly p, int lV)
   int  b = (int)((currRing->N +lV-1)/lV); /* the number of blocks */
   //int b  = (int)(currRing->N)/lV;
   int *B = (int *)omAlloc0((b+1)*sizeof(int)); /* the num of elements in a block */
-  pGetExpV(p,e);
+  p_GetExpV(p,e,currRing);
   int i,j;
   for (j=1; j<=b; j++)
   {
