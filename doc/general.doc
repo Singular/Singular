@@ -2383,6 +2383,7 @@ used for a function, even if it does return a value.
 @node General command syntax, Special characters, The SINGULAR language, The SINGULAR language
 @subsection General command syntax
 @cindex General command syntax
+@index alias
 
 In @sc{Singular} a command is either a declaration, an assignment, a
 call to a function without return value, or a print command. The general
@@ -2395,6 +2396,10 @@ form of a command is described in the following subsections.
 the expression as initial value to it.  Expression is an expression of
 the specified type or one that can be converted to that type.
 @xref{Type conversion and casting}.
+
+@item @code{alias} type name 
+@*Introduces name as an alternative, read-only name for another variable_name.
+Can only be used in procedure headings to avoid copying large data.
 
 @item type name_list @code{=} expression_list @code{;}
 @* declares variables with the given names and assigns successively each
