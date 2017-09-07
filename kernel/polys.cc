@@ -37,14 +37,23 @@ void rChangeCurrRing(ring r)
 poly p_Divide(poly p, poly q, const ring r)
 {
   assume(q!=NULL);
-  if (p==NULL) return NULL;
+  if (p==NULL)
+  {
+    p_Delete(&q,r);
+    return NULL;
+  }
   if (pNext(q)!=NULL)
   { /* This means that q != 0 consists of at least two terms*/
     if(p_GetComp(p,r)==0)
     {
       if ((r->cf->convSingNFactoryN!=ndConvSingNFactoryN)
       &&(!rField_is_Ring(r)))
-        return singclap_pdivide(p, q, r);
+      {
+        poly res=singclap_pdivide(p, q, r);
+        p_Delete(&p,r);
+        p_Delete(&q,r);
+        return res;
+      }
       else
       {
         ideal vi=idInit(1,1); vi->m[0]=q;
@@ -63,7 +72,7 @@ poly p_Divide(poly p, poly q, const ring r)
         id_Delete((ideal *)&T,r);
         id_Delete((ideal *)&U,r);
         id_Delete(&R,r);
-        vi->m[0]=NULL; ui->m[0]=NULL;
+        //vi->m[0]=NULL; ui->m[0]=NULL;
         id_Delete(&vi,r);
         id_Delete(&ui,r);
         return p;
@@ -73,7 +82,6 @@ poly p_Divide(poly p, poly q, const ring r)
     {
       int comps=p_MaxComp(p,r);
       ideal I=idInit(comps,1);
-      p=p_Copy(p,r);
       poly h;
       int i;
       // conversion to a list of polys:
@@ -123,6 +131,7 @@ poly p_Divide(poly p, poly q, const ring r)
         }
       }
       id_Delete(&I,r);
+      p_Delete(&q,r);
       return p;
     }
   }
@@ -141,7 +150,7 @@ poly p_Divide(poly p, poly q, const ring r)
       return NULL;
     }
 #endif
-    return p_DivideM(p_Copy(p,r),p_Head(q,r),r);
+    return p_DivideM(p,q,r);
   }
   return FALSE;
 }

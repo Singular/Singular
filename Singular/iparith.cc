@@ -1204,15 +1204,15 @@ static BOOLEAN jjDIV_N(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
 {
-  poly q=(poly)v->Data();
+  poly q=(poly)v->CopyD();
   if (q==NULL)
   {
     WerrorS(ii_div_by_0);
     return TRUE;
   }
-  poly p=(poly)(u->Data());
-  res->data=(void*)(p_Divide(p /*(poly)(u->Data())*/ ,
-                                         q /*(poly)(v->Data())*/ ,currRing));
+  poly p=(poly)(u->CopyD());
+  res->data=(void*)(p_Divide(p /*(poly)(u->CopyD())*/ ,
+                                         q /*(poly)(v->CopyD())*/ ,currRing));
   if (res->data!=NULL) pNormalize((poly)res->data);
   return errorreported; /*there may be errors in p_Divide*/
 }

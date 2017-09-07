@@ -161,6 +161,7 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
 
 /// polynomial division, ignoring the rest
 /// via singclap_pdiive resp. idLift
+/// destroyes a,b
 poly p_Divide(poly a, poly b, const ring r);
 /***************************************************************
  *
