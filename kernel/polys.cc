@@ -42,6 +42,11 @@ poly p_Divide(poly p, poly q, const ring r)
     p_Delete(&q,r);
     return NULL;
   }
+  if (q==NULL)
+  {
+    WerrorS("div. by 0");
+    return NULL;
+  }
   if (pNext(q)!=NULL)
   { /* This means that q != 0 consists of at least two terms*/
     if(p_GetComp(p,r)==0)
