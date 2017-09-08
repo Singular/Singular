@@ -24,7 +24,7 @@
 New syntax:
 @itemize
 @item @code{alias}: may be used as a prefix to a variable declaration.
-Can only be used in procedure headings. (@xref{alias}).
+Can only be used in procedure headings. (@xref{General command synta}).
 @end itemize
 
 Extended commands:
