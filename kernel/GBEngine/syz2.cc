@@ -668,7 +668,7 @@ Print(" mit index %d, %d ",tso.ind1,tso.ind2);
         {
           number n=nInvers(pGetCoeff(tso.p));
           pNorm(tso.p);
-          pMult_nn(tso.syz,n);
+          tso.syz=__p_Mult_nn(tso.syz,n,currRing);
           nDelete(&n);
         }
         if (k==IDELEMS((syzstr->res)[index]))

@@ -3553,7 +3553,7 @@ spectrumState   spectrumStateFromList( spectrumPolyList& speclist, lists *L,int 
                         //  normalize coefficient
 
             number inv = nInvers( pGetCoeff( f ) );
-            pMult_nn( search->nf,inv );
+            search->nf=__p_Mult_nn( search->nf,inv,currRing );
             nDelete( &inv );
 
                         //  exchange  normal forms
@@ -3612,7 +3612,7 @@ spectrumState   spectrumStateFromList( spectrumPolyList& speclist, lists *L,int 
             else if( cmp==0 )
             {
               search->nf = pSub( search->nf,
-                                 ppMult_nn( (*node)->nf,pGetCoeff( f ) ) );
+                                 __pp_Mult_nn( (*node)->nf,pGetCoeff( f ),currRing ) );
               pNorm( search->nf );
             }
           }

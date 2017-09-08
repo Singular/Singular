@@ -692,7 +692,7 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
 #ifdef WRITE_BUCKETS
               PrintS("multiplied with: ");nWrite(up);PrintLn();
 #endif
-              pMult_nn(syz,up);
+              syz=__p_Mult_nn(syz,up,currRing);
             }
             nDelete(&up);
 

@@ -2993,7 +2993,7 @@ static poly redNFTail (poly h, const int sl, kStrategy strat, int len)
           coef = kBucketPolyRed (P.bucket, strat->S[j],
                                  strat->lenS[j] /*pLength(strat->S[j]) */ ,
                                  strat->kNoether);
-        pMult_nn (res, coef);
+        res=__p_Mult_nn (res, coef, currRing);
         nDelete (&coef);
         h = kBucketGetLm (P.bucket);
         pTest (h);

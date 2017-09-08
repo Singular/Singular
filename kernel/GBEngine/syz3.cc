@@ -893,7 +893,7 @@ PrintLn();
     {
       n=nInvers(pGetCoeff(tso.p));
       pNorm(tso.p);
-      pMult_nn(tso.syz,n);
+      tso.syz=__p_Mult_nn(tso.syz,n,currRing);
       nDelete(&n);
     }
     new_generators->m[ng_place] = tso.p;
@@ -1329,7 +1329,7 @@ PrintLn();
     {
       n=nInvers(pGetCoeff(tso.p));
       pNorm(tso.p);
-      pMult_nn(tso.syz,n);
+      tso.syz=__p_Mult_nn(tso.syz,n,currRing);
       nDelete(&n);
     }
   }
