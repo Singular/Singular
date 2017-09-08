@@ -904,6 +904,7 @@ static inline poly p_Mult_nn(poly p, number n, const ring r)
   } else
     return r->p_Procs->p_Mult_nn(p, n, r);
 }
+#define __p_Mult_nn(p,n,r) r->p_Procs->p_Mult_nn(p, n, r)
 
 static inline poly p_Mult_nn(poly p, number n, const ring lmRing,
                         const ring tailRing)
@@ -924,9 +925,12 @@ static inline poly pp_Mult_nn(poly p, number n, const ring r)
 {
   if (n_IsOne(n, r->cf))
     return p_Copy(p, r);
+  else if (n_IsZero(n, r->cf))
+    return NULL;
   else
     return r->p_Procs->pp_Mult_nn(p, n, r);
 }
+#define __pp_Mult_nn(p,n,r) r->p_Procs->pp_Mult_nn(p, n, r)
 
 // test if the monomial is a constant as a vector component
 // i.e., test if all exponents are zero
@@ -958,18 +962,16 @@ static inline BOOLEAN p_LmIsConstant(const poly p, const ring r)
 static inline poly pp_Mult_mm(poly p, poly m, const ring r)
 {
   if (p_LmIsConstant(m, r))
-    return pp_Mult_nn(p, pGetCoeff(m), r);
+    return __pp_Mult_nn(p, pGetCoeff(m), r);
   else
-  {
     return r->p_Procs->pp_Mult_mm(p, m, r);
-  }
 }
 
 // returns p*m, destroys p, const: m
 static inline poly p_Mult_mm(poly p, poly m, const ring r)
 {
   if (p_LmIsConstant(m, r))
-    return p_Mult_nn(p, pGetCoeff(m), r);
+    return __p_Mult_nn(p, pGetCoeff(m), r);
   else
     return r->p_Procs->p_Mult_mm(p, m, r);
 }

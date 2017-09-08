@@ -2525,14 +2525,14 @@ poly noro_red_non_unique (poly p, int &len, NoroCache * cache, slimgb_alg * c)
           t = p_Copy (red.p, currRing);
         }
         else
-          t = pp_Mult_nn (red.p, red.coef, currRing);
+          t = __pp_Mult_nn (red.p, red.coef, currRing);
       }
       else
       {
         if(npIsOne (red.coef))
           t = red.p;
         else
-          t = p_Mult_nn (red.p, red.coef, currRing);
+          t = __p_Mult_nn (red.p, red.coef, currRing);
       }
       kBucket_Add_q (bucket, t, &red.len);
     }

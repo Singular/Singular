@@ -1571,7 +1571,7 @@ poly p_DivideM(poly a, poly b, const ring r)
   if ((!rField_is_Ring(r)) || n_IsUnit(inv,r->cf))
   {
     inv = n_Invers(inv,r->cf);
-    p_Mult_nn(result,inv,r);
+    __p_Mult_nn(result,inv,r);
   }
   else
   {
@@ -2431,7 +2431,7 @@ void p_Content(poly ph, const ring r)
           while (p!=NULL)
           { // each monom: coeff in Q_a (Z_a)
             fraction f=(fraction)pGetCoeff(p);
-            NUM(f)=p_Mult_nn(NUM(f),h,r->cf->extRing);
+            NUM(f)=__p_Mult_nn(NUM(f),h,r->cf->extRing);
             p_Normalize(NUM(f),r->cf->extRing);
             pIter(p);
           }
@@ -3131,7 +3131,7 @@ void p_ProjectiveUnique(poly ph, const ring r)
         nMapFunc nMap;
         nMap= n_SetMap (C->extRing->cf, C);
         number ninv= nMap (n,C->extRing->cf, C);
-        p=p_Mult_nn (p, ninv, r);
+        p=__p_Mult_nn (p, ninv, r);
         n_Delete (&ninv, C);
         n_Delete (&n, C->extRing->cf);
       }
@@ -4312,13 +4312,13 @@ static poly p_Invers(int n,poly u,intvec *w, const ring R)
   if(n==0)
     return v;
   short *ww=iv2array(w,R);
-  poly u1=p_JetW(p_Sub(p_One(R),p_Mult_nn(u,u0,R),R),n,ww,R);
+  poly u1=p_JetW(p_Sub(p_One(R),__p_Mult_nn(u,u0,R),R),n,ww,R);
   if(u1==NULL)
   {
     omFreeSize((ADDRESS)ww,(rVar(R)+1)*sizeof(short));
     return v;
   }
-  poly v1=p_Mult_nn(p_Copy(u1,R),u0,R);
+  poly v1=__p_Mult_nn(p_Copy(u1,R),u0,R);
   v=p_Add_q(v,p_Copy(v1,R),R);
   for(int i=n/p_MinDeg(u1,w,R);i>1;i--)
   {

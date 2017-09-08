@@ -346,7 +346,7 @@ poly singclap_resultant ( poly f, poly g , poly x, const ring r)
         number n=n_Invers(nf,r->cf);
         while(eg>0)
         {
-          res=p_Mult_nn(res,n,r);
+          res=__p_Mult_nn(res,n,r);
           eg--;
         }
         n_Delete(&n,r->cf);
@@ -357,7 +357,7 @@ poly singclap_resultant ( poly f, poly g , poly x, const ring r)
         number n=n_Invers(ng,r->cf);
         while(ef>0)
         {
-          res=p_Mult_nn(res,n,r);
+          res=__p_Mult_nn(res,n,r);
           ef--;
         }
         n_Delete(&n,r->cf);
@@ -1130,7 +1130,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
     p_Delete(&ff,r);
     if (N!=NULL)
     {
-      p_Mult_nn(res->m[0],N,r);
+      __p_Mult_nn(res->m[0],N,r);
       n_Delete(&N,r->cf);
       N=NULL;
     }
@@ -1427,7 +1427,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
     }
     if (N!=NULL)
     {
-      p_Mult_nn(res->m[0],N,r);
+      __p_Mult_nn(res->m[0],N,r);
       n_Delete(&N,r->cf);
       N=NULL;
     }

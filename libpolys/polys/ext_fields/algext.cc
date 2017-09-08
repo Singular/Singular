@@ -1247,7 +1247,7 @@ void naClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, co
   n_ClearContent(itr, cc, Q); // TODO: get rid of (-LC) normalization!?
 
   // over alg. ext. of Q // takes over the input number
-  c = (number) p_Mult_nn( (poly)c, cc, R);
+  c = (number) __p_Mult_nn( (poly)c, cc, R);
 //      p_Mult_q(p_NSet(cc, R), , R);
 
   n_Delete(&cc, Q);

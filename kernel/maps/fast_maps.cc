@@ -443,7 +443,7 @@ static int maPoly_Substitute(macoeff c, poly p, ring dest_r)
   while (c!=NULL)
   {
     done++;
-    poly t=pp_Mult_nn(p,c->n,dest_r);
+    poly t=__pp_Mult_nn(p,c->n,dest_r);
     #ifdef HAVE_RINGS
     if (zero_div) len=pLength(t);
     #endif

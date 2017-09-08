@@ -4668,7 +4668,7 @@ void enterExtendedSpoly(poly h,kStrategy strat)
       nDelete(&tmp);
     }
     p_Test(p,strat->tailRing);
-    p = pp_Mult_nn(p, gcd, strat->tailRing);
+    p = __pp_Mult_nn(p, gcd, strat->tailRing);
     nDelete(&gcd);
 
     if (p != NULL)
@@ -4751,7 +4751,7 @@ void enterExtendedSpolySig(poly h,poly hSig,kStrategy strat)
       nDelete(&tmp);
     }
     p_Test(p,strat->tailRing);
-    p = pp_Mult_nn(p, gcd, strat->tailRing);
+    p = __pp_Mult_nn(p, gcd, strat->tailRing);
 
     if (p != NULL)
     {
@@ -4785,7 +4785,7 @@ void enterExtendedSpolySig(poly h,poly hSig,kStrategy strat)
       Lp.p = tmp;
       //printf("\nOld\n");pWrite(h);pWrite(hSig);
       #if EXT_POLY_NEW
-      Lp.sig = pp_Mult_nn(hSig, gcd, currRing);
+      Lp.sig = __pp_Mult_nn(hSig, gcd, currRing);
       if(Lp.sig == NULL || nIsZero(pGetCoeff(Lp.sig)))
       {
         #ifdef ADIDEBUG

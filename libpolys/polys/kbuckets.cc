@@ -593,7 +593,7 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
     {
 #ifdef USE_COEF_BUCKETS
       if (i<coef_start)
-        bucket->buckets[i] = p_Mult_nn(bucket->buckets[i], n, r);
+        bucket->buckets[i] = __p_Mult_nn(bucket->buckets[i], n, r);
         /* Frank Seelisch on March 11, 2010:
            This looks a bit strange: The following "if" is indented
            like the previous line of code. But coded as it is,
@@ -609,14 +609,14 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
       else
       if (bucket->coef[i]!=NULL)
       {
-        bucket->coef[i] = p_Mult_nn(bucket->coef[i],n,r);
+        bucket->coef[i] = __p_Mult_nn(bucket->coef[i],n,r);
       }
       else
       {
         bucket->coef[i] = p_NSet(n_Copy(n,r),r);
       }
 #else
-      bucket->buckets[i] = p_Mult_nn(bucket->buckets[i], n, r);
+      bucket->buckets[i] = __p_Mult_nn(bucket->buckets[i], n, r);
       if (rField_is_Ring(r) && !(rField_is_Domain(r)))
       {
         bucket->buckets_length[i] = pLength(bucket->buckets[i]);
@@ -627,7 +627,7 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
   }
   kbTest(bucket);
 #else
-  bucket->p = p_Mult_nn(bucket->p, n, bucket->bucket_ring);
+  bucket->p = __p_Mult_nn(bucket->p, n, bucket->bucket_ring);
 #endif
 }
 
@@ -857,7 +857,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
       number backup=p_GetCoeff(m,r);
 
       p_SetCoeff0(m,add_coef,r);
-      bucket->buckets[i]=p_Mult_nn(bucket->buckets[i],orig_coef,r);
+      bucket->buckets[i]=__p_Mult_nn(bucket->buckets[i],orig_coef,r);
 
       n_Delete(&orig_coef,r);
       p_Delete(&bucket->coef[i],r);
@@ -927,8 +927,8 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
         n=gcd;
       }
       //assume(n_IsOne(n,r));
-      bucket->buckets[i]=p_Mult_nn(bucket->buckets[i],orig_coef,r);
-      p1=p_Mult_nn(p1,add_coef,r);
+      bucket->buckets[i]=__p_Mult_nn(bucket->buckets[i],orig_coef,r);
+      p1=__p_Mult_nn(p1,add_coef,r);
 
       p1 = p_Add_q(p1, bucket->buckets[i],r);
       l1=pLength(p1);
@@ -946,7 +946,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
       #ifdef USE_COEF_BUCKETS
       if(!(n_IsOne(n,r)))
       {
-        p1=p_Mult_nn(p1, n, r);
+        p1=__p_Mult_nn(p1, n, r);
         n_Delete(&n,r);
         n=n_Init(1,r);
       }
@@ -1105,7 +1105,7 @@ number kBucketPolyRed(kBucket_pt bucket,
 
       /* correct factor for cancelation by changing sign if an=-1 */
       if (rField_is_Ring(r))
-        lm = p_Mult_nn(lm, an, r);
+        lm = __p_Mult_nn(lm, an, r);
       else
         kBucket_Mult_n(bucket, an);
     }
@@ -1280,7 +1280,7 @@ poly kBucketExtractLmOfBucket(kBucket_pt bucket, int i)
       bucket->buckets[i]=next;
       number c=p_GetCoeff(bucket->coef[i],r);
       pNext(p)=NULL;
-      p=p_Mult_nn(p,c,r);
+      p=__p_Mult_nn(p,c,r);
       assume(p!=NULL);
       return p;
     }
