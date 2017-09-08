@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="version autgradalg.lib 4.1.0.3 Sep_2017 "; //$Id$
 category="Commutative Algebra, Algebraic Geometry";
 info="
 LIBRARY: autgradalg.lib   Compute automorphism groups of pointedly graded algebras and of Mori dream spaces.
@@ -29,7 +29,7 @@ autX(I0, w, TOR): compute the automorphism group of X=X(R,w) as an algebraic sub
 NOTE: the following functions were taken from 'quotsingcox.lib' by M.Donten-Bury and S.Keicher: 'hilbBas'.
 
 KEYWORDS: automorphisms; graded algebra; Mori dream spaces; automorphism group; symmetries
-";  
+";
 
 /* Printlevel settings:
  * 0: Silent mode
@@ -70,7 +70,7 @@ ASSUME: the basering must be graded (see setBaseMultigrading()) and the cone ove
 PURPOSE: returns a basis for the component I_w of the ideal; if dd = 0, a list of basis vectors is returned, if dd = 1, a list of monomials is returned.
 RETURN: a list L where L[1] is a list of all monomials of degree w and L[2] is list of polynomials.
 EXAMPLE: shows an example."
-{ 
+{
   list TOR;
   if(size(#) > 0 and typeof(#) == "list" and typeof(#[1]) == "int"){
     TOR = #[1];
@@ -129,10 +129,10 @@ EXAMPLE: shows an example."
   // translate back to polynomials unless 'basevecs' specified:
   if(dd == 0){
     L[2] = Iw;
-    return(L); 
+    return(L);
   }
 
-  matrix MONmat[1][size(MON)] = MON[1..size(MON)]; 
+  matrix MONmat[1][size(MON)] = MON[1..size(MON)];
   matrix Iwmat[size(Iw)][size(MON)];
 
   for(m = 1; m <= size(Iw); m++){
@@ -154,15 +154,15 @@ example
 
   // 1st example /////////
   // example with torsion: ZZ + ZZ/5ZZ:
-  intmat Q[2][5] = 
+  intmat Q[2][5] =
     1,1,1,1,1,
     2,3,1,4,0;
 
   list TOR = 5;
   ring R = 0,T(1..5),dp;
-  
+
   // attach degree matrix Q to R:
-  setBaseMultigrading(Q); 
+  setBaseMultigrading(Q);
 
   ideal I = T(1)*T(2) + T(3)*T(4) + T(5)^2;
   intvec w = 3,1;
@@ -182,7 +182,7 @@ example
     1, 1, 1, 1;
 
   // attach degree matrix Q to R:
-  setBaseMultigrading(Q); 
+  setBaseMultigrading(Q);
 
   ideal I = T(1)*T(2) + T(3)*T(4);
   intvec w = 0,2;
@@ -199,7 +199,7 @@ example
 
   // 3rd example /////////
   // torsion, parameter and 2 generators:
-  intmat Q[3][6] = 
+  intmat Q[3][6] =
     1,1,1,1,1,1,
     -1,1,1,-1,0,0,
     0,0,1,1,1,0;
@@ -210,9 +210,9 @@ example
   ring R = (0,lam),T(1..6),dp;
 
   // attach degree matrix Q to R:
-  setBaseMultigrading(Q); 
+  setBaseMultigrading(Q);
 
-  ideal I = 
+  ideal I =
     T(1)*T(2) + T(3)*T(4) + T(5)^2,
     lam*T(3)*T(4) + T(5)^2 + T(6)^2;
 
@@ -235,8 +235,8 @@ static proc gradedCompIdeal2basevecs(intvec w, intmat Q, ideal RL, list MON, lis
   list EL;
 
   for(int j = 1; j <= size(RLw); j++){
-    // translate e.g. T[1]^3-T[1]*T[2]^2 to e_1-e_3  
-    // if T[1]^3 is the 1st entry and T[1]*T[2]^2 the 3rd entry 
+    // translate e.g. T[1]^3-T[1]*T[2]^2 to e_1-e_3
+    // if T[1]^3 is the 1st entry and T[1]*T[2]^2 the 3rd entry
     // store then 1 in v[...] and -1 in v[...]:
     matrix v[1][size(MON)] = 0:size(MON); // Elements are in the coef-ring
 
@@ -263,7 +263,7 @@ example
     1, 1, 1, 1;
 
   // attach degree matrix Q to R:
-  setBaseMultigrading(Q); 
+  setBaseMultigrading(Q);
 
   ideal I = T(1)*T(2) + T(3)*T(4);
 
@@ -279,9 +279,9 @@ example
 //
 // Returns vector space generators for all polynomials of degree w
 // by shifting the generators in RL to degree w by a monomial.
-// 
+//
 // Returns a list of polynomials.
-// 
+//
 static proc gradedCompIdealhelper(intvec w, intmat Q, ideal RL, list #){
 
   list TOR;
@@ -300,18 +300,18 @@ static proc gradedCompIdealhelper(intvec w, intmat Q, ideal RL, list #){
       RLw[size(RLw)+1] = RL[i];
     } else {
       // if delta is not in cQ, then there is no monomial of this degree:
-      if(containsInSupport(cQ, delta)){
-	// calculate all monomials of degree delta
-	list deltaMON = wmonomials(delta, 0, TOR);
+      if(containsInSupportOld(cQ, delta)){
+        // calculate all monomials of degree delta
+        list deltaMON = wmonomials(delta, 0, TOR);
 
-	for(int k = 1; k <= size(deltaMON); k++){
-	  poly m = deltaMON[k];
-	  RLw[size(RLw)+1] = RL[i] * m;
+        for(int k = 1; k <= size(deltaMON); k++){
+          poly m = deltaMON[k];
+          RLw[size(RLw)+1] = RL[i] * m;
 
-	  kill m;
-	}
+          kill m;
+        }
 
-	kill k;
+        kill k;
       }
     }
 
@@ -319,7 +319,7 @@ static proc gradedCompIdealhelper(intvec w, intmat Q, ideal RL, list #){
   }
 
   return(RLw);
-} 
+}
 example
 {
   echo=2;
@@ -332,7 +332,7 @@ example
     1, 1, 1, 1;
 
   // attach degree matrix Q to R:
-  setBaseMultigrading(Q); 
+  setBaseMultigrading(Q);
 
   ideal I = T(1)*T(2) + T(3)*T(4);
 
@@ -344,10 +344,10 @@ example
 
 static proc wmonomials(intvec w1, int dd, list #)
   "USAGE: wmonomials(w, dd): w is an intvec and dd either 1 or 0; 1 means that the funtion should compute a list of exponent vectors and 0 means the function should compute a list of monomials. As an optional third argument a list of integers may be provided to indicate that the last rows of the degree matrix are residue classes in ZZ/aZZ. For instance [2,3] means that the second to last row consists of elements in ZZ/2ZZ and the last one of elements in ZZ/3ZZ.
-ASSUME: the basering must be graded (see setBAseMultigrading()) and the cone over 
+ASSUME: the basering must be graded (see setBAseMultigrading()) and the cone over
 the degrees of the variables must be pointed; there mustn't be 0-degrees.
 PURPOSE: computes all monomials T^\nu with deg(T^\nu) = w where
-the degree of the i-th variable of the basering is assumed to have 
+the degree of the i-th variable of the basering is assumed to have
 RETURN: a list of monomials or a list of their exponent vectors if a second argument is provided (an integer).
 EXAMPLE: shows an example."
 {
@@ -375,7 +375,7 @@ EXAMPLE: shows an example."
   } else {
     // deg(T_i) =...
     intmat Q = Qfull;
-    
+
     // for easier multiplication:
     intvec w0 = w1;
     bigintmat w[1][size(w0)] = w0[1..size(w0)];
@@ -386,11 +386,11 @@ EXAMPLE: shows an example."
   cone cd = dualCone(c);
   bigintmat v = transpose(relativeInteriorPoint(cd)); // 1 column
 
-  // if dotprod(a,w) > dotprod(v,w), then 
+  // if dotprod(a,w) > dotprod(v,w), then
   // we need not consider T^a any more
   // --> gives a degree bound bnd:
   bigint bnd = (w * v)[1,1];
-  
+
   // traverse all possible exponents v_i of T_i:
   // i-th entry of BNDlist will be maximum exponent for T_i
   // such that the bound can still be satisfied.
@@ -403,7 +403,7 @@ EXAMPLE: shows an example."
     bigintmat vi[1][size(coli)] = coli[1..nrows(Q)];
 
     while(((bndi * vi) * v)[1,1] < bnd){
-      bndi++;    
+      bndi++;
     }
 
     BNDlist[i] = bndi;
@@ -416,49 +416,49 @@ EXAMPLE: shows an example."
   // that still satisfy the bound condition
   //
   // NOTE: this is rather brute-force,
-  // but its running time is dominated by the 
+  // but its running time is dominated by the
   // other steps.
   list sol;
   list WL0 = wmonomialsRec(v, bnd, Q, BNDlist, sol); // candidates
 
-  // - in case of no torsion: 
-  //   select those ww out of WL0 with Q*ww = w0 
-  // - if case of torsion: 
-  //   select those ww out of WL0 with reduce(Q*ww) = w1 
+  // - in case of no torsion:
+  //   select those ww out of WL0 with Q*ww = w0
+  // - if case of torsion:
+  //   select those ww out of WL0 with reduce(Q*ww) = w1
   //   where reduce() means to take the last elements mod TOR[i]:
   list WL;
 
   for(int m = 1; m <= size(WL0); m++){
     list v0 = WL0[m];
     intvec vv = v0[1..size(v0)];
-    //bigintmat vv[1][size(v0)] = v0[1..size(v0)];     
+    //bigintmat vv[1][size(v0)] = v0[1..size(v0)];
 
-    if(size(TOR) == 0){ // free case 
+    if(size(TOR) == 0){ // free case
       if(Q * vv == w0){
-	WL[size(WL) + 1] = vv;
+        WL[size(WL) + 1] = vv;
       }
     } else { // torsion case
       // reduce the last entries mod p:
-      intvec Qvvred = Qfull * vv;     
+      intvec Qvvred = Qfull * vv;
       intvec w1red = w1;
       int pos;
 
-      for(int l = 1; l <= size(TOR); l++){	
-	pos = nrows(Qfull) - size(TOR) + l;
-	Qvvred[pos] = Qvvred[pos] mod TOR[l];
-	w1red[pos] = w1red[pos] mod TOR[l];
+      for(int l = 1; l <= size(TOR); l++){
+        pos = nrows(Qfull) - size(TOR) + l;
+        Qvvred[pos] = Qvvred[pos] mod TOR[l];
+        w1red[pos] = w1red[pos] mod TOR[l];
 
-	// make positive: e.g. -1 becomes 4 in ZZ/5ZZ:
-	if(Qvvred[pos] < 0){
-	  Qvvred[pos] = Qvvred[pos] + TOR[l];
-	}
-	if(w1red[pos] < 0){
-	  w1red[pos] = w1red[pos] + TOR[l];
-	}
+        // make positive: e.g. -1 becomes 4 in ZZ/5ZZ:
+        if(Qvvred[pos] < 0){
+          Qvvred[pos] = Qvvred[pos] + TOR[l];
+        }
+        if(w1red[pos] < 0){
+          w1red[pos] = w1red[pos] + TOR[l];
+        }
       }
 
       if(Qvvred == w1red){
-	WL[size(WL) + 1] = vv;
+        WL[size(WL) + 1] = vv;
       }
 
       kill pos, l, Qvvred, w1red;
@@ -486,15 +486,15 @@ example
   echo=2;
 
   // example with torsion: ZZ + ZZ/5ZZ:
-  intmat Q[2][5] = 
+  intmat Q[2][5] =
     1,1,1,1,1,
     2,3,1,4,0;
 
   list TOR = 5;
   ring R = 0,T(1..5),dp;
-  
+
   // attach degree matrix Q to R:
-  setBaseMultigrading(Q); 
+  setBaseMultigrading(Q);
 
   ideal I = T(1)*T(2) + T(3)*T(4) + T(5)^2;
   intvec w = 2,0;
@@ -512,7 +512,7 @@ example
     1, 1, 1, 1;
 
   // attach degree matrix Q to R:
-  setBaseMultigrading(Q); 
+  setBaseMultigrading(Q);
 
   intvec w = 0,2;
 
@@ -538,10 +538,10 @@ static proc wmonomialsRec(bigintmat v, bigint bnd, intmat Q, intvec BNDs, list s
 
   for(int i = 0; i <= BNDs[pos]; i++){
     list sol0 = sol;
-    sol0[pos] = i;  
+    sol0[pos] = i;
 
     list sol0tmp = sol;
-    
+
     for(int k = 1; k <= nvars(basering)-size(sol); k++){
       sol0tmp[size(sol)+k] =  0;
     }
@@ -634,17 +634,17 @@ static proc autGenWeightsTorsion(intmat Q, list TOR, list Origs, list OrigDim){
     Q0[i, 1..ncols(Q)] = Q[i, 1..ncols(Q)];
   }
 
-  // compute automorphisms B in AUT0 fixing the free part of 
+  // compute automorphisms B in AUT0 fixing the free part of
   // the generator weights:
   list AUT0 = autGenWeights(Q0);
   list AUT;
 
   // each element of AUT should be of shape
-  // 
-  // B | 0 
+  //
+  // B | 0
   // C | D
   //
-  // where D = diag(d1,..,dn) and C has entries 
+  // where D = diag(d1,..,dn) and C has entries
   // 0 <= c_ij < TOR[i]
 
   // form all possible C-matrices and D-matrices:
@@ -657,14 +657,13 @@ static proc autGenWeightsTorsion(intmat Q, list TOR, list Origs, list OrigDim){
   for(i = 1; i <= size(AUT0); i++){
     for(j = 1; j <= size(CL); j++){
       for(k = 1; k <= size(DL); k++){
-	intmat A = concatBCD(AUT0[i], CL[j], DL[k]);
-	  
-	// M * Origs = Origs?:
-	if(fixesOrig(A, Origs, OrigDim, TOR)){
-	  AUT[size(AUT)+1] = A;
-	}
+        intmat A = concatBCD(AUT0[i], CL[j], DL[k]);
+        // M * Origs = Origs?:
+        if(fixesOrig(A, Origs, OrigDim, TOR)){
+          AUT[size(AUT)+1] = A;
+        }
 
-	kill A;
+        kill A;
       }
     }
   }
@@ -696,7 +695,7 @@ static proc allLatticeBases(list QQ){
     // translate J to a 'subset' QJ (given as a list) of QQ:
     for(j = 1; j <= size(J); j++){
       if(J[j] == 1){
-	QJ[size(QJ) + 1] = QQ[j];
+        QJ[size(QJ) + 1] = QQ[j];
       }
     }
 
@@ -705,10 +704,10 @@ static proc allLatticeBases(list QQ){
       intmat QJmat[size(QQ[1])][d];
 
       for(int k = 1; k <= d; k++){
-	QJmat[1..size(QQ[1]), k] = QJ[k];
+        QJmat[1..size(QQ[1]), k] = QJ[k];
       }
       if(absValue(det(QJmat)) == 1){
-	Bases[size(Bases)+1] = QJmat;
+        Bases[size(Bases)+1] = QJmat;
       }
 
       kill QJmat, k;
@@ -716,7 +715,7 @@ static proc allLatticeBases(list QQ){
 
     kill QJ, J;
   }
-  
+
   if(size(Bases) < 1){
     // for only one row, it is ok to return simply [1]:
     if(d == 1){
@@ -741,16 +740,16 @@ static proc autGenWeightsFree(list QQ, list Origs, list OrigDim)
   list Bases = allLatticeBases(QQ);
 
   dbprint(printlevel, "Number of bases: " + string(size(Bases)));
-  
+
   // take only those A, with A*Origs = Origs:
   list G;
 
   // Any basis is mapped to another basis,
   // so it suffices to fix one basis A and
   // see where it is mapped to.
-  intmat A = Bases[1]; 
+  intmat A = Bases[1];
   list AA;
-  
+
   for(int j = 1; j <= ncols(A); j++){
     AA[size(AA)+1] = col(A, j);
   }
@@ -767,7 +766,7 @@ static proc autGenWeightsFree(list QQ, list Origs, list OrigDim)
     intmat Ainv = intInverse(A);
   }
 
-  // we also have to consider permutations of each 
+  // we also have to consider permutations of each
   // "image basis":
   int d = size(QQ[1]);
   intvec vd = 1..d;
@@ -775,7 +774,7 @@ static proc autGenWeightsFree(list QQ, list Origs, list OrigDim)
   list PER = permutations(Ld, list());
 
   dbprint(printlevel, "Number of permutations: " + string(size(PER)));
-  
+
   int b;
   list RES;
 
@@ -789,35 +788,35 @@ static proc autGenWeightsFree(list QQ, list Origs, list OrigDim)
       list sigma = PER[b];
 
       for(int k = 1; k <= d; k++){
-	// the k-th col of B is the
-	// sigma(k)-th one of B0:
-	intvec v = col(B0, sigma[k]);
-	B[1..nrows(B0), k] = v[1..size(v)];
+        // the k-th col of B is the
+        // sigma(k)-th one of B0:
+        intvec v = col(B0, sigma[k]);
+        B[1..nrows(B0), k] = v[1..size(v)];
 
-	kill v;
+        kill v;
       }
 
-      // init M: note that det(M) = +-1 
+      // init M: note that det(M) = +-1
       // since det(B)=+-1 and det(Ainv)=+-1.
-      intmat M = B * Ainv; 
+      intmat M = B * Ainv;
 
       // M * Origs = Origs?:
       int takeit = fixesOrig(M, Origs, OrigDim, list());
 
       if(takeit){
-	// M already present?:	
-	for(int u = 1; u <= size(RES); u++){
-	  if(RES[u] == M){
-	    takeit = 0;
-	    break;
-	  }
-	} 
+        // M already present?:
+        for(int u = 1; u <= size(RES); u++){
+          if(RES[u] == M){
+            takeit = 0;
+            break;
+          }
+        }
 
-	if(takeit){
-	  RES[size(RES)+1] = M;
-	}
+        if(takeit){
+          RES[size(RES)+1] = M;
+        }
 
-	kill u;
+        kill u;
       }
 
       kill k, sigma, B, M, takeit;
@@ -832,7 +831,7 @@ static proc autGenWeightsFree(list QQ, list Origs, list OrigDim)
 /////////////////////////////////
 
 proc autGenWeights(intmat Q, list #)
-  "USAGE: autGenWeights(Q): Q is an intmat (columns must contain a lattice basis). 
+  "USAGE: autGenWeights(Q): Q is an intmat (columns must contain a lattice basis).
 ASSUME: the cone over Q must be pointed and the columns of Q contain a lattice basis; there must be no 0-columns in Q. We assume that, in the torsion case, the torsion rows of Q are reduced (for example, a row of Q standing for entries in ZZ/5ZZ must not contain elements > 5 or < 0).
 PURPOSE: computes generators for the subgroup aut(Omega_S) of GL(n, \ZZ) that consists of all invertible integer kxk matrices which fix the set Omega_S of degrees of the variables of the basering S. The set of columns of Q equals Omega_S.
 REFERENCE: Remark 3.1.
@@ -849,7 +848,7 @@ EXAMPLE:"
   list OrigDim = Origs[2];
   list QQ = Origs[3]; // store columns of Q here
   Origs = Origs[1];
-  
+
   dbprint(printlevel, "--- Originary degrees ---");
   dbprint(printlevel, Origs);
   dbprint(printlevel, "--- Dimension of the respective component ---");
@@ -872,10 +871,10 @@ EXAMPLE:"
 example
 {
   echo=2;
-  
+
   // torsion example
   // ZZ + ZZ/5ZZ:
-  intmat Q[2][5] = 
+  intmat Q[2][5] =
     1,1,1,1,1,
     2,3,1,4,0;
 
@@ -894,7 +893,7 @@ example
 
   //----------------
   // 2nd free example
-  intmat Q[2][4] = 
+  intmat Q[2][4] =
     1,0,1,1,
     0,1,1,1;
 
@@ -904,11 +903,11 @@ example
 
 ///////////////////////////////////
 
-// converts e.g. n=5 to its binary representation, i.e. 0,1,0,1 
+// converts e.g. n=5 to its binary representation, i.e. 0,1,0,1
 // if r = 3.
 // and stores it in an intvec.
 // r gives the bound for n <= 2^r:
-static proc int2face(int n, int r) 
+static proc int2face(int n, int r)
 {
   int k = r;
   list v;
@@ -956,19 +955,19 @@ static proc permutations(list Left, list sol){
 
   for(int i = 1; i <= size(Left); i++){
     list sol0 = sol;
-    sol0[size(sol0)+1] = Left[i];  
+    sol0[size(sol0)+1] = Left[i];
 
     if(i > 1){
       if(i < size(Left)){
-	list Left0 = Left[1..i-1], Left[i+1..size(Left)];
+        list Left0 = Left[1..i-1], Left[i+1..size(Left)];
       } else { // i = size(Left)
-	list Left0 = Left[1..i-1];
+        list Left0 = Left[1..i-1];
       }
     } else{ // i = 1
       if(1 == size(Left)){
-	list Left0;
+        list Left0;
       } else {
-	list Left0 = Left[i+1..size(Left)];
+        list Left0 = Left[i+1..size(Left)];
       }
     }
 
@@ -1003,27 +1002,27 @@ static proc fixesOrig(intmat M, list Origs, list OrigDim, list TOR){
     intmat W = Origs[l]; // 1 col
     intmat MW = M * W;  // 1 col
 
-    // test whether M*W = some orig 
+    // test whether M*W = some orig
     // (and also not yet found)?:
     for(int m = 1; m <= size(Origs); m++){
       // reduce torsion rows:
       intmat MWred = MW; // 1 col
-      
-      for(int i = 1; i <= size(TOR); i++){
-	MWred[nrows(MWred) - size(TOR) + i,1] = MWred[nrows(MWred) - size(TOR) + i,1] mod TOR[i];
 
-	if(MWred[nrows(MWred) - size(TOR) + i,1] < 0){
-	  MWred[nrows(MWred) - size(TOR) + i,1] = MWred[nrows(MWred) - size(TOR) + i,1] + TOR[i];
-	}
+      for(int i = 1; i <= size(TOR); i++){
+        MWred[nrows(MWred) - size(TOR) + i,1] = MWred[nrows(MWred) - size(TOR) + i,1] mod TOR[i];
+
+        if(MWred[nrows(MWred) - size(TOR) + i,1] < 0){
+          MWred[nrows(MWred) - size(TOR) + i,1] = MWred[nrows(MWred) - size(TOR) + i,1] + TOR[i];
+        }
       }
 
       if(Origs[m] == MWred){
-	if(found[m] == OrigDim[m]){
-	  takeit = 0;
-	  break;
-	}
+        if(found[m] == OrigDim[m]){
+          takeit = 0;
+          break;
+        }
 
-	found[m] = 1;
+        found[m] = 1;
       }
 
       kill MWred, i;
@@ -1033,7 +1032,7 @@ static proc fixesOrig(intmat M, list Origs, list OrigDim, list TOR){
 
     if(!takeit){
       return(0); // false
-    }       
+    }
   }
 
   if(takeit and found == 1:size(Origs)){
@@ -1070,7 +1069,7 @@ static proc getDmatsrec(list TOR, list sol){
 
   if(size(sol) == size(TOR)){
     intmat D[size(TOR)][size(TOR)];
- 
+
     for(int k = 1; k <= size(TOR); k++){
       list L0 = sol[k];
       D[k, 1..ncols(D)] = L0[1..size(L0)];
@@ -1085,11 +1084,11 @@ static proc getDmatsrec(list TOR, list sol){
     list sol0 = sol;
 
     if(gcd(i, TOR[pos]) == 1){
-      sol0[pos] = i;  
+      sol0[pos] = i;
 
       list Res0 = getDmatsrec(TOR, sol0);
       for(int k = 1; k <= size(Res0); k++){
-	Res[size(Res)+1] = Res0[k];
+        Res[size(Res)+1] = Res0[k];
       }
 
       kill k;
@@ -1116,7 +1115,7 @@ static proc getCvecsrec(int m, int n, list sol){
 
   for(int i = 0; i < m; i++){
     list sol0 = sol;
-    sol0[pos] = i;  
+    sol0[pos] = i;
 
     list Res0 = getCvecsrec(m, n, sol0);
     for(int k = 1; k <= size(Res0); k++){
@@ -1164,7 +1163,7 @@ example
 
 ///////////////////////////
 
-// helper: chooses one element of each 
+// helper: chooses one element of each
 // element of ROWs and forms the matrix
 static proc getCmatsrec(list ROWS, list sol){
   int pos = size(sol) + 1;
@@ -1172,7 +1171,7 @@ static proc getCmatsrec(list ROWS, list sol){
 
   if(size(sol) == size(ROWS)){
     intmat C[size(ROWS)][size(ROWS[1][1])];
- 
+
     for(int k = 1; k <= size(ROWS); k++){
       list ROWSk = sol[k];
       C[k, 1..ncols(C)] = ROWSk[1..size(ROWSk)];
@@ -1185,7 +1184,7 @@ static proc getCmatsrec(list ROWS, list sol){
 
   for(int i = 1; i <= size(ROWS[pos]); i++){
     list sol0 = sol;
-    sol0[pos] = ROWS[pos][i];  
+    sol0[pos] = ROWS[pos][i];
 
     list Res0 = getCmatsrec(ROWS, sol0);
     for(int k = 1; k <= size(Res0); k++){
@@ -1201,10 +1200,10 @@ static proc getCmatsrec(list ROWS, list sol){
 //////////////////////////////////////////
 
 // helper: concats the given matrices to
-// B | 0 
+// B | 0
 // C | D
 static proc concatBCD(intmat B, intmat C, intmat D){
-  intmat A[nrows(B) + nrows(C)][ncols(B) + ncols(D)]; 
+  intmat A[nrows(B) + nrows(C)][ncols(B) + ncols(D)];
 
   for(int i = 1; i <= nrows(B); i++){
     A[i, 1..ncols(B)] = B[i,1..ncols(B)]; //, 0:ncols(D);
@@ -1230,7 +1229,7 @@ static proc createAutMatrix(list BL)
   // A will be nxn; compute n:
   list MON = sortMons(BL);
   int n = size(MON);
-  
+
   // the first rows of A correspond to the variables T(i):
   def R = basering;
   int n0 = nvars(basering);
@@ -1242,47 +1241,47 @@ static proc createAutMatrix(list BL)
   }
 
   string Sstr = "ring S = (" + charstr(basering) + "),(T(1..n0), Y(1..n0*n)),dp;";
-  execute(Sstr); // creates the ring 0,(T(1..n0), Y(1..n0*n)),dp; 
+  execute(Sstr); // creates the ring 0,(T(1..n0), Y(1..n0*n)),dp;
   setring S;
   setBaseMultigrading(QS);
 
   matrix A[n][n];
   map f = R, T(1..n0);
   list MONS = f(MON);
-  list BLS = f(BL);  
+  list BLS = f(BL);
   int k;
-  
+
   for(int i = 1; i <= n0; i++){
     // find out j such that BLS[j] contains var(i):
     int ind = 0;
-    
+
     for(int j = 1; j <= size(BLS); j++){
       for(k = 1; k <= size(BLS[j][3]); k++){
-	if(var(i) == BLS[j][3][k]){
-	  ind = j;
-	  break;
-	}
+        if(var(i) == BLS[j][3][k]){
+          ind = j;
+          break;
+        }
       }
-      
+
       if(ind > 0){
-	break;
+        break;
       }
     }
 
     list MONi = BLS[ind][3];
-    
+
     for(j = 1; j <= n; j++){
       // test if MON[j] is in the set {MONi}:
       for(int m = 1; m <= size(MONi); m++){
-	if(MONi[m] == MONS[j]){
-	  A[i,j] = Y((i-1)*n+j); // the Y-variables are ordered row-wise
-	  break;
-	}
+        if(MONi[m] == MONS[j]){
+          A[i,j] = Y((i-1)*n+j); // the Y-variables are ordered row-wise
+          break;
+        }
       }
-      
+
       kill m;
     }
-    
+
     kill MONi, ind, j;
   }
 
@@ -1291,7 +1290,7 @@ static proc createAutMatrix(list BL)
   matrix H[1][n0];
 
   for(k = 1; k <= n0; k++){
-    for(i = 1; i <= size(MONS); i++){     
+    for(i = 1; i <= size(MONS); i++){
       H[1,k] = H[1,k] + A[k,i] * MONS[i];
     }
   }
@@ -1299,17 +1298,17 @@ static proc createAutMatrix(list BL)
   // the lower rows of of A
   // are determined by the first ones:
   // e.g. A*(T_1^2) = (A*T_1)^2:
-  for(i = n0 + 1; i <= size(MONS); i++){     
+  for(i = n0 + 1; i <= size(MONS); i++){
     // e.g. for MON[i] = T[1]*T[2]^2,
-    // we have v = [1,2,0,0] and 
+    // we have v = [1,2,0,0] and
     // A * (T[1]*T[2]^2) = (A*T[1])(A*T[2])^2:
-    poly Av = 1;   
+    poly Av = 1;
     intvec v = leadexp(MONS[i]); // the last entries are all 0s
-    
-    for(int m = 1; m <= n0; m++){     
+
+    for(int m = 1; m <= n0; m++){
       Av = Av * H[1,m]^v[m];
     }
-    
+
     // if in Av there is e.g. the monomial Y(22)^2*T(1)^2
     // then A[i,j] = Y(22)^2 where MONS[j] = T(1)^2:
     for(int j = 1; j <= size(MONS); j++){
@@ -1376,9 +1375,9 @@ static proc Q2Origs(intmat Q){
 
     for(int j = 1; j <= size(Origs); j++){
       if(Origs[j] == v){
-	OrigDim[j] = OrigDim[j] + 1; // OrigDim[j] is already defined
-	takeit = 0;
-	break;
+        OrigDim[j] = OrigDim[j] + 1; // OrigDim[j] is already defined
+        takeit = 0;
+        break;
       }
     }
 
@@ -1397,7 +1396,7 @@ static proc Q2Origs(intmat Q){
 
 static proc gradedCompRing(ideal RL, intvec w, list #)
   "USAGE: gradedCompRing(I, w): I is an ideal, w an intvec. Optional 3rd argument: a list of integers representing the torsion part.
-ASSUME: the basering must be graded (see setBAseMultigrading()) and the cone over 
+ASSUME: the basering must be graded (see setBAseMultigrading()) and the cone over
 the degrees of the variables must be pointed; there mustn't be 0-degrees. The vector
 w must be an element of the cone over the degrees of the variables.
 PURPOSE: returns a basis for the vector space R_w where R is the factor ring of the basering by I.
@@ -1411,7 +1410,7 @@ EXAMPLE: shows an example."
   }
 
   // return a basis for I_w as a list of basis vectors:
-  list L = gradedCompIdeal(RL, w, 0, TOR); 
+  list L = gradedCompIdeal(RL, w, 0, TOR);
   list MON = L[1];
   list RLw = L[2];
 
@@ -1451,9 +1450,9 @@ EXAMPLE: shows an example."
 
     if(rv > r){
       if(r == 0){
-	matrix B = Btmp;
+        matrix B = Btmp;
       } else{
-	B = Btmp;
+        B = Btmp;
       }
 
       r = rv;
@@ -1479,15 +1478,15 @@ example
   echo=2;
 
   // example with torsion: ZZ + ZZ/5ZZ:
-  intmat Q[2][5] = 
+  intmat Q[2][5] =
     1,1,1,1,1,
     2,3,1,4,0;
 
   list TOR = 5;
   ring R = 0,T(1..5),dp;
-  
+
   // attach degree matrix Q to R:
-  setBaseMultigrading(Q); 
+  setBaseMultigrading(Q);
 
   ideal I = T(1)*T(2) + T(3)*T(4) + T(5)^2;
   intvec w = 3,1;
@@ -1505,7 +1504,7 @@ example
     1, 1, 1, 1;
 
   // attach degree matrix Q to R:
-  setBaseMultigrading(Q); 
+  setBaseMultigrading(Q);
 
   ideal I = T(1)*T(2) + T(3)*T(4);
   intvec w = 0,2;
@@ -1540,13 +1539,13 @@ static proc sortMons(list BL){
   string Sstr = "ring S = (" + charstr(basering)  + "), Y(nvars(basering)..1), dp;";
   execute(Sstr);
   setring S;  //creates a ring of shape '0, Y(nvars(basering)..1), dp'
-  
+
   map f = R, Y(1..nvars(basering));
   list fMON = f(MON);
   list MONS;
 
   // to sort MONS:
-  // form Sum_i fMON[i] and look 
+  // form Sum_i fMON[i] and look
   // for the leading terms iteratively:
   poly p = 0;
 
@@ -1556,7 +1555,7 @@ static proc sortMons(list BL){
 
   // sort it descendingly:
   int c = size(fMON);
- 
+
   while(p != 0){
     MONS[c] = lead(p);
     p = p - lead(p);
@@ -1564,7 +1563,7 @@ static proc sortMons(list BL){
   }
 
   // translate back to R:
-  setring R;  
+  setring R;
 
   map g = S, T(nvars(basering)..1);
   MON = g(MONS);
@@ -1604,7 +1603,7 @@ static proc insertIntvecIfNew(list L0, intvec v){
   if(takeit == 1){
     L[size(L) + 1] = v;
   }
-  
+
   return(L);
 }
 
@@ -1614,17 +1613,17 @@ static proc insertIntvecIfNew(list L0, intvec v){
 // returns the set
 // OmegaI = {w in K; I_w \subseteq I_<w}
 // of unique minimal generator degrees.
-// Elements of components are of shape 
+// Elements of components are of shape
 // [w, I_w, K[T]_w]
 // We assume that if I = <f_1,...,f_s> we have
 // OmegaI = {deg(f_1),...,deg(f_s)}
 static proc getOmegaI(ideal I, list #){
   dbprint(printlevel, "Warning: we assume that OmegaI = {deg(f_1),...,deg(f_s)} if the input ideal is generated by f_1,...,f_s. ");
-  
+
   list TOR;
   if(size(#) > 0 and typeof(#) == "list" and typeof(#[1]) == "int"){
     TOR = #[1];
-  }  
+  }
 
   // OmegaI = {w in K; I_w \subseteq I_<w}
   list OmegaI;
@@ -1649,8 +1648,8 @@ example
   ring R = 0,T(1..5),dp;
 
   // attach degree matrix Q to R:
-  setBaseMultigrading(Q); 
-  
+  setBaseMultigrading(Q);
+
   ideal I = T(1)*T(2) + T(3)^2*T(4) + T(5)^6,
     T(3)*T(4) + T(1)*T(5) + T(5)^4 + T(4)^2;
 
@@ -1697,10 +1696,10 @@ static proc applyA(matrix A, int n0, list AMONS){
   // T_i --> phi(T_i) = A * T_i:
   // store A*T[i] in H[1,i]:
   matrix H[1][n0];
-    
-  int l;    
+
+  int l;
   for(int k = 1; k <= n0; k++){
-    for(l = 1; l <= size(AMONS); l++){     
+    for(l = 1; l <= size(AMONS); l++){
       H[1,k] = H[1,k] + A[k,l] * AMONS[l];
     }
   }
@@ -1716,9 +1715,9 @@ example
   ring S = 0,(T(1..5),Y(1..45),Z),dp;
   matrix A = imap(R, AR);
   print(A);
-  list AMONS = T(1), T(2), T(3), T(4), T(5), T(3)*T(5), T(4)*T(5), T(5)^2, T(5)^3;  
+  list AMONS = T(1), T(2), T(3), T(4), T(5), T(3)*T(5), T(4)*T(5), T(5)^2, T(5)^3;
   int n0 = 5;
-  applyA(A, n0, AMONS);  
+  applyA(A, n0, AMONS);
 }
 
 //////////////////////////////////////
@@ -1732,10 +1731,10 @@ static proc applyAtoGenerator(matrix u, matrix H, list KTwS, int n0){
   for(int m = 1; m <= nrows(u); m++){
     if(u[m,1] != 0){
       intvec v = leadexp(KTwS[m]); // only the first n0 entries are interesting
-      poly g = u[m,1]; 
+      poly g = u[m,1];
 
       for(int x = 1; x <= n0; x++){
-	g = g * H[1,x]^v[x];
+        g = g * H[1,x]^v[x];
       }
 
       g0 = g0 + g;
@@ -1756,7 +1755,7 @@ static proc linEqs(list IBw, list MON){
   // the elements of the kernel MM correspond to linear forms:
   // e.g., [1,0,-1,0] means S[1] - S[3]:
   matrix B[size(IBw)][size(MON)];
-    
+
   for(int j = 1; j <= size(IBw); j++){
     B[j, 1..size(MON)] = IBw[j];
   }
@@ -1764,7 +1763,7 @@ static proc linEqs(list IBw, list MON){
   dbprint(printlevel, "Graded component as vectors:");
   dbprint(printlevel, B);
 
-  // in this case, this computes the kernel 
+  // in this case, this computes the kernel
   // (since there are only constant entries in B):
   matrix M = syz(B);
 
@@ -1789,7 +1788,7 @@ static proc getFullRingS(intmat Q, int n0, int n1){
   execute(Sstr);
   setring S;
   setBaseMultigrading(QS);
-  
+
   return(S);
 }
 
@@ -1799,7 +1798,7 @@ static proc getFullRingS(intmat Q, int n0, int n1){
 static proc monomials2basis(poly g0, list BMONS, int n0){
   // replace in g0 e.g. T[1]^2 by e_1:
   // store coeffs for e_1 in Res[1] etc:
-  list RES; 
+  list RES;
 
   for(int m = 1; m <= size(BMONS); m++){
     RES[m] = 0;
@@ -1842,22 +1841,22 @@ static proc getEqs(matrix MS, list RES){
 
 proc stabilizer(ideal RL, list #)
   "USAGE: stabilizer(RL, A, BB, AMON, n0): RL is an ideal, A a matrix (standing for a subgroup of GL(n)), BB is an intmat (standing for an automorphism of the grading group),  AMON a list of monomials corresponding to the rows/columns of A, n0 an integer such that the first n0 variables of the basering are the T(i), optional: a list of elementary divisors if there is torsion.
-ASSUME: the basering must be graded (see setBaseMultigrading()) and the cone over 
+ASSUME: the basering must be graded (see setBaseMultigrading()) and the cone over
 the degrees of the variables must be pointed; there mustn't be 0-degrees. The vector
 w must be an element of the cone over the degrees of the variables. Moreover, B must be such that it permutes the degrees of the variables and the degrees of the generators of RL.
 PURPOSE: returns relations such that A*I = I.
 RETURN: a ring. Also exports an ideal Jexported and a list stabExported.
 EXAMPLE: shows an example."
-{ 
+{
   def R = basering;
   intmat Q = getVariableWeights();
-  
+
   // torsion:
   list TOR;
   if(size(#) > 0 and typeof(#) == "list" and typeof(#[1]) == "int"){
     TOR = #[1];
   }
-  
+
   //list Components = stabPreprocessor(RL);
   //list OmegaI = getOmegaI(RL);
   int nTvars = nvars(basering);
@@ -1866,7 +1865,7 @@ EXAMPLE: shows an example."
   // output of aut_K(S):
   def RR = autKS(TOR); // = \KK[Y_{ij},Z]
   setring RR;
-  string AMONSstring = MONexported; // needed for later, dependent on T_i 
+  string AMONSstring = MONexported; // needed for later, dependent on T_i
 
   list listAutKS = autKSexported;
   ideal J; // will be the result
@@ -1885,7 +1884,7 @@ EXAMPLE: shows an example."
   setring RR; // KK[Y_i]
   for(int p = 1; p <= size(listAutKS); p++){
 
-    matrix A = listAutKS[p][1]; 
+    matrix A = listAutKS[p][1];
     intmat BB = listAutKS[p][2];
     ideal JBA = listAutKS[p][3];
 
@@ -1903,111 +1902,111 @@ EXAMPLE: shows an example."
       // go through each generator g of the ideal RL:
       // compute a basis for RL_deg(g), linear equations
       for(i = 1; i <= size(RL); i++){
-	dbprint(printlevel, "computing stabilizer: starting loop with i = " + string(i));
+        dbprint(printlevel, "computing stabilizer: starting loop with i = " + string(i));
 
-	// w = multidegree and reduce later entries
-	// if there is torsion:
-	intvec w = multiDegRedTor(RL[i], TOR);
+        // w = multidegree and reduce later entries
+        // if there is torsion:
+        intvec w = multiDegRedTor(RL[i], TOR);
 
-	// compute a basis KTw of \KK[T_1,...,T_r]_w:
-	list KTw = wmonomials(w, 0, TOR);
+        // compute a basis KTw of \KK[T_1,...,T_r]_w:
+        list KTw = wmonomials(w, 0, TOR);
 
-	// compute a basis Iw of I_w:
-	// I_w will be a subspace of KTw:
-	list L = gradedCompIdeal(RL, w, 0, TOR); 
-	list Iw = L[2];
-	list MON = L[1];
+        // compute a basis Iw of I_w:
+        // I_w will be a subspace of KTw:
+        list L = gradedCompIdeal(RL, w, 0, TOR);
+        list Iw = L[2];
+        list MON = L[1];
 
-	// compute a basis IBw of I_(B*w) if B*w != w:
-	// I_(B*w) will be a subspace of KTBw:
-	intvec Bw = BB * w;
+        // compute a basis IBw of I_(B*w) if B*w != w:
+        // I_(B*w) will be a subspace of KTBw:
+        intvec Bw = BB * w;
 
-	if(Bw != w){
-	  list LB = gradedCompIdeal(RL, Bw, 0, TOR); 
-	  list IBw = LB[2];
-	  list BMON = LB[1];
-	} else {
-	  list LB = L;
-	  list IBw = L[2];
-	  list BMON = L[1];
-	}
-      
-	matrix M = linEqs(IBw, MON); // kernel computation
-      
-	// Define the map
-	// T_i --> phi(T_i) = A * T_i:
-	// store A*T[i] in H[1,i]:
-	setring S;
-	matrix A = imap(RR, A);
-	matrix H = applyA(A, nTvars, AMONS);
+        if(Bw != w){
+          list LB = gradedCompIdeal(RL, Bw, 0, TOR);
+          list IBw = LB[2];
+          list BMON = LB[1];
+        } else {
+          list LB = L;
+          list IBw = L[2];
+          list BMON = L[1];
+        }
 
-	dbprint(printlevel, "the map phi (stored in H[1,j] = A*T_j):");
-	dbprint(printlevel, H);
+        matrix M = linEqs(IBw, MON); // kernel computation
 
-	//  for each basis vector u of Iw:
-	//  form g0 :=  A * (current generator) = Sum A*u_i where u_i <> 0:
-	list IwS = imap(R, Iw);
-	list KTwS = imap(R, KTw); 
+        // Define the map
+        // T_i --> phi(T_i) = A * T_i:
+        // store A*T[i] in H[1,i]:
+        setring S;
+        matrix A = imap(RR, A);
+        matrix H = applyA(A, nTvars, AMONS);
 
-	for(int k = 1; k <= size(IwS); k++){
-	  matrix u = IwS[k]; // ... x 1 matrix
+        dbprint(printlevel, "the map phi (stored in H[1,j] = A*T_j):");
+        dbprint(printlevel, H);
 
-	  poly g0 = applyAtoGenerator(u, H, KTwS, nTvars);
+        //  for each basis vector u of Iw:
+        //  form g0 :=  A * (current generator) = Sum A*u_i where u_i <> 0:
+        list IwS = imap(R, Iw);
+        list KTwS = imap(R, KTw);
 
-	  dbprint(printlevel, "Iw=");
-	  dbprint(printlevel, IwS);
-	  dbprint(printlevel, "current basis vector u of Iw:");
-	  dbprint(printlevel, u);
-	  dbprint(printlevel, "g0 = A * (current generator) = ");
-	  dbprint(printlevel, g0);
+        for(int k = 1; k <= size(IwS); k++){
+          matrix u = IwS[k]; // ... x 1 matrix
 
-	  // replace in g0 e.g. T[1]^2 by e_1:
-	  // store coeffs for e_1 in Res[1] etc:
+          poly g0 = applyAtoGenerator(u, H, KTwS, nTvars);
 
-	  // NOTE: I_w gets mapped to I_(B*w):
-	  list BMON = imap(R, BMON);
-	  list RES = monomials2basis(g0, BMON, nTvars); // AMONS = BMONS?
+          dbprint(printlevel, "Iw=");
+          dbprint(printlevel, IwS);
+          dbprint(printlevel, "current basis vector u of Iw:");
+          dbprint(printlevel, u);
+          dbprint(printlevel, "g0 = A * (current generator) = ");
+          dbprint(printlevel, g0);
 
-	  dbprint(printlevel, "after replacing in g0 e.g. T[1]^2 by e_1: (where e_i <--> KTwS[i]), RES = ");
-	  dbprint(printlevel, RES);
-	  matrix MS = imap(R, M);
-	  ideal GL = getEqs(MS, RES);
+          // replace in g0 e.g. T[1]^2 by e_1:
+          // store coeffs for e_1 in Res[1] etc:
 
-	  if(size(EQs) == 0){
-	    EQs = GL[1..size(GL)];
-	  } else {
-	    EQs = EQs, GL[1..size(GL)];
-	  }
+          // NOTE: I_w gets mapped to I_(B*w):
+          list BMON = imap(R, BMON);
+          list RES = monomials2basis(g0, BMON, nTvars); // AMONS = BMONS?
 
-	  dbprint(printlevel, "applying the linear forms of the kernel MS = ");
-	  dbprint(printlevel, MS);
-	  dbprint(printlevel, "yields equations GL = ");
-	  dbprint(printlevel, GL);
-	  dbprint(printlevel, "Total equations so far = EQs = ");
-	  dbprint(printlevel, EQs);
+          dbprint(printlevel, "after replacing in g0 e.g. T[1]^2 by e_1: (where e_i <--> KTwS[i]), RES = ");
+          dbprint(printlevel, RES);
+          matrix MS = imap(R, M);
+          ideal GL = getEqs(MS, RES);
 
-	  kill MS, GL, u, BMON, g0, RES;    
-	  setring S;
-	}
+          if(size(EQs) == 0){
+            EQs = GL[1..size(GL)];
+          } else {
+            EQs = EQs, GL[1..size(GL)];
+          }
 
-	setring S;
-	kill IwS, KTwS, A, H;
+          dbprint(printlevel, "applying the linear forms of the kernel MS = ");
+          dbprint(printlevel, MS);
+          dbprint(printlevel, "yields equations GL = ");
+          dbprint(printlevel, GL);
+          dbprint(printlevel, "Total equations so far = EQs = ");
+          dbprint(printlevel, EQs);
 
-	setring R;
-	kill M, w, KTw, L, Iw, MON, Bw, LB, IBw, BMON;
+          kill MS, GL, u, BMON, g0, RES;
+          setring S;
+        }
+
+        setring S;
+        kill IwS, KTwS, A, H;
+
+        setring R;
+        kill M, w, KTw, L, Iw, MON, Bw, LB, IBw, BMON;
       }
 
       //kill k;
- 
+
       setring RR;
       ideal JBAnew = JBA + imap(S, EQs);
       stabExported[size(stabExported) + 1] = list(A, BB, JBAnew);
 
       if(size(J) == 0){
-	J = JBAnew;
+        J = JBAnew;
       } else {
-	//J = J * JBAnew;
-	J = intersect(J, JBAnew); // in Singular, intersection is usually quicker
+        //J = J * JBAnew;
+        J = intersect(J, JBAnew); // in Singular, intersection is usually quicker
       }
 
 
@@ -2036,8 +2035,8 @@ example
   ring R = 0,T(1..5),dp;
 
   // attach degree matrix Q to R:
-  setBaseMultigrading(Q); 
-  
+  setBaseMultigrading(Q);
+
   ideal I = T(1)*T(2) + T(3)^2*T(4) + T(5)^6;
   def RR = stabilizer(I);
   setring RR;
@@ -2050,16 +2049,16 @@ example
 
   /////////////
   // example 3.14 from the paper
-  intmat Q[3][5] = 
+  intmat Q[3][5] =
     1,1,1,1,1,
     1,-1,0,0,1,
     1,1,1,0,0;
 
   list TOR = 2;
   ring R = 0,T(1..5),dp;
-  
+
   // attach degree matrix Q to R:
-  setBaseMultigrading(Q); 
+  setBaseMultigrading(Q);
 
   ideal I = T(1)*T(2) + T(3)^2 + T(4)^2;
   list TOR = 2;
@@ -2102,16 +2101,16 @@ static proc reduceIntvec(intvec w0, list TOR){
   intvec w = w0;
   int pos;
 
-  for(int l = 1; l <= size(TOR); l++){	
+  for(int l = 1; l <= size(TOR); l++){
     pos = size(w0) - size(TOR) + l;
-    w[pos] = w[pos] mod TOR[l];     
+    w[pos] = w[pos] mod TOR[l];
 
     // make positive:
     if(w[pos] < 0){
-      w[pos] = w[pos] + TOR[l];     
+      w[pos] = w[pos] + TOR[l];
     }
   }
-  
+
   return(w);
 }
 
@@ -2120,7 +2119,7 @@ static proc reduceIntvec(intvec w0, list TOR){
 static proc moncoef2(poly f, poly mon, int n0)
   "USAGE: moncoef(f, mon): f is a polynomial, mon a monomial, n0 an integer.
 PURPOSE: returns the (not necessarily constant) coefficient of mon in f.
-For example the coefficient of T(1)^2 in T(1)^2*T(2) will be T(2). 
+For example the coefficient of T(1)^2 in T(1)^2*T(2) will be T(2).
 The integer n0 means that the variables var(n0+1),... will be considered to be coefficients.
 RETURN: a ring element.
 EXAMPLE: shows an example."
@@ -2130,16 +2129,16 @@ EXAMPLE: shows an example."
 
   while (p != 0) {
     poly lp = lead(p) / mon;
-    
+
     if(lp != 0){
       // test wether there is still some T(i)-factor in lp:
       for(int i = 1; i <= n0; i++){
-	lp = subst(lp, var(i), 0);
+        lp = subst(lp, var(i), 0);
       }
-      
+
       if(lp != 0){
-	//return(lp);
-	res = res + lp;
+        //return(lp);
+        res = res + lp;
       }
 
       kill i;
@@ -2171,14 +2170,14 @@ example
 
   // only the first three variables
   // are considered for taking the coefficent:
-  moncoef2(f, m, 3); 
+  moncoef2(f, m, 3);
 }
 
 //////////////////////////////
 
 // helper
 static proc fixesDim(intmat B, list ABL, list TOR){
-  // ABL is of shape 
+  // ABL is of shape
   // [1]:
   //    [1]:
   //       2 = dim of basering_w
@@ -2197,11 +2196,11 @@ static proc fixesDim(intmat B, list ABL, list TOR){
 
     for(j = 1; j <= size(ABL); j++){
       if(ABL[j][2] == Bw){
-	if(ABL[j][1] != dimw){
-	  return(0);
-	}
+        if(ABL[j][1] != dimw){
+          return(0);
+        }
 
-	break;
+        break;
       }
     }
 
@@ -2223,7 +2222,7 @@ ASSUME: the basering is multigraded having used the command   setBaseMultigradin
 PURPOSE: Compute the subgroup Aut_K(S) of GL(n) of graded automorphisms of the polynomial ring S (the basering).
 RETURN: returns a ring S and exports an ideal ideal Iexported in the coordinate ring S = K[Y_ij] of GL(n) such that Aut_K(S) = V(I).
 EXAMPLE: shows an example."
-{ 
+{
   list TOR;
 
   if(size(#) > 0 and typeof(#) == "list" and typeof(#[1]) == "int"){
@@ -2244,14 +2243,14 @@ EXAMPLE: shows an example."
   // such that deg(T^(a+b)) = w.
   list sums = origsSumUp(BL, TOR);
   list adMons = getSadmissibleMonomials(sums);
-  int nadMons = size(adMons); 
+  int nadMons = size(adMons);
 
   // create formal matrix out of this:
   // phi(R_w) = R_w for all w in Orig and all automorphisms phi.
   def S = createAutMatrix(BL);
   setring S;
   basering;
- 
+
   matrix A = Aexported;
   list AMON = MONSexported;
   string MONexported = string(AMON);
@@ -2278,7 +2277,7 @@ EXAMPLE: shows an example."
 
   // convert the elements of Autor0 to permutation matrices:
   list Autor;
-  list ABL = imap(R, BL); 
+  list ABL = imap(R, BL);
 
   for(int i = 1; i <= size(Autor0); i++){
     if(fixesDim(Autor0[i], ABL, TOR)){
@@ -2288,7 +2287,7 @@ EXAMPLE: shows an example."
       dbprint(printlevel, string(Autor0[i]));
     }
   }
-  
+
   dbprint(printlevel, ".... automorphisms of the originary weight vectors as permutation matrices: ....");
   dbprint(printlevel, Autor);
 
@@ -2299,11 +2298,11 @@ EXAMPLE: shows an example."
   list adMons;
 
   if(nadMons > 0){
-    adMons = imap(R, adMons);  
+    adMons = imap(R, adMons);
   }
 
   // add determinant condition:
-  // we need one more variable for this:  
+  // we need one more variable for this:
   def S2 = adjoinVar(n0);
   setring S2;
   poly deter; // we need to store it for the grading
@@ -2325,16 +2324,16 @@ EXAMPLE: shows an example."
     dbprint(printlevel, "Admissible equations: done.");
 
     BA = relabelEntries(BA, n0);
-    
+
     dbprint(printlevel, "permuted matrix A:");
     dbprint(printlevel, BA);
 
     // add variable Y((i-1)*n+j) to Jexported
     // if BA[i,j] = 0 where 1 <= i <= n0:
     ideal omegaSdiagEqs = getMonomialsFor0Entries(BA, n0);
-    
+
     // also store in listAutKS
-    // will be useful for stabilizer 
+    // will be useful for stabilizer
     setring S2;
     matrix BA2 = imap(S, BA);
 
@@ -2342,7 +2341,7 @@ EXAMPLE: shows an example."
     deter = det(BA2);
     poly detEq = deter * Z - 1;
     dbprint(printlevel, "Determinant: done.");
-    
+
     ideal JBA = imap(S, Iadmiss) + imap(S, omegaSdiagEqs) + ideal(detEq);
     listAutKS[size(listAutKS) + 1] = list(BA2, BB, JBA, MONexported); // MONexported is an explanatory string
 
@@ -2355,10 +2354,10 @@ EXAMPLE: shows an example."
     setring S;
     kill BA, B, BB, Iadmiss, omegaSdiagEqs;
   }
-  
+
   setring S2;
 
-  setGLnGrading(Qnew, deter); 
+  setGLnGrading(Qnew, deter);
   ideal Iexported = J; //imap(S, J) + ideal(detEq);
   list autKSexported = listAutKS;
 
@@ -2377,8 +2376,8 @@ example
   ring R = 0,T(1..5),dp;
 
   // attach degree matrix Q to R:
-  setBaseMultigrading(Q); 
-  
+  setBaseMultigrading(Q);
+
   //ideal I = T(1)*T(2) + T(3)^2*T(4) + T(5)^6;
   def S = autKS();
   setring S;
@@ -2388,21 +2387,21 @@ example
 
   autKSexported;
   getVariableWeights();
-  
+
   kill S, Q, R;
-  
+
   /////////////
   // example 3.14 from the paper
-  intmat Q[3][5] = 
+  intmat Q[3][5] =
     1,1,1,1,1,
     1,-1,0,0,1,
     1,1,1,0,0;
 
   list TOR = 2;
   ring R = 0,T(1..5),dp;
-  
+
   // attach degree matrix Q to R:
-  setBaseMultigrading(Q); 
+  setBaseMultigrading(Q);
 
   //ideal I = T(1)*T(2) + T(3)^2 + T(4)^2;
   def S = autKS();
@@ -2437,7 +2436,7 @@ static proc setGLnGrading(intmat Qnew, poly deter, list #){
     if(j == 0){ // 9  --> i = 0, j = 9
       i = i - 1;
       j = n;
-    } 
+    }
 
     Qlarge[1..k, m] = Qnew[1..k, j];
     kill i, j;
@@ -2451,7 +2450,7 @@ static proc setGLnGrading(intmat Qnew, poly deter, list #){
   // deg(deter) = - deg(Z):
   intvec degDet = reduceIntvec(- multiDeg(deter), TOR);
   Qlarge[1..k, nvars(basering)] = degDet[1..size(degDet)];
-  
+
   // now set the final grading
   setBaseMultigrading(Qlarge);
 }
@@ -2487,7 +2486,7 @@ static proc getMonomialsFor0Entries(matrix BA, int n0) {
   for(int i = 1; i <= n0; i++){
     for( j = 1; j <= ncols(BA); j++){
       if(BA[i,j] == 0){
-	relB[size(relB)+1] = Y((i-1)*ncols(BA)+j);
+        relB[size(relB)+1] = Y((i-1)*ncols(BA)+j);
       }
     }
   }
@@ -2512,7 +2511,7 @@ static proc getAdmissibleEquations(list adMons, matrix A, int n0, list MONS){
   }
   def S = basering;
   map applyA = S, imageVars;
-  
+
   // go through all possiblities:
   int k, l;
   ideal IadmissibleExported;
@@ -2523,13 +2522,13 @@ static proc getAdmissibleEquations(list adMons, matrix A, int n0, list MONS){
 
     for(k = 1; k <= size(AL); k++){
       for(l = 1; l <= size(BL); l++){
-	poly Ta = AL[k];
-	poly Tb = BL[l];
-	poly Tab = Ta * Tb;
+        poly Ta = AL[k];
+        poly Tb = BL[l];
+        poly Tab = Ta * Tb;
 
-	IadmissibleExported[size(IadmissibleExported) + 1] = applyA(Tab) - applyA(Ta) * applyA(Tb);
+        IadmissibleExported[size(IadmissibleExported) + 1] = applyA(Tab) - applyA(Ta) * applyA(Tb);
 
-	kill Tab, Ta, Tb;
+        kill Tab, Ta, Tb;
       }
     }
 
@@ -2553,7 +2552,7 @@ static proc getGenDegsDims(ideal I, list TOR){
     if(I[i] != 0){
       c++;
 
-      GenDegs[i] = reduceIntvec(multiDeg(I[i]), TOR); 
+      GenDegs[i] = reduceIntvec(multiDeg(I[i]), TOR);
       list L = gradedCompIdeal(I, GenDegs[i], 0, TOR); //gradedcompbasis(I, GenDegs[i], TOR);
       GenDims[i] = size(L[1]); // this is dim(R_(deg f_i)), not dim(I_(deg f_i))
 
@@ -2581,7 +2580,7 @@ static proc isDimInvar(intmat B,  list GenDegsDims, list TOR){
   list GenDegs = GenDegsDims[1];
   list GenDims = GenDegsDims[2];
 
-  // return true iff B is 
+  // return true iff B is
   // such that dim(I_wi) = dim(I_(B*wi))
   // holds for all i, where wi in GenDegs:
   int j;
@@ -2589,15 +2588,15 @@ static proc isDimInvar(intmat B,  list GenDegsDims, list TOR){
   for(j = 1; j <= size(GenDegs); j++){
     intvec wj = GenDegs[j];
 
-    //intvec Bwj = B * wj; 
+    //intvec Bwj = B * wj;
     intvec Bwj  = reduceIntvec(intvec(B * wj), TOR);
 
     // find out dim(I_Bwj):
     int dimBwj;
     for(int bb = 1; bb <= size(GenDegs); bb++){
       if(GenDegs[bb] == Bwj){
-	dimBwj = GenDims[bb];
-	break;
+        dimBwj = GenDims[bb];
+        break;
       }
     }
 
@@ -2639,7 +2638,7 @@ static proc getSadmissibleMonomials(list sums){
 ///////////////////////////////////////
 
 // helper
-static proc origsSumUp(list BL, list #) { 
+static proc origsSumUp(list BL, list #) {
   list TOR;
   if(size(#) > 0 and typeof(#) == "list" and typeof(#[1]) == "int"){
     TOR = #[1];
@@ -2656,22 +2655,22 @@ static proc origsSumUp(list BL, list #) {
 
       // check if sum is not already in RES (no duplicates):
       for(k = 1; k <= size(RES); k++){
-	if(RES[k][1] == sum){
-	  break;
-	}
+        if(RES[k][1] == sum){
+          break;
+        }
       }
 
       if(k > size(RES)){ // then is it new
-	// check if sum is also in Origs 
-	for(k = 1; k <= size(BL); k++){
-	  if(BL[k][2] == sum){
-	    RES[size(RES) + 1] = list(sum, list(BL[i][2], BL[j][2]));
-	  }
-	}
+        // check if sum is also in Origs
+        for(k = 1; k <= size(BL); k++){
+          if(BL[k][2] == sum){
+            RES[size(RES) + 1] = list(sum, list(BL[i][2], BL[j][2]));
+          }
+        }
       }
 
       kill sum;
-    }    
+    }
   }
 
   return(RES);
@@ -2681,7 +2680,7 @@ example
   echo = 2;
 
   // 1st example
-  list BL = 
+  list BL =
     list(0, intvec(2,1), 0),
     list(0, intvec(1,1), 0),
     list(0, intvec(1,0), 0),
@@ -2693,14 +2692,14 @@ example
   kill BL;
 
   // 2nd example
-  list BL = 
+  list BL =
     list(0, intvec(3), 0),
     list(0, intvec(3), 0),
     list(0, intvec(2), 0),
     list(0, intvec(2), 0),
     list(0, intvec(1), 0);
 
-  origsSumUp(BL);  
+  origsSumUp(BL);
 }
 
 ///////////////////////////////////////
@@ -2712,7 +2711,7 @@ example
 // where the w are the originary weights.
 // we also assume that Origs are ordered as occurring in Q
 // returns a list of matrices (not intmats).
-static proc matrix2compper(intmat B, list BL, list MON, intmat Q, list TOR){ 
+static proc matrix2compper(intmat B, list BL, list MON, intmat Q, list TOR){
   list Origs;
   list MONweight;
 
@@ -2745,11 +2744,11 @@ static proc matrix2compper(intmat B, list BL, list MON, intmat Q, list TOR){
       // test if MONweight[j] == v (possibly with Torsion, i.e. after reduction)
       // and done[j] != 1:
       if(vred == zred and done[j] != 1){
-	PER[i,j] = 1;
-	done[j] = 1;
+        PER[i,j] = 1;
+        done[j] = 1;
 
-	kill zred;       
-	break;
+        kill zred;
+        break;
       }
 
       kill zred;
@@ -2787,7 +2786,7 @@ EXAMPLE: example autXhat; shows an example
     ERROR("size of w must equal the number of rows of the degree matrix.");
   }
 
-  cone c = GITcone(RL, Q0, w0);
+  cone c = gitCone(RL, Q0, w0);
   def RR = stabilizer(RL, TOR);
   setring RR;
 
@@ -2798,7 +2797,7 @@ EXAMPLE: example autXhat; shows an example
 
     setring R;
     bigintmat wB0[1][k0] = wB[1..k0];
-    cone cB = GITcone(RL, Q0, wB0);
+    cone cB = gitCone(RL, Q0, wB0);
     kill wB0;
     setring RR;
 
@@ -2815,16 +2814,16 @@ EXAMPLE: example autXhat; shows an example
 example
 {
   echo=2;
-  
-  intmat Q[3][5] = 
+
+  intmat Q[3][5] =
     1,1,1,1,1,
     1,-1,0,0,1,
     1,1,1,0,0;
 
   list TOR = 2;
   ring R = 0,T(1..5),dp;
-  
-  setBaseMultigrading(Q); 
+
+  setBaseMultigrading(Q);
 
   ideal I = T(1)*T(2) + T(3)^2 + T(4)^2;
   list TOR = 2;
@@ -2832,7 +2831,7 @@ example
   intvec w0 = 2,1,0;
   def RR = autXhat(I, w0, TOR);
   setring RR;
-  
+
   RES;
   kill RR, Q, R;
 }
@@ -2885,7 +2884,7 @@ example
 // Assume: basering variables are
 // T(1..n0), Y(1..), Z:
 // Replaces in M each non-zero entry M[i,j] by V[i,j]:
-// however: replace the lower entries, e.g., Y(11)^2, 
+// however: replace the lower entries, e.g., Y(11)^2,
 // by Y(2)^2 if Y(11) --> Y(2).
 static proc relabelEntries(matrix A, int n0){
   def R = basering;
@@ -2903,24 +2902,24 @@ static proc relabelEntries(matrix A, int n0){
   for(i = 1; i <= n0; i++){
     for(j = 1; j <= ncols(A); j++){
       if(A[i,j] != 0){ // then it is some Y(k) --> replace it by V[i,j]:
-	// ordering of variables in R is
-	// T(1..n0), Y(1..n^2), Z:
-	pos = (i-1)*n + j; 
+        // ordering of variables in R is
+        // T(1..n0), Y(1..n^2), Z:
+        pos = (i-1)*n + j;
 
-	// A[i,j] should be Y(pos):
-	// find out k with A[i,j] = Y(k):
-	for(m = 1; m <= n*n; m++){
-	  if(A[i,j] == Y(m)){
-	    Img[m + n0] = Y(pos); //+n0 since vars T(1..n0) are at front
-	    break;
-	  }
-	}
+        // A[i,j] should be Y(pos):
+        // find out k with A[i,j] = Y(k):
+        for(m = 1; m <= n*n; m++){
+          if(A[i,j] == Y(m)){
+            Img[m + n0] = Y(pos); //+n0 since vars T(1..n0) are at front
+            break;
+          }
+        }
       }
     }
   }
 
   // define the map:
-  map f = R, Img[1..size(Img)];  
+  map f = R, Img[1..size(Img)];
 
   return(f(A));
 }
@@ -2941,7 +2940,7 @@ static proc getCharacteristicGrading(list BL, list #){
 
   for(int i = 1; i <= size(BL); i++){
     intvec w = reduceIntvec(multiDeg(BL[i]), TOR);
-    
+
     Qnew[1..nrows(Q), i] = w[1..size(w)];
     kill w;
   }
@@ -3021,7 +3020,7 @@ EXAMPLE: example autX; shows an example
   intmat P = degMat2P(Q, TOR);
   intmat V = veron(transpose(P));
 
-  // creat map: 
+  // creat map:
   ideal imMap;
   for(int i = 1; i <= nrows(V); i++){
     intvec v = V[i, 1..ncols(V)];
@@ -3031,12 +3030,12 @@ EXAMPLE: example autX; shows an example
   }
 
   string Sstr = "ring S = (" + charstr(RR) + "),(T(1..size(V))),dp;";
-  execute(Sstr); // creates the ring 0,(T(1..size(V))),dp; 
+  execute(Sstr); // creates the ring 0,(T(1..size(V))),dp;
   setring S;
   setring RR;
 
   // f: S --> RR, T_i --> T^mu
-  map f = S, imMap; 
+  map f = S, imMap;
 
   setring S;
   ideal Iexported = preimage(RR, f, J);
@@ -3050,47 +3049,47 @@ example
 
   /////////////
   // PP2
-  intmat Q[1][4] = 
-    1,1,1,1;
-
-  ring R = 0,T(1..ncols(Q)),dp;
-  
-  // attach degree matrix Q to R:
-  setBaseMultigrading(Q); 
-  ideal I = 0;
-  intvec w0 = 1;
-
-  def RR = autX(I, w0);
-  setring RR;
-  Iexported;
-
-  basering;
-  dim(std(Iexported));
-  
-  kill RR, Q, R;  
-
-  quit;
-  /////////////
-  // example 3.14 from the paper
-  intmat Q[3][5] = 
-    1,1,1,1,1,
-    1,-1,0,0,1,
-    1,1,1,0,0;
-
-  list TOR = 2;
-  ring R = 0,T(1..5),dp;
-  
-  // attach degree matrix Q to R:
-  setBaseMultigrading(Q); 
-
-  ideal I = T(1)*T(2) + T(3)^2 + T(4)^2;
-  list TOR = 2;
-
-  intvec w0 = 2,1,0;
-  def RR = autX(I, w0, TOR);
-  setring RR;
-  
-  kill RR, Q, R;
+//  intmat Q[1][4] =
+//    1,1,1,1;
+//
+//  ring R = 0,T(1..ncols(Q)),dp;
+//
+//  // attach degree matrix Q to R:
+//  setBaseMultigrading(Q);
+//  ideal I = 0;
+//  intvec w0 = 1;
+//
+//  def RR = autX(I, w0);
+//  setring RR;
+//  Iexported;
+//
+//  basering;
+//  dim(std(Iexported));
+//
+//  kill RR, Q, R;
+//
+//  quit;
+//  /////////////
+//  // example 3.14 from the paper
+//  intmat Q[3][5] =
+//    1,1,1,1,1,
+//    1,-1,0,0,1,
+//    1,1,1,0,0;
+//
+//  list TOR = 2;
+//  ring R = 0,T(1..5),dp;
+//
+//  // attach degree matrix Q to R:
+//  setBaseMultigrading(Q);
+//
+//  ideal I = T(1)*T(2) + T(3)^2 + T(4)^2;
+//  list TOR = 2;
+//
+//  intvec w0 = 2,1,0;
+//  def RR = autX(I, w0, TOR);
+//  setring RR;
+//
+//  kill RR, Q, R;
 }
 
 ////////////////////
@@ -3098,7 +3097,7 @@ example
 // helper
 // compute the hilbert basis of c.
 static proc hilbertBas(cone c){
-  intmat A = rays(c);
+  intmat A = intmat(rays(c));
   intmat B = normaliz(A, 0);
 
   return(B);
@@ -3107,7 +3106,7 @@ example
 {
   echo = 2;
 
-  intmat A[2][2] = 
+  intmat A[2][2] =
     1,0,
     1,3;
 
@@ -3116,8 +3115,8 @@ example
 
   // 2nd ex:
   intmat C[3][4] =
-    1, 0, 0, 0, 
-    1, 1, 0, 0, 
+    1, 0, 0, 0,
+    1, 1, 0, 0,
     6, 3, 4, 2;
 
   intmat D = hilbBas(coneViaPoints(C));
@@ -3151,7 +3150,7 @@ example
 {
   echo = 2;
 
-  intmat Q[2][4] = 
+  intmat Q[2][4] =
     1,1,1,1,
     1,0,1,0;
 
@@ -3174,7 +3173,7 @@ static proc compsAreTrivial(ideal RL, list TOR){
 
     // compute a basis Iw of I_w:
     // I_w will be a subspace of KTw:
-    list Iw = gradedCompIdeal(RL, w, 0, TOR)[2]; 
+    list Iw = gradedCompIdeal(RL, w, 0, TOR)[2];
 
     if(size(Iw) > 0){
       return(0);
@@ -3192,7 +3191,7 @@ proc autGradAlg(ideal I, list #)
 "
 USAGE: autGradAlg(I, TOR); I is an ideal, TOR is an optional list of integers representing the torsion part of the grading group.
 ASSUME: minimally presented, degrees of the generators of I
-are the minimal degrees, basering multigraded pointedly, I_w = 0 
+are the minimal degrees, basering multigraded pointedly, I_w = 0
 for all w = deg(var(i))
 RETURN: a ring. Also exports an ideal Jexported and a list stabExported.
 EXAMPLE: example autGradAlg; shows an example
@@ -3219,7 +3218,7 @@ example
 {
   echo = 2;
 
-  intmat Q[1][3] = 
+  intmat Q[1][3] =
     1,1,1;
 
   ring R = 0,T(1..3), dp;
@@ -3250,7 +3249,7 @@ such that some generator of I is Y(i). Exports the image of the given ideal in S
 RETURN: a ring. Exports an ideal Ishrink.
 EXAMPLE: example shrink; shows an example
 "
-{ 
+{
   // create smaller ring:
   // we will map Y(i) --> 0 if i is in the list zeros:
   def R = basering;
@@ -3268,8 +3267,8 @@ EXAMPLE: example shrink; shows an example
   while(c <= size(I)){ // i may have 0-entries:
     for(j = 1; j <= nvars(R); j++){
       if(I[i] == var(j)){
-	zeros[size(zeros)+1] = j;
-	break;
+        zeros[size(zeros)+1] = j;
+        break;
       }
     }
 
@@ -3291,12 +3290,12 @@ EXAMPLE: example shrink; shows an example
   for(i = 1; i <= nvars(R); i++){
     if(take[i] != 0){
       if(firstone){
-	s = s + string(take[i]);
-	firstone = 0;
-	n++;
+        s = s + string(take[i]);
+        firstone = 0;
+        n++;
       } else {
-	s = s + ", " + string(take[i]);
-	n++;
+        s = s + ", " + string(take[i]);
+        n++;
       }
     }
   }
@@ -3315,7 +3314,7 @@ example
   echo=2;
 
   ring R = 0,(T(1..10),Y(1..3),Z),dp;
-  ideal I = 
+  ideal I =
     T(1)*T(3),
     Y(1),
     T(2)*Y(1),
@@ -3327,5 +3326,5 @@ example
   setring S;
 
   Ishrink;
-  
+
 }
