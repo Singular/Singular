@@ -2383,7 +2383,7 @@ used for a function, even if it does return a value.
 @node General command syntax, Special characters, The SINGULAR language, The SINGULAR language
 @subsection General command syntax
 @cindex General command syntax
-@index alias
+@cindex alias
 
 In @sc{Singular} a command is either a declaration, an assignment, a
 call to a function without return value, or a print command. The general
