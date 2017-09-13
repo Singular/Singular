@@ -196,8 +196,11 @@ void* omAllocFromSystem(size_t size)
       exit(1);
     }
   }
-
+#if defined(HAVE_MALLOC_SIZE) || defined(HAVE_MALLOC_USABLE_SIZE)
+  size=_omSizeOfLargeAddr(ptr);
+#else
   size=omSizeOfAddr(ptr);
+#endif
 #ifndef OM_NDEBUG
   if (((unsigned long) ptr) + size > om_MaxAddr)
     om_MaxAddr = ((unsigned long) ptr) + size;
