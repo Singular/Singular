@@ -1798,21 +1798,24 @@ static int ntSize(number a, const coeffs cf)
   if (IS0(a)) return 0;
   fraction f = (fraction)a;
   poly p = NUM(f);
-  int noOfTerms = 0;
-  int numDegree = 0;
+  unsigned long noOfTerms = 0;
+  unsigned long numDegree = 0;
   if (p!=NULL)
   {
     numDegree = p_Totaldegree(p,ntRing);
     noOfTerms = pLength(p);
   }
-  int denDegree = 0;
+  unsigned long denDegree = 0;
   if (!DENIS1(f))
   {
     denDegree =  p_Totaldegree(DEN(f),ntRing);
     noOfTerms += pLength(DEN(f));
   }
   ntTest(a); // !!!!
-  return ((numDegree + denDegree)*(numDegree + denDegree) + 1) * noOfTerms; // must be >0
+  // avoid int overflow:
+  unsigned long t= ((numDegree + denDegree)*(numDegree + denDegree) + 1) * noOfTerms; // must be >0
+  if (t>INT_MAX) return INT_MAX;
+  else return (int)t;
 }
 
 /* assumes that src = Q or Z, dst = Q(t_1, ..., t_s) */
