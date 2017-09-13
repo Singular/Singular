@@ -12,7 +12,7 @@
 #define MAP_ANONYMOUS MAP_ANON
 #endif
 
-static void* omVallocMmap(size_t size)
+static inline void* omVallocMmap(size_t size)
 {
   void* addr;
 #ifndef MAP_ANONYMOUS
@@ -40,7 +40,7 @@ static void* omVallocMmap(size_t size)
   return addr;
 }
 
-static int omVfreeMmap(void* addr, size_t size)
+static inline int omVfreeMmap(void* addr, size_t size)
 {
   return munmap(addr, size);
 }
