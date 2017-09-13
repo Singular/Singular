@@ -6481,7 +6481,7 @@ BOOLEAN iiAssignCR(leftv r, leftv arg)
 
 static void iiReportTypes(int nr,int t,const short *T)
 {
-  char *buf=(char*)omAlloc(250);
+  char buf[250];
   buf[0]='\0';
   if (nr==0)
     sprintf(buf,"wrong length of parameters(%d), expected ",t);
