@@ -830,6 +830,7 @@ static inline poly p_LmHead(poly p, const ring r)
   p_SetRingOfLm(np, r);
   memcpy(np->exp, p->exp, r->ExpL_Size*sizeof(long));
   pNext(np) = NULL;
+  pSetCoeff0(np, NULL);
   return np;
 }
 
