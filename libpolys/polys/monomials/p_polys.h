@@ -822,6 +822,17 @@ static inline poly p_Head(poly p, const ring r)
   return np;
 }
 
+static inline poly p_LmHead(poly p, const ring r)
+{
+  p_LmCheckPolyRing1(p, r);
+  poly np;
+  omTypeAllocBin(poly, np, r->PolyBin);
+  p_SetRingOfLm(np, r);
+  memcpy(np->exp, p->exp, r->ExpL_Size*sizeof(long));
+  pNext(np) = NULL;
+  return np;
+}
+
 // returns a copy of p with Lm(p) from lmRing and Tail(p) from tailRing
 static inline poly p_Copy(poly p, const ring lmRing, const ring tailRing)
 {
