@@ -2843,7 +2843,6 @@ poly p_Cleardenom(poly p, const ring r)
         p_SetCoeff(p,d,r);
         pIter(p);
       }
-      n_Delete(&h,r->cf);
     }
     n_Delete(&h,r->cf);
     p=start;
