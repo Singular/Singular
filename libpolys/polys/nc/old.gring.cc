@@ -1441,7 +1441,6 @@ poly gnc_ReduceSpolyNew(const poly p1, poly p2, const ring r)
   p2 = __p_Mult_nn(p2, C, r); // p2 !!!
   p_Test(p2,r);
   n_Delete(&C,r->cf);
-  n_Delete(&cG,r->cf);
 
   poly out = nc_mm_Mult_pp(m, pNext(p1), r);
   p_Delete(&m,r);
@@ -1652,7 +1651,7 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
 #endif
 #endif
 
-  p_Delete(&pL,r);
+  p_LmFree(&pL,r);
 
   /* zero exponents !? */
   poly M1    = nc_mm_Mult_p(m1,p_Head(p1,r),r); // M1 = m1 * lt(p1)
@@ -1908,12 +1907,7 @@ poly nc_CreateShortSpoly(poly p1, poly p2, const ring r)
     m = p_Lcm(p1, p2, r);
   }
 
-//  n_Delete(&p_GetCoeff(m, r), r->cf);
-//  pSetCoeff0(m, NULL);
-
-#ifdef PDEBUG
-//  p_Test(m,r);
-#endif
+  pSetCoeff0(m,NULL);
 
   return(m);
 }
@@ -2857,11 +2851,16 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
   {
     /* analyze C */
 
-    pN = NULL; /* check the consistency later */
+    BOOLEAN pN_set=FALSE;
+    pN = n_Init(0,curr->cf);
 
     if( r->N > 1 )
       if ( MATELEM(CC,1,2) != NULL )
+      {
+        if (!pN_set) n_Delete(&pN,curr->cf); // free initial nInit(0)
         pN = p_GetCoeff(MATELEM(CC,1,2), curr);
+	pN_set=TRUE;
+      }
 
     tmpIsSkewConstant = true;
 
@@ -2912,6 +2911,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
       nctype = nc_lie;
     else
       nctype = nc_general;
+    if (!pN_set) n_Delete(&pN,curr->cf); // free initial nInit(0)
   }
 
   /* initialition of the matrix D */
