@@ -300,6 +300,19 @@ ideal idSect (ideal h1,ideal h2, GbVariant alg)
       temp1=idInit(1,1);
     }
   }
+  else if (alg==GbModstd)
+  {
+    if (TEST_OPT_PROT) { PrintS("modStd:"); mflush(); }
+    BOOLEAN err;
+    void *args[]={temp,(void*)1,NULL};
+    int arg_t[]={MODUL_CMD,INT_CMD,0};
+    temp1=(ideal)iiCallLibProcM("modStd",args,arg_t,err);
+    if (err)
+    {
+      Werror("error %d in >>modStd<<",err);
+      temp1=idInit(1,1);
+    }
+  }
 
   if(syz_ring!=orig_ring)
     rChangeCurrRing(orig_ring);
@@ -2764,19 +2777,19 @@ GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)
   {
     return GbGroebner;
   }
-//  else if(alg==GbModstd)  // cond for modstd: requires ideal, not module
-//  {
-//    if(ggetid("modStd")==NULL)
-//    {
-//      WarnS(">>modStd<< not found");
-//    }
-//    else if(rField_is_Q(r)
-//    &&(!rIsPluralRing(r))
-//    &&(rHasGlobalOrdering(r)))
-//    {
-//      return GbModstd;
-//    }
-//  }
+  else if(alg==GbModstd)  // cond for modstd: Q or Q(a)
+  {
+    if(ggetid("modStd")==NULL)
+    {
+      WarnS(">>modStd<< not found");
+    }
+    else if(rField_is_Q(r)
+    &&(!rIsPluralRing(r))
+    &&(rHasGlobalOrdering(r)))
+    {
+      return GbModstd;
+    }
+  }
 
   return GbStd; // no conditions for std
 }
