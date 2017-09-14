@@ -607,17 +607,19 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w, GbVarian
       h3=idInit(1,1);
     }
   }
-//  else if (alg==GbModstd): requires ideal, not module
-//  {
-//    if (TEST_OPT_PROT) { PrintS("modstd:"); mflush(); }
-//    BOOLEAN err;
-//    h3=(ideal)iiCallLibProc1("modStd",idCopy(h2),MODUL_CMD,err);
-//    if (err)
-//    {
-//      Werror("error %d in >>modStd<<",err);
-//      h3=idInit(1,1);
-//    }
-//  }
+  else if (alg==GbModstd)
+  {
+    if (TEST_OPT_PROT) { PrintS("modstd:"); mflush(); }
+    BOOLEAN err;
+    void *args[]={idCopy(h2),(void*)1,NULL};
+    int arg_t[]={MODUL_CMD,INT_CMD,0};
+    h3=(ideal)iiCallLibProcM("modStd",args,arg_t,err);
+    if (err)
+    {
+      Werror("error %d in >>modStd<<",err);
+      h3=idInit(1,1);
+    }
+  }
   //else if (alg==GbSba): requires order C,...
   //{
   //  if (TEST_OPT_PROT) { PrintS("sba:"); mflush(); }
