@@ -752,8 +752,8 @@ public:
 
 oldGaussElem::~oldGaussElem()
 {
-    nDelete( & fac );
-    nDelete( & pdenom );
+  if (fac!=NULL)    nDelete( & fac );
+  if (pdenom!=NULL) nDelete( & pdenom );
 }
 
 
