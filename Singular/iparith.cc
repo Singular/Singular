@@ -1735,7 +1735,7 @@ static BOOLEAN jjCOEFFS2_KB(leftv res, leftv u, leftv v)
   pSetm(p);
   res->data = (void*)idCoeffOfKBase((ideal)(u->Data()),
                                     (ideal)(v->Data()), p);
-  pDelete(&p);
+  pLmFree(&p);
   return FALSE;
 }
 static BOOLEAN jjCONTRACT(leftv res, leftv u, leftv v)
