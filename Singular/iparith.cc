@@ -4241,7 +4241,7 @@ static BOOLEAN jjLEADMONOM(leftv res, leftv v)
   else
   {
     poly lm = pLmInit(p);
-    pSetCoeff(lm, nInit(1));
+    pSetCoeff0(lm, nInit(1));
     res->data = (char*) lm;
   }
   return FALSE;
