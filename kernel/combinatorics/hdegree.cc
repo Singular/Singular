@@ -1355,6 +1355,7 @@ ideal scKBase(int deg, ideal s, ideal Q, intvec * mv)
   if( Q!=NULL) id_Test(Q, currRing);
 
   int  i, di;
+  poly p;
 
   if (deg < 0)
   {
@@ -1367,7 +1368,8 @@ ideal scKBase(int deg, ideal s, ideal Q, intvec * mv)
   }
   stcmem = hCreate((currRing->N) - 1);
   hexist = hInit(s, Q, &hNexist, currRing);
-  last = pInit();
+  p = last = pInit();
+  /*pNext(p) = NULL;*/
   act = (scmon)omAlloc(((currRing->N) + 1) * sizeof(int));
   *act = 0;
   if (!hNexist)
@@ -1406,7 +1408,12 @@ ende:
   hDelete(hexist, hNexist);
   omFreeSize((ADDRESS)act, ((currRing->N) + 1) * sizeof(int));
   hKill(stcmem, (currRing->N) - 1);
-  return idInit(1,s->rank);
+  pLmDelete(&p);
+  if (p == NULL)
+    return idInit(1,s->rank);
+
+  last = p;
+  return scIdKbase(p, s->rank);
 }
 
 #if 0 //-- alternative implementation of scComputeHC
