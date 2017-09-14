@@ -78,7 +78,8 @@ static void copyL (kStrategy o,kStrategy n)
       l[j].p=pCopy(o->L[j].p);
     else
     {
-      l[j].p=pHead(o->L[j].p);
+      l[j].p=p_LmHead(o->L[j].p,currRing);
+      if (pGetCoeff(o->L[j].p)!=NULL) pSetCoeff0(l[j].p,nCopy(pGetCoeff(o->L[j].p)));
       pNext(l[j].p)=n->tail;
     }
     // copy .lcm ----------------------------------------------
