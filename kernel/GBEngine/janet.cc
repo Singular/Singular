@@ -385,7 +385,7 @@ void DestroyPoly(Poly *x)
 {
   pDelete(&x->root);
   pLmFree(&x->history);
-  if (x->lead) pDelete(&x->lead);
+  if (x->lead!=NULL) pLmFree(&x->lead);
   GCF(x->mult);
   GCF(x);
 }
@@ -409,7 +409,7 @@ void InitHistory(Poly *p)
 
 void InitLead(Poly *p)
 {
-  if (p->lead) pLmDelete(&p->lead);
+  if (p->lead!=NULL) pLmFree(&p->lead);
   p->lead=pLmInit(p->root);
   p->prolonged=-1;
 }
@@ -492,7 +492,7 @@ void ProlVar(Poly *temp,int i)
     Pr->lead=pLmInit(temp->lead);
     pIncrExp(Pr->lead,i+1);
     pSetm(Pr->lead);
-     InitProl(temp);
+    InitProl(temp);
 
      Pr->changed=0;
 //    pTest(Pr->root);
