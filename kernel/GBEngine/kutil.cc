@@ -1166,7 +1166,8 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
   if (set[j].lcm!=NULL)
   {
 #ifdef HAVE_RINGS
-    if (pGetCoeff(set[j].lcm) != NULL)
+    if (rField_is_Ring(currRing)
+    && (pGetCoeff(set[j].lcm) != NULL))
       pLmDelete(set[j].lcm);
     else
 #endif
@@ -2200,7 +2201,9 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
 
     if (TEST_OPT_INTSTRATEGY)
     {
-      if (!rIsPluralRing(currRing))
+      if (!rIsPluralRing(currRing)
+      && !rField_is_Ring(currRing)
+      && (Lp.p->coef!=NULL))
         nDelete(&(Lp.p->coef));
     }
 
@@ -2420,6 +2423,9 @@ static void enterOnePairLift (int i,poly p,int ecart, int isFromQ,kStrategy stra
 
     if (TEST_OPT_INTSTRATEGY)
     {
+      if (!rIsPluralRing(currRing)
+      && !rField_is_Ring(currRing)
+      && (Lp.p->coef!=NULL))
         nDelete(&(Lp.p->coef));
     }
 
@@ -2678,7 +2684,9 @@ static void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFro
 
     if (TEST_OPT_INTSTRATEGY)
     {
-      if (!rIsPluralRing(currRing))
+      if (!rIsPluralRing(currRing)
+      && !rField_is_Ring(currRing)
+      && (Lp.p->coef!=NULL))
         nDelete(&(Lp.p->coef));
     }
 
@@ -3082,7 +3090,9 @@ static void enterOnePairSigRing (int i, poly p, poly pSig, int, int ecart, int i
 
     if (TEST_OPT_INTSTRATEGY)
     {
-      if (!rIsPluralRing(currRing) && !rField_is_Ring(currRing))
+      if (!rIsPluralRing(currRing)
+      && !rField_is_Ring(currRing)
+      && (Lp.p->coef!=NULL))
         nDelete(&(Lp.p->coef));
     }
     // Check for sigdrop
@@ -3190,7 +3200,10 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
     strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
     if (TEST_OPT_INTSTRATEGY)
     {
-      nDelete(&(Lp.p->coef));
+      if (!rIsPluralRing(currRing)
+      && !rField_is_Ring(currRing)
+      && (Lp.p->coef!=NULL))
+        nDelete(&(Lp.p->coef));
     }
     l = strat->posInL(strat->L,strat->Ll,&Lp,strat);
     //Print("-> L[%d]\n",l);
@@ -7999,6 +8012,7 @@ void messageSets (kStrategy strat)
     {
       Print("\n  %d:",i);
       strat->T[i].wrp();
+      if (strat->T[i].length==0) strat->T[i].length=pLength(strat->T[i].p);
       Print(" o:%ld e:%d l:%d",
         strat->T[i].pFDeg(),strat->T[i].ecart,strat->T[i].length);
     }
@@ -10175,7 +10189,7 @@ void exitBuchMora (kStrategy strat)
   omFreeSize(strat->L,(strat->Lmax)*sizeof(LObject));
   /*- set B: should be empty -*/
   omFreeSize(strat->B,(strat->Bmax)*sizeof(LObject));
-  pLmDelete(&strat->tail);
+  pLmFree(&strat->tail);
   strat->syzComp=0;
 }
 
@@ -10750,6 +10764,7 @@ BOOLEAN newHEdge(kStrategy strat)
     strat->t_kHEdge = k_LmInit_currRing_2_tailRing(strat->kHEdge, strat->tailRing);
   /* compare old and new noether*/
   newNoether = pLmInit(strat->kHEdge);
+  pSetCoeff0(newNoether,nInit(1));
   j = p_FDeg(newNoether,currRing);
   for (i=1; i<=(currRing->N); i++)
   {
@@ -10775,7 +10790,7 @@ BOOLEAN newHEdge(kStrategy strat)
   }
   if (pCmp(strat->kNoether,newNoether)!=1)
   {
-    pDelete(&strat->kNoether);
+    if (strat->kNoether!=NULL) pLmDelete(&strat->kNoether);
     strat->kNoether=newNoether;
     if (strat->t_kNoether != NULL) p_LmFree(strat->t_kNoether, strat->tailRing);
     if (strat->tailRing != currRing)
@@ -10783,10 +10798,7 @@ BOOLEAN newHEdge(kStrategy strat)
 
     return TRUE;
   }
-  if (rField_is_Ring(currRing))
-    pLmDelete(newNoether);
-  else
-    pLmFree(newNoether);
+  pLmDelete(newNoether);
   return FALSE;
 }
 
@@ -12570,7 +12582,9 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 
     if (TEST_OPT_INTSTRATEGY)
     {
-      if (!rIsPluralRing(currRing))
+      if (!rIsPluralRing(currRing)
+      && !rField_is_Ring(currRing)
+      && (Lp.p->coef!=NULL))
         nDelete(&(Lp.p->coef));
     }
 

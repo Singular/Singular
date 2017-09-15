@@ -1881,10 +1881,10 @@ loop_count = 1;
     else
       Kstd1_mu=-1;
   }
-  pDelete(&strat->kHEdge);
+  if (strat->kHEdge!=NULL) pLmFree(&strat->kHEdge);
   strat->update = TRUE; //???
   strat->lastAxis = 0; //???
-  pDelete(&strat->kNoether);
+  if (strat->kNoether!=NULL) pLmDelete(&strat->kNoether);
   omFreeSize((ADDRESS)strat->NotUsedAxis,((currRing->N)+1)*sizeof(BOOLEAN));
   if ((TEST_OPT_PROT)||(TEST_OPT_DEBUG))  messageStat(hilbcount,strat);
 //  if (TEST_OPT_WEIGHTM)
@@ -1936,7 +1936,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   && ((!strat->kHEdgeFound)
     ||(TEST_OPT_DEGBOUND && (pWTotaldegree(strat->kNoether)<Kstd1_deg))))
   {
-    pDelete(&strat->kNoether);
+    pLmDelete(&strat->kNoether);
     strat->kNoether=pOne();
     pSetExp(strat->kNoether,1, Kstd1_deg+1);
     pSetm(strat->kNoether);
@@ -1971,7 +1971,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
       pSetmComp(p);
       p=pAdd(strat->kNoether,p);
       strat->kNoether=pNext(p);
-      p_LmFree(p,currRing);
+      p_LmDelete(p,currRing);
     }
   }
   if ((lazyReduce & KSTD_NF_LAZY)==0)
@@ -2031,8 +2031,8 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
     omFreeSize((ADDRESS)strat->fromQ,i*sizeof(int));
     strat->fromQ=NULL;
   }
-  pDelete(&strat->kHEdge);
-  pDelete(&strat->kNoether);
+  if (strat->kHEdge!=NULL) pLmFree(&strat->kHEdge);
+  if (strat->kNoether!=NULL) pLmDelete(&strat->kNoether);
 //  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
 //  {
 //    pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
@@ -2080,7 +2080,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   && ((!strat->kHEdgeFound)
     ||(TEST_OPT_DEGBOUND && (pWTotaldegree(strat->kNoether)<Kstd1_deg))))
   {
-    pDelete(&strat->kNoether);
+    pLmDelete(&strat->kNoether);
     strat->kNoether=pOne();
     pSetExp(strat->kNoether,1, Kstd1_deg+1);
     pSetm(strat->kNoether);
@@ -2115,7 +2115,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
       pSetmComp(p);
       p=pAdd(strat->kNoether,p);
       strat->kNoether=pNext(p);
-      p_LmFree(p,currRing);
+      p_LmDelete(p,currRing);
     }
   }
   if (TEST_OPT_INTSTRATEGY && ((lazyReduce & KSTD_NF_LAZY)==0))
@@ -2183,8 +2183,8 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
     omFreeSize((ADDRESS)strat->fromQ,i*sizeof(int));
     strat->fromQ=NULL;
   }
-  pDelete(&strat->kHEdge);
-  pDelete(&strat->kNoether);
+  if (strat->kHEdge!=NULL) pLmFree(&strat->kHEdge);
+  if (strat->kNoether!=NULL) pLmDelete(&strat->kNoether);
 //  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
 //  {
 //    pFDeg=strat->pOrigFDeg;
@@ -3224,7 +3224,7 @@ ideal kInterRedOld (ideal F, ideal Q)
   if (TEST_OPT_REDSB && TEST_OPT_INTSTRATEGY)
     completeReduce(strat);
   //else if (TEST_OPT_PROT) PrintLn();
-  pDelete(&strat->kHEdge);
+  if (strat->kHEdge!=NULL) pLmFree(&strat->kHEdge);
   omFreeSize((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
   omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
   omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
