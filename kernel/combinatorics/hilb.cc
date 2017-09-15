@@ -1812,7 +1812,7 @@ static void TwordMap(poly p, poly w, int lV, int d, ideal Jwi, bool &flag)
 
       //shiftInMon(qmonp, -d, lV, currRing):returns a new poly,
       //qmonp remains unchanged, delete it
-      pDelete(&qmonp);
+      pLmFree(&qmonp);
       pDelete(&dw);
       pDelete(&smon);
     }
