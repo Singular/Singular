@@ -2560,7 +2560,9 @@ number resMatrixDense::getDetAt( const number* evpoint )
     {
       for ( i= 0; i < (currRing->N); i++ )
       {
-        pSetCoeff( MATELEM(m,numVectors-k,numVectors-(getMVector(k)->numColParNr)[i]),
+        number np=pGetCoeff(MATELEM(m,numVectors-k,numVectors-(getMVector(k)->numColParNr)[i]));
+        if (np!=NULL) nDelete(&np);
+        pSetCoeff0( MATELEM(m,numVectors-k,numVectors-(getMVector(k)->numColParNr)[i]),
                    nCopy(evpoint[i]) );
       }
     }
