@@ -1572,12 +1572,12 @@ poly p_DivideM(poly a, poly b, const ring r)
   {
     inv = n_Invers(inv,r->cf);
     __p_Mult_nn(result,inv,r);
+    n_Delete(&inv, r->cf);
   }
   else
   {
     result = p_Div_nn(result,inv,r);
   }
-  n_Delete(&inv, r->cf);
   p_Delete(&b, r);
   return result;
 }
