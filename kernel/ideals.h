@@ -127,6 +127,7 @@ enum GbVariant
   GbModstd,
   GbFfmod,
   GbNfmod,
+  GbStdSat,
   GbSingmatic
 };
 
