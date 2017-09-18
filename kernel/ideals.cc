@@ -348,7 +348,7 @@ ideal idSect (ideal h1,ideal h2, GbVariant alg)
       }
       void *args[]={temp,v,NULL};
       int arg_t[]={MODUL_CMD,IDEAL_CMD,0};
-      temp1=(ideal)iiCallLibProcM("modStd",args,arg_t,err);
+      temp1=(ideal)iiCallLibProcM("satstd",args,arg_t,err);
     }
     if (err)
     {
@@ -698,7 +698,7 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w, GbVarian
       }
       void *args[]={idCopy(h2),v,NULL};
       int arg_t[]={MODUL_CMD,IDEAL_CMD,0};
-      h3=(ideal)iiCallLibProcM("modStd",args,arg_t,err);
+      h3=(ideal)iiCallLibProcM("satstd",args,arg_t,err);
     }
     if (err)
     {
@@ -2891,7 +2891,7 @@ GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)
     }
     else
     {
-      return GbModstd;
+      return GbStdSat;
     }
   }
 
