@@ -23,6 +23,7 @@ REFERENCES:
 
 PROCEDURES:
   modStd(I);    standard basis of I using modular methods
+  modSyz(I);    syzygy module of I  using modular methods
 ";
 
 LIB "poly.lib";
@@ -103,6 +104,38 @@ example
     size(reduce(J2, J1));
 }
 
+proc modSyz(def I)
+"USAGE:   modSyz(I); I ideal/module
+RETURN:   a generating set of syzygies of I
+NOTE:     The procedure computes a the syzygy module of I (over the rational
+          numbers) by using modular methods with high probability.
+SEE ALSO: modular
+EXAMPLE:  example modSyz; shows an example"
+{
+    /* save options */
+    intvec opt = option(get);
+    option(redSB);
+
+    /* choose the right command */
+    string command = "syz";
+
+    /* call modular() */
+    module M = modular(command, list(I), primeTest_std,
+         deleteUnluckyPrimes_std, pTest_syz);
+
+    /* return the result */
+    option(set, opt);
+    return(M);
+}
+example
+{
+    "EXAMPLE:"; echo = 2;
+    ring R1 = 0, (x,y,z,t), dp;
+    ideal I = 3x3+x2+1, 11y5+y3+2, 5z4+z2+4;
+    modSyz(I);
+    simplify(syz(I),1);
+}
+
 /* compute a normalized GB via groebner() */
 static proc groebner_norm(ideal I)
 {
@@ -165,7 +198,7 @@ static proc deleteUnluckyPrimes_std(alias list modresults)
      */
     list cat;
     int size_cat;
-    ideal L;
+    def L=modresults[1]; // dummy assign to get the type of L
     int i;
     int j;
     for (i = 1; i <= size_modresults; i++)
@@ -212,6 +245,11 @@ static proc deleteUnluckyPrimes_std(alias list modresults)
         if (i != cat_max) { unluckyIndices = unluckyIndices + cat[i][3]; }
     }
     return(unluckyIndices);
+}
+
+static proc pTest_syz(string command, alias list args, alias def result, int p)
+{
+  return(size(module(matrix(args[1])*matrix(result)))==0);
 }
 
 /* test if 'command' applied to 'args' in characteristic p is the same as
