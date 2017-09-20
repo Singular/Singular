@@ -33,6 +33,8 @@ PROCEDURES:
                             of Kronecker modules N (q; m, n)
   BettiNumsN(q, m, n);      Betti numbers of the moduli space
                             of Kronecker modules N (q; m, n)
+
+KEYWORDS: betti number; Goettsche's formula; Macdonald's formula;Kronecker modules
 ";
 //----------------------------------------------------------
 
