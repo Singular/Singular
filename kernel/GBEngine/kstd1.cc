@@ -2270,7 +2270,10 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     }
     else if (!TEST_OPT_DEGBOUND)
     {
-      h = (tHomog)idHomModule(F,Q,w);
+      if (w!=NULL)
+        h = (tHomog)idHomModule(F,Q,w);
+      else
+        h = (tHomog)idHomIdeal(F,Q);
     }
   }
   currRing->pLexOrder=b;

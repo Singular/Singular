@@ -211,7 +211,7 @@ public:
   KINLINE void Tail_Minus_mm_Mult_qq(poly m, poly qq, int lq, poly spNoether);
   KINLINE void Tail_Mult_nn(number n);
   // deletes bucket, makes sure that p and t_p exists
-  KINLINE poly GetP(omBin lmBin = NULL);
+  KINLINE poly GetP(omBin lmBin = (omBin)NULL);
   // similar, except that only t_p exists
   KINLINE poly GetTP();
 

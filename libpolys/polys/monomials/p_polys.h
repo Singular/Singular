@@ -1460,9 +1460,7 @@ static inline void p_GetExpVL(poly p, long *ev, const ring r)
 {
   p_LmCheckPolyRing1(p, r);
   for (unsigned j = r->N; j!=0; j--)
-      ev[j] = p_GetExp(p, j, r);
-
-  ev[0] = p_GetComp(p, r);
+      ev[j-1] = p_GetExp(p, j, r);
 }
 static inline void p_SetExpV(poly p, int *ev, const ring r)
 {
