@@ -19,6 +19,7 @@
 // enable large primes (32749 < p < 2^31-)
 #define NV_OPS
 #define NV_MAX_PRIME 32749
+#define FACTORY_MAX_PRIME 536870909
 
 struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
 struct snumber; typedef struct snumber *   number;
