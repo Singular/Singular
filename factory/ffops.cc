@@ -28,9 +28,9 @@ void ff_setprime ( const int p )
 
 int ff_newinv ( const int a )
 {
-    int p, q, r1, r2, y1, y2;
     if (a < 2)
           return (ff_invtab[a] = a);
+    int p, q, r1, r2, y1, y2;
     r1 = p = ff_prime;
     q = r1 / a;
     y1 = -q;
@@ -70,9 +70,9 @@ int ff_newinv ( const int a )
 
 int ff_biginv ( const int a )
 {
-    int p, q, r1, r2, y1, y2;
     if (a < 2)
       return a;
+    int p, q, r1, r2, y1, y2;
     r1 = p = ff_prime;
     q = r1 / a;
     y1 = -q;
