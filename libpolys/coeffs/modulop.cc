@@ -518,7 +518,6 @@ BOOLEAN npInitChar(coeffs r, void* p)
     //r->cfPower= nvPower;
     if (c>FACTORY_MAX_PRIME)
     {
-      Warn("prime too large(>%ld): factory routines are not available",FACTORY_MAX_PRIME);
       r->convSingNFactoryN=ndConvSingNFactoryN;
     }
   }
