@@ -24,13 +24,13 @@
 New syntax:
 @itemize
 @item @code{alias}: may be used as a prefix to a variable declaration.
-Can only be used in procedure headings. (@xref{General command syntax}).
+Can only be used in procedure headings. (@nref{General command syntax}).
 @end itemize
 
 Extended commands:
 @itemize
-@item @code{%},@code{mod}: also for poly operands (@xref{poly operations}).
-@item @code{delete}: extended to intvec, ideal, module (@xref{delete}).
+@item @code{%},@code{mod}: also for poly operands (@nref{poly operations}).
+@item @code{delete}: extended to intvec, ideal, module (@nref{delete}).
 @item syz (@nref{syz}), lift (@nref{lift}), liftstd (@nref{liftstd}), intersect(@nref{intersect}): with a specified GB algorithm
 @end itemize
 
