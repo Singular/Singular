@@ -2322,7 +2322,7 @@ namespace amp
         const ampf<Precision> *p2 = v2.GetData();
         mpfr_record *r = NULL;
         mpfr_record *t = NULL;
-        try
+        //try
         {
             r = mpfr_storage::newMpfr(Precision);
             t = mpfr_storage::newMpfr(Precision);
