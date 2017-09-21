@@ -33,8 +33,8 @@ Checking of the array boundaries mode.
 
 
 /********************************************************************
-This symbol is used for debugging. Do not define it and do not remove 
-comments. 
+This symbol is used for debugging. Do not define it and do not remove
+comments.
 ********************************************************************/
 //#define UNSAFE_MEM_COPY
 
@@ -129,11 +129,11 @@ const complex csqr(const complex &z);
 
 
 /********************************************************************
-Template defining vector in memory. It is used by the basic 
+Template defining vector in memory. It is used by the basic
 subroutines of linear algebra.
 
-Vector consists of Length elements of type T, starting from an element, 
-which Data is pointed to. Interval between adjacent elements equals 
+Vector consists of Length elements of type T, starting from an element,
+which Data is pointed to. Interval between adjacent elements equals
 the value of Step.
 
 The class provides an access for reading only.
@@ -163,8 +163,8 @@ protected:
 Template defining vector in memory, derived from const_raw_vector.
 It is used by the basic subroutines of linear algebra.
 
-Vector consists of Length elements of type T, starting from an element, 
-which Data is pointed to. Interval between adjacent elements equals 
+Vector consists of Length elements of type T, starting from an element,
+which Data is pointed to. Interval between adjacent elements equals
 the value of Step.
 
 The class provides an access both for reading and writing.
@@ -693,7 +693,7 @@ public:
             m_Vec=0;
     };
 
-    
+
     const template_1d_array& operator=(const template_1d_array &rhs)
     {
         if( this==&rhs )
@@ -719,7 +719,7 @@ public:
         return *this;
     };
 
-    
+
     const T& operator()(int i) const
     {
         #ifndef NO_AP_ASSERT
@@ -728,7 +728,7 @@ public:
         return m_Vec[ i-m_iLow ];
     };
 
-    
+
     T& operator()(int i)
     {
         #ifndef NO_AP_ASSERT
@@ -737,7 +737,7 @@ public:
         return m_Vec[ i-m_iLow ];
     };
 
-    
+
     void setbounds( int iLow, int iHigh )
     {
         if(m_Vec)
@@ -748,7 +748,7 @@ public:
         m_Vec = new T[m_iVecSize];
     };
 
-    
+
     void setcontent( int iLow, int iHigh, const T *pContent )
     {
         setbounds(iLow, iHigh);
@@ -756,7 +756,7 @@ public:
             (*this)(i) = pContent[i-iLow];
     };
 
-    
+
     T* getcontent()
     {
         return m_Vec;
@@ -767,13 +767,13 @@ public:
         return m_Vec;
     };
 
-    
+
     int getlowbound(int iBoundNum = 0) const
     {
         return m_iLow;
     };
 
-    
+
     int gethighbound(int iBoundNum = 0) const
     {
         return m_iHigh;
@@ -787,7 +787,7 @@ public:
             return raw_vector<T>(m_Vec+iStart-m_iLow, iEnd-iStart+1, 1);
     };
 
-    
+
     const_raw_vector<T> getvector(int iStart, int iEnd) const
     {
         if( iStart>iEnd || wrongIdx(iStart) || wrongIdx(iEnd) )
@@ -1033,7 +1033,7 @@ double minreal(double m1, double m2);
 
 namespace amp
 {
-    class exception {}; 
+    class exception {};
     class incorrectPrecision    : public exception {};
     class overflow              : public exception {};
     class divisionByZero        : public exception {};
@@ -1042,10 +1042,10 @@ namespace amp
     class invalidString         : public exception {};
     class internalError         : public exception {};
     class domainError           : public exception {};
-    
+
     typedef unsigned long unsigned32;
     typedef signed long   signed32;
-    
+
     struct mpfr_record
     {
         unsigned int refCount;
@@ -1053,15 +1053,15 @@ namespace amp
         mpfr_t value;
         mpfr_record *next;
     };
-    
+
     typedef mpfr_record* mpfr_record_ptr;
-    
+
     //
     // storage for mpfr_t instances
     //
     class mpfr_storage
     {
-    public:        
+    public:
         static mpfr_record* newMpfr(unsigned int Precision);
         static void deleteMpfr(mpfr_record* ref);
         /*static void clearStorage();*/
@@ -1069,7 +1069,7 @@ namespace amp
     private:
         static mpfr_record_ptr& getList(unsigned int Precision);
     };
-    
+
     //
     // mpfr_t reference
     //
@@ -1080,16 +1080,16 @@ namespace amp
         mpfr_reference(const mpfr_reference& r);
         mpfr_reference& operator= (const mpfr_reference &r);
         ~mpfr_reference();
-        
+
         void initialize(int Precision);
         void free();
-        
+
         mpfr_srcptr getReadPtr() const;
         mpfr_ptr getWritePtr();
     private:
         mpfr_record *ref;
     };
-        
+
     //
     // ampf template
     //
@@ -1106,13 +1106,13 @@ namespace amp
             if( rval->refCount==0 )
                 mpfr_storage::deleteMpfr(rval);
         }
-        
+
         //
         // Initializing
         //
         ampf ()                 { InitializeAsZero(); }
         ampf(mpfr_record *v)    { rval = v; }
-        
+
         ampf (long double v)    { InitializeAsDouble(v); }
         ampf (double v)         { InitializeAsDouble(v); }
         ampf (float v)          { InitializeAsDouble(v); }
@@ -1124,14 +1124,14 @@ namespace amp
         ampf (unsigned short v) { InitializeAsULong(v); }
         ampf (signed char v)    { InitializeAsSLong(v); }
         ampf (unsigned char v)  { InitializeAsULong(v); }
-        
+
         //
         // initializing from string
         // string s must have format "X0.hhhhhhhh@eee" or "X-0.hhhhhhhh@eee"
         //
         ampf (const std::string &s) { InitializeAsString(s.c_str()); }
         ampf (const char *s)        { InitializeAsString(s); }
-        
+
         //
         // copy constructors
         //
@@ -1191,7 +1191,7 @@ namespace amp
             return *this;
         }
 #endif
-        
+
         //
         // in-place operators
         // TODO: optimize
@@ -1200,13 +1200,13 @@ namespace amp
         template<class T> ampf& operator-=(const T& v){ *this = *this - v; return *this; };
         template<class T> ampf& operator*=(const T& v){ *this = *this * v; return *this; };
         template<class T> ampf& operator/=(const T& v){ *this = *this / v; return *this; };
-        
+
         //
         // MPFR access
         //
         mpfr_srcptr getReadPtr() const;
         mpfr_ptr getWritePtr();
-        
+
         //
         // properties and information
         //
@@ -1223,11 +1223,11 @@ namespace amp
         std::string toHex() const;
         std::string toDec() const;
         char * toString() const;
-        
-        
+
+
         //
         // static methods
-        //        
+        //
         static const ampf getUlpOf(const ampf &x);
         static const ampf getUlp();
         static const ampf getUlp256();
@@ -1245,7 +1245,7 @@ namespace amp
         void InitializeAsULong(unsigned long v);
         void InitializeAsDouble(long double v);
         void InitializeAsString(const char *s);
-        
+
         //mpfr_reference  ref;
         mpfr_record *rval;
     };
@@ -1261,7 +1261,7 @@ namespace amp
     {
         if( Precision<32 )
             //throw incorrectPrecision();
-	    WerrorS("incorrectPrecision");
+            WerrorS("incorrectPrecision");
     }
 
     template<unsigned int Precision>
@@ -1279,7 +1279,7 @@ namespace amp
         rval = mpfr_storage::newMpfr(Precision);
         mpfr_set_si(getWritePtr(), sv, GMP_RNDN);
     }
-    
+
     template<unsigned int Precision>
     void ampf<Precision>::InitializeAsULong(unsigned long v)
     {
@@ -1287,7 +1287,7 @@ namespace amp
         rval = mpfr_storage::newMpfr(Precision);
         mpfr_set_ui(getWritePtr(), v, GMP_RNDN);
     }
-                           
+
     template<unsigned int Precision>
     void ampf<Precision>::InitializeAsDouble(long double v)
     {
@@ -1302,14 +1302,14 @@ namespace amp
         CheckPrecision();
         rval = mpfr_storage::newMpfr(Precision);
         mpfr_strtofr(getWritePtr(), s, NULL, 0, GMP_RNDN);
-    } 
+    }
 
     template<unsigned int Precision>
     mpfr_srcptr ampf<Precision>::getReadPtr() const
     {
         return rval->value;
     }
-    
+
     template<unsigned int Precision>
     mpfr_ptr ampf<Precision>::getWritePtr()
     {
@@ -1321,7 +1321,7 @@ namespace amp
         rval = newrval;
         return rval->value;
     }
-        
+
     template<unsigned int Precision>
     bool ampf<Precision>::isFiniteNumber() const
     {
@@ -1335,13 +1335,13 @@ namespace amp
             return false;
         return mpfr_sgn(getReadPtr())>0;
     }
-    
+
     template<unsigned int Precision>
     bool ampf<Precision>::isZero() const
     {
         return mpfr_zero_p(getReadPtr())!=0;
     }
-    
+
     template<unsigned int Precision>
     bool ampf<Precision>::isNegativeNumber() const
     {
@@ -1355,13 +1355,13 @@ namespace amp
     {
         return getUlpOf(*this);
     }
-    
+
     template<unsigned int Precision>
     double ampf<Precision>::toDouble() const
     {
         return mpfr_get_d(getReadPtr(), GMP_RNDN);
     }
-    
+
     template<unsigned int Precision>
     std::string ampf<Precision>::toHex() const
     {
@@ -1378,7 +1378,7 @@ namespace amp
             mpfr_free_str(ptr);
             return r;
         }
-        
+
         //
         // general case
         //
@@ -1392,7 +1392,8 @@ namespace amp
         ptr2 = ptr;
         iexpval = expval;
         if( iexpval!=expval )
-            throw internalError();
+        //    throw internalError();
+            WerrorS("internalError");
         sprintf(buf_e, "%ld", long(iexpval));
         if( *ptr=='-' )
         {
@@ -1406,12 +1407,12 @@ namespace amp
         mpfr_free_str(ptr2);
         return r;
     }
-    
+
     template<unsigned int Precision>
     std::string ampf<Precision>::toDec() const
     {
         // TODO: advanced output formatting (zero, integers)
-        
+
         //
         // some special cases
         //
@@ -1425,7 +1426,7 @@ namespace amp
             mpfr_free_str(ptr);
             return r;
         }
-        
+
         //
         // general case
         //
@@ -1439,7 +1440,8 @@ namespace amp
         ptr2 = ptr;
         iexpval = expval;
         if( iexpval!=expval )
-            throw internalError();
+        //    throw internalError();
+            WerrorS("internalError");
         sprintf(buf_e, "%ld", long(iexpval));
         if( *ptr=='-' )
         {
@@ -1469,7 +1471,7 @@ namespace amp
             mpfr_free_str(ptr);
             return toString_Block;
         }
-        
+
         //
         // general case
         //
@@ -1484,7 +1486,7 @@ namespace amp
         iexpval = expval;
         if( iexpval!=expval )
             //throw internalError();
-	    WerrorS("internalError");
+            WerrorS("internalError");
         sprintf(buf_e, "%ld", long(iexpval));
         if( *ptr=='-' )
         {
@@ -1519,7 +1521,7 @@ namespace amp
             GMP_RNDN);
         return r;
     }
-        
+
     template<unsigned int Precision>
     const ampf<Precision> ampf<Precision>::getUlp()
     {
@@ -1528,7 +1530,7 @@ namespace amp
         mpfr_sub_ui(r.getWritePtr(), r.getWritePtr(), 1, GMP_RNDN);
         return r;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> ampf<Precision>::getUlp256()
     {
@@ -1542,7 +1544,7 @@ namespace amp
             GMP_RNDN);
         return r;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> ampf<Precision>::getUlp512()
     {
@@ -1555,7 +1557,7 @@ namespace amp
             9,
             GMP_RNDN);
         return r;
-    } 
+    }
 
     template<unsigned int Precision>
     const ampf<Precision> ampf<Precision>::getMaxNumber()
@@ -1565,7 +1567,7 @@ namespace amp
         mpfr_set_exp(r.getWritePtr(),mpfr_get_emax());
         return r;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> ampf<Precision>::getMinNumber()
     {
@@ -1579,7 +1581,7 @@ namespace amp
     {
         return getUlp256();
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> ampf<Precision>::getAlgoPascalMaxNumber()
     {
@@ -1590,7 +1592,7 @@ namespace amp
         mpfr_set_exp(r.getWritePtr(), e-5);
         return r;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> ampf<Precision>::getAlgoPascalMinNumber()
     {
@@ -1609,7 +1611,7 @@ namespace amp
         while(mpfr_urandomb(r.getWritePtr(), *amp::mpfr_storage::getRandState()));
         return r;
     }
-    
+
     //
     // comparison operators
     //
@@ -1624,31 +1626,31 @@ namespace amp
     {
         return mpfr_cmp(op1.getReadPtr(), op2.getReadPtr())!=0;
     }
-    
+
     template<unsigned int Precision>
     const bool operator<(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
         return mpfr_cmp(op1.getReadPtr(), op2.getReadPtr())<0;
     }
-    
+
     template<unsigned int Precision>
     const bool operator>(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
         return mpfr_cmp(op1.getReadPtr(), op2.getReadPtr())>0;
     }
-    
+
     template<unsigned int Precision>
     const bool operator<=(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
         return mpfr_cmp(op1.getReadPtr(), op2.getReadPtr())<=0;
     }
-    
+
     template<unsigned int Precision>
     const bool operator>=(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
         return mpfr_cmp(op1.getReadPtr(), op2.getReadPtr())>=0;
     }
-    
+
     //
     // arithmetic operators
     //
@@ -1657,7 +1659,7 @@ namespace amp
     {
         return op1;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> operator-(const ampf<Precision>& op1)
     {
@@ -1665,7 +1667,7 @@ namespace amp
         mpfr_neg(v->value, op1.getReadPtr(), GMP_RNDN);
         return v;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> operator+(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
@@ -1673,7 +1675,7 @@ namespace amp
         mpfr_add(v->value, op1.getReadPtr(), op2.getReadPtr(), GMP_RNDN);
         return v;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> operator-(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
@@ -1681,8 +1683,8 @@ namespace amp
         mpfr_sub(v->value, op1.getReadPtr(), op2.getReadPtr(), GMP_RNDN);
         return v;
     }
-        
-    
+
+
     template<unsigned int Precision>
     const ampf<Precision> operator*(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
@@ -1690,7 +1692,7 @@ namespace amp
         mpfr_mul(v->value, op1.getReadPtr(), op2.getReadPtr(), GMP_RNDN);
         return v;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> operator/(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
@@ -1698,7 +1700,7 @@ namespace amp
         mpfr_div(v->value, op1.getReadPtr(), op2.getReadPtr(), GMP_RNDN);
         return v;
     }
- 
+
     //
     // basic functions
     //
@@ -1765,11 +1767,13 @@ namespace amp
         signed long r;
         mpfr_trunc(tmp.getWritePtr(), x.getReadPtr());
         if( mpfr_integer_p(tmp.getReadPtr())==0 )
-            throw invalidConversion();
+            //throw invalidConversion();
+            WerrorS("internalError");
         mpfr_clear_erangeflag();
         r = mpfr_get_si(tmp.getReadPtr(), GMP_RNDN);
         if( mpfr_erangeflag_p()!=0 )
-            throw invalidConversion();
+            //throw invalidConversion();
+            WerrorS("internalError");
         return r;
     }
 
@@ -1789,11 +1793,13 @@ namespace amp
         signed long r;
         mpfr_floor(tmp.getWritePtr(), x.getReadPtr());
         if( mpfr_integer_p(tmp.getReadPtr())==0 )
-            throw invalidConversion();
+            //throw invalidConversion();
+            WerrorS("internalError");
         mpfr_clear_erangeflag();
         r = mpfr_get_si(tmp.getReadPtr(), GMP_RNDN);
         if( mpfr_erangeflag_p()!=0 )
-            throw invalidConversion();
+            //throw invalidConversion();
+            WerrorS("internalError");
         return r;
     }
 
@@ -1804,11 +1810,13 @@ namespace amp
         signed long r;
         mpfr_ceil(tmp.getWritePtr(), x.getReadPtr());
         if( mpfr_integer_p(tmp.getReadPtr())==0 )
-            throw invalidConversion();
+            //throw invalidConversion();
+            WerrorS("internalError");
         mpfr_clear_erangeflag();
         r = mpfr_get_si(tmp.getReadPtr(), GMP_RNDN);
         if( mpfr_erangeflag_p()!=0 )
-            throw invalidConversion();
+            //throw invalidConversion();
+            WerrorS("internalError");
         return r;
     }
 
@@ -1819,11 +1827,13 @@ namespace amp
         signed long r;
         mpfr_round(tmp.getWritePtr(), x.getReadPtr());
         if( mpfr_integer_p(tmp.getReadPtr())==0 )
-            throw invalidConversion();
+            //throw invalidConversion();
+            WerrorS("internalError");
         mpfr_clear_erangeflag();
         r = mpfr_get_si(tmp.getReadPtr(), GMP_RNDN);
         if( mpfr_erangeflag_p()!=0 )
-            throw invalidConversion();
+            //throw invalidConversion();
+            WerrorS("internalError");
         return r;
     }
 
@@ -1833,7 +1843,8 @@ namespace amp
         // TODO: optimize temporary for return value
         ampf<Precision> r;
         if( !x.isFiniteNumber() )
-            throw invalidConversion();
+            //throw invalidConversion();
+            WerrorS("internalError");
         if( x.isZero() )
         {
             *exponent = 0;
@@ -1854,7 +1865,7 @@ namespace amp
         mpfr_mul_2si(r.getWritePtr(), x.getReadPtr(), exponent, GMP_RNDN);
         return r;
     }
- 
+
     //
     // different types of arguments
     //
@@ -1929,7 +1940,7 @@ namespace amp
     __AMP_BINARY_OPF(double)
     __AMP_BINARY_OPF(long double)
     #undef __AMP_BINARY_OPF
-    
+
     //
     // transcendent functions
     //
@@ -2014,7 +2025,7 @@ namespace amp
         mpfr_atan2(v->value, y.getReadPtr(), x.getReadPtr(), GMP_RNDN);
         return v;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> log(const ampf<Precision> &x)
     {
@@ -2088,7 +2099,7 @@ namespace amp
     public:
         campf():x(0),y(0){};
         campf(long double v)    { x=v; y=0; }
-        campf(double v)         { x=v; y=0; } 
+        campf(double v)         { x=v; y=0; }
         campf(float v)          { x=v; y=0; }
         campf(signed long v)    { x=v; y=0; }
         campf(unsigned long v)  { x=v; y=0; }
@@ -2137,42 +2148,42 @@ namespace amp
 
         ampf<Precision> x, y;
     };
-    
+
     //
     // complex operations
     //
     template<unsigned int Precision>
     const bool operator==(const campf<Precision>& lhs, const campf<Precision>& rhs)
     { return lhs.x==rhs.x && lhs.y==rhs.y; }
-    
+
     template<unsigned int Precision>
     const bool operator!=(const campf<Precision>& lhs, const campf<Precision>& rhs)
     { return lhs.x!=rhs.x || lhs.y!=rhs.y; }
-    
+
     template<unsigned int Precision>
     const campf<Precision> operator+(const campf<Precision>& lhs)
     { return lhs; }
-    
+
     template<unsigned int Precision>
     campf<Precision>& operator+=(campf<Precision>& lhs, const campf<Precision>& rhs)
     { lhs.x += rhs.x; lhs.y += rhs.y; return lhs; }
-    
+
     template<unsigned int Precision>
     const campf<Precision> operator+(const campf<Precision>& lhs, const campf<Precision>& rhs)
     { campf<Precision> r = lhs; r += rhs; return r; }
-    
+
     template<unsigned int Precision>
     const campf<Precision> operator-(const campf<Precision>& lhs)
     { return campf<Precision>(-lhs.x, -lhs.y); }
-    
+
     template<unsigned int Precision>
     campf<Precision>& operator-=(campf<Precision>& lhs, const campf<Precision>& rhs)
     { lhs.x -= rhs.x; lhs.y -= rhs.y; return lhs; }
-    
+
     template<unsigned int Precision>
     const campf<Precision> operator-(const campf<Precision>& lhs, const campf<Precision>& rhs)
     { campf<Precision> r = lhs; r -= rhs; return r; }
-    
+
     template<unsigned int Precision>
     campf<Precision>& operator*=(campf<Precision>& lhs, const campf<Precision>& rhs)
     {
@@ -2181,11 +2192,11 @@ namespace amp
         lhs.y = mm-xx-yy;
         return lhs;
     }
-    
+
     template<unsigned int Precision>
     const campf<Precision> operator*(const campf<Precision>& lhs, const campf<Precision>& rhs)
     { campf<Precision> r = lhs; r *= rhs; return r; }
-    
+
     template<unsigned int Precision>
     const campf<Precision> operator/(const campf<Precision>& lhs, const campf<Precision>& rhs)
     {
@@ -2208,23 +2219,23 @@ namespace amp
         }
         return result;
     }
-    
+
     template<unsigned int Precision>
     campf<Precision>& operator/=(campf<Precision>& lhs, const campf<Precision>& rhs)
     {
         lhs = lhs/rhs;
         return lhs;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> abscomplex(const campf<Precision> &z)
     {
         ampf<Precision> w, xabs, yabs, v;
-    
+
         xabs = abs(z.x);
         yabs = abs(z.y);
         w = xabs>yabs ? xabs : yabs;
-        v = xabs<yabs ? xabs : yabs; 
+        v = xabs<yabs ? xabs : yabs;
         if( v==0 )
             return w;
         else
@@ -2233,20 +2244,20 @@ namespace amp
             return w*sqrt(1+sqr(t));
         }
     }
-    
+
     template<unsigned int Precision>
     const campf<Precision> conj(const campf<Precision> &z)
     {
-        return campf<Precision>(z.x, -z.y); 
+        return campf<Precision>(z.x, -z.y);
     }
-    
+
     template<unsigned int Precision>
     const campf<Precision> csqr(const campf<Precision> &z)
     {
-        ampf<Precision> t = z.x*z.y; 
-        return campf<Precision>(sqr(z.x)-sqr(z.y), t+t); 
+        ampf<Precision> t = z.x*z.y;
+        return campf<Precision>(sqr(z.x)-sqr(z.y), t+t);
     }
-    
+
     //
     // different types of arguments
     //
@@ -2292,13 +2303,13 @@ namespace amp
         template<unsigned int Precision>                   bool operator==(const type& op1,             const campf<Precision>& op2) { return op1==op2.x && op2.y==0; }   \
         template<unsigned int Precision>                   bool operator==(const campf<Precision>& op1, const type& op2)             { return op1.x==op2 && op1.y==0; }   \
         template<unsigned int Precision>                   bool operator!=(const type& op1,             const campf<Precision>& op2) { return op1!=op2.x || op2.y!=0; }   \
-        template<unsigned int Precision>                   bool operator!=(const campf<Precision>& op1, const type& op2)             { return op1.x!=op2 || op1.y!=0; }   
+        template<unsigned int Precision>                   bool operator!=(const campf<Precision>& op1, const type& op2)             { return op1.x!=op2 || op1.y!=0; }
     __AMP_BINARY_OPF(float)
     __AMP_BINARY_OPF(double)
     __AMP_BINARY_OPF(long double)
     __AMP_BINARY_OPF(ampf<Precision>)
     #undef __AMP_BINARY_OPF
-    
+
     //
     // Real linear algebra
     //
@@ -2326,14 +2337,14 @@ namespace amp
             mpfr_storage::deleteMpfr(t);
             return r;
         }
-        catch(...)
-        {
-            if( r!=NULL )
-                mpfr_storage::deleteMpfr(r);
-            if( t!=NULL )
-                mpfr_storage::deleteMpfr(t);
-            throw;
-        }
+        //catch(...)
+        //{
+        //    if( r!=NULL )
+        //        mpfr_storage::deleteMpfr(r);
+        //    if( t!=NULL )
+        //        mpfr_storage::deleteMpfr(t);
+        //    throw;
+        //}
     }
 
     template<unsigned int Precision>
@@ -2352,7 +2363,7 @@ namespace amp
             pSrc += vSrc.GetStep();
         }
     }
-    
+
     template<unsigned int Precision>
     void vMoveNeg(ap::raw_vector< ampf<Precision> > vDst, ap::const_raw_vector< ampf<Precision> > vSrc)
     {
@@ -2369,7 +2380,7 @@ namespace amp
             pSrc += vSrc.GetStep();
         }
     }
-    
+
     template<unsigned int Precision, class T2>
     void vMove(ap::raw_vector< ampf<Precision> > vDst, ap::const_raw_vector< ampf<Precision> > vSrc, T2 alpha)
     {
@@ -2387,7 +2398,7 @@ namespace amp
             pSrc += vSrc.GetStep();
         }
     }
-    
+
     template<unsigned int Precision>
     void vAdd(ap::raw_vector< ampf<Precision> > vDst, ap::const_raw_vector< ampf<Precision> > vSrc)
     {
@@ -2404,7 +2415,7 @@ namespace amp
             pSrc += vSrc.GetStep();
         }
     }
-    
+
     template<unsigned int Precision, class T2>
     void vAdd(ap::raw_vector< ampf<Precision> > vDst, ap::const_raw_vector< ampf<Precision> > vSrc, T2 alpha)
     {
@@ -2423,7 +2434,7 @@ namespace amp
             pSrc += vSrc.GetStep();
         }
     }
-    
+
     template<unsigned int Precision>
     void vSub(ap::raw_vector< ampf<Precision> > vDst, ap::const_raw_vector< ampf<Precision> > vSrc)
     {
@@ -2440,13 +2451,13 @@ namespace amp
             pSrc += vSrc.GetStep();
         }
     }
-    
+
     template<unsigned int Precision, class T2>
     void vSub(ap::raw_vector< ampf<Precision> > vDst, ap::const_raw_vector< ampf<Precision> > vSrc, T2 alpha)
     {
         vAdd(vDst, vSrc, -alpha);
     }
-    
+
     template<unsigned int Precision, class T2>
     void vMul(ap::raw_vector< ampf<Precision> > vDst, T2 alpha)
     {
@@ -2461,7 +2472,7 @@ namespace amp
         }
     }
 }
- 
+
 #endif
 
 /* stuff included from ./reflections.h */
@@ -2586,7 +2597,7 @@ namespace reflections
         amp::ampf<Precision> mx;
 
 
-        
+
         //
         // Executable Statements ..
         //
@@ -2595,7 +2606,7 @@ namespace reflections
             tau = 0;
             return;
         }
-        
+
         //
         // XNORM = DNRM2( N-1, X, INCX )
         //
@@ -2616,14 +2627,14 @@ namespace reflections
         }
         if( xnorm==0 )
         {
-            
+
             //
             // H  =  I
             //
             tau = 0;
             return;
         }
-        
+
         //
         // general case
         //
@@ -2687,7 +2698,7 @@ namespace reflections
         {
             return;
         }
-        
+
         //
         // w := C' * v
         //
@@ -2701,7 +2712,7 @@ namespace reflections
             t = v(i+1-m1);
             ap::vadd(work.getvector(n1, n2), c.getrow(i, n1, n2), t);
         }
-        
+
         //
         // C := C - tau * v * w'
         //
@@ -2760,7 +2771,7 @@ namespace reflections
         {
             return;
         }
-        
+
         //
         // w := C * v
         //
@@ -2770,7 +2781,7 @@ namespace reflections
             t = ap::vdotproduct(c.getrow(i, n1, n2), v.getvector(1, vm));
             work(i) = t;
         }
-        
+
         //
         // C := C - w * v'
         //
@@ -2991,7 +3002,7 @@ namespace bidiagonal
         amp::ampf<Precision> ltau;
 
 
-        
+
         //
         // Prepare
         //
@@ -3015,13 +3026,13 @@ namespace bidiagonal
         }
         if( m>=n )
         {
-            
+
             //
             // Reduce to upper bidiagonal form
             //
             for(i=0; i<=n-1; i++)
             {
-                
+
                 //
                 // Generate elementary reflector H(i) to annihilate A(i+1:m-1,i)
                 //
@@ -3030,14 +3041,14 @@ namespace bidiagonal
                 tauq(i) = ltau;
                 ap::vmove(a.getcolumn(i, i, m-1), t.getvector(1, m-i));
                 t(1) = 1;
-                
+
                 //
                 // Apply H(i) to A(i:m-1,i+1:n-1) from the left
                 //
                 reflections::applyreflectionfromtheleft<Precision>(a, ltau, t, i, m-1, i+1, n-1, work);
                 if( i<n-1 )
                 {
-                    
+
                     //
                     // Generate elementary reflector G(i) to annihilate
                     // A(i,i+2:n-1)
@@ -3047,7 +3058,7 @@ namespace bidiagonal
                     taup(i) = ltau;
                     ap::vmove(a.getrow(i, i+1, n-1), t.getvector(1, n-1-i));
                     t(1) = 1;
-                    
+
                     //
                     // Apply G(i) to A(i+1:m-1,i+1:n-1) from the right
                     //
@@ -3061,13 +3072,13 @@ namespace bidiagonal
         }
         else
         {
-            
+
             //
             // Reduce to lower bidiagonal form
             //
             for(i=0; i<=m-1; i++)
             {
-                
+
                 //
                 // Generate elementary reflector G(i) to annihilate A(i,i+1:n-1)
                 //
@@ -3076,14 +3087,14 @@ namespace bidiagonal
                 taup(i) = ltau;
                 ap::vmove(a.getrow(i, i, n-1), t.getvector(1, n-i));
                 t(1) = 1;
-                
+
                 //
                 // Apply G(i) to A(i+1:m-1,i:n-1) from the right
                 //
                 reflections::applyreflectionfromtheright<Precision>(a, ltau, t, i+1, m-1, i, n-1, work);
                 if( i<m-1 )
                 {
-                    
+
                     //
                     // Generate elementary reflector H(i) to annihilate
                     // A(i+2:m-1,i)
@@ -3093,7 +3104,7 @@ namespace bidiagonal
                     tauq(i) = ltau;
                     ap::vmove(a.getcolumn(i, i+1, m-1), t.getvector(1, m-1-i));
                     t(1) = 1;
-                    
+
                     //
                     // Apply H(i) to A(i+1:m-1,i+1:n-1) from the left
                     //
@@ -3147,7 +3158,7 @@ namespace bidiagonal
         {
             return;
         }
-        
+
         //
         // prepare Q
         //
@@ -3166,7 +3177,7 @@ namespace bidiagonal
                 }
             }
         }
-        
+
         //
         // Calculate
         //
@@ -3228,7 +3239,7 @@ namespace bidiagonal
             return;
         }
         ap::ap_error::make_assertion(fromtheright && zcolumns==m || !fromtheright && zrows==m);
-        
+
         //
         // init
         //
@@ -3239,7 +3250,7 @@ namespace bidiagonal
         work.setbounds(0, mx);
         if( m>=n )
         {
-            
+
             //
             // setup
             //
@@ -3262,7 +3273,7 @@ namespace bidiagonal
                 i2 = i;
                 istep = -istep;
             }
-            
+
             //
             // Process
             //
@@ -3285,7 +3296,7 @@ namespace bidiagonal
         }
         else
         {
-            
+
             //
             // setup
             //
@@ -3308,7 +3319,7 @@ namespace bidiagonal
                 i2 = i;
                 istep = -istep;
             }
-            
+
             //
             // Process
             //
@@ -3374,7 +3385,7 @@ namespace bidiagonal
         {
             return;
         }
-        
+
         //
         // prepare PT
         //
@@ -3393,7 +3404,7 @@ namespace bidiagonal
                 }
             }
         }
-        
+
         //
         // Calculate
         //
@@ -3455,7 +3466,7 @@ namespace bidiagonal
             return;
         }
         ap::ap_error::make_assertion(fromtheright && zcolumns==n || !fromtheright && zrows==n);
-        
+
         //
         // init
         //
@@ -3468,7 +3479,7 @@ namespace bidiagonal
         work.setbounds(0, mx);
         if( m>=n )
         {
-            
+
             //
             // setup
             //
@@ -3491,7 +3502,7 @@ namespace bidiagonal
                 i2 = i;
                 istep = -istep;
             }
-            
+
             //
             // Process
             //
@@ -3517,7 +3528,7 @@ namespace bidiagonal
         }
         else
         {
-            
+
             //
             // setup
             //
@@ -3540,7 +3551,7 @@ namespace bidiagonal
                 i2 = i;
                 istep = -istep;
             }
-            
+
             //
             // Process
             //
@@ -3659,13 +3670,13 @@ namespace bidiagonal
         tauq.setbounds(1, minmn);
         if( m>=n )
         {
-            
+
             //
             // Reduce to upper bidiagonal form
             //
             for(i=1; i<=n; i++)
             {
-                
+
                 //
                 // Generate elementary reflector H(i) to annihilate A(i+1:m,i)
                 //
@@ -3675,14 +3686,14 @@ namespace bidiagonal
                 tauq(i) = ltau;
                 ap::vmove(a.getcolumn(i, i, m), t.getvector(1, mmip1));
                 t(1) = 1;
-                
+
                 //
                 // Apply H(i) to A(i:m,i+1:n) from the left
                 //
                 reflections::applyreflectionfromtheleft<Precision>(a, ltau, t, i, m, i+1, n, work);
                 if( i<n )
                 {
-                    
+
                     //
                     // Generate elementary reflector G(i) to annihilate
                     // A(i,i+2:n)
@@ -3694,7 +3705,7 @@ namespace bidiagonal
                     taup(i) = ltau;
                     ap::vmove(a.getrow(i, ip1, n), t.getvector(1, nmi));
                     t(1) = 1;
-                    
+
                     //
                     // Apply G(i) to A(i+1:m,i+1:n) from the right
                     //
@@ -3708,13 +3719,13 @@ namespace bidiagonal
         }
         else
         {
-            
+
             //
             // Reduce to lower bidiagonal form
             //
             for(i=1; i<=m; i++)
             {
-                
+
                 //
                 // Generate elementary reflector G(i) to annihilate A(i,i+1:n)
                 //
@@ -3724,14 +3735,14 @@ namespace bidiagonal
                 taup(i) = ltau;
                 ap::vmove(a.getrow(i, i, n), t.getvector(1, nmip1));
                 t(1) = 1;
-                
+
                 //
                 // Apply G(i) to A(i+1:m,i:n) from the right
                 //
                 reflections::applyreflectionfromtheright<Precision>(a, ltau, t, i+1, m, i, n, work);
                 if( i<m )
                 {
-                    
+
                     //
                     // Generate elementary reflector H(i) to annihilate
                     // A(i+2:m,i)
@@ -3743,7 +3754,7 @@ namespace bidiagonal
                     tauq(i) = ltau;
                     ap::vmove(a.getcolumn(i, ip1, m), t.getvector(1, mmi));
                     t(1) = 1;
-                    
+
                     //
                     // Apply H(i) to A(i+1:m,i+1:n) from the left
                     //
@@ -3783,14 +3794,14 @@ namespace bidiagonal
         {
             return;
         }
-        
+
         //
         // init
         //
         q.setbounds(1, m, 1, qcolumns);
         v.setbounds(1, m);
         work.setbounds(1, qcolumns);
-        
+
         //
         // prepare Q
         //
@@ -3863,7 +3874,7 @@ namespace bidiagonal
             return;
         }
         ap::ap_error::make_assertion(fromtheright && zcolumns==m || !fromtheright && zrows==m);
-        
+
         //
         // init
         //
@@ -3874,7 +3885,7 @@ namespace bidiagonal
         work.setbounds(1, mx);
         if( m>=n )
         {
-            
+
             //
             // setup
             //
@@ -3897,7 +3908,7 @@ namespace bidiagonal
                 i2 = i;
                 istep = -istep;
             }
-            
+
             //
             // Process
             //
@@ -3921,7 +3932,7 @@ namespace bidiagonal
         }
         else
         {
-            
+
             //
             // setup
             //
@@ -3944,7 +3955,7 @@ namespace bidiagonal
                 i2 = i;
                 istep = -istep;
             }
-            
+
             //
             // Process
             //
@@ -3998,14 +4009,14 @@ namespace bidiagonal
         {
             return;
         }
-        
+
         //
         // init
         //
         pt.setbounds(1, ptrows, 1, n);
         v.setbounds(1, n);
         work.setbounds(1, ptrows);
-        
+
         //
         // prepare PT
         //
@@ -4078,7 +4089,7 @@ namespace bidiagonal
             return;
         }
         ap::ap_error::make_assertion(fromtheright && zcolumns==n || !fromtheright && zrows==n);
-        
+
         //
         // init
         //
@@ -4091,7 +4102,7 @@ namespace bidiagonal
         work.setbounds(1, mx);
         if( m>=n )
         {
-            
+
             //
             // setup
             //
@@ -4114,7 +4125,7 @@ namespace bidiagonal
                 i2 = i;
                 istep = -istep;
             }
-            
+
             //
             // Process
             //
@@ -4142,7 +4153,7 @@ namespace bidiagonal
         }
         else
         {
-            
+
             //
             // setup
             //
@@ -4165,7 +4176,7 @@ namespace bidiagonal
                 i2 = i;
                 istep = -istep;
             }
-            
+
             //
             // Process
             //
@@ -4379,14 +4390,14 @@ namespace qr
         work.setbounds(0, n-1);
         t.setbounds(1, m);
         tau.setbounds(0, minmn-1);
-        
+
         //
         // Test the input arguments
         //
         k = minmn;
         for(i=0; i<=k-1; i++)
         {
-            
+
             //
             // Generate elementary reflector H(i) to annihilate A(i+1:m,i)
             //
@@ -4397,7 +4408,7 @@ namespace qr
             t(1) = 1;
             if( i<n )
             {
-                
+
                 //
                 // Apply H(i) to A(i:m-1,i+1:n-1) from the left
                 //
@@ -4448,7 +4459,7 @@ namespace qr
         {
             return;
         }
-        
+
         //
         // init
         //
@@ -4471,13 +4482,13 @@ namespace qr
                 }
             }
         }
-        
+
         //
         // unpack Q
         //
         for(i=k-1; i>=0; i--)
         {
-            
+
             //
             // Apply H(i)
             //
@@ -4556,14 +4567,14 @@ namespace qr
         work.setbounds(1, n);
         t.setbounds(1, m);
         tau.setbounds(1, minmn);
-        
+
         //
         // Test the input arguments
         //
         k = ap::minint(m, n);
         for(i=1; i<=k; i++)
         {
-            
+
             //
             // Generate elementary reflector H(i) to annihilate A(i+1:m,i)
             //
@@ -4575,7 +4586,7 @@ namespace qr
             t(1) = 1;
             if( i<n )
             {
-                
+
                 //
                 // Apply H(i) to A(i:m,i+1:n) from the left
                 //
@@ -4610,7 +4621,7 @@ namespace qr
         {
             return;
         }
-        
+
         //
         // init
         //
@@ -4633,13 +4644,13 @@ namespace qr
                 }
             }
         }
-        
+
         //
         // unpack Q
         //
         for(i=k; i>=1; i--)
         {
-            
+
             //
             // Apply H(i)
             //
@@ -4677,12 +4688,12 @@ namespace qr
         v.setbounds(1, m);
         q.setbounds(1, m, 1, m);
         r.setbounds(1, m, 1, n);
-        
+
         //
         // QRDecomposition
         //
         qrdecomposition<Precision>(a, m, n, tau);
-        
+
         //
         // R
         //
@@ -4698,7 +4709,7 @@ namespace qr
         {
             ap::vmove(r.getrow(i, i, n), a.getrow(i, i, n));
         }
-        
+
         //
         // Q
         //
@@ -4841,7 +4852,7 @@ namespace lq
         k = ap::minint(m, n);
         for(i=0; i<=k-1; i++)
         {
-            
+
             //
             // Generate elementary reflector H(i) to annihilate A(i,i+1:n-1)
             //
@@ -4852,7 +4863,7 @@ namespace lq
             t(1) = 1;
             if( i<n )
             {
-                
+
                 //
                 // Apply H(i) to A(i+1:m,i:n) from the right
                 //
@@ -4903,7 +4914,7 @@ namespace lq
         {
             return;
         }
-        
+
         //
         // init
         //
@@ -4926,13 +4937,13 @@ namespace lq
                 }
             }
         }
-        
+
         //
         // unpack Q
         //
         for(i=k-1; i>=0; i--)
         {
-            
+
             //
             // Apply H(i)
             //
@@ -5014,14 +5025,14 @@ namespace lq
         work.setbounds(1, m);
         t.setbounds(1, n);
         tau.setbounds(1, minmn);
-        
+
         //
         // Test the input arguments
         //
         k = ap::minint(m, n);
         for(i=1; i<=k; i++)
         {
-            
+
             //
             // Generate elementary reflector H(i) to annihilate A(i,i+1:n)
             //
@@ -5033,7 +5044,7 @@ namespace lq
             t(1) = 1;
             if( i<n )
             {
-                
+
                 //
                 // Apply H(i) to A(i+1:m,i:n) from the right
                 //
@@ -5069,7 +5080,7 @@ namespace lq
         {
             return;
         }
-        
+
         //
         // init
         //
@@ -5092,13 +5103,13 @@ namespace lq
                 }
             }
         }
-        
+
         //
         // unpack Q
         //
         for(i=k; i>=1; i--)
         {
-            
+
             //
             // Apply H(i)
             //
@@ -5131,12 +5142,12 @@ namespace lq
         }
         q.setbounds(1, n, 1, n);
         l.setbounds(1, m, 1, n);
-        
+
         //
         // LQDecomposition
         //
         lqdecomposition<Precision>(a, m, n, tau);
-        
+
         //
         // L
         //
@@ -5154,7 +5165,7 @@ namespace lq
                 }
             }
         }
-        
+
         //
         // Q
         //
@@ -5565,7 +5576,7 @@ namespace blas
 
         if( !trans )
         {
-            
+
             //
             // y := alpha*A*x + beta*y;
             //
@@ -5575,7 +5586,7 @@ namespace blas
             }
             ap::ap_error::make_assertion(j2-j1==ix2-ix1);
             ap::ap_error::make_assertion(i2-i1==iy2-iy1);
-            
+
             //
             // beta*y
             //
@@ -5590,7 +5601,7 @@ namespace blas
             {
                 ap::vmul(y.getvector(iy1, iy2), beta);
             }
-            
+
             //
             // alpha*A*x
             //
@@ -5602,7 +5613,7 @@ namespace blas
         }
         else
         {
-            
+
             //
             // y := alpha*A'*x + beta*y;
             //
@@ -5612,7 +5623,7 @@ namespace blas
             }
             ap::ap_error::make_assertion(i2-i1==ix2-ix1);
             ap::ap_error::make_assertion(j2-j1==iy2-iy1);
-            
+
             //
             // beta*y
             //
@@ -5627,7 +5638,7 @@ namespace blas
             {
                 ap::vmul(y.getvector(iy1, iy2), beta);
             }
-            
+
             //
             // alpha*A'*x
             //
@@ -5703,7 +5714,7 @@ namespace blas
         amp::ampf<Precision> v;
 
 
-        
+
         //
         // Setup
         //
@@ -5734,7 +5745,7 @@ namespace blas
         }
         crows = arows;
         ccols = bcols;
-        
+
         //
         // Test WORK
         //
@@ -5743,7 +5754,7 @@ namespace blas
         i = ap::maxint(i, bcols);
         work(1) = 0;
         work(i) = 0;
-        
+
         //
         // Prepare C
         //
@@ -5764,7 +5775,7 @@ namespace blas
                 ap::vmul(c.getrow(i, cj1, cj2), beta);
             }
         }
-        
+
         //
         // A*B
         //
@@ -5781,7 +5792,7 @@ namespace blas
             }
             return;
         }
-        
+
         //
         // A*B'
         //
@@ -5812,7 +5823,7 @@ namespace blas
                 return;
             }
         }
-        
+
         //
         // A'*B
         //
@@ -5829,7 +5840,7 @@ namespace blas
             }
             return;
         }
-        
+
         //
         // A'*B'
         //
@@ -5993,7 +6004,7 @@ namespace rotations
         {
             return;
         }
-        
+
         //
         // Form  P * A
         //
@@ -6001,7 +6012,7 @@ namespace rotations
         {
             if( n1!=n2 )
             {
-                
+
                 //
                 // Common case: N1<>N2
                 //
@@ -6022,7 +6033,7 @@ namespace rotations
             }
             else
             {
-                
+
                 //
                 // Special case: N1=N2
                 //
@@ -6043,7 +6054,7 @@ namespace rotations
         {
             if( n1!=n2 )
             {
-                
+
                 //
                 // Common case: N1<>N2
                 //
@@ -6064,7 +6075,7 @@ namespace rotations
             }
             else
             {
-                
+
                 //
                 // Special case: N1=N2
                 //
@@ -6127,7 +6138,7 @@ namespace rotations
         amp::ampf<Precision> temp;
 
 
-        
+
         //
         // Form A * P'
         //
@@ -6135,7 +6146,7 @@ namespace rotations
         {
             if( m1!=m2 )
             {
-                
+
                 //
                 // Common case: M1<>M2
                 //
@@ -6156,7 +6167,7 @@ namespace rotations
             }
             else
             {
-                
+
                 //
                 // Special case: M1=M2
                 //
@@ -6177,7 +6188,7 @@ namespace rotations
         {
             if( m1!=m2 )
             {
-                
+
                 //
                 // Common case: M1<>M2
                 //
@@ -6198,7 +6209,7 @@ namespace rotations
             }
             else
             {
-                
+
                 //
                 // Special case: M1=M2
                 //
@@ -6617,7 +6628,7 @@ namespace bdsvd
             }
             return result;
         }
-        
+
         //
         // init
         //
@@ -6634,7 +6645,7 @@ namespace bdsvd
         maxitr = 12;
         rightside = true;
         fwddir = true;
-        
+
         //
         // resize E from N-1 to N
         //
@@ -6650,13 +6661,13 @@ namespace bdsvd
         }
         e(n) = 0;
         idir = 0;
-        
+
         //
         // Get machine constants
         //
         eps = amp::ampf<Precision>::getAlgoPascalEpsilon();
         unfl = amp::ampf<Precision>::getAlgoPascalMinNumber();
-        
+
         //
         // If matrix lower bidiagonal, rotate to be upper bidiagonal
         // by applying Givens rotations on the left
@@ -6672,7 +6683,7 @@ namespace bdsvd
                 work0(i) = cs;
                 work1(i) = sn;
             }
-            
+
             //
             // Update singular vectors if desired
             //
@@ -6685,7 +6696,7 @@ namespace bdsvd
                 rotations::applyrotationsfromtheleft<Precision>(fwddir, 1+cstart-1, n+cstart-1, cstart, cend, work0, work1, c, ctemp);
             }
         }
-        
+
         //
         // Compute singular values to relative accuracy TOL
         // (By setting TOL to be negative, algorithm will compute
@@ -6697,7 +6708,7 @@ namespace bdsvd
         {
             tol = -tol;
         }
-        
+
         //
         // Compute approximate maximum, minimum singular values
         //
@@ -6713,7 +6724,7 @@ namespace bdsvd
         sminl = 0;
         if( tol>=0 )
         {
-            
+
             //
             // Relative accuracy desired
             //
@@ -6736,13 +6747,13 @@ namespace bdsvd
         }
         else
         {
-            
+
             //
             // Absolute accuracy desired
             //
             thresh = amp::maximum<Precision>(amp::abs<Precision>(tol)*smax, maxitr*n*n*unfl);
         }
-        
+
         //
         // Prepare for main iteration loop for the singular values
         // (MAXIT is the maximum number of passes through the inner
@@ -6752,18 +6763,18 @@ namespace bdsvd
         iter = 0;
         oldll = -1;
         oldm = -1;
-        
+
         //
         // M points to last element of unconverged part of matrix
         //
         m = n;
-        
+
         //
         // Begin main iteration loop
         //
         while( true )
         {
-            
+
             //
             // Check for convergence or exceeding iteration count
             //
@@ -6776,7 +6787,7 @@ namespace bdsvd
                 result = false;
                 return result;
             }
-            
+
             //
             // Find diagonal block of matrix to work on
             //
@@ -6810,14 +6821,14 @@ namespace bdsvd
             }
             else
             {
-                
+
                 //
                 // Matrix splits since E(LL) = 0
                 //
                 e(ll) = 0;
                 if( ll==m-1 )
                 {
-                    
+
                     //
                     // Convergence of bottom singular value, return to top of loop
                     //
@@ -6826,13 +6837,13 @@ namespace bdsvd
                 }
             }
             ll = ll+1;
-            
+
             //
             // E(LL) through E(M-1) are nonzero, E(LL-1) is zero
             //
             if( ll==m-1 )
             {
-                
+
                 //
                 // 2 by 2 block, handle separately
                 //
@@ -6840,7 +6851,7 @@ namespace bdsvd
                 d(m-1) = sigmx;
                 e(m-1) = 0;
                 d(m) = sigmn;
-                
+
                 //
                 // Compute singular vectors, if desired
                 //
@@ -6877,7 +6888,7 @@ namespace bdsvd
                 m = m-2;
                 continue;
             }
-            
+
             //
             // If working on new submatrix, choose shift direction
             // (from larger end diagonal element towards smaller)
@@ -6900,7 +6911,7 @@ namespace bdsvd
             {
                 if( amp::abs<Precision>(d(ll))>=amp::abs<Precision>(d(m)) )
                 {
-                    
+
                     //
                     // Chase bulge from top (big end) to bottom (small end)
                     //
@@ -6908,20 +6919,20 @@ namespace bdsvd
                 }
                 else
                 {
-                    
+
                     //
                     // Chase bulge from bottom (big end) to top (small end)
                     //
                     idir = 2;
                 }
             }
-            
+
             //
             // Apply convergence tests
             //
             if( idir==1 )
             {
-                
+
                 //
                 // Run convergence test in forward direction
                 // First apply standard test to bottom of matrix
@@ -6933,7 +6944,7 @@ namespace bdsvd
                 }
                 if( tol>=0 )
                 {
-                    
+
                     //
                     // If relative accuracy desired,
                     // apply convergence criterion forward
@@ -6961,7 +6972,7 @@ namespace bdsvd
             }
             else
             {
-                
+
                 //
                 // Run convergence test in backward direction
                 // First apply standard test to top of matrix
@@ -6973,7 +6984,7 @@ namespace bdsvd
                 }
                 if( tol>=0 )
                 {
-                    
+
                     //
                     // If relative accuracy desired,
                     // apply convergence criterion backward
@@ -7001,14 +7012,14 @@ namespace bdsvd
             }
             oldll = ll;
             oldm = m;
-            
+
             //
             // Compute shift.  First, test if shifting would ruin relative
             // accuracy, and if so set the shift to zero.
             //
             if( tol>=0 && n*tol*(sminl/smax)<=amp::maximum<Precision>(eps, amp::ampf<Precision>("0.01")*tol) )
             {
-                
+
                 //
                 // Use a zero shift to avoid loss of relative accuracy
                 //
@@ -7016,7 +7027,7 @@ namespace bdsvd
             }
             else
             {
-                
+
                 //
                 // Compute the shift from 2-by-2 block at end of matrix
                 //
@@ -7030,7 +7041,7 @@ namespace bdsvd
                     sll = amp::abs<Precision>(d(m));
                     svd2x2<Precision>(d(ll), e(ll), d(ll+1), shift, r);
                 }
-                
+
                 //
                 // Test if shift negligible, and if so set to zero
                 //
@@ -7042,12 +7053,12 @@ namespace bdsvd
                     }
                 }
             }
-            
+
             //
             // Increment iteration count
             //
             iter = iter+m-ll;
-            
+
             //
             // If SHIFT = 0, do simplified QR iteration
             //
@@ -7055,7 +7066,7 @@ namespace bdsvd
             {
                 if( idir==1 )
                 {
-                    
+
                     //
                     // Chase bulge from top to bottom
                     // Save cosines and sines for later singular vector updates
@@ -7079,7 +7090,7 @@ namespace bdsvd
                     h = d(m)*cs;
                     d(m) = h*oldcs;
                     e(m-1) = h*oldsn;
-                    
+
                     //
                     // Update singular vectors
                     //
@@ -7095,7 +7106,7 @@ namespace bdsvd
                     {
                         rotations::applyrotationsfromtheleft<Precision>(fwddir, ll+cstart-1, m+cstart-1, cstart, cend, work2, work3, c, ctemp);
                     }
-                    
+
                     //
                     // Test convergence
                     //
@@ -7106,7 +7117,7 @@ namespace bdsvd
                 }
                 else
                 {
-                    
+
                     //
                     // Chase bulge from bottom to top
                     // Save cosines and sines for later singular vector updates
@@ -7130,7 +7141,7 @@ namespace bdsvd
                     h = d(ll)*cs;
                     d(ll) = h*oldcs;
                     e(ll) = h*oldsn;
-                    
+
                     //
                     // Update singular vectors
                     //
@@ -7146,7 +7157,7 @@ namespace bdsvd
                     {
                         rotations::applyrotationsfromtheleft<Precision>(!fwddir, ll+cstart-1, m+cstart-1, cstart, cend, work0, work1, c, ctemp);
                     }
-                    
+
                     //
                     // Test convergence
                     //
@@ -7158,13 +7169,13 @@ namespace bdsvd
             }
             else
             {
-                
+
                 //
                 // Use nonzero shift
                 //
                 if( idir==1 )
                 {
-                    
+
                     //
                     // Chase bulge from top to bottom
                     // Save cosines and sines for later singular vector updates
@@ -7197,7 +7208,7 @@ namespace bdsvd
                         work3(i-ll+1) = sinl;
                     }
                     e(m-1) = f;
-                    
+
                     //
                     // Update singular vectors
                     //
@@ -7213,7 +7224,7 @@ namespace bdsvd
                     {
                         rotations::applyrotationsfromtheleft<Precision>(fwddir, ll+cstart-1, m+cstart-1, cstart, cend, work2, work3, c, ctemp);
                     }
-                    
+
                     //
                     // Test convergence
                     //
@@ -7224,7 +7235,7 @@ namespace bdsvd
                 }
                 else
                 {
-                    
+
                     //
                     // Chase bulge from bottom to top
                     // Save cosines and sines for later singular vector updates
@@ -7257,7 +7268,7 @@ namespace bdsvd
                         work3(i-ll) = -sinl;
                     }
                     e(ll) = f;
-                    
+
                     //
                     // Test convergence
                     //
@@ -7265,7 +7276,7 @@ namespace bdsvd
                     {
                         e(ll) = 0;
                     }
-                    
+
                     //
                     // Update singular vectors if desired
                     //
@@ -7283,13 +7294,13 @@ namespace bdsvd
                     }
                 }
             }
-            
+
             //
             // QR iteration finished, go back and check convergence
             //
             continue;
         }
-        
+
         //
         // All singular values converged, so make them positive
         //
@@ -7298,7 +7309,7 @@ namespace bdsvd
             if( d(i)<0 )
             {
                 d(i) = -d(i);
-                
+
                 //
                 // Change sign of singular vectors, if desired
                 //
@@ -7308,14 +7319,14 @@ namespace bdsvd
                 }
             }
         }
-        
+
         //
         // Sort the singular values into decreasing order (insertion sort on
         // singular values, but only one transposition per singular vector)
         //
         for(i=1; i<=n-1; i++)
         {
-            
+
             //
             // Scan for smallest D(I)
             //
@@ -7331,7 +7342,7 @@ namespace bdsvd
             }
             if( isub!=n+1-i )
             {
-                
+
                 //
                 // Swap singular values and vectors
                 //
@@ -7434,7 +7445,7 @@ namespace bdsvd
                 au = fhmx/ga;
                 if( au==0 )
                 {
-                    
+
                     //
                     // Avoid possible harmful underflow if exponent range
                     // asymmetric (true SSMIN may not underflow even if
@@ -7499,7 +7510,7 @@ namespace bdsvd
         fa = amp::abs<Precision>(ft);
         ht = h;
         ha = amp::abs<Precision>(h);
-        
+
         //
         // PMAX points to the maximum absolute element of matrix
         //  PMAX = 1 if F largest in absolute values
@@ -7510,7 +7521,7 @@ namespace bdsvd
         swp = ha>fa;
         if( swp )
         {
-            
+
             //
             // Now FA .ge. HA
             //
@@ -7526,7 +7537,7 @@ namespace bdsvd
         ga = amp::abs<Precision>(gt);
         if( ga==0 )
         {
-            
+
             //
             // Diagonal matrix
             //
@@ -7545,7 +7556,7 @@ namespace bdsvd
                 pmax = 2;
                 if( fa/ga<amp::ampf<Precision>::getAlgoPascalEpsilon() )
                 {
-                    
+
                     //
                     // Case of very large GA
                     //
@@ -7569,7 +7580,7 @@ namespace bdsvd
             }
             if( gasmal )
             {
-                
+
                 //
                 // Normal case
                 //
@@ -7600,7 +7611,7 @@ namespace bdsvd
                 ssmax = fa*a;
                 if( mm==0 )
                 {
-                    
+
                     //
                     // Note that M is very tiny
                     //
@@ -7639,7 +7650,7 @@ namespace bdsvd
             csr = crt;
             snr = srt;
         }
-        
+
         //
         // Correct signs of SSMAX and SSMIN
         //
