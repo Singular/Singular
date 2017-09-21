@@ -24,6 +24,7 @@ REFERENCES:
 PROCEDURES:
   modStd(I);    standard basis of I using modular methods
   modSyz(I);    syzygy module of I  using modular methods
+  modIntersect(I,J); intersection of I and J using modular methods
 ";
 
 LIB "poly.lib";
@@ -109,6 +110,7 @@ proc modSyz(def I)
 RETURN:   a generating set of syzygies of I
 NOTE:     The procedure computes a the syzygy module of I (over the rational
           numbers) by using modular methods with high probability.
+	  The property of being a syzygy is tested.
 SEE ALSO: modular
 EXAMPLE:  example modSyz; shows an example"
 {
@@ -134,6 +136,41 @@ example
     ideal I = 3x3+x2+1, 11y5+y3+2, 5z4+z2+4;
     modSyz(I);
     simplify(syz(I),1);
+}
+
+proc modIntersect(def I, def J)
+"USAGE:   modIntersect(I,J); I,J ideal/module
+RETURN:   a generating set of the intersection of I and J
+NOTE:     The procedure computes a the intersection of I and J
+          (over the rational numbers) by using modular methods
+	  with high probability.
+	  No additional tests are performed.
+SEE ALSO: modular
+EXAMPLE:  example modIntersect; shows an example"
+{
+    /* save options */
+    intvec opt = option(get);
+    option(redSB);
+
+    /* choose the right command */
+    string command = "intersect";
+
+    /* call modular() */
+    def M = modular(command, list(I,J), primeTest_std,
+         deleteUnluckyPrimes_std);
+
+    /* return the result */
+    option(set, opt);
+    return(M);
+}
+example
+{
+    "EXAMPLE:"; echo = 2;
+    ring R1 = 0, (x,y,z,t), dp;
+    ideal I = 3x3+x2+1, 11y5+y3+2, 5z4+z2+4;
+    ideal J = maxideal(2);
+    modIntersect(I,J);
+    simplify(intersect(I,J),1);
 }
 
 /* compute a normalized GB via groebner() */
