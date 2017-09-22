@@ -2827,7 +2827,7 @@ proc tst_fpadim()
   /*return (R1); // return the new ring*/
 /*}*/
 
-proc lpSubstitute(poly f, list s1, list s2) {
+proc lpSubstitute(poly f, list s1, list s2, ideal G) {
   poly fs;
   for (int i = 1; i <= size(f); i++) {
     poly fis = leadcoef(f[i]);
@@ -2836,13 +2836,16 @@ proc lpSubstitute(poly f, list s1, list s2) {
       int varindex = ivfi[j];
       int subindex = indexof(s1, varindex);
       if (subindex > 0) {
+	s2[subindex] = lpNF(s2[subindex],G);
 	fis = lpMult(fis, s2[subindex]);
       } else {
-	fis = lpMult(fis, iv2lp(varindex));
+	fis = lpMult(fis, lpNF(iv2lp(varindex),G));
       }
+      fis = lpNF(fis,G);
     }
     fs = fs + fis;
   }
+  fs = lpNF(fs, G);
   return (fs);
 }
 example {
@@ -2851,16 +2854,18 @@ example {
   def R = makeLetterplaceRing(4);
   setring R;
 
+  ideal G = x(1)*y(2); // optional, can be 0
+
   poly f = 3*x(1)*x(2)+y(1)*x(2);
   list s1 = x(1), y(1);
   list s2 = y(1)*z(2)*z(3), x(1);
 
-  int minDegBound = calcSubstDegBound(f,s1,s2);
+  int minDegBound = calcSubstDegBounds(f,s1,s2);
   setring r;
   def R1 = makeLetterplaceRing(minDegBound);
   setring R1;
 
-  lpSubstitute(imap(R,f), imap(R,s1), imap(R,s2));
+  lpSubstitute(imap(R,f), imap(R,s1), imap(R,s2), imap(R,G));
 }
 example {
   LIB "fpadim.lib";
@@ -2884,7 +2889,7 @@ example {
   list s1 = imap(R,s1);
   list s2 = imap(R,s2);
   for (int i = 1; i <= size(L); i++) {
-    lpSubstitute(L[i], s1, s2);
+    lpSubstitute(L[i], s1, s2, 0);
   }
 }
 
