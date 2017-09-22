@@ -1135,7 +1135,7 @@ example
 
 // -----------------main procedures----------------------
 
-proc lpUfGkDim(ideal G)
+static proc lpUfGkDim(ideal G)
 {
   G = lead(G);
 
@@ -1194,7 +1194,7 @@ proc lpUfGkDim(ideal G)
   return(gkdim);
 }
 
-proc UfGraphURTNZDGrowth(intmat UG) {
+static proc UfGraphURTNZDGrowth(intmat UG) {
   // URTNZD = upper right triangle non zero diagonal
   for (int i = 1; i <= ncols(UG); i++) {
     UG[i,i] = 0; // remove all loops
@@ -1208,12 +1208,12 @@ proc UfGraphURTNZDGrowth(intmat UG) {
   return (k);
 }
 
-proc imIsZero(intmat M) {
+static proc imIsZero(intmat M) {
   intmat Zero[nrows(M)][ncols(M)];
   return (M == Zero);
 }
 
-proc imIsUpRightTriangle(intmat M) {
+static proc imIsUpRightTriangle(intmat M) {
   for (int i = 1; i <= nrows(M); i++) {
     for (int j = 1; j < i; j++) {
       if(M[i,j] != 0) { return (0); }
@@ -1222,7 +1222,7 @@ proc imIsUpRightTriangle(intmat M) {
   return (1);
 }
 
-proc eliminateZerosUpTriangle(intmat G) {
+static proc eliminateZerosUpTriangle(intmat G) {
   // G is expected to be an upper triangle matrix
   for (int i = 1; i <= ncols(G); i++) {
     if (G[i,i] == 0) { // i doesn't have a cycle
@@ -1241,7 +1241,7 @@ proc eliminateZerosUpTriangle(intmat G) {
   return (G);
 }
 
-proc imDelRowCol(intmat M, int row, int col) {
+static proc imDelRowCol(intmat M, int row, int col) {
   // row and col are expected to be > 0
   int nr = nrows(M);
   int nc = ncols(M);
@@ -1260,7 +1260,7 @@ proc imDelRowCol(intmat M, int row, int col) {
   return (Mdel);
 }
 
-proc topologicalSort(intmat G) {
+static proc topologicalSort(intmat G) {
   // NOTE: ignores loops
   // NOTE: this takes O(|V^3|), can be optimized
   int n = ncols(G);
@@ -1294,7 +1294,7 @@ proc topologicalSort(intmat G) {
   return (G);
 }
 
-proc imPermcol (intmat A, int c1, int c2)
+static proc imPermcol (intmat A, int c1, int c2)
 {
    intmat B = A;
    int k = nrows(B);
@@ -1303,7 +1303,7 @@ proc imPermcol (intmat A, int c1, int c2)
    return (B);
 }
 
-proc imPermrow (intmat A, int r1, int r2)
+static proc imPermrow (intmat A, int r1, int r2)
 {
    intmat B = A;
    int k = ncols(B);
@@ -1312,7 +1312,7 @@ proc imPermrow (intmat A, int r1, int r2)
    return (B);
 }
 
-proc UfGraphGrowth(intmat UG)
+static proc UfGraphGrowth(intmat UG)
 {
   int n = ncols(UG); // number of vertices
   // iterate through all vertices
@@ -1336,7 +1336,7 @@ proc UfGraphGrowth(intmat UG)
   return(maxCycleCount);
 }
 
-proc countCycles(intmat G, int v, intvec visited, intvec cyclic, intvec path)
+static proc countCycles(intmat G, int v, intvec visited, intvec cyclic, intvec path)
 "USAGE: countCycles(G, v, visited, cyclic, path); G a Graph, v the vertex to
 start. visited, cyclic and path should be 0.
 RETURN: int
@@ -1417,7 +1417,7 @@ ASSUME: Basering has to be a Letterplace ring.
   return(cycles);
 }
 
-proc lpUfGraph(ideal G)
+static proc lpUfGraph(ideal G)
 "USAGE: lpUfGraph(G); G a set of monomials in a letterplace ring
 RETURN: intmat
 PURPOSE: Constructs the Ufnarovskij graph induced by G
@@ -1459,7 +1459,7 @@ ASSUME: - basering is a Letterplace ring
   return (UG);
 }
 
-proc ivStandardWords(list G, int length) {
+static proc ivStandardWords(list G, int length) {
   if (length == 0) {
     return (0); // iv = 0 means monom = 1
   }
@@ -1491,7 +1491,7 @@ static proc ivdivides(list G, intvec iv) {
   }
 }
 
-proc lpGraphOfNormalWords(ideal G)
+static proc lpGraphOfNormalWords(ideal G)
 "USAGE: lpGraphOfNormalWords(G); G a set of monomials in a letterplace ring
 RETURN: intmat
 PURPOSE: Constructs the graph of normal words induced by G
@@ -1561,7 +1561,7 @@ ASSUME: - basering is a Letterplace ring
   return(T);
 }
 
-proc lpNorGkDim(ideal G)
+static proc lpNorGkDim(ideal G)
 "USAGE: lpNorGkDim(G); G an ideal in a letterplace ring
 RETURN: int
 PURPOSE: Determines the Gelfand Kirillov dimension of A/<G>
@@ -2827,7 +2827,24 @@ proc tst_fpadim()
   /*return (R1); // return the new ring*/
 /*}*/
 
-proc lpSubstitute(poly f, list s1, list s2, ideal G) {
+proc lpSubstitute(poly f, list s1, list s2, list #) {
+"USAGE: lpSubstitute(f,s1,s2[,G]); f letterplace polynomial, s1 list of variables
+@*	to replace, s2 list of polynomials to replace with, G optional ideal to
+@*	reduce with.
+RETURN: poly, the substituted polynomial
+ASSUME: - basering is a Letterplace ring
+@*      - G is a groebner basis,
+@*      - the current ring has a sufficient degbound (can be calculated with 
+@*	  calcSubstDegBound())
+EXAMPLE: example lpSubstitute; shows examples
+"
+  ideal G;
+  if (size(#) > 0) {
+    if (typeof(#[1])=="ideal") {
+      G = #[1];
+    }
+  }
+
   poly fs;
   for (int i = 1; i <= size(f); i++) {
     poly fis = leadcoef(f[i]);
@@ -2854,17 +2871,19 @@ example {
   def R = makeLetterplaceRing(4);
   setring R;
 
-  ideal G = x(1)*y(2); // optional, can be 0
+  ideal G = x(1)*y(2); // optional
 
   poly f = 3*x(1)*x(2)+y(1)*x(2);
   list s1 = x(1), y(1);
   list s2 = y(1)*z(2)*z(3), x(1);
 
+  // the substitution probably needs a higher degbound
   int minDegBound = calcSubstDegBounds(f,s1,s2);
   setring r;
   def R1 = makeLetterplaceRing(minDegBound);
   setring R1;
 
+  // the last parameter is optional
   lpSubstitute(imap(R,f), imap(R,s1), imap(R,s2), imap(R,G));
 }
 example {
@@ -2889,11 +2908,11 @@ example {
   list s1 = imap(R,s1);
   list s2 = imap(R,s2);
   for (int i = 1; i <= size(L); i++) {
-    lpSubstitute(L[i], s1, s2, 0);
+    lpSubstitute(L[i], s1, s2);
   }
 }
 
-proc indexof(list L, int varindex) {
+static proc indexof(list L, int varindex) {
   for (int i = 1; i <= size(L); i++) {
     if (lp2iv(L[i])[1] == varindex) {
       return (i);
@@ -2903,6 +2922,12 @@ proc indexof(list L, int varindex) {
 }
 
 proc calcSubstDegBound(poly f, list s1, list s2) {
+"USAGE: calcSubstDegBound(f,s1,s2); f letterplace polynomial, s1 list of variables
+@*	to replace, s2 list of polynomials to replace with
+RETURN: int, the min degbound required to perform the substitution
+ASSUME: - basering is a Letterplace ring
+EXAMPLE: example lpSubstitute; shows examples
+"
   int maxDegBound = 0;
   for (int i = 1; i <= size(f); i++) {
     intvec ivfi = lp2iv(f[i]);
@@ -2920,14 +2945,25 @@ proc calcSubstDegBound(poly f, list s1, list s2) {
       maxDegBound = tmpDegBound;
     }
   }
+
+  // increase degbound by 50% when ideal is provided
+  // needed for lpNF
+  maxDegBound = maxDegBound + maxDegBound/2;
+
   return (maxDegBound);
 }
 
 // convenience method
 proc calcSubstDegBounds(list L, list s1, list s2) {
+"USAGE: calcSubstDegBounds(L,s1,s2); L list of letterplace polynomials, s1 list
+@*	of variables to replace, s2 list of polynomials to replace with
+RETURN: int, the min degbound required to perform all of the substitutions
+ASSUME: - basering is a Letterplace ring
+EXAMPLE: example lpSubstitute; shows examples
+"
   int maxDegBound = 0;
   for (int i = 1; i <= size(L); i++) {
-    int tmpDegBound = calcSubstDegBound(L[i], s1, s2);
+    int tmpDegBound = calcSubstDegBound(L[i], s1, s2, #);
     if (tmpDegBound > maxDegBound) {
       maxDegBound = tmpDegBound;
     }
