@@ -3366,7 +3366,7 @@ NOTE: Taking the first possible reduction
 {
  print("lpNormalForm2");
  poly one = 1;
- if ( (pp == 0) || (leadmonom(pp) == one) ) { return(p); }  
+ if ( (pp == 0) || (leadmonom(pp) == one) ) { return(pp); }
  poly p = pp; poly q;
  int i; int s; intvec V;
  while ( (p != 0) && (leadmonom(p) != one) )
