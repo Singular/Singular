@@ -41,16 +41,11 @@ class CFSwitches
 private:
     bool switches [CFSwitchesMax];
 
-    CFSwitches ();
 public:
     // constructors, destructors
+    CFSwitches ();
     ~CFSwitches () {}
 
-    static inline CFSwitches& getInstance()
-    {
-       static CFSwitches singleton;
-       return singleton;
-    }
     // selectors
     /// switch 's' on
     void On ( int s ) { switches[s] = true; }
@@ -72,6 +67,6 @@ public:
 **/
 // extern CFSwitches& cf_glob_switches;
 // CFSwitches& cf_glob_switches = CFSwitches::getInstance();
-#define cf_glob_switches (CFSwitches::getInstance())
+extern CFSwitches cf_glob_switches;
 
 #endif /* ! INCL_CF_SWITCHES_H */

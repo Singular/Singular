@@ -389,8 +389,8 @@ static void updatePairs(SSet *resPairs,int *l_pairs,syStrategy syzstr,
             {
               poly p1,p2;
               int ip=(currRing->N);
-              p1 = pDivide(p,old_generators->m[jj]);
-              p2 = pDivide(prs[j1],old_generators->m[j1]);
+              p1 = pMDivide(p,old_generators->m[jj]);
+              p2 = pMDivide(prs[j1],old_generators->m[j1]);
               while ((ip>0) && (pGetExp(p1,ip)*pGetExp(p2,ip)==0)) ip--;
               if (ip==0)
               {
@@ -473,7 +473,7 @@ PrintLn();
 */
 inline void sySPRedSyz_Kosz(syStrategy syzstr,poly redWith,poly syz,poly q=NULL,int l_syz=-1)
 {
-  poly p=pDivide(q,redWith);
+  poly p=pMDivide(q,redWith);
   pSetCoeff(p,nDiv(pGetCoeff(q),pGetCoeff(redWith)));
   kBucket_Minus_m_Mult_p(syzstr->syz_bucket,p,syz,&l_syz,NULL);
   pDelete(&p);
@@ -738,7 +738,7 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
       number coefgcd = n_Gcd(pGetCoeff(tso.p1),pGetCoeff(tso.p2),currRing->cf);
       assume (old_repr->m[tso.ind1]!=NULL);
       tso.syz = pCopy(old_repr->m[tso.ind1]);
-      poly tt = pDivide(tso.lcm,tso.p1);
+      poly tt = pMDivide(tso.lcm,tso.p1);
       pSetComp(tt,0);
       pSetmComp(tt);
       pSetCoeff(tt,nDiv(pGetCoeff(tso.p1),coefgcd));
@@ -747,7 +747,7 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
       coefgcd = nInpNeg(coefgcd);
       assume (old_repr->m[tso.ind2]!=NULL);
       p = pCopy(old_repr->m[tso.ind2]);
-      tt = pDivide(tso.lcm,tso.p2);
+      tt = pMDivide(tso.lcm,tso.p2);
       pSetComp(tt,0);
       pSetmComp(tt);
       pSetCoeff(tt,nDiv(pGetCoeff(tso.p2),coefgcd));
@@ -893,7 +893,7 @@ PrintLn();
     {
       n=nInvers(pGetCoeff(tso.p));
       pNorm(tso.p);
-      pMult_nn(tso.syz,n);
+      tso.syz=__p_Mult_nn(tso.syz,n,currRing);
       nDelete(&n);
     }
     new_generators->m[ng_place] = tso.p;
@@ -1093,8 +1093,8 @@ static void updatePairsHIndex(SSet *resPairs,int *l_pairs,syStrategy /*syzstr*/,
             {
               poly p1,p2;
               int ip=(currRing->N);
-              p1 = pDivide(p,add_generators->m[j]);
-              p2 = pDivide(prs[j1],add_generators->m[j1]);
+              p1 = pMDivide(p,add_generators->m[j]);
+              p2 = pMDivide(prs[j1],add_generators->m[j1]);
               while ((ip>0) && (pGetExp(p1,ip)*pGetExp(p2,ip)==0)) ip--;
               if (ip==0)
               {
@@ -1261,7 +1261,7 @@ static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp,
       number coefgcd = n_Gcd(pGetCoeff(tso.p1),pGetCoeff(tso.p2),currRing->cf);
       assume (add_repr->m[tso.ind1]!=NULL);
       tso.syz = pCopy(add_repr->m[tso.ind1]);
-      poly tt = pDivide(tso.lcm,tso.p1);
+      poly tt = pMDivide(tso.lcm,tso.p1);
       pSetComp(tt,0);
       pSetmComp(tt);
       pSetCoeff(tt,nDiv(pGetCoeff(tso.p1),coefgcd));
@@ -1270,7 +1270,7 @@ static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp,
       coefgcd = nInpNeg(coefgcd);
       assume (add_repr->m[tso.ind2]!=NULL);
       p = pCopy(add_repr->m[tso.ind2]);
-      tt = pDivide(tso.lcm,tso.p2);
+      tt = pMDivide(tso.lcm,tso.p2);
       pSetComp(tt,0);
       pSetmComp(tt);
       pSetCoeff(tt,nDiv(pGetCoeff(tso.p2),coefgcd));
@@ -1329,7 +1329,7 @@ PrintLn();
     {
       n=nInvers(pGetCoeff(tso.p));
       pNorm(tso.p);
-      pMult_nn(tso.syz,n);
+      tso.syz=__p_Mult_nn(tso.syz,n,currRing);
       nDelete(&n);
     }
   }

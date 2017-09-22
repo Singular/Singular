@@ -50,8 +50,8 @@ public:
 
     ~gaussElem()
     {
-        nDelete( & pdenom );
-        nDelete( & fac );
+      if (pdenom!=NULL) nDelete( & pdenom );
+      if (fac!=NULL)    nDelete( & fac );
     }
 };
 

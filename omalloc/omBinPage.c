@@ -4,7 +4,7 @@
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
  *******************************************************************/
-#include <mylimits.h>
+#include <limits.h>
 #include "omalloc.h"
 #include "omDefaultConfig.h"
 

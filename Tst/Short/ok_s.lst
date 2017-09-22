@@ -4,7 +4,9 @@ branchTo
 bug_ecart
 bug_misc
 bug_minpoly
+bug_minpoly2
 bug_minpoly_frac
+bug_naGreater
 bug_newstruct
 bug_normalize
 bug_qring2
@@ -12,6 +14,7 @@ bug_ring
 bug_ringlist
 bug_ssi_algring
 bug_ssi_attr
+bug_zp
 bug_tr237
 ; do not try bug_tr276 without 2.2 GB RAM free
 ; bug_tr276
@@ -72,6 +75,7 @@ bug_tr774
 bug_tr778
 bug_tr779
 bug_tr785
+bug_tr806
 bug_genus_etc
 conv_bi
 facstd

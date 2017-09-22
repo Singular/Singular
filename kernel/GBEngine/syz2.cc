@@ -144,8 +144,8 @@ static void syCreateNewPairs_Hilb(syStrategy syzstr, int index,
                 {
                   poly p1,p2;
                   int ip= currRing->N;
-                  p1 = pDivide(p,(syzstr->resPairs[index])[i].p);
-                  p2 = pDivide(nP->m[j],(syzstr->resPairs[index])[j].p);
+                  p1 = pMDivide(p,(syzstr->resPairs[index])[i].p);
+                  p2 = pMDivide(nP->m[j],(syzstr->resPairs[index])[j].p);
                   while ((ip>0) && (pGetExp(p1,ip)*pGetExp(p2,ip)==0)) ip--;
                   if (ip==0)
                   {
@@ -179,8 +179,8 @@ Print("gefunden in Mod %d: ",index); poly_write((syzstr->resPairs[index])[ti].lc
                       }
                     }
                   }
-                  pLmDelete(&p1);
-                  pLmDelete(&p2);
+                  pLmFree(&p1);
+                  pLmFree(&p2);
                 }
 #endif
               }
@@ -230,14 +230,14 @@ Print("gefunden in Mod %d: ",index); poly_write((syzstr->resPairs[index])[ti].lc
           number coefgcd =
             n_SubringGcd(pGetCoeff(tso.p1),pGetCoeff(tso.p2),currRing->cf);
           tso.syz = pCopy((syzstr->resPairs[index])[i].syz);
-          poly tt = pDivide(tso.lcm,tso.p1);
-          pSetCoeff(tt,nDiv(pGetCoeff(tso.p1),coefgcd));
+          poly tt = pMDivide(tso.lcm,tso.p1);
+          pSetCoeff0(tt,nDiv(pGetCoeff(tso.p1),coefgcd));
           tso.syz = pMult_mm(tso.syz,tt);
           pLmDelete(&tt);
           coefgcd = nInpNeg(coefgcd);
           pp = pCopy((syzstr->resPairs[index])[r1].syz);
-          tt = pDivide(tso.lcm,tso.p2);
-          pSetCoeff(tt,nDiv(pGetCoeff(tso.p2),coefgcd));
+          tt = pMDivide(tso.lcm,tso.p2);
+          pSetCoeff0(tt,nDiv(pGetCoeff(tso.p2),coefgcd));
           pp = pMult_mm(pp,tt);
           pLmDelete(&tt);
           tso.syz = pAdd(pp,tso.syz);
@@ -393,8 +393,8 @@ PrintLn();
 
 inline void sySPRedSyz(syStrategy syzstr,sSObject redWith,poly q=NULL)
 {
-  poly p=pDivide(q,redWith.p);
-  pSetCoeff(p,nDiv(pGetCoeff(q),pGetCoeff(redWith.p)));
+  poly p=pMDivide(q,redWith.p);
+  pSetCoeff0(p,nDiv(pGetCoeff(q),pGetCoeff(redWith.p)));
   int il=-1;
   kBucket_Minus_m_Mult_p(syzstr->syz_bucket,p,redWith.syz,&il,NULL);
   pLmDelete(&p);
@@ -668,7 +668,7 @@ Print(" mit index %d, %d ",tso.ind1,tso.ind2);
         {
           number n=nInvers(pGetCoeff(tso.p));
           pNorm(tso.p);
-          pMult_nn(tso.syz,n);
+          tso.syz=__p_Mult_nn(tso.syz,n,currRing);
           nDelete(&n);
         }
         if (k==IDELEMS((syzstr->res)[index]))

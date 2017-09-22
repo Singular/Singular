@@ -36,6 +36,8 @@ PROCEDURES:
  defl(ideal I, int d);               deflation of ideal I
 
  NumPrimDecom(ideal I, int d);       numerical primary decomposition
+
+KEYWORDS: numerical irreducible decomposition; decomposition, numerical; primary decomposition, numerical;bertini; numerAlg_lib
 ";
 
 

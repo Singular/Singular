@@ -11,43 +11,66 @@
 
 /* interval */
 
-interval::interval()
+interval::interval(const ring r)
 {
-    lower = nInit(0);
-    upper = nInit(0);
-    R = currRing;
+    lower = n_Init(0, r->cf);
+    upper = n_Init(0, r->cf);
+    R = r;
     R->ref++;
 }
 
-interval::interval(number a)
+interval::interval(number a, const ring r)
 {
+    // dangerous: check if a is in coefs r->cf
     lower = a;
-    upper = nCopy(a);
-    R = currRing;
+    upper = n_Copy(a, r->cf);
+    R = r;
     R->ref++;
 }
 
-interval::interval(number a, number b)
+interval::interval(number a, number b, const ring r)
 {
     lower = a;
     upper = b;
-    R = currRing;
+    R = r;
     R->ref++;
 }
 
 interval::interval(interval *I)
 {
-    lower = nCopy(I->lower);
-    upper = nCopy(I->upper);
+    lower = n_Copy(I->lower, I->R->cf);
+    upper = n_Copy(I->upper, I->R->cf);
     R = I->R;
     R->ref++;
 }
 
 interval::~interval()
 {
-    nDelete(&lower);
-    nDelete(&upper);
+    n_Delete(&lower, R->cf);
+    n_Delete(&upper, R->cf);
     R->ref--;
+}
+
+interval& interval::setRing(ring r)
+{
+    if (R != r)
+    {
+        if (R->cf != r->cf)
+        {
+            nMapFunc fun = n_SetMap(R->cf, r->cf);
+            number lo = fun(lower, R->cf, r->cf),
+                up = fun(upper, R->cf, r->cf);
+            n_Delete(&lower, R->cf);
+            n_Delete(&upper, R->cf);
+            lower = lo;
+            upper = up;
+        }
+        R->ref--;
+        r->ref++;
+        R = r;
+    }
+
+    return *this;
 }
 
 /* box */
@@ -132,11 +155,11 @@ static char* interval_String(blackbox*, void *d)
     {
         interval* i = (interval*) d;
 
-        // use nWrite since nothing better (?) exists
+        // use n_Write since nothing better (?) exists
         StringSetS("[");
-        nWrite(i->lower);
+        n_Write(i->lower, i->R->cf);
         StringAppendS(", ");
-        nWrite(i->upper);
+        n_Write(i->upper, i->R->cf);
         StringAppendS("]");
 
         return StringEndS();
@@ -158,7 +181,6 @@ static void interval_Destroy(blackbox*, void *d)
 // assigning values to intervals
 static BOOLEAN interval_Assign(leftv result, leftv args)
 {
-    assume(result->Typ() == intervalID);
     interval *RES;
 
     /*
@@ -169,54 +191,55 @@ static BOOLEAN interval_Assign(leftv result, leftv args)
      * where a, b numbers or ints and J interval
      */
 
-    number n1, n2;
-
-    if (args->Typ() == INT_CMD)
-    {
-        n1 = nInit((int)(long) args->Data());
-    }
-    else if (args->Typ() == NUMBER_CMD)
-    {
-        n1 = (number) args->CopyD();
-    }
-    else if (args->Typ() == intervalID)
-    {
-        interval *I = (interval*) args->Data();
-        n1 = nCopy(I->lower);
-        n2 = nCopy(I->upper);
-    }
-    else
-    {
-        WerrorS("Input not supported: first argument not int or number");
-        return TRUE;
-    }
-
-    // check if second argument exists
     if (args->Typ() == intervalID)
     {
-        RES = new interval(n1, n2);
-    }
-    else if (args->next == NULL)
-    {
-        RES = new interval(n1);
+        RES = new interval((interval*) args->CopyD());
     }
     else
     {
-        if (args->next->Typ() == INT_CMD)
+        number n1, n2;
+
+        if (args->Typ() == INT_CMD)
         {
-            n2 = nInit((int)(long) args->next->Data());
+            n1 = nInit((int)(long) args->Data());
         }
-        else if (args->next->Typ() == NUMBER_CMD)
+        else if (args->Typ() == NUMBER_CMD)
         {
-            n2 = (number) args->next->CopyD();
+            n1 = (number) args->CopyD();
         }
         else
         {
-            WerrorS("Input not supported: second argument not int or number");
+            WerrorS("Input not supported: first argument not int or number");
             return TRUE;
         }
 
-        RES = new interval(n1, n2);
+        // check if second argument exists
+        if (args->Typ() == intervalID)
+        {
+            RES = new interval(n1, n2);
+        }
+        else if (args->next == NULL)
+        {
+            RES = new interval(n1);
+        }
+        else
+        {
+            if (args->next->Typ() == INT_CMD)
+            {
+                n2 = nInit((int)(long) args->next->Data());
+            }
+            else if (args->next->Typ() == NUMBER_CMD)
+            {
+                n2 = (number) args->next->CopyD();
+            }
+            else
+            {
+                WerrorS("Input not supported: second argument not int or number");
+                return TRUE;
+            }
+
+            RES = new interval(n1, n2);
+        }
     }
 
     // destroy data of result if it exists
@@ -245,7 +268,7 @@ static BOOLEAN length(leftv result, leftv arg)
     {
         interval *I = (interval*) arg->Data();
         result->rtyp = NUMBER_CMD;
-        result->data = (void*) nSub(I->upper, I->lower);
+        result->data = (void*) n_Sub(I->upper, I->lower, I->R->cf);
         arg->CleanUp();
         return FALSE;
     }
@@ -258,95 +281,98 @@ static BOOLEAN length(leftv result, leftv arg)
 
 static interval* intervalScalarMultiply(number a, interval *I)
 {
+    // must assume a is in ring I->R
     number lo, up;
     if (nGreaterZero(a))
     {
-        lo = nMult(a, I->lower);
-        up = nMult(a, I->upper);
+        lo = n_Mult(a, I->lower, I->R->cf);
+        up = n_Mult(a, I->upper, I->R->cf);
     }
     else
     {
-        lo = nMult(a, I->upper);
-        up = nMult(a, I->lower);
+        lo = n_Mult(a, I->upper, I->R->cf);
+        up = n_Mult(a, I->lower, I->R->cf);
     }
 
-    nNormalize(lo);
-    nNormalize(up);
+    n_Normalize(lo, I->R->cf);
+    n_Normalize(up, I->R->cf);
 
-    return new interval(lo, up);
+    return new interval(lo, up, I->R);
 }
 
 static interval* intervalMultiply(interval *I, interval *J)
 {
     number lo, up;
     number nums[4];
-    nums[0] = nMult(I->lower, J->lower);
-    nums[1] = nMult(I->lower, J->upper);
-    nums[2] = nMult(I->upper, J->lower);
-    nums[3] = nMult(I->upper, J->upper);
+    nums[0] = n_Mult(I->lower, J->lower, I->R->cf);
+    nums[1] = n_Mult(I->lower, J->upper, I->R->cf);
+    nums[2] = n_Mult(I->upper, J->lower, I->R->cf);
+    nums[3] = n_Mult(I->upper, J->upper, I->R->cf);
 
     int i, imax = 0, imin = 0;
     for (i = 1; i < 4; i++)
     {
-        if (nGreater(nums[i], nums[imax]))
+        if (n_Greater(nums[i], nums[imax], I->R->cf))
         {
             imax = i;
         }
-        if (nGreater(nums[imin], nums[i]))
+        if (n_Greater(nums[imin], nums[i], I->R->cf))
         {
             imin = i;
         }
     }
 
-    lo = nCopy(nums[imin]);
-    up = nCopy(nums[imax]);
+    lo = n_Copy(nums[imin], I->R->cf);
+    up = n_Copy(nums[imax], I->R->cf);
 
     // delete products
     for (i = 0; i < 4; i++)
     {
-        nDelete(&nums[i]);
+        n_Delete(&nums[i], I->R->cf);
     }
 
-    nNormalize(lo);
-    nNormalize(up);
+    n_Normalize(lo, I->R->cf);
+    n_Normalize(up, I->R->cf);
 
-    return new interval(lo, up);
+    return new interval(lo, up, I->R);
 }
 
 static interval* intervalAdd(interval *I, interval *J)
 {
-    number lo = nAdd(I->lower, J->lower),
-           up = nAdd(I->upper, J->upper);
+    number lo = n_Add(I->lower, J->lower, I->R->cf),
+           up = n_Add(I->upper, J->upper, I->R->cf);
 
-    nNormalize(lo);
-    nNormalize(up);
+    n_Normalize(lo, I->R->cf);
+    n_Normalize(up, I->R->cf);
 
     return new interval(lo, up);
 }
 
 static interval* intervalSubtract(interval *I, interval *J)
 {
-    number lo = nSub(I->lower, J->upper),
-           up = nSub(I->upper, J->lower);
+    number lo = n_Sub(I->lower, J->upper, I->R->cf),
+           up = n_Sub(I->upper, J->lower, I->R->cf);
 
-    nNormalize(lo);
-    nNormalize(up);
+    n_Normalize(lo, I->R->cf);
+    n_Normalize(up, I->R->cf);
 
-    return new interval(lo, up);
+    return new interval(lo, up, I->R);
 }
 
 static bool intervalEqual(interval *I, interval *J)
 {
-    return nEqual(I->lower, J->lower) && nEqual(I->upper, J->upper);
+    assume(I->R == J->R);
+    return n_Equal(I->lower, J->lower, I->R->cf)
+        && n_Equal(I->upper, J->upper, I->R->cf);
 }
 
 // ckeck if zero is contained in an interval
 static bool intervalContainsZero(interval *I)
 {
-    number n = nMult(I->lower, I->upper);
-    bool result = !nGreaterZero(n);
+    number n = n_Mult(I->lower, I->upper, I->R->cf);
+    bool result = !n_GreaterZero(n, I->R->cf);
     // delete helper number
-    nDelete(&n);
+    n_Delete(&n, I->R->cf);
 
     return result;
 }
@@ -355,25 +381,25 @@ static interval* intervalPower(interval *I, int p)
 {
     if (p == 0)
     {
-        return new interval(nInit(1));
+        return new interval(n_Init(1,I->R->cf), I->R);
     }
 
     // no initialisation required (?)
     number lo, up;
 
-    nPower(I->lower, p, &lo);
-    nPower(I->upper, p, &up);
+    n_Power(I->lower, p, &lo, I->R->cf);
+    n_Power(I->upper, p, &up, I->R->cf);
 
     // should work now
     if (p % 2 == 1)
     {
-        return new interval(lo, up);
+        return new interval(lo, up, I->R);
     }
     else
     {
         // perform pointer swap if necessary
         number tmp;
-        if (nGreater(lo, up))
+        if (n_Greater(lo, up, I->R->cf))
         {
             tmp = up;
             up = lo;
@@ -382,10 +408,10 @@ static interval* intervalPower(interval *I, int p)
 
         if (intervalContainsZero(I))
         {
-            nDelete(&lo);
-            lo = nInit(0);
+            n_Delete(&lo, I->R->cf);
+            lo = n_Init(0, I->R->cf);
         }
-        return new interval(lo, up);
+        return new interval(lo, up, I->R);
     }
 }
 
@@ -427,6 +453,11 @@ static BOOLEAN interval_Op2(int op, leftv result, leftv i1, leftv i2)
             interval *I1, *I2;
             I1 = (interval*) i1->Data();
             I2 = (interval*) i2->Data();
+            if (I1->R != I2->R)
+            {
+                WerrorS("adding intervals defined in different rings not supported");
+                return TRUE;
+            }
 
             RES = intervalAdd(I1, I2);
             break;
@@ -441,6 +472,11 @@ static BOOLEAN interval_Op2(int op, leftv result, leftv i1, leftv i2)
             interval *I1, *I2;
             I1 = (interval*) i1->Data();
             I2 = (interval*) i2->Data();
+            if (I1->R != I2->R)
+            {
+                WerrorS("subtracting intervals defined in different rings not supported");
+                return TRUE;
+            }
 
             RES = intervalSubtract(I1, I2);
             break;
@@ -453,6 +489,11 @@ static BOOLEAN interval_Op2(int op, leftv result, leftv i1, leftv i2)
                 interval *I1, *I2;
                 I1 = (interval*) i1->Data();
                 I2 = (interval*) i2->Data();
+                if (I1->R != I2->R)
+                {
+                    WerrorS("multiplying intervals defined in different rings not supported");
+                    return TRUE;
+                }
 
                 RES = intervalMultiply(I1, I2);
             }
@@ -502,22 +543,28 @@ static BOOLEAN interval_Op2(int op, leftv result, leftv i1, leftv i2)
                 I2 = (interval*) i2->Data();
 
                 // make sure I2 is invertible
-                if(intervalContainsZero(I2))
+                if (intervalContainsZero(I2))
                 {
                     WerrorS("second interval contains zero");
                     return TRUE;
                 }
 
                 number invlo, invup;
-                invlo = nInvers(I2->lower);
-                invup = nInvers(I2->upper);
+                invlo = n_Invers(I2->lower, I2->R->cf);
+                invup = n_Invers(I2->upper, I2->R->cf);
 
                 // inverse interval
-                interval *I2inv = new interval(invup, invlo);
+                interval *I2inv = new interval(invup, invlo, I2->R);
 
                 if (i1->Typ() == intervalID)
                 {
                     interval *I1 = (interval*) i1->Data();
+                    if (I1->R != I2->R)
+                    {
+                        WerrorS("dividing intervals from different rings not supported");
+                        delete I2inv;
+                        return TRUE;
+                    }
                     RES = intervalMultiply(I1, I2inv);
                 }
                 else
@@ -775,7 +822,6 @@ static char* box_String(blackbox*, void *d)
 // assigning values to intervals
 static BOOLEAN box_Assign(leftv result, leftv args)
 {
-    assume(result->Typ() == boxID);
     box *RES;
 
     /*
@@ -814,20 +860,7 @@ static BOOLEAN box_Assign(leftv result, leftv args)
 
             // make sure rings of boxes and their intervals are consistent
             // this is important for serialization
-            if (RES->R != RES->intervals[i]->R)
-            {
-                if (RES->R->cf != RES->intervals[i]->R->cf)
-                {
-                    WerrorS("Passing interval to ring with different coefficient field");
-                    delete RES;
-                    args->CleanUp();
-                    return TRUE;
-                }
-
-                RES->intervals[i]->R->ref--;
-                RES->R->ref++;
-                RES->intervals[i]->R = RES->R;
-            }
+            RES->intervals[i]->setRing(RES->R);
         }
     }
     else
@@ -908,15 +941,17 @@ static BOOLEAN box_Op2(int op, leftv result, leftv b1, leftv b2)
             if (b2 == NULL || b2->Typ() != boxID)
             {
                 WerrorS("second argument not box");
-            }
-            if (result->Data() != NULL)
-            {
-                delete (box*) result->Data();
+                return TRUE;
             }
 
             box *B2 = (box*) b2->Data();
             // maybe try to skip this initialisation
             // copying def of box() results in segfault?
+            if (B1->R != B2->R)
+            {
+                WerrorS("subtracting boxes from different rings not supported");
+                return TRUE;
+            }
             RES = new box();
             int i;
             for (i = 0; i < n; i++)
@@ -1094,8 +1129,6 @@ static BOOLEAN box_deserialize(blackbox**, void **d, si_link f)
 
 static BOOLEAN boxSet(leftv result, leftv args)
 {
-    assume(result->Typ() == boxID);
-
     // check for proper types
     const short t[] = {3, (short) boxID, INT_CMD, (short) intervalID};
     if (!iiCheckTypes(args, t, 1))
@@ -1116,22 +1149,8 @@ static BOOLEAN boxSet(leftv result, leftv args)
     box *RES = new box(B);
 
     RES->setInterval(i-1, new interval(I));
-
-    // same as above, ensure ring consistency
-    if (RES->R != RES->intervals[i-1]->R)
-    {
-        if (RES->R->cf != RES->intervals[i-1]->R->cf)
-        {
-            WerrorS("Passing interval to ring with different coefficient field");
-            delete RES;
-            args->CleanUp();
-            return TRUE;
-        }
-
-        RES->intervals[i]->R->ref--;
-        RES->R->ref++;
-        RES->intervals[i]->R = RES->R;
-    }
+    // ensure consistency
+    RES->intervals[i-1]->setRing(RES->R);
 
     result->rtyp = boxID;
     result->data = (void*) RES;
@@ -1145,8 +1164,6 @@ static BOOLEAN boxSet(leftv result, leftv args)
 
 static BOOLEAN evalPolyAtBox(leftv result, leftv args)
 {
-    assume(result->Typ() == intervalID);
-
     const short t[] = {2, POLY_CMD, (short) boxID};
     if (!iiCheckTypes(args, t, 1))
     {

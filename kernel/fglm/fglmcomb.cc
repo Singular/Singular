@@ -117,7 +117,7 @@ fglmReductionStep( poly * pptr, ideal source, int * w )
         nDelete( & n1 );
         n1= temp;
         n1= nInpNeg( n1 );
-        pMult_nn( p2, n1 );
+        p2=__p_Mult_nn( p2, n1, currRing );
 //         pNormalize( p2 );
         nDelete( & n1 );
         *pptr= pAdd( *pptr, p2 );

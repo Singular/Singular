@@ -48,7 +48,8 @@ static proc mod_init()
 {
     string arg_type;
     export arg_type;
-    if (!defined(Resources)) {
+    if (!defined(Resources))
+    {
         LIB "resources.lib";
     }
     int sem_cores = Resources::sem_cores;   // the number of processor cores
@@ -78,30 +79,31 @@ SEE ALSO: modStd
 EXAMPLE:  example modular; shows an example"
 {
     /* check for errors */
-    if (char(basering) != 0) {
-        ERROR("The characteristic must be zero.");
-    }
+    if (char(basering) != 0)
+    { ERROR("The characteristic must be zero."); }
 
     /* auxiliary variables */
     int i;
 
     /* set maximal prime number */
     int pmax = 2147483647;
-    if (npars(basering) > 0) {
+    if (npars(basering) > 0)
+    {
         pmax = 536870909;   // prime(2^29)
     }
 
     /* read optional parameters */
     list defaults = list(primeTest_default, deleteUnluckyPrimes_default,
         pTest_default, finalTest_default, pmax);
-    for (i = 1; i <= size(defaults); i++) {
-        if (typeof(#[i]) != typeof(defaults[i])) {
+    for (i = 1; i <= size(defaults); i++)
+    {
+        if (typeof(#[i]) != typeof(defaults[i]))
+        {
             # = insert(#, defaults[i], i-1);
         }
     }
-    if (size(#) != size(defaults)) {
-        ERROR("wrong optional parameters");
-    }
+    if (size(#) != size(defaults))
+    { ERROR("wrong optional parameters"); }
     proc primeTest = #[1];
     proc deleteUnluckyPrimes = #[2];
     proc pTest = #[3];
@@ -124,17 +126,22 @@ EXAMPLE:  example modular; shows an example"
     int p;
     list indices;
     int ncores_available;
-    while (1) {
+    while (1)
+    {
         // compute list of primes
-        if (nAllPrimes == 0) {
+        if (nAllPrimes == 0)
+        {
             nNewPrimes = NbModProcs();
         }
-        else {
+        else
+        {
             ncores_available = system("semaphore", "get_value", sem_cores)+1;
-            if (nAllPrimes < ncores_available) {
+            if (nAllPrimes < ncores_available)
+            {
                 nNewPrimes = nAllPrimes;
             }
-            else {
+            else
+            {
                 nNewPrimes = (nAllPrimes div ncores_available)
                     *ncores_available;
             }
@@ -144,12 +151,14 @@ EXAMPLE:  example modular; shows an example"
         nAllPrimes = nAllPrimes+nNewPrimes;
 
         // do computation modulo several primes
-        for (i = size(primes); i > 0; i--) {
+        for (i = size(primes); i > 0; i--)
+        {
             task t(i) = "Modular::modp", primes[i];
         }
         startTasks(t(1..size(primes)));
         waitAllTasks(t(1..size(primes)));
-        for (i = size(primes); i > 0; i--) {
+        for (i = size(primes); i > 0; i--)
+        {
             modresults[i] = getResult(t(i));
             killTask(t(i));
             kill t(i);
@@ -158,26 +167,32 @@ EXAMPLE:  example modular; shows an example"
         // delete unlucky primes
         indices = deleteUnluckyPrimes(modresults);
         indices = sort(indices)[1];
-        for (i = size(indices); i > 1; i--) {
-            if (indices[i] == indices[i-1]) {
+        for (i = size(indices); i > 1; i--)
+        {
+            if (indices[i] == indices[i-1])
+            {
                 indices = delete(indices, i);
             }
         }
-        for (i = size(indices); i > 0; i--) {
+        for (i = size(indices); i > 0; i--)
+        {
             modresults = delete(modresults, indices[i]);
             primes = delete(primes, indices[i]);
         }
 
         // lift result
-        if (N == 1) {
+        if (N == 1)
+        {
             result_lift = chinrem_recursive(modresults, primes);
         }
-        else {
+        else
+        {
             result_lift = chinrem_recursive(list(result_lift)+modresults,
                 list(N)+primes);
         }
         modresults = list();
-        for (i = size(primes); i > 0; i--) {
+        for (i = size(primes); i > 0; i--)
+        {
             N = N*primes[i];
         }
 
@@ -186,20 +201,15 @@ EXAMPLE:  example modular; shows an example"
 
         // pTest
         p = prime(random(pmax div 2, pmax-1));
-        while (!Modular::primeTest(p, Arguments)) {
-            if (p <= 2) {
-                ERROR("no more primes");
-            }
+        while (!Modular::primeTest(p, Arguments))
+        {
+            if (p <= 2) { ERROR("no more primes"); }
             p = prime(random(p div 2, p-1));
         }
-        if (!pTest(Command, Arguments, result, p)) {
-            continue;
-        }
+        if (!pTest(Command, Arguments, result, p)) { continue; }
 
         // finalTest
-        if (finalTest(Command, Arguments, result)) {
-            break;
-        }
+        if (finalTest(Command, Arguments, result)) break;
     }
 
     /* kill exported data */
@@ -221,7 +231,8 @@ example
 
 static proc chinrem_recursive(list modresults, list moduli)
 {
-    if (typeof(modresults[1]) != "list") {
+    if (typeof(modresults[1]) != "list")
+    {
         return(chinrem(modresults, moduli));
     }
     // if typeof(modresults[1]) == "list", then we assume
@@ -230,9 +241,11 @@ static proc chinrem_recursive(list modresults, list moduli)
     int n_sublists = size(modresults[1]);
     int i, j;
     list modresults_sublists;
-    for (j = n_sublists; j > 0; j--) {
+    for (j = n_sublists; j > 0; j--)
+    {
         modresults_sublists[j] = list();
-        for (i = size(modresults); i > 0; i--) {
+        for (i = size(modresults); i > 0; i--)
+        {
             modresults_sublists[j][i] = modresults[i][j];
         }
         task t(j) = "Modular::chinrem_recursive",
@@ -241,7 +254,8 @@ static proc chinrem_recursive(list modresults, list moduli)
     startTasks(t(1..n_sublists));
     waitAllTasks(t(1..n_sublists));
     list result;
-    for (j = n_sublists; j > 0; j--) {
+    for (j = n_sublists; j > 0; j--)
+    {
         result[j] = getResult(t(j));
         killTask(t(j));
     }
@@ -253,10 +267,10 @@ static proc primeList(int n, int pmax)
     list primes;
     int p = pmax;
     int i;
-    for (i = 1; i <= n; i++) {
-        if (p < 2) {
-            ERROR("no more primes");
-        }
+    for (i = 1; i <= n; i++)
+    {
+        if (p < 2)
+        { ERROR("no more primes"); }
         p = prime(p);
         task t(i) = "Modular::primeList_task", list(p);
         p--;
@@ -264,14 +278,17 @@ static proc primeList(int n, int pmax)
     startTasks(t(1..n));
     waitAllTasks(t(1..n));
     int j;
-    for (i = 1; i <= n; i++) {
-        if (getResult(t(i))) {
+    for (i = 1; i <= n; i++)
+    {
+        if (getResult(t(i)))
+        {
             j++;
             primes[j] = getArguments(t(i))[1];
         }
         killTask(t(i));
     }
-    if (j < n) {
+    if (j < n)
+    {
         primes = primes+primeList(n-j, p);
     }
     return(primes);
@@ -286,12 +303,10 @@ static proc modp(int p)
 {
     def br = basering;
     list lbr = ringlist(br);
-    if (typeof(lbr[1]) == "int") {
-        lbr[1] = p;
-    }
-    else {
-        lbr[1][1] = p;
-    }
+    if (typeof(lbr[1]) == "int")
+    { lbr[1] = p; }
+    else
+    { lbr[1][1] = p; }
     def rp = ring(lbr);
     setring(rp);
     list args = fetch(br, Arguments);
@@ -312,12 +327,14 @@ static proc deleteUnluckyPrimes_default(alias list modresults)
     return(list());
 }
 
-static proc pTest_default(string command, alias list args, def result, int p)
+static proc pTest_default(string command, alias list args, alias def result,
+    int p)
 {
     return(1);
 }
 
-static proc finalTest_default(string command, alias list args, def result)
+static proc finalTest_default(string command, alias list args,
+    alias def result)
 {
     return(1);
 }
@@ -326,40 +343,44 @@ static proc farey_parallel(def farey_arg, bigint farey_N)
 {
     arg_type = typeof(farey_arg);
     if (arg_type != "bigint" && arg_type != "ideal" && arg_type != "module"
-        && arg_type != "matrix" && arg_type != "list") {
-        ERROR("wrong input type");
-    }
+        && arg_type != "matrix" && arg_type != "list")
+    { ERROR("wrong input type"); }
     int i;
-    if (arg_type == "list") {
+    if (arg_type == "list")
+    {
         int size_farey_arg = size(farey_arg);
-        for (i = size_farey_arg; i > 0; i--) {
+        for (i = size_farey_arg; i > 0; i--)
+        {
             task t(i) = "Modular::farey_parallel", list(farey_arg[i], farey_N);
         }
         startTasks(t(1..size_farey_arg));
         waitAllTasks(t(1..size_farey_arg));
         list result;
-        for (i = size_farey_arg; i > 0; i--) {
+        for (i = size_farey_arg; i > 0; i--)
+        {
             result[i] = getResult(t(i));
             killTask(t(i));
         }
         return(result);
     }
-    if (arg_type == "bigint" || arg_type == "matrix") {
-        return(farey(farey_arg, farey_N));
-    }   // else: farey_arg is an ideal or a module
+    if (arg_type == "bigint" || arg_type == "matrix")
+    { return(farey(farey_arg, farey_N)); }
+    // else: farey_arg is an ideal or a module
     exportto(Modular, farey_arg);
     exportto(Modular, farey_N);
     int size_arg = ncols(farey_arg);
     int chunks = par_range(size_arg);
     intvec range;
-    for (i = chunks; i > 0; i--) {
+    for (i = chunks; i > 0; i--)
+    {
         range = par_range(size_arg, i);
         task t(i) = "Modular::farey_task", list(range);
     }
     startTasks(t(1..chunks));
     waitAllTasks(t(1..chunks));
     def result = getResult(t(chunks));
-    for (i = chunks-1; i > 0; i--) {
+    for (i = chunks-1; i > 0; i--)
+    {
         result = getResult(t(i)), result;
         killTask(t(i));
     }

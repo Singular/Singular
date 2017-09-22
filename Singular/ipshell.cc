@@ -1176,7 +1176,7 @@ BOOLEAN iiDefaultParameter(leftv p)
   tmp.data=at->CopyA();
   return iiAssign(p,&tmp);
 }
-BOOLEAN iiBranchTo(leftv res, leftv args)
+BOOLEAN iiBranchTo(leftv, leftv args)
 {
   // must be inside a proc, as we simultae an proc_end at the end
   if (myynest==0)
@@ -2545,22 +2545,22 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
         if (j_in_R==0) R->block0[0]=1;
         else
         {
-           int jj=j_in_R-1;
-           while((jj>=0)
-           && ((R->order[jj]== ringorder_a)
-              || (R->order[jj]== ringorder_aa)
-              || (R->order[jj]== ringorder_am)
-              || (R->order[jj]== ringorder_c)
-              || (R->order[jj]== ringorder_C)
-              || (R->order[jj]== ringorder_s)
-              || (R->order[jj]== ringorder_S)
-           ))
-           {
-             //Print("jj=%, skip %s\n",rSimpleOrdStr(R->order[jj]));
-             jj--;
-           }
-           if (jj<0) R->block0[j_in_R]=1;
-           else       R->block0[j_in_R]=R->block1[jj]+1;
+          int jj=j_in_R-1;
+          while((jj>=0)
+          && ((R->order[jj]== ringorder_a)
+             || (R->order[jj]== ringorder_aa)
+             || (R->order[jj]== ringorder_am)
+             || (R->order[jj]== ringorder_c)
+             || (R->order[jj]== ringorder_C)
+             || (R->order[jj]== ringorder_s)
+             || (R->order[jj]== ringorder_S)
+          ))
+          {
+            //Print("jj=%, skip %s\n",rSimpleOrdStr(R->order[jj]));
+            jj--;
+          }
+          if (jj<0) R->block0[j_in_R]=1;
+          else      R->block0[j_in_R]=R->block1[jj]+1;
         }
         intvec *iv;
         if (vv->m[1].Typ()==INT_CMD)
@@ -2568,11 +2568,18 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
         else
           iv=ivCopy((intvec*)vv->m[1].Data()); //assume INTVEC
         int iv_len=iv->length();
-        if (R->order[j_in_R]!=ringorder_s)
+        if ((R->order[j_in_R]!=ringorder_s)
+        &&(R->order[j_in_R]!=ringorder_c)
+        &&(R->order[j_in_R]!=ringorder_C))
         {
           R->block1[j_in_R]=si_max(R->block0[j_in_R],R->block0[j_in_R]+iv_len-1);
           if (R->block1[j_in_R]>R->N)
           {
+            if (R->block0[j_in_R]>R->N)
+            {
+              Werror("not enough variables for ordering %d (%s)",j_in_R,rSimpleOrdStr(R->order[j_in_R]));
+              return TRUE;
+            }
             R->block1[j_in_R]=R->N;
             iv_len=R->block1[j_in_R]-R->block0[j_in_R]+1;
           }
@@ -2653,6 +2660,10 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
            case 0:
            case ringorder_unspec:
              break;
+           case ringorder_L: /* cannot happen */
+           case ringorder_a64: /*not implemented */
+             WerrorS("ring order not implemented");
+             return TRUE;
         }
         delete iv;
       }
@@ -3549,7 +3560,7 @@ spectrumState   spectrumStateFromList( spectrumPolyList& speclist, lists *L,int 
                         //  normalize coefficient
 
             number inv = nInvers( pGetCoeff( f ) );
-            pMult_nn( search->nf,inv );
+            search->nf=__p_Mult_nn( search->nf,inv,currRing );
             nDelete( &inv );
 
                         //  exchange  normal forms
@@ -3608,7 +3619,7 @@ spectrumState   spectrumStateFromList( spectrumPolyList& speclist, lists *L,int 
             else if( cmp==0 )
             {
               search->nf = pSub( search->nf,
-                                 ppMult_nn( (*node)->nf,pGetCoeff( f ) ) );
+                                 __pp_Mult_nn( (*node)->nf,pGetCoeff( f ),currRing ) );
               pNorm( search->nf );
             }
           }
@@ -6470,7 +6481,7 @@ BOOLEAN iiAssignCR(leftv r, leftv arg)
 
 static void iiReportTypes(int nr,int t,const short *T)
 {
-  char *buf=(char*)omAlloc(250);
+  char buf[250];
   buf[0]='\0';
   if (nr==0)
     sprintf(buf,"wrong length of parameters(%d), expected ",t);

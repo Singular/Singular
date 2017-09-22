@@ -100,7 +100,7 @@ ideal getMinorIdeal_Int (const int* intMatrix, const int rowCount,
   bool zeroOk = ((k < 0) ? true : false); /* for k = 0, all minors are requested,
                                              omitting zero minors */
   bool duplicatesOk = (allDifferent ? false : true);
-  int kk = ((k < 0) ? -k : k); /* absolute value of k */
+  int kk = ABS(k); /* absolute value of k */
 
   /* looping over all minors: */
   while (mp.hasNextMinor() && ((kk == 0) || (collectedMinors < kk)))
@@ -154,7 +154,7 @@ ideal getMinorIdeal_Poly (const poly* polyMatrix, const int rowCount,
   bool zeroOk = ((k < 0) ? true : false); /* for k = 0, all minors are
                                              requested, omitting zero minors */
   bool duplicatesOk = (allDifferent ? false : true);
-  int kk = ((k < 0) ? -k : k); /* absolute value of k */
+  int kk = ABS(k); /* absolute value of k */
 #ifdef COUNT_AND_PRINT_OPERATIONS
   printCounters ("starting", true);
   int qqq = 0;
@@ -331,7 +331,7 @@ ideal getMinorIdealCache_Int(const int* intMatrix, const int rowCount,
   bool zeroOk = ((k < 0) ? true : false); /* for k = 0, all minors are
                                              requested, omitting zero minors */
   bool duplicatesOk = (allDifferent ? false : true);
-  int kk = ((k < 0) ? -k : k); /* absolute value of k */
+  int kk = ABS(k); /* absolute value of k */
 
   /* looping over all minors: */
   while (mp.hasNextMinor() && ((kk == 0) || (collectedMinors < kk)))
@@ -388,7 +388,7 @@ ideal getMinorIdealCache_Poly(const poly* polyMatrix, const int rowCount,
   bool zeroOk = ((k < 0) ? true : false); /* for k = 0, all minors are
                                              requested, omitting zero minors */
   bool duplicatesOk = (allDifferent ? false : true);
-  int kk = ((k < 0) ? -k : k); /* absolute value of k */
+  int kk = ABS(k); /* absolute value of k */
 #ifdef COUNT_AND_PRINT_OPERATIONS
   printCounters ("starting", true);
   int qqq = 0;

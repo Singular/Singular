@@ -206,8 +206,10 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
     return TRUE;
   }
 
+  BOOLEAN redefine_from_algext=FALSE;
   if ( currRing->idroot != NULL )
   {
+    redefine_from_algext=(currRing->cf->extRing->qideal!=NULL);
 //    return TRUE;
 #ifndef SING_NDEBUG
     idhdl p = currRing->idroot;
@@ -216,7 +218,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
 
     while(p != NULL)
     {
-      PrintS(p->String(TRUE)); PrintLn();
+      PrintS(p->String(TRUE)); Print("(%s)\n",IDID(p));
       p = p->next;
     }
 #endif
@@ -263,7 +265,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
     rDelete( A.r );
     return TRUE;
   }
-  if (DEN((fraction)(p)) != NULL) // minpoly must be a fraction with poly numerator...!!
+  if (!redefine_from_algext && (DEN((fraction)(p)) != NULL)) // minpoly must be a fraction with poly numerator...!!
   {
     poly n=DEN((fraction)(p));
     if(!p_IsConstantPoly(n,currRing->cf->extRing))
@@ -274,7 +276,8 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
     DEN((fraction)(p))=NULL;
   }
 
-  q->m[0] = NUM((fraction)p);
+  if (redefine_from_algext) q->m[0]=(poly)p;
+  else          q->m[0] = NUM((fraction)p);
   A.r->qideal = q;
 
 #if 0
@@ -288,6 +291,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   // :(
 //  NUM((fractionObject *)p) = NULL; // makes 0/ NULL fraction - which should not happen!
 //  n_Delete(&p, currRing->cf); // doesn't expect 0/ NULL :(
+  if (!redefine_from_algext)
   {
     extern omBin fractionObjectBin;
     NUM((fractionObject *)p) = NULL; // not necessary, but still...

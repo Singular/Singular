@@ -79,7 +79,7 @@ static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, 
     }
     else
     {
-      sBucket_Merge_p(result,term,1);
+      sBucket_Merge_m(result,term);
     }
   }
 }

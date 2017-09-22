@@ -590,7 +590,7 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
           syz->coef = nCopy(currRing->qideal->m[k-Fl]->coef);
           syz->coef = nInpNeg(syz->coef);
           lastmonom = syz;
-          multWith = pDivide(syz,F[j]);
+          multWith = pMDivide(syz,F[j]);
           multWith->coef = nCopy(currRing->qideal->m[k-Fl]->coef);
         }
         pSetComp(syz,j+1);
@@ -692,7 +692,7 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
 #ifdef WRITE_BUCKETS
               PrintS("multiplied with: ");nWrite(up);PrintLn();
 #endif
-              pMult_nn(syz,up);
+              syz=__p_Mult_nn(syz,up,currRing);
             }
             nDelete(&up);
 

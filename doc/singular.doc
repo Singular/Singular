@@ -1047,6 +1047,7 @@ see @ref{Libraries}.
 Comments should be send to the author of the library directly.
 
 @menu
+* autgradalg_lib::
 * brillnoether_lib:: Riemann-Roch spaces of divisors on curves
 * chern_lib:: Symbolic Computations with Chern classes
 * cimonom_lib:: complete intersection for toric ideals
@@ -1076,6 +1077,10 @@ Comments should be send to the author of the library directly.
 * swalk_lib:: Sagbi Walk Conversion Algorithm
 * tropicalNewton_lib:: Newton polygons in tropical geometry
 @end menu
+@c ----------------------------------------------------------
+@node autgradalg_lib
+@subsection autgradalg_lib
+@c lib autgradalg.lib
 @c ----------------------------------------------------------
 @node brillnoether_lib
 @subsection brillnoether_lib

@@ -71,6 +71,7 @@ static BOOLEAN sat_vars_sp(kStrategy strat)
     if (nonTrivialSaturationToBeDone==true)
     {
       // std::cout << "simplifying!" << std::endl;
+      if (TEST_OPT_PROT) { PrintS("S"); mflush(); }
       p=p_Copy(strat->P.p,currRing);
       memset(&strat->P,0,sizeof(strat->P));
       strat->P.tailRing = strat->tailRing;
@@ -115,6 +116,7 @@ static BOOLEAN sat_vars_sp(kStrategy strat)
     }
     if (nonTrivialSaturationToBeDone)
     {
+      if (TEST_OPT_PROT) { PrintS("S"); mflush(); }
       p=p_Copy(strat->P.t_p,strat->tailRing);
       memset(&strat->P,0,sizeof(strat->P));
       strat->P.tailRing = strat->tailRing;
@@ -141,7 +143,8 @@ static BOOLEAN sat_vars_sp(kStrategy strat)
 static BOOLEAN satstd(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
+  if ((u!=NULL)
+  && ((u->Typ()==IDEAL_CMD)||(u->Typ()==MODUL_CMD)))
   {
     leftv v = u->next;
 

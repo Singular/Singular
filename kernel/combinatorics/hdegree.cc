@@ -1408,7 +1408,7 @@ ende:
   hDelete(hexist, hNexist);
   omFreeSize((ADDRESS)act, ((currRing->N) + 1) * sizeof(int));
   hKill(stcmem, (currRing->N) - 1);
-  pLmDelete(&p);
+  pLmFree(&p);
   if (p == NULL)
     return idInit(1,s->rank);
 

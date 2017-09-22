@@ -66,7 +66,7 @@ static poly ggnc_pp_Mult_mm(const poly p, const poly m, const ring r)
   poly pResult;
 
   if (p_IsConstant(m, r))
-    pResult = pp_Mult_nn(p, p_GetCoeff(m,r),r);
+    pResult = __pp_Mult_nn(p, p_GetCoeff(m,r),r);
   else
   {
     CGlobalMultiplier* const pMultiplier = r->GetNC()->GetGlobalMultiplier();
@@ -76,7 +76,7 @@ static poly ggnc_pp_Mult_mm(const poly p, const poly m, const ring r)
     pResult = pMultiplier->MultiplyPE(p, pMonom);
     p_Delete(&pMonom, r);
     p_Test(pResult, r);
-    pResult = p_Mult_nn(pResult, p_GetCoeff(m, r), r);
+    pResult = __p_Mult_nn(pResult, p_GetCoeff(m, r), r);
   }
 
 #if OUTPUT
@@ -115,7 +115,7 @@ static poly ggnc_p_Mult_mm(poly p, const poly m, const ring r)
   poly pResult;
 
   if (p_IsConstant(m, r))
-    pResult = p_Mult_nn(p, p_GetCoeff(m,r),r);
+    pResult = __p_Mult_nn(p, p_GetCoeff(m,r),r);
   else
   {
     CGlobalMultiplier* const pMultiplier = r->GetNC()->GetGlobalMultiplier();
@@ -125,7 +125,7 @@ static poly ggnc_p_Mult_mm(poly p, const poly m, const ring r)
     pResult = pMultiplier->MultiplyPEDestroy(p, pMonom);
     p_Delete(&pMonom, r);
     p_Test(pResult, r);
-    pResult = p_Mult_nn(pResult, p_GetCoeff(m, r), r);
+    pResult = __p_Mult_nn(pResult, p_GetCoeff(m, r), r);
   }
 
 #if OUTPUT
@@ -165,7 +165,7 @@ static poly ggnc_mm_Mult_p(const poly m, poly p, const ring r)
   poly pResult;
 
   if (p_IsConstant(m, r))
-    pResult = p_Mult_nn(p, p_GetCoeff(m,r),r);
+    pResult = __p_Mult_nn(p, p_GetCoeff(m,r),r);
   else
   {
     CGlobalMultiplier* const pMultiplier = r->GetNC()->GetGlobalMultiplier();
@@ -175,7 +175,7 @@ static poly ggnc_mm_Mult_p(const poly m, poly p, const ring r)
     pResult = pMultiplier->MultiplyEPDestroy(pMonom, p);
     p_Delete(&pMonom, r);
     p_Test(pResult, r);
-    pResult = p_Mult_nn(pResult, p_GetCoeff(m, r), r);
+    pResult = __p_Mult_nn(pResult, p_GetCoeff(m, r), r);
   }
 
 #if OUTPUT
@@ -213,7 +213,7 @@ static poly ggnc_mm_Mult_pp(const poly m, const poly p, const ring r)
   poly pResult;
 
   if (p_IsConstant(m, r))
-    pResult = pp_Mult_nn(p, p_GetCoeff(m,r),r);
+    pResult = __pp_Mult_nn(p, p_GetCoeff(m,r),r);
   else
   {
     CGlobalMultiplier* const pMultiplier = r->GetNC()->GetGlobalMultiplier();
@@ -223,7 +223,7 @@ static poly ggnc_mm_Mult_pp(const poly m, const poly p, const ring r)
     pResult = pMultiplier->MultiplyEP(pMonom, p);
     p_Delete(&pMonom, r);
     p_Test(pResult, r);
-    pResult = p_Mult_nn(pResult, p_GetCoeff(m, r), r);
+    pResult = __p_Mult_nn(pResult, p_GetCoeff(m, r), r);
   }
 
 #if OUTPUT

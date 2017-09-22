@@ -1802,3 +1802,12 @@ void id_Shift(ideal M, int s, const ring r)
 
 //  id_Test( M, r );
 }
+
+ideal id_Delete_Pos(const ideal I, const int p, const ring r)
+{
+  if ((p<0)||(p>=IDELEMS(I))) return NULL;
+  ideal ret=idInit(IDELEMS(I)-1,I->rank);
+  for(int i=0;i<p;i++) ret->m[i]=p_Copy(I->m[i],r);
+  for(int i=p+1;i<IDELEMS(I);i++) ret->m[i-1]=p_Copy(I->m[i],r);
+  return ret;
+}

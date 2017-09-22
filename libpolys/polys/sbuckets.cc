@@ -93,26 +93,6 @@ sBucket_pt    sBucketCopy(const sBucket_pt bucket)
   return newbucket;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// internal routines
-//
-// returns floor(log_2(i))
-static inline int LOG2(int i)
-{
-  assume (i > 0);
-  int j = 0;
-
-  do
-  {
-    i = i >> 1;
-    if (i == 0) return j;
-    j++;
-  }
-  while (1);
-
-  return j;
-}
-
 //////////////////////////////////////////////////////////////////////////
 // Creation/Destruction of buckets
 //
@@ -151,7 +131,7 @@ void sBucketDeleteAndDestroy(sBucket_pt *bucket_pt)
 // Convertion from/to SBpolys
 //
 
-static void sBucket_Merge_m(sBucket_pt bucket, poly p)
+void sBucket_Merge_m(sBucket_pt bucket, poly p)
 {
   assume(p != NULL && pNext(p) == NULL);
   int length = 1;
@@ -190,6 +170,34 @@ void sBucket_Merge_p(sBucket_pt bucket, poly p, int length)
     bucket->buckets[i].length = 0;
     i++;
     assume(LOG2(length) == i);
+  }
+
+  bucket->buckets[i].p = p;
+  bucket->buckets[i].length = length;
+  if (i > bucket->max_bucket) bucket->max_bucket = i;
+}
+
+void sBucket_Add_m(sBucket_pt bucket, poly p)
+{
+  assume(bucket != NULL);
+  assume(1 == pLength(p));
+
+  int length = 1;
+
+  int i = 0; //LOG2(length);
+
+  while (bucket->buckets[i].p != NULL)
+  {
+    p = p_Add_q(p, bucket->buckets[i].p, length, bucket->buckets[i].length,
+                bucket->bucket_ring);
+    bucket->buckets[i].p = NULL;
+    bucket->buckets[i].length = 0;
+    if (p==NULL)
+    {
+      if (i > bucket->max_bucket) bucket->max_bucket = i;
+      return;
+    }
+    i = LOG2(length);
   }
 
   bucket->buckets[i].p = p;
@@ -374,7 +382,7 @@ poly sBucketSortAdd(poly p, const ring r)
   do
   {
     pNext(p) = NULL;
-    sBucket_Add_p(bucket, p, 1);
+    sBucket_Add_m(bucket, p);
     p = pn;
     if (p == NULL) break;
     pn = pNext(pn);

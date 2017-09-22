@@ -1204,78 +1204,12 @@ static BOOLEAN jjDIV_N(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
 {
-  poly q=(poly)v->Data();
-  if (q==NULL)
-  {
-    WerrorS(ii_div_by_0);
-    return TRUE;
-  }
-  poly p=(poly)(u->Data());
-  if (p==NULL)
-  {
-    res->data=NULL;
-    return FALSE;
-  }
-  if ((pNext(q)!=NULL) && (!rField_is_Ring(currRing)))
-  { /* This means that q != 0 consists of at least two terms.
-       Moreover, currRing is over a field. */
-    if(pGetComp(p)==0)
-    {
-      res->data=(void*)(singclap_pdivide(p /*(poly)(u->Data())*/ ,
-                                         q /*(poly)(v->Data())*/ ,currRing));
-    }
-    else
-    {
-      int comps=pMaxComp(p);
-      ideal I=idInit(comps,1);
-      p=pCopy(p);
-      poly h;
-      int i;
-      // conversion to a list of polys:
-      while (p!=NULL)
-      {
-        i=pGetComp(p)-1;
-        h=pNext(p);
-        pNext(p)=NULL;
-        pSetComp(p,0);
-        I->m[i]=pAdd(I->m[i],p);
-        p=h;
-      }
-      // division and conversion to vector:
-      h=NULL;
-      p=NULL;
-      for(i=comps-1;i>=0;i--)
-      {
-        if (I->m[i]!=NULL)
-        {
-          h=singclap_pdivide(I->m[i],q,currRing);
-          pSetCompP(h,i+1);
-          p=pAdd(p,h);
-        }
-      }
-      idDelete(&I);
-      res->data=(void *)p;
-    }
-  }
-  else
-  { /* This means that q != 0 consists of just one term,
-       or that currRing is over a coefficient ring. */
-#ifdef HAVE_RINGS
-    if (!rField_is_Domain(currRing))
-    {
-      WerrorS("division only defined over coefficient domains");
-      return TRUE;
-    }
-    if (pNext(q)!=NULL)
-    {
-      WerrorS("division over a coefficient domain only implemented for terms");
-      return TRUE;
-    }
-#endif
-    res->data = (char *)pDivideM(pCopy(p),pHead(q));
-  }
-  pNormalize((poly)res->data);
-  return FALSE;
+  poly q=(poly)v->CopyD();
+  poly p=(poly)(u->CopyD());
+  res->data=(void*)(p_Divide(p /*(poly)(u->CopyD())*/ ,
+                                         q /*(poly)(v->CopyD())*/ ,currRing));
+  if (res->data!=NULL) pNormalize((poly)res->data);
+  return errorreported; /*there may be errors in p_Divide: div. ny 0, etc.*/
 }
 static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
 {
@@ -1801,7 +1735,7 @@ static BOOLEAN jjCOEFFS2_KB(leftv res, leftv u, leftv v)
   pSetm(p);
   res->data = (void*)idCoeffOfKBase((ideal)(u->Data()),
                                     (ideal)(v->Data()), p);
-  pDelete(&p);
+  pLmFree(&p);
   return FALSE;
 }
 static BOOLEAN jjCONTRACT(leftv res, leftv u, leftv v)
@@ -1833,6 +1767,20 @@ static BOOLEAN jjDEG_IV(leftv res, leftv u, leftv v)
   else
     res->data=(char *)(long)(-1);
   return FALSE;
+}
+static BOOLEAN jjDelete_IV(leftv res, leftv u, leftv v)
+{
+  int pos=(int)(long)v->Data();
+  intvec *iv=(intvec*)u->Data();
+  res->data=(void*)iv->delete_pos(pos-1);
+  return res->data==NULL;
+}
+static BOOLEAN jjDelete_ID(leftv res, leftv u, leftv v)
+{
+  int pos=(int)(long)v->Data();
+  ideal I=(ideal)u->Data();
+  res->data=(void*)id_Delete_Pos(I,pos-1,currRing);
+  return res->data==NULL;
 }
 static BOOLEAN jjDIFF_P(leftv res, leftv u, leftv v)
 {
@@ -1908,7 +1856,7 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
   ideal R; matrix U;
   ideal m = idLift(vi,ui,&R, FALSE,hasFlag(v,FLAG_STD),TRUE,&U);
   if (m==NULL) return TRUE;
-  // now make sure that all matices have the corect size:
+  // now make sure that all matrices have the corect size:
   matrix T = id_Module2formatedMatrix(m,vl,ul,currRing);
   int i;
   if (MATCOLS(U) != (int)ul)
@@ -2564,6 +2512,24 @@ static BOOLEAN jjMOD_N(leftv res, leftv u, leftv v)
     return TRUE;
   }
   res->data =(char *) n_IntMod((number)u->Data(),q,currRing->cf);
+  return FALSE;
+}
+static BOOLEAN jjMOD_P(leftv res, leftv u, leftv v)
+{
+  poly q=(poly)v->Data();
+  if (q==NULL)
+  {
+    WerrorS(ii_div_by_0);
+    return TRUE;
+  }
+  poly p=(poly)(u->Data());
+  if (p==NULL)
+  {
+    res->data=NULL;
+    return FALSE;
+  }
+  res->data=(void*)(singclap_pmod(p /*(poly)(u->Data())*/ ,
+                                  q /*(poly)(v->Data())*/ ,currRing));
   return FALSE;
 }
 static BOOLEAN jjMONITOR2(leftv res, leftv u,leftv v);
@@ -4275,7 +4241,7 @@ static BOOLEAN jjLEADMONOM(leftv res, leftv v)
   else
   {
     poly lm = pLmInit(p);
-    pSetCoeff(lm, nInit(1));
+    pSetCoeff0(lm, nInit(1));
     res->data = (char*) lm;
   }
   return FALSE;
@@ -4666,11 +4632,7 @@ static BOOLEAN jjRPAR(leftv res, leftv v)
 }
 static BOOLEAN jjSLIM_GB(leftv res, leftv u)
 {
-#ifdef HAVE_PLURAL
   const bool bIsSCA = rIsSCA(currRing);
-#else
-  const bool bIsSCA = false;
-#endif
 
   if ((currRing->qideal!=NULL) && !bIsSCA)
   {
@@ -6616,81 +6578,32 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
   int rank=1;
   int i=0;
   poly p;
+  int dest_type=POLY_CMD;
+  if (iiOp==MODUL_CMD) dest_type=VECTOR_CMD;
   while (h!=NULL)
   {
-    switch(h->Typ())
+    // use standard type conversions to poly/vector
+    int ri;
+    int ht=h->Typ();
+    if (ht==dest_type)
     {
-      case POLY_CMD:
-      {
-        p=(poly)h->CopyD(POLY_CMD);
-        break;
-      }
-      case INT_CMD:
-      {
-        number n=nInit((int)(long)h->Data());
-        if (!nIsZero(n))
-        {
-          p=pNSet(n);
-        }
-        else
-        {
-          p=NULL;
-          nDelete(&n);
-        }
-        break;
-      }
-      case BIGINT_CMD:
-      {
-        number b=(number)h->Data();
-        nMapFunc nMap=n_SetMap(coeffs_BIGINT,currRing->cf);
-        if (nMap==NULL) return TRUE;
-        number n=nMap(b,coeffs_BIGINT,currRing->cf);
-        if (!nIsZero(n))
-        {
-          p=pNSet(n);
-        }
-        else
-        {
-          p=NULL;
-          nDelete(&n);
-        }
-        break;
-      }
-      case NUMBER_CMD:
-      {
-        number n=(number)h->CopyD(NUMBER_CMD);
-        if (!nIsZero(n))
-        {
-          p=pNSet(n);
-        }
-        else
-        {
-          p=NULL;
-          nDelete(&n);
-        }
-        break;
-      }
-      case VECTOR_CMD:
-      {
-        p=(poly)h->CopyD(VECTOR_CMD);
-        if (iiOp!=MODUL_CMD)
-        {
-          idDelete(&id);
-          pDelete(&p);
-          return TRUE;
-        }
-        rank=si_max(rank,(int)pMaxComp(p));
-        break;
-      }
-      default:
-      {
-        idDelete(&id);
-        return TRUE;
-      }
+      p=(poly)h->CopyD();
+      if (p!=NULL) rank=si_max(rank,(int)pMaxComp(p));
     }
-    if ((iiOp==MODUL_CMD)&&(p!=NULL)&&(pGetComp(p)==0))
+    else if ((ri=iiTestConvert(ht,dest_type,dConvertTypes))!=0)
     {
-      pSetCompP(p,1);
+      sleftv tmp;
+      leftv hnext=h->next;
+      h->next=NULL;
+      iiConvert(ht,dest_type,ri,h,&tmp,dConvertTypes);
+      h->next=hnext;
+      p=(poly)tmp.data;
+      if (p!=NULL) rank=si_max(rank,(int)pMaxComp(p));
+    }
+    else
+    {
+      idDelete(&id);
+      return TRUE;
     }
     id->m[i]=p;
     i++;
@@ -7868,6 +7781,21 @@ static Subexpr jjMakeSub(leftv e)
   r->start =(int)(long)e->Data();
   return r;
 }
+static BOOLEAN jjRESTART(leftv, leftv u)
+{
+  int c=(int)(long)u->Data();
+  switch(c)
+  {
+    case 0:{
+        PrintS("delete all variables\n");
+	killlocals(0);
+	WerrorS("restarting...");
+	break;
+      };
+    default: WerrorS("not implemented");
+  }
+  return FALSE;
+}
 #define D(A)    (A)
 #define NULL_VAL NULL
 #define IPARITH
@@ -8083,9 +8011,9 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
       if (bb!=NULL)
       {
         if (!bb->blackbox_Op2(op,res,a,b)) return FALSE;
-        // else: no op defined
+        //else: no op defined, try the default
       }
-      /*else*/
+      else
       return TRUE;
     }
     else if ((bt>MAX_TOK)&&(op!='('))
@@ -8096,7 +8024,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
         if(!bb->blackbox_Op2(op,res,a,b)) return FALSE;
         // else: no op defined
       }
-      /*else*/
+      else
       return TRUE;
     }
     int i=iiTabIndex(dArithTab2,JJTAB2LEN,op);
@@ -8272,7 +8200,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
         res->data=bb->blackbox_Init(bb);
         if(!bb->blackbox_Assign(res,a)) return FALSE;
       }
-      /*else*/
+      else
       return TRUE;
     }
     else if (at>MAX_TOK) // argument is of bb-type
@@ -8283,9 +8211,10 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
         if(!bb->blackbox_Op1(op,res,a)) return FALSE;
         // else: no op defined
       }
-      /*else*/
+      else
       return TRUE;
     }
+    if (errorreported) return TRUE;
 
     iiOp=op;
     int i=iiTabIndex(dArithTab1,JJTAB1LEN,op);
@@ -8487,7 +8416,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
         if(!bb->blackbox_Op3(op,res,a,b,c)) return FALSE;
         // else: no op defined
       }
-      /*else*/
+      else
       return TRUE;
       if (errorreported) return TRUE;
     }
@@ -8598,8 +8527,9 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
         if(!bb->blackbox_OpM(op,res,a)) return FALSE;
         // else: no op defined
       }
-      /*else*/
+      else
       return TRUE;
+      if (errorreported) return TRUE;
     }
     int args=0;
     if (a!=NULL) args=a->listLength();
@@ -8782,6 +8712,12 @@ const char * Tok2Cmdname(int tok)
   if (tok==ANY_TYPE) return "any_type";
   if (tok==COMMAND) return "command";
   if (tok==NONE) return "nothing";
+  static char Tok2Cmdname_buf[2]=" ";
+  if (tok < 128)
+  {
+    Tok2Cmdname_buf[1]=(char)tok;
+    return Tok2Cmdname_buf;
+  }
   //if (tok==IFBREAK) return "if_break";
   //if (tok==VECTOR_FROM_POLYS) return "vector_from_polys";
   //if (tok==ORDER_VECTOR) return "ordering";
@@ -9060,7 +8996,7 @@ static BOOLEAN check_valid(const int p, const int op)
     }
     else if ((p & PLURAL_MASK)==2 /*, COMM_PLURAL */)
     {
-      Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(op));
+      Warn("assume commutative subalgebra for cmd `%s` in >>%s<<",Tok2Cmdname(op),my_yylinebuf);
       return FALSE;
     }
     /* else, ALLOW_PLURAL */

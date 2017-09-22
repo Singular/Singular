@@ -39,7 +39,7 @@ static poly pChangeSizeOfPoly(ring p_ring, poly p,int minvar,int maxvar, const r
       p_SetExp(resultWorkP,i-minvar+1,p_GetExp(p,i,p_ring),dst_r);
     p_SetComp(resultWorkP,p_GetComp(p,p_ring),dst_r);
     n=n_Copy(pGetCoeff(p),dst_r->cf);
-    p_SetCoeff(resultWorkP,n,dst_r);
+    p_SetCoeff0(resultWorkP,n,dst_r);
     p_Setm(resultWorkP,dst_r);
     pIter(p);
     if (p!=NULL)

@@ -1,0 +1,32 @@
+
+#define assert(A)
+/*MAKEHEADER*/
+#include "ap.h"
+
+/*MAKEHEADER*/
+#include "amp.h"
+
+/*MAKEHEADER*/
+#include "reflections.h"
+
+/*MAKEHEADER*/
+#include "bidiagonal.h"
+
+/*MAKEHEADER*/
+#include "qr.h"
+
+/*MAKEHEADER*/
+#include "lq.h"
+
+/*MAKEHEADER*/
+#include "blas.h"
+
+/*MAKEHEADER*/
+#include "rotations.h"
+
+/*MAKEHEADER*/
+#include "bdsvd.h"
+
+/*MAKEHEADER*/
+#include "svd.h"
+

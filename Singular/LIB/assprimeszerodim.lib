@@ -99,7 +99,8 @@ example
 ////////////////////////////////////////////////////////////////////////////////
 
 /* The pTest for zeroRadical(), to be used in modular(). */
-static proc pTest_zeroRadical(string command, list args, ideal result, int p)
+static proc pTest_zeroRadical(string command, alias list args,
+    alias ideal result, int p)
 {
    /* change to characteristic p */
    def br = basering;
@@ -135,7 +136,8 @@ static proc pTest_zeroRadical(string command, list args, ideal result, int p)
 ////////////////////////////////////////////////////////////////////////////////
 
 /* The finalTest for zeroRadical, to be used in modular(). */
-static proc finalTest_zeroRadical(string command, list args, ideal F)
+static proc finalTest_zeroRadical(string command, alias list args,
+    alias ideal F)
 {
    int i;
    for(i = nvars(basering); i > 0; i--)
@@ -552,7 +554,8 @@ static proc modpSpecialAlgDep(ideal I, poly f, int d, int alg)
 ////////////////////////////////////////////////////////////////////////////////
 
 /* The pTest for assPrimes(), to be used in modular(). */
-static proc pTest_assPrimes(string command, list args, ideal F, int p)
+static proc pTest_assPrimes(string command, alias list args, alias ideal F,
+    int p)
 {
    def br = basering;
    list lbr = ringlist(br);

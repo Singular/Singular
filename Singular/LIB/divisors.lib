@@ -71,7 +71,7 @@ LIB "primdec.lib";
 proc mod_init()
 {
 LIB"customstd.so";
-LIB"polymake.lib";
+load("polymake.lib","try");
 newstruct("divisor","ideal den,ideal num");
 newstruct("formaldivisor","list summands");
 newstruct("pdivisor","list summands, cone tail");

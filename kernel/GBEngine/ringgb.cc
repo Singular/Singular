@@ -191,7 +191,7 @@ poly plain_zero_spoly(poly h)
   {
     number tmp=n_Ann(gcd,currRing->cf);
     p = p_Copy(h->next, currRing);
-    p = p_Mult_nn(p, tmp, currRing);
+    p = __p_Mult_nn(p, tmp, currRing);
     n_Delete(&tmp,currRing->cf);
   }
   return p;

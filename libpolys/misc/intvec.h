@@ -120,6 +120,7 @@ public:
     }
     return m;
   }
+  intvec* delete_pos(int p);
   // keiner (ausser obachman) darf das folgenden benutzen !!!
   inline int * ivGetVec() { return v; }
 };

@@ -429,9 +429,9 @@ static void handleNestedFractionsOverQ(fraction f, const coeffs cf)
     }
     if (!n_IsOne(lcmOfDenominators, ntCoeffs))
     { /* multiply NUM(f) and DEN(f) with lcmOfDenominators */
-      NUM(f) = p_Mult_nn(NUM(f), lcmOfDenominators, ntRing);
+      NUM(f) = __p_Mult_nn(NUM(f), lcmOfDenominators, ntRing);
       p_Normalize(NUM(f), ntRing);
-      DEN(f) = p_Mult_nn(DEN(f), lcmOfDenominators, ntRing);
+      DEN(f) = __p_Mult_nn(DEN(f), lcmOfDenominators, ntRing);
       p_Normalize(DEN(f), ntRing);
     }
     n_Delete(&lcmOfDenominators, ntCoeffs);
@@ -461,9 +461,9 @@ static void handleNestedFractionsOverQ(fraction f, const coeffs cf)
       { /* divide NUM(f) and DEN(f) by gcdOfCoefficients */
         number inverseOfGcdOfCoefficients = n_Invers(gcdOfCoefficients,
                                                      ntCoeffs);
-        NUM(f) = p_Mult_nn(NUM(f), inverseOfGcdOfCoefficients, ntRing);
+        NUM(f) = __p_Mult_nn(NUM(f), inverseOfGcdOfCoefficients, ntRing);
         p_Normalize(NUM(f), ntRing);
-        DEN(f) = p_Mult_nn(DEN(f), inverseOfGcdOfCoefficients, ntRing);
+        DEN(f) = __p_Mult_nn(DEN(f), inverseOfGcdOfCoefficients, ntRing);
         p_Normalize(DEN(f), ntRing);
         n_Delete(&inverseOfGcdOfCoefficients, ntCoeffs);
       }
@@ -797,10 +797,6 @@ static BOOLEAN ntGreater(number a, number b, const coeffs cf)
   //check_N(b,cf);
   ntTest(a);
   ntTest(b);
-  number aNumCoeff = NULL; int aNumDeg = 0;
-  number aDenCoeff = NULL; int aDenDeg = 0;
-  number bNumCoeff = NULL; int bNumDeg = 0;
-  number bDenCoeff = NULL; int bDenDeg = 0;
   if (IS0(a))
   {
     if (IS0(b)) return FALSE;
@@ -814,20 +810,22 @@ static BOOLEAN ntGreater(number a, number b, const coeffs cf)
   }
   // now: a!=0, b!=0
   fraction fa = (fraction)a;
-  aNumDeg = p_Totaldegree(NUM(fa), ntRing);
-  aNumCoeff = p_GetCoeff(NUM(fa), ntRing);
+  number aNumCoeff = p_GetCoeff(NUM(fa), ntRing);
+  int aNumDeg = p_Totaldegree(NUM(fa), ntRing);
+  number aDenCoeff = NULL; int aDenDeg = 0;
   if (DEN(fa)!=NULL)
   {
-    aDenDeg = p_Totaldegree(DEN(fa), ntRing);
     aDenCoeff=p_GetCoeff(DEN(fa),ntRing);
+    aDenDeg = p_Totaldegree(DEN(fa), ntRing);
   }
   fraction fb = (fraction)b;
-  bNumDeg = p_Totaldegree(NUM(fb), ntRing);
-  bNumCoeff = p_GetCoeff(NUM(fb), ntRing);
+  number bNumCoeff = p_GetCoeff(NUM(fb), ntRing);
+  int bNumDeg = p_Totaldegree(NUM(fb), ntRing);
+  number bDenCoeff = NULL; int bDenDeg = 0;
   if (DEN(fb)!=NULL)
   {
-    bDenDeg = p_Totaldegree(DEN(fb), ntRing);
     bDenCoeff=p_GetCoeff(DEN(fb),ntRing);
+    bDenDeg = p_Totaldegree(DEN(fb), ntRing);
   }
   if (aNumDeg-aDenDeg > bNumDeg-bDenDeg) return TRUE;
   if (aNumDeg-aDenDeg < bNumDeg-bDenDeg) return FALSE;
@@ -1102,8 +1100,8 @@ static void ntNormalizeDen(fraction result, const ring R)
     if (!n_IsOne(pGetCoeff(n),R->cf))
     {
       number inv=n_Invers(pGetCoeff(n),R->cf);
-      DEN(result)=p_Mult_nn(n,inv,R);
-      NUM(result)=p_Mult_nn(NUM(result),inv,R);
+      DEN(result)=__p_Mult_nn(n,inv,R);
+      NUM(result)=__p_Mult_nn(NUM(result),inv,R);
       n_Delete(&inv,R->cf);
       if (p_IsOne(DEN(result), R))
       {
@@ -1328,8 +1326,8 @@ static void heuristicGcdCancellation(number a, const coeffs cf)
         if (!n_IsOne(pGetCoeff(DEN(f)),ntCoeffs))
         {
           number inv=n_Invers(pGetCoeff(DEN(f)),ntCoeffs);
-          DEN(f)=p_Mult_nn(DEN(f),inv,ntRing);
-          NUM(f)=p_Mult_nn(NUM(f),inv,ntRing);
+          DEN(f)=__p_Mult_nn(DEN(f),inv,ntRing);
+          NUM(f)=__p_Mult_nn(NUM(f),inv,ntRing);
         }
         if(p_LmIsConstant(DEN(f),ntRing))
         {
@@ -1682,7 +1680,7 @@ static number ntNormalizeHelper(number a, number b, const coeffs cf)
 
       /* singclap_gcd destroys its arguments; we hence need copies: */
       pGcd = singclap_gcd(p_Copy(NUM(fa),ntRing), p_Copy(DEN(fb),ntRing), ntRing);
-      pGcd= p_Mult_nn (pGcd, contentpa, ntRing);
+      pGcd= __p_Mult_nn (pGcd, contentpa, ntRing);
       n_Delete(&contentpa, ntCoeffs);
     }
   }
@@ -1771,7 +1769,7 @@ static number ntGcd(number a, number b, const coeffs cf)
 
       /* singclap_gcd destroys its arguments; we hence need copies: */
       pGcd = singclap_gcd(p_Copy(NUM(fa),ntRing), p_Copy(NUM(fb),ntRing), ntRing);
-      pGcd= p_Mult_nn (pGcd, contentpa, ntRing);
+      pGcd= __p_Mult_nn (pGcd, contentpa, ntRing);
       n_Delete(&contentpa, ntCoeffs);
     }
   }
@@ -1797,28 +1795,27 @@ static number ntGcd(number a, number b, const coeffs cf)
 static int ntSize(number a, const coeffs cf)
 {
   ntTest(a);
-  if (IS0(a)) return -1;
-  /* this has been taken from the old implementation of field extensions,
-     where we computed the sum of the degrees and the numbers of terms in
-     the numerator and denominator of a; so we leave it at that, for the
-     time being */
+  if (IS0(a)) return 0;
   fraction f = (fraction)a;
   poly p = NUM(f);
-  int noOfTerms = 0;
-  int numDegree = 0;
+  unsigned long noOfTerms = 0;
+  unsigned long numDegree = 0;
   if (p!=NULL)
   {
     numDegree = p_Totaldegree(p,ntRing);
     noOfTerms = pLength(p);
   }
-  int denDegree = 0;
+  unsigned long denDegree = 0;
   if (!DENIS1(f))
   {
     denDegree =  p_Totaldegree(DEN(f),ntRing);
     noOfTerms += pLength(DEN(f));
   }
   ntTest(a); // !!!!
-  return numDegree + denDegree + noOfTerms;
+  // avoid int overflow:
+  unsigned long t= ((numDegree + denDegree)*(numDegree + denDegree) + 1) * noOfTerms; // must be >0
+  if (t>INT_MAX) return INT_MAX;
+  else return (int)t;
 }
 
 /* assumes that src = Q or Z, dst = Q(t_1, ..., t_s) */
@@ -2363,7 +2360,7 @@ static void ntClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
       if (nCoeff_is_Q (Q))
       {
         number LcGcd= n_SubringGcd (p_GetCoeff (cand, R), p_GetCoeff(den, R), Q);
-        gcd = p_Mult_nn(gcd, LcGcd, R);
+        gcd = __p_Mult_nn(gcd, LcGcd, R);
         n_Delete(&LcGcd,Q);
       }
 //      assume( n_IsOne(pGetCoeff(gcd), Q) ); // TODO: this may be wrong...
@@ -2430,14 +2427,14 @@ static void ntClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
       const poly den = DEN(f);
 
       if( den == NULL ) // ?? / 1 ?
-        NUM(f) = p_Mult_nn(NUM(f), d, R);
+        NUM(f) = __p_Mult_nn(NUM(f), d, R);
       else
       {
         assume( p_IsConstant(den, R) );
         assume( pNext(den) == NULL );
 
         number ddd = n_Div(d, pGetCoeff(den), Q); // but be an integer now!!!
-        NUM(f) = p_Mult_nn(NUM(f), ddd, R);
+        NUM(f) = __p_Mult_nn(NUM(f), ddd, R);
         n_Delete(&ddd, Q);
 
         p_Delete(&DEN(f), R);
@@ -2447,7 +2444,7 @@ static void ntClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
       assume( DEN(f) == NULL );
     }
 
-    NUM((fraction)c) = p_Mult_nn(NUM((fraction)c), d, R);
+    NUM((fraction)c) = __p_Mult_nn(NUM((fraction)c), d, R);
     n_Delete(&d, Q);
   }
 

@@ -85,10 +85,6 @@ void  m2_end(int i);
 
 #define loop for(;;)
 
-#ifndef ABS
-#define ABS(x) ((x)<0?(-(x)):(x))
-#endif
-
 extern omBin char_ptr_bin;
 
 #endif

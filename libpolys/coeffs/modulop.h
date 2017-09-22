@@ -19,6 +19,7 @@
 // enable large primes (32749 < p < 2^31-)
 #define NV_OPS
 #define NV_MAX_PRIME 32749
+#define FACTORY_MAX_PRIME 536870909
 
 struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
 struct snumber; typedef struct snumber *   number;
@@ -45,11 +46,21 @@ static inline number npMultM(number a, number b, const coeffs r)
   return (number)
     ((((unsigned long) a)*((unsigned long) b)) % ((unsigned long) r->ch));
 }
+static inline void npInpMultM(number &a, number b, const coeffs r)
+{
+  a=(number)
+    ((((unsigned long) a)*((unsigned long) b)) % ((unsigned long) r->ch));
+}
 #else
 static inline number npMultM(number a, number b, const coeffs r)
 {
   long x = (long)r->npLogTable[(long)a]+ r->npLogTable[(long)b];
   return (number)(long)r->npExpTable[x<r->npPminus1M ? x : x- r->npPminus1M];
+}
+static inline void npInpMultM(number &a, number b, const coeffs r)
+{
+  long x = (long)r->npLogTable[(long)a]+ r->npLogTable[(long)b];
+  a=(number)(long)r->npExpTable[x<r->npPminus1M ? x : x- r->npPminus1M];
 }
 #endif
 
@@ -79,6 +90,11 @@ static inline number npAddM(number a, number b, const coeffs r)
   unsigned long R = (unsigned long)a + (unsigned long)b;
   return (number)(R >= r->ch ? R - r->ch : R);
 }
+static inline void npInpAddM(number &a, number b, const coeffs r)
+{
+  unsigned long R = (unsigned long)a + (unsigned long)b;
+  a=(number)(R >= r->ch ? R - r->ch : R);
+}
 static inline number npSubM(number a, number b, const coeffs r)
 {
   return (number)((long)a<(long)b ?
@@ -95,6 +111,17 @@ static inline number npAddM(number a, number b, const coeffs r)
    res += ((long)res >> 31) & r->ch;
 #endif
    return (number)res;
+}
+static inline void npInpAddM(number &a, number b, const coeffs r)
+{
+   unsigned long res = (long)((unsigned long)a + (unsigned long)b);
+   res -= r->ch;
+#if SIZEOF_LONG == 8
+   res += ((long)res >> 63) & r->ch;
+#else
+   res += ((long)res >> 31) & r->ch;
+#endif
+   a=(number)res;
 }
 static inline number npSubM(number a, number b, const coeffs r)
 {

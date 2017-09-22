@@ -173,7 +173,7 @@ gfan::ZCone groebnerCone(const ideal I, const ring r, const gfan::ZVector &w)
       pIter(g);
       while (g!=NULL)
       {
-        pGetExpV(g,tailexpv);
+        p_GetExpV(g,tailexpv,currRing);
         tailexpw = intStar2ZVector(n, tailexpv);
         inequalities.appendRow(leadexpw-tailexpw);
         pIter(g);
@@ -193,7 +193,7 @@ gfan::ZCone groebnerCone(const ideal I, const ring r, const gfan::ZVector &w)
       pIter(g);
       while (g!=NULL)
       {
-        pGetExpV(g,tailexpv);
+        p_GetExpV(g,tailexpv,currRing);
         tailexpw = intStar2ZVector(n, tailexpv);
         equations.appendRow(leadexpw-tailexpw);
         pIter(g);

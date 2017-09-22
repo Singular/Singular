@@ -117,11 +117,12 @@ leftv slReadAscii2(si_link l, leftv pr)
   {
     fseek(fp,0L,SEEK_END);
     long len=ftell(fp);
+    if (len<0) len=0;
     fseek(fp,0L,SEEK_SET);
     buf=(char *)omAlloc((int)len+1);
     if (BVERBOSE(V_READING))
       Print("//Reading %ld chars\n",len);
-    myfread( buf, len, 1, fp);
+    if (len>0) myfread( buf, len, 1, fp);
     buf[len]='\0';
   }
   else
@@ -181,7 +182,7 @@ BOOLEAN slWriteAscii(si_link l, leftv v)
       if (s!=NULL)
       {
         fputs(s,outfile);
-	fputc('\n',outfile);
+        fputc('\n',outfile);
         omFree((ADDRESS)s);
       }
       else

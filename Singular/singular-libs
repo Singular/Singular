@@ -63,4 +63,4 @@ PLIBS = bimodules.lib bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib\
 
 # contributed libs, status not yet decided
 SLIB2 = KVequiv.lib deflation.lib lejeune.lib ncHilb.lib \
-	mathml.lib maxlike.lib recover.lib redcgs.lib difform.lib
+	mathml.lib maxlike.lib recover.lib redcgs.lib difform.lib autgradalg.lib

@@ -4,7 +4,7 @@
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
  *******************************************************************/
-#include <mylimits.h>
+#include <limits.h>
 #include <string.h>
 #include "omConfig.h"
 #include "omalloc.h"

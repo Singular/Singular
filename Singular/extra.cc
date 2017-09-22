@@ -2909,7 +2909,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
             extern lists testsvd(matrix M);
               res->rtyp=LIST_CMD;
             res->data=(char*)(testsvd((matrix)h->Data()));
-            eturn FALSE;
+            return FALSE;
        }
        else
   #endif
