@@ -821,6 +821,15 @@ intvec * ivConcat(intvec * a, intvec * b)
   return ab;
 }
 
+intvec* intvec::delete_pos(int p)
+{
+  if (!range(p)) return NULL;
+  intvec *iv=new intvec(rows()-1);
+  for(int i=0;i<p;i++) (*iv)[i]=v[i];
+  for(int i=p+1;i<rows();i++) (*iv)[i-1]=v[i];
+  return iv;
+}
+
 #pragma GCC pop_options
 
 #endif

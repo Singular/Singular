@@ -78,20 +78,13 @@ static  FORCE_INLINE int nlQlogSize (number n, const coeffs r)
 {
   assume( nCoeff_is_Q (r) );
 
-  long nl=n_Size(n,r);
-  if (nl==0L) return 0;
-  if (nl==1L)
+  if(SR_HDL(n)&SR_INT)
   {
+    if (SR_HDL(n)==SR_INT) return 0;
     long i = SR_TO_INT (n);
     unsigned long v;
-    v = (i >= 0) ? i : -i;
-    int r = 0;
-
-    while(v >>= 1)
-    {
-      r++;
-    }
-    return r + 1;
+    v = ABS(i);
+    return LOG2(v) + 1;
   }
   //assume denominator is 0
   number nn=(number) n;

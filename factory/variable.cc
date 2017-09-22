@@ -260,6 +260,7 @@ int ExtensionLevel()
 
 void prune (Variable& alpha)
 {
+  if (alpha.level()==LEVELBASE) return;
   int i, n = strlen( var_names_ext );
   ASSERT (n+1 >= -alpha.level(), "wrong variable");
   if (-alpha.level() == 1)

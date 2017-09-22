@@ -1,19 +1,24 @@
 ////////////////////////////////////////////////////////////////
-version = "version goettsche.lib 0.9 Sep_2016 ";      //$Id$
+version = "version goettsche.lib 0.92 Sep_2017 ";      //$Id$
 category = "Betti numbers";
 info="
-LIBRARY:  goettsche.lib     Goettsche's formula for the Betti numbers of the Hilbert scheme
+LIBRARY:  goettsche.lib     Drezet's formula for the Betti numbers of the moduli space
+                            of Kronecker modules,
+                            Goettsche's formula for the Betti numbers of the Hilbert scheme
                             of points on a surface,
                             Macdonald's formula for the symmetric product
 
-AUTHOR:  Oleksandr Iena,    o.g.yena@gmail.com,  yena@mathematik.uni-kl.de
+AUTHOR:  Oleksandr Iena,    o.g.yena@gmail.com
 
 REFERENCES:
-  [1] Goettsche, Lothar,    The Betti numbers of the Hilbert scheme of ponts
+  [1] Drezet, Jean-Marc     Cohomologie des varie'te's de modules de hauter nulle.
+                            Mathematische Annalen: 281, 43-85, (1988).
+
+  [2] Goettsche, Lothar,    The Betti numbers of the Hilbert scheme of ponts
                             on a smooth projective surface.
                             Mathematische Annalen: 286, 193-208, (1990).
 
-  [2] Macdonald, I. G.,     The Poincare polynomial of a symmetric product,
+  [3] Macdonald, I. G.,     The Poincare polynomial of a symmetric product,
                             Mathematical proceedings of the Cambridge Philosophical Society:
                             58, 563 - 568, (1962).
 
@@ -24,8 +29,13 @@ PROCEDURES:
   MacdonaldF(z, t, n, b);   The Macdonald's formula up to n-th degree
   PPolyS(z, n, b);          Poincare Polynomial of the n-th symmetric power of a variety
   BettiNumsS(n, b);         Betti numbers of the n-th symmetric power of a variety
+  PPolyN(t, q, m, n);       Poincare Polynomial of the moduli space
+                            of Kronecker modules N (q; m, n)
+  BettiNumsN(q, m, n);      Betti numbers of the moduli space
+                            of Kronecker modules N (q; m, n)
+
+KEYWORDS: betti number; Goettsche's formula; Macdonald's formula;Kronecker modules
 ";
-LIB "control.lib";
 //----------------------------------------------------------
 
 proc GoettscheF(poly z, poly t, int n, list b)
@@ -65,15 +75,14 @@ NOTE:     zero is returned if n<0 or b is not a list of non-negative integers
   // compute the generating function by the Goettsche's formula up to degree n in t@
   poly rez=1;
   int k,i;
+  ideal I=std(t@^(n+1));
   for(k=1;k<=n;k++)
   {
     for(i=0;i<=4;i++)
     {
-      rez=rez*generFactor( z@^(2*k-2+i)*t@^k, k, i, b[i+1], n);
+      rez=NF( rez*generFactor( z@^(2*k-2+i)*t@^k, k, i, b[i+1], n), I);
     }
   }
-  ideal I=std(t@^(n+1));
-  rez=NF(rez,I);
   setring br@; // come back to the initial base ring
   // define the specialization homomorphism z@=z, t@=t
   execute( "map FF= r@,"+varstr(br@)+", z, t;" );
@@ -129,15 +138,14 @@ NOTE:     zero is returned if n<0 or b is not a list of non-negative integers
   // compute the generating function by the Goettsche's formula up to degree n in t@
   poly rez=1;
   int k,i;
+  ideal I=std(t@^(n+1));
   for(k=1;k<=n;k++)
   {
     for(i=0;i<=4;i++)
     {
-      rez=rez*generFactor( z@^(2*k-2+i)*t@^k, k  ,i,b[i+1], n);
+      rez=NF(rez*generFactor( z@^(2*k-2+i)*t@^k, k, i, b[i+1], n), I);
     }
   }
-  ideal I=std(t@^(n+1));
-  rez=NF(rez,I);
   rez= coeffs(rez, t@)[n+1, 1]; // take the coefficient of the n-th power of t@
   setring br@; // come back to the initial base ring
   // define the specialization homomorphism z@=z, t@=0
@@ -193,15 +201,14 @@ NOTE:     an empty list is returned if n<0 or b is not a list of non-negative in
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   poly rez=1;
   int k,i;
+  ideal I=std(t@^(n+1));
   for(k=1;k<=n;k++)
   {
     for(i=0;i<=4;i++)
     {
-      rez=rez*generFactor( z@^(2*k-2+i)*t@^k, k  ,i,b[i+1], n);
+      rez=NF(rez*generFactor( z@^(2*k-2+i)*t@^k, k, i, b[i+1], n), I);
     }
   }
-  ideal I=std(t@^(n+1));
-  rez=NF(rez,I);
   rez= coeffs(rez, t@)[n+1, 1]; // take the coefficient of the n-th power of t@
   matrix CF=coeffs(rez, z@); // take the matrix of the coefficients
   list res; // and transform it to a list
@@ -252,12 +259,11 @@ NOTE:     zero is returned if n<0 or b is not a list of non-negative integers
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   poly rez=1;
   int i;
+  ideal I=std(t@^(n+1));
   for(i=0;i<d;i++)
   {
-      rez=rez*generFactor( z@^i*t@, 1, i, b[i+1], n);
+      rez=NF(rez*generFactor( z@^i*t@, 1, i, b[i+1], n), I);
   }
-  ideal I=std(t@^(n+1));
-  rez=NF(rez,I);
   setring br@; // come back to the initial base ring
   // define the specialization homomorphism z@=z, t@=t
   execute( "map FF= r@,"+varstr(br@)+",z, t;" );
@@ -304,12 +310,11 @@ NOTE:     zero is returned if n<0 or b is not a list of non-negative integers
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   poly rez=1;
   int i;
+  ideal I=std(t@^(n+1));
   for(i=0;i<d;i++)
   {
-      rez=rez*generFactor( z@^i*t@, 1, i, b[i+1], n);
+    rez=NF(rez*generFactor( z@^i*t@, 1, i, b[i+1], n), I);
   }
-  ideal I=std(t@^(n+1));
-  rez=NF(rez,I);
   rez= coeffs(rez, t@)[n+1, 1]; // take the coefficient of the n-th power of t@
   setring br@; // come back to the initial base ring
   // define the specialization homomorphism z@=z, t@=0
@@ -356,12 +361,11 @@ NOTE:     an empty list is returned if n<0 or b is not a list of non-negative in
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   poly rez=1;
   int i;
+  ideal I=std(t@^(n+1));
   for(i=0;i<d;i++)
   {
-      rez=rez*generFactor( z@^i*t@, 1, i, b[i+1], n);
+      rez=NF(rez*generFactor( z@^i*t@, 1, i, b[i+1], n), I);
   }
-  ideal I=std(t@^(n+1));
-  rez=NF(rez,I); // throw away the terms of higher degrees in t@
   rez= coeffs(rez, t@)[n+1, 1]; // take the coefficient of the n-th power of t@
   matrix CF=coeffs(rez, z@); // take the matrix of the coefficients
   list res; // and transform it to a list
@@ -377,10 +381,105 @@ example
 {
   "EXAMPLE:"; echo=2;
   ring r=0, (z), ls;
-  // consider the projective plane P_2 with Betti numbers 1,0,1,0,1
-  list b=1,0,1,0,1;
+  // consider a complex torus T (elliptic curve) with Betti numbers 1,2,1
+  list b=1,2,1;
+  // get the Betti numbers of the second symmetric power of T
+  print( BettiNumsS(2, b) );
+  // consider a projective plane P_2 with Betti numbers 1,0,1,0,1
+  b=1,0,1,0,1;
   // get the Betti numbers of the third symmetric power of P_2
   print( BettiNumsS(3, b) );
+}
+//----------------------------------------------------------
+
+proc PPolyN(poly t, int q, int m, int n)
+"USAGE:   PPolyN(t, q, m, n);  t polynomial, q, m, n integers
+RETURN:   polynomial in t
+PURPOSE:  computes the Poincare polynomial of the moduli space
+          of Kronecker modules N(q; m, n)
+EXAMPLE:  example PPolyN; shows an example
+NOTE:     if m and n are not coprime, the result does not necessary make sense
+"
+{
+  int d=dimKron(q, m, n);
+  if(d<0)
+  {
+    return(0);
+  }
+  if(gcd(m, n)!=1)
+  {
+    "You are trying to compute the Poincare polynomial";
+    "of the moduli space of Kronecker modules N("+string(q)+"; "+string(m)+", "+string(n)+").";
+    "Notice that gcd(m,n)=1 is expected to get the correct Poincare polynomial";
+    "of the moduli space N(q; m, n)!";
+  }
+  def br@=basering; // remember the base ring
+  // add additional variable t@ to the base ring
+  execute("ring r@= (" + charstr(basering) + "),("+varstr(basering)+", t@), dp;" );
+  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
+  poly rez=(1-t@^2)*PPolyW(q, m, n, t@, d);
+  ideal I=t@^(2*d+1);
+  rez=NF(rez, I);
+  setring br@; // come back to the initial base ring
+  // define the specialization homomorphism t@=t
+  execute( "map FF= r@,"+varstr(br@)+", t;" );
+  poly rez=FF(rez); // bring the result to the base ring
+  return(rez);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r=0, (t), ls;
+  // get the Poincare polynomial of N(3; 2, 3)
+  print( PPolyN(t, 3, 2, 3) );
+}
+//----------------------------------------------------------
+
+proc BettiNumsN(int q, int m, int n)
+"USAGE:   BettiNumsN(q, m, n);  q, m, n integers
+RETURN:   list of integers
+PURPOSE:  computes the Betti numbers of the moduli space
+          of Kronecker modules N(q; m, n)
+EXAMPLE:  example BettiNumsN; shows an example
+NOTE:     if m and n are not coprime, the result does not necessary make sense
+"
+{
+  int d=dimKron(q, m, n);
+  if(d<0)
+  {
+    return(0);
+  }
+  if(gcd(m, n)!=1)
+  {
+    "You are trying to compute the Poincare polynomial";
+    "of the moduli space of Kronecker modules N("+string(q)+"; "+string(m)+", "+string(n)+").";
+    "Notice that gcd(m,n)=1 is expected to get the correct Poincare polynomial";
+    "of the moduli space N(q; m, n)!";
+  }
+  def br@=basering; // remember the base ring
+  // add additional variable t@ to the base ring
+  execute("ring r@= (" + charstr(basering) + "),("+varstr(basering)+", t@), dp;" );
+  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
+  poly rez=(1-t@^2)*PPolyW(q, m, n, t@, d);
+  ideal I=t@^(2*d+1);
+  rez=NF(rez, I);
+  matrix CF=coeffs(rez, t@); // take the matrix of the coefficients
+  list res; // and transform it to a list
+  d=size(CF);
+  int i;
+  for(i=1; i<=d; i++)
+  {
+    res=res + list(int(CF[i, 1])) ;
+  }
+  setring br@; // come back to the initial base ring
+  return(res);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r=0, (t), dp;
+  // get the Betti numbers of N(3; 2, 3)
+  print( BettiNumsN(3, 2, 3) );
 }
 //----------------------------------------------------------------------------------------
 // The procedures below are for the internal usage only
@@ -439,7 +538,7 @@ NOTE:
   pow=(-1)^(i+1)*b;
   if(pow > 0)
   {
-    rez=(1-X)^pow;
+    rez=(1+X)^pow;
   }
   else
   {
@@ -450,8 +549,6 @@ NOTE:
     }
     rez=rez^(-pow);
   }
- //ideal I=std(t^(n+1));
-  //rez=NF(rez,I);
   return(rez);
 }
 example
@@ -463,4 +560,171 @@ example
   // and assuming that the degree of t is 3
   print( generFactor(t, 3, 0, 2, 11) );
 }
+//----------------------------------------------------------------------------------------
+// The procedures below are related to the Kronecker modules
+//----------------------------------------------------------------------------------------
+
+static proc PPolyW(int q, int m, int n, poly t, int d, list #)
+{
+  // without loss of generality assume that m >= n
+  int N;
+  int M;
+  if(n>m)
+  {
+    M = n;
+    N = m;
+  }
+  else
+  {
+    M = m;
+    N = n;
+  }
+  // now M >= N;
+  int i;
+  int j;
+  list plg;// will be the matrix-list with all the data
+  list newPlg;// will be used for computation of new entries of plg
+  // initial intitialization of plg, M entries
+  for(i=1;i<=M;i++)
+  {
+    plg = plg + list( list()   );
+  }
+  int ii;
+  int jj;
+  int st;
+  list P;
+  list PP;
+  int c;
+  int sz;
+  int pow;
+  poly pterm;
+  poly rez;// to be the result
+  ideal I=t^(2*d+1);
+  // starting in the bottom row, moving from left to right and from the bottom upwards
+  for(j=0;j<=N;j++)
+  {
+    for(i=max(j, 1);i<=M;i++)
+    {
+      // for each entry compute the relevant data inductively
+      // add the trivial polygon
+      newPlg = list( list( list( list(int(0), int(0)), list(i, j)) , poly(0),  int(0) ) );
+      // first summand in the Drezet's formula
+      if(j==0)// if in the bottom row
+      {
+        if(i==1)
+        {
+          rez=geomS(t^2, d);
+        }
+        else
+        {
+          rez=plg[i-1][1][1][2]*geomS(t^(2*i), d div i );
+        }
+      }
+      else// otherwise use the values from the bottom row
+      {
+        rez=plg[i][1][1][2]*plg[j][1][1][2];
+      }
+      rez=NF(rez, I);// throw away the higher powers
+      //inductively compute the polygons
+      for(ii = 0; ii <= i; ii++)
+      {
+        st= ((j*ii) div  i) + 1;
+        for(jj = st; jj <= j; jj++)
+        {
+          PP=list();// to be the list of polygons that will be added
+          P = plg[i-ii][j-jj+1];// list of smaller polygons
+          sz=size(P);
+          for(c=1;c<=sz;c++)// for every smaller polygon
+          {
+            if( jj*P[c][1][2][1]-P[c][1][2][2]*ii > 0  )// if the slopes fit
+            {
+              pow =  P[c][3]+  jj*( q*(i-ii)-(j-jj)  )-ii*(i-ii);// get the corresponding power
+              // and the corresponding product
+              pterm = NF(P[c][2]* plg[max(ii,jj)][min(ii,jj)+1][1][2], I);
+              // and add the data to PP
+              PP = PP + list(list(list(list(int(0),int(0))) + shift(P[c][1],ii,jj),pterm,pow));
+              // throw away the summands from the polygons with non-admissible slopes and pow<0
+              if(pterm!=0)
+              {
+                rez=rez-t^(2*pow) * pterm;// add the next summand
+              }
+            }
+          }
+          newPlg=newPlg + PP;// add the new polygons to the list
+        }
+      }
+      rez=NF(rez, I);// throw away the higher powers
+      newPlg[1][2]=rez;// set the polynomial corresponding to the trivial polygon
+      plg[i]=plg[i]+list(newPlg);// add the new data
+      // now all the data for (i, j) have been computed
+    }
+  }
+  if(size(#)==0)// if there are no optional parameters
+  {
+    return(plg[M][N+1][1][2]);// return the polynomial of the upper right entry
+  }
+  else// otherwise return all the computed data
+  {
+    return(plg);
+  }
+}
 //----------------------------------------------------------
+
+static proc dimKron(int q, int m, int n)
+{
+  if( (q<3)||(m<0)||(n<0) )
+  {
+    "Check the input data!";
+    "It is expected that for the moduli space of Kronecker modules N(q; m, n)";
+    "q >= 3, m >= 0, n >= 0.";
+    return(int(-1));
+  }
+  int ph=m^2+n^2-q*m*n;
+  if(ph<0)
+  {
+    return(1-ph);
+  }
+  int g=gcd(m, n);
+  if(g==0)
+  {
+    return(int(-1));
+  }
+  m = m div g;
+  n = n div g;
+  ph = m^2+n^2-q*m*n;
+  if(ph==1)
+  {
+    return(int(0));
+  }
+  else
+  {
+    return(int(-1));
+  }
+}
+//----------------------------------------------------------
+
+static proc shift(list l, int a, int b)
+{
+  int sz=size(l);
+  int i;
+  for(i=1;i<=sz;i++)
+  {
+    l[i][1]=l[i][1]+a;
+    l[i][2]=l[i][2]+b;
+  }
+  return(l);
+}
+//----------------------------------------------------------
+
+static proc geomS(poly t, int d)
+{
+  poly rez=1;
+  int i;
+  for(i=1;i<=d;i++)
+  {
+    rez=rez+t^i;
+  }
+  return(rez);
+}
+//----------------------------------------------------------
+

@@ -1010,7 +1010,7 @@ int ksReducePolyTailBound(LObject* PR, TObject* PW, int bound, poly Current, pol
 * creates the leading term of the S-polynomial of p1 and p2
 * do not destroy p1 and p2
 * remarks:
-*   1. the coefficient is 0 (nNew)
+*   1. the coefficient is 0 (p_Init)
 *   1. a) in the case of coefficient ring, the coefficient is calculated
 *   2. pNext is undefined
 */
@@ -1083,9 +1083,7 @@ x2:
           nDelete(&t2);
           pSetCoeff0(m2, t1);
       }
-      else
 #endif
-        nNew(&(pGetCoeff(m2)));
       return m2;
     }
     else
@@ -1135,9 +1133,7 @@ x1:
       nDelete(&lc2);
       nDelete(&t1);
     }
-    else
 #endif
-      nNew(&(pGetCoeff(m1)));
     return m1;
   }
   m1 = p_Init(currRing);
@@ -1192,9 +1188,7 @@ x1:
           nDelete(&lc2);
           nDelete(&t1);
         }
-        else
 #endif
-          nNew(&(pGetCoeff(m1)));
         return m1;
       }
       else
@@ -1208,9 +1202,7 @@ x1:
           nDelete(&lc2);
           nDelete(&t2);
         }
-        else
 #endif
-          nNew(&(pGetCoeff(m2)));
         return m2;
       }
     }
@@ -1240,9 +1232,7 @@ x1:
           nDelete(&t1);
           nDelete(&t2);
       }
-      else
 #endif
-        nNew(&(pGetCoeff(m1)));
       return m1;
     }
     pIter(a1);

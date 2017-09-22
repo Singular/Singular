@@ -1047,12 +1047,12 @@ void mpTrafo(
   trace = nInpNeg(trace);
   MATELEM(c,1,1) = pAdd(pAdd(pAdd(ppMult_qq(MATELEM(H,1,1), MATELEM(H,1,1)),
                                   ppMult_qq(MATELEM(H,1,2), MATELEM(H,2,1))),
-                             ppMult_nn(MATELEM(H,1,1), trace)),
-                        pMult_nn(pOne(), det));
+                             __pp_Mult_nn(MATELEM(H,1,1), trace, currRing)),
+                        __p_Mult_nn(pOne(), det,currRing));
   MATELEM(c,2,1) = pAdd(pMult(pCopy(MATELEM(H,2,1)),
                               pAdd(pCopy(MATELEM(H,1,1)),
                                    pCopy(MATELEM(H,2,2)))),
-                        ppMult_nn(MATELEM(H,2,1), trace));
+                        __pp_Mult_nn(MATELEM(H,2,1), trace,currRing));
   MATELEM(c,3,1) = ppMult_qq(MATELEM(H,2,1), MATELEM(H,3,2));
   nDelete(&trace); nDelete(&det);
 
@@ -1401,8 +1401,8 @@ void lduDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &dMat,
       if (!nIsOne(t))
       {
         for (int r = row; r <= rr; r++)
-          pMult_nn(MATELEM(dMat, r, r), t);
-        pMult_nn(MATELEM(lMat, row, row), t);
+          MATELEM(dMat, r, r)=__p_Mult_nn(MATELEM(dMat, r, r), t,currRing);
+        MATELEM(lMat, row, row)=__p_Mult_nn(MATELEM(lMat, row, row), t,currRing);
       }
       l = pMult(l, pCopy(MATELEM(lMat, row, row)));
       u = pMult(u, pCopy(MATELEM(uMat, row, col)));
@@ -1422,19 +1422,21 @@ void lduDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &dMat,
           for (int c = col + 1; c <= cc; c++)
           {
             poly p = MATELEM(uMat, r, c);
-            pMult_nn(p, f2);
+            p=__p_Mult_nn(p, f2,currRing);
             poly q = pCopy(MATELEM(uMat, row, c));
-            pMult_nn(q, f1); q = pNeg(q);
+            q=__p_Mult_nn(q, f1,currRing); q = pNeg(q);
             MATELEM(uMat, r, c) = pAdd(p, q);
           }
           number tt = nDiv(g, gg);
           nNormalize(tt);   /* this division works without remainder */
-          pMult_nn(MATELEM(lMat, r, r), tt); nDelete(&tt);
+          MATELEM(lMat, r, r)=__p_Mult_nn(MATELEM(lMat, r, r), tt, currRing);
+	  nDelete(&tt);
           MATELEM(lMat, r, row) = pCopy(MATELEM(lMat, r, r));
-          pMult_nn(MATELEM(lMat, r, row), f1);
+          MATELEM(lMat, r, row)=__p_Mult_nn(MATELEM(lMat, r, row), f1,currRing);
           nDelete(&f1); nDelete(&f2); nDelete(&g);
         }
-        else pMult_nn(MATELEM(lMat, r, r), t);
+        else
+	  MATELEM(lMat, r, r)=__p_Mult_nn(MATELEM(lMat, r, r), t, currRing);
       }
       nDelete(&t); nDelete(&gg);
       col++; row++;
@@ -1566,7 +1568,7 @@ bool luSolveViaLDUDecomp(const matrix pMat, const matrix lMat,
     number z = nInvers(pGetCoeff(lTimesU));
     for (int c = 1; c <= n; c++)
     {
-      pMult_nn(MATELEM(xVec, c, 1), z);
+      MATELEM(xVec, c, 1)=__p_Mult_nn(MATELEM(xVec, c, 1), z,currRing);
       pNormalize(MATELEM(xVec, c, 1));
     }
     nDelete(&z);

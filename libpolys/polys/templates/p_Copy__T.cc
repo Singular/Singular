@@ -23,7 +23,9 @@ LINKAGE poly p_Copy__T(poly s_p, const ring r)
   {
     p_AllocBin(pNext(d_p), bin, r);
     pIter(d_p);
-    pSetCoeff0(d_p, n_Copy__T(pGetCoeff(s_p), r->cf));
+    number n_p=pGetCoeff(s_p);
+    if (n_p!=NULL) n_p=n_Copy(n_p,r->cf);
+    pSetCoeff0(d_p, n_p);
     // it is better to iter here,
     // for MemCopy advances goes from low to high addresses
     h = s_p;

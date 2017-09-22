@@ -152,7 +152,7 @@ example
     parallelWaitFirst(commands, arguments);
 }
 
-proc parallelWaitAll(def commands, alias list args, list #)
+proc parallelWaitAll(alias def commands, alias list args, list #)
 "USAGE:   parallelWaitAll(commands, arguments[, timeout]); commands list or
           string, arguments list, timeout int
 RETURN:   a list, containing the results of commands[i] applied to
@@ -193,7 +193,7 @@ example
     parallelWaitAll(command, arguments);
 }
 
-proc parallelTestAND(def commands, alias list args, list #)
+proc parallelTestAND(alias def commands, alias list args, list #)
 "USAGE:   parallelTestAND(commands, arguments[, timeout]); commands list or
           string, arguments list, timeout int
 RETURN:   1, if commands[i] applied to arguments[i] is not equal to zero for
@@ -248,7 +248,7 @@ example
     parallelTestAND(command, arguments2);
 }
 
-proc parallelTestOR(def commands, alias list args, list #)
+proc parallelTestOR(alias def commands, alias list args, list #)
 "USAGE:   parallelTestOR(commands, arguments[, timeout]); commands list or
           string, arguments list, timeout int
 RETURN:   1, if commands[i] applied to arguments[i] is not equal to zero for

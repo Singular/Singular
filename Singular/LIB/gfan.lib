@@ -2,7 +2,7 @@
 version="version gfan.lib 4.0.3.3 Oct_2016 ";
 category = "Convex Geometry";
 info="
-LIBRARY:  gfan.lib   Interface to gfanlib to enable computations in convex geometry
+LIBRARY:  gfan.lib   Interface to gfan and gfanlib for computations in convex geometry
 AUTHORS:  Anders N. Jensen, email: jensen@imf.au.dk
           Yue Ren,          email: ren@mathematik.uni-kl.de
           Frank Seelisch
@@ -133,6 +133,58 @@ example
   rays(c);
 }
 
+/////
+// gfan interface functions
+/////
+
+static proc intmatToGfanVectorConfiguration(intmat P)
+{
+  string gfanVectorConfiguration = "{";
+  int c = ncols(P);
+  for (int i=1; i<=nrows(P); i++)
+  {
+    gfanVectorConfiguration = gfanVectorConfiguration
+      +"("+string(intvec(P[i,1..c]))+"),";
+  }
+  int k = size(gfanVectorConfiguration);
+  gfanVectorConfiguration = gfanVectorConfiguration[1..k-1];
+  gfanVectorConfiguration = gfanVectorConfiguration+"}";
+  return (gfanVectorConfiguration);
+}
+
+proc secondaryFan(intmat P, def #)
+"USAGE:   secondaryFan(P);   P intmat
+         secondaryFan(P,s); P intmat, s string
+RETURN:  fan, the secondary fan of the vector configuration P
+NOTE:    s is a option string that is passed to gfan, possible options are
+           '--log1' to '--log3' for output during the computation
+EXAMPLE: example secondaryFan; shows an examplex
+"
+{
+  string filename = "/tmp/gfanlib_secondaryFan_"+string(random(1,2147483647));
+  string filenameIn = filename+".in.gfan";
+  string filenameOut = filename+".out.gfan";
+
+  string filestring = intmatToGfanVectorConfiguration(P);
+  filestring;
+  write(":w "+filenameIn,filestring);
+  int dummy = system("sh","gfan_secondaryfan "+string(#)+" < "+filenameIn+" > "+filenameOut);
+  string fanString = read(filenameOut);
+
+  dummy = system("sh","rm "+filenameIn+" "+filenameOut);
+  return (fanFromString(fanString));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat P[4][3] =
+    1,0,0,
+    1,1,0,
+    1,0,1,
+    1,1,1;
+  fan F = secondaryFan(P);
+  F;
+}
 
 /////
 // cone related functions

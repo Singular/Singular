@@ -9,11 +9,13 @@ struct interval
     number upper;
     ring R;
 
-    interval();
-    interval(number);
-    interval(number, number);
+    interval(const ring r=currRing);
+    interval(number, const ring r=currRing);
+    interval(number, number, const ring r=currRing);
     interval(interval*);
     ~interval();
+
+    interval& setRing(ring);
 };
 
 struct box

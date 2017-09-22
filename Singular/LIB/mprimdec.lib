@@ -40,6 +40,8 @@ PROCEDURES:
   indSet(i);                   lists with varstrings of(in)dependend variables
   GTZopt(N[,check[,ann]]);     a faster version of GTZmod
   zeroOpt(N[,check[,ann]]);    a faster version of zeroMod
+
+KEYWORDS: primary decomposition of modules;decomposition of modules
 ";
 
 LIB "primdec.lib";

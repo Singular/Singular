@@ -822,6 +822,18 @@ static inline poly p_Head(poly p, const ring r)
   return np;
 }
 
+static inline poly p_LmHead(poly p, const ring r)
+{
+  p_LmCheckPolyRing1(p, r);
+  poly np;
+  omTypeAllocBin(poly, np, r->PolyBin);
+  p_SetRingOfLm(np, r);
+  memcpy(np->exp, p->exp, r->ExpL_Size*sizeof(long));
+  pNext(np) = NULL;
+  pSetCoeff0(np, NULL);
+  return np;
+}
+
 // returns a copy of p with Lm(p) from lmRing and Tail(p) from tailRing
 static inline poly p_Copy(poly p, const ring lmRing, const ring tailRing)
 {
@@ -904,6 +916,7 @@ static inline poly p_Mult_nn(poly p, number n, const ring r)
   } else
     return r->p_Procs->p_Mult_nn(p, n, r);
 }
+#define __p_Mult_nn(p,n,r) r->p_Procs->p_Mult_nn(p, n, r)
 
 static inline poly p_Mult_nn(poly p, number n, const ring lmRing,
                         const ring tailRing)
@@ -924,9 +937,12 @@ static inline poly pp_Mult_nn(poly p, number n, const ring r)
 {
   if (n_IsOne(n, r->cf))
     return p_Copy(p, r);
+  else if (n_IsZero(n, r->cf))
+    return NULL;
   else
     return r->p_Procs->pp_Mult_nn(p, n, r);
 }
+#define __pp_Mult_nn(p,n,r) r->p_Procs->pp_Mult_nn(p, n, r)
 
 // test if the monomial is a constant as a vector component
 // i.e., test if all exponents are zero
@@ -958,18 +974,16 @@ static inline BOOLEAN p_LmIsConstant(const poly p, const ring r)
 static inline poly pp_Mult_mm(poly p, poly m, const ring r)
 {
   if (p_LmIsConstant(m, r))
-    return pp_Mult_nn(p, pGetCoeff(m), r);
+    return __pp_Mult_nn(p, pGetCoeff(m), r);
   else
-  {
     return r->p_Procs->pp_Mult_mm(p, m, r);
-  }
 }
 
 // returns p*m, destroys p, const: m
 static inline poly p_Mult_mm(poly p, poly m, const ring r)
 {
   if (p_LmIsConstant(m, r))
-    return p_Mult_nn(p, pGetCoeff(m), r);
+    return __p_Mult_nn(p, pGetCoeff(m), r);
   else
     return r->p_Procs->p_Mult_mm(p, m, r);
 }
@@ -1048,14 +1062,7 @@ static inline poly p_Mult_q(poly p, poly q, const ring r)
 
   if (pNext(q) == NULL)
   {
-  // NEEDED
-#ifdef HAVE_PLURAL
-/*    if (rIsPluralRing(r))
-      p = gnc_p_Mult_mm(p, q, r); // ???
-    else*/
-#endif /* HAVE_PLURAL */
-      p = r->p_Procs->p_Mult_mm(p, q, r);
-
+    p = r->p_Procs->p_Mult_mm(p, q, r);
     r->p_Procs->p_Delete(&q, r);
     return p;
   }
@@ -1448,6 +1455,12 @@ static inline void p_GetExpV(poly p, int *ev, const ring r)
       ev[j] = p_GetExp(p, j, r);
 
   ev[0] = p_GetComp(p, r);
+}
+static inline void p_GetExpVL(poly p, long *ev, const ring r)
+{
+  p_LmCheckPolyRing1(p, r);
+  for (unsigned j = r->N; j!=0; j--)
+      ev[j-1] = p_GetExp(p, j, r);
 }
 static inline void p_SetExpV(poly p, int *ev, const ring r)
 {
@@ -1932,7 +1945,7 @@ void      p_Split(poly p, poly * r);   /*p => IN(p), r => REST(p) */
 BOOLEAN p_HasNotCF(poly p1, poly p2, const ring r);
 poly      p_mInit(const char *s, BOOLEAN &ok, const ring r); /* monom s -> poly, interpreter */
 const char *    p_Read(const char *s, poly &p,const ring r); /* monom -> poly */
-poly      p_Divide(poly a, poly b, const ring r);
+poly      p_MDivide(poly a, poly b, const ring r);
 poly      p_DivideM(poly a, poly b, const ring r);
 poly      p_Div_nn(poly p, const number n, const ring r);
 

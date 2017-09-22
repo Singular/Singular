@@ -92,6 +92,8 @@ LB_CHECK_GMP(4.0,,AC_MSG_ERROR([Unable to find GMP on your machine: please use -
 LB_CHECK_NTL(5.0,,AC_MSG_WARN([Unable to find NTL (which is strongly recommended) on your machine: please use --with-ntl=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 LB_CHECK_FLINT(2.3,,AC_MSG_WARN([Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 
+AC_CHECK_LIB(mpfr,mpfr_add)
+
 AC_CONFIG_GOOGLE_PERFTOOLS()
 
 AX_PYTHON_DEFAULT()

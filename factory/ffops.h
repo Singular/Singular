@@ -20,7 +20,11 @@
 
 /* define type of your compilers 64 bit integer type */
 #ifndef FACTORY_INT64
+#if SIZEOF_LONG == 8
+#define FACTORY_INT64 long int
+#else
 #define FACTORY_INT64 long long int
+#endif
 #endif
 
 extern int ff_prime;

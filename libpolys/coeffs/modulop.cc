@@ -28,8 +28,6 @@ BOOLEAN npGreaterZero (number k, const coeffs r);
 number  npMult        (number a, number b, const coeffs r);
 number  npInit        (long i, const coeffs r);
 long    npInt         (number &n, const coeffs r);
-number  npAdd         (number a, number b,const coeffs r);
-number  npSub         (number a, number b,const coeffs r);
 void    npPower       (number a, int i, number * result,const coeffs r);
 BOOLEAN npIsZero      (number a,const coeffs r);
 BOOLEAN npIsOne       (number a,const coeffs r);
@@ -120,30 +118,6 @@ long npInt(number &n, const coeffs r)
 
   if ((long)n > (((long)r->ch) >>1)) return ((long)n -((long)r->ch));
   else                               return ((long)n);
-}
-
-number npAdd (number a, number b, const coeffs r)
-{
-  n_Test(a, r);
-  n_Test(b, r);
-
-  number c = npAddM(a,b, r);
-
-  n_Test(c, r);
-
-  return c;
-}
-
-number npSub (number a, number b, const coeffs r)
-{
-  n_Test(a, r);
-  n_Test(b, r);
-
-  number c = npSubM(a,b,r);
-
-  n_Test(c, r);
-
-  return c;
 }
 
 BOOLEAN npIsZero (number  a, const coeffs r)
@@ -496,8 +470,10 @@ BOOLEAN npInitChar(coeffs r, void* p)
   r->cfCoeffWrite=npCoeffWrite;
 
   r->cfMult  = npMult;
-  r->cfSub   = npSub;
-  r->cfAdd   = npAdd;
+  r->cfInpMult  = npInpMultM;
+  r->cfSub   = npSubM;
+  r->cfAdd   = npAddM;
+  r->cfInpAdd   = npInpAddM;
   r->cfDiv   = npDiv;
   r->cfInit = npInit;
   //r->cfSize  = ndSize;
@@ -540,6 +516,10 @@ BOOLEAN npInitChar(coeffs r, void* p)
     r->cfExactDiv= nvDiv;
     r->cfInvers= nvInvers;
     //r->cfPower= nvPower;
+    if (c>FACTORY_MAX_PRIME)
+    {
+      r->convSingNFactoryN=ndConvSingNFactoryN;
+    }
   }
 #endif
 #ifdef LDEBUG

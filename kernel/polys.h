@@ -159,6 +159,10 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
 #define  pDivisibleByRingCase(f,g) p_DivisibleByRingCase(f,g,currRing)
 #endif
 
+/// polynomial division, ignoring the rest
+/// via singclap_pdiive resp. idLift
+/// destroyes a,b
+poly p_Divide(poly a, poly b, const ring r);
 /***************************************************************
  *
  * Copying/Deleteion of polys: args may be NULL
@@ -272,7 +276,7 @@ static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
 
 /* ----------------- define to enable new p_procs -----*/
 
-#define pDivide(a,b) p_Divide(a,b,currRing)
+#define pMDivide(a,b) p_MDivide(a,b,currRing)
 #define pDivideM(a,b) p_DivideM(a,b,currRing)
 #define pLcm(a,b,m) p_Lcm(a,b,m,currRing)
 #define pDiff(a,b)  p_Diff(a,b,currRing)

@@ -25,8 +25,8 @@ ideal redNF(ideal N,ideal M,matrix U,int d,intvec *w)
     for(int i=IDELEMS(M)-1;i>=0;i--)
     {
       u0=nInvers(pGetCoeff(MATELEM(U0,i+1,i+1)));
-      MATELEM(U0,i+1,i+1)=pMult_nn(MATELEM(U0,i+1,i+1),u0);
-      M->m[i]=pMult_nn(M->m[i],u0);
+      MATELEM(U0,i+1,i+1)=__p_Mult_nn(MATELEM(U0,i+1,i+1),u0,currRing);
+      M->m[i]=__p_Mult_nn(M->m[i],u0,currRing);
     }
   }
   ideal M0=idInit(IDELEMS(M),M->rank);

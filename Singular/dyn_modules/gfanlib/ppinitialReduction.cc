@@ -220,16 +220,6 @@ void ptNormalize(poly* gStar, const number p, const ring r)
   assume(n_IsUnit(gcd,r->cf));
   // now a*leadcoef(g)+b*p = gcd with gcd being a unit
   // so a*g+b*(p-t)*leadmonom(g) should have a unit as leading coefficient
-  // but first check whether b is 0,
-  // since p_Mult_nn doesn't allow 0 as number input
-  if (n_IsZero(b,r->cf))
-  {
-    n_Delete(&a,r->cf);
-    n_Delete(&b,r->cf);
-    n_Delete(&gcd,r->cf);
-    p_Delete(&pt,r);
-    return;
-  }
   poly m = p_Head(g,r);
   p_SetCoeff(m,n_Init(1,r->cf),r);
   g = p_Add_q(p_Mult_nn(g,a,r),p_Mult_nn(p_Mult_mm(pt,m,r),b,r),r);

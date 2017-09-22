@@ -12,6 +12,8 @@
 # include "singularconfig.h"
 # include "misc/auxiliary.h"
 
+#define HAVE_SVD
+
 #undef VERSION
 #define VERSION "4.1.0"
 #define SINGULAR_MAJOR_VERSION 4

@@ -23,6 +23,7 @@ PROCEDURES:
 
  NumLocalDim(ideal I, p);  numerical local dimension at a point computed as
                                   an approximate value
+KEYWORDS: bertini; numerDecom_lib
 ";
 
 LIB "numerDecom.lib";

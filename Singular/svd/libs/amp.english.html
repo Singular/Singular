@@ -1,0 +1,738 @@
+<html>
+<head>
+<title>Multiple precision library AMP</title>
+<style type="text/css">
+<!--
+h1 { font-family: Tahoma,sans-serif; font-size : larger; }
+h2 { font-family: Arial,sans-serif; font-size : 11pt; }
+h3 { font-family: Arial,sans-serif; font-size : 9pt; }
+p { text-align: justify; }
+code { font-family: Courier New, monospace; }
+.cond  { color:blue; }
+.const { color:#222222; }
+.func  { color:#111111; font-family: Courier New, monospace; font-size : 9pt; }
+-->
+</style>
+</head>
+<body>
+<h1>Introduction</h1>
+
+<p>
+The AMP library (ALGLIB Multiple Precision) is an object oriented interface for the MPFR library. This interface was created as part of the ALGLIB project (see www.alglib.net and alglib.sources.ru). In order to illustrate the reason why it was necessary to create yet another interface for MPFR, we should first give a brief introduction to the ALGLIB project.
+</p>
+
+<p>
+The goal of the project is to create a numerical analysis library which provides programs in different programming languages for each algorithm. This goal is attained by using automatic translation. Algorithms are stored as a pseudocode which can then be translated into the required programming language. Pseudocode syntax allows automatic translation into the most popular programming languages (e.g. C++, C#, Pascal etc.). It should be noted that, in a number of cases, programs in pseudocode can be modified to use multiple precision arithmetic. For this purpose, the AMP library is used as an interface for MPFR substituting standard double precision data type.
+</p>
+
+<p>
+Programs using AMP were originally implemented to work with a 64-bit accuracy. This fact has an impact on a library design. Because of this, the following features had appeared: compile time precision definition (in AMP accuracy is given by using the template class parameterization) and prohibition to operate with numbers of different precisions (e.g. addition of 256 bit and 512 bit numbers). These restrictions are necessary in order to use the library within the ALGLIB project.
+</p>
+
+<p>
+It should be noted that although AMP was designed especially for the ALGLIB project, it could be useful as just an MPFR interface. Particularly, automatic garbage collection could be useful for a number of applications. It is this part of functionality that we are going to develop, because the ALGLIB part has already been developed accurately enough and doesn't need any extension.
+</p>
+
+<h1>License</h1>
+
+<p>
+The AMP library is available under triple license conditions MPL 1.1 / GPL 2.0 / LGPL 2.1
+</p>
+
+<p>
+<b>Explanation</b>. Triple license conditions mean that the user can choose a license to use a program with. When distributing and/or modifying the AMP, the user has two options. First, he can distribute it using the same triple license conditions. In this case, the library recipient will have the same right to choose a license. Second, the user can distribute the AMP library subject to conditions of a GPL 2.0 license (or, depending on his choice, LGPL 2.1) and prohibit the use of other licenses.
+</p>
+
+<p>
+These distribution conditions allow the use of the AMP library in both proprietary/non-free programs (this is allowed by the MPL license) and GPL/LGPL licensed software. It is the author's opinion that such conditions will cause wide distribution and extensive use of a library.
+</p>
+
+<h1>How to Start</h1>
+
+<p>
+To use the AMP library you need to:
+</p>
+
+<ul>
+<li>add the GMP library to the project</li>
+<li>add the MPFR library to the project</li>
+<li>add the AP library to the project (see www.alglib.net or alglib.sources.ru)</li>
+<li>add the main library module (amp.cpp) to the project</li>
+<li>include the library header file (amp.h). It contains all the necessary declarations</li>
+</ul>
+
+<h1>AMP Basics</h1>
+
+<p>
+<b>Real numbers</b>. MPFR (and, therefore, AMP) is almost compliant with IEE-754 which describes real number arithmetic implementation requirements. The following features are available: signed zeros, finite numbers, positive and negative infinites, NANs. Denormalized numbers are not supported.
+</p>
+
+<p>
+<b>Operations and rounding</b>. MPFR supports four types of rounding: round towards plus infinity, round towards minus infinity, round to zero and round to the nearest representable value. AMP always uses the last one. Thus, all the real number operations are performed by using exact rounding. Special values (infinites or NaNs) appearing during the calculation don't cause exception generation and the calculation is continued under normal conditions. Operations with infinites and signed zeros are performed according to the rules of limits.
+</p>
+
+<p>
+<b>Precision</b>. Real number precision is a number of bits in a floating-point mantissa, including the high-order one (non-zero bit). For example, if the precision of a given number is equal to 53, this number is of a standard <code>double</code> type. The AMP library allows to set any precision no less than 32 (which represents the <code>signed long</code> type) including numbers which are not powers of two. The restriction was added due to compatibility reasons: a number of mathematical programs suppose that we can set any integer value to the real variable without any loss of accuracy.
+</p>
+
+<p>
+<b>Compile time precision definition</b>. The main feature of the AMP library is that class performing multiple precision real numbers operations is a template class with one parameter specifying precision of a stored value. Hence, the precision to perform the calculation with is known at the compile time (on template specialization) and could not be changed in run-time. This restriction was introduced knowingly. The reason is that the AMP library was designed to be used mainly within the ALGLIB project. In that case, the AMP library is used by the automatically translated programs. Automatically generated codes cannot work with dynamic precision real numbers due to the number of problems. For example, we can't say what precision ought to be used when some elements of the matrix have 128 bit precision and some have 256 bit. That's the reason why this restriction was introduced.
+</p>
+
+<p>
+<b>Mixed precision operands</b>. There are several floating point types in C++: <code>float</code>, <code>double</code>, <code>long double</code>. At that, if operands have a different precision, it is usually performed by automatic casting from less to finer precision (e.g. sum of <code>float</code> and <code>double</code> is <code>double</code>). The AMP library does not allow automatic casting of operands with different precision. For example, the sum of <code>amp::ampf&lt;128&gt;</code> and <code>amp::ampf&lt;144&gt;</code> will cause compilation errors because it is required to cast operand types. It is partly defined by C++ restrictions (which could be overcome), and partly by the developer's conviction that in numerical analysis such functionality is very seldom required.
+</p>
+
+<p>
+<b>Garbage collection</b>. Since in MPFR the memory for real numbers is allocated dynamically, real number initialization takes a great deal of time comparatively. In order to increase performance, the AMP library doesn't free used memory, but puts needless variables into the list. When it is necessary to create a new real number, it is taken from the list.
+</p>
+
+<p>
+<b>No multithreading</b>. The AMP library doesn't support multithreading. The library can work in a multithreaded environment, but it can't be used by two or more threads simultaneously.
+</p>
+
+<h1>Exception Classes</h1>
+
+<p>
+The AMP library includes the following exception classes:
+</p>
+
+<ol>
+<li><code>amp::incorrectPrecision</code> - generated when the real number of an invalid precision is initialized (less than 32 or more than MPFR library limitations)</li>
+<li><code>amp::invalidConversion</code> - generated when the real number to be rounded using <code>trunc</code>/<code>round</code>/<code>ceil</code>/<code>floor</code> doesn't fit in the <code>signed long</code> type</li>
+<li><code>amp::internalError</code> - generated when an internal AMP library error occurs (it should not happen under normal conditions)</li>
+</ol>
+
+<h1>amp::mpfr_record and amp::mpfr_storage</h1>
+
+<p>
+These classes are service classes. Although these classes are available to the programmer, he shouldn't use them, because they aren't intended to be used outside the AMP library.
+</p>
+
+<h1>amp::ampf</h1>
+
+<h2>Key Concepts</h2>
+
+<p>
+<code>amp::ampf class</code> is a template class incapsulating real numbers in MPFR library format. Class implements memory allocation, memory release and garbage collection. Arithmetic operations are overloaded. In most cases, code using this class is almost the same as code working with real numbers.
+</p>
+
+<h2>amp::ampf members</h2>
+
+<pre>
+<code>
+    <b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;
+    <b>class</b> ampf
+    {
+    <b>public</b>:
+        ~ampf();
+
+        ampf ();        
+        ampf (<b>long double</b> v);
+        ampf (<b>double</b> v);
+        ampf (<b>float</b> v);
+        ampf (<b>signed long</b> v);
+        ampf (<b>unsigned long</b> v);
+        ampf (<b>signed int</b> v);
+        ampf (<b>unsigned int</b> v);
+        ampf (<b>signed short</b> v);
+        ampf (<b>unsigned short</b> v);
+        ampf (<b>signed char</b> v);
+        ampf (<b>unsigned char</b> v);
+        ampf (<b>const</b> std::string &amp;s);
+        ampf (<b>const char</b> *s);
+        
+        ampf(<b>const</b> ampf&amp; r);
+        <b>template</b>&lt;<b>unsigned int</b> Precision2&gt;
+        ampf(<b>const</b> ampf&lt;Precision2&gt;&amp; r);
+
+        ampf&amp; <b>operator</b>= (<b>long double</b> v);
+        ampf&amp; <b>operator</b>= (<b>double</b> v);
+        ampf&amp; <b>operator</b>= (<b>float</b> v);
+        ampf&amp; <b>operator</b>= (<b>signed long</b> v);
+        ampf&amp; <b>operator</b>= (<b>unsigned long</b> v);
+        ampf&amp; <b>operator</b>= (<b>signed int</b> v);
+        ampf&amp; <b>operator</b>= (<b>unsigned int</b> v);
+        ampf&amp; <b>operator</b>= (<b>signed short</b> v);
+        ampf&amp; <b>operator</b>= (<b>unsigned short</b> v);
+        ampf&amp; <b>operator</b>= (<b>signed char</b> v);
+        ampf&amp; <b>operator</b>= (<b>unsigned char</b> v);
+        ampf&amp; <b>operator</b>= (<b>const char</b> *s);
+        ampf&amp; <b>operator</b>= (<b>const</b> std::string &amp;s);
+        ampf&amp; <b>operator</b>= (<b>const</b> ampf&amp; r);
+        <b>template</b>&lt;<b>unsigned int</b> Precision2&gt;
+        ampf&amp; <b>operator</b>= (<b>const</b> ampf&lt;Precision2&gt;&amp; r);
+        
+        <b>template</b>&lt;<b>class</b> T&gt;
+        ampf&amp; <b>operator</b>+=(<b>const</b> T&amp; v);
+        <b>template</b>&lt;<b>class</b> T&gt;
+        ampf&amp; <b>operator-</b>=(<b>const</b> T&amp; v);
+        <b>template</b>&lt;class T&gt;
+        ampf&amp; <b>operator</b>*=(<b>const</b> T&amp; v);
+        <b>template</b>&lt;class T&gt;
+        ampf&amp; <b>operator</b>/=(<b>const</b> T&amp; v);
+        
+        mpfr_srcptr getReadPtr() <b>const</b>;
+        mpfr_ptr getWritePtr();
+        
+        <b>bool</b> isFiniteNumber() <b>const</b>;
+        <b>bool</b> isPositiveNumber() <b>const</b>;
+        <b>bool</b> isZero() <b>const</b>;
+        <b>bool</b> isNegativeNumber() <b>const</b>;
+        <b>const</b> ampf getUlpOf();
+
+        <b>double</b> toDouble() <b>const</b>;
+        std::string toHex() <b>const</b>;
+        std::string toDec() <b>const</b>;
+        
+        <b>static const</b> ampf getUlpOf(<b>const</b> ampf &amp;x);
+        <b>static const</b> ampf getUlp();
+        <b>static const</b> ampf getUlp256();
+        <b>static const</b> ampf getUlp512();
+        <b>static const</b> ampf getMaxNumber();
+        <b>static const</b> ampf getMinNumber();
+        <b>static const</b> ampf getAlgoPascalEpsilon();
+        <b>static const</b> ampf getAlgoPascalMaxNumber();
+        <b>static const</b> ampf getAlgoPascalMinNumber();
+        <b>static const</b> ampf getRandom();
+    };
+</code>
+</pre>
+
+<h1>Variable Declaration and Initialization</h1>
+
+<p>
+<code>amp::ampf</code> is a template class having one parameter which specifies the precision of a real number. Thus, it is necessary to determine what degree of precision is required before using this class. A number of constructors are defined for class initialization. They can take instance of the same class, integer numbers, standard real numbers (float, double, long double) and strings as the input. Strings can have fractional ("12.34") or exponential form, at that the mantissa could be decimal or hexadecimal (see MPFR library description).
+</p>
+
+<p>
+Example:
+</p>
+
+<pre>
+<code>
+    <b>int</b> i = 3;
+    <b>double</b> d = 2.5;
+    amp::ampf&lt;128&gt; a(i), b(d), c("2.33");
+    a = "1.56E-3";
+    b = a;
+</code>
+</pre>
+
+<h2>Text Conversions</h2>
+
+<p>
+To convert a number into a text form, you can use member functions <code>toDec()</code> and <code>toHex()</code>. They return decimal and hexadecimal exponential representation of a number (at that, the hexadecimal conversion is performed faster than the decimal one, therefore if performance is critical it is better to use the hexadecimal conversion). You can't set the format of the result: all significant digits of the number are output.
+</p>
+
+<p>
+Example:
+</p>
+
+<pre>
+<code>
+    amp::ampf&lt;128&gt; a;
+    a = "11";
+    printf("%s\n", amp::sqrt(a).toDec().c_str());
+</code>
+</pre>
+
+<h2>Properties Checking</h2>
+
+<p>
+In order to check whether a real number is finite (as opposed to one of the special values), positive, zero or negative, use member function <code>isFiniteNumber()</code>, <code>isPositiveNumber()</code>, <code>isZero()</code>, <code>isNegativeNumber()</code>.
+</p>
+
+<h2>Information Functions</h2>
+
+<p>
+A number of functions were designed to get information about data type properties:
+</p>
+
+<ul>
+<li>member function <code>getUlpOf()</code> returns a value of the ULP, Unit-in-Last-Place, of the given <code>x</code>. This value is similar to machine precision. Static function <code>getUlpOf()</code> has the same functionality.</li>
+<li>static function <code>getUlp()</code> is equivalent to <code>amp::ampf&lt;Precision&gt;::getUlpOf(1)</code></li>
+<li>static function <code>getMaxNumber()</code> returns the biggest representable (using this data type) positive number</li>
+<li>static function <code>getMinNumber()</code> returns the smallest representable (using this data type) positive number</li>
+<li>functions <code>getAlgoPascalEpsilon()</code>, <code>getAlgoPascalMaxNumber()</code>, <code>getAlgoPascalMinNumber()</code> are similar to the above-mentioned ones, but they return values with safety margin. These functions are used by the ALGLIB project programs.</li>
+</ul>
+
+<h2>Access to the <code>mpfr_t</code> Pointer</h2>
+
+<p>
+The <code>getReadPtr()</code> and <code>getWritePtr()</code> functions provide access to mpfr_t pointer. The <code>getReadPtr()</code> function allows to get a read-only pointer, which can be passed into an MPFR library function as an argument. The <code>getWritePtr()</code> function allows to get a writable pointer, which can be passed into an MPFR library function as a place to store the result in.
+</p>
+
+<p>
+It should be noted that the AMP library uses copy-on-write technique, i.e. pointer which has been received by <code>getReadPtr()</code> could be common to several objects. Thus, such a pointer must not be used in operations which can change its contents.
+</p>
+
+<p>
+A pointer which has been received by <code>getWritePtr()</code> can be used in operations which can change its contents, but these operations should not change the precision of a pointer contents. You should take into account that due to its using copy-on-write technique, the pointer which has been received by <code>getWritePtr()</code> could differ from the pointer which had previously been received by <code>getReadPtr()</code>.
+</p>
+
+<h2>Random Numbers Generation</h2>
+
+<p>
+In order to generate random numbers from [0, 1), use the static function <code>getRandom()</code>. At first, the call function initializes a random number generator using system time.
+</p>
+
+<h2>Arithmetic Operations</h2>
+
+<p>
+<code>amp::ampf</code> class overloads comparison, addition, subtraction, multiplication and division operations. The result is rounded by using exact rounding. Two objects of <code>amp::ampf</code> class with the same precision could be the operands. It is acceptable to use objects of <code>amp::ampf</code> class and variables of standard data types. You can also use two objects of <code>amp::ampf</code> class with different precision as operands, but one of them should be casted to precision of another one.
+</p>
+
+<p>
+Example:
+</p>
+
+<pre>
+<code>
+    amp::ampf&lt;128&gt; a(3), b(4), c(99);
+    amp::ampf&lt;256&gt; d(1);
+
+    a = b+c;          <i>//</i>
+    b = c+2.3;        <i>// acceptable  expressions</i>
+    c = (2*a-5)/b;    <i>//</i>
+
+    a = b+d;          <i>// compile time error -</i>
+                      <i>// arguments of a different type</i>
+
+    a = b + amp::ampf&lt;128&gt;(d); <i>// this is the right way</i>
+
+    a = d;            <i>// this is also acceptable</i>
+</code>
+</pre>
+
+<h2>Mathematical functions</h2>
+
+<p>
+All functions described here are members of the <code>amp</code> namespace. Thus, when you call, for example, the <code>sqr</code> function, you should write <code>amp::sqr</code>. Unless otherwise specified, the result is rounded up by using exact rounding.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; sqr(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Returns the square of <code>x</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> <b>int</b> sign(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Returns:<br>
++1, if X&gt;0<br>
+-1, if X&lt;0<br>
+0, if X=0
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; abs(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Returns the absolute value of <code>x</code>.
+</p>
+
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; maximum(<b>const</b> ampf&lt;Precision&gt; &amp;x, <b>const</b> ampf&lt;Precision&gt; &amp;y)<br>
+</span>
+Returns the maximum of two integers.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; minimum(<b>const</b> ampf&lt;Precision&gt; &amp;x, <b>const</b> ampf&lt;Precision&gt; &amp;y)<br>
+</span>
+Returns the minimum of two real numbers.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; sqrt(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Returns the square root of <code>x</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> <b>signed</b> <b>long</b> trunc(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Rounds towards zero. Throws <code>amp::invalidConversion</code> if result doesn't fit in the in the <code>signed long</code> type.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; frac(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Returns  <code>x-trunc(x)</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> <b>signed</b> <b>long</b> floor(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Rounds towards minus infinity. Throws <code>amp::invalidConversion</code> if result doesn't fit in the in the <code>signed long</code> type.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> <b>signed</b> <b>long</b> ceil(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Rounds towards plus infinity. Throws <code>amp::invalidConversion</code> if result doesn't fit in the in the <code>signed long</code> type.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> <b>signed</b> <b>long</b> round(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Rounds towards nearest integer, rounding halfway cases away from zero. Throws <code>amp::invalidConversion</code> if result doesn't fit in the in the <code>signed long</code> type.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; frexp2(<b>const</b> ampf&lt;Precision&gt; &amp;x, mp_exp_t *exponent)<br>
+</span>
+Splits a number into mantissa and exponent.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; ldexp2(<b>const</b> ampf&lt;Precision&gt; &amp;x, mp_exp_t exponent)<br>
+</span>
+Calculates x*2<sup>exponent</sup>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; pi()<br>
+</span>
+Returns <code>Pi</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; halfpi()<br>
+</span>
+Returns <code>0.5*Pi</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; twopi()<br>
+</span>
+Returns <code>2*Pi</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; sin(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Calculates the sine of a value.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; cos(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Calculates the cosine of a value.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; tan(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Calculates the tangent of a value.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; asin(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Calculates the arcsine of a value.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; acos(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Calculates the arccosine of a value.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; atan(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Calculates the arctangent of a value.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; atan2(<b>const</b> ampf&lt;Precision&gt; &amp;y, <b>con</b>st ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Calculates the arc tangent of y/x. It produces correct results even when the resulting angle is near pi/2 or -pi/2 (x near 0).
+</p>
+    
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; log(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Calculates the natural logarithm of x.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; log2(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Calculates the binary logarithm of x.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; log10(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Calculates the base 10 logarithm of x.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; exp(<b>const</b> ampf&lt;Precision&gt; &amp;_x)<br>
+</span>
+Calculates the exponential e to the x.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; sinh(<b>const</b> ampf&lt;Precision&gt; &amp;x)<br>
+</span>
+Calculates the hyperbolic sine of a value.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; cosh(<b>const</b> ampf&lt;Precision&gt; &amp;_x)<br>
+</span>
+Calculates the hyperbolic cosine of a value.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; tanh(<b>const</b> ampf&lt;Precision&gt; &amp;_x)<br>
+</span>
+Calculates the hyperbolic tangent of a value.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; pow(<b>const</b> ampf&lt;Precision&gt; &amp;x, <b>const</b> ampf&lt;Precision&gt; &amp;y)<br>
+</span>
+Calculates x to the power of y.
+</p>
+
+<h1>Vectors, Matrices and Basic Linear Algebra Operations</h1>
+
+<h2>Introduction</h2>
+
+<p>
+The AP library, part of the ALGLIB project, includes vector and matrix template classes as well as subroutines performing basic linear algebra operations (Level 1 BLAS). Since the AP library implements matrix classes using templates, you can use these classes when working with matrices of multiple precision numbers. Therefore, the AMP library doesn't include vector and matrix classes.
+Basic linear algebra operations are also implemented by using templates in the AP library, but AMP includes its own classes specially designed to work with multiple precision numbers. The AMP library subroutines are optimized to reduce memory manager loading, thus it is better to use these subroutines when performing vector operations over multiple precision numbers.
+</p>
+
+<h2>Description</h2>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+ampf&lt;Precision&gt; vDotProduct(ap::const_raw_vector&lt; ampf&lt;Precision&gt; &gt; v1, ap::const_raw_vector&lt; ampf&lt;Precision&gt; &gt; v2)<br>
+</span>
+The subroutine calculates the scalar product of two vectors. For more information about <code>ap::const_raw_vector</code> see <a href="ap.english.html#blas">description of AP library</a>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>void</b> vMove(ap::raw_vector&lt; ampf&lt;Precision&gt; &gt; vDst, ap::const_raw_vector&lt; ampf&lt;Precision&gt; &gt; vSrc)<br>
+</span>
+This function copies <code>vSrc</code> vector to <code>vDst</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>void</b> vMoveNeg(ap::raw_vector&lt; ampf&lt;Precision&gt; &gt; vDst, ap::const_raw_vector&lt; ampf&lt;Precision&gt; &gt; vSrc)<br>
+</span>
+This function copies <code>-vSrc</code> vector to <code>vDst</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision, <b>class</b> T2&gt;<br>
+<b>void</b> vMove(ap::raw_vector&lt; ampf&lt;Precision&gt; &gt; vDst, ap::const_raw_vector&lt; ampf&lt;Precision&gt; &gt; vSrc, T2 alpha)<br>
+</span>
+This function copies <code>alpha*vSrc</code> vector to <code>vDst</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>void</b> vAdd(ap::raw_vector&lt; ampf&lt;Precision&gt; &gt; vDst, ap::const_raw_vector&lt; ampf&lt;Precision&gt; &gt; vSrc)<br>
+</span>
+This function adds <code>vSrc</code> vector to <code>vDst</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision, <b>class</b> T2&gt;<br>
+<b>void</b> vAdd(ap::raw_vector&lt; ampf&lt;Precision&gt; &gt; vDst, ap::const_raw_vector&lt; ampf&lt;Precision&gt; &gt; vSrc, T2 alpha)<br>
+</span>
+This function adds <code>alpha*vSrc</code> vector to <code>vDst</code>.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>void</b> vSub(ap::raw_vector&lt; ampf&lt;Precision&gt; &gt; vDst, ap::const_raw_vector&lt; ampf&lt;Precision&gt; &gt; vSrc)<br>
+</span>
+This function subtracts <code>vSrc</code> vector from <code>vDst</code> vector.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision, <b>class</b> T2&gt;<br>
+<b>void</b> vSub(ap::raw_vector&lt; ampf&lt;Precision&gt; &gt; vDst, ap::const_raw_vector&lt; ampf&lt;Precision&gt; &gt; vSrc, T2 alpha)<br>
+</span>
+This function subtracts <code>alpha*vSrc</code> from <code>vDst</code> vector.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision, <b>class</b> T2&gt;<br>
+<b>void</b> vMul(ap::raw_vector&lt; ampf&lt;Precision&gt; &gt; vDst, T2 alpha)<br>
+</span>
+This function multiplies vector by a number and stores the result in the same place
+</p>
+
+<h1>amp::campf class</h1>
+
+<h2>Key concepts</h2>
+
+<p>
+<code>amp::campf</code> class implements multiple precision complex number operations. Real and imaginary parts are stored in <code>x</code> and <code>y</code> fields of type <code>amp::ampf</code>. You can perform arithmetic and comparison operations over the objects of this class. Moreover, a number of standard mathematical functions are defined for this data type.
+</p>
+
+<h2>Members of amp::ampf</h2>
+
+<pre>
+<code>
+    <b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;
+    class campf
+    {
+    public:
+        campf():x(0),y(0);
+        campf(<b>long</b> <b>double</b> v);
+        campf(<b>double</b> v);
+        campf(<b>float</b> v);
+        campf(<b>signed</b> <b>long</b> v);
+        campf(<b>unsigned</b> <b>long</b> v);
+        campf(<b>signed</b> <b>int</b> v);
+        campf(<b>unsigned</b> <b>int</b> v);
+        campf(<b>signed</b> <b>short</b> v);
+        campf(<b>unsigned</b> <b>short</b> v);
+        campf(<b>signed</b> <b>char</b> v);
+        campf(<b>unsigned</b> <b>char</b> v);
+        campf(<b>const</b> ampf&lt;Precision&gt; &amp;_x);
+        campf(<b>const</b> ampf&lt;Precision&gt; &amp;_x, <b>const</b> ampf&lt;Precision&gt; &amp;_y);
+        campf(<b>const</b> campf &amp;z):x(z.x),y(z.y);
+        <b>template</b>&lt;<b>unsigned</b> <b>int</b> Prec2&gt;
+        campf(<b>const</b> campf&lt;Prec2&gt; &amp;z);
+
+        campf&amp; <b>operator</b>= (<b>long double</b> v);
+        campf&amp; <b>operator</b>= (<b>double</b> v);
+        campf&amp; <b>operator</b>= (<b>float</b> v);
+        campf&amp; <b>operator</b>= (<b>signed long</b> v);
+        campf&amp; <b>operator</b>= (<b>unsigned long</b> v);
+        campf&amp; <b>operator</b>= (<b>signed int</b> v);
+        campf&amp; <b>operator</b>= (<b>unsigned int</b> v);
+        campf&amp; <b>operator</b>= (<b>signed short</b> v);
+        campf&amp; <b>operator</b>= (<b>unsigned short</b> v);
+        campf&amp; <b>operator</b>= (<b>signed char</b> v);
+        campf&amp; <b>operator</b>= (<b>unsigned char</b> v);
+        campf&amp; <b>operator</b>= (<b>const char</b> *s);
+        campf&amp; <b>operator</b>= (<b>const</b> std::string &amp;s);
+        campf&amp; <b>operator</b>= (<b>const</b> campf&amp; r);
+        <b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision2&gt;
+        campf&amp; <b>operator</b>= (<b>const</b> campf&lt;Precision2&gt;&amp; r);
+
+        ampf&lt;Precision&gt; x, y;
+    };
+</code>
+</pre>
+
+<h2>Arithmetic Operations</h2>
+
+<p>
+<code>amp::campf</code> class overrides comparison, addition, subtraction, multiplication and division operations. Two objects of <code>amp::campf</code> class of the same precision could be the operands. It is acceptable to use objects of <code>amp::campf</code> and <code>amp::ampf</code> types and variables of standard data types as operands. You can also use <code>amp::campf</code> instances with different precision, but they should be casted.
+</p>
+
+<h2>Standard Functions</h2>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> ampf&lt;Precision&gt; abscomplex(<b>const</b> campf&lt;Precision&gt; &amp;z)<br>
+</span>
+Returns the modulus of complex number z. It should be noted that the modulus calculation is performed using so called "safe" algorithm, that could never cause overflow when calculating intermediate results.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> campf&lt;Precision&gt; conj(<b>const</b> campf&lt;Precision&gt; &amp;z)<br>
+</span>
+Returns complex conjugate of z.
+</p>
+
+<p>
+<span class=func>
+<b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>
+<b>const</b> campf&lt;Precision&gt; csqr(<b>const</b> campf&lt;Precision&gt; &amp;z)<br>
+</span>
+Returns the square of z.
+</p>
+
+</body>
+</html>

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version classify_aeq.lib 4.0.3.5 Nov_2016 "; // $Id$
+version="version classify_aeq.lib 4.1.0.3 Aug_2017 "; // $Id$
 category="Singularities";
 info="
 LIBRARY: classifyAeq.lib         Simple Space Curve singularities in characteristic 0
@@ -33,10 +33,11 @@ PROCEDURES:
   HHnormalForm(I);  computes for the parametrization defined by I
                   normal form, semi group, semi module of differentials,
                   Zariski number and moduli
-
+  modSagbiAlg(G); modular variant of sagbiAlg
 ";
 LIB "algebra.lib";
 LIB "curvepar.lib";
+LIB "modstd.lib";
 ///////////////////////////////////////////////////////////////////////////////
 proc planeCur(ideal I)
 "USAGE":  planeCur(I);  I ideal
@@ -2348,6 +2349,90 @@ static proc specialReduce(poly f, ideal K)
       }
    }
    return(f);
+}
+////////////////////////////////////////////////////////////////////////////////
+proc modSagbiAlg(ideal I, list #)
+"USAGE:   modSagbiAlg(I,i); I is an ideal, i an integer (optional).
+RETURN:   ideal, a sagbi basis for I using modular methods.
+PURPOSE:  Computes a sagbi basis for the ideal given by the generators in I using modular techniques.
+@*
+If second argument is 0 then the result is not verified.
+KEYWORDS: sagbi basis
+EXAMPLE:  example modSagbiAlg; shows an example"
+
+{
+    int exactness = 1;
+    if (size(#) > 0) {
+        exactness = #[1];
+    }
+    /* save options */
+    intvec opt = option(get);
+    option(redSB);
+    /* choose the right command */
+    string command = "sagbiAlg";
+    /* call modular() */
+    if (exactness) {
+        I = modular(command, list(I), Modstd::primeTest_std,
+            Modstd::deleteUnluckyPrimes_std, pTest_sagbi,finalTest_sagbi);
+    }
+    else {
+        I = modular(command, list(I), Modstd::primeTest_std,
+            Modstd::deleteUnluckyPrimes_std,pTest_sagbi);
+            //Modstd::deleteUnluckyPrimes_std,pTest_sagbi,536870909);
+            //only primes <=536870909 are used
+    }
+    /* return the result */
+    option(set, opt);
+    return(I);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,t,ds;
+  ideal I=t8,t10+t13,t12+t15;
+  modSagbiAlg(I,0);
+  modSagbiAlg(I);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc pTest_sagbi(string command, alias list args, def result, int p)
+{
+    def R0 = basering;
+    list r = ringlist(R0);
+    r[1] = p;
+    def @R = ring(r);
+    setring @R;
+    list args = fetch(R0, args);
+    ideal W = sagbiAlg(args[1]);
+    def result = fetch(R0, result);
+    int j;
+    if(size(result)==size(W))
+    {
+       j=1;
+       for(int i=1;i<=size(result);i++)
+       {
+          if(result[i]!=W[i])
+          {
+             j=0;break;
+          }
+       }
+    }
+    setring R0;
+    return(j);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc finalTest_sagbi(string command, alias list args, def result)
+{
+    int b=semiGroup(result)[2]+1;
+    int i,j;
+    for(i=1;i<=size(args[1]);i++)
+    {
+       if(sagbiNF(args[1][i],result,b)!=0){return(0);}
+    }
+    ideal W=sagbiSP(result);
+    for(i=1;i<=ncols(W);i++)
+    {
+       if(sagbiNF(W[i],result,b)!=0){return(0);}
+    }
+    return(1);
 }
 ////////////////////////////////////////////////////////////////////////////////
 //============================ Examples========================

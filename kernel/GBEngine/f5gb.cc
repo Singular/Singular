@@ -331,9 +331,9 @@ bool checkDGB(LList* gPrev) {
       if(pDeg(lcm) <= pDeg(gPrev->getLast()->getPoly())) {
         poly u1 = pOne();
         poly u2 = pOne();
-        u1  = pDivide(lcm,pHead(temp->getPoly()));
+        u1  = pMDivide(lcm,temp->getPoly());
         pSetCoeff(u1,nOne);
-        u2  = pDivide(lcm,pHead(temp2->getPoly()));
+        u2  = pMDivide(lcm,temp2->getPoly());
         pSetCoeff(u2,nOne);
         sp      =   ksOldSpolyRedNew(ppMult_qq(u1,temp->getPoly()),
             ppMult_qq(u2,temp2->getPoly()));
@@ -348,7 +348,7 @@ bool checkDGB(LList* gPrev) {
           reducer = gb->m[i];
           if(pDivisibleBy(reducer,pHead(sp))) {
             poly uReducer = pOne();
-            uReducer = pDivide(lcm,pHead(reducer));
+            uReducer = pMDivide(lcm,reducer);
             pSetCoeff(uReducer,nOne);
             sp = ksOldSpolyRedNew(sp,ppMult_qq(uReducer,reducer));
             //pNorm(tempSP);
@@ -464,12 +464,12 @@ inline void criticalPair(LList* gPrev, CListOld* critPairs, LTagList* lTag, RTag
         pLcm(newElement->getPoly(), temp->getPoly(), lcm);
         pSetCoeff(lcm,nOne);
         // computing factors u2 for new labels
-        u1 = pDivide(lcm,t);
+        u1 = pMDivide(lcm,t);
         if(NULL == u1) {
             break;
         }
         pSetCoeff(u1,nOne);
-        u2 = pDivide(lcm,pHead(temp->getPoly()));
+        u2 = pMDivide(lcm,temp->getPoly());
         pSetCoeff(u2,nOne);
         int degree = pDeg(ppMult_qq(u2,pHead(temp->getPoly())));
         // testing both new labels by the F5 Criterion
@@ -570,12 +570,12 @@ inline void criticalPair2(LList* gPrev, CListOld* critPairs, LTagList* lTag, RTa
         pLcm(newElement->getPoly(), temp->getPoly(), lcm);
         pSetCoeff(lcm,nOne);
         // computing factors u2 for new labels
-        u1 = pDivide(lcm,t);
+        u1 = pMDivide(lcm,t);
         if(NULL == u1) {
             break;
         }
         pSetCoeff(u1,nOne);
-        u2 = pDivide(lcm,pHead(temp->getPoly()));
+        u2 = pMDivide(lcm,temp->getPoly());
         pSetCoeff(u2,nOne);
        // testing both new labels by the F5 Criterion
         //Print("LABEL:  ");
@@ -1235,7 +1235,7 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, LList*
                 //Print("TEMPREDPOLY:  ");
                 //pWrite(tempRed->getPoly());
                 if(pLmDivisibleByNoComp(tempRed->getPoly(),tempPoly)) {
-                    u   =   pDivideM(pHead(tempPoly),pHead(tempRed->getPoly()));
+                    u   =   pMDivideM(tempPoly,tempRed->getPoly());
                     //Print("U:  ");
                     //pWrite(u);
                     if(pLmCmp(u,pOne()) != 0) { // else u = 1 and no test need to be done!
@@ -1389,7 +1389,7 @@ addToG  = 0;
               //pWrite(tempPoly);
               if(pLmDivisibleByNoComp(tempRed->getPoly(),tempPoly)) {
                     //Print("A\n");
-                    u   =   pDivideM(pHead(tempPoly),pHead(tempRed->getPoly()));
+                    u   =   pMDivideM(tempPoly,tempRed->getPoly());
                     //Print("U:  ");
                     //pWrite(u);
                     if(tempRed->getIndex() != idx) {
@@ -1587,7 +1587,7 @@ addToG  = 0;
                 //Print("BAD STUFF\n");
                 //pWrite(l->getPoly());
                 //pWrite(tempBad->getPoly());
-                u   =   pDivide(pHead(l->getPoly()),pHead(tempBad->getPoly()));
+                u   =   pMDivide(l->getPoly(),tempBad->getPoly());
                 //Print("MULTIPLIER:  ");
                 //pWrite(u);
                 pSetCoeff(u,nOne);
@@ -1834,7 +1834,7 @@ LNode* findReductor(LNode* l, LList* sPolyList, LNode* gPrevRedCheck, LList* gPr
         if(pLmDivisibleByNoComp(pHead(temp->getPoly()),t)) {
             // get all the information needed for the following tests
             // of the criteria
-            u   =   pDivide(t,pHead(temp->getPoly()));
+            u   =   pMDivide(t,temp->getPoly());
             pSetCoeff(u,nOne);
             red =   ppMult_qq(u,temp->getPoly());
             pNorm(red);
@@ -1921,7 +1921,7 @@ ideal F5main(ideal id, ring r, int opt, int plus, int termination)
     /*
     int* ev = new int[r->N +1];
     for(i=0;i<IDELEMS(id);i++) {
-        pGetExpV(id->m[i],ev);
+        p_GetExpV(id->m[i],ev,currRing);
         //ev2  =   pGetExp(id->m[i],1);
         pWrite(id->m[i]);
         Print("EXP1: %d\n",ev[1]);

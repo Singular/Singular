@@ -15,7 +15,6 @@
 
 /*BEGINPUBLIC*/
 
-extern const char factoryVersion[];
 extern const char factoryConfiguration[];
 
 /*ENDPUBLIC*/

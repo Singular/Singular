@@ -300,6 +300,62 @@ ideal idSect (ideal h1,ideal h2, GbVariant alg)
       temp1=idInit(1,1);
     }
   }
+  else if (alg==GbModstd)
+  {
+    if (TEST_OPT_PROT) { PrintS("modStd:"); mflush(); }
+    BOOLEAN err;
+    void *args[]={temp,(void*)1,NULL};
+    int arg_t[]={MODUL_CMD,INT_CMD,0};
+    temp1=(ideal)iiCallLibProcM("modStd",args,arg_t,err);
+    if (err)
+    {
+      Werror("error %d in >>modStd<<",err);
+      temp1=idInit(1,1);
+    }
+  }
+  else if (alg==GbStdSat)
+  {
+    if (TEST_OPT_PROT) { PrintS("std:sat:"); mflush(); }
+    BOOLEAN err;
+    // search for 2nd block of vars
+    int i=0;
+    int block=-1;
+    loop
+    {
+      if ((currRing->order[i]!=ringorder_c)
+      && (currRing->order[i]!=ringorder_C)
+      && (currRing->order[i]!=ringorder_s))
+      {
+        if (currRing->order[i]==0) { err=TRUE;break;}
+        block++;
+        if (block==1) { block=i; break;}
+      }
+      i++;
+    }
+    if (block>0)
+    {
+      if (TEST_OPT_PROT)
+      {
+        Print("sat(%d..%d)\n",currRing->block0[block],currRing->block1[block]);
+        mflush();
+      }
+      ideal v=idInit(currRing->block1[block]-currRing->block0[block]+1,1);
+      for(i=currRing->block0[block];i<=currRing->block1[block];i++)
+      {
+        v->m[i-currRing->block0[block]]=pOne();
+        pSetExp(v->m[i-currRing->block0[block]],i,1);
+        pSetm(v->m[i-currRing->block0[block]]);
+      }
+      void *args[]={temp,v,NULL};
+      int arg_t[]={MODUL_CMD,IDEAL_CMD,0};
+      temp1=(ideal)iiCallLibProcM("satstd",args,arg_t,err);
+    }
+    if (err)
+    {
+      Werror("error %d in >>satstd<<",err);
+      temp1=idInit(1,1);
+    }
+  }
 
   if(syz_ring!=orig_ring)
     rChangeCurrRing(orig_ring);
@@ -594,17 +650,62 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w, GbVarian
       h3=idInit(1,1);
     }
   }
-//  else if (alg==GbModstd): requires ideal, not module
-//  {
-//    if (TEST_OPT_PROT) { PrintS("modstd:"); mflush(); }
-//    BOOLEAN err;
-//    h3=(ideal)iiCallLibProc1("modStd",idCopy(h2),MODUL_CMD,err);
-//    if (err)
-//    {
-//      Werror("error %d in >>modStd<<",err);
-//      h3=idInit(1,1);
-//    }
-//  }
+  else if (alg==GbModstd)
+  {
+    if (TEST_OPT_PROT) { PrintS("modstd:"); mflush(); }
+    BOOLEAN err;
+    void *args[]={idCopy(h2),(void*)1,NULL};
+    int arg_t[]={MODUL_CMD,INT_CMD,0};
+    h3=(ideal)iiCallLibProcM("modStd",args,arg_t,err);
+    if (err)
+    {
+      Werror("error %d in >>modStd<<",err);
+      h3=idInit(1,1);
+    }
+  }
+  else if (alg==GbStdSat)
+  {
+    if (TEST_OPT_PROT) { PrintS("std:sat:"); mflush(); }
+    BOOLEAN err;
+    // search for 2nd block of vars
+    int i=0;
+    int block=-1;
+    loop
+    {
+      if ((currRing->order[i]!=ringorder_c)
+      && (currRing->order[i]!=ringorder_C)
+      && (currRing->order[i]!=ringorder_s))
+      {
+        if (currRing->order[i]==0) { err=TRUE;break;}
+        block++;
+        if (block==1) { block=i; break;}
+      }
+      i++;
+    }
+    if (block>0)
+    {
+      if (TEST_OPT_PROT)
+      {
+        Print("sat(%d..%d)\n",currRing->block0[block],currRing->block1[block]);
+        mflush();
+      }
+      ideal v=idInit(currRing->block1[block]-currRing->block0[block]+1,1);
+      for(i=currRing->block0[block];i<=currRing->block1[block];i++)
+      {
+        v->m[i-currRing->block0[block]]=pOne();
+        pSetExp(v->m[i-currRing->block0[block]],i,1);
+        pSetm(v->m[i-currRing->block0[block]]);
+      }
+      void *args[]={idCopy(h2),v,NULL};
+      int arg_t[]={MODUL_CMD,IDEAL_CMD,0};
+      h3=(ideal)iiCallLibProcM("satstd",args,arg_t,err);
+    }
+    if (err)
+    {
+      Werror("error %d in >>satstd<<",err);
+      h3=idInit(1,1);
+    }
+  }
   //else if (alg==GbSba): requires order C,...
   //{
   //  if (TEST_OPT_PROT) { PrintS("sba:"); mflush(); }
@@ -2737,6 +2838,7 @@ GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)
   else if (strcmp(n,"modstd")==0) alg=GbModstd;
   else if (strcmp(n,"ffmod")==0) alg=GbFfmod;
   else if (strcmp(n,"nfmod")==0) alg=GbNfmod;
+  else if (strcmp(n,"std:sat")==0) alg=GbStdSat;
   else Warn(">>%s<< is an unknown algorithm",n);
 
   if (alg==GbSlimgb) // test conditions for slimgb
@@ -2744,12 +2846,12 @@ GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)
     if(rHasGlobalOrdering(r)
     &&(!rIsPluralRing(r))
     &&(r->qideal==NULL)
-    &&(!rField_is_Ring(r))
-    && rHasTDeg(r))
+    &&(!rField_is_Ring(r)))
     {
        return GbSlimgb;
     }
-    if (TEST_OPT_PROT) PrintS("slimgb not possible here\n");
+    if (TEST_OPT_PROT)
+      WarnS("requires: coef:field, commutative, global ordering, not qring");
   }
   else if (alg==GbSba) // cond. for sba
   {
@@ -2759,25 +2861,39 @@ GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)
     {
       return GbSba;
     }
-    if (TEST_OPT_PROT) PrintS("sba not possible here\n");
+    if (TEST_OPT_PROT)
+      WarnS("requires: coef:domain, commutative, global ordering");
   }
   else if (alg==GbGroebner) // cond. for groebner
   {
     return GbGroebner;
   }
-//  else if(alg==GbModstd)  // cond for modstd: requires ideal, not module
-//  {
-//    if(ggetid("modStd")==NULL)
-//    {
-//      WarnS(">>modStd<< not found");
-//    }
-//    else if(rField_is_Q(r)
-//    &&(!rIsPluralRing(r))
-//    &&(rHasGlobalOrdering(r)))
-//    {
-//      return GbModstd;
-//    }
-//  }
+  else if(alg==GbModstd)  // cond for modstd: Q or Q(a)
+  {
+    if(ggetid("modStd")==NULL)
+    {
+      WarnS(">>modStd<< not found");
+    }
+    else if(rField_is_Q(r)
+    &&(!rIsPluralRing(r))
+    &&(rHasGlobalOrdering(r)))
+    {
+      return GbModstd;
+    }
+    if (TEST_OPT_PROT)
+      WarnS("requires: coef:QQ, commutative, global ordering");
+  }
+  else if(alg==GbStdSat)  // cond for std:sat: 2 blocks of variables
+  {
+    if(ggetid("satstd")==NULL)
+    {
+      WarnS(">>satstd<< not found");
+    }
+    else
+    {
+      return GbStdSat;
+    }
+  }
 
   return GbStd; // no conditions for std
 }

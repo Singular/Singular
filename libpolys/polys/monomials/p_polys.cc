@@ -1453,7 +1453,7 @@ poly p_NSet(number n, const ring r)
 * returns the multiplicant m,
 * leaves a and b unmodified
 */
-poly p_Divide(poly a, poly b, const ring r)
+poly p_MDivide(poly a, poly b, const ring r)
 {
   assume((p_GetComp(a,r)==p_GetComp(b,r)) || (p_GetComp(b,r)==0));
   int i;
@@ -1544,11 +1544,7 @@ poly p_DivideM(poly a, poly b, const ring r)
   if (a==NULL) { p_Delete(&b,r); return NULL; }
   poly result=a;
   poly prev=NULL;
-#ifdef HAVE_RINGS
   number inv=pGetCoeff(b);
-#else
-  number inv=n_Invers(pGetCoeff(b),r->cf);
-#endif
 
   while (a!=NULL)
   {
@@ -1572,21 +1568,16 @@ poly p_DivideM(poly a, poly b, const ring r)
       }
     }
   }
-#ifdef HAVE_RINGS
-  if (n_IsUnit(inv,r->cf))
+  if ((!rField_is_Ring(r)) || n_IsUnit(inv,r->cf))
   {
     inv = n_Invers(inv,r->cf);
-    p_Mult_nn(result,inv,r);
+    __p_Mult_nn(result,inv,r);
     n_Delete(&inv, r->cf);
   }
   else
   {
     result = p_Div_nn(result,inv,r);
   }
-#else
-  result = p_Mult_nn(result,inv,r);
-  n_Delete(&inv, r->cf);
-#endif
   p_Delete(&b, r);
   return result;
 }
@@ -2440,7 +2431,7 @@ void p_Content(poly ph, const ring r)
           while (p!=NULL)
           { // each monom: coeff in Q_a (Z_a)
             fraction f=(fraction)pGetCoeff(p);
-            NUM(f)=p_Mult_nn(NUM(f),h,r->cf->extRing);
+            NUM(f)=__p_Mult_nn(NUM(f),h,r->cf->extRing);
             p_Normalize(NUM(f),r->cf->extRing);
             pIter(p);
           }
@@ -2852,7 +2843,6 @@ poly p_Cleardenom(poly p, const ring r)
         p_SetCoeff(p,d,r);
         pIter(p);
       }
-      n_Delete(&h,r->cf);
     }
     n_Delete(&h,r->cf);
     p=start;
@@ -3140,7 +3130,7 @@ void p_ProjectiveUnique(poly ph, const ring r)
         nMapFunc nMap;
         nMap= n_SetMap (C->extRing->cf, C);
         number ninv= nMap (n,C->extRing->cf, C);
-        p=p_Mult_nn (p, ninv, r);
+        p=__p_Mult_nn (p, ninv, r);
         n_Delete (&ninv, C);
         n_Delete (&n, C->extRing->cf);
       }
@@ -3228,7 +3218,7 @@ poly p_Homogen (poly p, int varnum, const ring r)
       }
       qn = pNext(q);
       pNext(q) = NULL;
-      sBucket_Add_p(bp, q, 1);
+      sBucket_Add_m(bp, q);
       q = qn;
     }
     sBucketDestroyAdd(bp, &q, &ii);
@@ -4321,13 +4311,13 @@ static poly p_Invers(int n,poly u,intvec *w, const ring R)
   if(n==0)
     return v;
   short *ww=iv2array(w,R);
-  poly u1=p_JetW(p_Sub(p_One(R),p_Mult_nn(u,u0,R),R),n,ww,R);
+  poly u1=p_JetW(p_Sub(p_One(R),__p_Mult_nn(u,u0,R),R),n,ww,R);
   if(u1==NULL)
   {
     omFreeSize((ADDRESS)ww,(rVar(R)+1)*sizeof(short));
     return v;
   }
-  poly v1=p_Mult_nn(p_Copy(u1,R),u0,R);
+  poly v1=__p_Mult_nn(p_Copy(u1,R),u0,R);
   v=p_Add_q(v,p_Copy(v1,R),R);
   for(int i=n/p_MinDeg(u1,w,R);i>1;i--)
   {

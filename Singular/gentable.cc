@@ -20,6 +20,14 @@
 #include "grammar.h"
 #include "tok.h"
 
+#ifdef HAVE_RINGS
+  #define RING_MASK        4
+  #define ZERODIVISOR_MASK 8
+#else
+  #define RING_MASK        0
+  #define ZERODIVISOR_MASK 0
+#endif
+
 inline int RingDependend(int t) { return (BEGIN_RING<t)&&(t<END_RING); }
 
 // to produce convert_table.texi for doc:
@@ -349,14 +357,24 @@ void ttGen1()
     if (dArith1[i].p==jjWRONG)
       fprintf(outfile,"// DUMMY ");
     const char *s = iiTwoOps(op);
-    fprintf(outfile,"// operation: %s (%s)  ->  %s\n",
+    fprintf(outfile,"// operation: %s (%s)  ->  %s",
           s,
           Tok2Cmdname(dArith1[i].arg),
           Tok2Cmdname(dArith1[i].res));
     if (RingDependend(dArith1[i].res) && (!RingDependend(dArith1[i].arg)))
-    {
-      fprintf(outfile,"// WARNING: %s requires currRing\n",s);
-    }
+      fprintf(outfile," requires currRing");
+    if ((dArith1[i].valid_for & PLURAL_MASK)==2)
+      fprintf(outfile,", commutative subalgebra");
+    else if ((dArith1[i].valid_for & PLURAL_MASK)==0)
+      fprintf(outfile,", only commutative rings");
+    if ((dArith1[i].valid_for & RING_MASK)==0)
+      fprintf(outfile,", field coeffs");
+    else if ((dArith1[i].valid_for & ZERODIVISOR_MASK)==NO_ZERODIVISOR)
+      fprintf(outfile,", domain coeffs");
+    else if ((dArith1[i].valid_for & WARN_RING)==WARN_RING)
+      fprintf(outfile,", QQ coeffs");
+
+    fprintf(outfile,"\n");
     i++;
   }
   fprintf(outfile,"/*---------------------------------------------*/\n");
@@ -366,7 +384,7 @@ void ttGen1()
     if (dArith2[i].p==jjWRONG2)
       fprintf(outfile,"// DUMMY ");
     const char *s = iiTwoOps(op);
-    fprintf(outfile,"// operation: %s (%s, %s)  ->  %s\n",
+    fprintf(outfile,"// operation: %s (%s, %s)  ->  %s",
           s,
           Tok2Cmdname(dArith2[i].arg1),
           Tok2Cmdname(dArith2[i].arg2),
@@ -375,8 +393,20 @@ void ttGen1()
        && (!RingDependend(dArith2[i].arg1))
        && (!RingDependend(dArith2[i].arg2)))
     {
-      fprintf(outfile,"// WARNING: %s requires currRing\n",s);
+      fprintf(outfile," requires currRing");
     }
+    if ((dArith2[i].valid_for & PLURAL_MASK)==2)
+      fprintf(outfile,", commutative subalgebra");
+    else if ((dArith2[i].valid_for & PLURAL_MASK)==0)
+      fprintf(outfile,", only commutative rings");
+    if ((dArith2[i].valid_for & RING_MASK)==0)
+      fprintf(outfile,", field coeffs");
+    else if ((dArith2[i].valid_for & ZERODIVISOR_MASK)==NO_ZERODIVISOR)
+      fprintf(outfile,", domain coeffs");
+    else if ((dArith2[i].valid_for & WARN_RING)==WARN_RING)
+      fprintf(outfile,", QQ coeffs");
+
+    fprintf(outfile,"\n");
     i++;
   }
   fprintf(outfile,"/*---------------------------------------------*/\n");
@@ -386,7 +416,7 @@ void ttGen1()
     const char *s = iiTwoOps(op);
     if (dArith3[i].p==jjWRONG3)
       fprintf(outfile,"// DUMMY ");
-    fprintf(outfile,"// operation: %s (%s, %s, %s)  ->  %s\n",
+    fprintf(outfile,"// operation: %s (%s, %s, %s)  ->  %s",
           s,
           Tok2Cmdname(dArith3[i].arg1),
           Tok2Cmdname(dArith3[i].arg2),
@@ -397,8 +427,20 @@ void ttGen1()
        && (!RingDependend(dArith3[i].arg2))
        && (!RingDependend(dArith3[i].arg3)))
     {
-      fprintf(outfile,"// WARNING: %s requires currRing\n",s);
+      fprintf(outfile," requires currRing");
     }
+    if ((dArith3[i].valid_for & PLURAL_MASK)==2)
+      fprintf(outfile,", commutative subalgebra");
+    else if ((dArith3[i].valid_for & PLURAL_MASK)==0)
+      fprintf(outfile,", only commutative rings");
+    if ((dArith3[i].valid_for & RING_MASK)==0)
+      fprintf(outfile,", field coeffs");
+    else if ((dArith3[i].valid_for & ZERODIVISOR_MASK)==NO_ZERODIVISOR)
+      fprintf(outfile,", domain coeffs");
+    else if ((dArith3[i].valid_for & WARN_RING)==WARN_RING)
+      fprintf(outfile,", QQ coeffs");
+
+    fprintf(outfile,"\n");
     i++;
   }
   fprintf(outfile,"/*---------------------------------------------*/\n");

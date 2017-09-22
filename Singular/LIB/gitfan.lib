@@ -68,6 +68,7 @@ PROCEDURES:
   applyPermutationToIntvec(intvec,permutation); Apply permutation to a set of integers represented as an intvec
   hashToCone(bigint,list); Convert a bigint hash to a GIT-cone
   hashesToFan(list hashes,list OC)
+gitCone(ideal,bigintmat,bigintmat); Returns the GIT-cone around the given weight vector w
 
 KEYWORDS: library, gitfan, GIT, geometric invariant theory, quotients
 ";
@@ -2960,3 +2961,125 @@ static proc GITfanWrapperWithSymmetry(ideal J, intmat Q, list simplexSymmetryGro
   list Sigma = GITfanParallelSymmetric(OClist, Q, mov, actionOnOrbitconeIndices);
   return(Sigma, OClist);
 }
+///////////////////////////////////////
+
+proc gitCone(ideal a, bigintmat Q, bigintmat w)
+"USAGE: gitCone(a, Q, w); a: ideal, Q:bigintmat, w:bigintmat
+PURPOSE: Returns the GIT-cone lambda(w), i.e. the intersection of all
+orbit cones containing the vector w.
+NOTE: call this only if you are interested in a single GIT-cone.
+RETURN: a cone.
+EXAMPLE: example gitCone; shows an example
+"
+{
+  list OC =  orbitConesOld(a, intmat(Q));
+  cone lambda = nrows(Q);
+
+  for(int i = 1; i <= size(OC); i++)
+  {
+    cone c = OC[i];
+
+    if(containsInSupport(c, w))
+    {
+      lambda = convexIntersectionOld(lambda, c);
+    }
+
+    kill c;
+  }
+
+  return(lambda);
+}
+example
+{
+  echo=2;
+  intmat Q[3][4] =
+    1,0,1,0,
+    0,1,0,1,
+    0,0,1,1;
+
+  ring R = 0,T(1..4),dp;
+  ideal a = 0;
+
+  bigintmat w[1][3] = 3,3,1;
+  cone lambda = gitCone(a, Q, w);
+  rays(lambda);
+
+  bigintmat w2[1][3] = 1,1,1;
+  cone lambda2 = gitCone(a, Q, w2);
+  rays(lambda2);
+}
+
+proc orbitConesOld(ideal a, bigintmat Q, list #)
+"USAGE:  orbitConesOld(a, Q, b, c); a: ideal, Q: bigintmat, b: int, c: int
+PURPOSE: Returns a list consisting of all cones Q(gam0) where gam0 is an a-face.
+         Moreover, it is possible to specify a dimensional bound b,
+         upon which only cones of that dimension and above are returned.
+         Lastly, as the computation is parallizable, one can specify c,
+         the number of cores to be used by the computation.
+RETURN:  a list of cones
+EXAMPLE: example orbitConesOld; shows an example
+"
+{
+  list AF;
+
+  if((size(#) > 1) and (typeof(#[2]) == "int"))
+  {
+    AF = afaces(a, nrows(Q), #[2]);
+  }
+  else
+  {
+    AF = afaces(a, nrows(Q));
+  }
+
+  int dimensionBound = 0;
+  if((size(#) > 0) and (typeof(#[1]) == "int"))
+  {
+    dimensionBound = #[1];
+  }
+
+  list OC;
+  intvec gam0;
+  int j;
+
+  for(int i = 1; i <= size(AF); i++)
+  {
+    gam0 = AF[i];
+
+    if(gam0 == 0)
+    {
+      bigintmat M[1][nrows(Q)];
+    }
+    else
+    {
+      bigintmat M[size(gam0)][nrows(Q)];
+      for (j = 1; j <= size(gam0); j++)
+      {
+        M[j,1..ncols(M)] = Q[1..nrows(Q),gam0[j]];
+      }
+    }
+    cone c = coneViaPoints(M);
+
+    if((dimension(c) >= dimensionBound) and (!(listContainsCone(OC, c))))
+    {
+      OC[size(OC)+1] = c;
+    }
+
+    kill M, c;
+  }
+
+  return(OC);
+}
+example
+{
+  echo=2;
+  intmat Q[3][4] =
+    1,0,1,0,
+    0,1,0,1,
+    0,0,1,1;
+
+  ring R = 0,T(1..4),dp;
+  ideal a = 0;
+
+  orbitConesOld(a, Q);
+}
+

@@ -146,10 +146,6 @@ fi
 AM_CONDITIONAL([ENABLE_RESOURCES],[test "x$with_Singular" = xyes])
 
 
-AH_TEMPLATE([FACTORY_INT64], [Defenition for FACTORY_INT64])
-# Always long long int???!
-AC_DEFINE([FACTORY_INT64], [long long int])
-
 DX_INIT_DOXYGEN($PACKAGE_NAME, doxygen.cfg, $srcdir/docu)
 
 # do not use `MKINSTALLDIRS' and `MAKEHEADER' since there may be
@@ -391,7 +387,7 @@ AC_SUBST(MAKEHEADERFLAGS)
 #AC_SUBST(installtargets)
 #AC_SUBST(uninstalltargets)
 
-factory_version="4.0.1"
+factory_version="4.1.0"
 factory_configuration="'$ac_configure_args' in `pwd`"
 AC_SUBST(factory_version)
 

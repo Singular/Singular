@@ -750,7 +750,7 @@ intvec* leadExp(poly p)
 {
   int N=rVar(currRing);
   int *e=(int*)omAlloc((N+1)*sizeof(int));
-  pGetExpV(p,e);
+  p_GetExpV(p,e,currRing);
   intvec* iv=new intvec(N);
   for(int i=N;i>0;i--) { (*iv)[i-1]=e[i];}
   omFree(e);
@@ -773,7 +773,7 @@ int64vec* leadExp64(poly p)
 {
   int N=rVar(currRing);
   int *e=(int*)omAlloc((N+1)*sizeof(int));
-  pGetExpV(p,e);
+  p_GetExpV(p,e,currRing);
   int64vec* iv64=new int64vec(N);
   for(int i=N;i>0;i--) { (*iv64)[i-1]=(int64)e[i];}
   omFree(e);

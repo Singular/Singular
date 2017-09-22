@@ -1769,7 +1769,7 @@ static void TwordMap(poly p, poly w, int lV, int d, ideal Jwi, bool &flag)
    * in a colon ideal Jwi of I
    * p and w remain unchanged
    * the new polys for Jwi are constructed by sub-routines
-   * deleteInMon, shiftInMon, p_Divide,
+   * deleteInMon, shiftInMon, p_MDivide,
    * places the result in Jwi and deletes the new polys
    * coming in dw, smon, qmon
    */
@@ -1807,12 +1807,12 @@ static void TwordMap(poly p, poly w, int lV, int d, ideal Jwi, bool &flag)
     if(pLmDivisibleBy(dw, smon))
     {
       del = FALSE;
-      qmonp = p_Divide(smon, dw, currRing);
+      qmonp = p_MDivide(smon, dw, currRing);
       idInsertMonomials(Jwi, shiftInMon(qmonp, -d, lV, currRing));
 
       //shiftInMon(qmonp, -d, lV, currRing):returns a new poly,
       //qmonp remains unchanged, delete it
-      pDelete(&qmonp);
+      pLmFree(&qmonp);
       pDelete(&dw);
       pDelete(&smon);
     }

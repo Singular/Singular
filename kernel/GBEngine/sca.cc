@@ -1197,7 +1197,7 @@ ideal k_sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const intvec
     else
       Kstd1_mu=-1;
   }
-  pDelete(&strat->kHEdge);
+  if(strat->kHEdge!=NULL) pLmFree(&strat->kHEdge);
   strat->update = TRUE; //???
   strat->lastAxis = 0; //???
   pDelete(&strat->kNoether);

@@ -558,7 +558,7 @@ void pointSet::mergeWithPoly( const poly p )
 
   while ( piter )
   {
-    pGetExpV( piter, vert );
+    p_GetExpV( piter, vert, currRing );
 
     for ( i= 1; i <= num; i++ )
     {
@@ -585,7 +585,7 @@ int pointSet::getExpPos( const poly p )
   // hier unschoen...
   vert= (int *)omAlloc( (dim+1) * sizeof(int) );
 
-  pGetExpV( p, vert );
+  p_GetExpV( p, vert, currRing );
   for ( i= 1; i <= num; i++ )
   {
     for ( j= 1; j <= dim; j++ )
@@ -798,7 +798,7 @@ pointSet ** convexHull::newtonPolytopesP( const ideal gls )
     for( j= 1; j <= m; j++) {  // für jeden Exponentvektor
       if( !inHull( (gls->m)[i], p, m, j ) )
       {
-        pGetExpV( p, vert );
+        p_GetExpV( p, vert, currRing );
         Q[i]->addPoint( vert );
         k++;
         mprSTICKYPROT(ST_SPARSE_VADD);
@@ -2560,7 +2560,9 @@ number resMatrixDense::getDetAt( const number* evpoint )
     {
       for ( i= 0; i < (currRing->N); i++ )
       {
-        pSetCoeff( MATELEM(m,numVectors-k,numVectors-(getMVector(k)->numColParNr)[i]),
+        number np=pGetCoeff(MATELEM(m,numVectors-k,numVectors-(getMVector(k)->numColParNr)[i]));
+        if (np!=NULL) nDelete(&np);
+        pSetCoeff0( MATELEM(m,numVectors-k,numVectors-(getMVector(k)->numColParNr)[i]),
                    nCopy(evpoint[i]) );
       }
     }

@@ -35,8 +35,6 @@ int *  currcomponents=NULL;
 long *  currShiftedComponents=NULL;
 
 
-/*---head-term-polynomials for the reduction------------*/
-static poly redpol=NULL;
 /*---counts number of applications of GM-criteria-------*/
 //static int crit;
 //static int euler;
@@ -2446,7 +2444,6 @@ syStrategy syLaScala3(ideal arg,int * length)
 
   //crit = 0;
   //euler = -1;
-  redpol = pInit();
   syzstr->length = *length = (currRing->N)+2;
 
   // Creare dp,S ring and change to it
@@ -2531,7 +2528,6 @@ syStrategy syLaScala3(ideal arg,int * length)
 
   if (origR != syzstr->syRing)
     rChangeCurrRing(origR);
-  pLmDelete(&redpol);
 
   if (TEST_OPT_PROT) PrintLn();
 
@@ -2580,7 +2576,6 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
 
   //crit = 0;
   //euler = -1;
-  redpol = pInit();
 
   if( maxlength > 0 )
     syzstr->length = maxlength; //  = (currRing->N)+2;
@@ -2675,7 +2670,6 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
   kBucketDestroy(&(syzstr->bucket));
   if (origR != syzstr->syRing)
     rChangeCurrRing(origR);
-  pLmDelete(&redpol);
   if (TEST_OPT_PROT) PrintLn();
   return syzstr;
 }

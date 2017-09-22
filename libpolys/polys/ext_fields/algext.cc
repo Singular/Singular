@@ -363,11 +363,11 @@ BOOLEAN naGreater(number a, number b, const coeffs cf)
   if (naIsZero(a, cf))
   {
     if (naIsZero(b, cf)) return FALSE;
-    return !n_GreaterZero(pGetCoeff((poly)b),cf);
+    return !n_GreaterZero(pGetCoeff((poly)b),naCoeffs);
   }
   if (naIsZero(b, cf))
   {
-    return n_GreaterZero(pGetCoeff((poly)a),cf);
+    return n_GreaterZero(pGetCoeff((poly)a),naCoeffs);
   }
   int aDeg = p_Totaldegree((poly)a, naRing);
   int bDeg = p_Totaldegree((poly)b, naRing);
@@ -715,11 +715,7 @@ static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
 
 int naSize(number a, const coeffs cf)
 {
-  if (a == NULL) return -1;
-  /* this has been taken from the old implementation of field extensions,
-     where we computed the sum of the degree and the number of terms in
-     (poly)a; so we leave it at that, for the time being;
-     maybe, the number of terms alone is a better measure? */
+  if (a == NULL) return 0;
   poly aAsPoly = (poly)a;
   int theDegree = 0; int noOfTerms = 0;
   while (aAsPoly != NULL)
@@ -729,7 +725,7 @@ int naSize(number a, const coeffs cf)
     if (d > theDegree) theDegree = d;
     pIter(aAsPoly);
   }
-  return theDegree + noOfTerms;
+  return (theDegree +1) * noOfTerms;
 }
 
 /* performs polynomial division and overrides p by the remainder
@@ -1251,7 +1247,7 @@ void naClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, co
   n_ClearContent(itr, cc, Q); // TODO: get rid of (-LC) normalization!?
 
   // over alg. ext. of Q // takes over the input number
-  c = (number) p_Mult_nn( (poly)c, cc, R);
+  c = (number) __p_Mult_nn( (poly)c, cc, R);
 //      p_Mult_q(p_NSet(cc, R), , R);
 
   n_Delete(&cc, Q);

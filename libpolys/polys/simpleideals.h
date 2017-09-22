@@ -167,4 +167,5 @@ intvec * id_QHomWeight(ideal id, const ring r);
 ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring r);
 
 void id_Shift(ideal M, int s, const ring r);
+ideal id_Delete_Pos(const ideal I, const int pos, const ring r);
 #endif

@@ -309,7 +309,8 @@ KINLINE void sTObject::LmDeleteAndIter()
 KINLINE void sTObject::Mult_nn(number n)
 {
   if (t_p != NULL)
-  {    t_p = p_Mult_nn(t_p, n, tailRing);
+  {
+    t_p = p_Mult_nn(t_p, n, tailRing);
     if (p != NULL) pSetCoeff0(p, pGetCoeff(t_p));
   }
   else
@@ -563,7 +564,7 @@ KINLINE void sLObject::Tail_Mult_nn(number n)
   {
     poly _p = (t_p != NULL ? t_p : p);
     assume(_p != NULL);
-    pNext(_p) = p_Mult_nn(pNext(_p), n, tailRing);
+    pNext(_p) = __p_Mult_nn(pNext(_p), n, tailRing);
   }
 }
 
