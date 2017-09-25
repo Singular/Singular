@@ -1626,6 +1626,12 @@ example
 }
 
 proc lpGlDimBound(ideal G)
+"USAGE: lpGlDimBound(I); I an ideal
+RETURN: int, an upper bound for the global dimension, -1 means infinity
+PURPOSE: computing an upper bound for the global dimension
+ASSUME: - basering is a Letterplace ring.
+EXAMPLE: example lpGlDimBound; shows example
+"
 {
   for (int i = 1; i <= size(G); i++) {
     if (ord(G[i]) < 2) {
@@ -1670,8 +1676,18 @@ proc lpGlDimBound(ideal G)
     return (-1); // infinity
   }
 }
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  setring R; // sets basering to Letterplace ring
+  ideal G = x(1)*x(2), y(1)*y(2),x(1)*y(2)*x(3); // ideal G contains a
+  //Groebner basis
+  lpGlDimBound(G); // invokes procedure with Groebner basis G
+}
 
-proc imHasLoops(intmat A) {
+static proc imHasLoops(intmat A) {
   int n = ncols(A);
   for (int i = 1; i < n; i++) {
       if (A[i,i] == 1) {
@@ -1681,7 +1697,7 @@ proc imHasLoops(intmat A) {
   return (0);
 }
 
-proc lpGraphOfNChains(ideal G) // G must be reduced
+static proc lpGraphOfNChains(ideal G) // G must be reduced
 {
   list LG = lpId2ivLi(lead(G));
   int n = attrib(basering, "lV");
@@ -1738,7 +1754,7 @@ proc lpGraphOfNChains(ideal G) // G must be reduced
   return(GNC);
 }
 
-proc contains(list L, def item)
+static proc contains(list L, def item)
 {
   for (int i = 1; i <= size(L); i++) {
     if (L[i] == item) {
@@ -2470,54 +2486,6 @@ example
   // of the K-dimension of the factor algebra
   lpDHilbertSickle(G); // procedure with ring parameters
   lpDHilbertSickle(G,0); // procedure without degreebound
-}
-
-proc lpGlDimBound_OLD (ideal I)
-"USAGE: lpGlDimBound(I); I an ideal
-RETURN: int, an upper bound for the global dimension, -1 means infinity
-PURPOSE: computing an upper bound for the global dimension
-ASSUME: - basering is a Letterplace ring.
-NOTE: -1 is also returned when degree bound is reached
-EXAMPLE: example lpGlDimBound; shows example
-"
-{
- ideal G = lead(I);
- list L = lpId2ivLi(G); list RL;
- int n = attrib(basering,"lV");
- int d = attrib(basering,"uptodeg");
- int i,j,r; list V; intvec g,v,s,s1,vs;
- for (i = 1; i <= n; i++) {L[i] = i;}
- for (j = 1; j <= size(L); j++)
- {
-  i=1;
-  while (i <= size(V))
-  {
-   v = V[i], g = L[i]; s = GLDimSuffix(v,g);
-   if (size(s)>1) {s1 = s[1..(size(s)-1)];}
-           else {s1 = s[1];}
-   vs = v,s1;
-   if (isNormal(vs,L))
-    {
-     if (ContainedIn(s1,V)==0)
-     {
-      V = insert(V,s1,size(V));
-     }
-    }
-  }
- }
- r=findDChain(L);
- if (r == d) {return(-1);}
-  else { return(r);}
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
-  setring R; // sets basering to Letterplace ring
-  ideal G = x(1)*x(2), y(1)*y(2),x(1)*y(2)*x(3); // ideal G contains a
-  //Groebner basis
-  lpGlDimBound(G); // invokes procedure with Groebner basis G
 }
 
 proc lpHilbert(ideal G, list #)
