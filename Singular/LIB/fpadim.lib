@@ -2859,7 +2859,7 @@ EXAMPLE: example lpSubstitute; shows examples
       } else {
 	fis = lpMult(fis, lpNF(iv2lp(varindex),G));
       }
-      fis = lpNF(fis,G);
+      /*fis = lpNF(fis,G);*/
     }
     fs = fs + fis;
   }
