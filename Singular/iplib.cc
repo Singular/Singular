@@ -95,15 +95,6 @@ BOOLEAN iiGetLibStatus(char *lib)
 }
 
 /*2
-* find the library of an proc:
-*  => return (pi->libname)
-*/
-char * iiGetLibName(procinfov pi)
-{
-  return pi->libname;
-}
-
-/*2
 * given a line 'proc[ ]+{name}[ \t]*'
 * return a pointer to name and set the end of '\0'
 * changes the input!
