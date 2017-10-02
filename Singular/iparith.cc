@@ -5046,7 +5046,7 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
         {
           pl = enterid( plib,0, PACKAGE_CMD, &(basePack->idroot), TRUE );
           IDPACKAGE(pl)->language = LANG_SINGULAR;
-          IDPACKAGE(pl)->libname=plib;
+          IDPACKAGE(pl)->libname=omStrDup(s);
         }
         else if (IDTYP(pl)!=PACKAGE_CMD)
         {
@@ -5054,8 +5054,7 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
           omFree(plib);
           return TRUE;
         }
-        else
-          omFree(plib);
+        omFree(plib);
         package savepack=currPack;
         currPack=IDPACKAGE(pl);
         IDPACKAGE(pl)->loaded=TRUE;

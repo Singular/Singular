@@ -1335,10 +1335,12 @@ char *iiConvName(const char *libname)
   char *tmpname = omStrDup(libname);
   char *p = strrchr(tmpname, DIR_SEP);
   char *r;
-  if(p==NULL) p = tmpname;
-  else p++;
-  r = (char *)strchr(p, '.');
-  if( r!= NULL) *r = '\0';
+  if(p==NULL) p = tmpname; else p++;
+  // p is now the start of the file name (without path)
+  r=p;
+  while(isalnum(*r)) r++;
+  // r point the the end of the main part of the filename
+  *r = '\0';
   r = omStrDup(p);
   *r = mytoupper(*r);
   // printf("iiConvName: '%s' '%s' => '%s'\n", libname, tmpname, r);
