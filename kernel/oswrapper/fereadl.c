@@ -62,7 +62,6 @@ static BOOLEAN fe_stdout_is_tty;
 static BOOLEAN fe_stdin_is_tty;
 BOOLEAN fe_use_fgets=FALSE;
 static BOOLEAN fe_is_initialized=FALSE;
-static int     pagelength = 24;
 
 FILE *  fe_echo; /*the output file for echoed characters*/
 
@@ -70,8 +69,8 @@ FILE *  fe_echo; /*the output file for echoed characters*/
 char ** fe_hist=NULL;
 short   fe_hist_pos;
 BOOLEAN fe_is_raw_tty=0;
-int     fe_cursor_pos; /* 0..colmax-1*/
-int     fe_cursor_line; /* 0..pagelength-1*/
+short   fe_cursor_pos; /* 0..colmax-1*/
+short   fe_cursor_line; /* 0..pagelength-1*/
 
 #ifndef HAVE_ATEXIT
   int on_exit(void (*f)(int, void *), void *arg);
