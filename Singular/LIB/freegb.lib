@@ -3406,15 +3406,12 @@ ASSUME: p is a Letterplace polynomial, G is a set of Letterplace polynomials
 NOTE: Taking the first possible reduction
 "
 {
- print("lpNormalForm2");
  poly one = 1;
  if ( (pp == 0) || (leadmonom(pp) == one) ) { return(pp); }
  poly p = pp; poly q;
  int i; int s; intvec V;
  while ( (p != 0) && (leadmonom(p) != one) )
  {
-   printf("while1 (p=%p)", p);
-   printf("while1 (lm(p)=%p)", leadmonom(p));
    //"entered while with p="; p;
    V = makeDVec(delSupZero(leadexp(p)));
    i = 0;
@@ -3422,17 +3419,14 @@ NOTE: Taking the first possible reduction
    //"look for divisor";
    while ( (s == -1) && (i<size(L)) )
    {
-     printf("while2 (s=%p, i=%p, sizeL=%p)", s, i, size(L));
      i = i+1;
      s = dShiftDiv(V, L[i])[1];
    }
-   printf("s=%p", s);
  // now, out of here: either i=size(L) and s==-1 => no reduction
  // otherwise: i<=size(L) and s!= -1 => reduction
     //"out of divisor search: s="; s; "i="; i;
     if (s != -1)
 	{
-    printf("G[%p]=%p", i, G[i]);
     //"start reducing with G[i]:";
     p = lpReduce(p,G[i],s); // lm-reduction
 	  //"reduced to p="; p;
