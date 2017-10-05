@@ -1338,7 +1338,7 @@ char *iiConvName(const char *libname)
   if(p==NULL) p = tmpname; else p++;
   // p is now the start of the file name (without path)
   r=p;
-  while(isalnum(*r)) r++;
+  while(isalnum(*r)||(*r=='_')) r++;
   // r point the the end of the main part of the filename
   *r = '\0';
   r = omStrDup(p);
