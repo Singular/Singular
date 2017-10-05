@@ -75,15 +75,17 @@ static void initialize_lts_hash(lts_hash &C, const ideal L)
 
 #define delete_lts_hash(C) C->clear()
 
-poly FindReducer(const poly multiplier, const poly t, const lts_hash *m_div)
+poly find_reducer(const poly multiplier, const poly t,
+        const lts_hash *hash_previous_module)
 {
     const ring r = currRing;
-    lts_hash::const_iterator m_itr = m_div->find(p_GetComp(t, currRing));
-    if (m_itr == m_div->end()) {
+    lts_hash::const_iterator m_itr = hash_previous_module->find(p_GetComp(t,
+                currRing));
+    if (m_itr == hash_previous_module->end()) {
         return NULL;
     }
     lts_vector::const_iterator m_current = (m_itr->second).begin();
-    lts_vector::const_iterator m_finish  = (m_itr->second).end();
+    lts_vector::const_iterator m_finish = (m_itr->second).end();
     const poly q = p_New(r);
     pNext(q) = NULL;
     p_MemSum_LengthGeneral(q->exp, multiplier->exp, t->exp, r->ExpL_Size);
@@ -105,30 +107,31 @@ poly FindReducer(const poly multiplier, const poly t, const lts_hash *m_div)
     return NULL;
 }
 
-static poly TraverseTail_test(poly multiplier, const int tail,
+static poly traverse_tail(poly multiplier, const int tail,
         const ideal previous_module, const std::vector<bool> &variables,
-        const lts_hash *m_div);
+        const lts_hash *hash_previous_module);
 
-static inline poly ReduceTerm_test(poly multiplier, poly term4reduction,
+static inline poly reduce_term(poly multiplier, poly term4reduction,
         const ideal previous_module, const std::vector<bool> &variables,
-        const lts_hash *m_div)
+        const lts_hash *hash_previous_module)
 {
     const ring r = currRing;
-    poly s = FindReducer(multiplier, term4reduction, m_div);
+    poly s = find_reducer(multiplier, term4reduction, hash_previous_module);
     if( s == NULL )
     {
         return NULL;
     }
     const int c = p_GetComp(s, r) - 1;
-    const poly t = TraverseTail_test(s, c, previous_module, variables, m_div);
+    const poly t = traverse_tail(s, c, previous_module, variables,
+            hash_previous_module);
     if( t != NULL )
         s = p_Add_q(s, t, r);
     return s;
 }
 
-static poly ComputeImage_test(poly multiplier, const int t,
+static poly compute_image(poly multiplier, const int t,
         const ideal previous_module, const std::vector<bool> &variables,
-        const lts_hash *m_div)
+        const lts_hash *hash_previous_module)
 {
     const poly tail = previous_module->m[t]->next;
     if(tail != NULL)
@@ -140,8 +143,8 @@ static poly ComputeImage_test(poly multiplier, const int t,
         sBucket_pt sum = sBucketCreate(currRing);
         for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
         {
-            const poly rt = ReduceTerm_test(multiplier, p, previous_module,
-                    variables, m_div);
+            const poly rt = reduce_term(multiplier, p, previous_module,
+                    variables, hash_previous_module);
             sBucket_Add_p(sum, rt, pLength(rt));
         }
         poly s;
@@ -186,9 +189,9 @@ static void delete_cache()
 }
 #endif   // CACHE
 
-static poly TraverseTail_test(poly multiplier, const int tail,
+static poly traverse_tail(poly multiplier, const int tail,
         const ideal previous_module, const std::vector<bool> &variables,
-        const lts_hash *m_div)
+        const lts_hash *hash_previous_module)
 {
     const ring& r = currRing;
 #if CACHE
@@ -211,8 +214,8 @@ static poly TraverseTail_test(poly multiplier, const int tail,
             }
             return p;
         }
-        const poly p = ComputeImage_test(multiplier, tail, previous_module,
-                variables, m_div);
+        const poly p = compute_image(multiplier, tail, previous_module,
+                variables, hash_previous_module);
         itr = T.find(multiplier);
         if( itr == T.end() )
         {
@@ -223,8 +226,8 @@ static poly TraverseTail_test(poly multiplier, const int tail,
         return p;
     }
 #endif   // CACHE
-    const poly p = ComputeImage_test(multiplier, tail, previous_module,
-            variables, m_div);
+    const poly p = compute_image(multiplier, tail, previous_module, variables,
+            hash_previous_module);
 #if CACHE
     top_itr = m_cache_test.find(tail);
     if ( top_itr != m_cache_test.end() )
@@ -250,13 +253,14 @@ static poly TraverseTail_test(poly multiplier, const int tail,
 }
 
 static poly lift_ext_LT(const poly a, const ideal previous_module,
-        const std::vector<bool> &variables, const lts_hash *m_div)
+        const std::vector<bool> &variables,
+        const lts_hash *hash_previous_module)
 {
     const ring R = currRing;
-    poly t1 = ComputeImage_test(a, p_GetComp(a, R)-1,
-            previous_module, variables, m_div);
-    poly t2 = TraverseTail_test(a->next, p_GetComp(a->next, R)-1,
-            previous_module, variables, m_div);
+    poly t1 = compute_image(a, p_GetComp(a, R)-1, previous_module, variables,
+            hash_previous_module);
+    poly t2 = traverse_tail(a->next, p_GetComp(a->next, R)-1, previous_module,
+            variables, hash_previous_module);
     t1 = p_Add_q(t1, t2, R);
     return t1;
 }
