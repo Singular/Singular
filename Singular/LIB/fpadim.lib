@@ -1629,15 +1629,44 @@ proc lpGlDimBound(ideal G)
 "USAGE: lpGlDimBound(I); I an ideal
 RETURN: int, an upper bound for the global dimension, -1 means infinity
 PURPOSE: computing an upper bound for the global dimension
-ASSUME: - basering is a Letterplace ring.
+ASSUME: - basering is a Letterplace ring, G is a reduced Gröbner Basis
 EXAMPLE: example lpGlDimBound; shows example
+NOTE: if I = LM(I), then the global dimension is equal the Gelfand 
+@*    Kirillov dimension if it is finite
+@*    Global dimension should be 0 for A/G = K and 1 for A/G = K<x1...xn>
 "
 {
+  // NOTE: Gl should be 0 for A/G = K and 1 for A/G = K<x1...xn>
+  // G1 contains generators with single variable in LM
+  ideal G1;
   for (int i = 1; i <= size(G); i++) {
-    if (ord(G[i]) < 2) {
-      ERROR("G contains a variable");
+    if (ord(G[i]) < 2) { // single variable in LM
+      G1 = insertGenerator(G1,G[i]);
     }
   }
+
+  // G = NF(G,G1)
+  for (int i = 1; i <= size(G); i++) {
+    G[i] = lpNF(G[i],G1);
+  }
+  G = simplify(G,2); // remove zero generators
+
+  // delete variables in LM(G1) from the ring
+  def save = basering;
+  ring R = basering;
+  for (int i = 1; i <= size(G1); i++) {
+    if (attrib(R, "lV") > 1) {
+      ring R = lpDelVar(lp2iv(G1[i])[1]);
+      ideal G1 = imap(save,G1);
+      G1 = simplify(G1, 2); // remove zero generators
+      i = 0; // reset counter
+    } else {
+      // only the field is left (no variables)
+      return(0);
+    }
+  }
+
+  ideal G = imap(save, G);
 
   // Li p. 184 if G = LM(G), then I = LM(I) and thus glDim = gkDim if it's finite
   for (int i = 1; i <= size(G); i++) {
