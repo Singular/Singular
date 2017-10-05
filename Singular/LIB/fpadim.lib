@@ -1644,6 +1644,7 @@ NOTE: if I = LM(I), then the global dimension is equal the Gelfand
       G1 = insertGenerator(G1,G[i]);
     }
   }
+  G1 = simplify(G1,2); // remove zero generators
 
   // G = NF(G,G1)
   for (int i = 1; i <= size(G); i++) {
