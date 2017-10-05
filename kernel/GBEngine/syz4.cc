@@ -403,24 +403,26 @@ static ideal idConcat(const ideal *M, const int size, const int rank)
     return result;
 }
 
-static int compare_Mi(const void* a, const void *b)
+static int compare_comp(poly p_a, poly p_b)
 {
     const ring r = currRing;
-    poly p_a = *((poly *)a);
-    poly p_b = *((poly *)b);
-    int cmp;
     int comp_a = p_GetComp(p_a, r);
     int comp_b = p_GetComp(p_b, r);
-    cmp = (comp_a > comp_b) - (comp_a < comp_b);
-    if (cmp != 0) {
-        return cmp;
-    }
+    return (comp_a > comp_b) - (comp_a < comp_b);
+}
+
+static int compare_deg(poly p_a, poly p_b)
+{
+    const ring r = currRing;
     int deg_a = p_Deg(p_a, r);
     int deg_b = p_Deg(p_b, r);
-    cmp = (deg_a > deg_b) - (deg_a < deg_b);
-    if (cmp != 0) {
-        return cmp;
-    }
+    return (deg_a > deg_b) - (deg_a < deg_b);
+}
+
+static int compare_lex(poly p_a, poly p_b)
+{
+    int cmp;
+    const ring r = currRing;
     int exp_a[r->N+1];
     int exp_b[r->N+1];
     p_GetExpV(p_a, exp_a, r);
@@ -430,6 +432,19 @@ static int compare_Mi(const void* a, const void *b)
         if (cmp != 0) {
             return cmp;
         }
+    }
+    return 0;
+}
+
+static int compare_Mi(const void* a, const void *b)
+{
+    poly p_a = *((poly *)a);
+    poly p_b = *((poly *)b);
+    int cmp;
+    if ((cmp = compare_comp(p_a, p_b))
+            || (cmp = compare_deg(p_a, p_b))
+            || (cmp = compare_lex(p_a, p_b))) {
+        return cmp;
     }
     return 0;
 }
