@@ -110,21 +110,21 @@ static poly traverse_tail(poly multiplier, const int tail,
         const ideal previous_module, const std::vector<bool> &variables,
         const lts_hash *hash_previous_module);
 
-static inline poly reduce_term(poly multiplier, poly term4reduction,
+static inline poly reduce_term(const poly multiplier, const poly term,
         const ideal previous_module, const std::vector<bool> &variables,
         const lts_hash *hash_previous_module)
 {
-    const ring r = currRing;
-    poly s = find_reducer(multiplier, term4reduction, hash_previous_module);
-    if( s == NULL )
-    {
+    poly s = find_reducer(multiplier, term, hash_previous_module);
+    if (s == NULL) {
         return NULL;
     }
+    const ring r = currRing;
     const int c = p_GetComp(s, r) - 1;
     const poly t = traverse_tail(s, c, previous_module, variables,
             hash_previous_module);
-    if( t != NULL )
+    if (t != NULL) {
         s = p_Add_q(s, t, r);
+    }
     return s;
 }
 
