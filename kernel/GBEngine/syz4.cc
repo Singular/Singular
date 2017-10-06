@@ -79,25 +79,24 @@ poly find_reducer(const poly multiplier, const poly t,
         const lts_hash *hash_previous_module)
 {
     const ring r = currRing;
-    lts_hash::const_iterator m_itr = hash_previous_module->find(p_GetComp(t,
-                currRing));
-    if (m_itr == hash_previous_module->end()) {
+    lts_hash::const_iterator itr = hash_previous_module->find(p_GetComp(t, r));
+    if (itr == hash_previous_module->end()) {
         return NULL;
     }
-    lts_vector::const_iterator m_current = (m_itr->second).begin();
-    lts_vector::const_iterator m_finish = (m_itr->second).end();
+    lts_vector::const_iterator itr_curr = (itr->second).begin();
+    lts_vector::const_iterator itr_end = (itr->second).end();
     const poly q = p_New(r);
     pNext(q) = NULL;
     p_MemSum_LengthGeneral(q->exp, multiplier->exp, t->exp, r->ExpL_Size);
-    const unsigned long m_not_sev = ~p_GetShortExpVector(q, r);
-    for( ; m_current != m_finish; ++m_current) {
-        if (m_current->sev & m_not_sev
-                || unlikely(!(_p_LmDivisibleByNoComp(m_current->lt, q, r)))) {
+    const unsigned long q_not_sev = ~p_GetShortExpVector(q, r);
+    for( ; itr_curr != itr_end; ++itr_curr) {
+        if (itr_curr->sev & q_not_sev
+                || unlikely(!(_p_LmDivisibleByNoComp(itr_curr->lt, q, r)))) {
             continue;
         }
         p_MemAdd_NegWeightAdjust(q, r);
-        p_ExpVectorDiff(q, q, m_current->lt, r);
-        p_SetComp(q, (unsigned long)(m_current->comp)+1, r);
+        p_ExpVectorDiff(q, q, itr_curr->lt, r);
+        p_SetComp(q, (unsigned long)(itr_curr->comp)+1, r);
         p_Setm(q, r);
         number n = n_Mult(p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
         p_SetCoeff0(q, n_InpNeg(n, r), r);
