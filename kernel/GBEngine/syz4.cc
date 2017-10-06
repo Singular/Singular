@@ -128,31 +128,25 @@ static inline poly reduce_term(const poly multiplier, const poly term,
     return s;
 }
 
-static poly compute_image(poly multiplier, const int t,
+static poly compute_image(poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
         const lts_hash *hash_previous_module)
 {
-    const poly tail = previous_module->m[t]->next;
-    if(tail != NULL)
-    {
-        if (!check_variables(variables, multiplier))
-        {
-            return NULL;
-        }
-        sBucket_pt sum = sBucketCreate(currRing);
-        for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
-        {
-            const poly rt = reduce_term(multiplier, p, previous_module,
-                    variables, hash_previous_module);
-            sBucket_Add_p(sum, rt, pLength(rt));
-        }
-        poly s;
-        int l;
-        sBucketClearAdd(sum, &s, &l);
-        sBucketDestroy(&sum);
-        return s;
+    const poly tail = previous_module->m[comp]->next;
+    if (tail == NULL || !check_variables(variables, multiplier)) {
+        return NULL;
     }
-    return NULL;
+    sBucket_pt sum = sBucketCreate(currRing);
+    for (poly p = tail; p != NULL; p = pNext(p)) {
+        const poly rt = reduce_term(multiplier, p, previous_module, variables,
+                hash_previous_module);
+        sBucket_Add_p(sum, rt, pLength(rt));
+    }
+    poly s;
+    int l;
+    sBucketClearAdd(sum, &s, &l);
+    sBucketDestroy(&sum);
+    return s;
 }
 
 #define CACHE 1
