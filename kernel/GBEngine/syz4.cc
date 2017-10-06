@@ -106,7 +106,7 @@ poly find_reducer(const poly multiplier, const poly t,
     return NULL;
 }
 
-static poly traverse_tail(poly multiplier, const int tail,
+static poly traverse_tail(poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
         const lts_hash *hash_previous_module);
 
@@ -152,7 +152,7 @@ static poly compute_image(poly multiplier, const int comp,
 #define CACHE 1
 
 #if CACHE
-struct CCacheCompare_test
+struct cache_compare
 {
     inline bool operator() (const poly& l, const poly& r) const
     {
@@ -160,39 +160,39 @@ struct CCacheCompare_test
     }
 };
 
-typedef std::map<poly, poly, CCacheCompare_test> TP2PCache_test;
-typedef std::map<int, TP2PCache_test> TCache_test;
+typedef std::map<poly, poly, cache_compare> cache_term;
+typedef std::map<int, cache_term> cache_comp;
 
-static TCache_test m_cache_test;
+static cache_comp Cache;
 
 // note: we don't need to keep the coeffs of those terms which are lifted to 0
 
 static void delete_cache()
 {
-    for (TCache_test::iterator it = m_cache_test.begin();
-            it != m_cache_test.end(); it++) {
-        TP2PCache_test& T = it->second;
-        for (TP2PCache_test::iterator vit = T.begin(); vit != T.end(); vit++) {
-            p_Delete((&(vit->second)), currRing);
-            p_Delete(const_cast<poly*>(&(vit->first)), currRing);
+    const ring r = currRing;
+    for (cache_comp::iterator it1 = Cache.begin(); it1 != Cache.end(); ++it1) {
+        cache_term& T = it1->second;
+        for (cache_term::iterator it2 = T.begin(); it2 != T.end(); ++it2) {
+            p_Delete(&(it2->second), r);
+            p_Delete(const_cast<poly*>(&(it2->first)), r);
         }
         T.clear();
     }
-    m_cache_test.clear();
+    Cache.clear();
 }
 #endif   // CACHE
 
-static poly traverse_tail(poly multiplier, const int tail,
+static poly traverse_tail(poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
         const lts_hash *hash_previous_module)
 {
     const ring& r = currRing;
 #if CACHE
-    TCache_test::iterator top_itr = m_cache_test.find(tail);
-    if ( top_itr != m_cache_test.end() )
+    cache_comp::iterator top_itr = Cache.find(comp);
+    if ( top_itr != Cache.end() )
     {
-        TP2PCache_test& T = top_itr->second;
-        TP2PCache_test::iterator itr = T.find(multiplier);
+        cache_term& T = top_itr->second;
+        cache_term::iterator itr = T.find(multiplier);
         if( itr != T.end() )
         {
             if( itr->second == NULL )
@@ -207,38 +207,35 @@ static poly traverse_tail(poly multiplier, const int tail,
             }
             return p;
         }
-        const poly p = compute_image(multiplier, tail, previous_module,
+        const poly p = compute_image(multiplier, comp, previous_module,
                 variables, hash_previous_module);
         itr = T.find(multiplier);
         if( itr == T.end() )
         {
-            T.insert(TP2PCache_test::value_type(p_Head(multiplier,
-                            r), p) );
+            T.insert(cache_term::value_type(p_Head(multiplier, r), p) );
             return p_Copy(p, r);
         }
         return p;
     }
 #endif   // CACHE
-    const poly p = compute_image(multiplier, tail, previous_module, variables,
+    const poly p = compute_image(multiplier, comp, previous_module, variables,
             hash_previous_module);
 #if CACHE
-    top_itr = m_cache_test.find(tail);
-    if ( top_itr != m_cache_test.end() )
+    top_itr = Cache.find(comp);
+    if ( top_itr != Cache.end() )
     {
-        TP2PCache_test& T = top_itr->second;
-        TP2PCache_test::iterator itr = T.find(multiplier);
+        cache_term& T = top_itr->second;
+        cache_term::iterator itr = T.find(multiplier);
         if( itr == T.end() )
         {
-            T.insert(TP2PCache_test::value_type(p_Head(multiplier,
-                            r), p));
+            T.insert(cache_term::value_type(p_Head(multiplier, r), p));
             return p_Copy(p, r);
         }
         return p;
     }
-    TP2PCache_test T;
-    T.insert(TP2PCache_test::value_type(p_Head(multiplier, r),
-                p));
-    m_cache_test.insert( TCache_test::value_type(tail, T) );
+    cache_term T;
+    T.insert(cache_term::value_type(p_Head(multiplier, r), p));
+    Cache.insert( cache_comp::value_type(comp, T) );
     return p_Copy(p, r);
 #else
     return p;
