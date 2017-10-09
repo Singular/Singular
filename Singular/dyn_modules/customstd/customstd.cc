@@ -68,7 +68,7 @@ static BOOLEAN sat_vars_sp(kStrategy strat)
       // abort if the minimum is zero in each component
       if (nonTrivialSaturationToBeDone==false) break;
     }
-    if (nonTrivialSaturationToBeDone==true)
+    if (nonTrivialSaturationToBeDone)
     {
       // std::cout << "simplifying!" << std::endl;
       if (TEST_OPT_PROT) { PrintS("S"); mflush(); }
@@ -183,10 +183,8 @@ static BOOLEAN satstd(leftv res, leftv args)
       }
     }
 
-    ideal I = (ideal) u->Data();
-
     idealCache = NULL;
-    I=kStd(I,currRing->qideal,testHomog,NULL,NULL,0,0,NULL,sat_vars_sp);
+    ideal I=kStd(I,currRing->qideal,testHomog,NULL,NULL,0,0,NULL,sat_vars_sp);
     customstd_satstdSaturatingVariables = std::vector<int>();
 
     res->rtyp=IDEAL_CMD;
