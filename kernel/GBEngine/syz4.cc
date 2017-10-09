@@ -171,76 +171,85 @@ static void delete_cache()
 {
     const ring r = currRing;
     for (cache_comp::iterator it1 = Cache.begin(); it1 != Cache.end(); ++it1) {
-        cache_term& T = it1->second;
-        for (cache_term::iterator it2 = T.begin(); it2 != T.end(); ++it2) {
+        cache_term *T = &(it1->second);
+        for (cache_term::iterator it2 = T->begin(); it2 != T->end(); ++it2) {
             p_Delete(&(it2->second), r);
             p_Delete(const_cast<poly*>(&(it2->first)), r);
         }
-        T.clear();
+        T->clear();
     }
     Cache.clear();
 }
+
+static void insert_into_cache_term(cache_term *T, const poly multiplier,
+        const poly p)
+{
+    cache_term::iterator itr = T->find(multiplier);
+    if (itr == T->end()) {
+        const ring r = currRing;
+        T->insert(cache_term::value_type(p_Head(multiplier, r), p_Copy(p, r)));
+    }
+}
+
+static void insert_into_cache_comp(const int comp, const poly multiplier,
+        const poly p)
+{
+    cache_comp::iterator itr = Cache.find(comp);
+    if (itr != Cache.end()) {
+        insert_into_cache_term(&(itr->second), multiplier, p);
+    } else {
+        const ring r = currRing;
+        cache_term T;
+        T.insert(cache_term::value_type(p_Head(multiplier, r), p_Copy(p, r)));
+        Cache.insert(cache_comp::value_type(comp, T));
+    }
+}
+
+static poly get_from_cache_term(const cache_term::iterator itr,
+        const poly multiplier)
+{
+    if(itr->second == NULL) {
+        return NULL;
+    }
+    const ring r = currRing;
+    poly p = p_Copy(itr->second, r);
+    if (!n_Equal(pGetCoeff(multiplier), pGetCoeff(itr->first), r)) {
+        number n = n_Div(pGetCoeff(multiplier), pGetCoeff(itr->first), r);
+        p = p_Mult_nn(p, n, r);
+        n_Delete(&n, r);
+    }
+    return p;
+}
 #endif   // CACHE
 
-static poly traverse_tail(poly multiplier, const int comp,
+#if CACHE
+static poly traverse_tail(const poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
         const lts_hash *hash_previous_module)
 {
-    const ring& r = currRing;
-#if CACHE
     cache_comp::iterator top_itr = Cache.find(comp);
     if ( top_itr != Cache.end() )
     {
-        cache_term& T = top_itr->second;
-        cache_term::iterator itr = T.find(multiplier);
-        if( itr != T.end() )
+        cache_term *T = &(top_itr->second);
+        cache_term::iterator itr = T->find(multiplier);
+        if( itr != T->end() )
         {
-            if( itr->second == NULL )
-                return (NULL);
-            poly p = p_Copy(itr->second, r);
-            if( !n_Equal( pGetCoeff(multiplier), pGetCoeff(itr->first), r) )
-            {
-                number n = n_Div( pGetCoeff(multiplier), pGetCoeff(itr->first),
-                        r);
-                p = p_Mult_nn(p, n, r);
-                n_Delete(&n, r);
-            }
+            poly p = get_from_cache_term(itr, multiplier);
             return p;
         }
         const poly p = compute_image(multiplier, comp, previous_module,
                 variables, hash_previous_module);
-        itr = T.find(multiplier);
-        if( itr == T.end() )
-        {
-            T.insert(cache_term::value_type(p_Head(multiplier, r), p) );
-            return p_Copy(p, r);
-        }
+        insert_into_cache_term(T, multiplier, p);
         return p;
     }
-#endif   // CACHE
     const poly p = compute_image(multiplier, comp, previous_module, variables,
             hash_previous_module);
-#if CACHE
-    top_itr = Cache.find(comp);
-    if ( top_itr != Cache.end() )
-    {
-        cache_term& T = top_itr->second;
-        cache_term::iterator itr = T.find(multiplier);
-        if( itr == T.end() )
-        {
-            T.insert(cache_term::value_type(p_Head(multiplier, r), p));
-            return p_Copy(p, r);
-        }
-        return p;
-    }
-    cache_term T;
-    T.insert(cache_term::value_type(p_Head(multiplier, r), p));
-    Cache.insert( cache_comp::value_type(comp, T) );
-    return p_Copy(p, r);
-#else
+    insert_into_cache_comp(comp, multiplier, p);
     return p;
-#endif   // CACHE
 }
+#else
+    #define traverse_tail compute_image
+#endif   // CACHE
 
 static poly lift_ext_LT(const poly a, const ideal previous_module,
         const std::vector<bool> &variables,
