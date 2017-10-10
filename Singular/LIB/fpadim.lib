@@ -1636,6 +1636,7 @@ NOTE: if I = LM(I), then the global dimension is equal the Gelfand
 @*    Global dimension should be 0 for A/G = K and 1 for A/G = K<x1...xn>
 "
 {
+  G = simplify(G,2); // remove zero generators
   // NOTE: Gl should be 0 for A/G = K and 1 for A/G = K<x1...xn>
   // G1 contains generators with single variable in LM
   ideal G1;
@@ -1647,7 +1648,7 @@ NOTE: if I = LM(I), then the global dimension is equal the Gelfand
   G1 = simplify(G1,2); // remove zero generators
 
   // G = NF(G,G1)
-  for (int i = 1; i <= size(G); i++) {
+  for (int i = 1; i <= ncols(G); i++) { // do not use size() here
     G[i] = lpNF(G[i],G1);
   }
   G = simplify(G,2); // remove zero generators
@@ -1655,19 +1656,19 @@ NOTE: if I = LM(I), then the global dimension is equal the Gelfand
   // delete variables in LM(G1) from the ring
   def save = basering;
   ring R = basering;
-  for (int i = 1; i <= size(G1); i++) {
-    if (attrib(R, "lV") > 1) {
-      ring R = lpDelVar(lp2iv(G1[i])[1]);
-      ideal G1 = imap(save,G1);
-      G1 = simplify(G1, 2); // remove zero generators
-      i = 0; // reset counter
-    } else {
-      // only the field is left (no variables)
-      return(0);
+  if (size(G1) > 0) {
+    while (size(G1) > 0) {
+      if (attrib(R, "lV") > 1) {
+	ring R = lpDelVar(lp2iv(G1[1])[1]);
+	ideal G1 = imap(save,G1);
+	G1 = simplify(G1, 2); // remove zero generators
+      } else {
+	// only the field is left (no variables)
+	return(0);
+      }
     }
+    ideal G = imap(save, G); // put this here, because when save == R this call would make G = 0
   }
-
-  ideal G = imap(save, G);
 
   // Li p. 184 if G = LM(G), then I = LM(I) and thus glDim = gkDim if it's finite
   for (int i = 1; i <= size(G); i++) {
