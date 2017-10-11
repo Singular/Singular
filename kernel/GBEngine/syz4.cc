@@ -157,6 +157,10 @@ struct cache_compare
     inline bool operator() (const poly& l, const poly& r) const
     {
         return (p_LmCmp(l, r, currRing) == -1);
+        /* For expensive orderings, consider:
+         * return (memcmp(l->exp, r->exp,
+         *         (currRing->CmpL_Size)*sizeof(unsigned long)) < 0);
+         */
     }
 };
 
