@@ -175,8 +175,6 @@ typedef std::map<poly, poly, cache_compare> cache_term;
 
 static cache_term *Cache;
 
-// note: we don't need to keep the coeffs of those terms which are lifted to 0
-
 static void initialize_cache(const int size)
 {
     Cache = new cache_term[size];
