@@ -180,9 +180,9 @@ static void delete_cache(const int size)
     const ring r = currRing;
     for (int i = 0; i < size; i++) {
         cache_term *T = &(Cache[i]);
-        for (cache_term::iterator it2 = T->begin(); it2 != T->end(); ++it2) {
-            p_Delete(&(it2->second), r);
-            p_Delete(const_cast<poly*>(&(it2->first)), r);
+        for (cache_term::iterator itr = T->begin(); itr != T->end(); ++itr) {
+            p_Delete(&(itr->second), r);
+            p_Delete(const_cast<poly*>(&(itr->first)), r);
         }
         T->clear();
     }
@@ -214,22 +214,18 @@ static poly get_from_cache_term(const cache_term::iterator itr,
     }
     return p;
 }
-#endif   // CACHE
 
-#if CACHE
 static poly traverse_tail(const poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
         const lts_hash *hash_previous_module)
 {
     cache_term *T = &(Cache[comp]);
     cache_term::iterator itr = T->find(multiplier);
-    if( itr != T->end() )
-    {
-        poly p = get_from_cache_term(itr, multiplier);
-        return p;
+    if (itr != T->end()) {
+        return get_from_cache_term(itr, multiplier);
     }
-    const poly p = compute_image(multiplier, comp, previous_module,
-            variables, hash_previous_module);
+    poly p = compute_image(multiplier, comp, previous_module, variables,
+            hash_previous_module);
     insert_into_cache_term(T, multiplier, p);
     return p;
 }
