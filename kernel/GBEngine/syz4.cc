@@ -161,24 +161,28 @@ struct cache_compare
 };
 
 typedef std::map<poly, poly, cache_compare> cache_term;
-typedef std::map<int, cache_term> cache_comp;
 
-static cache_comp Cache;
+static cache_term *Cache;
 
 // note: we don't need to keep the coeffs of those terms which are lifted to 0
 
-static void delete_cache()
+static void initialize_cache(const int size)
+{
+    Cache = new cache_term[size];
+}
+
+static void delete_cache(const int size)
 {
     const ring r = currRing;
-    for (cache_comp::iterator it1 = Cache.begin(); it1 != Cache.end(); ++it1) {
-        cache_term *T = &(it1->second);
+    for (int i = 0; i < size; i++) {
+        cache_term *T = &(Cache[i]);
         for (cache_term::iterator it2 = T->begin(); it2 != T->end(); ++it2) {
             p_Delete(&(it2->second), r);
             p_Delete(const_cast<poly*>(&(it2->first)), r);
         }
         T->clear();
     }
-    Cache.clear();
+    delete[](Cache);
 }
 
 static void insert_into_cache_term(cache_term *T, const poly multiplier,
@@ -188,20 +192,6 @@ static void insert_into_cache_term(cache_term *T, const poly multiplier,
     if (itr == T->end()) {
         const ring r = currRing;
         T->insert(cache_term::value_type(p_Head(multiplier, r), p_Copy(p, r)));
-    }
-}
-
-static void insert_into_cache_comp(const int comp, const poly multiplier,
-        const poly p)
-{
-    cache_comp::iterator itr = Cache.find(comp);
-    if (itr != Cache.end()) {
-        insert_into_cache_term(&(itr->second), multiplier, p);
-    } else {
-        const ring r = currRing;
-        cache_term T;
-        T.insert(cache_term::value_type(p_Head(multiplier, r), p_Copy(p, r)));
-        Cache.insert(cache_comp::value_type(comp, T));
     }
 }
 
@@ -227,24 +217,16 @@ static poly traverse_tail(const poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
         const lts_hash *hash_previous_module)
 {
-    cache_comp::iterator top_itr = Cache.find(comp);
-    if ( top_itr != Cache.end() )
+    cache_term *T = &(Cache[comp]);
+    cache_term::iterator itr = T->find(multiplier);
+    if( itr != T->end() )
     {
-        cache_term *T = &(top_itr->second);
-        cache_term::iterator itr = T->find(multiplier);
-        if( itr != T->end() )
-        {
-            poly p = get_from_cache_term(itr, multiplier);
-            return p;
-        }
-        const poly p = compute_image(multiplier, comp, previous_module,
-                variables, hash_previous_module);
-        insert_into_cache_term(T, multiplier, p);
+        poly p = get_from_cache_term(itr, multiplier);
         return p;
     }
-    const poly p = compute_image(multiplier, comp, previous_module, variables,
-            hash_previous_module);
-    insert_into_cache_comp(comp, multiplier, p);
+    const poly p = compute_image(multiplier, comp, previous_module,
+            variables, hash_previous_module);
+    insert_into_cache_term(T, multiplier, p);
     return p;
 }
 #else
@@ -477,6 +459,9 @@ static void computeLiftings(const resolvente res, const int index,
     if (index > 1) {   // we don't know if the input is a reduced SB
         update_variables(variables, res[index-1]);
     }
+#if CACHE
+    initialize_cache(res[index-1]->ncols);
+#endif   // CACHE
     lts_hash *hash_previous_module = new lts_hash();
     initialize_lts_hash(*hash_previous_module, res[index-1]);
     for (int j = res[index]->ncols-1; j >= 0; j--) {
@@ -486,7 +471,7 @@ static void computeLiftings(const resolvente res, const int index,
     delete_lts_hash(hash_previous_module);
     delete(hash_previous_module);
 #if CACHE
-    delete_cache();
+    delete_cache(res[index-1]->ncols);
 #endif   // CACHE
 }
 
