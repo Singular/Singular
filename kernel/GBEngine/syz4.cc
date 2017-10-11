@@ -22,6 +22,8 @@
 #define unlikely(X) (X)
 #endif
 
+#define CACHE 1
+
 static void update_variables(std::vector<bool> &variables, const ideal L)
 {
     const ring R = currRing;
@@ -106,9 +108,16 @@ poly find_reducer(const poly multiplier, const poly t,
     return NULL;
 }
 
+#if CACHE
 static poly traverse_tail(poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
         const lts_hash *hash_previous_module);
+#else
+static poly compute_image(poly multiplier, const int comp,
+        const ideal previous_module, const std::vector<bool> &variables,
+        const lts_hash *hash_previous_module);
+#define traverse_tail compute_image
+#endif   // CACHE
 
 static inline poly reduce_term(const poly multiplier, const poly term,
         const ideal previous_module, const std::vector<bool> &variables,
@@ -148,8 +157,6 @@ static poly compute_image(poly multiplier, const int comp,
     sBucketDestroy(&sum);
     return s;
 }
-
-#define CACHE 1
 
 #if CACHE
 struct cache_compare
@@ -229,8 +236,6 @@ static poly traverse_tail(const poly multiplier, const int comp,
     insert_into_cache_term(T, multiplier, p);
     return p;
 }
-#else
-    #define traverse_tail compute_image
 #endif   // CACHE
 
 static poly lift_ext_LT(const poly a, const ideal previous_module,
