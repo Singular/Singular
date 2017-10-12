@@ -17,9 +17,7 @@
 //#define mprDEBUG_ALL
 
 //-> includes
-#include "misc/mylimits.h"
 #include "misc/options.h"
-#include "misc/intvec.h"
 
 #include "coeffs/numbers.h"
 #include "coeffs/mpr_global.h"
@@ -27,10 +25,6 @@
 #include "polys/matpol.h"
 
 #include "kernel/polys.h"
-#include "kernel/ideals.h"
-
-#include "kernel/polys.h"
-#include "kernel/ideals.h"
 
 #include "mpr_base.h"
 #include "mpr_numeric.h"
