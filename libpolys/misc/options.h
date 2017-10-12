@@ -60,12 +60,12 @@ extern unsigned si_opt_2;
 #define V_IDLIFT     21
 #define V_LENGTH     22
 //#define V_REPORT_STD 23
-#define V_ASSIGN_NONE 24
 /*23: kDebugPrint */
 #define V_ALLWARN    24
 #define V_INTERSECT_ELIM 25
 #define V_INTERSECT_SYZ 26
-/* for tests: 27-30 */
+#define V_ASSIGN_NONE 27
+/* for tests: 28-30 */
 #define V_DEG_STOP   31
 
 
