@@ -59,7 +59,8 @@ extern unsigned si_opt_2;
 #define V_COEFSTRAT  20
 #define V_IDLIFT     21
 #define V_LENGTH     22
-#define V_ASSIGN_NONE 23
+//#define V_REPORT_STD 23
+#define V_ASSIGN_NONE 24
 /*23: kDebugPrint */
 #define V_ALLWARN    24
 #define V_INTERSECT_ELIM 25
