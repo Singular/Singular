@@ -2851,10 +2851,11 @@ static BOOLEAN id_sat_vars_sp(kStrategy strat)
       for (int i=rVar(currRing); i>0; i--)
       {
         if (id_satstdSaturatingVariables[i]!=0)
-	{
+        {
           mm[i]=si_min(mm[i],m0[i]);
           if (mm[i]>0) nonTrivialSaturationToBeDone=true;
-	}
+        }
+        else mm[i]=0;
       }
       // abort if the minimum is zero in each component
       if (!nonTrivialSaturationToBeDone) break;
@@ -2864,6 +2865,10 @@ static BOOLEAN id_sat_vars_sp(kStrategy strat)
       // std::cout << "simplifying!" << std::endl;
       if (TEST_OPT_PROT) { PrintS("S"); mflush(); }
       p=p_Copy(strat->P.p,currRing);
+      //pWrite(p);
+      //  for (int i=rVar(currRing); i>0; i--)
+      //    if (mm[i]!=0) Print("x_%d:%d ",i,mm[i]);
+      //PrintLn();
       memset(&strat->P,0,sizeof(strat->P));
       strat->P.tailRing = strat->tailRing;
       strat->P.p=p;
@@ -2871,10 +2876,7 @@ static BOOLEAN id_sat_vars_sp(kStrategy strat)
       {
         for (int i=rVar(currRing); i>0; i--)
         {
-          if(id_satstdSaturatingVariables[i]!=0)
-	  {
-            p_SubExp(p,i,mm[i],currRing);
-	  }
+          p_SubExp(p,i,mm[i],currRing);
         }
         p_Setm(p,currRing);
         pIter(p);
@@ -2901,10 +2903,11 @@ static BOOLEAN id_sat_vars_sp(kStrategy strat)
       for(int i=rVar(currRing); i>0; i--)
       {
         if(id_satstdSaturatingVariables[i]!=0)
-	{
+        {
           mm[i]=si_min(mm[i],m0[i]);
           if (mm[i]>0) nonTrivialSaturationToBeDone = true;
-	}
+        }
+        else mm[i]=0;
       }
       // abort if the minimum is zero in each component
       if (!nonTrivialSaturationToBeDone) break;
@@ -2913,6 +2916,10 @@ static BOOLEAN id_sat_vars_sp(kStrategy strat)
     {
       if (TEST_OPT_PROT) { PrintS("S"); mflush(); }
       p=p_Copy(strat->P.t_p,strat->tailRing);
+      //p_Write(p,strat->tailRing);
+      //  for (int i=rVar(currRing); i>0; i--)
+      //    if (mm[i]!=0) Print("x_%d:%d ",i,mm[i]);
+      //PrintLn();
       memset(&strat->P,0,sizeof(strat->P));
       strat->P.tailRing = strat->tailRing;
       strat->P.t_p=p;
@@ -2920,10 +2927,7 @@ static BOOLEAN id_sat_vars_sp(kStrategy strat)
       {
         for(int i=rVar(currRing); i>0; i--)
         {
-          if(id_satstdSaturatingVariables[i]!=0)
-	  {
-            p_SubExp(p,i,mm[i],strat->tailRing);
-	  }
+          p_SubExp(p,i,mm[i],strat->tailRing);
         }
         p_Setm(p,strat->tailRing);
         pIter(p);
