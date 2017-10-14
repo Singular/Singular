@@ -730,13 +730,13 @@ EXAMPLE: example sat; shows an example
    def i=id;
    id=std(id);
    int p = printlevel-voice+3;  // p=printlevel+1 (default: p=1)
-   while( ii<=size(i) )
+   while( ii<=ncols(i) )
    {
       dbprint(p-1,"// compute quotient "+string(kk+1));
       i=quotient(id,j);
-      for( ii=1; ii<=size(i); ii++ )
+      for( ii=1; ii<=ncols(i); ii++ )
       {
-         if( reduce(i[ii],id,1)!=0 ) break;
+         if( reduce(i[ii],id,1+4)!=0 ) break;
       }
       id=std(i); kk++;
    }
