@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version mondromy.lib 4.0.1.0 Sep_2014 "; // $Id$
+version="version mondromy.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:  mondromy.lib  Monodromy of an Isolated Hypersurface Singularity
@@ -636,7 +636,7 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
     int i;
     dbprint(printlevel-voice+2,"//comparing with previous lattice...");
     t=timer;
-    for(i=mu-1;i>=1&&size(reduce(U,std(prevU)))>0;i--)
+    for(i=mu-1;i>=1&&size(reduce(U,std(prevU),5))>0;i--)
     {
       dbprint(printlevel-voice+2,"//...compared with previous lattice ["
         +string(timer-t)+" secs, "+string((memory(1)+1023)/1024)+" K]");

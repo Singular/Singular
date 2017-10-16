@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version resolve.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version resolve.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Algebraic Geometry";
 info="
 LIBRARY:  resolve.lib      Resolution of singularities (Desingularization)
@@ -314,7 +314,7 @@ EXAMPLE: example blowUp2;  shows an example
      ERROR("Your chosen center was the empty set. Exiting.");
   }
 //--- V(C) should be a subset of V(J)
-  if(size(reduce(J,std(C)))>0)
+  if(size(reduce(J,std(C),5))>0)
   {
      ERROR("V(J) does not contain V(C). Exiting.");
   }
@@ -1962,7 +1962,7 @@ ERROR("Not implemented yet");
      return(re);
    }
 //--- find Delta^(b-1)(J)
-   if(size(reduce(J,std(BM[1])))!=0)
+   if(size(reduce(J,std(BM[1]),5))!=0)
    {
      list L=DeltaList(BM);
    }
@@ -2482,7 +2482,7 @@ EXAMPLE: example CenterBO;  shows an example
 //---------------------------------------------------------------------------
    if(dim(C1)==dim(std(BO[1]))-1)
    {
-     if((size(reduce(J,C1))==0)&&(size(reduce(C1,std(J)))==0))
+     if((size(reduce(J,C1,5))==0)&&(size(reduce(C1,std(J),5))==0))
      {
 //--- C1 equals J and is of codimension 1 in W
         re[1]=C1;
@@ -2801,7 +2801,7 @@ EXAMPLE: example CenterBO;  shows an example
      {
         for(i=1;i<=size(BO[4]);i++)
         {
-           if((deg(BO[4][i][1])>0)&&(size(reduce(BO[4][i],Cstd))!=0))
+           if((deg(BO[4][i][1])>0)&&(size(reduce(BO[4][i],Cstd,5))!=0))
            {
               E0[size(E0)+1]=BO[4][i]+Cstd;
               E1[size(E1)+1]=BO[4][i];
@@ -2843,7 +2843,7 @@ EXAMPLE: example CenterBO;  shows an example
      {
         for(i=1;i<=size(BO1[4]);i++)
         {
-           if(size(reduce(templist[1],std(BO1[4][i])))==0)
+           if(size(reduce(templist[1],std(BO1[4][i]),5))==0)
            {
               templist[4][1]=1;
               break;
@@ -3057,7 +3057,7 @@ static proc CoverCenter(list BO,int b, ideal Jb)
 //--- form the union of the components of the center with maximum invariant
    for(i=1;i<=size(ceList);i++)
    {
-     if(size(reduce(ceList[i][1],BO[2]))==0)
+     if(size(reduce(ceList[i][1],BO[2],5))==0)
      {
 //--- already resolved ==> ignore
        i++;
@@ -3420,7 +3420,7 @@ static proc transversalT(ideal J, list E,list #)
    int d=nvars(basering)-dim(Jstd)+1;   // d=n-dim(V(J) \cap hypersurface)
    for(i=1;i<=size(E);i++)
    {
-      if(size(reduce(E[i],Jstd))==0)
+      if(size(reduce(E[i],Jstd,5))==0)
       {
 //--- V(J) is contained in E[i]
         return(0);
@@ -3444,7 +3444,7 @@ static proc transversalT(ideal J, list E,list #)
               return(0);
            }
            M=std(radical(M));
-           if(size(reduce(pp,M))>0){return(0);}
+           if(size(reduce(pp,M,5))>0){return(0);}
          }
       }
    }
@@ -3468,7 +3468,7 @@ static proc transversalTB(ideal J, list E,ideal V)
    int d=nvars(basering)-dim(Jstd)+1;   // d=n-dim(V(J) \cap hypersurface)
    for(i=1;i<=size(E);i++)
    {
-      if(size(reduce(E[i],Jstd))==0)
+      if(size(reduce(E[i],Jstd,5))==0)
       {
 //--- V(J) is contained in E[i]
         return(0);
@@ -3503,7 +3503,7 @@ static proc powerI(ideal I,int n,int m)
    }
    if(mon)
    {
-      if(size(reduce(I,std(radical(I[1]))))<size(I)-1){mon=0;}
+      if(size(reduce(I,std(radical(I[1])),5))<size(I)-1){mon=0;}
    }
    if((mon)&&(size(I)>3))
    {
@@ -3744,7 +3744,7 @@ static proc goodChoice(list BO, poly p)
 // test whether new W is smooth
 //---------------------------------------------------------------------------
    ideal W=BO[1]+ideal(p);
-   if(size(reduce(p,std(BO[1])))==0)
+   if(size(reduce(p,std(BO[1]),5))==0)
    {
 //--- p is already in BO[1], i.e. does not define a hypersurface in W
      return(1);
@@ -3915,7 +3915,7 @@ EXAMPLE: example resolve;  shows an example
    if(defined(cent)){kill cent;}
 
    ideal Jrad=equiRadical(J);
-   if(size(reduce(Jrad,std(J)))!=0)
+   if(size(reduce(Jrad,std(J),5))!=0)
    {
       "WARNING! The input is not reduced or not equidimensional!";
       "We will continue with the reduced top-dimensional part of input";
@@ -3953,7 +3953,7 @@ EXAMPLE: example resolve;  shows an example
       ideal K=ideal(1);
       for(j=1;j<=size(qs);j++)
       {
-         if(size(reduce(qs[j],std(maxideal(1))))==0)
+         if(size(reduce(qs[j],maxideal(1),5))==0)
          {
             K=intersect(K,qs[j]);
          }
@@ -3963,7 +3963,7 @@ EXAMPLE: example resolve;  shows an example
       K=ideal(1);
       for(j=1;j<=size(qr);j++)
       {
-         if(size(reduce(qr[j],std(maxideal(1))))!=0)
+         if(size(reduce(qr[j],maxideal(1),5))!=0)
          {
             K=intersect(K,qr[j]);
             smooth++;
@@ -4165,7 +4165,7 @@ EXAMPLE: example resolve;  shows an example
 //--- local case: initial step is blow-up in origin
          if(defined(@ce)){kill @ce;}
          if(defined(cent)){kill cent;}
-         if(size(reduce(slocusE(BO[2]),std(maxideal(1))))==0)
+         if(size(reduce(slocusE(BO[2]),maxideal(1),5))==0)
          {
             list @ce=maxideal(1),intvec(-1),intvec(0),intvec(0);
          }
@@ -4201,7 +4201,7 @@ EXAMPLE: example resolve;  shows an example
              ideal L=ideal(1);
              for(j=1;j<=size(tr);j++)
              {
-                if(size(reduce(ideal(@p),std(tr[j])))==0)
+                if(size(reduce(ideal(@p),std(tr[j]),5))==0)
                 {
                    L=intersect(L,tr[j]);
                 }
@@ -4274,8 +4274,8 @@ EXAMPLE: example resolve;  shows an example
           }
 //--- if computation of center returned BO2[2], we are done
 //--- ==> set @ce to BO[2], because later checks work with BO instead of BO2
-          if((size(reduce(@ce[1],std(BO2[2])))==0)&&
-             (size(reduce(BO2[2],std(@ce[1])))==0))
+          if((size(reduce(@ce[1],std(BO2[2]),5))==0)&&
+             (size(reduce(BO2[2],std(@ce[1]),5))==0))
           {
              @ce[1]=BO[2];
           }
@@ -4293,8 +4293,8 @@ EXAMPLE: example resolve;  shows an example
           list @ce=imap(R1,@ce);
           kill R1;
 
-         if((size(reduce(BO[2],std(@ce[1])))==0)
-             &&(size(reduce(@ce[1],Jstd))==0))
+         if((size(reduce(BO[2],std(@ce[1]),5))==0)
+             &&(size(reduce(@ce[1],Jstd,5))==0))
          {
 //--- J and center coincide
             pr[1]=@ce[1];
@@ -4304,7 +4304,7 @@ EXAMPLE: example resolve;  shows an example
          {
 //--- decompose center and use first component
             pr=minAssGTZ(@ce[1]);
-               if(size(reduce(@p,std(pr[1])))==0){"Achtung";~;}
+               if(size(reduce(@p,std(pr[1]),5))==0){"Achtung";~;}
                if(deg(std(slocus(pr[1]))[1])>0){"singulaer";~;}
             ideal cent=pr[1];
          }
@@ -4313,9 +4313,9 @@ EXAMPLE: example resolve;  shows an example
 //--- store the other components
             for(k=2;k<=size(pr);k++)
             {
-               if(size(reduce(@p,std(pr[k])))==0){"Achtung";~;}
+               if(size(reduce(@p,std(pr[k]),5))==0){"Achtung";~;}
                if(deg(std(slocus(pr[k]))[1])>0){"singulaer";~;}
-               if(size(reduce(@p,std(pr[k])))!=0)
+               if(size(reduce(@p,std(pr[k]),5))!=0)
                {
                   tmpList[size(tmpList)+1]=list(pr[k],@ce[2],@ce[3],@ce[4]);
                }
@@ -4376,12 +4376,12 @@ EXAMPLE: example resolve;  shows an example
               {
                  list @ce=CenterBO(BOloc);
               }
-              if(size(reduce(Ex,std(@ce[1])))!=0)
+              if(size(reduce(Ex,std(@ce[1]),5))!=0)
               {
                  list tempPr=minAssGTZ(@ce[1]);
                  for(k=size(tempPr);k>=1;k--)
                  {
-                    if(size(reduce(Ex,std(tempPr[k])))!=0)
+                    if(size(reduce(Ex,std(tempPr[k]),5))!=0)
                     {
                       tempPr=delete(tempPr,k);
                     }
@@ -4398,7 +4398,7 @@ EXAMPLE: example resolve;  shows an example
               }
             }
 //--- test whether we are done
-            if(size(reduce(slocusE(BO[2]),std(@ce[1])))!=0)
+            if(size(reduce(slocusE(BO[2]),std(@ce[1]),5))!=0)
             {
                if(transversalT(BO[2],BO[4]))
                {
@@ -4437,8 +4437,8 @@ EXAMPLE: example resolve;  shows an example
                kill xxx;
             }
          }
-         if((size(reduce(BO[2],std(@ce[1])))==0)
-             &&(size(reduce(@ce[1],Jstd))==0))
+         if((size(reduce(BO[2],std(@ce[1]),5))==0)
+             &&(size(reduce(@ce[1],Jstd,5))==0))
          {
 //--- J and center coincide
             pr[1]=@ce[1];
@@ -4561,7 +4561,7 @@ EXAMPLE: example resolve;  shows an example
          }
          if((!loca)&&(!locaT))
          {
-            if((norC(BO,cent))&&(size(reduce(cent,Jstd))!=0))
+            if((norC(BO,cent))&&(size(reduce(cent,Jstd,5))!=0))
             {
                "!!!  this chart is already finished  !!!";
                cent=BO[2];
@@ -4576,7 +4576,7 @@ EXAMPLE: example resolve;  shows an example
 //!!!! quick and dirty bug fix for old shortcut which has not yet been killed
 if((dim(std(cent))==0)&&defined(shortcut)) {kill shortcut;}
 //!!! end of bugfix
-      if(size(reduce(cent,Jstd))!=0)
+      if(size(reduce(cent,Jstd,5))!=0)
       {
 //--- center does not equal J
          tmpList=blowUpBO(BO,cent,extra);
@@ -4736,15 +4736,15 @@ static proc testRes(ideal J,list L,int loca)
             setring R;
             return(0);
          }
-         if(size(reduce(@p,std(radical(sLstd))))>0)
+         if(size(reduce(@p,std(radical(sLstd)),5))>0)
          {
             "J is not smooth";i;
             setring R;
             return(0);
          }
       }
-      if(!((size(reduce(J,std(stTK)))==0)
-           &&(size(reduce(stTK,std(J)))==0)))
+      if(!((size(reduce(J,std(stTK),5))==0)
+           &&(size(reduce(stTK,std(J),5))==0)))
       {
          "map is wrong";i;
          setring R;
@@ -4829,8 +4829,8 @@ static proc testBlowUp(list BO,ideal cent,list tmpList, int j, int extra)
       kill Q;
    }
    ideal sL=intersect(slocusE(BO[2]),cent);
-   if(size(reduce(sL,std(radical(T))))>0){setring R;return(0);}
-   if(size(reduce(T,std(radical(sL))))>0){setring R;return(0);}
+   if(size(reduce(sL,std(radical(T)),5))>0){setring R;return(0);}
+   if(size(reduce(T,std(radical(sL)),5))>0){setring R;return(0);}
    setring R;
    return(1);
 }
@@ -4881,7 +4881,7 @@ static proc normalCross(list E,list #)
       {
          if(size(#)>0)
          {
-            if(size(reduce(M,std(cent)))>0)
+            if(size(reduce(M,std(cent),5))>0)
             {
                ll[size(ll)+1]=std(M);
             }
@@ -4896,7 +4896,7 @@ static proc normalCross(list E,list #)
          }
          else
          {
-            if(size(reduce(pp,std(radical(M))))>0){re=0;}
+            if(size(reduce(pp,std(radical(M)),5))>0){re=0;}
          }
       }
       for(i=1;i<=size(E);i++)
@@ -4910,7 +4910,7 @@ static proc normalCross(list E,list #)
          {
             if(size(#)>0)
             {
-               if(size(reduce(Estd,std(cent)))>0)
+               if(size(reduce(Estd,std(cent),5))>0)
                {
                   ll[size(ll)+1]=Estd;
                }
@@ -4925,7 +4925,7 @@ static proc normalCross(list E,list #)
             }
             else
             {
-               if(size(reduce(pp,std(radical(M))))>0){re=0;}
+               if(size(reduce(pp,std(radical(M)),5))>0){re=0;}
             }
          }
          w[size(w)+1]=i;

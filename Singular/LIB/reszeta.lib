@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version reszeta.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version reszeta.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Algebraic Geometry";
 info="
 LIBRARY:  reszeta.lib       topological Zeta-function and
@@ -157,7 +157,7 @@ static proc ordE(ideal J,ideal E,ideal W)
    ideal Estd=std(E+W);
    ideal Epow=1;
    ideal Jquot=1;
-   while(size(reduce(Jquot,Estd))!=0)
+   while(size(reduce(Jquot,Estd,5))!=0)
    {
       s++;
       Epow=Epow*E;
@@ -1085,7 +1085,7 @@ static proc computeChiE_local(list re, list iden)
          {
 //--- have not set the initial value of chi(E_1) yet
 //--- in the local case, we need to know whether the center contains 0
-           if(size(reduce(cent,std(maxideal(1))))!=0)
+           if(size(reduce(cent,maxideal(1),5))!=0)
            {
 //--- first center does not meet 0
               list templist=0,nulliv;
@@ -1986,7 +1986,7 @@ EXAMPLE:  example abstractR;   shows an example
       if(defined(S)){kill S;}
       def S=re[2][i];
       setring S;
-      if(size(reduce(cent,std(BO[2]+BO[1])))!=0)
+      if(size(reduce(cent,std(BO[2]+BO[1]),5))!=0)
       {
 //--- only consider endrings
          i++;
@@ -2233,8 +2233,8 @@ EXAMPLE:  example prepEmbDiv;   shows an example
          found=0;
          for(j=1;j<=size(li1);j++)
          {
-            if((size(reduce(li1[j],std(EList[k])))==0)&&
-               (size(reduce(EList[k],std(li1[j])))==0))
+            if((size(reduce(li1[j],std(EList[k]),5))==0)&&
+               (size(reduce(EList[k],std(li1[j]),5))==0))
             {
 //--- found a match
                li1[j]=ideal(1);
@@ -2277,8 +2277,8 @@ EXAMPLE:  example prepEmbDiv;   shows an example
                      ideal id1=fetchInTree(re,repair[c][d][1],b,
                                iden0[size(iden0)][i][1],tempstr,iden0,1);
                      kill tempstr;
-                     if((size(reduce(EList[k],std(id1)))==0)&&
-                        (size(reduce(id1,std(EList[k])))==0))
+                     if((size(reduce(EList[k],std(id1),5))==0)&&
+                        (size(reduce(id1,std(EList[k]),5))==0))
                      {
                         repair[c][size(repair[c])+1]=intvec(iden0[size(iden0)][i][1],k);
                         break;
@@ -2925,7 +2925,7 @@ static proc Kontakt(ideal I, ideal K)
   while(!d)
   {
      k++;
-     d=size(reduce(I,std(maxideal(k)+K)));
+     d=size(reduce(I,std(maxideal(k)+K),5));
   }
   setring R;
   return(k-1);
@@ -2973,7 +2973,7 @@ static proc abstractNC(list BO)
       {
 //--- run through previously considered divisors
 //--- we do not want to bother with the same one twice
-         if((size(reduce(J,std(L[k])))==0)&&(size(reduce(L[k],std(J)))==0))
+         if((size(reduce(J,std(L[k]),5))==0)&&(size(reduce(L[k],std(J),5))==0))
          {
 //--- already considered this one
             flag=1;break;
@@ -3221,8 +3221,8 @@ EXAMPLE:  example intersectionDiv;  shows an example
           found=0;
           for(b=1;b<=size(li1);b++)
           {
-             if((size(reduce(li1[b],std(dcE[iden[i][j][2]][k][1])))==0)&&
-               (size(reduce(dcE[iden[i][j][2]][k][1],std(li1[b]+BO[2])))==0))
+             if((size(reduce(li1[b],std(dcE[iden[i][j][2]][k][1]),5))==0)&&
+               (size(reduce(dcE[iden[i][j][2]][k][1],std(li1[b]+BO[2]),5))==0))
              {
                 li1[b]=ideal(1);
                 tmpiden[size(tmpiden)-a+b][size(tmpiden[size(tmpiden)-a+b])+1]=
@@ -3262,8 +3262,8 @@ EXAMPLE:  example intersectionDiv;  shows an example
                      id1=radical(id1);        // for comparison
                                               // only the geometric
                                               // object matters
-                     if((size(reduce(dcE[iden[i][j][2]][k][1],std(id1+BO[2])))==0)&&
-                        (size(reduce(id1+BO[2],std(dcE[iden[i][j][2]][k][1])))==0))
+                     if((size(reduce(dcE[iden[i][j][2]][k][1],std(id1+BO[2]),5))==0)&&
+                        (size(reduce(id1+BO[2],std(dcE[iden[i][j][2]][k][1]),5))==0))
                      {
                        repair[c][size(repair[c])+1]=intvec(iden[i][j][1],iden[i][j][2],k);
                        break;
@@ -3671,8 +3671,8 @@ static proc addSelfInter(list re,intmat Inters,list iden,list iden0,intvec endiv
              }
              for(b=1;b<=size(dcE[a]);b++)
              {
-                if((size(reduce(dcE[a][b][1],std(pr[j][2])))==0)&&
-                   (size(reduce(pr[j][2],std(dcE[a][b][1])))==0))
+                if((size(reduce(dcE[a][b][1],std(pr[j][2]),5))==0)&&
+                   (size(reduce(pr[j][2],std(dcE[a][b][1]),5))==0))
                 {
                   templist[a][b]=Vielfachheit(pr[j][1],pr[j][2]);
                   v[j]=1;
@@ -3890,7 +3890,7 @@ static proc invSort(list re, list #)
      intvec e;
      for(j=1;j<=size(BO[4]);j++)
      {
-        if(size(reduce(BO[4][j],std(cent+BO[1])))==0)
+        if(size(reduce(BO[4][j],std(cent+BO[1]),5))==0)
         {
            e[j]=1;
         }
@@ -4247,8 +4247,8 @@ EXAMPLE:  example collectDiv;   shows an example
                       if(deg(tempsat[1][1])!=0)
                       {
 //--- saved center can be seen in this affine chart
-                        if((size(reduce(tempsat[1],std(cent)))==0) &&
-                           (size(reduce(cent,tempsat[1]))==0))
+                        if((size(reduce(tempsat[1],std(cent),5))==0) &&
+                           (size(reduce(cent,tempsat[1],5))==0))
                         {
 //--- this was the saved center which was used
                            savedCent=1;
@@ -4396,7 +4396,7 @@ EXAMPLE:  example collectDiv;   shows an example
      if(defined(S)){kill S;}
      def S=re[2][i];
      setring S;
-     if(size(reduce(cent,std(BO[2])))==0)
+     if(size(reduce(cent,std(BO[2]),5))==0)
      {
         tempiv=i,0;
         RE[size(RE)+1]=tempiv;
@@ -4509,8 +4509,8 @@ static proc cleanUpDiv(list re,intmat M,list divList)
          setring SPa;
          if(defined(tempIdE)){kill tempIdE;}
          ideal tempIdE=fetchInTree(re,oPa,comPa,mPa,"cent",divList);
-         if((size(reduce(cent,std(tempIdE)))!=0)||
-            (size(reduce(tempIdE,std(cent)))!=0))
+         if((size(reduce(cent,std(tempIdE),5))!=0)||
+            (size(reduce(tempIdE,std(cent),5))!=0))
          {
 //--- it is not the same divisor!
             j++;
@@ -4910,10 +4910,10 @@ proc fetchInTree(list L,
       for(i=branchPos-1;i<=size(BO[4]);i++)
       {
 //--- run through all relevant exceptional divisors
-        if(size(reduce(BO[4][i],std(id1+BO[1])))==0)
+        if(size(reduce(BO[4][i],std(id1+BO[1]),5))==0)
         {
 //--- V(id1) is contained in except. div. i in this chart
-           if(size(reduce(id1,std(BO[4][i])))!=0)
+           if(size(reduce(id1,std(BO[4][i]),5))!=0)
            {
 //--- V(id1) does not equal except. div. i of this chart
              Etemp=BO[4][i];
@@ -4930,7 +4930,7 @@ proc fetchInTree(list L,
                   for(j=1;j<=size(prtemp);j++)
                   {
 //--- find correct component
-                     if(size(reduce(prtemp[j],std(id1)))==0)
+                     if(size(reduce(prtemp[j],std(id1),5))==0)
                      {
                         Etemp=prtemp[j];
                         break;
@@ -4969,7 +4969,7 @@ proc fetchInTree(list L,
                    {
 //--- find the (univariate) generator of prtemp[1] which is the remaining
 //--- factor from the factorization over the extension field
-                      if(size(reduce(prtemp[1][j],std(id1)))>0)
+                      if(size(reduce(prtemp[1][j],std(id1),5))>0)
                       {
                          tli[2]=tli[2]*prtemp[1][j];
                       }
@@ -5142,10 +5142,10 @@ proc fetchInTree(list L,
             for(i=branchPos-1;i<=size(BO[4]);i++)
             {
 //--- run through all relevant exceptional divisors
-               if(size(reduce(BO[4][i],std(id1)))==0)
+               if(size(reduce(BO[4][i],std(id1),5))==0)
                {
 //--- V(id1) is contained in except. div. i in this chart
-                  if(size(reduce(id1,std(BO[4][i])))!=0)
+                  if(size(reduce(id1,std(BO[4][i]),5))!=0)
                   {
 //--- V(id1) does not equal except. div. i of this chart
                      if(defined(Etemp)) {kill Etemp;}
@@ -5162,7 +5162,7 @@ proc fetchInTree(list L,
                            for(j=1;j<=size(prtemp);j++)
                            {
 //--- find correct component
-                               if(size(reduce(prtemp[j],std(id1)))==0)
+                               if(size(reduce(prtemp[j],std(id1),5))==0)
                                {
                                   Etemp=prtemp[j];
                                   break;
@@ -5202,7 +5202,7 @@ proc fetchInTree(list L,
                          {
 //--- find the (univariate) generator of prtemp[1] which is the remaining
 //--- factor from the factorization over the extension field
-                           if(size(reduce(prtemp[1][j],std(id1)))>0)
+                           if(size(reduce(prtemp[1][j],std(id1),5))>0)
                            {
                               tli[2]=tli[2]*prtemp[1][j];
                            }

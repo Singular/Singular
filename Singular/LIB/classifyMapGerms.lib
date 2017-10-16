@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version classifyMapGerms.lib 4.0.3.3 Sep_2016 "; // $Id$
+version="version classifyMapGerms.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:   classifyMapGerms.lib
@@ -242,7 +242,7 @@ REMARk:   needed to compute the determinacy
       T=maxideal(1)*T;
 
       M=std(jet(M0,i)+maxideal(1)*T);
-      if(size(reduce(T,M,1))==0){return(i);}
+      if(size(reduce(T,M,5))==0){return(i);}
       if(i>100){M0=std(M0);if(vdim(M0)==-1){break;}}
    }
    return(-1);
@@ -387,7 +387,7 @@ static proc myReduce(vector f, module M, int bound)
    {
       for(i=1;i<=size(M);i++)
       {
-         if(reduce(lead(f),std(lead(M[i])))==0)
+         if(reduce(lead(f),std(lead(M[i])),5)==0)
          {
             c=leadcoef(f)/leadcoef(M[i]);
             vv=lead(f);ww=lead(M[i]);
@@ -403,7 +403,7 @@ static proc myReduce(vector f, module M, int bound)
          g=0;
          for(i=1;i<=size(M);i++)
          {
-            if(reduce(lead(f),std(lead(M[i])))==0)
+            if(reduce(lead(f),std(lead(M[i])),5)==0)
             {
                c=leadcoef(f)/leadcoef(M[i]);
                vv=lead(f);ww=lead(M[i]);
@@ -801,10 +801,18 @@ static proc deleteUnluckyPrimesM(list T, list L)
       {
          cT = lead(T[j]);
          attrib(cT,"isSB",1);
-         if((size(reduce(cT,lT))!=0)||(size(reduce(lT,cT))!=0))
+         if(size(reduce(cT,lT,5))!=0)
          {
             cK = cT;
             c++;
+         }
+         else
+         {
+           if(size(reduce(lT,cT,5))!=0)
+           {
+              cK = cT;
+              c++;
+           }
          }
       }
       if(c > size(T) div 2){ lT = cK; }
@@ -816,7 +824,7 @@ static proc deleteUnluckyPrimesM(list T, list L)
    {
       cT = lead(T[j]);
       attrib(cT,"isSB",1);
-      if((size(reduce(cT,lT)) != 0)||(size(reduce(lT,cT)) != 0))
+      if((size(reduce(cT,lT,5)) != 0)||(size(reduce(lT,cT,5)) != 0))
       {
          T = delete(T,j);
          if(j == 1)
@@ -893,7 +901,7 @@ int bound)
    module L = fetch(R0,L);
    attrib(M,"isSB",1);
    attrib(L,"isSB",1);
-   j=size(reduce(W[1],M))+size(reduce(W[2],L));
+   j=size(reduce(W[1],M,5))+size(reduce(W[2],L,5));
    setring R0;
    return(!j);
 }
@@ -910,7 +918,7 @@ static proc pTestSBM0(string command, alias list args, def result, int p)
     def result = fetch(R0, result);
     attrib(result[1],"isSB",1);
     attrib(result[2],"isSB",1);
-    int j=size(reduce(W[1],result[1]))+size(reduce(W[2],result[2]));
+    int j=size(reduce(W[1],result[1],5))+size(reduce(W[2],result[2],5));
     setring R0;
     return(!j);
 }
@@ -928,7 +936,7 @@ static proc pTestSBM0_size1(string command, alias list args, def result, int p)
     module L = vStd_size1(args[1..4]);
     def result = fetch(R0, result);
     attrib(result,"isSB",1);
-    int j = size(reduce(L, result));
+    int j = size(reduce(L, result,5));
     setring R0;
 
     return(!j);

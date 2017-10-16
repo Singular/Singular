@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="version nfmodstd.lib 4.0.1.0 Sep_2014 ";  // $Id$
+version="version nfmodstd.lib 4.1.0.3 Oct_2017 ";  // $Id$
 category="Commutative Algebra";
 info="
 
@@ -552,14 +552,14 @@ static proc final_Test_minpolyzero(string command, alias list args, module resul
     attrib(result, "isSB", 1);
     for (i = ncols(args[1]); i > 0; i--)
     {
-         if (reduce(args[1][i], result, 1) != 0)
+         if (reduce(args[1][i], result, 5) != 0)
          {
               return(0);
          }
     }
     /* test if result is a GB */
     module G = std(result);
-    if (size(reduce(G, result,1))!=0) //Modstd::reduce_parallel(G, result)
+    if (size(reduce(G, result,5))!=0) //Modstd::reduce_parallel(G, result)
     {
          return(0);
     }
@@ -580,7 +580,7 @@ static proc final_Test(string command, alias list args, def result)
         attrib(result, "isSB", 1);
         for (i = ncols(args[1]); i > 0; i--)
         {
-            if (reduce(args[1][i], result, 1) != 0)
+            if (reduce(args[1][i], result, 5) != 0)
             {
                 return(0);
             }
@@ -588,7 +588,7 @@ static proc final_Test(string command, alias list args, def result)
 
         /* test if result is a GB */
         ideal G = std(result);
-        if (size(reduce(G, result,1))!=0) //Modstd::reduce_parallel(G, result)
+        if (size(reduce(G, result,5))!=0) //Modstd::reduce_parallel(G, result)
         {
             return(0);
         }
@@ -628,7 +628,7 @@ static proc final_Test(string command, alias list args, def result)
         attrib(Result, "isSB", 1);
         for (i = ncols(ar_gs); i > 0; i--)
         {
-            if (reduce(ar_gs[i], Result, 1) != 0)
+            if (reduce(ar_gs[i], Result, 5) != 0)
             {
                 setring Ls;
                 return(0);
@@ -636,7 +636,7 @@ static proc final_Test(string command, alias list args, def result)
         }
         // test if result is a GB
         module G = std(Result);
-        if (size(reduce(G,Result,1))!=0) //Modstd::reduce_parallel(G, Result)
+        if (size(reduce(G,Result,5))!=0) //Modstd::reduce_parallel(G, Result)
         {
             setring Ls;
             return(0);
@@ -672,7 +672,7 @@ static proc PtestStd_minpolyzero(string command, list args, module result, int p
     attrib(Gp, "isSB", 1);
     for (i = ncols(Ip); i > 0; i--)
     {
-        if (reduce(Ip[i], Gp, 1) != 0)
+        if (reduce(Ip[i], Gp, 5) != 0)
         {
             setring(br);
             return(0);
@@ -682,7 +682,7 @@ static proc PtestStd_minpolyzero(string command, list args, module result, int p
     attrib(Ip,"isSB",1);
     for (i = ncols(Gp); i > 0; i--)
     {
-        if (reduce(Gp[i], Ip, 1) != 0)
+        if (reduce(Gp[i], Ip, 5) != 0)
         {
             setring(br);
             return(0);
@@ -794,7 +794,7 @@ static proc PtestStd(string command, list args, def result, int p)
         attrib(Gp, "isSB", 1);
         for (i = ncols(Jp); i > 0; i--)
         {
-            if (reduce(Jp[i], Gp, 1) != 0)
+            if (reduce(Jp[i], Gp, 5) != 0)
             {
                 setring(br);
                 return(0);
@@ -804,7 +804,7 @@ static proc PtestStd(string command, list args, def result, int p)
         attrib(Ip,"isSB",1);
         for (i = ncols(Gp); i > 0; i--)
         {
-            if (reduce(Gp[i], Ip, 1) != 0)
+            if (reduce(Gp[i], Ip, 5) != 0)
             {
                 setring(br);
                 return(0);
@@ -819,7 +819,7 @@ static proc PtestStd(string command, list args, def result, int p)
         attrib(Gp, "isSB", 1);
         for (i = ncols(Ip); i > 0; i--)
         {
-            if (reduce(Ip[i], Gp, 1) != 0)
+            if (reduce(Ip[i], Gp, 5) != 0)
             {
                 setring(br);
                 return(0);
@@ -829,7 +829,7 @@ static proc PtestStd(string command, list args, def result, int p)
         attrib(Ip,"isSB",1);
         for (i = ncols(Gp); i > 0; i--)
         {
-            if (reduce(Gp[i], Ip, 1) != 0)
+            if (reduce(Gp[i], Ip, 5) != 0)
             {
                 setring(br);
                 return(0);

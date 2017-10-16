@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version ffmodstd.lib 4.0.3.0 May_2016 "; // $Id$
+version="version ffmodstd.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:   ffmodstd.lib  Groebner bases of ideals in polynomial rings
@@ -2214,7 +2214,7 @@ static proc ideal_Inclusion(ideal I, ideal fareyresult)
     int i;
     for(i = ncols(I); i >= 1; i--)
     {
-        if(reduce(I[i],fareyresult,1)!= 0)
+        if(reduce(I[i],fareyresult,5)!= 0)
         {
             return(0);
         }
@@ -2251,7 +2251,7 @@ static proc pTest_tran(string Command,list args, ideal fareyResult,int Testp)
     if(ideal_Inclusion(Jp,fry))
     {
         // test if fry is in Jp
-        if(size(reduce(fry,Jp))==0)
+        if(size(reduce(fry,Jp,5))==0)
         {
             setring St;
             return(1);
@@ -2269,7 +2269,7 @@ static proc finalTest(ideal I, ideal fareyresult)
     int i;
     for(i = ncols(I); i >= 1; i--)
     {
-        if(reduce(I[i],fareyresult,1)!= 0)
+        if(reduce(I[i],fareyresult,5)!= 0)
         {
             return(0);
         }
@@ -2277,7 +2277,7 @@ static proc finalTest(ideal I, ideal fareyresult)
     //return 1 if std(fareyresult) included in fareyresult otherwise 0
     attrib(fareyresult,"isSB",1);
     ideal J=std(fareyresult);
-    if(size(reduce(J,fareyresult,1))!=0)
+    if(size(reduce(J,fareyresult,5))!=0)
     {
         return(0);
     }
@@ -2306,7 +2306,7 @@ static proc finalTest_tran(string Command,list args, ideal fareyresult)
     int i;
     for(i = ncols(I); i >= 1; i--)
     {
-        if(reduce(I[i],fareyresult,1)!= 0)
+        if(reduce(I[i],fareyresult,5)!= 0)
         {
             setring St;
             return(0);
@@ -2315,7 +2315,7 @@ static proc finalTest_tran(string Command,list args, ideal fareyresult)
     //return 1 if std(fareyresult) included in fareyresult otherwise 0
     attrib(fareyresult,"isSB",1);
     ideal J=std(fareyresult);
-    if(size(reduce(J,fareyresult,1))!=0)
+    if(size(reduce(J,fareyresult,5))!=0)
     {
         setring St;
         return(0);

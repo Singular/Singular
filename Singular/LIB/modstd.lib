@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version modstd.lib 4.0.2.0 Aug_2015 "; // $Id$
+version="version modstd.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  modstd.lib      Groebner bases of ideals using modular methods
@@ -245,8 +245,8 @@ static proc deleteUnluckyPrimes_std(alias list modresults)
         for (j = 1; j <= size_cat; j++)
         {
             if (size(L) == size(cat[j][1])
-            && size(reduce(L, cat[j][1])) == 0
-            && size(reduce(cat[j][1], L)) == 0)
+            && size(reduce(L, cat[j][1], 5)) == 0
+            && size(reduce(cat[j][1], L, 5)) == 0)
             {
                 cat[j][2] = cat[j][2]+1;
                 cat[j][3][cat[j][2]] = i;
@@ -550,7 +550,7 @@ EXAMPLE: example deleteUnluckyPrimes; shows an example
       {
          cT = lead(T[j]);
          attrib(cT,"isSB",1);
-         if((size(reduce(cT,lT))!=0)||(size(reduce(lT,cT))!=0))
+         if((size(reduce(cT,lT,5))!=0)||(size(reduce(lT,cT,5))!=0))
          {
             cK = cT;
             c++;
@@ -589,7 +589,7 @@ EXAMPLE: example deleteUnluckyPrimes; shows an example
    {
       cT = lead(T[j]);
       attrib(cT,"isSB",1);
-      if((size(reduce(cT,lT)) != 0)||(size(reduce(lT,cT)) != 0))
+      if((size(reduce(cT,lT,5)) != 0)||(size(reduce(lT,cT,5)) != 0))
       {
          T = delete(T,j);
          if(j == 1)

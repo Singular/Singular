@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version groups.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version groups.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Applications";
 info="
 LIBRARY:  groups.lib      Finite Group Theory
@@ -137,9 +137,9 @@ EXAMPLE: example splitS1; shows an example
          while(k<size(re))
          {
             k++;
-            if(size(reduce(re[k],I))==0){e=0;break;}
+            if(size(reduce(re[k],I,5))==0){e=0;break;}
             attrib(re[k],"isSB",1);
-            if(size(reduce(I,re[k]))==0){re=delete(re,k);k--;}
+            if(size(reduce(I,re[k],5))==0){re=delete(re,k);k--;}
          }
          if(j==2){I[i]=I[i]*n;}
          if(e)
@@ -168,7 +168,7 @@ EXAMPLE: example splitS1; shows an example
    }
    J=timeStd(I,s);       //J=std(I) in splitS
    attrib(I,"isSB",1);
-   if(size(reduce(J,I))==0){return(list(re+list(I),qr));}
+   if(size(reduce(J,I,5))==0){return(list(re+list(I),qr));}
    pr=splitS(J,s,re);
    return(list(re+pr[1],pr[2]));
 }
@@ -244,9 +244,9 @@ EXAMPLE: example splitS; shows an example
          while(k<size(re))
          {
             k++;
-            if(size(reduce(re[k],I))==0){e=0;break;}
+            if(size(reduce(re[k],I,5))==0){e=0;break;}
             attrib(re[k],"isSB",1);
-            if(size(reduce(I,re[k]))==0){re=delete(re,k);k--;}
+            if(size(reduce(I,re[k],5))==0){re=delete(re,k);k--;}
          }
          if(j==2){I[i]=I[i]*n;}
          if(e)
@@ -275,7 +275,7 @@ EXAMPLE: example splitS; shows an example
    }
    J=std(I);
    attrib(I,"isSB",1);
-   if(size(reduce(J,I))==0){return(list(re+list(I),qr));}
+   if(size(reduce(J,I,5))==0){return(list(re+list(I),qr));}
    pr=splitS(J,s,re);
    return(list(re+pr[1],pr[2]));
 }
@@ -774,7 +774,7 @@ EXAMPLE: example trivialSplit; shows an example
             }
             else
             {
-               if(size(reduce(trivialSimplify(T,Ke),K))!=0)
+               if(size(reduce(trivialSimplify(T,Ke),K,5))!=0)
                {
                   pr=trivialSplit(K,depth-1,trivialSimplify(T,Ke));
                   re=re+pr[1];

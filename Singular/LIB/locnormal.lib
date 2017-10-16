@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version locnormal.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version locnormal.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: locnormal.lib   Normalization of affine domains using local methods
@@ -303,7 +303,7 @@ static proc locComps(list l)
 static proc subset(ideal I, ideal J)
 {
   J = groebner(J);
-  return(size(reduce(I, J)) == 0);
+  return(size(reduce(I, J, 5)) == 0);
 }
 
 
