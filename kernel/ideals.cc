@@ -204,7 +204,8 @@ ideal idSectWithElim (ideal h1,ideal h2)
 */
 ideal idSect (ideal h1,ideal h2, GbVariant alg)
 {
-  int i,j,k,length;
+  int i,j,k;
+  unsigned length;
   int flength = id_RankFreeModule(h1,currRing);
   int slength = id_RankFreeModule(h2,currRing);
   int rank=si_max(h1->rank,h2->rank);
@@ -423,7 +424,8 @@ ideal idSect (ideal h1,ideal h2, GbVariant alg)
 */
 ideal idMultSect(resolvente arg, int length, GbVariant alg)
 {
-  int i,j=0,k=0,syzComp,l,maxrk=-1,realrki;
+  int i,j=0,k=0,l,maxrk=-1,realrki;
+  unsigned syzComp;
   ideal bigmat,tempstd,result;
   poly p;
   int isIdeal=0;
@@ -1419,23 +1421,19 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN *ad
   pSetComp(p,kmax);
   pSetmComp(p);
 /*--- constructing the big matrix ------------------------*/
-  ideal h4 = idInit(16,kmax+k-1);
+  ideal h4 = idInit(k,kmax+k-1);
   h4->m[0] = q;
   if (k2 == 0)
   {
-    if (k > IDELEMS(h4))
-    {
-      pEnlargeSet(&(h4->m),IDELEMS(h4),k-IDELEMS(h4));
-      IDELEMS(h4) = k;
-    }
     for (i=1; i<k; i++)
     {
       if (h4->m[i-1]!=NULL)
       {
-        p = p_Copy_noCheck(h4->m[i-1], currRing); p_Shift(&p,1,currRing);
-        // pTest(p);
+        p = p_Copy_noCheck(h4->m[i-1], currRing);
+	p_Shift(&p,1,currRing);
         h4->m[i] = p;
       }
+      else break;
     }
   }
   idSkipZeroes(h4);
@@ -1478,6 +1476,7 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN *ad
   //idTest(h4);//see remark at the beginning
   return h4;
 }
+
 /*2
 *computes the quotient of h1,h2
 */
