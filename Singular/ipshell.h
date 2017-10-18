@@ -62,7 +62,8 @@ BOOLEAN iiWRITE(leftv res,leftv exprlist);
 BOOLEAN iiExport(leftv v, int toLev);
 BOOLEAN iiExport(leftv v, int toLev, package pack);
 BOOLEAN iiInternalExport (leftv v, int toLev, package pack);
-char *  iiGetLibName(procinfov v);
+/// find the library of an proc
+static inline char *  iiGetLibName(const procinfov pi) { return pi->libname; }
 char *  iiGetLibProcBuffer( procinfov pi, int part=1 );
 char *  iiProcName(char *buf, char & ct, char* &e);
 char *  iiProcArgs(char *e,BOOLEAN withParenth);

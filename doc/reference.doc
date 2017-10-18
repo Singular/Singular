@@ -2708,7 +2708,7 @@ See
 none (if called with one argument)
 @*intvec (if called with two or three arguments)
 @item @strong{Purpose:}
-computes the (weighted) Hilbert series of the ideal, resp.@: module,
+computes the (weighted) Hilbert series of the base ring R modulo the ideal, resp.@: R^k modulo the module,
 defined by the leading terms of the generators of the given ideal, resp.@: module.@*
 If @code{hilb} is called with one argument, then the first and second Hilbert series
 together with some additional information are displayed.@*
@@ -7794,7 +7794,9 @@ module
 computes the first syzygy (i.e., the module of relations of the given
 generators) of the ideal, resp.@: module.
 @*An optional second argument specifies the Groebner base algorith to use.
-Possible values are @code{"std"} and @code{"slimgb"}.
+Possible values are @code{"std"}(default) and @code{"slimgb"}.
+@*Only for use of "std": If @code{option(returnSB)} is set,
+a standard basis is returned, otherwise a generating set.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -7812,6 +7814,7 @@ See
 @ref{module};
 @ref{mres};
 @ref{nres};
+@ref{option};
 @ref{res};
 @ref{sres};
 @ref{lift};

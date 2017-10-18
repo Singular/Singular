@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version modnormal.lib 4.0.0.0 Dec_2013 "; // $Id$
+version="version modnormal.lib 4.1.0.3 Oct_2017 "; // $Id$
 category = "Commutative Algebra";
 info="
 LIBRARY:  modnormal.lib    Normalization of affine domains using modular methods
@@ -69,7 +69,7 @@ static proc pTestNormal(ideal I, list L, int p, ideal normalIP)
   // Check if the universal denominator is valid
   ideal cOut = conduP*outP;
   ideal dI = ideal(denOutP) + IP;
-  int inc = size(reduce(cOut, groebner(dI)));
+  int inc = size(reduce(cOut, groebner(dI), 5));
   if(inc > 0)
   {
     "Inclusion is not satisfied. Unlucky prime?";
@@ -137,7 +137,7 @@ static proc modpNormal(ideal I, int p, poly condu,int printTimings,list #)
   // Check if the universal denominator is valid
   ideal cOut = conduP*outP;
   ideal dI = ideal(denOutP) + IP;
-  int inc = size(reduce(cOut, groebner(dI)));
+  int inc = size(reduce(cOut, groebner(dI), 5));
   if(inc > 0)
   {
     ERROR("Inclusion is not satisfied. Unlucky prime?");
@@ -470,7 +470,7 @@ static proc outComp(ideal Out1, ideal Out2, poly den1, poly den2, ideal I)
   Out2 = changeDenominator(Out2, den2, den1, I);
   Out1 = groebner(I+Out1);
   Out2 = groebner(I+Out2);
-  return((size(reduce(Out1, Out2)) == 0) * (size(reduce(Out2, Out1)) == 0));
+  return((size(reduce(Out1, Out2, 5)) == 0) * (size(reduce(Out2, Out1, 5)) == 0));
 }
 
 

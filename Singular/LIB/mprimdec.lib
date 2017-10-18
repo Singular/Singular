@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
-version="version mprimdec.lib 4.0.3.3 Sep_2016 "; // $Id$
+version="version mprimdec.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Commutative Algebra";
 
 info="
@@ -2235,7 +2235,7 @@ EXAMPLE: example stdModulesEqual; shows an example
          }
       }
       attrib(k2,"isSB",1);
-      if(size(reduce(k1,k2,1))==0)
+      if(size(reduce(k1,k2,5))==0)
       {
          return(1);
       }

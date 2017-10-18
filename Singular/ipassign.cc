@@ -1102,11 +1102,14 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
   }
   if(rt==NONE)
   {
-    WarnS("right side is not a datum, assignment ignored");
-    Warn("in line >>%s<<",my_yylinebuf);
-    // if (!errorreported)
-    //   WerrorS("right side is not a datum");
-    //return TRUE;
+    if ((!TEST_V_ASSIGN_NONE)||(lt!=DEF_CMD))
+    {
+      WarnS("right side is not a datum, assignment ignored");
+      Warn("in line >>%s<<",my_yylinebuf);
+      // if (!errorreported)
+      //   WerrorS("right side is not a datum");
+      //return TRUE;
+    }
     return FALSE;
   }
 

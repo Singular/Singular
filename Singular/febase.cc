@@ -41,6 +41,7 @@
 int     si_echo = 0;
 int     printlevel = 0;
 int     colmax = 80;
+int     pagelength = 24;
 char    prompt_char = '>'; /*1 either '>' or '.'*/
 int     yylineno  = 0;
 int  myynest = -1;

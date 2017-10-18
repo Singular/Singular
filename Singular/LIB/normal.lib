@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version normal.lib 4.1.0.0 Jan_2017 "; // $Id$
+version="version normal.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -3943,7 +3943,7 @@ static proc normalityTest(list mstdid)
       K = LK[2];
 
    //---------------------------- simplify output --------------------------
-      if(size(reduce(U,LK[1]))==0)  //previous U coincides with new U
+      if(size(reduce(U,LK[1],5))==0)  //previous U coincides with new U
       {                             //i.e. we reached the integral closure
          U=simplify(reduce(U,groebner(D)),2);
          U = D,U;
@@ -6532,12 +6532,12 @@ proc timeNormal(ideal I, list #)
       ideal U2 = fetch(r, U2);
       ideal W = fetch(r, W);
       ch = 0;
-      if(size(reduce(U2, groebner(W))) == 0)
+      if(size(reduce(U2, groebner(W),5)) == 0)
       {
         "U2 c U1";
         ch = 1;
       }
-      if(size(reduce(W, groebner(U2))) == 0)
+      if(size(reduce(W, groebner(U2),5)) == 0)
       {
         "U1 c U2";
         ch = ch + 1;
@@ -6576,12 +6576,12 @@ proc timeNormal(ideal I, list #)
       ideal U2 = fetch(r, U2);
       ideal W = fetch(r, W);
       ch = 0;
-      if(size(reduce(U2, groebner(W))) == 0)
+      if(size(reduce(U2, groebner(W),5)) == 0)
       {
         "U2 c U1";
         ch = 1;
       }
-      if(size(reduce(W, groebner(U2))) == 0)
+      if(size(reduce(W, groebner(U2),5)) == 0)
       {
         "U1 c U2";
         ch = ch + 1;

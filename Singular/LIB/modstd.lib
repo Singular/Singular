@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version modstd.lib 4.0.2.0 Aug_2015 "; // $Id$
+version="version modstd.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  modstd.lib      Groebner bases of ideals using modular methods
@@ -110,7 +110,7 @@ proc modSyz(def I)
 RETURN:   a generating set of syzygies of I
 NOTE:     The procedure computes a the syzygy module of I (over the rational
           numbers) by using modular methods with high probability.
-	  The property of being a syzygy is tested.
+          The property of being a syzygy is tested.
 SEE ALSO: modular
 EXAMPLE:  example modSyz; shows an example"
 {
@@ -143,8 +143,8 @@ proc modIntersect(def I, def J)
 RETURN:   a generating set of the intersection of I and J
 NOTE:     The procedure computes a the intersection of I and J
           (over the rational numbers) by using modular methods
-	  with high probability.
-	  No additional tests are performed.
+          with high probability.
+          No additional tests are performed.
 SEE ALSO: modular
 EXAMPLE:  example modIntersect; shows an example"
 {
@@ -245,8 +245,8 @@ static proc deleteUnluckyPrimes_std(alias list modresults)
         for (j = 1; j <= size_cat; j++)
         {
             if (size(L) == size(cat[j][1])
-            && size(reduce(L, cat[j][1])) == 0
-            && size(reduce(cat[j][1], L)) == 0)
+            && size(reduce(L, cat[j][1], 5)) == 0
+            && size(reduce(cat[j][1], L, 5)) == 0)
             {
                 cat[j][2] = cat[j][2]+1;
                 cat[j][3][cat[j][2]] = i;
@@ -283,10 +283,29 @@ static proc deleteUnluckyPrimes_std(alias list modresults)
     }
     return(unluckyIndices);
 }
+////////////////////////////////////////////////////////////////////////////////
+
+static proc cleardenomModule(def I)
+{
+  int t=ncols(I);
+  if(size(I)==0)
+  {
+      return(I);
+  }
+  else
+  {
+    for(int i=1;i<=t;i++)
+    {
+      I[i]=cleardenom(I[i]);
+    }
+  }
+  return(I);
+}
 
 static proc pTest_syz(string command, alias list args, alias def result, int p)
 {
-  return(size(module(matrix(args[1])*matrix(result)))==0);
+  module result_without_denom=cleardenomModule(result);
+  return(size(module(matrix(args[1])*matrix(result_without_denom)))==0);
 }
 
 /* test if 'command' applied to 'args' in characteristic p is the same as
@@ -531,7 +550,7 @@ EXAMPLE: example deleteUnluckyPrimes; shows an example
       {
          cT = lead(T[j]);
          attrib(cT,"isSB",1);
-         if((size(reduce(cT,lT))!=0)||(size(reduce(lT,cT))!=0))
+         if((size(reduce(cT,lT,5))!=0)||(size(reduce(lT,cT,5))!=0))
          {
             cK = cT;
             c++;
@@ -570,7 +589,7 @@ EXAMPLE: example deleteUnluckyPrimes; shows an example
    {
       cT = lead(T[j]);
       attrib(cT,"isSB",1);
-      if((size(reduce(cT,lT)) != 0)||(size(reduce(lT,cT)) != 0))
+      if((size(reduce(cT,lT,5)) != 0)||(size(reduce(lT,cT,5)) != 0))
       {
          T = delete(T,j);
          if(j == 1)

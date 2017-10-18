@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version primdec.lib 4.0.2.0 Apr_2015 "; // $Id$
+version="version primdec.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -418,7 +418,7 @@ static proc stdIdealsEqual( ideal k1, ideal k2)
       }
     }
     attrib(k2,"isSB",1);
-    if(size(reduce(k1,k2,1))==0)
+    if(size(reduce(k1,k2,5))==0)
     {
       return(1);
     }
@@ -486,7 +486,7 @@ proc primaryTest (ideal i, poly p)
       }
       t=leadcoef(i[m])*e*var(n)^f+(i[m]-lead(i[m]))/var(n)^((e-1)*f);
       i[m]=poly(e)^e*leadcoef(i[m])^(e-1)*i[m];
-      if (reduce(i[m]-t^e,prm,1) !=0)
+      if (reduce(i[m]-t^e,prm,5) !=0)
       {
         return(ideal(0));
       }
@@ -508,7 +508,7 @@ proc primaryTest (ideal i, poly p)
     {
       t=leadcoef(i[m])*e*var(n)+(i[m]-lead(i[m]))/var(n)^(e-1);
       i[m]=poly(e)^e*leadcoef(i[m])^(e-1)*i[m];
-      if (reduce(i[m]-t^e,prm,1) !=0)
+      if (reduce(i[m]-t^e,prm,5) !=0)
       {
         return(ideal(0));
       }
@@ -571,7 +571,7 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
   while(i<size(l) div 2)
   {
     i++;
-    if((size(ser)>0)&&(size(reduce(ser,l[2*i-1],1))==0))
+    if((size(ser)>0)&&(size(reduce(ser,l[2*i-1],5))==0))
     {
       l[2*i-1]=ideal(1);
       l[2*i]=ideal(1);
@@ -701,7 +701,7 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
   {
     attrib(l[2*i-1],"isSB",1);
 
-    if((size(ser)>0)&&(size(reduce(ser,l[2*i-1],1))==0)&&(deg(l[2*i-1][1])>0))
+    if((size(ser)>0)&&(size(reduce(ser,l[2*i-1],5))==0)&&(deg(l[2*i-1][1])>0))
     {
       "Achtung in split";
 
@@ -915,7 +915,7 @@ EXAMPLE: example zero_decomp; shows an example
       primary[2*@k]=interred(@qh);
       attrib( primary[2*@k-1],"isSB",1);
 
-      if((size(ser)>0)&&(size(reduce(ser,primary[2*@k-1],1))==0))
+      if((size(ser)>0)&&(size(reduce(ser,primary[2*@k-1],5))==0))
       {
         primary[2*@k-1]=ideal(1);
         primary[2*@k]=ideal(1);
@@ -929,7 +929,7 @@ EXAMPLE: example zero_decomp; shows an example
   if(homog(j)==1)
   {
     primary[1]=j;
-    if((size(ser)>0)&&(size(reduce(ser,j,1))==0))
+    if((size(ser)>0)&&(size(reduce(ser,j,5))==0))
     {
       primary[1]=ideal(1);
       primary[2]=ideal(1);
@@ -1177,7 +1177,7 @@ EXAMPLE: example zero_decomp; shows an example
         attrib(lres0[1],"isSB",1);
         ser1=psi(helpprim);
         lres0[2]=psi1(ser1);
-        if(size(reduce(lres0[2],lres0[1],1))==0)
+        if(size(reduce(lres0[2],lres0[1],5))==0)
         {
           primary[2*@k]=primary[2*@k-1];
           continue;
@@ -2476,17 +2476,17 @@ static proc union(list li)
         attrib(@erg[k],"isSB",1);
         attrib(i2,"isSB",1);
 
-        if(size(reduce(i1,i2,1))==0)
+        if(size(reduce(i1,i2,5))==0)
         {
-           if(size(reduce(@erg[i],@erg[k],1))==0)
+           if(size(reduce(@erg[i],@erg[k],5))==0)
            {
               @erg[k]=ideal(1);
               i2=ideal(1);
            }
         }
-        if(size(reduce(i2,i1,1))==0)
+        if(size(reduce(i2,i1,5))==0)
         {
-           if(size(reduce(@erg[k],@erg[i],1))==0)
+           if(size(reduce(@erg[k],@erg[i],5))==0)
            {
               break;
            }
@@ -2601,7 +2601,7 @@ EXAMPLE:example equidim; shows an example
   {
      ideal k=equidimMaxEHV(j);
   }
-  if(size(reduce(k,j,1))==0)
+  if(size(reduce(k,j,5))==0)
   {
     setring P;
     eq[1]=i;
@@ -3760,7 +3760,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
       setring gnir;
       ser=imap(@Phelp,ser);
     }
-    if(size(reduce(ser,peek,1))!=0)
+    if(size(reduce(ser,peek,5))!=0)
     {
       for(@m=1;@m<=size(restindep);@m++)
       {
@@ -3989,7 +3989,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
         quprimary=resu;
         @wr=3;
       }
-      if(size(reduce(ser,peek,1))!=0)
+      if(size(reduce(ser,peek,5))!=0)
       {
         htprimary=decomp_i(patchPrimaryDecomposition, @j,@wr,peek,ser);
         // here we collect now both results primary(sat(j,gh))
@@ -4077,7 +4077,7 @@ proc sep(poly f,int i, list #)
 
 
    poly h=gcd(f,diff(f,var(i)));
-   if((reduce(f,std(h))!=0)||(reduce(diff(f,var(i)),std(h))!=0))
+   if((reduce(f,std(h),5)!=0)||(reduce(diff(f,var(i)),std(h),5)!=0))
    {
       ERROR("FEHLER IN GCD");
    }
@@ -4325,7 +4325,7 @@ EXAMPLE: example radicalEHV; shows an example
     L=quotient(radI0,I);
     radI1=quotient(radI0,L);
 
-    if(size(reduce(radI1,m[1],1))==0)
+    if(size(reduce(radI1,m[1],5))==0)
     {
       return(I);
     }
@@ -4462,7 +4462,7 @@ static proc analyze(list pr)
    {
       for(jj=1;jj<ii;jj++)
       {
-         if(size(reduce(pr[2*jj],std(pr[2*ii],1)))==0)
+         if(size(reduce(pr[2*jj],std(pr[2*ii],5)))==0)
          {
             "eingebette Komponente";
             jj;
@@ -5940,7 +5940,7 @@ static proc absPrimdecGTZ_i(int patchPrimaryDecomposition, ideal I, list #)
          {
             tempid=absolute_primes[k][1];
             tempid[1]=0;                  // ignore minimal polynomial
-            if(size(reduce(lead(tempid),max_of_r))!=0)
+            if(size(reduce(lead(tempid),max_of_r,5))!=0)
             {
 // 1 contained in ideal, i.e. component does not meet origin in local ordering
                absolute_primes=delete(absolute_primes,k);
@@ -6647,7 +6647,7 @@ EXAMPLE: example radical; shows an example
   for(j = 1; j <= s; j++)
   {
     attrib(pr[s + 1 - j], "isSB", 1);
-    if((size(reduce(rad, pr[s + 1 - j], 1)) != 0) && ((dim(pr[s + 1 - j]) == di) || !il))
+    if((size(reduce(rad, pr[s + 1 - j], 5)) != 0) && ((dim(pr[s + 1 - j]) == di) || !il))
     {
       // SL Debug messages
       dbprint(printlevel-voice, "We shall compute the radical of ", pr[s + 1 - j]);
@@ -6667,7 +6667,7 @@ EXAMPLE: example radical; shows an example
       // SL Debug
       dbprint(printlevel-voice, "The radical of this component is not needed.");
       dbprint(printlevel-voice, "size(reduce(rad, pr[s + 1 - j], 1))",
-              size(reduce(rad, pr[s + 1 - j], 1)));
+              size(reduce(rad, pr[s + 1 - j], 5)));
       dbprint(printlevel-voice, "dim(pr[s + 1 - j])", dim(pr[s + 1 - j]));
       dbprint(printlevel-voice, "il", il);
     }
@@ -8177,7 +8177,7 @@ EXAMPLE: example newDecompStep; shows an example
         setring gnir;
         ser=imap(@Phelp,ser);
      }
-     if(size(reduce(ser,peek,1))!=0)
+     if(size(reduce(ser,peek,5))!=0)
      {
        for(@m=1;@m<=size(restindep);@m++)
        {
@@ -8410,7 +8410,7 @@ EXAMPLE: example newDecompStep; shows an example
          quprimary=resu;
          @wr=3;
        }
-       if(size(reduce(ser,peek,1))!=0)
+       if(size(reduce(ser,peek,5))!=0)
        {
          if(@wr>0)
          {
@@ -9082,7 +9082,7 @@ EXAMPLE: example newZero_decomp; shows an example
       primary[2*@k]=interred(@qh);
       attrib( primary[2*@k-1],"isSB",1);
 
-      if((size(ser)>0)&&(size(reduce(ser,primary[2*@k-1],1))==0))
+      if((size(ser)>0)&&(size(reduce(ser,primary[2*@k-1],5))==0))
       {
         primary[2*@k-1]=ideal(1);
         primary[2*@k]=ideal(1);
@@ -9094,7 +9094,7 @@ EXAMPLE: example newZero_decomp; shows an example
   if(homog(j)==1)
   {
     primary[1]=j;
-    if((size(ser)>0)&&(size(reduce(ser,j,1))==0))
+    if((size(ser)>0)&&(size(reduce(ser,j,5))==0))
     {
       ERROR("dim(ser/j)==-1 unexpected. Please send the example to the authors");
     }
@@ -9333,7 +9333,7 @@ EXAMPLE: example newZero_decomp; shows an example
         attrib(lres0[1],"isSB",1);
         ser1=psi(helpprim);
         lres0[2]=psi1(ser1);
-        if(size(reduce(lres0[2],lres0[1],1))==0)
+        if(size(reduce(lres0[2],lres0[1],5))==0)
         {
           primary[2*@k]=primary[2*@k-1];
           continue;

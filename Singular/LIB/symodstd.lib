@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version symodstd.lib 4.0.0.0 Dec_2013 "; // $Id$
+version="version symodstd.lib 4.1.0.3 Oct_2017 "; // $Id$
 category = "Commutative Algebra";
 info="
 LIBRARY:  symodstd.lib    Procedures for computing Groebner basis of ideals
@@ -1512,7 +1512,7 @@ EXAMPLE: example syModStd; shows an example
                   +string(rtimer - rt)+" seconds.";
                }
 
-               if(size(reduce(K,J)) == 0)
+               if(size(reduce(K,J,5)) == 0)
                {
                   option(set, opt);
                   if(n1 > 1) { kill I_for_fork; }

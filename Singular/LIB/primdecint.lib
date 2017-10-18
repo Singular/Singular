@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version primdecint.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version primdecint.lib 4.1.0.3 Oct_2017 "; // $Id$
 category = "Commutative Algebra";
 info="
 LIBRARY:  primdecint.lib   primary decomposition of an ideal in the polynomial
@@ -237,7 +237,7 @@ EXAMPLE: example primdecZ; shows an example
                N=stdZ(N);
                Q=extractZ(N,j,IS,B);
                //=== test for useless primaries
-               if(size(reduce(TES,Q))>0)
+               if(size(reduce(TES,Q,5))>0)
                {
                   TQ=intersectZ(TQ,Q);
                   //TQ=intersect(TQ,Q);
@@ -257,7 +257,7 @@ EXAMPLE: example primdecZ; shows an example
                K=stdZ(K);
                Q=B[j][1],p;
                Q=stdZ(Q);
-               if(size(reduce(TES,Q))>0)
+               if(size(reduce(TES,Q,5))>0)
                {
                   //TQ=intersectZ(TQ,Q);
                   P[size(P)+1]=list(Q,K);
@@ -284,14 +284,14 @@ EXAMPLE: example primdecZ; shows an example
       J=stdZ(J);
       TQ=intersectZ(TQ,TES);
       //TQ=intersect(TQ,TES);
-      if(size(reduce(TQ,J))!=0)
+      if(size(reduce(TQ,J,5))!=0)
       {
          //=== taking care about embedded components
          K=stdZ(quotientZ(J,TQ));
          ideal W=K;
          m++;
-         while(size(reduce(intersectZ(W,TQ),J))!=0)
-         //while(size(reduce(intersect(W,TQ),J))!=0)
+         while(size(reduce(intersectZ(W,TQ),J,5))!=0)
+         //while(size(reduce(intersect(W,TQ),J,5))!=0)
          {
             W=stdZ(I+specialPowerZ(K,m));
             m++;
@@ -358,7 +358,7 @@ EXAMPLE: example primdecZ; shows an example
           }
           for(i=1;i<=size(pr);i++)
           {
-             if(size(reduce(pr[i][1],M[j][1]))==0)
+             if(size(reduce(pr[i][1],M[j][1],5))==0)
              {
                 M=delete(M,j);
                 j--;
@@ -495,7 +495,7 @@ EXAMPLE: example minAssZ; shows an example
           M[j]=stdZ(M[j]);
           for(i=1;i<=size(pr);i++)
           {
-             if(size(reduce(pr[i],M[j]))==0)
+             if(size(reduce(pr[i],M[j],5))==0)
              {
                 M=delete(M,j);
                 j--;
@@ -1027,7 +1027,7 @@ static proc coefZ(ideal I)
    {
       i++;
       K=quotientOneZ(I,L[i]);
-      if(size(reduce(K,I))!=0)
+      if(size(reduce(K,I,5))!=0)
       {
          h=h*L[i];
          I=stdZ(K);
@@ -1218,7 +1218,7 @@ static proc satZ(ideal I,poly h)
 {
 //=== saturates I by h
    ideal J=quotientOneZ(I,h);
-   while(size(reduce(J,stdZ(I)))!=0)
+   while(size(reduce(J,stdZ(I),5))!=0)
    {
       I=J;
       J=quotientOneZ(I,h);
@@ -1352,7 +1352,7 @@ static proc testPrimaryZ(ideal I, list L)
       K=intersectZ(K,L[i][1]);
       //K=intersect(K,L[i][1]);
    }
-   i=size(reduce(K,stdZ(I)))+size(reduce(I,stdZ(K)));
+   i=size(reduce(K,stdZ(I),5))+size(reduce(I,stdZ(K),5));
    if(!i){return(1);}
    return(0);
 }

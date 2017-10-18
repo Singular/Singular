@@ -355,8 +355,9 @@ static proc deleteUnluckyPrimes_std(alias list modresults)
         attrib(L, "isSB", 1);
         for (j = 1; j <= size_cat; j++) {
             if (size(L) == size(cat[j][1])
-                && size(reduce(L, cat[j][1])) == 0
-                && size(reduce(cat[j][1], L)) == 0) {
+                && size(reduce(L, cat[j][1],5)) == 0
+                && size(reduce(cat[j][1], L,5)) == 0)
+            {
                 cat[j][2] = cat[j][2]+1;
                 cat[j][3][cat[j][2]] = i;
                 break;

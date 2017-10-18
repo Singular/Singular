@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version resgraph.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version resgraph.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Visualization";
 info="
 LIBRARY:  resgraph.lib            Visualization of Resolution Data
@@ -771,7 +771,7 @@ proc prepareDcE(list re, list inter, list endCharts)
                execute(strId);
                id10=subst(id1,t,numb);
                attrib(id10,"isSB",1);
-               if(size(reduce(idj0,id10))==0)
+               if(size(reduce(idj0,id10,5))==0)
                {
                   tintvec[a]=b;
                   break;

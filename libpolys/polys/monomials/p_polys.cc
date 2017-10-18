@@ -4545,9 +4545,10 @@ void p_Shift (poly * p,int i, const ring r)
   int     j = p_MaxComp(*p,r),k = p_MinComp(*p,r);
 
   if (j+i < 0) return ;
+  BOOLEAN toPoly= ((j == -i) && (j == k));
   while (qp1 != NULL)
   {
-    if ((__p_GetComp(qp1,r)+i > 0) || ((j == -i) && (j == k)))
+    if (toPoly || (__p_GetComp(qp1,r)+i > 0))
     {
       p_AddComp(qp1,i,r);
       p_SetmComp(qp1,r);

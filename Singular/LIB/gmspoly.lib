@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version gmspoly.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version gmspoly.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Singularities";
 
 info="
@@ -173,7 +173,7 @@ static proc vfiltmat(matrix B,int d)
   attrib(V0,"isSB",1);
   module V1=B;
   option(redSB);
-  while(size(reduce(V1,V0))>0)
+  while(size(reduce(V1,V0,5))>0)
   {
     V=std(V0+V1);
     V0=var(1)^(d-1)*V;
@@ -270,7 +270,7 @@ static proc spec(ideal e0,intvec s0,module V,matrix B)
   int d0=d;
   V=chart(V);
   module U=std(V);
-  while(size(reduce(var(1)^d*freemodule(mu),U))>0)
+  while(size(reduce(var(1)^d*freemodule(mu),U,5))>0)
   {
     d++;
   }
@@ -361,7 +361,7 @@ static proc fsplit(ideal e0,ideal e,intvec s,module V,matrix B,module G)
       {
         for(j=ncols(U1);j>=1;j--)
         {
-          if(size(reduce(U1[j],std(U0)))>0)
+          if(size(reduce(U1[j],std(U0),5))>0)
           {
             U0=U1[j]+U0;
           }

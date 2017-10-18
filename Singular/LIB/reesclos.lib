@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version reesclos.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version reesclos.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Commutative Algebra";
 
 info="
@@ -328,7 +328,7 @@ EXAMPLE:  example normalI; shows an example
       "//Check whether I is radical";
     }
 
-    if (size(reduce(radical(I),std(I)))==0)
+    if (size(reduce(radical(I),std(I),5))==0)
     {
       if (dblvl>0)
       {

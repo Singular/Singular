@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version crypto.lib 4.0.0.1 Aug_2014 "; // $Id$
+version="version crypto.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Teaching";
 info="
 LIBRARY:  crypto.lib     Procedures for teaching cryptography
@@ -1710,7 +1710,7 @@ EXAMPLE:example testElliptic; shows an example
    }
    //=== test if all points of C[l] satisfy  (x,y)^(q^2)=-[ql](x,y)
    //=== if so: t mod l =0 is returned
-   if(size(reduce(J,I))==0){return(0);}
+   if(size(reduce(J,I,5))==0){return(0);}
 
    //==== test for (x,y)^(q^2)=[ql](x,y) for some point
 
@@ -1823,9 +1823,9 @@ EXAMPLE:example testElliptic; shows an example
        reduce(ideal(Q1*L1-P1*H1,Q2*L2+P2*H2),I);
          pause();
       }
-      if(size(reduce(J,I))==0){return(t);}
+      if(size(reduce(J,I,5))==0){return(t);}
       J=Q1*L1-P1*H1,Q2*L2+P2*H2;
-      if(size(reduce(J,I))==0){return(l-t);}
+      if(size(reduce(J,I,5))==0){return(l-t);}
    }
    ERROR("something is wrong in testElliptic");
 }

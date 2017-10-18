@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version presolve.lib 4.0.2.2 Jan_2016 "; // $Id$
+version="version presolve.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
@@ -1387,9 +1387,9 @@ EXAMPLE: example idealSplit; shows an example
          while(k<size(re))
          {
             k++;
-            if(size(reduce(re[k],I))==0){e=0;break;}
+            if(size(reduce(re[k],I,5))==0){e=0;break;}
             attrib(re[k],"isSB",1);
-            if(size(reduce(I,re[k]))==0){re=delete(re,k);k--;}
+            if(size(reduce(I,re[k],5))==0){re=delete(re,k);k--;}
          }
          if(e)
          {
@@ -1411,7 +1411,7 @@ EXAMPLE: example idealSplit; shows an example
    }
    J=timeStd(I,timeS);
    attrib(I,"isSB",1);
-   if(size(reduce(J,I))==0){return(re+list(I));}
+   if(size(reduce(J,I,5))==0){return(re+list(I));}
    return(re+idealSplit(J,re,timeF,timeS));
 }
 example

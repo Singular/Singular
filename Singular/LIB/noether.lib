@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="version noether.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version noether.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: noether.lib   Noether normalization of an ideal (not nessecary
@@ -326,7 +326,7 @@ THEORY:  The last variable is in generic position if the quotient of the ideal
   I=quotient(select(i,n+1),x(n));
   I=I*maxideal(1);
   ret=1;
-  if (size(reduce(I,i)) <> 0)
+  if (size(reduce(I,i,5)) <> 0)
   {
     ret=0;
   }
@@ -664,7 +664,7 @@ ASSUME:  i is a homogeneous ideal.
     i=ic;
     K=subst(select(I,n+1),x(n),1);
     K=K*maxideal(maxdeg1(I));
-    if (size(reduce(K,I)) <> 0)
+    if (size(reduce(K,I,5)) <> 0)
     {
       nl=0;
       while ( nl < 30 )
@@ -676,7 +676,7 @@ ASSUME:  i is a homogeneous ideal.
         attrib(I,"isSB",1);
         K=subst(select(I,n+1),x(n),1);
         K=K*maxideal(maxdeg1(I));
-        if (size(reduce(K,I)) == 0)
+        if (size(reduce(K,I,5)) == 0)
         {
           break;
         }
@@ -695,7 +695,7 @@ ASSUME:  i is a homogeneous ideal.
       attrib(I,"isSB",1);
       K=subst(select(I,ii),x(ii-1),1);
       K=K*maxideal(maxdeg1(I));
-      if (size(reduce(K,I)) <> 0)
+      if (size(reduce(K,I,5)) <> 0)
       {
         nl=0;
         while ( nl < 30 )
@@ -708,7 +708,7 @@ ASSUME:  i is a homogeneous ideal.
           attrib(I,"isSB",1);
           K=subst(select(I,ii),x(ii-1),1);
           K=K*maxideal(maxdeg1(I));
-          if (size(reduce(K,I)) == 0)
+          if (size(reduce(K,I,5)) == 0)
           {
             sbi=T;
             break;
