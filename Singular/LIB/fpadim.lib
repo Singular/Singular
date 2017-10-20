@@ -1237,7 +1237,7 @@ proc imIsUpRightTriangle(intmat M) {
 
 static proc eliminateZerosUpTriangle(intmat G) {
   // G is expected to be an upper triangle matrix
-  for (int i = 1; i <= ncols(G); i++) {
+  for (int i = ncols(G); i >= 1; i--) { // loop order is important because we delete entries
     if (G[i,i] == 0) { // i doesn't have a cycle
       for (int j = 1; j < i; j++) {
         if (G[j,i] == 1) { // j has an edge to i
