@@ -1430,8 +1430,8 @@ ASSUME: Basering has to be a Letterplace ring.
   return(cycles);
 }
 
-static proc lpUfGraph(ideal G)
-"USAGE: lpUfGraph(G); G a set of monomials in a letterplace ring
+proc lpUfGraph(ideal G, list #)
+"USAGE: lpUfGraph(G); G a set of monomials in a letterplace ring, # an optional parameter which also returns the vertex list when 1
 RETURN: intmat
 PURPOSE: Constructs the Ufnarovskij graph induced by G
 @*      the adjacency matrix of the Ufnarovskij graph induced by G
@@ -1466,6 +1466,15 @@ ASSUME: - basering is a Letterplace ring
       vw[l] = w[l-1];
       if (v_overlap == w_overlap && !ivdivides(LG, vw)) {
         UG[i,j] = 1;
+      }
+    }
+  }
+  if (size(#) > 0) {
+    if (typeof(#[1]) == "int") {
+      if (#[1] == 1) {
+	list ret = UG;
+	ret[2] = ivL2lpI(SW); // the vertices
+	return (ret);
       }
     }
   }
