@@ -127,6 +127,7 @@ KINLINE void sTObject::Set(poly p_in, ring r)
     pp_Test(p_in, currRing, tailRing);
     p = p_in;
   }
+  pLength=::pLength(p_in);
 }
 
 KINLINE sTObject::sTObject(poly p_in, ring r)
@@ -142,6 +143,7 @@ KINLINE void sTObject::Set(poly p_in, ring c_r, ring t_r)
     assume(c_r == currRing && t_r == tailRing);
     pp_Test(p_in, currRing, t_r);
     p = p_in;
+    pLength=::pLength(p_in);
   }
   else
   {
