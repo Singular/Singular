@@ -1470,7 +1470,6 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN *ad
       h4->m[i] = h4->m[i+1];
     }
     h4->m[IDELEMS(h4)-1] = p;
-    if(!rField_is_Ring(currRing)) si_opt_1 |= Sy_bit(OPT_SB_1);
   }
   idDelete(&temph1);
   //idTest(h4);//see remark at the beginning
@@ -1495,8 +1494,6 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
       res = idFreeModule(h1->rank);
     return res;
   }
-  BITSET old_test1;
-  SI_SAVE_OPT1(old_test1);
   int i, kmax;
   BOOLEAN  addOnlyOne=TRUE;
   tHomog   hom=isNotHomog;
@@ -1525,13 +1522,16 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   ideal s_h3;
   if (addOnlyOne)
   {
+    BITSET old_test1;
+    SI_SAVE_OPT1(old_test1);
+    if(!rField_is_Ring(currRing)) si_opt_1 |= Sy_bit(OPT_SB_1);
     s_h3 = kStd(s_h4,currRing->qideal,hom,&weights1,NULL,0/*kmax-1*/,IDELEMS(s_h4)-1);
+    SI_RESTORE_OPT1(old_test1);
   }
   else
   {
     s_h3 = kStd(s_h4,currRing->qideal,hom,&weights1,NULL,kmax-1);
   }
-  SI_RESTORE_OPT1(old_test1);
   #if 0
   // only together with the above debug stuff
   idSkipZeroes(s_h3);
