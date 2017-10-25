@@ -336,7 +336,7 @@ void sleftv::CleanUp(ring r)
     if ((name!=NULL) && (name!=sNoName_fe) && (rtyp!=ALIAS_CMD))
     {
       //::Print("free %x (%s)\n",name,name);
-      omFreeBinAddr((ADDRESS)name);
+      omFree((ADDRESS)name); // may be larger >1000 char (large int)
     }
     //name=NULL;
     //flag=0;
