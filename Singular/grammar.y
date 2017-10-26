@@ -652,6 +652,7 @@ elemexpr:
         | extendedid  ARROW BLOCKTOK
           {
             if (iiARROW(&$$,$1,$3)) YYERROR;
+            omFree((ADDRESS)$3)
           }
         | '(' exprlist ')'    { $$ = $2; }
         ;
@@ -1157,7 +1158,7 @@ killcmd:
             if (v->name!=NULL)
             {
                Werror("`%s` is undefined in kill",v->name);
-	       omFree((ADDRESS)v->name); v->name=NULL;
+               omFree((ADDRESS)v->name); v->name=NULL;
             }
             else               WerrorS("kill what ?");
           }
@@ -1174,7 +1175,7 @@ killcmd:
             if (v->name!=NULL)
             {
                Werror("`%s` is undefined in kill",v->name);
-	       omFree((ADDRESS)v->name); v->name=NULL;
+               omFree((ADDRESS)v->name); v->name=NULL;
             }
             else               WerrorS("kill what ?");
           }
