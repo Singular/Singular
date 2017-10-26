@@ -37,14 +37,10 @@
 char fe_promptstr[] ="  ";
 FILE *File_Profiling=NULL;
 
-// output/print buffer:
-#define INITIAL_PRINT_BUFFER 24*1024L
 // line buffer for reading:
 // minimal value for MAX_FILE_BUFFER: 4*4096 - see Tst/Long/gcd0_l.tst
 // this is an upper limit for the size of monomials/numbers read via the interpreter
 #define MAX_FILE_BUFFER 4*4096
-// static long feBufferLength=INITIAL_PRINT_BUFFER;
-//static char * feBuffer=(char *)omAlloc(INITIAL_PRINT_BUFFER);
 
 /**************************************************************************
 * handling of 'voices'
@@ -537,31 +533,32 @@ int feReadLine(char* b, int l)
       b[i]='\0';
       if (currentVoice->sw==BI_buffer)
       {
+        BOOLEAN show_echo=FALSE;
+        char *anf;
+        long len;
         if (startfptr==0)
         {
-          char *anf=currentVoice->buffer;
+          anf=currentVoice->buffer;
           const char *ss=strchr(anf,'\n');
-          long len;
           if (ss==NULL) len=strlen(anf);
           else          len=ss-anf;
-          char *s=(char *)omAlloc(len+2);
-          strncpy(s,anf,len+2);
-          s[len+1]='\0';
-          fePrintEcho(s,b);
-          omFree((ADDRESS)s);
+          show_echo=TRUE;
         }
         else if (/*(startfptr>0) &&*/
         (currentVoice->buffer[startfptr-1]=='\n'))
         {
-          char *anf=currentVoice->buffer+startfptr;
+          anf=currentVoice->buffer+startfptr;
           const char *ss=strchr(anf,'\n');
-          long len;
           if (ss==NULL) len=strlen(anf);
           else          len=ss-anf;
+          show_echo=TRUE;
+          yylineno++;
+        }
+        if (show_echo)
+        {
           char *s=(char *)omAlloc(len+2);
           strncpy(s,anf,len+2);
           s[len+1]='\0';
-          yylineno++;
           fePrintEcho(s,b);
           omFree((ADDRESS)s);
         }
