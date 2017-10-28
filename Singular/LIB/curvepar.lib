@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="version curvepar.lib 4.1.0.3 Apr_2017 "; // $Id$
+version="version curvepar.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Singularity Theory";
 info="
 LIBRARY:  curvepar.lib  Resolution of space curve singularities, semi-group
@@ -452,10 +452,10 @@ static proc transversalTest(ideal I,poly f,list L)
   ideal J=imap(r1,J);
   ideal K=imap(r1,K);
   ideal T=imap(r1,T);
-  int m=size(reduce(J,std(K)))+size(reduce(K,std(J)));
+  int m=size(reduce(J,std(K),5))+size(reduce(K,std(J),5));
   if(m)
   {
-    m=size(reduce(J+K+T,std(ideal(x(1),x(2)))));
+    m=size(reduce(J+K+T,std(ideal(x(1),x(2))),5));
   }
   return(m);
 }

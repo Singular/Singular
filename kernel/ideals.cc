@@ -32,6 +32,7 @@
 #include "kernel/polys.h"
 
 #include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/kutil.h"
 #include "kernel/GBEngine/tgb.h"
 #include "kernel/GBEngine/syz.h"
 #include "Singular/ipshell.h" // iiCallLibProc1
@@ -203,7 +204,8 @@ ideal idSectWithElim (ideal h1,ideal h2)
 */
 ideal idSect (ideal h1,ideal h2, GbVariant alg)
 {
-  int i,j,k,length;
+  int i,j,k;
+  unsigned length;
   int flength = id_RankFreeModule(h1,currRing);
   int slength = id_RankFreeModule(h2,currRing);
   int rank=si_max(h1->rank,h2->rank);
@@ -422,7 +424,8 @@ ideal idSect (ideal h1,ideal h2, GbVariant alg)
 */
 ideal idMultSect(resolvente arg, int length, GbVariant alg)
 {
-  int i,j=0,k=0,syzComp,l,maxrk=-1,realrki;
+  int i,j=0,k=0,l,maxrk=-1,realrki;
+  unsigned syzComp;
   ideal bigmat,tempstd,result;
   poly p;
   int isIdeal=0;
@@ -1418,23 +1421,19 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN *ad
   pSetComp(p,kmax);
   pSetmComp(p);
 /*--- constructing the big matrix ------------------------*/
-  ideal h4 = idInit(16,kmax+k-1);
+  ideal h4 = idInit(k,kmax+k-1);
   h4->m[0] = q;
   if (k2 == 0)
   {
-    if (k > IDELEMS(h4))
-    {
-      pEnlargeSet(&(h4->m),IDELEMS(h4),k-IDELEMS(h4));
-      IDELEMS(h4) = k;
-    }
     for (i=1; i<k; i++)
     {
       if (h4->m[i-1]!=NULL)
       {
-        p = p_Copy_noCheck(h4->m[i-1], currRing); p_Shift(&p,1,currRing);
-        // pTest(p);
+        p = p_Copy_noCheck(h4->m[i-1], currRing);
+	p_Shift(&p,1,currRing);
         h4->m[i] = p;
       }
+      else break;
     }
   }
   idSkipZeroes(h4);
@@ -1477,6 +1476,7 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN *ad
   //idTest(h4);//see remark at the beginning
   return h4;
 }
+
 /*2
 *computes the quotient of h1,h2
 */
@@ -2825,6 +2825,146 @@ void idDelEquals(ideal id)
     }
   }
   omFreeSize((ADDRESS)(id_sort), idsize*sizeof(poly_sort));
+}
+
+static int * id_satstdSaturatingVariables=NULL;
+
+static BOOLEAN id_sat_vars_sp(kStrategy strat)
+{
+  BOOLEAN b = FALSE; // set b to TRUE, if spoly was changed,
+                     // let it remain FALSE otherwise
+  if (strat->P.t_p==NULL)
+  {
+    poly p=strat->P.p;
+
+    // iterate over all terms of p and
+    // compute the minimum mm of all exponent vectors
+    int *mm=(int*)omAlloc((1+rVar(currRing))*sizeof(int));
+    int *m0=(int*)omAlloc0((1+rVar(currRing))*sizeof(int));
+    p_GetExpV(p,mm,currRing);
+    bool nonTrivialSaturationToBeDone=true;
+    for (p=pNext(p); p!=NULL; pIter(p))
+    {
+      nonTrivialSaturationToBeDone=false;
+      p_GetExpV(p,m0,currRing);
+      for (int i=rVar(currRing); i>0; i--)
+      {
+        if (id_satstdSaturatingVariables[i]!=0)
+        {
+          mm[i]=si_min(mm[i],m0[i]);
+          if (mm[i]>0) nonTrivialSaturationToBeDone=true;
+        }
+        else mm[i]=0;
+      }
+      // abort if the minimum is zero in each component
+      if (!nonTrivialSaturationToBeDone) break;
+    }
+    if (nonTrivialSaturationToBeDone)
+    {
+      // std::cout << "simplifying!" << std::endl;
+      if (TEST_OPT_PROT) { PrintS("S"); mflush(); }
+      p=p_Copy(strat->P.p,currRing);
+      //pWrite(p);
+      //  for (int i=rVar(currRing); i>0; i--)
+      //    if (mm[i]!=0) Print("x_%d:%d ",i,mm[i]);
+      //PrintLn();
+      memset(&strat->P,0,sizeof(strat->P));
+      strat->P.tailRing = strat->tailRing;
+      strat->P.p=p;
+      while(p!=NULL)
+      {
+        for (int i=rVar(currRing); i>0; i--)
+        {
+          p_SubExp(p,i,mm[i],currRing);
+        }
+        p_Setm(p,currRing);
+        pIter(p);
+      }
+      b = TRUE;
+    }
+    omFree(mm);
+    omFree(m0);
+  }
+  else
+  {
+    poly p=strat->P.t_p;
+
+    // iterate over all terms of p and
+    // compute the minimum mm of all exponent vectors
+    int *mm=(int*)omAlloc((1+rVar(currRing))*sizeof(int));
+    int *m0=(int*)omAlloc0((1+rVar(currRing))*sizeof(int));
+    p_GetExpV(p,mm,strat->tailRing);
+    bool nonTrivialSaturationToBeDone=true;
+    for (p = pNext(p); p!=NULL; pIter(p))
+    {
+      nonTrivialSaturationToBeDone=false;
+      p_GetExpV(p,m0,strat->tailRing);
+      for(int i=rVar(currRing); i>0; i--)
+      {
+        if(id_satstdSaturatingVariables[i]!=0)
+        {
+          mm[i]=si_min(mm[i],m0[i]);
+          if (mm[i]>0) nonTrivialSaturationToBeDone = true;
+        }
+        else mm[i]=0;
+      }
+      // abort if the minimum is zero in each component
+      if (!nonTrivialSaturationToBeDone) break;
+    }
+    if (nonTrivialSaturationToBeDone)
+    {
+      if (TEST_OPT_PROT) { PrintS("S"); mflush(); }
+      p=p_Copy(strat->P.t_p,strat->tailRing);
+      //p_Write(p,strat->tailRing);
+      //  for (int i=rVar(currRing); i>0; i--)
+      //    if (mm[i]!=0) Print("x_%d:%d ",i,mm[i]);
+      //PrintLn();
+      memset(&strat->P,0,sizeof(strat->P));
+      strat->P.tailRing = strat->tailRing;
+      strat->P.t_p=p;
+      while(p!=NULL)
+      {
+        for(int i=rVar(currRing); i>0; i--)
+        {
+          p_SubExp(p,i,mm[i],strat->tailRing);
+        }
+        p_Setm(p,strat->tailRing);
+        pIter(p);
+      }
+      strat->P.GetP();
+      b = TRUE;
+    }
+    omFree(mm);
+    omFree(m0);
+  }
+  return b; // return TRUE if sp was changed, FALSE if not
+}
+
+ideal id_Satstd(const ideal I, ideal J, const ring r)
+{
+  ring save=currRing;
+  if (currRing!=r) rChangeCurrRing(r);
+  idSkipZeroes(J);
+  id_satstdSaturatingVariables=(int*)omAlloc0((1+rVar(currRing))*sizeof(int));
+  int k=IDELEMS(J);
+  for (int i=0; i<k; i++)
+  {
+    poly x = J->m[i];
+    int li = p_Var(x,r);
+    if (li>0)
+      id_satstdSaturatingVariables[li]=1;
+    else
+    {
+      if (currRing!=save) rChangeCurrRing(save);
+      WerrorS("ideal generators must be variables");
+      return NULL;
+    }
+  }
+  ideal res=kStd(I,r->qideal,testHomog,NULL,NULL,0,0,NULL,id_sat_vars_sp);
+  omFreeSize(id_satstdSaturatingVariables,(1+rVar(currRing))*sizeof(int));
+  id_satstdSaturatingVariables=NULL;
+  if (currRing!=save) rChangeCurrRing(save);
+  return res;
 }
 
 GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)

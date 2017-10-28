@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version elim.lib 4.0.0.1 Jan_2014 "; // $Id$
+version="version elim.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
@@ -730,13 +730,13 @@ EXAMPLE: example sat; shows an example
    def i=id;
    id=std(id);
    int p = printlevel-voice+3;  // p=printlevel+1 (default: p=1)
-   while( ii<=size(i) )
+   while( ii<=ncols(i) )
    {
       dbprint(p-1,"// compute quotient "+string(kk+1));
       i=quotient(id,j);
-      for( ii=1; ii<=size(i); ii++ )
+      for( ii=1; ii<=ncols(i); ii++ )
       {
-         if( reduce(i[ii],id,1)!=0 ) break;
+         if( reduce(i[ii],id,5)!=0 ) break;
       }
       id=std(i); kk++;
    }

@@ -3447,7 +3447,7 @@ No line of a library should consist of more than 60 characters.
 @end itemize
 
 @menu
-* Libraries in the SINGULAR  Documentation::
+* Libraries in the SINGULAR Documentation::
 * Version string::
 * Category string::
 * Info string::
@@ -3462,7 +3462,7 @@ No line of a library should consist of more than 60 characters.
 
 @c -------------------------------------------------------------------
 @node Libraries in the SINGULAR Documentation,Version string,Libraries,Libraries
-@subsection Libraries in the @sc{Singular} Documentation
+@subsection Libraries in the SINGULAR Documentation
 @cindex Libraries in the SINGULAR Documentation
 
 @itemize @bullet
@@ -3538,8 +3538,8 @@ A category string is part of the header of a library.
   Constitutes the help text of a library. Will be displayed in a
   @sc{Singular}  session upon entering @code{help libname.lib;} .
   Will be part of the @sc{Singular} documentation if the library
-  is distributed with @sc{Singular}. @xref{Libraries in the
-  SINGULAR  Documentation}.
+  is distributed with @sc{Singular}.
+  @xref{Libraries in the SINGULAR  Documentation}.
 @item @strong{Format:}
 @smallexample
 info="

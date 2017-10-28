@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version solve.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version solve.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Symbolic-numerical solving";
 info="
 LIBRARY: solve.lib     Complex Solving of Polynomial Systems
@@ -1048,7 +1048,7 @@ static proc checksol(ideal A, list lr)
       re[j] = var(j)-ro[j];
     }
     attrib(re,"isSB",1);
-    k = size(reduce(A,re,1));
+    k = size(reduce(A,re,5));
     if (k){return(i);}
   }
   return(0);

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="version ring.lib 4.0.3.5 Nov_2016 "; // $Id$
+version="version ring.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -1204,9 +1204,9 @@ RETURN: 1 if module(I) is in module(J), 0 otherwise
 EXAMPLE: isSubModule; shows an example
 {
   if (attrib(J,"isSB"))
-  { return(size(reduce(I,J,1))==0); }
+  { return(size(reduce(I,J,5))==0); }
   else
-  { return(size(reduce(I,groebner(J),1))==0); }
+  { return(size(reduce(I,groebner(J),5))==0); }
 }
 example
 {

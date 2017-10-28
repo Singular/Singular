@@ -73,22 +73,22 @@ public:
     length,     // as of pLDeg
     pLength,    // either == 0, or == pLength(p)
     i_r;        // index of TObject in R set, or -1 if not in T
-  BOOLEAN is_normalized; // true, if pNorm was called on p, false otherwise
+  /*BOOLEAN*/ char is_normalized; // true, if pNorm was called on p, false otherwise
   // used in incremental sba() with F5C:
   // we know some of the redundant elements in
   // strat->T beforehand, so we can just discard
   // them and do not need to consider them in the
   // interreduction process
-  BOOLEAN is_redundant;
+  /*BOOLEAN*/ char is_redundant;
   // used in sba's sig-safe reduction:
   // sometimes we already know that a reducer
   // is sig-safe, so no need for a real
   // sig-safeness check
-  BOOLEAN is_sigsafe;
+  /*BOOLEAN*/ char is_sigsafe;
 
 
 #ifdef HAVE_PLURAL
-  BOOLEAN is_special; // true, it is a new special S-poly (e.g. for SCA)
+  /*BOOLEAN*/ char is_special; // true, it is a new special S-poly (e.g. for SCA)
 #endif
 
   // initialization
@@ -357,30 +357,30 @@ public:
   int lV;
   int cv; // in shift bases: counting V criterion
   #endif
-  BOOLEAN interpt;
-  BOOLEAN homog;
+  /*BOOLEAN*/ char interpt;
+  /*BOOLEAN*/ char homog;
 #ifdef HAVE_PLURAL
-  BOOLEAN z2homog; // Z_2 - homogeneous input allows product criterion in commutative and SCA cases!
+  /*BOOLEAN*/ char z2homog; // Z_2 - homogeneous input allows product criterion in commutative and SCA cases!
 #endif
-  BOOLEAN kHEdgeFound;
-  BOOLEAN honey,sugarCrit;
-  BOOLEAN Gebauer,noTailReduction;
-  BOOLEAN fromT;
-  BOOLEAN noetherSet;
-  BOOLEAN update;
-  BOOLEAN posInLOldFlag;
-  BOOLEAN use_buckets;
+  /*BOOLEAN*/ char kHEdgeFound;
+  /*BOOLEAN*/ char honey,sugarCrit;
+  /*BOOLEAN*/ char Gebauer,noTailReduction;
+  /*BOOLEAN*/ char fromT;
+  /*BOOLEAN*/ char noetherSet;
+  /*BOOLEAN*/ char update;
+  /*BOOLEAN*/ char posInLOldFlag;
+  /*BOOLEAN*/ char use_buckets;
   // if set, pLDeg(p, l) == (pFDeg(pLast(p), pLength)
-  BOOLEAN LDegLast;
+  /*BOOLEAN*/ char LDegLast;
   // if set, then L.length == L.pLength
-  BOOLEAN length_pLength;
+  /*BOOLEAN*/ char length_pLength;
   // if set, then posInL does not depend on L.length
-  BOOLEAN posInLDependsOnLength;
+  /*BOOLEAN*/ char posInLDependsOnLength;
   /*FALSE, if posInL == posInL10*/
 #ifdef HAVE_PLURAL
   // set this flag to 1 to stop the product criteria
   // use ALLOW_PROD_CRIT(strat) to test
-  BOOLEAN no_prod_crit;
+  /*BOOLEAN*/ char no_prod_crit;
 #define ALLOW_PROD_CRIT(A) (!(A)->no_prod_crit)
 #else
 #define ALLOW_PROD_CRIT(A) (1)

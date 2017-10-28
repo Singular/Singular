@@ -2179,7 +2179,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   omFree(strat->R);
   if ((Q!=NULL)&&(strat->fromQ!=NULL))
   {
-    i=((IDELEMS(Q)+IDELEMS(F)+15)/16)*16;
+    i=((IDELEMS(F)+IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
     omFreeSize((ADDRESS)strat->fromQ,i*sizeof(int));
     strat->fromQ=NULL;
   }

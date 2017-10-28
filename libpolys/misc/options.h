@@ -59,11 +59,13 @@ extern unsigned si_opt_2;
 #define V_COEFSTRAT  20
 #define V_IDLIFT     21
 #define V_LENGTH     22
+//#define V_REPORT_STD 23
 /*23: kDebugPrint */
 #define V_ALLWARN    24
 #define V_INTERSECT_ELIM 25
 #define V_INTERSECT_SYZ 26
-/* for tests: 27-30 */
+#define V_ASSIGN_NONE 27
+/* for tests: 28-30 */
 #define V_DEG_STOP   31
 
 
@@ -125,6 +127,7 @@ extern unsigned si_opt_2;
 #define TEST_V_QRING               BVERBOSE(V_QRING)
 #define TEST_V_NSB                 BVERBOSE(V_NSB)
 #define TEST_V_QUIET               BVERBOSE(V_QUIET)
+#define TEST_V_ASSIGN_NONE         BVERBOSE(V_ASSIGN_NONE)
 
 #define TEST_VERB_NSB              BVERBOSE(V_NSB)
 #define TEST_V_DEG_STOP            BVERBOSE(V_DEG_STOP)

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version gmssing.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version gmssing.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Singularities";
 
 info="
@@ -392,7 +392,7 @@ static proc saturate()
   list l;
 
   dbprint(printlevel-voice+2,"// compute saturation of H''");
-  while(size(reduce(H,std(H0*var(1))))>0)
+  while(size(reduce(H,std(H0*var(1)),5))>0)
   {
     dbprint(printlevel-voice+2,"// compute matrix A of t");
     k++;
@@ -943,7 +943,7 @@ static proc fsplit(ideal e0,intvec m0,matrix A,module H,module H0)
       {
         for(j=ncols(U1);j>=1;j--)
         {
-          if(size(reduce(U1[j],std(U0)))>0)
+          if(size(reduce(U1[j],std(U0),5))>0)
           {
             U0=U0+U1[j];
           }

@@ -1,5 +1,5 @@
 //
-version="version grobcov.lib 4.1.0.3 Jun_2017 "; // $Id$
+version="version grobcov.lib 4.1.0.3 Oct_2017 "; // $Id$
            // version N;  Aug_2017;
 category="General purpose";
 info="
@@ -2311,7 +2311,7 @@ static proc precombine(list L)
       j++;
       option(redSB);
       L0[i]=std(L0[i]);
-      if(reduce(L3[i][j],L0[i])!=0){tes=0; F[i]=L3[i][j];}
+      if(reduce(L3[i][j],L0[i],5)!=0){tes=0; F[i]=L3[i][j];}
     }
     if (tes){"ERROR a polynomial in all p_j except p_i was not found";}
   }
@@ -3032,7 +3032,7 @@ static proc nonzerodivisor(poly gr, list Pr)
     option(redSB);
     Pi=std(P[i]);
     //attrib(Pi,"isSB",1);
-    if (reduce(g,Pi,1)==0){J[size(J)+1]=i;}
+    if (reduce(g,Pi,5)==0){J[size(J)+1]=i;}
   }
   for (i=1;i<=size(J);i++)
   {
@@ -3069,7 +3069,7 @@ static proc nullin(poly f,ideal P)
   def f0=imap(RR,f);
   def P0=imap(RR,P);
   attrib(P0,"isSB",1);
-  if (reduce(f0,P0,1)==0){t=1;}
+  if (reduce(f0,P0,5)==0){t=1;}
   else{t=0;}
   setring(RR);
   return(t);
@@ -3648,7 +3648,7 @@ static proc precombint(list L)
       j++;
       option(redSB);
       L0[i]=std(L0[i]);
-      if(reduce(L3[i][j],L0[i])!=0){tes=0; F[i]=L3[i][j];}
+      if(reduce(L3[i][j],L0[i],5)!=0){tes=0; F[i]=L3[i][j];}
     }
     if (tes){"ERROR a polynomial in all p_j except p_i was not found";}
   }

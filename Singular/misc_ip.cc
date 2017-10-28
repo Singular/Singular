@@ -553,6 +553,7 @@ const struct soptionStruct optionStruct[]=
 
 const struct soptionStruct verboseStruct[]=
 {
+  {"assign_none",Sy_bit(V_ASSIGN_NONE),~Sy_bit(V_ASSIGN_NONE)},
   {"mem",      Sy_bit(V_SHOW_MEM),  ~Sy_bit(V_SHOW_MEM)   },
   {"yacc",     Sy_bit(V_YACC),      ~Sy_bit(V_YACC)       },
   {"redefine", Sy_bit(V_REDEFINE),  ~Sy_bit(V_REDEFINE)   },

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version mregular.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version mregular.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: mregular.lib   Castelnuovo-Mumford regularity of homogeneous ideals
@@ -1753,7 +1753,7 @@ EXAMPLE: example is_nested; shows some examples
    {
      LL=minbase(subst(I,x(n-ii-1),1));
      attrib(LL,"isSB",1);
-     tev=size(reduce(KK,LL));
+     tev=size(reduce(KK,LL,5));
      if ( tev > 0 )
      {
        return(0);

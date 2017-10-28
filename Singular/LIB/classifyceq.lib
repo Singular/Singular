@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////
-version="version classifyceq.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version classifyceq.lib 4.1.0.3 Oct_2017 "; // $Id$
 category="Singularities";
 
 info="
@@ -97,7 +97,7 @@ static proc blowupone(poly f)
        if(size(sing)>1)
       {
          if(size(sing)!=n){ERROR("not simple");}
-         ideal mpsi=std(maxideal(1));
+         ideal mpsi=maxideal(1);
          for(i=1;i<=n;i++){mpsi[i]=var(i)-sing[n-i+1][2];}
          map psi=T,mpsi;
          p=psi(p);
@@ -1238,7 +1238,7 @@ static proc BlowUpO(poly f)
       {
         if(vdim(sing)==1)
             {
-                  mpsi=std(maxideal(1));
+                  mpsi=maxideal(1);
                   for(k=1;k<=n;k++){mpsi[k]=var(k)-sing[n-k+1][2];}
                   psi=T,mpsi;
                   p=psi(p);
@@ -1252,7 +1252,7 @@ static proc BlowUpO(poly f)
                        sing=std(L[j]);
                        sing=std(simplify(sing,1));
                        if(vdim(sing)!=1){ERROR("something is wrong in blowUpO");}
-                       mpsi=std(maxideal(1));
+                       mpsi=maxideal(1);
                        for(k=1;k<=n;k++){mpsi[k]=var(k)-sing[n-k+1][2];}
                        psi=T,mpsi;
                        m=psi(p);

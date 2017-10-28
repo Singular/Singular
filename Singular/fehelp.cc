@@ -1061,7 +1061,6 @@ static void heBuiltinHelp(heEntry hentry, int /*br*/)
 #define HELP_NOT_FOUND 2
 #define BUF_LEN        256
 #define IDX_LEN        256
-#define MAX_LINES      21
 
 static inline char tolow(char p)
 {
@@ -1084,7 +1083,7 @@ static int show(unsigned long offset, char *close)
         && (buffer[0] != FIN_INDEX))
   {
     printf("%s", buffer);
-    if(lines++> MAX_LINES)
+    if(lines++==pagelength)
     {
       printf("\n Press <RETURN> to continue or x to exit help.\n");
       fflush(stdout);
@@ -1097,7 +1096,7 @@ static int show(unsigned long offset, char *close)
       lines=0;
     }
   }
-  if(*close!='x')
+  if((*close!='x')&&(pagelength>0))
   {
     printf("\nEnd of part. Press <RETURN> to continue or x to exit help.\n");
     fflush(stdout);
