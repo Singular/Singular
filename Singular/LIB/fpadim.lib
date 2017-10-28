@@ -3041,6 +3041,9 @@ proc tst_fpadim()
   example lp2iv;
   example lp2ivId;
   example lpId2ivLi;
+  example lpGkDim;
+  example lpGlDimBound;
+  example lpSubstitute;
 }
 
 
