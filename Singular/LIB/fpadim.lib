@@ -48,17 +48,17 @@ REFERENCES:
 
 @*   [ufna] Ufnarovskij: Combinatorical and asymptotic methods in algebra, 1990
 @*   [lls] Levandovskyy, La Scala: Letterplace ideals and non-commutative
-          Groebner bases, 2009
+Groebner bases, 2009
 @*   [studzins] Studzinski: Dimension computations in non-commutative,
-                     associative algebras, Diploma thesis, RWTH Aachen, 2010
+associative algebras, Diploma thesis, RWTH Aachen, 2010
 
 ASSUMPTIONS:
 @* - basering is always a Letterplace ring
 @* - all intvecs correspond to Letterplace monomials
 @* - if you specify a different degree bound d,
-     d <= attrib(basering,uptodeg) holds
+d <= attrib(basering,uptodeg) holds
 @* In the procedures below, 'iv' stands for intvec representation
-  and 'lp' for the letterplace representation of monomials
+and 'lp' for the letterplace representation of monomials
 
 PROCEDURES:
 
@@ -147,9 +147,9 @@ NOTE:   d has to be > 0
     while (i2 <= (n^d))
     {for (i3 = 1; i3 <= n; i3++)
       {for (i4 = 1; i4 <= (n^(i1-1)); i4++)
-	{M[i2,i1] = i3;
-	  i2 = i2 + 1;
-	}
+        {M[i2,i1] = i3;
+          i2 = i2 + 1;
+        }
       }
     }
   }
@@ -195,15 +195,15 @@ PURPOSE:Computing the K-dimension of the quotient algebra
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+        }
       }
       if (w == 0)
       {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M) == 0) {return(0);}
@@ -211,8 +211,8 @@ PURPOSE:Computing the K-dimension of the quotient algebra
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-	dimen = dimen + 1 + findDimen(Vt,n,L,P);
+        for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+        dimen = dimen + 1 + findDimen(Vt,n,L,P);
       }
       return(dimen);
     }
@@ -224,14 +224,14 @@ PURPOSE:Computing the K-dimension of the quotient algebra
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+        }
       }
       if (w == 0) {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M) == 0) {return(0);}
@@ -239,8 +239,8 @@ PURPOSE:Computing the K-dimension of the quotient algebra
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-	dimen = dimen + 1 + findDimen(Vt,n,L,P,degbound);
+        for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+        dimen = dimen + 1 + findDimen(Vt,n,L,P,degbound);
       }
       return(dimen);
     }
@@ -259,10 +259,10 @@ PURPOSE:Searching the Ufnarovskij graph for cycles
     {Vt = V,i; w = 0;
       for (j = 1; j <= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0)
-	  {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0)
+          {w = 1; break;}
+        }
       }
       if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
       if (r == 1) {break;}
@@ -276,31 +276,31 @@ PURPOSE:Searching the Ufnarovskij graph for cycles
       intmat Mt[j][nrows(M)];
       for (it = 1; it <= j; it++)
       { for(it2 = 1; it2 <= nrows(M);it2++)
-	{Mt[it,it2] = int(leadcoef(M[it2,it]));}
+        {Mt[it,it2] = int(leadcoef(M[it2,it]));}
       }
       Vt = V[(size(V)-ld+1)..size(V)];
       //Mt; type(Mt);Vt;type(Vt);
       if (isInMat(Vt,Mt) > 0) {return(1);}
       else
       {vector Vtt;
-	for (it =1; it <= size(Vt); it++)
-	{Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
-	for (i = 1; i <= n; i++)
-	{Vt = V,i; w = 0;
-	  for (j = 1; j <= size(P); j++)
-	  {if (P[j] <= size(Vt))
-	    {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	      //L[j]; type(L[j]);Vt2;type(Vt2);
-	      if (isInMat(Vt2,L[j]) > 0)
-	      {w = 1; break;}
-	    }
-	  }
-	  if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
-	  if (r == 1) {break;}
-	}
-	return(r);
+        for (it =1; it <= size(Vt); it++)
+        {Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
+        for (i = 1; i <= n; i++)
+        {Vt = V,i; w = 0;
+          for (j = 1; j <= size(P); j++)
+          {if (P[j] <= size(Vt))
+            {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+              //L[j]; type(L[j]);Vt2;type(Vt2);
+              if (isInMat(Vt2,L[j]) > 0)
+              {w = 1; break;}
+            }
+          }
+          if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
+          if (r == 1) {break;}
+        }
+        return(r);
       }
     }
     else
@@ -312,16 +312,16 @@ PURPOSE:Searching the Ufnarovskij graph for cycles
       kill Vtt;
       for (i = 1; i <= n; i++)
       {Vt = V,i; w = 0;
-	for (j = 1; j <= size(P); j++)
-	{if (P[j] <= size(Vt))
-	  {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	    //L[j]; type(L[j]);Vt2;type(Vt2);
-	    if (isInMat(Vt2,L[j]) > 0)
-	    {w = 1; break;}
-	  }
-	}
-	if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
-	if (r == 1) {break;}
+        for (j = 1; j <= size(P); j++)
+        {if (P[j] <= size(Vt))
+          {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+            //L[j]; type(L[j]);Vt2;type(Vt2);
+            if (isInMat(Vt2,L[j]) > 0)
+            {w = 1; break;}
+          }
+        }
+        if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
+        if (r == 1) {break;}
       }
       return(r);
     }
@@ -335,29 +335,29 @@ PURPOSE:
 this is a classical deep-first search for cycles contained in a graph given by an intmat
 "
 {
- intvec rV;
- int k,k1,t;
- int j = V[size(V)];
- if (T[j,i] > 0) {return(V);}
- else
- {
-  for (k = 1; k <= ncols(T); k++)
+  intvec rV;
+  int k,k1,t;
+  int j = V[size(V)];
+  if (T[j,i] > 0) {return(V);}
+  else
   {
-   t = 0;
-   if (T[j,k] > 0)
-   {
-    for (k1 = 1; k1 <= size(V); k1++) {if (V[k1] == k) {t = 1; break;}}
-    if (t == 0)
+    for (k = 1; k <= ncols(T); k++)
     {
-     rV = V;
-     rV[size(rV)+1] = k;
-     rV = findCycleDFS(i,T,rV);
-     if (rV[1] > -1) {return(rV);}
+      t = 0;
+      if (T[j,k] > 0)
+      {
+        for (k1 = 1; k1 <= size(V); k1++) {if (V[k1] == k) {t = 1; break;}}
+        if (t == 0)
+        {
+          rV = V;
+          rV[size(rV)+1] = k;
+          rV = findCycleDFS(i,T,rV);
+          if (rV[1] > -1) {return(rV);}
+        }
+      }
     }
-   }
   }
- }
- return(intvec(-1));
+  return(intvec(-1));
 }
 
 
@@ -380,15 +380,15 @@ NOTE:   Starting with a part of the Hilbert series we change the coefficient
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+        }
       }
       if (w == 0)
       {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M) == 0) {return(H);}
@@ -396,8 +396,8 @@ NOTE:   Starting with a part of the Hilbert series we change the coefficient
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++) {Vt[j] =  int(leadcoef(M[i][j]));}
-	h1 = h1 + 1; H1 = findHCoeff(Vt,n,L,P,H1);
+        for (j =1; j <= size(M[i]); j++) {Vt[j] =  int(leadcoef(M[i][j]));}
+        h1 = h1 + 1; H1 = findHCoeff(Vt,n,L,P,H1);
       }
       if (size(H1) < (size(V)+2)) {H1[(size(V)+2)] = h1;}
       else {H1[(size(V)+2)] = H1[(size(V)+2)] + h1;}
@@ -412,15 +412,15 @@ NOTE:   Starting with a part of the Hilbert series we change the coefficient
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+        }
       }
       if (w == 0)
       {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M) == 0) {return(H);}
@@ -428,9 +428,9 @@ NOTE:   Starting with a part of the Hilbert series we change the coefficient
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++)
-	{Vt[j] =  int(leadcoef(M[i][j]));}
-	h1 = h1 + 1; H1 = findHCoeff(Vt,n,L,P,H1,degbound);
+        for (j =1; j <= size(M[i]); j++)
+        {Vt[j] =  int(leadcoef(M[i][j]));}
+        h1 = h1 + 1; H1 = findHCoeff(Vt,n,L,P,H1,degbound);
       }
       if (size(H1) < (size(V)+2)) { H1[(size(V)+2)] = h1;}
       else {H1[(size(V)+2)] = H1[(size(V)+2)] + h1;}
@@ -457,15 +457,15 @@ PURPOSE:Computing the coefficients of the Hilbert series and the Mistletoes all
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+        }
       }
       if (w == 0)
       {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M) == 0) {if (size(R) < 2){R[2] = list(V);} else {R[2] = R[2] + list(V);} return(R);}
@@ -473,12 +473,12 @@ PURPOSE:Computing the coefficients of the Hilbert series and the Mistletoes all
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++)
-	{Vt[j] =  int(leadcoef(M[i][j]));}
-	if (size(R[1]) < (size(V)+2)) { R[1][(size(V)+2)] = 1;}
-	else
-	{R[1][(size(V)+2)] = R[1][(size(V)+2)] + 1;}
-	R = findHCoeffMis(Vt,n,L,P,R);
+        for (j =1; j <= size(M[i]); j++)
+        {Vt[j] =  int(leadcoef(M[i][j]));}
+        if (size(R[1]) < (size(V)+2)) { R[1][(size(V)+2)] = 1;}
+        else
+        {R[1][(size(V)+2)] = R[1][(size(V)+2)] + 1;}
+        R = findHCoeffMis(Vt,n,L,P,R);
       }
       return(R);
     }
@@ -494,15 +494,15 @@ PURPOSE:Computing the coefficients of the Hilbert series and the Mistletoes all
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+        }
       }
       if (w == 0)
       {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M) == 0) {if (size(R) < 2){R[2] = list(V);} else {R[2] = R[2] + list(V);} return(R);}
@@ -510,12 +510,12 @@ PURPOSE:Computing the coefficients of the Hilbert series and the Mistletoes all
     {M = simplify(M,2);
       for (i = 1; i <= ncols(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++)
-	{Vt[j] =  int(leadcoef(M[i][j]));}
-	if (size(R[1]) < (size(V)+2)) { R[1][(size(V)+2)] = 1;}
-	else
-	{R[1][(size(V)+2)] = R[1][(size(V)+2)] + 1;}
-	R = findHCoeffMis(Vt,n,L,P,R,degbound);
+        for (j =1; j <= size(M[i]); j++)
+        {Vt[j] =  int(leadcoef(M[i][j]));}
+        if (size(R[1]) < (size(V)+2)) { R[1][(size(V)+2)] = 1;}
+        else
+        {R[1][(size(V)+2)] = R[1][(size(V)+2)] + 1;}
+        R = findHCoeffMis(Vt,n,L,P,R,degbound);
       }
       return(R);
     }
@@ -538,15 +538,15 @@ PURPOSE:Computing the K-dimension and the Mistletoes all at once
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+        }
       }
       if (w == 0)
       {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M) == 0)
@@ -558,8 +558,8 @@ PURPOSE:Computing the K-dimension and the Mistletoes all at once
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-	R[1] = R[1] + 1; R = findMisDim(Vt,n,L,P,R);
+        for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+        R[1] = R[1] + 1; R = findMisDim(Vt,n,L,P,R);
       }
       return(R);
     }
@@ -575,15 +575,15 @@ PURPOSE:Computing the K-dimension and the Mistletoes all at once
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+        }
       }
       if (w == 0)
       {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M) == 0)
@@ -595,8 +595,8 @@ PURPOSE:Computing the K-dimension and the Mistletoes all at once
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-	R[1] = R[1] + 1; R = findMisDim(Vt,n,L,P,R,degbound);
+        for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+        R[1] = R[1] + 1; R = findMisDim(Vt,n,L,P,R,degbound);
       }
       return(R);
     }
@@ -623,16 +623,16 @@ NOTE:   V has to be normal w.r.t. L, it will not be checked for being so
     {Vt = V,i; w = 0;
       for (j = 1; j <= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0)
-	  {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0)
+          {w = 1; break;}
+        }
       }
       if (w == 0)
       {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M)==0) {R = V; return(R);}
@@ -640,8 +640,8 @@ NOTE:   V has to be normal w.r.t. L, it will not be checked for being so
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-	R = R + findmistletoes(Vt,n,L,P);
+        for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+        R = R + findmistletoes(Vt,n,L,P);
       }
       return(R);
     }
@@ -654,15 +654,15 @@ NOTE:   V has to be normal w.r.t. L, it will not be checked for being so
     {Vt = V,i; w = 0;
       for (j = 1; j <= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0){w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0){w = 1; break;}
+        }
       }
       if (w == 0)
       {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M) == 0) {R = V; return(R);}
@@ -670,10 +670,10 @@ NOTE:   V has to be normal w.r.t. L, it will not be checked for being so
     {M = simplify(M,2);
       for (i = 1; i <= ncols(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++)
-	{Vt[j] =  int(leadcoef(M[i][j]));}
-	//Vt; typeof(Vt); size(Vt);
-	R = R + findmistletoes(Vt,n,L,P,degbound);
+        for (j =1; j <= size(M[i]); j++)
+        {Vt[j] =  int(leadcoef(M[i][j]));}
+        //Vt; typeof(Vt); size(Vt);
+        R = R + findmistletoes(Vt,n,L,P,degbound);
       }
       return(R);
     }
@@ -682,156 +682,156 @@ NOTE:   V has to be normal w.r.t. L, it will not be checked for being so
 
 static proc growthAlg(intmat T, list #)
 "
- real algorithm for checking the growth of an algebra
+real algorithm for checking the growth of an algebra
 "
 {
- int s = 1;
- if (size(#) > 0) { s = #[1];}
- int j;
- int n = ncols(T);
- intvec NV,C; NV[n] = 0; int m,i;
- intmat T2[n][n] = T[1..n,1..n]; intmat N[n][n];
- if (T2 == N)
- {
+  int s = 1;
+  if (size(#) > 0) { s = #[1];}
+  int j;
+  int n = ncols(T);
+  intvec NV,C; NV[n] = 0; int m,i;
+  intmat T2[n][n] = T[1..n,1..n]; intmat N[n][n];
+  if (T2 == N)
+  {
+    for (i = 1; i <= n; i++)
+    {
+      if (m <  T[n+1,i]) { m = T[n+1,i];}
+    }
+    return(m);
+  }
+
+  //first part: the diagonals
+  for (i = s; i <= n; i++)
+  {
+    if (T[i,i] > 0)
+    {
+      if ((T[i,i] >= 1) && (T[n+1,i] > 0)) {return(-1);}
+      if ((T[i,i] == 1) && (T[n+1,i] == 0))
+      {
+        T[i,i] = 0;
+        T[n+1,i] = 1;
+        return(growthAlg(T));
+      }
+    }
+  }
+
+  //second part: searching for the last but one vertices
+  T2 = T2*T2;
+  for (i = s; i <= n; i++)
+  {
+    if ((intvec(T[i,1..n]) <> intvec(0)) && (intvec(T2[i,1..n]) == intvec(0)))
+    {
+      for (j = 1; j <= n; j++)
+      {
+        if ((T[i,j] > 0) && (m < T[n+1,j])) {m = T[n+1,j];}
+      }
+      T[n+1,i] = T[n+1,i] + m;
+      T[i,1..n] = NV;
+      return(growthAlg(T));
+    }
+  }
+  m = 0;
+
+  //third part: searching for circles
+  for (i = s; i <= n; i++)
+  {
+    T2 = T[1..n,1..n];
+    C = findCycleDFS(i,T2, intvec(i));
+    if (C[1] > 0)
+    {
+      for (j = 2; j <= size(C); j++)
+      {
+        T[i,1..n] = T[i,1..n] + T[C[j],1..n];
+        T[C[j],1..n] = NV;
+      }
+      for (j = 2; j <= size(C); j++)
+      {
+        T[1..n,i] = T[1..n,i] + T[1..n,C[j]];
+        T[1..n,C[j]] = NV;
+      }
+      T[i,i] = T[i,i] - size(C) + 1;
+      m = 0;
+      for (j = 1; j <= size(C); j++)
+      {
+        m = m + T[n+1,C[j]];
+      }
+      for (j = 1; j <= size(C); j++)
+      {
+        T[n+1,C[j]] = m;
+      }
+      return(growthAlg(T,i));
+    }
+    else {ERROR("No Cycle found, something seems wrong! Please contact the authors.");}
+  }
+
+  m = 0;
   for (i = 1; i <= n; i++)
   {
-   if (m <  T[n+1,i]) { m = T[n+1,i];}
+    if (m < T[n+1,i])
+    {
+      m = T[n+1,i];
+    }
   }
   return(m);
- }
-
-//first part: the diagonals
- for (i = s; i <= n; i++)
- {
-  if (T[i,i] > 0)
-  {
-   if ((T[i,i] >= 1) && (T[n+1,i] > 0)) {return(-1);}
-   if ((T[i,i] == 1) && (T[n+1,i] == 0))
-   {
-    T[i,i] = 0;
-    T[n+1,i] = 1;
-    return(growthAlg(T));
-   }
-  }
- }
-
-//second part: searching for the last but one vertices
- T2 = T2*T2;
- for (i = s; i <= n; i++)
- {
-   if ((intvec(T[i,1..n]) <> intvec(0)) && (intvec(T2[i,1..n]) == intvec(0)))
-   {
-    for (j = 1; j <= n; j++)
-    {
-     if ((T[i,j] > 0) && (m < T[n+1,j])) {m = T[n+1,j];}
-    }
-    T[n+1,i] = T[n+1,i] + m;
-    T[i,1..n] = NV;
-    return(growthAlg(T));
-   }
- }
- m = 0;
-
-//third part: searching for circles
- for (i = s; i <= n; i++)
- {
-  T2 = T[1..n,1..n];
-  C = findCycleDFS(i,T2, intvec(i));
-  if (C[1] > 0)
-  {
-   for (j = 2; j <= size(C); j++)
-   {
-    T[i,1..n] = T[i,1..n] + T[C[j],1..n];
-    T[C[j],1..n] = NV;
-   }
-   for (j = 2; j <= size(C); j++)
-   {
-    T[1..n,i] = T[1..n,i] + T[1..n,C[j]];
-    T[1..n,C[j]] = NV;
-   }
-   T[i,i] = T[i,i] - size(C) + 1;
-   m = 0;
-   for (j = 1; j <= size(C); j++)
-   {
-    m = m + T[n+1,C[j]];
-   }
-   for (j = 1; j <= size(C); j++)
-   {
-    T[n+1,C[j]] = m;
-   }
-    return(growthAlg(T,i));
-  }
-  else {ERROR("No Cycle found, something seems wrong! Please contact the authors.");}
- }
-
- m = 0;
- for (i = 1; i <= n; i++)
- {
-	if (m < T[n+1,i])
-	{
-		m = T[n+1,i];
-	}
- }
- return(m);
 }
 
 static proc GlDimSuffix(intvec v, intvec g)
 {
-//Computes the shortest r such that g is a suffix for vr
-//only valid for lex orderings?
- intvec r,gt,vt,lt,g2;
- int lg,lv,l,i,c,f;
- lg = size(g); lv = size(v);
- if (lg <= lv)
- {
-	l = lv-lg;
- }
- else
- {
-	l = 0; g2 = g[(lv+1)..lg];
-	g = g[1..lv]; lg = size(g);
-	c = 1;
- }
- while (l < lv)
+  //Computes the shortest r such that g is a suffix for vr
+  //only valid for lex orderings?
+  intvec r,gt,vt,lt,g2;
+  int lg,lv,l,i,c,f;
+  lg = size(g); lv = size(v);
+  if (lg <= lv)
   {
-	vt = v[(l+1)..lv];
+    l = lv-lg;
+  }
+  else
+  {
+    l = 0; g2 = g[(lv+1)..lg];
+    g = g[1..lv]; lg = size(g);
+    c = 1;
+  }
+  while (l < lv)
+  {
+    vt = v[(l+1)..lv];
     gt = g[1..(lv-l)];
     lt = size(gt);
     for (i = 1; i <= lt; i++)
     {
-		if (vt[i]<>gt[i]) {l++; break;}
-	}
+      if (vt[i]<>gt[i]) {l++; break;}
+    }
     if (lt <=i ) { f = 1; break;}
   }
- if (f == 0) {return(g);}
- r = g[(lv-l+1)..lg];
- if (c == 1) {r = r,g2;}
- return(r);
+  if (f == 0) {return(g);}
+  r = g[(lv-l+1)..lg];
+  if (c == 1) {r = r,g2;}
+  return(r);
 }
 
 static proc isNormal(intvec V, list G)
 {
- int i,j,k,l;
- k = 0;
- for (i = 1; i <= size(G); i++)
- {
-  if ( size(G[i]) <= size(V) )
-   {
-    while ( size(G[i])+k <= size(V) )
+  int i,j,k,l;
+  k = 0;
+  for (i = 1; i <= size(G); i++)
+  {
+    if ( size(G[i]) <= size(V) )
     {
-		if ( G[i] == V[(1+k)..size(V)] ) {return(1);}
-	}
-   }
- }
- return(0);
+      while ( size(G[i])+k <= size(V) )
+      {
+        if ( G[i] == V[(1+k)..size(V)] ) {return(1);}
+      }
+    }
+  }
+  return(0);
 }
 
 static proc findDChain(list L)
 {
- list Li; int i,j;
- for (i = 1; i <= size(L); i++) {Li[i] = size(L[i]);}
- Li = sort(Li); Li = Li[1];
- return(Li[size(Li)]);
+  list Li; int i,j;
+  for (i = 1; i <= size(L); i++) {Li[i] = size(L[i]);}
+  Li = sort(Li); Li = Li[1];
+  return(Li[size(Li)]);
 }
 
 static proc isInList(intvec V, list L)
@@ -878,12 +878,12 @@ PURPOSE:
 checks, if a word P is a praefix of another word I
 "
 {
- int n = size(P);
- if (n <= 0) {return(1);}
- if (size(I) < n) {return(0);}
- intvec IP = I[1..n];
- if (IP == P) {return(1);}
- else {return(0);}
+  int n = size(P);
+  if (n <= 0) {return(1);}
+  if (size(I) < n) {return(0);}
+  intvec IP = I[1..n];
+  if (IP == P) {return(1);}
+  else {return(0);}
 }
 
 static proc isSF(intvec S, intvec I)
@@ -892,13 +892,13 @@ PURPOSE:
 checks, if a word P is a suffix of another word I
 "
 {
- int n = size(S);
- if (n <= 0) {return(1);}
- int m = size(I);
- if (m < n) {return(0);}
- intvec IS = I[(m-n+1)..m];
- if (IS == S) {return(1);}
- else {return(0);}
+  int n = size(S);
+  if (n <= 0) {return(1);}
+  int m = size(I);
+  if (m < n) {return(0);}
+  intvec IS = I[(m-n+1)..m];
+  if (IS == S) {return(1);}
+  else {return(0);}
 }
 
 static proc isIF(intvec IF, intvec I)
@@ -907,23 +907,23 @@ PURPOSE:
 checks, if a word IF is an infix of another word I
 "
 {
- int n = size(IF);
- int m = size(I);
+  int n = size(IF);
+  int m = size(I);
 
- if (n <= 0) {
-   return(1);
- }
- if (m < n) {
-   return(0);
- }
+  if (n <= 0) {
+    return(1);
+  }
+  if (m < n) {
+    return(0);
+  }
 
- for (int i = 0; (n + i) <= m; i++){
-   intvec IIF = I[(1 + i)..(n + i)];
-   if (IIF == IF) {
-     return(1);
-   }
- }
- return(0);
+  for (int i = 0; (n + i) <= m; i++){
+    intvec IIF = I[(1 + i)..(n + i)];
+    if (IIF == IF) {
+      return(1);
+    }
+  }
+  return(0);
 }
 
 proc ivL2lpI(list L)
@@ -1054,23 +1054,23 @@ PURPOSE:Transforming an ideal into the corresponding list of intvecs
 ASSUME: - basering has to be a Letterplace ring
 EXAMPLE: example lpId2ivLi; shows examples
 "
-{int i,j,k;
-  list M;
-  checkAssumptions(0,M);
-  for (i = 1; i <= size(G); i++) {M[i] = lp2iv(G[i]);}
-  return(M);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
-  setring R; // sets basering to Letterplace ring
-  ideal L = x(1)*x(2),y(1)*y(2),x(1)*y(2)*x(3);
-  lpId2ivLi(L); // returns the corresponding intvecs as a list
-}
+nt i,j,k;
+list M;
+checkAssumptions(0,M);
+for (i = 1; i <= size(G); i++) {M[i] = lp2iv(G[i]);}
+return(M);
 
-proc lp2iv(poly p)
+ample
+
+"EXAMPLE:"; echo = 2;
+ring r = 0,(x,y),dp;
+def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+setring R; // sets basering to Letterplace ring
+ideal L = x(1)*x(2),y(1)*y(2),x(1)*y(2)*x(3);
+lpId2ivLi(L); // returns the corresponding intvecs as a list
+
+
+oc lp2iv(poly p)
 "USAGE: lp2iv(p); p a poly
 RETURN: intvec
 PURPOSE:Transforming a monomial into the corresponding intvec
@@ -1315,20 +1315,20 @@ static proc topologicalSort(intmat G) {
 
 static proc imPermcol (intmat A, int c1, int c2)
 {
-   intmat B = A;
-   int k = nrows(B);
-   B[1..k,c1] = A[1..k,c2];
-   B[1..k,c2] = A[1..k,c1];
-   return (B);
+  intmat B = A;
+  int k = nrows(B);
+  B[1..k,c1] = A[1..k,c2];
+  B[1..k,c2] = A[1..k,c1];
+  return (B);
 }
 
 static proc imPermrow (intmat A, int r1, int r2)
 {
-   intmat B = A;
-   int k = ncols(B);
-   B[r1,1..k] = A[r2,1..k];
-   B[r2,1..k] = A[r1,1..k];
-   return (B);
+  intmat B = A;
+  int k = ncols(B);
+  B[r1,1..k] = A[r2,1..k];
+  B[r2,1..k] = A[r1,1..k];
+  return (B);
 }
 
 static proc UfGraphGrowth(intmat UG)
@@ -1442,7 +1442,7 @@ RETURN: intmat
 PURPOSE: Constructs the Ufnarovskij graph induced by G
 @*      the adjacency matrix of the Ufnarovskij graph induced by G
 ASSUME: - basering is a Letterplace ring
-        - G are the leading monomials of a Groebner basis
+- G are the leading monomials of a Groebner basis
 "
 {
   int l = 0; // length of longest word (monomial) in G
@@ -1478,9 +1478,9 @@ ASSUME: - basering is a Letterplace ring
   if (size(#) > 0) {
     if (typeof(#[1]) == "int") {
       if (#[1] == 1) {
-	list ret = UG;
-	ret[2] = ivL2lpI(SW); // the vertices
-	return (ret);
+        list ret = UG;
+        ret[2] = ivL2lpI(SW); // the vertices
+        return (ret);
       }
     }
   }
@@ -1525,7 +1525,7 @@ RETURN: intmat
 PURPOSE: Constructs the graph of normal words induced by G
 @*:      the adjacency matrix of the graph of normal words induced by G
 ASSUME: - basering is a Letterplace ring
-        - G are the leading monomials of a Groebner basis
+- G are the leading monomials of a Groebner basis
 "
 {
   // construct the Graph of normal words [Studzinski page 78]
@@ -1537,54 +1537,54 @@ ASSUME: - basering is a Letterplace ring
   for (i = 1; i <= v; i++){V = V, var(i);}
   for (i = 1; i <= size(LG); i++)
   {
-   E = leadexp(LG[i]);
-   if (E == intvec(0)) {V = V,monomial(intvec(0));}
-   else
-   {
-    for (j = 1; j < d; j++)
+    E = leadexp(LG[i]);
+    if (E == intvec(0)) {V = V,monomial(intvec(0));}
+    else
     {
-     Et = E[(j*v+1)..(d*v)];
-     if (Et == intvec(0)) {break;}
-     else {V = V, monomial(Et);}
+      for (j = 1; j < d; j++)
+      {
+        Et = E[(j*v+1)..(d*v)];
+        if (Et == intvec(0)) {break;}
+        else {V = V, monomial(Et);}
+      }
     }
-   }
   }
   V = simplify(V,2+4);
-            printf("V = %p", V);
-  
-  
+  printf("V = %p", V);
+
+
   // construct incidence matrix
-  
+
   list LV = lpId2ivLi(V);
   intvec Ip,Iw;
   int n = size(V);
   intmat T[n+1][n];
   for (i = 1; i <= n; i++)
   {
-       // printf("for1 (i=%p, n=%p)", i, n);
-   p = V[i]; Ip = lp2iv(p);
-   for (j = 1; j <= n; j++)
-   {
-       // printf("for2 (j=%p, n=%p)", j, n);
-    k = 1; b = 1;
-    q = V[j];
-    w = lpNF(lpMult(p,q),LG);
-    if (w <> 0)
+    // printf("for1 (i=%p, n=%p)", i, n);
+    p = V[i]; Ip = lp2iv(p);
+    for (j = 1; j <= n; j++)
     {
-     Iw = lp2iv(w);
-     while (k <= n)
-     {
-       // printf("while (k=%p, n=%p)", k, n);
-      if (isPF(LV[k],Iw) > 0)
-       {if (isPF(LV[k],Ip) == 0) {b = 0; k = n+1;} else {k++;}
-       }
-       else {k++;}
-     }
-     T[i,j] = b;
-       //  print("Incidence Matrix:");
-       // print(T);
+      // printf("for2 (j=%p, n=%p)", j, n);
+      k = 1; b = 1;
+      q = V[j];
+      w = lpNF(lpMult(p,q),LG);
+      if (w <> 0)
+      {
+        Iw = lp2iv(w);
+        while (k <= n)
+        {
+          // printf("while (k=%p, n=%p)", k, n);
+          if (isPF(LV[k],Iw) > 0)
+          {if (isPF(LV[k],Ip) == 0) {b = 0; k = n+1;} else {k++;}
+          }
+          else {k++;}
+        }
+        T[i,j] = b;
+        //  print("Incidence Matrix:");
+        // print(T);
+      }
     }
-   }
   }
   return(T);
 }
@@ -1595,7 +1595,7 @@ RETURN: int
 PURPOSE: Determines the Gelfand Kirillov dimension of A/<G>
 @*:     -1 means it is infinite
 ASSUME: - basering is a Letterplace ring
-        - G is a Groebner basis
+- G is a Groebner basis
 "
 {
   return(growthAlg(lpGraphOfNormalWords(G)));
@@ -1611,7 +1611,7 @@ PURPOSE: Determines the Gelfand Kirillov dimension of A/<G>
 @*      -1 means it is positive infinite
 @*      -2 means it is negative infinite
 ASSUME: - basering is a Letterplace ring
-        - G is a Groebner basis
+- G is a Groebner basis
 "
 {
   int method = 0;
@@ -1676,12 +1676,12 @@ NOTE: if I = LM(I), then the global dimension is equal the Gelfand
   if (size(G1) > 0) {
     while (size(G1) > 0) {
       if (attrib(R, "lV") > 1) {
-	ring R = lpDelVar(lp2iv(G1[1])[1]);
-	ideal G1 = imap(save,G1);
-	G1 = simplify(G1, 2); // remove zero generators
+        ring R = lpDelVar(lp2iv(G1[1])[1]);
+        ideal G1 = imap(save,G1);
+        G1 = simplify(G1, 2); // remove zero generators
       } else {
-	// only the field is left (no variables)
-	return(0);
+        // only the field is left (no variables)
+        return(0);
       }
     }
     ideal G = imap(save, G); // put this here, because when save == R this call would make G = 0
@@ -1693,11 +1693,11 @@ NOTE: if I = LM(I), then the global dimension is equal the Gelfand
       break;
     } else {
       if (i == size(G)) { // if last iteration
-	print("Using gk dim"); // DEBUG
-	int gkDim = lpGkDim(G);
-	if (gkDim >= 0) {
-	  return (gkDim);
-	}
+        print("Using gk dim"); // DEBUG
+        int gkDim = lpGkDim(G);
+        if (gkDim >= 0) {
+          return (gkDim);
+        }
       }
     }
   }
@@ -1738,9 +1738,9 @@ example
 static proc imHasLoops(intmat A) {
   int n = ncols(A);
   for (int i = 1; i < n; i++) {
-      if (A[i,i] == 1) {
-	return (1);
-      }
+    if (A[i,i] == 1) {
+      return (1);
+    }
   }
   return (0);
 }
@@ -1780,21 +1780,21 @@ static proc lpGraphOfNChains(ideal G) // G must be reduced
       if (contains(LG, uv)) {
         GNC[i,j] = 1;
       } else {
-	// Li p. 177
+        // Li p. 177
         // search for a right divisor 'w' of uv in G
         // then check if G doesn't divide the subword uv-1
 
-	// look for a right divisor in LG
+        // look for a right divisor in LG
         for (int k = 1; k <= size(LG); k++) {
-	  if (isSF(LG[k], uv)) {
-	    // w = LG[k]
-	    if(!ivdivides(LG, uv[1..(size(uv)-1)])) {
-	      // G doesn't divide uv-1
-	      GNC[i,j] = 1;
-	      break;
-	    }
-	  }
-	}
+          if (isSF(LG[k], uv)) {
+            // w = LG[k]
+            if(!ivdivides(LG, uv[1..(size(uv)-1)])) {
+              // G doesn't divide uv-1
+              GNC[i,j] = 1;
+              break;
+            }
+          }
+        }
       }
     }
   }
@@ -2146,7 +2146,7 @@ ASSUME: - The mistletoes have to be ordered lexicographically -> OrdMisLex.
 EXAMPLE: example ivMis2Base; shows examples
 "
 {
-//checkAssumptions(0,M);
+  //checkAssumptions(0,M);
   intvec L,A;
   if (size(M) == 0){ERROR("There are no mistletoes, so it appears your dimension is infinite!");}
   if (isInList(L,M) > 0) {print("1 is a mistletoe, therefore 1 is the only basis element"); return(list(intvec(0)));}
@@ -2157,21 +2157,21 @@ EXAMPLE: example ivMis2Base; shows examples
   for (i = size(L); 1 <= i; i--) {Rt = insert(Rt,intvec(L[1..i]));}
   for (i = 2; i <= size(M); i++)
   {A = M[i]; L = M[i-1];
-   s = size(A);
-   if (s > size(L))
-   {d = size(L);
-    for (j = s; j > d; j--) {Rt = insert(Rt,intvec(A[1..j]));}
-    A = A[1..d];
-   }
-   if (size(L) > s){L = L[1..s];}
-   while (A <> L)
-   {Rt = insert(Rt, intvec(A));
-    if (size(A) > 1)
-    {A = A[1..(size(A)-1)];
-     L = L[1..(size(L)-1)];
+    s = size(A);
+    if (s > size(L))
+    {d = size(L);
+      for (j = s; j > d; j--) {Rt = insert(Rt,intvec(A[1..j]));}
+      A = A[1..d];
     }
-    else {break;}
-   }
+    if (size(L) > s){L = L[1..s];}
+    while (A <> L)
+    {Rt = insert(Rt, intvec(A));
+      if (size(A) > 1)
+      {A = A[1..(size(A)-1)];
+        L = L[1..(size(L)-1)];
+      }
+      else {break;}
+    }
   }
   return(Rt);
 }
@@ -2230,7 +2230,7 @@ proc ivOrdMisLex(list M)
 RETURN: list, containing the ordered intvecs of M
 PURPOSE:Orders a given set of mistletoes lexicographically
 ASSUME: - basering is a Letterplace ring.
-       - intvecs correspond to monomials
+- intvecs correspond to monomials
 NOTE:   - This is preprocessing, it's not needed if the mistletoes are returned
 @*        from the sickle algorithm.
 @*      - Each entry of the list returned is an intvec.
@@ -2945,7 +2945,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 /* vl: new stuff for conversion to Magma and to SD
 todo: doc, example
-*/
+ */
 proc extractVars(r)
 {
   int i = 1;
@@ -2954,11 +2954,11 @@ proc extractVars(r)
   list result = list();
   for (i = 1; i<=nvars(r);i++)
   {
-        candidate = string(var(i))[1,find(string(var(i)),"(")-1];
-        if (!inList(result, candidate))
-        {
-          result = insert(result,candidate,size(result));
-        }
+    candidate = string(var(i))[1,find(string(var(i)),"(")-1];
+    if (!inList(result, candidate))
+    {
+      result = insert(result,candidate,size(result));
+    }
   }
   return(result);
 }
@@ -2976,12 +2976,12 @@ proc letterPlacePoly2MagmaString(poly h)
     }
     if (size(s)!=pos)
     {
-        s = s[1,pos-1]+s[pos+1,size(s)-pos]; // The last (")")
+      s = s[1,pos-1]+s[pos+1,size(s)-pos]; // The last (")")
     }
     else
     {
-		s = s[1,pos-1];
-	}
+      s = s[1,pos-1];
+    }
   }
   return(s);
 }
@@ -3045,16 +3045,16 @@ proc tst_fpadim()
 
 
 /*proc lpSubstituteExpandRing(poly f, list s1, list s2) {*/
-  /*int minDegBound = calcSubstDegBound(f,s1,s2);*/
+/*int minDegBound = calcSubstDegBound(f,s1,s2);*/
 /**/
-  /*def R = basering; // curr lp ring*/
-  /*setring ORIGINALRING; // non lp ring TODO*/
-  /*def R1 = makeLetterplaceRing(minDegBound);*/
-  /*setring R1;*/
+/*def R = basering; // curr lp ring*/
+/*setring ORIGINALRING; // non lp ring TODO*/
+/*def R1 = makeLetterplaceRing(minDegBound);*/
+/*setring R1;*/
 /**/
-  /*poly g = lpSubstitute(imap(R,f), imap(R,s1), imap(R,s2));*/
+/*poly g = lpSubstitute(imap(R,f), imap(R,s1), imap(R,s2));*/
 /**/
-  /*return (R1); // return the new ring*/
+/*return (R1); // return the new ring*/
 /*}*/
 
 proc lpSubstitute(poly f, list s1, list s2, list #)
@@ -3065,7 +3065,7 @@ RETURN: poly, the substituted polynomial
 ASSUME: - basering is a Letterplace ring
 @*      - G is a groebner basis,
 @*      - the current ring has a sufficient degbound (can be calculated with
-@*	  calcSubstDegBound())
+    @*	  calcSubstDegBound())
 EXAMPLE: example lpSubstitute; shows examples
 "
 {
@@ -3084,10 +3084,10 @@ EXAMPLE: example lpSubstitute; shows examples
       int varindex = ivfi[j];
       int subindex = indexof(s1, varindex);
       if (subindex > 0) {
-	s2[subindex] = lpNF(s2[subindex],G);
-	fis = lpMult(fis, s2[subindex]);
+        s2[subindex] = lpNF(s2[subindex],G);
+        fis = lpMult(fis, s2[subindex]);
       } else {
-	fis = lpMult(fis, lpNF(iv2lp(varindex),G));
+        fis = lpMult(fis, lpNF(iv2lp(varindex),G));
       }
       /*fis = lpNF(fis,G);*/
     }
@@ -3168,9 +3168,9 @@ EXAMPLE: example lpSubstitute; shows examples
       int varindex = ivfi[j];
       int subindex = indexof(s1, varindex);
       if (subindex > 0) {
-	tmpDegBound = tmpDegBound + deg(s2[subindex]);
+        tmpDegBound = tmpDegBound + deg(s2[subindex]);
       } else {
-	tmpDegBound = tmpDegBound + 1;
+        tmpDegBound = tmpDegBound + 1;
       }
     }
     if (tmpDegBound > maxDegBound) {
@@ -3206,220 +3206,220 @@ EXAMPLE: example lpSubstitute; shows examples
 
 
 /*
-  Here are some examples one may try. Just copy them into your console.
-  These are relations for braid groups, up to degree d:
+   Here are some examples one may try. Just copy them into your console.
+   These are relations for braid groups, up to degree d:
 
 
-  LIB "fpadim.lib";
-  ring r = 0,(x,y,z),dp;
-  int d =10; // degree
-  def R = makeLetterplaceRing(d);
-  setring R;
-  ideal I = y(1)*x(2)*y(3) - z(1)*y(2)*z(3), x(1)*y(2)*x(3) - z(1)*x(2)*y(3),
-  z(1)*x(2)*z(3) - y(1)*z(2)*x(3), x(1)*x(2)*x(3) + y(1)*y(2)*y(3) +
-  z(1)*z(2)*z(3) + x(1)*y(2)*z(3);
-  option(prot);
-  option(redSB);option(redTail);option(mem);
-  ideal J = system("freegb",I,d,3);
-  lpDimCheck(J);
-  sickle(J,1,1,1,d);//Computes mistletoes, K-dimension and the Hilbert series
-
-
-
-  LIB "fpadim.lib";
-  ring r = 0,(x,y,z),dp;
-  int d =11; // degree
-  def R = makeLetterplaceRing(d);
-  setring R;
-  ideal I = y(1)*x(2)*y(3) - z(1)*y(2)*z(3), x(1)*y(2)*z(3) - z(1)*x(2)*y(3),
-  z(1)*x(2)*z(3) - y(1)*z(2)*x(3), x(1)*x(2)*x(3) + y(1)*y(2)*y(3) +
-  z(1)*z(2)*z(3) + x(1)*y(2)*z(3);
-  option(prot);
-  option(redSB);option(redTail);option(mem);
-  ideal J = system("freegb",I,d,3);
-  lpDimCheck(J);
-  sickle(J,1,1,1,d);
+   LIB "fpadim.lib";
+   ring r = 0,(x,y,z),dp;
+   int d =10; // degree
+   def R = makeLetterplaceRing(d);
+   setring R;
+   ideal I = y(1)*x(2)*y(3) - z(1)*y(2)*z(3), x(1)*y(2)*x(3) - z(1)*x(2)*y(3),
+   z(1)*x(2)*z(3) - y(1)*z(2)*x(3), x(1)*x(2)*x(3) + y(1)*y(2)*y(3) +
+   z(1)*z(2)*z(3) + x(1)*y(2)*z(3);
+   option(prot);
+   option(redSB);option(redTail);option(mem);
+   ideal J = system("freegb",I,d,3);
+   lpDimCheck(J);
+   sickle(J,1,1,1,d);//Computes mistletoes, K-dimension and the Hilbert series
 
 
 
-  LIB "fpadim.lib";
-  ring r = 0,(x,y,z),dp;
-  int d  = 6; // degree
-  def R  = makeLetterplaceRing(d);
-  setring R;
-  ideal I = y(1)*x(2)*y(3) - z(1)*y(2)*z(3), x(1)*y(2)*x(3) - z(1)*x(2)*y(3),
-  z(1)*x(2)*z(3) - y(1)*z(2)*x(3), x(1)*x(2)*x(3) -2*y(1)*y(2)*y(3) + 3*z(1)*z(2)*z(3) -4*x(1)*y(2)*z(3) + 5*x(1)*z(2)*z(3)- 6*x(1)*y(2)*y(3) +7*x(1)*x(2)*z(3) - 8*x(1)*x(2)*y(3);
-  option(prot);
-  option(redSB);option(redTail);option(mem);
-  ideal J = system("freegb",I,d,3);
-  lpDimCheck(J);
-  sickle(J,1,1,1,d);
-*/
-
-/*
-  Here are some examples, which can also be found in [studzins]:
-
-  // takes up to 880Mb of memory
-  LIB "fpadim.lib";
-  ring r = 0,(x,y,z),dp;
-  int d =10; // degree
-  def R = makeLetterplaceRing(d);
-  setring R;
-  ideal I =
-  z(1)*z(2)*z(3)*z(4) + y(1)*x(2)*y(3)*x(4) - x(1)*y(2)*y(3)*x(4) - 3*z(1)*y(2)*x(3)*z(4), x(1)*x(2)*x(3) + y(1)*x(2)*y(3) - x(1)*y(2)*x(3), z(1)*y(2)*x(3)-x(1)*y(2)*z(3) + z(1)*x(2)*z(3);
-  option(prot);
-  option(redSB);option(redTail);option(mem);
-  ideal J = system("freegb",I,d,nvars(r));
-  lpDimCheck(J);
-  sickle(J,1,1,1,d); // dimension is 24872
+   LIB "fpadim.lib";
+   ring r = 0,(x,y,z),dp;
+   int d =11; // degree
+   def R = makeLetterplaceRing(d);
+   setring R;
+   ideal I = y(1)*x(2)*y(3) - z(1)*y(2)*z(3), x(1)*y(2)*z(3) - z(1)*x(2)*y(3),
+   z(1)*x(2)*z(3) - y(1)*z(2)*x(3), x(1)*x(2)*x(3) + y(1)*y(2)*y(3) +
+   z(1)*z(2)*z(3) + x(1)*y(2)*z(3);
+   option(prot);
+   option(redSB);option(redTail);option(mem);
+   ideal J = system("freegb",I,d,3);
+   lpDimCheck(J);
+   sickle(J,1,1,1,d);
 
 
-  LIB "fpadim.lib";
-  ring r = 0,(x,y,z),dp;
-  int d =10; // degree
-  def R = makeLetterplaceRing(d);
-  setring R;
-  ideal I = x(1)*y(2) + y(1)*z(2), x(1)*x(2) + x(1)*y(2) - y(1)*x(2) - y(1)*y(2);
-  option(prot);
-  option(redSB);option(redTail);option(mem);
-  ideal J = system("freegb",I,d,3);
-  lpDimCheck(J);
-  sickle(J,1,1,1,d);
-*/
 
+   LIB "fpadim.lib";
+   ring r = 0,(x,y,z),dp;
+   int d  = 6; // degree
+   def R  = makeLetterplaceRing(d);
+   setring R;
+   ideal I = y(1)*x(2)*y(3) - z(1)*y(2)*z(3), x(1)*y(2)*x(3) - z(1)*x(2)*y(3),
+   z(1)*x(2)*z(3) - y(1)*z(2)*x(3), x(1)*x(2)*x(3) -2*y(1)*y(2)*y(3) + 3*z(1)*z(2)*z(3) -4*x(1)*y(2)*z(3) + 5*x(1)*z(2)*z(3)- 6*x(1)*y(2)*y(3) +7*x(1)*x(2)*z(3) - 8*x(1)*x(2)*y(3);
+   option(prot);
+   option(redSB);option(redTail);option(mem);
+   ideal J = system("freegb",I,d,3);
+   lpDimCheck(J);
+   sickle(J,1,1,1,d);
+ */
 
 /*
-Example for computing GK dimension:
-returns a ring which contains an ideal I
-run gkDim(I) inside this ring and it should return 2n (the GK dimension
-of n-th Weyl algebra including evaluation operators).
+   Here are some examples, which can also be found in [studzins]:
 
-proc createWeylEx(int n, int d)
-"
-"
-{
-  int baseringdef;
- if (defined(basering)) // if a basering is defined, it should be saved for later use
- {
-  def save = basering;
-  baseringdef = 1;
- }
- ring r = 0,(d(1..n),x(1..n),e(1..n)),dp;
- def R = makeLetterplaceRing(d);
- setring R;
- ideal I; int i,j;
+// takes up to 880Mb of memory
+LIB "fpadim.lib";
+ring r = 0,(x,y,z),dp;
+int d =10; // degree
+def R = makeLetterplaceRing(d);
+setring R;
+ideal I =
+z(1)*z(2)*z(3)*z(4) + y(1)*x(2)*y(3)*x(4) - x(1)*y(2)*y(3)*x(4) - 3*z(1)*y(2)*x(3)*z(4), x(1)*x(2)*x(3) + y(1)*x(2)*y(3) - x(1)*y(2)*x(3), z(1)*y(2)*x(3)-x(1)*y(2)*z(3) + z(1)*x(2)*z(3);
+option(prot);
+option(redSB);option(redTail);option(mem);
+ideal J = system("freegb",I,d,nvars(r));
+lpDimCheck(J);
+sickle(J,1,1,1,d); // dimension is 24872
 
- for (i = 1; i <= n; i++)
- {
-  for (j = i+1; j<= n; j++)
-  {
+
+LIB "fpadim.lib";
+ring r = 0,(x,y,z),dp;
+int d =10; // degree
+def R = makeLetterplaceRing(d);
+setring R;
+ideal I = x(1)*y(2) + y(1)*z(2), x(1)*x(2) + x(1)*y(2) - y(1)*x(2) - y(1)*y(2);
+option(prot);
+option(redSB);option(redTail);option(mem);
+ideal J = system("freegb",I,d,3);
+lpDimCheck(J);
+sickle(J,1,1,1,d);
+ */
+
+
+/*
+   Example for computing GK dimension:
+   returns a ring which contains an ideal I
+   run gkDim(I) inside this ring and it should return 2n (the GK dimension
+   of n-th Weyl algebra including evaluation operators).
+
+   proc createWeylEx(int n, int d)
+   "
+   "
+   {
+   int baseringdef;
+   if (defined(basering)) // if a basering is defined, it should be saved for later use
+   {
+   def save = basering;
+   baseringdef = 1;
+   }
+   ring r = 0,(d(1..n),x(1..n),e(1..n)),dp;
+   def R = makeLetterplaceRing(d);
+   setring R;
+   ideal I; int i,j;
+
+   for (i = 1; i <= n; i++)
+   {
+   for (j = i+1; j<= n; j++)
+   {
    I[size(I)+1] = lpMult(var(i),var(j));
-  }
- }
+   }
+   }
 
- for (i = 1; i <= n; i++)
- {
-  for (j = i+1; j<= n; j++)
-  {
+   for (i = 1; i <= n; i++)
+   {
+   for (j = i+1; j<= n; j++)
+   {
    I[size(I)+1] = lpMult(var(n+i),var(n+j));
-  }
- }
- for (i = 1; i <= n; i++)
- {
-  for (j = 1; j<= n; j++)
-  {
+   }
+   }
+   for (i = 1; i <= n; i++)
+   {
+   for (j = 1; j<= n; j++)
+   {
    I[size(I)+1] = lpMult(var(i),var(n+j));
-  }
- }
-  for (i = 1; i <= n; i++)
- {
-  for (j = 1; j<= n; j++)
-  {
+   }
+   }
+   for (i = 1; i <= n; i++)
+   {
+   for (j = 1; j<= n; j++)
+   {
    I[size(I)+1] = lpMult(var(i),var(2*n+j));
-  }
- }
- for (i = 1; i <= n; i++)
- {
-  for (j = 1; j<= n; j++)
-  {
+   }
+   }
+   for (i = 1; i <= n; i++)
+   {
+   for (j = 1; j<= n; j++)
+   {
    I[size(I)+1] = lpMult(var(2*n+i),var(n+j));
-  }
- }
-  for (i = 1; i <= n; i++)
- {
-  for (j = 1; j<= n; j++)
-  {
+   }
+   }
+   for (i = 1; i <= n; i++)
+   {
+   for (j = 1; j<= n; j++)
+   {
    I[size(I)+1] = lpMult(var(2*n+i),var(2*n+j));
-  }
- }
- I = simplify(I,2+4);
- I = letplaceGBasis(I);
- export(I);
- if (baseringdef == 1) {setring save;}
- return(R);
-}
+   }
+   }
+   I = simplify(I,2+4);
+   I = letplaceGBasis(I);
+   export(I);
+   if (baseringdef == 1) {setring save;}
+   return(R);
+   }
 
 proc TestGKAuslander3()
 {
-ring r = (0,q),(z,x,y),(dp(1),dp(2));
-def R = makeLetterplaceRing(5); // constructs a Letterplace ring
-R; setring R; // sets basering to Letterplace ring
-ideal I;
-I = q*x(1)*y(2) - y(1)*x(2), z(1)*y(2) - y(1)*z(2), z(1)*x(2) - x(1)*z(2);
-I = letplaceGBasis(I);
-lpGkDim(I); // must be 3
-I = x(1)*y(2)*z(3) - y(1)*x(2), z(1)*y(2) - y(1)*z(2), z(1)*x(2) - x(1)*z(2);//gkDim = 2
-I = letplaceGBasis(I); // not finite BUT contains a poly in x,y only
-lpGkDim(I); // must be 4
+  ring r = (0,q),(z,x,y),(dp(1),dp(2));
+  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  R; setring R; // sets basering to Letterplace ring
+  ideal I;
+  I = q*x(1)*y(2) - y(1)*x(2), z(1)*y(2) - y(1)*z(2), z(1)*x(2) - x(1)*z(2);
+  I = letplaceGBasis(I);
+  lpGkDim(I); // must be 3
+  I = x(1)*y(2)*z(3) - y(1)*x(2), z(1)*y(2) - y(1)*z(2), z(1)*x(2) - x(1)*z(2);//gkDim = 2
+  I = letplaceGBasis(I); // not finite BUT contains a poly in x,y only
+  lpGkDim(I); // must be 4
 
-ring r = 0,(y,x,z),dp;
-def R = makeLetterplaceRing(10); // constructs a Letterplace ring
-R; setring R; // sets basering to Letterplace ring
-ideal I;
-I = x(1)*y(2)*z(3) - y(1)*x(2), z(1)*y(2) - y(1)*z(2), z(1)*x(2) - x(1)*z(2);//gkDim = 2
-I = letplaceGBasis(I); // computed as it would be homogenized; infinite
-poly p = x(1)*y(2)*y(3)*x(4)-y(1)*x(2)*x(3)*y(4);
-lpNF(p, I); // 0 as expected
+  ring r = 0,(y,x,z),dp;
+  def R = makeLetterplaceRing(10); // constructs a Letterplace ring
+  R; setring R; // sets basering to Letterplace ring
+  ideal I;
+  I = x(1)*y(2)*z(3) - y(1)*x(2), z(1)*y(2) - y(1)*z(2), z(1)*x(2) - x(1)*z(2);//gkDim = 2
+  I = letplaceGBasis(I); // computed as it would be homogenized; infinite
+  poly p = x(1)*y(2)*y(3)*x(4)-y(1)*x(2)*x(3)*y(4);
+  lpNF(p, I); // 0 as expected
 
-// with inverse of z
-ring r = 0,(iz,z,x,y),dp;
-def R = makeLetterplaceRing(11); // constructs a Letterplace ring
-R; setring R; // sets basering to Letterplace ring
-ideal I;
-I = x(1)*y(2)*z(3) - y(1)*x(2), z(1)*y(2) - y(1)*z(2), z(1)*x(2) - x(1)*z(2),
-iz(1)*y(2) - y(1)*iz(2), iz(1)*x(2) - x(1)*iz(2), iz(1)*z(2)-1, z(1)*iz(2) -1;
-I = letplaceGBasis(I); //
-setring r;
-def R2 = makeLetterplaceRing(23); // constructs a Letterplace ring
-setring R2; // sets basering to Letterplace ring
-ideal I = imap(R,I);
-lpGkDim(I);
+  // with inverse of z
+  ring r = 0,(iz,z,x,y),dp;
+  def R = makeLetterplaceRing(11); // constructs a Letterplace ring
+  R; setring R; // sets basering to Letterplace ring
+  ideal I;
+  I = x(1)*y(2)*z(3) - y(1)*x(2), z(1)*y(2) - y(1)*z(2), z(1)*x(2) - x(1)*z(2),
+    iz(1)*y(2) - y(1)*iz(2), iz(1)*x(2) - x(1)*iz(2), iz(1)*z(2)-1, z(1)*iz(2) -1;
+  I = letplaceGBasis(I); //
+  setring r;
+  def R2 = makeLetterplaceRing(23); // constructs a Letterplace ring
+  setring R2; // sets basering to Letterplace ring
+  ideal I = imap(R,I);
+  lpGkDim(I);
 
 
-ring r = 0,(t,z,x,y),(dp(2),dp(2));
-def R = makeLetterplaceRing(20); // constructs a Letterplace ring
-R; setring R; // sets basering to Letterplace ring
-ideal I;
-I = x(1)*y(2)*z(3) - y(1)*x(2)*t(3), z(1)*y(2) - y(1)*z(2), z(1)*x(2) - x(1)*z(2),
-t(1)*y(2) - y(1)*t(2), t(1)*x(2) - x(1)*t(2), t(1)*z(2) - z(1)*t(2);//gkDim = 2
-I = letplaceGBasis(I); // computed as it would be homogenized; infinite
-LIB "elim.lib";
-ideal Inoz = nselect(I,intvec(2,6,10,14,18,22,26,30));
-for(int i=1; i<=20; i++)
-{
-Inoz=subst(Inoz,t(i),1);
-}
-ideal J = x(1)*y(2)*y(3)*x(4)-y(1)*x(2)*x(3)*y(4);
-J = letplaceGBasis(J);
+  ring r = 0,(t,z,x,y),(dp(2),dp(2));
+  def R = makeLetterplaceRing(20); // constructs a Letterplace ring
+  R; setring R; // sets basering to Letterplace ring
+  ideal I;
+  I = x(1)*y(2)*z(3) - y(1)*x(2)*t(3), z(1)*y(2) - y(1)*z(2), z(1)*x(2) - x(1)*z(2),
+    t(1)*y(2) - y(1)*t(2), t(1)*x(2) - x(1)*t(2), t(1)*z(2) - z(1)*t(2);//gkDim = 2
+  I = letplaceGBasis(I); // computed as it would be homogenized; infinite
+  LIB "elim.lib";
+  ideal Inoz = nselect(I,intvec(2,6,10,14,18,22,26,30));
+  for(int i=1; i<=20; i++)
+  {
+    Inoz=subst(Inoz,t(i),1);
+  }
+  ideal J = x(1)*y(2)*y(3)*x(4)-y(1)*x(2)*x(3)*y(4);
+  J = letplaceGBasis(J);
 
-poly p = x(1)*y(2)*y(3)*x(4)-y(1)*x(2)*x(3)*y(4);
-lpNF(p, I); // 0 as expected
+  poly p = x(1)*y(2)*y(3)*x(4)-y(1)*x(2)*x(3)*y(4);
+  lpNF(p, I); // 0 as expected
 
-ring r2 = 0,(x,y),dp;
-def R2 = makeLetterplaceRing(50); // constructs a Letterplace ring
-setring R2;
-ideal J = x(1)*y(2)*y(3)*x(4)-y(1)*x(2)*x(3)*y(4);
-J = letplaceGBasis(J);
+  ring r2 = 0,(x,y),dp;
+  def R2 = makeLetterplaceRing(50); // constructs a Letterplace ring
+  setring R2;
+  ideal J = x(1)*y(2)*y(3)*x(4)-y(1)*x(2)*x(3)*y(4);
+  J = letplaceGBasis(J);
 }
 
 */
@@ -3456,4 +3456,4 @@ x(1)*y(2)*y(3)-a*y(1)*x(2)*y(3) - b*y(1)*y(2)*x(3) - F2;
 J = letplaceGBasis(J);
 lpGkDim(J); // 3 == correct
 
-*/
+ */
