@@ -1651,7 +1651,7 @@ RETURN: int, an upper bound for the global dimension, -1 means infinity
 PURPOSE: computing an upper bound for the global dimension
 ASSUME: - basering is a Letterplace ring, G is a reduced Gröbner Basis
 EXAMPLE: example lpGlDimBound; shows example
-NOTE: if I = LM(I), then the global dimension is equal the Gelfand 
+NOTE: if I = LM(I), then the global dimension is equal the Gelfand
 @*    Kirillov dimension if it is finite
 @*    Global dimension should be 0 for A/G = K and 1 for A/G = K<x1...xn>
 "
