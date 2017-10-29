@@ -881,7 +881,7 @@ checks, if a word P is a praefix of another word I
 "
 {
   int n = size(P);
-  if (n <= 0) {return(1);}
+  if (n <= 0 || P == 0) {return(1);}
   if (size(I) < n) {return(0);}
   intvec IP = I[1..n];
   if (IP == P) {return(1);}
@@ -891,11 +891,11 @@ checks, if a word P is a praefix of another word I
 static proc isSF(intvec S, intvec I)
 "
 PURPOSE:
-checks, if a word P is a suffix of another word I
+checks, if a word S is a suffix of another word I
 "
 {
   int n = size(S);
-  if (n <= 0) {return(1);}
+  if (n <= 0 || S == 0) {return(1);}
   int m = size(I);
   if (m < n) {return(0);}
   intvec IS = I[(m-n+1)..m];
@@ -912,12 +912,8 @@ checks, if a word IF is an infix of another word I
   int n = size(IF);
   int m = size(I);
 
-  if (n <= 0) {
-    return(1);
-  }
-  if (m < n) {
-    return(0);
-  }
+  if (n <= 0 || IF == 0) {return(1);}
+  if (m < n) {return(0);}
 
   for (int i = 0; (n + i) <= m; i++){
     intvec IIF = I[(1 + i)..(n + i)];
@@ -1490,9 +1486,16 @@ ASSUME: - basering is a Letterplace ring
   return (UG);
 }
 
-static proc ivStandardWords(list G, int length) {
+static proc ivStandardWords(list G, int length)
+"ASSUME: G is simplified
+"
+{
   if (length == 0) {
-    return (0); // iv = 0 means monom = 1
+    list words;
+    if (!ivdivides(G,0)) {
+      words[1] = 0; // iv = 0 means monom = 1
+    }
+    return (words); // no standard words
   }
   int lV = attrib(basering, "lV"); // variable count
   list prevWords = ivStandardWords(G, length - 1);
@@ -1506,6 +1509,18 @@ static proc ivStandardWords(list G, int length) {
         words = insert(words, word);
       }
     }
+  }
+  return (words);
+}
+
+static proc ivStandardWordsUpToLength(list G, int length)
+"ASSUME: G is simplified
+"
+{
+  list words = ivStandardWords(G,0);
+  if (size(words) == 0) {return (words)}
+  for (int i = 1; i <= length; i++) {
+    words = words + ivStandardWords(G, i);
   }
   return (words);
 }
