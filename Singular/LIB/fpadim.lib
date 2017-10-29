@@ -1161,6 +1161,7 @@ example
 static proc lpUfGkDim(ideal G)
 {
   G = lead(G);
+  G = simplify(G, 2+4+8);
 
   // check special case 1
   int l = 0;
@@ -1180,13 +1181,13 @@ static proc lpUfGkDim(ideal G)
   if (l == 1) {
     int n = attrib(basering, "lV"); // variable count
     int k = size(G);
-    if (k == n) {
+    if (k == n) { // V = {1} no edges
       return(0);
     }
-    if (k == n-1) {
+    if (k == n-1) { // V = {1} with loop
       return(1);
     }
-    if (k <= n-2) {
+    if (k <= n-2) { // V = {1} with more than one loop
       return(-1);
     }
   }
@@ -1438,7 +1439,7 @@ ASSUME: Basering has to be a Letterplace ring.
   return(cycles);
 }
 
-proc lpUfGraph(ideal G, list #)
+static proc lpUfGraph(ideal G, list #)
 "USAGE: lpUfGraph(G); G a set of monomials in a letterplace ring, # an optional parameter which also returns the vertex list when 1
 RETURN: intmat
 PURPOSE: Constructs the Ufnarovskij graph induced by G
