@@ -1156,6 +1156,12 @@ example
 // -----------------main procedures----------------------
 
 proc lpIsPrime(ideal G)
+"USAGE: lpIsPrime(G); G an ideal in a Letterplace ring
+RETURN: boolean
+PURPOSE: Check whether R/<G> is prime, where R is the basering
+ASSUME: - basering is a Letterplace ring
+@*      - G is a Groebner basis
+"
 {
   G = lead(G);
   G = simplify(G, 2+4+8);
@@ -1195,9 +1201,18 @@ proc lpIsPrime(ideal G)
   }
   return (1);
 }
+example {
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(5);
+  setring R;
+  ideal G = x(1)*x(2), y(1)*y(2); // K<x,y>/<xx,yy> is prime
+  lpIsPrime(G);
+}
 
 static proc existsRoute(intmat G, int v, int u, list #)
-"USAGE: G a graph, v and u vertices, don't pass something to # (internal use for recursion)
+"USAGE: existsRoute(G,v,u); G a graph, v and u vertices
+NOTE: don't pass something to # (internal use for recursion)
 "
 {
   if (v == u) {return (1);}
@@ -1429,11 +1444,11 @@ static proc UfGraphGrowth(intmat UG)
 
 static proc countCycles(intmat G, int v, intvec visited, intvec cyclic, intvec path)
 "USAGE: countCycles(G, v, visited, cyclic, path); G a Graph, v the vertex to
-start. visited, cyclic and path should be 0.
+start. The parameter visited, cyclic and path should be 0.
 RETURN: int
-PURPOSE: Calculate the maximal number of distinct cycles in a single path starting at v.
-@*: Maximal number of distinct cycles
-ASSUME: Basering has to be a Letterplace ring.
+@*:     Maximal number of distinct cycles
+PURPOSE: Calculate the maximal number of distinct cycles in a single path starting at v
+ASSUME: Basering is a Letterplace ring
 "
 {
   // Mark the current vertex as visited
@@ -1509,12 +1524,12 @@ ASSUME: Basering has to be a Letterplace ring.
 }
 
 static proc lpUfGraph(ideal G, list #)
-"USAGE: lpUfGraph(G); G a set of monomials in a letterplace ring, # an optional parameter which also returns the vertex list when 1
+"USAGE: lpUfGraph(G); G a set of monomials in a letterplace ring, # an optional parameter to return the vertex list when set
 RETURN: intmat
 PURPOSE: Constructs the Ufnarovskij graph induced by G
 @*      the adjacency matrix of the Ufnarovskij graph induced by G
 ASSUME: - basering is a Letterplace ring
-- G are the leading monomials of a Groebner basis
+@*      - G are the leading monomials of a Groebner basis
 "
 {
   int l = maxDeg(G);
