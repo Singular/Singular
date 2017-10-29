@@ -1155,6 +1155,78 @@ example
 
 // -----------------main procedures----------------------
 
+proc lpIsPrime(ideal G)
+{
+  G = lead(G);
+  G = simplify(G, 2+4+8);
+
+  list VUG = lpUfGraph(G, 1);
+  intmat UG = VUG[1]; // the Ufnarovskij graph
+  ideal V = VUG[2]; // the vertice of UG (standard words with length = l-1)
+
+  list LG = lpId2ivLi(G);
+  list LV = lpId2ivLi(V);
+
+  int n = ncols(UG);
+
+  // 1) for each vi vj there exists a route from vi to vj
+  for (int i = 1; i <= n; i++) {
+    for (int j = 1; j <= n; j++) {
+      if (!existsRoute(UG, i, j)) {
+        return (0);
+      }
+    }
+  }
+
+  // 2) any standard word with length < l-1 is a suffix of a vertex
+  list SW = ivStandardWordsUpToLength(LG, maxDeg(G) - 1);
+  if (size(SW) > 0 && size(LV) == 0) {return (0);}
+  for (int i = 1; i <= size(SW); i++) {
+    // check if SW[i] is a suffix of some LV
+    for (int j = 1; j <= size(LV); j++) {
+      if (!isSF(SW[i], LV[j])) {
+        if (j == size(LV)) {
+          return (0);
+        }
+      } else {
+        break;
+      }
+    }
+  }
+  return (1);
+}
+
+static proc existsRoute(intmat G, int v, int u, list #)
+"USAGE: G a graph, v and u vertices, don't pass something to # (internal use for recursion)
+"
+{
+  if (v == u) {return (1);}
+
+  int n = ncols(G);
+
+  // init visited
+  intvec visited;
+  if (size(#) > 0) {
+    visited = #[1];
+  } else {
+    visited[n] = 0;
+  }
+
+  // mark current vertex as visited
+  visited[v] = 1;
+
+  // recursive DFS
+  for (int i = 1; i <= n; i++) {
+    if (G[v,i] && !visited[i]) {
+      if (existsRoute(G, i, u, visited)) {
+        return (1);
+      }
+    }
+  }
+
+  return (0);
+}
+
 static proc lpUfGkDim(ideal G)
 {
   G = lead(G);
@@ -1445,13 +1517,7 @@ ASSUME: - basering is a Letterplace ring
 - G are the leading monomials of a Groebner basis
 "
 {
-  int l = 0; // length of longest word (monomial) in G
-  for (int i = 1; i <= size(G); i++) { // find the max degree in G
-    int d = deg(G[i]);
-    if (d > l) {
-      l = d;
-    }
-  }
+  int l = maxDeg(G);
   list LG = lpId2ivLi(G);
   list SW = ivStandardWords(LG, l - 1); // vertices
   int n = size(SW);
@@ -1485,6 +1551,18 @@ ASSUME: - basering is a Letterplace ring
     }
   }
   return (UG);
+}
+
+static proc maxDeg(ideal G)
+{
+  int l = 0;
+  for (int i = 1; i <= size(G); i++) { // find the max degree in G
+    int d = deg(G[i]);
+    if (d > l) {
+      l = d;
+    }
+  }
+  return (l);
 }
 
 static proc ivStandardWords(list G, int length)
