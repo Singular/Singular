@@ -135,7 +135,7 @@ static int factor_using_division (mpz_t t, unsigned int limit,lists primes, int 
   loop
   {
     mpz_tdiv_qr_ui (q, r, t, 3);
-    if (mpz_cmp_ui (r, 0) != 0)
+    if (mpz_sgn1 (r) != 0)
         break;
     mpz_set (t, q);
     f++;
@@ -149,7 +149,7 @@ static int factor_using_division (mpz_t t, unsigned int limit,lists primes, int 
   loop
   {
     mpz_tdiv_qr_ui (q, r, t, 5);
-    if (mpz_cmp_ui (r, 0) != 0)
+    if (mpz_sgn1 (r) != 0)
         break;
     mpz_set (t, q);
     f++;
@@ -167,7 +167,7 @@ static int factor_using_division (mpz_t t, unsigned int limit,lists primes, int 
   while (mpz_cmp_ui (t, 1) != 0)
   {
     mpz_tdiv_qr_ui (q, r, t, f);
-    if (mpz_cmp_ui (r, 0) != 0)
+    if (mpz_sgn1 (r) != 0)
     {
       f += addv[ai];
       if (mpz_cmp_ui (t, f) < 0)

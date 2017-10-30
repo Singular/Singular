@@ -202,7 +202,7 @@ static BOOLEAN nrzIsZero (number  a, const coeffs)
 
 static BOOLEAN nrzIsOne (number a, const coeffs)
 {
-  return (a!=NULL) && (0 == mpz_cmp_si((mpz_ptr) a, 1));
+  return (a!=NULL) && (0 == mpz_cmp_ui((mpz_ptr) a, 1));
 }
 
 static BOOLEAN nrzIsMOne (number a, const coeffs)
@@ -222,7 +222,7 @@ static BOOLEAN nrzGreater (number a,number b, const coeffs)
 
 static BOOLEAN nrzGreaterZero (number k, const coeffs)
 {
-  return 0 < mpz_cmp_si((mpz_ptr) k, 0);
+  return 0 < mpz_sgn1((mpz_ptr) k);
 }
 
 static BOOLEAN nrzDivBy (number a,number b, const coeffs)
@@ -652,7 +652,7 @@ static inline number nrz_short(number x)
   StringAppendS("short(");
   nrzWrite(x, NULL);
 #endif
-  if (mpz_cmp_ui((mpz_ptr) x,0L)==0)
+  if (mpz_sgn1((mpz_ptr) x)==0)
   {
     mpz_clear((mpz_ptr)x);
     omFreeBin(x, gmp_nrz_bin);
@@ -1422,7 +1422,7 @@ static number nrzDiv (number a,number b, const coeffs)
   omFree(s);
 #endif
 
-  if (mpz_cmp_si(r, 0)!=0)
+  if (mpz_sgn1(r)!=0)
   {
     //WerrorS("4:Division by non divisible element.");
     //WerrorS("Result is without remainder.");
@@ -1644,7 +1644,7 @@ void nrzInitExp(int, coeffs)
 BOOLEAN nrzDBTest (number x, const char *f, const int l, const coeffs)
 {
   if (SR_HDL(x) & SR_INT) return TRUE;
-  if (mpz_cmp_ui((mpz_ptr) x,0L)==0)
+  if (mpz_sgn1((mpz_ptr) x)==0)
   {
     Print("gmp-0 %s:%d\n",f,l);
     return FALSE;
