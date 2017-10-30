@@ -575,7 +575,7 @@ poly ssiReadPoly_R(const ssiInfo *D, const ring r)
   for(l=0;l<n;l++) // read n terms
   {
 // coef,comp.exp1,..exp N
-    p=p_Init(r);
+    p=p_Init(r,r->PolyBin);
     pSetCoeff0(p,ssiReadNumber_CF(D,r->cf));
     int d;
     d=s_readint(D->f_read);

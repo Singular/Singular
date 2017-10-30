@@ -945,8 +945,8 @@ KINLINE BOOLEAN k_GetLeadTerms(const poly p1, const poly p2, const ring p_r,
 
   int i;
   long x;
-  m1 = p_Init(m_r);
-  m2 = p_Init(m_r);
+  m1 = p_Init(m_r,m_r->PolyBin);
+  m2 = p_Init(m_r,m_r->PolyBin);
 
   for (i = p_r->N; i; i--)
   {
@@ -991,9 +991,9 @@ KINLINE void k_GetStrongLeadTerms(const poly p1, const poly p2, const ring leadR
   int e1;
   int e2;
   int s;
-  m1 = p_Init(tailRing);
-  m2 = p_Init(tailRing);
-  lcm = p_Init(leadRing);
+  m1 = p_Init(tailRing,tailRing->PolyBin);
+  m2 = p_Init(tailRing,tailRing->PolyBin);
+  lcm = p_Init(leadRing,leadRing->PolyBin);
 
   for (i = leadRing->N; i>=0; i--)
   {
