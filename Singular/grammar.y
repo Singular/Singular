@@ -1111,10 +1111,7 @@ mat_cmd: MATRIX_CMD
 
 filecmd:
         '<' stringexpr
-          { if ($<i>1 != '<') YYERROR;
-            if((feFilePending=feFopen($2,"r",NULL,TRUE))==NULL) YYERROR; }
-        ';'
-          { newFile($2,feFilePending); }
+          { newFile($2); }
         ;
 
 helpcmd:

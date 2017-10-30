@@ -122,7 +122,7 @@ feBufferTypes Voice::Typ()
 * start the file 'fname' (STDIN is stdin) as a new voice (cf.VFile)
 * return FALSE on success, TRUE if an error occurs (file cannot be opened)
 */
-BOOLEAN newFile(char *fname,FILE* f)
+BOOLEAN newFile(char *fname)
 {
   currentVoice->Next();
   //Print(":File%d(%s):%s(%x)\n",
@@ -138,16 +138,11 @@ BOOLEAN newFile(char *fname,FILE* f)
   else
   {
     currentVoice->sw = BI_file; /* needed by exitVoice below */
-    if (f!=NULL)
-      currentVoice->files = f;
-    else
+    currentVoice->files = feFopen(fname,"r",NULL,TRUE);
+    if (currentVoice->files==NULL)
     {
-      currentVoice->files = feFopen(fname,"r",NULL,TRUE);
-      if (currentVoice->files==NULL)
-      {
-        exitVoice();
-        return TRUE;
-      }
+      exitVoice();
+      return TRUE;
     }
     currentVoice->start_lineno = 0;
   }
@@ -551,8 +546,8 @@ int feReadLine(char* b, int l)
           const char *ss=strchr(anf,'\n');
           if (ss==NULL) len=strlen(anf);
           else          len=ss-anf;
-          show_echo=TRUE;
           yylineno++;
+          show_echo=TRUE;
         }
         if (show_echo)
         {
