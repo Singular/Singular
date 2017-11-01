@@ -129,7 +129,6 @@ poly f  = x^3+y^8+2*x*y^6;  // E[14]+
 f=phi(f);
 realclassify(f);
 
-// ?????
 poly f  = 3*x^3-y^8+2*x*y^6;  // E[14]-
 f=phi(f);
 realclassify(f);
