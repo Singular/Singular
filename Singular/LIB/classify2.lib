@@ -9,17 +9,33 @@ AUTHORS:               Janko Boehm,      email: boehm@mathematik.uni-kl.de
 
 
 OVERVIEW:
-We classify isolated singularities of corank <=2 and modality <=2 with respect to right-equivalence over the complex numbers according to Arnold's list. We determine the type and, for positive modality, the parameter. 
+We classify isolated singularities of corank <=2 and modality <=2 with respect 
+to right-equivalence over the complex numbers according to Arnold's list. We 
+determine the type and, for positive modality, the parameter. 
 
-V.I. Arnold has described normal forms and has developed a classifier for, in particular, all isolated hypersurface singularities over the complex numbers up to modality 2. Building on a series of 105 theorems, this classifier determines the type of the given singularity. However, for positive modality, this does not fix the right equivalence class of the singularity, since the values of the moduli parameters are not specified. 
+V.I. Arnold has described normal forms and has developed a classifier for, in 
+particular, all isolated hypersurface singularities over the complex numbers up 
+to modality 2. Building on a series of 105 theorems, this classifier determines 
+the type of the given singularity. However, for positive modality, this does not 
+fix the right equivalence class of the singularity, since the values of the 
+moduli parameters are not specified. 
 
-This library implements an alternative classification algorithm for isolated hypersurface singularities of corank and modality up to two.  For a singularity given by a polynomial over the rationals, the algorithm determines its right equivalence class by specifying a polynomial representative in Arnold's list of normal forms. In particular, the algorithm also determines values for the moduli parameters. 
+This library implements an alternative classification algorithm for isolated 
+hypersurface singularities of corank and modality up to two.  For a 
+singularity given by a polynomial over the rationals, the algorithm determines 
+its right equivalence class by specifying a polynomial representative in Arnold's 
+list of normal forms. In particular, the algorithm also determines values for the 
+moduli parameters. 
 
 The implementation is based on the paper 
 
-Janko Boehm, Magdaleen Marais, Gerhard Pfister: A Classification Algorithm for Complex Singularities of Corank and Modality up to Two, Singularities and Computer Algebra - Festschrift for Gert-Martin Greuel on the Occasion of his 70th Birthday, Springer 2017, http://arxiv.org/abs/1604.04774
+Janko Boehm, Magdaleen Marais, Gerhard Pfister: A Classification Algorithm for 
+Complex Singularities of Corank and Modality up to Two, Singularities and 
+Computer Algebra - Festschrift for Gert-Martin Greuel on the Occasion of his 
+70th Birthday, Springer 2017, http://arxiv.org/abs/1604.04774
 
-There are functions for determining a normal form equation and for determining the complex type of the singularity.
+There are functions for determining a normal form equation and for determining 
+the complex type of the singularity.
 
 
 KEYWORDS:
