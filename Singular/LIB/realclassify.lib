@@ -1646,7 +1646,7 @@ static proc caseJ10(poly rf, br1)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-proc caseYrs(poly rf, int mu ,br1)
+static proc caseYrs(poly rf, int mu ,br1)
 {
   //preliminaries
   def R = basering;
@@ -2090,7 +2090,7 @@ proc caseYrs(poly rf, int mu ,br1)
            else //b<0
            {
              typeofsing1  = "Y["+string(n1)+","+string(n2)+"]-+";
-             typeofsing2  = "Y["+string(n2)+","+string(n1)+"]—-";          
+             typeofsing2  = "Y["+string(n2)+","+string(n1)+"]--";
              if(deg(MP1)==1)
              {
                 number a = -number(subst(MP1,var(1),0));
@@ -4398,7 +4398,7 @@ proc caseYrs(poly rf, int mu ,br1)
   }
 }
 
-proc determineSignExpression(number e){
+static proc determineSignExpression(number e){
 def R = basering;
 poly MP = subst(minpoly,a,var(1));
 poly E = subst(e,a,var(1));
@@ -4674,7 +4674,7 @@ return(ret);
 }
 
 
-proc intersects(interval I,interval J){
+static proc intersects(interval I,interval J){
 number i1 = I[1];
 number i2 = I[2];
 number j1 = J[1];
@@ -4684,7 +4684,7 @@ if (((i1<=j1) and (j1<=i2)) or ((i1<=j2) and (j2<=i2)) or ((j1<=i1) and (i1<=j2)
 }
 return(0);}
 
-proc intersectIntervals(interval I,interval J){
+static proc intersectIntervals(interval I,interval J){
 number i1 = I[1];
 number i2 = I[2];
 number j1 = J[1];
