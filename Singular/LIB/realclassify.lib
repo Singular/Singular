@@ -367,6 +367,10 @@ example
   poly f  = -x^4+x*y^4+y^6-z^2;  // W[13]-
   f=phi(f);
   realclassify(f);
+
+  poly p = x^4-x^2*y^2+5*y^4+x*y^3+x^3*y;  //X9++
+  realclassify(p);
+
 }
 ////////////////////////////////////////////////////////////////////////////////
 static proc coeff(poly f, poly m){
