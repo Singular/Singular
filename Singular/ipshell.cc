@@ -6276,6 +6276,7 @@ void paPrint(const char *n,package p)
     case LANG_SINGULAR: PrintS("S"); break;
     case LANG_C:        PrintS("C"); break;
     case LANG_TOP:      PrintS("T"); break;
+    case LANG_MAX:      PrintS("M"); break;
     case LANG_NONE:     PrintS("N"); break;
     default:            PrintS("U");
   }

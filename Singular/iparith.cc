@@ -5054,6 +5054,17 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
           omFree(plib);
           return TRUE;
         }
+        else /* package */
+        {
+          package pa=IDPACKAGE(pl);
+          if ((pa->language==LANG_C)
+          || (pa->language==LANG_MIX))
+          {
+            Werror("can not create package `%s` - binaries  exists",plib);
+            omfree(plib);
+            return TRUE;
+          }
+        }
         omFree(plib);
         package savepack=currPack;
         currPack=IDPACKAGE(pl);

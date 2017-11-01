@@ -19,7 +19,7 @@
 #include "Singular/attrib.h"
 #include "Singular/fevoices.h" /* for sNoName_fe*/
 
-typedef enum { LANG_NONE, LANG_TOP, LANG_SINGULAR, LANG_C, LANG_MAX} language_defs;
+typedef enum { LANG_NONE, LANG_TOP, LANG_SINGULAR, LANG_C, LANG_MIX, LANG_MAX} language_defs;
 class proc_singular
 {
 public:
