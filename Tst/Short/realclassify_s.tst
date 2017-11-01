@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB "realclassify2.lib";
+LIB "realclassify.lib";
 
 ring r = 0, (x,y,z), ds;
 poly f = (x2+3y-2z)^2+xyz-(x-y3+x2z3)^3;
