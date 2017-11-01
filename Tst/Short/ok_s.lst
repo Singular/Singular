@@ -77,6 +77,7 @@ bug_tr779
 bug_tr785
 bug_tr806
 bug_genus_etc
+classify2
 conv_bi
 facstd
 fermat_gcd_1var
@@ -114,6 +115,7 @@ ncfactor_usl2_reducible_bug_s
 ncfactor_usl2_s
 nfmodsyz_s
 parallel_s
+polyclass
 primdec3
 reesclos
 resources_s

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version rootisolation.lib 4.1.0.3 Aug_2017 "; // $Id$
+version="version rootisolation.lib 4.1.0.3 Nov_2017 "; // $Id$
 info="
 LIBRARY:    rootisolation.lib implements an algorithm for real root isolation
             using interval arithmetic
@@ -868,7 +868,7 @@ static proc solveunivar(poly f){
           if(impart(r[j])==0)
           {
             number rj =r[j];
-            if (rj<>0){rj=round(rj*number(10)^epsilon);}           
+            if (rj<>0){rj=round(rj*number(10)^epsilon);}
             r1 = insert(r1,string(imap(R,rj)));
             kill rj;
           }
@@ -878,7 +878,7 @@ static proc solveunivar(poly f){
      setring R1;
      list r2;
      for(i=1; i<=k;i++)
-     { 
+     {
           execute("number m ="+r1[i]);
           m=m/(number(10)^epsilon);
           r2 = insert(r2,m);
@@ -923,7 +923,7 @@ EXAMPLE: example rootIsolationNoPreprocessing; exclusion test for intersection
 {
   int i;
   if (nvars(basering)==1){
-    list iv = solveunivar(I[1]); 
+    list iv = solveunivar(I[1]);
     list bo;
     for (i=1; i<=size(iv);i++){
         box B = list(iv[i]);
@@ -1082,7 +1082,7 @@ proc rootIsolationPrimdec(ideal I)
 "USAGE:  @code{rootIsolationPrimdec(I)};
         @code{I ideal}
 ASSUME: @code{I} is a zero-dimensional radical ideal
-RETURN: @code{L}, where @code{L} 
+RETURN: @code{L}, where @code{L}
         contains boxes which contain exactly one element of V(@code{I})
 PURPOSE: same as @code{rootIsolation}, but speeds up computation and improves output
         by doing a primary decomposition before doing the root isolation

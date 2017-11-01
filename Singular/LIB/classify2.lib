@@ -1,40 +1,40 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version classify2.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version classify2.lib 4.1.0.3 Nov_2107 "; // $Id$
 category="Commutative Algebra";
 info="
-LIBRARY: classify2.lib   Classification of isolated singularities 
+LIBRARY: classify2.lib   Classification of isolated singularities
 AUTHORS:               Janko Boehm,      email: boehm@mathematik.uni-kl.de
                        Magdaleen Marais, email: magdaleen.marais@up.ac.za
                        Gerhard Pfister,  email: pfister@mathematik.uni-kl.de
 
 
 OVERVIEW:
-We classify isolated singularities of corank <=2 and modality <=2 with respect 
-to right-equivalence over the complex numbers according to Arnold's list. We 
-determine the type and, for positive modality, the parameter. 
+We classify isolated singularities of corank <=2 and modality <=2 with respect
+to right-equivalence over the complex numbers according to Arnold's list. We
+determine the type and, for positive modality, the parameter.
 
-V.I. Arnold has described normal forms and has developed a classifier for, in 
-particular, all isolated hypersurface singularities over the complex numbers up 
-to modality 2. Building on a series of 105 theorems, this classifier determines 
-the type of the given singularity. However, for positive modality, this does not 
-fix the right equivalence class of the singularity, since the values of the 
-moduli parameters are not specified. 
+V.I. Arnold has described normal forms and has developed a classifier for, in
+particular, all isolated hypersurface singularities over the complex numbers up
+to modality 2. Building on a series of 105 theorems, this classifier determines
+the type of the given singularity. However, for positive modality, this does not
+fix the right equivalence class of the singularity, since the values of the
+moduli parameters are not specified.
 
-This library implements an alternative classification algorithm for isolated 
-hypersurface singularities of corank and modality up to two.  For a 
-singularity given by a polynomial over the rationals, the algorithm determines 
-its right equivalence class by specifying a polynomial representative in Arnold's 
-list of normal forms. In particular, the algorithm also determines values for the 
-moduli parameters. 
+This library implements an alternative classification algorithm for isolated
+hypersurface singularities of corank and modality up to two.  For a
+singularity given by a polynomial over the rationals, the algorithm determines
+its right equivalence class by specifying a polynomial representative in Arnold's
+list of normal forms. In particular, the algorithm also determines values for the
+moduli parameters.
 
-The implementation is based on the paper 
+The implementation is based on the paper
 
-Janko Boehm, Magdaleen Marais, Gerhard Pfister: A Classification Algorithm for 
-Complex Singularities of Corank and Modality up to Two, Singularities and 
-Computer Algebra - Festschrift for Gert-Martin Greuel on the Occasion of his 
+Janko Boehm, Magdaleen Marais, Gerhard Pfister: A Classification Algorithm for
+Complex Singularities of Corank and Modality up to Two, Singularities and
+Computer Algebra - Festschrift for Gert-Martin Greuel on the Occasion of his
 70th Birthday, Springer 2017, http://arxiv.org/abs/1604.04774
 
-There are functions for determining a normal form equation and for determining 
+There are functions for determining a normal form equation and for determining
 the complex type of the singularity.
 
 
@@ -151,7 +151,7 @@ for (i=1;i<=size(mon);i++){
      j=j+1;
   }
 }
-return(L);} 
+return(L);}
 
 
 
@@ -172,7 +172,7 @@ for (i=1;i<=size(mon);i++){
      j=j+1;
   }
 }
-return(L);} 
+return(L);}
 
 static proc lowestJet(poly f, intvec w){
 if (f==0){return(f);}
@@ -428,13 +428,13 @@ if ((size(L)==3) and (jet(f,3)==0)) {
   setring R;
   poly ff;
   list L = factorLowestJet(g);
-  if (NF(L[1][1],y)==0) 
+  if (NF(L[1][1],y)==0)
   {
     ff=lintrafo(f,ideal(y,x));
     //Poly FF=makePoly(ff);
     //return(FF);
-  } 
-  else 
+  }
+  else
   {
     ff=lintrafo(f,ideal(L[1][1],y));
     //Poly FF=makePoly(ff);
@@ -442,7 +442,7 @@ if ((size(L)==3) and (jet(f,3)==0)) {
   }
   number a1=coeff(ff,x^3*y);
   number a2=coeff(ff,x^2*y^2);
-  ff=lintrafo(ff,ideal(x,y+(a1/(2*a2))*x)); 
+  ff=lintrafo(ff,ideal(x,y+(a1/(2*a2))*x));
   Poly FF=makePoly(ff);
   return(FF);
 }
@@ -571,7 +571,7 @@ list L=latticePoints(NP);
 list L1;
 int l=1;
 for (int j=1;j<=size(L);j++){
-  if ((L[j][1]==co[1]-1) or (L[j][2]==co[2]-1)) {   
+  if ((L[j][1]==co[1]-1) or (L[j][2]==co[2]-1)) {
      L1[l]=L[j];
      l=l+1;
   }
@@ -903,7 +903,7 @@ for (int d =degdiag+1;d<=dprime;d++){
     if (printlevel>0){"coefficients of lift "+string(co);}
     phi = basering, x-co[1,1],y-co[2,1];
     f=phi(f);
-    //f=jet(f,mu+1);    
+    //f=jet(f,mu+1);
     f=truncateAtHighestCorner(f);
     if (printlevel>0){">>> after handling current degree "+string(piecewiseJet(f,wtNP,d));}
 }
@@ -951,7 +951,7 @@ static proc eliminateMonomialOnDiagonal(poly f,poly mon,list NPNF){
   ring T =0,(aa),dp;
   poly c=imap(RR,c);
   if (printlevel>0){"must be zero "+string(c);}
-  def S=absFactorize(c);  
+  def S=absFactorize(c);
   setring S;
   list L = absolute_factors;
   if (printlevel>0){"possible transformations "+string(L);}
@@ -1106,7 +1106,7 @@ return(facescontainingS0);}
 static proc highestCornerDeterminacyBound(poly f){
  ideal I2 = maxideal(2)*jacob(f);
  ideal I1 = maxideal(1)*jacob(f);
- ideal I0 = maxideal(0)*jacob(f); 
+ ideal I0 = maxideal(0)*jacob(f);
  int d2 = deg(highcorner(std(I2)));
  int d1 = 1+deg(highcorner(std(I1)));
  int d0 = 2+deg(highcorner(std(I0)));
@@ -1290,7 +1290,7 @@ while (1==1) {
   }
   ff=doWeightedLinearTransformation(f,delta);
   if (ff==0) {
-     // factor of highest multiplicity is not x-non-linear  
+     // factor of highest multiplicity is not x-non-linear
      if (not compareLists(monomials(termsOnPolygon(f,list(delta))),monomials(termsOnPolygon((x^2-y^3)^2,list(delta))))) {ERROR("modality is bigger than 2");}
      mu=milnor(f);
    if (mu mod 2 == 0) {T=list("W#[1,"+string(mu-15)+"]",(x^2+y^3)^2+x*y^((mu div 2)-3)+x*y^((mu div 2)-2) ,list(x*y^((mu div 2)-3),x*y^((mu div 2)-2)));}
@@ -1430,7 +1430,7 @@ while (1==1) {
   }
   ff=doWeightedLinearTransformation(f,delta);
   if (ff==0) {
-     // factor of highest multiplicity is not x-non-linear  
+     // factor of highest multiplicity is not x-non-linear
      if (not compareLists(monomials(termsOnPolygon(f,list(delta))),monomials(termsOnPolygon((x^2-y^3)^2,list(delta))))) {ERROR("modality is bigger than 2");}
      mu=milnor(f);
    if (mu mod 2 == 0) {T=list("W#[1,"+string(mu-15)+"]",(x^2+y^3)^2+x*y^((mu div 2)-3)+x*y^((mu div 2)-2) ,list(x*y^((mu div 2)-3),x*y^((mu div 2)-2)));}

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version classify2.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version polyclass.lib 4.1.0.3 Nov_2017 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: polyclass.lib   Data types for normal form equations 
@@ -78,7 +78,7 @@ if (F.modality>=1){
   }
   if (minpoly!=0){"Minimal polynomial = "+string(minpoly);}
   if (F.realCase && minpoly!=0){
-      if (F.modality>1){ERROR("Not implemented");}    
+      if (F.modality>1){ERROR("Not implemented");}
       "Interval = ["+string(F.parameters[1][2][1])+", "+string(F.parameters[1][2][2])+"]";
   }
 }
