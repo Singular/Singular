@@ -34,10 +34,10 @@ printPoly(f); print routine for polynomial type Poly
 printNormalFormEquation(F); print routine for normal form equations
 ";
 
+LIB "sing.lib";
 
 static proc mod_init()
 {
-  LIB "sing.lib";
   newstruct("Poly","ring in,poly value");
   newstruct("NormalFormEquation","list vars, string singularityType, int milnorNumber, Poly normalFormEquation, int modality, list parameters, int corank, int inertiaIndex, int determinacy, int realCase");
   system("install","Poly","print",printPoly,1);
