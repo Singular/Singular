@@ -23,8 +23,6 @@ extern "C" {
   #define REGISTER register
 #endif
 
-#endif
-
 typedef size_t            omBin;
 
 struct omInfo_s;
