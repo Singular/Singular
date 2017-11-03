@@ -1384,28 +1384,28 @@ void siInit(char *name)
 // default coeffs
   {
     idhdl h;
-    h=enterid(omStrDup("QQ"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+    h=enterid("QQ",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
     IDDATA(h)=(char*)nInitChar(n_Q,NULL);
-    h=enterid(omStrDup("ZZ"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+    h=enterid("ZZ",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
     IDDATA(h)=(char*)nInitChar(n_Z,NULL);
     iiAddCproc("kernel","crossprod",FALSE,iiCrossProd);
     iiAddCproc("kernel","Float",FALSE,iiFloat);
-    //h=enterid(omStrDup("RR"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+    //h=enterid("RR",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
     //IDDATA(h)=(char*)nInitChar(n_R,NULL);
-    //h=enterid(omStrDup("CC"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+    //h=enterid("CC",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
     //IDDATA(h)=(char*)nInitChar(n_long_C,NULL);
     n_coeffType t;
 #ifdef SINGULAR_4_2
     t=nRegister(n_unknown,n_AEInitChar);
     if (t!=n_unknown)
     {
-      h=enterid(omStrDup("AE"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+      h=enterid("AE",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
       IDDATA(h)=(char*)nInitChar(t,NULL);
     }
     t=nRegister(n_unknown,n_QAEInitChar);
     if (t!=n_unknown)
     {
-      h=enterid(omStrDup("QAE"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+      h=enterid("QAE",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
       IDDATA(h)=(char*)nInitChar(t,NULL);
     }
     n_pAE=nRegister(n_unknown,n_pAEInitChar);
@@ -1418,7 +1418,7 @@ void siInit(char *name)
     t=nRegister(n_unknown,flintQ_InitChar);
     if (t!=n_unknown)
     {
-      h=enterid(omStrDup("flint_poly_Q"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+      h=enterid("flint_poly_Q",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
       IDDATA(h)=(char*)nInitChar(t,NULL);
     }
     n_FlintZn=nRegister(n_unknown,flintZn_InitChar);

@@ -6186,7 +6186,7 @@ ideal kGroebner(ideal F, ideal Q)
   idhdl new_ring=NULL;
   if ((currRingHdl==NULL) || (IDRING(currRingHdl)!=currRing))
   {
-    currRingHdl=enterid(omStrDup(" GROEBNERring"),0,RING_CMD,&IDROOT,FALSE);
+    currRingHdl=enterid(" GROEBNERring",0,RING_CMD,&IDROOT,FALSE);
     new_ring=currRingHdl;
     IDRING(currRingHdl)=currRing;
   }

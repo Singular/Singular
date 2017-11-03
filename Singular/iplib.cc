@@ -1265,7 +1265,7 @@ void module_help_main(const char *newlib,const char *help)
   {
     package s=currPack;
     currPack=IDPACKAGE(pl);
-    idhdl h=enterid(omStrDup("info"),0,STRING_CMD,&IDROOT,FALSE);
+    idhdl h=enterid("info",0,STRING_CMD,&IDROOT,FALSE);
     IDSTRING(h)=omStrDup(help);
     currPack=s;
   }
@@ -1284,7 +1284,7 @@ void module_help_proc(const char *newlib,const char *p, const char *help)
     buff[255]='\0';
     strncpy(buff,p,255);
     strncat(buff,"_help",255-strlen(p));
-    idhdl h=enterid(omStrDup(buff),0,STRING_CMD,&IDROOT,FALSE);
+    idhdl h=enterid(buff,0,STRING_CMD,&IDROOT,FALSE);
     IDSTRING(h)=omStrDup(help);
     currPack=s;
   }
