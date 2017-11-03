@@ -75,7 +75,7 @@ NOTE:     The classification is done over the real numbers, so in contrast to
              of a number field QQ[a]/(minpoly), the coefficient ring of F in terms
              of the unique root of minpoly of the ring F.in in the interval specified
              in NF.parameters in conjunction with the parameter term.
-SEE ALSO: classify, Poly
+SEE ALSO: classify
 KEYWORDS: Classification of singularities
 EXAMPLE:  example realclassify; shows an example"
 {
