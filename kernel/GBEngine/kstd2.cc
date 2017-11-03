@@ -1543,8 +1543,7 @@ int redHoney (LObject* h, kStrategy strat)
 #endif
     assume(strat->fromT == FALSE);
 
-    number coef;
-    ksReducePoly(h,&(strat->T[ii]),strat->kNoetherTail(),&coef,strat);
+    ksReducePoly(h,&(strat->T[ii]),strat->kNoetherTail(),NULL,strat);
 #if SBA_PRINT_REDUCTION_STEPS
     sba_interreduction_steps++;
 #endif
