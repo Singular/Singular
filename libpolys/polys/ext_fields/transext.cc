@@ -1146,6 +1146,10 @@ static number ntDiv(number a, number b, const coeffs cf)
   {
     DEN(result) = f;
   }
+  else
+  {
+    p_Delete(&f, ntRing);
+  }
   COM(result) = COM(fa) + COM(fb) + MULT_COMPLEXITY;
 //  definiteGcdCancellation((number)result, cf,FALSE);
   heuristicGcdCancellation((number)result, cf);
@@ -1725,22 +1729,22 @@ static number ntGcd(number a, number b, const coeffs cf)
   fraction fa = (fraction)a;
   fraction fb = (fraction)b;
 
-  poly pa = p_Copy(NUM(fa), ntRing);
-  poly pb = p_Copy(NUM(fb), ntRing);
 
   poly pGcd;
   if (nCoeff_is_Q(ntCoeffs))
   {
+    poly pa = NUM(fa);
+    poly pb = NUM(fb);
     if (p_IsConstant(pa,ntRing) && p_IsConstant(pb,ntRing))
     {
-      pGcd = pa;
+      pGcd = p_Copy(pa,ntRing);
       p_SetCoeff (pGcd, n_SubringGcd (pGetCoeff(pGcd), pGetCoeff(pb), ntCoeffs), ntRing);
     }
     else
     {
       number contentpa, contentpb, tmp;
 
-      contentpb= p_GetCoeff(pb, ntRing);
+      contentpb= n_Copy(p_GetCoeff(pb, ntRing),ntCoeffs);
       pIter(pb);
       while (pb != NULL)
       {
@@ -1750,7 +1754,7 @@ static number ntGcd(number a, number b, const coeffs cf)
         pIter(pb);
       }
 
-      contentpa= p_GetCoeff(pa, ntRing);
+      contentpa= n_Copy(p_GetCoeff(pa, ntRing),ntCoeffs);
       pIter(pa);
       while (pa != NULL)
       {
@@ -1764,8 +1768,6 @@ static number ntGcd(number a, number b, const coeffs cf)
       n_Delete(&contentpa, ntCoeffs);
       n_Delete(&contentpb, ntCoeffs);
       contentpa= tmp;
-      p_Delete(&pb, ntRing);
-      p_Delete(&pa, ntRing);
 
       /* singclap_gcd destroys its arguments; we hence need copies: */
       pGcd = singclap_gcd(p_Copy(NUM(fa),ntRing), p_Copy(NUM(fb),ntRing), ntRing);
@@ -1774,7 +1776,7 @@ static number ntGcd(number a, number b, const coeffs cf)
     }
   }
   else
-    pGcd = singclap_gcd(pa, pb, cf->extRing);
+    pGcd = singclap_gcd(p_Copy(NUM(fa),ntRing), p_Copy(NUM(fb),ntRing), ntRing);
   /* Note that, over Q, singclap_gcd will remove the denominators in all
      rational coefficients of pa and pb, before starting to compute
      the gcd. Thus, we do not need to ensure that the coefficients of
