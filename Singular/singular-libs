@@ -48,7 +48,7 @@ SLIB1 = arr.lib \
 	JMBTest.lib JMSConst.lib \
 	nfmodstd.lib nfmodsyz.lib numerAlg.lib numerDecom.lib \
         orbitparam.lib \
-	parallel.lib polymake.lib polybori.lib \
+	parallel.lib polyclass.lib polymake.lib polybori.lib \
 	realizationMatroids.lib resources.lib ringgb.lib \
 	rootisolation.lib rwalk.lib rstandard.lib \
 	schreyer.lib symodstd.lib schubert.lib swalk.lib \
