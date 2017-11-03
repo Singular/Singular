@@ -1639,23 +1639,22 @@ static number ntNormalizeHelper(number a, number b, const coeffs cf)
   fraction fb = (fraction)b;
   if ((b==NULL)||(DEN(fb)==NULL)) return ntCopy(a,cf);
   fraction fa = (fraction)a;
-  /* singclap_gcd destroys its arguments; we hence need copies: */
-  poly pa = p_Copy(NUM(fa), ntRing);
-  poly pb = p_Copy(DEN(fb), ntRing);
 
   poly pGcd;
   if (nCoeff_is_Q(ntCoeffs))
   {
+    poly pa = NUM(fa);
+    poly pb = DEN(fb);
     if (p_IsConstant(pa,ntRing) && p_IsConstant(pb,ntRing))
     {
-      pGcd = pa;
+      pGcd = p_Copy(pa,ntRing);
       p_SetCoeff (pGcd, n_Gcd (pGetCoeff(pGcd), pGetCoeff(pb), ntCoeffs), ntRing);
     }
     else
     {
       number contentpa, contentpb, tmp;
 
-      contentpb= p_GetCoeff(pb, ntRing);
+      contentpb= n_Copy(p_GetCoeff(pb, ntRing),ntCoeffs);
       pIter(pb);
       while (pb != NULL)
       {
@@ -1665,7 +1664,7 @@ static number ntNormalizeHelper(number a, number b, const coeffs cf)
         pIter(pb);
       }
 
-      contentpa= p_GetCoeff(pa, ntRing);
+      contentpa= n_Copy(p_GetCoeff(pa, ntRing),ntCoeffs);
       pIter(pa);
       while (pa != NULL)
       {
@@ -1679,8 +1678,6 @@ static number ntNormalizeHelper(number a, number b, const coeffs cf)
       n_Delete(&contentpa, ntCoeffs);
       n_Delete(&contentpb, ntCoeffs);
       contentpa= tmp;
-      p_Delete(&pb, ntRing);
-      p_Delete(&pa, ntRing);
 
       /* singclap_gcd destroys its arguments; we hence need copies: */
       pGcd = singclap_gcd(p_Copy(NUM(fa),ntRing), p_Copy(DEN(fb),ntRing), ntRing);
@@ -1689,7 +1686,8 @@ static number ntNormalizeHelper(number a, number b, const coeffs cf)
     }
   }
   else
-    pGcd = singclap_gcd(pa, pb, cf->extRing);
+    /* singclap_gcd destroys its arguments; we hence need copies: */
+    pGcd = singclap_gcd(p_Copy(NUM(fa),ntRing), p_Copy(DEN(fb),ntRing), cf->extRing);
 
   /* Note that, over Q, singclap_gcd will remove the denominators in all
      rational coefficients of pa and pb, before starting to compute
@@ -1708,7 +1706,6 @@ static number ntNormalizeHelper(number a, number b, const coeffs cf)
     return (number)result;
   }
 
-
   /* return pa*pb/gcd */
     poly newNum = singclap_pdivide(NUM(fa), pGcd, ntRing);
     p_Delete(&pGcd,ntRing);
@@ -1716,8 +1713,6 @@ static number ntNormalizeHelper(number a, number b, const coeffs cf)
     NUM(result) = p_Mult_q(p_Copy(DEN(fb),ntRing),newNum,ntRing);
     ntTest((number)result); // !!!!
     return (number)result;
-
-    return NULL;
 }
 
 static number ntGcd(number a, number b, const coeffs cf)
