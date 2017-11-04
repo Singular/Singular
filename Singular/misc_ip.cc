@@ -1326,7 +1326,7 @@ void siInit(char *name)
   basePack=(package)omAlloc0(sizeof(*basePack));
   currPack=basePack;
   idhdl h;
-  h=enterid("Top", 0, PACKAGE_CMD, &IDROOT, TRUE);
+  h=enterid("Top", 0, PACKAGE_CMD, &IDROOT, FALSE);
   IDPACKAGE(h)=basePack;
   IDPACKAGE(h)->language = LANG_TOP;
   currPackHdl=h;
