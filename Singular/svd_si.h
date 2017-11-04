@@ -107,8 +107,8 @@ public:
 };
 
 const complex operator/(const complex& lhs, const complex& rhs);
-const bool operator==(const complex& lhs, const complex& rhs);
-const bool operator!=(const complex& lhs, const complex& rhs);
+bool operator==(const complex& lhs, const complex& rhs);
+bool operator!=(const complex& lhs, const complex& rhs);
 const complex operator+(const complex& lhs);
 const complex operator-(const complex& lhs);
 const complex operator+(const complex& lhs, const complex& rhs);
@@ -123,7 +123,7 @@ const complex operator*(const double& lhs, const complex& rhs);
 const complex operator/(const complex& lhs, const complex& rhs);
 const complex operator/(const double& lhs, const complex& rhs);
 const complex operator/(const complex& lhs, const double& rhs);
-const double abscomplex(const complex &z);
+double abscomplex(const complex &z);
 const complex conj(const complex &z);
 const complex csqr(const complex &z);
 
@@ -1616,37 +1616,37 @@ namespace amp
     // comparison operators
     //
     template<unsigned int Precision>
-    const bool operator==(const ampf<Precision>& op1, const ampf<Precision>& op2)
+    bool operator==(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
         return mpfr_cmp(op1.getReadPtr(), op2.getReadPtr())==0;
     }
 
     template<unsigned int Precision>
-    const bool operator!=(const ampf<Precision>& op1, const ampf<Precision>& op2)
+    bool operator!=(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
         return mpfr_cmp(op1.getReadPtr(), op2.getReadPtr())!=0;
     }
 
     template<unsigned int Precision>
-    const bool operator<(const ampf<Precision>& op1, const ampf<Precision>& op2)
+    bool operator<(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
         return mpfr_cmp(op1.getReadPtr(), op2.getReadPtr())<0;
     }
 
     template<unsigned int Precision>
-    const bool operator>(const ampf<Precision>& op1, const ampf<Precision>& op2)
+    bool operator>(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
         return mpfr_cmp(op1.getReadPtr(), op2.getReadPtr())>0;
     }
 
     template<unsigned int Precision>
-    const bool operator<=(const ampf<Precision>& op1, const ampf<Precision>& op2)
+    bool operator<=(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
         return mpfr_cmp(op1.getReadPtr(), op2.getReadPtr())<=0;
     }
 
     template<unsigned int Precision>
-    const bool operator>=(const ampf<Precision>& op1, const ampf<Precision>& op2)
+    bool operator>=(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
         return mpfr_cmp(op1.getReadPtr(), op2.getReadPtr())>=0;
     }
@@ -1714,7 +1714,7 @@ namespace amp
     }
 
     template<unsigned int Precision>
-    const int sign(const ampf<Precision> &x)
+    int sign(const ampf<Precision> &x)
     {
         int s = mpfr_sgn(x.getReadPtr());
         if( s>0 )
@@ -1761,7 +1761,7 @@ namespace amp
     }
 
     template<unsigned int Precision>
-    const signed long trunc(const ampf<Precision> &x)
+    signed long trunc(const ampf<Precision> &x)
     {
         ampf<Precision> tmp;
         signed long r;
@@ -1787,7 +1787,7 @@ namespace amp
     }
 
     template<unsigned int Precision>
-    const signed long floor(const ampf<Precision> &x)
+    signed long floor(const ampf<Precision> &x)
     {
         ampf<Precision> tmp;
         signed long r;
@@ -1804,7 +1804,7 @@ namespace amp
     }
 
     template<unsigned int Precision>
-    const signed long ceil(const ampf<Precision> &x)
+    signed long ceil(const ampf<Precision> &x)
     {
         ampf<Precision> tmp;
         signed long r;
@@ -1821,7 +1821,7 @@ namespace amp
     }
 
     template<unsigned int Precision>
-    const signed long round(const ampf<Precision> &x)
+    signed long round(const ampf<Precision> &x)
     {
         ampf<Precision> tmp;
         signed long r;
@@ -1886,30 +1886,30 @@ namespace amp
         template<unsigned int Precision> const ampf<Precision> operator/(const unsigned type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)/op2; } \
         template<unsigned int Precision> const ampf<Precision> operator/(const ampf<Precision>& op1, const signed type& op2) { return op1/ampf<Precision>(op2); }   \
         template<unsigned int Precision> const ampf<Precision> operator/(const ampf<Precision>& op1, const unsigned type& op2) { return op1/ampf<Precision>(op2); } \
-        template<unsigned int Precision> const bool       operator==(const signed type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)==op2; }   \
-        template<unsigned int Precision> const bool       operator==(const unsigned type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)==op2; } \
-        template<unsigned int Precision> const bool       operator==(const ampf<Precision>& op1, const signed type& op2) { return op1==ampf<Precision>(op2); }   \
-        template<unsigned int Precision> const bool       operator==(const ampf<Precision>& op1, const unsigned type& op2) { return op1==ampf<Precision>(op2); } \
-        template<unsigned int Precision> const bool       operator!=(const signed type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)!=op2; }   \
-        template<unsigned int Precision> const bool       operator!=(const unsigned type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)!=op2; } \
-        template<unsigned int Precision> const bool       operator!=(const ampf<Precision>& op1, const signed type& op2) { return op1!=ampf<Precision>(op2); }   \
-        template<unsigned int Precision> const bool       operator!=(const ampf<Precision>& op1, const unsigned type& op2) { return op1!=ampf<Precision>(op2); } \
-        template<unsigned int Precision> const bool       operator<=(const signed type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)<=op2; }   \
-        template<unsigned int Precision> const bool       operator<=(const unsigned type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)<=op2; } \
-        template<unsigned int Precision> const bool       operator<=(const ampf<Precision>& op1, const signed type& op2) { return op1<=ampf<Precision>(op2); }   \
-        template<unsigned int Precision> const bool       operator<=(const ampf<Precision>& op1, const unsigned type& op2) { return op1<=ampf<Precision>(op2); } \
-        template<unsigned int Precision> const bool       operator>=(const signed type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)>=op2; }   \
-        template<unsigned int Precision> const bool       operator>=(const unsigned type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)>=op2; } \
-        template<unsigned int Precision> const bool       operator>=(const ampf<Precision>& op1, const signed type& op2) { return op1>=ampf<Precision>(op2); }   \
-        template<unsigned int Precision> const bool       operator>=(const ampf<Precision>& op1, const unsigned type& op2) { return op1>=ampf<Precision>(op2); } \
-        template<unsigned int Precision> const bool       operator<(const signed type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)<op2; }   \
-        template<unsigned int Precision> const bool       operator<(const unsigned type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)<op2; } \
-        template<unsigned int Precision> const bool       operator<(const ampf<Precision>& op1, const signed type& op2) { return op1<ampf<Precision>(op2); }   \
-        template<unsigned int Precision> const bool       operator<(const ampf<Precision>& op1, const unsigned type& op2) { return op1<ampf<Precision>(op2); } \
-        template<unsigned int Precision> const bool       operator>(const signed type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)>op2; }   \
-        template<unsigned int Precision> const bool       operator>(const unsigned type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)>op2; } \
-        template<unsigned int Precision> const bool       operator>(const ampf<Precision>& op1, const signed type& op2) { return op1>ampf<Precision>(op2); }   \
-        template<unsigned int Precision> const bool       operator>(const ampf<Precision>& op1, const unsigned type& op2) { return op1>ampf<Precision>(op2); }
+        template<unsigned int Precision> bool       operator==(const signed type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)==op2; }   \
+        template<unsigned int Precision> bool       operator==(const unsigned type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)==op2; } \
+        template<unsigned int Precision> bool       operator==(const ampf<Precision>& op1, const signed type& op2) { return op1==ampf<Precision>(op2); }   \
+        template<unsigned int Precision> bool       operator==(const ampf<Precision>& op1, const unsigned type& op2) { return op1==ampf<Precision>(op2); } \
+        template<unsigned int Precision> bool       operator!=(const signed type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)!=op2; }   \
+        template<unsigned int Precision> bool       operator!=(const unsigned type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)!=op2; } \
+        template<unsigned int Precision> bool       operator!=(const ampf<Precision>& op1, const signed type& op2) { return op1!=ampf<Precision>(op2); }   \
+        template<unsigned int Precision> bool       operator!=(const ampf<Precision>& op1, const unsigned type& op2) { return op1!=ampf<Precision>(op2); } \
+        template<unsigned int Precision> bool       operator<=(const signed type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)<=op2; }   \
+        template<unsigned int Precision> bool       operator<=(const unsigned type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)<=op2; } \
+        template<unsigned int Precision> bool       operator<=(const ampf<Precision>& op1, const signed type& op2) { return op1<=ampf<Precision>(op2); }   \
+        template<unsigned int Precision> bool       operator<=(const ampf<Precision>& op1, const unsigned type& op2) { return op1<=ampf<Precision>(op2); } \
+        template<unsigned int Precision> bool       operator>=(const signed type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)>=op2; }   \
+        template<unsigned int Precision> bool       operator>=(const unsigned type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)>=op2; } \
+        template<unsigned int Precision> bool       operator>=(const ampf<Precision>& op1, const signed type& op2) { return op1>=ampf<Precision>(op2); }   \
+        template<unsigned int Precision> bool       operator>=(const ampf<Precision>& op1, const unsigned type& op2) { return op1>=ampf<Precision>(op2); } \
+        template<unsigned int Precision> bool       operator<(const signed type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)<op2; }   \
+        template<unsigned int Precision> bool       operator<(const unsigned type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)<op2; } \
+        template<unsigned int Precision> bool       operator<(const ampf<Precision>& op1, const signed type& op2) { return op1<ampf<Precision>(op2); }   \
+        template<unsigned int Precision> bool       operator<(const ampf<Precision>& op1, const unsigned type& op2) { return op1<ampf<Precision>(op2); } \
+        template<unsigned int Precision> bool       operator>(const signed type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)>op2; }   \
+        template<unsigned int Precision> bool       operator>(const unsigned type& op1, const ampf<Precision>& op2) { return ampf<Precision>(op1)>op2; } \
+        template<unsigned int Precision> bool       operator>(const ampf<Precision>& op1, const signed type& op2) { return op1>ampf<Precision>(op2); }   \
+        template<unsigned int Precision> bool       operator>(const ampf<Precision>& op1, const unsigned type& op2) { return op1>ampf<Precision>(op2); }
     __AMP_BINARY_OPI(char)
     __AMP_BINARY_OPI(short)
     __AMP_BINARY_OPI(long)
@@ -2153,11 +2153,11 @@ namespace amp
     // complex operations
     //
     template<unsigned int Precision>
-    const bool operator==(const campf<Precision>& lhs, const campf<Precision>& rhs)
+    bool operator==(const campf<Precision>& lhs, const campf<Precision>& rhs)
     { return lhs.x==rhs.x && lhs.y==rhs.y; }
 
     template<unsigned int Precision>
-    const bool operator!=(const campf<Precision>& lhs, const campf<Precision>& rhs)
+    bool operator!=(const campf<Precision>& lhs, const campf<Precision>& rhs)
     { return lhs.x!=rhs.x || lhs.y!=rhs.y; }
 
     template<unsigned int Precision>
@@ -2691,8 +2691,6 @@ namespace reflections
     {
         amp::ampf<Precision> t;
         int i;
-        int vm;
-
 
         if( tau==0 || n1>n2 || m1>m2 )
         {
@@ -2702,7 +2700,6 @@ namespace reflections
         //
         // w := C' * v
         //
-        vm = m2-m1+1;
         for(i=n1; i<=n2; i++)
         {
             work(i) = 0;
@@ -6600,7 +6597,6 @@ namespace bdsvd
         ap::template_1d_array< amp::ampf<Precision> > vttemp;
         ap::template_1d_array< amp::ampf<Precision> > ctemp;
         ap::template_1d_array< amp::ampf<Precision> > etemp;
-        bool rightside;
         bool fwddir;
         amp::ampf<Precision> tmp;
         int mm1;
@@ -6643,7 +6639,6 @@ namespace bdsvd
         vttemp.setbounds(vstart, vend);
         ctemp.setbounds(cstart, cend);
         maxitr = 12;
-        rightside = true;
         fwddir = true;
 
         //

@@ -94,7 +94,7 @@ BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
       h=IDROOT->get(name, 0);
       if (h==NULL)
       {
-        h=enterid(omStrDup(name),0,RING_CMD,&IDROOT,FALSE);
+        h=enterid(name,0,RING_CMD,&IDROOT,FALSE);
         IDRING(h)=r;
         r->ref++;
         break;
@@ -575,7 +575,7 @@ poly ssiReadPoly_R(const ssiInfo *D, const ring r)
   for(l=0;l<n;l++) // read n terms
   {
 // coef,comp.exp1,..exp N
-    p=p_Init(r);
+    p=p_Init(r,r->PolyBin);
     pSetCoeff0(p,ssiReadNumber_CF(D,r->cf));
     int d;
     d=s_readint(D->f_read);
@@ -1826,7 +1826,7 @@ int ssiBatch(const char *host, const char * port)
   if (slOpen(l,SI_LINK_OPEN,NULL)) return 1;
   SI_LINK_SET_RW_OPEN_P(l);
 
-  idhdl id = enterid(omStrDup("link_ll"), 0, LINK_CMD, &IDROOT, FALSE);
+  idhdl id = enterid("link_ll", 0, LINK_CMD, &IDROOT, FALSE);
   IDLINK(id) = l;
 
   loop

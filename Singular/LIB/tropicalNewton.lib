@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version tropical.lib 4.0.3.3 Nov_2016 "; // $Id$
+version="version tropicalNewton.lib 4.0.3.3 Nov_2016 "; // $Id$
 category="Tropical Geometry";
 info="
 LIBRARY:         tropicalNewton.lib  Computations in Tropical Geometry

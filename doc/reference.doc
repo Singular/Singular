@@ -6272,6 +6272,7 @@ The commands @code{reduce} and @code{NF} are synonymous.
 See
 @ref{ideal};
 @ref{module};
+@ref{normal form}
 @ref{vector};
 @ref{std};
 @ref{division};

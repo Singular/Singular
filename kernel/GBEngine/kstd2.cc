@@ -561,6 +561,7 @@ int redHomog (LObject* h,kStrategy strat)
     if (j < 0) return 1;
 
     li = strat->T[j].pLength;
+    if (li<=0) li=strat->T[j].GetpLength();
     ii = j;
     /*
      * the polynomial to reduce with (up to the moment) is;
@@ -575,7 +576,7 @@ int redHomog (LObject* h,kStrategy strat)
       i++;
       if (i > strat->tl)
         break;
-      if (li<=1)
+      if (li==1)
         break;
       if ((strat->T[i].pLength < li)
          &&
@@ -586,6 +587,7 @@ int redHomog (LObject* h,kStrategy strat)
          * the polynomial to reduce with is now;
          */
         li = strat->T[i].pLength;
+        if (li<=0) li=strat->T[i].GetpLength();
         ii = i;
       }
     }
@@ -738,6 +740,7 @@ int redSig (LObject* h,kStrategy strat)
     }
 
     li = strat->T[j].pLength;
+    if (li<=0) li=strat->T[j].GetpLength();
     ii = j;
     /*
      * the polynomial to reduce with (up to the moment) is;
@@ -752,7 +755,7 @@ int redSig (LObject* h,kStrategy strat)
       i++;
       if (i > strat->tl)
         break;
-      if (li<=1)
+      if (li==1)
         break;
       if ((strat->T[i].pLength < li)
          &&
@@ -763,6 +766,7 @@ int redSig (LObject* h,kStrategy strat)
          * the polynomial to reduce with is now;
          */
         li = strat->T[i].pLength;
+        if (li<=0) li=strat->T[i].GetpLength();
         ii = i;
       }
     }
@@ -996,6 +1000,7 @@ int redSigRing (LObject* h,kStrategy strat)
     }
 
     li = strat->T[j].pLength;
+    if (li<=0) li=strat->T[j].GetpLength();
     ii = j;
     /*
      * the polynomial to reduce with (up to the moment) is;
@@ -1009,7 +1014,7 @@ int redSigRing (LObject* h,kStrategy strat)
       i++;
       if (i > strat->tl)
         break;
-      if (li<=1)
+      if (li==1)
         break;
       if ((strat->T[i].pLength < li)
          && n_DivBy(pGetCoeff(h_p),pGetCoeff(strat->T[i].p),currRing->cf)
@@ -1020,6 +1025,7 @@ int redSigRing (LObject* h,kStrategy strat)
          * the polynomial to reduce with is now;
          */
         li = strat->T[i].pLength;
+        if (li<=0) li=strat->T[i].GetpLength();
         ii = i;
       }
     }
@@ -1312,12 +1318,7 @@ int redLazy (LObject* h,kStrategy strat)
     if (j < 0) return 1;
 
     li = strat->T[j].pLength;
-    #if 0
-    if (li==0)
-    {
-      li=strat->T[j].pLength=pLength(strat->T[j].p);
-    }
-    #endif
+    if (li<=0) li=strat->T[j].GetpLength();
     ii = j;
     /*
      * the polynomial to reduce with (up to the moment) is;
@@ -1333,15 +1334,8 @@ int redLazy (LObject* h,kStrategy strat)
       i++;
       if (i > strat->tl)
         break;
-      if (li<=1)
+      if (li==1)
         break;
-    #if 0
-      if (strat->T[i].pLength==0)
-      {
-        PrintS("!");
-        strat->T[i].pLength=pLength(strat->T[i].p);
-      }
-   #endif
       if ((strat->T[i].pLength < li)
          &&
           p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
@@ -1350,8 +1344,8 @@ int redLazy (LObject* h,kStrategy strat)
         /*
          * the polynomial to reduce with is now;
          */
-        PrintS("+");
         li = strat->T[i].pLength;
+        if (li<=0) li=strat->T[i].GetpLength();
         ii = i;
       }
     }
@@ -1477,6 +1471,7 @@ int redHoney (LObject* h, kStrategy strat)
 
     ei = strat->T[j].ecart;
     li = strat->T[j].pLength;
+    if (li<=0) li=strat->T[j].GetpLength();
     ii = j;
     /*
      * the polynomial to reduce with (up to the moment) is;
@@ -1492,7 +1487,7 @@ int redHoney (LObject* h, kStrategy strat)
         break;
       //if (ei < h->ecart)
       //  break;
-      if (li<=1)
+      if (li==1)
         break;
       if ((((strat->T[i].ecart < ei) && (ei> h->ecart))
          || ((strat->T[i].ecart <= h->ecart) && (strat->T[i].pLength < li)))
@@ -1505,6 +1500,7 @@ int redHoney (LObject* h, kStrategy strat)
          */
         ei = strat->T[i].ecart;
         li = strat->T[i].pLength;
+        if (li<=0) li=strat->T[i].GetpLength();
         ii = i;
       }
     }
@@ -1547,8 +1543,7 @@ int redHoney (LObject* h, kStrategy strat)
 #endif
     assume(strat->fromT == FALSE);
 
-    number coef;
-    ksReducePoly(h,&(strat->T[ii]),strat->kNoetherTail(),&coef,strat);
+    ksReducePoly(h,&(strat->T[ii]),strat->kNoetherTail(),NULL,strat);
 #if SBA_PRINT_REDUCTION_STEPS
     sba_interreduction_steps++;
 #endif

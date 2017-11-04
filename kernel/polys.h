@@ -58,7 +58,7 @@ void rChangeCurrRing(ring r);
 /// allocates the space for a new monomial -- no initialization !!!
 #define pNew()          p_New(currRing)
 /// allocates a new monomial and initializes everything to 0
-#define pInit()         p_Init(currRing)
+#define pInit()         p_Init(currRing,currRing->PolyBin)
 /// like pInit, except that expvector is initialized to that of p,
 /// p must be != NULL
 #define pLmInit(p)  p_LmInit(p, currRing)

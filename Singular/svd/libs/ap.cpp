@@ -7,10 +7,10 @@ const double ap::minrealnumber  = 1E-300;
 //
 // ap::complex operations
 //
-const bool ap::operator==(const ap::complex& lhs, const ap::complex& rhs)
+bool ap::operator==(const ap::complex& lhs, const ap::complex& rhs)
 { return lhs.x==rhs.x && lhs.y==rhs.y; }
 
-const bool ap::operator!=(const ap::complex& lhs, const ap::complex& rhs)
+bool ap::operator!=(const ap::complex& lhs, const ap::complex& rhs)
 { return lhs.x!=rhs.x || lhs.y!=rhs.y; }
 
 const ap::complex ap::operator+(const ap::complex& lhs)
@@ -93,7 +93,7 @@ const ap::complex ap::operator/(const double& lhs, const ap::complex& rhs)
 const ap::complex ap::operator/(const ap::complex& lhs, const double& rhs)
 { return ap::complex(lhs.x/rhs, lhs.y/rhs); }
 
-const double ap::abscomplex(const ap::complex &z)
+double ap::abscomplex(const ap::complex &z)
 {
     double w;
     double xabs;

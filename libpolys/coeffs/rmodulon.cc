@@ -480,7 +480,7 @@ static BOOLEAN nrnGreater(number a, number b, const coeffs)
 
 static BOOLEAN nrnGreaterZero(number k, const coeffs)
 {
-  return 0 < mpz_cmp_si((mpz_ptr)k, 0);
+  return 0 < mpz_sgn1((mpz_ptr)k);
 }
 
 static BOOLEAN nrnIsUnit(number a, const coeffs r)
@@ -849,11 +849,12 @@ static void nrnInitExp(unsigned long m, coeffs r)
 }
 
 #ifdef LDEBUG
-BOOLEAN nrnDBTest (number a, const char *, const int, const coeffs r)
+BOOLEAN nrnDBTest (number a, const char *f, const int l, const coeffs r)
 {
   if (a==NULL) return TRUE;
-  if ( (mpz_cmp_si((mpz_ptr) a, 0) < 0) || (mpz_cmp((mpz_ptr) a, r->modNumber) > 0) )
+  if ( (mpz_sgn1((mpz_ptr) a) < 0) || (mpz_cmp((mpz_ptr) a, r->modNumber) > 0) )
   {
+    Warn("mod-n: out of range at %s:%d\n",f,l);
     return FALSE;
   }
   return TRUE;

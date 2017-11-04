@@ -1,16 +1,17 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version realclassify.lib 4.0.3.5 Nov_2016 "; // $Id$
+version="version realclassify.lib 4.1.0.3 Nov_2107 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:  realclassify.lib   Classification of real singularities
-AUTHOR:   Magdaleen Marais,  magdaleen@aims.ac.za
+AUTHOR:   Janko Boehm,       boehm@mathematik.uni-kl.de
+          Magdaleen Marais,  magdaleen@aims.ac.za
           Andreas Steenpass, steenpass@mathematik.uni-kl.de
 
 OVERVIEW:
    A library for classifying isolated hypersurface singularities over the reals
    w.r.t. right equivalence, based on the determinator of singularities by
-   V.I. Arnold. This library is based on classify.lib by Kai Krueger, but
-   handles the real case, while classify.lib does the complex classification.
+   V.I. Arnold. This library is based on classify2.lib by the first and second author and G. Pfister, but
+   handles the real case, while classify2.lib does the complex classification.
 
 REFERENCES:
 Arnold, Varchenko, Gusein-Zade: Singularities of Differentiable Maps.
@@ -21,38 +22,46 @@ Greuel, Lossen, Shustin: Introduction to singularities and deformations.
 Springer, Berlin 2007
 
 PROCEDURES:
- realclassify(f);    real classification of singularities of modality 0 and 1
- realmorsesplit(f);  splitting lemma in the real case
- milnornumber(f);    Milnor number
- determinacy(f);     an upper bound for the determinacy
+ realclassify(f);               real classification of singularities of modality 0 and 1 up to stable equivalence
+ realmorsesplit(f);             splitting lemma in the real case
+ milnornumber(f);               Milnor number
+ determinacy(f);                an upper bound for the determinacy
+ addnondegeneratevariables(f);  find a right equivalent normal form by adding the non-degenerate variables
 ";
 
 LIB "linalg.lib";
 LIB "elim.lib";
-LIB "primdec.lib";
 LIB "classify.lib";
 LIB "rootsur.lib";
 LIB "rootsmr.lib";
 LIB "atkins.lib";
 LIB "solve.lib";
+LIB "general.lib";
+LIB "classify2.lib";
+LIB "rootisolation.lib";
+static proc mod_init()
+{
+  option(noredefine);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 proc realclassify(poly f, list #)
 "
-USAGE:    realclassify(f[, format]); f poly, format string
-RETURN:   A list containing (in this order)
-          @* - the type of the singularity as a string,
-          @* - the normal form,
-          @* - the corank, the Milnor number, the inertia index and
-               a bound for the determinacy as integers.
-          @* The normal form involves parameters for singularities of modality
-             greater than 0. The actual value of the parameters is not computed
-             in most of the cases. If the value of the parameter is unknown,
-             the normal form is given as a string with an \"a\" as the
-             parameter. Otherwise, it is given as a polynomial.
-          @* An optional string @code{format} can be provided. Its default
-             value is \"short\" in which case the return value is the list
-             described above. If set to \"nice\", a string is added at the end
-             of this list, containing the result in a more readable form.
+USAGE:    realclassify(f); f poly
+RETURN:   A list of elements NF of type NormalFormEquation with the following keys:
+          @* NF.singularityType    = the type of the singularity as a string
+          @* NF.normalFormEquation = an element F of type Poly with the normal form equation
+                                     (a representative of the stable equivalence class of f,
+                                      as chosen by Arnold)
+          @* NF.modality           = the modality of f
+          @* NF.parameters         = a list where each entry is a list consisting out of the parameter term in
+                                     the normalform equation and an interval
+          @* NF.corank             = the corank of f (of type int)
+          @* NF.inertiaIndex       = the interia index of f (of type int)
+          @* NF.milnorNumber       = the milnor number of f (of type int)
+          @* NF.determinacy        = an lower bound for the determinacy of f (of type int)
+
+
 NOTE:     The classification is done over the real numbers, so in contrast to
           classify.lib, the signs of coefficients of monomials where even
           exponents occur matter.
@@ -62,6 +71,10 @@ NOTE:     The classification is done over the real numbers, so in contrast to
           @* The input polynomial must be contained in maxideal(2) and must be
              an isolated singularity of modality 0 or 1. The Milnor number is
              checked for being finite.
+          @* In case of NF.modality=1, the parameter values are given as an element
+             of a number field QQ[a]/(minpoly), the coefficient ring of F in terms
+             of the unique root of minpoly of the ring F.in in the interval specified
+             in NF.parameters in conjunction with the parameter term.
 SEE ALSO: classify
 KEYWORDS: Classification of singularities
 EXAMPLE:  example realclassify; shows an example"
@@ -70,30 +83,22 @@ EXAMPLE:  example realclassify; shows an example"
   int i, j;
 
   /* name for the basering */
+  def br1 = basering;
   def br = basering;
+  ring R1 = (0),(var(1),var(2)),ds;
+  list L = ringlist(br);
+  string mord = ringlist(R1)[3][1][1];
+  L[3][1][1] = mord;
+  br = ring(L);
+  setring br;
+  kill R1;
+  poly f = fetch(br1,f);
 
-  /* read optional parameters */
-  int printcomments;
-  if(size(#) > 0)
-  {
-    if(size(#) > 1 || typeof(#[1]) != "string")
-    {
-      ERROR("Wrong optional parameters.");
-    }
-    if(#[1] != "short" && #[1] != "nice")
-    {
-      ERROR("Wrong optional parameters.");
-    }
-    if(#[1] == "nice")
-    {
-      printcomments = 1;
-    }
-  }
 
   /* error check */
-  if(!hasQQCoefficient(br))
+  if((charstr(br) != "QQ") and (charstr(br) != "0"))
   {
-    ERROR("The ground field must be Q (the rational numbers).");
+    ERROR("The ground field must be QQ (the rational numbers).");
   }
   int n = nvars(br);
   for(i = 1; i <= n; i++)
@@ -110,7 +115,6 @@ EXAMPLE:  example realclassify; shows an example"
 
   /* compute Milnor number before continuing the error check */
   int mu = milnornumber(f);
-
   /* continue error check */
   if(mu < 1)
   {
@@ -118,16 +122,6 @@ EXAMPLE:  example realclassify; shows an example"
       +"positive and finite.");
   }
 
-  /* call classify before continuing the error check */
-  list dataFromClassify = prepRealclassify(f);
-  int m = dataFromClassify[1];                // the modality of f
-  string complextype = dataFromClassify[2];   // the complex type of f
-
-  /* continue error check */
-  if(m > 1)
-  {
-    ERROR("The input polynomial must be a singularity of modality 0 or 1.");
-  }
 
   /* apply splitting lemma */
   list morse = realmorsesplit(f, mu);
@@ -138,90 +132,155 @@ EXAMPLE:  example realclassify; shows an example"
 
   /* determine the type */
   string typeofsing;
-  poly nf;
-  poly monparam;   // the monomial whose coefficient is the parameter
-                   // in the modality 1 cases, 0 otherwise
-  string morecomments = newline;
-
+  Poly nf;
+  list listNFE;
+  if(cr > 2)
+  {
+    ERROR("This case is not yet implemented.");
+  }
   if(cr == 0)   // case A[1]
   {
-    typeofsing, nf = caseA1(rf, lambda, n);
+    setring br1;
+    poly rf = fetch(br, rf);
+    typeofsing, nf = caseA1(rf, n);
+    int m =0;
   }
   if(cr == 1)   // case A[k], k > 1
   {
+    setring br1;
+    poly rf = fetch(br, rf);
     typeofsing, nf = caseAk(rf, n);
+    int m = 0;
   }
   if(cr == 2)
   {
+    list LL = ringlist(br);
+    LL[2]=list(LL[2][1],LL[2][2]);
+    def Rcc = ring(LL);
+    setring Rcc;
+    poly rf = fetch(br,rf);
+    list dataFromClassify = complexType(rf);
+    setring br;
+    int m = dataFromClassify[2];                // the modality of f
+    string complextype = dataFromClassify[1];   // the complex type of f
+    if(m > 1)
+    {
+     ERROR("The input polynomial must be a singularity of modality 0 or 1.");
+    }
     if(complextype[1,2] == "D[")   // case D[k]
     {
       if(mu == 4)   // case D[4]
       {
+        setring br1;
+        poly rf = fetch(br, rf);
         typeofsing, nf = caseD4(rf);
       }
       else   // case D[k], k > 4
       {
+        setring br1;
+        poly rf = fetch(br, rf);
         typeofsing, nf = caseDk(rf, mu);
       }
     }
     if(complextype == "E[6]")   // case E[6]
     {
+      setring br1;
+      poly rf = fetch(br, rf);
       typeofsing, nf = caseE6(rf);
     }
     if(complextype == "E[7]")   // case E[7]
     {
-      typeofsing, nf = caseE7();
+      setring br1;
+      poly rf = fetch(br, rf);
+      typeofsing, nf = caseE7(rf);
     }
     if(complextype == "E[8]")   // case E[8]
     {
-      typeofsing, nf = caseE8();
+      setring br1;
+      poly rf = fetch(br, rf);
+      typeofsing, nf = caseE8(rf);
     }
-    if(typeofsing == "")
+    if(complextype == "Z[11]")  // case Z[11]
     {
+      listNFE = caseZ11(rf,br1);
+    }
+    if(complextype == "Z[12]")  // case Z[12]
+    {
+      listNFE = caseZ12(rf, br1);
+    }
+    if(complextype == "Z[13]")  // case Z[12]
+    {
+      listNFE = caseZ13(rf,br1);
+    }
+    if(complextype == "W[12]")  // case W[12]
+    {
+      listNFE = caseW12(rf,br1);
+    }
+    if(complextype == "W[13]")  // case W[13]
+    {
+      listNFE = caseW13(rf,br1);
+    }
+    if(complextype == "E[12]")  // case E[12]
+    {
+      listNFE = caseE12(rf, br1);
+    }
+    if(complextype == "E[13]")  // case E[13]
+    {
+      listNFE = caseE13(rf, br1);
+    }
+    if(complextype == "E[14]")  // case E[14]
+    {
+      listNFE = caseE14(rf, br1);
+    }
+    if((complextype[1,2] == "X[") and (complextype <> "X[9]"))  // case X9k
+    {
+      listNFE = caseX9k(rf,mu,br1);
+    }
+    if((complextype[1,2] == "J[") and (complextype<>"J[10]"))  // case J[10+k]
+    {
+      listNFE = caseJ10k(rf,mu, br1);
+    }
+    if(complextype == "J[10]")   // case J[10]
+    {
+      listNFE = caseJ10(rf, br1);
+    }
+    if(complextype == "X[9]")  // case X9
+    {
+      listNFE = caseX9(rf, br1);
+    }
+    if(complextype[1,2] == "Y[")
+    {
+      listNFE = caseYrs(rf,mu, br1);
+    }
+  }
+  if (m==0){
+       NormalFormEquation NFE;
+       NFE.normalFormEquation = nf;
+       NFE.parameters = list();
+       NFE.singularityType = typeofsing;
+       listNFE = list(NFE);
+  }
+
+
+  if (size(listNFE)==0)
+  {
       ERROR("This case is not yet implemented.");
-    }
-  }
-  if(cr > 2)
-  {
-    ERROR("This case is not yet implemented.");
   }
 
-  /* add the non-corank variables to the normal forms */
-  nf = addnondegeneratevariables(nf, lambda, cr);
 
-  /* write normal form as a string in the cases with modality greater than 0 */
-  if(monparam != 0)
-  {
-    poly nf_tmp = nf;
-    kill nf;
-    def nf = modality1NF(nf_tmp, monparam);
-  }
+    for (i=1;i<=size(listNFE);i++){
+    listNFE[i].vars = ringlist(br1)[2];
+    listNFE[i].realCase = 1;
+    listNFE[i].corank = cr;
+    listNFE[i].inertiaIndex = lambda;
+    listNFE[i].determinacy = d;
+    listNFE[i].modality = m;
+    listNFE[i].determinacy = d;
+    listNFE[i].milnorNumber = mu;
+}
 
-  /* write comments */
-  if(printcomments)
-  {
-    string comments = newline;
-    comments = comments+"Type of singularity: "   +typeofsing    +newline
-                       +"Normal form:         "   +string(nf)    +newline
-                       +"Corank:              "   +string(cr)    +newline
-                       +"Milnor number:       "   +string(mu)    +newline
-                       +"Inertia index:       "   +string(lambda)+newline
-                       +"Determinacy:         <= "+string(d)     +newline;
-    if(morecomments != newline)
-    {
-      comments = comments+morecomments;
-    }
-  }
+return(listNFE);
 
-  /* return results */
-  if(printcomments)
-  {
-    return(list(typeofsing, nf, cr, mu, lambda, d, comments));
-  }
-  else
-  {
-    return(list(typeofsing, nf, cr, mu, lambda, d));
-  }
 }
 example
 {
@@ -229,11 +288,223 @@ example
   echo = 2;
   ring r = 0, (x,y,z), ds;
   poly f = (x2+3y-2z)^2+xyz-(x-y3+x2z3)^3;
-  realclassify(f, "nice");
-}
+  realclassify(f);
+  //map phi = r, x+2y+y^2+x*y+x^2+y^3,x+y+y^2+x^2+x*y+y^3,z;
+  map phi = r, x+2y+y^2+x*y,x+y+y^2+x^2,z;
 
+  poly f  = x^2+y^2-z^2;  // A[1]
+  f=phi(f);
+  realclassify(f);
+
+  poly f  = x^3+y^2-z^2;  // A[2]
+  f=phi(f);
+  realclassify(f);
+
+  poly f  = x^2*y-y^3+z^2;  // D[4]-
+  f=phi(f);
+  realclassify(f);
+
+
+  poly f  = x^3-y^4-z^2;  // E[6]-
+  realclassify(f);
+
+  poly f  = x^3+x*y^3+z^2;  // E[7]
+  f=phi(f);
+  realclassify(f);
+
+  poly f  = x^3+y^5-z^2;  // E[8]
+  realclassify(f);
+
+  poly f  = x^3+3*x^2*y^2+x*y^4-z^2;  //J[10]+
+  f=phi(f);
+  realclassify(f);
+
+  poly f  = x^3+x^2*y^2+4*y^9+z^2;  //J[13]+
+  f=phi(f);
+  realclassify(f);
+
+  poly f  = -x^4-x^2*y^2+3y^9-z^2;  //X[14]--
+  f=phi(f);
+  realclassify(f);
+
+  poly f  = -x^2*y^2-x^7+4*y^8+z^2;  //Y[7,8]--
+  f=phi(f);
+  realclassify(f);
+
+  poly f  = +(x^2+y^2)^2+5*x^9-z^2;  // tilde Y[9]
+  f=phi(f);
+  realclassify(f);
+
+  poly f  = x^3+y^7+3*x*y^5+z^2;  // E[12]
+  f=phi(f);
+  realclassify(f);
+
+  poly f  = x^3+x*y^5+4*y^8-z^2;  // E[13]
+  f=phi(f);
+  realclassify(f);
+
+  poly f  = x^3+y^8+2*x*y^6+z^2;  // E[14]+
+  f=phi(f);
+  realclassify(f);
+
+  poly f  = x^3*y+y^5+5*x*y^4-z^2;  // Z[11]
+  f=phi(f);
+  realclassify(f);
+
+  poly f  = x^3*y+x*y^4+6*x^2*y^3+z^2;  // Z[12]
+  f=phi(f);
+  realclassify(f);
+
+  poly f  = x^3*y-y^6+2*x*y^5-z^2;  // Z[13]-
+  f=phi(f);
+  realclassify(f);
+
+  poly f  = x^4+y^5+x^2*y^3+z^2;  // W[12]+
+  f=phi(f);
+  realclassify(f);
+
+
+  poly f  = -x^4+x*y^4+y^6-z^2;  // W[13]-
+  f=phi(f);
+  realclassify(f);
+
+  poly p = x^4-x^2*y^2+5*y^4+x*y^3+x^3*y;  //X9++
+  realclassify(p);
+
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc coeff(poly f, poly m){
+poly p = f;
+int i = 1;
+while (p<>0){
+  if (m==leadmonom(p)){return(leadcoef(p));}
+  p=p-lead(p);
+}
+return(0);}
 ///////////////////////////////////////////////////////////////////////////////
-static proc caseA1(poly rf, int lambda, int n)
+static proc maximumFiltration(poly f)
+{
+  def br = basering;
+  ring R = 0,(x,y),dp;
+  poly f = fetch(br,f);
+  int n = ord(f);
+  setring br;
+  return(ord(f));
+}
+//////////////////////////////////////////////////////////////////////////////////////
+static proc WeightedJet(poly f, intvec v, int k)
+{
+  def br = basering;
+  ring R = 0,(x,y),wp(v);
+  poly f = fetch(br,f);
+  while(deg(f,v)>k)
+  {
+    f=f-lead(f);
+  }
+  setring br;
+  poly jetf = fetch(R,f);
+  return(jetf)
+}
+//////////////////////////////////////////////////////////////////////////////////////
+static proc lowestJet(poly rf)   //Apply to cases of type: exceptional, J[10] and J[10+k].
+{
+  map phi;
+  def br = basering;
+  int n = maximumFiltration(rf);
+  poly g = jet(rf,n);
+  list factorization = factorize(g);
+  list factors = factorization[1][2];
+  poly f = factorization[1][2];
+  if(size(factorization[1])==3)
+  {
+    if(factorization[2][2] > factorization[2][3])
+    {
+      factors = insert(factors, factorization[1][3], 1);
+    }
+    else
+    {
+      factors = insert(factors, factorization[1][3]);
+    }
+  matrix T[2][2] = factors[1]/var(1), factors[1]/var(2),
+                   factors[2]/var(1), factors[2]/var(2);
+  phi = br, luinverse(T)[2]*matrix(ideal(var(1), var(2)), 2, 1);
+  rf = phi(rf);
+  }
+  else
+  {
+    if(coeff(f,var(1))<>0)
+    {
+      matrix T[2][2] = factors[1]/var(1),factors[1]/var(2),
+                       0, 1;
+      phi = br, luinverse(T)[2]*matrix(ideal(var(1), var(2)), 2, 1);
+      rf = phi(rf);
+    }
+    else
+    {
+      phi = br,var(2),var(1);
+      rf = phi(rf);
+    }
+  }
+  return(rf)
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc RealRootFactor(poly MP, number k1, number k2)
+{
+  def br = basering;
+  ring R = 0,x,dp;
+  number k1 = fetch(br,k1);
+  number k2 = fetch(br,k2);
+  poly MP = fetch(br,MP);
+  list factorization =factorize(MP);
+  while(size(factorization[1])>2 || factorization[2][2]>1)
+  {
+    for(int i=2;i<=size(factorization[1]);i=i+1)
+    {
+      if(sturm(factorization[1][i],k1,k2)>0)
+      {
+        MP=factorization[1][i];
+        factorization =factorize(MP);
+      }
+    }
+  }
+  int n = deg(MP);
+  setring br;
+  MP = fetch(R,MP);
+  number c = (coeff(MP,var(1)^n))^(-1);
+  MP = c*MP;
+  return(MP)
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc eliminateTildeY(poly rf, poly q, int n1)
+{
+  def br = basering;
+  int i = 5;
+  poly p = (jet(rf,i)-jet(rf,4))/(coeff(rf,var(1)^4)*4*q);
+  while(i<>n1)
+  {
+    rf = eliminateDegreeTildeY(rf,p,q,i,n1);
+    poly rf1 = jet(rf,i)-jet(rf,4);
+    if(rf1 <> 0)
+    {
+      ERROR("this remainder should be zero");
+    }
+    i = i+1;
+    p = (jet(rf,i)-jet(rf,4))/(coeff(rf,var(1)^4)*4*q);
+  }
+  rf = eliminateDegreeTildeY(rf,p,q,i,n1);
+  return(rf);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc eliminateDegreeTildeY(poly rf, poly p, poly q, int i, int n1)
+{
+   poly px = subst(p,var(2),0);
+   poly py = p-px;
+   map phi = br, var(1)-px/var(1), var(2)- py/(coeff(q,var(2)^2)*var(2));
+   rf  = phi(rf);
+   return(jet(rf,n1));
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc caseA1(poly rf, int n)
 {
   string typeofsing = "A[1]";
   poly nf = 0;
@@ -327,6 +598,7 @@ static proc caseDk(poly rf, int mu)
   poly nf;
   def br = basering;
   map phi;
+  poly MP;
 
   rf = jet(rf, mu-1);
   list factorization = factorize(jet(rf, 3));
@@ -409,7 +681,7 @@ static proc caseE6(poly rf)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static proc caseE7()
+static proc caseE7(poly rf)
 {
   string typeofsing = "E[7]";
   poly nf = var(1)^3+var(1)*var(2)^3;
@@ -417,47 +689,4403 @@ static proc caseE7()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static proc caseE8()
+static proc caseE8(poly rf)
 {
   string typeofsing = "E[8]";
   poly nf = var(1)^3+var(2)^5;
   return(typeofsing, nf);
 }
-
 ///////////////////////////////////////////////////////////////////////////////
-/*
-  print the normal form as a string for the modality 1 cases.
-  The first argument is the normalform with parameter = 1,
-  the second argument is the monomial whose coefficient is the parameter.
-*/
-static proc modality1NF(poly nf, poly monparam)
+static proc caseZ11(poly rf, br1)
 {
+  /*preliminaries*/
+  string typeofsing;
   def br = basering;
-  list lbr = ringlist(br);
-  ring r = (0,a), x, dp;
-  list lr = ringlist(r);
-  setring(br);
-  list lr = fetch(r, lr);
-  lbr[1] = lr[1];
-  def s = ring(lbr);
-  setring(s);
-  poly nf = fetch(br, nf);
-  poly monparam = fetch(br, monparam);
-  nf = nf+(a-1)*monparam;
-  string result = string(nf);
-  setring(br);
-  return(result);
+  poly nf;
+  map phi;
+  poly MP;
+  list intervalP;
+
+  /* II. Eliminate the monomials in supp(rf) underneath Gamma(T) */
+  rf = lowestJet(rf);
+
+  /* IV. Read off the desired information */
+  number b = 1/(coeff(rf,var(1)^3*var(2)));
+  phi = br, var(1),b*var(2);
+  rf = phi(rf);
+  b=coeff(rf,var(1)*var(2)^4)^(15)*coeff(rf,var(2)^5)^(-11);
+  MP = var(1)^(15)-b;
+  number n = maxabs(MP);
+  MP = RealRootFactor(MP,-(n+1),n+1);
+  n = maxabs(MP);
+  if(deg(MP)==1)
+  {
+    number a = -number(subst(MP,var(1),0));
+    setring br1;
+    number a = fetch(br,a);
+    number n = fetch(br,n);
+  }
+  else
+  {
+    string mord = ringlist(br1)[3][1][1];
+    ring R1 = (0,a),(var(1),var(2)),ds;
+    list L1 = ringlist(R1);
+    L1[3][1][1]=mord;
+    def R2 = ring(L1);
+    setring R2;
+    kill R1;
+    poly ff = fetch(br,MP);
+    minpoly = number(subst(ff,var(1),a));
+    number n = fetch(br,n);
+  }
+  Poly nfe = var(1)^3+var(2)^5+a*var(1)*var(2)^4;
+  intervalP = list(-n-1,n+1);
+  typeofsing = "Z[11]";
+  NormalFormEquation F;
+  F.normalFormEquation = nfe;
+  F.parameters = list(list(a*var(1)*var(2)^4,intervalP));
+  F.singularityType = typeofsing;
+  setring br;
+  return(list(F));
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc caseZ12(poly rf, br1)
+{
+  /*preliminaries*/
+  string typeofsing;
+  poly nf;
+  def br = basering;
+  map phi;
+  poly MP;
+  list intervalP;
+
+  /* II. Eliminate the monomials in supp(rf) underneath Gamma(T) */
+  rf = lowestJet(rf);
+
+  /* III. Eliminate the monomials in supp(rf) above \Gamma(T) which are not in supp(T)*/
+  /* Write the sum of the terms of rf above \Gamma(T) in terms of Arnold's system */
+  rf = rf-coeff(rf,var(2)^6)*var(2)^6-coeff(rf,var(2)^6)*3*(coeff(rf,var(1)*var(2)^4)^(-1))*var(1)^2*var(2)^3;
+  /* IV. Read off the desired information */
+  phi = br, var(1),(1/(coeff(rf,var(1)^3*var(2))))*var(2);
+  rf = phi(rf);
+  number b=(coeff(rf,var(1)^2*var(2)^3))^(11)*(coeff(rf,var(1)*var(2)^4))^(-7);
+  MP = var(1)^(11)-b;
+
+  number n = maxabs(MP);
+  MP = RealRootFactor(MP,-(n+1),n+1);
+  n = maxabs(MP);
+  if(deg(MP)==1)
+  {
+    number a = -number(subst(MP,var(1),0));
+    setring br1;
+    number a = fetch(br,a);
+    number n = fetch(br,n);
+  }
+  else
+  {
+    string mord = ringlist(br1)[3][1][1];
+    ring R1 = (0,a),(var(1),var(2)),ds;
+    list L1 = ringlist(R1);
+    L1[3][1][1]=mord;
+    def R2 = ring(L1);
+    setring R2;
+    kill R1;
+    poly ff = fetch(br,MP);
+    minpoly = number(subst(ff,var(1),a));
+    number n = fetch(br,n);
+  }
+  Poly nfe =var(1)^3*var(2)+var(1)*var(2)^4+a*var(1)^2*var(2)^3;
+  intervalP = list(-n-1,n+1);
+  typeofsing = "Z[12]";
+  NormalFormEquation F;
+  F.normalFormEquation = nfe;
+  F.parameters = list(list(a*var(1)^2*var(2)^3,intervalP));
+  F.singularityType = typeofsing;
+  setring br;
+  return(list(F));
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc caseZ13(poly rf, br1)
+{
+  /*preliminaries*/
+  string typeofsing;
+  poly nf;
+  def br = basering;
+  map phi;
+  poly MP;
+  list intervalP;
+
+  /* II. Eliminate the monomials in supp(rf) underneath or on \Gamma(T)*/
+  rf = lowestJet(rf);
+
+  /* III. Eliminate the monomials above \Gamma(T) which are not in supp(T)*/
+  number c = coeff(rf,var(1)^3*var(2));
+  poly g = 1/(coeff(rf,var(1)^3*var(2)))*rf;
+  intvec v = 5,3;
+
+  /* Consider the terms of g of w-degree j=19 and Apply Algorithm 4*/
+  poly h = (WeightedJet(g,v,19)-WeightedJet(g,v,18))/(3*var(1)^2*var(2));
+  phi = br,var(1)-h,var(2);
+  rf = phi(rf);
+
+  /* IV. Read off the desired information*/
+  phi = br, var(1), (1/c)*var(2);
+  rf = phi(rf);
+  number s = coeff(rf,var(2)^6);
+  int sg = sign(s);
+  if(coeff(rf,var(2)^6)>0)
+  {
+    typeofsing = "Z[13]+";
+  }
+  else
+  {
+    typeofsing = "Z[13]-";
+  }
+  number b = (coeff(rf,var(1)*var(2)^5))^9*(absValue(coeff(rf,var(2)^6)))^(-7);
+  MP = var(1)^(9)-b;
+  number n = maxabs(MP);
+  MP = RealRootFactor(MP,-(n+1),n+1);
+  n = maxabs(MP);
+  if(deg(MP)==1)
+  {
+    number a = -number(subst(MP,var(1),0));
+    setring br1;
+    number a = fetch(br,a);
+    number n = fetch(br,n);
+  }
+  else
+  {
+    string mord = ringlist(br1)[3][1][1];
+    ring R1 = (0,a),(var(1),var(2)),ds;
+    list L1 = ringlist(R1);
+    L1[3][1][1]=mord;
+    def R2 = ring(L1);
+    setring R2;
+    kill R1;
+    poly ff = fetch(br,MP);
+    minpoly = number(subst(ff,var(1),a));
+    number n = fetch(br,n);
+  }
+  Poly nfe =var(1)^3*var(2)+number(sg)*var(2)^6+a*var(1)*var(2)^5;
+  intervalP = list(-n-1,n+1);
+  NormalFormEquation F;
+  F.normalFormEquation = nfe;
+  F.parameters = list(list(a*var(1)*var(2)^5,intervalP));
+  F.singularityType = typeofsing;
+  setring br;
+  return(list(F));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-/*
-  add squares of the non-degenerate variables (i.e. var(cr+1), ...,
-  var(nvars(basering)) for corank cr) to the normalform nf,
-  with signs according to the inertia index lambda
-*/
-static proc addnondegeneratevariables(poly nf, int lambda, int cr)
+static proc caseW12(poly rf, br1)
 {
-  int n = nvars(basering);
+  /*preliminaries*/
+  string typeofsing;
+  poly nf;
+  def br = basering;
+  map phi;
+  poly MP;
+  list intervalP;
+
+  /* II. Eliminate the monomials in supp(rf) underneath or on \Gamma(T)*/
+  rf = lowestJet(rf);
+
+  /* III. Eliminate the monomials above \Gamma(T) which are not in supp(T)*/
+  poly g = 1/(coeff(rf,var(2)^5))*rf;
+  intvec v = 5,4;
+
+  /* Consider the terms of g of w-degree j=21 and Apply Algorithm 4 */
+  poly h = (WeightedJet(g,v,21)-WeightedJet(g,v,20))/(5*var(2)^4);
+  phi = br,var(1),var(2)-h;
+  rf = phi(rf);
+
+  /* IV. Read off the desired information*/
+  if(coeff(rf,var(2)^5)<0)
+  {
+    phi = br, var(1),-var(2);
+    rf = phi(rf);
+  }
+  number s = coeff(rf,var(1)^4);
+  int sg = sign(s);
+  if(coeff(rf,var(1)^4)>0)
+  {
+    typeofsing = "W[12]+";
+  }
+  else
+  {
+    typeofsing = "W[12]-";
+  }
+  MP = var(1)^(10)-coeff(rf,var(1)^2*var(2)^3)^(10)*(absValue(coeff(rf,var(1)^4)))^(-5)*coeff(rf,var(2)^5)^(-6);
+  if(coeff(rf,var(1)^2*var(2)^3)>0)
+  {
+    number n = maxabs(MP);
+    MP = RealRootFactor(MP,0,n+1);
+    number n1 = 0;
+    number n2 = maxabs(MP)+1;
+  }
+  else
+  {
+    number n = maxabs(MP);
+    MP = RealRootFactor(MP,-(n+1),0);
+    number n1 = -maxabs(MP)-1;
+    number n2 = 0;
+  }
+
+ if(deg(MP)==1)
+  {
+    number a = -number(subst(MP,var(1),0));
+    setring br1;
+    number a = fetch(br,a);
+    number n = fetch(br,n);
+  }
+  else
+  {
+    string mord = ringlist(br1)[3][1][1];
+    ring R1 = (0,a),(var(1),var(2)),ds;
+    list L1 = ringlist(R1);
+    L1[3][1][1]=mord;
+    def R2 = ring(L1);
+    setring R2;
+    kill R1;
+    poly ff = fetch(br,MP);
+    minpoly = number(subst(ff,var(1),a));
+  }
+  number n1 = fetch(br,n1);
+  number n2 = fetch(br,n2);
+  Poly nfe =number(sg)*var(1)^4+var(2)^5+a*var(1)^2*var(2)^3;
+  intervalP = list(n1,n2);
+  NormalFormEquation F;
+  F.normalFormEquation = nfe;
+  F.parameters = list(list(a*var(1)^2*var(2)^3,intervalP));
+  F.singularityType = typeofsing;
+  setring br;
+  return(list(F));
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc caseW13(poly rf, br1)
+{
+  /*preliminaries*/
+  string typeofsing;
+  poly nf;
+  def br = basering;
+  map phi;
+  poly MP;
+  list intervalP;
+
+  /* II. Eliminate the monomials in supp(rf) underneath or on \Gamma(T) */
+  rf = lowestJet(rf);
+
+  /* III. Eliminate the monomials above \Gamma(T) which are not in supp(T)*/
+  poly g = 1/(coeff(rf,var(1)*var(2)^4))*rf;
+  intvec v = 4,3;
+
+  /* Consider the terms of w-degree j=17 and Apply Algorithm 4*/
+  poly h = (WeightedJet(g,v,17)-WeightedJet(g,v,16))/(4*var(1)*var(2)^3);
+  phi = br,var(1),var(2)-h;
+  rf = phi(rf);
+
+  /* Write the sum of the terms of rf above \Gamma(T) in terms of Arnold's system */
+  number b = 1/(4*coeff(rf,var(1)^4));
+  rf = rf-coeff(rf,var(1)^3*var(2)^2)*var(1)^3*var(2)^2-b*coeff(rf,var(1)^3*var(2)^2)*var(2)^6;
+
+  /* Read off the desired information*/
+  phi = br,coeff(rf,var(1)*var(2)^4)^(-(1))*var(1),var(2);
+  rf = phi(rf);
+  number s = coeff(rf,var(1)^4);
+  int sg = sign(s);
+  if(coeff(rf,var(1)^4)>0)
+  {
+      typeofsing = "W[13]+";
+  }
+  else
+  {
+    typeofsing = "W[13]-";
+  }
+  MP = var(1)^(8)-coeff(rf,var(2)^6)^8*(absValue(coeff(rf,var(1)^4)))^3;
+  if(coeff(rf,var(2)^6)>0)
+  {
+    number n = maxabs(MP);
+    MP = RealRootFactor(MP,0,n+1);
+    number n1 = 0;
+    number n2 = maxabs(MP);
+  }
+  else
+  {
+    number n = maxabs(MP);
+    MP = RealRootFactor(MP,-(n+1),0);
+    number n1 = -maxabs(MP)-1;
+    number n2 = 0;
+  }
+
+  if(deg(MP)==1)
+  {
+    number a = -number(subst(MP,var(1),0));
+    setring br1;
+    number a = fetch(br,a);
+    number n = fetch(br,n);
+  }
+  else
+  {
+    string mord = ringlist(br1)[3][1][1];
+    ring R1 = (0,a),(var(1),var(2)),ds;
+    list L1 = ringlist(R1);
+    L1[3][1][1]=mord;
+    def R2 = ring(L1);
+    setring R2;
+    kill R1;
+    poly ff = fetch(br,MP);
+    minpoly = number(subst(ff,var(1),a));
+  }
+  number n1 = fetch(br,n1);
+  number n2 = fetch(br,n2);
+  Poly nfe =sg*var(1)^4+var(1)*var(2)^4+a*var(2)^6;
+  intervalP = list(n1,n2);
+  NormalFormEquation F;
+  F.normalFormEquation = nfe;
+  F.parameters = list(list(a*var(2)^6,intervalP));
+  F.singularityType = typeofsing;
+  setring br;
+  return(list(F));
+  }
+////////////////////////////////////////////////////////////////////////////////
+static proc caseE12(poly rf, br1)
+{
+  /*preliminaries*/
+  string typeofsing;
+  poly nf;
+  def br = basering;
+  map phi;
+  poly MP;
+  list intervalP;
+
+  /* II. Eliminate the monomials in supp(rf) underneath or on \Gamma(T)*/
+  /* Apply Algorithm 1*/
+  rf = lowestJet(rf);
+
+  poly g1 = coeff(rf,var(1)^3)^(-1)*rf;
+
+  /* Consider the terms of g1 of standard degree j=4 and Apply Algorithm 4*/
+  poly g2 = (jet(g1,4)-var(1)^3)/(3*var(1)^2);
+  phi = br, var(1)-g2,var(2);
+  g1 = phi(g1);
+
+  /* Consider the terms of g1 of standard degree j=5 and Apply Algorithm 4*/
+  poly g3 =  (jet(g1,5)-var(1)^3)/(3*var(1)^2);
+  phi = br, var(1)-g3, var(2);
+  g1 = phi(g1);
+  rf = coeff(rf,var(1)^3)*g1;
+  /* IV. Read off the desired information */
+  typeofsing = "E[12]";
+  MP = var(1)^(21)-coeff(rf,var(1)^3)^(-7)*coeff(rf,var(2)^7)^(-15)*coeff(rf,var(1)*var(2)^5)^(21);
+  number n = maxabs(MP);
+  MP = RealRootFactor(MP,-(n+1),n+1);
+  n = maxabs(MP);
+
+  if(deg(MP)==1)
+  {
+    number a = -number(subst(MP,var(1),0));
+    setring br1;
+    number a = fetch(br,a);
+  }
+  else
+  {
+    string mord = ringlist(br1)[3][1][1];
+    ring R1 = (0,a),(var(1),var(2)),ds;
+    list L1 = ringlist(R1);
+    L1[3][1][1]=mord;
+    def R2 = ring(L1);
+    setring R2;
+    kill R1;
+    poly ff = fetch(br,MP);
+    minpoly = number(subst(ff,var(1),a));
+  }
+  Poly nfe =var(1)^3+var(2)^7+a*var(1)*var(2)^5;
+  number n = fetch(br,n);
+  intervalP = list(-(n+1),n+1);
+  NormalFormEquation F;
+  F.normalFormEquation = nfe;
+  F.parameters = list(list(a*var(1)*var(2)^5,intervalP));
+  F.singularityType = typeofsing;
+  setring br;
+  return(list(F));
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc caseE13(poly rf, br1)
+{
+  /*preliminaries*/
+  string typeofsing;
+  poly nf;
+  def br = basering;
+  map phi;
+  poly MP;
+  list intervalP;
+
+  /* II. Eliminate the monomials in supp(rf) underneath or on \Gamma(T)*/
+  /* Apply Algorithm 1*/
+  rf = lowestJet(rf);
+
+  poly g1 = coeff(rf,var(1)^3)^(-1)*rf;
+
+  /* Consider the terms of g of standard degree j=4 and Apply Algorithm 4*/
+  poly g2 = (jet(g1,4)-var(1)^3)/(3*var(1)^2);
+  phi = br, var(1)-g2,var(2);
+  g1 = phi(g1);
+
+  /* Consider the terms of g of standard degree j=5 and Apply Algorithm 4*/
+  poly g3 =(jet(g1,5)-var(1)^3)/(3*var(1)^2);
+  phi = br, var(1)-g3, var(2);
+  g1 = phi(g1);
+
+  rf = coeff(rf,var(1)^3)*g1;
+
+  /* Read off the desired information */
+  phi  = br, coeff(rf,var(1)*var(2)^5)^(-1)*var(1), var(2);
+  rf = phi(rf);
+  if(coeff(rf,var(1)^3)<0)
+  {
+    phi = br, -var(1),-var(2);
+    rf = phi(rf);
+  }
+  rf = rf-coeff(rf,var(1)^2*var(2)^3)*(var(1)^2*var(2)^3+(3*coeff(rf,var(1)^3))^(-1)*var(2)^(8));
+  typeofsing = "E[13]";
+  MP = var(1)^(15)-coeff(rf,var(1)^3)^8*coeff(rf,var(2)^8)^(15);
+  number n = maxabs(MP);
+  MP = RealRootFactor(MP,-(n+1),n+1);
+
+  n = maxabs(MP);
+  if(deg(MP)==1)
+  {
+    number a = -number(subst(MP,var(1),0));
+    setring br1;
+    number a = fetch(br,a);
+  }
+  else
+  {
+    string mord = ringlist(br1)[3][1][1];
+    ring R1 = (0,a),(var(1),var(2)),ds;
+    list L1 = ringlist(R1);
+    L1[3][1][1]=mord;
+    def R2 = ring(L1);
+    setring R2;
+    kill R1;
+    poly ff = fetch(br,MP);
+    minpoly = number(subst(ff,var(1),a));
+  }
+  number n = fetch(br,n);
+  Poly nfe =var(1)^3+var(1)*var(2)^5+a*var(2)^8;
+  intervalP = list(-(n+1),n+1);
+  NormalFormEquation F;
+  F.normalFormEquation = nfe;
+  F.parameters = list(list(a*var(2)^8,intervalP));
+  F.singularityType = typeofsing;
+  setring br;
+  return(list(F));
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+static proc caseE14(poly rf, br1)
+{
+  /*preliminaries*/
+  string typeofsing = "E[14]";
+  poly nf;
+  def br = basering;
+  map phi;
+  poly MP;
+  list intervalP;
+
+  /* II. Eliminate the monomials in supp(f) underneath or on \Gamma(T)*/
+  /* Apply Algorithm 1*/
+  rf = lowestJet(rf);
+
+  poly g1 = coeff(rf,var(1)^3)^(-1)*rf;
+
+  /* Consider the terms of g1 of standard degree j=4 and Apply Algorithm 4*/
+  poly g2 = (jet(g1,4)-var(1)^3)/(3*var(1)^2);
+  phi = br, var(1)-g2,var(2);
+  g1 = phi(g1);
+
+  /*Consider the terms of g1 of standard degree j=5 and Apply Algorithm 4*/
+  poly g3 =  (jet(g1,5)-var(1)^3)/(3*var(1)^2);
+  phi = br, var(1)-g3, var(2);
+  g1 = phi(g1);
+
+  /*Eliminate the monomials above \Gamma(T) which are not in supp(T)*/
+
+  intvec v = 8,3;
+  /*Consider the terms of g1 of w-degree j=25 and Apply Algorithm 4*/
+  poly h = (WeightedJet(g1,v,25)-WeightedJet(g1,v,24))/(3*var(1)^2);
+  phi = br,var(1),var(2)-h;
+  g1 = phi(g1);
+
+  rf = coeff(rf,var(1)^3)*g1;
+
+  /*Read off the desired information */
+  if(coeff(rf,var(1)^3)<0)
+  {
+    phi = rf, -var(1),var(2);
+    rf = phi(rf);
+  }
+  int s =  sign(coeff(rf,var(1)^8));
+  if(coeff(rf,var(1)^8)<0)
+  {
+    typeofsing = "E[14]-";
+  }
+  else
+  {
+    typeofsing = "E[14]+";
+  }
+  MP = var(1)^(12)-coeff(rf,var(1)^3)^(-4)*absValue(coeff(rf,var(2)^8))^(-9)*coeff(rf,var(1)*var(2)^6)^(12);
+  if(coeff(rf,var(1)*var(2)^6)>0)
+  {
+    number n = maxabs(MP);
+    MP = RealRootFactor(MP,0,n+1);
+    n = maxabs(MP);
+    number n1 = 0;
+    number n2 = n+1;
+  }
+  else
+  {
+    number n = maxabs(MP);
+    MP = RealRootFactor(MP,-(n+1),0);
+    n = maxabs(MP);
+    number n1 = -(n+1);
+    number n2 = 0;
+  }
+  if(deg(MP)==1)
+  {
+    number a = -number(subst(MP,var(1),0));
+    setring br1;
+    number a = fetch(br,a);
+  }
+  else
+  {
+    string mord = ringlist(br1)[3][1][1];
+    ring R1 = (0,a),(var(1),var(2)),ds;
+    list L1 = ringlist(R1);
+    L1[3][1][1]=mord;
+    def R2 = ring(L1);
+    setring R2;
+    kill R1;
+    poly ff = fetch(br,MP);
+    minpoly = number(subst(ff,var(1),a));
+  }
+  number n1 = fetch(br,n1);
+  number n2 = fetch(br,n2);
+  Poly nfe =var(1)^3+number(s)*var(2)^8+a*var(1)*var(2)^6;
+  intervalP = list(n1,n2);
+  NormalFormEquation F;
+  F.normalFormEquation = nfe;
+  F.parameters = list(list(a*var(1)*var(2)^6,intervalP));
+  F.singularityType = typeofsing;
+  setring br;
+  return(list(F));
+}
+/////////////////////////////////////////////////////////////////////////////////////////
+static proc caseJ10(poly rf, br1)
+{
+  /*preliminaries*/
+  map phi;
+  poly MP;
+  poly MP1;
+  poly MP2;
+  poly MP3;
+  def br = basering;
+  string typeofsing;
+  string typeofsing1;
+  string typeofsing2;
+  string typeofsing3;
+  string intervalP;
+  list interval1;
+  list interval2;
+  list interval3;
+  intvec v = 2,1;
+  rf = jet(rf,6);
+  rf = lowestJet(rf);
+  number n = coeff(rf,var(1)^3);
+  rf = (1/n)*rf;
+  n = (coeff(rf,var(1)^2*var(2)^2)*(1/3));
+  phi = br,var(1)-n*var(2)^2,var(2);
+  rf = phi(rf);
+  number e = coeff(rf,var(2)^6);
+  number d = coeff(rf,var(1)*var(2)^4);
+  poly pplus = (4*d^3+27*e^2)*var(1)^6+(-36*d^3-243*e^2)*var(1)^4+(81*d^3+729*e^2)*var(1)^2-729*e^2;
+  poly pminus = -(4*d^3+27*e^2)*var(1)^6+(-36*d^3-243*e^2)*var(1)^4-(81*d^3+729*e^2)*var(1)^2-729*e^2;
+  poly k = var(1)^3+d*var(1)+e;
+  ring R = 0,x,dp;
+  poly k = fetch(br,k);
+  int n = nrroots(k);
+  kill R;
+  setring br;
+  if(n==1)
+  {
+    typeofsing1 = "J[10]+";
+    if(e<0)
+    {
+      MP = pplus;
+      number n00 = maxabs(MP);
+      MP = RealRootFactor(MP,0,n00+1);
+      number n0 = maxabs(MP);
+      number n1 = 0;
+      number n2 = n0+1;
+    }
+    if(e>0)
+    {
+      MP = pplus;
+      number n00 = maxabs(MP);
+      MP = RealRootFactor(MP,-(n00+1),0);
+      number n0 = maxabs(MP);
+      number n1 = -(n0+1);
+      number n2 = 0;
+    }
+    if(e==0)
+    {
+      MP=var(1);
+      number n1 = 0;
+      number n2 = 0;
+    }
+    if(deg(MP)==1)
+      {
+        number a = -number(subst(MP,var(1),0));
+        setring br1;
+        number a = fetch(br,a);
+      }
+      else
+      {
+        string mord = ringlist(br1)[3][1][1];
+        ring R1 = (0,a),(var(1),var(2)),ds;
+        list L1 = ringlist(R1);
+        L1[3][1][1]=mord;
+        def R2 = ring(L1);
+        setring R2;
+        kill R1;
+        poly ff = fetch(br,MP);
+        minpoly = number(subst(ff,var(1),a));
+      }
+      Poly nfe1 = var(1)^3+a*var(1)^2*var(2)^2+var(1)*var(2)^4;
+      number n1 = fetch(br,n1);
+      number n2 = fetch(br,n2);
+      interval1 = list(n1,n2);
+      NormalFormEquation F1;
+      F1.normalFormEquation = nfe1;
+      F1.parameters = list(list(a*var(1)^2*var(2)^2,interval1));
+      F1.singularityType = typeofsing1;
+      setring br;
+      return(F1)
+  }
+  else
+  {
+    phi = br,0,0;
+    k = phi(k);
+    if(k==0)
+    {
+      typeofsing1 = "J[10]+";
+      typeofsing2 = "J[10]-";
+      typeofsing3 = "J[10]+";
+      string mord = ringlist(br1)[3][1][1];
+
+      ring R1 = 0,(var(1),var(2)),ds;
+      list L1 = ringlist(R1);
+      L1[3][1][1]=mord;
+      def R2 = ring(L1);
+      setring R2;
+      kill R1;
+      Poly nfe2 =var(1)^3-var(1)*var(2)^4;
+      interval2 = list(0,0);
+      NormalFormEquation F2;
+      F2.normalFormEquation = nfe2;
+      F2.parameters = list(list(0*var(1)^2*var(2)^2,interval2));
+      F2.singularityType = typeofsing2;
+
+      ring R1 = (0,a),(var(1),var(2)),ds;
+      list L1 = ringlist(R1);
+      L1[3][1][1]=mord;
+      def R2 = ring(L1);
+      setring R2;
+      kill R1;
+      minpoly = a^2-(9/2);
+      Poly nfe1 =var(1)^3+a*var(1)^2*var(2)^2+var(1)*var(2)^4;
+      Poly nfe3 =var(1)^3+a*var(1)^2*var(2)^2+var(1)*var(2)^4;
+      interval1 = list(0,3/2);
+      interval3 = list(-3/2,0);
+      NormalFormEquation F1;
+      F1.normalFormEquation = nfe1;
+      F1.parameters = list(list(a*var(1)^2*var(2)^2,interval1));
+      F1.singularityType = typeofsing1;
+      NormalFormEquation F3;
+      F3.normalFormEquation = nfe3;
+      F3.parameters = list(list(a*var(1)^2*var(2)^2,interval3));
+      F3.singularityType = typeofsing3;
+      setring br;
+    }
+    else
+    {
+      int epsilon = 1;
+      ring R1 = 0,x,dp;
+      poly pplus=fetch(br,pplus);
+      ring R = (real,30,i),x,dp;
+      poly pplus = fetch(br,pplus);
+      list r;
+      while(size(r)<6)
+      {
+         epsilon = epsilon+1;
+         r = laguerre_solve(pplus,epsilon);
+      }
+      list r1;
+      for(int j = 1;j<=size(r);j++)
+      {
+        if(impart(r[j])==0)
+        {
+          bigint s = int(r[j]*10^(epsilon));
+          r1 = insert(r1,s);
+          kill s;
+        }
+      }
+      kill r;
+      kill j;
+      int k = size(r1);
+      setring R1;
+      list r2;
+      for(int i=1; i<=k;i++)
+      {
+         number m;
+         m=number(r1[i])/(10^(epsilon));
+         r2 = insert(r2,m);
+         kill m;
+      }
+      kill i;
+      list L1 = ringlist(br1);
+      number t = (number(epsilon))^(-1);
+      number n1 = sturm(pplus,r2[1]-t,r2[1]+t);
+      number n2 = sturm(pplus,r2[2]-t,r2[2]+t);
+      number n3 = sturm(pplus,r2[3]-t,r2[3]+t);
+      number n4 = sturm(pplus,r2[4]-t,r2[4]+t);
+      while(n1>1 || n2>1 || n3>1 || n4>1)
+      {
+        kill n1;
+        kill n2;
+        kill n3;
+        kill n4;
+        kill t;
+        kill r1;
+        kill r2;
+        epsilon = epsilon+1;
+        setring R;
+        pplus = fetch(br,pplus);
+        list r = laguerre_solve(pplus,epsilon);
+        list r1;
+        for(int j = 1;j<=size(r);j++)
+        {
+          if(impart(r[j])==0)
+          {
+            bigint s = int(r[j]*10^(epsilon));
+            r1 = insert(r1,s);
+            kill s;
+          }
+        }
+        kill r;
+        kill j;
+        k = size(r1);
+        setring R1;
+        list r2;
+        for(int i=1; i<=k;i++)
+        {
+           number m;
+           m=number(r1[i])/(10^(epsilon));
+           r2 = insert(r2,m);
+           kill m;
+        }
+        kill i;
+        number t = (number(epsilon))^(-1);
+        number n1 = sturm(pplus,r2[1]-t,r2[1]+t);
+        number n2 = sturm(pplus,r2[2]-t,r2[2]+t);
+        number n3 = sturm(pplus,r2[3]-t,r2[3]+t);
+        number n4 = sturm(pplus,r2[4]-t,r2[4]+t);
+      }
+      setring br;
+      kill R1;
+      list r2;
+      for(int i=1; i<=k;i++)
+      {
+         number m;
+         m=number(r1[i])/(10^(epsilon));
+         r2 = insert(r2,m);
+         kill m;
+      }
+      kill i;
+      number t = (number(epsilon))^(-1);
+      typeofsing1 = "J[10]-";
+      typeofsing2 = "J[10]+";
+      typeofsing3 = "J[10]+";
+
+      if(e>0)
+      {
+        MP3 = RealRootFactor(pplus, r2[4]-t, r2[4]+t);
+        number n1 = r2[4]-t;
+        number n2 = r2[4]+t;
+      }
+      else
+      {
+        MP3 = RealRootFactor(pplus, r2[3]-t, r2[3]+t);
+        number n1 = r2[3]-t;
+        number n2 = r2[3]+t;
+      }
+      if(deg(MP3)==1)
+      {
+        number a = -number(subst(MP3,var(1),0));
+        def R2 =  br1;
+        setring R2;
+        number a = fetch(br,a);
+      }
+      else
+      {
+        string mord = ringlist(br1)[3][1][1];
+        ring R1 = (0,a),(var(1),var(2)),ds;
+        list L1 = ringlist(R1);
+        L1[3][1][1]=mord;
+        def R2 = ring(L1);
+        setring R2;
+        kill mord;
+        kill R1;
+        poly ff = fetch(br,MP3);
+        minpoly = number(subst(ff,var(1),a));
+      }
+      number n1 = fetch(br,n1);
+      number n2 = fetch(br,n2);
+      Poly nfe3 =var(1)^3+a*var(1)^2*var(2)^2+var(1)*var(2)^4;
+      interval3 = list(n1,n2);
+      NormalFormEquation F3;
+      F3.normalFormEquation = nfe3;
+      F3.parameters = list(list(a*var(1)^2*var(2)^2,interval3));
+      F3.singularityType = typeofsing3;
+      setring br;
+      kill R2;
+
+      if(e>0)
+      {
+        MP2 = RealRootFactor(pplus, r2[2]-t,r2[2]+t);
+        n1 = r2[2]-t;
+        n2 = r2[2]+t;
+      }
+      else
+      {
+        MP2 = RealRootFactor(pplus, r2[1]-t,r2[1]+t);
+        n1 = r2[1]-t;
+        n2 = r2[1]+t;
+      }
+      if(deg(MP2)==1)
+      {
+        number a = -number(subst(MP2,var(1),0));
+        def R2 =  br1;
+        setring R2;
+        number a = fetch(br,a);
+      }
+      else
+      {
+        string mord = ringlist(br1)[3][1][1];
+        ring R1 = (0,a),(var(1),var(2)),ds;
+        list L1 = ringlist(R1);
+        L1[3][1][1]=mord;
+        def R2 = ring(L1);
+        setring R2;
+        kill mord;
+        kill R1;
+        poly ff = fetch(br,MP2);
+        minpoly = number(subst(ff,var(1),a));
+      }
+      number n1 = fetch(br,n1);
+      number n2 = fetch(br,n2);
+      Poly nfe2 =var(1)^3+a*var(1)^2*var(2)^2+var(1)*var(2)^4;
+      interval2 = list(n1,n2);
+      NormalFormEquation F2;
+      F2.normalFormEquation = nfe2;
+      F2.parameters = list(list(a*var(1)^2*var(2)^2,interval2));
+      F2.singularityType = typeofsing2;
+      setring br;
+      kill R2;
+      number n0 = maxabs(pminus);
+      if(e>0)
+      {
+        MP1 = RealRootFactor(pminus, 0,n0+1);
+        n0  = maxabs(pminus);
+        n1 = 0;
+        n2 = n0+1;
+      }
+      else
+      {
+        MP1 = RealRootFactor(pminus, -(n0+1),0);
+        n0 = maxabs(pminus);
+        n1 = -n0-1;
+        n2 = 0;
+      }
+      if(deg(MP1)==1)
+      {
+        number a = -number(subst(MP1,var(1),0));
+        setring br1;
+        number a = fetch(br,a);
+      }
+      else
+      {
+        string mord = ringlist(br1)[3][1][1];
+        ring R1 = (0,a),(var(1),var(2)),ds;
+        list L1 = ringlist(R1);
+        L1[3][1][1]=mord;
+        def R2 = ring(L1);
+        setring R2;
+        kill mord;
+        kill R1;
+        poly ff = fetch(br,MP1);
+        minpoly = number(subst(ff,var(1),a));
+      }
+      number n1 = fetch(br,n1);
+      number n2 = fetch(br,n2);
+      Poly nfe1 =var(1)^3+a*var(1)^2*var(2)^2-var(1)*var(2)^4;
+      interval1 = list(n1,n2);
+      NormalFormEquation F1;
+      F1.normalFormEquation = nfe1;
+      F1.parameters = list(list(a*var(1)^2*var(2)^2,interval1));
+      F1.singularityType = typeofsing1;
+     }
+     return(list(F1,F2,F3));
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+static proc caseYrs(poly rf, int mu ,br1)
+{
+  //preliminaries
+  def R = basering;
+  def br = basering;
+  map phi;
+  poly MP1;
+  poly MP2;
+  poly MP3;
+  poly MP4;
+  poly MP5;
+  poly MP6;
+  poly MP7;
+  poly MP8;
+  poly nf1;
+  poly nf2;
+  poly nf3;
+  poly nf4;
+  poly nf5;
+  poly nf6;
+  poly nf7;
+  poly nf8;
+  list interval1;
+  list interval2;
+  list interval3;
+  list interval4;
+  list interval5;
+  list interval6;
+  list interval7;
+  list interval8;
+  string typeofsing1;
+  string typeofsing2;
+  string typeofsing3;
+  string typeofsing4;
+  string typeofsing5;
+  string typeofsing6;
+  string typeofsing7;
+  string typeofsing8;
+  int d = determinacy(rf,mu);
+  rf = jet(rf,d);
+  poly f0 = rf;
+  int n1 = (mu-1) div 2;
+  poly rts = subst(jet(rf,4),var(2),1);
+  ring S = 0,(x),dp;
+  poly rts = fetch(br,rts);
+  int rt = nrroots(rts);
+  setring br;
+  kill S;
+  if((n1 mod 2 == 0) && (rt==0))
+  {
+     list factorization = factorize(jet(rf,4));
+     poly rf1 = factorization[1][2];
+     map phi = R, var(1)-coeff(rf1,var(1)*var(2))/(2*coeff(rf1,var(1)^2))*var(2),var(2);
+     rf = phi(rf);
+     poly q = phi(rf1);
+     number b = (coeff(rf,var(1)^4));
+     int sigmab = sign(b);
+     rf = eliminateTildeY(rf,q,n1);
+     b = b^(-1);
+     poly P = var(1)^4-(coeff(rf,var(1)^(n1)))^4*b^(n1);
+     number c = coeff(rf,var(1)^(n1));
+     int sigmac = sign(c);
+     if(sign(b)>0)
+     {
+       typeofsing1 = "tilde(Y)["+string(n1)+"]+";
+     }
+     else
+     {
+        typeofsing1 = "tilde(Y)["+string(n1)+"]-";
+     }
+     number m = maxabs(P);
+     if(sign(c)>0)
+     {
+        MP1 = RealRootFactor(P,0,m+1);
+     }
+     else
+     {
+       MP1 = RealRootFactor(P,-m-1,0);
+     }
+     number m1 = maxabs(MP1);
+     if(deg(MP1)==1)
+     {
+       number a = -number(subst(MP1,var(1),0));
+       def R2 = br1;
+       setring R2;
+       number a = fetch(R,a);
+     }
+     else
+     {
+       string mord = ringlist(br1)[3][1][1];
+       ring R1 = (0,a),(var(1),var(2)),ds;
+       list L1 = ringlist(R1);
+       L1[3][1][1]=mord;
+       def R2 = ring(L1);
+       setring R2;
+       kill mord;
+       kill R1;
+       poly ff = fetch(R,MP1);
+       minpoly = number(subst(ff,var(1),a));
+     }
+     Poly nfe1 =sigmab*(var(1)^2+var(2)^2)^2+a*var(1)^(n1);
+     number m1 = fetch(R,m1);
+     if(sigmac<0)
+     {
+       interval1 = list(-(m1+1),0);
+     }
+     else
+     {
+       interval1 = list(0,(m1+1));
+     }
+     NormalFormEquation F1;
+     F1.normalFormEquation = nfe1;
+     F1.parameters = list(list(a*var(1)^(n1),interval1));
+     F1.singularityType = typeofsing1;
+
+     setring br;
+     return(F1);
+  }
+  else
+  {
+  if(coeff(rf,var(1)^4)>0)
+  {
+    int sigma =1;
+  }
+  else
+  {
+    int sigma =-1;
+  }
+
+  // Eliminate the monomials in supp(rf) underneath Gamma(T)
+
+  poly h = jet(rf,4);
+  //Implement line 3 in Algorithm 5
+  int sum;
+  for(int i=2; i<=size(factorize(h)[2]);i++)
+  {
+    sum = sum+factorize(h)[2][i];
+  }
+  if(sum==4)
+  {
+    list factorization = factorize(h);
+     list factors = factorization[1][2];
+         factors = insert(factors,factorization[1][3]);
+    matrix T[2][2] = factors[1]/var(1), factors[1]/var(2),
+                     factors[2]/var(1), factors[2]/var(2);
+    phi = br, luinverse(T)[2]*matrix(ideal(var(1), var(2)), 2, 1);
+    rf = phi(rf);
+    rf = jet(rf, d);
+  }
+  else
+  {
+    def S = absFactorize(h);
+    setring S;
+    poly h = fetch(br,h);
+    poly rf = fetch(br,rf);
+    poly f =absolute_factors[3][2];
+    poly g = absolute_factors[1][2];
+    kill br;
+    ring br = (0,a),(var(1),var(2)),ds;
+    poly f = fetch(S,f);
+    minpoly=number(f);
+    poly h = fetch(S,h);
+    //poly rf = fetch(br,rf);
+    list factors = factorize(h);
+    matrix T[2][2] = factors[1][2]/var(1), factors[1][2]/var(2),
+                     factors[1][3]/var(1),factors[1][3]/var(2);
+    map phi = br, luinverse(T)[2]*matrix(ideal(var(1), var(2)), 2, 1);
+    poly rf = fetch(S,rf);
+    rf = phi(rf);
+    kill S;
+  }
+  int n1 = 3;
+  int n2 = 3;
+  number c1 = coeff(rf,var(1)^(n1));
+  number c2 = coeff(rf,var(2)^(n2));
+  number s1 = 0;
+  number s2 = 0;
+  number b;
+  while(c1==0 || c2==0)
+  {
+    if(coeff(rf,var(1)^(n1))==0 && s1==0)
+    {
+      n1 = n1+1;
+      b = coeff(rf,var(1)^(2)*var(2)^(2));
+      phi = br, var(1), var(2)-(coeff(rf,var(1)^(n1)*var(2))/(2*b))*var(1)^(n1-2);
+      rf = phi(rf);
+      c1 = coeff(rf,var(1)^(n1));
+    }
+    else
+    {
+      s1 = 1;
+    }
+    if(coeff(rf,var(2)^(n2))==0 && s2==0)
+    {
+      n2 = n2+1;
+      phi = br, var(1)-(coeff(rf,var(2)^(n2)*var(1))/(2*b))*var(2)^(n2-2), var(2);
+      rf = phi(rf);
+      c2 = coeff(rf,var(2)^(n2));
+    }
+    else
+    {
+      s2 = 1;
+    }
+    rf = jet(rf,d);
+  }
+
+  kill c1;
+  kill c2;
+  kill s1;
+  kill s2;
+  kill b;
+  //Eliminate the monomials above Gamma(T)
+  //Read off the desired information
+  ring S = 0,(x,y),dp;
+  poly f0 = fetch(R,f0);
+  poly f0x = subst(jet(f0,4),y,1);
+  int n = nrroots(f0x);
+  setring br;
+  kill S;
+  if(n>0)
+  {
+    if(minpoly == 0) //h has a linear factor over Q
+    {
+      if((n1 mod 2 <> 0) && (n2 mod 2 ==0))  //r is odd and s is even
+      {
+        phi = br,var(2),var(1);
+        rf = phi(rf);
+        int s = n1;
+        n1 = n2;
+        n2 = s;
+      }
+      poly P = var(1)^(2*n1)-(absValue(coeff(rf,var(1)^2*var(2)^2)))^(-n1*n2)*coeff(rf,var(1)^n1)^(2*n2)*coeff(rf,var(2)^n2)^(2*n1);
+      poly P1 =  var(1)^(2*n2)-(absValue(coeff(rf,var(1)^2*var(2)^2)))^(-n1*n2)*coeff(rf,var(1)^n1)^(2*n2)*coeff(rf,var(2)^n2)^(2*n1);
+
+     if((n1 mod 2 == 0) && (n2 mod 2 ==0))  // r is even and s is even
+      {
+        if(coeff(rf,var(1)^n1)>0) //d>0
+        {
+          number m = maxabs(P1);
+          MP2 = RealRootFactor(P1,0,m+1);
+          number m2 = maxabs(MP2);
+          if(coeff(rf,var(2)^n2)>0) //e>0
+          {
+            m = maxabs(P);
+            MP1 = RealRootFactor(P,0,m+1);
+            number m1 = maxabs(MP1);
+            if(coeff(rf,var(1)^2*var(2)^2)>0)   //b>0
+            {
+              typeofsing1  = "Y["+string(n1)+","+string(n2)+"]++";
+              typeofsing2  = "Y["+string(n2)+","+string(n1)+"]++";
+              if(deg(MP1)==1)
+              {
+                 number a = -number(subst(MP1,var(1),0));
+                 def R2 =  br1;
+                 setring R2;
+                 number a = fetch(br,a);
+              }
+              else
+              {
+                string mord = ringlist(br1)[3][1][1];
+                ring R1 = (0,a),(var(1),var(2)),ds;
+                list L1 = ringlist(R1);
+                L1[3][1][1]=mord;
+                def R2 = ring(L1);
+                kill mord;
+                setring R2;
+                kill R1;
+                poly ff = fetch(br,MP1);
+                minpoly = number(subst(ff,var(1),a));
+              }
+              Poly nfe1 =var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n2);
+              number m1 = fetch(br,m1);
+              interval1 = list(0,m1+1);
+              NormalFormEquation F1;
+              F1.normalFormEquation = nfe1;
+              F1.parameters = list(list(a*var(2)^(n2),interval1));
+              F1.singularityType = typeofsing1;
+              setring br;
+              kill R2;
+
+              if(deg(MP2)==1)
+              {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(br,a);
+              }
+              else
+              {
+                string mord = ringlist(br1)[3][1][1];
+                ring R1 = (0,a1),(var(1),var(2)),ds;
+                list L1 = ringlist(R1);
+                L1[3][1][1]=mord;
+                def R2 = ring(L1);
+                setring R2;
+                kill mord;
+                kill R1;
+                poly ff = fetch(br,MP2);
+                minpoly = number(subst(ff,var(1),a));
+              }
+              Poly nfe2 =var(1)^2*var(2)^2+var(1)^(n2)+a*var(2)^(n1);
+              number m2 = fetch(br,m2);
+              interval2 = list(0,m2+1);
+              NormalFormEquation F2;
+              F2.normalFormEquation = nfe2;
+              F2.parameters = list(list(a*var(2)^(n1),interval2));
+              F2.singularityType = typeofsing2;
+              return(F1,F2);
+            }
+            else //b<0
+            {
+              typeofsing1  = "Y["+string(n1)+","+string(n2)+"]-+";
+              typeofsing2  = "Y["+string(n2)+","+string(n1)+"]-+";
+              if(deg(MP1)==1)
+              {
+                 number a = -number(subst(MP1,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(br,a);
+              }
+              else
+              {
+                string mord = ringlist(br1)[3][1][1];
+                ring R1 = (0,a),(var(1),var(2)),ds;
+                list L1 = ringlist(R1);
+                L1[3][1][1]=mord;
+                def R2 = ring(L1);
+                setring R2;
+                kill R1;
+                kill mord;
+                poly ff = fetch(br,MP1);
+                minpoly = number(subst(ff,var(1),a));
+              }
+              Poly nfe1 =-var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n2);
+              number m1 = fetch(br,m1);
+              interval1 = list(0,m1+1);
+              NormalFormEquation F1;
+              F1.normalFormEquation = nfe1;
+              F1.parameters = list(list(a*var(2)^(n2),interval1));
+              F1.singularityType = typeofsing1;
+              setring br;
+              kill R2;
+              if(deg(MP2)==1)
+              {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(br,a);
+              }
+              else
+              {
+                string mord = ringlist(br1)[3][1][1];
+                ring R1 = (0,a),(var(1),var(2)),ds;
+                list L1 = ringlist(R1);
+                L1[3][1][1]=mord;
+                def R2 = ring(L1);
+                kill mord;
+                setring R2;
+                kill R1;
+                poly ff = fetch(br,MP2);
+                minpoly = number(subst(ff,var(1),a));
+              }
+              Poly nfe2 =-var(1)^2*var(2)^2+var(1)^(n2)+a*var(2)^(n1);
+              number m2 = fetch(br,m2);
+              interval2 = list(0,m2+1);
+              NormalFormEquation F2;
+              F2.normalFormEquation = nfe2;
+              F2.parameters = list(list(a*var(2)^(n1),interval2));
+              F2.singularityType = typeofsing2;
+              setring br;
+            }
+          }
+          else //e<0
+          {
+           number m = maxabs(P);
+           MP1 = RealRootFactor(P,-m-1,0);
+           number m1 = maxabs(MP1);
+           if(coeff(rf,var(1)^2*var(2)^2)>0)  //b>0
+           {
+              typeofsing1  = "Y["+string(n1)+","+string(n2)+"]++";
+              typeofsing2  = "Y["+string(n2)+","+string(n1)+"]+-";
+              if(deg(MP1)==1)
+              {
+                 number a = -number(subst(MP1,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(br,a);
+              }
+              else
+              {
+                string mord = ringlist(br1)[3][1][1];
+                ring R1 = (0,a),(var(1),var(2)),ds;
+                list L1 = ringlist(R1);
+                L1[3][1][1]=mord;
+                def R2 = ring(L1);
+                kill mord;
+                setring R2;
+                kill R1;
+                poly ff = fetch(br,MP1);
+                minpoly = number(subst(ff,var(1),a));
+              }
+              Poly nfe1 =var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n2);
+              number m1 = fetch(br,m1);
+              interval1 = list(-(m1+1),0);
+              NormalFormEquation F1;
+              F1.normalFormEquation = nfe1;
+              F1.parameters = list(list(a*var(2)^(n2),interval1));
+              F1.singularityType = typeofsing1;
+              setring br;
+              kill R2;
+
+              if(deg(MP2)==1)
+              {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(br,a);
+              }
+              else
+              {
+                string mord = ringlist(br1)[3][1][1];
+                ring R1 = (0,a),(var(1),var(2)),ds;
+                list L1 = ringlist(R1);
+                L1[3][1][1]=mord;
+                def R2 = ring(L1);
+                kill mord;
+                setring R2;
+                kill R1;
+                poly ff = fetch(br,MP2);
+                minpoly = number(subst(ff,var(1),a));
+              }
+              Poly nfe2 = var(1)^2*var(2)^2-var(1)^(n2)+a*var(2)^(n1);
+              number m2 = fetch(br,m2);
+              interval2 = list(0,m2+1);
+              NormalFormEquation F2;
+              F2.normalFormEquation = nfe2;
+              F2.parameters = list(list(a*var(2)^(n1),interval2));
+              F2.singularityType = typeofsing2;
+              setring br;
+              kill R2;
+           }
+           else //b<0
+           {
+             typeofsing1  = "Y["+string(n1)+","+string(n2)+"]-+";
+             typeofsing2  = "Y["+string(n2)+","+string(n1)+"]--";
+             if(deg(MP1)==1)
+             {
+                number a = -number(subst(MP1,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               kill mord;
+               setring R2;
+               kill R1;
+               poly ff = fetch(br,MP1);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe1 =-var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n2);
+             number m1 = fetch(br,m1);
+             interval1 = list(-(m1+1),0);
+             NormalFormEquation F1;
+             F1.normalFormEquation = nfe1;
+             F1.parameters = list(list(a*var(2)^(n2),interval1));
+             F1.singularityType = typeofsing1;
+             setring br;
+             kill R2;
+
+             if(deg(MP2)==1)
+             {
+                number a = -number(subst(MP2,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP2);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe2 = -var(1)^2*var(2)^2-var(1)^(n2)+a*var(2)^(n1);
+             number m2 = fetch(br,m2);
+             interval2 = list(0,m2+1);
+             NormalFormEquation F2;
+             F2.normalFormEquation = nfe2;
+             F2.parameters = list(list(a*var(2)^(n1),interval2));
+             F2.singularityType = typeofsing2;
+             setring br;
+           }
+         }
+       }
+       else //d<0
+       {
+         number m = maxabs(P1);
+         MP2 = RealRootFactor(P1,-m-1,0);
+         number m2 = maxabs(MP2);
+         if(coeff(rf,var(2)^n2)>0) //e>0
+         {
+           number m = maxabs(P);
+           MP1 = RealRootFactor(P,0,m+1);
+           number m1 = maxabs(MP1);
+           if(coeff(rf,var(1)^2*var(2)^2)>0)   //b>0
+           {
+             typeofsing1  = "Y["+string(n1)+","+string(n2)+"]+-";
+             typeofsing2  = "Y["+string(n2)+","+string(n1)+"]++";
+
+             if(deg(MP1)==1)
+             {
+                number a = -number(subst(MP1,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP1);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe1 =var(1)^2*var(2)^2-var(1)^(n1)+a*var(2)^(n2);
+             number m1 = fetch(br,m1);
+             interval1 = list(0,m1+1);
+             NormalFormEquation F1;
+             F1.normalFormEquation = nfe1;
+             F1.parameters = list(list(a*var(2)^(n2),interval1));
+             F1.singularityType = typeofsing1;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP2)==1)
+             {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill R1;
+               kill mord;
+               poly ff = fetch(br,MP2);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe2 = var(1)^2*var(2)^2+var(1)^(n2)+a*var(2)^(n1);
+             number m2 = fetch(br,m2);
+             interval2 = list(-(m2+1),0);
+             NormalFormEquation F2;
+             F2.normalFormEquation = nfe2;
+             F2.parameters = list(list(a*var(2)^(n1),interval2));
+             F2.singularityType = typeofsing2;
+             setring br;
+           }
+           else //b<0
+           {
+             typeofsing1  = "Y["+string(n1)+","+string(n2)+"]--";
+             typeofsing2  = "Y["+string(n2)+","+string(n1)+"]-+";
+
+
+             if(deg(MP1)==1)
+             {
+                number a = -number(subst(MP1,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill R1;
+               kill mord;
+               poly ff = fetch(br,MP1);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe1 =-var(1)^2*var(2)^2-var(1)^(n1)+a*var(2)^(n2);
+             number m1 = fetch(br,m1);
+             interval1 = list(0,m1+1);
+             NormalFormEquation F1;
+             F1.normalFormEquation = nfe1;
+             F1.parameters = list(list(a*var(2)^(n2),interval1));
+             F1.singularityType = typeofsing1;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP2)==1)
+             {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(br,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill R1;
+               kill mord;
+               poly ff = fetch(br,MP2);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe2 = -var(1)^2*var(2)^2+var(1)^(n2)+a*var(2)^(n1);
+             number m2 = fetch(br,m2);
+             interval2 = list(-(m2+1),0);
+             NormalFormEquation F2;
+             F2.normalFormEquation = nfe2;
+             F2.parameters = list(list(a*var(2)^(n1),interval2));
+             F2.singularityType = typeofsing2;
+             setring br;
+           }
+         }
+         else  //e<0
+         {
+           number m = maxabs(P);
+           MP1 = RealRootFactor(P,-m-1,0);
+           number m1 = maxabs(MP1);
+           if(coeff(rf,var(1)^2*var(2)^2)>0)       //b>0
+           {
+             typeofsing1  = "Y["+string(n1)+","+string(n2)+"]+-";
+             typeofsing2  = "Y["+string(n2)+","+string(n1)+"]+-";
+             if(deg(MP1)==1)
+             {
+                number a = -number(subst(MP1,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP1);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe1 =var(1)^2*var(2)^2-var(1)^(n1)+a*var(2)^(n2);
+             number m1 = fetch(br,m1);
+             interval1 = list(-(m1+1),0);
+             NormalFormEquation F1;
+             F1.normalFormEquation = nfe1;
+             F1.parameters = list(list(a*var(2)^(n2),interval1));
+             F1.singularityType = typeofsing1;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP2)==1)
+             {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(br,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP2);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe2 = var(1)^2*var(2)^2-var(1)^(n2)+a*var(2)^(n1);
+             number m2 = fetch(br,m2);
+             interval2 = list(-(m2+1),0);
+             NormalFormEquation F2;
+             F2.normalFormEquation = nfe2;
+             F2.parameters = list(list(a*var(2)^(n1),interval2));
+             F2.singularityType = typeofsing2;
+             setring br;
+           }
+           else //b<0
+           {
+             typeofsing1  = "Y["+string(n1)+","+string(n2)+"]--";
+             typeofsing2  = "Y["+string(n2)+","+string(n1)+"]--";
+
+             if(deg(MP1)==1)
+             {
+                number a = -number(subst(MP1,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP1);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe1 =-var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n2);
+             number m1 = fetch(br,m1);
+             interval1 = list(-(m1+1),0);
+             NormalFormEquation F1;
+             F1.normalFormEquation = nfe1;
+             F1.parameters = list(list(a*var(2)^(n2),interval1));
+             F1.singularityType = typeofsing1;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP2)==1)
+             {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(br,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP2);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe2 = -var(1)^2*var(2)^2-var(1)^(n2)+a*var(2)^(n1);
+             number m2 = fetch(br,m2);
+             interval2 = list(-(m2+1),0);
+             NormalFormEquation F2;
+             F2.normalFormEquation = nfe2;
+             F2.parameters = list(list(a*var(2)^(n1),interval2));
+             F2.singularityType = typeofsing2;
+             setring br;
+           }
+         }
+       }
+       if(n1==n2 && sign(coeff(rf,var(1)^n1))==sign(coeff(rf,var(2)^n2)))
+       {
+         return(F1);
+       }
+       else
+       {
+         return(F1,F2);
+       }
+      }
+      if((n1 mod 2 == 0) && (n2 mod 2<>0))  //r is even and s is odd
+      {
+        if(coeff(rf,var(1)^2*var(2)^2)>0)  //b>0
+        {
+          if(coeff(rf,var(1)^(n1))>0)    //d>0
+          {
+            number m = maxabs(P);
+            MP1 = RealRootFactor(P,-m-1,0);
+            number m1 = maxabs(MP1);
+            MP2 = RealRootFactor(P,0,m+1);
+            number m2 = maxabs(MP2);
+            MP3 = RealRootFactor(P1,0,m+1);
+            number m3 = maxabs(MP3);
+            MP4 = RealRootFactor(P1,0,m+1);
+            number m4 = maxabs(MP4);
+
+            typeofsing1 = "Y["+string(n1)+","+string(n2)+"]++";
+            typeofsing2 = "Y["+string(n1)+","+string(n2)+"]++";
+            typeofsing3 = "Y["+string(n2)+","+string(n1)+"]+-";
+            typeofsing4 = "Y["+string(n2)+","+string(n1)+"]++";
+
+
+             if(deg(MP1)==1)
+             {
+                number a = -number(subst(MP1,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP1);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe1 =var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n2);
+             number m1 = fetch(br,m1);
+             interval1 = list(-(m1+1),0);
+             NormalFormEquation F1;
+             F1.normalFormEquation = nfe1;
+             F1.parameters = list(list(a*var(2)^(n2),interval1));
+             F1.singularityType = typeofsing1;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP2)==1)
+             {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(br,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP2);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe2 = var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n2);
+             number m2 = fetch(br,m2);
+             interval2 = list(0,(m2+1));
+             NormalFormEquation F2;
+             F2.normalFormEquation = nfe2;
+             F2.parameters = list(list(a*var(2)^(n2),interval2));
+             F2.singularityType = typeofsing2;
+             setring br;
+             kill R2;
+
+             if(deg(MP3)==1)
+             {
+                number a = -number(subst(MP3,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP3);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe3 =var(1)^2*var(2)^2-var(1)^(n2)+a*var(2)^(n1);
+             number m3 = fetch(br,m3);
+             interval3 = list(0,(m3+1));
+             NormalFormEquation F3;
+             F3.normalFormEquation = nfe3;
+             F3.parameters = list(list(a*var(2)^(n1),interval3));
+             F3.singularityType = typeofsing3;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP4)==1)
+             {
+                 number a = -number(subst(MP4,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(br,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP4);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe4 = var(1)^2*var(2)^2+var(1)^(n2)+a*var(2)^(n1);
+             number m4 = fetch(br,m4);
+             interval4 = list(0,(m4+1));
+             NormalFormEquation F4;
+             F4.normalFormEquation = nfe4;
+             F4.parameters = list(list(a*var(2)^(n1),interval4));
+             F4.singularityType = typeofsing4;
+             setring br;
+
+            return(F1,F2,F3,F4);
+          }
+          else  //d<0
+          {
+            number m = maxabs(P);
+            MP1 = RealRootFactor(P,-m-1,0);
+            number m1 = maxabs(MP1);
+            MP2 = RealRootFactor(P,0,m+1);
+            number m2 = maxabs(MP2);
+            MP3 = RealRootFactor(P1,-m-1,0);
+            number m3 = maxabs(MP3);
+            MP4 = RealRootFactor(P1,-m-1,0);
+            number m4 = maxabs(MP4);
+
+            typeofsing1 = "Y["+string(n1)+","+string(n2)+"]+-";
+            typeofsing2 = "Y["+string(n1)+","+string(n2)+"]+-";
+            typeofsing3 = "Y["+string(n2)+","+string(n1)+"]+-";
+            typeofsing4 = "Y["+string(n2)+","+string(n1)+"]++";
+
+
+
+             if(deg(MP1)==1)
+             {
+                number a = -number(subst(MP1,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP1);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe1 =var(1)^2*var(2)^2-var(1)^(n1)+a*var(2)^(n2);
+             number m1 = fetch(br,m1);
+             interval1 = list(-(m1+1),0);
+             NormalFormEquation F1;
+             F1.normalFormEquation = nfe1;
+             F1.parameters = list(list(a*var(2)^(n2),interval1));
+             F1.singularityType = typeofsing1;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP2)==1)
+             {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP2);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe2 = var(1)^2*var(2)^2-var(1)^(n1)+a*var(2)^(n2);
+             number m2 = fetch(br,m2);
+             interval2 = list(0,(m2+1));
+             NormalFormEquation F2;
+             F2.normalFormEquation = nfe2;
+             F2.parameters = list(list(a*var(2)^(n2),interval2));
+             F2.singularityType = typeofsing2;
+             setring br;
+             kill R2;
+
+
+             if(deg(MP3)==1)
+             {
+                number a = -number(subst(MP3,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP3);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe3 =var(1)^2*var(2)^2-var(1)^(n2)+a*var(2)^(n1);
+             number m3 = fetch(br,m3);
+             interval3 = list(-(m3+1),0);
+             NormalFormEquation F3;
+             F3.normalFormEquation = nfe3;
+             F3.parameters = list(list(a*var(2)^(n2),interval3));
+             F3.singularityType = typeofsing3;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP4)==1)
+             {
+                 number a = -number(subst(MP4,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP4);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe4 = var(1)^2*var(2)^2+var(1)^(n2)+a*var(2)^(n1);
+             number m4 = fetch(br,m4);
+             interval4 = list(-(m4+1),0);
+             NormalFormEquation F4;
+             F4.normalFormEquation = nfe4;
+             F4.parameters = list(list(a*var(2)^(n1),interval4));
+             F4.singularityType = typeofsing4;
+             setring br;
+             kill R2;
+
+            return(F1,F2,F3,F4);
+          }
+        }
+        else
+        {
+         if(coeff(rf,var(1)^(n1))<0)    //d<0
+         {
+            number m = maxabs(P);
+            MP1 = RealRootFactor(P,-m-1,0);
+            number m1 = maxabs(MP1);
+            MP2 = RealRootFactor(P,0,m+1);
+            number m2 = maxabs(MP2);
+            MP3 = RealRootFactor(P1,-(m+1),0);
+            number m3 = maxabs(MP3);
+            MP4 = RealRootFactor(P1,-(m+1),0);
+            number m3 = maxabs(MP3);
+            typeofsing1 = "Y["+string(n1)+","+string(n2)+"]-+";
+            typeofsing2 = "Y["+string(n1)+","+string(n2)+"]-+";
+            typeofsing3 = "Y["+string(n2)+","+string(n1)+"]--";
+            typeofsing4 = "Y["+string(n2)+","+string(n1)+"]-+";
+
+
+
+             if(deg(MP1)==1)
+             {
+                number a = -number(subst(MP1,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP1);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe1 =-var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n2);
+             number m1 = fetch(br,m1);
+             interval1 = list(-(m1+1),0);
+             NormalFormEquation F1;
+             F1.normalFormEquation = nfe1;
+             F1.parameters = list(list(a*var(2)^(n2),interval1));
+             F1.singularityType = typeofsing1;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP2)==1)
+             {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP2);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe2 = -var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n2);
+             number m2 = fetch(br,m2);
+             interval2 = list(0,(m2+1));
+             NormalFormEquation F2;
+             F2.normalFormEquation = nfe2;
+             F2.parameters = list(list(a*var(2)^(n2),interval2));
+             F2.singularityType = typeofsing2;
+             setring br;
+             kill R2;
+
+             if(deg(MP3)==1)
+             {
+                number a = -number(subst(MP3,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP3);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe3 =-var(1)^2*var(2)^2-var(1)^(n2)+a*var(2)^(n1);
+             number m3 = fetch(br,m3);
+             interval3 = list(0,(m3+1));
+             NormalFormEquation F3;
+             F3.normalFormEquation = nfe3;
+             F3.parameters = list(list(a*var(2)^(n1),interval3));
+             F3.singularityType = typeofsing3;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP4)==1)
+             {
+                 number a = -number(subst(MP4,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP4);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe4 = -var(1)^2*var(2)^2+var(1)^(n2)+a*var(2)^(n1);
+             number m4 = fetch(br,m4);
+             interval4 = list(0,(m4+1));
+             NormalFormEquation F4;
+             F4.normalFormEquation = nfe4;
+             F4.parameters = list(list(a*var(2)^(n1),interval4));
+             F4.singularityType = typeofsing4;
+             setring br;
+            return(F1,F2,F3,F4);
+         }
+         else  //d>0
+         {
+            number m = maxabs(P);
+            MP1 = RealRootFactor(P,-m-1,0);
+            number m1 = maxabs(MP1);
+            MP2 = RealRootFactor(P,0,m+1);
+            number m2 = maxabs(MP2);
+            MP3 = RealRootFactor(P1,0,m+1);
+            number m3 = maxabs(MP3);
+            MP4 = RealRootFactor(P1,0,m+1);
+            number m4 = maxabs(MP4);
+            interval3 = "(-infinity,0)";
+            interval4 = "(-infinity,0)";
+
+            typeofsing1 = "Y["+string(n1)+","+string(n2)+"]-+";
+            typeofsing2 = "Y["+string(n1)+","+string(n2)+"]-+";
+            typeofsing3 = "Y["+string(n2)+","+string(n1)+"]--";
+            typeofsing4 = "Y["+string(n2)+","+string(n1)+"]-+";
+
+             if(deg(MP1)==1)
+             {
+                number a = -number(subst(MP1,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP1);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe1 =-var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n2);
+             number m1 = fetch(br,m1);
+             interval1 = list(-(m1+1),0);
+             NormalFormEquation F1;
+             F1.normalFormEquation = nfe1;
+             F1.parameters = list(list(a*var(2)^(n2),interval1));
+             F1.singularityType = typeofsing1;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP2)==1)
+             {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP2);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe2 =-var(1)^2*var(2)^2+var(1)^(n1)+var(2)^(n2);
+             number m2 = fetch(br,m2);
+             interval2 = list(0,(m2+1));
+             NormalFormEquation F2;
+             F2.normalFormEquation = nfe2;
+             F2.parameters = list(list(a*var(2)^(n2),interval2));
+             F2.singularityType = typeofsing2;
+             setring br;
+             kill R2;
+
+
+             if(deg(MP3)==1)
+             {
+                number a = -number(subst(MP3,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP3);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe3 =-var(1)^2*var(2)^2-var(1)^(n2)+a*var(2)^(n1);
+             number m3 = fetch(br,m3);
+             interval3 = list(-(m3+1),0);
+             NormalFormEquation F3;
+             F3.normalFormEquation = nfe3;
+             F3.parameters = list(list(a*var(2)^(n1),interval3));
+             F3.singularityType = typeofsing3;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP4)==1)
+             {
+                 number a = -number(subst(MP4,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP4);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe4 = -var(1)^2*var(2)^2+var(1)^(n2)+a*var(2)^(n1);
+             number m4 = fetch(br,m4);
+             interval4 = list(-(m4+1),0);
+             NormalFormEquation F4;
+             F4.normalFormEquation = nfe4;
+             F4.parameters = list(list(a*var(2)^(n1),interval4));
+             F4.singularityType = typeofsing4;
+             setring br;
+
+            return(F1,F2,F3,F4);
+         }
+       }
+     }
+     if((n1 mod 2 <> 0) && (n2 mod 2 <> 0))  // r and s are odd
+     {
+       if(coeff(rf,var(1)^2*var(2)^2)>0)
+       {
+            number m = maxabs(P);
+            MP1 = RealRootFactor(P,-m-1,0);
+            number m1 = maxabs(MP1);
+            MP3 = RealRootFactor(P,-m-1,0);
+            number m3 = maxabs(MP3);
+            MP2 = RealRootFactor(P,0,m+1);
+            number m2 = maxabs(MP2);
+            MP4 = RealRootFactor(P,0,m+1);
+            number m4 = maxabs(MP4);
+            m = maxabs(P1);
+            MP5 = RealRootFactor(P1,-m-1,0);
+            number m5 = maxabs(MP5);
+            MP7 = RealRootFactor(P1,-m-1,0);
+            number m7 = maxabs(MP7);
+            MP6 = RealRootFactor(P1,0,m+1);
+            number m6 = maxabs(MP6);
+            MP8 = RealRootFactor(P1,0,m+1);
+            number m8 = maxabs(MP8);
+
+            typeofsing1 = "Y["+string(n1)+","+string(n2)+"]+-";
+            typeofsing2 = "Y["+string(n1)+","+string(n2)+"]+-";
+            typeofsing3 = "Y["+string(n1)+","+string(n2)+"]++";
+            typeofsing4 = "Y["+string(n1)+","+string(n2)+"]++";
+            typeofsing5 = "Y["+string(n2)+","+string(n1)+"]+-";
+            typeofsing6 = "Y["+string(n2)+","+string(n1)+"]+-";
+            typeofsing7 = "Y["+string(n2)+","+string(n1)+"]++";
+            typeofsing8 = "Y["+string(n2)+","+string(n1)+"]++";
+
+             if(deg(MP1)==1)
+             {
+                number a = -number(subst(MP1,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP1);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe1 =var(1)^2*var(2)^2-var(1)^(n1)+a*var(2)^(n2);
+             number m1 = fetch(br,m1);
+             interval1 = list(-(m1+1),0);
+             NormalFormEquation F1;
+             F1.normalFormEquation = nfe1;
+             F1.parameters = list(list(a*var(2)^(n2),interval1));
+             F1.singularityType = typeofsing1;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP2)==1)
+             {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP2);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe2 =var(1)^2*var(2)^2-var(1)^(n1)+a*var(2)^(n2);
+             number m2 = fetch(br,m2);
+             interval2 = list(0,(m2+1));
+             NormalFormEquation F2;
+             F2.normalFormEquation = nfe2;
+             F2.parameters = list(list(a*var(2)^(n2),interval2));
+             F2.singularityType = typeofsing2;
+             setring br;
+             kill R2;
+
+
+             if(deg(MP3)==1)
+             {
+                number a = -number(subst(MP3,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP3);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe3 =var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n2);
+             number m3 = fetch(br,m3);
+             interval3 = list(-(m3+1),0);
+             NormalFormEquation F3;
+             F3.normalFormEquation = nfe3;
+             F3.parameters = list(list(a*var(2)^(n2),interval3));
+             F3.singularityType = typeofsing3;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP4)==1)
+             {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP4);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe4 = var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n2);
+             number m4 = fetch(br,m4);
+             interval4 = list(0,(m4+1));
+             NormalFormEquation F4;
+             F4.normalFormEquation = nfe4;
+             F4.parameters = list(list(a*var(2)^(n2),interval4));
+             F4.singularityType = typeofsing4;
+             setring br;
+             kill R2;
+
+             if(deg(MP5)==1)
+             {
+                number a = -number(subst(MP5,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP5);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe5 =var(1)^2*var(2)^2-var(1)^(n2)+a*var(2)^(n1);
+             number m5 = fetch(br,m5);
+             interval5 = list(-(m5+1),0);
+             NormalFormEquation F5;
+             F5.normalFormEquation = nfe5;
+             F5.parameters = list(list(a*var(2)^(n1),interval5));
+             F5.singularityType = typeofsing5;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP6)==1)
+             {
+                 number a = -number(subst(MP6,var(1),0));
+                 def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP6);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe6 =var(1)^2*var(2)^2-var(1)^(n2)+a*var(2)^(n1);
+             number m6 = fetch(br,m6);
+             interval6 = list(0,(m6+1));
+             NormalFormEquation F6;
+             F6.normalFormEquation = nfe6;
+             F6.parameters = list(list(a*var(2)^(n1),interval6));
+             F6.singularityType = typeofsing6;
+             setring br;
+             kill R2;
+
+
+             if(deg(MP7)==1)
+             {
+                number a = -number(subst(MP7,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP7);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe7 =var(1)^2*var(2)^2+var(1)^(n2)+a*var(2)^(n1);
+             number m7 = fetch(br,m7);
+             interval7 = list(-(m7+1),0);
+             NormalFormEquation F7;
+             F7.normalFormEquation = nfe7;
+             F7.parameters = list(list(a*var(2)^(n1),interval7));
+             F7.singularityType = typeofsing7;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP8)==1)
+             {
+                 number a = -number(subst(MP8,var(1),0));
+                 def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP8);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe8 = var(1)^2*var(2)^2+var(1)^(n2)+a*var(2)^(n1);
+             number m8 = fetch(br,m8);
+             interval8 = list(0,(m8+1));
+             NormalFormEquation F8;
+             F8.normalFormEquation = nfe8;
+             F8.parameters = list(list(a*var(2)^(n1),interval8));
+             F8.singularityType = typeofsing8;
+             setring br;
+       }
+       else
+       {
+            number m = maxabs(P);
+            MP1 = RealRootFactor(P,-m-1,0);
+            number m1 = maxabs(MP1);
+            MP3 = RealRootFactor(P,-m-1,0);
+            number m2 = maxabs(MP2);
+            MP2 = RealRootFactor(P,0,m+1);
+            number m3 = maxabs(MP3);
+            MP4 = RealRootFactor(P,0,m+1);
+            number m4 = maxabs(MP4);
+            MP5 = RealRootFactor(P1,-m-1,0);
+            number m5 = maxabs(MP5);
+            MP7 = RealRootFactor(P1,-m-1,0);
+            number m7 = maxabs(MP7);
+            MP6 = RealRootFactor(P1,0,m+1);
+            number m6 = maxabs(MP6);
+            MP8 = RealRootFactor(P1,0,m+1);
+            number m8 = maxabs(MP8);
+            typeofsing1 = "Y["+string(n1)+","+string(n2)+"]--";
+            typeofsing2 = "Y["+string(n1)+","+string(n2)+"]--";
+            typeofsing3 = "Y["+string(n1)+","+string(n2)+"]-+";
+            typeofsing4 = "Y["+string(n1)+","+string(n2)+"]-+";
+            typeofsing5 = "Y["+string(n2)+","+string(n1)+"]--";
+            typeofsing6 = "Y["+string(n2)+","+string(n1)+"]--";
+            typeofsing7 = "Y["+string(n2)+","+string(n1)+"]-+";
+            typeofsing8 = "Y["+string(n2)+","+string(n1)+"]-+";
+             if(deg(MP1)==1)
+             {
+                number a = -number(subst(MP1,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP1);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe1 =-var(1)^2*var(2)^2-var(1)^(n1)+a*var(2)^(n2);
+             number m1 = fetch(br,m1);
+             interval1 = list(-(m1+1),0);
+             NormalFormEquation F1;
+             F1.normalFormEquation = nfe1;
+             F1.parameters = list(list(a*var(2)^(n2),interval1));
+             F1.singularityType = typeofsing1;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP2)==1)
+             {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP2);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe2 =-var(1)^2*var(2)^2-var(1)^(n1)+a*var(2)^(n2);
+             number m2 = fetch(br,m2);
+             interval2 = list(0,(m2+1));
+             NormalFormEquation F2;
+             F2.normalFormEquation = nfe2;
+             F2.parameters = list(list(a*var(2)^(n2),interval2));
+             F2.singularityType = typeofsing2;
+             setring br;
+             kill R2;
+
+
+             if(deg(MP3)==1)
+             {
+                number a = -number(subst(MP3,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP3);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe3 =-var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n2);
+             number m3 = fetch(br,m3);
+             interval3 = list(-(m3+1),0);
+             NormalFormEquation F3;
+             F3.normalFormEquation = nfe3;
+             F3.parameters = list(list(a*var(2)^(n2),interval3));
+             F3.singularityType = typeofsing3;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP4)==1)
+             {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP4);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe4 = -var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n2);
+             number m4 = fetch(br,m4);
+             interval4 = list(0,(m4+1));
+             NormalFormEquation F4;
+             F4.normalFormEquation = nfe4;
+             F4.parameters = list(list(a*var(2)^(n2),interval4));
+             F4.singularityType = typeofsing4;
+             setring br;
+             kill R2;
+
+             if(deg(MP5)==1)
+             {
+                number a = -number(subst(MP5,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP5);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe5 =-var(1)^2*var(2)^2-var(1)^(n2)+a*var(2)^(n1);
+             number m5 = fetch(br,m5);
+             interval5 = list(-(m5+1),0);
+             NormalFormEquation F5;
+             F5.normalFormEquation = nfe5;
+             F5.parameters = list(list(a*var(2)^(n1),interval5));
+             F5.singularityType = typeofsing5;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP6)==1)
+             {
+                 number a = -number(subst(MP6,var(1),0));
+                 def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP6);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe6 =-var(1)^2*var(2)^2-var(1)^(n2)+a*var(2)^(n1);
+             number m6 = fetch(br,m6);
+             interval6 = list(0,(m6+1));
+             NormalFormEquation F6;
+             F6.normalFormEquation = nfe6;
+             F6.parameters = list(list(a*var(2)^(n1),interval6));
+             F6.singularityType = typeofsing6;
+             setring br;
+             kill R2;
+
+
+             if(deg(MP7)==1)
+             {
+                number a = -number(subst(MP7,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP7);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe7 =-var(1)^2*var(2)^2+var(1)^(n2)+a*var(2)^(n1);
+             number m7 = fetch(br,m7);
+             interval7 = list(-(m7+1),0);
+             NormalFormEquation F7;
+             F7.normalFormEquation = nfe7;
+             F7.parameters = list(list(a*var(2)^(n1),interval7));
+             F7.singularityType = typeofsing7;
+
+             setring br;
+             kill R2;
+
+             if(deg(MP8)==1)
+             {
+                 number a = -number(subst(MP8,var(1),0));
+                 def R2 = br1;
+                setring R2;
+                number a = fetch(br,a);
+
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(br,MP8);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe8 = -var(1)^2*var(2)^2+var(1)^(n2)+a*var(2)^(n1);
+             number m8 = fetch(br,m8);
+             interval8 = list(0,(m8+1));
+             NormalFormEquation F8;
+             F8.normalFormEquation = nfe8;
+             F8.parameters = list(list(a*var(2)^(n1),interval8));
+             F8.singularityType = typeofsing8;
+             setring br;
+             kill R2;
+       }
+       if(n1==n2)  // r=s
+       {
+            return(F1,F2,F3,F4);
+       }
+       else  // r not equal to s
+       {
+            return(F1,F2,F3,F4,F5,F6,F7,F8);
+       }
+     }
+    }
+    else // h has no linear factors over Q
+    {
+      if(sigma == 1)
+      {
+        poly de = (coeff(rf,var(1)^n1)*coeff(rf,var(2)^n1));
+        ring S = 0,(x,y),ds;
+        poly de = fetch(br,de);
+        number t0 = number(de);
+        if(n1 mod 2 <>0)
+        {
+          int r = 1;
+        }
+        else
+        {
+          int r = 0;
+        }
+        if(t0>0)
+        {
+          int t = 1;
+        }
+        else
+        {
+          int t = -1;
+        }
+        setring br;
+        if(r==1)  //r odd
+        {
+         "r odd";
+         number s = (coeff(rf,var(1)^2*var(2)^2));
+         s = s^(-n1);
+         poly P = var(1)^2-s*(coeff(rf,var(1)^(n1))*coeff(rf,var(2)^(n1)))^2;
+         setring R;
+         poly P = fetch(br,P);
+         typeofsing1 = "Y["+string(n1)+","+string(n1)+"]++";
+         typeofsing2 = "Y["+string(n1)+","+string(n1)+"]++";
+         typeofsing3 = "Y["+string(n1)+","+string(n1)+"]+-";
+         typeofsing4 = "Y["+string(n1)+","+string(n1)+"]+-";
+         number m = maxabs(P);
+         MP1 = RealRootFactor(P,-m-1,0);
+         number m1 = maxabs(MP1);
+         MP2 = RealRootFactor(P,0,m+1);
+         number m2 = maxabs(MP2);
+         MP3 = RealRootFactor(P,-m-1,0);
+         number m3 = maxabs(MP3);
+         MP4 = RealRootFactor(P,0,m+1);
+         number m4 = maxabs(MP4);
+         if(deg(MP1)==1)
+         {
+              number a = -number(subst(MP1,var(1),0));
+              def R2 = br1;
+              setring R2;
+              number a = fetch(R,a);
+         }
+         else
+         {
+             string mord = ringlist(br1)[3][1][1];
+             ring R1 = (0,a),(var(1),var(2)),ds;
+             list L1 = ringlist(R1);
+             L1[3][1][1]=mord;
+             def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+             poly ff = fetch(R,MP1);
+             minpoly = number(subst(ff,var(1),a));
+         }
+         Poly nfe1 =var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n1);
+         number m1 = fetch(R,m1);
+         interval1 = list(-(m1+1),0);
+         NormalFormEquation F1;
+         F1.normalFormEquation = nfe1;
+         F1.parameters = list(list(a*var(2)^(n1),interval1));
+         F1.singularityType = typeofsing1;
+
+         setring R;
+         kill R2;
+
+         if(deg(MP2)==1)
+         {
+             number a = -number(subst(MP2,var(1),0));
+             def R2 = br1;
+              setring R2;
+              number a = fetch(R,a);
+         }
+         else
+         {
+            string mord = ringlist(br1)[3][1][1];
+            ring R1 = (0,a),(var(1),var(2)),ds;
+            list L1 = ringlist(R1);
+            L1[3][1][1]=mord;
+            def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+            poly ff = fetch(R,MP2);
+            minpoly = number(subst(ff,var(1),a));
+          }
+          Poly nfe2 =var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n1);
+          number m2 = fetch(R,m2);
+          interval2 = list(0,(m2+1));
+          NormalFormEquation F2;
+          F2.normalFormEquation = nfe2;
+          F2.parameters = list(list(a*var(2)^(n1),interval2));
+          F2.singularityType = typeofsing2;
+          setring R;
+          kill R2;
+
+          if(deg(MP3)==1)
+          {
+             number a = -number(subst(MP3,var(1),0));
+              def R2 = br1;
+              setring R2;
+              number a = fetch(R,a);
+          }
+          else
+          {
+            string mord = ringlist(br1)[3][1][1];
+            ring R1 = (0,a),(var(1),var(2)),ds;
+            list L1 = ringlist(R1);
+            L1[3][1][1]=mord;
+            def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+            poly ff = fetch(R,MP3);
+            minpoly = number(subst(ff,var(1),a));
+          }
+          Poly nfe3 =var(1)^2*var(2)^2-var(1)^(n1)+a*var(2)^(n1);
+          number m3 = fetch(R,m3);
+          interval3 = list(-(m3+1),0);
+          NormalFormEquation F3;
+          F3.normalFormEquation = nfe3;
+          F3.parameters = list(list(a*var(2)^(n1),interval3));
+          F3.singularityType = typeofsing3;
+
+          setring R;
+          kill R2;
+
+          if(deg(MP4)==1)
+          {
+              number a = -number(subst(MP2,var(1),0));
+              def R2 = br1;
+              setring R2;
+              number a = fetch(R,a);
+          }
+          else
+          {
+            string mord = ringlist(br1)[3][1][1];
+            ring R1 = (0,a),(var(1),var(2)),ds;
+            list L1 = ringlist(R1);
+            L1[3][1][1]=mord;
+            def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+            poly ff = fetch(R,MP4);
+            minpoly = number(subst(ff,var(1),a));
+          }
+          Poly nfe4 = var(1)^2*var(2)^2-var(1)^(n1)+a*var(2)^(n1);
+          number m4 = fetch(R,m4);
+          interval4 = list(0,(m4+1));
+          NormalFormEquation F4;
+          F4.normalFormEquation = nfe4;
+          F4.parameters = list(list(a*var(2)^(n1),interval4));
+          F4.singularityType = typeofsing4;
+          setring br;
+          return(F1,F2,F3,F4);
+        }
+        else  //r even
+        {
+          //"r even";
+          if(t==-1) //de<0
+          {
+            //"de<0";
+            number s = number(n1);
+            s = -s/2;
+            int ns = int(s);
+            s = coeff(rf,var(1)^2*var(2)^2)^ns;
+            kill ns;
+            poly P = var(1)+s*(coeff(rf,var(1)^n1)*coeff(rf,var(2)^n1));
+            setring R;
+            MP1 = fetch(br,P);
+            MP2 = MP1;
+            number m = maxabs(MP1);
+            typeofsing1 = "Y["+string(n1)+","+string(n1)+"]+-";
+            typeofsing2 = "Y["+string(n1)+","+string(n1)+"]++";
+
+             if(deg(MP1)==1)
+             {
+                number a = -number(subst(MP1,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(R,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(R,MP1);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe1 =var(1)^2*var(2)^2-var(1)^(n1)+a*var(2)^(n1);
+             number m = fetch(R,m);
+             interval1 = list(-(m+1),m+1);
+             NormalFormEquation F1;
+             F1.normalFormEquation = nfe1;
+             F1.parameters = list(list(a*var(2)^(n1),interval1));
+             F1.singularityType = typeofsing1;
+
+             setring R;
+             kill R2;
+
+             if(deg(MP2)==1)
+             {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(R,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(R,MP2);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe2 =var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n1);
+             number m = fetch(R,m);
+             interval2 = list(-(m+1),(m+1));
+             NormalFormEquation F2;
+             F2.normalFormEquation = nfe2;
+             F2.parameters = list(list(a*var(2)^(n1),interval2));
+             F2.singularityType = typeofsing2;
+             setring R;
+
+            return(F1,F2);
+           }
+           else  //de>0
+           {
+             //"de>0";
+             number s = number(n1);
+             s = -s/2;
+             int ns = int(s);
+             s = coeff(rf,var(1)^2*var(2)^2)^ns;
+             poly P1 = var(1)+s*(coeff(rf,var(1)^n1)*coeff(rf,var(2)^n1));
+             poly P2 = var(1)-s*(coeff(rf,var(1)^n1)*coeff(rf,var(2)^n1));
+             int signE = determineSignExpression(coeff(rf,var(1)^n1));
+             //"e="+string(coeff(rf,var(1)^n1));
+             //setring R;
+             //poly f0x = subst(f0,var(2),0)+1;
+             //poly f0y = subst(f0,var(1),0)+1;
+             //ring S0 = 0,(var(1),var(2)),dp;
+             //poly f0x = fetch(R,f0x);
+             //poly f0y = fetch(R,f0y);
+             //int n3 = nrroots(f0x); // change
+             //int n4 = nrroots(f0y);
+             setring R;
+             //kill S0;
+             if(signE<0)
+             {
+               typeofsing1 = "Y["+string(n1)+","+string(n1)+"]+-";
+               nf1 = var(1)^2*var(2)^2-var(1)^(n1)+var(2)^(n1);
+               MP1 = fetch(br,P1);
+               number m = maxabs(MP1);
+               if(deg(MP1)==1)
+               {
+                  number a = -number(subst(MP1,var(1),0));
+                  def R2 = br1;
+                  setring R2;
+                  number a = fetch(R,a);
+               }
+               else
+               {
+                 string mord = ringlist(br1)[3][1][1];
+                 ring R1 = (0,a),(var(1),var(2)),ds;
+                 list L1 = ringlist(R1);
+                 L1[3][1][1]=mord;
+                 def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+                 poly ff = fetch(R,MP1);
+                 minpoly = number(subst(ff,var(1),a));
+               }
+               Poly nfe1 = var(1)^2*var(2)^2-var(1)^(n1)+a*var(2)^(n1);
+               number m = fetch(R,m);
+               interval1 = list(-(m+1),m+1);
+               NormalFormEquation F1;
+               F1.normalFormEquation = nfe1;
+               F1.parameters = list(list(a*var(2)^(n1),interval1));
+               F1.singularityType = typeofsing1;
+
+               setring R;
+               return(F1);
+             }
+             else
+             {
+               typeofsing1 = "Y["+string(n1)+","+string(n1)+"]++";
+               MP1 = fetch(br,P2);
+               number m = maxabs(MP1);
+               if(deg(MP1)==1)
+               {
+                  number a = -number(subst(MP1,var(1),0));
+                  def R2 = br1;
+                  setring R2;
+                  number a = fetch(R,a);
+               }
+               else
+               {
+                 string mord = ringlist(br1)[3][1][1];
+                 ring R1 = (0,a),(var(1),var(2)),ds;
+                 list L1 = ringlist(R1);
+                 L1[3][1][1]=mord;
+                 def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+                 poly ff = fetch(R,MP1);
+                 minpoly = number(subst(ff,var(1),a));
+               }
+               Poly nfe1 = var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n1);
+               number m = fetch(R,m);
+               interval1 = list(-(m+1),m+1);
+               NormalFormEquation F1;
+               F1.normalFormEquation = nfe1;
+               F1.parameters = list(list(a*var(2)^(n1),interval1));
+               F1.singularityType = typeofsing1;
+
+               setring R;
+               return(F1);
+             }
+           }
+         }}
+         else   //sigma<1
+         {
+            poly de = (coeff(rf,var(1)^n1)*coeff(rf,var(2)^n1));
+            poly w0 = coeff(rf,var(1)^2*var(2)^2);
+            ring S = 0,(x,y),ds;
+            poly w0 = fetch(br,w0);
+            poly de = fetch(br,de);
+            number t0 = number(de);
+            int w = sign(number(w0));
+            if(n1 mod 2 <>0)
+           {
+             int r = 1;
+           }
+           else
+           {
+             int r = 0;
+           }
+           if(t0>0)
+           {
+             int t = 1;
+           }
+           else
+           {
+             int t = -1;
+           }
+           setring br;
+           if(r==1)   //r odd
+           {
+             number c = w*(coeff(rf,var(1)^2*var(2)^2));
+             number s = c^(-n1);
+             poly P = var(1)^2-s*(coeff(rf,var(1)^(n1))*coeff(rf,var(2)^(n1)))^2;
+             setring R;
+             poly P = fetch(br,P);
+             typeofsing1 = "Y["+string(n1)+","+string(n1)+"]-+";
+             typeofsing2 = "Y["+string(n1)+","+string(n1)+"]-+";
+             typeofsing3 = "Y["+string(n1)+","+string(n1)+"]--";
+             typeofsing4 = "Y["+string(n1)+","+string(n1)+"]--";
+             number m = maxabs(P);
+             poly MP1 = RealRootFactor(P,-m-1,0);
+             number m1 = maxabs(MP1);
+             poly MP2 = RealRootFactor(P,0,m+1);
+             number m2 = maxabs(MP2);
+             poly MP3 = RealRootFactor(P,-m-1,0);
+             number m3 = maxabs(MP3);
+             poly MP4 = RealRootFactor(P,0,m+1);
+             number m4 = maxabs(MP4);
+
+            if(deg(MP1)==1)
+             {
+                number a = -number(subst(MP1,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(R,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(R,MP1);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe1 =-var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n1);
+             number m1 = fetch(R,m1);
+             interval1 = list(-(m1+1),0);
+             NormalFormEquation F1;
+             F1.normalFormEquation = nfe1;
+             F1.parameters = list(list(a*var(2)^(n1),interval1));
+             F1.singularityType = typeofsing1;
+
+             setring R;
+             kill R2;
+
+             if(deg(MP2)==1)
+             {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                 setring R2;
+                 number a = fetch(R,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(R,MP2);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe2 =-var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n1);
+             number m2 = fetch(R,m2);
+             interval2 = list(0,(m2+1));
+             NormalFormEquation F2;
+             F2.normalFormEquation = nfe2;
+             F2.parameters = list(list(a*var(2)^(n1),interval2));
+             F2.singularityType = typeofsing2;
+             setring R;
+             kill R2;
+
+
+             if(deg(MP3)==1)
+             {
+                number a = -number(subst(MP3,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(R,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(R,MP3);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe3 =-var(1)^2*var(2)^2-var(1)^(n1)+a*var(2)^(n1);
+             number m3 = fetch(R,m3);
+             interval3 = list(-(m3+1),0);
+             NormalFormEquation F3;
+             F3.normalFormEquation = nfe3;
+             F3.parameters = list(list(a*var(2)^(n1),interval3));
+             F3.singularityType = typeofsing3;
+
+             setring R;
+             kill R2;
+
+             if(deg(MP4)==1)
+             {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                setring R2;
+                number a = fetch(R,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(R,MP4);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe4 = -var(1)^2*var(2)^2-var(1)^(n1)+a*var(2)^(n1);
+             number m4 = fetch(R,m4);
+             interval4 = list(0,(m4+1));
+             NormalFormEquation F4;
+             F4.normalFormEquation = nfe4;
+             F4.parameters = list(list(a*var(2)^(n1),interval4));
+             F4.singularityType = typeofsing4;
+             setring R;
+            return(F1,F2,F3,F4);
+
+         }
+         else    //r even
+         {
+           if(t==-1)  //de<0
+           {
+             number s = number(n1);
+             s = -s/2;
+             int n = int(s);
+             number s = coeff(rf,var(1)^2*var(2)^2)^n;
+             poly P = var(1)+s*(coeff(rf,var(1)^n1)*coeff(rf,var(2)^n1));
+             setring R;
+             MP1 = fetch(br,P);
+             MP2 = MP1;
+             number m1 = maxabs(MP1);
+             number m2 = maxabs(MP2);
+             typeofsing1 = "Y["+string(n1)+","+string(n1)+"]--";
+             typeofsing2 = "Y["+string(n1)+","+string(n1)+"]-+";
+
+             if(deg(MP1)==1)
+             {
+                number a = -number(subst(MP1,var(1),0));
+                def R2 = br1;
+                setring R2;
+                number a = fetch(R,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(R,MP1);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe1 =-var(1)^2*var(2)^2-var(1)^(n1)+a*var(2)^(n1);
+             number m1 = fetch(R,m1);
+             interval1 = list(-(m1+1),m1+1);
+             NormalFormEquation F1;
+             F1.normalFormEquation = nfe1;
+             F1.parameters = list(list(a*var(2)^(n1),interval1));
+             F1.singularityType = typeofsing1;
+
+             setring R;
+             kill R2;
+
+             if(deg(MP2)==1)
+             {
+                 number a = -number(subst(MP2,var(1),0));
+                 def R2 = br1;
+                setring R2;
+                number a = fetch(R,a);
+             }
+             else
+             {
+               string mord = ringlist(br1)[3][1][1];
+               ring R1 = (0,a),(var(1),var(2)),ds;
+               list L1 = ringlist(R1);
+               L1[3][1][1]=mord;
+               def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+               poly ff = fetch(R,MP2);
+               minpoly = number(subst(ff,var(1),a));
+             }
+             Poly nfe2 =-var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n1);
+             number m2 = fetch(R,m2);
+             interval2 = list(-(m2+1),(m2+1));
+             NormalFormEquation F2;
+             F2.normalFormEquation = nfe2;
+             F2.parameters = list(list(a*var(2)^(n1),interval2));
+             F2.singularityType = typeofsing2;
+             setring R;
+
+             return(F1,F2);
+           }
+           else      //de>0
+           {
+             number s = number(n1);
+             s = -s/2;
+             int n = int(s);
+             number s = coeff(rf,var(1)^2*var(2)^2)^n;
+             setring R;
+             poly s0 = fetch(br,s);
+             if(s0>0)
+             {
+               int k = 1;
+             }
+             else
+             {
+               int k = -1;
+             }
+             setring br;
+             poly P1 = var(1)-k*s*(coeff(rf,var(1)^n1)*coeff(rf,var(2)^n2));
+             poly P2 = var(1)+k*s*(coeff(rf,var(1)^n1)*coeff(rf,var(2)^n2));
+             //"e="+string(coeff(rf,var(1)^n1));
+             int signE = determineSignExpression(coeff(rf,var(1)^n1));
+             //setring R;
+             //poly f0x = subst(f0,var(2),0)-1;
+             //poly f0y = subst(f0,var(1),0)-1;
+             //ring S = 0,(var(1),var(2)),dp;
+             //poly f0x = fetch(R,f0x);
+             //poly f0y = fetch(R,f0y);
+             //int n3 = nrroots(f0x); //change
+             //int n4 = nrroots(f0y);
+             setring R;
+             if(signE>0)
+             {
+               typeofsing1 = "Y["+string(n1)+","+string(n1)+"]-+";
+               nf1 = -var(1)^2*var(2)^2+var(1)^(n1)+var(2)^(n1);
+               MP1 = fetch(br,P1);
+               number m1 = maxabs(MP1);
+
+               if(deg(MP1)==1)
+               {
+                  number a = -number(subst(MP1,var(1),0));
+                  def R2 = br1;
+                  setring R2;
+                  number a = fetch(R,a);
+               }
+               else
+               {
+                 string mord = ringlist(br1)[3][1][1];
+                 ring R1 = (0,a),(var(1),var(2)),ds;
+                 list L1 = ringlist(R1);
+                 L1[3][1][1]=mord;
+                 def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+                 poly ff = fetch(R,MP1);
+                 minpoly = number(subst(ff,var(1),a));
+               }
+               Poly nfe1 =-var(1)^2*var(2)^2+var(1)^(n1)+a*var(2)^(n1);
+               number m1 = fetch(R,m1);
+               interval1 = list(-(m1+1),m1+1);
+               NormalFormEquation F1;
+               F1.normalFormEquation = nfe1;
+               F1.parameters = list(list(a*var(2)^(n1),interval1));
+               F1.singularityType = typeofsing1;
+
+               setring R;
+               return(F1);
+             }
+             else
+             {
+               typeofsing1 = "Y["+string(n1)+","+string(n1)+"]--";
+               MP1 = fetch(br,P2);
+               maxabs(MP1);
+               if(deg(MP1)==1)
+               {
+                  number a = -number(subst(MP1,var(1),0));
+                  def R2 = br1;
+                  setring R2;
+                  number a = fetch(R,a);
+               }
+               else
+               {
+                 string mord = ringlist(br1)[3][1][1];
+                 ring R1 = (0,a),(var(1),var(2)),ds;
+                 list L1 = ringlist(R1);
+                 L1[3][1][1]=mord;
+                 def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+                 poly ff = fetch(R,MP1);
+                 minpoly = number(subst(ff,var(1),a));
+               }
+               Poly nfe1 =-var(1)^2*var(2)^2-var(1)^(n1)+a*var(2)^(n1);
+               number m1 = fetch(R,m1);
+               interval1 = list(-(m1+1),m1+1);
+               NormalFormEquation F1;
+               F1.normalFormEquation = nfe1;
+               F1.parameters = list(list(a*var(2)^(n1),interval1));
+               F1.singularityType = typeofsing1;
+
+               setring R;
+               return(F1);
+           }
+         }
+       }
+     }
+    }
+  }
+  else         //case \tilde Y[r]--h has no linear factors over R
+  {
+    setring br;
+      number b = (coeff(rf,var(1)^2*var(2)^2));
+      b = b^(-1);
+      number c1 = coeff(rf,var(1)^(n1));
+      number c2 = coeff(rf,var(2)^(n1));
+      poly P = var(1)^8-(c1*c2)^4*(4^2*b)^(2*n1);
+      kill b;
+      setring R;
+      poly P = fetch(br,P);
+      if(sigma>0)
+      {
+        typeofsing1 = "tilde(Y)["+string(n1)+"]+";
+        typeofsing2 = "tilde(Y)["+string(n1)+"]+";
+      }
+      else
+      {
+        typeofsing1 = "tilde(Y)["+string(n1)+"]-";
+        typeofsing2 = "tilde(Y)["+string(n1)+"]-";
+      }
+      number m = maxabs(P);
+      MP1 = RealRootFactor(P,0,m+1);
+      number m1 = maxabs(MP1);
+      MP2 = RealRootFactor(P,-m-1,0);
+      number m2 = maxabs(MP2);
+      if(deg(MP1)==1)
+      {
+         number a = -number(subst(MP1,var(1),0));
+         def R2 = br1;
+         setring R2;
+         number a = fetch(R,a);
+      }
+      else
+      {
+        string mord = ringlist(br1)[3][1][1];
+        ring R1 = (0,a),(var(1),var(2)),ds;
+        list L1 = ringlist(R1);
+        L1[3][1][1]=mord;
+        def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+        poly ff = fetch(R,MP1);
+        minpoly = number(subst(ff,var(1),a));
+      }
+      Poly nfe1 =sigma*(var(1)^2+var(2)^2)^2+a*var(1)^(n1);
+      number m1 = fetch(R,m1);
+      interval1 = list(0,m1+1);
+      NormalFormEquation F1;
+      F1.normalFormEquation = nfe1;
+      F1.parameters = list(list(a*var(1)^(n1),interval1));
+      F1.singularityType = typeofsing1;
+
+      setring R;
+      kill R2;
+      if(deg(MP2)==1)
+      {
+         number a = -number(subst(MP2,var(1),0));
+         def R2 = br1;
+         setring R2;
+         number a = fetch(R,a);
+      }
+      else
+      {
+        string mord = ringlist(br1)[3][1][1];
+        ring R1 = (0,a),(var(1),var(2)),ds;
+        list L1 = ringlist(R1);
+        L1[3][1][1]=mord;
+        def R2 = ring(L1);
+               setring R2;
+               kill mord;
+               kill R1;
+        poly ff = fetch(R,MP2);
+        minpoly = number(subst(ff,var(1),a));
+      }
+      Poly nfe2 =sigma*(var(1)^2+var(2)^2)^2+a*var(1)^(n1);
+      number m2 = fetch(R,m2);
+      interval2 = list(-(m2+1),0);
+      NormalFormEquation F2;
+      F2.normalFormEquation = nfe2;
+      F2.parameters = list(list(a*var(1)^(n1),interval2));
+      F2.singularityType = typeofsing2;
+      setring R;
+      return(F1,F2);
+    }
+  }
+}
+
+static proc determineSignExpression(number e){
+def R = basering;
+poly MP = subst(minpoly,a,var(1));
+poly E = subst(e,a,var(1));
+ring RS =0,var(1),dp;
+poly MP = fetch(R,MP);
+poly E = fetch(R,E);
+number ze = -coeff(MP,var(1))/(2*coeff(MP,var(1)^2));
+return(sign(number(subst(E,var(1),ze))));
+//if (coeff(E,var(1))==0){return(sign(coeff(E,1)));}
+//number zeroOfE=-coeff(E,1)/coeff(E,var(1));
+//int signE=sign(zeroOfE*sign(coeff(E,var(1))));
+//return(signE);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+static proc caseJ10k(poly rf, int mu, br1)
+{
+/*preliminaries*/
+  string typeofsing;
+  def br = basering;
+  map phi;
+  poly MP;
+  list intervalP;
+  list interval1;
+  list interval2;
+  string typeofsing1;
+  string typeofsing2;
+
+  /* II. Eliminate the monomials in supp(rf) underneath or on \Gamma(T)*/
+  /* Apply Algorithm 1 to rf */
+  poly g = jet(rf,3);
+  list factorization = factorize(g);
+  poly m = factorization[1][2];
+  if(leadmonom(m)==y)
+  {
+    phi = br,var(2),var(1);
+    rf = phi(rf);
+  }
+  else
+  {
+    matrix T[2][2] = factorization[1][2]/var(1),factorization[1][2]/var(2) ,
+                     0, 1;
+    phi = br, luinverse(T)[2]*matrix(ideal(var(1), var(2)), 2, 1);
+    rf = phi(rf);
+  }
+
+  /* Apply Algorithm 3 */
+  intvec v = 2,1;
+  poly p = WeightedJet(rf,v,6);
+  p = subst(p,var(2),1);
+  kill factorization;
+  list factorization = factorize(p);
+
+  for(int i =2; i<=size(factorization[2]);i++)
+  {
+    if(factorization[2][i] == 2)
+    {
+      poly s = factorization[1][i];
+    }
+  }
+
+  number r = coeff(s,var(1));
+  number q = number(-subst(s,var(1),0))/r;
+  phi = br, var(1)+q*var(2)^2, var(2);
+  rf = phi(rf);
+
+  /*Use Algorithm 4 iteratively*
+  number c = coeff(rf,var(1)^2*var(2)^2);
+  number n = (mu-2)*(1/2);
+  if(round(n)>n)
+  {
+    n = round(n)-1;
+  }
+  else
+  {
+    n = round(n);
+  }
+  for(int i=4; i<=n;i++)
+  {
+    rf = jet(rf,mu+1);
+    number t = coeff(rf,var(1)*var(2)^(i));
+    phi = br, var(1)-(t/(2*c))*var(2)^(i-2),var(2);
+    rf = phi(rf);
+  }
+
+  /* III. and IV. Discard the monomials above \Gamma(T) and read off the desired information*/
+
+  number b = coeff(rf,var(1)^3);
+  number c = coeff(rf,var(1)^2*var(2)^2);
+  number t = coeff(rf,var(2)^(mu-4));
+  MP = var(1)^6-(b^2/(absValue(c))^3)^(mu-4)*t^6;
+  number n = maxabs(MP);
+  int sc = sign(c);
+  if(t>0)
+  {
+     MP = RealRootFactor(MP,0,n+1);
+     n = maxabs(MP);
+     number n1 = 0;
+     number n2 = n+1;
+     number n3 = -(n+1);
+     number n4 = 0;
+  }
+  else
+  {
+    MP = RealRootFactor(MP,0,n+1);
+    n = maxabs(MP);
+    number n1 = -(n+1);
+    number n2 = 0;
+    number n3 = 0;
+    number n4 = (n+1);
+
+  }
+  if(c>0)
+  {
+    typeofsing1 = "J["+string(mu)+"]+";
+  }
+  else
+  {
+    typeofsing1 = "J["+string(mu)+"]-";
+  }
+
+  if(deg(MP)==1)
+  {
+    number a = -number(subst(MP,var(1),0));
+    def R2 =  br1;
+    setring R2;
+    number a = fetch(br,a);
+
+  }
+  else
+  {
+    string mord = ringlist(br1)[3][1][1];
+    ring R1 = (0,a),(var(1),var(2)),ds;
+    list L1 = ringlist(R1);
+    L1[3][1][1]=mord;
+    def R2 = ring(L1);
+    setring R2;
+    poly ff = fetch(br,MP);
+    minpoly = number(subst(ff,var(1),a));
+  }
+  number n1 = fetch(br,n1);
+  number n2 = fetch(br,n2);
+  Poly nfe1 =var(1)^3+number(sc)*var(1)^2*var(2)^2+a*var(2)^(mu-4);
+  interval1 = list(n1,n2);
+  NormalFormEquation F1;
+  F1.normalFormEquation = nfe1;
+  F1.parameters = list(list(a*var(2)^(mu-4),interval1));
+  F1.singularityType = typeofsing1;
+  number b=-a;
+  number n3 = fetch(br,n3);
+  number n4 = fetch(br,n4);
+  Poly nfe2 =var(1)^3+number(sc)*var(1)^2*var(2)^2+b*var(2)^(mu-4);
+  interval2 = list(n3,n4);
+  NormalFormEquation F2;
+  F2.normalFormEquation = nfe2;
+  F2.parameters = list(list(b*var(2)^(mu-4),interval2));
+  F2.singularityType = typeofsing1;
+  setring br;
+  if((mu-4) mod 2 == 0)
+  {
+    return(list(F1));
+  }
+  else
+  {
+    return(list(F1,F2));
+  }
+}
+
+static proc findX9solutions(poly f, number s1, number s2, int expnum){
+matrix P[4][4] = 1,2,0,0, 0,1,3,0, 0,0,1,5, 1,0,0,-3;
+list sol;
+int cfs=0;
+while (size(sol)<>expnum){
+  if (rank(P)==4){
+    sol=findX9solutionsP(f, s1, s2,P);
+    if (size(sol)<expnum){ERROR("case X9, wrong number of equivalent normal form equations");}
+    cfs++;
+  }
+  P=randommat(4,4,maxideal(0),cfs);
+}
+return(sol);}
+
+// make static
+static proc findX9solutionsP(poly f, number s1, number s2,matrix pj){
+//"entering findX9solutions input "+string(f)+", "+string(s1)+", "+string(s2);
+def R0 = basering;
+ring R=0,(@a,@b,@c,@d,var(1),var(2)),lp;
+poly f = imap(R0,f);
+map phi = R, @a,@b,@c,@d,@a*var(5)+@b*var(6), @c*var(5)+@d*var(6);
+poly ft=phi(f);
+//ft;
+matrix C=coef(ft,var(5)*var(6));
+//C;
+matrix Cc[1][ncols(C)]=C[2,1..ncols(C)];
+ring R1=0,(@a,@b,@c,@d,t),dp;
+matrix Cc = imap(R,Cc);
+number x4coeff = fetch(R0,s1);
+number y4coeff = fetch(R0,s2);
+ideal I = Cc[1,1]-x4coeff, Cc[1,2]-0, Cc[1,3]-t, Cc[1,4]-0, Cc[1,5]-y4coeff;
+short =0;
+//I=std(radical(I));
+I=std(I);
+//"ideal to be solved "+string(I);
+//"elimination ideal";
+matrix pj = imap(R0,pj);
+matrix pjim = pj*matrix([@a,@b,@c,@d]);
+map phi =basering,pjim[1,1],pjim[2,1],pjim[3,1],pjim[4,1],t;
+I=phi(I);
+I =eliminate(I,@a*@b*@c);
+//elimI;
+ring R2=0,(@d,t),dp;
+ideal I = imap(R1,I);
+//I;
+//"starting root isolation";
+//list result = rootIsolation(elimI);
+//result;
+//setring R1;
+list result = rootIsolation(I);
+//"finished";
+//list result=0,result2;
+setring R1;
+poly mp = eliminate(I,@a*@b*@c*@d)[1];
+mp = subst(mp,t,@a);
+setring R;
+poly mp = imap(R1,mp);
+mp = subst(mp,@a,var(5));
+setring R0;
+poly mp = imap(R,mp);
+poly mpfac;
+number i1,i2;
+//setring R2;
+setring R1;
+list intervals;
+int i,j;
+int tst;
+//"result of root isolation ";
+//result;
+int ia = 2;
+//int ia = 5;
+for (i=1;i<=size(result[2]);i++){
+   tst=0;
+   for (j=1;j<=size(intervals);j++){
+     if (intersects(intervals[j],result[2][i][ia])){
+        //intersectIntervals(intervals[j],result[2][i][ia]);
+        intervals[j]=intersectIntervals(intervals[j],result[2][i][ia]);
+        //"-making interval j smaller ";intervals[j];
+        tst=1;
+     }
+   }
+   if (tst==0){
+        //"adding ";string(result[2][i][ia]);
+        intervals[size(intervals)+1]=result[2][i][ia];
+   }
+}
+//"number of intervals "+string(size(intervals));
+//intervals;
+list ret;
+number i1,i2;
+for (i=1;i<=size(intervals);i++){
+   setring R;
+   //"---";
+   //intervals[i];
+   number i1 = intervals[i][1];
+   number i2 = intervals[i][2];
+   setring R0;
+   i1=fetch(R,i1);
+   i2=fetch(R,i2);
+   mpfac = RealRootFactor(mp,i1,i2);
+   ret[i]=list(mpfac,list(i1,i2));
+}
+return(ret);
+}
+
+
+static proc intersects(interval I,interval J){
+number i1 = I[1];
+number i2 = I[2];
+number j1 = J[1];
+number j2 = J[2];
+if (((i1<=j1) and (j1<=i2)) or ((i1<=j2) and (j2<=i2)) or ((j1<=i1) and (i1<=j2)) or ((j1<=i2) and (i2<=j2))){
+    return(1);
+}
+return(0);}
+
+static proc intersectIntervals(interval I,interval J){
+number i1 = I[1];
+number i2 = I[2];
+number j1 = J[1];
+number j2 = J[2];
+interval L;
+if ((i1<=j1) and (j1<=i2)){
+  L = j1,min(i2,j2);
+}
+if ((i1<=j2) and (j2<=i2)){
+  L = max(i1,j1),j2;
+}
+if ((j1<=i1) and (i1<=j2)){
+  L = i1,min(j2,i2);
+}
+if ((j1<=i2) and (i2<=j2)){
+  L = max(j1,i1),i2;
+}
+return(L);}
+
+
+static proc caseX9(poly rf, def br1){
+    string typeofsing;
+    poly nf;
+    def br = basering;
+    poly MP2;
+
+    poly f4 = jet(rf, 4);
+    poly f=f4;
+    map phi;
+    if (coeff(f,var(1)^4)==0){
+      phi = br,var(2),var(1);
+      f=phi(f4);
+      if (coeff(f,var(1)^4)==0){
+         phi = br,var(1),var(1)+var(2);
+         f=phi(f4);
+         if (coeff(f,var(1)^4)==0){
+           phi = br,var(1),2*var(1)+var(2);
+           f=phi(f4);
+           if (coeff(f,x^4)==0){
+             phi = br,var(1),3*var(1)+var(2);
+             f=phi(f4);
+           }
+         }
+      }
+    }
+    phi = br, var(1) - coeff(f,var(1)^3*var(2))/coeff(f,var(1)^4)*var(2),var(2);
+    f=phi(f);
+    //"no x^3*y term";
+    //f;
+    number b = coeff(f,var(1)^4);
+    number c = coeff(f,var(1)^2*var(2)^2);
+    number d = coeff(f,var(1)*var(2)^3);
+    number e = coeff(f,var(2)^4);
+
+    list interval1,interval2;
+    poly nfe1,nfe2;
+    poly f1 = subst(f,var(2),1);
+    ring Rgl = 0,var(1),dp;
+    poly f1 = fetch(br,f1);
+    int r = nrroots(f1);
+    setring br;
+    poly MP1,MP2;
+    list sol;
+    string typeofsing1,typeofsing2;
+    if (r==0){
+      if (b>0){
+        sol = findX9solutions(f,1,1,2);
+        //if (size(sol)<>2){ERROR("case X9, wrong number of normal form equations");}
+        MP1 = sol[1][1];
+        MP2 = sol[2][1];
+        interval1 = sol[1][2];
+        interval2 = sol[2][2];
+        nfe1 = var(1)^4+var(2)^4;
+        nfe2 = var(1)^4+var(2)^4;
+        typeofsing1="X[9]++";
+        typeofsing2=typeofsing1;
+      } else {
+        sol = findX9solutions(f,-1,-1,2);
+        //if (size(sol)<>2){ERROR("case X9, wrong number of normal form equations");}
+        MP1 = sol[1][1];
+        MP2 = sol[2][1];
+        interval1 = sol[1][2];
+        interval2 = sol[2][2];
+        nfe1 = -var(1)^4-var(2)^4;
+        nfe2 = -var(1)^4-var(2)^4;
+        typeofsing1="X[9]--";
+        typeofsing2=typeofsing1;
+      }
+    }
+    if (r==2){
+        sol = findX9solutions(f,1,-1,1);
+        //if (size(sol)<>1){ERROR("case X9, wrong number of normal form equations");}
+        MP1 = sol[1][1];
+        MP2 = MP1;
+        interval1 = sol[1][2];
+        interval2 = interval1;
+        nfe1 = var(1)^4-var(2)^4;
+        nfe2 = -var(1)^4+var(2)^4;
+        typeofsing1="X[9]+-";
+        typeofsing2="X[9]-+";
+    }
+    if (r==4){
+        sol = findX9solutions(f,1,1,1);
+        //if (size(sol)<>1){ERROR("case X9, wrong number of normal form equations");}
+        sol = sol + findX9solutions(f,-1,-1,1);
+        //if (size(sol)<>2){ERROR("case X9, wrong number of normal form equations");}
+        MP1 = sol[1][1];
+        MP2 = sol[2][1];
+        interval1 = sol[1][2];
+        interval2 = sol[2][2];
+        nfe1 = var(1)^4+var(2)^4;
+        nfe2 = -var(1)^4-var(2)^4;
+        typeofsing1="X[9]++";
+        typeofsing2="X[9]--";
+    }
+    if(deg(MP1)==1)
+    {
+      number a = -number(subst(MP1,var(1),0));
+      def R2 =  br1;
+      setring R2;
+      number a = fetch(br,a);
+    }
+    else
+    {
+      string mord = ringlist(br1)[3][1][1];
+      ring R1 = (0,a),(var(1),var(2)),ds;
+      list L1 = ringlist(R1);
+      L1[3][1][1]=mord;
+      def R2 = ring(L1);
+      setring R2;
+      kill R1;
+      poly ff = fetch(br,MP1);
+      minpoly = number(subst(ff,var(1),a));
+    }
+
+list interval1 = fetch(br,interval1);
+poly nfe1 = fetch(br,nfe1);
+NormalFormEquation F1;
+Poly nfe1a = nfe1+a*var(1)^2*var(2)^2;
+F1.normalFormEquation = nfe1a;
+F1.parameters = list(list(a*var(1)^2*var(2)^2,interval1));
+F1.singularityType = typeofsing1;
+
+setring br;
+
+    if(deg(MP2)==1)
+    {
+      number a = -number(subst(MP2,var(1),0));
+      def R2 =  br1;
+      setring R2;
+      number a = fetch(br,a);
+    }
+    else
+    {
+      string mord = ringlist(br1)[3][1][1];
+      ring R1 = (0,a),(var(1),var(2)),ds;
+      list L1 = ringlist(R1);
+      L1[3][1][1]=mord;
+      def R2 = ring(L1);
+      setring R2;
+      kill R1;
+      poly ff = fetch(br,MP2);
+      minpoly = number(subst(ff,var(1),a));
+    }
+
+list interval2 = fetch(br,interval2);
+poly nfe2 = fetch(br,nfe2);
+NormalFormEquation F2;
+Poly nfe2a = nfe2+a*var(1)^2*var(2)^2;
+F2.normalFormEquation = nfe2a;
+F2.parameters = list(list(a*var(1)^2*var(2)^2,interval2));
+F2.singularityType = typeofsing2;
+
+setring br1;
+return(list(F1,F2));
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+static proc caseX9k(poly rf,int mu, br1)
+{
+  /*preliminaries*/
+  string typeofsing;
+  poly nf;
+  def br = basering;
+  number a;
+  map phi;
+  poly nf1;
+  poly nf2;
+  poly MP;
+  poly MP1;
+  poly MP2;
+  list intervalP;
+  list interval1;
+  list interval2;
+  int aconst;
+
+  /* II. Eliminate the monomials in supp(rf) underneath or on \Gamma(T)*/
+  /* Apply Algorithm 2 to rf */
+
+  poly g = jet(rf,4);
+  list factorization = factorize(g);
+  int i=2;
+  while(factorization[2][i]<>2)
+  {
+    i = i+1;
+  }
+  poly m = factorization[1][i];
+  if(leadmonom(m)==y)
+  {
+    phi = br,var(2),var(1);
+    rf = phi(rf);
+  }
+  else
+  {
+    matrix T[2][2] = factorization[1][i]/var(1),factorization[1][i]/var(2) ,
+                     0, 1;
+    phi = br, luinverse(T)[2]*matrix(ideal(var(1), var(2)), 2, 1);
+    rf = phi(rf);
+  }
+  phi = br,var(1), var(2)-coeff(rf,var(1)^3*var(2))*(1/2)*coeff(rf,var(1)^2*var(2)^2)^(-1)*var(1);
+  rf = phi(rf);
+  kill i;
+  /*Use Algorithm 4 iteratively*/
+
+  number c = coeff(rf,var(1)^2*var(2)^2);
+  number n = number(mu-3)/2;
+  if(round(n)>n)
+  {
+    n = round(n)-1;
+  }
+  else
+  {
+    n = round(n);
+  }
+  for(int i=4; i<=n;i++)
+  {
+    rf = jet(rf,mu+1);
+    number t = coeff(rf,var(1)*var(2)^(i));
+    phi = br, var(1)-(t/(2*c))*var(2)^(i-2),var(2);
+    rf = phi(rf);
+    kill t;
+  }
+  kill i;
+/* III. and IV. Discard the monomials above \Gamma(T) and read off the desired information*/
+
+  int b0 = sign(coeff(rf,var(1)^4));
+  int b1 = sign(coeff(rf,var(1)^2*var(2)^2));
+  if(b0<0 && b1<0)
+  {
+    typeofsing = "X["+string(mu)+"]--";
+  }
+  if(b0<0 && b1>0)
+  {
+    typeofsing = "X["+string(mu)+"]-+";
+  }
+  if(b0>0 && b1<0)
+  {
+    typeofsing = "X["+string(mu)+"]+-";
+  }
+  if(b0>0 && b1>0)
+  {
+    typeofsing = "X["+string(mu)+"]++";
+  }
+  MP = var(1)^4-coeff(rf,var(2)^(mu-5))^4*(absValue(coeff(rf,var(1)^4))*coeff(rf,var(1)^2*var(2)^2)^(-2))^(mu-5);
+  if(mu mod 2 <>0)
+  {
+    n = maxabs(MP);
+    MP = RealRootFactor(MP,-n-1,n+1);
+    n = maxabs(MP);
+    if(deg(MP)==1)
+    {
+      number a = -number(subst(MP,var(1),0));
+      def R2 =  br1;
+      setring R2;
+      number a = fetch(br,a);
+    }
+    else
+    {
+      string mord = ringlist(br1)[3][1][1];
+      ring R1 = (0,a),(var(1),var(2)),ds;
+      list L1 = ringlist(R1);
+      L1[3][1][1]=mord;
+      def R2 = ring(L1);
+      setring R2;
+      kill R1;
+      poly ff = fetch(br,MP);
+      minpoly = number(subst(ff,var(1),a));
+    }
+    number n = fetch(br,n);
+    Poly nfe = number(b0)*var(1)^4+number(b1)*var(1)^2*var(2)^2+a*var(2)^(mu-5);
+    intervalP = list(-(n+1),n+1);
+    NormalFormEquation F;
+    F.normalFormEquation = nfe;
+    F.parameters = list(list(a*var(2)^(mu-5),intervalP));
+    F.singularityType = typeofsing;
+    return(list(F));
+  }
+  else
+  {
+    n = maxabs(MP);
+    MP1 = RealRootFactor(MP,0,n+1);
+    MP2 = RealRootFactor(MP,-n-1,0);
+    if(deg(MP1)==1)
+    {
+      a = -number(subst(MP1,var(1),0));
+      def R2 =  br1;
+      setring R2;
+      number a = fetch(br,a);
+      aconst=1;
+    }
+    else
+    {
+      n = maxabs(MP1);
+      string mord = ringlist(br1)[3][1][1];
+      ring R1 = (0,a),(var(1),var(2)),ds;
+      list L1 = ringlist(R1);
+      L1[3][1][1]=mord;
+      def R2 = ring(L1);
+      setring R2;
+      kill R1;
+      poly ff = fetch(br,MP1);
+      minpoly = number(subst(ff,var(1),a));
+    }
+    number n = fetch(br,n);
+    Poly nfe1 = number(b0)*var(1)^4+number(b1)*var(1)^2*var(2)^2+a*var(2)^(mu-5);
+    interval1 = list(0,n+1);
+    NormalFormEquation F1;
+    F1.normalFormEquation = nfe1;
+    F1.parameters = list(list(a*var(2)^(mu-5),interval1));
+    F1.singularityType = typeofsing;
+    if (aconst){kill a;}
+    kill n;
+    setring br;
+    kill R2;
+    aconst=0;
+
+    if(deg(MP2)==1)
+    {
+      number a = -number(subst(MP2,var(1),0));
+      def R2 =  br1;
+      setring R2;
+      number a = fetch(br,a);
+      aconst = 1;
+    }
+    else
+    {
+      n = maxabs(MP2);
+      string mord = ringlist(br1)[3][1][1];
+      ring R1 = (0,a),(var(1),var(2)),ds;
+      list L1 = ringlist(R1);
+      L1[3][1][1]=mord;
+      def R2 = ring(L1);
+      setring R2;
+      kill R1;
+      poly ff = fetch(br,MP2);
+      minpoly = number(subst(ff,var(1),a));
+    }
+    number n = fetch(br,n);
+    Poly nfe2 = number(b0)*var(1)^4+number(b1)*var(1)^2*var(2)^2+a*var(2)^(mu-5);
+    interval2 = list(-n-1,0);
+    NormalFormEquation F2;
+    F2.normalFormEquation = nfe2;
+    F2.parameters = list(list(a*var(2)^(mu-5),interval2));
+    F2.singularityType = typeofsing;
+    if(aconst){kill a;}
+    return(list(F1,F2));
+  }
+}
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+proc addnondegeneratevariables(NormalFormEquation NFR)
+"
+USAGE:    addnondegeneratevariables(NFR); NFR NormalFormEquation
+RETURN:   Adds squares of the non-degenerate variables (i.e. var(cr+1), ...,
+          var(nvars(basering)) for corank cr) to the normalform nf,
+          with signs according to the inertia index.
+SEE ALSO: realmorsesplit
+KEYWORDS: Morse lemma; Splitting lemma
+EXAMPLE:  example addnondegeneratevariables; shows an example
+"
+{
+  def curring = basering;
+  Poly nf1 = NFR.normalFormEquation;
+  def S = nf1.in;
+  setring S;
+  poly nf = nf1.value;
+  list L = ringlist(S);
+  L[2]=NFR.vars;
+  def Rnew=ring(L);
+  setring Rnew;
+  poly nf = imap(S,nf);
+  int n = size(NFR.vars);
+  int lambda = NFR.inertiaIndex;
+  int cr = NFR.corank;
   int i;
   for(i = cr+1; i <= n-lambda; i++)
   {
@@ -467,7 +5095,20 @@ static proc addnondegeneratevariables(poly nf, int lambda, int cr)
   {
     nf = nf-var(i)^2;
   }
-  return(nf);
+  Poly nfp=nf;
+  NFR.normalFormEquation = nfp;
+  setring curring;
+  return(NFR);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ring r = 0, (x,y,z), ds;
+  poly f = (x2+3y-2z)^2+xyz-(x-y3+x2z3)^3;
+  list NFR = realclassify(f);
+  NFR[1];
+  addnondegeneratevariables(NFR[1]);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -606,15 +5247,6 @@ EXAMPLE:  example morsesplit; shows an example"
     h = f-jet(f, 2)-corank_part(f);
   }
   poly g = f-jet(f, 2);
-  poly lead_g = leadcoef(g);
-  if(lead_g > 0)
-  {
-    g = g/lead_g;
-  }
-  if(lead_g < 0)
-  {
-    g = -g/lead_g;
-  }
 
   return(list(c, lambda, k, g));
 }
@@ -634,7 +5266,7 @@ example
    If A is not a square matrix, then the largest upper or left submatrix
    is assumed to be symmetric.
 */
-proc sym_reduce(matrix A)
+static proc sym_reduce(matrix A)
 {
   int r = nrows(A);
   int c = ncols(A);
@@ -814,4 +5446,6 @@ example
   poly f = x3+xy3;
   determinacy(f);
 }
+
+
 

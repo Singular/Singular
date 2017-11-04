@@ -37,14 +37,10 @@
 char fe_promptstr[] ="  ";
 FILE *File_Profiling=NULL;
 
-// output/print buffer:
-#define INITIAL_PRINT_BUFFER 24*1024L
 // line buffer for reading:
 // minimal value for MAX_FILE_BUFFER: 4*4096 - see Tst/Long/gcd0_l.tst
 // this is an upper limit for the size of monomials/numbers read via the interpreter
 #define MAX_FILE_BUFFER 4*4096
-// static long feBufferLength=INITIAL_PRINT_BUFFER;
-//static char * feBuffer=(char *)omAlloc(INITIAL_PRINT_BUFFER);
 
 /**************************************************************************
 * handling of 'voices'
@@ -126,7 +122,7 @@ feBufferTypes Voice::Typ()
 * start the file 'fname' (STDIN is stdin) as a new voice (cf.VFile)
 * return FALSE on success, TRUE if an error occurs (file cannot be opened)
 */
-BOOLEAN newFile(char *fname,FILE* f)
+BOOLEAN newFile(char *fname)
 {
   currentVoice->Next();
   //Print(":File%d(%s):%s(%x)\n",
@@ -142,16 +138,11 @@ BOOLEAN newFile(char *fname,FILE* f)
   else
   {
     currentVoice->sw = BI_file; /* needed by exitVoice below */
-    if (f!=NULL)
-      currentVoice->files = f;
-    else
+    currentVoice->files = feFopen(fname,"r",NULL,TRUE);
+    if (currentVoice->files==NULL)
     {
-      currentVoice->files = feFopen(fname,"r",NULL,TRUE);
-      if (currentVoice->files==NULL)
-      {
-        exitVoice();
-        return TRUE;
-      }
+      exitVoice();
+      return TRUE;
     }
     currentVoice->start_lineno = 0;
   }
@@ -537,31 +528,32 @@ int feReadLine(char* b, int l)
       b[i]='\0';
       if (currentVoice->sw==BI_buffer)
       {
+        BOOLEAN show_echo=FALSE;
+        char *anf;
+        long len;
         if (startfptr==0)
         {
-          char *anf=currentVoice->buffer;
+          anf=currentVoice->buffer;
           const char *ss=strchr(anf,'\n');
-          long len;
           if (ss==NULL) len=strlen(anf);
           else          len=ss-anf;
-          char *s=(char *)omAlloc(len+2);
-          strncpy(s,anf,len+2);
-          s[len+1]='\0';
-          fePrintEcho(s,b);
-          omFree((ADDRESS)s);
+          show_echo=TRUE;
         }
         else if (/*(startfptr>0) &&*/
         (currentVoice->buffer[startfptr-1]=='\n'))
         {
-          char *anf=currentVoice->buffer+startfptr;
+          anf=currentVoice->buffer+startfptr;
           const char *ss=strchr(anf,'\n');
-          long len;
           if (ss==NULL) len=strlen(anf);
           else          len=ss-anf;
+          yylineno++;
+          show_echo=TRUE;
+        }
+        if (show_echo)
+        {
           char *s=(char *)omAlloc(len+2);
           strncpy(s,anf,len+2);
           s[len+1]='\0';
-          yylineno++;
           fePrintEcho(s,b);
           omFree((ADDRESS)s);
         }

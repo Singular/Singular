@@ -7429,6 +7429,7 @@ TObject* kFindDivisibleByInS_T(kStrategy strat, int end_pos, LObject* L, TObject
     if (strat->tl < 0 || strat->S_2_R[j] == -1)
     {
       T->Set(strat->S[j], r, strat->tailRing);
+      assume(T->GetpLength()==pLength(T->p != __null ? T->p : T->t_p));
       return T;
     }
     else
@@ -7454,6 +7455,7 @@ TObject* kFindDivisibleByInS_T(kStrategy strat, int end_pos, LObject* L, TObject
         if (p_LmShortDivisibleBy(t->t_p, sev[j], p, not_sev, r) &&
             (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
         {
+          t->pLength=pLength(t->t_p);
           return t;
         }
   #else
@@ -7463,6 +7465,7 @@ TObject* kFindDivisibleByInS_T(kStrategy strat, int end_pos, LObject* L, TObject
           assume(t != NULL && t->t_p != NULL && t->tailRing == r && t->p == strat->S[j]);
           if (p_LmDivisibleBy(t->t_p, p, r))
           {
+            t->pLength=pLength(t->t_p);
             return t;
           }
         }
@@ -7483,6 +7486,7 @@ TObject* kFindDivisibleByInS_T(kStrategy strat, int end_pos, LObject* L, TObject
         if (p_LmShortDivisibleBy(t->t_p, sev[j], p, not_sev, r) &&
             (ecart== LONG_MAX || ecart>= strat->ecartS[j]) && n_DivBy(pGetCoeff(p), pGetCoeff(t->t_p), r->cf))
         {
+          t->pLength=pLength(t->t_p);
           return t;
         }
   #else
@@ -7492,6 +7496,7 @@ TObject* kFindDivisibleByInS_T(kStrategy strat, int end_pos, LObject* L, TObject
           assume(t != NULL && t->t_p != NULL && t->tailRing == r && t->p == strat->S[j]);
           if (p_LmDivisibleBy(t->t_p, p, r) && n_DivBy(pGetCoeff(p), pGetCoeff(t->t_p), r->cf))
           {
+            t->pLength=pLength(t->t_p);
             return t;
           }
         }
@@ -7594,10 +7599,14 @@ poly redtailBba (LObject* L, int end_pos, kStrategy strat, BOOLEAN withT, BOOLEA
   TObject  With_s(strat->tailRing);
 
   LObject Ln(pNext(h), strat->tailRing);
-  Ln.pLength = L->GetpLength() - 1;
+  Ln.GetpLength();
 
   pNext(h) = NULL;
-  if (L->p != NULL) pNext(L->p) = NULL;
+  if (L->p != NULL)
+  {
+    pNext(L->p) = NULL;
+    if (L->t_p != NULL) pNext(L->t_p) = NULL;
+  }
   L->pLength = 1;
 
   Ln.PrepareRed(strat->use_buckets);
@@ -7625,11 +7634,13 @@ poly redtailBba (LObject* L, int end_pos, kStrategy strat, BOOLEAN withT, BOOLEA
         j = kFindDivisibleByInT(strat, &Ln);
         if (j < 0) break;
         With = &(strat->T[j]);
+	assume(With->GetpLength()==pLength(With->p != __null ? With->p : With->t_p));
       }
       else
       {
         With = kFindDivisibleByInS_T(strat, end_pos, &Ln, &With_s);
         if (With == NULL) break;
+	assume(With->GetpLength()==pLength(With->p != __null ? With->p : With->t_p));
       }
       cnt--;
       if (cnt==0)
