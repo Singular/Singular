@@ -1155,6 +1155,72 @@ example
 
 // -----------------main procedures----------------------
 
+proc lpIsSemiPrime(ideal G)
+{
+  G = lead(G);
+  G = simplify(G, 2+4+8);
+
+  list VUG = lpUfGraph(G, 1);
+  intmat UG = VUG[1]; // the Ufnarovskij graph
+  ideal V = VUG[2]; // the vertices of UG (standard words with length = l-1)
+
+  list LG = lpId2ivLi(G);
+  list SW = ivStandardWordsUpToLength(LG, maxDeg(G));
+  list LV = lpId2ivLi(V);
+
+  // delete the 0 in SW
+  int indexofzero = ivIndexOf(SW, 0);
+  if (indexofzero > 0) { // should be always true when |SW| > 0
+    SW = delete(SW, indexofzero);
+  }
+
+  // check if each monomial in SW is cyclic
+  for (int i = 1; i <= size(SW); i++) {
+    if (!isCyclicInUfGraph(UG, LV, SW[i])) {
+      return (0);
+    }
+  }
+
+  return (1);
+}
+
+// checks whether a monomial is a cyclic monomial
+proc isCyclicInUfGraph(intmat UG, list LV, intvec u)
+{
+  if (ncols(UG) == 0) {return (0);} // UG is empty
+  if (u == 0) {return (0);} // 0 is never cyclic
+
+  int l = size(LV[1]) + 1;
+
+  int s = size(u);
+  if (s <= l - 1) {
+    for (int i = 1; i <= size(LV); i++) {
+      // for all vertices where u is a suffix
+      if(isSF(u, LV[i])) {
+        if (existsRoute(UG, i, i)) {
+          return (1);
+        }
+      }
+    }
+  } else { // size(u) > l - 1
+    int m = s - l + 1;
+
+    // there must be a route from v0 to vm
+    intvec v0 = u[1..(l-1)]; // first in route of u
+    intvec vm = u[m+1..m+(l-1)]; // last in route of u
+
+    int iv0 = ivIndexOf(LV, v0);
+    int ivm = ivIndexOf(LV, vm);
+    if (iv0 <= 0 || ivm <= 0) {
+      ERROR("u is not a standard word");
+    }
+
+    return (existsRoute(UG, ivm, iv0));
+  }
+
+  return (0);
+}
+
 proc lpIsPrime(ideal G)
 "USAGE: lpIsPrime(G); G an ideal in a Letterplace ring
 RETURN: boolean
