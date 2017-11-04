@@ -1168,14 +1168,14 @@ ASSUME: - basering is a Letterplace ring
 
   list VUG = lpUfGraph(G, 1);
   intmat UG = VUG[1]; // the Ufnarovskij graph
-  ideal V = VUG[2]; // the vertice of UG (standard words with length = l-1)
+  ideal V = VUG[2]; // the vertices of UG (standard words with length = l-1)
 
   list LG = lpId2ivLi(G);
   list LV = lpId2ivLi(V);
 
   int n = ncols(UG);
 
-  // 1) for each vi vj there exists a route from vi to vj
+  // 1) for each vi vj there exists a route from vi to vj (means UG is connected)
   for (int i = 1; i <= n; i++) {
     for (int j = 1; j <= n; j++) {
       if (!existsRoute(UG, i, j)) {
@@ -1185,7 +1185,7 @@ ASSUME: - basering is a Letterplace ring
   }
 
   // 2) any standard word with length < l-1 is a suffix of a vertex
-  list SW = ivStandardWordsUpToLength(LG, maxDeg(G) - 1);
+  list SW = ivStandardWordsUpToLength(LG, maxDeg(G) - 2); // < maxDeg - 1
   if (size(SW) > 0 && size(LV) == 0) {return (0);}
   for (int i = 1; i <= size(SW); i++) {
     // check if SW[i] is a suffix of some LV
