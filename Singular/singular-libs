@@ -35,7 +35,7 @@ SLIB0 = absfact.lib ainvar.lib aksaka.lib alexpoly.lib algebra.lib \
 # (they should be ordered alphabetically)
 SLIB1 = arr.lib \
 	brillnoether.lib\
-	classifyMapGerms.lib classifyceq.lib classifyci.lib classify_aeq.lib\
+	classify2.lib classifyMapGerms.lib classifyceq.lib classifyci.lib classify_aeq.lib\
 	chern.lib cimonom.lib customstd.lib curveInv.lib \
 	deRham.lib dmodloc.lib divisors.lib \
 	ellipticcovers.lib \
@@ -48,7 +48,7 @@ SLIB1 = arr.lib \
 	JMBTest.lib JMSConst.lib \
 	nfmodstd.lib nfmodsyz.lib numerAlg.lib numerDecom.lib \
         orbitparam.lib \
-	parallel.lib polymake.lib polybori.lib \
+	parallel.lib polyclass.lib polymake.lib polybori.lib \
 	realizationMatroids.lib resources.lib ringgb.lib \
 	rootisolation.lib rwalk.lib rstandard.lib \
 	schreyer.lib symodstd.lib schubert.lib swalk.lib \

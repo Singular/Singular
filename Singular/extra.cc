@@ -2514,11 +2514,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           omMarkAsStaticAddr(h);
           if (fd == NULL && h->Typ()==STRING_CMD)
           {
-            fd = fopen((char*) h->Data(), "w");
+            char *fn=(char*) h->Data();
+            fd = fopen(fn, "w");
             if (fd == NULL)
-              Warn("Can not open %s for writing og mtrack. Using stdout"); // %s  ???
+              Warn("Can not open %s for writing og mtrack. Using stdout",fn);
           }
-          if (h->Typ() == INT_CMD)
+          else if (h->Typ() == INT_CMD)
           {
             max = (int)(long)h->Data();
           }
@@ -2528,26 +2529,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         if (fd != NULL) fclose(fd);
         om_Opts.MarkAsStatic = 0;
         return FALSE;
-  #endif
-      }
-  /*==================== mtrack_all ==================================*/
-      if(strcmp(sys_cmd,"mtrack_all")==0)
-      {
-  #ifdef OM_TRACK
-        om_Opts.MarkAsStatic = 1;
-        FILE *fd = NULL;
-        if ((h!=NULL) &&(h->Typ()==STRING_CMD))
-        {
-          fd = fopen((char*) h->Data(), "w");
-          if (fd == NULL)
-            Warn("Can not open %s for writing og mtrack. Using stdout");
-          omMarkAsStaticAddr(h);
-        }
-        // OB: TBC print to fd
-        omPrintUsedAddrs((fd == NULL ? stdout : fd), 5);
-        if (fd != NULL) fclose(fd);
-        om_Opts.MarkAsStatic = 0;
-        return FALSE;
+  #else
+        WerrorS("system(\"mtrack\",..) is not implemented in this version");
+        return TRUE;
   #endif
       }
       else

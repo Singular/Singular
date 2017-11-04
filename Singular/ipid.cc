@@ -53,8 +53,6 @@ omBin idrec_bin = omGetSpecBin(sizeof(idrec));
 
 coeffs coeffs_BIGINT;
 
-FILE   *feFilePending; /*temp. storage for grammar.y */
-
 proclevel *procstack=NULL;
 //idhdl idroot = NULL;
 

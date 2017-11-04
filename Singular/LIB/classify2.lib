@@ -1,0 +1,1463 @@
+//////////////////////////////////////////////////////////////////////////////
+version="version classify2.lib 4.1.0.3 Nov_2107 "; // $Id$
+category="Commutative Algebra";
+info="
+LIBRARY: classify2.lib   Classification of isolated singularities
+AUTHORS:               Janko Boehm,      email: boehm@mathematik.uni-kl.de
+                       Magdaleen Marais, email: magdaleen.marais@up.ac.za
+                       Gerhard Pfister,  email: pfister@mathematik.uni-kl.de
+
+
+OVERVIEW:
+We classify isolated singularities of corank <=2 and modality <=2 with respect
+to right-equivalence over the complex numbers according to Arnold's list. We
+determine the type and, for positive modality, the parameter.
+
+V.I. Arnold has described normal forms and has developed a classifier for, in
+particular, all isolated hypersurface singularities over the complex numbers up
+to modality 2. Building on a series of 105 theorems, this classifier determines
+the type of the given singularity. However, for positive modality, this does not
+fix the right equivalence class of the singularity, since the values of the
+moduli parameters are not specified.
+
+This library implements an alternative classification algorithm for isolated
+hypersurface singularities of corank and modality up to two.  For a
+singularity given by a polynomial over the rationals, the algorithm determines
+its right equivalence class by specifying a polynomial representative in Arnold's
+list of normal forms. In particular, the algorithm also determines values for the
+moduli parameters.
+
+The implementation is based on the paper
+
+Janko Boehm, Magdaleen Marais, Gerhard Pfister: A Classification Algorithm for
+Complex Singularities of Corank and Modality up to Two, Singularities and
+Computer Algebra - Festschrift for Gert-Martin Greuel on the Occasion of his
+70th Birthday, Springer 2017, http://arxiv.org/abs/1604.04774
+
+There are functions for determining a normal form equation and for determining
+the complex type of the singularity.
+
+
+KEYWORDS:
+singularities; classification
+
+SEE ALSO: realclassify_lib, classify_lib
+
+PROCEDURES:
+complexClassify(I); classifier returning a normal form equation
+complexType(I);     classifier returning the type and modality
+
+";
+
+
+
+static proc mod_init()
+{
+  LIB "gfanlib.so";
+}
+
+  LIB "polyclass.lib";
+  //LIB "sing.lib";
+  LIB "absfact.lib";
+  LIB "primdec.lib";
+
+
+
+static proc idealcontainment(ideal I,ideal J){
+int sz=size(reduce(I,std(J)));
+return(sz==0);}
+
+static proc exponentvector(poly f){
+return(leadexp(f));}
+
+static proc weighteddeg(poly f,intvec w){
+return(deg(f,w));}
+
+static proc piecewisedegree(poly f, list pw){
+int d1=weighteddeg(f,pw[1]);
+int d2;
+for (int i=2;i<=size(pw);i++){
+ d2=weighteddeg(f,pw[i]);
+ if (d2<d1){d1=d2;}
+}
+return(d1);}
+
+//list NP = newtonPolygon(x^2*y^2+x^5+y^7);
+static proc piecewiseWeightOfPolygon(list NP){
+if (size(NP)==1){return(list(NP[1][1]));}
+if (size(NP)>2){ERROR("Not implemented for more than two faces";)}
+intvec vt = setintersection(NP[1][2],NP[2][2])[1];
+int d1=weighteddeg(var(1)^vt[1]*var(2)^vt[2],NP[1][1]);
+int d2=weighteddeg(var(1)^vt[1]*var(2)^vt[2],NP[2][1]);
+int c1 = lcm(d1,d2) div d1;
+int c2 = lcm(d1,d2) div d2;
+return(list(c1*NP[1][1],c2*NP[2][1]));
+}
+//piecewiseWeightOfPolygon(NP);
+
+
+static proc piecewiseJet(poly f, list pw, int d){
+if (f==0){return(f);}
+list mon = terms(f);
+poly ff;
+int wt;
+for (int i=1;i<=size(mon);i++){
+   wt = piecewisedegree(mon[i],pw);
+   if (wt==d){ff=ff+mon[i];}
+}
+return(ff);}
+
+
+static proc monomials(poly f){
+list L;
+poly m;
+poly p = f;
+int i = 1;
+while (p<>0){
+  L[i]=leadmonom(p);
+  p=p-lead(p);
+  i=i+1;
+}
+return(L);}
+
+static proc terms(poly f){
+list L;
+poly m;
+poly p = f;
+int i = 1;
+while (p<>0){
+  L[i]=lead(p);
+  p=p-lead(p);
+  i=i+1;
+}
+return(L);}
+
+
+
+static proc lowestMonomials(poly f, intvec w){
+if (f==0){return(list(f));}
+list mon = monomials(f);
+int wt;
+int mindg = weighteddeg(mon[1],w);
+for (int i=2;i<=size(mon);i++){
+   wt = weighteddeg(mon[i],w);
+   if (wt<mindg){mindg=wt;}
+}
+list L;
+int j=1;
+for (i=1;i<=size(mon);i++){
+  if (weighteddeg(mon[i],w)==mindg){
+     L[j]=mon[i];
+     j=j+1;
+  }
+}
+return(L);}
+
+
+
+static proc lowestTerms(poly f, intvec w){
+if (f==0){return(list(f));}
+list mon = terms(f);
+int wt;
+int mindg = weighteddeg(mon[1],w);
+for (int i=2;i<=size(mon);i++){
+   wt = weighteddeg(mon[i],w);
+   if (wt<mindg){mindg=wt;}
+}
+list L;
+int j=1;
+for (i=1;i<=size(mon);i++){
+  if (weighteddeg(mon[i],w)==mindg){
+     L[j]=mon[i];
+     j=j+1;
+  }
+}
+return(L);}
+
+static proc lowestJet(poly f, intvec w){
+if (f==0){return(f);}
+list mon = terms(f);
+int wt;
+int mindg = weighteddeg(mon[1],w);
+for (int i=2;i<=size(mon);i++){
+   wt = weighteddeg(mon[i],w);
+   if (wt<mindg){mindg=wt;}
+}
+return(jet(f,mindg,w));}
+
+
+static proc removeMon(poly f,poly f0,intvec u1,intvec u2,poly t) {
+if (t==0){ERROR("term should not be zero");}
+if (printlevel>1){
+ "Algorithm 4";
+ "f0="+string(f0);
+ "u1="+string(u1);
+ "u2="+string(u2);
+ "t="+string(t);
+}
+poly dfx=diff(f0,var(1));
+poly dfy=diff(f0,var(2));
+if (printlevel>1){
+  "dfx = "+string(dfx);
+  "dfy = "+string(dfy);
+}
+poly mx=lowestJet(dfx,u2);
+mx=lowestJet(mx,u1);
+poly my=lowestJet(dfy,u1);
+my=lowestJet(my,u2);
+if (printlevel>1){
+  "mx = "+string(mx);
+  "my = "+string(my);
+}
+if (NF(t,mx)==0) {
+  f=subst(f,x,x-t/mx);
+  f=truncateAtHighestCorner(f);
+  return(f);
+}
+if (NF(t,my)==0) {
+  f=subst(f,y,y-t/my);
+  f=truncateAtHighestCorner(f);
+  return(f);
+}
+if (printlevel>0){"did nothing";}
+return(f);
+}
+
+static proc poshull(list L){
+intmat A[size(L)][size(L[1])]=L[1..size(L)];
+return(coneViaPoints(A));
+}
+
+static proc facetsAsCones(cone c){
+intmat R= intmat(rays(c));
+intmat Fc=intmat(facets(c));
+intmat M = intmat(facets(c)*transpose(R));
+intmat r[1][ncols(R)];
+int j;
+int l=1;
+list F;
+for (int i=1;i<=nrows(M);i++){
+  list L;
+  l=1;
+  //"Face";i;
+  for (j=1;j<=ncols(M);j++){
+    if (M[i,j]==0){
+       //"ray";j;
+       r=R[j,1..ncols(R)];
+       L[l]=intvec(r);
+       l=l+1;
+    }
+  }
+  F[i]=list(intvec(Fc[i,1..ncols(Fc)]),L);kill L;
+}
+return(F);}
+
+static proc newtonPolygon(poly f){
+//"f="+string(f);
+list M=monomials(f);
+//print(M);
+list E;
+intvec v;
+for (int i=1;i<=size(M);i++){
+   v=exponentvector(M[i]);
+   v[size(v)+1]=1;
+   E[i]=v;
+}
+E[size(M)+1]=intvec(1,0,0);
+E[size(M)+2]=intvec(0,1,0);
+cone c = poshull(E);
+//print(facets(c));
+list F=facetsAsCones(c);
+//"Facets as cones";print(F);
+list F1;
+list ry;
+int l=1;
+intvec nv;
+intvec ry1,ry2;
+list ryy;
+list fi;
+for (i=1;i<=size(F);i++){
+   ry=F[i][2];
+   nv=F[i][1];
+   nv=nv[1..2];
+   ry1=ry[1];ry1=ry1[1..2];
+   ry2=ry[2];ry2=ry2[1..2];
+   if (ry1[1]>ry2[1]) {ryy=list(ry2,ry1);} else {ryy=list(ry1,ry2);}
+   if ((ry[1][3]<>0) and (ry[2][3]<>0)){fi[l]=ryy[1][1];F1[l]=list(nv,ryy);l=l+1;}
+}
+intvec fii=sort(fi)[2];
+list F2;
+int j;
+for (i=1;i<=size(fii);i++){
+   F2[i]=F1[fii[i]];
+}
+return(F2);
+}
+
+static proc maximumFiltration(poly f){
+return(ord(f));
+}
+
+static proc factorLowestJet(poly f){
+poly g= jet(f,maximumFiltration(f));
+list L = factorize(g);
+intvec fii=sort(L[2])[2];
+list LL;
+for (int i=1;i<=size(fii);i++){
+   LL[size(fii)-i+1]=list(L[1][fii[i]],L[2][fii[i]]);
+}
+list LLL=LL[1..size(LL)-1];
+if (size(LL)==2){
+   return(list(LL[1]));
+}
+return(LLL);}
+
+static proc lintrafo(poly f, ideal T){
+   def R=basering;
+   list L=ringlist(R);
+   L[2]=L[2]+list("xx","yy");
+   L[3][1][2]=intvec(1,1,1,1);
+   L[3][1][1]="lp";
+   def RR=ring(L);
+   setring RR;
+   ideal T=fetch(R,T);
+   ideal I = xx-T[1],yy-T[2];
+   option(redSB);
+   ideal Is = std(I);
+   poly fx = -subst(Is[2],x,0)/(coeff(Is[2],x));
+   poly fy = -subst(Is[1],y,0)/(coeff(Is[1],y));
+   poly ff = subst(fetch(R,f),x,fx,y,fy);
+   list L=ringlist(RR);
+   L[2]=list("xx","yy");
+   L[3][1][2]=intvec(1,1);
+   def R1=ring(L);
+   setring R1;
+   poly ff = imap(RR,ff);
+   setring R;
+   return(fetch(R1,ff));
+}
+
+static proc coeff(poly f, poly m){
+poly p = f;
+int i = 1;
+while (p<>0){
+  if (m==leadmonom(p)){return(leadcoef(p));}
+  p=p-lead(p);
+}
+return(0);}
+
+
+static proc coeff2(poly f, poly m){
+poly radm=(radical(m))[1];
+matrix M =coef(f,radm);
+for (int i=1;i<=ncols(M);i++){
+   if (M[1,i]==m){return(M[2,i]);}
+}
+return(0);}
+
+
+
+static proc doLinearTransformation(Poly F){
+setring(F.in);
+poly f = F.value;
+poly g= jet(f,maximumFiltration(f));
+def R= basering;
+def S=absFactorize(g);
+setring S;
+list L = absolute_factors;
+if (printlevel>0){
+  "absolute factors";
+  L;
+}
+number mp;
+for (int i=1;i<=size(L[3]);i++){
+  if (L[3][i]<>a){
+     mp = leadcoef(L[3][i]);
+  }
+}
+if (mp==0){
+   setring R;
+} else {
+   if (printlevel>0){"minimal polynomial "+string(mp);}
+   minpoly = mp;
+   poly g=imap(R,g);
+   poly f=imap(R,f);
+}
+list L = factorize(g);
+int alllinear=1;
+for (i =1;i<=size(L[1]);i++){
+   if (deg(L[1][i])>1){alllinear=0;}
+}
+if (alllinear==0){
+  return(F);
+}
+intvec fii=sort(L[2])[2];
+list LL;
+for (i=1;i<=size(fii);i++){
+   LL[size(fii)-i+1]=list(L[1][fii[i]],L[2][fii[i]]);
+}
+list LLL=LL[1..size(LL)-1];
+// bugfix for inconsistent behaviour of Singular for list assignment
+if (size(LL)==2){
+   LLL=list(LL[1]);
+}
+L=LLL;
+//list L=factorLowestJet(f);
+poly ff;
+if (size(L)==1) {
+  if (NF(L[1][1],y)==0) {
+      if (printlevel>0){ "case1 ";}
+    ff=lintrafo(f,ideal(y,x));
+  Poly FF=makePoly(ff);
+  return(FF);
+  } else {
+    if (printlevel>0){"case2 ";}
+    ff=lintrafo(f,ideal(L[1][1],y));
+  Poly FF=makePoly(ff);
+  return(FF);
+  }
+}
+if (size(L)==2) {
+    if (printlevel>0){"case3 ";}
+  ff=lintrafo(f,ideal(L[1][1],L[2][1]));
+  Poly FF=makePoly(ff);
+  return(FF);
+}
+if ((size(L)==3) and (jet(f,3)==0)) {
+    if (printlevel>0){"case4 ";}
+  setring R;
+  poly ff;
+  list L = factorLowestJet(g);
+  if (NF(L[1][1],y)==0)
+  {
+    ff=lintrafo(f,ideal(y,x));
+    //Poly FF=makePoly(ff);
+    //return(FF);
+  }
+  else
+  {
+    ff=lintrafo(f,ideal(L[1][1],y));
+    //Poly FF=makePoly(ff);
+   // return(FF);
+  }
+  number a1=coeff(ff,x^3*y);
+  number a2=coeff(ff,x^2*y^2);
+  ff=lintrafo(ff,ideal(x,y+(a1/(2*a2))*x));
+  Poly FF=makePoly(ff);
+  return(FF);
+}
+return(F);}
+
+static proc isOnPolygon(intvec v,list NP){
+int tst;
+cone c1,c2;
+v[size(v)+1]=1;
+int j;
+intvec w;
+for (int i=1;i<=size(NP);i++){
+  list L;
+  for (j=1;j<=size(NP[i][2]);j++){
+    w=NP[i][2][j];
+    w[size(w)+1]=1;
+    L[j]=w;
+  }
+  c1=poshull(L);
+  L[size(L)+1]=v;
+  c2=poshull(L);
+  if (c1==c2){return(1);}
+  kill L;
+}
+return(0);}
+
+static proc latticePoints(list NP){
+int maxx,maxy;
+for (int i=1;i<=size(NP);i++){
+   if (NP[i][2][1][1]>maxx) {maxx=NP[i][2][1][1];}
+   if (NP[i][2][2][1]>maxx) {maxx=NP[i][2][2][1];}
+   if (NP[i][2][1][2]>maxy) {maxy=NP[i][2][1][2];}
+   if (NP[i][2][2][2]>maxy) {maxy=NP[i][2][2][2];}
+}
+int x,y;
+list LP;
+for (x=0;x<=maxx;x++){
+  for (y=0;y<=maxy;y++){
+     if (isOnPolygon(intvec(x,y),NP)){LP[size(LP)+1]=intvec(x,y);}
+  }
+}
+return(LP);}
+
+
+static proc allMonomialsInPiecewiseWeightedDegree(list wt,int d){
+list L;
+poly mon;
+int ix,iy;
+for (ix=0;ix<=d;ix++){
+  for (iy=0;iy<=d;iy++){
+     mon=var(1)^ix*var(2)^iy;
+     if (piecewisedegree(mon,wt)==d){L[size(L)+1]=mon;}
+  }
+}
+return(L);
+}
+//allMonomialsInPiecewiseWeightedDegree(list(intvec(3,2)),8);
+
+
+
+static proc latticeToMonomials(list L){
+list M;
+for (int i=1;i<=size(L);i++){
+   M[size(M)+1]=var(1)^(L[i][1])*var(2)^(L[i][2]);
+}
+return(M);}
+
+static proc termsOnPolygon(poly f1,NP){
+list HB=latticePoints(NP);
+poly g;
+for (int j=1;j<=size(HB);j++){
+    g=g+coeff(f1,x^HB[j][1]*y^HB[j][2])*x^HB[j][1]*y^HB[j][2];
+}
+return(g);
+}
+
+static proc factorWeightedLowestJet(poly f,list F){
+poly g= termsOnPolygon(f,list(F));
+list L=factorize(g);
+intvec fii=sort(L[2])[2];
+list LL;
+for (int i=1;i<=size(fii);i++){
+   LL[size(fii)-i+1]=list(L[1][fii[i]],L[2][fii[i]]);
+}
+list LLL=LL[1..size(LL)-1];
+if (size(LL)==2){
+   return(list(LL[1]));
+}
+return(LLL);}
+
+
+
+static proc doWeightedLinearTransformation(poly f1,list NF1){
+if (printlevel>0){"++++++++++++++++++ "+string(deg(f1));}
+list fac=factorWeightedLowestJet(f1,NF1);
+if (printlevel>0){print("Fac "+string(fac));}
+//subst(fac[1][1],y,0);
+if (deg(subst(fac[1][1],y,0))>1) {return(0);}
+poly rs=subst(fac[1][1],x,0);
+f1=subst(f1,x,x-rs);
+f1=truncateAtHighestCorner(f1);
+return(f1);
+}
+
+
+
+static proc corner(list NP){
+return(NP[1][2][2]);
+}
+
+
+
+static proc weightsOfNewtonPolygon(list NP){
+list wt;
+for (int i =1;i<=size(NP);i++){
+   wt[i]=NP[i][1];
+}
+return(wt);}
+
+
+static proc twofaceelimination(poly f,intvec co){
+int mu=milnor(f);
+list NP=newtonPolygon(f);
+list L=latticePoints(NP);
+//intvec co=corner(NP);
+list L1;
+int l=1;
+for (int j=1;j<=size(L);j++){
+  if ((L[j][1]==co[1]-1) or (L[j][2]==co[2]-1)) {
+     L1[l]=L[j];
+     l=l+1;
+  }
+}
+poly f0=termsOnPolygon(f,NP);
+poly f1=f;
+intvec co1;
+number c1;
+poly mon;
+list wt;
+list NPadj=adjecentFacesOfNewtonPolygon(NP,co);
+for (j=1;j<=size(L1);j++){
+  co1=L1[j];
+  mon=x^co1[1]*y^co1[2];
+  c1=coeff(f0,mon);
+  mon=c1*x^co1[1]*y^co1[2];
+  //"removing "+string(mon);
+  if (c1<>0){
+     wt=weightsOfNewtonPolygon(NPadj);
+     f1=removeMon(f,f0,wt[1],wt[2],mon);
+     //f1=jet(f1,mu+1);
+  }
+}
+return(f1);
+}
+
+static proc adjecentFacesOfNewtonPolygon(list NP,intvec co){
+list NP1;
+for (int i=1;i<=size(NP);i++){
+  if (isVertexOfFace(NP[i][2],co)){
+    NP1[size(NP1)+1]=NP[i];
+  }
+}
+return(NP1);}
+
+static proc isVertexOfFace(list F,intvec co){
+if ((F[1]==co) or (F[2]==co)){return(1);}
+return(0);}
+
+static proc dotwofaceelimination(poly f,intvec si){
+poly fnew=twofaceelimination(f,si);
+if (fnew==f){
+    return(f);
+} else {
+    return(dotwofaceelimination(fnew, si));
+};
+};
+
+
+static proc innerVertices(NP){
+list L;
+int j,jj;
+intvec co;
+for (j=1;j<=size(NP)-1;j++){
+   L[j]=NP[j][2][2];
+}
+return(L);
+}
+
+static proc setunion(list A, list B){
+list L=A;
+int i,j,l;
+l=1;
+int tst;
+for (i=1;i<=size(B);i++){
+   tst=0;
+   for (j=1;j<=size(L);j++){
+       if (L[j]==B[i]){tst=1;}
+   }
+   if (tst==0){L[size(L)+1]=B[i];}
+}
+return(L);}
+
+
+static proc setintersection(list A, list B){
+list L;
+if ((size(A)==0) or (size(B)==0)){return(L);}
+int i,j,l;
+l=1;
+for (i=1;i<=size(A);i++){
+   for (j=1;j<=size(B);j++){
+       if (B[j]==A[i]){L[l]=A[i];l=l+1;}
+   }
+}
+return(L);}
+
+static proc setminus(list A, list B){
+list L;
+if (size(A)==0){return(A);}
+int i,j,l;
+l=1;
+int tst;
+for (i=1;i<=size(A);i++){
+   tst=0;
+   for (j=1;j<=size(B);j++){
+       if (B[j]==A[i]){tst=1;break;}
+   }
+   if (tst==0){L[size(L)+1]=A[i];}
+}
+return(L);}
+
+
+
+static proc vectorfieldToTransformation(list vf, intvec wt, int n){
+list L;
+poly sumf=x;
+poly f=x;
+int currentorder=0;
+number fac =1;
+int i=1;
+while (currentorder<n){
+   f=(vf[1]*diff(f,x)+vf[2]*diff(f,y));
+   sumf=sumf+1/fac*f;
+   i=i+1;
+   fac=fac*i;
+   currentorder=deg(f,wt);
+}
+L[1]=sumf;
+sumf=y;
+f=y;
+currentorder=0;
+fac=1;
+i=1;
+while (currentorder<n){
+   f=(vf[1]*diff(f,x)+vf[2]*diff(f,y));
+   sumf=sumf+1/fac*f;
+   i=i+1;
+   fac=fac*i;
+   currentorder=deg(f,wt);
+}
+L[2]=sumf;
+return(L);
+}
+
+//vectorfieldToTransformation(list(3*y^2*c,-2*x*c),intvec(3,2),5);
+
+
+static proc removeMonW(poly f,poly f0,intvec u1,intvec u2,poly t,list T) {
+if (t==0){ERROR("term should not be zero");}
+if (printlevel>0){"Algorithm 7";}
+//"f0="+string(f0);
+//"u1="+string(u1);
+//"u2="+string(u2);
+if (printlevel>0){"t="+string(t);}
+list NP = newtonPolygon(T[2]);
+list wtNP = piecewiseWeightOfPolygon(NP);
+int currentweighteddeg=piecewisedegree(t,wtNP);
+poly oldf = f;
+poly dfx=diff(f0,var(1));
+poly dfy=diff(f0,var(2));
+ideal jac=jacob(f0);
+if (idealcontainment(ideal(t),jac)){return(f);}
+matrix co;
+int mu=milnor(f);
+f=removeMon(f,f0,intvec(1,1),intvec(1,1),t);
+//f=jet(f,mu+1);
+if (printlevel>0){">>> after transformation by Algorithm 4 "+string(piecewiseJet(f,wtNP,currentweighteddeg));}
+if (f!=oldf) {return(f);}
+int isparameterdeg=0;
+for (int i=1; i<=size(T[3]);i++){
+   if (currentweighteddeg==piecewisedegree(T[3][i],wtNP)){isparameterdeg=1;break;}
+}
+if ((f==oldf) and isparameterdeg) {return(f);}
+int dprime = piecewisedegree(T[3][1],wtNP);
+if (printlevel>0){"weighted degree of lowest parameter monomial "+string(dprime);}
+poly m = T[3][1];
+list fac = factorize(f0);
+if (fac[2][2]!=2){ERROR("there should be a quadratic factor");}
+poly g0 = fac[1][2];
+if (printlevel>0){"g0= "+string(g0);}
+list philist = vectorfieldToTransformation(list(diff(g0,y),-diff(g0,x)),intvec(3,2),5);
+if (printlevel>0){"automorphism from vectorfield "+string(philist);}
+poly s = coeff(f,m)*m;
+phi = basering, philist[1],philist[2];
+poly tprime = lowestJet(phi(s)-s,intvec(3,2));
+if (printlevel>0){"tprime  = "+string(tprime);}
+tprime = -f0+doEliminationByDegree(tprime+f0,f0,u1,u2,wtNP,currentweighteddeg,mu);
+tprime = lowestJet(tprime,intvec(3,2));
+if (printlevel>0){"tprime after elimination = "+string(tprime);}
+//matrix cc = lift(t,ideal(tprime));
+//"lift "+string(cc);
+//poly c = -cc[1,1];
+poly c = -t/tprime;
+if (printlevel>0){"c= "+string(c);}
+if (c==0){ERROR("c should not be zero");}
+philist = vectorfieldToTransformation(list(c*diff(g0,y),-c*diff(g0,x)),intvec(3,2),5);
+phi = basering, philist[1],philist[2];
+if (printlevel>0){"f0 = "+string(f0);}
+//"before vector field coefficients of x^2*y^5 and y^8 "+string(coeff(f,x^2*y^5))+", "+string(coeff(f,y^8));
+poly ff0=f-f0;
+poly h =f0+phi(ff0);
+//h=jet(h,mu+1);
+h=truncateAtHighestCorner(h);
+//"after vector field coefficients of x^2*y^5 and y^8 "+string(coeff(h,x^2*y^5))+", "+string(coeff(h,y^8));
+h=doEliminationByDegree(h,f0,u1,u2,wtNP,currentweighteddeg,mu);
+//"after elimination coefficients of x^2*y^5 and y^8 "+string(coeff(h,x^2*y^5))+", "+string(coeff(h,y^8));
+if (printlevel>0){"h= "+string(h);}
+return(h);}
+
+static proc doEliminationByDegree(poly f, poly f0, intvec u1, intvec u2, list wtNP, int d,int mu){
+//list Lelim=listOfMonomialsInPiecewiseWeightedDegree(f,wtNP,d);
+list Lelim=allMonomialsInPiecewiseWeightedDegree(wtNP,d);
+if (printlevel>0){"monomials to be considered "+string(Lelim);}
+poly me;
+for (int j=1;j<=size(Lelim);j++){
+       me=Lelim[size(Lelim)-j+1];
+       if (printlevel>0){"eliminating "+string(me)+" with coefficient "+string(coeff(f,me));}
+       if (coeff(f,me)!=0){
+          if (printlevel>0){"before elimination "+string(listOfMonomialsInPiecewiseWeightedDegree(f,wtNP,d));}
+          f=removeMon(f,f0,u1,u2,coeff(f,me)*me);
+          //f=jet(f,mu+1);
+          if (printlevel>0){"after elimination "+string(listOfMonomialsInPiecewiseWeightedDegree(f,wtNP,d));}
+       }
+}
+return(f);}
+
+
+static proc rescaling(Poly G){
+//"rescaling to be implemented";
+return(G);}
+
+static proc eliminateonandabove(Poly fl,list T){
+def R= basering;
+setring(fl.in);
+poly f = fl.value;
+if (printlevel>0){"on and above";}
+if (printlevel>0){"current polynomial = "+string(f);}
+if (printlevel>0){
+   "Type:";
+   T;
+}
+list NP = newtonPolygon(f);
+if (printlevel>0){
+   "Newton polygon = ";
+   NP;
+}
+if (printlevel>0){"on Newton polygon = "+string(termsOnPolygon(f,NP));}
+list NPNF = newtonPolygon(T[2]);
+if (printlevel>0){
+   "Newton polygon normal form = ";
+   NPNF;
+}
+list monfNPNF=monomials(termsOnPolygon(f,NPNF));
+list allmonNPNF=latticeToMonomials(latticePoints(NPNF));
+list nonNFmon=setminus(setminus(allmonNPNF,T[3]),monomials(T[2]));
+list tobeelim=setminus(setminus(monfNPNF,T[3]),monomials(T[2]));
+if (printlevel>0){
+   if (size(nonNFmon)>0) {"Monomials which can be eliminated "+string(nonNFmon);}
+if (size(tobeelim)>0) {"Monomials which have to be eliminated "+string(tobeelim);}
+}
+if (size(tobeelim)>1){
+    if (printlevel>0){"to be implemented";}
+    if (T[1]!="X_9"){ERROR("should be X9");}
+    Poly F=makePoly(f);
+    return(F);
+}
+if (size(tobeelim)==1){
+   tobeelim[1];
+   f=eliminateMonomialOnDiagonal(f,tobeelim[1],NPNF);
+   f=eliminateMonomialsAboveNewtonPolygon(f,T);
+   Poly F=makePoly(f);
+   return(F);
+}
+f=eliminateMonomialsAboveNewtonPolygon(f,T);
+Poly F=makePoly(f);
+return(F);
+}
+
+static proc eliminateMonomialsAboveNewtonPolygon(poly f,list T)
+{
+int Whash;
+if ((T[1][1]=="W") and (T[1][2]=="#")){Whash=1;}
+if (printlevel>0){"eliminate above the newton polygon";}
+list NP = newtonPolygon(T[2]);
+list wtNP = piecewiseWeightOfPolygon(NP);
+if (printlevel>0){"piecewise weight "+string(wtNP);}
+int dprime = piecewisedegree(T[3][size(T[3])],wtNP);
+if (printlevel>0){"weighted degree of highest parameter monomial "+string(dprime);}
+int degdiag = piecewisedegree(terms(T[2])[1],wtNP);
+if (printlevel>0){"weighted degree of diagonal "+string(degdiag);}
+int j;
+poly f0;
+int w1,w2;
+poly me;
+matrix co;
+ideal jac;
+map phi;
+int mu = milnor(f);
+f0=termsOnPolygon(f,NP);
+if (printlevel>0){"On Newton polygon of normal form "+string(f0);}
+int dprimelow = piecewisedegree(T[3][1],wtNP);
+if (printlevel>0){"weighted degree of lowest parameter monomial "+string(dprimelow);}
+for (int d =degdiag+1;d<=dprime;d++){
+    if (printlevel>0){"Considering degree "+string(d);}
+    //list Lelim=listOfMonomialsInPiecewiseWeightedDegree(f,wtNP,d);
+    list Lelim=allMonomialsInPiecewiseWeightedDegree(wtNP,d);
+    if (printlevel>0){"monomials to be eliminated "+string(Lelim);}
+    for (j=1;j<=size(Lelim);j++){
+       me=Lelim[size(Lelim)-j+1];
+       if (printlevel>0){"eliminating "+string(me)+" with coefficient "+string(coeff(f,me));}
+       if (coeff(f,me)!=0){
+        if (size(NP)==1){
+           if (Whash==1) {
+             f=removeMonW(f,f0,intvec(1,1),intvec(1,1),coeff(f,me)*me,T);
+             //f=jet(f,mu+1);
+           } else {
+             f=removeMon(f,f0,intvec(1,1),intvec(1,1),coeff(f,me)*me);
+           }
+        }
+        if (size(NP)==2){
+           jac=jacob(f0);
+           if (idealcontainment(ideal(me),jac)){
+             f=removeMon(f,f0,wtNP[2],wtNP[1],coeff(f,me)*me);
+             //f=jet(f,mu+1);
+           }
+        }
+       }
+    }
+    //"afterwards "+string(piecewiseJet(f,wtNP,d));
+    kill Lelim;
+    me=piecewiseJet(f,wtNP,d);
+    if (printlevel>0){"still to be eliminated or written in Arnold's basis "+string(me);}
+    f0=termsOnPolygon(f,NP);
+    jac = jacob(f0);
+    for (j=1; j<=size(T[3]);j++){
+        if (piecewisedegree(T[3][j],wtNP)==d){jac=jac+ideal(T[3][j]);}
+    }
+    co=lift(jac,me);
+    if (printlevel>0){"coefficients of lift "+string(co);}
+    phi = basering, x-co[1,1],y-co[2,1];
+    f=phi(f);
+    //f=jet(f,mu+1);
+    f=truncateAtHighestCorner(f);
+    if (printlevel>0){">>> after handling current degree "+string(piecewiseJet(f,wtNP,d));}
+}
+poly fjet;
+for (d =degdiag;d<=dprime;d++){
+  fjet=fjet+piecewiseJet(f,wtNP,d);
+}
+if (printlevel>0){">>>>>>>>>>>>>>>>>>>>>>>>>>> after elimination above "+string(fjet);}
+return(fjet);}
+
+static proc listOfMonomialsInPiecewiseWeightedDegree(poly f, list wtNP,int d){
+    poly tobeelim=piecewiseJet(f,wtNP,d);
+    //list NP = newtonPolygon(f);
+    //"On Newton polygon "+string(termsOnPolygon(f,NP));
+    //"Considering jet "+string(tobeelim);
+    if (tobeelim==0){return(list());}
+    def R=basering;
+    list L=ringlist(R);
+    L[3][1][1]="dp";
+    def RR=ring(L);
+    kill L;
+    setring RR;
+    poly tobeelim=fetch(R,tobeelim);
+    list Lelim=monomials(tobeelim);
+    setring R;
+    list Lelim=fetch(RR,Lelim);
+    return(Lelim);
+}
+
+static proc eliminateMonomialOnDiagonal(poly f,poly mon,list NPNF){
+  if (printlevel>0){"weighted linear transformation on diagonal";}
+  def R=basering;
+  list L=ringlist(R);
+  L[2]=L[2]+list("aa");
+  L[3][1][2]=intvec(1,1,1);
+  L[3][1][1]="lp";
+  def RR=ring(L);
+  setring RR;
+  poly f=fetch(R,f);
+  int wx=NPNF[1][1][1];
+  int wy=NPNF[1][1][2];
+  poly ff = subst(f,x,x+aa*y^(wx div wy));
+  poly mon = fetch(R,mon);
+  poly c=coeff2(ff,mon);
+  ring T =0,(aa),dp;
+  poly c=imap(RR,c);
+  if (printlevel>0){"must be zero "+string(c);}
+  def S=absFactorize(c);
+  setring S;
+  list L = absolute_factors;
+  if (printlevel>0){"possible transformations "+string(L);}
+  poly equ;
+  for (int i=2;i<=size(L[1]);i++){if (deg(L[1][i])==1){equ=L[1][i];break;}}
+  if (equ==0){ERROR("There should be a tranformation on the diagonal defined over the current field");}
+  number a1=number(subst(equ,aa,0));
+  number a2=number(diff(equ,aa));
+  number valueforaa=-a1/a2;
+  setring RR;
+  number valueforaa=number(imap(S,valueforaa));
+  if (printlevel>0){"value "+string(valueforaa);}
+  ff=subst(ff,aa,valueforaa);
+  //ff=truncateAtHighestCorner(ff);
+  if (printlevel>0){"after transformation "+string(monomials(termsOnPolygon(ff,NPNF)));}
+  setring R;
+  return(fetch(RR,ff));
+}
+
+static proc determinecase(poly f){
+if (printlevel>0){"Start determinecase";}
+int t=timer;
+int mu=milnor(f);
+if (printlevel>0){
+  "f = "+string(f);
+  "Milnor number "+string(mu);
+}
+list case;
+list NP=newtonPolygon(f);
+list NP1;
+//list lowestordinaryjet1;
+//list lowestordinaryjet=lowestJet(f,intvec(1,1));
+list cases=possibleTypesOfModalityAndCorankUpToTwo(mu);
+int tt=timer;
+//int ttt,tttt,ttt1,tttt1;
+//int lll;
+for (int i=1;i<=size(cases);i++){
+   NP1=newtonPolygon(cases[i][2]);
+   //lowestordinaryjet1=lowestJet(cases[i][2],intvec(1,1));
+   //"-->"+string(compareNormalsOfNewtonPolygons(NP1,NP));
+   //ttt=timer;
+   //lll=compareNormalsOfNewtonPolygons(NP1,NP);
+   //ttt=timer-ttt;
+   //ttt1=ttt1+ttt;
+   //tttt=timer;
+   //lll=(termsOnPolygon(f,NP1)==termsOnPolygon(f,NP));
+   //tttt=timer-tttt;
+   //tttt1=tttt1+tttt;
+   //and (termsOnPolygon(f,NP1)==termsOnPolygon(f,NP))
+   if ((compareNormalsOfNewtonPolygons(NP1,NP))) {case[size(case)+1]=cases[i];}
+}
+if (size(case)==0){return(list());}
+if (size(case)>1){ERROR("Several possible Newton polygons (should not happen) "+string(case));}
+if (printlevel>0){"Time for determinecase "+string(timer-t);}
+//+"  for compare normals "+string(ttt1)+"  for terms "+string(tttt1);
+return(case[1]);
+}
+
+static proc compareLists(list NP1,list NP2){
+if (size(NP1)!=size(NP2)){return(0);}
+for (int i=1;i<=size(NP1);i++){
+   if (not (NP1[i]==NP2[i])){return(0);}
+}
+return(1);}
+
+
+static proc compareNormalsOfNewtonPolygons(list NP1,list NP2){
+if (size(NP1)!=size(NP2)){return(0);}
+for (int i=1;i<=size(NP1);i++){
+   if (not (NP1[i][1]==NP2[i][1])){return(0);}
+}
+return(1);}
+
+static proc possibleTypesOfModalityAndCorankUpToTwo(int mu){
+list cases;
+list individuals = list("E[6]",x^3+y^4,list()),
+list("E[7]",x^3+x*y^3,list()),
+list("E[8]",x^3+y^5,list()),
+list("X[9]",x^4+x^2*y^2+y^4,list(x^2*y^2)),
+list("J[10]",x^3+x^2*y^2+y^6,list(x^2*y^2)),
+list("E[12]",x^3+y^7,list(x*y^5)),
+list("E[13]",x^3+x*y^5,list(y^8)),
+list("E[14]",x^3+y^8,list(x*y^6)),
+list("E[18]",x^3+y^10,list(x*y^7,x*y^8)),
+list("E[19]",x^3+x*y^7,list(y^11,y^12)),
+list("E[20]",x^3+y^11,list(x*y^8,x*y^9)),
+list("Z[11]",x^3*y+y^5,list(x*y^4)),
+list("Z[12]",x^3*y+x*y^4,list(x^2*y^3)),
+list("Z[13]",x^3*y+y^6,list(x*y^5)),
+list("Z[17]",x^3*y+y^8,list(x*y^6,x*y^7)),
+list("Z[18]",x^3*y+x*y^6,list(y^9,y^10)),
+list("Z[19]",x^3*y+y^9,list(x*y^7,x*y^8)),
+list("W[12]",x^4+y^5,list(x^2*y^3)),
+list("W[13]",x^4+x*y^4,list(y^6)),
+list("W[17]",x^4+x*y^5,list(y^7,y^8)),
+list("W[18]",x^4+y^7,list(x^2*y^4,x^2*y^5)),
+list("J[3,0]",x^3+x^2*y^3+y^9,list(x^2*y^3,x*y^7)),
+list("Z[1,0]",x^3*y+x^2*y^3+y^7,list(x^2*y^3,x*y^6)),
+list("W[1,0]",x^4+x^2*y^3+y^6,list(x^2*y^3,x^2*y^4));
+//
+for (int i=1;i<=size(individuals);i++){
+    if (mu==milnor(individuals[i][2])){cases[size(cases)+1]=individuals[i];}
+}
+//
+list families;
+
+if (mu>=1){families[size(families)+1]=list("A["+string(mu)+"]", x^2+y^(mu+1),list())};
+
+if (mu>=4){families[size(families)+1]=list("D["+string(mu)+"]", x^2*y+y^(mu-1),list())};
+
+if (mu>=11){families[size(families)+1] = list("J["+string(mu)+"]", x^3+x^2*y^2+y^(mu-4), list(y^(mu-4)));
+         for (i=1;i<mu-9;i++){families[size(families)+1] = list("Y["+string(4+i)+","+string(4+mu-9-i)+"]", x^(4+i)+x^2*y^2+y^(4+(mu-9-i)),list(x^2*y^2));};
+}
+//
+if (mu>=10){families[size(families)+1]=list("X["+string(mu)+"]", x^4+x^2*y^2+y^(mu-5),list(y^(mu-5)))};
+//
+if (mu>=17){families[size(families)+1]=list("J[3,"+string(mu-16)+"]",x^3+x^2*y^3+y^(mu-7) ,list(y^(mu-7),y^(mu-6)))};
+//
+if(mu>=16){families[size(families)+1]=list("Z[1,"+string(mu-15)+"]",x^3*y+x^2*y^3+y^(mu-8),list(y^(mu-8),y^(mu-7)));
+//
+families[size(families)+1]=list("W[1,"+string(mu-15)+"]",x^4+x^2*y^3+y^(mu-9) ,list(y^(mu-9),y^(mu-8)));
+//
+if (mu mod 2 == 0) {families[size(families)+1]=list("W#[1,"+string(mu-15)+"]",(x^2+y^3)^2+x*y^((mu div 2)-3)+x*y^((mu div 2)-2) ,list(x*y^((mu div 2)-3),x*y^((mu div 2)-2)));}
+//
+if (mu mod 2 == 1) {families[size(families)+1]=list("W#[1,"+string(mu-15)+"]",(x^2+y^3)^2+x^2*y^((mu-9) div 2)+x^2*y^((mu-7) div 2) ,list(x^2*y^((mu-9) div 2),x^2*y^((mu-7) div 2)));}
+};
+//
+cases=cases+families;
+return(cases);}
+
+
+
+static proc findFaces(poly f,list NP,list S0)
+{
+if (printlevel>0){"S0 = "+string(S0);}
+list facescontainingS0;
+list mNPi;
+for (int i=1;i<=size(NP);i++)
+{
+   mNPi=monomials(termsOnPolygon(f,list(NP[i])));
+   if (printlevel>0){
+      "monomials on face "+string(mNPi);
+      "intersection "+string(setintersection(mNPi,S0));
+   }
+   if (size(S0)==size(setintersection(mNPi,S0)))
+   {facescontainingS0[size(facescontainingS0)+1]=NP[i];}
+}
+return(facescontainingS0);}
+
+
+
+static proc highestCornerDeterminacyBound(poly f){
+ ideal I2 = maxideal(2)*jacob(f);
+ ideal I1 = maxideal(1)*jacob(f);
+ ideal I0 = maxideal(0)*jacob(f);
+ int d2 = deg(highcorner(std(I2)));
+ int d1 = 1+deg(highcorner(std(I1)));
+ int d0 = 2+deg(highcorner(std(I0)));
+ //"-------->"+string(d0)+", "+string(d1)+", "+string(d2);
+ return(min(d0,min(d1,d2)));
+}
+
+static proc truncateAtHighestCorner(def f){
+ //int t;
+ if (typeof(f)=="Poly") {
+   //t = timer;
+   ideal I2 = maxideal(2)*jacob(f.value);
+   int d2 = deg(highcorner(std(I2)));
+   //int d2=milnor(f.value)+1;
+   //t=timer-t;
+   //"truncation "+string(deg(f.value))+" -> "+string(d2)+"     "+string(t);
+   Poly F = jet(f.value,d2);
+   return(F);
+ } else {
+   //t = timer;
+   ideal I2 = maxideal(2)*jacob(f);
+   int d2 = deg(highcorner(std(I2)));
+   //int d2=milnor(f)+1;
+   //t=timer-t;
+   //"truncation "+string(deg(f))+" -> "+string(d2)+"     "+string(t);
+   return(jet(f,d2));
+}
+}
+
+
+
+proc complexClassify(Poly fl)
+"USAGE:  complexClassify(fl); fl Poly
+ASSUME:  fl is a bivariate polynomial defining a curve singularity at (0,0) of modality <=2 and corank <=2.
+         The ordering of the basering must be local.@*
+
+RETURN:  A normal form equation g for fl represented by an element of type NormalFormEquation.@*
+
+         Note: So far the final scaling step is not implemented, so to obtain a normal form equation
+         it may be necessary to do a transformation of the form x->lambda1*x, y->lambda2*y@*
+
+         Note: Case X9 is not implemented yet. In this case an error is returned stating that it is case X9.
+
+         g.normalFormEquation.in   stores the polynomial ring containing the normal form equation.@*
+
+         g.normalFormEquation.value is the normal form equation.
+
+         To access the normal form equation as a polynomial do:@*
+
+         def S = g.normalFormEquation.in;@*
+         setring S;@*
+         poly nf = g.normalFormEquation.value;@*
+
+KEYWORDS: Arnold, classification.
+
+EXAMPLE: example complexClassify; shows an example
+
+"
+
+{
+fl=truncateAtHighestCorner(fl);
+def curring=basering;
+int i,j;
+int mu=milnor(fl.value);
+Poly F=doLinearTransformation(fl);
+def S = F.in;
+setring S;
+poly f = F.value;
+poly f0=lowestJet(f,intvec(1,1));
+if (printlevel>0){print("f0 = "+string(f0));}
+list S0 = monomials(f0);
+list NP,mf0,iv;
+poly f1,ff;
+list si,T;
+list delta;
+list ef0;
+list Gamma0;
+list deltalist;
+int foundcorner;
+list si0;
+while (1==1) {
+  NP=newtonPolygon(f);if (printlevel>0){print("Newton polygon ");print(NP);}
+  if (printlevel>0){print("S0 = "+string(S0));}
+  for (i=1;i<=size(S0);i++){
+     ef0[i]=exponentvector(S0[i]);
+  }
+  iv=innerVertices(NP);if (printlevel>0){print("inner vertices "+string(iv)+" exponents "+string(ef0));}
+  si0=setintersection(iv,ef0);
+  for (j=1;j<=size(si0);j++){
+     if ((si0[j][1]!=1) and (si0[j][2]!=1)){si[size(si)+1]=si0[j];}
+  }
+  if (size(si)>0) {
+     if (size(si)>1){ERROR("This set should contain only one element");}
+     if (printlevel>0){print("two face case, corner "+string(si));}
+     if ((si[1]!=intvec(2,2)) and (si[1]!=intvec(2,3))) {ERROR("modality is bigger than 2");}
+     if (printlevel>0){"f="+string(f);}
+     f=dotwofaceelimination(f,si[1]);
+     if (printlevel>0){print("after two face elimination "+string(termsOnPolygon(f,newtonPolygon(f))));}
+     NP=newtonPolygon(f);
+     if (printlevel>0){
+        "Newton polygon ";NP;
+        "si = "+string(si);
+     }
+     Gamma0 = findFaces(f,NP,list(var(1)^si[1][1]*var(2)^si[1][2]));
+     if (printlevel>0){
+        "Gamma0 = "+string(Gamma0);
+     }
+     f1=termsOnPolygon(f,Gamma0);
+     if (printlevel>0){
+       "f1= "+string(f1);
+     }
+     T = determinecase(f1);
+     if (size(T)==0){ERROR("modality is bigger than 2");};
+     if (printlevel>0){"Type "+T[1];}
+     Poly G = eliminateonandabove(f,T);
+     G=rescaling(G);
+     NormalFormEquation NFE;
+     NFE.vars = ringlist(curring)[2];
+     NFE.singularityType=T[1];
+     NFE.milnorNumber =mu;
+     NFE.normalFormEquation=G;
+     NFE.modality=size(T[3]);
+     setring G.in;
+     list para;
+     for (j =1;j<=size(T[3]);j++){para[j]=list(coeff(G.value,T[3][j])*T[3][j]);}
+     NFE.parameters=para;
+     NFE.corank=2;
+     NFE.determinacy=highestCornerDeterminacyBound(G.value);
+     NFE.realCase=0;
+     setring curring;
+     return(NFE);
+  }
+  //delta =  face of NP containing S0
+  deltalist = findFaces(f,NP,S0);
+  //if (size(deltalist)!=1){ERROR("There should be exactly one face containing S0");}
+  delta = deltalist[1];
+  f1=termsOnPolygon(f,list(delta));
+  if (printlevel>0){print("f1= ",string(f1)+" milnor "+string(milnor(f1)));}
+  if (milnor(f1)<>-1) {
+     if (printlevel>0){
+        print("one face case");
+        "----";f1;
+        newtonPolygon(f1);
+     }
+     T = determinecase(f1);
+     if (size(T)==0){ERROR("modality is bigger than 2");}
+     if (printlevel>0){"Type "+T[1];}
+     if (size(T[3])==0){
+        Poly G=makePoly(T[2]);
+        NormalFormEquation NFE;
+        NFE.singularityType=T[1];
+        NFE.milnorNumber =mu;
+        NFE.normalFormEquation=G;
+        NFE.modality=size(T[3]);
+        NFE.parameters=list();
+        NFE.corank=2;
+        NFE.vars = ringlist(curring)[2];
+        if (T[1][1]=="A"){NFE.corank=1;}
+        NFE.determinacy=highestCornerDeterminacyBound(G.value);
+        NFE.realCase=0;
+        setring curring;
+        return(NFE);
+     }
+     Poly G=eliminateonandabove(f,T);
+     G=rescaling(G);
+     NormalFormEquation NFE;
+     NFE.singularityType=T[1];
+     NFE.milnorNumber =mu;
+     NFE.normalFormEquation=G;
+     NFE.modality=size(T[3]);
+     NFE.vars = ringlist(curring)[2];
+     setring G.in;
+     list para;
+     for (j =1;j<=size(T[3]);j++){para[j]=list(coeff(G.value,T[3][j])*T[3][j]);}
+     NFE.parameters=para;
+     NFE.corank=2;
+     NFE.determinacy=highestCornerDeterminacyBound(G.value);
+     NFE.realCase=0;
+     setring curring;
+     return(NFE);
+  }
+  ff=doWeightedLinearTransformation(f,delta);
+  if (ff==0) {
+     // factor of highest multiplicity is not x-non-linear
+     if (not compareLists(monomials(termsOnPolygon(f,list(delta))),monomials(termsOnPolygon((x^2-y^3)^2,list(delta))))) {ERROR("modality is bigger than 2");}
+     mu=milnor(f);
+   if (mu mod 2 == 0) {T=list("W#[1,"+string(mu-15)+"]",(x^2+y^3)^2+x*y^((mu div 2)-3)+x*y^((mu div 2)-2) ,list(x*y^((mu div 2)-3),x*y^((mu div 2)-2)));}
+if (mu mod 2 == 1) {T=list("W#[1,"+string(mu-15)+"]",(x^2+y^3)^2+x^2*y^((mu-9) div 2)+x^2*y^((mu-7) div 2) ,list(x^2*y^((mu-9) div 2),x^2*y^((mu-7) div 2)));}
+     if (printlevel>0){"Type "+T[1];}
+     //Whash cases
+     Poly G=eliminateonandabove(f,T);
+     G=rescaling(G);
+     NormalFormEquation NFE;
+     NFE.singularityType=T[1];
+     NFE.milnorNumber =mu;
+     NFE.normalFormEquation=G;
+     NFE.modality=size(T[3]);
+     NFE.vars = ringlist(curring)[2];
+     setring G.in;
+     list para;
+     for (j =1;j<=size(T[3]);j++){para[j]=list(coeff(G.value,T[3][j])*T[3][j]);}
+     NFE.parameters=para;
+     NFE.corank=2;
+     NFE.determinacy=highestCornerDeterminacyBound(G.value);
+     NFE.realCase=0;
+     setring curring;
+     return(NFE);
+     }
+  f=ff;
+  //f=jet(f,mu+1);
+  f=truncateAtHighestCorner(f);
+  f0=termsOnPolygon(f,list(delta));if (printlevel>0){print("f0= "+string(f0));}
+  S0=monomials(f0);
+}
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R = 0,(x,y),ds;
+  Poly f = -16065*y^9*x-5103*y^9-128*x^7-595*y^9*x^4+6*y^5-21*y^9*x^5-2187*y^7+4*x^2*y^2+12*x*y^3-5102*y^8-4480*x^6*y^2-45359*x^4*y^4-54431*x^2*y^6-19152*x^5*y^3-64258*x^3*y^5-25515*y^7*x-14490*y^9*x^2-4830*y^9*x^3-27208*x*y^8-77490*x^3*y^6-25872*x^5*y^4+20*y^3*x^3+4*x^4*y^2-15116*x^4*y^3+8*x^3*y^2-6384*x^6*y^3+y^6+28*y^3*x^2-6048*x^5*y^2+28*y^4*x+30*y^4*x^2-1344*x^6*y-2835*y^10-51555*x^3*y^7-4235*y^8*x^4-17185*x^4*y^7-22668*x^3*y^4-84*y^5*x^7-5040*y^4*x^6-560*y^3*x^7-280*y^4*x^7-19320*y^5*x^5-2380*y^5*x^6-672*x^6*y^6-40880*x^4*y^6-8610*x^5*y^6-2289*x^5*y^7-38717*y^8*x^2-20384*y^8*x^3+x^8*y^8-x^7*y^7-14*x^7*y^6-105*x^6*y^7-280*x^5*y^8+21*x^6*y^8+8*x^7*y^8+14*y^5*x-20402*y^5*x^2-10204*y^6*x-5670*y^10*x-3234*y^10*x^2-630*y^10*x^3-35*y^10*x^4-189*y^12-945*y^11-y^14-1197*y^11*x-21*y^13-399*y^11*x^2-140*y^12*x-35*y^11*x^3-21*y^12*x^2-7*y^13*x-61803*y^7*x^2-57960*y^5*x^4-448*x^7*y+9*y^4-672*x^7*y^2;
+NormalFormEquation F = complexClassify(f);
+F;
+def S = F.normalFormEquation.in;
+setring S;
+poly nf = F.normalFormEquation.value;
+}
+
+
+
+
+
+proc complexType(Poly fl)
+"USAGE:  complexType(fl); fl Poly
+ASSUME:  fl is a bivariate polynomial defining a curve singularity at (0,0) of modality and corank <=2.
+         The ordering of the basering must be local.@*
+
+RETURN:  A list with the complex type of fl and the modality.@*
+
+
+KEYWORDS: Arnold, classification.
+
+EXAMPLE: example complexType; shows an example
+
+"
+
+{
+fl=truncateAtHighestCorner(fl);
+def curring=basering;
+int i,j;
+int mu=milnor(fl.value);
+Poly F=doLinearTransformation(fl);
+def S = F.in;
+setring S;
+poly f = F.value;
+poly f0=lowestJet(f,intvec(1,1));
+if (printlevel>0){print("f0 = "+string(f0));}
+list S0 = monomials(f0);
+list NP,mf0,iv;
+poly f1,ff;
+list si,T;
+list delta;
+list ef0;
+list Gamma0;
+list deltalist;
+int foundcorner;
+list si0;
+while (1==1) {
+  NP=newtonPolygon(f);if (printlevel>0){print("Newton polygon ");print(NP);}
+  if (printlevel>0){print("S0 = "+string(S0));}
+  for (i=1;i<=size(S0);i++){
+     ef0[i]=exponentvector(S0[i]);
+  }
+  iv=innerVertices(NP);if (printlevel>0){print("inner vertices "+string(iv)+" exponents "+string(ef0));}
+  si0=setintersection(iv,ef0);
+  for (j=1;j<=size(si0);j++){
+     if ((si0[j][1]!=1) and (si0[j][2]!=1)){si[size(si)+1]=si0[j];}
+  }
+  if (size(si)>0) {
+     if (size(si)>1){ERROR("This set should contain only one element");}
+     if (printlevel>0){print("two face case, corner "+string(si));}
+     if ((si[1]!=intvec(2,2)) and (si[1]!=intvec(2,3))) {ERROR("modality is bigger than 2");}
+     if (printlevel>0){"f="+string(f);}
+     f=dotwofaceelimination(f,si[1]);
+     if (printlevel>0){print("after two face elimination "+string(termsOnPolygon(f,newtonPolygon(f)))+" Milnor "+string(milnor(f)));}
+     NP=newtonPolygon(f);
+     if (printlevel>0){
+        "Newton polygon ";NP;
+        "si = "+string(si);
+     }
+     Gamma0 = findFaces(f,NP,list(var(1)^si[1][1]*var(2)^si[1][2]));
+     if (printlevel>0){
+        "Gamma0 = "+string(Gamma0);
+     }
+     f1=termsOnPolygon(f,Gamma0);
+     if (printlevel>0){
+       "f1= "+string(f1);
+     }
+     T = determinecase(f1);
+     if (size(T)==0){ERROR("modality is bigger than 2");};
+     if (printlevel>0){"Type "+T[1];}
+     return(list(T[1],size(T[3])));
+  }
+  //delta =  face of NP containing S0
+  deltalist = findFaces(f,NP,S0);
+  //if (size(deltalist)!=1){ERROR("There should be exactly one face containing S0");}
+  delta = deltalist[1];
+  f1=termsOnPolygon(f,list(delta));
+  if (printlevel>0){print("f1= ",string(f1)+" milnor "+string(milnor(f1)));}
+  if (milnor(f1)<>-1) {
+     if (printlevel>0){
+        print("one face case");
+        "----";f1;
+        newtonPolygon(f1);
+     }
+     T = determinecase(f1);
+     if (size(T)==0){ERROR("modality is bigger than 2");}
+     if (printlevel>0){"Type "+T[1];}
+     if (size(T[3])==0){
+        return(list(T[1],size(T[3])));
+     }
+     return(list(T[1],size(T[3])));
+  }
+  ff=doWeightedLinearTransformation(f,delta);
+  if (ff==0) {
+     // factor of highest multiplicity is not x-non-linear
+     if (not compareLists(monomials(termsOnPolygon(f,list(delta))),monomials(termsOnPolygon((x^2-y^3)^2,list(delta))))) {ERROR("modality is bigger than 2");}
+     mu=milnor(f);
+   if (mu mod 2 == 0) {T=list("W#[1,"+string(mu-15)+"]",(x^2+y^3)^2+x*y^((mu div 2)-3)+x*y^((mu div 2)-2) ,list(x*y^((mu div 2)-3),x*y^((mu div 2)-2)));}
+if (mu mod 2 == 1) {T=list("W#[1,"+string(mu-15)+"]",(x^2+y^3)^2+x^2*y^((mu-9) div 2)+x^2*y^((mu-7) div 2) ,list(x^2*y^((mu-9) div 2),x^2*y^((mu-7) div 2)));}
+     if (printlevel>0){"Type "+T[1];}
+     //Whash cases
+     return(list(T[1],size(T[3])));
+     }
+  f=ff;
+  //f=jet(f,mu+1);
+  f=truncateAtHighestCorner(f);
+  f0=termsOnPolygon(f,list(delta));if (printlevel>0){print("f0= "+string(f0));}
+  S0=monomials(f0);
+}
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R = 0,(x,y),ds;
+  Poly f = -16065*y^9*x-5103*y^9-128*x^7-595*y^9*x^4+6*y^5-21*y^9*x^5-2187*y^7+4*x^2*y^2+12*x*y^3-5102*y^8-4480*x^6*y^2-45359*x^4*y^4-54431*x^2*y^6-19152*x^5*y^3-64258*x^3*y^5-25515*y^7*x-14490*y^9*x^2-4830*y^9*x^3-27208*x*y^8-77490*x^3*y^6-25872*x^5*y^4+20*y^3*x^3+4*x^4*y^2-15116*x^4*y^3+8*x^3*y^2-6384*x^6*y^3+y^6+28*y^3*x^2-6048*x^5*y^2+28*y^4*x+30*y^4*x^2-1344*x^6*y-2835*y^10-51555*x^3*y^7-4235*y^8*x^4-17185*x^4*y^7-22668*x^3*y^4-84*y^5*x^7-5040*y^4*x^6-560*y^3*x^7-280*y^4*x^7-19320*y^5*x^5-2380*y^5*x^6-672*x^6*y^6-40880*x^4*y^6-8610*x^5*y^6-2289*x^5*y^7-38717*y^8*x^2-20384*y^8*x^3+x^8*y^8-x^7*y^7-14*x^7*y^6-105*x^6*y^7-280*x^5*y^8+21*x^6*y^8+8*x^7*y^8+14*y^5*x-20402*y^5*x^2-10204*y^6*x-5670*y^10*x-3234*y^10*x^2-630*y^10*x^3-35*y^10*x^4-189*y^12-945*y^11-y^14-1197*y^11*x-21*y^13-399*y^11*x^2-140*y^12*x-35*y^11*x^3-21*y^12*x^2-7*y^13*x-61803*y^7*x^2-57960*y^5*x^4-448*x^7*y+9*y^4-672*x^7*y^2;
+complexType(f);
+}
+
+
+
+
+
+
+
+
+

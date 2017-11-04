@@ -1074,6 +1074,7 @@ int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
     }
     else
       Warn("internal error: unknown procedure type %d",pi->language);
+    if (currPack->language==LANG_SINGULAR) currPack->language==LANG_MIX;
     return(1);
   }
   else
@@ -1134,6 +1135,12 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
     if(IDPACKAGE(pl)->language==LANG_C)
     {
       if (BVERBOSE(V_LOAD_LIB)) Warn( "%s already loaded as package", newlib);
+      omFree(plib);
+      return FALSE;
+    }
+    else if(IDPACKAGE(pl)->language==LANG_MIX)
+    {
+      if (BVERBOSE(V_LOAD_LIB)) Warn( "%s contain binary parts, cannot load", newlib);
       omFree(plib);
       return FALSE;
     }
@@ -1258,7 +1265,7 @@ void module_help_main(const char *newlib,const char *help)
   {
     package s=currPack;
     currPack=IDPACKAGE(pl);
-    idhdl h=enterid(omStrDup("info"),0,STRING_CMD,&IDROOT,FALSE);
+    idhdl h=enterid("info",0,STRING_CMD,&IDROOT,FALSE);
     IDSTRING(h)=omStrDup(help);
     currPack=s;
   }
@@ -1277,7 +1284,7 @@ void module_help_proc(const char *newlib,const char *p, const char *help)
     buff[255]='\0';
     strncpy(buff,p,255);
     strncat(buff,"_help",255-strlen(p));
-    idhdl h=enterid(omStrDup(buff),0,STRING_CMD,&IDROOT,FALSE);
+    idhdl h=enterid(buff,0,STRING_CMD,&IDROOT,FALSE);
     IDSTRING(h)=omStrDup(help);
     currPack=s;
   }

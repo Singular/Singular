@@ -1430,7 +1430,7 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN *ad
       if (h4->m[i-1]!=NULL)
       {
         p = p_Copy_noCheck(h4->m[i-1], currRing);
-	p_Shift(&p,1,currRing);
+        p_Shift(&p,1,currRing);
         h4->m[i] = p;
       }
       else break;
@@ -1470,7 +1470,6 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN *ad
       h4->m[i] = h4->m[i+1];
     }
     h4->m[IDELEMS(h4)-1] = p;
-    if(!rField_is_Ring(currRing)) si_opt_1 |= Sy_bit(OPT_SB_1);
   }
   idDelete(&temph1);
   //idTest(h4);//see remark at the beginning
@@ -1495,8 +1494,6 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
       res = idFreeModule(h1->rank);
     return res;
   }
-  BITSET old_test1;
-  SI_SAVE_OPT1(old_test1);
   int i, kmax;
   BOOLEAN  addOnlyOne=TRUE;
   tHomog   hom=isNotHomog;
@@ -1525,13 +1522,16 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   ideal s_h3;
   if (addOnlyOne)
   {
+    BITSET old_test1;
+    SI_SAVE_OPT1(old_test1);
+    if(!rField_is_Ring(currRing)) si_opt_1 |= Sy_bit(OPT_SB_1);
     s_h3 = kStd(s_h4,currRing->qideal,hom,&weights1,NULL,0/*kmax-1*/,IDELEMS(s_h4)-1);
+    SI_RESTORE_OPT1(old_test1);
   }
   else
   {
     s_h3 = kStd(s_h4,currRing->qideal,hom,&weights1,NULL,kmax-1);
   }
-  SI_RESTORE_OPT1(old_test1);
   #if 0
   // only together with the above debug stuff
   idSkipZeroes(s_h3);
@@ -2947,17 +2947,36 @@ ideal id_Satstd(const ideal I, ideal J, const ring r)
   idSkipZeroes(J);
   id_satstdSaturatingVariables=(int*)omAlloc0((1+rVar(currRing))*sizeof(int));
   int k=IDELEMS(J);
-  for (int i=0; i<k; i++)
+  if (k>1)
   {
-    poly x = J->m[i];
-    int li = p_Var(x,r);
-    if (li>0)
-      id_satstdSaturatingVariables[li]=1;
-    else
+    for (int i=0; i<k; i++)
     {
-      if (currRing!=save) rChangeCurrRing(save);
-      WerrorS("ideal generators must be variables");
-      return NULL;
+      poly x = J->m[i];
+      int li = p_Var(x,r);
+      if (li>0)
+        id_satstdSaturatingVariables[li]=1;
+      else
+      {
+        if (currRing!=save) rChangeCurrRing(save);
+        WerrorS("ideal generators must be variables");
+        return NULL;
+      }
+    }
+  }
+  else
+  {
+    poly x = J->m[0];
+    for (int i=1; i<=r->N; i++)
+    {
+      int li = p_GetExp(x,i,r);
+      if (li==1)
+        id_satstdSaturatingVariables[i]=1;
+      else if (li>1)
+      {
+        if (currRing!=save) rChangeCurrRing(save);
+        Werror("exponent(x(%d)^%d) must be 0 or 1",i,li);
+        return NULL;
+      }
     }
   }
   ideal res=kStd(I,r->qideal,testHomog,NULL,NULL,0,0,NULL,id_sat_vars_sp);

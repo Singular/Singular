@@ -22,7 +22,7 @@ void ring_set(Ring & R)
       static int ending=0;
       ending++;
       sprintf(name_buffer, "PYTHON_RING_VAR%d",ending);
-      h=enterid(omStrDup(name_buffer),0,RING_CMD,&IDROOT);
+      h=enterid(name_buffer,0,RING_CMD,&IDROOT);
       IDRING(h)=r;
       r->ref++;
     }

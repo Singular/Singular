@@ -652,6 +652,7 @@ elemexpr:
         | extendedid  ARROW BLOCKTOK
           {
             if (iiARROW(&$$,$1,$3)) YYERROR;
+            omFree((ADDRESS)$3)
           }
         | '(' exprlist ')'    { $$ = $2; }
         ;
@@ -1110,10 +1111,7 @@ mat_cmd: MATRIX_CMD
 
 filecmd:
         '<' stringexpr
-          { if ($<i>1 != '<') YYERROR;
-            if((feFilePending=feFopen($2,"r",NULL,TRUE))==NULL) YYERROR; }
-        ';'
-          { newFile($2,feFilePending); }
+          { newFile($2); }
         ;
 
 helpcmd:
@@ -1157,7 +1155,7 @@ killcmd:
             if (v->name!=NULL)
             {
                Werror("`%s` is undefined in kill",v->name);
-	       omFree((ADDRESS)v->name); v->name=NULL;
+               omFree((ADDRESS)v->name); v->name=NULL;
             }
             else               WerrorS("kill what ?");
           }
@@ -1174,7 +1172,7 @@ killcmd:
             if (v->name!=NULL)
             {
                Werror("`%s` is undefined in kill",v->name);
-	       omFree((ADDRESS)v->name); v->name=NULL;
+               omFree((ADDRESS)v->name); v->name=NULL;
             }
             else               WerrorS("kill what ?");
           }

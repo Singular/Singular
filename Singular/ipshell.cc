@@ -2339,7 +2339,7 @@ void rComposeRing(lists L, ring R)
     }
   }
   // ----------------------------------------
-  if ((mpz_cmp_ui(modBase, 1) == 0) && (mpz_cmp_ui(modBase, 0) < 0))
+  if ((mpz_cmp_ui(modBase, 1) == 0) && (mpz_sgn1(modBase) < 0))
   {
     WerrorS("Wrong ground ring specification (module is 1)");
     return;
@@ -2350,7 +2350,7 @@ void rComposeRing(lists L, ring R)
     return;
   }
   // module is 0 ---> integers
-  if (mpz_cmp_ui(modBase, 0) == 0)
+  if (mpz_sgn1(modBase) == 0)
   {
     R->cf=nInitChar(n_Z,NULL);
   }
@@ -5738,7 +5738,7 @@ ring rInit(leftv pn, leftv rv, leftv ord)
     else
       cf=nInitChar(n_Z,NULL);
 
-    if ((mpz_cmp_ui(modBase, 1) == 0) && (mpz_cmp_ui(modBase, 0) < 0))
+    if ((mpz_cmp_ui(modBase, 1) == 0) && (mpz_sgn1(modBase) < 0))
     {
       WerrorS("Wrong ground ring specification (module is 1)");
       goto rInitError;
@@ -5761,7 +5761,7 @@ ring rInit(leftv pn, leftv rv, leftv ord)
       }
       else
       {
-        if (mpz_cmp_ui(modBase,0)==0)
+        if (mpz_sgn1(modBase)==0)
         {
           WerrorS("modulus must not be 0 or parameter not allowed");
           goto rInitError;
@@ -5776,7 +5776,7 @@ ring rInit(leftv pn, leftv rv, leftv ord)
     // just a module m > 1
     else if (cf == NULL)
     {
-      if (mpz_cmp_ui(modBase,0)==0)
+      if (mpz_sgn1(modBase)==0)
       {
         WerrorS("modulus must not be 0 or parameter not allowed");
         goto rInitError;
@@ -6186,7 +6186,7 @@ ideal kGroebner(ideal F, ideal Q)
   idhdl new_ring=NULL;
   if ((currRingHdl==NULL) || (IDRING(currRingHdl)!=currRing))
   {
-    currRingHdl=enterid(omStrDup(" GROEBNERring"),0,RING_CMD,&IDROOT,FALSE);
+    currRingHdl=enterid(" GROEBNERring",0,RING_CMD,&IDROOT,FALSE);
     new_ring=currRingHdl;
     IDRING(currRingHdl)=currRing;
   }
@@ -6276,6 +6276,7 @@ void paPrint(const char *n,package p)
     case LANG_SINGULAR: PrintS("S"); break;
     case LANG_C:        PrintS("C"); break;
     case LANG_TOP:      PrintS("T"); break;
+    case LANG_MAX:      PrintS("M"); break;
     case LANG_NONE:     PrintS("N"); break;
     default:            PrintS("U");
   }

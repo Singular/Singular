@@ -211,7 +211,7 @@ static void specialXGCD(unsigned long& s, unsigned long a, const coeffs r)
   mpz_ptr rr = (mpz_ptr)omAlloc(sizeof(mpz_t));
   mpz_init(rr);
 
-  while (mpz_cmp_ui(v, 0) != 0) /* i.e., while v != 0 */
+  while (mpz_sgn1(v) != 0) /* i.e., while v != 0 */
   {
     mpz_div(q, u, v);
     mpz_mod(rr, u, v);
@@ -225,7 +225,7 @@ static void specialXGCD(unsigned long& s, unsigned long a, const coeffs r)
     mpz_set(v1, v0);
   }
 
-  while (mpz_cmp_ui(u1, 0) < 0) /* i.e., while u1 < 0 */
+  while (mpz_sgn1(u1) < 0) /* i.e., while u1 < 0 */
   {
     /* we add 2^m = (2^m - 1) + 1 to u1: */
     mpz_add_ui(u1, u1, r->mod2mMask);
