@@ -3173,9 +3173,9 @@ proc tst_fpadim()
 /*return (R1); // return the new ring*/
 /*}*/
 
-proc lpSubstitute(poly f, list s1, list s2, list #)
-"USAGE: lpSubstitute(f,s1,s2[,G]); f letterplace polynomial, s1 list of variables
-@*	to replace, s2 list of polynomials to replace with, G optional ideal to
+proc lpSubstitute(poly f, ideal s1, ideal s2, list #)
+"USAGE: lpSubstitute(f,s1,s2[,G]); f letterplace polynomial, s1 list (ideal) of variables
+@*	to replace, s2 list (ideal) of polynomials to replace with, G optional ideal to
 @*	reduce with.
 RETURN: poly, the substituted polynomial
 ASSUME: - basering is a Letterplace ring
@@ -3198,7 +3198,7 @@ EXAMPLE: example lpSubstitute; shows examples
     intvec ivfi = lp2iv(f[i]);
     for (int j = 1; j <= size(ivfi); j++) {
       int varindex = ivfi[j];
-      int subindex = indexof(s1, varindex);
+      int subindex = lpIndexOf(s1, var(varindex));
       if (subindex > 0) {
         s2[subindex] = lpNF(s2[subindex],G);
         fis = lpMult(fis, s2[subindex]);
@@ -3221,8 +3221,8 @@ example {
   ideal G = x(1)*y(2); // optional
 
   poly f = 3*x(1)*x(2)+y(1)*x(2);
-  list s1 = x(1), y(1);
-  list s2 = y(1)*z(2)*z(3), x(1);
+  ideal s1 = x(1), y(1);
+  ideal s2 = y(1)*z(2)*z(3), x(1);
 
   // the substitution probably needs a higher degbound
   int minDegBound = calcSubstDegBounds(f,s1,s2);
@@ -3242,35 +3242,45 @@ example {
   poly f = 3*x(1)*x(2)+y(1)*x(2);
   poly g = z(1)*x(2)+y(1);
   poly h = 7*x(1)*z(2)+x(1);
-  list L = f,g,h;
-  list s1 = x(1), y(1);
-  list s2 = y(1)*z(2)*z(3), x(1);
+  ideal I = f,g,h;
+  ideal s1 = x(1), y(1);
+  ideal s2 = y(1)*z(2)*z(3), x(1);
 
-  int minDegBound = calcSubstDegBounds(L,s1,s2);
+  int minDegBound = calcSubstDegBounds(I,s1,s2);
   setring r;
   def R1 = makeLetterplaceRing(minDegBound);
   setring R1;
 
-  list L = imap(R,L);
-  list s1 = imap(R,s1);
-  list s2 = imap(R,s2);
-  for (int i = 1; i <= size(L); i++) {
-    lpSubstitute(L[i], s1, s2);
+  ideal I = imap(R,I);
+  ideal s1 = imap(R,s1);
+  ideal s2 = imap(R,s2);
+  for (int i = 1; i <= size(I); i++) {
+    lpSubstitute(I[i], s1, s2);
   }
 }
 
-static proc indexof(list L, int varindex) {
-  for (int i = 1; i <= size(L); i++) {
-    if (lp2iv(L[i])[1] == varindex) {
+static proc lpIndexOf(ideal I, poly p) {
+  for (int i = 1; i <= size(I); i++) {
+    if (I[i] == p) {
       return (i);
     }
   }
   return (-1);
 }
 
-proc calcSubstDegBound(poly f, list s1, list s2)
-"USAGE: calcSubstDegBound(f,s1,s2); f letterplace polynomial, s1 list of variables
-@*	to replace, s2 list of polynomials to replace with
+static proc ivIndexOf(list L, intvec iv) {
+  for (int i = 1; i <= size(L); i++) {
+    if (L[i] == iv) {
+      return (i);
+    }
+  }
+  return (-1);
+}
+
+
+proc calcSubstDegBound(poly f, ideal s1, ideal s2)
+"USAGE: calcSubstDegBound(f,s1,s2); f letterplace polynomial, s1 list (ideal) of variables
+@*	to replace, s2 list (ideal) of polynomials to replace with
 RETURN: int, the min degbound required to perform the substitution
 ASSUME: - basering is a Letterplace ring
 EXAMPLE: example lpSubstitute; shows examples
@@ -3282,7 +3292,7 @@ EXAMPLE: example lpSubstitute; shows examples
     int tmpDegBound;
     for (int j = 1; j <= size(ivfi); j++) {
       int varindex = ivfi[j];
-      int subindex = indexof(s1, varindex);
+      int subindex = lpIndexOf(s1, var(varindex));
       if (subindex > 0) {
         tmpDegBound = tmpDegBound + deg(s2[subindex]);
       } else {
@@ -3302,17 +3312,17 @@ EXAMPLE: example lpSubstitute; shows examples
 }
 
 // convenience method
-proc calcSubstDegBounds(list L, list s1, list s2)
-"USAGE: calcSubstDegBounds(L,s1,s2); L list of letterplace polynomials, s1 list
-@*	of variables to replace, s2 list of polynomials to replace with
+proc calcSubstDegBounds(ideal I, ideal s1, ideal s2)
+"USAGE: calcSubstDegBounds(I,s1,s2); I list (ideal) of letterplace polynomials, s1 list (ideal)
+@*	of variables to replace, s2 list (ideal) of polynomials to replace with
 RETURN: int, the min degbound required to perform all of the substitutions
 ASSUME: - basering is a Letterplace ring
 EXAMPLE: example lpSubstitute; shows examples
 "
 {
   int maxDegBound = 0;
-  for (int i = 1; i <= size(L); i++) {
-    int tmpDegBound = calcSubstDegBound(L[i], s1, s2, #);
+  for (int i = 1; i <= size(I); i++) {
+    int tmpDegBound = calcSubstDegBound(I[i], s1, s2, #);
     if (tmpDegBound > maxDegBound) {
       maxDegBound = tmpDegBound;
     }
