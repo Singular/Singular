@@ -51,7 +51,7 @@ void write_enter_id(FILE *fp)
   fprintf(fp, "{\n");
   fprintf(fp, "  idhdl h;\n");
   fprintf(fp, "\n");
-  fprintf(fp, "  h=enterid(omStrDup(name),0, t, &(currPack->idroot), TRUE/*FALSE*/);\n");
+  fprintf(fp, "  h=enterid(name,0, t, &(currPack->idroot), TRUE/*FALSE*/);\n");
   fprintf(fp, "  if(h!=NULL)\n");
   fprintf(fp, "  {\n");
   fprintf(fp, "    switch(t)\n");

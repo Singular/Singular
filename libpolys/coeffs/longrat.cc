@@ -115,7 +115,7 @@ BOOLEAN nlDBTest(number a, const char *f,int l, const coeffs r);
 static inline number nlShort3(number x) // assume x->s==3
 {
   assume(x->s==3);
-  if (mpz_cmp_ui(x->z,0L)==0)
+  if (mpz_sgn1(x->z)==0)
   {
     mpz_clear(x->z);
     FREE_RNUMBER(x);
@@ -148,7 +148,7 @@ static inline number nlShort3(number x) // assume x->s==3
 // #define SR_TO_INT(SR)   (((long)SR) >> 2)
 
 #define MP_SMALL 1
-//#define mpz_isNeg(A) (mpz_cmp_si(A,0L)<0)
+//#define mpz_isNeg(A) (mpz_sgn1(A)<0)
 #define mpz_isNeg(A) ((A)->_mp_size<0)
 #define mpz_limb_size(A) ((A)->_mp_size)
 #define mpz_limb_d(A) ((A)->_mp_d)
@@ -1324,7 +1324,7 @@ static int int_extgcd(int a, int b, int * u, int* x, int * v, int* y)
 number nlShort1(number x) // assume x->s==0/1
 {
   assume(x->s<2);
-  if (mpz_cmp_ui(x->z,0L)==0)
+  if (mpz_sgn1(x->z)==0)
   {
     _nlDelete_NoImm(&x);
     return INT_TO_SR(0);
@@ -1702,7 +1702,7 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
         mpz_mul_si(x,b->n,SR_TO_INT(a));
         mpz_add(u->z,b->z,x);
         mpz_clear(x);
-        if (mpz_cmp_ui(u->z,0L)==0)
+        if (mpz_sgn1(u->z)==0)
         {
           mpz_clear(u->z);
           FREE_RNUMBER(u);
@@ -1751,7 +1751,7 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
             mpz_add(u->z,u->z,x);
             mpz_clear(x);
 
-            if (mpz_cmp_ui(u->z,0L)==0)
+            if (mpz_sgn1(u->z)==0)
             {
               mpz_clear(u->z);
               FREE_RNUMBER(u);
@@ -1774,7 +1774,7 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
           {
             mpz_mul(u->z,b->z,a->n);
             mpz_add(u->z,u->z,a->z);
-            if (mpz_cmp_ui(u->z,0L)==0)
+            if (mpz_sgn1(u->z)==0)
             {
               mpz_clear(u->z);
               FREE_RNUMBER(u);
@@ -1803,7 +1803,7 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
           {
             mpz_mul(u->z,a->z,b->n);
             mpz_add(u->z,u->z,b->z);
-            if (mpz_cmp_ui(u->z,0L)==0)
+            if (mpz_sgn1(u->z)==0)
             {
               mpz_clear(u->z);
               FREE_RNUMBER(u);
@@ -1997,7 +1997,7 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
         mpz_mul_si(x,b->n,SR_TO_INT(a));
         mpz_sub(u->z,x,b->z);
         mpz_clear(x);
-        if (mpz_cmp_ui(u->z,0L)==0)
+        if (mpz_sgn1(u->z)==0)
         {
           mpz_clear(u->z);
           FREE_RNUMBER(u);
@@ -2044,7 +2044,7 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
         mpz_mul_si(x,a->n,SR_TO_INT(b));
         mpz_sub(u->z,a->z,x);
         mpz_clear(x);
-        if (mpz_cmp_ui(u->z,0L)==0)
+        if (mpz_sgn1(u->z)==0)
         {
           mpz_clear(u->z);
           FREE_RNUMBER(u);
@@ -2098,7 +2098,7 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
             mpz_sub(u->z,y,x);
             mpz_clear(x);
             mpz_clear(y);
-            if (mpz_cmp_ui(u->z,0L)==0)
+            if (mpz_sgn1(u->z)==0)
             {
               mpz_clear(u->z);
               FREE_RNUMBER(u);
@@ -2124,7 +2124,7 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
             mpz_mul(x,b->z,a->n);
             mpz_sub(u->z,a->z,x);
             mpz_clear(x);
-            if (mpz_cmp_ui(u->z,0L)==0)
+            if (mpz_sgn1(u->z)==0)
             {
               mpz_clear(u->z);
               FREE_RNUMBER(u);
@@ -2156,7 +2156,7 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
             mpz_mul(x,a->z,b->n);
             mpz_sub(u->z,x,b->z);
             mpz_clear(x);
-            if (mpz_cmp_ui(u->z,0L)==0)
+            if (mpz_sgn1(u->z)==0)
             {
               mpz_clear(u->z);
               FREE_RNUMBER(u);
@@ -2822,7 +2822,7 @@ number nlFarey(number nN, number nP, const coeffs r)
   mpz_init2(E,bits); mpz_set(E,P);
   mpz_init2(tmp,bits);
   number z=INT_TO_SR(0);
-  while(mpz_cmp_si(N,0L)!=0)
+  while(mpz_sgn1(N)!=0)
   {
     mpz_mul(tmp,N,N);
     mpz_add(tmp,tmp,tmp);

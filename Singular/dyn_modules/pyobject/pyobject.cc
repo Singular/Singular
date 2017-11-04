@@ -192,7 +192,7 @@ public:
   }
 
   void import_as(const char* name) const {
-    idhdl handle = enterid(omStrDup(name), 0, DEF_CMD,
+    idhdl handle = enterid(name, 0, DEF_CMD,
                            &IDROOT, FALSE);
 
     if (handle)

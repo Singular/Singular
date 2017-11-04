@@ -263,9 +263,9 @@ static void WriteShort(number a, const coeffs r)
     fmpq_poly_get_coeff_mpq(m,(fmpq_poly_ptr)a,i);
     mpq_get_num(num,m);
     mpq_get_den(den,m);
-    if (mpz_cmp_ui(num,0)!=0)
+    if (mpz_sgn1(num)!=0)
     {
-      if (need_plus && (mpz_cmp_si(num,0)>0))
+      if (need_plus && (mpz_sgn1(num)>0))
         StringAppendS("+");
       need_plus=TRUE;
       int l=mpz_sizeinbase(num,10);

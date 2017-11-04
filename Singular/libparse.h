@@ -17,7 +17,7 @@ typedef enum { LOAD_LIB, GET_INFO } lp_modes;
 #define package void*
 #define BOOLEAN int
 
-typedef enum { LANG_NONE, LANG_TOP, LANG_SINGULAR, LANG_C, LANG_MAX} language_defs;
+typedef enum { LANG_NONE, LANG_TOP, LANG_SINGULAR, LANG_C, LANG_MIX, LANG_MAX} language_defs;
 // LANG_TOP     : Toplevel package only
 // LANG_SINGULAR:
 // LANG_C       :

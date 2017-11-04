@@ -98,7 +98,7 @@ BOOLEAN contBuffer(feBufferTypes typ);
 BOOLEAN exitBuffer(feBufferTypes typ);
 BOOLEAN exitVoice();
 void    monitor(void *F, int mode); /* FILE*, int */
-BOOLEAN newFile(char* fname, FILE *f=NULL);
+BOOLEAN newFile(char* fname);
 void    newBuffer(char* s, feBufferTypes t, procinfo *pname = NULL, int start_lineno = 0);
 void *  myynewbuffer();
 void    myyoldbuffer(void * oldb);

@@ -48,7 +48,6 @@ RETURN:  matrix
 PURPOSE: compute the matrix of a homomorphism Hom(A,R^k), where R is the basering. Let A be a matrix defining a map F1-->F2 of free R-modules, then the matrix of Hom(F2,R^k)-->Hom(F1,R^k) is computed.
 NOTE: if A is matrix of a left (resp. right) R-module homomorphism, then Hom(A,R^k) is a right (resp. left) R-module R-module homomorphism
 EXAMPLE: example contraHom; shows an example.
-SEE ALSO:
 "
 {
   // also possible: compute with kontrahom from homolog_lib

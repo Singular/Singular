@@ -70,14 +70,15 @@ A minimal standard basis is @strong{completely reduced} if for all i: @code{redu
 @subheading Properties
 @table @asis
 @item normal form:
-@cindex Normal form
+@cindex normal form
 @tex
 A function $\hbox{NF} : R^r \times \{G \mid G\ \hbox{ a standard
 basis}\} \to R^r, (p,G) \mapsto \hbox{NF}(p|G)$, is called a {\bf normal
 form} if for any $p \in R^r$ and any standard basis $G$ the following
 holds: if $\hbox{NF}(p|G) \not= 0$ then $L(g)$ does not divide
 $L(\hbox{NF}(p|G))$ for all $g \in G$.
-(Note that such a function is not unique).
+The function may also be applied to any generating set of an ideal:
+the result is then not uniquely defined.
 
 \noindent
 $\hbox{NF}(p|G)$ is called a {\bf normal form of} $p$ {\bf with
@@ -88,7 +89,9 @@ A function NF : R^r x @{G | G a standard basis@} -> R^r, (p,G) ->
 NF(p|G), is called a @strong{normal form} if for any p in R^r and any
 standard basis G the following holds: if NF(p|G) <> 0 then L(g) does not
 divide L(NF(p|G)) for all g in G.
-(Note that such a function is not unique).
+The function may also be applied to any generating set of an ideal:
+the result is then not uniquely defined.
+
 @*NF(p|G) is called a @strong{normal form} of p with respect to G
 @end ifinfo
 @item ideal membership:

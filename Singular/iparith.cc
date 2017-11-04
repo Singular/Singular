@@ -3443,7 +3443,7 @@ static BOOLEAN jjSetRing(leftv, leftv u)
       static int ending=1000000;
       ending++;
       sprintf(name_buffer, "PYTHON_RING_VAR%d",ending);
-      h=enterid(omStrDup(name_buffer),0,RING_CMD,&IDROOT);
+      h=enterid(name_buffer,0,RING_CMD,&IDROOT);
       IDRING(h)=r;
       r->ref++;
     }
@@ -5053,6 +5053,17 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
           Werror("can not create package `%s`",plib);
           omFree(plib);
           return TRUE;
+        }
+        else /* package */
+        {
+          package pa=IDPACKAGE(pl);
+          if ((pa->language==LANG_C)
+          || (pa->language==LANG_MIX))
+          {
+            Werror("can not create package `%s` - binaries  exists",plib);
+            omfree(plib);
+            return TRUE;
+          }
         }
         omFree(plib);
         package savepack=currPack;
