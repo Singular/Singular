@@ -1585,9 +1585,9 @@ static proc ivStandardWords(list G, int length)
 "ASSUME: G is simplified
 "
 {
-  if (length == 0) {
+  if (length <= 0) {
     list words;
-    if (!ivdivides(G,0)) {
+    if (length == 0 && !ivdivides(G,0)) {
       words[1] = 0; // iv = 0 means monom = 1
     }
     return (words); // no standard words
