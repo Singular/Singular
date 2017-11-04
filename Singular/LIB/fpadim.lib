@@ -1214,17 +1214,17 @@ example {
 static proc existsRoute(intmat G, int v, int u, list #)
 "USAGE: existsRoute(G,v,u); G a graph, v and u vertices
 NOTE: don't pass anything to # (internal use for recursion)
+@*    routes always have at least one edge
 "
 {
-  if (v == u) {return (1);}
-
   int n = ncols(G);
 
   // init visited
   intvec visited;
   if (size(#) > 0) {
+    if (v == u) {return (1);} // don't check on first call so |route| >= 1 holds
     visited = #[1];
-  } else {
+  } else { // first call
     visited[n] = 0;
   }
 
@@ -1233,7 +1233,7 @@ NOTE: don't pass anything to # (internal use for recursion)
 
   // recursive DFS
   for (int i = 1; i <= n; i++) {
-    if (G[v,i] && !visited[i]) {
+    if (G[v,i] && (!visited[i] || i == u)) { // i == u to allow routes from u to u
       if (existsRoute(G, i, u, visited)) {
         return (1);
       }
