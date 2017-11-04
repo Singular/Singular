@@ -1199,6 +1199,7 @@ ASSUME: - basering is a Letterplace ring
       }
     }
   }
+
   return (1);
 }
 example {
@@ -1212,7 +1213,7 @@ example {
 
 static proc existsRoute(intmat G, int v, int u, list #)
 "USAGE: existsRoute(G,v,u); G a graph, v and u vertices
-NOTE: don't pass something to # (internal use for recursion)
+NOTE: don't pass anything to # (internal use for recursion)
 "
 {
   if (v == u) {return (1);}
