@@ -1878,7 +1878,8 @@ BOOLEAN rOrd_is_Totaldegree_Ordering(const ring r)
             rOrder_is_DegOrdering(( rRingOrder_t)r->order[1]))) ||
            (rHasSimpleOrderAA(r) &&
             (rOrder_is_DegOrdering((rRingOrder_t)r->order[1]) ||
-             rOrder_is_DegOrdering((rRingOrder_t)r->order[2])))));
+	    ((r->order[1]!=0) &&
+             rOrder_is_DegOrdering((rRingOrder_t)r->order[2]))))));
 }
 
 // return TRUE if p->exp[r->pOrdIndex] holds a weighted degree of p */
