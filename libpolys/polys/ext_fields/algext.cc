@@ -462,8 +462,7 @@ number naMult(number a, number b, const coeffs cf)
 {
   naTest(a); naTest(b);
   if ((a == NULL)||(b == NULL)) return NULL;
-  poly aTimesB = p_Mult_q(p_Copy((poly)a, naRing),
-                          p_Copy((poly)b, naRing), naRing);
+  poly aTimesB = pp_Mult_qq((poly)a, (poly)b, naRing);
   definiteReduce(aTimesB, naMinpoly, cf);
   p_Normalize(aTimesB,naRing);
   return (number)aTimesB;
@@ -622,8 +621,7 @@ number naLcm(number a, number b, const coeffs cf)
   naTest(a); naTest(b);
   if (a == NULL) return NULL;
   if (b == NULL) return NULL;
-  number theProduct = (number)p_Mult_q(p_Copy((poly)a, naRing),
-                                       p_Copy((poly)b, naRing), naRing);
+  number theProduct = (number)pp_Mult_qq((poly)a, (poly)b, naRing);
   /* note that theProduct needs not be reduced w.r.t. naMinpoly;
      but the final division will take care of the necessary reduction */
   number theGcd = naGcd(a, b, cf);
@@ -1545,8 +1543,7 @@ number n2pMult(number a, number b, const coeffs cf)
 {
   n2pTest(a); n2pTest(b);
   if ((a == NULL)||(b == NULL)) return NULL;
-  poly aTimesB = p_Mult_q(p_Copy((poly)a, n2pRing),
-                          p_Copy((poly)b, n2pRing), n2pRing);
+  poly aTimesB = pp_Mult_qq((poly)a, (poly)b, n2pRing);
   return (number)aTimesB;
 }
 
