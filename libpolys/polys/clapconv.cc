@@ -194,7 +194,6 @@ static void convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int
         //z->e[i-1]+=exp[i];
           p_AddExp(z,i,exp[i-par_start],r->cf->extRing);
       }
-      pGetCoeff(term)=(number)ALLOC0_RNUMBER();
       p_GetCoeff(term, r->cf->extRing)=(number) z;
       p_Setm( term,r );
       result = p_Add_q( result, term, r );
