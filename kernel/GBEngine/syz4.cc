@@ -47,6 +47,11 @@ static inline bool check_variables(const std::vector<bool> variables,
         const poly m)
 {
     const ring R = currRing;
+    // variables[R->N] is true iff index == 1, that is, for the first step in
+    // the resolution
+    if (unlikely(variables[R->N])) {
+        return true;
+    }
     for (int j = R->N; j > 0; j--) {
         if (variables[j-1] && p_GetExp(m, j, R) > 0) {
             return true;
@@ -459,8 +464,9 @@ static ideal computeFrame(const ideal G, syzM_i_Function syzM_i,
 static void computeLiftings(const resolvente res, const int index,
         std::vector<bool> &variables)
 {
-    if (index > 1) {   // we don't know if the input is a reduced SB
-        update_variables(variables, res[index-1]);
+    update_variables(variables, res[index-1]);
+    if (index == 2) {   // we don't know if the input is a reduced SB
+        variables[currRing->N] = false;
     }
 #if CACHE
     initialize_cache(res[index-1]->ncols);
@@ -486,7 +492,7 @@ static int computeResolution(resolvente &res, const int max_index,
         index++;
         res[index] = computeFrame(res[index-1], syzM_i_unsorted, syzHead);
         std::vector<bool> variables;
-        variables.resize(currRing->N, true);
+        variables.resize(currRing->N+1, true);
         while (!idIs0(res[index])) {
             if (do_lifting) {
                 computeLiftings(res, index, variables);
