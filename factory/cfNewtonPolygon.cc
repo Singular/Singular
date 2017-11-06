@@ -726,6 +726,7 @@ compress (const CanonicalForm& F, mpz_t*& M, mpz_t*& A, bool computeMA)
   int k= 0;
   Variable alpha;
   mpz_t * exps= new mpz_t [2*size (F)];
+  int exps_maxcount=0;
   int count= 0;
   for (CFIterator i= F; i.hasTerms(); i++)
   {
@@ -752,6 +753,7 @@ compress (const CanonicalForm& F, mpz_t*& M, mpz_t*& A, bool computeMA)
       mpz_init_set (exps[count], expX);
       count++;
       mpz_init_set (exps[count], expY);
+      exps_maxcount=count;
       count++;
       continue;
     }
@@ -771,6 +773,7 @@ compress (const CanonicalForm& F, mpz_t*& M, mpz_t*& A, bool computeMA)
       mpz_init_set (exps[count], expX);
       count++;
       mpz_init_set (exps[count], expY);
+      exps_maxcount=count;
       count++;
       j++;
       k= 1;
@@ -789,6 +792,7 @@ compress (const CanonicalForm& F, mpz_t*& M, mpz_t*& A, bool computeMA)
       mpz_init_set (exps[count], expX);
       count++;
       mpz_init_set (exps[count], expY);
+      exps_maxcount=count;
       count++;
       if (mpz_cmp (minExpY, expY) > 0)
         mpz_set (minExpY, expY);
@@ -835,6 +839,7 @@ compress (const CanonicalForm& F, mpz_t*& M, mpz_t*& A, bool computeMA)
     mpz_mat_inv (M);
   }
 
+  for(int tt=exps_maxcount;tt>=0;tt--) mpz_clear(exps[tt]);
   delete [] exps;
   mpz_clear (expX);
   mpz_clear (expY);
@@ -858,6 +863,7 @@ decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
   mpz_init (minExpY);
 
   mpz_t * exps= new mpz_t [2*size(F)];
+  int max_exps=0;
   int count= 0;
   if (F.isUnivariate() && F.level() == 1)
   {
@@ -877,8 +883,10 @@ decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
     mpz_set (minExpY, expY);
 
     mpz_init_set (exps[count], expX);
-    mpz_init_set (exps[count+1], expY);
-    count += 2;
+    count++;
+    mpz_init_set (exps[count], expY);
+    count++;
+    max_exps=count;
 
     i++;
     for (; i.hasTerms(); i++)
@@ -894,8 +902,10 @@ decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
       mpz_submul (expY, inverseM[3], A[1]);
 
       mpz_init_set (exps[count], expX);
-      mpz_init_set (exps[count+1], expY);
-      count += 2;
+      count++;
+      mpz_init_set (exps[count], expY);
+      max_exps=count;
+      count++;
 
       if (mpz_cmp (minExpY, expY) > 0)
         mpz_set (minExpY, expY);
@@ -910,6 +920,7 @@ decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
     {
       result += i.coeff()*power (x, mpz_get_si (exps[count])-mExpX)*
                 power (y, mpz_get_si (exps[count+1])-mExpY);
+      max_exps=count+1;
       count += 2;
     }
 
@@ -918,6 +929,7 @@ decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
     mpz_clear (minExpX);
     mpz_clear (minExpY);
 
+    for(int tt=max_exps;tt>=0;tt--) mpz_clear(exps[tt]);
     delete [] exps;
     return result/ Lc (result); //normalize
   }
@@ -954,8 +966,10 @@ decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
           mpz_set (minExpX, expX);
       }
       mpz_init_set (exps[count], expX);
-      mpz_init_set (exps[count+1], expY);
-      count += 2;
+      count++;
+      mpz_init_set (exps[count], expY);
+      max_exps=count;
+      count++;
       continue;
     }
     CFIterator j= i.coeff();
@@ -979,8 +993,10 @@ decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
       mpz_set (minExpY, expY);
 
       mpz_init_set (exps[count], expX);
-      mpz_init_set (exps[count+1], expY);
-      count += 2;
+      count++;
+      mpz_init_set (exps[count], expY);
+      max_exps=count;
+      count++;
 
       j++;
       k= 1;
@@ -1003,8 +1019,10 @@ decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
       mpz_addmul (expY, tmp, inverseM[3]);
 
       mpz_init_set (exps[count], expX);
-      mpz_init_set (exps[count+1], expY);
-      count += 2;
+      count++;
+      mpz_init_set (exps[count], expY);
+      max_exps=count;
+      count++;
 
       if (mpz_cmp (minExpY, expY) > 0)
         mpz_set (minExpY, expY);
@@ -1022,6 +1040,7 @@ decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
     {
       result += i.coeff()*power (x, mpz_get_si (exps[count])-mExpX)*
                 power (y, mpz_get_si (exps[count+1])-mExpY);
+      max_exps=count+1;
       count += 2;
       continue;
     }
@@ -1029,6 +1048,7 @@ decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
     {
       result += j.coeff()*power (x, mpz_get_si (exps[count])-mExpX)*
                 power (y, mpz_get_si (exps[count+1])-mExpY);
+      max_exps=count+1;
       count += 2;
     }
   }
@@ -1039,6 +1059,7 @@ decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
   mpz_clear (minExpY);
   mpz_clear (tmp);
 
+  for(int tt=max_exps;tt>=0;tt--) mpz_clear(exps[tt]);
   delete [] exps;
 
   return result/Lc (result); //normalize
