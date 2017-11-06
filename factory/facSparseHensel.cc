@@ -241,6 +241,7 @@ sparseHeuristic (const CanonicalForm& A, const CFList& biFactors,
         }
         delete [] storeFactors;
         delete [] seperator;
+        delete [] normalizingFactors;
         return CFList();
       }
       seperator [i][k]= new int [count + 3];
@@ -399,6 +400,7 @@ sparseHeuristic (const CanonicalForm& A, const CFList& biFactors,
   }
   delete [] seperator;
   delete [] storeFactors;
+  delete [] normalizingFactors;
   //
 
   return result;
