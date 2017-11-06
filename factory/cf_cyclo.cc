@@ -53,7 +53,6 @@ int* integerFactorizer (const long integer, int& length, bool& fail)
 
   long j= 0;
   exp= 0;
-  int* buf;
   int next_prime;
   while ((i != 1) && (j < 31937))
   {
@@ -65,13 +64,14 @@ int* integerFactorizer (const long integer, int& length, bool& fail)
     }
     if (exp != 0)
     {
-      buf= result;
+      int *buf= result;
       result= new int [length + exp];
       for (int k= 0; k < length; k++)
         result [k]= buf[k];
       for (int k= 0; k < exp; k++)
         result [k + length]= next_prime;
       length += exp;
+      delete[] buf;
     }
     exp= 0;
     j++;
