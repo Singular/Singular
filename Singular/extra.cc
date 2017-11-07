@@ -389,33 +389,20 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
    // Hilbert series of non-commutative monomial algebras
   if(strcmp(sys_cmd,"rcolon") == 0)
   {
-    ideal i; poly w; int lV;
-    if((h != NULL)&&(h->Typ() == IDEAL_CMD))
-      i = (ideal)h->Data();
-    else
+    const short t1[]={3,IDEAL_CMD,POLY_CMD,INT_CMD};
+    if (iiCheckTypes(h,t1,1))
     {
-      WerrorS("nc_Hilb:ideal expected");
-      return TRUE;
+      ideal i = (ideal)h->Data();
+      h = h->next;
+      poly w=(poly)h->Data();
+      h = h->next;
+      int lV = (int)(long)h->Data();
+      res->rtyp = IDEAL_CMD;
+      res->data = RightColonOperation(i, w, lV);
+      return(FALSE);
     }
-    h = h->next;
-    if((h != NULL)&&(h->Typ() == POLY_CMD))
-      w=(poly)h->Data();
     else
-    {
-      WerrorS("nc_Hilb:monomial expected");
       return TRUE;
-    }
-    h = h->next;
-    if((h != NULL)&&(h->Typ() == INT_CMD))
-      lV = (int)(long)h->Data();
-    else
-    {
-      WerrorS("nc_Hilb:int expected");
-      return TRUE;
-    }
-    res->rtyp = IDEAL_CMD;
-    res->data = RightColonOperation(i, w, lV);
-    return(FALSE);
   }
   else
 
