@@ -793,7 +793,6 @@ void rKillModifiedRing(ring r);
 void rKillModified_Wp_Ring(ring r);
 
 ring rModifyRing_Simple(ring r, BOOLEAN omit_degree, BOOLEAN omit_comp, unsigned long exp_limit, BOOLEAN &simple);
-void rKillModifiedRing_Simple(ring r);
 
 #ifdef RDEBUG
 void rDebugPrint(const ring r);
