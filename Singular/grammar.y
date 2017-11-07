@@ -1111,7 +1111,7 @@ mat_cmd: MATRIX_CMD
 
 filecmd:
         '<' stringexpr
-          { newFile($2); }
+          { newFile($2); omFree($2); }
         ;
 
 helpcmd:
@@ -1342,6 +1342,7 @@ scriptcmd:
          SYSVAR stringexpr
           {
             if (($1!=LIB_CMD)||(jjLOAD($2,TRUE))) YYERROR;
+	    omFree($2);
           }
         ;
 
