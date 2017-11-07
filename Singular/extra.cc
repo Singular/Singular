@@ -385,7 +385,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return(FALSE);
     }
     else
-
+/*===== rcolon ===============================================*/
+   // Hilbert series of non-commutative monomial algebras
   if(strcmp(sys_cmd,"rcolon") == 0)
   {
     ideal i; poly w; int lV;
