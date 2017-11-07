@@ -356,7 +356,7 @@ resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights)
   int j=0;
   while ((j<i) && hom_complex)
   {
-    hom_complex = hom_complex && (w[i]!=NULL);
+    hom_complex = hom_complex && (w[j]!=NULL);
     j++;
   }
   if ((!hom_complex) || (weights==NULL))
