@@ -9,5 +9,5 @@ ring r=0,(x,y,z),dp;
     module p5=[1,x,z,z,x,z];
 
     list l4=list(p1,p2,p3,p4,p5);
-    nchilb(l4,7,3);
+    nchilb(l4,7,"p");
 tst_status(1);$
