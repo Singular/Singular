@@ -2231,15 +2231,15 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp
   matrix H_serVec = mpNew(lO, 1);
   matrix Hnot;
 
-  std::clock_t start;
-  start = std::clock();
+  //std::clock_t start;
+  //start = std::clock();
 
   luDecomp(gMat, pMat, lMat, uMat, R);
   luSolveViaLUDecomp(pMat, lMat, uMat, cMat, H_serVec, Hnot);
  
   //to print system solving time
-  if(odp){
-  std::cout<<"solving time of the system = "<<(std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000)<<" ms"<<std::endl;}
+  //if(odp){
+  //std::cout<<"solving time of the system = "<<(std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000)<<" ms"<<std::endl;}
 
   mp_Delete(&mR, R);
   mp_Delete(&u, R);
