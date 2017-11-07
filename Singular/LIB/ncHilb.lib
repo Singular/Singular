@@ -1,9 +1,9 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version nc_hilb.lib 4.1.0.0 Nov_2016 "; // $Id$
+version="version nc_hilb.lib 4.1.0.3 Nov_2017 "; // $Id$
 category="Noncommutative algebra";
 info="
 LIBRARY:  ncHilb.lib: A library for computing graded and multi-graded Hilbert
-                      series of non-commutative algebras. It also computes 
+                      series of non-commutative algebras. It also computes
                       the truncated Hilbert series of the algebras whose Hilbert
                       series are possibly not rational or unknown.
 
@@ -36,9 +36,9 @@ proc nchilb(list L_wp, int d, list #)
          #[]=tdeg, for obtaining the truncated Hilbert series up to the
               total degree tdeg-1 (tdeg should be > 2), and
 
-         #[]=string(p), to print the details about the orbit and system of 
+         #[]=string(p), to print the details about the orbit and system of
              equations. Let the orbit is O_I = {T_{w_1}(I),...,T_{w_r}(I)}
-             ($w_i\in W$), where we assume that if T_{w_i}(I)=T_{w_i'}(I)$ 
+             ($w_i\in W$), where we assume that if T_{w_i}(I)=T_{w_i'}(I)$
              for some $w'_i\in W$, then $deg(w_i)\leq deg(w'_i)$.
              Then, it prints words description of orbit: w_1,...,w_r.
              It also prints the maximal degree and the cardinality of
@@ -72,7 +72,7 @@ EXAMPLE: example nchilb; shows an example "
     int i;
     for(i=sz ;i >= 1; i--)
     {
-      if(typeof(#[i])=="string") 
+      if(typeof(#[i])=="string")
       {
         if(#[i]!="")
         {
@@ -248,7 +248,7 @@ example
     nchilb(l5,7,1,2,"p");
 
     nchilb(l5,7,1,2,11,"p");
-    //'11' is to compute the truncated HS up to degree 10. 
+    //'11' is to compute the truncated HS up to degree 10.
 }
 
 proc rcolon(list L_wp, module W, int d)
@@ -257,7 +257,6 @@ proc rcolon(list L_wp, module W, int d)
          w is a monomail
          d is an integer for the degree bound (maximal total degree of
          monomials of the generating set of the input monomial ideal),
-         
 NOTE  : A two-sided monomial ideal and a monomial w for the input should be given
         in a special form. This form is a list of modules, where the generator
         of every module represents a monomial times a coefficient in the free
