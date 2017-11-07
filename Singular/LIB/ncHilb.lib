@@ -1,19 +1,26 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version nc_hilb.lib 4.1.0.0 Nov_2016 "; // $Id$
+version="version nc_hilb.lib 4.1.0.3 Nov_2017 "; // $Id$
 category="Noncommutative algebra";
 info="
 LIBRARY:  ncHilb.lib: A library for computing graded and multi-graded Hilbert
-                      series of the non-commutative monomial algebras
-                      (e.g. k<x,y,z>/I, where I is a two-sided ideal).
+                      series of non-commutative algebras. It also computes
+                      the truncated Hilbert series of the algebras whose Hilbert
+                      series are possibly not rational or unknown.
 
-AUTHOR:   Sharwan K. Tiwari   stiwari@mathematik.uni-kl.de
+AUTHOR:   Sharwan K. Tiwari   shrawant@gmail.com
+          Roberto La Scala
 
 REFERENCES:
           La Scala R.: Monomial right ideals and the Hilbert series of
           non-commutative modules, J. of Symb. Comp. (2016).
 
+          La Scala R., Tiwari Sharwan K.: Multigraded Hilbert Series of
+          noncommutative modules, https://arxiv.org/abs/1705.01083.
+
 PROCEDURES:
-          nchilb(L,d,#); Hilbert series of a non-commutative monomial algebra
+          nchilb(L,d,#); Hilbert series of a non-commutative algebra
+          rcolon(L, w, d); Right colon ideal of a two-sided monomial ideal
+                           with respect to a monomial w
 
 ";
 
@@ -22,19 +29,31 @@ LIB "freegb.lib";
 proc nchilb(list L_wp, int d, list #)
 "USAGE:  nchilb(list of relations, an integer, optional);
          L is a list of modules (each module represents a free-polynomial),
-         d is an integer for the degree bound (maximal total degree of the
-            polynomials of generating set of input ideal),
-         #[]=1 represents the case of non-finitely generated ideals,
-         #[]=2 is for the computation of multi-graded Hilbert series, and
-         #[]=3 is to print the details about the orbit and system of equation.
+         d is an integer for the degree bound (maximal total degree of
+         polynomials of the generating set of the input ideal),
+         #[]=1, computation for non-finitely generated regular ideals,
+         #[]=2, computation of multi-graded Hilbert series,
+         #[]=tdeg, for obtaining the truncated Hilbert series up to the
+              total degree tdeg-1 (tdeg should be > 2), and
 
-NOTE  : The generating set of input ideal should be a Groebner basis and needs
-        to be given in a special form. It is a list of modules, where each
-        generator of every module represents a monomial times a coefficient
-        in the free associative algebra. The first entry, in each generator,
-        represents a coefficient and every next entry is a variable.
-        Ex: module p1=[1,y,z],[-1,z,y] represents the poly y*z-z*y;
-            module p2=[1,x,z,x],[-1,z,x,z] represents the poly x*z*x-z*x*z
+         #[]=string(p), to print the details about the orbit and system of
+             equations. Let the orbit is O_I = {T_{w_1}(I),...,T_{w_r}(I)}
+             ($w_i\in W$), where we assume that if T_{w_i}(I)=T_{w_i'}(I)$
+             for some $w'_i\in W$, then $deg(w_i)\leq deg(w'_i)$.
+             Then, it prints words description of orbit: w_1,...,w_r.
+             It also prints the maximal degree and the cardinality of
+             \sum_j R(w_i, b_j) corresponding to each w_i, where {b_j} is a
+             basis of I. Moreover, it also prints the linear system (for the
+             information about adjacency matrix) and its solving time.
+
+NOTE  : A Groebner basis of two-sided ideal of the input should be given in a
+        special form. This form is a list of modules, where each generator
+        of every module represents a monomial times a coefficient in the free
+        associative algebra. The first entry, in each generator, represents a
+        coefficient and every next entry is a variable.
+
+        Ex: module p1=[1,y,z],[-1,z,y], represents the poly y*z-z*y;
+            module p2=[1,x,z,x],[-1,z,x,z], represents the poly x*z*x-z*x*z
         for more details about the input, see examples.
 EXAMPLE: example nchilb; shows an example "
 {
@@ -46,30 +65,48 @@ EXAMPLE: example nchilb; shows an example "
     def save = basering;
     int sz=size(#);
     int lV=nvars(save);
-    int ig, mgrad, odp;
-    int i=1;
-
+    int ig=0;
+    int mgrad=0;
+    int tdeg=0;
+    string odp="";
+    int i;
+    for(i=sz ;i >= 1; i--)
+    {
+      if(typeof(#[i])=="string")
+      {
+        if(#[i]!="")
+        {
+          odp = "p";
+        }
+        # = delete(#,i);
+        sz = sz-1;
+        break;
+      }
+    }
+    i=1;
+//only one optional parameter (for printing the details) is allowed as a string.
     while(typeof(#[i])=="int" && i<=sz)
     {
-      if(#[i] == 1)
+      if(#[i] == 1 && ig==0)
       {
         ig = 1;
       }
       else
       {
-        if(#[i] == 2)
+        if(#[i] == 2 && mgrad==0)
         {
           mgrad = 2;
         }
         else
         {
-          if(#[i] == 3)
+          if(#[i] > 2 && tdeg==0)
           {
-            odp = 3;
+            tdeg = #[i];
           }
           else
           {
-            ERROR("error:only int 1,2,3 are allowed as optional parameters");
+            ERROR("error: only int 1,2 and >2 are allowed as
+            optional parameters");
           }
         }
       }
@@ -77,9 +114,13 @@ EXAMPLE: example nchilb; shows an example "
     }
     if( i <= sz)
     {
-      ERROR("error:only int 1,2,3 are allowed as optional parameters");
+      ERROR("error:only int 1,2, >2, and a string are allowed as
+       optional parameters");
     }
-    def R = makeLetterplaceRing(2*d);
+    if(tdeg==0)
+    {def R = makeLetterplaceRing(2*d);}
+    else
+    {def R = makeLetterplaceRing(2*(tdeg-1));}
     setring R;
     ideal I;
     poly p;
@@ -127,9 +168,12 @@ EXAMPLE: example nchilb; shows an example "
         J_lm[i]=leadmonom(I[i]);
     }
     //compute the Hilbert series
-
-    system("nc_hilb", J_lm, lV, ig, mgrad, odp);
+    if(odp == "")
+    {system("nc_hilb", J_lm, lV, ig, mgrad,tdeg);}
+    else
+    {system("nc_hilb", J_lm, lV, ig, mgrad,tdeg, odp);}
 }
+
 example
 {
 "EXAMPLE:"; echo = 2;
@@ -172,8 +216,8 @@ example
     module p5=[1,x,z,z,x,z];
 
     list l4=list(p1,p2,p3,p4,p5);
-    nchilb(l4,7,3); //third argument '3' is to print the details
-                    // of the orbit and system
+    nchilb(l4,7,"p"); //third argument "p" is to print the details
+                     // of the orbit and system
 
     ring r=0,(x,y,z),dp;
 
@@ -201,6 +245,109 @@ example
 
     list l5=list(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,
     p14,p15,p16,p17,p18,p19,p20,p21);
-    nchilb(l5,7,1,2,3);
+    nchilb(l5,7,1,2,"p");
+
+    nchilb(l5,7,1,2,11,"p");
+    //'11' is to compute the truncated HS up to degree 10.
+}
+
+proc rcolon(list L_wp, module W, int d)
+"USAGE:  rcolon(list of relations, a monomial, an integer);
+         L is a list of modules (each module represents a monomial),
+         w is a monomail
+         d is an integer for the degree bound (maximal total degree of
+         monomials of the generating set of the input monomial ideal),
+NOTE  : A two-sided monomial ideal and a monomial w for the input should be given
+        in a special form. This form is a list of modules, where the generator
+        of every module represents a monomial times a coefficient in the free
+        associative algebra. The first entry, in each generator, represents a
+        coefficient, that is 1, and every next entry is a variable.
+
+        Ex: module p1=[1,y,z], represents the monomial y*z;
+            module p2=[1,x,z,x], represents the monomial x*z*x
+        for more details about the input, see examples.
+EXAMPLE: example rcolon; shows an example "
+{
+
+    if (d<1)
+    {
+      ERROR("bad degree bound");
+    }
+
+    def save = basering;
+    int lV=nvars(save);
+    int i;
+    def R = makeLetterplaceRing(2*d);
+    setring R;
+    ideal I;
+    poly p; poly q=0;
+    setring save;
+    module M;
+    int k,sw,slm;
+    vector w; poly pc=0;
+    intvec v;
+    slm = size(L_wp);              // number of words in the given ideal
+    for (i=1; i<=slm; i++)
+    {
+      M  = L_wp[i];
+      w = M[1];
+      sw = size(w);
+      for (k=2; k<=sw; k++)
+      {
+        v[k-1]=rvar(w[k]);
+      }
+      pc=w[1];
+      setring R;
+      p=imap(save,pc);
+      for (k=2; k<=sw; k++)
+      {
+        p=p*var(v[k-1]+(k-2)*lV);
+      }
+      q=q+p;
+      I = I,q; //lp-monomial added to I
+      q=0;   //ready for the next monomial
+      setring save;
+    }
+   //=====lp-format for W==============
+    w=W[1];
+    sw = size(w);
+    for (k=2; k<=sw; k++)
+    {
+      v[k-1]=rvar(w[k]);
+    }
+    pc=w[1];
+    setring R;
+    poly wc=imap(save,pc);
+    for (k=2; k<=sw; k++)
+    {
+     wc=wc*var(v[k-1]+(k-2)*lV);
+    }
+    I=simplify(I,2);
+    //
+    ideal J = system("rcolon", I, wc, lV);
+    if(J==1)
+    {"<1>"}
+    else{
+    lp2lstr(J,save);
+    setring save;
+    lst2str(@LN, 1);
+    "+ generators of the given ideal;";}
+ }
+example
+{
+"EXAMPLE:"; echo = 2;
+
+    ring r=0,(X,Y,Z),dp;
+    module w =[1,Y];
+    module p1 =[1,Y,Z];
+    module p2 =[1,Y,Z,X];
+    module p3 =[1,Y,Z,Z,X,Z];
+    module p4 =[1,Y,Z,Z,Z,X,Z];
+    module p5 =[1,Y,Z,Z,Z,Z,X,Z];
+    module p6 =[1,Y,Z,Z,Z,Z,Z,X,Z];
+    module p7 =[1,Y,Z,Z,Z,Z,Z,Z,X,Z];
+    module p8 =[1,Y,Z,Z,Z,Z,Z,Z,Z,X,Z];
+    list l1=list(p1,p2,p3,p4,p5,p6,p7,p8);
+    rcolon(l1,w,10);
 }
 
