@@ -114,11 +114,11 @@ static poly find_reducer(const poly multiplier, const poly t,
 }
 
 #if CACHE
-static poly traverse_tail(poly multiplier, const int comp,
+static poly traverse_tail(const poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
         const lts_hash *hash_previous_module);
 #else
-static poly compute_image(poly multiplier, const int comp,
+static poly compute_image(const poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
         const lts_hash *hash_previous_module);
 #define traverse_tail compute_image
@@ -142,7 +142,7 @@ static poly reduce_term(const poly multiplier, const poly term,
     return s;
 }
 
-static poly compute_image(poly multiplier, const int comp,
+static poly compute_image(const poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
         const lts_hash *hash_previous_module)
 {
@@ -395,7 +395,7 @@ static ideal idConcat(const ideal *M, const int size, const int rank)
     return result;
 }
 
-static int compare_comp(poly p_a, poly p_b)
+static int compare_comp(const poly p_a, const poly p_b)
 {
     const ring r = currRing;
     int comp_a = p_GetComp(p_a, r);
@@ -403,7 +403,7 @@ static int compare_comp(poly p_a, poly p_b)
     return (comp_a > comp_b) - (comp_a < comp_b);
 }
 
-static int compare_deg(poly p_a, poly p_b)
+static int compare_deg(const poly p_a, const poly p_b)
 {
     const ring r = currRing;
     int deg_a = p_Deg(p_a, r);
@@ -411,7 +411,7 @@ static int compare_deg(poly p_a, poly p_b)
     return (deg_a > deg_b) - (deg_a < deg_b);
 }
 
-static int compare_lex(poly p_a, poly p_b)
+static int compare_lex(const poly p_a, const poly p_b)
 {
     int cmp;
     const ring r = currRing;
@@ -494,7 +494,8 @@ static void normalize_input(resolvente res)
     }
 }
 
-static void denormalize_first_syz_module(resolvente res, int comp, number coef)
+static void denormalize_first_syz_module(resolvente res, const int comp,
+        const number coef)
 {
     const ring r = currRing;
     number coef_inv = n_Invers(coef, r->cf);
@@ -522,8 +523,8 @@ static void denormalize_input(resolvente res)
     }
 }
 
-static int computeResolution(resolvente &res, const int max_index,
-        syzHeadFunction *syzHead, bool do_lifting)
+static int computeResolution(resolvente res, const int max_index,
+        syzHeadFunction *syzHead, const bool do_lifting)
 {
     int index = 0;
     if (!idIs0(res[index]) && index < max_index) {
