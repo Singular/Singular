@@ -1104,6 +1104,7 @@ EXAMPLE: example rootIsolationPrimdec; for intersection of two ellipses"
   for (i = 1; i<=size(dc);i++)
   {
     dci = elimpart(dc[i][1]);
+    dci;
     idi = dci[1];
     list keepvar,delvar;
     for (j=1; j<=n;j++)
@@ -1124,25 +1125,36 @@ EXAMPLE: example rootIsolationPrimdec; for intersection of two ellipses"
       RLi[2]=deleteSublist(intvec(delvar[1..size(delvar)]),RLi[2]);
       RLi[3]=list(list("dp",intvec(1:size(keepvar))),list("C",0));
     }
-    def Ri = ring(RLi);
-    setring Ri;
-    ideal idi=imap(R,idi);
-    ri = rootIsolation(idi);
-    setring R;
-    kill Ri;
-    list ivlist;
-    for (l=1;l<=size(ri[2]);l++)
-    {
-      for (j=1; j<=size(keepvar); j++)
+    if (size(keepvar)>0){
+      def Ri = ring(RLi);
+      setring Ri;
+      ideal idi=imap(R,idi);
+      ri = rootIsolation(idi);
+      setring R;
+      kill Ri;
+      list ivlist;
+      for (l=1;l<=size(ri[2]);l++)
       {
-        ivlist[keepvar[j]]=ri[2][l][j];
+        for (j=1; j<=size(keepvar); j++)
+        {
+          ivlist[keepvar[j]]=ri[2][l][j];
+        }
+        for (j=1; j<=size(delvar); j++)
+        {
+          ii = bounds(number(dci[5][delvar[j]]));
+          ivlist[delvar[j]]=ii;
+        }
+        sols[size(sols)+1]=box(ivlist);
       }
-      for (j=1; j<=size(delvar); j++)
-      {
-        ii = bounds(number(dci[5][delvar[j]]));
-        ivlist[delvar[j]]=ii;
-      }
-      sols[size(sols)+1]=box(ivlist);
+    } else {
+        list ivlist;
+        for (j=1; j<=size(delvar); j++)
+        {
+          ii = bounds(number(dci[5][delvar[j]]));
+          ivlist[delvar[j]]=ii;
+        }
+        sols[size(sols)+1]=box(ivlist);
+        
     }
     kill keepvar,delvar,ivlist;
   }
