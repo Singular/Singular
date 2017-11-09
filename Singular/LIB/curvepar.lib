@@ -822,8 +822,7 @@ RETURN:   list L of size 1.
           Param[i][2] is an irredusible polynomial f\in k[a].It is a minimal polynomial for
                       the parameter a.
           Param[i][3] is an integer b--upper bound for the conductor of Weierstrass semigroup
-
-EXAMPLE: example curveparam; shows an example"
+EXAMPLE: example CurveParam; shows an example"
 {
   int i;
   int j;
@@ -882,6 +881,7 @@ EXAMPLE: example curveparam; shows an example"
     {
       dd=boundparam(P[2]);
       if(dd==1){dd=boundparam(P[1]);}
+      dd++;
       P[1]=jet(P[1],dd);
       P[2]=jet(P[2],dd);
       Q[1]=quickSubst(T[1],P[1],P[2],std(f));
