@@ -82,7 +82,7 @@ static void initialize_lts_hash(lts_hash &C, const ideal L)
 
 #define delete_lts_hash(C) C->clear()
 
-poly find_reducer(const poly multiplier, const poly t,
+static poly find_reducer(const poly multiplier, const poly t,
         const lts_hash *hash_previous_module)
 {
     const ring r = currRing;
