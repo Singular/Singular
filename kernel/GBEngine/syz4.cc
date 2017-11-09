@@ -124,7 +124,7 @@ static poly compute_image(poly multiplier, const int comp,
 #define traverse_tail compute_image
 #endif   // CACHE
 
-static inline poly reduce_term(const poly multiplier, const poly term,
+static poly reduce_term(const poly multiplier, const poly term,
         const ideal previous_module, const std::vector<bool> &variables,
         const lts_hash *hash_previous_module)
 {
