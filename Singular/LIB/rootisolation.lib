@@ -941,7 +941,7 @@ EXAMPLE: example rootIsolationNoPreprocessing; exclusion test for intersection
   //help set of boxes
   list lBoxesHelp;
 
-  int i, j, s, cnt;
+  int j, s, cnt;
   int zeroTest;
   int N = nvars(basering);
 
@@ -1104,7 +1104,6 @@ EXAMPLE: example rootIsolationPrimdec; for intersection of two ellipses"
   for (i = 1; i<=size(dc);i++)
   {
     dci = elimpart(dc[i][1]);
-    dci;
     idi = dci[1];
     list keepvar,delvar;
     for (j=1; j<=n;j++)
