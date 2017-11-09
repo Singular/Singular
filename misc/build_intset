@@ -1,0 +1,2 @@
+gcc -shared -DDYNAMIC_VERSION -fPIC -std=c++11 `libsingular-config --cflags` intset.cc -o intset.so
+
