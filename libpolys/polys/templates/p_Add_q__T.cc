@@ -22,11 +22,9 @@ LINKAGE poly p_Add_q__T(poly p, poly q, int &Shorter, const ring r)
 #if PDEBUG > 0
   int l = pLength(p) + pLength(q);
 #endif
+  assume(p!=NULL && q!=NULL);
 
-  // test for trivial cases
   Shorter = 0;
-  if (q == NULL) return p;
-  if (p == NULL) return q;
 
   number t, n1, n2;
   int shorter = 0;

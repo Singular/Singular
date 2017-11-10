@@ -24,7 +24,7 @@ LINKAGE poly p_Mult_nn__T(poly p, const number n, const ring r)
 #ifdef HAVE_ZERODIVISORS
   poly old = NULL;
 #endif
-  while (p != NULL)
+  while (p!=NULL)
   {
 #ifndef HAVE_ZERODIVISORS
     n_InpMult__T(pGetCoeff(p), n, r->cf);
