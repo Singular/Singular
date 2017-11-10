@@ -935,7 +935,10 @@ static inline poly p_Mult_nn(poly p, number n, const ring lmRing,
   poly pnext = pNext(p);
   pNext(p) = NULL;
   p = lmRing->p_Procs->p_Mult_nn(p, n, lmRing);
-  pNext(p) = tailRing->p_Procs->p_Mult_nn(pnext, n, tailRing);
+  if (pnext!=NULL)
+  {
+    pNext(p) = tailRing->p_Procs->p_Mult_nn(pnext, n, tailRing);
+  }
   return p;
 }
 
