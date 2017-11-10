@@ -14,14 +14,6 @@
 #include <vector>
 #include <map>
 
-#ifdef __GNUC__
-#define likely(X)   (__builtin_expect(!!(X), 1))
-#define unlikely(X) (__builtin_expect(!!(X), 0))
-#else
-#define likely(X)   (X)
-#define unlikely(X) (X)
-#endif
-
 #define CACHE 1
 
 static void update_variables(std::vector<bool> &variables, const ideal L)
