@@ -75,8 +75,8 @@ static void initialize_lts_hash(lts_hash &C, const ideal L)
     const int n_elems = L->ncols;
     for (int k = 0; k < n_elems; k++) {
         const poly a = L->m[k];
-        const long comp = __p_GetComp(a, R);
-        C[comp].push_back((lt_struct){a, p_GetShortExpVector(a, R), k});
+        C[__p_GetComp(a, R)].push_back(
+                (lt_struct){a, p_GetShortExpVector(a, R), k});
     }
 }
 
