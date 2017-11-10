@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="version methods.lib 4.1.0.3 Nov_2017 "; //$Id$
 category="Miscellaneous";
 info="
 LIBRARY:  methods.lib    installing methods in Singular
@@ -9,13 +9,13 @@ AUTHORS:  J. Boehm, boehm @ mathematik.uni-kl.de
 OVERVIEW:
 
 Methods select the function to execute by the types of the input tuple.
-The central function is installMethod, which takes a hashtable assocating a tuple of 
+The central function is installMethod, which takes a hashtable assocating a tuple of
 input types to function names and creates a corresponding procedure.
 
-HashTables are lists with arbitrary index sets. They can be created by the 
+HashTables are lists with arbitrary index sets. They can be created by the
 command hashTable. Their size can be determined by the command size. Values
 can be extracted by selectKey or the * operator. HashTables can also be added
-using addHashTables or the + operator. 
+using addHashTables or the + operator.
 
 Methods can be added with the + operator.
 
@@ -24,7 +24,7 @@ Method                the class of all methods
 HashTable             the class of all hash tables
 
 KEYWORDS:
-methods, hashtables     
+methods, hashtables
 
 
 PROCEDURES:
@@ -34,75 +34,73 @@ method                         make a method
 hashTable                      make a HashTable
 selectKey                      select a key in a HashTable, can also be used by *
 addHashTables                  add two HashTables, can also be used by +
-
-
 ";
-
-
 
 proc mod_init()
 {
+  newstruct("HashTable","list keys, list values");
+  system("install","HashTable","print",printHashTable,1);
+  system("install","HashTable","size",sizeHashTable,1);
+  system("install","HashTable","*",selectKey,2);
+  system("install","HashTable","+",addHashTables,2);
 
-newstruct("HashTable","list keys, list values");
-system("install","HashTable","print",printHashTable,1);
-system("install","HashTable","size",sizeHashTable,1);
-system("install","HashTable","*",selectKey,2);
-system("install","HashTable","+",addHashTables,2);
+  newstruct("Method","HashTable functionClosures");
 
-newstruct("Method","HashTable functionClosures");
-
-system("install","Method","print",printMethod,1);
-system("install","Method","+",addMethods,2);
+  system("install","Method","print",printMethod,1);
+  system("install","Method","+",addMethods,2);
 }
 
 
 proc hashTable(list k, list v)
- "USAGE: hashTable(k, v); k,v,lists
- RETURN: makes a HashTable with keys k and values v
- EXAMPLE: example hashTable, shows an example
- "
+"USAGE: hashTable(k, v); k,v,lists
+RETURN: makes a HashTable with keys k and values v
+EXAMPLE: example hashTable, shows an example
+"
 {
   HashTable H;
   H.keys = k;
   H.values = v;
-return(H);
+  return(H);
 }
 example
 { "EXAMPLE:"; echo=2;
-HashTable H = hashTable(list("a","b","c"),list("aa","bb","cc"));
-H;
+  HashTable H = hashTable(list("a","b","c"),list("aa","bb","cc"));
+  H;
 }
 
 
-proc printHashTable(HashTable H){
+proc printHashTable(HashTable H)
+{
   for (int j=1; j<=size(H); j++)
   {
     print(string((H.keys)[j])+" => "+string((H.values)[j]));
   }
-};
+}
 
-proc sizeHashTable(HashTable H){
-return(size(H.keys));}
+proc sizeHashTable(HashTable H)
+{
+  return(size(H.keys));
+}
 
 
 proc selectKey(HashTable H, def k)
- "USAGE: selectKey(H, k); H HashTable, k key
- RETURN: returns the k-th value of H
- EXAMPLE: example selectKey, shows an example
- "
+"USAGE: selectKey(H, k); H HashTable, k key
+RETURN: returns the k-th value of H
+EXAMPLE: example selectKey, shows an example
+"
 {
-for (int j=1; j<=size(H); j++)
+  for (int j=1; j<=size(H); j++)
   {
     if ((H.keys)[j]==k){return((H.values)[j]);}
   }
-ERROR("key not found");
+  ERROR("key not found");
 }
 example
 { "EXAMPLE:"; echo=2;
-HashTable H = hashTable(list("a","b","c"),list("aa","bb","cc"));
-selectKey(H,"b");
-selectKey(H,"d");
-H*"b";
+  HashTable H = hashTable(list("a","b","c"),list("aa","bb","cc"));
+  selectKey(H,"b");
+  selectKey(H,"d");
+  H*"b";
 }
 
 
@@ -113,21 +111,18 @@ proc addHashTables(HashTable H, HashTable W)
  EXAMPLE: example addHashTables, shows an example
  "
 {
-HashTable D;
-D.keys = (H.keys)+(W.keys);
-D.values = (H.values)+(W.values);
-return(D);
+  HashTable D;
+  D.keys = (H.keys)+(W.keys);
+  D.values = (H.values)+(W.values);
+  return(D);
 }
 example
 { "EXAMPLE:"; echo=2;
-HashTable H = hashTable(list("a","b","c"),list("aa","bb","cc"));
-HashTable W = hashTable(list("d","e","f"),list("aa","bb","cc"));
-addHashTables(H,W);
-H+W;
+  HashTable H = hashTable(list("a","b","c"),list("aa","bb","cc"));
+  HashTable W = hashTable(list("d","e","f"),list("aa","bb","cc"));
+  addHashTables(H,W);
+  H+W;
 }
-
-
-
 
 proc method(HashTable #)
 {
@@ -142,30 +137,27 @@ proc method(HashTable #)
     //H.values=list(#[2]);
     //M.functionClosures = H;
   //}
-return(M);}
+  return(M);
+}
 
 proc printMethod(Method f)
 {
-print(f.functionClosures);
+  print(f.functionClosures);
 }
-
-
 
 proc addMethods(Method f, Method g)
 {
   Method M;
   HashTable H = (f.functionClosures)+(g.functionClosures);
   M.functionClosures = H;
-return(M);}
-
-
-
+  return(M);
+}
 
 proc installMethod(Method M,string fname)
- "USAGE: installMethod(M, st); M Method, st string
- RETURN: installs a method calling procedures according to M
- EXAMPLE: example installMethod, shows an example
- "
+"USAGE: installMethod(M, st); M Method, st string
+RETURN: installs a method calling procedures according to M
+EXAMPLE: example installMethod, shows an example
+"
 {
   HashTable H = M.functionClosures;
   //string fname = nameof(M);
@@ -187,35 +179,32 @@ proc installMethod(Method M,string fname)
  };
   s=s+"ERROR(\"No method found\");}";
   //s;
-intvec o=option(get);
-option(noredefine);
-execute(s);
-execute("exportto(Top,"+fname+");");
-option(set,o);
-};
+  intvec o=option(get);
+  option(noredefine);
+  execute(s);
+  execute("exportto(Top,"+fname+");");
+  option(set,o);
+}
 example
 { "EXAMPLE:"; echo=2;
-proc square(int i){return(i^2);};
-HashTable H1 = hashTable(list(list("int")),list("square"));
-Method m1 = method(H1);
-installMethod(m1,"tst");
-tst(2);
-proc kbase2(ideal I,int n){return(kbase(I,n));}
-HashTable H2 = hashTable(list(list("ideal","int")),list("kbase2"));
-Method m2=method(H2);
-Method m=m1+m2;
-installMethod(m,"tst");
-ring R=0,(x,y),dp;
-ideal I = x^3,y^7;
-I=std(I);
-tst(I,2);
-HashTable F = hashTable(list(list("int"),list("ideal","int")),list("square","kbase2"));
-Method m3 = method(F);
-installMethod(m3,"tst");
-tst(I,2);
-tst(3);
+  proc square(int i){return(i^2);};
+  HashTable H1 = hashTable(list(list("int")),list("square"));
+  Method m1 = method(H1);
+  installMethod(m1,"tst");
+  tst(2);
+  proc kbase2(ideal I,int n){return(kbase(I,n));}
+  HashTable H2 = hashTable(list(list("ideal","int")),list("kbase2"));
+  Method m2=method(H2);
+  Method m=m1+m2;
+  installMethod(m,"tst");
+  ring R=0,(x,y),dp;
+  ideal I = x^3,y^7;
+  I=std(I);
+  tst(I,2);
+  HashTable F = hashTable(list(list("int"),list("ideal","int")),list("square","kbase2"));
+  Method m3 = method(F);
+  installMethod(m3,"tst");
+  tst(I,2);
+  tst(3);
 }
-
-
-
 
