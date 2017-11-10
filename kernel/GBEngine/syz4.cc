@@ -525,10 +525,10 @@ static int computeResolution(resolvente res, const int max_index,
         syzHeadFunction *syzHead, const bool do_lifting)
 {
     int index = 0;
-    if (!idIs0(res[index]) && index < max_index) {
+    if (!idIs0(res[0]) && 0 < max_index) {
         index++;
         normalize_input(res);
-        res[index] = computeFrame(res[index-1], syzM_i_unsorted, syzHead);
+        res[1] = computeFrame(res[0], syzM_i_unsorted, syzHead);
         std::vector<bool> variables;
         variables.resize(currRing->N+1, true);
         while (!idIs0(res[index])) {
