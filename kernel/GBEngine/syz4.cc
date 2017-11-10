@@ -262,16 +262,14 @@ static void id_DelDiv_no_test(ideal id)
     int i, j;
     int k = IDELEMS(id)-1;
     for (i = k; i >= 0; i--) {
-        if (id->m[i] != NULL) {
-            for (j = k; j > i; j--) {
-                if (id->m[j] != NULL) {
-                    if (p_DivisibleBy(id->m[i], id->m[j], r)) {
-                        p_Delete(&id->m[j], r);
-                    }
-                    else if (p_DivisibleBy(id->m[j], id->m[i], r)) {
-                        p_Delete(&id->m[i], r);
-                        break;
-                    }
+        for (j = k; j > i; j--) {
+            if (id->m[j] != NULL) {
+                if (p_DivisibleBy(id->m[i], id->m[j], r)) {
+                    p_Delete(&id->m[j], r);
+                }
+                else if (p_DivisibleBy(id->m[j], id->m[i], r)) {
+                    p_Delete(&id->m[i], r);
+                    break;
                 }
             }
         }
