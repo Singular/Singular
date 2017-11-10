@@ -393,16 +393,16 @@ static ideal idConcat(const ideal *M, const int size, const int rank)
 static int compare_comp(const poly p_a, const poly p_b)
 {
     const ring r = currRing;
-    int comp_a = p_GetComp(p_a, r);
-    int comp_b = p_GetComp(p_b, r);
+    long comp_a = __p_GetComp(p_a, r);
+    long comp_b = __p_GetComp(p_b, r);
     return (comp_a > comp_b) - (comp_a < comp_b);
 }
 
 static int compare_deg(const poly p_a, const poly p_b)
 {
     const ring r = currRing;
-    int deg_a = p_Deg(p_a, r);
-    int deg_b = p_Deg(p_b, r);
+    long deg_a = p_Deg(p_a, r);
+    long deg_b = p_Deg(p_b, r);
     return (deg_a > deg_b) - (deg_a < deg_b);
 }
 
