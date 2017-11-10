@@ -446,7 +446,7 @@ static ideal computeFrame(const ideal G, syzM_i_Function syzM_i,
             omFreeBin(M[i], sip_sideal_bin);
         }
     }
-    omFree(M);
+    omfree(M);
     qsort(frame->m, frame->ncols, sizeof(poly), compare_Mi);
     return frame;
 }
