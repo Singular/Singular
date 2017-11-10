@@ -568,7 +568,7 @@ KINLINE void sLObject::Tail_Mult_nn(number n)
   {
     poly _p = (t_p != NULL ? t_p : p);
     assume(_p != NULL);
-    if (pNext(_p)!=NULL) pNext(_p) = __p_Mult_nn(pNext(_p), n, tailRing);
+    pNext(_p) = __p_Mult_nn(pNext(_p), n, tailRing);
   }
 }
 
