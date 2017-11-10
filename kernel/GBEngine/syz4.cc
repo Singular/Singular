@@ -202,11 +202,8 @@ static void delete_cache(const int size)
 static void insert_into_cache_term(cache_term *T, const poly multiplier,
         const poly p)
 {
-    cache_term::iterator itr = T->find(multiplier);
-    if (itr == T->end()) {
-        const ring r = currRing;
-        T->insert(cache_term::value_type(p_Head(multiplier, r), p_Copy(p, r)));
-    }
+    const ring r = currRing;
+    T->insert(cache_term::value_type(p_Head(multiplier, r), p_Copy(p, r)));
 }
 
 static poly get_from_cache_term(const cache_term::iterator itr,
