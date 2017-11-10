@@ -587,21 +587,15 @@ static void insert_ext_induced_LTs(const resolvente res, const int length)
     }
 }
 
-static void remove_tails(resolvente res)
-{
-    const ring r = currRing;
-    for (int i = 0; i < res[0]->ncols; i++) {
-        if (res[0]->m[i]->next != NULL) {
-            p_Delete(&(res[0]->m[i]->next), r);
-        }
-    }
-}
-
 syStrategy syFrank(const ideal arg, const int length, const char *method)
 {
     syStrategy result = (syStrategy)omAlloc0(sizeof(ssyStrategy));
     resolvente res = (resolvente)omAlloc0((length+1)*sizeof(ideal));
-    res[0] = id_Copy(arg, currRing);
+    if (strcmp(method, "frame") != 0) {
+        res[0] = id_Copy(arg, currRing);
+    } else {
+        res[0] = id_Head(arg, currRing);
+    }
     syzHeadFunction *syzHead;
     bool do_lifting;
     set_options(&syzHead, &do_lifting, method);
@@ -612,8 +606,6 @@ syStrategy syFrank(const ideal arg, const int length, const char *method)
     }
     if (strcmp(method, "frame") != 0) {
         insert_ext_induced_LTs(res, new_length);
-    } else {
-        remove_tails(res);
     }
     result->fullres = res;
     result->length = new_length;
