@@ -19,8 +19,8 @@ LINKAGE poly p_Mult_mm__T(poly p, const poly m, const ring ri)
 {
   p_Test(p, ri);
   p_LmTest(m, ri);
-  if (p == NULL) return NULL;
   pAssume(m != NULL);
+  assume(p!=NULL);
   poly q = p;
   number ln = pGetCoeff(m);
   number pn;
