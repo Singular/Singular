@@ -27,7 +27,7 @@
 static void update_variables(std::vector<bool> &variables, const ideal L)
 {
     const ring R = currRing;
-    const int l = IDELEMS(L)-1;
+    const int l = L->ncols-1;
     int k;
     for (int j = R->N; j > 0; j--) {
         if (variables[j-1]) {
@@ -72,7 +72,7 @@ typedef std::map<long, lts_vector> lts_hash;
 static void initialize_lts_hash(lts_hash &C, const ideal L)
 {
     const ring R = currRing;
-    const int n_elems = IDELEMS(L);
+    const int n_elems = L->ncols;
     for (int k = 0; k < n_elems; k++) {
         const poly a = L->m[k];
         const long comp = __p_GetComp(a, R);
@@ -261,7 +261,7 @@ static void id_DelDiv_no_test(ideal id)
 {
     const ring r = currRing;
     int i, j;
-    int k = IDELEMS(id)-1;
+    int k = id->ncols-1;
     for (i = k; i >= 0; i--) {
         for (j = k; j > i; j--) {
             if (id->m[j] != NULL) {
@@ -449,12 +449,12 @@ static ideal computeFrame(const ideal G, syzM_i_Function syzM_i,
     ideal frame = idConcat(M, G->ncols-1, G->ncols);
     for (int i = G->ncols-2; i >= 0; i--) {
         if (M[i] != NULL) {
-            omFreeSize(M[i]->m, IDELEMS(M[i])*sizeof(poly));
+            omFreeSize(M[i]->m, M[i]->ncols*sizeof(poly));
             omFreeBin(M[i], sip_sideal_bin);
         }
     }
     omFree(M);
-    qsort(frame->m, IDELEMS(frame), sizeof(poly), compare_Mi);
+    qsort(frame->m, frame->ncols, sizeof(poly), compare_Mi);
     return frame;
 }
 
