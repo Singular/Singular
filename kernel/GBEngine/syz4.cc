@@ -63,7 +63,7 @@ static inline bool check_variables(const std::vector<bool> variables,
 typedef struct {
     poly lt;
     unsigned long sev;
-    int comp;
+    unsigned long comp;
 } lt_struct;
 
 typedef std::vector<lt_struct> lts_vector;
@@ -72,11 +72,12 @@ typedef std::map<long, lts_vector> lts_hash;
 static void initialize_lts_hash(lts_hash &C, const ideal L)
 {
     const ring R = currRing;
-    const int n_elems = L->ncols;
-    for (int k = 0; k < n_elems; k++) {
+    const unsigned long n_elems = L->ncols;
+    unsigned long k = 0;
+    while (k < n_elems) {
         const poly a = L->m[k];
         C[__p_GetComp(a, R)].push_back(
-                (lt_struct){a, p_GetShortExpVector(a, R), k});
+                (lt_struct){a, p_GetShortExpVector(a, R), ++k});
     }
 }
 
@@ -104,7 +105,7 @@ static poly find_reducer(const poly multiplier, const poly t,
         }
         p_MemAdd_NegWeightAdjust(q, r);
         p_ExpVectorDiff(q, q, itr_curr->lt, r);
-        p_SetComp(q, (unsigned long)(itr_curr->comp)+1, r);
+        p_SetComp(q, itr_curr->comp, r);
         p_Setm(q, r);
         number n = n_Mult(p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
         p_SetCoeff0(q, n_InpNeg(n, r), r);
