@@ -75,7 +75,7 @@ static void initialize_lts_hash(lts_hash &C, const ideal L)
     const int n_elems = IDELEMS(L);
     for (int k = 0; k < n_elems; k++) {
         const poly a = L->m[k];
-        const long comp = p_GetComp(a, R);
+        const long comp = __p_GetComp(a, R);
         C[comp].push_back((lt_struct){a, p_GetShortExpVector(a, R), k});
     }
 }
@@ -86,7 +86,8 @@ static poly find_reducer(const poly multiplier, const poly t,
         const lts_hash *hash_previous_module)
 {
     const ring r = currRing;
-    lts_hash::const_iterator itr = hash_previous_module->find(p_GetComp(t, r));
+    lts_hash::const_iterator itr
+        = hash_previous_module->find(__p_GetComp(t, r));
     if (unlikely(itr == hash_previous_module->end())) {
         return NULL;
     }
@@ -133,7 +134,7 @@ static poly reduce_term(const poly multiplier, const poly term,
         return NULL;
     }
     const ring r = currRing;
-    const int c = p_GetComp(s, r) - 1;
+    const int c = __p_GetComp(s, r) - 1;
     const poly t = traverse_tail(s, c, previous_module, variables,
             hash_previous_module);
     if (unlikely(t != NULL)) {
@@ -243,10 +244,10 @@ static poly lift_ext_LT(const poly a, const ideal previous_module,
         const lts_hash *hash_previous_module)
 {
     const ring R = currRing;
-    poly t1 = compute_image(a, p_GetComp(a, R)-1, previous_module, variables,
+    poly t1 = compute_image(a, __p_GetComp(a, R)-1, previous_module, variables,
             hash_previous_module);
-    poly t2 = traverse_tail(a->next, p_GetComp(a->next, R)-1, previous_module,
-            variables, hash_previous_module);
+    poly t2 = traverse_tail(a->next, __p_GetComp(a->next, R)-1,
+            previous_module, variables, hash_previous_module);
     t1 = p_Add_q(t1, t2, R);
     return t1;
 }
@@ -327,17 +328,18 @@ typedef ideal syzM_i_Function(ideal, int, syzHeadFunction);
 static ideal syzM_i_unsorted(const ideal G, const int i,
         syzHeadFunction *syzHead)
 {
+    const ring r = currRing;
     ideal M_i = NULL;
-    int comp = pGetComp(G->m[i]);
+    int comp = __p_GetComp(G->m[i], r);
     int ncols = 0;
     for (int j = i-1; j >= 0; j--) {
-        if (pGetComp(G->m[j]) == comp) ncols++;
+        if (__p_GetComp(G->m[j], r) == comp) ncols++;
     }
     if (ncols > 0) {
         M_i = idInit(ncols, G->ncols);
         int k = ncols-1;
         for (int j = i-1; j >= 0; j--) {
-            if (pGetComp(G->m[j]) == comp) {
+            if (__p_GetComp(G->m[j], r) == comp) {
                 M_i->m[k] = syzHead(G, i, j);
                 k--;
             }
@@ -351,10 +353,11 @@ static ideal syzM_i_unsorted(const ideal G, const int i,
 static ideal syzM_i_sorted(const ideal G, const int i,
         syzHeadFunction *syzHead)
 {
+    const ring r = currRing;
     ideal M_i = NULL;
-    int comp = pGetComp(G->m[i]);
+    int comp = __p_GetComp(G->m[i], r);
     int index = i-1;
-    while (pGetComp(G->m[index]) == comp) index--;
+    while (__p_GetComp(G->m[index], r) == comp) index--;
     index++;
     int ncols = i-index;
     if (ncols > 0) {
@@ -497,7 +500,7 @@ static void denormalize_first_syz_module(resolvente res, const int comp,
     for (int i = 0; i < res[1]->ncols; i++) {
         poly p = res[1]->m[i];
         while (p != NULL) {
-            if (unlikely(pGetComp(p) == comp)) {
+            if (unlikely(__p_GetComp(p, r) == comp)) {
                 n_InpMult(pGetCoeff(p), coef_inv, r->cf);
             }
             pIter(p);
