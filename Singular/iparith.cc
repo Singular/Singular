@@ -2232,7 +2232,7 @@ static BOOLEAN jjFRES3(leftv res, leftv u, leftv v, leftv w)
 
 static BOOLEAN jjFRES(leftv res, leftv u, leftv v)
 {
-    leftv w = (leftv)omalloc0(sizeof(sleftv));
+    leftv w = (leftv)omAlloc0(sizeof(sleftv));
     w->rtyp = STRING_CMD;
     w->data = (char *)"complete";   // default
     BOOLEAN RES = jjFRES3(res, u, v, w);
