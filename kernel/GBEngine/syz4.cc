@@ -15,8 +15,8 @@
 #include <map>
 
 #ifdef __GNUC__
-#define likely(X)   (__builtin_expect(X, 1))
-#define unlikely(X) (__builtin_expect(X, 0))
+#define likely(X)   (__builtin_expect(!!(X), 1))
+#define unlikely(X) (__builtin_expect(!!(X), 0))
 #else
 #define likely(X)   (X)
 #define unlikely(X) (X)
@@ -53,7 +53,7 @@ static inline bool check_variables(const std::vector<bool> variables,
         return true;
     }
     for (int j = R->N; j > 0; j--) {
-        if (variables[j-1] && p_GetExp(m, j, R) > 0) {
+        if (unlikely(variables[j-1] && p_GetExp(m, j, R) > 0)) {
             return true;
         }
     }
@@ -87,7 +87,7 @@ static poly find_reducer(const poly multiplier, const poly t,
 {
     const ring r = currRing;
     lts_hash::const_iterator itr = hash_previous_module->find(p_GetComp(t, r));
-    if (itr == hash_previous_module->end()) {
+    if (unlikely(itr == hash_previous_module->end())) {
         return NULL;
     }
     lts_vector::const_iterator itr_curr = (itr->second).begin();
@@ -97,7 +97,7 @@ static poly find_reducer(const poly multiplier, const poly t,
     p_MemSum_LengthGeneral(q->exp, multiplier->exp, t->exp, r->ExpL_Size);
     const unsigned long q_not_sev = ~p_GetShortExpVector(q, r);
     for( ; itr_curr != itr_end; ++itr_curr) {
-        if (itr_curr->sev & q_not_sev
+        if (likely(itr_curr->sev & q_not_sev)
                 || unlikely(!(_p_LmDivisibleByNoComp(itr_curr->lt, q, r)))) {
             continue;
         }
@@ -136,7 +136,7 @@ static poly reduce_term(const poly multiplier, const poly term,
     const int c = p_GetComp(s, r) - 1;
     const poly t = traverse_tail(s, c, previous_module, variables,
             hash_previous_module);
-    if (t != NULL) {
+    if (unlikely(t != NULL)) {
         s = p_Add_q(s, t, r);
     }
     return s;
@@ -147,7 +147,7 @@ static poly compute_image(const poly multiplier, const int comp,
         const lts_hash *hash_previous_module)
 {
     const poly tail = previous_module->m[comp]->next;
-    if (tail == NULL || !check_variables(variables, multiplier)) {
+    if (unlikely(tail == NULL) || !check_variables(variables, multiplier)) {
         return NULL;
     }
     sBucket_pt sum = sBucketCreate(currRing);
@@ -212,12 +212,12 @@ static void insert_into_cache_term(cache_term *T, const poly multiplier,
 static poly get_from_cache_term(const cache_term::iterator itr,
         const poly multiplier)
 {
-    if(itr->second == NULL) {
+    if (likely(itr->second == NULL)) {
         return NULL;
     }
     const ring r = currRing;
     poly p = p_Copy(itr->second, r);
-    if (!n_Equal(pGetCoeff(multiplier), pGetCoeff(itr->first), r)) {
+    if (likely(!n_Equal(pGetCoeff(multiplier), pGetCoeff(itr->first), r))) {
         number n = n_Div(pGetCoeff(multiplier), pGetCoeff(itr->first), r);
         p = p_Mult_nn(p, n, r);
         n_Delete(&n, r);
@@ -231,7 +231,7 @@ static poly traverse_tail(const poly multiplier, const int comp,
 {
     cache_term *T = &(Cache[comp]);
     cache_term::iterator itr = T->find(multiplier);
-    if (itr != T->end()) {
+    if (likely(itr != T->end())) {
         return get_from_cache_term(itr, multiplier);
     }
     poly p = compute_image(multiplier, comp, previous_module, variables,
@@ -502,7 +502,7 @@ static void denormalize_first_syz_module(resolvente res, const int comp,
     for (int i = 0; i < res[1]->ncols; i++) {
         poly p = res[1]->m[i];
         while (p != NULL) {
-            if (pGetComp(p) == comp) {
+            if (unlikely(pGetComp(p) == comp)) {
                 n_InpMult(pGetCoeff(p), coef_inv, r->cf);
             }
             pIter(p);
