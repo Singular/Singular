@@ -254,6 +254,7 @@ Short/ringsum.tst
 Short/ringutils_s.tst
 Short/ringz.tst
 Short/rInit.tst
+Short/rootisolation.tst
 Short/schwarz_6_32003_lp.tst
 Short/schwarz_7_32003_lp.tst
 Short/schwarz_8_32003_lp.tst
