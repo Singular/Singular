@@ -1251,12 +1251,10 @@ extern "C" int SI_MOD_INIT(interval)(SModulFunctions* psModulFunctions)
   boxID = setBlackboxStuff(b_bx, "box");
 
   // add additional functions
-  psModulFunctions->iiAddCproc("interval.so", "length", FALSE, length);
-  psModulFunctions->iiAddCproc("interval.so", "boxSet", FALSE, boxSet);
-  psModulFunctions->iiAddCproc("interval.so", "evalPolyAtBox", FALSE,
-      evalPolyAtBox);
-
-  // TODO add help strings
+  psModulFunctions->iiAddCproc("rootisolation.lib", "length", FALSE, length);
+  psModulFunctions->iiAddCproc("rootisolation.lib", "boxSet", FALSE, boxSet);
+  psModulFunctions->iiAddCproc("rootisolation.lib", "evalPolyAtBox", FALSE,
+    evalPolyAtBox);
 
   return MAX_TOK;
 }
