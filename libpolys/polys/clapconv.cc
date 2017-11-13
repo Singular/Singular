@@ -67,23 +67,21 @@ static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, 
   }
   else
   {
-    poly term = p_Init(r);
-    pNext( term ) = NULL;
-    for ( int i = 1; i <= r->N; i++ )
-      p_SetExp( term, i, exp[i], r);
-    pGetCoeff( term )=r->cf->convFactoryNSingN(f, r->cf);
-    p_Setm( term, r );
-    if ( n_IsZero(pGetCoeff(term), r->cf) )
+    number n=r->cf->convFactoryNSingN(f, r->cf);
+    if ( n_IsZero(n, r->cf) )
     {
-      p_Delete(&term,r);
+      n_Delete(&n,r->cf);
     }
     else
     {
+      poly term = p_Init(r);
+      //pNext( term ) = NULL; // done by p_Init
+      pGetCoeff(term)=n;
+      p_SetExpV(term,exp,r);
       sBucket_Merge_m(result,term);
     }
   }
 }
-
 
 CanonicalForm convSingPFactoryP( poly p, const ring r )
 {
@@ -177,7 +175,7 @@ static void convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int
     if (z!=NULL)
     {
       poly term = p_Init(r);
-      pNext( term ) = NULL;
+      //pNext( term ) = NULL; // done by p_Init
       int i;
       for ( i = rVar(r); i>0 ; i-- )
         p_SetExp( term, i , exp[i+var_start],r);
@@ -256,18 +254,19 @@ static number convFactoryNSingAN( const CanonicalForm &f, const ring r)
 poly convFactoryASingA ( const CanonicalForm & f, const ring r )
 {
   poly a=NULL;
-  poly t;
   for( CFIterator i=f; i.hasTerms(); i++)
   {
-    t= p_Init (r->cf->extRing);
-    p_GetCoeff(t, r->cf->extRing)= convFactoryNSingAN( i.coeff(), r );
-    if (n_IsZero(p_GetCoeff(t,r->cf->extRing),r->cf->extRing->cf))
+    number n= convFactoryNSingAN( i.coeff(), r );
+    if (n_IsZero(n,r->cf->extRing->cf))
     {
-      p_Delete(&t,r->cf->extRing);
+      n_Delete(&n,r->cf->extRing->cf);
     }
     else
     {
+      poly t= p_Init (r->cf->extRing);
+      pGetCoeff(t)=n;
       p_SetExp(t,1,i.exp(),r->cf->extRing);
+      //p_Setm(t,r->cf->extRing);// not needed for rings with 1 variable
       a=p_Add_q(a,t,r->cf->extRing);
     }
   }
@@ -348,7 +347,7 @@ convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs, const
   else
   {
     poly term = p_Init(r);
-    pNext( term ) = NULL;
+    //pNext( term ) = NULL; // done by p_Init
     for ( int i = rVar(r); i>0; i-- )
       p_SetExp( term, i ,exp[i], r);
     //if (rRing_has_Comp(currRing)) p_SetComp(term, 0, currRing); // done by pInit

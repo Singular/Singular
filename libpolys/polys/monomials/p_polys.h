@@ -904,7 +904,7 @@ static inline poly p_Add_q(poly p, poly q, int &lp, int lq, const ring r)
   if (p==NULL) { lp=lq; return q; }
   int shorter;
   poly res = r->p_Procs->p_Add_q(p, q, shorter, r);
-  lp = (lp + lq) - shorter;
+  lp += lq - shorter;
   return res;
 }
 
@@ -1481,7 +1481,7 @@ static inline void p_SetExpV(poly p, int *ev, const ring r)
   for (unsigned j = r->N; j!=0; j--)
       p_SetExp(p, j, ev[j], r);
 
-  p_SetComp(p, ev[0],r);
+  if(ev[0]!=0) p_SetComp(p, ev[0],r);
   p_Setm(p, r);
 }
 
