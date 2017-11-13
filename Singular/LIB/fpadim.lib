@@ -1300,6 +1300,160 @@ proc inOrOutCommingEdgeInCycle(intmat G, int v, intvec visited, intvec path) {
   return (inFlag + outFlag);
 }
 
+proc lpIsSemiPrime(ideal G)
+{
+  G = lead(G);
+  G = simplify(G, 2+4+8);
+
+  list VUG = lpUfGraph(G, 1);
+  intmat UG = VUG[1]; // the Ufnarovskij graph
+  ideal V = VUG[2]; // the vertices of UG (standard words with length = l-1)
+
+  list LG = lpId2ivLi(G);
+  list SW = ivStandardWordsUpToLength(LG, maxDeg(G));
+  list LV = lpId2ivLi(V);
+
+  // delete the 0 in SW
+  int indexofzero = ivIndexOf(SW, 0);
+  if (indexofzero > 0) { // should be always true when |SW| > 0
+    SW = delete(SW, indexofzero);
+  }
+
+  // check if each monomial in SW is cyclic
+  for (int i = 1; i <= size(SW); i++) {
+    if (!isCyclicInUfGraph(UG, LV, SW[i])) {
+      return (0);
+    }
+  }
+
+  return (1);
+}
+
+// checks whether a monomial is a cyclic monomial
+proc isCyclicInUfGraph(intmat UG, list LV, intvec u)
+{
+  if (ncols(UG) == 0) {return (0);} // UG is empty
+  if (u == 0) {return (0);} // 0 is never cyclic
+
+  int l = size(LV[1]) + 1;
+
+  int s = size(u);
+  if (s <= l - 1) {
+    for (int i = 1; i <= size(LV); i++) {
+      // for all vertices where u is a suffix
+      if(isSF(u, LV[i])) {
+        if (existsRoute(UG, i, i)) {
+          return (1);
+        }
+      }
+    }
+  } else { // size(u) > l - 1
+    int m = s - l + 1;
+
+    // there must be a route from v0 to vm
+    intvec v0 = u[1..(l-1)]; // first in route of u
+    intvec vm = u[m+1..m+(l-1)]; // last in route of u
+
+    int iv0 = ivIndexOf(LV, v0);
+    int ivm = ivIndexOf(LV, vm);
+    if (iv0 <= 0 || ivm <= 0) {
+      ERROR("u is not a standard word");
+    }
+
+    return (existsRoute(UG, ivm, iv0));
+  }
+
+  return (0);
+}
+
+proc lpIsPrime(ideal G)
+"USAGE: lpIsPrime(G); G an ideal in a Letterplace ring
+RETURN: boolean
+PURPOSE: Check whether R/<G> is prime, where R is the basering
+ASSUME: - basering is a Letterplace ring
+@*      - G is a Groebner basis
+"
+{
+  G = lead(G);
+  G = simplify(G, 2+4+8);
+
+  list VUG = lpUfGraph(G, 1);
+  intmat UG = VUG[1]; // the Ufnarovskij graph
+  ideal V = VUG[2]; // the vertices of UG (standard words with length = l-1)
+
+  list LG = lpId2ivLi(G);
+  list LV = lpId2ivLi(V);
+
+  int n = ncols(UG);
+
+  // 1) for each vi vj there exists a route from vi to vj (means UG is connected)
+  for (int i = 1; i <= n; i++) {
+    for (int j = 1; j <= n; j++) {
+      if (!existsRoute(UG, i, j)) {
+        return (0);
+      }
+    }
+  }
+
+  // 2) any standard word with length < l-1 is a suffix of a vertex
+  list SW = ivStandardWordsUpToLength(LG, maxDeg(G) - 2); // < maxDeg - 1
+  if (size(SW) > 0 && size(LV) == 0) {return (0);}
+  for (int i = 1; i <= size(SW); i++) {
+    // check if SW[i] is a suffix of some LV
+    for (int j = 1; j <= size(LV); j++) {
+      if (!isSF(SW[i], LV[j])) {
+        if (j == size(LV)) {
+          return (0);
+        }
+      } else {
+        break;
+      }
+    }
+  }
+
+  return (1);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(5);
+  setring R;
+  ideal G = x(1)*x(2), y(1)*y(2); // K<x,y>/<xx,yy> is prime
+  lpIsPrime(G);
+}
+
+static proc existsRoute(intmat G, int v, int u, list #)
+"USAGE: existsRoute(G,v,u); G a graph, v and u vertices
+NOTE: don't pass anything to # (internal use for recursion)
+@*    routes always have at least one edge
+"
+{
+  int n = ncols(G);
+
+  // init visited
+  intvec visited;
+  if (size(#) > 0) {
+    if (v == u) {return (1);} // don't check on first call so |route| >= 1 holds
+    visited = #[1];
+  } else { // first call
+    visited[n] = 0;
+  }
+
+  // mark current vertex as visited
+  visited[v] = 1;
+
+  // recursive DFS
+  for (int i = 1; i <= n; i++) {
+    if (G[v,i] && (!visited[i] || i == u)) { // i == u to allow routes from u to u
+      if (existsRoute(G, i, u, visited)) {
+        return (1);
+      }
+    }
+  }
+
+  return (0);
+}
+
 static proc lpUfGkDim(ideal G)
 {
   G = lead(G);
@@ -1502,11 +1656,11 @@ static proc UfGraphGrowth(intmat UG)
 
 static proc countCycles(intmat G, int v, intvec visited, intvec cyclic, intvec path)
 "USAGE: countCycles(G, v, visited, cyclic, path); G a Graph, v the vertex to
-start. visited, cyclic and path should be 0.
+start. The parameter visited, cyclic and path should be 0.
 RETURN: int
-PURPOSE: Calculate the maximal number of distinct cycles in a single path starting at v.
-@*: Maximal number of distinct cycles
-ASSUME: Basering has to be a Letterplace ring.
+@*:     Maximal number of distinct cycles
+PURPOSE: Calculate the maximal number of distinct cycles in a single path starting at v
+ASSUME: Basering is a Letterplace ring
 "
 {
   // Mark the current vertex as visited
@@ -1582,21 +1736,15 @@ ASSUME: Basering has to be a Letterplace ring.
 }
 
 static proc lpUfGraph(ideal G, list #)
-"USAGE: lpUfGraph(G); G a set of monomials in a letterplace ring, # an optional parameter which also returns the vertex list when 1
+"USAGE: lpUfGraph(G); G a set of monomials in a letterplace ring, # an optional parameter to return the vertex list when set
 RETURN: intmat
 PURPOSE: Constructs the Ufnarovskij graph induced by G
 @*      the adjacency matrix of the Ufnarovskij graph induced by G
 ASSUME: - basering is a Letterplace ring
-- G are the leading monomials of a Groebner basis
+@*      - G are the leading monomials of a Groebner basis
 "
 {
-  int l = 0; // length of longest word (monomial) in G
-  for (int i = 1; i <= size(G); i++) { // find the max degree in G
-    int d = deg(G[i]);
-    if (d > l) {
-      l = d;
-    }
-  }
+  int l = maxDeg(G);
   list LG = lpId2ivLi(G);
   list SW = ivStandardWords(LG, l - 1); // vertices
   int n = size(SW);
@@ -1632,13 +1780,25 @@ ASSUME: - basering is a Letterplace ring
   return (UG);
 }
 
+static proc maxDeg(ideal G)
+{
+  int l = 0;
+  for (int i = 1; i <= size(G); i++) { // find the max degree in G
+    int d = deg(G[i]);
+    if (d > l) {
+      l = d;
+    }
+  }
+  return (l);
+}
+
 static proc ivStandardWords(list G, int length)
 "ASSUME: G is simplified
 "
 {
-  if (length == 0) {
+  if (length <= 0) {
     list words;
-    if (!ivdivides(G,0)) {
+    if (length == 0 && !ivdivides(G,0)) {
       words[1] = 0; // iv = 0 means monom = 1
     }
     return (words); // no standard words
@@ -3224,9 +3384,9 @@ proc tst_fpadim()
 /*return (R1); // return the new ring*/
 /*}*/
 
-proc lpSubstitute(poly f, list s1, list s2, list #)
-"USAGE: lpSubstitute(f,s1,s2[,G]); f letterplace polynomial, s1 list of variables
-@*	to replace, s2 list of polynomials to replace with, G optional ideal to
+proc lpSubstitute(poly f, ideal s1, ideal s2, list #)
+"USAGE: lpSubstitute(f,s1,s2[,G]); f letterplace polynomial, s1 list (ideal) of variables
+@*	to replace, s2 list (ideal) of polynomials to replace with, G optional ideal to
 @*	reduce with.
 RETURN: poly, the substituted polynomial
 ASSUME: - basering is a Letterplace ring
@@ -3249,7 +3409,7 @@ EXAMPLE: example lpSubstitute; shows examples
     intvec ivfi = lp2iv(f[i]);
     for (int j = 1; j <= size(ivfi); j++) {
       int varindex = ivfi[j];
-      int subindex = indexof(s1, varindex);
+      int subindex = lpIndexOf(s1, var(varindex));
       if (subindex > 0) {
         s2[subindex] = lpNF(s2[subindex],G);
         fis = lpMult(fis, s2[subindex]);
@@ -3272,8 +3432,8 @@ example {
   ideal G = x(1)*y(2); // optional
 
   poly f = 3*x(1)*x(2)+y(1)*x(2);
-  list s1 = x(1), y(1);
-  list s2 = y(1)*z(2)*z(3), x(1);
+  ideal s1 = x(1), y(1);
+  ideal s2 = y(1)*z(2)*z(3), x(1);
 
   // the substitution probably needs a higher degbound
   int minDegBound = calcSubstDegBounds(f,s1,s2);
@@ -3293,35 +3453,45 @@ example {
   poly f = 3*x(1)*x(2)+y(1)*x(2);
   poly g = z(1)*x(2)+y(1);
   poly h = 7*x(1)*z(2)+x(1);
-  list L = f,g,h;
-  list s1 = x(1), y(1);
-  list s2 = y(1)*z(2)*z(3), x(1);
+  ideal I = f,g,h;
+  ideal s1 = x(1), y(1);
+  ideal s2 = y(1)*z(2)*z(3), x(1);
 
-  int minDegBound = calcSubstDegBounds(L,s1,s2);
+  int minDegBound = calcSubstDegBounds(I,s1,s2);
   setring r;
   def R1 = makeLetterplaceRing(minDegBound);
   setring R1;
 
-  list L = imap(R,L);
-  list s1 = imap(R,s1);
-  list s2 = imap(R,s2);
-  for (int i = 1; i <= size(L); i++) {
-    lpSubstitute(L[i], s1, s2);
+  ideal I = imap(R,I);
+  ideal s1 = imap(R,s1);
+  ideal s2 = imap(R,s2);
+  for (int i = 1; i <= size(I); i++) {
+    lpSubstitute(I[i], s1, s2);
   }
 }
 
-static proc indexof(list L, int varindex) {
-  for (int i = 1; i <= size(L); i++) {
-    if (lp2iv(L[i])[1] == varindex) {
+static proc lpIndexOf(ideal I, poly p) {
+  for (int i = 1; i <= size(I); i++) {
+    if (I[i] == p) {
       return (i);
     }
   }
   return (-1);
 }
 
-proc calcSubstDegBound(poly f, list s1, list s2)
-"USAGE: calcSubstDegBound(f,s1,s2); f letterplace polynomial, s1 list of variables
-@*	to replace, s2 list of polynomials to replace with
+static proc ivIndexOf(list L, intvec iv) {
+  for (int i = 1; i <= size(L); i++) {
+    if (L[i] == iv) {
+      return (i);
+    }
+  }
+  return (-1);
+}
+
+
+proc calcSubstDegBound(poly f, ideal s1, ideal s2)
+"USAGE: calcSubstDegBound(f,s1,s2); f letterplace polynomial, s1 list (ideal) of variables
+@*	to replace, s2 list (ideal) of polynomials to replace with
 RETURN: int, the min degbound required to perform the substitution
 ASSUME: - basering is a Letterplace ring
 EXAMPLE: example lpSubstitute; shows examples
@@ -3333,7 +3503,7 @@ EXAMPLE: example lpSubstitute; shows examples
     int tmpDegBound;
     for (int j = 1; j <= size(ivfi); j++) {
       int varindex = ivfi[j];
-      int subindex = indexof(s1, varindex);
+      int subindex = lpIndexOf(s1, var(varindex));
       if (subindex > 0) {
         tmpDegBound = tmpDegBound + deg(s2[subindex]);
       } else {
@@ -3353,17 +3523,17 @@ EXAMPLE: example lpSubstitute; shows examples
 }
 
 // convenience method
-proc calcSubstDegBounds(list L, list s1, list s2)
-"USAGE: calcSubstDegBounds(L,s1,s2); L list of letterplace polynomials, s1 list
-@*	of variables to replace, s2 list of polynomials to replace with
+proc calcSubstDegBounds(ideal I, ideal s1, ideal s2)
+"USAGE: calcSubstDegBounds(I,s1,s2); I list (ideal) of letterplace polynomials, s1 list (ideal)
+@*	of variables to replace, s2 list (ideal) of polynomials to replace with
 RETURN: int, the min degbound required to perform all of the substitutions
 ASSUME: - basering is a Letterplace ring
 EXAMPLE: example lpSubstitute; shows examples
 "
 {
   int maxDegBound = 0;
-  for (int i = 1; i <= size(L); i++) {
-    int tmpDegBound = calcSubstDegBound(L[i], s1, s2, #);
+  for (int i = 1; i <= size(I); i++) {
+    int tmpDegBound = calcSubstDegBound(I[i], s1, s2, #);
     if (tmpDegBound > maxDegBound) {
       maxDegBound = tmpDegBound;
     }
