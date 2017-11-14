@@ -205,7 +205,7 @@ static void insert_into_cache_term(cache_term *T, const poly multiplier,
     T->insert(cache_term::value_type(p_Head(multiplier, r), p_Copy(p, r)));
 }
 
-static poly get_from_cache_term(const cache_term::iterator itr,
+static poly get_from_cache_term(const cache_term::const_iterator itr,
         const poly multiplier)
 {
     if (likely(itr->second == NULL)) {
@@ -226,7 +226,7 @@ static poly traverse_tail(const poly multiplier, const int comp,
         const lt_struct *const *const hash_previous_module)
 {
     cache_term *T = &(Cache[comp]);
-    cache_term::iterator itr = T->find(multiplier);
+    cache_term::const_iterator itr = T->find(multiplier);
     if (likely(itr != T->end())) {
         return get_from_cache_term(itr, multiplier);
     }
