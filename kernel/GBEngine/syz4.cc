@@ -138,10 +138,7 @@ static poly reduce_term(const poly multiplier, const poly term,
     const int c = __p_GetComp(s, r) - 1;
     const poly t = traverse_tail(s, c, previous_module, variables,
             hash_previous_module);
-    if (unlikely(t != NULL)) {
-        s = p_Add_q(s, t, r);
-    }
-    return s;
+    return p_Add_q(s, t, r);
 }
 
 static poly compute_image(const poly multiplier, const int comp,
