@@ -49,10 +49,10 @@ isSuperset(Set,Set)        test whether a set is a superset of another set
 addElement(Set,def)        adds an element to the set
 ";
 
-LIB "methods.lib";
 
 static proc mod_init()
 {
+  LIB "methods.lib"; // mod_init needs Hashtable/Method from methods.lib
   newstruct("Set","list elements");
   system("install","Set","print",printSet,1);
   system("install","Set","+",union,2);

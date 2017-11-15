@@ -37,5 +37,4 @@ installMethod(m3,"tst");
 tst(I,2);
 tst(3);
 
-
-tst_status(1);
+tst_status(1);$

@@ -17,5 +17,4 @@ printlevel=0;
 
   member(1,list(1,4,5));
 
-
-tst_status(1);
+tst_status(1);$

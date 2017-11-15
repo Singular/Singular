@@ -152,6 +152,4 @@ F;
 "input "+string(f0);
 }
 
-
-
-tst_status(1);
+tst_status(1);$

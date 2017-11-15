@@ -50,6 +50,7 @@ printlevel=0;
  N;
  M;
  N*M;
+ kill j;
 
 
  int i=1;
@@ -61,6 +62,7 @@ printlevel=0;
  M;
  isElement(i,M);
  isElement(j,M);
+ kill M,k,j;
 
 
 
@@ -71,6 +73,7 @@ printlevel=0;
  N;
  M;
  complement(N,M);
+ kill M,N,l,j;
 
 
  list l =1,2;
@@ -81,6 +84,7 @@ printlevel=0;
  M;
  N<M;
  M<N;
+ kill M,N,l,j;
 
 
  list l =1,2;
@@ -91,6 +95,8 @@ printlevel=0;
  M;
  N>M;
  M>N;
+ kill M,N,l,j;
 
 
-tst_status(1);
+tst_status(1);$
+

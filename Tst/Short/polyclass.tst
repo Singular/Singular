@@ -45,6 +45,5 @@ printlevel=0;
  F.singularityType = "X[13]";
  F;
 
+tst_status(1);$
 
-
-tst_status(1);
