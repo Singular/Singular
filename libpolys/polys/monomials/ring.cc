@@ -580,7 +580,11 @@ char * rOrdStr(ring r)
       StringAppend("(%d)", s);
     }
 
-    if (l==nblocks) return StringEndS();
+    if (l==nblocks)
+    {
+      if (r->bitmask!=0xffff) StringAppend(",L(%ld)",r->bitmask);
+      return StringEndS();
+    }
     StringAppendS(",");
   }
 }
