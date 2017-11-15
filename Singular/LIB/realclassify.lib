@@ -5413,9 +5413,9 @@ EXAMPLE:  example determinacy; shows an example"
 
   /* highest corner */
   int hc;
-  if(ordstr(br) != "ds")
+  list lbr = ringlist(br);
+  if((ordstr(br)[1,2] != "ds")||(size(lbr[3])!=2))
   {
-    list lbr = ringlist(br);
     lbr[3] = list(list("ds", 1:nvars(br)), list("C", 0));
     def br_ds = ring(lbr);
     setring(br_ds);
@@ -5431,10 +5431,7 @@ EXAMPLE:  example determinacy; shows an example"
       f = jet(f, k);
     }
   }
-  if(ordstr(br) != "ds")
-  {
-    setring(br);
-  }
+  setring(br);
 
   return(k);
 }
