@@ -1204,7 +1204,8 @@ static proc lpUfGkDim(ideal G)
 
   if (imIsUpRightTriangle(UG)) {
     UG = eliminateZerosUpTriangle(UG);
-    if (UG == 0) { // when the diagonal was zero
+    intmat empty[0][0];
+    if (UG == empty) { // when the diagonal was zero
       return (0)
     }
     return(UfGraphURTNZDGrowth(UG));
