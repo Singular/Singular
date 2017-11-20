@@ -1,22 +1,4 @@
-; Short/polybori_s.tst
-; Short/primdec3.tst ; too long!
-; Short/tropical.tst ;; too long ?
-;; Short/bug_554.tst
 ;;2GB mem Short/bug_tr276.tst
-;;; Short/divisors_s.tst ; no uu!?
-;;; Short/parallel_l.tst
-;;; Short/parallel_s.tst
-;;;; Short/bug_M.tst
-;;;; Short/facstd.tst
-;;;; Short/general_s.tst
-;;;; Short/gmssin_s.tst
-;;;; Short/zerored.tst
-;;;; new tests from master
-;;;;;;;;;;;;;;;;;;;; Short/polymake.tst
-;;;;;;;;;;;;;;;;;;;; Short/pyobject.tst
-;MP Short/bug_tr280.tst
-;MP Short/mpsr_s.tst
-;MP Short/stratify.tst
 Short/Gonnet-83_1_32003_dp_slim.tst
 Short/Gonnet-83_32003_dp_slim.tst
 Short/Katsura_3_32003_lp_slimgb.tst
