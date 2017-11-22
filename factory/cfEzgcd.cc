@@ -15,7 +15,6 @@
 
 #include "config.h"
 
-
 #include "timing.h"
 #include "cf_assert.h"
 #include "debug.h"
@@ -841,7 +840,8 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
 
   CFMap M,N;
   int smallestDegLev;
-  TIMING_START (ez_p_compress)
+  TIMING_DEFINE(ez_p_compress);
+  TIMING_START (ez_p_compress);
   int best_level= compress4EZGCD (F, G, M, N, smallestDegLev);
 
   if (best_level == 0) return G.genOne();
@@ -850,6 +850,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   G= M (G);
   TIMING_END_AND_PRINT (ez_p_compress, "time for compression in EZ_P: ")
 
+  TIMING_DEFINE (ez_p_content)
   TIMING_START (ez_p_content)
   f = content( F, x ); g = content( G, x );
   d = gcd( f, g );
@@ -1011,6 +1012,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   o= 0;
   t= 1;
   int goodPointCount= 0;
+  TIMING_DEFINE(ez_p_eval);
   while( !gcdfound )
   {
     TIMING_START (ez_p_eval);
@@ -1312,6 +1314,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           return N (d*modGCDFp (F,G));
       }
 
+      TIMING_DEFINE(ez_p_hensel_lift);
       TIMING_START (ez_p_hensel_lift);
       gcdfound= Hensel (B*lcD, DD, b, lcDD);
       TIMING_END_AND_PRINT (ez_p_hensel_lift, "time for Hensel lift in EZ_P: ");
@@ -1357,6 +1360,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
 
       if (gcdfound == 1)
       {
+        TIMING_DEFINE(termination_test);
         TIMING_START (termination_test);
         contcand= content (DD[2], Variable (1));
         cand = DD[2] / contcand;
