@@ -118,6 +118,7 @@ CanonicalForm cyclotomicPoly (int n, bool& fail)
   prime_factors= integerFactorizer (n, prime_factors_length, fail);
   int* distinct_factors= makeDistinct (prime_factors, prime_factors_length,
                                         distinct_factors_length);
+  delete [] prime_factors;
   if (fail)
     return 1;
   CanonicalForm buf;
