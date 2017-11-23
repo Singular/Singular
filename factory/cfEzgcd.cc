@@ -236,8 +236,8 @@ Evaluation optimize4Lift (const CanonicalForm& F, CFMap & M,
   int pos= 2;
   while (k > 1)
   {
-    max_deg= degsf [i];
-    while ((max_deg == 0)&&(i<n))
+    max_deg= degsf [i]; // i is always 2 here, n>=2
+    while ((i<n) &&(max_deg == 0))
     {
       i++;
       max_deg= degsf [i];
