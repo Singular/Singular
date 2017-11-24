@@ -1308,6 +1308,25 @@ proc lpIsSemiPrime(ideal G)
   G = lead(G);
   G = simplify(G, 2+4+8);
 
+  // check special case 1
+  int l = 0;
+  for (int i = 1; i <= size(G); i++) {
+    // find the max degree in G
+    int d = deg(G[i]);
+    if (d > l) {
+      l = d;
+    }
+
+    // also if G is the whole ring
+    if (leadmonom(G[i]) == 1) {
+      return(1);
+    }
+  }
+  // if longest word has length 1 we handle it as a special case
+  if (l == 1) {
+    return(1);
+  }
+
   list VUG = lpUfGraph(G, 1);
   intmat UG = VUG[1]; // the Ufnarovskij graph
   ideal V = VUG[2]; // the vertices of UG (standard words with length = l-1)
@@ -1379,6 +1398,25 @@ ASSUME: - basering is a Letterplace ring
 {
   G = lead(G);
   G = simplify(G, 2+4+8);
+
+  // check special case 1
+  int l = 0;
+  for (int i = 1; i <= size(G); i++) {
+    // find the max degree in G
+    int d = deg(G[i]);
+    if (d > l) {
+      l = d;
+    }
+
+    // also if G is the whole ring
+    if (leadmonom(G[i]) == 1) {
+      return(1);
+    }
+  }
+  // if longest word has length 1 we handle it as a special case
+  if (l == 1) {
+    return(1);
+  }
 
   list VUG = lpUfGraph(G, 1);
   intmat UG = VUG[1]; // the Ufnarovskij graph
