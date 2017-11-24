@@ -128,6 +128,7 @@ CanonicalForm cyclotomicPoly (int n, bool& fail)
     result= leftShift (result, distinct_factors[i])/result;
     prod *= distinct_factors[i];
   }
+  delete [] distinct_factors;
   return leftShift (result, n/prod);
 }
 
