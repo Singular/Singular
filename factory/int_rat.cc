@@ -31,25 +31,13 @@ static long intgcd( long a, long b )
 }
 
 
-InternalRational::InternalRational()
-{
-    mpz_init( _num );
-    mpz_init_set_si( _den, 1 );
-}
-
-InternalRational::InternalRational( const int i )
-{
-    mpz_init_set_si( _num, i );
-    mpz_init_set_si( _den, 1 );
-}
-
 InternalRational::InternalRational( const int n, const int d )
 {
     ASSERT( d != 0, "divide by zero" );
     if ( n == 0 )
     {
-        mpz_init_set_si( _num, 0 );
-        mpz_init_set_si( _den, 1 );
+        mpz_init_set_ui( _num, 0 );
+        mpz_init_set_ui( _den, 1 );
     }
     else
     {
@@ -67,19 +55,13 @@ InternalRational::InternalRational( const int n, const int d )
     }
 }
 
-InternalRational::InternalRational( const long i )
-{
-    mpz_init_set_si( _num, i );
-    mpz_init_set_si( _den, 1 );
-}
-
 InternalRational::InternalRational( const long n, const long d )
 {
     ASSERT( d != 0, "divide by zero" );
     if ( n == 0 )
     {
-        mpz_init_set_si( _num, 0 );
-        mpz_init_set_si( _den, 1 );
+        mpz_init_set_ui( _num, 0 );
+        mpz_init_set_ui( _den, 1 );
     }
     else
     {
@@ -110,24 +92,6 @@ InternalRational::InternalRational( const char * )
 //    mpz_init_set_si( _den, 1 );
 //}
 
-InternalRational::InternalRational( const mpz_ptr n )
-{
-    _num[0]=*n;
-    mpz_init_set_si( _den, 1 );
-}
-
-InternalRational::InternalRational( const mpz_ptr n, const mpz_ptr d )
-{
-  _num[0]=*n;
-  _den[0]=*d;
-}
-
-InternalRational::~InternalRational()
-{
-    mpz_clear( _num );
-    mpz_clear( _den );
-}
-
 InternalCF* InternalRational::deepCopyObject() const
 {
     mpz_t dummy_num;
@@ -150,11 +114,6 @@ void InternalRational::print( OSTREAM & os, char * c )
     delete [] str;
 }
 #endif /* NOSTREAMIO */
-
-bool InternalRational::is_imm() const
-{
-    return mpz_cmp_si( _den, 1 ) == 0 && mpz_is_imm( _num );
-}
 
 InternalCF* InternalRational::genZero()
 {
@@ -567,9 +526,9 @@ InternalCF* InternalRational::addcoeff( InternalCF* c )
         if ( cc == 0 )
             return this;
         else
-	{
+      {
           mpz_init( n );
-	  if ( cc < 0 )
+        if ( cc < 0 )
           {
             mpz_mul_ui( n, _den, -cc );
             mpz_sub( n, _num, n );
@@ -579,7 +538,7 @@ InternalCF* InternalRational::addcoeff( InternalCF* c )
             mpz_mul_ui( n, _den, cc );
             mpz_add( n, _num, n );
           }
-	}
+      }
     }
     else
     {
@@ -902,11 +861,6 @@ long InternalRational::intval() const
 
 }
 
-/**
- * @sa CanonicalForm::sign()
-**/
-int
-InternalRational::sign () const
-{
-    return mpz_sgn( _num );
-}
+bool InternalRational::is_imm() const
+{ return mpz_cmp_si( _den, 1 ) == 0 && mpz_is_imm( _num ); }
+

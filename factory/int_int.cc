@@ -15,33 +15,6 @@
 const omBin InternalInteger::InternalInteger_bin = omGetSpecBin(sizeof(InternalInteger));
 #endif
 
-InternalInteger::InternalInteger()
-{
-    mpz_init( thempi );
-}
-
-InternalInteger::InternalInteger( const int i )
-{
-    mpz_init_set_si( thempi, (long)i );
-}
-
-InternalInteger::InternalInteger( const long i )
-{
-    mpz_init_set_si( thempi, i );
-}
-
-InternalInteger::InternalInteger( const mpz_ptr mpi) { thempi[0]=*mpi;}
-
-InternalInteger::InternalInteger( const char * str, const int base )
-{
-    mpz_init_set_str( thempi, str, base );
-}
-
-InternalInteger::~InternalInteger()
-{
-    mpz_clear( thempi );
-}
-
 InternalCF* InternalInteger::deepCopyObject() const
 {
     mpz_t dummy;

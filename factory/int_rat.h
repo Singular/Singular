@@ -45,19 +45,43 @@ private:
     static mpz_ptr MPQDEN( const InternalCF * const c );
     static void normalize( const mpz_ptr, const mpz_ptr, mpz_ptr, mpz_ptr );
 public:
-    InternalRational();
+    InternalRational()
+    {
+      mpz_init( _num );
+      mpz_init_set_ui( _den, 1 );
+    }
     InternalRational( const InternalCF& )
     {
-	ASSERT( 0, "ups there is something wrong in your code" );
+      ASSERT( 0, "ups there is something wrong in your code" );
     }
-    InternalRational( const int i );
+    InternalRational( const int i )
+    {
+      mpz_init_set_si( _num, i );
+      mpz_init_set_ui( _den, 1 );
+    }
     InternalRational( const int n, const int d );
-    InternalRational( const long i );
+    InternalRational( const long i )
+    {
+      mpz_init_set_si( _num, i );
+      mpz_init_set_ui( _den, 1 );
+    }
     InternalRational( const long n, const long d );
     InternalRational( const char * str );
-    InternalRational( const mpz_ptr );
-    InternalRational( const mpz_ptr , const mpz_ptr );
-    ~InternalRational();
+    InternalRational( const mpz_ptr n)
+    {
+      _num[0]=*n;
+      mpz_init_set_ui( _den, 1 );
+    }
+    InternalRational( const mpz_ptr n, const mpz_ptr d)
+    {
+      _num[0]=*n;
+      _den[0]=*d;
+    }
+    ~InternalRational()
+    {
+      mpz_clear( _num );
+      mpz_clear( _den );
+    }
     InternalCF* deepCopyObject() const;
     const char * classname() const { return "InternalRational"; }
 #ifndef NOSTREAMIO
@@ -106,7 +130,7 @@ public:
 
     long intval() const;
 
-    int sign() const;
+    int sign() const { return mpz_sgn( _num ); }
 
     InternalCF * normalize_myself();
 
