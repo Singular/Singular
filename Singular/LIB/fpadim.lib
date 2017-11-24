@@ -1173,9 +1173,9 @@ proc lpNoetherian(ideal G) {
       l = d;
     }
 
-    // also if G is the whole ring return noetherian
+    // also if G is the whole ring
     if (leadmonom(G[i]) == 1) {
-      return(3);
+      ERROR("noetherianity not defined for 0-ring")
     }
   }
   // if longest word has length 1 we handle it as a special case
@@ -1319,7 +1319,7 @@ proc lpIsSemiPrime(ideal G)
 
     // also if G is the whole ring
     if (leadmonom(G[i]) == 1) {
-      return(1);
+      ERROR("primeness not defined for 0-ring")
     }
   }
   // if longest word has length 1 we handle it as a special case
@@ -1410,7 +1410,7 @@ ASSUME: - basering is a Letterplace ring
 
     // also if G is the whole ring
     if (leadmonom(G[i]) == 1) {
-      return(1);
+      ERROR("primeness not defined for 0-ring")
     }
   }
   // if longest word has length 1 we handle it as a special case
@@ -1511,7 +1511,7 @@ static proc lpUfGkDim(ideal G)
 
     // also if G is the whole ring return minus infinity
     if (leadmonom(G[i]) == 1) {
-      return(-2); // minus infinity
+      ERROR("Gk-Dim not defined for 0-ring")
     }
   }
   // if longest word has length 1 we handle it as a special case
@@ -1977,7 +1977,6 @@ proc lpGkDim(ideal G, list#)
 RETURN: int
 PURPOSE: Determines the Gelfand Kirillov dimension of A/<G>
 @*      -1 means it is positive infinite
-@*      -2 means it is negative infinite
 ASSUME: - basering is a Letterplace ring
 - G is a Groebner basis
 "
