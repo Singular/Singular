@@ -497,7 +497,7 @@ static number nrnAnn(number k, const coeffs r)
   mpz_init(tmp);
   mpz_gcd(tmp, (mpz_ptr) k, r->modNumber);
   if (mpz_cmp_si(tmp, 1)==0) {
-    mpz_set_si(tmp, 0);
+    mpz_set_ui(tmp, 0);
     return (number) tmp;
   }
   mpz_divexact(tmp, r->modNumber, tmp);
@@ -583,7 +583,7 @@ static number nrnMod(number a, number b, const coeffs r)
   mpz_ptr g = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_ptr rr = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_init(g);
-  mpz_init_set_si(rr, 0);
+  mpz_init_set_ui(rr, 0);
   mpz_gcd(g, (mpz_ptr)r->modNumber, (mpz_ptr)b); // g is now as above
   if (mpz_cmp_si(g, 1L) != 0) mpz_mod(rr, (mpz_ptr)a, g); // the case g <> 1
   mpz_clear(g);
@@ -785,7 +785,7 @@ nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
       }
       if (mpz_divisible_p(nrnMapModul, dst->modNumber))
       {
-        mpz_set_si(nrnMapCoef, 1);
+        mpz_set_ui(nrnMapCoef, 1);
       }
       else
       if (nrnDivBy(NULL, (number) nrnMapModul,dst))
@@ -869,7 +869,7 @@ static const char * nlCPEatLongC(char *s, mpz_ptr i)
   const char * start=s;
   if (!(*s >= '0' && *s <= '9'))
   {
-    mpz_init_set_si(i, 1);
+    mpz_init_set_ui(i, 1);
     return s;
   }
   mpz_init(i);
