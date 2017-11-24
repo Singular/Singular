@@ -542,21 +542,22 @@ static char* nnCoeffString(const coeffs r)
   return omStrDup(buf);
 }
 
+typedef char si_char_SI_BUF_SIZE[SI_BUF_SIZE];
+static si_char_SI_BUF_SIZE nnCoeffName_buf;
 static char* nnCoeffName(const coeffs r)
 {
-  static char buf[SI_BUF_SIZE];
   coeffs_array d=(coeffs_array)r->data;
   int i=0;
-  buf[0]='\0';
+  nnCoeffName_buf[0]='\0';
   loop
   {
     char *s=d[i]->cfCoeffName(d[i]);
-    strncat(buf,s, SI_BUF_SIZE-strlen(buf)-strlen(s)-1);
+    strncat(nnCoeffName_buf,s, SI_BUF_SIZE-strlen(nnCoeffName_buf)-strlen(s)-1);
     i++;
     if (d[i]==NULL) break;
-    strncat(buf," x ", SI_BUF_SIZE-strlen(buf)-4);
+    strncat(nnCoeffName_buf," x ", SI_BUF_SIZE-strlen(nnCoeffName_buf)-4);
   }
-  return buf;
+  return nnCoeffName_buf;
 }
 
 static void nnDelete (number * a, const coeffs r)

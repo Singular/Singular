@@ -312,7 +312,7 @@ static void maMap_KillRings(ring map_r, ring image_r, ring src_r, ring dest_r)
   if (map_r != src_r)
     rKillModified_Wp_Ring(src_r);
   if (image_r != dest_r)
-    rKillModifiedRing_Simple(dest_r);
+    rKillModifiedRing(dest_r);
 }
 
 /*******************************************************************************

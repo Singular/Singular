@@ -53,7 +53,6 @@ int* integerFactorizer (const long integer, int& length, bool& fail)
 
   long j= 0;
   exp= 0;
-  int* buf;
   int next_prime;
   while ((i != 1) && (j < 31937))
   {
@@ -65,13 +64,14 @@ int* integerFactorizer (const long integer, int& length, bool& fail)
     }
     if (exp != 0)
     {
-      buf= result;
+      int *buf= result;
       result= new int [length + exp];
       for (int k= 0; k < length; k++)
         result [k]= buf[k];
       for (int k= 0; k < exp; k++)
         result [k + length]= next_prime;
       length += exp;
+      delete[] buf;
     }
     exp= 0;
     j++;
@@ -88,17 +88,17 @@ int* makeDistinct (int* factors, const int factors_length, int& length)
 {
   length= 1;
   int* result= new int [length];
-  int* buf;
   result[0]= factors [0];
   for (int i= 1; i < factors_length; i++)
   {
     if (factors[i - 1] != factors[i])
     {
-      buf= result;
+      int *buf= result;
       result= new int [length + 1];
       for (int j= 0; j < length; j++)
         result[j]= buf [j];
       result[length]= factors[i];
+      delete[] buf;
       length++;
     }
   }
@@ -118,6 +118,7 @@ CanonicalForm cyclotomicPoly (int n, bool& fail)
   prime_factors= integerFactorizer (n, prime_factors_length, fail);
   int* distinct_factors= makeDistinct (prime_factors, prime_factors_length,
                                         distinct_factors_length);
+  delete [] prime_factors;
   if (fail)
     return 1;
   CanonicalForm buf;
@@ -127,6 +128,7 @@ CanonicalForm cyclotomicPoly (int n, bool& fail)
     result= leftShift (result, distinct_factors[i])/result;
     prod *= distinct_factors[i];
   }
+  delete [] distinct_factors;
   return leftShift (result, n/prod);
 }
 

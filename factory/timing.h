@@ -42,6 +42,8 @@
 
 #if defined(WINNT) && ! defined(__GNUC__)
 
+#define TIMING_DEFINE(t) static clock_t timing_ ## t ## _start, timing_ ## t ## _end; \
+static clock_t timing_ ## t ## _time; 
 #define TIMING_START(t) timing_ ## t ## _start = clock();
 #define TIMING_END(t) timing_ ## t ## _end = clock(); \
 timing_ ## t ## _time += timing_ ## t ## _end - timing_ ## t ## _start;
@@ -60,6 +62,8 @@ static void timing_reset_ ## t () { \
 
 #else /* ! WINNT */
 
+#define TIMING_DEFINE(t) static struct tms timing_ ## t ## _start, timing_ ## t ## _end; \
+static long timing_ ## t ## _time;
 #define TIMING_START(t) times( &timing_ ## t ## _start );
 #define TIMING_END(t) times( &timing_ ## t ## _end ); \
   timing_ ## t ## _time += timing_ ## t ## _end.tms_utime - timing_ ## t ## _start.tms_utime;
@@ -84,6 +88,7 @@ static void timing_reset_ ## t () { \
 #define TIMING_RESET(t) timing_reset_ ## t ();
 
 #else /* TIMING */
+#define TIMING_DEFINE(t)
 #define TIMING_START(t)
 #define TIMING_END(t)
 #define TIMING_END_AND_PRINT(t, msg)

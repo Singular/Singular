@@ -261,8 +261,8 @@ ring sm_RingChange(const ring origR, long bound)
 //  *origR =currRing;
   ring tmpR=rCopy0(origR,FALSE,FALSE);
   rRingOrder_t *ord=(rRingOrder_t*)omAlloc0(3*sizeof(rRingOrder_t));
-  int *block0=(int*)omAlloc(3*sizeof(int));
-  int *block1=(int*)omAlloc(3*sizeof(int));
+  int *block0=(int*)omAlloc0(3*sizeof(int));
+  int *block1=(int*)omAlloc0(3*sizeof(int));
   ord[0]=ringorder_c;
   ord[1]=ringorder_dp;
   tmpR->order=ord;
@@ -290,6 +290,8 @@ ring sm_RingChange(const ring origR, long bound)
 void sm_KillModifiedRing(ring r)
 {
   if (r->qideal!=NULL) id_Delete(&(r->qideal),r);
+  for(int i=r->N-1;i>=0;i--) omFree(r->names[i]);
+  omFreeSize(r->names,r->N*sizeof(char*));
   rKillModifiedRing(r);
 }
 

@@ -580,7 +580,11 @@ char * rOrdStr(ring r)
       StringAppend("(%d)", s);
     }
 
-    if (l==nblocks) return StringEndS();
+    if (l==nblocks)
+    {
+      if (r->bitmask!=0xffff) StringAppend(",L(%ld)",r->bitmask);
+      return StringEndS();
+    }
     StringAppendS(",");
   }
 }
@@ -1878,7 +1882,8 @@ BOOLEAN rOrd_is_Totaldegree_Ordering(const ring r)
             rOrder_is_DegOrdering(( rRingOrder_t)r->order[1]))) ||
            (rHasSimpleOrderAA(r) &&
             (rOrder_is_DegOrdering((rRingOrder_t)r->order[1]) ||
-             rOrder_is_DegOrdering((rRingOrder_t)r->order[2])))));
+	    ((r->order[1]!=0) &&
+             rOrder_is_DegOrdering((rRingOrder_t)r->order[2]))))));
 }
 
 // return TRUE if p->exp[r->pOrdIndex] holds a weighted degree of p */
@@ -2943,12 +2948,6 @@ ring rModifyRing_Simple(ring r, BOOLEAN ommit_degree, BOOLEAN ommit_comp, unsign
   }
   return rModifyRing(r, ommit_degree, ommit_comp, exp_limit);
 }
-
-void rKillModifiedRing_Simple(ring r)
-{
-  rKillModifiedRing(r);
-}
-
 
 void rKillModifiedRing(ring r)
 {

@@ -25,6 +25,7 @@
 #include "Singular/ipid.h"
 #include "Singular/ipshell.h"
 #include "Singular/attrib.h"
+#include "Singular/blackbox.h"
 #include "misc/options.h"
 
 void siInit(char *);

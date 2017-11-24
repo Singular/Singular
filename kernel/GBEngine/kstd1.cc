@@ -3227,6 +3227,7 @@ ideal kInterRedOld (ideal F, ideal Q)
   if (TEST_OPT_REDSB && TEST_OPT_INTSTRATEGY)
     completeReduce(strat);
   //else if (TEST_OPT_PROT) PrintLn();
+  cleanT(strat);
   if (strat->kHEdge!=NULL) pLmFree(&strat->kHEdge);
   omFreeSize((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
   omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));

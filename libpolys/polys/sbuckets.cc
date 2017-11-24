@@ -188,8 +188,10 @@ void sBucket_Add_m(sBucket_pt bucket, poly p)
 
   while (bucket->buckets[i].p != NULL)
   {
-    p = p_Add_q(p, bucket->buckets[i].p, length, bucket->buckets[i].length,
-                bucket->bucket_ring);
+    int shorter;
+    p = bucket->bucket_ring->p_Procs->p_Add_q(p, bucket->buckets[i].p,
+                shorter, bucket->bucket_ring);
+    length+=bucket->buckets[i].length-shorter;
     bucket->buckets[i].p = NULL;
     bucket->buckets[i].length = 0;
     if (p==NULL)
@@ -217,8 +219,10 @@ void sBucket_Add_p(sBucket_pt bucket, poly p, int length)
 
   while (bucket->buckets[i].p != NULL)
   {
-    p = p_Add_q(p, bucket->buckets[i].p, length, bucket->buckets[i].length,
+    int shorter;
+    p = bucket->bucket_ring->p_Procs->p_Add_q(p, bucket->buckets[i].p, shorter,
                 bucket->bucket_ring);
+    length+= bucket->buckets[i].length-shorter;
     bucket->buckets[i].p = NULL;
     bucket->buckets[i].length = 0;
     if (p==NULL)

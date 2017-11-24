@@ -8713,6 +8713,8 @@ static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op)
   return 0;
 }
 
+typedef char si_char_2[2];
+static si_char_2 Tok2Cmdname_buf=" ";
 const char * Tok2Cmdname(int tok)
 {
   if (tok <= 0)
@@ -8722,7 +8724,6 @@ const char * Tok2Cmdname(int tok)
   if (tok==ANY_TYPE) return "any_type";
   if (tok==COMMAND) return "command";
   if (tok==NONE) return "nothing";
-  static char Tok2Cmdname_buf[2]=" ";
   if (tok < 128)
   {
     Tok2Cmdname_buf[1]=(char)tok;

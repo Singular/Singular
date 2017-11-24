@@ -1568,15 +1568,18 @@ poly p_DivideM(poly a, poly b, const ring r)
       }
     }
   }
-  if ((!rField_is_Ring(r)) || n_IsUnit(inv,r->cf))
+  if (result!=NULL)
   {
-    inv = n_Invers(inv,r->cf);
-    __p_Mult_nn(result,inv,r);
-    n_Delete(&inv, r->cf);
-  }
-  else
-  {
-    result = p_Div_nn(result,inv,r);
+    if ((!rField_is_Ring(r)) || n_IsUnit(inv,r->cf))
+    {
+      inv = n_Invers(inv,r->cf);
+      __p_Mult_nn(result,inv,r);
+      n_Delete(&inv, r->cf);
+    }
+    else
+    {
+      result = p_Div_nn(result,inv,r);
+    }
   }
   p_Delete(&b, r);
   return result;

@@ -1,0 +1,520 @@
+///////////////////////////////////////////////////////////////////////////////
+version="version sets.lib 4.1.0.3 Nov_2017 "; //$id$
+category="Miscellaneous";
+info="
+LIBRARY:  sets.lib    Sets in Singular
+
+AUTHORS:  J. Boehm, boehm @ mathematik.uni-kl.de
+          D. Wienholz, wienholz @ mathematik.uni-kl.de
+          S. Zillien, zillien @ rhrk.uni-kl.de
+
+OVERVIEW:
+
+We implement the new class set and all basic methods needed to work with sets.
+A set is generated from a list. After the generating of a set, the adding of an
+element or the union of two sets, automatically every double element is removed
+to secure that no element occurs in a set more than once.
+
+There is a comparison operator, we access the operator via the function isEqual.
+This function isEqual can be used to compare two elements of the same type
+(Set, list, int, bigint, string, intmat, bigintmat, intvec, ring, map, poly, matrix,
+ideal, module, vector, resolution) and also works for comparing of int, bigint and
+number with each other, similarily for matrix, bigintmat and intmat.
+
+The function size can be used to determine the number of elements.
+
+The + operator is used for the union, the * operator for the intersection.
+
+The operators < and > can be used for inclusion tests.
+
+The print function can be used for printing sets.
+
+Note that the implementation of the underlying data structure and algorithms is
+very trivial and will at some point be replaced with something more efficient.
+
+KEYWORDS:
+set, intersection, union, complement, equality, isEqual
+
+TYPES:
+Set                     The class of all sets
+
+PROCEDURES:
+set(list)               general procedure to generate a set from a list
+union(Set,Set)          union of sets
+intersection(Set,Set)   intersection of sets
+complement(Set,Set)     complement of sets
+isElement(def,Set)      test whether an object is in a set
+isSubset(Set,Set)        test whether a set is a subset of another set
+isSuperset(Set,Set)        test whether a set is a superset of another set
+addElement(Set,def)        adds an element to the set
+";
+
+
+static proc mod_init()
+{
+  LIB "methods.lib"; // mod_init needs Hashtable/Method from methods.lib
+  newstruct("Set","list elements");
+  system("install","Set","print",printSet,1);
+  system("install","Set","+",union,2);
+  system("install","Set","*",intersection,2);
+  system("install","Set","<",isSubset,2);
+  system("install","Set","size",sizeSet,1);
+  system("install","Set",">",isSuperset,2);
+  system("install","Set","==",isEqualSet,2);
+  HashTable F = hashTable(
+        list(
+                list("Set","Set"), list("int","number"), list("number","bigint"),
+                list("poly","poly"), list("matrix","matrix"), list("ideal","ideal"),
+                list("map","map"), list("ring","ring"), list("list","list"),
+                list("bigint","int"), list("int","bigint"), list("bigint","bigint"),
+                list("string","string"), list("vector","vector"), list("intvec","intvec"),
+                list("intmat","intmat"), list("bigintmat","bigintmat"), list("matrix","intmat"),
+                list("intmat","matrix"), list("intmat","bigintmat"), list("bigintmat","intmat"),
+                list("int","int"), list("number","int"), list("bigint","number"),
+                list("module","module"), list("number","number"), list("resolution","resolution"),
+                list("vector","intvec"), list("intvec","vector")
+        ),
+        list(
+                "isEqualSet", "isEqualInt", "isEqualInt",
+                "isEqualInt", "isEqualInt", "isEqualIdeal",
+                "isEqualMap", "isEqualRing", "isEqualList",
+                "isEqualInt", "isEqualInt", "isEqualInt",
+                "isEqualInt", "isEqualInt", "isEqualInt",
+                "isEqualInt", "isEqualInt", "isEqualInt",
+                "isEqualInt", "isEqualInt", "isEqualInt",
+                "isEqualInt", "isEqualInt", "isEqualInt",
+                "isEqualModule", "isEqualInt", "isEqualResolution",
+                "isEqualInt","isEqualInt"
+        )
+  );
+  Method isEqual_ = method(F);
+  export(isEqual_);
+  installMethod(isEqual_,"isEqual");
+  system("install","Set","=",set,1);
+}
+
+proc sizeSet(Set a)
+{
+  list L =a.elements;
+  return(size(L));
+}
+
+
+proc isEqualInt(def a,def b)        //exists for matrix, int, bigint, poly, string, vector, intvec, number, intmat, bigintmat, cone
+{
+  return(a==b);
+}
+
+
+proc isEqualMap(def a, def b)
+{
+  if(!(isEqualRing(preimage(a),preimage(b))))        //check the startring of the maps
+  {
+    return(0);
+  }
+  for(int i=1;i<=size(ringlist(preimage(a))[2]);i++){        //check if the two maps are the same
+        if(a[i]!=b[i]){                                        //in every component
+                return(0);
+  }
+}
+return(1);}
+
+
+proc isEqualModule(def m0, def s0)
+{
+  intvec o=option(get);
+  option(redSB);
+  module m=std(m0);
+  module s=std(s0);
+  option(set,o);
+  if(size(m)!=size(s)){return(0);}
+  for(int i=1;i<=size(m);i++){
+        if(m[i]!=s[i]){return(0);}
+  }
+  return(1);
+}
+
+
+proc isEqualResolution(def r, def s)
+{
+  list l=r;
+  list j=s;
+  return(isEqual(l,j));
+}
+
+proc isEqualRing(def r, def t)
+{
+  list a=ringlist(r);                //creating two lists with everything that defines the rings
+  list b=ringlist(t);
+  return(isEqual(a,b));
+}
+
+proc isEqualList(def a, def b)
+{
+  if(size(a)!=size(b)){                //check if the two lists have the same size
+    return(0);
+  }
+  for(int i=1;i<=size(a);i++){                //checking every element of the two lists
+    if(!(isEqual(a[i],b[i]))){
+      return(0);
+    }
+  }
+  return(1);
+}
+
+proc isEqualSet(def a, def b)
+{
+  if(size(a)!=size(b)){                //check if the two sets have the same size
+   return(0);
+  }
+  list L = a.elements;
+  for(int i=1;i<=size(a);i++){                //chek if every element of the first set occurs in
+    if(!(isElement(L[i],b))){        //the second set
+      return(0);
+    }
+  }
+  return(1);
+}
+
+proc isEqualIdeal(def a, def b)
+{
+  option(redSB);
+  intvec o=option(get);
+  ideal I = std(a);
+  ideal J = std(b);
+  option(set,o);
+  if(size(I)!=size(J)){
+    return(0);
+  }
+  for(int i  = 1;i<=size(I); i++){
+    if(I[i]!=J[i]){
+      return(0);
+    }
+  }
+  return(1);
+}
+
+static proc removeDouble(list L)
+{
+  int j;
+  list L1;                        //creating a list tagging the first appearance with 1 and the following with 0
+  list Output;                        //creating an empty list for the return
+  for(int i=1; i<=size(L); i++){
+    L1=insert(L1,1);        //at the beginning every element is tagged with 1
+  }
+  for(i=1; i<size(L); i++){
+    if(L1[i]){                //for every element tagged with 1
+      for(j=i+1; j<=size(L); j++){                //check if it appearace again
+        if(isEqual(L[i],L[j])){                //and tag those appearances with 0
+          L1[j] = 0;
+	}
+      }
+    }
+  }
+  for(i=1; i<=size(L); i++){
+    if(L1[i]){                        //adding every element tagged with 1 to the list
+      Output=insert(Output,L[i]);        //for the return
+    }
+  }
+  return(Output);
+}
+
+
+static proc complementOfLists(list L,list J)
+{
+  int j;
+  list L1;                                //create a list to tag the elements with 1 or 0
+  list Output;                                //create a list for the return
+  for(int i=1; i<=size(J); i++){
+    L1=insert(L1,1);                //every element of the second list is tagged with 1
+  }
+  for(i=1; i<=size(L); i++){                //for every element of the first list
+    for(j=1; j<=size(J); j++){        //test if it is equal to the elements of the
+      if(isEqual(L[i],J[j])){                //second list
+        L1[j] = 0;                //and tag those with 0
+        break;
+      }
+    }
+  }
+  for(i=1; i<=size(J); i++){                //adding every element tagged with 1 to the set
+    if(L1[i]){                        //for the return
+      Output=insert(Output,J[i]);
+    }
+  }
+  return(Output);
+}
+
+proc addElement(Set M, def a)
+"USAGE: addElement(M,a) ; M Set, a freely chosen element
+RETURN: adds the Element a to the Set M
+EXAMPLE: example addElement, shows an example
+"
+{
+  Set S=a;
+  return(M+S);
+}
+example
+{ "EXAMPLE:"; echo = 2;                //example for addElement
+  int a=4;
+  list L = 1,2,3;
+  Set S = L;
+  S;
+  a;
+  addElement(S,a);
+}
+
+proc set(list L)
+"USAGE: set(l) or *=l (short form of * = set(l)); l list
+RETURN: Set, the set createt from the entered list
+EXAMPLE: example set, shows an example
+"
+{
+  Set S;
+  S.elements=removeDouble(L);                //removing every element which occurs more then once
+  return(S);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;                //example for set
+  Set S0a = list(list(1,2,3),list(list(1,2)),list(10,11));
+  Set S0b = list(list(10,11),list(list(1,2)));
+  S0b<S0a;
+  S0a<S0b;
+  S0a==S0a;
+  S0a==S0b;
+  list L = 1,1,2,3;
+  Set S1 = L;
+  S1;
+  ring R1;
+  ring R2 = 0,(x,y),dp;
+  Set S2 = list(R1,R1,R2);
+  S2;
+  ideal I1 = x+y;
+  ideal I2 = y^2;
+  ideal I3 = x+y, (x+y)^3;
+  Set S3 = list(I1,I2,I3);
+  S3;
+  isEqual(I1,I3);
+  isEqual(I1,I2);
+  module M1 = x*gen(1), y*gen(1);
+  module M2 = y^2*gen(2);
+  module M3 = (x+y)*gen(1), (x-y)*gen(1);
+  Set S4 = list(M1,M2,M3);
+  S4;
+  intmat m1[2][3]= 1,2,3,4,5,6;
+  intmat m2[2][3]= 1,2,3,4,5,7;
+  Set S5 = list(m1,m2,m1);
+  S5;
+  bigintmat b1[2][3]= 1,2,3,4,5,6;
+  bigintmat b2[2][3]= 1,2,3,4,5,7;
+  Set S6 = list(b1,b2,b1);
+  S6;
+  resolution r1 = res(maxideal(3),0);
+  resolution r2 = res(maxideal(4),0);
+  Set S7 = list(r1,r1,r2);
+  size(S7);
+}
+
+proc printSet(Set M)
+{
+  string st;
+  list L = M.elements;
+  if (size(L)==0) {
+    print("Empty set");        //returning Empty Set if the set contains no elements
+  }
+  else
+  {
+    string s ="{";                        //if the set isn't empty creating a string with
+    for (int j=1; j<=size(L)-1; j++)        //with every element of the set
+    {
+      s=s+string((L[j]))+"; ";
+    }
+    s=s+string((L[size(L)]))+"}";
+    print(s);                                //printing the string
+    if (size(L)>1){st ="s";}
+    print("Set with "+string(size(L))+" element"+st);        //printing a string with the number
+  }                                                        //of elements of the set
+}
+
+static proc setJoinOfLists(list L1,list L2)
+{
+  for(int i=1; i<=size(L2); i++){
+    L1 = insert(L1,L2[i]);        //adding every element of the second list to the first
+  }
+  return(L1);
+}
+
+
+proc union(Set N, Set M)
+"USAGE:  union(N,M) or N+M;  N,M sets
+RETURN:  Set, the union of the sets N and M
+EXAMPLE: example union, shows an example
+"
+{
+  Set S;
+  list L1 = N.elements;                //converting the sets into lists
+  list L2 = M.elements;
+  list L = setJoinOfLists(L1,L2);                //creating the joint of the two lists
+  S.elements = removeDouble(L);                //removing every element which occurs more then once
+  return(S);
+}
+example                        //example for union
+{ "EXAMPLE:"; echo = 2;
+  list l =1,2,3;
+  list j =2,3,4;
+  Set N=l;
+  Set M=j;
+  N;
+  M;
+  N+M;
+}
+
+
+static proc setIntersectionOfLists(list L1,list L2)
+{
+  if(size(L1)>size(L2)){                //secure that the first list isn't bigger then the second
+    list J = L1;
+    L1=L2;
+    L2=J;
+  }
+  list M;                                //creating an empty set, which will be returned
+  if(size(L1)==0){                //if the first list is empty, the intersection is empty
+    return(M);
+  }
+  Set S = set(L2);
+  for(int i=1; i<=size(L1); i++){                //check for every element of the first list
+    if(isElement(L1[i],S)){                //is in the second list
+      M=insert(M,L1[i]);         //an element of both lists, is added the set
+    }
+  }
+  return(M);
+}
+
+proc intersection(Set N, Set M)
+"USAGE: intersection(N,M) or N*M; N,M sets
+RETURN: Set, the interseection of the sets N and M
+EXAMPLE: example intersection, shows an example
+"
+{
+  Set S;
+  list L1 = N.elements;
+  list L2 = M.elements;
+  list L = setIntersectionOfLists(L1,L2);
+  S.elements = removeDouble(L);
+  return(S);
+}
+example                        //example for intersection
+{ "EXAMPLE:"; echo = 2;
+  list l =1,2,3;
+  list j =2,3,4;
+  Set N=l;
+  Set M=j;
+  N;
+  M;
+  N*M;
+}
+
+proc isElement(def a, Set M)
+"USAGE: isElement(a,M); M set a def
+RETURN: bool, 1 if a is an element of M, 0 if not
+EXAMPLE: example isElement, shows an example
+"
+{
+  list L = M.elements;
+  for(int i=1; i<=size(L); i++){                //test for every element of the set, if it is the
+    if(isEqual(a,L[i])){                //element to be checked
+      return(1);
+    }
+  }
+  return(0);
+}
+example                                //example for isElement
+{
+  "EXAMPLE:"; echo = 2;
+  int i=1;
+  int j=5;
+  list k =1,2,3,4;
+  Set M=k;
+  i;
+  j;
+  M;
+  isElement(i,M);
+  isElement(j,M);
+}
+
+proc complement(Set S, Set M)
+"USAGE: complement(N,M); N,M sets
+RETURN: Set, the complement of the set N in M
+EXAMPLE: example complement, shows an example
+"
+{
+  if (!(S<M)){                //check if the complement can be created
+    return("Error, first set isn't a subset of the second set.");
+  }
+  Set N;
+  list L1 = S.elements;
+  list L2 = M.elements;
+  list L = complementOfLists(L1,L2);
+  N.elements = L;
+  return(N);
+}
+example                                //example for complement
+{ "EXAMPLE:"; echo = 2;
+  list l =1,2;
+  list j =1,2,3,4;
+  Set N=l;
+  Set M=j;
+  N;
+  M;
+  complement(N,M);
+}
+
+proc isSubset(Set S, Set M)
+"USAGE: isSubset(N,M) or N<M ; N,M sets
+RETURN: bool, 1 if N is a Subset of M or 0 if not
+EXAMPLE: example isSubset, shows an example
+"
+{
+  list L = S.elements;
+  list J = M.elements;
+  if(size(L)>size(J)){                //check if the first set is smaller then the second
+    return(0);
+  }
+  for(int i=1; i<=size(L); i++){
+    if(!isElement(L[i],M)){                //check if every element of the first set is in the
+      return(0);                //second set
+    }
+  }
+  return(1);
+}
+example                        //example for isSubset
+{ "EXAMPLE:"; echo = 2;
+  list l =1,2;
+  list j =1,2,3,4;
+  Set N=l;
+  Set M=j;
+  N;
+  M;
+  N<M;
+  M<N;
+}
+
+proc isSuperset(Set S, Set M)        //opposite of isSubset
+"USAGE: isSuperset(N,M) or N>M ; N,M sets
+RETURN: bool, 1 if N is a Superset of M or 0 if not
+EXAMPLE: example isSuperset, shows an example
+"
+{
+  return(M<S);
+}
+example                        //example for isSuperset
+{ "EXAMPLE:"; echo = 2;
+  list l =1,2;
+  list j =1,2,3,4;
+  Set N=l;
+  Set M=j;
+  N;
+  M;
+  N>M;
+  M>N;
+}

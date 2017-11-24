@@ -890,6 +890,8 @@ static inline poly p_ShallowCopyDelete(poly p, const ring r, omBin bin)
 static inline poly p_Add_q(poly p, poly q, const ring r)
 {
   assume( (p != q) || (p == NULL && q == NULL) );
+  if (q==NULL) return p;
+  if (p==NULL) return q;
   int shorter;
   return r->p_Procs->p_Add_q(p, q, shorter, r);
 }
@@ -898,22 +900,26 @@ static inline poly p_Add_q(poly p, poly q, const ring r)
 static inline poly p_Add_q(poly p, poly q, int &lp, int lq, const ring r)
 {
   assume( (p != q) || (p == NULL && q == NULL) );
+  if (q==NULL) return p;
+  if (p==NULL) { lp=lq; return q; }
   int shorter;
   poly res = r->p_Procs->p_Add_q(p, q, shorter, r);
-  lp = (lp + lq) - shorter;
+  lp += lq - shorter;
   return res;
 }
 
 // returns p*n, destroys p
 static inline poly p_Mult_nn(poly p, number n, const ring r)
 {
+  if (p==NULL) return NULL;
   if (n_IsOne(n, r->cf))
     return p;
   else if (n_IsZero(n, r->cf))
   {
     r->p_Procs->p_Delete(&p, r); // NOTE: without p_Delete - memory leak!
     return NULL;
-  } else
+  }
+  else
     return r->p_Procs->p_Mult_nn(p, n, r);
 }
 #define __p_Mult_nn(p,n,r) r->p_Procs->p_Mult_nn(p, n, r)
@@ -921,6 +927,7 @@ static inline poly p_Mult_nn(poly p, number n, const ring r)
 static inline poly p_Mult_nn(poly p, number n, const ring lmRing,
                         const ring tailRing)
 {
+  assume(p!=NULL);
 #ifndef PDEBUG
   if (lmRing == tailRing)
     return p_Mult_nn(p, n, tailRing);
@@ -928,13 +935,17 @@ static inline poly p_Mult_nn(poly p, number n, const ring lmRing,
   poly pnext = pNext(p);
   pNext(p) = NULL;
   p = lmRing->p_Procs->p_Mult_nn(p, n, lmRing);
-  pNext(p) = tailRing->p_Procs->p_Mult_nn(pnext, n, tailRing);
+  if (pnext!=NULL)
+  {
+    pNext(p) = tailRing->p_Procs->p_Mult_nn(pnext, n, tailRing);
+  }
   return p;
 }
 
 // returns p*n, does not destroy p
 static inline poly pp_Mult_nn(poly p, number n, const ring r)
 {
+  if (p==NULL) return NULL;
   if (n_IsOne(n, r->cf))
     return p_Copy(p, r);
   else if (n_IsZero(n, r->cf))
@@ -973,6 +984,7 @@ static inline BOOLEAN p_LmIsConstant(const poly p, const ring r)
 // returns Copy(p)*m, does neither destroy p nor m
 static inline poly pp_Mult_mm(poly p, poly m, const ring r)
 {
+  if (p==NULL) return NULL;
   if (p_LmIsConstant(m, r))
     return __pp_Mult_nn(p, pGetCoeff(m), r);
   else
@@ -982,6 +994,7 @@ static inline poly pp_Mult_mm(poly p, poly m, const ring r)
 // returns p*m, destroys p, const: m
 static inline poly p_Mult_mm(poly p, poly m, const ring r)
 {
+  if (p==NULL) return NULL;
   if (p_LmIsConstant(m, r))
     return __p_Mult_nn(p, pGetCoeff(m), r);
   else
@@ -1468,7 +1481,7 @@ static inline void p_SetExpV(poly p, int *ev, const ring r)
   for (unsigned j = r->N; j!=0; j--)
       p_SetExp(p, j, ev[j], r);
 
-  p_SetComp(p, ev[0],r);
+  if(ev[0]!=0) p_SetComp(p, ev[0],r);
   p_Setm(p, r);
 }
 

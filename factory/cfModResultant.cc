@@ -158,7 +158,7 @@ void myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
         min_max_deg= degsgx*degsf[i] + degsfx*degsg[i];
       else
         min_max_deg= 0;
-      while (min_max_deg == 0 && i < m + 1)
+      while (min_max_deg == 0 && i < m)
       {
         i++;
         if (degsf [i] != 0 && degsg [i] != 0)

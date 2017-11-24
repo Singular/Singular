@@ -319,7 +319,6 @@ matrix mp_Coeffs (ideal I, int var, const ring R)
 {
   poly h,f;
   int l, i, c, m=0;
-  matrix co;
   /* look for maximal power m of x_var in I */
   for (i=IDELEMS(I)-1; i>=0; i--)
   {
@@ -331,7 +330,7 @@ matrix mp_Coeffs (ideal I, int var, const ring R)
       pIter(f);
     }
   }
-  co=mpNew((m+1)*I->rank,IDELEMS(I));
+  matrix co=mpNew((m+1)*I->rank,IDELEMS(I));
   /* divide each monomial by a power of x_var,
   * remember the power in l and the component in c*/
   for (i=IDELEMS(I)-1; i>=0; i--)

@@ -346,6 +346,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       bool ig = FALSE;
       bool mgrad = FALSE;
       bool autop = FALSE;
+      int trunDegHs=0;
       if((h != NULL)&&(h->Typ() == IDEAL_CMD))
         i = (ideal)h->Data();
       else
@@ -362,25 +363,49 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         return TRUE;
       }
       h = h->next;
-      while((h != NULL)&&(h->Typ() == INT_CMD))
+      while(h != NULL)
       {
         if((int)(long)h->Data() == 1)
           ig = TRUE;
         else if((int)(long)h->Data() == 2)
           mgrad = TRUE;
-        else if((int)(long)h->Data() == 3)
+        else if(h->Typ()==STRING_CMD)
            autop = TRUE;
+        else if(h->Typ() == INT_CMD)
+          trunDegHs = (int)(long)h->Data();
         h = h->next;
       }
       if(h != NULL)
       {
-        WerrorS("nc_Hilb:int 1,2 or 3 are expected");
+        WerrorS("nc_Hilb:int 1,2, total degree for the truncation, and a string                  for printing the details are expected");
         return TRUE;
       }
-      HilbertSeries_OrbitData(i, lV, ig, mgrad, autop);
+
+      HilbertSeries_OrbitData(i, lV, ig, mgrad, autop, trunDegHs);
       return(FALSE);
     }
     else
+/*===== rcolon ===============================================*/
+   // Hilbert series of non-commutative monomial algebras
+  if(strcmp(sys_cmd,"rcolon") == 0)
+  {
+    const short t1[]={3,IDEAL_CMD,POLY_CMD,INT_CMD};
+    if (iiCheckTypes(h,t1,1))
+    {
+      ideal i = (ideal)h->Data();
+      h = h->next;
+      poly w=(poly)h->Data();
+      h = h->next;
+      int lV = (int)(long)h->Data();
+      res->rtyp = IDEAL_CMD;
+      res->data = RightColonOperation(i, w, lV);
+      return(FALSE);
+    }
+    else
+      return TRUE;
+  }
+  else
+
 /*==================== sh ==================================*/
     if(strcmp(sys_cmd,"sh")==0)
     {

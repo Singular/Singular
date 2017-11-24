@@ -33,27 +33,27 @@ REFERENCES: [1] Cloud, Kearfott, Moore: Introduction to Interval Analysis,
                 Science, World Scientific Publishing Co. Pte. Ltd., 2005
 
 OVERLOADS:
-[           ivmatGet              indexing
-print       ivmatPrint            printing
-nrows       ivmatNrows            number of rows
-ncols       ivmatNcols            number of columns@*
-*           ivmatMultiplyGeneral  matrix multiplication
+  [           ivmatGet              indexing
+  print       ivmatPrint            printing
+  nrows       ivmatNrows            number of rows
+  ncols       ivmatNcols            number of columns@*
+  *           ivmatMultiplyGeneral  matrix multiplication
 
 PROCEDURES:
-bounds(a,#);            creates a new interval with given bounds
-length(I);              returns Euclidean length of interval
-boxSet(B,i,I);          returns box B with B[i]==I
-ivmatInit(m, n);        returns m x n [0,0]-matrix
-ivmatSet(A,i,j,I);      returns matrix A where A[i][j]=I
-unitMatrix(m);          returns m x m unit matrix where 1 = [1,1]
-ivmatGaussian(M);       computes M^(-1) using Gaussian elimination for intervals
-evalPolyAtBox(f,B);     returns evaluation of polynomial at a box
-evalJacobianAtBox(A,B); jacobian matrix of A where polynomials are evaluated at B
+  bounds(a,#);            creates a new interval with given bounds
+  length(I);              returns Euclidean length of interval
+  boxSet(B,i,I);          returns box B with B[i]==I
+  ivmatInit(m, n);        returns m x n [0,0]-matrix
+  ivmatSet(A,i,j,I);      returns matrix A where A[i][j]=I
+  unitMatrix(m);          returns m x m unit matrix where 1 = [1,1]
+  ivmatGaussian(M);       computes M^(-1) using Gaussian elimination for intervals
+  evalPolyAtBox(f,B);     returns evaluation of polynomial at a box
+  evalJacobianAtBox(A,B); jacobian matrix of A where polynomials are evaluated at B
 
-rootIsolationNoPreprocessing(I,L,e);
-                        computes boxes containing unique roots of I lying in L
-rootIsolation(I,B,e);   slims down input box B and calls rootIsolationNoPreprocessing
-rootIsolationPrimdec(I,B,e);   runs a primary decomposition primdecGTZ before root isoation
+  rootIsolationNoPreprocessing(I,L,e);
+                          computes boxes containing unique roots of I lying in L
+  rootIsolation(I,B,e);   slims down input box B and calls rootIsolationNoPreprocessing
+  rootIsolationPrimdec(I,B,e);   runs a primary decomposition primdecGTZ before root isoation
 
 
 KEYWORDS:   real root isolation; interval arithmetic; Newton step
@@ -135,7 +135,7 @@ example
 }
 
 // function defined in interval.so
-proc length(interval)
+proc length()
 "USAGE:  @code{length(I)}; @code{I interval}
 RETURN: number, the Euclidean length of the interval
 EXAMPLE: example length; shows an example"
@@ -153,7 +153,7 @@ example
 
 // BOX FUNCTIONS
 
-proc boxSet(box, int, interval)
+proc boxSet()
 "USAGE: @code{boxSet(B, i, I)}; @code{B box, i int, I interval}
 RETURN: new box @code{C} where @code{C[i]==I}
 PURPOSE: modifies a single entry of a box
@@ -265,14 +265,6 @@ NOTE:   this uses exclusion tests and Groebner bases to determine whether the
     // else there must?/might be a zero on the intersection, so decrease ratio
     // slightly
     ratio = ratio * 15/16;
-
-    // make sure algorithm terminates after taking too many steps this may not
-    // be necessary
-    if ( ratio < 1/100 )
-    {
-      print("splitBox took too long");
-      break;
-    }
   }
 
   // now split boxes
@@ -851,14 +843,16 @@ static proc boxEmbedding(box B, box Bproj, intvec v)
 
 
 // use laguerre solver for univariate case
-static proc solveunivar(poly f){
+static proc solveunivar(poly f)
+{
    def R1 = basering;
    ring R = (real,30,i),x,dp;
    poly f = fetch(R1,f);
    int i,j,k;
    int epsilon=12;
    int tst;
-   while (tst==0){
+   while (tst==0)
+   {
      if (epsilon>29){ERROR("Precision not sufficient");}
      setring R;
      list r = laguerre_solve(f,epsilon);
@@ -886,19 +880,22 @@ static proc solveunivar(poly f){
      }
       number t = (number(10)^epsilon)^(-1);
       tst=1;
-      for (j=1;j<=k;j++){
+      for (j=1;j<=k;j++)
+      {
          if (sturm(f,r2[j]-t,r2[j]+t)>1){tst=0;break;};
       }
       epsilon++;
    }
    list iv;
-   for (i=1; i<=size(r2);i++){
+   for (i=1; i<=size(r2);i++)
+   {
       number lo = r2[i]-t;
       number hi = r2[i]+t;
       iv[i]=bounds(lo,hi);
       kill lo,hi;
    }
-return(iv);}
+  return(iv);
+}
 
 proc rootIsolationNoPreprocessing(ideal I, list start, number eps)
 "USAGE:  @code{rootIsolationNoPreprocessing(I, B, eps)};
@@ -922,13 +919,13 @@ EXAMPLE: example rootIsolationNoPreprocessing; exclusion test for intersection
         of two ellipses"
 {
   int i;
-  if (nvars(basering)==1){
+  if (nvars(basering)==1)
+  {
     list iv = solveunivar(I[1]);
     list bo;
-    for (i=1; i<=size(iv);i++){
-        box B = list(iv[i]);
-        bo[i]=B;
-        kill B;
+    for (i=1; i<=size(iv);i++)
+    {
+      bo[i] = box(list(iv[i]));
     }
     return(list(),bo);
   }
@@ -941,7 +938,7 @@ EXAMPLE: example rootIsolationNoPreprocessing; exclusion test for intersection
   //help set of boxes
   list lBoxesHelp;
 
-  int i, j, s, cnt;
+  int j, s, cnt;
   int zeroTest;
   int N = nvars(basering);
 
@@ -1064,7 +1061,7 @@ example
 static proc rootIsolationTriangL(list T, #)
 {
   int n = size(T);
-  int i, j, k, l;
+  int i;
   list lBoxesUnique, lBoxesSize, lRoots;
   def bInt;
   for (i = 1; i <= n; i++)
@@ -1120,29 +1117,43 @@ EXAMPLE: example rootIsolationPrimdec; for intersection of two ellipses"
       }
     }
     RLi = RL;
-    if (size(delvar)>0){
+    if (size(delvar)>0)
+    {
       RLi[2]=deleteSublist(intvec(delvar[1..size(delvar)]),RLi[2]);
       RLi[3]=list(list("dp",intvec(1:size(keepvar))),list("C",0));
     }
-    def Ri = ring(RLi);
-    setring Ri;
-    ideal idi=imap(R,idi);
-    ri = rootIsolation(idi);
-    setring R;
-    kill Ri;
-    list ivlist;
-    for (l=1;l<=size(ri[2]);l++)
+    if (size(keepvar)>0)
     {
-      for (j=1; j<=size(keepvar); j++)
+      def Ri = ring(RLi);
+      setring Ri;
+      ideal idi=imap(R,idi);
+      ri = rootIsolation(idi);
+      setring R;
+      kill Ri;
+      list ivlist;
+      for (l=1;l<=size(ri[2]);l++)
       {
-        ivlist[keepvar[j]]=ri[2][l][j];
+        for (j=1; j<=size(keepvar); j++)
+        {
+          ivlist[keepvar[j]]=ri[2][l][j];
+        }
+        for (j=1; j<=size(delvar); j++)
+        {
+          ii = bounds(number(dci[5][delvar[j]]));
+          ivlist[delvar[j]]=ii;
+        }
+        sols[size(sols)+1]=box(ivlist);
       }
-      for (j=1; j<=size(delvar); j++)
-      {
-        ii = bounds(number(dci[5][delvar[j]]));
-        ivlist[delvar[j]]=ii;
-      }
-      sols[size(sols)+1]=box(ivlist);
+    }
+    else
+    {
+        list ivlist;
+        for (j=1; j<=size(delvar); j++)
+        {
+          ii = bounds(number(dci[5][delvar[j]]));
+          ivlist[delvar[j]]=ii;
+        }
+        sols[size(sols)+1]=box(ivlist);
     }
     kill keepvar,delvar,ivlist;
   }
@@ -1185,8 +1196,6 @@ NOTE:   This algorithm and some procedures used therein perform Groebner basis
         to the triangular decomposition of @code{I}.
 EXAMPLE: example rootIsolation; for intersection of two ellipses"
 {
-  //voice;
-  //printlevel=voice;
   dbprint("Start rootisolation");
   int N = nvars(basering);
   int i, j, k, l;
@@ -1195,21 +1204,26 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
   // input parameter check
   int determinebox;
 
-  if (size(#)==0){
+  if (size(#)==0)
+  {
     determinebox = 1;
     number eps = 0;
   }
 
-  if (size(#)==1){
-    if (typeof(#[1])=="box"){
+  if (size(#)==1)
+  {
+    if (typeof(#[1])=="box")
+    {
         box start = #[1];
         number eps = 0;
     }
-    if (typeof(#[1])=="number"){
+    if (typeof(#[1])=="number")
+    {
         number eps = #[1];
         determinebox = 1;
     }
-    if ((typeof(#[1])!="box") and (typeof(#[1])!="number")){
+    if ((typeof(#[1])!="box") and (typeof(#[1])!="number"))
+    {
         ERROR("second argument should be a box or a number");
     }
   }
@@ -1228,7 +1242,8 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
     number eps = #[2];
   }
 
-  if (size(#)>2){
+  if (size(#)>2)
+  {
     ERROR("too many arguments");
   }
 
@@ -1387,7 +1402,6 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
     }
 
     // get boxes containing roots of univariate polynomial
-    //"rootIsolationNoPreprocessing ";
     univarResult = rootIsolationNoPreprocessing(gbUnivar,
       list(box(list(bounds(lo, up)))), eps);
     // maybe result[1] is not empty, so take both

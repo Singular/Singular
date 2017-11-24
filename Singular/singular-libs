@@ -36,7 +36,7 @@ SLIB0 = absfact.lib ainvar.lib aksaka.lib alexpoly.lib algebra.lib \
 SLIB1 = arr.lib \
 	brillnoether.lib\
 	classify2.lib classifyMapGerms.lib classifyceq.lib classifyci.lib classify_aeq.lib\
-	chern.lib cimonom.lib customstd.lib curveInv.lib \
+	chern.lib cimonom.lib combinat.lib customstd.lib curveInv.lib \
 	deRham.lib dmodloc.lib divisors.lib \
 	ellipticcovers.lib \
         ffsolve.lib ffmodstd.lib decomp.lib template.lib \
@@ -44,14 +44,14 @@ SLIB1 = arr.lib \
         gfan.lib gitfan.lib gradedModules.lib GND.lib graal.lib goettsche.lib \
 	hess.lib hdepth.lib \
         locnormal.lib \
-	modnormal.lib modular.lib multigrading.lib modwalk.lib\
+	methods.lib modnormal.lib modular.lib multigrading.lib modwalk.lib\
 	JMBTest.lib JMSConst.lib \
 	nfmodstd.lib nfmodsyz.lib numerAlg.lib numerDecom.lib \
         orbitparam.lib \
 	parallel.lib polyclass.lib polymake.lib polybori.lib \
-	realizationMatroids.lib resources.lib ringgb.lib \
+	realclassify.lib realizationMatroids.lib resources.lib ringgb.lib \
 	rootisolation.lib rwalk.lib rstandard.lib \
-	schreyer.lib symodstd.lib schubert.lib swalk.lib \
+	schreyer.lib sets.lib symodstd.lib schubert.lib swalk.lib \
 	tasks.lib tropical.lib tropicalNewton.lib
 
 PLIBS = bimodules.lib bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib\
