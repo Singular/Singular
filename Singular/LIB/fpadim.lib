@@ -1760,6 +1760,9 @@ ASSUME: - basering is a Letterplace ring
       intvec v_overlap;
       intvec w_overlap;
       //TODO how should the graph look like when l - 1 = 0 ?
+      if (l - 1 == 0) {
+        ERROR("Ufnarovskij graph not implemented for l = 1");
+      }
       if (l - 1 > 1) {
         v_overlap = v[2 .. l-1];
         w_overlap = w[1 .. l-2];
