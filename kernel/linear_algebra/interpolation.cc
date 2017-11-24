@@ -550,10 +550,10 @@ static void modp_Evaluate(modp_number *ev, mono_type mon, condition_type con)  /
 static void int_Evaluate(mpz_t ev, mono_type mon, condition_type con) // (***) evaluates monomial on condition for integer numbers
 {
     int i;
-    mpz_set_si(ev,0);
+    mpz_set_ui(ev,0);
     for (i=0;i<variables;i++)
         if (con.mon[i] > mon[i]) return ;;
-    mpz_set_si(ev,1);
+    mpz_set_ui(ev,1);
     mpz_t mon_conv;
     mpz_init(mon_conv);
     int j,k;
@@ -598,7 +598,7 @@ static void ProduceRow(mono_type mon)  // produces a row for monomial - first pa
 static void IntegerPoints ()  // produces integer points from rationals by scaling the coordinate system
 {
      int i,j;
-     mpz_set_si(common_denom,1); // this is common scaling factor
+     mpz_set_ui(common_denom,1); // this is common scaling factor
      for (i=0;i<n_points;i++)
      {
          for (j=0;j<variables;j++)
@@ -1302,7 +1302,7 @@ static bool CheckGenerator () // evaluates generator to check whether it is good
      mpz_init(sum);
      for (con=0;con<final_base_dim;con++)
      {
-       mpz_set_si(sum,0);
+       mpz_set_ui(sum,0);
        for (i=0;i<=final_base_dim;i++)
        {
          int_Evaluate(val, polyexp[i], condition_list[con]);
@@ -1463,7 +1463,7 @@ static void ResolveCoeff (mpq_t c, number m)
   if ((long)m & SR_INT)
   {
     long m_val=SR_TO_INT(m);
-    mpq_set_si(c,m_val,1);
+    mpq_set_ui(c,m_val,1);
   }
   else
   {

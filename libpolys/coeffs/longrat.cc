@@ -2815,9 +2815,9 @@ number nlFarey(number nN, number nP, const coeffs r)
   else                     mpz_set(N,nN->z);
   assume(!mpz_isNeg(P));
   if (mpz_isNeg(N))  mpz_add(N,N,P);
-  mpz_init2(A,bits); mpz_set_si(A,0L);
-  mpz_init2(B,bits); mpz_set_si(B,1L);
-  mpz_init2(C,bits); mpz_set_si(C,0L);
+  mpz_init2(A,bits); mpz_set_ui(A,0L);
+  mpz_init2(B,bits); mpz_set_ui(B,1L);
+  mpz_init2(C,bits); mpz_set_ui(C,0L);
   mpz_init2(D,bits);
   mpz_init2(E,bits); mpz_set(E,P);
   mpz_init2(tmp,bits);
