@@ -71,7 +71,6 @@ void omFreeLarge(void* addr)
 void* omAlloc0Large(size_t size)
 {
   void* addr = omAllocLarge(size);
-  size = omSizeOfLargeAddr(addr);
   memset(addr, 0, size);
   return addr;
 }
