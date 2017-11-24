@@ -1161,6 +1161,9 @@ proc lpNoetherian(ideal G) {
   // return 2 right
   // return 3 both
 
+  G = lead(G);
+  G = simplify(G, 2+4+8);
+
   // check special case 1
   int l = 0;
   for (int i = 1; i <= size(G); i++) {
