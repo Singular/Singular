@@ -1063,7 +1063,7 @@ static void PrepareChinese (int n) // initialization for CRA
          in_gamma[i]=OneInverse(prod,congr[k]);
      }
      mpz_init(bigcongr);
-     mpz_set_ui(bigcongr,congr[0]);
+     mpz_set_si(bigcongr,congr[0]);
      for (k=1;k<n;k++) mpz_mul_ui(bigcongr,bigcongr,congr[k]);
 }
 
@@ -1463,7 +1463,7 @@ static void ResolveCoeff (mpq_t c, number m)
   if ((long)m & SR_INT)
   {
     long m_val=SR_TO_INT(m);
-    mpq_set_ui(c,m_val,1);
+    mpq_set_si(c,m_val,1);
   }
   else
   {
