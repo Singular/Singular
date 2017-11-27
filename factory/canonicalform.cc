@@ -1831,25 +1831,33 @@ CanonicalForm::genOne() const
     else
         return CanonicalForm( value->genOne() );
 }
+/// For optimizing if-branches
+#ifdef __GNUC__
+#define LIKELY(expression) (__builtin_expect(!!(expression), 1))
+#define UNLIKELY(expression) (__builtin_expect(!!(expression), 0))
+#else
+#define LIKELY(expression) (expression)
+#define UNLIKELY(expression) (expression)
+#endif
 
 /** exponentiation **/
 CanonicalForm
 power ( const CanonicalForm & f, int n )
 {
   ASSERT( n >= 0, "illegal exponent" );
-  if ( f.isZero() )
-    return CanonicalForm(0L);
-  else  if ( f.isOne() )
-    return f;
-  else  if ( f == -1 )
+  if (UNLIKELY( f.isZero() ))
+    return f.genZero();
+  else  if (UNLIKELY( f.isOne() ))
+    return f.genOne();
+  else  if (UNLIKELY( f == -1 ))
   {
     if ( n % 2 == 0 )
-      return CanonicalForm(1L);
+      return f.genOne();
     else
       return CanonicalForm(-1L);
   }
-  else  if ( n == 0 )
-    return CanonicalForm(1L);
+  else  if (UNLIKELY( n == 0 ))
+    return  f.genOne();
 
   //else if (f.inGF())
   //{
@@ -1881,9 +1889,9 @@ power ( const Variable & v, int n )
 {
     //ASSERT( n >= 0, "illegal exponent" );
     if ( n == 0 )
-        return 1;
+        return CanonicalForm(1L);
     else  if ( n == 1 )
-        return v;
+        return CanonicalForm(v);
     else  if (( v.level() < 0 ) && (hasMipo(v)))
     {
         CanonicalForm result( v, n-1 );

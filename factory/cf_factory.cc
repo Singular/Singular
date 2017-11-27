@@ -15,13 +15,22 @@
 #include "int_poly.h"
 #include "imm.h"
 
+/// For optimizing if-branches
+#ifdef __GNUC__
+#define LIKELY(expression) (__builtin_expect(!!(expression), 1))
+#define UNLIKELY(expression) (__builtin_expect(!!(expression), 0))
+#else
+#define LIKELY(expression) (expression)
+#define UNLIKELY(expression) (expression)
+#endif
+
 int CFFactory::currenttype = IntegerDomain;
 
 InternalCF *
 CFFactory::basic ( long value )
 {
     if ( currenttype == IntegerDomain )
-        if ( value >= MINIMMEDIATE && value <= MAXIMMEDIATE )
+        if (LIKELY( value >= MINIMMEDIATE && value <= MAXIMMEDIATE ))
             return int2imm( value );
         else
             return new InternalInteger( value );
@@ -44,7 +53,7 @@ InternalCF *
 CFFactory::basic ( int type, long value )
 {
     if ( type == IntegerDomain )
-        if ( value >= MINIMMEDIATE && value <= MAXIMMEDIATE )
+        if (LIKELY( value >= MINIMMEDIATE && value <= MAXIMMEDIATE ))
             return int2imm( value );
         else
             return new InternalInteger( value );
