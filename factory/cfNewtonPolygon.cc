@@ -603,30 +603,30 @@ void convexDense(int** points, int sizePoints, mpz_t*& M, mpz_t*& A)
     }
     else if (sizePoints == 1)
     {
-      mpz_set_ui (M[0], 1);
-      mpz_set_ui (M[3], 1);
+      mpz_set_si (M[0], 1);
+      mpz_set_si (M[3], 1);
     }
     return;
   }
-  mpz_set_ui (M[0], 1);
-  mpz_set_ui (M[3], 1);
+  mpz_set_si (M[0], 1);
+  mpz_set_si (M[3], 1);
 
   mpz_t * Mu= new mpz_t[4];
-  mpz_init_set_ui (Mu[1], 1);
-  mpz_init_set_ui (Mu[2], 1);
+  mpz_init_set_si (Mu[1], 1);
+  mpz_init_set_si (Mu[2], 1);
   mpz_init (Mu[0]);
   mpz_init (Mu[3]);
 
   mpz_t * Lambda= new mpz_t[4];
-  mpz_init_set_ui (Lambda[0], 1);
+  mpz_init_set_si (Lambda[0], 1);
   mpz_init_set_si (Lambda[1], -1);
   mpz_init_set_si (Lambda[3], 1);
   mpz_init (Lambda[2]);
 
   mpz_t * InverseLambda= new mpz_t[4];
-  mpz_init_set_ui (InverseLambda[0], 1);
-  mpz_init_set_ui (InverseLambda[1], 1);
-  mpz_init_set_ui (InverseLambda[3], 1);
+  mpz_init_set_si (InverseLambda[0], 1);
+  mpz_init_set_si (InverseLambda[1], 1);
+  mpz_init_set_si (InverseLambda[3], 1);
   mpz_init (InverseLambda[2]);
 
   mpz_t tmp;
