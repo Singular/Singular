@@ -1520,6 +1520,23 @@ static BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,k
   }
 
   k_GetStrongLeadTerms(p, si, currRing, m1, m2, gcd, strat->tailRing);
+
+  unsigned long sev = pGetShortExpVector(gcd);
+
+  for (int j = 0; j < strat->sl; j++) {
+    if (j == i)
+      continue;
+
+    if (n_DivBy(d, pGetCoeff(strat->S[j]), currRing->cf) &&
+        !(strat->sevS[j] & ~sev) &&
+        p_LmDivisibleBy(strat->S[j], gcd, currRing)) {
+      nDelete(&d);
+      nDelete(&s);
+      nDelete(&t);
+      return FALSE;
+    }
+  }
+
   //p_Test(m1,strat->tailRing);
   //p_Test(m2,strat->tailRing);
   /*if(!enterTstrong)
@@ -1578,7 +1595,7 @@ static BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,k
   int posx;
   h.pCleardenom();
   strat->initEcart(&h);
-  h.sev = pGetShortExpVector(h.p);
+  h.sev = sev;
   h.i_r1 = -1;h.i_r2 = -1;
   if (currRing!=strat->tailRing)
     h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
