@@ -111,12 +111,15 @@ int kFindDivisibleByInTIntegers(const kStrategy strat, const LObject* L, const i
 #if COEF_NEGATION_CHECK
         if( n_DivBy(a, pGetCoeff(T[j].p), r->cf) ||
             n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(a, pGetCoeff(T[j].p), r->cf))
+            n_Greater(a, pGetCoeff(T[j].p), r->cf)) {
+
+          nDelete(&a);
 #else
         if( n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf))
+            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf)) {
 #endif
           return j;
+        }
       }
 #else
       if (!(sevT[j] & not_sev) &&
@@ -125,12 +128,15 @@ int kFindDivisibleByInTIntegers(const kStrategy strat, const LObject* L, const i
 #if COEF_NEGATION_CHECK
         if( n_DivBy(a, pGetCoeff(T[j].p), r->cf) ||
             n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(a, pGetCoeff(T[j].p), r->cf))
+            n_Greater(a, pGetCoeff(T[j].p), r->cf)) {
+
+          nDelete(&a);
 #else
         if( n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf))
+            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf)) {
 #endif
           return j;
+        }
       }
 #endif
       j++;
@@ -154,12 +160,14 @@ int kFindDivisibleByInTIntegers(const kStrategy strat, const LObject* L, const i
 #if COEF_NEGATION_CHECK
         if( n_DivBy(a, pGetCoeff(T[j].p), r->cf) ||
             n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(a, pGetCoeff(T[j].p), r->cf))
+            n_Greater(a, pGetCoeff(T[j].p), r->cf)) {
+          nDelete(&a);
 #else
         if( n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf))
+            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf)) {
 #endif
           return j;
+        }
       }
 #else
       if (!(sevT[j] & not_sev) &&
@@ -168,12 +176,14 @@ int kFindDivisibleByInTIntegers(const kStrategy strat, const LObject* L, const i
 #if COEF_NEGATION_CHECK
         if( n_DivBy(a, pGetCoeff(T[j].p), r->cf) ||
             n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(a, pGetCoeff(T[j].p), r->cf))
+            n_Greater(a, pGetCoeff(T[j].p), r->cf)) {
+          nDelete(&a);
 #else
         if( n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf))
+            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf)) {
 #endif
           return j;
+        }
       }
 #endif
       j++;
@@ -540,6 +550,7 @@ int redRingIntegers (LObject* h,kStrategy strat)
   if (h->IsNull()) return 0; // spoly is zero (can only occure with zero divisors)
   if (strat->tl<0) return 1;
 
+  number mult, rest;
   int at/*,i*/;
   long d;
   int j = 0;
@@ -601,13 +612,13 @@ int redRingIntegers (LObject* h,kStrategy strat)
       tj  = strat->T[j];
       tj.Copy();
       /* compute division with remainder of lc(h) and lc(T[j]) */
-      number a, d;
-      d = n_QuotRem(pGetCoeff(h->p), pGetCoeff(strat->T[j].p), &a, currRing->cf);
+      rest = n_QuotRem(pGetCoeff(h->p), pGetCoeff(strat->T[j].p),
+          &mult, currRing->cf);
       /* set corresponding new lead coefficient already. we do not
        * remove the lead term in ksReducePolyLC, but only apply
        * a lead coefficient reduction */
-      tj.Mult_nn(d);
-      ksReducePolyLC(h, &tj, NULL, &a, strat);
+      tj.Mult_nn(rest);
+      ksReducePolyLC(h, &tj, NULL, &mult, strat);
       tj.Delete();
     }
     /* printf("\nAfter small red: ");pWrite(h->p); */
