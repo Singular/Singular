@@ -504,6 +504,7 @@ poly redNFTail (poly h,const int sl,kStrategy strat);
 int redHoney (LObject* h, kStrategy strat);
 #ifdef HAVE_RINGS
 int redRing (LObject* h,kStrategy strat);
+int redRingIntegers (LObject* h,kStrategy strat);
 int redRiloc (LObject* h,kStrategy strat);
 void enterExtendedSpoly(poly h,kStrategy strat);
 void enterExtendedSpolySig(poly h,poly hSig,kStrategy strat);
@@ -591,6 +592,7 @@ int kFindInT(poly p, TSet T, int tlength);
 /// return -1 if no divisor is found
 ///        number of first divisor in T, otherwise
 int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start=0);
+int kFindDivisibleByInTIntegers(const kStrategy strat, const LObject* L, const int start=0);
 
 /// return -1 if no divisor is found
 ///        number of first divisor in S, otherwise
@@ -687,6 +689,12 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
 //         -1 tailRing change could not be performed due to exceeding exp
 //            bound of currRing
 int ksReducePoly(LObject* PR,
+                 TObject* PW,
+                 poly spNoether = NULL,
+                 number *coef = NULL,
+                 kStrategy strat = NULL);
+
+int ksReducePolyLC(LObject* PR,
                  TObject* PW,
                  poly spNoether = NULL,
                  number *coef = NULL,

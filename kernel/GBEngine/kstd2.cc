@@ -44,6 +44,8 @@
 #define SBA_PRINT_SIZE_SYZ                  0
 #define SBA_PRINT_PRODUCT_CRITERION         0
 
+#define COEF_NEGATION_CHECK 1
+
 // counts sba's reduction steps
 #if SBA_PRINT_REDUCTION_STEPS
 long sba_reduction_steps;
@@ -79,6 +81,105 @@ long sba_interreduction_operations;
   int (*test_PosInT)(const TSet T,const int tl,LObject &h);
   int (*test_PosInL)(const LSet set, const int length,
                 LObject* L,const kStrategy strat);
+
+// return -1 if no divisor is found
+//        number of first divisor, otherwise
+int kFindDivisibleByInTIntegers(const kStrategy strat, const LObject* L, const int start)
+{
+  unsigned long not_sev = ~L->sev;
+  int j = start;
+
+  const TSet T=strat->T;
+  const unsigned long* sevT=strat->sevT;
+  if (L->p!=NULL)
+  {
+    const ring r=currRing;
+    const poly p=L->p;
+
+    pAssume(~not_sev == p_GetShortExpVector(p, r));
+
+#if COEF_NEGATION_CHECK
+    number a = n_Copy(pGetCoeff(p), currRing->cf);
+    n_InpNeg(a, currRing->cf);
+#endif
+    loop
+    {
+      if (j > strat->tl) return -1;
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+      if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
+      {
+#if COEF_NEGATION_CHECK
+        if( n_DivBy(a, pGetCoeff(T[j].p), r->cf) ||
+            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
+            n_Greater(a, pGetCoeff(T[j].p), r->cf))
+#else
+        if( n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
+            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf))
+#endif
+          return j;
+      }
+#else
+      if (!(sevT[j] & not_sev) &&
+          p_LmDivisibleBy(T[j].p, p, r))
+      {
+#if COEF_NEGATION_CHECK
+        if( n_DivBy(a, pGetCoeff(T[j].p), r->cf) ||
+            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
+            n_Greater(a, pGetCoeff(T[j].p), r->cf))
+#else
+        if( n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
+            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf))
+#endif
+          return j;
+      }
+#endif
+      j++;
+    }
+  }
+  else
+  {
+    const poly p=L->t_p;
+    const ring r=strat->tailRing;
+#if COEF_NEGATION_CHECK
+    number a = n_Copy(pGetCoeff(p), currRing->cf);
+    n_InpNeg(a, currRing->cf);
+#endif
+    loop
+    {
+      if (j > strat->tl) return -1;
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+      if (p_LmShortDivisibleBy(T[j].t_p, sevT[j],
+            p, not_sev, r))
+      {
+#if COEF_NEGATION_CHECK
+        if( n_DivBy(a, pGetCoeff(T[j].p), r->cf) ||
+            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
+            n_Greater(a, pGetCoeff(T[j].p), r->cf))
+#else
+        if( n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
+            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf))
+#endif
+          return j;
+      }
+#else
+      if (!(sevT[j] & not_sev) &&
+          p_LmDivisibleBy(T[j].t_p, p, r))
+      {
+#if COEF_NEGATION_CHECK
+        if( n_DivBy(a, pGetCoeff(T[j].p), r->cf) ||
+            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
+            n_Greater(a, pGetCoeff(T[j].p), r->cf))
+#else
+        if( n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
+            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf))
+#endif
+          return j;
+      }
+#endif
+      j++;
+    }
+  }
+}
 
 // return -1 if no divisor is found
 //        number of first divisor, otherwise
@@ -434,6 +535,139 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
 /*2
 *  reduction procedure for the ring Z/2^m
 */
+int redRingIntegers (LObject* h,kStrategy strat)
+{
+  if (h->IsNull()) return 0; // spoly is zero (can only occure with zero divisors)
+  if (strat->tl<0) return 1;
+
+  int at/*,i*/;
+  long d;
+  int j = 0;
+  int pass = 0;
+  // poly zeroPoly = NULL;
+
+// TODO warum SetpFDeg notwendig?
+  h->SetpFDeg();
+  assume(h->pFDeg() == h->FDeg);
+  long reddeg = h->GetpFDeg();
+
+  h->SetShortExpVector();
+  TObject tj; // probably needed as special reducer
+  loop
+  {
+    /* we do not check divisibility of lead coefficients over rings.
+     * this is postponed and checked directly before deciding how to reduce h */
+    j = kFindDivisibleByInT(strat, h);
+    if (j < 0)
+      j = kFindDivisibleByInTIntegers(strat, h);
+    if (j < 0)
+    {
+      // over ZZ: cleanup coefficients by complete reduction with monomials
+      postReduceByMon(h, strat);
+      if(h->p == NULL)
+      {
+        if (h->lcm!=NULL) pLmDelete(h->lcm);
+        h->Clear();
+        tj.Clear();
+        return 0;
+      }
+      if(nIsZero(pGetCoeff(h->p))) return 2;
+      j = kFindDivisibleByInT(strat, h);
+      if(j < 0)
+      {
+        if(strat->tl >= 0)
+            h->i_r1 = strat->tl;
+        else
+            h->i_r1 = -1;
+        if (h->GetLmTailRing() == NULL)
+        {
+          if (h->lcm!=NULL) pLmDelete(h->lcm);
+          h->Clear();
+          tj.Clear();
+          return 0;
+        }
+        return 1;
+      }
+    }
+    if(n_DivBy(pGetCoeff(h->p), pGetCoeff(strat->T[j].p), currRing->cf)) {
+      ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
+    } else {
+      /* add h to T: it may be useful as a better reducer */
+      /* enterT(*h, strat); */
+      /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
+       * => gcd-poly reduction */
+
+      /* first copy T[j] in order to multiply it with a coefficient later on */
+      tj  = strat->T[j];
+      tj.Copy();
+      /* compute division with remainder of lc(h) and lc(T[j]) */
+      number a, d;
+      d = n_QuotRem(pGetCoeff(h->p), pGetCoeff(strat->T[j].p), &a, currRing->cf);
+      /* set corresponding new lead coefficient already. we do not
+       * remove the lead term in ksReducePolyLC, but only apply
+       * a lead coefficient reduction */
+      tj.Mult_nn(d);
+      ksReducePolyLC(h, &tj, NULL, &a, strat);
+      tj.Delete();
+    }
+    /* printf("\nAfter small red: ");pWrite(h->p); */
+    if (h->GetLmTailRing() == NULL)
+    {
+      if (h->lcm!=NULL) pLmDelete(h->lcm);
+#ifdef KDEBUG
+      h->lcm=NULL;
+#endif
+      h->Clear();
+      tj.Clear();
+      return 0;
+    }
+    h->SetShortExpVector();
+    d = h->SetpFDeg();
+    /*- try to reduce the s-polynomial -*/
+    pass++;
+    if (!TEST_OPT_REDTHROUGH &&
+        (strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
+    {
+      h->SetLmCurrRing();
+      if (strat->posInLDependsOnLength)
+        h->SetLength(strat->length_pLength);
+      at = strat->posInL(strat->L,strat->Ll,h,strat);
+      if (at <= strat->Ll)
+      {
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG) Print(" ->L[%d]\n",at);
+#endif
+        enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);     // NOT RING CHECKED OLIVER
+        h->Clear();
+        tj.Clear();
+        return -1;
+      }
+    }
+    if (d != reddeg)
+    {
+      if (d >= (long)strat->tailRing->bitmask)
+      {
+        if (h->pTotalDeg() >= (long)strat->tailRing->bitmask)
+        {
+          strat->overflow=TRUE;
+          //Print("OVERFLOW in redRing d=%ld, max=%ld\n",d,strat->tailRing->bitmask);
+          h->GetP();
+          at = strat->posInL(strat->L,strat->Ll,h,strat);
+          enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+          h->Clear();
+          tj.Clear();
+          return -1;
+        }
+      }
+      else if ((TEST_OPT_PROT) && (strat->Ll < 0))
+      {
+        Print(".%ld",d);mflush();
+        reddeg = d;
+      }
+    }
+  }
+}
+
 int redRing (LObject* h,kStrategy strat)
 {
   if (h->IsNull()) return 0; // spoly is zero (can only occure with zero divisors)
