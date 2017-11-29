@@ -819,6 +819,8 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
         continue;
       setReduce(a,true);
       if (off_rational) Off(SW_RATIONAL); else On(SW_RATIONAL);
+      delete[] other;
+      delete[] bound;
       return gcdcfcg;
     }
     setCharacteristic(0);
@@ -866,6 +868,8 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
             if (off_rational) Off(SW_RATIONAL); else On(SW_RATIONAL);
             TIMING_END_AND_PRINT (alg_termination,
                                  "time for successful termination test in alg gcd: ")
+            delete[] other;
+            delete[] bound;
             return tmp*gcdcfcg;
           }
         }
@@ -880,6 +884,8 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
         if (off_rational) Off(SW_RATIONAL); else On(SW_RATIONAL);
         TIMING_END_AND_PRINT (alg_termination,
                             "time for successful termination test in alg gcd: ")
+        delete[] other;
+        delete[] bound;
         return tmp*gcdcfcg;
       }
       TIMING_END_AND_PRINT (alg_termination,
@@ -898,6 +904,8 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
   }
   // hopefully, we never reach this point
   setReduce(a,true);
+  delete[] other;
+  delete[] bound;
   Off( SW_USE_QGCD );
   D = gcdcfcg*gcd( f, g );
   On( SW_USE_QGCD );

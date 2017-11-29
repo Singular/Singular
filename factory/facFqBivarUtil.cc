@@ -741,6 +741,7 @@ getCoeffs (const CanonicalForm& G, const int k, const int l, const int degMipo,
 
   nmod_mat_clear (MFLINTF);
   nmod_mat_clear (mulResult);
+  nmod_poly_clear(FLINTF);
 
   if (degree (F, 2) < k)
     return CFArray();

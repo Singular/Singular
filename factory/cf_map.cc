@@ -257,13 +257,14 @@ compress ( const CFArray & a, CFMap & M, CFMap & N )
     if ( maxlevel <= 0 )
         return;
 
-    int * degs = new int[maxlevel+1];
-    int * tmp = new int[maxlevel+1];
-    for ( i = 1; i <= maxlevel; i++ )
+    int * degs = NEW_ARRAY(int,maxlevel+1);
+    int * tmp = NEW_ARRAY(int,maxlevel+1);
+    for ( i = maxlevel; i >= 1; i-- )
         degs[i] = 0;
 
     // calculate the union of all levels occuring in a
-    for ( i = a.min(); i <= a.max(); i++ ) {
+    for ( i = a.min(); i <= a.max(); i++ )
+    {
         tmp = degrees( a[i], tmp );
         for ( j = 1; j <= level( a[i] ); j++ )
             if ( tmp[j] != 0 )
@@ -272,16 +273,18 @@ compress ( const CFArray & a, CFMap & M, CFMap & N )
 
     // create the maps
     i = 1; j = 1;
-    while ( i <= maxlevel ) {
-        if ( degs[i] != 0 ) {
+    while ( i <= maxlevel )
+    {
+        if ( degs[i] != 0 )
+	{
             M.newpair( Variable(i), Variable(j) );
             N.newpair( Variable(j), Variable(i) );
             j++;
         }
         i++;
     }
-    delete [] tmp;
-    delete [] degs;
+    DELETE_ARRAY(degs);
+    DELETE_ARRAY(tmp);
 }
 
 /*
@@ -347,8 +350,8 @@ compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFMap & 
 {
     int n = tmax( f.level(), g.level() );
     int i, k, p1, pe;
-    int * degsf = new int[n+1];
-    int * degsg = new int[n+1];
+    int * degsf = NEW_ARRAY(int,n+1);
+    int * degsg = NEW_ARRAY(int,n+1);
 
     for ( i = 0; i <= n; i++ )
     {
@@ -406,6 +409,6 @@ compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFMap & 
         i++;
     }
 
-    delete [] degsf;
-    delete [] degsg;
+    DELETE_ARRAY(degsf);
+    DELETE_ARRAY(degsg);
 }

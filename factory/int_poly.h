@@ -111,8 +111,12 @@ public:
     bool inCoeffDomain() const { return var.level() < 0; }
     bool inPolyDomain() const { return var.level() > 0; }
     bool inQuotDomain() const { return false; }
-    InternalCF* genZero();
-    InternalCF* genOne();
+
+    InternalCF* genZero()
+    { return firstTerm->coeff.genZero().getval(); }
+
+    InternalCF* genOne()
+    { return firstTerm->coeff.genOne().getval(); }
 
     bool isUnivariate() const;
 

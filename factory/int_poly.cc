@@ -72,18 +72,6 @@ InternalPoly::deepCopyObject() const
     return new InternalPoly( first, last, var );
 }
 
-InternalCF*
-InternalPoly::genZero()
-{
-    return firstTerm->coeff.genZero().getval();
-}
-
-InternalCF*
-InternalPoly::genOne()
-{
-    return firstTerm->coeff.genOne().getval();
-}
-
 bool
 InternalPoly::isUnivariate() const
 {

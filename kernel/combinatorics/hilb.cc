@@ -825,7 +825,7 @@ static void eulerchar (ideal I, int variables, mpz_ptr ec)
         {
             mpz_init(dummy);
             if((variables % 2) == 0)
-                {mpz_set_si(dummy, 1);}
+                {mpz_set_ui(dummy, 1);}
             else
                 {mpz_set_si(dummy, -1);}
             mpz_add(ec, ec, dummy);

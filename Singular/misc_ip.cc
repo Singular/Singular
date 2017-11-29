@@ -215,10 +215,10 @@ static void factor_using_pollard_rho (mpz_t n, unsigned long a, lists primes, in
 
   mpz_init (t1);
   mpz_init (t2);
-  mpz_init_set_si (last_f, 0);
-  mpz_init_set_si (y, 2);
-  mpz_init_set_si (x, 2);
-  mpz_init_set_si (x1, 2);
+  mpz_init_set_ui (last_f, 0);
+  mpz_init_set_ui (y, 2);
+  mpz_init_set_ui (x, 2);
+  mpz_init_set_ui (x1, 2);
   mpz_init_set_ui (P, 1);
   k = 1;
   l = 1;

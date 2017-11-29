@@ -236,8 +236,8 @@ Evaluation optimize4Lift (const CanonicalForm& F, CFMap & M,
   int pos= 2;
   while (k > 1)
   {
-    max_deg= degsf [i];
-    while (max_deg == 0)
+    max_deg= degsf [i]; // i is always 2 here, n>=2
+    while ((i<n) &&(max_deg == 0))
     {
       i++;
       max_deg= degsf [i];
@@ -444,6 +444,13 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
   int sizeG= size (GG);
 
 
+  if ((sizeF==1) || (sizeG==1))
+  {
+    Off(SW_USE_EZGCD);
+    CanonicalForm result=gcd( FF, GG );
+    On(SW_USE_EZGCD);
+    return result;
+  }
   if (!isRat)
     On (SW_RATIONAL);
   if (sizeF/maxNumVars > 500 && sizeG/maxNumVars > 500)
@@ -503,19 +510,22 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
   DEBOUTLN( cerr, "g = " << g );
   F /= f; G /= g;
   TIMING_END_AND_PRINT (ez_content, "time to extract content in EZ: ")
-  if ( F.isUnivariate() && G.isUnivariate() )
+  if ( F.isUnivariate() )
   {
-    DEBDECLEVEL( cerr, "ezgcd" );
-    if(F.mvar()==G.mvar())
-      d*=gcd(F,G);
-    else
+    if ( G.isUnivariate() )
+    {
+      DEBDECLEVEL( cerr, "ezgcd" );
+      if(F.mvar()==G.mvar())
+        d*=gcd(F,G);
+      else
+        return N (d);
       return N (d);
-    return N (d);
-  }
-  if ( F.isUnivariate())
-  {
-    g= content (G,G.mvar());
-    return N(d*gcd(F,g));
+    }
+    else
+    {
+      g= content (G,G.mvar());
+      return N(d*gcd(F,g));
+    }
   }
   if ( G.isUnivariate())
   {

@@ -43,4 +43,12 @@ static const int SW_USE_FF_MOD_GCD=7;
 
 /*ENDPUBLIC*/
 
+#ifdef HAVE_OMALLOC
+#include "omalloc/omalloc.h"
+#define NEW_ARRAY(T,N)   (T*)omAlloc((N)*sizeof(T))
+#define DELETE_ARRAY(P)  omFree(P)
+#else
+#define NEW_ARRAY(T,N)   new T[N]
+#define DELETE_ARRY(P)   delete[] P
+#endif
 #endif /* ! INCL_CF_DEFS_H */

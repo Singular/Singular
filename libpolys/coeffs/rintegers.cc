@@ -409,7 +409,7 @@ static const char * nlEatLongC(char *s, mpz_ptr i)
 
   if (*s<'0' || *s>'9')
   {
-    mpz_set_si(i,1);
+    mpz_set_ui(i,1);
     return s;
   }
   while (*s >= '0' && *s <= '9') s++;
@@ -1696,7 +1696,7 @@ static const char * nlEatLongC(char *s, mpz_ptr i)
 
   if (*s<'0' || *s>'9')
   {
-    mpz_set_si(i,1);
+    mpz_set_ui(i,1);
     return s;
   }
   while (*s >= '0' && *s <= '9') s++;

@@ -320,9 +320,9 @@ getNumVars ( const CanonicalForm & f )
         return 1;
     else
     {
-        int * vars = new int[ n+1 ];
+        int * vars = NEW_ARRAY(int, n+1);
         int i;
-        for ( i = 0; i < n; i++ ) vars[i] = 0;
+        for ( i = n-1; i >=0; i-- ) vars[i] = 0;
 
         // look for variables
         for ( CFIterator I = f; I.hasTerms(); ++I )
@@ -333,7 +333,7 @@ getNumVars ( const CanonicalForm & f )
         for ( i = 1; i < n; i++ )
             if ( vars[i] != 0 ) m++;
 
-        delete [] vars;
+        DELETE_ARRAY(vars);
         // do not forget to count our own variable
         return m+1;
     }
@@ -356,9 +356,9 @@ getVars ( const CanonicalForm & f )
         return Variable( 1 );
     else
     {
-        int * vars = new int[ n+1 ];
+        int * vars = NEW_ARRAY(int, n+1);
         int i;
-        for ( i = 0; i <= n; i++ ) vars[i] = 0;
+        for ( i = n; i >= 0; i-- ) vars[i] = 0;
 
         // look for variables
         for ( CFIterator I = f; I.hasTerms(); ++I )
@@ -369,7 +369,7 @@ getVars ( const CanonicalForm & f )
         for ( i = n; i > 0; i-- )
             if ( vars[i] != 0 ) result *= Variable( i );
 
-        delete [] vars;
+        DELETE_ARRAY(vars);
         // do not forget our own variable
         return f.mvar() * result;
     }
@@ -502,9 +502,9 @@ int * degrees ( const CanonicalForm & f, int * degs )
     else
     {
         int level = f.level();
-        if ( degs == 0 )
+        if ( degs == NULL )
             degs = new int[level+1];
-        for ( int i = 0; i <= level; i++ )
+        for ( int i = level; i >= 0; i-- )
             degs[i] = 0;
         degreesRec( f, degs );
         return degs;
