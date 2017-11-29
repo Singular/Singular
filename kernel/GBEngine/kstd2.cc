@@ -569,57 +569,55 @@ int redRingIntegers (LObject* h,kStrategy strat)
     /* we do not check divisibility of lead coefficients over rings.
      * this is postponed and checked directly before deciding how to reduce h */
     j = kFindDivisibleByInT(strat, h);
-    if (j < 0)
+    if (j < 0) {
       j = kFindDivisibleByInTIntegers(strat, h);
-    if (j < 0)
-    {
-      // over ZZ: cleanup coefficients by complete reduction with monomials
-      postReduceByMon(h, strat);
-      if(h->p == NULL)
+      if (j < 0)
       {
-        if (h->lcm!=NULL) pLmDelete(h->lcm);
-        h->Clear();
-        tj.Clear();
-        return 0;
-      }
-      if(nIsZero(pGetCoeff(h->p))) return 2;
-      j = kFindDivisibleByInT(strat, h);
-      if(j < 0)
-      {
-        if(strat->tl >= 0)
-            h->i_r1 = strat->tl;
-        else
-            h->i_r1 = -1;
-        if (h->GetLmTailRing() == NULL)
+        // over ZZ: cleanup coefficients by complete reduction with monomials
+        postReduceByMon(h, strat);
+        if(h->p == NULL)
         {
           if (h->lcm!=NULL) pLmDelete(h->lcm);
           h->Clear();
           tj.Clear();
           return 0;
         }
-        return 1;
-      }
-    }
-    if(n_DivBy(pGetCoeff(h->p), pGetCoeff(strat->T[j].p), currRing->cf)) {
-      ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
-    } else {
-      /* add h to T: it may be useful as a better reducer */
-      /* enterT(*h, strat); */
-      /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
-       * => gcd-poly reduction */
+        if(nIsZero(pGetCoeff(h->p))) return 2;
+        j = kFindDivisibleByInT(strat, h);
+        if(j < 0)
+        {
+          if(strat->tl >= 0)
+              h->i_r1 = strat->tl;
+          else
+              h->i_r1 = -1;
+          if (h->GetLmTailRing() == NULL)
+          {
+            if (h->lcm!=NULL) pLmDelete(h->lcm);
+            h->Clear();
+            tj.Clear();
+            return 0;
+          }
+          return 1;
+        }
+      } else {
+        /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
+        * => gcd-poly reduction */
 
-      /* first copy T[j] in order to multiply it with a coefficient later on */
-      tj  = strat->T[j];
-      tj.Copy();
-      /* compute division with remainder of lc(h) and lc(T[j]) */
-      rest = n_QuotRem(pGetCoeff(h->p), pGetCoeff(strat->T[j].p),
-          &mult, currRing->cf);
-      /* set corresponding new lead coefficient already. we do not
-       * remove the lead term in ksReducePolyLC, but only apply
-       * a lead coefficient reduction */
-      tj.Mult_nn(rest);
-      ksReducePolyLC(h, &tj, NULL, &mult, strat);
-      tj.Delete();
+        /* first copy T[j] in order to multiply it with a coefficient later on */
+        tj  = strat->T[j];
+        tj.Copy();
+        /* compute division with remainder of lc(h) and lc(T[j]) */
+        rest = n_QuotRem(pGetCoeff(h->p), pGetCoeff(strat->T[j].p),
+            &mult, currRing->cf);
+        /* set corresponding new lead coefficient already. we do not
+        * remove the lead term in ksReducePolyLC, but only apply
+        * a lead coefficient reduction */
+        tj.Mult_nn(rest);
+        ksReducePolyLC(h, &tj, NULL, &mult, strat);
+        tj.Delete();
+      }
+    } else {
+      ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
     }
     /* printf("\nAfter small red: ");pWrite(h->p); */
     if (h->GetLmTailRing() == NULL)
