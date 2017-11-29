@@ -444,6 +444,13 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
   int sizeG= size (GG);
 
 
+  if ((sizeF==1) || (sizeG==1))
+  {
+    Off(SW_USE_EZGCD);
+    CanonicalForm result=gcd( FF, GG );
+    On(SW_USE_EZGCD);
+    return result;
+  }
   if (!isRat)
     On (SW_RATIONAL);
   if (sizeF/maxNumVars > 500 && sizeG/maxNumVars > 500)
