@@ -540,9 +540,9 @@ if (printlevel>0){"++++++++++++++++++ "+string(deg(f1));}
 list fac=factorWeightedLowestJet(f1,NF1);
 if (printlevel>0){print("Fac "+string(fac));}
 //subst(fac[1][1],y,0);
-if (deg(subst(fac[1][1],y,0))>1) {return(0);}
-poly rs=subst(fac[1][1],x,0);
-f1=subst(f1,x,x-rs);
+if (deg(subst(fac[1][1],var(2),0))>1) {return(0);}
+poly rs=subst(fac[1][1],var(1),0);
+f1=subst(f1,var(1),var(1)/(coeff(fac[1][1],var(1)))-rs/(coeff(fac[1][1],var(1))));
 f1=truncateAtHighestCorner(f1);
 return(f1);
 }
@@ -1373,12 +1373,14 @@ list deltalist;
 int foundcorner;
 list si0;
 while (1==1) {
-  NP=newtonPolygon(f);if (printlevel>0){print("Newton polygon ");print(NP);}
+  NP=newtonPolygon(f);
+  if (printlevel>0){print("Newton polygon ");print(NP);}
   if (printlevel>0){print("S0 = "+string(S0));}
   for (i=1;i<=size(S0);i++){
      ef0[i]=exponentvector(S0[i]);
   }
-  iv=innerVertices(NP);if (printlevel>0){print("inner vertices "+string(iv)+" exponents "+string(ef0));}
+  iv=innerVertices(NP);
+  if (printlevel>0){print("inner vertices "+string(iv)+" exponents "+string(ef0));}
   si0=setintersection(iv,ef0);
   for (j=1;j<=size(si0);j++){
      if ((si0[j][1]!=1) and (si0[j][2]!=1)){si[size(si)+1]=si0[j];}

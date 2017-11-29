@@ -84,14 +84,12 @@ EXAMPLE:  example realclassify; shows an example"
 
   /* name for the basering */
   def br1 = basering;
+  list br1vars=ringlist(br1)[2];
   def br = basering;
-  ring R1 = (0),(var(1),var(2)),ds;
   list L = ringlist(br);
-  string mord = ringlist(R1)[3][1][1];
-  L[3][1][1] = mord;
+  L[3][1][1] = "ds";
   br = ring(L);
   setring br;
-  kill R1;
   poly f = fetch(br1,f);
 
 
@@ -160,7 +158,6 @@ EXAMPLE:  example realclassify; shows an example"
     setring Rcc;
     poly rf = fetch(br,rf);
     list dataFromClassify = complexType(rf);
-    setring br;
     int m = dataFromClassify[2];                // the modality of f
     string complextype = dataFromClassify[1];   // the complex type of f
     if(m > 1)
@@ -269,7 +266,7 @@ EXAMPLE:  example realclassify; shows an example"
 
 
     for (i=1;i<=size(listNFE);i++){
-    listNFE[i].vars = ringlist(br1)[2];
+    listNFE[i].vars = br1vars;
     listNFE[i].realCase = 1;
     listNFE[i].corank = cr;
     listNFE[i].inertiaIndex = lambda;
@@ -289,7 +286,6 @@ example
   ring r = 0, (x,y,z), ds;
   poly f = (x2+3y-2z)^2+xyz-(x-y3+x2z3)^3;
   realclassify(f);
-  //map phi = r, x+2y+y^2+x*y+x^2+y^3,x+y+y^2+x^2+x*y+y^3,z;
   map phi = r, x+2y+y^2+x*y,x+y+y^2+x^2,z;
 
   poly f  = x^2+y^2-z^2;  // A[1]
@@ -306,6 +302,7 @@ example
 
 
   poly f  = x^3-y^4-z^2;  // E[6]-
+  f=phi(f);
   realclassify(f);
 
   poly f  = x^3+x*y^3+z^2;  // E[7]
@@ -313,6 +310,7 @@ example
   realclassify(f);
 
   poly f  = x^3+y^5-z^2;  // E[8]
+  f=phi(f);
   realclassify(f);
 
   poly f  = x^3+3*x^2*y^2+x*y^4-z^2;  //J[10]+
@@ -331,7 +329,7 @@ example
   f=phi(f);
   realclassify(f);
 
-  poly f  = +(x^2+y^2)^2+5*x^9-z^2;  // tilde Y[9]
+  poly f  = (x^2+y^2)^2+5*x^9-z^2;  // tilde Y[9]
   f=phi(f);
   realclassify(f);
 
@@ -368,7 +366,8 @@ example
   f=phi(f);
   realclassify(f);
 
-  poly p = x^4-x^2*y^2+5*y^4+x*y^3+x^3*y;  //X9++
+  poly p = x^4-x^2*y^2+5*y^4+x*y^3+x^3*y+z^2;  //X9++
+  f=phi(f);
   realclassify(p);
 
 }
@@ -5432,7 +5431,6 @@ EXAMPLE:  example determinacy; shows an example"
     }
   }
   setring(br);
-
   return(k);
 }
 example
