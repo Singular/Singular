@@ -3558,6 +3558,12 @@ static BOOLEAN jjCOUNT_BI(leftv res, leftv v)
   res->data = (char *)(long)n_Size((number)v->Data(),coeffs_BIGINT);
   return FALSE;
 }
+static BOOLEAN jjCOUNT_BIM(leftv res, leftv v)
+{
+  bigintmat* aa= (bigintmat *)v->Data();
+  res->data = (char *)(long)(aa->rows()*aa->cols());
+  return FALSE;
+}
 static BOOLEAN jjCOUNT_N(leftv res, leftv v)
 {
   res->data = (char *)(long)nSize((number)v->Data());
