@@ -36,6 +36,7 @@ Extended commands:
 
 New libraries:
 @itemize
+@item classify2.lib: Classification of isolated singularities of corank <=2 and modality <= wrt. right equivalence over the complex numbers according to Arnold's list. (@nref{classify_2_lib})
 @item goettsche.lib: Goettsche's formula for the Betti numbers of the Hilbert scheme
 of points on a surface, Macdonald's formula for the symmetric product (@nref{goettsche_lib})
 @item ncHilb.lib: Hilbert series of non-commutative monomial algebras (@nref{ncHilb_lib})
