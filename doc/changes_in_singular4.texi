@@ -215,7 +215,7 @@ In contrast to Singular 3, there are now many more configuration options.
 
 All possible options for configure can be seen by running the configure script with
 option @code{--help}. On a multicore compute consider running make with the
-option @code{-f [cores]}.
+option @code{-j [cores]}.
 
 @subsection Side-by-side installation
 
