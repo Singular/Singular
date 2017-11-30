@@ -116,7 +116,15 @@
 #define SEEK_SET 0
 #endif
 
-#define HALT() m2_end(2)
+#ifdef __cplusplus
+extern "C" {
+#endif
+void  m2_end(int i);
+#ifdef __cplusplus
+}
+#endif
+
+static inline void HALT() { m2_end(2);}
 
 /* define OLD_RES for res/sres/mres(i,j,k) */
 #undef OLD_RES
