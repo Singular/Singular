@@ -9,6 +9,7 @@ bug_minpoly2
 bug_minpoly_frac
 bug_naGreater
 bug_newstruct
+bug_newstruct3
 bug_normalize
 bug_qring2
 bug_ring
