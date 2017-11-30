@@ -3924,7 +3924,6 @@ void pairLcmCriterion(kStrategy strat)
 				/* !(strat->sevS[j] & ~sev) && */
 				p_LmDivisibleBy(strat->L[l].p, t, currRing)) {
 			deleteInL(strat->L, &strat->Ll, l, strat);
-			printf("!!\n");
 		}
 	}
 }
