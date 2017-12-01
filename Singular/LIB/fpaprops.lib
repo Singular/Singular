@@ -1052,6 +1052,7 @@ EXAMPLE: example lpSubstitute; shows examples
   return (fs);
 }
 example {
+  //////// EXAMPLE A ////////
   LIB "fpadim.lib";
   ring r = 0,(x,y,z),dp;
   def R = makeLetterplaceRing(4);
@@ -1071,8 +1072,8 @@ example {
 
   // the last parameter is optional
   lpSubstitute(imap(R,f), imap(R,s1), imap(R,s2), imap(R,G));
-}
-example {
+
+  //////// EXAMPLE B ////////
   LIB "fpadim.lib";
   ring r = 0,(x,y,z),dp;
   def R = makeLetterplaceRing(4);
@@ -1149,14 +1150,17 @@ EXAMPLE: example lpSubstitute; shows examples
 
   return (maxDegBound);
 }
+example {
+  // see lpSubstitute()
+}
 
-// convenience method
 proc lpCalcSubstDegBounds(ideal I, ideal s1, ideal s2)
 "USAGE: lpCalcSubstDegBounds(I,s1,s2); I list (ideal) of letterplace polynomials, s1 list (ideal)
 @*  of variables to replace, s2 list (ideal) of polynomials to replace with
 RETURN: int, the min degbound required to perform all of the substitutions
 ASSUME: - basering is a Letterplace ring
 EXAMPLE: example lpSubstitute; shows examples
+NOTE: convenience method
 "
 {
   int maxDegBound = 0;
@@ -1167,6 +1171,9 @@ EXAMPLE: example lpSubstitute; shows examples
     }
   }
   return (maxDegBound);
+}
+example {
+  // see lpSubstitute()
 }
 
 static proc isSF(intvec S, intvec I)
