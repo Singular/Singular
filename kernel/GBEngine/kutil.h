@@ -11,7 +11,9 @@
 #include <string.h>
 
 #include "omalloc/omalloc.h"
+#ifndef XMEMORY_H
 #include "omalloc/omallocClass.h"
+#endif
 #include "misc/mylimits.h"
 
 
@@ -257,7 +259,10 @@ public:
 
 extern int HCord;
 
-class skStrategy : public omallocClass
+class skStrategy
+#ifndef XMEMORY_H
+                 : public omallocClass
+#endif
 {
 public:
   kStrategy next;

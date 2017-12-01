@@ -8,10 +8,16 @@
 */
 #include <string.h>
 #include "misc/auxiliary.h"
+#include "omalloc/omalloc.h"
+#ifndef XMEMORY_H
 #include "omalloc/omallocClass.h"
+#endif
 #include "misc/intvec.h"
 
-class int64vec :public omallocClass
+class int64vec
+#ifndef XMEMORY_H
+               :public omallocClass
+#endif
 {
 private:
   int64 *v;

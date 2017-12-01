@@ -26,7 +26,9 @@
 #include "variable.h"
 
 #ifdef HAVE_OMALLOC
+#ifndef XMEMORY_H
 #include "omalloc/omallocClass.h"
+#endif
 #endif
 
 class CanonicalForm;
@@ -38,7 +40,9 @@ class CanonicalForm;
 **/
 class InternalCF
 #ifdef HAVE_OMALLOC
+#ifndef XMEMORY_H
        : public omallocClass
+#endif
 #endif
 {
 private:

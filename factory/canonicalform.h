@@ -33,7 +33,9 @@
 #include "factory/templates/ftmpl_factor.h"
 #include "factory/templates/ftmpl_matrix.h"
 #ifdef HAVE_OMALLOC
+#ifndef XMEMORY_H
 #include "omalloc/omallocClass.h"
+#endif
 #endif
 
 /*BEGINPUBLIC*/
@@ -74,7 +76,9 @@ inline int is_imm ( const InternalCF * const ptr )
 **/
 class CanonicalForm
 #ifdef HAVE_OMALLOC
+#ifndef XMEMORY_H
        : public omallocClass
+#endif
 #endif
 {
 private:
