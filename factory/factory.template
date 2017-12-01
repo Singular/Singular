@@ -25,7 +25,10 @@
 #include "factory/factoryconf.h"
 #include <stdint.h>
 #ifdef HAVE_OMALLOC
+#include "omalloc/omalloc.h"
+#ifndef XMEMORY_H
 #include "omalloc/omallocClass.h"
+#endif
 #endif
 
 #ifndef NOSTREAMIO

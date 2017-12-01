@@ -8,11 +8,17 @@
 */
 #include <string.h>
 #include "kernel/structs.h"
+#include "omalloc/omalloc.h"
+#ifndef XMEMORY_H
 #include "omalloc/omallocClass.h"
+#endif
 
 class sattr;
 typedef sattr * attr;
-class sattr: public omallocClass
+class sattr
+#ifndef XMEMORY_H
+            : public omallocClass
+#endif
 {
   public:
     inline void Init() { memset(this,0,sizeof(*this)); }
