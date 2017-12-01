@@ -8,7 +8,7 @@ AUTHORS: Karim Abou Zeid,       karim.abou.zeid at rwth-aachen.de
 Supported by the transregional collaborative research centre
 SFB-TRR 195 'Symbolic Tools in Mathematics and their Application' of the German DFG
 OVERVIEW:
-TODO
+Algorithms for computing various properties of quotient algebras in the letterplace case.
 
 REFERENCES:
 Huishi Li: Groebner bases in ring theory. World Scientific, 2010.
@@ -16,14 +16,14 @@ Huishi Li: Groebner bases in ring theory. World Scientific, 2010.
 SEE ALSO:  fpadim.lib, freegb.lib,
 
 PROCEDURES:
-  lpNoetherian();
-  lpIsSemiPrime();
-  lpIsPrime();
-  lpGkDim();
-  lpGlDimBound();
-  lpSubstitute();
-  lpCalcSubstDegBound();
-  lpCalcSubstDegBounds();
+  lpNoetherian(<GB>);     check whether A/<GB> is (left/right) noetherian
+  lpIsSemiPrime(<GB>);    check whether A/<GB> is semi prime
+  lpIsPrime(<GB>);        check whether A/<GB> is prime
+  lpGkDim(<GB>);          compute the Gelfand Kirillov dimension of A/<GB>
+  lpGlDimBound(<GB>);     compute an upper bound for the global dimension of A/<GB>
+  lpSubstitute();         substitute variable with polynoms
+  lpCalcSubstDegBound();  utility for lpSubstitute
+  lpCalcSubstDegBounds(); utility for lpSubstitute
 ";
 
 LIB "fpadim.lib";
@@ -31,10 +31,10 @@ LIB "fpadim.lib";
 proc lpNoetherian(ideal G)
 "USAGE: lpNoetherian(G); G an ideal in a Letterplace ring
 RETURN: int
-        0 not noetherian
-        1 left noetherian
-        2 right noetherian
-        3 noetherian
+@*      0 not noetherian
+@*      1 left noetherian
+@*      2 right noetherian
+@*      3 noetherian
 PURPOSE: Check whether R/<G> is (left/right) noetherian, where R is the basering
 ASSUME: - basering is a Letterplace ring
 @*      - G is a Groebner basis
