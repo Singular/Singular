@@ -1326,9 +1326,14 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
   h.ecart=0; h.length=0;
 #endif
   /*- computes the lcm(s[i],p) -*/
+  if(pHasNotCF(p,strat->S[i]))
+  {
+      strat->cp++;
+      return;
+  }
   h.lcm = p_Lcm(p,strat->S[i],currRing);
   pSetCoeff0(h.lcm, n_Lcm(pGetCoeff(p), pGetCoeff(strat->S[i]), currRing->cf));
-  if (nIsZero(pGetCoeff(h.lcm)))
+  if(nIsZero(pGetCoeff(h.lcm)))
   {
       strat->cp++;
       pLmDelete(h.lcm);
@@ -3921,7 +3926,6 @@ void pairLcmCriterion(kStrategy strat)
 	poly t    = strat->P.p;
 	for (int l = 0; l < strat->Ll; ++l) {
 		if (n_DivBy(a, pGetCoeff(strat->L[l].p), currRing->cf) &&
-				/* !(strat->sevS[j] & ~sev) && */
 				p_LmDivisibleBy(strat->L[l].p, t, currRing)) {
 			deleteInL(strat->L, &strat->Ll, l, strat);
 		}

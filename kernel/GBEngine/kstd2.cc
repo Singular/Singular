@@ -2343,8 +2343,8 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       // a first test for removing old pairs where
       // strat->P.p divides lcm of pair
-      /* if (rField_is_Ring(currRing))
-       *   pairLcmCriterion(strat); */
+      if (rField_is_Ring(currRing))
+        pairLcmCriterion(strat);
 
       // enter into S, L, and T
       if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
