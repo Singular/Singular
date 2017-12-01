@@ -2606,8 +2606,14 @@ static BOOLEAN jjNEWSTRUCT2(leftv, leftv u, leftv v)
 {
   // u: the name of the new type
   // v: the elements
-  newstruct_desc d=newstructFromString((const char *)v->Data());
-  if (d!=NULL) newstruct_setup((const char *)u->Data(),d);
+  const char *s=(const char *)u->Data();
+  newstruct_desc d=NULL;
+  if (strlen(s)>=2)
+  {
+    d=newstructFromString((const char *)v->Data());
+    if (d!=NULL) newstruct_setup(s,d);
+  }
+  else WerrorS("name of newstruct must be longer than 1 character");
   return d==NULL;
 }
 static BOOLEAN jjPARSTR2(leftv res, leftv u, leftv v)
@@ -3556,6 +3562,12 @@ static BOOLEAN jjCONTENT(leftv res, leftv v)
 static BOOLEAN jjCOUNT_BI(leftv res, leftv v)
 {
   res->data = (char *)(long)n_Size((number)v->Data(),coeffs_BIGINT);
+  return FALSE;
+}
+static BOOLEAN jjCOUNT_BIM(leftv res, leftv v)
+{
+  bigintmat* aa= (bigintmat *)v->Data();
+  res->data = (char *)(long)(aa->rows()*aa->cols());
   return FALSE;
 }
 static BOOLEAN jjCOUNT_N(leftv res, leftv v)
@@ -7798,9 +7810,9 @@ static BOOLEAN jjRESTART(leftv, leftv u)
   {
     case 0:{
         PrintS("delete all variables\n");
-	killlocals(0);
-	WerrorS("restarting...");
-	break;
+        killlocals(0);
+        WerrorS("restarting...");
+        break;
       };
     default: WerrorS("not implemented");
   }

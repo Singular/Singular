@@ -67,16 +67,17 @@ public:
     }
 #endif
 
-    InternalInteger();
+    InternalInteger() {  mpz_init( thempi ); }
     InternalInteger( const InternalCF& )
     {
         ASSERT( 0, "ups there is something wrong in your code" );
     }
-    InternalInteger( const int i );
-    InternalInteger( const long i );
-    InternalInteger( const char * str, const int base=10 );
-    InternalInteger( const mpz_ptr );
-    ~InternalInteger();
+    InternalInteger( const int i ) { mpz_init_set_si( thempi, (long)i );}
+    InternalInteger( const long i ) { mpz_init_set_si( thempi, i );}
+    InternalInteger( const char * str, const int base=10 )
+    { mpz_init_set_str( thempi, str, base ); }
+    InternalInteger( const mpz_ptr mpi) {thempi[0]=*mpi;}
+    ~InternalInteger() { mpz_clear( thempi ); }
     InternalCF* deepCopyObject() const;
     const char * classname() const { return "InternalInteger"; }
 #ifndef NOSTREAMIO

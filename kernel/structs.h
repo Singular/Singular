@@ -75,14 +75,6 @@ typedef procinfo *         procinfov;
 /* 7.1 C-routines : */
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-void  m2_end(int i);
-#ifdef __cplusplus
-}
-#endif
-
 #define loop for(;;)
 
 extern omBin char_ptr_bin;

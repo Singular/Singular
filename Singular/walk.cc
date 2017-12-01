@@ -1902,11 +1902,11 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
 
   mpz_t sing_int;
   mpz_init(sing_int);
-  mpz_set_si(sing_int,  2147483647);
+  mpz_set_ui(sing_int,  2147483647);
 
   mpz_t sing_int_half;
   mpz_init(sing_int_half);
-  mpz_set_si(sing_int_half,  3*(1073741824/2));
+  mpz_set_ui(sing_int_half,  3*(1073741824/2));
 
   mpz_t deg_w0_p1, deg_d0_p1;
   mpz_init(deg_w0_p1);
@@ -2259,11 +2259,11 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
 
   mpz_t sing_int;
   mpz_init(sing_int);
-  mpz_set_si(sing_int,  2147483647);
+  mpz_set_ui(sing_int,  2147483647);
 
   mpz_t sing_int_half;
   mpz_init(sing_int_half);
-  mpz_set_si(sing_int_half,  3*(1073741824/2));
+  mpz_set_ui(sing_int_half,  3*(1073741824/2));
 
   mpz_t deg_w0_p1, deg_d0_p1;
   mpz_init(deg_w0_p1);
@@ -3668,7 +3668,7 @@ static intvec* TranPertVector(ideal G, intvec* iva)
   mpz_init_set(deg_tmp, ndeg);
 
   mpz_t *ivres=( mpz_t *) omAlloc(nV*sizeof(mpz_t));
-  mpz_init_set_si(ivres[nV-1],1);
+  mpz_init_set_ui(ivres[nV-1],1);
 
   for(i=nV-2; i>=0; i--)
   {
@@ -3792,7 +3792,7 @@ static intvec* TranPertVector_lp(ideal G)
   mpz_init_set(deg_tmp, ndeg);
 
   mpz_t *ivres=(mpz_t *)omAlloc(nV*sizeof(mpz_t));
-  mpz_init_set_si(ivres[nV-1], 1);
+  mpz_init_set_ui(ivres[nV-1], 1);
 
   for(i=nV-2; i>=0; i--)
   {
@@ -3863,7 +3863,7 @@ static intvec* RepresentationMatrix_Dp(ideal G, intvec* M)
   mpz_t ztmp;
   mpz_init_set_si(ztmp, maxdeg);
   mpz_t *ivres=(mpz_t *)omAlloc(nV*sizeof(mpz_t));
-  mpz_init_set_si(ivres[nV-1], 1); // (*ivres)[nV-1] = 1;
+  mpz_init_set_ui(ivres[nV-1], 1); // (*ivres)[nV-1] = 1;
 
   for(i=nV-2; i>=0; i--)
   {

@@ -151,7 +151,7 @@ static void gf_get_table ( int p, int n )
     int i, degree;
     sscanf( bufptr, "%d", &degree );
     bufptr = (char *)strchr( bufptr, ' ' ) + 1;
-    int * mipo = new int[degree + 1];
+    int * mipo = NEW_ARRAY(int,degree+1);
     for ( i = 0; i <= degree; i++ )
     {
         sscanf( bufptr, "%d", mipo + i );
@@ -161,7 +161,7 @@ static void gf_get_table ( int p, int n )
     gf_p = p; gf_n = n;
     gf_q = q; gf_q1 = q-1;
     gf_mipo = intVec2CF( degree, mipo, 1 );
-    delete [] mipo;
+    DELETE_ARRAY(mipo);
 
     // now for the table
     int k, digs = gf_tab_numdigits62( gf_q );

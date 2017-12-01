@@ -5,6 +5,7 @@
 #include "Singular/lists.h"
 #include "Singular/ipid.h"
 #include "Singular/ipshell.h"
+#include "Singular/ipconv.h"
 #include "Singular/newstruct.h"
 
 #include <ctype.h>
@@ -562,7 +563,7 @@ BOOLEAN newstruct_CheckAssign(blackbox */*b*/, leftv L, leftv R)
 {
   int lt=L->Typ();
   int rt=R->Typ();
-  if ((lt!=DEF_CMD)&&(lt!=rt))
+  if (iiTestConvert(rt,lt,dConvertTypes)==0)
   {
     const char *rt1=Tok2Cmdname(rt);
     const char *lt1=Tok2Cmdname(lt);

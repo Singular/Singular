@@ -22,12 +22,12 @@ as @code{a-b-c-d} where a,b,c and d are numbers:
 @itemize
 @item a is changed with major, incompatible changes
 @item b is changed with incompatible changes (of some commands/libraries)
-@item c is changed with compatible chnages (i.e. new commands,
+@item c is changed with compatible changes (i.e. new commands,
       extended options, new algorithms, etc.)
 @item d is changed with each release (i.e. with bug fixes, etc.)
 @end itemize
-@sc{Singular} does also have "inofficiall" build orginating from
-a code version between "officiall" version: such builds display
+@sc{Singular} does also have "unofficial" build orginating from
+a code version between "official" version: such builds display
 "Development version a.b.c" in the header while "official" versions
 show "version a.b.c". Also the manual describes version a-b-c.
 To get the complete version number, use
@@ -215,7 +215,7 @@ In contrast to Singular 3, there are now many more configuration options.
 
 All possible options for configure can be seen by running the configure script with
 option @code{--help}. On a multicore compute consider running make with the
-option @code{-f [cores]}.
+option @code{-j [cores]}.
 
 @subsection Side-by-side installation
 

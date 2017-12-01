@@ -70,7 +70,7 @@ void find_exp(const CanonicalForm & f, int * exp_f)
 int find_mvar(const CanonicalForm & f)
 {
   int mv=f.level();
-  int *exp_f=new int[mv+1];
+  int *exp_f=NEW_ARRAY(int,mv+1);
   int i;
   for(i=mv;i>0;i--) exp_f[i]=0;
   find_exp(f,exp_f);
@@ -81,7 +81,7 @@ int find_mvar(const CanonicalForm & f)
       mv=i;
     }
   }
-  delete[] exp_f;
+  DELETE_ARRAY(exp_f);
   return mv;
 }
 

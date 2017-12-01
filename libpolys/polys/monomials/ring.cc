@@ -582,7 +582,12 @@ char * rOrdStr(ring r)
 
     if (l==nblocks)
     {
-      if (r->bitmask!=0xffff) StringAppend(",L(%ld)",r->bitmask);
+      if (r->bitmask!=0xffff) 
+      {
+        long mm=r->bitmask;
+        if (mm>MAX_INT_VAL) mm=MAX_INT_VAL;
+        StringAppend(",L(%ld)",mm);
+      }
       return StringEndS();
     }
     StringAppendS(",");

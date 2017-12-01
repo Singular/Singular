@@ -36,6 +36,7 @@ Extended commands:
 
 New libraries:
 @itemize
+@item classify2.lib: Classification of isolated singularities of corank <=2 and modality <= wrt. right equivalence over the complex numbers according to Arnold's list. (@nref{classify2_lib})
 @item goettsche.lib: Goettsche's formula for the Betti numbers of the Hilbert scheme
 of points on a surface, Macdonald's formula for the symmetric product (@nref{goettsche_lib})
 @item ncHilb.lib: Hilbert series of non-commutative monomial algebras (@nref{ncHilb_lib})
@@ -54,6 +55,7 @@ Changed libraries:
 Changes in the kernel/build system:
 @itemize
 @item port to polymake 3.x.x
+@item port to NTL 10 with threads (needs also C++11: gcc6 or -std=c++11)
 @item p_Invers is only a helper for p_Series: now static
 @item p_Divide is now p_MDivide, pDivive is a new routine
 @end itemize

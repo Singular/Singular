@@ -51,7 +51,7 @@ public:
     InternalCF() { refCount = 1; };
     InternalCF( const InternalCF& )
     {
-	ASSERT( 0, "ups there is something wrong in your code");
+        ASSERT( 0, "ups there is something wrong in your code");
     };
     virtual ~InternalCF() {};
     int deleteObject() { return decRefCount() == 0; }

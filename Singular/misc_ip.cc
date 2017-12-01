@@ -72,6 +72,15 @@
   #endif
 #endif
 
+#ifdef HAVE_NTL
+#include<NTL/version.h>
+#include<NTL/tools.h>
+#ifdef NTL_CLIENT
+NTL_CLIENT
+#endif
+#endif
+
+
 static FORCE_INLINE void number2mpz(number n, mpz_t m){ number2mpz(n, coeffs_BIGINT, m); }
 static FORCE_INLINE number mpz2number(mpz_t m){ return mpz2number(m, coeffs_BIGINT); }
 
@@ -215,10 +224,10 @@ static void factor_using_pollard_rho (mpz_t n, unsigned long a, lists primes, in
 
   mpz_init (t1);
   mpz_init (t2);
-  mpz_init_set_si (last_f, 0);
-  mpz_init_set_si (y, 2);
-  mpz_init_set_si (x, 2);
-  mpz_init_set_si (x1, 2);
+  mpz_init_set_ui (last_f, 0);
+  mpz_init_set_ui (y, 2);
+  mpz_init_set_ui (x, 2);
+  mpz_init_set_ui (x1, 2);
   mpz_init_set_ui (P, 1);
   k = 1;
   l = 1;
@@ -1301,6 +1310,14 @@ void siInit(char *name)
   On(SW_USE_QGCD);
   Off(SW_USE_NTL_SORT); // may be changed by an command line option
   factoryError=WerrorS;
+
+// NTL error handling (>= 9.3.0)
+#ifdef HAVE_NTL
+#if (((NTL_MAJOR_VERSION==9)&&(NTL_MINOR_VERSION>=3))||(NTL_MAJOR_VERSION>=10))
+  ErrorMsgCallback=WerrorS;
+  ErrorCallback=HALT;
+#endif
+#endif
 
 // memory initialization: -----------------------------------------------
     om_Opts.OutOfMemoryFunc = omSingOutOfMemoryFunc;

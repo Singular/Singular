@@ -13,4 +13,7 @@ P.summands=L;
 P.tail=c;
 P;
 
+// tr. #813
+newstruct("s","string a");
+
 tst_status(1);$

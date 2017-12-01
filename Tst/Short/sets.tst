@@ -34,6 +34,7 @@ printlevel=0;
  Set S5 = list(m1,m2,m1);
  S5;
  bigintmat b1[2][3]= 1,2,3,4,5,6;
+ size(b1);
  bigintmat b2[2][3]= 1,2,3,4,5,7;
  Set S6 = list(b1,b2,b1);
  S6;
