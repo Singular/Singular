@@ -386,7 +386,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
 /*===== rcolon ===============================================*/
-   // Hilbert series of non-commutative monomial algebras
   if(strcmp(sys_cmd,"rcolon") == 0)
   {
     const short t1[]={3,IDEAL_CMD,POLY_CMD,INT_CMD};
