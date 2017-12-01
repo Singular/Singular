@@ -34,6 +34,7 @@ fullSerreRelations(A,N,C,P,d); compute the ideal of all Serre's relations
 @*                             associated to a generalized Cartan matrix A
 isVar(p);                   check whether p is a power of a single variable
 ademRelations(i,j);    compute the ideal of Adem relations for i<2j in char 0
+lpDelVar();     delete a variable from the current Letterplace ring
 
 SEE ALSO: fpadim_lib, LETTERPLACE
 ";
@@ -3414,7 +3415,7 @@ NOTE: Taking the first possible reduction
    //"entered while with p="; p;
    V = makeDVec(delSupZero(leadexp(p)));
    i = 0;
-   s = -1; 
+   s = -1;
    //"look for divisor";
    while ( (s == -1) && (i<size(L)) )
    {
@@ -3425,21 +3426,21 @@ NOTE: Taking the first possible reduction
  // otherwise: i<=size(L) and s!= -1 => reduction
     //"out of divisor search: s="; s; "i="; i;
     if (s != -1)
-	{
-    //"start reducing with G[i]:";
-    p = lpReduce(p,G[i],s); // lm-reduction
-	  //"reduced to p="; p;
-	}
-	else
     {
-	  // ie no lm-reduction possible; proceed with the tail reduction
-	  q = p-lead(p);
-	  p = lead(p); 
-	  if (q!=0)
-	  {
-	    p = p + lpNormalForm2(q,G,L);
-	  }
-      return(p); 
+    //"start reducing with G[i]:";
+      p = lpReduce(p,G[i],s); // lm-reduction
+      //"reduced to p="; p;
+    }
+    else
+    {
+      // ie no lm-reduction possible; proceed with the tail reduction
+      q = p-lead(p);
+      p = lead(p);
+      if (q!=0)
+      {
+        p = p + lpNormalForm2(q,G,L);
+      }
+      return(p);
     }
  }
  // out of while when p==0 or p == const
@@ -3770,7 +3771,7 @@ EXAMPLE: example makeLetterplaceRingElim; shows examples
       iV = (0: lV);
       iV[i] = 1;
       iVl = iV;
-      for (j = 1; j <= D; j++) 
+      for (j = 1; j <= D; j++)
        { iVl = iVl,iV; }
       L[3][i] = list("a",iVl);
     }
@@ -3839,7 +3840,7 @@ proc makeLetterplaceRingNDO(int d)
 RETURN:  ring
 PURPOSE: creates a ring with a non-degree first ordering, suitable for
 @* the use of non-homogeneous letterplace
-NOTE: the matrix for the ordering looks as follows: 
+NOTE: the matrix for the ordering looks as follows:
 @*    'd' blocks of shifted original variables
 EXAMPLE: example makeLetterplaceRingNDO; shows examples
 "
@@ -3957,7 +3958,7 @@ NOTE: Activate the resulting ring by using @code{setring}
   {
     ERROR("uptodeg and lV do not agree on the basering!");
   }
-  
+
 
     // Set letterplace-specific attributes for the output ring!
   attrib(R, "uptodeg", uptodeg);
@@ -3987,9 +3988,9 @@ does not work for degree reasons (deg function does not work for lp rings -> new
   {
     ERROR("Ring is not a lp-ring with an elimination ordering");
   }
-  
+
   //int nE = attrib(basering, "eV");
-  
+
   return(letplaceGBasis(I));
 }
 
