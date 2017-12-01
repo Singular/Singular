@@ -1,0 +1,1191 @@
+////////////////////////////////////////////////////////////////
+version="version fpaprops.lib 1.0.0.0 Dec_2017 "; // $Id$
+category="Noncommutative";
+info="
+LIBRARY:
+fpaprops.lib   Algorithms for the properties of quotient algebras in the letterplace case
+AUTHORS: Karim Abou Zeid,       karim.abou.zeid at rwth-aachen.de
+
+Supported by the transregional collaborative research centre
+SFB-TRR 195 "Symbolic Tools in Mathematics and their Application" of the German DFG
+OVERVIEW:
+TODO
+
+REFERENCES:
+Huishi Li: Groebner bases in ring theory. World Scientific, 2010.
+
+SEE ALSO:  fpadim.lib, freegb.lib,
+
+PROCEDURES:
+  lpNoetherian();
+  lpIsSemiPrime();
+  lpIsPrime();
+  lpGkDim();
+  lpGlDimBound();
+  lpSubstitute();
+  lpCalcSubstDegBound();
+  lpCalcSubstDegBounds();
+";
+
+LIB "fpadim.lib";
+////////////////////////////////////////////////////////////////////
+proc lpNoetherian(ideal G)
+"USAGE: lpNoetherian(G); G an ideal in a Letterplace ring
+RETURN: int
+        0 not noetherian
+        1 left noetherian
+        2 right noetherian
+        3 noetherian
+PURPOSE: Check whether R/<G> is (left/right) noetherian, where R is the basering
+ASSUME: - basering is a Letterplace ring
+@*      - G is a Groebner basis
+"
+{
+  G = lead(G);
+  G = simplify(G, 2+4+8);
+
+  // check special case 1
+  int l = 0;
+  for (int i = 1; i <= size(G); i++) {
+    // find the max degree in G
+    int d = deg(G[i]);
+    if (d > l) {
+      l = d;
+    }
+
+    // also if G is the whole ring
+    if (leadmonom(G[i]) == 1) {
+      ERROR("noetherianity not defined for 0-ring")
+    }
+  }
+  // if longest word has length 1 we handle it as a special case
+  if (l == 1) {
+    int n = attrib(basering, "lV"); // variable count
+    int k = size(G);
+    if (k == n) { // only the field left
+      return(3); // every field is noetherian
+    }
+    if (k == n-1) { // V = {1} with loop
+      return(3);
+    }
+    if (k <= n-2) { // V = {1} with more than one loop
+      return(0);
+    }
+  }
+
+  intmat UG = lpUfGraph(G);
+
+  // check special case 2
+  intmat zero[nrows(UG)][ncols(UG)];
+  if (UG == zero) {
+    return (3);
+  }
+
+  if (!imHasLoops(UG) && imIsUpRightTriangle(topologicalSort(UG))) {
+    // UG is a DAG
+    return (3);
+  }
+
+  // DFS from every vertex, if cycle is found, check every vertex for incomming/outcom
+  intvec visited;
+  visited[ncols(UG)] = 0;
+  int inFlag, outFlag;
+  for (int v = 1; v <= ncols(UG) && (inFlag + outFlag) != 3; v++) {
+    int inOutFlags = inOrOutCommingEdgeInCycle(UG, v, visited, 0);
+    if (inOutFlags == 1) {
+      inFlag = 1;
+    }
+    if (inOutFlags == 2) {
+      outFlag = 2;
+    }
+    if (inOutFlags == 3) {
+      inFlag = 1;
+      outFlag = 2;
+    }
+  }
+  return (3 - inFlag - outFlag);
+}
+
+static proc inOrOutCommingEdgeInCycle(intmat G, int v, intvec visited, intvec path) {
+  // Mark the current vertex as visited
+  visited[v] = 1;
+
+  // Store the current vertex in path
+  if (path[1] == 0) {
+    path[1] = v;
+  } else {
+    path[size(path) + 1] = v;
+  }
+
+  int inFlag, outFlag;
+
+  for (int w = 1; w <= ncols(G) && (inFlag + outFlag) != 3; w++) {
+    if (G[v,w] == 1) {
+      if (visited[w] == 1) {
+        // new cycle
+        if (v == w) {
+          for (int u = 1; u <= ncols(G); u++) {
+            if (G[v,u] && u != v) {
+              outFlag = 2;
+            }
+            if (G[u,v] && u != v) {
+              inFlag = 1;
+            }
+          }
+        } else {
+          for (int i = size(path); i >= 1; i--) { // for each vertex in the path
+            // check for neighbors not directly next or prev in cycle
+            for (int u = 1; u <= ncols(G); u++) {
+              if (G[path[i],u] == 1) { // there is an edge to u
+                if (path[i] != v) {
+                  if (u != path[i+1]) { // and u is not the next element in the cycle
+                    outFlag = 2;
+                  }
+                } else {
+                  if (u != w) {
+                    outFlag = 2;
+                  }
+                }
+              }
+              if (G[u,path[i]] == 1) { // there is an edge from u
+                if (path[i] != w) {
+                  if (u != path[i-1]) { // and u is not the previous element in the cylce
+                    inFlag = 1;
+                  }
+                } else {
+                  if (u != v) {
+                    inFlag = 1;
+                  }
+                }
+              }
+            }
+            if (path[i] == w) {
+              break;
+            }
+          }
+        }
+      } else {
+        int inOutFlags = inOrOutCommingEdgeInCycle(G, w, visited, path);
+        if (inOutFlags == 1) {
+          inFlag = 1;
+        }
+        if (inOutFlags == 2) {
+          outFlag = 2;
+        }
+        if (inOutFlags == 3) {
+          inFlag = 1;
+          outFlag = 2;
+        }
+      }
+    }
+  }
+
+  return (inFlag + outFlag);
+}
+
+proc lpIsSemiPrime(ideal G)
+"USAGE: lpIsSemiPrime(G); G an ideal in a Letterplace ring
+RETURN: boolean
+PURPOSE: Check whether R/<G> is semi prime, where R is the basering
+ASSUME: - basering is a Letterplace ring
+@*      - G is a Groebner basis
+"
+{
+  G = lead(G);
+  G = simplify(G, 2+4+8);
+
+  // check special case 1
+  int l = 0;
+  for (int i = 1; i <= size(G); i++) {
+    // find the max degree in G
+    int d = deg(G[i]);
+    if (d > l) {
+      l = d;
+    }
+
+    // also if G is the whole ring
+    if (leadmonom(G[i]) == 1) {
+      ERROR("primeness not defined for 0-ring")
+    }
+  }
+  // if longest word has length 1 we handle it as a special case
+  if (l == 1) {
+    return(1);
+  }
+
+  list VUG = lpUfGraph(G, 1);
+  intmat UG = VUG[1]; // the Ufnarovskij graph
+  ideal V = VUG[2]; // the vertices of UG (standard words with length = l-1)
+
+  list LG = lpId2ivLi(G);
+  list SW = ivStandardWordsUpToLength(LG, maxDeg(G));
+  list LV = lpId2ivLi(V);
+
+  // delete the 0 in SW
+  int indexofzero = ivIndexOf(SW, 0);
+  if (indexofzero > 0) { // should be always true when |SW| > 0
+    SW = delete(SW, indexofzero);
+  }
+
+  // check if each monomial in SW is cyclic
+  for (int i = 1; i <= size(SW); i++) {
+    if (!isCyclicInUfGraph(UG, LV, SW[i])) {
+      return (0);
+    }
+  }
+
+  return (1);
+}
+
+// checks whether a monomial is a cyclic monomial
+static proc isCyclicInUfGraph(intmat UG, list LV, intvec u)
+{
+  if (ncols(UG) == 0) {return (0);} // UG is empty
+  if (u == 0) {return (0);} // 0 is never cyclic
+
+  int l = size(LV[1]) + 1;
+
+  int s = size(u);
+  if (s <= l - 1) {
+    for (int i = 1; i <= size(LV); i++) {
+      // for all vertices where u is a suffix
+      if(isSF(u, LV[i])) {
+        if (existsRoute(UG, i, i)) {
+          return (1);
+        }
+      }
+    }
+  } else { // size(u) > l - 1
+    int m = s - l + 1;
+
+    // there must be a route from v0 to vm
+    intvec v0 = u[1..(l-1)]; // first in route of u
+    intvec vm = u[m+1..m+(l-1)]; // last in route of u
+
+    int iv0 = ivIndexOf(LV, v0);
+    int ivm = ivIndexOf(LV, vm);
+    if (iv0 <= 0 || ivm <= 0) {
+      ERROR("u is not a standard word");
+    }
+
+    return (existsRoute(UG, ivm, iv0));
+  }
+
+  return (0);
+}
+
+proc lpIsPrime(ideal G)
+"USAGE: lpIsPrime(G); G an ideal in a Letterplace ring
+RETURN: boolean
+PURPOSE: Check whether R/<G> is prime, where R is the basering
+ASSUME: - basering is a Letterplace ring
+@*      - G is a Groebner basis
+"
+{
+  G = lead(G);
+  G = simplify(G, 2+4+8);
+
+  // check special case 1
+  int l = 0;
+  for (int i = 1; i <= size(G); i++) {
+    // find the max degree in G
+    int d = deg(G[i]);
+    if (d > l) {
+      l = d;
+    }
+
+    // also if G is the whole ring
+    if (leadmonom(G[i]) == 1) {
+      ERROR("primeness not defined for 0-ring")
+    }
+  }
+  // if longest word has length 1 we handle it as a special case
+  if (l == 1) {
+    return(1);
+  }
+
+  list VUG = lpUfGraph(G, 1);
+  intmat UG = VUG[1]; // the Ufnarovskij graph
+  ideal V = VUG[2]; // the vertices of UG (standard words with length = l-1)
+
+  list LG = lpId2ivLi(G);
+  list LV = lpId2ivLi(V);
+
+  int n = ncols(UG);
+
+  // 1) for each vi vj there exists a route from vi to vj (means UG is connected)
+  for (int i = 1; i <= n; i++) {
+    for (int j = 1; j <= n; j++) {
+      if (!existsRoute(UG, i, j)) {
+        return (0);
+      }
+    }
+  }
+
+  // 2) any standard word with length < l-1 is a suffix of a vertex
+  list SW = ivStandardWordsUpToLength(LG, maxDeg(G) - 2); // < maxDeg - 1
+  if (size(SW) > 0 && size(LV) == 0) {return (0);}
+  for (int i = 1; i <= size(SW); i++) {
+    // check if SW[i] is a suffix of some LV
+    for (int j = 1; j <= size(LV); j++) {
+      if (!isSF(SW[i], LV[j])) {
+        if (j == size(LV)) {
+          return (0);
+        }
+      } else {
+        break;
+      }
+    }
+  }
+
+  return (1);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(5);
+  setring R;
+  ideal G = x(1)*x(2), y(1)*y(2); // K<x,y>/<xx,yy> is prime
+  lpIsPrime(G);
+}
+
+static proc existsRoute(intmat G, int v, int u, list #)
+"USAGE: existsRoute(G,v,u); G a graph, v and u vertices
+NOTE: don't pass anything to # (internal use for recursion)
+@*    routes always have at least one edge
+"
+{
+  int n = ncols(G);
+
+  // init visited
+  intvec visited;
+  if (size(#) > 0) {
+    if (v == u) {return (1);} // don't check on first call so |route| >= 1 holds
+    visited = #[1];
+  } else { // first call
+    visited[n] = 0;
+  }
+
+  // mark current vertex as visited
+  visited[v] = 1;
+
+  // recursive DFS
+  for (int i = 1; i <= n; i++) {
+    if (G[v,i] && (!visited[i] || i == u)) { // i == u to allow routes from u to u
+      if (existsRoute(G, i, u, visited)) {
+        return (1);
+      }
+    }
+  }
+
+  return (0);
+}
+
+static proc lpUfGkDim(ideal G)
+{
+  G = lead(G);
+  G = simplify(G, 2+4+8);
+
+  // check special case 1
+  int l = 0;
+  for (int i = 1; i <= size(G); i++) {
+    // find the max degree in G
+    int d = deg(G[i]);
+    if (d > l) {
+      l = d;
+    }
+
+    // also if G is the whole ring return minus infinity
+    if (leadmonom(G[i]) == 1) {
+      ERROR("Gk-Dim not defined for 0-ring")
+    }
+  }
+  // if longest word has length 1 we handle it as a special case
+  if (l == 1) {
+    int n = attrib(basering, "lV"); // variable count
+    int k = size(G);
+    if (k == n) { // V = {1} no edges
+      return(0);
+    }
+    if (k == n-1) { // V = {1} with loop
+      return(1);
+    }
+    if (k <= n-2) { // V = {1} with more than one loop
+      return(-1);
+    }
+  }
+
+  int t = rtimer; // DEBUG
+  intmat UG = lpUfGraph(G);
+  printf("lpUfGraph took %p", rtimer - t); // DEBUG
+
+  // check special case 2
+  intmat zero[nrows(UG)][ncols(UG)];
+  if (UG == zero) {
+    return (0);
+  }
+
+  // check special case 3
+  UG = topologicalSort(UG);
+
+  if (imIsUpRightTriangle(UG)) {
+    UG = eliminateZerosUpTriangle(UG);
+    if (ncols(UG) == 0 || nrows(UG) == 0) { // when the diagonal was zero
+      return (0)
+    }
+    return(UfGraphURTNZDGrowth(UG));
+  }
+
+  // otherwise count cycles in the Ufnarovskij Graph
+  int t = rtimer; // DEBUG
+  int gkdim = UfGraphGrowth(UG);
+  printf("UfGraphGrowth took %p", rtimer - t); // DEBUG
+  return(gkdim);
+}
+
+static proc UfGraphURTNZDGrowth(intmat UG) {
+  // URTNZD = upper right triangle non zero diagonal
+  for (int i = 1; i <= ncols(UG); i++) {
+    UG[i,i] = 0; // remove all loops
+  }
+  intmat UGk = UG;
+  intmat zero[nrows(UGk)][ncols(UGk)];
+  int k = 1;
+  while (UGk != zero) {
+    UGk = UGk * UG;
+    k++;
+  }
+  return (k);
+}
+
+static proc imIsUpRightTriangle(intmat M) {
+  for (int i = 1; i <= nrows(M); i++) {
+    for (int j = 1; j < i; j++) {
+      if(M[i,j] != 0) { return (0); }
+    }
+  }
+  return (1);
+}
+
+static proc eliminateZerosUpTriangle(intmat G) {
+  // G is expected to be an upper triangle matrix
+  for (int i = ncols(G); i >= 1; i--) { // loop order is important because we delete entries
+    if (G[i,i] == 0) { // i doesn't have a cycle
+      for (int j = 1; j < i; j++) {
+        if (G[j,i] == 1) { // j has an edge to i
+          for (int k = i + 1; k <= nrows(G); k++) {
+            if (G[i,k] == 1) {
+              G[j,k] = G[i,k]; // give j all edges from i
+            }
+          }
+        }
+      }
+      G = imDelRowCol(G,i,i); // remove vertex i
+    }
+  }
+  return (G);
+}
+
+static proc imDelRowCol(intmat M, int row, int col) {
+  // row and col are expected to be > 0
+  int nr = nrows(M);
+  int nc = ncols(M);
+  intmat Mdel[nr - 1][nc - 1];
+  for (int i = 1; i <= nr; i++) {
+    for (int j = 1; j <= nc; j++) {
+      if(i != row && j != col) {
+        int newi = i;
+        int newj = j;
+        if (i > row) { newi = i - 1; }
+        if (j > col) { newj = j - 1; }
+        Mdel[newi,newj] = M[i,j];
+      }
+    }
+  }
+  return (Mdel);
+}
+
+static proc topologicalSort(intmat G) {
+  // NOTE: ignores loops
+  // NOTE: this takes O(|V^3|), can be optimized
+  int n = ncols(G);
+  for (int i = 1; i <= n; i++) { // only use the submat at i
+    // find a vertex v in the submat at i with no incoming edges
+    int v;
+    for (int j = i; j <= n; j++) {
+      int incoming = 0;
+      for (int k = i; k <= n; k++) {
+        if (k != j && G[k,j] == 1) {
+          incoming = 1;
+        }
+      }
+      if (incoming == 0) {
+        v = j;
+        break;
+      } else {
+        if (j == n) {
+          // G contains at least one cycle, abort
+          return (G);
+        }
+      }
+    }
+
+    // swap v and i
+    if (v != i) {
+      G = imPermcol(G, v, i);
+      G = imPermrow(G, v, i);
+    }
+  }
+  return (G);
+}
+
+static proc imPermcol (intmat A, int c1, int c2)
+{
+  intmat B = A;
+  int k = nrows(B);
+  B[1..k,c1] = A[1..k,c2];
+  B[1..k,c2] = A[1..k,c1];
+  return (B);
+}
+
+static proc imPermrow (intmat A, int r1, int r2)
+{
+  intmat B = A;
+  int k = ncols(B);
+  B[r1,1..k] = A[r2,1..k];
+  B[r2,1..k] = A[r1,1..k];
+  return (B);
+}
+
+static proc UfGraphGrowth(intmat UG)
+{
+  int n = ncols(UG); // number of vertices
+  // iterate through all vertices
+
+  intvec visited;
+  visited[n] = 0;
+
+  intvec cyclic;
+  cyclic[n] = 0;
+
+  int maxCycleCount = 0;
+  for (int v = 1; v <= n; v++) {
+    int cycleCount = countCycles(UG, v, visited, cyclic, 0);
+    if (cycleCount == -1) {
+      return(-1);
+    }
+    if (cycleCount > maxCycleCount) {
+      maxCycleCount = cycleCount;
+    }
+  }
+  return(maxCycleCount);
+}
+
+static proc countCycles(intmat G, int v, intvec visited, intvec cyclic, intvec path)
+"USAGE: countCycles(G, v, visited, cyclic, path); G a Graph, v the vertex to
+start. The parameter visited, cyclic and path should be 0.
+RETURN: int
+@*:     Maximal number of distinct cycles
+PURPOSE: Calculate the maximal number of distinct cycles in a single path starting at v
+ASSUME: Basering is a Letterplace ring
+"
+{
+  // Mark the current vertex as visited
+  visited[v] = 1;
+
+  // Store the current vertex in path
+  if (path[1] == 0) {
+    path[1] = v;
+  } else {
+    path[size(path) + 1] = v;
+  }
+
+  int cycles = 0;
+  for (int w = 1; w <= ncols(G); w++) {
+    if (G[v,w] == 1) {
+      if (visited[w] == 1) { // neuer zykel gefunden
+        // 1. alle Knoten in path bis w überprüfen ob in cyclic
+        for (int j = size(path); j >= 1; j--) {
+          if(cyclic[path[j]] == 1) {
+            // 1.1 falls ja return -1
+            return (-1);
+          }
+          if (path[j] == w) {
+            break;
+          }
+        }
+
+        // 2. ansonsten cycles++
+        for (int j = size(path); j >= 1; j--) {
+          // 2.2 Kanten in diesem Zykel entfernen; Knoten cyclic
+          if (j == size(path)) { // Sonderfall bei der ersten Iteration
+            cyclic[v] = 1;
+            G[v, w] = 0;
+          } else {
+            cyclic[path[j]] = 1;
+            G[path[j], path[j+1]] = 0;
+          }
+          if (path[j] == w) {
+            break;
+          }
+        }
+
+        // 3. auf jedem dieser Knoten countCycles() aufrufen
+        int maxCycleCount = 0;
+        for (int j = size(path); j >= 1; j--) {
+          int cycleCount = countCycles(G, path[j], visited, cyclic, path);
+          if(cycleCount == -1) {
+            return (-1);
+          }
+          if (cycleCount > maxCycleCount) {
+            maxCycleCount = cycleCount;
+          }
+          if (path[j] == w) {
+            break;
+          }
+        }
+        if (maxCycleCount >= cycles) {
+          cycles = maxCycleCount + 1;
+        }
+      } else {
+        int cycleCount = countCycles(G, w, visited, cyclic, path);
+        if (cycleCount == -1) {
+          return(-1);
+        }
+        if (cycleCount > cycles) {
+          cycles = cycleCount;
+        }
+      }
+    }
+  }
+  // printf("Path: %s countCycles: %s", path, cycles); // DEBUG
+  return(cycles);
+}
+
+static proc lpUfGraph(ideal G, list #)
+"USAGE: lpUfGraph(G); G a set of monomials in a letterplace ring, # an optional parameter to return the vertex list when set
+RETURN: intmat
+PURPOSE: Constructs the Ufnarovskij graph induced by G
+@*      the adjacency matrix of the Ufnarovskij graph induced by G
+ASSUME: - basering is a Letterplace ring
+@*      - G are the leading monomials of a Groebner basis
+"
+{
+  int l = maxDeg(G);
+  list LG = lpId2ivLi(G);
+  list SW = ivStandardWords(LG, l - 1); // vertices
+  int n = size(SW);
+  intmat UG[n][n]; // Ufnarovskij graph
+  for (int i = 1; i <= n; i++) {
+    for (int j = 1; j <= n; j++) {
+      // [Studzinski page 76]
+      intvec v = SW[i];
+      intvec w = SW[j];
+      intvec v_overlap;
+      intvec w_overlap;
+      //TODO how should the graph look like when l - 1 = 0 ?
+      if (l - 1 == 0) {
+        ERROR("Ufnarovskij graph not implemented for l = 1");
+      }
+      if (l - 1 > 1) {
+        v_overlap = v[2 .. l-1];
+        w_overlap = w[1 .. l-2];
+      }
+      intvec vw = v;
+      vw[l] = w[l-1];
+      if (v_overlap == w_overlap && !ivdivides(LG, vw)) {
+        UG[i,j] = 1;
+      }
+    }
+  }
+  if (size(#) > 0) {
+    if (typeof(#[1]) == "int") {
+      if (#[1] == 1) {
+        list ret = UG;
+        ret[2] = ivL2lpI(SW); // the vertices
+        return (ret);
+      }
+    }
+  }
+  return (UG);
+}
+
+static proc maxDeg(ideal G)
+{
+  int l = 0;
+  for (int i = 1; i <= size(G); i++) { // find the max degree in G
+    int d = deg(G[i]);
+    if (d > l) {
+      l = d;
+    }
+  }
+  return (l);
+}
+
+static proc ivStandardWords(list G, int length)
+"ASSUME: G is simplified
+"
+{
+  if (length <= 0) {
+    list words;
+    if (length == 0 && !ivdivides(G,0)) {
+      words[1] = 0; // iv = 0 means monom = 1
+    }
+    return (words); // no standard words
+  }
+  int lV = attrib(basering, "lV"); // variable count
+  list prevWords = ivStandardWords(G, length - 1);
+  list words;
+  for (int i = 1; i <= lV; i++) {
+    for (int j = 1; j <= size(prevWords); j++) {
+      intvec word = prevWords[j];
+      word[length] = i;
+      // assumes that G is simplified!
+      if (!ivdivides(G, word)) {
+        words = insert(words, word);
+      }
+    }
+  }
+  return (words);
+}
+
+static proc ivStandardWordsUpToLength(list G, int length)
+"ASSUME: G is simplified
+"
+{
+  list words = ivStandardWords(G,0);
+  if (size(words) == 0) {return (words)}
+  for (int i = 1; i <= length; i++) {
+    words = words + ivStandardWords(G, i);
+  }
+  return (words);
+}
+
+static proc ivdivides(list G, intvec iv) {
+  for (int k = 1; k <= size(G); k++) {
+    if (isIF(G[k], iv)) {
+      return (1);
+    } else {
+      if (k == size(G)) {
+        return (0);
+      }
+    }
+  }
+}
+
+// TODO
+proc lpGkDim(ideal G, list#)
+"USAGE: lpGkDim(G); G an ideal in a letterplace ring, method an
+@*       optional integer. method = 0 uses the Ufnarovskij Graph
+@*       and method = 1 uses the Graph of normal words to determine
+@*       the Gelfand Kirillov dimension
+RETURN: int
+PURPOSE: Determines the Gelfand Kirillov dimension of A/<G>
+@*      -1 means it is positive infinite
+ASSUME: - basering is a Letterplace ring
+- G is a Groebner basis
+"
+{
+  int method = 0;
+  if (size(#) > 0) {
+    if (typeof(#[1])=="int") {
+      method = #[1];
+    }
+  }
+
+  if (method == 0) {
+    return (lpUfGkDim(G));
+  } else {
+    return (lpNorGkDim(G));
+  }
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  R;
+  setring R; // sets basering to Letterplace ring
+  ideal I = z(1);//an example of infinite GK dimension
+  lpGkDim(I);
+  I = x(1),y(1),z(1); // gkDim = 0
+  lpGkDim(I);
+  I = x(1)*y(2), x(1)*z(2), z(1)*y(2), z(1)*z(2);//gkDim = 2
+  lpGkDim(I);
+}
+
+proc lpGlDimBound(ideal G)
+"USAGE: lpGlDimBound(I); I an ideal
+RETURN: int, an upper bound for the global dimension, -1 means infinity
+PURPOSE: computing an upper bound for the global dimension
+ASSUME: - basering is a Letterplace ring, G is a reduced Gröbner Basis
+EXAMPLE: example lpGlDimBound; shows example
+NOTE: if I = LM(I), then the global dimension is equal the Gelfand
+@*    Kirillov dimension if it is finite
+@*    Global dimension should be 0 for A/G = K and 1 for A/G = K<x1...xn>
+"
+{
+  G = simplify(G,2); // remove zero generators
+  // NOTE: Gl should be 0 for A/G = K and 1 for A/G = K<x1...xn>
+  // G1 contains generators with single variable in LM
+  ideal G1;
+  for (int i = 1; i <= size(G); i++) {
+    if (ord(G[i]) < 2) { // single variable in LM
+      G1 = insertGenerator(G1,G[i]);
+    }
+  }
+  G1 = simplify(G1,2); // remove zero generators
+
+  // G = NF(G,G1)
+  for (int i = 1; i <= ncols(G); i++) { // do not use size() here
+    G[i] = lpNF(G[i],G1);
+  }
+  G = simplify(G,2); // remove zero generators
+
+  // delete variables in LM(G1) from the ring
+  def save = basering;
+  ring R = basering;
+  if (size(G1) > 0) {
+    while (size(G1) > 0) {
+      if (attrib(R, "lV") > 1) {
+        ring R = lpDelVar(lp2iv(G1[1])[1]);
+        ideal G1 = imap(save,G1);
+        G1 = simplify(G1, 2); // remove zero generators
+      } else {
+        // only the field is left (no variables)
+        return(0);
+      }
+    }
+    ideal G = imap(save, G); // put this here, because when save == R this call would make G = 0
+  }
+
+  // Li p. 184 if G = LM(G), then I = LM(I) and thus glDim = gkDim if it's finite
+  for (int i = 1; i <= size(G); i++) {
+    if (G[i] != lead(G[i])) {
+      break;
+    } else {
+      if (i == size(G)) { // if last iteration
+        print("Using gk dim"); // DEBUG
+        int gkDim = lpGkDim(G);
+        if (gkDim >= 0) {
+          return (gkDim);
+        }
+      }
+    }
+  }
+
+  intmat GNC = lpGraphOfNChains(G);
+
+  // assuming GNC is connected
+
+  // TODO: maybe loop+cycle checking could be done more efficiently?
+  if (!imHasLoops(GNC) && imIsUpRightTriangle(topologicalSort(GNC))) {
+    // GNC is a DAG
+    intmat GNCk = GNC;
+    intmat zero[1][ncols(GNCk)];
+    int k = 1;
+    // while first row isn't empty
+    while (GNCk[1,1..(ncols(GNCk))] != zero[1,1..(ncols(zero))]) {
+      GNCk = GNCk * GNC;
+      k++;
+    }
+    // k-1 = number of edges in longest path starting from 1
+    return (k-1);
+  } else {
+    // GNC contains loops/cycles => there is always an n-chain
+    return (-1); // infinity
+  }
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  setring R; // sets basering to Letterplace ring
+  ideal G = x(1)*x(2), y(1)*y(2),x(1)*y(2)*x(3); // ideal G contains a
+  //Groebner basis
+  lpGlDimBound(G); // invokes procedure with Groebner basis G
+}
+
+static proc imHasLoops(intmat A) {
+  int n = ncols(A);
+  for (int i = 1; i < n; i++) {
+    if (A[i,i] == 1) {
+      return (1);
+    }
+  }
+  return (0);
+}
+
+static proc lpGraphOfNChains(ideal G) // G must be reduced
+{
+  list LG = lpId2ivLi(lead(G));
+  int n = attrib(basering, "lV");
+  int degbound = attrib(basering, "uptodeg");
+
+  list V;
+  for (int i = 0; i <= n; i++) {
+    V[i+1] = i; // add 1 and all variables
+  }
+  for (int i = 1; i <= size(LG); i++) {
+    intvec u = LG[i];
+    for (int j = 2; j <= size(u); j++) {
+      intvec v = u[j..size(u)];
+      if (!contains(V, v)) {
+        V = insert(V, v, size(V)); // add subword j..size
+      }
+    }
+  }
+  int nV = size(V);
+  intmat GNC[nV][nV]; // graph of n-chains
+
+  // for vertex 1
+  for (int i = 2; i <= n + 1; i++) {
+    GNC[1,i] = 1; // 1 has an edge to all variables
+  }
+
+  // for the other vertices
+  for (int i = 2; i <= nV; i++) {
+    for (int j = 2; j <= nV; j++) {
+      intvec uv = V[i],V[j];
+
+      if (contains(LG, uv)) {
+        GNC[i,j] = 1;
+      } else {
+        // Li p. 177
+        // search for a right divisor 'w' of uv in G
+        // then check if G doesn't divide the subword uv-1
+
+        // look for a right divisor in LG
+        for (int k = 1; k <= size(LG); k++) {
+          if (isSF(LG[k], uv)) {
+            // w = LG[k]
+            if(!ivdivides(LG, uv[1..(size(uv)-1)])) {
+              // G doesn't divide uv-1
+              GNC[i,j] = 1;
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return(GNC);
+}
+
+static proc contains(list L, def item)
+{
+  for (int i = 1; i <= size(L); i++) {
+    if (L[i] == item) {
+      return (1);
+    }
+  }
+  return (0);
+}
+
+/*proc lpSubstituteExpandRing(poly f, list s1, list s2) {*/
+/*int minDegBound = lpCalcSubstDegBound(f,s1,s2);*/
+/**/
+/*def R = basering; // curr lp ring*/
+/*setring ORIGINALRING; // non lp ring TODO*/
+/*def R1 = makeLetterplaceRing(minDegBound);*/
+/*setring R1;*/
+/**/
+/*poly g = lpSubstitute(imap(R,f), imap(R,s1), imap(R,s2));*/
+/**/
+/*return (R1); // return the new ring*/
+/*}*/
+
+proc lpSubstitute(poly f, ideal s1, ideal s2, list #)
+"USAGE: lpSubstitute(f,s1,s2[,G]); f letterplace polynomial, s1 list (ideal) of variables
+@*	to replace, s2 list (ideal) of polynomials to replace with, G optional ideal to
+@*	reduce with.
+RETURN: poly, the substituted polynomial
+ASSUME: - basering is a Letterplace ring
+@*      - G is a groebner basis,
+@*      - the current ring has a sufficient degbound (can be calculated with
+    @*	  lpCalcSubstDegBound())
+EXAMPLE: example lpSubstitute; shows examples
+"
+{
+  ideal G;
+  if (size(#) > 0) {
+    if (typeof(#[1])=="ideal") {
+      G = #[1];
+    }
+  }
+
+  poly fs;
+  for (int i = 1; i <= size(f); i++) {
+    poly fis = leadcoef(f[i]);
+    intvec ivfi = lp2iv(f[i]);
+    for (int j = 1; j <= size(ivfi); j++) {
+      int varindex = ivfi[j];
+      int subindex = lpIndexOf(s1, var(varindex));
+      if (subindex > 0) {
+        s2[subindex] = lpNF(s2[subindex],G);
+        fis = lpMult(fis, s2[subindex]);
+      } else {
+        fis = lpMult(fis, lpNF(iv2lp(varindex),G));
+      }
+      /*fis = lpNF(fis,G);*/
+    }
+    fs = fs + fis;
+  }
+  fs = lpNF(fs, G);
+  return (fs);
+}
+example {
+  LIB "fpadim.lib";
+  ring r = 0,(x,y,z),dp;
+  def R = makeLetterplaceRing(4);
+  setring R;
+
+  ideal G = x(1)*y(2); // optional
+
+  poly f = 3*x(1)*x(2)+y(1)*x(2);
+  ideal s1 = x(1), y(1);
+  ideal s2 = y(1)*z(2)*z(3), x(1);
+
+  // the substitution probably needs a higher degbound
+  int minDegBound = lpCalcSubstDegBounds(f,s1,s2);
+  setring r;
+  def R1 = makeLetterplaceRing(minDegBound);
+  setring R1;
+
+  // the last parameter is optional
+  lpSubstitute(imap(R,f), imap(R,s1), imap(R,s2), imap(R,G));
+}
+example {
+  LIB "fpadim.lib";
+  ring r = 0,(x,y,z),dp;
+  def R = makeLetterplaceRing(4);
+  setring R;
+
+  poly f = 3*x(1)*x(2)+y(1)*x(2);
+  poly g = z(1)*x(2)+y(1);
+  poly h = 7*x(1)*z(2)+x(1);
+  ideal I = f,g,h;
+  ideal s1 = x(1), y(1);
+  ideal s2 = y(1)*z(2)*z(3), x(1);
+
+  int minDegBound = lpCalcSubstDegBounds(I,s1,s2);
+  setring r;
+  def R1 = makeLetterplaceRing(minDegBound);
+  setring R1;
+
+  ideal I = imap(R,I);
+  ideal s1 = imap(R,s1);
+  ideal s2 = imap(R,s2);
+  for (int i = 1; i <= size(I); i++) {
+    lpSubstitute(I[i], s1, s2);
+  }
+}
+
+static proc lpIndexOf(ideal I, poly p) {
+  for (int i = 1; i <= size(I); i++) {
+    if (I[i] == p) {
+      return (i);
+    }
+  }
+  return (-1);
+}
+
+static proc ivIndexOf(list L, intvec iv) {
+  for (int i = 1; i <= size(L); i++) {
+    if (L[i] == iv) {
+      return (i);
+    }
+  }
+  return (-1);
+}
+
+
+proc lpCalcSubstDegBound(poly f, ideal s1, ideal s2)
+"USAGE: lpCalcSubstDegBound(f,s1,s2); f letterplace polynomial, s1 list (ideal) of variables
+@*	to replace, s2 list (ideal) of polynomials to replace with
+RETURN: int, the min degbound required to perform the substitution
+ASSUME: - basering is a Letterplace ring
+EXAMPLE: example lpSubstitute; shows examples
+"
+{
+  int maxDegBound = 0;
+  for (int i = 1; i <= size(f); i++) {
+    intvec ivfi = lp2iv(f[i]);
+    int tmpDegBound;
+    for (int j = 1; j <= size(ivfi); j++) {
+      int varindex = ivfi[j];
+      int subindex = lpIndexOf(s1, var(varindex));
+      if (subindex > 0) {
+        tmpDegBound = tmpDegBound + deg(s2[subindex]);
+      } else {
+        tmpDegBound = tmpDegBound + 1;
+      }
+    }
+    if (tmpDegBound > maxDegBound) {
+      maxDegBound = tmpDegBound;
+    }
+  }
+
+  // increase degbound by 50% when ideal is provided
+  // needed for lpNF
+  maxDegBound = maxDegBound + maxDegBound/2;
+
+  return (maxDegBound);
+}
+
+// convenience method
+proc lpCalcSubstDegBounds(ideal I, ideal s1, ideal s2)
+"USAGE: lpCalcSubstDegBounds(I,s1,s2); I list (ideal) of letterplace polynomials, s1 list (ideal)
+@*	of variables to replace, s2 list (ideal) of polynomials to replace with
+RETURN: int, the min degbound required to perform all of the substitutions
+ASSUME: - basering is a Letterplace ring
+EXAMPLE: example lpSubstitute; shows examples
+"
+{
+  int maxDegBound = 0;
+  for (int i = 1; i <= size(I); i++) {
+    int tmpDegBound = lpCalcSubstDegBound(I[i], s1, s2, #);
+    if (tmpDegBound > maxDegBound) {
+      maxDegBound = tmpDegBound;
+    }
+  }
+  return (maxDegBound);
+}
+
+static proc isSF(intvec S, intvec I)
+"
+PURPOSE:
+checks, if a word S is a suffix of another word I
+"
+{
+  int n = size(S);
+  if (n <= 0 || S == 0) {return(1);}
+  int m = size(I);
+  if (m < n) {return(0);}
+  intvec IS = I[(m-n+1)..m];
+  if (IS == S) {return(1);}
+  else {return(0);}
+}
+
+static proc isIF(intvec IF, intvec I)
+"
+PURPOSE:
+checks, if a word IF is an infix of another word I
+"
+{
+  int n = size(IF);
+  int m = size(I);
+
+  if (n <= 0 || IF == 0) {return(1);}
+  if (m < n) {return(0);}
+
+  for (int i = 0; (n + i) <= m; i++){
+    intvec IIF = I[(1 + i)..(n + i)];
+    if (IIF == IF) {
+      return(1);
+    }
+  }
+  return(0);
+}
