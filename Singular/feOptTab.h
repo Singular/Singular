@@ -140,6 +140,9 @@ struct fe_option feOptSpec[] =
   {"cpus",            required_argument,    LONG_OPTION_RETURN,
    "#CPUs",   "maximal number of CPUs to use",                         feOptInt,    (void*)2,      0},
 
+  {"threads",         required_argument,    LONG_OPTION_RETURN,
+   "#threads", "maximal number of CPUs to use for threads",            feOptInt,    (void*)2,      0},
+
 
   {"MPport",           required_argument,   LONG_OPTION_RETURN,
    "PORT",     "Use PORT number for connections",                       feOptString,    0,      0},

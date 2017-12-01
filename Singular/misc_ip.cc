@@ -1388,7 +1388,7 @@ void siInit(char *name)
 // singular links: --------------------------------------------------
   slStandardInit();
   myynest=0;
-// semapohore 0 -----------------------------------------------------
+// how many processes ? -----------------------------------------------------
   int cpus=2;
   int cpu_n;
   #ifdef _SC_NPROCESSORS_ONLN
@@ -1397,6 +1397,8 @@ void siInit(char *name)
   if ((cpu_n=sysconf(_SC_NPROCESSORS_CONF))>cpus) cpus=cpu_n;
   #endif
   feSetOptValue(FE_OPT_CPUS, cpus);
+// how many threads ? -----------------------------------------------------
+  feSetOptValue(FE_OPT_THREADS, cpus);
 
 // default coeffs
   {
