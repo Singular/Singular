@@ -109,7 +109,7 @@ CFFList FpFactorize (const CanonicalForm& G,///< [in] a multivariate poly
   if (substCheck)
   {
     bool foundOne= false;
-    int * substDegree= new int [F.level()];
+    int * substDegree= NEW_ARRAY(int,F.level());
     for (int i= 1; i <= F.level(); i++)
     {
       if (degree (F, i) > 0)
@@ -145,10 +145,10 @@ CFFList FpFactorize (const CanonicalForm& G,///< [in] a multivariate poly
           newResult.append (CFFactor (j.getItem().factor(),
                                       j.getItem().exp()*i.getItem().exp()));
       }
-      delete [] substDegree;
+      DELETE_ARRAY(substDegree);
       return newResult;
     }
-    delete [] substDegree;
+    DELETE_ARRAY(substDegree);
   }
 
   ExtensionInfo info= ExtensionInfo (false);
@@ -193,7 +193,7 @@ CFFList FqFactorize (const CanonicalForm& G, ///< [in] a multivariate poly
   if (substCheck)
   {
     bool foundOne= false;
-    int * substDegree= new int [F.level()];
+    int * substDegree= NEW_ARRAY(int,F.level());
     for (int i= 1; i <= F.level(); i++)
     {
       if (degree (F, i) > 0)
@@ -229,10 +229,10 @@ CFFList FqFactorize (const CanonicalForm& G, ///< [in] a multivariate poly
           newResult.append (CFFactor (j.getItem().factor(),
                                       j.getItem().exp()*i.getItem().exp()));
       }
-      delete [] substDegree;
+      DELETE_ARRAY(substDegree);
       return newResult;
     }
-    delete [] substDegree;
+    DELETE_ARRAY(substDegree);
   }
 
   ExtensionInfo info= ExtensionInfo (alpha, false);
@@ -277,7 +277,7 @@ CFFList GFFactorize (const CanonicalForm& G, ///< [in] a multivariate poly
   if (substCheck)
   {
     bool foundOne= false;
-    int * substDegree= new int [F.level()];
+    int * substDegree= NEW_ARRAY(int,F.level());
     for (int i= 1; i <= F.level(); i++)
     {
       if (degree (F, i) > 0)
@@ -313,10 +313,10 @@ CFFList GFFactorize (const CanonicalForm& G, ///< [in] a multivariate poly
           newResult.append (CFFactor (j.getItem().factor(),
                                       j.getItem().exp()*i.getItem().exp()));
       }
-      delete [] substDegree;
+      DELETE_ARRAY(substDegree);
       return newResult;
     }
-    delete [] substDegree;
+    DELETE_ARRAY(substDegree);
   }
 
   Variable a= Variable (1);

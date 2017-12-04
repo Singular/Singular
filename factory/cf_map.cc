@@ -224,7 +224,7 @@ compress ( const CanonicalForm & f, CFMap & m )
         }
         n++; i++;
     }
-    delete [] degs;
+    DELETE_ARRAY(degs);
     return result;
 }
 

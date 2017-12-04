@@ -46,8 +46,8 @@ void myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
                   CFMap & N, const Variable& x)
 {
   int n= tmax (F.level(), G.level());
-  int * degsf= new int [n + 1];
-  int * degsg= new int [n + 1];
+  int * degsf= NEW_ARRAY(int,n + 1);
+  int * degsg= NEW_ARRAY(int,n + 1);
 
   for (int i = 0; i <= n; i++)
     degsf[i]= degsg[i]= 0;
@@ -60,6 +60,8 @@ void myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
   int g_zero= 0;
   int both_zero= 0;
   int degsfx, degsgx;
+  int Flevel=F.level();
+  int Glevel=G.level();
 
   if (x.level() != 1)
   {
@@ -72,12 +74,12 @@ void myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
         both_non_zero++;
         continue;
       }
-      if (degsf[i] == 0 && degsg[i] != 0 && i <= G.level())
+      if (degsf[i] == 0 && degsg[i] != 0 && i <= Glevel)
       {
         f_zero++;
         continue;
       }
-      if (degsg[i] == 0 && degsf[i] && i <= F.level())
+      if (degsg[i] == 0 && degsf[i] && i <= Flevel)
       {
         g_zero++;
         continue;
@@ -108,15 +110,15 @@ void myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
           }
         }
       }
-      delete [] degsf;
-      delete [] degsg;
+      DELETE_ARRAY(degsf);
+      DELETE_ARRAY(degsg);
       return;
     }
 
     if (both_non_zero == 0)
     {
-      delete [] degsf;
-      delete [] degsg;
+      DELETE_ARRAY(degsf);
+      DELETE_ARRAY(degsg);
       return;
     }
 
@@ -127,7 +129,7 @@ void myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
     {
       if (i == xlevel)
         continue;
-      if (degsf[i] != 0 && degsg[i] == 0 && i <= F.level())
+      if (degsf[i] != 0 && degsg[i] == 0 && i <= Flevel)
       {
         if (k + both_non_zero != i)
         {
@@ -136,7 +138,7 @@ void myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
         }
         k++;
       }
-      if (degsf[i] == 0 && degsg[i] != 0 && i <= G.level())
+      if (degsf[i] == 0 && degsg[i] != 0 && i <= Glevel)
       {
         if (l + g_zero + both_non_zero != i)
         {
@@ -232,8 +234,8 @@ void myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
     }
   }
 
-  delete [] degsf;
-  delete [] degsg;
+  DELETE_ARRAY(degsf);
+  DELETE_ARRAY(degsg);
 }
 
 static inline

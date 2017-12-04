@@ -45,6 +45,7 @@ coeffBound ( const CanonicalForm & f, int p )
       M += degs[i];
       b *= degs[i] + 1;
     }
+    DELETE_ARRAY(degs);
     b /= power (CanonicalForm (2), k);
     b= b.sqrt() + 1;
     b *= 2 * maxNorm( f ) * power( CanonicalForm( 2 ), M );
@@ -103,6 +104,7 @@ coeffBound ( const CanonicalForm & f, int p, const CanonicalForm& mipo )
         M += degs[i];
         K *= degs[i] + 1;
     }
+    DELETE_ARRAY(degs);
     K /= power (CanonicalForm (2), k/2);
     K *= power (CanonicalForm (2), M);
     int N= degree (mipo);
