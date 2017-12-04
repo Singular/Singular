@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="version freegb.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version freegb.lib 4.1.0.4 Dec_2017 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY: freegb.lib   Compute two-sided Groebner bases in free algebras via
@@ -1076,6 +1076,7 @@ EXAMPLE: example makeLetterplaceRing1; shows examples
     LR[3][nb*(D+1)+1] = tmp;
   }
   L[3] = LR[3];
+  attrib(L,"maxExp",1);
   def @R = ring(L);
   //  setring @R;
   //  int uptodeg = d; int lV = nvars(basering); // were defined before
@@ -1184,6 +1185,7 @@ EXAMPLE: example makeLetterplaceRing2; shows examples
     //    LR[3] = tmp[1..size(tmp)-1];
   }
   L[3] = LR[3];
+  attrib(L,"maxExp",1);
   def @R = ring(L);
   //  setring @R;
   //  int uptodeg = d; int lV = nvars(basering); // were defined before
@@ -1293,6 +1295,7 @@ EXAMPLE: example makeLetterplaceRing1; shows examples
     LR[3][nb*(D+1)+1] = tmp;
   }
   L[3] = LR[3];
+  attrib(L,"maxExp",1);
   def @R = ring(L);
   //  setring @R;
   //  int uptodeg = d; int lV = nvars(basering); // were defined before
