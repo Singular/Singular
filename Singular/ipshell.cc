@@ -2739,7 +2739,7 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
   return FALSE;
 }
 
-ring rCompose(const lists  L, const BOOLEAN check_comp)
+ring rCompose(const lists  L, const BOOLEAN check_comp, const long bitmask)
 {
   if ((L->nr!=3)
 #ifdef HAVE_PLURAL
@@ -2819,7 +2819,7 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
 
       if( R->cf == NULL )
       {
-        ring extRing = rCompose((lists)L->m[0].Data(),FALSE);
+        ring extRing = rCompose((lists)L->m[0].Data(),FALSE,0x7fff);
 
         if (extRing==NULL)
         {
@@ -2866,6 +2866,7 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
   // ------------------------ ??????? --------------------
 
   rRenameVars(R);
+  if (bitmask!=0x7fff) R->bitmask=bitmask*2;
   rComplete(R);
 
   // ------------------------ Q-IDEAL ------------------------

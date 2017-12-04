@@ -88,7 +88,7 @@
 #include <unistd.h>
 #include <vector>
 
-ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
+ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE, const long bitmask=0x7fff);
 
 // defaults for all commands: NO_PLURAL | NO_RING | ALLOW_ZERODIVISOR
 
@@ -4264,10 +4264,12 @@ static BOOLEAN jjLOAD1(leftv /*res*/, leftv v)
 }
 static BOOLEAN jjLISTRING(leftv res, leftv v)
 {
-  ring r=rCompose((lists)v->Data());
-  if (r==NULL) return TRUE;
+  lists l=(lists)v->Data();
+  long mm=(long)atGet(v,"maxExp",INT_CMD);
+  if (mm==0) mm=0x7fff;
+  ring r=rCompose((lists)v->Data(),TRUE,mm);
   res->data=(char *)r;
-  return FALSE;
+  return (r==NULL);
 }
 static BOOLEAN jjPFAC1(leftv res, leftv v)
 {
@@ -4604,8 +4606,17 @@ static BOOLEAN jjRINGLIST(leftv res, leftv v)
 {
   ring r=(ring)v->Data();
   if (r!=NULL)
+  {
     res->data = (char *)rDecompose((ring)v->Data());
-  return (r==NULL)||(res->data==NULL);
+    if (res->data!=NULL)
+    {
+      long mm=r->bitmask/2;
+      if (mm>MAX_INT_VAL) mm=MAX_INT_VAL;
+      atSet(res,omStrDup("maxExp"),(void*)mm,INT_CMD);
+      return FALSE;
+    }
+  }
+  return TRUE;
 }
 static BOOLEAN jjRINGLIST_C(leftv res, leftv v)
 {
