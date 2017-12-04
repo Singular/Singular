@@ -421,7 +421,10 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   }
   if (h->attribute!=NULL)
   {
-    h->attribute->killAll(r);
+    if ((IDTYP(h)==RING_CMD)&&(IDRING(h)!=r))
+       h->attribute->killAll(IDRING(h));
+    else
+       h->attribute->killAll(r);
     h->attribute=NULL;
   }
   if (IDTYP(h) == PACKAGE_CMD)
