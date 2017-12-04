@@ -825,7 +825,7 @@ static void eulerchar (ideal I, int variables, mpz_ptr ec)
         {
             mpz_init(dummy);
             if((variables % 2) == 0)
-                {mpz_set_si(dummy, 1);}
+                {mpz_set_ui(dummy, 1);}
             else
                 {mpz_set_si(dummy, -1);}
             mpz_add(ec, ec, dummy);
@@ -1952,8 +1952,8 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp
   S = minimalMonomialGenSet(S);
   if( !idIs0(S) && p_Totaldegree(S->m[0], currRing)==0)
   {
-    PrintS("Hilbert Series:");
-    PrintLn(); PrintS(" 0");PrintLn(); return;
+    PrintS("Hilbert Series:\n 0\n");
+    return;
   }
   int (*POS)(ideal, poly, std::vector<ideal>, std::vector<poly>, int, int);
   if(trunDegHs != 0)
