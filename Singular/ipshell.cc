@@ -5233,7 +5233,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
       i++;
     else if ((*iv)[1]==ringorder_L)
     {
-      R->bitmask=(*iv)[2];
+      R->bitmask=(*iv)[2]*2+1;
       n--;
     }
     else if (((*iv)[1]!=ringorder_a)
