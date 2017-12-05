@@ -339,7 +339,7 @@ the weight vector for homogeneous or quasihomogeneous ideals/modules
 complete intersection property
 @item isCM
 Cohen-Macaulay property
-@item maxExp (for ring)
+@item maxExp (for ring/list from ringlist)
 limit for each exponent (32767 by default)
 @item rank (for module)
 set/get the rank of a module (see @ref{nrows})
@@ -6482,6 +6482,8 @@ the quotient ideal.
 @end enumerate
 From a list of such structure, a new ring may be defined by the command @code{ring}
 ( see the following example ).
+If the attribute "maxExp" of the ring is different from the default 32767,
+it is also set for the list.
 @item @strong{Note:} All data which depends on a ring belong to the current ring,
 not to a ring which can be contructed fron a modified list.
 These data will be mapped via fetch to the ring to be constructed.
@@ -6501,8 +6503,10 @@ These data will be mapped via fetch to the ring to be constructed.
  l[3][3]=l[3][2]; // save the module ordering
  l[3][1]=list("dp",intvec(1,1));
  l[3][2]=list("wp",intvec(3,4));
+ attrib(l,"maxExp",100); // and lower the limit for exponents to 100
  def ra = ring(l);     //creates the newring
  ra; setring ra;
+ attrib(ra,"maxExp");
  list lra = ringlist(ra);
  lra[1][4]=ideal(a2+1);
  def Ra = ring(lra);
@@ -6512,6 +6516,7 @@ These data will be mapped via fetch to the ring to be constructed.
 @end table
 @c ref
 See
+@ref{maxExp);
 @ref{ring};
 @ref{ring_list};
 @ref{qring}.
