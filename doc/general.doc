@@ -1913,7 +1913,8 @@ Loc_(x)K[x1,...,xn]).
 @end ifinfo
 For more details, see @ref{Polynomial data}.
 
-In a ring declaration, @sc{Singular} offers the following orderings:
+In a ring declaration, @sc{Singular} offers the following orderings
+(but see also @ref{Monomial orderings}):
 @enumerate
 @item Global orderings
 @table @asis

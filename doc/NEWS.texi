@@ -29,6 +29,7 @@ Can only be used in procedure headings. (@nref{General command syntax}).
 
 Extended commands:
 @itemize
+@item pseudo ordering @code{L} allows setting of limits for exponents in polynomials (@nref{Pseudo ordering L})
 @item @code{%},@code{mod}: also for poly operands (@nref{poly operations}).
 @item @code{delete}: extended to intvec, ideal, module (@nref{delete}).
 @item syz (@nref{syz}), lift (@nref{lift}), liftstd (@nref{liftstd}), intersect(@nref{intersect}): with a specified GB algorithm
