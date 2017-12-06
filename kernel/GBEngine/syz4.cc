@@ -58,42 +58,54 @@ typedef struct {
     unsigned long comp;
 } lt_struct;
 
-typedef std::vector<lt_struct> lts_vector;
-
-static void initialize_hash(lts_vector *C, const ideal L)
+static void initialize_hash(lt_struct **C, const ideal L)
 {
     const ring R = currRing;
     const unsigned long n_elems = L->ncols;
+    unsigned int *count
+        = (unsigned int *)omAlloc0((L->rank+1)*sizeof(unsigned int));
     unsigned long k = 0;
     while (k < n_elems) {
-        const poly a = L->m[k];
-        C[__p_GetComp(a, R)].push_back(
-                (lt_struct){a, p_GetShortExpVector(a, R), ++k});
+        count[__p_GetComp(L->m[k], R)]++;
+        k++;
     }
+    for (int i = 0; i <= L->rank; i++) {
+        // do ++count[i] and use C[i][0].comp to save count[i]
+        C[i] = (lt_struct *)omalloc0((++count[i])*sizeof(lt_struct));
+        C[i][0].comp = count[i];
+    }
+    k = n_elems;
+    while (k > 0) {
+        const poly a = L->m[k-1];
+        const unsigned long comp = __p_GetComp(a, R);
+        C[comp][--count[comp]]
+            = (lt_struct){a, p_GetShortExpVector(a, R), k};
+        k--;
+    }
+    omFree(count);
 }
 
 static poly find_reducer(const poly multiplier, const poly t,
-        const lts_vector *hash_previous_module)
+        const lt_struct *const *const hash_previous_module)
 {
     const ring r = currRing;
-    const lts_vector v = hash_previous_module[__p_GetComp(t, r)];
-    lts_vector::const_iterator itr_curr = v.begin();
-    lts_vector::const_iterator itr_end = v.end();
-    if (unlikely(itr_curr == itr_end)) {
+    const lt_struct *v = hash_previous_module[__p_GetComp(t, r)];
+    unsigned long count = v[0].comp;
+    if (unlikely(count == 1)) {
         return NULL;
     }
     const poly q = p_New(r);
     pNext(q) = NULL;
     p_MemSum_LengthGeneral(q->exp, multiplier->exp, t->exp, r->ExpL_Size);
     const unsigned long q_not_sev = ~p_GetShortExpVector(q, r);
-    for( ; itr_curr != itr_end; ++itr_curr) {
-        if (likely(itr_curr->sev & q_not_sev)
-                || unlikely(!(_p_LmDivisibleByNoComp(itr_curr->lt, q, r)))) {
+    for(int i = 1; i < count; i++) {
+        if (likely(v[i].sev & q_not_sev)
+                || unlikely(!(_p_LmDivisibleByNoComp(v[i].lt, q, r)))) {
             continue;
         }
         p_MemAdd_NegWeightAdjust(q, r);
-        p_ExpVectorDiff(q, q, itr_curr->lt, r);
-        p_SetComp(q, itr_curr->comp, r);
+        p_ExpVectorDiff(q, q, v[i].lt, r);
+        p_SetComp(q, v[i].comp, r);
         p_Setm(q, r);
         number n = n_Mult(p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
         p_SetCoeff0(q, n_InpNeg(n, r), r);
@@ -106,17 +118,17 @@ static poly find_reducer(const poly multiplier, const poly t,
 #if CACHE
 static poly traverse_tail(const poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
-        const lts_vector *hash_previous_module);
+        const lt_struct *const *const hash_previous_module);
 #else
 static poly compute_image(const poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
-        const lts_vector *hash_previous_module);
+        const lt_struct *const *const hash_previous_module);
 #define traverse_tail compute_image
 #endif   // CACHE
 
 static poly reduce_term(const poly multiplier, const poly term,
         const ideal previous_module, const std::vector<bool> &variables,
-        const lts_vector *hash_previous_module)
+        const lt_struct *const *const hash_previous_module)
 {
     poly s = find_reducer(multiplier, term, hash_previous_module);
     if (s == NULL) {
@@ -134,7 +146,7 @@ static poly reduce_term(const poly multiplier, const poly term,
 
 static poly compute_image(const poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
-        const lts_vector *hash_previous_module)
+        const lt_struct *const *const hash_previous_module)
 {
     const poly tail = previous_module->m[comp]->next;
     if (unlikely(tail == NULL) || !check_variables(variables, multiplier)) {
@@ -214,7 +226,7 @@ static poly get_from_cache_term(const cache_term::iterator itr,
 
 static poly traverse_tail(const poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
-        const lts_vector *hash_previous_module)
+        const lt_struct *const *const hash_previous_module)
 {
     cache_term *T = &(Cache[comp]);
     cache_term::iterator itr = T->find(multiplier);
@@ -230,7 +242,7 @@ static poly traverse_tail(const poly multiplier, const int comp,
 
 static poly lift_ext_LT(const poly a, const ideal previous_module,
         const std::vector<bool> &variables,
-        const lts_vector *hash_previous_module)
+        const lt_struct *const *const hash_previous_module)
 {
     const ring R = currRing;
     poly t1 = compute_image(a, __p_GetComp(a, R)-1, previous_module, variables,
@@ -457,13 +469,17 @@ static void computeLiftings(const resolvente res, const int index,
 #if CACHE
     initialize_cache(res[index-1]->ncols);
 #endif   // CACHE
-    lts_vector *hash_previous_module = new lts_vector[res[index-1]->rank+1];
+    lt_struct **hash_previous_module
+        = (lt_struct **)omAlloc((res[index-1]->rank+1)*sizeof(lt_struct *));
     initialize_hash(hash_previous_module, res[index-1]);
     for (int j = res[index]->ncols-1; j >= 0; j--) {
         res[index]->m[j]->next->next = lift_ext_LT(res[index]->m[j],
                 res[index-1], variables, hash_previous_module);
     }
-    delete[](hash_previous_module);
+    for (int i = 0; i <= res[index-1]->rank; i++) {
+        omfree(hash_previous_module[i]);
+    }
+    omFree(hash_previous_module);
 #if CACHE
     delete_cache(res[index-1]->ncols);
 #endif   // CACHE
