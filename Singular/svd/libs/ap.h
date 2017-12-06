@@ -27,8 +27,8 @@ Checking of the array boundaries mode.
 
 
 /********************************************************************
-This symbol is used for debugging. Do not define it and do not remove 
-comments. 
+This symbol is used for debugging. Do not define it and do not remove
+comments.
 ********************************************************************/
 //#define UNSAFE_MEM_COPY
 
@@ -123,11 +123,11 @@ const complex csqr(const complex &z);
 
 
 /********************************************************************
-Template defining vector in memory. It is used by the basic 
+Template defining vector in memory. It is used by the basic
 subroutines of linear algebra.
 
-Vector consists of Length elements of type T, starting from an element, 
-which Data is pointed to. Interval between adjacent elements equals 
+Vector consists of Length elements of type T, starting from an element,
+which Data is pointed to. Interval between adjacent elements equals
 the value of Step.
 
 The class provides an access for reading only.
@@ -157,8 +157,8 @@ protected:
 Template defining vector in memory, derived from const_raw_vector.
 It is used by the basic subroutines of linear algebra.
 
-Vector consists of Length elements of type T, starting from an element, 
-which Data is pointed to. Interval between adjacent elements equals 
+Vector consists of Length elements of type T, starting from an element,
+which Data is pointed to. Interval between adjacent elements equals
 the value of Step.
 
 The class provides an access both for reading and writing.
@@ -687,7 +687,7 @@ public:
             m_Vec=0;
     };
 
-    
+
     const template_1d_array& operator=(const template_1d_array &rhs)
     {
         if( this==&rhs )
@@ -713,7 +713,7 @@ public:
         return *this;
     };
 
-    
+
     const T& operator()(int i) const
     {
         #ifndef NO_AP_ASSERT
@@ -722,7 +722,7 @@ public:
         return m_Vec[ i-m_iLow ];
     };
 
-    
+
     T& operator()(int i)
     {
         #ifndef NO_AP_ASSERT
@@ -731,7 +731,7 @@ public:
         return m_Vec[ i-m_iLow ];
     };
 
-    
+
     void setbounds( int iLow, int iHigh )
     {
         if(m_Vec)
@@ -742,7 +742,7 @@ public:
         m_Vec = new T[m_iVecSize];
     };
 
-    
+
     void setcontent( int iLow, int iHigh, const T *pContent )
     {
         setbounds(iLow, iHigh);
@@ -750,7 +750,7 @@ public:
             (*this)(i) = pContent[i-iLow];
     };
 
-    
+
     T* getcontent()
     {
         return m_Vec;
@@ -761,13 +761,13 @@ public:
         return m_Vec;
     };
 
-    
+
     int getlowbound(int iBoundNum = 0) const
     {
         return m_iLow;
     };
 
-    
+
     int gethighbound(int iBoundNum = 0) const
     {
         return m_iHigh;
@@ -781,7 +781,7 @@ public:
             return raw_vector<T>(m_Vec+iStart-m_iLow, iEnd-iStart+1, 1);
     };
 
-    
+
     const_raw_vector<T> getvector(int iStart, int iEnd) const
     {
         if( iStart>iEnd || wrongIdx(iStart) || wrongIdx(iEnd) )

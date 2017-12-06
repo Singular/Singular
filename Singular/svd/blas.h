@@ -399,7 +399,7 @@ namespace blas
 
         if( !trans )
         {
-            
+
             //
             // y := alpha*A*x + beta*y;
             //
@@ -409,7 +409,7 @@ namespace blas
             }
             ap::ap_error::make_assertion(j2-j1==ix2-ix1);
             ap::ap_error::make_assertion(i2-i1==iy2-iy1);
-            
+
             //
             // beta*y
             //
@@ -424,7 +424,7 @@ namespace blas
             {
                 ap::vmul(y.getvector(iy1, iy2), beta);
             }
-            
+
             //
             // alpha*A*x
             //
@@ -436,7 +436,7 @@ namespace blas
         }
         else
         {
-            
+
             //
             // y := alpha*A'*x + beta*y;
             //
@@ -446,7 +446,7 @@ namespace blas
             }
             ap::ap_error::make_assertion(i2-i1==ix2-ix1);
             ap::ap_error::make_assertion(j2-j1==iy2-iy1);
-            
+
             //
             // beta*y
             //
@@ -461,7 +461,7 @@ namespace blas
             {
                 ap::vmul(y.getvector(iy1, iy2), beta);
             }
-            
+
             //
             // alpha*A'*x
             //
@@ -537,7 +537,7 @@ namespace blas
         amp::ampf<Precision> v;
 
 
-        
+
         //
         // Setup
         //
@@ -568,7 +568,7 @@ namespace blas
         }
         crows = arows;
         ccols = bcols;
-        
+
         //
         // Test WORK
         //
@@ -577,7 +577,7 @@ namespace blas
         i = ap::maxint(i, bcols);
         work(1) = 0;
         work(i) = 0;
-        
+
         //
         // Prepare C
         //
@@ -598,7 +598,7 @@ namespace blas
                 ap::vmul(c.getrow(i, cj1, cj2), beta);
             }
         }
-        
+
         //
         // A*B
         //
@@ -615,7 +615,7 @@ namespace blas
             }
             return;
         }
-        
+
         //
         // A*B'
         //
@@ -646,7 +646,7 @@ namespace blas
                 return;
             }
         }
-        
+
         //
         // A'*B
         //
@@ -663,7 +663,7 @@ namespace blas
             }
             return;
         }
-        
+
         //
         // A'*B'
         //

@@ -43,7 +43,7 @@
 #if defined(WINNT) && ! defined(__GNUC__)
 
 #define TIMING_DEFINE(t) static clock_t timing_ ## t ## _start, timing_ ## t ## _end; \
-static clock_t timing_ ## t ## _time; 
+static clock_t timing_ ## t ## _time;
 #define TIMING_START(t) timing_ ## t ## _start = clock();
 #define TIMING_END(t) timing_ ## t ## _end = clock(); \
 timing_ ## t ## _time += timing_ ## t ## _end - timing_ ## t ## _start;

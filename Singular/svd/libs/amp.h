@@ -18,7 +18,7 @@
 
 namespace amp
 {
-    class exception {}; 
+    class exception {};
     class incorrectPrecision    : public exception {};
     class overflow              : public exception {};
     class divisionByZero        : public exception {};
@@ -27,10 +27,10 @@ namespace amp
     class invalidString         : public exception {};
     class internalError         : public exception {};
     class domainError           : public exception {};
-    
+
     typedef unsigned long unsigned32;
     typedef signed long   signed32;
-    
+
     struct mpfr_record
     {
         unsigned int refCount;
@@ -38,15 +38,15 @@ namespace amp
         mpfr_t value;
         mpfr_record *next;
     };
-    
+
     typedef mpfr_record* mpfr_record_ptr;
-    
+
     //
     // storage for mpfr_t instances
     //
     class mpfr_storage
     {
-    public:        
+    public:
         static mpfr_record* newMpfr(unsigned int Precision);
         static void deleteMpfr(mpfr_record* ref);
         /*static void clearStorage();*/
@@ -54,7 +54,7 @@ namespace amp
     private:
         static mpfr_record_ptr& getList(unsigned int Precision);
     };
-    
+
     //
     // mpfr_t reference
     //
@@ -65,16 +65,16 @@ namespace amp
         mpfr_reference(const mpfr_reference& r);
         mpfr_reference& operator= (const mpfr_reference &r);
         ~mpfr_reference();
-        
+
         void initialize(int Precision);
         void free();
-        
+
         mpfr_srcptr getReadPtr() const;
         mpfr_ptr getWritePtr();
     private:
         mpfr_record *ref;
     };
-        
+
     //
     // ampf template
     //
@@ -91,13 +91,13 @@ namespace amp
             if( rval->refCount==0 )
                 mpfr_storage::deleteMpfr(rval);
         }
-        
+
         //
         // Initializing
         //
         ampf ()                 { InitializeAsZero(); }
         ampf(mpfr_record *v)    { rval = v; }
-        
+
         ampf (long double v)    { InitializeAsDouble(v); }
         ampf (double v)         { InitializeAsDouble(v); }
         ampf (float v)          { InitializeAsDouble(v); }
@@ -109,14 +109,14 @@ namespace amp
         ampf (unsigned short v) { InitializeAsULong(v); }
         ampf (signed char v)    { InitializeAsSLong(v); }
         ampf (unsigned char v)  { InitializeAsULong(v); }
-        
+
         //
         // initializing from string
         // string s must have format "X0.hhhhhhhh@eee" or "X-0.hhhhhhhh@eee"
         //
         ampf (const std::string &s) { InitializeAsString(s.c_str()); }
         ampf (const char *s)        { InitializeAsString(s); }
-        
+
         //
         // copy constructors
         //
@@ -176,7 +176,7 @@ namespace amp
             return *this;
         }
 #endif
-        
+
         //
         // in-place operators
         // TODO: optimize
@@ -185,13 +185,13 @@ namespace amp
         template<class T> ampf& operator-=(const T& v){ *this = *this - v; return *this; };
         template<class T> ampf& operator*=(const T& v){ *this = *this * v; return *this; };
         template<class T> ampf& operator/=(const T& v){ *this = *this / v; return *this; };
-        
+
         //
         // MPFR access
         //
         mpfr_srcptr getReadPtr() const;
         mpfr_ptr getWritePtr();
-        
+
         //
         // properties and information
         //
@@ -208,11 +208,11 @@ namespace amp
         std::string toHex() const;
         std::string toDec() const;
         char * toString() const;
-        
-        
+
+
         //
         // static methods
-        //        
+        //
         static const ampf getUlpOf(const ampf &x);
         static const ampf getUlp();
         static const ampf getUlp256();
@@ -230,7 +230,7 @@ namespace amp
         void InitializeAsULong(unsigned long v);
         void InitializeAsDouble(long double v);
         void InitializeAsString(const char *s);
-        
+
         //mpfr_reference  ref;
         mpfr_record *rval;
     };
@@ -263,7 +263,7 @@ namespace amp
         rval = mpfr_storage::newMpfr(Precision);
         mpfr_set_si(getWritePtr(), sv, GMP_RNDN);
     }
-    
+
     template<unsigned int Precision>
     void ampf<Precision>::InitializeAsULong(unsigned long v)
     {
@@ -271,7 +271,7 @@ namespace amp
         rval = mpfr_storage::newMpfr(Precision);
         mpfr_set_ui(getWritePtr(), v, GMP_RNDN);
     }
-                           
+
     template<unsigned int Precision>
     void ampf<Precision>::InitializeAsDouble(long double v)
     {
@@ -286,19 +286,19 @@ namespace amp
         CheckPrecision();
         rval = mpfr_storage::newMpfr(Precision);
         mpfr_strtofr(getWritePtr(), s, NULL, 0, GMP_RNDN);
-    } 
+    }
 
     template<unsigned int Precision>
     mpfr_srcptr ampf<Precision>::getReadPtr() const
     {
-        // TODO: подумать, нужно ли сделать, чтобы и при getRead, и при 
+        // TODO: подумать, нужно ли сделать, чтобы и при getRead, и при
         //       getWrite создавалась новая instance mpfr_t.
         //       это может быть нужно для корректной обработки ситуаций вида
         //       mpfr_чего_то_там( a.getWritePtr(), a.getReadPtr())
         //       вроде бы нужно, а то если там завязано на side-effects...
         return rval->value;
     }
-    
+
     template<unsigned int Precision>
     mpfr_ptr ampf<Precision>::getWritePtr()
     {
@@ -310,7 +310,7 @@ namespace amp
         rval = newrval;
         return rval->value;
     }
-        
+
     template<unsigned int Precision>
     bool ampf<Precision>::isFiniteNumber() const
     {
@@ -324,13 +324,13 @@ namespace amp
             return false;
         return mpfr_sgn(getReadPtr())>0;
     }
-    
+
     template<unsigned int Precision>
     bool ampf<Precision>::isZero() const
     {
         return mpfr_zero_p(getReadPtr())!=0;
     }
-    
+
     template<unsigned int Precision>
     bool ampf<Precision>::isNegativeNumber() const
     {
@@ -344,13 +344,13 @@ namespace amp
     {
         return getUlpOf(*this);
     }
-    
+
     template<unsigned int Precision>
     double ampf<Precision>::toDouble() const
     {
         return mpfr_get_d(getReadPtr(), GMP_RNDN);
     }
-    
+
     template<unsigned int Precision>
     std::string ampf<Precision>::toHex() const
     {
@@ -367,7 +367,7 @@ namespace amp
             mpfr_free_str(ptr);
             return r;
         }
-        
+
         //
         // general case
         //
@@ -395,12 +395,12 @@ namespace amp
         mpfr_free_str(ptr2);
         return r;
     }
-    
+
     template<unsigned int Precision>
     std::string ampf<Precision>::toDec() const
     {
         // TODO: advanced output formatting (zero, integers)
-        
+
         //
         // some special cases
         //
@@ -414,7 +414,7 @@ namespace amp
             mpfr_free_str(ptr);
             return r;
         }
-        
+
         //
         // general case
         //
@@ -458,7 +458,7 @@ namespace amp
             mpfr_free_str(ptr);
             return toString_Block;
         }
-        
+
         //
         // general case
         //
@@ -507,7 +507,7 @@ namespace amp
             GMP_RNDN);
         return r;
     }
-        
+
     template<unsigned int Precision>
     const ampf<Precision> ampf<Precision>::getUlp()
     {
@@ -516,7 +516,7 @@ namespace amp
         mpfr_sub_ui(r.getWritePtr(), r.getWritePtr(), 1, GMP_RNDN);
         return r;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> ampf<Precision>::getUlp256()
     {
@@ -530,7 +530,7 @@ namespace amp
             GMP_RNDN);
         return r;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> ampf<Precision>::getUlp512()
     {
@@ -543,7 +543,7 @@ namespace amp
             9,
             GMP_RNDN);
         return r;
-    } 
+    }
 
     template<unsigned int Precision>
     const ampf<Precision> ampf<Precision>::getMaxNumber()
@@ -553,7 +553,7 @@ namespace amp
         mpfr_set_exp(r.getWritePtr(),mpfr_get_emax());
         return r;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> ampf<Precision>::getMinNumber()
     {
@@ -567,7 +567,7 @@ namespace amp
     {
         return getUlp256();
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> ampf<Precision>::getAlgoPascalMaxNumber()
     {
@@ -578,7 +578,7 @@ namespace amp
         mpfr_set_exp(r.getWritePtr(), e-5);
         return r;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> ampf<Precision>::getAlgoPascalMinNumber()
     {
@@ -597,7 +597,7 @@ namespace amp
         while(mpfr_urandomb(r.getWritePtr(), *amp::mpfr_storage::getRandState()));
         return r;
     }
-    
+
     //
     // comparison operators
     //
@@ -612,31 +612,31 @@ namespace amp
     {
         return mpfr_cmp(op1.getReadPtr(), op2.getReadPtr())!=0;
     }
-    
+
     template<unsigned int Precision>
     const bool operator<(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
         return mpfr_cmp(op1.getReadPtr(), op2.getReadPtr())<0;
     }
-    
+
     template<unsigned int Precision>
     const bool operator>(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
         return mpfr_cmp(op1.getReadPtr(), op2.getReadPtr())>0;
     }
-    
+
     template<unsigned int Precision>
     const bool operator<=(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
         return mpfr_cmp(op1.getReadPtr(), op2.getReadPtr())<=0;
     }
-    
+
     template<unsigned int Precision>
     const bool operator>=(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
         return mpfr_cmp(op1.getReadPtr(), op2.getReadPtr())>=0;
     }
-    
+
     //
     // arithmetic operators
     //
@@ -645,7 +645,7 @@ namespace amp
     {
         return op1;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> operator-(const ampf<Precision>& op1)
     {
@@ -653,7 +653,7 @@ namespace amp
         mpfr_neg(v->value, op1.getReadPtr(), GMP_RNDN);
         return v;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> operator+(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
@@ -661,7 +661,7 @@ namespace amp
         mpfr_add(v->value, op1.getReadPtr(), op2.getReadPtr(), GMP_RNDN);
         return v;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> operator-(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
@@ -669,8 +669,8 @@ namespace amp
         mpfr_sub(v->value, op1.getReadPtr(), op2.getReadPtr(), GMP_RNDN);
         return v;
     }
-        
-    
+
+
     template<unsigned int Precision>
     const ampf<Precision> operator*(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
@@ -678,7 +678,7 @@ namespace amp
         mpfr_mul(v->value, op1.getReadPtr(), op2.getReadPtr(), GMP_RNDN);
         return v;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> operator/(const ampf<Precision>& op1, const ampf<Precision>& op2)
     {
@@ -686,7 +686,7 @@ namespace amp
         mpfr_div(v->value, op1.getReadPtr(), op2.getReadPtr(), GMP_RNDN);
         return v;
     }
- 
+
     //
     // basic functions
     //
@@ -842,7 +842,7 @@ namespace amp
         mpfr_mul_2si(r.getWritePtr(), x.getReadPtr(), exponent, GMP_RNDN);
         return r;
     }
- 
+
     //
     // different types of arguments
     //
@@ -917,7 +917,7 @@ namespace amp
     __AMP_BINARY_OPF(double)
     __AMP_BINARY_OPF(long double)
     #undef __AMP_BINARY_OPF
-    
+
     //
     // transcendent functions
     //
@@ -1002,7 +1002,7 @@ namespace amp
         mpfr_atan2(v->value, y.getReadPtr(), x.getReadPtr(), GMP_RNDN);
         return v;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> log(const ampf<Precision> &x)
     {
@@ -1076,7 +1076,7 @@ namespace amp
     public:
         campf():x(0),y(0){};
         campf(long double v)    { x=v; y=0; }
-        campf(double v)         { x=v; y=0; } 
+        campf(double v)         { x=v; y=0; }
         campf(float v)          { x=v; y=0; }
         campf(signed long v)    { x=v; y=0; }
         campf(unsigned long v)  { x=v; y=0; }
@@ -1125,42 +1125,42 @@ namespace amp
 
         ampf<Precision> x, y;
     };
-    
+
     //
     // complex operations
     //
     template<unsigned int Precision>
     const bool operator==(const campf<Precision>& lhs, const campf<Precision>& rhs)
     { return lhs.x==rhs.x && lhs.y==rhs.y; }
-    
+
     template<unsigned int Precision>
     const bool operator!=(const campf<Precision>& lhs, const campf<Precision>& rhs)
     { return lhs.x!=rhs.x || lhs.y!=rhs.y; }
-    
+
     template<unsigned int Precision>
     const campf<Precision> operator+(const campf<Precision>& lhs)
     { return lhs; }
-    
+
     template<unsigned int Precision>
     campf<Precision>& operator+=(campf<Precision>& lhs, const campf<Precision>& rhs)
     { lhs.x += rhs.x; lhs.y += rhs.y; return lhs; }
-    
+
     template<unsigned int Precision>
     const campf<Precision> operator+(const campf<Precision>& lhs, const campf<Precision>& rhs)
     { campf<Precision> r = lhs; r += rhs; return r; }
-    
+
     template<unsigned int Precision>
     const campf<Precision> operator-(const campf<Precision>& lhs)
     { return campf<Precision>(-lhs.x, -lhs.y); }
-    
+
     template<unsigned int Precision>
     campf<Precision>& operator-=(campf<Precision>& lhs, const campf<Precision>& rhs)
     { lhs.x -= rhs.x; lhs.y -= rhs.y; return lhs; }
-    
+
     template<unsigned int Precision>
     const campf<Precision> operator-(const campf<Precision>& lhs, const campf<Precision>& rhs)
     { campf<Precision> r = lhs; r -= rhs; return r; }
-    
+
     template<unsigned int Precision>
     campf<Precision>& operator*=(campf<Precision>& lhs, const campf<Precision>& rhs)
     {
@@ -1169,11 +1169,11 @@ namespace amp
         lhs.y = mm-xx-yy;
         return lhs;
     }
-    
+
     template<unsigned int Precision>
     const campf<Precision> operator*(const campf<Precision>& lhs, const campf<Precision>& rhs)
     { campf<Precision> r = lhs; r *= rhs; return r; }
-    
+
     template<unsigned int Precision>
     const campf<Precision> operator/(const campf<Precision>& lhs, const campf<Precision>& rhs)
     {
@@ -1196,23 +1196,23 @@ namespace amp
         }
         return result;
     }
-    
+
     template<unsigned int Precision>
     campf<Precision>& operator/=(campf<Precision>& lhs, const campf<Precision>& rhs)
     {
         lhs = lhs/rhs;
         return lhs;
     }
-    
+
     template<unsigned int Precision>
     const ampf<Precision> abscomplex(const campf<Precision> &z)
     {
         ampf<Precision> w, xabs, yabs, v;
-    
+
         xabs = abs(z.x);
         yabs = abs(z.y);
         w = xabs>yabs ? xabs : yabs;
-        v = xabs<yabs ? xabs : yabs; 
+        v = xabs<yabs ? xabs : yabs;
         if( v==0 )
             return w;
         else
@@ -1221,20 +1221,20 @@ namespace amp
             return w*sqrt(1+sqr(t));
         }
     }
-    
+
     template<unsigned int Precision>
     const campf<Precision> conj(const campf<Precision> &z)
     {
-        return campf<Precision>(z.x, -z.y); 
+        return campf<Precision>(z.x, -z.y);
     }
-    
+
     template<unsigned int Precision>
     const campf<Precision> csqr(const campf<Precision> &z)
     {
-        ampf<Precision> t = z.x*z.y; 
-        return campf<Precision>(sqr(z.x)-sqr(z.y), t+t); 
+        ampf<Precision> t = z.x*z.y;
+        return campf<Precision>(sqr(z.x)-sqr(z.y), t+t);
     }
-    
+
     //
     // different types of arguments
     //
@@ -1280,13 +1280,13 @@ namespace amp
         template<unsigned int Precision>                   bool operator==(const type& op1,             const campf<Precision>& op2) { return op1==op2.x && op2.y==0; }   \
         template<unsigned int Precision>                   bool operator==(const campf<Precision>& op1, const type& op2)             { return op1.x==op2 && op1.y==0; }   \
         template<unsigned int Precision>                   bool operator!=(const type& op1,             const campf<Precision>& op2) { return op1!=op2.x || op2.y!=0; }   \
-        template<unsigned int Precision>                   bool operator!=(const campf<Precision>& op1, const type& op2)             { return op1.x!=op2 || op1.y!=0; }   
+        template<unsigned int Precision>                   bool operator!=(const campf<Precision>& op1, const type& op2)             { return op1.x!=op2 || op1.y!=0; }
     __AMP_BINARY_OPF(float)
     __AMP_BINARY_OPF(double)
     __AMP_BINARY_OPF(long double)
     __AMP_BINARY_OPF(ampf<Precision>)
     #undef __AMP_BINARY_OPF
-    
+
     //
     // Real linear algebra
     //
@@ -1340,7 +1340,7 @@ namespace amp
             pSrc += vSrc.GetStep();
         }
     }
-    
+
     template<unsigned int Precision>
     void vMoveNeg(ap::raw_vector< ampf<Precision> > vDst, ap::const_raw_vector< ampf<Precision> > vSrc)
     {
@@ -1357,7 +1357,7 @@ namespace amp
             pSrc += vSrc.GetStep();
         }
     }
-    
+
     template<unsigned int Precision, class T2>
     void vMove(ap::raw_vector< ampf<Precision> > vDst, ap::const_raw_vector< ampf<Precision> > vSrc, T2 alpha)
     {
@@ -1375,7 +1375,7 @@ namespace amp
             pSrc += vSrc.GetStep();
         }
     }
-    
+
     template<unsigned int Precision>
     void vAdd(ap::raw_vector< ampf<Precision> > vDst, ap::const_raw_vector< ampf<Precision> > vSrc)
     {
@@ -1392,7 +1392,7 @@ namespace amp
             pSrc += vSrc.GetStep();
         }
     }
-    
+
     template<unsigned int Precision, class T2>
     void vAdd(ap::raw_vector< ampf<Precision> > vDst, ap::const_raw_vector< ampf<Precision> > vSrc, T2 alpha)
     {
@@ -1411,7 +1411,7 @@ namespace amp
             pSrc += vSrc.GetStep();
         }
     }
-    
+
     template<unsigned int Precision>
     void vSub(ap::raw_vector< ampf<Precision> > vDst, ap::const_raw_vector< ampf<Precision> > vSrc)
     {
@@ -1428,13 +1428,13 @@ namespace amp
             pSrc += vSrc.GetStep();
         }
     }
-    
+
     template<unsigned int Precision, class T2>
     void vSub(ap::raw_vector< ampf<Precision> > vDst, ap::const_raw_vector< ampf<Precision> > vSrc, T2 alpha)
     {
         vAdd(vDst, vSrc, -alpha);
     }
-    
+
     template<unsigned int Precision, class T2>
     void vMul(ap::raw_vector< ampf<Precision> > vDst, T2 alpha)
     {
@@ -1449,5 +1449,5 @@ namespace amp
         }
     }
 }
- 
+
 #endif

@@ -118,7 +118,7 @@ namespace rotations
         {
             return;
         }
-        
+
         //
         // Form  P * A
         //
@@ -126,7 +126,7 @@ namespace rotations
         {
             if( n1!=n2 )
             {
-                
+
                 //
                 // Common case: N1<>N2
                 //
@@ -147,7 +147,7 @@ namespace rotations
             }
             else
             {
-                
+
                 //
                 // Special case: N1=N2
                 //
@@ -168,7 +168,7 @@ namespace rotations
         {
             if( n1!=n2 )
             {
-                
+
                 //
                 // Common case: N1<>N2
                 //
@@ -189,7 +189,7 @@ namespace rotations
             }
             else
             {
-                
+
                 //
                 // Special case: N1=N2
                 //
@@ -252,7 +252,7 @@ namespace rotations
         amp::ampf<Precision> temp;
 
 
-        
+
         //
         // Form A * P'
         //
@@ -260,7 +260,7 @@ namespace rotations
         {
             if( m1!=m2 )
             {
-                
+
                 //
                 // Common case: M1<>M2
                 //
@@ -281,7 +281,7 @@ namespace rotations
             }
             else
             {
-                
+
                 //
                 // Special case: M1=M2
                 //
@@ -302,7 +302,7 @@ namespace rotations
         {
             if( m1!=m2 )
             {
-                
+
                 //
                 // Common case: M1<>M2
                 //
@@ -323,7 +323,7 @@ namespace rotations
             }
             else
             {
-                
+
                 //
                 // Special case: M1=M2
                 //

@@ -810,7 +810,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
 #if 0
   if (idHomModule(res[0],currRing->qideal,&w)!=isHomog)
   {
-    Warn("betti-command: Input is not homogeneous!");
+    WarnS("betti-command: Input is not homogeneous!");
     weights=NULL;
   }
 #endif

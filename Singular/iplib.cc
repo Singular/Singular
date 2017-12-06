@@ -596,7 +596,7 @@ static void iiCallLibProcBegin()
 }
 static void iiCallLibProcEnd(idhdl save_ringhdl, ring save_ring)
 {
-  if ((currRing!=NULL) 
+  if ((currRing!=NULL)
   &&(currRing!=save_ring))
   {
     currRing->ref--;
@@ -961,8 +961,8 @@ BOOLEAN iiLoadLIB(FILE *fp, const char *libnamebuf, const char*newlib,
   if( (lib_style == OLD_LIBSTYLE) && (BVERBOSE(V_LOAD_LIB)))
   {
     Warn( "library %s has old format. This format is still accepted,", newlib);
-    Warn( "but for functionality you may wish to change to the new");
-    Warn( "format. Please refer to the manual for further information.");
+    WarnS( "but for functionality you may wish to change to the new");
+    WarnS( "format. Please refer to the manual for further information.");
   }
   reinit_yylp();
   fclose( yylpin );

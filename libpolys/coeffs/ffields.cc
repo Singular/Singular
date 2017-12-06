@@ -911,7 +911,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   if(p->GFChar > (2<<15))
   {
 #ifndef SING_NDEBUG
-    Warn("illegal characteristic");
+    WarnS("illegal characteristic");
 #endif
     return TRUE;
   }

@@ -19,7 +19,7 @@ amp::mpfr_record* amp::mpfr_storage::newMpfr(unsigned int Precision)
         rec->next = lst;
         lst = rec;
     }
-    
+
     amp::mpfr_record *p = lst;
     p->refCount = 1;
     lst = lst->next;
@@ -110,7 +110,7 @@ amp::mpfr_reference::~mpfr_reference()
     if( ref!=NULL )
         free();
 }
-        
+
 void amp::mpfr_reference::initialize(int Precision)
 {
     if( ref!=NULL )
@@ -129,7 +129,7 @@ void amp::mpfr_reference::free()
         amp::mpfr_storage::deleteMpfr(ref);
     ref = NULL;
 }
-        
+
 mpfr_srcptr amp::mpfr_reference::getReadPtr() const
 {
     if( ref==NULL )
@@ -148,7 +148,7 @@ mpfr_ptr amp::mpfr_reference::getWritePtr()
 
     amp::mpfr_record *newref = amp::mpfr_storage::newMpfr(ref->Precision);
     mpfr_set(newref->value, ref->value, GMP_RNDN);
-    
+
     free();
     ref = newref;
     return ref->value;

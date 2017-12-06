@@ -2475,7 +2475,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #  ifdef RDEBUG
           p_DebugPrint((poly)h->Data(), currRing);
 #  else
-          Warn("Sorry: not available for release build!");
+          WarnS("Sorry: not available for release build!");
 #  endif
           return FALSE;
         }
@@ -2498,7 +2498,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #  ifdef RDEBUG
           rDebugPrint((ring)h->Data());
 #  else
-          Warn("Sorry: not available for release build!");
+          WarnS("Sorry: not available for release build!");
 #  endif
           return FALSE;
         }
@@ -2670,7 +2670,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           {
             if (h->next->Typ()!=POLY_CMD)
             {
-              Warn("Wrong types for poly= comb(ideal,poly)");
+              WarnS("Wrong types for poly= comb(ideal,poly)");
             }
           }
           res->rtyp=POLY_CMD;
@@ -2691,7 +2691,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           {
             if (h->next->Typ()!=POLY_CMD)
             {
-                Warn("Wrong types for poly= comb(ideal,poly)");
+                WarnS("Wrong types for poly= comb(ideal,poly)");
             }
           }
           res->rtyp=POLY_CMD;

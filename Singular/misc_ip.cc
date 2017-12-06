@@ -663,7 +663,7 @@ BOOLEAN setOption(leftv res, leftv v)
             si_opt_1 &= ~Sy_bit(OPT_REDTHROUGH);
         }
         else
-          Warn("cannot set option");
+          WarnS("cannot set option");
 #if 0
         if (TEST_OPT_INTSTRATEGY && (currRing!=NULL)
         && rField_has_simple_inverse()
@@ -682,7 +682,7 @@ BOOLEAN setOption(leftv res, leftv v)
           si_opt_1 &= optionStruct[i].resetval;
         }
         else
-          Warn("cannot clear option");
+          WarnS("cannot clear option");
         goto okay;
       }
     }

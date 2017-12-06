@@ -172,7 +172,7 @@ void feHelp(char *str)
       Warn("No unique help for '%s'", str);
     else
       Warn("No help for topic '%s'", str);
-    Warn("Try one of");
+    WarnS("Try one of");
     char *matches=StringEndS();
     PrintS(matches);
     omFree(matches);
@@ -797,7 +797,7 @@ static void heBrowserHelp(heEntry hentry)
     //{
     //  Warn("Using URL '%s'.", feResource('u', 0));
     //}
-    Warn("Use 'system(\"--browser\", <browser>);' to change browser,");
+    WarnS("Use 'system(\"--browser\", <browser>);' to change browser,");
     StringSetS("where <browser> can be: ");
     int i = 0;
     i = 0;
@@ -1038,8 +1038,8 @@ static void heEmacsHelp(heEntry hentry, int /*br*/)
   WarnS("Your help command could not be executed. Use");
   Warn("C-h C-s %s",
        (hentry != NULL && *(hentry->node) != '\0' ? hentry->node : "Top"));
-  Warn("to enter the Singular online help. For general");
-  Warn("information on Singular running under Emacs, type C-h m.");
+  WarnS("to enter the Singular online help. For general");
+  WarnS("information on Singular running under Emacs, type C-h m.");
 }
 static int singular_manual(char *str, BOOLEAN isIndexEntry);
 static void heBuiltinHelp(heEntry hentry, int /*br*/)

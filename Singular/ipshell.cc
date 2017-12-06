@@ -526,7 +526,7 @@ void test_cmd(int i)
     ii=i;
     if (Sy_bit(ii) & kOptions)
     {
-      Warn("Gerhard, use the option command");
+      WarnS("Gerhard, use the option command");
       si_opt_1 |= Sy_bit(ii);
     }
     else if (Sy_bit(ii) & validOpts)

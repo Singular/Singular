@@ -582,7 +582,7 @@ char * rOrdStr(ring r)
 
     if (l==nblocks)
     {
-      if (r->bitmask!=0xffff) 
+      if (r->bitmask!=0xffff)
       {
         long mm=r->bitmask;
         if (mm>MAX_INT_VAL) mm=MAX_INT_VAL;
@@ -5063,7 +5063,7 @@ int rGetMaxSyzComp(int i, const ring r)
   {
   #ifndef SING_NDEBUG
     WarnS("rGetMaxSyzComp: order c");
-  #endif  
+  #endif
     return 0;
   }
 }

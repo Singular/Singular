@@ -2946,7 +2946,7 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
   else if (strat->M==NULL)
   {
     M=idInit(1,F->rank);
-    Warn("no minimal generating set computed");
+    WarnS("no minimal generating set computed");
   }
   else
   {
