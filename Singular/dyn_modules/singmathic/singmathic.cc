@@ -10,6 +10,7 @@
 #include "kernel/polys.h"
 
 #include "Singular/ipid.h"
+#include "Singular/feOpt.h"
 #include "Singular/mod_lib.h"
 
 #include <mathicgb.h>
@@ -481,7 +482,9 @@ BOOLEAN mathicgb(leftv result, leftv arg)
   const int varCount = currRing->N;
   const ideal I=(ideal) arg->Data();
   mgb::GroebnerConfiguration conf(characteristic, varCount,I->rank);
-  conf.setMaxThreadCount(0); // default number of cores
+  feOptIndex fno=feGetOptIndex(FE_OPT_THREADS);
+  //conf.setMaxThreadCount(0); // default number of cores
+  conf.setMaxThreadCount((int)(long)feOptSpec[fno].value);
   if (!setOrder(currRing, conf))
     return TRUE;
   if (TEST_OPT_PROT)
