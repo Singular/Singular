@@ -107,7 +107,8 @@ static poly find_reducer(const poly multiplier, const poly t,
         p_ExpVectorDiff(q, q, v[i].lt, r);
         p_SetComp(q, v[i].comp, r);
         p_Setm(q, r);
-        number n = n_Mult(p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
+        number n = n_Div(p_GetCoeff(multiplier, r), p_GetCoeff(v[i].lt, r), r);
+        n_InpMult(n, p_GetCoeff(t, r), r);
         p_SetCoeff0(q, n_InpNeg(n, r), r);
         return q;
     }
@@ -304,7 +305,8 @@ static poly syzHeadExtFrame(const ideal G, const int i, const int j)
     poly head = p_Init(r);
     pSetCoeff0(head, n_Init(1, r->cf));
     poly head_ext = p_Init(r);
-    pSetCoeff0(head_ext, n_Init(-1, r->cf));
+    pSetCoeff0(head_ext, n_InpNeg(n_Div(pGetCoeff(f_i), pGetCoeff(f_j), r->cf),
+                r->cf));
     long exp_i, exp_j, lcm;
     for (int k = (int)r->N; k > 0; k--) {
         exp_i = p_GetExp(f_i, k, r);
@@ -482,53 +484,12 @@ static void computeLiftings(const resolvente res, const int index,
 #endif   // CACHE
 }
 
-static void normalize_input(resolvente res)
-{
-    const ring r = currRing;
-    for (int i = 0; i < res[0]->ncols; i++) {
-        const number c = pGetCoeff(res[0]->m[i]);
-        if (!n_IsOne(c, r->cf)) {
-            res[0]->m[i]->next = p_Div_nn(res[0]->m[i]->next, c, r);
-        }
-    }
-}
-
-static void denormalize_first_syz_module(resolvente res, const int comp,
-        const number coef)
-{
-    const ring r = currRing;
-    number coef_inv = n_Invers(coef, r->cf);
-    for (int i = 0; i < res[1]->ncols; i++) {
-        poly p = res[1]->m[i];
-        while (p != NULL) {
-            if (unlikely(__p_GetComp(p, r) == comp)) {
-                n_InpMult(pGetCoeff(p), coef_inv, r->cf);
-            }
-            pIter(p);
-        }
-    }
-    n_Delete(&coef_inv, r->cf);
-}
-
-static void denormalize_input(resolvente res)
-{
-    const ring r = currRing;
-    for (int i = 0; i < res[0]->ncols; i++) {
-        const number c = pGetCoeff(res[0]->m[i]);
-        if (!n_IsOne(c, r->cf)) {
-            res[0]->m[i]->next = p_Mult_nn(res[0]->m[i]->next, c, r);
-            denormalize_first_syz_module(res, i+1, c);
-        }
-    }
-}
-
 static int computeResolution(resolvente res, const int max_index,
         syzHeadFunction *syzHead, const bool do_lifting)
 {
     int index = 0;
     if (!idIs0(res[0]) && 0 < max_index) {
         index++;
-        normalize_input(res);
         res[1] = computeFrame(res[0], syzM_i_unsorted, syzHead);
         std::vector<bool> variables;
         variables.resize(currRing->N+1, true);
@@ -541,7 +502,6 @@ static int computeResolution(resolvente res, const int max_index,
             res[index] = computeFrame(res[index-1], syzM_i_sorted, syzHead);
         }
         variables.clear();
-        denormalize_input(res);
     }
     return index+1;
 }
