@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version compregb.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version compregb.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="General purpose";
 info="
 LIBRARY:  compregb.lib      experimental implementation for comprehensive Groebner systems

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version derham.lib 4.0.0.0 Jun_2013 ";
+version="version derham.lib 4.1.1.0 Dec_2017 ";
 category="Noncommutative";
 info="
 LIBRARY:  deRham.lib      Computation of deRham cohomology

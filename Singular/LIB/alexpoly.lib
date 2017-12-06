@@ -1,5 +1,5 @@
 ////
-version="version alexpoly.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version alexpoly.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:  alexpoly.lib   Resolution Graph and Alexander Polynomial

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version hdepth.lib 4.0.0.0 Jun_2013"; //
+version="version hdepth.lib 4.1.1.0 Dec_2017 "; //
 category="Commutative Algebra";
 info="
 LIBRARY: hdepth.lib     Procedures for computing hdepth_1
@@ -7,7 +7,7 @@ AUTHORS: Popescu, A.,     popescu@mathematik.uni-kl.de
 
 SEE ALSO: 'An algorithm to compute the Hilbert depth', Adrian Popescu, arxiv/AC/1307.6084
 
-KEYWORDS: hdepth, library
+KEYWORDS: hdepth; depth, Hilbert; Hilbert depth
 
 
 PROCEDURES:

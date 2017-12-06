@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="version difform.lib 1.0.0.2 Apr_2015 "; // $Id$
+version="version difform.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY:   difform.lib Procedures for differential forms

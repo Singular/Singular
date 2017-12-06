@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version atkins.lib 4.0.0.1 Jun_2014 ";
+version="version atkins.lib 4.1.1.0 Dec_2017 ";
 category="Teaching";
 info="
 LIBRARY:  atkins.lib     Procedures for teaching cryptography
