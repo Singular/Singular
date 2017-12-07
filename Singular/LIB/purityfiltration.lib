@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////
 //procedures examples comments
-version="version purityfiltration.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version purityfiltration.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY: purityfiltration.lib     Algorithms for computing a purity filtration of a given module

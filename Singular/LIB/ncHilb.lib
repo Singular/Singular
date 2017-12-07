@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version nc_hilb.lib 4.1.0.3 Nov_2017 "; // $Id$
+version="version nc_hilb.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="Noncommutative algebra";
 info="
 LIBRARY:  ncHilb.lib: A library for computing graded and multi-graded Hilbert

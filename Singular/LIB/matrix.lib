@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version matrix.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version matrix.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations

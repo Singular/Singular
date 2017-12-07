@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version="version lrcalc.lib 0.91 Dec_2015 ";      //$Id$
+version="version lrcalc.lib 4.1.1.0 Dec_2017 ";      //$Id$
 category="Littlewood-Richardson coefficients";
 info="
 LIBRARY:  lrcalc.lib    An interface to the Littlewood-Richardson Calculator by Anders Buch

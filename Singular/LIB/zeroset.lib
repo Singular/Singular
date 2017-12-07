@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version zeroset.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version zeroset.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  zeroset.lib      Procedures for roots and factorization

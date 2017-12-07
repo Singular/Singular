@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version realclassify.lib 4.1.0.3 Nov_2107 "; // $Id$
+version="version realclassify.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:  realclassify.lib   Classification of real singularities

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version perron.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version perron.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY:  perron.lib         computation of algebraic dependences

@@ -1,4 +1,5 @@
-version="version polymake.lib 4.0.0.0 Jun_2013 ";
+//
+version="version polymake.lib 4.1.1.0 Dec_2017 ";
 category="Tropical Geometry";
 info="
 LIBRARY:   polymake.lib    Computations with polytopes and fans,

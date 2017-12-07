@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////
-version="version tasks.lib 4.0.0.0 Dec_2013 "; // $Id$
+version="version tasks.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="General purpose";
 info="
 LIBRARY:   tasks.lib  A parallel framework based on tasks

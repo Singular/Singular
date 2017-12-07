@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="version ring.lib 4.1.0.3 Oct_2017 "; // $Id$
+version="version ring.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps

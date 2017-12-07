@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////
-version="version resources.lib 4.0.0.0 Dec_2013 "; // $Id$
+version="version resources.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="General purpose";
 info="
 LIBRARY:   resources.lib  Tools to manage the computational resources

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version modwalk.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version modwalk.lib 4.1.1.0 Dec_2017 "; // $Id$
 category = "Commutative Algebra";
 info="
 LIBRARY:  modwalk.lib      Groebner basis convertion
