@@ -3,6 +3,7 @@
  ***************************************/
 /*
  * ABSTRACT: resolutions
+ * reference: https://arxiv.org/abs/1502.01654
  */
 
 #include <kernel/GBEngine/syz.h>
@@ -14,8 +15,17 @@
 #include <vector>
 #include <map>
 
+/*
+ * If set to true, the result of compute_image() is cached for _every_ term in
+ * the current step of the resolution. This corresponds to the subtree attached
+ * to the node which represents this term, see reference.
+ */
 #define CACHE 1
 
+/*
+ * set variables[i] to false if the i-th variable does not appear among the
+ * leading terms of L
+ */
 static void update_variables(std::vector<bool> &variables, const ideal L)
 {
     const ring R = currRing;
@@ -35,6 +45,10 @@ static void update_variables(std::vector<bool> &variables, const ideal L)
     }
 }
 
+/*
+ * If the previous step in the resolution is reduced, then this check can be
+ * used to determine lower order terms.
+ */
 static inline bool check_variables(const std::vector<bool> variables,
         const poly m)
 {
@@ -52,6 +66,11 @@ static inline bool check_variables(const std::vector<bool> variables,
     return false;
 }
 
+/*
+ * For each step in the resolution, the following data is saved for each of the
+ * induced leading terms: the leading term itself, its short exponent vector,
+ * and its position in the ideal/module.
+ */
 typedef struct {
     poly lt;
     unsigned long sev;
@@ -75,6 +94,8 @@ static void initialize_hash(lt_struct **C, const ideal L)
         C[i][0].comp = count[i];
     }
     k = n_elems;
+    // the order of the elements in each C[i] matters if check_variables() is
+    // to be used
     while (k > 0) {
         const poly a = L->m[k-1];
         const unsigned long comp = __p_GetComp(a, R);
@@ -85,6 +106,12 @@ static void initialize_hash(lt_struct **C, const ideal L)
     omFree(count);
 }
 
+/*
+ * compute a new term in the resolution, that is, compute
+ * ( t * multiplier / f ) where f is an induced leading term from the previous
+ * module, or return NULL if no such f dividing t * multiplier exists, that is,
+ * if multiplier is a lower order term
+ */
 static poly find_reducer(const poly multiplier, const poly t,
         const lt_struct *const *const hash_previous_module)
 {
@@ -127,6 +154,9 @@ static poly compute_image(const poly multiplier, const int comp,
 #define traverse_tail compute_image
 #endif   // CACHE
 
+/*
+ * recursively call traverse_tail() for each new term found by find_reducer()
+ */
 static poly reduce_term(const poly multiplier, const poly term,
         const ideal previous_module, const std::vector<bool> &variables,
         const lt_struct *const *const hash_previous_module)
@@ -142,6 +172,10 @@ static poly reduce_term(const poly multiplier, const poly term,
     return p_Add_q(s, t, r);
 }
 
+/*
+ * iterating over tail, call reduce_term(multiplier, p, ...) for each term p in
+ * tail and sum up the results
+ */
 static poly compute_image(const poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
         const lt_struct *const *const hash_previous_module)
@@ -238,11 +272,15 @@ static poly traverse_tail(const poly multiplier, const int comp,
 }
 #endif   // CACHE
 
+/*
+ * lift the extended induced leading term a to a syzygy
+ */
 static poly lift_ext_LT(const poly a, const ideal previous_module,
         const std::vector<bool> &variables,
         const lt_struct *const *const hash_previous_module)
 {
     const ring R = currRing;
+    // the leading term does not need to be cached
     poly t1 = compute_image(a, __p_GetComp(a, R)-1, previous_module, variables,
             hash_previous_module);
     poly t2 = traverse_tail(a->next, __p_GetComp(a->next, R)-1,
@@ -253,9 +291,11 @@ static poly lift_ext_LT(const poly a, const ideal previous_module,
 
 /*****************************************************************************/
 
-// copied from id_DelDiv(), but without testing and without HAVE_RINGS.
-// delete id[j], if LT(j) == coeff*mon*LT(i) and vice versa, i.e.,
-// delete id[i], if LT(i) == coeff*mon*LT(j)
+/*
+ * copied from id_DelDiv(), but without testing and without HAVE_RINGS;
+ * delete id[j], if LT(j) == coeff*mon*LT(i) and vice versa, that is,
+ * delete id[i], if LT(i) == coeff*mon*LT(j)
+ */
 static void id_DelDiv_no_test(ideal id)
 {
     const ring r = currRing;
@@ -278,6 +318,9 @@ static void id_DelDiv_no_test(ideal id)
 
 typedef poly syzHeadFunction(ideal, int, int);
 
+/*
+ * compute the induced leading term corresponding to the index pair (i, j)
+ */
 static poly syzHeadFrame(const ideal G, const int i, const int j)
 {
     const ring r = currRing;
@@ -297,6 +340,10 @@ static poly syzHeadFrame(const ideal G, const int i, const int j)
     return head;
 }
 
+/*
+ * compute the _extended_ induced leading term corresponding to the index pair
+ * (i, j), that is, the first two terms w.r.t. the induced order
+ */
 static poly syzHeadExtFrame(const ideal G, const int i, const int j)
 {
     const ring r = currRing;
@@ -325,6 +372,11 @@ static poly syzHeadExtFrame(const ideal G, const int i, const int j)
 
 typedef ideal syzM_i_Function(ideal, int, syzHeadFunction);
 
+/*
+ * compute the monomial ideal M_i, see reference;
+ * in the first step, we cannot assume that all leading terms which lie in the
+ * component are adjacent to each other
+ */
 static ideal syzM_i_unsorted(const ideal G, const int i,
         syzHeadFunction *syzHead)
 {
@@ -350,6 +402,11 @@ static ideal syzM_i_unsorted(const ideal G, const int i,
     return M_i;
 }
 
+/*
+ * compute the monomial ideal M_i, see reference;
+ * from step two on, we can assume that all leading terms which lie in the same
+ * component are adjacent to each other
+ */
 static ideal syzM_i_sorted(const ideal G, const int i,
         syzHeadFunction *syzHead)
 {
@@ -371,6 +428,9 @@ static ideal syzM_i_sorted(const ideal G, const int i,
     return M_i;
 }
 
+/*
+ * concatenate the ideals in M[]
+ */
 static ideal idConcat(const ideal *M, const int size, const int rank)
 {
     int ncols = 0;
@@ -439,6 +499,10 @@ static int compare_Mi(const void* a, const void *b)
     return 0;
 }
 
+/*
+ * compute the frame, that is, the induced leading terms for the next step in
+ * the resolution
+ */
 static ideal computeFrame(const ideal G, syzM_i_Function syzM_i,
         syzHeadFunction *syzHead)
 {
@@ -458,6 +522,9 @@ static ideal computeFrame(const ideal G, syzM_i_Function syzM_i,
     return frame;
 }
 
+/*
+ * lift each (extended) induced leading term to a syzygy
+ */
 static void computeLiftings(const resolvente res, const int index,
         std::vector<bool> &variables)
 {
@@ -484,6 +551,10 @@ static void computeLiftings(const resolvente res, const int index,
 #endif   // CACHE
 }
 
+/*
+ * for each step in the resolution, compute the corresponding module until
+ * either index == max_index is reached or res[index] is the zero module
+ */
 static int computeResolution(resolvente res, const int max_index,
         syzHeadFunction *syzHead, const bool do_lifting)
 {
@@ -527,6 +598,9 @@ static void set_options(syzHeadFunction **syzHead_ptr, bool *do_lifting_ptr,
     }
 }
 
+/*
+ * insert the first term of r at the right place
+ */
 #define insert_first_term(r, p, q, R)                             \
 do                                                                \
 {                                                                 \
@@ -543,6 +617,10 @@ do                                                                \
 }                                                                 \
 while (0)
 
+/*
+ * for each poly in the resolution, insert the first two terms at their right
+ * places
+ */
 static void insert_ext_induced_LTs(const resolvente res, const int length)
 {
     const ring R = currRing;
@@ -555,6 +633,10 @@ static void insert_ext_induced_LTs(const resolvente res, const int length)
     }
 }
 
+/*
+ * compute the Schreyer resolution of arg, see reference at the beginning of
+ * this file
+ */
 syStrategy syFrank(const ideal arg, const int length, const char *method)
 {
     syStrategy result = (syStrategy)omAlloc0(sizeof(ssyStrategy));
