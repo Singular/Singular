@@ -98,7 +98,7 @@ static poly find_reducer(const poly multiplier, const poly t,
     pNext(q) = NULL;
     p_MemSum_LengthGeneral(q->exp, multiplier->exp, t->exp, r->ExpL_Size);
     const unsigned long q_not_sev = ~p_GetShortExpVector(q, r);
-    for(int i = 1; i < count; i++) {
+    for(unsigned long i = 1; i < count; i++) {
         if (likely(v[i].sev & q_not_sev)
                 || unlikely(!(_p_LmDivisibleByNoComp(v[i].lt, q, r)))) {
             continue;
@@ -330,7 +330,7 @@ static ideal syzM_i_unsorted(const ideal G, const int i,
 {
     const ring r = currRing;
     ideal M_i = NULL;
-    int comp = __p_GetComp(G->m[i], r);
+    unsigned long comp = __p_GetComp(G->m[i], r);
     int ncols = 0;
     for (int j = i-1; j >= 0; j--) {
         if (__p_GetComp(G->m[j], r) == comp) ncols++;
@@ -355,7 +355,7 @@ static ideal syzM_i_sorted(const ideal G, const int i,
 {
     const ring r = currRing;
     ideal M_i = NULL;
-    int comp = __p_GetComp(G->m[i], r);
+    unsigned long comp = __p_GetComp(G->m[i], r);
     int index = i-1;
     while (__p_GetComp(G->m[index], r) == comp) index--;
     index++;
