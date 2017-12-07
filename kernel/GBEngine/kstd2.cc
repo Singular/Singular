@@ -4068,6 +4068,10 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   // strat->posInT = posInT_pLength;
   kTest_TS(strat);
 
+#ifdef HAVE_TAIL_RING
+  kStratInitChangeTailRing(strat);
+#endif
+
   /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)
   {
@@ -4104,6 +4108,15 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       strat->P.p = NULL;
       poly m1 = NULL, m2 = NULL;
 
+      // check that spoly creation is ok
+      while (strat->tailRing != currRing &&
+             !kCheckSpolyCreation(&(strat->P), strat, m1, m2))
+      {
+        assume(m1 == NULL && m2 == NULL);
+        // if not, change to a ring where exponents are at least
+        // large enough
+        kStratChangeTailRing(strat);
+      }
       // create the real one
       ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
                     strat->tailRing, m1, m2, strat->R);
