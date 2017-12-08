@@ -56,7 +56,7 @@ Groebner bases, 2009
 @*   [studzins] Studzinski: Dimension computations in non-commutative,
 associative algebras, Diploma thesis, RWTH Aachen, 2010
 
-ASSUMPTIONS:
+NOTE:
 - basering is always a Letterplace ring
 - all intvecs correspond to Letterplace monomials
 - if you specify a different degree bound d, d <= attrib(basering,uptodeg) holds
@@ -69,7 +69,6 @@ PROCEDURES:
 ivDHilbert(L,n[,d]);       computes the K-dimension and the Hilbert series
 ivDHilbertSickle(L,n[,d]); computes mistletoes, K-dimension and Hilbert series
 ivDimCheck(L,n);           checks if the K-dimension of A/<L> is infinite
-lpGlDimBound(G);           computes upper bound of global dimension of A/<G>
 ivHilbert(L,n[,d]);        computes the Hilbert series of A/<L> in intvec format
 ivKDim(L,n[,d]);           computes the K-dimension of A/<L> in intvec format
 ivMis2Base(M);             computes a K-basis of the factor algebra

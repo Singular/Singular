@@ -619,11 +619,11 @@ ASSUME: Basering is a Letterplace ring
   int cycles = 0;
   for (int w = 1; w <= ncols(G); w++) {
     if (G[v,w] == 1) {
-      if (visited[w] == 1) { // neuer zykel gefunden
-        // 1. alle Knoten in path bis w ueberpruefen ob in cyclic
+      if (visited[w] == 1) { // found new cycle
+        // 1. for all vertices in path until w, check if they are cyclic
         for (int j = size(path); j >= 1; j--) {
           if(cyclic[path[j]] == 1) {
-            // 1.1 falls ja return -1
+            // 1.1 if yes, return -1
             return (-1);
           }
           if (path[j] == w) {
@@ -631,10 +631,10 @@ ASSUME: Basering is a Letterplace ring
           }
         }
 
-        // 2. ansonsten cycles++
+        // 2. otherwise cycles++
         for (int j = size(path); j >= 1; j--) {
-          // 2.2 Kanten in diesem Zykel entfernen; Knoten cyclic
-          if (j == size(path)) { // Sonderfall bei der ersten Iteration
+          // 2.2 remove the edges from that cycle and mark the vertices as cyclic
+          if (j == size(path)) { // special case in the first iteration
             cyclic[v] = 1;
             G[v, w] = 0;
           } else {
@@ -646,7 +646,7 @@ ASSUME: Basering is a Letterplace ring
           }
         }
 
-        // 3. auf jedem dieser Knoten countCycles() aufrufen
+        // 3. countCycles() on all these vertices
         int maxCycleCount = 0;
         for (int j = size(path); j >= 1; j--) {
           int cycleCount = countCycles(G, path[j], visited, cyclic, path);
