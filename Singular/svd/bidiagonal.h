@@ -206,7 +206,7 @@ namespace bidiagonal
         amp::ampf<Precision> ltau;
 
 
-        
+
         //
         // Prepare
         //
@@ -230,13 +230,13 @@ namespace bidiagonal
         }
         if( m>=n )
         {
-            
+
             //
             // Reduce to upper bidiagonal form
             //
             for(i=0; i<=n-1; i++)
             {
-                
+
                 //
                 // Generate elementary reflector H(i) to annihilate A(i+1:m-1,i)
                 //
@@ -245,14 +245,14 @@ namespace bidiagonal
                 tauq(i) = ltau;
                 ap::vmove(a.getcolumn(i, i, m-1), t.getvector(1, m-i));
                 t(1) = 1;
-                
+
                 //
                 // Apply H(i) to A(i:m-1,i+1:n-1) from the left
                 //
                 reflections::applyreflectionfromtheleft<Precision>(a, ltau, t, i, m-1, i+1, n-1, work);
                 if( i<n-1 )
                 {
-                    
+
                     //
                     // Generate elementary reflector G(i) to annihilate
                     // A(i,i+2:n-1)
@@ -262,7 +262,7 @@ namespace bidiagonal
                     taup(i) = ltau;
                     ap::vmove(a.getrow(i, i+1, n-1), t.getvector(1, n-1-i));
                     t(1) = 1;
-                    
+
                     //
                     // Apply G(i) to A(i+1:m-1,i+1:n-1) from the right
                     //
@@ -276,13 +276,13 @@ namespace bidiagonal
         }
         else
         {
-            
+
             //
             // Reduce to lower bidiagonal form
             //
             for(i=0; i<=m-1; i++)
             {
-                
+
                 //
                 // Generate elementary reflector G(i) to annihilate A(i,i+1:n-1)
                 //
@@ -291,14 +291,14 @@ namespace bidiagonal
                 taup(i) = ltau;
                 ap::vmove(a.getrow(i, i, n-1), t.getvector(1, n-i));
                 t(1) = 1;
-                
+
                 //
                 // Apply G(i) to A(i+1:m-1,i:n-1) from the right
                 //
                 reflections::applyreflectionfromtheright<Precision>(a, ltau, t, i+1, m-1, i, n-1, work);
                 if( i<m-1 )
                 {
-                    
+
                     //
                     // Generate elementary reflector H(i) to annihilate
                     // A(i+2:m-1,i)
@@ -308,7 +308,7 @@ namespace bidiagonal
                     tauq(i) = ltau;
                     ap::vmove(a.getcolumn(i, i+1, m-1), t.getvector(1, m-1-i));
                     t(1) = 1;
-                    
+
                     //
                     // Apply H(i) to A(i+1:m-1,i+1:n-1) from the left
                     //
@@ -362,7 +362,7 @@ namespace bidiagonal
         {
             return;
         }
-        
+
         //
         // prepare Q
         //
@@ -381,7 +381,7 @@ namespace bidiagonal
                 }
             }
         }
-        
+
         //
         // Calculate
         //
@@ -443,7 +443,7 @@ namespace bidiagonal
             return;
         }
         ap::ap_error::make_assertion(fromtheright && zcolumns==m || !fromtheright && zrows==m);
-        
+
         //
         // init
         //
@@ -454,7 +454,7 @@ namespace bidiagonal
         work.setbounds(0, mx);
         if( m>=n )
         {
-            
+
             //
             // setup
             //
@@ -477,7 +477,7 @@ namespace bidiagonal
                 i2 = i;
                 istep = -istep;
             }
-            
+
             //
             // Process
             //
@@ -500,7 +500,7 @@ namespace bidiagonal
         }
         else
         {
-            
+
             //
             // setup
             //
@@ -523,7 +523,7 @@ namespace bidiagonal
                 i2 = i;
                 istep = -istep;
             }
-            
+
             //
             // Process
             //
@@ -589,7 +589,7 @@ namespace bidiagonal
         {
             return;
         }
-        
+
         //
         // prepare PT
         //
@@ -608,7 +608,7 @@ namespace bidiagonal
                 }
             }
         }
-        
+
         //
         // Calculate
         //
@@ -670,7 +670,7 @@ namespace bidiagonal
             return;
         }
         ap::ap_error::make_assertion(fromtheright && zcolumns==n || !fromtheright && zrows==n);
-        
+
         //
         // init
         //
@@ -683,7 +683,7 @@ namespace bidiagonal
         work.setbounds(0, mx);
         if( m>=n )
         {
-            
+
             //
             // setup
             //
@@ -706,7 +706,7 @@ namespace bidiagonal
                 i2 = i;
                 istep = -istep;
             }
-            
+
             //
             // Process
             //
@@ -732,7 +732,7 @@ namespace bidiagonal
         }
         else
         {
-            
+
             //
             // setup
             //
@@ -755,7 +755,7 @@ namespace bidiagonal
                 i2 = i;
                 istep = -istep;
             }
-            
+
             //
             // Process
             //
@@ -874,13 +874,13 @@ namespace bidiagonal
         tauq.setbounds(1, minmn);
         if( m>=n )
         {
-            
+
             //
             // Reduce to upper bidiagonal form
             //
             for(i=1; i<=n; i++)
             {
-                
+
                 //
                 // Generate elementary reflector H(i) to annihilate A(i+1:m,i)
                 //
@@ -890,14 +890,14 @@ namespace bidiagonal
                 tauq(i) = ltau;
                 ap::vmove(a.getcolumn(i, i, m), t.getvector(1, mmip1));
                 t(1) = 1;
-                
+
                 //
                 // Apply H(i) to A(i:m,i+1:n) from the left
                 //
                 reflections::applyreflectionfromtheleft<Precision>(a, ltau, t, i, m, i+1, n, work);
                 if( i<n )
                 {
-                    
+
                     //
                     // Generate elementary reflector G(i) to annihilate
                     // A(i,i+2:n)
@@ -909,7 +909,7 @@ namespace bidiagonal
                     taup(i) = ltau;
                     ap::vmove(a.getrow(i, ip1, n), t.getvector(1, nmi));
                     t(1) = 1;
-                    
+
                     //
                     // Apply G(i) to A(i+1:m,i+1:n) from the right
                     //
@@ -923,13 +923,13 @@ namespace bidiagonal
         }
         else
         {
-            
+
             //
             // Reduce to lower bidiagonal form
             //
             for(i=1; i<=m; i++)
             {
-                
+
                 //
                 // Generate elementary reflector G(i) to annihilate A(i,i+1:n)
                 //
@@ -939,14 +939,14 @@ namespace bidiagonal
                 taup(i) = ltau;
                 ap::vmove(a.getrow(i, i, n), t.getvector(1, nmip1));
                 t(1) = 1;
-                
+
                 //
                 // Apply G(i) to A(i+1:m,i:n) from the right
                 //
                 reflections::applyreflectionfromtheright<Precision>(a, ltau, t, i+1, m, i, n, work);
                 if( i<m )
                 {
-                    
+
                     //
                     // Generate elementary reflector H(i) to annihilate
                     // A(i+2:m,i)
@@ -958,7 +958,7 @@ namespace bidiagonal
                     tauq(i) = ltau;
                     ap::vmove(a.getcolumn(i, ip1, m), t.getvector(1, mmi));
                     t(1) = 1;
-                    
+
                     //
                     // Apply H(i) to A(i+1:m,i+1:n) from the left
                     //
@@ -998,14 +998,14 @@ namespace bidiagonal
         {
             return;
         }
-        
+
         //
         // init
         //
         q.setbounds(1, m, 1, qcolumns);
         v.setbounds(1, m);
         work.setbounds(1, qcolumns);
-        
+
         //
         // prepare Q
         //
@@ -1078,7 +1078,7 @@ namespace bidiagonal
             return;
         }
         ap::ap_error::make_assertion(fromtheright && zcolumns==m || !fromtheright && zrows==m);
-        
+
         //
         // init
         //
@@ -1089,7 +1089,7 @@ namespace bidiagonal
         work.setbounds(1, mx);
         if( m>=n )
         {
-            
+
             //
             // setup
             //
@@ -1112,7 +1112,7 @@ namespace bidiagonal
                 i2 = i;
                 istep = -istep;
             }
-            
+
             //
             // Process
             //
@@ -1136,7 +1136,7 @@ namespace bidiagonal
         }
         else
         {
-            
+
             //
             // setup
             //
@@ -1159,7 +1159,7 @@ namespace bidiagonal
                 i2 = i;
                 istep = -istep;
             }
-            
+
             //
             // Process
             //
@@ -1213,14 +1213,14 @@ namespace bidiagonal
         {
             return;
         }
-        
+
         //
         // init
         //
         pt.setbounds(1, ptrows, 1, n);
         v.setbounds(1, n);
         work.setbounds(1, ptrows);
-        
+
         //
         // prepare PT
         //
@@ -1293,7 +1293,7 @@ namespace bidiagonal
             return;
         }
         ap::ap_error::make_assertion(fromtheright && zcolumns==n || !fromtheright && zrows==n);
-        
+
         //
         // init
         //
@@ -1306,7 +1306,7 @@ namespace bidiagonal
         work.setbounds(1, mx);
         if( m>=n )
         {
-            
+
             //
             // setup
             //
@@ -1329,7 +1329,7 @@ namespace bidiagonal
                 i2 = i;
                 istep = -istep;
             }
-            
+
             //
             // Process
             //
@@ -1357,7 +1357,7 @@ namespace bidiagonal
         }
         else
         {
-            
+
             //
             // setup
             //
@@ -1380,7 +1380,7 @@ namespace bidiagonal
                 i2 = i;
                 istep = -istep;
             }
-            
+
             //
             // Process
             //

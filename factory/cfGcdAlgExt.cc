@@ -56,8 +56,8 @@ static int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M
                 CFMap & N, bool topLevel)
 {
   int n= tmax (F.level(), G.level());
-  int * degsf= new int [n + 1];
-  int * degsg= new int [n + 1];
+  int * degsf= NEW_ARRAY(int,n + 1);
+  int * degsg= NEW_ARRAY(int,n + 1);
 
   for (int i = 0; i <= n; i++)
     degsf[i]= degsg[i]= 0;
@@ -69,6 +69,8 @@ static int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M
   int f_zero= 0;
   int g_zero= 0;
   int both_zero= 0;
+  int Flevel=F.level();
+  int Glevel=G.level();
 
   if (topLevel)
   {
@@ -79,12 +81,12 @@ static int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M
         both_non_zero++;
         continue;
       }
-      if (degsf[i] == 0 && degsg[i] != 0 && i <= G.level())
+      if (degsf[i] == 0 && degsg[i] != 0 && i <= Glevel)
       {
         f_zero++;
         continue;
       }
-      if (degsg[i] == 0 && degsf[i] && i <= F.level())
+      if (degsg[i] == 0 && degsf[i] && i <= Flevel)
       {
         g_zero++;
         continue;
@@ -93,8 +95,8 @@ static int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M
 
     if (both_non_zero == 0)
     {
-      delete [] degsf;
-      delete [] degsg;
+      DELETE_ARRAY(degsf);
+      DELETE_ARRAY(degsg);
       return 0;
     }
 
@@ -103,7 +105,7 @@ static int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M
     int l= 1;
     for (int i= 1; i <= n; i++)
     {
-      if (degsf[i] != 0 && degsg[i] == 0 && i <= F.level())
+      if (degsf[i] != 0 && degsg[i] == 0 && i <= Flevel)
       {
         if (k + both_non_zero != i)
         {
@@ -112,7 +114,7 @@ static int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M
         }
         k++;
       }
-      if (degsf[i] == 0 && degsg[i] != 0 && i <= G.level())
+      if (degsf[i] == 0 && degsg[i] != 0 && i <= Glevel)
       {
         if (l + g_zero + both_non_zero != i)
         {
@@ -125,7 +127,7 @@ static int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M
 
     // sort Variables x_{i} in increasing order of
     // min(deg_{x_{i}}(f),deg_{x_{i}}(g))
-    int m= tmax (F.level(), G.level());
+    int m= tmax (Flevel, Glevel);
     int min_max_deg;
     k= both_non_zero;
     l= 0;
@@ -210,8 +212,8 @@ static int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M
     }
   }
 
-  delete [] degsf;
-  delete [] degsg;
+  DELETE_ARRAY(degsf);
+  DELETE_ARRAY(degsg);
 
   return 1;
 }

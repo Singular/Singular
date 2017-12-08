@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version methods.lib 4.1.0.3 Nov_2017 "; //$Id$
+version="version methods.lib 4.1.1.0 Dec_2017 "; //$Id$
 category="Miscellaneous";
 info="
 LIBRARY:  methods.lib    installing methods in Singular

@@ -345,7 +345,7 @@ namespace bdsvd
             }
             return result;
         }
-        
+
         //
         // init
         //
@@ -362,7 +362,7 @@ namespace bdsvd
         maxitr = 12;
         rightside = true;
         fwddir = true;
-        
+
         //
         // resize E from N-1 to N
         //
@@ -378,13 +378,13 @@ namespace bdsvd
         }
         e(n) = 0;
         idir = 0;
-        
+
         //
         // Get machine constants
         //
         eps = amp::ampf<Precision>::getAlgoPascalEpsilon();
         unfl = amp::ampf<Precision>::getAlgoPascalMinNumber();
-        
+
         //
         // If matrix lower bidiagonal, rotate to be upper bidiagonal
         // by applying Givens rotations on the left
@@ -400,7 +400,7 @@ namespace bdsvd
                 work0(i) = cs;
                 work1(i) = sn;
             }
-            
+
             //
             // Update singular vectors if desired
             //
@@ -413,7 +413,7 @@ namespace bdsvd
                 rotations::applyrotationsfromtheleft<Precision>(fwddir, 1+cstart-1, n+cstart-1, cstart, cend, work0, work1, c, ctemp);
             }
         }
-        
+
         //
         // Compute singular values to relative accuracy TOL
         // (By setting TOL to be negative, algorithm will compute
@@ -425,7 +425,7 @@ namespace bdsvd
         {
             tol = -tol;
         }
-        
+
         //
         // Compute approximate maximum, minimum singular values
         //
@@ -441,7 +441,7 @@ namespace bdsvd
         sminl = 0;
         if( tol>=0 )
         {
-            
+
             //
             // Relative accuracy desired
             //
@@ -464,13 +464,13 @@ namespace bdsvd
         }
         else
         {
-            
+
             //
             // Absolute accuracy desired
             //
             thresh = amp::maximum<Precision>(amp::abs<Precision>(tol)*smax, maxitr*n*n*unfl);
         }
-        
+
         //
         // Prepare for main iteration loop for the singular values
         // (MAXIT is the maximum number of passes through the inner
@@ -480,18 +480,18 @@ namespace bdsvd
         iter = 0;
         oldll = -1;
         oldm = -1;
-        
+
         //
         // M points to last element of unconverged part of matrix
         //
         m = n;
-        
+
         //
         // Begin main iteration loop
         //
         while( true )
         {
-            
+
             //
             // Check for convergence or exceeding iteration count
             //
@@ -504,7 +504,7 @@ namespace bdsvd
                 result = false;
                 return result;
             }
-            
+
             //
             // Find diagonal block of matrix to work on
             //
@@ -538,14 +538,14 @@ namespace bdsvd
             }
             else
             {
-                
+
                 //
                 // Matrix splits since E(LL) = 0
                 //
                 e(ll) = 0;
                 if( ll==m-1 )
                 {
-                    
+
                     //
                     // Convergence of bottom singular value, return to top of loop
                     //
@@ -554,13 +554,13 @@ namespace bdsvd
                 }
             }
             ll = ll+1;
-            
+
             //
             // E(LL) through E(M-1) are nonzero, E(LL-1) is zero
             //
             if( ll==m-1 )
             {
-                
+
                 //
                 // 2 by 2 block, handle separately
                 //
@@ -568,7 +568,7 @@ namespace bdsvd
                 d(m-1) = sigmx;
                 e(m-1) = 0;
                 d(m) = sigmn;
-                
+
                 //
                 // Compute singular vectors, if desired
                 //
@@ -605,7 +605,7 @@ namespace bdsvd
                 m = m-2;
                 continue;
             }
-            
+
             //
             // If working on new submatrix, choose shift direction
             // (from larger end diagonal element towards smaller)
@@ -628,7 +628,7 @@ namespace bdsvd
             {
                 if( amp::abs<Precision>(d(ll))>=amp::abs<Precision>(d(m)) )
                 {
-                    
+
                     //
                     // Chase bulge from top (big end) to bottom (small end)
                     //
@@ -636,20 +636,20 @@ namespace bdsvd
                 }
                 else
                 {
-                    
+
                     //
                     // Chase bulge from bottom (big end) to top (small end)
                     //
                     idir = 2;
                 }
             }
-            
+
             //
             // Apply convergence tests
             //
             if( idir==1 )
             {
-                
+
                 //
                 // Run convergence test in forward direction
                 // First apply standard test to bottom of matrix
@@ -661,7 +661,7 @@ namespace bdsvd
                 }
                 if( tol>=0 )
                 {
-                    
+
                     //
                     // If relative accuracy desired,
                     // apply convergence criterion forward
@@ -689,7 +689,7 @@ namespace bdsvd
             }
             else
             {
-                
+
                 //
                 // Run convergence test in backward direction
                 // First apply standard test to top of matrix
@@ -701,7 +701,7 @@ namespace bdsvd
                 }
                 if( tol>=0 )
                 {
-                    
+
                     //
                     // If relative accuracy desired,
                     // apply convergence criterion backward
@@ -729,14 +729,14 @@ namespace bdsvd
             }
             oldll = ll;
             oldm = m;
-            
+
             //
             // Compute shift.  First, test if shifting would ruin relative
             // accuracy, and if so set the shift to zero.
             //
             if( tol>=0 && n*tol*(sminl/smax)<=amp::maximum<Precision>(eps, amp::ampf<Precision>("0.01")*tol) )
             {
-                
+
                 //
                 // Use a zero shift to avoid loss of relative accuracy
                 //
@@ -744,7 +744,7 @@ namespace bdsvd
             }
             else
             {
-                
+
                 //
                 // Compute the shift from 2-by-2 block at end of matrix
                 //
@@ -758,7 +758,7 @@ namespace bdsvd
                     sll = amp::abs<Precision>(d(m));
                     svd2x2<Precision>(d(ll), e(ll), d(ll+1), shift, r);
                 }
-                
+
                 //
                 // Test if shift negligible, and if so set to zero
                 //
@@ -770,12 +770,12 @@ namespace bdsvd
                     }
                 }
             }
-            
+
             //
             // Increment iteration count
             //
             iter = iter+m-ll;
-            
+
             //
             // If SHIFT = 0, do simplified QR iteration
             //
@@ -783,7 +783,7 @@ namespace bdsvd
             {
                 if( idir==1 )
                 {
-                    
+
                     //
                     // Chase bulge from top to bottom
                     // Save cosines and sines for later singular vector updates
@@ -807,7 +807,7 @@ namespace bdsvd
                     h = d(m)*cs;
                     d(m) = h*oldcs;
                     e(m-1) = h*oldsn;
-                    
+
                     //
                     // Update singular vectors
                     //
@@ -823,7 +823,7 @@ namespace bdsvd
                     {
                         rotations::applyrotationsfromtheleft<Precision>(fwddir, ll+cstart-1, m+cstart-1, cstart, cend, work2, work3, c, ctemp);
                     }
-                    
+
                     //
                     // Test convergence
                     //
@@ -834,7 +834,7 @@ namespace bdsvd
                 }
                 else
                 {
-                    
+
                     //
                     // Chase bulge from bottom to top
                     // Save cosines and sines for later singular vector updates
@@ -858,7 +858,7 @@ namespace bdsvd
                     h = d(ll)*cs;
                     d(ll) = h*oldcs;
                     e(ll) = h*oldsn;
-                    
+
                     //
                     // Update singular vectors
                     //
@@ -874,7 +874,7 @@ namespace bdsvd
                     {
                         rotations::applyrotationsfromtheleft<Precision>(!fwddir, ll+cstart-1, m+cstart-1, cstart, cend, work0, work1, c, ctemp);
                     }
-                    
+
                     //
                     // Test convergence
                     //
@@ -886,13 +886,13 @@ namespace bdsvd
             }
             else
             {
-                
+
                 //
                 // Use nonzero shift
                 //
                 if( idir==1 )
                 {
-                    
+
                     //
                     // Chase bulge from top to bottom
                     // Save cosines and sines for later singular vector updates
@@ -925,7 +925,7 @@ namespace bdsvd
                         work3(i-ll+1) = sinl;
                     }
                     e(m-1) = f;
-                    
+
                     //
                     // Update singular vectors
                     //
@@ -941,7 +941,7 @@ namespace bdsvd
                     {
                         rotations::applyrotationsfromtheleft<Precision>(fwddir, ll+cstart-1, m+cstart-1, cstart, cend, work2, work3, c, ctemp);
                     }
-                    
+
                     //
                     // Test convergence
                     //
@@ -952,7 +952,7 @@ namespace bdsvd
                 }
                 else
                 {
-                    
+
                     //
                     // Chase bulge from bottom to top
                     // Save cosines and sines for later singular vector updates
@@ -985,7 +985,7 @@ namespace bdsvd
                         work3(i-ll) = -sinl;
                     }
                     e(ll) = f;
-                    
+
                     //
                     // Test convergence
                     //
@@ -993,7 +993,7 @@ namespace bdsvd
                     {
                         e(ll) = 0;
                     }
-                    
+
                     //
                     // Update singular vectors if desired
                     //
@@ -1011,13 +1011,13 @@ namespace bdsvd
                     }
                 }
             }
-            
+
             //
             // QR iteration finished, go back and check convergence
             //
             continue;
         }
-        
+
         //
         // All singular values converged, so make them positive
         //
@@ -1026,7 +1026,7 @@ namespace bdsvd
             if( d(i)<0 )
             {
                 d(i) = -d(i);
-                
+
                 //
                 // Change sign of singular vectors, if desired
                 //
@@ -1036,14 +1036,14 @@ namespace bdsvd
                 }
             }
         }
-        
+
         //
         // Sort the singular values into decreasing order (insertion sort on
         // singular values, but only one transposition per singular vector)
         //
         for(i=1; i<=n-1; i++)
         {
-            
+
             //
             // Scan for smallest D(I)
             //
@@ -1059,7 +1059,7 @@ namespace bdsvd
             }
             if( isub!=n+1-i )
             {
-                
+
                 //
                 // Swap singular values and vectors
                 //
@@ -1162,7 +1162,7 @@ namespace bdsvd
                 au = fhmx/ga;
                 if( au==0 )
                 {
-                    
+
                     //
                     // Avoid possible harmful underflow if exponent range
                     // asymmetric (true SSMIN may not underflow even if
@@ -1227,7 +1227,7 @@ namespace bdsvd
         fa = amp::abs<Precision>(ft);
         ht = h;
         ha = amp::abs<Precision>(h);
-        
+
         //
         // PMAX points to the maximum absolute element of matrix
         //  PMAX = 1 if F largest in absolute values
@@ -1238,7 +1238,7 @@ namespace bdsvd
         swp = ha>fa;
         if( swp )
         {
-            
+
             //
             // Now FA .ge. HA
             //
@@ -1254,7 +1254,7 @@ namespace bdsvd
         ga = amp::abs<Precision>(gt);
         if( ga==0 )
         {
-            
+
             //
             // Diagonal matrix
             //
@@ -1273,7 +1273,7 @@ namespace bdsvd
                 pmax = 2;
                 if( fa/ga<amp::ampf<Precision>::getAlgoPascalEpsilon() )
                 {
-                    
+
                     //
                     // Case of very large GA
                     //
@@ -1297,7 +1297,7 @@ namespace bdsvd
             }
             if( gasmal )
             {
-                
+
                 //
                 // Normal case
                 //
@@ -1328,7 +1328,7 @@ namespace bdsvd
                 ssmax = fa*a;
                 if( mm==0 )
                 {
-                    
+
                     //
                     // Note that M is very tiny
                     //
@@ -1367,7 +1367,7 @@ namespace bdsvd
             csr = crt;
             snr = srt;
         }
-        
+
         //
         // Correct signs of SSMAX and SSMIN
         //

@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version = "version goettsche.lib 0.92 Sep_2017 ";      //$Id$
+version = "version goettsche.lib 4.1.1.0 Sep_2017 ";  // $Id$
 category = "Betti numbers";
 info="
 LIBRARY:  goettsche.lib     Drezet's formula for the Betti numbers of the moduli space

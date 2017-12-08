@@ -103,7 +103,7 @@ double ap::abscomplex(const ap::complex &z)
     xabs = fabs(z.x);
     yabs = fabs(z.y);
     w = xabs>yabs ? xabs : yabs;
-    v = xabs<yabs ? xabs : yabs; 
+    v = xabs<yabs ? xabs : yabs;
     if( v==0 )
         return w;
     else

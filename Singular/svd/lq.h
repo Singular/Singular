@@ -132,7 +132,7 @@ namespace lq
         k = ap::minint(m, n);
         for(i=0; i<=k-1; i++)
         {
-            
+
             //
             // Generate elementary reflector H(i) to annihilate A(i,i+1:n-1)
             //
@@ -143,7 +143,7 @@ namespace lq
             t(1) = 1;
             if( i<n )
             {
-                
+
                 //
                 // Apply H(i) to A(i+1:m,i:n) from the right
                 //
@@ -194,7 +194,7 @@ namespace lq
         {
             return;
         }
-        
+
         //
         // init
         //
@@ -217,13 +217,13 @@ namespace lq
                 }
             }
         }
-        
+
         //
         // unpack Q
         //
         for(i=k-1; i>=0; i--)
         {
-            
+
             //
             // Apply H(i)
             //
@@ -305,14 +305,14 @@ namespace lq
         work.setbounds(1, m);
         t.setbounds(1, n);
         tau.setbounds(1, minmn);
-        
+
         //
         // Test the input arguments
         //
         k = ap::minint(m, n);
         for(i=1; i<=k; i++)
         {
-            
+
             //
             // Generate elementary reflector H(i) to annihilate A(i,i+1:n)
             //
@@ -324,7 +324,7 @@ namespace lq
             t(1) = 1;
             if( i<n )
             {
-                
+
                 //
                 // Apply H(i) to A(i+1:m,i:n) from the right
                 //
@@ -360,7 +360,7 @@ namespace lq
         {
             return;
         }
-        
+
         //
         // init
         //
@@ -383,13 +383,13 @@ namespace lq
                 }
             }
         }
-        
+
         //
         // unpack Q
         //
         for(i=k; i>=1; i--)
         {
-            
+
             //
             // Apply H(i)
             //
@@ -422,12 +422,12 @@ namespace lq
         }
         q.setbounds(1, n, 1, n);
         l.setbounds(1, m, 1, n);
-        
+
         //
         // LQDecomposition
         //
         lqdecomposition<Precision>(a, m, n, tau);
-        
+
         //
         // L
         //
@@ -445,7 +445,7 @@ namespace lq
                 }
             }
         }
-        
+
         //
         // Q
         //

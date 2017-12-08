@@ -127,7 +127,7 @@ These classes are service classes. Although these classes are available to the p
     <b>public</b>:
         ~ampf();
 
-        ampf ();        
+        ampf ();
         ampf (<b>long double</b> v);
         ampf (<b>double</b> v);
         ampf (<b>float</b> v);
@@ -141,7 +141,7 @@ These classes are service classes. Although these classes are available to the p
         ampf (<b>unsigned char</b> v);
         ampf (<b>const</b> std::string &amp;s);
         ampf (<b>const char</b> *s);
-        
+
         ampf(<b>const</b> ampf&amp; r);
         <b>template</b>&lt;<b>unsigned int</b> Precision2&gt;
         ampf(<b>const</b> ampf&lt;Precision2&gt;&amp; r);
@@ -162,7 +162,7 @@ These classes are service classes. Although these classes are available to the p
         ampf&amp; <b>operator</b>= (<b>const</b> ampf&amp; r);
         <b>template</b>&lt;<b>unsigned int</b> Precision2&gt;
         ampf&amp; <b>operator</b>= (<b>const</b> ampf&lt;Precision2&gt;&amp; r);
-        
+
         <b>template</b>&lt;<b>class</b> T&gt;
         ampf&amp; <b>operator</b>+=(<b>const</b> T&amp; v);
         <b>template</b>&lt;<b>class</b> T&gt;
@@ -171,10 +171,10 @@ These classes are service classes. Although these classes are available to the p
         ampf&amp; <b>operator</b>*=(<b>const</b> T&amp; v);
         <b>template</b>&lt;class T&gt;
         ampf&amp; <b>operator</b>/=(<b>const</b> T&amp; v);
-        
+
         mpfr_srcptr getReadPtr() <b>const</b>;
         mpfr_ptr getWritePtr();
-        
+
         <b>bool</b> isFiniteNumber() <b>const</b>;
         <b>bool</b> isPositiveNumber() <b>const</b>;
         <b>bool</b> isZero() <b>const</b>;
@@ -184,7 +184,7 @@ These classes are service classes. Although these classes are available to the p
         <b>double</b> toDouble() <b>const</b>;
         std::string toHex() <b>const</b>;
         std::string toDec() <b>const</b>;
-        
+
         <b>static const</b> ampf getUlpOf(<b>const</b> ampf &amp;x);
         <b>static const</b> ampf getUlp();
         <b>static const</b> ampf getUlp256();
@@ -498,7 +498,7 @@ Calculates the arctangent of a value.
 </span>
 Calculates the arc tangent of y/x. It produces correct results even when the resulting angle is near pi/2 or -pi/2 (x near 0).
 </p>
-    
+
 <p>
 <span class=func>
 <b>template</b>&lt;<b>unsigned</b> <b>int</b> Precision&gt;<br>

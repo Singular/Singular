@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 
 category= "Commutative Algebra";
-version="version cisimplicial.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version cisimplicial.lib 4.1.1.0 Dec_2017 "; // $Id$
 info="
 LIBRARY: cisimplicial.lib. Determines if the toric ideal of
 a simplicial toric variety is a complete intersection

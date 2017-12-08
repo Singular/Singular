@@ -8,7 +8,10 @@
 */
 #include "coeffs/numbers.h"
 #include "polys/monomials/p_polys.h"
+#include "omalloc/omalloc.h"
+#ifndef XMEMORY_H
 #include "omalloc/omallocClass.h"
+#endif
 
 class slimgb_alg;
 
@@ -38,7 +41,10 @@ class tgb_matrix
   int non_zero_entries(int row);
 };
 
-class mac_poly_r :public omallocClass
+class mac_poly_r
+#ifndef XMEMORY_H
+                 :public omallocClass
+#endif
 {
 public:
   number coef;

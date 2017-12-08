@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////
-version="version gradedModules.lib 4.0.1.1 Jan_2015 "; // $Id$
+version="version gradedModules.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: gradedModules.lib     Operations with graded modules/matrices/resolutions

@@ -20,7 +20,7 @@
 #include "coeffs/si_gmp.h"
 
 #include "coeffs/generics.h"
- 
+
 #include "coeffs/rintegers.h"
 
 #include <string.h>
@@ -431,7 +431,7 @@ static number  gExtGcd (number a, number b, number *s, number *t, const coeffs)
   gcp tt=(gcp)omalloc(sizeof(*ss));
   cc->a1=coeffs1->cfExtGcd(aa->a1,bb->a1,&ss->a1,&tt->a1,coeffs1);
   cc->a2=coeffs2->cfExtGcd(aa->a2,bb->a2,&ss->a2,&tt->a2,coeffs2);
-  return (number)cc; 
+  return (number)cc;
 }
 static number  gGetUnit (number n, const coeffs r)
 {
@@ -439,7 +439,7 @@ static number  gGetUnit (number n, const coeffs r)
   gcp cc=(gcp)omalloc(sizeof(*cc));
   cc->a1=coeffs1->cfGetUnit(aa->a1,coeffs1);
   cc->a2=coeffs2->cfGetUnit(aa->a2,coeffs2);
-  return (number)cc; 
+  return (number)cc;
 }
 static BOOLEAN gIsUnit (number a, const coeffs)
 {

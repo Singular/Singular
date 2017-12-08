@@ -1632,14 +1632,14 @@ static BOOLEAN jiA_MATRIX_L(leftv l,leftv r)
     {
       if (r!=NULL)
       {
-        Warn("list length mismatch in assign (l>r)");
+        WarnS("list length mismatch in assign (l>r)");
         nok=TRUE;
       }
       break;
     }
     else if (r==NULL)
     {
-      Warn("list length mismatch in assign (l<r)");
+      WarnS("list length mismatch in assign (l<r)");
       nok=TRUE;
       break;
     }

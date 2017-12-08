@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////
-version="version realizationMatroids.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version realizationMatroids.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="Tropical Geometry";
 info="
 LIBRARY:  realizationMatroids.lib   Deciding Relative Realizability for Tropical Fan Curves in 2-Dimensional Matroidal Fans

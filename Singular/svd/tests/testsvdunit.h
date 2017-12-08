@@ -89,13 +89,13 @@ namespace testsvdunit
         threshold = 5*100*amp::ampf<Precision>::getAlgoPascalEpsilon();
         failthreshold = amp::ampf<Precision>("5.0E-3");
         a.setbounds(0, maxmn-1, 0, maxmn-1);
-        
+
         //
         // TODO: div by zero fail, convergence fail
         //
         for(gpass=1; gpass<=1; gpass++)
         {
-            
+
             //
             // zero matrix, several cases
             //
@@ -113,7 +113,7 @@ namespace testsvdunit
                     testsvdproblem<Precision>(a, i, j, materr, orterr, othererr, wsorted, wfailed);
                 }
             }
-            
+
             //
             // Long dense matrix
             //
@@ -145,7 +145,7 @@ namespace testsvdunit
                     testsvdproblem<Precision>(a, i, j, materr, orterr, othererr, wsorted, wfailed);
                 }
             }
-            
+
             //
             // Dense matrices
             //
@@ -163,7 +163,7 @@ namespace testsvdunit
                     testsvdproblem<Precision>(a, m, n, materr, orterr, othererr, wsorted, wfailed);
                 }
             }
-            
+
             //
             // Sparse matrices, very sparse matrices, incredible sparse matrices
             //
@@ -183,7 +183,7 @@ namespace testsvdunit
                 }
             }
         }
-        
+
         //
         // report
         //
@@ -282,7 +282,7 @@ namespace testsvdunit
 
 
         minmn = ap::minint(m, n);
-        
+
         //
         // decomposition error
         //
@@ -300,7 +300,7 @@ namespace testsvdunit
             }
         }
         materr = amp::maximum<Precision>(materr, locerr);
-        
+
         //
         // orthogonality error
         //
@@ -330,7 +330,7 @@ namespace testsvdunit
             }
         }
         orterr = amp::maximum<Precision>(orterr, locerr);
-        
+
         //
         // values order error
         //
@@ -372,7 +372,7 @@ namespace testsvdunit
         amp::ampf<Precision> mx;
 
 
-        
+
         //
         // Main SVD test
         //
@@ -383,7 +383,7 @@ namespace testsvdunit
             return;
         }
         getsvderror<Precision>(a, m, n, u, w, vt, materr, orterr, wsorted);
-        
+
         //
         // Additional SVD tests
         //
@@ -438,7 +438,7 @@ namespace testsvdunit
                 }
             }
         }
-        
+
         //
         // update counter
         //

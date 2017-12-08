@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version gfan.lib 4.0.3.3 Oct_2016 ";
+version="version gfan.lib 4.1.1.0 Dec_2017 ";
 category = "Convex Geometry";
 info="
 LIBRARY:  gfan.lib   Interface to gfan and gfanlib for computations in convex geometry

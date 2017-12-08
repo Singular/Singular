@@ -3,7 +3,7 @@ tst_init();
 
 // overflow in subst
 
-ring rng = 0,(x,y,z,aa),(L(2^16-1),dp); // to make it indep of the machine
+ring rng = 0,(x,y,z,aa),(L(2^15-1),dp); // to make it indep of the machine
 ideal I = x^10000;
 
 I = subst (I,x,x^ 10000);

@@ -66,9 +66,9 @@ BOOLEAN si_intset_Assign(leftv l, leftv r)
       IDDATA((idhdl)l->data)=(char*) tobeassigned;
     }
     else
-    {                
+    {
       l->data = (void*) tobeassigned;
-    }        
+    }
   }
   else
   {
@@ -115,7 +115,7 @@ BOOLEAN intersect_set (leftv result, leftv arg)
   ||(arg->next->next->Typ()!=si_intset_type_id))
   {
     WerrorS("syntax: intersect_set(<intset>,<intset>,<intset>)");
-    return TRUE; 
+    return TRUE;
   }
   si_intset *a=(si_intset*)arg->Data();
   si_intset *b=(si_intset*)arg->next->Data();
@@ -149,13 +149,13 @@ BOOLEAN insert_set (leftv result, leftv arg)
   ||(arg->Typ()!=si_intset_type_id)
   ||(arg->next->Typ()!=INT_CMD))
   {
-    WerrorS("syntax: insert_set(<intset>,<int>)"); 
+    WerrorS("syntax: insert_set(<intset>,<int>)");
     return TRUE;
   }
   si_intset *a=(si_intset*)arg->Data();
   int b=(int)(long)arg->next->Data();
   a->insert(b);
-  result->rtyp=NONE; 
+  result->rtyp=NONE;
   result->data=NULL;
   return FALSE;
 }

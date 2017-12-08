@@ -94,10 +94,10 @@ int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
                 CFMap & N, bool topLevel)
 {
   int n= tmax (F.level(), G.level());
-  int * degsf= new int [n + 1];
-  int * degsg= new int [n + 1];
+  int * degsf= NEW_ARRAY(int,n + 1);
+  int * degsg= NEW_ARRAY(int,n + 1);
 
-  for (int i = 0; i <= n; i++)
+  for (int i = n; i >= 0; i--)
     degsf[i]= degsg[i]= 0;
 
   degsf= degrees (F, degsf);
@@ -131,8 +131,8 @@ int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
 
     if (both_non_zero == 0)
     {
-      delete [] degsf;
-      delete [] degsg;
+      DELETE_ARRAY(degsf);
+      DELETE_ARRAY(degsg);
       return 0;
     }
 
@@ -248,8 +248,8 @@ int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
     }
   }
 
-  delete [] degsf;
-  delete [] degsg;
+  DELETE_ARRAY(degsf);
+  DELETE_ARRAY(degsg);
 
   return 1;
 }

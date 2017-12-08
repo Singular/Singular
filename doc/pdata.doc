@@ -344,6 +344,7 @@ computes a normal form of a polynomial f in a quotient ring (cf.@:
 * Matrix orderings::
 * Product orderings::
 * Extra weight vector::
+* Pseudo ordering L::
 @end menu
 
 @c --------------------------------------------------------------------------
@@ -1301,7 +1302,7 @@ defines: @code{lp} on the first 3 variables, the matrix ordering
 @code{ws(1,2,3)} on the last 3 variables.
 
 @c --------------------------------------------------------------
-@node Extra weight vector,  , Product orderings, Monomial orderings
+@node Extra weight vector
 @subsection Extra weight vector
 @cindex Extra weight vector
 @cindex a, ordering
@@ -1352,3 +1353,16 @@ ring r = 0, (x,y,z),  (a(1,2,3),wp(4,5,2));
 ring s = 0, (x,y,z),  (a(1,2,3),dp);
 ring q = 0, (a,b,c,d),(lp(1),a(1,2,3),ds);
 @end smallexample
+@c --------------------------------------------------------------
+@node Pseudo ordering L
+@subsection Pseudo ordering L
+@cindex Pseudo ordering L
+@cindex L, ordering
+@cindex orderings, L
+
+L(max_exponent) is not an ordering but sets the maximal allowed exponent
+for polynomial in this ring. The default is 32767.
+The current value for a ring is reflected in the attribute "maxExp".
+This attribute is also set (and acknowledged) for the list
+constructed by @code{ringlist} and the construction of a ring from such a list.
+

@@ -7,11 +7,17 @@
 * ABSTRACT: class intvec: lists/vectors of integers
 */
 #include <string.h>
+#include "omalloc/omalloc.h"
+#ifndef XMEMORY_H
 #include "omalloc/omallocClass.h"
+#endif
 #include "reporter/reporter.h"
 
 
-class intvec :public omallocClass
+class intvec
+#ifndef XMEMORY_H
+             :public omallocClass
+#endif
 {
 private:
   int *v;

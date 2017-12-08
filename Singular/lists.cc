@@ -275,7 +275,7 @@ lists liMakeResolv(resolvente r, int length, int reallen,
       else
       {
         // should not happen:
-        Warn("internal NULL in resolvente");
+        WarnS("internal NULL in resolvente");
         L->m[i].data=(void *)idInit(1,1);
       }
       #endif

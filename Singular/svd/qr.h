@@ -141,14 +141,14 @@ namespace qr
         work.setbounds(0, n-1);
         t.setbounds(1, m);
         tau.setbounds(0, minmn-1);
-        
+
         //
         // Test the input arguments
         //
         k = minmn;
         for(i=0; i<=k-1; i++)
         {
-            
+
             //
             // Generate elementary reflector H(i) to annihilate A(i+1:m,i)
             //
@@ -159,7 +159,7 @@ namespace qr
             t(1) = 1;
             if( i<n )
             {
-                
+
                 //
                 // Apply H(i) to A(i:m-1,i+1:n-1) from the left
                 //
@@ -210,7 +210,7 @@ namespace qr
         {
             return;
         }
-        
+
         //
         // init
         //
@@ -233,13 +233,13 @@ namespace qr
                 }
             }
         }
-        
+
         //
         // unpack Q
         //
         for(i=k-1; i>=0; i--)
         {
-            
+
             //
             // Apply H(i)
             //
@@ -318,14 +318,14 @@ namespace qr
         work.setbounds(1, n);
         t.setbounds(1, m);
         tau.setbounds(1, minmn);
-        
+
         //
         // Test the input arguments
         //
         k = ap::minint(m, n);
         for(i=1; i<=k; i++)
         {
-            
+
             //
             // Generate elementary reflector H(i) to annihilate A(i+1:m,i)
             //
@@ -337,7 +337,7 @@ namespace qr
             t(1) = 1;
             if( i<n )
             {
-                
+
                 //
                 // Apply H(i) to A(i:m,i+1:n) from the left
                 //
@@ -372,7 +372,7 @@ namespace qr
         {
             return;
         }
-        
+
         //
         // init
         //
@@ -395,13 +395,13 @@ namespace qr
                 }
             }
         }
-        
+
         //
         // unpack Q
         //
         for(i=k; i>=1; i--)
         {
-            
+
             //
             // Apply H(i)
             //
@@ -439,12 +439,12 @@ namespace qr
         v.setbounds(1, m);
         q.setbounds(1, m, 1, m);
         r.setbounds(1, m, 1, n);
-        
+
         //
         // QRDecomposition
         //
         qrdecomposition<Precision>(a, m, n, tau);
-        
+
         //
         // R
         //
@@ -460,7 +460,7 @@ namespace qr
         {
             ap::vmove(r.getrow(i, i, n), a.getrow(i, i, n));
         }
-        
+
         //
         // Q
         //

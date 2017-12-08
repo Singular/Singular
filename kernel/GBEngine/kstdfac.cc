@@ -100,7 +100,7 @@ static void copyL (kStrategy o,kStrategy n)
       i++;
       if(i>o->tl)
       {
-        Warn("poly p1 not found in T:");wrp(p);PrintLn();
+        WarnS("poly p1 not found in T:");wrp(p);PrintLn();
         l[j].p1=pCopy(p);
         l[j].i_r1=-1;
         break;
@@ -122,7 +122,7 @@ static void copyL (kStrategy o,kStrategy n)
       i++;
       if(i>o->tl)
       {
-        Warn("poly p2 not found in T:");wrp(p);PrintLn();
+        WarnS("poly p2 not found in T:");wrp(p);PrintLn();
         l[j].p2=pCopy(p);
         l[j].i_r2=-1;
         break;

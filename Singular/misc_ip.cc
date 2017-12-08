@@ -663,7 +663,7 @@ BOOLEAN setOption(leftv res, leftv v)
             si_opt_1 &= ~Sy_bit(OPT_REDTHROUGH);
         }
         else
-          Warn("cannot set option");
+          WarnS("cannot set option");
 #if 0
         if (TEST_OPT_INTSTRATEGY && (currRing!=NULL)
         && rField_has_simple_inverse()
@@ -682,7 +682,7 @@ BOOLEAN setOption(leftv res, leftv v)
           si_opt_1 &= optionStruct[i].resetval;
         }
         else
-          Warn("cannot clear option");
+          WarnS("cannot clear option");
         goto okay;
       }
     }
@@ -1388,7 +1388,7 @@ void siInit(char *name)
 // singular links: --------------------------------------------------
   slStandardInit();
   myynest=0;
-// semapohore 0 -----------------------------------------------------
+// how many processes ? -----------------------------------------------------
   int cpus=2;
   int cpu_n;
   #ifdef _SC_NPROCESSORS_ONLN
@@ -1397,6 +1397,8 @@ void siInit(char *name)
   if ((cpu_n=sysconf(_SC_NPROCESSORS_CONF))>cpus) cpus=cpu_n;
   #endif
   feSetOptValue(FE_OPT_CPUS, cpus);
+// how many threads ? -----------------------------------------------------
+  feSetOptValue(FE_OPT_THREADS, cpus);
 
 // default coeffs
   {

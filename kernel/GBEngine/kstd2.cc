@@ -4158,7 +4158,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       {
          /* Shrink is zero, like y(1)*y(2) - y(1)*y(3)*/
 #ifdef KDEBUG
-         if (TEST_OPT_DEBUG){PrintS("nonzero s shrinks to 0");PrintLn();}
+         if (TEST_OPT_DEBUG){PrintS("nonzero s shrinks to 0\n");}
 #endif
          //         strat->P.Delete();  // cause error
          strat->P.p = NULL;

@@ -4,9 +4,9 @@ lib_LTLIBRARIES=libomalloc.la
 
 libomalloc_includedir=$(includedir)/omalloc
 
-libomalloc_include_HEADERS = omalloc.h omallocClass.h
+libomalloc_include_HEADERS = omalloc.h
 
-SOURCES=dummy.c omallocClass.cc
+SOURCES=dummy.c
 
 AM_CPPFLAGS =-I${top_srcdir}/.. -I${top_builddir}/..
 

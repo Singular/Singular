@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version finvar.lib 4.0.3.2 June_2016 "; // $Id$
+version="version finvar.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups

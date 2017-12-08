@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////
-version="version stratify.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version stratify.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="Invariant theory";
 info="
 LIBRARY: stratify.lib   Algorithmic Stratification for Unipotent Group-Actions

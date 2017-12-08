@@ -188,7 +188,7 @@ FpBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   if (substCheck)
   {
     bool foundOne= false;
-    int * substDegree= new int [F.level()];
+    int * substDegree= NEW_ARRAY(int,F.level());
     for (int i= 1; i <= F.level(); i++)
     {
       substDegree[i-1]= substituteCheck (F, Variable (i));
@@ -220,10 +220,10 @@ FpBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
                                       j.getItem().exp()*i.getItem().exp()));
       }
       decompress (newResult, N);
-      delete [] substDegree;
+      DELETE_ARRAY(substDegree);
       return newResult;
     }
-    delete [] substDegree;
+    DELETE_ARRAY(substDegree);
   }
 
   CanonicalForm LcF= Lc (F);
@@ -314,7 +314,7 @@ FqBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   if (substCheck)
   {
     bool foundOne= false;
-    int * substDegree= new int [F.level()];
+    int * substDegree= NEW_ARRAY(int,F.level());
     for (int i= 1; i <= F.level(); i++)
     {
       substDegree[i-1]= substituteCheck (F, Variable (i));
@@ -346,10 +346,10 @@ FqBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
                                       j.getItem().exp()*i.getItem().exp()));
       }
       decompress (newResult, N);
-      delete [] substDegree;
+      DELETE_ARRAY(substDegree);
       return newResult;
     }
-    delete [] substDegree;
+    DELETE_ARRAY(substDegree);
   }
 
   CanonicalForm LcF= Lc (F);
@@ -442,7 +442,7 @@ GFBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   if (substCheck)
   {
     bool foundOne= false;
-    int * substDegree= new int [F.level()];
+    int * substDegree=NEW_ARRAY(int,F.level());
     for (int i= 1; i <= F.level(); i++)
     {
       substDegree[i-1]= substituteCheck (F, Variable (i));
@@ -474,10 +474,10 @@ GFBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
                                       j.getItem().exp()*i.getItem().exp()));
       }
       decompress (newResult, N);
-      delete [] substDegree;
+      DELETE_ARRAY(substDegree);
       return newResult;
     }
-    delete [] substDegree;
+    DELETE_ARRAY(substDegree);
   }
 
   CanonicalForm LcF= Lc (F);

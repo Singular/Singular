@@ -2786,7 +2786,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   if (rHasLocalOrMixedOrdering(currRing))
   {
     /* error: no local ord yet with shifts */
-    PrintS("No local ordering possible for shifts");
+    WerrorS("No local ordering possible for shifts");
     return(NULL);
   }
   else
@@ -2946,7 +2946,7 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
   else if (strat->M==NULL)
   {
     M=idInit(1,F->rank);
-    Warn("no minimal generating set computed");
+    WarnS("no minimal generating set computed");
   }
   else
   {

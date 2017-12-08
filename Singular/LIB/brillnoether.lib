@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////
-version="version brillnoether.lib 4.0.1.0 Oct_2014 "; // $Id$
+version="version brillnoether.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="Algebraic Geometry";
 info="
 LIBRARY:  brillnoether.lib  Riemann-Roch spaces of divisors on curves

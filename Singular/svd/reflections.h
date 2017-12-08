@@ -121,7 +121,7 @@ namespace reflections
         amp::ampf<Precision> mx;
 
 
-        
+
         //
         // Executable Statements ..
         //
@@ -130,7 +130,7 @@ namespace reflections
             tau = 0;
             return;
         }
-        
+
         //
         // XNORM = DNRM2( N-1, X, INCX )
         //
@@ -151,14 +151,14 @@ namespace reflections
         }
         if( xnorm==0 )
         {
-            
+
             //
             // H  =  I
             //
             tau = 0;
             return;
         }
-        
+
         //
         // general case
         //
@@ -222,7 +222,7 @@ namespace reflections
         {
             return;
         }
-        
+
         //
         // w := C' * v
         //
@@ -236,7 +236,7 @@ namespace reflections
             t = v(i+1-m1);
             ap::vadd(work.getvector(n1, n2), c.getrow(i, n1, n2), t);
         }
-        
+
         //
         // C := C - tau * v * w'
         //
@@ -295,7 +295,7 @@ namespace reflections
         {
             return;
         }
-        
+
         //
         // w := C * v
         //
@@ -305,7 +305,7 @@ namespace reflections
             t = ap::vdotproduct(c.getrow(i, n1, n2), v.getvector(1, vm));
             work(i) = t;
         }
-        
+
         //
         // C := C - w * v'
         //

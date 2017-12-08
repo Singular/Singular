@@ -49,6 +49,6 @@ static const int SW_USE_FF_MOD_GCD=7;
 #define DELETE_ARRAY(P)  omFree(P)
 #else
 #define NEW_ARRAY(T,N)   new T[N]
-#define DELETE_ARRY(P)   delete[] P
+#define DELETE_ARRAY(P)  delete[] P
 #endif
 #endif /* ! INCL_CF_DEFS_H */

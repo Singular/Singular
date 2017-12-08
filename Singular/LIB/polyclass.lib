@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version polyclass.lib 4.1.0.3 Nov_2017 "; // $Id$
+version="version polyclass.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="Commutative Algebra";
 info="
-LIBRARY: polyclass.lib   Data types for normal form equations 
+LIBRARY: polyclass.lib   Data types for normal form equations
 AUTHORS:               Janko Boehm,      email: boehm@mathematik.uni-kl.de
                        Magdaleen Marais, email: magdaleen.marais@up.ac.za
                        Gerhard Pfister,  email: pfister@mathematik.uni-kl.de
@@ -10,17 +10,17 @@ AUTHORS:               Janko Boehm,      email: boehm@mathematik.uni-kl.de
 
 OVERVIEW:
 This library implements a ring independent polynomial type used for the return value in
-classify2.lib and realclassify.lib. You can use +,  * and == for addition, multiplication 
-and comparison. The key over contains the base ring of the polynomial, the key value its 
-value as a polynomial of type poly. The constructor can be called by assigning a polynomial 
+classify2.lib and realclassify.lib. You can use +,  * and == for addition, multiplication
+and comparison. The key over contains the base ring of the polynomial, the key value its
+value as a polynomial of type poly. The constructor can be called by assigning a polynomial
 of type poly to a polynomial of type Poly via =.
 
-Moreover the library implements a class NormalformEquation consisting out of a string type, 
-an integer milnorNumber, a Poly normalFormEquation, and integer modality, a list of numbers 
-parameters, a list variables, an integer corank, in the real case, an integer inertiaIndex, 
-a list of open intervals represented as lists consisting out of two rationals used to select 
-a real root of the minimal polynomial (which is stored in the variable minpoly of the polynomial 
-ring containing normalFormEquation, that is, in normalFormEquation.in), or if no minimal 
+Moreover the library implements a class NormalformEquation consisting out of a string type,
+an integer milnorNumber, a Poly normalFormEquation, and integer modality, a list of numbers
+parameters, a list variables, an integer corank, in the real case, an integer inertiaIndex,
+a list of open intervals represented as lists consisting out of two rationals used to select
+a real root of the minimal polynomial (which is stored in the variable minpoly of the polynomial
+ring containing normalFormEquation, that is, in normalFormEquation.in), or if no minimal
 polynomial is defined then an interval containing the rational parameter value.
 
 KEYWORDS:

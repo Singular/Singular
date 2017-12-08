@@ -49,8 +49,8 @@ int compress4EZGCD (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
                     CFMap & N, int& both_non_zero)
 {
   int n= tmax (F.level(), G.level());
-  int * degsf= new int [n + 1];
-  int * degsg= new int [n + 1];
+  int * degsf= NEW_ARRAY(int,n + 1);
+  int * degsg= NEW_ARRAY(int,n + 1);
 
   for (int i = 0; i <= n; i++)
     degsf[i]= degsg[i]= 0;
@@ -83,17 +83,19 @@ int compress4EZGCD (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
 
   if (both_non_zero == 0)
   {
-    delete [] degsf;
-    delete [] degsg;
+    DELETE_ARRAY(degsf);
+    DELETE_ARRAY(degsg);
     return 0;
   }
 
   // map Variables which do not occur in both polynomials to higher levels
   int k= 1;
   int l= 1;
+  int Flevel=F.level();
+  int Glevel=G.level();
   for (int i= 1; i <= n; i++)
   {
-    if (degsf[i] != 0 && degsg[i] == 0 && i <= F.level())
+    if (degsf[i] != 0 && degsg[i] == 0 && i <= Flevel)
     {
       if (k + both_non_zero != i)
       {
@@ -102,7 +104,7 @@ int compress4EZGCD (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
       }
       k++;
     }
-    if (degsf[i] == 0 && degsg[i] != 0 && i <= G.level())
+    if (degsf[i] == 0 && degsg[i] != 0 && i <= Glevel)
     {
       if (l + g_zero + both_non_zero != i)
       {
@@ -115,7 +117,8 @@ int compress4EZGCD (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
 
   // sort Variables x_{i} in decreasing order of
   // min(deg_{x_{i}}(f),deg_{x_{i}}(g))
-  int m= tmin (F.level(), G.level());
+  //int m= tmin (F.level(), G.level());
+  int m= tmin (Flevel, Glevel);
   int max_min_deg;
   k= both_non_zero;
   l= 0;
@@ -174,8 +177,8 @@ int compress4EZGCD (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
     k--;
   }
 
-  delete [] degsf;
-  delete [] degsg;
+  DELETE_ARRAY(degsf);
+  DELETE_ARRAY(degsg);
 
   return both_non_zero;
 }
@@ -206,9 +209,10 @@ CanonicalForm myReverseShift (const CanonicalForm& F, const CFList& evaluation)
   int l= evaluation.length() + 1;
   CanonicalForm result= F;
   CFListIterator j= evaluation;
+  int Flevel=F.level();
   for (int i= 2; i < l + 1; i++, j++)
   {
-    if (F.level() < i)
+    if (Flevel < i)
       continue;
     result= result (Variable (i) - j.getItem(), i);
   }
@@ -220,9 +224,9 @@ Evaluation optimize4Lift (const CanonicalForm& F, CFMap & M,
                     CFMap & N, const Evaluation& A)
 {
   int n= F.level();
-  int * degsf= new int [n + 1];
+  int * degsf= NEW_ARRAY(int,n + 1);
 
-  for (int i = 0; i <= n; i++)
+  for (int i = n; i >= 0; i--)
     degsf[i]= 0;
 
   degsf= degrees (F, degsf);
@@ -280,7 +284,7 @@ Evaluation optimize4Lift (const CanonicalForm& F, CFMap & M,
     l= 2;
   }
 
-  delete [] degsf;
+  DELETE_ARRAY(degsf);
 
   return result;
 }
@@ -346,14 +350,14 @@ int Hensel (const CanonicalForm & UU, CFArray & G, const Evaluation & AA,
   bool noOneToOne= false;
   if (U.level() > 2)
   {
-    liftBounds= new int [U.level() - 1]; /* index: 0.. U.level()-2 */
+    liftBounds= NEW_ARRAY(int,U.level() - 1); /* index: 0.. U.level()-2 */
     liftBounds[0]= liftBound;
     for (int i= 1; i < U.level() - 1; i++)
       liftBounds[i]= degree (shiftedU, Variable (i + 2)) + 1;
     factors= nonMonicHenselLift2 (UEval, factors, liftBounds, U.level() - 1,
                                   false, shiftedLCsEval1, shiftedLCsEval2, Pi,
                                   diophant, noOneToOne);
-    delete [] liftBounds;
+    DELETE_ARRAY(liftBounds);
     if (noOneToOne)
       return 0;
   }

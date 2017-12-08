@@ -89,7 +89,7 @@ void* dynl_open_binary_warn(const char* binary_name, const char* msg)
             binary_name, DL_TAIL,proc_path);
     if (found) Warn("Error message from system: %s", dynl_error());
     if (msg != NULL) Warn("%s", msg);
-    Warn("See the INSTALL section in the Singular manual for details.");
+    WarnS("See the INSTALL section in the Singular manual for details.");
     warn_handle = TRUE;
   }
   omfree((ADDRESS)binary_name_so );
@@ -105,10 +105,10 @@ void* dynl_sym_warn(void* handle, const char* proc, const char* msg)
     proc_ptr = dynl_sym(handle, proc);
     if (proc_ptr == NULL && ! warn_proc)
     {
-      Warn("Could load a procedure from a dynamic library");
+      WarnS("Could load a procedure from a dynamic library");
       Warn("Error message from system: %s", dynl_error());
       if (msg != NULL) Warn("%s", msg);
-      Warn("See the INSTALL section in the Singular manual for details.");
+      WarnS("See the INSTALL section in the Singular manual for details.");
       warn_proc = TRUE;
     }
   }

@@ -141,7 +141,7 @@ First we will discuss general principles of working with array classes, then des
 </p>
 
 <p align=justify>
-Classes of the standard library allow operations with matrixes and vectors (one-dimensional and two-dimensional arrays) of variable size and with variable numeration of elements, that is, the array numeration can start at any number, end at any number and change dynamically. Because the array classes are templates, the arrays of the same dimension have the same set of member functions. And as the member functions of arrays with different dimensions differ only by the number of arguments, there is little difference between two-dimensional and one-dimenstional arrays. 
+Classes of the standard library allow operations with matrixes and vectors (one-dimensional and two-dimensional arrays) of variable size and with variable numeration of elements, that is, the array numeration can start at any number, end at any number and change dynamically. Because the array classes are templates, the arrays of the same dimension have the same set of member functions. And as the member functions of arrays with different dimensions differ only by the number of arguments, there is little difference between two-dimensional and one-dimenstional arrays.
 </p>
 
 <p align=justify>
@@ -153,7 +153,7 @@ After an empty array has been created, you should allocate the memory for its el
 </p>
 
 <p align=justify>
-To address the array elements, an overloaded <code:>operator()</code:> is used. That is, the code addressing the element of array <code:>a</code:> with indexes <code:>a(i,j,k)</code:> will look like <code:>a(i,j,k)</code:>. Below is given an example of factorial array calculation, illustrating the work with arrays. 
+To address the array elements, an overloaded <code:>operator()</code:> is used. That is, the code addressing the element of array <code:>a</code:> with indexes <code:>a(i,j,k)</code:> will look like <code:>a(i,j,k)</code:>. Below is given an example of factorial array calculation, illustrating the work with arrays.
 </p>
 
 <pre>
@@ -200,7 +200,7 @@ This class is a template of dynamical one-dimensional array with variable upper 
 </p>
 
 <p align=justify>
-<span class=func>T&amp; operator()(<b>int</b> i)</span><br> Addressing the array element number i 
+<span class=func>T&amp; operator()(<b>int</b> i)</span><br> Addressing the array element number i
 </p>
 
 <p align=justify>
@@ -212,7 +212,7 @@ This class is a template of dynamical one-dimensional array with variable upper 
 </p>
 
 <p align=justify>
-<span class=func>T* getcontent()</span><br> Gets pointer to the array. The data pointed by the returned pointer can be changed, and the array content will be changed as well. 
+<span class=func>T* getcontent()</span><br> Gets pointer to the array. The data pointed by the returned pointer can be changed, and the array content will be changed as well.
 </p>
 
 <p align=justify>
@@ -224,7 +224,7 @@ This class is a template of dynamical one-dimensional array with variable upper 
 </p>
 
 <p align=justify>
-<span class=func>const_raw_vector&lt;T&gt; getvector(<b>int</b> iStart, <b>int</b> iEnd) <b>const</b></span><br> The method is used by the basic subroutines of linear algebra to get access to the internal memory of the array. The method returns an object, holding the pointer to a vector part (starting from the element with iStart index value and finishing with iEnd index value). If iEnd&lt;iStart, then an empty vector is considered to be set. The returned object is for read only. 
+<span class=func>const_raw_vector&lt;T&gt; getvector(<b>int</b> iStart, <b>int</b> iEnd) <b>const</b></span><br> The method is used by the basic subroutines of linear algebra to get access to the internal memory of the array. The method returns an object, holding the pointer to a vector part (starting from the element with iStart index value and finishing with iEnd index value). If iEnd&lt;iStart, then an empty vector is considered to be set. The returned object is for read only.
 </p>
 
 
@@ -272,7 +272,7 @@ This class is a template of dynamical two-dimensional array with variable upper 
 </p>
 
 <p align=justify>
-<span class=func>T* getcontent()</span><br> Gets pointer to the array. The data pointed by the returned pointer can be changed, and the array content will be changed as well. 
+<span class=func>T* getcontent()</span><br> Gets pointer to the array. The data pointed by the returned pointer can be changed, and the array content will be changed as well.
 </p>
 
 <p align=justify>

@@ -503,7 +503,7 @@ int * degrees ( const CanonicalForm & f, int * degs )
     {
         int level = f.level();
         if ( degs == NULL )
-            degs = new int[level+1];
+            degs = NEW_ARRAY(int,level+1);
         for ( int i = level; i >= 0; i-- )
             degs[i] = 0;
         degreesRec( f, degs );

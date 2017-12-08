@@ -136,7 +136,7 @@ myContent (const CanonicalForm& F, const Variable& x)
 CanonicalForm myCompress (const CanonicalForm& F, CFMap& N)
 {
   int n= F.level();
-  int * degsf= new int [n + 1];
+  int * degsf= NEW_ARRAY(int,n + 1);
   int ** swap= new int* [n + 1];
   for (int i= 0; i <= n; i++)
   {
@@ -204,11 +204,11 @@ CanonicalForm myCompress (const CanonicalForm& F, CFMap& N)
       N.newpair (Variable (i), Variable (swap[i] [0]));
   }
 
-  for (i= 0; i <= F.level(); i++)
+  for (i= F.level(); i >=0 ; i--)
     delete [] swap[i];
   delete [] swap;
 
-  delete [] degsf;
+  DELETE_ARRAY(degsf);
 
   return result;
 }

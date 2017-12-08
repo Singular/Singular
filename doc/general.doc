@@ -1913,7 +1913,8 @@ Loc_(x)K[x1,...,xn]).
 @end ifinfo
 For more details, see @ref{Polynomial data}.
 
-In a ring declaration, @sc{Singular} offers the following orderings:
+In a ring declaration, @sc{Singular} offers the following orderings
+(but see also @ref{Monomial orderings}):
 @enumerate
 @item Global orderings
 @table @asis
@@ -2397,7 +2398,7 @@ the expression as initial value to it.  Expression is an expression of
 the specified type or one that can be converted to that type.
 @xref{Type conversion and casting}.
 
-@item @code{alias} type name 
+@item @code{alias} type name
 @*Introduces name as an alternative, read-only name for another variable_name.
 Can only be used in procedure headings to avoid copying large data.
 
