@@ -2,39 +2,33 @@
 version="version freegb.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="Noncommutative";
 info="
-LIBRARY: freegb.lib   Compute two-sided Groebner bases in free algebras via
-@*                    letterplace
+LIBRARY: freegb.lib   Compute two-sided Groebner bases in free algebras via letterplace approach
 AUTHORS: Viktor Levandovskyy,     viktor.levandovskyy@math.rwth-aachen.de
-@*       Grischa Studzinski,      grischa.studzinski@math.rwth-aachen.de
+       Grischa Studzinski,      grischa.studzinski@math.rwth-aachen.de
 
 OVERVIEW: For the theory, see chapter 'Letterplace' in the @sc{Singular} Manual
 
 PROCEDURES:
-makeLetterplaceRing(d);    creates a ring with d blocks of shifted original
-@*                         variables
-letplaceGBasis(I); computes two-sided Groebner basis of a letterplace ideal I
-@*                 up to a degree bound
-lpNF(f,I);      normal form of f with respect to ideal I
-freeGBasis(L, n);  computes two-sided Groebner basis of an ideal, encoded via
-@*                 list L, up to degree n
+makeLetterplaceRing(d); creates a ring with d blocks of shifted original variables
+letplaceGBasis(I); computes two-sided Groebner basis of a letterplace ideal I up to a degree bound
+lpNF(f,I); two-sided normal form of f with respect to ideal I
 setLetterplaceAttributes(R,d,b); supplies ring R with the letterplace structure
-
+freeGBasis(L, n);  computes two-sided Groebner basis of an ideal, encoded via list L, up to degree n
 
 lpMult(f,g);    letterplace multiplication of letterplace polynomials
 shiftPoly(p,i); compute the i-th shift of letterplace polynomial p
 lpPower(f,n);   natural power of a letterplace polynomial
-lp2lstr(K, s);      convert letter-place ideal to a list of modules
-lst2str(L[, n]);   convert a list (of modules) into polynomials in free algebra
-mod2str(M[, n]); convert a module into a polynomial in free algebra
-vct2str(M[, n]);   convert a vector into a word in free algebra
 lieBracket(a,b[, N]);  compute Lie bracket ab-ba of two letterplace polynomials
-serreRelations(A,z);   compute the homogeneous part of Serre's relations
-@*                     associated to a generalized Cartan matrix A
-fullSerreRelations(A,N,C,P,d); compute the ideal of all Serre's relations
-@*                             associated to a generalized Cartan matrix A
-isVar(p);                   check whether p is a power of a single variable
+
+lp2lstr(K, s);  convert a letterplace ideal into a list of modules
+lst2str(L[, n]); convert a list (of modules) into polynomials in free algebra via strings
+mod2str(M[, n]); convert a module into a polynomial in free algebra via strings
+vct2str(M[, n]);   convert a vector into a word in free algebra
+
+serreRelations(A,z); compute the homogeneous part of Serre's relations associated to a generalized Cartan matrix A
+fullSerreRelations(A,N,C,P,d); compute the ideal of all Serre's relations associated to a generalized Cartan matrix A
+isVar(p);              check whether p is a power of a single variable
 ademRelations(i,j);    compute the ideal of Adem relations for i<2j in char 0
-lpDelVar();     delete a variable from the current Letterplace ring
 
 SEE ALSO: fpadim_lib, LETTERPLACE
 ";
@@ -1321,7 +1315,7 @@ proc lpDelVar(int index) {
   int d = attrib(basering, "uptodeg"); // degree bround
   list LR = ringlist(basering);
 
-  if (!(index >= 1 && index <= lV)) { return (basering) } // invalid index
+  if (!(index >= 1 && index <= lV)) { return (basering); } // invalid index
 
   // remove frome the variable list
   for (int i = (d-1)*lV + index; i >= 1; i = i - lV) {
@@ -1356,8 +1350,14 @@ proc lpDelVar(int index) {
   def R = setLetterplaceAttributes(ring(LR),d,lV-1);
   return (R);
 }
-
-
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  def A = makeLetterplaceRing(3);
+  setring A; A;
+  def R = lpDelVar(2); setring R; R;
+}
 
 /* EXAMPLES:
 
@@ -2642,7 +2642,9 @@ EXAMPLE: example fullSerreRelations; shows examples
   i = 2*size(rNegative) + size(rCartan);
   if (i>N)
   {
-    ERROR("The total number of elements in input ideals must not exceed the dimension of the ground ring");
+    string s1="The total number of elements in input ideals";
+    string s2="must not exceed the dimension of the ground ring";
+    ERROR(s1+s2);
   }
   if (i < N)
   {
@@ -3071,8 +3073,7 @@ example
 
 */
 
-//static
-proc lpMultX(poly f, poly g)
+static proc lpMultX(poly f, poly g)
 {
   /* multiplies two polys in a very general setting correctly */
   /* alternative to lpMult, possibly better at non-positive orderings */
@@ -3125,7 +3126,6 @@ example
   lpMultX(a,b);
 }
 
-// TODO:
 // multiply two letterplace polynomials, lpMult: done
 // reduction/ Normalform? needs kernel stuff
 
@@ -3214,7 +3214,7 @@ example
 //   ASSUMPTIONS: every polynomial is an element of V',
 //@* else there wouldn't be an dvec representation
 
-//Mainprocedure for the user
+//Main procedure for the user
 
 proc lpNF(poly p, ideal G)
 "USAGE: lpNF(p,G); f letterplace polynomial, ideal I
@@ -3223,8 +3223,8 @@ PURPOSE: computation of the normalform of p with respect to G
 ASSUME: p is a Letterplace polynomial, G is a set Letterplace polynomials,
 being a Letterplace Groebner basis (no check for this will be done)
 NOTE: Strategy: take the smallest monomial wrt ordering for reduction
-@*     For homogenous ideals the shift does not matter
-@*     For non-homogenous ideals the first shift will be the smallest monomial
+-     For homogenous ideals the shift does not matter
+-     For non-homogenous ideals the first shift will be the smallest monomial
 EXAMPLE: example lpNF; shows examples
 "
 {if ((p==0) || (size(G) == 0)){return(p);}
@@ -3256,13 +3256,12 @@ static proc getExpVecs(ideal G)
 "USUAGE: getExpVecs(G);
 RETURN: list of intvecs
 PURPOSE: convert G into a list of intvecs, corresponding to the exponent vector
-@* of the leading monomials of G
+ of the leading monomials of G
 "
 {int i; list L;
  for (i = 1; i <= size(G); i++) {L[i] = leadexp(G[i]); }
  return(L);
 }
-
 
 static proc delSupZero(intvec I)
 "USUAGE:delSupZero(I);
@@ -3288,7 +3287,6 @@ ASSUME: Intvec is an exponent vector of a letterplace monomial contained in V'
   }
  return(I);
 }
-
 
 static proc delSupZeroList(list L)
 "USUAGE:delSupZeroList(L); L a list, containing intvecs
@@ -3368,10 +3366,7 @@ ASSUME: V,W are DVecs of monomials contained in V'
  else {return(list(-1));}
 }
 
-
-
-//the actual normalform procedure, if a user want not to presort the ideal, just make it not static
-
+//the first normal form procedure, if a user want not to presort the ideal, just make it not static
 
 static proc lpNormalForm1(poly p, ideal G, list L)
 "USUAGE:lpNormalForm1(p,G);
@@ -3400,11 +3395,11 @@ NOTE: Taking the first possible reduction
 }
 
 
-// new VL
-proc lpNormalForm2(poly pp, ideal G, list L)
+// new VL; called from lpNF
+static proc lpNormalForm2(poly pp, ideal G, list L)
 "USUAGE:lpNormalForm2(p,G);
 RETURN:poly
-PURPOSE:computation of the normalform of p w.r.t. G
+PURPOSE:computation of the normal form of p w.r.t. G
 ASSUME: p is a Letterplace polynomial, G is a set of Letterplace polynomials
 NOTE: Taking the first possible reduction
 "
@@ -3614,7 +3609,7 @@ static proc isLinearVector(vector v)
 // // the following is to determine a shift of a mono/poly from the
 // // interface
 
-// proc whichshift(poly p, int numvars)
+// static proc whichshift(poly p, int numvars)
 // {
 // // numvars = number of vars of the orig free algebra
 // // assume: we are in the letterplace ring
@@ -3631,7 +3626,7 @@ static proc isLinearVector(vector v)
 
 
 // LIB "qhmoduli.lib";
-// proc polyshift(poly p,  int numvars)
+// static proc polyshift(poly p,  int numvars)
 // {
 //   poly q = p; int i = 0;
 //   while (q!=0)
@@ -3709,15 +3704,15 @@ static proc checkWeightedExampleLP()
   lpMultX(a,b); // seems to work properly
 }
 
-
+/* THE FOLLOWING IS UNDER DEVELOPMENT
 // copied following from freegb_wrkcp.lib by Karim Abou Zeid on 07.04.2017:
-// proc makeLetterplaceRingElim(int d)
-// proc makeLetterplaceRingNDO(int d)
-// proc setLetterplaceAttributesElim(def R, int uptodeg, int lV)
-// proc lpElimIdeal(ideal I)
-// proc makeLetterplaceRingWt(int d, intvec W)
+// makeLetterplaceRingElim(int d)
+// makeLetterplaceRingNDO(int d)
+// setLetterplaceAttributesElim(def R, int uptodeg, int lV)
+// lpElimIdeal(ideal I)
+// makeLetterplaceRingWt(int d, intvec W)
 
-proc makeLetterplaceRingElim(int d)
+static proc makeLetterplaceRingElim(int d)
 "USAGE:  makeLetterplaceRingElim(d); d integers
 RETURN:  ring
 PURPOSE: creates a ring with an elimination ordering
@@ -3838,7 +3833,7 @@ example
 
 
 
-proc makeLetterplaceRingNDO(int d)
+static proc makeLetterplaceRingNDO(int d)
 "USAGE:  makeLetterplaceRingNDO(d); d an integer
 RETURN:  ring
 PURPOSE: creates a ring with a non-degree first ordering, suitable for
@@ -3946,7 +3941,7 @@ example
   attrib(A,"lV"); // number of variables in the main block
 }
 
-proc setLetterplaceAttributesElim(def R, int uptodeg, int lV)
+static proc setLetterplaceAttributesElim(def R, int uptodeg, int lV)
 "USAGE: setLetterplaceAttributesElim(R, d, b, eV); R a ring, b,d, eV integers
 RETURN: ring with special attributes set
 PURPOSE: sets attributes for a letterplace ring:
@@ -3980,7 +3975,7 @@ example
 }
 
 
-proc lpElimIdeal(ideal I)
+static proc lpElimIdeal(ideal I)
 "
 does not work for degree reasons (deg function does not work for lp rings -> newone!)
 "
@@ -3998,7 +3993,7 @@ does not work for degree reasons (deg function does not work for lp rings -> new
 }
 
 
-proc makeLetterplaceRingWt(int d, intvec W)
+static proc makeLetterplaceRingWt(int d, intvec W)
 "USAGE:  makeLetterplaceRingWt(d,W); d an integer, W a vector of positive integers
 RETURN:  ring
 PURPOSE: creates a ring with a special ordering, suitable for
@@ -4101,3 +4096,4 @@ example
   attrib(A,"uptodeg");  // degree bound
   attrib(A,"lV"); // number of variables in the main block
 }
+*/

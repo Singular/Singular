@@ -5,15 +5,16 @@ info="
 LIBRARY: fpaprops.lib   Algorithms for the properties of quotient algebras in the letterplace case
 AUTHORS: Karim Abou Zeid,       karim.abou.zeid at rwth-aachen.de
 
-Supported by the transregional collaborative research centre
+Support: Project II.6 in the transregional collaborative research centre
 SFB-TRR 195 'Symbolic Tools in Mathematics and their Application' of the German DFG
+
 OVERVIEW:
 Algorithms for computing various properties of quotient algebras in the letterplace case.
 
 REFERENCES:
 Huishi Li: Groebner bases in ring theory. World Scientific, 2010.
 
-SEE ALSO:  fpadim.lib, freegb.lib,
+SEE ALSO:  fpadim_lib, freegb_lib
 
 PROCEDURES:
   lpNoetherian(<GB>);     check whether A/<GB> is (left/right) noetherian
@@ -21,7 +22,7 @@ PROCEDURES:
   lpIsPrime(<GB>);        check whether A/<GB> is prime
   lpGkDim(<GB>);          compute the Gelfand Kirillov dimension of A/<GB>
   lpGlDimBound(<GB>);     compute an upper bound for the global dimension of A/<GB>
-  lpSubstitute();         substitute variable with polynoms
+  lpSubstitute();         substitute variable with polynomials
   lpCalcSubstDegBound();  utility for lpSubstitute
   lpCalcSubstDegBounds(); utility for lpSubstitute
 ";
@@ -195,7 +196,7 @@ proc lpIsSemiPrime(ideal G)
 RETURN: boolean
 PURPOSE: Check whether R/<G> is semi prime, where R is the basering
 ASSUME: - basering is a Letterplace ring
-@*      - G is a Groebner basis
+      - G is a Groebner basis
 "
 {
   G = lead(G);
@@ -294,7 +295,7 @@ proc lpIsPrime(ideal G)
 RETURN: boolean
 PURPOSE: Check whether R/<G> is prime, where R is the basering
 ASSUME: - basering is a Letterplace ring
-@*      - G is a Groebner basis
+      - G is a Groebner basis
 "
 {
   G = lead(G);
@@ -367,7 +368,7 @@ example {
 static proc existsRoute(intmat G, int v, int u, list #)
 "USAGE: existsRoute(G,v,u); G a graph, v and u vertices
 NOTE: don't pass anything to # (internal use for recursion)
-@*    routes always have at least one edge
+routes always have at least one edge
 "
 {
   int n = ncols(G);
@@ -681,9 +682,9 @@ static proc lpUfGraph(ideal G, list #)
 "USAGE: lpUfGraph(G); G a set of monomials in a letterplace ring, # an optional parameter to return the vertex list when set
 RETURN: intmat
 PURPOSE: Constructs the Ufnarovskij graph induced by G
-@*      the adjacency matrix of the Ufnarovskij graph induced by G
+      the adjacency matrix of the Ufnarovskij graph induced by G
 ASSUME: - basering is a Letterplace ring
-@*      - G are the leading monomials of a Groebner basis
+      - G are the leading monomials of a Groebner basis
 "
 {
   int l = maxDeg(G);
@@ -791,12 +792,12 @@ static proc ivdivides(list G, intvec iv) {
 // TODO
 proc lpGkDim(ideal G, list#)
 "USAGE: lpGkDim(G); G an ideal in a letterplace ring, method an
-@*       optional integer. method = 0 uses the Ufnarovskij Graph
-@*       and method = 1 uses the Graph of normal words to determine
-@*       the Gelfand Kirillov dimension
+       optional integer. method = 0 uses the Ufnarovskij Graph
+       and method = 1 uses the Graph of normal words to determine
+       the Gelfand Kirillov dimension
 RETURN: int
 PURPOSE: Determines the Gelfand Kirillov dimension of A/<G>
-@*      -1 means it is positive infinite
+      -1 means it is positive infinite
 ASSUME: - basering is a Letterplace ring
 - G is a Groebner basis
 "
@@ -836,8 +837,8 @@ PURPOSE: computing an upper bound for the global dimension
 ASSUME: - basering is a Letterplace ring, G is a reduced Groebner Basis
 EXAMPLE: example lpGlDimBound; shows example
 NOTE: if I = LM(I), then the global dimension is equal the Gelfand
-@*    Kirillov dimension if it is finite
-@*    Global dimension should be 0 for A/G = K and 1 for A/G = K<x1...xn>
+    Kirillov dimension if it is finite
+    Global dimension should be 0 for A/G = K and 1 for A/G = K<x1...xn>
 "
 {
   G = simplify(G,2); // remove zero generators
@@ -1014,13 +1015,13 @@ static proc contains(list L, def item)
 
 proc lpSubstitute(poly f, ideal s1, ideal s2, list #)
 "USAGE: lpSubstitute(f,s1,s2[,G]); f letterplace polynomial, s1 list (ideal) of variables
-@*  to replace, s2 list (ideal) of polynomials to replace with, G optional ideal to
-@*  reduce with.
+  to replace, s2 list (ideal) of polynomials to replace with, G optional ideal to
+  reduce with.
 RETURN: poly, the substituted polynomial
 ASSUME: - basering is a Letterplace ring
-@*      - G is a groebner basis,
-@*      - the current ring has a sufficient degbound (can be calculated with
-@*      lpCalcSubstDegBound())
+      - G is a groebner basis,
+      - the current ring has a sufficient degbound (can be calculated with
+      lpCalcSubstDegBound())
 EXAMPLE: example lpSubstitute; shows examples
 "
 {
@@ -1120,7 +1121,7 @@ static proc ivIndexOf(list L, intvec iv) {
 
 proc lpCalcSubstDegBound(poly f, ideal s1, ideal s2)
 "USAGE: lpCalcSubstDegBound(f,s1,s2); f letterplace polynomial, s1 list (ideal) of variables
-@*  to replace, s2 list (ideal) of polynomials to replace with
+  to replace, s2 list (ideal) of polynomials to replace with
 RETURN: int, the min degbound required to perform the substitution
 ASSUME: - basering is a Letterplace ring
 EXAMPLE: example lpSubstitute; shows examples
@@ -1156,7 +1157,7 @@ example {
 
 proc lpCalcSubstDegBounds(ideal I, ideal s1, ideal s2)
 "USAGE: lpCalcSubstDegBounds(I,s1,s2); I list (ideal) of letterplace polynomials, s1 list (ideal)
-@*  of variables to replace, s2 list (ideal) of polynomials to replace with
+  of variables to replace, s2 list (ideal) of polynomials to replace with
 RETURN: int, the min degbound required to perform all of the substitutions
 ASSUME: - basering is a Letterplace ring
 EXAMPLE: example lpSubstitute; shows examples
