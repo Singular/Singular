@@ -44,8 +44,6 @@
 #define SBA_PRINT_SIZE_SYZ                  0
 #define SBA_PRINT_PRODUCT_CRITERION         0
 
-#define COEF_NEGATION_CHECK 1
-
 // counts sba's reduction steps
 #if SBA_PRINT_REDUCTION_STEPS
 long sba_reduction_steps;
@@ -91,6 +89,7 @@ int kFindDivisibleByInTIntegers(const kStrategy strat, const LObject* L, const i
 
   const TSet T=strat->T;
   const unsigned long* sevT=strat->sevT;
+  number rest, mult;
   if (L->p!=NULL)
   {
     const ring r=currRing;
@@ -98,26 +97,15 @@ int kFindDivisibleByInTIntegers(const kStrategy strat, const LObject* L, const i
 
     pAssume(~not_sev == p_GetShortExpVector(p, r));
 
-#if COEF_NEGATION_CHECK
-    number a = n_Copy(pGetCoeff(p), currRing->cf);
-    n_InpNeg(a, currRing->cf);
-#endif
     loop
     {
       if (j > strat->tl) return -1;
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
       {
-#if COEF_NEGATION_CHECK
-        if( n_DivBy(a, pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(a, pGetCoeff(T[j].p), r->cf)) {
-
-          nDelete(&a);
-#else
-        if( n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf)) {
-#endif
+        mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p),
+            &rest, currRing->cf);
+        if (!n_IsZero(mult, currRing)) {
           return j;
         }
       }
@@ -125,16 +113,9 @@ int kFindDivisibleByInTIntegers(const kStrategy strat, const LObject* L, const i
       if (!(sevT[j] & not_sev) &&
           p_LmDivisibleBy(T[j].p, p, r))
       {
-#if COEF_NEGATION_CHECK
-        if( n_DivBy(a, pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(a, pGetCoeff(T[j].p), r->cf)) {
-
-          nDelete(&a);
-#else
-        if( n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf)) {
-#endif
+        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p),
+            &rest, currRing->cf);
+        if (!n_IsZero(mult, currRing)) {
           return j;
         }
       }
@@ -146,10 +127,6 @@ int kFindDivisibleByInTIntegers(const kStrategy strat, const LObject* L, const i
   {
     const poly p=L->t_p;
     const ring r=strat->tailRing;
-#if COEF_NEGATION_CHECK
-    number a = n_Copy(pGetCoeff(p), currRing->cf);
-    n_InpNeg(a, currRing->cf);
-#endif
     loop
     {
       if (j > strat->tl) return -1;
@@ -157,15 +134,9 @@ int kFindDivisibleByInTIntegers(const kStrategy strat, const LObject* L, const i
       if (p_LmShortDivisibleBy(T[j].t_p, sevT[j],
             p, not_sev, r))
       {
-#if COEF_NEGATION_CHECK
-        if( n_DivBy(a, pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(a, pGetCoeff(T[j].p), r->cf)) {
-          nDelete(&a);
-#else
-        if( n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf)) {
-#endif
+        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p),
+            &rest, currRing->cf);
+        if (!n_IsZero(mult, currRing)) {
           return j;
         }
       }
@@ -173,15 +144,9 @@ int kFindDivisibleByInTIntegers(const kStrategy strat, const LObject* L, const i
       if (!(sevT[j] & not_sev) &&
           p_LmDivisibleBy(T[j].t_p, p, r))
       {
-#if COEF_NEGATION_CHECK
-        if( n_DivBy(a, pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(a, pGetCoeff(T[j].p), r->cf)) {
-          nDelete(&a);
-#else
-        if( n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r->cf) ||
-            n_Greater(pGetCoeff(p), pGetCoeff(T[j].p), r->cf)) {
-#endif
+        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p),
+            &rest, currRing->cf);
+        if (!n_IsZero(mult, currRing)) {
           return j;
         }
       }
