@@ -787,6 +787,7 @@ static proc ivdivides(list G, intvec iv) {
       }
     }
   }
+  return (0);
 }
 
 // TODO
