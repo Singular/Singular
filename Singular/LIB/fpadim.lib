@@ -2360,10 +2360,118 @@ proc ivMaxIdeal(int l, int lonly)
   }
   return (words);
 }
+example {
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(a,b,c),dp;
+  def R = makeLetterplaceRing(7); setring R;
+  ivMaxIdeal(1,0);
+  ivMaxIdeal(2,0);
+  ivMaxIdeal(2,1);
+  ivMaxIdeal(4,0);
+  ivMaxIdeal(4,1);
+}
 
 proc lpMaxIdeal(int d, donly)
 {
   ivL2lpI(ivMaxIdeal(d, donly));
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(a,b,c),dp;
+  def R = makeLetterplaceRing(7); setring R;
+  lpMaxIdeal(1,0);
+  lpMaxIdeal(2,0);
+  lpMaxIdeal(2,1);
+  lpMaxIdeal(4,0);
+  lpMaxIdeal(4,1);
+}
+
+proc monomialBasis(int d, int donly, ideal J)
+{
+  /*
+  TODO: doc
+  computes a list of free monomials in a Letterplace basering R
+  of degree at most d, where d <= degree bound (uptodeg) of R
+  - the ideal J has to be a Groebner basis up; if J is nonzero, then
+  the list of monomials, not contained in LM(J) is returned
+  - if donly <>0, only monomials of degree exactly d is returned
+  */
+  /*
+  history and changelog
+  old name: maxLPideal(int d, int donly) without I
+  problem: fpadim.lib needs nonzero ideal
+  motivation: unite everything
+  new idea: in presence of J, apply sickle
+  */
+  if (size(J)==0)
+  {
+    ideal I = maxLPideal(d,donly);
+    if (!donly)
+    {
+      // append 1 as the first element
+      I = 1, I;
+    }
+    return( I );
+  }
+  int nv = attrib(basering,"uptodeg");
+  if ((d>nv) || (d<0) )
+  {
+    ERROR("incorrect degree");
+  }
+  nv = attrib(basering,"lV"); // nvars
+  // ok, Sickle misbehaves: have to remove all
+  // elts from J of degree >d
+  ideal JJ;
+  int j; int sj = size(J);
+  int cnt=0;
+  for(j=1;j<=sj;j++)
+  {
+     if (deg(J[j]) <= d)
+        {
+             cnt++;
+                 JJ[cnt]=lead(J[j]); // only LMs are needed
+                  }
+  }
+  if (cnt==0)
+  {
+    // there are no elements in J of degree <= d
+    // return free stuff
+    return( monomialBasis(d, donly, std(0)) );
+  }
+  // from here on, Ibase is not zero
+  ideal Ibase = lpMis2Base(lpSickle(JJ,d)); // the complete K-basis modulo J up to d
+  if (!donly)
+  {
+    // for not donly, give everything back
+     return(Ibase);
+  }
+  /* !donly: pick out only monomials of degree d */
+  ideal I;
+  int i; int si = size(Ibase);
+  cnt=0;
+  for(i=1;i<=si;i++)
+  {
+     if (deg(Ibase[i]) == d)
+        {
+             cnt++;
+                 I[cnt]=Ibase[i];
+                  }
+  }
+  kill Ibase;
+  return(I);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(7); setring R;
+  ideal J = x(1)*y(2)*x(3) - y(1)*x(2)*y(3);
+  option(redSB); option(redTail);
+  J = letplaceGBasis(J);
+  J;
+  monomialBasis(2,1,std(0));
+  monomialBasis(2,0,std(0));
+  monomialBasis(3,1,J);
+  monomialBasis(3,0,J);
 }
 
 
