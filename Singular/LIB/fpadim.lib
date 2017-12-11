@@ -2331,6 +2331,42 @@ example
   sickle(G,0,0,1); // computes Hilbert series only
 }
 
+proc ivMaxIdeal(int l, int lonly)
+{
+  if (l < 1) {
+    ERROR("l must be greater 0")
+  }
+  int lV = attrib(basering, "lV"); // variable count
+  list prevWords;
+  if (l > 1) {
+    prevWords = ivMaxIdeal(l - 1, lonly);
+  } else {
+    prevWords = 0;
+  }
+  list words;
+  int i,j;
+  for (j = 1; j <= size(prevWords); j++) {
+    if (size(prevWords[j]) >= l - 1) {
+      for (i = 1; i <= lV; i++) {
+        intvec word = prevWords[j];
+        word[l] = i;
+        words = insert(words, word);
+        kill word;
+      }
+    }
+  }
+  if (!lonly && l > 1) {
+    words = prevWords + words;
+  }
+  return (words);
+}
+
+proc lpMaxIdeal(int d, donly)
+{
+  ivL2lpI(ivMaxIdeal(d, donly));
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 /* vl: stuff for conversion to Magma and to SD
 todo: doc, example
