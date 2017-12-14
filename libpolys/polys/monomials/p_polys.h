@@ -1469,13 +1469,22 @@ static inline void p_GetExpV(poly p, int *ev, const ring r)
 
   ev[0] = p_GetComp(p, r);
 }
-static inline void p_GetExpVL(poly p, long *ev, const ring r)
+static inline void p_GetExpVL(poly p, int64 *ev, const ring r)
 {
   p_LmCheckPolyRing1(p, r);
   for (unsigned j = r->N; j!=0; j--)
       ev[j-1] = p_GetExp(p, j, r);
 }
 static inline void p_SetExpV(poly p, int *ev, const ring r)
+{
+  p_LmCheckPolyRing1(p, r);
+  for (unsigned j = r->N; j!=0; j--)
+      p_SetExp(p, j, ev[j], r);
+
+  if(ev[0]!=0) p_SetComp(p, ev[0],r);
+  p_Setm(p, r);
+}
+static inline void p_SetExpVL(poly p, int64 *ev, const ring r)
 {
   p_LmCheckPolyRing1(p, r);
   for (unsigned j = r->N; j!=0; j--)
