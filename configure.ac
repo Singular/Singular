@@ -33,10 +33,10 @@ SING_CHECK_SET_ARGS()
 AC_PROG_CPP
 AC_PROG_CXXCPP
 AM_PROG_CC_C_O
+AM_PROG_AR
 ### AM_PROG_LEX
 AC_PROG_LN_S
 AC_PROG_INSTALL
-m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
 AC_HEADER_STDC
 AC_CHECK_HEADERS(unistd.h iostream.h sys/time.h sys/times.h asm/sigcontext.h)

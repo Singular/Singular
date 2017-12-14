@@ -16,11 +16,12 @@ AM_SANITY_CHECK
 # Add pre'prefixed config
 AX_PREFIX_CONFIG_H([singular_resourcesconfig.h],[],[_config.h])
 
+AM_PROG_AR
+
 SING_RESET_FLAGS()
 SING_CHECK_SET_ARGS()
 
 AM_PROG_CC_C_O
-# AM_PROG_AR
 
 AC_PROG_LN_S
 AC_PROG_INSTALL
