@@ -9333,6 +9333,7 @@ void enterSBba (LObject &p,int atS,kStrategy strat, int atR)
   }
 
   /*- save result -*/
+  p_Test(p.p,currRing);
   strat->S[atS] = p.p;
   if (strat->honey) strat->ecartS[atS] = p.ecart;
   if (p.sev == 0)
@@ -12742,10 +12743,16 @@ void enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV)
     qq      = p; //qq.Copy();
     qq.p    = NULL;
     qq.max_exp  = NULL;
-    qq.t_p = p_LPshift(p_Copy(p.t_p,strat->tailRing), i, uptodeg, lV, strat->tailRing); // direct shift
+    if (p.t_p!=NULL)
+      qq.t_p = p_LPshift(p_Copy(p.t_p,strat->tailRing), i, uptodeg, lV, strat->tailRing); // direct shift
+    else
+      qq.p = p_LPshift(p_Copy(p.p,currRing), i, uptodeg, lV, currRing); // direct shift
     qq.GetP();
     // update q.sev
     qq.sev = pGetShortExpVector(qq.p);
+    #ifdef KTEST
+    kTest_T(&qq, strat->tailRing, -1, 'L');
+    #endif
     /* enter it into T, first el't is with the shift 0 */
     // compute the position for qq
     atT = strat->posInT(strat->T, strat->tl, qq);
