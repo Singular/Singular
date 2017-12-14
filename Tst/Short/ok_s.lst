@@ -90,6 +90,7 @@ fermat_gcd_mod_2var
 fermat_gcd_mod_3var
 fermat_gcd_mod_4var
 ffmodstd_s
+fres_s
 gcd2test
 gcd3primtest
 gcd3test
