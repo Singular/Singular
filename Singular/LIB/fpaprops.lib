@@ -57,7 +57,8 @@ ASSUME: - basering is a Letterplace ring
     if (leadmonom(G[i]) == 1) {
       ERROR("noetherianity not defined for 0-ring")
     }
-  }
+    kill d;
+  } kill i;
   // if longest word has length 1 we handle it as a special case
   if (l == 1) {
     int n = attrib(basering, "lV"); // variable count
@@ -102,7 +103,8 @@ ASSUME: - basering is a Letterplace ring
       inFlag = 1;
       outFlag = 2;
     }
-  }
+    kill inOutFlags;
+  } kill v;
   return (3 - inFlag - outFlag);
 }
 example {
@@ -139,7 +141,7 @@ static proc inOrOutCommingEdgeInCycle(intmat G, int v, intvec visited, intvec pa
             if (G[u,v] && u != v) {
               inFlag = 1;
             }
-          }
+          } kill u;
         } else {
           for (int i = size(path); i >= 1; i--) { // for each vertex in the path
             // check for neighbors not directly next or prev in cycle
@@ -166,11 +168,11 @@ static proc inOrOutCommingEdgeInCycle(intmat G, int v, intvec visited, intvec pa
                   }
                 }
               }
-            }
+            } kill u;
             if (path[i] == w) {
               break;
             }
-          }
+          } kill i;
         }
       } else {
         int inOutFlags = inOrOutCommingEdgeInCycle(G, w, visited, path);
@@ -184,9 +186,10 @@ static proc inOrOutCommingEdgeInCycle(intmat G, int v, intvec visited, intvec pa
           inFlag = 1;
           outFlag = 2;
         }
+        kill inOutFlags;
       }
     }
-  }
+  } kill w;
 
   return (inFlag + outFlag);
 }
@@ -215,7 +218,8 @@ ASSUME: - basering is a Letterplace ring
     if (leadmonom(G[i]) == 1) {
       ERROR("primeness not defined for 0-ring")
     }
-  }
+    kill d;
+  } kill i;
   // if longest word has length 1 we handle it as a special case
   if (l == 1) {
     return(1);
@@ -240,7 +244,7 @@ ASSUME: - basering is a Letterplace ring
     if (!isCyclicInUfGraph(UG, LV, SW[i])) {
       return (0);
     }
-  }
+  } kill i;
 
   return (1);
 }
@@ -270,7 +274,7 @@ static proc isCyclicInUfGraph(intmat UG, list LV, intvec u)
           return (1);
         }
       }
-    }
+    } kill i;
   } else { // size(u) > l - 1
     int m = s - l + 1;
 
@@ -314,7 +318,8 @@ ASSUME: - basering is a Letterplace ring
     if (leadmonom(G[i]) == 1) {
       ERROR("primeness not defined for 0-ring")
     }
-  }
+    kill d;
+  } kill i;
   // if longest word has length 1 we handle it as a special case
   if (l == 1) {
     return(1);
@@ -335,8 +340,8 @@ ASSUME: - basering is a Letterplace ring
       if (!existsRoute(UG, i, j)) {
         return (0);
       }
-    }
-  }
+    } kill j;
+  } kill i;
 
   // 2) any standard word with length < l-1 is a suffix of a vertex
   list SW = ivStandardWordsUpToLength(LG, maxDeg(G) - 2); // < maxDeg - 1
@@ -352,7 +357,7 @@ ASSUME: - basering is a Letterplace ring
         break;
       }
     }
-  }
+  } kill i;
 
   return (1);
 }
@@ -392,78 +397,16 @@ routes always have at least one edge
         return (1);
       }
     }
-  }
+  } kill i;
 
   return (0);
-}
-
-static proc lpUfGkDim(ideal G)
-{
-  G = lead(G);
-  G = simplify(G, 2+4+8);
-
-  // check special case 1
-  int l = 0;
-  for (int i = 1; i <= size(G); i++) {
-    // find the max degree in G
-    int d = deg(G[i]);
-    if (d > l) {
-      l = d;
-    }
-
-    // also if G is the whole ring return minus infinity
-    if (leadmonom(G[i]) == 1) {
-      ERROR("Gk-Dim not defined for 0-ring")
-    }
-  }
-  // if longest word has length 1 we handle it as a special case
-  if (l == 1) {
-    int n = attrib(basering, "lV"); // variable count
-    int k = size(G);
-    if (k == n) { // V = {1} no edges
-      return(0);
-    }
-    if (k == n-1) { // V = {1} with loop
-      return(1);
-    }
-    if (k <= n-2) { // V = {1} with more than one loop
-      return(-1);
-    }
-  }
-
-  int t = rtimer; // DEBUG
-  intmat UG = lpUfGraph(G);
-  printf("lpUfGraph took %p", rtimer - t); // DEBUG
-
-  // check special case 2
-  intmat zero[nrows(UG)][ncols(UG)];
-  if (UG == zero) {
-    return (0);
-  }
-
-  // check special case 3
-  UG = topologicalSort(UG);
-
-  if (imIsUpRightTriangle(UG)) {
-    UG = eliminateZerosUpTriangle(UG);
-    if (ncols(UG) == 0 || nrows(UG) == 0) { // when the diagonal was zero
-      return (0)
-    }
-    return(UfGraphURTNZDGrowth(UG));
-  }
-
-  // otherwise count cycles in the Ufnarovskij Graph
-  int t = rtimer; // DEBUG
-  int gkdim = UfGraphGrowth(UG);
-  printf("UfGraphGrowth took %p", rtimer - t); // DEBUG
-  return(gkdim);
 }
 
 static proc UfGraphURTNZDGrowth(intmat UG) {
   // URTNZD = upper right triangle non zero diagonal
   for (int i = 1; i <= ncols(UG); i++) {
     UG[i,i] = 0; // remove all loops
-  }
+  } kill i;
   intmat UGk = UG;
   intmat zero[nrows(UGk)][ncols(UGk)];
   int k = 1;
@@ -478,8 +421,8 @@ static proc imIsUpRightTriangle(intmat M) {
   for (int i = 1; i <= nrows(M); i++) {
     for (int j = 1; j < i; j++) {
       if(M[i,j] != 0) { return (0); }
-    }
-  }
+    } kill j;
+  } kill i;
   return (1);
 }
 
@@ -493,12 +436,12 @@ static proc eliminateZerosUpTriangle(intmat G) {
             if (G[i,k] == 1) {
               G[j,k] = G[i,k]; // give j all edges from i
             }
-          }
+          } kill k;
         }
-      }
+      } kill j;
       G = imDelRowCol(G,i,i); // remove vertex i
     }
-  }
+  } kill i;
   return (G);
 }
 
@@ -515,9 +458,10 @@ static proc imDelRowCol(intmat M, int row, int col) {
         if (i > row) { newi = i - 1; }
         if (j > col) { newj = j - 1; }
         Mdel[newi,newj] = M[i,j];
+        kill newi; kill newj;
       }
-    }
-  }
+    } kill j;
+  } kill i;
   return (Mdel);
 }
 
@@ -534,7 +478,7 @@ static proc topologicalSort(intmat G) {
         if (k != j && G[k,j] == 1) {
           incoming = 1;
         }
-      }
+      } kill k;
       if (incoming == 0) {
         v = j;
         break;
@@ -544,14 +488,16 @@ static proc topologicalSort(intmat G) {
           return (G);
         }
       }
-    }
+      kill incoming;
+    } kill j;
 
     // swap v and i
     if (v != i) {
       G = imPermcol(G, v, i);
       G = imPermrow(G, v, i);
     }
-  }
+    kill v;
+  } kill i;
   return (G);
 }
 
@@ -593,7 +539,8 @@ static proc UfGraphGrowth(intmat UG)
     if (cycleCount > maxCycleCount) {
       maxCycleCount = cycleCount;
     }
-  }
+    kill cycleCount;
+  } kill v;
   return(maxCycleCount);
 }
 
@@ -629,7 +576,7 @@ ASSUME: Basering is a Letterplace ring
           if (path[j] == w) {
             break;
           }
-        }
+        } kill j;
 
         // 2. otherwise cycles++
         for (int j = size(path); j >= 1; j--) {
@@ -644,7 +591,7 @@ ASSUME: Basering is a Letterplace ring
           if (path[j] == w) {
             break;
           }
-        }
+        } kill j;
 
         // 3. countCycles() on all these vertices
         int maxCycleCount = 0;
@@ -659,10 +606,12 @@ ASSUME: Basering is a Letterplace ring
           if (path[j] == w) {
             break;
           }
-        }
+          kill cycleCount;
+        } kill j;
         if (maxCycleCount >= cycles) {
           cycles = maxCycleCount + 1;
         }
+        kill maxCycleCount;
       } else {
         int cycleCount = countCycles(G, w, visited, cyclic, path);
         if (cycleCount == -1) {
@@ -671,9 +620,10 @@ ASSUME: Basering is a Letterplace ring
         if (cycleCount > cycles) {
           cycles = cycleCount;
         }
+        kill cycleCount;
       }
     }
-  }
+  } kill w;
   // printf("Path: %s countCycles: %s", path, cycles); // DEBUG
   return(cycles);
 }
@@ -712,8 +662,9 @@ ASSUME: - basering is a Letterplace ring
       if (v_overlap == w_overlap && !ivdivides(LG, vw)) {
         UG[i,j] = 1;
       }
-    }
-  }
+      kill v; kill w; kill v_overlap; kill w_overlap; kill vw;
+    } kill j;
+  } kill i;
   if (size(#) > 0) {
     if (typeof(#[1]) == "int") {
       if (#[1] == 1) {
@@ -734,7 +685,8 @@ static proc maxDeg(ideal G)
     if (d > l) {
       l = d;
     }
-  }
+    kill d;
+  } kill i;
   return (l);
 }
 
@@ -760,8 +712,9 @@ static proc ivStandardWords(list G, int length)
       if (!ivdivides(G, word)) {
         words = insert(words, word);
       }
-    }
-  }
+      kill word;
+    } kill j;
+  } kill i;
   return (words);
 }
 
@@ -773,7 +726,7 @@ static proc ivStandardWordsUpToLength(list G, int length)
   if (size(words) == 0) {return (words)}
   for (int i = 1; i <= length; i++) {
     words = words + ivStandardWords(G, i);
-  }
+  } kill i;
   return (words);
 }
 
@@ -786,35 +739,73 @@ static proc ivdivides(list G, intvec iv) {
         return (0);
       }
     }
-  }
+  } kill k;
   return (0);
 }
 
-// TODO
-proc lpGkDim(ideal G, list#)
-"USAGE: lpGkDim(G); G an ideal in a letterplace ring, method an
-       optional integer. method = 0 uses the Ufnarovskij Graph
-       and method = 1 uses the Graph of normal words to determine
-       the Gelfand Kirillov dimension
+proc lpGkDim(ideal G)
+"USAGE: lpGkDim(G); G an ideal in a letterplace ring
 RETURN: int
 PURPOSE: Determines the Gelfand Kirillov dimension of A/<G>
-      -1 means it is positive infinite
+@*       -1 means it is positive infinite
 ASSUME: - basering is a Letterplace ring
-- G is a Groebner basis
+@*      - G is a Groebner basis
 "
 {
-  int method = 0;
-  if (size(#) > 0) {
-    if (typeof(#[1])=="int") {
-      method = #[1];
+  G = lead(G);
+  G = simplify(G, 2+4+8);
+
+  // check special case 1
+  int l = 0;
+  for (int i = 1; i <= size(G); i++) {
+    // find the max degree in G
+    int d = deg(G[i]);
+    if (d > l) {
+      l = d;
+    }
+
+    // also if G is the whole ring return minus infinity
+    if (leadmonom(G[i]) == 1) {
+      ERROR("Gk-Dim not defined for 0-ring")
+    }
+    kill d;
+  } kill i;
+  // if longest word has length 1 we handle it as a special case
+  if (l == 1) {
+    int n = attrib(basering, "lV"); // variable count
+    int k = size(G);
+    if (k == n) { // V = {1} no edges
+      return(0);
+    }
+    if (k == n-1) { // V = {1} with loop
+      return(1);
+    }
+    if (k <= n-2) { // V = {1} with more than one loop
+      return(-1);
     }
   }
 
-  if (method == 0) {
-    return (lpUfGkDim(G));
-  } else {
-    return (lpNorGkDim(G));
+  intmat UG = lpUfGraph(G);
+
+  // check special case 2
+  intmat zero[nrows(UG)][ncols(UG)];
+  if (UG == zero) {
+    return (0);
   }
+
+  // check special case 3
+  UG = topologicalSort(UG);
+
+  if (imIsUpRightTriangle(UG)) {
+    UG = eliminateZerosUpTriangle(UG);
+    if (ncols(UG) == 0 || nrows(UG) == 0) { // when the diagonal was zero
+      return (0)
+    }
+    return(UfGraphURTNZDGrowth(UG));
+  }
+
+  // otherwise count cycles in the Ufnarovskij Graph
+  return(UfGraphGrowth(UG));
 }
 example
 {
@@ -850,13 +841,13 @@ NOTE: if I = LM(I), then the global dimension is equal the Gelfand
     if (ord(G[i]) < 2) { // single variable in LM
       G1 = insertGenerator(G1,G[i]);
     }
-  }
+  } kill i;
   G1 = simplify(G1,2); // remove zero generators
 
   // G = NF(G,G1)
   for (int i = 1; i <= ncols(G); i++) { // do not use size() here
     G[i] = lpNF(G[i],G1);
-  }
+  } kill i;
   G = simplify(G,2); // remove zero generators
 
   // delete variables in LM(G1) from the ring
@@ -882,14 +873,14 @@ NOTE: if I = LM(I), then the global dimension is equal the Gelfand
       break;
     } else {
       if (i == size(G)) { // if last iteration
-        print("Using gk dim"); // DEBUG
         int gkDim = lpGkDim(G);
         if (gkDim >= 0) {
           return (gkDim);
         }
+        kill gkDim;
       }
     }
-  }
+  } kill i;
 
   intmat GNC = lpGraphOfNChains(G);
 
@@ -930,7 +921,7 @@ static proc imHasLoops(intmat A) {
     if (A[i,i] == 1) {
       return (1);
     }
-  }
+  } kill i;
   return (0);
 }
 
@@ -943,7 +934,7 @@ static proc lpGraphOfNChains(ideal G) // G must be reduced
   list V;
   for (int i = 0; i <= n; i++) {
     V[i+1] = i; // add 1 and all variables
-  }
+  } kill i;
   for (int i = 1; i <= size(LG); i++) {
     intvec u = LG[i];
     for (int j = 2; j <= size(u); j++) {
@@ -951,15 +942,17 @@ static proc lpGraphOfNChains(ideal G) // G must be reduced
       if (!contains(V, v)) {
         V = insert(V, v, size(V)); // add subword j..size
       }
-    }
-  }
+      kill v;
+    } kill j;
+    kill u;
+  } kill i;
   int nV = size(V);
   intmat GNC[nV][nV]; // graph of n-chains
 
   // for vertex 1
   for (int i = 2; i <= n + 1; i++) {
     GNC[1,i] = 1; // 1 has an edge to all variables
-  }
+  } kill i;
 
   // for the other vertices
   for (int i = 2; i <= nV; i++) {
@@ -983,10 +976,11 @@ static proc lpGraphOfNChains(ideal G) // G must be reduced
               break;
             }
           }
-        }
+        } kill k;
       }
-    }
-  }
+      kill uv;
+    } kill j;
+  } kill i;
 
   return(GNC);
 }
@@ -997,7 +991,7 @@ static proc contains(list L, def item)
     if (L[i] == item) {
       return (1);
     }
-  }
+  } kill i;
   return (0);
 }
 
@@ -1047,9 +1041,11 @@ EXAMPLE: example lpSubstitute; shows examples
         fis = lpMult(fis, lpNF(iv2lp(varindex),G));
       }
       /*fis = lpNF(fis,G);*/
-    }
+      kill varindex; kill subindex;
+    } kill j;
+    kill fis; kill ivfi;
     fs = fs + fis;
-  }
+  } kill i;
   fs = lpNF(fs, G);
   return (fs);
 }
@@ -1106,7 +1102,7 @@ static proc lpIndexOf(ideal I, poly p) {
     if (I[i] == p) {
       return (i);
     }
-  }
+  } kill i;
   return (-1);
 }
 
@@ -1115,7 +1111,7 @@ static proc ivIndexOf(list L, intvec iv) {
     if (L[i] == iv) {
       return (i);
     }
-  }
+  } kill i;
   return (-1);
 }
 
@@ -1140,11 +1136,13 @@ EXAMPLE: example lpSubstitute; shows examples
       } else {
         tmpDegBound = tmpDegBound + 1;
       }
-    }
+      kill varindex; kill subindex;
+    } kill j;
     if (tmpDegBound > maxDegBound) {
       maxDegBound = tmpDegBound;
     }
-  }
+    kill ivfi; kill tmpDegBound;
+  } kill i;
 
   // increase degbound by 50% when ideal is provided
   // needed for lpNF
@@ -1171,7 +1169,8 @@ NOTE: convenience method
     if (tmpDegBound > maxDegBound) {
       maxDegBound = tmpDegBound;
     }
-  }
+    kill tmpDegBound;
+  } kill i;
   return (maxDegBound);
 }
 example {
@@ -1210,7 +1209,8 @@ checks, if a word IF is an infix of another word I
     if (IIF == IF) {
       return(1);
     }
-  }
+    kill IIF;
+  } kill i;
   return(0);
 }
 
@@ -1225,7 +1225,7 @@ static proc lpDelVar(int index) {
   // remove frome the variable list
   for (int i = (d-1)*lV + index; i >= 1; i = i - lV) {
     LR[2] = delete(LR[2], i);
-  }
+  } kill i;
 
   // remove from a ordering
   intvec aiv = LR[3][1][2];
@@ -1248,9 +1248,9 @@ static proc lpDelVar(int index) {
             break;
           }
         }
-      }
+      } kill j;
     }
-  }
+  } kill i;
 
   def R = setLetterplaceAttributes(ring(LR),d,lV-1);
   return (R);
