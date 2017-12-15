@@ -31,6 +31,8 @@ New command:
 @itemize
 @item @code{fres}: improved version of @code{sres}: computes a (not necessarily minimal) free resolution of the input ideal/module, using Schreyer's algorithm.
 (@nref{fres},@nref{sres}).
+@end itemize
+
 
 Extended commands:
 @itemize
