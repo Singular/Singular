@@ -27,6 +27,11 @@ New syntax:
 Can only be used in procedure headings. (@nref{General command syntax}).
 @end itemize
 
+New command:
+@itemize
+@item @code{fres}: improved version of @code{sres}: computes a (not necessarily minimal) free resolution of the input ideal/module, using Schreyer's algorithm.
+(@nref{fres},@nref{sres}).
+
 Extended commands:
 @itemize
 @item pseudo ordering @code{L} allows setting of limits for exponents in polynomials (@nref{Pseudo ordering L},@nref{attrib} for maxExp)
