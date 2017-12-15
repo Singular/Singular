@@ -1321,22 +1321,6 @@ See also
      return(nres(m,i));
    }
 
-/* if( attrib(basering, "global") == 1 ) // preparations for s_res usage. in testing!
-   {
-     if (p_opt) { "using s_res";}
-     if( !defined(s_res) )
-     {
-       def @@v=option(get); option(noloadLib); option(noloadProc); LIB( "schreyer.lib" ); // for s_res
-       option(set, @@v); kill @@v;
-     }
-     resolution re = s_res(m,i);
-     if(size(#)>2)
-     {
-       re=minres(re);
-     }
-     return(re);
-   }*/
-
    if(homog(m)==1)
    {
       resolution re;

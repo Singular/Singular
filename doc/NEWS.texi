@@ -174,7 +174,7 @@ Changed libraries:
 @item Ring::addvarsTo (@nref{addvarsTo})
 @item Ring::addNvarsTo (@nref{addNvarsTo})
 @item Ring::hasAlgExtensionCoefficient (@nref{hasAlgExtensionCoefficient})
-@item Schreyer::s_res (@nref{s_res})
+@item Schreyer::s_res (@code{s_res})
 @item grobcov.lib (grobcovK) (@nref{grobcov_lib}) with new routines
    AddCons  AddConsP.
 @item normaliz.lib (for normaliz >=2.8) (@nref{normaliz_lib})
