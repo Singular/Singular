@@ -5977,7 +5977,6 @@ THEORY: @code{homogfacFirstWeyl} returns a list with all factorization of the gi
  factor of degree zero is irreducible in K[theta_1, ..., theta_n], but reducible in
  the nth Weyl algebra, the permutations of this element with the other
  entries will also be computed.
-SEE ALSO: homogfacFirstWeyl
 "{//proc HomogfacNthWeylAll
   int p=printlevel-voice+2;//for dbprint
   intvec iv11= 1:nvars(basering);
@@ -11796,7 +11795,7 @@ GENERAL ASSUMPTIONS:
    x1, ..., xn, and the second n variables do represent the d1, ..., dn.
  - We have n parameters q_1,..., q_n given.
 
-SEE ALSO: homogfacNthWeyl, homogfacFirstQWeyl, homogfacFirstQWeyl_all
+SEE ALSO: homogfacFirstQWeyl, homogfacFirstQWeyl_all
 "
 {//proc homogfacNthQWeyl_all
   int p=printlevel-voice+2;//for dbprint
