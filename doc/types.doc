@@ -722,6 +722,8 @@ ordering (see @ref{fglm})
 @item finduni
 computation of univariate polynomials lying in a zero dimensional ideal
 (see @ref{finduni})
+@item fres
+free resolution of a standard basis (see @ref{fres})
 @item groebner
 Groebner basis computation (a wrapper around @code{std,stdhilb,stdfglm},...)
 (see @ref{groebner})
@@ -2960,6 +2962,8 @@ Krull dimension of free module over the basering modulo the module of leading te
 elimination of variables (see @ref{eliminate})
 @item freemodule
 the free module of given rank (see @ref{freemodule})
+@item fres
+free resolution of a standard basis (see @ref{fres})
 @item groebner
 Groebner basis computation (a wrapper around @code{std,stdhilb,stdfglm},...)
 (see @ref{groebner})
@@ -3862,6 +3866,8 @@ See @ref{Type conversion and casting}.
 @table @code
 @item betti
 Betti numbers of a resolution (see @ref{betti})
+@item fres
+free resolution of a standard basis (see @ref{fres})
 @item lres
 free resolution (see @ref{lres})
 @item minres
@@ -4737,14 +4743,14 @@ var, variables, varstr, vdim, waitfirst, waitall, weight}
 
 @item functions with 2 arguments:
 @code{attrib, betti, bracket, chinrem, coeffs, contract, deg, delete, diff, dim, extgcd,
-eliminate, exportto, facstd, factorize, farey, fetch, fglm, fglmquot, find, frwalk, gcd,
+eliminate, exportto, facstd, factorize, farey, fetch, fglm, fglmquot, find, fres, frwalk, gcd,
 hilb, homog, hres, imap, importfrom, indepSet, insert, interpolation, janet, kbase, kernel,
 killattrib, koszul, lift, liftstd, load, lres, modulo, mpresmat, mres, newstruct, nc_algebra,
 nres, oppose, parstr, primefactors, quotient, random, rank, read, sba, simplify, sqrfree,
 sres, varstr, waitfirst, waitall, wedge}
 
 @item functions with 3 arguments:
-@code{attrib, bareiss, coeffs, eliminate, find, frwalk, hilb, homog, insert, koszul,
+@code{attrib, bareiss, coeffs, eliminate, find, fres, frwalk, hilb, homog, insert, koszul,
 laguerre, lift, liftstd, newstruct, preimage, random, resultant, sba, vandermonde}
 
 @item functions with  variable number of arguments arguments (number_of_args:4):
