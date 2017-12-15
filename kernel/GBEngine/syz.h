@@ -98,6 +98,8 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights = NULL);
 syStrategy syHilb(ideal arg,int * length);
 syStrategy syKosz(ideal arg,int * length);
 
+syStrategy syFrank(const ideal arg, const int length, const char *method);
+
 void syKillComputation(syStrategy syzstr, ring r=currRing);
 intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim=TRUE,int * row_shift=NULL, intvec *weights=NULL);
 

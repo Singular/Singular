@@ -78,6 +78,7 @@ enum {
   FIND_CMD,
   FACSTD_CMD,
   FMD_CMD,
+  FRES_CMD,
   FWALK_CMD,
   FGLM_CMD,
   FGLMQUOT_CMD,

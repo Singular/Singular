@@ -830,13 +830,6 @@ poly tree_add(poly* a,int begin, int end,ring r)
   }
 }
 */
-#ifdef __GNUC__
-#define LIKELY(expression) (__builtin_expect(!!(expression), 1))
-#define UNLIKELY(expression) (__builtin_expect(!!(expression), 0))
-#else
-#define LIKELY(expression) (expression)
-#define UNLIKELY(expression) (expression)
-#endif
 
 template<class number_type> SparseRow<number_type>* convert_to_sparse_row(number_type* temp_array,int temp_size,int non_zeros){
 SparseRow<number_type>* res=new SparseRow<number_type>(non_zeros);
