@@ -967,25 +967,26 @@ NOTE: if h is given and nonzero, the pure homogeneous letterplace block
 EXAMPLE: example makeLetterplaceRing; shows examples
 "
 {
-  int use_old_mlr = 0;
+  int alternativeVersion = 0;
   if ( size(#)>0 )
   {
-    if (( typeof(#[1]) == "int" ) || ( typeof(#[1]) == "poly" ) )
+    if (typeof(#[1]) == "int")
     {
-      poly x = poly(#[1]);
-      if (x!=0)
-      {
-        use_old_mlr = 1;
-      }
+      alternativeVersion = #[1];
     }
   }
-  if (use_old_mlr)
+  if (alternativeVersion == 1)
   {
     def @A = makeLetterplaceRing1(d);
   }
-  else
-  {
-    def @A = makeLetterplaceRing2(d);
+  else { 
+    if (alternativeVersion == 2)
+    {
+      def @A = makeLetterplaceRing2(d);
+    }
+    else {
+      def @A = makeLetterplaceRing4(d);
+    }
   }
   return(@A);
 }
@@ -1184,6 +1185,74 @@ EXAMPLE: example makeLetterplaceRing2; shows examples
   def @R = ring(L);
   //  setring @R;
   //  int uptodeg = d; int lV = nvars(basering); // were defined before
+  def @@R = setLetterplaceAttributes(@R,uptodeg,lV);
+  return (@@R);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),(dp(1),dp(2));
+  def A = makeLetterplaceRing2(2);
+  setring A;
+  A;
+  attrib(A,"isLetterplaceRing");
+  attrib(A,"uptodeg");  // degree bound
+  attrib(A,"lV"); // number of variables in the main block
+}
+
+static proc makeLetterplaceRing4(int d)
+"USAGE:  makeLetterplaceRing2(d); d an integer
+RETURN:  ring
+PURPOSE: creates a Letterplace ring with a Dp ordering, suitable for
+@* the use of non-homogeneous letterplace
+NOTE: the matrix for the ordering looks as follows: first row is 1,1,...,1
+EXAMPLE: example makeLetterplaceRing2; shows examples
+"
+{
+
+  // ToDo future: inherit positive weights in the orig ring
+  // complain on nonpositive ones
+
+  // d = up to degree, will be shifted to d+1
+  if (d<1) {"bad d"; return(0);}
+
+  int uptodeg = d; int lV = nvars(basering);
+
+  int ppl = printlevel-voice+2;
+  string err = "";
+
+  int i,j,s;
+  def save = basering;
+  int D = d-1;
+  list LR  = ringlist(save);
+  list L, tmp, tmp2, tmp3;
+  L[1] = LR[1]; // ground field
+  L[4] = LR[4]; // quotient ideal
+  tmp  = LR[2]; // varnames
+  s = size(LR[2]);
+  for (i=1; i<=D; i++)
+  {
+    for (j=1; j<=s; j++)
+    {
+      tmp[i*s+j] = string(tmp[j])+"("+string(i+1)+")";
+    }
+  }
+  for (i=1; i<=s; i++)
+  {
+    tmp[i] = string(tmp[i])+"("+string(1)+")";
+  }
+  L[2] = tmp;
+  list OrigNames = LR[2];
+
+  s = size(LR[3]);
+  list ordering;
+  ordering[1] = list("Dp",intvec(1: int(d*lV)));
+  ordering[2] = LR[3][s]; // module ord to place at the very end
+  LR[3] = ordering;
+
+  L[3] = LR[3];
+  attrib(L,"maxExp",1);
+  def @R = ring(L);
   def @@R = setLetterplaceAttributes(@R,uptodeg,lV);
   return (@@R);
 }
