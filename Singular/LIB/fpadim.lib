@@ -893,9 +893,10 @@ RETURN: ideal
 PURPOSE:Transforming a list of intvecs into an ideal of Letterplace monomials
 ASSUME: - Intvec corresponds to a Letterplace monomial
 @*      - basering has to be a Letterplace ring
+NOTE:   - Assumptions will not be checked!
 EXAMPLE: example ivL2lpI; shows examples
 "
-{checkAssumptions(0,L);
+{
   int i; ideal G;
   poly p;
   for (i = 1; i <= size(L); i++)
@@ -2341,8 +2342,13 @@ proc ivMaxIdeal(int l, int lonly)
   NOTE: see also lpMaxIdeal()
   "
 {
-  if (l < 1) {
-    ERROR("l must be greater 0")
+  if (l < 0) {
+    ERROR("l must not be negative")
+  }
+  list words;
+  if (l == 0) {
+     words = 0;
+     return (words);
   }
   int lV = attrib(basering, "lV"); // variable count
   list prevWords;
@@ -2351,18 +2357,16 @@ proc ivMaxIdeal(int l, int lonly)
   } else {
     prevWords = 0;
   }
-  list words;
-  int i,j;
-  for (j = 1; j <= size(prevWords); j++) {
-    if (size(prevWords[j]) >= l - 1) {
-      for (i = 1; i <= lV; i++) {
-        intvec word = prevWords[j];
-        word[l] = i;
+  for (int i = 1; i <= size(prevWords); i++) {
+    if (size(prevWords[i]) >= l - 1) {
+      for (int j = 1; j <= lV; j++) {
+        intvec word = prevWords[i];
+        word[l] = j;
         words = insert(words, word);
         kill word;
-      }
+      } kill j;
     }
-  }
+  } kill i;
   if (!lonly && l > 1) {
     words = prevWords + words;
   }
@@ -2413,26 +2417,32 @@ proc monomialBasis(int d, int donly, ideal J)
   @*      - J is a Groebner basis
   "
 {
-  if (size(J)==0)
-  {
-    ideal I = maxLPideal(d,donly);
-    if (!donly)
-    {
-      // append 1 as the first element
-      I = 1, I;
-    }
-    return( I );
-  }
   int nv = attrib(basering,"uptodeg");
   if ((d>nv) || (d<0) )
   {
     ERROR("incorrect degree");
   }
   nv = attrib(basering,"lV"); // nvars
+  if (d==0)
+  {
+    return(ideal(1));
+  }
+  /* from now on d>=1 */
+  ideal I;
+  if (size(J)==0)
+  {
+    I = lpMaxIdeal(d,donly);
+    if (!donly)
+    {
+      // append 1 as the first element; d>=1
+      I = 1, I;
+    }
+    return( I );
+  }
   // ok, Sickle misbehaves: have to remove all
   // elts from J of degree >d
   ideal JJ;
-  int j; int sj = size(J);
+  int j; int sj = ncols(J);
   int cnt=0;
   for(j=1;j<=sj;j++)
   {
@@ -2445,20 +2455,27 @@ proc monomialBasis(int d, int donly, ideal J)
   if (cnt==0)
   {
     // there are no elements in J of degree <= d
-    // return free stuff
-    return( monomialBasis(d, donly, std(0)) );
+    // return free stuff and the 1
+    I = monomialBasis(d, donly, std(0));
+    if (!donly)
+    {
+      I = 1, I;
+    }
+    return(I);
   }
   // from here on, Ibase is not zero
   ideal Ibase = lpMis2Base(lpSickle(JJ,d)); // the complete K-basis modulo J up to d
   if (!donly)
   {
     // for not donly, give everything back
+    // sort by DP starting with smaller terms
+    Ibase = sort(Ibase,"Dp")[1];
     return(Ibase);
   }
   /* !donly: pick out only monomials of degree d */
-  ideal I;
-  int i; int si = size(Ibase);
+  int i; int si = ncols(Ibase);
   cnt=0;
+  I=0;
   for(i=1;i<=si;i++)
   {
     if (deg(Ibase[i]) == d)
