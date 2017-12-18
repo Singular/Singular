@@ -1,0 +1,780 @@
+//////////////////////////////////////////////////////////////////////////////
+version="version ncModslimgb.lib 4.1.0.0 Nov_2017 "; //$Id$
+category="Noncommutative algebras";
+info="
+LIBRARY:  ncModslimgb.lib A library for computing Groebner bases over G-algebras
+                         defined over the rationals using modular techniques.
+
+AUTHORS:    W. Decker, C. Eder, V. Levandovskyy, and Sharwan K. Tiwari
+
+REFERENCES:
+             Wolfram Decker, Christian Eder, Viktor Levandovskyy, and
+             Sharwan K. Tiwari, Modular Techniques For Noncommutative
+             Groebner Bases, https://arxiv.org/abs/1704.02852.
+
+             E. A. Arnold, Modular algorithms for computing Groebner bases.
+             J. Symb. Comp. 35, 403-419 (2003).
+
+             N. Idrees, G. Pfister, S. Steidel, Parallelization of Modular
+             Algorithms, J. Symb. Comp. 46, 672-684 (2011).
+PROCEDURES:
+          ncmodslimgb(ideal I, list #); Groebner basis of a given left ideal I
+                                        using modular methods (Chinese remainder
+                                        theorem and Farey map).
+
+";
+
+LIB "parallel.lib";
+LIB "resources.lib";
+LIB "dmod.lib";
+
+static proc mod_init()
+{
+  newstruct("idealPrimeTestId", "ideal Ideal");
+}
+
+//==========================Main Procedure===================================
+
+proc ncmodslimgb(ideal I, list #)
+"USAGE:  ncmodslimgb(I[, exactness, ncores]); I ideal, optional integers for
+         the exactness and number of cores to be used
+RETURN:  A Groebner basis of I;
+
+NOTE:    If the given algebra and ideal are graded, then the computed Groebner
+         basis will be exact. Otherwise, the result will be correct with
+         a very high probability.
+
+         If user wants to avoid the final tests then assign optional parameter 0
+         with the input ideal. To use multicores for the computation, user can
+         provide an integer to assign the number of cores he wants to use (of
+         course this integer should be <= to available number of cores in
+         the computing machine).
+
+EXAMPLE: example ncmodslimgb; shows an example
+"
+{
+  int ncores=1;      // default
+  int exactness = 1; // default
+  int sz=size(#);
+
+  if(sz>2)
+  {
+    ERROR("wrong optional parameters");
+  }
+
+  while(sz > 0)
+  {
+    if(typeof(#[sz]) == "int" && #[sz] == 0)
+    {
+      exactness = #[sz];
+    }
+    else
+    {
+      if(typeof(#[sz]) == "int" && #[sz] > 1)
+      {
+        ncores=setcores(#[sz]);
+      }
+    }
+    sz = sz-1;
+  }
+
+  def R0 = basering;
+  list rl = ringlist(R0);
+  if(rl[1][1] > 0)
+  {
+    ERROR("Characteristic of basering should be zero, basering should
+           have no parameters.");
+  }
+
+  //check the non-degenracy condition to ensure that the defined is
+  //a G-algbera
+
+  ideal ndc = ndcond();
+  if(ndc != 0)
+  {
+    ERROR("The given input is not a G-algebra");
+  }
+
+  int index = 1;
+  int nextbp=1;
+  int i,k,c;
+  int j = 1;
+  int  pTest, sizeTest;
+  bigint N;
+
+  //Initialization of number of primes to be taken
+  int n2 = 20; //number of primes to be taken first time
+
+  if(ncores > 1)
+  {
+    int a = n2 % ncores;
+    if(a>0)
+    {
+      n2 = n2 - a + ncores;
+    }
+  }
+
+  //second round onwards, number of primes to be taken,
+  //one can decide;
+  int n3 = n2;     //default
+
+  intvec opt = option(get);
+  option(redSB);
+
+  //PrimeList procedure selects suitable primes such that
+  //these primes do not divide coefficients occuring
+  //in the generating polynomials of input ideal and
+  //in the defining relations of input algebra
+
+  intvec L = PrimeList(I, n2, ncores);
+
+  list P,T1,T2,LL;
+  int sizeT1;
+  int sizeT2;
+  ideal J,K,H;
+
+  // modular algorithm steps start here
+  list arguments_farey, results_farey, argumentpar;
+
+  while(1)
+  {
+    //sequential GB computation for the selected primes
+    if(ncores == 1)
+    {
+      while(nextbp <= size(L))
+      {
+        P = ModpSlim(I, L[nextbp]);
+        T1[index] = P[1];
+        T2[index] = bigint(P[2]);
+        index++;
+        nextbp++;
+      }
+    }
+    //GB computations in parallel for the  primes
+    else
+    {
+      argumentpar = list();
+      for(i = nextbp; i <= size(L); i++)
+      {
+        argumentpar[i-nextbp+1] = list(I,L[i]);
+      }
+      P = parallelWaitAll("ModpSlim",argumentpar, 0,ncores);
+
+      for(i = 1; i <= size(P); i++)
+      {
+        T1[i+sizeT1] = P[i][1];
+        T2[i+sizeT2] = bigint(P[i][2]);
+      }
+    }
+
+    LL = DeleteUnluckyPrimes(T1,T2);
+    T1 = LL[1];
+    T2 = LL[2];
+
+    //Lifting of results via CRT
+     N = T2[1];
+     for(i = 2; i <= size(T2); i++)
+     {
+       N = N*T2[i];
+     }
+     H = chinrem(T1,T2);
+
+    //Lifting of results to Rationals via Farey map
+    //sequential lifting
+     if(ncores == 1)
+     {
+       J = farey(H,N);
+     }
+    //parallel lifting
+    else
+    {
+      for(i = size(H); i > 0; i--)
+      {
+        arguments_farey[i] = list(ideal(H[i]), N);
+      }
+      results_farey = parallelWaitAll("farey", arguments_farey, 0, ncores);
+      for(i = size(H); i > 0; i--)
+      {
+        J[i] = results_farey[i][1];
+      }
+    }
+
+    //Verification steps
+    pTest = PTestGB(I,J,L,ncores);
+    if(pTest)
+    {
+      attrib(J,"isSB",1);
+      if(exactness == 0)
+      {
+        option(set, opt);
+        return(J);
+      }
+      if(exactness == 1)
+      {
+        //sizeTest = 1 - IsIncluded(I,J,ncores);
+        sizeTest = 1 - IsIncludedseq(I,J);
+        if(sizeTest == 0)
+        {
+          K = slimgb(J);
+          if(size(reduce(K,J)) == 0)
+          {
+            option(set, opt);
+            return(J);
+          }
+        }
+      }
+    }
+   // If, J is not Groebner basis of I
+   // compute for more number of primes
+    T1 = H;
+    sizeT1=size(T1);
+    T2 = N;
+    sizeT2=size(T2);
+    index = 2;
+    nextbp = size(L) + 1;
+    L = PrimeList(I,n3,L,ncores);
+  }
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  def r = reiffen(3,4);
+  setring r;
+  def A = Sannfs(RC);
+  setring A;
+  ideal bs = LD, imap(r,RC);
+  ideal I=ncmodslimgb(bs);
+
+  ring r = 0,(x,y,z),Dp;
+  poly F = x^3+y^3+z^3;
+  def A  = Sannfs(F);
+  setring A;
+  ideal I=LD,imap(r,F) ;
+  ideal J=ncmodslimgb(I);
+}
+
+static proc PrimeList(ideal I, int n, list #)
+"USAGE:  PrimeList(I,n[,ncores]); ( resp. PrimeList(I,n[,L,ncores]); ) I ideal,
+         n an integer
+RETURN:  n number of primes <= 2147483647 such that these primes do not divide
+         any coefficient of any generating polynomial of I.
+EXAMPLE: example PrimeList; shows an example
+{
+  intvec L;
+  int i,p;
+  int ncores = 1;
+
+ //Initialize optional parameter ncores
+  if(size(#) > 0)
+  {
+    if(size(#) == 1)
+    {
+      if(typeof(#[1]) == "int")
+      {
+        ncores = #[1];
+        # = list();
+      }
+    }
+    else
+    {
+      ncores = #[2];
+    }
+  }
+  if(size(#) == 0)
+  {
+    p = 2147483647;
+
+    //largest prime which can be represented as an @code{int} in Singular
+    while(!PrimeTestId(I,p) || !PrimeTestCommutatorRel(p))
+    {
+      p = prime(p-1);
+      if(p == 2)
+      {
+        ERROR("no more primes");
+      }
+    }
+    L[1] = p;
+  }
+  else
+  {
+    L = #[1];
+    p = prime(L[size(L)]-1);
+    while(!PrimeTestId(I,p) || !PrimeTestCommutatorRel(p))
+    {
+      p = prime(p-1);
+      if(p == 2)
+      {
+        ERROR("no more primes");
+      }
+    }
+    L[size(L)+1] = p;
+  }
+  if(p == 2)
+  {
+    ERROR("no more primes");
+  }
+
+ //sequential selection of remaining n-1  suitable primes
+  if(ncores == 1)
+  {
+    for(i = 2; i <= n; i++)
+    {
+      p = prime(p-1);
+      while(!PrimeTestId(I,p) || !PrimeTestCommutatorRel(p))
+      {
+        p = prime(p-1);
+        if(p == 2)
+        {
+          ERROR("no more primes");
+        }
+      }
+      L[size(L)+1] = p;
+    }
+  }
+ //parallel selection of remaining n-1 suitable primes
+  else
+  {
+    int neededSize = size(L)+n-1;;
+    list parallelResults;
+    list parallelResults2;
+    list arguments;
+    list arguments2;
+    int neededPrimes = neededSize-size(L);
+    idealPrimeTestId Id;
+    Id.Ideal = I;
+    export(Id);
+    while(neededPrimes > 0)
+    {
+      arguments = list();
+      for(i = ((neededPrimes div ncores)+1-(neededPrimes%ncores == 0)) *ncores;
+                                                                   i > 0; i--)
+      {
+        p = prime(p-1);
+        if(p == 2)
+        {
+          ERROR("no more primes");
+        }
+          arguments[i] = list("Id", p);
+          arguments2[i] = list(p);
+      }
+      parallelResults = parallelWaitAll("PrimeTestId", arguments, 0, ncores);
+
+      //check that primes are suitable for commutator relations
+      parallelResults2 = parallelWaitAll("PrimeTestCommutatorRel", arguments2,
+                                                                     0, ncores);
+
+      for(i = size(arguments); i > 0; i--)
+      {
+        if(parallelResults[i] && parallelResults2[i])
+        {
+          L[size(L)+1] = arguments[i][2];
+        }
+      }
+      neededPrimes = neededSize-size(L);
+    }
+    kill Id;
+    if(size(L) > neededSize)
+    {
+      L = L[1..neededSize];
+    }
+  }
+  return(L);
+}
+example
+{
+   "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y),dp;
+   def a = nc_algebra(2147483647, 1);
+   setring a;
+   ideal I = x+2147483629y, x3+y3;
+   intvec V = PrimeList(I,5);
+   V;
+   intvec W = PrimeList(I,5,2); // number of cores = 2
+   W;
+}
+
+proc PrimeTestCommutatorRel(int p)
+"USAGE:  PrimeTestCommutatorRel(p); p a prime integer
+RETURN:  1 if p does not divide any coefficient of any defining relation of
+         G-algebra, 0 otherwise.
+EXAMPLE: example PrimeTestCommutatorRel; shows an example
+{
+  list rl = ringlist(basering);
+  matrix commrelmatC = rl[5];
+  matrix commrelmatD = rl[6];
+  int nvar=nvars(basering);
+  int i, j, k;
+  poly f; number cnt;
+
+
+  for(i = 1; i <= nvar; i++)
+  {
+    for(j = i+1; j <= nvar; j++)
+    {
+
+      cnt = leadcoef(commrelmatC[i,j]);
+
+      if(cnt == 0)
+      {
+        ERROR("wrong relations");
+      }
+      if((bigint(numerator(cnt)) mod p) == 0)
+      {
+        return(0);
+      }
+      if((bigint(denominator(cnt)) mod p) == 0)
+      {
+        return(0);
+      }
+    }
+  }
+  // checks for standard polynomials d_ij
+  for(i = 1; i <= nvar; i++)
+  {
+    for(j = i+1; j <= nvar; j++)
+    {
+      if(commrelmatD[i,j] != 0)
+      {
+        f = cleardenom(commrelmatD[i,j]);
+        cnt = leadcoef(commrelmatD[i,j])/leadcoef(f);
+        if((bigint(numerator(cnt)) mod p) == 0)
+        {
+          return(0);
+        }
+        if((bigint(denominator(cnt)) mod p) == 0)
+        {
+          return(0);
+        }
+        for(k = size(f); k > 0; k--)
+        {
+          if((bigint(leadcoef(f[k])) mod p) == 0)
+          {
+            return(0);
+          }
+        }
+      }
+    }
+  }
+  return(1);
+}
+example
+{
+ "EXAMPLE:"; echo = 2;
+ ring r = 0,(x,y),dp;
+ def a = nc_algebra(2147483647,1);
+ setring a;
+ ideal I = x+2147483629y;
+ int p1 = 2147483647;
+ int p2 = 2147483629;
+ int p3 = 2147483549;
+
+ PrimeTestCommutatorRel(p1);
+ PrimeTestCommutatorRel(p2);
+ PrimeTestCommutatorRel(p3);
+}
+
+proc PrimeTestId(def II, bigint p)
+"USAGE:  PrimeTestId(I, p); I ideal, p a prime integer
+RETURN:  1 if p does not divide any numerator or denominator of any coefficient
+         of any generating polynomial of I, 0 otherwise.
+EXAMPLE: example PrimeTestId; shows an example
+{
+  if(typeof(II) == "string")
+  {
+    ideal I = `II`.Ideal;
+  }
+  else
+  {
+    ideal I = II;
+  }
+  I = simplify(I, 2);
+  int i,j;
+  poly f;
+  number cnt;
+
+  for(i = 1; i <= size(I); i++)
+  {
+    f = cleardenom(I[i]);
+    if(f == 0)
+    {
+      return(0);
+    }
+    cnt = leadcoef(I[i])/leadcoef(f);
+    if((bigint(numerator(cnt)) mod p) == 0)
+    {
+      return(0);
+    }
+    if((bigint(denominator(cnt)) mod p) == 0)
+    {
+      return(0);
+    }
+    for(j = size(f); j > 0; j--)
+    {
+      if((bigint(leadcoef(f[j])) mod p) == 0)
+      {
+        return(0);
+      }
+    }
+  }
+  return(1);
+}
+example
+{
+ "EXAMPLE:"; echo = 2;
+ ring r = 0,(x,y),dp;
+ def a = nc_algebra(2147483647,1);
+ setring a;
+ ideal I = x+2147483629y;
+ int p1 = 2147483647;
+ int p2 = 2147483629;
+ int p3 = 2147483549;
+
+ PrimeTestId(I,p1);
+ PrimeTestId(I,p2);
+ PrimeTestId(I,p3);
+}
+
+proc ModpSlim(ideal I, int p)
+"USAGE:  ModpSlim(I, p); I ideal, p a prime
+RETURN:  The reduced Groebner basis of I mod p.
+EXAMPLE: example ModpSlim; shows an example
+{
+  def R0 = basering;
+  list rl = ringlist(R0);
+
+  matrix commrelmatC = rl[5];
+  matrix commrelmatD = rl[6];
+  rl[1] = p;
+  def @rr = ring(rl);
+  setring @rr;
+  list rll = ringlist(@rr);
+
+  rll[5] = imap(R0,commrelmatC);
+  rll[6] = imap(R0,commrelmatD);
+  def @r = ring(rll);
+  setring @r;
+  kill @rr;
+  ideal ii = fetch(R0,I);
+  option(redSB);
+  ii = slimgb(ii);
+  setring R0;
+  return(list(fetch(@r,ii),p));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  def r = reiffen(4,5);
+  setring r;
+  def A = Sannfs(RC);
+  setring A;
+  ideal bs = LD, imap(r,RC);
+  int p = 2147483647;
+  list l = ModpSlim(bs, p);
+  l;
+}
+
+static proc DeleteUnluckyPrimes(list T, list L)
+{
+  int sizeModgbs = size(T);
+  list class;
+  int sizeClass;
+  ideal Lm;
+  int i;
+  int j;
+  for(i = 1; i <= sizeModgbs; i++)
+  {
+    Lm=lead(T[i]);
+    attrib(Lm, "isSB", 1);
+    for(j = 1; j <= sizeClass; j++)
+    {
+      if (size(Lm) == size(class[j][1])
+            && size(reduce(Lm, class[j][1])) == 0
+            && size(reduce(class[j][1], Lm)) == 0)
+      {
+        class[j][2] = class[j][2]+1;
+        class[j][3][class[j][2]] = i;
+        break;
+      }
+    }
+    if(j > sizeClass)
+    {
+      sizeClass++;
+      class[sizeClass]=list();
+      class[sizeClass][1]=Lm;
+      class[sizeClass][2]=1;
+      class[sizeClass][3]=list(i);
+    }
+  }
+  int classMax = 1;
+  int max = class[1][2];
+  for (i = 2; i <= sizeClass; i++)
+  {
+    if (class[i][2] > max)
+    {
+      ClassMax = i;
+      max = class[i][2];
+    }
+  }
+  list unluckyIndices;
+  for (i = 1; i <= sizeClass; i++)
+  {
+    if (i != classMax)
+    {
+      unluckyIndices = unluckyIndices + class[i][3];
+    }
+  }
+  for (i = size(unluckyIndices); i > 0; i--)
+  {
+    T = delete(T, unluckyIndices[i]);
+    L = delete(L, unluckyIndices[i]);
+  }
+  return(T,L);
+}
+
+static proc PTestGB(ideal I, ideal J, list L, int ncores)
+"USAGE:  PTestGB(I, J, L, ncores); I, J ideals, L intvec of primes
+RETURN:  1 (respectively 0) if for a randomly chosen prime p which is not in L
+         J mod p is (respectively is not) a Groebner basis of I mod p.
+"
+{
+  int i,k,p;
+  int ptest;
+  def R = basering;
+  list r = ringlist(R);
+  matrix commrelC = r[5];
+  matrix commrelD = r[6];
+  while(!ptest)
+  {
+    ptest = 1;
+    p = prime(random(1000000000,2134567879));
+    for(i = 1; i <= size(L); i++)
+    {
+      if(p == L[i])
+      {
+        ptest = 0;
+        break;
+      }
+    }
+    if(!PrimeTestCommutatorRel(p))
+    {
+      ptest = 0;
+    }
+    if(ptest)
+    {
+      for(i = 1; i <= ncols(J); i++)
+      {
+        for(k = 2; k <= size(J[i]); k++)
+        {
+          if((bigint(denominator(leadcoef(J[i][k]))) mod p) == 0)
+          {
+            ptest = 0;
+            break;
+          }
+        }
+        if(!ptest)
+        {
+          break;
+        }
+      }
+    }
+    if(ptest)
+    {
+      if(!PrimeTestId(I,p) )
+      {
+        ptest = 0;
+      }
+    }
+  }
+  r[1] = p;
+  def @RR = ring(r);
+  setring @RR;
+  list rr=ringlist(@RR);
+  rr[5]=imap(R,commrelC);
+  rr[6]=imap(R,commrelD);
+  def @R=ring(rr);
+  setring @R;
+  kill @RR;
+
+  ideal I = imap(R,I);
+  ideal J = imap(R, J);
+  attrib(J,"isSB",1);
+  ptest = 1;
+  //if(IsIncluded(I,J,ncores) == 0)
+  if(IsIncludedseq(I, J) == 0)
+  {
+    ptest = 0;
+  }
+
+  if(ptest)
+  {
+   ideal K = slimgb(I);
+    // if(IsIncludedseq(J, K,ncores) == 0)
+    if(IsIncludedseq(J, K) == 0)
+    {
+      ptest = 0;
+    }
+  }
+  setring R;
+  return(ptest);
+}
+
+proc IsIncludedseq(ideal I, ideal J, list #)
+"USAGE:  IsIncludedseq(I,J), where I, J are ideals
+RETURN:  1 if J includes I, 0  if there is a generating element f of I which
+         does not reduce to 0 with respect to J. The set of generators of J
+         should be a Groebner basis otherwise the result might not be correct.
+{
+  int i, k;
+  int ncores = 1;
+  //def R = basering;
+  //setring R;
+  attrib(J,"isSB",1);
+
+/*if( size(#) == 1)
+  {
+    if(typeof(#[1]) == "int")
+    {
+      ncores = #[1];
+    }
+  }*/
+  //sequential reduction
+  //if(ncores==1)
+  //{
+      for(k = 1; k <= ncols(I); k++)
+      {
+        if(reduce(I[k],J,1) != 0)
+        {
+          return(0);
+        }
+      }
+      return(1);
+ // }
+
+  //parallel reduction
+ /*
+  else
+  {
+    list args,results;
+    for(k = 1; k <= ncols(I); k++)
+    {
+      args[k] = list(ideal(I[k]),J,1);
+    }
+    option(notWarnSB);
+    results = parallelWaitAll("reduce",args, 0, ncores);
+    for(k=1; k <= size(results); k++)
+    {
+      if(results[k] != 0)
+      {
+        return(0);
+      }
+    }
+    return(1);
+  }*/
+}
+//===========================================================
+
+
+
+
+
+

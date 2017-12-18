@@ -60,15 +60,6 @@
 #  define SINGULARXX_THROW(type) WerrorS(type().what());
 #endif
 
-/// For optimizing if-branches
-#ifdef __GNUC__
-#define LIKELY(expression) (__builtin_expect(!!(expression), 1))
-#define UNLIKELY(expression) (__builtin_expect(!!(expression), 0))
-#else
-#define LIKELY(expression) (expression)
-#define UNLIKELY(expression) (expression)
-#endif
-
 // #include "CSingularTypes.h"
 
 #endif /* SINGULAR_singular_defs_h_ */

@@ -27,6 +27,13 @@ New syntax:
 Can only be used in procedure headings. (@nref{General command syntax}).
 @end itemize
 
+New command:
+@itemize
+@item @code{fres}: improved version of @code{sres}: computes a (not necessarily minimal) free resolution of the input ideal/module, using Schreyer's algorithm.
+(@nref{fres},@nref{sres}).
+@end itemize
+
+
 Extended commands:
 @itemize
 @item pseudo ordering @code{L} allows setting of limits for exponents in polynomials (@nref{Pseudo ordering L},@nref{attrib} for maxExp)
@@ -169,7 +176,7 @@ Changed libraries:
 @item Ring::addvarsTo (@nref{addvarsTo})
 @item Ring::addNvarsTo (@nref{addNvarsTo})
 @item Ring::hasAlgExtensionCoefficient (@nref{hasAlgExtensionCoefficient})
-@item Schreyer::s_res (@nref{s_res})
+@item Schreyer::s_res (@code{s_res})
 @item grobcov.lib (grobcovK) (@nref{grobcov_lib}) with new routines
    AddCons  AddConsP.
 @item normaliz.lib (for normaliz >=2.8) (@nref{normaliz_lib})

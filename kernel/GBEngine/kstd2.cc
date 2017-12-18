@@ -4240,38 +4240,64 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 
     /* here in the nonhomog case we shrink the reduced poly AGAIN */
 
-    if ( ! strat->homog)
-    {
-      strat->P.GetP(strat->lmBin); // because shifts are counted with .p structure
-      /* assume strat->P.t_p != NULL */
-      /* in the nonhomog case we have to shrink the polynomial */
-      assume(strat->P.t_p!=NULL); // poly qq defined above
-      qq = p_Shrink(strat->P.t_p, lV, strat->tailRing); // direct shrink
-      if (qq != NULL)
+      if ( ! strat->homog)
       {
-         /* we're here if Shrink is nonzero */
-        //         strat->P.p =  NULL;
-        //        strat->P.Delete(); /* deletes P.p and P.t_p */ //error
-        strat->P.p   =  NULL; // is not set by Delete
-        strat->P.t_p =  qq;
-        strat->P.GetP(strat->lmBin);
-        // update sev and length
-        strat->initEcart(&(strat->P));
-        strat->P.sev = pGetShortExpVector(strat->P.p);
-      }
-      else
-      {
-         /* Shrink is zero, like y(1)*y(2) - y(1)*y(3)*/
+        strat->P.GetP(strat->lmBin); // because shifts are counted with .p structure
+        /* in the nonhomog case we have to shrink the polynomial */
+        if (strat->P.t_p!=NULL)
+        {
+          qq = p_Shrink(strat->P.t_p, lV, strat->tailRing); // direct shrink
+          if (qq != NULL)
+          {
+            /* we're here if Shrink is nonzero */
+            //         strat->P.p =  NULL;
+            //        strat->P.Delete(); /* deletes P.p and P.t_p */ //error
+            strat->P.p   =  NULL; // is not set by Delete
+            strat->P.t_p =  qq;
+            strat->P.GetP(strat->lmBin);
+            // update sev and length
+            strat->initEcart(&(strat->P));
+            strat->P.sev = pGetShortExpVector(strat->P.p);
+          }
+          else
+          {
+            /* Shrink is zero, like y(1)*y(2) - y(1)*y(3)*/
 #ifdef PDEBUG
-         if (TEST_OPT_DEBUG){PrintS("nonzero s shrinks to 0");PrintLn();}
+            if (TEST_OPT_DEBUG){PrintS("nonzero s shrinks to 0");PrintLn();}
 #endif
-         //         strat->P.Delete();  // cause error
-         strat->P.p = NULL;
-         strat->P.t_p = NULL;
-           //         strat->P.p = NULL; // or delete strat->P.p ?
-         goto     red_shrink2zero;
-       }
-    }
+            //         strat->P.Delete();  // cause error
+            strat->P.p = NULL;
+            strat->P.t_p = NULL;
+            //         strat->P.p = NULL; // or delete strat->P.p ?
+            goto     red_shrink2zero;
+          }
+        }
+        else
+        {
+          qq = p_Shrink(strat->P.p, lV, currRing); // direct shrink
+          if (qq != NULL)
+          {
+            /* we're here if Shrink is nonzero */
+            strat->P.p   =  qq;
+            strat->P.t_p =  NULL;
+            // update sev and length
+            strat->initEcart(&(strat->P));
+            strat->P.sev = pGetShortExpVector(strat->P.p);
+          }
+          else
+          {
+            /* Shrink is zero, like y(1)*y(2) - y(1)*y(3)*/
+#ifdef PDEBUG
+            if (TEST_OPT_DEBUG){PrintS("nonzero s shrinks to 0");PrintLn();}
+#endif
+            //         strat->P.Delete();  // cause error
+            strat->P.p = NULL;
+            strat->P.t_p = NULL;
+            //         strat->P.p = NULL; // or delete strat->P.p ?
+            goto     red_shrink2zero;
+          }
+        }
+      }
       /* end shrinking poly AGAIN in the nonhomog case */
 
 
@@ -4288,6 +4314,16 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, atR,uptodeg,lV);
       //      enterpairsShift(vw,strat->sl,strat->P.ecart,pos,strat, strat->tl,uptodeg,lV);
       // posInS only depends on the leading term
+      if ((strat->P.t_p!=NULL)&&(currRing!=strat->tailRing))
+      {
+        // move to currRing:
+        // need tp save t_p, as it is in also in T
+        pNext(strat->P.p)=strat->p_shallow_copy_delete(
+	                    p_Copy(pNext(strat->P.p),strat->tailRing),
+                            strat->tailRing, currRing,
+                            currRing->PolyBin);
+	strat->P.t_p=NULL;
+      }
       strat->enterS(strat->P, pos, strat, atR);
 
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);

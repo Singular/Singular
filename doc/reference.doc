@@ -98,6 +98,7 @@ and @code{LIB} no brackets are allowed.
 * Float::
 * fprintf::
 * freemodule::
+* fres::
 * frwalk::
 * gcd::
 * gen::
@@ -466,7 +467,7 @@ generators in degree i+j of the j-th syzygy module (= module of
 relations) of R^n/M (the 0th (resp.@: 1st) syzygy module of R^n/M is R^n
 (resp.@: M)).
 @end ifinfo
-The argument is considered to be the result of a res/sres/mres/nres/lres
+The argument is considered to be the result of a res/fres/sres/mres/nres/lres
 command. This implies that a zero is only allowed (and counted) as a
 generator in the first module.
 @*For the computation betti uses only the initial monomials. This could lead
@@ -527,6 +528,7 @@ $$
 
 @c ref
 See
+@ref{fres};
 @ref{hres};
 @ref{lres};
 @ref{mres};
@@ -2343,7 +2345,7 @@ See
 @c lib standard.lib:fprintf lib_fun lib_ex subsection
 
 @c ---------------------------------------
-@node freemodule, frwalk, fprintf, Functions
+@node freemodule, fres, fprintf, Functions
 @subsection freemodule
 @cindex freemodule
 
@@ -2370,8 +2372,61 @@ See
 @ref{gen};
 @ref{module}.
 @c ref
+
 @c ---------------------------------------
-@node frwalk, gcd, freemodule, Functions
+@node fres, frwalk, freemodule, Functions
+@subsection fres
+@cindex fres
+
+@table @code
+@item @strong{Syntax:}
+@code{fres (} ideal_expression/module_expression @code{,} int_expression
+@code{, [} string_expression @code{])}
+@item @strong{Type:}
+resolution
+@item @strong{Purpose:}
+computes a (not necessarily minimal) free resolution of the input ideal/module,
+using Schreyer's algorithm, see reference.
+@* If the second argument is @code{n > 0}, then the resolution is computed up
+to step @code{n}. If it is @code{0}, @code{fres} computes the whole resolution.
+@* The optional third argument can be @code{"complete"} (default) to compute
+the whole syzygy module in each step, @code{"frame"} to compute only the
+so-called frame, or @code{"extended frame"} to compute only the first two
+terms of each generator w.r.t. the induced monomial ordering.
+@item @strong{Note:}
+The input ideal/module must be a standard basis.
+@item @strong{Reference:}
+B. Erocal, O. Motsak, F.-O. Schreyer, A. Steenpass:
+Refined Algorithms to Compute Syzygies.
+J. Symb. Comput. 74 (2016), 308-327.
+@url{http://arxiv.org/abs/1502.01654}
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r = 0, (w,x,y,z), dp;
+  ideal I = w2-xz, wx-yz, x2-wy, xy-z2, y2-wz;
+  attrib(I, "isSB", 1);
+  resolution s = fres(I, 0);
+  s;
+  print(betti(s, 0), "betti");
+  list l = s;
+  print(l[1]);
+  print(l[2]);
+  print(l[3]);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{Free resolution};
+@ref{syz};
+@ref{res};
+@ref{sres};
+@ref{minres}.
+@c ref
+
+@c ---------------------------------------
+@node frwalk, gcd, fres, Functions
 @subsection frwalk
 @cindex frwalk
 
@@ -2874,6 +2929,7 @@ See
 @ref{module};
 @ref{mres};
 @ref{res};
+@ref{fres};
 @ref{lres};
 @ref{sres}.
 @c ref
@@ -4007,6 +4063,7 @@ See
 @ref{module};
 @ref{mres};
 @ref{res};
+@ref{fres};
 @ref{hres};
 @ref{sres}.
 @c ref
@@ -4421,6 +4478,7 @@ given by the list_expression, resp.@: resolution_expression.
 @c ref
 See
 @ref{res};
+@ref{fres};
 @ref{mres};
 @ref{sres}.
 @c ref
@@ -4706,6 +4764,7 @@ See
 @ref{lres};
 @ref{module};
 @ref{res};
+@ref{fres};
 @ref{sres}.
 @c ref
 @c ---------------------------------------
@@ -4998,6 +5057,7 @@ See
 @ref{mres};
 @ref{res};
 @ref{resolution};
+@ref{fres};
 @ref{sres}.
 @c ref
 @c ---------------------------------------
@@ -6337,6 +6397,7 @@ the computation unless @code{option(notRegularity);} is given.
 See
 @ref{res};
 @ref{resolution};
+@ref{fres};
 @ref{mres};
 @ref{sres};
 @ref{list};
@@ -7178,6 +7239,7 @@ See
 @ref{betti};
 @ref{ideal};
 @ref{int};
+@ref{fres};
 @ref{lres};
 @ref{hres};
 @ref{minres};
@@ -7822,6 +7884,7 @@ See
 @ref{nres};
 @ref{option};
 @ref{res};
+@ref{fres};
 @ref{sres};
 @ref{lift};
 @ref{liftstd};

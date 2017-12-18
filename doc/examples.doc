@@ -1408,6 +1408,12 @@ computes a free resolution of an ideal or module using a heuristically
 chosen method.
 This is the preferred method to compute free resolutions of ideals or
 modules.
+@item fres
+@ifset singularmanual
+@ref{fres}@*
+@end ifset
+improved version of @ref{sres}, computes a free resolution of an ideal or
+module using Schreyer's method. The input has to be a standard basis.
 @item lres
 @ifset singularmanual
 @ref{lres}@*
