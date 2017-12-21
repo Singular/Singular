@@ -1,0 +1,1023 @@
+//////////////////////////////////////////////////////////////////////
+version="version ncfrac.lib 4.0.0.0 Dec_2017 "; //$Id$
+category="Noncommutative";
+info="
+LIBRARY:   ncfrac.lib  object-oriented interface for olga.lib
+AUTHOR:    Johannes Hoffmann, email: johannes.hoffmann at math.rwth-aachen.de
+
+OVERVIEW:
+This library introduces a new type: ncfrac.
+This type wraps the data defining a (non-commutative) fraction in an Ore
+localization of a G-algebra as in olga.lib.
+An element of type ncfrac has five members:
+  - polys lnum, lden, rnum, rden
+  - ncloc loc
+
+OPERATIONS:
+string(ncfrac);
+  give a string representation of the data describing the fraction
+print(ncfrac);
+  prints the string representation of the fraction
+status(ncfrac);
+  report on the status/validity of the fraction
+test(ncfrac);
+  check if the fraction is valid
+
+INFIX OPERATIONS:
+ncfrac == ncfrac;
+  compare two fractions
+ncfrac != ncfrac;
+  compare two fractions
+ncfrac + ncfrac;
+  add two fractions
+ncfrac - ncfrac
+  subtract two fractions
+ncfrac * ncfrac
+  multiply two fractions
+ncfrac / ncfrac
+  divide two fractions
+ncfrac = int/number/poly
+  create a fraction with:
+    - left and right denominator equal to 1
+    - left and right numerator determined by the input
+    - localization data describing the trivial monoidal localization at 1
+ncfrac = vector
+  create a fraction from a vector v with unspecified localization such that
+  lden,lnum,rnum,rden = v[1],v[2],v[3],v[4]
+  (note: without specifying a localization afterwards this results is an
+  invalid fraction)
+ncfrac = list
+  create a fraction from a list L as follows:
+    - try to create a fraction from L[1] as above
+    - if L[2] is of type ncloc set the localization of the fraction to L[2]
+
+PROCEDURES:
+hasLeftDenom(ncfrac); check if the given fraction has a left representation
+hasRightDenom(ncfrac); check if the given fraction has a right representation
+isZeroNcfrac(ncfrac); check if the given fraction is equal to zero
+isOneNcfrac(ncfrac); check if the given fraction is equal to one
+zeroNcfrac(ncloc loc); create the fraction equal to zero in the given localization
+oneNcfrac(ncloc loc); create the fraction equal to one in the given localization
+ensureLeftNcfrac(ncfrac); compute a left representation of the given fraction if it does not have one
+ensureRightNcfrac(ncfrac); compute a right representation of the given fraction if it does not have one
+negateNcfrac(ncfrac); compute the additive inverse of the given fraction
+isInvertibleNcfrac(ncfrac); check if the given fraction is invertible (note: see the description of
+  isInvertibleLeftFraction from olga.lib for specific behaviour)
+invertNcfrac(ncfrac); compute the multiplicative inverse of the given fraction  (note: see the
+  description of invertLeftFraction from olga.lib for specific behaviour)
+testNcfrac(); execute a series of internal testing procedures
+testNcfracExamples(); execute the examples of all procedures in this library
+";
+//////////////////////////////////////////////////////////////////////
+proc testNcfracExamples()
+"USAGE:   testNcfracExamples()
+PURPOSE: execute the examples of all procedures in this library
+RETURN:  nothing
+NOTE:
+EXAMPLE: "
+{
+    example hasLeftDenom;
+    example hasRightDenom;
+    example isZeroNcfrac;
+    example isOneNcfrac;
+    example zeroNcfrac;
+    example oneNcfrac;
+    example ensureLeftNcfrac;
+    example ensureRightNcfrac;
+}
+//////////////////////////////////////////////////////////////////////
+proc testNcfrac()
+"USAGE:   testNcfrac()
+PURPOSE: execute a series of internal testing procedures
+RETURN:  nothing
+NOTE:
+EXAMPLE: "
+{
+    print("testing ncfrac.lib...");
+    testHasLeftHasRight();
+    testIsZeroIsOne();
+    testNcFracCreation();
+    testNcfracComparison();
+    testNcfracAddition();
+    testNcfracSubtraction();
+    testNcfracMultiplication();
+    testNcfracDivision();
+    testNcfracInversion();
+    testEnsureRightNcfrac();
+    testEnsureLeftNcfrac();
+    print("testing complete - ncfrac.lib OK");
+}
+//////////////////////////////////////////////////////////////////////
+static proc mod_init() {
+    LIB "ncloc.lib";
+    /* new type: ncfrac (non-commutative fraction) */
+    newstruct("ncfrac", "ncloc loc, poly rden, poly rnum, poly lden, poly lnum");
+    system("install", "ncfrac", "print", printNcfrac, 1);
+    system("install", "ncfrac", "string", ncfracToString, 1);
+    system("install", "ncfrac", "=", createNcfrac, 1);
+    system("install", "ncfrac", "==", compareNcfracs, 2);
+    system("install", "ncfrac", "!=", invertedCompareNcfracs, 2);
+    system("install", "ncfrac", "+", addNcfracs, 2);
+    system("install", "ncfrac", "-", subtractNcfracs, 2);
+    system("install", "ncfrac", "*", multiplyNcfracs, 2);
+    system("install", "ncfrac", "/", divideNcfracs, 2);
+    system("install", "ncfrac", "test", testNcfrac, 4);
+    system("install", "ncfrac", "status", statusNcfrac, 4);
+}
+//////////////////////////////////////////////////////////////////////
+proc hasLeftDenom(ncfrac frac)
+"USAGE:   hasLeftDenom(frac), ncfrac frac
+PURPOSE: checks if frac has a left representation
+RETURN:  int, 1 if frac has a left representation, 0 otherwise
+EXAMPLE: example hasLeftDenom; shows example"
+{
+    return(frac.lden != 0);
+}
+example
+{
+    "EXAMPLE:"; echo = 2;
+    ring R = 0,(x,y,Dx,Dy),dp;
+    def S = Weyl();
+    setring S;
+    ncloc loc = ideal(x-3,y+7);
+    ncfrac noLeft = list([0,0,3*y*Dx,x+2], loc);
+    hasLeftDenom(noLeft);
+    ncfrac left = list([1,Dx,Dx,1], loc);
+    hasLeftDenom(left);
+}
+//////////////////////////////////////////////////////////////////////
+proc hasRightDenom(ncfrac frac)
+"USAGE:   hasRightDenom(frac), ncfrac frac
+PURPOSE: checks if frac has a right representation
+RETURN:  int, 1 if frac has a right representation, 0 otherwise
+EXAMPLE: example hasRightDenom; shows example"
+{
+    return(frac.rden != 0);
+}
+example
+{
+    "EXAMPLE:"; echo = 2;
+    ring R = 0,(x,y,Dx,Dy),dp;
+    def S = Weyl();
+    setring S;
+    ncloc loc = ideal(x-3,y+7);
+    ncfrac noRight = list([x+2,3*y*Dx,0,0], loc);
+    hasRightDenom(noRight);
+    ncfrac right = list([1,Dx,Dx,1], loc);
+    hasRightDenom(right);
+}
+////////// status and printing ///////////////////////////////////////
+static proc toVector(ncfrac frac) {
+    return([frac.lden, frac.lnum, frac.rnum, frac.rden]);
+}
+//////////////////////////////////////////////////////////////////////
+static proc statusNcfrac(ncfrac frac) {
+    return(fracStatus(toVector(frac), frac.loc.locType, frac.loc.locData));
+    // fracStatus from olga.lib
+}
+//////////////////////////////////////////////////////////////////////
+static proc testNcfrac(ncfrac frac) {
+    list stat = status(frac);
+    if(!stat[1]) {
+        ERROR(stat[2]);
+    } else {
+        return();
+    }
+}
+//////////////////////////////////////////////////////////////////////
+static proc ncfracToString(ncfrac frac) {
+    list stat = status(frac);
+    if (!stat[1]) {
+        return(stat[2]);
+    } else {
+        return("left repr.: (" + string(frac.lden) + "," + string(frac.lnum)
+          + ")" + newline + "right repr.: (" + string(frac.rnum) + ","
+          + string(frac.rden) + ")");
+    }
+}
+//////////////////////////////////////////////////////////////////////
+static proc printNcfrac(ncfrac frac) {
+    string(frac);
+}
+//////////////////////////////////////////////////////////////////////
+proc isZeroNcfrac(ncfrac frac)
+"USAGE:   isZeroNcfrac(frac), ncfrac frac
+PURPOSE: checks if frac is zero
+RETURN:  int, 1 if frac is zero, 0 otherwise
+EXAMPLE: example isZeroNcfrac; shows example"
+{
+    testNcfrac(frac);
+    if (hasLeftDenom(frac)) { // frac has left representation
+        return(frac.lnum == 0);
+    } else { // frac has right representation, but no left representation
+        return(frac.rnum == 0);
+    }
+}
+example
+{
+    "EXAMPLE:"; echo = 2;
+    ring Q = (0,q),(x,y,Qx,Qy),dp;
+    matrix C[4][4] = UpOneMatrix(4);
+    C[1,3] = q;
+    C[2,4] = q;
+    def ncQ = nc_algebra(C,0);
+    setring ncQ;
+    ncloc loc = intvec(2);
+    ncfrac frac = list([y^2+7*y+1,0,0,0], loc);
+    isZeroNcfrac(frac);
+    frac.lnum = 42*y*Qy+7*Qx+3*x+7;
+    isZeroNcfrac(frac);
+}
+//////////////////////////////////////////////////////////////////////
+proc isOneNcfrac(ncfrac frac)
+"USAGE:   isOneNcfrac(frac), ncfrac frac
+PURPOSE: checks if frac is one
+RETURN:  int, 1 if frac is one, 0 otherwise
+EXAMPLE: example isOneNcfrac; shows example"
+{
+    testNcfrac(frac);
+    if (hasLeftDenom(frac)) { // frac has left representation
+        return(frac.lden == frac.lnum);
+    } else { // frac has right representation, but no left representation
+        return(frac.rden == frac.rnum);
+    }
+}
+example
+{
+    "EXAMPLE:"; echo = 2;
+    ring Q = (0,q),(x,y,Qx,Qy),dp;
+    matrix C[4][4] = UpOneMatrix(4);
+    C[1,3] = q;
+    C[2,4] = q;
+    def ncQ = nc_algebra(C,0);
+    setring ncQ;
+    ncloc loc = intvec(2);
+    ncfrac frac = list([y^2+7*y+1,y^2+7*y+1,0,0], loc);
+    isOneNcfrac(frac);
+    frac.lnum = 42*y*Qy+7*Qx+3*x+7;
+    isOneNcfrac(frac);
+}
+////////// initialization, comparison and declaration ////////////////
+static proc createNcfrac(def input) {
+    string inputType = typeof(input);
+    ncfrac result;
+    if (inputType == "list") {
+        if (size(input) >= 2) {
+            result = createNcfrac(input[1]);
+            if (typeof(input[2]) == "ncloc") {
+                result.loc = input[2];
+            }
+        }
+    }
+    if (inputType == "int" || inputType == "number" || inputType == "poly") {
+        result.lden = poly(1);
+        result.lnum = poly(input);
+        result.rden = poly(1);
+        result.rnum = poly(input);
+        result.loc = ncloc(list(1));
+    }
+    if (inputType == "vector") {
+        result.lden = input[1];
+        result.lnum = input[2];
+        result.rnum = input[3];
+        result.rden = input[4];
+    }
+    return(result);
+}
+//////////////////////////////////////////////////////////////////////
+proc zeroNcfrac(ncloc loc)
+"USAGE:   zeroNcfrac(loc), ncloc loc
+PURPOSE: returns the zero fraction in the localization loc
+RETURN:  ncfrac
+EXAMPLE: example zeroNcfrac; shows example"
+{
+    return(ncfrac(list([1,0,0,1], loc)));
+}
+example
+{
+    "EXAMPLE:"; echo = 2;
+    ring R = 0,(x,y,Dx,Dy),dp;
+    def S = Weyl();
+    setring S;
+    ncloc loc = ideal(x-53,y-7);
+    zeroNcfrac(loc);
+}
+//////////////////////////////////////////////////////////////////////
+proc oneNcfrac(ncloc loc)
+"USAGE:   oneNcfrac(loc), ncloc loc
+PURPOSE: returns the one fraction in the localization loc
+RETURN:  ncfrac
+EXAMPLE: "
+{
+    return(ncfrac(list([1,1,1,1], loc)));
+}
+example
+{
+    "EXAMPLE:"; echo = 2;
+    ring R = 0,(x,y,Dx,Dy),dp;
+    def S = Weyl();
+    setring S;
+    ncloc loc = ideal(x-42,y-17);
+    oneNcfrac(loc);
+}
+//////////////////////////////////////////////////////////////////////
+static proc trimNcfrac(ncfrac frac)
+"USAGE:   trimNcfrac(frac), ncfrac frac
+PURPOSE: simplifies complicated representations of zero and one
+RETURN:  ncfrac
+NOTE:    - if frac is zero, returns the default representation of zero
+         - if frac is one, returns the default representation of one
+         - otherwise returns frac
+EXAMPLE: example trimNcfrac; shows example"
+{
+    testNcfrac(frac);
+    if (isZeroNcfrac(frac)) {
+        return(zeroNcfrac(frac.loc));
+    }
+    if (isOneNcfrac(frac)) {
+        return(oneNcfrac(frac.loc));
+    }
+    return(frac);
+} example {
+    "EXAMPLE:"; echo = 2;
+    ring R = 0,(x,y,Dx,Dy),dp;
+    def S = Weyl();
+    setring S;
+    ncloc loc = poly(x);
+    loc;
+    ncfrac frac1 = list([x^2,x*x,0,0], loc);
+    trimNcfrac(frac1);
+    ncfrac frac2 = list([0,0,0,x], loc);
+    trimNcfrac(frac2);
+}
+//////////////////////////////////////////////////////////////////////
+static proc compareNcfracs(ncfrac frac1, ncfrac frac2) {
+    testNcfrac(frac1);
+    testNcfrac(frac2);
+    if (isZeroNcfrac(frac1)) {
+        return(isZeroNcfrac(frac2));
+    }
+    if (isOneNcfrac(frac1)) {
+        return(isOneNcfrac(frac2));
+    }
+    if (isZeroNcfrac(frac1 - frac2)) {
+        // frac1 and frac2 are equal iff their difference is zero
+        return (1);
+    } else {
+        return (0);
+    }
+}
+//////////////////////////////////////////////////////////////////////
+static proc invertedCompareNcfracs(ncfrac frac1, ncfrac frac2) {
+    return(!compareNcfracs(frac1, frac2));
+}
+////////// compute left resp. right representations //////////////////
+proc ensureLeftNcfrac(ncfrac frac)
+"USAGE:   ensureLeftNcfrac(frac), ncfrac frac
+PURPOSE: ensures that frac has a left representation (by computing it if not
+         alreaDy known)
+RETURN:  ncfrac, a representation of frac which has a left representation
+EXAMPLE: "
+{
+    testNcfrac(frac);
+    if (hasLeftDenom(frac)) {
+        return(frac);
+    }
+    ncloc loc = frac.loc;
+    vector f = toVector(frac);
+    vector result = convertRightToLeftFraction(f, loc.locType, loc.locData);
+    return(ncfrac(list(result, loc)));
+}
+example
+{
+    "EXAMPLE:"; echo = 2;
+    ring R = 0,(x,y,Dx,Dy),dp;
+    def S = Weyl();
+    setring S; S;
+    // monoidal localization
+    poly g1 = x+3;
+    poly g2 = x*y;
+    list L = g1,g2;
+    ncloc loc0 = L;
+    poly g = g1^2*g2;
+    poly f = Dx;
+    ncfrac frac0 = [0,0,f,g];
+    frac0.loc = loc0;
+    ncfrac rm = ensureLeftNcfrac(frac0);
+    print(rm);
+    rm.lnum*g-rm.lden*f;
+    // geometric localization
+    ncloc loc1 = ideal(x-1,y-3);
+    f = Dx;
+    g = x^2+y;
+    ncfrac frac1 = [0,0,f,g];
+    frac1.loc = loc1;
+    ncfrac rg = ensureLeftNcfrac(frac1);
+    print(rg);
+    rg.lnum*g-rg.lden*f;
+    // rational localization
+    intvec rat = 1;
+    ncloc loc2 = rat;
+    f = Dx+Dy;
+    g = x;
+    ncfrac frac2 = [0,0,f,g];
+    frac2.loc = loc2;
+    ncfrac rr = ensureLeftNcfrac(frac2);
+    print(rr);
+    rr.lnum*g-rr.lden*f;
+}
+//////////////////////////////////////////////////////////////////////
+proc ensureRightNcfrac(ncfrac frac)
+"USAGE:   ensureLeftNcfrac(frac), ncfrac frac
+PURPOSE: ensures that frac has a right representation (by computing it if not
+         alreaDy known)
+RETURN:  ncfrac, a representation of frac which has a right representation
+EXAMPLE: "
+{
+    testNcfrac(frac);
+    if (hasRightDenom(frac)) {
+        return (frac);
+    }
+    ncloc loc = frac.loc;
+    vector f = toVector(frac);
+    vector result = convertLeftToRightFraction(f, loc.locType, loc.locData);
+    return(ncfrac(list(result, loc)));
+}
+example
+{
+    "EXAMPLE:"; echo = 2;
+    ring R = 0,(x,y,Dx,Dy),dp;
+    def S = Weyl();
+    setring S; S;
+    // monoidal localization
+    poly g = x;
+    poly f = Dx;
+    ncloc loc0 = g;
+    ncfrac frac0 = [g,f,0,0];
+    frac0.loc = loc0;
+    ncfrac rm = ensureRightNcfrac(frac0);
+    print(rm);
+    f*rm.rden-g*rm.rnum;
+    // geometric localization
+    g = x+y;
+    f = Dx+Dy;
+    ncloc loc1 = ideal(x-1,y-3);
+    ncfrac frac1 = [g,f,0,0];
+    frac1.loc = loc1;
+    ncfrac rg = ensureRightNcfrac(frac1);
+    print(rg);
+    f*rg.rden-g*rg.rnum;
+    // rational localization
+    intvec rat = 1;
+    f = Dx+Dy;
+    g = x;
+    ncloc loc2 = rat;
+    ncfrac frac2 = [g,f,0,0];
+    frac2.loc = loc2;
+    ncfrac rr = ensureRightNcfrac(frac2);
+    print(rr);
+    f*rr.rden-g*rr.rnum;
+}
+////////// arithmetic ////////////////////////////////////////////////
+static proc addNcfracs(ncfrac frac1, ncfrac frac2) {
+    testNcfrac(frac1);
+    testNcfrac(frac2);
+    ncloc loc = frac1.loc;
+    if (loc != frac2.loc) {
+        ERROR("cannot add fractions: incompatible localizations");
+    }
+    vector f1 = toVector(frac1);
+    vector f2 = toVector(frac2);
+    vector result = addLeftFractions(f1, f2, loc.locType, loc.locData, 1);
+    return(ncfrac(list(result, loc)));
+}
+//////////////////////////////////////////////////////////////////////
+proc negateNcfrac(ncfrac frac)
+"USAGE:   negateNcfrac(frac), ncfrac frac
+PURPOSE: compute the negative (i.e. additive inverse) of frac
+RETURN:  ncfrac
+NOTE:    returns (-1)*frac
+EXAMPLE: example negateNcfrac; shows example"
+{
+    ncfrac result = frac;
+    result.lnum = result.lnum * (-1);
+    result.rnum = result.rnum * (-1);
+    return(result);
+}
+example
+{
+    "EXAMPLE:"; echo = 2;
+    ring R = 0,(x,y,Dx,Dy),dp;
+    def S = Weyl();
+    setring S;
+    poly g = x*y^2+4*x+7*y-98;
+    ncloc loc = g;
+    ncfrac frac = list([g, 13*x^2], loc);
+    frac;
+    ncfrac negFrac = negateNcfrac(frac);
+    negFrac;
+    frac + negFrac;
+}
+//////////////////////////////////////////////////////////////////////
+static proc subtractNcfracs(ncfrac frac1, ncfrac frac2) {
+    testNcfrac(frac1);
+    testNcfrac(frac2);
+    if (frac1.loc != frac2.loc) {
+        ERROR("cannot subtract fractions: incompatible localizations");
+    }
+    return(frac1 + negateNcfrac(frac2));
+}
+//////////////////////////////////////////////////////////////////////
+static proc multiplyNcfracs(ncfrac frac1, ncfrac frac2) {
+    testNcfrac(frac1);
+    testNcfrac(frac2);
+    ncloc loc = frac1.loc;
+    if (loc != frac2.loc) {
+        ERROR("cannot multiply fractions: incompatible localizations");
+    }
+    vector f1 = toVector(frac1);
+    vector f2 = toVector(frac2);
+    vector result = multiplyLeftFractions(f1, f2, loc.locType, loc.locData, 1);
+    return(ncfrac(list(result, loc)));
+}
+//////////////////////////////////////////////////////////////////////
+proc isInvertibleNcfrac(ncfrac frac)
+"USAGE:   isInvertibleNcfrac(frac), ncfrac frac
+PURPOSE: checks if frac is invertible
+RETURN:  int, 1 if frac is invertible, 0 otherwise
+EXAMPLE: example isInvertibleNcfrac; shows example"
+{
+    testNcfrac(frac);
+    poly num;
+    if (hasLeftDenom(frac)) { // frac has left representation
+        num = frac.lnum;
+    } else { // frac has right representation, but no left representation
+        num = frac.rnum;
+    }
+    return(isDenom(num, frac.loc));
+}
+example
+{
+    "EXAMPLE:"; echo = 2;
+    ring R = 0,(x,y,Dx,Dy),dp;
+    def S = Weyl();
+    setring S;
+    ncloc loc = intvec(2);
+    ncfrac frac = list([y,y+1,0,0], loc);
+    isInvertibleNcfrac(frac);
+    frac = list([y,x+1,0,0], loc);
+    isInvertibleNcfrac(frac);
+}
+//////////////////////////////////////////////////////////////////////
+proc invertNcfrac(ncfrac frac)
+"USAGE:   invertNcfrac(frac), ncfrac frac
+PURPOSE: compute the inverse of frac
+RETURN:  ncfrac
+NOTE:    returns the zero fraction if frac is not invertible
+EXAMPLE: example invertNcfrac; shows example"
+{
+    ncfrac result;
+    if (!isInvertibleNcfrac(frac)) {
+        result = zeroNcfrac(frac.loc);
+    } else {
+        result = list([frac.lnum, frac.lden, frac.rden, frac.rnum], frac.loc);
+    }
+    return(result);
+}
+example
+{
+    "EXAMPLE:"; echo = 2;
+    ring R = 0,(x,y,Dx,Dy),dp;
+    def S = Weyl();
+    setring S;
+    ncloc loc = intvec(2);
+    ncfrac frac1 = list([y,y+1,0,0], loc);
+    // frac1 is invertible
+    ncfrac inv = invertNcfrac(frac1);
+    inv;
+    ncfrac frac2 = list([y,x+1,0,0], loc);
+    // frac2 is not invertible
+    inv = invertNcfrac(frac2);
+    inv;
+}
+//////////////////////////////////////////////////////////////////////
+static proc divideNcfracs(ncfrac frac1, ncfrac frac2) {
+    testNcfrac(frac1);
+    testNcfrac(frac2);
+    if (frac1.loc != frac2.loc) {
+        ERROR("cannot multiply fractions: incompatible localizations");
+    }
+    if(!isInvertibleNcfrac(frac2)) {
+        ERROR("division by non-invertible fraction");
+    } else {
+        return(frac1 * invertNcfrac(frac2));
+    }
+}
+//////////////////////////////////////////////////////////////////////
+////////// internal testing procedures ///////////////////////////////
+static proc testHasLeftHasRight()
+{
+    print("  testing ncfrac hasLeftDenom/hasRightDenom...");
+    ring r = 0,(x,y,Dx,Dy),dp;
+    def R = Weyl();
+    setring R;
+    ncloc loc = ideal(x-3,y+7);
+    ncfrac noLeft = list([0,0,3*y*Dx,x+2], loc);
+    if (hasLeftDenom(noLeft)) {
+        ERROR("hasLeftDenom noLeft failed");
+    }
+    ncfrac left = list([1,Dx,Dx,1], loc);
+    if (!hasLeftDenom(left)) {
+        ERROR("hasLeftDenom left failed");
+    }
+    ncfrac noRight = list([x+2,3*y*Dx,0,0], loc);
+    if (hasRightDenom(noRight)) {
+        ERROR("hasRightDenom noRight failed");
+    }
+    ncfrac right = list([1,Dx,Dx,1], loc);
+    if (!hasRightDenom(right)) {
+        ERROR("hasRightDenom right failed");
+    }
+    print("    ncloc hasLeftDenom/hasRightDenom OK");
+}
+//////////////////////////////////////////////////////////////////////
+static proc testIsZeroIsOne()
+{
+    print("  testing ncfrac isZeroNcfrac/isOneNcfrac...");
+    ring Q = (0,q),(x,y,Qx,Qy),dp;
+    matrix C[4][4] = UpOneMatrix(4);
+    C[1,3] = q;
+    C[2,4] = q;
+    def ncQ = nc_algebra(C,0);
+    setring ncQ;
+    ncloc loc = intvec(2);
+    ncfrac frac = list([y^2+7*y+1,0,0,0], loc);
+    if (!isZeroNcfrac(frac)) {
+        ERROR("isZeroNcfrac zero failed");
+    }
+    frac.lnum = 42*y*Qy+7*Qx+3*x+7;
+    if (isZeroNcfrac(frac)) {
+        ERROR("isZeroNcfrac non-zero failed");
+    }
+    frac.lnum = frac.lden;
+    //frac = list([y^2+7*y+1,y^2+7*y+1,0,0], loc);
+    if (!isOneNcfrac(frac)) {
+        ERROR("isOneNcfrac one failed");
+    }
+    frac.lnum = 42*y*Qy+7*Qx+3*x+7;
+    if (isOneNcfrac(frac)) {
+        ERROR("isOneNcfrac non-one failed");
+    }
+    print("    ncloc isZeroNcfrac/isOneNcfrac OK");
+}
+//////////////////////////////////////////////////////////////////////
+static proc testNcFracCreation() {
+    print("  testing ncfrac creation...");
+    ring r = 0,(x,y,Dx,Dy),dp;
+    def R = Weyl();
+    setring R;
+    ncloc loc = list(x);
+    ncfrac frac1 = [x,Dx,0,0]; // create from vector
+    frac1.loc = loc;
+    test(frac1);
+    ncfrac frac2 = 7; // create from interface
+    frac2.loc = loc;
+    test(frac2);
+    ncfrac frac3 = 4*x*Dx*Dy*Dy; // create from poly
+    frac3.loc = loc;
+    test(frac3);
+    ncfrac frac4 = list([x^2,Dx], loc); // create from list with vector
+    test(frac4);
+    ncfrac frac5 = list(42, loc); // create from list with int
+    test(frac5);
+    print("    ncfrac creation OK");
+}
+//////////////////////////////////////////////////////////////////////
+static proc testNcfracComparison() {
+    print("  testing ncfrac comparison...");
+    ring r = 0,(x,y,Dx,Dy),dp;
+    def R = Weyl();
+    setring R;
+    // monoidal
+    poly g1 = x*y+3;
+    poly g2 = y^3;
+    ncloc locm = list(g1, g2);
+    ncfrac fracm1 = list([g1,Dx,0,0], locm);
+    ncfrac fracm2 = list([g1*g2,g2*Dx,0,0], locm);
+    ncfrac fracm3 = list([g1*g2,g1*Dx+3,0,0], locm);
+    if (!(fracm1 == fracm2)) {
+        ERROR("Weyl monoidal positive basic comparison error");
+    }
+    if (fracm1 == fracm3) {
+        ERROR("Weyl monoidal first negative basic comparison error");
+    }
+    if (fracm2 == fracm3) {
+        ERROR("Weyl monoidal second negative basic comparison error");
+    }
+    // geometric
+    ideal p = x+5, y-2;
+    ncloc locg = p;
+    ncfrac fracg1 = list([g1,Dx,0,0], locg);
+    ncfrac fracg2 = list([g1*g2,g2*Dx,0,0], locg);
+    ncfrac fracg3 = list([g1*g2,g1*Dx+3,0,0], locg);
+    if (!(fracg1 == fracg2)) {
+        ERROR("Weyl geometric positive basic comparison error");
+    }
+    if (fracg1 == fracg3) {
+        ERROR("Weyl geometric first negative basic comparison error");
+    }
+    if (fracg2 == fracg3) {
+        ERROR("Weyl geometric second negative basic comparison error");
+    }
+    // rational
+    intvec rat = 1,4;
+    ncloc locr = rat;
+    ncfrac fracr1 = list([x+Dy,Dx,0,0], locr);
+    ncfrac fracr2 = list([x*Dy*(x+Dy),x*Dx*Dy,0,0], locr);
+    ncfrac fracr3 = list([Dy*x*(x+Dy),x*Dx*Dy+1,0,0], locr);
+    if (!(fracr1 == fracr2)) {
+        ERROR("Weyl rational positive basic comparison error");
+    }
+    if (fracr1 == fracr3) {
+        ERROR("Weyl rational first negative basic comparison error");
+    }
+    if (fracr2 == fracr3) {
+        ERROR("Weyl rational second negative basic comparison error");
+    }
+    print("    ncfrac comparison OK");
+}
+//////////////////////////////////////////////////////////////////////
+static proc testNcfracAddition() {
+    print("  testing ncfrac addition...");
+    ring R = 0,(x,y,Dx,Dy),dp;
+    def S = Weyl();
+    setring S;
+    poly g1 = x+3;
+    poly g2 = x*y+y;
+    ncloc loc = list(g1,g2);
+    ncfrac frac1 = list([g1,Dx,0,0], loc);
+    ncfrac frac2 = list([g2,Dy,0,0], loc);
+    ncfrac resu = frac1 + frac2;
+    if (resu.lden != g1*g2 || resu.lnum != g2*Dx+g1*Dy) {
+        ERROR("Weyl monoidal addition error");
+    }
+    loc = ideal(x-1,y-3);
+    frac1.loc = loc;
+    frac2.loc = loc;
+    resu = frac1 + frac2;
+    if (resu.lden != g1*g2 || resu.lnum != g2*Dx+g1*Dy) {
+        ERROR("Weyl geometric maximal addition error");
+    }
+    loc = ideal(y+3);
+    frac1.loc = loc;
+    frac2.loc = loc;
+    resu = frac1 + frac2;
+    if (resu.lden != g1*g2 || resu.lnum != g2*Dx+g1*Dy) {
+        ERROR("Weyl geometric prime addition error");
+    }
+    loc = intvec(2);
+    frac1 = list([y^2+y+1,Dx,0,0], loc);
+    frac2 = list([y-2,Dy,0,0], loc);
+    resu = frac1 + frac2;
+    if (resu.lden != (y^2+y+1)*(y-2) || resu.lnum != (y-2)*Dx+(y^2+y+1)*Dy) {
+        ERROR("Weyl rational addition error");
+    }
+    print("    ncfrac addition OK");
+}
+//////////////////////////////////////////////////////////////////////
+static proc testNcfracSubtraction() {
+    print("  testing ncfrac subtraction...");
+    ring R = 0,(x,y,Dx,Dy),dp;
+    def S = Weyl();
+    setring S;
+    poly g1 = x+3;
+    poly g2 = x*y+y;
+    ncloc loc = list(g1,g2);
+    ncfrac frac1 = list([g1,Dx,0,0], loc);
+    ncfrac frac2 = list([g2,-Dy,0,0], loc);
+    ncfrac resu = frac1 - frac2;
+    if (resu.lden != g1*g2 || resu.lnum != g2*Dx+g1*Dy) {
+        ERROR("Weyl monoidal subtraction error");
+    }
+    loc = ideal(x-1,y-3);
+    frac1.loc = loc;
+    frac2.loc = loc;
+    resu = frac1 - frac2;
+    if (resu.lden != g1*g2 || resu.lnum != g2*Dx+g1*Dy) {
+        ERROR("Weyl geometric subtraction error");
+    }
+    loc = intvec(2);
+    frac1 = list([y^2+y+1,Dx,0,0], loc);
+    frac2 = list([y-2,-Dy,0,0], loc);
+    resu = frac1 - frac2;
+    if (resu.lden != (y^2+y+1)*(y-2) || resu.lnum != (y-2)*Dx+(y^2+y+1)*Dy) {
+        ERROR("Weyl rational subtraction error");
+    }
+    print("    ncfrac subtraction OK");
+}
+//////////////////////////////////////////////////////////////////////
+static proc testNcfracMultiplication() {
+    print("  testing ncfrac multiplication...");
+    ring R = 0,(x,y,Dx,Dy),dp;
+    def S = Weyl();
+    setring S;
+    // monoidal localization
+    poly g1 = x+3;
+    poly g2 = x*y+y;
+    ncloc loc = list(g1,g2);
+    ncfrac frac1 = list([g1,Dx,0,0], loc);
+    ncfrac frac2 = list([g2,Dy,0,0], loc);
+    ncfrac resu = frac1 * frac2;
+    if (resu.lden != g1*g2^2 || resu.lnum != x*y*Dx*Dy+y*Dx*Dy-y*Dy) {
+        ERROR("Weyl monoidal multiplication error");
+    }
+    // geometric localization
+    loc = ideal(x-1,y-3);
+    frac1.loc = loc;
+    frac2.loc = loc;
+    resu = frac1 * frac2;
+    if (resu.lden != g1*g2*(x+1) || resu.lnum != x*Dx*Dy+Dx*Dy-Dy) {
+        ERROR("Weyl geometric multiplication error");
+    }
+    // rational localization
+    loc = intvec(2);
+    frac1 = list([y^2+y+1,Dx,0,0], loc);
+    frac2 = list([y-2,Dy,0,0], loc);
+    resu = frac1 * frac2;
+    if (resu.lden != (y^2+y+1)*(y-2) || resu.lnum != Dx*Dy) {
+        ERROR("Weyl rational multiplication (1*2) error");
+    }
+    resu = frac2 * frac1;
+    if (resu.lden != (y^2+y+1)^2*(y-2) || resu.lnum != y^2*Dx*Dy+y*Dx*Dy-2*y*Dx+Dx*Dy-Dx) {
+        ERROR("Weyl rational multiplication (2*1) error");
+    }
+    print("    ncfrac multiplication OK");
+}
+//////////////////////////////////////////////////////////////////////
+static proc testNcfracDivision() {
+    print("  testing ncfrac division...");
+    ring R = 0,(x,y,Dx,Dy),dp;
+    def S = Weyl();
+    setring S;
+    // monoidal localization
+    poly g1 = x+3;
+    poly g2 = x*y+y;
+    ncloc loc = list(g1,g2);
+    ncfrac frac1 = list([g1,Dx,0,0], loc);
+    ncfrac frac2 = list([g2,g1,0,0], loc);
+    ncfrac resu = frac1 / frac2;
+    if (resu.lden != g1^3 || resu.lnum != x^2*y*Dx+4*x*y*Dx+3*y*Dx+2*y) {
+        ERROR("Weyl monoidal division error");
+    }
+    // geometric localization
+    loc = ideal(x-1,y-3);
+    frac1.loc = loc;
+    frac2.loc = loc;
+    resu = frac1 / frac2;
+    if (resu.lden != g1^3 || resu.lnum != x^2*y*Dx+4*x*y*Dx+3*y*Dx+2*y) {
+        ERROR("Weyl geometric division error");
+    }
+    // rational localization
+    loc = intvec(2);
+    frac1 = list([y^2+y+1,Dx,0,0], loc);
+    frac2 = list([y-2,3*y^2-21y+2,0,0], loc);
+    resu = frac1 / frac2;
+    if (resu.lden != 3*y^4-18*y^3-16*y^2-19*y+2 || resu.lnum != (y-2)*Dx) {
+        ERROR("Weyl geometric division error");
+    }
+    print("    ncfrac division OK");
+}
+//////////////////////////////////////////////////////////////////////
+static proc testNcfracInversion() {
+    print("  testing ncfrac invertNcfrac...");
+    ring R = 0,(x,y,Dx,Dy),dp;
+    def S = Weyl();
+    setring S;
+    poly g1 = x+3;
+    poly g2 = x*y;
+    ncfrac frac = list([g1*g2, 17, 0, 0], ncloc(list(g1,g2)));
+    frac = invertNcfrac(frac);
+    if (frac.lden != 17 || frac.lnum != g1*g2) {
+        ERROR("Weyl monoidal inversion error");
+    }
+    frac = list([g1, 3*x, 0, 0], ncloc(ideal(x-1,y)));
+    frac = invertNcfrac(frac);
+    if (frac.lden != 3*x || frac.lnum != x+3) {
+        ERROR("Weyl geometric inversion error");
+    }
+    frac = list([g1*g2, y, 0, 0], ncloc(intvec(1,2)));
+    frac = invertNcfrac(frac);
+    if (frac.lden != y || frac.lnum != g1*g2) {
+        ERROR("Weyl rational inversion error");
+    }
+    print("    ncfrac invertNcfrac OK");
+}
+//////////////////////////////////////////////////////////////////////
+static proc testEnsureRightNcfrac() {
+    print("  testing ncfrac ensureRightNcfrac...");
+    // Weyl
+    ring W = 0,(x,y,Dx,Dy),dp;
+    def ncW = Weyl();
+    setring ncW;
+    //// monoidal localization
+    ncloc monloc = list(x);
+    ncfrac monfrac = list([x,Dx,0,0], monloc);
+    ncfrac monresult = ensureRightNcfrac(monfrac);
+    if (!status(monresult)[1]) {
+        ERROR("Weyl monoidal ensureRightNcfrac failed");
+    }
+    //// geometrical localization
+    ncloc geoloc = ideal(x-1,y-3);
+    ncfrac geofrac = list([x+y,Dx+Dy,0,0], geoloc);
+    ncfrac georesult = ensureRightNcfrac(geofrac);
+    if (!status(georesult)[1]) {
+        ERROR("Weyl geometric ensureRightNcfrac failed");
+    }
+    //// rational localization
+    ncloc ratloc = intvec(1);
+    ncfrac ratfrac = list([x,Dx+Dy], ratloc);
+    ncfrac ratresult = ensureRightNcfrac(ratfrac);
+    if (!status(ratresult)[1]) {
+        ERROR("Weyl rational ensureRightNcfrac failed");
+    }
+    // shift rational localization
+    ring S = 0,(x,y,Sx,Sy),dp;
+    matrix D[4][4];
+    D[1,3] = Sx;
+    D[2,4] = Sy;
+    def ncS = nc_algebra(1, D);
+    setring ncS;
+    ncfrac shiftfrac = list([x,Sx+Sy], ratloc);
+    ncfrac shiftresult = ensureRightNcfrac(shiftfrac);
+    if (!status(shiftresult)[1]) {
+        ERROR("Shift rational ensureRightNcfrac failed");
+    }
+    // q-shift rational localization
+    ring Q = (0,q),(x,y,Qx,Qy),dp;
+    matrix C[4][4] = UpOneMatrix(4);
+    C[1,3] = q;
+    C[2,4] = q;
+    def ncQ = nc_algebra(C, 0);
+    setring ncQ;
+    ncfrac qshiftfrac = list([x,Qx+Qy], ratloc);
+    ncfrac qshiftresult = ensureRightNcfrac(qshiftfrac);
+    if (!status(qshiftresult)[1]) {
+        ERROR("q-shift rational ensureRightNcfrac failed");
+    }
+    print("    ncfrac ensureRightNcfrac OK");
+}
+//////////////////////////////////////////////////////////////////////
+static proc testEnsureLeftNcfrac() {
+    print("  testing ncfrac ensureLeftNcfrac...");
+    // Weyl
+    ring W = 0,(x,y,Dx,Dy),dp;
+    def ncW = Weyl();
+    setring ncW;
+    //// monoidal localization
+    ncloc monloc = list(x+3, x*y);
+    ncfrac monfrac = list([0,0,Dx,(x+3)^2*x], monloc);
+    ncfrac monresult = ensureLeftNcfrac(monfrac);
+    if (!status(monresult)[1]) {
+        ERROR("Weyl monoidal ensureLeftNcfrac failed");
+    }
+    //// geometric localization
+    ncloc geoloc = ideal(x-1,y-3);
+    ncfrac geofrac = list([0,0,Dx,x^2+y], geoloc);
+    ncfrac georesult = ensureLeftNcfrac(geofrac);
+    if (!status(georesult)[1]) {
+        ERROR("Weyl monoidal ensureLeftNcfrac failed");
+    }
+    //// rational localization
+    ncloc ratloc = intvec(1);
+    ncfrac ratfrac = list([0,0,Dx+Dy,x], ratloc);
+    ncfrac ratresult = ensureLeftNcfrac(ratfrac);
+    if (!status(ratresult)[1]) {
+        ERROR("Weyl monoidal ensureLeftNcfrac failed");
+    }
+    // shift rational localization
+    ring S = 0,(x,y,Sx,Sy),dp;
+    matrix D[4][4];
+    D[1,3] = Sx;
+    D[2,4] = Sy;
+    def ncS = nc_algebra(1, D);
+    setring ncS;
+    ncfrac shiftfrac = list([0,0,Sx+Sy,x], ratloc);
+    ncfrac shiftresult = ensureLeftNcfrac(shiftfrac);
+    if (!status(shiftresult)[1]) {
+        ERROR("Shift rational ensureLeftNcfrac failed");
+    }
+    // q-shift rational localization
+    ring Q = (0,q),(x,y,Qx,Qy),dp;
+    matrix C[4][4] = UpOneMatrix(4);
+    C[1,3] = q;
+    C[2,4] = q;
+    def ncQ = nc_algebra(C, 0);
+    setring ncQ;
+    ncfrac qshiftfrac = list([0,0,Qx+Qy,x], ratloc);
+    ncfrac qshiftresult = ensureLeftNcfrac(qshiftfrac);
+    if (!status(qshiftresult)[1]) {
+        ERROR("q-shift rational ensureLeftNcfrac failed");
+    }
+    print("    ncfrac ensureLeftNcfrac OK");
+}
+//////////////////////////////////////////////////////////////////////
