@@ -8,6 +8,12 @@ AUTHORS: Viktor Levandovskyy,     viktor.levandovskyy@math.rwth-aachen.de
 
 OVERVIEW: For the theory, see chapter 'Letterplace' in the @sc{Singular} Manual
 
+Support: Joint projects LE 2697/2-1 and KR 1907/3-1 of the Priority Programme SPP 1489:
+'Algorithmische und Experimentelle Methoden in Algebra, Geometrie und Zahlentheorie'
+of the German DFG
+and Project II.6 of the transregional collaborative research centre
+SFB-TRR 195 'Symbolic Tools in Mathematics and their Application' of the German DFG
+
 PROCEDURES:
 makeLetterplaceRing(d); creates a ring with d blocks of shifted original variables
 letplaceGBasis(I); computes two-sided Groebner basis of a letterplace ideal I up to a degree bound
@@ -962,8 +968,10 @@ proc makeLetterplaceRing(int d, list #)
 "USAGE:  makeLetterplaceRing(d [,h]); d an integer, h an optional integer
 RETURN:  ring
 PURPOSE: creates a ring with the ordering, used in letterplace computations
-NOTE: if h is given and nonzero, the pure homogeneous letterplace block
-@*    ordering will be used.
+NOTE: h = 0 (default) : Dp ordering will be used
+h = 1 : weights 1 used for all the variables, a tie breaker is a list of block
+of original ring
+h = 2 : the pure homogeneous letterplace block ordering (experimental) will be used.
 EXAMPLE: example makeLetterplaceRing; shows examples
 "
 {
@@ -3238,7 +3246,7 @@ example
 proc lpNF(poly p, ideal G)
 "USAGE: lpNF(p,G); f letterplace polynomial, ideal I
 RETURN: poly
-PURPOSE: computation of the normalform of p with respect to G
+PURPOSE: computation of the normal form of p with respect to G
 ASSUME: p is a Letterplace polynomial, G is a set Letterplace polynomials,
 being a Letterplace Groebner basis (no check for this will be done)
 NOTE: Strategy: take the smallest monomial wrt ordering for reduction
@@ -3723,7 +3731,7 @@ static proc checkWeightedExampleLP()
   lpMultX(a,b); // seems to work properly
 }
 
-/* THE FOLLOWING IS UNDER DEVELOPMENT
+/* THE FOLLOWING ARE UNDER DEVELOPMENT
 // copied following from freegb_wrkcp.lib by Karim Abou Zeid on 07.04.2017:
 // makeLetterplaceRingElim(int d)
 // makeLetterplaceRingNDO(int d)

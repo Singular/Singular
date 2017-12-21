@@ -66,6 +66,14 @@ and 'lp' for the letterplace representation of monomials
 
 PROCEDURES:
 
+lpMis2Dim(M);              computes the K-dimension of the monomial factor algebra
+lpKDim(G[,d,n]);           computes the K-dimension of A/<G>
+lpDimCheck(G);             checks if the K-dimension of A/<G> is infinite
+lpMis2Base(M);             computes a K-basis of the factor algebra
+lpHilbert(G[,d,n]);        computes the Hilbert series of A/<G> in lp format
+lpDHilbert(G[,d,n]);       computes the K-dimension and Hilbert series of A/<G>
+lpDHilbertSickle(G[,d,n]); computes mistletoes, K-dimension and Hilbert series
+
 ivDHilbert(L,n[,d]);       computes the K-dimension and the Hilbert series
 ivDHilbertSickle(L,n[,d]); computes mistletoes, K-dimension and Hilbert series
 ivDimCheck(L,n);           checks if the K-dimension of A/<L> is infinite
@@ -77,13 +85,6 @@ ivOrdMisLex(M);            orders a list of intvecs lexicographically
 ivSickle(L,n[,d]);         computes the mistletoes of A/<L> in intvec format
 ivSickleHil(L,n[,d]);      computes the mistletoes and Hilbert series of A/<L>
 ivSickleDim(L,n[,d]);      computes the mistletoes and the K-dimension of A/<L>
-lpDHilbert(G[,d,n]);       computes the K-dimension and Hilbert series of A/<G>
-lpDHilbertSickle(G[,d,n]); computes mistletoes, K-dimension and Hilbert series
-lpHilbert(G[,d,n]);        computes the Hilbert series of A/<G> in lp format
-lpDimCheck(G);             checks if the K-dimension of A/<G> is infinite
-lpKDim(G[,d,n]);           computes the K-dimension of A/<G> in lp format
-lpMis2Base(M);             computes a K-basis of the factor algebra
-lpMis2Dim(M);              computes the K-dimension of the factor algebra
 lpOrdMisLex(M);            orders an ideal of lp-monomials lexicographically
 lpSickle(G[,d,n]);         computes the mistletoes of A/<G> in lp format
 lpSickleHil(G[,d,n]);      computes the mistletoes and Hilbert series of A/<G>
@@ -2608,7 +2609,6 @@ proc tst_fpadim()
    Here are some examples one may try. Just copy them into your console.
    These are relations for braid groups, up to degree d:
 
-
    LIB "fpadim.lib";
    ring r = 0,(x,y,z),dp;
    int d =10; // degree
@@ -2824,8 +2824,7 @@ proc TestGKAuslander3()
 */
 
 
-/*   actual work:
-// downup algebra A
+/*   more tests : downup algebra A
 LIB "fpadim.lib";
 ring r = (0,a,b,g),(x,y),Dp;
 def R = makeLetterplaceRing(6); // constructs a Letterplace ring
