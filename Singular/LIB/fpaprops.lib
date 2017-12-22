@@ -481,6 +481,7 @@ static proc topologicalSort(intmat G) {
       } kill k;
       if (incoming == 0) {
         v = j;
+        kill incoming;
         break;
       } else {
         if (j == n) {
