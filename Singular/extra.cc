@@ -277,7 +277,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
 /*==================== alarm ==================================*/
-  #ifdef unix
       if(strcmp(sys_cmd,"alarm")==0)
       {
         if ((h!=NULL) &&(h->Typ()==INT_CMD))
@@ -295,7 +294,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           WerrorS("int expected");
       }
       else
-  #endif
 /*==================== cpu ==================================*/
     if(strcmp(sys_cmd,"cpu")==0)
     {

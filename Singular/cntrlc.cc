@@ -35,7 +35,6 @@
 #undef CALL_GDB
 #endif
 
-#if defined(unix)
  #include <unistd.h>
  #include <sys/types.h>
 
@@ -65,7 +64,6 @@
  #ifndef __OPTIMIZE__
    static void stack_trace (char *const*args);
  #endif
-#endif
 
 si_link pipeLastLink=NULL;
 BOOLEAN singular_in_batchmode=FALSE;
@@ -301,11 +299,9 @@ void sigsegv_handler(int sig)
     longjmp(si_start_jmpbuf,1);
   }
   #endif /* __OPTIMIZE__ */
-  #if defined(unix)
   #ifdef CALL_GDB
   if (sig!=SIGINT) debug(STACK_TRACE);
   #endif /* CALL_GDB */
-  #endif /* unix */
   exit(0);
 }
 #endif
@@ -409,7 +405,6 @@ void sigint_handler(int /*sig*/)
 //  }
 //}
 
-#ifdef unix
 #  ifndef __OPTIMIZE__
 volatile int si_stop_stack_trace_x;
 #    ifdef CALL_GDB
@@ -564,7 +559,6 @@ static void stack_trace (char *const*args)
 }
 
 #  endif /* !__OPTIMIZE__ */
-#endif /* unix */
 
 /*2
 * init signal handlers

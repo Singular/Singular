@@ -97,13 +97,8 @@ extern char * text_buffer;
 #  define YYLP_MISS_BR3   12
 
 #  ifdef STANDALONE_PARSER
-#ifndef unix
-extern FILE* myfopen(char *path, char *mode);
-extern size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream);
-#else
 #define myfopen fopen
 #define myfread fread
-#endif
 #  endif
 
 #endif /* LIBPARSE_H */
