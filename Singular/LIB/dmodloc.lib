@@ -311,7 +311,7 @@ EXAMPLE:  example polyVars; shows examples
   ideal V;
   int i;
   int n = nvars(basering);
-  for (i=1; i<=nrows(v); i++)
+  for (i=1; i<=size(v); i++)
   {
     if ( (v[i]<0) || (v[i]>n) )
     {
