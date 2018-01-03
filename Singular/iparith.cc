@@ -2198,6 +2198,48 @@ static BOOLEAN jjFIND2(leftv res, leftv u, leftv v)
   /*else res->data=NULL;*/
   return FALSE;
 }
+
+static BOOLEAN jjFRES3(leftv res, leftv u, leftv v, leftv w)
+{
+    assumeStdFlag(u);
+    ideal id = (ideal)u->Data();
+    int max_length = (int)(long)v->Data();
+    if (max_length < 0) {
+        WerrorS("length for fres must not be negative");
+        return TRUE;
+    }
+    if (max_length == 0) {
+        max_length = currRing->N+1;
+        if (currRing->qideal != NULL) {
+            Warn("full resolution in a qring may be infinite, "
+                "setting max length to %d", max_length);
+        }
+    }
+    char *method = (char *)w->Data();
+    /* For the moment, only "complete" (default), "frame", or "extended frame"
+     * are allowed. Another useful option would be "linear strand".
+     */
+    if (strcmp(method, "complete") != 0
+            && strcmp(method, "frame") != 0
+            && strcmp(method, "extended frame") != 0) {
+        WerrorS("wrong optional argument for fres");
+    }
+    syStrategy r = syFrank(id, max_length, method);
+    assume(r->fullres != NULL);
+    res->data = (void *)r;
+    return FALSE;
+}
+
+static BOOLEAN jjFRES(leftv res, leftv u, leftv v)
+{
+    leftv w = (leftv)omAlloc0(sizeof(sleftv));
+    w->rtyp = STRING_CMD;
+    w->data = (char *)"complete";   // default
+    BOOLEAN RES = jjFRES3(res, u, v, w);
+    omFree(w);
+    return RES;
+}
+
 static BOOLEAN jjFWALK(leftv res, leftv u, leftv v)
 {
   res->data=(char *)fractalWalkProc(u,v);
