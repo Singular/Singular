@@ -46,8 +46,9 @@ SLIB1 = arr.lib \
         locnormal.lib \
 	methods.lib modnormal.lib modular.lib multigrading.lib modwalk.lib\
 	JMBTest.lib JMSConst.lib \
+	ncfrac.lib ncloc.lib ncModslimgb.lib\
 	nfmodstd.lib nfmodsyz.lib numerAlg.lib numerDecom.lib \
-        orbitparam.lib \
+        olga.lib orbitparam.lib \
 	parallel.lib polyclass.lib polymake.lib polybori.lib \
 	realclassify.lib realizationMatroids.lib resources.lib ringgb.lib \
 	rootisolation.lib rwalk.lib rstandard.lib \
