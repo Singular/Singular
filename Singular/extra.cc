@@ -3009,11 +3009,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   /*==================== Roune Hilb  =================*/
        if (strcmp(sys_cmd, "hilbroune") == 0)
        {
-         ideal I;
          if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
          {
-           I=(ideal)h->CopyD();
-           slicehilb(I);
+           slicehilb((ideal)h->Data());
          }
          else return TRUE;
          return FALSE;
