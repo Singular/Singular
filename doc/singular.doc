@@ -287,7 +287,6 @@ with the @code{--no-stdlib} command line option (see
 * random_lib:: procedures of random/sparse  matrix and polynomial operations
 * resources_lib:: Tools to manage the computational resources
 * ring_lib:: procedures for manipulating rings and maps
-* schreyer_lib:: Helpers for Schreyer resolution
 * tasks_lib:: A parallel framework based on tasks
 @end menu
 
@@ -347,10 +346,6 @@ LIB "all.lib";
 @node ring_lib
 @subsection ring_lib
 @c lib ring.lib
-@c ----------------------------------------------------------
-@node schreyer_lib
-@subsection schreyer_lib
-@c lib schreyer.lib
 @c ----------------------------------------------------------
 @node tasks_lib
 @subsection tasks_lib

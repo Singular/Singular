@@ -95,21 +95,6 @@ Hence setting these options only affects the current ring. Be aware of this
 when switching between different rings, since the options affect the
 result of various computations (in particular Groebner bases).
 
-@subsubheading New libraries depending on Singular 4
-@cindex New libraries depending on Singular 4
-
-In Singular 4 there several new features are implemented within a
-dynamic module @code{syzextra.so}, not available in Singular 3.
-It implements the low-level functions for Schreyer resolutions and many auxiliary functions.
-The following new libraries @ref{deRham_lib}, @ref{schreyer_lib} depend on it:
-
-@c table @asis
-@itemize @bullet
-@item @ref{deRham_lib} - computes de Rham cohomology
-@item @ref{schreyer_lib} - computes Schreyer resolution via several approaches. It also serves as a high-level wrapper to the dynamic module @code{syzextra.so}
-@end itemize
-@c @end table
-
 @subsubheading Path names
 @cindex Path names
 
