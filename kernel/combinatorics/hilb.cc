@@ -129,7 +129,8 @@ static int  *hAddHilb(int Nv, int x, int *pol, int *lp)
 static void hLastHilb(scmon pure, int Nv, varset var, int *pol, int lp)
 {
   int  l = lp, x, i, j;
-  int  *p, *pl;
+  int  *pl;
+  int  *p;
   p = pol;
   for (i = Nv; i>0; i--)
   {
@@ -263,7 +264,7 @@ static bool idDegSortTest(ideal I)
 #endif
 
 //adds the new polynomial at the coresponding position
-//and simplifies the ideal
+//and simplifies the ideal, destroys p
 static void SortByDeg_p(ideal I, poly p)
 {
   int i,j;
@@ -278,6 +279,7 @@ static void SortByDeg_p(ideal I, poly p)
   {
     if(p_DivisibleBy( I->m[i],p, currRing))
     {
+      p_Delete(&p,currRing);
       return;
     }
   }
@@ -285,7 +287,7 @@ static void SortByDeg_p(ideal I, poly p)
   {
     if(p_DivisibleBy(p,I->m[i], currRing))
     {
-      I->m[i] = NULL;
+      p_Delete(&I->m[i],currRing);
     }
   }
   if(idIs0(I))
@@ -373,10 +375,10 @@ static ideal SortByDeg(ideal I)
   ideal res;
   idSkipZeroes(I);
   res = idInit(1,1);
-  res->m[0] = poly(0);
   for(i = 0; i<=IDELEMS(I)-1;i++)
   {
     SortByDeg_p(res, I->m[i]);
+    I->m[i]=NULL; // I->m[i] is now in res
   }
   idSkipZeroes(res);
   //idDegSortTest(res);
@@ -437,6 +439,7 @@ ideal idQuotMon(ideal Iorig, ideal p)
       for(i = 0; i<=IDELEMS(res)-1; i++)
       {
         SortByDeg_p(I,res->m[i]);
+        res->m[i]=NULL; // is now in I
       }
     }
     id_Delete(&res,currRing);
@@ -448,6 +451,7 @@ ideal idQuotMon(ideal Iorig, ideal p)
 static void idAddMon(ideal I, ideal p)
 {
   SortByDeg_p(I,p->m[0]);
+  p->m[0]=NULL; // is now in I
   //idSkipZeroes(I);
 }
 
@@ -1319,7 +1323,8 @@ intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree, ri
 intvec * hSecondSeries(intvec *hseries1)
 {
   intvec *work, *hseries2;
-  int i, j, k, s, t, l;
+  int i, j, k, t, l;
+  int s;
   if (hseries1 == NULL)
     return NULL;
   work = new intvec(hseries1);
@@ -1352,7 +1357,8 @@ intvec * hSecondSeries(intvec *hseries1)
 
 void hDegreeSeries(intvec *s1, intvec *s2, int *co, int *mu)
 {
-  int m, i, j, k;
+  int i, j, k;
+  int m;
   *co = *mu = 0;
   if ((s1 == NULL) || (s2 == NULL))
     return;
