@@ -32,7 +32,7 @@
 #include <malloc/malloc.h>
 #define _omSizeOfLargeAddr(addr) (malloc_size(addr))
 #elif defined(HAVE_MALLOC_USABLE_SIZE)
-#include <malloc.h>
+#include <stdlib.h>
 #define _omSizeOfLargeAddr(addr) (malloc_usable_size(addr))
 #else
 void* omAllocLarge(size_t size)
