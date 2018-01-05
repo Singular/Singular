@@ -19,7 +19,7 @@
 #define OM_MALLOC_SIZEOF_ADDR(addr)  (malloc_size(addr))
 #elif (defined(HAVE_MALLOC_USABLE_SIZE))
 /* and this will work under Linux */
-#include <malloc.h>
+#include <stdlib.h>
 #define OM_MALLOC_SIZEOF_ADDR(addr) (malloc_usable_size(addr))
 #else
 static inline size_t OM_MALLOC_SIZEOF_ADDR(void *d) { long*dd=(long*)d; return *(dd-1); }
