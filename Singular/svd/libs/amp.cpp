@@ -1,4 +1,5 @@
 #include "svd_si.h"
+#ifdef HAVE_SVD
 
 /************************************************************************
 Storage of mpfr lists
@@ -153,3 +154,4 @@ mpfr_ptr amp::mpfr_reference::getWritePtr()
     ref = newref;
     return ref->value;
 }
+#endif

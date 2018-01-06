@@ -14,7 +14,9 @@ See www.alglib.net or alglib.sources.ru for details.
 #include <stdlib.h>
 #include <math.h>
 #include "resources/feFopen.h"
+#include "kernel/mod2.h"
 
+#ifdef HAVE_SVD
 /********************************************************************
 Checking of the array boundaries mode.
 ********************************************************************/
@@ -8329,5 +8331,6 @@ namespace svd
     }
 } // namespace
 
+#endif
 #endif
 
