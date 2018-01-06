@@ -1,4 +1,5 @@
 #include "svd_si.h"
+#ifdef HAVE_SVD
 
 const double ap::machineepsilon = 5E-16;
 const double ap::maxrealnumber  = 1E300;
@@ -177,3 +178,4 @@ double ap::minreal(double m1, double m2)
 {
     return m1>m2 ? m2 : m1;
 }
+#endif

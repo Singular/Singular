@@ -1012,12 +1012,7 @@ double minreal(double m1, double m2);
 };//namespace ap
 
 
-#endif
-
 /* stuff included from libs/amp.h */
-
-#ifndef _AMP_R_H
-#define _AMP_R_H
 
 #include <omalloc/omalloc.h>
 #include <gmp.h>
@@ -2475,8 +2470,6 @@ namespace amp
     }
 }
 
-#endif
-
 /* stuff included from ./reflections.h */
 
 /*************************************************************************
@@ -2516,9 +2509,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
-
-#ifndef _reflections_h
-#define _reflections_h
 
 namespace reflections
 {
@@ -2792,8 +2782,6 @@ namespace reflections
     }
 } // namespace
 
-#endif
-
 /* stuff included from ./bidiagonal.h */
 
 /*************************************************************************
@@ -2833,9 +2821,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
-
-#ifndef _bidiagonal_h
-#define _bidiagonal_h
 
 namespace bidiagonal
 {
@@ -4245,8 +4230,6 @@ namespace bidiagonal
     }
 } // namespace
 
-#endif
-
 /* stuff included from ./qr.h */
 
 /*************************************************************************
@@ -4286,9 +4269,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
-
-#ifndef _qr_h
-#define _qr_h
 
 namespace qr
 {
@@ -4716,8 +4696,6 @@ namespace qr
     }
 } // namespace
 
-#endif
-
 /* stuff included from ./lq.h */
 
 /*************************************************************************
@@ -4751,9 +4729,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
-
-#ifndef _lq_h
-#define _lq_h
 
 namespace lq
 {
@@ -5172,8 +5147,6 @@ namespace lq
     }
 } // namespace
 
-#endif
-
 /* stuff included from ./blas.h */
 
 /*************************************************************************
@@ -5207,9 +5180,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
-
-#ifndef _blas_h
-#define _blas_h
 
 namespace blas
 {
@@ -5881,8 +5851,6 @@ namespace blas
     }
 } // namespace
 
-#endif
-
 /* stuff included from ./rotations.h */
 
 /*************************************************************************
@@ -5922,9 +5890,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
-
-#ifndef _rotations_h
-#define _rotations_h
 
 namespace rotations
 {
@@ -6279,8 +6244,6 @@ namespace rotations
     }
 } // namespace
 
-#endif
-
 /* stuff included from ./bdsvd.h */
 
 /*************************************************************************
@@ -6320,9 +6283,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
-
-#ifndef _bdsvd_h
-#define _bdsvd_h
 
 namespace bdsvd
 {
@@ -7668,8 +7628,6 @@ namespace bdsvd
     }
 } // namespace
 
-#endif
-
 /* stuff included from ./svd.h */
 
 /*************************************************************************
@@ -7703,9 +7661,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
-
-#ifndef _svd_h
-#define _svd_h
 
 /*MAKEHEADER*/
 
