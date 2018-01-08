@@ -1044,15 +1044,16 @@ EXAMPLE: example lpSubstitute; shows examples
       /*fis = lpNF(fis,G);*/
       kill varindex; kill subindex;
     } kill j;
-    kill fis; kill ivfi;
+    kill ivfi;
     fs = fs + fis;
-  } kill i;
+    kill fis;
+  }
+  kill i;
   fs = lpNF(fs, G);
   return (fs);
 }
 example {
   //////// EXAMPLE A ////////
-  LIB "fpadim.lib";
   ring r = 0,(x,y,z),dp;
   def R = makeLetterplaceRing(4);
   setring R;
@@ -1073,7 +1074,6 @@ example {
   lpSubstitute(imap(R,f), imap(R,s1), imap(R,s2), imap(R,G));
 
   //////// EXAMPLE B ////////
-  LIB "fpadim.lib";
   ring r = 0,(x,y,z),dp;
   def R = makeLetterplaceRing(4);
   setring R;
