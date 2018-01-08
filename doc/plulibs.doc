@@ -27,6 +27,7 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 * dmodapp_lib::  Applications of algebraic D-modules
 * dmodvar_lib:: Algebraic D-modules and Bernstein-Sato polynomial for varieties
 * fpadim_lib::  Algorithms for quotient algebras in the letterplace case
+* fpaprops_lib:: Algorithms for properties of quotient algebras in letterplace case
 * freegb_lib::  Two-sided Groebner bases in free algebras via Letterplace
 * involut_lib::  Computations and operations with involutions
 * gkdim_lib::  Computation of the Gelfand-Kirillov dimension of modules
@@ -47,86 +48,89 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 @lowersections
 
 @c ----------------------------------------------------------
-@node bimodules_lib, bfun_lib, , Non-commutative libraries
+@node bimodules_lib
 @section bimodules_lib
 @c lib bimodules.lib
 @c ----------------------------------------------------------
-@node bfun_lib, central_lib, bimodules_lib, Non-commutative libraries
+@node bfun_lib
 @section bfun_lib
 @c lib bfun.lib
 @c ----------------------------------------------------------
-@node central_lib, dmod_lib, bfun_lib, Non-commutative libraries
+@node central_lib
 @section central_lib
 @c lib central.lib
 @c ----------------------------------------------------------
-@node dmod_lib, dmodapp_lib, central_lib, Non-commutative libraries
+@node dmod_lib
 @section dmod_lib
 @c lib dmod.lib
 @c ----------------------------------------------------------
-@node dmodapp_lib, dmodvar_lib, dmod_lib, Non-commutative libraries
+@node dmodapp_lib
 @section dmodapp_lib
 @c lib dmodapp.lib
 @c ----------------------------------------------------------
-@node dmodvar_lib, fpadim_lib, dmodapp_lib, Non-commutative libraries
+@node dmodvar_lib
 @section dmodvar_lib
 @c lib dmodvar.lib
 @c ----------------------------------------------------------
-@node fpadim_lib, freegb_lib, dmodvar_lib, Non-commutative libraries
+@node fpadim_lib
 @section fpadim_lib
 @c lib fpadim.lib
 @c ----------------------------------------------------------
-@node freegb_lib, involut_lib, fpadim_lib, Non-commutative libraries
+@node fpaprops_lib
+@section fpaprops_lib
+@c lib fpaprops.lib
+@c ----------------------------------------------------------
+@node freegb_lib
 @section freegb_lib
 @c lib freegb.lib
 @c ----------------------------------------------------------
-@node involut_lib,  gkdim_lib, freegb_lib, Non-commutative libraries
+@node involut_lib
 @section involut_lib
 @c lib involut.lib
 @c ----------------------------------------------------------
-@node gkdim_lib, ncalg_lib, involut_lib, Non-commutative libraries
+@node gkdim_lib
 @section gkdim_lib
 @c lib gkdim.lib
 @c ----------------------------------------------------------
-@node ncalg_lib, ncdecomp_lib, gkdim_lib, Non-commutative libraries
+@node ncalg_lib
 @section ncalg_lib
 @c lib ncalg.lib
 @c ----------------------------------------------------------
-@node ncdecomp_lib, ncfactor_lib, ncalg_lib, Non-commutative libraries
+@node ncdecomp_lib
 @section ncdecomp_lib
 @c lib ncdecomp.lib
 @c ----------------------------------------------------------
-@node ncfactor_lib, ncpreim_lib, ncdecomp_lib, Non-commutative libraries
+@node ncfactor_lib
 @section ncfactor_lib
 @c lib ncfactor.lib
 @c ----------------------------------------------------------
-@node ncpreim_lib, nctools_lib, ncfactor_lib, Non-commutative libraries
+@node ncpreim_lib
 @section ncpreim_lib
 @c lib ncpreim.lib
 @c ----------------------------------------------------------
-@node nctools_lib, perron_lib, ncpreim_lib, Non-commutative libraries
+@node nctools_lib
 @section nctools_lib
 @c lib nctools.lib
 @c ----------------------------------------------------------
-@node perron_lib, qmatrix_lib, nctools_lib, Non-commutative libraries
+@node perron_lib
 @section perron_lib
 @c lib perron.lib
 @c ---------------------------------------------------------
-@node qmatrix_lib, purityfiltration_lib , perron_lib, Non-commutative libraries
+@node qmatrix_lib
 @section qmatrix_lib
 @c lib qmatrix.lib
 @c ----------------------------------------------------------
-@node purityfiltration_lib, nchomolog_lib, qmatrix_lib, Non-commutative libraries
+@node purityfiltration_lib
 @section purityfiltration_lib
 Status: experimental
 @c lib purityfiltration.lib
 @c ----------------------------------------------------------
-@node nchomolog_lib, ratgb_lib, purityfiltration_lib, Non-commutative libraries
+@node nchomolog_lib
 @section nchomolog_lib
 Status: experimental
 @c lib nchomolog.lib
 @c ----------------------------------------------------------
-@c @node ratgb_lib, bimodules_lib, nchomolog_lib, Non-commutative libraries
-@node ratgb_lib, dmodloc_lib, nchomolog_lib, Non-commutative libraries
+@node ratgb_lib
 @section ratgb_lib
 Status: experimental
 @c lib ratgb.lib
@@ -136,8 +140,7 @@ Status: experimental
 @c Status: experimental
 @c @c lib bimodules.lib
 @c ----------------------------------------------------------
-@c @node dmodloc_lib, , bimodules_lib, Non-commutative libraries
-@node dmodloc_lib, , ratgb_lib, Non-commutative libraries
+@node dmodloc_lib
 @section dmodloc_lib
 Status: experimental
 @c lib dmodloc.lib
