@@ -1523,14 +1523,21 @@ static inline int p_LmCmp(poly p, poly q, const ring r)
     goto LengthGeneral_OrdGeneral_LoopTop;
   }
   const long* _ordsgn = (long*) r->ordsgn;
+#if 1 /* two variants*/ 
   if (_v1 > _v2)
   {
-    if (_ordsgn[_i] == 1) return 1;
-    return -1;
+    return _ordsgn[_i];
   }
-  if (_ordsgn[_i] == 1) return -1;
-  return 1;
-
+  return -(_ordsgn[_i]);
+#else
+   if (_v1 > _v2)
+   {
+     if (_ordsgn[_i] == 1) return 1;
+     return -1;
+   }
+   if (_ordsgn[_i] == 1) return -1;
+   return 1;
+#endif
 }
 
 // The coefficient will be compared in absolute value
