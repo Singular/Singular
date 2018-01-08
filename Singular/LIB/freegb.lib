@@ -986,7 +986,7 @@ EXAMPLE: example makeLetterplaceRing; shows examples
   {
     def @A = makeLetterplaceRing1(d);
   }
-  else { 
+  else {
     if (alternativeVersion == 2)
     {
       def @A = makeLetterplaceRing2(d);
