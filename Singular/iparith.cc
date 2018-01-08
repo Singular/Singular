@@ -2302,6 +2302,8 @@ static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
   assumeStdFlag(u);
   intvec *module_w=(intvec*)atGet(u,"isHomog",INTVEC_CMD);
   intvec *iv=hFirstSeries((ideal)u->Data(),module_w,currRing->qideal);
+  if (errorreported) return TRUE;
+
   switch((int)(long)v->Data())
   {
     case 1:
@@ -5696,6 +5698,8 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
   assumeStdFlag(u);
   intvec *module_w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   intvec *iv=hFirstSeries((ideal)u->Data(),module_w,currRing->qideal,wdegree);
+  if (errorreported) return TRUE;
+
   switch((int)(long)v->Data())
   {
     case 1:

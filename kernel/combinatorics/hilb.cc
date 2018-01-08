@@ -110,11 +110,20 @@ static int  *hAddHilb(int Nv, int x, int *pol, int *lp)
   pon = Qpol[Nv];
   memcpy(pon, pol, l * sizeof(int));
   if (l > x)
-  {
+  {/*pon[i] -= pol[i - x];*/
     for (i = x; i < l; i++)
-      pon[i] -= pol[i - x];
+    { int64 t=pon[i];
+      int64 t2=pol[i - x];
+      t-=t2;
+      if ((t>=INT_MIN)&&(t<=INT_MAX)) pon[i]=t;
+      else if (!errorreported) WerrorS("int overflow in hilb 1");
+    }
     for (i = l; i < ln; i++)
-      pon[i] = -pol[i - x];
+    { /*pon[i] = -pol[i - x];*/
+      int64 t= -pol[i - x];
+      if ((t>=INT_MIN)&&(t<=INT_MAX)) pon[i]=t;
+      else if (!errorreported) WerrorS("int overflow in hilb 2");
+    }
   }
   else
   {
@@ -141,13 +150,25 @@ static void hLastHilb(scmon pure, int Nv, varset var, int *pol, int lp)
   pl = *Qpol;
   j = Q0[Nv + 1];
   for (i = 0; i < l; i++)
-    pl[i + j] += p[i];
+  { /* pl[i + j] += p[i];*/
+    int64 t=pl[i+j];
+    int64 t2=p[i];
+    t+=t2;
+    if ((t>=INT_MIN)&&(t<=INT_MAX)) pl[i+j]=t;
+    else if (!errorreported) WerrorS("int overflow in hilb 3");
+  }
   x = pure[var[1]];
   if (x!=0)
   {
     j += x;
     for (i = 0; i < l; i++)
-      pl[i + j] -= p[i];
+    { /* pl[i + j] -= p[i];*/
+      int64 t=pl[i+j];
+      int64 t2=p[i];
+      t-=t2;
+      if ((t>=INT_MIN)&&(t<=INT_MAX)) pl[i+j]=t;
+      else if (!errorreported) WerrorS("int overflow in hilb 4");
+    }
   }
   j += l;
   if (j > hLength)
@@ -1398,6 +1419,7 @@ void hLookSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree, ring ta
   id_TestTail(S, currRing, tailRing);
 
   intvec *hseries1 = hFirstSeries(S, modulweight, Q, wdegree, tailRing);
+  if (errorreported) return;
 
   hPrintHilb(hseries1);
 
