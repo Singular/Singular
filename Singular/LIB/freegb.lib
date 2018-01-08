@@ -974,7 +974,7 @@ h = 1 : the pure homogeneous letterplace block ordering (applicable in the situa
 EXAMPLE: example makeLetterplaceRing; shows examples
 "
 {
-  int alternativeVersion = 0;
+  int alternativeVersion = 2; // temporary until makeLetterplaceRing4() is fixed
   if ( size(#)>0 )
   {
     if (typeof(#[1]) == "int")
