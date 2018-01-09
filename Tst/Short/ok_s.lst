@@ -14,6 +14,7 @@ bug_normalize
 bug_qring2
 bug_ring
 bug_ringlist
+bug_solve
 bug_ssi_algring
 bug_ssi_attr
 bug_zp
