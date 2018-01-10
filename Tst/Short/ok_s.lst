@@ -102,6 +102,8 @@ gcd_univar_p_s
 gcd_univar_p_alpha_s
 modular_s
 modstd_s
+modules
+nets
 ncfactor_facNthShift1_s
 ncfactor_landau_ex_s
 ncfactor_multipleFacsSameTopAndBottom_s

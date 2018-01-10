@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="version nets.lib 4.1.1.0 Jan_2018 "; // $Id$
 category="Miscellaneous";
 info="
 LIBRARY:  net.lib    Net structures for pretty printing
@@ -66,12 +66,12 @@ LIB "combinat.lib";
 	ring r4 = 0,(a,b,c,d),lp;
 //
 	ring r5 = 7,(x,y,z),ds;
-//	
+//
 	ring r6 = 10,(x,y,z),ds;
 //
 	ring r7 = 7,(x(1..6)),(lp(3),dp);
 //
-	ring r8 = 0,(x,y,z,a,b,c),(ds(3), dp(3)); 
+	ring r8 = 0,(x,y,z,a,b,c),(ds(3), dp(3));
 //
 	ring r9 = 0,(x,y,z),(c,wp(2,1,3));
 //
@@ -131,7 +131,7 @@ static proc emptyString(int n)
 	{
   		S=S+" ";
 	}
-	
+
 return(S);
 }
 
@@ -166,7 +166,7 @@ EXAMPLE: example stackNets; shows an example
 	list LM=M.rows;
 	Net NM;
 	NM.rows=LN+LM;
-	
+
 return(NM);
 }
 example
@@ -207,7 +207,7 @@ EXAMPLE: example catNets; shows an example
 	}
 	Net NM;
 	NM.rows=L;
-	
+
 return(NM);
 }
 example
@@ -350,7 +350,7 @@ EXAMPLE: example netPrimePower; shows an example
 		return(string("n"));
 	}
 	*/
-	string S=string(n)+string("^")+string(m);	
+	string S=string(n)+string("^")+string(m);
 return(net(/*(n)+net("^")+net(r)*/ S));
 }
 example{
@@ -364,7 +364,7 @@ netPrimePower(n,m);
 
 
 //
-//  netRing  
+//  netRing
 //
 proc netRing(def R)
 "USAGE: netRing(f); f ring@*
@@ -381,12 +381,12 @@ EXAMPLE: example netRing; shows an example
         } else {
              Net N=netCoefficientRing(R)+net("[")+net(string(RL[2]))+net("] / ")+net(RL[4]);
         }
-  	
+
 return(N);
 }
 example
 {
-"EXAMPLE:"; // from 3.3.1 Examples of ring declarations 
+"EXAMPLE:"; // from 3.3.1 Examples of ring declarations
 	ring r1 = 32003,(x,y,z),dp;
 	netRing(r1);
 //
@@ -401,14 +401,14 @@ example
 //
 	ring r5 = 7,(x,y,z),ds;
 	netRing(r5);
-//	
+//
 	ring r6 = 10,(x,y,z),ds;
 	netRing(r6);
 //
 	ring r7 = 7,(x(1..6)),(lp(3),dp);
 	netRing(r7);
 //
-	ring r8 = 0,(x,y,z,a,b,c),(ds(3), dp(3)); 
+	ring r8 = 0,(x,y,z,a,b,c),(ds(3), dp(3));
 	netRing(r8);
 //
 	ring r9 = 0,(x,y,z),(c,wp(2,1,3));
@@ -448,7 +448,7 @@ example
 
 
 //
-//  netMap 
+//  netMap
 //
 proc netMap( map f)
 "USAGE: netMap(f); f map@*
@@ -466,7 +466,7 @@ EXAMPLE: example netMap; shows an example
 	Net M;
 
 // 1
-	Map=string(nameof(f)); 
+	Map=string(nameof(f));
 	Source=string(nameof(preimage(f)));
 	Target=string(nameof(basering));
 	Output[1]="Map"+": "+Source+" --> "+Target;
@@ -474,15 +474,15 @@ EXAMPLE: example netMap; shows an example
 	empty=size(Output[1]);
 	Output[1]=Output[1]+" , "+string(ringlist(preimage(f))[2][1])+" -> "+string(f[1]);
 
-// 2	
+// 2
 	for (i=2; i<=v; i++){// +2
 		Output[i]=emptyString(empty)+" , "+string(ringlist(preimage(f))[2][i])+" -> "+string(f[i]);
 	}// -2
-	
+
 // 3
 	M.rows=Output;
 
-// -	
+// -
 	return(M);
 }
 
@@ -498,7 +498,7 @@ netMap(f);
 
 
 //
-//  netMap2 
+//  netMap2
 //
 proc netMap2( map f)
 "USAGE: netMap2(f); f map@*
@@ -528,10 +528,10 @@ EXAMPLE: example netMap2; shows an example
 	for (i=2; i<=v; i++){// +2
 		Output[1]=Output[1]+" , "+string(ringlist(preimage(f))[2][i])+" -> "+string(f[i]);
 	}// -2
-	
+
 // 3
 	M.rows=Output;
-	
+
 // -
 	return(M);
 }
@@ -557,7 +557,7 @@ THEORY: A Singular object is converted into a character array (a Net) for on scr
 KEYWORDS: Output
 EXAMPLE: example netBigIntMatrix; shows an example
 "
-{ 
+{
 // 0
 	int Length=100; //Length of Output
 
@@ -591,7 +591,7 @@ EXAMPLE: example netBigIntMatShort; shows an example
 "
 {
 // 0
- 	int Length=10; // Länge der Ausgabe 
+ 	int Length=10; // Länge der Ausgabe
  	string S;
     list L, SizeCol, SizeColShort;
     int wd,defect;
@@ -601,17 +601,17 @@ EXAMPLE: example netBigIntMatShort; shows an example
 	if( size(#)!=0 ){// + 1
 		Length=#[1];
 	}// - 1
-   
+
 // 2
    for (j=1; j <= ncols(M); j++){// +2
 		SizeCol[j]=0;
 	}// -2
-	
-// 3	
+
+// 3
 	for (j=1; j <= ncols(M); j++){// +3
 		SizeColShort[j]=0;
 	}// -3
-	
+
 // 4
 	for (j=1; j <= ncols(M); j++){// +4
 		for (i=1; i <= nrows(M) ; i++){// +4.1
@@ -628,7 +628,7 @@ EXAMPLE: example netBigIntMatShort; shows an example
 			SizeColShort[j]=Length;
 		}// -5.1
 	}// -5
-	
+
 // 6
     for (i=1; i<=nrows(M); i++ ){// +6
     	for (j=1; j<=ncols(M); j++ ){// +6.1
@@ -638,7 +638,7 @@ EXAMPLE: example netBigIntMatShort; shows an example
     		if ( SizeCol[j] > Length ){// -6.1.2
     			if ( size(string(M[i,j])) > Length ){// +6.1.2.1
     				S=S+string(M[i,j])[1,Length]+"...";
-    			}// -6.1.2.1 
+    			}// -6.1.2.1
     			else{// +6.1.2.2
     				defect=SizeColShort[j]+3-size(string(M[i,j]));
     				S=S+string(M[i,j])+emptyString(defect);
@@ -652,13 +652,13 @@ EXAMPLE: example netBigIntMatShort; shows an example
       	L[i]=S;
       	S="";
     }// -6
-    
-// 7     
+
+// 7
     for (j=1; j<=nrows(M); j++){// +7
        L[j]="| "+L[j]+" |";
     }// -7
 
-// 8    
+// 8
     Net NM;
     NM.rows=L;
 
@@ -690,15 +690,15 @@ THEORY: A Singular object is converted into a character array (a Net) for on scr
 KEYWORDS: Output
 EXAMPLE: example netBigIntMat; shows an example
 "
-{ 
-// 0	
+{
+// 0
 	int m=nrows(M);
 	int n=ncols(M);
 
 // 1
 	bigintmat B[m][n]=M;
 	Net Output=netBigIntMat(B);
-	
+
 // -
 	return(Output);
 }
@@ -712,7 +712,7 @@ int c=333333;
 int d=444444;
 intmat M[2][2]=a,b,c,d;
 netIntMat(M);
-}	
+}
 
 
 
@@ -727,7 +727,7 @@ THEORY: A Singular object is converted into a character array (a Net) for on scr
 KEYWORDS: Output
 EXAMPLE: example netIntMatShort; shows an example
 "
-{ 	
+{
 // 0
 	int m=nrows(M);
 	int n=ncols(M);
@@ -736,13 +736,13 @@ EXAMPLE: example netIntMatShort; shows an example
 	bigintmat B[m][n]=bigintmat(M);
 
 // 2
-	if( size(#)!=0 ){// +2.1	
+	if( size(#)!=0 ){// +2.1
 		Net Output=netBigIntMatShort(B, #[1]);
 	}// -2.1
 	else{// +2.1
 		Net Output=netBigIntMatShort(B);
 	}// -2.2
-		
+
 // -
 	return(Output);
 }
@@ -825,7 +825,7 @@ EXAMPLE: example netIntVectorShort; shows an example
 	}// -2.1
 	else{// +2.2
 		Output=netIntMatShort(M);
-	}// -2.2	
+	}// -2.2
 
 // -
 	return(Output);
@@ -863,7 +863,7 @@ EXAMPLE: example netmatrix; shows an example
 	if( size(#)!=0 ){// +1
 		Size=#[1];
 	}// -1
-    
+
 // -
 	return(netmatrixShort(M, Size));
 }
@@ -895,12 +895,12 @@ THEORY: A Singular object is converted into a character array (a Net) for on scr
 KEYWORDS: Output
 EXAMPLE: example netmatrixShort; shows an example
 "
-{ 
+{
 	int i, j;
 	list breite = list();
 	Net Output;
 	string Zeile;
-	
+
 	//maximale Spaltenbreite setzen
 	for (i=1; i<=ncols(M); i++){
 		breite = breite + list(0);
@@ -910,17 +910,17 @@ EXAMPLE: example netmatrixShort; shows an example
 			}
 		}
 	}
-	
+
 	//einfügen
 	for (i=1; i<=nrows(M); i++){
 		Zeile = "| ";
 		for (j=1; j<=ncols(M); j++){
 			Zeile = Zeile + string(M[i,j]) + emptyString( breite[j] - size(string(M[i,j])) + 1);
-			
+
 		}
 		Output.rows[i] = Zeile + "|";
 	}
-	
+
 	return (Output);
 }
 example
@@ -1045,7 +1045,7 @@ KEYWORDS: Output
 EXAMPLE: example netvector; shows an example
 "
 {
-// 0 
+// 0
 	matrix M=matrix(V);
 	int Size=25;
 
@@ -1058,7 +1058,7 @@ EXAMPLE: example netvector; shows an example
 	Net Output;
 	Output=netmatrix(M, Size);
 
-// - 
+// -
 	return(Output);
 }
 example
@@ -1078,7 +1078,7 @@ example
 
 
 //
-//  netvectorShort 
+//  netvectorShort
 //
 proc netvectorShort(vector V, list #)
 "USAGE: netvectorShort(V); V vector@*
@@ -1182,20 +1182,20 @@ EXAMPLE: example netPoly; shows an example
 							Up=Up+emptyString(1);
 						} // (2.1.2.1.1)
 						else { // (2.1.2.1.2)
-						Down=Down+string( leadcoef(Q) );  
+						Down=Down+string( leadcoef(Q) );
 						Up=Up+emptyString( size( string( leadcoef(Q) ) ) ); //size(leadcoef(-1))=1, deshalb size(string ...
 						}// (2.1.2.1.2)
 					} // (2.1.2.1)
 					else { // (2.1.2.2)
-						Down=Down+string( leadcoef(Q) ); // leading coef 
+						Down=Down+string( leadcoef(Q) ); // leading coef
 						Up=Up+emptyString( size( string( leadcoef(Q) ) ) );
 					}// (2.1.2.2
-				} // (2.1.2)		
+				} // (2.1.2)
 				S=size( ringlist(basering)[2] ); //variables
 				for ( i=1; i<=S; i++) { // (2.1.1)
 					if ( leadexp(Q)[i] == 0 ) { // (2.1.1.1)
 					}
-	  				else { // (2.1.1.2))	
+	  				else { // (2.1.1.2))
 						Down=Down+string( ringlist( basering )[2][i] );
 						Up=Up+emptyString( size (string( ringlist( basering )[2][i] ) ) );
 						if ( leadexp(Q)[i] == 1 ){ // (2.1.1.2.1))
@@ -1223,14 +1223,14 @@ EXAMPLE: example netPoly; shows an example
 							Up=Up+emptyString(1);
 						} // (2.2.2.1.1)
 						else { // ()
-						Down=Down+string( leadcoef(Q) );  
+						Down=Down+string( leadcoef(Q) );
 						Up=Up+emptyString( size( string( leadcoef(Q) ) ) ); //size(leadcoef(-1))=1
 						}// (2.2.2.1.2)
 					} // (2.2.2.1)
 					else { // (2.2.2.2)
 						Down=Down+"+";
 						Up=Up+" ";
-						Down=Down+string( leadcoef(Q) ); // leading coef 
+						Down=Down+string( leadcoef(Q) ); // leading coef
 						Up=Up+emptyString( size( string( leadcoef(Q) ) ) );
 					} // (2.2.2.2)
 				} // (2.2.2)
@@ -1239,7 +1239,7 @@ EXAMPLE: example netPoly; shows an example
 				for ( i=1; i<=S; i++) { // (2.2.3)
 					if ( leadexp(Q)[i] == 0 ) { // (2.2.3.1)
 					} // (2.2.3.1)
-	  				else { // (2.2.3.2)	
+	  				else { // (2.2.3.2)
 						Down=Down+string( ringlist( basering )[2][i] );
 						Up=Up+emptyString( size (string( ringlist( basering )[2][i] ) ) );
 						if ( leadexp(Q)[i] == 1 ){ // (2.2.3.2.1)
@@ -1264,7 +1264,7 @@ EXAMPLE: example netPoly; shows an example
 example
 {
 "EXAMPLE:"; // from 3.3.1 Examples of ring declarations
-// 	
+//
 	ring R1 = 32003,(x,y,z),dp;
 	poly q6=1;
 	print(q6);
@@ -1295,7 +1295,7 @@ example
 	netPoly(q5);
 
 	ring R2 = 32003,(x(1..10)),dp;
-	
+
 	poly w6=1;
 	print(w6);
 	netPoly(w6);
@@ -1368,8 +1368,8 @@ example
 	p2;
 	netPoly(p2);
 
-	ring r3=7,(x,y,z),lp;	
-	poly p=17x2+24y;	
+	ring r3=7,(x,y,z),lp;
+	poly p=17x2+24y;
 	p;
         netPoly(p);
 
@@ -1408,7 +1408,7 @@ EXAMPLE: example netIdeal; shows an example
 	for (int i=1; i<size(I); i++){ // (1)
 		N=N+string(I[i])+string(", ");
  	} // (1)
- 
+
 	N=N+string(I[size(I)])+string(">");
 	return(net(N));
 }

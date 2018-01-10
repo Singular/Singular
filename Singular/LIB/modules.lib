@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="version modules.lib 4.1.1.0 Jan_2018 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  modules.lib    Modules
@@ -9,16 +9,16 @@ AUTHORS:  J. Boehm, boehm@mathematik.uni-kl.de
 	  C. Koenen koenen@rhrk.uni-kl.de
 	  M. Mayer mayer@mathematik.uni-kl.de
 
-OVERVIEW: 
-This library is used for the computation of graded free resolutions with an own graduation of 
-the monomials. For these Resolution is a new class of modules needed. These modules, can be 
-computed via the image, kernel, cokernel of a matrix or the subquotient of two matrices.  
+OVERVIEW:
+This library is used for the computation of graded free resolutions with an own graduation of
+the monomials. For these Resolution is a new class of modules needed. These modules, can be
+computed via the image, kernel, cokernel of a matrix or the subquotient of two matrices.
 The used matrices also have a free module as source and target, with graded generators if the
 matrix is homogenous. A matrix of this new form is created by a normal matrix, source, target and
 the graduatin, if the matrix is homogenous, are done automatically. With this matrices it is then
 possible to compute the new class of modules.
 This library also offers the opppurtunity to create R-module-homomorphisms betweens two modules.
-For these homorphisms the kernel can be computed an will be returned as a module of the new class. 
+For these homorphisms the kernel can be computed an will be returned as a module of the new class.
 
 This is experimental work in progress!!!
 
@@ -39,7 +39,7 @@ id(int n)			return a nxn identity Matrix
 zero(int n,int m)		return a nxm zero Matrix
 freeModule(ring,int,list)	creating a graded free module
 makeMatrix(matrix,#int)		creating a Matrix with graded target and source if the matrix is homogenous. If # is set to 1, makeMatrix ignores the grading of source & target.
-makeIdeal(ideal)		creates an Ideal from an given ideal, is used to compute a resolution of the ideal	
+makeIdeal(ideal)		creates an Ideal from an given ideal, is used to compute a resolution of the ideal
 Target(Matrix)			return target of the Matrix
 Source(Matrix)			return source of the Matrix
 printMatrix(Matrix)		print a Matrix
@@ -62,7 +62,7 @@ image(Matrix)			return a Module, the image of the Matrix
 Ker(Matrix)			return a Module, the kernel of the Matrix
 compareModules(Module,Module)	return 0 or 1, compares the two Modules up to isomorphism
 addModules(Module,Module)	return a Module, sum of the two Modules
-homomorphism(matrix,Module,Module)	creates a R-Modul-Homomorphism 
+homomorphism(matrix,Module,Module)	creates a R-Modul-Homomorphism
 target(Homomorphism)		return a Module, target of the Homomorphism
 source(Homomorphism)		return a Module, source of the Homomorphism
 compareMatrix(Matrix,Matrix)	return 0 or 1, compares two Matrices
@@ -71,7 +71,7 @@ compareMatrix(Matrix,Matrix)	return 0 or 1, compares two Matrices
 freeModule2Module(FreeModule)		converts a FreeModule into a Module
 makeVector(vector,Module)		creates Vector in the given Module
 netVector(Vector)			prints Vector
-netMatrix(Matrix)			prints Matrix 
+netMatrix(Matrix)			prints Matrix
 presentation(Module)			converts M as a Subquotient to the Coker of a matrix C
 tensorMatrix(Matrix,Matrix)		computes tensorproduct of two Matrices
 tensorModule(Module,Module)		computes tensorproduct of two Modules
@@ -281,7 +281,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////////
 
 proc freeModule(def basis,int myrank,list degrees)
-"USAGE: freeModule(r,n,l); r ring, n integer, l list 
+"USAGE: freeModule(r,n,l); r ring, n integer, l list
 RETURN: a free Module over the ring r, with rank n, and degrees l for the generators
 NOTE: -1 for nor graduation and 0 to set every degree to 0
 EXAMPLE: example freeModule, shows an example"
@@ -290,14 +290,14 @@ def R=basering;
 setring(basis);
 int mydeg=0;
 FreeModule M;
-M.over= basis;			
-M.Rank = myrank;		
+M.over= basis;
+M.Rank = myrank;
 list l=-1;
 M.isgraded=0;
 if(!(comparedeg(degrees,l))){
-	M.isgraded=1;		
+	M.isgraded=1;
 	l=0;
-	if(comparedeg(degrees,l)){	
+	if(comparedeg(degrees,l)){
 		for(int j=1;j<=myrank;j++){
 			M.grading[j]=mydeg;
 		}
@@ -305,7 +305,7 @@ if(!(comparedeg(degrees,l))){
 
 	else{
 	if(myrank!=size(degrees)){ERROR("Graduation incorrect")}
-	M.grading=degrees;	
+	M.grading=degrees;
 	}
 }
 setring(R);
@@ -339,22 +339,22 @@ def R=basering;
 setring(N.over);
 list mydeg;
 Matrix M;
-M.ishomogenous=1;		
+M.ishomogenous=1;
 M.over=basering;
 int a;
 int j;
 for(int i=1;i<=ncols(m);i++){
-	a=0;		
+	a=0;
 	for(j=1;j<=nrows(m);j++){
-		if(m[i][j]!=0){			
+		if(m[i][j]!=0){
 			a=Deg(m[i][j]);
-			break;	
+			break;
 		}
-	}	
+	}
 	mydeg[i]=t[j]+a;
 }
-M.target = N;			
-M.source = freeModule(basering,ncols(m),mydeg);	 
+M.target = N;
+M.source = freeModule(basering,ncols(m),mydeg);
 M.hom = m;
 setring(R);
 return(M);
@@ -363,8 +363,8 @@ return(M);
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 static proc comparedeg(list l,list j){
-if(size(l)!=size(j)){return(0);}	
-for(int i=1;i<=size(l);i++){		
+if(size(l)!=size(j)){return(0);}
+for(int i=1;i<=size(l);i++){
 	if(l[i]!=j[i]){return(0);}
 }
 return(1);
@@ -376,22 +376,22 @@ static proc isHomogenous(matrix m)
 {
 int j;
 int f;
-list mydeg;	
+list mydeg;
 list controldeg;
 for(int i=1;i<=ncols(m);i++){
 	mydeg[i]=0;
 	controldeg[i]=0;
 	for(j=1;j<=nrows(m);j++){
-		if(m[j,i]!=0){		
+		if(m[j,i]!=0){
 			if(controldeg[i]==1){
-				if(mydeg[i]!=Deg(m[j,i])){return(-1)}	
-			}						
+				if(mydeg[i]!=Deg(m[j,i])){return(-1)}
+			}
 			mydeg[i]=Deg(m[j,i]);
 			controldeg[i]=1;
 		}
 	}
 }
-return(mydeg)	
+return(mydeg)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -482,20 +482,20 @@ if(size(#)!=0){j=#;}
 list mydeg;
 Resolution R;
 R.reso=mres(m,j);
-matrix a=R.reso[1];		
-R.dd[1]=makeMatrix(a);			
-if(!(R.dd[1].ishomogenous)){	
+matrix a=R.reso[1];
+R.dd[1]=makeMatrix(a);
+if(!(R.dd[1].ishomogenous)){
 	R.isgraded=0;
 	for(int i=2;i<=(size(R.reso)+1);i++){
-		a=R.reso[i];			
-		R.dd[i]=nongradedMatrix(a);	
+		a=R.reso[i];
+		R.dd[i]=nongradedMatrix(a);
 	}
 
 }
 else{
 	R.isgraded=1;
 	for(int i=2;i<=(size(R.reso));i++){
-		a=R.reso[i];		
+		a=R.reso[i];
 		mydeg=R.dd[i-1].source.grading;
 		R.dd[i]=resMatrix(a,mydeg,R.dd[i-1].source);
 	}
@@ -523,7 +523,7 @@ example
 proc sRes(def M,int #)
 "USAGE: sRes(M,n); M Module or Ideal, n integer
 RETURN: Resolution, with graded modules, computed with Schreyer's method using the function sres
-NOTE: n is optional, if n ist positiv only that many steps will be computed 
+NOTE: n is optional, if n ist positiv only that many steps will be computed
       use R.dd[i]; to return the diffrent modules as image of matrices, R Resolution i integer
 EXAMPLE. example sRes, shows an example"
 {
@@ -544,20 +544,20 @@ if(size(#)!=0){j=#;}
 list mydeg;
 Resolution R;
 R.reso=sres(m,j);
-matrix a=R.reso[1];	
-R.dd[1]=makeMatrix(a);			
+matrix a=R.reso[1];
+R.dd[1]=makeMatrix(a);
 if(!(R.dd[1].ishomogenous)){
 	R.isgraded=0;
 	for(int i=2;i<(size(R.reso)+1);i++){
 		a=R.reso[i];
-		R.dd[i]=nongradedMatrix(a);	
+		R.dd[i]=nongradedMatrix(a);
 	}
 
 }
 else{
 	R.isgraded=1;
 	for(int i=2;i<(size(R.reso));i++){
-		a=R.reso[i];	
+		a=R.reso[i];
 		mydeg=R.dd[i-1].source.grading;
 		R.dd[i]=resMatrix(a,mydeg,R.dd[i-1].source);
 	}
@@ -585,7 +585,7 @@ example
 proc Res(def M,int #)
 "USAGE: Res(M,n); M Module or Ideal, n integer
 RETURN: Resolution, resolution with graded modules
-NOTE: n is optional, if n ist positiv only that many steps will be computed 
+NOTE: n is optional, if n ist positiv only that many steps will be computed
       use R.dd[i]; to return the diffrent modules as image of matrices, R Resolution i integer
 EXAMPLE. example Res, shows an example"
 {
@@ -606,13 +606,13 @@ if(size(#)!=0){j=#;}
 list mydeg;
 Resolution R;
 R.reso=res(m,j);
-matrix a=R.reso[1]; 
-R.dd[1]=makeMatrix(a);			
+matrix a=R.reso[1];
+R.dd[1]=makeMatrix(a);
 if(!(R.dd[1].ishomogenous)){
 	R.isgraded=0;
 	for(int i=2;i<(size(R.reso)+1);i++){
 		a=R.reso[i];
-		R.dd[i]=nongradedMatrix(a);	
+		R.dd[i]=nongradedMatrix(a);
 	}
 
 }
@@ -810,7 +810,7 @@ example
  ring r;
  matrix m[2][2]=x,y3,z,xz;
  Matrix Ma=m;
- FreeModule M=Source(Ma); 
+ FreeModule M=Source(Ma);
  M;
  Degree(M);
 }
@@ -835,9 +835,9 @@ if(M.ishomogenous){
 		l1[i]=0;
 		for(j=1;j<=nrows(m);j++){
 			if(size(string(m[i][j]))>l1[i]){
-				l1[i]=size(string(m[i][j]));							
-			}	
-		}	
+				l1[i]=size(string(m[i][j]));
+			}
+		}
 	}
 	s1="   ";
 	for(i=1;i<=ncols(m);i++){
@@ -1128,7 +1128,7 @@ if ((!idgens)&&(!zerorel)) {
    ret2=net(", subquotient of ")+net(nameof(basering))+net("^")+net((nrows(rels)));
 }
 
-if (M.isgraded == 1){	
+if (M.isgraded == 1){
 	ret3 = net("Graded with:") + net(M.grading);
 }
 
@@ -1442,7 +1442,7 @@ example
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//Eigene Funktionen 
+//Eigene Funktionen
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1451,7 +1451,7 @@ proc printModule(Module M)
 "USAGE: printModule(M); or M; M a Module
 RETURN: nothing, prints the Module
 EXAMPLE: example printModule; shows an example
-{	
+{
 	netModuleShort(M);
 }
 example
@@ -1533,13 +1533,13 @@ EXAMPLE: example netMatrix; shows an example"
 Net N = netmatrix(M.hom); /*
 N;
 print("");
-print("From source"); 
+print("From source");
 printFreeModule(M.source);
 print("");
 print("to target");
 printFreeModule(M.target);
 print("");
-print("Ring:"); 
+print("Ring:");
 M.over;*/
 return(N);
 }
@@ -1690,7 +1690,7 @@ example
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-proc tensorMatrix(Matrix A, Matrix B) 
+proc tensorMatrix(Matrix A, Matrix B)
 "USAGE = tensorMatrix(A,B); A,B Matrix over the same ring
 RETURN: Tensorprodukt of A,B
 EXAMPLE: example tensorMatrix; shows an example"
@@ -1724,11 +1724,11 @@ if (A.target.isgraded==0 || B.target.isgraded==0) {
 }else{
 	target_grading = 0; //vorläufig
 }
-T.target = freeModule(A.over,A.target.Rank*B.target.Rank,target_grading); 
+T.target = freeModule(A.over,A.target.Rank*B.target.Rank,target_grading);
 return(T);
 }
 
-example 
+example
 {
 "EXAMPLE:"; echo=2;
 ring r;
@@ -1761,7 +1761,7 @@ Module T = coker(Tensormatrix);
 return(T);
 }
 
-example 
+example
 {
 "EXAMPLE:"; echo=2;
 ring R = 0,(x,y,z),dp;
@@ -1799,7 +1799,7 @@ Module T = coker(Tensormatrix);
 return(T);
 }
 
-example 
+example
 {
 "EXAMPLE:"; echo=2;
 ring R = 0,(x,y,z),dp;
@@ -1843,7 +1843,7 @@ FreeModule T = freeModule(M.over,M.Rank*N.Rank,-1); //vorläufig ohne grading 	/
 return(T);
 }
 
-example 
+example
 {
 "EXAMPLE:"; echo=2;
 ring R = 0,(x,y,z),dp;
@@ -1860,7 +1860,7 @@ tensorFreeModule(F,F);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-proc pruneModule(Module M) 
+proc pruneModule(Module M)
 "USAGE = pruneModule(M); M Module
 RETURN: M in a simplyfied presentation
 EXAMPLE: example pruneModule; shows an example"
@@ -1944,10 +1944,10 @@ static proc pruneModule2(Matrix M) {
 				if (pivot!=1) {for(k=1;k<=rows;k++) { m[k,j] = m[k,j]/pivot; }}
 				//dividing Pivot col with Pivot element
 				//Now add multiples of Pivot column to the other columns to make the row to zero:
-				for(k=1;k<=cols;k++) { 
+				for(k=1;k<=cols;k++) {
 					if (k!=j) {
 					factor = -m[i,k];
-					m[1..rows,k] = m[1..rows,k] + factor*m[1..rows,j];	
+					m[1..rows,k] = m[1..rows,k] + factor*m[1..rows,j];
 					}//change all columns except pivot column
 				}
 			}
@@ -2007,7 +2007,7 @@ Whenever the relations of a presented Module include a 1-entry, we can reduce th
 		interpr[k] = V;
 	}
 	N.interpretation[1] = interpr;
-	//Now construct the inverse map: 'forget' the i-th row and send the i-th unitvector to the according negative relations. 
+	//Now construct the inverse map: 'forget' the i-th row and send the i-th unitvector to the according negative relations.
 	list preinterpr;
 	vector v;
 	matrix n[rows][rows];
@@ -2024,7 +2024,7 @@ Whenever the relations of a presented Module include a 1-entry, we can reduce th
 		}else{
 			v = [(-1)*needthislater[1..rows,j]];
 			preinterpr[k] = v;
-		}			
+		}
 	}
 	N.interpretation[2] = preinterpr;
 	return(N);
@@ -2046,7 +2046,7 @@ static proc isUnit(poly p) {
 	if (deg(p)!=0){ return (0); }
 	int i = int(p);
 	if (char(basering) != 0) {
-		if (gcd(char(basering),i) == 1){ return(1); }  
+		if (gcd(char(basering),i) == 1){ return(1); }
 		else{ return(0); }
 	}else{
 		if (charstr(basering) == "ZZ" && absValue(i) != 1){ return(0); }
@@ -2062,7 +2062,7 @@ static proc isUnit(poly p) {
 
 proc interpretElem(Vector Elmt, int #)
 "USAGE = interpretElem(V,n); Vector Elmt, n integer
-RETURN: interpretation of a Vector with # steps or until can't interpret further 
+RETURN: interpretation of a Vector with # steps or until can't interpret further
 EXAMPLE: example interpretElem; shows an example"
 {
 	if (# == 0){#=-1;}	//if we want to interpret as far as possible
@@ -2088,7 +2088,7 @@ interpretElem(V,3);
 
 
 proc interpretList(list Elements, int #)
-"USAGE = interpretList(L,n); list L of Vectors all of the same Module, n integer 
+"USAGE = interpretList(L,n); list L of Vectors all of the same Module, n integer
 RETURN: interpretation of Elements in some abstract structure defined by the user or into a Module
 EXAMPLE: example interpretList; shows an example"
 {
@@ -2123,7 +2123,7 @@ list L = U,V,W;
 
 proc reduceIntChain(Module C, int #)
 "USAGE = reduceIntChain(C,n); C Module, n int
-RETURN: Module C with minimized (or # steps) interpretation list  
+RETURN: Module C with minimized (or # steps) interpretation list
 EXAMPLE: example reduceIntChain; shows an example"
 {
 Module M;
@@ -2149,7 +2149,7 @@ list intList;
 			}
 			(C.interpretation)[2] = preList;
 			// Second concatenate the interpretation maps
-			for(i=1;i<=size((C.interpretation)[1]);i++) {	
+			for(i=1;i<=size((C.interpretation)[1]);i++) {
 				intList[i] = interpret((C.interpretation)[1][i]);
 			}
 			C.interpretation[1] = intList;
@@ -2157,7 +2157,7 @@ list intList;
 			# = #-1;
 		}
 	}
-	
+
 	return(C);
 }
 
@@ -2175,7 +2175,7 @@ Module N = simplePrune(simplePrune(simplePrune(simplePrune(M))));
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-proc interpret(Vector V) 
+proc interpret(Vector V)
 "USAGE = interpret(V); V Vector
 RETURN: interpretation of V into some space that is stored in the interpretationlist of V.space
 EXAMPLE: example interpret; shows an example"
@@ -2200,7 +2200,7 @@ int i;
 	for (i=2;i<=nrows(myCoeffs);i++) {
 		W = W + V.space.interpretation[1][i]*myCoeffs[i,1]; //user needs to define '+' as well
 	}
-	return(W);	
+	return(W);
 }
 
 
@@ -2233,7 +2233,7 @@ interpret(V);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-proc interpretInv(def V, Module N) 
+proc interpretInv(def V, Module N)
 "USAGE = interpretInv(V,N); V Vector or Homomorphism, N Module
 RETURN: interpretation of V into some Module N (inverse to interpret)
 EXAMPLE: example interpretInv; shows an example"
@@ -2241,19 +2241,19 @@ EXAMPLE: example interpretInv; shows an example"
 	if (typeof(V)=="Vector"){
 		Module M = V.space;
 		//Check wheter there is a inverse interpretationlist:
-		if ((size(N.interpretation)!=0) && (size((N.interpretation)[2])!=0) && (((N.interpretation)[1][1]).space == M)) {	
+		if ((size(N.interpretation)!=0) && (size((N.interpretation)[2])!=0) && (((N.interpretation)[1][1]).space == M)) {
 		// third condition checks whether the given modules are related
 			//in this case we decompose v into the generators of its Module and project those onto the generators of N
 			list DivVec = division(V.entries,M.generators.hom);
 			matrix myCoeffs = DivVec[1];
-			vector w = N.interpretation[2][1]*myCoeffs[1,1]; 
+			vector w = N.interpretation[2][1]*myCoeffs[1,1];
 			//inverse maps only contain elements of type vector
 			int i;
 			for (i=2;i<=nrows(myCoeffs);i++) {
-				w = w + N.interpretation[2][i]*myCoeffs[i,1]; 
+				w = w + N.interpretation[2][i]*myCoeffs[i,1];
 			}
 			Vector W = w,N;
-			return(W);	
+			return(W);
 		}
 		//If not, check wheter there exists an interpretationlist to N in the Module of V:
 		if ((size(M.interpretation)!=0) && (((M.interpretation)[1][1]).space == N)){return(interpret(V));}
@@ -2393,7 +2393,7 @@ ring R=0,(x,y),(lp,c);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-static proc concMatrix(Matrix A,Matrix B) 
+static proc concMatrix(Matrix A,Matrix B)
 "USAGE = concMatrix(A,B); A,B Matrix over the same ring
 RETURN: concatinated Matrix with concatinated grading
 EXAMPLE: example concMatrix; shows an example"
@@ -2431,7 +2431,7 @@ concMatrix(A,B);
 static proc concatGrading(FreeModule F1, FreeModule F2){
 	list L1 = F1.grading;
 	list L2 = F2.grading;
-	
+
 	if (F1.isgraded == 0 || F2.isgraded == 0){
 		return(-1);
 	}
