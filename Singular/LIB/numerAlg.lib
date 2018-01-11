@@ -19,7 +19,7 @@ PROCEDURES:
 
  Equal(ideal I, ideal J);  test if I equals to J
 
- Degree(ideal I, int i);   computes the degree of a pure i-dimensional
+ DegreePure(ideal I, int i);   computes the degree of a pure i-dimensional
 
  NumLocalDim(ideal I, p);  numerical local dimension at a point computed as
                                   an approximate value
@@ -30,11 +30,11 @@ LIB "numerDecom.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-proc Degree(ideal I,int i)
-"USAGE:  Degree(ideal I,int i); I ideal,  i positive integer
+proc DegreePure(ideal I,int i)
+"USAGE:  DegreePure(ideal I,int i); I ideal,  i positive integer
 RETURN:  the degree of the pure i-dimensional component of the algebraic
           variety defined by I
-EXAMPLE: example Degree; shows an example
+EXAMPLE: example DegreePure; shows an example
 "
 {
  def S=basering;
@@ -61,11 +61,11 @@ example
    poly f2=(x2+y2+z2-6)*(x-z)*(y-2);
    poly f3=(x2+y2+z2-6)*(x-y)*(x-z)*(z-3);
    ideal I=f1,f2,f3;
-   def W=Degree(I,1);
+   def W=DegreePure(I,1);
         ==>
            The Degree of Component
            3
-   def W=Degree(I,2);
+   def W=DegreePure(I,2);
         ==>
            The Degree of Component
            2
