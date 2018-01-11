@@ -819,9 +819,9 @@ EXAMPLE: example triangMH; shows an example
     {
         ERROR("The input is no groebner basis.");
     }
-    if((charstr(r)[1]!="c") && (npars(basering)<>0))
+    if(npars(basering)<>0)
     {
-        ERROR("basering has parameters");
+      "Warning: factorization may fail";
     }
     // Faktorisierungsschalter setzen.
     int fak;
