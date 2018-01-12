@@ -1074,7 +1074,7 @@ int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
     }
     else
       Warn("internal error: unknown procedure type %d",pi->language);
-    if (currPack->language==LANG_SINGULAR) currPack->language==LANG_MIX;
+    if (currPack->language==LANG_SINGULAR) currPack->language=LANG_MIX;
     return(1);
   }
   else

@@ -1046,7 +1046,7 @@ static void heBuiltinHelp(heEntry hentry, int /*br*/)
 {
   char* node = omStrDup(hentry != NULL && *(hentry->key) != '\0' ?
                        hentry->key : "Top");
-  singular_manual(node,(hentry != NULL) && (hentry->url!=NULL));
+  singular_manual(node,(hentry != NULL) && *(hentry->url)!='\0');
   omFree(node);
 }
 
