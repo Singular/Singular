@@ -9109,7 +9109,8 @@ static BOOLEAN check_valid(const int p, const int op)
 // --------------------------------------------------------------------
 static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
 {
-  if (rField_is_Ring(currRing)
+  if ((currRing!=NULL)
+  && rField_is_Ring(currRing)
   && (!rField_is_Z(currRing)))
   {
     WerrorS("not implemented for rings with rings as coeffients (except ZZ)");
