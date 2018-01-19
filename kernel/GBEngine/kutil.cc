@@ -8076,8 +8076,7 @@ void initS (ideal F, ideal Q, kStrategy strat)
         h.p = pCopy(Q->m[i]);
         if (TEST_OPT_INTSTRATEGY)
         {
-          //pContent(h.p);
-          h.pCleardenom(); // also does a pContent
+          h.pCleardenom(); // also does remove Content
         }
         else
         {
@@ -8119,8 +8118,7 @@ void initS (ideal F, ideal Q, kStrategy strat)
       {
         if (TEST_OPT_INTSTRATEGY)
         {
-          //pContent(h.p);
-          h.pCleardenom(); // also does a pContent
+          h.pCleardenom(); // also does remove Content
         }
         else
         {
@@ -8176,8 +8174,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
         }
         if (TEST_OPT_INTSTRATEGY)
         {
-          //pContent(h.p);
-          h.pCleardenom(); // also does a pContent
+          h.pCleardenom(); // also does remove Content
         }
         else
         {
@@ -8216,8 +8213,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
         {
           if (TEST_OPT_INTSTRATEGY)
           {
-            //pContent(h.p);
-            h.pCleardenom(); // also does a pContent
+            h.pCleardenom(); // also does remove Content
           }
           else
           {
@@ -8283,8 +8279,7 @@ void initSLSba (ideal F, ideal Q,kStrategy strat)
         }
         if (TEST_OPT_INTSTRATEGY)
         {
-          //pContent(h.p);
-          h.pCleardenom(); // also does a pContent
+          h.pCleardenom(); // also does remove Content
         }
         else
         {
@@ -8341,8 +8336,7 @@ void initSLSba (ideal F, ideal Q,kStrategy strat)
         {
           if (TEST_OPT_INTSTRATEGY)
           {
-            //pContent(h.p);
-            h.pCleardenom(); // also does a pContent
+            h.pCleardenom(); // also does remove Content
           }
           else
           {
@@ -8580,8 +8574,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
         h.p = pCopy(Q->m[i]);
         //if (TEST_OPT_INTSTRATEGY)
         //{
-        //  //pContent(h.p);
-        //  h.pCleardenom(); // also does a pContent
+        //  h.pCleardenom(); // also does remove Content
         //}
         //else
         //{
@@ -8725,8 +8718,7 @@ void initSSpecialSba (ideal F, ideal Q, ideal P,kStrategy strat)
         h.p = pCopy(Q->m[i]);
         //if (TEST_OPT_INTSTRATEGY)
         //{
-        //  //pContent(h.p);
-        //  h.pCleardenom(); // also does a pContent
+        //  h.pCleardenom(); // also does remove Content
         //}
         //else
         //{
@@ -9082,7 +9074,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
               if (TEST_OPT_CONTENTSB)
               {
                 number n;
-                p_Cleardenom_n(strat->S[i], currRing, n);// also does a pContent
+                p_Cleardenom_n(strat->S[i], currRing, n);// also does remove Content
                 if (!nIsOne(n))
                 {
                   denominator_list denom=(denominator_list)omAlloc(sizeof(denominator_list_s));
@@ -9094,8 +9086,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
               }
               else
               {
-                //pContent(strat->S[i]);
-                strat->S[i]=p_Cleardenom(strat->S[i], currRing);// also does a pContent
+                strat->S[i]=p_Cleardenom(strat->S[i], currRing);// also does remove Content
               }
             }
             else
@@ -9119,7 +9110,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
           h.p = redtailBba(strat->S[i],i-1,strat);
           if (TEST_OPT_INTSTRATEGY)
           {
-            h.pCleardenom();// also does a pContent
+            h.pCleardenom();// also does remove Content
           }
         }
         else
@@ -9169,7 +9160,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
               if (TEST_OPT_CONTENTSB)
               {
                 number n;
-                p_Cleardenom_n(strat->S[i], currRing, n);// also does a pContent
+                p_Cleardenom_n(strat->S[i], currRing, n);// also does remove Content
                 if (!nIsOne(n))
                 {
                   denominator_list denom=(denominator_list)omAlloc(sizeof(denominator_list_s));
@@ -9181,8 +9172,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
               }
               else
               {
-                //pContent(strat->S[i]);
-                strat->S[i]=p_Cleardenom(strat->S[i], currRing);// also does a pContent
+                strat->S[i]=p_Cleardenom(strat->S[i], currRing);// also does remove Content
               }
             }
             else
@@ -10716,7 +10706,7 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
         if (TEST_OPT_CONTENTSB)
         {
           number n;
-          p_Cleardenom_n(strat->S[i], currRing, n);// also does a pContent
+          p_Cleardenom_n(strat->S[i], currRing, n);// also does remove Content
           if (!nIsOne(n))
           {
             denominator_list denom=(denominator_list)omAlloc(sizeof(denominator_list_s));
@@ -10728,8 +10718,7 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
         }
         else
         {
-          //pContent(strat->S[i]);
-          strat->S[i]=p_Cleardenom(strat->S[i], currRing);// also does a pContent
+          strat->S[i]=p_Cleardenom(strat->S[i], currRing);// also does remove Content
         }
       }
       #ifdef KDEBUG

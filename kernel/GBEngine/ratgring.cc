@@ -328,7 +328,6 @@ ideal ncGCD(poly p, poly q, const ring r)
 // #endif
 //   /* questionable: */
 //   if (P1!=NULL) pCleardenom(P1);
-//   if (P1!=NULL) pContent(P1);
 //   return(P1);
 // }
 
@@ -451,7 +450,7 @@ poly nc_rat_CreateSpoly(poly pp1, poly pp2, int ishift, const ring r)
   p_Test(out,r);
 #endif
 
-  //  if ( out!=NULL ) pContent(out); // postponed to enterS
+  //  if ( out!=NULL ) pCleardenom(out); // postponed to enterS
   return(out);
 }
 
@@ -559,7 +558,7 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
   p_Test(out,r);
 #endif
 
-  //  if ( out!=NULL ) pContent(out); // postponed to enterS
+  //  if ( out!=NULL ) pCleardenom(out); // postponed to enterS
   return(out);
 }
 

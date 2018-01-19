@@ -149,8 +149,7 @@ static void initSSpecialCC (ideal F, ideal Q, ideal P,kStrategy strat)
         h.p = pCopy(Q->m[i]);
         //if (TEST_OPT_INTSTRATEGY)
         //{
-        //  //pContent(h.p);
-        //  h.pCleardenom(); // also does a pContent
+        //  h.pCleardenom(); // also does a Content
         //}
         //else
         //{

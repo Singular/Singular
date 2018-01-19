@@ -3385,7 +3385,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
 
       // reduce the tail and normalize poly
       // in the ring case we cannot expect LC(f) = 1,
-      // therefore we call pContent instead of pNorm
+      // therefore we call pCleardenom instead of pNorm
       if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
       {
         strat->P.pCleardenom();

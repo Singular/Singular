@@ -2149,7 +2149,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       // reduce the tail and normalize poly
       // in the ring case we cannot expect LC(f) = 1,
-      // therefore we call pContent instead of pNorm
+      // therefore we call pCleardenom instead of pNorm
       strat->redTailChange=FALSE;
       if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
       {
@@ -2849,7 +2849,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       // reduce the tail and normalize poly
       // in the ring case we cannot expect LC(f) = 1,
-      // therefore we call pContent instead of pNorm
+      // therefore we call pCleardenom instead of pNorm
       #ifdef HAVE_RINGS
       poly beforetailred;
       if(rField_is_Ring(currRing))
@@ -3747,8 +3747,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
         {
           if (TEST_OPT_INTSTRATEGY)
           {
-            //pContent(h.p);
-            h.pCleardenom(); // also does a pContent
+            h.pCleardenom(); // also does remove Content
           }
           else
           {
@@ -3876,7 +3875,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
       #endif
       // reduce the tail and normalize poly
       // in the ring case we cannot expect LC(f) = 1,
-      // therefore we call pContent instead of pNorm
+      // therefore we call pCleardenom instead of pNorm
 #if F5CTAILRED
       BOOLEAN withT = TRUE;
       if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))

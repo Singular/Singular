@@ -477,7 +477,7 @@ static int nc_redHomog0 (LObject* h,kStrategy strat)
         if (TEST_OPT_INTSTRATEGY)
         {
           if (rField_is_Zp_a(currRing)) p_Content(h->p,currRing);
-          else h->pCleardenom();// also does a pContent
+          else h->pCleardenom();// also does a Content
         }
         if (strat->syzComp!=0)
         {
@@ -737,7 +737,7 @@ static int nc_redHoney (LObject*  h,kStrategy strat)
       }
       if (TEST_OPT_INTSTRATEGY)
       {
-        h->pCleardenom();// also does a p_Content
+        h->pCleardenom();// also does remove Content
       }
       /* compute the ecart */
       if (ei <= (*h).ecart)
@@ -802,7 +802,7 @@ static int nc_redHoney (LObject*  h,kStrategy strat)
         if (TEST_OPT_DEBUG) PrintLn();
         if (TEST_OPT_INTSTRATEGY)
         {
-          h->pCleardenom();// also does a p_Content
+          h->pCleardenom();// also does remove Content
         }
         enterT((*h),strat);
         return 0;

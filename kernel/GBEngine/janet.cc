@@ -112,7 +112,6 @@ int ReducePolyLead(Poly *x,Poly *y)
 #else
   x->root=ksOldSpolyRed(y->root,x->root,NULL);
 #endif
-//  if (x->root) p_Content(x->root,currRing);
 //  if (x->root) pSimpleContent(x->root,5);
 
   return 1;
