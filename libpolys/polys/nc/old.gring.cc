@@ -1388,7 +1388,7 @@ poly gnc_ReduceSpolyOld(const poly p1, poly p2/*,poly spNoether*/, const ring r)
   }
   out = p_Add_q(p2,N,r);
   p_Test(out,r);
-  if ( out!=NULL ) p_Content(out,r);
+  if ( out!=NULL ) p_Cleardenom(out,r);
   p_Delete(&m,r);
   n_Delete(&cF,r->cf);
   n_Delete(&C,r->cf);
@@ -1458,7 +1458,7 @@ poly gnc_ReduceSpolyNew(const poly p1, poly p2, const ring r)
 
   out = p_Add_q(p2,N,r); // delete N, p2
   p_Test(out,r);
-  if ( out!=NULL ) p_Content(out,r);
+  if ( out!=NULL ) p_Cleardenom(out,r);
   return(out);
 }
 
@@ -1551,7 +1551,6 @@ poly gnc_CreateSpolyOld(poly p1, poly p2/*,poly spNoether*/, const ring r)
   p_Test(M2,r);
 #endif
   if (M2!=NULL) M2=p_Cleardenom(M2,r);
-  //if (M2!=NULL) p_Content(M2); // done by pCleardenom
   return(M2);
 }
 

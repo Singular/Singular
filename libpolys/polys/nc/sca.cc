@@ -812,7 +812,6 @@ poly sca_SPoly( const poly p1, const poly p2, const ring r )
   poly spoly = p_Add_q (tmp1, tmp2, r); // spoly = spoly(lt(p1), lt(p2)) + m1 * tail(p1), delete tmp1,2
 
   if (spoly!=NULL) p_Cleardenom (spoly, r);
-//  if (spoly!=NULL) p_Content (spoly); // r?
 
 #ifdef PDEBUG
   p_Test (spoly, r);
@@ -887,7 +886,7 @@ poly sca_ReduceSpoly(const poly p1, poly p2, const ring r)
 
   p2 = p_Add_q(p2, T, r);
 
-  if ( p2!=NULL ) p_Content(p2,r);
+  if ( p2!=NULL ) p_Cleardenom(p2,r);
 
 #ifdef PDEBUG
   p_Test(p2,r);

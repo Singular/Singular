@@ -37,14 +37,14 @@ void rChangeCurrRing(ring r)
 poly p_Divide(poly p, poly q, const ring r)
 {
   assume(q!=NULL);
-  if (p==NULL)
-  {
-    p_Delete(&q,r);
-    return NULL;
-  }
   if (q==NULL)
   {
     WerrorS("div. by 0");
+    return NULL;
+  }
+  if (p==NULL)
+  {
+    p_Delete(&q,r);
     return NULL;
   }
   if (pNext(q)!=NULL)

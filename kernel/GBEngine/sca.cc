@@ -44,7 +44,6 @@ void addLObject(LObject& h, kStrategy& strat)
     else
     {
       pNorm(h.p);
-      p_Content(h.p,currRing);
     }
 
     if ((strat->syzComp==0)||(!strat->homog))
@@ -53,8 +52,7 @@ void addLObject(LObject& h, kStrategy& strat)
 
       if (TEST_OPT_INTSTRATEGY)
       {
-//        pCleardenom(h.p);
-        p_Content(h.p,currRing);
+        p_Cleardenom(h.p,currRing);
       }
       else
       {
@@ -266,8 +264,7 @@ ideal k_sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *,
 
         if (TEST_OPT_INTSTRATEGY)
         {
-//           h.pCleardenom(); // also does a p_Content
-          p_Content(h.p,currRing);
+          h.pCleardenom(); // also removes Content
         }
         else
         {
@@ -519,7 +516,7 @@ ideal k_sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec
               h.is_special = TRUE;
 
               if (TEST_OPT_INTSTRATEGY)
-                h.pCleardenom(); // also does a p_Content
+                h.pCleardenom(); // also removes Content
               else
                 h.pNorm();
 
@@ -710,8 +707,7 @@ ideal k_sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec
 
         if (TEST_OPT_INTSTRATEGY)
         {
-//          p_Content(h.p);
-          h.pCleardenom(); // also does a p_Content
+          h.pCleardenom(); // also removes Content
         }
         else
         {
@@ -1010,7 +1006,7 @@ ideal k_sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const intvec
               LObject h(p_new); // h = x_i * strat->P
 
               if (TEST_OPT_INTSTRATEGY)
-                h.pCleardenom(); // also does a p_Content
+                h.pCleardenom(); // also removes Content
               else
                 h.pNorm();
 
@@ -1146,7 +1142,7 @@ ideal k_sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const intvec
         LObject h(p_new); // h = x_i * strat->P
 
         if (TEST_OPT_INTSTRATEGY)
-           h.pCleardenom(); // also does a p_Content
+           h.pCleardenom(); // also removes Content
         else
           h.pNorm();
 

@@ -379,8 +379,7 @@ poly fglmNewLinearCombination( ideal source, poly monset )
                 pSetCoeff( sum, nCopy( temp.getconstelem( k ) ) );
             }
         }
-        p_Content( result, currRing );
-        if ( ! nGreaterZero( pGetCoeff( result ) ) ) result= pNeg( result );
+        p_Cleardenom( result, currRing );
     }
     // Free Memory
     omFreeSize( (ADDRESS)lengthes, numMonoms * sizeof( int ) );

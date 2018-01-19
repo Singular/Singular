@@ -1896,31 +1896,6 @@ static BOOLEAN idPrepare(leftv res, leftv h)
   return FALSE;
 }
 
-/// Get raw syzygies (idPrepare)
-static BOOLEAN _p_Content(leftv res, leftv h)
-{
-  if ( !( (h!=NULL) && (h->Typ()==POLY_CMD) && (h->Data() != NULL) ) )
-  {
-    WerrorS("`p_Content(<poly-var>)` expected");
-    return TRUE;
-  }
-
-
-  const poly p = reinterpret_cast<poly>(h->Data());
-
-
-  pTest(p);  pWrite(p); PrintLn();
-
-
-  p_Content( p, currRing);
-
-  pTest(p);
-  pWrite(p); PrintLn();
-
-  NoReturn(res);
-  return FALSE;
-}
-
 static BOOLEAN _m2_end(leftv res, leftv h)
 {
   int ret = 0;
@@ -2014,8 +1989,6 @@ extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   ADD("noop", FALSE, noop);
   ADD("idPrepare", FALSE, idPrepare);
   ADD("reduce_syz", FALSE, reduce_syz);
-
-  ADD("p_Content", FALSE, _p_Content);
 
   ADD("Tail", FALSE, Tail);
 

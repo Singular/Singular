@@ -1734,7 +1734,7 @@ void p_ContentRat(poly &ph, const ring r)
   {
     p_Delete(&C[0], r);
     p_Delete(&LM[0], r);
-    p_Content(ph, r);
+    p_ContentForGB(ph, r);
     goto cleanup;
   }
 
@@ -1770,7 +1770,7 @@ void p_ContentRat(poly &ph, const ring r)
         p_Delete(&C[k], r);
         p_Delete(&LM[k], r);
       }
-      p_Content(ph, r);
+      p_ContentForGB(ph, r);
       goto cleanup;
     }
   }
@@ -2234,13 +2234,52 @@ poly p_Power(poly p, int i, const ring r)
 
 /* --------------------------------------------------------------------------------*/
 /* content suff                                                                   */
-
 static number p_InitContent(poly ph, const ring r);
-
-#define CLEARENUMERATORS 1
 
 void p_Content(poly ph, const ring r)
 {
+  if (ph==NULL) return;
+  if (pNext(ph)==NULL)
+  {
+    p_SetCoeff(ph,n_Init(1,r->cf),r);
+  }
+  if (r->cf->cfSubRingGcd==ndGcd) /* trivial gcd*/ return;
+  number h=p_InitContent(ph,r); /* first guess of a gcd of all coeffs */
+  poly p=ph;
+  // take the SubringGcd of all coeffs
+  while (p!=NULL)
+  {
+    n_Normalize(pGetCoeff(p),r->cf);
+    d=n_SubringGcd(h,pGetCoeff(p),r->cf);
+    n_Delete(&h,r->cf);
+    h = d;
+    if(n_IsOne(h,r->cf))
+    {
+      break;
+    }
+    pIter(p);
+  }
+  // if foundi<>1, divide by it
+  if(!n_IsOne(h,r->cf))
+  {
+    p = ph;
+    while (p!=NULL)
+    {
+      number d = n_ExactDiv(pGetCoeff(p),h,r->cf);
+      p_SetCoeff(p,d,r);
+      pIter(p);
+    }
+  }
+  n_Delete(&h,r->cf);
+  // and last: check leading sign:
+  if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
+}
+
+#define CLEARENUMERATORS 1
+
+void p_ContentForGB(poly ph, const ring r)
+{
+  if(TEST_OPT_CONTENTSB) return;
   assume( ph != NULL );
 
   assume( r != NULL ); assume( r->cf != NULL );
@@ -2292,7 +2331,6 @@ void p_Content(poly ph, const ring r)
   number h,d;
   poly p;
 
-  if(TEST_OPT_CONTENTSB) return;
   if(pNext(ph)==NULL)
   {
     p_SetCoeff(ph,n_Init(1,r->cf),r);
@@ -2339,10 +2377,10 @@ void p_Content(poly ph, const ring r)
       }
       pIter(p);
     }
-    p = ph;
     //number tmp;
     if(!n_IsOne(h,r->cf))
     {
+      p = ph;
       while (p!=NULL)
       {
         //d = nDiv(pGetCoeff(p),h);
@@ -2468,7 +2506,6 @@ void p_SimpleContent(poly ph, int smax, const ring r)
     return;
   }
 
-
   poly p=ph;
   number h=d;
   if (smax==1) smax=2;
@@ -2479,7 +2516,7 @@ void p_SimpleContent(poly ph, int smax, const ring r)
     n_Delete(&h,r->cf);
     h = d;
 #else
-    STATISTIC(n_Gcd); nlInpGcd(h,pGetCoeff(p),r->cf); // FIXME? TODO? // extern void nlInpGcd(number &a, number b, const coeffs r);
+    STATISTIC(n_Gcd); nlInpGcd(h,pGetCoeff(p),r->cf);
 #endif
     if(n_Size(h,r->cf)<smax)
     {
@@ -2750,25 +2787,20 @@ poly p_Cleardenom(poly p, const ring r)
   if( 0 )
   {
     CPolyCoeffsEnumerator itr(p);
-
     n_ClearDenominators(itr, C);
-
     n_ClearContent(itr, C); // divide out the content
-
     p_Test(p, r); n_Test(pGetCoeff(p), C);
     assume(n_GreaterZero(pGetCoeff(p), C)); // ??
 //    if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
-
     return p;
   }
 #endif
-
 
   number d, h;
 
   if (rField_is_Ring(r))
   {
-    p_Content(p,r);
+    p_ContentForGB(p,r);
     if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
     return p;
   }
@@ -2800,21 +2832,18 @@ poly p_Cleardenom(poly p, const ring r)
   if( nCoeff_is_Q(C) || nCoeff_is_Q_a(C) )
   {
     CPolyCoeffsEnumerator itr(p);
-
     n_ClearDenominators(itr, C);
-
     n_ClearContent(itr, C); // divide out the content
-
     p_Test(p, r); n_Test(pGetCoeff(p), C);
     assume(n_GreaterZero(pGetCoeff(p), C)); // ??
 //    if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
-
     return start;
   }
 #endif
 
   if(1)
   {
+    // get lcm of all denominators ----------------------------------
     h = n_Init(1,r->cf);
     while (p!=NULL)
     {
@@ -2824,23 +2853,13 @@ poly p_Cleardenom(poly p, const ring r)
       h=d;
       pIter(p);
     }
-    /* contains the 1/lcm of all denominators */
+    /* h now contains the 1/lcm of all denominators */
     if(!n_IsOne(h,r->cf))
     {
+      // multiply by the lcm of all denominators
       p = start;
       while (p!=NULL)
       {
-        /* should be: // NOTE: don't use ->coef!!!!
-        * number hh;
-        * nGetDenom(p->coef,&hh);
-        * nMult(&h,&hh,&d);
-        * nNormalize(d);
-        * nDelete(&hh);
-        * nMult(d,p->coef,&hh);
-        * nDelete(&d);
-        * nDelete(&(p->coef));
-        * p->coef =hh;
-        */
         d=n_Mult(h,pGetCoeff(p),r->cf);
         n_Normalize(d,r->cf);
         p_SetCoeff(p,d,r);
@@ -2850,7 +2869,7 @@ poly p_Cleardenom(poly p, const ring r)
     n_Delete(&h,r->cf);
     p=start;
 
-    p_Content(p,r);
+    p_ContentForGB(p,r);
 #ifdef HAVE_RATGRING
     if (rIsRatGRing(r))
     {
@@ -3067,7 +3086,7 @@ void p_ProjectiveUnique(poly ph, const ring r)
 
   if (rField_is_Ring(r))
   {
-    p_Content(ph,r);
+    p_ContentForGB(ph,r);
     if(!n_GreaterZero(pGetCoeff(ph),C)) ph = p_Neg(ph,r);
         assume( n_GreaterZero(pGetCoeff(ph),C) );
     return;
@@ -3106,7 +3125,7 @@ void p_ProjectiveUnique(poly ph, const ring r)
     p_SetCoeff(p, n_Init(1, C), r);
   }
 
-  p_Cleardenom(ph, r); //performs also a p_Content
+  p_Cleardenom(ph, r); //removes also Content
 
 
     /* normalize ph over a transcendental extension s.t.

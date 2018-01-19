@@ -106,8 +106,7 @@ int redGrFirst (LObject* h,kStrategy strat)
       }
       if (TEST_OPT_INTSTRATEGY)
       {
-        if (rField_is_Zp_a(currRing)) p_Content(h->p,currRing);
-        else h->pCleardenom();// also does a p_Content
+        h->pCleardenom();// also removes Content
       }
       /*computes the ecart*/
       d = currRing->pLDeg((*h).p,&((*h).length),currRing);
@@ -237,8 +236,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
   reddeg = strat->LazyDegree+d;
   if (!TEST_OPT_INTSTRATEGY)
   {
-    if (rField_is_Zp_a(currRing)) p_Content(h->p,currRing);
-    else h->pCleardenom();// also does a pContentRat
+    h->pCleardenom();// also does a pContentRat
   }
   loop
   {
@@ -274,8 +272,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
         (*h).p=c_p;
         if (!TEST_OPT_INTSTRATEGY)
         {
-          if (rField_is_Zp_a(currRing)) p_Content(h->p,currRing);
-          else h->pCleardenom();// also does a p_Content
+          h->pCleardenom();// also removes Content
         }
 
 #ifdef KDEBUG
@@ -476,8 +473,7 @@ static int nc_redHomog0 (LObject* h,kStrategy strat)
       {
         if (TEST_OPT_INTSTRATEGY)
         {
-          if (rField_is_Zp_a(currRing)) p_Content(h->p,currRing);
-          else h->pCleardenom();// also does a Content
+          h->pCleardenom();// also removes Content
         }
         if (strat->syzComp!=0)
         {
@@ -500,8 +496,7 @@ static int nc_redHomog0 (LObject* h,kStrategy strat)
       {
         if (TEST_OPT_INTSTRATEGY)
         {
-          if (rField_is_Zp_a(currRing)) p_Content(h->p,currRing);
-          else h->pCleardenom();// also does a p_Content
+          h->pCleardenom();// also removes Content
         }
 /*
 *       (*h).length=pLength0((*h).p);
@@ -576,8 +571,7 @@ static int nc_redLazy (LObject* h,kStrategy strat)
         }
         if (TEST_OPT_INTSTRATEGY)
         {
-          p_Content(h->p,currRing);
-          //pCleardenom(h->p);// also does a p_Content
+          pCleardenom(h->p);// also removes Content
         }
       }
       /*- try to reduce the s-polynomial -*/
@@ -620,8 +614,7 @@ static int nc_redLazy (LObject* h,kStrategy strat)
         if (TEST_OPT_DEBUG) PrintLn();
         if (TEST_OPT_INTSTRATEGY)
         {
-          if (rField_is_Zp_a(currRing)) p_Content(h->p,currRing);
-          else h->pCleardenom();// also does a p_Content
+          h->pCleardenom();// also removes Content
         }
         enterT((*h),strat);
         return 0;
@@ -956,7 +949,7 @@ static int nc_redBest (LObject*  h,kStrategy strat)
       {
         if (TEST_OPT_INTSTRATEGY)
         {
-          h->pCleardenom();// also does a p_Content
+          h->pCleardenom();// also removes Content
         }
         enterT((*h),strat);
         return 0;

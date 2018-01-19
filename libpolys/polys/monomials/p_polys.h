@@ -207,6 +207,7 @@ void      p_Norm(poly p1, const ring r);
 void      p_Normalize(poly p,const ring r);
 void      p_ProjectiveUnique(poly p,const ring r);
 
+void      p_ContentForGB(poly p, const ring r);
 void      p_Content(poly p, const ring r);
 #if 1
 // currently only used by Singular/janet
