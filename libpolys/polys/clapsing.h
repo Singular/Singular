@@ -9,17 +9,10 @@
 #ifndef INCL_FACTORYSING_H
 #define INCL_FACTORYSING_H
 
-class bigintmat;
-class intvec;
-
-struct snumber; typedef struct snumber *   number;
-struct spolyrec; typedef struct spolyrec    polyrec; typedef polyrec *          poly;
-struct ip_sring; typedef struct ip_sring *         ring;
-struct sip_sideal; typedef struct sip_sideal *       ideal;
-
-class ip_smatrix; typedef ip_smatrix *       matrix;
-
-struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
+#include "polys/monomials/ring.h"
+#include "polys/matpol.h"
+#include "misc/intvec.h"
+#include "coeffs/bigintmat.h"
 
 /// destroys f and g
 poly singclap_gcd ( poly f, poly g, const ring r );

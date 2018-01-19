@@ -6,12 +6,6 @@
 #ifdef PLURAL_INTERNAL_DECLARATIONS
 #include "polys/nc/nc.h"
 
-struct  spolyrec; typedef struct spolyrec    polyrec; typedef polyrec *          poly;
-struct ip_sring; typedef struct ip_sring *         ring;
-struct sip_sideal; typedef struct sip_sideal *       ideal;
-
-class intvec;
-
 extern NF_Proc nc_NF;
 extern BBA_Proc gnc_gr_bba, gnc_gr_mora, sca_bba, sca_mora, sca_gr_bba;
 

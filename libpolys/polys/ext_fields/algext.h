@@ -31,10 +31,7 @@
 */
 
 #include "coeffs/coeffs.h"
-
-// Forward declarations
-struct ip_sring; typedef struct ip_sring * ring;
-struct sip_sideal; typedef struct sip_sideal * ideal;
+#include "polys/monomials/ring.h"
 
 /// struct for passing initialization parameters to naInitChar
 typedef struct { ring r; /*ideal i;*/ } AlgExtInfo; // `r.qideal` is supposed to be `i`
@@ -48,10 +45,6 @@ BOOLEAN n2pInitChar(coeffs cf, void * infoStruct);
 
 /// if m == var(i)/1 => return i,
 int naIsParam(number, const coeffs);
-
-struct  spolyrec;
-typedef struct spolyrec    polyrec;
-typedef polyrec *          poly;
 
 /// assumes that p and q are univariate polynomials in r,
 ///   mentioning the same variable;

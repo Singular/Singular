@@ -13,8 +13,7 @@
 #define P_MULT_Q_H
 
 #include "misc/auxiliary.h"
-
-struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
+#include "polys/monomials/ring.h"
 
 // Use buckets if min(pLength(p), pLength(q)) >= MIN_LENGTH_BUCKET
 // Not thoroughly tested what is best

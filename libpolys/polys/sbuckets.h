@@ -12,12 +12,8 @@
  *******************************************************************/
 #ifndef S_BUCKETS_H
 #define S_BUCKETS_H
-
+#include "polys/monomials/ring.h"
 class sBucket; typedef sBucket*           sBucket_pt;
-struct  spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
-struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* const_ring;
-
-
 
 //////////////////////////////////////////////////////////////////////////
 // Creation/Destruction of buckets

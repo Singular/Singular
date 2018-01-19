@@ -7,11 +7,9 @@
 
 #ifndef INTERPOLATION_H
 #define INTERPOLATION_H
-
+#include "polys/monomials/ring.h"
+#include "misc/intvec.h"
 #include <vector>
-
-class intvec;
-struct sip_sideal; typedef struct sip_sideal * ideal;
 
 ideal interpolation(const std::vector<ideal>& L, intvec *v);
 

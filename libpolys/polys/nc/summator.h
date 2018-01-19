@@ -7,15 +7,8 @@
 #define HAVE_SUMMATOR 1
 
 #ifdef HAVE_SUMMATOR
-
-// struct snumber; typedef struct snumber *   number;
-
-class  sBucket; typedef sBucket* sBucket_pt;
-struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
-struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* const_ring;
-
-
-class  kBucket; typedef kBucket* kBucket_pt;
+#include "polys/monomials/ring.h"
+#include "polys/sbuckets.h"
 
 // TODO: redesign into templates with no extra run-time cost!!!
 // TODO: make several out of CPolynomialSummator with similar (?) usage

@@ -1,13 +1,12 @@
 #ifndef MINOR_H
 #define MINOR_H
 
+#include "polys/monomials/ring.h"
+#include "kernel/polys.h"
+
 // #include <assert.h>
 #include <string>
 
-struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
-struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* const_ring;
-
-struct sip_sideal; typedef struct sip_sideal *       ideal;
 
 // using namespace std;
 

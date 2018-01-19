@@ -7,13 +7,9 @@
 * ABSTRACT
 */
 
-struct spolyrec  ; typedef struct spolyrec polyrec; typedef polyrec * poly;
-struct ip_sring  ; typedef struct ip_sring                          * ring;
-struct sip_sideal; typedef struct sip_sideal                        * ideal;
-
-class intvec;
-
-extern ring currRing;
+#include "polys/monomials/ring.h"
+#include "kernel/polys.h"
+#include "misc/intvec.h"
 
 void scComputeHC(ideal s,ideal Q, int  k,poly &hEdge, ring tailRing = currRing);
 #if 0 // - alternative implementation for tests

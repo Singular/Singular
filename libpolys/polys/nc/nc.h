@@ -3,19 +3,11 @@
 
 #include "polys/monomials/ring.h"
 #include "polys/kbuckets.h"
+#include "polys/matpol.h"
 
 #ifdef HAVE_PLURAL
 
-// TODO: the following is a part of ring.h... would be nice to have a
-// clear public NC interface defined here!
-
-
-class ip_smatrix;
-typedef ip_smatrix *       matrix;
-
-
 matrix nc_PrintMat(int a, int b, ring r, int metric);
-
 
 enum nc_type
 {

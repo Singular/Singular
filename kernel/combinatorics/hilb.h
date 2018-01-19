@@ -7,13 +7,9 @@
 * ABSTRACT
 */
 
-struct spolyrec  ; typedef struct spolyrec polyrec; typedef polyrec * poly;
-struct ip_sring  ; typedef struct ip_sring                          * ring;
-struct sip_sideal; typedef struct sip_sideal                        * ideal;
-
-class intvec;
-
-extern ring currRing;
+#include "polys/monomials/ring.h"
+#include "kernel/polys.h"
+#include "misc/intvec.h"
 
 intvec * hHstdSeries(ideal S, intvec *modulweight, intvec *wdegree, ideal Q=NULL, ring tailRing = currRing);
 intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegree=NULL, ring tailRing = currRing);

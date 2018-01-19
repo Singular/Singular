@@ -34,15 +34,10 @@
 */
 
 #include "coeffs/coeffs.h"
-
-struct ip_sring;
-typedef struct ip_sring * ring;
-
+#include "polys/monomials/ring.h"
 
 // restrict access to the internal represention as much as possible:
 #ifdef TRANSEXT_PRIVATES
-struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec * poly;
-
 
 /** a number in K(t_1, .., t_s) is represented by either NULL
    (representing the zero number), or a pointer to a fraction which contains

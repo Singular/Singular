@@ -12,9 +12,7 @@
 #define P_PROCS_H
 
 #include "omalloc/omalloc.h"
-
-struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
-struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* const_ring;
+#include "polys/monomials/ring.h"
 
 /*------------- p_Proc stuff ----------------------*/
 typedef poly (*p_Copy_Proc_Ptr)(poly p, const ring r);

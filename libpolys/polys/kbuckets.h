@@ -12,9 +12,7 @@
 
 // define to not really use the bucket feature
 // #define HAVE_PSEUDO_BUCKETS
-class  kBucket; typedef kBucket* kBucket_pt;
-struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
-struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* const_ring;
+//class  kBucket; typedef kBucket* kBucket_pt; // ring.h
 
 #include "polys/monomials/ring.h" // for ring->p_Procs->p_kBucketSetLm!
 #include "polys/templates/p_Procs.h" // for p_kBucketSetLm_Proc_Ptr

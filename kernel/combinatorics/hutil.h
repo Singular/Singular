@@ -7,12 +7,9 @@
 * ABSTRACT
 */
 
-class intvec;
-
-struct ip_sring  ; typedef struct ip_sring                          * ring;
-struct sip_sideal; typedef struct sip_sideal                        * ideal;
-struct spolyrec  ; typedef struct spolyrec polyrec; typedef polyrec * poly;
-typedef                                                     poly    * polyset;
+#include "polys/monomials/ring.h"
+#include "kernel/polys.h"
+#include "misc/intvec.h"
 
 typedef int * scmon;
 typedef scmon * scfmon;
