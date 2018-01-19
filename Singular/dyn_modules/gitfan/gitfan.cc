@@ -12,22 +12,21 @@
 #include "kernel/mod2.h"
 
 #if HAVE_GFANLIB
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <sys/stat.h>
+#include <iostream>
+#include <list>
 
 #include "Singular/dyn_modules/gfanlib/callgfanlib_conversion.h"
 #include "Singular/dyn_modules/gfanlib/bbcone.h"
 #include "Singular/dyn_modules/gfanlib/bbfan.h"
-#include "Singular/iplib.cc"
+#include "Singular/mod_lib.h"
+
 #include "gitfan.h"
 
-#include "Singular/ipid.h"
-#include "Singular/lists.h"
-#include "Singular/ipshell.h"
 
-#include "coeffs/bigintmat.h"
-#include "coeffs/coeffs.h"
-
-#include <iostream>
-#include <list>
 
 namespace gitfan
 {
