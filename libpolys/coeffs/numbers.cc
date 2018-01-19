@@ -159,7 +159,7 @@ BOOLEAN n_IsZeroDivisor( number a, const coeffs r)
 
 static void   ndNormalize(number&, const coeffs) { }
 static number ndReturn0(number, const coeffs r)        { return r->cfInit(0,r); }
-static number ndGcd(number, number, const coeffs r)    { return r->cfInit(1,r); }
+number ndGcd(number, number, const coeffs r)    { return r->cfInit(1,r); }
 static number ndIntMod(number, number, const coeffs r) { return r->cfInit(0,r); }
 static number ndGetDenom(number &, const coeffs r)     { return r->cfInit(1,r); }
 static number ndGetNumerator(number &a,const coeffs r) { return r->cfCopy(a,r); }

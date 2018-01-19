@@ -61,7 +61,7 @@
 /* the dummy routines: */
 // void nDummy1(number* d);
 // void ndDelete(number* d, const coeffs r);
-// number ndGcd(number a, number b, const coeffs);
+number ndGcd(number a, number b, const coeffs);
 // number ndCopy(number a, const coeffs r);
 number ndCopyMap(number a, const coeffs src, const coeffs dst);
 // int ndSize(number a, const coeffs r);

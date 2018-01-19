@@ -2250,7 +2250,7 @@ void p_Content(poly ph, const ring r)
   while (p!=NULL)
   {
     n_Normalize(pGetCoeff(p),r->cf);
-    d=n_SubringGcd(h,pGetCoeff(p),r->cf);
+    number d=n_SubringGcd(h,pGetCoeff(p),r->cf);
     n_Delete(&h,r->cf);
     h = d;
     if(n_IsOne(h,r->cf))
