@@ -2243,7 +2243,7 @@ void p_Content(poly ph, const ring r)
   {
     p_SetCoeff(ph,n_Init(1,r->cf),r);
   }
-  if (r->cf->cfSubRingGcd==ndGcd) /* trivial gcd*/ return;
+  if (r->cf->cfSubringGcd==ndGcd) /* trivial gcd*/ return;
   number h=p_InitContent(ph,r); /* first guess of a gcd of all coeffs */
   poly p=ph;
   // take the SubringGcd of all coeffs
