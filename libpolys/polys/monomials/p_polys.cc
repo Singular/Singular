@@ -1570,7 +1570,8 @@ poly p_DivideM(poly a, poly b, const ring r)
   }
   if (result!=NULL)
   {
-    if ((!rField_is_Ring(r)) || n_IsUnit(inv,r->cf))
+    //if ((!rField_is_Ring(r)) || n_IsUnit(inv,r->cf))
+    if (rField_is_Zp(r))
     {
       inv = n_Invers(inv,r->cf);
       __p_Mult_nn(result,inv,r);
