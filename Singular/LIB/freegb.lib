@@ -55,19 +55,20 @@ proc tstfreegb()
   /* adding the new proc, add it here */
   example makeLetterplaceRing;
   example letplaceGBasis;
+  example lpNF;
   example freeGBasis;
   example setLetterplaceAttributes;
   /* secondary */
   example   lpMult;
   example   shiftPoly;
   example   lpPower;
+  example   lieBracket;
   example   lp2lstr;
   example   lst2str;
   example   mod2str;
   example   vct2str;
-  example   lieBracket;
   example   serreRelations;
-  example fullSerreRelations;
+  example   fullSerreRelations;
   example   isVar;
   example   ademRelations;
 }
