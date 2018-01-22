@@ -6501,16 +6501,12 @@ static void iiReportTypes(int nr,int t,const short *T)
 
 BOOLEAN iiCheckTypes(leftv args, const short *type_list, int report)
 {
+  int l=0;
   if (args==NULL)
   {
     if (type_list[0]==0) return TRUE;
-    else
-    {
-      if (report) WerrorS("no arguments expected");
-      return FALSE;
-    }
   }
-  int l=args->listLength();
+  else l=args->listLength();
   if (l!=(int)type_list[0])
   {
     if (report) iiReportTypes(0,l,type_list);
