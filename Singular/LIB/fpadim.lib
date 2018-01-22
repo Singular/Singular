@@ -91,6 +91,10 @@ lpSickleHil(G[,d,n]);      computes the mistletoes and Hilbert series of A/<G>
 lpSickleDim(G[,d,n]);      computes the mistletoes and the K-dimension of A/<G>
 sickle(G[,m,d,h]);         can be used to access all lp main procedures
 
+ivMaxIdeal(l,lonly);       computes a list of free monomials in intvec presentation
+lpMaxIdeal(d,donly);       computes a list of free monomials
+monomialBasis(d, donly, J); computes a list of free monomials not contained in J
+
 ivL2lpI(L);           transforms a list of intvecs into an ideal of lp monomials
 iv2lp(I);             transforms an intvec into the corresponding monomial
 iv2lpList(L);         transforms a list of intmats into an ideal of lp monomials
@@ -2602,7 +2606,9 @@ proc tst_fpadim()
   example lp2iv;
   example lp2ivId;
   example lpId2ivLi;
-  example lpSubstitute;
+  example ivMaxIdeal;
+  example lpMaxIdeal;
+  example monomialBasis;
 }
 
 /*
