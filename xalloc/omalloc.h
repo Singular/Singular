@@ -11,6 +11,10 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "omalloc/omConfig.h"
+#if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
+#include <malloc.h>
+#endif
 #ifdef __cplusplus
 extern "C" {
   #if __cplusplus >= 201402L
