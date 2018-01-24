@@ -387,7 +387,7 @@ struct ip_sring
 ring   rDefault(int ch, int N, char **n);
 ring   rDefault(const coeffs cf, int N, char **n, const rRingOrder_t o=ringorder_lp);
 ring   rDefault(int ch, int N, char **n,int ord_size, rRingOrder_t *ord, int *block0, int *block1, int **wvhdl=NULL);
-ring   rDefault(const coeffs cf, int N, char **n,int ord_size, rRingOrder_t *ord, int *block0, int *block1, int **wvhdl=NULL);
+ring   rDefault(const coeffs cf, int N, char **n,int ord_size, rRingOrder_t *ord, int *block0, int *block1, int **wvhdl=NULL, unsigned long bitmask=0);
 
 // #define rIsRingVar(A) r_IsRingVar(A,currRing)
 int    r_IsRingVar(const char *n, char**names, int N);

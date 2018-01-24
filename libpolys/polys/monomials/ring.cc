@@ -100,7 +100,7 @@ static void rOptimizeLDeg(ring r);
 //  return FALSE;
 //}
 
-ring rDefault(const coeffs cf, int N, char **n,int ord_size, rRingOrder_t *ord, int *block0, int *block1, int** wvhdl)
+ring rDefault(const coeffs cf, int N, char **n,int ord_size, rRingOrder_t *ord, int *block0, int *block1, int** wvhdl, unsigned long bitmask)
 {
   assume( cf != NULL);
   ring r=(ring) omAlloc0Bin(sip_sring_bin);
@@ -122,6 +122,7 @@ ring rDefault(const coeffs cf, int N, char **n,int ord_size, rRingOrder_t *ord, 
   r->order = ord;
   r->block0 = block0;
   r->block1 = block1;
+  r->bitmask = bitmask;
 
   /* complete ring intializations */
   rComplete(r);
