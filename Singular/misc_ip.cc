@@ -822,6 +822,11 @@ char * versionString(/*const bool bShowDetails = false*/ )
               StringAppend("FLINT(%s),",version);
 #endif
               StringAppendS("factory(" FACTORYVERSION "),\n\t");
+#ifdef XMEMORY_H
+              StringAppendS("xalloc,");
+#else
+              StringAppendS("omalloc,");
+#endif
 #if defined(HAVE_DYN_RL)
               if (fe_fgets_stdin==fe_fgets_dummy)
                 StringAppendS("no input,");
