@@ -128,10 +128,6 @@ ideal idMinBase (ideal h1)
 }
 
 
-/*2
-*initialized a field with r numbers between beg and end for the
-*procedure idNextChoise
-*/
 ideal idSectWithElim (ideal h1,ideal h2)
 // does not destroy h1,h2
 {
@@ -167,8 +163,8 @@ ideal idSectWithElim (ideal h1,ideal h2)
   // create 1-t, t
   poly omt=p_One(currRing);
   p_SetExp(omt,r->N,1,currRing);
-  poly t=p_Copy(omt,currRing);
   p_Setm(omt,currRing);
+  poly t=p_Copy(omt,currRing);
   omt=p_Neg(omt,currRing);
   omt=p_Add_q(omt,pOne(),currRing);
   // compute (1-t)*h1
@@ -190,10 +186,10 @@ ideal idSectWithElim (ideal h1,ideal h2)
   idDelete(&h1);
   idDelete(&h2);
   // eliminate t:
-
   ideal res=idElimination(h,t);
   // cleanup
   idDelete(&h);
+  pDelete(&t);
   if (res!=NULL) res=idrMoveR(res,r,origRing);
   rChangeCurrRing(origRing);
   rDelete(r);
