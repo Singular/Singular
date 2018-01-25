@@ -1363,7 +1363,7 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
         if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
         {
           #ifdef ADIDEBUG
-          printf("\nGelöscht h\n");
+          printf("\ndelete h\n");
           #endif
           strat->c3++;
           pLmDelete(h.lcm);
@@ -1374,7 +1374,7 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
       if(compareCoeff == pDivComp_GREATER)
       {
         #ifdef ADIDEBUG
-        printf("\nGelöscht: B[j]\n");
+        printf("\ndelete: B[j]\n");
         #endif
         deleteInL(strat->B,&strat->Bl,j,strat);
         strat->c3++;
@@ -1384,7 +1384,7 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
         if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
         {
           #ifdef ADIDEBUG
-          printf("\nGelöscht h\n");
+          printf("\ndelete h\n");
           #endif
           strat->c3++;
           pLmDelete(h.lcm);
@@ -1400,7 +1400,7 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
         if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
         {
           #ifdef ADIDEBUG
-          printf("\nGelöscht h\n");
+          printf("\ndelete h\n");
           #endif
           strat->c3++;
           pLmDelete(h.lcm);
@@ -1411,7 +1411,7 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
       if(compare == pDivComp_GREATER)
       {
         #ifdef ADIDEBUG
-        printf("\nGelöscht: B[j]\n");
+        printf("\ndelete B[j]\n");
         #endif
         deleteInL(strat->B,&strat->Bl,j,strat);
         strat->c3++;
@@ -9544,7 +9544,7 @@ void enterT(LObject &p, kStrategy strat, int atT)
   printf("\nenterT: add in position %i\n",atT);
   p_Write(p.p,strat->tailRing);p_Write(p.sig,currRing);
   #endif
-  //printf("\nenterT: neue hingefügt: länge = %i, ecart = %i\n",p.length,p.ecart);
+  //printf("\nenterT: add new: length = %i, ecart = %i\n",p.length,p.ecart);
 
   if (pNext(p.p) != NULL)
     strat->T[atT].max_exp = p_GetMaxExpP(pNext(p.p), strat->tailRing);
@@ -9630,7 +9630,7 @@ void enterT_strong(LObject &p, kStrategy strat, int atT)
   printf("\nenterT_strong: add in position %i\n",atT);
   pWrite(p.p);
   #endif
-  //printf("\nenterT_strong: neue hingefügt: länge = %i, ecart = %i\n",p.length,p.ecart);
+  //printf("\nenterT_strong: add new: length = %i, ecart = %i\n",p.length,p.ecart);
 
   if (pNext(p.p) != NULL)
     strat->T[atT].max_exp = p_GetMaxExpP(pNext(p.p), strat->tailRing);

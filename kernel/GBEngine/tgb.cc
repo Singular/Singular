@@ -10,7 +10,7 @@
 //#include <vector>
 //using namespace std;
 
-///@TODO: delay nur auf Sugarvergr?erung
+///@TODO: delay nur auf Sugarvergroesserung
 ///@TODO: grade aus ecartS, setze dazu strat->honey; und nutze p.ecart
 ///@TODO: no tail reductions in syz comp
 #include "kernel/mod2.h"
@@ -290,7 +290,7 @@ static inline wlen_type pSLength (poly p, int l)
   return erg; /*pLength(p) */ ;
 }
 
-//! TODO CoefBuckets bercksichtigen
+//! TODO CoefBuckets beruecksichtigen
 wlen_type kSBucketLength (kBucket * b, poly lm = NULL)
 {
   wlen_type s = 0;
