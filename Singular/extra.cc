@@ -1164,7 +1164,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           WerrorS("pLPshift: too big shift requested\n");
           return TRUE;
         }
-        res->data = pLPshift(p,sh,uptodeg,lVblock);
+        res->data = p_LPshift(p,sh,uptodeg,lVblock,currRing);
         res->rtyp = POLY_CMD;
         return FALSE;
       }
