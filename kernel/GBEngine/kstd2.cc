@@ -4068,7 +4068,8 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   kTest_TS(strat);
 
 #ifdef HAVE_TAIL_RING
-  kStratInitChangeTailRing(strat);
+//  kStratInitChangeTailRing(strat);
+   strat->tailRing=currRing;
 #endif
 
   /* compute------------------------------------------------------- */
@@ -4313,16 +4314,6 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, atR,uptodeg,lV);
       //      enterpairsShift(vw,strat->sl,strat->P.ecart,pos,strat, strat->tl,uptodeg,lV);
       // posInS only depends on the leading term
-      if ((strat->P.t_p!=NULL)&&(currRing!=strat->tailRing))
-      {
-        // move to currRing:
-        // need tp save t_p, as it is in also in T
-        pNext(strat->P.p)=strat->p_shallow_copy_delete(
-	                    p_Copy(pNext(strat->P.p),strat->tailRing),
-                            strat->tailRing, currRing,
-                            currRing->PolyBin);
-	strat->P.t_p=NULL;
-      }
       strat->enterS(strat->P, pos, strat, atR);
 
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
