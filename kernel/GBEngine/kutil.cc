@@ -587,9 +587,11 @@ void cleanT (kStrategy strat)
       {
         if (strat->T[j].t_p != NULL)
         {
-          assume(p_shallow_copy_delete != NULL);
-          pNext(p) = p_shallow_copy_delete(pNext(p),strat->tailRing,currRing,
+          if (p_shallow_copy_delete!=NULL)
+          {
+            pNext(p) = p_shallow_copy_delete(pNext(p),strat->tailRing,currRing,
                                            currRing->PolyBin);
+          }
           p_LmFree(strat->T[j].t_p, strat->tailRing);
         }
         break;
@@ -7634,13 +7636,13 @@ poly redtailBba (LObject* L, int end_pos, kStrategy strat, BOOLEAN withT, BOOLEA
         j = kFindDivisibleByInT(strat, &Ln);
         if (j < 0) break;
         With = &(strat->T[j]);
-	assume(With->GetpLength()==pLength(With->p != __null ? With->p : With->t_p));
+        assume(With->GetpLength()==pLength(With->p != __null ? With->p : With->t_p));
       }
       else
       {
         With = kFindDivisibleByInS_T(strat, end_pos, &Ln, &With_s);
         if (With == NULL) break;
-	assume(With->GetpLength()==pLength(With->p != __null ? With->p : With->t_p));
+        assume(With->GetpLength()==pLength(With->p != __null ? With->p : With->t_p));
       }
       cnt--;
       if (cnt==0)
