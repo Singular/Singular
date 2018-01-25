@@ -4517,7 +4517,7 @@ multi_reduction_find (red_object * los, int losl, slimgb_alg * c, int startf,
   return;
 }
 
- //  nicht reduzierbare eintraege in ergebnisliste schreiben
+//  nicht reduzierbare eintrage in ergnisliste schreiben
 //   nullen loeschen
 //   while(finde_groessten leitterm reduzierbar(c,erg))
 //   {
@@ -4656,7 +4656,7 @@ static void multi_reduction (red_object * los, int &losl, slimgb_alg * c)
 
   int curr_pos = losl - 1;
 
-//  nicht reduzierbare eintr�e in ergebnisliste schreiben
+//  nicht reduzierbare eintrage in ergnisliste schreiben
   // nullen loeschen
   while(curr_pos >= 0)
   {
