@@ -94,8 +94,6 @@ static proc prepareSyz( module I, list # )
     I[i] = I[i] + gen(k + i);
   }
 
-//   Syzextra::DetailedPrint(I);
-
   return(I);
 }
 
@@ -159,7 +157,6 @@ static proc Sinit(module M)
   {
     "Sinit::Input";
     type(M);
-//      Syzextra::DetailedPrint(M);
     attrib(M);
   }
 
@@ -180,7 +177,6 @@ static proc Sinit(module M)
   {
     "Sinit::StartingISRing";
     basering;
-//      Syzextra::DetailedPrint(basering);
   }
 
   // Setup the leading syzygy^{-1} module to zero:
@@ -205,7 +201,6 @@ static proc Sinit(module M)
     type(M);
     attrib(M);
     attrib(M, "isHomog");
-//      Syzextra::DetailedPrint(M);
   }
 
   if( @DEBUG )
@@ -215,7 +210,6 @@ static proc Sinit(module M)
     {
       transpose( transpose(M) * transpose(MRES) );
       "ERROR: transpose( transpose(M) * transpose(MRES) ) != 0!!!";
-        Syzextra::m2_end(666);
     }
   }
 
@@ -230,7 +224,6 @@ static proc Sinit(module M)
   if( @DEBUG )
   {
     "Sinit::MRES";
-      Syzextra::DetailedPrint(MRES);
     attrib(MRES, "isHomog");
     attrib(S);
   }
@@ -247,7 +240,6 @@ static proc Sstep()
   if( @DEBUG )
   {
     "Sstep::NextInducedRing";
-      Syzextra::DetailedPrint(basering);
 
     attrib(basering, "InducionLeads");
     attrib(basering, "InducionStart");
@@ -302,7 +294,6 @@ static proc Sstep()
     M;
     deg(M[1..ncols(M)]); // no use of @W :(?
     @RANK;
-      Syzextra::DetailedPrint(MRES);
     attrib(MRES, "isHomog"); @W;
     deg(MRES[1..ncols(MRES)]);
   }
@@ -314,8 +305,6 @@ static proc Sstep()
   def K = prepareSyz(M, @RANK);
 //  K;
 
-//   attrib(K, "isHomog", @V);     Syzextra::DetailedPrint(K, 1000);
-
 //  pause();
 
   K =   Syzextra::idPrepare(K, @RANK); // std(K); // ?
@@ -324,8 +313,6 @@ static proc Sstep()
 //  K;
 
   module N = separateSyzGB(K, @RANK)[2]; // 1^st syz. module: vectors which start in lower part (comp >= @RANK)
-
-// "N_0: "; N;   Syzextra::DetailedPrint(N, 10);
 
 //  basering; print(@V); type(N);
 //  attrib(N, "isHomog", @V);  // TODO: fix "wrong weights"!!!? deg is wrong :(((
@@ -343,10 +330,6 @@ static proc Sstep()
       {
         MRES;
 
-        "N: "; N;   Syzextra::DetailedPrint(N, 10);
-
-        "K:"; K;   Syzextra::DetailedPrint(K, 10);
-
         "RANKS: ", @RANK;
 
         "ERROR: transpose( transpose(N) * transpose(MRES) ) != 0!!!";
@@ -354,8 +337,6 @@ static proc Sstep()
 
         "transpose(N) * transpose(MRES): ";
         transpose(N) * transpose(MRES);
-          Syzextra::DetailedPrint(module(_), 2);
-          Syzextra::m2_end(666);
       }
     }
   }
@@ -372,7 +353,6 @@ static proc Sstep()
   if( @DEBUG )
   {
     "Sstep::NextSyzOutput: ";
-      Syzextra::DetailedPrint(N);
     attrib(N, "isHomog");
   }
 
@@ -542,7 +522,6 @@ static proc MySort(def M)
           module( matrix(module(matrix(@N))) - matrix(module(matrix(@M))) );
 
           "ERROR: MySort: wrong sorting in 'MySort': @N != @M!!!";
-            Syzextra::m2_end(666);
         }
       }
     }
@@ -658,7 +637,6 @@ proc SSinit(def M)
       module( matrix(@N) - matrix(M) );
 
       "ERROR: wrong sorting (in SSnit): @N != M!!!";
-        Syzextra::m2_end(666);
     }
 
     if( size(module( matrix(@LEAD) - matrix(LEAD) )) > 0 )
@@ -670,7 +648,6 @@ proc SSinit(def M)
       module( matrix(@LEAD) - matrix(LEAD) );
 
       "ERROR: wrong sorting (in SSnit): @LEAD != LEAD!!!";
-        Syzextra::m2_end(666);
     }
 
   }
@@ -699,7 +676,6 @@ proc SSinit(def M)
     {
       "SSinit::NewRing(C,lex)?";
       basering;
-        Syzextra::DetailedPrint(basering);
     }
   } else
   { def S = basering; }
@@ -760,7 +736,6 @@ proc SSinit(def M)
     {
       transpose( transpose(M) * transpose(MRES) );
       "ERROR: transpose( transpose(M) * transpose(MRES) ) != 0!!!";
-        Syzextra::m2_end(666);
     }
   }
 
@@ -820,7 +795,6 @@ proc SSinit(def M)
   {
     "SSinit::MRES";
     MRES;
-//      Syzextra::DetailedPrint(MRES);
     attrib(MRES, "isHomog");
     attrib(S);
   }
@@ -950,18 +924,12 @@ static proc SSComputeLeadingSyzygyTerms(def L)
         "ERROR: SSComputeLeadingSyzygyTerms: S != SS ";
 
         "basering: "; basering;
-//          Syzextra::DetailedPrint(basering);
-
         "S: ";  S;
-//          Syzextra::DetailedPrint(_, 1);
         "SS: "; SS;
-//          Syzextra::DetailedPrint(_, 1);
 
         "DIFF: ";
         module(matrix(S) - matrix(SS));
-//          Syzextra::DetailedPrint(_, 2);
         print(matrix(S) - matrix(SS));
-          Syzextra::m2_end(666);
       }
     }
   }
@@ -1029,7 +997,6 @@ static proc SSCompute2LeadingSyzygyTerms(def L)
       {
         transpose( transpose(SS) * transpose(L) );
         "ERROR: transpose( transpose(SS) * transpose(L) ) != 0!!!";
-          Syzextra::m2_end(666);
       }
     }
   }
@@ -1113,7 +1080,6 @@ static proc SSCompute2LeadingSyzygyTerms(def L)
         {
           transpose( transpose(S) * transpose(L) );
           "ERROR: transpose( transpose(S) * transpose(L) ) != 0!!!";
-            Syzextra::m2_end(666);
         }
       }
     }
@@ -1122,13 +1088,10 @@ static proc SSCompute2LeadingSyzygyTerms(def L)
     {
       "ERROR: SSCompute2LeadingSyzygyTerms: size(S) != size(SS)";
 
-      "basering: "; basering; //        Syzextra::DetailedPrint(basering);
+      "basering: "; basering;
 
       "S: ";  S;
-//        Syzextra::DetailedPrint(S, 2);
       "SS: "; SS;
-//        Syzextra::DetailedPrint(SS, 2);
-        Syzextra::m2_end(666);
     }
 
     if(size(S) > 0 && size(SS) > 0)
@@ -1138,18 +1101,13 @@ static proc SSCompute2LeadingSyzygyTerms(def L)
         "ERROR: SSCompute2LeadingSyzygyTerms: lead(S) != lead(SS) ";
 
         "basering: ";  basering;
-//          Syzextra::DetailedPrint(basering);
 
         "lead(S ): "; lead(S );
-//          Syzextra::DetailedPrint(_, 2);
         "lead(SS): "; lead(SS);
-//          Syzextra::DetailedPrint(_, 2);
 
         "DIFF: ";
         print( matrix(lead(S)) - matrix(lead(SS))  );
         module(matrix(lead(S)) - matrix(lead(SS)));
-//          Syzextra::DetailedPrint(_ , 4);
-          Syzextra::m2_end(666);
       }
 
 
@@ -1160,18 +1118,13 @@ static proc SSCompute2LeadingSyzygyTerms(def L)
         "ERROR: SSCompute2LeadingSyzygyTerms: Tail(S) != Tail(SS) ";
 
         "basering: ";  basering;
-//          Syzextra::DetailedPrint(basering);
 
         "Tail(S ): ";   Syzextra::Tail(S );
-//          Syzextra::DetailedPrint(_, 2);
         "Tail(SS): ";   Syzextra::Tail(SS);
-//          Syzextra::DetailedPrint(_, 2);
 
         "DIFF: ";
         module( matrix(  Syzextra::Tail(S)) - matrix(  Syzextra::Tail(SS)) );
-//          Syzextra::DetailedPrint(_, 4);
         print( matrix(  Syzextra::Tail(S)) - matrix(  Syzextra::Tail(SS)) );
-          Syzextra::m2_end(666);
       }
       }
     }
@@ -1188,7 +1141,6 @@ static proc SSCompute2LeadingSyzygyTerms(def L)
       type(SS);
       type(S2);
       L;
-        Syzextra::m2_end(666);
     }
   }
 
@@ -1256,7 +1208,6 @@ static proc SSFindReducer(def product, def syzterm, def L, list #)
     {
       "product: ", product, ", @@product: ", @@product;
       "ERROR: 'syzterm' results in wrong product !!!???";
-        Syzextra::m2_end(666);
     }
   }
 
@@ -1323,7 +1274,6 @@ static proc SSFindReducer(def product, def syzterm, def L, list #)
     if( my != nf )
     {
       "ERROR in   Syzextra::FindReducer => ", my, " != nf: ", nf;
-        Syzextra::m2_end(666);
     }
   }
 
@@ -1389,7 +1339,6 @@ static proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
       "m: ", m, ", t: ", t;
       "@@m: ", @@m, ", @@t: ", @@t;
       "ERROR: 'syzterm' results in wrong m * t !!!";
-        Syzextra::m2_end(666);
     }
   }
 
@@ -1432,7 +1381,6 @@ static proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
       "t: ", t;
       "syzterm: ", syzterm;
        L; T; #;
-        Syzextra::m2_end(666);
     }
   }
 
@@ -1507,7 +1455,6 @@ static proc SSTraverseTail(poly m, def @tail, def L, def T, list #)
       "m: ", m;
       "@tail: ", @tail;
       L; T; #;
-        Syzextra::m2_end(666);
     }
   }
 
@@ -1598,7 +1545,6 @@ static proc SSSchreyerSyzygyNF(vector syz_lead, vector syz_2, def L, def T, list
       "syzygy 2nd : ", syz_2;
 
       L; T; #;
-        Syzextra::m2_end(666);
     }
   }
 
@@ -1627,7 +1573,6 @@ static proc SSComputeSyzygy(def L, def T)
   {
     "SSComputeSyzygy::Input";
     "basering: ", basering; attrib(basering);
-//      Syzextra::DetailedPrint(basering);
 
 //    "iCompShift: ", iCompShift;
 
@@ -1680,7 +1625,6 @@ static proc SSComputeSyzygy(def L, def T)
       "";
       type(LL);
       type(@LL);
-        Syzextra::m2_end(666);
     }
 
     if( size( module( matrix(LL) - matrix(@LL) ) ) != 0 )
@@ -1691,7 +1635,6 @@ static proc SSComputeSyzygy(def L, def T)
       "";
       type(LL);
       type(@LL);
-        Syzextra::m2_end(666);
     }
 
     module TT, SYZ;
@@ -1756,7 +1699,6 @@ static proc SSComputeSyzygy(def L, def T)
               if( size(a2) == 0 ) // if syzterm == 0!!!!
               {
                 "ERROR in SSComputeSyzygy: could not find the 2nd syzygy term during the hybrid NF!!!";
-                  Syzextra::m2_end(666);
               }
             }
 
@@ -1788,7 +1730,6 @@ static proc SSComputeSyzygy(def L, def T)
 //          "IMAGES:";
 //              transpose( transpose(N) * transpose(MRES) );
 
-            Syzextra::m2_end(666);
         }
 
       } // FOR
@@ -1805,7 +1746,6 @@ static proc SSComputeSyzygy(def L, def T)
       "";
       type(TT);
       type(@TT);
-        Syzextra::m2_end(666);
     }
 
     if( size( module( matrix(TT) - matrix(@TT) ) ) != 0 )
@@ -1818,7 +1758,6 @@ static proc SSComputeSyzygy(def L, def T)
       "";
       type(LL);
       type(@LL);
-        Syzextra::m2_end(666);
     }
 
   }
@@ -1904,7 +1843,6 @@ proc SSstep()
     L;
     @V;
     @RANK;
-//      Syzextra::DetailedPrint(MRES);
     attrib(MRES, "isHomog");
   }
 
@@ -1928,10 +1866,10 @@ proc SSstep()
       {
         "MRES", MRES;
 
-        "N: "; N; //   Syzextra::DetailedPrint(N, 2);
+        "N: "; N;
 
-        "LL:"; LL; //   Syzextra::DetailedPrint(LL, 1);
-        "TT:"; TT; //   Syzextra::DetailedPrint(TT, 10);
+        "LL:"; LL;
+        "TT:"; TT;
 
         "RANKS: ", @RANK;
 
@@ -1940,8 +1878,6 @@ proc SSstep()
 
         "transpose(N) * transpose(MRES): ";
         transpose(N) * transpose(MRES);
-        //   Syzextra::DetailedPrint(module(_), 2);
-          Syzextra::m2_end(666);
       }
     }
   }
@@ -1968,7 +1904,6 @@ proc SSstep()
   {
     "SSstep::NextSyzOutput: ";
     N;
-//      Syzextra::DetailedPrint(N);
     attrib(N);
   }
 
@@ -2336,7 +2271,6 @@ static proc  StopResTesting()
     "<<<<<<<<< }}}}}}}}}  STOP TESTING (", @save_res_desc,  ") !!!!!!!!!!!! ";
 
     "ERROR: There were some wrong betti numbers... ";
-//      Syzextra::m2_end(666);
   } else
   {
     if( !@treeout )
@@ -2435,7 +2369,6 @@ static proc SCheck(def S)
   if( nrows(M) != ncols(M) )
   {
     "ERROR: non-square M!!!";
-      Syzextra::m2_end(666);
   }
 
   if( size(module( M*M )) > 0 )
@@ -2445,14 +2378,12 @@ static proc SCheck(def S)
 
     "MRES': "; M; print(M);
 
-      Syzextra::m2_end(666);
   }
 //  "MRES': "; M; print(M);
 
   if( size(RES[1]) != 0 )
   {
     "ERROR: wrong starting zero module!!!";
-      Syzextra::m2_end(666);
   }
 
 //  RES;
@@ -2485,11 +2416,8 @@ static proc TestSSres(def I)
   );
 
   option(redSB); option(redTail);
-  if(@PROFILE){  Syzextra::ProfilerStart(@prof);}
   timer=0;rtimer=0;def R=SSres(I,0);@m=rtimer;
-  if(@PROFILE){  Syzextra::ProfilerStop();}
   setring R;module M;list @l=list();@l[size(RES)-1]=list();r=nrows(RES[1]);for(i=2;i<=size(RES);i++){M=RES[i];rr=nrows(M);if((r>0)&&(size(M)>0)&&(r<rr)){M=transpose(M);M=M[(r+1)..ncols(M)];M=transpose(M);RES[i]=M;};r=rr;@l[i-1] = M;};resolution RR=@l;RR=minres(RR);def S=betti(RR,1);@t=rtimer;
-//    Syzextra::DetailedPrint(RR,0);
   SCheck(R);
   StopAddResTest(RR, S, @t,@m);
   kill S, RR; setring save; kill R;
@@ -2634,12 +2562,9 @@ static proc TestSSSres(def I)
   );
 
   option(redSB); option(redTail);
-  if(@PROFILE){  Syzextra::ProfilerStart(@prof);}
   timer=0;rtimer=0;def R=SSinit(I);setring R;def RR=  Syzextra::ComputeResolution(RES[2], LRES[2], TRES[2], 0);
 @m=rtimer;
-  if(@PROFILE){  Syzextra::ProfilerStop();}
 RR=minres(RR); def S=betti(RR,1);@t=rtimer;
-//    Syzextra::DetailedPrint(RR,0);  print(RR);  print(S, "betti");
   SCheck(R);
   StopAddResTest(RR, S, @t,@m);
   kill S, RR; setring save; kill R;
