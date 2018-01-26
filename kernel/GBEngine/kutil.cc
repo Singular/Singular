@@ -12079,7 +12079,7 @@ void updateSShift(kStrategy strat,int uptodeg,int lV)
   for (i=0; i<=strat->sl; i++)
   {
     memset(&h,0,sizeof(h));
-    h.p =  strat->S[i]; // lm in currRing, tail in TR
+    h.p =  strat->S[i];
     strat->initEcart(&h);
     h.sev = strat->sevS[i];
     h.t_p = NULL;
@@ -12732,13 +12732,11 @@ void enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV)
   for (i=1; i<=toInsert; i++) // toIns - 1?
   {
     qq      = p; //qq.Copy();
-    qq.p    = NULL;
+    qq.t_p=NULL;
     qq.max_exp  = NULL;
-    if (p.t_p!=NULL)
-      qq.t_p = p_LPshift(p_Copy(p.t_p,strat->tailRing), i, uptodeg, lV, strat->tailRing); // direct shift
-    else
+    if (p.p!=NULL)
       qq.p = p_LPshift(p_Copy(p.p,currRing), i, uptodeg, lV, currRing); // direct shift
-    qq.GetP();
+    qq.GetTP();
     // update q.sev
     qq.sev = pGetShortExpVector(qq.p);
     #ifdef KTEST

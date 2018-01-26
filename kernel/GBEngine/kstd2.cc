@@ -4137,15 +4137,12 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
     {
       strat->P.GetP(strat->lmBin); // because shifts are counted with .p structure
       /* in the nonhomog case we have to shrink the polynomial */
-      assume(strat->P.t_p!=NULL);
-      qq = p_Shrink(strat->P.t_p, lV, strat->tailRing); // direct shrink
+      qq = p_Shrink(strat->P.p, lV, currRing); // direct shrink
       if (qq != NULL)
       {
          /* we're here if Shrink is nonzero */
-        //         strat->P.p =  NULL;
-        //        strat->P.Delete(); /* deletes P.p and P.t_p */ //error
-        strat->P.p   =  NULL; // is not set by Delete
-        strat->P.t_p =  qq;
+        strat->P.p   =  qq;
+        strat->P.t_p =  NULL;
         strat->P.GetP(strat->lmBin);
         // update sev and length
         strat->initEcart(&(strat->P));
@@ -4160,10 +4157,8 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 #ifdef KDEBUG
          if (TEST_OPT_DEBUG){PrintS("nonzero s shrinks to 0\n");}
 #endif
-         //         strat->P.Delete();  // cause error
          strat->P.p = NULL;
          strat->P.t_p = NULL;
-           //         strat->P.p = NULL; // or delete strat->P.p ?
        }
     }
       /* end shrinking poly in the nonhomog case */
@@ -4244,16 +4239,14 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       {
         strat->P.GetP(strat->lmBin); // because shifts are counted with .p structure
         /* in the nonhomog case we have to shrink the polynomial */
-        if (strat->P.t_p!=NULL)
+        if (strat->P.p!=NULL)
         {
-          qq = p_Shrink(strat->P.t_p, lV, strat->tailRing); // direct shrink
+          qq = p_Shrink(strat->P.p, lV, currRing); // direct shrink
           if (qq != NULL)
           {
             /* we're here if Shrink is nonzero */
-            //         strat->P.p =  NULL;
-            //        strat->P.Delete(); /* deletes P.p and P.t_p */ //error
-            strat->P.p   =  NULL; // is not set by Delete
-            strat->P.t_p =  qq;
+            strat->P.p   =  qq; // is not set by Delete
+            strat->P.t_p =  NULL;
             strat->P.GetP(strat->lmBin);
             // update sev and length
             strat->initEcart(&(strat->P));
@@ -4265,10 +4258,8 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 #ifdef PDEBUG
             if (TEST_OPT_DEBUG){PrintS("nonzero s shrinks to 0");PrintLn();}
 #endif
-            //         strat->P.Delete();  // cause error
             strat->P.p = NULL;
             strat->P.t_p = NULL;
-            //         strat->P.p = NULL; // or delete strat->P.p ?
             goto     red_shrink2zero;
           }
         }
@@ -4290,10 +4281,8 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 #ifdef PDEBUG
             if (TEST_OPT_DEBUG){PrintS("nonzero s shrinks to 0");PrintLn();}
 #endif
-            //         strat->P.Delete();  // cause error
             strat->P.p = NULL;
             strat->P.t_p = NULL;
-            //         strat->P.p = NULL; // or delete strat->P.p ?
             goto     red_shrink2zero;
           }
         }
@@ -4485,10 +4474,9 @@ int redFirstShift (LObject* h,kStrategy strat)
     ksReducePoly(h, &(strat->T[j]), strat->kNoetherTail(), NULL, strat);
     if (!h->IsNull())
     {
-      poly qq=p_Shrink(h->GetTP(),strat->lV,strat->tailRing);
-      h->p=NULL;
-      h->t_p=qq;
-      if (qq!=NULL) h->GetP(strat->lmBin);
+      poly qq=p_Shrink(h->GetP(),strat->lV,currRing);
+      h->p=qq;
+      h->t_p=NULL;
     }
 
 #ifdef KDEBUG
