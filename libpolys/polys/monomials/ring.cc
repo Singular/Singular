@@ -2555,7 +2555,7 @@ static unsigned long rGetExpSize(unsigned long bitmask, int & bits)
 /*2
 * optimize rGetExpSize for a block of N variables, exp <=bitmask
 */
-static unsigned long rGetExpSize(unsigned long bitmask, int & bits, int N)
+unsigned long rGetExpSize(unsigned long bitmask, int & bits, int N)
 {
 #if SIZEOF_LONG == 8
   if (N<4) N=4;
