@@ -31,7 +31,6 @@
 
 #include "singularxx_defs.h"
 
-#include "DebugPrint.h"
 #include "myNF.h"
 #include "syzextra.h"
 
@@ -256,221 +255,6 @@ static inline void view(const intvec* v)
 
 
 
-static BOOLEAN DetailedPrint(leftv __res, leftv h)
-{
-  NoReturn(__res);
-
-  if( h == NULL )
-  {
-    WarnS("DetailedPrint needs an argument...");
-    return TRUE;
-  }
-
-  if( h->Typ() == NUMBER_CMD)
-  {
-    number n = (number)h->Data();
-
-    const ring r = currRing;
-
-    n_Test(n, r->cf);
-
-    StringSetS("");
-    n_Write(n, r->cf);
-    PrintS(StringEndS());
-    PrintLn();
-
-    return FALSE;
-  }
-
-  if( h->Typ() == RING_CMD)
-  {
-    const ring r = (const ring)h->Data();
-    rWrite(r, TRUE);
-    PrintLn();
-#ifdef RDEBUG
-    //rDebugPrint(r);
-#endif
-    return FALSE;
-  }
-
-  if( h->Typ() == POLY_CMD || h->Typ() == VECTOR_CMD)
-  {
-    const poly p = (const poly)h->Data(); h = h->Next();
-
-    dPrint(p, currRing, currRing, getOptionalInteger(h, 3));
-
-    return FALSE;
-  }
-
-  if( h->Typ() == IDEAL_CMD || h->Typ() == MODUL_CMD)
-  {
-    const ideal id = (const ideal)h->Data(); h = h->Next();
-
-    dPrint(id, currRing, currRing, getOptionalInteger(h, 3));
-
-    return FALSE;
-  }
-
-  if( h->Typ() == RESOLUTION_CMD )
-  {
-    const syStrategy syzstr = reinterpret_cast<const syStrategy>(h->Data());
-
-    h = h->Next();
-
-    int nTerms = getOptionalInteger(h, 1);
-
-
-    Print("RESOLUTION_CMD(%p): ", reinterpret_cast<const void*>(syzstr)); PrintLn();
-
-    const ring save = currRing;
-    const ring r = syzstr->syRing;
-//    const ring rr = (r != NULL) ? r: save;
-
-
-    const int iLength = syzstr->length;
-
-    Print("int 'length': %d", iLength); PrintLn();
-    Print("int 'regularity': %d", syzstr->regularity); PrintLn();
-    Print("short 'list_length': %hd", syzstr->list_length); PrintLn();
-    Print("short 'references': %hd", syzstr->references); PrintLn();
-
-
-#define PRINT_pINTVECTOR(s, v) Print("intvec '%10s'(%p)", #v, reinterpret_cast<const void*>((s)->v)); \
-if( (s)->v != NULL ){ PrintS(": "); view((s)->v); }; \
-PrintLn();
-
-    PRINT_pINTVECTOR(syzstr, resolution);
-    PRINT_pINTVECTOR(syzstr, betti);
-    PRINT_pINTVECTOR(syzstr, Tl);
-    PRINT_pINTVECTOR(syzstr, cw);
-#undef PRINT_pINTVECTOR
-
-    if (r == NULL)
-      Print("ring '%10s': NULL", "syRing");
-    else
-      if (r == currRing)
-        Print("ring '%10s': currRing", "syRing");
-      else
-        if (r != NULL && r != save)
-        {
-          Print("ring '%10s': ", "syRing");
-          rWrite(r);
-#ifdef RDEBUG
-          //              rDebugPrint(r);
-#endif
-          // rChangeCurrRing(r);
-        }
-    PrintLn();
-
-    const SRes rP = syzstr->resPairs;
-    Print("SRes 'resPairs': %p", reinterpret_cast<const void*>(rP)); PrintLn();
-
-    if (rP != NULL)
-      for (int iLevel = 0; (iLevel < iLength) && (rP[iLevel] != NULL) && ((*syzstr->Tl)[iLevel] >= 0); iLevel++)
-      {
-        int n = 0;
-        const int iTl = (*syzstr->Tl)[iLevel];
-        for (int j = 0; (j < iTl) && ((rP[iLevel][j].lcm!=NULL) || (rP[iLevel][j].syz!=NULL)); j++)
-        {
-          if (rP[iLevel][j].isNotMinimal==NULL)
-            n++;
-        }
-        Print("minimal-resPairs-Size[1+%d]: %d", iLevel, n); PrintLn();
-      }
-
-
-    //  const ring rrr = (iLevel > 0) ? rr : save; ?
-#define PRINT_RESOLUTION(s, v) Print("resolution '%12s': %p", #v, reinterpret_cast<const void*>((s)->v)); PrintLn(); \
-if ((s)->v != NULL) \
-  for (int iLevel = 0; (iLevel < iLength) && ( ((s)->v)[iLevel] != NULL ); iLevel++) \
-  { \
-    /* const ring rrr = (iLevel > 0) ? save : save; */ \
-    Print("id '%10s'[%d]: (%p) ncols = %d / size: %d; nrows = %d, rank = %ld / rk: %ld", #v, iLevel, reinterpret_cast<const void*>(((s)->v)[iLevel]), ((s)->v)[iLevel]->ncols, IDELEMS(((s)->v)[iLevel]), ((s)->v)[iLevel]->nrows, ((s)->v)[iLevel]->rank, -1L/*id_RankFreeModule(((s)->v)[iLevel], rrr)*/ ); \
-    PrintLn(); \
-  } \
-  PrintLn();
-
-    // resolvente:
-    PRINT_RESOLUTION(syzstr, minres);
-    PRINT_RESOLUTION(syzstr, fullres);
-
-//    assume (id_RankFreeModule (syzstr->res[1], rr) == syzstr->res[1]->rank);
-
-    PRINT_RESOLUTION(syzstr, res);
-    PRINT_RESOLUTION(syzstr, orderedRes);
-#undef PRINT_RESOLUTION
-
-#define PRINT_POINTER(s, v) Print("pointer '%17s': %p", #v, reinterpret_cast<const void*>((s)->v)); PrintLn();
-    // 2d arrays:
-    PRINT_POINTER(syzstr, truecomponents);
-    PRINT_POINTER(syzstr, ShiftedComponents);
-    PRINT_POINTER(syzstr, backcomponents);
-    PRINT_POINTER(syzstr, Howmuch);
-    PRINT_POINTER(syzstr, Firstelem);
-    PRINT_POINTER(syzstr, elemLength);
-    PRINT_POINTER(syzstr, sev);
-
-    // arrays of intvects:
-    PRINT_POINTER(syzstr, weights);
-    PRINT_POINTER(syzstr, hilb_coeffs);
-#undef PRINT_POINTER
-
-
-    if (syzstr->fullres==NULL)
-    {
-      PrintS("resolution 'fullres': (NULL) => resolution not computed yet");
-      PrintLn();
-    } else
-    {
-      Print("resolution 'fullres': (%p) => resolution seems to be computed already", reinterpret_cast<const void*>(syzstr->fullres));
-      PrintLn();
-      dPrint(*syzstr->fullres, save, save, nTerms);
-    }
-
-
-
-
-    if (syzstr->minres==NULL)
-    {
-      PrintS("resolution 'minres': (NULL) => resolution not minimized yet");
-      PrintLn();
-    } else
-    {
-      Print("resolution 'minres': (%p) => resolution seems to be minimized already", reinterpret_cast<const void*>(syzstr->minres));
-      PrintLn();
-      dPrint(*syzstr->minres, save, save, nTerms);
-    }
-
-
-
-
-    /*
-    int ** truecomponents;
-    long** ShiftedComponents;
-    int ** backcomponents;
-    int ** Howmuch;
-    int ** Firstelem;
-    int ** elemLength;
-    unsigned long ** sev;
-
-    intvec ** weights;
-    intvec ** hilb_coeffs;
-
-    SRes resPairs;               //polynomial data for internal use only
-
-    resolvente fullres;
-    resolvente minres;
-    resolvente res;              //polynomial data for internal use only
-    resolvente orderedRes;       //polynomial data for internal use only
-*/
-
-    //            if( currRing != save ) rChangeCurrRing(save);
-  }
-
-
-  return FALSE;
-}
-
 /// wrapper around p_Tail and id_Tail
 static BOOLEAN Tail(leftv res, leftv h)
 {
@@ -516,7 +300,6 @@ static BOOLEAN _ComputeLeadingSyzygyTerms(leftv res, leftv h)
 {
   const SchreyerSyzygyComputationFlags attributes(currRingHdl);
 
-  const BOOLEAN OPT__DEBUG      = attributes.OPT__DEBUG;
 //  const BOOLEAN OPT__SYZCHECK   = attributes.OPT__SYZCHECK;
   const BOOLEAN OPT__LEAD2SYZ   = attributes.OPT__LEAD2SYZ;
 //  const BOOLEAN OPT__HYBRIDNF   = attributes.OPT__HYBRIDNF;
@@ -539,12 +322,6 @@ static BOOLEAN _ComputeLeadingSyzygyTerms(leftv res, leftv h)
 
     assume(id != NULL);
 
-    if( UNLIKELY( OPT__DEBUG ) )
-    {
-      PrintS("ComputeLeadingSyzygyTerms::Input: \n");
-      dPrint(id, r, r, 0);
-    }
-
     assume( !OPT__LEAD2SYZ );
 
     h = h->Next(); assume (h == NULL);
@@ -566,7 +343,6 @@ static BOOLEAN _Sort_c_ds(leftv res, leftv h)
 {
   const SchreyerSyzygyComputationFlags attributes(currRingHdl);
 
-  const BOOLEAN OPT__DEBUG      = FALSE; // attributes.OPT__DEBUG;
 //  const BOOLEAN OPT__SYZCHECK   = attributes.OPT__SYZCHECK;
 //  const BOOLEAN OPT__LEAD2SYZ   = attributes.OPT__LEAD2SYZ;
 //  const BOOLEAN OPT__HYBRIDNF   = attributes.OPT__HYBRIDNF;
@@ -594,12 +370,6 @@ static BOOLEAN _Sort_c_ds(leftv res, leftv h)
 
     assume(id != NULL);
 
-    if( UNLIKELY( OPT__DEBUG ) )
-    {
-      PrintS("Sort_c_ds::Input: \n");
-      dPrint(id, r, r, 0);
-    }
-
     assume (h->Next() == NULL);
 
     id_Test(id, r);
@@ -608,12 +378,6 @@ static BOOLEAN _Sort_c_ds(leftv res, leftv h)
 
 //    res->data = id;
 //    res->rtyp = h->Typ();
-
-    if( UNLIKELY( OPT__DEBUG ) )
-    {
-      PrintS("Sort_c_ds::Output: \n");
-      dPrint(id, r, r, 0);
-    }
 
     // NOTE: nothing is to be returned!!!
     return FALSE;
@@ -628,7 +392,6 @@ static BOOLEAN _Compute2LeadingSyzygyTerms(leftv res, leftv h)
 {
   const SchreyerSyzygyComputationFlags attributes(currRingHdl);
 
-  const BOOLEAN OPT__DEBUG      = attributes.OPT__DEBUG;
 //  const BOOLEAN OPT__SYZCHECK   = attributes.OPT__SYZCHECK;
   const BOOLEAN OPT__LEAD2SYZ   = attributes.OPT__LEAD2SYZ;
 //  const BOOLEAN OPT__HYBRIDNF   = attributes.OPT__HYBRIDNF;
@@ -653,12 +416,6 @@ static BOOLEAN _Compute2LeadingSyzygyTerms(leftv res, leftv h)
 
     assume(id != NULL);
 
-    if( UNLIKELY( OPT__DEBUG ) )
-    {
-      PrintS("Compute2LeadingSyzygyTerms::Input: \n");
-      dPrint(id, r, r, 0);
-    }
-
     h = h->Next(); assume (h == NULL);
 
     res->data = Compute2LeadingSyzygyTerms(id, attributes);
@@ -678,7 +435,6 @@ static BOOLEAN _FindReducer(leftv res, leftv h)
 {
   const SchreyerSyzygyComputationFlags attributes(currRingHdl);
 
-  const BOOLEAN OPT__DEBUG      = attributes.OPT__DEBUG;
 //   const BOOLEAN OPT__SYZCHECK   = attributes.OPT__SYZCHECK;
 //   const BOOLEAN OPT__LEAD2SYZ   = attributes.OPT__LEAD2SYZ;
 //   const BOOLEAN OPT__HYBRIDNF   = attributes.OPT__HYBRIDNF;
@@ -739,32 +495,8 @@ static BOOLEAN _FindReducer(leftv res, leftv h)
 
   assume( h == NULL );
 
-  if( UNLIKELY(OPT__DEBUG) )
-  {
-    PrintS("FindReducer(product, syzterm, L, T, #)::Input: \n");
-
-    PrintS("product: "); dPrint(product, r, r, 0);
-    PrintS("syzterm: "); dPrint(syzterm, r, r, 0);
-//    PrintS("L: "); dPrint(L, r, r, 0);
-//    PrintS("T: "); dPrint(T, r, r, 0);
-
-    if( LS == NULL )
-//      PrintS("LS: NULL\n");
-      ;
-    else
-    {
-//      PrintS("LS: "); dPrint(LS, r, r, 0);
-    }
-  }
-
   res->rtyp = VECTOR_CMD;
   res->data = FindReducer(product, syzterm, L, LS, attributes);
-
-  if( UNLIKELY( OPT__DEBUG ) )
-  {
-    PrintS("FindReducer::Output: \n");
-    dPrint((poly)res->data, r, r, 0);
-  }
 
   return FALSE;
 
@@ -775,7 +507,6 @@ static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
 {
   const SchreyerSyzygyComputationFlags attributes(currRingHdl);
 
-  const BOOLEAN OPT__DEBUG      = attributes.OPT__DEBUG;
 //   const BOOLEAN OPT__SYZCHECK   = attributes.OPT__SYZCHECK;
 //   const BOOLEAN OPT__LEAD2SYZ   = attributes.OPT__LEAD2SYZ;
   const BOOLEAN OPT__HYBRIDNF   = attributes.OPT__HYBRIDNF;
@@ -843,36 +574,9 @@ static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
 
   assume( h == NULL );
 
-  if( UNLIKELY( OPT__DEBUG ) )
-  {
-    PrintS("SchreyerSyzygyNF(syz_lead, syz_2, L, T, #)::Input: \n");
-
-    PrintS("syz_lead: "); dPrint(syz_lead, r, r, 0);
-    PrintS("syz_2: "); dPrint(syz_2, r, r, 0);
-
-//    PrintS("L: "); dPrint(L, r, r, 0);
-//    PrintS("T: "); dPrint(T, r, r, 0);
-
-    if( LS == NULL )
-//      PrintS("LS: NULL\n")
-          ;
-    else
-    {
-//      PrintS("LS: "); dPrint(LS, r, r, 0);
-    }
-  }
-
   res->rtyp = VECTOR_CMD;
   res->data = SchreyerSyzygyNF(syz_lead,
                                (syz_2!=NULL)? p_Copy(syz_2, r): syz_2, L, T, LS, attributes);
-
-  if( UNLIKELY( OPT__DEBUG ) )
-  {
-    PrintS("SchreyerSyzygyNF::Output: ");
-
-    dPrint((poly)res->data, r, r, 0);
-  }
-
 
   return FALSE;
 }
@@ -884,7 +588,6 @@ static BOOLEAN _ReduceTerm(leftv res, leftv h)
 {
   const SchreyerSyzygyComputationFlags attributes(currRingHdl);
 
-  const BOOLEAN OPT__DEBUG      = attributes.OPT__DEBUG;
 //  const BOOLEAN OPT__SYZCHECK   = attributes.OPT__SYZCHECK;
 //   const BOOLEAN OPT__LEAD2SYZ   = attributes.OPT__LEAD2SYZ;
 //   const BOOLEAN OPT__HYBRIDNF   = attributes.OPT__HYBRIDNF;
@@ -964,59 +667,8 @@ static BOOLEAN _ReduceTerm(leftv res, leftv h)
 
   assume( h == NULL );
 
-  if( UNLIKELY( OPT__DEBUG ) )
-  {
-    PrintS("ReduceTerm(m, t, syzterm, L, T, #)::Input: \n");
-
-    PrintS("m: "); dPrint(multiplier, r, r, 0);
-    PrintS("t: "); dPrint(term4reduction, r, r, 0);
-    PrintS("syzterm: "); dPrint(syztermCheck, r, r, 0);
-
-//    PrintS("L: "); dPrint(L, r, r, 0);
-//    PrintS("T: "); dPrint(T, r, r, 0);
-
-    if( LS == NULL )
-//      PrintS("LS: NULL\n")
-          ;
-    else
-    {
-//      PrintS("LS: "); dPrint(LS, r, r, 0);
-    }
-  }
-
-
-  if ( UNLIKELY( OPT__DEBUG && syztermCheck != NULL) )
-  {
-    const int c = p_GetComp(syztermCheck, r) - 1;
-    assume( c >= 0 && c < IDELEMS(L) );
-
-    const poly p = L->m[c];
-    assume( p != NULL ); assume( pNext(p) == NULL );
-
-    assume( p_EqualPolys(term4reduction, p, r) ); // assume? TODO
-
-
-    poly m = leadmonom(syztermCheck, r);
-    assume( m != NULL ); assume( pNext(m) == NULL );
-
-    assume( p_EqualPolys(multiplier, m, r) ); // assume? TODO
-
-    p_Delete(&m, r);
-
-// NOTE:   leadmonomial(syzterm) == m &&  L[leadcomp(syzterm)] == t
-  }
-
   res->rtyp = VECTOR_CMD;
   res->data = ReduceTerm(multiplier, term4reduction, syztermCheck, L, T, LS, attributes);
-
-
-  if( UNLIKELY( OPT__DEBUG ) )
-  {
-    PrintS("ReduceTerm::Output: ");
-
-    dPrint((poly)res->data, r, r, 0);
-  }
-
 
   return FALSE;
 }
@@ -1029,7 +681,6 @@ static BOOLEAN _TraverseTail(leftv res, leftv h)
 {
   const SchreyerSyzygyComputationFlags attributes(currRingHdl);
 
-  const BOOLEAN OPT__DEBUG      = attributes.OPT__DEBUG;
 //   const BOOLEAN OPT__SYZCHECK   = attributes.OPT__SYZCHECK;
 //   const BOOLEAN OPT__LEAD2SYZ   = attributes.OPT__LEAD2SYZ;
 //   const BOOLEAN OPT__HYBRIDNF   = attributes.OPT__HYBRIDNF;
@@ -1097,34 +748,8 @@ static BOOLEAN _TraverseTail(leftv res, leftv h)
 
   assume( h == NULL );
 
-  if( UNLIKELY( OPT__DEBUG ) )
-  {
-    PrintS("TraverseTail(m, t, L, T, #)::Input: \n");
-
-    PrintS("m: "); dPrint(multiplier, r, r, 0);
-    PrintS("t: "); dPrint(tail, r, r, 0);
-
-//    PrintS("L: "); dPrint(L, r, r, 0);
-//    PrintS("T: "); dPrint(T, r, r, 0);
-
-    if( LS == NULL )
-//      PrintS("LS: NULL\n")
-          ;
-    else
-    {
-//      PrintS("LS: "); dPrint(LS, r, r, 0);
-    }
-  }
-
   res->rtyp = VECTOR_CMD;
   res->data = TraverseTail(multiplier, tail, L, T, LS, attributes);
-
-
-  if( UNLIKELY( OPT__DEBUG ) )
-  {
-    PrintS("TraverseTail::Output: ");
-    dPrint((poly)res->data, r, r, 0);
-  }
 
   return FALSE;
 }
@@ -1133,8 +758,6 @@ static BOOLEAN _TraverseTail(leftv res, leftv h)
 static BOOLEAN _ComputeResolution(leftv res, leftv h)
 {
   const SchreyerSyzygyComputationFlags attributes(currRingHdl);
-
-  const BOOLEAN OPT__DEBUG      = attributes.OPT__DEBUG;
 
   const char* usage = "`ComputeResolution(<ideal/module>, <same as before>, <same as before>[,int])` expected";
   const ring r = attributes.m_rBaseRing;
@@ -1192,16 +815,6 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
   if( length <= 0 )
     length = 1 + rVar(r);
 
-  if( UNLIKELY( OPT__DEBUG ) )
-  {
-    PrintS("ComputeResolution(M, length)::Input: \n");
-    Print( "starting length: %ld\n", length);
-    PrintS("M: \n"); dPrint(M, r, r, 0);
-    PrintS("L=LEAD(M): \n"); dPrint(L, r, r, 0);
-    PrintS("T=TAIL(M): \n"); dPrint(T, r, r, 0);
-  }
-
-
   syStrategy _res=(syStrategy)omAlloc0(sizeof(ssyStrategy));
 
 //  class ssyStrategy; typedef ssyStrategy * syStrategy;
@@ -1222,12 +835,6 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
 
     ComputeSyzygy(L, T, LL, TT, attributes);
 
-    if( UNLIKELY( OPT__DEBUG ) )
-    {
-      Print("ComputeResolution()::Separated Syzygy[%d]: \n", index);
-//      PrintS("LL: \n"); dPrint(LL, r, r, 0);
-//      PrintS("TT: \n"); dPrint(TT, r, r, 0);
-    }
     size = IDELEMS(LL);
 
     assume( size == IDELEMS(TT) );
@@ -1244,12 +851,6 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
     }
     M->rank = id_RankFreeModule(M, r);
 
-    if( UNLIKELY( OPT__DEBUG ) )
-    {
-      Print("ComputeResolution()::Restored Syzygy[%d]: \n", index);
-      PrintS("M = LL + TT: \n"); dPrint(M, r, r, 0);
-    }
-
     _res->fullres[index++] = M; // ???
   }
 //  if ( UNLIKELY(attributes.OPT__TREEOUTPUT) )
@@ -1259,14 +860,6 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
 
   res->data = _res;
   res->rtyp = RESOLUTION_CMD;
-
-  if( UNLIKELY(OPT__DEBUG) )
-  {
-    Print("ComputeResolution::Output (index: %d): ", index);
-//    class sleftv; typedef sleftv * leftv;
-    sleftv _h;
-    DetailedPrint(&_h, res);
-  }
 
 //  omFreeSize(_res, sizeof(ssyStrategy));
 
@@ -1282,7 +875,6 @@ static BOOLEAN _ComputeSyzygy(leftv res, leftv h)
 {
   const SchreyerSyzygyComputationFlags attributes(currRingHdl);
 
-  const BOOLEAN OPT__DEBUG      = attributes.OPT__DEBUG;
 //   const BOOLEAN OPT__SYZCHECK   = attributes.OPT__SYZCHECK;
 //   const BOOLEAN OPT__LEAD2SYZ   = attributes.OPT__LEAD2SYZ;
 //   const BOOLEAN OPT__HYBRIDNF   = attributes.OPT__HYBRIDNF;
@@ -1316,13 +908,6 @@ static BOOLEAN _ComputeSyzygy(leftv res, leftv h)
 
   h = h->Next(); assume( h == NULL );
 
-  if( UNLIKELY( OPT__DEBUG ) )
-  {
-    PrintS("ComputeSyzygy(L, T)::Input: \n");
-//    PrintS("L: "); dPrint(L, r, r, 0);
-//    PrintS("T: "); dPrint(T, r, r, 0);
-  }
-
   ideal LL, TT;
 
   ComputeSyzygy(L, T, LL, TT, attributes);
@@ -1334,14 +919,6 @@ static BOOLEAN _ComputeSyzygy(leftv res, leftv h)
   l->m[1].rtyp = MODUL_CMD; l->m[1].data = reinterpret_cast<void *>(TT);
 
   res->data = l; res->rtyp = LIST_CMD;
-
-  if( UNLIKELY( OPT__DEBUG ) )
-  {
-    PrintS("ComputeSyzygy::Output: \nLL: \n");
-    dPrint(LL, r, r, 0);
-    PrintS("\nTT: \n");
-    dPrint(TT, r, r, 0);
-  }
 
   return FALSE;
 
@@ -1971,7 +1548,6 @@ extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
 
   ADD("m2_end", FALSE, _m2_end);
 
-  ADD("DetailedPrint", FALSE, DetailedPrint);
   ADD("leadmonomial", FALSE, _leadmonom);
   ADD("leadcomp", FALSE, leadcomp);
   ADD("leadrawexp", FALSE, leadrawexp);

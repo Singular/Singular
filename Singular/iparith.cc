@@ -4311,7 +4311,7 @@ static BOOLEAN jjLISTRING(leftv res, leftv v)
   lists l=(lists)v->Data();
   long mm=(long)atGet(v,"maxExp",INT_CMD);
   if (mm==0) mm=0x7fff;
-  ring r=rCompose((lists)v->Data(),TRUE,mm);
+  ring r=rCompose(l,TRUE,mm);
   res->data=(char *)r;
   return (r==NULL);
 }
