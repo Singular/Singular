@@ -192,42 +192,6 @@ static int getOptionalInteger(const leftv& h, const int _n)
   return (_n);
 }
 
-static BOOLEAN noop(leftv __res, leftv /*__v*/)
-{
-  NoReturn(__res);
-  return FALSE;
-}
-
-static BOOLEAN _ProfilerStart(leftv __res, leftv h)
-{
-  NoReturn(__res);
-#if GOOGLE_PROFILE_ENABLED
-  if( h!= NULL && h->Typ() == STRING_CMD )
-  {
-    const char* name = (char*)(h->Data());
-    assume( name != NULL );
-    ProfilerStart(name);
-  } else
-    WerrorS("ProfilerStart requires a string [name] argument");
-#else
-  WarnS("Sorry no google profiler support (GOOGLE_PROFILE_ENABLE!=1)...");
-//  return TRUE; // ?
-#endif // #if GOOGLE_PROFILE_ENABLED
-  return FALSE;
-  (void)h;
-}
-static BOOLEAN _ProfilerStop(leftv __res, leftv /*__v*/)
-{
-  NoReturn(__res);
-#if GOOGLE_PROFILE_ENABLED
-  ProfilerStop();
-#else
-  WarnS("Sorry no google profiler support (GOOGLE_PROFILE_ENABLED!=1)...");
-//  return TRUE; // ?
-#endif // #if GOOGLE_PROFILE_ENABLED
-  return FALSE;
-}
-
 static inline number jjLONG2N(long d)
 {
   return n_Init(d, coeffs_BIGINT);
@@ -977,45 +941,6 @@ static BOOLEAN leadcomp(leftv res, leftv h)
   return TRUE;
 }
 
-
-
-
-/// Get raw leading exponent vector
-static BOOLEAN leadrawexp(leftv res, leftv h)
-{
-  NoReturn(res);
-
-  if ((h!=NULL) && (h->Typ()==VECTOR_CMD || h->Typ()==POLY_CMD) && (h->Data() != NULL))
-  {
-    const ring r = currRing;
-    const poly p = (poly)(h->Data());
-
-    assume( p != NULL );
-    p_LmTest(p, r);
-
-    const int iExpSize = r->ExpL_Size;
-
-//    intvec *iv = new intvec(iExpSize);
-
-    lists l=(lists)omAllocBin(slists_bin);
-    l->Init(iExpSize);
-
-    for(int i = iExpSize-1; i >= 0; i--)
-    {
-      l->m[i].rtyp = BIGINT_CMD;
-      l->m[i].data = reinterpret_cast<void *>(jjLONG2N(p->exp[i])); // longs...
-    }
-
-    res->rtyp = LIST_CMD; // list of bigints
-    res->data = reinterpret_cast<void *>(l);
-    return FALSE;
-  }
-
-  WerrorS("`leadrawexp(<poly/vector>)` expected");
-  return TRUE;
-}
-
-
 /// Endowe the current ring with additional (leading) Syz-component ordering
 static BOOLEAN MakeSyzCompOrdering(leftv res, leftv /*h*/)
 {
@@ -1473,23 +1398,6 @@ static BOOLEAN idPrepare(leftv res, leftv h)
   return FALSE;
 }
 
-static BOOLEAN _m2_end(leftv res, leftv h)
-{
-  int ret = 0;
-
-  if ( (h!=NULL) && (h->Typ()!=INT_CMD) )
-  {
-    WerrorS("`m2_end([<int>])` expected");
-    return TRUE;
-  }
-  ret = (int)(long)(h->Data());
-
-  m2_end( ret );
-
-  NoReturn(res);
-  return FALSE;
-}
-
 // no args.
 // init num stats
 static BOOLEAN _NumberStatsInit(leftv res, leftv h)
@@ -1546,11 +1454,8 @@ extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   ADD("ClearContent", FALSE, _ClearContent);
   ADD("ClearDenominators", FALSE, _ClearDenominators);
 
-  ADD("m2_end", FALSE, _m2_end);
-
   ADD("leadmonomial", FALSE, _leadmonom);
   ADD("leadcomp", FALSE, leadcomp);
-  ADD("leadrawexp", FALSE, leadrawexp);
 
   ADD("ISUpdateComponents", FALSE, ISUpdateComponents);
   ADD("SetInducedReferrence", FALSE, SetInducedReferrence);
@@ -1562,7 +1467,6 @@ extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   ADD("ProfilerStart", FALSE, _ProfilerStart);
   ADD("ProfilerStop",  FALSE, _ProfilerStop );
 
-  ADD("noop", FALSE, noop);
   ADD("idPrepare", FALSE, idPrepare);
   ADD("reduce_syz", FALSE, reduce_syz);
 

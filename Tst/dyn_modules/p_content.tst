@@ -2,8 +2,6 @@ LIB "tst.lib"; tst_init();
 echo = 2;
 
 LIB("syzextra.so");
-noop();
-
 
 option(redSB);option(redTail);
 

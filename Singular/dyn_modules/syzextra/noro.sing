@@ -2,8 +2,6 @@ echo = 2;
 
 LIB("syzextra.so");
 
-noop();
-
 system("--min-time", "0.01");
 system("--ticks-per-sec", 100);
 

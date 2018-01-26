@@ -1,8 +1,6 @@
 LIB "tst.lib"; tst_init();
 LIB("syzextra.so");
 
-noop();
-
 proc NegativeNumber(number c)
 {
   string s = sprintf("(%s)", c); int i = 1;

@@ -1,7 +1,6 @@
 ;;; dyn_modules/bigintm.tst
 dyn_modules/ederc.tst
 dyn_modules/p_content.tst
-dyn_modules/syzextra.tst
 ; dyn_modules/test_clear_enum.tst
 Manual/python_eval.tst
 Manual/python_import.tst
