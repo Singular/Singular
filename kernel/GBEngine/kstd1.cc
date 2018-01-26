@@ -3296,6 +3296,8 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
   {
     h = (tHomog)idHomModule(F,Q,&w);
   }
+  else
+    h = isNotHomog;
   if (h==isHomog)
   {
     if (strat->ak > 0 && (w!=NULL) && (w!=NULL))
@@ -3506,7 +3508,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
 #ifdef HAVE_TAIL_RING
         if(currRing->bitmask>strat->tailRing->bitmask)
         {
-	  // retry without T
+          // retry without T
           strat->completeReduce_retry=FALSE;
           cleanT(strat);strat->tailRing=currRing;
           int i;
