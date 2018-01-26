@@ -1464,9 +1464,6 @@ extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   ADD("MakeInducedSchreyerOrdering", FALSE, MakeInducedSchreyerOrdering);
   ADD("MakeSyzCompOrdering", FALSE, MakeSyzCompOrdering);
 
-  ADD("ProfilerStart", FALSE, _ProfilerStart);
-  ADD("ProfilerStop",  FALSE, _ProfilerStop );
-
   ADD("idPrepare", FALSE, idPrepare);
   ADD("reduce_syz", FALSE, reduce_syz);
 
