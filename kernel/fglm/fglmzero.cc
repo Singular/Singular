@@ -1119,70 +1119,75 @@ GroebnerViaFunctionals( const idealFunctionals & l,
 static ideal
 FindUnivariatePolys( const idealFunctionals & l )
 {
-    fglmVector v;
-    fglmVector p;
-    ideal destIdeal = idInit( (currRing->N), 1 );
+  fglmVector v;
+  fglmVector p;
+  ideal destIdeal = idInit( (currRing->N), 1 );
 
-    int i;
-    BOOLEAN isZero;
-    int *varpermutation = (int*)omAlloc( ((currRing->N)+1)*sizeof(int) );
-    ideal perm = idMaxIdeal(1);
-    intvec *iv = idSort(perm,TRUE);
-    idDelete(&perm);
-    for(i = (currRing->N); i > 0; i--) varpermutation[(currRing->N)+1-i] = (*iv)[i-1];
-    delete iv;
+  int i;
+  BOOLEAN isZero;
+  int *varpermutation = (int*)omAlloc( ((currRing->N)+1)*sizeof(int) );
+  ideal perm = idMaxIdeal(1);
+  intvec *iv = idSort(perm,TRUE);
+  idDelete(&perm);
+  for(i = (currRing->N); i > 0; i--) varpermutation[(currRing->N)+1-i] = (*iv)[i-1];
+  delete iv;
 
-    for (i= 1; i <= (currRing->N); i++ )
+  for (i= 1; i <= (currRing->N); i++ )
+  {
+    // main loop
+    STICKYPROT2( "(%i)", i /*varpermutation[i]*/);
+    gaussReducer gauss( l.dimen() );
+    isZero= FALSE;
+    v= fglmVector( l.dimen(), 1 );
+    while ( !isZero )
     {
-        // main loop
-        STICKYPROT2( "(%i)", i /*varpermutation[i]*/);
-        gaussReducer gauss( l.dimen() );
-        isZero= FALSE;
-        v= fglmVector( l.dimen(), 1 );
-        while ( !isZero )
+      if ( (isZero= gauss.reduce( v )))
+      {
+        STICKYPROT( "+" );
+        p= gauss.getDependence();
+        number gcd= p.gcd();
+        if ( ! nIsOne( gcd ) )
         {
-            if ( (isZero= gauss.reduce( v )))
-            {
-                STICKYPROT( "+" );
-                p= gauss.getDependence();
-                number gcd= p.gcd();
-                if ( ! nIsOne( gcd ) )
-                {
-                    p /= gcd;
-                }
-                nDelete( & gcd );
-                int k;
-                poly temp = NULL;
-                poly result;
-                for ( k= p.size(); k > 0; k-- ) {
-                    number n = nCopy( p.getconstelem( k ) );
-                    if ( ! nIsZero( n ) ) {
-                        if ( temp == NULL ) {
-                            result= pOne();
-                            temp= result;
-                        }
-                        else {
-                            temp->next= pOne();
-                            pIter( temp );
-                        }
-                        pSetCoeff( temp, n );
-                        pSetExp( temp, i /*varpermutation[i]*/, k-1 );
-                        pSetm( temp );
-                    }
-                }
-                if ( ! nGreaterZero( pGetCoeff( result ) ) ) result= pNeg( result );
-                (destIdeal->m)[i-1]= result;
-            }
-            else {
-                STICKYPROT( "." );
-                gauss.store();
-                v= l.multiply( v, i /*varpermutation[i]*/ );
-            }
+          p /= gcd;
         }
+        nDelete( & gcd );
+        int k;
+        poly temp = NULL;
+        poly result=NULL;
+        for ( k= p.size(); k > 0; k-- )
+        {
+          number n = nCopy( p.getconstelem( k ) );
+          if ( ! nIsZero( n ) )
+          {
+            if ( temp == NULL )
+            {
+              result= pOne();
+              temp= result;
+            }
+            else
+            {
+              temp->next= pOne();
+              pIter( temp );
+            }
+            pSetCoeff( temp, n );
+            pSetExp( temp, i /*varpermutation[i]*/, k-1 );
+            pSetm( temp );
+          }
+        }
+        if ( ! nGreaterZero( pGetCoeff( result ) ) ) result= pNeg( result );
+        (destIdeal->m)[i-1]= result;
+      }
+      else
+      {
+        STICKYPROT( "." );
+        gauss.store();
+        v= l.multiply( v, i /*varpermutation[i]*/ );
+      }
     }
-    STICKYPROT( "\n" );
-    omFreeSize( (ADDRESS)varpermutation, ((currRing->N)+1)*sizeof(int) );
-    return destIdeal;
+  }
+  STICKYPROT( "\n" );
+  omFreeSize( (ADDRESS)varpermutation, ((currRing->N)+1)*sizeof(int) );
+  return destIdeal;
 }
 
 // for a descritption of the parameters see fglm.h
