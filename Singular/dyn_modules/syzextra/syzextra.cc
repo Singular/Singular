@@ -2133,7 +2133,7 @@ void CReducerFinder::DebugPrint() const
 
       assume( p_GetComp(p, r) == it->first );
 
-      Print("L[%d]: ", k); dPrint(p, r, r, 0); Print("SEV: %ld\n", p_sev);
+      Print("L[%d]: ", k); Print("SEV: %ld\n", p_sev);
 
       assume( m_L->m[k] == p );
     }
