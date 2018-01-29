@@ -31,7 +31,6 @@
 
 #include "singularxx_defs.h"
 
-#include "myNF.h"
 #include "syzextra.h"
 
 
@@ -888,26 +887,6 @@ static BOOLEAN _ComputeSyzygy(leftv res, leftv h)
 
 }
 
-/// Get leading term without a module component
-static BOOLEAN _leadmonom(leftv res, leftv h)
-{
-  NoReturn(res);
-
-  if ((h!=NULL) && (h->Typ()==VECTOR_CMD || h->Typ()==POLY_CMD) && (h->Data() != NULL))
-  {
-    const ring r = currRing;
-    const poly p = (poly)(h->Data());
-
-    res->data = reinterpret_cast<void *>(  leadmonom(p, r) );
-    res->rtyp = POLY_CMD;
-
-    return FALSE;
-  }
-
-  WerrorS("`leadmonom(<poly/vector>)` expected");
-  return TRUE;
-}
-
 /// Get leading component
 static BOOLEAN leadcomp(leftv res, leftv h)
 {
@@ -941,21 +920,6 @@ static BOOLEAN leadcomp(leftv res, leftv h)
   return TRUE;
 }
 
-/// Endowe the current ring with additional (leading) Syz-component ordering
-static BOOLEAN MakeSyzCompOrdering(leftv res, leftv /*h*/)
-{
-
-  NoReturn(res);
-
-  //    res->data = rCurrRingAssure_SyzComp(); // changes current ring! :(
-  res->data = reinterpret_cast<void *>(rAssure_SyzComp(currRing, TRUE));
-  res->rtyp = RING_CMD; // return new ring!
-  // QRING_CMD?
-
-  return FALSE;
-}
-
-
 /// Same for Induced Schreyer ordering (ordering on components is defined by sign!)
 static BOOLEAN MakeInducedSchreyerOrdering(leftv res, leftv h)
 {
@@ -983,32 +947,6 @@ static BOOLEAN MakeInducedSchreyerOrdering(leftv res, leftv h)
   return FALSE;
 }
 
-
-/// Returns old SyzCompLimit, can set new limit
-static BOOLEAN SetSyzComp(leftv res, leftv h)
-{
-  NoReturn(res);
-
-  const ring r = currRing;
-
-  if( !rIsSyzIndexRing(r) )
-  {
-    WerrorS("`SetSyzComp(<int>)` called on incompatible ring (not created by 'MakeSyzCompOrdering'!)");
-    return TRUE;
-  }
-
-  res->rtyp = INT_CMD;
-  res->data = reinterpret_cast<void *>(rGetCurrSyzLimit(r)); // return old syz limit
-
-  if ((h!=NULL) && (h->Typ()==INT_CMD))
-  {
-    const int iSyzComp = (int)reinterpret_cast<long>(h->Data());
-    assume( iSyzComp > 0 );
-    rSetSyzComp(iSyzComp, currRing);
-  }
-
-  return FALSE;
-}
 
 /// ?
 static BOOLEAN GetInducedData(leftv res, leftv h)
@@ -1068,119 +1006,6 @@ static BOOLEAN GetInducedData(leftv res, leftv h)
 
 }
 
-
-/* // the following turned out to be unnecessary...
-/// Finds p^th AM ordering, and returns its position in r->typ[] AND
-/// corresponding &r->wvhdl[]
-/// returns FALSE if something went wrong!
-/// p - starts with 0!
-BOOLEAN rGetAMPos(const ring r, const int p, int &typ_pos, int &wvhdl_pos, const BOOLEAN bSearchWvhdl = FALSE)
-{
-#if MYTEST
-  Print("rGetAMPos(p: %d...)\nF:", p);
-  PrintLn();
-#endif
-  typ_pos = -1;
-  wvhdl_pos = -1;
-
-  if (r->typ==NULL)
-    return FALSE;
-
-
-  int j = p; // Which IS record to use...
-  for( int pos = 0; pos < r->OrdSize; pos++ )
-    if( r->typ[pos].ord_typ == ro_am)
-      if( j-- == 0 )
-      {
-        typ_pos = pos;
-
-        if( bSearchWvhdl )
-        {
-          const int nblocks = rBlocks(r) - 1;
-          const int* w = r->typ[pos].data.am.weights; // ?
-
-          for( pos = 0; pos <= nblocks; pos ++ )
-            if (r->order[pos] == ringorder_am)
-              if( r->wvhdl[pos] == w )
-              {
-                wvhdl_pos = pos;
-                break;
-              }
-          if (wvhdl_pos < 0)
-            return FALSE;
-
-          assume(wvhdl_pos >= 0);
-        }
-        assume(typ_pos >= 0);
-        return TRUE;
-      }
-
-  return FALSE;
-}
-
-// // ?
-// static BOOLEAN GetAMData(leftv res, leftv h)
-// {
-//   NoReturn(res);
-//
-//   const ring r = currRing;
-//
-//   int p = 0; // which IS-block? p^th!
-//
-//   if ((h!=NULL) && (h->Typ()==INT_CMD))
-//     p = (int)((long)(h->Data())); h=h->next;
-//
-//   assume(p >= 0);
-//
-//   int d, w;
-//
-//   if( !rGetAMPos(r, p, d, w, TRUE) )
-//   {
-//     Werror("`GetAMData([int])`: no %d^th _am block-ordering!", p);
-//     return TRUE;
-//   }
-//
-//   assume( r->typ[d].ord_typ == ro_am );
-//   assume( r->order[w] == ringorder_am );
-//
-//
-//   const short start = r->typ[d].data.am.start;  // bounds of ordering (in E)
-//   const short end = r->typ[d].data.am.end;
-//   const short len_gen = r->typ[d].data.am.len_gen; // i>len_gen: weight(gen(i)):=0
-//   const int *weights = r->typ[d].data.am.weights; // pointers into wvhdl field of length (end-start+1) + len_gen
-//   // contents w_1,... w_n, len, mod_w_1, .. mod_w_len, 0
-//
-//   assume( weights == r->wvhdl[w] );
-//
-//
-//   lists l=(lists)omAllocBin(slists_bin);
-//   l->Init(2);
-//
-//   const short V = end-start+1;
-//   intvec* ww_vars = new intvec(V);
-//   intvec* ww_gens = new intvec(len_gen);
-//
-//   for (int i = 0; i < V; i++ )
-//     (*ww_vars)[i] = weights[i];
-//
-//   assume( weights[V] == len_gen );
-//
-//   for (int i = 0; i < len_gen; i++ )
-//     (*ww_gens)[i] = weights[i - V - 1];
-//
-//
-//   l->m[0].rtyp = INTVEC_CMD;
-//   l->m[0].data = reinterpret_cast<void *>(ww_vars);
-//
-//   l->m[1].rtyp = INTVEC_CMD;
-//   l->m[1].data = reinterpret_cast<void *>(ww_gens);
-//
-//
-//   return FALSE;
-//
-// }
-*/
-
 /// Returns old SyzCompLimit, can set new limit
 static BOOLEAN SetInducedReferrence(leftv res, leftv h)
 {
@@ -1226,82 +1051,6 @@ static BOOLEAN SetInducedReferrence(leftv res, leftv h)
 
   // F & componentWeights belong to that ordering block of currRing now:
   rSetISReference(r, F, rank, p); // F will be copied!
-  return FALSE;
-}
-
-
-//    F = ISUpdateComponents( F, V, MIN );
-//    // replace gen(i) -> gen(MIN + V[i-MIN]) for all i > MIN in all terms from F!
-static BOOLEAN ISUpdateComponents(leftv res, leftv h)
-{
-  NoReturn(res);
-
-  PrintS("ISUpdateComponents:.... \n");
-
-  if ((h!=NULL) && (h->Typ()==MODUL_CMD))
-  {
-    ideal F = (ideal)h->Data(); ; // No copy!
-    h=h->next;
-
-    if ((h!=NULL) && (h->Typ()==INTVEC_CMD))
-    {
-      const intvec* const V = (const intvec* const) h->Data();
-      h=h->next;
-
-      if ((h!=NULL) && (h->Typ()==INT_CMD))
-      {
-        const int MIN = (int)((long)(h->Data()));
-
-        pISUpdateComponents(F, V, MIN, currRing);
-        return FALSE;
-      }
-    }
-  }
-
-  WerrorS("`ISUpdateComponents(<module>, intvec, int)` expected");
-  return TRUE;
-}
-
-
-/// NF using length
-static BOOLEAN reduce_syz(leftv res, leftv h)
-{
-  // const ring r = currRing;
-
-  if ( !( (h!=NULL) && (h->Typ()==VECTOR_CMD || h->Typ()==POLY_CMD) ) )
-  {
-    WerrorS("`reduce_syz(<poly/vector>!, <ideal/module>, <int>, [int])` expected");
-    return TRUE;
-  }
-
-  res->rtyp = h->Typ();
-  const poly v = reinterpret_cast<poly>(h->Data());
-  h=h->next;
-
-  if ( !( (h!=NULL) && (h->Typ()==MODUL_CMD || h->Typ()==IDEAL_CMD ) ) )
-  {
-    WerrorS("`reduce_syz(<poly/vector>, <ideal/module>!, <int>, [int])` expected");
-    return TRUE;
-  }
-
-  assumeStdFlag(h);
-  const ideal M = reinterpret_cast<ideal>(h->Data()); h=h->next;
-
-
-  if ( !( (h!=NULL) && (h->Typ()== INT_CMD)  ) )
-  {
-    WerrorS("`reduce_syz(<poly/vector>, <ideal/module>, <int>!, [int])` expected");
-    return TRUE;
-  }
-
-  const int iSyzComp = (int)((long)(h->Data())); h=h->next;
-
-  int iLazyReduce = 0;
-
-  if ( ( (h!=NULL) && (h->Typ()== INT_CMD)  ) )
-    iLazyReduce = (int)((long)(h->Data()));
-
-  res->data = (void *)kNFLength(M, currRing->qideal, v, iSyzComp, iLazyReduce); // NOTE: currRing :(
   return FALSE;
 }
 
@@ -1398,48 +1147,6 @@ static BOOLEAN idPrepare(leftv res, leftv h)
   return FALSE;
 }
 
-// no args.
-// init num stats
-static BOOLEAN _NumberStatsInit(leftv res, leftv h)
-{
-  if ( (h!=NULL) && (h->Typ()!=INT_CMD) )
-  {
-    WerrorS("`NumberStatsInit([<int>])` expected");
-    return TRUE;
-  }
-
-  unsigned long v = 0;
-
-  if( h != NULL )
-    v = (unsigned long)(h->Data());
-
-  number_stats_Init(v);
-
-  NoReturn(res);
-  return FALSE;
-}
-
-// maybe one arg.
-// print num stats
-static BOOLEAN _NumberStatsPrint(leftv res, leftv h)
-{
-  if ( (h!=NULL) && (h->Typ()!=STRING_CMD) )
-  {
-    WerrorS("`NumberStatsPrint([<string>])` expected");
-    return TRUE;
-  }
-
-  const char* msg = NULL;
-
-  if( h != NULL )
-    msg = (const char*)(h->Data());
-
-  number_stats_Print(msg);
-
-  NoReturn(res);
-  return FALSE;
-}
-
 extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
 {
 
@@ -1454,18 +1161,13 @@ extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   ADD("ClearContent", FALSE, _ClearContent);
   ADD("ClearDenominators", FALSE, _ClearDenominators);
 
-  ADD("leadmonomial", FALSE, _leadmonom);
   ADD("leadcomp", FALSE, leadcomp);
 
-  ADD("ISUpdateComponents", FALSE, ISUpdateComponents);
   ADD("SetInducedReferrence", FALSE, SetInducedReferrence);
   ADD("GetInducedData", FALSE, GetInducedData);
-  ADD("SetSyzComp", FALSE, SetSyzComp);
   ADD("MakeInducedSchreyerOrdering", FALSE, MakeInducedSchreyerOrdering);
-  ADD("MakeSyzCompOrdering", FALSE, MakeSyzCompOrdering);
 
   ADD("idPrepare", FALSE, idPrepare);
-  ADD("reduce_syz", FALSE, reduce_syz);
 
   ADD("Tail", FALSE, Tail);
 
@@ -1484,10 +1186,6 @@ extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   ADD("ComputeSyzygy", FALSE, _ComputeSyzygy);
 
   ADD("ComputeResolution", FALSE, _ComputeResolution);
-//  ADD("GetAMData", FALSE, GetAMData);
-
-  ADD("NumberStatsInit", FALSE, _NumberStatsInit);
-  ADD("NumberStatsPrint", FALSE, _NumberStatsPrint);
 
   //  ADD("", FALSE, );
 
