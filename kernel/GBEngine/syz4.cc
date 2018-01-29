@@ -625,11 +625,13 @@ static void insert_ext_induced_LTs(const resolvente res, const int length)
 {
     const ring R = currRing;
     poly p, q;
-    for (int i = length-2; i > 0; i--) {
-        for (int j = res[i]->ncols-1; j >= 0; j--) {
-            insert_first_term(res[i]->m[j]->next, p, q, R);
-            insert_first_term(res[i]->m[j], p, q, R);
+    int index = 1;
+    while (index < length && !idIs0(res[index])) {
+        for (int j = res[index]->ncols-1; j >= 0; j--) {
+            insert_first_term(res[index]->m[j]->next, p, q, R);
+            insert_first_term(res[index]->m[j], p, q, R);
         }
+        index++;
     }
 }
 
