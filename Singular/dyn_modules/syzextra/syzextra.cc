@@ -286,128 +286,6 @@ static int cmp_poly(const poly &a, const poly &b)
 
 /* namespace SORT_c_ds */
 
-/// writes a monomial (p),
-/// uses form x*gen(.) if ko != coloumn number of p
-static void writeLatexTerm(const poly t, const ring r, const bool bCurrSyz = true, const bool bLTonly = true)
-{
-  if( t == NULL )
-  {
-    PrintS(" 0 ");
-    return;
-  }
-
-  assume( r != NULL );
-  const coeffs C = r->cf; assume(C != NULL);
-
-  poly p = t;
-  BOOLEAN writePlus = FALSE;
-
-  do {
-  assume( p != NULL );
-
-  // write coef...
-  number& n = p_GetCoeff(p, r);
-
-  n_Normalize(n, C);
-
-  BOOLEAN writeMult = FALSE; ///< needs * before pp or module generator
-
-  BOOLEAN writeOne = FALSE; ///< need to write something after '-'!
-
-  if( n_IsZero(n, C) )
-  {
-    PrintS( writePlus? " + 0" : " 0 " ); writePlus = TRUE; writeMult = TRUE;
-//    return; // yes?
-  }
-
-  if (n_IsMOne(n, C))
-  {
-    PrintS(" - "); writeOne = TRUE; writePlus = FALSE;
-  }
-  else if (!n_IsOne(n, C))
-  {
-    if( writePlus && n_GreaterZero(n, C) )
-      PrintS(" + ");
-
-    StringSetS(""); n_WriteLong(n, C);
-    if (true)
-    {
-      char *s = StringEndS(); PrintS(s); omFree(s);
-    }
-
-
-    writeMult = TRUE;
-    writePlus = TRUE;
-  } else
-     writeOne = TRUE;
-
-  // missing '1' if no PP and gen...!?
-  // write monom...
-  const short N = rVar(r);
-
-  BOOLEAN wrotePP = FALSE; ///< needs * before module generator?
-
-  for (short i = 0; i < N; i++)
-  {
-    const long ee = p_GetExp(p, i+1, r);
-
-    if (ee!=0L)
-    {
-      if (writeMult)
-      {
-        PrintS(" ");
-        writeMult = FALSE;
-      } else
-      if( writePlus )
-        PrintS(" + ");
-
-      writePlus = FALSE;
-
-      if (ee != 1L)
-        Print(" %s^{%ld} ", rRingVar(i, r), ee);
-      else
-        Print(" %s ", rRingVar(i, r));
-
-      writeOne = FALSE;
-      wrotePP = TRUE;
-    }
-  }
-
-  writePlus = writePlus || wrotePP;
-  writeMult = writeMult || wrotePP;
-
-  // write module gen...
-  const long comp = p_GetComp(p, r);
-
-  if (comp > 0 )
-  {
-    if (writeMult)
-      PrintS("  ");
-     else
-      if( writePlus )
-        PrintS(" + ");
-
-    if (bCurrSyz)
-      Print(" \\\\GEN{%ld} ", comp);
-    else
-      Print(" \\\\GENP{%ld} ", comp);
-
-      writeOne = FALSE;
-  }
-
-  if ( writeOne )
-    PrintS( writePlus? " + 1 " : " 1 " );
-
-
-  pIter(p);
-
-  writePlus = TRUE;
-  } while( (!bLTonly) && (p != NULL) );
-
-}
-
-
-
 static FORCE_INLINE poly myp_Head(const poly p, const bool bIgnoreCoeff, const ring r)
 {
   assume( p != NULL ); p_LmCheckPolyRing1(p, r);
@@ -916,13 +794,6 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
 
   assume( a != NULL );
 
-  if( UNLIKELY(OPT__TREEOUTPUT) )
-  {
-     PrintS("{ \"proc\": \"TraverseNF\", \"nodelabel\": \"");
-     writeLatexTerm(a, R);
-     PrintS("\", \"children\": [");
-  }
-
   poly aa = leadmonom(a, R); assume( aa != NULL); // :(
 
   poly t = TraverseTail(aa, r);
@@ -930,14 +801,6 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
   if( a2 != NULL )
   {
     assume( OPT__LEAD2SYZ );
-
-    if( UNLIKELY(OPT__TREEOUTPUT) )
-    {
-
-       PrintS("{ \"proc\": \"TraverseNF2\", \"nodelabel\": \"");
-       writeLatexTerm(a2, R);
-       PrintS("\", \"children\": [");
-    }
 
     // replace the following... ?
     const int r2 = p_GetComp(a2, R) - 1; poly aa2 = leadmonom(a2, R); // :(
@@ -948,14 +811,6 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
 
     p_Delete(&aa2, R);
 
-
-    if( UNLIKELY(OPT__TREEOUTPUT) )
-    {
-      PrintS("], \"noderesult\": \"");
-      writeLatexTerm(s, R, true, false);
-      PrintS("\" },");
-    }
-
     t = p_Add_q(a2, p_Add_q(t, s, R), R);
 
   } else
@@ -963,14 +818,6 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
 
   p_Delete(&aa, R);
 
-  if( UNLIKELY(OPT__TREEOUTPUT) )
-  {
-//     poly tt = pp_Add_qq( a, t, R);
-     PrintS("], \"noderesult\": \"");
-     writeLatexTerm(t, R, true, false);
-     PrintS("\" },");
-//     p_Delete(&tt, R);
-  }
   return t;
 }
 
@@ -1191,12 +1038,6 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
 
   assume( syz_lead != NULL );
 
-  if( UNLIKELY( OPT__TREEOUTPUT ) )
-  {
-    PrintS("{   \"nodelabel\": \""); writeLatexTerm(syz_lead, r);
-    PrintS("\", \"children\": [");
-  }
-
   if( syz_2 == NULL )
   {
     const int rr = p_GetComp(syz_lead, r) - 1;
@@ -1208,18 +1049,9 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
     syz_2 = m_div.FindReducer(syz_lead, L->m[rr], syz_lead, m_checker);
     p_Test(syz_2, r);
 
-    if( UNLIKELY( OPT__TREEOUTPUT ) )
-    {
-      PrintS("{ \"nodelabel\": \""); writeLatexTerm(syz_2, r); PrintS("\" },");
-    }
 #else
     poly aa = leadmonom(syz_lead, r); assume( aa != NULL); // :(
     aa = p_Mult_mm(aa, L->m[rr], r);
-
-    if( UNLIKELY( OPT__TREEOUTPUT ) )
-    {
-      PrintS("{ \"nodelabel\": \""); writeLatexTerm(syz_2, r); PrintS("\", \"edgelabel\": \""); writeLatexTerm(aa, r, false); PrintS("\" },");
-    }
 
     syz_2 = m_div.FindReducer(aa, syz_lead, m_checker);
     p_Test(syz_2, r);
@@ -1283,11 +1115,6 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
       c = p_GetComp(t, r) - 1;
 
       assume( c >= 0 && c < IDELEMS(T) );
-
-      if(UNLIKELY( OPT__TREEOUTPUT ))
-      {
-        PrintS("{ \"nodelabel\": \""); writeLatexTerm(t, r); PrintS("\", \"edgelabel\": \""); writeLatexTerm(spoly, r, false); PrintS("\" },");
-      }
 
       kBucket_Plus_mm_Mult_pp(bucket, p, T->m[c], 0); // pLength(T->m[c])?
 //      spoly = p_Add_q(spoly, pp_Mult_qq(p, T->m[c], r), r);
@@ -1362,16 +1189,6 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
        if( itr->second == NULL ) // leadcoeff plays no role if value is NULL!
          return (NULL);
 
-       if( UNLIKELY( OPT__TREEOUTPUT ) )
-       {
-//         PrintS("{ \"nodelabel\": \""); writeLatexTerm(multiplier, r, false);
-//         Print("  \\\\GEN{%d}\", \"children\": [ ", tail + 1);
-         PrintS("{ \"proc\": \"TTLookup\", \"nodelabel\": \"");
-         writeLatexTerm(itr->first, r, false); Print(" \\\\GEN{%d}\", \"Lookup\": \"", tail + 1);
-         writeLatexTerm(itr->second, r, true, false);
-         PrintS("\", ");
-       }
-
        poly p = p_Copy(itr->second, r); // COPY!!!
 
        p_Test(multiplier, r);
@@ -1396,30 +1213,15 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
        } else
          if( UNLIKELY( OPT__PROT ) ) ++ m_stat[6]; // PrintS("l"); // lookup no rescale
 
-       if( UNLIKELY(OPT__TREEOUTPUT) )
-       {
-         PrintS("\"noderesult\": \"");         writeLatexTerm(p, r, true, false);         PrintS("\" },");
-       }
-
        p_Test(multiplier, r);
 
        return p;
      }
 
 
-     if( UNLIKELY(OPT__TREEOUTPUT) )
-     {
-       Print("{ \"proc\": \"TTStore%d\", \"nodelabel\": \"", tail + 1); writeLatexTerm(multiplier, r, false); Print(" \\\\GEN{%d}\", \"children\": [", tail + 1);
-     }
-
      p_Test(multiplier, r);
 
      const poly p = ComputeImage(multiplier, tail);
-
-     if( UNLIKELY(OPT__TREEOUTPUT) )
-     {
-       PrintS("], \"noderesult\": \""); writeLatexTerm(p, r, true, false); PrintS("\" },");
-     }
 
      if( UNLIKELY(OPT__PROT) ) ++ m_stat[8]; // PrintS("S"); // store
 
@@ -1437,17 +1239,7 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
 
   CCacheCompare o(r); TP2PCache T(o);
 
-  if( UNLIKELY(OPT__TREEOUTPUT) )
-  {
-    Print("{ \"proc\": \"TTStore%d\", \"nodelabel\": \"", 0); writeLatexTerm(multiplier, r, false); Print(" \\\\GEN{%d}\", \"children\": [", tail + 1);
-  }
-
   const poly p = ComputeImage(multiplier, tail);
-
-  if( UNLIKELY(OPT__TREEOUTPUT) )
-  {
-    PrintS("], \"noderesult\": \""); writeLatexTerm(p, r, true, false); PrintS("\" },");
-  }
 
   if( UNLIKELY( OPT__PROT ) ) ++ m_stat[8]; // PrintS("S"); // store // %d", tail + 1);
 
@@ -1474,26 +1266,10 @@ poly SchreyerSyzygyComputation::ComputeImage(poly multiplier, const int tail) co
 
   if(t != NULL)
   {
-    if( UNLIKELY(OPT__TREEOUTPUT) )
-    {
-      PrintS("{ \"proc\": \"ComputeImage\", \"nodelabel\": \"");
-      writeLatexTerm(multiplier, r, false);
-      Print(" \\\\GEN{%d}\", \"edgelabel\": \"", tail + 1);
-      writeLatexTerm(t, r, false);
-      PrintS("\", \"children\": [");
-    }
-
     const poly p = TraverseTail(multiplier, t);
 
     p_Test(multiplier, r);
-
-    if( UNLIKELY(OPT__TREEOUTPUT) )
-    {
-      PrintS("], \"noderesult\": \""); writeLatexTerm(p, r, true, false); PrintS("\" },");
-    }
-
     return p;
-
   }
 
   return NULL;
@@ -1553,11 +1329,6 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
   //    CPolynomialSummator sum(r, bUsePolynomial);
   //    poly s = NULL;
 
-  if( UNLIKELY( OPT__TREEOUTPUT & 0 ) )
-  {
-    Print("{ \"proc\": \"TTPoly\", \"nodelabel\": \""); writeLatexTerm(multiplier, r, false); Print(" * \\\\ldots \", \"children\": [");
-  }
-
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
@@ -1588,11 +1359,6 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
 
   assume( pLength(s) == len );
 */
-
-  if( UNLIKELY( OPT__TREEOUTPUT & 0 ) )
-  {
-    PrintS("], \"noderesult\": \""); writeLatexTerm(s, r, true, false); PrintS("\" },");
-  }
 
   p_Test(multiplier, r);
 
@@ -1636,13 +1402,6 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
       return NULL;
     }
 
-    if( UNLIKELY( OPT__TREEOUTPUT ) )
-    {
-      poly product = pp_Mult_mm(multiplier, term4reduction, r);
-      PrintS("{ \"proc\": \"RdTrmNoP\", \"nodelabel\": \""); writeLatexTerm(s, r); PrintS("\", \"edgelabel\": \""); writeLatexTerm(product, r, false);
-      p_Delete(&product, r);
-    }
-
 #else
     // NOTE: only LT(term4reduction) should be used in the following:
     poly product = pp_Mult_mm(multiplier, term4reduction, r);
@@ -1657,11 +1416,6 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
     {
       if( UNLIKELY(OPT__PROT) ) ++ m_stat[4]; // PrintS("$"); // LOT
       return NULL;
-    }
-
-    if( UNLIKELY(OPT__TREEOUTPUT) )
-    {
-      PrintS("{ \"proc\": \"RdTrmP\", \"nodelabel\": \""); writeLatexTerm(s, r); PrintS("\", \"edgelabel\": \""); writeLatexTerm(product, r, false);
     }
 
     p_Delete(&product, r);
@@ -1692,22 +1446,6 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
      PrintS("\", \"children\": [");
 
   const poly t = TraverseTail(b, c); // T->m[c];
-
-  if( UNLIKELY( OPT__TREEOUTPUT ) )
-  {
-
-    PrintS("], \"noderesult\": \"");
-    writeLatexTerm(t, r, true, false);
-    PrintS("\"");
-
-    if( syztermCheck != NULL )
-    {
-      PrintS(", \"syztermCheck\":\"" );
-      writeLatexTerm(syztermCheck, r, true, false);
-      PrintS("\" },");
-    } else
-      PrintS(" },");
-  }
 
   p_Test(multiplier, r);
 
