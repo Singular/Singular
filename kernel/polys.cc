@@ -14,12 +14,6 @@ ring  currRing = NULL;
 
 void rChangeCurrRing(ring r)
 {
-  #if 0
-  if ((currRing!=NULL)&&(currRing!=r))
-  {
-    currRing->options=si_opt_1 & TEST_RINGDEP_OPTS;
-  }
-  #endif
   //------------ set global ring vars --------------------------------
   currRing = r;
   if( r != NULL )
@@ -29,7 +23,7 @@ void rChangeCurrRing(ring r)
     assume( r->cf!= NULL );
     nSetChar(r->cf);
     //------------ global variables related to polys
-    p_SetGlobals(r);
+    p_SetGlobals(r); // also setting TEST_RINGDEP_OPTS
     //------------ global variables related to factory -----------------
   }
 }
