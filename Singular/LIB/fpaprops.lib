@@ -604,10 +604,10 @@ ASSUME: Basering is a Letterplace ring
           if (cycleCount > maxCycleCount) {
             maxCycleCount = cycleCount;
           }
+          kill cycleCount;
           if (path[j] == w) {
             break;
           }
-          kill cycleCount;
         } kill j;
         if (maxCycleCount >= cycles) {
           cycles = maxCycleCount + 1;
