@@ -551,12 +551,23 @@ static void computeLiftings(const resolvente res, const int index,
 #endif   // CACHE
 }
 
+static void delete_tails(resolvente res, const int index)
+{
+    const ring r = currRing;
+    for (int i = 0; i < res[index]->ncols; i++) {
+        if (res[index]->m[i] != NULL) {
+            p_Delete(&(res[index]->m[i]->next), r);
+        }
+    }
+}
+
 /*
  * for each step in the resolution, compute the corresponding module until
  * either index == max_index is reached or res[index] is the zero module
  */
 static int computeResolution(resolvente res, const int max_index,
-        syzHeadFunction *syzHead, const bool do_lifting)
+        syzHeadFunction *syzHead, const bool do_lifting,
+        const bool single_module)
 {
     int index = 0;
     if (!idIs0(res[0]) && 0 < max_index) {
@@ -567,6 +578,9 @@ static int computeResolution(resolvente res, const int max_index,
         while (!idIs0(res[index])) {
             if (do_lifting) {
                 computeLiftings(res, index, variables);
+                if (single_module) {
+                    delete_tails(res, index-1);
+                }
             }
             if (index >= max_index) { break; }
             index++;
@@ -578,23 +592,32 @@ static int computeResolution(resolvente res, const int max_index,
 }
 
 static void set_options(syzHeadFunction **syzHead_ptr, bool *do_lifting_ptr,
-        const char *method)
+        bool *single_module_ptr, const char *method)
 {
     if (strcmp(method, "complete") == 0) {   // default
         *syzHead_ptr = syzHeadExtFrame;
         *do_lifting_ptr = true;
+        *single_module_ptr = false;
     }
     else if (strcmp(method, "frame") == 0) {
         *syzHead_ptr = syzHeadFrame;
         *do_lifting_ptr = false;
+        *single_module_ptr = false;
     }
     else if (strcmp(method, "extended frame") == 0) {
         *syzHead_ptr = syzHeadExtFrame;
         *do_lifting_ptr = false;
+        *single_module_ptr = false;
+    }
+    else if (strcmp(method, "single module") == 0) {
+        *syzHead_ptr = syzHeadExtFrame;
+        *do_lifting_ptr = true;
+        *single_module_ptr = true;
     }
     else {   // "linear strand" (not yet implemented)
         *syzHead_ptr = syzHeadExtFrame;
         *do_lifting_ptr = true;
+        *single_module_ptr = false;
     }
 }
 
@@ -618,14 +641,15 @@ do                                                                \
 while (0)
 
 /*
- * for each poly in the resolution, insert the first two terms at their right
- * places
+ * For each poly in the resolution, insert the first two terms at their right
+ * places. If single_module is true, then only consider the last module.
  */
-static void insert_ext_induced_LTs(const resolvente res, const int length)
+static void insert_ext_induced_LTs(const resolvente res, const int length,
+        const bool single_module)
 {
     const ring R = currRing;
     poly p, q;
-    int index = 1;
+    int index = (single_module ? length-1 : 1);
     while (index < length && !idIs0(res[index])) {
         for (int j = res[index]->ncols-1; j >= 0; j--) {
             insert_first_term(res[index]->m[j]->next, p, q, R);
@@ -650,14 +674,16 @@ syStrategy syFrank(const ideal arg, const int length, const char *method)
     }
     syzHeadFunction *syzHead;
     bool do_lifting;
-    set_options(&syzHead, &do_lifting, method);
-    int new_length = computeResolution(res, length-1, syzHead, do_lifting);
+    bool single_module;
+    set_options(&syzHead, &do_lifting, &single_module, method);
+    int new_length = computeResolution(res, length-1, syzHead, do_lifting,
+            single_module);
     if (new_length < length) {
         res = (resolvente)omReallocSize(res, (length+1)*sizeof(ideal),
                 (new_length+1)*sizeof(ideal));
     }
     if (strcmp(method, "frame") != 0) {
-        insert_ext_induced_LTs(res, new_length);
+        insert_ext_induced_LTs(res, new_length, single_module);
     }
     result->fullres = res;
     result->length = new_length;

@@ -2221,7 +2221,8 @@ static BOOLEAN jjFRES3(leftv res, leftv u, leftv v, leftv w)
      */
     if (strcmp(method, "complete") != 0
             && strcmp(method, "frame") != 0
-            && strcmp(method, "extended frame") != 0) {
+            && strcmp(method, "extended frame") != 0
+            && strcmp(method, "single module") != 0) {
         WerrorS("wrong optional argument for fres");
     }
     syStrategy r = syFrank(id, max_length, method);
