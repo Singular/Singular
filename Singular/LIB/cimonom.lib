@@ -167,7 +167,7 @@ EXAMPLE: example MinMult; shows some examples.
   if (n == 1)
   {
     // ---- trivial case
-    return(b[1]/gcd(a,b[1]));
+    return(b[1] div gcd(a,b[1]));
   }
 
   max = b[1];
@@ -374,8 +374,8 @@ EXAMPLE: example CompInt; shows some examples
       if (i <> j)
       {
         new = gcd(d[i],d[j]);
-        new1 = d[j]/new;
-        new2 = d[i]/new;
+        new1 = d[j] div new;
+        new2 = d[i] div new;
         if (!bound[i] ||(new1 < bound[i]))
         {
           bound[i] = new1;
@@ -517,7 +517,7 @@ EXAMPLE: example CompInt; shows some examples
               if (using[l])
               {
                 divide = gcd(d[l],d[n+i]);
-                new = d[n+i] / divide;
+                new = d[n+i] div divide;
                 if ((multiple[l])&&(multiple[l] > new))
                 {
                   return (0);
@@ -526,7 +526,7 @@ EXAMPLE: example CompInt; shows some examples
                 {
                   bound[l] = new;
                 }
-                new = d[l] / divide;
+                new = d[l] div divide;
                 if  ( !bound[n+i] || (new < bound[n+i]))
                 {
                   bound[n+i] = new;
