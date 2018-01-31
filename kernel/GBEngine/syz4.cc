@@ -23,6 +23,15 @@
 #define CACHE 1
 
 /*
+ * If set to true, the current module is modfied after each lifting step in the
+ * resolution: any term which contains a variable which does not appear among
+ * the (induced) leading terms is deleted. Note that the resulting object is
+ * not necessarily a complex anymore. However, constant entries remain exactly
+ * the same.
+ */
+#define FRES_TENSOR_TRICK 1
+
+/*
  * set variables[i] to false if the i-th variable does not appear among the
  * leading terms of L
  */
@@ -547,6 +556,10 @@ static void computeLiftings(const resolvente res, const int index,
 #endif   // CACHE
 }
 
+#if FRES_TENSOR_TRICK
+/*
+ * check if the monomial m contains any of the variables set to false
+ */
 static inline bool contains_unused_variable(const poly m,
     const std::vector<bool> &variables)
 {
@@ -559,8 +572,12 @@ static inline bool contains_unused_variable(const poly m,
     return false;
 }
 
-static void delete_variables(resolvente &res, const int index,
-    std::vector<bool> variables)
+/*
+ * delete any term in res[index] which contains any of the variables set to
+ * false
+ */
+static void delete_variables(resolvente res, const int index,
+    const std::vector<bool> &variables)
 {
     for (int i = 0; i < res[index]->ncols; i++) {
         poly p_iter = res[index]->m[i]->next;
@@ -575,6 +592,7 @@ static void delete_variables(resolvente &res, const int index,
         }
     }
 }
+#endif   // FRES_TENSOR_TRICK
 
 static void delete_tails(resolvente res, const int index)
 {
@@ -602,7 +620,9 @@ static int computeResolution(resolvente res, const int max_index,
         variables.resize(currRing->N+1, true);
         if (do_lifting) {
             update_variables(variables, res[0]);
+#if FRES_TENSOR_TRICK
             delete_variables(res, 0, variables);
+#endif   // FRES_TENSOR_TRICK
         }
         while (!idIs0(res[index])) {
             if (do_lifting) {
@@ -615,7 +635,9 @@ static int computeResolution(resolvente res, const int max_index,
                 if (index == 1) {
                     variables[currRing->N] = false;
                 }
+#if FRES_TENSOR_TRICK
                 delete_variables(res, index, variables);
+#endif   // FRES_TENSOR_TRICK
             }
             if (index >= max_index) { break; }
             index++;
