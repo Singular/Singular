@@ -155,6 +155,7 @@ m4_ifval([$3],
 fi[]dnl
 ])])
 
+AX_LIB_SOCKET_NSL
 
 AC_DEFINE_UNQUOTED([CC],"$CC",[CC])
 AC_DEFINE_UNQUOTED([CXX],"$CXX",[CXX])
