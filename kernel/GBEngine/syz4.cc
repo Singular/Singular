@@ -612,7 +612,7 @@ static int computeResolution(resolvente res, const int max_index,
                 }
                 update_variables(variables, res[index]);
                 // we don't know if the input is a reduced SB:
-                if (index == 2) {
+                if (index == 1) {
                     variables[currRing->N] = false;
                 }
                 delete_variables(res, index, variables);
