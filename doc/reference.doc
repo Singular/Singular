@@ -2389,10 +2389,17 @@ computes a (not necessarily minimal) free resolution of the input ideal/module,
 using Schreyer's algorithm, see reference.
 @* If the second argument is @code{n > 0}, then the resolution is computed up
 to step @code{n}. If it is @code{0}, @code{fres} computes the whole resolution.
-@* The optional third argument can be @code{"complete"} (default) to compute
-the whole syzygy module in each step, @code{"frame"} to compute only the
-so-called frame, or @code{"extended frame"} to compute only the first two
-terms of each generator w.r.t. the induced monomial ordering.
+@* The optional third argument can be set to
+@itemize @bullet
+@item @code{"complete"} (default) to compute the whole syzygy module in each
+step,
+@item @code{"frame"} to compute only the so-called frame,
+@item @code{"extended frame"} to compute only the first two terms of each
+generator w.r.t. the induced monomial ordering, or
+@item @code{"single module"} to return only the frame of each module except the
+last one and to return the last module in its entirety. This option can be used
+to reduce the amount of memory needed for the computation.
+@end itemize
 @item @strong{Note:}
 The input ideal/module must be a standard basis.
 @item @strong{Reference:}
