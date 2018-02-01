@@ -49,7 +49,7 @@ static void update_variables(std::vector<bool> &variables, const ideal L)
  * If the previous step in the resolution is reduced, then this check can be
  * used to determine lower order terms.
  */
-static inline bool check_variables(const std::vector<bool> variables,
+static inline bool check_variables(const std::vector<bool> &variables,
         const poly m)
 {
     const ring R = currRing;
@@ -526,7 +526,7 @@ static ideal computeFrame(const ideal G, syzM_i_Function syzM_i,
  * lift each (extended) induced leading term to a syzygy
  */
 static void computeLiftings(const resolvente res, const int index,
-        std::vector<bool> &variables)
+        const std::vector<bool> &variables)
 {
 #if CACHE
     initialize_cache(res[index-1]->ncols);
@@ -609,11 +609,11 @@ static int computeResolution_iteration(resolvente res, const int max_index,
             if (single_module) {
                 delete_tails(res, index-1);
             }
-            update_variables(variables, res[index]);
             // we don't know if the input is a reduced SB:
             if (index == 1) {
                 variables[currRing->N] = false;
             }
+            update_variables(variables, res[index]);
             if (use_tensor_trick) {
                 delete_variables(res, index, variables);
             }
@@ -633,22 +633,24 @@ static int computeResolution(resolvente res, const int max_index,
         syzHeadFunction *syzHead, const bool do_lifting,
         const bool single_module, const bool use_tensor_trick)
 {
-    int index = 0;
-    if (!idIs0(res[0]) && 0 < max_index) {
-        index++;
-        res[1] = computeFrame(res[0], syzM_i_unsorted, syzHead);
-        std::vector<bool> variables;
-        variables.resize(currRing->N+1, true);
-        if (do_lifting) {
-            update_variables(variables, res[0]);
-            if (use_tensor_trick) {
-                delete_variables(res, 0, variables);
-            }
+    if (idIs0(res[0])) {
+        return 1;
+    }
+    std::vector<bool> variables;
+    variables.resize(currRing->N+1, true);
+    if (do_lifting) {
+        update_variables(variables, res[0]);
+        if (use_tensor_trick) {
+            delete_variables(res, 0, variables);
         }
+    }
+    int index = 0;
+    if (max_index > 0) {
+        res[1] = computeFrame(res[0], syzM_i_unsorted, syzHead);
         index = computeResolution_iteration(res, max_index, syzHead,
                 do_lifting, single_module, use_tensor_trick, variables);
-        variables.clear();
     }
+    variables.clear();
     return index+1;
 }
 
