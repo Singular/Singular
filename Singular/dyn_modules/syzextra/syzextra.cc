@@ -61,28 +61,11 @@
 # define RTIMER_BENCHMARKING 0
 #endif
 
-#ifndef SING_NDEBUG
-ring SBucketFactory::_GetBucketRing(const SBucketFactory::Bucket& bt)
-{
-  assume( bt != NULL );
-  return sBucketGetRing(bt);
-}
-
-bool SBucketFactory::_IsBucketEmpty(const SBucketFactory::Bucket& bt)
-{
-  assume( bt != NULL );
-  return sIsEmpty(bt);
-}
-#endif
-
 SBucketFactory::Bucket SBucketFactory::_CreateBucket(const ring r)
 {
   const Bucket bt = sBucketCreate(r);
 
   assume( bt != NULL );
-  assume( _IsBucketEmpty(bt) );
-  assume( r == _GetBucketRing(bt) );
-
   return bt;
 }
 
@@ -90,7 +73,6 @@ void SBucketFactory::_DestroyBucket(SBucketFactory::Bucket & bt)
 {
   if( bt != NULL )
   {
-    assume( _IsBucketEmpty(bt) );
     sBucketDestroy( &bt );
     bt = NULL;
   }
@@ -1481,48 +1463,9 @@ SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl
 
 CLeadingTerm::CLeadingTerm(unsigned int _label,  const poly _lt, const ring R):
     m_sev( p_GetShortExpVector(_lt, R) ),  m_label( _label ),  m_lt( _lt )
-#ifndef SING_NDEBUG
-    , _R(R), m_lt_copy( myp_Head(_lt, true, R) ) // note that p_LmEqual only tests exponents!
-#endif
 {
-#ifndef SING_NDEBUG
-  assume( pNext(m_lt_copy) == NULL );
-#endif
   assume( sev() == p_GetShortExpVector(lt(), R) );
 }
-
-#ifndef SING_NDEBUG
-CLeadingTerm::~CLeadingTerm()
-{
-  assume( p_LmEqual(m_lt, m_lt_copy, _R) );
-  assume( m_sev == p_GetShortExpVector(m_lt, _R) );
-
-  poly p = const_cast<poly>(m_lt_copy);
-  p_Delete(&p, _R);
-}
-poly CLeadingTerm::lt() const
-{
-  assume( p_LmEqual(m_lt, m_lt_copy, _R) );
-  assume( m_sev == p_GetShortExpVector(m_lt, _R) );
-  return m_lt;
-}
-
-unsigned long CLeadingTerm::sev() const
-{
-  assume( p_LmEqual(m_lt, m_lt_copy, _R) );
-  assume( m_sev == p_GetShortExpVector(m_lt, _R) );
-  return m_sev;
-}
-
-unsigned int CLeadingTerm::label() const
-{
-  assume( p_LmEqual(m_lt, m_lt_copy, _R) );
-  assume( m_sev == p_GetShortExpVector(m_lt, _R) );
-  return m_label;
-}
-#endif
-
-
 
 CReducerFinder::~CReducerFinder()
 {
@@ -1633,10 +1576,6 @@ bool CLeadingTerm::DivisibilityCheck(const poly product, const unsigned long not
   assume( product != NULL );
   assume( (p_GetComp(lt(), r) == p_GetComp(product, r)) || (p_GetComp(lt(), r) == 0) );
 
-#ifndef SING_NDEBUG
-  assume( r == _R );
-#endif
-
 //  const int k = label();
 //  assume( m_L->m[k] == p );
 
@@ -1664,10 +1603,6 @@ bool CLeadingTerm::DivisibilityCheck(const poly m, const poly t, const unsigned 
   p_Test(t, r);
 //  const int k = label();
 //  assume( m_L->m[k] == p );
-
-#ifndef SING_NDEBUG
-  assume( r == _R );
-#endif
 
   if (sev() & not_sev)
     return false;
@@ -1770,7 +1705,6 @@ class CDivisorEnumerator: public SchreyerSyzygyComputationFlags
 };
 
 
-
 bool CReducerFinder::IsDivisible(const poly product) const
 {
   assume( product != NULL );
@@ -1783,101 +1717,7 @@ bool CReducerFinder::IsDivisible(const poly product) const
 
   return itr.MoveNext();
 
-/*
-  const ring& r = m_rBaseRing;
-
-  const long comp = p_GetComp(product, r);
-  const unsigned long not_sev = ~p_GetShortExpVector(product, r);
-
-  assume( comp >= 0 );
-
-  CReducersHash::const_iterator it = m_hash.find(comp); // same module component
-
-  assume( m_L != NULL );
-
-  if( it == m_hash.end() )
-    return false;
-  // assume comp!
-
-  const TReducers& reducers = it->second;
-
-  for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
-  {
-    assume( (*vit)->CheckLT( m_L ) );
-
-    if( (*vit)->DivisibilityCheck(product, not_sev, r) )
-    {
-      return true;
-    }
-  }
-
-  return false;
-*/
 }
-
-
-#ifndef SING_NDEBUG
-void CReducerFinder::Verify() const
-{
-  const ring& r = m_rBaseRing;
-
-  for( CReducersHash::const_iterator it = m_hash.begin(); it != m_hash.end(); it++)
-  {
-    const TReducers& reducers = it->second;
-
-    for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
-    {
-      assume( (*vit)->CheckLT( m_L ) );
-
-      const poly p = (*vit)->lt();
-
-      const unsigned long p_sev = (*vit)->sev();
-      assume( p_sev == p_GetShortExpVector(p, r) );
-
-      assume( p_GetComp(p, r) == it->first );
-
-      const int k = (*vit)->label();
-      assume( m_L->m[k] == p );
-
-      pp_Test(p, r, r);
-    }
-  }
-}
-
-
-
-void CReducerFinder::DebugPrint() const
-{
-  const ring& r = m_rBaseRing;
-
-  for( CReducersHash::const_iterator it = m_hash.begin(); it != m_hash.end(); it++)
-  {
-    Print("Hash Key: %ld, Values: \n", it->first);
-    const TReducers& reducers = it->second;
-
-    for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
-    {
-      assume( (*vit)->CheckLT( m_L ) );
-
-      const int k = (*vit)->label();
-      const poly p = (*vit)->lt();
-
-      pp_Test(p, r, r);
-
-      assume( m_L->m[k] == p );
-
-      const unsigned long p_sev = (*vit)->sev();
-      assume( p_sev == p_GetShortExpVector(p, r) );
-
-      assume( p_GetComp(p, r) == it->first );
-
-      Print("L[%d]: ", k); Print("SEV: %ld\n", p_sev);
-
-      assume( m_L->m[k] == p );
-    }
-  }
-}
-#endif
 
 #if NOPRODUCT
 
@@ -1917,7 +1757,6 @@ class CDivisorEnumerator2: public SchreyerSyzygyComputationFlags
 
       p_Test(m, m_rBaseRing);
 
-//      assume( p_GetComp(m_multiplier, m_rBaseRing) == 0 );
     }
 
     inline bool Reset()
@@ -2066,80 +1905,6 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
     assume( itr.Current().CheckLT( L ) ); // ???
     return q;
   }
-
-/*
-  const long comp = p_GetComp(t, r); assume( comp >= 0 );
-  const unsigned long not_sev = ~p_GetShortExpVector(multiplier, t, r); // !
-
-//   for( int k = IDELEMS(L)-1; k>= 0; k-- )
-//   {
-//     const poly p = L->m[k];
-//
-//     if ( p_GetComp(p, r) != comp )
-//       continue;
-//
-//     const unsigned long p_sev = p_GetShortExpVector(p, r); // to be stored in m_hash!!!
-
-   // looking for an appropriate diviser p = L[k]...
-  CReducersHash::const_iterator it = m_hash.find(comp); // same module component
-
-  if( it == m_hash.end() )
-    return NULL;
-
-  // assume comp!
-
-  assume( m_L != NULL );
-
-  const TReducers& reducers = it->second;
-
-  for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
-  {
-
-    const poly p = (*vit)->lt(); // ??
-    const int k = (*vit)->label();
-
-    assume( L->m[k] == p ); // CheckLT
-
-//    const unsigned long p_sev = (*vit)->sev();
-//    assume( p_sev == p_GetShortExpVector(p, r) );
-
-//    if( !p_LmShortDivisibleByNoComp(p, p_sev, product, not_sev, r) )
-//      continue;
-
-    if( !(*vit)->DivisibilityCheck(multiplier, t, not_sev, r) )
-      continue;
-
-
-//    if (p_sev & not_sev) continue;
-//    if( !_p_LmDivisibleByNoComp(p, multiplier, t, r) ) continue;
-
-
-    p_ExpVectorSum(q, multiplier, t, r); // q == product == multiplier * t
-    p_ExpVectorDiff(q, q, p, r); // (LM(product) / LM(L[k]))
-
-    p_SetComp(q, k + 1, r);
-    p_Setm(q, r);
-
-    // cannot allow something like: a*gen(i) - a*gen(i)
-    if (syzterm != NULL && (k == c))
-      if (p_ExpVectorEqual(syzterm, q, r))
-      {
-        continue;
-      }
-
-    // while the complement (the fraction) is not reducible by leading syzygies
-    if( to_check && syz_checker.IsDivisible(q) )
-    {
-      continue;
-    }
-
-    number n = n_Mult( p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
-    p_SetCoeff0(q, n_InpNeg( n_Div(n, p_GetCoeff(p, r), r), r), r);
-    n_Delete(&n, r);
-
-    return q;
-  }
-*/
 
   p_LmFree(q, r);
 
@@ -2293,7 +2058,6 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
 }
 
 
-
 CLCM::CLCM(const ideal& L, const SchreyerSyzygyComputationFlags& flags):
     SchreyerSyzygyComputationFlags(flags), std::vector<bool>(),
     m_compute(false), m_N(rVar(flags.m_rBaseRing))
@@ -2345,16 +2109,8 @@ bool CLCM::Check(const poly m) const
   } else return true;
 }
 
-CCacheCompare::CCacheCompare(): m_ring(currRing) {}
 
 
-template class std::vector<bool>;
-template class std::vector<CLeadingTerm const*>;
-template class std::map< CReducerFinder::TComponentKey, CReducerFinder::TReducers >;
 
-template class std::map<TCacheKey, TCacheValue, struct CCacheCompare>;
-template class std::map<int, TP2PCache>;
-
-template class std::stack <sBucket_pt>;
 
 // Vi-modeline: vim: filetype=c:syntax:shiftwidth=2:tabstop=8:textwidth=0:expandtab
