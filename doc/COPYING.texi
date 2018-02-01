@@ -316,3 +316,6 @@ the Volkswagen-Stiftung, the Deutsche Forschungsgemeinschaft
 and the Stiftung f@"ur Innovation des Landes Rheinland-Pfalz
 to the @sc{Singular} project.
 
+@sc{Singular} is supported by Project B5 of SFB-TRR 195 'Symbolic Tools in
+Mathematics and their Application'.
+
