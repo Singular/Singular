@@ -23,15 +23,6 @@
 #define CACHE 1
 
 /*
- * If set to true, the current module is modfied after each lifting step in the
- * resolution: any term which contains a variable which does not appear among
- * the (induced) leading terms is deleted. Note that the resulting object is
- * not necessarily a complex anymore. However, constant entries remain exactly
- * the same.
- */
-#define FRES_TENSOR_TRICK 1
-
-/*
  * set variables[i] to false if the i-th variable does not appear among the
  * leading terms of L
  */
@@ -556,7 +547,6 @@ static void computeLiftings(const resolvente res, const int index,
 #endif   // CACHE
 }
 
-#if FRES_TENSOR_TRICK
 /*
  * check if the monomial m contains any of the variables set to false
  */
@@ -592,7 +582,6 @@ static void delete_variables(resolvente res, const int index,
         }
     }
 }
-#endif   // FRES_TENSOR_TRICK
 
 static void delete_tails(resolvente res, const int index)
 {
@@ -610,7 +599,7 @@ static void delete_tails(resolvente res, const int index)
  */
 static int computeResolution(resolvente res, const int max_index,
         syzHeadFunction *syzHead, const bool do_lifting,
-        const bool single_module)
+        const bool single_module, const bool use_tensor_trick)
 {
     int index = 0;
     if (!idIs0(res[0]) && 0 < max_index) {
@@ -620,9 +609,9 @@ static int computeResolution(resolvente res, const int max_index,
         variables.resize(currRing->N+1, true);
         if (do_lifting) {
             update_variables(variables, res[0]);
-#if FRES_TENSOR_TRICK
-            delete_variables(res, 0, variables);
-#endif   // FRES_TENSOR_TRICK
+            if (use_tensor_trick) {
+                delete_variables(res, 0, variables);
+            }
         }
         while (!idIs0(res[index])) {
             if (do_lifting) {
@@ -635,9 +624,9 @@ static int computeResolution(resolvente res, const int max_index,
                 if (index == 1) {
                     variables[currRing->N] = false;
                 }
-#if FRES_TENSOR_TRICK
-                delete_variables(res, index, variables);
-#endif   // FRES_TENSOR_TRICK
+                if (use_tensor_trick) {
+                    delete_variables(res, index, variables);
+                }
             }
             if (index >= max_index) { break; }
             index++;
@@ -717,10 +706,18 @@ static void insert_ext_induced_LTs(const resolvente res, const int length,
 }
 
 /*
- * compute the Schreyer resolution of arg, see reference at the beginning of
- * this file
+ * Compute the Schreyer resolution of arg, see reference at the beginning of
+ * this file.
+ * If use_tensor_trick == true, the current module is modfied after each
+ * lifting step in the resolution: any term which contains a variable which
+ * does not appear among the (induced) leading terms is deleted. Note that the
+ * resulting object is not necessarily a complex anymore. However, constant
+ * entries remain exactly the same. This option does not apply for
+ * method == "frame" and method "extended frame". It is used in PrymGreen.jl;
+ * do not delete!
  */
-syStrategy syFrank(const ideal arg, const int length, const char *method)
+syStrategy syFrank(const ideal arg, const int length, const char *method,
+        const bool use_tensor_trick)
 {
     syStrategy result = (syStrategy)omAlloc0(sizeof(ssyStrategy));
     resolvente res = (resolvente)omAlloc0((length+1)*sizeof(ideal));
@@ -734,7 +731,7 @@ syStrategy syFrank(const ideal arg, const int length, const char *method)
     bool single_module;
     set_options(&syzHead, &do_lifting, &single_module, method);
     int new_length = computeResolution(res, length-1, syzHead, do_lifting,
-            single_module);
+            single_module, use_tensor_trick);
     if (new_length < length) {
         res = (resolvente)omReallocSize(res, (length+1)*sizeof(ideal),
                 (new_length+1)*sizeof(ideal));

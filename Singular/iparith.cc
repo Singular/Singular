@@ -2225,7 +2225,7 @@ static BOOLEAN jjFRES3(leftv res, leftv u, leftv v, leftv w)
             && strcmp(method, "single module") != 0) {
         WerrorS("wrong optional argument for fres");
     }
-    syStrategy r = syFrank(id, max_length, method);
+    syStrategy r = syFrank(id, max_length, method, false);
     assume(r->fullres != NULL);
     res->data = (void *)r;
     return FALSE;
