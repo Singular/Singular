@@ -597,6 +597,38 @@ static void delete_tails(resolvente res, const int index)
  * for each step in the resolution, compute the corresponding module until
  * either index == max_index is reached or res[index] is the zero module
  */
+static int computeResolution_iteration(resolvente res, const int max_index,
+        syzHeadFunction *syzHead, const bool do_lifting,
+        const bool single_module, const bool use_tensor_trick,
+        std::vector<bool> &variables)
+{
+    int index = 1;
+    while (!idIs0(res[index])) {
+        if (do_lifting) {
+            computeLiftings(res, index, variables);
+            if (single_module) {
+                delete_tails(res, index-1);
+            }
+            update_variables(variables, res[index]);
+            // we don't know if the input is a reduced SB:
+            if (index == 1) {
+                variables[currRing->N] = false;
+            }
+            if (use_tensor_trick) {
+                delete_variables(res, index, variables);
+            }
+        }
+        if (index >= max_index) { break; }
+        index++;
+        res[index] = computeFrame(res[index-1], syzM_i_sorted, syzHead);
+    }
+    return index;
+}
+
+/*
+ * compute the frame of the first syzygy module and set variables, then call
+ * computeResolution_iteration() for the remaining steps
+ */
 static int computeResolution(resolvente res, const int max_index,
         syzHeadFunction *syzHead, const bool do_lifting,
         const bool single_module, const bool use_tensor_trick)
@@ -613,25 +645,8 @@ static int computeResolution(resolvente res, const int max_index,
                 delete_variables(res, 0, variables);
             }
         }
-        while (!idIs0(res[index])) {
-            if (do_lifting) {
-                computeLiftings(res, index, variables);
-                if (single_module) {
-                    delete_tails(res, index-1);
-                }
-                update_variables(variables, res[index]);
-                // we don't know if the input is a reduced SB:
-                if (index == 1) {
-                    variables[currRing->N] = false;
-                }
-                if (use_tensor_trick) {
-                    delete_variables(res, index, variables);
-                }
-            }
-            if (index >= max_index) { break; }
-            index++;
-            res[index] = computeFrame(res[index-1], syzM_i_sorted, syzHead);
-        }
+        index = computeResolution_iteration(res, max_index, syzHead,
+                do_lifting, single_module, use_tensor_trick, variables);
         variables.clear();
     }
     return index+1;
