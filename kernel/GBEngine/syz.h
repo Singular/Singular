@@ -98,7 +98,9 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights = NULL);
 syStrategy syHilb(ideal arg,int * length);
 syStrategy syKosz(ideal arg,int * length);
 
-syStrategy syFrank(const ideal arg, const int length, const char *method);
+// use_cache and use_tensor_trick are needed in PrymGreen.jl; do not delete!
+syStrategy syFrank(const ideal arg, const int length, const char *method,
+        const bool use_cache = true, const bool use_tensor_trick = false);
 
 void syKillComputation(syStrategy syzstr, ring r=currRing);
 intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim=TRUE,int * row_shift=NULL, intvec *weights=NULL);
