@@ -581,7 +581,6 @@ static int getShorter (int * a, int l, int j, int cols, int rows)
 int * bigintmat::getwid(int maxwid)
 {
   int const c = /*2**/(col-1)+1;
-  if (col + c > maxwid-1) return NULL;
   int * wv = (int*)omAlloc(sizeof(int)*col*row);
   int * cwv = (int*)omAlloc(sizeof(int)*col);
   for (int j=0; j<col; j++)
@@ -601,7 +600,7 @@ int * bigintmat::getwid(int maxwid)
   }
 
   // Groesse verkleinern, bis < maxwid
-  while (intArrSum(cwv, col)+c > maxwid)
+  if (intArrSum(cwv, col)+c > maxwid)
   {
     int j = findLongest(cwv, col);
     cwv[j] = getShorter(wv, cwv[j], j, col, row);
@@ -617,11 +616,6 @@ void bigintmat::pprint(int maxwid)
   else
   {
     int * colwid = getwid(maxwid);
-    if (colwid == NULL)
-    {
-      WerrorS("not enough space to print bigintmat");
-      return;
-    }
     char * ps;
     int slength = 0;
     for (int j=0; j<col; j++)

@@ -117,7 +117,7 @@ void sleftv::Print(leftv store, int spaces)
         case CMATRIX_CMD: // like BIGINTMAT
 #endif
         case BIGINTMAT_CMD:
-          ((bigintmat *)d)->pprint(80);
+          ((bigintmat *)d)->pprint(colmax);
           break;
         case UNKNOWN:
         case DEF_CMD:
