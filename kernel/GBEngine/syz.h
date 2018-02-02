@@ -99,7 +99,10 @@ syStrategy syHilb(ideal arg,int * length);
 syStrategy syKosz(ideal arg,int * length);
 
 syStrategy syFrank(const ideal arg, const int length, const char *method,
-        const bool use_tensor_trick);
+        const bool use_tensor_trick = false);
+// used in PrymGreen.jl; do not remove!
+syStrategy syFrank_no_cache(const ideal arg, const int length,
+        const char *method, const bool use_tensor_trick = false);
 
 void syKillComputation(syStrategy syzstr, ring r=currRing);
 intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim=TRUE,int * row_shift=NULL, intvec *weights=NULL);

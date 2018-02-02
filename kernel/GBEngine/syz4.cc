@@ -16,12 +16,58 @@
 #include <map>
 
 /*
- * If set to true, the result of compute_image() is cached for _every_ term in
- * the current step of the resolution. This corresponds to the subtree attached
- * to the node which represents this term, see reference.
+ * If FRES_CACHE is enabled, the result of compute_image() is cached for
+ * _every_ term in the current step of the resolution. This corresponds to the
+ * subtree attached to the node which represents this term, see reference.
+ *
+ * This file includes itself twice: once with the generic (cache-independent)
+ * code marked with FRES_GENERIC and FRES_CACHE enabled, then with FRES_CACHE
+ * disabled. The second version is used in PrymGreen.jl; do not remove!
  */
-#define CACHE 1
+#ifndef FRES_GUARD
+#define FRES_GUARD   // do not include recursively
 
+#define FRES_GENERIC
+#define FRES_CACHE 1
+#include "syz4.cc"
+#undef FRES_CACHE
+
+#undef FRES_GENERIC
+#define FRES_CACHE 0
+#define FRES_APPEND(f) f ## _no_cache
+#define FRES_RENAME(f) FRES_APPEND(f)
+/*
+ * these are exactly the functions which are not enclosed by
+ * #ifdef FRES_GENERIC
+ * ..
+ * #endif
+ */
+#define reduce_term                 FRES_RENAME(reduce_term)
+#define compute_image               FRES_RENAME(compute_image)
+#define traverse_tail               compute_image   // !
+#define lift_ext_LT                 FRES_RENAME(lift_ext_LT)
+#define computeLiftings             FRES_RENAME(computeLiftings)
+#define computeResolution_iteration FRES_RENAME(computeResolution_iteration)
+#define computeResolution           FRES_RENAME(computeResolution)
+#define syFrank                     FRES_RENAME(syFrank)
+#include "syz4.cc"
+#undef reduce_term
+#undef compute_image
+#undef traverse_tail
+#undef lift_ext_LT
+#undef computeLiftings
+#undef computeResolution_iteration
+#undef computeResolution
+#undef syFrank
+#undef FRES_RENAME
+#undef FRES_APPEND
+#undef FRES_CACHE
+
+#undef FRES_GUARD
+#endif   // !FRES_GUARD
+
+#ifdef FRES_GUARD
+#ifdef FRES_GENERIC
 /*
  * set variables[i] to false if the i-th variable does not appear among the
  * leading terms of L
@@ -142,17 +188,11 @@ static poly find_reducer(const poly multiplier, const poly t,
     p_LmFree(q, r);
     return NULL;
 }
+#endif   // FRES_GENERIC
 
-#if CACHE
 static poly traverse_tail(const poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
         const lt_struct *const *const hash_previous_module);
-#else
-static poly compute_image(const poly multiplier, const int comp,
-        const ideal previous_module, const std::vector<bool> &variables,
-        const lt_struct *const *const hash_previous_module);
-#define traverse_tail compute_image
-#endif   // CACHE
 
 /*
  * recursively call traverse_tail() for each new term found by find_reducer()
@@ -197,7 +237,7 @@ static poly compute_image(const poly multiplier, const int comp,
     return s;
 }
 
-#if CACHE
+#if FRES_CACHE
 struct cache_compare
 {
     inline bool operator() (const poly& l, const poly& r) const
@@ -270,7 +310,7 @@ static poly traverse_tail(const poly multiplier, const int comp,
     insert_into_cache_term(T, multiplier, p);
     return p;
 }
-#endif   // CACHE
+#endif   // FRES_CACHE
 
 /*
  * lift the extended induced leading term a to a syzygy
@@ -291,6 +331,7 @@ static poly lift_ext_LT(const poly a, const ideal previous_module,
 
 /*****************************************************************************/
 
+#ifdef FRES_GENERIC
 /*
  * copied from id_DelDiv(), but without testing and without HAVE_RINGS;
  * delete id[j], if LT(j) == coeff*mon*LT(i) and vice versa, that is,
@@ -521,6 +562,7 @@ static ideal computeFrame(const ideal G, syzM_i_Function syzM_i,
     qsort(frame->m, frame->ncols, sizeof(poly), compare_Mi);
     return frame;
 }
+#endif   // FRES_GENERIC
 
 /*
  * lift each (extended) induced leading term to a syzygy
@@ -528,9 +570,9 @@ static ideal computeFrame(const ideal G, syzM_i_Function syzM_i,
 static void computeLiftings(const resolvente res, const int index,
         const std::vector<bool> &variables)
 {
-#if CACHE
+#if FRES_CACHE
     initialize_cache(res[index-1]->ncols);
-#endif   // CACHE
+#endif   // FRES_CACHE
     lt_struct **hash_previous_module
         = (lt_struct **)omAlloc((res[index-1]->rank+1)*sizeof(lt_struct *));
     initialize_hash(hash_previous_module, res[index-1]);
@@ -542,11 +584,12 @@ static void computeLiftings(const resolvente res, const int index,
         omfree(hash_previous_module[i]);
     }
     omFree(hash_previous_module);
-#if CACHE
+#if FRES_CACHE
     delete_cache(res[index-1]->ncols);
-#endif   // CACHE
+#endif   // FRES_CACHE
 }
 
+#ifdef FRES_GENERIC
 /*
  * check if the monomial m contains any of the variables set to false
  */
@@ -592,6 +635,7 @@ static void delete_tails(resolvente res, const int index)
         }
     }
 }
+#endif   // FRES_GENERIC
 
 /*
  * for each step in the resolution, compute the corresponding module until
@@ -654,6 +698,7 @@ static int computeResolution(resolvente res, const int max_index,
     return index+1;
 }
 
+#ifdef FRES_GENERIC
 static void set_options(syzHeadFunction **syzHead_ptr, bool *do_lifting_ptr,
         bool *single_module_ptr, const char *method)
 {
@@ -721,6 +766,7 @@ static void insert_ext_induced_LTs(const resolvente res, const int length,
         index++;
     }
 }
+#endif   // FRES_GENERIC
 
 /*
  * Compute the Schreyer resolution of arg, see reference at the beginning of
@@ -761,4 +807,5 @@ syStrategy syFrank(const ideal arg, const int length, const char *method,
     result->list_length = new_length;
     return result;
 }
+#endif   // FRES_GUARD
 
