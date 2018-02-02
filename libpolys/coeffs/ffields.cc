@@ -806,7 +806,7 @@ static BOOLEAN nfCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
 {
   if (n==n_GF) {
     GFInfo* p = (GFInfo *)(parameter);
-    int c = std::pow (p->GFChar, p->GFDegree);
+    int c = pow (p->GFChar, p->GFDegree);
     if ((c == r->m_nfCharQ) && (strcmp(n_ParameterNames(r)[0], p->GFPar_name) == 0))
       return TRUE;
   }
@@ -927,7 +927,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
     return TRUE;
   }
 
-  int c = std::pow (p->GFChar, p->GFDegree);
+  int c = pow (p->GFChar, p->GFDegree);
 
   nfReadTable(c, r);
 
