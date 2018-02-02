@@ -16,59 +16,6 @@
 #include <map>
 
 /*
- * If FRES_CACHE is enabled, the result of compute_image() is cached for
- * _every_ term in the current step of the resolution. This corresponds to the
- * subtree attached to the node which represents this term, see reference.
- *
- * This file includes itself twice: once with the generic (cache-independent)
- * code marked with FRES_GENERIC and FRES_CACHE enabled, then with FRES_CACHE
- * disabled. The second version is used in PrymGreen.jl; do not remove!
- */
-#ifndef FRES_GUARD
-#define FRES_GUARD   // do not include recursively
-
-#define FRES_GENERIC
-#define FRES_CACHE 1
-#include "syz4.cc"
-#undef FRES_CACHE
-
-#undef FRES_GENERIC
-#define FRES_CACHE 0
-#define FRES_APPEND(f) f ## _no_cache
-#define FRES_RENAME(f) FRES_APPEND(f)
-/*
- * these are exactly the functions which are not enclosed by
- * #ifdef FRES_GENERIC
- * ..
- * #endif
- */
-#define reduce_term                 FRES_RENAME(reduce_term)
-#define compute_image               FRES_RENAME(compute_image)
-#define traverse_tail               compute_image   // !
-#define lift_ext_LT                 FRES_RENAME(lift_ext_LT)
-#define computeLiftings             FRES_RENAME(computeLiftings)
-#define computeResolution_iteration FRES_RENAME(computeResolution_iteration)
-#define computeResolution           FRES_RENAME(computeResolution)
-#define syFrank                     FRES_RENAME(syFrank)
-#include "syz4.cc"
-#undef reduce_term
-#undef compute_image
-#undef traverse_tail
-#undef lift_ext_LT
-#undef computeLiftings
-#undef computeResolution_iteration
-#undef computeResolution
-#undef syFrank
-#undef FRES_RENAME
-#undef FRES_APPEND
-#undef FRES_CACHE
-
-#undef FRES_GUARD
-#endif   // !FRES_GUARD
-
-#ifdef FRES_GUARD
-#ifdef FRES_GENERIC
-/*
  * set variables[i] to false if the i-th variable does not appear among the
  * leading terms of L
  */
@@ -188,18 +135,23 @@ static poly find_reducer(const poly multiplier, const poly t,
     p_LmFree(q, r);
     return NULL;
 }
-#endif   // FRES_GENERIC
 
 static poly traverse_tail(const poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
         const lt_struct *const *const hash_previous_module);
+
+static poly compute_image(const poly multiplier, const int comp,
+        const ideal previous_module, const std::vector<bool> &variables,
+        const lt_struct *const *const hash_previous_module,
+        const bool use_cache);
 
 /*
  * recursively call traverse_tail() for each new term found by find_reducer()
  */
 static poly reduce_term(const poly multiplier, const poly term,
         const ideal previous_module, const std::vector<bool> &variables,
-        const lt_struct *const *const hash_previous_module)
+        const lt_struct *const *const hash_previous_module,
+        const bool use_cache)
 {
     poly s = find_reducer(multiplier, term, hash_previous_module);
     if (s == NULL) {
@@ -207,8 +159,14 @@ static poly reduce_term(const poly multiplier, const poly term,
     }
     const ring r = currRing;
     const int c = __p_GetComp(s, r) - 1;
-    const poly t = traverse_tail(s, c, previous_module, variables,
-            hash_previous_module);
+    poly t;
+    if (use_cache) {
+        t = traverse_tail(s, c, previous_module, variables,
+                hash_previous_module);
+    } else {
+        t = compute_image(s, c, previous_module, variables,
+                hash_previous_module, false);
+    }
     return p_Add_q(s, t, r);
 }
 
@@ -218,7 +176,8 @@ static poly reduce_term(const poly multiplier, const poly term,
  */
 static poly compute_image(const poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
-        const lt_struct *const *const hash_previous_module)
+        const lt_struct *const *const hash_previous_module,
+        const bool use_cache)
 {
     const poly tail = previous_module->m[comp]->next;
     if (unlikely(tail == NULL) || !check_variables(variables, multiplier)) {
@@ -227,7 +186,7 @@ static poly compute_image(const poly multiplier, const int comp,
     sBucket_pt sum = sBucketCreate(currRing);
     for (poly p = tail; p != NULL; p = pNext(p)) {
         const poly rt = reduce_term(multiplier, p, previous_module, variables,
-                hash_previous_module);
+                hash_previous_module, use_cache);
         sBucket_Add_p(sum, rt, pLength(rt));
     }
     poly s;
@@ -237,7 +196,6 @@ static poly compute_image(const poly multiplier, const int comp,
     return s;
 }
 
-#if FRES_CACHE
 struct cache_compare
 {
     inline bool operator() (const poly& l, const poly& r) const
@@ -306,32 +264,37 @@ static poly traverse_tail(const poly multiplier, const int comp,
         return get_from_cache_term(itr, multiplier);
     }
     poly p = compute_image(multiplier, comp, previous_module, variables,
-            hash_previous_module);
+            hash_previous_module, true);
     insert_into_cache_term(T, multiplier, p);
     return p;
 }
-#endif   // FRES_CACHE
 
 /*
  * lift the extended induced leading term a to a syzygy
  */
 static poly lift_ext_LT(const poly a, const ideal previous_module,
         const std::vector<bool> &variables,
-        const lt_struct *const *const hash_previous_module)
+        const lt_struct *const *const hash_previous_module,
+        const bool use_cache)
 {
     const ring R = currRing;
     // the leading term does not need to be cached
     poly t1 = compute_image(a, __p_GetComp(a, R)-1, previous_module, variables,
-            hash_previous_module);
-    poly t2 = traverse_tail(a->next, __p_GetComp(a->next, R)-1,
-            previous_module, variables, hash_previous_module);
+            hash_previous_module, use_cache);
+    poly t2;
+    if (use_cache) {
+        t2 = traverse_tail(a->next, __p_GetComp(a->next, R)-1,
+                previous_module, variables, hash_previous_module);
+    } else {
+        t2 = compute_image(a->next, __p_GetComp(a->next, R)-1,
+                previous_module, variables, hash_previous_module, false);
+    }
     t1 = p_Add_q(t1, t2, R);
     return t1;
 }
 
 /*****************************************************************************/
 
-#ifdef FRES_GENERIC
 /*
  * copied from id_DelDiv(), but without testing and without HAVE_RINGS;
  * delete id[j], if LT(j) == coeff*mon*LT(i) and vice versa, that is,
@@ -562,34 +525,32 @@ static ideal computeFrame(const ideal G, syzM_i_Function syzM_i,
     qsort(frame->m, frame->ncols, sizeof(poly), compare_Mi);
     return frame;
 }
-#endif   // FRES_GENERIC
 
 /*
  * lift each (extended) induced leading term to a syzygy
  */
 static void computeLiftings(const resolvente res, const int index,
-        const std::vector<bool> &variables)
+        const std::vector<bool> &variables, const bool use_cache)
 {
-#if FRES_CACHE
-    initialize_cache(res[index-1]->ncols);
-#endif   // FRES_CACHE
+    if (use_cache) {
+        initialize_cache(res[index-1]->ncols);
+    }
     lt_struct **hash_previous_module
         = (lt_struct **)omAlloc((res[index-1]->rank+1)*sizeof(lt_struct *));
     initialize_hash(hash_previous_module, res[index-1]);
     for (int j = res[index]->ncols-1; j >= 0; j--) {
         res[index]->m[j]->next->next = lift_ext_LT(res[index]->m[j],
-                res[index-1], variables, hash_previous_module);
+                res[index-1], variables, hash_previous_module, use_cache);
     }
     for (int i = 0; i <= res[index-1]->rank; i++) {
         omfree(hash_previous_module[i]);
     }
     omFree(hash_previous_module);
-#if FRES_CACHE
-    delete_cache(res[index-1]->ncols);
-#endif   // FRES_CACHE
+    if (use_cache) {
+        delete_cache(res[index-1]->ncols);
+    }
 }
 
-#ifdef FRES_GENERIC
 /*
  * check if the monomial m contains any of the variables set to false
  */
@@ -635,7 +596,6 @@ static void delete_tails(resolvente res, const int index)
         }
     }
 }
-#endif   // FRES_GENERIC
 
 /*
  * for each step in the resolution, compute the corresponding module until
@@ -643,13 +603,13 @@ static void delete_tails(resolvente res, const int index)
  */
 static int computeResolution_iteration(resolvente res, const int max_index,
         syzHeadFunction *syzHead, const bool do_lifting,
-        const bool single_module, const bool use_tensor_trick,
-        std::vector<bool> &variables)
+        const bool single_module, const bool use_cache,
+        const bool use_tensor_trick, std::vector<bool> &variables)
 {
     int index = 1;
     while (!idIs0(res[index])) {
         if (do_lifting) {
-            computeLiftings(res, index, variables);
+            computeLiftings(res, index, variables, use_cache);
             if (single_module) {
                 delete_tails(res, index-1);
             }
@@ -675,7 +635,8 @@ static int computeResolution_iteration(resolvente res, const int max_index,
  */
 static int computeResolution(resolvente res, const int max_index,
         syzHeadFunction *syzHead, const bool do_lifting,
-        const bool single_module, const bool use_tensor_trick)
+        const bool single_module, const bool use_cache,
+        const bool use_tensor_trick)
 {
     if (idIs0(res[0])) {
         return 1;
@@ -692,13 +653,13 @@ static int computeResolution(resolvente res, const int max_index,
     if (max_index > 0) {
         res[1] = computeFrame(res[0], syzM_i_unsorted, syzHead);
         index = computeResolution_iteration(res, max_index, syzHead,
-                do_lifting, single_module, use_tensor_trick, variables);
+                do_lifting, single_module, use_cache, use_tensor_trick,
+                variables);
     }
     variables.clear();
     return index+1;
 }
 
-#ifdef FRES_GENERIC
 static void set_options(syzHeadFunction **syzHead_ptr, bool *do_lifting_ptr,
         bool *single_module_ptr, const char *method)
 {
@@ -766,21 +727,26 @@ static void insert_ext_induced_LTs(const resolvente res, const int length,
         index++;
     }
 }
-#endif   // FRES_GENERIC
 
 /*
  * Compute the Schreyer resolution of arg, see reference at the beginning of
  * this file.
+ *
+ * If use_cache == true (default), the result of compute_image() is cached for
+ * _every_ term in the current step of the resolution. This corresponds to the
+ * subtree attached to the node which represents this term, see reference.
+ *
  * If use_tensor_trick == true, the current module is modfied after each
  * lifting step in the resolution: any term which contains a variable which
  * does not appear among the (induced) leading terms is deleted. Note that the
  * resulting object is not necessarily a complex anymore. However, constant
  * entries remain exactly the same. This option does not apply for
- * method == "frame" and method "extended frame". It is used in PrymGreen.jl;
- * do not delete!
+ * method == "frame" and method "extended frame".
+ *
+ * These two options are used in PrymGreen.jl; do not delete!
  */
 syStrategy syFrank(const ideal arg, const int length, const char *method,
-        const bool use_tensor_trick)
+        const bool use_cache, const bool use_tensor_trick)
 {
     syStrategy result = (syStrategy)omAlloc0(sizeof(ssyStrategy));
     resolvente res = (resolvente)omAlloc0((length+1)*sizeof(ideal));
@@ -794,7 +760,7 @@ syStrategy syFrank(const ideal arg, const int length, const char *method,
     bool single_module;
     set_options(&syzHead, &do_lifting, &single_module, method);
     int new_length = computeResolution(res, length-1, syzHead, do_lifting,
-            single_module, use_tensor_trick);
+            single_module, use_cache, use_tensor_trick);
     if (new_length < length) {
         res = (resolvente)omReallocSize(res, (length+1)*sizeof(ideal),
                 (new_length+1)*sizeof(ideal));
@@ -807,5 +773,4 @@ syStrategy syFrank(const ideal arg, const int length, const char *method,
     result->list_length = new_length;
     return result;
 }
-#endif   // FRES_GUARD
 
