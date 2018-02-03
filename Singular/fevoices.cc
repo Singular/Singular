@@ -18,12 +18,7 @@
 #include "Singular/ipshell.h"
 #include "Singular/sdb.h"
 
-#include <stdlib.h>
-#include <stdio.h>
 #include "misc/mylimits.h"
-#include <stdarg.h>
-#include <sys/stat.h>
-#include <ctype.h>
 #include <unistd.h>
 
 #ifdef HAVE_PWD_H
@@ -681,10 +676,5 @@ Voice * feInitStdin(Voice *pp)
   omMarkAsStaticAddr(p->filename);
   return p;
 }
-
-
-#else /* ! STANDALONE_PARSER */
-#include <stdio.h>
-
 #endif
 

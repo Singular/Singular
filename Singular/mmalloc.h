@@ -7,8 +7,6 @@
 * ABSTRACT: declaration of routines for memory stuff
 */
 
-#include <stdlib.h>
-
 #undef reallocSize
 #undef freeSize
 

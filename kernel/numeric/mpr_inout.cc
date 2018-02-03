@@ -29,9 +29,6 @@
 #include "kernel/polys.h"
 #include "kernel/ideals.h"
 
-
-#include <math.h>
-
 #include "mpr_base.h"
 #include "mpr_numeric.h"
 #include "mpr_inout.h"

@@ -445,14 +445,6 @@ lists primeFactorisation(const number n, const int pBound)
 *}
 */
 
-#include <string.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <time.h>
-
-
 void singular_example(char *str)
 {
   assume(str!=NULL);
@@ -1073,10 +1065,6 @@ void checkall()
       }
 }
 #endif
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 extern "C"
 int singular_fstat(int fd, struct stat *buf)

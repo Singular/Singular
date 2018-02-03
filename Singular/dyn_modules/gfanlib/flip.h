@@ -1,7 +1,6 @@
 #ifndef GFANLIB_FLIP_H
 #define GFANLIB_FLIP_H
 
-#include <utility>
 #include "polys/simpleideals.h"
 #include "gfanlib/gfanlib_vector.h"
 

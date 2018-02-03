@@ -15,13 +15,7 @@
 
 //#include "Singular/febase.h"
 
-#include <stdlib.h>
-#include <stdio.h>
 #include "misc/mylimits.h"
-#include <stdarg.h>
-#include <sys/stat.h>
-#include <ctype.h>
-#include <unistd.h>
 
 #ifdef HAVE_PWD_H
 #include <pwd.h>
@@ -84,10 +78,6 @@ void monitor(void *F, int mode)
   }
 }
 #endif
-
-
-#else /* ! STANDALONE_PARSER */
-#include <stdio.h>
 
 #endif
 

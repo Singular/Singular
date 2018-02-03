@@ -5,10 +5,6 @@
 * ABSTRACT: interpreter: LIB and help
 */
 
-
-
-
-
 #include "kernel/mod2.h"
 
 #include "Singular/tok.h"
@@ -22,12 +18,7 @@
 #include "Singular/fevoices.h"
 #include "Singular/lists.h"
 
-//#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <ctype.h>
-#include <sys/stat.h>
-
 
 #if SIZEOF_LONG == 8
 #define SI_MAX_NEST 500

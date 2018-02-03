@@ -40,12 +40,6 @@
 #include "kernel/groebner_walk/walkSupport.h"
 #include "polys/prCopy.h"
 
-//#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
-
 ///////////////////////////////////////////////////////////////////
 //walkProc
 ///////////////////////////////////////////////////////////////////

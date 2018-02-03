@@ -4,14 +4,6 @@
 /*
 * ABSTRACT - interupt handling
 */
-#include <stdio.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <strings.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-
 #include "kernel/mod2.h"
 
 #include "omalloc/omalloc.h"
@@ -34,9 +26,6 @@
 #if defined(__OPTIMIZE__) && defined(CALL_GDB)
 #undef CALL_GDB
 #endif
-
- #include <unistd.h>
- #include <sys/types.h>
 
  #ifdef TIME_WITH_SYS_TIME
    #include <time.h>

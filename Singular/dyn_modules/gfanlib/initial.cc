@@ -3,8 +3,6 @@
 
 #include "gfanlib/gfanlib.h"
 
-#include <exception>
-
 long wDeg(const poly p, const ring r, const gfan::ZVector &w)
 {
   long d=0;

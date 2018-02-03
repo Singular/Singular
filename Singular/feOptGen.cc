@@ -5,11 +5,6 @@
 * ABSTRACT: Implementation of option business
 */
 
-#include <string.h>
-#include <stdlib.h>
-
-
-
 
 #include "kernel/mod2.h"
 
@@ -26,7 +21,6 @@ const char SHORT_OPTS_STRING[] = "bdhqstvxec:r:u:";
 // Generation of feOptIndex
 //
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
 int main()
 {

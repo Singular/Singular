@@ -66,7 +66,7 @@
 #include "Singular/fevoices.h"
 #include "Singular/sdb.h"
 
-#include <math.h>
+#include <cmath>
 #include <ctype.h>
 
 #include "kernel/maps/gen_maps.h"

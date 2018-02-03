@@ -4,11 +4,6 @@
 #include "singularWishlist.h"
 #include "ppinitialReduction.h"
 
-#include <map>
-#include <set>
-#include <exception>
-
-
 #ifndef NDEBUG
 bool isOrderingLocalInT(const ring r)
 {

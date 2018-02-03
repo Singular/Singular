@@ -1,4 +1,3 @@
-#include <utility>
 #include "kernel/GBEngine/kstd1.h"
 #include "gfanlib/gfanlib_vector.h"
 #include "callgfanlib_conversion.h"

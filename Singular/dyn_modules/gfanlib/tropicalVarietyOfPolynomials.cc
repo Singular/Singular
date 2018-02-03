@@ -1,4 +1,3 @@
-#include <set>
 #include "gfanlib/gfanlib.h"
 #include "polys/monomials/p_polys.h"
 #include "callgfanlib_conversion.h"

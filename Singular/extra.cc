@@ -16,12 +16,6 @@
 
 #include "factory/factory.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <signal.h>
-
 #ifdef TIME_WITH_SYS_TIME
 # include <time.h>
 # ifdef HAVE_SYS_TIME_H

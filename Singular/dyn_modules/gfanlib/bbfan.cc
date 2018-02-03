@@ -15,7 +15,6 @@
 #include "callgfanlib_conversion.h"
 #include "bbfan.h"
 #include "gfan.h"
-#include <sstream>
 
 int fanID;
 

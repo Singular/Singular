@@ -3,7 +3,6 @@
 
 #include "gfanlib/gfanlib.h"
 #include "polys/monomials/p_polys.h"
-#include <set>
 
 #include "tropicalStrategy.h"
 

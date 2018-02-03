@@ -10,9 +10,6 @@
 
 #include "kernel/mod2.h"
 
-#include <string.h>
-#include <stdlib.h>
-
 #include "factory/factory.h"
 
 #define FE_OPT_STRUCTURE
@@ -35,8 +32,8 @@ const char SHORT_OPTS_STRING[] = "bdhpqstvxec:r:u:";
 #ifdef GENERATE_OPTION_INDEX
 
 #include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
+//#include <unistd.h>
+//#include <stdlib.h>
 int main()
 {
   FILE* fd;

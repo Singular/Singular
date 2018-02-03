@@ -19,12 +19,6 @@
 #include "Singular/ipshell.h"
 #include "Singular/links/silink.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
 /* declarations */
 static BOOLEAN DumpAscii(FILE *fd, idhdl h,char ***list_of_libs);
 static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h,char ***list_of_libs);

@@ -17,8 +17,7 @@
 #include "coeffs/longrat.h"
 #include "coeffs/ffields.h"
 
-#include <string.h>
-#include <math.h>
+#include <cmath>
 #include <errno.h>
 
 #ifdef LDEBUG

@@ -31,12 +31,6 @@
 #include "Singular/ipshell.h"
 #include "feOpt.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
 // #ifdef HAVE_DBM
 // #ifdef __CYGWIN__
 // #define USE_GDBM

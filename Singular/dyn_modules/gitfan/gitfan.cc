@@ -12,12 +12,6 @@
 #include "kernel/mod2.h"
 
 #if HAVE_GFANLIB
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <sys/stat.h>
-#include <iostream>
-#include <list>
 
 #include "Singular/dyn_modules/gfanlib/callgfanlib_conversion.h"
 #include "Singular/dyn_modules/gfanlib/bbcone.h"

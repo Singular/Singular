@@ -8,7 +8,6 @@
 #include "polys/simpleideals.h"
 #include "kernel/ideals.h"
 #include "gfanlib/gfanlib.h"
-#include <set>
 
 #include "tropicalStrategy.h"
 

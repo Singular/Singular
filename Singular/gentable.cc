@@ -9,9 +9,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
-#include <time.h>
 #include <unistd.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 
 // need global defines:

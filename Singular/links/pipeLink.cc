@@ -18,15 +18,8 @@
 #include "lists.h"
 #include "pipeLink.h"
 
-#include <stdio.h>
-#include <fcntl.h>
 #include <errno.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <signal.h>
 #include <sys/types.h>          /* for portability */
-#include <sys/select.h>
-#include <sys/socket.h>
 
 typedef struct
 {

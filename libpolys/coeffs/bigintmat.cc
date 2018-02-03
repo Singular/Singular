@@ -14,8 +14,7 @@
 
 #include "coeffs/rmodulon.h"
 
-#include <math.h>
-#include <string.h>
+#include <cmath>
 
 #ifdef HAVE_RINGS
 ///create Z/nA of type n_Zn

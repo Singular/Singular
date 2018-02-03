@@ -6,9 +6,6 @@
 * ABSTRACT:
 */
 
-#include <stdio.h>
-#include <math.h>
-
 #include "misc/auxiliary.h"
 
 #include "omalloc/omalloc.h"

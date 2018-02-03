@@ -10,9 +10,7 @@
 
 #include "kernel/mod2.h"
 
-#  include <stdio.h>
 #  include <fcntl.h>
-#  include <errno.h>
 
 #ifdef HAVE_DBM
 

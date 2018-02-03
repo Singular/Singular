@@ -1,8 +1,6 @@
 #ifndef LIBSINGULAR__H
 #define LIBSINGULAR__H
 
-#include <math.h> // Why this?
-
 #include "singularconfig.h"
 #include "kernel/mod2.h"
 #include "kernel/structs.h"

@@ -9,7 +9,6 @@
 #include "tropicalStrategy.h"
 #include "tropicalVarietyOfPolynomials.h"
 #include "tropicalCurves.h"
-#include <set>
 
 /***
  * Given two sets of cones A,B and a dimensional bound d,

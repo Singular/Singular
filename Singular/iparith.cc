@@ -5,8 +5,6 @@
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
-//#include <sys/time.h>
-//#include <sys/resource.h>
 //long all_farey=0L;
 //long farey_cnt=0L;
 
@@ -80,13 +78,7 @@
 //#include "kernel/mpr_inout.h"
 #include "reporter/si_signals.h"
 
-#include <stdlib.h>
-#include <string.h>
 #include <ctype.h>
-#include <stdio.h>
-#include <time.h>
-#include <unistd.h>
-#include <vector>
 
 ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE, const long bitmask=0x7fff);
 

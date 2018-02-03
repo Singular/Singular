@@ -74,16 +74,8 @@
 
 #include "coeffs/mpr_complex.h"
 
-#include <stdio.h>
-// === Zeit & System (Holger Croeni ===
-#include <time.h>
-#include <sys/time.h>
-#include <math.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <float.h>
+#include <cmath>
 #include "misc/mylimits.h"
-#include <sys/types.h>
 
 int nstep;
 

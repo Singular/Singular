@@ -6,11 +6,6 @@
 *           assignment of expressions and lists to objects or lists
 */
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-
-
 #include "kernel/mod2.h"
 
 #include "omalloc/omalloc.h"

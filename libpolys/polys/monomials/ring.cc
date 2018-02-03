@@ -6,7 +6,7 @@
 */
 
 /* includes */
-#include <math.h>
+#include <cmath>
 
 #include "omalloc/omalloc.h"
 
