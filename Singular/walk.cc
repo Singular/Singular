@@ -2302,7 +2302,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
       }
       for(j=0; j<nRing; j++)
       {
-        (*diff_weight1)[j] = floor(0.1*(*diff_weight1)[j] + 0.5);
+        (*diff_weight1)[j] = ((*diff_weight1)[j] + 5) / 10;
       }
     }
 
@@ -2317,7 +2317,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
       {
         (*curr_weight)[j] = (*diff_weight1)[j];
         j = MivAbsMaxArg(diff_weight1);
-        (*diff_weight1)[j] = floor(0.1*(*diff_weight1)[j] + 0.5);
+        (*diff_weight1)[j] = ((*diff_weight1)[j] + 5) / 10;
       }
     }
 
@@ -4560,7 +4560,7 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* orig_M, intvec* target_wei
           (*next_weight2)[i] = rand() % 60000 - 30000;
           weight_norm = weight_norm + (*next_weight2)[i]*(*next_weight2)[i];
         }
-        weight_norm = 1 + floor(sqrt(weight_norm));
+        weight_norm = 1 + static_cast<int>(sqrt(double(weight_norm)));
       }
       for(i=0; i<nV; i++)
       {
