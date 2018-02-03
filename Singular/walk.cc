@@ -117,159 +117,6 @@ inline static int* initS_2_R (int maxnr)
   return (int*)omAlloc0(maxnr*sizeof(int));
 }
 
-/************************************
- * construct the set s from F u {P} *
- ************************************/
-// unused
-/*
-static void initSSpecialCC (ideal F, ideal Q, ideal P,kStrategy strat)
-{
-  int   i,pos;
-
-  if (Q!=NULL) i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
-  else i=setmaxT;
-
-  strat->ecartS=initec(i);
-  strat->sevS=initsevS(i);
-  strat->S_2_R=initS_2_R(i);
-  strat->fromQ=NULL;
-  strat->Shdl=idInit(i,F->rank);
-  strat->S=strat->Shdl->m;
-
-  // - put polys into S -
-  if (Q!=NULL)
-  {
-    strat->fromQ=initec(i);
-    memset(strat->fromQ,0,i*sizeof(int));
-    for (i=0; i<IDELEMS(Q); i++)
-    {
-      if (Q->m[i]!=NULL)
-      {
-        LObject h;
-        h.p = pCopy(Q->m[i]);
-        //if (TEST_OPT_INTSTRATEGY)
-        //{
-        //  h.pCleardenom(); // also does a Content
-        //}
-        //else
-        //{
-        //  h.pNorm();
-        //}
-        strat->initEcart(&h);
-        if (rHasLocalOrMixedOrdering(currRing))
-        {
-          deleteHC(&h,strat);
-        }
-        if (h.p!=NULL)
-        {
-          if (strat->sl==-1)
-            pos =0;
-          else
-          {
-            pos = posInS(strat,strat->sl,h.p,h.ecart);
-          }
-          h.sev = pGetShortExpVector(h.p);
-          h.SetpFDeg();
-          strat->enterS(h,pos,strat, strat->tl+1);
-          enterT(h, strat);
-          strat->fromQ[pos]=1;
-        }
-      }
-    }
-  }
-  //- put polys into S -
-  for (i=0; i<IDELEMS(F); i++)
-  {
-    if (F->m[i]!=NULL)
-    {
-      LObject h;
-      h.p = pCopy(F->m[i]);
-      if (rHasGlobalOrdering(currRing))
-      {
-        //h.p=redtailBba(h.p,strat->sl,strat);
-        h.p=redtailBba(h.p,strat->sl,strat);
-      }
-      else
-      {
-        deleteHC(&h,strat);
-      }
-      strat->initEcart(&h);
-      if (h.p!=NULL)
-      {
-        if (strat->sl==-1)
-          pos =0;
-        else
-          pos = posInS(strat,strat->sl,h.p,h.ecart);
-        h.sev = pGetShortExpVector(h.p);
-        strat->enterS(h,pos,strat, strat->tl+1);
-        h.length = pLength(h.p);
-        h.SetpFDeg();
-        enterT(h,strat);
-      }
-    }
-  }
-#ifdef INITSSPECIAL
-  for (i=0; i<IDELEMS(P); i++)
-  {
-    if (P->m[i]!=NULL)
-    {
-      LObject h;
-      h.p=pCopy(P->m[i]);
-      strat->initEcart(&h);
-      h.length = pLength(h.p);
-      if (TEST_OPT_INTSTRATEGY)
-      {
-        h.pCleardenom();
-      }
-      else
-      {
-        h.pNorm();
-      }
-      if(strat->sl>=0)
-      {
-        if (rHasGlobalOrdering(currRing))
-        {
-          h.p=redBba(h.p,strat->sl,strat);
-          if (h.p!=NULL)
-            h.p=redtailBba(h.p,strat->sl,strat);
-        }
-        else
-        {
-          h.p=redMora(h.p,strat->sl,strat);
-          strat->initEcart(&h);
-        }
-        if(h.p!=NULL)
-        {
-          if (TEST_OPT_INTSTRATEGY)
-          {
-            h.pCleardenom();
-          }
-          else
-          {
-            h.is_normalized = 0;
-            h.pNorm();
-          }
-          h.sev = pGetShortExpVector(h.p);
-          h.SetpFDeg();
-          pos = posInS(strat->S,strat->sl,h.p,h.ecart);
-          enterpairsSpecial(h.p,strat->sl,h.ecart,pos,strat,strat->tl+1);
-          strat->enterS(h,pos,strat, strat->tl+1);
-          enterT(h,strat);
-        }
-      }
-      else
-      {
-        h.sev = pGetShortExpVector(h.p);
-        h.SetpFDeg();
-        strat->enterS(h,0,strat, strat->tl+1);
-        enterT(h,strat);
-      }
-    }
-  }
-#endif
-}
-*/
-
 /*****************
  *interreduce F  *
  *****************/
@@ -308,7 +155,6 @@ static ideal kInterRedCC(ideal F, ideal Q)
     strat->honey = TRUE;
   }
 
-  //initSCC(F,Q,strat);
   initS(F,Q,strat);
 
   /*
@@ -441,61 +287,6 @@ static void idString(ideal L, const char* st)
   Print(" %s;", pString(L->m[nL-1]));
 }
 #endif
-/*
-#if defined(CHECK_IDEAL_MWALK) || defined(ENDWALKS)
-static void headidString(ideal L, char* st)
-{
-  int i, nL = IDELEMS(L);
-
-  Print("\n//  ideal %s =  ", st);
-  for(i=0; i<nL-1; i++)
-  {
-    Print(" %s, ", pString(pHead(L->m[i])));
-  }
-  Print(" %s;", pString(pHead(L->m[nL-1])));
-}
-#endif
-
-#if defined(CHECK_IDEAL_MWALK) || defined(ENDWALKS)
-static void idElements(ideal L, char* st)
-{
-  int i, nL = IDELEMS(L);
-  int *K=(int *)omAlloc(nL*sizeof(int));
-
-  Print("\n//  #monoms of %s =  ", st);
-  for(i=0; i<nL; i++)
-  {
-    K[i] = pLength(L->m[i]);
-  }
-  int j, nsame;
-  // int  nk=0;
-  for(i=0; i<nL; i++)
-  {
-    if(K[i]!=0)
-    {
-      nsame = 1;
-      for(j=i+1; j<nL; j++)
-      {
-        if(K[j]==K[i])
-        {
-          nsame ++;
-          K[j]=0;
-        }
-      }
-      if(nsame == 1)
-      {
-        Print("%d, ",K[i]);
-      }
-      else
-      {
-        Print("%d[%d], ", K[i], nsame);
-      }
-    }
-  }
-  omFree(K);
-}
-#endif
-*/
 
 static void ivString(intvec* iv, const char* ch)
 {
@@ -558,38 +349,6 @@ static inline long gcd(const long a, const long b)
   return p0;
 }
 
-/*****************************************************************************
- * compute the gcd of the entries of the vectors curr_weight and diff_weight *
- *****************************************************************************/
-/* unused:
-static int simplify_gcd(intvec* curr_weight, intvec* diff_weight)
-{
-  int j;
-  int nRing = currRing->N;
-  int gcd_tmp = (*curr_weight)[0];
-  for (j=1; j<nRing; j++)
-  {
-    gcd_tmp = gcd(gcd_tmp, (*curr_weight)[j]);
-    if(gcd_tmp == 1)
-    {
-      break;
-    }
-  }
-  if(gcd_tmp != 1)
-  {
-    for (j=0; j<nRing; j++)
-    {
-    gcd_tmp = gcd(gcd_tmp, (*diff_weight)[j]);
-    if(gcd_tmp == 1)
-      {
-        break;
-      }
-    }
-  }
-  return gcd_tmp;
-}
-*/
-
 /*********************************************
  * cancel gcd of integers zaehler and nenner *
  *********************************************/
@@ -605,23 +364,6 @@ static void cancel(mpz_t zaehler, mpz_t nenner)
 
   mpz_clear(g);
 }
-
-//unused
-#if 0
-static int isVectorNeg(intvec* omega)
-{
-  int i;
-
-  for(i=omega->length(); i>=0; i--)
-  {
-    if((*omega)[i]<0)
-    {
-      return 1;
-    }
-  }
-  return 0;
-}
-#endif
 
 /********************************************************************
  * compute a weight degree of a monomial p w.r.t. a weight_vector   *
@@ -1035,53 +777,6 @@ intvec* Mivlp(int nR)
   return ivm;
 }
 
-//unused
-/*****************************************************************************
- * print the max total degree and the max coefficient of G                   *
- *****************************************************************************/
-/*
-static void checkComplexity(ideal G, char* cG)
-{
-  int nV = currRing->N;
-  int nG = IDELEMS(G);
-  intvec* ivUnit = Mivdp(nV);
-  int i, tmpdeg, maxdeg=0;
-  number tmpcoeff , maxcoeff=nInit(0);
-  poly p;
-  for(i=nG-1; i>=0; i--)
-  {
-    tmpdeg = MwalkWeightDegree(G->m[i], ivUnit);
-    if(tmpdeg > maxdeg )
-    {
-      maxdeg = tmpdeg;
-    }
-  }
-
-  for(i=nG-1; i>=0; i--)
-  {
-    p = pCopy(G->m[i]);
-    while(p != NULL)
-    {
-      //tmpcoeff = pGetCoeff(pHead(p));
-      tmpcoeff = pGetCoeff(p);
-      if(nGreater(tmpcoeff,maxcoeff))
-      {
-         maxcoeff = nCopy(tmpcoeff);
-      }
-      pIter(p);
-    }
-    pDelete(&p);
-  }
-  p = pNSet(maxcoeff);
-  char* pStr = pString(p);
-  delete ivUnit;
-  Print("// max total degree of %s = %d\n",cG, maxdeg);
-  Print("// max coefficient of %s  = %s", cG, pStr);//ing(p));
-  Print(" which consists of %d digits", (int)strlen(pStr));
-  PrintLn();
-}
-*/
-
 /*****************************************************************************
 * If target_ord = intmat(A1, ..., An) then calculate the perturbation        *
 * vectors                                                                    *
@@ -1482,25 +1177,6 @@ intvec* MivWeightOrderdp(intvec* ivstart)
   return(ivM);
 }
 
-//unused
-/*
-static intvec* MatrixOrderdp(int nV)
-{
-  int i;
-  intvec* ivM = new intvec(nV*nV);
-
-  for(i=0; i<nV; i++)
-  {
-    (*ivM)[i] = 1;
-  }
-  for(i=1; i<nV; i++)
-  {
-    (*ivM)[(i+1)*nV - i] = -1;
-  }
-  return(ivM);
-}
-*/
-
 intvec* MivUnit(int nV)
 {
   int i;
@@ -1592,7 +1268,6 @@ intvec* Mfpertvector(ideal G, intvec* ivtarget)
   }
 
   mpz_t ztmp; mpz_init(ztmp);
-  // BOOLEAN isneg = FALSE;
 
   for(i=1; i<nV; i++)
   {
@@ -1759,50 +1434,6 @@ static ideal MLifttwoIdeal(ideal Gw, ideal M, ideal G)
   return F;
 }
 
-//unused
-/*
-static void checkidealCC(ideal G, char* Ch)
-{
-  int i,nmon=0,ntmp;
-  int nG = IDELEMS(G);
-  int n = nG-1;
-  Print("\n// ** Ideal %s besteht aus %d Polynomen mit ", Ch, nG);
-
-  for(i=0; i<nG; i++)
-  {
-    ntmp =  pLength(G->m[i]);
-    nmon += ntmp;
-
-    if(i != n)
-    {
-      Print("%d, ", ntmp);
-    }
-    else
-    {
-      Print(" bzw. %d ", ntmp);
-    }
-  }
-  PrintS(" Monomen.\n");
-  Print("// ** %s besitzt %d Monome.", Ch, nmon);
-  PrintLn();
-}
-*/
-
-//unused
-/*
-static void HeadidString(ideal L, char* st)
-{
-  int i, nL = IDELEMS(L)-1;
-
-  Print("//  The head terms of the ideal %s = ", st);
-  for(i=0; i<nL; i++)
-  {
-    Print(" %s, ", pString(pHead(L->m[i])));
-  }
-  Print(" %s;\n", pString(pHead(L->m[nL])));
-}
-
-*/
 static inline int MivComp(intvec* iva, intvec* ivb)
 {
   assume(iva->length() == ivb->length());
@@ -1875,364 +1506,6 @@ static int MivAbsMaxArg(intvec* vec)
  * Compute a next weight vector between curr_weight and target_weight *
  * with respect to an ideal <G>.                                      *
 **********************************************************************/
-/*
-static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
-                                 ideal G)
-{
-  BOOLEAN nError = Overflow_Error;
-  Overflow_Error = FALSE;
-
-  assume(currRing != NULL && curr_weight != NULL &&
-         target_weight != NULL && G != NULL);
-
-  int nRing = currRing->N;
-  int checkRed, j, nG = IDELEMS(G);
-  intvec* ivtemp;
-
-  mpz_t t_zaehler, t_nenner;
-  mpz_init(t_zaehler);
-  mpz_init(t_nenner);
-
-  mpz_t s_zaehler, s_nenner, temp, MwWd;
-  mpz_init(s_zaehler);
-  mpz_init(s_nenner);
-  mpz_init(temp);
-  mpz_init(MwWd);
-
-  mpz_t sing_int;
-  mpz_init(sing_int);
-  mpz_set_ui(sing_int,  2147483647);
-
-  mpz_t sing_int_half;
-  mpz_init(sing_int_half);
-  mpz_set_ui(sing_int_half,  3*(1073741824/2));
-
-  mpz_t deg_w0_p1, deg_d0_p1;
-  mpz_init(deg_w0_p1);
-  mpz_init(deg_d0_p1);
-
-  mpz_t sztn, sntz;
-  mpz_init(sztn);
-  mpz_init(sntz);
-
-  mpz_t t_null;
-  mpz_init(t_null);
-
-  mpz_t ggt;
-  mpz_init(ggt);
-
-  mpz_t dcw;
-  mpz_init(dcw);
-
-  int gcd_tmp;
-  intvec* diff_weight = MivSub(target_weight, curr_weight);
-
-  intvec* diff_weight1 = MivSub(target_weight, curr_weight);
-  poly g;
-
-  for (j=0; j<nG; j++)
-  {
-    g = G->m[j];
-    if (g != NULL)
-    {
-      ivtemp = MExpPol(g);
-      mpz_set_si(deg_w0_p1, MivDotProduct(ivtemp, curr_weight));
-      mpz_set_si(deg_d0_p1, MivDotProduct(ivtemp, diff_weight));
-      delete ivtemp;
-
-      pIter(g);
-      while (g != NULL)
-      {
-        ivtemp = MExpPol(g);
-        mpz_set_si(MwWd, MivDotProduct(ivtemp, curr_weight));
-        mpz_sub(s_zaehler, deg_w0_p1, MwWd);
-        if(mpz_cmp(s_zaehler, t_null) != 0)
-        {
-          mpz_set_si(MwWd, MivDotProduct(ivtemp, diff_weight));
-          mpz_sub(s_nenner, MwWd, deg_d0_p1);
-          // check for 0 < s <= 1
-          if( (mpz_cmp(s_zaehler,t_null) > 0 &&
-               mpz_cmp(s_nenner, s_zaehler)>=0) ||
-              (mpz_cmp(s_zaehler, t_null) < 0 &&
-               mpz_cmp(s_nenner, s_zaehler)<=0))
-          {
-            // make both positive
-            if (mpz_cmp(s_zaehler, t_null) < 0)
-            {
-              mpz_neg(s_zaehler, s_zaehler);
-              mpz_neg(s_nenner, s_nenner);
-            }
-
-            //compute a simple fraction of s
-            cancel(s_zaehler, s_nenner);
-
-            if(mpz_cmp(t_nenner, t_null) != 0)
-            {
-              mpz_mul(sztn, s_zaehler, t_nenner);
-              mpz_mul(sntz, s_nenner, t_zaehler);
-
-              if(mpz_cmp(sztn,sntz) < 0)
-              {
-                mpz_add(t_nenner, t_null, s_nenner);
-                mpz_add(t_zaehler,t_null, s_zaehler);
-              }
-            }
-            else
-            {
-              mpz_add(t_nenner, t_null, s_nenner);
-              mpz_add(t_zaehler,t_null, s_zaehler);
-            }
-          }
-        }
-        pIter(g);
-        delete ivtemp;
-      }
-    }
-  }
-  //Print("\n// Alloc Size = %d \n", nRing*sizeof(mpz_t));
-  mpz_t *vec=(mpz_t*)omAlloc(nRing*sizeof(mpz_t));
-
-
-  // there is no 0<t<1 and define the next weight vector that is equal
-  // to the current weight vector
-  if(mpz_cmp(t_nenner, t_null) == 0)
-  {
-#ifndef SING_NDEBUG
-    PrintS("\n//MwalkNextWeightCC: t_nenner=0\n");
-#endif
-    delete diff_weight;
-    diff_weight = ivCopy(curr_weight);//take memory
-    goto FINISH;
-  }
-
-  // define the target vector as the next weight vector, if t = 1
-  if(mpz_cmp_si(t_nenner, 1)==0 && mpz_cmp_si(t_zaehler,1)==0)
-  {
-    delete diff_weight;
-    diff_weight = ivCopy(target_weight); //this takes memory
-    goto FINISH;
-  }
-
-   checkRed = 0;
-
-  SIMPLIFY_GCD:
-
-  // simplify the vectors curr_weight and diff_weight (C-int)
-  gcd_tmp = (*curr_weight)[0];
-
-  for (j=1; j<nRing; j++)
-  {
-    gcd_tmp = gcd(gcd_tmp, (*curr_weight)[j]);
-    if(gcd_tmp == 1)
-    {
-      break;
-    }
-  }
-  if(gcd_tmp != 1)
-  {
-    for (j=0; j<nRing; j++)
-    {
-      gcd_tmp = gcd(gcd_tmp, (*diff_weight)[j]);
-      if(gcd_tmp == 1)
-      {
-        break;
-      }
-    }
-  }
-  if(gcd_tmp != 1)
-  {
-    for (j=0; j<nRing; j++)
-    {
-      (*curr_weight)[j] =  (*curr_weight)[j]/gcd_tmp;
-      (*diff_weight)[j] =  (*diff_weight)[j]/gcd_tmp;
-    }
-  }
-  if(checkRed > 0)
-  {
-    for (j=0; j<nRing; j++)
-    {
-      mpz_set_si(vec[j], (*diff_weight)[j]);
-    }
-    goto TEST_OVERFLOW;
-  }
-
-#ifdef  NEXT_VECTORS_CC
-  Print("\n// gcd of the weight vectors (current and target) = %d", gcd_tmp);
-  ivString(curr_weight, "new cw");
-  ivString(diff_weight, "new dw");
-
-  PrintS("\n// t_zaehler: ");  mpz_out_str( stdout, 10, t_zaehler);
-  PrintS(", t_nenner: ");  mpz_out_str( stdout, 10, t_nenner);
-#endif
-
-// construct a new weight vector and check whether vec[j] is overflow,
-// i.e. vec[j] > 2^31.
-// If vec[j] doesn't overflow, define a weight vector. Otherwise,
-// report that overflow appears. In the second case, test whether the
-// the correctness of the new vector plays an important role
-
-  for (j=0; j<nRing; j++)
-  {
-    mpz_set_si(dcw, (*curr_weight)[j]);
-    mpz_mul(s_nenner, t_nenner, dcw);
-
-    if( (*diff_weight)[j]>0)
-    {
-      mpz_mul_ui(s_zaehler, t_zaehler, (*diff_weight)[j]);
-    }
-    else
-    {
-      mpz_mul_ui(s_zaehler, t_zaehler, -(*diff_weight)[j]);
-      mpz_neg(s_zaehler, s_zaehler);
-    }
-    mpz_add(sntz, s_nenner, s_zaehler);
-    mpz_init_set(vec[j], sntz);
-
-#ifdef NEXT_VECTORS_CC
-    Print("\n//   j = %d ==> ", j);
-    PrintS("(");
-    mpz_out_str( stdout, 10, t_nenner);
-    Print(" * %d)", (*curr_weight)[j]);
-    PrintS(" + ("); mpz_out_str( stdout, 10, t_zaehler);
-    Print(" * %d) =  ",  (*diff_weight)[j]);
-    mpz_out_str( stdout, 10, s_nenner);
-    PrintS(" + ");
-    mpz_out_str( stdout, 10, s_zaehler);
-    PrintS(" = "); mpz_out_str( stdout, 10, sntz);
-    Print(" ==> vector[%d]: ", j); mpz_out_str(stdout, 10, vec[j]);
-#endif
-
-    if(j==0)
-    {
-      mpz_set(ggt, sntz);
-    }
-    else
-    {
-      if(mpz_cmp_si(ggt,1) != 0)
-      {
-        mpz_gcd(ggt, ggt, sntz);
-      }
-    }
-  }
-  // reduce the vector with the gcd
-  if(mpz_cmp_si(ggt,1) != 0)
-  {
-    for (j=0; j<nRing; j++)
-    {
-      mpz_divexact(vec[j], vec[j], ggt);
-    }
-  }
-#ifdef  NEXT_VECTORS_CC
-  PrintS("\n// gcd of elements of the vector: ");
-  mpz_out_str( stdout, 10, ggt);
-#endif
-
-  for(j=0; j<nRing; j++)
-  {
-    if(mpz_cmp(vec[j], sing_int_half) >= 0)
-    {
-      goto REDUCTION;
-    }
-  }
-  checkRed = 1;
-  for (j=0; j<nRing; j++)
-    {
-      (*diff_weight)[j] = mpz_get_si(vec[j]);
-    }
-  goto SIMPLIFY_GCD;
-
-  REDUCTION:
-  checkRed = 1;
-  for (j=0; j<nRing; j++)
-  {
-    (*diff_weight1)[j] = mpz_get_si(vec[j]);
-  }
-  while(test_w_in_ConeCC(G,diff_weight1))
-  {
-    for(j=0; j<nRing; j++)
-    {
-      (*diff_weight)[j] = (*diff_weight1)[j];
-      mpz_set_si(vec[j], (*diff_weight)[j]);
-    }
-    for(j=0; j<nRing; j++)
-    {
-      (*diff_weight1)[j] = floor(0.1*(*diff_weight)[j] + 0.5);
-    }
-  }
-  if(MivAbsMax(diff_weight)>10000)
-  {
-    for(j=0; j<nRing; j++)
-    {
-      (*diff_weight1)[j] = (*diff_weight)[j];
-    }
-    j = 0;
-    while(test_w_in_ConeCC(G,diff_weight1))
-    {
-      (*diff_weight)[j] = (*diff_weight1)[j];
-      mpz_set_si(vec[j], (*diff_weight)[j]);
-      j = MivAbsMaxArg(diff_weight1);
-      (*diff_weight1)[j] = floor(0.1*(*diff_weight1)[j] + 0.5);
-    }
-    goto SIMPLIFY_GCD;
-  }
-
- TEST_OVERFLOW:
-
-  for (j=0; j<nRing; j++)
-  {
-    if(mpz_cmp(vec[j], sing_int)>=0)
-    {
-      if(Overflow_Error == FALSE)
-      {
-        Overflow_Error = TRUE;
-        PrintS("\n// ** OVERFLOW in \"MwalkNextWeightCC\": ");
-        mpz_out_str( stdout, 10, vec[j]);
-        PrintS(" is greater than 2147483647 (max. integer representation)\n");
-        //Print("//  So vector[%d] := %d is wrong!!\n",j+1, vec[j]);// vec[j] is mpz_t
-      }
-    }
-  }
-
- FINISH:
-   delete diff_weight1;
-   mpz_clear(t_zaehler);
-   mpz_clear(t_nenner);
-   mpz_clear(s_zaehler);
-   mpz_clear(s_nenner);
-   mpz_clear(sntz);
-   mpz_clear(sztn);
-   mpz_clear(temp);
-   mpz_clear(MwWd);
-   mpz_clear(deg_w0_p1);
-   mpz_clear(deg_d0_p1);
-   mpz_clear(ggt);
-   omFree(vec);
-   mpz_clear(sing_int_half);
-   mpz_clear(sing_int);
-   mpz_clear(dcw);
-   mpz_clear(t_null);
-
-  if(Overflow_Error == FALSE)
-  {
-    Overflow_Error = nError;
-  }
-  rComplete(currRing);
-  for(j=0; j<IDELEMS(G); j++)
-  {
-    poly p=G->m[j];
-    while(p!=NULL)
-    {
-      p_Setm(p,currRing);
-      pIter(p);
-    }
-  }
-return diff_weight;
-}
-*/
-/**********************************************************************
- * Compute a next weight vector between curr_weight and target_weight *
- * with respect to an ideal <G>.                                      *
-**********************************************************************/
 static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
                                  ideal G)
 {
@@ -2282,7 +1555,6 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
   mpz_init(dcw);
 
   int gcd_tmp;
-  //intvec* diff_weight = MivSub(target_weight, curr_weight);
 
   intvec* diff_weight1 = new intvec(nRing); //MivSub(target_weight, curr_weight);
   poly g;
@@ -2600,88 +1872,6 @@ intvec* MkInterRedNextWeight(intvec* iva, intvec* ivb, ideal G)
   return result;
 }
 
-/********************************************************************
- * define and execute a new ring which order is (a(vb),a(va),lp,C)  *
- * ******************************************************************/
-/*static ring VMrHomogeneous(intvec* va, intvec* vb)
-{
-
-  if ((currRing->ppNoether)!=NULL)
-  {
-    pDelete(&(currRing->ppNoether));
-  }
-  if (((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING)) ||
-      ((sLastPrinted.rtyp==LIST_CMD)&&(lRingDependend((lists)sLastPrinted.data))))
-  {
-    sLastPrinted.CleanUp();
-  }
-
-  ring r = (ring) omAlloc0Bin(sip_sring_bin);
-  int i, nv = currRing->N;
-
-  r->cf  = currRing->cf;
-  r->N   = currRing->N;
-  int nb = 4;
-
-
-  //names
-  char* Q; // In order to avoid the corrupted memory, do not change.
-  r->names = (char **) omAlloc0(nv * sizeof(char_ptr));
-  for(i=0; i<nv; i++)
-  {
-    Q = currRing->names[i];
-    r->names[i]  = omStrDup(Q);
-  }
-
-  //weights: entries for 3 blocks: NULL Made:???
-  r->wvhdl = (int **)omAlloc0(nb * sizeof(int_ptr));
-  r->wvhdl[0] = (int*) omAlloc(nv*sizeof(int));
-  r->wvhdl[1] = (int*) omAlloc((nv)*sizeof(int));
-
-  for(i=0; i<nv; i++)
-  {
-    r->wvhdl[1][i] = (*vb)[i];
-    r->wvhdl[0][i] = (*va)[i];
-  }
-  r->wvhdl[0][nv] = (*va)[nv];
-
-  // order: (1..1),a,lp,C
-  r->order = (int *) omAlloc(nb * sizeof(int *));
-  r->block0 = (int *)omAlloc0(nb * sizeof(int *));
-  r->block1 = (int *)omAlloc0(nb * sizeof(int *));
-
-  // ringorder a for the first block: var 1..nv
-  r->order[0]  = ringorder_a;
-  r->block0[0] = 1;
-  r->block1[0] = nv;
-
- // ringorder a for the second block: var 2..nv
-  r->order[1]  = ringorder_a;
-  r->block0[1] = 1;
-  r->block1[1] = nv;
-
-  // ringorder lp for the third block: var 2..nv
-  r->order[2]  = ringorder_lp;
-  r->block0[2] = 1;
-  r->block1[2] = nv;
-
-  // ringorder C for the 4th block
-  // it is very important within "idLift",
-  // especially, by ring syz_ring=rCurrRingAssure_SyzComp();
-  // therefore, nb  must be (nBlocks(currRing)  + 1)
-  r->order[3]  = ringorder_C;
-
-  // polynomial ring
-  r->OrdSgn    = 1;
-
-  // complete ring intializations
-
-  rComplete(r);
-  return r;
-  //rChangeCurrRing(r);
-}
-*/
-
 /**************************************************************
  * define and execute a new ring which order is (a(va),lp,C)  *
  * ************************************************************/
@@ -2785,7 +1975,6 @@ static ring VMrRefine(intvec* va, intvec* vb)
   r->order[4]  = (rRingOrder_t)0;
 
   // complete ring intializations
-
   rComplete(r);
 
   //rChangeCurrRing(r);
@@ -2836,7 +2025,6 @@ static ring VMatrDefault(intvec* va)
   r->order[3]  = (rRingOrder_t)0;
 
   // complete ring intializations
-
   rComplete(r);
 
   //rChangeCurrRing(r);
@@ -2893,7 +2081,6 @@ static ring VMatrRefine(intvec* va, intvec* vb)
   r->order[3]  = (rRingOrder_t)0;
 
   // complete ring intializations
-
   rComplete(r);
 
   //rChangeCurrRing(r);
@@ -2934,7 +2121,6 @@ static void VMrDefaultlp(void)
   r->OrdSgn    = 1;
 
   /* complete ring intializations */
-
   rComplete(r);
 
   rChangeCurrRing(r);
@@ -2985,7 +2171,6 @@ static void DefRingPar(intvec* va)
   // polynomial ring
   res->OrdSgn    = 1;
 
-
   // complete ring intializations
   rComplete(res);
 
@@ -3024,44 +2209,12 @@ static void DefRingParlp(void)
   /*polynomial ring*/
   r->OrdSgn    = 1;
 
-
-//   if (rParameter(currRing)!=NULL)
-//   {
-//     r->cf->extRing->qideal->m[0]=p_Copy(currRing->cf->extRing->qideal->m[0], currRing->cf->extRing);
-//     int l=rPar(currRing);
-//     r->cf->extRing->names=(char **)omAlloc(l*sizeof(char_ptr));
-//
-//     for(int i=l-1;i>=0;i--)
-//     {
-//       rParameter(r)[i]=omStrDup(rParameter(currRing)[i]);
-//     }
-//   }
-
   // complete ring intializations
-
   rComplete(r);
 
   // execute the created ring
   rChangeCurrRing(r);
 }
-
-/*************************************************************
- * check whether one or more components of a vector are zero *
- *************************************************************/
-/* unused:
-static int isNolVector(intvec* hilb)
-{
-  int i;
-  for(i=hilb->length()-1; i>=0; i--)
-  {
-    if((* hilb)[i]==0)
-    {
-      return 1;
-    }
-  }
-  return 0;
-}
-*/
 
 /*************************************************************
  * check whether one or more components of a vector are <= 0 *
@@ -3396,20 +2549,6 @@ static ideal LastGB(ideal G, intvec* curr_weight,int tp_deg)
   {
     if(nlast == 1)
     {
-      //OMEGA_OVERFLOW_LASTGB:
-      /*
-      if(MivSame(curr_weight, iv_lp) == 1)
-        if (rParameter(currRing) != NULL)
-          DefRingParlp();
-        else
-          VMrDefaultlp();
-      else
-        if (rParameter(currRing) != NULL)
-          DefRingPar(curr_weight);
-        else
-          VMrDefault(curr_weight);
-      */
-
         //..25.03.03 VMrDefaultlp();//define and execute the ring "lp"
         if (rParameter (currRing) != NULL)
         {
@@ -3547,15 +2686,6 @@ static inline int test_G_GB_walk(ideal H0, ideal H1)
   }
   for(i=nG-1; i>=0; i--)
   {
-/*
-    poly t;
-    if((t=pSub(pCopy(H0->m[i]), pCopy(H1->m[i]))) != NULL)
-    {
-      pDelete(&t);
-      return 0;
-    }
-    pDelete(&t);
-*/
     if(!pEqualPolys(H0->m[i],H1->m[i]))
     {
       return 0;
@@ -3563,369 +2693,6 @@ static inline int test_G_GB_walk(ideal H0, ideal H1)
   }
   return 1;
 }
-
-//unused
-/*****************************************************
- * find the maximal total degree of polynomials in G *
- *****************************************************/
-/*
-static int Trandegreebound(ideal G)
-{
-  int i, nG = IDELEMS(G);
-  // int np=1;
-  int nV = currRing->N;
-  int degtmp, result = 0;
-  intvec* ivUnit = Mivdp(nV);
-
-  for(i=nG-1; i>=0; i--)
-  {
-    // find the maximal total degree of the polynomial G[i]
-    degtmp = MwalkWeightDegree(G->m[i], ivUnit);
-    if(degtmp > result)
-    {
-      result = degtmp;
-    }
-  }
-  delete ivUnit;
-  return result;
-}
-*/
-
-//unused
-/************************************************************************
- * perturb the weight vector iva w.r.t. the ideal G.                    *
- *  the monomial order of the current ring is the w_1 weight lex. order *
- *  define w := d^(n-1)w_1+ d^(n-2)w_2, ...+ dw_(n-1)+ w_n              *
- *  where d := 1 + max{totdeg(g):g in G}*m, or                          *
- *  d := (2*maxdeg*maxdeg + (nV+1)*maxdeg)*m;                           *
- ************************************************************************/
-#if 0
-static intvec* TranPertVector(ideal G, intvec* iva)
-{
-  BOOLEAN nError = Overflow_Error;
-  Overflow_Error = FALSE;
-
-  int i, j;
-  // int nG = IDELEMS(G);
-  int nV = currRing->N;
-
-  // define the sequence which expresses the current monomial ordering
-  // w_1 = iva; w_2 = (1,0,..,0); w_n = (0,...,0,1,0)
-  intvec* ivMat = MivMatrixOrder(iva);
-
-  int  mtmp, m=(*iva)[0];
-
-  for(i=ivMat->length(); i>=0; i--)
-  {
-    mtmp = (*ivMat)[i];
-    if(mtmp <0)
-    {
-      mtmp = -mtmp;
-    }
-    if(mtmp > m)
-    {
-      m = mtmp;
-    }
-  }
-
-  // define the maximal total degree of polynomials of G
-  mpz_t ndeg;
-  mpz_init(ndeg);
-
- // 12 Juli 03
-#ifndef UPPER_BOUND
-  mpz_set_si(ndeg, Trandegreebound(G)+1);
-#else
-  mpz_t ztmp;
-  mpz_init(ztmp);
-
-  mpz_t maxdeg;
-  mpz_init_set_si(maxdeg, Trandegreebound(G));
-
-  //ndeg = (2*maxdeg*maxdeg + (nV+1)*maxdeg)*m;//Kalkbrenner (1999)
-  mpz_pow_ui(ztmp, maxdeg, 2);
-  mpz_mul_ui(ztmp, ztmp, 2);
-  mpz_mul_ui(maxdeg, maxdeg, nV+1);
-  mpz_add(ndeg, ztmp, maxdeg);
-  mpz_mul_ui(ndeg, ndeg, m);
-
-  mpz_clear(ztmp);
-
-  //PrintS("\n// with the new upper degree bound (2d^2+(n+1)d)*m ");
-  //Print("\n//         where d = %d, n = %d and bound = %d", maxdeg, nV, ndeg);
-#endif //UPPER_BOUND
-
-#ifdef INVEPS_SMALL_IN_TRAN
-  if(mpz_cmp_ui(ndeg, nV)>0 && nV > 3)
-  {
-    mpz_cdiv_q_ui(ndeg, ndeg, nV);
-  }
- //PrintS("\n// choose the \"small\" inverse epsilon:");
- //mpz_out_str(stdout, 10, ndeg);
-#endif
-  mpz_t deg_tmp;
-  mpz_init_set(deg_tmp, ndeg);
-
-  mpz_t *ivres=( mpz_t *) omAlloc(nV*sizeof(mpz_t));
-  mpz_init_set_ui(ivres[nV-1],1);
-
-  for(i=nV-2; i>=0; i--)
-  {
-    mpz_init_set(ivres[i], deg_tmp);
-    mpz_mul(deg_tmp, deg_tmp, ndeg);
-  }
-
-  mpz_t *ivtmp=(mpz_t *)omAlloc(nV*sizeof(mpz_t));
-  for(i=0; i<nV; i++)
-  {
-    mpz_init(ivtmp[i]);
-  }
-  mpz_t sing_int;
-  mpz_init_set_ui(sing_int,  2147483647);
-
-  intvec* repr_vector = new intvec(nV);
-
-  // define ivtmp := ndeg^(n-1).w_1 + ndeg^(n-2).w_2 + ... + w_n
-  for(i=0; i<nV; i++)
-  {
-    for(j=0; j<nV; j++)
-    {
-      if( (*ivMat)[i*nV+j] >= 0 )
-      {
-        mpz_mul_ui(ivres[i], ivres[i], (*ivMat)[i*nV+j]);
-      }
-      else
-      {
-        mpz_mul_ui(ivres[i], ivres[i], -(*ivMat)[i*nV+j]);
-        mpz_neg(ivres[i], ivres[i]);
-      }
-      mpz_add(ivtmp[j], ivtmp[j], ivres[i]);
-    }
-  }
-  delete ivMat;
-
-  int ntrue=0;
-  for(i=0; i<nV; i++)
-  {
-    (*repr_vector)[i] = mpz_get_si(ivtmp[i]);
-    if(mpz_cmp(ivtmp[i], sing_int)>=0)
-    {
-      ntrue++;
-      if(Overflow_Error == FALSE)
-      {
-        Overflow_Error = TRUE;
-
-        PrintS("\n// ** OVERFLOW in \"Repr.Vector\": ");
-        mpz_out_str( stdout, 10, ivtmp[i]);
-        PrintS(" is greater than 2147483647 (max. integer representation)");
-        Print("\n//  So vector[%d] := %d is wrong!!\n",i+1,(*repr_vector)[i]);
-      }
-    }
-  }
-  if(Overflow_Error == TRUE)
-  {
-    ivString(repr_vector, "repvector");
-    Print("\n// %d element(s) of it are overflow!!", ntrue);
-  }
-
-  if(Overflow_Error == FALSE)
-    Overflow_Error=nError;
-
-  omFree(ivres);
-  omFree(ivtmp);
-
-  mpz_clear(sing_int);
-  mpz_clear(deg_tmp);
-  mpz_clear(ndeg);
-
-  return repr_vector;
-}
-#endif
-
-//unused
-#if 0
-static intvec* TranPertVector_lp(ideal G)
-{
-  BOOLEAN nError = Overflow_Error;
-  Overflow_Error = FALSE;
-  // int j, nG = IDELEMS(G);
-  int i;
-  int nV = currRing->N;
-
-  // define the maximal total degree of polynomials of G
-  mpz_t ndeg;
-  mpz_init(ndeg);
-
- // 12 Juli 03
-#ifndef UPPER_BOUND
-  mpz_set_si(ndeg, Trandegreebound(G)+1);
-#else
-  mpz_t ztmp;
-  mpz_init(ztmp);
-
-  mpz_t maxdeg;
-  mpz_init_set_si(maxdeg, Trandegreebound(G));
-
-  //ndeg = (2*maxdeg*maxdeg + (nV+1)*maxdeg);//Kalkbrenner (1999)
-  mpz_pow_ui(ztmp, maxdeg, 2);
-  mpz_mul_ui(ztmp, ztmp, 2);
-  mpz_mul_ui(maxdeg, maxdeg, nV+1);
-  mpz_add(ndeg, ztmp, maxdeg);
-  // PrintS("\n// with the new upper degree bound (2d^2+(n+1)d)*m ");
-  // Print("\n//         where d = %d, n = %d and bound = %d",
-  // mpz_get_si(maxdeg), nV, mpz_get_si(ndeg));
-
- mpz_clear(ztmp);
-
-#endif
-
-#ifdef INVEPS_SMALL_IN_TRAN
- if(mpz_cmp_ui(ndeg, nV)>0 && nV > 3)
-    mpz_cdiv_q_ui(ndeg, ndeg, nV);
-
- //PrintS("\n// choose the \"small\" inverse epsilon:");
- // mpz_out_str(stdout, 10, ndeg);
-#endif
-
-  mpz_t deg_tmp;
-  mpz_init_set(deg_tmp, ndeg);
-
-  mpz_t *ivres=(mpz_t *)omAlloc(nV*sizeof(mpz_t));
-  mpz_init_set_ui(ivres[nV-1], 1);
-
-  for(i=nV-2; i>=0; i--)
-  {
-    mpz_init_set(ivres[i], deg_tmp);
-    mpz_mul(deg_tmp, deg_tmp, ndeg);
-  }
-
-  mpz_t sing_int;
-  mpz_init_set_ui(sing_int,  2147483647);
-
-  intvec* repr_vector = new intvec(nV);
-  int ntrue=0;
-  for(i=0; i<nV; i++)
-  {
-    (*repr_vector)[i] = mpz_get_si(ivres[i]);
-
-    if(mpz_cmp(ivres[i], sing_int)>=0)
-    {
-      ntrue++;
-      if(Overflow_Error == FALSE)
-      {
-        Overflow_Error = TRUE;
-        PrintS("\n// ** OVERFLOW in \"Repr.Vector\": ");
-        mpz_out_str( stdout, 10, ivres[i]);
-        PrintS(" is greater than 2147483647 (max. integer representation)");
-        Print("\n//  So vector[%d] := %d is wrong!!\n",i+1,(*repr_vector)[i]);
-      }
-    }
-  }
-  if(Overflow_Error == TRUE)
-  {
-    ivString(repr_vector, "repvector");
-    Print("\n// %d element(s) of it are overflow!!", ntrue);
-  }
-  if(Overflow_Error == FALSE)
-    Overflow_Error = nError;
-
-  omFree(ivres);
-
-  mpz_clear(ndeg);
-  mpz_clear(sing_int);
-
-  return repr_vector;
-}
-#endif
-
-//unused
-#if 0
-static intvec* RepresentationMatrix_Dp(ideal G, intvec* M)
-{
-  BOOLEAN nError = Overflow_Error;
-  Overflow_Error = FALSE;
-
-  int i, j;
-  int nV = currRing->N;
-
-  intvec* ivUnit = Mivdp(nV);
-  int degtmp, maxdeg = 0;
-
-  for(i=IDELEMS(G)-1; i>=0; i--)
-  {
-    // find the maximal total degree of the polynomial G[i]
-    degtmp = MwalkWeightDegree(G->m[i], ivUnit);
-    if(degtmp > maxdeg)
-      maxdeg = degtmp;
-  }
-
-  mpz_t ztmp;
-  mpz_init_set_si(ztmp, maxdeg);
-  mpz_t *ivres=(mpz_t *)omAlloc(nV*sizeof(mpz_t));
-  mpz_init_set_ui(ivres[nV-1], 1); // (*ivres)[nV-1] = 1;
-
-  for(i=nV-2; i>=0; i--)
-  {
-    mpz_init_set(ivres[i], ztmp); //(*ivres)[i] = ztmp;
-    mpz_mul_ui(ztmp, ztmp, maxdeg); //ztmp *=maxdeg;
-  }
-
-  mpz_t *ivtmp=(mpz_t*)omAlloc(nV*sizeof(mpz_t));
-  for(i=0; i<nV; i++)
-    mpz_init(ivtmp[i]);
-
-  // define ivtmp := ndeg^(n-1).w_1 + ndeg^(n-2).w_2 + ... + w_n
-  for(i=0; i<nV; i++)
-    for(j=0; j<nV; j++)
-    {
-      if((*M)[i*nV+j] < 0)
-      {
-        mpz_mul_ui(ztmp, ivres[i], -(*M)[i*nV+j]);
-        mpz_neg(ztmp, ztmp);
-      }
-      else
-        mpz_mul_ui(ztmp, ivres[i], (*M)[i*nV+j]);
-
-      mpz_add(ivtmp[j], ivtmp[j], ztmp);
-    }
-  delete ivres;
-  mpz_t sing_int;
-  mpz_init_set_ui(sing_int,  2147483647);
-
-  int ntrue=0;
-  intvec* repvector = new intvec(nV);
-  for(i=0; i<nV; i++)
-  {
-    (*repvector)[i] = mpz_get_si(ivtmp[i]);
-    if(mpz_cmp(ivtmp[i], sing_int)>0)
-    {
-      ntrue++;
-      if(Overflow_Error == FALSE)
-      {
-        Overflow_Error = TRUE;
-        PrintS("\n// ** OVERFLOW in \"Repr.Matrix\": ");
-        mpz_out_str( stdout, 10, ivtmp[i]);
-        PrintS(" is greater than 2147483647 (max. integer representation)");
-        Print("\n//  So vector[%d] := %d is wrong!!\n",i+1,(*repvector)[i]);
-      }
-    }
-  }
-  if(Overflow_Error == TRUE)
-  {
-    ivString(repvector, "repvector");
-    Print("\n// %d element(s) of it are overflow!!", ntrue);
-  }
-
-  if(Overflow_Error == FALSE)
-    Overflow_Error = nError;
-
-  mpz_clear(sing_int);
-  mpz_clear(ztmp);
-  omFree(ivtmp);
-  omFree(ivres);
-  return repvector;
-}
-#endif
 
 /*****************************************************************************
  * The following subroutine is the implementation of our first improved      *
@@ -3959,7 +2726,6 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
   intvec* target_weight;
   intvec* ivNull = new intvec(nV); //define (0,...,0)
   ring EXXRing = currRing;
-  //int NEG=0; //19 juni 03
   intvec* next_weight;
 #ifndef  BUCHBERGER_ALG
   //08 Juli 03
@@ -4024,8 +2790,6 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
 
     if(Overflow_Error == TRUE)
     {
-      //nOverflow_Error = Overflow_Error;
-      //NEG = 1;
       newRing = currRing;
       goto JUNI_STD;
     }
@@ -4152,7 +2916,6 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
 
     if(MivComp(next_weight, ivNull) == 1)
     {
-      //newRing = currRing;
       delete next_weight;
       break;
     }
@@ -4166,7 +2929,6 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
       else
       {
         // REC_LAST_GB_ALT2:
-        //nOverflow_Error = Overflow_Error;
 #ifdef TIME_TEST
         tproc=tproc+clock()-tinput;
 #endif
@@ -4206,7 +2968,6 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
 
     if(nnwinC == 0 || test_w_in_ConeCC(F1, target_weight) != 1 )
     {
-      // nOverflow_Error = Overflow_Error;
       //Print("\n//  takes %d steps and calls \"Rec_LastGB (%d):", tp_deg+1);
 #ifdef TIME_TEST
       tproc=tproc+clock()-tinput;
@@ -4289,7 +3050,6 @@ ideal MAltwalk2(ideal Go, intvec* curr_weight, intvec* target_weight)
 {
   Set_Error(FALSE);
   Overflow_Error = FALSE;
-  //BOOLEAN nOverflow_Error = FALSE;
   //Print("// pSetm_Error = (%d)", ErrorCheck());
 #ifdef TIME_TEST
   xtif=0; xtstd=0; xtlift=0; xtred=0; xtnw=0; xtextra=0;
@@ -4299,15 +3059,10 @@ ideal MAltwalk2(ideal Go, intvec* curr_weight, intvec* target_weight)
   nstep = 0;
   int i, nV = currRing->N;
   int nwalk=0, endwalks=0;
-  // int nhilb = 1;
   ideal Gomega, M, F, Gomega1, Gomega2, M1, F1, G;
-  //ideal  G1;
-  //ring endRing;
   ring newRing, oldRing;
   intvec* ivNull = new intvec(nV);
   intvec* next_weight;
-  //intvec* extra_curr_weight = new intvec(nV);
-  //intvec* hilb_func;
   intvec* exivlp = Mivlp(nV);
   ring XXRing = currRing;
 
@@ -4340,15 +3095,6 @@ ideal MAltwalk2(ideal Go, intvec* curr_weight, intvec* target_weight)
 #ifdef TIME_TEST
     xtif=xtif+clock()-to;
 #endif
-/*
-    if(Overflow_Error == TRUE)
-    {
-      for(i=nV-1; i>=0; i--)
-        (*curr_weight)[i] = (*extra_curr_weight)[i];
-      delete extra_curr_weight;
-      goto LAST_GB_ALT2;
-    }
-*/
     oldRing = currRing;
 
     /* define a new ring that its ordering is "(a(curr_weight),lp) */
@@ -4454,7 +3200,6 @@ ideal MAltwalk2(ideal Go, intvec* curr_weight, intvec* target_weight)
       if(MivSame(target_weight, exivlp)==1)
       {
      // LAST_GB_ALT2:
-        //nOverflow_Error = Overflow_Error;
 #ifdef TIME_TEST
         tproc = clock()-xftinput;
 #endif
@@ -4470,7 +3215,6 @@ ideal MAltwalk2(ideal Go, intvec* curr_weight, intvec* target_weight)
 
     for(i=nV-1; i>=0; i--)
     {
-      //(*extra_curr_weight)[i] = (*curr_weight)[i];
       (*curr_weight)[i] = (*next_weight)[i];
     }
     delete next_weight;
@@ -4527,7 +3271,6 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* orig_M, intvec* target_wei
   assume(currRing != NULL && orig_M != NULL &&
          target_weight != NULL && G->m[0] != NULL);
 
-  //BOOLEAN nError = Overflow_Error;
   Overflow_Error = FALSE;
 
   BOOLEAN found_random_weight = FALSE;
@@ -5249,7 +3992,6 @@ ideal MwalkAlt(ideal Go, intvec* curr_weight, intvec* target_weight)
     MivString(curr_weight, target_weight, next_weight);
 #endif
 
-    //if(test_w_in_ConeCC(G, next_weight) != 1)
     if(Overflow_Error == TRUE)
     {
       newRing = currRing;
@@ -5338,13 +4080,7 @@ ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M,
   intvec* curr_weight = new intvec(nV);
   intvec* target_weight = new intvec(nV);
   intvec* exivlp = Mivlp(nV);
-/*
-  intvec* tmp_weight = new intvec(nV);
-  for(i=0; i<nV; i++)
-  {
-    (*tmp_weight)[i] = (*orig_M)[i];
-  }
-*/
+
   for(i=0; i<nV; i++)
   {
     (*curr_weight)[i] = (*orig_M)[i];
@@ -5380,12 +4116,11 @@ ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M,
   if(orig_M->length() == nV)
   {
     // define a new ring with ordering "(a(curr_weight),lp)
-    //newRing = VMrDefault(curr_weight);
     newRing=VMrRefine(target_weight, curr_weight);
   }
   else
   {
-    newRing = VMatrRefine(target_M,curr_weight); //newRing = VMatrDefault(orig_M);
+    newRing = VMatrRefine(target_M,curr_weight);
   }
   rChangeCurrRing(newRing);
   if(printout > 2)
@@ -5452,12 +4187,11 @@ ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M,
       if(orig_M->length() == nV)
       {
         // define a new ring with ordering "(a(curr_weight),lp)
-        //newRing = VMrDefault(curr_weight);
         newRing=VMrRefine(target_weight, curr_weight);
       }
       else
       {
-        newRing = VMatrRefine(target_M,curr_weight);//newRing = VMatrDefault(orig_M);
+        newRing = VMatrRefine(target_M,curr_weight);
       }
     }
     else
@@ -5465,7 +4199,6 @@ ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M,
      if(target_M->length() == nV)
      {
        //define a new ring with ordering "(a(curr_weight),lp)"
-       //newRing = VMrDefault(curr_weight);
        newRing=VMrRefine(target_weight, curr_weight);
      }
      else
@@ -5579,7 +4312,6 @@ ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M,
 
     for(i=nV-1; i>=0; i--)
     {
-      //(*tmp_weight)[i] = (*curr_weight)[i];
       (*curr_weight)[i] = (*next_weight)[i];
     }
     delete next_weight;
@@ -5683,12 +4415,11 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
   }
   if(orig_M->length() == nV)
   {
-    //newRing = VMrDefault(curr_weight); // define a new ring with ordering "(a(curr_weight),lp)
     newRing=VMrRefine(target_weight, curr_weight);
   }
   else
   {
-    newRing = VMatrRefine(target_M,curr_weight);//newRing = VMatrDefault(orig_M);
+    newRing = VMatrRefine(target_M,curr_weight);
   }
   rChangeCurrRing(newRing);
 #ifdef TIME_TEST
@@ -5744,19 +4475,17 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
     {
       if(orig_M->length() == nV)
       {
-        /*newRing = VMrDefault(curr_weight); // define a new ring with ordering "(a(curr_weight),lp)*/
         newRing=VMrRefine(target_weight, curr_weight);
       }
       else
       {
-        newRing = VMatrRefine(target_M,curr_weight);//newRing = VMatrDefault(orig_M);
+        newRing = VMatrRefine(target_M,curr_weight);
       }
     }
     else
     {
      if(target_M->length() == nV)
      {
-       /*newRing = VMrDefault(curr_weight); // define a new ring with ordering "(a(curr_weight),lp)*/
        newRing=VMrRefine(target_weight, curr_weight);
      }
      else
@@ -5858,7 +4587,6 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
 #endif
 
     //lengthpoly(Gomega) = 1 if there is a polynomial in Gomega with at least 3 monomials and 0 otherwise
-    //polylength = lengthpoly(Gomega);
     if(lengthpoly(Gomega) > 0)
     {
       //there is a polynomial in Gomega with at least 3 monomials,
@@ -5866,7 +4594,6 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
       delete next_weight;
       if(target_M->length() == nV)
       {
-        //iv_M = MivMatrixOrder(curr_weight);
         iv_M = MivMatrixOrderRefine(curr_weight,target_M);
       }
       else
@@ -6023,12 +4750,6 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
   else
   {
     //define ring order := (a(curr_weight),lp);
-/*
-    if (rParameter(currRing) != NULL)
-      DefRingPar(curr_weight);
-    else
-      rChangeCurrRing(VMrDefault(curr_weight));
-*/
     rChangeCurrRing(VMrRefine(target_weight,curr_weight));
 
     G = idrMoveR(Go, XXRing,currRing);
@@ -6049,12 +4770,6 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
   // perturbs the target weight vector
   if(tp_deg > 1 && tp_deg <= nV)
   {
-/*
-    if (rParameter(currRing) != NULL)
-      DefRingPar(target_weight);
-    else
-      rChangeCurrRing(VMrDefault(target_weight));
-*/
     rChangeCurrRing(VMrRefine(target_weight,curr_weight));
 
     TargetRing = currRing;
@@ -6134,12 +4849,6 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
     oldRing = currRing;
 
     // define a new ring with ordering "(a(curr_weight),lp)
-/*
-    if (rParameter(currRing) != NULL)
-      DefRingPar(curr_weight);
-    else
-      rChangeCurrRing(VMrDefault(curr_weight));
-*/
     rChangeCurrRing(VMrRefine(target_weight,curr_weight));
 
     newRing = currRing;
@@ -6299,14 +5008,6 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
   {
   FINISH_160302:
     if(MivSame(orig_target, exivlp) == 1) {
-    /*  if (rParameter(currRing) != NULL)
-        DefRingParlp();
-      else
-        VMrDefaultlp();
-    else
-      if (rParameter(currRing) != NULL)
-        DefRingPar(orig_target);
-      else*/
         rChangeCurrRing(VMrDefault(orig_target));
     }
     TargetRing=currRing;
@@ -6622,13 +5323,7 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
     oldRing = currRing;
 
     if(target_M->length() == nV)
-    {/*
-      // define a new ring with ordering "(a(curr_weight),lp)
-      if (rParameter(currRing) != NULL)
-        DefRingPar(curr_weight);
-      else
-        rChangeCurrRing(VMrDefault(curr_weight));
-*/
+    {
       rChangeCurrRing(VMrRefine(target_M,curr_weight));
     }
     else
@@ -6966,7 +5661,6 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
   }
   int i, nV = currRing->N;
   ring new_ring, testring;
-  //ring extoRing;
   ideal Gomega, Gomega1, Gomega2, FF, F, Gresult, Gresult1, G1, Gt;
   int nwalks = 0;
   intvec* Mwlp;
@@ -6977,13 +5671,11 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
   intvec* next_vect;
   intvec* omega2 = new intvec(nV);
   intvec* omtmp = new intvec(nV);
-  //intvec* altomega = new intvec(nV);
 
   for(i = nV -1; i>=0; i--)//Aenderung!!
   {
     (*omtmp)[i] = (*ivtarget)[i];
   }
-  //BOOLEAN isnewtarget = FALSE;
 
   // to avoid (1,0,...,0) as the target vector (Hans)
   intvec* last_omega = new intvec(nV);
@@ -7049,17 +5741,10 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
 
         if(ivtarget->length() == nV)
         {
-/*
-          if (rParameter(currRing) != NULL)
-            DefRingPar(omtmp);
-          else
-            rChangeCurrRing(VMrDefault(omtmp));
-*/
           rChangeCurrRing(VMrRefine(ivtarget,omtmp));
         }
         else
         {
-          //rChangeCurrRing(VMatrDefault(ivtarget));
           rChangeCurrRing(VMatrRefine(ivtarget,omtmp));
         }
         testring = currRing;
@@ -7117,17 +5802,10 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
       delete next_vect;
       if(ivtarget->length() == nV)
       {
-/*
-        if (rParameter(currRing) != NULL)
-          DefRingPar(omtmp);
-        else
-          rChangeCurrRing(VMrDefault(omtmp));
-*/
         rChangeCurrRing(VMrRefine(ivtarget,omtmp));
       }
       else
       {
-        //rChangeCurrRing(VMatrDefault(ivtarget));
         rChangeCurrRing(VMatrRefine(ivtarget,omtmp));
       }
 #ifdef TEST_OVERFLOW
@@ -7150,7 +5828,6 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
       Gt = NULL;
 
       delete omega2;
-      //delete altomega;
       if(printout > 0)
       {
         Print("\n//** rec_fractal_call: Overflow. (4) Leaving the %d-th recursion with %d steps.\n",
@@ -7175,17 +5852,10 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
     {
       if(ivtarget->length() == nV)
       {
-/*
-        if (rParameter(currRing) != NULL)
-          DefRingPar(omtmp);
-        else
-          rChangeCurrRing(VMrDefault(omtmp));
-*/
         rChangeCurrRing(VMrRefine(ivtarget,omtmp));
       }
       else
       {
-        //rChangeCurrRing(VMatrDefault(ivtarget));
         rChangeCurrRing(VMatrRefine(ivtarget,omtmp));
       }
 
@@ -7195,7 +5865,6 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
       {
         delete omega2;
         delete next_vect;
-        //delete altomega;
         if(printout > 0)
         {
           Print("\n//** rec_fractal_call: Correct cone. (5) Leaving the %d-th recursion with %d steps.\n",
@@ -7269,18 +5938,6 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
         // update the original target vector w.r.t. the current GB
         if(ivtarget->length() == nV)
         {
-/*
-          if(MivSame(Xivinput, Xivlp) == 1)
-            if (rParameter(currRing) != NULL)
-              DefRingParlp();
-            else
-              VMrDefaultlp();
-          else
-            if (rParameter(currRing) != NULL)
-              DefRingPar(Xivinput);
-            else
-              rChangeCurrRing(VMrDefault(Xivinput));
-*/
           rChangeCurrRing(VMrRefine(ivtarget,Xivinput));
         }
         else
@@ -7307,7 +5964,6 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
 
         delete omega2;
         delete next_vect;
-        //delete altomega;
         if(printout > 0)
         {
           Print("\n//** rec_fractal_call: Vectors updated. (6) Leaving the %d-th recursion with %d steps.\n",
@@ -7323,7 +5979,6 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
     }// end of (if next_vect==nullvector)
 
     for(i=nV-1; i>=0; i--) {
-      //(*altomega)[i] = (*omega)[i];
       (*omega)[i] = (*next_vect)[i];
     }
     delete next_vect;
@@ -7365,12 +6020,6 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
 
     if(ivtarget->length() == nV)
     {
-/*
-      if (rParameter(currRing) != NULL)
-        DefRingPar(omega);
-      else
-        rChangeCurrRing(VMrDefault(omega));
-*/
       rChangeCurrRing(VMrRefine(ivtarget,omega));
     }
     else
@@ -7466,7 +6115,6 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
 
   int nwalks = 0,i,nV=currRing->N;//polylength
   ring new_ring, testring;
-  //ring extoRing;
   ideal Gomega, Gomega1, Gomega2, F, FF, Gresult, Gresult1, G1, Gt;
 #ifdef TIME_TEST
   ideal F1;
@@ -7679,21 +6327,10 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
       delete next_vect;
       if(ivtarget->length() == nV)
       {
-/*
-        if (rParameter(currRing) != NULL)
-        {
-          DefRingPar(omtmp);
-        }
-        else
-        {
-          rChangeCurrRing(VMrDefault(omtmp));
-        }
-*/
         rChangeCurrRing(VMrRefine(ivtarget,omtmp));
       }
       else
       {
-        //rChangeCurrRing(VMatrDefault(ivtarget));
         rChangeCurrRing(VMatrRefine(ivtarget,omtmp));
       }
 #ifdef TEST_OVERFLOW
@@ -7741,12 +6378,6 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
       // because t is not defined
       if(ivtarget->length() == nV)
       {
-/*
-        if (rParameter(currRing) != NULL)
-          DefRingPar(omtmp);
-        else
-          rChangeCurrRing(VMrDefault(omtmp));
-*/
         rChangeCurrRing(VMrRefine(ivtarget,omtmp));
       }
       else
@@ -7842,18 +6473,6 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
         // update the original target vector w.r.t. the current GB
         if(ivtarget->length() == nV)
         {
-/*
-          if(MivSame(Xivinput, Xivlp) == 1)
-            if (rParameter(currRing) != NULL)
-              DefRingParlp();
-            else
-              VMrDefaultlp();
-          else
-            if (rParameter(currRing) != NULL)
-              DefRingPar(Xivinput);
-            else
-              rChangeCurrRing(VMrDefault(Xivinput));
-*/
           rChangeCurrRing(VMrRefine(ivtarget,Xivinput));
         }
         else
@@ -7909,8 +6528,6 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
 #ifdef TIME_TEST
     xtif=xtif+clock()-to;
 #endif
-    //polylength = 1 if there is a polynomial in Gomega with at least 3 monomials and 0 otherwise
-    //polylength = lengthpoly(Gomega);
 #ifdef CHECK_IDEAL_MWALK
     if(printout > 1)
     {
@@ -7940,12 +6557,6 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
 #endif
     if(ivtarget->length() == nV)
     {
-/*
-      if (rParameter(currRing) != NULL)
-        DefRingPar(omega);
-      else
-        rChangeCurrRing(VMrDefault(omega));
-*/
       rChangeCurrRing(VMrRefine(ivtarget,omega));
     }
     else
@@ -8010,7 +6621,6 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
     idDelete(&G);
 
     rChangeCurrRing(new_ring);
-    //F1 = idrMoveR(F, oRing,currRing);
     G = idrMoveR(F,oRing,currRing);
 /*
 #ifdef TIME_TEST
@@ -8043,7 +6653,6 @@ ideal Mfwalk(ideal G, intvec* ivstart, intvec* ivtarget,
   if(reduction == 0)
   {
     si_opt_1 &= (~Sy_bit(OPT_REDSB)); // no reduced Groebner basis
-    //si_opt_1 &= (~Sy_bit(OPT_REDTAIL)); // not tail reductions
   }
   Set_Error(FALSE);
   Overflow_Error = FALSE;
@@ -8153,17 +6762,10 @@ ideal Mfwalk(ideal G, intvec* ivstart, intvec* ivtarget,
   ring tRing = currRing;
   if(ivtarget->length() == nV)
   {
-/*
-    if (rParameter(currRing) != NULL)
-      DefRingPar(ivstart);
-    else
-      rChangeCurrRing(VMrDefault(ivstart));
-*/
     rChangeCurrRing(VMrRefine(ivtarget,ivstart));
   }
   else
   {
-    //rChangeCurrRing(VMatrDefault(ivstart));
     rChangeCurrRing(VMatrRefine(ivtarget,ivstart));
   }
 
@@ -8190,7 +6792,6 @@ ideal Mfwalk(ideal G, intvec* ivstart, intvec* ivtarget,
 
   si_opt_1 = save1; //set original options, e. g. option(RedSB)
   delete Xivlp;
-  //delete Xsigma;
   delete Xtau;
   delete XivNull;
   //Print("\n//Mfwalk: (5)\n");
@@ -8340,17 +6941,10 @@ ideal Mfrwalk(ideal G, intvec* ivstart, intvec* ivtarget,
   ring tRing = currRing;
   if(ivtarget->length() == nV)
   {
-/*
-    if (rParameter(currRing) != NULL)
-      DefRingPar(ivstart);
-    else
-      rChangeCurrRing(VMrDefault(ivstart));
-*/
     rChangeCurrRing(VMrRefine(ivtarget,ivstart));
   }
   else
   {
-    //rChangeCurrRing(VMatrDefault(ivstart));
     rChangeCurrRing(VMatrRefine(ivtarget,ivstart));
   }
 
@@ -8418,14 +7012,12 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
   int nsteppert=0, i, nV = currRing->N, nwalk=0, npert_tmp=0;
   int *npert=(int*)omAlloc(2*nV*sizeof(int));
   ideal Gomega, M,F,  G1, Gomega1, Gomega2, M1, F1;
-  //ring endRing;
   ring newRing, oldRing, lpRing;
   intvec* next_weight;
   intvec* ivNull = new intvec(nV); //define (0,...,0)
   intvec* iv_dp = MivUnit(nV);// define (1,1,...,1)
   intvec* iv_lp = Mivlp(nV); //define (1,0,...,0)
   ideal H0;
-  //ideal  H1;
   ideal H2, Glp;
   int nGB, endwalks = 0,  nwalkpert=0;
   intvec* Mlp =  MivMatrixOrderlp(nV);
@@ -8825,567 +7417,12 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
   return(G);
 }
 
-#if 0
-/*******************************************************
- * Tran's algorithm with random element                *
- *                                                     *
- * use kStd, if nP = 0, else call Ab_Rec_Pert (LastGB) *
- *******************************************************/
-ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, int weight_rad, int pert_deg)
-{
-#ifdef TIME_TEST
-  clock_t mtim = clock();
-#endif
-  Set_Error(FALSE  );
-  Overflow_Error =  FALSE;
-  //Print("// pSetm_Error = (%d)", ErrorCheck());
-  //Print("\n// ring ro = %s;", rString(currRing));
-
-#ifdef TIME_TEST
-  clock_t tostd, tif=0, tstd=0, tlift=0, tred=0, tnw=0, textra=0;
-  clock_t tinput = clock();
-#endif
-  int nsteppert=0, i, nV = currRing->N, nwalk=0, npert_tmp=0;
-  int *npert=(int*)omAlloc(2*nV*sizeof(int));
-  ideal Gomega, M,F,  G1, Gomega1, Gomega2, M1, F1;
-  //ring endRing;
-  ring newRing, oldRing, lpRing;
-  intvec* next_weight;
-  intvec* ivNull = new intvec(nV); //define (0,...,0)
-  intvec* iv_dp = MivUnit(nV);// define (1,1,...,1)
-  intvec* iv_lp = Mivlp(nV); //define (1,0,...,0)
-  ideal H0;
-  //ideal H1;
-  ideal H2, Glp;
-  int weight_norm, nGB, endwalks = 0,  nwalkpert=0,  npertstep=0;
-  intvec* Mlp =  MivMatrixOrderlp(nV);
-  intvec* vector_tmp = new intvec(nV);
-#ifndef BUCHBERGER_ALG
-  intvec* hilb_func;
-#endif
-  // to avoid (1,0,...,0) as the target vector
-  intvec* last_omega = new intvec(nV);
-  for(i=nV-1; i>0; i--)
-  {
-    (*last_omega)[i] = 1;
-  }
-  (*last_omega)[0] = 10000;
-
-//intvec* extra_curr_weight = new intvec(nV);
-  intvec* target_weight = new intvec(nV);
-  for(i=nV-1; i>=0; i--)
-  {
-    (*target_weight)[i] = (*target_tmp)[i];
-  }
-  ring XXRing = currRing;
-  newRing = currRing;
-
-#ifdef TIME_TEST
-  to=clock();
-#endif
-  // compute a red. GB w.r.t. the help ring
-  if(MivComp(curr_weight, iv_dp) == 1)
-  {
-    //rOrdStr(currRing) = "dp"
-    G = MstdCC(G);
-  }
-  else
-  {
-    //rOrdStr(currRing) = (a(.c_w..),lp,C)
-    if (rParameter(currRing) != NULL)
-    {
-      DefRingPar(curr_weight);
-    }
-    else
-    {
-      rChangeCurrRing(VMrDefault(curr_weight));
-    }
-    G = idrMoveR(G, XXRing,currRing);
-    G = MstdCC(G);
-  }
-#ifdef TIME_TEST
-  tostd=clock()-to;
-#endif
-
-#ifdef REPRESENTATION_OF_SIGMA
-  ideal Gw = MwalkInitialForm(G, curr_weight);
-
-  if(islengthpoly2(Gw)==1)
-  {
-    intvec* MDp;
-    if(MivComp(curr_weight, iv_dp) == 1)
-    {
-      MDp = MatrixOrderdp(nV); //MivWeightOrderlp(iv_dp);
-    }
-    else
-    {
-      MDp = MivWeightOrderlp(curr_weight);
-    }
-    curr_weight = RepresentationMatrix_Dp(G, MDp);
-
-    delete MDp;
-
-    ring exring = currRing;
-
-    if (rParameter(currRing) != NULL)
-    {
-      DefRingPar(curr_weight);
-    }
-    else
-    {
-      rChangeCurrRing(VMrDefault(curr_weight));
-    }
-#ifdef TIME_TEST
-    to=clock();
-#endif
-    Gw = idrMoveR(G, exring,currRing);
-    G = MstdCC(Gw);
-    Gw = NULL;
-#ifdef TIME_TEST
-    tostd=tostd+clock()-to;
-#endif
-    //ivString(curr_weight,"rep. sigma");
-    goto COMPUTE_NEW_VECTOR;
-  }
-
-  idDelete(&Gw);
-  delete iv_dp;
-#endif
-
-
-  while(1)
-  {
-#ifdef TIME_TEST
-    to=clock();
-#endif
-    // compute an initial form ideal of <G> w.r.t. "curr_vector"
-    Gomega = MwalkInitialForm(G, curr_weight);
-#ifdef TIME_TEST
-    tif=tif+clock()-to;
-#endif
-
-#ifndef  BUCHBERGER_ALG
-    if(isNolVector(curr_weight) == 0)
-    {
-      hilb_func = hFirstSeries(Gomega,NULL,NULL,curr_weight,currRing);
-    }
-    else
-    {
-      hilb_func = hFirstSeries(Gomega,NULL,NULL,last_omega,currRing);
-    }
-#endif // BUCHBERGER_ALG
-
-    oldRing = currRing;
-
-    // define a new ring with ordering "(a(curr_weight),lp)
-    if (rParameter(currRing) != NULL)
-    {
-      DefRingPar(curr_weight);
-    }
-    else
-    {
-      rChangeCurrRing(VMrDefault(curr_weight));
-    }
-    newRing = currRing;
-    Gomega1 = idrMoveR(Gomega, oldRing,currRing);
-
-#ifdef TIME_TEST
-    to=clock();
-#endif
-    // compute a reduced Groebner basis of <Gomega> w.r.t. "newRing"
-#ifdef  BUCHBERGER_ALG
-    M = MstdhomCC(Gomega1);
-#else
-    M=kStd(Gomega1,NULL,isHomog,NULL,hilb_func,0,NULL,curr_weight);
-    delete hilb_func;
-#endif
-#ifdef TIME_TEST
-    tstd=tstd+clock()-to;
-#endif
-
-    // change the ring to oldRing
-    rChangeCurrRing(oldRing);
-    M1 =  idrMoveR(M, newRing,currRing);
-    Gomega2 =  idrMoveR(Gomega1, newRing,currRing);
-
-#ifdef TIME_TEST
-    to=clock();
-#endif
-    // compute a representation of the generators of submod (M) with respect to those of mod (Gomega).
-    // Gomega is a reduced Groebner basis w.r.t. the current ring
-    F = MLifttwoIdeal(Gomega2, M1, G);
-#ifdef TIME_TEST
-    tlift=tlift+clock()-to;
-#endif
-
-    idDelete(&M1);
-    idDelete(&Gomega2);
-    idDelete(&G);
-
-    // change the ring to newRing
-    rChangeCurrRing(newRing);
-    F1 = idrMoveR(F, oldRing,currRing);
-
-#ifdef TIME_TEST
-    to=clock();
-#endif
-    // reduce the Groebner basis <G> w.r.t. new ring
-    G = kInterRedCC(F1, NULL);
-#ifdef TIME_TEST
-    tred=tred+clock()-to;
-#endif
-    idDelete(&F1);
-
-  COMPUTE_NEW_VECTOR:
-    newRing = currRing;
-    nwalk++;
-    nwalkpert++;
-#ifdef TIME_TEST
-    to=clock();
-#endif
-    // compute a next weight vector
-    //next_weight = MwalkNextWeightCC(curr_weight,target_weight, G);
-    next_weight = MWalkRandomNextWeight(G, curr_weight, target_weight, weight_rad, pert_deg);
-/*
-    next_weight = MkInterRedNextWeight(curr_weight,target_weight,G);
-
-    if(MivComp(next_weight, target_weight) != 1)
-    {
-      // compute a perturbed next weight vector "next_weight1"
-      intvec* next_weight1 = MkInterRedNextWeight(MPertVectors(G, MivMatrixOrder(curr_weight), pert_deg), target_weight, G);
-
-      // compare next_weight and next_weight1
-      ideal G_test = MwalkInitialForm(G, next_weight);
-      ideal G_test1 = MwalkInitialForm(G, next_weight1);
-      if(IDELEMS(G_test1) <= IDELEMS(G_test))
-      {
-        next_weight = ivCopy(next_weight1);
-      }
-      delete next_weight1;
-      // compute a random next weight vector "next_weight2"
-      intvec* next_weight22 = ivCopy(target_weight);
-      // Print("\n//  size of target_weight  = %d", sizeof((*target_weight)));
-      k = 0;
-
-      while(test_w_in_ConeCC(G, next_weight22) == 0 && k < 11)
-      {
-        k++;
-        if(k>10)
-        {
-          break;
-        }
-        weight_norm = 0;
-        while(weight_norm == 0)
-        {
-          for(i=nV-1; i>=0; i--)
-          {
-            // Print("\n//  next_weight[%d]  = %d", i, (*next_weight)[i]);
-            (*next_weight22)[i] = rand() % 60000 - 30000;
-            weight_norm = weight_norm + (*next_weight22)[i]*(*next_weight22)[i];
-          }
-          weight_norm = 1 + floor(sqrt(weight_norm));
-        }
-        for(i=nV-1; i>=0; i--)
-        {
-          if((*next_weight22)[i] < 0)
-          {
-            (*next_weight22)[i] = 1 + (*curr_weight)[i] + floor(weight_rad*(*next_weight22)[i]/weight_norm);
-          }
-          else
-          {
-            (*next_weight22)[i] = (*curr_weight)[i] + floor(weight_rad*(*next_weight22)[i]/weight_norm);
-          }
-          // Print("\n//  next_weight22[%d]  = %d", i, (*next_weight22)[i]);
-        }
-      }
-
-      if(test_w_in_ConeCC(G, next_weight22) == 1)
-      {
-        // compare next_weight and next_weight2
-        // Print("\n// ZUFALL IM KEGEL");
-        intvec* next_weight2 = MkInterRedNextWeight(next_weight22, target_weight, G);
-
-        ideal G_test2 = MwalkInitialForm(G, next_weight2);
-        if(IDELEMS(G_test2) <= IDELEMS(G_test))
-        {
-          if(IDELEMS(G_test2) <= IDELEMS(G_test1))
-          {
-             // Print("\n// ZUFALL BENUTZT!\n");
-            next_weight = ivCopy(next_weight2);
-          }
-        }
-        idDelete(&G_test2);
-        delete next_weight2;
-      }
-      delete next_weight22;
-      idDelete(&G_test);
-      idDelete(&G_test1);
-    }*/
-
-#ifdef TIME_TEST
-    tnw=tnw+clock()-to;
-#endif
-#ifdef PRINT_VECTORS
-    MivString(curr_weight, target_weight, next_weight);
-#endif
-
-/*   check whether the computed intermediate weight vector is in
-     the correct cone; sometimes it is very big e.g. s7, cyc7.
-     If it is NOT in the correct cone, then compute directly
-     a reduced Groebner basis with respect to the lexicographic ordering
-     for the known Groebner basis that it is computed in the last step.
-*/
-    //if(test_w_in_ConeCC(G, next_weight) != 1)
-    if(Overflow_Error == TRUE)
-    {
-    OMEGA_OVERFLOW_TRAN_NEW:
-      //Print("\n//  takes %d steps!", nwalk-1);
-      //Print("\n//ring lastRing = %s;", rString(currRing));
-#ifdef TEST_OVERFLOW
-      goto  BE_FINISH;
-#endif
-
-#ifdef CHECK_IDEAL_MWALK
-      idElements(G, "G");
-      //headidString(G, "G");
-#endif
-
-      if(MivSame(target_tmp, iv_lp) == 1)
-      {
-        if (rParameter(currRing) != NULL)
-        {
-          DefRingParlp();
-        }
-        else
-        {
-          VMrDefaultlp();
-        }
-      }
-      else
-      {
-        if (rParameter(currRing) != NULL)
-        {
-          DefRingPar(target_tmp);
-        }
-        else
-        {
-          rChangeCurrRing(VMrDefault(target_tmp));
-        }
-      }
-      lpRing = currRing;
-      G1 = idrMoveR(G, newRing,currRing);
-
-#ifdef TIME_TEST
-      to=clock();
-#endif
-      // apply kStd or LastGB to compute  a lex. red. Groebner basis of <G>
-      if(nP == 0 || MivSame(target_tmp, iv_lp) == 0)
-      {
-        //Print("\n\n// calls \"std in ring r_%d = %s;", nwalk, rString(currRing));
-        G = MstdCC(G1);//no result for qnt1
-      }
-      else
-      {
-        rChangeCurrRing(newRing);
-        G1 = idrMoveR(G1, lpRing,currRing);
-
-        //Print("\n\n// calls \"LastGB\" (%d) to compute a GB", nV-1);
-        G = LastGB(G1, curr_weight, nV-1); //no result for kats7
-
-        rChangeCurrRing(lpRing);
-        G = idrMoveR(G, newRing,currRing);
-      }
-#ifdef TIME_TEST
-      textra=clock()-to;
-#endif
-      npert[endwalks]=nwalk-npert_tmp;
-      npert_tmp = nwalk;
-      endwalks ++;
-      break;
-    }
-
-    // check whether the computed Groebner basis is really a Groebner basis.
-    // If not, we perturb the target vector with the maximal "perturbation" degree.
-
-    if(MivComp(next_weight, target_weight) == 1 || MivComp(next_weight, curr_weight) == 1 )
-    {
-      //Print("\n//ring r_%d = %s;", nwalk, rString(currRing));
-
-
-      //compute the number of perturbations and its step
-      npert[endwalks]=nwalk-npert_tmp;
-      npert_tmp = nwalk;
-
-      endwalks ++;
-
-      // it is very important if the walk only uses one step, e.g. Fate, liu
-      if(endwalks == 1 && MivComp(next_weight, curr_weight) == 1)
-      {
-        rChangeCurrRing(XXRing);
-        G = idrMoveR(G, newRing,currRing);
-        goto FINISH;
-      }
-      H0 = id_Head(G,currRing);
-
-      if(MivSame(target_tmp, iv_lp) == 1)
-      {
-        if (rParameter(currRing) != NULL)
-        {
-          DefRingParlp();
-        }
-        else
-        {
-          VMrDefaultlp();
-        }
-      }
-      else
-      {
-        if (rParameter(currRing) != NULL)
-        {
-          DefRingPar(target_tmp);
-        }
-        else
-        {
-          rChangeCurrRing(VMrDefault(target_tmp));
-        }
-      }
-      lpRing = currRing;
-      Glp = idrMoveR(G, newRing,currRing);
-      H2 = idrMoveR(H0, newRing,currRing);
-
-      // Apply Lemma 2.2 in Collart et. al (1997) to check whether cone(k-1) is equal to cone(k)
-      nGB = 1;
-      for(i=IDELEMS(Glp)-1; i>=0; i--)
-      {
-        poly t;
-        if((t=pSub(pHead(Glp->m[i]), pCopy(H2->m[i]))) != NULL)
-        {
-          pDelete(&t);
-          idDelete(&H2);//5.5.02
-          nGB = 0; //i.e. Glp is no reduced Groebner basis
-          break;
-        }
-        pDelete(&t);
-      }
-
-      idDelete(&H2);//5.5.02
-
-      if(nGB == 1)
-      {
-        G = Glp;
-        Glp = NULL;
-        break;
-      }
-
-       // perturb the target weight vector, if the vector target_tmp stays in many cones
-      poly p;
-      BOOLEAN plength3 = FALSE;
-      for(i=IDELEMS(Glp)-1; i>=0; i--)
-      {
-        p = MpolyInitialForm(Glp->m[i], target_tmp);
-        if(p->next != NULL &&
-           p->next->next != NULL &&
-           p->next->next->next != NULL)
-        {
-          Overflow_Error = FALSE;
-
-          for(i=0; i<nV; i++)
-          {
-            (*vector_tmp)[i] = (*target_weight)[i];
-          }
-          delete target_weight;
-          target_weight = MPertVectors(Glp, Mlp, nV);
-
-          if(MivComp(vector_tmp, target_weight)==1)
-          {
-            //PrintS("\n// The old and new representaion vector are the same!!");
-            G = Glp;
-            newRing = currRing;
-            goto OMEGA_OVERFLOW_TRAN_NEW;
-           }
-
-          if(Overflow_Error == TRUE)
-          {
-            rChangeCurrRing(newRing);
-            G = idrMoveR(Glp, lpRing,currRing);
-            goto OMEGA_OVERFLOW_TRAN_NEW;
-          }
-
-          plength3 = TRUE;
-          pDelete(&p);
-          break;
-        }
-        pDelete(&p);
-      }
-
-      if(plength3 == FALSE)
-      {
-        rChangeCurrRing(newRing);
-        G = idrMoveR(Glp, lpRing,currRing);
-        goto TRAN_LIFTING;
-      }
-
-
-      npertstep = nwalk;
-      nwalkpert = 1;
-      nsteppert ++;
-
-      /*
-      Print("\n// Subroutine needs (%d) steps.", nwalk);
-      idElements(Glp, "last G in walk:");
-      PrintS("\n// ****************************************");
-      Print("\n// Perturb the original target vector (%d): ", nsteppert);
-      ivString(target_weight, "new target");
-      PrintS("\n// ****************************************\n");
-      */
-      rChangeCurrRing(newRing);
-      G = idrMoveR(Glp, lpRing,currRing);
-
-      delete next_weight;
-
-      //Print("\n// ring rNEW = %s;", rString(currRing));
-      goto COMPUTE_NEW_VECTOR;
-    }
-
-  TRAN_LIFTING:
-    for(i=nV-1; i>=0; i--)
-    {
-      (*curr_weight)[i] = (*next_weight)[i];
-    }
-    delete next_weight;
-  } // end of while
-#ifdef TEST_OVERFLOW
- BE_FINISH:
-#endif
-  rChangeCurrRing(XXRing);
-  G = idrMoveR(G, lpRing,currRing);
-
- FINISH:
-  delete ivNull;
-  delete next_weight;
-  delete iv_lp;
-  omFree(npert);
-
-#ifdef TIME_TEST
-  Print("\n// Computation took %d steps and %.2f sec", nwalk, ((double) (clock()-mtim)/1000000));
-
-  TimeStringFractal(tinput, tostd, tif, tstd, textra, tlift, tred, tnw);
-
-  Print("\n// pSetm_Error = (%d)", ErrorCheck());
-  Print("\n// Overflow_Error? (%d)\n", Overflow_Error);
-#endif
-
-  return(G);
-}
-#endif
-
 /*****************************************************************
  * compute the reduced Groebner basis of an ideal <Go> w.r.t. lp *
  *****************************************************************/
 static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
 {
   Overflow_Error = FALSE;
- // BOOLEAN nOverflow_Error = FALSE;
 #ifdef TIME_TEST
   clock_t tproc=0;
   clock_t tinput=clock();
@@ -9409,7 +7446,7 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
   ring YXXRing = currRing;
 
   intvec* iv_M_dpp = MivMatrixOrderlp(nV);
-  intvec* target_weight;// = Mivlp(nV);
+  intvec* target_weight;
   ideal ssG;
 
   // perturb the target vector
@@ -9448,7 +7485,6 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
   if(tp_deg != tp_deg_tmp)
   {
     Overflow_Error = TRUE;
-    //nOverflow_Error = TRUE;
   }
 
   //  Print("\n// tp_deg = %d", tp_deg);
@@ -9586,7 +7622,6 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
     {
       delete next_weight;
       if(tp_deg > 1){
-        //nOverflow_Error = Overflow_Error;
 #ifdef TIME_TEST
         tproc = tproc+clock()-tinput;
 #endif
@@ -9613,7 +7648,6 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
     }
     for(i=nV-1; i>=0; i--)
     {
-      //(*extra_curr_weight)[i] = (*curr_weight)[i];
       (*curr_weight)[i] = (*next_weight)[i];
     }
     delete next_weight;
@@ -9703,7 +7737,6 @@ ideal MAltwalk1(ideal Go, int op_deg, int tp_deg, intvec* curr_weight,
   intvec* ivNull = new intvec(nV);
   intvec* iv_dp = MivUnit(nV);// define (1,1,...,1)
   intvec* exivlp = Mivlp(nV);
-  //intvec* extra_curr_weight = new intvec(nV);
 #ifndef  BUCHBERGER_ALG
   intvec* hilb_func;
 #endif
@@ -9801,17 +7834,6 @@ ideal MAltwalk1(ideal Go, int op_deg, int tp_deg, intvec* curr_weight,
     Gomega = MwalkInitialForm(G, curr_weight);
 #ifdef TIME_TEST
     xtif=xtif+clock()-to;
-#endif
-#if 0
-    if(Overflow_Error == TRUE)
-    {
-      for(i=nV-1; i>=0; i--)
-        (*curr_weight)[i] = (*extra_curr_weight)[i];
-      delete extra_curr_weight;
-
-      newRing = currRing;
-      goto MSTD_ALT1;
-    }
 #endif
 #ifndef  BUCHBERGER_ALG
     if(isNolVector(curr_weight) == 0)
@@ -9954,7 +7976,6 @@ ideal MAltwalk1(ideal Go, int op_deg, int tp_deg, intvec* curr_weight,
     //NOT Changed, to free memory
     for(i=nV-1; i>=0; i--)
     {
-      //(*extra_curr_weight)[i] = (*curr_weight)[i];
       (*curr_weight)[i] = (*next_weight)[i];
     }
     delete next_weight;
