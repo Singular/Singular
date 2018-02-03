@@ -4566,11 +4566,11 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* orig_M, intvec* target_wei
       {
         if((*next_weight2)[i] < 0)
         {
-          (*next_weight2)[i] = 1 + (*curr_weight)[i] + floor(weight_rad*(*next_weight2)[i]/weight_norm);
+          (*next_weight2)[i] = 1 + (*curr_weight)[i] + weight_rad*(*next_weight2)[i]/weight_norm;
         }
         else
         {
-          (*next_weight2)[i] = (*curr_weight)[i] + floor(weight_rad*(*next_weight2)[i]/weight_norm);
+          (*next_weight2)[i] = (*curr_weight)[i] + weight_rad*(*next_weight2)[i]/weight_norm;
         }
       }
       if(test_w_in_ConeCC(G,next_weight2) == 1)
