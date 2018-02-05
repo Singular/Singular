@@ -1217,7 +1217,8 @@ BOOLEAN iiBranchTo(leftv, leftv args)
   if (h->Typ()!=PROC_CMD)
   {
     omFree(t);
-    Werror("last arg (%d) is not a proc(%d), nest=%d",i,h->Typ(),myynest);
+    Werror("last(%d.) arg.(%s) is not a proc(but %s(%d)), nesting=%d",
+           i,h->name,Tok2Cmdname(h->Typ()),h->Typ(),myynest);
     return TRUE;
   }
   b=iiCheckTypes(iiCurrArgs,t,0);
