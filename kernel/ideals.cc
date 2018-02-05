@@ -581,7 +581,7 @@ ideal idMultSect(resolvente arg, int length, GbVariant alg)
 */
 static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w, GbVariant alg)
 {
-  ideal   h2, h3;
+  ideal   h2;
   int     j,k;
   poly    p,q;
 
@@ -627,6 +627,7 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w, GbVarian
 
   idTest(h2);
 
+  ideal h3=NULL;
   if (alg==GbDefault) alg=GbStd;
   if (alg==GbStd)
   {

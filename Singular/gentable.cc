@@ -474,7 +474,7 @@ void ttGen1()
   }
 /*-------------------------------------------------------------------*/
   fprintf(outfile,"/*---------------------------------------------*/\n");
-  FILE *doctable;
+  FILE *doctable=NULL; /*to silence "may be used uninitialized"*/
   if (produce_convert_table)
   {
     doctable=fopen("convert_table.texi","w");
