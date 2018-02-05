@@ -281,7 +281,7 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
           {
             goto errlabel;
           }
-          else return *root;
+          else return h;
         }
         else
         {
