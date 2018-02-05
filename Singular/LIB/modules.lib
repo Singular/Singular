@@ -2134,7 +2134,7 @@ list intList;
   if (size(C.interpretation) != 0) {  // either there is no interpretation list or at least the "interpret direction" exists
     int i;
     if (#==0){#=-1;}
-    while ((typeof((C.interpretation)[1][1])=="Vector") && (#!=0))
+    while ((typeof((C.interpretation)[1][1])=="Vector") && (#<>0))
     {
       if (size(((C.interpretation)[1][1]).space.interpretation)==0){break;}
       // M is in each iteration step precisely the module, which will be cut out of the chain
