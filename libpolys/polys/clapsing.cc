@@ -1255,22 +1255,10 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
     for(i=rVar(r);i>0;i--) if(p_GetExp(f,i,r)!=0) n++;
     if (with_exps==0 || with_exps==3) n++; // with coeff
     res=idInit(si_max(n,1),1);
-    switch(with_exps)
+    if(with_exps!=1)
     {
-      case 0: // with coef & exp.
-        res->m[0]=p_NSet(n_Copy(pGetCoeff(f),r->cf),r);
-        // no break
-      case 3: // with coef & exp.
-        res->m[0]=p_NSet(n_Copy(pGetCoeff(f),r->cf),r);
-        // no break
-      case 2: // with exp.
         (*v)=new intvec(si_max(1,n));
         (**v)[0]=1;
-        // no break
-      case 1: ;
-      #ifdef TEST
-      default: ;
-      #endif
     }
     res->m[0]=p_NSet(n_Copy(pGetCoeff(f),r->cf),r);
     if (n==0)
