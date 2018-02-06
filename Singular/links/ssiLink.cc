@@ -48,6 +48,7 @@
 #include <sys/types.h>          /* for portability */
 #include <ctype.h>   /*for isdigit*/
 #include <netdb.h>
+#include <netinet/in.h> /* for htons etc.*/
 
 #define SSI_VERSION 10
 // 5->6: changed newstruct representation
