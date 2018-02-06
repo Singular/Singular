@@ -43,10 +43,10 @@ SLIB1 = arr.lib \
         findifs.lib finitediff.lib \
         gfan.lib gitfan.lib gradedModules.lib GND.lib graal.lib goettsche.lib \
 	hess.lib hdepth.lib \
-        locnormal.lib \
-	methods.lib modnormal.lib modular.lib multigrading.lib modwalk.lib\
 	JMBTest.lib JMSConst.lib \
-	ncfrac.lib ncloc.lib ncModslimgb.lib\
+        locnormal.lib \
+	methods.lib modnormal.lib modular.lib modules.lib multigrading.lib modwalk.lib\
+	nets.lib ncfrac.lib ncloc.lib ncModslimgb.lib\
 	nfmodstd.lib nfmodsyz.lib numerAlg.lib numerDecom.lib \
         olga.lib orbitparam.lib \
 	parallel.lib polyclass.lib polymake.lib polybori.lib \

@@ -47,6 +47,7 @@ New libraries:
 @item classify2.lib: Classification of isolated singularities of corank <=2 and modality <= wrt. right equivalence over the complex numbers according to Arnold's list. (@nref{classify2_lib})
 @item goettsche.lib: Goettsche's formula for the Betti numbers of the Hilbert scheme
 of points on a surface, Macdonald's formula for the symmetric product (@nref{goettsche_lib})
+@item combinat.lib, modules.lib, methods,lib, nets.lib: a more mathematical view of modules (@nref{combinat_lib}: combinatorics), (@nref{methods.lib}: construct procedures), (@nref{modules_lib}: free resolutions), (@nref{nets.lib}: pretty printing)
 @item ncHilb.lib: Hilbert series of non-commutative monomial algebras (@nref{ncHilb_lib})
 @item realclassify.lib: Classification of real singularities(@nref{realclassify_lib})
 @item rootisolation.lib: real root isolation using interval arithmetic(@nref{rootisolation_lib})
