@@ -6,15 +6,17 @@
 /*
  * ABSTRACT: macros for global options
  */
-
+#include "misc/auxiliary.h" /*for BOOLEAN*/
 /*the general set of std-options : si_opt_1(test) */
 /*the general set of verbose-options : si_opt_2(verbose) */
 #ifdef __cplusplus
 extern "C" unsigned si_opt_1; //< NOTE: Original option variable name: test
 extern "C" unsigned si_opt_2; //< NOTE: Original option variable name: verbose
+extern "C" BOOLEAN siCntrlc;
 #else
 extern unsigned si_opt_1;
 extern unsigned si_opt_2;
+extern BOOLEAN siCntrlc;
 #endif
 #define SI_SAVE_OPT(A,B) { A=si_opt_1; B=si_opt_2; }
 #define SI_SAVE_OPT1(A) { A=si_opt_1; }

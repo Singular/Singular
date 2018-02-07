@@ -11,6 +11,7 @@
 #include "reporter/si_signals.h"
 #include "Singular/fevoices.h"
 
+#include "misc/options.h"
 #include "Singular/tok.h"
 #include "Singular/ipshell.h"
 #include "Singular/cntrlc.h"
@@ -80,7 +81,7 @@ void sig_term_hdl(int /*sig*/)
 }
 
 /*---------------------------------------------------------------------*
- * File scope Variables (Variables share by several functions in
+ * File scope Variables (Variables shared by several functions in
  *                       the same file )
  *
  *---------------------------------------------------------------------*/
@@ -88,7 +89,6 @@ void sig_term_hdl(int /*sig*/)
 jmp_buf si_start_jmpbuf;
 int siRandomStart;
 short si_restart=0;
-BOOLEAN siCntrlc = FALSE;
 
 typedef void (*si_hdl_typ)(int);
 

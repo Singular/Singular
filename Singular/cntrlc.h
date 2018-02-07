@@ -13,7 +13,6 @@
 extern jmp_buf si_start_jmpbuf;
 extern short si_restart;
 extern int siRandomStart;
-extern BOOLEAN siCntrlc;
 void init_signals();
 
 extern BOOLEAN singular_in_batchmode;
