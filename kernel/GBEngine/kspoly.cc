@@ -20,8 +20,6 @@
 #include "kernel/polys.h"
 #endif
 
-//#define ADIDEBUG 0
-
 #ifdef KDEBUG
 int red_count = 0;
 int create_count = 0;
@@ -515,11 +513,6 @@ int ksReducePolySigRing(LObject* PR,
                  number *coef,
                  kStrategy strat)
 {
-#ifdef ADIDEBUG
-printf("\nksReducePolySig\n");
-pWrite(PR->p);pWrite(PR->sig);
-pWrite(PW->p);pWrite(PW->sig);
-#endif
 #ifdef KDEBUG
   red_count++;
 #ifdef TEST_OPT_DEBUG_RED
@@ -613,9 +606,6 @@ pWrite(PW->p);pWrite(PW->sig);
       //It may happen that now the signature is 0 (drop)
       if(PR->sig == NULL)
       {
-        #ifdef ADIDEBUG
-        printf("\nPossible sigdrop in ksreducepolysig (lost signature)\n");
-        #endif
         strat->sigdrop=TRUE;
       }
       else
@@ -632,9 +622,6 @@ pWrite(PW->p);pWrite(PW->sig);
         }
         if(pLtCmp(PR->sig,origsig) == -1)
         {
-          #ifdef ADIDEBUG
-          printf("\nSigdrop in ksreducepolysig from * to *\n");pWrite(origsig);pWrite(PR->sig);
-          #endif
           strat->sigdrop=TRUE;
         }
       }
