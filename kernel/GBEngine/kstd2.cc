@@ -1961,28 +1961,31 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     #ifdef KDEBUG
       if (TEST_OPT_DEBUG) messageSets(strat);
     #endif
-    if (strat->Ll== 0) strat->interpt=TRUE;
-    if (siCntrlc
-    || (TEST_OPT_DEGBOUND
+    if (siCntrlc)
+    {
+      while (strat->Ll >= 0)
+        deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+      strat->noClearS=TRUE;
+    }
+    if (TEST_OPT_DEGBOUND
         && ((strat->honey && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
-            || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg)))))
+            || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
     {
       /*
        *stops computation if
        * 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
        *a predefined number Kstd1_deg
-       * or siCntrlc
        */
       while ((strat->Ll >= 0)
-        && (siCntrlc ||
-          ((strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)
-            && ((strat->honey && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
+        && (strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)
+        && ((strat->honey && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
             || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg)))
-        )))
+        )
         deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
       if (strat->Ll<0) break;
       else strat->noClearS=TRUE;
     }
+    if (strat->Ll== 0) strat->interpt=TRUE;
     /* picks the last element from the lazyset L */
     strat->P = strat->L[strat->Ll];
     strat->Ll--;

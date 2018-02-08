@@ -1582,20 +1582,23 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     #ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
     #endif
-    if (siCntrlc
-    || (TEST_OPT_DEGBOUND
-      && (strat->L[strat->Ll].ecart+strat->L[strat->Ll].GetpFDeg()> Kstd1_deg)))
+    if (siCntrlc)
+    {
+      while (strat->Ll >= 0)
+        deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+      strat->noClearS=TRUE;
+    }
+    if (TEST_OPT_DEGBOUND
+    && (strat->L[strat->Ll].ecart+strat->L[strat->Ll].GetpFDeg()> Kstd1_deg))
     {
       /*
       * stops computation if
       * - 24 (degBound)
       *   && upper degree is bigger than Kstd1_deg
-      * or siCntrlc
       */
-      while ((strat->Ll >= 0) &&
-        siCntrlc
-        || ((strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)
-          && (strat->L[strat->Ll].ecart+strat->L[strat->Ll].GetpFDeg()> Kstd1_deg))
+      while ((strat->Ll >= 0)
+        && (strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)
+        && (strat->L[strat->Ll].ecart+strat->L[strat->Ll].GetpFDeg()> Kstd1_deg)
       )
       {
         deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
