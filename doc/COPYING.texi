@@ -33,13 +33,14 @@ it under the terms of the GNU General Public License as published by
 the Free Software Foundation (version 2 or version 3 of the License).
 
 Some single files have a copyright given within the file:
-Singular/ndbm.* (BSD)
+Singular/links/ndbm.* (BSD)
 
 The following software modules shipped with @sc{Singular} have their own copyright:
 the omalloc library, the readline library,
 the GNU Multiple Precision Library (GMP),
 NTL: A Library for doing Number Theory (NTL),
-the Singular-Factory library, the Singular-libfac library,
+Flint: Fast Library for Number Theory, the Singular-Factory library, the
+Singular-Factory library, the Singular-libfac library,
 surfex, and,
 for the Windows distributions, the Cygwin DLL and the Cygwin tools (Cygwin), and the
 XEmacs editor (XEmacs).
@@ -56,7 +57,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 (see @uref{http://www.gnu.org/copyleft/gpl.html,,GPL})
 
 Please send any comments or bug reports to
