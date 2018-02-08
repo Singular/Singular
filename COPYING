@@ -1,9 +1,9 @@
-                        SINGULAR version 4-0
+                        SINGULAR version 4-1
                      University of Kaiserslautern
       Department of Mathematics and  Centre for Computer Algebra
      Authors: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann
 
-                        Copyright (C) 1986-2016
+                        Copyright (C) 1986-2018
 
 
                                *NOTICE*
@@ -114,4 +114,7 @@ We should like to acknowledge the financial support given by the
 Volkswagen-Stiftung, the Deutsche Forschungsgemeinschaft and the
 Stiftung fu"r Innovation des Landes Rheinland-Pfalz to the SINGULAR
 project.
+
+SINGULAR is supported by Project B5 of SFB-TRR 195 'Symbolic Tools in
+Mathematics and their Application'.
 
