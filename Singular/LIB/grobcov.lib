@@ -94,7 +94,11 @@ OVERVIEW: In 2010, the library was designed to contain
           A. Montes. \"The Groebner Cover\" (Discussing
           Parametric Polynomial Systems).
 
-          This version was finished on 30/06/2017
+          The last inclusion is an automatic algorithm for
+          Automatic Deduction of Geometric Theorems,
+          described in the book \"Groebner Cover\".
+
+          This version was finished on 10/02/2018
 
 NOTATIONS: Before calling any routine of the library grobcov,
           the user  must define the ideal Q[a][x], and all the
@@ -224,8 +228,7 @@ WLemma(F,A); Given an ideal F in Q[a][x] and an ideal A
           given by I-regular functions.
 
 intersectpar(L); Auxiliary routine. Given a list of ideals definend on K[a][x]
-        but depending only on the parameters, it determines the intersection
-        of all of them in K[a]
+         it determines the intersection of all of them in K[x,a]
 
 ADGT(H,T,H1,T1); Given 4 ideals H,T,H1,T1 in Q[a][x], corresponding to
         a problem of Automatic Deduction of Geometric Theorems,
@@ -237,9 +240,9 @@ ADGT(H,T,H1,T1); Given 4 ideals H,T,H1,T1 in Q[a][x], corresponding to
 SEE ALSO: compregb_lib
 ";
 
+LIB "poly.lib";
 LIB "primdec.lib";
 LIB "qhmoduli.lib";
-LIB "poly.lib";
 
 // ************ Begin of the grobcov library *********************
 
@@ -282,7 +285,7 @@ LIB "poly.lib";
 //        (designed for W, nonnull conditions)
 // Input: ideal J
 // Output:ideal K with the elements of J that are non constants, in the
-//        ring K[x1,..,xm]
+//        ring Q[x1,..,xm]
 static proc elimintfromideal(ideal J)
 {
   int i;
@@ -960,7 +963,7 @@ static proc pspol(poly f,poly g)
 //         even 0 is ignored. It can be called from ideal Q[a][x], but
 //         the given ideal J must only contain poynomials in the
 //         parameters a.
-//         Operates in the ring K[a], but can be called from ring K[a][x],
+//         Operates in the ring Q[a], but can be called from ring Q[a][x],
 // input:  ideal J
 // output: ideal Jc: Returns all the free-square factors of the elements
 //         of ideal J (non repeated). Integer factors are ignored,
@@ -6953,11 +6956,19 @@ static proc CompLev(list G)
       S[size(S)+1]=G[i][3];
     }
   }
-  setring P;
-  def SP=imap(RR,S);
-  list LP=ConsLevels(SP);   // construct the levels of the constructible
-  setring RR;
-  def L=imap(P,LP);
+  if(size(S)==0)
+  {
+    list L;
+    L[1]=1;
+  }
+  else
+  {
+    setring P;
+    def SP=imap(RR,S);
+    list LP=ConsLevels(SP);   // construct the levels of the constructible
+    setring RR;
+    def L=imap(P,LP);
+  }
   return(L);
 }
 
@@ -6966,30 +6977,34 @@ static proc CompLev(list G)
 proc intersectpar(list S)
 "USAGE: interectpar(list of ideals S)
     list S=ideal I1,...,ideal Ik;
-RETURN: The intersection of the ideals I1 ...  Ik  in Q[a]
+RETURN: The intersection of the ideals I1 ...  Ik  in Q[x,a]
 NOTE: The routine is called in Q[a][x],
-    but the ideals I1,..,Ik must be ideals depending only on [a]
+    The ideals I1,..,Ik can be ideals depending only on [a] or on [x,a]
 EXAMPLE: intersectpar shows an example"
 {
   def RR=basering;
   def Rx=ringlist(RR);
   def P=ring(Rx[1]);
-  setring(P);
+  Rx[1]=0;
+  def D=ring(Rx);
+  def RP=D+P;
+  setring(RP);
   def SP=imap(RR,S);
   def EP=intersect(SP[1..size(SP)]);
   setring RR;
-  def E=imap(P,EP);
+  def E=imap(RP,EP);
   return(E);
 }
 example
 {
+"EXAMPLE:"; echo = 2;
+if(defined(R)){kill R;}
 ring R=(0,x,y,z),(x1,y1,z1),lp;
-ideal I1=x+y*z;
-ideal I2=x-y*z;
-ideal I3=x+y+z;
+ideal I1=x+y*z*x1;
+ideal I2=x-y*z*y1;
+ideal I3=x+y+z*z1;
 list S=I1,I2,I3;
-"S="; S;
-"intersectpar(S)=";
+S;
 intersectpar(S);
 }
 
@@ -6997,29 +7012,34 @@ proc ADGT(ideal H,ideal T,ideal H1,ideal T1,list #)
 "USAGE: ADGT(ideal H, ideal T, ideal H1,ideal T1[,options]);
       H: ideal in Q[a][x] hypothesis
       T: ideal in Q[a][x] thesis
-      H1: ideal in Q[a][x] negative hypothesis
+      H1: ideal in Q[a][x] negative hypothesis, only dependent on [a]
       T1: ideal in Q[a][x] negative thesis
            of the Proposition (H and not H1) => (T and not T1)
 RETURN: The list  [[1,S1],[2,S2],..],
        S1, S2, .. represent the set of parameter values
        that must be verified as supplementary
-       conditions for the Proposition to be a Theorem.
+       conditions for the Proposition to become a Theorem.
        They are given by default in Prep.
-       If the proposition is generally true, then
-       S1=[1,[0,..],G1]. In this case the generic segment
-       of the internal grobcob called is provided
-       to provide information about the values of the
-       variables determined for every value of the
-       parameters, as thy are usually determined.
+       If the proposition is generally true,
+       (the proposition is already a theorem), then
+       the generic segment of the internal grobcov
+       called is also returned to provide information
+       about the values of the variables determined
+       for every value of the parameters.
 OPTIONS: An option is a pair of arguments: string,
        integer. To modify the default options, pairs
        of arguments -option name, value- of valid options
        must be added to the call.
-       \"rep\",0-1: The default is (\"rep\",0)
+       Option \"rep\",0-1: The default is (\"rep\",0)
        and then the segments are given in canonical
        P-representation.
        Option (\"rep\",1) represents the segments
        in canonical C-representation,
+       Option \"gseg\",0-1: The default is \"gseg\",1
+       and then when the proposition is generally true,
+       ADGT outputs a second element which is the
+       \"generic segment\" to provide supplementary information.
+       With option \"gseg\",0 this is avoided.
 NOTE:  The basering R, must be of the form Q[a][x],
        (a=parameters, x=variables), and
        should be defined previously. The ideals
@@ -7039,9 +7059,11 @@ EXAMPLE:  ADGT shows an example"
   int start=timer;
   // options
   int rep=0;
+  int gseg=1;
   for(i=1;i<=size(Lopt) div 2;i++)
   {
     if(Lopt[2*i-1]=="rep"){rep=Lopt[2*i];}
+    else{if(Lopt[2*i-1]=="gseg"){gseg=Lopt[2*i];}}
   }
   // begin proc
   if(equalideals(T1,ideal(1))) //nonnullT==0)
@@ -7109,46 +7131,99 @@ EXAMPLE:  ADGT shows an example"
       }
     }
   }
-  list L=Levels(CompLev(G2));
-  if(rep==0)
+  if(size(G2)==0)
   {
-    setring P;
-    def LFP=imap(RR,L);
-    // list LFP1=LFP;
-    for(i=1;i<=size(LFP);i++)
-    {
-      LFP[i][2]=Prep(LFP[i][2][1],LFP[i][2][2]);
-    }
-    setring RR;
-    L=imap(P,LFP);
+    list L;
+    L[1]=1;
   }
-  if(equalideals(G2[1][3][1][1],0) and not(equalideals(G2[1][1],ideal(1))))
-  {L[size(L)+1]=G2[1];}
+  else
+  {
+    list L=Levels(CompLev(G2));
+    if(rep==0)
+    {
+      setring P;
+      def LFP=imap(RR,L);
+      // list LFP1=LFP;
+      for(i=1;i<=size(LFP);i++)
+      {
+        LFP[i][2]=Prep(LFP[i][2][1],LFP[i][2][2]);
+      }
+      setring RR;
+      L=imap(P,LFP);
+    }
+    if(equalideals(G2[1][3][1][1],0) and not(equalideals(G2[1][1],ideal(1))))
+    {
+      list GL=G2[1];
+      list LL=GL[3];
+      if(rep==0)
+      {
+        setring P;
+        def LLP=imap(RR,LL);
+        LLP=Prep(LLP[1],LLP[2]);
+        setring RR;
+        LL=imap(P,LLP);
+        GL[3]=LL;
+      }
+      if(gseg==1)
+      {
+        L[size(L)+1]=list("Generic segment",GL);
+      }
+    }
+  }
   return(L);
 }
 example
 {
-"Determine the supplementary conditions";
-"for the non-degenerate  triangle A(-1,0), B(1,0), C(x,y)";
-"to have an ortic non-degenerate isosceles triangle";
+"EXAMPLE:"; echo = 2;
+// Determine the supplementary conditions
+// for the non-degenerate  triangle A(-1,0), B(1,0), C(x,y)
+// to have an ortic non-degenerate isosceles triangle
 
+if(defined(R)){kill R;}
 ring R=(0,x,y),(x2,y2,x1,y1),lp;
-
+// Hypothesis H
 ideal H=-y*x1+(x-1)*y1+y,
              (x-1)*(x1+1)+y*y1,
              -y*x2+(x+1)*y2-y,
              (x+1)*(x2-1)+y*y2;
+// Thesis T
 ideal T=(x1-x)^2+y1^2-(x2-x)^2-y2^2;
+// Negative Hypothesis H1
 ideal H1=y;
+ // Negative Thesis T1
 ideal T1=x*(y1-y2)-y*(x1-x2)+x1*y2-x2*y1;
-" "; "Hypothesis H="; H;
-" "; "Thesis T="; H;
-" "; "Negative Hypothesis H1="; H1;
-" "; "Negative Thesis T1="; T1;
-" "; "Complementary conditions for the";
-"Proposition (H and not H1) => (T and not T1)";
-" to be true";
+// Complementary conditions for the
+// Proposition (H and not H1) => (T and not T1)
+// to be true
+
 ADGT(H,T,H1,T1);
+//********************************************
+
+// Example of automatic demonstrations of a theorem
+// The Nine Points Circle Theorem:
+
+if(defined(R1)){kill R1;}
+ring R1=(0,x,y),(x1,y1,x2,y2,yh,a,b,r),dp;
+short=0;
+//Hypothesis H
+ideal H=y*x1+y1-x*y1-y,
+            (x-1)*(x1+1)+y*y1,
+            -y*x2+y2+x*y2-y,
+            (x+1)*(x2-1)+y*y2,
+            (x1-a)^2+(y1-b)^2-r^2,
+            (x2-a)^2+(y2-b)^2-r^2,
+            (x-a)^2+b^2-r^2,
+            -yh+x*y1-x1*yh+y1;
+// Thesis T
+ideal T=yh+x*y2-x2*yh-y2,
+            (x-1-2*a)^2+(yh-2*b)^2-4*r^2,
+            (x+1-2*a)^2+(yh-2*b)^2-4*r^2,
+            4*(x-a)^2+(y+yh-2*b)^2-4*r^2,
+            (x-1-2*a)^2+(y-2*b)^2-4*r^2,
+            (x+1-2*a)^2+(y-2*b)^2-4*r^2,
+            4*(x-a)^2+(yh+y-2*b)^2-4*r^2;
+ADGT(H,T,y,1);
+// Thus the theorem is true.
 }
 //****************************** End ADGT *************************
 
@@ -7189,7 +7264,7 @@ ADGT(H,T,H1,T1);
 //     def @RP=D+@P;
 //     export(@R);      // global ring Q[a][x]
 //     export(@P);      // global ring Q[a]
-//     export(@RP);     // global ring K[x,a] with product order
+//     export(@RP);     // global ring Q[x,a] with product order
 //     setring(RRR);
 //   };
 //   example
