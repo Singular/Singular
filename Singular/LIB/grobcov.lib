@@ -28,8 +28,7 @@ IMPORTANT: The book,  not yet published:
            but the book actualices all the contents.
 
 AUTHORS:  Antonio Montes (Universitat Politecnica de Catalunya),
-          Hans Schoenemann (Techische Universitaet
-          Kaiserslautern).
+          Hans Schoenemann (Technische Universitaet Kaiserslautern).
 
 OVERVIEW: In 2010, the library was designed to contain
           Montes-Wibmer's
@@ -1494,19 +1493,19 @@ static proc Crep0(ideal N, ideal M)
 //    the Prep of V(N) \ V(M)
 // Assumed to be called in the ring ring Q[a][x]. But the data must only contain parameters.
 proc Prep(ideal N, ideal M)
- "USAGE: Prep(ideal N,ideal M);
+"USAGE: Prep(ideal N,ideal M);
        ideal N (null ideal) (not necessarily radical nor
        maximal) in Q[a]. (a=parameters, x=variables).
        ideal M (hole ideal) (not necessarily containing N)
        in Q[a]. To be called in a ring Q[a][x] or a ring
        Q[a]. But the ideals can contain only the
        parameters in Q[a].
- RETURN: The canonical P-representation of the locally closed
+RETURN: The canonical P-representation of the locally closed
        set V(N) \ V(M)
        Output: [Comp_1, .. , Comp_s ] where
        Comp_i=[p_i,[p_i1,..,p_is_i]]
- KEYWORDS: locally closed set; canoncial form
- EXAMPLE:  Prep; shows an example"
+KEYWORDS: locally closed set; canoncial form
+EXAMPLE:  Prep; shows an example"
 {
   int te;
   def RR=basering;
@@ -1597,12 +1596,12 @@ proc PtoCrep(list L)
        V(N) \ V(M). To be called in a ring Q[a][x]
        or a ring Q[a]. But the ideals can contain
        only the parameters in Q[a].
- RETURN:The canonical C-representation [P,Q] of the
+RETURN:The canonical C-representation [P,Q] of the
        locally closed set. A pair of radical ideals with
        P included in Q, representing the
        set V(P) \ V(Q)
- KEYWORDS: locally closed set; canoncial form
- EXAMPLE:  PtoCrep; shows an example"
+KEYWORDS: locally closed set; canoncial form
+EXAMPLE:  PtoCrep; shows an example"
 {
   int te;
   def RR=basering;
