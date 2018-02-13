@@ -6928,6 +6928,8 @@ erase generators/columns which a skalar multiples (w.r.t. ground field/ring) of 
 erase generators/columns whose leading monomials are copies of leading monomials of earlier listed generators/columns such that the coefficients of both leading terms are units in the ground field/ring.
 @item 32
 erase generators/columns whose leading terms are divisible by leading terms of other (not necessarily earlier) listed generators/columns.
+@item 64
+normalize each coefficient of every monomial (of every polynomial)
 @end table
 @item @strong{Example:}
 @smallexample
