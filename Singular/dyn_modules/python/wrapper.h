@@ -24,7 +24,7 @@
 #include "interpreter_support.h"
 #include "ring_wrap.h"
 #include "intvec_wrap.h"
-using boost::python::numeric::array;
+//using boost::python::numeric::array;
 using boost::python::extract;
 
 using namespace boost::python;
