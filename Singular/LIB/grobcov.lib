@@ -7025,6 +7025,8 @@ RETURN: The list  [[1,S1],[2,S2],..],
        called is also returned to provide information
        about the values of the variables determined
        for every value of the parameters.
+       If the propsition is false for every values of the
+       parameters, then the emply list is returned.
 OPTIONS: An option is a pair of arguments: string,
        integer. To modify the default options, pairs
        of arguments -option name, value- of valid options
@@ -7133,12 +7135,12 @@ EXAMPLE:  ADGT shows an example"
   if(size(G2)==0)
   {
     list L;
-    L[1]=1;
+    // L[1]=1;
   }
   else
   {
     list L=Levels(CompLev(G2));
-    if(rep==0)
+    if(rep==0 and size(L)>0)
     {
       setring P;
       def LFP=imap(RR,L);
