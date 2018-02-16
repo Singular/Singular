@@ -17,8 +17,7 @@
 #include "coeffs/longrat.h"
 #include "coeffs/ffields.h"
 
-#include <string.h>
-#include <math.h>
+#include <cmath>
 #include <errno.h>
 
 #ifdef LDEBUG
@@ -806,7 +805,7 @@ static BOOLEAN nfCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
 {
   if (n==n_GF) {
     GFInfo* p = (GFInfo *)(parameter);
-    int c = pow (p->GFChar, p->GFDegree);
+    int c = (int)pow ((double)p->GFChar, (double)p->GFDegree);
     if ((c == r->m_nfCharQ) && (strcmp(n_ParameterNames(r)[0], p->GFPar_name) == 0))
       return TRUE;
   }
@@ -927,7 +926,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
     return TRUE;
   }
 
-  int c = pow (p->GFChar, p->GFDegree);
+  int c = (int)pow ((double)p->GFChar, (double)p->GFDegree);
 
   nfReadTable(c, r);
 

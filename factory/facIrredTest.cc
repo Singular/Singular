@@ -14,7 +14,7 @@
 
 #include "config.h"
 
-#include <math.h>
+#include <cmath>
 
 #include "facIrredTest.h"
 #include "cf_map.h"

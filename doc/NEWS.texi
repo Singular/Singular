@@ -36,7 +36,7 @@ New command:
 
 Extended commands:
 @itemize
-@item pseudo ordering @code{L} allows setting of limits for exponents in polynomials (@nref{Pseudo ordering L},@nref{attrib} for maxExp)
+@item pseudo ordering @code{L} allows setting of limits for exponents in polynomials (@nref{Pseudo ordering L},@nref{attrib} for @code{maxExp})
 @item @code{%},@code{mod}: also for poly operands (@nref{poly operations}).
 @item @code{delete}: extended to intvec, ideal, module (@nref{delete}).
 @item syz (@nref{syz}), lift (@nref{lift}), liftstd (@nref{liftstd}), intersect(@nref{intersect}): with a specified GB algorithm
@@ -47,6 +47,10 @@ New libraries:
 @item classify2.lib: Classification of isolated singularities of corank <=2 and modality <= wrt. right equivalence over the complex numbers according to Arnold's list. (@nref{classify2_lib})
 @item goettsche.lib: Goettsche's formula for the Betti numbers of the Hilbert scheme
 of points on a surface, Macdonald's formula for the symmetric product (@nref{goettsche_lib})
+@item combinat.lib, modules.lib, methods,lib, nets.lib: a more mathematical view of modules (@nref{combinat_lib}: combinatorics),
+(@nref{methods_lib}: construct procedures),
+(@nref{modules_lib}: free resolutions),
+(@nref{nets_lib}: pretty printing)
 @item ncHilb.lib: Hilbert series of non-commutative monomial algebras (@nref{ncHilb_lib})
 @item realclassify.lib: Classification of real singularities(@nref{realclassify_lib})
 @item rootisolation.lib: real root isolation using interval arithmetic(@nref{rootisolation_lib})

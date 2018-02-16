@@ -1,7 +1,6 @@
 #ifndef GFANLIB_EXCEPTIONS_H
 #define GFANLIB_EXCEPTIONS_H
 
-#include <iostream>
 #include <exception>
 
 class weightOverflowException: public std::exception

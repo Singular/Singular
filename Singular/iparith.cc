@@ -5,8 +5,6 @@
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
-//#include <sys/time.h>
-//#include <sys/resource.h>
 //long all_farey=0L;
 //long farey_cnt=0L;
 
@@ -80,13 +78,7 @@
 //#include "kernel/mpr_inout.h"
 #include "reporter/si_signals.h"
 
-#include <stdlib.h>
-#include <string.h>
 #include <ctype.h>
-#include <stdio.h>
-#include <time.h>
-#include <unistd.h>
-#include <vector>
 
 ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE, const long bitmask=0x7fff);
 
@@ -2221,7 +2213,8 @@ static BOOLEAN jjFRES3(leftv res, leftv u, leftv v, leftv w)
      */
     if (strcmp(method, "complete") != 0
             && strcmp(method, "frame") != 0
-            && strcmp(method, "extended frame") != 0) {
+            && strcmp(method, "extended frame") != 0
+            && strcmp(method, "single module") != 0) {
         WerrorS("wrong optional argument for fres");
     }
     syStrategy r = syFrank(id, max_length, method);
@@ -3066,6 +3059,7 @@ static BOOLEAN jjRSUM(leftv res, leftv u, leftv v)
   res->data = (char *)r;
   return (i==-1);
 }
+#define SIMPL_NORMALIZE 64
 #define SIMPL_LMDIV 32
 #define SIMPL_LMEQ  16
 #define SIMPL_MULT 8
@@ -3100,6 +3094,10 @@ static BOOLEAN jjSIMPL_ID(leftv res, leftv u, leftv v)
   if (sw & SIMPL_NORM)
   {
     id_Norm(id,currRing);
+  }
+  if (sw & SIMPL_NORMALIZE)
+  {
+    id_Normalize(id,currRing);
   }
   res->data = (char * )id;
   return FALSE;
@@ -3171,6 +3169,10 @@ static BOOLEAN jjSIMPL_P(leftv res, leftv u, leftv v)
   if (sw & SIMPL_NORM)
   {
     pNorm(p);
+  }
+  if (sw & SIMPL_NORMALIZE)
+  {
+    p_Normalize(p,currRing);
   }
   res->data = (char * )p;
   return FALSE;

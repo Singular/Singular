@@ -1,9 +1,9 @@
-                        SINGULAR version 4-0
+                        SINGULAR version 4-1-1
                      University of Kaiserslautern
-      Department of Mathematics and  Centre for Computer Algebra
+       Department of Mathematics and Centre for Computer Algebra
      Authors: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann
 
-                        Copyright (C) 1986-2016
+                        Copyright (C) 1986-2018
 
 
                                *NOTICE*
@@ -19,44 +19,43 @@ The following software modules shipped with SINGULAR have their own
 copyright: the omalloc library, the readline library, the GNU Multiple
 Precision Library (GMP), NTL: A Library for doing Number Theory (NTL),
 Flint: Fast Library for Number Theory, the Singular-Factory library, the
-Singular-libfac library, surfex, and, for the Windows distributions,
-the Cygwin DLL and the Cygwin tools (Cygwin), and the XEmacs editor
-(XEmacs).
+Singular-Factory library, the Singular-libfac library, surfex, and, for
+the Windows distributions, the Cygwin DLL and the Cygwin tools (Cygwin),
+and the XEmacs editor (XEmacs).
 
 Their copyrights and licenses can be found in the accompanying files
-COPYING which are distributed along with these packages.  (Since
-version 3-0-3 of SINGULAR, all parts have GPL or LGPL as (one of) their
+COPYING which are distributed along with these packages.  (Since version
+3-0-3 of SINGULAR, all parts have GPL or LGPL as (one of) their
 licences.)
 
 This program is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+Public License for more details.
 
 You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
-59 Temple Place, Suite 330, Boston, MA  02111-1307  USA (see GPL)
+59 Temple Place, Suite 330, Boston, MA 02111-1307 USA (see GPL)
 
 Please send any comments or bug reports to
 <singular@mathematik.uni-kl.de>.
 
 If you want to be informed of new releases, please register as a
-SINGULAR user by sending an email to
-<singular@mathematik.uni-kl.de> with subject line `register' and body
-containing the following data:      your name, email address,
-organisation, country and platform(s).
+SINGULAR user by sending an email to <singular@mathematik.uni-kl.de>
+with subject line 'register' and body containing the following data:
+your name, email address, organisation, country and platform(s).
 
 For information on how to cite SINGULAR see
-`http://www.singular.uni-kl.de/index.php/how-to-cite-singular'.
+<http://www.singular.uni-kl.de/index.php/how-to-cite-singular>.
 
-You can also support SINGULAR by informing us about your result
-obtained by using SINGULAR.
+You can also support SINGULAR by informing us about your result obtained
+by using SINGULAR.
 
 Availability
 ============
 
 The latest information regarding the status of SINGULAR is always
-available from `http://www.singular.uni-kl.de'.
+available from <http://www.singular.uni-kl.de>.
 
 Acknowledgements
 ================
@@ -65,15 +64,15 @@ The development of SINGULAR is directed and coordinated by Wolfram
 Decker, Gert-Martin Greuel, Gerhard Pfister, and Hans Scho"nemann.
 
 Current devteams: Abdus Salam School of Mathematical Sciences in Lahore,
-BTU Cottbus, Center for Advanced Security Research Darmstadt (CASED),
-FU Berlin, Isfahan University of Technology, Mathematisches
+BTU Cottbus, Center for Advanced Security Research Darmstadt (CASED), FU
+Berlin, Isfahan University of Technology, Mathematisches
 Forschunginstitut Oberwolfach, Oklahoma State University, RWTH Aachen,
-Universidad de Buenos Aires, Université de Versailles
+Universidad de Buenos Aires, Universite' de Versailles
 Saint-Quentin-en-Yvelines, University of Go"ttingen, University of
 Hannover, University of La Laguna and University of Valladolid.
 
-Current SINGULAR developers: Wolfram Decker, Gert-Martin Greuel,
-Gerhard Pfister, Hans Scho"nemann,
+Current SINGULAR developers: Wolfram Decker, Gert-Martin Greuel, Gerhard
+Pfister, Hans Scho"nemann,
 
 Shawki Al-Rashed, Daniel Andres, Mohamed Barakat, Isabel Bermejo,
 Muhammad Asan Binyamin, Rene' Birkner, Rocio Blanco, Xenia Bogomolec,
@@ -81,25 +80,24 @@ Michael Brickenstein, Stanislav Bulygin, Antonio Campillo, Raza
 Choudery, Alexander Dreyer, Christian Eder, Santiago Encinas, Jose
 Ignacio Farran, Anne Fru"hbis-Kru"ger, Rosa de Frutos, Eva
 Garcia-Llorente, Ignacio Garcia-Marco, Christian Haase, Amir Hashemi,
-Fernando Hernando, Bradford Hovinen, Nazeran Idress, Anders Jensen,
-Lars Kastner, Junaid Alan Khan, Kai Kru"ger, Santiago Laplagne,
-Grégoire Lecerf, Martin Lee, Viktor Levandovskyy, Benjamin Lorenz,
-Christoph Lossen, Thomas Markwig, Hannah Markwig, Irene Marquez, Bernd
-Martin, Edgar Martinez, Martin Monerjan, Francisco Monserrat, Oleksandr
-Motsak, Andreas Paffenholz, Maria Jesus Pisabarro, Diego Ruano, Afshan
-Sadiq, Kristina Schindelar, Mathias Schulze, Frank Seelisch, Andreas
-Steenpass, Stefan Steidel, Grischa Studzinski, Katharina Werner and Eva
-Zerz.
+Fernando Hernando, Bradford Hovinen, Nazeran Idress, Anders Jensen, Lars
+Kastner, Junaid Alan Khan, Kai Kru"ger, Santiago Laplagne, Gre'goire
+Lecerf, Martin Lee, Viktor Levandovskyy, Benjamin Lorenz, Christoph
+Lossen, Thomas Markwig, Hannah Markwig, Irene Marquez, Bernd Martin,
+Edgar Martinez, Martin Monerjan, Francisco Monserrat, Oleksandr Motsak,
+Andreas Paffenholz, Maria Jesus Pisabarro, Diego Ruano, Afshan Sadiq,
+Kristina Schindelar, Mathias Schulze, Frank Seelisch, Andreas Steenpass,
+Stefan Steidel, Grischa Studzinski, Katharina Werner and Eva Zerz.
 
 Further contributions to SINGULAR have been made by: Martin Albrecht,
 Olaf Bachmann, Muhammad Ahsan Banyamin, Thomas Bauer, Thomas Bayer,
 Markus Becker, J. Boehm, Gergo Gyula Borus, Winfried Bruns, Fernando
-Hernando Carrillo, Victor Castellanos, Nadine Cremer, Michael Cuntz,
-Kai Dehmann, Christian Dingler, Marcin Dumnicki, Stephan Endrass,
-Vladimir Gerdt, Philippe Gimenez, Christian Gorzel, Hubert Grassmann,
-Jan Hackfeld, Agnes Heydtmann, Dietmar Hillebrand, Tobias Hirsch,
-Markus Hochstetter, N. Idrees, Manuel Kauers, Simon King, Sebastian
-Jambor, Oliver Labs, Anen Lakhal, Martin Lamm, Francisco Javier Lobillo,
+Hernando Carrillo, Victor Castellanos, Nadine Cremer, Michael Cuntz, Kai
+Dehmann, Christian Dingler, Marcin Dumnicki, Stephan Endrass, Vladimir
+Gerdt, Philippe Gimenez, Christian Gorzel, Hubert Grassmann, Jan
+Hackfeld, Agnes Heydtmann, Dietmar Hillebrand, Tobias Hirsch, Markus
+Hochstetter, N. Idrees, Manuel Kauers, Simon King, Sebastian Jambor,
+Oliver Labs, Anen Lakhal, Martin Lamm, Francisco Javier Lobillo,
 Christoph Mang, Michael Messollen, Andrea Mindnich, Antonio Montes,
 Jorge Martin Morales, Thomas Nu"ssler, Wolfgang Neumann, Markus Perling,
 Wilfried Pohl, Adrian Popescu, Tetyana Povalyaeva, Carlos Rabelo,
@@ -114,4 +112,7 @@ We should like to acknowledge the financial support given by the
 Volkswagen-Stiftung, the Deutsche Forschungsgemeinschaft and the
 Stiftung fu"r Innovation des Landes Rheinland-Pfalz to the SINGULAR
 project.
+
+SINGULAR is supported by Project B5 of SFB-TRR 195 'Symbolic Tools in
+Mathematics and their Application'.
 

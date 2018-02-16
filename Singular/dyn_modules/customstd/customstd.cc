@@ -1,6 +1,6 @@
 #include "Singular/libsingular.h"
-#include <vector>
-#include <iostream>
+//#include <vector>
+//#include <iostream>
 
 // global variable potentially storing output
 //ideal idealCache=NULL;

@@ -70,17 +70,11 @@ class SBucketFactory: private std::stack <sBucket_pt>
 {
   private:
     typedef std::stack <sBucket_pt> Base;
-//    typedef std::vector<Bucket> Memory;
-//    typedef std::deque <Bucket> Memory;
-//    typedef std::stack <Bucket, Memory > Base;
 
   public:
     typedef Base::value_type Bucket;
 
     SBucketFactory(const ring r)
-#ifndef SING_NDEBUG
-        : m_ring(r)
-#endif
     {
       push ( _CreateBucket(r) ); // start with at least one sBucket...?
       assume( top() != NULL );
@@ -97,8 +91,6 @@ class SBucketFactory: private std::stack <sBucket_pt>
 
     Bucket getBucket(const ring r, const bool remove = true)
     {
-      assume( r == m_ring );
-
       Bucket bt = NULL;
 
       if( !empty() )
@@ -120,8 +112,6 @@ class SBucketFactory: private std::stack <sBucket_pt>
       }
 
       assume( bt != NULL );
-      assume( _IsBucketEmpty(bt) );
-      assume( r == _GetBucketRing(bt) );
 
       return bt;
     }
@@ -130,8 +120,6 @@ class SBucketFactory: private std::stack <sBucket_pt>
     void putBucket(const Bucket & bt, const bool replace = false)
     {
       assume( bt != NULL );
-      assume( _IsBucketEmpty(bt) );
-      assume( m_ring == _GetBucketRing(bt) );
 
       if( empty() )
         push( bt );
@@ -150,16 +138,6 @@ class SBucketFactory: private std::stack <sBucket_pt>
     }
 
   private:
-
-#ifndef SING_NDEBUG
-    const ring m_ring; ///< For debugging: all buckets are over the same ring... right?!
-
-    /// get bucket ring
-    static ring _GetBucketRing(const Bucket& bt);
-
-    static bool  _IsBucketEmpty(const Bucket& bt);
-#endif
-
     /// inital allocation for new buckets
     static Bucket _CreateBucket(const ring r);
 
@@ -257,10 +235,6 @@ class CLeadingTerm
   public:
     CLeadingTerm(unsigned int label,  const poly lt, const ring);
 
-#ifndef SING_NDEBUG
-    ~CLeadingTerm();
-#endif
-
 #if NOPRODUCT
     bool DivisibilityCheck(const poly multiplier, const poly t, const unsigned long not_sev, const ring r) const;
 #endif
@@ -268,16 +242,9 @@ class CLeadingTerm
 
     bool CheckLT( const ideal & L ) const;
 
-#ifndef SING_NDEBUG
-    poly lt() const;
-    unsigned long sev() const;
-    unsigned int label() const;
-#else
     inline poly lt() const { return m_lt; };
     inline unsigned long sev() const { return m_sev; };
     inline unsigned int label() const { return m_label; };
-#endif
-
   private:
     const unsigned long m_sev; ///< not short exp. vector
 
@@ -285,12 +252,6 @@ class CLeadingTerm
     const unsigned int  m_label; ///< index in the main L[] + 1
 
     const poly          m_lt; ///< the leading term itself L[label-1]
-
-#ifndef SING_NDEBUG
-    const ring _R;
-
-    const poly          m_lt_copy; ///< original copy of LEAD(lt) (only for debug!!!)
-#endif
 
     // disable the following:
     CLeadingTerm();
@@ -339,11 +300,6 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
 
     /// is the term to be "preprocessed" as lower order term or lead to only reducible syzygies...
     int PreProcessTerm(const poly t, CReducerFinder& syzChecker) const;
-
-#ifndef SING_NDEBUG
-    void DebugPrint() const;
-    void Verify() const;
-#endif
 
   private:
     ideal m_L; ///< only for debug
@@ -524,31 +480,7 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     /// for checking tail-terms and makeing them irreducible (wrt m_LS!)
     CReducerFinder m_checker;
 
-    /*
-    // need more data here:
-    // (m_idLeads : m_tailterm) = (m, pos, compl), s.th: compl * m_tailterm divides m_idLeads[pos]
-    // but resulting sysygy compl * gen(pos) should not be in
-    // Idea: extend CReducerFinder??!!
-    struct CTailTerm
-    {
-      const poly m_tailterm;
-
-      const CReducerFinder m_reducers; // positions are labels (in m_idLeads)...
-      // compl - to be computed if needed?
-
-      CTailTerm(const poly tt, const CReducerFinder reds): m_tailterm(tt), m_reducers(reds) {}
-    };
-
-    typedef std::vector<const CTailTerm*> TTail;
-    typedef std::vector<TTail> TTailTerms;
-
-    TTailTerms m_idTailTerms;
-    */
-
     mutable TCache m_cache; // cacher comp + poly -> poly! // mutable???
-
-/// TODO: look into m_idTailTerms!!!!!!!!!!!!!!!!!!!!!!!! map? heaps???
-    // NOTE/TODO: the following globally shared buckets violate reentrance - they should rather belong to TLS!
 
     /// used for simple summing up
     mutable SBucketFactory m_sum_bucket_factory; // sBucket_pt

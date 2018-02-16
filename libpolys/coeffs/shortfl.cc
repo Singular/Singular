@@ -21,8 +21,8 @@
 #include "coeffs/shortfl.h"
 #include "coeffs/longrat.h"
 
-#include <string.h>
-#include <math.h>
+//#include <string.h>
+#include <cmath>
 
 // Private interface should be hidden!!!
 
@@ -105,18 +105,6 @@ static long nrInt(number &n, const coeffs r)
     i = (long)f;
   else
     i = 0;
-  return i;
-}
-
-static int nrSize(number n, const coeffs)
-{
-  SI_FLOAT f = nf(n).F();
-  int i = (int)f;
-  /* basically return the largest integer in n;
-     only if this happens to be zero although n != 0,
-     return 1;
-     (this code ensures that zero has the size zero) */
-  if ((f != 0.0) & (i == 0)) i = 1;
   return i;
 }
 
@@ -759,7 +747,7 @@ BOOLEAN nrInitChar(coeffs n, void* p)
     /* nName= ndName; */
     /*nSize  = ndSize;*/
 #ifdef LDEBUG
-  //n->cfDBTest=ndDBTest; // not yet implemented: nrDBTest;
+  n->cfDBTest=nrDBTest; // not yet implemented: nrDBTest;
 #endif
 
   //n->nCoeffIsEqual = ndCoeffIsEqual;

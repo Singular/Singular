@@ -16,13 +16,6 @@
 #include <map>
 
 /*
- * If set to true, the result of compute_image() is cached for _every_ term in
- * the current step of the resolution. This corresponds to the subtree attached
- * to the node which represents this term, see reference.
- */
-#define CACHE 1
-
-/*
  * set variables[i] to false if the i-th variable does not appear among the
  * leading terms of L
  */
@@ -49,7 +42,7 @@ static void update_variables(std::vector<bool> &variables, const ideal L)
  * If the previous step in the resolution is reduced, then this check can be
  * used to determine lower order terms.
  */
-static inline bool check_variables(const std::vector<bool> variables,
+static inline bool check_variables(const std::vector<bool> &variables,
         const poly m)
 {
     const ring R = currRing;
@@ -143,23 +136,22 @@ static poly find_reducer(const poly multiplier, const poly t,
     return NULL;
 }
 
-#if CACHE
 static poly traverse_tail(const poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
         const lt_struct *const *const hash_previous_module);
-#else
+
 static poly compute_image(const poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
-        const lt_struct *const *const hash_previous_module);
-#define traverse_tail compute_image
-#endif   // CACHE
+        const lt_struct *const *const hash_previous_module,
+        const bool use_cache);
 
 /*
  * recursively call traverse_tail() for each new term found by find_reducer()
  */
 static poly reduce_term(const poly multiplier, const poly term,
         const ideal previous_module, const std::vector<bool> &variables,
-        const lt_struct *const *const hash_previous_module)
+        const lt_struct *const *const hash_previous_module,
+        const bool use_cache)
 {
     poly s = find_reducer(multiplier, term, hash_previous_module);
     if (s == NULL) {
@@ -167,8 +159,14 @@ static poly reduce_term(const poly multiplier, const poly term,
     }
     const ring r = currRing;
     const int c = __p_GetComp(s, r) - 1;
-    const poly t = traverse_tail(s, c, previous_module, variables,
-            hash_previous_module);
+    poly t;
+    if (use_cache) {
+        t = traverse_tail(s, c, previous_module, variables,
+                hash_previous_module);
+    } else {
+        t = compute_image(s, c, previous_module, variables,
+                hash_previous_module, false);
+    }
     return p_Add_q(s, t, r);
 }
 
@@ -178,7 +176,8 @@ static poly reduce_term(const poly multiplier, const poly term,
  */
 static poly compute_image(const poly multiplier, const int comp,
         const ideal previous_module, const std::vector<bool> &variables,
-        const lt_struct *const *const hash_previous_module)
+        const lt_struct *const *const hash_previous_module,
+        const bool use_cache)
 {
     const poly tail = previous_module->m[comp]->next;
     if (unlikely(tail == NULL) || !check_variables(variables, multiplier)) {
@@ -187,7 +186,7 @@ static poly compute_image(const poly multiplier, const int comp,
     sBucket_pt sum = sBucketCreate(currRing);
     for (poly p = tail; p != NULL; p = pNext(p)) {
         const poly rt = reduce_term(multiplier, p, previous_module, variables,
-                hash_previous_module);
+                hash_previous_module, use_cache);
         sBucket_Add_p(sum, rt, pLength(rt));
     }
     poly s;
@@ -197,7 +196,6 @@ static poly compute_image(const poly multiplier, const int comp,
     return s;
 }
 
-#if CACHE
 struct cache_compare
 {
     inline bool operator() (const poly& l, const poly& r) const
@@ -266,25 +264,31 @@ static poly traverse_tail(const poly multiplier, const int comp,
         return get_from_cache_term(itr, multiplier);
     }
     poly p = compute_image(multiplier, comp, previous_module, variables,
-            hash_previous_module);
+            hash_previous_module, true);
     insert_into_cache_term(T, multiplier, p);
     return p;
 }
-#endif   // CACHE
 
 /*
  * lift the extended induced leading term a to a syzygy
  */
 static poly lift_ext_LT(const poly a, const ideal previous_module,
         const std::vector<bool> &variables,
-        const lt_struct *const *const hash_previous_module)
+        const lt_struct *const *const hash_previous_module,
+        const bool use_cache)
 {
     const ring R = currRing;
     // the leading term does not need to be cached
     poly t1 = compute_image(a, __p_GetComp(a, R)-1, previous_module, variables,
-            hash_previous_module);
-    poly t2 = traverse_tail(a->next, __p_GetComp(a->next, R)-1,
-            previous_module, variables, hash_previous_module);
+            hash_previous_module, use_cache);
+    poly t2;
+    if (use_cache) {
+        t2 = traverse_tail(a->next, __p_GetComp(a->next, R)-1,
+                previous_module, variables, hash_previous_module);
+    } else {
+        t2 = compute_image(a->next, __p_GetComp(a->next, R)-1,
+                previous_module, variables, hash_previous_module, false);
+    }
     t1 = p_Add_q(t1, t2, R);
     return t1;
 }
@@ -526,75 +530,163 @@ static ideal computeFrame(const ideal G, syzM_i_Function syzM_i,
  * lift each (extended) induced leading term to a syzygy
  */
 static void computeLiftings(const resolvente res, const int index,
-        std::vector<bool> &variables)
+        const std::vector<bool> &variables, const bool use_cache)
 {
-    update_variables(variables, res[index-1]);
-    if (index == 2) {   // we don't know if the input is a reduced SB
-        variables[currRing->N] = false;
+    if (use_cache) {
+        initialize_cache(res[index-1]->ncols);
     }
-#if CACHE
-    initialize_cache(res[index-1]->ncols);
-#endif   // CACHE
     lt_struct **hash_previous_module
         = (lt_struct **)omAlloc((res[index-1]->rank+1)*sizeof(lt_struct *));
     initialize_hash(hash_previous_module, res[index-1]);
     for (int j = res[index]->ncols-1; j >= 0; j--) {
         res[index]->m[j]->next->next = lift_ext_LT(res[index]->m[j],
-                res[index-1], variables, hash_previous_module);
+                res[index-1], variables, hash_previous_module, use_cache);
     }
     for (int i = 0; i <= res[index-1]->rank; i++) {
         omfree(hash_previous_module[i]);
     }
     omFree(hash_previous_module);
-#if CACHE
-    delete_cache(res[index-1]->ncols);
-#endif   // CACHE
+    if (use_cache) {
+        delete_cache(res[index-1]->ncols);
+    }
+}
+
+/*
+ * check if the monomial m contains any of the variables set to false
+ */
+static inline bool contains_unused_variable(const poly m,
+    const std::vector<bool> &variables)
+{
+    const ring R = currRing;
+    for (int j = R->N; j > 0; j--) {
+        if (!variables[j-1] && p_GetExp(m, j, R) > 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/*
+ * delete any term in res[index] which contains any of the variables set to
+ * false
+ */
+static void delete_variables(resolvente res, const int index,
+    const std::vector<bool> &variables)
+{
+    for (int i = 0; i < res[index]->ncols; i++) {
+        poly p_iter = res[index]->m[i]->next;
+        if (p_iter != NULL) {
+            while (p_iter->next != NULL) {
+                if (contains_unused_variable(p_iter->next, variables)) {
+                    pLmDelete(&p_iter->next);
+                } else {
+                    pIter(p_iter);
+                }
+            }
+        }
+    }
+}
+
+static void delete_tails(resolvente res, const int index)
+{
+    const ring r = currRing;
+    for (int i = 0; i < res[index]->ncols; i++) {
+        if (res[index]->m[i] != NULL) {
+            p_Delete(&(res[index]->m[i]->next), r);
+        }
+    }
 }
 
 /*
  * for each step in the resolution, compute the corresponding module until
  * either index == max_index is reached or res[index] is the zero module
  */
-static int computeResolution(resolvente res, const int max_index,
-        syzHeadFunction *syzHead, const bool do_lifting)
+static int computeResolution_iteration(resolvente res, const int max_index,
+        syzHeadFunction *syzHead, const bool do_lifting,
+        const bool single_module, const bool use_cache,
+        const bool use_tensor_trick, std::vector<bool> &variables)
 {
-    int index = 0;
-    if (!idIs0(res[0]) && 0 < max_index) {
-        index++;
-        res[1] = computeFrame(res[0], syzM_i_unsorted, syzHead);
-        std::vector<bool> variables;
-        variables.resize(currRing->N+1, true);
-        while (!idIs0(res[index])) {
-            if (do_lifting) {
-                computeLiftings(res, index, variables);
+    int index = 1;
+    while (!idIs0(res[index])) {
+        if (do_lifting) {
+            computeLiftings(res, index, variables, use_cache);
+            if (single_module) {
+                delete_tails(res, index-1);
             }
-            if (index >= max_index) { break; }
-            index++;
-            res[index] = computeFrame(res[index-1], syzM_i_sorted, syzHead);
+            // we don't know if the input is a reduced SB:
+            if (index == 1) {
+                variables[currRing->N] = false;
+            }
+            update_variables(variables, res[index]);
+            if (use_tensor_trick) {
+                delete_variables(res, index, variables);
+            }
         }
-        variables.clear();
+        if (index >= max_index) { break; }
+        index++;
+        res[index] = computeFrame(res[index-1], syzM_i_sorted, syzHead);
     }
+    return index;
+}
+
+/*
+ * compute the frame of the first syzygy module and set variables, then call
+ * computeResolution_iteration() for the remaining steps
+ */
+static int computeResolution(resolvente res, const int max_index,
+        syzHeadFunction *syzHead, const bool do_lifting,
+        const bool single_module, const bool use_cache,
+        const bool use_tensor_trick)
+{
+    if (idIs0(res[0])) {
+        return 1;
+    }
+    std::vector<bool> variables;
+    variables.resize(currRing->N+1, true);
+    if (do_lifting) {
+        update_variables(variables, res[0]);
+        if (use_tensor_trick) {
+            delete_variables(res, 0, variables);
+        }
+    }
+    int index = 0;
+    if (max_index > 0) {
+        res[1] = computeFrame(res[0], syzM_i_unsorted, syzHead);
+        index = computeResolution_iteration(res, max_index, syzHead,
+                do_lifting, single_module, use_cache, use_tensor_trick,
+                variables);
+    }
+    variables.clear();
     return index+1;
 }
 
 static void set_options(syzHeadFunction **syzHead_ptr, bool *do_lifting_ptr,
-        const char *method)
+        bool *single_module_ptr, const char *method)
 {
     if (strcmp(method, "complete") == 0) {   // default
         *syzHead_ptr = syzHeadExtFrame;
         *do_lifting_ptr = true;
+        *single_module_ptr = false;
     }
     else if (strcmp(method, "frame") == 0) {
         *syzHead_ptr = syzHeadFrame;
         *do_lifting_ptr = false;
+        *single_module_ptr = false;
     }
     else if (strcmp(method, "extended frame") == 0) {
         *syzHead_ptr = syzHeadExtFrame;
         *do_lifting_ptr = false;
+        *single_module_ptr = false;
+    }
+    else if (strcmp(method, "single module") == 0) {
+        *syzHead_ptr = syzHeadExtFrame;
+        *do_lifting_ptr = true;
+        *single_module_ptr = true;
     }
     else {   // "linear strand" (not yet implemented)
         *syzHead_ptr = syzHeadExtFrame;
         *do_lifting_ptr = true;
+        *single_module_ptr = false;
     }
 }
 
@@ -618,26 +710,43 @@ do                                                                \
 while (0)
 
 /*
- * for each poly in the resolution, insert the first two terms at their right
- * places
+ * For each poly in the resolution, insert the first two terms at their right
+ * places. If single_module is true, then only consider the last module.
  */
-static void insert_ext_induced_LTs(const resolvente res, const int length)
+static void insert_ext_induced_LTs(const resolvente res, const int length,
+        const bool single_module)
 {
     const ring R = currRing;
     poly p, q;
-    for (int i = length-2; i > 0; i--) {
-        for (int j = res[i]->ncols-1; j >= 0; j--) {
-            insert_first_term(res[i]->m[j]->next, p, q, R);
-            insert_first_term(res[i]->m[j], p, q, R);
+    int index = (single_module ? length-1 : 1);
+    while (index < length && !idIs0(res[index])) {
+        for (int j = res[index]->ncols-1; j >= 0; j--) {
+            insert_first_term(res[index]->m[j]->next, p, q, R);
+            insert_first_term(res[index]->m[j], p, q, R);
         }
+        index++;
     }
 }
 
 /*
- * compute the Schreyer resolution of arg, see reference at the beginning of
- * this file
+ * Compute the Schreyer resolution of arg, see reference at the beginning of
+ * this file.
+ *
+ * If use_cache == true (default), the result of compute_image() is cached for
+ * _every_ term in the current step of the resolution. This corresponds to the
+ * subtree attached to the node which represents this term, see reference.
+ *
+ * If use_tensor_trick == true, the current module is modfied after each
+ * lifting step in the resolution: any term which contains a variable which
+ * does not appear among the (induced) leading terms is deleted. Note that the
+ * resulting object is not necessarily a complex anymore. However, constant
+ * entries remain exactly the same. This option does not apply for
+ * method == "frame" and method "extended frame".
+ *
+ * These two options are used in PrymGreen.jl; do not delete!
  */
-syStrategy syFrank(const ideal arg, const int length, const char *method)
+syStrategy syFrank(const ideal arg, const int length, const char *method,
+        const bool use_cache, const bool use_tensor_trick)
 {
     syStrategy result = (syStrategy)omAlloc0(sizeof(ssyStrategy));
     resolvente res = (resolvente)omAlloc0((length+1)*sizeof(ideal));
@@ -648,14 +757,16 @@ syStrategy syFrank(const ideal arg, const int length, const char *method)
     }
     syzHeadFunction *syzHead;
     bool do_lifting;
-    set_options(&syzHead, &do_lifting, method);
-    int new_length = computeResolution(res, length-1, syzHead, do_lifting);
+    bool single_module;
+    set_options(&syzHead, &do_lifting, &single_module, method);
+    int new_length = computeResolution(res, length-1, syzHead, do_lifting,
+            single_module, use_cache, use_tensor_trick);
     if (new_length < length) {
         res = (resolvente)omReallocSize(res, (length+1)*sizeof(ideal),
                 (new_length+1)*sizeof(ideal));
     }
     if (strcmp(method, "frame") != 0) {
-        insert_ext_induced_LTs(res, new_length);
+        insert_ext_induced_LTs(res, new_length, single_module);
     }
     result->fullres = res;
     result->length = new_length;

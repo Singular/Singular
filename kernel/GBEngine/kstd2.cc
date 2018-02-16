@@ -9,7 +9,6 @@
 
 #include "kernel/mod2.h"
 
-//#define ADIDEBUG 1
 #define GCD_SBA 1
 
 // define if no buckets should be used
@@ -878,19 +877,10 @@ int redSigRing (LObject* h,kStrategy strat)
   //where the sig remains the same and replace h by this gcd poly
   assume(rField_is_Ring(currRing));
   #if GCD_SBA
-  #ifdef ADIDEBUG
-  printf("\nBefore sbaCheckGcdPair ");pWrite(h->p);
-  #endif
   while(sbaCheckGcdPair(h,strat))
   {
-    #ifdef ADIDEBUG
-    printf("\nIntermidiate sbaCheckGcdPair ");pWrite(h->p);
-    #endif
     h->sev = pGetShortExpVector(h->p);
   }
-  #ifdef ADIDEBUG
-  printf("\nAfter sbaCheckGcdPair ");pWrite(h->p);
-  #endif
   #endif
   poly beforeredsig;
   beforeredsig = pCopy(h->sig);
@@ -899,11 +889,6 @@ int redSigRing (LObject* h,kStrategy strat)
   //if (h->GetLmTailRing()==NULL) return 0; // HS: SHOULD NOT BE NEEDED!
   //printf("FDEGS: %ld -- %ld\n",h->FDeg, h->pFDeg());
   assume(h->FDeg == h->pFDeg());
-  #ifdef ADIDEBUG
-  printf("\n--------------------------redSig-------------------------------------\n");
-  printf("\nBefore redSig:\n");
-  p_Write(h->p,strat->tailRing);pWrite(h->sig);
-  #endif
 //#if 1
 #ifdef DEBUGF5
   Print("------- IN REDSIG -------\n");
@@ -934,21 +919,12 @@ int redSigRing (LObject* h,kStrategy strat)
     if (j < 0)
     {
       #if GCD_SBA
-      #ifdef ADIDEBUG
-      printf("\nBefore sbaCheckGcdPair ");pWrite(h->p);
-      #endif
       while(sbaCheckGcdPair(h,strat))
       {
-        #ifdef ADIDEBUG
-        printf("\nIntermidiate sbaCheckGcdPair ");pWrite(h->p);
-        #endif
         h->sev = pGetShortExpVector(h->p);
         h->is_redundant = FALSE;
         start = 0;
       }
-      #ifdef ADIDEBUG
-      printf("\nAfter sbaCheckGcdPair ");pWrite(h->p);
-      #endif
       #endif
       // over ZZ: cleanup coefficients by complete reduction with monomials
       postReduceByMonSig(h, strat);
@@ -969,27 +945,18 @@ int redSigRing (LObject* h,kStrategy strat)
         //Check for sigdrop after reduction
         if(pLtCmp(beforeredsig,h->sig) == 1)
         {
-          #ifdef ADIDEBUG
-          printf("\nSigDrop after reduce\n");pWrite(beforeredsig);pWrite(h->sig);
-          #endif
           strat->sigdrop = TRUE;
           //Reduce it as much as you can
           int red_result = redRing(h,strat);
           if(red_result == 0)
           {
             //It reduced to 0, cancel the sigdrop
-            #ifdef ADIDEBUG
-            printf("\nReduced to 0 via redRing. Cancel sigdrop\n");
-            #endif
             strat->sigdrop = FALSE;
             p_Delete(&h->sig,currRing);h->sig = NULL;
             return 0;
           }
           else
           {
-            #ifdef ADIDEBUG
-            printf("\nReduced to this via redRing.SIGDROP\n");pWrite(h->p);
-            #endif
             //strat->enterS(*h, strat->sl+1, strat, strat->tl);
             return 0;
           }
@@ -1058,13 +1025,7 @@ int redSigRing (LObject* h,kStrategy strat)
     Print("--------------------------------\n");
     printf("INDEX OF REDUCER T: %d\n",ii);
 #endif
-    #ifdef ADIDEBUG
-    printf("\nWe reduce it with:\n");p_Write(strat->T[ii].p,strat->tailRing);pWrite(strat->T[ii].sig);
-    #endif
     sigSafe = ksReducePolySigRing(h, &(strat->T[ii]), strat->S_2_R[ii], NULL, NULL, strat);
-    #ifdef ADIDEBUG
-    printf("\nAfter small reduction:\n");pWrite(h->p);pWrite(h->sig);
-    #endif
     if(h->p == NULL && h->sig == NULL)
     {
       //Trivial case catch
@@ -1075,23 +1036,14 @@ int redSigRing (LObject* h,kStrategy strat)
     //In some cases this proves to be very bad
     if(rField_is_Ring(currRing) && h->p != NULL && pLmCmp(h->p,strat->T[ii].p)==0)
     {
-      #ifdef ADIDEBUG
-      printf("\nReducer and Original have same LT. Force it with redRing!\n");
-      #endif
       int red_result = redRing(h,strat);
       if(red_result == 0)
       {
-        #ifdef ADIDEBUG
-        printf("\nRedRing reduced it to 0. Perfect\n");
-        #endif
         pDelete(&h->sig);h->sig = NULL;
         return 0;
       }
       else
       {
-        #ifdef ADIDEBUG
-        printf("\nRedRing reduced it to *.\nHave to sigdrop now\n");pWrite(h->p);
-        #endif
         strat->sigdrop = TRUE;
         return 1;
       }
@@ -1232,18 +1184,11 @@ poly redtailSba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
         With->pNorm();
       }
       strat->redTailChange=TRUE;
-      #ifdef ADIDEBUG
-      printf("\nWill TAILreduce * with *:\n");p_Write(Ln.p,strat->tailRing);pWrite(Ln.sig);
-      p_Write(With->p,strat->tailRing);pWrite(With->sig);pWrite(L->sig);
-      #endif
       int ret = ksReducePolyTailSig(L, With, &Ln, strat);
       if(rField_is_Ring(currRing))
         L->sig = Ln.sig;
       //Because Ln.sig is set to L->sig, but in ksReducePolyTailSig -> ksReducePolySig
       // I delete it an then set Ln.sig. Hence L->sig is lost
-      #ifdef ADIDEBUG
-      printf("\nAfter small TAILreduce:\n");pWrite(Ln.p);pWrite(Ln.sig);pWrite(L->sig);
-      #endif
 #if SBA_PRINT_REDUCTION_STEPS
       if (ret != 3)
         sba_reduction_steps++;
@@ -2013,48 +1958,15 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)
   {
-    #ifdef ADIDEBUG
-    printf("\n      ------------------------NEW LOOP\n");
-    printf("\nShdl = \n");
-    #if 0
-    idPrint(strat->Shdl);
-    #else
-    for(int ii = 0; ii<=strat->sl;ii++)
-        p_Write(strat->S[ii],strat->tailRing);
-    #endif
-    printf("\n   list   L\n");
-    int iii;
-    #if 1
-    for(iii = 0; iii<= strat->Ll; iii++)
-    {
-        printf("L[%i]:",iii);
-        p_Write(strat->L[iii].p, currRing);
-        p_Write(strat->L[iii].p1, currRing);
-        p_Write(strat->L[iii].p2, currRing);
-    }
-    #else
-    {
-        printf("L[%i]:",strat->Ll);
-        p_Write(strat->L[strat->Ll].p, strat->tailRing);
-        p_Write(strat->L[strat->Ll].p1, strat->tailRing);
-        p_Write(strat->L[strat->Ll].p2, strat->tailRing);
-    }
-    #endif
-    #if 0
-    for(iii = 0; iii<= strat->Bl; iii++)
-    {
-        printf("B[%i]:",iii);
-        p_Write(strat->B[iii].p, /*strat->tailRing*/currRing);
-        p_Write(strat->B[iii].p1, /*strat->tailRing*/currRing);
-        p_Write(strat->B[iii].p2, strat->tailRing);
-    }
-    #endif
-    //getchar();
-    #endif
     #ifdef KDEBUG
       if (TEST_OPT_DEBUG) messageSets(strat);
     #endif
-    if (strat->Ll== 0) strat->interpt=TRUE;
+    if (siCntrlc)
+    {
+      while (strat->Ll >= 0)
+        deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+      strat->noClearS=TRUE;
+    }
     if (TEST_OPT_DEGBOUND
         && ((strat->honey && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
             || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
@@ -2073,6 +1985,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if (strat->Ll<0) break;
       else strat->noClearS=TRUE;
     }
+    if (strat->Ll== 0) strat->interpt=TRUE;
     /* picks the last element from the lazyset L */
     strat->P = strat->L[strat->Ll];
     strat->Ll--;
@@ -2206,9 +2119,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
         // posInS only depends on the leading term
         strat->enterS(strat->P, pos, strat, strat->tl);
-        #ifdef ADIDEBUG
-        printf("\nThis element has been added to S:\n");pWrite(strat->P.p);pWrite(strat->P.p1);pWrite(strat->P.p2);
-        #endif
 #if 0
         int pl=pLength(strat->P.p);
         if (pl==1)
@@ -2548,54 +2458,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)
   {
-    #ifdef ADIDEBUG
-    printf("\n      ------------------------NEW LOOP\n");
-    printf("\nShdl = \n");
-    #if 0
-    idPrint(strat->Shdl);
-    #else
-    for(int ii = 0; ii<=strat->sl;ii++)
-    {
-      printf("\nS[%i]:  ",ii);p_Write(strat->S[ii],strat->tailRing);
-      printf("sig:   ");pWrite(strat->sig[ii]);
-    }
-    #endif
-    #if 0
-    for(int iii = 0; iii< strat->syzl; iii++)
-    {
-        printf("\nsyz[%i]:\n",iii);
-        p_Write(strat->syz[iii], currRing);
-    }
-    #endif
-    #if 0
-    for(int iii = 0; iii<= strat->tl; iii++)
-    {
-        printf("\nT[%i]:\n",iii);
-        p_Write(strat->T[iii].p, currRing);
-    }
-    #endif
-    printf("\n   list   L\n");
-    int iii;
-    #if 0
-    for(iii = 0; iii<= strat->Ll; iii++)
-    {
-        printf("\nL[%i]:\n",iii);
-        p_Write(strat->L[iii].p, currRing);
-        p_Write(strat->L[iii].p1, currRing);
-        p_Write(strat->L[iii].p2, currRing);
-        p_Write(strat->L[iii].sig, currRing);
-    }
-    #else
-    {
-        printf("L[%i]:",strat->Ll);
-        p_Write(strat->L[strat->Ll].p, strat->tailRing);
-        p_Write(strat->L[strat->Ll].p1, strat->tailRing);
-        p_Write(strat->L[strat->Ll].p2, strat->tailRing);
-        p_Write(strat->L[strat->Ll].sig, currRing);
-    }
-    #endif
-    //getchar();
-    #endif
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
     #ifdef KDEBUG
       if (TEST_OPT_DEBUG) messageSets(strat);
@@ -2642,14 +2504,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
     if(rField_is_Ring(currRing))
       strat->sbaEnterS = pGetComp(strat->P.sig) - 1;
-
-    #ifdef ADIDEBUG
-    printf("\n-------------------------\nThis is the current element P\n");
-    p_Write(strat->P.p,strat->tailRing);
-    p_Write(strat->P.p1,strat->tailRing);
-    p_Write(strat->P.p2,strat->tailRing);
-    p_Write(strat->P.sig,currRing);
-    #endif
     /* reduction of the element chosen from L */
     if (!strat->rewCrit2(strat->P.sig, ~strat->P.sevSig, strat->P.GetLmCurrRing(), strat, strat->P.checked+1))
     {
@@ -2758,31 +2612,19 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if(strat->P.p != NULL)
         strat->P.sev = pGetShortExpVector(strat->P.p);
     }
-    #ifdef ADIDEBUG
-    printf("\nAfter reduce (redresult=%i): \n",red_result);pWrite(strat->P.p);pWrite(strat->P.sig);
-    #endif
     //sigdrop case
     if(rField_is_Ring(currRing) && strat->sigdrop)
     {
       //First reduce it as much as one can
-      #ifdef ADIDEBUG
-      printf("\nSigdrop in the reduce. Trying redring\n");
-      #endif
       red_result = redRing(&strat->P,strat);
       if(red_result == 0)
       {
-        #ifdef ADIDEBUG
-        printf("\nSigdrop cancelled since redRing reduced to 0\n");
-        #endif
         strat->sigdrop = FALSE;
         pDelete(&strat->P.sig);
         strat->P.sig = NULL;
       }
       else
       {
-        #ifdef ADIDEBUG
-        printf("\nStill Sigdrop - redRing reduced to:\n");pWrite(strat->P.p);
-        #endif
         strat->enterS(strat->P, 0, strat, strat->tl);
         if (TEST_OPT_PROT)
           PrintS("-");
@@ -2791,9 +2633,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
     if(rField_is_Ring(currRing) && strat->blockred > strat->blockredmax)
     {
-      #ifdef ADIDEBUG
-      printf("\nToo many blocked reductions\n");
-      #endif
       strat->sigdrop = TRUE;
       break;
     }
@@ -2887,9 +2726,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // Best case scenerio: remains the leading term
       if(rField_is_Ring(currRing) && strat->sigdrop)
       {
-        #ifdef ADIDEBUG
-        printf("\n Still sigdrop after redtailSba - it reduced to \n");pWrite(strat->P.p);
-        #endif
         strat->enterS(strat->P, 0, strat, strat->tl);
         break;
       }
@@ -2898,26 +2734,17 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     {
       if(strat->P.sig == NULL || pLtCmp(beforetailred,strat->P.sig) == 1)
       {
-        #ifdef ADIDEBUG
-        printf("\nSigDrop after TAILred\n");pWrite(beforetailred);pWrite(strat->P.sig);
-        #endif
         strat->sigdrop = TRUE;
         //Reduce it as much as you can
         red_result = redRing(&strat->P,strat);
         if(red_result == 0)
         {
           //It reduced to 0, cancel the sigdrop
-          #ifdef ADIDEBUG
-          printf("\nReduced to 0 via redRing. Cancel sigdrop\n");
-          #endif
           strat->sigdrop = FALSE;
           p_Delete(&strat->P.sig,currRing);strat->P.sig = NULL;
         }
         else
         {
-          #ifdef ADIDEBUG
-          printf("\nReduced to this via redRing.SIGDROP\n");pWrite(strat->P.p);
-          #endif
           strat->enterS(strat->P, 0, strat, strat->tl);
           break;
         }
@@ -2927,10 +2754,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if(strat->P.p == NULL)
         goto case_when_red_result_changed;
     }
-    #ifdef ADIDEBUG
-    printf("\nNach redTailSba: \n");
-    p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.sig,currRing);
-    #endif
     // remove sigsafe label since it is no longer valid for the next element to
     // be reduced
     if (strat->sbaOrder == 1)
@@ -2988,11 +2811,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         superenterpairsSig(strat->P.p,strat->P.sig,strat->sl+1,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       else
         enterpairsSig(strat->P.p,strat->P.sig,strat->sl+1,strat->sl,strat->P.ecart,pos,strat, strat->tl);
-      #ifdef ADIDEBUG
-        printf("\nThis element is added to S\n");
-        p_Write(strat->P.p, strat->tailRing);p_Write(strat->P.p1, strat->tailRing);p_Write(strat->P.p2, strat->tailRing);pWrite(strat->P.sig);
-        //getchar();
-        #endif
       if(rField_is_Ring(currRing) && strat->sigdrop)
         break;
       if(rField_is_Ring(currRing))

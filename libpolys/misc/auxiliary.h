@@ -116,7 +116,7 @@ static inline int ABS(int v)
 
 // stolen from:
 // https://graphics.stanford.edu/~seander/bithacks.html#IntegerLog
-static inline int LOG2(int v)
+static inline int SI_LOG2(int v)
 {
   const unsigned int b[] = {0x2, 0xC, 0xF0, 0xFF00, 0xFFFF0000};
   const unsigned int S[] = {1, 2, 4, 8, 16};

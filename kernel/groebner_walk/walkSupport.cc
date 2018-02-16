@@ -12,9 +12,6 @@
 #include "kernel/groebner_walk/walkSupport.h"
 #include "kernel/GBEngine/kstd1.h"
 
-#include <string.h>
-#include <math.h>
-
 extern BOOLEAN overflow_error;
 
 ///////////////////////////////////////////////////////////////////

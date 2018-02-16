@@ -10,7 +10,6 @@
 
 
 #include "kernel/mod2.h"
-//#include <vector>
 //using namespace std;
   #define SINGULAR 1
   #include "factory/factory.h"

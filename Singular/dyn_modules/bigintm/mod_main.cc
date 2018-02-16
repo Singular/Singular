@@ -8,8 +8,6 @@
 #include "Singular/ipid.h"
 #include "Singular/lists.h"
 
-#include <dlfcn.h>
-
 #include "bigintm.h"
 
 namespace

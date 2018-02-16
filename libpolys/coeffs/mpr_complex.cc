@@ -23,7 +23,7 @@
 
 #include "coeffs/longrat.h"
 
-#include <math.h>
+#include <cmath>
 
 
 //%s

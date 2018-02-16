@@ -17,16 +17,13 @@
 #define BOOLEAN boolean
 #endif
 
-#include <stdio.h>
 #include <unistd.h>
 
 #ifdef DecAlpha_OSF1
 #define _BSD
 #endif
 
-#include <stdlib.h>
 #include <stdarg.h>
-#include <string.h>
 
 #ifdef __CYGWIN__
 #include <windows.h>

@@ -21,9 +21,6 @@
 
 #include "kernel/polys.h"
 
-#define ADIDEBUG 0
-
-
 /*2
 * compare the given hilbert series with the current one,
 * delete not needed pairs (if possible)
@@ -151,36 +148,6 @@ so delete all the remaining pairs
   Lm = id_Head(strat->Shdl,currRing);
 
   newhilb =hHstdSeries(Lm,w,strat->kHomW,Q,currRing); // ,strat->tailRing?
-
-#if ADIDEBUG
-PrintS("\nOriginal\n");
-int   i, j, l, k;
-  if (hilb == NULL)
-    return;
-  l = hilb->length()-1;
-  k = (*hilb)[l];
-  for (i = 0; i < l; i++)
-  {
-    j = (*hilb)[i];
-    if (j != 0)
-    {
-      Print("//  %8d t^%d\n", j, i+k);
-    }
-  }
-  PrintS("\nActual\n");
-  if (newhilb == NULL)
-    return;
-  l = newhilb->length()-1;
-  k = (*newhilb)[l];
-  for (i = 0; i < l; i++)
-  {
-    j = (*newhilb)[i];
-    if (j != 0)
-    {
-      Print("//  %8d t^%d\n", j, i+k);
-    }
-  }
-#endif
 
   if(newhilb->compare(hilb) == 0)
   {

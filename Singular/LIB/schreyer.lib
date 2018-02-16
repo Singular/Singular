@@ -153,12 +153,6 @@ static proc Sinit(module M)
   def @save = basering;
 
   int @DEBUG = 0; // !system("with", "ndebug");
-  if( @DEBUG )
-  {
-    "Sinit::Input";
-    type(M);
-    attrib(M);
-  }
 
   int @RANK = nrows(M); int @SIZE = ncols(M);
 
@@ -172,12 +166,6 @@ static proc Sinit(module M)
   def S =   Syzextra::MakeInducedSchreyerOrdering(1); // 1 puts history terms to the back
   // TODO: NOTE: +1 causes trouble to Singular interpreter!!!???
   setring S; // a new ring with a Schreyer ordering
-
-  if( @DEBUG )
-  {
-    "Sinit::StartingISRing";
-    basering;
-  }
 
   // Setup the leading syzygy^{-1} module to zero:
   module Z = 0; Z[@RANK] = 0; attrib(Z, "isHomog", intvec(0));
@@ -194,25 +182,6 @@ static proc Sinit(module M)
   attrib(M, "isHomog", @V);
   attrib(M, "isSB", 1);
 
-
-  if( @DEBUG )
-  {
-    "Sinit::SB_Input: ";
-    type(M);
-    attrib(M);
-    attrib(M, "isHomog");
-  }
-
-  if( @DEBUG )
-  {
-    // 0^th syz. property
-    if( size(module(transpose( transpose(M) * transpose(MRES) ))) > 0 )
-    {
-      transpose( transpose(M) * transpose(MRES) );
-      "ERROR: transpose( transpose(M) * transpose(MRES) ) != 0!!!";
-    }
-  }
-
   RES[size(RES)+1] = M; // list of all syzygy modules
   MRES = MRES, M;
 
@@ -220,13 +189,6 @@ static proc Sinit(module M)
 
   attrib(S, "InducionLeads", lead(M));
   attrib(S, "InducionStart", @RANK);
-
-  if( @DEBUG )
-  {
-    "Sinit::MRES";
-    attrib(MRES, "isHomog");
-    attrib(S);
-  }
 
   export RES;
   export MRES;
@@ -236,16 +198,6 @@ static proc Sinit(module M)
 static proc Sstep()
 {
   int @DEBUG = 0; // !system("with", "ndebug");
-
-  if( @DEBUG )
-  {
-    "Sstep::NextInducedRing";
-
-    attrib(basering, "InducionLeads");
-    attrib(basering, "InducionStart");
-
-      Syzextra::GetInducedData();
-  }
 
   // syzygy step:
 
@@ -288,19 +240,7 @@ static proc Sstep()
   intvec @V = deg(M[1..ncols(M)]);
   @V = @W, @V;
 
-  if( @DEBUG )
-  {
-    "Sstep::NextInput: ";
-    M;
-    deg(M[1..ncols(M)]); // no use of @W :(?
-    @RANK;
-    attrib(MRES, "isHomog"); @W;
-    deg(MRES[1..ncols(MRES)]);
-  }
-
-
-
-    Syzextra::SetInducedReferrence(L, limit, 0);
+  Syzextra::SetInducedReferrence(L, limit, 0);
 
   def K = prepareSyz(M, @RANK);
 //  K;
@@ -319,28 +259,6 @@ static proc Sstep()
   N = std(N);
   attrib(N, "isHomog", @V);
 
-//  N;
-
-  if( @DEBUG )
-  {
-    if( size(N) > 0 )
-    {
-      // next syz. property
-      if( size(module(transpose( transpose(N) * transpose(MRES) ))) > 0 )
-      {
-        MRES;
-
-        "RANKS: ", @RANK;
-
-        "ERROR: transpose( transpose(N) * transpose(MRES) ) != 0!!!";
-        transpose( transpose(N) * transpose(MRES) );
-
-        "transpose(N) * transpose(MRES): ";
-        transpose(N) * transpose(MRES);
-      }
-    }
-  }
-
   RES[@l + 1] = N; // list of all syzygy modules
 
   MRES = MRES, N;
@@ -349,12 +267,6 @@ static proc Sstep()
 
   L = L, lead(N);
   attrib(basering, "InducionLeads", L);
-
-  if( @DEBUG )
-  {
-    "Sstep::NextSyzOutput: ";
-    attrib(N, "isHomog");
-  }
 
 }
 
@@ -490,12 +402,6 @@ static proc MySort(def M)
     int @KERCHECK = @DEBUG;
   }
 
-
-  if( @DEBUG )
-  {
-    "MySort:: Input: "; M;
-  }
-
   def @N = M;
 
   if( size(M) > 0 )
@@ -525,11 +431,6 @@ static proc MySort(def M)
         }
       }
     }
-  }
-
-  if( @DEBUG )
-  {
-    "MySort:: Ouput: "; @N;
   }
 
   return (@N);
@@ -588,14 +489,6 @@ proc SSinit(def M)
     @RINGCHANGE = attrib(SSinit, "RINGCHANGE");
   }
 
-
-  if( @DEBUG )
-  {
-    "SSinit::Input";
-    type(M);
-    attrib(M);
-  }
-
   def opts = option(get);
   option(redSB); option(redTail);
     M = simplify(interred(groebner(M)), 1 + 2 + 4 + 32); // NOTE: we require interreduced GB for input
@@ -607,12 +500,6 @@ proc SSinit(def M)
   if( @IGNORETAILS )
   {
     M = lead(M);
-
-    if( @DEBUG )
-    {
-      "SSinit::Ignorring tails: M: ";
-      type(M);
-    }
   }
 
   def @N = MySort(M); // TODO: replace with inplace sorting!!!
@@ -672,11 +559,6 @@ proc SSinit(def M)
     def S = ring(@l); // --  Syzextra::MakeInducedSchreyerOrdering(1);
     kill @l;
     setring S; // ring with an easy divisibility test ("C, lex") // or not!???
-    if( @DEBUG )
-    {
-      "SSinit::NewRing(C,lex)?";
-      basering;
-    }
   } else
   { def S = basering; }
 
@@ -685,10 +567,10 @@ proc SSinit(def M)
 
   if( !@RINGCHANGE )
   {
-    if( defined(RES) )  { if( @DEBUG ){ "WARN: killing existing object: RES!"; }; kill RES; }
-    if( defined(MRES) ) { if( @DEBUG ){ "WARN: killing existing object: MRES!"; }; kill MRES; }
-    if( defined(LRES) ) { if( @DEBUG ){ "WARN: killing existing object: LRES!"; }; kill LRES; }
-    if( defined(TRES) ) { if( @DEBUG ){ "WARN: killing existing object: TRES!"; }; kill TRES; }
+    if( defined(RES) )  { kill RES; }
+    if( defined(MRES) ) { kill MRES; }
+    if( defined(LRES) ) { kill LRES; }
+    if( defined(TRES) ) { kill TRES; }
   }
 
   module MRES = Z;
@@ -719,14 +601,6 @@ proc SSinit(def M)
   if( !defined(TAIL) )
   {
     def TAIL = imap(@save, TAIL);
-  }
-
-  if( @DEBUG )
-  {
-    "SSinit::(sorted) SB_Input: ";
-    type(M);
-    attrib(M);
-    attrib(M, "isHomog");
   }
 
   if( @SYZCHECK )
@@ -791,14 +665,6 @@ proc SSinit(def M)
   attrib(S, "TREEOUTPUT", @TREEOUTPUT);
   attrib(S, "SYZNUMBER", 0);
 
-  if( @DEBUG )
-  {
-    "SSinit::MRES";
-    MRES;
-    attrib(MRES, "isHomog");
-    attrib(S);
-  }
-
   export RES;
   export MRES;
   export LRES;
@@ -836,562 +702,11 @@ LIB "poly.lib"; // for lcm
 
 
 
-/// Compute L(Syz(L))
-static proc SSComputeLeadingSyzygyTerms(def L)
-{
-  if( typeof( attrib(basering, "DEBUG") ) == "int" )
-  {
-    int @DEBUG = attrib(basering, "DEBUG");
-  } else
-  {
-    int @DEBUG = 0; // !system("with", "ndebug");
-  }
-
-  if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
-  {
-    int @SYZCHECK = attrib(basering, "SYZCHECK");
-  } else
-  {
-    int @SYZCHECK = @DEBUG;
-  }
-
-  if( typeof( attrib(basering, "KERCHECK") ) == "int" )
-  {
-    int @KERCHECK = attrib(basering, "KERCHECK");
-  } else
-  {
-    int @KERCHECK = @DEBUG;
-  }
-
-  if( @DEBUG )
-  {
-    "SSComputeLeadingSyzygyTerms::Input: ";
-    L;
-  }
-
-  module SS =   Syzextra::ComputeLeadingSyzygyTerms(L);
-
-  if( @KERCHECK )
-  {
-    int i, j, r;
-    int N = ncols(L);
-    def a, b;
-    poly aa, bb;
-
-    bigint c;
-
-    ideal M;
-
-    module S = 0;
-
-    for(i = 1; i <= N; i++)
-    {
-      a = L[i];
-      c =   Syzextra::leadcomp(a);
-      r = int(c);
-
-      aa =   Syzextra::leadmonomial(a);
-
-      M = 0;
-
-      for(j = i-1; j > 0; j--)
-      {
-        b = L[j];
-
-        if(   Syzextra::leadcomp(b) == c )
-        {
-          bb =   Syzextra::leadmonomial(b);
-
-          M[j] = (lcm(aa, bb) / aa);
-        }
-      }
-
-      // TODO: add quotient relations here...
-
-      M = simplify(M, 1 + 2 + 32);
-
-      M = MySort(M);
-
-      S = S, M * gen(i);
-    }
-
-    S = MySort(simplify(S, 2));
-
-    if( (size(S) + size(SS)) > 0 )
-    {
-      if( size(module(matrix(S) - matrix(SS))) > 0 )
-      {
-        "ERROR: SSComputeLeadingSyzygyTerms: S != SS ";
-
-        "basering: "; basering;
-        "S: ";  S;
-        "SS: "; SS;
-
-        "DIFF: ";
-        module(matrix(S) - matrix(SS));
-        print(matrix(S) - matrix(SS));
-      }
-    }
-  }
-
-
-  if( @DEBUG )
-  {
-    "SSComputeLeadingSyzygyTerms::Output: ";
-    "SS: "; SS;
-  }
-
-  if( size(SS) > 0 )
-  {
-    attrib(SS, "isSB", 1);
-  }
-
-  return (SS);
-}
-
-/// Compute Syz(L), where L is a monomial (leading) module
-static proc SSCompute2LeadingSyzygyTerms(def L)
-{
-  if( typeof( attrib(basering, "DEBUG") ) == "int" )
-  {
-    int @DEBUG = attrib(basering, "DEBUG");
-  } else
-  {
-    int @DEBUG = 0; // !system("with", "ndebug");
-  }
-
-  if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
-  {
-    int @SYZCHECK = attrib(basering, "SYZCHECK");
-  } else
-  {
-    int @SYZCHECK = @DEBUG;
-  }
-
-  if( typeof( attrib(basering, "KERCHECK") ) == "int" )
-  {
-    int @KERCHECK = attrib(basering, "KERCHECK");
-  } else
-  {
-    int @KERCHECK = @DEBUG;
-  }
-
-  if( @DEBUG )
-  {
-    "SSCompute2LeadingSyzygyTerms::Input: ";
-    L;
-  }
-
-  module SS =   Syzextra::Compute2LeadingSyzygyTerms(L);
-
-  if( @DEBUG )
-  {
-    "SSCompute2LeadingSyzygyTerms::Syz(SS): "; SS;
-  }
-
-  if( @SYZCHECK )
-  {
-    if( size(SS) > 0 and size(L) > 0 )
-    {
-      if( size(module(transpose( transpose(SS) * transpose(L) ))) > 0 )
-      {
-        transpose( transpose(SS) * transpose(L) );
-        "ERROR: transpose( transpose(SS) * transpose(L) ) != 0!!!";
-      }
-    }
-  }
-
-  if( @KERCHECK )
-  {
-    int @TAILREDSYZ = 1;
-    if( typeof( attrib(basering, "TAILREDSYZ") ) == "int" )
-    {
-      @TAILREDSYZ = attrib(basering, "TAILREDSYZ");
-    }
-
-    int i, j, r;
-    int N = ncols(L);
-    def a, b;
-
-    poly aa, bb, @lcm;
-
-    bigint c;
-
-    module M;
-
-    module S = 0;
-
-    for(i = 1; i <= N; i++)
-    {
-      a = L[i];
-  //    "a: ", a;
-      c =   Syzextra::leadcomp(a);
-      r = int(c);
-
-      aa =   Syzextra::leadmonomial(a);
-
-      M = 0;
-
-      for(j = i-1; j > 0; j--)
-      {
-        b = L[j];
-  //      "b: ", b;
-
-        if(   Syzextra::leadcomp(b) == c )
-        {
-          bb =   Syzextra::leadmonomial(b);
-          @lcm = lcm(aa, bb);
-
-          M[j] = (@lcm / aa)* gen(i) - (@lcm / bb)* gen(j);
-        }
-      }
-
-      M = simplify(M, 2);
-
-      // TODO: add quotient relations here...
-      S = S, M;
-    }
-
-    if( @TAILREDSYZ )
-    {
-      // Make sure that 2nd syzygy terms are not reducible by 1st
-      def opts = option(get);
-      option(redSB); option(redTail);
-      S = std(S); // binomial module
-      option(set, opts);
-      //  kill opts;
-    } else
-    {
-      S = simplify(S, 2 + 32);
-    }
-
-    S = MySort(S);
-
-    if( @DEBUG )
-    {
-      "SSCompute2LeadingSyzygyTerms::Syz(S): "; S;
-    }
-
-    if( @SYZCHECK )
-    {
-      if( size(S) > 0 and size(L) > 0 )
-      {
-        if( size(module(transpose( transpose(S) * transpose(L) ))) > 0 )
-        {
-          transpose( transpose(S) * transpose(L) );
-          "ERROR: transpose( transpose(S) * transpose(L) ) != 0!!!";
-        }
-      }
-    }
-
-    if(size(S) != size(SS))
-    {
-      "ERROR: SSCompute2LeadingSyzygyTerms: size(S) != size(SS)";
-
-      "basering: "; basering;
-
-      "S: ";  S;
-      "SS: "; SS;
-    }
-
-    if(size(S) > 0 && size(SS) > 0)
-    {
-      if( size(module(matrix(lead(S)) - matrix(lead(SS)))) > 0 )
-      {
-        "ERROR: SSCompute2LeadingSyzygyTerms: lead(S) != lead(SS) ";
-
-        "basering: ";  basering;
-
-        "lead(S ): "; lead(S );
-        "lead(SS): "; lead(SS);
-
-        "DIFF: ";
-        print( matrix(lead(S)) - matrix(lead(SS))  );
-        module(matrix(lead(S)) - matrix(lead(SS)));
-      }
-
-
-      if( @TAILREDSYZ )
-      {
-      if( size(module(matrix(  Syzextra::Tail(S)) - matrix(  Syzextra::Tail(SS)))) > 0 )
-      {
-        "ERROR: SSCompute2LeadingSyzygyTerms: Tail(S) != Tail(SS) ";
-
-        "basering: ";  basering;
-
-        "Tail(S ): ";   Syzextra::Tail(S );
-        "Tail(SS): ";   Syzextra::Tail(SS);
-
-        "DIFF: ";
-        module( matrix(  Syzextra::Tail(S)) - matrix(  Syzextra::Tail(SS)) );
-        print( matrix(  Syzextra::Tail(S)) - matrix(  Syzextra::Tail(SS)) );
-      }
-      }
-    }
-  }
-
-  module S2 =   Syzextra::Tail(SS);
-  SS = lead(SS); // (C,lp) on base ring!
-
-  if( @SYZCHECK )
-  {
-    if( ncols(SS) != ncols(S2) ) // || size(SS) != ncols(SS) || size(S2) != ncols(S2)
-    {
-      "ERROR: SSCompute2LeadingSyzygyTerms: inappropriate S2 / SS: ";
-      type(SS);
-      type(S2);
-      L;
-    }
-  }
-
-  if( @DEBUG )
-  {
-    "SSCompute2LeadingSyzygyTerms::Output: "; SS; S2;
-  }
-
-  attrib(SS, "isSB", 1);
-
-  return (SS, S2);
-}
-
 // -------------------------------------------------------- //
 
 /// TODO: save shortcut (syz: |-.->) LM(LM(m) * "t") -> syz?
-static proc SSFindReducer(def product, def syzterm, def L, list #)
-{
-  if( typeof( attrib(basering, "DEBUG") ) == "int" )
-  {
-    int @DEBUG = attrib(basering, "DEBUG");
-  } else
-  {
-    int @DEBUG = 0; // !system("with", "ndebug");
-  }
-
-  if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
-  {
-    int @SYZCHECK = attrib(basering, "SYZCHECK");
-  } else
-  {
-    int @SYZCHECK = @DEBUG;
-  }
-
-  if( typeof( attrib(basering, "KERCHECK") ) == "int" )
-  {
-    int @KERCHECK = attrib(basering, "KERCHECK");
-  } else
-  {
-    int @KERCHECK = @DEBUG;
-  }
-
-
-  if( @DEBUG )
-  {
-    "SSFindReducer::Input: ";
-
-    "syzterm: ", syzterm;
-    "product: ", product;
-//    "L: ", L;
-//    "T: ", T;
-    if( size(#) > 0 )
-    {
-//      "LSyz: ", #;
-    }
-  }
-
-
-  if( @DEBUG && (syzterm != 0) )
-  {
-    def @@c =   Syzextra::leadcomp(syzterm); int @@r = int(@@c);
-    def @@product =   Syzextra::leadmonomial(syzterm) * L[@@r];
-
-    if( @@product != product)
-    {
-      "product: ", product, ", @@product: ", @@product;
-      "ERROR: 'syzterm' results in wrong product !!!???";
-    }
-  }
-
-  if( typeof(#[1]) == "module" )
-  {
-    vector my =   Syzextra::FindReducer(product, syzterm, L/*, T*/, #[1]);
-  } else
-  {
-    vector my =   Syzextra::FindReducer(product, syzterm, L/*, T*/);
-  }
-
-
-  if( @KERCHECK )
-  {
-    bigint c =   Syzextra::leadcomp(product); int r = int(c);
-
-    def a, b, bb;
-
-    vector nf = [0];
-
-    // looking for an appropriate diviser
-    for( int k = ncols(L); k > 0; k-- )
-    {
-      a = L[k];
-      // with the same mod. component
-      if(   Syzextra::leadcomp(a) == c )
-      {
-        b = - (  Syzextra::leadmonomial(product) /   Syzextra::leadmonomial(L[k]));
-
-        // which divides the product: looking for the 1st appropriate one!
-        if( b != 0 )
-        {
-          bb = b * gen(k);
-
-          if (size(bb + syzterm) == 0) // cannot allow something like: a*gen(i) - a*gen(i)
-          {
-            nf = [0];
-          } else
-          {
-            nf = bb;
-          }
-
-          // new syz. term should not be in <LS = #>
-          if( size(#) > 0 )
-          {
-            if( typeof(#[1]) == "module" )
-            {
-              nf = NF(bb, #[1]);
-            }
-          }
-
-          // while the complement (the fraction) is not reducible by leading syzygies
-          if( nf != 0 ) // nf must be == bb!!!
-          {
-            /// TODO: save shortcut LM(m) * T[i] -> ?
-
-            // choose ANY such reduction... (with the biggest index?)
-            break;
-          }
-        }
-      }
-    }
-
-    if( my != nf )
-    {
-      "ERROR in   Syzextra::FindReducer => ", my, " != nf: ", nf;
-    }
-  }
-
-  if( @DEBUG )
-  {
-    "SSFindReducer::Output: ", my;
-  }
-
-  return (my);
-}
 
 /// TODO: save shortcut (syz: |-.->) LM(m) * "t" -> ?
-static proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
-{
-  if( typeof( attrib(basering, "DEBUG") ) == "int" )
-  {
-    int @DEBUG = attrib(basering, "DEBUG");
-  } else
-  {
-    int @DEBUG = 0; // !system("with", "ndebug");
-  }
-
-
-  if( @DEBUG )
-  {
-    "SSReduce::Input: ";
-
-    "syzterm: ", syzterm;
-    "mult: ", m;
-    "term: ", t;
-//    "L: ", L;
-//    "T: ", T;
-    if( size(#) > 0 )
-    {
-//      "LSyz: ", #;
-    }
-//    "attrib(LS, 'isSB')", attrib(LS, "isSB");
-  }
-
-  if( typeof( attrib(basering, "KERCHECK") ) == "int" )
-  {
-    int @KERCHECK = attrib(basering, "KERCHECK");
-  } else
-  {
-    int @KERCHECK = @DEBUG;
-  }
-
-  if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
-  {
-    int @SYZCHECK = attrib(basering, "SYZCHECK");
-  } else
-  {
-    int @SYZCHECK = @DEBUG;
-  }
-
-  if( @SYZCHECK && (syzterm != 0) )
-  {
-    def @@c =   Syzextra::leadcomp(syzterm); int @@r = int(@@c);
-    poly @@m =   Syzextra::leadmonomial(syzterm); def @@t = L[@@r];
-
-    if( (@@m != m) || (@@t != t))
-    {
-      "m: ", m, ", t: ", t;
-      "@@m: ", @@m, ", @@t: ", @@t;
-      "ERROR: 'syzterm' results in wrong m * t !!!";
-    }
-  }
-
-  if( typeof(#[1]) == "module" )
-  {
-    vector ss =   Syzextra::ReduceTerm(m, t, syzterm, L, T, #[1]);
-  } else
-  {
-    vector ss =   Syzextra::ReduceTerm(m, t, syzterm, L, T);
-  }
-
-  if( @KERCHECK )
-  {
-    int @TREEOUTPUT  = attrib(basering, "TREEOUTPUT");
-
-    vector s = 0;
-
-    if( size(t) > 0 )
-    {
-      def product = m * t;
-
-      s = SSFindReducer(product, syzterm, L, #);
-
-      if( size(s) != 0 )
-      {
-        poly @b =   Syzextra::leadmonomial(s);
-
-        def @c =   Syzextra::leadcomp(s); int k = int(@c);
-
-        if( @TREEOUTPUT ){ "\CHILD{", (s), "}{", ( @b*L[k]), "}"; }
-
-        s = s + SSTraverseTail(@b, T[k], L, T, #); // !!!
-      }
-    }
-
-    if( s != ss )
-    {
-      "ERROR in   Syzextra::ReduceTerm => old: ", s, " != ker: ", ss;
-      "m: ", m;
-      "t: ", t;
-      "syzterm: ", syzterm;
-       L; T; #;
-    }
-  }
-
-  if( @DEBUG )
-  {
-    "SSReduceTerm::Output: ", ss;
-  }
-
-  return (ss);
-}
-
 
 // TODO: store m * @tail -.-^-.-^-.--> ?
 static proc SSTraverseTail(poly m, def @tail, def L, def T, list #)
@@ -1410,20 +725,6 @@ static proc SSTraverseTail(poly m, def @tail, def L, def T, list #)
   } else
   {
     int @KERCHECK = @DEBUG;
-  }
-
-
-  if( @DEBUG )
-  {
-    "SSTraverse::Input: ";
-
-    "mult: ", m;
-    "tail: ", @tail; // T[i];
-
-    if( size(#) > 0 )
-    {
-//      "LSyz: "; #[1];
-    }
   }
 
   if( typeof(#[1]) == "module" )
@@ -1458,329 +759,15 @@ static proc SSTraverseTail(poly m, def @tail, def L, def T, list #)
     }
   }
 
-  if( @DEBUG )
-  {
-    "SSTraverseTail::Output: ", ss;
-  }
-
   return (ss);
 }
 
 // -------------------------------------------------------- //
 
-static proc SSSchreyerSyzygyNF(vector syz_lead, vector syz_2, def L, def T, list #)
-"  Hybrid Syzygy computation: 'reduce' spoly by eliminating _any_ terms while discurding terms of lower order!
-   Return the tail syzygy (without: syz_lead, starting with: syz_2)"
-{
-  if( typeof( attrib(basering, "DEBUG") ) == "int" )
-  {
-    int @DEBUG = attrib(basering, "DEBUG");
-  } else
-  {
-    int @DEBUG = 0; // !system("with", "ndebug");
-  }
-
-  if( @DEBUG )
-  {
-    "SSSchreyerSyzygyNF::Input: ";
-
-    "syzygy_lead: ", syz_lead;
-    "syzygy 2nd : ", syz_2;
-//    L; T;
-    if( size(#) > 0 )
-    {
-//      "LSyz: "; #[1];
-    }
-  }
-
-  if( typeof( attrib(basering, "KERCHECK") ) == "int" )
-  {
-    int @KERCHECK = attrib(basering, "KERCHECK");
-  } else
-  {
-    int @KERCHECK = @DEBUG;
-  }
-
-  if( typeof(#[1]) == "module" )
-  {
-    def my =   Syzextra::SchreyerSyzygyNF(syz_lead, syz_2, L, T, #[1]);
-  } else
-  {
-    def my =   Syzextra::SchreyerSyzygyNF(syz_lead, syz_2, L, T);
-  }
-
-  if( @KERCHECK )
-  {
-    int @TREEOUTPUT  = attrib(basering, "TREEOUTPUT");
-
-    def spoly =   Syzextra::leadmonomial(syz_lead) * T[int(  Syzextra::leadcomp(syz_lead))]
-              +   Syzextra::leadmonomial(syz_2)    * T[int(  Syzextra::leadcomp(syz_2))];
-
-    vector @tail = syz_2;
-
-    poly @b; int k;
-
-    while (size(spoly) > 0)
-    {
-      syz_2 = SSFindReducer(lead(spoly), 0, L, #); spoly =   Syzextra::Tail(spoly);
-
-      if( size(syz_2) != 0)
-      {
-        @b =   Syzextra::leadmonomial(syz_2);
-        k =  int(  Syzextra::leadcomp(syz_2));
-
-        if( @TREEOUTPUT ){ "\CHILD{", (syz_2), "}{", ( lead(spoly)), "}"; }
-
-        spoly = spoly + @b * T[k];
-        @tail = @tail + syz_2;
-
-      }
-    }
-
-    if( my != @tail )
-    {
-      "ERROR in   Syzextra::SchreyerSyzygyNF => old: ", @tail, " != ker: ", my;
-
-      "syzygy_lead: ", syz_lead;
-      "syzygy 2nd : ", syz_2;
-
-      L; T; #;
-    }
-  }
-
-  if( @DEBUG )
-  {
-    "SSSchreyerSyzygyNF::Output: ", my;
-  }
-
-  return (my);
-}
-
-
-
 // -------------------------------------------------------- //
 
 // module (N, LL, TT) = SSComputeSyzygy(L, T);
 // Compute Syz(L ++ T) = N = LL ++ TT
-static proc SSComputeSyzygy(def L, def T)
-{
-//  rtimer, "***TIMESNAP0 for   Syzextra::ComputeSyzygy(L,T): on level: [",attrib(basering,"SYZNUMBER"),"] :: t: ", timer, ", r: ", rtimer;
-  int @DEBUG    = attrib(basering, "DEBUG");
-  int @KERCHECK = attrib(basering, "KERCHECK");
-  int @SYZCHECK = attrib(basering, "SYZCHECK");
-
-  if( @DEBUG )
-  {
-    "SSComputeSyzygy::Input";
-    "basering: ", basering; attrib(basering);
-
-//    "iCompShift: ", iCompShift;
-
-    "L: "; L;
-    "T: "; T;
-  }
-
-//  option(prot);
-//  rtimer, "***TIME for   Syzextra::ComputeSyzygy(L,T): on level: [",attrib(basering,"SYZNUMBER"),"] :: t: ", timer, ", r: ", rtimer;
-  list @res=  Syzextra::ComputeSyzygy(L,T);
-//  rtimer, "***TIME for   Syzextra::ComputeSyzygy(L,T): on level: [",attrib(basering,"SYZNUMBER"),"] :: t: ", timer, ", r: ", rtimer;
-//  option(noprot); // TODO: restore!
-
-
-  module @LL = @res[1]; module @TT = @res[2];
-
-  if( @KERCHECK )
-  {
-    int @SYZCHECK    = attrib(basering, "SYZCHECK");
-    int @LEAD2SYZ    = attrib(basering, "LEAD2SYZ");
-    int @TAILREDSYZ  = attrib(basering, "TAILREDSYZ");
-    int @HYBRIDNF    = attrib(basering, "HYBRIDNF");
-    int @IGNORETAILS = attrib(basering, "IGNORETAILS");
-    int @TREEOUTPUT  = attrib(basering, "TREEOUTPUT");
-
-    int @SYZNUMBER   = attrib(basering,"SYZNUMBER");
-
-    if( @HYBRIDNF == 2 )
-    {
-      if( @SYZNUMBER < 3 ){ @HYBRIDNF = 1; } else { @HYBRIDNF = 0; }
-    }
-
-    module LL;
-
-    /// Get the critical leading syzygy terms
-    if( @LEAD2SYZ ) // & 2nd syz. term
-    {
-      module LL2;
-      (LL, LL2) = SSCompute2LeadingSyzygyTerms(L);
-    } else
-    {
-      LL = SSComputeLeadingSyzygyTerms(L);
-    }
-
-    if( ncols(LL) != ncols(@LL) )
-    {
-      "ERROR in SSComputeSyzygy: wrong leading syzygies!?";
-      "";
-      L; T;
-      "";
-      type(LL);
-      type(@LL);
-    }
-
-    if( size( module( matrix(LL) - matrix(@LL) ) ) != 0 )
-    {
-      "ERROR in SSComputeSyzygy: wrong leading syzygies!?";
-      "";
-      L; T;
-      "";
-      type(LL);
-      type(@LL);
-    }
-
-    module TT, SYZ;
-
-    vector a, a2; bigint c; int r; poly aa;
-
-    if( size(LL) > 0 )
-    {
-      list LS;
-
-      if( @TAILREDSYZ)
-      {
-        LS = list(LL);
-      }
-
-      vector @tail = 0;
-
-//      for(int k = 1; k <= ncols(LL); k++ )
-      for(int k = ncols(LL); k > 0; k-- )
-      {
-        // leading syz. term:
-        a = LL[k];
-
-        if( !@IGNORETAILS )
-        {
-          c =   Syzextra::leadcomp(a); r = int(c); aa =   Syzextra::leadmonomial(a);
-
-          if( @TREEOUTPUT ){ "\ROOT{", (lead(a)), "}"; }
-
-          // NF reduction:
-          if( @HYBRIDNF == 0 ) // Traverse approach:
-          {
-            @tail = SSTraverseTail(aa, T[r], L, T, LS);
-
-            // get the 2nd syzygy term...
-            if( @LEAD2SYZ ) // with the 2nd syz. term:
-            {
-              a2 = LL2[k]; c =   Syzextra::leadcomp(a2); r = int(c); aa =   Syzextra::leadmonomial(a2);
-
-              if( @TREEOUTPUT ){ "\CHILD{", (lead(a2)), "}{", ( aa*L[r]), "}"; }
-
-              @tail = a2 + @tail + SSTraverseTail(aa, T[r], L, T, LS);
-            } else
-            {
-              @tail = @tail + SSReduceTerm(aa, L[r], a, L, T, LS);
-            }
-
-          } else // Hybrid approach:
-          {
-
-            // get the 2nd syzygy term...
-            if( @LEAD2SYZ )
-            {
-              a2 = LL2[k];
-            } else
-            {
-              a2 = SSFindReducer( aa * L[r], a, L, LS);
-            }
-
-            if ( (@SYZCHECK || @DEBUG) )
-            {
-              if( size(a2) == 0 ) // if syzterm == 0!!!!
-              {
-                "ERROR in SSComputeSyzygy: could not find the 2nd syzygy term during the hybrid NF!!!";
-              }
-            }
-
-            if( @TREEOUTPUT ){ "\CHILD{", (a2), "}{", ( aa*L[r]), "}"; }
-
-            @tail = SSSchreyerSyzygyNF(a, a2, L, T, LS);
-          }
-        } // else @tail remains zero!
-
-        TT[k] = @tail;
-        SYZ[k] = a + @tail;
-
-        if ( TT[k] != @TT[k] )
-        {
-          "ERROR in SSComputeSyzygy: wrong tail syzygy!?";
-          "INPUT";
-          L; T;
-          "LEADING SYZYGY TERMS";
-          type(LL);
-
-          "CURRENT TAILS";
-          type(TT);
-          type(@TT);
-
-          "WRONG TAIL [", k, "]:";
-          type(TT[k]);
-          type(@TT[k]);
-
-//          "IMAGES:";
-//              transpose( transpose(N) * transpose(MRES) );
-
-        }
-
-      } // FOR
-    }
-
-    if( ncols(TT) != ncols(@TT) )
-    {
-      "ERROR in SSComputeSyzygy: wrong tail syzygies!?";
-      "";
-      L; T;
-      "";
-      type(LL);
-      type(@LL);
-      "";
-      type(TT);
-      type(@TT);
-    }
-
-    if( size( module( matrix(TT) - matrix(@TT) ) ) != 0 )
-    {
-      "ERROR in SSComputeSyzygy: wrong tail syzygies!?";
-      "";
-      TT; @TT;
-      "";
-      L; T;
-      "";
-      type(LL);
-      type(@LL);
-    }
-
-  }
-
-  module @SYZ;
-
-  for(int @k = ncols(@LL); @k > 0; @k-- )
-  {
-    @SYZ[@k] = @LL[@k] + @TT[@k];
-  }
-
-  if( @DEBUG )
-  {
-    "SSComputeSyzygy::Output";
-
-//    "SYZ: "; @SYZ;
-    "LL: "; @LL;
-    "TT: "; @TT;
-  }
-
-//  rtimer, "***TIMESNAP1 for   Syzextra::ComputeSyzygy(L,T): on level: [",attrib(basering,"SYZNUMBER"),"] :: t: ", timer, ", r: ", rtimer;
-  return (@SYZ, @LL, @TT);
-}
 
 // resolution/syzygy step:
 /* static */
@@ -1790,12 +777,6 @@ proc SSstep()
 
   int @DEBUG = attrib(basering, "DEBUG");
   int @SYZCHECK = attrib(basering, "SYZCHECK");
-
-  if( @DEBUG )
-  {
-    "SSstep::NextInducedRing";
-    "basering: ", basering; attrib(basering);
-  }
 
 /*
   // is initial weights are all zeroes!
@@ -1835,17 +816,6 @@ proc SSstep()
 */
 
   intvec @W = attrib(M, "isHomog"); intvec @V = attrib(M, "degrees"); @V = @W, @V;
-
-  if( @DEBUG )
-  {
-    "Sstep::NextInput: ";
-    M;
-    L;
-    @V;
-    @RANK;
-    attrib(MRES, "isHomog");
-  }
-
 
   // TODO: N  = SYZ( M )!!!
   module N, LL, TT; (N, LL, TT) = SSComputeSyzygy(/*M, */L, T/*, @RANK*/);
@@ -1899,13 +869,6 @@ proc SSstep()
   attrib(MRES, "isHomog", @V);
 
 //  L = L, lead(N);  attrib(basering, "InducionLeads", L);
-
-  if( @DEBUG )
-  {
-    "SSstep::NextSyzOutput: ";
-    N;
-    attrib(N);
-  }
 
   int ss = attrib(basering, "SYZNUMBER");
   attrib(basering, "SYZNUMBER", ss + 1 );
@@ -2438,7 +1401,6 @@ SEE ALSO: sres, lres, Sres
 EXAMPLE: example s_res; shows an example
 "
 {
-  int @prot = (find(option(),"prot") != 0) && (defined(  Syzextra::NumberStatsInit)) && (defined(  Syzextra::NumberStatsPrint));
   def @save = basering;
 
   int @RINGCHANGE = 0;
@@ -2452,9 +1414,7 @@ EXAMPLE: example s_res; shows an example
   if( @RINGCHANGE ){ setring R; }
 
   int @l = size(RES);
-  if(@prot){   Syzextra::NumberStatsInit(); }
   def rsltn =   Syzextra::ComputeResolution(RES[@l], LRES[@l], TRES[@l], l);
-  if(@prot){   Syzextra::NumberStatsPrint("Number statistic for s_res with   Syzextra::ComputeResolution"); }
 
   if( !@RINGCHANGE )
   {
@@ -2478,7 +1438,6 @@ example
 /* static */
 proc s_res_bm(def I)
 {
-  int @prot = (find(option(),"prot") != 0) && (defined(  Syzextra::NumberStatsInit)) && (defined(  Syzextra::NumberStatsPrint));
   def @save = basering;
 
   int @RINGCHANGE = 0;
@@ -2506,13 +1465,10 @@ t=rtimer;def R=SSinit(I);tt=rtimer;
 
   while ( 1 )
   {
-    if(@prot){   Syzextra::NumberStatsInit(); }
-
 //  SSstep():
 t=rtimer;(N,LL,TT)=SSComputeSyzygy(L,T);tt=rtimer;
 
     @l = @l + 1;
-    if(@prot){   Syzextra::NumberStatsPrint("Number statistic for SSComputeSyzygy["+string(@l-2)+"]"); }
     "%% SSstep[",@l-2, "] TIME:", tt - t;  // if(@prot){ } ?
     sum = sum + (tt-t);
 

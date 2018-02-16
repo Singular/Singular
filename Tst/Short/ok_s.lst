@@ -11,9 +11,11 @@ bug_naGreater
 bug_newstruct
 bug_newstruct3
 bug_normalize
+bug_printres
 bug_qring2
 bug_ring
 bug_ringlist
+bug_sca
 bug_solve
 bug_ssi_algring
 bug_ssi_attr
@@ -79,6 +81,7 @@ bug_tr778
 bug_tr779
 bug_tr785
 bug_tr806
+bug_tr820
 bug_genus_etc
 conv_bi
 facstd

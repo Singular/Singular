@@ -5,9 +5,9 @@ info="
 LIBRARY:  modules.lib    Modules
 
 AUTHORS:  J. Boehm, boehm@mathematik.uni-kl.de
-	  D. Wienholz wienholz@mathematik.uni-kl.de
-	  C. Koenen koenen@rhrk.uni-kl.de
-	  M. Mayer mayer@mathematik.uni-kl.de
+    D. Wienholz wienholz@mathematik.uni-kl.de
+    C. Koenen koenen@rhrk.uni-kl.de
+    M. Mayer mayer@mathematik.uni-kl.de
 
 OVERVIEW:
 This library is used for the computation of graded free resolutions with an own graduation of
@@ -26,68 +26,68 @@ This is experimental work in progress!!!
 KEYWORDS: graded-module, graded-resolution, homogenoues-matrix, R-module-homomorphism
 
 TYPES:
-Matrix			the class of matrices with source and target in form of free modules
-FreeModule		free modules representet with the ring and degree
-Resolution		class of graded resolutions
-Module			modules represented by either the image, coker, kernelof a matrix or the subquotient of two matrices
-Vector			element of a Module
-Ideal			same as ideal, but with it's own basering saved, used to compute resolutions
-Homomorphism		class of R-module-homomormphisms
+Matrix      the class of matrices with source and target in form of free modules
+FreeModule    free modules representet with the ring and degree
+Resolution    class of graded resolutions
+Module      modules represented by either the image, coker, kernelof a matrix or the subquotient of two matrices
+Vector      element of a Module
+Ideal      same as ideal, but with it's own basering saved, used to compute resolutions
+Homomorphism    class of R-module-homomormphisms
 
 PROCEDURES:
-id(int n)			return a nxn identity Matrix
-zero(int n,int m)		return a nxm zero Matrix
-freeModule(ring,int,list)	creating a graded free module
-makeMatrix(matrix,#int)		creating a Matrix with graded target and source if the matrix is homogenous. If # is set to 1, makeMatrix ignores the grading of source & target.
-makeIdeal(ideal)		creates an Ideal from an given ideal, is used to compute a resolution of the ideal
-Target(Matrix)			return target of the Matrix
-Source(Matrix)			return source of the Matrix
-printMatrix(Matrix)		print a Matrix
-printFreeModule(FreeModule)	print a FreeModule
-printResolution(Resolution)	print a Resolution
-printModule(Module)		print a Module
-printHom(Homomorphism)		print a Homomorphism
-mRes(Module/Ideal,#int)		return a minimized graded Resolution
-sRes(Module/Ideal,#int)		return a  graded Resolution computet with Schreyer's method
-Res(Module/Ideal,#int)		return a graded Resolution
-Betti(Resolution)		return the Betti-Matrix of the Resolution
-printBetti(Resolution)		prints the Betti-matrix of the Resolution
-SetDeg(list/intvec)		sets an own graduatuation for the monomials
-Deg(poly)			same as deg, but can be used with an own graduation
-Degree(FreeModule)		return list with degrees of the module
-Degrees(Module)			return list with degrees of the module
-subquotient(Matrix,Matrix)	return a Module, the subquotient of the two Matrices
-coker(Matrix)			return a Module, the cokernel of the Matrix
-image(Matrix)			return a Module, the image of the Matrix
-Ker(Matrix)			return a Module, the kernel of the Matrix
-compareModules(Module,Module)	return 0 or 1, compares the two Modules up to isomorphism
-addModules(Module,Module)	return a Module, sum of the two Modules
-homomorphism(matrix,Module,Module)	creates a R-Modul-Homomorphism
-target(Homomorphism)		return a Module, target of the Homomorphism
-source(Homomorphism)		return a Module, source of the Homomorphism
-compareMatrix(Matrix,Matrix)	return 0 or 1, compares two Matrices
+id(int n)      return a nxn identity Matrix
+zero(int n,int m)    return a nxm zero Matrix
+freeModule(ring,int,list)  creating a graded free module
+makeMatrix(matrix,#int)    creating a Matrix with graded target and source if the matrix is homogenous. If # is set to 1, makeMatrix ignores the grading of source & target.
+makeIdeal(ideal)    creates an Ideal from an given ideal, is used to compute a resolution of the ideal
+Target(Matrix)      return target of the Matrix
+Source(Matrix)      return source of the Matrix
+printMatrix(Matrix)    print a Matrix
+printFreeModule(FreeModule)  print a FreeModule
+printResolution(Resolution)  print a Resolution
+printModule(Module)    print a Module
+printHom(Homomorphism)    print a Homomorphism
+mRes(Module/Ideal,#int)    return a minimized graded Resolution
+sRes(Module/Ideal,#int)    return a  graded Resolution computet with Schreyer's method
+Res(Module/Ideal,#int)    return a graded Resolution
+Betti(Resolution)    return the Betti-Matrix of the Resolution
+printBetti(Resolution)    prints the Betti-matrix of the Resolution
+SetDeg(list/intvec)    sets an own graduatuation for the monomials
+Deg(poly)      same as deg, but can be used with an own graduation
+Degree(FreeModule)    return list with degrees of the module
+Degrees(Module)      return list with degrees of the module
+subquotient(Matrix,Matrix)  return a Module, the subquotient of the two Matrices
+coker(Matrix)      return a Module, the cokernel of the Matrix
+image(Matrix)      return a Module, the image of the Matrix
+Ker(Matrix)      return a Module, the kernel of the Matrix
+compareModules(Module,Module)  return 0 or 1, compares the two Modules up to isomorphism
+addModules(Module,Module)  return a Module, sum of the two Modules
+homomorphism(matrix,Module,Module)  creates a R-Modul-Homomorphism
+target(Homomorphism)    return a Module, target of the Homomorphism
+source(Homomorphism)    return a Module, source of the Homomorphism
+compareMatrix(Matrix,Matrix)  return 0 or 1, compares two Matrices
 
 
-freeModule2Module(FreeModule)		converts a FreeModule into a Module
-makeVector(vector,Module)		creates Vector in the given Module
-netVector(Vector)			prints Vector
-netMatrix(Matrix)			prints Matrix
-presentation(Module)			converts M as a Subquotient to the Coker of a matrix C
-tensorMatrix(Matrix,Matrix)		computes tensorproduct of two Matrices
-tensorModule(Module,Module)		computes tensorproduct of two Modules
-tensorModFreemod(Module,FreeModule)	computes tensorproduct of Module and FreeModule
-tensorFreemodMod(FreeModule,Module)	computes tensorproduct of FreeModule and Module
-tensorFreeModule(FreeModule,FreeModule)	computes tensorproduct ot two FreeModules
-tensorProduct(def,def)			computes tensorproduct
-pruneModule(Module)			simplifies the presentation of a Module
-hom(Module,Module)			computes Hom(M,N)
-kerHom(Homomorphism)			computes the kernel of a Homomorphism
-interpret(Vector)			interpretes the Vector in some Module or abstract space
-interpretInv(def,Module)		interpretes a Vector or Homomorphism into the given Module
-reduceIntChain(Module,#int)		reduces a chain of interpretations to minimal size or # steps
-interpretElem(Vector,#int)		interpret a Vector with # steps or until can't interpret further
-interpretList(list,#int)		interpret a list of Vectors as far as possible
-compareVectors(Vector,Vector)		compares two Vectors with regard to the relations of their Module
+freeModule2Module(FreeModule)    converts a FreeModule into a Module
+makeVector(vector,Module)    creates Vector in the given Module
+netVector(Vector)      prints Vector
+netMatrix(Matrix)      prints Matrix
+presentation(Module)      converts M as a Subquotient to the Coker of a matrix C
+tensorMatrix(Matrix,Matrix)    computes tensorproduct of two Matrices
+tensorModule(Module,Module)    computes tensorproduct of two Modules
+tensorModFreemod(Module,FreeModule)  computes tensorproduct of Module and FreeModule
+tensorFreemodMod(FreeModule,Module)  computes tensorproduct of FreeModule and Module
+tensorFreeModule(FreeModule,FreeModule)  computes tensorproduct ot two FreeModules
+tensorProduct(def,def)      computes tensorproduct
+pruneModule(Module)      simplifies the presentation of a Module
+hom(Module,Module)      computes Hom(M,N)
+kerHom(Homomorphism)      computes the kernel of a Homomorphism
+interpret(Vector)      interpretes the Vector in some Module or abstract space
+interpretInv(def,Module)    interpretes a Vector or Homomorphism into the given Module
+reduceIntChain(Module,#int)    reduces a chain of interpretations to minimal size or # steps
+interpretElem(Vector,#int)    interpret a Vector with # steps or until can't interpret further
+interpretList(list,#int)    interpret a list of Vectors as far as possible
+compareVectors(Vector,Vector)    compares two Vectors with regard to the relations of their Module
 simplePrune(Module)                     simplify module
 
 ";
@@ -209,20 +209,20 @@ EXAMPLE: example SetDeg, shows an example"
 {
 list R=ringlist(basering);
 if(size(R[2])!=size(mydeg)){
-	ERROR("Number of arguments doesn't match number of variables");
+  ERROR("Number of arguments doesn't match number of variables");
 }
 intvec I;
 if(typeof(mydeg)=="intvec"){
-	I=mydeg;
+  I=mydeg;
 }else{
-	if(typeof(mydeg)=="list"){
-		for(int i=1;i<=size(mydeg);i++){
-			I[i]=mydeg[i];
-		}
-	}
-	else{
-	ERROR("Intput isn't a list or intvec");
-	}
+  if(typeof(mydeg)=="list"){
+    for(int i=1;i<=size(mydeg);i++){
+      I[i]=mydeg[i];
+    }
+  }
+  else{
+  ERROR("Intput isn't a list or intvec");
+  }
 }
 attrib(basering,"Grading",I);
 }
@@ -295,18 +295,18 @@ M.Rank = myrank;
 list l=-1;
 M.isgraded=0;
 if(!(comparedeg(degrees,l))){
-	M.isgraded=1;
-	l=0;
-	if(comparedeg(degrees,l)){
-		for(int j=1;j<=myrank;j++){
-			M.grading[j]=mydeg;
-		}
-	}
+  M.isgraded=1;
+  l=0;
+  if(comparedeg(degrees,l)){
+    for(int j=1;j<=myrank;j++){
+      M.grading[j]=mydeg;
+    }
+  }
 
-	else{
-	if(myrank!=size(degrees)){ERROR("Graduation incorrect")}
-	M.grading=degrees;
-	}
+  else{
+  if(myrank!=size(degrees)){ERROR("Graduation incorrect")}
+  M.grading=degrees;
+  }
 }
 setring(R);
 return(M);
@@ -344,14 +344,14 @@ M.over=basering;
 int a;
 int j;
 for(int i=1;i<=ncols(m);i++){
-	a=0;
-	for(j=1;j<=nrows(m);j++){
-		if(m[i][j]!=0){
-			a=Deg(m[i][j]);
-			break;
-		}
-	}
-	mydeg[i]=t[j]+a;
+  a=0;
+  for(j=1;j<=nrows(m);j++){
+    if(m[i][j]!=0){
+      a=Deg(m[i][j]);
+      break;
+    }
+  }
+  mydeg[i]=t[j]+a;
 }
 M.target = N;
 M.source = freeModule(basering,ncols(m),mydeg);
@@ -365,7 +365,7 @@ return(M);
 static proc comparedeg(list l,list j){
 if(size(l)!=size(j)){return(0);}
 for(int i=1;i<=size(l);i++){
-	if(l[i]!=j[i]){return(0);}
+  if(l[i]!=j[i]){return(0);}
 }
 return(1);
 }
@@ -379,17 +379,17 @@ int f;
 list mydeg;
 list controldeg;
 for(int i=1;i<=ncols(m);i++){
-	mydeg[i]=0;
-	controldeg[i]=0;
-	for(j=1;j<=nrows(m);j++){
-		if(m[j,i]!=0){
-			if(controldeg[i]==1){
-				if(mydeg[i]!=Deg(m[j,i])){return(-1)}
-			}
-			mydeg[i]=Deg(m[j,i]);
-			controldeg[i]=1;
-		}
-	}
+  mydeg[i]=0;
+  controldeg[i]=0;
+  for(j=1;j<=nrows(m);j++){
+    if(m[j,i]!=0){
+      if(controldeg[i]==1){
+        if(mydeg[i]!=Deg(m[j,i])){return(-1)}
+      }
+      mydeg[i]=Deg(m[j,i]);
+      controldeg[i]=1;
+    }
+  }
 }
 return(mydeg)
 }
@@ -405,18 +405,18 @@ string l1;
 string l2;
 l2=nameof(basering);
 for(int i=1;i<=size(l2);i++){
-	l1=l1+" ";
+  l1=l1+" ";
 }
 l1=l1+string(M.Rank);
 print(l1);
 print(l2);
 print("free Module");
 if(M.isgraded){
-	string l3 = "Degrees of the generators: ";
-	for(i=1;i<=size(M.grading);i++){
-		l3=l3+"{"+string(M.grading[i])+"} ";
-	}
-	print(l3);
+  string l3 = "Degrees of the generators: ";
+  for(i=1;i<=size(M.grading);i++){
+    l3=l3+"{"+string(M.grading[i])+"} ";
+  }
+  print(l3);
 }
 }
 example
@@ -468,14 +468,14 @@ EXAMPLE. example mRes, shows an example"
 module m;
 def S =basering;
 if(typeof(M)=="Ideal"){
-	setring(M.over);
-	m=M.gens;
+  setring(M.over);
+  m=M.gens;
 }
 if(typeof(M)=="Module"){
-	setring(M.over);
-	module gens=M.generators.hom;
-	module rels=M.relations.hom;
-	m=modulo(gens,rels);
+  setring(M.over);
+  module gens=M.generators.hom;
+  module rels=M.relations.hom;
+  m=modulo(gens,rels);
 }
 int j=0;
 if(size(#)!=0){j=#;}
@@ -485,20 +485,20 @@ R.reso=mres(m,j);
 matrix a=R.reso[1];
 R.dd[1]=makeMatrix(a);
 if(!(R.dd[1].ishomogenous)){
-	R.isgraded=0;
-	for(int i=2;i<=(size(R.reso)+1);i++){
-		a=R.reso[i];
-		R.dd[i]=nongradedMatrix(a);
-	}
+  R.isgraded=0;
+  for(int i=2;i<=(size(R.reso)+1);i++){
+    a=R.reso[i];
+    R.dd[i]=nongradedMatrix(a);
+  }
 
 }
 else{
-	R.isgraded=1;
-	for(int i=2;i<=(size(R.reso));i++){
-		a=R.reso[i];
-		mydeg=R.dd[i-1].source.grading;
-		R.dd[i]=resMatrix(a,mydeg,R.dd[i-1].source);
-	}
+  R.isgraded=1;
+  for(int i=2;i<=(size(R.reso));i++){
+    a=R.reso[i];
+    mydeg=R.dd[i-1].source.grading;
+    R.dd[i]=resMatrix(a,mydeg,R.dd[i-1].source);
+  }
 }
 R.over=M.over;
 setring(S);
@@ -530,14 +530,14 @@ EXAMPLE. example sRes, shows an example"
 module m;
 def S =basering;
 if(typeof(M)=="Ideal"){
-	setring(M.over);
-	m=M.gens;
+  setring(M.over);
+  m=M.gens;
 }
 if(typeof(M)=="Module"){
-	setring(M.over);
-		module gens=M.generators.hom;
-		module rels=M.relations.hom;
-		m=modulo(gens,rels);
+  setring(M.over);
+    module gens=M.generators.hom;
+    module rels=M.relations.hom;
+    m=modulo(gens,rels);
 }
 int j=0;
 if(size(#)!=0){j=#;}
@@ -547,20 +547,20 @@ R.reso=sres(m,j);
 matrix a=R.reso[1];
 R.dd[1]=makeMatrix(a);
 if(!(R.dd[1].ishomogenous)){
-	R.isgraded=0;
-	for(int i=2;i<(size(R.reso)+1);i++){
-		a=R.reso[i];
-		R.dd[i]=nongradedMatrix(a);
-	}
+  R.isgraded=0;
+  for(int i=2;i<(size(R.reso)+1);i++){
+    a=R.reso[i];
+    R.dd[i]=nongradedMatrix(a);
+  }
 
 }
 else{
-	R.isgraded=1;
-	for(int i=2;i<(size(R.reso));i++){
-		a=R.reso[i];
-		mydeg=R.dd[i-1].source.grading;
-		R.dd[i]=resMatrix(a,mydeg,R.dd[i-1].source);
-	}
+  R.isgraded=1;
+  for(int i=2;i<(size(R.reso));i++){
+    a=R.reso[i];
+    mydeg=R.dd[i-1].source.grading;
+    R.dd[i]=resMatrix(a,mydeg,R.dd[i-1].source);
+  }
 }
 R.over=basering;
 setring(S);
@@ -592,14 +592,14 @@ EXAMPLE. example Res, shows an example"
 module m;
 def S =basering;
 if(typeof(M)=="Ideal"){
-	setring(M.over);
-	m=M.gens;
+  setring(M.over);
+  m=M.gens;
 }
 if(typeof(M)=="Module"){
-	setring(M.over);
-		module gens=M.generators.hom;
-		module rels=M.relations.hom;
-		m=modulo(gens,rels);
+  setring(M.over);
+    module gens=M.generators.hom;
+    module rels=M.relations.hom;
+    m=modulo(gens,rels);
 }
 int j=0;
 if(size(#)!=0){j=#;}
@@ -609,20 +609,20 @@ R.reso=res(m,j);
 matrix a=R.reso[1];
 R.dd[1]=makeMatrix(a);
 if(!(R.dd[1].ishomogenous)){
-	R.isgraded=0;
-	for(int i=2;i<(size(R.reso)+1);i++){
-		a=R.reso[i];
-		R.dd[i]=nongradedMatrix(a);
-	}
+  R.isgraded=0;
+  for(int i=2;i<(size(R.reso)+1);i++){
+    a=R.reso[i];
+    R.dd[i]=nongradedMatrix(a);
+  }
 
 }
 else{
-	R.isgraded=1;
-	for(int i=2;i<(size(R.reso));i++){
-		a=R.reso[i];
-		mydeg=R.dd[i-1].source.grading;
-		R.dd[i]=resMatrix(a,mydeg,R.dd[i-1].source);
-	}
+  R.isgraded=1;
+  for(int i=2;i<(size(R.reso));i++){
+    a=R.reso[i];
+    mydeg=R.dd[i-1].source.grading;
+    R.dd[i]=resMatrix(a,mydeg,R.dd[i-1].source);
+  }
 }
 R.over=basering;
 setring(S);
@@ -655,17 +655,17 @@ list l;
 int i=size(resi.dd);
 M=resi.dd[i];
 for(j=1;j<=size(M.source.grading);j++){
-		l[M.source.grading[j]-i+1]=0;
-	}
+    l[M.source.grading[j]-i+1]=0;
+  }
 intmat Bet[size(l)][size(resi.dd)+1];
 for(j=1;j<=size(M.source.grading);j++){
-		Bet[M.source.grading[j]-i+1,i+1]=Bet[M.source.grading[j]-i+1,i+1]+1;
-	}
+    Bet[M.source.grading[j]-i+1,i+1]=Bet[M.source.grading[j]-i+1,i+1]+1;
+  }
 for(i=1;i<=size(resi.dd);i++){
-	M=resi.dd[i];
-	for(j=1;j<=size(M.target.grading);j++){
-		Bet[M.target.grading[j]-i+2,i]=Bet[M.target.grading[j]-i+2,i]+1;
-	}
+  M=resi.dd[i];
+  for(j=1;j<=size(M.target.grading);j++){
+    Bet[M.target.grading[j]-i+2,i]=Bet[M.target.grading[j]-i+2,i]+1;
+  }
 }
 return(Bet);
 }
@@ -724,7 +724,7 @@ EXAMPLE: exmaple makeMatrix, shows an example"
 Matrix M;
 list mydeg=isHomogenous(m);
 if(mydeg[1]==-1 || # == 1){
-	return(nongradedMatrix(m));
+  return(nongradedMatrix(m));
 }
 return(gradedMatrix(m,mydeg));
 }
@@ -827,36 +827,36 @@ def R=basering;
 setring(M.over);
 matrix m=M.hom;
 if(M.ishomogenous){
-	string s1;
-	string s2;
-	list l1;
-	int j;
-	for(int i=1;i<=ncols(m);i++){
-		l1[i]=0;
-		for(j=1;j<=nrows(m);j++){
-			if(size(string(m[i][j]))>l1[i]){
-				l1[i]=size(string(m[i][j]));
-			}
-		}
-	}
-	s1="   ";
-	for(i=1;i<=ncols(m);i++){
-		for(j=1;j<=(l1[i]);j++){
-			s1=s1+" ";
-		}
-		s1=s1+"{"+string(M.source.grading[i])+"}";
-	}
-	print(s1);
-	for(int k=1;k<=nrows(m);k++){
-		s2="{"+string(M.target.grading[k])+"}";
-			for(i=1;i<=ncols(m);i++){
-				for(j=1;j<=(l1[i]+3-size(string(m[i][k])));j++){
-					s2=s2+" ";
-				}
-				s2=s2+string(m[i][k]);
-			}
-	print(s2);
-	}
+  string s1;
+  string s2;
+  list l1;
+  int j;
+  for(int i=1;i<=ncols(m);i++){
+    l1[i]=0;
+    for(j=1;j<=nrows(m);j++){
+      if(size(string(m[i][j]))>l1[i]){
+        l1[i]=size(string(m[i][j]));
+      }
+    }
+  }
+  s1="   ";
+  for(i=1;i<=ncols(m);i++){
+    for(j=1;j<=(l1[i]);j++){
+      s1=s1+" ";
+    }
+    s1=s1+"{"+string(M.source.grading[i])+"}";
+  }
+  print(s1);
+  for(int k=1;k<=nrows(m);k++){
+    s2="{"+string(M.target.grading[k])+"}";
+      for(i=1;i<=ncols(m);i++){
+        for(j=1;j<=(l1[i]+3-size(string(m[i][k])));j++){
+          s2=s2+" ";
+        }
+        s2=s2+string(m[i][k]);
+      }
+  print(s2);
+  }
 
 }
 else{print(m);}
@@ -879,7 +879,7 @@ list a=ringlist(r);
 list b=ringlist(t);
 if(a[1]!=b[1]){return(0);}
 for(int i=1;i<=size(a[2]);i++){
-	if(a[2][i]!=b[2][i]){return(0);}
+  if(a[2][i]!=b[2][i]){return(0);}
 }
 if(a[3][1][1]!=b[3][1][1]){return(0);}
 if(a[3][1][2]!=b[3][1][2]){return(0);}
@@ -888,12 +888,12 @@ if(a[3][2][2]!=b[3][2][2]){return(0);}
 ideal I = std(a[4]);
 ideal J = std(b[4]);
 if(size(I)!=size(J)){
-	return(0);
+  return(0);
 }
 for(int j  = 1;i<=size(I); i++){
-	if(I[i]!=J[i]){
-		return(0);
-	}
+  if(I[i]!=J[i]){
+    return(0);
+  }
 }
 return(1);
 }
@@ -961,8 +961,8 @@ module d=targets.relations.hom;
 module b=rules*sources.relations.hom;
 d=std(d);
 for(int i=1;i<=size(b);i++){
-	if(reduce(b[i],d)!=0){
-		ERROR("The given homomorphism between the two modules isn't possible");}
+  if(reduce(b[i],d)!=0){
+    ERROR("The given homomorphism between the two modules isn't possible");}
 }
 Homomorphism H;
 H.source=sources;
@@ -999,9 +999,9 @@ int n = nrows(rels.hom);
 matrix new = rels.hom;
 //Delete Zerocolumns in relations:
 for (i=2;i<ncols(new);i++) {
-	if ([new[1..n,i]]==0) {
-		new = deleteCol(new,i);
-	}
+  if ([new[1..n,i]]==0) {
+    new = deleteCol(new,i);
+  }
 }
 Module M;
 if(rels.ishomogenous){M.isgraded=1;}
@@ -1053,9 +1053,9 @@ EXAMPLE: example Ker; shows an example"
 {
 matrix m=syz(mat.hom);
 if (mat.source.isgraded){
-	Matrix M=resMatrix(m,mat.source.grading,mat.source);
+  Matrix M=resMatrix(m,mat.source.grading,mat.source);
 }else{
-	Matrix M = makeMatrix(m,1);
+  Matrix M = makeMatrix(m,1);
 }
 return(image(M));
 }
@@ -1100,7 +1100,7 @@ return(n);}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-static proc netModule(Module M)
+proc netModule(Module M)
 {
 def R=basering;
 setring(M.over);
@@ -1129,18 +1129,18 @@ if ((!idgens)&&(!zerorel)) {
 }
 
 if (M.isgraded == 1){
-	ret3 = net("Graded with:") + net(M.grading);
+  ret3 = net("Graded with:") + net(M.grading);
 }
 
 //interpretationlist:
 
 if (size(M.interpretation)==0){ret4 = net("The Interpretationmap is the Identity.");}
 else {
-	ret4 = netList(M.interpretation[1]);
-	ret4.rows = (net("Interpretation:")).rows + ret4.rows;
-	if (size(M.interpretation[2])!=0) {
-		ret4.rows = ret4.rows + (net("inverse Interpretation:")).rows + (net(M.interpretation[2])).rows;
-	}
+  ret4 = netList(M.interpretation[1]);
+  ret4.rows = (net("Interpretation:")).rows + ret4.rows;
+  if (size(M.interpretation[2])!=0) {
+    ret4.rows = ret4.rows + (net("inverse Interpretation:")).rows + (net(M.interpretation[2])).rows;
+  }
 }
 
 
@@ -1353,10 +1353,10 @@ EXAMPLE: example compareModules; shows an example"
  int re =1;
 if(M.isgraded!=N.isgraded){re=0;}
 if(M.isgraded){
-	if(size(M.grading)!=size(N.grading)){re=0;}
-	for(int i=1;i<=size(M.grading);i++){
-		if(M.grading[i]!=N.grading[i]){re=0;}
-	}
+  if(size(M.grading)!=size(N.grading)){re=0;}
+  for(int i=1;i<=size(M.grading);i++){
+    if(M.grading[i]!=N.grading[i]){re=0;}
+  }
 }
 module gensm=M.generators.hom;
 module relsm=M.relations.hom;
@@ -1452,7 +1452,7 @@ proc printModule(Module M)
 RETURN: nothing, prints the Module
 EXAMPLE: example printModule; shows an example
 {
-	netModuleShort(M);
+  netModuleShort(M);
 }
 example
 {
@@ -1468,33 +1468,33 @@ example
 
 static proc netModuleShort(Module M)
 {
-	def R=basering;
-	setring(M.over);
-	matrix rels = M.relations.hom;
-	matrix gens = M.generators.hom;
-	int zerorel=isZero(rels);
-	int idgens=isIdentity(gens);
-	Net ret;
-	if (zerorel) {
-	   if (idgens){
-	     ret=net(nameOver(M))+net("^")+net(nrows(gens));
-	   } else {
-	     ret=net("image ")+net(gens);
-	   }
-	}
-	if ((!zerorel)&&idgens) {
-	   ret=net("cokernel ")+net(rels);
-	}
-	if ((!idgens)&&(!zerorel)) {
-	   ret=net("subquotient (")+net(gens)+net(", ")+net(rels)+net(")");
-	}
-	setring(R);
-	return(ret);
+  def R=basering;
+  setring(M.over);
+  matrix rels = M.relations.hom;
+  matrix gens = M.generators.hom;
+  int zerorel=isZero(rels);
+  int idgens=isIdentity(gens);
+  Net ret;
+  if (zerorel) {
+     if (idgens){
+       ret=net(nameOver(M))+net("^")+net(nrows(gens));
+     } else {
+       ret=net("image ")+net(gens);
+     }
+  }
+  if ((!zerorel)&&idgens) {
+     ret=net("cokernel ")+net(rels);
+  }
+  if ((!idgens)&&(!zerorel)) {
+     ret=net("subquotient (")+net(gens)+net(", ")+net(rels)+net(")");
+  }
+  setring(R);
+  return(ret);
 }
 
 
 static proc netHom(Homomorphism f) {
-	return(net(f.rule));
+  return(net(f.rule));
 }
 
 
@@ -1562,16 +1562,16 @@ proc makeVector(vector v, Module M)
 RETURN: a Vector V, element of M with entries v
 EXAMPLE: example makeVector; shows an example"
 {
-	//assure that v has the right size:
-	if (nrows(v)>nrows(M.generators.hom)){ERROR("The Element has too many entries");}
-	//assure that V is in M:
-	list DivVec = division(v,M.generators.hom);
-	if ((DivVec[2])[1] != 0) {ERROR("The vector isn't in the Module");}
+  //assure that v has the right size:
+  if (nrows(v)>nrows(M.generators.hom)){ERROR("The Element has too many entries");}
+  //assure that V is in M:
+  list DivVec = division(v,M.generators.hom);
+  if ((DivVec[2])[1] != 0) {ERROR("The vector isn't in the Module");}
 
-	Vector V;
-	V.space = M;
-	V.entries = v;
-	return(V);
+  Vector V;
+  V.space = M;
+  V.entries = v;
+  return(V);
 }
 example
 {
@@ -1587,10 +1587,10 @@ proc netVector(Vector V)
 RETURN: pretty print for Vector
 EXAMPLE: example netVector; shows an example"
 {
-	int i = nrows(V.space.generators.hom);
-	matrix ents[i][1] = V.entries;
-	Net ret = net(ents);
-	return(ret);
+  int i = nrows(V.space.generators.hom);
+  matrix ents[i][1] = V.entries;
+  Net ret = net(ents);
+  return(ret);
 }
 example
 {
@@ -1602,7 +1602,7 @@ example
 }
 
 static proc printVector(Vector V) {
-	net(V);
+  net(V);
 }
 
 proc compareVectors(Vector V1, Vector V2)
@@ -1610,12 +1610,12 @@ proc compareVectors(Vector V1, Vector V2)
 RETURN: compares the given Vectors up tu equivalence
 EXAMPLE: example compareVector; shows an example"
 {
-	if (V1.space == V2.space){
-		int n = nrows(((V1.space).generators).hom);
-		matrix vecDiff[n][1] = V1.entries-V2.entries;
-		list divList = division(vecDiff,V1.space.relations.hom);
-		if (divList[2][1] == 0){return(1);} else {return(0);}
-	}else{return(0);}
+  if (V1.space == V2.space){
+    int n = nrows(((V1.space).generators).hom);
+    matrix vecDiff[n][1] = V1.entries-V2.entries;
+    list divList = division(vecDiff,V1.space.relations.hom);
+    if (divList[2][1] == 0){return(1);} else {return(0);}
+  }else{return(0);}
 }
 example
 {
@@ -1641,11 +1641,11 @@ proc presentation(Module M)
 RETURN: Subquotient M converted to coker(C)
 EXAMPLE: example presentation; shows an example"
 {
-	//TODO Grading
+  //TODO Grading
 matrix A = M.generators.hom;
 // If M is already given as a cokernel, don't change anything:
 if (M.generators == id(M.generators.source.Rank)){
-	return(M);
+  return(M);
 }
 matrix B = M.relations.hom;
 int n = nrows(A);
@@ -1662,11 +1662,11 @@ Module N = coker(C);
 int i;
 list L = list(),list();
 for (i=1;i<=ncols(A);i++) {
-	(L)[1][i] = makeVector([A[1..nrows(A),i]],M);
+  (L)[1][i] = makeVector([A[1..nrows(A),i]],M);
 }
 matrix gens = N.generators.hom;
 for (i=1;i<=ncols(gens);i++){
-	(L)[2][i] = [gens[1..nrows(gens),i]];
+  (L)[2][i] = [gens[1..nrows(gens),i]];
 }
 N.interpretation = L;
 return(N);
@@ -1696,33 +1696,33 @@ RETURN: Tensorprodukt of A,B
 EXAMPLE: example tensorMatrix; shows an example"
 {
 if (A.over != B.over) {
-	ERROR("A and B don't work over the same ring")
+  ERROR("A and B don't work over the same ring")
 }
 int i;
 int j;
 Matrix T = tensor(A.hom,B.hom);
-list source_grading;	//TODO Grading
+list source_grading;  //TODO Grading
 list target_grading;
 list betweenSafe = B.source.grading; //english for Runaways
 if (A.source.isgraded==0 || B.source.isgraded==0) {
-	source_grading = -1;
+  source_grading = -1;
 }else{
-	/*If both Matrices have dimension 1x1, we only need to add the degrees. Especially if both gradings are zero.*/
-	if (size(A.source.grading)==1 && size(B.source.grading)==1) {
-		source_grading = A.source.grading[1]+B.source.grading[1];
-	}else{
-		for (i=1;i<=A.source.Rank;i++) {
-			for (j=1;j<=B.source.Rank;j++) {
-				source_grading = source_grading + list(betweenSafe[j] + A.source.grading[i]);
-			}
-		}
-	}
+  /*If both Matrices have dimension 1x1, we only need to add the degrees. Especially if both gradings are zero.*/
+  if (size(A.source.grading)==1 && size(B.source.grading)==1) {
+    source_grading = A.source.grading[1]+B.source.grading[1];
+  }else{
+    for (i=1;i<=A.source.Rank;i++) {
+      for (j=1;j<=B.source.Rank;j++) {
+        source_grading = source_grading + list(betweenSafe[j] + A.source.grading[i]);
+      }
+    }
+  }
 }
 T.source = freeModule(A.over,A.source.Rank*B.source.Rank,source_grading);
 if (A.target.isgraded==0 || B.target.isgraded==0) {
-	target_grading = -1;
+  target_grading = -1;
 }else{
-	target_grading = 0; //vorläufig
+  target_grading = 0; //vorlaeufig
 }
 T.target = freeModule(A.over,A.target.Rank*B.target.Rank,target_grading);
 return(T);
@@ -1750,7 +1750,7 @@ EXAMPLE: example tensorModule; shows an example"
 {
 //TODO Grading
 if (M.over != N.over) {
-	ERROR("The modules don't live over the same ring");
+  ERROR("The modules don't live over the same ring");
 }
 Module M2 = presentation(M);
 Module N2 = presentation(N);
@@ -1791,7 +1791,7 @@ EXAMPLE: example tensorModFreemod; shows an example"
 {
 //TODO Grading
 if (M.over != F.over) {
-	ERROR("The modules don't live over the same ring");
+  ERROR("The modules don't live over the same ring");
 }
 Module M2 = presentation(M);
 Matrix Tensormatrix = tensorMatrix(M2.relations, id(F.Rank));
@@ -1821,7 +1821,7 @@ tensorModFreemod(M,F);
 proc tensorFreemodMod(FreeModule F, Module M) //Dreht input um
 {
 if (M.over != F.over) {
-	ERROR("The modules don't live over the same ring");
+  ERROR("The modules don't live over the same ring");
 }
 Module T = tensorModFreemod(M,F);
 return(T);
@@ -1837,9 +1837,9 @@ RETURN: Tensorprodukt of M,N
 EXAMPLE: example tensorFreeModule; shows an example"
 {
 if (M.over != N.over) {
-	ERROR("The modules don't live over the same ring");
+  ERROR("The modules don't live over the same ring");
 }
-FreeModule T = freeModule(M.over,M.Rank*N.Rank,-1); //vorläufig ohne grading 	//TODO Grading
+FreeModule T = freeModule(M.over,M.Rank*N.Rank,-1); //vorlaeufig ohne grading   //TODO Grading
 return(T);
 }
 
@@ -1884,8 +1884,8 @@ EXAMPLE: example pruneModule; shows an example"
         int dimension = nrows(P.generators.hom);
         P = simplePrune(P);
         while (dimension != nrows(P.generators.hom)){
-        	dimension--;
-     	 	P = simplePrune(P);
+          dimension--;
+          P = simplePrune(P);
                 P = reduceIntChain(P);
         }
         //compute GB of relations:
@@ -1917,12 +1917,12 @@ pruneModule(H);
 
 
 static proc pruneModule1(Matrix M) {
-	matrix gens = std(M.hom);
-/*	if (homog(gens)==1) {
-		matrix gens = minbase(M.hom);
-	}*/
-	Matrix Gens = gens;
-	return(Gens);
+  matrix gens = std(M.hom);
+/*  if (homog(gens)==1) {
+    matrix gens = minbase(M.hom);
+  }*/
+  Matrix Gens = gens;
+  return(Gens);
 }
 
 
@@ -1930,31 +1930,31 @@ static proc pruneModule1(Matrix M) {
 
 
 static proc pruneModule2(Matrix M) {
-	matrix m = M.hom;
-	poly factor;
-	poly pivot;
-	int i,j,k,l;
-	int rows = nrows(m);
-	int cols = ncols(m);
-	for (i=1;i<=rows;i++) {
-		for (j=1;j<=cols;j++) {
-			if (isUnit(m[i,j])) {
-			//if the entry is a unit, it's Pivot element
-				pivot = m[i,j];
-				if (pivot!=1) {for(k=1;k<=rows;k++) { m[k,j] = m[k,j]/pivot; }}
-				//dividing Pivot col with Pivot element
-				//Now add multiples of Pivot column to the other columns to make the row to zero:
-				for(k=1;k<=cols;k++) {
-					if (k!=j) {
-					factor = -m[i,k];
-					m[1..rows,k] = m[1..rows,k] + factor*m[1..rows,j];
-					}//change all columns except pivot column
-				}
-			}
-		}
-	}
-	Matrix Mat = m;
-	return (Mat);
+  matrix m = M.hom;
+  poly factor;
+  poly pivot;
+  int i,j,k,l;
+  int rows = nrows(m);
+  int cols = ncols(m);
+  for (i=1;i<=rows;i++) {
+    for (j=1;j<=cols;j++) {
+      if (isUnit(m[i,j])) {
+      //if the entry is a unit, it's Pivot element
+        pivot = m[i,j];
+        if (pivot!=1) {for(k=1;k<=rows;k++) { m[k,j] = m[k,j]/pivot; }}
+        //dividing Pivot col with Pivot element
+        //Now add multiples of Pivot column to the other columns to make the row to zero:
+        for(k=1;k<=cols;k++) {
+          if (k!=j) {
+          factor = -m[i,k];
+          m[1..rows,k] = m[1..rows,k] + factor*m[1..rows,j];
+          }//change all columns except pivot column
+        }
+      }
+    }
+  }
+  Matrix Mat = m;
+  return (Mat);
 }
 
 
@@ -1969,65 +1969,65 @@ EXAMPLE: example simplePrune; shows an example"
 Whenever the relations of a presented Module include a 1-entry, we can reduce the dimension of the Module by representing the relevant variable. This allows us, to 'forget' this row after killing all the other row entries to 0. Therefore, we can reduce the dimension of the Module by 1 without losing any information.
 */
 {
-	//TODO Grading
+  //TODO Grading
 //M must be presented as a cokernel
-	matrix rels = M.relations.hom;
-	int abbruch = 0;
-	int i,j;
-	while (i<nrows(rels) && abbruch==0) {
-		i++;
-		for (j=1;j<=ncols(rels);j++) {
-			if (rels[i,j] == 1) {abbruch=1;break;}
-		}
-	}
-	if (abbruch==0){return(M);} //no 1 found
-	//Have now indices (i,j) of a 1-entry
-	Module N;
-	N.over = M.over;
-	if (ncols(rels)>1){
-		matrix newrels[ncols(rels)][nrows(rels)-1] = deleteCol(transpose(rels),i);
-		matrix needthislater = transpose(newrels);
-		newrels = deleteCol(needthislater,j);
-		Matrix Newrels = newrels;
-	}else{
-		Matrix Newrels = zero(nrows(rels)-1,1);
-		matrix needthislater = Newrels.hom;
-	}
-	N.relations = Newrels;
-	int rows = nrows(M.generators.hom)-1;
-	N.generators = id(rows);
-	N.interpretation = list(list(),list());
-	//Need to insert 0 in the i-th row which is for the identitymatrix equivalent to deleting the i-th column:
-	matrix m[rows+1][rows] = deleteCol(id(rows+1).hom,i);
-	int k;
-	list interpr;
-	Vector V;
-	for (k=1;k<=rows;k++) {
-		V = makeVector([m[1..(rows+1),k]],M);
-		interpr[k] = V;
-	}
-	N.interpretation[1] = interpr;
-	//Now construct the inverse map: 'forget' the i-th row and send the i-th unitvector to the according negative relations.
-	list preinterpr;
-	vector v;
-	matrix n[rows][rows];
-	n = n+1;
-	for (k=1;k<=rows+1;k++) {
-		if (k!=i) {
-			if (k<i) {
-				v = [n[1..rows,k]];
-				preinterpr[k] = v;
-			}else{
-				v = [n[1..rows,k-1]];
-				preinterpr[k] = v;
-			}
-		}else{
-			v = [(-1)*needthislater[1..rows,j]];
-			preinterpr[k] = v;
-		}
-	}
-	N.interpretation[2] = preinterpr;
-	return(N);
+  matrix rels = M.relations.hom;
+  int abbruch = 0;
+  int i,j;
+  while (i<nrows(rels) && abbruch==0) {
+    i++;
+    for (j=1;j<=ncols(rels);j++) {
+      if (rels[i,j] == 1) {abbruch=1;break;}
+    }
+  }
+  if (abbruch==0){return(M);} //no 1 found
+  //Have now indices (i,j) of a 1-entry
+  Module N;
+  N.over = M.over;
+  if (ncols(rels)>1){
+    matrix newrels[ncols(rels)][nrows(rels)-1] = deleteCol(transpose(rels),i);
+    matrix needthislater = transpose(newrels);
+    newrels = deleteCol(needthislater,j);
+    Matrix Newrels = newrels;
+  }else{
+    Matrix Newrels = zero(nrows(rels)-1,1);
+    matrix needthislater = Newrels.hom;
+  }
+  N.relations = Newrels;
+  int rows = nrows(M.generators.hom)-1;
+  N.generators = id(rows);
+  N.interpretation = list(list(),list());
+  //Need to insert 0 in the i-th row which is for the identitymatrix equivalent to deleting the i-th column:
+  matrix m[rows+1][rows] = deleteCol(id(rows+1).hom,i);
+  int k;
+  list interpr;
+  Vector V;
+  for (k=1;k<=rows;k++) {
+    V = makeVector([m[1..(rows+1),k]],M);
+    interpr[k] = V;
+  }
+  N.interpretation[1] = interpr;
+  //Now construct the inverse map: 'forget' the i-th row and send the i-th unitvector to the according negative relations.
+  list preinterpr;
+  vector v;
+  matrix n[rows][rows];
+  n = n+1;
+  for (k=1;k<=rows+1;k++) {
+    if (k!=i) {
+      if (k<i) {
+        v = [n[1..rows,k]];
+        preinterpr[k] = v;
+      }else{
+        v = [n[1..rows,k-1]];
+        preinterpr[k] = v;
+      }
+    }else{
+      v = [(-1)*needthislater[1..rows,j]];
+      preinterpr[k] = v;
+    }
+  }
+  N.interpretation[2] = preinterpr;
+  return(N);
 }
 example
 {
@@ -2043,15 +2043,15 @@ Module N = simplePrune(M);
 
 
 static proc isUnit(poly p) {
-	if (deg(p)!=0){ return (0); }
-	int i = int(p);
-	if (char(basering) != 0) {
-		if (gcd(char(basering),i) == 1){ return(1); }
-		else{ return(0); }
-	}else{
-		if (charstr(basering) == "ZZ" && absValue(i) != 1){ return(0); }
-		else{ return(1); }
-	}
+  if (deg(p)!=0){ return (0); }
+  int i = int(p);
+  if (char(basering) != 0) {
+    if (gcd(char(basering),i) == 1){ return(1); }
+    else{ return(0); }
+  }else{
+    if (charstr(basering) == "ZZ" && absValue(i) != 1){ return(0); }
+    else{ return(1); }
+  }
 }
 
 
@@ -2065,12 +2065,12 @@ proc interpretElem(Vector Elmt, int #)
 RETURN: interpretation of a Vector with # steps or until can't interpret further
 EXAMPLE: example interpretElem; shows an example"
 {
-	if (# == 0){#=-1;}	//if we want to interpret as far as possible
-	while (# != 0 && size(Elmt.space.interpretation) != 0){
-		Elmt = interpret(Elmt);
-		# = # - 1;
-	}
-	return(Elmt);
+  if (# == 0){#=-1;}  //if we want to interpret as far as possible
+  while (# != 0 && size(Elmt.space.interpretation) != 0){
+    Elmt = interpret(Elmt);
+    # = # - 1;
+  }
+  return(Elmt);
 }
 example
 {
@@ -2092,16 +2092,16 @@ proc interpretList(list Elements, int #)
 RETURN: interpretation of Elements in some abstract structure defined by the user or into a Module
 EXAMPLE: example interpretList; shows an example"
 {
-	Vector Cache;
-	Module C = (Elements[1]).space;
-	C = reduceIntChain(C,#);
-	int i;
-	list newEls;
-	for (i=1;i<=size(Elements);i++) {
-		Cache = makeVector((Elements[i]).entries,C);
-		newEls = newEls + list(interpret(Cache));
-	}
-	return(newEls);
+  Vector Cache;
+  Module C = (Elements[1]).space;
+  C = reduceIntChain(C,#);
+  int i;
+  list newEls;
+  for (i=1;i<=size(Elements);i++) {
+    Cache = makeVector((Elements[i]).entries,C);
+    newEls = newEls + list(interpret(Cache));
+  }
+  return(newEls);
 }
 example
 {
@@ -2131,34 +2131,34 @@ list preList;
 Vector V;
 Vector cacheVec;
 list intList;
-	if (size(C.interpretation) != 0) {	// either there is no interpretation list or at least the "interpret direction" exists
-		int i;
-		if (#==0){#=-1;}
-		while (typeof((C.interpretation)[1][1])=="Vector" && #!=0) {
-			if (size(((C.interpretation)[1][1]).space.interpretation)==0){break;}
-			// M is in each iteration step precisely the module, which will be cut out of the chain
-			M = ((C.interpretation)[1][1]).space;
-			// First construct the concatenation of the inverse maps
-			preList = list();
-			if (size(C.interpretation[2]) != 0 && size(M.interpretation[2]) != 0){
-				for (i=1; i<=size((M.interpretation)[2]);i++){
-					V = makeVector(((M.interpretation)[2])[i],M);
-					cacheVec = interpretInv(V,C);
-					preList[i] = cacheVec.entries;
-				}
-			}
-			(C.interpretation)[2] = preList;
-			// Second concatenate the interpretation maps
-			for(i=1;i<=size((C.interpretation)[1]);i++) {
-				intList[i] = interpret((C.interpretation)[1][i]);
-			}
-			C.interpretation[1] = intList;
-			intList = list();
-			# = #-1;
-		}
-	}
-
-	return(C);
+  if (size(C.interpretation) != 0) {  // either there is no interpretation list or at least the "interpret direction" exists
+    int i;
+    if (#==0){#=-1;}
+    while ((typeof((C.interpretation)[1][1])=="Vector") && (#<>0))
+    {
+      if (size(((C.interpretation)[1][1]).space.interpretation)==0){break;}
+      // M is in each iteration step precisely the module, which will be cut out of the chain
+      M = ((C.interpretation)[1][1]).space;
+      // First construct the concatenation of the inverse maps
+      preList = list();
+      if (size(C.interpretation[2]) != 0 && size(M.interpretation[2]) != 0){
+        for (i=1; i<=size((M.interpretation)[2]);i++){
+          V = makeVector(((M.interpretation)[2])[i],M);
+          cacheVec = interpretInv(V,C);
+          preList[i] = cacheVec.entries;
+        }
+      }
+      (C.interpretation)[2] = preList;
+      // Second concatenate the interpretation maps
+      for(i=1;i<=size((C.interpretation)[1]);i++) {
+        intList[i] = interpret((C.interpretation)[1][i]);
+      }
+      C.interpretation[1] = intList;
+      intList = list();
+      # = #-1;
+    }
+  }
+  return(C);
 }
 
 example
@@ -2181,26 +2181,26 @@ RETURN: interpretation of V into some space that is stored in the interpretation
 EXAMPLE: example interpret; shows an example"
 {
 int i;
-	if (size(V.space.interpretation) == 0) {return(V);}
-	//nothing to interpret
+  if (size(V.space.interpretation) == 0) {return(V);}
+  //nothing to interpret
 
-	if (V.space.generators == id(ncols(V.space.generators.hom))) {
-		def W = V.space.interpretation[1][1];
-		W = V.space.interpretation[1][1]*V.entries[1];
-		for (i=2;i<=nrows(V.entries);i++) {
-			W = W + V.space.interpretation[1][i]*V.entries[i];
-		}
-		return(W);
-	}//Have cokernel-presentation in this case
+  if (V.space.generators == id(ncols(V.space.generators.hom))) {
+    def W = V.space.interpretation[1][1];
+    W = V.space.interpretation[1][1]*V.entries[1];
+    for (i=2;i<=nrows(V.entries);i++) {
+      W = W + V.space.interpretation[1][i]*V.entries[i];
+    }
+    return(W);
+  }//Have cokernel-presentation in this case
 
-	//general case:
-	list DivVec = division(V.entries,V.space.generators.hom);
-	matrix myCoeffs = DivVec[1];
-	def W = V.space.interpretation[1][1]*myCoeffs[1,1]; //user needs to define '*' in advance
-	for (i=2;i<=nrows(myCoeffs);i++) {
-		W = W + V.space.interpretation[1][i]*myCoeffs[i,1]; //user needs to define '+' as well
-	}
-	return(W);
+  //general case:
+  list DivVec = division(V.entries,V.space.generators.hom);
+  matrix myCoeffs = DivVec[1];
+  def W = V.space.interpretation[1][1]*myCoeffs[1,1]; //user needs to define '*' in advance
+  for (i=2;i<=nrows(myCoeffs);i++) {
+    W = W + V.space.interpretation[1][i]*myCoeffs[i,1]; //user needs to define '+' as well
+  }
+  return(W);
 }
 
 
@@ -2238,47 +2238,47 @@ proc interpretInv(def V, Module N)
 RETURN: interpretation of V into some Module N (inverse to interpret)
 EXAMPLE: example interpretInv; shows an example"
 {
-	if (typeof(V)=="Vector"){
-		Module M = V.space;
-		//Check wheter there is a inverse interpretationlist:
-		if ((size(N.interpretation)!=0) && (size((N.interpretation)[2])!=0) && (((N.interpretation)[1][1]).space == M)) {
-		// third condition checks whether the given modules are related
-			//in this case we decompose v into the generators of its Module and project those onto the generators of N
-			list DivVec = division(V.entries,M.generators.hom);
-			matrix myCoeffs = DivVec[1];
-			vector w = N.interpretation[2][1]*myCoeffs[1,1];
-			//inverse maps only contain elements of type vector
-			int i;
-			for (i=2;i<=nrows(myCoeffs);i++) {
-				w = w + N.interpretation[2][i]*myCoeffs[i,1];
-			}
-			Vector W = w,N;
-			return(W);
-		}
-		//If not, check wheter there exists an interpretationlist to N in the Module of V:
-		if ((size(M.interpretation)!=0) && (((M.interpretation)[1][1]).space == N)){return(interpret(V));}
-		//If neither exist, can't interpretInv:
-		ERROR("There exists no inverse map into the given module");
-	}
-	if (typeof(V)=="Homomorphism"){
-		//generators of Hom are the tensors of the canonical basevectors
-		matrix cache = V.rule;
-		int n = nrows(cache);
-		int m = ncols(cache);
-		int i,j;
-		vector ret_bar;
-		if (size(N.interpretation)==0){ERROR("There exists no inverse map into the given module");}
-		if (size(N.interpretation[2])!=n*m){ERROR("Homomorphism has wrong dimension");}
-		list int_inv = N.interpretation[2];
-		for (i=1;i<=n;i++){
-			for(j=1;j<=m;j++){
-				ret_bar = ret_bar + cache[i,j]*int_inv[(j-1)*n+i];
-			}
-		}
-		Vector ret = ret_bar,N;
-		return(ret);
-	}
-	else {ERROR("Can't interpret object of the given type into the Module");}
+  if (typeof(V)=="Vector"){
+    Module M = V.space;
+    //Check wheter there is a inverse interpretationlist:
+    if ((size(N.interpretation)!=0) && (size((N.interpretation)[2])!=0) && (((N.interpretation)[1][1]).space == M)) {
+    // third condition checks whether the given modules are related
+      //in this case we decompose v into the generators of its Module and project those onto the generators of N
+      list DivVec = division(V.entries,M.generators.hom);
+      matrix myCoeffs = DivVec[1];
+      vector w = N.interpretation[2][1]*myCoeffs[1,1];
+      //inverse maps only contain elements of type vector
+      int i;
+      for (i=2;i<=nrows(myCoeffs);i++) {
+        w = w + N.interpretation[2][i]*myCoeffs[i,1];
+      }
+      Vector W = w,N;
+      return(W);
+    }
+    //If not, check wheter there exists an interpretationlist to N in the Module of V:
+    if ((size(M.interpretation)!=0) && (((M.interpretation)[1][1]).space == N)){return(interpret(V));}
+    //If neither exist, can't interpretInv:
+    ERROR("There exists no inverse map into the given module");
+  }
+  if (typeof(V)=="Homomorphism"){
+    //generators of Hom are the tensors of the canonical basevectors
+    matrix cache = V.rule;
+    int n = nrows(cache);
+    int m = ncols(cache);
+    int i,j;
+    vector ret_bar;
+    if (size(N.interpretation)==0){ERROR("There exists no inverse map into the given module");}
+    if (size(N.interpretation[2])!=n*m){ERROR("Homomorphism has wrong dimension");}
+    list int_inv = N.interpretation[2];
+    for (i=1;i<=n;i++){
+      for(j=1;j<=m;j++){
+        ret_bar = ret_bar + cache[i,j]*int_inv[(j-1)*n+i];
+      }
+    }
+    Vector ret = ret_bar,N;
+    return(ret);
+  }
+  else {ERROR("Can't interpret object of the given type into the Module");}
 }
 
 example
@@ -2315,32 +2315,32 @@ proc hom(Module M, Module N)
 RETURN: calculates Hom(M,N) as a subquotient and yields an interpretation for the elements
 EXAMPLE: example hom; shows an example"
 {
-	//TODO Grading
-	N = presentation(N);
-	M = presentation(M);
-	Matrix T = tensorMatrix(transMat(M.relations.hom),N.generators);
-	Module Targ = coker(tensorMatrix(id(ncols(M.relations.hom)),N.relations));
-	Module Sour = coker(tensorMatrix(id(nrows(M.relations.hom)),N.relations));
-	Homomorphism h = homomorphism(T.hom,Sour,Targ);
-	Module H = kerHom(h);
-	//interpretationlist:
-	list interpretation = list(),list();
-	//Need to write the generators of H as matrices:
-	int m = nrows(M.relations.hom);
-	int n = nrows(N.relations.hom);
-	int i,j;
-	matrix mat[n][m];
-	mat = transpose(mat);
-	matrix H_gens = H.generators.hom;
-	Homomorphism interpr_hom;
-	for (i=1;i<=ncols(H_gens);i++) {
-		mat = H_gens[1..nrows(H_gens),i];
-		interpr_hom = homomorphism(transpose(mat),M,N);
-		interpretation[1] = interpretation[1] + list(interpr_hom);
-		mat = 0;
-	}
-	H.interpretation = interpretation;
-	return(H);
+  //TODO Grading
+  N = presentation(N);
+  M = presentation(M);
+  Matrix T = tensorMatrix(transMat(M.relations.hom),N.generators);
+  Module Targ = coker(tensorMatrix(id(ncols(M.relations.hom)),N.relations));
+  Module Sour = coker(tensorMatrix(id(nrows(M.relations.hom)),N.relations));
+  Homomorphism h = homomorphism(T.hom,Sour,Targ);
+  Module H = kerHom(h);
+  //interpretationlist:
+  list interpretation = list(),list();
+  //Need to write the generators of H as matrices:
+  int m = nrows(M.relations.hom);
+  int n = nrows(N.relations.hom);
+  int i,j;
+  matrix mat[n][m];
+  mat = transpose(mat);
+  matrix H_gens = H.generators.hom;
+  Homomorphism interpr_hom;
+  for (i=1;i<=ncols(H_gens);i++) {
+    mat = H_gens[1..nrows(H_gens),i];
+    interpr_hom = homomorphism(transpose(mat),M,N);
+    interpretation[1] = interpretation[1] + list(interpr_hom);
+    mat = 0;
+  }
+  H.interpretation = interpretation;
+  return(H);
 }
 example
 {
@@ -2364,16 +2364,16 @@ proc kerHom(Homomorphism H)
 RETURN: returns the kernel of the given homomorphism
 EXAMPLE: example kerHom; shows an example"
 {
-	Matrix B = H.rule;
-	Matrix A = H.target.relations;
-	Matrix C = concMatrix(A,B);
-	matrix s = syz(C.hom);
-	int s_rows = nrows(s);
-	int s_cols = ncols(s);
-	int A_cols = ncols(A.hom);
-	matrix k = submat(s,A_cols+1..s_rows,1..s_cols);
-	Module Kernel = subquotient(k,H.source.relations);
-	return(Kernel);
+  Matrix B = H.rule;
+  Matrix A = H.target.relations;
+  Matrix C = concMatrix(A,B);
+  matrix s = syz(C.hom);
+  int s_rows = nrows(s);
+  int s_cols = ncols(s);
+  int A_cols = ncols(A.hom);
+  matrix k = submat(s,A_cols+1..s_rows,1..s_cols);
+  Module Kernel = subquotient(k,H.source.relations);
+  return(Kernel);
 }
 example
 {
@@ -2398,9 +2398,9 @@ static proc concMatrix(Matrix A,Matrix B)
 RETURN: concatinated Matrix with concatinated grading
 EXAMPLE: example concMatrix; shows an example"
 {
-	//TODO Grading
+  //TODO Grading
 if (A.over != B.over) {
-	ERROR("The matrices don't live over the same ring");
+  ERROR("The matrices don't live over the same ring");
 }
 Matrix M;
 int i = ncols(A.hom);
@@ -2411,7 +2411,7 @@ matrix m[k][i+j] = concat(A.hom,B.hom);
 M.hom = m;
 list grading = concatGrading(A.source,B.source);
 M.source = freeModule(A.over,ncols(A.hom)+ncols(B.hom),grading);
-M.target = A.target; //vorläufig
+M.target = A.target; //vorlaeufig
 M.over = A.over;
 return(M);
 }
@@ -2429,13 +2429,13 @@ concMatrix(A,B);
 
 
 static proc concatGrading(FreeModule F1, FreeModule F2){
-	list L1 = F1.grading;
-	list L2 = F2.grading;
+  list L1 = F1.grading;
+  list L2 = F2.grading;
 
-	if (F1.isgraded == 0 || F2.isgraded == 0){
-		return(-1);
-	}
-	return(L1+L2);
+  if (F1.isgraded == 0 || F2.isgraded == 0){
+    return(-1);
+  }
+  return(L1+L2);
 }
 
 
@@ -2443,9 +2443,9 @@ static proc concatGrading(FreeModule F1, FreeModule F2){
 
 
 static proc transMat(Matrix M){
-	matrix m = transpose(M.hom);
-	M = m;
-	return(M);
+  matrix m = transpose(M.hom);
+  M = m;
+  return(M);
 }
 
 
@@ -2453,29 +2453,29 @@ static proc transMat(Matrix M){
 
 
 static proc addHomomorphism(Homomorphism h1, Homomorphism h2){
-	if (target(h1) == target(h2) && source(h1) == source(h2)){
-	Homomorphism H = homomorphism(h1.rule + h2.rule, h1.source, h2.target);
-	return (H);
-	}else{
-	ERROR("Cannot add those homomorphisms!");generators of hom(M,N)
-	}
+  if (target(h1) == target(h2) && source(h1) == source(h2)){
+  Homomorphism H = homomorphism(h1.rule + h2.rule, h1.source, h2.target);
+  return (H);
+  }else{
+  ERROR("Cannot add those homomorphisms!");generators of hom(M,N)
+  }
 }
 
 
 static proc scaleHomomorphism(def P, def H){
-	if (typeof(H) == "Homomorphism"){
-		if (typeof(P) == "poly"){
-			H.rule = H.rule*P;
-		}
-		return(H)
-	}
-	if (typeof(P) == "Homomorphism"){
-		if (typeof(H) == "poly"){
-			P.rule = P.rule*H;
-		}
-		return(P)
-	}
-	return(H*P);
+  if (typeof(H) == "Homomorphism"){
+    if (typeof(P) == "poly"){
+      H.rule = H.rule*P;
+    }
+    return(H)
+  }
+  if (typeof(P) == "Homomorphism"){
+    if (typeof(H) == "poly"){
+      P.rule = P.rule*H;
+    }
+    return(P)
+  }
+  return(H*P);
 }
 
 
@@ -2484,27 +2484,27 @@ static proc scaleHomomorphism(def P, def H){
 
 static proc multVecPoly(def V, def P) {
 if (typeof(V) == "Vector"){
-	if (typeof(P) == "poly"){
-		V.entries = V.entries*P;
-	}
-	return(V)
+  if (typeof(P) == "poly"){
+    V.entries = V.entries*P;
+  }
+  return(V)
 }
 if (typeof(P) == "Vector"){
-	if (typeof(V) == "poly"){
-		P.entries = P.entries*V;
-	}
-	return(P)
+  if (typeof(V) == "poly"){
+    P.entries = P.entries*V;
+  }
+  return(P)
 }
 return(V*P);
 }
 
 
 static proc addVector(Vector V, Vector W) {
-	int i;
-	if ((V.space==W.space)==0) {ERROR("The Vectors aren't in the same Module");}
-	vector sum = V.entries + W.entries;
-	Vector Sum = makeVector(sum,V.space);
-	return(Sum);
+  int i;
+  if ((V.space==W.space)==0) {ERROR("The Vectors aren't in the same Module");}
+  vector sum = V.entries + W.entries;
+  Vector Sum = makeVector(sum,V.space);
+  return(Sum);
 }
 
 
@@ -2513,22 +2513,22 @@ static proc addVector(Vector V, Vector W) {
 
 
 static proc deleteCol(matrix mat, int i) {
-	int n = nrows(mat);
-	int m = ncols(mat);
-	if (i<1 || i>m) {return(mat);}
-	if (n == 1) {matrix a[n][1]; return (a)}	//if there is only one column, we could return the nx0 matrix but for the use of this function it is easier to set it to the zero matrix
-	if (i==1) {
-		matrix new[n][m-1] = mat[1..n,2..m];
-		return(new);
-	}
-	if (i==m) {
-		matrix new[n][m-1] = mat[1..n,1..m-1];
-		return(new);
-	}
-	matrix thing1[n][i-1] = mat[1..n,1..i-1];
-	matrix thing2[n][m-i] = mat[1..n,i+1..m];
-	matrix new[n][m-1] = concat(thing1,thing2);
-	return(new);
+  int n = nrows(mat);
+  int m = ncols(mat);
+  if (i<1 || i>m) {return(mat);}
+  if (n == 1) {matrix a[n][1]; return (a)}  //if there is only one column, we could return the nx0 matrix but for the use of this function it is easier to set it to the zero matrix
+  if (i==1) {
+    matrix new[n][m-1] = mat[1..n,2..m];
+    return(new);
+  }
+  if (i==m) {
+    matrix new[n][m-1] = mat[1..n,1..m-1];
+    return(new);
+  }
+  matrix thing1[n][i-1] = mat[1..n,1..i-1];
+  matrix thing2[n][m-i] = mat[1..n,i+1..m];
+  matrix new[n][m-1] = concat(thing1,thing2);
+  return(new);
 }
 
 
@@ -2539,15 +2539,15 @@ static proc convertMat2Vec(matrix A, Module M)
 "USAGE = convertMat2Vectors(M); A matrix s.th. the columns of A are in M, M Module
 RETURN: list of columns as Vectors in M"
 {
-	list ret;
-	vector v;
-	int i;
-	int rows = nrows(A);
-	for (i=1;i<=ncols(A);i++){
-		v = [A[1..rows,i]];
-		ret = ret + list(makeVector(v,M));
-	}
-	return(ret);
+  list ret;
+  vector v;
+  int i;
+  int rows = nrows(A);
+  for (i=1;i<=ncols(A);i++){
+    v = [A[1..rows,i]];
+    ret = ret + list(makeVector(v,M));
+  }
+  return(ret);
 }
 
 

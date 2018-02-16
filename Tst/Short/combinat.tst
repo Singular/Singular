@@ -2,6 +2,7 @@ LIB "tst.lib";
 tst_init();
 
 LIB "combinat.lib";
+LIB "ellipticcovers.lib";
 printlevel=0;
 
   list L = 1,2,3,4,5;

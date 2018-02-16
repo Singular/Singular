@@ -9,9 +9,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
-#include <time.h>
 #include <unistd.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 
 // need global defines:
@@ -476,7 +474,7 @@ void ttGen1()
   }
 /*-------------------------------------------------------------------*/
   fprintf(outfile,"/*---------------------------------------------*/\n");
-  FILE *doctable;
+  FILE *doctable=NULL; /*to silence "may be used uninitialized"*/
   if (produce_convert_table)
   {
     doctable=fopen("convert_table.texi","w");

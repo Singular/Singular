@@ -31,21 +31,15 @@
 
 //**************************************************************************/
 
-#include <stdio.h>
 /* alternative:
 * #   define EPERM 1
 * #   define ENOMEM 23
 * #   define ENOSPC 28
 * #   define L_SET SEEK_SET
 */
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/file.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
 #ifndef HAVE_BCOPY
 #   define bcopy(a,b,c) memmove(b,a,c)
 #endif /* not HAVE_BCOPY */
@@ -61,7 +55,6 @@ static  int finddatum(char buf[PBLKSIZ], datum item);
 static  long dcalchash(datum item);
 static  int delitem(char buf[PBLKSIZ], int n);
 static  int additem(char buf[PBLKSIZ], datum item, datum item1);
-// extern  int errno;
 extern "C" int singular_fstat(int fd, struct stat *buf);
 
 DBM * dbm_open(char *file, int flags, int mode)

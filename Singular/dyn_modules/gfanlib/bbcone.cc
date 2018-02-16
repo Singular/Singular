@@ -15,7 +15,6 @@
 #include "Singular/links/ssiLink.h"
 
 #include "callgfanlib_conversion.h"
-#include <sstream>
 
 #include "gfanlib/gfanlib.h"
 #include "gfanlib/gfanlib_q.h"

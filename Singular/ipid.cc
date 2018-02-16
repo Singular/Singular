@@ -44,8 +44,6 @@
 #include "polys/mod_raw.h"
 #endif /* HAVE_DYNAMIC_LOADING */
 
-#include <string.h>
-
 omBin sip_command_bin = omGetSpecBin(sizeof(sip_command));
 omBin sip_package_bin = omGetSpecBin(sizeof(sip_package));
 //omBin ip_package_bin = omGetSpecBin(sizeof(ip_package));
@@ -283,7 +281,7 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
           {
             goto errlabel;
           }
-          else return *root;
+          else return h;
         }
         else
         {

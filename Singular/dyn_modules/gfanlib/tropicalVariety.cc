@@ -8,7 +8,6 @@
 #include "misc/options.h"
 #include "kernel/structs.h"
 
-#include <iostream>
 #include "gfanlib/gfanlib_zfan.h"
 
 BITSET bitsetSave1, bitsetSave2;

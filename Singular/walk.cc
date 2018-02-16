@@ -74,16 +74,8 @@
 
 #include "coeffs/mpr_complex.h"
 
-#include <stdio.h>
-// === Zeit & System (Holger Croeni ===
-#include <time.h>
-#include <sys/time.h>
-#include <math.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <float.h>
+#include <cmath>
 #include "misc/mylimits.h"
-#include <sys/types.h>
 
 int nstep;
 
@@ -2302,7 +2294,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
       }
       for(j=0; j<nRing; j++)
       {
-        (*diff_weight1)[j] = floor(0.1*(*diff_weight1)[j] + 0.5);
+        (*diff_weight1)[j] = ((*diff_weight1)[j] + 5) / 10;
       }
     }
 
@@ -2317,7 +2309,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
       {
         (*curr_weight)[j] = (*diff_weight1)[j];
         j = MivAbsMaxArg(diff_weight1);
-        (*diff_weight1)[j] = floor(0.1*(*diff_weight1)[j] + 0.5);
+        (*diff_weight1)[j] = ((*diff_weight1)[j] + 5) / 10;
       }
     }
 
@@ -4560,17 +4552,17 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* orig_M, intvec* target_wei
           (*next_weight2)[i] = rand() % 60000 - 30000;
           weight_norm = weight_norm + (*next_weight2)[i]*(*next_weight2)[i];
         }
-        weight_norm = 1 + floor(sqrt(weight_norm));
+        weight_norm = 1 + static_cast<int>(sqrt(double(weight_norm)));
       }
       for(i=0; i<nV; i++)
       {
         if((*next_weight2)[i] < 0)
         {
-          (*next_weight2)[i] = 1 + (*curr_weight)[i] + floor(weight_rad*(*next_weight2)[i]/weight_norm);
+          (*next_weight2)[i] = 1 + (*curr_weight)[i] + weight_rad*(*next_weight2)[i]/weight_norm;
         }
         else
         {
-          (*next_weight2)[i] = (*curr_weight)[i] + floor(weight_rad*(*next_weight2)[i]/weight_norm);
+          (*next_weight2)[i] = (*curr_weight)[i] + weight_rad*(*next_weight2)[i]/weight_norm;
         }
       }
       if(test_w_in_ConeCC(G,next_weight2) == 1)

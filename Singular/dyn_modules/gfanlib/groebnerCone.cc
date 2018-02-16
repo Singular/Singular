@@ -1,4 +1,3 @@
-#include <utility>
 
 #include "kernel/GBEngine/kstd1.h"
 #include "kernel/ideals.h"
@@ -16,7 +15,6 @@
 #include "groebnerCone.h"
 #include "callgfanlib_conversion.h"
 #include "containsMonomial.h"
-// #include "flip.h"
 #include "tropicalCurves.h"
 #include "bbcone.h"
 #include "tropicalDebug.h"

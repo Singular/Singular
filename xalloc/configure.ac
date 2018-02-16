@@ -5,7 +5,7 @@ dnl Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 dnl Created: 11/99
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
-AC_INIT([xmalloc],[4.0])
+AC_INIT([xmalloc],[4.1])
 
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([../build-aux])

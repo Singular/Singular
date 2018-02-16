@@ -29,7 +29,7 @@
 #include "mpr_base.h"
 #include "mpr_numeric.h"
 
-#include <math.h>
+#include <cmath>
 //<-
 
 //-----------------------------------------------------------------------------

@@ -5,7 +5,6 @@
 #include "gfanlib/gfanlib_zcone.h"
 #include "polys/simpleideals.h"
 #include "kernel/ideals.h" // for idElem
-#include <set>
 #include "callgfanlib_conversion.h"
 #include "containsMonomial.h"
 #include "flip.h"

@@ -40,11 +40,7 @@
 #include "Singular/blackbox.h"
 #include "Singular/number2.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <ctype.h>
-#include <unistd.h>
 
 omBin sSubexpr_bin = omGetSpecBin(sizeof(_ssubexpr));
 omBin sleftv_bin = omGetSpecBin(sizeof(sleftv));
@@ -117,7 +113,7 @@ void sleftv::Print(leftv store, int spaces)
         case CMATRIX_CMD: // like BIGINTMAT
 #endif
         case BIGINTMAT_CMD:
-          ((bigintmat *)d)->pprint(80);
+          ((bigintmat *)d)->pprint(colmax);
           break;
         case UNKNOWN:
         case DEF_CMD:

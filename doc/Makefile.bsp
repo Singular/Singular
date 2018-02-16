@@ -9,7 +9,6 @@ SHELL=/bin/sh
 ## Configuration
 ##
 SINGUNAME       = spielwiese
-S_VERSION       = 4-0-0
 
 ## directory where info files are installed
 prefix          = /scratch/hannes/billbo-sw
@@ -19,7 +18,7 @@ htmldir         = ${prefix}/html
 exdir           = ${prefix}/examples
 
 localdir        = /usr/local
-install_prefix  = ${localdir}/Singular/${S_VERSION}
+install_prefix  = ${localdir}/share
 install_infodir = ${install_prefix}/info
 install_htmldir = ${install_prefix}/html
 install_docdir  = ${install_prefix}/doc

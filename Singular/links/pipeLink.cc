@@ -18,15 +18,8 @@
 #include "lists.h"
 #include "pipeLink.h"
 
-#include <stdio.h>
-#include <fcntl.h>
 #include <errno.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <signal.h>
 #include <sys/types.h>          /* for portability */
-#include <sys/select.h>
-#include <sys/socket.h>
 
 typedef struct
 {
@@ -89,11 +82,27 @@ LINKAGE BOOLEAN pipeClose(si_link l)
   pipeInfo *d = (pipeInfo *)l->data;
   if (d!=NULL)
   {
-    if (d->f_read!=NULL) fclose(d->f_read);
-    if (d->f_write!=NULL) fclose(d->f_write);
-    if (d->pid!=0) { kill(d->pid,15); kill(d->pid,9); }
+    BOOLEAN unidirectional=TRUE;
+    if ( (d->f_read!=NULL) &&  (d->f_write!=NULL))
+      unidirectional=FALSE;
+
+    if (d->f_read!=NULL)
+    {
+      fclose(d->f_read);
+      d->f_read=NULL;
+      SI_LINK_SET_CLOSE_P(l);
+      SI_LINK_SET_R_OPEN_P(l);
+    }
+    if (unidirectional && (d->f_write!=NULL))
+    {
+      fclose(d->f_write);
+      d->f_write=NULL;
+      SI_LINK_SET_CLOSE_P(l);
+    }
+    if (unidirectional && (d->pid!=0))
+    { kill(d->pid,15); kill(d->pid,9); }
   }
-  SI_LINK_SET_CLOSE_P(l);
+  else SI_LINK_SET_CLOSE_P(l);
   return FALSE;
 }
 

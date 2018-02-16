@@ -2396,6 +2396,13 @@ syStrategy syMinimize(syStrategy syzstr)
 {
   if (syzstr->minres==NULL)
   {
+    if (syzstr->resolution!=NULL)
+    {
+      // need to clear syzstr->resolution, as we are
+      // now displaying the minres instead of fullres
+      delete syzstr->resolution;
+      syzstr->resolution=NULL;
+    }
     if (syzstr->resPairs!=NULL)
     {
       if (syzstr->hilb_coeffs==NULL)

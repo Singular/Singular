@@ -11,16 +11,12 @@ OVERVIEW:
 Some useful basic functions from combinatorics.
 
 KEYWORDS:
-partitions, permutations, sum, max, min
+permutations, sum, max, min
 
 PROCEDURES:
-partitions(int, int)                      partitions of an integer into a fixed number of summands
-permute(list)                             all permutations of a list
-intersectLists(list,list)                 returns a list of elements which are in both lists (no duplicates)
-member(def,list)                          membership test
-sublists(list)                            all sublists
-intersectLists(list,list)                 list containing all elements of both lists
-member(def,list)                          test whether an element is a member of a list
+intersectLists(list,list)     returns a list of elements which are in both lists (no duplicates)
+sublists(list)                all sublists
+member(def,list)              test whether an element is a member of a list
 ";
 
 proc sublists(list L)
@@ -46,70 +42,6 @@ example
   list L = 1,2,3,4,5;
   sublists(L);
 }
-
-
-
-proc permute (list N)
-"USAGE:  permute(N); N list@*
-ASSUME:  N is a list@*
-RETURN:  list with all permutations of N.
-THEORY:  Computes all permutations of N.
-KEYWORDS: permutations
-EXAMPLE:  example permute; shows an example
-"
-{
-   int i,j,k;
-   list L,L1;
-   if (size(N)==1)
-   {
-     return(list(N));
-   }
-   else
-   {
-     k=1;
-     for (i=1; i<=size(N); i++)
-     {
-       L=permute(delete(N,i));
-       for (j=1; j<=size(L); j++)
-       {
-          L1[k]=L[j]+list(N[i]);
-          k=k+1;
-       }
-     }
-   }
-return(L1);}
-example
-{ "EXAMPLE:"; echo=2;
-  ring R=(0,x1,x2,x3,x4),(q),dp;
-  permute(list(x1,x2,x3,x4));
-}
-
-proc partitions(int n, int a)
-"USAGE:  partitions(n,a); n int, a int@*
-ASSUME:  n and a  are positive integers@*
-RETURN:  list of all partitions of a into n summands.
-THEORY:  Computes all partitions of a into n summands.
-KEYWORDS: partitions
-EXAMPLE:  example partitions; shows an example
-"
-{
-  ring R = 2,(x(1..n)),dp;
-  ideal I = maxideal(a);
-  list L;
-  for (int j=1;j<=size(I);j++)
-  {
-    L[j]=leadexp(I[j]);
-  }
-  return(L);
-}
-example
-{ "EXAMPLE:"; echo=2;
-  partitions(3,7);
-}
-
-
-
-
 
 proc intersectLists(list L, list M)
 "USAGE:  intersectLists(L,M); L list, M list@*

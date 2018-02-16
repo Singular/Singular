@@ -11,3 +11,4 @@ unsigned si_opt_2 = Sy_bit(V_QUIET)
                    | Sy_bit(V_PROMPT)
                    ;
 
+BOOLEAN siCntrlc = FALSE;

@@ -20,13 +20,6 @@
 #include "Singular/fevoices.h"
 #include "kernel/oswrapper/timer.h"
 
-// #ifdef HAVE_FANS
-// #include <callgfanlib/bbcone.h>
-// #include <callgfanlib/bbpolytope.h>
-// #include <callgfanlib/bbfan.h>
-// #include <callgfanlib/gitfan.h>
-// #endif
-
 #include "ipshell.h"
 #include "cntrlc.h"
 #include "links/silink.h"
@@ -42,11 +35,6 @@
 #include "Singular/pyobject_setup.h"
 
 #include <unistd.h>
-#include <string.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <time.h>
-#include <errno.h>
 
 
 extern int siInit(char *);

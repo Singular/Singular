@@ -8,8 +8,6 @@
 
 #include "Singular/subexpr.h"
 
-#include <string.h>
-
 //extern int (*ListGreatMove)(jList *,jList *,poly);
 
 static BOOLEAN jInitBasis(ideal v, jList **TT,jList **QQ)

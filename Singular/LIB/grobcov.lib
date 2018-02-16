@@ -1,14 +1,17 @@
 //
-version="version grobcov.lib 4.1.1.0 Dec_2017 "; // $Id$
-           // version N;  Aug_2017;
+version="version grobcov.lib 4.1.1.0 Feb_2018 "; // $Id$
+           // version N4; February 2018;
+           // Two routines for Automatic Deduction of Geometric Theorems
+            // have been added: ADGT, intersectpar.
 category="General purpose";
 info="
-LIBRARY:  grobcov.lib Groebner Cover for parametric ideals.
-          Comprehensive Groebner Systems; Groebner Cover;
-          Canonical Forms; Parametric Polynomial Systems;
-          Automatic Deduction of Geometric Theorems;
-          Dynamic Geometry; Loci; Envelope; Constructible sets
-@*        See: A. Montes A, M. Wibmer,
+LIBRARY:  grobcov.lib  February 2018.
+          Groebner Cover for parametric ideals.
+          Comprehensive Groebner Systems, Groebner Cover,
+          Canonical Forms,  Parametric Polynomial Systems,
+          Automatic Deduction of Geometric Theorems,
+          Dynamic Geometry, Loci, Envelope, Constructible sets.
+          See: A. Montes A, M. Wibmer,
           \"Groebner Bases for Polynomial Systems with parameters\",
           Journal of Symbolic Computation 45 (2010) 1391-1425.
           (https://www.mat.upc.edu//en/people/antonio.montes/).
@@ -25,8 +28,7 @@ IMPORTANT: The book,  not yet published:
            but the book actualices all the contents.
 
 AUTHORS:  Antonio Montes (Universitat Politecnica de Catalunya),
-          Hans Schoenemann (Techische Universitaet
-          Kaiserslautern).
+          Hans Schoenemann (Technische Universitaet Kaiserslautern).
 
 OVERVIEW: In 2010, the library was designed to contain
           Montes-Wibmer's
@@ -91,7 +93,11 @@ OVERVIEW: In 2010, the library was designed to contain
           A. Montes. \"The Groebner Cover\" (Discussing
           Parametric Polynomial Systems).
 
-          This version was finished on 30/06/2017
+          The last inclusion is an automatic algorithm for
+          Automatic Deduction of Geometric Theorems,
+          described in the book \"Groebner Cover\".
+
+          This version was finished on 10/02/2018
 
 NOTATIONS: Before calling any routine of the library grobcov,
           the user  must define the ideal Q[a][x], and all the
@@ -119,8 +125,7 @@ pdivi(f,F); Performs a pseudodivision of a parametric
           polynomial by  a parametric ideal.
 
 pnormalf(f,E,N); Reduces a parametric polynomial f over V(E) \ V(N).
-          (E is the null ideal and N the non-null
-          ideal) over the parameters.
+          E is the null ideal and N the non-null ideal over the parameters.
 
 Crep(N,M); Computes the canonical C-representation of V(N) \ V(M).
           It can be called in Q[a] or in Q[a][x],
@@ -151,7 +156,7 @@ ConsLevels(L); Given a list L of locally closed sets, it returns
          constructible set and its complements of the
          union of them.
 
-ConsLevelsToLevels(L);Transforms the output of ConsLevels
+Levels(L);Transforms the output of ConsLevels
           into the proper Levels of  the constructible set.
 
 locus(G); Special routine for determining the geometrical
@@ -221,13 +226,20 @@ WLemma(F,A); Given an ideal F in Q[a][x] and an ideal A
           (or optionally in C-representation). The basis is
           given by I-regular functions.
 
+intersectpar(L); Auxiliary routine. Given a list of ideals definend on K[a][x]
+         it determines the intersection of all of them in K[x,a]
+
+ADGT(H,T,H1,T1); Given 4 ideals H,T,H1,T1 in Q[a][x], corresponding to
+        a problem of Automatic Deduction of Geometric Theorems,
+        it determines the supplementary conditions over the parameters
+        for the Proposition (H and not H1) => (T and not T1) to be a
+        Theorem.
+        If H1=1 then H1 is not considered, and analogously for T1.
+
 SEE ALSO: compregb_lib
-KEYWORDS: Comprehensive Groebner Systems; Groebner Cover;
-          Canonical Forms; Parametric Polynomial Systems;
-          Automatic Deduction of Geometric Theorems;
-          Dynamic Geometry; Loci; Envelope; Constructible sets
 ";
 
+LIB "poly.lib";
 LIB "primdec.lib";
 LIB "qhmoduli.lib";
 
@@ -260,16 +272,19 @@ LIB "qhmoduli.lib";
 //    hyper-surfaces and associated questions: 22-4-2016: 20-9-2016
 // New routine WLemma for computing the result of
 //    Wibmer's Lemma:  19-9-2016
-// Final version October 2016
-// Updated locus (messages)
-// Final version Mars 2017
+// Final data October 2016
+// Updated locus (messages) // Updated locus (messages)
+// Final data Mars 2017
+// Release N4: (public)
+// New routines for ADGT: 21-1-2018
+// Final data February 2018
 //*************Auxiliary routines**************
 
 // elimintfromideal: elimine the constant numbers from an ideal
 //        (designed for W, nonnull conditions)
 // Input: ideal J
 // Output:ideal K with the elements of J that are non constants, in the
-//        ring K[x1,..,xm]
+//        ring Q[x1,..,xm]
 static proc elimintfromideal(ideal J)
 {
   int i;
@@ -409,7 +424,7 @@ static proc idcontains(ideal p, ideal q)
   poly r;
   while ((t) and (i<=size(Q)))
   {
-    r=reduce(Q[i],P);
+    r=reduce(Q[i],P,5);
     if (r!=0){t=0;}
     i++;
   }
@@ -947,7 +962,7 @@ static proc pspol(poly f,poly g)
 //         even 0 is ignored. It can be called from ideal Q[a][x], but
 //         the given ideal J must only contain poynomials in the
 //         parameters a.
-//         Operates in the ring K[a], but can be called from ring K[a][x],
+//         Operates in the ring Q[a], but can be called from ring Q[a][x],
 // input:  ideal J
 // output: ideal Jc: Returns all the free-square factors of the elements
 //         of ideal J (non repeated). Integer factors are ignored,
@@ -1479,16 +1494,16 @@ static proc Crep0(ideal N, ideal M)
 // Assumed to be called in the ring ring Q[a][x]. But the data must only contain parameters.
 proc Prep(ideal N, ideal M)
 "USAGE: Prep(ideal N,ideal M);
-      ideal N (null ideal) (not necessarily radical nor
-      maximal) in Q[a]. (a=parameters, x=variables).
-      ideal M (hole ideal) (not necessarily containing N)
-      in Q[a]. To be called in a ring Q[a][x] or a ring
-      Q[a]. But the ideals can contain only the
-      parameters in Q[a].
+       ideal N (null ideal) (not necessarily radical nor
+       maximal) in Q[a]. (a=parameters, x=variables).
+       ideal M (hole ideal) (not necessarily containing N)
+       in Q[a]. To be called in a ring Q[a][x] or a ring
+       Q[a]. But the ideals can contain only the
+       parameters in Q[a].
 RETURN: The canonical P-representation of the locally closed
-      set V(N) \ V(M)
-      Output: [Comp_1, .. , Comp_s ] where
-      Comp_i=[p_i,[p_i1,..,p_is_i]]
+       set V(N) \ V(M)
+       Output: [Comp_1, .. , Comp_s ] where
+       Comp_i=[p_i,[p_i1,..,p_is_i]]
 KEYWORDS: locally closed set; canoncial form
 EXAMPLE:  Prep; shows an example"
 {
@@ -1575,16 +1590,16 @@ static proc Prep0(ideal N, ideal M)
 // Assumed to be called in the ring Q[a] or Q[x]
 proc PtoCrep(list L)
 "USAGE: PtoCrep(list L)
-      list L=  [ Comp_1, .. , Comp_s ] where
-      list Comp_i=[p_i,[p_i1,..,p_is_i] ], is the
-      P-representation of a locally closed set
-      V(N) \ V(M). To be called in a ring Q[a][x]
-      or a ring Q[a]. But the ideals can contain
-      only the parameters in Q[a].
+       list L=  [ Comp_1, .. , Comp_s ] where
+       list Comp_i=[p_i,[p_i1,..,p_is_i] ], is the
+       P-representation of a locally closed set
+       V(N) \ V(M). To be called in a ring Q[a][x]
+       or a ring Q[a]. But the ideals can contain
+       only the parameters in Q[a].
 RETURN:The canonical C-representation [P,Q] of the
-      locally closed set. A pair of radical ideals with
-      P included in Q, representing the
-      set V(P) \ V(Q)
+       locally closed set. A pair of radical ideals with
+       P included in Q, representing the
+       set V(P) \ V(Q)
 KEYWORDS: locally closed set; canoncial form
 EXAMPLE:  PtoCrep; shows an example"
 {
@@ -2914,7 +2929,8 @@ NOTE: The basering R, must be of the form Q[a][x],
        (a=parameters, x=variables),
        and should be defined previously. The ideal
        must be defined on R.
-KEYWORDS: Groebner cover; parametric ideal; canonical; discussion of parametric ideal; full representation
+KEYWORDS: Groebner cover; parametric ideal; canonical,
+       discussion of parametric ideal; full representation
 EXAMPLE:  extendGC; shows an example"
 {
   int te;
@@ -4324,7 +4340,7 @@ RETURN: The list of ideals [a1,a2,...,at] representing the
        C=V(a2 \ V(a3) u V(a4) \ V(a5) u ...
        The expression of S can be obtained from the
        output of ConsLevels by
-       the call to ConsLevelsToLevels.
+       the call to Levels.
 NOTE: The algorithm was described in
        J.M. Brunat, A. Montes. \"Computing the canonical
        representation of constructible sets.\"
@@ -4390,22 +4406,22 @@ example
 //    [A1,A2,..,Ak], where the Ai's are the closures of the levels.
 // Output: An expression of the form
 //      L1=[[1,[A1,A2]],[3,[A3,A4]],..,[2l-1,[A_{2l-1},A_{2l}]]] the list of Levels of S
-proc ConsLevelsToLevels(list L)
-"USAGE: ConsLevelsToLevels(list L);
+proc Levels(list L)
+"USAGE: Levels(list L);
        The input list L must be the output of the call to the
        routine ConsLevels of a constructible set:
        L=[a1,a2,..,ak], where the a's are the closures
        of the levels, determined by ConsLevels.
-       ConsLevelsToLevels selects the levels of the
+       Levels selects the levels of the
        constructible set. To be called in a ring Q[a][x]
        or a ring Q[a]. But the ideals can contain
        only the parameters in Q[a].
 RETURN: The levels of the constructible set:
        Lc=[ [1,[a1,a2]],[3,[a3,a4]],..,
            [2l-1,[a_{2l-1},a_{2l}]] ]
-       the list of  Levels of S
+       the list of  levels of S
 KEYWORDS: constructible sets; canonical form
-EXAMPLE:  ConsLevelsToLevels shows an example"
+EXAMPLE:  Levels shows an example"
 {
   int n=size(L) div 2;
   int i;
@@ -4439,12 +4455,12 @@ example
   def LL=ConsLevels(L);
   LL;
 
-  ConsLevelsToLevels(LL);
+  Levels(LL);
 }
 
 //**************************** End ConsLevels ******************
 
-//******************** Begin locus ******************************
+//******************** Begin locus and envelop ******************************
 
 // indepparameters
 // Auxiliary routine to detect 'Special' components of the locus
@@ -4723,7 +4739,7 @@ static proc determineF(ideal A,poly F,ideal E)
    def FH=imap(RR,F);
    def EH=imap(RR,E);
    ideal M=std(AA+FH);
-   def rh=reduce(EH,M);
+   def rh=reduce(EH,M,5);
    //"T_AA="; AA; "T_FH="; FH; "T_EH="; EH; "T_rh="; rh;
    if(rh==0){env=1;} else{env=0;}
    setring RR;
@@ -6639,7 +6655,7 @@ static proc LocusConsLevels(list L)
     Lc[size(Lc)+1]=Sc;
   }
   list S=ConsLevels(Lc);
-  S=ConsLevelsToLevels(S);
+  S=Levels(S);
   list Sout;
   list Lev;
   for(i=1;i<=size(S);i++)
@@ -6650,8 +6666,34 @@ static proc LocusConsLevels(list L)
   return(Sout);
 }
 
+// used in NS
+// returns 0 if E does not reduce modulo N
+// returns 1 if it reduces
+static proc redPbasis(ideal E, ideal N)
+{
+  int i;
+  def RR=basering;
+  def Rx=ringlist(RR);
+  def Lx=Rx;
+  def P=ring(Rx[1]);
+  setring P;
+  def EP=imap(RR,E);
+  def NP=imap(RR,N);
+  NP=std(NP);
+  list L;
+  int red=1;
+  i=1;
+  while(red and (i<=size(EP)))
+  {
+    if(reduce(EP[i],NP,5)!=0){red=0;}
+    i++;
+  }
+  setring RR;
+  return(red);
+}
 
-//********************* End locus ****************************
+
+//******************** End locus and envelop ******************************
 
 //********************* Begin WLemma **********************
 
@@ -6789,6 +6831,7 @@ example
 
 //********************* End WLemma ************************
 
+// Not used
 static proc redbasis(ideal B, ideal C)
 {
   int i;
@@ -6813,33 +6856,8 @@ static proc redbasis(ideal B, ideal C)
   return(BBB);
 }
 
-// returns 0 if E does not reduce modulo N
-// returns 1 if it reduces
-proc redPbasis(ideal E, ideal N)
-{
-  int i;
-  def RR=basering;
-  def Rx=ringlist(RR);
-  def Lx=Rx;
-  def P=ring(Rx[1]);
-  setring P;
-  def EP=imap(RR,E);
-  def NP=imap(RR,N);
-  attrib(NP,"IsSB",1);
-  NP=std(NP);
-  list L;
-  int red=1;
-  i=1;
-  while(red and (i<=size(EP)))
-  {
-    if(reduce(EP[i],NP)!=0){red=0;}
-    i++;
-  }
-  setring RR;
-  return(red);
-}
 
-
+// not used
 // Input: ideals E, N
 // Output: the ideal N without the polynomials in E
 //   Works in any kind of ideal
@@ -6860,6 +6878,7 @@ static proc idminusid(ideal E,ideal N)
   return(h);
 }
 
+// not used
 // eliminar els factors de cada polinomi de F que estiguin a N\ E
 static proc simpB(ideal F,ideal E,ideal N)
 {
@@ -6879,6 +6898,7 @@ static proc simpB(ideal F,ideal E,ideal N)
   return(FF);
 }
 
+// used in simpB that is not used
 static proc elimfacsinP(poly f,poly g)
 {
   def RR=basering;
@@ -6912,6 +6932,301 @@ static proc elimfacsinP(poly f,poly g)
   def pp=imap(RP,p);
   return(pp);
 }
+
+//****************************** Begin ADGT *************************
+
+// used in ADGT
+// Given G=grobcov(F,"rep",1) to have the GC in C-representation,
+// CompLev determines the levels of the constructible subset of the parameter space
+//   for which there exist solutions of F
+// To be called in Q[a][x]
+static proc CompLev(list G)
+{
+  int i;
+  list S;
+  def RR=basering;
+  def Rx=ringlist(RR);
+  def P=ring(Rx[1]);
+  setring(RR);
+  for(i=1;i<=size(G);i++)     // select the segments with solutions
+  {
+    if(not(G[i][1][1][1]==1))
+    {
+      S[size(S)+1]=G[i][3];
+    }
+  }
+  if(size(S)==0)
+  {
+    list L;
+    L[1]=1;
+  }
+  else
+  {
+    setring P;
+    def SP=imap(RR,S);
+    list LP=ConsLevels(SP);   // construct the levels of the constructible
+    setring RR;
+    def L=imap(P,LP);
+  }
+  return(L);
+}
+
+// Auxiliary rutine for intersecting ideal only in the parameters a
+// when the ideals are defined in Q[a][x]
+proc intersectpar(list S)
+"USAGE: interectpar(list of ideals S)
+    list S=ideal I1,...,ideal Ik;
+RETURN: The intersection of the ideals I1 ...  Ik  in Q[x,a]
+NOTE: The routine is called in Q[a][x],
+    The ideals I1,..,Ik can be ideals depending only on [a] or on [x,a]
+EXAMPLE: intersectpar shows an example"
+{
+  def RR=basering;
+  def Rx=ringlist(RR);
+  def P=ring(Rx[1]);
+  Rx[1]=0;
+  def D=ring(Rx);
+  def RP=D+P;
+  setring(RP);
+  def SP=imap(RR,S);
+  def EP=intersect(SP[1..size(SP)]);
+  setring RR;
+  def E=imap(RP,EP);
+  return(E);
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+if(defined(R)){kill R;}
+ring R=(0,x,y,z),(x1,y1,z1),lp;
+ideal I1=x+y*z*x1;
+ideal I2=x-y*z*y1;
+ideal I3=x+y+z*z1;
+list S=I1,I2,I3;
+S;
+intersectpar(S);
+}
+
+proc ADGT(ideal H,ideal T,ideal H1,ideal T1,list #)
+"USAGE: ADGT(ideal H, ideal T, ideal H1,ideal T1[,options]);
+      H: ideal in Q[a][x] hypothesis
+      T: ideal in Q[a][x] thesis
+      H1: ideal in Q[a][x] negative hypothesis, only dependent on [a]
+      T1: ideal in Q[a][x] negative thesis
+           of the Proposition (H and not H1) => (T and not T1)
+RETURN: The list  [[1,S1],[2,S2],..],
+       S1, S2, .. represent the set of parameter values
+       that must be verified as supplementary
+       conditions for the Proposition to become a Theorem.
+       They are given by default in Prep.
+       If the proposition is generally true,
+       (the proposition is already a theorem), then
+       the generic segment of the internal grobcov
+       called is also returned to provide information
+       about the values of the variables determined
+       for every value of the parameters.
+       If the propsition is false for every values of the
+       parameters, then the emply list is returned.
+OPTIONS: An option is a pair of arguments: string,
+       integer. To modify the default options, pairs
+       of arguments -option name, value- of valid options
+       must be added to the call.
+       Option \"rep\",0-1: The default is (\"rep\",0)
+       and then the segments are given in canonical
+       P-representation.
+       Option (\"rep\",1) represents the segments
+       in canonical C-representation,
+       Option \"gseg\",0-1: The default is \"gseg\",1
+       and then when the proposition is generally true,
+       ADGT outputs a second element which is the
+       \"generic segment\" to provide supplementary information.
+       With option \"gseg\",0 this is avoided.
+NOTE:  The basering R, must be of the form Q[a][x],
+       (a=parameters, x=variables), and
+       should be defined previously. The ideals
+       must be defined on R.
+KEYWORDS: Automatic Deduction; Automatic Demonstration; Geometric Theorems
+EXAMPLE:  ADGT shows an example"
+{
+  int i; int j;
+  def RR=basering;
+  def Rx=ringlist(RR);
+  def P=ring(Rx[1]);
+  Rx[1]=0;
+  def D=ring(Rx);
+  def RP=D+P;
+  setring RR;
+  list Lopt=#;
+  int start=timer;
+  // options
+  int rep=0;
+  int gseg=1;
+  for(i=1;i<=size(Lopt) div 2;i++)
+  {
+    if(Lopt[2*i-1]=="rep"){rep=Lopt[2*i];}
+    else{if(Lopt[2*i-1]=="gseg"){gseg=Lopt[2*i];}}
+  }
+  // begin proc
+  if(equalideals(T1,ideal(1))) //nonnullT==0)
+  {
+    def F=H;
+    for(i=1;i<=size(T);i++)
+    {
+      F[size(F)+1]=T[i];
+    }
+    list G2;
+    if(not(equalideals(H1,ideal(1))))  //nonnullH==1)
+    {
+      G2=grobcov(F,"nonnull",H1,"rep",1);
+    }
+    else
+    {
+      G2=grobcov(F,"rep",1);
+    }
+  }
+  else
+  {
+    def F=H;
+    for(i=1;i<=size(T1);i++)
+    {
+      F[size(F)+1]=T1[i];
+    }
+    list G3=grobcov(F,"rep",1);
+    def L0=CompLev(G3);
+    setring P;
+    def LP=imap(RR,L0);
+    def H1P=imap(RR,H1);
+    if(not(equalideals(H1P,ideal(1))))  //nonnullH==1)
+    {
+      i=1;
+      while(i<=size(LP))
+      {
+        if(i mod 2==1)
+        {
+          LP[i]=intersect(LP[i],H1P);
+        }
+        i++;
+      }
+    }
+    setring RR;
+    L0=imap(P,LP);
+    F=H;
+    for(i=1;i<=size(T);i++)
+    {
+      F[size(F)+1]=T[i];
+    }
+    def G2=grobcov(F,"nonnull",L0[1],"rep",1);
+    list G1;
+    int m=size(L0);
+    int r=m div 2;
+    if(m mod 2==0){r=r-1;}
+     for(i=1;i<=r;i++)
+    {
+      G1=grobcov(F,"null",L0[2*i],"nonnull",L0[2*i+1],"rep",1);
+      for(j=1;j<=size(G1);j++)
+      {
+        if(not(equalideals(G1[j][1],ideal(1))))
+        {
+          G2[size(G2)+1]=G1[j];
+        }
+      }
+    }
+  }
+  if(size(G2)==0)
+  {
+    list L;
+    // L[1]=1;
+  }
+  else
+  {
+    list L=Levels(CompLev(G2));
+    if(rep==0 and size(L)>0)
+    {
+      setring P;
+      def LFP=imap(RR,L);
+      // list LFP1=LFP;
+      for(i=1;i<=size(LFP);i++)
+      {
+        LFP[i][2]=Prep(LFP[i][2][1],LFP[i][2][2]);
+      }
+      setring RR;
+      L=imap(P,LFP);
+    }
+    if(equalideals(G2[1][3][1][1],0) and not(equalideals(G2[1][1],ideal(1))))
+    {
+      list GL=G2[1];
+      list LL=GL[3];
+      if(rep==0)
+      {
+        setring P;
+        def LLP=imap(RR,LL);
+        LLP=Prep(LLP[1],LLP[2]);
+        setring RR;
+        LL=imap(P,LLP);
+        GL[3]=LL;
+      }
+      if(gseg==1)
+      {
+        L[size(L)+1]=list("Generic segment",GL);
+      }
+    }
+  }
+  return(L);
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+// Determine the supplementary conditions
+// for the non-degenerate  triangle A(-1,0), B(1,0), C(x,y)
+// to have an ortic non-degenerate isosceles triangle
+
+if(defined(R)){kill R;}
+ring R=(0,x,y),(x2,y2,x1,y1),lp;
+// Hypothesis H
+ideal H=-y*x1+(x-1)*y1+y,
+             (x-1)*(x1+1)+y*y1,
+             -y*x2+(x+1)*y2-y,
+             (x+1)*(x2-1)+y*y2;
+// Thesis T
+ideal T=(x1-x)^2+y1^2-(x2-x)^2-y2^2;
+// Negative Hypothesis H1
+ideal H1=y;
+ // Negative Thesis T1
+ideal T1=x*(y1-y2)-y*(x1-x2)+x1*y2-x2*y1;
+// Complementary conditions for the
+// Proposition (H and not H1) => (T and not T1)
+// to be true
+
+ADGT(H,T,H1,T1);
+//********************************************
+
+// Example of automatic demonstrations of a theorem
+// The Nine Points Circle Theorem:
+
+if(defined(R1)){kill R1;}
+ring R1=(0,x,y),(x1,y1,x2,y2,yh,a,b,r),dp;
+short=0;
+//Hypothesis H
+ideal H=y*x1+y1-x*y1-y,
+            (x-1)*(x1+1)+y*y1,
+            -y*x2+y2+x*y2-y,
+            (x+1)*(x2-1)+y*y2,
+            (x1-a)^2+(y1-b)^2-r^2,
+            (x2-a)^2+(y2-b)^2-r^2,
+            (x-a)^2+b^2-r^2,
+            -yh+x*y1-x1*yh+y1;
+// Thesis T
+ideal T=yh+x*y2-x2*yh-y2,
+            (x-1-2*a)^2+(yh-2*b)^2-4*r^2,
+            (x+1-2*a)^2+(yh-2*b)^2-4*r^2,
+            4*(x-a)^2+(y+yh-2*b)^2-4*r^2,
+            (x-1-2*a)^2+(y-2*b)^2-4*r^2,
+            (x+1-2*a)^2+(y-2*b)^2-4*r^2,
+            4*(x-a)^2+(yh+y-2*b)^2-4*r^2;
+ADGT(H,T,y,1);
+// Thus the theorem is true.
+}
+//****************************** End ADGT *************************
 
 //   Obsolete routine. No more used after the actual release.
 //   setglobalrings();  Generates the global rings @R, @P and @RP that are respectively the rings Q[a][x], Q[a], Q[x,a].
@@ -6950,7 +7265,7 @@ static proc elimfacsinP(poly f,poly g)
 //     def @RP=D+@P;
 //     export(@R);      // global ring Q[a][x]
 //     export(@P);      // global ring Q[a]
-//     export(@RP);     // global ring K[x,a] with product order
+//     export(@RP);     // global ring Q[x,a] with product order
 //     setring(RRR);
 //   };
 //   example

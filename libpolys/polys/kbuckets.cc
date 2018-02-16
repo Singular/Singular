@@ -70,7 +70,7 @@ static inline unsigned int pLogLength(unsigned int l)
   if (l == 0) return 0;
   l--;
 #ifdef BUCKET_TWO_BASE
-  i=LOG2(l);
+  i=SI_LOG2(l);
 #else
   i=LOG4(l);
 #endif

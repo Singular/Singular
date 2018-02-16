@@ -84,7 +84,7 @@ static  FORCE_INLINE int nlQlogSize (number n, const coeffs r)
     long i = SR_TO_INT (n);
     unsigned long v;
     v = ABS(i);
-    return LOG2(v) + 1;
+    return SI_LOG2(v) + 1;
   }
   //assume denominator is 0
   number nn=(number) n;

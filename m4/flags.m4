@@ -108,7 +108,7 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
  AX_APPEND_LINK_FLAGS(${FLAGS})
 
  if test "x${ENABLE_DEBUG}" = xyes; then
-  DBGFLAGS="-g -ftrapv -fdiagnostics-show-option -Wall -Wextra"
+  DBGFLAGS="-g -ftrapv -fdiagnostics-show-option -Wall -Wextra -fno-delete-null-pointer-checks"
   #  -pedantic too strict ??? -Wvla -Wno-long-long ???
   AC_LANG_PUSH([C])
   AX_APPEND_COMPILE_FLAGS(${DBGFLAGS}, [CFLAGS])

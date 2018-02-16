@@ -24,7 +24,7 @@
 @center @uref{http://www.mathematik.uni-kl.de/,,Department of Mathematics} and  @uref{http://www.mathematik.uni-kl.de/~zca/,,Centre for Computer Algebra}
 @center Authors: @uref{http://www.mathematik.uni-kl.de/~decker,,W. Decker}, @uref{http://www.mathematik.uni-kl.de/~greuel,,G.-M. Greuel}, @uref{http://www.mathematik.uni-kl.de/~pfister,,G. Pfister}, @uref{http://www.mathematik.uni-kl.de/~hannes,,H. Schoenemann}
 
-@center Copyright @copyright{} 1986-2016
+@center Copyright @copyright{} 1986-2018
 @sp 2
 @center @strong{NOTICE}
 
@@ -33,13 +33,14 @@ it under the terms of the GNU General Public License as published by
 the Free Software Foundation (version 2 or version 3 of the License).
 
 Some single files have a copyright given within the file:
-Singular/ndbm.* (BSD)
+Singular/links/ndbm.* (BSD)
 
 The following software modules shipped with @sc{Singular} have their own copyright:
 the omalloc library, the readline library,
 the GNU Multiple Precision Library (GMP),
 NTL: A Library for doing Number Theory (NTL),
-the Singular-Factory library, the Singular-libfac library,
+Flint: Fast Library for Number Theory, the Singular-Factory library, the
+Singular-Factory library, the Singular-libfac library,
 surfex, and,
 for the Windows distributions, the Cygwin DLL and the Cygwin tools (Cygwin), and the
 XEmacs editor (XEmacs).
@@ -56,7 +57,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 (see @uref{http://www.gnu.org/copyleft/gpl.html,,GPL})
 
 Please send any comments or bug reports to
@@ -124,7 +125,7 @@ Some external programs are optional:
 @item 4ti2 (used by sing4ti2.lib, @pxref{sing4ti2_lib})
 @uref{http://www.4ti2.de/}
 @item gfan (used by tropical.lib, @pxref{tropical_lib})
-@uref{http://www.math.tu-berlin.de/~jensen/software/gfan/gfan.html}
+@uref{http://home.imf.au.dk/jensen/software/gfan/gfan.html}
 @item graphviz (used by resgraph.lib, @pxref{resgraph_lib})
 @uref{http://www.graphviz.org/}
 @item normaliz (used by normaliz.lib, @pxref{normaliz_lib})
@@ -132,7 +133,7 @@ Some external programs are optional:
 @* @uref{http://www.mathematik.uni-osnabrueck.de/normaliz/}
 @item polymake (used by polymake.lib, @pxref{polymake_lib})
 @copyright{} Ewgenij Gawrilow and Michael Joswig
-@* @uref{http://www.polymake.de/}
+@* @uref{http://polymake.org/}
 @item surf (used by surf.lib, @pxref{surf_lib})
 @copyright{} Stephan Endrass
 @* @uref{http://surf.sf.net}
@@ -140,7 +141,7 @@ Some external programs are optional:
 @uref{http://www.imaginary2008.de/surfer.php}
 @item surfex (used by surfex.lib, @pxref{surfex_lib})
 @copyright{} Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
-@* @uref{http://surfex.AlgebraicSurface.net}
+@* @uref{https://github.com/Singular/Sources/tree/spielwiese/Singular/LIB/surfex}
 @item TOPCOM (used by polymake.lib, @pxref{polymake_lib})
 @copyright{} J@"org Rambau
 @* @uref{http://www.rambau.wm.uni-bayreuth.de/TOPCOM/}
@@ -315,4 +316,7 @@ We should like to acknowledge the financial support given by
 the Volkswagen-Stiftung, the Deutsche Forschungsgemeinschaft
 and the Stiftung f@"ur Innovation des Landes Rheinland-Pfalz
 to the @sc{Singular} project.
+
+@sc{Singular} is supported by Project B5 of SFB-TRR 195 'Symbolic Tools in
+Mathematics and their Application'.
 

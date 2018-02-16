@@ -4,14 +4,6 @@
 /*
 * ABSTRACT - interupt handling
 */
-#include <stdio.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <strings.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-
 #include "kernel/mod2.h"
 
 #include "omalloc/omalloc.h"
@@ -19,6 +11,7 @@
 #include "reporter/si_signals.h"
 #include "Singular/fevoices.h"
 
+#include "misc/options.h"
 #include "Singular/tok.h"
 #include "Singular/ipshell.h"
 #include "Singular/cntrlc.h"
@@ -34,9 +27,6 @@
 #if defined(__OPTIMIZE__) && defined(CALL_GDB)
 #undef CALL_GDB
 #endif
-
- #include <unistd.h>
- #include <sys/types.h>
 
  #ifdef TIME_WITH_SYS_TIME
    #include <time.h>
@@ -91,7 +81,7 @@ void sig_term_hdl(int /*sig*/)
 }
 
 /*---------------------------------------------------------------------*
- * File scope Variables (Variables share by several functions in
+ * File scope Variables (Variables shared by several functions in
  *                       the same file )
  *
  *---------------------------------------------------------------------*/
@@ -99,7 +89,6 @@ void sig_term_hdl(int /*sig*/)
 jmp_buf si_start_jmpbuf;
 int siRandomStart;
 short si_restart=0;
-BOOLEAN siCntrlc = FALSE;
 
 typedef void (*si_hdl_typ)(int);
 

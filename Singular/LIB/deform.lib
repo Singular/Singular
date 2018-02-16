@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version deform.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version deform.lib 4.1.1.0 Feb_2018 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:  deform.lib    Miniversal Deformation of Singularities and Modules
@@ -74,7 +74,8 @@ EXAMPLE:example versal; shows an example
   string myQx = @my+"Qx";
   string myOx = @my+"Ox";
   string mySo = @my+"So";
-         Fo   = simplify(Fo,10);
+  if (ord_test(basering)==-1) {  Fo   = minbase(Fo);}
+  else                        {  Fo   =interred(Fo);}
   @is_qh      = qhweight(Fo);
   int    @rowR= size(Fo);
   def    Po   = basering;
@@ -207,6 +208,7 @@ setring  Po;
       degBound = 0;
 //--------------- obtain new base-ring ----------------------------------------
         if(defined(`myOx`)) {kill `myOx`;}
+  attrib(J,"isSB",1); // J is a degBound-SB (deg @d)
   qring `myOx` = J;
         matrix Fs,Rs,F_R,Cup,Cup',homFR,New,Rn,Fn;
         module hom';

@@ -22,8 +22,6 @@
 
 #include "polys/weight.h"
 
-#include <math.h>
-
 /*0 implementation*/
 extern "C" double (*wFunctional)(int *degw, int *lpol, int npol,
        double *rel, double wx, double wNsqr);

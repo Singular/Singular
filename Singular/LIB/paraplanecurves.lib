@@ -4,8 +4,8 @@ category="Algebraic Geometry";
 info="
 LIBRARY:  paraplanecurves.lib Rational parametrization of rational plane curves
 
-AUTHORS:  J. Boehm, j.boehm at mx.uni-saarland.de @*
-          W. Decker, decker at mathematik.uni-kl.de> @*
+AUTHORS:  J. Boehm, boehm at mathematik.uni-kl.de @*
+          W. Decker, decker at mathematik.uni-kl.de @*
           S. Laplagne, slaplagn at dm.uba.ar @*
           F. Seelisch, seelisch at mathematik.uni-kl.de
 
@@ -48,6 +48,10 @@ REFERENCES:
 Janko Boehm: Parametrisierung rationaler Kurven, Diploma Thesis,
 http://www.math.uni-sb.de/ag/schreyer/jb/diplom%20janko%20boehm.pdf
 
+Janko Boehm,  Wolfram Decker, Santiago Laplagne, Gerhard Pfister:
+Local to global algorithms for the Gorenstein adjoint ideal of a curve,
+Algorithmic and Experimental Methods in Algebra, Geometry, and Number Theory, Springer 2018
+
 Theo de Jong: An algorithm for computing the integral closure,
 Journal of Symbolic Computation 26 (3) (1998), p. 273-277
 
@@ -57,6 +61,7 @@ Journal of Symbolic Computation 9 (2010), p. 887-901
 Mark van Hoeij: An Algorithm for Computing an Integral Basis in an Algebraic
 Function Field, Journal of Symbolic Computation 18 (1994), p. 353-363,
 http://www.math.fsu.edu/~hoeij/papers/comments/jsc1994.html
+
 
 KEYWORDS:
 Curves; Parametrization; Rational curves; Adjoint ideal; Geometric genus
@@ -553,7 +558,15 @@ EXAMPLE: example adjointIdeal; shows an example
          }
        else
          {
-           f = subst(f,var(1),var(1)+var(2));
+           number cc=1;
+           int tst=0;
+           poly ff;
+           while (tst==0){
+              ff = subst(f,var(1),var(1)+cc*var(2));
+              tst=((size(coeffs(ff,var(2)))-1) == deg(ff));
+              if (tst==0){cc=cc+1;}
+           }
+           f = subst(f,var(1),var(1)+cc*var(2));
          }
     }
   co = coeffs(f,var(2));
@@ -565,12 +578,12 @@ EXAMPLE: example adjointIdeal; shows an example
     {
        if(bb2x)
          {
-           map perm = basering, var(2), var(1), var(3);
+           perm = basering, var(2), var(1), var(3);
            AI = mstd(perm(AI))[2];
          }
        else
          {
-           AI = mstd(substitute(AI,var(1),var(1)-var(2)))[2];
+           AI = mstd(substitute(AI,var(1),var(1)-cc*var(2)))[2];
          }
 
     }

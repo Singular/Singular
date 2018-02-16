@@ -5,7 +5,7 @@
  *  simple prime test for int
  */
 
-#include <math.h>
+#include <cmath>
 #include "misc/prime.h"
 #include "factory/cf_primes.h"
 

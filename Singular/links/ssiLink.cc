@@ -44,20 +44,11 @@
 #include "Singular/links/simpleipc.h"
 #endif
 
-#include <stdio.h>
-#include <fcntl.h>
 #include <errno.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <signal.h>
 #include <sys/types.h>          /* for portability */
-#include <sys/select.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <ctype.h>   /*for isdigit*/
 #include <netdb.h>
-#include <sys/wait.h>
-#include <time.h>
+#include <netinet/in.h> /* for htons etc.*/
 
 #define SSI_VERSION 10
 // 5->6: changed newstruct representation

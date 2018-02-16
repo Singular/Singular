@@ -22,11 +22,7 @@
 #endif
 #endif
 
-#include <stdlib.h>
-#include <math.h>
-#include <ctype.h>
-#include <string.h>
-
+#include "omalloc/omalloc.h"
 #include "kernel/spectrum/GMPrat.h"
 
 // ----------------------------------------------------------------------------
@@ -368,8 +364,8 @@ ostream& operator<< (ostream& s,const Rational& a)
 
 unsigned int Rational::length( ) const
 {
-    char *snum = (char*)NULL;
-    char *sden = (char*)NULL;
+    char *snum = (char*)omAlloc(mpz_sizeinbase(mpq_numref(p->rat),10)+2);
+    char *sden = (char*)omAlloc(mpz_sizeinbase(mpq_denref(p->rat),10)+2);
 
     snum = mpz_get_str( snum,10,mpq_numref( p->rat ) );
     sden = mpz_get_str( sden,10,mpq_denref( p->rat ) );
@@ -378,8 +374,8 @@ unsigned int Rational::length( ) const
 
     if( sden[0] != '1' || sden[1] != '\0' ) length += strlen( sden ) + 1;
 
-    free( snum );
-    free( sden );
+    omFree( snum );
+    omFree( sden );
 
     return  length;
 }

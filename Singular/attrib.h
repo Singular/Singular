@@ -6,7 +6,6 @@
 /*
 * ABSTRACT: attributes to leftv and idhdl
 */
-#include <string.h>
 #include "kernel/structs.h"
 #include "omalloc/omalloc.h"
 #ifndef XMEMORY_H

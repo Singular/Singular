@@ -20,7 +20,6 @@
 #include "poly_wrap.h"
 extern int inerror;
 using namespace boost::python;
-using boost::python::numeric::array;
 using boost::python::extract;
 static void free_leftv(leftv args)
 {
@@ -28,7 +27,14 @@ static void free_leftv(leftv args)
     omFreeBin(args, sleftv_bin);
 }
 
-matrix matrixFromArray(const boost::python::numeric::array& f)
+#if BOOST_VERSION < 106500    /* 1.65 */
+typedef typename boost::python::numeric::array NumpyArrayType;
+#else
+#include <boost/python/numpy.hpp>
+typedef typename boost::python::numpy::ndarray NumpyArrayType;
+#endif
+
+matrix matrixFromArray(const NumpyArrayType& f)
 {
   object o=f.attr("shape");
   object o1=o[0];
@@ -130,7 +136,7 @@ class arg_list
     v->rtyp=VECTOR_CMD;
     internal_append(v);
   }
-  void appendArray(const boost::python::numeric::array& f)
+  void appendArray(const NumpyArrayType& f)
   {
     leftv v=initArg();
     matrix m=matrixFromArray(f);
@@ -276,7 +282,7 @@ class idhdl_wrap
       id->data.p=p.as_poly();
     }
   }
-  void writeArray(const boost::python::numeric::array& f)
+  void writeArray(const NumpyArrayType& f)
   {
     if(id->typ=MATRIX_CMD)
     {
@@ -323,9 +329,9 @@ class idhdl_wrap
 };
 
 
-static boost::python::numeric::array buildPythonMatrix(matrix m, ring r)
+static NumpyArrayType buildPythonMatrix(matrix m, ring r)
 {
-  using boost::python::numeric::array;
+  //using boost::python::numeric::array;
   using boost::python::self;
   using boost::python::make_tuple;
   using boost::python::tuple;
@@ -345,11 +351,15 @@ static boost::python::numeric::array buildPythonMatrix(matrix m, ring r)
     }
     l.append(row);
   }
+  #if BOOST_VERSION <106500
   //FIXME: should call this only once
-  boost::python::numeric::array::set_module_and_type("Numeric",
+  NumpyArrayType::set_module_and_type("Numeric",
                              "ArrayType"
                              );
-  return boost::python::numeric::array(l);
+  return NumpyArrayType(l);
+  #else
+  return boost::python::numpy::array(l);
+  #endif
 }
 boost::python::object buildPyObjectFromLeftv(leftv v);
 boost::python::list buildPythonList(lists l, ring r)

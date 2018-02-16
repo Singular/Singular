@@ -1,0 +1,3 @@
+gcc -shared -DDYNAMIC_VERSION -fPIC `libsingular-config --cflags` lt.cc -o same_lt.so
+gcc -shared -DDYNAMIC_VERSION -fPIC `libsingular-config --cflags` lt2.cc -o same_lt2.so
+

@@ -46,8 +46,6 @@
 
 #include "clapsing.h"
 
-#define ADIDEBUG 0
-
 /*
  * lift ideal with coeffs over Z (mod N) to Q via Farey
  */

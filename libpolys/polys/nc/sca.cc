@@ -1082,8 +1082,6 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
   // y_{iAltVarStart}^2, y_{iAltVarStart+1}^2, \ldots, y_{iAltVarEnd}^2  (iAltVarEnd > iAltVarStart)
   // to be within quotient ideal.
 
-  bool bSCA = true;
-
   int b = N+1;
   int e = -1;
 
@@ -1097,7 +1095,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
 #endif
   }
 
-  for ( int i = iAltVarStart; (i <= iAltVarEnd) && bSCA; i++ )
+  for ( int i = iAltVarStart; (i <= iAltVarEnd); i++ )
     if( (i < b) || (i > e) ) // otherwise it's ok since rG is an SCA!
     {
       poly square = p_One( rG);
@@ -1111,8 +1109,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
       if( square != NULL ) // var(i)^2 is not in Q?
       {
         p_Delete(&square, rG);
-        bSCA = false;
-        break;
+        return false;
       }
     }
 
