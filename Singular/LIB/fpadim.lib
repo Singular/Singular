@@ -2398,7 +2398,7 @@ proc lpMaxIdeal(int d, int donly)
   NOTE: analogous to maxideal(d) in the commutative case
   "
 {
-  ivL2lpI(ivMaxIdeal(d, donly));
+  return(ivL2lpI(ivMaxIdeal(d, donly)));
 }
 example {
   "EXAMPLE:"; echo = 2;
