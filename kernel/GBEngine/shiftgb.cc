@@ -102,7 +102,7 @@ poly p_mLPshift(poly p, int sh, int uptodeg, int lV, const ring r)
 
   assume(sh>=0);
   int L = p_mLastVblock(p,lV,r);
-  assume(L+sh-1<=uptodeg);
+  assume(L+sh<=uptodeg);
 
   int *e=(int *)omAlloc0((r->N+1)*sizeof(int));
   int *s=(int *)omAlloc0((r->N+1)*sizeof(int));
