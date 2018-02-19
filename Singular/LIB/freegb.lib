@@ -2520,10 +2520,6 @@ EXAMPLE: example shiftPoly; shows examples
   }
   int uptodeg = attrib(basering,"uptodeg");
   int lV = attrib(basering,"lV");
-  if (deg(a) + i > uptodeg)
-  {
-    ERROR("degree bound violated by the shift!");
-  }
   return(system("stest",a,i,uptodeg,lV));
 }
 example
@@ -2538,6 +2534,32 @@ example
   shiftPoly(f,2);
 }
 
+proc lastBlock(poly p)
+"USAGE:  lastBlock(p); p letterplace poly
+RETURN: int
+ASSUME: basering has letterplace ring structure
+PURPOSE: get the number of the last block occuring in the poly
+EXAMPLE: example lastBlock; shows examples
+"
+{
+  if (lpAssumeViolation())
+  {
+    ERROR("Incomplete Letterplace structure on the basering!");
+  }
+  int lV = attrib(basering,"lV");
+  // calls pLastVblock(p,lV);
+  return(system("btest",p,lV));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  int uptodeg = 5;
+  def R = makeLetterplaceRing(uptodeg);
+  setring R;
+  poly f = x(1)*z(2)*y(3) - 2*z(1)*y(2) + 3*x(1);
+  lastBlock(f); // should be 3
+}
 
 static proc mmLiebr(poly a, poly b)
 {
