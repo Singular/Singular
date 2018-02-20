@@ -222,15 +222,10 @@ void kBucketDeleteAndDestroy(kBucket_pt *bucket_pt)
   int i;
   for (i=0; i<= bucket->buckets_used; i++)
   {
-
-    if (bucket->buckets[i] != NULL)
-    {
-      p_Delete(&(bucket->buckets[i]), bucket->bucket_ring);
+    p_Delete(&(bucket->buckets[i]), bucket->bucket_ring);
 #ifdef USE_COEF_BUCKETS
-      if (bucket->coef[i]!=NULL)
-        p_Delete(&(bucket->coef[i]), bucket->bucket_ring);
+    p_Delete(&(bucket->coef[i]), bucket->bucket_ring);
 #endif
-    }
   }
   omFreeBin(bucket, kBucket_bin);
   *bucket_pt = NULL;
@@ -974,7 +969,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
     n_Delete(&n,r);
   }
 
-  if ((p1==NULL) && (bucket->coef[i]!=NULL))
+  if (p1==NULL)
     p_Delete(&bucket->coef[i],r);
 #endif
   bucket->buckets_length[i]=l1;

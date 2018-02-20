@@ -1426,7 +1426,7 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN *ad
     {
       if (h4->m[i-1]!=NULL)
       {
-        p = p_Copy_noCheck(h4->m[i-1], currRing);
+        p = p_Copy_noCheck(h4->m[i-1], currRing); /*h4->m[i-1]!=NULL*/
         p_Shift(&p,1,currRing);
         h4->m[i] = p;
       }
