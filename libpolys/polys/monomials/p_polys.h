@@ -212,6 +212,7 @@ void      p_Content(poly p, const ring r);
 #if 1
 // currently only used by Singular/janet
 void      p_SimpleContent(poly p, int s, const ring r);
+number    p_InitContent(poly ph, const ring r);
 #endif
 
 poly      p_Cleardenom(poly p, const ring r);

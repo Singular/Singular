@@ -2233,7 +2233,7 @@ poly p_Power(poly p, int i, const ring r)
 
 /* --------------------------------------------------------------------------------*/
 /* content suff                                                                   */
-static number p_InitContent(poly ph, const ring r);
+//number p_InitContent(poly ph, const ring r);
 
 void p_Content(poly ph, const ring r)
 {
@@ -2542,7 +2542,7 @@ void p_SimpleContent(poly ph, int smax, const ring r)
 }
 #endif
 
-static number p_InitContent(poly ph, const ring r)
+number p_InitContent(poly ph, const ring r)
 // only for coefficients in Q and rational functions
 #if 0
 {
