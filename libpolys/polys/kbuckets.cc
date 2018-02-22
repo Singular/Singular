@@ -4,9 +4,11 @@
 
 #include "omalloc/omalloc.h"
 #include "misc/auxiliary.h"
+#include "misc/options.h"
 
 #include "polys/monomials/p_polys.h"
 #include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
 #include "polys/monomials/ring.h"
 #include "polys/kbuckets.h"
 
@@ -1157,7 +1159,68 @@ number kBucketPolyRed(kBucket_pt bucket,
 }
 
 #ifndef USE_COEF_BUCKETS
-void kBucketSimpleContent(kBucket_pt) {}
+void kBucketSimpleContent(kBucket_pt bucket)
+{
+  ring r=bucket->bucket_ring;
+  if (rField_is_Ring(r)) return;
+  if (r->cf->cfSubringGcd==ndGcd) /* trivial gcd*/ return;
+
+  number coef=n_Init(0,r->cf);
+  // find an initial guess of a gcd
+  for (int i=bucket->buckets_used;i>=0;i--)
+  {
+    if (bucket->buckets[i]!=NULL)
+    {
+      number t=p_InitContent(bucket->buckets[i],r);
+      if (n_Size(t,r->cf)<2)
+      {
+        n_Delete(&t,r->cf);
+        n_Delete(&coef,r->cf);
+        return;
+      }
+      number t2=n_SubringGcd(coef,t,r->cf);
+      n_Delete(&t,r->cf);
+      n_Delete(&coef,r->cf);
+      coef=t2;
+      if (n_Size(coef,r->cf)<2) { n_Delete(&coef,r->cf);return;}
+    }
+  }
+  // find the gcd
+  for (int i=bucket->buckets_used;i>=0;i--)
+  {
+    if (bucket->buckets[i]!=NULL)
+    {
+      poly p=bucket->buckets[i];
+      while(p!=NULL)
+      {
+        number t=n_SubringGcd(coef,pGetCoeff(p),r->cf);
+        if (n_Size(t,r->cf)<2)
+        {
+          n_Delete(&t,r->cf);
+          n_Delete(&coef,r->cf);
+          return;
+        }
+        pIter(p);
+      }
+    }
+  }
+  // divided by the gcd
+  if (TEST_OPT_PROT) PrintS("@");
+  for (int i=bucket->buckets_used;i>=0;i--)
+  {
+    if (bucket->buckets[i]!=NULL)
+    {
+      poly p=bucket->buckets[i];
+      while(p!=NULL)
+      {
+        number d = n_ExactDiv(pGetCoeff(p),coef,r->cf);
+        p_SetCoeff(p,d,r);
+        pIter(p);
+      }
+    }
+  }
+  n_Delete(&coef,r->cf);
+}
 #else
 static BOOLEAN nIsPseudoUnit(number n, ring r)
 {
