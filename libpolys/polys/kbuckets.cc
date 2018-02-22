@@ -1161,43 +1161,59 @@ number kBucketPolyRed(kBucket_pt bucket,
 #ifndef USE_COEF_BUCKETS
 void kBucketSimpleContent(kBucket_pt bucket)
 {
+  if (bucket->buckets[0]==NULL) return;
+
   ring r=bucket->bucket_ring;
   if (rField_is_Ring(r)) return;
-  if (r->cf->cfSubringGcd==ndGcd) /* trivial gcd*/ return;
 
-  number coef=n_Init(0,r->cf);
+  coeffs cf=r->cf;
+  if (cf->cfSubringGcd==ndGcd) /* trivial gcd*/ return;
+
+  number nn=pGetCoeff(bucket->buckets[0]);
+  if ((bucket->buckets_used==0)
+  &&(!n_IsOne(nn,cf)))
+  {
+    if (TEST_OPT_PROT) PrintS("@");
+    p_SetCoeff(bucket->buckets[0],n_Init(1,cf),r);
+    return;
+  }
+
+  if (n_Size(nn,cf)<2) return;
+
+  //kBucketAdjustBucketsUsed(bucket);
+  number coef=n_Copy(nn,cf);
   // find an initial guess of a gcd
-  for (int i=bucket->buckets_used;i>=0;i--)
+  for (int i=1; i<=bucket->buckets_used;i++)
   {
     if (bucket->buckets[i]!=NULL)
     {
       number t=p_InitContent(bucket->buckets[i],r);
-      if (n_Size(t,r->cf)<2)
+      if (n_Size(t,cf)<2)
       {
-        n_Delete(&t,r->cf);
-        n_Delete(&coef,r->cf);
+        n_Delete(&t,cf);
+        n_Delete(&coef,cf);
         return;
       }
-      number t2=n_SubringGcd(coef,t,r->cf);
-      n_Delete(&t,r->cf);
-      n_Delete(&coef,r->cf);
+      number t2=n_SubringGcd(coef,t,cf);
+      n_Delete(&t,cf);
+      n_Delete(&coef,cf);
       coef=t2;
-      if (n_Size(coef,r->cf)<2) { n_Delete(&coef,r->cf);return;}
+      if (n_Size(coef,cf)<2) { n_Delete(&coef,cf);return;}
     }
   }
   // find the gcd
-  for (int i=bucket->buckets_used;i>=0;i--)
+  for (int i=0; i<=bucket->buckets_used;i++)
   {
     if (bucket->buckets[i]!=NULL)
     {
       poly p=bucket->buckets[i];
       while(p!=NULL)
       {
-        number t=n_SubringGcd(coef,pGetCoeff(p),r->cf);
-        if (n_Size(t,r->cf)<2)
+        number t=n_SubringGcd(coef,pGetCoeff(p),cf);
+        if (n_Size(t,cf)<2)
         {
-          n_Delete(&t,r->cf);
-          n_Delete(&coef,r->cf);
+          n_Delete(&t,cf);
+          n_Delete(&coef,cf);
           return;
         }
         pIter(p);
@@ -1213,13 +1229,13 @@ void kBucketSimpleContent(kBucket_pt bucket)
       poly p=bucket->buckets[i];
       while(p!=NULL)
       {
-        number d = n_ExactDiv(pGetCoeff(p),coef,r->cf);
+        number d = n_ExactDiv(pGetCoeff(p),coef,cf);
         p_SetCoeff(p,d,r);
         pIter(p);
       }
     }
   }
-  n_Delete(&coef,r->cf);
+  n_Delete(&coef,cf);
 }
 #else
 static BOOLEAN nIsPseudoUnit(number n, ring r)
