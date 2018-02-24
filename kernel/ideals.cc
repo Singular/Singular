@@ -539,7 +539,7 @@ ideal idMultSect(resolvente arg, int length, GbVariant alg)
   else
   {
     tempstd=idInit(1,1);
-    Werror("wrong algorith %d for SB",(int)alg);
+    Werror("wrong algorithm %d for SB",(int)alg);
   }
 
   if(syz_ring!=orig_ring)
@@ -714,7 +714,7 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w, GbVarian
   else
   {
     h3=idInit(1,1);
-    Werror("wrong algorith %d for SB",(int)alg);
+    Werror("wrong algorithm %d for SB",(int)alg);
   }
 
   idDelete(&h2);
