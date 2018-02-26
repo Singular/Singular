@@ -2,17 +2,40 @@
 version="version fpalgebras.lib 4.1.1.0 Feb_2018 ";
 category="Noncommutative";
 info="
-LIBRARY: fpalgebras.lib   [TODO]
+LIBRARY: fpalgebras.lib
 AUTHORS: Karim Abou Zeid,       karim.abou.zeid at rwth-aachen.de
 
 Support: Project II.6 in the transregional collaborative research centre
 SFB-TRR 195 'Symbolic Tools in Mathematics and their Application' of the German DFG
 
 OVERVIEW:
-[TODO]
+Generation of various groups and algebras in the Letterplace ring
 
 PROCEDURES:
-[TODO]
+baumslagSolitar(int n, int m, int d, list #);
+baumslag(int m, int n, int d);
+crystallographicGroupP1(int d);
+crystallographicGroupPM(int d);
+crystallographicGroupPG(int d);
+crystallographicGroupP2MM(int d);
+crystallographicGroupP2(int d);
+crystallographicGroupP2GG(int d);
+crystallographicGroupCM(int d);
+crystallographicGroupC2MM(int d);
+crystallographicGroupP4(int d);
+crystallographicGroupP4MM(int d);
+crystallographicGroupP4GM(int d);
+crystallographicGroupP3(int d);
+crystallographicGroupP31M(int d);
+crystallographicGroupP3M1(int d);
+crystallographicGroupP6(int d);
+crystallographicGroupP6MM(int d);
+dyckGroup1(int n, int d, intvec P);
+dyckGroup2(int n, int d, intvec P);
+dyckGroup3(int n, int d, intvec P);
+fibonacciGroup(int m, int d);
+tetrahedronGroup(int g, int d);
+triangularGroup(int g, int d);
 ";
 
 LIB "freegb.lib";
@@ -24,7 +47,7 @@ LIB "general.lib";
 // from Grischa Studzinski /////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 
-proc baumslagSolitar(int n,int m,int d,list #)
+proc baumslagSolitar(int n, int m, int d, list #)
 "USAGE: baumslagSolitar(m,n,d[,IsGroup]); n an integer, m an integer, d an integer, IsGroup an optional integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
@@ -116,13 +139,13 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 }
 
 
-//Baumslag group with the following presentation
-//< a, b | a^m = b^n = 1 >
-
-proc baumslag(int m, int n, int d)
-"USAGE: baumslag(m,n,d); m an integer, n an integer, d an integer
+proc baumslagGroup(int m, int n, int d)
+"USAGE: baumslagGroup(m,n,d); m an integer, n an integer, d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - Baumslag group with the following presentation
+@*      < a, b | a^m = b^n = 1 >
+@*    -d gives the degreebound for the Letterplace ring
 "
 {
  if (m < 0 || n < 0 ) {ERROR("m,n must be non-negativ integers!");}
