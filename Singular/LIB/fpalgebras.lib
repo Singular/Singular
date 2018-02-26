@@ -142,12 +142,12 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 
 
 ////////////////////////////////////////////////////////////////////
-// Crystalographic Groups //////////////////////////////////////////
+// Crystallographic Groups //////////////////////////////////////////
 // from Grischa Studzinski /////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 
-proc cgP1(int d)
-"USAGE: cgP1(d); d an integer
+proc crystallographicGroupP1(int d)
+"USAGE: crystallographicGroupP1(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p1 group with the following presentation
@@ -173,8 +173,8 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  return(R);
 }
 
-// old? there is already another cgP2 proc
-/* proc cgP2(int d) */
+// old? there is already another crystallographicGroupP2 proc
+/* proc crystallographicGroupP2(int d) */
 /* " */
 /* p2 group with the following presentation */
 /* < x, y, r | [x, y] = r^2 = 1, r^-1*x*r = x^-1, r^-1*y*r = y^-1 > */
@@ -200,8 +200,8 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 /*  return(R); */
 /* } */
 
-proc cgPM(int d)
-"USAGE: cgPM(d); d an integer
+proc crystallographicGroupPM(int d)
+"USAGE: crystallographicGroupPM(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - pm group with the following presentation
@@ -228,8 +228,8 @@ X(1)*x(2)-1, Y(1)*y(2)-1,  y(1)*Y(2)-1;
  return(R);
 }
 
-proc cgPG(int d)
-"USAGE: cgPG(d); d an integer
+proc crystallographicGroupPG(int d)
+"USAGE: crystallographicGroupPG(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - pg group with the following presentation
@@ -257,8 +257,8 @@ Y(1)*y(2)-1,  y(1)*Y(2)-1, t(1)*T(2)-1, T(1)*t(2)-1;
 }
 
 
-proc cgP2MM(int d)
-"USAGE: cgP2MM(d); d an integer
+proc crystallographicGroupP2MM(int d)
+"USAGE: crystallographicGroupP2MM(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p2mm group with the following presentation
@@ -286,8 +286,8 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  return(R);
 }
 
-proc cgP2(int d)
-"USAGE: cgP2(d); d an integer
+proc crystallographicGroupP2(int d)
+"USAGE: crystallographicGroupP2(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p2 group with the following presentation
@@ -315,8 +315,8 @@ m(1)*M(2)-1, M(1)*m(2)-1;
  return(R);
 }
 
-proc cgP2GG(int d)
-"USAGE: cgP2GG(d); d an integer
+proc crystallographicGroupP2GG(int d)
+"USAGE: crystallographicGroupP2GG(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p2gg group with the following presentation
@@ -344,8 +344,8 @@ X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1, u(1)*U(2)-1, U(1)*u(2)-1, 
  return(R);
 }
 
-proc cgCM(int d)
-"USAGE: cgCM(d); d an integer
+proc crystallographicGroupCM(int d)
+"USAGE: crystallographicGroupCM(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - cm group with the following presentation
@@ -373,8 +373,8 @@ X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
  return(R);
 }
 
-proc cgC2MM(int d)
-"USAGE: cgC2MM(d); d an integer
+proc crystallographicGroupC2MM(int d)
+"USAGE: crystallographicGroupC2MM(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - c2mm group with the following presentation
@@ -402,8 +402,8 @@ X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
  return(R);
 }
 
-proc cgP4(int d)
-"USAGE: cgP4(d); d an integer
+proc crystallographicGroupP4(int d)
+"USAGE: crystallographicGroupP4(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p4 group with the following presentation
@@ -431,8 +431,8 @@ X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
  return(R);
 }
 
-proc cgP4MM(int d)
-"USAGE: cgP4MM(d); d an integer
+proc crystallographicGroupP4MM(int d)
+"USAGE: crystallographicGroupP4MM(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p4mm group with the following presentation
@@ -460,8 +460,8 @@ X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
  return(R);
 }
 
-proc cgP4GM(int d)
-"USAGE: cgP4GM(d); d an integer
+proc crystallographicGroupP4GM(int d)
+"USAGE: crystallographicGroupP4GM(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p4gm group with the following presentation
@@ -489,8 +489,8 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  return(R);
 }
 
-proc cgP3(int d)
-"USAGE: cgP3(d); d an integer
+proc crystallographicGroupP3(int d)
+"USAGE: crystallographicGroupP3(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p3 group with the following presentation
@@ -517,8 +517,8 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  return(R);
 }
 
-proc cgP31M(int d)
-"USAGE: cgP31M(d); d an integer
+proc crystallographicGroupP31M(int d)
+"USAGE: crystallographicGroupP31M(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p31m group with the following presentation
@@ -548,8 +548,8 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  return(R);
 }
 
-proc cgP3M1(int d)
-"USAGE: cgP3M1(d); d an integer
+proc crystallographicGroupP3M1(int d)
+"USAGE: crystallographicGroupP3M1(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p3m1 group with the following presentation
@@ -577,8 +577,8 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  return(R);
 }
 
-proc cgP6(int d)
-"USAGE: cgP6(d); d an integer
+proc crystallographicGroupP6(int d)
+"USAGE: crystallographicGroupP6(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p6 group with the following presentation
@@ -606,8 +606,8 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  return(R);
 }
 
-proc cgP6MM(int d)
-"USAGE: cgP6MM(d); d an integer
+proc crystallographicGroupP6MM(int d)
+"USAGE: crystallographicGroupP6MM(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p6mm group with the following presentation
