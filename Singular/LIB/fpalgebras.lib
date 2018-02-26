@@ -137,7 +137,11 @@ NOTE: - the ring contains the ideal I, which contains the required relations
    return(Gr); 
   }
 }
-
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = baumslagSolitar(2,3,4); setring R;
+  I;
+}
 
 proc baumslagGroup(int m, int n, int d)
 "USAGE: baumslagGroup(m,n,d); m an integer, n an integer, d an integer
@@ -162,7 +166,11 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  export(I);
  return(R);
 }
-
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = baumslag(2,3,4); setring R;
+  I;
+}
 
 ////////////////////////////////////////////////////////////////////
 // Crystallographic Groups //////////////////////////////////////////
@@ -194,6 +202,11 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  export(I);
  if (baseringdef == 1) {setring save;}
  return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP1(5); setring R;
+  I;
 }
 
 // old? there is already another crystallographicGroupP2 proc
@@ -250,6 +263,11 @@ X(1)*x(2)-1, Y(1)*y(2)-1,  y(1)*Y(2)-1;
  if (baseringdef == 1) {setring save;}
  return(R);
 }
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupPM(5); setring R;
+  I;
+}
 
 proc crystallographicGroupPG(int d)
 "USAGE: crystallographicGroupPG(d); d an integer
@@ -277,6 +295,11 @@ Y(1)*y(2)-1,  y(1)*Y(2)-1, t(1)*T(2)-1, T(1)*t(2)-1;
  export(I);
  if (baseringdef == 1) {setring save;}
  return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupPG(5); setring R;
+  I;
 }
 
 
@@ -308,6 +331,11 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  if (baseringdef == 1) {setring save;}
  return(R);
 }
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP2MM(5); setring R;
+  I;
+}
 
 proc crystallographicGroupP2(int d)
 "USAGE: crystallographicGroupP2(d); d an integer
@@ -336,6 +364,11 @@ m(1)*M(2)-1, M(1)*m(2)-1;
  export(I);
  if (baseringdef == 1) {setring save;}
  return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP2(5); setring R;
+  I;
 }
 
 proc crystallographicGroupP2GG(int d)
@@ -366,6 +399,11 @@ X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1, u(1)*U(2)-1, U(1)*u(2)-1, 
  if (baseringdef == 1) {setring save;}
  return(R);
 }
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP2GG(5); setring R;
+  I;
+}
 
 proc crystallographicGroupCM(int d)
 "USAGE: crystallographicGroupCM(d); d an integer
@@ -395,6 +433,11 @@ X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
  if (baseringdef == 1) {setring save;}
  return(R);
 }
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupCM(5); setring R;
+  I;
+}
 
 proc crystallographicGroupC2MM(int d)
 "USAGE: crystallographicGroupC2MM(d); d an integer
@@ -404,6 +447,11 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 @*      < x, y, m, r | [x, y] = m^2 = r^2 = 1, m^-1*y*m = y^-1, m^-1*x*m = x*y, r^-1*y*r = y^-1, r^-1*x*r = x^-1, m^-1*r*m = r^-1 >
 @*    - d gives the degreebound for the Letterplace ring
 "
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupC2MM(5); setring R;
+  I;
+}
 {
  if (d < 3){ERROR("Degreebound is to small for choosen example!");}
  
@@ -453,6 +501,11 @@ X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
  if (baseringdef == 1) {setring save;}
  return(R);
 }
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP4(5); setring R;
+  I;
+}
 
 proc crystallographicGroupP4MM(int d)
 "USAGE: crystallographicGroupP4MM(d); d an integer
@@ -481,6 +534,11 @@ X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
  export(I);
  if (baseringdef == 1) {setring save;}
  return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP4MM(5); setring R;
+  I;
 }
 
 proc crystallographicGroupP4GM(int d)
@@ -511,6 +569,11 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  if (baseringdef == 1) {setring save;}
  return(R);
 }
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP4GM(5); setring R;
+  I;
+}
 
 proc crystallographicGroupP3(int d)
 "USAGE: crystallographicGroupP3(d); d an integer
@@ -538,6 +601,11 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  export(I);
  if (baseringdef == 1) {setring save;}
  return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP3(5); setring R;
+  I;
 }
 
 proc crystallographicGroupP31M(int d)
@@ -570,6 +638,11 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  if (baseringdef == 1) {setring save;}
  return(R);
 }
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP31M(5); setring R;
+  I;
+}
 
 proc crystallographicGroupP3M1(int d)
 "USAGE: crystallographicGroupP3M1(d); d an integer
@@ -579,6 +652,11 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 @*      < x, y, r, m | [x, y] = r^3 = m^2 = 1, m^-1*r*m = r^2, r^-1*x*r = x^-1*y, r^-1*y*r = x^-1, m^-1*x*m = x^-1, m^-1*y*m = x^-1*y >
 @*    - d gives the degreebound for the Letterplace ring
 "
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP3M1(5); setring R;
+  I;
+}
 {
  if (d < 4){ERROR("Degreebound is to small for choosen example!");}
  
@@ -628,6 +706,11 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  if (baseringdef == 1) {setring save;}
  return(R);
 }
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP6(5); setring R;
+  I;
+}
 
 proc crystallographicGroupP6MM(int d)
 "USAGE: crystallographicGroupP6MM(d); d an integer
@@ -637,6 +720,11 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 @*      < x, y, r, m | [x, y] = r^6 = m^2 = 1, r^-1*y*r = x^-1*y, r^-1*x*r = y, m^-1*x*m = x^-1, m^-1*y*m = x^-1*y, m^-1*r*m = r^-1*y>
 @*    - d gives the degreebound for the Letterplace ring
 "
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP6MM(5); setring R;
+  I;
+}
 {
  if (d < 7){ERROR("Degreebound is to small for choosen example!");}
  
@@ -705,6 +793,12 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  if (baseringdef == 1) {setring save;}
  return(R);
 }
+example {
+  "EXAMPLE:"; echo = 2;
+  intvec P = 1,2,3;
+  def R = dyckGroup1(3,5,P); setring R;
+  I;
+}
 
 
 proc dyckGroup2(int n, int d, intvec P)
@@ -747,6 +841,12 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  export(I);
  if (baseringdef == 1) {setring save;}
  return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  intvec P = 1,2,3;
+  def R = dyckGroup2(3,5,P); setring R;
+  I;
 }
 
 
@@ -792,6 +892,12 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  export(I);
  if (baseringdef == 1) {setring save;}
  return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  intvec P = 1,2,3;
+  def R = dyckGroup3(3,5,P); setring R;
+  I;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -839,10 +945,15 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  if (baseringdef == 1) {setring save;}
  return(R);
 }
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = fibonacciGroup(3,5); setring R;
+  I;
+}
 
 
 ////////////////////////////////////////////////////////////////////
-// Tetrahedon Groups ///////////////////////////////////////////////
+// Tetrahedron Groups ///////////////////////////////////////////////
 // from Grischa Studzinski /////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 
@@ -898,6 +1009,11 @@ not equivalent to a presentation for an ordinary tetrahedron group.
  export(I);
  if (baseringdef == 1) {setring save;}
  return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = tetrahedronGroup(3,5); setring R;
+  I;
 }
 
 
@@ -996,4 +1112,9 @@ a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*a(7)*b(8)*b(9)*a(10)*b(11)*b(12)*a(13)*b(14)*a(15)
  export(I);
  if (baseringdef == 1) {setring save;}
  return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = triangularGroup(3,10); setring R;
+  I;
 }
