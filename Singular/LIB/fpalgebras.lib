@@ -640,8 +640,8 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 // from Grischa Studzinski /////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 
-proc dyckGrp1(int n, int d, intvec P)
-"USAGE: dyckGrp1(n,d,P); n an integer, d an integer, P an intvec
+proc dyckGroup1(int n, int d, intvec P)
+"USAGE: dyckGroup1(n,d,P); n an integer, d an integer, P an intvec
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - The Dyck group with the following presentation
@@ -683,8 +683,8 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 }
 
 
-proc dyckGrp2(int n, int d, intvec P)
-"USAGE: dyckGrp2(n,d,P); n an integer, d an integer, P an intvec
+proc dyckGroup2(int n, int d, intvec P)
+"USAGE: dyckGroup2(n,d,P); n an integer, d an integer, P an intvec
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - The Dyck group with the following presentation
@@ -727,8 +727,8 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 
 
 
-proc dyckGrp3(int n, int d, intvec P)
-"USAGE: dyckGrp2(n,d,P); n an integer, d an integer, P an intvec
+proc dyckGroup3(int n, int d, intvec P)
+"USAGE: dyckGroup2(n,d,P); n an integer, d an integer, P an intvec
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - The Dyck group with the following presentation
