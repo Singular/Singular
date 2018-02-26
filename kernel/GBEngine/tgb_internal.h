@@ -13,7 +13,6 @@
 
 //#define TGB_DEBUG
 #define FULLREDUCTIONS
-#define HANS_IDEA
 //#define HALFREDUCTIONS
 //#define HEAD_BIN
 //#define HOMOGENEOUS_EXAMPLE
@@ -327,7 +326,7 @@ enum calc_state
     //SOONTREP
   };
 template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly p, len_type len, set_type setL, polyset set);
-void free_sorted_pair_node(sorted_pair_node* s, ring r);
+void free_sorted_pair_node(sorted_pair_node* s, const ring r);
 ideal do_t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode,int deg_pos);
 void now_t_rep(const int & arg_i, const int & arg_j, slimgb_alg* c);
 
@@ -1422,15 +1421,18 @@ template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly
   len=i;
   bool dense=true;
   if (max_density<0.3) dense=false;
-  if (dense){
+  if (dense)
+  {
     SparseRow<number_type>* res=noro_red_to_non_poly_dense(mon,len,cache);
     omfree(mon);
     return res;
-  } else   {
-      SparseRow<number_type>* res=noro_red_to_non_poly_sparse(mon,len,cache);
-      omfree(mon);
-      return res;
-    }
+  }
+  else
+  {
+    SparseRow<number_type>* res=noro_red_to_non_poly_sparse(mon,len,cache);
+    omfree(mon);
+    return res;
+  }
   //in the loop before nIrreducibleMonomials increases, so position here is important
 
 }

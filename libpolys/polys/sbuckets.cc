@@ -116,11 +116,7 @@ void sBucketDeleteAndDestroy(sBucket_pt *bucket_pt)
   int i;
   for (i=0; i<= bucket->max_bucket; i++)
   {
-
-    if (bucket->buckets[i].p != NULL)
-    {
-      p_Delete(&(bucket->buckets[i].p), bucket->bucket_ring);
-    }
+    p_Delete(&(bucket->buckets[i].p), bucket->bucket_ring);
   }
   omFreeBin(bucket, sBucket_bin);
   *bucket_pt = NULL;

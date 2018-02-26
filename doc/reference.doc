@@ -5510,9 +5510,14 @@ shows correct usage in error messages (set by default).
 @item @tab @tab @tab
 @item @tab @code{slimgb}
 @tab @code{M[n,m]} @tab parallel reduction of n elements with m non-zero output elements
+@item @tab @tab @code{v} @tab candidate for postponing, need to canonicalize
 @item @tab @tab @code{.} @tab postponed a reduction of a pair/S-polynomial
 @item @tab @tab @code{b} @tab exchange of a reductor by a 'better' one
 @item @tab @tab @code{e} @tab a new reductor with non-minimal leading term
+@item @tab @tab @code{r} @tab redTail reduction
+@item @tab @tab @code{n} @tab no redTail reduction
+@item @tab @tab @code{B} @tab resort pairs
+@item @tab @tab @code{C} @tab slimgb_alg::cleanDegs
 @item @tab @tab @code{(n)} @tab n critical pairs are still to be reduced
 @item @tab @tab d @tab the maximal degree of the leading terms is currently d
 @item @tab @tab @tab

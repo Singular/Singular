@@ -792,7 +792,7 @@ sorted_pair_node **spn_merge (sorted_pair_node ** p, int pn,
     memmove (p + a[i] + (1 + i), p + a[i], size);
     p[a[i] + i] = q[i];
   }
-  omfree (a);
+  omFree (a);
   return p;
 }
 
@@ -899,7 +899,7 @@ BOOLEAN good_has_t_rep (int i, int j, slimgb_alg * c)
       return TRUE;
     }
   }
-  omfree (i_con);
+  omFree (i_con);
 
   return FALSE;
 }
@@ -1156,7 +1156,7 @@ static int *make_connections (int from, int to, poly bound, slimgb_alg * c)
           {
             connected[connected_length] = -1;
           }
-          omfree (cans);
+          omFree (cans);
           return connected;
         }
         if((last_cans_pos == from) || (last_cans_pos == to))
@@ -1197,7 +1197,7 @@ static int *make_connections (int from, int to, poly bound, slimgb_alg * c)
   {
     connected[connected_length] = -1;
   }
-  omfree (cans);
+  omFree (cans);
   return connected;
 }
 
@@ -1284,8 +1284,8 @@ static void replace_pair (int &i, int &j, slimgb_alg * c)
   }
 
   //can also try dependend search
-  omfree (i_con);
-  omfree (j_con);
+  omFree (i_con);
+  omFree (j_con);
   return;
 }
 
@@ -1753,7 +1753,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
   //  Print("i:%d,spc_final:%d",i,spc_final);
 
   assume (spc_final <= spc);
-  omfree (nodes);
+  omFree (nodes);
   nodes = NULL;
 
   add_to_reductors (c, h, c->lengths[c->n - 1], ecart, TRUE);
@@ -1825,7 +1825,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
       spn_merge (c->apairs, c->pair_top + 1, nodes_final, spc_final, c);
     c->pair_top += spc_final;
     clean_top_of_pair_list (c);
-    omfree (nodes_final);
+    omFree (nodes_final);
     return NULL;
   }
   {
@@ -2173,9 +2173,9 @@ static void mass_add (poly * p, int pn, slimgb_alg * c)
   c->apairs = spn_merge (c->apairs, c->pair_top + 1, big_sbuf, sum, c);
   c->pair_top += sum;
   clean_top_of_pair_list (c);
-  omfree (big_sbuf);
-  omfree (sbuf);
-  omfree (ibuf);
+  omFree (big_sbuf);
+  omFree (sbuf);
+  omFree (ibuf);
   //omfree(buf);
 #ifdef TGB_DEBUG
   int z;
@@ -2663,10 +2663,10 @@ void noro_step (poly * p, int &pn, slimgb_alg * c)
   //    Print("actual number of columns:%i\n",nterms);
   int rank = reduced_c;
   linalg_step_modp (reduced, p, rank, terms, nterms, c);
-  omfree (terms);
+  omFree (terms);
 
   pn = rank;
-  omfree (reduced);
+  omFree (reduced);
 
   if(TEST_OPT_PROT)
     PrintS ("\n");
@@ -2699,7 +2699,7 @@ static void go_on (slimgb_alg * c)
   if((use_noro) || (c->use_noro_last_block))
     max_pairs = bundle_size_noro;
 #endif
-  poly *p = (poly *) omalloc ((max_pairs + 1) * sizeof (poly)); //nullterminated
+  poly *p = (poly *) omAlloc ((max_pairs + 1) * sizeof (poly)); //nullterminated
 
   int curr_deg = -1;
   while(i < max_pairs)
@@ -2774,7 +2774,7 @@ static void go_on (slimgb_alg * c)
 //  pre_comp(p,i,c);
   if(i == 0)
   {
-    omfree (p);
+    omFree (p);
     return;
   }
 #ifdef TGB_RESORT_PAIRS
@@ -2792,7 +2792,7 @@ static void go_on (slimgb_alg * c)
     int pn = i;
     if(pn == 0)
     {
-      omfree (p);
+      omFree (p);
       return;
     }
     {
@@ -2818,7 +2818,7 @@ static void go_on (slimgb_alg * c)
     //  Print("reported rank:%i\n",pn);
     //}
     mass_add (p, pn, c);
-    omfree (p);
+    omFree (p);
     return;
     /*if (TEST_OPT_PROT)
        for(j=0;j<pn;j++)
@@ -2827,7 +2827,7 @@ static void go_on (slimgb_alg * c)
        } */
   }
 #endif
-  red_object *buf = (red_object *) omalloc (i * sizeof (red_object));
+  red_object *buf = (red_object *) omAlloc (i * sizeof (red_object)); /*i>0*/
   for(j = 0; j < i; j++)
   {
     p_Test (p[j], c->r);
@@ -2840,7 +2840,7 @@ static void go_on (slimgb_alg * c)
     buf[j].initial_quality = buf[j].guess_quality (c);
     assume (buf[j].initial_quality >= 0);
   }
-  omfree (p);
+  omFree (p);
   qsort (buf, i, sizeof (red_object), red_object_better_gen);
 //    Print("\ncurr_deg:%i\n",curr_deg);
   if(TEST_OPT_PROT)
@@ -2918,8 +2918,8 @@ static void go_on (slimgb_alg * c)
     //sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
   }
   mass_add (add_those, i, c);
-  omfree (add_those);
-  omfree (buf);
+  omFree (add_those);
+  omFree (buf);
 
   if(TEST_OPT_PROT)
     Print ("(%d)", c->pair_top + 1);
@@ -3106,12 +3106,12 @@ void slimgb_alg::introduceDelayedPairs (poly * pa, int s)
   if(s == 0)
     return;
   sorted_pair_node **si_array =
-    (sorted_pair_node **) omalloc (s * sizeof (sorted_pair_node *));
+    (sorted_pair_node **) omAlloc (s * sizeof (sorted_pair_node *));
 
   for(int i = 0; i < s; i++)
   {
     sorted_pair_node *si =
-      (sorted_pair_node *) omalloc (sizeof (sorted_pair_node));
+      (sorted_pair_node *) omAlloc (sizeof (sorted_pair_node));
     si->i = -1;
     si->j = -2;
     poly p = pa[i];
@@ -3134,7 +3134,7 @@ void slimgb_alg::introduceDelayedPairs (poly * pa, int s)
   qsort (si_array, s, sizeof (sorted_pair_node *), tgb_pair_better_gen2);
   apairs = spn_merge (apairs, pair_top + 1, si_array, s, this);
   pair_top += s;
-  omfree (si_array);
+  omFree (si_array);
 }
 
 slimgb_alg::slimgb_alg (ideal I, int syz_comp, BOOLEAN F4, int deg_pos)
@@ -3202,7 +3202,7 @@ slimgb_alg::slimgb_alg (ideal I, int syz_comp, BOOLEAN F4, int deg_pos)
   max_pairs = 5 * IDELEMS (I);
 
   apairs =
-    (sorted_pair_node **) omalloc (sizeof (sorted_pair_node *) * max_pairs);
+    (sorted_pair_node **) omAlloc (sizeof (sorted_pair_node *) * max_pairs);
   pair_top = -1;
 
   int n = IDELEMS (I);
@@ -3211,13 +3211,13 @@ slimgb_alg::slimgb_alg (ideal I, int syz_comp, BOOLEAN F4, int deg_pos)
 
   i = 0;
   this->n = 0;
-  T_deg = (int *) omalloc (n * sizeof (int));
+  T_deg = (int *) omAlloc (n * sizeof (int));
   if(eliminationProblem)
-    T_deg_full = (int *) omalloc (n * sizeof (int));
+    T_deg_full = (int *) omAlloc (n * sizeof (int));
   else
     T_deg_full = NULL;
-  tmp_pair_lm = (poly *) omalloc (n * sizeof (poly));
-  tmp_spn = (sorted_pair_node **) omalloc (n * sizeof (sorted_pair_node *));
+  tmp_pair_lm = (poly *) omAlloc (n * sizeof (poly));
+  tmp_spn = (sorted_pair_node **) omAlloc (n * sizeof (sorted_pair_node *));
   lm_bin = omGetSpecBin (POLYSIZE + (r->ExpL_Size) * sizeof (long));
 #ifdef HEAD_BIN
   HeadBin = omGetSpecBin (POLYSIZE + (currRing->ExpL_Size) * sizeof (long));
@@ -3226,17 +3226,17 @@ slimgb_alg::slimgb_alg (ideal I, int syz_comp, BOOLEAN F4, int deg_pos)
 #ifndef HAVE_BOOST
 #ifdef USE_STDVECBOOL
 #else
-  h = omalloc (n * sizeof (char *));
+  h = omAlloc (n * sizeof (char *));
 
   states = (char **) h;
 #endif
 #endif
-  h = omalloc (n * sizeof (int));
+  h = omAlloc (n * sizeof (int));
   lengths = (int *) h;
   weighted_lengths = (wlen_type *) omAllocAligned (n * sizeof (wlen_type));
   gcd_of_terms = (poly *) omAlloc (n * sizeof (poly));
 
-  short_Exps = (long *) omalloc (n * sizeof (long));
+  short_Exps = (long *) omAlloc (n * sizeof (long));
   if(F4_mode)
     S = idInit (n, I->rank);
   else
@@ -3330,7 +3330,7 @@ slimgb_alg::~slimgb_alg ()
 
   if(!(completed))
   {
-    poly *add = (poly *) omalloc ((pair_top + 2) * sizeof (poly));
+    poly *add = (poly *) omAlloc ((pair_top + 2) * sizeof (poly));
     int piter;
     int pos = 0;
     for(piter = 0; piter <= pair_top; piter++)
@@ -3373,7 +3373,7 @@ slimgb_alg::~slimgb_alg ()
     pDelete (&(c->to_destroy->p));
     poly_list_node *old = c->to_destroy;
     c->to_destroy = c->to_destroy->next;
-    omfree (old);
+    omFree (old);
   }
   while(c->F)
   {
@@ -3381,11 +3381,11 @@ slimgb_alg::~slimgb_alg ()
     {
       pDelete (&(c->F->mp[i].m));
     }
-    omfree (c->F->mp);
+    omFree (c->F->mp);
     c->F->mp = NULL;
     mp_array_list *old = c->F;
     c->F = c->F->next;
-    omfree (old);
+    omFree (old);
   }
   while(c->F_minus)
   {
@@ -3393,35 +3393,34 @@ slimgb_alg::~slimgb_alg ()
     {
       pDelete (&(c->F_minus->p[i]));
     }
-    omfree (c->F_minus->p);
+    omFree (c->F_minus->p);
     c->F_minus->p = NULL;
     poly_array_list *old = c->F_minus;
     c->F_minus = c->F_minus->next;
-    omfree (old);
+    omFree (old);
   }
 #ifndef HAVE_BOOST
 #ifndef USE_STDVECBOOL
   for(int z = 1 /* zero length at 0 */ ; z < c->n; z++)
   {
-    omfree (c->states[z]);
+    omFree (c->states[z]);
   }
-  omfree (c->states);
+  omFree (c->states);
 #endif
 #endif
 
-  omfree (c->lengths);
-  omfree (c->weighted_lengths);
+  omFree (c->lengths);
+  omFree (c->weighted_lengths);
   for(int z = 0; z < c->n; z++)
   {
     pDelete (&c->tmp_pair_lm[z]);
-    omfree (c->tmp_spn[z]);
+    omFree (c->tmp_spn[z]);
   }
-  omfree (c->tmp_pair_lm);
-  omfree (c->tmp_spn);
+  omFree (c->tmp_pair_lm);
+  omFree (c->tmp_spn);
 
-  omfree (c->T_deg);
-  if(c->T_deg_full)
-    omfree (c->T_deg_full);
+  omFree (c->T_deg);
+  omfree (c->T_deg_full); /*c->T_deg_full my be NULL*/
 
   omFree (c->strat->ecartS);
   omFree (c->strat->sevS);
@@ -3439,9 +3438,9 @@ slimgb_alg::~slimgb_alg ()
     if(c->gcd_of_terms[i])
       pDelete (&(c->gcd_of_terms[i]));
   }
-  omfree (c->gcd_of_terms);
+  omFree (c->gcd_of_terms);
 
-  omfree (c->apairs);
+  omFree (c->apairs);
   if(TEST_OPT_PROT)
   {
     //Print("calculated %d NFs\n",c->normal_forms);
@@ -3507,7 +3506,7 @@ slimgb_alg::~slimgb_alg ()
       }
     }
   }
-  omfree (c->short_Exps);
+  omFree (c->short_Exps);
 
   ideal I = c->S;
   IDELEMS (I) = c->n;
@@ -3916,11 +3915,11 @@ state_is (calc_state state, const int &arg_i, const int &arg_j,
     return (c->states[arg_j][arg_i] == state);
 }
 
-void free_sorted_pair_node (sorted_pair_node * s, ring r)
+void free_sorted_pair_node (sorted_pair_node * s, const ring r)
 {
   if(s->i >= 0)
     p_Delete (&s->lcm_of_lm, r);
-  omfree (s);
+  omFree (s);
 }
 
 static BOOLEAN
@@ -4627,14 +4626,14 @@ static void sort_region_down (red_object * los, int l, int u, slimgb_alg * /*c*/
       j--;
     }
   }
-  omfree (los_region);
-  omfree (new_indices);
+  omFree (los_region);
+  omFree (new_indices);
 }
 
 //assume that los is ordered ascending by leading term, all non zero
 static void multi_reduction (red_object * los, int &losl, slimgb_alg * c)
 {
-  poly *delay = (poly *) omalloc (losl * sizeof (poly));
+  poly *delay = (poly *) omAlloc (losl * sizeof (poly));
   int delay_s = 0;
   //initialize;
   assume (c->strat->sl >= 0);
@@ -4664,7 +4663,7 @@ static void multi_reduction (red_object * los, int &losl, slimgb_alg * c)
        && (lies_in_last_dp_block (los[curr_pos].p, c)))
     {
       int pn_noro = curr_pos + 1;
-      poly *p_noro = (poly *) omalloc (pn_noro * sizeof (poly));
+      poly *p_noro = (poly *) omAlloc (pn_noro * sizeof (poly));
       for(i = 0; i < pn_noro; i++)
       {
         int dummy_len;
@@ -4810,7 +4809,7 @@ static void multi_reduction (red_object * los, int &losl, slimgb_alg * c)
      qsort(pairs,delay_s,sizeof(sorted_pair_node*),tgb_pair_better_gen2);
      c->apairs=spn_merge(c->apairs,c->pair_top+1,pairs,delay_s,c);
      c->pair_top+=delay_s; */
-  omfree (delay);
+  omFree (delay);
   //omfree(pairs);
   return;
 }
