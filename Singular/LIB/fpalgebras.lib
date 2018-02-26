@@ -641,11 +641,14 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 ////////////////////////////////////////////////////////////////////
 
 proc dyckGrp1(int n, int d, intvec P)
-"
-The Dyck group with the following presentation
-< x_1, x_2, ... , x_n | (x_1)^p1 = (x_2)^p2 = ... = (x_n)^pn = x_1 * x_2 * ... * x_n = 1 >
-negative exponents are allowed
-representation in the form x_i^p_i - x_(i+1)^p_(i+1)
+"USAGE: dyckGrp1(n,d,P); n an integer, d an integer, P an intvec
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - The Dyck group with the following presentation
+@*      < x_1, x_2, ... , x_n | (x_1)^p1 = (x_2)^p2 = ... = (x_n)^pn = x_1 * x_2 * ... * x_n = 1 >
+@*    - negative exponents are allowed
+@*    - representation in the form x_i^p_i - x_(i+1)^p_(i+1)
+@*    - d gives the degreebound for the Letterplace ring
 "
 {
  int baseringdef,i,j;
@@ -681,11 +684,14 @@ representation in the form x_i^p_i - x_(i+1)^p_(i+1)
 
 
 proc dyckGrp2(int n, int d, intvec P)
-"
-The Dyck group with the following presentation
-< x_1, x_2, ... , x_n | (x_1)^p1 = (x_2)^p2 = ... = (x_n)^pn = x_1 * x_2 * ... * x_n = 1 >
-negative exponents are allowed
-representation in the form x_i^p_i - 1
+"USAGE: dyckGrp2(n,d,P); n an integer, d an integer, P an intvec
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - The Dyck group with the following presentation
+@*      < x_1, x_2, ... , x_n | (x_1)^p1 = (x_2)^p2 = ... = (x_n)^pn = x_1 * x_2 * ... * x_n = 1 >
+@*    - negative exponents are allowed
+@*    - representation in the form x_i^p_i - 1
+@*    - d gives the degreebound for the Letterplace ring
 "
 {
  int baseringdef,i,j;
@@ -722,11 +728,14 @@ representation in the form x_i^p_i - 1
 
 
 proc dyckGrp3(int n, int d, intvec P)
-"
-The Dyck group with the following presentation
-< x_1, x_2, ... , x_n | (x_1)^p1 = (x_2)^p2 = ... = (x_n)^pn = x_1 * x_2 * ... * x_n = 1 >
-only positive exponents are allowed
-no inverse generators needed
+"USAGE: dyckGrp2(n,d,P); n an integer, d an integer, P an intvec
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - The Dyck group with the following presentation
+@*      < x_1, x_2, ... , x_n | (x_1)^p1 = (x_2)^p2 = ... = (x_n)^pn = x_1 * x_2 * ... * x_n = 1 >
+@*    - only positive exponents are allowed
+@*    - no inverse generators needed
+@*    - d gives the degreebound for the Letterplace ring
 "
 {
  int baseringdef,i,j;
@@ -766,12 +775,16 @@ no inverse generators needed
 // from Grischa Studzinski /////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 
-proc fibGroup(int m, int d)
-"The Fibonacci group F(2, m) with the following presentation
-< x_1, x_2, ... , x_m | x_i * x_(i + 1) = x_(i + 2) >
-TODO: basefield Q oder F2?
-inverse Elemente!
+proc fibonacciGroup(int m, int d)
+"USAGE: fibonacciGroup(m,d); m an integer, d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - The Fibonacci group F(2, m) with the following presentation
+@*      < x_1, x_2, ... , x_m | x_i * x_(i + 1) = x_(i + 2) >
+@*    - d gives the degreebound for the Letterplace ring
 "
+// TODO: basefield Q oder F2?
+// TODO: inverse Elemente!
 {
  if (m < 3) {ERROR("At least three generators are required!");}
  if (d < 2) {ERROR("Degree bound must be at least 2!");}
@@ -809,14 +822,20 @@ inverse Elemente!
 // from Grischa Studzinski /////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 
-proc tetrahedron (int g, int d)
-"The following examples are found in 
+proc tetrahedronGroup(int g, int d)
+"USAGE: tetrahedronGroup(g,d); g an integer, d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - g gives the number of the example
+@*    - d gives the degreebound for the Letterplace ring
+@*
+The examples are found in
 Classification of the finite generalized tetrahedron groups
 by Gerhard Rosenberger and Martin Scheer.
-The following 5 examples are denoted in Proposition 1.9 and concern
+The 5 examples are denoted in Proposition 1.9 and concern
 finite generalized tetrahedron group in the Tsarnarov-case, which are
 not equivalent to a presentation for an ordinary tetrahedron group.
-g gives the number of the example
+@*
 "
 {
  if (g < 1 || g > 5) {ERROR("There are only 5 examples!");}
@@ -863,12 +882,18 @@ g gives the number of the example
 // from Grischa Studzinski /////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 
-proc trianGrp(int g, int d)
-"The following examples are found in 
+proc triangularGroup(int g, int d)
+"USAGE: triangularGroup(g,d); g an integer, d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - g gives the number of the example
+@*    - d gives the degreebound for the Letterplace ring
+@*
+The examples are found in
 Classification of the finite generalized tetrahedron groups
 by Gerhard Rosenberger and Martin Scheer.
-Triangle groups, as in theorem 2.12
-g is the number of the example
+The 14 examples are denoted in theorem 2.12
+@*
 "
 {
  if (g < 1 || g > 14) {ERROR("There are only 14 examples!");}
