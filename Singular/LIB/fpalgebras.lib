@@ -35,12 +35,12 @@ NOTE: -the ring contains the ideal I, which contains the required relations
 {
   int isGroup = 0;
   if (size(#) > 0) {isGroup = #[1];}
- 
-  if (isGroup <= 0)
+
+  if (isGroup != 0)
   {
    int baseringdef;
    if (defined(basering)) // if a basering is defined, it should be saved for later use
-  {
+   {
     def save = basering;
     baseringdef = 1;
    }
@@ -120,7 +120,7 @@ NOTE: -the ring contains the ideal I, which contains the required relations
 //< a, b | a^m = b^n = 1 >
 
 proc baumslag(int m, int n, int d)
-"USAGE:baumslag(m,n,d)
+"USAGE: baumslag(m,n,d)
 RETURN: a ring containing an ideal I with the required relations 
 "
 {
@@ -146,9 +146,12 @@ RETURN: a ring containing an ideal I with the required relations
 ////////////////////////////////////////////////////////////////////
 
 proc cgP1(int d)
-"
-p1 group with the following presentation
-< x, y | [x, y] = 1 >
+"USAGE: cgP1(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p1 group with the following presentation
+@*      < x, y | [x, y] = 1 >
+@*    -d gives the degreebound for the Letterplace ring
 "
 {
  if (d < 2){ERROR("Degreebound is to small for choosen example!");}
@@ -197,9 +200,12 @@ p1 group with the following presentation
 /* } */
 
 proc cgPM(int d)
-"
-pm group with the following presentation
-< x, y, m | [x, y] = m^2 = 1, m^-1*x*m = x, m^-1*y*m = y^-1 >
+"USAGE: cgPM(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - pm group with the following presentation
+@*      < x, y, m | [x, y] = m^2 = 1, m^-1*x*m = x, m^-1*y*m = y^-1 >
+@*    - d gives the degreebound for the Letterplace ring
 "
 {
  if (d < 3){ERROR("Degreebound is to small for choosen example!");}
@@ -222,9 +228,12 @@ X(1)*x(2)-1, Y(1)*y(2)-1,  y(1)*Y(2)-1;
 }
 
 proc cgPG(int d)
-"
-pg group with the following presentation
-< x, y, t | [x, y] = 1, t^2 = x, t^-1*y*t = y^-1 >
+"USAGE: cgPG(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - pg group with the following presentation
+@*      < x, y, t | [x, y] = 1, t^2 = x, t^-1*y*t = y^-1 >
+@*    - d gives the degreebound for the Letterplace ring
 "
 {
  if (d < 3){ERROR("Degreebound is to small for choosen example!");}
@@ -248,10 +257,12 @@ Y(1)*y(2)-1,  y(1)*Y(2)-1, t(1)*T(2)-1, T(1)*t(2)-1;
 
 
 proc cgP2MM(int d)
-"
-p2mm group with the following presentation
-< x, y, p, q | [x, y] = [p, q] = p^2 = q^2 = 1, p^-1*x*p = x, q^-1*x*q = x^-1, p^-1*y*p = y^-1, q^-1*y*q = y >	
-Note: More redundandent relations may be added to I
+"USAGE: cgP2(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p2mm group with the following presentation
+@*      < x, y, p, q | [x, y] = [p, q] = p^2 = q^2 = 1, p^-1*x*p = x, q^-1*x*q = x^-1, p^-1*y*p = y^-1, q^-1*y*q = y >
+@*    - d gives the degreebound for the Letterplace ring
 "
 {
  if (d < 3){ERROR("Degreebound is to small for choosen example!");}
@@ -275,9 +286,12 @@ Note: More redundandent relations may be added to I
 }
 
 proc cgP2(int d)
-"
-p2 group with the following presentation
-< x, y, m, t | [x, y] = t^2 = 1, m^2 = y, t^-1*x*t = x, m^-1*x*m = x^-1, t^-1*y*t = y^-1, t^-1*m*t = m^-1 >
+"USAGE: cgP2(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p2 group with the following presentation
+@*      < x, y, m, t | [x, y] = t^2 = 1, m^2 = y, t^-1*x*t = x, m^-1*x*m = x^-1, t^-1*y*t = y^-1, t^-1*m*t = m^-1 >
+@*    - d gives the degreebound for the Letterplace ring
 "
 {
  if (d < 3){ERROR("Degreebound is to small for choosen example!");}
@@ -301,9 +315,12 @@ m(1)*M(2)-1, M(1)*m(2)-1;
 }
 
 proc cgP2GG(int d)
-"
-p2gg group with the following presentation
-< x, y, u, v | [x, y] = (u*v)^2 = 1, u^2 = x, v^2 = y, v^-1*x*v = x^-1, u^-1*y*u = y^-1 >
+"USAGE: cgP2(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p2gg group with the following presentation
+@*      < x, y, u, v | [x, y] = (u*v)^2 = 1, u^2 = x, v^2 = y, v^-1*x*v = x^-1, u^-1*y*u = y^-1 >
+@*    - d gives the degreebound for the Letterplace ring
 "
 {
  if (d < 4){ERROR("Degreebound is to small for choosen example!");}
@@ -327,9 +344,12 @@ X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1, u(1)*U(2)-1, U(1)*u(2)-1, 
 }
 
 proc cgCM(int d)
-"
-cm group with the following presentation
-< x, y, t | [x, y] = t^2 = 1, t^-1*x*t = x*y, t^-1*y*t = y^-1 >	  
+"USAGE: cgCM(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - cm group with the following presentation
+@*      < x, y, t | [x, y] = t^2 = 1, t^-1*x*t = x*y, t^-1*y*t = y^-1 >	  
+@*    - d gives the degreebound for the Letterplace ring
 "
 {
  if (d < 3){ERROR("Degreebound is to small for choosen example!");}
@@ -353,9 +373,12 @@ X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
 }
 
 proc cgC2MM(int d)
-"
-c2mm group with the following presentation
-< x, y, m, r | [x, y] = m^2 = r^2 = 1, m^-1*y*m = y^-1, m^-1*x*m = x*y, r^-1*y*r = y^-1, r^-1*x*r = x^-1, m^-1*r*m = r^-1 >
+"USAGE: cgC2(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - c2mm group with the following presentation
+@*      < x, y, m, r | [x, y] = m^2 = r^2 = 1, m^-1*y*m = y^-1, m^-1*x*m = x*y, r^-1*y*r = y^-1, r^-1*x*r = x^-1, m^-1*r*m = r^-1 >
+@*    - d gives the degreebound for the Letterplace ring
 "
 {
  if (d < 3){ERROR("Degreebound is to small for choosen example!");}
@@ -379,9 +402,12 @@ X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
 }
 
 proc cgP4(int d)
-"
-p4 group with the following presentation
-< x, y, r | [x, y] = r^4 = 1, r^-1*x*r = x^-1, r^-1*x*r = y >	
+"USAGE: cgP4(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p4 group with the following presentation
+@*      < x, y, r | [x, y] = r^4 = 1, r^-1*x*r = x^-1, r^-1*x*r = y >	
+@*    - d gives the degreebound for the Letterplace ring
 "
 {
  if (d < 5){ERROR("Degreebound is to small for choosen example!");}
@@ -405,9 +431,12 @@ X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
 }
 
 proc cgP4MM(int d)
-"
-p4mm group with the following presentation
-< x, y, r, m | [x, y] = r^4 = m^2 = 1, r^-1*y*r = x^-1, r^-1*x*r = y, m^-1*x*m = y, m^-1*r*m = r^-1 >
+"USAGE: cgP4(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p4mm group with the following presentation
+@*      < x, y, r, m | [x, y] = r^4 = m^2 = 1, r^-1*y*r = x^-1, r^-1*x*r = y, m^-1*x*m = y, m^-1*r*m = r^-1 >
+@*    - d gives the degreebound for the Letterplace ring
 "
 {
  if (d < 5){ERROR("Degreebound is to small for choosen example!");}
@@ -431,9 +460,12 @@ X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
 }
 
 proc cgP4GM(int d)
-"
-p4gm group with the following presentation
-< x, y, r, t | [x, y] = r^4 = t^2 = 1, r^-1*y*r = x^-1, r^-1*x*r = y, t^-1*x*t = y, t^-1*r*t = x^-1*r^-1>
+"USAGE: cgP4(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p4gm group with the following presentation
+@*      < x, y, r, t | [x, y] = r^4 = t^2 = 1, r^-1*y*r = x^-1, r^-1*x*r = y, t^-1*x*t = y, t^-1*r*t = x^-1*r^-1>
+@*    - d gives the degreebound for the Letterplace ring
 "
 {
  if (d < 5){ERROR("Degreebound is to small for choosen example!");}
@@ -457,9 +489,12 @@ p4gm group with the following presentation
 }
 
 proc cgP3(int d)
-"
-p3 group with the following presentation
-< x, y, r | [x, y] = r^3 = 1, r^-1*x*r = x^-1*y, r^-1*y*r = x^-1>
+"USAGE: cgP3(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p3 group with the following presentation
+@*      < x, y, r | [x, y] = r^3 = 1, r^-1*x*r = x^-1*y, r^-1*y*r = x^-1>
+@*    - d gives the degreebound for the Letterplace ring
 "
 {
  if (d < 4){ERROR("Degreebound is to small for choosen example!");}
@@ -482,9 +517,12 @@ p3 group with the following presentation
 }
 
 proc cgP31M(int d)
-"
-p31m group with the following presentation
-< x, y, r, t | [x, y] = r^2 = t^2 = (t*r)^3 = 1, r^-1*x*r = x, t^-1*y*t = y, t^-1*x*t = x^-1*y, r^-1*y*r = x*y^-1 >
+"USAGE: cgP3(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p31m group with the following presentation
+@*      < x, y, r, t | [x, y] = r^2 = t^2 = (t*r)^3 = 1, r^-1*x*r = x, t^-1*y*t = y, t^-1*x*t = x^-1*y, r^-1*y*r = x*y^-1 >
+@*    - d gives the degreebound for the Letterplace ring
 "
 {
  if (d < 6){ERROR("Degreebound is to small for choosen example!");}
@@ -510,9 +548,12 @@ p31m group with the following presentation
 }
 
 proc cgP3M1(int d)
-"
-p3m1 group with the following presentation
-< x, y, r, m | [x, y] = r^3 = m^2 = 1, m^-1*r*m = r^2, r^-1*x*r = x^-1*y, r^-1*y*r = x^-1, m^-1*x*m = x^-1, m^-1*y*m = x^-1*y >
+"USAGE: cgP3(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p3m1 group with the following presentation
+@*      < x, y, r, m | [x, y] = r^3 = m^2 = 1, m^-1*r*m = r^2, r^-1*x*r = x^-1*y, r^-1*y*r = x^-1, m^-1*x*m = x^-1, m^-1*y*m = x^-1*y >
+@*    - d gives the degreebound for the Letterplace ring
 "
 {
  if (d < 4){ERROR("Degreebound is to small for choosen example!");}
@@ -536,9 +577,12 @@ p3m1 group with the following presentation
 }
 
 proc cgP6(int d)
-"
-p6 group with the following presentation
-< x, y, r | [x, y] = r^6 = 1, r^-1*x*r = y, r^-1*y*r = x^-1*y>
+"USAGE: cgP6(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p6 group with the following presentation
+@*      < x, y, r | [x, y] = r^6 = 1, r^-1*x*r = y, r^-1*y*r = x^-1*y>
+@*    - d gives the degreebound for the Letterplace ring
 "
 {
  if (d < 7){ERROR("Degreebound is to small for choosen example!");}
@@ -562,9 +606,12 @@ p6 group with the following presentation
 }
 
 proc cgP6MM(int d)
-"
-p6mm group with the following presentation
-< x, y, r, m | [x, y] = r^6 = m^2 = 1, r^-1*y*r = x^-1*y, r^-1*x*r = y, m^-1*x*m = x^-1, m^-1*y*m = x^-1*y, m^-1*r*m = r^-1*y>	
+"USAGE: cgP6(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p6mm group with the following presentation
+@*      < x, y, r, m | [x, y] = r^6 = m^2 = 1, r^-1*y*r = x^-1*y, r^-1*x*r = y, m^-1*x*m = x^-1, m^-1*y*m = x^-1*y, m^-1*r*m = r^-1*y>
+@*    - d gives the degreebound for the Letterplace ring
 "
 {
  if (d < 7){ERROR("Degreebound is to small for choosen example!");}
