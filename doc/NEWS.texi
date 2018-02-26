@@ -20,6 +20,13 @@
 @end ifset
 
 @heading News for version @value{VERSION}
+Changed libraries:
+@itemize
+@item schreyer.lib: deprecated 
+@item grobcov.lib: small bug fix (@nref{grobcov_lib})
+@end itemize
+
+@heading News for version 4-1-1
 
 New syntax:
 @itemize
