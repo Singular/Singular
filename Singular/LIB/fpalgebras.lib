@@ -25,12 +25,12 @@ LIB "general.lib";
 ////////////////////////////////////////////////////////////////////
 
 proc baumslagSolitar(int n,int m,int d,list #)
-"USAGE: baumslagSolitar(m,n,d[,IsGroup]);
+"USAGE: baumslagSolitar(m,n,d[,IsGroup]); n an integer, m an integer, d an integer, IsGroup an optional integer
 RETURN: ring
-NOTE: -the ring contains the ideal I, which contains the required relations
-@*    -in the group case: A = a^(-1), B = b^(-1)
-@*    -negativ input is only allowed in the group case!
-@*    -d gives a degreebound and must be >m,n
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - in the group case: A = a^(-1), B = b^(-1)
+@*    - negativ input is only allowed in the group case!
+@*    - d gives a degreebound and must be >m,n
 "
 {
   int isGroup = 0;
@@ -120,8 +120,9 @@ NOTE: -the ring contains the ideal I, which contains the required relations
 //< a, b | a^m = b^n = 1 >
 
 proc baumslag(int m, int n, int d)
-"USAGE: baumslag(m,n,d)
-RETURN: a ring containing an ideal I with the required relations 
+"USAGE: baumslag(m,n,d); m an integer, n an integer, d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
 "
 {
  if (m < 0 || n < 0 ) {ERROR("m,n must be non-negativ integers!");}
