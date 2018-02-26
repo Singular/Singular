@@ -1,0 +1,903 @@
+////////////////////////////////////////////////////////////////
+version="version fpalgebras.lib 4.1.1.0 Feb_2018 ";
+category="Noncommutative";
+info="
+LIBRARY: fpalgebras.lib   [TODO]
+AUTHORS: Karim Abou Zeid,       karim.abou.zeid at rwth-aachen.de
+
+Support: Project II.6 in the transregional collaborative research centre
+SFB-TRR 195 'Symbolic Tools in Mathematics and their Application' of the German DFG
+
+OVERVIEW:
+[TODO]
+
+PROCEDURES:
+[TODO]
+";
+
+LIB "freegb.lib";
+LIB "general.lib";
+////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////
+// Baumslag ////////////////////////////////////////////////////////
+// from Grischa Studzinski /////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+proc baumslagSolitar(int n,int m,int d,list #)
+"USAGE: baumslagSolitar(m,n,d[,IsGroup]);
+RETURN: ring
+NOTE: -the ring contains the ideal I, which contains the required relations
+@*    -in the group case: A = a^(-1), B = b^(-1)
+@*    -negativ input is only allowed in the group case!
+@*    -d gives a degreebound and must be >m,n
+"
+{
+  int isGroup = 0;
+  if (size(#) > 0) {isGroup = #[1];}
+ 
+  if (isGroup <= 0)
+  {
+   int baseringdef;
+   if (defined(basering)) // if a basering is defined, it should be saved for later use
+  {
+    def save = basering;
+    baseringdef = 1;
+   }
+   if (m < 0 || n < 0) {ERROR("Exponent can't be negativ in monoid rings!");}
+   if (d < 1 || d < m || d < n) {ERROR("Degree bound must be positiv and greater then m,n!");}
+   int i;
+   ring mr = 0,(a,b),Dp;
+   def Mr = makeLetterplaceRing(d);
+   setring Mr;
+   poly p,q;
+   if (n==0) {p = b(1);}
+   else
+   {
+    p = a(1)*b(2);
+    for (i = 1; i < n; i++) {p = lpMult(a(1),p);}
+   }
+   if (m==0) {q = b(1);}
+   else
+   {
+    q = b(1)*a(2);
+    for (i = 1; i < m; i++) {q = lpMult(q,a(1));}
+   }
+   ideal I = p - q;
+   export(I);
+   if (baseringdef == 1) {setring save;}
+   return(Mr); 
+  }
+  else
+  {
+   int baseringdef;
+   if (defined(basering)) // if a basering is defined, it should be saved for later use
+   {
+    def save = basering;
+    baseringdef = 1;
+   }
+   int i;
+   if (d < 1 || d < absValue(m) || d < absValue(n)) {ERROR("Degree bound must be positiv and greater then |m|,|n|!");}
+   ring gr = 0,(a,b,A,B),Dp;
+   def Gr = makeLetterplaceRing(d);
+   setring Gr;
+   poly p,q;
+   if (n==0) {p = b(1);}
+   else
+   {if (n > 0) 
+    {
+     p = a(1)*b(2);
+     for (i = 1; i < n; i++) {p = lpMult(a(1),p);}
+    }
+    else
+    {
+     p = A(1)*b(2);
+     for (i = 1; i < -n; i++) {p = lpMult(A(1),p);}
+    }
+   }
+   if (m==0) {q = b(1);}
+   else
+   {if (m > 0) 
+    {
+     q = b(1)*a(2);
+     for (i = 1; i < m; i++) {q = lpMult(q,a(1));}
+    }
+    else
+    {
+     q = A(1)*b(2);
+     for (i = 1; i < -m; i++) {q = lpMult(q,A(1));}
+    }
+   }
+   ideal I = p - q, a(1)*A(2) - 1, b(1)*B(2) - 1, a(1)*A(2) - A(1)*a(2), b(1)*B(2) - B(1)*b(2);
+   export(I);
+   if (baseringdef == 1) {setring save;}
+   return(Gr); 
+  }
+}
+
+
+//Baumslag group with the following presentation
+//< a, b | a^m = b^n = 1 >
+
+proc baumslag(int m, int n, int d)
+"USAGE:baumslag(m,n,d)
+RETURN: a ring containing an ideal I with the required relations 
+"
+{
+ if (m < 0 || n < 0 ) {ERROR("m,n must be non-negativ integers!");}
+ if (d < 1 || d < m || d < n) {ERROR("degreebound must be positiv and larger than n and m!");}
+ int i;
+ ring r = 0,(a,b),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ poly p,q;
+ p = 1; q = 1;
+ for (i = 1; i <= m; i++){p = lpMult(p,a(1));}
+ for (i = 1; i <= n; i++){q = lpMult(q,b(1));}
+ ideal I = p-1,q-1;
+ export(I);
+ return(R);
+}
+
+
+////////////////////////////////////////////////////////////////////
+// Crystalographic Groups //////////////////////////////////////////
+// from Grischa Studzinski /////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+proc cgP1(int d)
+"
+p1 group with the following presentation
+< x, y | [x, y] = 1 >
+"
+{
+ if (d < 2){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, X(1)*x(2)-1, x(1)*X(2)-1, y(1)*Y(2)-1, Y(1)*y(2)-1; 
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+// old? there is already another cgP2 proc
+/* proc cgP2(int d) */
+/* " */
+/* p2 group with the following presentation */
+/* < x, y, r | [x, y] = r^2 = 1, r^-1*x*r = x^-1, r^-1*y*r = y^-1 > */
+/* Note: r = r^-1 */
+/* " */
+/* { */
+/*  if (d < 3){ERROR("Degreebound is to small for choosen example!");} */
+ 
+/*  int baseringdef; */
+/*  if (defined(basering)) // if a basering is defined, it should be saved for later use */
+/*  { */
+/*   def save = basering; */
+/*   baseringdef = 1; */
+/*  } */
+/*  ring r = 2,(x,y,r,X,Y),dp; */
+/*  def R = makeLetterplaceRing(d); */
+/*  setring R; */
+/*  ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2), r(1)*r(2)-1, r(1)*x(2)*r(3)-X(1), r(1)*y(2)*r(3)-Y(1),x(1)*X(2)-1, */  
+/* X(1)*x(2)-1, Y(1)*y(2)-1,  y(1)*Y(2)-1; */
+/*  I = simplify(I,2); */
+/*  export(I); */
+/*  if (baseringdef == 1) {setring save;} */
+/*  return(R); */
+/* } */
+
+proc cgPM(int d)
+"
+pm group with the following presentation
+< x, y, m | [x, y] = m^2 = 1, m^-1*x*m = x, m^-1*y*m = y^-1 >
+"
+{
+ if (d < 3){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,m,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-m(1)*m(2), m(1)*m(2)-1, m(1)*x(2)*m(3)-x(1), m(1)*y(2)*m(3)-Y(1),x(1)*X(2)-1,  
+X(1)*x(2)-1, Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+proc cgPG(int d)
+"
+pg group with the following presentation
+< x, y, t | [x, y] = 1, t^2 = x, t^-1*y*t = y^-1 >
+"
+{
+ if (d < 3){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,t,X,Y,T),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, t(1)*t(2) - x(1), T(1)*y(2)*t(3)-Y(1), X(1)*x(2)-1, x(1)*X(2)-1,  
+Y(1)*y(2)-1,  y(1)*Y(2)-1, t(1)*T(2)-1, T(1)*t(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+
+proc cgP2MM(int d)
+"
+p2mm group with the following presentation
+< x, y, p, q | [x, y] = [p, q] = p^2 = q^2 = 1, p^-1*x*p = x, q^-1*x*q = x^-1, p^-1*y*p = y^-1, q^-1*y*q = y >	
+Note: More redundandent relations may be added to I
+"
+{
+ if (d < 3){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,p,q,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, p(1)*q(2)-q(1)*p(2)-1, p(1)*p(2) - 1, q(1)*q(2) - 1, p(1)*y(2)*p(3)-Y(1), p(1)*x(2)*p(3)-x(1), 
+ q(1)*y(2)*q(3)-y(1), q(1)*x(2)*q(3)-X(1), X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1,  x(1)*y(2)-y(1)*x(2)- p(1)*p(2),
+ x(1)*y(2)-y(1)*x(2)- q(1)*q(2), p(1)*p(2)-q(1)*q(2);
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+proc cgP2(int d)
+"
+p2 group with the following presentation
+< x, y, m, t | [x, y] = t^2 = 1, m^2 = y, t^-1*x*t = x, m^-1*x*m = x^-1, t^-1*y*t = y^-1, t^-1*m*t = m^-1 >
+"
+{
+ if (d < 3){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,m,t,X,Y,M),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-t(1)*t(2), m(1)*m(2)-y(1), t(1)*t(2) - 1, t(1)*x(2)*t(3)-x(1), 
+M(1)*x(2)*m(3)-X(1), t(1)*y(2)*t(3)-Y(1), t(1)*m(2)*t(3)-M(1), X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1, 
+m(1)*M(2)-1, M(1)*m(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+proc cgP2GG(int d)
+"
+p2gg group with the following presentation
+< x, y, u, v | [x, y] = (u*v)^2 = 1, u^2 = x, v^2 = y, v^-1*x*v = x^-1, u^-1*y*u = y^-1 >
+"
+{
+ if (d < 4){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,u,v,X,Y,u,v),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-u(1)*v(2)*u(3)*v(4), u(1)*v(2)*u(3)*v(4)-1, u(1)*u(2)-x(1), v(1)*v(2) - y, 
+V(1)*x(2)*v(3)-X(1), U(1)*y(2)*u(3)-Y(1), 
+X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1, u(1)*U(2)-1, U(1)*u(2)-1, v(1)*V(2)-1, V(1)*v(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+proc cgCM(int d)
+"
+cm group with the following presentation
+< x, y, t | [x, y] = t^2 = 1, t^-1*x*t = x*y, t^-1*y*t = y^-1 >	  
+"
+{
+ if (d < 3){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,t,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-t(1)*t(2), t(1)*t(2)-1,  
+t(1)*x(2)*t(3)-x(1)*y(2), t(1)*y(2)*t(3)-Y(1), 
+X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+proc cgC2MM(int d)
+"
+c2mm group with the following presentation
+< x, y, m, r | [x, y] = m^2 = r^2 = 1, m^-1*y*m = y^-1, m^-1*x*m = x*y, r^-1*y*r = y^-1, r^-1*x*r = x^-1, m^-1*r*m = r^-1 >
+"
+{
+ if (d < 3){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,m,r,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-m(1)*m(2), x(1)*y(2)-y(1)*x(2)-r(1)*r(2), m(1)*m(2)-1,  r(1)*r(2)-1, 
+ m(1)*m(2)-r(1)*r(2), m(1)*y(2)*m(3)-Y(1), m(1)*x(2)*m(3)-x(1)*y(2), (1)*y(2)*r(3)-Y(1), r(1)*x(2)*r(3)-X(1), m(1)*r(2)*m(3)-r(1), 
+X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+proc cgP4(int d)
+"
+p4 group with the following presentation
+< x, y, r | [x, y] = r^4 = 1, r^-1*x*r = x^-1, r^-1*x*r = y >	
+"
+{
+ if (d < 5){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,r,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2)*r(3)*r(4), r(1)*r(2)*r(3)*r(4)-1, 
+ r(1)*r(2)*r(3)*x(4)*r(5)-X(1), r(1)*r(2)*r(3)*x(4)*r(5)-y(1), 
+X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+proc cgP4MM(int d)
+"
+p4mm group with the following presentation
+< x, y, r, m | [x, y] = r^4 = m^2 = 1, r^-1*y*r = x^-1, r^-1*x*r = y, m^-1*x*m = y, m^-1*r*m = r^-1 >
+"
+{
+ if (d < 5){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,r,m,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2)*r(3)*r(4),  r(1)*r(2)*r(3)*r(4)-1, 
+ r(1)*r(2)*r(3)*x(4)*r(5)-X(1), r(1)*r(2)*r(3)*x(4)*r(5)-y(1), 
+X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+proc cgP4GM(int d)
+"
+p4gm group with the following presentation
+< x, y, r, t | [x, y] = r^4 = t^2 = 1, r^-1*y*r = x^-1, r^-1*x*r = y, t^-1*x*t = y, t^-1*r*t = x^-1*r^-1>
+"
+{
+ if (d < 5){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,r,t,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2)*r(3)*r(4),  r(1)*r(2)*r(3)*r(4)-1, x(1)*y(2)-y(1)*x(2)-t(1)*t(2),
+ t(1)*t(2)-1,  r(1)*r(2)*r(3)*r(4)-t(1)*t(2),  r(1)*r(2)*r(3)*y(4)*r(5)-X(1), r(1)*r(2)*r(3)*x(4)*r(5)-y(1), 
+ t(1)*r(2)*t(3)-X(1)*r(2)*r(3)*r(4), X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+proc cgP3(int d)
+"
+p3 group with the following presentation
+< x, y, r | [x, y] = r^3 = 1, r^-1*x*r = x^-1*y, r^-1*y*r = x^-1>
+"
+{
+ if (d < 4){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,r,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2)*r(3),  r(1)*r(2)*r(3)-1, 
+  r(1)*r(2)*x(3)*r(4)-X(1)*y(2),  r(1)*r(2)*y(3)*r(4)-X(1), X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+proc cgP31M(int d)
+"
+p31m group with the following presentation
+< x, y, r, t | [x, y] = r^2 = t^2 = (t*r)^3 = 1, r^-1*x*r = x, t^-1*y*t = y, t^-1*x*t = x^-1*y, r^-1*y*r = x*y^-1 >
+"
+{
+ if (d < 6){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,r,t,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2), x(1)*y(2)-y(1)*x(2)-t(1)*t(2), r(1)*r(2)-1, t(1)*t(2)-1,
+ t(1)*r(2)*t(3)*r(4)*t(5)*r(6)-1, r(1)*r(2)-t(1)*t(2),  x(1)*y(2)-y(1)*x(2)-t(1)*r(2)*t(3)*r(4)*t(5)*r(6), 
+ t(1)*r(2)*t(3)*r(4)*t(5)*r(6)-r(1)*r(2), t(1)*r(2)*t(3)*r(4)*t(5)*r(6)-t(1)*t(2),
+ r(1)*x(2)*r(3)-x(1),  t(1)*y(2)*t(3)-y(1), t(1)*x(2)*t(3)-X(1)*y(2), r(1)*y(2)*r(3)-x(1)*Y(2), 
+ X(1)*x(2)-1, x(1)*X(2)-1, Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+proc cgP3M1(int d)
+"
+p3m1 group with the following presentation
+< x, y, r, m | [x, y] = r^3 = m^2 = 1, m^-1*r*m = r^2, r^-1*x*r = x^-1*y, r^-1*y*r = x^-1, m^-1*x*m = x^-1, m^-1*y*m = x^-1*y >
+"
+{
+ if (d < 4){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,r,m,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2)*r(3), x(1)*y(2)-y(1)*x(2)-m(1)*m(2), r(1)*r(2)*r(3)-1, m(1)*m(2)-1,
+ r(1)*r(2)*r(3)-m(1)*m(2),  m(1)*r(2)*m(3)-r(1)*r(2), r(1)*r(2)*x(3)*r(4)-X(1)*y(2), r(1)*r(2)*y(3)*r(4)-X(1),m(1)*x(2)*m(3)-X(1),
+ m(1)*y(2)*m(3)-X(1)*y(2), X(1)*x(2)-1, x(1)*X(2)-1, Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+proc cgP6(int d)
+"
+p6 group with the following presentation
+< x, y, r | [x, y] = r^6 = 1, r^-1*x*r = y, r^-1*y*r = x^-1*y>
+"
+{
+ if (d < 7){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,r,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2)*r(3)*r(4)*r(5)*r(6), r(1)*r(2)*r(3)*r(4)*r(5)*r(6)-1,
+ r(1)*r(2)*r(3)*r(4)*r(5)*x(6)*r(7)-y(1), r(1)*r(2)*r(3)*r(4)*r(5)*y(6)*r(7)-X(1)*y(2),
+ X(1)*x(2)-1, x(1)*X(2)-1, Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+proc cgP6MM(int d)
+"
+p6mm group with the following presentation
+< x, y, r, m | [x, y] = r^6 = m^2 = 1, r^-1*y*r = x^-1*y, r^-1*x*r = y, m^-1*x*m = x^-1, m^-1*y*m = x^-1*y, m^-1*r*m = r^-1*y>	
+"
+{
+ if (d < 7){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,r,m,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2)*r(3)*r(4)*r(5)*r(6), r(1)*r(2)*r(3)*r(4)*r(5)*r(6)-1, 
+ x(1)*y(2)-y(1)*x(2)-m(1)*m(2), r(1)*r(2)*r(3)*r(4)*r(5)*r(6)-m(1)*m(2), m(1)*m(2)-1, m(1)*x(2)*m(3)-X(1),  m(1)*y(2)*m(3)-X(1)*y(2), 
+ r(1)*r(2)*r(3)*r(4)*r(5)*x(6)*r(7)-y(1), r(1)*r(2)*r(3)*r(4)*r(5)*y(6)*r(7)-X(1)*y(2), M(1)*r(2)*m(3)- r(1)*r(2)*r(3)*r(4)*r(5)*y(6)
+ X(1)*x(2)-1, x(1)*X(2)-1, Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+////////////////////////////////////////////////////////////////////
+// Dyck Group //////////////////////////////////////////////////////
+// from Grischa Studzinski /////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+proc dyckGrp1(int n, int d, intvec P)
+"
+The Dyck group with the following presentation
+< x_1, x_2, ... , x_n | (x_1)^p1 = (x_2)^p2 = ... = (x_n)^pn = x_1 * x_2 * ... * x_n = 1 >
+negative exponents are allowed
+representation in the form x_i^p_i - x_(i+1)^p_(i+1)
+"
+{
+ int baseringdef,i,j;
+ if (n < 1) {ERROR("There must be at least one variable!");}
+ if (d < n) {ERROR("Degreebound is to small!");}
+ for (i = 1; i <= size(P); i++) {if (d < absValue(P[i])){ERROR("Degreebound is to small!");}}
+
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x(1..n),Y(1..n)),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I; poly p,q;
+ p = 1; q = 1;
+ for (i = 1; i<= n; i++) {p = lpMult(p,var(i));}
+ I = p-1;
+ for (i = n; i > 0; i--)
+ {
+  if (P[i] >= 0) {for (j = 1; j <= P[i]; j++){q = lpMult(q,var(i));}} 
+  else {for (j = 1; j <= -P[i]; j++){q = lpMult(q,var(i+n));}}
+  I = p - q,I;
+  p = q; q = 1;
+ }
+ 
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+
+proc dyckGrp2(int n, int d, intvec P)
+"
+The Dyck group with the following presentation
+< x_1, x_2, ... , x_n | (x_1)^p1 = (x_2)^p2 = ... = (x_n)^pn = x_1 * x_2 * ... * x_n = 1 >
+negative exponents are allowed
+representation in the form x_i^p_i - 1
+"
+{
+ int baseringdef,i,j;
+ if (n < 1) {ERROR("There must be at least one variable!");}
+ if (d < n) {ERROR("Degreebound is to small!");}
+ for (i = 1; i <= size(P); i++) {if (d < absValue(P[i])){ERROR("Degreebound is to small!");}}
+
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x(1..n),Y(1..n)),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I; poly p;
+ p = 1;
+ for (i = 1; i<= n; i++) {p = lpMult(p,var(i));}
+ I = p-1;
+ for (i = n; i > 0; i--)
+ {
+  p = 1;
+  if (P[i] >= 0) {for (j = 1; j <= P[i]; j++){p = lpMult(p,var(i));}} 
+  else {for (j = 1; j <= -P[i]; j++){p = lpMult(p,var(i+n));}}
+  I = p - 1,I;
+ }
+ 
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+
+
+proc dyckGrp3(int n, int d, intvec P)
+"
+The Dyck group with the following presentation
+< x_1, x_2, ... , x_n | (x_1)^p1 = (x_2)^p2 = ... = (x_n)^pn = x_1 * x_2 * ... * x_n = 1 >
+only positive exponents are allowed
+no inverse generators needed
+"
+{
+ int baseringdef,i,j;
+ if (n < 1) {ERROR("There must be at least one variable!");}
+ if (d < n) {ERROR("Degreebound is to small!");}
+ for (i = 1; i <= size(P); i++) {if (P[i] < 0){ERROR("Exponents must be positive!");}}
+ for (i = 1; i <= size(P); i++) {if (d < P[i]){ERROR("Degreebound is to small!");}}
+ 
+
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,x(1..n),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I; poly p;
+ p = 1;
+ for (i = 1; i<= n; i++) {p = lpMult(p,var(i));}
+ I = p-1;
+ for (i = n; i > 0; i--)
+ {
+  p = 1;
+  for (j = 1; j <= P[i]; j++){p = lpMult(p,var(i));} 
+  I = p - 1,I;
+ }
+ 
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+////////////////////////////////////////////////////////////////////
+// Fibonacci Group /////////////////////////////////////////////////
+// from Grischa Studzinski /////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+proc fibGroup(int m, int d)
+"The Fibonacci group F(2, m) with the following presentation
+< x_1, x_2, ... , x_m | x_i * x_(i + 1) = x_(i + 2) >
+TODO: basefield Q oder F2?
+inverse Elemente!
+"
+{
+ if (m < 3) {ERROR("At least three generators are required!");}
+ if (d < 2) {ERROR("Degree bound must be at least 2!");}
+ int baseringdef,i;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x(1..m),Y(1..m)),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I; poly p;
+ for (i = 1; i < m-1; i++)
+ {
+  p = lpMult(var(i),var(i+1))-var(i+2);
+  I = I,p;
+ }
+ for (i = 1; i <= m; i++)
+ {
+  p = lpMult(var(i),var(i+m))-1;
+  I = I,p;
+  p = lpMult(var(i+m),var(i))-1;
+  I = I,p;
+ } 
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+
+////////////////////////////////////////////////////////////////////
+// Tetrahedon Groups ///////////////////////////////////////////////
+// from Grischa Studzinski /////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+proc tetrahedron (int g, int d)
+"The following examples are found in 
+Classification of the finite generalized tetrahedron groups
+by Gerhard Rosenberger and Martin Scheer.
+The following 5 examples are denoted in Proposition 1.9 and concern
+finite generalized tetrahedron group in the Tsarnarov-case, which are
+not equivalent to a presentation for an ordinary tetrahedron group.
+g gives the number of the example
+"
+{
+ if (g < 1 || g > 5) {ERROR("There are only 5 examples!");}
+ if ((g == 1 && d < 6)||(g == 2 && d < 6)||(g == 3 && d < 5)||(g == 4 && d < 4)||(g == 5 && d < 5))
+ {ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef,i,j;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,z),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I;
+ if (g == 1) 
+ {I = x(1)*x(2)*x(3)*x(4)*x(5)-1, y(1)*y(2)-1, z(1)*z(2)*z(3)-1, x(1)*y(2)*x(3)*y(4)*x(5)*y(6)-1, x(1)*x(2)*z(3)*x(4)*x(5)*z(6)-1,
+      y(1)*z(2)*y(3)*z(4)-1;
+ }
+ if (g == 2)
+ {I = x(1)*x(2)*x(3)-1, y(1)*y(2)*y(3)-1, z(1)*z(2)*z(3)*z(4)*z(5)-1,x(1)*y(2)*x(3)*y(4)-1,x(1)*z(2)*x(3)*z(4)-1, 
+      y(1)*z(2)*z(3)*y(4)*z(5)*z(6)-1;
+ }
+ if (g == 3)
+ {I =  x(1)*x(2)*x(3)-1, y(1)*y(2)*y(3)-1, z(1)*z(2)*z(3)-1, x(1)*y(2)*x(3)*y(4)-1, x(1)*z(2)*x(3)*z(4)-1, y(1)*z(2)*y(3)*z(4)-1;
+ }
+ if (g == 4)
+ {I =  x(1)*x(2)*x(3)-1, y(1)*y(2)*y(3)-1, z(1)*z(2)*z(3)*z(4)-1,x(1)*y(2)*x(3)*y(4)-1, x(1)*z(2)*x(3)*z(4)-1, y(1)*z(2)*y(3)*z(4)-1;
+ }
+ if (g ==5)
+ {I =  x(1)*x(2)*x(3)-1, y(1)*y(2)*y(3)-1, z(1)*z(2)*z(3)*z(4)*z(5)-1,x(1)*y(2)*x(3)*y(4)-1, x(1)*z(2)*x(3)*z(4)-1, y(1)*z(2)*y(3)*z(4)-1;
+ }
+  
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+
+
+////////////////////////////////////////////////////////////////////
+// Triangular Groups ///////////////////////////////////////////////
+// from Grischa Studzinski /////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+proc trianGrp(int g, int d)
+"The following examples are found in 
+Classification of the finite generalized tetrahedron groups
+by Gerhard Rosenberger and Martin Scheer.
+Triangle groups, as in theorem 2.12
+g is the number of the example
+"
+{
+ if (g < 1 || g > 14) {ERROR("There are only 14 examples!");}
+ if ((g == 1 && d < 20)||(g == 2 && d < 21)||(g == 3 && d < 10)||(g == 4 && d < 12)||(g == 5 && d < 10)||(g == 6 && d < 18)||(g == 7 && d < 20)||(g == 8 && d < 16)||(g == 9 && d < 10)||(g == 10 && d < 14)||(g == 11 && d < 16)||(g == 12 && d < 24)||(g == 13 && d < 28)||(g == 14 && d < 37))
+ {ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(a,b),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I;
+ 
+ if (g == 1) 
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)-1,
+  a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*b(7)*a(8)*b(9)*b(10)*a(11)*b(12)*a(13)*b(14)*a(15)*b(16)*b(17)*a(18)*b(19)*b(20)-1;
+ }
+ if (g == 2)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)-1,
+  a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*b(7)*a(8)*b(9)*a(10)*b(11)*a(12)*b(13)*b(14)*a(15)*b(16)*a(17)*b(18)*a(19)*b(20)*b(21)-1;
+ }
+ if (g == 3)
+ {I = a(1)*a(2)*a(3)-1, b(1)*b(2)*b(3)-1,
+  a(1)*b(2)*a(3)*b(4)*b(5)*a(6)*b(7)*a(8)*b(9)*b(10)-1;
+ }
+ if (g == 4)
+ {I = a(1)*a(2)*a(3)-1, b(1)*b(2)*b(3)-1,
+  a(1)*b(2)*a(3)*a(4)*b(5)*b(6)*a(7)*b(8)*a(9)*a(10)*b(11)*b(12)-1;
+ }
+ if (g == 5)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)*b(4)*b(5)-1,
+   a(1)*b(2)*a(3)*b(4)*b(5)*a(6)*b(7)*a(8)*b(9)*b(10)-1;
+ }
+ if (g == 6)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)*b(4)*b(5)-1,
+   a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*b(7)*b(8)*b(9)*a(10)*b(11)*a(12)*b(13)*a(14)*b(15)*b(16)*b(17)*b(18)-1;
+ }
+ if (g == 7)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)*b(4)*b(5)-1,
+   a(1)*b(2)*a(3)*b(4)*b(5)*a(6)*b(7)*b(8)*b(9)*b(10)*a(11)*b(12)*a(13)*b(14)*b(15)*a(16)*b(17)*b(18)*b(19)*b(20)-1;
+ }
+ if (g == 8)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)*b(4)-1,
+   a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*b(7)*b(8)*a(9)*b(10)*a(11)*b(12)*a(13)*b(14)*b(15)*b(16)-1;
+ }
+ if (g == 9)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)-1,
+   a(1)*b(2)*a(3)*b(4)*b(5)*a(6)*b(7)*a(8)*b(9)*b(10)-1;
+ }
+ if (g == 10)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)-1,
+  a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*b(7)*a(8)*b(9)*a(10)*b(11)*a(12)*b(13)*b(14)-1;
+ }
+ if (g == 11)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)-1,
+  a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*a(7)*b(8)*b(9)*a(10)*b(11)*a(12)*b(13)*a(14)*b(15)*b(16)-1;
+ }
+ if (g == 12)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)-1,
+  a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*b(7)*a(8)*b(9)*a(10)*b(11)*b(12)*a(13)*b(14)*a(15)*b(16)*a(17)*b(18)*b(19)*a(20)*b(21)*a(22)*b(23)*b(24)-1;
+ }
+ if (g == 13)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)-1,
+a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*a(7)*b(8)*a(9)*b(10)*b(11)*a(12)*b(13)*b(14)*a(15)*b(16)*a(17)*b(18)*a(19)*b(20)*a(21)*b(22)*a(23)*b(24)*b(25)*a(26)*b(27)*b(28)-1;
+ }
+ if (g == 14)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)-1,
+a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*a(7)*b(8)*b(9)*a(10)*b(11)*b(12)*a(13)*b(14)*a(15)*b(16)*b(17)*a(18)*b(19)*b(20)*a(21)*b(22)*a(23)*b(24)*a(25)*b(26)*a(27)*b(28)*b(29)*a(30)*b(31)*a(32)*b(33)*b(34)*a(35)*b(36)*b(37)-1;
+ }
+
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
