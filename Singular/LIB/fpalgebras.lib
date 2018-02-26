@@ -447,11 +447,6 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 @*      < x, y, m, r | [x, y] = m^2 = r^2 = 1, m^-1*y*m = y^-1, m^-1*x*m = x*y, r^-1*y*r = y^-1, r^-1*x*r = x^-1, m^-1*r*m = r^-1 >
 @*    - d gives the degreebound for the Letterplace ring
 "
-example {
-  "EXAMPLE:"; echo = 2;
-  def R = crystallographicGroupC2MM(5); setring R;
-  I;
-}
 {
  if (d < 3){ERROR("Degreebound is to small for choosen example!");}
  
@@ -471,6 +466,11 @@ X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
  export(I);
  if (baseringdef == 1) {setring save;}
  return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupC2MM(5); setring R;
+  I;
 }
 
 proc crystallographicGroupP4(int d)
@@ -652,11 +652,6 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 @*      < x, y, r, m | [x, y] = r^3 = m^2 = 1, m^-1*r*m = r^2, r^-1*x*r = x^-1*y, r^-1*y*r = x^-1, m^-1*x*m = x^-1, m^-1*y*m = x^-1*y >
 @*    - d gives the degreebound for the Letterplace ring
 "
-example {
-  "EXAMPLE:"; echo = 2;
-  def R = crystallographicGroupP3M1(5); setring R;
-  I;
-}
 {
  if (d < 4){ERROR("Degreebound is to small for choosen example!");}
  
@@ -676,6 +671,11 @@ example {
  export(I);
  if (baseringdef == 1) {setring save;}
  return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP3M1(5); setring R;
+  I;
 }
 
 proc crystallographicGroupP6(int d)
@@ -720,11 +720,6 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 @*      < x, y, r, m | [x, y] = r^6 = m^2 = 1, r^-1*y*r = x^-1*y, r^-1*x*r = y, m^-1*x*m = x^-1, m^-1*y*m = x^-1*y, m^-1*r*m = r^-1*y>
 @*    - d gives the degreebound for the Letterplace ring
 "
-example {
-  "EXAMPLE:"; echo = 2;
-  def R = crystallographicGroupP6MM(5); setring R;
-  I;
-}
 {
  if (d < 7){ERROR("Degreebound is to small for choosen example!");}
  
@@ -745,6 +740,11 @@ example {
  export(I);
  if (baseringdef == 1) {setring save;}
  return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP6MM(5); setring R;
+  I;
 }
 
 ////////////////////////////////////////////////////////////////////
