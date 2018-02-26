@@ -257,7 +257,7 @@ Y(1)*y(2)-1,  y(1)*Y(2)-1, t(1)*T(2)-1, T(1)*t(2)-1;
 
 
 proc cgP2MM(int d)
-"USAGE: cgP2(d); d an integer
+"USAGE: cgP2MM(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p2mm group with the following presentation
@@ -315,7 +315,7 @@ m(1)*M(2)-1, M(1)*m(2)-1;
 }
 
 proc cgP2GG(int d)
-"USAGE: cgP2(d); d an integer
+"USAGE: cgP2GG(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p2gg group with the following presentation
@@ -373,7 +373,7 @@ X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
 }
 
 proc cgC2MM(int d)
-"USAGE: cgC2(d); d an integer
+"USAGE: cgC2MM(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - c2mm group with the following presentation
@@ -431,7 +431,7 @@ X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
 }
 
 proc cgP4MM(int d)
-"USAGE: cgP4(d); d an integer
+"USAGE: cgP4MM(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p4mm group with the following presentation
@@ -460,7 +460,7 @@ X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
 }
 
 proc cgP4GM(int d)
-"USAGE: cgP4(d); d an integer
+"USAGE: cgP4GM(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p4gm group with the following presentation
@@ -517,7 +517,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 }
 
 proc cgP31M(int d)
-"USAGE: cgP3(d); d an integer
+"USAGE: cgP31M(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p31m group with the following presentation
@@ -548,7 +548,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 }
 
 proc cgP3M1(int d)
-"USAGE: cgP3(d); d an integer
+"USAGE: cgP3M1(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p3m1 group with the following presentation
@@ -606,7 +606,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 }
 
 proc cgP6MM(int d)
-"USAGE: cgP6(d); d an integer
+"USAGE: cgP6MM(d); d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - p6mm group with the following presentation
