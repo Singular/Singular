@@ -1339,7 +1339,7 @@ proc arrCoordNormalize(arr A, intvec v)
 RETURN:     [arr]: Arrangement after a coordinate change that transforms the arrangement such that
             after a tranformation x -> Tx + c we have the arrangement has the matrix representation
             [AT^-1|b+AT^-1c] such that [AT^-1]_v = I and [b+AT^-1c]_v = 0;
-NOTE:       algorith performs a base change if H_k is homogenous (i.e. has no)
+NOTE:       algorithm performs a base change if H_k is homogenous (i.e. has no)
             constant term and an affine transformation otherwise
             Ax+b = 0, Transformation x = Ty+c: AT^-1y + AT^-1c + b = 0
             Now we want to have (AT^-1)_v = I and (AT^-1c +b)_v = AT^-1_v*c + b_v = 0
