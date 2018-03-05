@@ -289,7 +289,7 @@ void yyerror(const char * fmt)
 %type <i>    ringcmd1
 %type <i>    mat_cmd
 
-%type <i>    '=' '<' '>' '+' '-' COLONCOLON
+%type <i>    '=' '<' '+' '-' COLONCOLON
 %type <i>    '/' '[' ']' '^' ',' ';'
 
 
@@ -800,7 +800,7 @@ expr_arithmetic:
             if(iiExprArith2(&$$,&$1,'-',&$3)) YYERROR;
           }
         | expr '/' expr
-          {
+          { /* also for *,% */
             if(iiExprArith2(&$$,&$1,$<i>2,&$3)) YYERROR;
           }
         | expr '^' expr
@@ -808,11 +808,11 @@ expr_arithmetic:
             if(iiExprArith2(&$$,&$1,'^',&$3)) YYERROR;
           }
         | expr '<' expr
-          {
+          { /* also for > */
             if(iiExprArith2(&$$,&$1,$<i>2,&$3)) YYERROR;
           }
         | expr '&' expr
-          {
+          { /* also for |*/
             if(iiExprArith2(&$$,&$1,$<i>2,&$3)) YYERROR;
           }
         | expr NOTEQUAL expr
