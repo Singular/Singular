@@ -9117,7 +9117,7 @@ void enterSBba (LObject &p,int atS,kStrategy strat, int atR)
   }
 
   /*- save result -*/
-  poly pp=strat->P.p;
+  poly pp=p.p;
   strat->S[atS] = pp;
   if (strat->honey) strat->ecartS[atS] = p.ecart;
   if (p.sev == 0)
