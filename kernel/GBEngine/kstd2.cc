@@ -90,14 +90,15 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
 
   const TSet T=strat->T;
   const unsigned long* sevT=strat->sevT;
+  const ring r=currRing;
+  const BOOLEAN is_Ring=rField_is_Ring(r);
   if (L->p!=NULL)
   {
-    const ring r=currRing;
     const poly p=L->p;
 
     pAssume(~not_sev == p_GetShortExpVector(p, r));
 
-    if(rField_is_Ring(r))
+    if(is_Ring)
     {
       loop
       {
@@ -144,7 +145,7 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
   {
     const poly p=L->t_p;
     const ring r=strat->tailRing;
-    if(rField_is_Ring(r))
+    if(is_Ring)
     {
       loop
       {
@@ -199,16 +200,23 @@ int kFindDivisibleByInS(const kStrategy strat, int* max_ind, LObject* L)
   int j = 0;
 
   pAssume(~not_sev == p_GetShortExpVector(p, currRing));
+
+  BOOLEAN is_Ring=rField_is_Ring(currRing);
 #if 1
   int ende;
-  if ((strat->ak>0) || currRing->pLexOrder || rField_is_Ring(currRing)) ende=strat->sl;
-  else ende=posInS(strat,*max_ind,p,0)+1;
-  if (ende>(*max_ind)) ende=(*max_ind);
+  if (is_Ring
+  || (strat->ak>0)
+  || currRing->pLexOrder)
+    ende=strat->sl;
+  else
+  {
+    ende=posInS(strat,*max_ind,p,0)+1;
+    if (ende>(*max_ind)) ende=(*max_ind);
+  }
 #else
   int ende=strat->sl;
 #endif
-  (*max_ind)=ende;
-  if(rField_is_Ring(currRing))
+  if(is_Ring)
   {
     loop
     {

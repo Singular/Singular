@@ -2996,7 +2996,6 @@ static poly redNFTail (poly h, const int sl, kStrategy strat, int len)
         res=__p_Mult_nn (res, coef, currRing);
         nDelete (&coef);
         h = kBucketGetLm (P.bucket);
-        pTest (h);
         if(h == NULL)
         {
 #ifdef REDTAIL_PROT
@@ -3005,7 +3004,6 @@ static poly redNFTail (poly h, const int sl, kStrategy strat, int len)
           kBucketDestroy (&P.bucket);
           return res;
         }
-        pTest (h);
         P.p = h;
         P.t_p = NULL;
         P.SetShortExpVector ();
@@ -4492,7 +4490,7 @@ multi_reduction_find (red_object * los, int losl, slimgb_alg * c, int startf,
       canonicalize_region (los, erg.to_reduce_u + 1, startf, c);
       return;
     }
-    if(j < 0)
+    else /*if(j < 0)*/
     {
       //not reduceable, try to use this for reducing higher terms
       int i2 = fwbw (los, i);
