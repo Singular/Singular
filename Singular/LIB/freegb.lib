@@ -3259,7 +3259,7 @@ EXAMPLE: example lpNF; shows examples
  checkAssumptions(p,G);
  G = sort(G)[1];
  list L = makeDVecI(G);
- return(normalize(lpNormalForm2(p,G,L)));
+ return(lpNormalForm2(p,G,L));
 }
 example
 {
