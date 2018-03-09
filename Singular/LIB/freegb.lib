@@ -3310,7 +3310,7 @@ NOTE: - L[1] NF(p,I)
   poly pNF = imap(save, pNF);
   ideal I = imap(save, I);
   for (int i = 1; i <= size(I); i++) {
-    I[i] = I[i] + var(norigvars + i);
+    I[i] = I[i] - var(norigvars + i);
   } kill i;
 
   list summands;
