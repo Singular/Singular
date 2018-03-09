@@ -4,12 +4,13 @@ category="Noncommutative";
 info="
 LIBRARY: fpalgebras.lib
 AUTHORS: Karim Abou Zeid,       karim.abou.zeid at rwth-aachen.de
+@*       Grischa Studzinski,    grischa.studzinski at rwth-aachen.de
 
 Support: Project II.6 in the transregional collaborative research centre
 SFB-TRR 195 'Symbolic Tools in Mathematics and their Application' of the German DFG
 
 OVERVIEW:
-Generation of various groups and algebras in the Letterplace ring
+Generation of various algebras, including group algebras of finitely presented groups in the Letterplace ring
 
 PROCEDURES:
 baumslagSolitar(int n, int m, int d, list #);
