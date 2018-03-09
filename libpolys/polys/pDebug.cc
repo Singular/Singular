@@ -89,7 +89,8 @@ BOOLEAN p_LmCheckIsFromRing(poly p, ring r)
     #endif
     #ifndef X_OMALLOC
     {
-      _pPolyAssumeReturn(omIsBinPageAddr(p) && omSizeWOfAddr(p)==omSizeWOfBin(r->PolyBin),p,r);
+      _pPolyAssumeReturn(omIsBinPageAddr(p),p,r);
+      _pPolyAssumeReturn(omSizeWOfAddr(p)==omSizeWOfBin(r->PolyBin),p,r);
       return TRUE;
     }
     return FALSE;

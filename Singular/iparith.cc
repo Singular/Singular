@@ -5634,6 +5634,14 @@ static BOOLEAN jjCOEFFS3_P(leftv res, leftv u, leftv v, leftv w)
   mp_Monomials((matrix)res->data, rank, pVar((poly)v->Data()),(matrix)w->Data(),currRing);
   return FALSE;
 }
+static BOOLEAN jjELIMIN_ALG(leftv res, leftv u, leftv v, leftv w)
+{
+  ideal I=(ideal)u->Data();
+  GbVariant alg=syGetAlgorithm((char*)w->Data(),currRing,I);
+  res->data=(char *)idElimination(I,(poly)v->Data(),NULL,alg);
+  //setFlag(res,FLAG_STD);
+  return v->next!=NULL; //do not allow next like in eliminate(I,a(1..4))
+}
 static BOOLEAN jjELIMIN_HILB(leftv res, leftv u, leftv v, leftv w)
 {
   res->data=(char *)idElimination((ideal)u->Data(),(poly)v->Data(),
