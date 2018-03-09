@@ -3298,7 +3298,7 @@ NOTE: - L[1] NF(p,I)
   string tagvarstr = "(tag_1";
   for (int i = 2; i <= size(I); i++) {
     tagvarstr = tagvarstr + ",tag_" + string(i);
-  }
+  } kill i;
   tagvarstr = tagvarstr + ")";
   string field = string(ringlist(r)[1]);
   execute("ring @tags = " + field + "," + tagvarstr + ",dp;");
@@ -3311,7 +3311,7 @@ NOTE: - L[1] NF(p,I)
   ideal I = imap(save, I);
   for (int i = 1; i <= size(I); i++) {
     I[i] = I[i] + var(norigvars + i);
-  }
+  } kill i;
 
   list summands;
   list L = pNF;
@@ -3331,16 +3331,21 @@ NOTE: - L[1] NF(p,I)
         }
         list summand = (iv[j] - norigvars), leadcoef(pTaggedNF[i])*iv2lp(left), iv2lp(right);
         summands = insert(summands, summand, size(summands));
+
+        kill left;
+        kill right;
+        kill summand;
         break;
       }
-    }
-  }
+    } kill j;
+    kill iv;
+  } kill i;
 
   L[2] = summands;
 
   setring save;
   list L = imap(@R,L);
-  return(L);
+  return (L);
 }
 
 proc lpGBPres2Poly(list L, ideal I)
