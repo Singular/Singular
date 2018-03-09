@@ -1335,7 +1335,7 @@ example
   isOrderingShiftInvariant(1);
 }
 
-proc lpMonomialsWithHoles(int d)
+static proc lpMonomialsWithHoles(int d)
 {
   if (d < 0) {
     ERROR("d must not be negative")
