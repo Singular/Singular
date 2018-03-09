@@ -15,7 +15,7 @@
 #include "variable.h"
 
 #include "factory/cf_gmp.h"
-#include "factory/cf_assert.h"
+#include "cf_assert.h"
 
 class InternalCF;
 class CanonicalForm;

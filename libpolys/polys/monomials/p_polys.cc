@@ -623,7 +623,7 @@ long p_WTotaldegree(poly p, const ring r)
         break;
       case ringorder_am:
         b1=si_min(b1,r->N);
-	/* no break, continue as ringorder_a*/
+        /* no break, continue as ringorder_a*/
       case ringorder_a:
         for (k=b0 /*r->block0[i]*/;k<=b1 /*r->block1[i]*/;k++)
         { // only one line
@@ -2233,42 +2233,46 @@ poly p_Power(poly p, int i, const ring r)
 
 /* --------------------------------------------------------------------------------*/
 /* content suff                                                                   */
-static number p_InitContent(poly ph, const ring r);
+//number p_InitContent(poly ph, const ring r);
 
 void p_Content(poly ph, const ring r)
 {
   if (ph==NULL) return;
+  const coeffs cf=r->cf;
   if (pNext(ph)==NULL)
   {
-    p_SetCoeff(ph,n_Init(1,r->cf),r);
+    p_SetCoeff(ph,n_Init(1,cf),r);
   }
-  if (r->cf->cfSubringGcd==ndGcd) /* trivial gcd*/ return;
+  if (cf->cfSubringGcd==ndGcd) /* trivial gcd*/ return;
   number h=p_InitContent(ph,r); /* first guess of a gcd of all coeffs */
-  poly p=ph;
+  poly p;
+  if(n_IsOne(h,cf))
+  {
+    goto content_finish;
+  }
+  p=ph;
   // take the SubringGcd of all coeffs
   while (p!=NULL)
   {
-    n_Normalize(pGetCoeff(p),r->cf);
-    number d=n_SubringGcd(h,pGetCoeff(p),r->cf);
-    n_Delete(&h,r->cf);
+    n_Normalize(pGetCoeff(p),cf);
+    number d=n_SubringGcd(h,pGetCoeff(p),cf);
+    n_Delete(&h,cf);
     h = d;
-    if(n_IsOne(h,r->cf))
+    if(n_IsOne(h,cf))
     {
-      break;
+      goto content_finish;
     }
     pIter(p);
   }
-  // if foundi<>1, divide by it
-  if(!n_IsOne(h,r->cf))
+  // if found<>1, divide by it
+  p = ph;
+  while (p!=NULL)
   {
-    p = ph;
-    while (p!=NULL)
-    {
-      number d = n_ExactDiv(pGetCoeff(p),h,r->cf);
-      p_SetCoeff(p,d,r);
-      pIter(p);
-    }
+    number d = n_ExactDiv(pGetCoeff(p),h,cf);
+    p_SetCoeff(p,d,r);
+    pIter(p);
   }
+content_finish:
   n_Delete(&h,r->cf);
   // and last: check leading sign:
   if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
@@ -2542,7 +2546,7 @@ void p_SimpleContent(poly ph, int smax, const ring r)
 }
 #endif
 
-static number p_InitContent(poly ph, const ring r)
+number p_InitContent(poly ph, const ring r)
 // only for coefficients in Q and rational functions
 #if 0
 {

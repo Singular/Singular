@@ -212,6 +212,7 @@ void      p_Content(poly p, const ring r);
 #if 1
 // currently only used by Singular/janet
 void      p_SimpleContent(poly p, int s, const ring r);
+number    p_InitContent(poly ph, const ring r);
 #endif
 
 poly      p_Cleardenom(poly p, const ring r);
@@ -797,17 +798,25 @@ p_GetTotalDegree(const unsigned long l, const ring r, const int number_of_exps)
 /// returns a copy of p (without any additional testing)
 static inline poly p_Copy_noCheck(poly p, const ring r)
 {
-  assume(r != NULL); assume(r->p_Procs != NULL); assume(r->p_Procs->p_Copy != NULL);
+  /*assume(p!=NULL);*/
+  assume(r != NULL);
+  assume(r->p_Procs != NULL);
+  assume(r->p_Procs->p_Copy != NULL);
   return r->p_Procs->p_Copy(p, r);
 }
 
 /// returns a copy of p
 static inline poly p_Copy(poly p, const ring r)
 {
-  p_Test(p,r);
-  const poly pp = p_Copy_noCheck(p, r);
-  p_Test(pp,r);
-  return pp;
+  if (p!=NULL)
+  {
+    p_Test(p,r);
+    const poly pp = p_Copy_noCheck(p, r);
+    p_Test(pp,r);
+    return pp;
+  }
+  else
+    return NULL;
 }
 
 static inline poly p_Head(poly p, const ring r)
@@ -823,18 +832,6 @@ static inline poly p_Head(poly p, const ring r)
   return np;
 }
 
-static inline poly p_LmHead(poly p, const ring r)
-{
-  p_LmCheckPolyRing1(p, r);
-  poly np;
-  omTypeAllocBin(poly, np, r->PolyBin);
-  p_SetRingOfLm(np, r);
-  memcpy(np->exp, p->exp, r->ExpL_Size*sizeof(long));
-  pNext(np) = NULL;
-  pSetCoeff0(np, NULL);
-  return np;
-}
-
 // returns a copy of p with Lm(p) from lmRing and Tail(p) from tailRing
 static inline poly p_Copy(poly p, const ring lmRing, const ring tailRing)
 {
@@ -845,7 +842,8 @@ static inline poly p_Copy(poly p, const ring lmRing, const ring tailRing)
       return p_Copy_noCheck(p, tailRing);
 #endif
     poly pres = p_Head(p, lmRing);
-    pNext(pres) = p_Copy_noCheck(pNext(p), tailRing);
+    if (pNext(p)!=NULL)
+      pNext(pres) = p_Copy_noCheck(pNext(p), tailRing);
     return pres;
   }
   else
@@ -857,7 +855,7 @@ static inline void p_Delete(poly *p, const ring r)
 {
   assume( p!= NULL );
   assume( r!= NULL );
-  r->p_Procs->p_Delete(p, r);
+  if ((*p)!=NULL) r->p_Procs->p_Delete(p, r);
 }
 
 static inline void p_Delete(poly *p,  const ring lmRing, const ring tailRing)
@@ -917,7 +915,7 @@ static inline poly p_Mult_nn(poly p, number n, const ring r)
     return p;
   else if (n_IsZero(n, r->cf))
   {
-    r->p_Procs->p_Delete(&p, r); // NOTE: without p_Delete - memory leak!
+    p_Delete(&p, r); // NOTE: without p_Delete - memory leak!
     return NULL;
   }
   else
@@ -1052,12 +1050,12 @@ static inline poly p_Mult_q(poly p, poly q, const ring r)
 
   if (p == NULL)
   {
-    r->p_Procs->p_Delete(&q, r);
+    p_Delete(&q, r);
     return NULL;
   }
   if (q == NULL)
   {
-    r->p_Procs->p_Delete(&p, r);
+    p_Delete(&p, r);
     return NULL;
   }
 
@@ -1070,14 +1068,14 @@ static inline poly p_Mult_q(poly p, poly q, const ring r)
 #endif /* HAVE_PLURAL */
       q = r->p_Procs->p_Mult_mm(q, p, r);
 
-    r->p_Procs->p_Delete(&p, r);
+    p_LmDelete(&p, r);
     return q;
   }
 
   if (pNext(q) == NULL)
   {
     p = r->p_Procs->p_Mult_mm(p, q, r);
-    r->p_Procs->p_Delete(&q, r);
+    p_LmDelete(&q, r);
     return p;
   }
 #ifdef HAVE_PLURAL

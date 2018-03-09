@@ -89,7 +89,10 @@ EXAMPLE: example markov4ti2; shows an example
 // Singular's string is too clumsy for this, hence we first prepare
 // using standard unix commands
 //----------------------------------------------------------------------
-   j=system("sh","markov sing4ti2 >/dev/null 2>&1");
+   // find the name of markov/4ti2-markov
+   string s_name=system("executable","markov");
+   if (size(s_name)==0) { s_name=system("executable","4ti2-markov"); /* debian*/ }
+   j=system("sh",s_name+" sing4ti2 >/dev/null 2>&1");
    j=system("sh","awk \'BEGIN{ORS=\",\";}{print $0;}\' sing4ti2.mar | sed s/[\\\ \\\t\\\v\\\f]/,/g | sed s/,+/,/g|sed s/,,/,/g|sed s/,,/,/g > sing4ti2.converted");
    if(!defined(keepfiles))
    {
@@ -211,11 +214,14 @@ EXAMPLE: example graver4ti2; shows an example
 // Singular's string is too clumsy for this, hence we first prepare
 // using standard unix commands
 //----------------------------------------------------------------------
-   j=system("sh","graver sing4ti2 >/dev/null 2>&1");
+   // find the name of graver/4ti2-graver
+   string s_name=system("executable","graver");
+   if (size(s_name)==0) { s_name=system("executable","4ti2-graver"); /* debian*/ }
+   j=system("sh",s_name+" sing4ti2 >/dev/null 2>&1");
    j=system("sh","awk \'BEGIN{ORS=\",\";}{print $0;}\' sing4ti2.gra | sed s/[\\\ \\\t\\\v\\\f]/,/g | sed s/,+/,/g |sed s/,,/,/g|sed s/,,/,/g > sing4ti2.converted");
    if(!defined(keepfiles))
    {
-      j=system("sh",("rm -f sing4ti2.gra sing4ti2."+fileending));
+     j=system("sh",("rm -f sing4ti2.gra sing4ti2."+fileending));
    }
 //----------------------------------------------------------------------
 // reading output of 4ti2
@@ -331,7 +337,10 @@ EXAMPLE: example graver4ti2; shows an example
 // Singular's string is too clumsy for this, hence we first prepare
 // using standard unix commands
 //----------------------------------------------------------------------
-   j=system("sh","hilbert sing4ti2 >/dev/null 2>&1");
+   // find the name of hilbert/4ti2-hilbert
+   string s_name=system("executable","hilbert");
+   if (size(s_name)==0) { s_name=system("executable","4ti2-hilbert"); /* debian*/ }
+   j=system("sh",s_name+" sing4ti2 >/dev/null 2>&1");
    j=system("sh","awk \'BEGIN{ORS=\",\";}{print $0;}\' sing4ti2.hil | sed s/[\\\ \\\t\\\v\\\f]/,/g | sed s/,+/,/g |sed s/,,/,/g|sed s/,,/,/g > sing4ti2.converted");
    if(!defined(keepfiles))
    {
