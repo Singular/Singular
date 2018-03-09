@@ -2149,7 +2149,7 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp
   TransExtInfo p;
   if(!mgrad)
   {
-    tt=(char**)omalloc(sizeof(char*));
+    tt=(char**)omAlloc(sizeof(char*));
     tt[0] = omStrDup("t");
     npar = 1;
   }
@@ -2158,7 +2158,7 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp
     tt=(char**)omalloc(lV*sizeof(char*));
     for(is = 0; is < lV; is++)
     {
-      tt[is] = (char*)omalloc(7*sizeof(char)); //if required enlarge it later
+      tt[is] = (char*)omAlloc(7*sizeof(char)); //if required enlarge it later
       sprintf (tt[is], "t%d", is+1);
     }
     npar = lV;
@@ -2166,7 +2166,7 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp
 
   p.r = rDefault(0, npar, tt);
   coeffs cf = nInitChar(n_transExt, &p);
-  char** xx = (char**)omalloc(sizeof(char*));
+  char** xx = (char**)omAlloc(sizeof(char*));
   xx[0] = omStrDup("x");
   ring R = rDefault(cf, 1, xx);
   rChangeCurrRing(R);//rWrite(R);

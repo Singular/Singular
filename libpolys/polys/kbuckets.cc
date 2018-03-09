@@ -4,9 +4,11 @@
 
 #include "omalloc/omalloc.h"
 #include "misc/auxiliary.h"
+#include "misc/options.h"
 
 #include "polys/monomials/p_polys.h"
 #include "coeffs/coeffs.h"
+#include "coeffs/numbers.h"
 #include "polys/monomials/ring.h"
 #include "polys/kbuckets.h"
 
@@ -101,7 +103,7 @@ BOOLEAN kbTest_i(kBucket_pt bucket, int i)
   }
   #endif
   pFalseReturn(p_Test(bucket->buckets[i], bucket->bucket_ring));
-  if (bucket->buckets_length[i] != pLength(bucket->buckets[i]))
+  if ((unsigned)bucket->buckets_length[i] != pLength(bucket->buckets[i]))
   {
     dReportError("Bucket %d lengths difference should:%d has:%d",
                  i, bucket->buckets_length[i], pLength(bucket->buckets[i]));
@@ -222,15 +224,10 @@ void kBucketDeleteAndDestroy(kBucket_pt *bucket_pt)
   int i;
   for (i=0; i<= bucket->buckets_used; i++)
   {
-
-    if (bucket->buckets[i] != NULL)
-    {
-      p_Delete(&(bucket->buckets[i]), bucket->bucket_ring);
+    p_Delete(&(bucket->buckets[i]), bucket->bucket_ring);
 #ifdef USE_COEF_BUCKETS
-      if (bucket->coef[i]!=NULL)
-        p_Delete(&(bucket->coef[i]), bucket->bucket_ring);
+    p_Delete(&(bucket->coef[i]), bucket->bucket_ring);
 #endif
-    }
   }
   omFreeBin(bucket, kBucket_bin);
   *bucket_pt = NULL;
@@ -336,7 +333,7 @@ void kBucketInit(kBucket_pt bucket, poly lm, int length)
 {
   //assume(false);
   assume(bucket != NULL);
-  assume(length <= 0 || length == pLength(lm));
+  assume(length <= 0 || (unsigned)length == pLength(lm));
   assume(kBucketIsCleared(bucket));
 
   if (lm == NULL) return;
@@ -436,7 +433,7 @@ int kBucketCanonicalize(kBucket_pt bucket)
     assume(bucket->coef[0]==NULL);
     assume(bucket->coef[i]==NULL);
   #endif
-  assume(pLength(p) == (int) pl);
+  assume(pLength(p) == (unsigned)pl);
   //if (TEST_OPT_PROT) { Print("C(%d)",pl); }
   kbTest(bucket);
   return i;
@@ -736,7 +733,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
   {
     if ((i <= bucket->buckets_used) && (bucket->buckets[i] != NULL))
     {
-      assume(pLength(bucket->buckets[i])==bucket->buckets_length[i]);
+      assume(pLength(bucket->buckets[i])==(unsigned)bucket->buckets_length[i]);
 //#ifdef USE_COEF_BUCKETS
 //     if(bucket->coef[i]!=NULL)
 //     {
@@ -806,7 +803,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
 void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
 {
     assume((!rIsPluralRing(bucket->bucket_ring))||p_IsConstant(m, bucket->bucket_ring));
-  assume(l <= 0 || pLength(p) == l);
+  assume(l <= 0 || pLength(p) == (unsigned)l);
   int i, l1;
   poly p1 = p;
   ring r = bucket->bucket_ring;
@@ -974,7 +971,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
     n_Delete(&n,r);
   }
 
-  if ((p1==NULL) && (bucket->coef[i]!=NULL))
+  if (p1==NULL)
     p_Delete(&bucket->coef[i],r);
 #endif
   bucket->buckets_length[i]=l1;
@@ -1037,9 +1034,9 @@ void kBucketTakeOutComp(kBucket_pt bucket,
       p_TakeOutComp(&(bucket->buckets[i]), comp, &q, &lq, bucket->bucket_ring);
       if (q != NULL)
       {
-        assume(pLength(q) == lq);
+        assume(pLength(q) == (unsigned)lq);
         bucket->buckets_length[i] -= lq;
-        assume(pLength(bucket->buckets[i]) == bucket->buckets_length[i]);
+        assume(pLength(bucket->buckets[i]) == (unsigned)bucket->buckets_length[i]);
         p = p_Add_q(p, q, lp, lq, bucket->bucket_ring);
       }
     }
@@ -1069,7 +1066,7 @@ number kBucketPolyRed(kBucket_pt bucket,
   assume((!rIsPluralRing(r))||p_LmEqual(p1,kBucketGetLm(bucket), r));
   assume(p1 != NULL &&
          p_DivisibleBy(p1,  kBucketGetLm(bucket), r));
-  assume(pLength(p1) == (int) l1);
+  assume(pLength(p1) == (unsigned) l1);
 
   poly a1 = pNext(p1), lm = kBucketExtractLm(bucket);
   BOOLEAN reset_vec=FALSE;
@@ -1127,7 +1124,7 @@ number kBucketPolyRed(kBucket_pt bucket,
   p_ExpVectorSub(lm, p1, r);
   l1--;
 
-  assume(l1==pLength(a1));
+  assume((unsigned)l1==pLength(a1));
 #if 0
   BOOLEAN backuped=FALSE;
   number coef;
@@ -1162,7 +1159,84 @@ number kBucketPolyRed(kBucket_pt bucket,
 }
 
 #ifndef USE_COEF_BUCKETS
-void kBucketSimpleContent(kBucket_pt) {}
+void kBucketSimpleContent(kBucket_pt bucket)
+{
+  if (bucket->buckets[0]==NULL) return;
+
+  ring r=bucket->bucket_ring;
+  if (rField_is_Ring(r)) return;
+
+  coeffs cf=r->cf;
+  if (cf->cfSubringGcd==ndGcd) /* trivial gcd*/ return;
+
+  number nn=pGetCoeff(bucket->buckets[0]);
+  //if ((bucket->buckets_used==0)
+  //&&(!n_IsOne(nn,cf)))
+  //{
+  //  if (TEST_OPT_PROT) PrintS("@");
+  //  p_SetCoeff(bucket->buckets[0],n_Init(1,cf),r);
+  //  return;
+  //}
+
+  if (n_Size(nn,cf)<2) return;
+
+  //kBucketAdjustBucketsUsed(bucket);
+  number coef=n_Copy(nn,cf);
+  // find an initial guess of a gcd
+  for (int i=1; i<=bucket->buckets_used;i++)
+  {
+    if (bucket->buckets[i]!=NULL)
+    {
+      number t=p_InitContent(bucket->buckets[i],r);
+      if (n_Size(t,cf)<2)
+      {
+        n_Delete(&t,cf);
+        n_Delete(&coef,cf);
+        return;
+      }
+      number t2=n_SubringGcd(coef,t,cf);
+      n_Delete(&t,cf);
+      n_Delete(&coef,cf);
+      coef=t2;
+      if (n_Size(coef,cf)<2) { n_Delete(&coef,cf);return;}
+    }
+  }
+  // find the gcd
+  for (int i=0; i<=bucket->buckets_used;i++)
+  {
+    if (bucket->buckets[i]!=NULL)
+    {
+      poly p=bucket->buckets[i];
+      while(p!=NULL)
+      {
+        number t=n_SubringGcd(coef,pGetCoeff(p),cf);
+        if (n_Size(t,cf)<2)
+        {
+          n_Delete(&t,cf);
+          n_Delete(&coef,cf);
+          return;
+        }
+        pIter(p);
+      }
+    }
+  }
+  // divided by the gcd
+  if (TEST_OPT_PROT) PrintS("@");
+  for (int i=bucket->buckets_used;i>=0;i--)
+  {
+    if (bucket->buckets[i]!=NULL)
+    {
+      poly p=bucket->buckets[i];
+      while(p!=NULL)
+      {
+        number d = n_ExactDiv(pGetCoeff(p),coef,cf);
+        p_SetCoeff(p,d,r);
+        pIter(p);
+      }
+    }
+  }
+  n_Delete(&coef,cf);
+}
 #else
 static BOOLEAN nIsPseudoUnit(number n, ring r)
 {

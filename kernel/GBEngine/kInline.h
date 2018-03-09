@@ -206,8 +206,7 @@ KINLINE void sTObject::Copy()
     t_p = p_Copy(t_p, tailRing);
     if (p != NULL) /* and t_p!=NULL*/
     {
-      p = p_Head(p, currRing);
-      n_Delete(&pGetCoeff(p),currRing->cf);
+      p = p_LmInit(p, currRing);
       pGetCoeff(p)=pGetCoeff(t_p);
       pNext(p) = pNext(t_p);
     }

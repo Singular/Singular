@@ -1573,65 +1573,6 @@ BOOLEAN containsInSupport(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN containsInSupportOld(leftv res, leftv args)
-{
-  gfan::initializeCddlibIfRequired();
-  leftv u=args;
-  if ((u != NULL) && (u->Typ() == coneID))
-  {
-    leftv v=u->next;
-    if ((v != NULL) && (v->Typ() == coneID))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-      gfan::ZCone* zd = (gfan::ZCone*)v->Data();
-      int d1 = zc->ambientDimension();
-      int d2 = zd->ambientDimension();
-      if (d1 != d2)
-      {
-        Werror("expected cones with same ambient dimensions\n but got"
-               " dimensions %d and %d", d1, d2);
-        return TRUE;
-      }
-      bool b = (zc->contains(*zd) ? 1 : 0);
-      res->rtyp = INT_CMD;
-      res->data = (void*) (long) b;
-      return FALSE;
-    }
-    if ((v != NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-      bigintmat* iv = NULL;
-      if (v->Typ() == INTVEC_CMD)
-      {
-        intvec* iv0 = (intvec*) v->Data();
-        iv = iv2bim(iv0,coeffs_BIGINT)->transpose();
-      }
-      else
-        iv = (bigintmat*)v->Data();
-
-      gfan::ZVector* zv = bigintmatToZVector(iv);
-      int d1 = zc->ambientDimension();
-      int d2 = zv->size();
-      if (d1 != d2)
-      {
-        Werror("expected cones with same ambient dimensions\n but got"
-               " dimensions %d and %d", d1, d2);
-        return TRUE;
-      }
-      int b = zc->contains(*zv);
-      res->rtyp = INT_CMD;
-      res->data = (void*) (long) b;
-
-      delete zv;
-      if (v->Typ() == INTMAT_CMD)
-        delete iv;
-      return FALSE;
-    }
-  }
-  WerrorS("containsInSupportOld: unexpected parameters");
-  return TRUE;
-}
-
 BOOLEAN convexIntersectionOld(leftv res, leftv args)
 {
   gfan::initializeCddlibIfRequired();
@@ -2140,7 +2081,6 @@ void bbcone_setup(SModulFunctions* p)
   p->iiAddCproc("gfan.lib","coneLink",FALSE,coneLink);
   p->iiAddCproc("gfan.lib","containsAsFace",FALSE,hasFace);
   p->iiAddCproc("gfan.lib","containsInSupport",FALSE,containsInSupport);
-  p->iiAddCproc("gfan.lib","containsInSupportOld",FALSE,containsInSupportOld);
   p->iiAddCproc("gfan.lib","containsPositiveVector",FALSE,containsPositiveVector);
   p->iiAddCproc("gfan.lib","containsRelatively",FALSE,containsRelatively);
   p->iiAddCproc("gfan.lib","convexHull",FALSE,convexHull);

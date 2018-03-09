@@ -539,7 +539,7 @@ ideal idMultSect(resolvente arg, int length, GbVariant alg)
   else
   {
     tempstd=idInit(1,1);
-    Werror("wrong algorith %d for SB",(int)alg);
+    Werror("wrong algorithm %d for SB",(int)alg);
   }
 
   if(syz_ring!=orig_ring)
@@ -714,7 +714,7 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w, GbVarian
   else
   {
     h3=idInit(1,1);
-    Werror("wrong algorith %d for SB",(int)alg);
+    Werror("wrong algorithm %d for SB",(int)alg);
   }
 
   idDelete(&h2);
@@ -1426,7 +1426,7 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN *ad
     {
       if (h4->m[i-1]!=NULL)
       {
-        p = p_Copy_noCheck(h4->m[i-1], currRing);
+        p = p_Copy_noCheck(h4->m[i-1], currRing); /*h4->m[i-1]!=NULL*/
         p_Shift(&p,1,currRing);
         h4->m[i] = p;
       }
@@ -1571,7 +1571,7 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
 /*2
 * eliminate delVar (product of vars) in h1
 */
-ideal idElimination (ideal h1,poly delVar,intvec *hilb)
+ideal idElimination (ideal h1,poly delVar,intvec *hilb, GbVariant alg)
 {
   int    i,j=0,k,l;
   ideal  h,hh, h3;
@@ -1776,7 +1776,51 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   //Print("h: %d gen, rk=%d\n",IDELEMS(h),h->rank);
   //extern char * showOption();
   //Print("%s\n",showOption());
-  hh = kStd(h,NULL,hom,&w,hilb);
+  if (alg==GbDefault) alg=GbStd;
+  if (alg==GbStd)
+  {
+    if (TEST_OPT_PROT) { PrintS("std:"); mflush(); }
+    hh = kStd(h,NULL,hom,&w,hilb);
+  }
+  else if (alg==GbSlimgb)
+  {
+    if (TEST_OPT_PROT) { PrintS("slimgb:"); mflush(); }
+    hh = t_rep_gb(currRing, h, 0);
+  }
+  else if (alg==GbGroebner)
+  {
+    if (TEST_OPT_PROT) { PrintS("groebner:"); mflush(); }
+    BOOLEAN err;
+    hh=(ideal)iiCallLibProc1("groebner",idCopy(h),MODUL_CMD,err);
+    if (err)
+    {
+      Werror("error %d in >>groebner<<",err);
+      hh=idInit(1,1);
+    }
+  }
+  else if (alg==GbModstd)
+  {
+    if (TEST_OPT_PROT) { PrintS("modstd:"); mflush(); }
+    BOOLEAN err;
+    void *args[]={idCopy(h),(void*)1,NULL};
+    int arg_t[]={IDEAL_CMD,INT_CMD,0};
+    hh=(ideal)iiCallLibProcM("modStd",args,arg_t,err);
+    if (err)
+    {
+      Werror("error %d in >>modStd<<",err);
+      hh=idInit(1,1);
+    }
+  }
+  else if (alg==GbSba)
+  {
+    if (TEST_OPT_PROT) { PrintS("sba:"); mflush(); }
+    hh = kSba(h,currRing->qideal,hom,&w,1,0,NULL);
+  }
+  else
+  {
+    hh=idInit(1,1);
+    Werror("wrong algorith %d for SB",(int)alg);
+  }
   //SI_RESTORE_OPT1(save1);
   idDelete(&h);
 #else

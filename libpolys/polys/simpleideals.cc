@@ -1141,8 +1141,30 @@ ideal id_Vec2Ideal(poly vec, const ring R)
    return result;
 }
 
+/// for julia: convert an array of poly to vector
+poly id_Array2Vector(poly *m, unsigned n, const ring R)
+{
+  poly h;
+  int l;
+  sBucket_pt bucket = sBucketCreate(R);
 
-// converts mat to module, destroys mat
+  for(unsigned j=0;j<n ;j++)
+  {
+    h = m[j];
+    if (h!=NULL)
+    {
+      h=p_Copy(h, R);
+      l=pLength(h);
+      p_SetCompP(h,j+1, R);
+      sBucket_Merge_p(bucket, h, l);
+    }
+  }
+  sBucketClearMerge(bucket, &h, &l);
+  sBucketDestroy(&bucket);
+  return h;
+}
+
+/// converts mat to module, destroys mat
 ideal id_Matrix2Module(matrix mat, const ring R)
 {
   int mc=MATCOLS(mat);

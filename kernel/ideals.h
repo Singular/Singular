@@ -153,7 +153,7 @@ ideal   idQuot (ideal h1,ideal h2,
 // ideal   idPower(ideal gid,int deg);
 
 //ideal   idElimination (ideal h1,poly delVar);
-ideal   idElimination (ideal h1,poly delVar, intvec *hilb=NULL);
+ideal   idElimination (ideal h1,poly delVar, intvec *hilb=NULL, GbVariant a=GbDefault);
 
 #ifdef WITH_OLD_MINOR
 poly idMinor(matrix a, int ar, unsigned long which, ideal R = NULL);

@@ -168,4 +168,7 @@ ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring r);
 
 void id_Shift(ideal M, int s, const ring r);
 ideal id_Delete_Pos(const ideal I, const int pos, const ring r);
+
+/// for julia: convert an array of poly to vector
+poly id_Array2Vector(poly *m, unsigned n, const ring R);
 #endif
