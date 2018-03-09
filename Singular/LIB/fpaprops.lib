@@ -629,9 +629,12 @@ ASSUME: Basering is a Letterplace ring
   return(cycles);
 }
 
-static proc lpUfGraph(ideal G, list #)
-"USAGE: lpUfGraph(G); G a set of monomials in a letterplace ring, # an optional parameter to return the vertex list when set
-RETURN: intmat
+proc lpUfGraph(ideal G, list #)
+"USAGE: lpUfGraph(G); G a set of monomials in a letterplace ring.
+@*      lpUfGraph(G,1); G a set of monomials in a letterplace ring.
+RETURN: intmat or list
+NOTE: lpUfGraph(G); returns intmat. lpUfGraph(G,1); returns list L with L[1] an intmat and L[2] an ideal.
+      The intmat is the Ufnarovskij Graph and the ideal contains the vertices.
 PURPOSE: Constructs the Ufnarovskij graph induced by G
       the adjacency matrix of the Ufnarovskij graph induced by G
 ASSUME: - basering is a Letterplace ring
@@ -668,7 +671,7 @@ ASSUME: - basering is a Letterplace ring
   } kill i;
   if (size(#) > 0) {
     if (typeof(#[1]) == "int") {
-      if (#[1] == 1) {
+      if (#[1] != 0) {
         list ret = UG;
         ret[2] = ivL2lpI(SW); // the vertices
         return (ret);
@@ -676,6 +679,15 @@ ASSUME: - basering is a Letterplace ring
     }
   }
   return (UG);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  setring R; // sets basering to Letterplace ring
+  ideal I = x(1)*y(2), x(1)*z(2), z(1)*y(2), z(1)*z(2);
+  lpUfGraph(I);
+  lpUfGraph(I,1);
 }
 
 static proc maxDeg(ideal G)

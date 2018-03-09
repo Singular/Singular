@@ -59,7 +59,7 @@ static int bucket_guess(kBucket* bucket);
 static void simplify_poly (poly p, ring r)
 {
   assume (r == currRing);
-  if(!rField_is_Zp (r))
+  if(TEST_OPT_INTSTRATEGY)
   {
     p_Cleardenom (p, r);
     //includes p_Content(p,r);
@@ -982,13 +982,13 @@ add_to_reductors (slimgb_alg * c, poly h, int len, int ecart,
   P.FDeg = c->r->pFDeg (P.p, c->r);
   if(!(simplified))
   {
-    if(!rField_is_Zp (c->r))
+    if(TEST_OPT_INTSTRATEGY)
     {
       p_Cleardenom (P.p, c->r); //includes p_Content(P.p,c->r );
     }
     else
       pNorm (P.p);
-    pNormalize (P.p);
+    //pNormalize (P.p);
   }
   wlen_type pq = pQuality (h, c, len);
   i = simple_posInS (c->strat, h, len, pq);
@@ -1504,13 +1504,13 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
 
   //necessary for correct weighted length
 
-  if(!rField_is_Zp (c->r))
+  if(TEST_OPT_INTSTRATEGY)
   {
     p_Cleardenom (h, c->r); //includes p_Content(h,c->r);
   }
   else
     pNorm (h);
-  pNormalize (h);
+  //pNormalize (h);
 
   c->weighted_lengths[i] = pQuality (h, c, c->lengths[i]);
   c->gcd_of_terms[i] = got;
@@ -2996,7 +2996,6 @@ static poly redNFTail (poly h, const int sl, kStrategy strat, int len)
         res=__p_Mult_nn (res, coef, currRing);
         nDelete (&coef);
         h = kBucketGetLm (P.bucket);
-        pTest (h);
         if(h == NULL)
         {
 #ifdef REDTAIL_PROT
@@ -3005,7 +3004,6 @@ static poly redNFTail (poly h, const int sl, kStrategy strat, int len)
           kBucketDestroy (&P.bucket);
           return res;
         }
-        pTest (h);
         P.p = h;
         P.t_p = NULL;
         P.SetShortExpVector ();
@@ -3773,7 +3771,7 @@ void slimgb_alg::cleanDegs (int lower, int upper)
         poly h;
         h = S->m[i];
         h = redNFTail (h, strat->sl, strat, lengths[i]);
-        if(!rField_is_Zp (r))
+        if(TEST_OPT_INTSTRATEGY)
         {
           p_Cleardenom (h, r); //includes p_Content(h,r);
         }
@@ -4362,7 +4360,7 @@ multi_reduction_lls_trick (red_object * los, int /*losl*/, slimgb_alg * c,
     assume (pLength (clear_into) == new_length);
     if(c->strat->lenSw != NULL)
       c->strat->lenSw[j] = qal;
-    if(!rField_is_Zp (c->r))
+    if(TEST_OPT_INTSTRATEGY)
     {
       p_Cleardenom (clear_into, c->r);  //should be unnecessary
       //includes p_Content(clear_into, c->r);
@@ -4492,7 +4490,7 @@ multi_reduction_find (red_object * los, int losl, slimgb_alg * c, int startf,
       canonicalize_region (los, erg.to_reduce_u + 1, startf, c);
       return;
     }
-    if(j < 0)
+    else /*if(j < 0)*/
     {
       //not reduceable, try to use this for reducing higher terms
       int i2 = fwbw (los, i);
@@ -4871,8 +4869,6 @@ void simple_reducer::reduce (red_object * r, int l, int u)
   {
     kBucketSimpleContent (r[i].bucket);
     r[i].validate ();
-#ifdef TGB_DEBUG
-#endif
   }
 }
 
@@ -4911,12 +4907,12 @@ void multi_reduce_step (find_erg & erg, red_object * r, slimgb_alg * c)
     r[rn].flatten ();
     kBucketClear (r[rn].bucket, &red, &red_len);
 
-    if(!rField_is_Zp (c->r))
+    if(TEST_OPT_INTSTRATEGY)
     {
       p_Cleardenom (red, c->r); //should be unnecessary
       //includes p_Content(red, c->r);
     }
-    pNormalize (red);
+    //pNormalize (red);
 
     if((!(erg.fromS)) && (TEST_V_UPTORADICAL))
     {

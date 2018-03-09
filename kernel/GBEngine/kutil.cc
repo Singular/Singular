@@ -9117,13 +9117,13 @@ void enterSBba (LObject &p,int atS,kStrategy strat, int atR)
   }
 
   /*- save result -*/
-  p_Test(p.p,currRing);
-  strat->S[atS] = p.p;
+  poly pp=p.p;
+  strat->S[atS] = pp;
   if (strat->honey) strat->ecartS[atS] = p.ecart;
   if (p.sev == 0)
-    p.sev = pGetShortExpVector(p.p);
+    p.sev = pGetShortExpVector(pp);
   else
-    assume(p.sev == pGetShortExpVector(p.p));
+    assume(p.sev == pGetShortExpVector(pp));
   strat->sevS[atS] = p.sev;
   strat->ecartS[atS] = p.ecart;
   strat->S_2_R[atS] = atR;
