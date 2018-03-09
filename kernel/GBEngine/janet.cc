@@ -236,7 +236,8 @@ void NFL(Poly *p, TreeM *F)
     if ((pX == pF) && (pF == phF))
     {
       pLmFree(&f->history);
-      f->history=p_Copy_noCheck(p->history,currRing); /* cf of p->history is NULL */
+      if (p->history!=NULL)
+        f->history=p_Copy_noCheck(p->history,currRing); /* cf of p->history is NULL */
     }
   }
 

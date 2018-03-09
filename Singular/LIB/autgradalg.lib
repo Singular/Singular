@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="version autgradalg.lib 4.1.1.0 Dec_2017 "; //$Id$
+version="version autgradalg.lib 4.1.1.1 Feb_2018 "; // $Id$
 category="Commutative Algebra, Algebraic Geometry";
 info="
 LIBRARY: autgradalg.lib   Compute automorphism groups of pointedly graded algebras and of Mori dream spaces.
@@ -26,7 +26,8 @@ stabilizer(I0, TOR): compute the stabilizer of the given ideal
 autXhat(I0, w, TOR): compute the automorphism group of \widehat X as an algebraic subgroup V(I) of some GL(n).
 autX(I0, w, TOR): compute the automorphism group of X=X(R,w) as an algebraic subgroup V(I) of some GL(n).
 
-NOTE: the following functions were taken from 'quotsingcox.lib' by M.Donten-Bury and S.Keicher: 'hilbBas'.
+NOTE: the following functions were taken from 'quotsingcox.lib' by M.Donten-Bury and S.Keicher: 'hilbertBas'.
+NOTE: This library comes without any warranty whatsoever. Use it at your own risk.
 
 KEYWORDS: automorphisms; graded algebra; Mori dream spaces; automorphism group; symmetries
 ";
@@ -300,7 +301,7 @@ static proc gradedCompIdealhelper(intvec w, intmat Q, ideal RL, list #){
       RLw[size(RLw)+1] = RL[i];
     } else {
       // if delta is not in cQ, then there is no monomial of this degree:
-      if(containsInSupportOld(cQ, delta)){
+      if(containsInSupport(cQ, delta)){
         // calculate all monomials of degree delta
         list deltaMON = wmonomials(delta, 0, TOR);
 
@@ -658,6 +659,7 @@ static proc autGenWeightsTorsion(intmat Q, list TOR, list Origs, list OrigDim){
     for(j = 1; j <= size(CL); j++){
       for(k = 1; k <= size(DL); k++){
         intmat A = concatBCD(AUT0[i], CL[j], DL[k]);
+
         // M * Origs = Origs?:
         if(fixesOrig(A, Origs, OrigDim, TOR)){
           AUT[size(AUT)+1] = A;
@@ -2971,7 +2973,10 @@ static proc linearHull(intmat P){
 // helper
 // compute generators for the veronese subalgebra
 static proc veron(intmat P){
-  cone V = linearHull(P);//coneViaPoints(M);
+  // linear hull of P:
+  intmat Pplusminus[2*nrows(P)][ncols(P)] = P, -P;
+
+  cone V = coneViaPoints(Pplusminus);
   cone posorth = coneViaPoints(getIdMat(ambientDimension(V)));
   cone c = convexIntersection(V, posorth);
 
@@ -3045,51 +3050,52 @@ EXAMPLE: example autX; shows an example
 }
 example
 {
-  echo=2;
+  ///////////////
+  //// CAREFUL: the following examples seems to be unfeasible at the moment, see remark in the paper
 
-  /////////////
-  // PP2
-//  intmat Q[1][4] =
-//    1,1,1,1;
-//
-//  ring R = 0,T(1..ncols(Q)),dp;
-//
-//  // attach degree matrix Q to R:
-//  setBaseMultigrading(Q);
-//  ideal I = 0;
-//  intvec w0 = 1;
-//
-//  def RR = autX(I, w0);
-//  setring RR;
-//  Iexported;
-//
-//  basering;
-//  dim(std(Iexported));
-//
-//  kill RR, Q, R;
-//
-//  quit;
-//  /////////////
-//  // example 3.14 from the paper
-//  intmat Q[3][5] =
-//    1,1,1,1,1,
-//    1,-1,0,0,1,
-//    1,1,1,0,0;
-//
-//  list TOR = 2;
-//  ring R = 0,T(1..5),dp;
-//
-//  // attach degree matrix Q to R:
-//  setBaseMultigrading(Q);
-//
-//  ideal I = T(1)*T(2) + T(3)^2 + T(4)^2;
-//  list TOR = 2;
-//
-//  intvec w0 = 2,1,0;
-//  def RR = autX(I, w0, TOR);
-//  setring RR;
-//
-//  kill RR, Q, R;
+  //echo=2;
+  ///////////////
+  //// PP2
+  //intmat Q[1][4] =
+  //  1,1,1,1;
+
+  //ring R = 0,T(1..ncols(Q)),dp;
+
+  //// attach degree matrix Q to R:
+  //setBaseMultigrading(Q);
+  //ideal I = 0;
+  //intvec w0 = 1;
+
+  //def RR = autX(I, w0);
+  //setring RR;
+  //Iexported;
+
+  //basering;
+  //dim(std(Iexported));
+
+  //kill RR, Q, R;
+
+  ///////////////
+  //// example 3.14 from the paper
+  //intmat Q[3][5] =
+  //  1,1,1,1,1,
+  //  1,-1,0,0,1,
+  //  1,1,1,0,0;
+
+  //list TOR = 2;
+  //ring R = 0,T(1..5),dp;
+
+  //// attach degree matrix Q to R:
+  //setBaseMultigrading(Q);
+
+  //ideal I = T(1)*T(2) + T(3)^2 + T(4)^2;
+  //list TOR = 2;
+
+  //intvec w0 = 2,1,0;
+  //def RR = autX(I, w0, TOR);
+  //setring RR;
+
+  //kill RR, Q, R;
 }
 
 ////////////////////
@@ -3110,7 +3116,7 @@ example
     1,0,
     1,3;
 
-  intmat B = hilbBas(coneViaPoints(A));
+  intmat B = hilbertBas(coneViaPoints(A));
   print(B);
 
   // 2nd ex:
@@ -3119,7 +3125,7 @@ example
     1, 1, 0, 0,
     6, 3, 4, 2;
 
-  intmat D = hilbBas(coneViaPoints(C));
+  intmat D = hilbertBas(coneViaPoints(C));
   print(D);
 
 }

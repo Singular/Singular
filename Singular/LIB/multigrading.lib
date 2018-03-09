@@ -3118,7 +3118,11 @@ RETURN:  toric ideal specified by Hilbert basis thereof
 EXAMPLE: example graver4ti2; shows an example
 "
 {
-   if( system("sh","which hilbert 2> /dev/null 1> /dev/null") != 0 )
+   // find the name of hilbert/4ti2-hilbert
+   string s_name=system("executable","hilbert");
+   if (size(s_name)==0) { s_name=system("executable","4ti2-hilbert"); /* debian*/ }
+
+   if( size(s_name)==0 )
    {
      ERROR("Sorry: cannot find 'hilbert' command from 4ti2. Please install 4ti2!");
    }
@@ -3176,7 +3180,7 @@ EXAMPLE: example graver4ti2; shows an example
 //----------------------------------------------------------------------
 
 
-   j=system("sh","hilbert -q sing4ti2 >/dev/null 2>&1"); ////////// be quiet + no loggin!!!
+   j=system("sh",s_name+" -q sing4ti2 >/dev/null 2>&1"); ////////// be quiet + no loggin!!!
 
    j=system("sh", "awk \'BEGIN{ORS=\",\";}{print $0;}\' sing4ti2.hil " +
                 "| sed s/[\\\ \\\t\\\v\\\f]/,/g " +

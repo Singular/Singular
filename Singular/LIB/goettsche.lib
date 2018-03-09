@@ -1,11 +1,13 @@
 ////////////////////////////////////////////////////////////////
-version = "version goettsche.lib 4.1.1.0 Sep_2017 ";  // $Id$
-category = "Betti numbers";
+version = "version goettsche.lib 0.931 Feb_2018 ";      //$Id$
 info="
 LIBRARY:  goettsche.lib     Drezet's formula for the Betti numbers of the moduli space
-                            of Kronecker modules,
+                            of Kronecker modules;
                             Goettsche's formula for the Betti numbers of the Hilbert scheme
-                            of points on a surface,
+                            of points on a surface;
+                            Nakajima's and Yoshioka's formula for the Betti numbers
+                            of the punctual Quot-schemes on a plane or, equivalently,
+                            of the moduli spaces of the framed torsion-free planar sheaves;
                             Macdonald's formula for the symmetric product
 
 AUTHOR:  Oleksandr Iena,    o.g.yena@gmail.com
@@ -20,12 +22,20 @@ REFERENCES:
 
   [3] Macdonald, I. G.,     The Poincare polynomial of a symmetric product,
                             Mathematical proceedings of the Cambridge Philosophical Society:
-                            58, 563 - 568, (1962).
+                            58, 563-568, (1962).
+
+  [4] Nakajima, Hiraku;     Lectures on instanton counting, CRM Proceedings and Lecture Notes,
+      Yoshioka, Kota        Volume 88, 31-101, (2004).
 
 PROCEDURES:
   GoettscheF(z, t, n, b);   The Goettsche's formula up to n-th degree
   PPolyH(z, n, b);          Poincare Polynomial of the Hilbert scheme of n points on a surface
   BettiNumsH(n, b);         Betti numbers of the Hilbert scheme of n points on a surface
+  NakYoshF(z, t, r, n);     The Nakajima-Yoshioka formula up to n-th degree
+  PPolyQp(z, n, b);         Poincare Polynomial of the punctual Quot-scheme
+                            of rank r on n planar points
+  BettiNumsQp(n, b);        Betti numbers of the punctual Quot-scheme
+                            of rank r on n planar points
   MacdonaldF(z, t, n, b);   The Macdonald's formula up to n-th degree
   PPolyS(z, n, b);          Poincare Polynomial of the n-th symmetric power of a variety
   BettiNumsS(n, b);         Betti numbers of the n-th symmetric power of a variety
@@ -34,7 +44,7 @@ PROCEDURES:
   BettiNumsN(q, m, n);      Betti numbers of the moduli space
                             of Kronecker modules N (q; m, n)
 
-KEYWORDS: betti number; Goettsche's formula; Macdonald's formula;Kronecker modules
+KEYWORDS:  Betty number; Goettsche's formula; Macdonald's formula; Kronecker module; Hilbert scheme; Quot-scheme; framed sheaves; symmetric product
 ";
 //----------------------------------------------------------
 
@@ -60,7 +70,7 @@ NOTE:     zero is returned if n<0 or b is not a list of non-negative integers
     print("zero polynomial is returned");
     return( poly(0) );
   }
-  // now is non-negative and b is a list of non-negative integers
+  // now n is non-negative and b is a list of non-negative integers
   if(size(b) < 5) // if there are not enough Betti numbers
   {
     print("a surface must habe 5 Betti numbers b_0, b_1, b_2, b_3, b_4");
@@ -123,7 +133,7 @@ NOTE:     zero is returned if n<0 or b is not a list of non-negative integers
     print("zero polynomial is returned");
     return( poly(0) );
   }
-  // now is non-negative and b is a list of non-negative integers
+  // now n is non-negative and b is a list of non-negative integers
   if(size(b) < 5) // if there are not enough Betti numbers
   {
     print("a surface must habe 5 Betti numbers b_0, b_1, b_2, b_3, b_4");
@@ -187,7 +197,7 @@ NOTE:     an empty list is returned if n<0 or b is not a list of non-negative in
     print("an empty list is returned");
     return(list());
   }
-  // now is non-negative and b is a list of non-negative integers
+  // now n is non-negative and b is a list of non-negative integers
   if(size(b) < 5) // if there are not enough Betti numbers
   {
     print("a surface must habe 5 Betti numbers b_0, b_1, b_2, b_3, b_4");
@@ -228,6 +238,174 @@ example
   list b=1,0,1,0,1;
   // get the Betti numbers of the Hilbert scheme of 3 points on P_2
   print( BettiNumsH(3, b) );
+}
+//----------------------------------------------------------
+
+proc NakYoshF(poly z, poly t, int r, int n)
+"USAGE:   NakYoshF(z, t, r, n);  z, t polynomials, r, n integers
+RETURN:   polynomial in z and t
+PURPOSE:  computes the formula of Nakajima and Yoshioka
+          up to degree n in t
+EXAMPLE:  example NakYoshF; shows an example
+NOTE:     zero is returned if n<0 or r<=0
+"
+{
+  // check the input data
+  if(n<0)
+  {
+    print("the number of points must be non-negative");
+    print("zero polynomial is returned");
+    return( poly(0) );
+  }
+  if(r<=0)
+  {
+    print("r must be positive");
+    print("zero polynomial is returned");
+    return( poly(0) );
+  }
+  // now n is non-negative and r is positive
+  def br@=basering; // remember the base ring
+  // add additional variables z@, t@ to the base ring
+  execute("ring r@= (" + charstr(basering) + "),("+varstr(basering)+", z@, t@), dp;" );
+  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
+  // compute the generating function by the Nakajima-Yoshioka formula up to degree n in t@
+  poly rez=1;
+  int k,i;
+  ideal I=std(t@^(n+1));
+  for(k=1;k<=n;k++)
+  {
+    for(i=1;i<=r;i++)
+    {
+      rez=NF( rez*generFactor( z@^(2*(r*k-i))*t@^k, k, 0, 1, n), I);
+    }
+  }
+  setring br@; // come back to the initial base ring
+  // define the specialization homomorphism z@=z, t@=t
+  execute( "map FF= r@,"+varstr(br@)+", z, t;" );
+  poly rez=FF(rez); // bring the result to the base ring
+  return(rez);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r=0, (t, z), ls;
+  // get the Nakajima-Yoshioka formula for r=1 up to degree 3, i.e.,
+  // the generating function for the Poincare polynomials of the
+  // punctual Hilbert schemes of n planar points
+  print( NakYoshF(z, t, 1, 3) );
+}
+//----------------------------------------------------------
+
+proc PPolyQp(poly z, int r, int n)
+"USAGE:   PPolyQp(z, r, n);  z polynomial, r, n integers
+RETURN:   polynomial in z
+PURPOSE:  computes the Poincare polynomial of the punctual Quot-scheme
+          of rank r on n planar points
+EXAMPLE:  example PPolyQp; shows an example
+NOTE:     zero is returned if n<0 or r<=0
+"
+{
+  // check the input data
+  if(n<0)
+  {
+    print("the number of points must be non-negative");
+    print("zero polynomial is returned");
+    return( poly(0) );
+  }
+  if(r<=0)
+  {
+    print("r must be positive");
+    print("zero polynomial is returned");
+    return( poly(0) );
+  }
+  // now n is non-negative and r is positive
+  def br@=basering; // remember the base ring
+  // add additional variables z@, t@ to the base ring
+  execute("ring r@= (" + charstr(basering) + "),("+varstr(basering)+", z@, t@), dp;" );
+  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
+  // compute the generating function by the Nakajima-Yoshioka formula up to degree n in t@
+  poly rez=1;
+  int k,i;
+  ideal I=std(t@^(n+1));
+  for(k=1;k<=n;k++)
+  {
+    for(i=1;i<=r;i++)
+    {
+      rez=NF(rez*generFactor( z@^(2*(r*k-i))*t@^k, k, 0, 1, n), I);
+    }
+  }
+  rez= coeffs(rez, t@)[n+1, 1]; // take the coefficient of the n-th power of t@
+  setring br@; // come back to the initial base ring
+  // define the specialization homomorphism z@=z, t@=0
+  execute( "map FF= r@,"+varstr(br@)+",z, 0;" );
+  poly rez=FF(rez); // bring the result to the base ring
+  return(rez);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r=0, (z), ls;
+  // get the Poincare polynomial of the punctual Hilbert scheme (r=1)
+  // of 3 planar points
+  print( PPolyQp(z, 1, 3) );
+}
+//----------------------------------------------------------
+
+proc BettiNumsQp(int r, int n)
+"USAGE:   BettiNumsQp(r, n);  n, r integers
+RETURN:   list of non-negative integers
+PURPOSE:  computes the Betti numbers of the punctual Quot-scheme
+          of rank r on n points on a plane
+EXAMPLE:  example BettiNumsQp; shows an example
+NOTE:     an empty list is returned if n<0 or r<=0
+"
+{
+  // check the input data
+  if(n<0)
+  {
+    print("the number of points must be non-negative");
+    print("zero polynomial is returned");
+    return( poly(0) );
+  }
+  if(r<=0)
+  {
+    print("r must be positive");
+    print("zero polynomial is returned");
+    return( poly(0) );
+  }
+  // now n is non-negative and r is positive
+  def br@=basering; // remember the base ring
+  // add additional variables z@, t@ to the base ring
+  execute("ring r@= (" + charstr(basering) + "),("+varstr(basering)+", z@, t@), dp;" );
+  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
+  poly rez=1;
+  int k,i;
+  ideal I=std(t@^(n+1));
+  for(k=1;k<=n;k++)
+  {
+    for(i=1;i<=r;i++)
+    {
+      rez=NF(rez*generFactor( z@^(2*(r*k-i))*t@^k, k, 0, 1, n), I);
+    }
+  }
+  rez= coeffs(rez, t@)[n+1, 1]; // take the coefficient of the n-th power of t@
+  matrix CF=coeffs(rez, z@); // take the matrix of the coefficients
+  list res; // and transform it to a list
+  int d=size(CF);
+  for(i=1; i<=d; i++)
+  {
+    res=res+ list(int(CF[i, 1])) ;
+  }
+  setring br@; // come back to the initial base ring
+  return(res);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r=0, (z), ls;
+  // get the Betti numbers of the punctual Hilbert scheme (r=1)
+  // of 3 points on a plane
+  print( BettiNumsQp(1, 3) );
 }
 //----------------------------------------------------------
 
@@ -727,4 +905,3 @@ static proc geomS(poly t, int d)
   return(rez);
 }
 //----------------------------------------------------------
-

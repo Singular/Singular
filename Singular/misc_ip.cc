@@ -73,8 +73,8 @@
 #endif
 
 #ifdef HAVE_NTL
-#include<NTL/version.h>
-#include<NTL/tools.h>
+#include <NTL/version.h>
+#include <NTL/tools.h>
 #ifdef NTL_CLIENT
 NTL_CLIENT
 #endif
