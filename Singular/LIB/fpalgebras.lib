@@ -44,6 +44,128 @@ LIB "general.lib";
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
+// Simple Algebras /////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+proc simpleAlgebra(string a, int d) // TODO name
+"USAGE: simpleAlgebra(a,d); a a string, d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - a gives the name of the algebra
+@*    - d gives the degreebound for the Letterplace ring
+@*
+@*    a must be one of the following:
+@*      integrodiff3
+@*      toeplitz
+@*      weyl1
+@*      usl2
+@*      usl2h
+@*      shift1inverse
+@*      exterior2
+@*      quadrowmm
+@*      shift1
+@*      weyl1inverse
+@*
+"
+{
+  if (d < 2) {
+    ERROR("Degbound d is too small. Must be at least 2.");
+  }
+  int baseringdef;
+  if (defined(basering)) // if a basering is defined, it should be saved for later use
+  {
+    def save = basering;
+    baseringdef = 1;
+  }
+
+  if (a == "integrodiff3") {
+    ring r = 0,(d,I,x),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = d(1)*x(2)-x(1)*d(2)-1,
+          I(1)*x(2)-x(1)*I(2)+I(1)*I(2),
+          d(1)*I(2)-1;
+  }
+  if (a == "toeplitz") {
+    ring r = 0,(y,x),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = y(1)*x(2)-1;
+  }
+  if (a == "weyl1") {
+    ring r = 0,(d,x),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = d(1)*x(2)-x(1)*d(2)-1;
+  }
+  if (a == "usl2") {
+    ring r = 0,(h,f,e),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = f(1)*e(2)-e(1)*f(2)+h(1),
+          h(1)*e(2)-e(1)*h(2)-2*e(1),
+          h(1)*f(2)-f(1)*h(2)+2*f(1);
+  }
+  if (a == "usl2h") {
+    ring r = 0,(H,h,f,e),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = f(1)*e(2)-e(1)*f(2)+h(1)*H(2),
+          h(1)*e(2)-e(1)*h(2)-2*e(1)*H(2),
+          h(1)*f(2)-f(1)*h(2)+2*f(1)*H(2),
+          f(1)*H(2)-H(1)*f(2),
+          e(1)*H(2)-H(1)*e(2),
+          h(1)*H(2)-H(1)*h(2);
+  }
+  if (a == "shift1inverse") {
+    ring r = 0,(d,x,t),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = d(1)*x(2)-x(1)*d(2)-d(1),
+          t(1)*x(2)-1,
+          x(1)*t(2)-1;
+  }
+  if (a == "exterior2") {
+    ring r = 0,(y,x),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = y(1)*x(2)+x(1)*y(2),
+          x(1)*x(2),
+          y(1)*y(2);
+  }
+  if (a == "quadrowmm") {
+    ring r = 0,(y,x),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = y(1)*x(2)-x(1)*y(2),
+          x(1)*x(2),
+          y(1)*y(2);
+  }
+  if (a == "shift1") {
+    ring r = 0,(s,x),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = s(1)*x(2)-x(1)*s(2)-s(1);
+  }
+  if (a == "weyl1inverse") {
+    ring r = 0,(d,x,t),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = d(1)*x(2)-x(1)*d(2)-1,
+          t(1)*x(2)-1,
+          x(1)*t(2)-1;
+  }
+
+  if (!defined(I)) {
+    ERROR("Illegal argument for algebra");
+  }
+
+  export(I);
+  if (baseringdef == 1) {setring save;}
+  return(R);
+}
+
+////////////////////////////////////////////////////////////////////
 // Baumslag ////////////////////////////////////////////////////////
 // from Grischa Studzinski /////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
