@@ -1050,15 +1050,18 @@ EXAMPLE: example lpSubstitute; shows examples
     intvec ivfi = lp2iv(f[i]);
     for (int j = 1; j <= size(ivfi); j++) {
       int varindex = ivfi[j];
-      int subindex = lpIndexOf(s1, var(varindex));
-      if (subindex > 0) {
-        s2[subindex] = lpNF(s2[subindex],G);
-        fis = lpMult(fis, s2[subindex]);
-      } else {
-        fis = lpMult(fis, lpNF(iv2lp(varindex),G));
+      if (varindex > 0) {
+        int subindex = lpIndexOf(s1, var(varindex));
+        if (subindex > 0) {
+          s2[subindex] = lpNF(s2[subindex],G);
+          fis = lpMult(fis, s2[subindex]);
+        } else {
+          fis = lpMult(fis, lpNF(iv2lp(varindex),G));
+        }
+        /*fis = lpNF(fis,G);*/
+        kill subindex;
       }
-      /*fis = lpNF(fis,G);*/
-      kill varindex; kill subindex;
+      kill varindex;
     } kill j;
     kill ivfi;
     fs = fs + fis;
@@ -1149,13 +1152,16 @@ EXAMPLE: example lpSubstitute; shows examples
     int tmpDegBound;
     for (int j = 1; j <= size(ivfi); j++) {
       int varindex = ivfi[j];
-      int subindex = lpIndexOf(s1, var(varindex));
-      if (subindex > 0) {
-        tmpDegBound = tmpDegBound + deg(s2[subindex]);
-      } else {
-        tmpDegBound = tmpDegBound + 1;
+      if (varindex > 0) {
+        int subindex = lpIndexOf(s1, var(varindex));
+        if (subindex > 0) {
+          tmpDegBound = tmpDegBound + deg(s2[subindex]);
+        } else {
+          tmpDegBound = tmpDegBound + 1;
+        }
+        kill subindex;
       }
-      kill varindex; kill subindex;
+      kill varindex;
     } kill j;
     if (tmpDegBound > maxDegBound) {
       maxDegBound = tmpDegBound;
