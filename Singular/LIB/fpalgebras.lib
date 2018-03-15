@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version="version fpalgebras.lib 4.1.1.0 Feb_2018 ";
+version="version fpalgebras.lib 4.1.1.0 Mar_2018 ";
 category="Noncommutative";
 info="
 LIBRARY: fpalgebras.lib
@@ -13,6 +13,7 @@ OVERVIEW:
 Generation of various algebras, including group algebras of finitely presented groups in the Letterplace ring
 
 PROCEDURES:
+operatorAlgebra(string a, int d);
 baumslagSolitar(int n, int m, int d, list #);
 baumslag(int m, int n, int d);
 crystallographicGroupP1(int d);
@@ -44,11 +45,11 @@ LIB "general.lib";
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
-// Simple Algebras /////////////////////////////////////////////////
+// Operator Algebras ///////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 
-proc simpleAlgebra(string a, int d) // TODO name
-"USAGE: simpleAlgebra(a,d); a a string, d an integer
+proc operatorAlgebra(string a, int d)
+"USAGE: operatorAlgebra(a,d); a a string, d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - a gives the name of the algebra
@@ -65,6 +66,8 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 @*      quadrowmm
 @*      shift1
 @*      weyl1inverse
+@*
+@*    This is a collection of common algebras
 @*
 "
 {
@@ -177,6 +180,9 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - in the group case: A = a^(-1), B = b^(-1)
 @*    - negativ input is only allowed in the group case!
 @*    - d gives a degreebound and must be >m,n
+@*
+@*    This is a family
+@*
 "
 {
   int isGroup = 0;
@@ -273,6 +279,9 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - Baumslag group with the following presentation
 @*      < a, b | a^m = b^n = 1 >
 @*    -d gives the degreebound for the Letterplace ring
+@*
+@*    This is a family
+@*
 "
 {
  if (m < 0 || n < 0 ) {ERROR("m,n must be non-negativ integers!");}
@@ -884,6 +893,9 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - negative exponents are allowed
 @*    - representation in the form x_i^p_i - x_(i+1)^p_(i+1)
 @*    - d gives the degreebound for the Letterplace ring
+@*
+@*    This is a family
+@*
 "
 {
  int baseringdef,i,j;
@@ -933,6 +945,9 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - negative exponents are allowed
 @*    - representation in the form x_i^p_i - 1
 @*    - d gives the degreebound for the Letterplace ring
+@*
+@*    This is a family
+@*
 "
 {
  int baseringdef,i,j;
@@ -983,6 +998,9 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - only positive exponents are allowed
 @*    - no inverse generators needed
 @*    - d gives the degreebound for the Letterplace ring
+@*
+@*    This is a family
+@*
 "
 {
  int baseringdef,i,j;
@@ -1035,6 +1053,9 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 @*    - The Fibonacci group F(2, m) with the following presentation
 @*      < x_1, x_2, ... , x_m | x_i * x_(i + 1) = x_(i + 2) >
 @*    - d gives the degreebound for the Letterplace ring
+@*
+@*    This is a family
+@*
 "
 // TODO: basefield Q oder F2?
 // TODO: inverse Elemente!
@@ -1084,8 +1105,10 @@ proc tetrahedronGroup(int g, int d)
 "USAGE: tetrahedronGroup(g,d); g an integer, d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
-@*    - g gives the number of the example
+@*    - g gives the number of the example (1 - 5)
 @*    - d gives the degreebound for the Letterplace ring
+@*
+@*    This is a family
 @*
 The examples are found in
 Classification of the finite generalized tetrahedron groups
@@ -1149,8 +1172,10 @@ proc triangularGroup(int g, int d)
 "USAGE: triangularGroup(g,d); g an integer, d an integer
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
-@*    - g gives the number of the example
+@*    - g gives the number of the example (1 - 14)
 @*    - d gives the degreebound for the Letterplace ring
+@*
+@*    This is a family
 @*
 The examples are found in
 Classification of the finite generalized tetrahedron groups
