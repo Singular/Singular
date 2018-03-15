@@ -1171,7 +1171,7 @@ EXAMPLE: example lpSubstitute; shows examples
 
   // increase degbound by 50% when ideal is provided
   // needed for lpNF
-  maxDegBound = maxDegBound + maxDegBound/2;
+  maxDegBound = maxDegBound + (maxDegBound div 2);
 
   return (maxDegBound);
 }
