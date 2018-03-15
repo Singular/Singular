@@ -2377,7 +2377,8 @@ proc ivMaxIdeal(int l, int lonly)
   }
   return (words);
 }
-example {
+example
+{
   "EXAMPLE:"; echo = 2;
   ring r = 0,(a,b,c),dp;
   def R = makeLetterplaceRing(7); setring R;
@@ -2398,7 +2399,8 @@ proc lpMaxIdeal(int d, int donly)
 {
   return(ivL2lpI(ivMaxIdeal(d, donly)));
 }
-example {
+example
+{
   "EXAMPLE:"; echo = 2;
   ring r = 0,(a,b,c),dp;
   def R = makeLetterplaceRing(7); setring R;
@@ -2488,7 +2490,8 @@ proc monomialBasis(int d, int donly, ideal J)
   kill Ibase;
   return(I);
 }
-example {
+example
+{
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(7); setring R;

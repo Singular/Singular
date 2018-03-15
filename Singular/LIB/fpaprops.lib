@@ -107,7 +107,8 @@ ASSUME: - basering is a Letterplace ring
   } kill v;
   return (3 - inFlag - outFlag);
 }
-example {
+example
+{
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5);
@@ -248,7 +249,8 @@ ASSUME: - basering is a Letterplace ring
 
   return (1);
 }
-example {
+example
+{
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x1,x2),dp;
   def R = makeLetterplaceRing(5);
@@ -361,7 +363,8 @@ ASSUME: - basering is a Letterplace ring
 
   return (1);
 }
-example {
+example
+{
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5);
@@ -680,7 +683,8 @@ ASSUME: - basering is a Letterplace ring
   }
   return (UG);
 }
-example {
+example
+{
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
@@ -1064,7 +1068,9 @@ EXAMPLE: example lpSubstitute; shows examples
   fs = lpNF(fs, G);
   return (fs);
 }
-example {
+example
+{
+  "EXAMPLE:"; echo = 2;
   //////// EXAMPLE A ////////
   ring r = 0,(x,y,z),dp;
   def R = makeLetterplaceRing(4);
@@ -1163,7 +1169,8 @@ EXAMPLE: example lpSubstitute; shows examples
 
   return (maxDegBound);
 }
-example {
+example
+{
   // see lpSubstitute()
 }
 
@@ -1186,7 +1193,8 @@ NOTE: convenience method
   } kill i;
   return (maxDegBound);
 }
-example {
+example
+{
   // see lpSubstitute()
 }
 
