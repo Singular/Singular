@@ -3731,6 +3731,40 @@ static proc checkWeightedExampleLP()
   lpMultX(a,b); // seems to work properly
 }
 
+proc lpPrint(ideal I, def @r)
+"USAGE: lpPrint(I, r); I an ideal, r a ring
+RETURN: list of strings
+PURPOSE: represent Letterplace ideal in the form of words
+ASSUME: - basering is a Letterplace ring, r is the commutative ring
+from which basering has been built
+EXAMPLE: example lpPrint; shows example
+"
+{
+	def save = basering;
+	lp2lstr(I,@r); // export an object called @code{@LN} to the ring r
+	setring @r;  // change to the ring r
+	list @L = lst2str(@LN,1);
+	export @L;
+	setring save;
+	list @@L = @L;
+	setring @r;
+	kill @L;
+	kill @LN;
+	setring save;
+	return(@@L);
+}
+example
+{
+ "EXAMPLE:"; echo = 2;
+ ring r = (0,a,b,g),(x,y),Dp;
+ def R = makeLetterplaceRing(4); // constructs a Letterplace ring
+ setring R; // downup algebra A
+ ideal J = x(1)*x(2)*y(3)-a*x(1)*y(2)*x(3) - b*y(1)*x(2)*x(3) - g*x(1),
+ x(1)*y(2)*y(3)-a*y(1)*x(2)*y(3) - b*y(1)*y(2)*x(3) - g*y(1);
+ list L = lpPrint(J,r);
+ L;
+}
+
 /* THE FOLLOWING ARE UNDER DEVELOPMENT
 // copied following from freegb_wrkcp.lib by Karim Abou Zeid on 07.04.2017:
 // makeLetterplaceRingElim(int d)
