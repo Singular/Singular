@@ -3511,7 +3511,7 @@ static proc lpReduce(poly p, poly g, int s)
  for (i = 1; i <= size(g); i++)
  {qt = qt + lpMult(lpMult(l,g[i]),r);
  }
- return((leadcoef(qt)*p - leadcoef(p)*qt));
+ return(p - leadcoef(p)*normalize(qt));
 }
 
 
