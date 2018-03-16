@@ -35,7 +35,6 @@
 * #   define EPERM 1
 * #   define ENOMEM 23
 * #   define ENOSPC 28
-* #   define L_SET SEEK_SET
 */
 #include <errno.h>
 #include <stdlib.h>
@@ -155,7 +154,7 @@ int dbm_delete(DBM *db, datum key)
   if (!delitem(db->dbm_pagbuf, i))
     goto err;
   db->dbm_pagbno = db->dbm_blkno;
-  (void) lseek(db->dbm_pagf, db->dbm_blkno*PBLKSIZ, L_SET);
+  (void) lseek(db->dbm_pagf, db->dbm_blkno*PBLKSIZ, SEEK_SET);
   if (si_write(db->dbm_pagf, db->dbm_pagbuf, PBLKSIZ) != PBLKSIZ)
   {
   err:
@@ -195,7 +194,7 @@ _loop:
   if (!additem(db->dbm_pagbuf, key, dat))
     goto split;
   db->dbm_pagbno = db->dbm_blkno;
-  (void) lseek(db->dbm_pagf, db->dbm_blkno*PBLKSIZ, L_SET);
+  (void) lseek(db->dbm_pagf, db->dbm_blkno*PBLKSIZ, SEEK_SET);
   if ( (ret=si_write(db->dbm_pagf, db->dbm_pagbuf, PBLKSIZ)) != PBLKSIZ)
   {
     db->dbm_flags |= _DBM_IOERR;
@@ -234,13 +233,13 @@ split:
     i += 2;
   }
   db->dbm_pagbno = db->dbm_blkno;
-  (void) lseek(db->dbm_pagf, db->dbm_blkno*PBLKSIZ, L_SET);
+  (void) lseek(db->dbm_pagf, db->dbm_blkno*PBLKSIZ, SEEK_SET);
   if (si_write(db->dbm_pagf, db->dbm_pagbuf, PBLKSIZ) != PBLKSIZ)
   {
     db->dbm_flags |= _DBM_IOERR;
     return (-1);
   }
-  (void) lseek(db->dbm_pagf, (db->dbm_blkno+db->dbm_hmask+1)*PBLKSIZ, L_SET);
+  (void) lseek(db->dbm_pagf, (db->dbm_blkno+db->dbm_hmask+1)*PBLKSIZ, SEEK_SET);
   if (si_write(db->dbm_pagf, ovfbuf, PBLKSIZ) != PBLKSIZ)
   {
     db->dbm_flags |= _DBM_IOERR;
@@ -273,7 +272,7 @@ datum dbm_nextkey(DBM *db)
     if (db->dbm_blkptr != db->dbm_pagbno)
     {
       db->dbm_pagbno = db->dbm_blkptr;
-      (void) lseek(db->dbm_pagf, db->dbm_blkptr*PBLKSIZ, L_SET);
+      (void) lseek(db->dbm_pagf, db->dbm_blkptr*PBLKSIZ, SEEK_SET);
       if (si_read(db->dbm_pagf, db->dbm_pagbuf, PBLKSIZ) != PBLKSIZ)
         memset(db->dbm_pagbuf, 0, PBLKSIZ);
 #ifdef DEBUG
@@ -312,7 +311,7 @@ static void dbm_access(DBM *db, long hash)
   if (db->dbm_blkno != db->dbm_pagbno)
   {
     db->dbm_pagbno = db->dbm_blkno;
-    (void) lseek(db->dbm_pagf, db->dbm_blkno*PBLKSIZ, L_SET);
+    (void) lseek(db->dbm_pagf, db->dbm_blkno*PBLKSIZ, SEEK_SET);
     if (si_read(db->dbm_pagf, db->dbm_pagbuf, PBLKSIZ) != PBLKSIZ)
       memset(db->dbm_pagbuf, 0, PBLKSIZ);
 #ifdef DEBUG
@@ -337,7 +336,7 @@ static int getbit(DBM *db)
   if (b != db->dbm_dirbno)
   {
     db->dbm_dirbno = b;
-    (void) lseek(db->dbm_dirf, (long)b*DBLKSIZ, L_SET);
+    (void) lseek(db->dbm_dirf, (long)b*DBLKSIZ, SEEK_SET);
     if (si_read(db->dbm_dirf, db->dbm_dirbuf, DBLKSIZ) != DBLKSIZ)
       memset(db->dbm_dirbuf, 0, DBLKSIZ);
   }
@@ -358,13 +357,13 @@ static void setbit(DBM *db)
   if (b != db->dbm_dirbno)
   {
     db->dbm_dirbno = b;
-    (void) lseek(db->dbm_dirf, (long)b*DBLKSIZ, L_SET);
+    (void) lseek(db->dbm_dirf, (long)b*DBLKSIZ, SEEK_SET);
     if (si_read(db->dbm_dirf, db->dbm_dirbuf, DBLKSIZ) != DBLKSIZ)
       memset(db->dbm_dirbuf, 0, DBLKSIZ);
   }
   db->dbm_dirbuf[i] |= 1<<n;
   db->dbm_dirbno = b;
-  (void) lseek(db->dbm_dirf, (long)b*DBLKSIZ, L_SET);
+  (void) lseek(db->dbm_dirf, (long)b*DBLKSIZ, SEEK_SET);
   if (si_write(db->dbm_dirf, db->dbm_dirbuf, DBLKSIZ) != DBLKSIZ)
     db->dbm_flags |= _DBM_IOERR;
 }
