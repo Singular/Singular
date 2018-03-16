@@ -1,0 +1,1268 @@
+////////////////////////////////////////////////////////////////
+version="version fpalgebras.lib 4.1.1.0 Mar_2018 ";
+category="Noncommutative";
+info="
+LIBRARY: fpalgebras.lib
+AUTHORS: Karim Abou Zeid,       karim.abou.zeid at rwth-aachen.de
+@*       Grischa Studzinski,    grischa.studzinski at rwth-aachen.de
+
+Support: Project II.6 in the transregional collaborative research centre
+SFB-TRR 195 'Symbolic Tools in Mathematics and their Application' of the German DFG
+
+OVERVIEW:
+Generation of various algebras, including group algebras of finitely presented groups in the Letterplace ring
+
+PROCEDURES:
+operatorAlgebra(string a, int d);
+baumslagSolitar(int n, int m, int d, list #);
+baumslag(int m, int n, int d);
+crystallographicGroupP1(int d);
+crystallographicGroupPM(int d);
+crystallographicGroupPG(int d);
+crystallographicGroupP2MM(int d);
+crystallographicGroupP2(int d);
+crystallographicGroupP2GG(int d);
+crystallographicGroupCM(int d);
+crystallographicGroupC2MM(int d);
+crystallographicGroupP4(int d);
+crystallographicGroupP4MM(int d);
+crystallographicGroupP4GM(int d);
+crystallographicGroupP3(int d);
+crystallographicGroupP31M(int d);
+crystallographicGroupP3M1(int d);
+crystallographicGroupP6(int d);
+crystallographicGroupP6MM(int d);
+dyckGroup1(int n, int d, intvec P);
+dyckGroup2(int n, int d, intvec P);
+dyckGroup3(int n, int d, intvec P);
+fibonacciGroup(int m, int d);
+tetrahedronGroup(int g, int d);
+triangularGroup(int g, int d);
+";
+
+LIB "freegb.lib";
+LIB "general.lib";
+////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////
+// Operator Algebras ///////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+proc operatorAlgebra(string a, int d)
+"USAGE: operatorAlgebra(a,d); a a string, d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - a gives the name of the algebra
+@*    - d gives the degreebound for the Letterplace ring
+@*
+@*    a must be one of the following:
+@*      integrodiff3
+@*      toeplitz
+@*      weyl1
+@*      usl2
+@*      usl2h
+@*      shift1inverse
+@*      exterior2
+@*      quadrowmm
+@*      shift1
+@*      weyl1inverse
+@*
+@*    This is a collection of common algebras
+@*
+"
+{
+  if (d < 2) {
+    ERROR("Degbound d is too small. Must be at least 2.");
+  }
+  int baseringdef;
+  if (defined(basering)) // if a basering is defined, it should be saved for later use
+  {
+    def save = basering;
+    baseringdef = 1;
+  }
+
+  if (a == "integrodiff3") {
+    ring r = 0,(d,I,x),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = d(1)*x(2)-x(1)*d(2)-1,
+          I(1)*x(2)-x(1)*I(2)+I(1)*I(2),
+          d(1)*I(2)-1;
+  }
+  if (a == "toeplitz") {
+    ring r = 0,(y,x),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = y(1)*x(2)-1;
+  }
+  if (a == "weyl1") {
+    ring r = 0,(d,x),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = d(1)*x(2)-x(1)*d(2)-1;
+  }
+  if (a == "usl2") {
+    ring r = 0,(h,f,e),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = f(1)*e(2)-e(1)*f(2)+h(1),
+          h(1)*e(2)-e(1)*h(2)-2*e(1),
+          h(1)*f(2)-f(1)*h(2)+2*f(1);
+  }
+  if (a == "usl2h") {
+    ring r = 0,(H,h,f,e),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = f(1)*e(2)-e(1)*f(2)+h(1)*H(2),
+          h(1)*e(2)-e(1)*h(2)-2*e(1)*H(2),
+          h(1)*f(2)-f(1)*h(2)+2*f(1)*H(2),
+          f(1)*H(2)-H(1)*f(2),
+          e(1)*H(2)-H(1)*e(2),
+          h(1)*H(2)-H(1)*h(2);
+  }
+  if (a == "shift1inverse") {
+    ring r = 0,(d,x,t),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = d(1)*x(2)-x(1)*d(2)-d(1),
+          t(1)*x(2)-1,
+          x(1)*t(2)-1;
+  }
+  if (a == "exterior2") {
+    ring r = 0,(y,x),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = y(1)*x(2)+x(1)*y(2),
+          x(1)*x(2),
+          y(1)*y(2);
+  }
+  if (a == "quadrowmm") {
+    ring r = 0,(y,x),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = y(1)*x(2)-x(1)*y(2),
+          x(1)*x(2),
+          y(1)*y(2);
+  }
+  if (a == "shift1") {
+    ring r = 0,(s,x),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = s(1)*x(2)-x(1)*s(2)-s(1);
+  }
+  if (a == "weyl1inverse") {
+    ring r = 0,(d,x,t),dp;
+    def R = makeLetterplaceRing(d);
+    setring(R);
+    ideal I = d(1)*x(2)-x(1)*d(2)-1,
+          t(1)*x(2)-1,
+          x(1)*t(2)-1;
+  }
+
+  if (!defined(I)) {
+    ERROR("Illegal argument for algebra");
+  }
+
+  export(I);
+  if (baseringdef == 1) {setring save;}
+  return(R);
+}
+
+////////////////////////////////////////////////////////////////////
+// Baumslag ////////////////////////////////////////////////////////
+// from Grischa Studzinski /////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+proc baumslagSolitar(int n, int m, int d, list #)
+"USAGE: baumslagSolitar(m,n,d[,IsGroup]); n an integer, m an integer, d an integer, IsGroup an optional integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - in the group case: A = a^(-1), B = b^(-1)
+@*    - negativ input is only allowed in the group case!
+@*    - d gives a degreebound and must be >m,n
+@*
+@*    This is a family
+@*
+"
+{
+  int isGroup = 0;
+  if (size(#) > 0) {isGroup = #[1];}
+
+  if (isGroup != 0)
+  {
+   int baseringdef;
+   if (defined(basering)) // if a basering is defined, it should be saved for later use
+   {
+    def save = basering;
+    baseringdef = 1;
+   }
+   if (m < 0 || n < 0) {ERROR("Exponent can't be negativ in monoid rings!");}
+   if (d < 1 || d < m || d < n) {ERROR("Degree bound must be positiv and greater then m,n!");}
+   int i;
+   ring mr = 0,(a,b),Dp;
+   def Mr = makeLetterplaceRing(d);
+   setring Mr;
+   poly p,q;
+   if (n==0) {p = b(1);}
+   else
+   {
+    p = a(1)*b(2);
+    for (i = 1; i < n; i++) {p = lpMult(a(1),p);}
+   }
+   if (m==0) {q = b(1);}
+   else
+   {
+    q = b(1)*a(2);
+    for (i = 1; i < m; i++) {q = lpMult(q,a(1));}
+   }
+   ideal I = p - q;
+   export(I);
+   if (baseringdef == 1) {setring save;}
+   return(Mr); 
+  }
+  else
+  {
+   int baseringdef;
+   if (defined(basering)) // if a basering is defined, it should be saved for later use
+   {
+    def save = basering;
+    baseringdef = 1;
+   }
+   int i;
+   if (d < 1 || d < absValue(m) || d < absValue(n)) {ERROR("Degree bound must be positiv and greater then |m|,|n|!");}
+   ring gr = 0,(a,b,A,B),Dp;
+   def Gr = makeLetterplaceRing(d);
+   setring Gr;
+   poly p,q;
+   if (n==0) {p = b(1);}
+   else
+   {if (n > 0) 
+    {
+     p = a(1)*b(2);
+     for (i = 1; i < n; i++) {p = lpMult(a(1),p);}
+    }
+    else
+    {
+     p = A(1)*b(2);
+     for (i = 1; i < -n; i++) {p = lpMult(A(1),p);}
+    }
+   }
+   if (m==0) {q = b(1);}
+   else
+   {if (m > 0) 
+    {
+     q = b(1)*a(2);
+     for (i = 1; i < m; i++) {q = lpMult(q,a(1));}
+    }
+    else
+    {
+     q = A(1)*b(2);
+     for (i = 1; i < -m; i++) {q = lpMult(q,A(1));}
+    }
+   }
+   ideal I = p - q, a(1)*A(2) - 1, b(1)*B(2) - 1, a(1)*A(2) - A(1)*a(2), b(1)*B(2) - B(1)*b(2);
+   export(I);
+   if (baseringdef == 1) {setring save;}
+   return(Gr); 
+  }
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = baumslagSolitar(2,3,4); setring R;
+  I;
+}
+
+proc baumslagGroup(int m, int n, int d)
+"USAGE: baumslagGroup(m,n,d); m an integer, n an integer, d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - Baumslag group with the following presentation
+@*      < a, b | a^m = b^n = 1 >
+@*    -d gives the degreebound for the Letterplace ring
+@*
+@*    This is a family
+@*
+"
+{
+ if (m < 0 || n < 0 ) {ERROR("m,n must be non-negativ integers!");}
+ if (d < 1 || d < m || d < n) {ERROR("degreebound must be positiv and larger than n and m!");}
+ int i;
+ ring r = 0,(a,b),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ poly p,q;
+ p = 1; q = 1;
+ for (i = 1; i <= m; i++){p = lpMult(p,a(1));}
+ for (i = 1; i <= n; i++){q = lpMult(q,b(1));}
+ ideal I = p-1,q-1;
+ export(I);
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = baumslag(2,3,4); setring R;
+  I;
+}
+
+////////////////////////////////////////////////////////////////////
+// Crystallographic Groups //////////////////////////////////////////
+// from Grischa Studzinski /////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+proc crystallographicGroupP1(int d)
+"USAGE: crystallographicGroupP1(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p1 group with the following presentation
+@*      < x, y | [x, y] = 1 >
+@*    -d gives the degreebound for the Letterplace ring
+"
+{
+ if (d < 2){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, X(1)*x(2)-1, x(1)*X(2)-1, y(1)*Y(2)-1, Y(1)*y(2)-1; 
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP1(5); setring R;
+  I;
+}
+
+// old? there is already another crystallographicGroupP2 proc
+/* proc crystallographicGroupP2(int d) */
+/* " */
+/* p2 group with the following presentation */
+/* < x, y, r | [x, y] = r^2 = 1, r^-1*x*r = x^-1, r^-1*y*r = y^-1 > */
+/* Note: r = r^-1 */
+/* " */
+/* { */
+/*  if (d < 3){ERROR("Degreebound is to small for choosen example!");} */
+ 
+/*  int baseringdef; */
+/*  if (defined(basering)) // if a basering is defined, it should be saved for later use */
+/*  { */
+/*   def save = basering; */
+/*   baseringdef = 1; */
+/*  } */
+/*  ring r = 2,(x,y,r,X,Y),dp; */
+/*  def R = makeLetterplaceRing(d); */
+/*  setring R; */
+/*  ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2), r(1)*r(2)-1, r(1)*x(2)*r(3)-X(1), r(1)*y(2)*r(3)-Y(1),x(1)*X(2)-1, */  
+/* X(1)*x(2)-1, Y(1)*y(2)-1,  y(1)*Y(2)-1; */
+/*  I = simplify(I,2); */
+/*  export(I); */
+/*  if (baseringdef == 1) {setring save;} */
+/*  return(R); */
+/* } */
+
+proc crystallographicGroupPM(int d)
+"USAGE: crystallographicGroupPM(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - pm group with the following presentation
+@*      < x, y, m | [x, y] = m^2 = 1, m^-1*x*m = x, m^-1*y*m = y^-1 >
+@*    - d gives the degreebound for the Letterplace ring
+"
+{
+ if (d < 3){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,m,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-m(1)*m(2), m(1)*m(2)-1, m(1)*x(2)*m(3)-x(1), m(1)*y(2)*m(3)-Y(1),x(1)*X(2)-1,  
+X(1)*x(2)-1, Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupPM(5); setring R;
+  I;
+}
+
+proc crystallographicGroupPG(int d)
+"USAGE: crystallographicGroupPG(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - pg group with the following presentation
+@*      < x, y, t | [x, y] = 1, t^2 = x, t^-1*y*t = y^-1 >
+@*    - d gives the degreebound for the Letterplace ring
+"
+{
+ if (d < 3){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,t,X,Y,T),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, t(1)*t(2) - x(1), T(1)*y(2)*t(3)-Y(1), X(1)*x(2)-1, x(1)*X(2)-1,  
+Y(1)*y(2)-1,  y(1)*Y(2)-1, t(1)*T(2)-1, T(1)*t(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupPG(5); setring R;
+  I;
+}
+
+
+proc crystallographicGroupP2MM(int d)
+"USAGE: crystallographicGroupP2MM(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p2mm group with the following presentation
+@*      < x, y, p, q | [x, y] = [p, q] = p^2 = q^2 = 1, p^-1*x*p = x, q^-1*x*q = x^-1, p^-1*y*p = y^-1, q^-1*y*q = y >
+@*    - d gives the degreebound for the Letterplace ring
+"
+{
+ if (d < 3){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,p,q,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, p(1)*q(2)-q(1)*p(2)-1, p(1)*p(2) - 1, q(1)*q(2) - 1, p(1)*y(2)*p(3)-Y(1), p(1)*x(2)*p(3)-x(1), 
+ q(1)*y(2)*q(3)-y(1), q(1)*x(2)*q(3)-X(1), X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1,  x(1)*y(2)-y(1)*x(2)- p(1)*p(2),
+ x(1)*y(2)-y(1)*x(2)- q(1)*q(2), p(1)*p(2)-q(1)*q(2);
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP2MM(5); setring R;
+  I;
+}
+
+proc crystallographicGroupP2(int d)
+"USAGE: crystallographicGroupP2(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p2 group with the following presentation
+@*      < x, y, m, t | [x, y] = t^2 = 1, m^2 = y, t^-1*x*t = x, m^-1*x*m = x^-1, t^-1*y*t = y^-1, t^-1*m*t = m^-1 >
+@*    - d gives the degreebound for the Letterplace ring
+"
+{
+ if (d < 3){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,m,t,X,Y,M),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-t(1)*t(2), m(1)*m(2)-y(1), t(1)*t(2) - 1, t(1)*x(2)*t(3)-x(1), 
+M(1)*x(2)*m(3)-X(1), t(1)*y(2)*t(3)-Y(1), t(1)*m(2)*t(3)-M(1), X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1, 
+m(1)*M(2)-1, M(1)*m(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP2(5); setring R;
+  I;
+}
+
+proc crystallographicGroupP2GG(int d)
+"USAGE: crystallographicGroupP2GG(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p2gg group with the following presentation
+@*      < x, y, u, v | [x, y] = (u*v)^2 = 1, u^2 = x, v^2 = y, v^-1*x*v = x^-1, u^-1*y*u = y^-1 >
+@*    - d gives the degreebound for the Letterplace ring
+"
+{
+ if (d < 4){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,u,v,X,Y,u,v),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-u(1)*v(2)*u(3)*v(4), u(1)*v(2)*u(3)*v(4)-1, u(1)*u(2)-x(1), v(1)*v(2) - y, 
+V(1)*x(2)*v(3)-X(1), U(1)*y(2)*u(3)-Y(1), 
+X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1, u(1)*U(2)-1, U(1)*u(2)-1, v(1)*V(2)-1, V(1)*v(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP2GG(5); setring R;
+  I;
+}
+
+proc crystallographicGroupCM(int d)
+"USAGE: crystallographicGroupCM(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - cm group with the following presentation
+@*      < x, y, t | [x, y] = t^2 = 1, t^-1*x*t = x*y, t^-1*y*t = y^-1 >	  
+@*    - d gives the degreebound for the Letterplace ring
+"
+{
+ if (d < 3){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,t,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-t(1)*t(2), t(1)*t(2)-1,  
+t(1)*x(2)*t(3)-x(1)*y(2), t(1)*y(2)*t(3)-Y(1), 
+X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupCM(5); setring R;
+  I;
+}
+
+proc crystallographicGroupC2MM(int d)
+"USAGE: crystallographicGroupC2MM(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - c2mm group with the following presentation
+@*      < x, y, m, r | [x, y] = m^2 = r^2 = 1, m^-1*y*m = y^-1, m^-1*x*m = x*y, r^-1*y*r = y^-1, r^-1*x*r = x^-1, m^-1*r*m = r^-1 >
+@*    - d gives the degreebound for the Letterplace ring
+"
+{
+ if (d < 3){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,m,r,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-m(1)*m(2), x(1)*y(2)-y(1)*x(2)-r(1)*r(2), m(1)*m(2)-1,  r(1)*r(2)-1, 
+ m(1)*m(2)-r(1)*r(2), m(1)*y(2)*m(3)-Y(1), m(1)*x(2)*m(3)-x(1)*y(2), (1)*y(2)*r(3)-Y(1), r(1)*x(2)*r(3)-X(1), m(1)*r(2)*m(3)-r(1), 
+X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupC2MM(5); setring R;
+  I;
+}
+
+proc crystallographicGroupP4(int d)
+"USAGE: crystallographicGroupP4(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p4 group with the following presentation
+@*      < x, y, r | [x, y] = r^4 = 1, r^-1*x*r = x^-1, r^-1*x*r = y >	
+@*    - d gives the degreebound for the Letterplace ring
+"
+{
+ if (d < 5){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,r,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2)*r(3)*r(4), r(1)*r(2)*r(3)*r(4)-1, 
+ r(1)*r(2)*r(3)*x(4)*r(5)-X(1), r(1)*r(2)*r(3)*x(4)*r(5)-y(1), 
+X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP4(5); setring R;
+  I;
+}
+
+proc crystallographicGroupP4MM(int d)
+"USAGE: crystallographicGroupP4MM(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p4mm group with the following presentation
+@*      < x, y, r, m | [x, y] = r^4 = m^2 = 1, r^-1*y*r = x^-1, r^-1*x*r = y, m^-1*x*m = y, m^-1*r*m = r^-1 >
+@*    - d gives the degreebound for the Letterplace ring
+"
+{
+ if (d < 5){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,r,m,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2)*r(3)*r(4),  r(1)*r(2)*r(3)*r(4)-1, 
+ r(1)*r(2)*r(3)*x(4)*r(5)-X(1), r(1)*r(2)*r(3)*x(4)*r(5)-y(1), 
+X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP4MM(5); setring R;
+  I;
+}
+
+proc crystallographicGroupP4GM(int d)
+"USAGE: crystallographicGroupP4GM(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p4gm group with the following presentation
+@*      < x, y, r, t | [x, y] = r^4 = t^2 = 1, r^-1*y*r = x^-1, r^-1*x*r = y, t^-1*x*t = y, t^-1*r*t = x^-1*r^-1>
+@*    - d gives the degreebound for the Letterplace ring
+"
+{
+ if (d < 5){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,r,t,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2)*r(3)*r(4),  r(1)*r(2)*r(3)*r(4)-1, x(1)*y(2)-y(1)*x(2)-t(1)*t(2),
+ t(1)*t(2)-1,  r(1)*r(2)*r(3)*r(4)-t(1)*t(2),  r(1)*r(2)*r(3)*y(4)*r(5)-X(1), r(1)*r(2)*r(3)*x(4)*r(5)-y(1), 
+ t(1)*r(2)*t(3)-X(1)*r(2)*r(3)*r(4), X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP4GM(5); setring R;
+  I;
+}
+
+proc crystallographicGroupP3(int d)
+"USAGE: crystallographicGroupP3(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p3 group with the following presentation
+@*      < x, y, r | [x, y] = r^3 = 1, r^-1*x*r = x^-1*y, r^-1*y*r = x^-1>
+@*    - d gives the degreebound for the Letterplace ring
+"
+{
+ if (d < 4){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,r,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2)*r(3),  r(1)*r(2)*r(3)-1, 
+  r(1)*r(2)*x(3)*r(4)-X(1)*y(2),  r(1)*r(2)*y(3)*r(4)-X(1), X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP3(5); setring R;
+  I;
+}
+
+proc crystallographicGroupP31M(int d)
+"USAGE: crystallographicGroupP31M(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p31m group with the following presentation
+@*      < x, y, r, t | [x, y] = r^2 = t^2 = (t*r)^3 = 1, r^-1*x*r = x, t^-1*y*t = y, t^-1*x*t = x^-1*y, r^-1*y*r = x*y^-1 >
+@*    - d gives the degreebound for the Letterplace ring
+"
+{
+ if (d < 6){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,r,t,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2), x(1)*y(2)-y(1)*x(2)-t(1)*t(2), r(1)*r(2)-1, t(1)*t(2)-1,
+ t(1)*r(2)*t(3)*r(4)*t(5)*r(6)-1, r(1)*r(2)-t(1)*t(2),  x(1)*y(2)-y(1)*x(2)-t(1)*r(2)*t(3)*r(4)*t(5)*r(6), 
+ t(1)*r(2)*t(3)*r(4)*t(5)*r(6)-r(1)*r(2), t(1)*r(2)*t(3)*r(4)*t(5)*r(6)-t(1)*t(2),
+ r(1)*x(2)*r(3)-x(1),  t(1)*y(2)*t(3)-y(1), t(1)*x(2)*t(3)-X(1)*y(2), r(1)*y(2)*r(3)-x(1)*Y(2), 
+ X(1)*x(2)-1, x(1)*X(2)-1, Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP31M(5); setring R;
+  I;
+}
+
+proc crystallographicGroupP3M1(int d)
+"USAGE: crystallographicGroupP3M1(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p3m1 group with the following presentation
+@*      < x, y, r, m | [x, y] = r^3 = m^2 = 1, m^-1*r*m = r^2, r^-1*x*r = x^-1*y, r^-1*y*r = x^-1, m^-1*x*m = x^-1, m^-1*y*m = x^-1*y >
+@*    - d gives the degreebound for the Letterplace ring
+"
+{
+ if (d < 4){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,r,m,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2)*r(3), x(1)*y(2)-y(1)*x(2)-m(1)*m(2), r(1)*r(2)*r(3)-1, m(1)*m(2)-1,
+ r(1)*r(2)*r(3)-m(1)*m(2),  m(1)*r(2)*m(3)-r(1)*r(2), r(1)*r(2)*x(3)*r(4)-X(1)*y(2), r(1)*r(2)*y(3)*r(4)-X(1),m(1)*x(2)*m(3)-X(1),
+ m(1)*y(2)*m(3)-X(1)*y(2), X(1)*x(2)-1, x(1)*X(2)-1, Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP3M1(5); setring R;
+  I;
+}
+
+proc crystallographicGroupP6(int d)
+"USAGE: crystallographicGroupP6(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p6 group with the following presentation
+@*      < x, y, r | [x, y] = r^6 = 1, r^-1*x*r = y, r^-1*y*r = x^-1*y>
+@*    - d gives the degreebound for the Letterplace ring
+"
+{
+ if (d < 7){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,r,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2)*r(3)*r(4)*r(5)*r(6), r(1)*r(2)*r(3)*r(4)*r(5)*r(6)-1,
+ r(1)*r(2)*r(3)*r(4)*r(5)*x(6)*r(7)-y(1), r(1)*r(2)*r(3)*r(4)*r(5)*y(6)*r(7)-X(1)*y(2),
+ X(1)*x(2)-1, x(1)*X(2)-1, Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP6(5); setring R;
+  I;
+}
+
+proc crystallographicGroupP6MM(int d)
+"USAGE: crystallographicGroupP6MM(d); d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - p6mm group with the following presentation
+@*      < x, y, r, m | [x, y] = r^6 = m^2 = 1, r^-1*y*r = x^-1*y, r^-1*x*r = y, m^-1*x*m = x^-1, m^-1*y*m = x^-1*y, m^-1*r*m = r^-1*y>
+@*    - d gives the degreebound for the Letterplace ring
+"
+{
+ if (d < 7){ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,r,m,X,Y),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2)*r(3)*r(4)*r(5)*r(6), r(1)*r(2)*r(3)*r(4)*r(5)*r(6)-1, 
+ x(1)*y(2)-y(1)*x(2)-m(1)*m(2), r(1)*r(2)*r(3)*r(4)*r(5)*r(6)-m(1)*m(2), m(1)*m(2)-1, m(1)*x(2)*m(3)-X(1),  m(1)*y(2)*m(3)-X(1)*y(2), 
+ r(1)*r(2)*r(3)*r(4)*r(5)*x(6)*r(7)-y(1), r(1)*r(2)*r(3)*r(4)*r(5)*y(6)*r(7)-X(1)*y(2), M(1)*r(2)*m(3)- r(1)*r(2)*r(3)*r(4)*r(5)*y(6)
+ X(1)*x(2)-1, x(1)*X(2)-1, Y(1)*y(2)-1,  y(1)*Y(2)-1;
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = crystallographicGroupP6MM(5); setring R;
+  I;
+}
+
+////////////////////////////////////////////////////////////////////
+// Dyck Group //////////////////////////////////////////////////////
+// from Grischa Studzinski /////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+proc dyckGroup1(int n, int d, intvec P)
+"USAGE: dyckGroup1(n,d,P); n an integer, d an integer, P an intvec
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - The Dyck group with the following presentation
+@*      < x_1, x_2, ... , x_n | (x_1)^p1 = (x_2)^p2 = ... = (x_n)^pn = x_1 * x_2 * ... * x_n = 1 >
+@*    - negative exponents are allowed
+@*    - representation in the form x_i^p_i - x_(i+1)^p_(i+1)
+@*    - d gives the degreebound for the Letterplace ring
+@*
+@*    This is a family
+@*
+"
+{
+ int baseringdef,i,j;
+ if (n < 1) {ERROR("There must be at least one variable!");}
+ if (d < n) {ERROR("Degreebound is to small!");}
+ for (i = 1; i <= size(P); i++) {if (d < absValue(P[i])){ERROR("Degreebound is to small!");}}
+
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x(1..n),Y(1..n)),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I; poly p,q;
+ p = 1; q = 1;
+ for (i = 1; i<= n; i++) {p = lpMult(p,var(i));}
+ I = p-1;
+ for (i = n; i > 0; i--)
+ {
+  if (P[i] >= 0) {for (j = 1; j <= P[i]; j++){q = lpMult(q,var(i));}} 
+  else {for (j = 1; j <= -P[i]; j++){q = lpMult(q,var(i+n));}}
+  I = p - q,I;
+  p = q; q = 1;
+ }
+ 
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  intvec P = 1,2,3;
+  def R = dyckGroup1(3,5,P); setring R;
+  I;
+}
+
+
+proc dyckGroup2(int n, int d, intvec P)
+"USAGE: dyckGroup2(n,d,P); n an integer, d an integer, P an intvec
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - The Dyck group with the following presentation
+@*      < x_1, x_2, ... , x_n | (x_1)^p1 = (x_2)^p2 = ... = (x_n)^pn = x_1 * x_2 * ... * x_n = 1 >
+@*    - negative exponents are allowed
+@*    - representation in the form x_i^p_i - 1
+@*    - d gives the degreebound for the Letterplace ring
+@*
+@*    This is a family
+@*
+"
+{
+ int baseringdef,i,j;
+ if (n < 1) {ERROR("There must be at least one variable!");}
+ if (d < n) {ERROR("Degreebound is to small!");}
+ for (i = 1; i <= size(P); i++) {if (d < absValue(P[i])){ERROR("Degreebound is to small!");}}
+
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x(1..n),Y(1..n)),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I; poly p;
+ p = 1;
+ for (i = 1; i<= n; i++) {p = lpMult(p,var(i));}
+ I = p-1;
+ for (i = n; i > 0; i--)
+ {
+  p = 1;
+  if (P[i] >= 0) {for (j = 1; j <= P[i]; j++){p = lpMult(p,var(i));}} 
+  else {for (j = 1; j <= -P[i]; j++){p = lpMult(p,var(i+n));}}
+  I = p - 1,I;
+ }
+ 
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  intvec P = 1,2,3;
+  def R = dyckGroup2(3,5,P); setring R;
+  I;
+}
+
+
+
+proc dyckGroup3(int n, int d, intvec P)
+"USAGE: dyckGroup2(n,d,P); n an integer, d an integer, P an intvec
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - The Dyck group with the following presentation
+@*      < x_1, x_2, ... , x_n | (x_1)^p1 = (x_2)^p2 = ... = (x_n)^pn = x_1 * x_2 * ... * x_n = 1 >
+@*    - only positive exponents are allowed
+@*    - no inverse generators needed
+@*    - d gives the degreebound for the Letterplace ring
+@*
+@*    This is a family
+@*
+"
+{
+ int baseringdef,i,j;
+ if (n < 1) {ERROR("There must be at least one variable!");}
+ if (d < n) {ERROR("Degreebound is to small!");}
+ for (i = 1; i <= size(P); i++) {if (P[i] < 0){ERROR("Exponents must be positive!");}}
+ for (i = 1; i <= size(P); i++) {if (d < P[i]){ERROR("Degreebound is to small!");}}
+ 
+
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,x(1..n),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I; poly p;
+ p = 1;
+ for (i = 1; i<= n; i++) {p = lpMult(p,var(i));}
+ I = p-1;
+ for (i = n; i > 0; i--)
+ {
+  p = 1;
+  for (j = 1; j <= P[i]; j++){p = lpMult(p,var(i));} 
+  I = p - 1,I;
+ }
+ 
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  intvec P = 1,2,3;
+  def R = dyckGroup3(3,5,P); setring R;
+  I;
+}
+
+////////////////////////////////////////////////////////////////////
+// Fibonacci Group /////////////////////////////////////////////////
+// from Grischa Studzinski /////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+proc fibonacciGroup(int m, int d)
+"USAGE: fibonacciGroup(m,d); m an integer, d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - The Fibonacci group F(2, m) with the following presentation
+@*      < x_1, x_2, ... , x_m | x_i * x_(i + 1) = x_(i + 2) >
+@*    - d gives the degreebound for the Letterplace ring
+@*
+@*    This is a family
+@*
+"
+// TODO: basefield Q oder F2?
+// TODO: inverse Elemente!
+{
+ if (m < 3) {ERROR("At least three generators are required!");}
+ if (d < 2) {ERROR("Degree bound must be at least 2!");}
+ int baseringdef,i;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x(1..m),Y(1..m)),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I; poly p;
+ for (i = 1; i < m-1; i++)
+ {
+  p = lpMult(var(i),var(i+1))-var(i+2);
+  I = I,p;
+ }
+ for (i = 1; i <= m; i++)
+ {
+  p = lpMult(var(i),var(i+m))-1;
+  I = I,p;
+  p = lpMult(var(i+m),var(i))-1;
+  I = I,p;
+ } 
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = fibonacciGroup(3,5); setring R;
+  I;
+}
+
+
+////////////////////////////////////////////////////////////////////
+// Tetrahedron Groups ///////////////////////////////////////////////
+// from Grischa Studzinski /////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+proc tetrahedronGroup(int g, int d)
+"USAGE: tetrahedronGroup(g,d); g an integer, d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - g gives the number of the example (1 - 5)
+@*    - d gives the degreebound for the Letterplace ring
+@*
+@*    This is a family
+@*
+The examples are found in
+Classification of the finite generalized tetrahedron groups
+by Gerhard Rosenberger and Martin Scheer.
+The 5 examples are denoted in Proposition 1.9 and concern
+finite generalized tetrahedron group in the Tsarnarov-case, which are
+not equivalent to a presentation for an ordinary tetrahedron group.
+@*
+"
+{
+ if (g < 1 || g > 5) {ERROR("There are only 5 examples!");}
+ if ((g == 1 && d < 6)||(g == 2 && d < 6)||(g == 3 && d < 5)||(g == 4 && d < 4)||(g == 5 && d < 5))
+ {ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef,i,j;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(x,y,z),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I;
+ if (g == 1) 
+ {I = x(1)*x(2)*x(3)*x(4)*x(5)-1, y(1)*y(2)-1, z(1)*z(2)*z(3)-1, x(1)*y(2)*x(3)*y(4)*x(5)*y(6)-1, x(1)*x(2)*z(3)*x(4)*x(5)*z(6)-1,
+      y(1)*z(2)*y(3)*z(4)-1;
+ }
+ if (g == 2)
+ {I = x(1)*x(2)*x(3)-1, y(1)*y(2)*y(3)-1, z(1)*z(2)*z(3)*z(4)*z(5)-1,x(1)*y(2)*x(3)*y(4)-1,x(1)*z(2)*x(3)*z(4)-1, 
+      y(1)*z(2)*z(3)*y(4)*z(5)*z(6)-1;
+ }
+ if (g == 3)
+ {I =  x(1)*x(2)*x(3)-1, y(1)*y(2)*y(3)-1, z(1)*z(2)*z(3)-1, x(1)*y(2)*x(3)*y(4)-1, x(1)*z(2)*x(3)*z(4)-1, y(1)*z(2)*y(3)*z(4)-1;
+ }
+ if (g == 4)
+ {I =  x(1)*x(2)*x(3)-1, y(1)*y(2)*y(3)-1, z(1)*z(2)*z(3)*z(4)-1,x(1)*y(2)*x(3)*y(4)-1, x(1)*z(2)*x(3)*z(4)-1, y(1)*z(2)*y(3)*z(4)-1;
+ }
+ if (g ==5)
+ {I =  x(1)*x(2)*x(3)-1, y(1)*y(2)*y(3)-1, z(1)*z(2)*z(3)*z(4)*z(5)-1,x(1)*y(2)*x(3)*y(4)-1, x(1)*z(2)*x(3)*z(4)-1, y(1)*z(2)*y(3)*z(4)-1;
+ }
+  
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = tetrahedronGroup(3,5); setring R;
+  I;
+}
+
+
+////////////////////////////////////////////////////////////////////
+// Triangular Groups ///////////////////////////////////////////////
+// from Grischa Studzinski /////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+proc triangularGroup(int g, int d)
+"USAGE: triangularGroup(g,d); g an integer, d an integer
+RETURN: ring
+NOTE: - the ring contains the ideal I, which contains the required relations
+@*    - g gives the number of the example (1 - 14)
+@*    - d gives the degreebound for the Letterplace ring
+@*
+@*    This is a family
+@*
+The examples are found in
+Classification of the finite generalized tetrahedron groups
+by Gerhard Rosenberger and Martin Scheer.
+The 14 examples are denoted in theorem 2.12
+@*
+"
+{
+ if (g < 1 || g > 14) {ERROR("There are only 14 examples!");}
+ if ((g == 1 && d < 20)||(g == 2 && d < 21)||(g == 3 && d < 10)||(g == 4 && d < 12)||(g == 5 && d < 10)||(g == 6 && d < 18)||(g == 7 && d < 20)||(g == 8 && d < 16)||(g == 9 && d < 10)||(g == 10 && d < 14)||(g == 11 && d < 16)||(g == 12 && d < 24)||(g == 13 && d < 28)||(g == 14 && d < 37))
+ {ERROR("Degreebound is to small for choosen example!");}
+ 
+ int baseringdef;
+ if (defined(basering)) // if a basering is defined, it should be saved for later use
+ {
+  def save = basering;
+  baseringdef = 1;
+ }
+ ring r = 2,(a,b),dp;
+ def R = makeLetterplaceRing(d);
+ setring R;
+ ideal I;
+ 
+ if (g == 1) 
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)-1,
+  a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*b(7)*a(8)*b(9)*b(10)*a(11)*b(12)*a(13)*b(14)*a(15)*b(16)*b(17)*a(18)*b(19)*b(20)-1;
+ }
+ if (g == 2)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)-1,
+  a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*b(7)*a(8)*b(9)*a(10)*b(11)*a(12)*b(13)*b(14)*a(15)*b(16)*a(17)*b(18)*a(19)*b(20)*b(21)-1;
+ }
+ if (g == 3)
+ {I = a(1)*a(2)*a(3)-1, b(1)*b(2)*b(3)-1,
+  a(1)*b(2)*a(3)*b(4)*b(5)*a(6)*b(7)*a(8)*b(9)*b(10)-1;
+ }
+ if (g == 4)
+ {I = a(1)*a(2)*a(3)-1, b(1)*b(2)*b(3)-1,
+  a(1)*b(2)*a(3)*a(4)*b(5)*b(6)*a(7)*b(8)*a(9)*a(10)*b(11)*b(12)-1;
+ }
+ if (g == 5)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)*b(4)*b(5)-1,
+   a(1)*b(2)*a(3)*b(4)*b(5)*a(6)*b(7)*a(8)*b(9)*b(10)-1;
+ }
+ if (g == 6)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)*b(4)*b(5)-1,
+   a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*b(7)*b(8)*b(9)*a(10)*b(11)*a(12)*b(13)*a(14)*b(15)*b(16)*b(17)*b(18)-1;
+ }
+ if (g == 7)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)*b(4)*b(5)-1,
+   a(1)*b(2)*a(3)*b(4)*b(5)*a(6)*b(7)*b(8)*b(9)*b(10)*a(11)*b(12)*a(13)*b(14)*b(15)*a(16)*b(17)*b(18)*b(19)*b(20)-1;
+ }
+ if (g == 8)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)*b(4)-1,
+   a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*b(7)*b(8)*a(9)*b(10)*a(11)*b(12)*a(13)*b(14)*b(15)*b(16)-1;
+ }
+ if (g == 9)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)-1,
+   a(1)*b(2)*a(3)*b(4)*b(5)*a(6)*b(7)*a(8)*b(9)*b(10)-1;
+ }
+ if (g == 10)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)-1,
+  a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*b(7)*a(8)*b(9)*a(10)*b(11)*a(12)*b(13)*b(14)-1;
+ }
+ if (g == 11)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)-1,
+  a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*a(7)*b(8)*b(9)*a(10)*b(11)*a(12)*b(13)*a(14)*b(15)*b(16)-1;
+ }
+ if (g == 12)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)-1,
+  a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*b(7)*a(8)*b(9)*a(10)*b(11)*b(12)*a(13)*b(14)*a(15)*b(16)*a(17)*b(18)*b(19)*a(20)*b(21)*a(22)*b(23)*b(24)-1;
+ }
+ if (g == 13)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)-1,
+a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*a(7)*b(8)*a(9)*b(10)*b(11)*a(12)*b(13)*b(14)*a(15)*b(16)*a(17)*b(18)*a(19)*b(20)*a(21)*b(22)*a(23)*b(24)*b(25)*a(26)*b(27)*b(28)-1;
+ }
+ if (g == 14)
+ {I = a(1)*a(2)-1, b(1)*b(2)*b(3)-1,
+a(1)*b(2)*a(3)*b(4)*a(5)*b(6)*a(7)*b(8)*b(9)*a(10)*b(11)*b(12)*a(13)*b(14)*a(15)*b(16)*b(17)*a(18)*b(19)*b(20)*a(21)*b(22)*a(23)*b(24)*a(25)*b(26)*a(27)*b(28)*b(29)*a(30)*b(31)*a(32)*b(33)*b(34)*a(35)*b(36)*b(37)-1;
+ }
+
+ I = simplify(I,2);
+ export(I);
+ if (baseringdef == 1) {setring save;}
+ return(R);
+}
+example {
+  "EXAMPLE:"; echo = 2;
+  def R = triangularGroup(3,10); setring R;
+  I;
+}
