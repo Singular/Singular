@@ -3340,7 +3340,6 @@ NOTE: - L[1] NF(p,I)
   list summands;
   list L = pNF;
   poly pTaggedNF = lpNF(p,I);
-  pTaggedNF = pTaggedNF * leadcoef(p); // somehow pTaggedNF gets normalized
   for (int i = 1; i <= size(pTaggedNF); i++) {
     intvec iv = lp2iv(pTaggedNF[i]);
     for (int j = 1; j <= size(iv); j++) {
