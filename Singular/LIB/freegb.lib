@@ -3480,8 +3480,6 @@ NOTE: Taking the first possible reduction
 //secundary procedures, all static
 
 static proc getlpCoeffs(poly q, poly p)
-"
-"
 {list R; poly m; intvec cq,t,lv,rv,bla;
  int n = attrib(basering,"lV"); int d = attrib(basering,"uptodeg");
  int i;
@@ -3504,12 +3502,12 @@ static proc lpReduce(poly p, poly g, int s)
 "NOTE: shift can not exceed the degree bound, because s*g | p
 "
 {poly l,r,qt; int i;
- g = shiftPoly(g,s);
- list K = getlpCoeffs(lead(g),lead(p));
+ list K = getlpCoeffs(lead(shiftPoly(g,s)), lead(p));
  l = K[1]; r = K[2];
  kill K;
  for (i = 1; i <= size(g); i++)
- {qt = qt + lpMult(lpMult(l,g[i]),r);
+ {
+   qt = qt + lpMult(lpMult(l,g[i]),r);
  }
  return(p - leadcoef(p)*normalize(qt));
 }
