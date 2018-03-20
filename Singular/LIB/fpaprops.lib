@@ -18,8 +18,8 @@ SEE ALSO:  fpadim_lib, freegb_lib
 
 PROCEDURES:
   lpNoetherian(<GB>);     check whether A/<GB> is (left/right) noetherian
-  lpIsSemiPrime(<GB>);    check whether A/<GB> is semi prime
-  lpIsPrime(<GB>);        check whether A/<GB> is prime
+  lpIsSemiPrime(<GB>);    check whether A/<LM(GB)> is semi prime
+  lpIsPrime(<GB>);        check whether A/<LM(GB)> is prime
   lpGkDim(<GB>);          compute the Gelfand Kirillov dimension of A/<GB>
   lpGlDimBound(<GB>);     compute an upper bound for the global dimension of A/<GB>
   lpSubstitute();         substitute variable with polynomials
@@ -36,7 +36,7 @@ RETURN: int
 @*      1 left noetherian
 @*      2 right noetherian
 @*      3 noetherian
-PURPOSE: Check whether R/<G> is (left/right) noetherian, where R is the basering
+PURPOSE: Check whether A/<G> is (left/right) noetherian
 ASSUME: - basering is a Letterplace ring
 @*      - G is a Groebner basis
 "
@@ -107,7 +107,8 @@ ASSUME: - basering is a Letterplace ring
   } kill v;
   return (3 - inFlag - outFlag);
 }
-example {
+example
+{
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5);
@@ -197,7 +198,7 @@ static proc inOrOutCommingEdgeInCycle(intmat G, int v, intvec visited, intvec pa
 proc lpIsSemiPrime(ideal G)
 "USAGE: lpIsSemiPrime(G); G an ideal in a Letterplace ring
 RETURN: boolean
-PURPOSE: Check whether R/<G> is semi prime, where R is the basering
+PURPOSE: Check whether A/<LM(G)> is semi prime, that is when p * (A/<LM(G)>) * p != 0 for all p in (A/<LM(G)> - {0}).
 ASSUME: - basering is a Letterplace ring
       - G is a Groebner basis
 "
@@ -248,7 +249,8 @@ ASSUME: - basering is a Letterplace ring
 
   return (1);
 }
-example {
+example
+{
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x1,x2),dp;
   def R = makeLetterplaceRing(5);
@@ -297,7 +299,7 @@ static proc isCyclicInUfGraph(intmat UG, list LV, intvec u)
 proc lpIsPrime(ideal G)
 "USAGE: lpIsPrime(G); G an ideal in a Letterplace ring
 RETURN: boolean
-PURPOSE: Check whether R/<G> is prime, where R is the basering
+PURPOSE: Check whether A/<LM(G)> is prime, that is when p1 * (A/<LM(G)>) * p2 != 0 for all p1, p2 in (A/<LM(G)> - {0}).
 ASSUME: - basering is a Letterplace ring
       - G is a Groebner basis
 "
@@ -361,7 +363,8 @@ ASSUME: - basering is a Letterplace ring
 
   return (1);
 }
-example {
+example
+{
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5);
@@ -604,10 +607,10 @@ ASSUME: Basering is a Letterplace ring
           if (cycleCount > maxCycleCount) {
             maxCycleCount = cycleCount;
           }
+          kill cycleCount;
           if (path[j] == w) {
             break;
           }
-          kill cycleCount;
         } kill j;
         if (maxCycleCount >= cycles) {
           cycles = maxCycleCount + 1;
@@ -629,9 +632,12 @@ ASSUME: Basering is a Letterplace ring
   return(cycles);
 }
 
-static proc lpUfGraph(ideal G, list #)
-"USAGE: lpUfGraph(G); G a set of monomials in a letterplace ring, # an optional parameter to return the vertex list when set
-RETURN: intmat
+proc lpUfGraph(ideal G, list #)
+"USAGE: lpUfGraph(G); G a set of monomials in a letterplace ring.
+@*      lpUfGraph(G,1); G a set of monomials in a letterplace ring.
+RETURN: intmat or list
+NOTE: lpUfGraph(G); returns intmat. lpUfGraph(G,1); returns list L with L[1] an intmat and L[2] an ideal.
+      The intmat is the Ufnarovskij Graph and the ideal contains the vertices.
 PURPOSE: Constructs the Ufnarovskij graph induced by G
       the adjacency matrix of the Ufnarovskij graph induced by G
 ASSUME: - basering is a Letterplace ring
@@ -668,7 +674,7 @@ ASSUME: - basering is a Letterplace ring
   } kill i;
   if (size(#) > 0) {
     if (typeof(#[1]) == "int") {
-      if (#[1] == 1) {
+      if (#[1] != 0) {
         list ret = UG;
         ret[2] = ivL2lpI(SW); // the vertices
         return (ret);
@@ -676,6 +682,16 @@ ASSUME: - basering is a Letterplace ring
     }
   }
   return (UG);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  setring R; // sets basering to Letterplace ring
+  ideal I = x(1)*y(2), x(1)*z(2), z(1)*y(2), z(1)*z(2);
+  lpUfGraph(I);
+  lpUfGraph(I,1);
 }
 
 static proc maxDeg(ideal G)
@@ -1034,15 +1050,18 @@ EXAMPLE: example lpSubstitute; shows examples
     intvec ivfi = lp2iv(f[i]);
     for (int j = 1; j <= size(ivfi); j++) {
       int varindex = ivfi[j];
-      int subindex = lpIndexOf(s1, var(varindex));
-      if (subindex > 0) {
-        s2[subindex] = lpNF(s2[subindex],G);
-        fis = lpMult(fis, s2[subindex]);
-      } else {
-        fis = lpMult(fis, lpNF(iv2lp(varindex),G));
+      if (varindex > 0) {
+        int subindex = lpIndexOf(s1, var(varindex));
+        if (subindex > 0) {
+          s2[subindex] = lpNF(s2[subindex],G);
+          fis = lpMult(fis, s2[subindex]);
+        } else {
+          fis = lpMult(fis, lpNF(iv2lp(varindex),G));
+        }
+        /*fis = lpNF(fis,G);*/
+        kill subindex;
       }
-      /*fis = lpNF(fis,G);*/
-      kill varindex; kill subindex;
+      kill varindex;
     } kill j;
     kill ivfi;
     fs = fs + fis;
@@ -1052,7 +1071,9 @@ EXAMPLE: example lpSubstitute; shows examples
   fs = lpNF(fs, G);
   return (fs);
 }
-example {
+example
+{
+  "EXAMPLE:"; echo = 2;
   //////// EXAMPLE A ////////
   ring r = 0,(x,y,z),dp;
   def R = makeLetterplaceRing(4);
@@ -1131,13 +1152,16 @@ EXAMPLE: example lpSubstitute; shows examples
     int tmpDegBound;
     for (int j = 1; j <= size(ivfi); j++) {
       int varindex = ivfi[j];
-      int subindex = lpIndexOf(s1, var(varindex));
-      if (subindex > 0) {
-        tmpDegBound = tmpDegBound + deg(s2[subindex]);
-      } else {
-        tmpDegBound = tmpDegBound + 1;
+      if (varindex > 0) {
+        int subindex = lpIndexOf(s1, var(varindex));
+        if (subindex > 0) {
+          tmpDegBound = tmpDegBound + deg(s2[subindex]);
+        } else {
+          tmpDegBound = tmpDegBound + 1;
+        }
+        kill subindex;
       }
-      kill varindex; kill subindex;
+      kill varindex;
     } kill j;
     if (tmpDegBound > maxDegBound) {
       maxDegBound = tmpDegBound;
@@ -1147,11 +1171,12 @@ EXAMPLE: example lpSubstitute; shows examples
 
   // increase degbound by 50% when ideal is provided
   // needed for lpNF
-  maxDegBound = maxDegBound + maxDegBound/2;
+  maxDegBound = maxDegBound + (maxDegBound div 2);
 
   return (maxDegBound);
 }
-example {
+example
+{
   // see lpSubstitute()
 }
 
@@ -1174,7 +1199,8 @@ NOTE: convenience method
   } kill i;
   return (maxDegBound);
 }
-example {
+example
+{
   // see lpSubstitute()
 }
 
@@ -1264,3 +1290,4 @@ example
   setring A; A;
   def R = lpDelVar(2); setring R; R;
 }
+

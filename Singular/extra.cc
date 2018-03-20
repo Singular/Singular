@@ -1152,8 +1152,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           WerrorS("negative shift for pLPshift");
           return TRUE;
         }
-        int L = pmLastVblock(p,lVblock);
-        if (L+sh-1 > uptodeg)
+        int L = pLastVblock(p,lVblock);
+        if (L+sh > uptodeg)
         {
           WerrorS("pLPshift: too big shift requested\n");
           return TRUE;
