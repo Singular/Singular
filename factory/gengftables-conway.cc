@@ -283,7 +283,7 @@ printTable ( int d, int q, CanonicalForm mipo )
  * The new function for getting the minimal polynomials.
  * It uses the Conway polynomials.
  * It reads the polynomials from a file.
- * The file contains all poynomials with p^k <= 2^16
+ * The file contains all polynomials with p^k <= 2^16
  * but currently only polynomials with p^k <= 2^14 are used.
 **/
 static CanonicalForm findGenNew(int n, ///< n is the exponent
@@ -359,8 +359,8 @@ main()
     int i, p, q, n;
     for ( i = 0; i < primes_len; i++ ) {
                 p = primes[i];
-                q = p*p;
-                n = 2;
+                q = p;
+                n = 1;
                 setCharacteristic( p );
                 while ( q < maxtable ) {
                         CanonicalForm f = findGenNew( n, q );
