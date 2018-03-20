@@ -77,6 +77,10 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 @section fpadim_lib
 @c lib fpadim.lib
 @c ----------------------------------------------------------
+@node fpalgebras_lib
+@section fpalgebras_lib
+@c lib fpalgebras.lib
+@c ----------------------------------------------------------
 @node fpaprops_lib
 @section fpaprops_lib
 @c lib fpaprops.lib
