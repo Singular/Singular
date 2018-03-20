@@ -20,8 +20,15 @@
 @end ifset
 
 @heading News for version @value{VERSION}
+New libraries:
+@itemize
+@item fpalgebras.lib: Generation of various algebras in the letterplace case
+(@nref{fpalgebras_lib})
+@end itemize
+
 Changed libraries:
 @itemize
+@item freegb.lib: lpDivision, lpPrint (@nref{freegb_lib})
 @item schreyer.lib: deprecated 
 @item goettsche.lib: new, extended version (The Nakajima-Yoshioka formula up to n-th degree,Poincare Polynomial of the punctual Quot-scheme of rank r on n planar points Betti numbers of the punctual Quot-scheme of rank r on n planar points)(@nref{goettsche_lib})
 @item grobcov.lib: small bug fix (@nref{grobcov_lib})

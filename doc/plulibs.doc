@@ -27,6 +27,7 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 * dmodapp_lib::  Applications of algebraic D-modules
 * dmodvar_lib:: Algebraic D-modules and Bernstein-Sato polynomial for varieties
 * fpadim_lib::  Algorithms for quotient algebras in the letterplace case
+* fpalgebras_lib:: Generation of various algebras in the letterplace case
 * fpaprops_lib:: Algorithms for properties of quotient algebras in letterplace case
 * freegb_lib::  Two-sided Groebner bases in free algebras via Letterplace
 * involut_lib::  Computations and operations with involutions
