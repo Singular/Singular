@@ -496,7 +496,7 @@ void s_internalDelete(const int t,  void *d, const ring r)
     case CRING_CMD:
       {
         coeffs cf=(coeffs)d;
-        if ((cf->ref<=1)&&
+        if ((cf->ref<1)&&
         ((cf->type <=n_GF)
           ||((cf->type >=n_long_C)&&(cf->type <=n_CF))))
         {

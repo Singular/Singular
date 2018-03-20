@@ -3780,6 +3780,28 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return TRUE;
     }
     else
+/*==================== GF(p,n) ==================================*/
+    if(strcmp(sys_cmd,"GF")==0)
+    {
+      const short t[]={3,INT_CMD,INT_CMD,STRING_CMD};
+      if (iiCheckTypes(h,t,1))
+      {
+        int p=(int)(long)h->Data();
+	int n=(int)(long)h->next->Data();
+	char *v=(char*)h->next->next->CopyD();
+	GFInfo param;
+        param.GFChar = p;
+	param.GFDegree = n;
+	param.GFPar_name = v;
+	coeffs cf= nInitChar(n_GF, &param);
+	res->rtyp=CRING_CMD;
+	res->data=cf;
+	return FALSE;
+      }
+      else
+        return TRUE;
+    }
+    else
 /*==================== power* ==================================*/
     #if 0
     if(strcmp(sys_cmd,"power1")==0)
