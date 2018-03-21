@@ -389,9 +389,11 @@ MinorKey MinorKey::getSubMinorKey (const int absoluteEraseRowIndex,
   if ((newColumnBits != 0) || (columnBlock < getNumberOfColumnBlocks() - 1))
     result.setColumnKey(columnBlock, newColumnBits);
 
+  #ifndef SING_NDEBUG
   /* let's check that the number of selected rows and columns are equal;
      (this check is only performed in the debug version) */
   assume(result.getSetBits(1) == result.getSetBits(2));
+  #endif
 
   return result;
 }
