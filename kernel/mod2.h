@@ -397,6 +397,9 @@ extern void dErrorBreak();
 #define assume(x) do {} while (0)
 #define r_assume(x) do {} while (0)
 #else /* ! HAVE_ASSUME */
+#ifdef SING_NDEBUG
+#undef SING_NDEBUG
+#endif
 
 #define assume_violation(s,f,l) \
   dReportError("assume violation at %s:%d condition: %s", f,l,s)
