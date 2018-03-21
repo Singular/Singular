@@ -243,7 +243,7 @@ static long nfInt (number &n, const coeffs r )
   unsigned short nn=(unsigned short)(long)n;
   if (nn==r->m_nfCharQ) return 0;
   long i=1; /* 1==a^0 */
-  while ((c!=nn)&&(i<r->m_nfCharQ))
+  while ((c!=nn)&&(i<r->m_nfCharP))
   {
     c=r->m_nfPlus1Table[c];
     i++;
