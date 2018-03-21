@@ -4464,15 +4464,19 @@ multi_reduction_find (red_object * los, int losl, slimgb_alg * c, int startf,
 {
   kStrategy strat = c->strat;
 
+  #ifndef SING_NDEBUG
   assume (startf <= losl);
   assume ((startf == losl - 1)
           || (pLmCmp (los[startf].p, los[startf + 1].p) == -1));
+  #endif
   int i = startf;
 
   int j;
   while(i >= 0)
   {
+    #ifndef SING_NDEBUG
     assume ((i == losl - 1) || (pLmCmp (los[i].p, los[i + 1].p) <= 0));
+    #endif
     assume (is_valid_ro (los[i]));
     j = kFindDivisibleByInS_easy (strat, los[i]);
     if(j >= 0)
@@ -4486,7 +4490,9 @@ multi_reduction_find (red_object * los, int losl, slimgb_alg * c, int startf,
       assume (i >= i2);
 
       erg.to_reduce_l = i2;
+      #ifndef SING_NDEBUG
       assume ((i == losl - 1) || (pLmCmp (los[i].p, los[i + 1].p) == -1));
+      #endif
       canonicalize_region (los, erg.to_reduce_u + 1, startf, c);
       return;
     }
@@ -4503,7 +4509,9 @@ multi_reduction_find (red_object * los, int losl, slimgb_alg * c, int startf,
         erg.to_reduce_l = i2;
         erg.reduce_by = i;
         erg.fromS = FALSE;
+        #ifndef SING_NDEBUG
         assume ((i == losl - 1) || (pLmCmp (los[i].p, los[i + 1].p) == -1));
+        #endif
         canonicalize_region (los, erg.to_reduce_u + 1, startf, c);
         return;
       }

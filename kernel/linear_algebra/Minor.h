@@ -1,6 +1,7 @@
 #ifndef MINOR_H
 #define MINOR_H
 
+#include "kernel/mod2.h"
 #include "polys/monomials/ring.h"
 #include "kernel/polys.h"
 

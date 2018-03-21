@@ -935,7 +935,9 @@ int temp_size,SparseRow<number_type>* row, number coef)
       assume(bpos<256);
       assume(!(npIsZero((number)(long) buffer[bpos],currRing->cf)));
       STATISTIC(n_Add); temp_array[idx]=F4mat_to_number_type(npAddM((number)(long) temp_array[idx], (number)(long) buffer[bpos++],currRing->cf));
+      #ifndef SING_NDEBUG
       assume(idx<temp_size);
+      #endif
     }
 
   }
@@ -981,7 +983,9 @@ int temp_size,const number_type* row, int len,number coef)
       assume(bpos<256);
       //assume(!(npIsZero((number) buffer[bpos])));
       STATISTIC(n_Add); temp_array[i]=F4mat_to_number_type(npAddM((number)(long) temp_array[i], (number)(long) buffer[bpos++],currRing->cf));
+      #ifndef SING_NDEBUG
       assume(i<temp_size);
+      #endif
     }
 
   }
@@ -1006,7 +1010,9 @@ int temp_size,const number_type* row, int len)
   for(i=0;i<len;i++)
   {
       STATISTIC(n_Add); temp_array[i]=F4mat_to_number_type(npAddM((number)(long) temp_array[i], (number)(long) row[i],currRing->cf));
+      #ifndef SING_NDEBUG
       assume(i<temp_size);
+      #endif
   }
 
 }
@@ -1031,7 +1037,9 @@ int temp_size,const number_type* row, int len)
   {
 
       STATISTIC(n_Sub); temp_array[i]=F4mat_to_number_type(npSubM((number)(long) temp_array[i], (number)(long) row[i],currRing->cf));
+      #ifndef SING_NDEBUG
       assume(i<temp_size);
+      #endif
   }
 
 }
@@ -1051,7 +1059,9 @@ template <class number_type> void add_sparse(number_type* const temp_array,int t
         {
           int idx=idx_array[j];
           STATISTIC(n_Add); temp_array[idx]=F4mat_to_number_type(   (number_type)(long)npAddM((number) (long)temp_array[idx],(number)(long) coef_array[j],currRing->cf));
+          #ifndef SING_NDEBUG
           assume(idx<temp_size);
+	  #endif
         }
 }
 #ifdef SING_NDEBUG
@@ -1069,7 +1079,9 @@ template <class number_type> void sub_sparse(number_type* const temp_array,int t
         {
           int idx=idx_array[j];
           STATISTIC(n_Sub); temp_array[idx]=F4mat_to_number_type(  (number_type)(long) npSubM((number) (long)temp_array[idx],(number)(long) coef_array[j],currRing->cf));
+          #ifndef SING_NDEBUG
           assume(idx<temp_size);
+          #endif
         }
 }
 template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_dense(MonRedResNP<number_type>* mon, int len,NoroCache<number_type>* cache)

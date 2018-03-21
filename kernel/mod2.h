@@ -133,17 +133,6 @@ static inline void HALT() { m2_end(2);}
 /* #define MAX_INT_LEN 11 */
 
 
-#ifdef DO_PROFILE
-/* define to enable explicit profiling of some crucial inline
- * routines and defines  */
-#undef DO_DEEP_PROFILE
-#endif
-
-/* define to enable assume */
-#ifndef HAVE_ASSUME
-#undef HAVE_ASSUME
-#endif
-
 /* define LINKAGE to "extern C" if compiling for shared libs */
 #ifndef LINKAGE
 #if defined(PIC)
@@ -397,9 +386,6 @@ extern void dErrorBreak();
 #define assume(x) do {} while (0)
 #define r_assume(x) do {} while (0)
 #else /* ! HAVE_ASSUME */
-#ifdef SING_NDEBUG
-#undef SING_NDEBUG
-#endif
 
 #define assume_violation(s,f,l) \
   dReportError("assume violation at %s:%d condition: %s", f,l,s)
