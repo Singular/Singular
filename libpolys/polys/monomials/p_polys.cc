@@ -3552,6 +3552,7 @@ void  p_Vec2Array(poly v, poly *p, int len, const ring r)
   poly h;
   int k;
 
+  for(int i=len-1;i>=0;i--) p[i]=NULL;
   while (v!=NULL)
   {
     h=p_Head(v,r);
