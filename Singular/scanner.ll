@@ -25,6 +25,7 @@ extern char * yytext;
 extern int yyleng;
 extern int inerror;
 
+#ifndef SING_NDEBUG
 // this is to  shadow the malloc/realloc
 // used by yy_flex_malloc/yy_flex_realloc
 // so that we can mark stuff as static
@@ -41,16 +42,18 @@ static void* my_realloc(void* addr, size_t size)
   omMarkAsStaticAddr(new_addr);
   return new_addr;
 }
-static void my_free(void* addr)
-{
-  omFree(addr);
-}
 #undef malloc
 #define malloc my_malloc
 #undef realloc
 #define realloc my_realloc
+#else
+#undef malloc
+#define malloc omAlloc
+#undef realloc
+#define realloc omRealloc
+#endif
 #undef free
-#define free my_free
+#define free omFree
 static char * dupyytext()
 {
   char* s;
