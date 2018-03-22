@@ -757,7 +757,7 @@ KINLINE long sLObject::pLDeg(BOOLEAN deg_last)
 
   long ldeg;
   ldeg = tailRing->pLDeg(GetLmTailRing(), &length, tailRing);
-#ifdef HAVE_ASSUME
+#ifndef SING_NDEBUG
   if ( pLength == 0)
     p_Last(GetLmTailRing(), pLength, tailRing);
   assume ( pLength == length || rIsSyzIndexRing(currRing));

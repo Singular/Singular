@@ -120,10 +120,10 @@ extern void dErrorBreak();
 }
 #endif
 
-#ifndef HAVE_ASSUME
+#ifdef SING_NDEBUG
 #define assume(x) do {} while (0)
 #define r_assume(x) do {} while (0)
-#else /* ! HAVE_ASSUME */
+#else /* !SING_NDEBUG */
 
 #define assume_violation(s,f,l) \
   dReportError("assume violation at %s:%d condition: %s", f,l,s)
@@ -151,6 +151,6 @@ do                                              \
   }                                             \
 }                                               \
 while (0)
-#endif /* HAVE_ASSUME */
+#endif /* !SING_NDEBUG */
 
 #endif /* ifndef OUTPUT_H */

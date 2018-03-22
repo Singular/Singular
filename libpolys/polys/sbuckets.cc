@@ -333,12 +333,11 @@ done:
 
 poly sBucketSortMerge(poly p, const ring r)
 {
-#ifdef HAVE_ASSUME
-  int l_in = pLength(p);
-#endif
-
   if (p == NULL || pNext(p) == NULL) return p;
 
+#ifndef SING_NDEBUG
+  int l_in = pLength(p);
+#endif  
   sBucket_pt bucket = sBucketCreate(r);
   poly pn = pNext(p);
 
@@ -357,10 +356,8 @@ poly sBucketSortMerge(poly p, const ring r)
   sBucketDestroy(&bucket);
 
   p_Test(pn, r);
-#ifdef HAVE_ASSUME
   assume(l_dummy == pLength(pn));
   assume(l_in == l_dummy);
-#endif
   return pn;
 }
 
@@ -370,7 +367,7 @@ poly sBucketSortMerge(poly p, const ring r)
 
 poly sBucketSortAdd(poly p, const ring r)
 {
-#ifdef HAVE_ASSUME
+#ifndef SING_NDEBUG
   int l_in = pLength(p);
 #endif
 
@@ -394,7 +391,7 @@ poly sBucketSortAdd(poly p, const ring r)
   sBucketDestroy(&bucket);
 
   p_Test(pn, r);
-#ifdef HAVE_ASSUME
+#ifndef SING_NDEBUG
   assume(l_dummy == pLength(pn));
   assume(l_in >= l_dummy);
 #endif

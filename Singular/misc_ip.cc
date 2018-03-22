@@ -858,9 +858,6 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #if YYDEBUG
               StringAppendS("YYDEBUG=1,");
 #endif
-#ifdef HAVE_ASSUME
-             StringAppendS("ASSUME,");
-#endif
 #ifdef MDEBUG
               StringAppend("MDEBUG=%d,",MDEBUG);
 #endif

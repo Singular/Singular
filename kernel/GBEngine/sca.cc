@@ -881,10 +881,6 @@ static BOOLEAN kMoraUseBucket(kStrategy)
   return FALSE;
 }
 
-#ifdef HAVE_ASSUME
-static int sca_mora_count = 0;
-#endif
-
 // ideal sca_mora (ideal F, ideal Q, intvec *w, intvec *, kStrategy strat)
 ideal k_sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const intvec *, kStrategy strat, const ring _currRing)
 {
@@ -912,10 +908,6 @@ ideal k_sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const intvec
 
 #ifdef PDEBUG
   assume( strat->homog == bIdHomog );
-#endif
-
-#ifdef HAVE_ASSUME
-  sca_mora_count++;
 #endif
 
   strat->update = TRUE;

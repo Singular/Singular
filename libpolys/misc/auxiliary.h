@@ -160,9 +160,6 @@ static inline unsigned long si_min(const unsigned long a, const unsigned long b)
 /* undefine to enable inline */
 #define NO_INLINE
 
-/* undefine to disable assume -- should normally be defined for SING_NDEBUG */
-#define HAVE_ASSUME
-
 /* undef PDEBUG to disable checks of polys
 
  define PDEBUG to

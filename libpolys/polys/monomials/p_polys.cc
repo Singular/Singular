@@ -3449,7 +3449,7 @@ void p_TakeOutComp(poly *r_p, long comp, poly *r_q, int *lq, const ring r)
   poly p, q, p_prev;
   int l = 0;
 
-#ifdef HAVE_ASSUME
+#ifndef SING_NDEBUG
   int lp = pLength(*r_p);
 #endif
 
@@ -3484,7 +3484,7 @@ void p_TakeOutComp(poly *r_p, long comp, poly *r_q, int *lq, const ring r)
   *r_p = pNext(&pp);
   *r_q = pNext(&qq);
   *lq = l;
-#ifdef HAVE_ASSUME
+#ifndef SING_NDEBUG
   assume(pLength(*r_p) + pLength(*r_q) == lp);
 #endif
   p_Test(*r_p,r);
