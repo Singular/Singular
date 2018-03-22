@@ -6545,17 +6545,19 @@ static BOOLEAN jjCALL3ARG(leftv res, leftv u)
 
 static BOOLEAN jjCOEF_M(leftv, leftv v)
 {
-  const short t[]={5,VECTOR_CMD,POLY_CMD,MATRIX_CMD,MATRIX_CMD,IDHDL};
-  if (iiCheckTypes(v,t))
-     return TRUE;
-  idhdl c=(idhdl)v->next->next->data;
-  if (v->next->next->next->rtyp!=IDHDL) return TRUE;
-  idhdl m=(idhdl)v->next->next->next->data;
-  idDelete((ideal *)&(c->data.uideal));
-  idDelete((ideal *)&(m->data.uideal));
-  mp_Coef2((poly)v->Data(),(poly)v->next->Data(),
-    (matrix *)&(c->data.umatrix),(matrix *)&(m->data.umatrix),currRing);
-  return FALSE;
+  const short t[]={4,VECTOR_CMD,POLY_CMD,MATRIX_CMD,MATRIX_CMD};
+  if (iiCheckTypes(v,t,1))
+  {
+    idhdl c=(idhdl)v->next->next->data;
+    if (v->next->next->next->rtyp!=IDHDL) return TRUE;
+    idhdl m=(idhdl)v->next->next->next->data;
+    idDelete((ideal *)&(c->data.uideal));
+    idDelete((ideal *)&(m->data.uideal));
+    mp_Coef2((poly)v->Data(),(poly)v->next->Data(),
+      (matrix *)&(c->data.umatrix),(matrix *)&(m->data.umatrix),currRing);
+    return FALSE;
+  }
+  return TRUE;
 }
 
 static BOOLEAN jjDIVISION4(leftv res, leftv v)
