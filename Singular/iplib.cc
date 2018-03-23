@@ -1413,7 +1413,7 @@ void libstack::push(const char */*p*/, char *libn)
       ls->next = this;
       ls->libname = omStrDup(libn);
       ls->to_be_done = TRUE;
-      if(this != NULL) ls->cnt = this->cnt+1; else ls->cnt = 0;
+      if(library_stack != NULL) ls->cnt = library_stack->cnt+1; else ls->cnt = 0;
       library_stack = ls;
     }
   }
