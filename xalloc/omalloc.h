@@ -141,9 +141,34 @@ static inline void omFree(void *d)
 
 static inline void *omRealloc0(void *d, size_t ns)
 {
-#if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
-  void *n=realloc(d,ns);
-  memset(n,0,ns);
+#ifdef HAVE_MALLOC_USABLE_SIZE
+  size_t os=0;
+  if (d!=NULL) os=malloc_usable_size(d);
+  if (os>=ns)
+  {
+    void *n=realloc(d,ns);
+    return n;
+  }
+  else
+  {
+    char *n=(char*)realloc(d,ns);
+    memset(n+(ns-os),0,ns-os);
+    return (void*)n;
+  }
+#elif defined(HAVE_MALLOC_SIZE)
+  size_t os=0;
+  if (d!=NULL) os=malloc_size(d);
+  if (os>=ns)
+  {
+    void *n=realloc(d,ns);
+    return n;
+  }
+  else
+  {
+    char *n=(char*)realloc(d,ns);
+    memset(n+(ns-os),0,ns-os);
+    return (void*)n;
+  }
 #else
   void *n=omAlloc0(ns);
   if (d!=NULL)
@@ -154,8 +179,8 @@ static inline void *omRealloc0(void *d, size_t ns)
     memcpy(n,d,c);
     omFree(d);
   }
-#endif
   return n;
+#endif
 }
 static inline void omFreeSize(void *d, __attribute__((unused)) size_t s)
 #if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
