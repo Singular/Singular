@@ -623,7 +623,7 @@ static void nfReadTable(const int c, const coeffs r)
 
   if (r->m_nfCharQ > 1)
   {
-    omFreeSize( (ADDRESS)r->m_nfPlus1Table,r->m_nfCharQ*sizeof(unsigned short) );
+    omFreeSize( (ADDRESS)r->m_nfPlus1Table,(r->m_nfCharQ+1)*sizeof(unsigned short) );
     r->m_nfPlus1Table=NULL;
   }
   if ((c>1) || (c<0))
@@ -657,7 +657,7 @@ static void nfReadTable(const int c, const coeffs r)
     nfReadMipo(buf);
     r->m_nfCharQ1=r->m_nfCharQ-1;
     //Print("nfCharQ=%d,nfCharQ1=%d,mipo=>>%s<<\n",nfCharQ,nfCharQ1,buf);
-    r->m_nfPlus1Table= (unsigned short *)omAlloc( (r->m_nfCharQ)*sizeof(unsigned short) );
+    r->m_nfPlus1Table= (unsigned short *)omAlloc0( (r->m_nfCharQ+1)*sizeof(unsigned short) );
     int digs = gf_tab_numdigits62( r->m_nfCharQ );
     char * bufptr;
     int i = 1;
