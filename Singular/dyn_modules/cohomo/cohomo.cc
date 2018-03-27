@@ -326,7 +326,7 @@ ideal idsrRing(ideal h)
       rsr=pp;
   //Print("This is the first quotient generators %d:\n",i);
   //id_print(rsr);
-      break;	
+      break;        
     }
   }
   for(n=i+1;n<=rVar(currRing);n++)
@@ -1668,13 +1668,14 @@ ideal getpresolve(ideal h)
 {
   //ring r=currRing;
   int i;
-  assume (LIB "presolve.lib");
+  //assume (LIB "presolve.lib");
   sleftv a;a.Init();
   a.rtyp=IDEAL_CMD;a.data=(void*)h;
   idhdl solve=ggetid("elimlinearpart");
   if(solve==NULL)
   {
     WerrorS("presolve.lib are not loaded!");
+    return NULL;
   }
   BOOLEAN sl=iiMake_proc(solve,NULL,&a);
   //PrintS("no errors here\n");
@@ -2620,7 +2621,7 @@ std::vector<std::vector<int> > value2(std::vector<std::vector<int> > mvs, std::v
     if(base.size()!=mts.size())
     {
        WerrorS("Errors in Nab set!");
-	//WerrorS("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
+        //WerrorS("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
       usleep(1000000);
       assert(false);
     }
