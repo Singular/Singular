@@ -1,0 +1,469 @@
+///////////////////////////////////////////////////////////////////////////////
+version="version stanleyreisner.lib 1.0.0.0 April_2018 "; // $Id$
+category="Commutative Algebra";
+info="
+LIBRARY:  stanleyreisner.lib   Deformations of Stanley-Reiser ideals
+AUTHORS:
+
+OVERVIEW: (skip here!)
+
+Firstly, we implement the graded pieces has certain degree of cotangent modules
+T1 and T2 for a general Stanley-Reiser ring. And the graded pieces of homomorphisms
+are represented by lists of integers.
+
+
+
+
+
+
+KEYWORDS: Stanely-Reisner ideals, Stanley-Reisner rings, deformations
+
+TYPES:
+Homomorphism                class of homomorphisms
+
+PROCEDURES:
+T1(ideal)                   compute first order deformations
+T2(ideal)                   compute second order deformations
+makePoly(poly)              creat a Poly
+fPiece(ideal,poly,poly)             creat a FirstOrderDeformation
+sPiece(ideal,poly,poly)              creat a SecondOrderDeformation
+makeLinks(ideal,poly,poly)  creat a FirstOrderDeformation of the links
+
+";
+
+LIB "presolve.lib";
+
+
+static proc mod_init()
+{
+  LIB "cohomo.so";
+  newstruct("FirstOrderDeformation","ideal source, ideal gens, ring over, list dgs, list rule, qring target ");
+  newstruct("SecondOrderDeformation","ideal source, list relations, list lamda, list dgs");
+  newstruct("Poly","poly value, qring over");
+  newstruct("LinksDeformation","ideal links, poly a, FirstOrderDeformation FirstDeformation, SecondOrderDeformation SecondDeformation");
+  system("install","FirstOrderDeformation","print",printFirstOrderDeformation,1);
+  system("install","SecondOrderDeformation","print",printSecondOrderDeformation,1);
+  system("install","LinksDeformation","print",printLinksDeformation,1);
+  system("install","Poly","+",addPolys,2);
+  system("install","Poly","print",printPoly,1);
+}
+
+
+
+
+
+
+proc printFirstOrderDeformation(FirstOrderDeformation phi)
+"USAGE: printFirstOrderDeformation(phi); phi = FirstOrderDeformation.
+RETURN:  Prints the first order deformation lamda.
+KEYWORDS: FirstOrderDeformation
+EXAMPLE: example printFirstOrderDeformation, shows an example"
+{
+  def Rold = basering;
+  def Rcurrent = phi.over;
+  list rule=phi.rule;
+  ideal source=phi.source;
+  setring Rcurrent;
+  //string(phi.source) + "  ->  "+ string (phi.rule);
+  nameof(phi)+".source" +"  ->  "+ nameof(phi)+".over"+" / "+ nameof(phi)+".source";
+  //nameof(phi.source) +"  ->  "+ nameof(phi.rule)+ " / " nameof(phi.source);
+  // print monomial -> lambda * monomial ....
+  setring Rold;
+}
+example
+{
+ "EXAMPLE:";
+ ring R=0,(x1,x2,x3,x4,x5),lp;
+ ideal I = x1*x2,x2*x3,x3*x4,x4*x5,x5*x1;
+ list L = T1(I);
+ L[1];
+}
+
+
+
+proc printSecondOrderDeformation(SecondOrderDeformation psi)
+"USAGE: printSecondOrderDeformation(psi); psi = SecondOrderDeformation.
+RETURN:  Prints the second order deformation lamda.
+KEYWORDS: SecondOrderDeformation
+EXAMPLE: example printSecondOrderDeformation, shows an example"
+{
+  def Rold = basering;
+  nameof(phi)+".relations"  +"  ->  "+ nameof(phi)+".over"+"/"+ nameof(phi)+".source";
+  //print monomial -> lambda * monomial ....
+  setring Rold;
+}
+example
+{
+ "EXAMPLE:";
+ ring R=0,(x1,x2,x3,x4,x5),lp;
+ ideal I = x1*x2,x2*x3,x3*x4,x4*x5,x5*x1;
+ list L = T2(I);
+ L[1];
+}
+
+
+
+
+proc printLinksDeformation(LinksDeformation L)
+"USAGE:  printLinksDeformation(L); L = LinksDeformation.
+ASSUME:  L is a LinksDeformation.
+RETURN:  print the LinksDeformation.
+KEYWORDS: LinksDeformation.
+EXAMPLE: example printLinksDeformation, shows an example"
+{
+  "The links of "+string(L.a)+" is :";
+  L.links;
+  "The first order deformation of the links is :";
+  L.FirstDeformation;
+  "The second order deformation of the links is :";
+  L.SecondDeformation;
+}
+example
+{
+ "EXAMPLE:";
+ ring R=0,(x(1..4)),lp;
+ ideal i=x(2)*x(3);
+ LinksDeformation L=makeLinks(i,x(4)^2,x(1)*x(0));
+ L;
+}
+
+
+
+
+proc printPoly(Poly f)
+"USAGE:  printPoly(f); f = Poly.
+ASSUME:  f is a polynomial in quotient ring.
+RETURN:  print the polynomial in the quotient ring.
+KEYWORDS: Poly, quotient ring.
+EXAMPLE: example printPoly, shows an example"
+{
+  def Rold = basering;
+  def Rcurrent = f.over;
+  setring Rcurrent;
+  f.value;
+  setring Rold;
+}
+example
+{
+ "EXAMPLE:";
+ ring r=0,(x,y,z),lp;
+ ideal i=xy;
+ qring q=std(i);
+ poly p=x*y+z;
+ Poly q=makePoly(p);
+ q;
+}
+
+
+
+proc makePoly(poly p)
+"USAGE:  makePoly(p); p = polynomial.
+ASSUME:  p is a polynomial in basering.
+RETURN:  a Poly which is in a quotient ring.
+THEORY:  The procedure will convert a polynomial in basering to a polynomial in a quotient ring.
+KEYWORDS: Poly, quotient ring.
+EXAMPLE: example makePoly; shows an example"
+{
+  def rc=basering;
+  Poly P;
+  P.over=rc;
+  //option(redSB);
+  P.value=reduce(p,std(0));
+  return (P);
+}
+example
+{
+ "EXAMPLE:";
+ ring r=0,(x,y,z),lp;
+ ideal i=xy;
+ qring q=std(i);
+ poly p=x*y+z;
+ Poly q=makePoly(p);
+ q.over;
+ q.value;
+}
+
+
+
+proc addPolys(Poly f, Poly g)
+"USAGE:  addPolys(f,g); f = Poly, g = Poly.
+ASSUME:  f and g are the polynomials in a quotient ring.
+RETURN:  the sum of f and g in the quotient ring.
+THEORY:  The procedure will compute the normal form of f+g.
+KEYWORDS: Poly
+EXAMPLE: example addPolys; shows an example"
+{
+  def Rold = basering;
+  def Rcurrent = f.over;
+  setring Rcurrent;
+  poly ff = f.value;
+  poly gg = g.value;
+  poly ffplusgg = ff+gg;
+  Poly fplusg;
+  fplusg.value = ffplusgg;
+  fplusg.over = Rcurrent;
+  setring Rold;
+  return(fplusg);
+}
+example
+{
+ "EXAMPLE:";
+ ring R=0,(x(1..4)),lp;
+ ideal i=x(2)*x(3);
+ LinksDeformation L=makeLinks(i,x(4)^2,x(1)*x(0));
+}
+
+
+
+proc fPiece(ideal I, poly a, poly b)
+"USAGE:  fPiece(I,a,b); I = ideal, a = poly, b = poly.
+ASSUME:  I is the ideal generated by the monomials w.r.t. faces, a-b is the degree
+         of the graded piece.
+RETURN:  graded piece (of degree a-b) of first order deformation on ideal I.
+THEORY:  The procedure will compute the graded pieces of the first order deformaiton
+         which has degree a-b.
+KEYWORDS: first order deformation
+EXAMPLE: example fPiece; shows an example
+"
+{
+ FirstOrderDeformation C;
+ option(noredefine);
+ C.source = I;
+ C.gens=mg(I,a,b);
+ C.over = basering;
+ C.dgs = getdegree(a,b);
+ C.rule=getrule(I,a,b);
+ C.target=makeqring(I);
+ option(redefine);
+ return(C);
+}
+example
+{
+ "EXAMPLE:";
+ ring R=0,(x(1..4)),lp;
+ ideal i=x(1),x(2),x(3),x(4),x(1)*x(4),x(2)*x(4),x(1)*x(3),x(2)*x(3);
+ FirstOrderDeformation phi=fPiece(i,x(4)^2,x(1)*x(0));
+}
+
+
+
+
+proc sPiece(ideal I, poly a, poly b)
+"USAGE:  sPiece(I,a,b); I = ideal, a = polynomial, b = polynomial.
+ASSUME:  I is the ideal generated by the monomials w.r.t. faces, a-b is the degree
+         of the graded piece.
+RETURN:  graded piece (of degree a-b) of second order deformation on ideal I.
+THEORY:  The procedure will compute the graded pieces of the second order deformaiton
+         which has degree (a-b).
+KEYWORDS: graded piece,  second order piece
+EXAMPLE: example sPiece; shows an example"
+"
+{
+ SecondOrderDeformation C;
+ option(noredefine);
+ C.source = I;
+ C.relations=getrelations(I,a,b);
+ C.lamda=getlamda(I,a,b);
+ C.dgs = getdegree(a,b);
+ option(redefine);
+ return(C);
+}
+example
+{
+ "EXAMPLE:";
+ ring R=0,(x(1..4)),lp;
+ ideal i=x(1),x(2),x(3),x(4),x(1)*x(4),x(2)*x(4),x(1)*x(3),x(2)*x(3);
+ SecondOrderDeformation psi=sPiece(i,x(4)^2,x(1)*x(0));
+}
+
+
+proc T1(ideal h)
+"USAGE:  T1(h); h = ideal.
+ASSUME:  I is the ideal generated by the monomials w.r.t. faces.
+RETURN:  first order deformation on ideal I.
+THEORY:  The procedure will compute the first order deformaiton.
+KEYWORDS: first order deformation
+EXAMPLE: example T1; shows an example"
+{
+  list L;
+  int i,j;
+  int m=1;
+  ideal ai;
+  ideal bi=findbset(h);
+  FirstOrderDeformation C;
+  option(noredefine);
+  for(int i=1;i<=ncols(bi);i++)
+  {
+    ai=findaset(h,bi[i],0);
+    if(ai!=0)
+    {
+      for(j=1;j<=ncols(ai);j++)
+      {
+        C=fPiece(h, ai[j],bi[i]);
+        if(C.gens!=0)
+        {
+          L[m]=C;
+          m++;
+        }
+      }
+    }
+  }
+  option(redefine);
+  return (L);
+}
+example
+{
+ "EXAMPLE:";
+ ring R=0,(x(1..4)),lp;
+ ideal i=x(1),x(2),x(3),x(4),x(1)*x(4),x(2)*x(4),x(1)*x(3),x(2)*x(3);
+ list L=T1(i);
+}
+
+
+
+proc T2(ideal h)
+"USAGE:  T2(h); h = ideal.
+ASSUME:  I is the ideal generated by the monomials w.r.t. faces.
+RETURN:  second order deformation on ideal I.
+THEORY:  The procedure will compute the second order deformaiton.
+KEYWORDS: second order deformation.
+EXAMPLE: example T2; shows an example"
+{
+  option(noredefine);
+  list L;
+  int i,j;
+  SecondOrderDeformation C;
+  ideal ai;
+  int m=1;
+  ideal bi=findbset(h);
+  for(int i=1;i<=ncols(bi);i++)
+  {
+    ai=findaset(h,bi[i],0);
+    if(ai!=0)
+    {
+      for(j=1;j<=ncols(ai);j++)
+      {
+        C=sPiece(h, ai[j],bi[i]);
+        if(size(C.relations)!=0)
+        {
+          L[m]=C;
+          m++;
+        }
+      }
+    }
+  }
+  option(redefine);
+  return (L);
+}
+example
+{
+ "EXAMPLE:";
+ ring R=0,(x(1..4)),lp;
+ ideal i=x(1),x(2),x(3),x(4),x(1)*x(4),x(2)*x(4),x(1)*x(3),x(2)*x(3);
+ list L=T2(i);
+}
+
+
+
+
+
+
+
+proc makeLinks(ideal I, poly p, poly q)
+"USAGE:  makeLinks(I,p,q); I = ideal, p = poly, p=poly.
+ASSUME:  I is the ideal generated by the monomials w.r.t. faces.
+RETURN:  links of p, graded pieces of first and second order deformation of links on ideal I.
+KEYWORDS: links
+EXAMPLE: example T2; shows an example"
+{
+  LinksDeformation L;
+  ideal h=Links(p,I);
+  L.links=h;
+  L.a=p;
+  L.FirstDeformation=fPiece(h,1,q);
+  L.SecondDeformation=sPiece(h,1,q);
+  return (L);
+}
+example
+{
+ "EXAMPLE:";
+ ring R=0,(x(1..4)),lp;
+ ideal i=x(1),x(2),x(3),x(4),x(1)*x(4),x(2)*x(4),x(1)*x(3),x(2)*x(3);
+ LinksDeformation L=makeLinks(i,x(4)^2,x(1)*x(0));
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+proc getdegree(poly a, poly b)
+{
+  intvec L=gd(a,b);
+  list lv;
+  for(int i=1;i<=size(L);i++)
+  {
+    lv[i]=L[i];
+  }
+  return (lv);
+}
+
+proc getrule(ideal I, poly a, poly b)
+{
+  list lf,ls;
+  intmat V=fgp(I,a,b);
+  int i,j;
+  for(i=1;i<=nrows(V);i++)
+  {
+    for(j=1;j<=ncols(V);j++)
+    {
+       lf[j]=V[i,j];}
+    ls[i]=lf;
+    list lf;
+  }
+  return (ls);
+}
+
+proc makeqring(ideal h)
+{
+  ideal h1=idcomplement(h);
+  def Rold = basering;
+  qring Q=std(h1);
+  setring Rold;
+  return (Q);
+}
+
+proc getrelations(ideal h, poly a, poly b)
+{
+  ideal hh=genst(h,a,b);
+  list lr,lrs;
+  int i;
+  int j=1;
+  if(hh!=0)
+  {
+    for(i=1;i<=ncols(hh);i++)
+    {
+      lr[1]=hh[i];
+      lr[2]=hh[i+1];
+      i++;
+      lrs[j]=lr;
+      j++;
+      list lr;
+    }
+  }
+  return(lrs);
+}
+
+proc getlamda(ideal I, poly a, poly b)
+{
+  list lf,ls;
+  intmat V=sgp(I,a,b);
+  int i,j;
+  for(i=1;i<=nrows(V);i++)
+  {
+    for(j=1;j<=ncols(V);j++)
+    {
+       lf[j]=V[i,j];
+    }
+    ls[i]=lf;
+    list lf;
+  }
+  return (ls);
+}
