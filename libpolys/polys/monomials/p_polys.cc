@@ -3644,8 +3644,6 @@ void pEnlargeSet(poly* *p, int l, int increment)
     h=(poly*)omReallocSize((poly*)*p,l*sizeof(poly),(l+increment)*sizeof(poly));
     if (increment>0)
     {
-      //for (i=l; i<l+increment; i++)
-      //  h[i]=NULL;
       memset(&(h[l]),0,increment*sizeof(poly));
     }
   }
