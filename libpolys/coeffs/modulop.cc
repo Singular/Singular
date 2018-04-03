@@ -548,7 +548,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
   {
 #ifdef HAVE_DIV_MOD
     r->npInvTable=(unsigned short*)omAlloc0( r->ch*sizeof(unsigned short) );
-#elif !defined(HAVE_MULT_MOD)
+#elif (!defined(HAVE_MULT_MOD)||(!HAVE_DIV_MOD))
     r->npExpTable=(unsigned short *)omAlloc0( r->ch*sizeof(unsigned short) );
     r->npLogTable=(unsigned short *)omAlloc0( r->ch*sizeof(unsigned short) );
     r->npExpTable[0] = 1;
