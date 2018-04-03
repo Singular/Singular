@@ -55,12 +55,12 @@ static inline void npInpMultM(number &a, number b, const coeffs r)
 static inline number npMultM(number a, number b, const coeffs r)
 {
   long x = (long)r->npLogTable[(long)a]+ r->npLogTable[(long)b];
-  return (number)(long)r->npExpTable[x<r->npPminus1M ? x : x- r->npPminus1M];
+  return (number)(long)r->npExpTable[x<=r->npPminus1M ? x : x- r->npPminus1M];
 }
 static inline void npInpMultM(number &a, number b, const coeffs r)
 {
   long x = (long)r->npLogTable[(long)a]+ r->npLogTable[(long)b];
-  a=(number)(long)r->npExpTable[x<r->npPminus1M ? x : x- r->npPminus1M];
+  a=(number)(long)r->npExpTable[x<=r->npPminus1M ? x : x- r->npPminus1M];
 }
 #endif
 

@@ -40,6 +40,7 @@ BOOLEAN npEqual       (number a, number b,const coeffs r);
 void    npWrite       (number a, const coeffs r);
 void    npCoeffWrite  (const coeffs r, BOOLEAN details);
 const char *  npRead  (const char *s, number *a,const coeffs r);
+void nvInpMult(number &a, number b, const coeffs r);
 
 #ifdef LDEBUG
 BOOLEAN npDBTest      (number a, const char *f, const int l, const coeffs r);
@@ -508,6 +509,14 @@ BOOLEAN npInitChar(coeffs r, void* p)
   r->cfSetMap = npSetMap;
   //r->cfName = ndName;
   //r->cfInpMult=ndInpMult;
+  r->convSingNFactoryN=npConvSingNFactoryN;
+  r->convFactoryNSingN=npConvFactoryNSingN;
+  r->cfRandom=npRandom;
+#ifdef LDEBUG
+  // debug stuff
+  r->cfDBTest=npDBTest;
+#endif
+
 #ifdef NV_OPS
   if (c>NV_MAX_PRIME)
   {
@@ -522,15 +531,6 @@ BOOLEAN npInitChar(coeffs r, void* p)
     }
   }
 #endif
-#ifdef LDEBUG
-  // debug stuff
-  r->cfDBTest=npDBTest;
-#endif
-
-  r->convSingNFactoryN=npConvSingNFactoryN;
-  r->convFactoryNSingN=npConvFactoryNSingN;
-
-  r->cfRandom=npRandom;
 
   // io via ssi
   r->cfWriteFd=npWriteFd;
@@ -546,9 +546,11 @@ BOOLEAN npInitChar(coeffs r, void* p)
   if (r->ch <=NV_MAX_PRIME)
 #endif
   {
-#if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
-    r->npExpTable=(unsigned short *)omAlloc( r->ch*sizeof(unsigned short) );
-    r->npLogTable=(unsigned short *)omAlloc( r->ch*sizeof(unsigned short) );
+#ifdef HAVE_DIV_MOD
+    r->npInvTable=(unsigned short*)omAlloc0( r->ch*sizeof(unsigned short) );
+#elif !defined(HAVE_MULT_MOD)
+    r->npExpTable=(unsigned short *)omAlloc0( r->ch*sizeof(unsigned short) );
+    r->npLogTable=(unsigned short *)omAlloc0( r->ch*sizeof(unsigned short) );
     r->npExpTable[0] = 1;
     r->npLogTable[0] = 0;
     if (r->ch > 2)
@@ -577,10 +579,22 @@ BOOLEAN npInitChar(coeffs r, void* p)
       r->npLogTable[1] = 0;
     }
 #endif
-#ifdef HAVE_DIV_MOD
-    r->npInvTable=(unsigned short*)omAlloc0( r->ch*sizeof(unsigned short) );
-#endif
   }
+#ifdef NV_OPS
+  else /*if (c>NV_MAX_PRIME)*/
+  {
+    r->cfMult  = nvMult;
+    r->cfDiv   = nvDiv;
+    r->cfExactDiv = nvDiv;
+    r->cfInvers  = nvInvers;
+    r->cfInpMult = nvInpMult;
+    //r->cfPower= nvPower;
+    //if (c>FACTORY_MAX_PRIME) // factory will catch this error
+    //{
+    //  r->convSingNFactoryN=ndConvSingNFactoryN;
+    //}
+  }
+#endif
   return FALSE;
 }
 
@@ -779,12 +793,11 @@ number nvMult (number a,number b, const coeffs r)
     return nvMultM(a,b,r);
 }
 
-void   nvInpMult(number &a, number b, const coeffs r)
+void nvInpMult(number &a, number b, const coeffs r)
 {
   number n=nvMultM(a,b,r);
   a=n;
 }
-
 
 static inline long nvInvMod(long a, const coeffs R)
 {
