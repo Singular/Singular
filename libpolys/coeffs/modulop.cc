@@ -96,6 +96,17 @@ number npMult (number a,number b, const coeffs r)
   return c;
 }
 
+void npInpMult (number &a,number b, const coeffs r)
+{
+  n_Test(a, r);
+  n_Test(b, r);
+
+  if (((long)a == 0) || ((long)b == 0))
+    a=(number)0;
+  a = npMultM(a,b, r);
+  n_Test(a, r);
+}
+
 /*2
 * create a number from int
 */
@@ -471,7 +482,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
   r->cfCoeffWrite=npCoeffWrite;
 
   r->cfMult  = npMult;
-  r->cfInpMult  = npInpMultM;
+  r->cfInpMult  = npInpMult;
   r->cfSub   = npSubM;
   r->cfAdd   = npAddM;
   r->cfInpAdd   = npInpAddM;
@@ -515,21 +526,6 @@ BOOLEAN npInitChar(coeffs r, void* p)
 #ifdef LDEBUG
   // debug stuff
   r->cfDBTest=npDBTest;
-#endif
-
-#ifdef NV_OPS
-  if (c>NV_MAX_PRIME)
-  {
-    r->cfMult  = nvMult;
-    r->cfDiv   = nvDiv;
-    r->cfExactDiv= nvDiv;
-    r->cfInvers= nvInvers;
-    //r->cfPower= nvPower;
-    if (c>FACTORY_MAX_PRIME)
-    {
-      r->convSingNFactoryN=ndConvSingNFactoryN;
-    }
-  }
 #endif
 
   // io via ssi
