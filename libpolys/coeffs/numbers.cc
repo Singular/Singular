@@ -144,16 +144,15 @@ static number ndParameter(const int, const coeffs r)
 
 BOOLEAN n_IsZeroDivisor( number a, const coeffs r)
 {
-  int c = n_GetChar(r);
   BOOLEAN ret = n_IsZero(a, r);
-  if( (c != 0) && !ret )
-  {
-    number ch = n_Init( c, r );
-    number g = n_Gcd( ch, a, r );
-    ret = !n_IsOne (g, r);
-    n_Delete(&ch, r);
-    n_Delete(&g, r);
-  }
+  int c = n_GetChar(r);
+  if (ret || (c==0) || (r->is_field))
+    return ret; /*n_IsZero(a, r)*/
+  number ch = n_Init( c, r );
+  number g = n_Gcd( ch, a, r );
+  ret = !n_IsOne (g, r);
+  n_Delete(&ch, r);
+  n_Delete(&g, r);
   return ret;
 }
 
