@@ -879,6 +879,7 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #ifdef KDEBUG
               StringAppendS("KDEBUG,");
 #endif
+              StringAppendS("\n\t");
 #ifdef __OPTIMIZE__
               StringAppendS("CC:OPTIMIZE,");
 #endif
@@ -888,6 +889,17 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #ifdef __NO_INLINE__
               StringAppendS("CC:NO_INLINE,");
 #endif
+#ifdef HAVE_GENERIC_ADD
+              StringAppendS("GenericAdd,");
+#else
+              StringAppendS("AvoidBranching,");
+#endif
+#ifdef HAVE_MULT_MOD
+              StringAppendS("GenericMult,");
+#else
+              StringAppendS("TableMult,");
+#endif
+              StringAppendS("\n\t");
 #ifdef HAVE_EIGENVAL
               StringAppendS("eigenvalues,");
 #endif
