@@ -103,7 +103,8 @@ void npInpMult (number &a,number b, const coeffs r)
 
   if (((long)a == 0) || ((long)b == 0))
     a=(number)0;
-  a = npMultM(a,b, r);
+  else
+    a = npMultM(a,b, r);
   n_Test(a, r);
 }
 
