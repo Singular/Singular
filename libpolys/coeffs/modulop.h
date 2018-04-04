@@ -55,12 +55,32 @@ static inline void npInpMultM(number &a, number b, const coeffs r)
 static inline number npMultM(number a, number b, const coeffs r)
 {
   long x = (long)r->npLogTable[(long)a]+ r->npLogTable[(long)b];
-  return (number)(long)r->npExpTable[x<=r->npPminus1M ? x : x- r->npPminus1M];
+  #ifdef HAVE_GENERIC_ADD
+  if (x>r->npPminus1M) x-=r->npPminus1M;
+  #else
+    x-=r->npPminus1M;
+    #if SIZEOF_LONG == 8
+     x += (x >> 63) & r->npPminus1M;
+    #else
+     x += (x >> 31) & r->npPminus1M;
+    #endif
+  #endif
+  return (number)(long)r->npExpTable[x];
 }
 static inline void npInpMultM(number &a, number b, const coeffs r)
 {
   long x = (long)r->npLogTable[(long)a]+ r->npLogTable[(long)b];
-  a=(number)(long)r->npExpTable[x<=r->npPminus1M ? x : x- r->npPminus1M];
+  #ifdef HAVE_GENERIC_ADD
+  if (x>r->npPminus1M) x-=r->npPminus1M;
+  #else
+    x-=r->npPminus1M;
+    #if SIZEOF_LONG == 8
+     x += (x >> 63) & r->npPminus1M;
+    #else
+     x += (x >> 31) & r->npPminus1M;
+    #endif
+  #endif
+  a=(number)(long)r->npExpTable[x];
 }
 #endif
 

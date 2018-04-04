@@ -39,7 +39,7 @@ void ff_setprime ( const int );
 inline int ff_norm ( const int a )
 {
     int n = a % ff_prime;
-#if defined(i386) || defined(NTL_AVOID_BRANCHING)
+#if defined(i386) || defined(__x86_64__) || defined(NTL_AVOID_BRANCHING)
     n += (n >> 31) & ff_prime;
     return n;
 #else
@@ -51,7 +51,7 @@ inline int ff_norm ( const int a )
 inline long ff_norm ( const long a )
 {
     long n = a % ff_prime;
-#if defined(i386) || defined(NTL_AVOID_BRANCHING)
+#if defined(i386) || defined(__x86_64__) || defined(NTL_AVOID_BRANCHING)
     n += (n >> 31) & ff_prime;
     return n;
 #else
@@ -79,7 +79,7 @@ inline long ff_symmetric( const long a )
 inline int ff_longnorm ( const long a )
 {
     int n = (int)(a % (long)ff_prime);
-#if defined(i386) || defined(NTL_AVOID_BRANCHING)
+#if defined(i386) || defined(__x86_64__) || defined(NTL_AVOID_BRANCHING)
     n += (n >> 31) & ff_prime;
     return n;
 #else
@@ -91,7 +91,7 @@ inline int ff_longnorm ( const long a )
 inline int ff_bignorm ( const FACTORY_INT64 a )
 {
     int n = (int)(a % (FACTORY_INT64)ff_prime);
-#if defined(i386) || defined(NTL_AVOID_BRANCHING)
+#if defined(i386) || defined(__x86_64__) || defined(NTL_AVOID_BRANCHING)
     n += (n >> 31) & ff_prime;
     return n;
 #else
@@ -103,7 +103,7 @@ inline int ff_bignorm ( const FACTORY_INT64 a )
 inline int ff_add ( const int a, const int b )
 {
     //return ff_norm( a + b );
-#if defined(i386) || defined(NTL_AVOID_BRANCHING)
+#if defined(i386) || defined(__x86_64__) || defined(NTL_AVOID_BRANCHING)
     int r=( a + b );
     r -= ff_prime;
     r += (r >> 31) & ff_prime;
@@ -118,7 +118,7 @@ inline int ff_add ( const int a, const int b )
 inline int ff_sub ( const int a, const int b )
 {
     //return ff_norm( a - b );
-#if defined(i386) || defined(NTL_AVOID_BRANCHING)
+#if defined(i386) || defined(__x86_64__) || defined(NTL_AVOID_BRANCHING)
     int r=( a - b );
     r += (r >> 31) & ff_prime;
     return r;
@@ -133,7 +133,7 @@ inline int ff_neg ( const int a )
 {
     //return ff_norm( -a );
 // EXPERIMENT
-#if defined(i386) || defined(NTL_AVOID_BRANCHING)
+#if defined(i386) || defined(__x86_64__) || defined(NTL_AVOID_BRANCHING)
     int r= -a;
     r += (r >> 31) & ff_prime;
     return r;
