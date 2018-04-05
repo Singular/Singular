@@ -15,6 +15,7 @@
 #include "kernel/GBEngine/kstd1.h"
 #include "kernel/GBEngine/tgb.h"
 #include "kernel/maps/gen_maps.h"
+#include "kernel/preimage.h"
 #include "polys/sparsmat.h"
 
 #include "Singular/mod_lib.h"
