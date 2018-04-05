@@ -1819,7 +1819,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb, GbVariant alg)
   else
   {
     hh=idInit(1,1);
-    Werror("wrong algorith %d for SB",(int)alg);
+    Werror("wrong algorithm %d for SB",(int)alg);
   }
   //SI_RESTORE_OPT1(save1);
   idDelete(&h);
