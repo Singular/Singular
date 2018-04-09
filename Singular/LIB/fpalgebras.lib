@@ -520,10 +520,10 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   def save = basering;
   baseringdef = 1;
  }
- ring r = 2,(x,y,u,v,X,Y,u,v),dp;
+ ring r = 2,(x,y,u,v,X,Y,U,V),dp;
  def R = makeLetterplaceRing(d);
  setring R;
- ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-u(1)*v(2)*u(3)*v(4), u(1)*v(2)*u(3)*v(4)-1, u(1)*u(2)-x(1), v(1)*v(2) - y, 
+ ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-u(1)*v(2)*u(3)*v(4), u(1)*v(2)*u(3)*v(4)-1, u(1)*u(2)-x(1), v(1)*v(2) - y(1), 
 V(1)*x(2)*v(3)-X(1), U(1)*y(2)*u(3)-Y(1), 
 X(1)*x(2)-1, x(1)*X(2)-1,  Y(1)*y(2)-1,  y(1)*Y(2)-1, u(1)*U(2)-1, U(1)*u(2)-1, v(1)*V(2)-1, V(1)*v(2)-1;
  I = simplify(I,2);
