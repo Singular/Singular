@@ -772,7 +772,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 }
 example {
   "EXAMPLE:"; echo = 2;
-  def R = crystallographicGroupP31M(5); setring R;
+  def R = crystallographicGroupP31M(6); setring R;
   I;
 }
 
