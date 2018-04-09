@@ -280,7 +280,7 @@ EXAMPLE: example elimRing; shows an example
 
   if ( size(w1) <= 1 )
   {
-    return(BR);
+    ERROR("## elimination of no variables?");
   }
   if ( size(w2) <= 1 )
   {

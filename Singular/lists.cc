@@ -25,7 +25,7 @@ omBin slists_bin = omGetSpecBin(sizeof(slists));
 int lSize(lists L)
 {
   int n=L->nr;
-   while ((n>=0)&&((L->m[n].rtyp==DEF_CMD)||(L->m[n].rtyp==0))) n--;
+  while ((n>=0)&&((L->m[n].rtyp==DEF_CMD)||(L->m[n].rtyp==0))) n--;
   return n;
 }
 
@@ -199,15 +199,16 @@ BOOLEAN lDelete(leftv res, leftv u, leftv v)
 BOOLEAN lRingDependend(lists L)
 {
   if (L==NULL) return FALSE;
-  int i=0;
-  while (i<=L->nr)
+  int i=L->nr;
+  while (i>=0)
   {
-    if ((BEGIN_RING<L->m[i].rtyp)
-    && (L->m[i].rtyp<END_RING))
+    REGISTER int t=L->m[i].rtyp;
+    if ((BEGIN_RING<t /*L->m[i].rtyp*/)
+    && (/*L->m[i].rtyp*/ t<END_RING))
       return TRUE;
-    if ((L->m[i].rtyp==LIST_CMD)&&lRingDependend((lists)L->m[i].data))
+    if ((/*L->m[i].rtyp*/ t==LIST_CMD)&&lRingDependend((lists)L->m[i].data))
       return TRUE;
-    i++;
+    i--;
   }
   return FALSE;
 }

@@ -124,7 +124,7 @@ void sleftv::Print(leftv store, int spaces)
           PrintNSpaces(spaces);
           paPrint(n,(package)d);
           break;
-	case LIB_CMD:
+        case LIB_CMD:
         case NONE:
           return;
         case INTVEC_CMD:
@@ -496,7 +496,7 @@ void s_internalDelete(const int t,  void *d, const ring r)
     case CRING_CMD:
       {
         coeffs cf=(coeffs)d;
-        if ((cf->ref<=1)&&
+        if ((cf->ref<1)&&
         ((cf->type <=n_GF)
           ||((cf->type >=n_long_C)&&(cf->type <=n_CF))))
         {
@@ -867,10 +867,11 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           {
             char* ns = (char*) omAlloc(strlen(s) + 10);
             sprintf(ns, "%s(%s)", (t/*Typ()*/==MODUL_CMD ? "module" : "ideal"), s);
+            omFree(s);
             omCheckAddr(ns);
             return ns;
           }
-          return omStrDup(s);
+          return s;
 
         case INTVEC_CMD:
         case INTMAT_CMD:

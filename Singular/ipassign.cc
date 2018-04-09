@@ -119,7 +119,8 @@ static BOOLEAN jjSHORTOUT(leftv, leftv a)
 #else
     currRing->ShortOut = shortOut;
     coeffs cf = currRing->cf;
-    while (nCoeff_is_Extension(cf)) {
+    while (nCoeff_is_Extension(cf))
+    {
       cf->extRing->ShortOut = shortOut;
       assume(cf->extRing != NULL);
       cf = cf->extRing->cf;
@@ -1356,9 +1357,9 @@ static BOOLEAN jiA_VECTOR_L(leftv l,leftv r)
   leftv h;
   sleftv t;
   int i=0;
+  memset(&t,0,sizeof(sleftv));
   while (l!=NULL)
   {
-    memset(&t,0,sizeof(sleftv));
     t.rtyp=POLY_CMD;
     if (i>=IDELEMS(I))
     {
@@ -1736,12 +1737,12 @@ static BOOLEAN jiAssign_list(leftv l, leftv r)
   leftv ld=&(li->m[i]);
   ld->e=l->e->next;
   BOOLEAN b;
+  sleftv tmp;
+  memset(&tmp,0,sizeof(sleftv));
   if (/*(ld->rtyp!=LIST_CMD)
   &&*/(ld->e==NULL)
   && (ld->Typ()!=r->Typ()))
   {
-    sleftv tmp;
-    memset(&tmp,0,sizeof(sleftv));
     tmp.rtyp=DEF_CMD;
     b=iiAssign(&tmp,r,FALSE);
     ld->CleanUp();
@@ -1751,8 +1752,6 @@ static BOOLEAN jiAssign_list(leftv l, leftv r)
   && (ld->Typ()==r->Typ())
   && (ld->Typ()<MAX_TOK))
   {
-    sleftv tmp;
-    memset(&tmp,0,sizeof(sleftv));
     tmp.rtyp=r->Typ();
     tmp.data=(char*)idrecDataInit(r->Typ());
     b=iiAssign(&tmp,r,FALSE);

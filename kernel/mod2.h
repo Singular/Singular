@@ -133,17 +133,6 @@ static inline void HALT() { m2_end(2);}
 /* #define MAX_INT_LEN 11 */
 
 
-#ifdef DO_PROFILE
-/* define to enable explicit profiling of some crucial inline
- * routines and defines  */
-#undef DO_DEEP_PROFILE
-#endif
-
-/* define to enable assume */
-#ifndef HAVE_ASSUME
-#undef HAVE_ASSUME
-#endif
-
 /* define LINKAGE to "extern C" if compiling for shared libs */
 #ifndef LINKAGE
 #if defined(PIC)
@@ -163,9 +152,6 @@ static inline void HALT() { m2_end(2);}
 
 /* undefine to enable inline */
 #define NO_INLINE
-
-/* undefine to disable assume -- should normally be defined for SING_NDEBUG */
-#define HAVE_ASSUME
 
 /* undef PDEBUG to disable checks of polys
 
@@ -393,10 +379,10 @@ extern void dErrorBreak();
 }
 #endif
 
-#ifndef HAVE_ASSUME
+#ifdef SING_NDEBUG
 #define assume(x) do {} while (0)
 #define r_assume(x) do {} while (0)
-#else /* ! HAVE_ASSUME */
+#else /* SING_NDEBUG */
 
 #define assume_violation(s,f,l) \
   dReportError("assume violation at %s:%d condition: %s", f,l,s)
@@ -424,10 +410,10 @@ do                                              \
   }                                             \
 }                                               \
 while (0)
-#endif /* HAVE_ASSUME */
+#endif /* SING_NDEBUG */
 
 /* do have RDEBUG, unless we are doing the very real thing */
-#ifdef HAVE_ASSUME
+#ifndef SING_NDEBUG
 #ifndef RDEBUG
 #define RDEBUG
 #endif

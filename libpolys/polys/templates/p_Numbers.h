@@ -54,7 +54,6 @@ static FORCE_INLINE void n_InpAdd_FieldGeneral(number &n1, number n2, const coef
 #define n_Equal_RingGeneral(n1, n2, r)     n_Equal_FieldGeneral(n1, n2, r)
 #define n_Neg_RingGeneral(n, r)            n_Neg_FieldGeneral(n, r)
 #define n_Sub_RingGeneral(n1, n2, r)       n_Sub_FieldGeneral(n1, n2, r)
-//#define n_InpMult_RingGeneral(n1, n2, r)   n_InpMult_FieldGeneral(n1, n2, r)
 #define n_InpMult_RingGeneral(n1, n2, r)   n_InpMult_FieldGeneral(n1, n2, r)
 
 static FORCE_INLINE void n_InpAdd_RingGeneral(number &n1, number n2, const coeffs r)
@@ -103,7 +102,7 @@ static FORCE_INLINE number n_Neg_FieldZp(number n, const coeffs r)
 { STATISTIC(n_InpNeg); return npNegM(n, r); }
 
 static FORCE_INLINE void n_InpMult_FieldZp(number &n1, number n2, const coeffs r)
-{ STATISTIC(n_InpMult); n1=npMultM(n1, n2, r);  }
+{ STATISTIC(n_InpMult); npInpMultM(n1, n2, r);  }
 
 #ifdef HAVE_NUMSTATS
 static FORCE_INLINE void n_InpAdd_FieldZp(number &n1, number n2, const coeffs r)

@@ -45,17 +45,6 @@
 
 #include "polys/clapsing.h"
 
-
-// // TODO: DUE to the use of HALT in npolygon.cc :(((
-extern "C" {void m2_end(int i){exit(i);}}
-
-// // TODO: DUE to its use in kutil.cc :(((
-char * showOption(){return NULL;}
-
-// // TODO: DUE to its use in feread.cc :(((
-char *iiArithGetCmd(int nPos){return NULL; }
-
-
 #include "coeffs/numbers.h"
 
 #include "structs.h"

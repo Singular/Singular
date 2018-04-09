@@ -51,6 +51,7 @@ BOOLEAN jjCRING_Zp(leftv res, leftv a, leftv b)
       info.exp= 1;
       if (mpz_popcount((mpz_ptr)modBase)==1) // is a power of 2
       {
+        i2=SI_LOG2(i2);
         // is exponent <=2^(8*sizeof(unsigned long))
         if (i2<(8*sizeof(unsigned long)))
         {

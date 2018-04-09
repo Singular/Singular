@@ -3449,7 +3449,7 @@ void p_TakeOutComp(poly *r_p, long comp, poly *r_q, int *lq, const ring r)
   poly p, q, p_prev;
   int l = 0;
 
-#ifdef HAVE_ASSUME
+#ifndef SING_NDEBUG
   int lp = pLength(*r_p);
 #endif
 
@@ -3484,7 +3484,7 @@ void p_TakeOutComp(poly *r_p, long comp, poly *r_q, int *lq, const ring r)
   *r_p = pNext(&pp);
   *r_q = pNext(&qq);
   *lq = l;
-#ifdef HAVE_ASSUME
+#ifndef SING_NDEBUG
   assume(pLength(*r_p) + pLength(*r_q) == lp);
 #endif
   p_Test(*r_p,r);
@@ -3537,8 +3537,33 @@ void  p_Vec2Polys(poly v, poly* *p, int *len, const ring r)
     h=p_Head(v,r);
     k=__p_GetComp(h,r);
     p_SetComp(h,0,r);
-    (*p)[k-1]=p_Add_q((*p)[k-1],h,r);
+    pNext(h)=(*p)[k-1];(*p)[k-1]=h;
     pIter(v);
+  }
+  for(int i=(*len-1);i>=0;i--)
+  {
+    if ((*p)[i]!=NULL) (*p)[i]=pReverse((*p)[i]);
+  }
+}
+
+/// julia: vector to already allocated array (len=p_MaxComp(v,r))
+void  p_Vec2Array(poly v, poly *p, int len, const ring r)
+{
+  poly h;
+  int k;
+
+  for(int i=len-1;i>=0;i--) p[i]=NULL;
+  while (v!=NULL)
+  {
+    h=p_Head(v,r);
+    k=__p_GetComp(h,r);
+    p_SetComp(h,0,r);
+    pNext(h)=p[k-1];p[k-1]=h;
+    pIter(v);
+  }
+  for(int i=len-1;i>=0;i--)
+  {
+    if (p[i]!=NULL) p[i]=pReverse(p[i]);
   }
 }
 
@@ -3619,8 +3644,6 @@ void pEnlargeSet(poly* *p, int l, int increment)
     h=(poly*)omReallocSize((poly*)*p,l*sizeof(poly),(l+increment)*sizeof(poly));
     if (increment>0)
     {
-      //for (i=l; i<l+increment; i++)
-      //  h[i]=NULL;
       memset(&(h[l]),0,increment*sizeof(poly));
     }
   }

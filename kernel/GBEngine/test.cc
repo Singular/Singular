@@ -41,12 +41,6 @@
 #include "polys/clapsing.h"
 
 
-// // TODO: DUE to the use of HALT in npolygon.cc :(((
-//extern "C" {void m2_end(int i){exit(i);}}
-
-// TODO: DUE to its use in kutil.cc :(((
-char * showOption(){return NULL;}
-
 #include "kernel/combinatorics/stairc.h"
 #include "kernel/GBEngine/syz.h"
 #include "kernel/GBEngine/khstd.h"

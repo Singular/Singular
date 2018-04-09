@@ -378,7 +378,7 @@ long syReorderShiftedComponents(long * sc, int n)
   }
 
   assume(LONG_MAX -  SYZ_SHIFT_BASE > tc[n-1]);
-#ifdef HAVE_ASSUME
+#ifndef SING_NDEBUG
   for (i=1; i<n; i++)
   {
     assume(tc[i] >= 0);

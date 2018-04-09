@@ -1136,7 +1136,6 @@ ideal id_Vec2Ideal(poly vec, const ring R)
 {
    ideal result=idInit(1,1);
    omFree((ADDRESS)result->m);
-   result->m=NULL; // remove later
    p_Vec2Polys(vec, &(result->m), &(IDELEMS(result)),R);
    return result;
 }

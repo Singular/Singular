@@ -606,7 +606,7 @@ int feReadLine(char* b, int l)
     //s[strlen(s)+1]='\0'; add an second \0 at the end of the string
     s[rc]='\0';
     // handel \\ :
-    rc-=3;
+    rc-=3; if (rc<0) rc=0;
     if ((s[rc]=='\\')&&(currentVoice->sw!=BI_buffer))
     {
       s[rc]='\0';

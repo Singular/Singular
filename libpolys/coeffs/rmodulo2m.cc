@@ -24,26 +24,39 @@
 
 #ifdef HAVE_RINGS
 
+#ifdef LDEBUG
+BOOLEAN nr2mDBTest(number a, const char *f, const int l, const coeffs r)
+{
+  if (((long)a<0L) || ((long)a>(long)r->mod2mMask))
+  {
+    Print("wrong mod 2^n number %ld at %s,%d\n",(long)a,f,l);
+    return FALSE;
+  }
+  return TRUE;
+}
+#endif
+
+
 static inline number nr2mMultM(number a, number b, const coeffs r)
 {
   return (number)
-    ((((unsigned long) a) * ((unsigned long) b)) & ((unsigned long)r->mod2mMask));
+    ((((unsigned long) a) * ((unsigned long) b)) & r->mod2mMask);
 }
 
 static inline number nr2mAddM(number a, number b, const coeffs r)
 {
   return (number)
-    ((((unsigned long) a) + ((unsigned long) b)) & ((unsigned long)r->mod2mMask));
+    ((((unsigned long) a) + ((unsigned long) b)) & r->mod2mMask);
 }
 
 static inline number nr2mSubM(number a, number b, const coeffs r)
 {
   return (number)((unsigned long)a < (unsigned long)b ?
-                       r->mod2mMask - (unsigned long)b + (unsigned long)a + 1:
+                       r->mod2mMask+1 - (unsigned long)b + (unsigned long)a:
                        (unsigned long)a - (unsigned long)b);
 }
 
-#define nr2mNegM(A,r) (number)((r->mod2mMask - (unsigned long)(A) + 1) & r->mod2mMask)
+#define nr2mNegM(A,r) (number)((r->mod2mMask+1 - (unsigned long)(A)) & r->mod2mMask)
 #define nr2mEqualM(A,B)  ((A)==(B))
 
 extern omBin gmp_nrz_bin; /* init in rintegers*/
@@ -81,40 +94,40 @@ static char* nr2mCoeffString(const coeffs r)
 
 static coeffs nr2mQuot1(number c, const coeffs r)
 {
-    coeffs rr;
-    long ch = r->cfInt(c, r);
-    mpz_t a,b;
-    mpz_init_set(a, r->modNumber);
-    mpz_init_set_ui(b, ch);
-    mpz_ptr gcd;
-    gcd = (mpz_ptr) omAlloc(sizeof(mpz_t));
-    mpz_init(gcd);
-    mpz_gcd(gcd, a,b);
-    if(mpz_cmp_ui(gcd, 1) == 0)
-        {
-            WerrorS("constant in q-ideal is coprime to modulus in ground ring");
-            WerrorS("Unable to create qring!");
-            return NULL;
-        }
-    if(mpz_cmp_ui(gcd, 2) == 0)
+  coeffs rr;
+  long ch = r->cfInt(c, r);
+  mpz_t a,b;
+  mpz_init_set(a, r->modNumber);
+  mpz_init_set_ui(b, ch);
+  mpz_ptr gcd;
+  gcd = (mpz_ptr) omAlloc(sizeof(mpz_t));
+  mpz_init(gcd);
+  mpz_gcd(gcd, a,b);
+  if(mpz_cmp_ui(gcd, 1) == 0)
+  {
+    WerrorS("constant in q-ideal is coprime to modulus in ground ring");
+    WerrorS("Unable to create qring!");
+    return NULL;
+  }
+  if(mpz_cmp_ui(gcd, 2) == 0)
+  {
+    rr = nInitChar(n_Zp, (void*)2);
+  }
+  else
+  {
+    int kNew = 1;
+    mpz_t baseTokNew;
+    mpz_init(baseTokNew);
+    mpz_set(baseTokNew, r->modBase);
+    while(mpz_cmp(gcd, baseTokNew) > 0)
     {
-        rr = nInitChar(n_Zp, (void*)2);
+      kNew++;
+      mpz_mul(baseTokNew, baseTokNew, r->modBase);
     }
-    else
-    {
-        int kNew = 1;
-        mpz_t baseTokNew;
-        mpz_init(baseTokNew);
-        mpz_set(baseTokNew, r->modBase);
-        while(mpz_cmp(gcd, baseTokNew) > 0)
-        {
-          kNew++;
-          mpz_mul(baseTokNew, baseTokNew, r->modBase);
-        }
-        mpz_clear(baseTokNew);
-        rr = nInitChar(n_Z2m, (void*)(long)kNew);
-    }
-    return(rr);
+    mpz_clear(baseTokNew);
+    rr = nInitChar(n_Z2m, (void*)(long)kNew);
+  }
+  return(rr);
 }
 
 /* TRUE iff 0 < k <= 2^m / 2 */
@@ -130,10 +143,13 @@ static BOOLEAN nr2mGreaterZero(number k, const coeffs r)
  */
 static number nr2mMult(number a, number b, const coeffs r)
 {
+  number n;
   if (((unsigned long)a == 0) || ((unsigned long)b == 0))
     return (number)0;
   else
-    return nr2mMultM(a, b, r);
+    n=nr2mMultM(a, b, r);
+  n_Test(n,r);
+  return n;
 }
 
 static number nr2mAnn(number b, const coeffs r);
@@ -339,7 +355,7 @@ static number nr2mInit(long i, const coeffs r)
  */
 static long nr2mInt(number &n, const coeffs r)
 {
-  unsigned long nn = (unsigned long)(unsigned long)n & r->mod2mMask;
+  unsigned long nn = (unsigned long)n;
   unsigned long l = r->mod2mMask >> 1; l++; /* now: l = 2^(m-1) */
   if ((unsigned long)nn > l)
     return (long)((unsigned long)nn - r->mod2mMask - 1);
@@ -349,12 +365,16 @@ static long nr2mInt(number &n, const coeffs r)
 
 static number nr2mAdd(number a, number b, const coeffs r)
 {
-  return nr2mAddM(a, b, r);
+  number n=nr2mAddM(a, b, r);
+  n_Test(n,r);
+  return n;
 }
 
 static number nr2mSub(number a, number b, const coeffs r)
 {
-  return nr2mSubM(a, b, r);
+  number n=nr2mSubM(a, b, r);
+  n_Test(n,r);
+  return n;
 }
 
 static BOOLEAN nr2mIsUnit(number a, const coeffs)
@@ -410,7 +430,9 @@ static number nr2mDiv(number a, number b, const coeffs r)
       return (number) ((unsigned long) a / (unsigned long) b);
     }
   }
-  return (number)nr2mMult(a, nr2mInversM(b,r),r);
+  number n=(number)nr2mMult(a, nr2mInversM(b,r),r);
+  n_Test(n,r);
+  return n;
 }
 
 /* Is 'a' divisible by 'b'? There are two cases:
@@ -577,12 +599,14 @@ static number nr2mAnn(number b, const coeffs r)
 static number nr2mNeg(number c, const coeffs r)
 {
   if ((unsigned long)c == 0) return c;
-  return nr2mNegM(c, r);
+  number n=nr2mNegM(c, r);
+  n_Test(n,r);
+  return n;
 }
 
 static number nr2mMapMachineInt(number from, const coeffs /*src*/, const coeffs dst)
 {
-  unsigned long i = ((unsigned long)from) % dst->mod2mMask ;
+  unsigned long i = ((unsigned long)from) % (dst->mod2mMask + 1) ;
   return (number)i;
 }
 
@@ -710,15 +734,6 @@ static void nr2mInitExp(int m, coeffs r)
   if (m < 2)
     WarnS("nr2mInitExp unexpectedly called with m = 1 (we continue with Z/2^2");
 }
-
-#ifdef LDEBUG
-static BOOLEAN nr2mDBTest (number a, const char *, const int, const coeffs r)
-{
-  //if ((unsigned long)a < 0) return FALSE; // is unsigned!
-  if (((unsigned long)a & r->mod2mMask) != (unsigned long)a) return FALSE;
-  return TRUE;
-}
-#endif
 
 static void nr2mWrite (number a, const coeffs r)
 {
