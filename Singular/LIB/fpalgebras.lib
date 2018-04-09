@@ -866,7 +866,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  setring R;
  ideal I = x(1)*y(2)-y(1)*x(2)-1, x(1)*y(2)-y(1)*x(2)-r(1)*r(2)*r(3)*r(4)*r(5)*r(6), r(1)*r(2)*r(3)*r(4)*r(5)*r(6)-1, 
  x(1)*y(2)-y(1)*x(2)-m(1)*m(2), r(1)*r(2)*r(3)*r(4)*r(5)*r(6)-m(1)*m(2), m(1)*m(2)-1, m(1)*x(2)*m(3)-X(1),  m(1)*y(2)*m(3)-X(1)*y(2), 
- r(1)*r(2)*r(3)*r(4)*r(5)*x(6)*r(7)-y(1), r(1)*r(2)*r(3)*r(4)*r(5)*y(6)*r(7)-X(1)*y(2), M(1)*r(2)*m(3)- r(1)*r(2)*r(3)*r(4)*r(5)*y(6)
+ r(1)*r(2)*r(3)*r(4)*r(5)*x(6)*r(7)-y(1), r(1)*r(2)*r(3)*r(4)*r(5)*y(6)*r(7)-X(1)*y(2), m(1)*r(2)*m(3)- r(1)*r(2)*r(3)*r(4)*r(5)*y(6),
  X(1)*x(2)-1, x(1)*X(2)-1, Y(1)*y(2)-1,  y(1)*Y(2)-1;
  I = simplify(I,2);
  export(I);
@@ -875,7 +875,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 }
 example {
   "EXAMPLE:"; echo = 2;
-  def R = crystallographicGroupP6MM(5); setring R;
+  def R = crystallographicGroupP6MM(7); setring R;
   I;
 }
 
