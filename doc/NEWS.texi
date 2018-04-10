@@ -22,8 +22,8 @@
 @heading News for version @value{VERSION}
 New libraries:
 @itemize
-@c @item fpalgebras.lib: Generation of various algebras in the letterplace case
-@c (@nref{fpalgebras_lib})
+@item fpalgebras.lib: Generation of various algebras in the letterplace case
+(@nref{fpalgebras_lib})
 @end itemize
 
 Changed libraries:
