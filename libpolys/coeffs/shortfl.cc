@@ -266,7 +266,7 @@ static void nrWrite (number a, const coeffs r)
     chbr[n+1] = ')';
     chbr[n+2] = '\0';
     StringAppendS(chbr);
-    delete chbr;
+    delete[] chbr;
   }
   else
     StringAppend("(%s)",ch);
