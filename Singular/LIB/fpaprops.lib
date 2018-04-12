@@ -17,7 +17,7 @@ Huishi Li: Groebner bases in ring theory. World Scientific, 2010.
 SEE ALSO:  fpadim_lib, freegb_lib
 
 PROCEDURES:
-  lpNoetherian(<GB>);     check whether A/<GB> is (left/right) noetherian
+  lpNoetherian(<GB>);     check whether A/<LM(GB)> is (left/right) noetherian
   lpIsSemiPrime(<GB>);    check whether A/<LM(GB)> is semi prime
   lpIsPrime(<GB>);        check whether A/<LM(GB)> is prime
   lpGkDim(<GB>);          compute the Gelfand Kirillov dimension of A/<GB>
@@ -36,9 +36,10 @@ RETURN: int
 @*      1 left noetherian
 @*      2 right noetherian
 @*      3 noetherian
-PURPOSE: Check whether A/<G> is (left/right) noetherian
+PURPOSE: Check whether the monomial algebra A/<LM(G)> is (left/right) noetherian
 ASSUME: - basering is a Letterplace ring
 @*      - G is a Groebner basis
+NOTE: A/<LM(G)> (left/right) noetherian implies A/<G> (left/right) noetherian
 "
 {
   G = lead(G);
