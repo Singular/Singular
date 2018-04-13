@@ -4713,6 +4713,8 @@ static BOOLEAN jjSLIM_GB(leftv res, leftv u)
     WerrorS("ordering must be global for slimgb");
     return TRUE;
   }
+  if (rField_is_numeric(currRing))
+    WarnS("groebner base computations with inexact coefficients can not be trusted due to rounding errors");
   intvec *w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   // tHomog hom=testHomog;
   ideal u_id=(ideal)u->Data();
@@ -4819,6 +4821,8 @@ static BOOLEAN jjSBA_2(leftv res, leftv v, leftv u, leftv t)
 }
 static BOOLEAN jjSTD(leftv res, leftv v)
 {
+  if (rField_is_numeric(currRing))
+    WarnS("groebner base computations with inexact coefficients can not be trusted due to rounding errors");
   ideal result;
   ideal v_id=(ideal)v->Data();
   intvec *w=(intvec *)atGet(v,"isHomog",INTVEC_CMD);

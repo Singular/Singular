@@ -7056,7 +7056,8 @@ A reduced Groebner basis is returned if option(redSB) is set
 To view the progress of long running computations, use option(prot)
 (see @ref{option(prot)}).
 
-
+@item @strong{Warning:}
+Groebner basis computations with inexact coefficients can not be trusted due to rounding errors.
 
 @item @strong{Example:}
 @smallexample
@@ -7377,6 +7378,8 @@ first argument) and additional generator(s) (the second argument).
 @*4 arguments @code{G,p,hv,w} are the combination of the above:
 standard basis @code{G}, additional generator @code{p}, hilbert function @code{hv} w.r.t. weights @code{w}.
 
+@item @strong{Warning:}
+Groebner basis computations with inexact coefficients can not be trusted due to rounding errors.
 @item @strong{Note:}
 The
 standard basis is computed with a (more or less) straight-forward
