@@ -36,7 +36,7 @@ RETURN: int
 @*      1 left Noetherian
 @*      2 right Noetherian
 @*      3 Noetherian
-@*      4 weak Noetherian (TODO)
+@*      4 weak Noetherian
 PURPOSE: Check whether the monomial algebra A/<LM(G)> is (left/right) noetherian
 ASSUME: - basering is a Letterplace ring
 @*      - G is a Groebner basis
@@ -97,22 +97,42 @@ the acc (ascending chain condition).
   // DFS from every vertex, if cycle is found, check every vertex for incomming/outcom
   intvec visited;
   visited[ncols(UG)] = 0;
-  int inFlag, outFlag;
+  int inFlag, outFlag, inOutFlag;
   for (int v = 1; v <= ncols(UG) && (inFlag + outFlag) != 3; v++) {
-    int inOutFlags = inOrOutCommingEdgeInCycle(UG, v, visited, 0);
+    int inOutFlags = inOutCommingEdgesInCycles(UG, v, visited, 0);
     if (inOutFlags == 1) {
       inFlag = 1;
     }
     if (inOutFlags == 2) {
-      outFlag = 2;
+      outFlag = 1;
     }
     if (inOutFlags == 3) {
       inFlag = 1;
-      outFlag = 2;
+      outFlag = 1;
+    }
+    if (inOutFlags == 4) {
+      inOutFlag = 1;
+    }
+    if (inOutFlags == 5) {
+      inFlag = 1;
+      inOutFlag = 1;
+    }
+    if (inOutFlags == 6) {
+      outFlag = 1;
+      inOutFlag = 1;
+    }
+    if (inOutFlags == 7) {
+      inFlag = 1;
+      outFlag = 1;
+      inOutFlag = 1;
     }
     kill inOutFlags;
   } kill v;
-  return (3 - inFlag - outFlag);
+  int noetherian = 3 - 1*inFlag - 2*outFlag;
+  if (noetherian == 0) {
+    return (4 - 4*inOutFlag); // weak noetherian
+  }
+  return (noetherian);
 }
 example
 {
@@ -124,7 +144,7 @@ example
   lpNoetherian(G);
 }
 
-static proc inOrOutCommingEdgeInCycle(intmat G, int v, intvec visited, intvec path) {
+static proc inOutCommingEdgesInCycles(intmat G, int v, intvec visited, intvec path) {
   // Mark the current vertex as visited
   visited[v] = 1;
 
@@ -135,19 +155,22 @@ static proc inOrOutCommingEdgeInCycle(intmat G, int v, intvec visited, intvec pa
     path[size(path) + 1] = v;
   }
 
-  int inFlag, outFlag;
+  int inFlag, outFlag, inOutFlag;
 
   for (int w = 1; w <= ncols(G) && (inFlag + outFlag) != 3; w++) {
     if (G[v,w] == 1) {
-      if (visited[w] == 1) {
-        // new cycle
-        if (v == w) {
+      if (visited[w] == 1) { // new cycle
+        int tmpInFlag;
+        int tmpOutFlag;
+        if (v == w) { // cycle is a loop
           for (int u = 1; u <= ncols(G); u++) {
             if (G[v,u] && u != v) {
-              outFlag = 2;
+              outFlag = 1;
+              tmpOutFlag = 1;
             }
             if (G[u,v] && u != v) {
               inFlag = 1;
+              tmpInFlag = 1;
             }
           } kill u;
         } else {
@@ -157,11 +180,13 @@ static proc inOrOutCommingEdgeInCycle(intmat G, int v, intvec visited, intvec pa
               if (G[path[i],u] == 1) { // there is an edge to u
                 if (path[i] != v) {
                   if (u != path[i+1]) { // and u is not the next element in the cycle
-                    outFlag = 2;
+                    outFlag = 1;
+                    tmpOutFlag = 1;
                   }
                 } else {
                   if (u != w) {
-                    outFlag = 2;
+                    outFlag = 1;
+                    tmpOutFlag = 1;
                   }
                 }
               }
@@ -169,10 +194,12 @@ static proc inOrOutCommingEdgeInCycle(intmat G, int v, intvec visited, intvec pa
                 if (path[i] != w) {
                   if (u != path[i-1]) { // and u is not the previous element in the cylce
                     inFlag = 1;
+                    tmpInFlag = 1;
                   }
                 } else {
                   if (u != v) {
                     inFlag = 1;
+                    tmpInFlag = 1;
                   }
                 }
               }
@@ -182,24 +209,46 @@ static proc inOrOutCommingEdgeInCycle(intmat G, int v, intvec visited, intvec pa
             }
           } kill i;
         }
+        if (tmpInFlag > 0 && tmpOutFlag > 0) {
+          // there are both in and outcomming edges in this cycle
+          inOutFlag = 1;
+        }
+        kill tmpInFlag;
+        kill tmpOutFlag;
       } else {
-        int inOutFlags = inOrOutCommingEdgeInCycle(G, w, visited, path);
+        int inOutFlags = inOutCommingEdgesInCycles(G, w, visited, path);
         if (inOutFlags == 1) {
           inFlag = 1;
         }
         if (inOutFlags == 2) {
-          outFlag = 2;
+          outFlag = 1;
         }
         if (inOutFlags == 3) {
           inFlag = 1;
-          outFlag = 2;
+          outFlag = 1;
+        }
+        if (inOutFlags == 4) {
+          inOutFlag = 1;
+        }
+        if (inOutFlags == 5) {
+          inFlag = 1;
+          inOutFlag = 1;
+        }
+        if (inOutFlags == 6) {
+          outFlag = 1;
+          inOutFlag = 1;
+        }
+        if (inOutFlags == 7) {
+          inFlag = 1;
+          outFlag = 1;
+          inOutFlag = 1;
         }
         kill inOutFlags;
       }
     }
   } kill w;
 
-  return (inFlag + outFlag);
+  return (1*inFlag + 2*outFlag + 4*inOutFlag);
 }
 
 proc lpIsSemiPrime(ideal G)
