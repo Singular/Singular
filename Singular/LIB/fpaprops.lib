@@ -17,7 +17,7 @@ Huishi Li: Groebner bases in ring theory. World Scientific, 2010.
 SEE ALSO:  fpadim_lib, freegb_lib
 
 PROCEDURES:
-  lpNoetherian(<GB>);     check whether A/<LM(GB)> is (left/right) noetherian
+  lpNoetherian(<GB>);     check whether A/<LM(GB)> is (left/right) Noetherian
   lpIsSemiPrime(<GB>);    check whether A/<LM(GB)> is semi prime
   lpIsPrime(<GB>);        check whether A/<LM(GB)> is prime
   lpGkDim(<GB>);          compute the Gelfand Kirillov dimension of A/<GB>
@@ -32,14 +32,20 @@ LIB "fpadim.lib";
 proc lpNoetherian(ideal G)
 "USAGE: lpNoetherian(G); G an ideal in a Letterplace ring
 RETURN: int
-@*      0 not noetherian
-@*      1 left noetherian
-@*      2 right noetherian
-@*      3 noetherian
+@*      0 not Noetherian
+@*      1 left Noetherian
+@*      2 right Noetherian
+@*      3 Noetherian
+@*      4 weak Noetherian (TODO)
 PURPOSE: Check whether the monomial algebra A/<LM(G)> is (left/right) noetherian
 ASSUME: - basering is a Letterplace ring
 @*      - G is a Groebner basis
-NOTE: A/<LM(G)> (left/right) noetherian implies A/<G> (left/right) noetherian
+THEORY: lpNoetherian works with the monomial algebra A/<LM(G)>.
+If it gives an affirmative answer for one of the properties, then it 
+holds for both A/<LM(G)> and A/<G>. However, a negative answer applies 
+only to A/<LM(G)> and not necessarily to A/<G>.
+NOTE: Weak Noetherian means that two-sided ideals in A/<G> satisfy
+the acc (ascending chain condition).
 "
 {
   G = lead(G);
@@ -202,6 +208,10 @@ RETURN: boolean
 PURPOSE: Check whether A/<LM(G)> is semi prime, that is when p * (A/<LM(G)>) * p != 0 for all p in (A/<LM(G)> - {0}).
 ASSUME: - basering is a Letterplace ring
       - G is a Groebner basis
+THEORY: lpIsSemiPrime works with the monomial algebra A/<LM(G)>.
+A positive answer holds for both A/<LM(G)> and A/<G>, while 
+a negative answer applies only to A/<LM(G)> and not necessarily to 
+A/<G>.
 "
 {
   G = lead(G);
@@ -303,6 +313,9 @@ RETURN: boolean
 PURPOSE: Check whether A/<LM(G)> is prime, that is when p1 * (A/<LM(G)>) * p2 != 0 for all p1, p2 in (A/<LM(G)> - {0}).
 ASSUME: - basering is a Letterplace ring
       - G is a Groebner basis
+THEORY: lpIsPrime works with the monomial algebra A/<LM(G)>.
+A positive answer holds for both A/<LM(G)> and A/<G>, while
+a negative answer applies only to A/<LM(G)> and not necessarily to A/<G>.
 "
 {
   G = lead(G);
