@@ -44,7 +44,7 @@ THEORY: lpNoetherian works with the monomial algebra A/<LM(G)>.
 If it gives an affirmative answer for one of the properties, then it 
 holds for both A/<LM(G)> and A/<G>. However, a negative answer applies 
 only to A/<LM(G)> and not necessarily to A/<G>.
-NOTE: Weak Noetherian means that two-sided ideals in A/<G> satisfy
+NOTE: Weak Noetherian means that two-sided ideals in A/<LM(G)> satisfy
 the acc (ascending chain condition).
 "
 {
