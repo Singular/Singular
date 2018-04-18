@@ -154,8 +154,6 @@ BOOLEAN npIsMOne (number a, const coeffs r)
   return ((r->npPminus1M == (long)a) &&(1L!=(long)a))/*for char 2*/;
 }
 
-#ifdef HAVE_DIV_MOD
-
 #ifdef USE_NTL_XGCD
 
 //ifdef HAVE_NTL // in ntl.a
@@ -210,7 +208,6 @@ static inline long InvMod(long a, const coeffs R)
   #endif
 #endif
 }
-#endif
 
 static inline number npInversM (number c, const coeffs r)
 {
