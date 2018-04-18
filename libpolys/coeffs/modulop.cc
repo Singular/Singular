@@ -169,9 +169,10 @@ NTL_CLIENT
 
 static inline long InvMod(long a, const coeffs R)
 {
-   long d, s, t;
+   long s, t;
 
 #ifdef USE_NTL_XGCD
+   long d;
    XGCD(d, s, t, a, R->ch);
    assume (d == 1);
 #else
@@ -184,7 +185,8 @@ static inline long InvMod(long a, const coeffs R)
    while (v != 0)
    {
       q = u / v;
-      r = u % v;
+      //r = u % v;
+      r = u - q*v;
       u = v;
       v = r;
       u0 = u2;
@@ -195,30 +197,41 @@ static inline long InvMod(long a, const coeffs R)
    assume(u==1);
    s = u1;
 #endif
+#ifdef HAVE_GENERIC_ADD
    if (s < 0)
       return s + R->ch;
    else
       return s;
+#else
+  #if SIZEOF_LONG == 8
+  s += (s >> 63) & R->ch;
+  #else
+  s += (s >> 31) & R->ch;
+  #endif
+#endif
 }
 #endif
 
 static inline number npInversM (number c, const coeffs r)
 {
   n_Test(c, r);
-#ifndef HAVE_DIV_MOD
+#if !defined(HAVE_MULT_MOD) && (!defined(HAVE_DIV_MOD))
   number d = (number)(long)r->npExpTable[r->npPminus1M - r->npLogTable[(long)c]];
 #else
   long inv=(long)r->npInvTable[(long)c];
   if (inv==0)
   {
+    #ifndef HAVE_MULT_MOD
+    inv = (long)r->npExpTable[r->npPminus1M - r->npLogTable[(long)c]];
+    #else
     inv=InvMod((long)c,r);
+    #endif
     r->npInvTable[(long)c]=inv;
   }
   number d = (number)inv;
 #endif
   n_Test(d, r);
   return d;
-
 }
 
 number npDiv (number a,number b, const coeffs r)
@@ -226,21 +239,15 @@ number npDiv (number a,number b, const coeffs r)
   n_Test(a, r);
   n_Test(b, r);
 
-//#ifdef NV_OPS
-//  if (r->ch>NV_MAX_PRIME)
-//    return nvDiv(a,b);
-//#endif
-  if ((long)a==0L)
-    return (number)0L;
-  number d;
-
-#ifndef HAVE_DIV_MOD
   if ((long)b==0L)
   {
     WerrorS(nDivBy0);
     return (number)0L;
   }
+  if ((long)a==0) return (number)0L;
 
+  number d;
+#ifndef HAVE_DIV_MOD
   int s = r->npLogTable[(long)a] - r->npLogTable[(long)b];
   if (s < 0)
     s += r->npPminus1M;
