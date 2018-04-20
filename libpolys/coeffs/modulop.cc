@@ -206,25 +206,36 @@ static inline long InvMod(long a, const coeffs R)
   #else
   s += (s >> 31) & R->ch;
   #endif
+  return s;
 #endif
 }
 
 static inline number npInversM (number c, const coeffs r)
 {
   n_Test(c, r);
-#if !defined(HAVE_MULT_MOD) && (!defined(HAVE_DIV_MOD))
+#ifndef HAVE_GENERIC_MULT
+  #ifndef HAVE_INVTABLE
   number d = (number)(long)r->npExpTable[r->npPminus1M - r->npLogTable[(long)c]];
-#else
+  #else
   long inv=(long)r->npInvTable[(long)c];
   if (inv==0)
   {
-    #ifndef HAVE_MULT_MOD
     inv = (long)r->npExpTable[r->npPminus1M - r->npLogTable[(long)c]];
-    #else
-    inv=InvMod((long)c,r);
-    #endif
     r->npInvTable[(long)c]=inv;
   }
+  number d = (number)inv;
+  #endif
+#else
+  #ifdef HAVE_INVTABLE
+  long inv=(long)r->npInvTable[(long)c];
+  if (inv==0)
+  {
+    inv=InvMod((long)c,r);
+    r->npInvTable[(long)c]=inv;
+  }
+  #else
+  long  inv=InvMod((long)c,r);
+  #endif
   number d = (number)inv;
 #endif
   n_Test(d, r);
@@ -244,10 +255,18 @@ number npDiv (number a,number b, const coeffs r)
   if ((long)a==0) return (number)0L;
 
   number d;
-#ifndef HAVE_DIV_MOD
+#ifndef HAVE_GENERIC_MULT
   int s = r->npLogTable[(long)a] - r->npLogTable[(long)b];
+  #ifdef HAVE_GENERIC_ADD
   if (s < 0)
     s += r->npPminus1M;
+  #else
+    #if SIZEOF_LONG == 8
+    s += ((long)s >> 63) & r->npPminus1M;
+    #else
+    s += ((long)s >> 31) & r->npPminus1M;
+    #endif
+  #endif
   d = (number)(long)r->npExpTable[s];
 #else
   number inv=npInversM(b,r);
@@ -394,11 +413,14 @@ const char * npRead (const char *s, number *a, const coeffs r)
 
 void npKillChar(coeffs r)
 {
-  #ifdef HAVE_DIV_MOD
+  #ifdef HAVE_INVTABLE
   if (r->npInvTable!=NULL)
-  omFreeSize( (void *)r->npInvTable, r->ch*sizeof(unsigned short) );
-  r->npInvTable=NULL;
-  #else
+  {
+    omFreeSize( (void *)r->npInvTable, r->ch*sizeof(unsigned short) );
+    r->npInvTable=NULL;
+  }
+  #endif
+  #ifndef HAVE_GENERIC_MULT
   if (r->npExpTable!=NULL)
   {
     omFreeSize( (void *)r->npExpTable, r->ch*sizeof(unsigned short) );
@@ -547,9 +569,10 @@ BOOLEAN npInitChar(coeffs r, void* p)
   if (r->ch <=NV_MAX_PRIME)
 #endif
   {
-#ifdef HAVE_DIV_MOD
+#ifdef HAVE_INVTABLE
     r->npInvTable=(unsigned short*)omAlloc0( r->ch*sizeof(unsigned short) );
-#elif (!defined(HAVE_MULT_MOD)||(!HAVE_DIV_MOD))
+#endif
+#ifndef HAVE_GENERIC_MULT
     r->npExpTable=(unsigned short *)omAlloc0( r->ch*sizeof(unsigned short) );
     r->npLogTable=(unsigned short *)omAlloc0( r->ch*sizeof(unsigned short) );
     r->npExpTable[0] = 1;
@@ -800,49 +823,9 @@ void nvInpMult(number &a, number b, const coeffs r)
   a=n;
 }
 
-static inline long nvInvMod(long a, const coeffs R)
-{
-#ifdef HAVE_DIV_MOD
-  return InvMod(a, R);
-#else
-/// TODO: use "long InvMod(long a, const coeffs R)"?!
-
-   long  s;
-
-   long  u, u0, u1, u2, q, r; // v0, v1, v2,
-
-   u1=1; // v1=0;
-   u2=0; // v2=1;
-   u = a;
-
-   long v = R->ch;
-
-   while (v != 0)
-   {
-      q = u / v;
-      r = u % v;
-      u = v;
-      v = r;
-      u0 = u2;
-//      v0 = v2;
-      u2 = u1 - q*u2;
-//      v2 = v1 - q*v2;
-      u1 = u0;
-//      v1 = v0;
-   }
-
-   s = u1;
-   //t = v1;
-   if (s < 0)
-      return s + R->ch;
-   else
-     return s;
-#endif
-}
-
 static inline number nvInversM (number c, const coeffs r)
 {
-  long inv=nvInvMod((long)c,r);
+  long inv=InvMod((long)c,r);
   return (number)inv;
 }
 

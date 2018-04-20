@@ -8,13 +8,21 @@
 */
 #include "misc/auxiliary.h"
 
-// defines are in struct.h
+
 // define if a*b is with mod instead of tables
-//#define HAVE_MULT_MOD
-// define if a/b is with mod instead of tables
-//#define HAVE_DIV_MOD
+//#define HAVE_GENERIC_MULT
+// define if 1/b is from  tables
+//#define HAVE_INVTABLE
 // define if an if should be used
 //#define HAVE_GENERIC_ADD
+
+//#undef HAVE_GENERIC_ADD
+//#undef HAVE_GENERIC_MULT
+//#undef HAVE_INVTABLE
+
+//#define HAVE_GENERIC_ADD 1
+//#define HAVE_GENERIC_MULT 1
+//#define HAVE_INVTABLE 1
 
 // enable large primes (32749 < p < 2^31-)
 #define NV_OPS
@@ -40,7 +48,7 @@ BOOLEAN npInitChar(coeffs r, void* p);
 //    res += (res >> 31) & npPrimeM;
 //    return (number)res;
 // }
-#ifdef HAVE_MULT_MOD
+#ifdef HAVE_GENERIC_MULT
 static inline number npMultM(number a, number b, const coeffs r)
 {
   return (number)
