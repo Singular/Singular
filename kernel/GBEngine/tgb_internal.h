@@ -70,11 +70,11 @@ using std::vector;
 #if 1
 
 #define npInit n_Init
-#define npNeg n_InpNeg
-#define npInvers n_Invers
-#define npMult n_Mult
-#define npIsOne n_IsOne
-#define npIsZero n_IsZero
+#define npNeg npNegM
+#define npInvers npInversM
+#define npMult npMultM
+//#define npIsOne n_IsOne
+#define npIsZero npIsZeroM
 
 #else
 #error Please do NOT call internal functions directly!

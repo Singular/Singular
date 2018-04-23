@@ -140,106 +140,11 @@ BOOLEAN npIsZero (number  a, const coeffs r)
   return 0 == (long)a;
 }
 
-BOOLEAN npIsOne (number a, const coeffs r)
-{
-  n_Test(a, r);
-
-  return 1 == (long)a;
-}
-
 BOOLEAN npIsMOne (number a, const coeffs r)
 {
   n_Test(a, r);
 
   return ((r->npPminus1M == (long)a) &&(1L!=(long)a))/*for char 2*/;
-}
-
-#ifdef USE_NTL_XGCD
-
-//ifdef HAVE_NTL // in ntl.a
-//extern void XGCD(long& d, long& s, long& t, long a, long b);
-#include <NTL/ZZ.h>
-#ifdef NTL_CLIENT
-NTL_CLIENT
-#endif
-
-#endif
-
-static inline long InvMod(long a, const coeffs R)
-{
-   long s, t;
-
-#ifdef USE_NTL_XGCD
-   long d;
-   XGCD(d, s, t, a, R->ch);
-   assume (d == 1);
-#else
-   long  u, v, u0, v0, u1, v1, u2, v2, q, r;
-
-   assume(a>0);
-   u1=1; u2=0;
-   u = a; v = R->ch;
-
-   while (v != 0)
-   {
-      q = u / v;
-      //r = u % v;
-      r = u - q*v;
-      u = v;
-      v = r;
-      u0 = u2;
-      u2 = u1 - q*u2;
-      u1 = u0;
-   }
-
-   assume(u==1);
-   s = u1;
-#endif
-#ifdef HAVE_GENERIC_ADD
-   if (s < 0)
-      return s + R->ch;
-   else
-      return s;
-#else
-  #if SIZEOF_LONG == 8
-  s += (s >> 63) & R->ch;
-  #else
-  s += (s >> 31) & R->ch;
-  #endif
-  return s;
-#endif
-}
-
-static inline number npInversM (number c, const coeffs r)
-{
-  n_Test(c, r);
-#ifndef HAVE_GENERIC_MULT
-  #ifndef HAVE_INVTABLE
-  number d = (number)(long)r->npExpTable[r->npPminus1M - r->npLogTable[(long)c]];
-  #else
-  long inv=(long)r->npInvTable[(long)c];
-  if (inv==0)
-  {
-    inv = (long)r->npExpTable[r->npPminus1M - r->npLogTable[(long)c]];
-    r->npInvTable[(long)c]=inv;
-  }
-  number d = (number)inv;
-  #endif
-#else
-  #ifdef HAVE_INVTABLE
-  long inv=(long)r->npInvTable[(long)c];
-  if (inv==0)
-  {
-    inv=InvMod((long)c,r);
-    r->npInvTable[(long)c]=inv;
-  }
-  #else
-  long  inv=InvMod((long)c,r);
-  #endif
-  number d = (number)inv;
-#endif
-  n_Test(d, r);
-  return d;
 }
 
 number npDiv (number a,number b, const coeffs r)
@@ -825,7 +730,7 @@ void nvInpMult(number &a, number b, const coeffs r)
 
 static inline number nvInversM (number c, const coeffs r)
 {
-  long inv=InvMod((long)c,r);
+  long inv=npInvMod((long)c,r);
   return (number)inv;
 }
 
