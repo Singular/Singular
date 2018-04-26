@@ -163,8 +163,8 @@ number npDiv (number a,number b, const coeffs r)
 #ifndef HAVE_GENERIC_MULT
   int s = r->npLogTable[(long)a] - r->npLogTable[(long)b];
   #ifdef HAVE_GENERIC_ADD
-  if (s < 0)
-    s += r->npPminus1M;
+    if (s < 0)
+      s += r->npPminus1M;
   #else
     #if SIZEOF_LONG == 8
     s += ((long)s >> 63) & r->npPminus1M;
