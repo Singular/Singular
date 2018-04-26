@@ -72,9 +72,10 @@ using std::vector;
 #define npInit n_Init
 #define npNeg npNegM
 #define npInvers npInversM
-#define npMult npMultM
-//#define npIsOne n_IsOne
+#define npIsOne npIsOne
 #define npIsZero npIsZeroM
+
+#define npMult npMult
 
 #else
 #error Please do NOT call internal functions directly!
