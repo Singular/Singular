@@ -15,8 +15,7 @@
 // need global defines:
 #include "kernel/mod2.h"
 // need to include all tokens: *_CMD:
-#include "grammar.h"
-#include "tok.h"
+#include "Singular/tok.h"
 
 #ifdef HAVE_RINGS
   #define RING_MASK        4
