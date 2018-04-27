@@ -189,7 +189,10 @@ CPolynomialSummator::CPolynomialSummator(const CPolynomialSummator& b):
     if(m_bUsePolynomial)
       m_temp.m_poly = p_Copy( b.m_temp.m_poly, m_basering);
     else
+    {
+      sBucketCanonicalize(b.m_temp.m_bucket);
       m_temp.m_bucket = sBucketCopy(b.m_temp.m_bucket);
+    }
 //  }
 //  catch(...)
 //  {
