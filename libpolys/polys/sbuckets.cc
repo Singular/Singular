@@ -337,7 +337,7 @@ poly sBucketSortMerge(poly p, const ring r)
 
 #ifndef SING_NDEBUG
   int l_in = pLength(p);
-#endif  
+#endif
   sBucket_pt bucket = sBucketCreate(r);
   poly pn = pNext(p);
 
@@ -448,17 +448,19 @@ done:
   }
 }
 
+poly sBucketPeek(sBucket_pt b)
+{
+  sBucketCanonicalize(b);
+  return b->buckets[b->max_bucket].p;
+}
+
 char* sBucketString(sBucket_pt bucket)
 {
-  sBucketCanonicalize(bucket);
-  StringSetS("bucket: ");
-  StringAppendS(p_String(bucket->buckets[bucket->max_bucket].p,bucket->bucket_ring));
-  return StringEndS();
+  return (p_String(sBucketPeek(bucket),sBucketGetRing(bucket)));
 }
 
 void sBucketPrint(sBucket_pt bucket)
 {
-  sBucketCanonicalize(bucket);
-  PrintS("bucket: ");
-  p_Write(bucket->buckets[bucket->max_bucket].p,bucket->bucket_ring);
+  p_Write0(sBucketPeek(bucket),sBucketGetRing(bucket));
 }
+
