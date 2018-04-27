@@ -397,3 +397,68 @@ poly sBucketSortAdd(poly p, const ring r)
 #endif
   return pn;
 }
+
+void sBucketCanonicalize(sBucket_pt bucket)
+{
+  poly pr = NULL;
+  int  lr = 0;
+  int i = 0;
+
+  while (bucket->buckets[i].p == NULL)
+  {
+    assume( bucket->buckets[i].length == 0 );
+    i++;
+    if (i > bucket->max_bucket) goto done;
+  }
+
+  pr = bucket->buckets[i].p;
+  lr = bucket->buckets[i].length;
+
+  assume( pr != NULL && (lr > 0) );
+
+  bucket->buckets[i].p = NULL;
+  bucket->buckets[i].length = 0;
+  i++;
+
+  while (i <= bucket->max_bucket)
+  {
+    if (bucket->buckets[i].p != NULL)
+    {
+      assume( bucket->buckets[i].length == pLength(bucket->buckets[i].p) );
+
+      pr = p_Add_q(pr, bucket->buckets[i].p, lr, bucket->buckets[i].length,
+                   bucket->bucket_ring);
+
+      bucket->buckets[i].p = NULL;
+      bucket->buckets[i].length = 0;
+    }
+
+    assume( bucket->buckets[i].p == NULL );
+    assume( bucket->buckets[i].length == 0 );
+    i++;
+  }
+
+done:
+  if (pr!=NULL)
+  {
+    i = SI_LOG2(lr);
+    bucket->buckets[i].p = pr;
+    bucket->buckets[i].length = lr;
+    bucket->max_bucket = i;
+  }
+}
+
+char* sBucketString(sBucket_pt bucket)
+{
+  sBucketCanonicalize(bucket);
+  StringSetS("bucket: ");
+  StringAppendS(p_String(bucket->buckets[bucket->max_bucket].p,bucket->bucket_ring));
+  return StringEndS();
+}
+
+void sBucketPrint(sBucket_pt bucket)
+{
+  sBucketCanonicalize(bucket);
+  PrintS("bucket: ");
+  p_Write(bucket->buckets[bucket->max_bucket].p,bucket->bucket_ring);
+}

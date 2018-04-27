@@ -99,4 +99,7 @@ poly sBucketSortMerge(poly p, const ring r);
 poly sBucketSortAdd(poly p, const ring r);
 
 
+void sBucketCanonicalize(sBucket_pt bucket);
+char* sBucketString(sBucket_pt bucket);
+void sBucketPrint(sBucket_pt bucket);
 #endif // P_BUCKET_SORT
