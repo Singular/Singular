@@ -124,6 +124,21 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
 
       }
       break;
+    case BUCKET_CMD:
+      if ((what==FETCH_CMD)&& (preimage_r->cf==currRing->cf))
+        res->data=(void *)prCopyR(sBucketPeek((sBucket_pt)data), preimage_r, currRing);
+      else
+        if ( (what==IMAP_CMD) || /*(*/ (what==FETCH_CMD) /*)*/) /* && (nMap!=nCopy)*/
+        res->data=(void *)p_PermPoly(sBucketPeek((sBucket_pt)data),perm,preimage_r,currRing, nMap,par_perm,P,use_mult);
+      else /*if (what==MAP_CMD)*/
+      {
+        matrix s=mpNew(N,maMaxDeg_P(sBucketPeek((sBucket_pt)data), preimage_r));
+        res->data=(void *)maEval(theMap, sBucketPeek((sBucket_pt)data), preimage_r, nMap, (ideal)s, currRing);
+        idDelete((ideal *)&s);
+      }
+      if (nCoeff_is_Extension(currRing->cf))
+        res->data=(void *)p_MinPolyNormalize(sBucketPeek((sBucket_pt)data), currRing);
+      break;
     case POLY_CMD:
     case VECTOR_CMD:
       if ((what==FETCH_CMD)&& (preimage_r->cf==currRing->cf))

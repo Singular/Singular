@@ -17,8 +17,6 @@
 #include "polys/monomials/ring.h"
 #include "polys/monomials/p_polys.h"
 
-
-
 //////////////////////////////////////////////////////////////////////////
 // Declarations
 //
@@ -73,6 +71,7 @@ bool sIsEmpty(const sBucket_pt bucket)
 /// Copy sBucket non-intrusive!!!
 sBucket_pt    sBucketCopy(const sBucket_pt bucket)
 {
+  sBucketCanonicalize(bucket);
   const ring r = bucket->bucket_ring;
 
   sBucket_pt newbucket = sBucketCreate(r);
@@ -209,6 +208,7 @@ void sBucket_Add_p(sBucket_pt bucket, poly p, int length)
   assume(length <= 0 || length == pLength(p));
 
   if (p == NULL) return;
+  p_Test(p,bucket->bucket_ring);
   if (length <= 0) length = pLength(p);
 
   int i = SI_LOG2(length);
@@ -424,10 +424,13 @@ void sBucketCanonicalize(sBucket_pt bucket)
   {
     if (bucket->buckets[i].p != NULL)
     {
+      p_Test(pr,bucket->bucket_ring);
       assume( bucket->buckets[i].length == pLength(bucket->buckets[i].p) );
 
-      pr = p_Add_q(pr, bucket->buckets[i].p, lr, bucket->buckets[i].length,
-                   bucket->bucket_ring);
+      p_Test(bucket->buckets[i].p,bucket->bucket_ring);
+      //pr = p_Add_q(pr, bucket->buckets[i].p, lr, bucket->buckets[i].length,
+      //             bucket->bucket_ring);
+      pr = p_Add_q(pr, bucket->buckets[i].p, bucket->bucket_ring);
 
       bucket->buckets[i].p = NULL;
       bucket->buckets[i].length = 0;
@@ -439,6 +442,7 @@ void sBucketCanonicalize(sBucket_pt bucket)
   }
 
 done:
+  lr=pLength(pr);
   if (pr!=NULL)
   {
     i = SI_LOG2(lr);

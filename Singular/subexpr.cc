@@ -115,6 +115,24 @@ void sleftv::Print(leftv store, int spaces)
         case BIGINTMAT_CMD:
           ((bigintmat *)d)->pprint(colmax);
           break;
+        case BUCKET_CMD:
+          {
+            sBucket_pt b=(sBucket_pt)d;
+            if ((e==NULL)
+            && (TEST_V_QRING)
+            &&(currRing->qideal!=NULL))
+            {
+              poly p=pCopy(sBucketPeek(b));
+              jjNormalizeQRingP(p);
+              PrintNSpaces(spaces);
+              pWrite0(p);
+              pDelete(&p);
+              break;
+            }
+            else
+              sBucketPrint(b);
+          }
+          break;
         case UNKNOWN:
         case DEF_CMD:
           PrintNSpaces(spaces);
@@ -426,6 +444,8 @@ static inline void * s_internalCopy(const int t,  void *d)
 #endif
     case BIGINTMAT_CMD:
       return (void*)bimCopy((bigintmat *)d);
+    case BUCKET_CMD:
+      return (void*)sBucketCopy((sBucket_pt)d);
     case INTVEC_CMD:
     case INTMAT_CMD:
       return (void *)ivCopy((intvec *)d);
@@ -525,6 +545,12 @@ void s_internalDelete(const int t,  void *d, const ring r)
     {
       bigintmat *v=(bigintmat*)d;
       delete v;
+      break;
+    }
+    case BUCKET_CMD:
+    {
+      sBucket_pt b=(sBucket_pt)d;
+      sBucketDeleteAndDestroy(&b);
       break;
     }
     case INTVEC_CMD:
@@ -688,7 +714,13 @@ void sleftv::Copy(leftv source)
   void *d=source->Data();
   if(!errorreported)
   {
-    data=s_internalCopy(rtyp,d);
+    if (rtyp==BUCKET_CMD)
+    {
+      rtyp=POLY_CMD;
+      data=(void*)pCopy(sBucketPeek((sBucket_pt)d));
+    }
+    else
+      data=s_internalCopy(rtyp,d);
     if ((source->attribute!=NULL)||(source->e!=NULL))
       attribute=source->CopyA();
     flag=source->flag;
@@ -843,7 +875,8 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           StringAppendS((char*) (typed ? ")" : ""));
           return StringEndS();
           }
-
+        case BUCKET_CMD:
+          return sBucketString((sBucket_pt)d);
         case MATRIX_CMD:
           s= iiStringMatrix((matrix)d,dim, currRing);
           if (typed)

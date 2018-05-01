@@ -1,5 +1,5 @@
 #!/bin/sh
-bison -d -t -o grammar.cc grammar.y
+bison243 -d -t -o grammar.cc grammar.y
 if [ -f grammar.hh ]
 then
   mv grammar.hh grammar.cc.h
