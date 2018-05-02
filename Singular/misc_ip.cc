@@ -894,10 +894,15 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #else
               StringAppendS("AvoidBranching,");
 #endif
-#ifdef HAVE_MULT_MOD
+#ifdef HAVE_GENERIC_MULT
               StringAppendS("GenericMult,");
 #else
               StringAppendS("TableMult,");
+#endif
+#ifdef HAVE_INVTABLE
+              StringAppendS("invTable,");
+#else
+              StringAppendS("no invTable,");
 #endif
               StringAppendS("\n\t");
 #ifdef HAVE_EIGENVAL

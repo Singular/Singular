@@ -52,7 +52,11 @@ inline long ff_norm ( const long a )
 {
     long n = a % ff_prime;
 #if defined(i386) || defined(__x86_64__) || defined(NTL_AVOID_BRANCHING)
+    #if SIZEOF_LONG==8
+    n += (n >> 63) & ff_prime;
+    #else
     n += (n >> 31) & ff_prime;
+    #endif
     return n;
 #else
     if (n < 0) n += ff_prime;

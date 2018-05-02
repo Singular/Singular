@@ -140,13 +140,6 @@ BOOLEAN npIsZero (number  a, const coeffs r)
   return 0 == (long)a;
 }
 
-BOOLEAN npIsOne (number a, const coeffs r)
-{
-  n_Test(a, r);
-
-  return 1 == (long)a;
-}
-
 BOOLEAN npIsMOne (number a, const coeffs r)
 {
   n_Test(a, r);
@@ -154,96 +147,31 @@ BOOLEAN npIsMOne (number a, const coeffs r)
   return ((r->npPminus1M == (long)a) &&(1L!=(long)a))/*for char 2*/;
 }
 
-#ifdef HAVE_DIV_MOD
-
-#ifdef USE_NTL_XGCD
-
-//ifdef HAVE_NTL // in ntl.a
-//extern void XGCD(long& d, long& s, long& t, long a, long b);
-#include <NTL/ZZ.h>
-#ifdef NTL_CLIENT
-NTL_CLIENT
-#endif
-
-#endif
-
-static inline long InvMod(long a, const coeffs R)
-{
-   long d, s, t;
-
-#ifdef USE_NTL_XGCD
-   XGCD(d, s, t, a, R->ch);
-   assume (d == 1);
-#else
-   long  u, v, u0, v0, u1, v1, u2, v2, q, r;
-
-   assume(a>0);
-   u1=1; u2=0;
-   u = a; v = R->ch;
-
-   while (v != 0)
-   {
-      q = u / v;
-      r = u % v;
-      u = v;
-      v = r;
-      u0 = u2;
-      u2 = u1 - q*u2;
-      u1 = u0;
-   }
-
-   assume(u==1);
-   s = u1;
-#endif
-   if (s < 0)
-      return s + R->ch;
-   else
-      return s;
-}
-#endif
-
-static inline number npInversM (number c, const coeffs r)
-{
-  n_Test(c, r);
-#ifndef HAVE_DIV_MOD
-  number d = (number)(long)r->npExpTable[r->npPminus1M - r->npLogTable[(long)c]];
-#else
-  long inv=(long)r->npInvTable[(long)c];
-  if (inv==0)
-  {
-    inv=InvMod((long)c,r);
-    r->npInvTable[(long)c]=inv;
-  }
-  number d = (number)inv;
-#endif
-  n_Test(d, r);
-  return d;
-
-}
-
 number npDiv (number a,number b, const coeffs r)
 {
   n_Test(a, r);
   n_Test(b, r);
 
-//#ifdef NV_OPS
-//  if (r->ch>NV_MAX_PRIME)
-//    return nvDiv(a,b);
-//#endif
-  if ((long)a==0L)
-    return (number)0L;
-  number d;
-
-#ifndef HAVE_DIV_MOD
   if ((long)b==0L)
   {
     WerrorS(nDivBy0);
     return (number)0L;
   }
+  if ((long)a==0) return (number)0L;
 
+  number d;
+#ifndef HAVE_GENERIC_MULT
   int s = r->npLogTable[(long)a] - r->npLogTable[(long)b];
+  #ifdef HAVE_GENERIC_ADD
   if (s < 0)
     s += r->npPminus1M;
+  #else
+    #if SIZEOF_LONG == 8
+    s += ((long)s >> 63) & r->npPminus1M;
+    #else
+    s += ((long)s >> 31) & r->npPminus1M;
+    #endif
+  #endif
   d = (number)(long)r->npExpTable[s];
 #else
   number inv=npInversM(b,r);
@@ -390,11 +318,14 @@ const char * npRead (const char *s, number *a, const coeffs r)
 
 void npKillChar(coeffs r)
 {
-  #ifdef HAVE_DIV_MOD
+  #ifdef HAVE_INVTABLE
   if (r->npInvTable!=NULL)
-  omFreeSize( (void *)r->npInvTable, r->ch*sizeof(unsigned short) );
-  r->npInvTable=NULL;
-  #else
+  {
+    omFreeSize( (void *)r->npInvTable, r->ch*sizeof(unsigned short) );
+    r->npInvTable=NULL;
+  }
+  #endif
+  #ifndef HAVE_GENERIC_MULT
   if (r->npExpTable!=NULL)
   {
     omFreeSize( (void *)r->npExpTable, r->ch*sizeof(unsigned short) );
@@ -543,9 +474,10 @@ BOOLEAN npInitChar(coeffs r, void* p)
   if (r->ch <=NV_MAX_PRIME)
 #endif
   {
-#ifdef HAVE_DIV_MOD
+#ifdef HAVE_INVTABLE
     r->npInvTable=(unsigned short*)omAlloc0( r->ch*sizeof(unsigned short) );
-#elif (!defined(HAVE_MULT_MOD)||(!HAVE_DIV_MOD))
+#endif
+#ifndef HAVE_GENERIC_MULT
     r->npExpTable=(unsigned short *)omAlloc0( r->ch*sizeof(unsigned short) );
     r->npLogTable=(unsigned short *)omAlloc0( r->ch*sizeof(unsigned short) );
     r->npExpTable[0] = 1;
@@ -796,49 +728,9 @@ void nvInpMult(number &a, number b, const coeffs r)
   a=n;
 }
 
-static inline long nvInvMod(long a, const coeffs R)
-{
-#ifdef HAVE_DIV_MOD
-  return InvMod(a, R);
-#else
-/// TODO: use "long InvMod(long a, const coeffs R)"?!
-
-   long  s;
-
-   long  u, u0, u1, u2, q, r; // v0, v1, v2,
-
-   u1=1; // v1=0;
-   u2=0; // v2=1;
-   u = a;
-
-   long v = R->ch;
-
-   while (v != 0)
-   {
-      q = u / v;
-      r = u % v;
-      u = v;
-      v = r;
-      u0 = u2;
-//      v0 = v2;
-      u2 = u1 - q*u2;
-//      v2 = v1 - q*v2;
-      u1 = u0;
-//      v1 = v0;
-   }
-
-   s = u1;
-   //t = v1;
-   if (s < 0)
-      return s + R->ch;
-   else
-     return s;
-#endif
-}
-
 static inline number nvInversM (number c, const coeffs r)
 {
-  long inv=nvInvMod((long)c,r);
+  long inv=npInvMod((long)c,r);
   return (number)inv;
 }
 
