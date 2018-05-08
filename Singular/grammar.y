@@ -197,6 +197,7 @@ void yyerror(const char * fmt)
 /* valid when ring defined ! */
 %token <i> BEGIN_RING
 /* types, part 2 */
+%token <i> BUCKET_CMD
 %token <i> IDEAL_CMD
 %token <i> MAP_CMD
 %token <i> MATRIX_CMD

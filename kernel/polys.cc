@@ -136,9 +136,9 @@ poly p_Divide(poly p, poly q, const ring r)
   }
   else
   { /* This means that q != 0 consists of just one term,
-       or that currRing is over a coefficient ring. */
+       or that r is over a coefficient ring. */
 #ifdef HAVE_RINGS
-    if (!rField_is_Domain(currRing))
+    if (!rField_is_Domain(r))
     {
       WerrorS("division only defined over coefficient domains");
       return NULL;

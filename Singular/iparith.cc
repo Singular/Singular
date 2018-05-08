@@ -774,9 +774,31 @@ static BOOLEAN jjPLUS_N(leftv res, leftv u, leftv v)
   res->data = (char *)(nAdd((number)u->Data(), (number)v->Data()));
   return jjPLUSMINUS_Gen(res,u,v);
 }
-static BOOLEAN jjPLUS_P(leftv res, leftv u, leftv v)
+static BOOLEAN jjPLUS_V(leftv res, leftv u, leftv v)
 {
   res->data = (char *)(pAdd((poly)u->CopyD(POLY_CMD) , (poly)v->CopyD(POLY_CMD)));
+  return jjPLUSMINUS_Gen(res,u,v);
+}
+static BOOLEAN jjPLUS_B(leftv res, leftv u, leftv v)
+{
+  //res->data = (char *)(pAdd((poly)u->CopyD(POLY_CMD) , (poly)v->CopyD(POLY_CMD)));
+  sBucket_pt b=sBucketCreate(currRing);
+  poly p=(poly)u->CopyD(POLY_CMD);
+  int l=pLength(p);
+  sBucket_Add_p(b,p,l);
+  p= (poly)v->CopyD(POLY_CMD);
+  l=pLength(p);
+  sBucket_Add_p(b,p,l);
+  res->data=(void*)b;
+  return jjPLUSMINUS_Gen(res,u,v);
+}
+static BOOLEAN jjPLUS_B_P(leftv res, leftv u, leftv v)
+{
+  sBucket_pt b=(sBucket_pt)u->CopyD(BUCKET_CMD);
+  poly p= (poly)v->CopyD(POLY_CMD);
+  int l=pLength(p);
+  sBucket_Add_p(b,p,l);
+  res->data=(void*)b;
   return jjPLUSMINUS_Gen(res,u,v);
 }
 static BOOLEAN jjPLUS_IV(leftv res, leftv u, leftv v)
@@ -867,9 +889,32 @@ static BOOLEAN jjMINUS_N(leftv res, leftv u, leftv v)
   res->data = (char *)(nSub((number)u->Data(), (number)v->Data()));
   return jjPLUSMINUS_Gen(res,u,v);
 }
-static BOOLEAN jjMINUS_P(leftv res, leftv u, leftv v)
+static BOOLEAN jjMINUS_V(leftv res, leftv u, leftv v)
 {
   res->data = (char *)(pSub((poly)u->CopyD(POLY_CMD) , (poly)v->CopyD(POLY_CMD)));
+  return jjPLUSMINUS_Gen(res,u,v);
+}
+static BOOLEAN jjMINUS_B_P(leftv res, leftv u, leftv v)
+{
+  sBucket_pt b=(sBucket_pt)u->CopyD(BUCKET_CMD);
+  poly p= (poly)v->CopyD(POLY_CMD);
+  int l=pLength(p);
+  p=p_Neg(p,currRing);
+  sBucket_Add_p(b,p,l);
+  res->data=(void*)b;
+  return jjPLUSMINUS_Gen(res,u,v);
+}
+static BOOLEAN jjMINUS_B(leftv res, leftv u, leftv v)
+{
+  sBucket_pt b=sBucketCreate(currRing);
+  poly p=(poly)u->CopyD(POLY_CMD);
+  int l=pLength(p);
+  sBucket_Add_p(b,p,l);
+  p= (poly)v->CopyD(POLY_CMD);
+  p=p_Neg(p,currRing);
+  l=pLength(p);
+  sBucket_Add_p(b,p,l);
+  res->data=(void*)b;
   return jjPLUSMINUS_Gen(res,u,v);
 }
 static BOOLEAN jjMINUS_IV(leftv res, leftv u, leftv v)
@@ -1367,6 +1412,29 @@ static BOOLEAN jjINDEX_P(leftv res, leftv u, leftv v)
     }
     pIter(p);
   }
+  return FALSE;
+}
+static BOOLEAN jjINDEX_PBu(leftv res, leftv u, leftv v)
+{
+  sBucket_pt b=(sBucket_pt)u->CopyD();
+  sBucketCanonicalize(b);
+  int l; poly p,pp;
+  sBucketDestroyAdd(b, &pp, &l);
+  int i=(int)(long)v->Data();
+  int j=0;
+  p=pp;
+  while (p!=NULL)
+  {
+    j++;
+    if (j==i)
+    {
+      res->data=(char *)pHead(p);
+      p_Delete(&pp,currRing);
+      return FALSE;
+    }
+    pIter(p);
+  }
+  p_Delete(&pp,currRing);
   return FALSE;
 }
 static BOOLEAN jjINDEX_P_IV(leftv res, leftv u, leftv v)
@@ -4984,6 +5052,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
     case CNUMBER_CMD:
     #endif
     case BIGINT_CMD:
+    case BUCKET_CMD:
     case LIST_CMD:
     case PACKAGE_CMD:
     case LINK_CMD:
@@ -7376,6 +7445,8 @@ static BOOLEAN jjREDUCE4(leftv res, leftv u)
   leftv u2=u1->next;
   leftv u3=u2->next;
   leftv u4=u3->next;
+  int u1t=u1->Typ(); if (u1t==BUCKET_CMD) u1t=POLY_CMD;
+  int u2t=u2->Typ(); if (u2t==BUCKET_CMD) u2t=POLY_CMD;
   if((u3->Typ()==INT_CMD)&&(u4->Typ()==INTVEC_CMD))
   {
     int save_d=Kstd1_deg;
@@ -7393,7 +7464,7 @@ static BOOLEAN jjREDUCE4(leftv res, leftv u)
     return r;
   }
   else
-  if((u1->Typ()==IDEAL_CMD)&&(u2->Typ()==MATRIX_CMD)&&(u3->Typ()==IDEAL_CMD)&&
+  if((u1t==IDEAL_CMD)&&(u2t==MATRIX_CMD)&&(u3->Typ()==IDEAL_CMD)&&
      (u4->Typ()==INT_CMD))
   {
     assumeStdFlag(u3);
@@ -7412,18 +7483,24 @@ static BOOLEAN jjREDUCE4(leftv res, leftv u)
     return FALSE;
   }
   else
-  if((u1->Typ()==POLY_CMD)&&(u2->Typ()==POLY_CMD)&&(u3->Typ()==IDEAL_CMD)&&
+  if((u1t==POLY_CMD)&&(u2t==POLY_CMD)&&(u3->Typ()==IDEAL_CMD)&&
      (u4->Typ()==INT_CMD))
   {
+    poly u1p;
+    if (u1->Typ()==BUCKET_CMD) u1p=sBucketPeek((sBucket_pt)u1->Data());
+    else                     u1p=(poly)u1->Data();
+    poly u2p;
+    if (u2->Typ()==BUCKET_CMD) u2p=sBucketPeek((sBucket_pt)u2->Data());
+    else                     u2p=(poly)u2->Data();
     assumeStdFlag(u3);
-    if(!pIsUnit((poly)u2->Data()))
+    if(!pIsUnit(u2p))
     {
       WerrorS("2nd argument must be a unit");
       return TRUE;
     }
     res->rtyp=POLY_CMD;
-    res->data=(char*)redNF(idCopy((ideal)u3->Data()),pCopy((poly)u1->Data()),
-                           pCopy((poly)u2->Data()),(int)(long)u4->Data());
+    res->data=(char*)redNF((ideal)u3->CopyD(),pCopy(u1p),
+                           pCopy(u2p),(int)(long)u4->Data());
     return FALSE;
   }
   else

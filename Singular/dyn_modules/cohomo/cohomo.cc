@@ -3135,7 +3135,7 @@ void firstorderdef_setup(SModulFunctions* p)
 
 
 
-extern "C" int SI_MOD_INIT(stanleyreisnerlib)(SModulFunctions* p)
+extern "C" int SI_MOD_INIT(cohomo)(SModulFunctions* p)
 {
   firstorderdef_setup(p);
   return MAX_TOK;

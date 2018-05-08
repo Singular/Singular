@@ -62,6 +62,12 @@ static void * iiBI2P(void *data)
   return (void *)p;
 }
 
+static void iiBu2P(leftv out, leftv in) /* non-destr.*/
+{
+  sBucket_pt b=(sBucket_pt)in->Data();
+  out->data=(void*)pCopy(sBucketPeek(b));
+}
+
 static void * iiI2V(void *data)
 {
   poly p=pISet((int)(long)data);
@@ -106,11 +112,38 @@ static void * iiBI2Id(void *data)
   I->m[0]=p;
   return (void *)I;
 }
+static void * iiBu2V(void *data)
+{
+  poly p=NULL;
+  if (data!=NULL)
+  {
+    sBucket_pt b=(sBucket_pt)data;
+    int l;
+    sBucketDestroyAdd(b,&p,&l);
+    if (p!=NULL) pSetCompP(p,1);
+  }
+  return (void *)p;
+}
+
 static void * iiP2V(void *data)
 {
   poly p=(poly)data;
   if (p!=NULL) pSetCompP(p,1);
   return (void *)p;
+}
+
+static void * iiBu2Id(void *data)
+{
+  ideal I=idInit(1,1);
+
+  if (data!=NULL)
+  {
+    sBucket_pt b=(sBucket_pt)data;
+    poly p; int l;
+    sBucketDestroyAdd(b,&p,&l);
+    I->m[0]=p;
+  }
+  return (void *)I;
 }
 
 static void * iiP2Id(void *data)

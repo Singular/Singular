@@ -907,12 +907,10 @@ BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinf
     case INTMAT_CMD:
     case RING_CMD:
     case RING_DECL:
-    case RING_DECL_LIST:
     case ROOT_DECL:
-    case ROOT_DECL_LIST:
     // operations:
     case CMD_1:
-      if(args!=1) { Warn("args must be 1 in %s",my_yylinebuf);args=1;}
+      if(args!=1) { Warn("args must be 1 for %s in %s",func,my_yylinebuf);args=1;}
       break;
     case CMD_2:
       if(args!=2) { Warn("args must be 2 in %s",my_yylinebuf);args=2;}
@@ -932,6 +930,8 @@ BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinf
     case CMD_123:
       if((args<1)||(args>3)) { Werror("args must in 1..3 in %s",my_yylinebuf);}
       break;
+    case RING_DECL_LIST:
+    case ROOT_DECL_LIST:
     case CMD_M:
       if(args!=4) { Warn("args must be 4 in %s",my_yylinebuf);args=4;}
       break;

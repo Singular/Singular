@@ -73,13 +73,13 @@ static inline number npMultM(number a, number b, const coeffs r)
 {
   long x = (long)r->npLogTable[(long)a]+ r->npLogTable[(long)b];
   #ifdef HAVE_GENERIC_ADD
-  if (x>r->npPminus1M) x-=r->npPminus1M;
+    if (x>=r->npPminus1M) x-=r->npPminus1M;
   #else
     x-=r->npPminus1M;
     #if SIZEOF_LONG == 8
-     x += (x >> 63) & r->npPminus1M;
+      x += (x >> 63) & r->npPminus1M;
     #else
-     x += (x >> 31) & r->npPminus1M;
+      x += (x >> 31) & r->npPminus1M;
     #endif
   #endif
   return (number)(long)r->npExpTable[x];
@@ -88,13 +88,13 @@ static inline void npInpMultM(number &a, number b, const coeffs r)
 {
   long x = (long)r->npLogTable[(long)a]+ r->npLogTable[(long)b];
   #ifdef HAVE_GENERIC_ADD
-  if (x>r->npPminus1M) x-=r->npPminus1M;
+    if (x>=r->npPminus1M) x-=r->npPminus1M;
   #else
     x-=r->npPminus1M;
     #if SIZEOF_LONG == 8
-     x += (x >> 63) & r->npPminus1M;
+      x += (x >> 63) & r->npPminus1M;
     #else
-     x += (x >> 31) & r->npPminus1M;
+      x += (x >> 31) & r->npPminus1M;
     #endif
   #endif
   a=(number)(long)r->npExpTable[x];
@@ -267,6 +267,8 @@ static inline number npInversM (number c, const coeffs r)
 // The folloing is reused inside gnumpc.cc, gnumpfl.cc and longrat.cc
 long    npInt         (number &n, const coeffs r);
 
+// The folloing is reused inside tgb*.cc
+number  npMult        (number a, number b, const coeffs r);
 // The following is currently used in OPAE.cc, OPAEQ.cc and OPAEp.cc for setting their SetMap...
 nMapFunc npSetMap(const coeffs src, const coeffs dst); // FIXME! BUG?
 

@@ -37,11 +37,6 @@
 #include "Singular/mod_lib.h"
 
 
-#if GOOGLE_PROFILE_ENABLED
-#include <google/profiler.h>
-#endif // #if GOOGLE_PROFILE_ENABLED
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -257,433 +252,9 @@ static BOOLEAN Tail(leftv res, leftv h)
   return TRUE;
 }
 
-// proc SchreyerSyzygyNF(vector syz_lead, vector syz_2, def L, def T, list #)
-static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
-{
-  const SchreyerSyzygyComputationFlags attributes(currRingHdl);
-
-//   const BOOLEAN OPT__SYZCHECK   = attributes.OPT__SYZCHECK;
-//   const BOOLEAN OPT__LEAD2SYZ   = attributes.OPT__LEAD2SYZ;
-  const BOOLEAN OPT__HYBRIDNF   = attributes.OPT__HYBRIDNF;
-  const BOOLEAN OPT__TAILREDSYZ = attributes.OPT__TAILREDSYZ;
-
-  const char* usage = "`SchreyerSyzygyNF(<vector>, <vector>, <ideal/module>, <ideal/module>[,<module>])` expected";
-  const ring r = attributes.m_rBaseRing;
-
-  NoReturn(res);
-
-  assume( OPT__HYBRIDNF ); // ???
-
-  if ((h==NULL) || (h->Typ() != VECTOR_CMD) || (h->Data() == NULL))
-  {
-    WerrorS(usage);
-    return TRUE;
-  }
-
-  const poly syz_lead = (poly) h->Data(); assume (syz_lead != NULL);
-
-
-  h = h->Next();
-  if ((h==NULL) || (h->Typ() != VECTOR_CMD) || (h->Data() == NULL))
-  {
-    WerrorS(usage);
-    return TRUE;
-  }
-
-  const poly syz_2 = (poly) h->Data(); assume (syz_2 != NULL);
-
-  h = h->Next();
-  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
-  {
-    WerrorS(usage);
-    return TRUE;
-  }
-
-  const ideal L = (ideal) h->Data(); assume( IDELEMS(L) > 0 );
-
-
-  h = h->Next();
-  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
-  {
-    WerrorS(usage);
-    return TRUE;
-  }
-
-  const ideal T = (ideal) h->Data();
-
-  assume( IDELEMS(L) == IDELEMS(T) );
-
-  ideal LS = NULL;
-
-  h = h->Next();
-  if ((h != NULL) && (h->Typ() ==MODUL_CMD) && (h->Data() != NULL))
-  {
-    LS = (ideal)h->Data();
-    h = h->Next();
-  }
-
-#ifndef SING_NDEBUG
-  if( LIKELY( OPT__TAILREDSYZ) )
-    assume (LS != NULL);
-#endif
-
-  assume( h == NULL );
-
-  res->rtyp = VECTOR_CMD;
-  res->data = SchreyerSyzygyNF(syz_lead,
-                               (syz_2!=NULL)? p_Copy(syz_2, r): syz_2, L, T, LS, attributes);
-
-  return FALSE;
-}
-
-
-
-/// proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
-static BOOLEAN _ReduceTerm(leftv res, leftv h)
-{
-  const SchreyerSyzygyComputationFlags attributes(currRingHdl);
-
-//  const BOOLEAN OPT__SYZCHECK   = attributes.OPT__SYZCHECK;
-//   const BOOLEAN OPT__LEAD2SYZ   = attributes.OPT__LEAD2SYZ;
-//   const BOOLEAN OPT__HYBRIDNF   = attributes.OPT__HYBRIDNF;
-  const BOOLEAN OPT__TAILREDSYZ = attributes.OPT__TAILREDSYZ;
-
-  const char* usage = "`ReduceTerm(<poly>, <poly/vector>, <vector/0>, <ideal/module>, <ideal/module>[,<module>])` expected";
-  const ring r = attributes.m_rBaseRing;
-
-  NoReturn(res);
-
-  if ((h==NULL) || (h->Typ() !=POLY_CMD) || (h->Data() == NULL))
-  {
-    WerrorS(usage);
-    return TRUE;
-  }
-
-  const poly multiplier = (poly) h->Data(); assume (multiplier != NULL);
-
-
-  h = h->Next();
-  if ((h==NULL) || (h->Typ()!=VECTOR_CMD && h->Typ() !=POLY_CMD) || (h->Data() == NULL))
-  {
-    WerrorS(usage);
-    return TRUE;
-  }
-
-  const poly term4reduction = (poly) h->Data(); assume( term4reduction != NULL );
-
-
-  poly syztermCheck = NULL;
-
-  h = h->Next();
-  if ((h==NULL) || !((h->Typ()==VECTOR_CMD) || (h->Data() == NULL)) )
-  {
-    WerrorS(usage);
-    return TRUE;
-  }
-
-  if(h->Typ()==VECTOR_CMD)
-    syztermCheck = (poly) h->Data();
-
-
-  h = h->Next();
-  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
-  {
-    WerrorS(usage);
-    return TRUE;
-  }
-
-  const ideal L = (ideal) h->Data(); assume( IDELEMS(L) > 0 );
-
-
-  h = h->Next();
-  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
-  {
-    WerrorS(usage);
-    return TRUE;
-  }
-
-  const ideal T = (ideal) h->Data();
-
-  assume( IDELEMS(L) == IDELEMS(T) );
-
-  ideal LS = NULL;
-
-  h = h->Next();
-  if ((h != NULL) && (h->Typ() ==MODUL_CMD) && (h->Data() != NULL))
-  {
-    LS = (ideal)h->Data();
-    h = h->Next();
-  }
-
-#ifndef SING_NDEBUG
-  if( LIKELY( OPT__TAILREDSYZ) )
-    assume (LS != NULL);
-#endif
-
-  assume( h == NULL );
-
-  res->rtyp = VECTOR_CMD;
-  res->data = ReduceTerm(multiplier, term4reduction, syztermCheck, L, T, LS, attributes);
-
-  return FALSE;
-}
-
-
-
-
-// proc SSTraverseTail(poly m, def @tail, def L, def T, list #)
-static BOOLEAN _TraverseTail(leftv res, leftv h)
-{
-  const SchreyerSyzygyComputationFlags attributes(currRingHdl);
-
-//   const BOOLEAN OPT__SYZCHECK   = attributes.OPT__SYZCHECK;
-//   const BOOLEAN OPT__LEAD2SYZ   = attributes.OPT__LEAD2SYZ;
-//   const BOOLEAN OPT__HYBRIDNF   = attributes.OPT__HYBRIDNF;
-  const BOOLEAN OPT__TAILREDSYZ = attributes.OPT__TAILREDSYZ;
-
-  const char* usage = "`TraverseTail(<poly>, <poly/vector>, <ideal/module>, <ideal/module>[,<module>])` expected";
-  const ring r = attributes.m_rBaseRing;
-
-  NoReturn(res);
-
-  if ((h==NULL) || (h->Typ() !=POLY_CMD) || (h->Data() == NULL))
-  {
-    WerrorS(usage);
-    return TRUE;
-  }
-
-  const poly multiplier = (poly) h->Data(); assume (multiplier != NULL);
-
-  h = h->Next();
-  if ((h==NULL) || (h->Typ()!=VECTOR_CMD && h->Typ() !=POLY_CMD))
-  {
-    WerrorS(usage);
-    return TRUE;
-  }
-
-  const poly tail = (poly) h->Data();
-
-  h = h->Next();
-
-  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
-  {
-    WerrorS(usage);
-    return TRUE;
-  }
-
-  const ideal L = (ideal) h->Data();
-
-  assume( IDELEMS(L) > 0 );
-
-  h = h->Next();
-  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
-  {
-    WerrorS(usage);
-    return TRUE;
-  }
-
-  const ideal T = (ideal) h->Data();
-
-  assume( IDELEMS(L) == IDELEMS(T) );
-
-  h = h->Next();
-
-  ideal LS = NULL;
-
-  if ((h != NULL) && (h->Typ() ==MODUL_CMD) && (h->Data() != NULL))
-  {
-    LS = (ideal)h->Data();
-    h = h->Next();
-  }
-
-#ifndef SING_NDEBUG
-  if( LIKELY( OPT__TAILREDSYZ) )
-    assume (LS != NULL);
-#endif
-
-  assume( h == NULL );
-
-  res->rtyp = VECTOR_CMD;
-  res->data = TraverseTail(multiplier, tail, L, T, LS, attributes);
-
-  return FALSE;
-}
-
-
-static BOOLEAN _ComputeResolution(leftv res, leftv h)
-{
-  const SchreyerSyzygyComputationFlags attributes(currRingHdl);
-
-  const char* usage = "`ComputeResolution(<ideal/module>, <same as before>, <same as before>[,int])` expected";
-  const ring r = attributes.m_rBaseRing;
-
-  NoReturn(res);
-
-  // input
-  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
-  {
-    WerrorS(usage);
-    return TRUE;
-  }
-
-  const int type = h->Typ();
-  ideal M = (ideal)(h->CopyD()); // copy for resolution...!???
-  int size = IDELEMS(M);
-
-  assume( size >= 0 );
-
-  h = h->Next();
-
-  // lead
-  if ((h==NULL) || (h->Typ()!=type) || (h->Data() == NULL))
-  {
-    WerrorS(usage);
-    return TRUE;
-  }
-
-  ideal L = (ideal)(h->CopyD()); // no copy!
-  assume( IDELEMS(L) == size );
-
-  h = h->Next();
-  if ((h==NULL) || (h->Typ()!=type) || (h->Data() == NULL))
-  {
-    WerrorS(usage);
-    return TRUE;
-  }
-
-  ideal T = (ideal)(h->CopyD()); // no copy!
-  assume( IDELEMS(T) == size );
-
-  h = h->Next();
-
-  // length..?
-  long length = 0;
-
-  if ((h!=NULL) && (h->Typ()==INT_CMD))
-  {
-    length = (long)(h->Data());
-    h = h->Next();
-  }
-
-  assume( h == NULL );
-
-  if( length <= 0 )
-    length = 1 + rVar(r);
-
-  syStrategy _res=(syStrategy)omAlloc0(sizeof(ssyStrategy));
-
-//  class ssyStrategy; typedef ssyStrategy * syStrategy;
-//  typedef ideal *            resolvente;
-
-  _res->length = length + 1; // index + 1;
-  _res->fullres = (resolvente)omAlloc0((_res->length+1)*sizeof(ideal));
-  int index = 0;
-  _res->fullres[index++] = M;
-
-//  if (UNLIKELY(attributes.OPT__TREEOUTPUT))
-//    Print("{ \"RESOLUTION: HYBRIDNF:%d, TAILREDSYZ: %d, LEAD2SYZ: %d, IGNORETAILS: %d\": [\n", attributes.OPT__HYBRIDNF, attributes.OPT__TAILREDSYZ, attributes.OPT__LEAD2SYZ, attributes.OPT__IGNORETAILS);
-
-  while( (!idIs0(L)) && (index < length))
-  {
-    attributes.nextSyzygyLayer();
-    ideal LL, TT;
-
-    ComputeSyzygy(L, T, LL, TT, attributes);
-
-    size = IDELEMS(LL);
-
-    assume( size == IDELEMS(TT) );
-
-    id_Delete(&L, r); id_Delete(&T, r);
-
-    L = LL; T = TT;
-
-    // id_Add(T, L, r);
-    M = idInit(size, 0);
-    for( int i = size-1; i >= 0; i-- )
-    {
-      M->m[i] = p_Add_q(p_Copy(T->m[i], r), p_Copy(L->m[i], r), r); // TODO: :(((
-    }
-    M->rank = id_RankFreeModule(M, r);
-
-    _res->fullres[index++] = M; // ???
-  }
-//  if ( UNLIKELY(attributes.OPT__TREEOUTPUT) )
-//    PrintS("] }\n");
-
-  id_Delete(&L, r); id_Delete(&T, r);
-
-  res->data = _res;
-  res->rtyp = RESOLUTION_CMD;
-
-//  omFreeSize(_res, sizeof(ssyStrategy));
-
-  return FALSE;
-
-}
-
-
-/// module (LL, TT) = SSComputeSyzygy(L, T);
-/// Compute Syz(L ++ T) = N = LL ++ TT
-// proc SSComputeSyzygy(def L, def T)
-static BOOLEAN _ComputeSyzygy(leftv res, leftv h)
-{
-  const SchreyerSyzygyComputationFlags attributes(currRingHdl);
-
-//   const BOOLEAN OPT__SYZCHECK   = attributes.OPT__SYZCHECK;
-//   const BOOLEAN OPT__LEAD2SYZ   = attributes.OPT__LEAD2SYZ;
-//   const BOOLEAN OPT__HYBRIDNF   = attributes.OPT__HYBRIDNF;
-//   const BOOLEAN OPT__TAILREDSYZ = attributes.OPT__TAILREDSYZ;
-
-  const char* usage = "`ComputeSyzygy(<ideal/module>, <ideal/module>)` expected";
-  const ring r = attributes.m_rBaseRing;
-
-  NoReturn(res);
-
-  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
-  {
-    WerrorS(usage);
-    return TRUE;
-  }
-
-  const ideal L = (ideal) h->Data();
-
-  assume( IDELEMS(L) > 0 );
-
-  h = h->Next();
-  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
-  {
-    WerrorS(usage);
-    return TRUE;
-  }
-
-  const ideal T = (ideal) h->Data();
-  assume( IDELEMS(L) == IDELEMS(T) );
-
-
-  h = h->Next(); assume( h == NULL );
-
-  ideal LL, TT;
-
-  ComputeSyzygy(L, T, LL, TT, attributes);
-
-  lists l = (lists)omAllocBin(slists_bin); l->Init(2);
-
-  l->m[0].rtyp = MODUL_CMD; l->m[0].data = reinterpret_cast<void *>(LL);
-
-  l->m[1].rtyp = MODUL_CMD; l->m[1].data = reinterpret_cast<void *>(TT);
-
-  res->data = l; res->rtyp = LIST_CMD;
-
-  return FALSE;
-
-}
-
 /// Get leading component
 static BOOLEAN leadcomp(leftv res, leftv h)
 {
-  NoReturn(res);
-
   if ((h!=NULL) && (h->Typ()==VECTOR_CMD || h->Typ()==POLY_CMD))
   {
     const ring r = currRing;
@@ -700,7 +271,8 @@ static BOOLEAN leadcomp(leftv res, leftv h)
   //    assume( iComp > 0 ); // p is a vector
 
       res->data = reinterpret_cast<void *>(jjLONG2N(iComp));
-    } else
+    }
+    else
       res->data = reinterpret_cast<void *>(jjLONG2N(0));
 
 
@@ -715,9 +287,6 @@ static BOOLEAN leadcomp(leftv res, leftv h)
 /// Same for Induced Schreyer ordering (ordering on components is defined by sign!)
 static BOOLEAN MakeInducedSchreyerOrdering(leftv res, leftv h)
 {
-
-  NoReturn(res);
-
   int sign = 1;
   if ((h!=NULL) && (h->Typ()==INT_CMD))
   {
@@ -743,8 +312,6 @@ static BOOLEAN MakeInducedSchreyerOrdering(leftv res, leftv h)
 /// ?
 static BOOLEAN GetInducedData(leftv res, leftv h)
 {
-  NoReturn(res);
-
   const ring r = currRing;
 
   int p = 0; // which IS-block? p^th!
@@ -801,6 +368,7 @@ static BOOLEAN GetInducedData(leftv res, leftv h)
 /// Returns old SyzCompLimit, can set new limit
 static BOOLEAN SetInducedReferrence(leftv res, leftv h)
 {
+  res->Init();
   NoReturn(res);
 
   const ring r = currRing;
@@ -838,8 +406,6 @@ static BOOLEAN SetInducedReferrence(leftv res, leftv h)
     WerrorS("`SetInducedReferrence(<ideal/module>, [int[, int]])` called on incompatible ring (not created by 'MakeInducedSchreyerOrdering'!)");
     return TRUE;
   }
-
-
 
   // F & componentWeights belong to that ordering block of currRing now:
   rSetISReference(r, F, rank, p); // F will be copied!
@@ -946,10 +512,6 @@ extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   psModulFunctions->iiAddCproc((currPack->libname? currPack->libname: ""), (char*)C, D, E);
 
 
-// #define ADD(A,B,C,D,E) ADD0(iiAddCproc, "", C, D, E)
-
-//#define ADD0(A,B,C,D,E) A(B, (char*)C, D, E)
-// #define ADD(A,B,C,D,E) ADD0(A->iiAddCproc, B, C, D, E)
   ADD("ClearContent", FALSE, _ClearContent);
   ADD("ClearDenominators", FALSE, _ClearDenominators);
 
@@ -962,17 +524,6 @@ extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   ADD("idPrepare", FALSE, idPrepare);
 
   ADD("Tail", FALSE, Tail);
-
-  ADD("ReduceTerm", FALSE, _ReduceTerm);
-  ADD("TraverseTail", FALSE, _TraverseTail);
-
-
-  ADD("SchreyerSyzygyNF", FALSE, _SchreyerSyzygyNF);
-  ADD("ComputeSyzygy", FALSE, _ComputeSyzygy);
-
-  ADD("ComputeResolution", FALSE, _ComputeResolution);
-
-  //  ADD("", FALSE, );
 
 #undef ADD
   return MAX_TOK;

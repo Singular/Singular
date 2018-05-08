@@ -813,6 +813,18 @@ static BOOLEAN jiA_BIGINTMAT(leftv res, leftv a, Subexpr)
   jiAssignAttr(res,a);
   return FALSE;
 }
+static BOOLEAN jiA_BUCKET(leftv res, leftv a, Subexpr e)
+// there should be no assign bucket:=bucket, here we have poly:=bucket
+{
+  sBucket_pt b=(sBucket_pt)a->CopyD();
+  poly p; int l;
+  sBucketDestroyAdd(b,&p,&l);
+  sleftv tmp;
+  tmp.Init();
+  tmp.rtyp=POLY_CMD;
+  tmp.data=p;
+  return jiA_POLY(res,&tmp,e);
+}
 static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr)
 {
   if (res->data!=NULL) idDelete((ideal*)&res->data);
@@ -1111,6 +1123,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
 
   if (lt==DEF_CMD)
   {
+      
     if (TEST_V_ALLWARN
     && (rt!=RING_CMD)
     && (l->name!=NULL)
@@ -1123,19 +1136,24 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
     }
     if (l->rtyp==IDHDL)
     {
-      IDTYP((idhdl)l->data)=rt;
+      if (rt==BUCKET_CMD) IDTYP((idhdl)l->data)=POLY_CMD;
+      else                IDTYP((idhdl)l->data)=rt;
     }
     else if (l->name!=NULL)
     {
+      int rrt;
+      if (rt==BUCKET_CMD) rrt=POLY_CMD;
+      else                rrt=rt;
       sleftv ll;
-      iiDeclCommand(&ll,l,myynest,rt,&IDROOT);
+      iiDeclCommand(&ll,l,myynest,rrt,&IDROOT);
       memcpy(l,&ll,sizeof(sleftv));
     }
     else
     {
-      l->rtyp=rt;
+      if (rt==BUCKET_CMD) l->rtyp=POLY_CMD;
+      else                l->rtyp=rt;
     }
-    lt=rt;
+    lt=l->Typ();
   }
   else
   {

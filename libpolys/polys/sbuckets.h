@@ -73,6 +73,7 @@ inline void sBucketDestroyAdd(sBucket_pt bucket, poly *p, int *length)
 
 void sBucketDeleteAndDestroy(sBucket_pt *bucket_pt);
 
+poly sBucketPeek(sBucket_pt b);
 //////////////////////////////////////////////////////////////////////////
 
 /// Merges p into Spoly: assumes Bpoly and p have no common monoms
@@ -99,4 +100,8 @@ poly sBucketSortMerge(poly p, const ring r);
 poly sBucketSortAdd(poly p, const ring r);
 
 
+//////////////////////////////////////////////////////////////////////////
+void sBucketCanonicalize(sBucket_pt bucket);
+char* sBucketString(sBucket_pt bucket);
+void sBucketPrint(sBucket_pt bucket);
 #endif // P_BUCKET_SORT

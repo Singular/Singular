@@ -1478,6 +1478,19 @@ BOOLEAN ssiWrite(si_link l, leftv data)
           case RING_CMD:fputs("5 ",d->f_write);
                         ssiWriteRing(d,(ring)dd);
                         break;
+          case BUCKET_CMD:
+                        {
+                          sBucket_pt b=(sBucket_pt)dd;
+                          if (d->r!=sBucketGetRing(b))
+                          {
+                            fputs("15 ",d->f_write);
+                            ssiWriteRing(d,sBucketGetRing(b));
+                            if (d->level<=1) fputc('\n',d->f_write);
+                          }
+                          fputs("6 ",d->f_write);
+                          ssiWritePoly(d,tt,sBucketPeek(b));
+                          break;
+                        }
           case POLY_CMD:
           case VECTOR_CMD:
                         if (d->r!=currRing)

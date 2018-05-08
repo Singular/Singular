@@ -17,8 +17,6 @@
 #include "polys/monomials/ring.h"
 #include "polys/monomials/p_polys.h"
 
-
-
 //////////////////////////////////////////////////////////////////////////
 // Declarations
 //
@@ -73,6 +71,7 @@ bool sIsEmpty(const sBucket_pt bucket)
 /// Copy sBucket non-intrusive!!!
 sBucket_pt    sBucketCopy(const sBucket_pt bucket)
 {
+  sBucketCanonicalize(bucket);
   const ring r = bucket->bucket_ring;
 
   sBucket_pt newbucket = sBucketCreate(r);
@@ -209,6 +208,7 @@ void sBucket_Add_p(sBucket_pt bucket, poly p, int length)
   assume(length <= 0 || length == pLength(p));
 
   if (p == NULL) return;
+  p_Test(p,bucket->bucket_ring);
   if (length <= 0) length = pLength(p);
 
   int i = SI_LOG2(length);
@@ -337,7 +337,7 @@ poly sBucketSortMerge(poly p, const ring r)
 
 #ifndef SING_NDEBUG
   int l_in = pLength(p);
-#endif  
+#endif
   sBucket_pt bucket = sBucketCreate(r);
   poly pn = pNext(p);
 
@@ -397,3 +397,74 @@ poly sBucketSortAdd(poly p, const ring r)
 #endif
   return pn;
 }
+
+void sBucketCanonicalize(sBucket_pt bucket)
+{
+  poly pr = NULL;
+  int  lr = 0;
+  int i = 0;
+
+  while (bucket->buckets[i].p == NULL)
+  {
+    assume( bucket->buckets[i].length == 0 );
+    i++;
+    if (i > bucket->max_bucket) goto done;
+  }
+
+  pr = bucket->buckets[i].p;
+  lr = bucket->buckets[i].length;
+
+  assume( pr != NULL && (lr > 0) );
+
+  bucket->buckets[i].p = NULL;
+  bucket->buckets[i].length = 0;
+  i++;
+
+  while (i <= bucket->max_bucket)
+  {
+    if (bucket->buckets[i].p != NULL)
+    {
+      p_Test(pr,bucket->bucket_ring);
+      assume( bucket->buckets[i].length == pLength(bucket->buckets[i].p) );
+
+      p_Test(bucket->buckets[i].p,bucket->bucket_ring);
+      //pr = p_Add_q(pr, bucket->buckets[i].p, lr, bucket->buckets[i].length,
+      //             bucket->bucket_ring);
+      pr = p_Add_q(pr, bucket->buckets[i].p, bucket->bucket_ring);
+
+      bucket->buckets[i].p = NULL;
+      bucket->buckets[i].length = 0;
+    }
+
+    assume( bucket->buckets[i].p == NULL );
+    assume( bucket->buckets[i].length == 0 );
+    i++;
+  }
+
+done:
+  lr=pLength(pr);
+  if (pr!=NULL)
+  {
+    i = SI_LOG2(lr);
+    bucket->buckets[i].p = pr;
+    bucket->buckets[i].length = lr;
+    bucket->max_bucket = i;
+  }
+}
+
+poly sBucketPeek(sBucket_pt b)
+{
+  sBucketCanonicalize(b);
+  return b->buckets[b->max_bucket].p;
+}
+
+char* sBucketString(sBucket_pt bucket)
+{
+  return (p_String(sBucketPeek(bucket),sBucketGetRing(bucket)));
+}
+
+void sBucketPrint(sBucket_pt bucket)
+{
+  p_Write0(sBucketPeek(bucket),sBucketGetRing(bucket));
+}
+

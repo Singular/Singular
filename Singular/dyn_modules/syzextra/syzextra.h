@@ -152,12 +152,6 @@ class SBucketFactory: private std::stack <sBucket_pt>
 
 };
 
-
-
-
-
-
-
 /// Computation attribute storage
 struct SchreyerSyzygyComputationFlags
 {
@@ -435,8 +429,6 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
 
     /// low level computation...
     poly ComputeImage(poly multiplier, const int tail) const;
-
-
 
   public:
     /// just for testing via the wrapper below

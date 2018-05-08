@@ -295,7 +295,7 @@ static omBinPageRegion omAllocNewBinPagesRegion(int min_pages)
   om_Info.InternalUsedBytesMalloc+=sizeof(omBinPageRegion_t);
   void* addr;
   int pages = (min_pages>om_Opts.PagesPerRegion ? min_pages : om_Opts.PagesPerRegion);
-  size_t size = pages*SIZEOF_SYSTEM_PAGE;
+  size_t size = ((size_t)pages)*SIZEOF_SYSTEM_PAGE;
 
   addr = _omVallocFromSystem(size, 1);
   if (addr == NULL)

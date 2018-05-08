@@ -298,8 +298,8 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjPLUS_I),    '+',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjPLUS_BI),   '+',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjPLUS_N),    '+',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_P),    '+',            POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_P),    '+',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjPLUS_B),    '+',            BUCKET_CMD,     POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjPLUS_V),    '+',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjPLUS_ID),   '+',            IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjPLUS_ID),   '+',            MODUL_CMD,      MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjPLUS_P_MA), '+',            MATRIX_CMD,     POLY_CMD,   MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -327,11 +327,13 @@ const struct sValCmd2 dArith2[]=
 #endif
 ,{D(lAdd),        '+',            LIST_CMD,       LIST_CMD,   LIST_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjRSUM),      '+',            RING_CMD,       RING_CMD,   RING_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjPLUS_B_P),    '+',          BUCKET_CMD,     BUCKET_CMD, POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjMINUS_I),   '-',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjMINUS_BI),  '-',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjMINUS_N),   '-',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMINUS_P),   '-',            POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMINUS_P),   '-',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjMINUS_B),   '-',            BUCKET_CMD,     POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjMINUS_V),   '-',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjMINUS_V),   '-',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjPLUS_MA_P), '-',            MATRIX_CMD,     MATRIX_CMD, POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjMINUS_MA),  '-',            MATRIX_CMD,     MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjMINUS_BIM), '-',            BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -354,6 +356,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjPOLY2_OP2), '-',            CPOLY_CMD,      INT_CMD,    CPOLY_CMD,  ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjMINUS_BIM), '-',            CMATRIX_CMD,    CMATRIX_CMD,CMATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
 #endif
+,{D(jjMINUS_B_P), '-',            BUCKET_CMD,     BUCKET_CMD, POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{  jjWRONG2 ,    '-',            NONE,           IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{  jjWRONG2 ,    '-',            NONE,           MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjTIMES_I),   '*',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -535,6 +538,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjINDEX_I),   '[',            ANY_TYPE/*set by p*/,LIST_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjINDEX_IV),  '[',            ANY_TYPE/*set by p*/,LIST_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjINDEX_P),   '[',            POLY_CMD,       POLY_CMD,   INT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjINDEX_PBu), '[',            POLY_CMD,       BUCKET_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjINDEX_P_IV),'[',            POLY_CMD,       POLY_CMD,   INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjINDEX_V),   '[',            POLY_CMD,       VECTOR_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjINDEX_V_IV),'[',            VECTOR_CMD,     VECTOR_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -1097,6 +1101,7 @@ cmdnames cmds[] =
   { "pardeg",      0, PARDEG_CMD ,        CMD_1},
   { "parstr",      0, PARSTR_CMD ,        CMD_12},
   { "poly",        0, POLY_CMD ,          RING_DECL},
+  { "polyBucket",  0, BUCKET_CMD ,        RING_DECL},
   { "preimage",    0, PREIMAGE_CMD ,      CMD_13},
   { "prime",       0, PRIME_CMD ,         CMD_1},
   { "primefactors",0, PFAC_CMD ,          CMD_12},
@@ -1206,7 +1211,7 @@ cmdnames cmds[] =
 #ifdef IPCONV
 const struct sConvertTypes dConvertTypes[] =
 {
-//   input type       output type     convert procedure
+//   input type       output type     convert procedure(destr.)/(non-destr.)
 //  int -> bigint
    { INT_CMD,         BIGINT_CMD,     D(iiI2BI) , NULL_VAL },
 //  int -> number
@@ -1215,6 +1220,7 @@ const struct sConvertTypes dConvertTypes[] =
 //  int -> poly
    { INT_CMD,         POLY_CMD,       D(iiI2P) , NULL_VAL },
    { BIGINT_CMD,      POLY_CMD,       D(iiBI2P) , NULL_VAL },
+   { BUCKET_CMD,      POLY_CMD,       NULL_VAL,   D(iiBu2P) },
 //  int -> vector
    { INT_CMD,         VECTOR_CMD,     D(iiI2V) , NULL_VAL },
    { BIGINT_CMD,      VECTOR_CMD,     D(iiBI2V) , NULL_VAL },
@@ -1248,6 +1254,10 @@ const struct sConvertTypes dConvertTypes[] =
    { POLY_CMD,        VECTOR_CMD,     D(iiP2V) , NULL_VAL },
 //  poly -> matrix
    { POLY_CMD,        MATRIX_CMD,     D(iiP2Id) , NULL_VAL },
+// the same for polyBucket:
+   { BUCKET_CMD,      IDEAL_CMD,      D(iiBu2Id) , NULL_VAL },
+   { BUCKET_CMD,      VECTOR_CMD,     D(iiBu2V) , NULL_VAL },
+   { BUCKET_CMD,      MATRIX_CMD,     D(iiBu2Id) , NULL_VAL },
 //  vector -> module
    { VECTOR_CMD,      MODUL_CMD,      D(iiP2Id) , NULL_VAL },
 //  vector -> matrix
@@ -1289,51 +1299,46 @@ const struct sValAssign dAssign[]=
 {
 // same res types must be grouped together
 // proc         res             arg
- {D(jiA_IDEAL),    IDEAL_CMD,      IDEAL_CMD }
+ {D(jiA_BIGINT),   BIGINT_CMD,     BIGINT_CMD }
+,{D(jiA_BIGINTMAT),BIGINTMAT_CMD,  BIGINTMAT_CMD}
+,{D(jiA_CRING),    CRING_CMD,      CRING_CMD }
+,{D(jiA_IDEAL),    IDEAL_CMD,      IDEAL_CMD }
 ,{D(jiA_IDEAL_M),  IDEAL_CMD,      MATRIX_CMD }
-,{D(jiA_RESOLUTION),RESOLUTION_CMD,RESOLUTION_CMD }
 ,{D(jiA_INT),      INT_CMD,        INT_CMD }
 ,{D(jiA_1x1INTMAT), INT_CMD,       INTMAT_CMD }
-,{D(jiA_IDEAL),    MATRIX_CMD,     MATRIX_CMD }
-,{D(jiA_MAP_ID),   MAP_CMD,        IDEAL_CMD }
-,{D(jiA_MAP),      MAP_CMD,        MAP_CMD }
-,{D(jiA_IDEAL),    MODUL_CMD,      MODUL_CMD }
-,{D(jiA_MODUL_P),  MODUL_CMD,      POLY_CMD }
-,{D(jiA_POLY),     POLY_CMD,       POLY_CMD }
-,{D(jiA_1x1MATRIX),POLY_CMD,       MATRIX_CMD }
-,{D(jiA_RING),     RING_CMD,       RING_CMD }
-,{D(jiA_QRING),    RING_CMD,       IDEAL_CMD }
-,{D(jiA_CRING),    CRING_CMD,      CRING_CMD }
-,{D(jiA_STRING),   STRING_CMD,     STRING_CMD }
-,{D(jiA_PROC),     PROC_CMD,       STRING_CMD }
-,{D(jiA_PROC),     PROC_CMD,       PROC_CMD }
-,{D(jiA_POLY),     VECTOR_CMD,     VECTOR_CMD }
 ,{D(jiA_INTVEC),   INTVEC_CMD,     INTVEC_CMD }
 ,{D(jiA_INTVEC),   INTMAT_CMD,     INTMAT_CMD }
-,{D(jiA_BIGINTMAT),BIGINTMAT_CMD,  BIGINTMAT_CMD}
-#ifdef SINGULAR_4_2
-,{D(jiA_BIGINTMAT),CMATRIX_CMD,    CMATRIX_CMD}
-#endif
-,{D(jiA_NUMBER),   NUMBER_CMD,     NUMBER_CMD }
-#ifdef SINGULAR_4_2
-,{D(jiA_NUMBER2),  CNUMBER_CMD,    CNUMBER_CMD }
-//,{D(jiA_NUMBER2_I),CNUMBER_CMD,    INT_CMD }
-//,{D(jiA_NUMBER2_N),CNUMBER_CMD,    NUMBER_CMD }
-,{D(jiA_POLY2),    CPOLY_CMD,      CPOLY_CMD }
-//,{D(jiA_POLY2_P),  CPOLY_CMD,      POLY_CMD }
-#endif
-,{D(jiA_BIGINT),   BIGINT_CMD,     BIGINT_CMD }
-,{D(jiA_LIST_RES), LIST_CMD,       RESOLUTION_CMD }
-,{D(jiA_LIST),     LIST_CMD,       LIST_CMD }
 ,{D(jiA_LINK),     LINK_CMD,       STRING_CMD }
 ,{D(jiA_LINK),     LINK_CMD,       LINK_CMD }
+,{D(jiA_LIST_RES), LIST_CMD,       RESOLUTION_CMD }
+,{D(jiA_LIST),     LIST_CMD,       LIST_CMD }
+,{D(jiA_MAP_ID),   MAP_CMD,        IDEAL_CMD }
+,{D(jiA_MAP),      MAP_CMD,        MAP_CMD }
+,{D(jiA_IDEAL),    MATRIX_CMD,     MATRIX_CMD }
+,{D(jiA_IDEAL),    MODUL_CMD,      MODUL_CMD }
+,{D(jiA_MODUL_P),  MODUL_CMD,      POLY_CMD }
+,{D(jiA_NUMBER),   NUMBER_CMD,     NUMBER_CMD }
 ,{D(jiA_PACKAGE),  PACKAGE_CMD,    PACKAGE_CMD }
-,{D(jiA_DEF),      DEF_CMD,        DEF_CMD }
+,{D(jiA_POLY),     POLY_CMD,       POLY_CMD }
+,{D(jiA_1x1MATRIX),POLY_CMD,       MATRIX_CMD }
+,{D(jiA_BUCKET),   POLY_CMD,       BUCKET_CMD}
+,{D(jiA_PROC),     PROC_CMD,       STRING_CMD }
+,{D(jiA_PROC),     PROC_CMD,       PROC_CMD }
+,{D(jiA_RESOLUTION),RESOLUTION_CMD,RESOLUTION_CMD }
+,{D(jiA_RING),     RING_CMD,       RING_CMD }
+,{D(jiA_QRING),    RING_CMD,       IDEAL_CMD }
+,{D(jiA_STRING),   STRING_CMD,     STRING_CMD }
+,{D(jiA_POLY),     VECTOR_CMD,     VECTOR_CMD }
 #ifdef SINGULAR_4_2
+,{D(jiA_BIGINTMAT),CMATRIX_CMD,    CMATRIX_CMD}
+,{D(jiA_NUMBER2),  CNUMBER_CMD,    CNUMBER_CMD }
 ,{D(jiA_NUMBER2_I),CNUMBER_CMD,    INT_CMD }
 ,{D(jiA_NUMBER2_N),CNUMBER_CMD,    NUMBER_CMD }
+,{D(jiA_POLY2),    CPOLY_CMD,      CPOLY_CMD }
+//,{D(jiA_POLY2_P),  CPOLY_CMD,      POLY_CMD }
 ,{D(jiA_CRING),    CRING_CMD,      CRING_CMD }
 #endif
+,{D(jiA_DEF),      DEF_CMD,        DEF_CMD }
 ,{NULL_VAL,        0,              0 }
 };
 const struct sValAssign_sys dAssign_sys[]=

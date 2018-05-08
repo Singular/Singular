@@ -36,18 +36,38 @@ lists pcvLAddL(lists l1,lists l2)
   l0->Init(i+1);
   for(;i>=0;i--)
   {
-    if(i<=l1->nr&&(l1->m[i].rtyp==POLY_CMD||l1->m[i].rtyp==VECTOR_CMD))
+    if(i<=l1->nr
+    &&(l1->m[i].rtyp==POLY_CMD||l1->m[i].rtyp==BUCKET_CMD||l1->m[i].rtyp==VECTOR_CMD))
     {
-      l0->m[i].rtyp=l1->m[i].rtyp;
-      l0->m[i].data=pCopy((poly)l1->m[i].data);
-      if(i<=l2->nr&&l2->m[i].rtyp==l1->m[i].rtyp)
+      if (l1->m[i].rtyp==BUCKET_CMD)
+      {
+        poly p=sBucketPeek((sBucket_pt)l1->m[i].data);
+        l0->m[i].rtyp=POLY_CMD;
+        l0->m[i].data=pCopy(p);
+      }
+      else
+      {
+        l0->m[i].rtyp=l1->m[i].rtyp;
+        l0->m[i].data=pCopy((poly)l1->m[i].data);
+      }
+      if(i<=l2->nr&&l2->m[i].rtyp==l0->m[i].rtyp)
         l0->m[i].data=pAdd((poly)l0->m[i].data,pCopy((poly)l2->m[i].data));
     }
     else
-    if(i<=l2->nr&&(l2->m[i].rtyp==POLY_CMD||l2->m[i].rtyp==VECTOR_CMD))
+    if(i<=l2->nr
+    &&(l2->m[i].rtyp==POLY_CMD||l2->m[i].rtyp==BUCKET_CMD||l2->m[i].rtyp==VECTOR_CMD))
     {
-      l0->m[i].rtyp=l2->m[i].rtyp;
-      l0->m[i].data=pCopy((poly)l2->m[i].data);
+      if (l2->m[i].rtyp==BUCKET_CMD)
+      {
+        poly p=sBucketPeek((sBucket_pt)l2->m[i].data);
+        l0->m[i].rtyp=POLY_CMD;
+        l0->m[i].data=pCopy(p);
+      }
+      else
+      {
+        l0->m[i].rtyp=l2->m[i].rtyp;
+        l0->m[i].data=pCopy((poly)l2->m[i].data);
+      }
     }
   }
   return(l0);
@@ -63,6 +83,11 @@ lists pcvPMulL(poly p,lists l1)
     {
       l0->m[i].rtyp=POLY_CMD;
       l0->m[i].data=ppMult_qq(p,(poly)l1->m[i].data);
+    }
+    else if(l1->m[i].rtyp==BUCKET_CMD)
+    {
+      l0->m[i].rtyp=POLY_CMD;
+      l0->m[i].data=ppMult_qq(p,sBucketPeek((sBucket_pt)l1->m[i].data));
     }
   }
   return(l0);
@@ -85,8 +110,10 @@ BOOLEAN pcvLAddL(leftv res,leftv h)
 
 BOOLEAN pcvPMulL(leftv res,leftv h)
 {
-  const short t[]={2,POLY_CMD,LIST_CMD};
-  if (iiCheckTypes(h,t,1))
+  const short t1[]={2,POLY_CMD,LIST_CMD};
+  const short t2[]={2,BUCKET_CMD,LIST_CMD};
+  if (iiCheckTypes(h,t2,0)
+  ||iiCheckTypes(h,t1,1))
   {
     poly p=(poly)h->Data();
     h=h->next;
@@ -138,6 +165,13 @@ BOOLEAN pcvMinDeg(leftv res,leftv h)
 {
   if(h)
   {
+    if(h->Typ()==BUCKET_CMD)
+    {
+      res->rtyp=INT_CMD;
+      res->data=(void*)(long)pcvMinDeg(sBucketPeek((sBucket_pt)h->Data()));
+      return FALSE;
+    }
+    else
     if(h->Typ()==POLY_CMD)
     {
       res->rtyp=INT_CMD;
@@ -291,6 +325,11 @@ lists pcvP2CV(lists pl,int d0,int d1)
     {
       cvl->m[i].rtyp=VECTOR_CMD;
       cvl->m[i].data=pcvP2CV((poly)pl->m[i].data,d0,d1);
+    }
+    else if(pl->m[i].rtyp==BUCKET_CMD)
+    {
+      cvl->m[i].rtyp=VECTOR_CMD;
+      cvl->m[i].data=pcvP2CV(sBucketPeek((sBucket_pt)pl->m[i].data),d0,d1);
     }
   }
   pcvClean();
