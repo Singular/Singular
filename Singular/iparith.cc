@@ -4379,7 +4379,7 @@ static BOOLEAN jjLISTRING(leftv res, leftv v)
   lists l=(lists)v->Data();
   long mm=(long)atGet(v,"maxExp",INT_CMD);
   if (mm==0) mm=0x7fff;
-  int isLetterplace=(int)(long)atGet(v,"isLPring",INT_CMD);
+  int isLetterplace=(int)(long)atGet(v,"isLetterplaceRing",INT_CMD);
   ring r=rCompose(l,TRUE,mm,isLetterplace);
   if (isLetterplace)
   {
