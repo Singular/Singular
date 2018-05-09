@@ -49,7 +49,7 @@ static proc mod_init()
   newstruct("Poly","ring in,poly value");
   newstruct("NormalFormEquation","list vars, string singularityType, int milnorNumber, Poly normalFormEquation, int modality, list parameters, int corank, int inertiaIndex, int determinacy, int realCase");
   system("install","Poly","print",printPoly,1);
-  system("install","Poly","string",stringPoly,1);
+  system("install","Poly","string",stringPoly,4);
   system("install","Poly","+",addPoly,2);
   system("install","Poly","*",multPoly,2);
   system("install","Poly","^",expPoly,2);

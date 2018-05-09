@@ -13,6 +13,7 @@ RiemannRochBN();     Computes a vector space basis of the
                      Riemann-Roch space of a divisor D on a
                      projective curve C
 
+SEE ALSO: brnoeth_lib
 ";
 
 LIB "normal.lib";

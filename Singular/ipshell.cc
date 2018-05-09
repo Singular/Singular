@@ -2740,7 +2740,7 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
   return FALSE;
 }
 
-ring rCompose(const lists  L, const BOOLEAN check_comp, const long bitmask)
+ring rCompose(const lists  L, const BOOLEAN check_comp, const long bitmask,const int isLetterplace)
 {
   if ((L->nr!=3)
 #ifdef HAVE_PLURAL
@@ -2866,7 +2866,7 @@ ring rCompose(const lists  L, const BOOLEAN check_comp, const long bitmask)
 
   // ------------------------ ??????? --------------------
 
-  rRenameVars(R);
+  if (!isLetterplace) rRenameVars(R);
   if (bitmask!=0x7fff) R->bitmask=bitmask*2;
   rComplete(R);
 
