@@ -80,8 +80,6 @@
 
 #include <ctype.h>
 
-ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE, const long bitmask=0x7fff);
-
 // defaults for all commands: NO_PLURAL | NO_RING | ALLOW_ZERODIVISOR
 
 #ifdef HAVE_PLURAL
@@ -4381,7 +4379,14 @@ static BOOLEAN jjLISTRING(leftv res, leftv v)
   lists l=(lists)v->Data();
   long mm=(long)atGet(v,"maxExp",INT_CMD);
   if (mm==0) mm=0x7fff;
-  ring r=rCompose(l,TRUE,mm);
+  int isLetterplace=(int)(long)atGet(v,"isLPring",INT_CMD);
+  ring r=rCompose(l,TRUE,mm,isLetterplace);
+  if (isLetterplace)
+  {
+    r->ShortOut=FALSE;
+    r->CanShortOut=FALSE;
+    r->isLPring=TRUE;
+  }
   res->data=(char *)r;
   return (r==NULL);
 }
