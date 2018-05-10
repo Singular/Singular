@@ -93,8 +93,7 @@ NOTE: Activate the resulting ring by using @code{setring}
 
     // Set letterplace-specific attributes for the output ring!
   attrib(R, "uptodeg", uptodeg);
-  attrib(R, "lV", lV);
-  attrib(R, "isLetterplaceRing", 1);
+  attrib(R, "isLetterplaceRing", lV);
   return (R);
 }
 example
@@ -497,7 +496,7 @@ EXAMPLE: example letplaceGBasis; shows examples
   // assumes of the ring have been checked
   // run the computation - it will test assumes on the ideal
   int uptodeg = attrib(save,"uptodeg");
-  int lV = attrib(save,"lV");
+  int lV = attrib(save,"isLetterplaceRing");
   dbprint(ppl,"start computing GB");
   ideal J = system("freegb",I,uptodeg,lV);
   dbprint(ppl,"finished computing GB");
@@ -1009,7 +1008,6 @@ example
   setring A;  A;
   attrib(A,"isLetterplaceRing");
   attrib(A,"uptodeg");  // degree bound
-  attrib(A,"lV"); // number of variables in the main block
   setring r; def B = makeLetterplaceRing(2,1); // to compare:
   setring B;  B;
 }
@@ -1097,9 +1095,8 @@ example
   def A = makeLetterplaceRing1(2);
   setring A;
   A;
-  attrib(A,"isLetterplaceRing");
+  attrib(A,"isLetterplaceRing");// number of variables in the main block
   attrib(A,"uptodeg");  // degree bound
-  attrib(A,"lV"); // number of variables in the main block
 }
 
 static proc makeLetterplaceRing2(int d)
@@ -1206,9 +1203,8 @@ example
   def A = makeLetterplaceRing2(2);
   setring A;
   A;
-  attrib(A,"isLetterplaceRing");
+  attrib(A,"isLetterplaceRing"); // number of variables in the main block
   attrib(A,"uptodeg");  // degree bound
-  attrib(A,"lV"); // number of variables in the main block
 }
 
 static proc makeLetterplaceRing4(int d)
@@ -1274,9 +1270,8 @@ example
   def A = makeLetterplaceRing2(2);
   setring A;
   A;
-  attrib(A,"isLetterplaceRing");
+  attrib(A,"isLetterplaceRing"); // number of variables in the main block
   attrib(A,"uptodeg");  // degree bound
-  attrib(A,"lV"); // number of variables in the main block
 }
 
 // P[s;sigma] approach
@@ -1384,9 +1379,8 @@ example
   def A = makeLetterplaceRing3(2);
   setring A;
   A;
-  attrib(A,"isLetterplaceRing");
+  attrib(A,"isLetterplaceRing"); // number of variables in the main block
   attrib(A,"uptodeg");  // degree bound
-  attrib(A,"lV"); // number of variables in the main block
 }
 
 /* EXAMPLES:
@@ -2522,7 +2516,7 @@ EXAMPLE: example shiftPoly; shows examples
     ERROR("Incomplete Letterplace structure on the basering!");
   }
   int uptodeg = attrib(basering,"uptodeg");
-  int lV = attrib(basering,"lV");
+  int lV = attrib(basering,"isLetterplaceRing");
   return(system("stest",a,i,uptodeg,lV));
 }
 example
@@ -2549,7 +2543,7 @@ EXAMPLE: example lastBlock; shows examples
   {
     ERROR("Incomplete Letterplace structure on the basering!");
   }
-  int lV = attrib(basering,"lV");
+  int lV = attrib(basering,"isLetterplaceRing");
   // calls pLastVblock(p,lV);
   return(system("btest",p,lV));
 }
@@ -3141,7 +3135,7 @@ static proc lpMultX(poly f, poly g)
     ERROR("Incomplete Letterplace structure on the basering!");
   }
   // decompose f,g into graded pieces with inForm: need dmodapp.lib
-  int b = attrib(basering,"lV");  // the length of the block
+  int b = attrib(basering,"isLetterplaceRing");  // the length of the block
   intvec w; // inherit the graded on the oridinal ring
   int i;
   for(i=1; i<=b; i++)
@@ -3170,7 +3164,7 @@ static proc lpMultX(poly f, poly g)
   }
   // shrinking
   //  result;
-  return( system("shrinktest",result,attrib(basering, "lV")) );
+  return( system("shrinktest",result,attrib(basering, "isLetterplaceRing")) );
 }
 example
 {
@@ -3221,7 +3215,7 @@ EXAMPLE: example lpMult; shows examples
   poly v = f*shiftPoly(g,sf);
   // bug, reported by Simon King: in nonhomog case [solved]
   // we need to shrink
-  return( system("shrinktest",v,attrib(basering, "lV")) );
+  return( system("shrinktest",v,attrib(basering, "isLetterplaceRing")) );
 }
 example
 {
@@ -3414,7 +3408,7 @@ ASSUME: Intvec is an exponent vector of a letterplace monomial contained in V'
 "
 {if (I==intvec(0)) {return(intvec(0));}
  int j,k,l;
- int n = attrib(basering,"lV"); int d = attrib(basering,"uptodeg");
+ int n = attrib(basering,"isLetterplaceRing"); int d = attrib(basering,"uptodeg");
  intvec w; j = 1;
  while (j <= d)
  {w = I[1..n];
@@ -3450,7 +3444,7 @@ PURPOSE: Converts an modified exponent vector into an Dvec
 NOTE: Superfluos zero blocks must have been deleted befor using this procedure
 "
 {int i,j,k,r1,r2; intvec D;
- int n = attrib(basering,"lV");
+ int n = attrib(basering,"isLetterplaceRing");
  k = size(V) div n; r1 = 0; r2 = 0;
  for (i=1; i<= k; i++)
   {for (j=(1+((i-1)*n)); j <= (i*n); j++)
@@ -3495,7 +3489,7 @@ ASSUME: V,W are DVecs of monomials contained in V'
 {if(size(V)<size(W)){return(list(-1));}
 
  int i,j,r; intvec T; list R;
- int n = attrib(basering,"lV");
+ int n = attrib(basering,"isLetterplaceRing");
  int k = size(V) - size(W) + 1;
  if (intvec(V[1..size(W)])-W == 0){R[1]=0;}
  for (i =2; i <=k; i++)
@@ -3598,7 +3592,7 @@ proc isOrderingShiftInvariant(int withHoles)
 {
   int shiftInvariant = 1;
 
-  int n = attrib(basering, "lV");
+  int n = attrib(basering, "isLetterplaceRing");
   int d = attrib(basering, "uptodeg");
 
   ideal monomials;
@@ -3659,7 +3653,7 @@ static proc lpMonomialsWithHoles(int d)
      return (monomials);
   }
 
-  int lV = attrib(basering, "lV"); // variable count
+  int lV = attrib(basering, "isLetterplaceRing"); // variable count
   ideal prevMonomials = lpMonomialsWithHoles(d - 1);
 
   for (int i = 1; i <= size(prevMonomials); i++) {
@@ -3688,7 +3682,7 @@ static proc lpMonomialsWithHoles(int d)
 
 static proc getlpCoeffs(poly q, poly p)
 {list R; poly m; intvec cq,t,lv,rv,bla;
- int n = attrib(basering,"lV"); int d = attrib(basering,"uptodeg");
+ int n = attrib(basering,"isLetterplaceRing"); int d = attrib(basering,"uptodeg");
  int i;
  m = p/q;
  cq = leadexp(m);
@@ -3724,8 +3718,8 @@ static proc lpShrink(poly p)
 "
 "
 {int n;
- if (typeof(attrib(basering,"isLetterplaceRing"))=="int")
- {n = attrib(basering,"lV");
+ if (attrib(basering,"isLetterplaceRing")>0)
+ {n = attrib(basering,"isLetterplaceRing");
   return(system("shrinktest",p,n));
  }
  else {ERROR("Basering is not a Letterplace ring!");}
@@ -3743,7 +3737,7 @@ static proc checkAssumptions(poly p, ideal G)
 static proc checkLPRing();
 "
 "
-{if (typeof(attrib(basering,"isLetterplaceRing"))=="string") {ERROR("Basering is not a Letterplace ring!");}
+{if (attrib(basering,"isLetterplaceRing")==0) {ERROR("Basering is not a Letterplace ring!");}
  return();
 }
 
@@ -3769,7 +3763,7 @@ static proc isContainedInVp(poly p)
 "
 {int r = 0; intvec w;
  intvec l = leadexp(p);
- int n = attrib(basering,"lV"); int d = attrib(basering,"uptodeg");
+ int n = attrib(basering,"isLetterplaceRing"); int d = attrib(basering,"uptodeg");
  int i,j,c,c1;
  while (1 <= d)
  {w = l[1..n];
@@ -3888,7 +3882,7 @@ static proc lpAssumeViolation()
   {
     return(1);
   }
-  def lV = attrib(basering,"lV");
+  def lV = attrib(basering,"isLetterplaceRing");
   if ( typeof(lV)!="int" )
   {
     return(1);
@@ -4094,9 +4088,8 @@ example
   def A = makeLetterplaceRingElim(2);
   setring A;
   A;
-  attrib(A,"isLetterplaceRing");
+  attrib(A,"isLetterplaceRing"); // number of variables in the main block
   attrib(A,"uptodeg");  // degree bound
-  attrib(A,"lV"); // number of variables in the main block
 }
 
 
@@ -4204,9 +4197,8 @@ example
   def A = makeLetterplaceRingNDO(2);
   setring A;
   A;
-  attrib(A,"isLetterplaceRing");
+  attrib(A,"isLetterplaceRing"); // number of variables in the main block
   attrib(A,"uptodeg");  // degree bound
-  attrib(A,"lV"); // number of variables in the main block
 }
 
 static proc setLetterplaceAttributesElim(def R, int uptodeg, int lV)
@@ -4228,8 +4220,7 @@ NOTE: Activate the resulting ring by using @code{setring}
 
     // Set letterplace-specific attributes for the output ring!
   attrib(R, "uptodeg", uptodeg);
-  attrib(R, "lV", lV);
-  attrib(R, "isLetterplaceRing", 1);
+  attrib(R, "isLetterplaceRing", lV);
   attrib(R, "HasElimOrd", 1);
   return (R);
 }
@@ -4250,7 +4241,7 @@ does not work for degree reasons (deg function does not work for lp rings -> new
 {
   def lpring = attrib(basering,"isLetterplaceRing");
   def lpEO =  attrib(basering,"HasElimOrd");
-  if ( typeof(lpring)!="int" && typeof(lpEO)!="int")
+  if ( lpring)==0 && typeof(lpEO)!="int")
   {
     ERROR("Ring is not a lp-ring with an elimination ordering");
   }
@@ -4360,8 +4351,7 @@ example
   def A = makeLetterplaceRingWt(2,intvec(1,2,3));
   setring A;
   A;
-  attrib(A,"isLetterplaceRing");
+  attrib(A,"isLetterplaceRing"); // number of variables in the main block
   attrib(A,"uptodeg");  // degree bound
-  attrib(A,"lV"); // number of variables in the main block
 }
 */
