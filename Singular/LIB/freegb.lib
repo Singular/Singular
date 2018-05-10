@@ -1259,6 +1259,7 @@ EXAMPLE: example makeLetterplaceRing2; shows examples
 
   L[3] = LR[3];
   attrib(L,"maxExp",1);
+  attrib(L,"isLetterplaceRing",1);
   def @R = ring(L);
   def @@R = setLetterplaceAttributes(@R,uptodeg,lV);
   return (@@R);
