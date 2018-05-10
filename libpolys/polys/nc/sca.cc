@@ -58,7 +58,7 @@
 poly sca_pp_Mult_mm(const poly pPoly, const poly pMonom, const ring rRing, poly &);
 
 // return pMonom * pPoly; preserve pPoly and pMonom.
-static poly sca_mm_Mult_pp(const poly pMonom, const poly pPoly, const ring rRing);
+static poly sca_pp_mm_Mult(const poly pPoly, const poly pMonom, const ring rRing);
 
 // return pPoly * pMonom; preserve pMonom, destroy or reuse pPoly.
 poly sca_p_Mult_mm(poly pPoly, const poly pMonom, const ring rRing);
@@ -564,7 +564,7 @@ static inline poly sca_xi_Mult_pp(short i, const poly pPoly, const ring rRing)
 
 
 // return new poly = pMonom * pPoly; preserve pPoly and pMonom.
-static poly sca_mm_Mult_pp(const poly pMonom, const poly pPoly, const ring rRing)
+static poly sca_pp_mm_Mult(const poly pPoly, const poly pMonom, const ring rRing)
 {
   assume( rIsSCA(rRing) );
 
@@ -596,7 +596,7 @@ static poly sca_mm_Mult_pp(const poly pMonom, const poly pPoly, const ring rRing
       if( iComponent!=0 ) // TODO: make global if on iComponentMonomM =?= 0
       {
         // REPORT_ERROR
-        Werror("sca_mm_Mult_pp: exponent mismatch %d and %d\n", iComponent, iComponentMonomM);
+        Werror("sca_pp_mm_Mult: exponent mismatch %d and %d\n", iComponent, iComponentMonomM);
         // what should we do further?!?
 
         p_Delete( &pResult, rRing); // delete the result
@@ -605,7 +605,7 @@ static poly sca_mm_Mult_pp(const poly pMonom, const poly pPoly, const ring rRing
 #ifdef PDEBUG
       if(iComponent==0 )
       {
-        dReportError("sca_mm_Mult_pp: Multiplication in the left module from the right!");
+        dReportError("sca_pp_mm_Mult: Multiplication in the left module from the right!");
 //        PrintS("mm = "); p_Write(pMonom, rRing);
 //        PrintS("pp = "); p_Write(pPoly, rRing);
 //        assume(iComponent!=0);
@@ -1234,7 +1234,7 @@ void sca_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
 
   // non-commutaitve
   p_Procs->p_mm_Mult          = sca_p_mm_Mult;
-  rGR->GetNC()->p_Procs.mm_Mult_pp  = sca_mm_Mult_pp;
+  p_Procs->pp_mm_Mult         = sca_pp_mm_Mult;
 
 //   rGR->GetNC()->p_Procs.SPoly         = sca_SPoly;
 //   rGR->GetNC()->p_Procs.ReduceSPoly   = sca_ReduceSpoly;

@@ -109,7 +109,7 @@ bool ncExtensions(int iMask) //  = 0x0FFFF
 poly gnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly &last);
 poly gnc_p_Mult_mm(poly p, const poly m, const ring r);
 poly gnc_p_mm_Mult(poly m, const poly p, const ring r);
-poly gnc_mm_Mult_pp(const poly m, const poly p, const ring r);
+poly gnc_pp_mm_Mult(const poly p, const poly m, const ring r);
 
 
 /* syzygies : */
@@ -405,7 +405,7 @@ poly gnc_p_mm_Mult(poly p, const poly m, const ring r)
   return( gnc_p_Mult_mm_Common(p, m, 0, r) );
 }
 
-poly gnc_mm_Mult_pp(const poly m, const poly p, const ring r)
+poly gnc_pp_mm_Mult(const poly p, const poly m, const ring r)
 {
   return( gnc_p_Mult_mm_Common(p_Copy(p,r), m, 0, r) );
 }
@@ -3147,7 +3147,7 @@ void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
 
   // non-commutaitve multiplication by monomial from the left
   p_Procs->p_mm_Mult   = gnc_p_mm_Mult;
-  rGR->GetNC()->p_Procs.mm_Mult_pp  = gnc_mm_Mult_pp;
+  p_Procs->pp_mm_Mult  = gnc_pp_mm_Mult;
 
 #if 0
   // Previous Plural's implementation...
