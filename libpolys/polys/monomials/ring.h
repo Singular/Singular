@@ -406,7 +406,17 @@ static inline BOOLEAN rIsPluralRing(const ring r)
   assume(r != NULL); assume(r->cf != NULL);
 #ifdef HAVE_PLURAL
   nc_struct *n;
-  return (r != NULL) && ((n=r->GetNC()) != NULL) /*&& (n->type != nc_error)*/;
+  return ((n=r->GetNC()) != NULL) /*&& (n->type != nc_error)*/;
+#else
+  return FALSE;
+#endif
+}
+
+static inline BOOLEAN rIsNCRing(const ring r)
+{
+  assume(r != NULL); assume(r->cf != NULL);
+#ifdef HAVE_PLURAL
+  return (r->isLPring!=0) || rIsPluralRing(r);
 #else
   return FALSE;
 #endif

@@ -214,7 +214,7 @@ poly _gnc_p_Mult_q(poly p, poly q, const int copy, const ring r) // not used any
 // return pPolyP * pPolyQ; destroy or reuse pPolyP and pPolyQ
 poly _nc_p_Mult_q(poly pPolyP, poly pPolyQ, const ring rRing)
 {
-  assume( rIsPluralRing(rRing) );
+  assume( rIsNCRing(rRing) );
 #ifdef PDEBUG
   p_Test(pPolyP, rRing);
   p_Test(pPolyQ, rRing);

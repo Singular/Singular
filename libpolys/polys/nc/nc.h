@@ -223,10 +223,9 @@ poly nc_p_Plus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp,
 // returns m*p, does neither destroy p nor m
 static inline poly nc_mm_Mult_pp(const poly m, const poly p, const ring r)
 {
-  assume(rIsPluralRing(r));
+  assume(rIsNCRing(r));
   assume(r->p_Procs->pp_mm_Mult!=NULL);
   return r->p_Procs->pp_mm_Mult(p, m, r);
-//  return pp_Mult_mm( p, m, r);
 }
 
 
