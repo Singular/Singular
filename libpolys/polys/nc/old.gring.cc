@@ -108,7 +108,7 @@ bool ncExtensions(int iMask) //  = 0x0FFFF
 // polynomial multiplication functions for p_Procs :
 poly gnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly &last);
 poly gnc_p_Mult_mm(poly p, const poly m, const ring r);
-poly gnc_mm_Mult_p(const poly m, poly p, const ring r);
+poly gnc_p_mm_Mult(poly m, const poly p, const ring r);
 poly gnc_mm_Mult_pp(const poly m, const poly p, const ring r);
 
 
@@ -357,7 +357,7 @@ poly gnc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r)
 #ifdef PDEBUG
         const char* s;
         if (side==1) s="gnc_p_Mult_mm";
-        else s="gnc_mm_Mult_p";
+        else s="gnc_p_mm_Mult";
         Print("%s: exponent mismatch %d and %d\n",s,expP,expM);
 #endif
         expOut=0;
@@ -399,7 +399,8 @@ poly gnc_p_Mult_mm(poly p, const poly m, const ring r)
   return( gnc_p_Mult_mm_Common(p, m, 1, r) );
 }
 
-poly gnc_mm_Mult_p(const poly m, poly p, const ring r)
+/* m * p */
+poly gnc_p_mm_Mult(poly p, const poly m, const ring r)
 {
   return( gnc_p_Mult_mm_Common(p, m, 0, r) );
 }
@@ -662,7 +663,7 @@ poly gnc_mm_Mult_nn(int *F0, int *G0, const ring r)
 #ifdef PDEBUG
     p_Test(Rout,r);
 #endif
-    out=gnc_mm_Mult_p(Rout,out,r); /* getting the final result */
+    out=gnc_p_mm_Mult(out,Rout,r); /* getting the final result */
     freeT(Prv,rN);
     p_Delete(&Rout,r);
   }
@@ -790,7 +791,7 @@ poly gnc_mm_Mult_uu(int *F,int jG,int bG, const ring r)
        freeT(Prv,rN);
        Prv = NULL;
 
-       out=gnc_mm_Mult_p(Rout,out,r); /* getting the final result */
+       out=gnc_p_mm_Mult(out,Rout,r); /* getting the final result */
     }
 
     freeT(lF,rN);
@@ -860,7 +861,7 @@ poly gnc_mm_Mult_uu(int *F,int jG,int bG, const ring r)
        if (t!=first)   /* typical expr */
        {
          w=gnc_p_Mult_mm(D,Pn,r);
-         Rout=gnc_mm_Mult_p(Pp,w,r);
+         Rout=gnc_p_mm_Mult(w,Pp,r);
          w=NULL;
        }
        else                   /* last step */
@@ -877,7 +878,7 @@ poly gnc_mm_Mult_uu(int *F,int jG,int bG, const ring r)
      }
      else                     /* first step */
      {
-       Rout=gnc_mm_Mult_p(Pp,D,r);
+       Rout=gnc_p_mm_Mult(D,Pp,r);
      }
 #ifdef PDEBUG
      p_Test(Pp,r);
@@ -921,7 +922,7 @@ poly gnc_mm_Mult_uu(int *F,int jG,int bG, const ring r)
     p_SetExpV(Rout,Prv,r);
     p_Setm(Rout,r);
     freeT(Prv, rN);
-    out=gnc_mm_Mult_p(Rout,out,r); /* getting the final result */
+    out=gnc_p_mm_Mult(out,Rout,r); /* getting the final result */
     p_Delete(&Rout,r);
   }
 
@@ -954,7 +955,7 @@ poly gnc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
      {
        t = nc_p_CopyGet(MATELEM(cMT,k-1,1),r);
        //        t=p_Copy(MATELEM(cMT,k-1,1),r);
-       t = gnc_mm_Mult_p(y,t,r);
+       t = gnc_p_mm_Mult(t,y,r);
        cMT=r->GetNC()->MT[cMTindex]; // since multiplication can change the MT table...
        assume( t != NULL );
 #ifdef PDEBUG
@@ -1194,7 +1195,7 @@ poly gnc_uu_Mult_ww_horvert (int i, int a, int j, int b, const ring r)
       if (t==NULL)   /* remove after debug */
       {
         t = p_Copy(MATELEM(cMT,m-1,1),r);
-        t = gnc_mm_Mult_p(y,t,r);
+        t = gnc_p_mm_Mult(t,y,r);
         MATELEM(cMT,m,1) = t;
         /*        omCheckAddr(cMT->m); */
       }
@@ -1267,7 +1268,7 @@ poly gnc_uu_Mult_ww_horvert (int i, int a, int j, int b, const ring r)
       if (t==NULL)   /* remove after debug */
       {
         t = p_Copy(MATELEM(cMT,k-1,b),r);
-        t = gnc_mm_Mult_p(y,t,r);
+        t = gnc_p_mm_Mult(t,y,r);
         MATELEM(cMT,k,b) = t;
         /*        omCheckAddr(cMT->m); */
       }
@@ -1292,7 +1293,7 @@ poly gnc_uu_Mult_ww_horvert (int i, int a, int j, int b, const ring r)
         if (t==NULL)   /* remove after debug */
         {
           t = p_Copy(MATELEM(cMT,m-1,1),r);
-          t = gnc_mm_Mult_p(y,t,r);
+          t = gnc_p_mm_Mult(t,y,r);
           MATELEM(cMT,m,1) = t;
           /*        omCheckAddr(cMT->m); */
         }
@@ -2346,7 +2347,7 @@ poly nc_mm_Bracket_nn(poly m1, poly m2, const ring r)
             p_Setm(prefix, r);
             p_SetExpV(suffix,aSUFFIX, r);
             p_Setm(suffix, r);
-            if (!p_LmIsConstant(prefix, r)) bres = gnc_mm_Mult_p(prefix, bres, r);
+            if (!p_LmIsConstant(prefix, r)) bres = gnc_p_mm_Mult(bres, prefix, r);
             if (!p_LmIsConstant(suffix, r)) bres = gnc_p_Mult_mm(bres, suffix, r);
             ares=p_Add_q(ares, bres, r);
             /* What to give free? */
@@ -2372,7 +2373,7 @@ poly nc_mm_Bracket_nn(poly m1, poly m2, const ring r)
         p_SetExpV(suffix,aSUFFIX, r);
         p_Setm(suffix, r);
         bres=ares;
-        if (!p_LmIsConstant(prefix, r)) bres = gnc_mm_Mult_p(prefix, bres, r);
+        if (!p_LmIsConstant(prefix, r)) bres = gnc_p_mm_Mult(bres, prefix, r);
         if (!p_LmIsConstant(suffix, r)) bres = gnc_p_Mult_mm(bres, suffix, r);
         res=p_Add_q(res, bres, r);
         p_Delete(&prefix, r);
@@ -3145,7 +3146,7 @@ void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
   p_Procs->p_Minus_mm_Mult_qq = rGR->p_Procs->p_Minus_mm_Mult_qq = nc_p_Minus_mm_Mult_qq;
 
   // non-commutaitve multiplication by monomial from the left
-  rGR->GetNC()->p_Procs.mm_Mult_p   = gnc_mm_Mult_p;
+  p_Procs->p_mm_Mult   = gnc_p_mm_Mult;
   rGR->GetNC()->p_Procs.mm_Mult_pp  = gnc_mm_Mult_pp;
 
 #if 0

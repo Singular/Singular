@@ -55,7 +55,6 @@ typedef void (*bucket_Proc_Ptr)(kBucket_pt b, poly p, number *c);
 struct nc_pProcs
 {
 public:
-  mm_Mult_p_Proc_Ptr                    mm_Mult_p;
   mm_Mult_pp_Proc_Ptr                   mm_Mult_pp;
 
   bucket_Proc_Ptr                       BucketPolyRed;
@@ -242,8 +241,8 @@ static inline poly nc_mm_Mult_pp(const poly m, const poly p, const ring r)
 static inline poly nc_mm_Mult_p(const poly m, poly p, const ring r)
 {
   assume(rIsPluralRing(r));
-  assume(r->GetNC()->p_Procs.mm_Mult_p!=NULL);
-  return r->GetNC()->p_Procs.mm_Mult_p(m, p, r);
+  assume(r->p_Procs->p_mm_Mult!=NULL);
+  return r->p_Procs->p_mm_Mult(p, m, r);
 //   return p_Mult_mm( p, m, r);
 }
 

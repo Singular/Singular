@@ -1064,13 +1064,7 @@ static inline poly p_Mult_q(poly p, poly q, const ring r)
 
   if (pNext(p) == NULL)
   {
-#ifdef HAVE_PLURAL
-    if (rIsPluralRing(r))
-      q = nc_mm_Mult_p(p, q, r);
-    else
-#endif /* HAVE_PLURAL */
-      q = r->p_Procs->p_Mult_mm(q, p, r);
-
+    q = r->p_Procs->p_mm_Mult(q, p, r);
     p_LmDelete(&p, r);
     return q;
   }
