@@ -1090,7 +1090,7 @@ static inline poly pp_Mult_qq(poly p, poly q, const ring r)
 
   if (pNext(p) == NULL)
   {
-    return r->p_Procs->pp_mm_Mult_mm(q, p, r);
+    return r->p_Procs->pp_mm_Mult(q, p, r);
   }
 
   if (pNext(q) == NULL)
