@@ -80,12 +80,12 @@ stry;
 string(stry);
 
 proc to_str(def arg) { return ("(overloaded)"); }
-system("install", "stringifiable", "string", to_str,1);
+system("install", "stringifiable", "string", to_str,4);
 stry;  // print falls back to string
 string(stry);
 
 proc to_str_wrong(def arg) { return (17); }
-system("install", "stringifiable", "string", to_str_wrong,1);
+system("install", "stringifiable", "string", to_str_wrong,4);
 stry;  // incorrectly converted, fall back to default
 string(stry);
 

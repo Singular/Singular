@@ -164,6 +164,8 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
       SetProcs_ring(RingGeneral,length,ord);
   }
   #endif
+  _p_procs->p_mm_Mult=_p_procs->p_Mult_mm;
+  _p_procs->pp_mm_Mult=_p_procs->pp_Mult_mm;
   CheckProc(p_Copy);
   CheckProc(p_Delete);
   CheckProc(p_ShallowCopyDelete);
