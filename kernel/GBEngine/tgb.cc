@@ -2986,7 +2986,7 @@ static poly redNFTail (poly h, const int sl, kStrategy strat, int len)
 #ifdef HAVE_PLURAL
         if(nc)
         {
-          nc_BucketPolyRed_Z (P.bucket, strat->S[j], &coef);
+          nc_kBucketPolyRed_Z (P.bucket, strat->S[j], &coef);
         }
         else
 #endif
@@ -4849,7 +4849,7 @@ void simple_reducer::do_reduce (red_object & ro)
   number coef;
 #ifdef HAVE_PLURAL
   if(c->nc)
-    nc_BucketPolyRed_Z (ro.bucket, p, &coef);
+    nc_kBucketPolyRed_Z (ro.bucket, p, &coef);
   else
 #endif
     coef = kBucketPolyRed (ro.bucket, p, p_len, c->strat->kNoether);

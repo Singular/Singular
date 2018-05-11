@@ -3161,7 +3161,7 @@ void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
   rGR->GetNC()->p_Procs.SPoly       = gnc_CreateSpolyNew;
   rGR->GetNC()->p_Procs.ReduceSPoly = gnc_ReduceSpolyNew;
 
-  rGR->GetNC()->p_Procs.BucketPolyRed  = gnc_kBucketPolyRedNew;
+  rGR->GetNC()->p_Procs.BucketPolyRed_NF= gnc_kBucketPolyRedNew;
   rGR->GetNC()->p_Procs.BucketPolyRed_Z= gnc_kBucketPolyRed_ZNew;
 #endif
 
