@@ -1685,7 +1685,7 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
       if (rIsPluralRing(currRing))
       {
         number coef;
-        nc_kBucketPolyRed(P.bucket,strat->S[j],&coef);
+        nc_kBucketPolyRed_NF(P.bucket,strat->S[j],&coef);
         nDelete(&coef);
       }
       else
@@ -1840,7 +1840,7 @@ poly redNFBound (poly h,int &max_ind,int nonorm,kStrategy strat,int bound)
       if (rIsPluralRing(currRing))
       {
         number coef;
-        nc_kBucketPolyRed(P.bucket,strat->S[j],&coef);
+        nc_kBucketPolyRed_NF(P.bucket,strat->S[j],&coef);
         nDelete(&coef);
       }
       else

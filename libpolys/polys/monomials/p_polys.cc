@@ -2182,7 +2182,7 @@ poly p_Power(poly p, int i, const ring r)
         else
         {
 #ifdef HAVE_PLURAL
-          if (rIsPluralRing(r)) /* in the NC case nothing helps :-( */
+          if (rIsNCRing(r)) /* in the NC case nothing helps :-( */
           {
             int j=i;
             rc = p_Copy(p,r);

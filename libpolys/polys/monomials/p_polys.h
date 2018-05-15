@@ -1076,7 +1076,7 @@ static inline poly p_Mult_q(poly p, poly q, const ring r)
     return p;
   }
 #ifdef HAVE_PLURAL
-  if (rIsPluralRing(r))
+  if (rIsNCRing(r))
     return _nc_p_Mult_q(p, q, r);
   else
 #endif
