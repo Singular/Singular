@@ -201,7 +201,7 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 
   poly res = pp_Mult_mm(p,q,r);     // holds initially q1*p
   poly qq = pNext(q);               // we iter of this
-  poly qn = r->p_Procs->pp_mm_Mult(qq, p,r);    // holds p1*qi
+  poly qn = pp_Mult_mm(qq, p,r);    // holds p1*qi
   poly pp = pNext(p);               // used for Lm(qq)*pp
   poly rr = res;                    // last monom which is surely not NULL
   poly rn = pNext(res);             // pNext(rr)
@@ -226,7 +226,7 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 
   Work: // compute res + Lm(qq)*pp
   if (rn == NULL)
-    pNext(rr) = r->p_Procs->pp_mm_Mult(pp, qq, r);
+    pNext(rr) = pp_Mult_mm(pp, qq, r);
   else
   {
     pNext(rr) = p_Plus_mm_Mult_qq(rn, qq, pp, r);
