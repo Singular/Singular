@@ -1477,24 +1477,34 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #ifdef HAVE_SHIFTBBA
     if (strcmp(sys_cmd, "freegb") == 0)
     {
+      /* levandov: now allow IDEAL_CMD and MODUL_CMD as input */
       const short t[]={3,IDEAL_CMD,INT_CMD,INT_CMD};
-      if (iiCheckTypes(h,t,1))
+      const short tM[]={3,MODUL_CMD,INT_CMD,INT_CMD};
+      if ( (!iiCheckTypes(h,t,1)) && (!iiCheckTypes(h,tM,1)) )
       {
-        ideal I=(ideal)h->CopyD();
-        h=h->next;
-        int uptodeg=(int)((long)(h->Data()));
-        h=h->next;
-        int lVblock=(int)((long)(h->Data()));
-        res->data = freegb(I,uptodeg,lVblock);
-        if (res->data == NULL)
-        {
-          /* that is there were input errors */
-          res->data = I;
-        }
-        res->rtyp = IDEAL_CMD;
-        return FALSE;
+        return TRUE;
       }
-      else return TRUE;
+      /* else: one of IDEAL_CMD, MODUL_CMD is true */
+      ideal I=(ideal)h->CopyD();
+      h=h->next;
+      int uptodeg=(int)((long)(h->Data()));
+      h=h->next;
+      int lVblock=(int)((long)(h->Data()));
+      res->data = freegb(I,uptodeg,lVblock);
+      if (res->data == NULL)
+      {
+        /* that is there were input errors */
+        res->data = I;
+      }
+      if (iiCheckTypes(h,t,0))
+      {
+        res->rtyp = IDEAL_CMD;
+      }
+      else /* i.e. (h,tM,1) */
+      {
+        res->rtyp = MODUL_CMD;
+      }
+      return FALSE;
     }
     else
   #endif /*SHIFTBBA*/
