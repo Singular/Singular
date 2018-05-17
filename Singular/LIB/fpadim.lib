@@ -2459,7 +2459,7 @@ proc monomialBasis(int d, int donly, ideal J)
   {
     // there are no elements in J of degree <= d
     // return free stuff and the 1
-    I = monomialBasis(d, donly, std(0));
+    I = monomialBasis(d, donly, ideal(0));
     if (!donly)
     {
       I = 1, I;
@@ -2499,8 +2499,8 @@ example
   option(redSB); option(redTail);
   J = letplaceGBasis(J);
   J;
-  monomialBasis(2,1,std(0));
-  monomialBasis(2,0,std(0));
+  monomialBasis(2,1,ideal(0));
+  monomialBasis(2,0,ideal(0));
   monomialBasis(3,1,J);
   monomialBasis(3,0,J);
 }

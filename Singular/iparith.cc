@@ -9185,7 +9185,6 @@ static BOOLEAN check_valid(const int p, const int op)
   {
     if ((p & ALLOW_LP)==0)
     {
-      rWrite(currRing);PrintLn();
       Werror("`%s` not implemented for letterplace rings in >>%s<<",Tok2Cmdname(op),my_yylinebuf);
       return TRUE;
     }
