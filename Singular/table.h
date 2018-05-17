@@ -15,242 +15,260 @@
 
 // the procedures have to be wrapped into the macro D(...)
 // with the exception of jjWRONG... (which always fails)
+// -----------------------------------------------------------------------
+// context: non-commutative rings and coefficient domain:
+//
+// commutativity:
+// ALLOW_NC: also for plural rings and letterplace rings
+// ALLOW_LP: also for letterplace rings, not for plural rings
+// ALLOW_PLURAL: not for letterplace rings, but also for plural rings
+// COMM_PLURAL: only for commuative subrings of plural rings
+// NO_NC: not for non-commutative rings
+//
+// coefficient domain:
+// ALLOW_RING:  coefficient domain may be a ring
+// NO_ZERODIVISOR: coefficient domain may be a ring without zero-divisors
+// NO_RING: coefficient domain must be a field
+//
+// other stuff:
+// NO_CONVERSION: arguments must have EXACTLY these types
+// WARN_RING: warn, that the operation happens in the quotient field
 /*=================== operations with 1 arg.: table =================*/
 const struct sValCmd1 dArith1[]=
 {
 // operations:
 // proc            cmd               res             arg            context
- {D(jjPLUSPLUS),   PLUSPLUS,        NONE,           IDHDL         , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjPLUSPLUS),   MINUSMINUS,      NONE,           IDHDL         , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjUMINUS_I),   '-',             INT_CMD,        INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjUMINUS_BI),   '-',            BIGINT_CMD,     BIGINT_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjUMINUS_N),   '-',             NUMBER_CMD,     NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
+ {D(jjPLUSPLUS),   PLUSPLUS,        NONE,           IDHDL         , ALLOW_NC |ALLOW_RING}
+,{D(jjPLUSPLUS),   MINUSMINUS,      NONE,           IDHDL         , ALLOW_NC |ALLOW_RING}
+,{D(jjUMINUS_I),   '-',             INT_CMD,        INT_CMD       , ALLOW_NC |ALLOW_RING}
+,{D(jjUMINUS_BI),   '-',            BIGINT_CMD,     BIGINT_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjUMINUS_N),   '-',             NUMBER_CMD,     NUMBER_CMD    , ALLOW_NC |ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjNUMBER2_OP1),'-',             CNUMBER_CMD,    CNUMBER_CMD   , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjPOLY2_OP1),  '-',             CPOLY_CMD,      CPOLY_CMD     , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjNUMBER2_OP1),'-',             CNUMBER_CMD,    CNUMBER_CMD   , ALLOW_NC |ALLOW_RING}
+,{D(jjPOLY2_OP1),  '-',             CPOLY_CMD,      CPOLY_CMD     , ALLOW_NC |ALLOW_RING}
 #endif
-,{D(jjUMINUS_P),   '-',             POLY_CMD,       POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjUMINUS_P),   '-',             VECTOR_CMD,     VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjUMINUS_MA),  '-',             MATRIX_CMD,     MATRIX_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjUMINUS_IV),  '-',             INTVEC_CMD,     INTVEC_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjUMINUS_IV),  '-',             INTMAT_CMD,     INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjUMINUS_BIM), '-',             BIGINTMAT_CMD,  BIGINTMAT_CMD , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjUMINUS_P),   '-',             POLY_CMD,       POLY_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjUMINUS_P),   '-',             VECTOR_CMD,     VECTOR_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjUMINUS_MA),  '-',             MATRIX_CMD,     MATRIX_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjUMINUS_IV),  '-',             INTVEC_CMD,     INTVEC_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjUMINUS_IV),  '-',             INTMAT_CMD,     INTMAT_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjUMINUS_BIM), '-',             BIGINTMAT_CMD,  BIGINTMAT_CMD , ALLOW_NC |ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjUMINUS_BIM), '-',             CMATRIX_CMD,    CMATRIX_CMD ,   ALLOW_PLURAL |ALLOW_RING}
+,{D(jjUMINUS_BIM), '-',             CMATRIX_CMD,    CMATRIX_CMD ,   ALLOW_NC |ALLOW_RING}
 #endif
-,{D(jjPROC1),      '(',             ANY_TYPE/*set by p*/,PROC_CMD , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjPROC1),      '(',             ANY_TYPE/*set by p*/,PROC_CMD , ALLOW_NC |ALLOW_RING}
 // and the procedures with 1 argument:
-,{D(atATTRIB1),    ATTRIB_CMD,      NONE,           DEF_CMD       , ALLOW_PLURAL |ALLOW_RING}
+,{D(atATTRIB1),    ATTRIB_CMD,      NONE,           DEF_CMD       , ALLOW_NC |ALLOW_RING}
 ,{D(jjBAREISS_BIM), BAREISS_CMD,    BIGINTMAT_CMD,  BIGINTMAT_CMD  , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBAREISS),    BAREISS_CMD,     LIST_CMD,       MODUL_CMD     , NO_PLURAL |ALLOW_RING | NO_ZERODIVISOR}
+,{D(jjBAREISS),    BAREISS_CMD,     LIST_CMD,       MODUL_CMD     , NO_NC |ALLOW_RING | NO_ZERODIVISOR}
 ,{D(jjBETTI),      BETTI_CMD,       INTMAT_CMD,     LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(syBetti1),     BETTI_CMD,       INTMAT_CMD,     RESOLUTION_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBETTI),      BETTI_CMD,       INTMAT_CMD,     IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBETTI),      BETTI_CMD,       INTMAT_CMD,     MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDUMMY),      BIGINT_CMD,      BIGINT_CMD,     BIGINT_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjN2BI),       BIGINT_CMD,      BIGINT_CMD,     NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjP2BI),       BIGINT_CMD,      BIGINT_CMD,     POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDUMMY),      BIGINTMAT_CMD,   BIGINTMAT_CMD,  BIGINTMAT_CMD , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCHAR),       CHARACTERISTIC_CMD, INT_CMD,     RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCHARSERIES), CHAR_SERIES_CMD, MATRIX_CMD,     IDEAL_CMD     , NO_PLURAL |NO_RING}
-,{D(jjrCharStr),   CHARSTR_CMD,     STRING_CMD,     RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjOpenClose),  CLOSE_CMD,       NONE,           LINK_CMD      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjDUMMY),      BIGINT_CMD,      BIGINT_CMD,     BIGINT_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjN2BI),       BIGINT_CMD,      BIGINT_CMD,     NUMBER_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjP2BI),       BIGINT_CMD,      BIGINT_CMD,     POLY_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjDUMMY),      BIGINTMAT_CMD,   BIGINTMAT_CMD,  BIGINTMAT_CMD , ALLOW_NC |ALLOW_RING}
+,{D(jjCHAR),       CHARACTERISTIC_CMD, INT_CMD,     RING_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjCHARSERIES), CHAR_SERIES_CMD, MATRIX_CMD,     IDEAL_CMD     , NO_NC |NO_RING}
+,{D(jjrCharStr),   CHARSTR_CMD,     STRING_CMD,     RING_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjOpenClose),  CLOSE_CMD,       NONE,           LINK_CMD      , ALLOW_NC |ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjDUMMY),      CMATRIX_CMD,     CMATRIX_CMD,    CMATRIX_CMD ,   ALLOW_PLURAL |ALLOW_RING}
+,{D(jjDUMMY),      CMATRIX_CMD,     CMATRIX_CMD,    CMATRIX_CMD ,   ALLOW_NC |ALLOW_RING}
 #endif
-//,{  jjWRONG ,       COLS_CMD,        0,              VECTOR_CMD  , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCOLS),       COLS_CMD,        INT_CMD,        MATRIX_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCOLS),       COLS_CMD,        INT_CMD,        IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCOLS),       COLS_CMD,        INT_CMD,        MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCOLS_IV),    COLS_CMD,        INT_CMD,        INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCOLS_BIM),   COLS_CMD,        INT_CMD,        BIGINTMAT_CMD , ALLOW_PLURAL |ALLOW_RING}
+//,{  jjWRONG ,       COLS_CMD,        0,              VECTOR_CMD  , ALLOW_NC |ALLOW_RING}
+,{D(jjCOLS),       COLS_CMD,        INT_CMD,        MATRIX_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjCOLS),       COLS_CMD,        INT_CMD,        IDEAL_CMD     , ALLOW_NC |ALLOW_RING}
+,{D(jjCOLS),       COLS_CMD,        INT_CMD,        MODUL_CMD     , ALLOW_NC |ALLOW_RING}
+,{D(jjCOLS_IV),    COLS_CMD,        INT_CMD,        INTMAT_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjCOLS_BIM),   COLS_CMD,        INT_CMD,        BIGINTMAT_CMD , ALLOW_NC |ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjCOLS_BIM),   COLS_CMD,        INT_CMD,        CMATRIX_CMD , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCOLS_BIM),   COLS_CMD,        INT_CMD,        CMATRIX_CMD , ALLOW_NC |ALLOW_RING}
 #endif
-,{  jjWRONG ,      COLS_CMD,        0,              INTVEC_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCONTENT),    CONTENT_CMD,     POLY_CMD,       POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCONTENT),    CONTENT_CMD,     VECTOR_CMD,     VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCOUNT_BI),   COUNT_CMD,       INT_CMD,        BIGINT_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCOUNT_N),    COUNT_CMD,       INT_CMD,        NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCOUNT_RES),  COUNT_CMD,       INT_CMD,        RESOLUTION_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjstrlen),     COUNT_CMD,       INT_CMD,        STRING_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjpLength),    COUNT_CMD,       INT_CMD,        POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjpLength),    COUNT_CMD,       INT_CMD,        VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjidElem),     COUNT_CMD,       INT_CMD,        IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjidElem),     COUNT_CMD,       INT_CMD,        MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCOUNT_M),    COUNT_CMD,       INT_CMD,        MATRIX_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCOUNT_IV),   COUNT_CMD,       INT_CMD,        INTVEC_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCOUNT_IV),   COUNT_CMD,       INT_CMD,        INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCOUNT_BIM),  COUNT_CMD,       INT_CMD,        BIGINTMAT_CMD , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCOUNT_L),    COUNT_CMD,       INT_CMD,        LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCOUNT_RG),   COUNT_CMD,       INT_CMD,        RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjR2_CR),      CRING_CMD,       CRING_CMD,      RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjNULL),       DEF_CMD,         DEF_CMD,        INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{  jjWRONG ,      DEF_CMD,         0,              ANY_TYPE      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDEG),        DEG_CMD,         INT_CMD,        POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDEG),        DEG_CMD,         INT_CMD,        VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDEG_M),      DEG_CMD,         INT_CMD,        MATRIX_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDEGREE),     DEGREE_CMD,      STRING_CMD,     IDEAL_CMD     , NO_PLURAL |ALLOW_RING | NO_ZERODIVISOR}
-,{D(jjDEGREE),     DEGREE_CMD,      STRING_CMD,     MODUL_CMD     , NO_PLURAL |ALLOW_RING | NO_ZERODIVISOR}
-,{D(jjDEFINED),    DEFINED_CMD,     INT_CMD,        DEF_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDENOMINATOR),DENOMINATOR_CMD, NUMBER_CMD,     NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjNUMERATOR),  NUMERATOR_CMD,   NUMBER_CMD,     NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
+,{  jjWRONG ,      COLS_CMD,        0,              INTVEC_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjCONTENT),    CONTENT_CMD,     POLY_CMD,       POLY_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjCONTENT),    CONTENT_CMD,     VECTOR_CMD,     VECTOR_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjCOUNT_BI),   COUNT_CMD,       INT_CMD,        BIGINT_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjCOUNT_N),    COUNT_CMD,       INT_CMD,        NUMBER_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjCOUNT_RES),  COUNT_CMD,       INT_CMD,        RESOLUTION_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjstrlen),     COUNT_CMD,       INT_CMD,        STRING_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjpLength),    COUNT_CMD,       INT_CMD,        POLY_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjpLength),    COUNT_CMD,       INT_CMD,        VECTOR_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjidElem),     COUNT_CMD,       INT_CMD,        IDEAL_CMD     , ALLOW_NC |ALLOW_RING}
+,{D(jjidElem),     COUNT_CMD,       INT_CMD,        MODUL_CMD     , ALLOW_NC |ALLOW_RING}
+,{D(jjCOUNT_M),    COUNT_CMD,       INT_CMD,        MATRIX_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjCOUNT_IV),   COUNT_CMD,       INT_CMD,        INTVEC_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjCOUNT_IV),   COUNT_CMD,       INT_CMD,        INTMAT_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjCOUNT_BIM),  COUNT_CMD,       INT_CMD,        BIGINTMAT_CMD , ALLOW_NC |ALLOW_RING}
+,{D(jjCOUNT_L),    COUNT_CMD,       INT_CMD,        LIST_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjCOUNT_RG),   COUNT_CMD,       INT_CMD,        RING_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjR2_CR),      CRING_CMD,       CRING_CMD,      RING_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjNULL),       DEF_CMD,         DEF_CMD,        INT_CMD       , ALLOW_NC |ALLOW_RING}
+,{  jjWRONG ,      DEF_CMD,         0,              ANY_TYPE      , ALLOW_NC |ALLOW_RING}
+,{D(jjDEG),        DEG_CMD,         INT_CMD,        POLY_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjDEG),        DEG_CMD,         INT_CMD,        VECTOR_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjDEG_M),      DEG_CMD,         INT_CMD,        MATRIX_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjDEGREE),     DEGREE_CMD,      STRING_CMD,     IDEAL_CMD     , NO_NC |ALLOW_RING | NO_ZERODIVISOR}
+,{D(jjDEGREE),     DEGREE_CMD,      STRING_CMD,     MODUL_CMD     , NO_NC |ALLOW_RING | NO_ZERODIVISOR}
+,{D(jjDEFINED),    DEFINED_CMD,     INT_CMD,        DEF_CMD       , ALLOW_NC |ALLOW_RING}
+,{D(jjDENOMINATOR),DENOMINATOR_CMD, NUMBER_CMD,     NUMBER_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjNUMERATOR),  NUMERATOR_CMD,   NUMBER_CMD,     NUMBER_CMD    , ALLOW_NC |ALLOW_RING}
 #ifdef SINGULAR_4_2
 ,{D(jjDET_N2),     DET_CMD,         CNUMBER_CMD,    CMATRIX_CMD   , ALLOW_PLURAL |ALLOW_RING}
 #endif
-,{D(jjDET_BI),     DET_CMD,         BIGINT_CMD,     BIGINTMAT_CMD , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDET_I),      DET_CMD,         INT_CMD,        INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDET),        DET_CMD,         POLY_CMD,       MATRIX_CMD    , NO_PLURAL |ALLOW_RING}
-,{D(jjDET_S),      DET_CMD,         POLY_CMD,       MODUL_CMD     , NO_PLURAL |NO_RING}
+,{D(jjDET_BI),     DET_CMD,         BIGINT_CMD,     BIGINTMAT_CMD , ALLOW_NC |ALLOW_RING}
+,{D(jjDET_I),      DET_CMD,         INT_CMD,        INTMAT_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjDET),        DET_CMD,         POLY_CMD,       MATRIX_CMD    , NO_NC |ALLOW_RING}
+,{D(jjDET_S),      DET_CMD,         POLY_CMD,       MODUL_CMD     , NO_NC |NO_RING}
 ,{D(jjDIM),        DIM_CMD,         INT_CMD,        IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDIM),        DIM_CMD,         INT_CMD,        MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDIM_R),      DIM_CMD,         INT_CMD,        RESOLUTION_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDUMP),       DUMP_CMD,        NONE,           LINK_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjE),          E_CMD,           VECTOR_CMD,     INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjEXECUTE),    EXECUTE_CMD,     NONE,           STRING_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjERROR),      ERROR_CMD,       NONE,           STRING_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjFAC_P),      FAC_CMD,         LIST_CMD,       POLY_CMD      , NO_PLURAL |ALLOW_ZZ}
-,{D(findUniProc),  FINDUNI_CMD,     IDEAL_CMD,      IDEAL_CMD     , NO_PLURAL |NO_RING}
-,{D(jjidFreeModule),FREEMODULE_CMD, MODUL_CMD,      INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjFACSTD),     FACSTD_CMD,      LIST_CMD,       IDEAL_CMD     , NO_PLURAL |NO_RING}
-,{D(jjGETDUMP),    GETDUMP_CMD,     NONE,           LINK_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjHIGHCORNER), HIGHCORNER_CMD,  POLY_CMD,       IDEAL_CMD     , NO_PLURAL |ALLOW_RING}
-,{D(jjHIGHCORNER_M), HIGHCORNER_CMD,VECTOR_CMD,     MODUL_CMD     , NO_PLURAL |ALLOW_RING}
+,{D(jjDUMP),       DUMP_CMD,        NONE,           LINK_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjE),          E_CMD,           VECTOR_CMD,     INT_CMD       , ALLOW_NC |ALLOW_RING}
+,{D(jjEXECUTE),    EXECUTE_CMD,     NONE,           STRING_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjERROR),      ERROR_CMD,       NONE,           STRING_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjFAC_P),      FAC_CMD,         LIST_CMD,       POLY_CMD      , NO_NC |ALLOW_ZZ}
+,{D(findUniProc),  FINDUNI_CMD,     IDEAL_CMD,      IDEAL_CMD     , NO_NC |NO_RING}
+,{D(jjidFreeModule),FREEMODULE_CMD, MODUL_CMD,      INT_CMD       , ALLOW_NC |ALLOW_RING}
+,{D(jjFACSTD),     FACSTD_CMD,      LIST_CMD,       IDEAL_CMD     , NO_NC |NO_RING}
+,{D(jjGETDUMP),    GETDUMP_CMD,     NONE,           LINK_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjHIGHCORNER), HIGHCORNER_CMD,  POLY_CMD,       IDEAL_CMD     , NO_NC |ALLOW_RING}
+,{D(jjHIGHCORNER_M), HIGHCORNER_CMD,VECTOR_CMD,     MODUL_CMD     , NO_NC |ALLOW_RING}
 ,{D(jjHILBERT),    HILBERT_CMD,     NONE,           IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING | NO_ZERODIVISOR}
 ,{D(jjHILBERT),    HILBERT_CMD,     NONE,           MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING | NO_ZERODIVISOR}
 ,{D(jjHILBERT_IV), HILBERT_CMD,     INTVEC_CMD,     INTVEC_CMD    , ALLOW_PLURAL |ALLOW_RING | NO_ZERODIVISOR}
-,{D(jjHOMOG1),     HOMOG_CMD,       INT_CMD,        IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjHOMOG1),     HOMOG_CMD,       INT_CMD,        MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDUMMY),      IDEAL_CMD,       IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjidVec2Ideal),IDEAL_CMD,       IDEAL_CMD,      VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjIDEAL_Ma),   IDEAL_CMD,       IDEAL_CMD,      MATRIX_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjIDEAL_R),    IDEAL_CMD,       IDEAL_CMD,      RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjIDEAL_Map),  IDEAL_CMD,       IDEAL_CMD,      MAP_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjIMPART),     IMPART_CMD,      NUMBER_CMD,     NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjINDEPSET),   INDEPSET_CMD,    INTVEC_CMD,     IDEAL_CMD     , NO_PLURAL |NO_RING}
-,{D(jjDUMMY),      INT_CMD,         INT_CMD,        INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjnlInt),      INT_CMD,         INT_CMD,        BIGINT_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjnInt),       INT_CMD,         INT_CMD,        NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjP2I),        INT_CMD,         INT_CMD,        POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjHOMOG1),     HOMOG_CMD,       INT_CMD,        IDEAL_CMD     , ALLOW_NC |ALLOW_RING}
+,{D(jjHOMOG1),     HOMOG_CMD,       INT_CMD,        MODUL_CMD     , ALLOW_NC |ALLOW_RING}
+,{D(jjDUMMY),      IDEAL_CMD,       IDEAL_CMD,      IDEAL_CMD     , ALLOW_NC |ALLOW_RING}
+,{D(jjidVec2Ideal),IDEAL_CMD,       IDEAL_CMD,      VECTOR_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjIDEAL_Ma),   IDEAL_CMD,       IDEAL_CMD,      MATRIX_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjIDEAL_R),    IDEAL_CMD,       IDEAL_CMD,      RING_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjIDEAL_Map),  IDEAL_CMD,       IDEAL_CMD,      MAP_CMD       , ALLOW_NC |ALLOW_RING}
+,{D(jjIMPART),     IMPART_CMD,      NUMBER_CMD,     NUMBER_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjINDEPSET),   INDEPSET_CMD,    INTVEC_CMD,     IDEAL_CMD     , NO_NC |NO_RING}
+,{D(jjDUMMY),      INT_CMD,         INT_CMD,        INT_CMD       , ALLOW_NC |ALLOW_RING}
+,{D(jjnlInt),      INT_CMD,         INT_CMD,        BIGINT_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjnInt),       INT_CMD,         INT_CMD,        NUMBER_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjP2I),        INT_CMD,         INT_CMD,        POLY_CMD      , ALLOW_NC |ALLOW_RING}
 ,{D(jjINTERRED),   INTERRED_CMD,    IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |NO_RING}
 ,{D(jjINTERRED),   INTERRED_CMD,    MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |NO_RING}
 ,{D(jjBI2IM),      INTMAT_CMD,      INTMAT_CMD,     BIGINTMAT_CMD  , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDUMMY),      INTMAT_CMD,      INTMAT_CMD,     INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjIm2Iv),      INTVEC_CMD,      INTVEC_CMD,     INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDUMMY),      INTVEC_CMD,      INTVEC_CMD,     INTVEC_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjIS_RINGVAR_P), IS_RINGVAR,    INT_CMD,        POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjIS_RINGVAR_S), IS_RINGVAR,    INT_CMD,        STRING_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjIS_RINGVAR0),IS_RINGVAR,      INT_CMD,        ANY_TYPE      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjDUMMY),      INTMAT_CMD,      INTMAT_CMD,     INTMAT_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjIm2Iv),      INTVEC_CMD,      INTVEC_CMD,     INTMAT_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjDUMMY),      INTVEC_CMD,      INTVEC_CMD,     INTVEC_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjIS_RINGVAR_P), IS_RINGVAR,    INT_CMD,        POLY_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjIS_RINGVAR_S), IS_RINGVAR,    INT_CMD,        STRING_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjIS_RINGVAR0),IS_RINGVAR,      INT_CMD,        ANY_TYPE      , ALLOW_NC |ALLOW_RING}
 ,{D(jjJACOB_P),    JACOB_CMD,       IDEAL_CMD,      POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(mpJacobi),     JACOB_CMD,       MATRIX_CMD,     IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjJACOB_M),    JACOB_CMD,       MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjJanetBasis), JANET_CMD,       IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |NO_RING}
 ,{D(jjKBASE),      KBASE_CMD,       IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING|WARN_RING} /*ring-cf: warning at top level*/
 ,{D(jjKBASE),      KBASE_CMD,       MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING|WARN_RING} /*ring-cf: warning at top level*/
-,{D(jjLU_DECOMP),  LU_CMD,          LIST_CMD,       MATRIX_CMD    , NO_PLURAL |NO_RING}
-,{D(jjPFAC1),      PFAC_CMD,        LIST_CMD,       BIGINT_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjPFAC1),      PFAC_CMD,        LIST_CMD,       NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(atKILLATTR1),  KILLATTR_CMD,    NONE,           IDHDL         , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjpHead),      LEAD_CMD,        POLY_CMD,       POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjidHead),     LEAD_CMD,        IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjpHead),      LEAD_CMD,        VECTOR_CMD,     VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjidHead),     LEAD_CMD,        MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjLEADCOEF),   LEADCOEF_CMD,    NUMBER_CMD,     POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjLEADCOEF),   LEADCOEF_CMD,    NUMBER_CMD,     VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjLEADEXP),    LEADEXP_CMD,     INTVEC_CMD,     POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjLEADEXP),    LEADEXP_CMD,     INTVEC_CMD,     VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjLEADMONOM),  LEADMONOM_CMD,   POLY_CMD,       POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjLEADMONOM),  LEADMONOM_CMD,   VECTOR_CMD,     VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDUMMY),      LINK_CMD,        LINK_CMD,       LINK_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCALL1MANY),  LIST_CMD,        LIST_CMD,       DEF_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{  jjWRONG ,      MAP_CMD,         0,              ANY_TYPE      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDUMMY),      MATRIX_CMD,      MATRIX_CMD,     MATRIX_CMD    , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjLU_DECOMP),  LU_CMD,          LIST_CMD,       MATRIX_CMD    , NO_NC |NO_RING}
+,{D(jjPFAC1),      PFAC_CMD,        LIST_CMD,       BIGINT_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjPFAC1),      PFAC_CMD,        LIST_CMD,       NUMBER_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(atKILLATTR1),  KILLATTR_CMD,    NONE,           IDHDL         , ALLOW_NC |ALLOW_RING}
+,{D(jjpHead),      LEAD_CMD,        POLY_CMD,       POLY_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjidHead),     LEAD_CMD,        IDEAL_CMD,      IDEAL_CMD     , ALLOW_NC |ALLOW_RING}
+,{D(jjpHead),      LEAD_CMD,        VECTOR_CMD,     VECTOR_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjidHead),     LEAD_CMD,        MODUL_CMD,      MODUL_CMD     , ALLOW_NC |ALLOW_RING}
+,{D(jjLEADCOEF),   LEADCOEF_CMD,    NUMBER_CMD,     POLY_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjLEADCOEF),   LEADCOEF_CMD,    NUMBER_CMD,     VECTOR_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjLEADEXP),    LEADEXP_CMD,     INTVEC_CMD,     POLY_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjLEADEXP),    LEADEXP_CMD,     INTVEC_CMD,     VECTOR_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjLEADMONOM),  LEADMONOM_CMD,   POLY_CMD,       POLY_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjLEADMONOM),  LEADMONOM_CMD,   VECTOR_CMD,     VECTOR_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjDUMMY),      LINK_CMD,        LINK_CMD,       LINK_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjCALL1MANY),  LIST_CMD,        LIST_CMD,       DEF_CMD       , ALLOW_NC |ALLOW_RING}
+,{  jjWRONG ,      MAP_CMD,         0,              ANY_TYPE      , ALLOW_NC |ALLOW_RING}
+,{D(jjDUMMY),      MATRIX_CMD,      MATRIX_CMD,     MATRIX_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjidMaxIdeal), MAXID_CMD,       IDEAL_CMD,      INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjMEMORY),     MEMORY_CMD,      BIGINT_CMD,     INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjidMinBase),  MINBASE_CMD,     IDEAL_CMD,      IDEAL_CMD     , NO_PLURAL |NO_RING}
-,{D(jjidMinBase),  MINBASE_CMD,     MODUL_CMD,      MODUL_CMD     , NO_PLURAL |NO_RING}
+,{D(jjMEMORY),     MEMORY_CMD,      BIGINT_CMD,     INT_CMD       , ALLOW_NC |ALLOW_RING}
+,{D(jjidMinBase),  MINBASE_CMD,     IDEAL_CMD,      IDEAL_CMD     , NO_NC |NO_RING}
+,{D(jjidMinBase),  MINBASE_CMD,     MODUL_CMD,      MODUL_CMD     , NO_NC |NO_RING}
 ,{D(jjMINRES),     MINRES_CMD,      LIST_CMD,       LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjMINRES_R),   MINRES_CMD,      RESOLUTION_CMD, RESOLUTION_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDUMMY),      MODUL_CMD,       MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjMONITOR1),   MONITOR_CMD,     NONE,           LINK_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjMONOM),      MONOM_CMD,       POLY_CMD,       INTVEC_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjMULT),       MULTIPLICITY_CMD,  INT_CMD,      IDEAL_CMD     , NO_PLURAL |ALLOW_RING}
-,{D(jjMULT),       MULTIPLICITY_CMD,  INT_CMD,      MODUL_CMD     , NO_PLURAL |ALLOW_RING}
-,{D(jjMSTD),       MSTD_CMD,        LIST_CMD,       IDEAL_CMD     , NO_PLURAL |ALLOW_RING}
-,{D(jjMSTD),       MSTD_CMD,        LIST_CMD,       MODUL_CMD     , NO_PLURAL |ALLOW_RING}
-,{D(jjNAMEOF),     NAMEOF_CMD,      STRING_CMD,     ANY_TYPE      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjNAMES_I),    NAMES_CMD,       LIST_CMD,       INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjNAMES),      NAMES_CMD,       LIST_CMD,       PACKAGE_CMD   , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjNAMES),      NAMES_CMD,       LIST_CMD,       RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjNOT),        NOT,             INT_CMD,        INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjDUMMY),      MODUL_CMD,       MODUL_CMD,      MODUL_CMD     , ALLOW_NC |ALLOW_RING}
+,{D(jjMONITOR1),   MONITOR_CMD,     NONE,           LINK_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjMONOM),      MONOM_CMD,       POLY_CMD,       INTVEC_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjMULT),       MULTIPLICITY_CMD,  INT_CMD,      IDEAL_CMD     , NO_NC |ALLOW_RING}
+,{D(jjMULT),       MULTIPLICITY_CMD,  INT_CMD,      MODUL_CMD     , NO_NC |ALLOW_RING}
+,{D(jjMSTD),       MSTD_CMD,        LIST_CMD,       IDEAL_CMD     , NO_NC |ALLOW_RING}
+,{D(jjMSTD),       MSTD_CMD,        LIST_CMD,       MODUL_CMD     , NO_NC |ALLOW_RING}
+,{D(jjNAMEOF),     NAMEOF_CMD,      STRING_CMD,     ANY_TYPE      , ALLOW_NC |ALLOW_RING}
+,{D(jjNAMES_I),    NAMES_CMD,       LIST_CMD,       INT_CMD       , ALLOW_NC |ALLOW_RING}
+,{D(jjNAMES),      NAMES_CMD,       LIST_CMD,       PACKAGE_CMD   , ALLOW_NC |ALLOW_RING}
+,{D(jjNAMES),      NAMES_CMD,       LIST_CMD,       RING_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjNOT),        NOT,             INT_CMD,        INT_CMD       , ALLOW_NC |ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjN2_N),       NUMBER_CMD,      NUMBER_CMD,     CNUMBER_CMD   , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjN2_N),       NUMBER_CMD,      NUMBER_CMD,     CNUMBER_CMD   , ALLOW_NC |ALLOW_RING}
 #endif
-,{D(jjDUMMY),      NUMBER_CMD,      NUMBER_CMD,     NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjP2N),        NUMBER_CMD,      NUMBER_CMD,     POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBI2N),       NUMBER_CMD,      NUMBER_CMD,     BIGINT_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDUMMY),      CNUMBER_CMD,     CNUMBER_CMD,    CNUMBER_CMD   , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjRPAR),       NPARS_CMD,       INT_CMD,        RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjNVARS),      NVARS_CMD,       INT_CMD,        RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjOpenClose),  OPEN_CMD,        NONE,           LINK_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCALL1MANY),  OPTION_CMD,      NONE,           DEF_CMD       , ALLOW_PLURAL |ALLOW_RING} /*libsing*/
+,{D(jjDUMMY),      NUMBER_CMD,      NUMBER_CMD,     NUMBER_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjP2N),        NUMBER_CMD,      NUMBER_CMD,     POLY_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjBI2N),       NUMBER_CMD,      NUMBER_CMD,     BIGINT_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjDUMMY),      CNUMBER_CMD,     CNUMBER_CMD,    CNUMBER_CMD   , ALLOW_NC |ALLOW_RING}
+,{D(jjRPAR),       NPARS_CMD,       INT_CMD,        RING_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjNVARS),      NVARS_CMD,       INT_CMD,        RING_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjOpenClose),  OPEN_CMD,        NONE,           LINK_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjCALL1MANY),  OPTION_CMD,      NONE,           DEF_CMD       , ALLOW_NC |ALLOW_RING} /*libsing*/
 ,{D(jjORD),        ORD_CMD,         INT_CMD,        POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjORD),        ORD_CMD,         INT_CMD,        VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjrOrdStr),    ORDSTR_CMD,      STRING_CMD,     RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjPAR1),       PAR_CMD,         NUMBER_CMD,     INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjPARDEG),     PARDEG_CMD,      INT_CMD,        NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjrOrdStr),    ORDSTR_CMD,      STRING_CMD,     RING_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjPAR1),       PAR_CMD,         NUMBER_CMD,     INT_CMD       , ALLOW_NC |ALLOW_RING}
+,{D(jjPARDEG),     PARDEG_CMD,      INT_CMD,        NUMBER_CMD    , ALLOW_NC |ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjN2_CR),      PARENT_CMD,      CRING_CMD,      CNUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjP2_R),       PARENT_CMD,      RING_CMD,       CPOLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCM_CR),      PARENT_CMD,      CRING_CMD,      CMATRIX_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBIM2_CR),    PARENT_CMD,      CRING_CMD,      BIGINTMAT_CMD , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjN2_CR),      PARENT_CMD,      CRING_CMD,      CNUMBER_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjP2_R),       PARENT_CMD,      RING_CMD,       CPOLY_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjCM_CR),      PARENT_CMD,      CRING_CMD,      CMATRIX_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjBIM2_CR),    PARENT_CMD,      CRING_CMD,      BIGINTMAT_CMD , ALLOW_NC |ALLOW_RING}
 #endif
-,{D(jjPARSTR1),    PARSTR_CMD,      STRING_CMD,     INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjrParStr),    PARSTR_CMD,      STRING_CMD,     RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDUMMY),      POLY_CMD,        POLY_CMD,       POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBI2P),       POLY_CMD,        POLY_CMD,       BIGINT_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjPREIMAGE_R), PREIMAGE_CMD,    RING_CMD,       MAP_CMD       , NO_PLURAL |ALLOW_RING}
-,{D(jjPRIME),      PRIME_CMD,       INT_CMD,        INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjPRINT),      PRINT_CMD,       STRING_CMD,     LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjPRINT),      PRINT_CMD,       STRING_CMD,     DEF_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDUMMY),      PROC_CMD,        PROC_CMD,       PROC_CMD       , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjPARSTR1),    PARSTR_CMD,      STRING_CMD,     INT_CMD       , ALLOW_NC |ALLOW_RING}
+,{D(jjrParStr),    PARSTR_CMD,      STRING_CMD,     RING_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjDUMMY),      POLY_CMD,        POLY_CMD,       POLY_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjBI2P),       POLY_CMD,        POLY_CMD,       BIGINT_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjPREIMAGE_R), PREIMAGE_CMD,    RING_CMD,       MAP_CMD       , NO_NC |ALLOW_RING}
+,{D(jjPRIME),      PRIME_CMD,       INT_CMD,        INT_CMD       , ALLOW_NC |ALLOW_RING}
+,{D(jjPRINT),      PRINT_CMD,       STRING_CMD,     LIST_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjPRINT),      PRINT_CMD,       STRING_CMD,     DEF_CMD       , ALLOW_NC |ALLOW_RING}
+,{D(jjDUMMY),      PROC_CMD,        PROC_CMD,       PROC_CMD       , ALLOW_NC |ALLOW_RING}
 ,{D(jjPRUNE),      PRUNE_CMD,       MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(kQHWeight),    QHWEIGHT_CMD,    INTVEC_CMD,     IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(kQHWeight),    QHWEIGHT_CMD,    INTVEC_CMD,     MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjRANK1),      RANK_CMD,        INT_CMD,        MATRIX_CMD    , ALLOW_PLURAL |NO_RING}
-,{D(jjREAD),       READ_CMD,        STRING_CMD,     LINK_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjREGULARITY), REGULARITY_CMD,  INT_CMD,        LIST_CMD      , NO_PLURAL |ALLOW_RING}
-,{D(jjREPART),     REPART_CMD,      NUMBER_CMD,     NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjRESERVEDNAME),RESERVEDNAME_CMD, INT_CMD,      STRING_CMD    , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjRANK1),      RANK_CMD,        INT_CMD,        MATRIX_CMD    , ALLOW_NC |NO_RING}
+,{D(jjREAD),       READ_CMD,        STRING_CMD,     LINK_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjREGULARITY), REGULARITY_CMD,  INT_CMD,        LIST_CMD      , NO_NC |ALLOW_RING}
+,{D(jjREPART),     REPART_CMD,      NUMBER_CMD,     NUMBER_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjRESERVEDNAME),RESERVEDNAME_CMD, INT_CMD,      STRING_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjL2R),        RESOLUTION_CMD,  RESOLUTION_CMD, LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDUMMY),      RESOLUTION_CMD,  RESOLUTION_CMD, RESOLUTION_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjRESTART),    RESTART_CMD,     NONE,           INT_CMD,        ALLOW_PLURAL |ALLOW_RING}
-,{D(jjRINGLIST),   RINGLIST_CMD,    LIST_CMD,       RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjRINGLIST_C), RING_LIST_CMD,   LIST_CMD,       CRING_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjRING_LIST),  RING_LIST_CMD,   LIST_CMD,       RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDUMMY),      RING_CMD,        RING_CMD,       RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjLISTRING),   RING_CMD,        RING_CMD,       LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
-//,{  jjWRONG ,      ROWS_CMD,        0,              POLY_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjpMaxComp),   ROWS_CMD,        INT_CMD,        VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjROWS),       ROWS_CMD,        INT_CMD,        MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjROWS),       ROWS_CMD,        INT_CMD,        MATRIX_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjROWS_IV),    ROWS_CMD,        INT_CMD,        INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjROWS_BIM),   ROWS_CMD,        INT_CMD,        BIGINTMAT_CMD , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjRESTART),    RESTART_CMD,     NONE,           INT_CMD,        ALLOW_NC |ALLOW_RING}
+,{D(jjRINGLIST),   RINGLIST_CMD,    LIST_CMD,       RING_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjRINGLIST_C), RING_LIST_CMD,   LIST_CMD,       CRING_CMD     , ALLOW_NC |ALLOW_RING}
+,{D(jjRING_LIST),  RING_LIST_CMD,   LIST_CMD,       RING_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjDUMMY),      RING_CMD,        RING_CMD,       RING_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjLISTRING),   RING_CMD,        RING_CMD,       LIST_CMD      , ALLOW_NC |ALLOW_RING}
+//,{  jjWRONG ,      ROWS_CMD,        0,              POLY_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjpMaxComp),   ROWS_CMD,        INT_CMD,        VECTOR_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjROWS),       ROWS_CMD,        INT_CMD,        MODUL_CMD     , ALLOW_NC |ALLOW_RING}
+,{D(jjROWS),       ROWS_CMD,        INT_CMD,        MATRIX_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjROWS_IV),    ROWS_CMD,        INT_CMD,        INTMAT_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjROWS_BIM),   ROWS_CMD,        INT_CMD,        BIGINTMAT_CMD , ALLOW_NC |ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjROWS_BIM),   ROWS_CMD,        INT_CMD,        CMATRIX_CMD , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjROWS_BIM),   ROWS_CMD,        INT_CMD,        CMATRIX_CMD , ALLOW_NC |ALLOW_RING}
 #endif
-,{D(jjCOUNT_IV),   ROWS_CMD,        INT_CMD,        INTVEC_CMD    , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCOUNT_IV),   ROWS_CMD,        INT_CMD,        INTVEC_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjSBA),        SBA_CMD,         IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSBA),        SBA_CMD,         MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjSetRing),    SETRING_CMD,     NONE,           RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjSetRing),    SETRING_CMD,     NONE,           RING_CMD      , ALLOW_NC |ALLOW_RING}
 ,{D(jjSLIM_GB),    SLIM_GB_CMD,     IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |NO_RING}
 ,{D(jjSLIM_GB),    SLIM_GB_CMD,     MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |NO_RING}
-,{D(jjSort_Id),    SORTVEC_CMD,     INTVEC_CMD,     IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjSort_Id),    SORTVEC_CMD,     INTVEC_CMD,     MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjSQR_FREE),   SQR_FREE_CMD,    LIST_CMD,      POLY_CMD      , NO_PLURAL |NO_RING}
+,{D(jjSort_Id),    SORTVEC_CMD,     INTVEC_CMD,     IDEAL_CMD     , ALLOW_NC |ALLOW_RING}
+,{D(jjSort_Id),    SORTVEC_CMD,     INTVEC_CMD,     MODUL_CMD     , ALLOW_NC |ALLOW_RING}
+,{D(jjSQR_FREE),   SQR_FREE_CMD,    LIST_CMD,      POLY_CMD      , NO_NC |NO_RING}
 ,{D(jjSTD),        STD_CMD,         IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSTD),        STD_CMD,         MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDUMMY),      STRING_CMD,      STRING_CMD,     STRING_CMD    , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjDUMMY),      STRING_CMD,      STRING_CMD,     STRING_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjSYZYGY),     SYZYGY_CMD,      MODUL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSYZYGY),     SYZYGY_CMD,      MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 #ifdef HAVE_PLURAL
@@ -258,301 +276,301 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjOPPOSITE),   OPPOSITE_CMD,    RING_CMD,       RING_CMD      , ALLOW_PLURAL |NO_RING}
 ,{D(jjTWOSTD),     TWOSTD_CMD,      IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |NO_RING}
 #endif
-,{  jjWRONG ,      TRACE_CMD,       0,              INTVEC_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{  jjWRONG ,      TRACE_CMD,       0,              IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
+,{  jjWRONG ,      TRACE_CMD,       0,              INTVEC_CMD    , ALLOW_NC |ALLOW_RING}
+,{  jjWRONG ,      TRACE_CMD,       0,              IDEAL_CMD     , ALLOW_NC |ALLOW_RING}
 ,{D(jjTRACE_IV),   TRACE_CMD,       INT_CMD,        INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjmpTrace),    TRACE_CMD,       POLY_CMD,       MATRIX_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjTRANSP_IV),  TRANSPOSE_CMD,   INTMAT_CMD,     INTVEC_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjTRANSP_IV),  TRANSPOSE_CMD,   INTMAT_CMD,     INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjTRANSP_BIM), TRANSPOSE_CMD,   BIGINTMAT_CMD,  BIGINTMAT_CMD , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjTRANSP_IV),  TRANSPOSE_CMD,   INTMAT_CMD,     INTVEC_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjTRANSP_IV),  TRANSPOSE_CMD,   INTMAT_CMD,     INTMAT_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjTRANSP_BIM), TRANSPOSE_CMD,   BIGINTMAT_CMD,  BIGINTMAT_CMD , ALLOW_NC |ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjTRANSP_BIM), TRANSPOSE_CMD,   CMATRIX_CMD,    CMATRIX_CMD ,   ALLOW_PLURAL |ALLOW_RING}
+,{D(jjTRANSP_BIM), TRANSPOSE_CMD,   CMATRIX_CMD,    CMATRIX_CMD ,   ALLOW_NC |ALLOW_RING}
 #endif
-,{D(jjmpTransp),   TRANSPOSE_CMD,   MATRIX_CMD,     MATRIX_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjidTransp),   TRANSPOSE_CMD,   MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjTYPEOF),     TYPEOF_CMD,      STRING_CMD,     ANY_TYPE      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjmpTransp),   TRANSPOSE_CMD,   MATRIX_CMD,     MATRIX_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjidTransp),   TRANSPOSE_CMD,   MODUL_CMD,      MODUL_CMD     , ALLOW_NC |ALLOW_RING}
+,{D(jjTYPEOF),     TYPEOF_CMD,      STRING_CMD,     ANY_TYPE      , ALLOW_NC |ALLOW_RING}
 ,{D(jjUNIVARIATE), UNIVARIATE_CMD,  INT_CMD,        POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjVARIABLES_P),VARIABLES_CMD,   IDEAL_CMD,      POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjVARIABLES_ID),VARIABLES_CMD,  IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjVARIABLES_ID),VARIABLES_CMD,  IDEAL_CMD,      MATRIX_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDUMMY),      VECTOR_CMD,      VECTOR_CMD,     VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjDUMMY),      VECTOR_CMD,      VECTOR_CMD,     VECTOR_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjVDIM),       VDIM_CMD,        INT_CMD,        IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING |WARN_RING} /*ring-cf: warning at top level*/
 ,{D(jjVDIM),       VDIM_CMD,        INT_CMD,        MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING |WARN_RING} /*ring-cf: warning at top level*/
-,{D(jjVAR1),       VAR_CMD,         POLY_CMD,       INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjVARSTR1),    VARSTR_CMD,      STRING_CMD,     INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjrVarStr),    VARSTR_CMD,      STRING_CMD,     RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjVAR1),       VAR_CMD,         POLY_CMD,       INT_CMD       , ALLOW_NC |ALLOW_RING}
+,{D(jjVARSTR1),    VARSTR_CMD,      STRING_CMD,     INT_CMD       , ALLOW_NC |ALLOW_RING}
+,{D(jjrVarStr),    VARSTR_CMD,      STRING_CMD,     RING_CMD      , ALLOW_NC |ALLOW_RING}
 ,{D(kWeight),      WEIGHT_CMD,      INTVEC_CMD,     IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(kWeight),      WEIGHT_CMD,      INTVEC_CMD,     MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjLOAD1),      LOAD_CMD,        NONE,           STRING_CMD    , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjLOAD1),      LOAD_CMD,        NONE,           STRING_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(loNewtonP),    NEWTONPOLY_CMD,  IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjWAIT1ST1),   WAIT1ST_CMD,     INT_CMD,        LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjWAITALL1),   WAITALL_CMD,     INT_CMD,        LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{NULL_VAL,        0,               0,              0             , NO_PLURAL |NO_RING}
+,{D(jjWAIT1ST1),   WAIT1ST_CMD,     INT_CMD,        LIST_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjWAITALL1),   WAITALL_CMD,     INT_CMD,        LIST_CMD      , ALLOW_NC |ALLOW_RING}
+,{NULL_VAL,        0,               0,              0             , NO_NC |NO_RING}
 };
 /*=================== operations with 2 arg.: table =================*/
 const struct sValCmd2 dArith2[]=
 {
 // operations:
 // proc           cmd              res             arg1        arg2   context
- {D(jjCOLCOL),    COLONCOLON,     ANY_TYPE,       DEF_CMD,    DEF_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_I),    '+',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_BI),   '+',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_N),    '+',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_B),    '+',            BUCKET_CMD,     POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_V),    '+',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_ID),   '+',            IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_ID),   '+',            MODUL_CMD,      MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_P_MA), '+',            MATRIX_CMD,     POLY_CMD,   MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_MA_P), '+',            MATRIX_CMD,     MATRIX_CMD, POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_MA),   '+',            MATRIX_CMD,     MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_S),    '+',            STRING_CMD,     STRING_CMD, STRING_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_BIM),  '+',            BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_BIM_I),  '+',            BIGINTMAT_CMD,  BIGINTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_I_BIM),  '+',            BIGINTMAT_CMD,  INT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_BIM_BI),  '+',           BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_BI_BIM),  '+',           BIGINTMAT_CMD,  BIGINT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_IV_I),   '+',            INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_I_IV),   '+',            INTVEC_CMD,     INT_CMD,    INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_IM_I),   '+',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_I_IM),   '+',            INTMAT_CMD,     INT_CMD,    INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_IV),   '+',            INTVEC_CMD,     INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_IV),   '+',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
+ {D(jjCOLCOL),    COLONCOLON,     ANY_TYPE,       DEF_CMD,    DEF_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPLUS_I),    '+',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPLUS_BI),   '+',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPLUS_N),    '+',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPLUS_B),    '+',            BUCKET_CMD,     POLY_CMD,   POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPLUS_V),    '+',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPLUS_ID),   '+',            IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPLUS_ID),   '+',            MODUL_CMD,      MODUL_CMD,  MODUL_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPLUS_P_MA), '+',            MATRIX_CMD,     POLY_CMD,   MATRIX_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPLUS_MA_P), '+',            MATRIX_CMD,     MATRIX_CMD, POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPLUS_MA),   '+',            MATRIX_CMD,     MATRIX_CMD, MATRIX_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPLUS_S),    '+',            STRING_CMD,     STRING_CMD, STRING_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPLUS_BIM),  '+',            BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_BIM_I),  '+',            BIGINTMAT_CMD,  BIGINTMAT_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_I_BIM),  '+',            BIGINTMAT_CMD,  INT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_BIM_BI),  '+',           BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_BI_BIM),  '+',           BIGINTMAT_CMD,  BIGINT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_IV_I),   '+',            INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_I_IV),   '+',            INTVEC_CMD,     INT_CMD,    INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_IM_I),   '+',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_I_IM),   '+',            INTMAT_CMD,     INT_CMD,    INTMAT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPLUS_IV),   '+',            INTVEC_CMD,     INTVEC_CMD, INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPLUS_IV),   '+',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD, ALLOW_NC | ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjNUMBER2_OP2),'+',           CNUMBER_CMD,    CNUMBER_CMD,CNUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjNUMBER2_OP2),'+',           CNUMBER_CMD,    DEF_CMD,    CNUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjNUMBER2_OP2),'+',           CNUMBER_CMD,    CNUMBER_CMD,DEF_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPOLY2_OP2), '+',            CPOLY_CMD,      CPOLY_CMD,  DEF_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPOLY2_OP2), '+',            CPOLY_CMD,      DEF_CMD,    CPOLY_CMD,  ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_BIM),  '+',            CMATRIX_CMD,    CMATRIX_CMD, CMATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'+',           CNUMBER_CMD,    CNUMBER_CMD,CNUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'+',           CNUMBER_CMD,    DEF_CMD,    CNUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'+',           CNUMBER_CMD,    CNUMBER_CMD,DEF_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPOLY2_OP2), '+',            CPOLY_CMD,      CPOLY_CMD,  DEF_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPOLY2_OP2), '+',            CPOLY_CMD,      DEF_CMD,    CPOLY_CMD,  ALLOW_NC | ALLOW_RING}
+,{D(jjPLUS_BIM),  '+',            CMATRIX_CMD,    CMATRIX_CMD, CMATRIX_CMD, ALLOW_NC | ALLOW_RING}
 #endif
-,{D(lAdd),        '+',            LIST_CMD,       LIST_CMD,   LIST_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjRSUM),      '+',            RING_CMD,       RING_CMD,   RING_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_B_P),    '+',          BUCKET_CMD,     BUCKET_CMD, POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMINUS_I),   '-',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMINUS_BI),  '-',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMINUS_N),   '-',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMINUS_B),   '-',            BUCKET_CMD,     POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMINUS_V),   '-',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMINUS_V),   '-',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPLUS_MA_P), '-',            MATRIX_CMD,     MATRIX_CMD, POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMINUS_MA),  '-',            MATRIX_CMD,     MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMINUS_BIM), '-',            BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_BIM_I),  '-',            BIGINTMAT_CMD,  BIGINTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_I_BIM),  '-',            BIGINTMAT_CMD,  INT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_BIM_BI),  '-',           BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_BI_BIM),  '-',           BIGINTMAT_CMD,  BIGINT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_IV_I),   '-',            INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_IM_I),   '-',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMINUS_IV),  '-',            INTVEC_CMD,     INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMINUS_IV),  '-',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(lAdd),        '+',            LIST_CMD,       LIST_CMD,   LIST_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjRSUM),      '+',            RING_CMD,       RING_CMD,   RING_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPLUS_B_P),    '+',          BUCKET_CMD,     BUCKET_CMD, POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjMINUS_I),   '-',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjMINUS_BI),  '-',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjMINUS_N),   '-',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjMINUS_B),   '-',            BUCKET_CMD,     POLY_CMD,   POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjMINUS_V),   '-',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjMINUS_V),   '-',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPLUS_MA_P), '-',            MATRIX_CMD,     MATRIX_CMD, POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjMINUS_MA),  '-',            MATRIX_CMD,     MATRIX_CMD, MATRIX_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjMINUS_BIM), '-',            BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_BIM_I),  '-',            BIGINTMAT_CMD,  BIGINTMAT_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_I_BIM),  '-',            BIGINTMAT_CMD,  INT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_BIM_BI),  '-',           BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_BI_BIM),  '-',           BIGINTMAT_CMD,  BIGINT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_IV_I),   '-',            INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_IM_I),   '-',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjMINUS_IV),  '-',            INTVEC_CMD,     INTVEC_CMD, INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjMINUS_IV),  '-',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD, ALLOW_NC | ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjNUMBER2_OP2),'-',           CNUMBER_CMD,    CNUMBER_CMD,CNUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjNUMBER2_OP2),'-',           CNUMBER_CMD,    INT_CMD,    CNUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjNUMBER2_OP2),'-',           CNUMBER_CMD,    CNUMBER_CMD,INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjNUMBER2_OP2),'-',           CNUMBER_CMD,    BIGINT_CMD, CNUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjNUMBER2_OP2),'-',           CNUMBER_CMD,    CNUMBER_CMD,BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPOLY2_OP2), '-',            CPOLY_CMD,      CPOLY_CMD,  CPOLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPOLY2_OP2), '-',            CPOLY_CMD,      CPOLY_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPOLY2_OP2), '-',            CPOLY_CMD,      INT_CMD,    CPOLY_CMD,  ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMINUS_BIM), '-',            CMATRIX_CMD,    CMATRIX_CMD,CMATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'-',           CNUMBER_CMD,    CNUMBER_CMD,CNUMBER_CMD, ALLOW_NALLOW_NC | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'-',           CNUMBER_CMD,    INT_CMD,    CNUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'-',           CNUMBER_CMD,    CNUMBER_CMD,INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'-',           CNUMBER_CMD,    BIGINT_CMD, CNUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'-',           CNUMBER_CMD,    CNUMBER_CMD,BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPOLY2_OP2), '-',            CPOLY_CMD,      CPOLY_CMD,  CPOLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPOLY2_OP2), '-',            CPOLY_CMD,      CPOLY_CMD,  INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPOLY2_OP2), '-',            CPOLY_CMD,      INT_CMD,    CPOLY_CMD,  ALLOW_NC | ALLOW_RING}
+,{D(jjMINUS_BIM), '-',            CMATRIX_CMD,    CMATRIX_CMD,CMATRIX_CMD, ALLOW_NC | ALLOW_RING}
 #endif
-,{D(jjMINUS_B_P), '-',            BUCKET_CMD,     BUCKET_CMD, POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{  jjWRONG2 ,    '-',            NONE,           IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{  jjWRONG2 ,    '-',            NONE,           MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_I),   '*',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_BI),  '*',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_N),   '*',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_P),   '*',            POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_P),   '*',            VECTOR_CMD,     POLY_CMD,   VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_P),   '*',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_MA_P1),'*',           IDEAL_CMD,      IDEAL_CMD,  POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_MA_P2),'*',           IDEAL_CMD,      POLY_CMD,   IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_MA_P1),'*',           MODUL_CMD,      MODUL_CMD,  POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_MA_P2),'*',           MODUL_CMD,      POLY_CMD,   MODUL_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_ID),  '*',            IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_MA_P1),'*',           MODUL_CMD,      IDEAL_CMD,  VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_MA_P2),'*',           MODUL_CMD,      VECTOR_CMD, IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_ID),  '*',            MODUL_CMD,      IDEAL_CMD,  MODUL_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_ID),  '*',            MODUL_CMD,      MODUL_CMD,  IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_MA_P1),'*',           MATRIX_CMD,     MATRIX_CMD, POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_MA_P2),'*',           MATRIX_CMD,     POLY_CMD,   MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_MA_N1),'*',           MATRIX_CMD,     MATRIX_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_MA_N2),'*',           MATRIX_CMD,     NUMBER_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_MA_I1),'*',           MATRIX_CMD,     MATRIX_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_MA_I2),'*',           MATRIX_CMD,     INT_CMD,    MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_MA),  '*',            MATRIX_CMD,     MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_MA_BI1),'*',          MATRIX_CMD,     MATRIX_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_MA_BI2),'*',          MATRIX_CMD,     BIGINT_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_BIM), '*',            BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_BIM_I),  '*',            BIGINTMAT_CMD,  BIGINTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_I_BIM),  '*',            BIGINTMAT_CMD,  INT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjMINUS_B_P), '-',            BUCKET_CMD,     BUCKET_CMD, POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{  jjWRONG2 ,    '-',            NONE,           IDEAL_CMD,  IDEAL_CMD, ALLOW_NC | ALLOW_RING}
+,{  jjWRONG2 ,    '-',            NONE,           MODUL_CMD,  MODUL_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_I),   '*',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_BI),  '*',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_N),   '*',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_P),   '*',            POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_P),   '*',            VECTOR_CMD,     POLY_CMD,   VECTOR_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_P),   '*',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_MA_P1),'*',           IDEAL_CMD,      IDEAL_CMD,  POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_MA_P2),'*',           IDEAL_CMD,      POLY_CMD,   IDEAL_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_MA_P1),'*',           MODUL_CMD,      MODUL_CMD,  POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_MA_P2),'*',           MODUL_CMD,      POLY_CMD,   MODUL_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_ID),  '*',            IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_MA_P1),'*',           MODUL_CMD,      IDEAL_CMD,  VECTOR_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_MA_P2),'*',           MODUL_CMD,      VECTOR_CMD, IDEAL_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_ID),  '*',            MODUL_CMD,      IDEAL_CMD,  MODUL_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_ID),  '*',            MODUL_CMD,      MODUL_CMD,  IDEAL_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_MA_P1),'*',           MATRIX_CMD,     MATRIX_CMD, POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_MA_P2),'*',           MATRIX_CMD,     POLY_CMD,   MATRIX_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_MA_N1),'*',           MATRIX_CMD,     MATRIX_CMD, NUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_MA_N2),'*',           MATRIX_CMD,     NUMBER_CMD, MATRIX_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_MA_I1),'*',           MATRIX_CMD,     MATRIX_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_MA_I2),'*',           MATRIX_CMD,     INT_CMD,    MATRIX_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_MA),  '*',            MATRIX_CMD,     MATRIX_CMD, MATRIX_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_MA_BI1),'*',          MATRIX_CMD,     MATRIX_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_MA_BI2),'*',          MATRIX_CMD,     BIGINT_CMD, MATRIX_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_BIM), '*',            BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_BIM_I),  '*',            BIGINTMAT_CMD,  BIGINTMAT_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_I_BIM),  '*',            BIGINTMAT_CMD,  INT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjOP_BIM_BI),  '*',           BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_BI_BIM),  '*',           BIGINTMAT_CMD,  BIGINT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_IV_I),   '*',            INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_I_IV),   '*',            INTVEC_CMD,     INT_CMD,    INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_IV_I),   '*',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_I_IV),   '*',            INTMAT_CMD,     INT_CMD,    INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_IV),  '*',            INTVEC_CMD,     INTMAT_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_IV),  '*',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_IV),  '*',            INTMAT_CMD,     INTVEC_CMD, INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjOP_BI_BIM),  '*',           BIGINTMAT_CMD,  BIGINT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_IV_I),   '*',            INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_I_IV),   '*',            INTVEC_CMD,     INT_CMD,    INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_IV_I),   '*',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_I_IV),   '*',            INTMAT_CMD,     INT_CMD,    INTMAT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_IV),  '*',            INTVEC_CMD,     INTMAT_CMD, INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_IV),  '*',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_IV),  '*',            INTMAT_CMD,     INTVEC_CMD, INTMAT_CMD, ALLOW_NC | ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjNUMBER2_OP2),'*',           CNUMBER_CMD,    CNUMBER_CMD,CNUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjNUMBER2_OP2),'*',           CNUMBER_CMD,    INT_CMD,    CNUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjNUMBER2_OP2),'*',           CNUMBER_CMD,    CNUMBER_CMD,INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjNUMBER2_OP2),'*',           CNUMBER_CMD,    BIGINT_CMD, CNUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjNUMBER2_OP2),'*',           CNUMBER_CMD,    CNUMBER_CMD,BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPOLY2_OP2), '*',            CPOLY_CMD,      CPOLY_CMD,  CPOLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPOLY2_OP2), '*',            CPOLY_CMD,      CPOLY_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPOLY2_OP2), '*',            CPOLY_CMD,      INT_CMD,    CPOLY_CMD,  ALLOW_PLURAL | ALLOW_RING}
-,{D(jjTIMES_BIM), '*',            CMATRIX_CMD,    CMATRIX_CMD, CMATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'*',           CNUMBER_CMD,    CNUMBER_CMD,CNUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'*',           CNUMBER_CMD,    INT_CMD,    CNUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'*',           CNUMBER_CMD,    CNUMBER_CMD,INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'*',           CNUMBER_CMD,    BIGINT_CMD, CNUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'*',           CNUMBER_CMD,    CNUMBER_CMD,BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPOLY2_OP2), '*',            CPOLY_CMD,      CPOLY_CMD,  CPOLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPOLY2_OP2), '*',            CPOLY_CMD,      CPOLY_CMD,  INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPOLY2_OP2), '*',            CPOLY_CMD,      INT_CMD,    CPOLY_CMD,  ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_BIM), '*',            CMATRIX_CMD,    CMATRIX_CMD, CMATRIX_CMD, ALLOW_NC | ALLOW_RING}
 #endif
-,{D(jjDIV_N),     '/',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjDIV_P),     '/',            POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjDIV_N),     '/',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjDIV_P),     '/',            POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_NC | ALLOW_RING} /* ! letterplace? */
 ,{D(jjDIV_P),     '/',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjDIV_Ma),    '/',            MATRIX_CMD,     MATRIX_CMD, POLY_CMD, ALLOW_PLURAL | NO_RING}
-,{D(jjDIVMOD_I),  '/',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjDIV_BI),    '/',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_IV_I),   '/',            INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_IV_I),   '/',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjDIVMOD_I),  '/',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjDIV_BI),    '/',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_IV_I),   '/',            INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_IV_I),   '/',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjCRING_Zp),  '/',            CRING_CMD,      CRING_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCRING_Zm),  '/',            CRING_CMD,      CRING_CMD,  BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjNUMBER2_OP2),'/',           CNUMBER_CMD,    CNUMBER_CMD,CNUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjNUMBER2_OP2),'/',           CNUMBER_CMD,    INT_CMD,    CNUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjNUMBER2_OP2),'/',           CNUMBER_CMD,    CNUMBER_CMD,INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjNUMBER2_OP2),'/',           CNUMBER_CMD,    BIGINT_CMD, CNUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjNUMBER2_OP2),'/',           CNUMBER_CMD,    CNUMBER_CMD,BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'/',           CNUMBER_CMD,    CNUMBER_CMD,CNUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'/',           CNUMBER_CMD,    INT_CMD,    CNUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'/',           CNUMBER_CMD,    CNUMBER_CMD,INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'/',           CNUMBER_CMD,    BIGINT_CMD, CNUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'/',           CNUMBER_CMD,    CNUMBER_CMD,BIGINT_CMD, ALLOW_NC | ALLOW_RING}
 #endif
-,{D(jjDIVMOD_I),  INTDIV_CMD,     INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjDIV_BI),    INTDIV_CMD,     BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_IV_I),   INTDIV_CMD,     INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_IV_I),   INTDIV_CMD,     INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjDIVMOD_I),  INTDIV_CMD,     INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjDIV_BI),    INTDIV_CMD,     BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_IV_I),   INTDIV_CMD,     INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_IV_I),   INTDIV_CMD,     INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjDIV_P),     INTDIV_CMD,     POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjDIV_P),     INTDIV_CMD,     VECTOR_CMD,     VECTOR_CMD, POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjDIVMOD_I),  '%',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMOD_BI),    '%',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_IV_I),   '%',            INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_IV_I),   '%',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMOD_N),     '%',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMOD_P),     '%',            POLY_CMD,       POLY_CMD,   POLY_CMD, NO_PLURAL | NO_RING}
+,{D(jjDIVMOD_I),  '%',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjMOD_BI),    '%',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_IV_I),   '%',            INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_IV_I),   '%',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjMOD_N),     '%',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjMOD_P),     '%',            POLY_CMD,       POLY_CMD,   POLY_CMD, NO_NC | NO_RING}
 #ifdef SINGULAR_4_2
-,{D(jjNUMBER2_OP2),'%',           CNUMBER_CMD,    CNUMBER_CMD,CNUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjNUMBER2_OP2),'%',           CNUMBER_CMD,    INT_CMD,    CNUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjNUMBER2_OP2),'%',           CNUMBER_CMD,    CNUMBER_CMD,INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjNUMBER2_OP2),'%',           CNUMBER_CMD,    BIGINT_CMD, CNUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjNUMBER2_OP2),'%',           CNUMBER_CMD,    CNUMBER_CMD,BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'%',           CNUMBER_CMD,    CNUMBER_CMD,CNUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'%',           CNUMBER_CMD,    INT_CMD,    CNUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'%',           CNUMBER_CMD,    CNUMBER_CMD,INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'%',           CNUMBER_CMD,    BIGINT_CMD, CNUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjNUMBER2_OP2),'%',           CNUMBER_CMD,    CNUMBER_CMD,BIGINT_CMD, ALLOW_NC | ALLOW_RING}
 #endif
-,{D(jjPOWER_I),   '^',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPOWER_BI),   '^',           BIGINT_CMD,     BIGINT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPOWER_N),   '^',            NUMBER_CMD,     NUMBER_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPOWER_P),   '^',            POLY_CMD,       POLY_CMD,   INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPOWER_ID),  '^',            IDEAL_CMD,      IDEAL_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjPOWER_I),   '^',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPOWER_BI),   '^',           BIGINT_CMD,     BIGINT_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPOWER_N),   '^',            NUMBER_CMD,     NUMBER_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPOWER_P),   '^',            POLY_CMD,       POLY_CMD,   INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPOWER_ID),  '^',            IDEAL_CMD,      IDEAL_CMD,  INT_CMD, ALLOW_NC | ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjNUMBER2_POW),'^',           CNUMBER_CMD,    CNUMBER_CMD,INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPOLY2_POW), '^',            CPOLY_CMD,      CPOLY_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjNUMBER2_POW),'^',           CNUMBER_CMD,    CNUMBER_CMD,INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPOLY2_POW), '^',            CPOLY_CMD,      CPOLY_CMD,  INT_CMD, ALLOW_NC | ALLOW_RING}
 #endif
-,{D(jjLE_I),      LE,             INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjLE_BI),     LE,             INT_CMD,        BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjLE_N),      LE,             INT_CMD,        NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_S), LE,             INT_CMD,        STRING_CMD, STRING_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_IV_I),LE,           INT_CMD,        INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_IV),LE,             INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_P), LE,             INT_CMD,        POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_P), LE,             INT_CMD,        VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_MA),LE,             INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING | NO_CONVERSION }
-,{D(jjLT_I),      '<',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjLT_BI),     '<',            INT_CMD,        BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjLT_N),      '<',            INT_CMD,        NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_IV_I),'<',          INT_CMD,        INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_IV),'<',            INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_S), '<',            INT_CMD,        STRING_CMD, STRING_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_P), '<',            INT_CMD,        POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_P), '<',            INT_CMD,        VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_MA),'<',            INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING | NO_CONVERSION }
-,{D(jjGE_I),      GE,             INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjGE_BI),     GE,             INT_CMD,        BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjGE_N),      GE,             INT_CMD,        NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_S), GE,             INT_CMD,        STRING_CMD, STRING_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_IV_I),GE,           INT_CMD,        INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_IV),GE,             INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_P), GE,             INT_CMD,        POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_P), GE,             INT_CMD,        VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_MA),GE,             INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING | NO_CONVERSION }
-,{D(jjGT_I),      '>',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjGT_BI),     '>',            INT_CMD,        BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjGT_N),      '>',            INT_CMD,        NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_S), '>',            INT_CMD,        STRING_CMD, STRING_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_IV_I),'>',          INT_CMD,        INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_IV),'>',            INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_P), '>',            INT_CMD,        POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_P), '>',            INT_CMD,        VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_MA),'>',            INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING | NO_CONVERSION }
-,{D(jjAND_I),     '&',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOR_I),      '|',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjEQUAL_I),   EQUAL_EQUAL,    INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjEQUAL_I),   EQUAL_EQUAL,    INT_CMD,        RING_CMD,   INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjEQUAL_I),   EQUAL_EQUAL,    INT_CMD,        RING_CMD,   RING_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjEQUAL_BI),  EQUAL_EQUAL,    INT_CMD,        BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjEQUAL_N),   EQUAL_EQUAL,    INT_CMD,        NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_S), EQUAL_EQUAL,    INT_CMD,        STRING_CMD, STRING_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjEQUAL_P),   EQUAL_EQUAL,    INT_CMD,        POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjEQUAL_P),   EQUAL_EQUAL,    INT_CMD,        VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_IV_I),EQUAL_EQUAL,  INT_CMD,        INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_IV),EQUAL_EQUAL,    INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_IV),EQUAL_EQUAL,    INT_CMD,        INTMAT_CMD, INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_BIM),EQUAL_EQUAL,   INT_CMD,        BIGINTMAT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjLE_I),      LE,             INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjLE_BI),     LE,             INT_CMD,        BIGINT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjLE_N),      LE,             INT_CMD,        NUMBER_CMD, NUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_S), LE,             INT_CMD,        STRING_CMD, STRING_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_IV_I),LE,           INT_CMD,        INTVEC_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_IV),LE,             INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_P), LE,             INT_CMD,        POLY_CMD,   POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_P), LE,             INT_CMD,        VECTOR_CMD, VECTOR_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_MA),LE,             INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_NC | ALLOW_RING | NO_CONVERSION }
+,{D(jjLT_I),      '<',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjLT_BI),     '<',            INT_CMD,        BIGINT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjLT_N),      '<',            INT_CMD,        NUMBER_CMD, NUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_IV_I),'<',          INT_CMD,        INTVEC_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_IV),'<',            INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_S), '<',            INT_CMD,        STRING_CMD, STRING_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_P), '<',            INT_CMD,        POLY_CMD,   POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_P), '<',            INT_CMD,        VECTOR_CMD, VECTOR_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_MA),'<',            INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_NC | ALLOW_RING | NO_CONVERSION }
+,{D(jjGE_I),      GE,             INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjGE_BI),     GE,             INT_CMD,        BIGINT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjGE_N),      GE,             INT_CMD,        NUMBER_CMD, NUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_S), GE,             INT_CMD,        STRING_CMD, STRING_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_IV_I),GE,           INT_CMD,        INTVEC_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_IV),GE,             INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_P), GE,             INT_CMD,        POLY_CMD,   POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_P), GE,             INT_CMD,        VECTOR_CMD, VECTOR_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_MA),GE,             INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_NC | ALLOW_RING | NO_CONVERSION }
+,{D(jjGT_I),      '>',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjGT_BI),     '>',            INT_CMD,        BIGINT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjGT_N),      '>',            INT_CMD,        NUMBER_CMD, NUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_S), '>',            INT_CMD,        STRING_CMD, STRING_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_IV_I),'>',          INT_CMD,        INTVEC_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_IV),'>',            INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_P), '>',            INT_CMD,        POLY_CMD,   POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_P), '>',            INT_CMD,        VECTOR_CMD, VECTOR_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_MA),'>',            INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_NC | ALLOW_RING | NO_CONVERSION }
+,{D(jjAND_I),     '&',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOR_I),      '|',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjEQUAL_I),   EQUAL_EQUAL,    INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjEQUAL_I),   EQUAL_EQUAL,    INT_CMD,        RING_CMD,   INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjEQUAL_I),   EQUAL_EQUAL,    INT_CMD,        RING_CMD,   RING_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjEQUAL_BI),  EQUAL_EQUAL,    INT_CMD,        BIGINT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjEQUAL_N),   EQUAL_EQUAL,    INT_CMD,        NUMBER_CMD, NUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_S), EQUAL_EQUAL,    INT_CMD,        STRING_CMD, STRING_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjEQUAL_P),   EQUAL_EQUAL,    INT_CMD,        POLY_CMD,   POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjEQUAL_P),   EQUAL_EQUAL,    INT_CMD,        VECTOR_CMD, VECTOR_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_IV_I),EQUAL_EQUAL,  INT_CMD,        INTVEC_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_IV),EQUAL_EQUAL,    INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_IV),EQUAL_EQUAL,    INT_CMD,        INTMAT_CMD, INTMAT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_BIM),EQUAL_EQUAL,   INT_CMD,        BIGINTMAT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjCOMPARE_BIM),EQUAL_EQUAL,   INT_CMD,        CMATRIX_CMD, CMATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjCOMPARE_BIM),EQUAL_EQUAL,   INT_CMD,        CMATRIX_CMD, CMATRIX_CMD, ALLOW_NC | ALLOW_RING}
 #endif
-,{D(jjEQUAL_CR),  EQUAL_EQUAL,    INT_CMD,        CRING_CMD,  CRING_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjEQUAL_Ma),  EQUAL_EQUAL,    INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjEQUAL_R),   EQUAL_EQUAL,    INT_CMD,        RING_CMD,   RING_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{  jjWRONG2 ,    EQUAL_EQUAL,    0,              IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{  jjWRONG2 ,    EQUAL_EQUAL,    0,              MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{  jjWRONG2 ,    EQUAL_EQUAL,    0,              IDEAL_CMD,  MODUL_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{  jjWRONG2 ,    EQUAL_EQUAL,    0,              MODUL_CMD,  IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjEQUAL_I),   NOTEQUAL,       INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjEQUAL_BI),  NOTEQUAL,       INT_CMD,        BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjEQUAL_N),   NOTEQUAL,       INT_CMD,        NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_S), NOTEQUAL,       INT_CMD,        STRING_CMD, STRING_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjEQUAL_P),   NOTEQUAL,       INT_CMD,        POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjEQUAL_P),   NOTEQUAL,       INT_CMD,        VECTOR_CMD, VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_IV),NOTEQUAL,       INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_IV),NOTEQUAL,       INT_CMD,        INTMAT_CMD, INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjEQUAL_Ma),  NOTEQUAL,       INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{  jjWRONG2 ,    NOTEQUAL,       0,              IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{  jjWRONG2 ,    NOTEQUAL,       0,              MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{  jjWRONG2 ,    NOTEQUAL,       0,              IDEAL_CMD,  MODUL_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{  jjWRONG2 ,    NOTEQUAL,       0,              MODUL_CMD,  IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjEQUAL_R),   NOTEQUAL,       INT_CMD,        RING_CMD,   RING_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjDOTDOT),    DOTDOT,         INTVEC_CMD,     INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjINDEX_I),   '[',            INT_CMD,        INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjINDEX_IV),  '[',            INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjINDEX_I),   '[',            POLY_CMD,       IDEAL_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjINDEX_I),   '[',            POLY_CMD,       MAP_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjINDEX_IV),  '[',            POLY_CMD,       IDEAL_CMD,  INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjINDEX_I),   '[',            VECTOR_CMD,     MODUL_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjINDEX_IV),  '[',            VECTOR_CMD,     MODUL_CMD,  INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjINDEX_I),   '[',            STRING_CMD,     STRING_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjINDEX_IV),  '[',            STRING_CMD,     STRING_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjINDEX_I),   '[',            ANY_TYPE/*set by p*/,LIST_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjINDEX_IV),  '[',            ANY_TYPE/*set by p*/,LIST_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjINDEX_P),   '[',            POLY_CMD,       POLY_CMD,   INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjINDEX_PBu), '[',            POLY_CMD,       BUCKET_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjINDEX_P_IV),'[',            POLY_CMD,       POLY_CMD,   INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjINDEX_V),   '[',            POLY_CMD,       VECTOR_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjINDEX_V_IV),'[',            VECTOR_CMD,     VECTOR_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjRING_1),    '[',            RING_CMD,     CRING_CMD, ANY_TYPE, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjPROC),      '(',            ANY_TYPE/*set by p*/,PROC_CMD, DEF_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjEQUAL_CR),  EQUAL_EQUAL,    INT_CMD,        CRING_CMD,  CRING_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjEQUAL_Ma),  EQUAL_EQUAL,    INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjEQUAL_R),   EQUAL_EQUAL,    INT_CMD,        RING_CMD,   RING_CMD, ALLOW_NC | ALLOW_RING}
+,{  jjWRONG2 ,    EQUAL_EQUAL,    0,              IDEAL_CMD,  IDEAL_CMD, ALLOW_NC | ALLOW_RING}
+,{  jjWRONG2 ,    EQUAL_EQUAL,    0,              MODUL_CMD,  MODUL_CMD, ALLOW_NC | ALLOW_RING}
+,{  jjWRONG2 ,    EQUAL_EQUAL,    0,              IDEAL_CMD,  MODUL_CMD, ALLOW_NC | ALLOW_RING}
+,{  jjWRONG2 ,    EQUAL_EQUAL,    0,              MODUL_CMD,  IDEAL_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjEQUAL_I),   NOTEQUAL,       INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjEQUAL_BI),  NOTEQUAL,       INT_CMD,        BIGINT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjEQUAL_N),   NOTEQUAL,       INT_CMD,        NUMBER_CMD, NUMBER_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_S), NOTEQUAL,       INT_CMD,        STRING_CMD, STRING_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjEQUAL_P),   NOTEQUAL,       INT_CMD,        POLY_CMD,   POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjEQUAL_P),   NOTEQUAL,       INT_CMD,        VECTOR_CMD, VECTOR_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_IV),NOTEQUAL,       INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOMPARE_IV),NOTEQUAL,       INT_CMD,        INTMAT_CMD, INTMAT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjEQUAL_Ma),  NOTEQUAL,       INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_NC | ALLOW_RING}
+,{  jjWRONG2 ,    NOTEQUAL,       0,              IDEAL_CMD,  IDEAL_CMD, ALLOW_NC | ALLOW_RING}
+,{  jjWRONG2 ,    NOTEQUAL,       0,              MODUL_CMD,  MODUL_CMD, ALLOW_NC | ALLOW_RING}
+,{  jjWRONG2 ,    NOTEQUAL,       0,              IDEAL_CMD,  MODUL_CMD, ALLOW_NC | ALLOW_RING}
+,{  jjWRONG2 ,    NOTEQUAL,       0,              MODUL_CMD,  IDEAL_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjEQUAL_R),   NOTEQUAL,       INT_CMD,        RING_CMD,   RING_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjDOTDOT),    DOTDOT,         INTVEC_CMD,     INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjINDEX_I),   '[',            INT_CMD,        INTVEC_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjINDEX_IV),  '[',            INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjINDEX_I),   '[',            POLY_CMD,       IDEAL_CMD,  INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjINDEX_I),   '[',            POLY_CMD,       MAP_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjINDEX_IV),  '[',            POLY_CMD,       IDEAL_CMD,  INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjINDEX_I),   '[',            VECTOR_CMD,     MODUL_CMD,  INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjINDEX_IV),  '[',            VECTOR_CMD,     MODUL_CMD,  INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjINDEX_I),   '[',            STRING_CMD,     STRING_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjINDEX_IV),  '[',            STRING_CMD,     STRING_CMD, INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjINDEX_I),   '[',            ANY_TYPE/*set by p*/,LIST_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjINDEX_IV),  '[',            ANY_TYPE/*set by p*/,LIST_CMD, INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjINDEX_P),   '[',            POLY_CMD,       POLY_CMD,   INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjINDEX_PBu), '[',            POLY_CMD,       BUCKET_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjINDEX_P_IV),'[',            POLY_CMD,       POLY_CMD,   INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjINDEX_V),   '[',            POLY_CMD,       VECTOR_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjINDEX_V_IV),'[',            VECTOR_CMD,     VECTOR_CMD, INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjRING_1),    '[',            RING_CMD,     CRING_CMD, ANY_TYPE, ALLOW_NC | ALLOW_RING}
+,{D(jjPROC),      '(',            ANY_TYPE/*set by p*/,PROC_CMD, DEF_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjMAP),       '(',            ANY_TYPE/*set by p*/,MAP_CMD, DEF_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjLOAD2),     '(',            NONE,             LIB_CMD,    STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjKLAMMER),   '(',            ANY_TYPE/*set by p*/,ANY_TYPE, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjKLAMMER_IV),'(',            ANY_TYPE/*set by p*/,ANY_TYPE, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOLON),     ':',            INTVEC_CMD,     INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjLOAD2),     '(',            NONE,             LIB_CMD,    STRING_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjKLAMMER),   '(',            ANY_TYPE/*set by p*/,ANY_TYPE, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjKLAMMER_IV),'(',            ANY_TYPE/*set by p*/,ANY_TYPE, INTVEC_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjCOLON),     ':',            INTVEC_CMD,     INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
 // and the procedures with 2 arguments:
-,{D(jjALIGN_V),   ALIGN_CMD,      VECTOR_CMD,     VECTOR_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjALIGN_M),   ALIGN_CMD,      MODUL_CMD,      MODUL_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(atATTRIB2),   ATTRIB_CMD,     NONE/*set by p*/,DEF_CMD,   STRING_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjALIGN_V),   ALIGN_CMD,      VECTOR_CMD,     VECTOR_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjALIGN_M),   ALIGN_CMD,      MODUL_CMD,      MODUL_CMD,  INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(atATTRIB2),   ATTRIB_CMD,     NONE/*set by p*/,DEF_CMD,   STRING_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjBETTI2),    BETTI_CMD,      INTMAT_CMD,     LIST_CMD,   INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(syBetti2),    BETTI_CMD,      INTMAT_CMD,     RESOLUTION_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjBETTI2_ID), BETTI_CMD,      INTMAT_CMD,     IDEAL_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -562,26 +580,26 @@ const struct sValCmd2 dArith2[]=
 #endif
 ,{D(jjCHINREM_BI),CHINREM_CMD,    BIGINT_CMD,     INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
 //,{D(jjCHINREM_P), CHINREM_CMD,    POLY_CMD,       LIST_CMD,   INTVEC_CMD, ALLOW_PLURAL}
-,{D(jjCHINREM_ID),CHINREM_CMD,    ANY_TYPE/*set by p*/,LIST_CMD,INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCHINREM_ID),CHINREM_CMD,    ANY_TYPE/*set by p*/,LIST_CMD,LIST_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCHINREM_ID),CHINREM_CMD,    ANY_TYPE/*set by p*/,LIST_CMD,INTVEC_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjCHINREM_ID),CHINREM_CMD,    ANY_TYPE/*set by p*/,LIST_CMD,LIST_CMD, ALLOW_NC |ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjNUMBER2CR), CNUMBER_CMD,    CNUMBER_CMD,     INT_CMD,    CRING_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjNUMBER2CR), CNUMBER_CMD,    CNUMBER_CMD,     BIGINT_CMD, CRING_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjNUMBER2CR), CNUMBER_CMD,    CNUMBER_CMD,     NUMBER_CMD, CRING_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjNUMBER2CR), CNUMBER_CMD,    CNUMBER_CMD,     INT_CMD,    CRING_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjNUMBER2CR), CNUMBER_CMD,    CNUMBER_CMD,     BIGINT_CMD, CRING_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjNUMBER2CR), CNUMBER_CMD,    CNUMBER_CMD,     NUMBER_CMD, CRING_CMD, ALLOW_NC |ALLOW_RING}
 #endif
-,{D(jjCOEF),      COEF_CMD,       MATRIX_CMD,     POLY_CMD,   POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCOEFFS_Id), COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCOEFFS_Id), COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCOEFFS2_KB),COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCOEFFS2_KB),COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCOEF),      COEF_CMD,       MATRIX_CMD,     POLY_CMD,   POLY_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjCOEFFS_Id), COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  POLY_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjCOEFFS_Id), COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  POLY_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjCOEFFS2_KB),COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjCOEFFS2_KB),COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  MODUL_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjCONTRACT),  CONTRACT_CMD,   MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDEG_IV),    DEG_CMD,        INT_CMD,        POLY_CMD,   INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDEG_IV),    DEG_CMD,        INT_CMD,        VECTOR_CMD, INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDEG_M_IV),  DEG_CMD,        INT_CMD,        MATRIX_CMD, INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDelete_IV), DELETE_CMD,     INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDelete_ID), DELETE_CMD,     IDEAL_CMD,      IDEAL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDelete_ID), DELETE_CMD,     MODUL_CMD,      MODUL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(lDelete),     DELETE_CMD,     LIST_CMD,       LIST_CMD,   INT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjDEG_IV),    DEG_CMD,        INT_CMD,        POLY_CMD,   INTVEC_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjDEG_IV),    DEG_CMD,        INT_CMD,        VECTOR_CMD, INTVEC_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjDEG_M_IV),  DEG_CMD,        INT_CMD,        MATRIX_CMD, INTVEC_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjDelete_IV), DELETE_CMD,     INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjDelete_ID), DELETE_CMD,     IDEAL_CMD,      IDEAL_CMD,  INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjDelete_ID), DELETE_CMD,     MODUL_CMD,      MODUL_CMD,  INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(lDelete),     DELETE_CMD,     LIST_CMD,       LIST_CMD,   INT_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjDIFF_P),    DIFF_CMD,       POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDIFF_P),    DIFF_CMD,       VECTOR_CMD,     VECTOR_CMD, POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDIFF_ID),   DIFF_CMD,       IDEAL_CMD,      IDEAL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -597,28 +615,28 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjELIMIN),    ELIMINATION_CMD,MODUL_CMD,      MODUL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjELIMIN_IV), ELIMINATION_CMD,IDEAL_CMD,      IDEAL_CMD,  INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjELIMIN_IV), ELIMINATION_CMD,MODUL_CMD,      MODUL_CMD,  INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjEXPORTTO),  EXPORTTO_CMD,   NONE,           PACKAGE_CMD, IDHDL, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjEXPORTTO),  EXPORTTO_CMD,   NONE,           PACKAGE_CMD, IDHDL, ALLOW_NC |ALLOW_RING}
 ,{D(jjEXTGCD_I),  EXTGCD_CMD,     LIST_CMD,       INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjEXTGCD_BI), EXTGCD_CMD,     LIST_CMD,       BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjEXTGCD_P),  EXTGCD_CMD,     LIST_CMD,       POLY_CMD,   POLY_CMD, NO_PLURAL |NO_RING}
-,{D(jjFAC_P2),    FAC_CMD,        IDEAL_CMD,      POLY_CMD,   INT_CMD, NO_PLURAL |NO_RING}
-,{D(jjFACSTD2),   FACSTD_CMD,     LIST_CMD,       IDEAL_CMD,  IDEAL_CMD, NO_PLURAL |NO_RING}
+,{D(jjEXTGCD_P),  EXTGCD_CMD,     LIST_CMD,       POLY_CMD,   POLY_CMD, NO_NC |NO_RING}
+,{D(jjFAC_P2),    FAC_CMD,        IDEAL_CMD,      POLY_CMD,   INT_CMD, NO_NC |NO_RING}
+,{D(jjFACSTD2),   FACSTD_CMD,     LIST_CMD,       IDEAL_CMD,  IDEAL_CMD, NO_NC |NO_RING}
 ,{D(jjFAREY_BI),  FAREY_CMD,      NUMBER_CMD,     BIGINT_CMD,  BIGINT_CMD, ALLOW_PLURAL |NO_RING}
 ,{D(jjFAREY_ID),  FAREY_CMD,      IDEAL_CMD,      IDEAL_CMD,   BIGINT_CMD, ALLOW_PLURAL |NO_RING}
 ,{D(jjFAREY_ID),  FAREY_CMD,      MODUL_CMD,      MODUL_CMD,   BIGINT_CMD, ALLOW_PLURAL |NO_RING}
 ,{D(jjFAREY_ID),  FAREY_CMD,      MATRIX_CMD,     MATRIX_CMD,  BIGINT_CMD, ALLOW_PLURAL |NO_RING}
 ,{D(jjFAREY_LI),  FAREY_CMD,      LIST_CMD,       LIST_CMD,    BIGINT_CMD, ALLOW_PLURAL |NO_RING}
 ,{D(jjFETCH),     FETCH_CMD,      ANY_TYPE/*set by p*/,RING_CMD,  ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
-,{D(fglmProc),    FGLM_CMD,       IDEAL_CMD,      RING_CMD,   DEF_CMD, NO_PLURAL |NO_RING}
-,{D(fglmQuotProc),FGLMQUOT_CMD,   IDEAL_CMD,      IDEAL_CMD,  POLY_CMD, NO_PLURAL |NO_RING}
-,{D(jjFIND2),     FIND_CMD,       INT_CMD,        STRING_CMD, STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjFRES),      FRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD, NO_PLURAL |NO_RING}
-,{D(jjFRES),      FRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD, NO_PLURAL |NO_RING}
-,{D(jjFWALK),     FWALK_CMD,      IDEAL_CMD,      RING_CMD,   DEF_CMD, NO_PLURAL |NO_RING}
+,{D(fglmProc),    FGLM_CMD,       IDEAL_CMD,      RING_CMD,   DEF_CMD, NO_NC |NO_RING}
+,{D(fglmQuotProc),FGLMQUOT_CMD,   IDEAL_CMD,      IDEAL_CMD,  POLY_CMD, NO_NC |NO_RING}
+,{D(jjFIND2),     FIND_CMD,       INT_CMD,        STRING_CMD, STRING_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjFRES),      FRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD, NO_NC |NO_RING}
+,{D(jjFRES),      FRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD, NO_NC |NO_RING}
+,{D(jjFWALK),     FWALK_CMD,      IDEAL_CMD,      RING_CMD,   DEF_CMD, NO_NC |NO_RING}
 ,{D(jjGCD_I),     GCD_CMD,        INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjGCD_N),     GCD_CMD,        NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjGCD_BI),    GCD_CMD,        BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjGCD_P),     GCD_CMD,        POLY_CMD,       POLY_CMD,   POLY_CMD, NO_PLURAL |ALLOW_RING}
+,{D(jjGCD_P),     GCD_CMD,        POLY_CMD,       POLY_CMD,   POLY_CMD, NO_NC |ALLOW_RING}
 ,{D(jjHILBERT2),  HILBERT_CMD,    INTVEC_CMD,     IDEAL_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING | NO_ZERODIVISOR}
 ,{D(jjHILBERT2),  HILBERT_CMD,    INTVEC_CMD,     MODUL_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING | NO_ZERODIVISOR}
 ,{D(jjHOMOG1_W),  HOMOG_CMD,      INT_CMD,        IDEAL_CMD,  INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -627,12 +645,12 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjHOMOG_P),   HOMOG_CMD,      VECTOR_CMD,     VECTOR_CMD, POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjHOMOG_ID),  HOMOG_CMD,      IDEAL_CMD,      IDEAL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjHOMOG_ID),  HOMOG_CMD,      MODUL_CMD,      MODUL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjRES),       HRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD, NO_PLURAL |NO_RING}
-,{D(jjFETCH),     IMAP_CMD,       ANY_TYPE/*set by p*/,RING_CMD,  ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjIMPORTFROM),IMPORTFROM_CMD, NONE,           PACKAGE_CMD, ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjINDEPSET2), INDEPSET_CMD,   LIST_CMD,       IDEAL_CMD,  INT_CMD, NO_PLURAL |NO_RING}
-,{D(lInsert),     INSERT_CMD,     LIST_CMD,       LIST_CMD,   DEF_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjINTERPOLATION),INTERPOLATE_CMD,IDEAL_CMD,   LIST_CMD,   INTVEC_CMD, NO_PLURAL |NO_RING}
+,{D(jjRES),       HRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD, NO_NC |NO_RING}
+,{D(jjFETCH),     IMAP_CMD,       ANY_TYPE/*set by p*/,RING_CMD,  ANY_TYPE, ALLOW_NC |ALLOW_RING}
+,{D(jjIMPORTFROM),IMPORTFROM_CMD, NONE,           PACKAGE_CMD, ANY_TYPE, ALLOW_NC |ALLOW_RING}
+,{D(jjINDEPSET2), INDEPSET_CMD,   LIST_CMD,       IDEAL_CMD,  INT_CMD, NO_NC |NO_RING}
+,{D(lInsert),     INSERT_CMD,     LIST_CMD,       LIST_CMD,   DEF_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjINTERPOLATION),INTERPOLATE_CMD,IDEAL_CMD,   LIST_CMD,   INTVEC_CMD, NO_NC |NO_RING}
 ,{D(jjINTERSECT), INTERSECT_CMD,  IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjINTERSECT), INTERSECT_CMD,  MODUL_CMD,      MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjJanetBasis2), JANET_CMD,    IDEAL_CMD,      IDEAL_CMD,  INT_CMD, ALLOW_PLURAL |NO_RING}
@@ -644,53 +662,53 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjKBASE2),    KBASE_CMD,      IDEAL_CMD,      IDEAL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING |WARN_RING} /*ring-cf: warning at top level*/
 ,{D(jjKBASE2),    KBASE_CMD,      MODUL_CMD,      MODUL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING |WARN_RING} /*ring-cf: warning at top level*/
 ,{D(jjKERNEL),    KERNEL_CMD,     IDEAL_CMD, RING_CMD,        ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
-,{D(atKILLATTR2), KILLATTR_CMD,   NONE,           IDHDL,      STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjKoszul),    KOSZUL_CMD,     MATRIX_CMD,     INT_CMD,    INT_CMD, NO_PLURAL |ALLOW_RING}
-,{D(jjKoszul_Id), KOSZUL_CMD,     MATRIX_CMD,     INT_CMD,    IDEAL_CMD, NO_PLURAL |ALLOW_RING}
-,{D(jjRES),       KRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD, NO_PLURAL |NO_RING}
+,{D(atKILLATTR2), KILLATTR_CMD,   NONE,           IDHDL,      STRING_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjKoszul),    KOSZUL_CMD,     MATRIX_CMD,     INT_CMD,    INT_CMD, NO_NC |ALLOW_RING}
+,{D(jjKoszul_Id), KOSZUL_CMD,     MATRIX_CMD,     INT_CMD,    IDEAL_CMD, NO_NC |ALLOW_RING}
+,{D(jjRES),       KRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD, NO_NC |NO_RING}
 ,{D(jjLIFT),      LIFT_CMD,       MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLIFT),      LIFT_CMD,       MATRIX_CMD,     MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLIFTSTD),   LIFTSTD_CMD,    IDEAL_CMD,      IDEAL_CMD,  MATRIX_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLIFTSTD),   LIFTSTD_CMD,    MODUL_CMD,      MODUL_CMD,  MATRIX_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjLOAD_E),    LOAD_CMD,       NONE,           STRING_CMD, STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjRES),       LRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD, NO_PLURAL |NO_RING}
+,{D(jjLOAD_E),    LOAD_CMD,       NONE,           STRING_CMD, STRING_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjRES),       LRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD, NO_NC |NO_RING}
 ,{D(jjMODULO),    MODULO_CMD,     MODUL_CMD,      IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjMODULO),    MODULO_CMD,     MODUL_CMD,      MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjMONITOR2),  MONITOR_CMD,    NONE,           LINK_CMD, STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
-//,{D(jjRES),       MRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD, NO_PLURAL |ALLOW_RING}
-//,{D(jjRES),       MRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD, NO_PLURAL |ALLOW_RING}
-,{D(nuMPResMat),  MPRES_CMD,      MODUL_CMD,      IDEAL_CMD,  INT_CMD, NO_PLURAL |NO_RING}
-,{D(jjNEWSTRUCT2),NEWSTRUCT_CMD,  NONE,           STRING_CMD, STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjMONITOR2),  MONITOR_CMD,    NONE,           LINK_CMD, STRING_CMD, ALLOW_NC |ALLOW_RING}
+//,{D(jjRES),       MRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD, NO_NC |ALLOW_RING}
+//,{D(jjRES),       MRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD, NO_NC |ALLOW_RING}
+,{D(nuMPResMat),  MPRES_CMD,      MODUL_CMD,      IDEAL_CMD,  INT_CMD, NO_NC |NO_RING}
+,{D(jjNEWSTRUCT2),NEWSTRUCT_CMD,  NONE,           STRING_CMD, STRING_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjRES),       MRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjRES),       MRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-//,{D(nuMPResMat),  MPRES_CMD,      MODUL_CMD,      IDEAL_CMD,  INT_CMD, NO_PLURAL |ALLOW_RING}
+//,{D(nuMPResMat),  MPRES_CMD,      MODUL_CMD,      IDEAL_CMD,  INT_CMD, NO_NC |ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjNUMBER2CR), CNUMBER_CMD,    CNUMBER_CMD,    INT_CMD,    CRING_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjNUMBER2CR), CNUMBER_CMD,    CNUMBER_CMD,    BIGINT_CMD, CRING_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjNUMBER2CR), CNUMBER_CMD,    CNUMBER_CMD,    NUMBER_CMD, CRING_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjNUMBER2CR), CNUMBER_CMD,    CNUMBER_CMD,    CNUMBER_CMD,CRING_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjNUMBER2CR), CNUMBER_CMD,    CNUMBER_CMD,    INT_CMD,    CRING_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjNUMBER2CR), CNUMBER_CMD,    CNUMBER_CMD,    BIGINT_CMD, CRING_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjNUMBER2CR), CNUMBER_CMD,    CNUMBER_CMD,    NUMBER_CMD, CRING_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjNUMBER2CR), CNUMBER_CMD,    CNUMBER_CMD,    CNUMBER_CMD,CRING_CMD, ALLOW_NC |ALLOW_RING}
 #endif
-,{D(jjPFAC2),     PFAC_CMD,       LIST_CMD,       BIGINT_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjPFAC2),     PFAC_CMD,       LIST_CMD,       NUMBER_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjPFAC2),     PFAC_CMD,       LIST_CMD,       BIGINT_CMD, INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjPFAC2),     PFAC_CMD,       LIST_CMD,       NUMBER_CMD, INT_CMD, ALLOW_NC |ALLOW_RING}
 #ifdef HAVE_PLURAL
-,{D(jjPlural_num_poly), NCALGEBRA_CMD,NONE,       POLY_CMD,   POLY_CMD  , NO_PLURAL |NO_RING}
-,{D(jjPlural_num_mat),  NCALGEBRA_CMD,NONE,       POLY_CMD,   MATRIX_CMD, NO_PLURAL |NO_RING}
-,{D(jjPlural_mat_poly), NCALGEBRA_CMD,NONE,       MATRIX_CMD, POLY_CMD  , NO_PLURAL |NO_RING}
-,{D(jjPlural_mat_mat),  NCALGEBRA_CMD,NONE,       MATRIX_CMD, MATRIX_CMD, NO_PLURAL |NO_RING}
-,{D(jjPlural_num_poly), NC_ALGEBRA_CMD,RING_CMD,  POLY_CMD,   POLY_CMD  , NO_PLURAL |NO_RING}
-,{D(jjPlural_num_mat),  NC_ALGEBRA_CMD,RING_CMD,  POLY_CMD,   MATRIX_CMD, NO_PLURAL |NO_RING}
-,{D(jjPlural_mat_poly), NC_ALGEBRA_CMD,RING_CMD,  MATRIX_CMD, POLY_CMD  , NO_PLURAL |NO_RING}
-,{D(jjPlural_mat_mat),  NC_ALGEBRA_CMD,RING_CMD,  MATRIX_CMD, MATRIX_CMD, NO_PLURAL |NO_RING}
+,{D(jjPlural_num_poly), NCALGEBRA_CMD,NONE,       POLY_CMD,   POLY_CMD  , NO_NC |NO_RING}
+,{D(jjPlural_num_mat),  NCALGEBRA_CMD,NONE,       POLY_CMD,   MATRIX_CMD, NO_NC |NO_RING}
+,{D(jjPlural_mat_poly), NCALGEBRA_CMD,NONE,       MATRIX_CMD, POLY_CMD  , NO_NC |NO_RING}
+,{D(jjPlural_mat_mat),  NCALGEBRA_CMD,NONE,       MATRIX_CMD, MATRIX_CMD, NO_NC |NO_RING}
+,{D(jjPlural_num_poly), NC_ALGEBRA_CMD,RING_CMD,  POLY_CMD,   POLY_CMD  , NO_NC |NO_RING}
+,{D(jjPlural_num_mat),  NC_ALGEBRA_CMD,RING_CMD,  POLY_CMD,   MATRIX_CMD, NO_NC |NO_RING}
+,{D(jjPlural_mat_poly), NC_ALGEBRA_CMD,RING_CMD,  MATRIX_CMD, POLY_CMD  , NO_NC |NO_RING}
+,{D(jjPlural_mat_mat),  NC_ALGEBRA_CMD,RING_CMD,  MATRIX_CMD, MATRIX_CMD, NO_NC |NO_RING}
 ,{D(jjOPPOSE),    OPPOSE_CMD,     ANY_TYPE/*set by p*/, RING_CMD,   DEF_CMD, ALLOW_PLURAL |NO_RING}
 #endif
-,{D(jjPARSTR2),   PARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjPRINT_FORMAT), PRINT_CMD,   STRING_CMD,     DEF_CMD,    STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjPARSTR2),   PARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjPRINT_FORMAT), PRINT_CMD,   STRING_CMD,     DEF_CMD,    STRING_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjQUOT),      QUOTIENT_CMD,   IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjQUOT),      QUOTIENT_CMD,   MODUL_CMD,      MODUL_CMD,  IDEAL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjQUOT),      QUOTIENT_CMD,   IDEAL_CMD,      MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjRANDOM),    RANDOM_CMD,     INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjRANK2),     RANK_CMD,       INT_CMD,        MATRIX_CMD, INT_CMD, ALLOW_PLURAL |NO_RING}
-,{D(jjREAD2),     READ_CMD,       STRING_CMD,     LINK_CMD,   STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjRANDOM),    RANDOM_CMD,     INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjRANK2),     RANK_CMD,       INT_CMD,        MATRIX_CMD, INT_CMD, ALLOW_NC |NO_RING}
+,{D(jjREAD2),     READ_CMD,       STRING_CMD,     LINK_CMD,   STRING_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjREDUCE_P),  REDUCE_CMD,     POLY_CMD,       POLY_CMD,   IDEAL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjREDUCE_P),  REDUCE_CMD,     VECTOR_CMD,     VECTOR_CMD, IDEAL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjREDUCE_P),  REDUCE_CMD,     VECTOR_CMD,     VECTOR_CMD, MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -701,17 +719,17 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjRES),       RES_CMD,        RESOLUTION_CMD, MODUL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSBA_1),     SBA_CMD,        IDEAL_CMD,      IDEAL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSBA_1),     SBA_CMD,        MODUL_CMD,      MODUL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjSIMPL_P),   SIMPLIFY_CMD,   POLY_CMD,       POLY_CMD,   INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjSIMPL_P),   SIMPLIFY_CMD,   VECTOR_CMD,     VECTOR_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjSIMPL_ID),  SIMPLIFY_CMD,   IDEAL_CMD,      IDEAL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjSIMPL_ID),  SIMPLIFY_CMD,   MODUL_CMD,      MODUL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjSQR_FREE2), SQR_FREE_CMD,   IDEAL_CMD,      POLY_CMD,   INT_CMD, NO_PLURAL |ALLOW_RING}
-,{D(jjSTATUS2),   STATUS_CMD,     STRING_CMD,     LINK_CMD,   STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjSTATUS2L),  STATUS_CMD,     INT_CMD,        LIST_CMD,   INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-//,{D(jjRES),       SRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD, NO_PLURAL |ALLOW_RING}
-//,{D(jjRES),       SRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD, NO_PLURAL |ALLOW_RING}
-,{D(jjRES),       SRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD, NO_PLURAL |ALLOW_RING}
-,{D(jjRES),       SRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD, NO_PLURAL |ALLOW_RING}
+,{D(jjSIMPL_P),   SIMPLIFY_CMD,   POLY_CMD,       POLY_CMD,   INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjSIMPL_P),   SIMPLIFY_CMD,   VECTOR_CMD,     VECTOR_CMD, INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjSIMPL_ID),  SIMPLIFY_CMD,   IDEAL_CMD,      IDEAL_CMD,  INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjSIMPL_ID),  SIMPLIFY_CMD,   MODUL_CMD,      MODUL_CMD,  INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjSQR_FREE2), SQR_FREE_CMD,   IDEAL_CMD,      POLY_CMD,   INT_CMD, NO_NC |ALLOW_RING}
+,{D(jjSTATUS2),   STATUS_CMD,     STRING_CMD,     LINK_CMD,   STRING_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjSTATUS2L),  STATUS_CMD,     INT_CMD,        LIST_CMD,   INT_CMD, ALLOW_NC |ALLOW_RING}
+//,{D(jjRES),       SRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD, NO_NC |ALLOW_RING}
+//,{D(jjRES),       SRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD, NO_NC |ALLOW_RING}
+,{D(jjRES),       SRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD, NO_NC |ALLOW_RING}
+,{D(jjRES),       SRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD, NO_NC |ALLOW_RING}
 ,{D(jjSTD_1),     STD_CMD,        IDEAL_CMD,      IDEAL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSTD_1),     STD_CMD,        MODUL_CMD,      MODUL_CMD,  VECTOR_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSTD_1),     STD_CMD,        IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -720,37 +738,37 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjSTD_HILB),  STD_CMD,        MODUL_CMD,      MODUL_CMD,  INTVEC_CMD, ALLOW_PLURAL |NO_RING}
 ,{D(jjSYZ_2),     SYZYGY_CMD,     MODUL_CMD,      IDEAL_CMD,  STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSYZ_2),     SYZYGY_CMD,     MODUL_CMD,      MODUL_CMD,  STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjVARSTR2),   VARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjWAIT1ST2),  WAIT1ST_CMD,    INT_CMD,        LIST_CMD,   INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjWAITALL2),  WAITALL_CMD,    INT_CMD,        LIST_CMD,   INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjWEDGE),     WEDGE_CMD,      MATRIX_CMD,     MATRIX_CMD, INT_CMD, NO_PLURAL |ALLOW_RING}
-,{NULL_VAL,       0,              0,              0,          0, NO_PLURAL |NO_RING}
+,{D(jjVARSTR2),   VARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjWAIT1ST2),  WAIT1ST_CMD,    INT_CMD,        LIST_CMD,   INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjWAITALL2),  WAITALL_CMD,    INT_CMD,        LIST_CMD,   INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjWEDGE),     WEDGE_CMD,      MATRIX_CMD,     MATRIX_CMD, INT_CMD, NO_NC |ALLOW_RING}
+,{NULL_VAL,       0,              0,              0,          0, NO_NC |NO_RING}
 };
 /*=================== operations with 3 args.: table =================*/
 const struct sValCmd3 dArith3[]=
 {
 // operations:
 // proc                cmd          res         arg1        arg2        arg3   context
- {D(jjBRACK_S),        '[',        STRING_CMD, STRING_CMD, INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBRACK_Im),       '[',        INT_CMD,    INTMAT_CMD, INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBRACK_Bim),      '[',        BIGINT_CMD, BIGINTMAT_CMD, INT_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBRACK_Ma_I_IV),  '[',        INT_CMD,    INTMAT_CMD, INT_CMD,    INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBRACK_Ma_I_IV),  '[',        BIGINT_CMD, BIGINTMAT_CMD, INT_CMD,    INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBRACK_Ma_IV_I),  '[',        INT_CMD,    INTMAT_CMD, INTVEC_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBRACK_Ma_IV_I),  '[',        BIGINT_CMD, BIGINTMAT_CMD, INTVEC_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBRACK_Ma_IV_IV), '[',        INT_CMD,    INTMAT_CMD, INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBRACK_Ma_IV_IV), '[',        BIGINT_CMD, BIGINTMAT_CMD, INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBRACK_Ma),       '[',        POLY_CMD,   MATRIX_CMD, INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBRACK_Ma_I_IV),  '[',        POLY_CMD,   MATRIX_CMD, INT_CMD,    INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBRACK_Ma_IV_I),  '[',        POLY_CMD,   MATRIX_CMD, INTVEC_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBRACK_Ma_IV_IV), '[',        POLY_CMD,   MATRIX_CMD, INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjRING_2),         '[',        RING_CMD,   CRING_CMD,  ANY_TYPE,   ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
+ {D(jjBRACK_S),        '[',        STRING_CMD, STRING_CMD, INT_CMD,    INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjBRACK_Im),       '[',        INT_CMD,    INTMAT_CMD, INT_CMD,    INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjBRACK_Bim),      '[',        BIGINT_CMD, BIGINTMAT_CMD, INT_CMD, INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjBRACK_Ma_I_IV),  '[',        INT_CMD,    INTMAT_CMD, INT_CMD,    INTVEC_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjBRACK_Ma_I_IV),  '[',        BIGINT_CMD, BIGINTMAT_CMD, INT_CMD,    INTVEC_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjBRACK_Ma_IV_I),  '[',        INT_CMD,    INTMAT_CMD, INTVEC_CMD, INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjBRACK_Ma_IV_I),  '[',        BIGINT_CMD, BIGINTMAT_CMD, INTVEC_CMD, INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjBRACK_Ma_IV_IV), '[',        INT_CMD,    INTMAT_CMD, INTVEC_CMD, INTVEC_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjBRACK_Ma_IV_IV), '[',        BIGINT_CMD, BIGINTMAT_CMD, INTVEC_CMD, INTVEC_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjBRACK_Ma),       '[',        POLY_CMD,   MATRIX_CMD, INT_CMD,    INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjBRACK_Ma_I_IV),  '[',        POLY_CMD,   MATRIX_CMD, INT_CMD,    INTVEC_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjBRACK_Ma_IV_I),  '[',        POLY_CMD,   MATRIX_CMD, INTVEC_CMD, INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjBRACK_Ma_IV_IV), '[',        POLY_CMD,   MATRIX_CMD, INTVEC_CMD, INTVEC_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjRING_2),         '[',        RING_CMD,   CRING_CMD,  ANY_TYPE,   ANY_TYPE, ALLOW_NC |ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjBRACK_Bim),      '[',        CNUMBER_CMD, CMATRIX_CMD, INT_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjBRACK_Bim),      '[',        CNUMBER_CMD, CMATRIX_CMD, INT_CMD, INT_CMD, ALLOW_NC |ALLOW_RING}
 #endif
-,{D(jjPROC3),          '(',        ANY_TYPE,   PROC_CMD,   DEF_CMD,    DEF_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(atATTRIB3),        ATTRIB_CMD, NONE,       IDHDL,      STRING_CMD, DEF_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBAREISS3),       BAREISS_CMD,LIST_CMD,   MODUL_CMD,  INT_CMD,    INT_CMD, NO_PLURAL |ALLOW_RING|NO_ZERODIVISOR}
+,{D(jjPROC3),          '(',        ANY_TYPE,   PROC_CMD,   DEF_CMD,    DEF_CMD, ALLOW_NC |ALLOW_RING}
+,{D(atATTRIB3),        ATTRIB_CMD, NONE,       IDHDL,      STRING_CMD, DEF_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjBAREISS3),       BAREISS_CMD,LIST_CMD,   MODUL_CMD,  INT_CMD,    INT_CMD, NO_NC |ALLOW_RING|NO_ZERODIVISOR}
 ,{D(jjCOEFFS3_P),      COEFFS_CMD, MATRIX_CMD, POLY_CMD,   POLY_CMD,   MATRIX_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCOEFFS3_P),      COEFFS_CMD, MATRIX_CMD, VECTOR_CMD, POLY_CMD,   MATRIX_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCOEFFS3_Id),     COEFFS_CMD, MATRIX_CMD, IDEAL_CMD,  POLY_CMD,   MATRIX_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -760,26 +778,26 @@ const struct sValCmd3 dArith3[]=
 #ifdef SINGULAR_4_2
 ,{D(jjCMATRIX_3),     CMATRIX_CMD, CMATRIX_CMD,INT_CMD,    INT_CMD,   CRING_CMD, ALLOW_PLURAL |ALLOW_RING}
 #endif
-,{D(jjELIMIN_HILB),    ELIMINATION_CMD,IDEAL_CMD, IDEAL_CMD, POLY_CMD, INTVEC_CMD, NO_PLURAL |ALLOW_RING}
-,{D(jjELIMIN_HILB),    ELIMINATION_CMD,MODUL_CMD, MODUL_CMD, POLY_CMD, INTVEC_CMD, NO_PLURAL |ALLOW_RING}
+,{D(jjELIMIN_HILB),    ELIMINATION_CMD,IDEAL_CMD, IDEAL_CMD, POLY_CMD, INTVEC_CMD, NO_NC |ALLOW_RING}
+,{D(jjELIMIN_HILB),    ELIMINATION_CMD,MODUL_CMD, MODUL_CMD, POLY_CMD, INTVEC_CMD, NO_NC |ALLOW_RING}
 ,{D(jjELIMIN_ALG),     ELIMINATION_CMD,IDEAL_CMD, IDEAL_CMD,  POLY_CMD, STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjELIMIN_ALG),     ELIMINATION_CMD,MODUL_CMD, MODUL_CMD,  POLY_CMD, STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjFIND3),          FIND_CMD,   INT_CMD,    STRING_CMD, STRING_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjFRES3),          FRES_CMD,   RESOLUTION_CMD, IDEAL_CMD, INT_CMD, STRING_CMD, NO_PLURAL |NO_RING}
-,{D(jjFRES3),          FRES_CMD,   RESOLUTION_CMD, MODUL_CMD, INT_CMD, STRING_CMD, NO_PLURAL |NO_RING}
-,{D(jjFWALK3),         FWALK_CMD,  IDEAL_CMD,  RING_CMD,   DEF_CMD,    INT_CMD, NO_PLURAL |ALLOW_RING}
+,{D(jjFIND3),          FIND_CMD,   INT_CMD,    STRING_CMD, STRING_CMD, INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjFRES3),          FRES_CMD,   RESOLUTION_CMD, IDEAL_CMD, INT_CMD, STRING_CMD, NO_NC |NO_RING}
+,{D(jjFRES3),          FRES_CMD,   RESOLUTION_CMD, MODUL_CMD, INT_CMD, STRING_CMD, NO_NC |NO_RING}
+,{D(jjFWALK3),         FWALK_CMD,  IDEAL_CMD,  RING_CMD,   DEF_CMD,    INT_CMD, NO_NC |ALLOW_RING}
 ,{D(jjHILBERT3),       HILBERT_CMD,INTVEC_CMD, IDEAL_CMD,  INT_CMD,    INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING | NO_ZERODIVISOR}
 ,{D(jjHILBERT3),       HILBERT_CMD,INTVEC_CMD, MODUL_CMD,  INT_CMD,    INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING | NO_ZERODIVISOR}
 ,{D(jjHOMOG_P_W),      HOMOG_CMD,  POLY_CMD,   POLY_CMD,   POLY_CMD,   INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjHOMOG_P_W),      HOMOG_CMD,  VECTOR_CMD, VECTOR_CMD, POLY_CMD,   INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjHOMOG_ID_W),     HOMOG_CMD,  IDEAL_CMD,  IDEAL_CMD,  POLY_CMD,   INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjHOMOG_ID_W),     HOMOG_CMD,  MODUL_CMD,  MODUL_CMD,  POLY_CMD,   INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(lInsert3),         INSERT_CMD, LIST_CMD,   LIST_CMD,   DEF_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(lInsert3),         INSERT_CMD, LIST_CMD,   LIST_CMD,   DEF_CMD,    INT_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjINTERSEC3S),     INTERSECT_CMD,IDEAL_CMD,IDEAL_CMD,  IDEAL_CMD,  STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjINTERSEC3S),     INTERSECT_CMD,MODUL_CMD,MODUL_CMD,  MODUL_CMD,  STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjINTERSECT3),     INTERSECT_CMD,IDEAL_CMD,IDEAL_CMD,  IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjINTERSECT3),     INTERSECT_CMD,MODUL_CMD,MODUL_CMD,  MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjINTMAT3),        INTMAT_CMD, INTMAT_CMD, INTMAT_CMD, INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjINTMAT3),        INTMAT_CMD, INTMAT_CMD, INTMAT_CMD, INT_CMD,    INT_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjJET_P_IV),       JET_CMD,    POLY_CMD,   POLY_CMD,   INT_CMD,    INTVEC_CMD, ALLOW_PLURAL }
 ,{D(jjJET_ID_IV),      JET_CMD,    IDEAL_CMD,  IDEAL_CMD,  INT_CMD,    INTVEC_CMD, ALLOW_PLURAL }
 ,{D(jjJET_P_IV),       JET_CMD,    VECTOR_CMD, VECTOR_CMD, INT_CMD,    INTVEC_CMD, ALLOW_PLURAL }
@@ -789,23 +807,23 @@ const struct sValCmd3 dArith3[]=
 ,{D(jjJET_ID_M),       JET_CMD,    IDEAL_CMD,  IDEAL_CMD,  MATRIX_CMD, INT_CMD, ALLOW_PLURAL }
 ,{D(jjJET_ID_M),       JET_CMD,    MODUL_CMD,  MODUL_CMD,  MATRIX_CMD, INT_CMD, ALLOW_PLURAL }
 ,{  jjWRONG3 ,         JET_CMD,    POLY_CMD,   POLY_CMD,   INT_CMD,    INT_CMD, ALLOW_PLURAL }
-,{D(mpKoszul),         KOSZUL_CMD, MATRIX_CMD, INT_CMD,    INT_CMD,    IDEAL_CMD, NO_PLURAL |NO_RING}
+,{D(mpKoszul),         KOSZUL_CMD, MATRIX_CMD, INT_CMD,    INT_CMD,    IDEAL_CMD, NO_NC |NO_RING}
 ,{D(jjLIFT3),          LIFT_CMD,   MATRIX_CMD, IDEAL_CMD,  IDEAL_CMD,  MATRIX_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLIFT3),          LIFT_CMD,   MATRIX_CMD, MODUL_CMD,  MODUL_CMD,  MATRIX_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLIFTSTD3),       LIFTSTD_CMD,IDEAL_CMD,  IDEAL_CMD,  MATRIX_CMD, MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLIFTSTD3),       LIFTSTD_CMD,MODUL_CMD,  MODUL_CMD,  MATRIX_CMD, MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjMATRIX_Id),      MATRIX_CMD, MATRIX_CMD, IDEAL_CMD,  INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjMATRIX_Mo),      MATRIX_CMD, MATRIX_CMD, MODUL_CMD,  INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjMATRIX_Ma),      MATRIX_CMD, MATRIX_CMD, MATRIX_CMD, INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjMATRIX_Id),      MATRIX_CMD, MATRIX_CMD, IDEAL_CMD,  INT_CMD,    INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjMATRIX_Mo),      MATRIX_CMD, MATRIX_CMD, MODUL_CMD,  INT_CMD,    INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjMATRIX_Ma),      MATRIX_CMD, MATRIX_CMD, MATRIX_CMD, INT_CMD,    INT_CMD, ALLOW_NC |ALLOW_RING}
 #ifdef OLD_RES
 ,{D(jjRES3),           MRES_CMD,   NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjRES3),           MRES_CMD,   NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
 #endif
-,{D(jjNEWSTRUCT3),     NEWSTRUCT_CMD, NONE,     STRING_CMD, STRING_CMD, STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjNEWSTRUCT3),     NEWSTRUCT_CMD, NONE,     STRING_CMD, STRING_CMD, STRING_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjPREIMAGE),       PREIMAGE_CMD, IDEAL_CMD, RING_CMD,  ANY_TYPE,   ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjRANDOM_Im),      RANDOM_CMD, INTMAT_CMD, INT_CMD,    INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjRANDOM_Im),      RANDOM_CMD, INTMAT_CMD, INT_CMD,    INT_CMD,    INT_CMD, ALLOW_NC |ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjRANDOM_CF),      RANDOM_CMD, CNUMBER_CMD, CNUMBER_CMD, CNUMBER_CMD, CRING_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjRANDOM_CF),      RANDOM_CMD, CNUMBER_CMD, CNUMBER_CMD, CNUMBER_CMD, CRING_CMD, ALLOW_NC |ALLOW_RING}
 #endif
 ,{D(jjREDUCE3_P),      REDUCE_CMD, POLY_CMD,   POLY_CMD,   IDEAL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjREDUCE3_P),      REDUCE_CMD, VECTOR_CMD, VECTOR_CMD, IDEAL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -821,15 +839,15 @@ const struct sValCmd3 dArith3[]=
 ,{D(jjRES3),           RES_CMD,    NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjRES3),           RES_CMD,    NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
 #endif
-,{D(jjRESULTANT),      RESULTANT_CMD, POLY_CMD,POLY_CMD,   POLY_CMD,   POLY_CMD, NO_PLURAL |ALLOW_RING}
+,{D(jjRESULTANT),      RESULTANT_CMD, POLY_CMD,POLY_CMD,   POLY_CMD,   POLY_CMD, NO_NC |ALLOW_RING}
 ,{D(jjRING3),          RING_CMD,   RING_CMD,   DEF_CMD,    DEF_CMD,    DEF_CMD, ALLOW_PLURAL |ALLOW_RING}
 #ifdef OLD_RES
-,{D(jjRES3),           SRES_CMD,   NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE, NO_PLURAL |ALLOW_RING}
-,{D(jjRES3),           SRES_CMD,   NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE, NO_PLURAL |ALLOW_RING}
+,{D(jjRES3),           SRES_CMD,   NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE, NO_NC |ALLOW_RING}
+,{D(jjRES3),           SRES_CMD,   NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE, NO_NC |ALLOW_RING}
 #endif
 ,{D(jjSBA_2),          SBA_CMD,    IDEAL_CMD,  IDEAL_CMD,  INT_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSBA_2),          SBA_CMD,    MODUL_CMD,  MODUL_CMD,  INT_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjSTATUS3),        STATUS_CMD, INT_CMD,    LINK_CMD,   STRING_CMD, STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjSTATUS3),        STATUS_CMD, INT_CMD,    LINK_CMD,   STRING_CMD, STRING_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjSTD_HILB_W),     STD_CMD,    IDEAL_CMD,  IDEAL_CMD,  INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL |NO_RING}
 ,{D(jjSTD_HILB_W),     STD_CMD,    MODUL_CMD,  MODUL_CMD,  INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL |NO_RING}
 ,{D(jjSUBST_P),        SUBST_CMD,  POLY_CMD,   POLY_CMD,   POLY_CMD,   POLY_CMD , ALLOW_PLURAL |ALLOW_RING}
@@ -839,9 +857,9 @@ const struct sValCmd3 dArith3[]=
 ,{D(jjSUBST_Id),       SUBST_CMD,  MATRIX_CMD, MATRIX_CMD, POLY_CMD,   POLY_CMD , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSUBST_Id_I),     SUBST_CMD,  MATRIX_CMD, MATRIX_CMD, POLY_CMD,   INT_CMD  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSUBST_Id_N),     SUBST_CMD,  MATRIX_CMD, MATRIX_CMD, POLY_CMD,   NUMBER_CMD , ALLOW_PLURAL |ALLOW_RING}
-,{D(nuLagSolve),       LAGSOLVE_CMD,LIST_CMD,  POLY_CMD,   INT_CMD,    INT_CMD  , NO_PLURAL |NO_RING}
-,{D(nuVanderSys),      VANDER_CMD, POLY_CMD,   IDEAL_CMD,  IDEAL_CMD,  INT_CMD  , NO_PLURAL |NO_RING}
-,{NULL_VAL,            0,          0,          0,          0,          0        , NO_PLURAL |NO_RING}
+,{D(nuLagSolve),       LAGSOLVE_CMD,LIST_CMD,  POLY_CMD,   INT_CMD,    INT_CMD  , NO_NC |NO_RING}
+,{D(nuVanderSys),      VANDER_CMD, POLY_CMD,   IDEAL_CMD,  IDEAL_CMD,  INT_CMD  , NO_NC |NO_RING}
+,{NULL_VAL,            0,          0,          0,          0,          0        , NO_NC |NO_RING}
 };
 /*=================== operations with many arg.: table =================*/
 /* number_of_args:  -1: any, -2: any >0, 1: 1, 2: 2, .. */
@@ -849,77 +867,77 @@ const struct sValCmdM dArithM[]=
 {
 // operations:
 // proc            cmd               res        number_of_args   context
- {D(jjKLAMMER_PL),  '(',           ANY_TYPE,           -2      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjRING_PL),   '[',             RING_CMD,           -2      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBREAK0),    BREAKPOINT_CMD,  NONE,               0       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjBREAK1),    BREAKPOINT_CMD,  NONE,               -2      , ALLOW_PLURAL |ALLOW_RING}
-,{D(iiBranchTo),  BRANCHTO_CMD,    NONE,               -2      , ALLOW_PLURAL |ALLOW_RING}
+ {D(jjKLAMMER_PL),  '(',           ANY_TYPE,           -2      , ALLOW_NC |ALLOW_RING}
+,{D(jjRING_PL),   '[',             RING_CMD,           -2      , ALLOW_NC |ALLOW_RING}
+,{D(jjBREAK0),    BREAKPOINT_CMD,  NONE,               0       , ALLOW_NC |ALLOW_RING}
+,{D(jjBREAK1),    BREAKPOINT_CMD,  NONE,               -2      , ALLOW_NC |ALLOW_RING}
+,{D(iiBranchTo),  BRANCHTO_CMD,    NONE,               -2      , ALLOW_NC |ALLOW_RING}
 #ifdef SINGULAR_4_2
-,{D(jjCALL3ARG),  CMATRIX_CMD,     CMATRIX_CMD,        3       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCALL2ARG),  CNUMBER_CMD,     CNUMBER_CMD,        2       , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCALL3ARG),  CMATRIX_CMD,     CMATRIX_CMD,        3       , ALLOW_NC |ALLOW_RING}
+,{D(jjCALL2ARG),  CNUMBER_CMD,     CNUMBER_CMD,        2       , ALLOW_NC |ALLOW_RING}
 #endif
 ,{D(jjCALL2ARG),  COEF_CMD,        MATRIX_CMD,         2       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCOEF_M),    COEF_CMD,        NONE,               4       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL2ARG),  DIVISION_CMD,    ANY_TYPE/*or set by p*/,2   , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDIVISION4), DIVISION_CMD,    ANY_TYPE/*or set by p*/,3   , NO_PLURAL |NO_RING}
-,{D(jjDIVISION4), DIVISION_CMD,    ANY_TYPE/*or set by p*/,4   , NO_PLURAL |NO_RING}
-,{D(jjDBPRINT),   DBPRINT_CMD,     NONE,               -2      , ALLOW_PLURAL |ALLOW_RING}
-//,{D(jjEXPORTTO_M),  EXPORTTO_CMD,    NONE,             -2      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjDIVISION4), DIVISION_CMD,    ANY_TYPE/*or set by p*/,3   , NO_NC |NO_RING}
+,{D(jjDIVISION4), DIVISION_CMD,    ANY_TYPE/*or set by p*/,4   , NO_NC |NO_RING}
+,{D(jjDBPRINT),   DBPRINT_CMD,     NONE,               -2      , ALLOW_NC |ALLOW_RING}
+//,{D(jjEXPORTTO_M),  EXPORTTO_CMD,    NONE,             -2      , ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL2ARG),  FETCH_CMD,       ANY_TYPE/*or set by p*/,2   , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjFETCH_M),   FETCH_CMD,       ANY_TYPE/*or set by p*/,3   , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjFETCH_M),   FETCH_CMD,       ANY_TYPE/*or set by p*/,4   , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCALL1ARG),  IDEAL_CMD,       IDEAL_CMD,          1       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjIDEAL_PL),  IDEAL_CMD,       IDEAL_CMD,          -1      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCALL1ARG),  IDEAL_CMD,       IDEAL_CMD,          1       , ALLOW_NC |ALLOW_RING}
+,{D(jjIDEAL_PL),  IDEAL_CMD,       IDEAL_CMD,          -1      , ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL2ARG),  INTERSECT_CMD,   IDEAL_CMD,          2       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL3ARG),  INTERSECT_CMD,   IDEAL_CMD,          3       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjINTERSECT_PL),INTERSECT_CMD, IDEAL_CMD,          -2      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCALL1ARG),  INTVEC_CMD,      INTVEC_CMD,         1       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjINTVEC_PL), INTVEC_CMD,      INTVEC_CMD,         -2      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCALL1ARG),  INTVEC_CMD,      INTVEC_CMD,         1       , ALLOW_NC |ALLOW_RING}
+,{D(jjINTVEC_PL), INTVEC_CMD,      INTVEC_CMD,         -2      , ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL2ARG),  JET_CMD,         POLY_CMD,/*or set by p*/ 2  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL3ARG),  JET_CMD,         POLY_CMD,/*or set by p*/ 3  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjJET4),      JET_CMD,         POLY_CMD,/*or set by p*/ 4  , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCALL1ARG),  LIB_CMD,         NONE,                1  , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCALL1ARG),  LIB_CMD,         NONE,                1  , ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL2ARG),  LIFT_CMD,        MATRIX_CMD,          2  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL3ARG),  LIFT_CMD,        MATRIX_CMD,          3  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLIFT_4),    LIFT_CMD,        MATRIX_CMD,          4  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL2ARG),  LIFTSTD_CMD,     MODUL_CMD,/*or IDEAL*/2  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL3ARG),  LIFTSTD_CMD,     MODUL_CMD,/*or IDEAL*/3  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLIFTSTD_4), LIFTSTD_CMD,     MODUL_CMD,/*or IDEAL*/4  , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjLIST_PL),   LIST_CMD,        LIST_CMD,           -1      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjLU_INVERSE),LUI_CMD,         LIST_CMD,           -2      , NO_PLURAL |NO_RING}
-,{D(jjLU_SOLVE),  LUS_CMD,         LIST_CMD,           -2      , NO_PLURAL |NO_RING}
+,{D(jjLIST_PL),   LIST_CMD,        LIST_CMD,           -1      , ALLOW_NC |ALLOW_RING}
+,{D(jjLU_INVERSE),LUI_CMD,         LIST_CMD,           -2      , NO_NC |NO_RING}
+,{D(jjLU_SOLVE),  LUS_CMD,         LIST_CMD,           -2      , NO_NC |NO_RING}
 ,{  jjWRONG ,     MINOR_CMD,       NONE,               1       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjMINOR_M),   MINOR_CMD,       IDEAL_CMD,          -2      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCALL1ARG),  MODUL_CMD,       MODUL_CMD,          1       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjIDEAL_PL),  MODUL_CMD,       MODUL_CMD,          -1      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCALL1ARG),  NAMES_CMD,       LIST_CMD,            1      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjNAMES0),    NAMES_CMD,       LIST_CMD,            0      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCALL2ARG),  CNUMBER_CMD,     CNUMBER_CMD,         2      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjOPTION_PL), OPTION_CMD,      STRING_CMD/*or set by p*/,-1, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCALL1ARG),  MODUL_CMD,       MODUL_CMD,          1       , ALLOW_NC |ALLOW_RING}
+,{D(jjIDEAL_PL),  MODUL_CMD,       MODUL_CMD,          -1      , ALLOW_NC |ALLOW_RING}
+,{D(jjCALL1ARG),  NAMES_CMD,       LIST_CMD,            1      , ALLOW_NC |ALLOW_RING}
+,{D(jjNAMES0),    NAMES_CMD,       LIST_CMD,            0      , ALLOW_NC |ALLOW_RING}
+,{D(jjCALL2ARG),  CNUMBER_CMD,     CNUMBER_CMD,         2      , ALLOW_NC |ALLOW_RING}
+,{D(jjOPTION_PL), OPTION_CMD,      STRING_CMD/*or set by p*/,-1, ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL2ARG),  REDUCE_CMD,      IDEAL_CMD/*or set by p*/,  2, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL3ARG),  REDUCE_CMD,      IDEAL_CMD/*or set by p*/,  3, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjREDUCE4),   REDUCE_CMD,      IDEAL_CMD/*or set by p*/,  4, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjREDUCE5),   REDUCE_CMD,      IDEAL_CMD/*or set by p*/,  5, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCALL1ARG),  RESERVEDNAME_CMD, INT_CMD,            1      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjRESERVED0), RESERVEDNAME_CMD, NONE,               0      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjSTRING_PL), STRING_CMD,      STRING_CMD,         -1      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCALL1ARG),  RESERVEDNAME_CMD, INT_CMD,            1      , ALLOW_NC |ALLOW_RING}
+,{D(jjRESERVED0), RESERVEDNAME_CMD, NONE,               0      , ALLOW_NC |ALLOW_RING}
+,{D(jjSTRING_PL), STRING_CMD,      STRING_CMD,         -1      , ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL3ARG),  SUBST_CMD,       NONE/*set by p*/,   3       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSUBST_M),   SUBST_CMD,       NONE/*set by p*/,   -2      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjSYSTEM),    SYSTEM_CMD,      NONE/*or set by p*/,-2      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjTEST),      TEST_CMD,        NONE,               -2      , ALLOW_PLURAL |ALLOW_RING}
-,{D(iiWRITE),     WRITE_CMD,       NONE,               -2      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCALL2ARG),  STATUS_CMD,      STRING_CMD,          2      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCALL3ARG),  STATUS_CMD,      INT_CMD,             3      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjSTATUS_M),  STATUS_CMD,      INT_CMD,             4      , ALLOW_PLURAL |ALLOW_RING}
-,{D(loSimplex),   SIMPLEX_CMD,     LIST_CMD,            6      , NO_PLURAL |NO_RING}
-,{D(nuUResSolve), URSOLVE_CMD,     LIST_CMD,            4      , NO_PLURAL |NO_RING}
+,{D(jjSYSTEM),    SYSTEM_CMD,      NONE/*or set by p*/,-2      , ALLOW_NC |ALLOW_RING}
+,{D(jjTEST),      TEST_CMD,        NONE,               -2      , ALLOW_NC |ALLOW_RING}
+,{D(iiWRITE),     WRITE_CMD,       NONE,               -2      , ALLOW_NC |ALLOW_RING}
+,{D(jjCALL2ARG),  STATUS_CMD,      STRING_CMD,          2      , ALLOW_NC |ALLOW_RING}
+,{D(jjCALL3ARG),  STATUS_CMD,      INT_CMD,             3      , ALLOW_NC |ALLOW_RING}
+,{D(jjSTATUS_M),  STATUS_CMD,      INT_CMD,             4      , ALLOW_NC |ALLOW_RING}
+,{D(loSimplex),   SIMPLEX_CMD,     LIST_CMD,            6      , NO_NC |NO_RING}
+,{D(nuUResSolve), URSOLVE_CMD,     LIST_CMD,            4      , NO_NC |NO_RING}
 ,{D(jjCALL1ARG),  STD_CMD,         IDEAL_CMD,           1      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL2ARG),  STD_CMD,         IDEAL_CMD,           2      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCALL3ARG),  STD_CMD,         IDEAL_CMD,           3      , NO_PLURAL |ALLOW_RING}
-,{D(jjSTD_HILB_WP), STD_CMD,       IDEAL_CMD,           4      , NO_PLURAL |NO_RING}
+,{D(jjCALL3ARG),  STD_CMD,         IDEAL_CMD,           3      , NO_NC |ALLOW_RING}
+,{D(jjSTD_HILB_WP), STD_CMD,       IDEAL_CMD,           4      , NO_NC |NO_RING}
 ,{D(jjQRDS),      QRDS_CMD,        LIST_CMD,            4      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjFactModD_M),FMD_CMD,         LIST_CMD,           -2      , NO_PLURAL |NO_RING}
-,{NULL_VAL,       0,               0,                   0      , NO_PLURAL |NO_RING}
+,{D(jjFactModD_M),FMD_CMD,         LIST_CMD,           -2      , NO_NC |NO_RING}
+,{NULL_VAL,       0,               0,                   0      , NO_NC |NO_RING}
 };
 #ifdef GENTABLE
 // this table MUST be order alphabetically by its first entry:
