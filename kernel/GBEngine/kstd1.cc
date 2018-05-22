@@ -2568,6 +2568,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
   kStrategy strat=new skStrategy;
+  intvec* temp_w=NULL;
 
   if(!TEST_OPT_RETURN_SB)
     strat->syzComp = syzComp;
@@ -2593,6 +2594,11 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   }
   if (h==testHomog)
   {
+    if (delete_w)
+    {
+      temp_w=new intvec((strat->ak)+1);
+      w = &temp_w;
+    }
     if (strat->ak == 0)
     {
       h = (tHomog)idHomIdeal(F,Q);
@@ -2600,7 +2606,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
     }
     else if (!TEST_OPT_DEGBOUND)
     {
-      h = (tHomog)idHomModule(F,Q,w);
+      if (w!=NULL) h = (tHomog)idHomModule(F,Q,w);
     }
   }
   currRing->pLexOrder=b;

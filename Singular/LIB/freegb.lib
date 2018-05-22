@@ -475,12 +475,12 @@ static proc mono2word(poly p, int d)
 {
 }
 
-proc letplaceGBasis(ideal I)
-"USAGE: letplaceGBasis(I);  I an ideal
-RETURN: ideal
-ASSUME: basering is a Letterplace ring, an ideal consists of Letterplace
+proc letplaceGBasis(def I)
+"USAGE: letplaceGBasis(I);  I an ideal/module
+RETURN: ideal/module
+ASSUME: basering is a Letterplace ring, input consists of Letterplace
 @*      polynomials
-PURPOSE: compute the two-sided Groebner basis of an ideal I via Letterplace
+PURPOSE: compute the two-sided Groebner basis of I via Letterplace
 @*       algorithm
 NOTE: the degree bound for this computation is read off the letterplace
 @*    structure of basering
@@ -498,7 +498,7 @@ EXAMPLE: example letplaceGBasis; shows examples
   int uptodeg = attrib(save,"uptodeg");
   int lV = attrib(save,"isLetterplaceRing");
   dbprint(ppl,"start computing GB");
-  ideal J = system("freegb",I,uptodeg,lV);
+  def J = system("freegb",I,uptodeg,lV);
   dbprint(ppl,"finished computing GB");
   dbprint(ppl-1,"the result is:");
   dbprint(ppl-1,J);
