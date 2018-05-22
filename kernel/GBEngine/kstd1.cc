@@ -2197,7 +2197,10 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
             }
             else if (!TEST_OPT_DEGBOUND)
             {
+              if (w!=NULL)
                 h = (tHomog)idHomModule(FCopy,Q,w);
+              else
+                h = (tHomog)idHomIdeal(FCopy,Q);
             }
         }
         currRing->pLexOrder=b;
@@ -2330,7 +2333,10 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
       }
       else if (!TEST_OPT_DEGBOUND)
       {
-        h = (tHomog)idHomModule(F,Q,w);
+        if (w!=NULL)
+          h = (tHomog)idHomModule(F,Q,w);
+        else
+          h = (tHomog)idHomIdeal(F,Q);
       }
     }
     currRing->pLexOrder=b;
@@ -2478,7 +2484,10 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
         }
         else if (!TEST_OPT_DEGBOUND)
         {
-          h = (tHomog)idHomModule(F,Q,w);
+          if (w!=NULL)
+            h = (tHomog)idHomModule(F,Q,w);
+          else
+            h = (tHomog)idHomIdeal(F,Q);
         }
       }
       currRing->pLexOrder=b;
@@ -2606,7 +2615,10 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
     }
     else if (!TEST_OPT_DEGBOUND)
     {
-      if (w!=NULL) h = (tHomog)idHomModule(F,Q,w);
+      if (w!=NULL)
+        h = (tHomog)idHomModule(F,Q,w);
+      else
+        h = (tHomog)idHomIdeal(F,Q);
     }
   }
   currRing->pLexOrder=b;
@@ -3141,7 +3153,10 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
   }
   else if (!TEST_OPT_DEGBOUND)
   {
-    h = (tHomog)idHomModule(F,Q,&w);
+    if (w!=NULL)
+      h = (tHomog)idHomModule(F,Q,w);
+    else
+      h = (tHomog)idHomIdeal(F,Q);
   }
   else
     h = isNotHomog;
