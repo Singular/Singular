@@ -12317,6 +12317,11 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 //      if (strat->pairtest==NULL) initPairtest(strat);
 //      strat->pairtest[i] = TRUE;/*- hint for spoly(S^[i],p)=0 -*/
 //      strat->pairtest[strat->sl+1] = TRUE;
+// new: visual check how often this happens: ! for the debug situation
+#ifdef KDEBUG
+      Print("!");
+      //if (TEST_OPT_DEBUG){Print("!");} // option teach
+#endif /* KDEBUG */
     /* END _ TEMPORARILY DISABLED FOR SHIFTS */
     /*hint for spoly(S[i],p) == 0 for some i,0 <= i <= sl*/
     /*
