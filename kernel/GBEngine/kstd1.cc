@@ -2197,7 +2197,10 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
             }
             else if (!TEST_OPT_DEGBOUND)
             {
+              if (w!=NULL)
                 h = (tHomog)idHomModule(FCopy,Q,w);
+              else
+                h = (tHomog)idHomIdeal(FCopy,Q);
             }
         }
         currRing->pLexOrder=b;
@@ -2330,7 +2333,10 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
       }
       else if (!TEST_OPT_DEGBOUND)
       {
-        h = (tHomog)idHomModule(F,Q,w);
+        if (w!=NULL)
+          h = (tHomog)idHomModule(F,Q,w);
+        else
+          h = (tHomog)idHomIdeal(F,Q);
       }
     }
     currRing->pLexOrder=b;
@@ -2478,7 +2484,10 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
         }
         else if (!TEST_OPT_DEGBOUND)
         {
-          h = (tHomog)idHomModule(F,Q,w);
+          if (w!=NULL)
+            h = (tHomog)idHomModule(F,Q,w);
+          else
+            h = (tHomog)idHomIdeal(F,Q);
         }
       }
       currRing->pLexOrder=b;
@@ -2568,6 +2577,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
   kStrategy strat=new skStrategy;
+  intvec* temp_w=NULL;
 
   if(!TEST_OPT_RETURN_SB)
     strat->syzComp = syzComp;
@@ -2593,6 +2603,11 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   }
   if (h==testHomog)
   {
+    if (delete_w)
+    {
+      temp_w=new intvec((strat->ak)+1);
+      w = &temp_w;
+    }
     if (strat->ak == 0)
     {
       h = (tHomog)idHomIdeal(F,Q);
@@ -2600,7 +2615,10 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
     }
     else if (!TEST_OPT_DEGBOUND)
     {
-      h = (tHomog)idHomModule(F,Q,w);
+      if (w!=NULL)
+        h = (tHomog)idHomModule(F,Q,w);
+      else
+        h = (tHomog)idHomIdeal(F,Q);
     }
   }
   currRing->pLexOrder=b;
@@ -3117,7 +3135,6 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
   // BOOLEAN toReset=FALSE;
   kStrategy strat=new skStrategy;
   tHomog h;
-  intvec * w=NULL;
 
   if (rField_has_simple_inverse(currRing))
     strat->LazyPass=20;
@@ -3131,24 +3148,15 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
   if (strat->ak == 0)
   {
     h = (tHomog)idHomIdeal(F,Q);
-    w=NULL;
   }
   else if (!TEST_OPT_DEGBOUND)
   {
-    h = (tHomog)idHomModule(F,Q,&w);
+    h = (tHomog)idHomIdeal(F,Q);
   }
   else
     h = isNotHomog;
   if (h==isHomog)
   {
-    if (strat->ak > 0 && (w!=NULL) && (w!=NULL))
-    {
-      strat->kModW = kModW = w;
-      strat->pOrigFDeg = currRing->pFDeg;
-      strat->pOrigLDeg = currRing->pLDeg;
-      pSetDegProcs(currRing,kModDeg);
-      // toReset = TRUE;
-    }
     strat->LazyPass*=2;
   }
   strat->homog=h;
@@ -3381,7 +3389,6 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
   ideal res=strat->Shdl;
   strat->Shdl=NULL;
   delete strat;
-  if (w!=NULL) delete w;
   return res;
 }
 ideal kInterRed (ideal F, ideal Q)

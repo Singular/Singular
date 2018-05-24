@@ -31,10 +31,13 @@ inline int RingDependend(int t) { return (BEGIN_RING<t)&&(t<END_RING); }
 int produce_convert_table=0;
 
 // bits 0,1 for PLURAL
-#define NO_PLURAL        0
+#define NO_NC            0
 #define ALLOW_PLURAL     1
 #define COMM_PLURAL      2
-#define PLURAL_MASK      3
+// bit 6: non-commutative letterplace
+#define ALLOW_LP         64
+#define NC_MASK          (3+64)
+#define ALLOW_NC         ALLOW_LP|ALLOW_PLURAL
 
 // bit 2 for RING-CF
 #define ALLOW_RING       4
@@ -360,9 +363,11 @@ void ttGen1()
           Tok2Cmdname(dArith1[i].res));
     if (RingDependend(dArith1[i].res) && (!RingDependend(dArith1[i].arg)))
       fprintf(outfile," requires currRing");
-    if ((dArith1[i].valid_for & PLURAL_MASK)==2)
+    if ((dArith1[i].valid_for & NC_MASK)==2)
       fprintf(outfile,", commutative subalgebra");
-    else if ((dArith1[i].valid_for & PLURAL_MASK)==0)
+    else if ((dArith1[i].valid_for & NC_MASK)==ALLOW_LP)
+      fprintf(outfile,", letterplace rings");
+    else if ((dArith1[i].valid_for & NC_MASK)==0)
       fprintf(outfile,", only commutative rings");
     if ((dArith1[i].valid_for & RING_MASK)==0)
       fprintf(outfile,", field coeffs");
@@ -392,9 +397,9 @@ void ttGen1()
     {
       fprintf(outfile," requires currRing");
     }
-    if ((dArith2[i].valid_for & PLURAL_MASK)==2)
+    if ((dArith2[i].valid_for & NC_MASK)==COMM_PLURAL)
       fprintf(outfile,", commutative subalgebra");
-    else if ((dArith2[i].valid_for & PLURAL_MASK)==0)
+    else if ((dArith2[i].valid_for & NC_MASK)==0)
       fprintf(outfile,", only commutative rings");
     if ((dArith2[i].valid_for & RING_MASK)==0)
       fprintf(outfile,", field coeffs");
@@ -426,9 +431,9 @@ void ttGen1()
     {
       fprintf(outfile," requires currRing");
     }
-    if ((dArith3[i].valid_for & PLURAL_MASK)==2)
+    if ((dArith3[i].valid_for & NC_MASK)==COMM_PLURAL)
       fprintf(outfile,", commutative subalgebra");
-    else if ((dArith3[i].valid_for & PLURAL_MASK)==0)
+    else if ((dArith3[i].valid_for & NC_MASK)==0)
       fprintf(outfile,", only commutative rings");
     if ((dArith3[i].valid_for & RING_MASK)==0)
       fprintf(outfile,", field coeffs");
@@ -858,9 +863,9 @@ void ttGen4()
       {
         old_s=s;
         #ifdef HAVE_PLURAL
-        switch (dArith1[i].valid_for & PLURAL_MASK)
+        switch (dArith1[i].valid_for & NC_MASK)
         {
-          case NO_PLURAL:
+          case NO_NC:
             fprintf(outfile,"@item @ref{%s} @tab @code{---}\n",s);
             break;
           case ALLOW_PLURAL:
@@ -888,9 +893,9 @@ void ttGen4()
       {
         old_s=s;
         #ifdef HAVE_PLURAL
-        switch (dArith2[i].valid_for & PLURAL_MASK)
+        switch (dArith2[i].valid_for & NC_MASK)
         {
-          case NO_PLURAL:
+          case NO_NC:
             fprintf(outfile,"@item @ref{%s} @tab @code{---}\n",s);
             break;
           case ALLOW_PLURAL:
@@ -918,9 +923,9 @@ void ttGen4()
       {
         old_s=s;
         #ifdef HAVE_PLURAL
-        switch (dArith3[i].valid_for & PLURAL_MASK)
+        switch (dArith3[i].valid_for & NC_MASK)
         {
-          case NO_PLURAL:
+          case NO_NC:
             fprintf(outfile,"@item @ref{%s} @tab @code{---}\n",s);
             break;
           case ALLOW_PLURAL:
@@ -946,9 +951,9 @@ void ttGen4()
     {
         old_s=s;
         #ifdef HAVE_PLURAL
-        switch (dArithM[i].valid_for & PLURAL_MASK)
+        switch (dArithM[i].valid_for & NC_MASK)
         {
-          case NO_PLURAL:
+          case NO_NC:
             fprintf(outfile,"@item @ref{%s} @tab @code{---}\n",s);
             break;
           case ALLOW_PLURAL:

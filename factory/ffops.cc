@@ -18,7 +18,8 @@ short * ff_invtab = new short [32767];
 
 void ff_setprime ( const int p )
 {
-    if ( p != ff_prime ) {
+    if ( p != ff_prime )
+    {
         ff_prime = p;
         ff_halfprime = ff_prime / 2;
         if ( ! ff_big )

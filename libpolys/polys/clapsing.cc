@@ -87,8 +87,14 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
       res= convFactoryPSingTrP( gcd( F, G ),r );
     }
   }
-  else
+  else if (r->cf->convSingNFactoryN==ndConvSingNFactoryN)
     WerrorS( feNotImplemented );
+  else
+  { // handle user type coeffs:
+    setCharacteristic( rChar(r) );
+    CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g, r ) );
+    res=convFactoryPSingP( gcd( F, G ) , r);
+  }
   Off(SW_RATIONAL);
   return res;
 }

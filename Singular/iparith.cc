@@ -80,16 +80,16 @@
 
 #include <ctype.h>
 
-// defaults for all commands: NO_PLURAL | NO_RING | ALLOW_ZERODIVISOR
+// defaults for all commands: NO_NC | NO_RING | ALLOW_ZERODIVISOR
 
 #ifdef HAVE_PLURAL
   #include "kernel/GBEngine/ratgring.h"
   #include "kernel/GBEngine/nc.h"
   #include "polys/nc/nc.h"
   #include "polys/nc/sca.h"
-  #define  PLURAL_MASK 3
+  #define  NC_MASK (3+64)
 #else /* HAVE_PLURAL */
-  #define  PLURAL_MASK     0
+  #define  NC_MASK     0
 #endif /* HAVE_PLURAL */
 
 #ifdef HAVE_RINGS
@@ -100,12 +100,14 @@
   #define ZERODIVISOR_MASK 0
 #endif
 #define ALLOW_PLURAL     1
-#define NO_PLURAL        0
+#define NO_NC            0
 #define COMM_PLURAL      2
 #define ALLOW_RING       4
 #define NO_RING          0
 #define NO_ZERODIVISOR   8
 #define ALLOW_ZERODIVISOR  0
+#define ALLOW_LP         64
+#define ALLOW_NC         ALLOW_LP|ALLOW_PLURAL
 
 #define ALLOW_ZZ (ALLOW_RING|NO_ZERODIVISOR)
 
@@ -3980,7 +3982,7 @@ static BOOLEAN jjEXECUTE(leftv, leftv v)
 static BOOLEAN jjFACSTD(leftv res, leftv v)
 {
   lists L=(lists)omAllocBin(slists_bin);
-  if (currRing->cf->convSingNFactoryN!=NULL) /* conversion to factory*/
+  if (currRing->cf->convSingNFactoryN!=ndConvSingNFactoryN) /* conversion to factory*/
   {
     ideal_list p,h;
     h=kStdfac((ideal)v->Data(),NULL,testHomog,NULL);
@@ -9167,17 +9169,25 @@ static BOOLEAN check_valid(const int p, const int op)
   #ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing))
   {
-    if ((p & PLURAL_MASK)==0 /*NO_PLURAL*/)
+    if ((p & NC_MASK)==NO_NC)
     {
       WerrorS("not implemented for non-commutative rings");
       return TRUE;
     }
-    else if ((p & PLURAL_MASK)==2 /*, COMM_PLURAL */)
+    else if ((p & NC_MASK)==COMM_PLURAL)
     {
       Warn("assume commutative subalgebra for cmd `%s` in >>%s<<",Tok2Cmdname(op),my_yylinebuf);
       return FALSE;
     }
     /* else, ALLOW_PLURAL */
+  }
+  else if (currRing->isLPring)
+  {
+    if ((p & ALLOW_LP)==0)
+    {
+      Werror("`%s` not implemented for letterplace rings in >>%s<<",Tok2Cmdname(op),my_yylinebuf);
+      return TRUE;
+    }
   }
   #endif
 #ifdef HAVE_RINGS

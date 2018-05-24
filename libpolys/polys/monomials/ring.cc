@@ -411,18 +411,16 @@ void   rWrite(ring r, BOOLEAN details)
 
       if (Q!=NULL)
       {
-//        if (r==currRing)
-//        {
-//          PrintLn();
           iiWriteMatrix((matrix)Q,"scaQ",1,r,0);
-//        }
-//        else
-//            PrintS(" ...");
       }
       else
         PrintS(" (NULL)");
     }
 #endif
+  }
+  if (r->isLPring)
+  {
+    PrintS("\n// letterplace ring");
   }
 #endif
   if (r->qideal!=NULL)

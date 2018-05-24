@@ -41,8 +41,8 @@ PURPOSE: Check whether the monomial algebra A/<LM(G)> is (left/right) noetherian
 ASSUME: - basering is a Letterplace ring
 @*      - G is a Groebner basis
 THEORY: lpNoetherian works with the monomial algebra A/<LM(G)>.
-If it gives an affirmative answer for one of the properties, then it 
-holds for both A/<LM(G)> and A/<G>. However, a negative answer applies 
+If it gives an affirmative answer for one of the properties, then it
+holds for both A/<LM(G)> and A/<G>. However, a negative answer applies
 only to A/<LM(G)> and not necessarily to A/<G>.
 NOTE: Weak Noetherian means that two-sided ideals in A/<LM(G)> satisfy
 the acc (ascending chain condition).
@@ -258,8 +258,8 @@ PURPOSE: Check whether A/<LM(G)> is semi prime, that is when p * (A/<LM(G)>) * p
 ASSUME: - basering is a Letterplace ring
       - G is a Groebner basis
 THEORY: lpIsSemiPrime works with the monomial algebra A/<LM(G)>.
-A positive answer holds for both A/<LM(G)> and A/<G>, while 
-a negative answer applies only to A/<LM(G)> and not necessarily to 
+A positive answer holds for both A/<LM(G)> and A/<G>, while
+a negative answer applies only to A/<LM(G)> and not necessarily to
 A/<G>.
 "
 {

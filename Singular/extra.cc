@@ -1478,8 +1478,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     if (strcmp(sys_cmd, "freegb") == 0)
     {
       const short t[]={3,IDEAL_CMD,INT_CMD,INT_CMD};
-      if (iiCheckTypes(h,t,1))
+      const short tM[]={3,MODUL_CMD,INT_CMD,INT_CMD};
+      if (iiCheckTypes(h,tM,0)
+      || (iiCheckTypes(h,t,0)))
       {
+        res->rtyp=h->Typ();
         ideal I=(ideal)h->CopyD();
         h=h->next;
         int uptodeg=(int)((long)(h->Data()));
@@ -1491,10 +1494,13 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           /* that is there were input errors */
           res->data = I;
         }
-        res->rtyp = IDEAL_CMD;
         return FALSE;
       }
-      else return TRUE;
+      else
+      {
+        WerrorS("system(\"freegb\",`ideal/module`,`int`,`int`) expected");
+        return TRUE;
+      }
     }
     else
   #endif /*SHIFTBBA*/
@@ -3787,16 +3793,16 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if (iiCheckTypes(h,t,1))
       {
         int p=(int)(long)h->Data();
-	int n=(int)(long)h->next->Data();
-	char *v=(char*)h->next->next->CopyD();
-	GFInfo param;
+        int n=(int)(long)h->next->Data();
+        char *v=(char*)h->next->next->CopyD();
+        GFInfo param;
         param.GFChar = p;
-	param.GFDegree = n;
-	param.GFPar_name = v;
-	coeffs cf= nInitChar(n_GF, &param);
-	res->rtyp=CRING_CMD;
-	res->data=cf;
-	return FALSE;
+        param.GFDegree = n;
+        param.GFPar_name = v;
+        coeffs cf= nInitChar(n_GF, &param);
+        res->rtyp=CRING_CMD;
+        res->data=cf;
+        return FALSE;
       }
       else
         return TRUE;

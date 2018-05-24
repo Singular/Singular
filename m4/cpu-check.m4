@@ -52,10 +52,9 @@ dnl the following settings seems to be better on itanium processors
   [ia64*], [
       AC_DEFINE(HAVE_GENERIC_ADD,1,use branch for addition in Z/p otherwise it uses a generic add)],
 dnl the following settings seems to be better on i386 and x86_64 processors
-dnl AC_DEFINE(HAVE_GENERIC_MULT,1,)
   [i*86*|x86_64*], [
             AC_DEFINE(HAVE_GENERIC_ADD,1,use branch for addition in Z/p otherwise it uses a generic add)
-            AC_DEFINE(HAVE_GENERIC_MULT,1,multiplication is fast on the cpu: a*b is with mod otherwise using tables of logartihms)
+dnl            AC_DEFINE(HAVE_GENERIC_MULT,1,multiplication is fast on the cpu: a*b is with mod otherwise using tables of logartihms)
 	    ],
 dnl the following settings seems to be better on sparc processors
   [sparc*], [
@@ -63,7 +62,9 @@ dnl the following settings seems to be better on sparc processors
 	    ],
 dnl the following settings seems to be better on ppc processors
 dnl testet on: ppc_Linux, 740/750 PowerMac G3, 512k L2 cache
-  [powerpc*|yyppc*], [AC_DEFINE(HAVE_GENERIC_MULT,1,multiplication is fast on the cpu: a*b is with mod otherwise using tables of logartihms)],
+  [powerpc*|ppc*], [AC_DEFINE(HAVE_GENERIC_MULT,1,multiplication is fast on the cpu: a*b is with mod otherwise using tables of logartihms)],
+dnl the following settings seems to be better on arm processors
+  [arm*], [],
   []
 )
 
