@@ -1,4 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 version="version freegb.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="Noncommutative";
 info="
@@ -90,11 +91,14 @@ NOTE: Activate the resulting ring by using @code{setring}
   {
     ERROR("uptodeg and lV do not agree on the basering!");
   }
-
+  // a kind of dirty hack
+  list L = ringlist(R);
+  attrib(L,"maxExp",1);
+  def @R = ring(L);
     // Set letterplace-specific attributes for the output ring!
-  attrib(R, "uptodeg", uptodeg);
-  attrib(R, "isLetterplaceRing", lV);
-  return (R);
+  attrib(@R, "uptodeg", uptodeg);
+  attrib(@R, "isLetterplaceRing", lV);
+  return (@R);
 }
 example
 {
@@ -1004,15 +1008,20 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),(dp(1),dp(2));
-  def A = makeLetterplaceRing(2);
+  def A = makeLetterplaceRing(2); // same as  makeLetterplaceRing(2,0)
   setring A;  A;
   attrib(A,"isLetterplaceRing");
   attrib(A,"uptodeg");  // degree bound
   setring r; def B = makeLetterplaceRing(2,1); // to compare:
   setring B;  B;
+  attrib(B,"isLetterplaceRing");
+  attrib(B,"uptodeg");  // degree bound
+  setring r; def C = makeLetterplaceRing(2,2); // to compare:
+  setring C;  C;
+  attrib(C,"isLetterplaceRing");
+  attrib(C,"uptodeg");  // degree bound
 }
 
-//proc freegbRing(int d)
 static proc makeLetterplaceRing1(int d)
 "USAGE:  makeLetterplaceRing1(d); d an integer
 RETURN:  ring
@@ -1208,12 +1217,12 @@ example
 }
 
 static proc makeLetterplaceRing4(int d)
-"USAGE:  makeLetterplaceRing2(d); d an integer
+"USAGE:  makeLetterplaceRing4(d); d an integer
 RETURN:  ring
 PURPOSE: creates a Letterplace ring with a Dp ordering, suitable for
 @* the use of non-homogeneous letterplace
 NOTE: the matrix for the ordering looks as follows: first row is 1,1,...,1
-EXAMPLE: example makeLetterplaceRing2; shows examples
+EXAMPLE: example makeLetterplaceRing4; shows examples
 "
 {
 
@@ -1267,7 +1276,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),(dp(1),dp(2));
-  def A = makeLetterplaceRing2(2);
+  def A = makeLetterplaceRing4(2);
   setring A;
   A;
   attrib(A,"isLetterplaceRing"); // number of variables in the main block
@@ -1276,13 +1285,13 @@ example
 
 // P[s;sigma] approach
 static proc makeLetterplaceRing3(int d)
-"USAGE:  makeLetterplaceRing1(d); d an integer
+"USAGE:  makeLetterplaceRing3(d); d an integer
 RETURN:  ring
 PURPOSE: creates a ring with a special ordering, representing
 @* the original P[s,sigma] (adds d blocks of shifted s)
 ASSUME: basering is a letterplace ring
 NOTE: experimental status
-EXAMPLE: example makeLetterplaceRing1; shows examples
+EXAMPLE: example makeLetterplaceRing3; shows examples
 "
 {
   // d = up to degree, will be shifted to d+1
