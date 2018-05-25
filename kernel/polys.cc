@@ -66,9 +66,13 @@ poly p_Divide(poly p, poly q, const ring r)
         ideal m = idLift(vi,ui,&R, FALSE,TRUE,TRUE,&U);
         SI_RESTORE_OPT1(save_opt);
         if (r!=save_ring) rChangeCurrRing(save_ring);
-        matrix T = id_Module2formatedMatrix(m,1,1,r);
-        p=MATELEM(T,1,1); MATELEM(T,1,1)=NULL;
-        id_Delete((ideal *)&T,r);
+        if (idIs0(R))
+        {
+          matrix T = id_Module2formatedMatrix(m,1,1,r);
+          p=MATELEM(T,1,1); MATELEM(T,1,1)=NULL;
+          id_Delete((ideal *)&T,r);
+        }
+        else p=NULL;
         id_Delete((ideal *)&U,r);
         id_Delete(&R,r);
         //vi->m[0]=NULL; ui->m[0]=NULL;
@@ -116,9 +120,13 @@ poly p_Divide(poly p, poly q, const ring r)
             ideal m = idLift(vi,ui,&R, FALSE,TRUE,TRUE,&U);
             SI_RESTORE_OPT1(save_opt);
             if (r!=save_ring) rChangeCurrRing(save_ring);
-            matrix T = id_Module2formatedMatrix(m,1,1,r);
-            h=MATELEM(T,1,1); MATELEM(T,1,1)=NULL;
-            id_Delete((ideal*)&T,r);
+            if (idIs0(R))
+            {
+              matrix T = id_Module2formatedMatrix(m,1,1,r);
+              p=MATELEM(T,1,1); MATELEM(T,1,1)=NULL;
+              id_Delete((ideal *)&T,r);
+            }
+            else p=NULL;
             id_Delete((ideal*)&U,r);
             id_Delete(&R,r);
             vi->m[0]=NULL; ui->m[0]=NULL;
