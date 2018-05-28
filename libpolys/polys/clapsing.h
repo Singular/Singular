@@ -14,9 +14,6 @@
 #include "misc/intvec.h"
 #include "coeffs/bigintmat.h"
 
-/// destroys f and g
-poly singclap_gcd ( poly f, poly g, const ring r );
-
 poly singclap_gcd_r ( poly f, poly g, const ring r );
 
 /// clears denominators of f and g, divides by gcd(f,g)

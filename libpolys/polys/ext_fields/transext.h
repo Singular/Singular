@@ -129,5 +129,7 @@ static BOOLEAN ntCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
 /// if m == var(i)/1 => return i,
 int ntIsParam(number, const coeffs);
 
+/// helper routine for calling singclap_gcd_r
+poly gcd_over_Q ( poly f, poly g, const ring r);
 #endif
 /* TRANSEXT_H */

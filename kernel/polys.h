@@ -160,12 +160,20 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
 #endif
 
 /// polynomial division, ignoring the rest
-/// via singclap_pdiive resp. idLift
+/// via singclap_pdivide resp. idLift
 /// destroyes a,b
 poly p_Divide(poly a, poly b, const ring r);
+
+/// polynomial gcd
+/// via singclap_gcd_r resp. idSyzygies
+/// destroys f and g
+poly singclap_gcd ( poly f, poly g, const ring r );
+
+
+
 /***************************************************************
  *
- * Copying/Deleteion of polys: args may be NULL
+ * Copying/Deletion of polys: args may be NULL
  *
  ***************************************************************/
 /// return a copy of the poly
