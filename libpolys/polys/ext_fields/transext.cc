@@ -1692,7 +1692,6 @@ static number ntNormalizeHelper(number a, number b, const coeffs cf)
       n_Delete(&contentpb, ntCoeffs);
       contentpa= tmp;
 
-      /* gcd_over_Q destroys its arguments; we hence need copies: */
       pGcd = gcd_over_Q(NUM(fa), DEN(fb), ntRing);
       pGcd= __p_Mult_nn (pGcd, contentpa, ntRing);
       n_Delete(&contentpa, ntCoeffs);
