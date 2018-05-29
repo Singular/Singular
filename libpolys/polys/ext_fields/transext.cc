@@ -273,6 +273,19 @@ static BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
 }
 #endif
 
+poly gcd_over_Q ( poly f, poly g, const ring r)
+{
+  poly res;
+  f=p_Copy(f,r);
+  p_Cleardenom(f, r);
+  g=p_Copy(g,r);
+  p_Cleardenom(g, r);
+  res=singclap_gcd_r(f,g,r);
+  p_Delete(&f, r);
+  p_Delete(&g, r);
+  return res;
+}
+
 /* returns the bottom field in this field extension tower; if the tower
    is flat, i.e., if there is no extension, then r itself is returned;
    as a side-effect, the counter 'height' is filled with the height of
@@ -1679,15 +1692,13 @@ static number ntNormalizeHelper(number a, number b, const coeffs cf)
       n_Delete(&contentpb, ntCoeffs);
       contentpa= tmp;
 
-      /* singclap_gcd destroys its arguments; we hence need copies: */
-      pGcd = singclap_gcd(p_Copy(NUM(fa),ntRing), p_Copy(DEN(fb),ntRing), ntRing);
+      pGcd = gcd_over_Q(NUM(fa), DEN(fb), ntRing);
       pGcd= __p_Mult_nn (pGcd, contentpa, ntRing);
       n_Delete(&contentpa, ntCoeffs);
     }
   }
   else
-    /* singclap_gcd destroys its arguments; we hence need copies: */
-    pGcd = singclap_gcd(p_Copy(NUM(fa),ntRing), p_Copy(DEN(fb),ntRing), cf->extRing);
+    pGcd = singclap_gcd_r(NUM(fa), DEN(fb), ntRing);
 
   /* Note that, over Q, singclap_gcd will remove the denominators in all
      rational coefficients of pa and pb, before starting to compute
@@ -1764,14 +1775,13 @@ static number ntGcd(number a, number b, const coeffs cf)
       n_Delete(&contentpb, ntCoeffs);
       contentpa= tmp;
 
-      /* singclap_gcd destroys its arguments; we hence need copies: */
-      pGcd = singclap_gcd(p_Copy(NUM(fa),ntRing), p_Copy(NUM(fb),ntRing), ntRing);
+      pGcd = gcd_over_Q(NUM(fa), NUM(fb), ntRing);
       pGcd= __p_Mult_nn (pGcd, contentpa, ntRing);
       n_Delete(&contentpa, ntCoeffs);
     }
   }
   else
-    pGcd = singclap_gcd(p_Copy(NUM(fa),ntRing), p_Copy(NUM(fb),ntRing), ntRing);
+    pGcd = singclap_gcd_r(NUM(fa), NUM(fb), ntRing);
   /* Note that, over Q, singclap_gcd will remove the denominators in all
      rational coefficients of pa and pb, before starting to compute
      the gcd. Thus, we do not need to ensure that the coefficients of
@@ -2262,7 +2272,11 @@ static void ntClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
     if( cand == NULL )
       cand = p_Copy(num, R);
     else
-      cand = singclap_gcd(cand, p_Copy(num, R), R); // gcd(cand, num)
+    {
+      poly tmp = singclap_gcd_r(cand, num, R); // gcd(cand, num)
+      p_Delete(&cand,R);
+      cand=tmp;
+    }
 
     if( p_IsConstant(cand, R) )
       break;
@@ -2353,7 +2367,7 @@ static void ntClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
       // cand === LCM( cand, den )!!!!
       // NOTE: maybe it's better to make the product and clearcontent afterwards!?
       // TODO: move the following to factory?
-      poly gcd = singclap_gcd(p_Copy(cand, R), p_Copy(den, R), R); // gcd(cand, den) is monic no mater leading coeffs! :((((
+      poly gcd = singclap_gcd_r(cand, den, R); // gcd(cand, den) is monic no mater leading coeffs! :((((
       if (nCoeff_is_Q (Q))
       {
         number LcGcd= n_SubringGcd (p_GetCoeff (cand, R), p_GetCoeff(den, R), Q);

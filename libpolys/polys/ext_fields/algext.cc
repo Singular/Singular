@@ -812,7 +812,7 @@ number naGcd(number a, number b, const coeffs cf)
 #if 0
   naTest(a); naTest(b);
   const ring R = naRing;
-  return (number) singclap_gcd(p_Copy((poly)a, R), p_Copy((poly)b, R), R);
+  return (number) singclap_gcd_r((poly)a, (poly)b, R);
 #endif
 //  return (number)p_Gcd((poly)a, (poly)b, naRing);
 }
@@ -1103,7 +1103,7 @@ int naIsParam(number m, const coeffs cf)
 }
 
 
-void naClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
+static void naClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
 {
   assume(cf != NULL);
   assume(getCoeffType(cf) == n_algExt);
@@ -1171,7 +1171,11 @@ void naClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, co
 
 //    p_InpGcd(cand, (poly)n, R);
 
-    cand = singclap_gcd(cand, p_Copy((poly)n, R), R);
+    { // R->cf is QQ
+      poly tmp=gcd_over_Q(cand,(poly)n,R);
+      p_Delete(&cand,R);
+      cand=tmp;
+    }
 
 //    cand1 = p_Gcd(cand,(poly)n, R); p_Delete(&cand, R); cand = cand1;
 

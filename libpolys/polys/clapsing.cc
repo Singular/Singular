@@ -258,31 +258,6 @@ poly singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
   return res;
 }
 
-poly singclap_gcd ( poly f, poly g, const ring r)
-{
-  poly res=NULL;
-
-  if (f!=NULL)
-  {
-    //if (r->cf->has_simple_Inverse) p_Norm(f,r);
-    if (rField_is_Zp(r)) p_Norm(f,r);
-    else                 p_Cleardenom(f, r);
-  }
-  if (g!=NULL)
-  {
-    //if (r->cf->has_simple_Inverse) p_Norm(g,r);
-    if (rField_is_Zp(r)) p_Norm(g,r);
-    else                 p_Cleardenom(g, r);
-  }
-  else         return f; // g==0 => gcd=f (but do a p_Cleardenom/pNorm)
-  if (f==NULL) return g; // f==0 => gcd=g (but do a p_Cleardenom/pNorm)
-
-  res=singclap_gcd_r(f,g,r);
-  p_Delete(&f, r);
-  p_Delete(&g, r);
-  return res;
-}
-
 /*2 find the maximal exponent of var(i) in poly p*/
 int pGetExp_Var(poly p, int i, const ring r)
 {

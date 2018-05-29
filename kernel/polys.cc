@@ -66,9 +66,13 @@ poly p_Divide(poly p, poly q, const ring r)
         ideal m = idLift(vi,ui,&R, FALSE,TRUE,TRUE,&U);
         SI_RESTORE_OPT1(save_opt);
         if (r!=save_ring) rChangeCurrRing(save_ring);
-        matrix T = id_Module2formatedMatrix(m,1,1,r);
-        p=MATELEM(T,1,1); MATELEM(T,1,1)=NULL;
-        id_Delete((ideal *)&T,r);
+        if (idIs0(R))
+        {
+          matrix T = id_Module2formatedMatrix(m,1,1,r);
+          p=MATELEM(T,1,1); MATELEM(T,1,1)=NULL;
+          id_Delete((ideal *)&T,r);
+        }
+        else p=NULL;
         id_Delete((ideal *)&U,r);
         id_Delete(&R,r);
         //vi->m[0]=NULL; ui->m[0]=NULL;
@@ -116,9 +120,13 @@ poly p_Divide(poly p, poly q, const ring r)
             ideal m = idLift(vi,ui,&R, FALSE,TRUE,TRUE,&U);
             SI_RESTORE_OPT1(save_opt);
             if (r!=save_ring) rChangeCurrRing(save_ring);
-            matrix T = id_Module2formatedMatrix(m,1,1,r);
-            h=MATELEM(T,1,1); MATELEM(T,1,1)=NULL;
-            id_Delete((ideal*)&T,r);
+            if (idIs0(R))
+            {
+              matrix T = id_Module2formatedMatrix(m,1,1,r);
+              p=MATELEM(T,1,1); MATELEM(T,1,1)=NULL;
+              id_Delete((ideal *)&T,r);
+            }
+            else p=NULL;
             id_Delete((ideal*)&U,r);
             id_Delete(&R,r);
             vi->m[0]=NULL; ui->m[0]=NULL;
@@ -152,4 +160,64 @@ poly p_Divide(poly p, poly q, const ring r)
     return p_DivideM(p,q,r);
   }
   return FALSE;
+}
+
+poly singclap_gcd ( poly f, poly g, const ring r )
+{
+  poly res=NULL;
+
+  if (f!=NULL)
+  {
+    //if (r->cf->has_simple_Inverse) p_Norm(f,r);
+    if (rField_is_Zp(r)) p_Norm(f,r);
+    else                 p_Cleardenom(f, r);
+  }
+  if (g!=NULL)
+  {
+    //if (r->cf->has_simple_Inverse) p_Norm(g,r);
+    if (rField_is_Zp(r)) p_Norm(g,r);
+    else                 p_Cleardenom(g, r);
+  }
+  else         return f; // g==0 => gcd=f (but do a p_Cleardenom/pNorm)
+  if (f==NULL) return g; // f==0 => gcd=g (but do a p_Cleardenom/pNorm)
+  if(p_IsConstant(f,currRing)
+  ||p_IsConstant(g,currRing))
+  {
+    res=p_One(currRing);
+  }
+  else if (r->cf->convSingNFactoryN!=ndConvSingNFactoryN)
+  {
+    res=singclap_gcd_r(f,g,r);
+  }
+  else
+  {
+    ideal I=idInit(2,1);
+    I->m[0]=f;
+    I->m[1]=p_Copy(g,r);
+    intvec *w=NULL;
+    ring save_ring=currRing;
+    if (r!=currRing) rChangeCurrRing(r);
+    int save_opt;
+    SI_SAVE_OPT1(save_opt);
+    si_opt_1 &= ~(Sy_bit(OPT_PROT));
+    ideal S1=idSyzygies(I,testHomog,&w);
+    if (w!=NULL) delete w;
+    // expect S1->m[0]=(-g/gcd,f/gcd)
+    if (IDELEMS(S1)!=1) WarnS("error in syzygy computation for GCD");
+    int lp;
+    p_TakeOutComp(&S1->m[0],1,&res,&lp,r);
+    p_Delete(&S1->m[0],r);
+    // GCD is g divided iby (-g/gcd):
+    res=p_Divide(g,res,r);
+    // restore, r, opt:
+    SI_RESTORE_OPT1(save_opt);
+    if (r!=save_ring) rChangeCurrRing(save_ring);
+    // clean the result
+    res=p_Cleardenom(res,r);
+    p_Content(res,r);
+    return res;
+  }
+  p_Delete(&f, r);
+  p_Delete(&g, r);
+  return res;
 }
