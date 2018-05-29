@@ -92,9 +92,14 @@ NOTE: Activate the resulting ring by using @code{setring}
   }
 
     // Set letterplace-specific attributes for the output ring!
-  attrib(R, "uptodeg", uptodeg);
-  attrib(R, "isLetterplaceRing", lV);
-  return (R);
+  list RL = ringlist(R);
+  attrib(RL, "isLetterplaceRing", lV);
+  attrib(RL, "maxExp", 1);
+  def @R = ring(RL);
+
+  attrib(@R, "uptodeg", uptodeg);
+  attrib(@R, "isLetterplaceRing", lV);
+  return (@R);
 }
 example
 {
@@ -1259,7 +1264,6 @@ EXAMPLE: example makeLetterplaceRing2; shows examples
 
   L[3] = LR[3];
   attrib(L,"maxExp",1);
-  attrib(L,"isLetterplaceRing",1);
   def @R = ring(L);
   def @@R = setLetterplaceAttributes(@R,uptodeg,lV);
   return (@@R);
