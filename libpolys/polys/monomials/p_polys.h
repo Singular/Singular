@@ -96,6 +96,7 @@ poly      p_ISet(long i, const ring r);
 poly      p_NSet(number n, const ring r);
 
 void  p_Vec2Polys(poly v, poly**p, int *len, const ring r);
+poly  p_Vec2Poly(poly v, int k, const ring r);
 
 /// julia: vector to already allocated array (len=p_MaxComp(v,r))
 void  p_Vec2Array(poly v, poly *p, int len, const ring r);
