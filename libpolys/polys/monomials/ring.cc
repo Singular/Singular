@@ -1886,7 +1886,7 @@ BOOLEAN rOrd_is_Totaldegree_Ordering(const ring r)
             rOrder_is_DegOrdering(( rRingOrder_t)r->order[1]))) ||
            (rHasSimpleOrderAA(r) &&
             (rOrder_is_DegOrdering((rRingOrder_t)r->order[1]) ||
-	    ((r->order[1]!=0) &&
+            ((r->order[1]!=0) &&
              rOrder_is_DegOrdering((rRingOrder_t)r->order[2]))))));
 }
 
@@ -2977,8 +2977,11 @@ void rKillModified_Wp_Ring(ring r)
 static void rSetOutParams(ring r)
 {
   r->VectorOut = (r->order[0] == ringorder_c);
-  r->CanShortOut = TRUE;
+  if (rIsNCRing(r))
+    r->CanShortOut=FALSE;
+  else
   {
+    r->CanShortOut = TRUE;
     int i;
     if (rParameter(r)!=NULL)
     {
