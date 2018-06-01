@@ -19,6 +19,7 @@
 #ifdef HAVE_RINGS
 #include "kernel/polys.h"
 #endif
+#include "kernel/GBEngine/shiftgb.h"
 
 #ifdef KDEBUG
 int red_count = 0;
@@ -122,10 +123,10 @@ int ksReducePoly(LObject* PR,
     }
   }
 
-  int holeStart = tailRing->isLPring * p_mFirstVblock(p2, tailRing->isLPring, tailRing);
-  // n1 and n2 is already set to 1
-  poly n1 = p_GetExp_k_n(lm, holeStart, tailRing->N, tailRing);
-  poly n2 = p_GetExp_k_n(lm, 1, holeStart, tailRing);
+  poly lmRight;
+  if (tailRing->isLPring) {
+    k_SplitFrame(p2, lm, lmRight, tailRing);
+  }
 
   // take care of coef buisness
   if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
@@ -134,7 +135,6 @@ int ksReducePoly(LObject* PR,
     number an = pGetCoeff(p2);
     int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
     p_SetCoeff(lm, bn, tailRing);
-    p_SetCoeff(n1, bn, tailRing);
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
@@ -142,13 +142,13 @@ int ksReducePoly(LObject* PR,
   }
   else
   {
-    p_SetCoeff(n1, pGetCoeff(lm), tailRing);
     if (coef != NULL) *coef = n_Init(1, tailRing->cf);
   }
 
+
   // and finally,
   if (tailRing->isLPring) {
-    PR->Tail_Minus_mm1_Mult_qq_Mult_mm2(n1, t2, n2, pLength(t2), spNoether);
+    PR->Tail_Minus_mm_Mult_qq(lm, tailRing->p_Procs->pp_Mult_mm(t2, lmRight, tailRing), pLength(t2), spNoether);
   } else {
     PR->Tail_Minus_mm_Mult_qq(lm, t2, pLength(t2) /*PW->GetpLength() - 1*/, spNoether);
   }
@@ -264,6 +264,11 @@ int ksReducePolyBound(LObject* PR,
     }
   }
 
+  poly lmRight;
+  if (tailRing->isLPring) {
+    k_SplitFrame(p2, lm, lmRight, tailRing);
+  }
+
   // take care of coef buisness
   if (! n_IsOne(pGetCoeff(p2), tailRing))
   {
@@ -283,7 +288,11 @@ int ksReducePolyBound(LObject* PR,
 
 
   // and finally,
-  PR->Tail_Minus_mm_Mult_qq(lm, t2, pLength(t2) /*PW->GetpLength() - 1*/, spNoether);
+  if (tailRing->isLPring) {
+    PR->Tail_Minus_mm_Mult_qq(lm, tailRing->p_Procs->pp_Mult_mm(t2, lmRight, tailRing), pLength(t2), spNoether);
+  } else {
+    PR->Tail_Minus_mm_Mult_qq(lm, t2, pLength(t2) /*PW->GetpLength() - 1*/, spNoether);
+  }
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
   PR->LmDeleteAndIter();
 
@@ -470,6 +479,11 @@ int ksReducePolySig(LObject* PR,
     }
   }
 
+  poly lmRight;
+  if (tailRing->isLPring) {
+    k_SplitFrame(p2, lm, lmRight, tailRing);
+  }
+
   // take care of coef buisness
   if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
   {
@@ -489,7 +503,11 @@ int ksReducePolySig(LObject* PR,
 
 
   // and finally,
-  PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
+  if (tailRing->isLPring) {
+    PR->Tail_Minus_mm_Mult_qq(lm, tailRing->p_Procs->pp_Mult_mm(t2, lmRight, tailRing), pLength(t2), spNoether);
+  } else {
+    PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
+  }
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
   PR->LmDeleteAndIter();
 
@@ -708,6 +726,12 @@ int ksReducePolySigRing(LObject* PR,
       ret = 1;
     }
   }
+
+  poly lmRight;
+  if (tailRing->isLPring) {
+    k_SplitFrame(p2, lm, lmRight, tailRing);
+  }
+
   // take care of coef buisness
   if(rField_is_Ring(currRing))
   {
@@ -734,7 +758,11 @@ int ksReducePolySigRing(LObject* PR,
   }
 
   // and finally,
-  PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
+  if (tailRing->isLPring) {
+    PR->Tail_Minus_mm_Mult_qq(lm, tailRing->p_Procs->pp_Mult_mm(t2, lmRight, tailRing), pLength(t2), spNoether);
+  } else {
+    PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
+  }
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
   PR->LmDeleteAndIter();
 
@@ -811,6 +839,16 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   if (m1 == NULL)
     k_GetLeadTerms(p1, p2, currRing, m1, m2, tailRing);
 
+  poly m12, m22;
+  if (tailRing->isLPring)
+  {
+    k_SplitFrame(p1, m1, m12, tailRing);
+    k_SplitFrame(p1, m2, m22, tailRing);
+    // manually free the coeffs, because pSetCoeff0 is used in the next step
+    n_Delete(&(m1->coef), tailRing->cf);
+    n_Delete(&(m2->coef), tailRing->cf);
+  }
+
   pSetCoeff0(m1, lc2);
   pSetCoeff0(m2, lc1);  // and now, m1 * LT(p1) == m2 * LT(p2)
 
@@ -842,19 +880,33 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
     assume(l2 == pLength(a2));
   }
   else
-    a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, tailRing);
+    if (tailRing->isLPring) {
+      // m2*a2*m22
+      a2 = tailRing->p_Procs->pp_Mult_mm(tailRing->p_Procs->pp_mm_Mult(a2, m2, tailRing), m22, tailRing);
+    } else {
+      a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, tailRing);
+    }
 #ifdef HAVE_RINGS
   if (!(rField_is_Domain(currRing))) l2 = pLength(a2);
 #endif
 
   Pair->SetLmTail(m2, a2, l2, use_buckets, tailRing);
 
-  // get m2*a2 - m1*a1
-  Pair->Tail_Minus_mm_Mult_qq(m1, a1, l1, spNoether);
+  if (tailRing->isLPring) {
+    // get m2*a2*m22 - m1*a1*m12
+    Pair->Tail_Minus_mm_Mult_qq(m1, tailRing->p_Procs->p_Mult_mm(a1, m12, tailRing), l1, spNoether);
+  } else {
+    // get m2*a2 - m1*a1
+    Pair->Tail_Minus_mm_Mult_qq(m1, a1, l1, spNoether);
+  }
 
   // Clean-up time
   Pair->LmDeleteAndIter();
   p_LmDelete(m1, tailRing);
+  if (tailRing->isLPring) {
+    p_LmDelete(m12, tailRing);
+    p_LmDelete(m22, tailRing);
+  }
 
   if (co != 0)
   {

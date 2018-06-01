@@ -1,6 +1,7 @@
 #include "shiftop.h"
 
-#define SHIFT_MULT_DEBUG
+/* #define SHIFT_MULT_DEBUG */
+#define SHIFT_MULT_WARNINGS
 
 #ifdef SHIFT_MULT_DEBUG
 #include "../kernel/polys.h"
@@ -13,17 +14,13 @@ poly shift_pp_Mult_mm(poly p, const poly m, const ring ri)
 #endif
 
   int lV = ri->isLPring;
-  if (p_mFirstVblock(m,lV,ri) < p_mFirstVblock(p,lV,ri)) {
-    // TODO remove this
-    PrintS("WARNING: auto switch to shift_pp_mm_Mult");
-    return shift_pp_mm_Mult(p, m, ri);
-  }
 
   // we just shift m and then call the commutative multiplication
   int uptodeg = ri->N/lV;
   int pshift = p_LastVblock(p, lV, ri);
   int mshift = p_mFirstVblock(m, lV, ri) - 1;
-#ifdef SHIFT_MULT_DEBUG
+#ifdef SHIFT_MULT_WARNINGS
+  // only needed because our examples still use x(1)*y(2) etc on the interface level
   if (mshift > 0) {
     PrintLn();
     PrintS("WARNING: m is already shifted");
@@ -52,17 +49,13 @@ poly shift_p_Mult_mm(poly p, const poly m, const ring ri)
 #endif
 
   int lV = ri->isLPring;
-  if (p_mFirstVblock(m,lV,ri) < p_mFirstVblock(p,lV,ri)) {
-    // TODO remove this
-    Print("WARNING: auto switch to shift_p_mm_Mult");
-    return shift_p_mm_Mult(p, m, ri);
-  }
 
   // we just shift m and then call the commutative multiplication
   int uptodeg = ri->N/lV;
   int pshift = p_LastVblock(p, lV, ri);
   int mshift = p_mFirstVblock(m, lV, ri) - 1;
-#ifdef SHIFT_MULT_DEBUG
+#ifdef SHIFT_MULT_WARNINGS
+  // only needed because our examples still use x(1)*y(2) etc on the interface level
   if (mshift > 0) {
     PrintLn(); Print("WARNING: m is already shifted"); PrintLn();
   }
@@ -89,17 +82,13 @@ poly shift_pp_mm_Mult(poly p, const poly m, const ring ri)
 #endif
 
   int lV = ri->isLPring;
-  if (p_mFirstVblock(p,lV,ri) < p_mFirstVblock(m,lV,ri)) {
-    // TODO remove this
-    PrintS("WARNING: auto switch to shift_pp_Mult_mm");
-    return shift_pp_Mult_mm(p, m, ri);
-  }
 
   // we just shift m and then call the commutative multiplication
   int uptodeg = ri->N/lV;
   int mshift = p_mLastVblock(m, lV, ri);
   int pshift = p_FirstVblock(p, lV, ri) - 1;
-#ifdef SHIFT_MULT_DEBUG
+#ifdef SHIFT_MULT_WARNINGS
+  // only needed because our examples still use x(1)*y(2) etc on the interface level
   if (pshift > 0) {
     PrintLn(); PrintS("WARNING: p is already shifted"); PrintLn();
   }
@@ -127,17 +116,13 @@ poly shift_p_mm_Mult(poly p, const poly m, const ring ri)
 #endif
 
   int lV = ri->isLPring;
-  if (p_mFirstVblock(p,lV,ri) < p_mFirstVblock(m,lV,ri)) {
-    // TODO remove this
-    Print("WARNING: auto switch to shift_p_Mult_mm");
-    return shift_p_Mult_mm(p, m, ri);
-  }
 
   // we just shift m and then call the commutative multiplication
   int uptodeg = ri->N/lV;
   int mshift = p_mLastVblock(m, lV, ri);
   int pshift = p_FirstVblock(p, lV, ri) - 1;
-#ifdef SHIFT_MULT_DEBUG
+#ifdef SHIFT_MULT_WARNINGS
+  // only needed because our examples still use x(1)*y(2) etc on the interface level
   if (pshift > 0) {
     PrintLn(); PrintS("WARNING: p is already shifted"); PrintLn();
   }

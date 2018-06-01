@@ -723,7 +723,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
   ||(rIsPluralRing(r)))
   {
     pSetCoeff0(m, n_InpNeg(pGetCoeff(m),r->cf));
-    p1=pp_Mult_mm(p,m,r);
+    p1=r->p_Procs->pp_mm_Mult(p,m,r);
     pSetCoeff0(m, n_InpNeg(pGetCoeff(m),r->cf));
     l1=pLength(p1);
     i = pLogLength(l1);
@@ -765,7 +765,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
       }
       else
       {
-        p1 = r->p_Procs->pp_Mult_mm(p1, m, r);
+        p1 = r->p_Procs->pp_mm_Mult(p1, m, r);
       }
       pSetCoeff0(m, n_InpNeg(pGetCoeff(m),r->cf));
     }
@@ -790,110 +790,6 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
     kBucketAdjustBucketsUsed(bucket);
 #else // HAVE_PSEUDO_BUCKETS
   bucket->p = p_Minus_mm_Mult_qq(bucket->p, m,  p,
-                               bucket->l, l1,
-                               spNoether, r);
-#endif
-}
-
-//////////////////////////////////////////////////////////////////////////
-///
-/// Bpoly == Bpoly - m1*p*m2; where m1 and m2 are monoms
-/// Does not destroy p, m1 and m2
-/// assume (*l <= 0 || pLength(p) == *l)
-void kBucket_Minus_m1_Mult_p_Mult_m2(kBucket_pt bucket, poly m1, poly p, poly m2, int *l, poly spNoether)
-{
-  assume(*l <= 0 || pLength(p) == *l);
-  int i, l1;
-  poly p1 = p;
-  ring r = bucket->bucket_ring;
-
-  if (*l <= 0)
-  {
-    l1 = pLength(p1);
-    *l = l1;
-  }
-  else
-    l1 = *l;
-
-  if (m1 == NULL || m2 == NULL || p == NULL) return;
-
-#ifndef HAVE_PSEUDO_BUCKETS
-  kBucketMergeLm(bucket);
-  kbTest(bucket);
-  i = pLogLength(l1);
-
-#if defined(HAVE_PLURAL)
-  if ((rField_is_Ring(r) && !(rField_is_Domain(r)))
-  ||(rIsPluralRing(r)))
-  {
-    pSetCoeff0(m1, n_InpNeg(pGetCoeff(m1),r->cf));
-    p1=pp_Mult_mm(r->p_Procs->pp_mm_Mult(p, m1, r),m2,r);
-    pSetCoeff0(m1, n_InpNeg(pGetCoeff(m1),r->cf));
-    l1=pLength(p1);
-    i = pLogLength(l1);
-  }
-  else
-#endif
-  {
-    if ((i <= bucket->buckets_used) && (bucket->buckets[i] != NULL))
-    {
-      assume(pLength(bucket->buckets[i])==(unsigned)bucket->buckets_length[i]);
-//#ifdef USE_COEF_BUCKETS
-//     if(bucket->coef[i]!=NULL)
-//     {
-//       poly mult=p_Mult_mm(bucket->coef[i],m,r);
-//       bucket->coef[i]=NULL;
-//       p1 = p_Minus_mm_Mult_qq(bucket->buckets[i], mult, p1,
-//                               bucket->buckets_length[i], l1,
-//                             spNoether, r);
-//     }
-//     else
-//#endif
-      MULTIPLY_BUCKET(bucket,i);
-      p1 = p_Minus_mm_Mult_qq(bucket->buckets[i], m1, p_Mult_mm(p1, m2, r),
-                            bucket->buckets_length[i], l1,
-                            spNoether, r);
-      l1 = bucket->buckets_length[i];
-      bucket->buckets[i] = NULL;
-      bucket->buckets_length[i] = 0;
-      i = pLogLength(l1);
-    }
-    else
-    {
-      pSetCoeff0(m1, n_InpNeg(pGetCoeff(m1),r->cf));
-      if (spNoether != NULL)
-      {
-        l1 = -1;
-        p1 = r->p_Procs->pp_Mult_mm_Noether(r->p_Procs->pp_mm_Mult(p1, m1, r), m2, spNoether, l1, r);
-        i = pLogLength(l1);
-      }
-      else
-      {
-        p1 = r->p_Procs->pp_Mult_mm(r->p_Procs->pp_mm_Mult(p1, m1, r), m2, r);
-      }
-      pSetCoeff0(m1, n_InpNeg(pGetCoeff(m1),r->cf));
-    }
-  }
-
-  while (bucket->buckets[i] != NULL)
-  {
-    //kbTest(bucket);
-    MULTIPLY_BUCKET(bucket,i);
-    p1 = p_Add_q(p1, bucket->buckets[i],
-                 l1, bucket->buckets_length[i], r);
-    bucket->buckets[i] = NULL;
-    bucket->buckets_length[i] = 0;
-    i = pLogLength(l1);
-  }
-
-  bucket->buckets[i] = p1;
-  bucket->buckets_length[i]=l1;
-  if (i >= bucket->buckets_used)
-    bucket->buckets_used = i;
-  else
-    kBucketAdjustBucketsUsed(bucket);
-#else // HAVE_PSEUDO_BUCKETS
-  bucket->p = p_Minus_mm_Mult_qq(bucket->p, m1, p_Mult_mm(p, m2, r),
                                bucket->l, l1,
                                spNoether, r);
 #endif

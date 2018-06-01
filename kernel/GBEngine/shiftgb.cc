@@ -97,11 +97,14 @@ poly p_mLPshift(poly p, int sh, int uptodeg, int lV, const ring r)
 {
   /* p is a monomial from the ring r */
 
-  if (sh == 0 || p == NULL) return(p); /* the zero shift */
+  if (sh == 0 || p == NULL || p_LmIsConstant(p,r)) return(p);
 
   int L = p_mLastVblock(p,lV,r);
   assume(L+sh>=1);
   assume(L+sh<=uptodeg);
+  if (!(L+sh<=uptodeg)){
+    int i = 5;
+  }
 
   int *e=(int *)omAlloc0((r->N+1)*sizeof(int));
   int *s=(int *)omAlloc0((r->N+1)*sizeof(int));
@@ -464,3 +467,18 @@ poly p_mShrink(poly p, int lV, const ring r)
 enlargeT: just reallocation */
 
 #endif
+
+// splits a frame (e.g. x(1)*y(5)) m1 into m1 and m2 (e.g. m1=x(1) and m2=y(1)) according to p
+void k_SplitFrame(const poly p, poly &m1, poly &m2, const ring r) {
+  int lV = r->isLPring;
+  int uptodeg = r->N/lV;
+
+  number m1Coeff = pGetCoeff(m1);
+
+  int hole = lV * p_mFirstVblock(p, lV, r);
+  m2 = p_GetExp_k_n(m1, 1, hole, r);
+  m1 = p_GetExp_k_n(m1, hole, r->N, r);
+
+  p_LPshift(m2, 1 - p_mFirstVblock(m2, lV, r), uptodeg, lV, r);
+  p_SetCoeff(m1, m1Coeff, r);
+}
