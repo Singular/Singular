@@ -2226,6 +2226,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
   }
   else if (TEST_OPT_PROT) PrintLn();
+  /* release temp data-------------------------------- */
+  exitBuchMora(strat);
+  /* postprocessing for GB over ZZ --------------------*/
   if (!errorreported)
   {
     if(rField_is_Ring_Z(currRing))
@@ -2249,8 +2252,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     else if (rField_is_Ring(currRing))
       finalReduceByMon(strat);
   }
-  /* release temp data-------------------------------- */
-  exitBuchMora(strat);
 //  if (TEST_OPT_WEIGHTM)
 //  {
 //    pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
@@ -2262,6 +2263,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 //  }
   if ((TEST_OPT_PROT) || (TEST_OPT_DEBUG)) messageStat(hilbcount,strat);
   SI_RESTORE_OPT1(save);
+  /* postprocessing for GB over Q-rings ------------------*/
   if ((Q!=NULL)&&(!errorreported)) updateResult(strat->Shdl,Q,strat);
 
   idTest(strat->Shdl);
