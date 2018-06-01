@@ -10970,7 +10970,8 @@ void postReduceByMonSig(LObject* h, kStrategy strat)
 */
 void finalReduceByMon(kStrategy strat)
 {
-  assume(strat->tl<0); /* can only be called with elements in T: i.e. after exitBuchMora */
+  assume(strat->tl<0); /* can only be called with no elements in T:
+                          i.e. after exitBuchMora */
   if(!nCoeff_is_Ring_Z(currRing->cf))
       return;
   poly p,pp;
