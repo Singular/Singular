@@ -1653,10 +1653,25 @@ BOOLEAN p_ComparePolys(poly p1,poly p2, const ring r);
 static inline int p_Cmp(poly p1, poly p2, ring r)
 {
   if (p2==NULL)
+  {
+    if (p1==NULL) return 0;
     return 1;
+  }
   if (p1==NULL)
     return -1;
   return p_LmCmp(p1,p2,r);
+}
+
+static inline int p_CmpPolys(poly p1, poly p2, ring r)
+{
+  if (p2==NULL)
+  {
+    if (p1==NULL) return 0;
+    return 1;
+  }
+  if (p1==NULL)
+    return -1;
+  return p_ComparePolys(p1,p2,r);
 }
 
 
