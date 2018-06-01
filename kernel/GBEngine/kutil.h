@@ -211,6 +211,7 @@ public:
   KINLINE void SetLmTail(poly lm, poly new_p, int length,
                          int use_bucket, ring r);
   KINLINE void Tail_Minus_mm_Mult_qq(poly m, poly qq, int lq, poly spNoether);
+  KINLINE void Tail_Minus_mm1_Mult_qq_Mult_mm2(poly m1, poly qq, poly m2, int lq, poly spNoether);
   KINLINE void Tail_Mult_nn(number n);
   // deletes bucket, makes sure that p and t_p exists
   KINLINE poly GetP(omBin lmBin = (omBin)NULL);

@@ -31,8 +31,13 @@ int p_LastVblock(poly p, int lV, const ring r);
 //int pmLastVblock(poly p, int lV);
 #define pmLastVblock(p,lV) p_mLastVblock(p,lV,currRing)
 
-int pFirstVblock(poly p, int lV);
-int pmFirstVblock(poly p, int lV);
+int p_FirstVblock(poly p, int lV, const ring r);
+int p_mFirstVblock(poly p, int lV, const ring r);
+
+//int pLastVblock(poly p, int lV);
+#define pFirstVblock(p,lV) p_FirstVblock(p,lV,currRing)
+//int pmLastVblock(poly p, int lV);
+#define pmFirstVblock(p,lV) p_mFirstVblock(p,lV,currRing)
 
 int isInV(poly p, int lV);
 int poly_isInV(poly p, int lV);

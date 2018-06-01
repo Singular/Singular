@@ -3961,7 +3961,9 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 
     if ( ! strat->homog)
     {
-      strat->P.GetP(strat->lmBin); // because shifts are counted with .p structure
+      if (!strat->P.IsNull()) {
+        strat->P.GetP(strat->lmBin); // because shifts are counted with .p structure
+      }
       /* in the nonhomog case we have to shrink the polynomial */
       qq = p_Shrink(strat->P.p, lV, currRing); // direct shrink
       if (qq != NULL)

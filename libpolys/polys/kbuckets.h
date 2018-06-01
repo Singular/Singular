@@ -133,6 +133,13 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
 
 //////////////////////////////////////////////////////////////////////////
 ///
+/// Bpoly == Bpoly - m1*p*m2; where m1 and m2 are monoms
+/// Does not destroy p, m1 and m2 (TODO: rename into kBucket_Minus_mm1_Mult_pp_Mult_mm2!?)
+/// assume (*l <= 0 || pLength(p) == *l)
+void kBucket_Minus_m1_Mult_p_Mult_m2(kBucket_pt bucket, poly m1, poly p, poly m2, int *l, poly spNother = NULL);
+
+//////////////////////////////////////////////////////////////////////////
+///
 /// Bpoly == Bpoly + m*p; where m is a monom
 /// Does not destroy p and m
 /// assume (l <= 0 || pLength(p) == l)

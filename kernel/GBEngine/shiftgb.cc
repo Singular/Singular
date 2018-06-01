@@ -77,7 +77,6 @@ poly p_LPshift(poly p, int sh, int uptodeg, int lV, const ring r)
   /* shifts the poly p from the ring r by sh */
 
   /* assume sh and uptodeg agree TODO check */
-  assume(sh>=0);
 
   if (sh == 0) return(p); /* the zero shift */
 
@@ -98,10 +97,10 @@ poly p_mLPshift(poly p, int sh, int uptodeg, int lV, const ring r)
 {
   /* p is a monomial from the ring r */
 
-  if (sh == 0) return(p); /* the zero shift */
+  if (sh == 0 || p == NULL) return(p); /* the zero shift */
 
-  assume(sh>=0);
   int L = p_mLastVblock(p,lV,r);
+  assume(L+sh>=1);
   assume(L+sh<=uptodeg);
 
   int *e=(int *)omAlloc0((r->N+1)*sizeof(int));
@@ -117,6 +116,7 @@ poly p_mLPshift(poly p, int sh, int uptodeg, int lV, const ring r)
     if (e[j]==1)
     {
       assume(j + (sh*lV)<=r->N);
+      assume(j + (sh*lV)>=1);
       s[j + (sh*lV)] = e[j]; /* actually 1 */
     }
   }
@@ -174,7 +174,7 @@ int p_mLastVblock(poly p, int lV, const ring r)
 {
   /* for a monomial p, returns the number of the last block */
   /* where a nonzero exponent is sitting */
-  if (p_LmIsConstant(p,r))
+  if (p == NULL || p_LmIsConstant(p,r))
   {
     return(0);
   }
@@ -189,45 +189,45 @@ int p_mLastVblock(poly p, int lV, const ring r)
   return (b);
 }
 
-int pFirstVblock(poly p, int lV)
+int p_FirstVblock(poly p, int lV, const ring r)
 {
   /* returns the number of maximal block */
   /* appearing among the monomials of p */
   /* the 0th block is the 1st one */
-  poly q = p; //p_Copy(p,currRing); /* need it ? */
-  int ans = 0;
+  if (p == NULL) {
+    return 0;
+  }
+  poly q = p;
+  int ans = p_mFirstVblock(q,lV,r);
   int ansnew = 0;
   while (q!=NULL)
   {
-    ansnew = pmFirstVblock(q,lV);
-    ans    = si_min(ans,ansnew);
+    ansnew = p_mFirstVblock(q,lV,r);
+    if (ansnew > 0) { // don't count constants
+      ans = si_min(ans,ansnew);
+    }
     pIter(q);
   }
   /* do not need to delete q */
   return(ans);
 }
 
-int pmFirstVblock(poly p, int lV)
+int p_mFirstVblock(poly p, int lV, const ring r)
 {
-  if (pIsConstantPoly(p))
+  if (p == NULL || p_LmIsConstant(p,r))
   {
-    return(int(0));
+    return(0);
   }
   /* for a monomial p, returns the number of the first block */
   /* where a nonzero exponent is sitting */
-  int *e=(int *)omAlloc0((currRing->N+1)*sizeof(int));
-  p_GetExpV(p,e,currRing);
+  int *e=(int *)omAlloc0((r->N+1)*sizeof(int));
+  p_GetExpV(p,e,r);
   int j,b;
   j = 1;
-  while ( (!e[j]) && (j<=currRing->N-1) ) j++;
-  if (j==currRing->N + 1)
-  {
-#ifdef PDEBUG
-    PrintS("pmFirstVblock: unexpected zero exponent vector\n");
-#endif
-    return(j);
-  }
-  b = (int)(j/lV)+1; /* the number of the block, 1<= N <= currRing->N  */
+  while ( (!e[j]) && (j<=r->N-1) ) j++;
+  freeT(e, r->N);
+  assume(j <= r->N);
+  b = (int)(j+lV-1)/lV; /* the number of the block, 1<= b <= r->N  */
   return (b);
 }
 
@@ -395,6 +395,7 @@ poly p_mShrink(poly p, int lV, const ring r)
   /* check assumes/exceptions */
   /* r->N is a multiple of lV */
 
+  if (p==NULL) return p;
   int *e = (int *)omAlloc0((r->N+1)*sizeof(int));
   int  b = (int)((r->N +lV-1)/lV); /* the number of blocks */
   //  int *B = (int *)omAlloc0((b+1)*sizeof(int)); /* the num of elements in a block */

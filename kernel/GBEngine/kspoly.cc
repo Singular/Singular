@@ -122,6 +122,11 @@ int ksReducePoly(LObject* PR,
     }
   }
 
+  int holeStart = tailRing->isLPring * p_mFirstVblock(p2, tailRing->isLPring, tailRing);
+  // n1 and n2 is already set to 1
+  poly n1 = p_GetExp_k_n(lm, holeStart, tailRing->N, tailRing);
+  poly n2 = p_GetExp_k_n(lm, 1, holeStart, tailRing);
+
   // take care of coef buisness
   if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
   {
@@ -129,6 +134,7 @@ int ksReducePoly(LObject* PR,
     number an = pGetCoeff(p2);
     int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
     p_SetCoeff(lm, bn, tailRing);
+    p_SetCoeff(n1, bn, tailRing);
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
@@ -136,12 +142,16 @@ int ksReducePoly(LObject* PR,
   }
   else
   {
+    p_SetCoeff(n1, pGetCoeff(lm), tailRing);
     if (coef != NULL) *coef = n_Init(1, tailRing->cf);
   }
 
-
   // and finally,
-  PR->Tail_Minus_mm_Mult_qq(lm, t2, pLength(t2) /*PW->GetpLength() - 1*/, spNoether);
+  if (tailRing->isLPring) {
+    PR->Tail_Minus_mm1_Mult_qq_Mult_mm2(n1, t2, n2, pLength(t2), spNoether);
+  } else {
+    PR->Tail_Minus_mm_Mult_qq(lm, t2, pLength(t2) /*PW->GetpLength() - 1*/, spNoether);
+  }
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
   PR->LmDeleteAndIter();
 

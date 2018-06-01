@@ -593,6 +593,26 @@ KINLINE void sLObject::Tail_Minus_mm_Mult_qq(poly m, poly q, int lq,
   }
 }
 
+KINLINE void sLObject::Tail_Minus_mm1_Mult_qq_Mult_mm2(poly m1, poly q, poly m2, int lq, poly spNoether)
+{
+  if (bucket != NULL)
+  {
+    kBucket_Minus_m1_Mult_p_Mult_m2(bucket, m1, q, m2, &lq, NULL); // check if we need noether
+  }
+  else
+  {
+    if (lq<=0) lq= ::pLength(q);
+    poly _p = (t_p != NULL ? t_p : p);
+    assume(_p != NULL);
+
+    int lp=pLength-1;
+    pNext(_p) = p_Minus_mm_Mult_qq( pNext(_p), m1, p_Mult_mm(q, m2, tailRing), lp, lq,
+        spNoether, tailRing );
+    pLength=lp+1;
+    return;
+  }
+}
+
 KINLINE void sLObject::LmDeleteAndIter()
 {
   sTObject::LmDeleteAndIter();
