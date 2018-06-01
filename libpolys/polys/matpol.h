@@ -49,6 +49,7 @@ matrix mp_Add(matrix a, matrix b, const ring r);
 matrix mp_Sub(matrix a, matrix b, const ring r);
 matrix mp_Mult(matrix a, matrix b, const ring r);
 matrix mp_Transp(matrix a, const ring r);
+BOOLEAN mp_Equal(matrix a, matrix b, const ring r);
 poly mp_Trace ( matrix a, const ring r);
 poly TraceOfProd ( matrix a, matrix b, int n, const ring r);
 
