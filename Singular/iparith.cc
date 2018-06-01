@@ -1292,7 +1292,7 @@ static BOOLEAN jjEQUAL_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjEQUAL_Ma(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((long)mp_Compare((matrix)u->Data(),(matrix)v->Data(),currRing)==0);
+  res->data = (char *)((long)mp_Equal((matrix)u->Data(),(matrix)v->Data(),currRing));
   jjEQUAL_REST(res,u,v);
   return FALSE;
 }

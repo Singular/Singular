@@ -581,6 +581,30 @@ int mp_Compare(matrix a, matrix b, const ring R)
   return r;
 }
 
+BOOLEAN mp_Equal(matrix a, matrix b, const ring R)
+{
+  if ((MATCOLS(a)!=MATCOLS(b)) || (MATROWS(a)!=MATROWS(b)))
+    return FALSE;
+  int i=MATCOLS(a)*MATROWS(a)-1;
+  while (i>=0)
+  {
+    if (a->m[i]==NULL)
+    {
+      if (b->m[i]!=NULL) return FALSE;
+    }
+    else if (b->m[i]==NULL) return FALSE;
+    else if (p_Cmp(a->m[i],b->m[i], R)!=0) return FALSE;
+    i--;
+  }
+  i=MATCOLS(a)*MATROWS(a)-1;
+  while (i>=0)
+  {
+    if(!p_EqualPolys(a->m[i],b->m[i], R)) return FALSE;
+    i--;
+  }
+  return TRUE;
+}
+
 /*2
 * insert a monomial into a list, avoid duplicates
 * arguments are destroyed
