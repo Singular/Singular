@@ -881,7 +881,7 @@ static inline void p_Delete(poly *p,  const ring lmRing, const ring tailRing)
 }
 
 // copys monomials of p, allocates new monomials from bin,
-// deletes monomoals of p
+// deletes monomials of p
 static inline poly p_ShallowCopyDelete(poly p, const ring r, omBin bin)
 {
   p_LmCheckPolyRing2(p, r);
