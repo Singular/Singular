@@ -2552,6 +2552,7 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->cfFarey        = ntFarey;
   cf->cfChineseRemainder = ntChineseRemainder;
   cf->cfInt          = ntInt;
+  cf->cfAdd          = ntAdd;
   cf->cfInpNeg       = ntNeg;
   cf->cfSub          = ntSub;
   cf->cfMult         = ntMult;
