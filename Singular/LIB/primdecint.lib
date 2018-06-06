@@ -918,14 +918,14 @@ NOTE:    this is an alternative to intersect(I,J) over integers,
 EXAMPLE: example intersectZ; shows an example
 {
    def R = basering;
-   execute("ring S=integer,( X(1..nvars(R)) ), ( dp(nvars(R)) );");
+   ring S=integer,( X(1..nvars(R)) ), ( dp(nvars(R)) );
    ideal I = fetch(R,I);
    ideal J = fetch(R,J);
-   execute("ring St=integer, ( t, X(1..nvars(R))  ), ( dp(1), dp(nvars(R)) );");
+   ring St=integer, ( t, X(1..nvars(R))  ), ( dp(1), dp(nvars(R)) );
    ideal I = imap(S,I);
    ideal J = imap(S,J);
    ideal K =  var(1)*I+(1-var(1))*J;
-   K = stdZ(K);
+   K = std(K);
    int i;
    ideal L;
    for(i=1; i<=size(K); i++)
