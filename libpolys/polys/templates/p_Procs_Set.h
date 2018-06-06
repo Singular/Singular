@@ -171,6 +171,10 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
     _p_procs->p_mm_Mult = shift_p_mm_Mult;
     _p_procs->pp_mm_Mult = shift_pp_mm_Mult;
     _p_procs->p_Minus_mm_Mult_qq = shift_p_Minus_mm_Mult_qq;
+    // Unsupported
+    _p_procs->pp_Mult_mm_Noether = shift_pp_Mult_mm_Noether_STUB;
+    _p_procs->pp_Mult_Coeff_mm_DivSelect = shift_pp_Mult_Coeff_mm_DivSelect_STUB;
+    _p_procs->pp_Mult_Coeff_mm_DivSelectMult = shift_pp_Mult_Coeff_mm_DivSelectMult_STUB;
   } else {
     _p_procs->p_mm_Mult=_p_procs->p_Mult_mm;
     _p_procs->pp_mm_Mult=_p_procs->pp_Mult_mm;

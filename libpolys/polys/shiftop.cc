@@ -154,3 +154,37 @@ poly shift_p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly s
   Shorter -= pLength(qq);
   return qq;
 }
+
+// Unsupported Operation STUBs
+poly shift_pp_Mult_mm_Noether_STUB(poly p, const poly m, const poly spNoether, int &ll, const ring ri) {
+  WarnS("pp_Mult_mm_Noether is not supported yet by Letterplace. Ignoring spNoether. This might lead to unexpected behavior.");
+#ifdef SHIFT_MULT_DEBUG
+  PrintLn(); PrintS("shift_pp_Mult_mm_Noether: "); p_wrp(m, ri, ri); PrintS(" * "); p_wrp(p, ri, ri); PrintLn();
+#endif
+
+  int pLen = 0;
+  if (ll >= 0) {
+    pLen = pLength(p);
+  }
+
+  p = shift_pp_Mult_mm(p, m, ri);
+
+  if (ll >= 0) {
+    ll = pLen - pLength(p);
+  } else {
+    ll = pLength(p);
+  }
+
+  return p;
+}
+
+
+poly shift_pp_Mult_Coeff_mm_DivSelectMult_STUB(poly p,const poly m, const poly a, const poly b, int &shorter,const ring r) {
+  WarnS("pp_Mult_Coeff_mm_DivSelectMult is not supported yet by Letterplace. This might lead to unexpected behavior.");
+  return NULL;
+}
+
+poly shift_pp_Mult_Coeff_mm_DivSelect_STUB(poly p, const poly m, int &shorter, const ring r) {
+  WarnS("pp_Mult_Coeff_mm_DivSelect is not supported yet by Letterplace. This might lead to unexpected behavior.");
+  return NULL;
+}
