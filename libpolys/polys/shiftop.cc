@@ -22,8 +22,7 @@ poly shift_pp_Mult_mm(poly p, const poly m, const ring ri)
 #ifdef SHIFT_MULT_WARNINGS
   // only needed because our examples still use x(1)*y(2) etc on the interface level
   if (mshift > 0) {
-    PrintLn();
-    PrintS("WARNING: m is already shifted");
+    PrintLn(); WarnS("m is already shifted");
   }
 #endif
   poly m2 = p_Copy(m,ri);
@@ -55,7 +54,7 @@ poly shift_p_Mult_mm(poly p, const poly m, const ring ri)
 #ifdef SHIFT_MULT_WARNINGS
   // only needed because our examples still use x(1)*y(2) etc on the interface level
   if (mshift > 0) {
-    PrintLn(); Print("WARNING: m is already shifted"); PrintLn();
+    PrintLn(); WarnS("m is already shifted");
   }
 #endif
   poly m2 = p_Copy(m,ri);
@@ -88,7 +87,7 @@ poly shift_pp_mm_Mult(poly p, const poly m, const ring ri)
 #ifdef SHIFT_MULT_WARNINGS
   // only needed because our examples still use x(1)*y(2) etc on the interface level
   if (pshift > 0) {
-    PrintLn(); PrintS("WARNING: p is already shifted"); PrintLn();
+    PrintLn(); WarnS("p is already shifted");
   }
 #endif
   p = p_Copy(p,ri);
@@ -121,7 +120,7 @@ poly shift_p_mm_Mult(poly p, const poly m, const ring ri)
 #ifdef SHIFT_MULT_WARNINGS
   // only needed because our examples still use x(1)*y(2) etc on the interface level
   if (pshift > 0) {
-    PrintLn(); PrintS("WARNING: p is already shifted"); PrintLn();
+    PrintLn(); WarnS("p is already shifted");
   }
 #endif
   p_LPshift(p, mshift - pshift, uptodeg, lV, ri);
@@ -157,7 +156,7 @@ poly shift_p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly s
 
 // Unsupported Operation STUBs
 poly shift_pp_Mult_mm_Noether_STUB(poly p, const poly m, const poly spNoether, int &ll, const ring ri) {
-  WarnS("pp_Mult_mm_Noether is not supported yet by Letterplace. Ignoring spNoether. This might lead to unexpected behavior.");
+  PrintLn(); WarnS("pp_Mult_mm_Noether is not supported yet by Letterplace. Ignoring spNoether. This might lead to unexpected behavior.");
 #ifdef SHIFT_MULT_DEBUG
   PrintLn(); PrintS("shift_pp_Mult_mm_Noether: "); p_wrp(m, ri, ri); PrintS(" * "); p_wrp(p, ri, ri); PrintLn();
 #endif
@@ -180,11 +179,11 @@ poly shift_pp_Mult_mm_Noether_STUB(poly p, const poly m, const poly spNoether, i
 
 
 poly shift_pp_Mult_Coeff_mm_DivSelectMult_STUB(poly p,const poly m, const poly a, const poly b, int &shorter,const ring r) {
-  WarnS("pp_Mult_Coeff_mm_DivSelectMult is not supported yet by Letterplace. This might lead to unexpected behavior.");
+  PrintLn(); WarnS("pp_Mult_Coeff_mm_DivSelectMult is not supported yet by Letterplace. This might lead to unexpected behavior.");
   return NULL;
 }
 
 poly shift_pp_Mult_Coeff_mm_DivSelect_STUB(poly p, const poly m, int &shorter, const ring r) {
-  WarnS("pp_Mult_Coeff_mm_DivSelect is not supported yet by Letterplace. This might lead to unexpected behavior.");
+  PrintLn(); WarnS("pp_Mult_Coeff_mm_DivSelect is not supported yet by Letterplace. This might lead to unexpected behavior.");
   return NULL;
 }
