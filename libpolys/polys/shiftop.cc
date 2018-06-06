@@ -42,8 +42,6 @@ poly shift_pp_Mult_mm(poly p, const poly m, const ring ri)
 // destroys p
 poly shift_p_Mult_mm(poly p, const poly m, const ring ri)
 {
-  // TODO remove this
-  return shift_pp_Mult_mm(p,m,ri);
 #ifdef SHIFT_MULT_DEBUG
   PrintLn(); PrintS("shift_p_Mult_mm: "); p_wrp(p, ri, ri); PrintS(" * "); p_wrp(m, ri, ri); PrintLn();
 #endif
@@ -110,7 +108,6 @@ poly shift_pp_mm_Mult(poly p, const poly m, const ring ri)
 // destroys p
 poly shift_p_mm_Mult(poly p, const poly m, const ring ri)
 {
-  return shift_pp_mm_Mult(p,m,ri);
 #ifdef SHIFT_MULT_DEBUG
   PrintLn(); PrintS("shift_p_mm_Mult: "); p_wrp(m, ri, ri); PrintS(" * "); p_wrp(p, ri, ri); PrintLn();
 #endif
@@ -143,7 +140,6 @@ poly shift_p_mm_Mult(poly p, const poly m, const ring ri)
 
 // p - m*q destroys p
 poly shift_p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoether, const ring ri) {
-
 #ifdef SHIFT_MULT_DEBUG
   PrintLn(); PrintS("shift_p_Minus_mm_Mult_qq: "); p_wrp(p, ri, ri); PrintS(" - "); p_wrp(m, ri, ri); PrintS(" * "); p_wrp(q, ri, ri); PrintLn();
 #endif
