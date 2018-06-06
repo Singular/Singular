@@ -2241,16 +2241,16 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         }
       }
       finalReduceByMon(strat);
-      for(int i = 0;i<=strat->sl;i++)
+      for(int i = 0;i<IDELEMS(strat->Shdl);i++)
       {
-        if(!nGreaterZero(pGetCoeff(strat->S[i])))
+        if(!nGreaterZero(pGetCoeff(strat->Shdl->m[i])))
         {
-          strat->S[i] = pNeg(strat->S[i]);
+          strat->S[i] = pNeg(strat->Shdl->m[i]);
         }
       }
     }
-    else if (rField_is_Ring(currRing))
-      finalReduceByMon(strat);
+    //else if (rField_is_Ring(currRing))
+    //  finalReduceByMon(strat);
   }
 //  if (TEST_OPT_WEIGHTM)
 //  {

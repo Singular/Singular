@@ -10972,43 +10972,67 @@ void finalReduceByMon(kStrategy strat)
 {
   assume(strat->tl<0); /* can only be called with no elements in T:
                           i.e. after exitBuchMora */
+  /* do not use strat->S, strat->sl as they may be out of sync*/
   if(!nCoeff_is_Ring_Z(currRing->cf))
       return;
   poly p,pp;
-  for(int j = 0; j<=strat->sl; j++)
+  for(int j = 0; j<IDELEMS(strat->Shdl); j++)
   {
-    if((strat->S[j]!=NULL)&&(pNext(strat->S[j]) == NULL))
+    if((strat->Shdl->m[j]!=NULL)&&(pNext(strat->Shdl->m[j]) == NULL))
     {
-      for(int i = 0; i<=strat->sl; i++)
+      for(int i = 0; i<IDELEMS(strat->Shdl); i++)
       {
-        if((i != j) && (strat->S[i] != NULL))
+        if((i != j) && (strat->Shdl->m[i] != NULL))
         {
-          p = strat->S[i];
-          if(pLmDivisibleBy(strat->S[j], p))
+          p = strat->Shdl->m[i];
+          while((p!=NULL) && pLmDivisibleBy(strat->Shdl->m[j], p))
           {
-            number dummy = n_IntMod(p->coef, strat->S[j]->coef, currRing->cf);
-            p_SetCoeff(p,dummy,currRing);
+            number dummy = n_IntMod(p->coef, strat->Shdl->m[j]->coef, currRing->cf);
+            if (!nEqual(dummy,p->coef))
+            {
+              if (nIsZero(dummy))
+              {
+                nDelete(&dummy);
+                pLmDelete(&strat->Shdl->m[i]);
+                p=strat->Shdl->m[i];
+              }
+              else
+              {
+                p_SetCoeff(p,dummy,currRing);
+                break;
+              }
+            }
+            else
+            {
+              nDelete(&dummy);
+              break;
+            }
           }
-          pp = pNext(p);
-          if((pp == NULL) && (nIsZero(p->coef)))
+          if (p!=NULL)
           {
-            deleteInS(i, strat);
-          }
-          else
-          {
+            pp = pNext(p);
             while(pp != NULL)
             {
-              if(pLmDivisibleBy(strat->S[j], pp))
+              if(pLmDivisibleBy(strat->Shdl->m[j], pp))
               {
-                number dummy = n_IntMod(pp->coef, strat->S[j]->coef, currRing->cf);
-                p_SetCoeff(pp,dummy,currRing);
-                if(nIsZero(pp->coef))
+                number dummy = n_IntMod(pp->coef, strat->Shdl->m[j]->coef, currRing->cf);
+                if (!nEqual(dummy,pp->coef))
                 {
-                  pLmDelete(&pNext(p));
-                  pp = pNext(p);
+                  p_SetCoeff(pp,dummy,currRing);
+                  if(nIsZero(pp->coef))
+                  {
+                    pLmDelete(&pNext(p));
+                    pp = pNext(p);
+                  }
+                  else
+                  {
+                    p = pp;
+                    pp = pNext(p);
+                  }
                 }
                 else
                 {
+                  nDelete(&dummy);
                   p = pp;
                   pp = pNext(p);
                 }
@@ -11020,19 +11044,12 @@ void finalReduceByMon(kStrategy strat)
               }
             }
           }
-          if(strat->S[i]!= NULL && nIsZero(pGetCoeff(strat->S[i])))
-          {
-            if(pNext(strat->S[i]) == NULL)
-              strat->S[i]=NULL;
-            else
-              strat->S[i]=pNext(strat->S[i]);
-          }
         }
       }
       //idPrint(strat->Shdl);
     }
   }
-  //idSkipZeroes(strat->Shdl);
+  idSkipZeroes(strat->Shdl);
 }
 #endif
 
