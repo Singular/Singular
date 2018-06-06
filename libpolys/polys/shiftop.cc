@@ -132,7 +132,7 @@ poly shift_p_mm_Mult(poly p, const poly m, const ring ri)
   poly q = p_Shrink(p, lV, ri);
   p_Delete(&p, ri);
 #ifdef SHIFT_MULT_DEBUG
-  PrintLn(); PrintS("shift_p_mm_Mult resutl: "); p_wrp(q, ri, ri); PrintLn();
+  PrintLn(); PrintS("shift_p_mm_Mult result: "); p_wrp(q, ri, ri); PrintLn();
 #endif
   return q;
 }
