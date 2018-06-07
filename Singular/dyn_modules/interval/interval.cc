@@ -216,11 +216,7 @@ static BOOLEAN interval_Assign(leftv result, leftv args)
     }
 
     // check if second argument exists
-    if (args->Typ() == intervalID)
-    {
-      RES = new interval(n1, n2);
-    }
-    else if (args->next == NULL)
+    if (args->next == NULL)
     {
       RES = new interval(n1);
     }
