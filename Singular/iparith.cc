@@ -6244,6 +6244,19 @@ static BOOLEAN jjSUBST_Test(leftv v,leftv w,
   }
   return FALSE;
 }
+static BOOLEAN jjSUBST_Bu(leftv res, leftv u, leftv v,leftv w)
+{
+  // generic conversion from polyBucket to poly:
+  // force this to be the first try everytime
+  poly p; int l;
+  sBucket_pt bu=(sBucket_pt)w->CopyD();
+  sBucketDestroyAdd(bu,&p,&l);
+  sleftv tmpw;
+  tmpw.Init();
+  tmpw.rtyp=POLY_CMD;
+  tmpw.data=p;
+  return iiExprArith3(res, iiOp, u, v, &tmpw);
+}
 static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
 {
   int ringvar;
