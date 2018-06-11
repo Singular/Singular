@@ -94,4 +94,11 @@ extern omBin ip_smatrix_bin;
 int mp_Compare(matrix a, matrix b, const ring r);
 
 ideal mp_Tensor(ideal A, ideal B, const ring r);
+// -------------------------------------------------------
+ideal sm_Add(ideal a, ideal b, const ring R);
+ideal sm_Sub(ideal a, ideal b, const ring R);
+ideal sm_Mult(ideal a, ideal b, const ring R);
+ideal sm_Transp(ideal a, const ring R);
+poly sm_Trace ( ideal a, const ring R);
+int sm_Compare(ideal a, ideal b, const ring R);
 #endif/* MATPOL_H */
