@@ -3861,7 +3861,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
 #ifdef HAVE_SHIFTBBA
 
 
-ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int uptodeg, int lV)
+ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 {
   int   red_result = 1;
   int   olddeg,reduc;
@@ -3877,11 +3877,10 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   initBbaShift(strat); /* DONE */
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   /*Shdl=*/initBuchMoraShift(F, Q,strat); /* updateS with no toT, i.e. no init for T */
-  updateSShift(strat,uptodeg,lV); /* initializes T */
+  updateSShift(strat); /* initializes T */
 
   if (strat->minim>0) strat->M=idInit(IDELEMS(F),F->rank);
   reduc = olddeg = 0;
-  strat->lV=lV;
 
 #ifndef NO_BUCKETS
   if (!TEST_OPT_NOT_BUCKETS)
@@ -3957,42 +3956,6 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       strat->P.PrepareRed(strat->use_buckets);
     }
 
-    poly qq;
-
-    /* here in the nonhomog case we shrink the new spoly */
-
-    if ( ! strat->homog)
-    {
-      if (!strat->P.IsNull()) {
-        strat->P.GetP(strat->lmBin); // because shifts are counted with .p structure
-      }
-      /* in the nonhomog case we have to shrink the polynomial */
-      qq = p_Shrink(strat->P.p, lV, currRing); // direct shrink
-      if (qq != NULL)
-      {
-         /* we're here if Shrink is nonzero */
-        strat->P.p   =  qq;
-        strat->P.t_p =  NULL;
-        strat->P.GetP(strat->lmBin);
-        // update sev and length
-        strat->initEcart(&(strat->P));
-        strat->P.sev = pGetShortExpVector(strat->P.p);
-//         strat->P.FDeg = strat->P.pFDeg();
-//         strat->P.length = strat->P.pLDeg();
-//         strat->P.pLength =strat->P.GetpLength(); //pLength(strat->P.p);
-      }
-      else
-      {
-         /* Shrink is zero, like y(1)*y(2) - y(1)*y(3)*/
-#ifdef KDEBUG
-         if (TEST_OPT_DEBUG){PrintS("nonzero s shrinks to 0\n");}
-#endif
-         strat->P.p = NULL;
-         strat->P.t_p = NULL;
-       }
-    }
-      /* end shrinking poly in the nonhomog case */
-
     if (strat->P.p == NULL && strat->P.t_p == NULL)
     {
       red_result = 0;
@@ -4019,6 +3982,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
 
       // reduce the tail and normalize poly
+      strat->redTailChange=FALSE;
       if (TEST_OPT_INTSTRATEGY)
       {
         strat->P.pCleardenom();
@@ -4026,17 +3990,25 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
         {
           strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
           strat->P.pCleardenom();
+          if (strat->redTailChange) { 
+            strat->P.t_p=NULL;
+            // for some reason length and pLength are set to 0 in redtailBba
+            strat->initEcart(&(strat->P));
+          }
         }
       }
       else
       {
         strat->P.pNorm();
-        if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+        if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL)) {
           strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
+          if (strat->redTailChange) {
+            strat->P.t_p=NULL;
+            // for some reason length and pLength are set to 0 in redtailBba
+            strat->initEcart(&(strat->P));
+          }
+        }
       }
-
-      // here we must shrink again! and optionally reduce again
-      // or build shrink into redtailBba!
 
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG){PrintS("new s:");strat->P.wrp();PrintLn();}
@@ -4063,62 +4035,6 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
         minimcnt++;
       }
 
-    /* here in the nonhomog case we shrink the reduced poly AGAIN */
-
-      if ( ! strat->homog)
-      {
-        strat->P.GetP(strat->lmBin); // because shifts are counted with .p structure
-        /* in the nonhomog case we have to shrink the polynomial */
-        if (strat->P.p!=NULL)
-        {
-          qq = p_Shrink(strat->P.p, lV, currRing); // direct shrink
-          if (qq != NULL)
-          {
-            /* we're here if Shrink is nonzero */
-            strat->P.p   =  qq; // is not set by Delete
-            strat->P.t_p =  NULL;
-            strat->P.GetP(strat->lmBin);
-            // update sev and length
-            strat->initEcart(&(strat->P));
-            strat->P.sev = pGetShortExpVector(strat->P.p);
-          }
-          else
-          {
-            /* Shrink is zero, like y(1)*y(2) - y(1)*y(3)*/
-#ifdef PDEBUG
-            if (TEST_OPT_DEBUG){PrintS("nonzero s shrinks to 0");PrintLn();}
-#endif
-            strat->P.p = NULL;
-            strat->P.t_p = NULL;
-            goto     red_shrink2zero;
-          }
-        }
-        else
-        {
-          qq = p_Shrink(strat->P.p, lV, currRing); // direct shrink
-          if (qq != NULL)
-          {
-            /* we're here if Shrink is nonzero */
-            strat->P.p   =  qq;
-            strat->P.t_p =  NULL;
-            // update sev and length
-            strat->initEcart(&(strat->P));
-            strat->P.sev = pGetShortExpVector(strat->P.p);
-          }
-          else
-          {
-            /* Shrink is zero, like y(1)*y(2) - y(1)*y(3)*/
-#ifdef PDEBUG
-            if (TEST_OPT_DEBUG){PrintS("nonzero s shrinks to 0");PrintLn();}
-#endif
-            strat->P.p = NULL;
-            strat->P.t_p = NULL;
-            goto     red_shrink2zero;
-          }
-        }
-      }
-      /* end shrinking poly AGAIN in the nonhomog case */
-
 
       // enter into S, L, and T
       //if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
@@ -4129,8 +4045,8 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       // because shifts are counted with .p structure // done before, but ?
       int atR=strat->tl+1; // enterTShift introduces T[tl+1], T[tl+2]...
                            // with T[tl+1]=P.p
-      enterTShift(strat->P,strat,-1,uptodeg, lV);
-      enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, atR,uptodeg,lV);
+      enterTShift(strat->P,strat,-1);
+      enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, atR);
       //      enterpairsShift(vw,strat->sl,strat->P.ecart,pos,strat, strat->tl,uptodeg,lV);
       // posInS only depends on the leading term
       strat->enterS(strat->P, pos, strat, atR);
@@ -4139,13 +4055,9 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 //      Print("[%d]",hilbeledeg);
       if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
     }
-    else
+    else if (strat->P.p1 == NULL && strat->minim > 0)
     {
-    red_shrink2zero:
-      if (strat->P.p1 == NULL && strat->minim > 0)
-      {
-        p_Delete(&strat->P.p2, currRing, strat->tailRing);
-      }
+      p_Delete(&strat->P.p2, currRing, strat->tailRing);
     }
 #ifdef KDEBUG
     memset(&(strat->P), 0, sizeof(strat->P));
@@ -4233,33 +4145,17 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 }
 
 
-ideal freegb(ideal I, int uptodeg, int lVblock)
+ideal freegb(ideal I)
 {
-  /* todo main call */
-
-  /* assume: ring is prepared, ideal is copied into shifted ring */
-  /* uptodeg and lVblock are correct - test them! */
-
-  /* check whether the ideal is in V */
-
-//  if (0)
-  if (! ideal_isInV(I,lVblock) )
-  {
-    WerrorS("The input ideal contains incorrectly encoded elements! ");
-    return(NULL);
+  if (!currRing->isLPring) {
+    WerrorS("freegb only works with Letterplace rings");
+    return NULL;
   }
 
-  //  kStrategy strat = new skStrategy;
-  /* ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int uptodeg, int lV) */
-  /* at the moment:
-- no quotient (check)
-- no *w, no *hilb
-  */
-  /* ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
-     int newIdeal, intvec *vw) */
-  ideal RS = kStdShift(I,NULL, testHomog, NULL,NULL,0,0,NULL, uptodeg, lVblock);
-    //bbaShift(I,NULL, NULL, NULL, strat, uptodeg, lVblock);
-  idSkipZeroes(RS);
+  assume(ideal_isInV(I, currRing));
+  ideal RS = kStdShift(I,NULL, testHomog, NULL,NULL,0,0,NULL);
+  idSkipZeroes(RS); // is this even necessary?
+  assume(ideal_isInV(RS, currRing));
   return(RS);
 }
 
@@ -4302,12 +4198,6 @@ int redFirstShift (LObject* h,kStrategy strat)
     }
 #endif
     ksReducePoly(h, &(strat->T[j]), strat->kNoetherTail(), NULL, strat);
-    if (!h->IsNull())
-    {
-      poly qq=p_Shrink(h->GetP(),strat->lV,currRing);
-      h->p=qq;
-      h->t_p=NULL;
-    }
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)

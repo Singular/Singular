@@ -501,10 +501,8 @@ EXAMPLE: example letplaceGBasis; shows examples
   def save = basering;
   // assumes of the ring have been checked
   // run the computation - it will test assumes on the ideal
-  int uptodeg = attrib(save,"uptodeg");
-  int lV = attrib(save,"isLetterplaceRing");
   dbprint(ppl,"start computing GB");
-  def J = system("freegb",I,uptodeg,lV);
+  def J = system("freegb",I);
   dbprint(ppl,"finished computing GB");
   dbprint(ppl-1,"the result is:");
   dbprint(ppl-1,J);
@@ -2526,9 +2524,7 @@ EXAMPLE: example shiftPoly; shows examples
   {
     ERROR("Incomplete Letterplace structure on the basering!");
   }
-  int uptodeg = attrib(basering,"uptodeg");
-  int lV = attrib(basering,"isLetterplaceRing");
-  return(system("stest",a,i,uptodeg,lV));
+  return(system("stest",a,i));
 }
 example
 {

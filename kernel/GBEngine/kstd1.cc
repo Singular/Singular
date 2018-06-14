@@ -2571,7 +2571,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
 
 #ifdef HAVE_SHIFTBBA
 ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
-                int newIdeal, intvec *vw, int uptodeg, int lV)
+                int newIdeal, intvec *vw)
 {
   ideal r;
   BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
@@ -2652,9 +2652,9 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   {
     /* global ordering */
     if (w!=NULL)
-      r=bbaShift(F,Q,*w,hilb,strat,uptodeg,lV);
+      r=bbaShift(F,Q,*w,hilb,strat);
     else
-      r=bbaShift(F,Q,NULL,hilb,strat,uptodeg,lV);
+      r=bbaShift(F,Q,NULL,hilb,strat);
   }
 #ifdef KDEBUG
   idTest(r);

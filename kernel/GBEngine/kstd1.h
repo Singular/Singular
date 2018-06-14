@@ -39,7 +39,7 @@ ideal kStd(ideal F, ideal Q, tHomog h, intvec ** mw,intvec *hilb=NULL,
           int syzComp=0,int newIdeal=0, intvec *vw=NULL, s_poly_proc_t sp=NULL);
 
 ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
-                int newIdeal, intvec *vw, int uptodeg, int lVblock);
+                int newIdeal, intvec *vw);
 
 /* the following global data are defined in kutil.cc */
 //extern int syzComp;

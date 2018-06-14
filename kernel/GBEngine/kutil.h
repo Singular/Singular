@@ -359,7 +359,6 @@ public:
   int blockredmax;
   #endif
   #ifdef HAVE_SHIFTBBA
-  int lV;
   int cv; // in shift bases: counting V criterion
   #endif
   /*BOOLEAN*/ char interpt;
@@ -815,17 +814,17 @@ poly pMoveCurrTail2poly(poly p, kStrategy strat);
 
 poly pCopyL2p(LObject h, kStrategy strat);
 
-void enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV);
+void enterTShift(LObject p, kStrategy strat, int atT);
 
 void initBuchMoraShift (ideal F,ideal Q,kStrategy strat);
 
-void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV);
+void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy strat, int atR);
 
-void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS, int uptodeg, int lV); // ok
+void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS);
 
-void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR,int uptodeg, int lV);
+void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR);
 
-void updateSShift(kStrategy strat,int uptodeg,int lV);
+void updateSShift(kStrategy strat);
 
 void initBbaShift(kStrategy strat);
 
@@ -833,9 +832,9 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
 
 int redFirstShift (LObject* h,kStrategy strat); // ok
 
-ideal freegb(ideal I, int uptodeg, int lVblock);
+ideal freegb(ideal I);
 
-ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int uptodeg, int lV);
+ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
 // test syz strategy: // will be removed soon
 extern  int (*test_PosInT)(const TSet T,const int tl,LObject &h);
 extern  int (*test_PosInL)(const LSet set, const int length,

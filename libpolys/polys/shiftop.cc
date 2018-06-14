@@ -30,8 +30,8 @@ poly shift_pp_Mult_mm(poly p, const poly m, const ring ri)
   poly pCopyHead = p; // used to delete p later
   p_LPUnShift(p, ri);
 #else
-  assume(p_mFirstVblock(_m, lV, ri) <= 1);
-  assume(p_FirstVblock(p, lV, ri) <= 1); // TODO check that each block is <=1
+  assume(p_mFirstVblock(_m, ri) <= 1);
+  assume(p_FirstVblock(p, ri) <= 1); // TODO check that each block is <=1
 #endif
   // at this point _m and p are shifted to 1
 
@@ -42,7 +42,7 @@ poly shift_pp_Mult_mm(poly p, const poly m, const ring ri)
   pAssume(!n_IsZero(mCoeff, ri->cf));
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
 
-  int mLength = p_mLastVblock(_m, lV, ri) * lV;
+  int mLength = p_mLastVblock(_m, ri) * lV;
   int *mExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
   p_GetExpV(_m,mExpV,ri);
   do
@@ -53,7 +53,7 @@ poly shift_pp_Mult_mm(poly p, const poly m, const ring ri)
 
     int *pExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
     p_GetExpV(p, pExpV, ri);
-    p_LPExpVappend(pExpV, mExpV, p_mLastVblock(p, lV, ri) * lV, mLength, ri);
+    p_LPExpVappend(pExpV, mExpV, p_mLastVblock(p, ri) * lV, mLength, ri);
     p_MemCopy_LengthGeneral(q->exp, p->exp, ri->ExpL_Size); // otherwise q is not initialized correctly
     p_SetExpV(q, pExpV, ri);
     omFreeSize((ADDRESS) pExpV, (ri->N+1)*sizeof(int));
@@ -103,7 +103,7 @@ poly shift_p_Mult_mm(poly p, const poly m, const ring ri)
   number pCoeff;
   pAssume(!n_IsZero(mCoeff, ri->cf));
 
-  int mLength = p_mLastVblock(_m, lV, ri) * lV;
+  int mLength = p_mLastVblock(_m, ri) * lV;
   int *mExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
   p_GetExpV(_m,mExpV,ri);
   while (p != NULL)
@@ -114,7 +114,7 @@ poly shift_p_Mult_mm(poly p, const poly m, const ring ri)
 
     int *pExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
     p_GetExpV(p,pExpV,ri);
-    p_LPExpVappend(pExpV, mExpV, p_mLastVblock(p, lV, ri) * lV, mLength, ri);
+    p_LPExpVappend(pExpV, mExpV, p_mLastVblock(p, ri) * lV, mLength, ri);
     p_SetExpV(p, pExpV, ri);
     omFreeSize((ADDRESS) pExpV, (ri->N+1)*sizeof(int));
 
@@ -165,7 +165,7 @@ poly shift_pp_mm_Mult(poly p, const poly m, const ring ri)
   pAssume(!n_IsZero(mCoeff, ri->cf));
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
 
-  int mLength = p_mLastVblock(_m, lV, ri) * lV;
+  int mLength = p_mLastVblock(_m, ri) * lV;
   int *mExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
   p_GetExpV(_m,mExpV,ri);
   do
@@ -176,7 +176,7 @@ poly shift_pp_mm_Mult(poly p, const poly m, const ring ri)
 
     int *pExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
     p_GetExpV(p, pExpV, ri);
-    p_LPExpVprepend(pExpV, mExpV, p_mLastVblock(p, lV, ri) * lV, mLength, ri);
+    p_LPExpVprepend(pExpV, mExpV, p_mLastVblock(p, ri) * lV, mLength, ri);
     p_MemCopy_LengthGeneral(q->exp, p->exp, ri->ExpL_Size); // otherwise q is not initialized correctly
     p_SetExpV(q, pExpV, ri);
     omFreeSize((ADDRESS) pExpV, (ri->N+1)*sizeof(int));
@@ -226,7 +226,7 @@ poly shift_p_mm_Mult(poly p, const poly m, const ring ri)
   number pCoeff;
   pAssume(!n_IsZero(mCoeff, ri->cf));
 
-  int mLength = p_mLastVblock(_m, lV, ri) * lV;
+  int mLength = p_mLastVblock(_m, ri) * lV;
   int *mExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
   p_GetExpV(_m,mExpV,ri);
   while (p != NULL)
@@ -237,7 +237,7 @@ poly shift_p_mm_Mult(poly p, const poly m, const ring ri)
 
     int *pExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
     p_GetExpV(p,pExpV,ri);
-    p_LPExpVprepend(pExpV, mExpV, p_mLastVblock(p, lV, ri) * lV, mLength, ri);
+    p_LPExpVprepend(pExpV, mExpV, p_mLastVblock(p, ri) * lV, mLength, ri);
     p_SetExpV(p, pExpV, ri);
     omFreeSize((ADDRESS) pExpV, (ri->N+1)*sizeof(int));
 
@@ -311,11 +311,11 @@ void p_mLPUnShift(poly m, const ring ri)
 
   int lV = ri->isLPring;
 
-  int shift = p_mFirstVblock(m, lV, ri) - 1;
+  int shift = p_mFirstVblock(m, ri) - 1;
 
   if (shift == 0) return;
 
-  int L = p_mLastVblock(m, lV, ri);
+  int L = p_mLastVblock(m, ri);
 
   int *e=(int *)omAlloc0((ri->N+1)*sizeof(int));
   int *s=(int *)omAlloc0((ri->N+1)*sizeof(int));
