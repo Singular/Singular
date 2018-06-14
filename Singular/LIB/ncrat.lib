@@ -17,8 +17,8 @@ REFERENCES:   T. Mai: On the analytic theory of non-commutative
    distributions in free probability. Universitaet des Saarlandes,
    Dissertation, 2017
 
-KEYWORDS:     noncommutative, rational expressions,
-   rational functions, formal linear representations, minimal representations
+KEYWORDS:     noncommutative, rational expressions;
+   rational functions; formal linear representations; minimal representations
 
 PROCEDURES:
   ncInit(list);                 Set up framework, list contains nc variables
