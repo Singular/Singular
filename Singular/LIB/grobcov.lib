@@ -5,105 +5,81 @@ version="version grobcov.lib 4.1.1.0 Feb_2018 "; // $Id$
             // have been added: ADGT, intersectpar.
 category="General purpose";
 info="
-LIBRARY:  grobcov.lib  February 2018.
-          Groebner Cover for parametric ideals.
-          Comprehensive Groebner Systems, Groebner Cover,
-          Canonical Forms,  Parametric Polynomial Systems,
-          Automatic Deduction of Geometric Theorems,
-          Dynamic Geometry, Loci, Envelope, Constructible sets.
-          See: A. Montes A, M. Wibmer,
-          \"Groebner Bases for Polynomial Systems with parameters\",
-          Journal of Symbolic Computation 45 (2010) 1391-1425.
-          (https://www.mat.upc.edu//en/people/antonio.montes/).
+LIBRARY:  grobcov.lib  February 2018.  Groebner Cover for parametric ideals.
 
 IMPORTANT: The book,  not yet published:
            A. Montes. \" The Groebner Cover\":
            (Discussing Parametric Polynomial Systems).
-           can be used as a user manual of all
-           the  routines included in this library.
-           It defines and proves all the theoretic results used
-           here,  and shows examples of all the routines.
+           can be used as a user manual of all the  routines included in this library.
+           It defines and proves all the theoretic results used here,  and shows examples of all the routines.
            It will be published soon.
-           There are many previous papers realted to the subject,
-           but the book actualices all the contents.
+           There are many previous papers realted to the subject, but the book actualices all the contents.
+           (https://www.mat.upc.edu/en/people/antonio.montes/).
 
 AUTHORS:  Antonio Montes (Universitat Politecnica de Catalunya),
           Hans Schoenemann (Technische Universitaet Kaiserslautern).
 
-OVERVIEW: In 2010, the library was designed to contain
-          Montes-Wibmer's
-          algorithms for computing the Canonical Groebner
-          Cover of a  parametric ideal. The central  routine is
-          grobcov. Given  a  parametric ideal, grobcov outputs
-          its Canonical  Groebner Cover, consisting of a set
-          of triplets of (lpp, basis,  segment). The basis
-          (after normalization) is the reduced  Groebner basis
-          for each point of the segment. The segments
-          are disjoint, locally closed and  correspond to
-          constant lpp (leading power product) of the basis,
-          and are represented in canonical representation.
-          The segments cover the  whole parameter space.
-          The output is canonical, it only depends on the
-          given parametric ideal and the monomial order.
-          This is much more than a simple Comprehensive
-          Groebner System.  The algorithm grobcov allows
-          options to solve  partially the problem when the
-          whole automatic algorithm  does not finish in
-          reasonable time.
+PURPOSE: The routine grobcov computes a Groebner cover of a parametric ideal.
+        This is a disjoint covering of the parameter space by locally closed sets (set theoretical the difference of two
+        varieties given by two ideals), on which the Groebner basis of the input ideal is constant (and hence all invariants
+        which can be computed from the Groebner basis or its leading ideal). Moreover it computes for each locally
+        closed subset the corresponding Groebner basis and the leading ideal.
+        This is the fundamental routine of the library.
 
-          grobcov uses a first algorithm cgsdr that outputs a
-          disjoint  reduced Comprehensive Groebner System
-          with constant lpp. For this purpose, in this library,
-          the implemented algorithm is Kapur-Sun-Wang
-          algorithm, because it is actually the most efficient
+OVERVIEW: In 2010, the library was designed to contain Montes-Wibmer's algorithms
+          for computing the Canonical Groebner Cover of a  parametric ideal.s
+          The central  routine is grobcov. Given  a  parametric ideal,
+          grobcov outputs its Canonical  Groebner Cover, consisting of a set
+          of triplets of (lpp, basis,  segment).
+          The basis (after normalization) is the reduced  Groebner basis
+          for each point of the segment. The segments are disjoint,
+          locally closed and  correspond to constant lpp (leading power product)
+          of the basis, and are represented in canonical representation.
+          The segments cover the  whole parameter space.
+          The output is canonical, it only depends on the given parametric ideal
+          and the monomial order.  This is much more than a simple Comprehensive
+          Groebner System.  The algorithm grobcov allows options to solve
+          partially the problem when the whole automatic algorithm does not
+          finish in reasonable time.
+
+          grobcov uses a first algorithm cgsdr that outputs a disjoint reduced
+          Comprehensive Groebner System with constant lpp.
+          For this purpose, in this library, the implemented algorithm is
+          Kapur-Sun-Wang algorithm, because it is actually the most efficient
           algorithm known for this purpose.
-          D. Kapur, Y. Sun, and D.K. Wang \"A New Algorithm
-          for  Computing Comprehensive Groebner Systems\".
+          D. Kapur, Y. Sun, and D.K. Wang \"A New Algorithm for  Computing Comprehensive Groebner Systems\".
           Proceedings of ISSAC'2010, ACM Press, (2010), 29-36.
 
-          The library has evolved to include new applications of
-          the  Groebner Cover, and new theoretical developments
-          have been done. The actual version also includes a
-          routine (ConsLevels) for computing the canonical form
-          of a constructible set, given as a union of locally
-          closed sets. It determines the canonical locally closed
-          level sets of a constructible set. It is described in:
-          J.M. Brunat, A. Montes, \"Computing the canonical
-          representation of constructible sets\".
+          The library has evolved to include new applications of the  Groebner Cover,
+          and new theoretical developments have been done. The actual version
+          also includes a routine (ConsLevels) for computing the canonical form
+          of a constructible set, given as a union of locally closed sets.
+          It determines the canonical locally closed level sets of a constructible set.
+          It is described in:
+          J.M. Brunat, A. Montes, \"Computing the canonical representation of constructible sets\".
           Math.  Comput. Sci. (2016) 19: 165-178.
 
-          A new routine locus has been included to compute
-          loci of points, and determining the taxonomy of the
-          components. It is  described in the book
-          A. Montes. \"The Groebner Cover\" (Discussing
-          Parametric Polynomial Systems).
-          Additional routines to transform the output to string
-          (locusdg,  locusto) are also included and used in the
-          Dynamic Geometry software  GeoGebra. They were
-          described in:
-          M.A. Abanades, F. Botana, A. Montes, T. Recio:
-          \''An Algebraic Taxonomy  for Locus Computation in
-          Dynamic Geometry\''.
+          A new routine locus has been included to compute loci of points,
+          and determining the taxonomy of the components. It is  described in the book
+          A. Montes. \"The Groebner Cover\" (Discussing Parametric Polynomial Systems).
+          Additional routines to transform the output to string (locusdg,  locusto)
+          are also included and used in the Dynamic Geometry software GeoGebra.
+          They were described in:
+          M.A. Abanades, F. Botana, A. Montes, T. Recio: \"An Algebraic Taxonomy  for Locus Computation in Dynamic Geometry\".
           Computer-Aided Design 56 (2014) 22-33.
 
-          Recently also routines for computing the generalized
-          envelope  of a family of hyper-surfaces (envelop),
-          to be used in Dynamic Geometry, has been included
-          and is described in the book
-          A. Montes. \"The Groebner Cover\" (Discussing
-          Parametric Polynomial Systems).
+          Recently also routines for computing the generalized envelope  of a family of hyper-surfaces (envelop),
+          to be used in Dynamic Geometry, has been included and is described in the book
+          A. Montes. \"The Groebner Cover\" (Discussing Parametric Polynomial Systems).
 
-          The last inclusion is an automatic algorithm for
-          Automatic Deduction of Geometric Theorems,
+          The last inclusion is an automatic algorithm for Automatic Deduction of Geometric Theorems,
           described in the book \"Groebner Cover\".
 
           This version was finished on 10/02/2018
 
-NOTATIONS: Before calling any routine of the library grobcov,
-          the user  must define the ideal Q[a][x], and all the
-          input polynomials and  ideals defined on it.
-          Internally the routines define and use also other
-          ideals: Q[a], Q[x,a] and so on.
+NOTATIONS: Before calling any routine of the library grobcov, the user  must define the ideal Q[a][x],
+          and all the input polynomials and  ideals defined on it.
+          Internally the routines define and use also other ideals: Q[a], Q[x,a] and so on.
 
 PROCEDURES:
 
@@ -2504,110 +2480,80 @@ static proc gcover(ideal F,list #)
 //            given by the lpp, the basis, and the P-representation of the segment
 proc grobcov(ideal F,list #)
 "USAGE: grobcov(ideal F[,options]);
-       F: ideal in Q[a][x] (a=parameters, x=variables) to be
-       discussed.This is the fundamental routine of the
-       library. It computes the Groebner Cover of a parametric
-       ideal F in Q[a][x]. See
-       A. Montes , M. Wibmer, \"Groebner Bases for Polynomial
-       Systems with parameters\".
+       F: ideal in a ring with parameters and variables (the names can be arbitrary)
+RETURN:  list, say G, where all the data of the Groebner cover of F are stored.
+        G is a list of lists G[1],G[2],...,G[s] (G[i] is called below: (lpp_i, basis_i, segment_i, [lpph_i])
+        - each list G[i], consists of 2 ideals: G[i][1] and G[i][2] in the variables
+           and a list G[i][3] of 2 ideals G[i][3][1] and G[i][3][2] in the parameters
+           [and a fourth list,G[i][4] of 2 ideals in the parameters if option (\"rep\",2) is set]
+        Meaning of the ideals G[i][1] and G[i][2]:
+        - G[i][1] (= lpp_i) is the leading power product ideal of the input ideal F under the conditions in G[i][3]
+
+        - G[i][2] (= basis_i) is the Groebner basis of the input ideal F under the conditions in G[i][3]
+        Meaning of the list G[i][3] (and  similar for G[i][4]):
+
+         - G[i][3] (= segment_i) describes the locally closed set which has G[i][1] as (reduced) Groebner basis@*
+           G[i][3][1] is the ideal of the closed conditions@*
+           G[i][3][2] is the ideal of the open conditions@*
+           i.e. in the set V(G[i][3][1]) \ G[i][3][2] the input ideal has  leading ideal G[i][1] and Groebner basis G[i][2]
+NOTE: grobcov is only tested for ideals in rings with global ordering over QQ
+OPTIONS: An option is a pair of arguments: string, integer.
+       To modify the default options, pairs of arguments
+       -option name, value- of valid options must be added to the call.
+EXPLANATION: In the list G[1]=[[lpp_1,basis_1,segment_1], ..., G[s]=[lpp_s,basis_s,segment_s]]
+(optionally [[ lpp_1,basis_1,segment_1,lpph_1], ..., [lpp_s,basis_s,segment_s,lpph_s]])
+The lpp (leading power products) are constant over a segment and are the set of lpp of the reduced
+Groebner basis for each point of the segment.
+
+         option (\"showhom\",1): the lpph will be shown: The lpph are the lpp of the homogenized ideal and are
+        different for each segment. It is given as a string, and shown only for information.
+        With the default option \"can\",1, the segments have different lpph.
+
+        basis: to each element of lpp corresponds an I-regular function given in full representation (by option (\"ext\",1))
+        or in generic representation (default option (\"ext\",0)). The I-regular function is the corresponding
+        element of the reduced Groebner basis for each point of the segment with the given lpp.
+        For each point in the segment, the polynomial or the set of polynomials representing it
+        (if they do not specialize to 0) specializes to the corresponding element of the reduced Groebner basis
+        after normalization.
+        In the full representation at least one of the polynomials representing the I-regular function specializes
+        to non-zero.
+
+        option (\"rep\",0): With the default option (\"rep\",0) the representation of the segment is the P-representation.
+        The P-representation of a segment is of the form [[p_1,[p_11,..,p_1k1]],..,[p_r,[p_r1,..,p_rkr]]] representing
+        the segment Union_i ( V(p_i) \ ( Union_j V(p_ij) ) ), where the p's are prime ideals.
+
+        option (\"rep\",1): With option (\"rep\",1) the representation of the segment is the C-representation.
+        The C-representation of a segment is of the form (E,N) representing V(E) \ V(N), and the ideals E and N
+        are radical and N contains E.
+
+        option (\"rep\",2): With option (\"rep\",2) both representations of the segment are given.
+
+        With the default option the homogenized ideal is computed before obtaining the Groebner Cover,
+        so that the result is the canonical Groebner Cover. Setting (\"can\",0) only homogenizes the basis so
+        the result is not exactly canonical, but the computation is shorter.
+
+        \"ext\",0-1: The default is (\"ext\",0).
+        With the default (\"ext\",0), only the generic representation of the bases is computed (single polynomials,
+        but not specializing to non-zero for every point of the segment.
+        With option (\"ext\",1) the full representation of the bases is computed (possible sheaves) and sometimes a
+        simpler result is obtained, but the computation is more time consuming.
+
+        \"rep\",0-1-2: The default is (\"rep\",0)
+        and then the segments are given in canonical P-representation;
+        option (\"rep\",1) represents the segments in canonical C-representation, and
+        option (\"rep\",2) gives both representations.
+
+        \"comment\",0-3: The default is (\"comment\",0).
+        Setting \"comment\" higher will provide information about the development of the computation.
+
+        \"showhom\",0-1: The default is (\"showhom\",0).
+        Setting \"showhom\",1 will output the set of lpp of the homogenized ideal of each segment as last element.
+
+        One can give none or whatever of these options.
+THEORY: A. Montes , M. Wibmer, \"Groebner Bases for Polynomial Systems with parameters\".
        JSC 45 (2010) 1391-1425.)
        or the not yet published book
-       A. Montes. \" The Groebner Cover\" (Discussing
-       Parametric Polynomial Systems).
-       The Groebner Cover of a parametric ideal F consist
-       of a set of pairs(S_i,B_i), where the S_i are disjoint
-       locally closed segments of the parameter space,
-       and the B_i are the reducedGroebner bases of the
-       ideal on every point of S_i. The ideal F must be
-       defined on a parametric ring Q[a][x] (a=parameters,
-       x=variables).
-RETURN: The list  [[lpp_1,basis_1,segment_1],  ...,
-       [lpp_s,basis_s,segment_s]]
-       optionally  [[ lpp_1,basis_1,segment_1,lpph_1],  ...,
-       [lpp_s,basis_s,segment_s,lpph_s]]
-       The lpp are constant over a segment and
-       correspond to the set of lpp of the reduced
-       Groebner basis for each point of the segment.
-       With option (\"showhom\",1) the lpph will be
-       shown: The lpph corresponds to the lpp of the
-       homogenized ideal and is different for each
-       segment. It is given as a string, and shown
-       only for information. With the default option
-       \"can\",1, the segments have different lpph.
-       Basis: to each element of lpp corresponds
-       an I-regular function given in full
-       representation (by option (\"ext\",1)) or
-       in generic representation (default option (\"ext\",0)).
-       The I-regular function is the corresponding
-       element of the reduced Groebner basis for
-       each point of the segment with the given lpp.
-       For each point in the segment, the polynomial
-       or the set of polynomials  representing it,
-       if they do not specialize to 0, then after
-       normalization, specializes to the corresponding
-       element of the reduced Groebner basis.
-       In the full representation at least one of the
-       polynomials representing the I-regular function
-       specializes to non-zero.
-       With the default option (\"rep\",0) the
-       representation of the segment is the
-       P-representation.
-       With option (\"rep\",1) the representation
-       of the segment is the C-representation.
-       With option (\"rep\",2) both representations
-       of the segment are given.
-       The P-representation of a segment is of the form
-       [[p_1,[p_11,..,p_1k1]],..,[p_r,[p_r1,..,p_rkr]]]
-       representing the segment
-       Union_i ( V(p_i) \ ( Union_j V(p_ij) ) ),
-       where the p's are prime ideals.
-       The C-representation of a segment is of the form
-       (E,N) representing V(E) \ V(N), and the ideals E
-       and N are radical and N contains E.
-OPTIONS: An option is a pair of arguments: string,
-       integer. To modify the default options, pairs
-       of arguments -option name, value- of valid options
-       must be added to the call.
-       \"null\",ideal E: The default is (\"null\",ideal(0)).
-       \"nonnull\",ideal N: The default is
-       (\"nonnull\",ideal(1)).
-       When options \"null\" and/or \"nonnull\" are given,
-       then the parameter space is restricted to V(E) \ V(N).
-       \"can\",0-1: The default is (\"can\",1).
-       With the default option the homogenized
-       ideal is computed before obtaining the Groebner
-       Cover, so that the result is the canonical Groebner
-       Cover. Setting (\"can\",0) only homogenizes the
-       basis so the result is not exactly canonical,
-       but the computation is shorter.
-       \"ext\",0-1: The default is (\"ext\",0).
-       With the default (\"ext\",0), only the generic
-       representation of the bases is computed
-       (single polynomials, but not specializing
-       to non-zero for every point of the segment.
-       With option (\"ext\",1) the full representation
-       of the bases is computed (possible sheaves)
-       and sometimes a simpler result is obtained,
-       but the computation is more time consuming.
-       \"rep\",0-1-2: The default is (\"rep\",0)
-       and then the segments are given in canonical
-       P-representation.
-       Option (\"rep\",1) represents the segments
-       in canonical C-representation, and
-       option (\"rep\",2) gives both representations.
-       \"comment\",0-3: The default is (\"comment\",0).
-       Setting \"comment\" higher will provide
-       information about the development of the
-       computation.
-       \"showhom\",0-1: The default is (\"showhom\",0).
-       Setting \"showhom\",1 will output the set
-       of lpp of the homogenized ideal of each segment
-       as last element. One can give none or whatever
-       of these options.
-NOTE:    The basering R, must be of the form Q[a][x],
-       (a=parameters, x=variables), and
-       should be defined previously. The ideal
-       must be defined on R.
+       A. Montes. \" The Groebner Cover\" (Discussing Parametric Polynomial Systems).
 KEYWORDS: Groebner cover; parametric ideal; canonical; discussion of parametric ideal
 EXAMPLE:  grobcov; shows an example"
 {
@@ -2718,8 +2664,7 @@ example
 {
 "EXAMPLE:"; echo = 2;
 // Casas conjecture for degree 4:
-  if(defined(R)){kill R;}
-  ring R=(0,a0,a1,a2,a3,a4),(x1,x2,x3),dp;
+  ring R1=(0,a0,a1,a2,a3,a4),(x1,x2,x3),dp;
   short=0;
   ideal F=x1^4+(4*a3)*x1^3+(6*a2)*x1^2+(4*a1)*x1+(a0),
             x1^3+(3*a3)*x1^2+(3*a2)*x1+(a1),
@@ -2736,12 +2681,20 @@ example
   // IMA Volumes in Mathematics and its Applications,
   //    Springer-Verlag 118: 1-29 (2000).;
   //    (18. Mathematical robotics: Problem 4, two-arm robot)."
-  if (defined(R)){kill R;}
-  ring R=(0,a,b,l2,l3),(c3,s3,c1,s1), dp;
+  ring R2=(0,a,b,l2,l3),(c3,s3,c1,s1), dp;
   short=0;
   ideal S12=a-l3*c3-l2*c1,b-l3*s3-l2*s1,c1^2+s1^2-1,c3^2+s3^2-1;
   S12;
   grobcov(S12);
+  // EXAMPLE: different segments may have different dimensions
+  ring R3=(0,g,h),(y,z,v,w,t),dp;
+  ideal I = -4*v2+zw+(h)*zt + (g)*vy, zv-4*v2+(h)*t2, -v2+vw+(-g)*vt+(-h)*t2;
+  list G = grobcov(I);
+  G;
+  //Compute the dimension and the degree at the segment G[1][3]: V(0) \ V(h,g) = {h!=0 and g!=0}
+  degree(std(G[1][1]));
+  //Compute the dimension and the degree at the segment G[4][3]: V(h) \ V(h,g) = {h=0 and g!=0}
+  degree(std(G[4][1]));
 }
 
 // Auxiliary routine called by extendGC

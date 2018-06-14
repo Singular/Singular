@@ -29,7 +29,9 @@ int CFFactory::currenttype = IntegerDomain;
 InternalCF *
 CFFactory::basic ( long value )
 {
-    if ( currenttype == IntegerDomain )
+  switch(currenttype)
+  {
+    case IntegerDomain:
         if (LIKELY( value >= MINIMMEDIATE && value <= MAXIMMEDIATE ))
             return int2imm( value );
         else
@@ -39,14 +41,15 @@ CFFactory::basic ( long value )
 //             return int2imm( value );
 //         else
 //             return new InternalRational( value );
-    else  if ( currenttype == FiniteFieldDomain )
+    case FiniteFieldDomain:
         return int2imm_p( ff_norm( value ) );
-    else  if ( currenttype == GaloisFieldDomain )
+    case GaloisFieldDomain:
         return int2imm_gf( gf_int2gf( value ) );
-    else {
+    default: {
         ASSERT( 0, "illegal basic domain!" );
         return 0;
     }
+  }
 }
 
 InternalCF *

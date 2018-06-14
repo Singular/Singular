@@ -3546,6 +3546,25 @@ void  p_Vec2Polys(poly v, poly* *p, int *len, const ring r)
   }
 }
 
+poly p_Vec2Poly(poly v, int k, const ring r)
+{
+  poly h;
+  poly res=NULL;
+
+  while (v!=NULL)
+  {
+    if (__p_GetComp(v,r)==k)
+    {
+      h=p_Head(v,r);
+      p_SetComp(h,0,r);
+      pNext(h)=res;res=h;
+    }
+    pIter(v);
+  }
+  if (res!=NULL) res=pReverse(res);
+  return res;
+}
+
 /// julia: vector to already allocated array (len=p_MaxComp(v,r))
 void  p_Vec2Array(poly v, poly *p, int len, const ring r)
 {

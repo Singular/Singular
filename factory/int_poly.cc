@@ -30,6 +30,14 @@ using namespace std;
 #include "variable.h"
 #include "imm.h"
 
+#ifdef __GNUC__
+#define LIKELY(X)   (__builtin_expect(!!(X), 1))
+#define UNLIKELY(X) (__builtin_expect(!!(X), 0))
+#else
+#define LIKELY(X)   (X)
+#define UNLIKELY(X) (X)
+#endif
+
 #ifdef HAVE_OMALLOC
 const omBin term::term_bin = omGetSpecBin(sizeof(term));
 const omBin InternalPoly::InternalPoly_bin = omGetSpecBin(sizeof(InternalPoly));
@@ -2154,7 +2162,7 @@ InternalPoly::mulAddTermList ( termList theList, termList aList, const Canonical
         if ( theCursor->exp == aCursor->exp + exp )
         {
             theCursor->coeff += aCursor->coeff * coeff;
-            if ( theCursor->coeff.isZero() )
+            if(UNLIKELY(( theCursor->coeff.isZero() )))
             {
                 if ( predCursor )
                 {

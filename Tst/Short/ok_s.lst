@@ -1,6 +1,7 @@
 arr
 abusalem
 branchTo
+bug_bucket
 bug_curvepar
 bug_ecart
 bug_misc
@@ -104,6 +105,7 @@ gcd5primtest
 gcd5test
 gcd_univar_p_s
 gcd_univar_p_alpha_s
+homalg
 modular_s
 modstd_s
 modules

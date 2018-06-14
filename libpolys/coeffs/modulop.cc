@@ -343,8 +343,7 @@ static BOOLEAN npCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
 CanonicalForm npConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs r )
 {
   if (setChar) setCharacteristic( r->ch );
-  CanonicalForm term(npInt( n,r ));
-  return term;
+  return CanonicalForm(npInt( n,r ));
 }
 
 number npConvFactoryNSingN( const CanonicalForm n, const coeffs r)

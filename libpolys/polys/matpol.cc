@@ -1774,4 +1774,124 @@ ideal mp_Tensor(ideal A, ideal B, const ring r)
   omFreeSize(a,m*sizeof(poly));
   return res;
 }
+// --------------------------------------------------------------------------
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+
+/*
+* ABSTRACT: basic operation for sparse matrices:
+* type: ideal (of column vectors)
+* nrows: I->rank, ncols: IDELEMS(I)
+*/
+
+ideal sm_Add(ideal a, ideal b, const ring R)
+{
+  assume(IDELEMS(a)==IDELEMS(b));
+  assume(a->rank==b->rank);
+  ideal c=idInit(IDELEMS(a),a->rank);
+  for (int k=IDELEMS(a)-1; k>=0; k--)
+    c->m[k] = p_Add_q(p_Copy(a->m[k], R), p_Copy(b->m[k], R), R);
+  return c;
+}
+
+ideal sm_Sub(ideal a, ideal b, const ring R)
+{
+  assume(IDELEMS(a)==IDELEMS(b));
+  assume(a->rank==b->rank);
+  ideal c=idInit(IDELEMS(a),a->rank);
+  for (int k=IDELEMS(a)-1; k>=0; k--)
+    c->m[k] = p_Sub(p_Copy(a->m[k], R), p_Copy(b->m[k], R), R);
+  return c;
+}
+
+#define SMATELEM(A,i,j,R) p_Vec2Poly(A->m[j],i+1,R)
+ideal sm_Mult(ideal a, ideal b, const ring R)
+{
+  int i, j, k;
+  int m = a->rank;
+  int p = IDELEMS(a);
+  int q = IDELEMS(b);
+
+  assume (IDELEMS(a)==b->rank);
+  ideal c = idInit(m,q);
+
+  for (i=0; i<m; i++)
+  {
+    for (k=0; k<p; k++)
+    {
+      poly aik;
+      if ((aik=SMATELEM(a,i,k,R))!=NULL)
+      {
+        for (j=0; j<q; j++)
+        {
+          poly bkj;
+          if ((bkj=SMATELEM(b,k,j,R))!=NULL)
+          {
+            poly s = p_Mult_q(p_Copy(aik,R) /*SMATELEM(a,i,k)*/, bkj/*SMATELEM(b,k,j)*/, R);
+            if (s!=NULL) p_SetComp(s,i+1,R);
+            c->m[j]=p_Add_q(c->m[j],s, R);
+          }
+        }
+        p_Delete(&aik,R);
+      }
+    }
+  }
+  for(i=m-1;i>=0;i--) p_Normalize(c->m[i], R);
+  return c;
+}
+
+ideal sm_Transp(ideal a, const ring R)
+{
+  int    i, j, r = a->rank, c = IDELEMS(a);
+  poly *p;
+  ideal b =  idInit(c,r);
+  poly *m=(poly*)omAlloc0(r*sizeof(poly));
+  for(i=0;i<c;i++)
+  {
+    p_Vec2Polys(a->m[i],&m,&r,R);// m has A[1..r,i+1]
+    if (r>a->rank) Print("wrong rang (%d,%ld) in sm_Transp\n",r,a->rank);
+    for(j=0;j<r;j++)
+    {
+      // m[j] is A[j+1,i]
+      p_SetCompP(m[j],i+1,R);
+      b->m[j]=p_Add_q(b->m[j],m[j],R);
+    }
+  }
+  omFreeSize(m,a->rank*sizeof(poly));
+  return b;
+}
+
+/*2
+*returns the trace of matrix a
+*/
+poly sm_Trace ( ideal a, const ring R)
+{
+  int i;
+  int n = (IDELEMS(a)<a->rank) ? IDELEMS(a) : a->rank;
+  poly  t = NULL;
+
+  for (i=0; i<=n; i++)
+    t = p_Add_q(t, p_Copy(SMATELEM(a,i,i,R), R), R);
+  return t;
+}
+
+int sm_Compare(ideal a, ideal b, const ring R)
+{
+  if (IDELEMS(a)<IDELEMS(b)) return -1;
+  else if (IDELEMS(a)>IDELEMS(b)) return 1;
+  if ((a->rank)<(b->rank)) return -1;
+  else if ((a->rank)<(b->rank)) return 1;
+
+  unsigned ii=IDELEMS(a)-1;
+  unsigned j=0;
+  int r=0;
+  while (j<=ii)
+  {
+    r=p_Compare(a->m[j],b->m[j],R);
+    if (r!=0) return r;
+    j++;
+  }
+  return r;
+}
 

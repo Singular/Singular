@@ -653,7 +653,7 @@ elemexpr:
         | extendedid  ARROW BLOCKTOK
           {
             if (iiARROW(&$$,$1,$3)) YYERROR;
-            omFree((ADDRESS)$3)
+            omFree((ADDRESS)$3);
           }
         | '(' exprlist ')'    { $$ = $2; }
         ;
@@ -671,17 +671,10 @@ exprlist:
             $$ = $1;
           }
         | expr
-          {
-            $$ = $1;
-          }
         ;
 
 expr:   expr_arithmetic
-          {
-            /*if ($1.typ == eunknown) YYERROR;*/
-            $$ = $1;
-          }
-        | elemexpr       { $$ = $1; }
+        | elemexpr
         | expr '[' expr ',' expr ']'
           {
             if(iiExprArith3(&$$,'[',&$1,&$3,&$5)) YYERROR;
@@ -851,8 +844,8 @@ expr_arithmetic:
         ;
 
 left_value:
-        declare_ip_variable cmdeq  { $$ = $1; }
-        | exprlist '='
+        declare_ip_variable cmdeq
+        | exprlist cmdeq
           {
             if ($1.rtyp==0)
             {
@@ -917,25 +910,23 @@ declare_ip_variable:
               IDMATRIX(h) = mpNew(r,c);
               if (IDMATRIX(h)==NULL) YYERROR;
             }
-            else if ($1 == INTMAT_CMD)
+            else if (($1 == INTMAT_CMD)||($1 == BIGINTMAT_CMD))
             {
               if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
                 YYERROR;
               v=&$$;
               h=(idhdl)v->data;
-              delete IDINTVEC(h);
-              IDINTVEC(h) = new intvec(r,c,0);
+              if ($1==INTMAT_CMD)
+              {
+                delete IDINTVEC(h);
+                IDINTVEC(h) = new intvec(r,c,0);
+              }
+              else
+              {
+                delete IDBIMAT(h);
+                IDBIMAT(h) = new bigintmat(r, c, coeffs_BIGINT);
+              }
               if (IDINTVEC(h)==NULL) YYERROR;
-            }
-            else /* BIGINTMAT_CMD */
-            {
-              if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
-                YYERROR;
-              v=&$$;
-              h=(idhdl)v->data;
-              delete IDBIMAT(h);
-              IDBIMAT(h) = new bigintmat(r, c, coeffs_BIGINT);
-              if (IDBIMAT(h)==NULL) YYERROR;
             }
           }
         | mat_cmd elemexpr
@@ -944,24 +935,22 @@ declare_ip_variable:
             {
               if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot), TRUE)) YYERROR;
             }
-            else if ($1 == INTMAT_CMD)
+            else if (($1 == INTMAT_CMD)||($1 == BIGINTMAT_CMD))
             {
               if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
                 YYERROR;
-              leftv v=&$$;
-              idhdl h;
-              do
+              if ($1 == INTMAT_CMD)
               {
-                 h=(idhdl)v->data;
-                 delete IDINTVEC(h);
-                 IDINTVEC(h) = new intvec(1,1,0);
-                 v=v->next;
-              } while (v!=NULL);
-            }
-            else /* BIGINTMAT_CMD */
-            {
-              if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
-                YYERROR;
+                leftv v=&$$;
+                idhdl h;
+                do
+                {
+                  h=(idhdl)v->data;
+                  delete IDINTVEC(h);
+                  IDINTVEC(h) = new intvec(1,1,0);
+                  v=v->next;
+                } while (v!=NULL);
+              }
             }
           }
         | declare_ip_variable ',' elemexpr
@@ -1099,11 +1088,8 @@ cmdeq:  '='
 
 
 mat_cmd: MATRIX_CMD
-            { $$ = $1; }
         | INTMAT_CMD
-            { $$ = $1; }
         | BIGINTMAT_CMD
-            { $$ = $1; }
           ;
 
 /* --------------------------------------------------------------------*/
@@ -1343,7 +1329,7 @@ scriptcmd:
          SYSVAR stringexpr
           {
             if (($1!=LIB_CMD)||(jjLOAD($2,TRUE))) YYERROR;
-	    omFree($2);
+            omFree($2);
           }
         ;
 

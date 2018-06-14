@@ -1483,15 +1483,21 @@ static void definiteGcdCancellation(number a, const coeffs cf,
        remove those nested fractions, in case there are any. */
     if (nCoeff_is_Zp(ntCoeffs))
     {
-      NUM (f) = p_Div_nn (NUM (f), p_GetCoeff (DEN(f),ntRing), ntRing);
+      number d=p_GetCoeff (DEN(f),ntRing);
+      BOOLEAN d_not_1=FALSE;
+      if (!n_IsOne(d,ntCoeffs))
+      {
+        NUM (f) = p_Div_nn (NUM (f), d, ntRing);
+        d_not_1=TRUE;
+      }
       if (p_IsConstant (DEN (f), ntRing))
       {
         p_Delete(&DEN (f), ntRing);
         DEN (f) = NULL;
       }
-      else
+      else if (d_not_1)
       {
-        p_Norm (DEN (f),ntRing);
+        DEN (f) = p_Div_nn (DEN (f), d, ntRing);
       }
     } else if (nCoeff_is_Q(ntCoeffs)) handleNestedFractionsOverQ(f, cf);
   }
@@ -2546,8 +2552,8 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->cfFarey        = ntFarey;
   cf->cfChineseRemainder = ntChineseRemainder;
   cf->cfInt          = ntInt;
-  cf->cfInpNeg          = ntNeg;
   cf->cfAdd          = ntAdd;
+  cf->cfInpNeg       = ntNeg;
   cf->cfSub          = ntSub;
   cf->cfMult         = ntMult;
   cf->cfDiv          = ntDiv;

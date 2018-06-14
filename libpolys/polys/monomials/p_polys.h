@@ -96,6 +96,7 @@ poly      p_ISet(long i, const ring r);
 poly      p_NSet(number n, const ring r);
 
 void  p_Vec2Polys(poly v, poly**p, int *len, const ring r);
+poly  p_Vec2Poly(poly v, int k, const ring r);
 
 /// julia: vector to already allocated array (len=p_MaxComp(v,r))
 void  p_Vec2Array(poly v, poly *p, int len, const ring r);
@@ -880,7 +881,7 @@ static inline void p_Delete(poly *p,  const ring lmRing, const ring tailRing)
 }
 
 // copys monomials of p, allocates new monomials from bin,
-// deletes monomoals of p
+// deletes monomials of p
 static inline poly p_ShallowCopyDelete(poly p, const ring r, omBin bin)
 {
   p_LmCheckPolyRing2(p, r);
@@ -1652,10 +1653,25 @@ BOOLEAN p_ComparePolys(poly p1,poly p2, const ring r);
 static inline int p_Cmp(poly p1, poly p2, ring r)
 {
   if (p2==NULL)
+  {
+    if (p1==NULL) return 0;
     return 1;
+  }
   if (p1==NULL)
     return -1;
   return p_LmCmp(p1,p2,r);
+}
+
+static inline int p_CmpPolys(poly p1, poly p2, ring r)
+{
+  if (p2==NULL)
+  {
+    if (p1==NULL) return 0;
+    return 1;
+  }
+  if (p1==NULL)
+    return -1;
+  return p_ComparePolys(p1,p2,r);
 }
 
 

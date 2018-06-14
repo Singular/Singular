@@ -6831,7 +6831,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
 
   attrib(I, "isSB", 1);   // I needs to be a reduced standard basis
   list indep, fett;
-  intvec @w, @hilb, op;
+  intvec op;
   int @wr, @n, @m, lauf, di;
   ideal fac, @h, collectrad, lsau;
   poly @q;
@@ -6839,20 +6839,11 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
 
   def @P = basering;
   int jdim = dim(I);               // Computes the dimension of I
-  int  homo = homog(I);            // Finds out if I is homogeneous
   ideal rad = ideal(1);            // The unit ideal
   ideal te = ser;
   if(size(#) > 0)
   {
     @wr = #[1];
-  }
-  if(homo == 1)
-  {
-    for(@n = 1; @n <= nvars(basering); @n++)
-    {
-      @w[@n] = ord(var(@n));
-    }
-    @hilb = hilb(I, 1, @w);
   }
 
   // SL 2006.04.11 1 Debug messages
@@ -6910,14 +6901,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
       execute("ring gnir1 = (" + charstr(basering) + "), (" + indep[@m][1] + "),("
                               + indep[@m][2] + ");");
       execute("map phi = @P," + @va + ";");
-      if(homo == 1)
-      {
-        ideal @j = std(phi(I), @hilb, @w);
-      }
-      else
-      {
-        ideal @j = groebner(phi(I));
-      }
+      ideal @j = groebner(phi(I));
     }
     if((deg(@j[1]) == 0) || (dim(@j) < jdim))
     {
@@ -7059,10 +7043,6 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
     if((dim(I) < jdim)||(size(te) == 0))
     {
       break;
-    }
-    if(homo==1)
-    {
-      @hilb = hilb(I, 1, @w);
     }
   }
 

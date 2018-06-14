@@ -93,14 +93,13 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
   poly op=p;
   while ( p!=NULL )
   {
-    CanonicalForm term;
-    term=r->cf->convSingNFactoryN(pGetCoeff( p ),setChar, r->cf);
+    CanonicalForm term=r->cf->convSingNFactoryN(pGetCoeff( p ),setChar, r->cf);
     if (errorreported) break;
     setChar=FALSE;
     for ( int i = n; i >0; i-- )
     {
       if ( (e = p_GetExp( p, i, r)) != 0 )
-        term *= power( Variable( i ), e );
+        term *= CanonicalForm( Variable( i ), e );
     }
     result += term;
     pIter( p );

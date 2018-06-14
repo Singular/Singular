@@ -806,7 +806,6 @@ char * versionString(/*const bool bShowDetails = false*/ )
               StringAppend("GMP(%s),", gmp_version);
 #endif
 #ifdef HAVE_NTL
-#include <NTL/version.h>
               StringAppend("NTL(%s),",NTL_VERSION);
 #endif
 

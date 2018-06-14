@@ -1468,32 +1468,9 @@ static BOOLEAN jjINDEX_P_IV(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjINDEX_V(leftv res, leftv u, leftv v)
 {
-  poly p=(poly)u->CopyD(VECTOR_CMD);
-  poly r=p; // pointer to the beginning of component i
-  poly o=NULL;
+  poly p=(poly)u->Data();
   int i=(int)(long)v->Data();
-  while (p!=NULL)
-  {
-    if (pGetComp(p)!=i)
-    {
-      if (r==p) r=pNext(p);
-      if (o!=NULL)
-      {
-        if (pNext(o)!=NULL) pLmDelete(&pNext(o));
-        p=pNext(o);
-      }
-      else
-        pLmDelete(&p);
-    }
-    else
-    {
-      pSetComp(p, 0);
-      p_SetmComp(p, currRing);
-      o=p;
-      p=pNext(o);
-    }
-  }
-  res->data=(char *)r;
+  res->data=(char *)p_Vec2Poly(p,i,currRing);
   return FALSE;
 }
 static BOOLEAN jjINDEX_V_IV(leftv res, leftv u, leftv v)
@@ -6266,6 +6243,19 @@ static BOOLEAN jjSUBST_Test(leftv v,leftv w,
     }
   }
   return FALSE;
+}
+static BOOLEAN jjSUBST_Bu(leftv res, leftv u, leftv v,leftv w)
+{
+  // generic conversion from polyBucket to poly:
+  // force this to be the first try everytime
+  poly p; int l;
+  sBucket_pt bu=(sBucket_pt)w->CopyD();
+  sBucketDestroyAdd(bu,&p,&l);
+  sleftv tmpw;
+  tmpw.Init();
+  tmpw.rtyp=POLY_CMD;
+  tmpw.data=p;
+  return iiExprArith3(res, iiOp, u, v, &tmpw);
 }
 static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
 {
