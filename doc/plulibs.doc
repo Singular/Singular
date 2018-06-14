@@ -41,7 +41,7 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 * qmatrix_lib::  Quantum matrices, quantum minors and symmetric groups
 * purityfiltration_lib:: purity filtration of a given module
 * nchomolog_lib:: Noncommutative Homological Algebra
-* ncrat_lib:  nc rational functions
+* ncrat_lib::  nc rational functions
 * ratgb_lib:: Groebner bases in Ore localizations of noncommutative G-algebras
 * dmodloc_lib:: Localization of algebraic D-modules
 @end menu
