@@ -55,7 +55,7 @@ static BOOLEAN ipPrint_INTMAT(intvec* v)
 /*2
 * internal print for: matrix
 */
-static void ipPrint_MA0(matrix m, const char *name)
+void ipPrint_MA0(matrix m, const char *name)
 {
   if ((MATCOLS(m)>0)&&(MATROWS(m)>0))
   {

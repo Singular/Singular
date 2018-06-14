@@ -833,6 +833,18 @@ static BOOLEAN jjPLUS_MA(leftv res, leftv u, leftv v)
   }
   return jjPLUSMINUS_Gen(res,u,v);
 }
+static BOOLEAN jjPLUS_SM(leftv res, leftv u, leftv v)
+{
+  ideal A=(ideal)u->Data(); ideal B=(ideal)v->Data();
+  res->data = (char *)(sm_Add(A , B, currRing));
+  if (res->data==NULL)
+  {
+     Werror("matrix size not compatible(%dx%d, %dx%d)",
+             (int)A->rank,IDELEMS(A),(int)B->rank,IDELEMS(B));
+     return TRUE;
+  }
+  return jjPLUSMINUS_Gen(res,u,v);
+}
 static BOOLEAN jjPLUS_MA_P(leftv res, leftv u, leftv v)
 {
   matrix m=(matrix)u->Data();
@@ -945,6 +957,19 @@ static BOOLEAN jjMINUS_MA(leftv res, leftv u, leftv v)
   {
      Werror("matrix size not compatible(%dx%d, %dx%d)",
              MATROWS(A),MATCOLS(A),MATROWS(B),MATCOLS(B));
+     return TRUE;
+  }
+  return jjPLUSMINUS_Gen(res,u,v);
+  return FALSE;
+}
+static BOOLEAN jjMINUS_SM(leftv res, leftv u, leftv v)
+{
+  ideal A=(ideal)u->Data(); ideal B=(ideal)v->Data();
+  res->data = (char *)(sm_Sub(A , B, currRing));
+  if (res->data==NULL)
+  {
+     Werror("matrix size not compatible(%dx%d, %dx%d)",
+             (int)A->rank,IDELEMS(A),(int)B->rank,IDELEMS(B));
      return TRUE;
   }
   return jjPLUSMINUS_Gen(res,u,v);
@@ -1129,6 +1154,21 @@ static BOOLEAN jjTIMES_MA(leftv res, leftv u, leftv v)
     return jjOP_REST(res,u,v);
   return FALSE;
 }
+static BOOLEAN jjTIMES_SM(leftv res, leftv u, leftv v)
+{
+  ideal A=(ideal)u->Data(); ideal B=(ideal)v->Data();
+  res->data = (char *)sm_Mult(A,B,currRing);
+  if (res->data==NULL)
+  {
+     Werror("matrix size not compatible(%dx%d, %dx%d) in *",
+             (int)A->rank,IDELEMS(A),(int)B->rank,IDELEMS(B));
+     return TRUE;
+  }
+  id_Normalize((ideal)res->data,currRing);
+  if ((v->next!=NULL) || (u->next!=NULL))
+    return jjOP_REST(res,u,v);
+  return FALSE;
+}
 static BOOLEAN jjGE_BI(leftv res, leftv u, leftv v)
 {
   number h=n_Sub((number)u->Data(),(number)v->Data(),coeffs_BIGINT);
@@ -1293,6 +1333,12 @@ static BOOLEAN jjEQUAL_I(leftv res, leftv u, leftv v)
 static BOOLEAN jjEQUAL_Ma(leftv res, leftv u, leftv v)
 {
   res->data = (char *)((long)mp_Equal((matrix)u->Data(),(matrix)v->Data(),currRing));
+  jjEQUAL_REST(res,u,v);
+  return FALSE;
+}
+static BOOLEAN jjEQUAL_SM(leftv res, leftv u, leftv v)
+{
+  res->data = (char *)((long)sm_Equal((ideal)u->Data(),(ideal)v->Data(),currRing));
   jjEQUAL_REST(res,u,v);
   return FALSE;
 }
@@ -5430,6 +5476,35 @@ static BOOLEAN jjBRACK_Ma(leftv res, leftv u, leftv v,leftv w)
   {
     Werror("wrong range[%d,%d] in matrix %s(%d x %d)",r,c,u->Fullname(),
       MATROWS(m),MATCOLS(m));
+    return TRUE;
+  }
+  res->data=u->data; u->data=NULL;
+  res->rtyp=u->rtyp; u->rtyp=0;
+  res->name=u->name; u->name=NULL;
+  Subexpr e=jjMakeSub(v);
+          e->next=jjMakeSub(w);
+  if (u->e==NULL)
+    res->e=e;
+  else
+  {
+    Subexpr h=u->e;
+    while (h->next!=NULL) h=h->next;
+    h->next=e;
+    res->e=u->e;
+    u->e=NULL;
+  }
+  return FALSE;
+}
+static BOOLEAN jjBRACK_SM(leftv res, leftv u, leftv v,leftv w)
+{
+  ideal m= (ideal)u->Data();
+  int   r = (int)(long)v->Data();
+  int   c = (int)(long)w->Data();
+  //Print("gen. elem %d, %d\n",r,c);
+  if ((r<1)||(r>m->rank)||(c<1)||(c>IDELEMS(m)))
+  {
+    Werror("wrong range[%d,%d] in matrix %s(%d x %d)",r,c,u->Fullname(),
+      (int)m->rank,IDELEMS(m));
     return TRUE;
   }
   res->data=u->data; u->data=NULL;

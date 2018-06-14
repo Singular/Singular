@@ -1805,7 +1805,6 @@ ideal sm_Sub(ideal a, ideal b, const ring R)
   return c;
 }
 
-#define SMATELEM(A,i,j,R) p_Vec2Poly(A->m[j],i+1,R)
 ideal sm_Mult(ideal a, ideal b, const ring R)
 {
   int i, j, k;
@@ -1893,5 +1892,29 @@ int sm_Compare(ideal a, ideal b, const ring R)
     j++;
   }
   return r;
+}
+
+BOOLEAN sm_Equal(ideal a, ideal b, const ring R)
+{
+  if ((a->rank!=b->rank) || (IDELEMS(a)!=IDELEMS(b)))
+    return FALSE;
+  int i=IDELEMS(a)-1;
+  while (i>=0)
+  {
+    if (a->m[i]==NULL)
+    {
+      if (b->m[i]!=NULL) return FALSE;
+    }
+    else if (b->m[i]==NULL) return FALSE;
+    else if (p_Cmp(a->m[i],b->m[i], R)!=0) return FALSE;
+    i--;
+  }
+  i=IDELEMS(a)-1;
+  while (i>=0)
+  {
+    if(!p_EqualPolys(a->m[i],b->m[i], R)) return FALSE;
+    i--;
+  }
+  return TRUE;
 }
 

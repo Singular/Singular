@@ -50,13 +50,14 @@
 #include <netdb.h>
 #include <netinet/in.h> /* for htons etc.*/
 
-#define SSI_VERSION 10
+#define SSI_VERSION 12
 // 5->6: changed newstruct representation
 // 6->7: attributes
 // 7->8: qring
 // 8->9: module: added rank
 // 9->10: tokens in grammar.h/tok.h reorganized
 // 10->11: extended ring descr. for named coeffs (not in used until 4.1)
+// 11->12: add rank to ideal/module, add smatrix
 
 link_list ssiToBeClosed=NULL;
 volatile BOOLEAN ssiToBeClosed_inactive=TRUE;
@@ -283,8 +284,9 @@ void ssiWritePoly(const ssiInfo *d, int typ, poly p)
 
 void ssiWriteIdeal_R(const ssiInfo *d, int typ,const ideal I, const ring R)
 {
-   // syntax: 7 # of elements <poly 1> <poly2>.....
-   // syntax: 8 <rows> <cols> <poly 1> <poly2>.....
+   // syntax: 7 # of elements <poly 1> <poly2>.....(ideal,module,smatrix)
+   // syntax: 8 <rows> <cols> <poly 1> <poly2>.....(matrix)
+   // syntax
    matrix M=(matrix)I;
    int mn;
    if (typ==MATRIX_CMD)
@@ -300,8 +302,10 @@ void ssiWriteIdeal_R(const ssiInfo *d, int typ,const ideal I, const ring R)
 
    int i;
    int tt;
-   if (typ==MODUL_CMD) tt=VECTOR_CMD;
-   else                tt=POLY_CMD;
+   if ((typ==MODUL_CMD)||(typ==SMATRIX_CMD))
+     tt=VECTOR_CMD;
+   else
+     tt=POLY_CMD;
 
    for(i=0;i<mn;i++)
    {
@@ -597,7 +601,7 @@ ideal ssiReadIdeal_R(const ssiInfo *d,const ring r)
   int n,i;
   ideal I;
   n=s_readint(d->f_read);
-  I=idInit(n,1);
+  I=idInit(n,1); // will be fixed later for module/smatrix
   for(i=0;i<IDELEMS(I);i++) // read n terms
   {
     I->m [i]=ssiReadPoly_R(d,r);
@@ -1310,7 +1314,9 @@ leftv ssiRead1(si_link l)
            if (d->r==NULL) goto no_ring;
            res->data=(char*)ssiReadPoly(d);
            break;
-    case 10:res->rtyp=MODUL_CMD;
+    case 10:
+    case 22:if (t==22) res->rtyp=SMATRIX_CMD;
+           else        res->rtyp=MODUL_CMD;
            if (d->r==NULL) goto no_ring;
            {
              int rk=s_readint(d->f_read);
@@ -1506,6 +1512,7 @@ BOOLEAN ssiWrite(si_link l, leftv data)
           case IDEAL_CMD:
           case MODUL_CMD:
           case MATRIX_CMD:
+          case SMATRIX_CMD:
                         if (d->r!=currRing)
                         {
                           fputs("15 ",d->f_write);
@@ -1514,6 +1521,7 @@ BOOLEAN ssiWrite(si_link l, leftv data)
                         }
                         if(tt==IDEAL_CMD)       fputs("7 ",d->f_write);
                         else if(tt==MATRIX_CMD) fputs("8 ",d->f_write);
+                        else if(tt==SMATRIX_CMD) fputs("22 ",d->f_write);
                         else
                         {
                           ideal M=(ideal)dd;
@@ -2150,6 +2158,7 @@ BOOLEAN ssiGetDump(si_link l)
 // 19 bigintmat <r> <c> ...
 // 20 blackbox <name> 1 <len> ...
 // 21 attrib <bit-attrib> <len> <a-name1> <val1>... <data>
+// 22 smatrix
 //
 // 98: verify version: <ssi-version> <MAX_TOK> <OPT1> <OPT2>
 // 99: quit Singular

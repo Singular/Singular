@@ -101,4 +101,8 @@ ideal sm_Mult(ideal a, ideal b, const ring R);
 ideal sm_Transp(ideal a, const ring R);
 poly sm_Trace ( ideal a, const ring R);
 int sm_Compare(ideal a, ideal b, const ring R);
+BOOLEAN sm_Equal(ideal a, ideal b, const ring R);
+
+#define SMATELEM(A,i,j,R) p_Vec2Poly(A->m[j],i+1,R)
+
 #endif/* MATPOL_H */

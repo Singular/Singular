@@ -205,6 +205,7 @@ void yyerror(const char * fmt)
 %token <i> NUMBER_CMD
 %token <i> POLY_CMD
 %token <i> RESOLUTION_CMD
+%token <i> SMATRIX_CMD
 %token <i> VECTOR_CMD
 /* end types */
 
@@ -901,13 +902,16 @@ declare_ip_variable:
             int c; TESTSETINT($7,c);
             leftv v;
             idhdl h;
-            if ($1 == MATRIX_CMD)
+            if (($1 == MATRIX_CMD) || ($1 == SMATRIX_CMD ))
             {
               if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot), TRUE)) YYERROR;
               v=&$$;
               h=(idhdl)v->data;
               idDelete(&IDIDEAL(h));
-              IDMATRIX(h) = mpNew(r,c);
+              if ($1 == MATRIX_CMD)
+                IDMATRIX(h) = mpNew(r,c);
+              else
+                IDIDEAL(h) = idInit(c,r);
               if (IDMATRIX(h)==NULL) YYERROR;
             }
             else if (($1 == INTMAT_CMD)||($1 == BIGINTMAT_CMD))
@@ -931,7 +935,7 @@ declare_ip_variable:
           }
         | mat_cmd elemexpr
           {
-            if ($1 == MATRIX_CMD)
+            if (($1 == MATRIX_CMD)||($1 == SMATRIX_CMD))
             {
               if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot), TRUE)) YYERROR;
             }
@@ -1088,6 +1092,7 @@ cmdeq:  '='
 
 
 mat_cmd: MATRIX_CMD
+        | SMATRIX_CMD
         | INTMAT_CMD
         | BIGINTMAT_CMD
           ;

@@ -337,6 +337,11 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h, char ***list_of_libs)
     if (fprintf(fd, "[%d][%d]", IDINTVEC(h)->rows(), IDINTVEC(h)->cols())
         == EOF) return TRUE;
   }
+  else if (type_id == SMATRIX_CMD)
+  {
+    ideal id = IDIDEAL(h);
+    if (fprintf(fd, "[%d][%d]", (int)id->rank, IDELEMS(id))== EOF) return TRUE;
+  }
 
   if (type_id == PACKAGE_CMD)
   {
@@ -389,6 +394,7 @@ static const char* GetIdString(idhdl h)
     case VECTOR_CMD:
     case MODUL_CMD:
     case MATRIX_CMD:
+    case SMATRIX_CMD:
       return Tok2Cmdname(type);
 
     case MAP_CMD:
@@ -513,7 +519,8 @@ static int DumpRhs(FILE *fd, idhdl h)
     BOOLEAN need_klammer=FALSE;
     if (type_id == INTVEC_CMD) { fputs("intvec(",fd);need_klammer=TRUE; }
     else if (type_id == IDEAL_CMD) { fputs("ideal(",fd);need_klammer=TRUE; }
-    else if (type_id == MODUL_CMD) { fputs("module(",fd);need_klammer=TRUE; }
+    else if ((type_id == MODUL_CMD)||(type_id == SMATRIX_CMD))
+                                   { fputs("module(",fd);need_klammer=TRUE; }
     else if (type_id == BIGINT_CMD) { fputs("bigint(",fd);need_klammer=TRUE; }
 
     if (fputs(rhs,fd) == EOF) return EOF;
