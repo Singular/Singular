@@ -5074,6 +5074,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
     case MAP_CMD:
     case PROC_CMD:
     case RING_CMD:
+    case SMATRIX_CMD:
     //case QRING_CMD:
     case INTMAT_CMD:
     case BIGINTMAT_CMD:
