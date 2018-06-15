@@ -902,15 +902,18 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             return omStrDup(s);
           }
 
-        case MODUL_CMD:
         case IDEAL_CMD:
         case MAP_CMD:
+        case MODUL_CMD:
         case SMATRIX_CMD:
           s= iiStringMatrix((matrix)d,dim, currRing);
           if (typed)
           {
             char* ns = (char*) omAlloc(strlen(s) + 10);
-            sprintf(ns, "%s(%s)", (t/*Typ()*/!=IDEAL_CMD ? "module" : "ideal"), s);
+            if ((t/*Typ()*/==IDEAL_CMD)||(t==MAP_CMD))
+              sprintf(ns, "ideal(%s)", s);
+            else /*MODUL_CMD, SMATRIX_CMD */
+              sprintf(ns, "module(%s)", s);
             omFree(s);
             omCheckAddr(ns);
             return ns;
