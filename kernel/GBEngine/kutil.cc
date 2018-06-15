@@ -12512,20 +12512,12 @@ void enterTShift(LObject p, kStrategy strat, int atT)
 
   int toInsert = itoInsert(p.p, strat->tailRing);
 
-#ifdef PDEBUG
-  //  Print("enterTShift uses toInsert: %d", toInsert);  PrintLn();
-#endif
-  int i;
-
-  if (atT < 0)
-    atT = strat->posInT(strat->T, strat->tl, p);
-
   /* can call enterT in a sequence, e.g. */
 
   /* shift0 = it's our model for further shifts */
   enterT(p,strat,atT);
   LObject qq;
-  for (i=1; i<=toInsert; i++) // toIns - 1?
+  for (int i=1; i<=toInsert; i++)
   {
     qq      = p; //qq.Copy();
     qq.t_p=NULL;
@@ -12539,13 +12531,8 @@ void enterTShift(LObject p, kStrategy strat, int atT)
     kTest_T(&qq, strat->tailRing, -1, 'L');
     #endif
     /* enter it into T, first el't is with the shift 0 */
-    // compute the position for qq
-    atT = strat->posInT(strat->T, strat->tl, qq);
     enterT(qq,strat,atT);
   }
-/* Q: what to do with this one in the orig enterT ? */
-/*  strat->R[strat->tl] = &(strat->T[atT]); */
-/* Solution: it is done by enterT each time separately */
 }
 #endif
 
