@@ -1840,27 +1840,6 @@ ideal sm_Mult(ideal a, ideal b, const ring R)
   return c;
 }
 
-ideal sm_Transp(ideal a, const ring R)
-{
-  int    i, j, r = a->rank, c = IDELEMS(a);
-  poly *p;
-  ideal b =  idInit(c,r);
-  poly *m=(poly*)omAlloc0(r*sizeof(poly));
-  for(i=0;i<c;i++)
-  {
-    p_Vec2Polys(a->m[i],&m,&r,R);// m has A[1..r,i+1]
-    if (r>a->rank) Print("wrong rang (%d,%ld) in sm_Transp\n",r,a->rank);
-    for(j=0;j<r;j++)
-    {
-      // m[j] is A[j+1,i]
-      p_SetCompP(m[j],i+1,R);
-      b->m[j]=p_Add_q(b->m[j],m[j],R);
-    }
-  }
-  omFreeSize(m,a->rank*sizeof(poly));
-  return b;
-}
-
 /*2
 *returns the trace of matrix a
 */
