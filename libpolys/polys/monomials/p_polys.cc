@@ -3519,33 +3519,6 @@ void p_DeleteComp(poly * p,int k, const ring r)
   }
 }
 
-/*2
-* convert a vector to a set of polys,
-* allocates the polyset, (entries 0..(*len)-1)
-* the vector will not be changed
-*/
-void  p_Vec2Polys(poly v, poly* *p, int *len, const ring r)
-{
-  poly h;
-  int k;
-
-  *len=p_MaxComp(v,r);
-  if (*len==0) *len=1;
-  *p=(poly*)omAlloc0((*len)*sizeof(poly));
-  while (v!=NULL)
-  {
-    h=p_Head(v,r);
-    k=__p_GetComp(h,r);
-    p_SetComp(h,0,r);
-    pNext(h)=(*p)[k-1];(*p)[k-1]=h;
-    pIter(v);
-  }
-  for(int i=(*len-1);i>=0;i--)
-  {
-    if ((*p)[i]!=NULL) (*p)[i]=pReverse((*p)[i]);
-  }
-}
-
 poly p_Vec2Poly(poly v, int k, const ring r)
 {
   poly h;
@@ -3566,6 +3539,7 @@ poly p_Vec2Poly(poly v, int k, const ring r)
 }
 
 /// julia: vector to already allocated array (len=p_MaxComp(v,r))
+// also used for p_Vec2Polys
 void  p_Vec2Array(poly v, poly *p, int len, const ring r)
 {
   poly h;
@@ -3584,6 +3558,22 @@ void  p_Vec2Array(poly v, poly *p, int len, const ring r)
   {
     if (p[i]!=NULL) p[i]=pReverse(p[i]);
   }
+}
+
+/*2
+* convert a vector to a set of polys,
+* allocates the polyset, (entries 0..(*len)-1)
+* the vector will not be changed
+*/
+void  p_Vec2Polys(poly v, poly* *p, int *len, const ring r)
+{
+  poly h;
+  int k;
+
+  *len=p_MaxComp(v,r);
+  if (*len==0) *len=1;
+  *p=(poly*)omAlloc0((*len)*sizeof(poly));
+  p_Vec2Array(v,*p,*len,r);
 }
 
 //
