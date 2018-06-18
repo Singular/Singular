@@ -3550,8 +3550,13 @@ void  p_Vec2Array(poly v, poly *p, int len, const ring r)
   {
     h=p_Head(v,r);
     k=__p_GetComp(h,r);
-    p_SetComp(h,0,r);
-    pNext(h)=p[k-1];p[k-1]=h;
+    if (k>len) { Werror("wrong rank:%d, should be %d",len,k); }
+    else
+    {
+      p_SetComp(h,0,r);
+      p_Setm(h,r);
+      pNext(h)=p[k-1];p[k-1]=h;
+    }
     pIter(v);
   }
   for(int i=len-1;i>=0;i--)
