@@ -1698,26 +1698,9 @@ matrix mp_Wedge(matrix a, int ar, const ring R)
   return (result);
 }
 
-static void p_DecomposeComp(poly p, poly *a, int l, const ring r)
-{
-  poly h=p;
-  while(h!=NULL)
-  {
-    poly hh=pNext(h);
-    pNext(h)=a[__p_GetComp(h,r)-1];
-    a[__p_GetComp(h,r)-1]=h;
-    p_SetComp(h,0,r);
-    p_SetmComp(h,r);
-    h=hh;
-  }
-  for(int i=0;i<l;i++)
-  {
-    if(a[i]!=NULL) a[i]=pReverse(a[i]);
-  }
-}
-// helper for mp_Tensor
+// helper for sm_Tensor
 // destroyes f, keeps B
-static ideal mp_MultAndShift(poly f, ideal B, int s, const ring r)
+static ideal sm_MultAndShift(poly f, ideal B, int s, const ring r)
 {
   assume(f!=NULL);
   ideal res=idInit(IDELEMS(B),B->rank+s);
@@ -1734,9 +1717,9 @@ static ideal mp_MultAndShift(poly f, ideal B, int s, const ring r)
   p_Delete(&f,r);
   return res;
 }
-// helper for mp_Tensor
+// helper for sm_Tensor
 // updates res, destroyes contents of sm
-static void mp_AddSubMat(ideal res, ideal sm, int col, const ring r)
+static void sm_AddSubMat(ideal res, ideal sm, int col, const ring r)
 {
   for(int i=0;i<IDELEMS(sm);i++)
   {
@@ -1745,9 +1728,9 @@ static void mp_AddSubMat(ideal res, ideal sm, int col, const ring r)
   }
 }
 
-ideal mp_Tensor(ideal A, ideal B, const ring r)
+ideal sm_Tensor(ideal A, ideal B, const ring r)
 {
-  // size of the result n*q x m*p
+  // size of the result m*p x n*q
   int n=IDELEMS(A); // m x n
   int m=A->rank;
   int q=IDELEMS(B); // p x q
@@ -1757,16 +1740,16 @@ ideal mp_Tensor(ideal A, ideal B, const ring r)
   for(int i=0; i<n; i++)
   {
     memset(a,0,m*sizeof(poly));
-    p_DecomposeComp(p_Copy(A->m[i],r),a,m,r);
+    p_Vec2Array(A->m[i],a,m,r);
     for(int j=0;j<m;j++)
     {
       if (a[j]!=NULL)
       {
-        ideal sm=mp_MultAndShift(a[j], // A_i_j
+        ideal sm=sm_MultAndShift(a[j], // A_i_j
                                  B,
                                  j*p, // shift j*p down
                                  r);
-        mp_AddSubMat(res,sm,i*q,r); // add this columns to col i*q ff
+        sm_AddSubMat(res,sm,i*q,r); // add this columns to col i*q ff
         id_Delete(&sm,r); // delete the now empty ideal
       }
     }
