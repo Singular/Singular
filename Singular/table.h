@@ -78,6 +78,7 @@ const struct sValCmd1 dArith1[]=
 #endif
 //,{  jjWRONG ,       COLS_CMD,        0,              VECTOR_CMD  , ALLOW_NC |ALLOW_RING}
 ,{D(jjCOLS),       COLS_CMD,        INT_CMD,        MATRIX_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjCOLS),       COLS_CMD,        INT_CMD,        SMATRIX_CMD   , ALLOW_NC |ALLOW_RING}
 ,{D(jjCOLS),       COLS_CMD,        INT_CMD,        IDEAL_CMD     , ALLOW_NC |ALLOW_RING}
 ,{D(jjCOLS),       COLS_CMD,        INT_CMD,        MODUL_CMD     , ALLOW_NC |ALLOW_RING}
 ,{D(jjCOLS_IV),    COLS_CMD,        INT_CMD,        INTMAT_CMD    , ALLOW_NC |ALLOW_RING}
@@ -252,6 +253,7 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjpMaxComp),   ROWS_CMD,        INT_CMD,        VECTOR_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjROWS),       ROWS_CMD,        INT_CMD,        MODUL_CMD     , ALLOW_NC |ALLOW_RING}
 ,{D(jjROWS),       ROWS_CMD,        INT_CMD,        MATRIX_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjROWS),       ROWS_CMD,        INT_CMD,        SMATRIX_CMD   , ALLOW_NC |ALLOW_RING}
 ,{D(jjROWS_IV),    ROWS_CMD,        INT_CMD,        INTMAT_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjROWS_BIM),   ROWS_CMD,        INT_CMD,        BIGINTMAT_CMD , ALLOW_NC |ALLOW_RING}
 #ifdef SINGULAR_4_2
@@ -404,9 +406,9 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjTIMES_MA_I1),'*',           MATRIX_CMD,     MATRIX_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjTIMES_MA_I2),'*',           MATRIX_CMD,     INT_CMD,    MATRIX_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjTIMES_MA),  '*',            MATRIX_CMD,     MATRIX_CMD, MATRIX_CMD, ALLOW_NC | ALLOW_RING}
-,{D(jjTIMES_SM),  '*',            SMATRIX_CMD,    SMATRIX_CMD,SMATRIX_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjTIMES_MA_BI1),'*',          MATRIX_CMD,     MATRIX_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjTIMES_MA_BI2),'*',          MATRIX_CMD,     BIGINT_CMD, MATRIX_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjTIMES_SM),  '*',            SMATRIX_CMD,    SMATRIX_CMD,SMATRIX_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjTIMES_BIM), '*',            BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjOP_BIM_I),  '*',            BIGINTMAT_CMD,  BIGINTMAT_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjOP_I_BIM),  '*',            BIGINTMAT_CMD,  INT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
@@ -746,6 +748,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjSTD_HILB),  STD_CMD,        MODUL_CMD,      MODUL_CMD,  INTVEC_CMD, ALLOW_PLURAL |NO_RING}
 ,{D(jjSYZ_2),     SYZYGY_CMD,     MODUL_CMD,      IDEAL_CMD,  STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSYZ_2),     SYZYGY_CMD,     MODUL_CMD,      MODUL_CMD,  STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjTENSOR),    TENSOR_CMD,     SMATRIX_CMD,    SMATRIX_CMD,SMATRIX_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjVARSTR2),   VARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjWAIT1ST2),  WAIT1ST_CMD,    INT_CMD,        LIST_CMD,   INT_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjWAITALL2),  WAITALL_CMD,    INT_CMD,        LIST_CMD,   INT_CMD, ALLOW_NC |ALLOW_RING}
@@ -1177,6 +1180,7 @@ cmdnames cmds[] =
   { "subst",       0, SUBST_CMD ,         CMD_M},
   { "system",      0, SYSTEM_CMD,         CMD_M},
   { "syz",         0, SYZYGY_CMD ,        CMD_12},
+  { "tensor",      0, TENSOR_CMD ,        CMD_2},
   { "test",        0, TEST_CMD ,          CMD_M},
   { "trace",       0, TRACE_CMD ,         CMD_1},
   { "transpose",   0, TRANSPOSE_CMD ,     CMD_1},

@@ -3394,7 +3394,13 @@ static BOOLEAN jjSYZ_2(leftv res, leftv u, leftv v)
   if (w!=NULL) delete w;
   if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
   return FALSE;
-
+}
+static BOOLEAN jjTENSOR(leftv res, leftv u, leftv v)
+{
+  ideal A=(ideal)u->Data();
+  ideal B=(ideal)v->Data();
+  res->data = (char *)sm_Tensor(A,B,currRing);
+  return FALSE;
 }
 static BOOLEAN jjVARSTR2(leftv res, leftv u, leftv v)
 {
