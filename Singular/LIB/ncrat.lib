@@ -2297,7 +2297,8 @@ EXAMPLE:  example ncrepSubstitute;
     matrix Q(i) = l[i + 1];
   }
 
-  int n = ncols(points[1]);
+  int n=1;
+  if (typeof(points[1])!="poly") { n = ncols(points[1]);}
   matrix E[n][n];
   E = E + 1;
 
