@@ -545,9 +545,9 @@ EXAMPLE:  example goodBasis; shows examples
 
         B=pidbasis(K2,L2);
       }
+      B0=std(coeffs(reduce(matrix(K,nrows(module(K)),nrows(B))*B,JS),b0));
 
-      B0=std(coeffs(reduce(matrix(K,nrows(K),nrows(B))*B,JS),b0));
-      b=matrix(K,nrows(K),nrows(B))*B;
+      b=matrix(K,nrows(module(K)),nrows(B))*B;
     }
 
     A=lift(B,reduce(coeffs(f*b+var(1)^2*diff(b,var(1)),M,product(X)),L1));
