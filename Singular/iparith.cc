@@ -3402,6 +3402,25 @@ static BOOLEAN jjTENSOR(leftv res, leftv u, leftv v)
   res->data = (char *)sm_Tensor(A,B,currRing);
   return FALSE;
 }
+static BOOLEAN jjTENSOR_Ma(leftv res, leftv u, leftv v)
+{
+  sleftv tmp_u,tmp_v,tmp_res;
+  int index=iiTestConvert(MATRIX_CMD,SMATRIX_CMD,dConvertTypes);
+  iiConvert(MATRIX_CMD,SMATRIX_CMD,index,u,&tmp_u,dConvertTypes);
+  iiConvert(MATRIX_CMD,SMATRIX_CMD,index,v,&tmp_v,dConvertTypes);
+  tmp_res.Init();
+  tmp_res.rtyp=SMATRIX_CMD;
+  BOOLEAN bo=jjTENSOR(&tmp_res,&tmp_u,&tmp_v);
+  if (!bo)
+  {
+    index=iiTestConvert(SMATRIX_CMD,MATRIX_CMD,dConvertTypes);
+    iiConvert(SMATRIX_CMD,MATRIX_CMD,index,&tmp_res,res,dConvertTypes);
+  }
+  tmp_u.CleanUp();
+  tmp_v.CleanUp();
+  tmp_res.CleanUp();
+  return bo;
+}
 static BOOLEAN jjVARSTR2(leftv res, leftv u, leftv v)
 {
   idhdl h=(idhdl)u->data;
