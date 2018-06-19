@@ -206,6 +206,7 @@ and @code{LIB} no brackets are allowed.
 * subst::
 * system::
 * syz::
+* tensor::
 * trace::
 * transpose::
 * type::
@@ -7864,7 +7865,7 @@ system("--browser", "firefox");
 @end smallexample
 @end table
 @c -------------------------------------------------
-@node syz, trace, system, Functions
+@node syz
 @subsection syz
 @cindex syz
 @table @code
@@ -7908,7 +7909,38 @@ See
 @ref{nfmodsyz_lib}.
 @c ref
 @c ---------------------------------------
-@node trace, transpose, syz, Functions
+@node tensor
+@subsection tensor
+@cindex tensor
+@cindex Kronecker product
+@table @code
+@item @strong{Syntax:}
+@code{tensor (} matrix_expression @code{,} matrix_expression @code{)}
+@*@code{tensor (} module_expression @code{,} module_expression @code{)}
+@*@code{tensor (} smatrix_expression @code{,} smatrix_expression @code{)}
+@item @strong{Type:}
+same as the first argument
+@item @strong{Purpose:}
+computes the tensor product (Kronecker product) of A and B
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=32003,(x,y,z),(c,ds);
+  matrix A[3][3]=1,2,3,4,5,6,7,8,9;
+  matrix B[2][2]=x,y,0,z;
+  print(A);
+  print(B);
+  print(tensor(A,B));
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{matrix};
+@ref{module}.
+@c ref
+@c ---------------------------------------
+@node trace
 @subsection trace
 @cindex trace
 @table @code
