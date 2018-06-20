@@ -1,11 +1,11 @@
 ////////////////////////////////////////////////////////////////
-version = "version chern.lib 4.1.1.0 Dec_2017 ";  //$Id$
+version = "version chern.lib 0.706 Jun_2018 ";      //$Id$
 category = "Chern classes";
 info="
 LIBRARY:  chern.lib    Symbolic Computations with Chern classes,
                        Computation of Chern classes
 
-AUTHOR:  Oleksandr Iena,      o.g.yena@gmail.com,  yena@mathematik.uni-kl.de
+AUTHOR:  Oleksandr Iena,      o.g.yena@gmail.com
 
 OVERVIEW:
   A toolbox for symbolic computations with Chern classes.
@@ -687,9 +687,9 @@ NOTE:     uses the elimination and is extremely inefficient,
   {
     def br@=basering; // remember the base ring
     // add additional variables c@, a@(1..n) to the base ring
-    execute("ring r@= (" + charstr(basering) + "),(c@,"+varstr(basering)+", a@(1..n)), dp;" );
+    execute("ring r@= (" + charstr(basering) + "),(c@,"+varstr(basering)+", a@(1..n)), lp;" );
     execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
-    list c=F(c); // embedd c in the bigger ring
+    list c=F(c); // embed c in the bigger ring
     poly rez;
     list A=a@(1..n);
     list sym=symm(A);
@@ -701,7 +701,7 @@ NOTE:     uses the elimination and is extremely inefficient,
       I=I, c[i]-sym[i];
     }
     I=I, c@-sum_of_powers(n, A);
-    I=elim(I, E);
+    I=simplify(elim(I, E),1);
     rez = -subst(I[1], c@, 0);
     setring br@; // come back to the initial base ring
     execute( "map FF= r@,0,"+varstr(br@)+";" ); // define the specialization homomorphism
@@ -1017,10 +1017,10 @@ NOTE:     makes sense only for (lists of) polynomials;
   int n=r*R; // the rank of the product of two vector bundles
   def br@=basering; // remember the base ring
   // add additional variables a@(1..r), b@(1..R), x@ to the base ring
-  execute("ring r@=("+ charstr(basering) +"),(x@,"+varstr(basering)+",a@(1..r),b@(1..R)), dp;");
+  execute("ring r@=("+ charstr(basering) +"),(x@,"+varstr(basering)+",a@(1..r),b@(1..R)), lp;");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
-  list c=F(c); // embedd c in the bigger ring
-  list C=F(C); // embedd C in the bigger ring
+  list c=F(c); // embed c in the bigger ring
+  list C=F(C); // embed C in the bigger ring
   list A=a@(1..r); // list of Chern roots of the first vector bundle
   list syma = symm(A); // symmetric functions in the Chern roots of the first vector bundles
   list B=b@(1..R); // list of Chern roots of the second vector bundle
@@ -1043,7 +1043,7 @@ NOTE:     makes sense only for (lists of) polynomials;
   for(i=1;i<=n;i++)
   {
     J = I, x@-Cf[i]; // add the equation for the i-th Chern class to the ideal of relations
-    J = elim(J, E); // eliminate the Chern roots
+    J = simplify(elim(J, E), 1); // eliminate the Chern roots
     // get the expression for the i-th Chern class of the product
     // in terms of the Chern classes of the factors
     rez = rez + list( -subst(J[1], x@, 0) );
@@ -1570,7 +1570,7 @@ NOTE:     for the second symmetric power chSymm2L(...) could be faster
   //-------------------------------
   def br@=basering; // remember the base ring
   // add additional variables to the base ring
-  execute("ring r@=(" + charstr(basering) +  "),(x@,"+varstr(basering)+", a@(1..r)), dp;" );
+  execute("ring r@=(" + charstr(basering) +  "),(x@,"+varstr(basering)+", a@(1..r)), lp;" );
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c=F(c); // embed c into the bigger ring
   list rez; // the Chern classes of the symmetric power are going to be written here
@@ -2194,7 +2194,7 @@ NOTE:     returns an empty list if l is empty,
   {
     def br@=basering; // remember the base ring
     // add additional variables a@(1..n), x@ to the base ring
-    execute("ring r@=(" + charstr(basering) + "), (x@,"+varstr(basering)+", a@(1..n)), dp;" );
+    execute("ring r@=(" + charstr(basering) + "), (x@,"+varstr(basering)+", a@(1..n)), lp;" );
     execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
     list c=F(c); // embed c into the bigger ring
     int j;
