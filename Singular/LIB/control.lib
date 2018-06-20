@@ -227,7 +227,7 @@ example
   module L = leftInverse(M);
   print(L);
   // check
-  print(L*M);
+  print(matrix(L)*matrix(M));
 }
 //-----------------------------------------------------------------------
 proc rightInverse(module R)
@@ -270,7 +270,7 @@ example
   module L = rightInverse(M);
   print(L);
   // check
-  print(M*L);
+  print(matrix(M)*matrix(L));
 }
 //-----------------------------------------------------------------------
 static proc dim_Our(module R)

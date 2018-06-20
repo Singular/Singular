@@ -9,9 +9,9 @@ i = std(i);
 resolution F=nres(i,0); F;
 list l = F; l;
 // see the exactness at this point:
-size(ideal(transpose(l[2])*transpose(l[1])));
+size(ideal(transpose(matrix(l[2]))*transpose(l[1])));
 // see the exactness at this point:
-size(ideal(transpose(l[3])*transpose(l[2])));
+size(ideal(transpose(matrix(l[3]))*transpose(l[2])));
 print(betti(l), "betti");
 print(betti(minres(l)), "betti");
 tst_status(1);$

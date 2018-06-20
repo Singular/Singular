@@ -4,6 +4,7 @@ module m1=[x];
 module m2=[y];
 m1+m2;
 m1*m2;
+matrix(m1)*matrix(m2);
 //
 poly f=z;
 f+m1;

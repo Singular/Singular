@@ -18,8 +18,8 @@ print(matrix(l[1]));
 print(matrix(l[2]));
 ideal tst; // now let us show that the resolution is exact
 matrix TST;
-TST = transpose(l[3])*transpose(l[2]); // 2nd term
+TST = transpose(matrix(l[3]))*transpose(l[2]); // 2nd term
 size(ideal(TST));
-TST = transpose(l[2])*transpose(l[1]); // 1st term
+TST = transpose(matrix(l[2]))*transpose(l[1]); // 1st term
 size(ideal(TST));
 tst_status(1);$

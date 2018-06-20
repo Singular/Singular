@@ -1352,7 +1352,7 @@ EXAMPLE: example grprod; shows an example
 
   ASSUME(0, (size(a) == size(b)) && (a == b));  // == for intvec :(
 
-  return ( grobj( A*B, grrange(A), grdeg(B) ) );
+  return ( grobj( matrix(A)*matrix(B), grrange(A), grdeg(B) ) );
 }
 example
 { "EXAMPLE:"; echo = 2;

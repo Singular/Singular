@@ -5,5 +5,5 @@ minpoly = w2-w-1;
 module M = [a2,b2],[wab,w2c2+2b2],[(w-2)*a2+wab,wb2+w2c2];
 module REL = linear_relations(M);
 pmat(REL);
-pmat(M*REL);
+pmat(matrix(M)*REL);
 tst_status(1);$

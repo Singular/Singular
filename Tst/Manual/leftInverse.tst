@@ -16,5 +16,5 @@ module M = module(U);
 module L = leftInverse(M);
 print(L);
 // check
-print(L*M);
+print(matrix(L)*matrix(M));
 tst_status(1);$

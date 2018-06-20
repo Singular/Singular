@@ -42,7 +42,7 @@ EXAMPLE: example deform; shows an example
 {
    list L=T_1(id,"");
    def K=L[1]; attrib(K,"isSB",1);
-   return(L[2]*kbase(K));
+   return(matrix(L[2])*matrix(kbase(K)));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -664,10 +664,10 @@ example
    vdim(T);                      // Tjurina number = dim_K(T_1), should be 3
    list L=T_1(i,"");
    module kB  = kbase(L[1]);
-   print(L[2]*kB);               // basis of 1st order miniversal deformation
+   print(matrix(L[2])*matrix(kB)); // basis of 1st order miniversal deformation
    show(L[2]);                   // presentation of normal bundle
    print(L[3]);                  // relations of i
-   print(transpose(L[3])*L[2]);  // should be 0 (mod i)
+   print(transpose(matrix(L[3]))*matrix(L[2]));  // should be 0 (mod i)
    printlevel = p;
 }
 ///////////////////////////////////////////////////////////////////////////////
