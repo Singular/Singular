@@ -1796,7 +1796,7 @@ ideal sm_Mult(ideal a, ideal b, const ring R)
   int q = IDELEMS(b);
 
   assume (IDELEMS(a)==b->rank);
-  ideal c = idInit(m,q);
+  ideal c = idInit(q,m);
 
   for (i=0; i<m; i++)
   {
