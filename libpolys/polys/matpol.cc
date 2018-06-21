@@ -1807,8 +1807,8 @@ ideal sm_Mult(ideal a, ideal b, const ring R)
       {
         for (j=0; j<q; j++)
         {
-          poly bkj;
-          if ((bkj=SMATELEM(b,k,j,R))!=NULL)
+          poly bkj=SMATELEM(b,k,j,R);
+          if (bkj!=NULL)
           {
             poly s = p_Mult_q(p_Copy(aik,R) /*SMATELEM(a,i,k)*/, bkj/*SMATELEM(b,k,j)*/, R);
             if (s!=NULL) p_SetComp(s,i+1,R);
@@ -1819,7 +1819,7 @@ ideal sm_Mult(ideal a, ideal b, const ring R)
       }
     }
   }
-  for(i=m-1;i>=0;i--) p_Normalize(c->m[i], R);
+  for(i=q-1;i>=0;i--) p_Normalize(c->m[i], R);
   return c;
 }
 
