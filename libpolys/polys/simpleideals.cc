@@ -1276,6 +1276,39 @@ matrix id_Module2formatedMatrix(ideal mod,int rows, int cols, const ring R)
   return result;
 }
 
+ideal id_ResizeModule(ideal mod,int rows, int cols, const ring R)
+{
+  // columns?
+  if (cols!=IDELEMS(mod))
+  {
+    for(int i=IDELEMS(mod)-1;i>=cols;i--) p_Delete(&mod->m[i],R);
+    pEnlargeSet(&(mod->m),IDELEMS(mod),cols-IDELEMS(mod));
+    IDELEMS(mod)=cols;
+  }
+  // rows?
+  if (rows<mod->rank)
+  {
+    for(int i=IDELEMS(mod)-1;i>=0;i--)
+    {
+      if (mod->m[i]!=NULL)
+      {
+        while((mod->m[i]!=NULL) && (p_GetComp(mod->m[i],R)>rows))
+          mod->m[i]=p_LmDeleteAndNext(mod->m[i],R);
+        poly p=mod->m[i];
+        while(pNext(p)!=NULL)
+        {
+          if (p_GetComp(pNext(p),R)>rows)
+            pNext(p)=p_LmDeleteAndNext(pNext(p),R);
+          else
+            pIter(p);
+        }
+      }
+    }
+  }
+  mod->rank=rows;
+  return mod;
+}
+
 /*2
 * substitute the n-th variable by the monomial e in id
 * destroy id
