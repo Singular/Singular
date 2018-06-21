@@ -6473,7 +6473,7 @@ static BOOLEAN jjMATRIX_Mo(leftv res, leftv u, leftv v,leftv w)
 {
   int mi=(int)(long)v->Data();
   int ni=(int)(long)w->Data();
-  if ((mi<1)||(ni<1))
+  if ((mi<0)||(ni<1))
   {
     Werror("converting module to matrix: dimensions must be positive(%dx%d)",mi,ni);
     return TRUE;
@@ -6506,6 +6506,19 @@ static BOOLEAN jjMATRIX_Ma(leftv res, leftv u, leftv v,leftv w)
   }
   id_Delete((ideal *)&I,currRing);
   res->data = (char *)m;
+  return FALSE;
+}
+static BOOLEAN jjSMATRIX_Mo(leftv res, leftv u, leftv v,leftv w)
+{
+  int mi=(int)(long)v->Data();
+  int ni=(int)(long)w->Data();
+  if ((mi<0)||(ni<1))
+  {
+    Werror("converting to smatrix: dimensions must be positive(%dx%d)",mi,ni);
+    return TRUE;
+  }
+  res->data = (char *)id_ResizeModule((ideal)u->CopyD(),
+           mi,ni,currRing);
   return FALSE;
 }
 static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
