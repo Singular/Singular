@@ -4002,6 +4002,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           strat->P.pCleardenom();
           if (strat->redTailChange) { 
             strat->P.t_p=NULL;
+            strat->initEcart(&(strat->P));
           }
         }
       }
@@ -4012,6 +4013,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
           if (strat->redTailChange) {
             strat->P.t_p=NULL;
+            strat->initEcart(&(strat->P));
           }
         }
       }
