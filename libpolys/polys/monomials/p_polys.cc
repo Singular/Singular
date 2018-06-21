@@ -3538,7 +3538,7 @@ poly p_Vec2Poly(poly v, int k, const ring r)
   return res;
 }
 
-/// julia: vector to already allocated array (len=p_MaxComp(v,r))
+/// vector to already allocated array (len>=p_MaxComp(v,r))
 // also used for p_Vec2Polys
 void  p_Vec2Array(poly v, poly *p, int len, const ring r)
 {
