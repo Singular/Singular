@@ -128,7 +128,7 @@ parname        #
                            yy_noeof=noeof_comment;
                            loop
                            {
-                             register int c;
+                             REGISTER int c;
                              while ( (c = yyinput()) != '*' && c != EOF );
                              if ( c == '*' )
                              {
@@ -348,7 +348,7 @@ newline                  {
 
 .                       {
                            /*if (*yytext == '\n') REJECT;*/
-                           register char ch= *yytext;
+                           REGISTER char ch= *yytext;
                            lvalp->i = ch;
                            switch(ch)
                            {

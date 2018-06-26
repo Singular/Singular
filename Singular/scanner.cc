@@ -931,7 +931,7 @@ YY_RULE_SETUP
                            yy_noeof=noeof_comment;
                            loop
                            {
-                             register int c;
+                             REGISTER int c;
                              while ( (c = yyinput()) != '*' && c != EOF );
                              if ( c == '*' )
                              {
@@ -1393,7 +1393,7 @@ YY_RULE_SETUP
 #line 346 "scanner.l"
 {
                            /*if (*yytext == '\n') REJECT;*/
-                           register char ch= *yytext;
+                           REGISTER char ch= *yytext;
                            lvalp->i = ch;
                            switch(ch)
                            {

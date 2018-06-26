@@ -16,6 +16,8 @@ extern "C" {
   #if __cplusplus >= 201402L
   /* clang 3.7, gcc 5.1 sets 201402L */
   #define REGISTER
+  #elif defined(__clang__)
+  #define REGISTER
   #else
   #define REGISTER register
   #endif
