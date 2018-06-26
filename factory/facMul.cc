@@ -3030,7 +3030,7 @@ CanonicalForm mulMod (const CanonicalForm& A, const CanonicalForm& B,
   }
   else
   {
-    m= (tmax(degF, degG)+1)/2;
+    m= (int) ceil (tmin (degF, degG)/2.0);
     CanonicalForm yToM= power (y, m);
     CanonicalForm F0= mod (F, yToM);
     CanonicalForm F1= div (F, yToM);
