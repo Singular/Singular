@@ -1309,12 +1309,7 @@ static BOOLEAN iiCrossProd(leftv res, leftv args)
 void siInit(char *name)
 {
 // factory default settings: -----------------------------------------------
-  On(SW_USE_EZGCD);
-  On(SW_USE_CHINREM_GCD);
-  //On(SW_USE_FF_MOD_GCD);
-  On(SW_USE_EZGCD_P);
-  On(SW_USE_QGCD);
-  Off(SW_USE_NTL_SORT); // may be changed by an command line option
+  //Off(SW_USE_NTL_SORT); // may be changed by an command line option
   factoryError=WerrorS;
 
 // NTL error handling (>= 9.3.0)
