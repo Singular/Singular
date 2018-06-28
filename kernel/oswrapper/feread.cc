@@ -346,7 +346,7 @@ static char * fe_fgets_stdin_init(const char *pr,char *s, int size)
 {
 #if (defined(HAVE_READLINE) || defined(HAVE_LIBREADLINE)) && !defined(HAVE_DYN_RL) && !defined(HAVE_FEREAD)
   /* Allow conditional parsing of the ~/.inputrc file. */
-  rl_readline_name = "Singular";
+  rl_readline_name = (char*)"Singular";
   /* Tell the completer that we want a crack first. */
 #ifdef USE_READLINE4
   rl_attempted_completion_function = (rl_completion_func_t *)singular_completion;
