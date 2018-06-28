@@ -21,7 +21,8 @@ typedef mgb::GroebnerConfiguration::Exponent Exponent;
 typedef mgb::GroebnerConfiguration::BaseOrder BaseOrder;
 
 // Constructs a Singular ideal.
-class MathicToSingStream {
+class MathicToSingStream
+{
 public:
   MathicToSingStream(Coefficient modulus, VarIndex varCount):
     mModulus(modulus),
@@ -38,7 +39,8 @@ public:
   Coefficient modulus() const {return mModulus;}
   VarIndex varCount() const {return mModulus;}
 
-  void idealBegin(size_t polyCount) {
+  void idealBegin(size_t polyCount)
+  {
     deleteIdeal();
     mIdeal = idInit(polyCount);
     mPolyCount = 0;
@@ -46,7 +48,8 @@ public:
 
   void appendPolynomialBegin(size_t termCount) {}
 
-  void appendTermBegin(const mgb::GroebnerConfiguration::Component c) {
+  void appendTermBegin(const mgb::GroebnerConfiguration::Component c)
+  {
     if (mTerm == 0)
       mTerm = mIdeal->m[mPolyCount] = pInit();
     else
@@ -54,16 +57,19 @@ public:
     pSetComp(mTerm,c);
   }
 
-  void appendExponent(VarIndex index, Exponent exponent) {
+  void appendExponent(VarIndex index, Exponent exponent)
+  {
     pSetExp(mTerm, index + 1, exponent);
   }
 
-  void appendTermDone(Coefficient coefficient) {
+  void appendTermDone(Coefficient coefficient)
+  {
     mTerm->coef = reinterpret_cast<number>(coefficient);
     pSetm(mTerm);
   }
 
-  void appendPolynomialDone() {
+  void appendPolynomialDone()
+  {
     ++mPolyCount;
     mTerm = 0;
   }
@@ -73,15 +79,18 @@ public:
 
   // Singular interface
 
-  ::ideal takeIdeal() {
+  ::ideal takeIdeal()
+  {
     ::ideal id = mIdeal;
     mIdeal = 0;
     return id;
   }
 
 private:
-  void deleteIdeal() {
-    if (mIdeal != 0) {
+  void deleteIdeal()
+  {
+    if (mIdeal != 0)
+    {
       idDelete(&mIdeal);
       mIdeal = 0;
     }
@@ -96,7 +105,8 @@ private:
 
 #include <iostream>
 
-bool setOrder(ring r, mgb::GroebnerConfiguration& conf) {
+bool setOrder(ring r, mgb::GroebnerConfiguration& conf)
+{
   const VarIndex varCount = conf.varCount();
 
   bool didSetComponentBefore = false;
@@ -104,34 +114,41 @@ bool setOrder(ring r, mgb::GroebnerConfiguration& conf) {
     mgb::GroebnerConfiguration::RevLexDescendingBaseOrder;
 
   std::vector<Exponent> gradings;
-  for (int block = 0; r->order[block] != ringorder_no; ++block) {
+  for (int block = 0; r->order[block] != ringorder_no; ++block)
+  {
     // *** ringorder_no
 
     const rRingOrder_t type = static_cast<rRingOrder_t>(r->order[block]);
-    if (r->block0[block] < 0 || r->block1[block] < 0) {
+    if (r->block0[block] < 0 || r->block1[block] < 0)
+    {
       WerrorS("Unexpected negative block0/block1 in ring.");
       return false;
     }
     const VarIndex block0 = static_cast<VarIndex>(r->block0[block]);
     const VarIndex block1 = static_cast<VarIndex>(r->block1[block]);
     const int* const weights = r->wvhdl[block];
-    if (block0 > block1) {
+    if (block0 > block1)
+    {
       WerrorS("Unexpected block0 > block1 in ring.");
       return false;
     }
 
     // *** ringorder_c and ringorder_C
-    if (type == ringorder_c || type == ringorder_C) {
-      if (block0 != 0 || block1 != 0 || weights != 0) {
+    if (type == ringorder_c || type == ringorder_C)
+    {
+      if (block0 != 0 || block1 != 0 || weights != 0)
+      {
         WerrorS("Unexpected non-zero fields on c/C block in ring.");
         return false;
       }
-      if (didSetComponentBefore) {
+      if (didSetComponentBefore)
+      {
         WerrorS("Unexpected two c/C blocks in ring.");
         return false;
       }
       didSetComponentBefore = true;
-      if (r->order[block + 1] == ringorder_no) {
+      if (r->order[block + 1] == ringorder_no)
+      {
         conf.setComponentBefore
           (mgb::GroebnerConfiguration::ComponentAfterBaseOrder);
       } else
@@ -139,11 +156,13 @@ bool setOrder(ring r, mgb::GroebnerConfiguration& conf) {
       conf.setComponentsAscending(type == ringorder_C);
       continue;
     }
-    if (block0 == 0 || block1 == 0) {
+    if (block0 == 0 || block1 == 0)
+    {
       WerrorS("Expected block0 != 0 and block1 != 0 in ring.");
       return false;
     }
-    if (block1 > varCount) {
+    if (block1 > varCount)
+    {
       // todo: first handle any block types where this is not true
       WerrorS("Expected block1 <= #vars in ring.");
       return false;
@@ -168,7 +187,8 @@ bool setOrder(ring r, mgb::GroebnerConfiguration& conf) {
     // ws(w): -w-graded, revlex from right (descending)
     //    ls:            revlex from  left (ascending)
 
-    if (type == ringorder_a64) {
+    if (type == ringorder_a64)
+    {
       WerrorS("Block type a64 not supported for MathicGB interface.");
       return false;
     }
@@ -179,26 +199,35 @@ bool setOrder(ring r, mgb::GroebnerConfiguration& conf) {
     const bool wGrading =
       (type == ringorder_a || type == ringorder_Wp || type == ringorder_wp);
     const bool minusWGrading = (type == ringorder_ws || type == ringorder_Ws);
-    if (oneGrading || minusOneGrading || wGrading || minusWGrading) {
+    if (oneGrading || minusOneGrading || wGrading || minusWGrading)
+    {
       const VarIndex begin = gradings.size();
       gradings.resize(begin + varCount);
-      if (oneGrading || minusOneGrading) {
-        if (weights != 0) {
+      if (oneGrading || minusOneGrading)
+      {
+        if (weights != 0)
+        {
           WerrorS("Expect wvhdl == 0 in Dp/dp/Ds/ds-block in ring.");
           return false;
         }
         const Exponent value = oneGrading ? 1 : -1;
         for (int var = block0 - 1; var < block1; ++var)
           gradings[begin + var] = value;
-      } else {
-        if (weights == 0) {
+      }
+      else
+      {
+        if (weights == 0)
+        {
           WerrorS("Expect wvhdl != 0 in a/Wp/wp/ws/Ws-block in ring.");
           return false;
         }
-        if (wGrading) {
+        if (wGrading)
+        {
           for (int var = 0; var < dim; ++var)
             gradings[begin + (block0 - 1) + var] = weights[var];
-        } else {
+        }
+        else
+        {
           for (int var = 0; var < dim; ++var)
             gradings[begin + (block0 - 1) + var] = -weights[var];
         }
@@ -222,12 +251,14 @@ bool setOrder(ring r, mgb::GroebnerConfiguration& conf) {
       type == ringorder_ds ||
       type == ringorder_wp ||
       type == ringorder_ws;
-    if (lexFromLeft || lexFromRight || revlexFromLeft || revlexFromRight) {
+    if (lexFromLeft || lexFromRight || revlexFromLeft || revlexFromRight)
+    {
       const int next = r->order[block + 1];
       bool final = next == ringorder_no;
       if (!final && r->order[block + 2] == ringorder_no)
         final = next == ringorder_c || next == ringorder_C;
-      if (final) {
+      if (final)
+      {
         if (lexFromRight)
           baseOrder = mgb::GroebnerConfiguration::LexAscendingBaseOrder;
         else if (revlexFromRight)
@@ -242,10 +273,13 @@ bool setOrder(ring r, mgb::GroebnerConfiguration& conf) {
       const size_t begin = gradings.size();
       gradings.resize(begin + dim * varCount);
       const Exponent value = (lexFromLeft || lexFromRight) ? 1 : -1;
-      if (lexFromLeft || revlexFromLeft) {
+      if (lexFromLeft || revlexFromLeft)
+      {
         for (size_t row = 0; row < dim; ++row)
           gradings[begin + row * varCount + (block0 - 1) + row] = value;
-      } else {
+      }
+      else
+      {
         for (size_t row = 0; row < dim; ++row)
           gradings[begin + row * varCount + (block1 - 1) - row] = value;
       }
@@ -253,8 +287,10 @@ bool setOrder(ring r, mgb::GroebnerConfiguration& conf) {
     }
 
     // *** ringorder_M: a square invertible matrix
-    if (type == ringorder_M) {
-      if (weights == 0) {
+    if (type == ringorder_M)
+    {
+      if (weights == 0)
+      {
         WerrorS("Expected wvhdl != 0 in M-block in ring.");
         return false;
       }
@@ -271,27 +307,32 @@ bool setOrder(ring r, mgb::GroebnerConfiguration& conf) {
       type == ringorder_s ||
       type == ringorder_S ||
       type == ringorder_IS
-    ) {
+    )
+    {
       // todo: Consider supporting this later.
       WerrorS("Schreyer order s/S/IS not supported in MathicGB interface.");
       return false;
     }
-    if (type == ringorder_am) {
+    if (type == ringorder_am)
+    {
       // This block is a Schreyer-like ordering only used in Spielwiese.
       // todo: Consider supporting it later.
       WerrorS("Block type am not supported in MathicGB interface");
       return false;
     }
-    if (type == ringorder_L) {
+    if (type == ringorder_L)
+    {
       WerrorS("Invalid L-block found in order of ring.");
       return false;
     }
-    if (type == ringorder_aa) {
+    if (type == ringorder_aa)
+    {
       // I don't know what an aa block is supposed to do.
       WerrorS("aa ordering not supported by the MathicGB interface.");
       return false;
     }
-    if (type == ringorder_unspec) {
+    if (type == ringorder_unspec)
+    {
       WerrorS("Invalid unspec-block found in order of ring.");
       return false;
     }
@@ -299,31 +340,36 @@ bool setOrder(ring r, mgb::GroebnerConfiguration& conf) {
     return false;
   }
 
-  if (!didSetComponentBefore) {
+  if (!didSetComponentBefore)
+  {
     WerrorS("Expected to find a c/C block in ring.");
     return false;
   }
 
-  if (!conf.setMonomialOrder(baseOrder, gradings)) {
+  if (!conf.setMonomialOrder(baseOrder, gradings))
+  {
     WerrorS("MathicGB does not support non-global orders.");
     return false;
   }
   return true;
 }
 
-bool prOrderMatrix(ring r) {
+bool prOrderMatrix(ring r)
+{
   const int varCount = r->N;
   mgb::GroebnerConfiguration conf(101, varCount,0);
   if (!setOrder(r, conf))
     return false;
   const std::vector<Exponent>& gradings = conf.monomialOrder().second;
-  if (gradings.size() % varCount != 0) {
+  if (gradings.size() % varCount != 0)
+  {
     WerrorS("Expected matrix to be a multiple of varCount.");
     return false;
   }
   const size_t rowCount = gradings.size() / varCount;
   std::cout << "Order matrix:\n";
-  for (size_t row = 0; row < rowCount; ++row) {
+  for (size_t row = 0; row < rowCount; ++row)
+  {
     for (size_t col = 0; col < varCount; ++col)
       std::cerr << ' ' << gradings[row * varCount + col];
     std::cerr << '\n';
@@ -335,12 +381,16 @@ bool prOrderMatrix(ring r) {
   std::cerr << "Component before: " << conf.componentBefore() << '\n';
   std::cerr << "Components ascending: " << conf.componentsAscending() << '\n';
   std::cerr << "Schreyering: " << conf.schreyering() << '\n';
+  return true;
 }
 
-void prOrder(ring r) {
+void prOrder(ring r)
+{
   std::cout << "Printing order of ring.\n";
-  for (int block = 0; ; ++block) {
-    switch (r->order[block]) {
+  for (int block = 0; ; ++block)
+  {
+    switch (r->order[block])
+    {
     case ringorder_no: // end of blocks
       return;
 
@@ -444,7 +494,8 @@ void prOrder(ring r) {
     const int b0 = r->block0[block];
     const int b1 = r->block1[block];
     std::cout << ' ' << b0 << ':' << b1 << " (" << r->wvhdl[block] << ")" << std::flush;
-    if (r->wvhdl[block] != 0 && b0 != 0) {
+    if (r->wvhdl[block] != 0 && b0 != 0)
+    {
       for (int v = 0; v <= b1 - b0; ++v)
         std::cout << ' ' << r->wvhdl[block][v];
     } else
@@ -453,8 +504,10 @@ void prOrder(ring r) {
   }
 }
 
-BOOLEAN prOrderX(leftv result, leftv arg) {
-  if (currRing == 0) {
+BOOLEAN prOrderX(leftv result, leftv arg)
+{
+  if (currRing == 0)
+  {
     WerrorS("There is no current ring.");
     return TRUE;
   }
@@ -469,11 +522,13 @@ BOOLEAN mathicgb(leftv result, leftv arg)
   result->rtyp=NONE;
 
   if (arg == NULL || arg->next != NULL ||
-  ((arg->Typ() != IDEAL_CMD) &&(arg->Typ() != MODUL_CMD))){
+  ((arg->Typ() != IDEAL_CMD) &&(arg->Typ() != MODUL_CMD)))
+  {
     WerrorS("Syntax: mathicgb(<ideal>/<module>)");
     return TRUE;
   }
-  if (!rField_is_Zp(currRing)) {
+  if (!rField_is_Zp(currRing))
+  {
     WerrorS("Polynomial ring must be over Zp.");
     return TRUE;
   }
@@ -495,14 +550,16 @@ BOOLEAN mathicgb(leftv result, leftv arg)
   const ideal id = static_cast<const ideal>(arg->Data());
   const int size = IDELEMS(id);
   toMathic.idealBegin(size);
-  for (int i = 0; i < size; ++i) {
+  for (int i = 0; i < size; ++i)
+  {
     const poly origP = id->m[i];
     int termCount = 0;
     for (poly p = origP; p != 0; p = pNext(p))
       ++termCount;
     toMathic.appendPolynomialBegin(termCount);
 
-    for (poly p = origP; p != 0; p = pNext(p)) {
+    for (poly p = origP; p != 0; p = pNext(p))
+    {
       toMathic.appendTermBegin(pGetComp(p));
       for (int i = 1; i <= currRing->N; ++i)
         toMathic.appendExponent(i - 1, pGetExp(p, i));
