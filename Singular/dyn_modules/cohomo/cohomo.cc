@@ -803,7 +803,7 @@ std::vector<std::vector<int> > soleli1( std::vector<std::vector<int> > eqs)
   }
   //listsprint(pre);
   std::vector<int> yaya;
-  for(i=0;i<re.size(),pre.size()>0;i++)
+  for(i=0;(i<re.size()) && (pre.size()>0);i++)
   {
     yaya=eli1(re[i],pre[0]);
     //listprint(yaya);
