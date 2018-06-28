@@ -1823,6 +1823,25 @@ ideal sm_Mult(ideal a, ideal b, const ring R)
   return c;
 }
 
+ideal sm_Flatten(ideal a, const ring R)
+{
+  if (IDELEMS(a)==0) return id_Copy(a,R);
+  ideal res=idInit(1,IDELEMS(a)*a->rank);
+  for(int i=0;i<IDELEMS(a);i++)
+  {
+    if(a->m[i]!=NULL)
+    {
+      poly p=p_Copy(a->m[i],R);
+      if (i==0) res->m[0]=p;
+      else
+      {
+        p_Shift(&p,i*a->rank,R);
+        res->m[0]=p_Add_q(res->m[0],p,R);
+      }
+    }
+  }
+  return res;
+}
 /*2
 *returns the trace of matrix a
 */

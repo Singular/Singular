@@ -317,6 +317,19 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return TRUE;
     }
     else
+  /*==================== flatten =============================*/
+    if(strcmp(sys_cmd,"flatten")==0)
+    {
+      if ((h!=NULL) &&(h->Typ()==SMATRIX_CMD))
+      {
+        res->data=(char*)sm_Flatten((ideal)h->Data(),currRing);
+        res->rtyp=SMATRIX_CMD;
+        return FALSE;
+      }
+      else
+        WerrorS("smatrix expected");
+    }
+    else
   /*==================== neworder =============================*/
     if(strcmp(sys_cmd,"neworder")==0)
     {
