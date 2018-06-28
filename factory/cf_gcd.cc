@@ -88,12 +88,9 @@ icontent ( const CanonicalForm & f )
  * @sa gcd(), cf_defs.h
  *
 **/
-#if 0
-int si_factor_reminder=1;
-#endif
 CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
 {
-  CanonicalForm fc, gc, d1;
+  CanonicalForm fc, gc;
   bool fc_isUnivariate=f.isUnivariate();
   bool gc_isUnivariate=g.isUnivariate();
   bool fc_and_gc_Univariate=fc_isUnivariate && gc_isUnivariate;
@@ -137,8 +134,6 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
   {
     fc = subResGCD_0( fc, gc );
   }
-  if ( d1.degree() > 0 )
-    fc *= d1;
   return fc;
 }
 
