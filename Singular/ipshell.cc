@@ -185,6 +185,11 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                       ,MATCOLS(IDMATRIX(h))
                     );
                     break;
+    case SMATRIX_CMD:Print(" %u x %u"
+                      ,(int)(IDIDEAL(h)->rank)
+                      ,IDELEMS(IDIDEAL(h))
+                    );
+                    break;
     case PACKAGE_CMD:
                     paPrint(IDID(h),IDPACKAGE(h));
                     break;
