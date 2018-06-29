@@ -1842,6 +1842,31 @@ ideal sm_Flatten(ideal a, const ring R)
   }
   return res;
 }
+
+ideal sm_UnFlatten(ideal a, int col, const ring R)
+{
+  if ((IDELEMS(a)!=1)
+  ||((a->rank % col)!=0))
+  {
+    Werror("wrong format: %d x %d for unflatten",(int)a->rank,IDELEMS(a));
+    return NULL;
+  }
+  int row=a->rank/col;
+  ideal res=idInit(col,row);
+  poly p=a->m[0];
+  while(p!=NULL)
+  {
+    poly h=p_Head(p,R);
+    int comp=p_GetComp(h,R);
+    int c=(comp-1)/row;
+    int r=comp%row; if (r==0) r=row;
+    p_SetComp(h,r,R); p_SetmComp(h,R);
+    res->m[c]=p_Add_q(res->m[c],h,R);
+    pIter(p);
+  }
+  return res;
+}
+
 /*2
 *returns the trace of matrix a
 */
