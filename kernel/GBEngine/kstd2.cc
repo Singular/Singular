@@ -3972,6 +3972,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       /* reduction of the element chosen from L */
       red_result = strat->red(&strat->P,strat);
+      if (errorreported) break;
     }
 
     // reduction to non-zero new poly
