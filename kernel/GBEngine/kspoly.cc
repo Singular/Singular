@@ -95,6 +95,10 @@ int ksReducePoly(LObject* PR,
   }
 #endif
 
+  if (tailRing->isLPring && t2 == NULL && PW->pUnshifted != NULL) {
+      t2 = pNext(PW->pUnshifted);
+  }
+
   if (t2==NULL)           // Divisor is just one term, therefore it will
   {                       // just cancel the leading term
     PR->LmDeleteAndIter();
@@ -103,6 +107,11 @@ int ksReducePoly(LObject* PR,
   }
 
   p_ExpVectorSub(lm, p2, tailRing); // Calculate the Monomial we must multiply to p2
+
+  poly lmRight;
+  if (tailRing->isLPring) {
+    k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
+  } // the while loop below won't be executed for letterplace
 
   //if (tailRing != currRing)
   {
@@ -121,11 +130,6 @@ int ksReducePoly(LObject* PR,
       p_ExpVectorSub(lm, p2, tailRing);
       ret = 1;
     }
-  }
-
-  poly lmRight;
-  if (tailRing->isLPring) {
-    k_SplitFrame(p2, lm, lmRight, tailRing);
   }
 
   // take care of coef buisness
@@ -222,6 +226,10 @@ int ksReducePolyBound(LObject* PR,
   }
 #endif
 
+  if (tailRing->isLPring && t2 == NULL && PW->pUnshifted != NULL) {
+      t2 = pNext(PW->pUnshifted);
+  }
+
   if (t2==NULL)           // Divisor is just one term, therefore it will
   {                       // just cancel the leading term
     PR->LmDeleteAndIter();
@@ -230,6 +238,11 @@ int ksReducePolyBound(LObject* PR,
   }
 
   p_ExpVectorSub(lm, p2, tailRing); // Calculate the Monomial we must multiply to p2
+
+  poly lmRight;
+  if (tailRing->isLPring) {
+    k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
+  } // the while loop below won't be executed for letterplace
 
   if (tailRing != currRing)
   {
@@ -248,11 +261,6 @@ int ksReducePolyBound(LObject* PR,
       p_ExpVectorSub(lm, p2, tailRing);
       ret = 1;
     }
-  }
-
-  poly lmRight;
-  if (tailRing->isLPring) {
-    k_SplitFrame(p2, lm, lmRight, tailRing);
   }
 
   // take care of coef buisness
@@ -423,6 +431,10 @@ int ksReducePolySig(LObject* PR,
   }
 #endif
 
+  if (tailRing->isLPring && t2 == NULL && PW->pUnshifted != NULL) {
+      t2 = pNext(PW->pUnshifted);
+  }
+
   if (t2==NULL)           // Divisor is just one term, therefore it will
   {                       // just cancel the leading term
     PR->LmDeleteAndIter();
@@ -431,6 +443,11 @@ int ksReducePolySig(LObject* PR,
   }
 
   p_ExpVectorSub(lm, p2, tailRing); // Calculate the Monomial we must multiply to p2
+
+  poly lmRight;
+  if (tailRing->isLPring) {
+    k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
+  } // the while loop below won't be executed for letterplace
 
   if (tailRing != currRing)
   {
@@ -449,11 +466,6 @@ int ksReducePolySig(LObject* PR,
       p_ExpVectorSub(lm, p2, tailRing);
       ret = 1;
     }
-  }
-
-  poly lmRight;
-  if (tailRing->isLPring) {
-    k_SplitFrame(p2, lm, lmRight, tailRing);
   }
 
   // take care of coef buisness
@@ -657,6 +669,10 @@ int ksReducePolySigRing(LObject* PR,
   }
 #endif
 
+  if (tailRing->isLPring && t2 == NULL && PW->pUnshifted != NULL) {
+      t2 = pNext(PW->pUnshifted);
+  }
+
   if (t2==NULL)           // Divisor is just one term, therefore it will
   {                       // just cancel the leading term
     PR->LmDeleteAndIter();
@@ -665,6 +681,11 @@ int ksReducePolySigRing(LObject* PR,
   }
 
   p_ExpVectorSub(lm, p2, tailRing); // Calculate the Monomial we must multiply to p2
+
+  poly lmRight;
+  if (tailRing->isLPring) {
+    k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
+  } // the while loop below won't be executed for letterplace
 
   if (tailRing != currRing)
   {
@@ -683,11 +704,6 @@ int ksReducePolySigRing(LObject* PR,
       p_ExpVectorSub(lm, p2, tailRing);
       ret = 1;
     }
-  }
-
-  poly lmRight;
-  if (tailRing->isLPring) {
-    k_SplitFrame(p2, lm, lmRight, tailRing);
   }
 
   // take care of coef buisness
@@ -787,8 +803,10 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   poly m12, m22;
   if (tailRing->isLPring)
   {
-    k_SplitFrame(p1, m1, m12, tailRing);
-    k_SplitFrame(p1, m2, m22, tailRing);
+    int split = p_FirstVblock(p1, tailRing);
+    // TODO: shouldn't we use p1 AND p2 here??
+    k_SplitFrame(m1, m12, split, tailRing);
+    k_SplitFrame(m2, m22, split, tailRing);
     // manually free the coeffs, because pSetCoeff0 is used in the next step
     n_Delete(&(m1->coef), tailRing->cf);
     n_Delete(&(m2->coef), tailRing->cf);

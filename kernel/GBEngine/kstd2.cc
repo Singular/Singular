@@ -4048,11 +4048,11 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // enter into S, L, and T
       if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
       {
-        int atR=strat->tl+1; // enterTShift introduces P.p=T[tl+1], T[tl+2]...
-        enterTShift(strat->P,strat,-1);
-        enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, atR);
+        enterT(strat->P, strat);
+        enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
         // posInS only depends on the leading term
-        strat->enterS(strat->P, pos, strat, atR);
+        strat->enterS(strat->P, pos, strat, strat->tl);
+        enterTShift(strat->P, strat);
       }
 
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);

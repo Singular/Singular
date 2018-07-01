@@ -93,6 +93,10 @@ public:
   /*BOOLEAN*/ char is_special; // true, it is a new special S-poly (e.g. for SCA)
 #endif
 
+  // letterplace
+  int shift;
+  poly pUnshifted;
+
   // initialization
   KINLINE void Init(ring r = currRing);
   KINLINE sTObject(ring tailRing = currRing);
@@ -814,7 +818,7 @@ poly pMoveCurrTail2poly(poly p, kStrategy strat);
 
 poly pCopyL2p(LObject h, kStrategy strat);
 
-void enterTShift(LObject p, kStrategy strat, int atT);
+void enterTShift(LObject p, kStrategy strat, int atT = -1);
 
 void initBuchMoraShift (ideal F,ideal Q,kStrategy strat);
 

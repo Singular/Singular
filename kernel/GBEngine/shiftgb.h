@@ -35,6 +35,6 @@ int ideal_isInV(ideal I, const ring r);
 
 int itoInsert(poly p, const ring r);
 
-void k_SplitFrame(const poly p, poly &m1, poly &m2, const ring r);
+void k_SplitFrame(poly &m1, poly &m2, int at, const ring r);
 #endif
 #endif

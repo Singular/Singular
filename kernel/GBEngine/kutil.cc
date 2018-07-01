@@ -12509,29 +12509,26 @@ void enterTShift(LObject p, kStrategy strat, int atT)
   /* x(0)y(1)z(2) : lastVblock-1=2, to add until lastVblock=uptodeg-1 */
   /* hence, a total number of elt's to add is: */
   /*  int toInsert = 1 + (uptodeg-1) - (pLastVblock(p.p, lV) -1);  */
+  pAssume(p.p != NULL);
 
   int toInsert = itoInsert(p.p, strat->tailRing);
 
-  /* can call enterT in a sequence, e.g. */
-
-  /* shift0 = it's our model for further shifts */
-  enterT(p,strat,atT);
-  LObject qq;
-  for (int i=1; i<=toInsert; i++)
+  poly shifted;
+  for (int i = 1; i <= toInsert; i++)
   {
-    qq      = p; //qq.Copy();
-    qq.t_p=NULL;
-    qq.max_exp  = NULL;
-    if (p.p!=NULL)
-      qq.p = p_LPshift(p_Copy(p.p,currRing), i, currRing); // direct shift
-    qq.GetTP();
-    // update q.sev
-    qq.sev = pGetShortExpVector(qq.p);
+    shifted = p_mLPshift(p_Head(p.p, currRing), i, currRing);
+    LObject qq(shifted);
+    qq.SetpFDeg();
+    qq.SetShortExpVector();
+    qq.shift = i;
+    qq.pUnshifted = pNext(p.p);
+    strat->initEcart(&qq);
+    qq.ecart = p.ecart;
     #ifdef KTEST
     kTest_T(&qq, strat->tailRing, -1, 'L');
     #endif
     /* enter it into T, first el't is with the shift 0 */
-    enterT(qq,strat,atT);
+    enterT(qq, strat, atT);
   }
 }
 #endif
