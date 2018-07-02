@@ -514,6 +514,9 @@ static inline BOOLEAN rField_is_Q(const ring r)
 static inline BOOLEAN rField_is_Z(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Z(r->cf); }
 
+static inline BOOLEAN rField_is_Zn(const ring r)
+{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Zn(r->cf); }
+
 static inline BOOLEAN rField_is_numeric(const ring r) /* R, long R, long C */
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_numeric(r->cf); }
 

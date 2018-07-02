@@ -840,6 +840,9 @@ static FORCE_INLINE BOOLEAN nCoeff_is_Q(const coeffs r)
 static FORCE_INLINE BOOLEAN nCoeff_is_Z(const coeffs r)
 { assume(r != NULL); return getCoeffType(r)==n_Z || ((getCoeffType(r)==n_Q) && (!r->is_field)); }
 
+static FORCE_INLINE BOOLEAN nCoeff_is_Zn(const coeffs r)
+{ assume(r != NULL); return getCoeffType(r)==n_Zn; }
+
 static FORCE_INLINE BOOLEAN nCoeff_is_Q_or_BI(const coeffs r)
 { assume(r != NULL); return getCoeffType(r)==n_Q; }
 
