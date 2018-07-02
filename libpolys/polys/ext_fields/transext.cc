@@ -6,7 +6,7 @@
 *           transcendental variables t_1, ..., t_s, where s >= 1.
 *           Denoting the implemented coeffs object by cf, then these numbers
 *           are represented as quotients of polynomials living in the
-*           polynomial ring K[t_1, .., t_s] represented by cf->extring.
+*           polynomial ring K[t_1, .., t_s] represented by cf->extRing.
 *
 *           An element of K(t_1, .., t_s) may have numerous representations,
 *           due to the possibility of common polynomial factors in the
