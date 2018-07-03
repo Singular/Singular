@@ -8,6 +8,7 @@
 #include "omalloc/omalloc.h"
 
 #include "misc/mylimits.h"
+#include "misc/prime.h" // IsPrime
 #include "reporter/reporter.h"
 
 #include "coeffs/si_gmp.h"
@@ -23,12 +24,7 @@
 
 #ifdef HAVE_RINGS
 
-#if SI_INTEGER_VARIANT==2
-// FIXME? TODO? // extern void    nrzWrite       (number &a, const coeffs r); // FIXME
-# define  nrnWrite      nrzWrite
-#else
 void nrnWrite (number a, const coeffs);
-#endif
 #ifdef LDEBUG
 BOOLEAN nrnDBTest      (number a, const char *f, const int l, const coeffs r);
 #endif
@@ -41,8 +37,18 @@ static void nrnCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
   char* s = (char*) omAlloc(l);
   s= mpz_get_str (s, 10, r->modBase);
 
-  if (nCoeff_is_Ring_ModN(r)) Print("ZZ/bigint(%s)", s);
-  else if (nCoeff_is_Ring_PtoM(r)) Print("ZZ/(bigint(%s)^%lu)", s, r->modExponent);
+  #ifdef TEST_ZN_AS_ZP
+  if (l<10)
+  {
+    if (nCoeff_is_Ring_ModN(r)) Print("ZZ/%s", s);
+    else if (nCoeff_is_Ring_PtoM(r)) Print("ZZ/(%s^%lu)", s, r->modExponent);
+  }
+  else
+  #endif
+  {
+    if (nCoeff_is_Ring_ModN(r)) Print("ZZ/bigint(%s)", s);
+    else if (nCoeff_is_Ring_PtoM(r)) Print("ZZ/(bigint(%s)^%lu)", s, r->modExponent);
+  }
 
   omFreeSize((ADDRESS)s, l);
 }
@@ -64,10 +70,12 @@ static char* nrnCoeffName(const coeffs r)
 }
 
 
-static BOOLEAN nrnCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
+static BOOLEAN nrnCoeffIsEqual(const coeffs r, n_coeffType n, void * parameter)
 {
   /* test, if r is an instance of nInitCoeffs(n,parameter) */
-  return (n==n_Zn) && (mpz_cmp_ui(r->modNumber,(long)parameter)==0);
+  ZnmInfo *info=(ZnmInfo*)parameter;
+  return (n==r->type) && (r->modExponent==info->exp)
+  && (mpz_cmp(r->modBase,info->base)==0);
 }
 
 static char* nrnCoeffString(const coeffs r)
@@ -164,7 +172,9 @@ static void nrnDelete(number *a, const coeffs)
 static int nrnSize(number a, const coeffs)
 {
   if (a == NULL) return 0;
-  return sizeof(mpz_t);
+  mpz_ptr p=(mpz_ptr)a;
+  int s=p->_mp_alloc;
+  return s;
 }
 
 /*
@@ -465,7 +475,7 @@ static BOOLEAN nrnIsMOne(number a, const coeffs r)
 #ifdef LDEBUG
   if (a == NULL) return FALSE;
 #endif
-  if(nrnIsOne(a,r)) return FALSE; // for char 2
+  if((r->ch==2) && (nrnIsOne(a,r))) return FALSE;
   mpz_t t; mpz_init_set(t, (mpz_ptr)a);
   mpz_add_ui(t, t, 1);
   bool erg = (0 == mpz_cmp(t, r->modNumber));
@@ -478,8 +488,21 @@ static BOOLEAN nrnGreater(number a, number b, const coeffs)
   return 0 < mpz_cmp((mpz_ptr)a, (mpz_ptr)b);
 }
 
-static BOOLEAN nrnGreaterZero(number k, const coeffs)
+static BOOLEAN nrnGreaterZero(number k, const coeffs cf)
 {
+  if (cf->is_field)
+  {
+    if (mpz_cmp_ui(cf->modBase,2)==0)
+    {
+      return TRUE;
+    }
+    mpz_t ch2; mpz_init_set(ch2, cf->modBase);
+    mpz_sub_ui(ch2,ch2,1);
+    mpz_divexact_ui(ch2,ch2,2);
+    if (mpz_cmp(ch2,(mpz_ptr)k)<0)
+      return FALSE;
+    mpz_clear(ch2);
+  }
   return 0 < mpz_sgn1((mpz_ptr)k);
 }
 
@@ -528,6 +551,13 @@ static int nrnDivComp(number a, number b, const coeffs r)
 
 static number nrnDiv(number a, number b, const coeffs r)
 {
+  if (r->is_field)
+  {
+    number inv=nrnInvers(b,r);
+    number erg=nrnMult(a,inv,r);
+    nrnDelete(&inv,r);
+    return erg;
+  }
   if (a == NULL) a = (number)r->modNumber;
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -722,8 +752,7 @@ static number nrnMapZ(number from, const coeffs src, const coeffs dst)
   return nrnMapQ(from,src,dst);
 }
 #endif
-#if SI_INTEGER_VARIANT!=2
-void nrnWrite (number a, const coeffs)
+void nrnWrite (number a, const coeffs cf)
 {
   char *s,*z;
   if (a==NULL)
@@ -734,12 +763,32 @@ void nrnWrite (number a, const coeffs)
   {
     int l=mpz_sizeinbase((mpz_ptr) a, 10) + 2;
     s=(char*)omAlloc(l);
-    z=mpz_get_str(s,10,(mpz_ptr) a);
-    StringAppendS(z);
+    if (cf->is_field)
+    {
+      mpz_t ch2; mpz_init_set(ch2, cf->modBase);
+      mpz_sub_ui(ch2,ch2,1);
+      mpz_divexact_ui(ch2,ch2,2);
+      if ((mpz_cmp_ui(cf->modBase,2)!=0) && (mpz_cmp(ch2,(mpz_ptr)a)<0))
+      {
+        mpz_sub(ch2,(mpz_ptr)a,cf->modBase);
+        z=mpz_get_str(s,10,ch2);
+        StringAppendS(z);
+      }
+      else
+      {
+        z=mpz_get_str(s,10,(mpz_ptr) a);
+        StringAppendS(z);
+      }
+      mpz_clear(ch2);
+    }
+    else
+    {
+      z=mpz_get_str(s,10,(mpz_ptr) a);
+      StringAppendS(z);
+    }
     omFreeSize((ADDRESS)s,l);
   }
 }
-#endif
 
 nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
 {
@@ -762,7 +811,7 @@ nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
   {
     if (   (!nCoeff_is_Zp(src))
         && (mpz_cmp(src->modBase, dst->modBase) == 0)
-        && (src->modExponent == dst->modExponent)) return nrnMapGMP;
+        && (src->modExponent == dst->modExponent)) return ndCopyMap;
     else
     {
       mpz_ptr nrnMapModul = (mpz_ptr) omAllocBin(gmp_nrz_bin);
@@ -895,8 +944,34 @@ static const char * nrnRead (const char *s, number *a, const coeffs r)
     s = nlCPEatLongC((char *)s, z);
   }
   mpz_mod(z, z, r->modNumber);
-  *a = (number) z;
+  if ((*s)=='/')
+  {
+    mpz_ptr n = (mpz_ptr) omAllocBin(gmp_nrz_bin);
+    s++;
+    s=nlCPEatLongC((char*)s,n);
+    if (!nrnIsOne((number)n,r))
+    {
+      *a=nrnDiv((number)z,(number)n,r);
+      mpz_clear(z);
+      omFreeBin((void *)z, gmp_nrz_bin);
+      mpz_clear(n);
+      omFreeBin((void *)n, gmp_nrz_bin);
+    }
+  }
+  else
+    *a = (number) z;
   return s;
+}
+
+static number nrnConvFactoryNSingN( const CanonicalForm n, const coeffs r)
+{
+  return nrnInit(n.intval(),r);
+}
+
+static CanonicalForm nrnConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs r )
+{
+  if (setChar) setCharacteristic( r->ch );
+   return CanonicalForm(nrnInt( n,r ));
 }
 
 /* for initializing function pointers */
@@ -957,12 +1032,21 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->cfQuotRem     = nrnQuotRem;
   r->cfCoeffName   = nrnCoeffName;
   r->cfCoeffWrite  = nrnCoeffWrite;
-  r->nCoeffIsEqual = nrnCoeffsEqual;
+  r->nCoeffIsEqual = nrnCoeffIsEqual;
   r->cfKillChar    = nrnKillChar;
   r->cfQuot1       = nrnQuot1;
 #ifdef LDEBUG
   r->cfDBTest      = nrnDBTest;
 #endif
+  if ((r->modExponent==1)&&(mpz_size1(r->modBase)==1))
+  {
+    long p=mpz_get_si(r->modBase);
+    if ((p<=536870909)&&(p==IsPrime(p))) /*factory limit: <2^29*/
+    {
+      r->convFactoryNSingN=nrnConvFactoryNSingN;
+      r->convSingNFactoryN=nrnConvSingNFactoryN;
+    }
+  }
   return FALSE;
 }
 

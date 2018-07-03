@@ -753,6 +753,23 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         return -1;
       }
     }
+    else if ((getCoeffType(r1->cf)==n_Zn)||(getCoeffType(r1->cf)==n_Znm))
+    {
+      if (getCoeffType(r2->cf)==n_Q)
+      {
+        tmpR.cf=nCopyCoeff(r1->cf);
+      }
+      else if (nCoeff_is_Extension(r2->cf)
+      && (mpz_cmp(r1->cf->modNumber,r2->cf->extRing->cf->modNumber)==0))
+      { // covers transext.cc and algext.cc
+        tmpR.cf=nCopyCoeff(r2->cf);
+      }
+      else
+      {
+        WerrorS("Z/n+...");
+        return -1;
+      }
+    }
     else if (getCoeffType(r1->cf)==n_R)
     {
       WerrorS("R+..");

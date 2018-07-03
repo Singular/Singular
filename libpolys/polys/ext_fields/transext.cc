@@ -2100,6 +2100,10 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
       if (src->ch == dst->ch) return ntMapPP;         /// Z/p     --> Z/p(T)
       else return ntMapUP;                            /// Z/u     --> Z/p(T)
     }
+    if (nCoeff_is_Zn(src) && nCoeff_is_Zn(bDst))
+    {
+      if (mpz_cmp(src->modNumber,bDst->modNumber)==0) return ntMapPP;         /// Z/p     --> Z/p(T)
+    }
   }
   if (h != 1) return NULL;
   //if ((!nCoeff_is_Zp(bDst)) && (!nCoeff_is_Q(bDst))) return NULL;

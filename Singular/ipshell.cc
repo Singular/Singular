@@ -1568,7 +1568,19 @@ idhdl rDefault(const char *s)
 
   ring r = IDRING(tmp) = (ring) omAlloc0Bin(sip_sring_bin);
 
+  #ifndef TEST_ZN_AS_ZP
   r->cf = nInitChar(n_Zp, (void*)32003); //   r->cf->ch = 32003;
+  #else
+  mpz_t modBase;
+  mpz_init_set_ui(modBase, (long)32003);
+  ZnmInfo info;
+  info.base= modBase;
+  info.exp= 1;
+  r->cf=nInitChar(n_Zn,(void*) &info);
+  r->cf->is_field=1;
+  r->cf->is_domain=1;
+  r->cf->has_simple_Inverse=1;
+  #endif
   r->N      = 3;
   /*r->P     = 0; Alloc0 in idhdl::set, ipid.cc*/
   /*names*/
@@ -2786,7 +2798,19 @@ ring rCompose(const lists  L, const BOOLEAN check_comp, const long bitmask,const
         Warn("%d is invalid characteristic of ground field. %d is used.", ch, l);
         ch = l;
       }
+      #ifndef TEST_ZN_AS_ZP
       R->cf = nInitChar(n_Zp, (void*)(long)ch);
+      #else
+      mpz_t modBase;
+      mpz_init_set_ui(modBase,(long) ch);
+      ZnmInfo info;
+      info.base= modBase;
+      info.exp= 1;
+      R->cf=nInitChar(n_Zn,(void*) &info); //exponent is missing
+      R->cf->is_field=1;
+      R->cf->is_domain=1;
+      R->cf->has_simple_Inverse=1;
+      #endif
     }
   }
   else if (L->m[0].Typ()==LIST_CMD) // something complicated...
@@ -2906,7 +2930,8 @@ ring rCompose(const lists  L, const BOOLEAN check_comp, const long bitmask,const
           // Allow imap/fetch to be make an exception only for:
           if ( (rField_is_Q_a(orig_ring) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
             (rField_is_Q(currRing) || rField_is_Q_a(currRing) ||
-             (rField_is_Zp(currRing) || rField_is_Zp_a(currRing))))
+             rField_is_Zp(currRing) || rField_is_Zp_a(currRing) ||
+	     rField_is_Zn(currRing)))
            ||
            (rField_is_Zp_a(orig_ring) &&  // Zp(a..) -> Zp(a..) || Zp
             (rField_is_Zp(currRing, rInternalChar(orig_ring)) ||
@@ -5612,7 +5637,19 @@ ring rInit(leftv pn, leftv rv, leftv ord)
           Warn("%d is invalid as characteristic of the ground field. 32003 is used.", ch);
           ch=32003;
         }
+	#ifndef TEST_ZN_AS_ZP
         cf = nInitChar(n_Zp, (void*)(long)ch);
+	#else
+        mpz_t modBase;
+        mpz_init_set_ui(modBase, (long)ch);
+        ZnmInfo info;
+        info.base= modBase;
+        info.exp= 1;
+        cf=nInitChar(n_Zn,(void*) &info);
+        cf->is_field=1;
+        cf->is_domain=1;
+        cf->has_simple_Inverse=1;
+	#endif
       }
       else
         cf = nInitChar(n_Q, (void*)(long)ch);
@@ -5724,7 +5761,7 @@ ring rInit(leftv pn, leftv rv, leftv ord)
       if (pnn->next->Typ()==INT_CMD)
       {
         pnn=pnn->next;
-        mpz_set_ui(modBase, (int)(long) pnn->Data());
+        mpz_set_ui(modBase, (long) pnn->Data());
         if ((pnn->next!=NULL) && (pnn->next->Typ()==INT_CMD))
         {
           pnn=pnn->next;
