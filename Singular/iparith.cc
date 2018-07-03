@@ -2174,13 +2174,9 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     if ((nMap=n_SetMap(r->cf,currRing->cf))==NULL)
     {
       // Allow imap/fetch to be make an exception only for:
-      if ( (rField_is_Q_a(r) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
-            (rField_is_Q(currRing) || rField_is_Q_a(currRing) ||
-             (rField_is_Zp(currRing) || rField_is_Zp_a(currRing))))
-           ||
-           (rField_is_Zp_a(r) &&  // Zp(a..) -> Zp(a..) || Zp
-            (rField_is_Zp(currRing, r->cf->ch) ||
-             rField_is_Zp_a(currRing, r->cf->ch))) )
+      if (nCoeff_is_Extension(r->cf) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
+         ((n_SetMap(r->cf->extRing->cf,currRing->cf)!=NULL) 
+	 || (nCoeff_is_Extension(currRing->cf) && (n_SetMap(r->cf->extRing->cf,currRing->cf->extRing->cf)!=NULL))))
       {
         par_perm_size=rPar(r);
       }
@@ -6917,13 +6913,9 @@ static BOOLEAN jjFETCH_M(leftv res, leftv u)
     if ((nMap=n_SetMap(r->cf,currRing->cf))==NULL)
     {
       // Allow imap/fetch to be make an exception only for:
-      if ( (rField_is_Q_a(r) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
-            (rField_is_Q(currRing) || rField_is_Q_a(currRing) ||
-             (rField_is_Zp(currRing) || rField_is_Zp_a(currRing))))
-           ||
-           (rField_is_Zp_a(r) &&  // Zp(a..) -> Zp(a..) || Zp
-            (rField_is_Zp(currRing, r->cf->ch) ||
-             rField_is_Zp_a(currRing, r->cf->ch))) )
+      if (nCoeff_is_Extension(r->cf) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
+         ((n_SetMap(r->cf->extRing->cf,currRing->cf)!=NULL) 
+	 || (nCoeff_is_Extension(currRing->cf) && (n_SetMap(r->cf->extRing->cf,currRing->cf->extRing->cf)!=NULL))))
       {
         par_perm_size=rPar(r);
       }
