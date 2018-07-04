@@ -119,7 +119,7 @@ void ssiWriteString(const ssiInfo *d,const char *s)
 
 void ssiWriteBigInt(const ssiInfo *d, const number n)
 {
- n_WriteFd(n,d->f_write,coeffs_BIGINT);
+ n_WriteFd(n,d,coeffs_BIGINT);
 }
 
 void ssiWriteNumber_CF(const ssiInfo *d, const number n, const coeffs cf)
@@ -145,7 +145,7 @@ void ssiWriteNumber_CF(const ssiInfo *d, const number n, const coeffs cf)
   }
   else if (cf->cfWriteFd!=NULL)
   {
-    n_WriteFd(n,d->f_write,cf);
+    n_WriteFd(n,d,cf);
   }
   else WerrorS("coeff field not implemented");
 }

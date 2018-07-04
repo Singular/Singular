@@ -430,18 +430,19 @@ static char* CoeffString(const coeffs r)
   sprintf(buf,"flintZ(%d,\"%s\")",r->ch,r->pParameterNames[0]);
   return buf;
 }
-static void WriteFd(number a, FILE *f, const coeffs)
+static void WriteFd(number a, const ssiInfo *d, const coeffs)
 {
   // format: len a_len .. a_0
   nmod_poly_ptr aa=(nmod_poly_ptr)a;
   int l=nmod_poly_length(aa);
-  fprintf(f,"%d ",l);
+  fprintf(d->f_write,"%d ",l);
   for(int i=l; i>=0; i--)
   {
     ulong ul=nmod_poly_get_coeff_ui(aa,i);
-    fprintf(f,"%lu ", ul);
+    fprintf(d->f_write,"%lu ", ul);
   }
 }
+
 static number ReadFd(s_buff f, const coeffs r)
 {
   // format: len a_len .. a_0

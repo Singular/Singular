@@ -274,7 +274,7 @@ struct n_Procs_s
    //CF: tries to find a canonical map from src -> dst
    nMapFunc (*cfSetMap)(const coeffs src, const coeffs dst);
 
-   void    (*cfWriteFd)(number a, FILE *f, const coeffs r);
+   void    (*cfWriteFd)(number a, const ssiInfo *f, const coeffs r);
    number  (*cfReadFd)( s_buff f, const coeffs r);
 
    /// Inplace: a *= b
@@ -983,7 +983,7 @@ static FORCE_INLINE number n_Random(siRandProc p, number p1, number p2, const co
 { STATISTIC(n_Random); assume( cf != NULL ); assume( cf->cfRandom != NULL );  return cf->cfRandom(p, p1, p2, cf); }
 
 /// io via ssi:
-static FORCE_INLINE void n_WriteFd(number a, FILE *f, const coeffs r)
+static FORCE_INLINE void n_WriteFd(number a, const ssiInfo *f, const coeffs r)
 { STATISTIC(n_WriteFd); assume(r != NULL); assume(r->cfWriteFd != NULL); return r->cfWriteFd(a, f, r); }
 
 /// io via ssi:

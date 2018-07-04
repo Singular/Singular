@@ -3175,7 +3175,7 @@ static char* nlCoeffString(const coeffs r)
   else                 return omStrDup("ZZ");
 }
 
-static void nlWriteFd(number n,FILE* f, const coeffs)
+static void nlWriteFd(number n, const ssiInfo* d, const coeffs)
 {
   if(SR_HDL(n) & SR_INT)
   {
@@ -3186,15 +3186,15 @@ static void nlWriteFd(number n,FILE* f, const coeffs)
     if ((nn<POW_2_28_32)&&(nn>= -POW_2_28_32))
     {
       int nnn=(int)nn;
-      fprintf(f,"4 %d ",nnn);
+      fprintf(d->f_write,"4 %d ",nnn);
     }
     else
     {
       mpz_t tmp;
       mpz_init_set_si(tmp,nn);
-      fputs("8 ",f);
-      mpz_out_str (f,SSI_BASE, tmp);
-      fputc(' ',f);
+      fputs("8 ",d->f_write);
+      mpz_out_str (d->f_write,SSI_BASE, tmp);
+      fputc(' ',d->f_write);
       mpz_clear(tmp);
     }
     #endif
@@ -3202,20 +3202,20 @@ static void nlWriteFd(number n,FILE* f, const coeffs)
   else if (n->s<2)
   {
     //gmp_fprintf(f,"%d %Zd %Zd ",n->s,n->z,n->n);
-    fprintf(f,"%d ",n->s+5);
-    mpz_out_str (f,SSI_BASE, n->z);
-    fputc(' ',f);
-    mpz_out_str (f,SSI_BASE, n->n);
-    fputc(' ',f);
+    fprintf(d->f_write,"%d ",n->s+5);
+    mpz_out_str (d->f_write,SSI_BASE, n->z);
+    fputc(' ',d->f_write);
+    mpz_out_str (d->f_write,SSI_BASE, n->n);
+    fputc(' ',d->f_write);
 
     //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: s=%d gmp/gmp \"%Zd %Zd\" ",n->s,n->z,n->n);
   }
   else /*n->s==3*/
   {
     //gmp_fprintf(d->f_write,"3 %Zd ",n->z);
-    fputs("8 ",f);
-    mpz_out_str (f,SSI_BASE, n->z);
-    fputc(' ',f);
+    fputs("8 ",d->f_write);
+    mpz_out_str (d->f_write,SSI_BASE, n->z);
+    fputc(' ',d->f_write);
 
     //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: gmp \"%Zd\" ",n->z);
   }

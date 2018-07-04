@@ -371,9 +371,9 @@ static char* npCoeffString(const coeffs cf)
   return omStrDup(npCoeffName(cf));
 }
 
-static void npWriteFd(number n, FILE* f, const coeffs)
+static void npWriteFd(number n, const ssiInfo* d, const coeffs)
 {
-  fprintf(f,"%d ",(int)(long)n);
+  fprintf(d->f_write,"%d ",(int)(long)n);
 }
 
 static number npReadFd(s_buff f, const coeffs)

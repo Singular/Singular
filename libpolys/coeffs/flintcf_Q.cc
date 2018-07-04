@@ -485,12 +485,12 @@ static number Parameter(const int i, const coeffs r)
   fmpq_poly_set_coeff_si(res,1,1);
   return (number)res;
 }
-static void WriteFd(number a, FILE *f, const coeffs)
+static void WriteFd(number a, const ssiInfo *d, const coeffs)
 {
   // format: len a_len(num den) .. a_0
   fmpq_poly_ptr aa=(fmpq_poly_ptr)a;
   int l=fmpq_poly_length(aa);
-  fprintf(f,"%d ",l);
+  fprintf(d->f_write,"%d ",l);
   mpq_t m;
   mpq_init(m);
   mpz_t num,den;
@@ -501,10 +501,10 @@ static void WriteFd(number a, FILE *f, const coeffs)
     fmpq_poly_get_coeff_mpq(m,(fmpq_poly_ptr)a,i);
     mpq_get_num(num,m);
     mpq_get_den(den,m);
-    mpz_out_str (f,SSI_BASE, num);
-    fputc(' ',f);
-    mpz_out_str (f,SSI_BASE, den);
-    fputc(' ',f);
+    mpz_out_str (d->f_write,SSI_BASE, num);
+    fputc(' ',d->f_write);
+    mpz_out_str (d->f_write,SSI_BASE, den);
+    fputc(' ',d->f_write);
   }
   mpz_clear(den);
   mpz_clear(num);
