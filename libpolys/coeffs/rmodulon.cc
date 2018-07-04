@@ -13,6 +13,7 @@
 
 #include "coeffs/si_gmp.h"
 #include "coeffs/coeffs.h"
+#include "coeffs/modulop.h"
 #include "coeffs/numbers.h"
 
 #include "coeffs/mpr_complex.h"
@@ -1027,7 +1028,7 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   if ((r->modExponent==1)&&(mpz_size1(r->modBase)==1))
   {
     long p=mpz_get_si(r->modBase);
-    if ((p<=536870909)&&(p==IsPrime(p))) /*factory limit: <2^29*/
+    if ((p<=FACTORY_MAX_PRIME)&&(p==IsPrime(p))) /*factory limit: <2^29*/
     {
       r->convFactoryNSingN=nrnConvFactoryNSingN;
       r->convSingNFactoryN=nrnConvSingNFactoryN;
