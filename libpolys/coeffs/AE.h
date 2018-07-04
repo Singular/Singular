@@ -2,9 +2,9 @@
 #define AE_H
 
 #include "misc/auxiliary.h"
-#include "coeffs/si_gmp.h"
 
 #ifdef SINGULAR_4_2
+#include "coeffs/si_gmp.h"
 
 class int_poly // Klasse von int_polynomen mit Typ (Grad, Koeffizienten ganzzahlig)
 {
@@ -108,5 +108,3 @@ public:
 
 #endif
 #endif
-
-

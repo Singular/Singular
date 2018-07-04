@@ -13,19 +13,13 @@
 #include "coeffs/coeffs.h"
 #include "misc/intvec.h"
 #include "misc/int64vec.h"
+#include "coeffs/coeffs.h" // ring,number
 #include "polys/monomials/monomials.h"
 //#include "polys/monomials/polys-impl.h"
 //
 
 /* forward declaration of types */
 class idrec; typedef idrec *   idhdl; // _only_ for idhdl ip_sring::idroot
-//struct  spolyrec;
-//typedef struct spolyrec    polyrec;
-//typedef struct spolyrec *         poly;
-//typedef struct spolyrec const *   const_poly;
-struct ip_sring;
-typedef struct ip_sring *         ring;
-typedef struct ip_sring const *   const_ring;
 struct p_Procs_s;
 typedef struct p_Procs_s p_Procs_s;
 class kBucket;

@@ -54,9 +54,8 @@ struct snumber;
 typedef struct snumber *   number;
 
 /* standard types */
-struct ip_sring;
-typedef struct ip_sring *         ring;
-typedef struct ip_sring const *   const_ring;
+//struct ip_sring;
+//typedef struct ip_sring *         ring; /* already needed in s_buff.h*/
 
 /// @class coeffs coeffs.h coeffs/coeffs.h
 ///

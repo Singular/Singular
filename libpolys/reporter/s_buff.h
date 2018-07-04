@@ -14,6 +14,22 @@ struct s_buff_s
 
 typedef struct s_buff_s * s_buff;
 
+struct ip_sring;
+typedef struct ip_sring *         ring;
+
+typedef struct
+{
+  s_buff f_read;
+  FILE *f_write;
+  ring r;
+  pid_t pid; /* only valid for fork/tcp mode*/
+  int fd_read,fd_write; /* only valid for fork/tcp mode*/
+  char level;
+  char send_quit_at_exit;
+  char quit_sent;
+
+} ssiInfo;
+
 s_buff s_open(int fd);
 s_buff s_open_by_name(const char *n);
 int    s_close(s_buff &f);
