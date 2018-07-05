@@ -93,8 +93,8 @@ poly shift_p_Mult_mm(poly p, const poly m, const ring ri)
   p_mLPUnShift(_m, ri);
   p_LPUnShift(p, ri);
 #else
-  assume(p_mFirstVblock(_m, lV, ri) <= 1);
-  assume(p_FirstVblock(p, lV, ri) <= 1); // TODO check that each block is <=1
+  assume(p_mFirstVblock(_m, ri) <= 1);
+  assume(p_FirstVblock(p, ri) <= 1); // TODO check that each block is <=1
 #endif
   // at this point _m and p are shifted to 1
 
@@ -153,8 +153,8 @@ poly shift_pp_mm_Mult(poly p, const poly m, const ring ri)
   poly pCopyHead = p; // used to delete p later
   p_LPUnShift(p, ri);
 #else
-  assume(p_mFirstVblock(_m, lV, ri) <= 1);
-  assume(p_FirstVblock(p, lV, ri) <= 1); // TODO check that each block is <=1
+  assume(p_mFirstVblock(_m, ri) <= 1);
+  assume(p_FirstVblock(p, ri) <= 1); // TODO check that each block is <=1
 #endif
   // at this point _m and p are shifted to 1
 
@@ -216,8 +216,8 @@ poly shift_p_mm_Mult(poly p, const poly m, const ring ri)
   p_mLPUnShift(_m, ri);
   p_LPUnShift(p, ri);
 #else
-  assume(p_mFirstVblock(_m, lV, ri) <= 1);
-  assume(p_FirstVblock(p, lV, ri) <= 1); // TODO check that each block is <=1
+  assume(p_mFirstVblock(_m, ri) <= 1);
+  assume(p_FirstVblock(p, ri) <= 1); // TODO check that each block is <=1
 #endif
   // at this point _m and p are shifted to 1
 

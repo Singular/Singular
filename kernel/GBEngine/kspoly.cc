@@ -787,13 +787,16 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   poly m12, m22;
   if (tailRing->isLPring)
   {
-    int split = p_FirstVblock(p1, tailRing);
+    // note: because of the crits, p2 is never shifted
+    int split = p_mFirstVblock(p1, tailRing);
     // TODO: shouldn't we use p1 AND p2 here??
     k_SplitFrame(m1, m12, split, tailRing);
     k_SplitFrame(m2, m22, split, tailRing);
     // manually free the coeffs, because pSetCoeff0 is used in the next step
     n_Delete(&(m1->coef), tailRing->cf);
     n_Delete(&(m2->coef), tailRing->cf);
+
+    a1 = p_LPshift(p_Copy(a1, tailRing), 1 - split, tailRing); // unshift a1
   }
 
   pSetCoeff0(m1, lc2);
@@ -841,7 +844,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
 
   if (tailRing->isLPring) {
     // get m2*a2*m22 - m1*a1*m12
-    Pair->Tail_Minus_mm_Mult_qq(m1, tailRing->p_Procs->pp_Mult_mm(a1, m12, tailRing), l1, spNoether);
+    Pair->Tail_Minus_mm_Mult_qq(m1, tailRing->p_Procs->p_Mult_mm(a1, m12, tailRing), l1, spNoether); // a1 is a copy: safe to destroy
   } else {
     // get m2*a2 - m1*a1
     Pair->Tail_Minus_mm_Mult_qq(m1, a1, l1, spNoether);
