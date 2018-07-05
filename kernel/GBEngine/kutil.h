@@ -95,7 +95,6 @@ public:
 
   // letterplace
   int shift;
-  poly pUnshifted;
 
   // initialization
   KINLINE void Init(ring r = currRing);

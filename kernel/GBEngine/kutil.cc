@@ -565,6 +565,9 @@ void cleanT (kStrategy strat)
         }
         else
         {
+          if (currRing->isLPring && strat->T[j].shift > 0) {
+            pNext(p) = NULL; // pNext(p) points to the unshifted tail, don't try to delete it here
+          }
           pDelete(&p);
         }
         break;
@@ -821,7 +824,13 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
   {
     if (T->p == NULL && i > 0)
       return dReportError("%c[%d].p is NULL", TN, i);
-    pFalseReturn(p_Test(T->p, currRing));
+    if (currRing->isLPring && T->shift > 0) {
+      // in this case, the order is not correct. test LM and tail separately
+      pFalseReturn(p_LmTest(T->p, currRing));
+      pFalseReturn(p_Test(pNext(T->p), currRing));
+    } else {
+      pFalseReturn(p_Test(T->p, currRing));
+    }
   }
 
   if ((i >= 0) && (T->pLength != 0)
@@ -9276,7 +9285,15 @@ void enterT(LObject &p, kStrategy strat, int atT)
 {
   int i;
 
-  pp_Test(p.p, currRing, p.tailRing);
+#ifdef PDEBUG
+  if (currRing->isLPring && p.shift > 0) {
+    // in this case, the order is not correct. test LM and tail separately
+    p_LmTest(p.p, currRing);
+    p_Test(pNext(p.p), currRing);
+  } else {
+    pp_Test(p.p, currRing, p.tailRing);
+  }
+#endif
   assume(strat->tailRing == p.tailRing);
   // redMoraNF complains about this -- but, we don't really
   // neeed this so far
@@ -9325,7 +9342,8 @@ void enterT(LObject &p, kStrategy strat, int atT)
     }
   }
 
-  if ((strat->tailBin != NULL) && (pNext(p.p) != NULL))
+  // letterplace: if p.shift > 0 then pNext(p.p) is already in the tailBin
+  if ((strat->tailBin != NULL) && (pNext(p.p) != NULL) && !(currRing->isLPring && p.shift > 0))
   {
     pNext(p.p)=p_ShallowCopyDelete(pNext(p.p),
                                    (strat->tailRing != NULL ?
@@ -12500,8 +12518,8 @@ void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 
 #ifdef HAVE_SHIFTBBA
 /*2
-* puts p to the set T, starting with the at position atT
-* and inserts all admissible shifts of p
+* enteres all admissible shifts of p into T
+* assumes that p is already in T!
 */
 void enterTShift(LObject p, kStrategy strat, int atT)
 {
@@ -12513,22 +12531,16 @@ void enterTShift(LObject p, kStrategy strat, int atT)
 
   int toInsert = itoInsert(p.p, strat->tailRing);
 
-  poly shifted;
   for (int i = 1; i <= toInsert; i++)
   {
-    shifted = p_mLPshift(p_Head(p.p, currRing), i, currRing);
-    LObject qq(shifted);
-    qq.SetpFDeg();
-    qq.SetShortExpVector();
+    poly shifted = p_mLPshift(p_Head(p.p, currRing), i, currRing);
+    pNext(shifted) = pNext(p.p);
+    LObject qq;
+    qq.p = shifted; // don't use Set() because it'll test the poly order
     qq.shift = i;
-    qq.pUnshifted = pNext(p.p);
-    strat->initEcart(&qq);
-    qq.ecart = p.ecart;
-    #ifdef KTEST
-    kTest_T(&qq, strat->tailRing, -1, 'L');
-    #endif
-    /* enter it into T, first el't is with the shift 0 */
-    enterT(qq, strat, atT);
+    strat->initEcart(&qq); // initEcartBBA sets length, pLength, FDeg and ecart
+
+    enterT(qq, strat, atT); // enterT is modified, so it doesn't copy and delete the tail of shifted polys
   }
 }
 #endif
