@@ -3221,10 +3221,10 @@ static void nlWriteFd(number n, const ssiInfo* d, const coeffs)
   }
 }
 
-static number nlReadFd(s_buff f, const coeffs)
+static number nlReadFd(const ssiInfo *d, const coeffs)
 {
   int sub_type=-1;
-  sub_type=s_readint(f);
+  sub_type=s_readint(d->f_read);
   switch(sub_type)
   {
      case 0:
@@ -3232,8 +3232,8 @@ static number nlReadFd(s_buff f, const coeffs)
        {// read mpz_t, mpz_t
          number n=nlRInit(0);
          mpz_init(n->n);
-         s_readmpz(f,n->z);
-         s_readmpz(f,n->n);
+         s_readmpz(d->f_read,n->z);
+         s_readmpz(d->f_read,n->n);
          n->s=sub_type;
          return n;
        }
@@ -3241,7 +3241,7 @@ static number nlReadFd(s_buff f, const coeffs)
      case 3:
        {// read mpz_t
          number n=nlRInit(0);
-         s_readmpz(f,n->z);
+         s_readmpz(d->f_read,n->z);
          n->s=3; /*sub_type*/
          #if SIZEOF_LONG == 8
          n=nlShort3(n);
@@ -3250,7 +3250,7 @@ static number nlReadFd(s_buff f, const coeffs)
        }
      case 4:
        {
-         LONG dd=s_readlong(f);
+         LONG dd=s_readlong(d->f_read);
          //#if SIZEOF_LONG == 8
          return INT_TO_SR(dd);
          //#else
@@ -3262,15 +3262,15 @@ static number nlReadFd(s_buff f, const coeffs)
        {// read raw mpz_t, mpz_t
          number n=nlRInit(0);
          mpz_init(n->n);
-         s_readmpz_base (f,n->z, SSI_BASE);
-         s_readmpz_base (f,n->n, SSI_BASE);
+         s_readmpz_base (d->f_read,n->z, SSI_BASE);
+         s_readmpz_base (d->f_read,n->n, SSI_BASE);
          n->s=sub_type-5;
          return n;
        }
      case 8:
        {// read raw mpz_t
          number n=nlRInit(0);
-         s_readmpz_base (f,n->z, SSI_BASE);
+         s_readmpz_base (d->f_read,n->z, SSI_BASE);
          n->s=sub_type=3; /*subtype-5*/
          #if SIZEOF_LONG == 8
          n=nlShort3(n);

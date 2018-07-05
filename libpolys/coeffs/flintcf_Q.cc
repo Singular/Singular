@@ -510,12 +510,12 @@ static void WriteFd(number a, const ssiInfo *d, const coeffs)
   mpz_clear(num);
   mpq_clear(m);
 }
-static number ReadFd(s_buff f, const coeffs)
+static number ReadFd(const ssiInfo *d, const coeffs)
 {
   // format: len a_len .. a_0
   fmpq_poly_ptr aa=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
   fmpq_poly_init(aa);
-  int l=s_readint(f);
+  int l=s_readint(d->f_read);
   mpz_t nm;
   mpz_init(nm);
   mpq_t m;
@@ -523,9 +523,9 @@ static number ReadFd(s_buff f, const coeffs)
   for (int i=l;i>=0;i--)
   {
 
-    s_readmpz_base (f,nm, SSI_BASE);
+    s_readmpz_base (d->f_read,nm, SSI_BASE);
     mpq_set_num(m,nm);
-    s_readmpz_base (f,nm, SSI_BASE);
+    s_readmpz_base (d->f_read,nm, SSI_BASE);
     mpq_set_den(m,nm);
     fmpq_poly_set_coeff_mpq(aa,i,m);
   }

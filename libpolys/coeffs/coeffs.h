@@ -275,7 +275,7 @@ struct n_Procs_s
    nMapFunc (*cfSetMap)(const coeffs src, const coeffs dst);
 
    void    (*cfWriteFd)(number a, const ssiInfo *f, const coeffs r);
-   number  (*cfReadFd)( s_buff f, const coeffs r);
+   number  (*cfReadFd)( const ssiInfo *f, const coeffs r);
 
    /// Inplace: a *= b
    void    (*cfInpMult)(number &a, number b, const coeffs r);
@@ -987,7 +987,7 @@ static FORCE_INLINE void n_WriteFd(number a, const ssiInfo *f, const coeffs r)
 { STATISTIC(n_WriteFd); assume(r != NULL); assume(r->cfWriteFd != NULL); return r->cfWriteFd(a, f, r); }
 
 /// io via ssi:
-static FORCE_INLINE number n_ReadFd( s_buff f, const coeffs r)
+static FORCE_INLINE number n_ReadFd( const ssiInfo *f, const coeffs r)
 { STATISTIC(n_ReadFd); assume(r != NULL); assume(r->cfReadFd != NULL); return r->cfReadFd(f, r); }
 
 

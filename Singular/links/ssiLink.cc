@@ -402,7 +402,7 @@ number ssiReadNumber_CF(const ssiInfo *d, const coeffs cf)
 {
   if (cf->cfReadFd!=NULL)
   {
-     return n_ReadFd(d->f_read,cf);
+     return n_ReadFd(d,cf);
   }
   else if (getCoeffType(cf) == n_transExt)
   {

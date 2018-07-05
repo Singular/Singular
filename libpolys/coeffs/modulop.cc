@@ -376,11 +376,11 @@ static void npWriteFd(number n, const ssiInfo* d, const coeffs)
   fprintf(d->f_write,"%d ",(int)(long)n);
 }
 
-static number npReadFd(s_buff f, const coeffs)
+static number npReadFd(const ssiInfo *d, const coeffs)
 {
   // read int
   int dd;
-  dd=s_readint(f);
+  dd=s_readint(d->f_read);
   return (number)(long)dd;
 }
 

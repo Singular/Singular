@@ -443,16 +443,16 @@ static void WriteFd(number a, const ssiInfo *d, const coeffs)
   }
 }
 
-static number ReadFd(s_buff f, const coeffs r)
+static number ReadFd(const ssiInfo *d, const coeffs r)
 {
   // format: len a_len .. a_0
   nmod_poly_ptr aa=(nmod_poly_ptr)omAlloc(sizeof(nmod_poly_t));
   nmod_poly_init(aa,r->ch);
-  int l=s_readint(f);
+  int l=s_readint(d->f_read);
   unsigned long ul;
   for (int i=l;i>=0;i--)
   {
-    unsigned long ul=s_readlong(f);
+    unsigned long ul=s_readlong(d->f_read);
     nmod_poly_set_coeff_ui(aa,i,ul);
   }
   return (number)aa;
