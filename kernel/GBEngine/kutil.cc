@@ -1392,10 +1392,10 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
   poly pm1 = pp_Mult_mm(pNext(p), m1, strat->tailRing);
   poly sim2 = pp_Mult_mm(pNext(si), m2, strat->tailRing);
   pDelete(&si);
+  p_LmDelete(m1, currRing);
+  p_LmDelete(m2, currRing);
   if(sim2 == NULL)
   {
-    pDelete(&m1);
-    pDelete(&m2);
     if(pm1 == NULL)
     {
       if(h.lcm != NULL)
@@ -1426,8 +1426,6 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
     gcd = p_Add_q(pm1, sim2, strat->tailRing);
   }
   p_Test(gcd, strat->tailRing);
-  //p_LmDelete(m1, strat->tailRing);
-  //p_LmDelete(m2, strat->tailRing);
 #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
