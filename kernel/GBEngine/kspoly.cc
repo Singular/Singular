@@ -844,7 +844,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
 
   if (tailRing->isLPring) {
     // get m2*a2*m22 - m1*a1*m12
-    Pair->Tail_Minus_mm_Mult_qq(m1, tailRing->p_Procs->p_Mult_mm(a1, m12, tailRing), l1, spNoether); // a1 is a copy: safe to destroy
+    Pair->Tail_Minus_mm_Mult_qq(m1, tailRing->p_Procs->pp_Mult_mm(a1, m12, tailRing), l1, spNoether);
   } else {
     // get m2*a2 - m1*a1
     Pair->Tail_Minus_mm_Mult_qq(m1, a1, l1, spNoether);
@@ -857,6 +857,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
     p_LmDelete(m12, tailRing);
     p_LmDelete(m22, tailRing);
     // m2 is already deleted
+    p_Delete(&a1, tailRing); // a1 is a copy: safe to destroy
   }
 
   if (co != 0)
