@@ -3180,7 +3180,7 @@ static void nlWriteFd(number n, const ssiInfo* d, const coeffs)
   if(SR_HDL(n) & SR_INT)
   {
     #if SIZEOF_LONG == 4
-    fprintf(f,"4 %ld ",SR_TO_INT(n));
+    fprintf(d->f_write,"4 %ld ",SR_TO_INT(n));
     #else
     long nn=SR_TO_INT(n);
     if ((nn<POW_2_28_32)&&(nn>= -POW_2_28_32))
