@@ -597,3 +597,45 @@ number n_convFactoryNSingN( const CanonicalForm n, const coeffs r)
 
 CanonicalForm n_convSingNFactoryN( number n, BOOLEAN setChar, const coeffs r )
 { STATISTIC(n_convSingNFactoryN); assume(r != NULL); assume(r->convSingNFactoryN != NULL); return r->convSingNFactoryN(n, setChar, r); }
+
+
+char* nEati(char *s, int *i, int m)
+{
+
+  if (((*s) >= '0') && ((*s) <= '9'))
+  {
+    unsigned long ii=0L;
+    do
+    {
+      ii *= 10;
+      ii += *s++ - '0';
+      if ((m!=0) && (ii>m)) ii=ii%m;
+    }
+    while (((*s) >= '0') && ((*s) <= '9'));
+    if ((m!=0) && (ii>m)) ii=ii%m;
+    *i=(int)ii;
+  }
+  else (*i) = 1;
+  return s;
+}
+
+/// extracts a long integer from s, returns the rest
+char * nEatLong(char *s, mpz_ptr i)
+{
+  const char * start=s;
+
+  while (*s >= '0' && *s <= '9') s++;
+  if (*s=='\0')
+  {
+    mpz_set_str(i,start,10);
+  }
+  else
+  {
+    char c=*s;
+    *s='\0';
+    mpz_set_str(i,start,10);
+    *s=c;
+  }
+  return s;
+}
+

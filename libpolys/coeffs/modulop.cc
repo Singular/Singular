@@ -263,23 +263,9 @@ void npPower (number a, int i, number * result, const coeffs r)
 }
 #endif
 
-static const char* npEati(const char *s, int *i, const coeffs r)
+static inline const char* npEati(const char *s, int *i, const coeffs r)
 {
-  if (((*s) >= '0') && ((*s) <= '9'))
-  {
-    unsigned long ii=0L;
-    do
-    {
-      ii *= 10;
-      ii += *s++ - '0';
-      if (ii >= (MAX_INT_VAL / 10)) ii = ii % r->ch;
-    }
-    while (((*s) >= '0') && ((*s) <= '9'));
-    if (ii >= (unsigned long)r->ch) ii = ii % r->ch;
-    *i=(int)ii;
-  }
-  else (*i) = 1;
-  return s;
+  return nEati((char *)s,i,r->ch);
 }
 
 const char * npRead (const char *s, number *a, const coeffs r)

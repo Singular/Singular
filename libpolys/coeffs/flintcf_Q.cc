@@ -44,26 +44,6 @@ static char * nlEatLong(char *s, mpz_ptr i)
   return s;
 }
 
-static const char* Eati(const char *s, int *i)
-{
-
-  if (((*s) >= '0') && ((*s) <= '9'))
-  {
-    unsigned long ii=0L;
-    do
-    {
-      ii *= 10;
-      ii += *s++ - '0';
-    }
-    while (((*s) >= '0') && ((*s) <= '9'));
-    *i=(int)ii;
-  }
-  else (*i) = 1;
-  return s;
-}
-
-
-
 static void CoeffWrite(const coeffs r, BOOLEAN details)
 {
   PrintS("flint fmpq_poly");
@@ -302,7 +282,7 @@ static const char* Read(const char * st, number * a, const coeffs r)
 {
 // we only read "monomials" (i.e. [-][digits][parameter]),
 // everythings else (+,*,^,()) is left to the singular interpreter
-  const char *s=st;
+  char *s=(char *)st;
   *a=(number)omAlloc(sizeof(fmpq_poly_t));
   fmpq_poly_init((fmpq_poly_ptr)(*a));
   BOOLEAN neg=FALSE;
@@ -328,7 +308,7 @@ static const char* Read(const char * st, number * a, const coeffs r)
     if(isdigit(*s))
     {
       int i=1;
-      s=Eati(s,&i);
+      s=nEati(s,&i,0);
       if (i!=1)
       {
         fmpq_poly_set_coeff_si((fmpq_poly_ptr)(*a),1,0);

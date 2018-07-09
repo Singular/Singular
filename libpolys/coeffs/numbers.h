@@ -104,4 +104,9 @@ coeffs nFindCoeffByName(const char *n);
 /// does nothing (just returns a dummy one number)
 // void ndClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, number& d, const coeffs r);
 
+/// helper routine: read an int from a string (mod m), return a pointer to the rest
+char* nEati(char *s, int *i, int m);
+
+/// extracts a long integer from s, returns the rest
+char * nEatLong(char *s, mpz_ptr i);
 #endif
