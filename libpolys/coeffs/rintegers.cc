@@ -573,6 +573,20 @@ static number nrzFarey(number r, number N, const coeffs R)
   return ab;
 }
 
+void nrzWriteFd(number n, const ssiInfo* d, const coeffs)
+{
+  mpz_out_str (d->f_write,SSI_BASE, (mpz_ptr)n);
+  fputc(' ',d->f_write);
+}
+
+number nrzReadFd(const ssiInfo *d, const coeffs)
+{
+  mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
+  mpz_init(erg);
+  s_readmpz_base(d->f_read,erg,SSI_BASE);
+  return (number)erg;
+}
+
 BOOLEAN nrzInitChar(coeffs r,  void *)
 {
   assume( getCoeffType(r) == n_Z );
@@ -624,6 +638,8 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->convFactoryNSingN=nrzConvFactoryNSingN;
   r->cfChineseRemainder=nlChineseRemainderSym;
   r->cfFarey=nrzFarey;
+  r->cfWriteFd=nrzWriteFd;
+  r->cfReadFd=nrzReadFd;
   // debug stuff
 
 #ifdef LDEBUG
@@ -1806,6 +1822,9 @@ static coeffs nrzQuot1(number c, const coeffs r)
     return(rr);
 }
 
+number nlReadFd(const ssiInfo *d, const coeffs);
+void nlWriteFd(number n, const ssiInfo* d, const coeffs);
+
 BOOLEAN nrzInitChar(coeffs r,  void *)
 {
   assume( getCoeffType(r) == n_Z );
@@ -1858,6 +1877,8 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->convFactoryNSingN = nrzConvFactoryNSingN;
   r->cfMPZ = nrzMPZ;
   r->cfFarey = nrzFarey;
+  r->cfWriteFd=nlWriteFd;
+  r->cfReadFd=nlReadFd;
 
   r->cfQuot1 = nrzQuot1;
   // requires conversion to factory:

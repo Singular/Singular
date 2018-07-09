@@ -3175,7 +3175,7 @@ static char* nlCoeffString(const coeffs r)
   else                 return omStrDup("ZZ");
 }
 
-static void nlWriteFd(number n, const ssiInfo* d, const coeffs)
+void nlWriteFd(number n, const ssiInfo* d, const coeffs)
 {
   if(SR_HDL(n) & SR_INT)
   {
@@ -3221,7 +3221,7 @@ static void nlWriteFd(number n, const ssiInfo* d, const coeffs)
   }
 }
 
-static number nlReadFd(const ssiInfo *d, const coeffs)
+number nlReadFd(const ssiInfo *d, const coeffs)
 {
   int sub_type=-1;
   sub_type=s_readint(d->f_read);
@@ -3283,6 +3283,7 @@ static number nlReadFd(const ssiInfo *d, const coeffs)
   }
   return NULL;
 }
+
 BOOLEAN nlCoeffIsEqual(const coeffs r, n_coeffType n, void *p)
 {
   /* test, if r is an instance of nInitCoeffs(n,parameter) */
