@@ -95,8 +95,12 @@ const char* const nDivBy0 = "div by 0";
 typedef BOOLEAN (*cfInitCharProc)(coeffs, void *);
 n_coeffType nRegister(n_coeffType n, cfInitCharProc p);
 
+/// initialize an object of type coeffs by its name, return NULL otherwise
+typedef coeffs (*cfInitCfByNameProc)(char *s,n_coeffType n);
+void nRegisterCfByName(cfInitCfByNameProc p,n_coeffType n);
+
 /// find an existing coeff by its "CoeffName"
-coeffs nFindCoeffByName(const char *n);
+coeffs nFindCoeffByName(char *n);
 
 /// divide by the first (leading) number and return it, i.e. make monic
 // void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs r);

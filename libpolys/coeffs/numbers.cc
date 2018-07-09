@@ -566,9 +566,30 @@ n_coeffType nRegister(n_coeffType n, cfInitCharProc p)
   }
 }
 
-coeffs nFindCoeffByName(const char *cf_name)
+struct nFindCoeffByName_s;
+typedef struct nFindCoeffByName_s* nFindCoeffByName_p;
+
+struct nFindCoeffByName_s
+{
+  n_coeffType n;
+  cfInitCfByNameProc p;
+  nFindCoeffByName_p next;
+};
+
+nFindCoeffByName_p nFindCoeffByName_Root=NULL;
+void nRegisterCfByName(cfInitCfByNameProc p,n_coeffType n)
+{
+  nFindCoeffByName_p h=(nFindCoeffByName_p)omAlloc0(sizeof(*h));
+  h->p=p;
+  h->n=n;
+  h->next=nFindCoeffByName_Root;
+  nFindCoeffByName_Root=h;
+}
+
+coeffs nFindCoeffByName(char *cf_name)
 {
   n_Procs_s* n=cf_root;
+  // try existings coeffs:
   while(n!=NULL)
   {
     if ((n->cfCoeffName!=NULL)
@@ -576,6 +597,14 @@ coeffs nFindCoeffByName(const char *cf_name)
     n=n->next;
   }
   // TODO: parametrized cf, e.g. flint:Z/26[a]
+  // try existing types:
+  nFindCoeffByName_p p=nFindCoeffByName_Root;
+  while(p!=NULL)
+  {
+    coeffs cf=p->p(cf_name,p->n);
+    if (cf!=NULL) return cf;
+    p=p->next;
+  }
   return NULL;
 }
 
