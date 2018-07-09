@@ -54,18 +54,45 @@ static void nrnCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
   omFreeSize((ADDRESS)s, l);
 }
 
+coeffs nrnInitCfByName(char *s,n_coeffType n)
+{
+  const int start_len=strlen("ZZ/bigint(");
+  if (strncmp(s,"ZZ/bigint(",start_len)==0)
+  {
+    s+=start_len;
+    mpz_t z;
+    mpz_init(z);
+    s=nEatLong(s,z);
+    ZnmInfo info;
+    info.base=z;
+    info.exp= 1;
+    while ((*s!='\0') && (*s!=')')) s++;
+    // expect ")" or ")^exp"
+    if (*s=='\0') { mpz_clear(z); return NULL; }
+    if (((*s)==')') && (*(s+1)=='^'))
+    {
+      s=s+2;
+      s=nEati(s,&(info.exp),0);
+      return nInitChar(n_Znm,(void*) &info);
+    }
+    else
+      return nInitChar(n_Zn,(void*) &info);
+  }
+  else return NULL;
+}
+
 static char* nrnCoeffName_buff=NULL;
 static char* nrnCoeffName(const coeffs r)
 {
   if(nrnCoeffName_buff!=NULL) omFree(nrnCoeffName_buff);
   size_t l = (size_t)mpz_sizeinbase(r->modBase, 10) + 2;
-  nrnCoeffName_buff=(char*)omAlloc(l+6);
+  nrnCoeffName_buff=(char*)omAlloc(l+12);
   char* s = (char*) omAlloc(l);
   s= mpz_get_str (s, 10, r->modBase);
   if (nCoeff_is_Ring_ModN(r))
-    snprintf(nrnCoeffName_buff,l+6,"ZZ/%s",s);
+    snprintf(nrnCoeffName_buff,l+6,"ZZ/bigint(%s)",s);
   else if (nCoeff_is_Ring_PtoM(r))
-    snprintf(nrnCoeffName_buff,l+6,"ZZ/%s^%lu",s,r->modExponent);
+    snprintf(nrnCoeffName_buff,l+6,"ZZ/bigint(%s)^%lu",s,r->modExponent);
   omFreeSize((ADDRESS)s, l);
   return nrnCoeffName_buff;
 }

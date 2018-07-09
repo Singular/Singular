@@ -30,6 +30,7 @@
 #include "coeffs/OPAEp.h"
 #include "coeffs/flintcf_Q.h"
 #include "coeffs/flintcf_Zn.h"
+#include "coeffs/rmodulon.h"
 
 #include "polys/ext_fields/algext.h"
 #include "polys/ext_fields/transext.h"
@@ -1408,6 +1409,7 @@ void siInit(char *name)
     IDDATA(h)=(char*)nInitChar(n_Q,NULL);
     h=enterid("ZZ",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
     IDDATA(h)=(char*)nInitChar(n_Z,NULL);
+    nRegisterCfByName(nrnInitCfByName,n_Zn); // and n_Znm
     iiAddCproc("kernel","crossprod",FALSE,iiCrossProd);
     iiAddCproc("kernel","Float",FALSE,iiFloat);
     //h=enterid("RR",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
