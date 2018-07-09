@@ -132,7 +132,7 @@ number nrzInit (long i, const coeffs)
   return (number) erg;
 }
 
-static void nrzDelete(number *a, const coeffs)
+void nrzDelete(number *a, const coeffs)
 {
   if (*a != NULL)
   {
@@ -157,7 +157,7 @@ number nrzCopyMap(number a, const coeffs /*src*/, const coeffs dst)
 }
 #endif
 
-static int nrzSize(number a, const coeffs)
+int nrzSize(number a, const coeffs)
 {
   mpz_ptr p=(mpz_ptr)a;
   int s=p->_mp_alloc;

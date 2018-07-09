@@ -14,6 +14,7 @@
 #include "coeffs/si_gmp.h"
 #include "coeffs/coeffs.h"
 #include "coeffs/modulop.h"
+#include "coeffs/rintegers.h"
 #include "coeffs/numbers.h"
 
 #include "coeffs/mpr_complex.h"
@@ -86,17 +87,19 @@ static char* nrnCoeffName(const coeffs r)
 {
   if(nrnCoeffName_buff!=NULL) omFree(nrnCoeffName_buff);
   size_t l = (size_t)mpz_sizeinbase(r->modBase, 10) + 2;
-  nrnCoeffName_buff=(char*)omAlloc(l+12);
   char* s = (char*) omAlloc(l);
+  l+=22;
+  nrnCoeffName_buff=(char*)omAlloc(l);
   s= mpz_get_str (s, 10, r->modBase);
+  int ll;
   if (nCoeff_is_Ring_ModN(r))
-    snprintf(nrnCoeffName_buff,l+6,"ZZ/bigint(%s)",s);
+    ll=snprintf(nrnCoeffName_buff,l,"ZZ/bigint(%s)",s);
   else if (nCoeff_is_Ring_PtoM(r))
-    snprintf(nrnCoeffName_buff,l+6,"ZZ/bigint(%s)^%lu",s,r->modExponent);
-  omFreeSize((ADDRESS)s, l);
+    ll=snprintf(nrnCoeffName_buff,l,"ZZ/bigint(%s)^%lu",s,r->modExponent);
+  assume(ll<(int)l); // otherwise nrnCoeffName_buff too small
+  omFreeSize((ADDRESS)s, l-22);
   return nrnCoeffName_buff;
 }
-
 
 static BOOLEAN nrnCoeffIsEqual(const coeffs r, n_coeffType n, void * parameter)
 {
@@ -189,6 +192,18 @@ static number nrnInit(long i, const coeffs r)
   return (number) erg;
 }
 
+/*
+ * convert a number to int
+ */
+static long nrnInt(number &n, const coeffs)
+{
+  return mpz_get_si((mpz_ptr) n);
+}
+
+#if SI_INTEGER_VARIANT==2
+#define nrnDelete nrzDelete
+#define nrnSize   nrzSize
+#else
 static void nrnDelete(number *a, const coeffs)
 {
   if (*a != NULL)
@@ -198,7 +213,6 @@ static void nrnDelete(number *a, const coeffs)
     *a = NULL;
   }
 }
-
 static int nrnSize(number a, const coeffs)
 {
   mpz_ptr p=(mpz_ptr)a;
@@ -206,15 +220,7 @@ static int nrnSize(number a, const coeffs)
   if (s==1) s=(mpz_cmp_ui(p,0)!=0);
   return s;
 }
-
-/*
- * convert a number to int
- */
-static long nrnInt(number &n, const coeffs)
-{
-  return mpz_get_si((mpz_ptr) n);
-}
-
+#endif
 /*
  * Multiply two numbers
  */
@@ -1049,6 +1055,11 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->nCoeffIsEqual = nrnCoeffIsEqual;
   r->cfKillChar    = nrnKillChar;
   r->cfQuot1       = nrnQuot1;
+#if SI_INTEGER_VARIANT==2
+  r->cfWriteFd     = nrzWriteFd;
+  r->cfReadFd      = nrzReadFd;
+#endif
+
 #ifdef LDEBUG
   r->cfDBTest      = nrnDBTest;
 #endif
