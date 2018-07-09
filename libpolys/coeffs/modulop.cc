@@ -265,7 +265,7 @@ void npPower (number a, int i, number * result, const coeffs r)
 
 static inline const char* npEati(const char *s, int *i, const coeffs r)
 {
-  return nEati((char *)s,i,r->ch);
+  return nEati((char *)s,i,(int)r->ch);
 }
 
 const char * npRead (const char *s, number *a, const coeffs r)

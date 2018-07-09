@@ -10,6 +10,7 @@
 #include <stdlib.h>
 
 #include "misc/auxiliary.h"
+#include "misc/mylimits.h"
 #include "omalloc/omalloc.h"
 #include "factory/factory.h"
 
@@ -638,10 +639,10 @@ char* nEati(char *s, int *i, int m)
     {
       ii *= 10;
       ii += *s++ - '0';
-      if ((m!=0) && (ii>m)) ii=ii%m;
+      if ((m!=0) && (ii > (MAX_INT_VAL / 10))) ii = ii % m;
     }
     while (((*s) >= '0') && ((*s) <= '9'));
-    if ((m!=0) && (ii>m)) ii=ii%m;
+    if ((m!=0) && (ii>=m)) ii=ii%m;
     *i=(int)ii;
   }
   else (*i) = 1;
