@@ -300,9 +300,11 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h, char ***list_of_libs)
     // do not dump the default CRINGs:
     if (strcmp(IDID(h),"QQ")==0) return FALSE;
     if (strcmp(IDID(h),"ZZ")==0) return FALSE;
+    #ifdef SINGULAR_4_2
     if (strcmp(IDID(h),"AE")==0) return FALSE;
     if (strcmp(IDID(h),"QAE")==0) return FALSE;
-    if (strcmp(IDID(h),"flint_poly_Q")==0) return FALSE;
+    #endif
+    if (strcmp(IDID(h),"flintQ")==0) return FALSE;
   }
 
   // we do not throw an error if a wrong type was attempted to be dumped

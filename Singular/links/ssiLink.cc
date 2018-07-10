@@ -2028,6 +2028,18 @@ static BOOLEAN DumpSsiIdhdl(si_link l, idhdl h)
   if ((type_id == RING_CMD) && (strncmp(IDID(h),"ssiRing",7)==0))
     return FALSE;
 
+  // do not dump default cring:
+  if (type_id == CRING_CMD)
+  {
+    if (strcmp(IDID(h),"ZZ")==0) return FALSE;
+    if (strcmp(IDID(h),"QQ")==0) return FALSE;
+    #ifdef SINGULAR_4_2
+    if (strcmp(IDID(h),"AE")==0) return FALSE;
+    if (strcmp(IDID(h),"QAE")==0) return FALSE;
+    #endif
+    if (strcmp(IDID(h),"flintQ")==0) return FALSE;
+  }
+
   command D=(command)omAlloc0(sizeof(*D));
   sleftv tmp;
   memset(&tmp,0,sizeof(tmp));
