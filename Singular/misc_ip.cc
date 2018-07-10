@@ -1225,14 +1225,8 @@ static BOOLEAN ii_pAE_init(leftv res,leftv a)
 static n_coeffType n_FlintZn=n_unknown;
 static BOOLEAN ii_FlintZn_init(leftv res,leftv a)
 {
-  if ((a->Typ()!=INT_CMD)
-  ||(a->next==NULL)
-  ||(a->next->Typ()!=STRING_CMD))
-  {
-    WerrorS("`int`i,`string` expected");
-    return TRUE;
-  }
-  else
+  const short t[]={2,INT_CMD,STRING_CMD};
+  if (iiCheckTypes(a,t,1))
   {
     flintZn_struct p;
     p.ch=(int)(long)a->Data();
@@ -1241,6 +1235,7 @@ static BOOLEAN ii_FlintZn_init(leftv res,leftv a)
     res->data=(void*)nInitChar(n_FlintZn,(void*)&p);
     return FALSE;
   }
+  return TRUE;
 }
 #endif
 
@@ -1440,13 +1435,14 @@ void siInit(char *name)
     t=nRegister(n_unknown,flintQ_InitChar);
     if (t!=n_unknown)
     {
-      h=enterid("flint_poly_Q",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+      h=enterid("flintQ",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
       IDDATA(h)=(char*)nInitChar(t,NULL);
     }
     n_FlintZn=nRegister(n_unknown,flintZn_InitChar);
     if (n_FlintZn!=n_unknown)
     {
-      iiAddCproc("kernel","flintZ",FALSE,ii_FlintZn_init);
+      iiAddCproc("kernel","flintZn",FALSE,ii_FlintZn_init);
+      nRegisterCfByName(flintZnInitCfByName,n_FlintZn);
     }
     #endif
   }

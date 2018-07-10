@@ -427,8 +427,29 @@ static char * CoeffName(const coeffs r)
 static char* CoeffString(const coeffs r)
 {
   char *buf=(char*)omAlloc(12+10 /*ch*/+strlen(r->pParameterNames[0]));
-  sprintf(buf,"flintZ(%d,\"%s\")",r->ch,r->pParameterNames[0]);
+  sprintf(buf,"flintZn(%d,\"%s\")",r->ch,r->pParameterNames[0]);
   return buf;
+}
+coeffs flintZnInitCfByName(char *s,n_coeffType n)
+{
+  const char start[]="flint:Z/";
+  const int start_len=strlen(start);
+  if (strncmp(s,start,start_len)==0)
+  {
+    s+=start_len;
+    int p;
+    char st[10];
+    int l=sscanf(s,"%d[%s",&p,&st);
+    if (l==2)
+    {
+      flintZn_struct info;
+      info.ch=p;
+      while (st[strlen(st)-1]==']') st[strlen(st)-1]='\0';
+      info.name=st;
+      return nInitChar(n,(void*)&info);
+    }
+  }
+  return NULL;
 }
 static void WriteFd(number a, const ssiInfo *d, const coeffs)
 {
@@ -479,8 +500,8 @@ BOOLEAN flintZn_InitChar(coeffs cf, void * infoStruct)
   cf->cfAdd          = Add;
   cf->cfDiv          = Div;
   cf->cfExactDiv     = ExactDiv; // ???
-  cf->cfInit         =Init;
-  cf->cfInitMPZ      =InitMPZ;
+  cf->cfInit         = Init;
+  cf->cfInitMPZ      = InitMPZ;
   cf->cfSize         = Size;
   cf->cfInt          = Int;
   cf->cfMPZ          = MPZ;

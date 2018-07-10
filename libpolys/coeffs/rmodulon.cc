@@ -57,8 +57,9 @@ static void nrnCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 
 coeffs nrnInitCfByName(char *s,n_coeffType n)
 {
-  const int start_len=strlen("ZZ/bigint(");
-  if (strncmp(s,"ZZ/bigint(",start_len)==0)
+  const char start[]="ZZ/bigint(";
+  const int start_len=strlen(start);
+  if (strncmp(s,start,start_len)==0)
   {
     s+=start_len;
     mpz_t z;
