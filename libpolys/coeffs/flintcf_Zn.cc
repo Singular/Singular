@@ -439,7 +439,7 @@ coeffs flintZnInitCfByName(char *s,n_coeffType n)
     s+=start_len;
     int p;
     char st[10];
-    int l=sscanf(s,"%d[%s",&p,&st);
+    int l=sscanf(s,"%d[%s",&p,st);
     if (l==2)
     {
       flintZn_struct info;
