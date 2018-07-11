@@ -17,5 +17,23 @@ def h2=read(l2);
 h2;
 basering;
 listvar();
+close(l2);
+
+ring r3=flintQ("bb"),x,dp;
+poly p=x+11+bb;
+p;
+write(l1,p);
+ring r4=flintZn(29,"a"),x,dp;
+poly p=x+11+a;
+p;
+write(l1,p);
+close(l1);
+def h3=read(l2);
+h3;
+basering;
+def h4=read(l2);
+h4;
+basering;
+close(l2);
 
 tst_status(1);$

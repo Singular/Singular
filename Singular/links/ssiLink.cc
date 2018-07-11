@@ -2037,7 +2037,6 @@ static BOOLEAN DumpSsiIdhdl(si_link l, idhdl h)
     if (strcmp(IDID(h),"AE")==0) return FALSE;
     if (strcmp(IDID(h),"QAE")==0) return FALSE;
     #endif
-    if (strcmp(IDID(h),"flintQ")==0) return FALSE;
   }
 
   command D=(command)omAlloc0(sizeof(*D));

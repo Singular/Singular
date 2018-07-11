@@ -1223,6 +1223,7 @@ static BOOLEAN ii_pAE_init(leftv res,leftv a)
 #endif
 #ifdef HAVE_FLINT
 static n_coeffType n_FlintZn=n_unknown;
+static n_coeffType n_FlintQ=n_unknown;
 static BOOLEAN ii_FlintZn_init(leftv res,leftv a)
 {
   const short t[]={2,INT_CMD,STRING_CMD};
@@ -1233,6 +1234,19 @@ static BOOLEAN ii_FlintZn_init(leftv res,leftv a)
     p.name=(char*)a->next->Data();
     res->rtyp=CRING_CMD;
     res->data=(void*)nInitChar(n_FlintZn,(void*)&p);
+    return FALSE;
+  }
+  return TRUE;
+}
+static BOOLEAN ii_FlintQ_init(leftv res,leftv a)
+{
+  const short t[]={1,STRING_CMD};
+  if (iiCheckTypes(a,t,1))
+  {
+    char* p;
+    p=(char*)a->Data();
+    res->rtyp=CRING_CMD;
+    res->data=(void*)nInitChar(n_FlintQ,(void*)p);
     return FALSE;
   }
   return TRUE;
@@ -1432,11 +1446,11 @@ void siInit(char *name)
     }
 #endif
     #ifdef HAVE_FLINT
-    t=nRegister(n_unknown,flintQ_InitChar);
-    if (t!=n_unknown)
+    n_FlintQ=nRegister(n_unknown,flintQ_InitChar);
+    if (n_FlintQ!=n_unknown)
     {
-      h=enterid("flintQ",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
-      IDDATA(h)=(char*)nInitChar(t,NULL);
+      iiAddCproc("kernel","flintQ",FALSE,ii_FlintQ_init);
+      nRegisterCfByName(flintQInitCfByName,n_FlintQ);
     }
     n_FlintZn=nRegister(n_unknown,flintZn_InitChar);
     if (n_FlintZn!=n_unknown)

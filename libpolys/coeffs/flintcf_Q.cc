@@ -44,10 +44,6 @@ static char * nlEatLong(char *s, mpz_ptr i)
   return s;
 }
 
-static void CoeffWrite(const coeffs r, BOOLEAN details)
-{
-  PrintS("flint fmpq_poly");
-}
 static BOOLEAN CoeffIsEqual(const coeffs r, n_coeffType n, void * parameter)
 {
   return (r->type==n);
@@ -525,11 +521,37 @@ static CanonicalForm ConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs 
 }
 char * CoeffName(const coeffs r)
 {
-  return (char*)"flint:Q[a]";
+  static char CoeffName_flint_Q[20];
+  sprintf(CoeffName_flint_Q,"flint:QQ[%s]",r->pParameterNames[0]);
+  return (char*)CoeffName_flint_Q;
+
 }
 static char* CoeffString(const coeffs r)
 {
-  return omStrDup(CoeffName(r));
+  char *buf=(char*)omAlloc(12+strlen(r->pParameterNames[0]));
+  sprintf(buf,"flintQ(\"%s\")",r->pParameterNames[0]);
+  return buf;
+}
+static void CoeffWrite(const coeffs r, BOOLEAN details)
+{
+  PrintS(CoeffName(r));
+}
+coeffs flintQInitCfByName(char *s,n_coeffType n)
+{
+  const char start[]="flint:QQ[";
+  const int start_len=strlen(start);
+  if (strncmp(s,start,start_len)==0)
+  {
+    s+=start_len;
+    char st[10];
+    int l=sscanf(s,"%s",st);
+    if (l==1)
+    {
+      while (st[strlen(st)-1]==']') st[strlen(st)-1]='\0';
+      return nInitChar(n,(void*)st);
+    }
+  }
+  return NULL;
 }
 #ifdef LDEBUG
 static BOOLEAN DBTest(number a, const char *f, const int l, const coeffs r)
@@ -539,6 +561,7 @@ static BOOLEAN DBTest(number a, const char *f, const int l, const coeffs r)
 #endif
 BOOLEAN flintQ_InitChar(coeffs cf, void * infoStruct)
 {
+  char *pp=(char*)infoStruct;
   cf->cfCoeffString  = CoeffString;
   cf->cfCoeffName    = CoeffName;
   cf->cfCoeffWrite   = CoeffWrite;
@@ -604,7 +627,7 @@ BOOLEAN flintQ_InitChar(coeffs cf, void * infoStruct)
 
   cf->iNumberOfParameters = 1;
   char **pn=(char**)omAlloc0(sizeof(char*));
-  pn[0]=(char*)omStrDup("a");
+  pn[0]=omStrDup(pp);
   cf->pParameterNames = (const char **)pn;
   cf->has_simple_Inverse= FALSE;
   cf->has_simple_Alloc= FALSE;

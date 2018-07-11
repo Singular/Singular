@@ -304,7 +304,6 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h, char ***list_of_libs)
     if (strcmp(IDID(h),"AE")==0) return FALSE;
     if (strcmp(IDID(h),"QAE")==0) return FALSE;
     #endif
-    if (strcmp(IDID(h),"flintQ")==0) return FALSE;
   }
 
   // we do not throw an error if a wrong type was attempted to be dumped

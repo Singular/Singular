@@ -12,6 +12,8 @@
 #include "misc/auxiliary.h"
 #ifdef HAVE_FLINT
 BOOLEAN flintQ_InitChar(coeffs cf, void * infoStruct);
+
+coeffs flintQInitCfByName(char *s,n_coeffType n);
 #endif
 
 #endif
