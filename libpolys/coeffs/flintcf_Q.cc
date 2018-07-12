@@ -557,7 +557,7 @@ static BOOLEAN DBTest(number a, const char *f, const int l, const coeffs r)
 #endif
 static void KillChar(coeffs cf)
 {
-  omFree(cf->pParameterNames[0]);
+  omFree((ADDRESS)(cf->pParameterNames[0]));
   omFreeSize(cf->pParameterNames,sizeof(char*));
 }
 BOOLEAN flintQ_InitChar(coeffs cf, void * infoStruct)
