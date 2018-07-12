@@ -48,10 +48,6 @@ static BOOLEAN CoeffIsEqual(const coeffs r, n_coeffType n, void * parameter)
 {
   return (r->type==n);
 }
-static void KillChar(coeffs r)
-{
-  // not yet
-}
 static void SetChar(const coeffs r)
 {
   // dummy
@@ -559,6 +555,11 @@ static BOOLEAN DBTest(number a, const char *f, const int l, const coeffs r)
   return TRUE;
 }
 #endif
+static void KillChar(coeffs cf)
+{
+  omFree(cf->pParameterNames[0]);
+  omFreeSize(cf->pParameterNames,sizeof(char*));
+}
 BOOLEAN flintQ_InitChar(coeffs cf, void * infoStruct)
 {
   char *pp=(char*)infoStruct;

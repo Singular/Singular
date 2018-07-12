@@ -57,9 +57,10 @@ static BOOLEAN CoeffIsEqual(const coeffs r, n_coeffType n, void * parameter)
           &&(r->pParameterNames!=NULL)
           &&(strcmp(r->pParameterNames[0],pp->name)==0);
 }
-static void KillChar(coeffs r)
+static void KillChar(coeffs cf)
 {
-  // not yet
+  omFree(cf->pParameterNames[0]);
+  omFreeSize(cf->pParameterNames,sizeof(char*));
 }
 static void SetChar(const coeffs r)
 {
