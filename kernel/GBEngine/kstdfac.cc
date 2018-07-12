@@ -574,7 +574,7 @@ ideal bbafac (ideal /*F*/, ideal Q,intvec */*w*/,kStrategy strat, ideal_list FL)
           }
         }
       }
-      if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
+      kDeleteLcm(&strat->P);
       int i;
 
       for(i=IDELEMS(fac)-1;i>=0;i--)

@@ -1153,13 +1153,7 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
 {
   if (set[j].lcm!=NULL)
   {
-#ifdef HAVE_RINGS
-    if (rField_is_Ring(currRing)
-    && (pGetCoeff(set[j].lcm) != NULL))
-      pLmDelete(set[j].lcm);
-    else
-#endif
-      pLmFree(set[j].lcm);
+    kDeleteLcm(&set[j]);
   }
   if (set[j].sig!=NULL)
   {

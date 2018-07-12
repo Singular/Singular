@@ -101,7 +101,7 @@ int redGrFirst (LObject* h,kStrategy strat)
 #endif
       if ((*h).p == NULL)
       {
-        if (h->lcm!=NULL) p_LmFree((*h).lcm, currRing);
+        kDeleteLcm(h);
         return 0;
       }
       if (TEST_OPT_INTSTRATEGY)
@@ -285,7 +285,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
 #endif
         if ((*h).p == NULL)
         {
-          if (h->lcm!=NULL) p_LmFree((*h).lcm, currRing);
+          kDeleteLcm(h);
           return 0;
         }
         ratGB_divide_out((*h).p);
@@ -398,8 +398,7 @@ static int nc_redHomog (LObject* h,kStrategy strat)
       if ((*h).p == NULL)
       {
         if (TEST_OPT_DEBUG) PrintS(" to 0\n");
-        if (h->lcm!=NULL) pLmFree((*h).lcm);
-        (*h).lcm=NULL;
+        kDeleteLcm(h);
         return 0;
       }
 /*
@@ -465,8 +464,7 @@ static int nc_redHomog0 (LObject* h,kStrategy strat)
       if ((*h).p == NULL)
       {
         if (TEST_OPT_DEBUG) PrintS(" to 0\n");
-        if (h->lcm!=NULL) pLmFree((*h).lcm);
-        (*h).lcm=NULL;
+        kDeleteLcm(h);
         return 0;
       }
       else
@@ -547,8 +545,7 @@ static int nc_redLazy (LObject* h,kStrategy strat)
       if ((*h).p == NULL)
       {
         if (TEST_OPT_DEBUG) PrintS(" to 0\n");
-        if (h->lcm!=NULL) pLmFree((*h).lcm);
-        (*h).lcm=NULL;
+        kDeleteLcm(h);
         return 0;
       }
 //      else if (strat->syzComp)
@@ -724,8 +721,7 @@ static int nc_redHoney (LObject*  h,kStrategy strat)
       }
       if ((*h).p == NULL)
       {
-        if (h->lcm!=NULL) pLmFree((*h).lcm);
-        (*h).lcm=NULL;
+        kDeleteLcm(h);
         return 0;
       }
       if (TEST_OPT_INTSTRATEGY)
@@ -869,11 +865,7 @@ static int nc_redBest (LObject*  h,kStrategy strat)
               {
                 pLmFree(p);
                 pDelete(&((*h).p));
-                if (h->lcm!=NULL)
-                {
-                  pLmFree((*h).lcm);
-                  (*h).lcm=NULL;
-                }
+                kDeleteLcm(h);
                 return 0;
               }
               else if (pLmCmp(ph,p) == -1)
@@ -894,12 +886,7 @@ static int nc_redBest (LObject*  h,kStrategy strat)
       }
       else
       {
-        if (h->lcm!=NULL)
-        {
-          pLmFree((*h).lcm);
-          (*h).lcm=NULL;
-        }
-        (*h).p = NULL;
+        kDeleteLcm(h);
         return 0;
       }
       if (strat->honey && currRing->pLexOrder)
@@ -1244,11 +1231,8 @@ ideal k_gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *,
         }
 //      if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
       }
-      if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
+      kDeleteLcm(&strat->P);
     }
-#ifdef KDEBUG
-    strat->P.lcm=NULL;
-#endif
     //kTest(strat);
   }
   if (TEST_OPT_DEBUG) messageSets(strat);

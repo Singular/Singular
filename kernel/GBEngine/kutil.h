@@ -840,4 +840,18 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 extern  int (*test_PosInT)(const TSet T,const int tl,LObject &h);
 extern  int (*test_PosInL)(const LSet set, const int length,
                 LObject* L,const kStrategy strat);
+
+static inline void kDeleteLcm(LObject *P)
+{
+ if (P->lcm!=NULL)
+ {
+ #ifdef HAVE_RINGS
+   if (rField_is_Ring(currRing))
+     pLmDelete(P->lcm);
+   else
+ #endif
+     pLmFree(P->lcm);
+   P->lcm=NULL;
+ }
+}
 #endif

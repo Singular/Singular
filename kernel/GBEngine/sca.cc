@@ -85,7 +85,7 @@ void addLObject(LObject& h, kStrategy& strat)
     strat->enterS(h, pos, strat, -1);
 //    enterT(h, strat); // ?!
 
-    if (h.lcm!=NULL) pLmFree(h.lcm);
+    kDeleteLcm(&h);
   }
 
 
@@ -680,7 +680,7 @@ ideal k_sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec
 //       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 
 //      Print("[%d]",hilbeledeg);
-      if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
+      kDeleteLcm(&strat->P);
 
       // //////////////////////////////////////////////////////////
       // SCA:
@@ -1108,8 +1108,7 @@ ideal k_sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const intvec
 
 
       // clear strat->P
-      if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
-      strat->P.lcm=NULL;
+      kDeleteLcm(&strat->P);
 
       // //////////////////////////////////////////////////////////
       // SCA:
