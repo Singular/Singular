@@ -2015,7 +2015,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       strat->P.PrepareRed(strat->use_buckets);
     }
 
-    if (strat->P.p == NULL && strat->P.t_p == NULL)
+    if ((strat->P.p == NULL) && (strat->P.t_p == NULL))
     {
       red_result = 0;
     }
@@ -2868,7 +2868,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if(strat->sbaOrder == 0 || strat->sbaOrder == 3)
       {
         int cmp     = pGetComp(strat->P.sig);
-        int max_cmp = IDELEMS(F);
+        unsigned max_cmp = IDELEMS(F);
         int* vv = (int*)omAlloc((currRing->N+1)*sizeof(int));
         p_GetExpV (strat->P.p,vv,currRing);
         LObject Q;
@@ -2895,7 +2895,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         {
           // if the element is not the first one in the given index we build all
           // possible syzygies with elements of higher index
-          for (int i=cmp+1; i<=max_cmp; ++i)
+          for (unsigned i=cmp+1; i<=max_cmp; ++i)
           {
             pos = -1;
             for (int j=0; j<strat->sl; ++j)
