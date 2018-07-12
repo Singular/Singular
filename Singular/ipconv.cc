@@ -64,7 +64,7 @@ static void * iiBI2P(void *data)
 
 static void iiBu2P(leftv out, leftv in)
 {
-  sBucket_pt b=(sBucket_pt)in->Data();
+  sBucket_pt b=(sBucket_pt)in->CopyD();
   poly p; int l;
   sBucketDestroyAdd(b,&p,&l);
   out->data=(void*)p;
