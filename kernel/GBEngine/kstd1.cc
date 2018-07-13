@@ -992,10 +992,8 @@ BOOLEAN hasPurePower (LObject *L,int last, int *length,kStrategy strat)
 {
   if (L->bucket != NULL)
   {
-    poly p = L->CanonicalizeP();
-    BOOLEAN ret = hasPurePower(p, last, length, strat);
-    pNext(p) = NULL;
-    return ret;
+    poly p = L->GetP();
+    return hasPurePower(p, last, length, strat);
   }
   else
   {

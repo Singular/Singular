@@ -219,7 +219,7 @@ public:
 
   // does not delete bucket, just canonicalizes it
   // returned poly is such that Lm(p) \in currRing, Tail(p) \in tailRing
-  KINLINE poly CanonicalizeP();
+  KINLINE void CanonicalizeP();
 
   // makes a copy of the poly of L
   KINLINE void Copy();
