@@ -24,14 +24,19 @@ static void update_variables(std::vector<bool> &variables, const ideal L)
     const ring R = currRing;
     const int l = L->ncols-1;
     int k;
-    for (int j = R->N; j > 0; j--) {
-        if (variables[j-1]) {
-            for (k = l; k >= 0; k--) {
-                if (p_GetExp(L->m[k], j, R) > 0) {
+    for (int j = R->N; j > 0; j--)
+    {
+        if (variables[j-1])
+        {
+            for (k = l; k >= 0; k--)
+            {
+                if (p_GetExp(L->m[k], j, R) > 0)
+                {
                     break;
                 }
             }
-            if (k < 0) {   // no break
+            if (k < 0)
+            {   // no break
                 variables[j-1] = false;
             }
         }
@@ -48,11 +53,14 @@ static inline bool check_variables(const std::vector<bool> &variables,
     const ring R = currRing;
     // variables[R->N] is true iff index == 1, that is, for the first step in
     // the resolution
-    if (unlikely(variables[R->N])) {
+    if (UNLIKELY(variables[R->N]))
+    {
         return true;
     }
-    for (int j = R->N; j > 0; j--) {
-        if (unlikely(variables[j-1] && p_GetExp(m, j, R) > 0)) {
+    for (int j = R->N; j > 0; j--)
+    {
+        if (UNLIKELY(variables[j-1] && p_GetExp(m, j, R) > 0))
+        {
             return true;
         }
     }
@@ -77,11 +85,13 @@ static void initialize_hash(lt_struct **C, const ideal L)
     unsigned int *count
         = (unsigned int *)omAlloc0((L->rank+1)*sizeof(unsigned int));
     unsigned long k = 0;
-    while (k < n_elems) {
+    while (k < n_elems)
+    {
         count[__p_GetComp(L->m[k], R)]++;
         k++;
     }
-    for (int i = 0; i <= L->rank; i++) {
+    for (int i = 0; i <= L->rank; i++)
+    {
         // do ++count[i] and use C[i][0].comp to save count[i]
         C[i] = (lt_struct *)omalloc0((++count[i])*sizeof(lt_struct));
         C[i][0].comp = count[i];
@@ -89,7 +99,8 @@ static void initialize_hash(lt_struct **C, const ideal L)
     k = n_elems;
     // the order of the elements in each C[i] matters if check_variables() is
     // to be used
-    while (k > 0) {
+    while (k > 0)
+    {
         const poly a = L->m[k-1];
         const unsigned long comp = __p_GetComp(a, R);
         C[comp][--count[comp]]
@@ -111,16 +122,19 @@ static poly find_reducer(const poly multiplier, const poly t,
     const ring r = currRing;
     const lt_struct *v = hash_previous_module[__p_GetComp(t, r)];
     unsigned long count = v[0].comp;
-    if (unlikely(count == 1)) {
+    if (UNLIKELY(count == 1))
+    {
         return NULL;
     }
     const poly q = p_New(r);
     pNext(q) = NULL;
     p_MemSum_LengthGeneral(q->exp, multiplier->exp, t->exp, r->ExpL_Size);
     const unsigned long q_not_sev = ~p_GetShortExpVector(q, r);
-    for(unsigned long i = 1; i < count; i++) {
-        if (likely(v[i].sev & q_not_sev)
-                || unlikely(!(_p_LmDivisibleByNoComp(v[i].lt, q, r)))) {
+    for(unsigned long i = 1; i < count; i++)
+    {
+        if (LIKELY(v[i].sev & q_not_sev)
+                || UNLIKELY(!(_p_LmDivisibleByNoComp(v[i].lt, q, r))))
+                {
             continue;
         }
         p_MemAdd_NegWeightAdjust(q, r);
@@ -154,13 +168,15 @@ static poly reduce_term(const poly multiplier, const poly term,
         const bool use_cache)
 {
     poly s = find_reducer(multiplier, term, hash_previous_module);
-    if (s == NULL) {
+    if (s == NULL)
+    {
         return NULL;
     }
     const ring r = currRing;
     const int c = __p_GetComp(s, r) - 1;
     poly t;
-    if (use_cache) {
+    if (use_cache)
+    {
         t = traverse_tail(s, c, previous_module, variables,
                 hash_previous_module);
     } else {
@@ -180,11 +196,13 @@ static poly compute_image(const poly multiplier, const int comp,
         const bool use_cache)
 {
     const poly tail = previous_module->m[comp]->next;
-    if (unlikely(tail == NULL) || !check_variables(variables, multiplier)) {
+    if (UNLIKELY(tail == NULL) || !check_variables(variables, multiplier))
+    {
         return NULL;
     }
     sBucket_pt sum = sBucketCreate(currRing);
-    for (poly p = tail; p != NULL; p = pNext(p)) {
+    for (poly p = tail; p != NULL; p = pNext(p))
+    {
         const poly rt = reduce_term(multiplier, p, previous_module, variables,
                 hash_previous_module, use_cache);
         sBucket_Add_p(sum, rt, pLength(rt));
@@ -220,9 +238,11 @@ static void initialize_cache(const int size)
 static void delete_cache(const int size)
 {
     const ring r = currRing;
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++)
+    {
         cache_term *T = &(Cache[i]);
-        for (cache_term::iterator itr = T->begin(); itr != T->end(); ++itr) {
+        for (cache_term::iterator itr = T->begin(); itr != T->end(); ++itr)
+        {
             p_Delete(&(itr->second), r);
             p_Delete(const_cast<poly*>(&(itr->first)), r);
         }
@@ -241,12 +261,14 @@ static void insert_into_cache_term(cache_term *T, const poly multiplier,
 static poly get_from_cache_term(const cache_term::const_iterator itr,
         const poly multiplier)
 {
-    if (likely(itr->second == NULL)) {
+    if (LIKELY(itr->second == NULL))
+    {
         return NULL;
     }
     const ring r = currRing;
     poly p = p_Copy(itr->second, r);
-    if (likely(!n_Equal(pGetCoeff(multiplier), pGetCoeff(itr->first), r))) {
+    if (LIKELY(!n_Equal(pGetCoeff(multiplier), pGetCoeff(itr->first), r)))
+    {
         number n = n_Div(pGetCoeff(multiplier), pGetCoeff(itr->first), r);
         p = p_Mult_nn(p, n, r);
         n_Delete(&n, r);
@@ -260,7 +282,8 @@ static poly traverse_tail(const poly multiplier, const int comp,
 {
     cache_term *T = &(Cache[comp]);
     cache_term::const_iterator itr = T->find(multiplier);
-    if (likely(itr != T->end())) {
+    if (LIKELY(itr != T->end()))
+    {
         return get_from_cache_term(itr, multiplier);
     }
     poly p = compute_image(multiplier, comp, previous_module, variables,
@@ -282,7 +305,8 @@ static poly lift_ext_LT(const poly a, const ideal previous_module,
     poly t1 = compute_image(a, __p_GetComp(a, R)-1, previous_module, variables,
             hash_previous_module, use_cache);
     poly t2;
-    if (use_cache) {
+    if (use_cache)
+    {
         t2 = traverse_tail(a->next, __p_GetComp(a->next, R)-1,
                 previous_module, variables, hash_previous_module);
     } else {
@@ -305,13 +329,18 @@ static void id_DelDiv_no_test(ideal id)
     const ring r = currRing;
     int i, j;
     int k = id->ncols-1;
-    for (i = k; i >= 0; i--) {
-        for (j = k; j > i; j--) {
-            if (id->m[j] != NULL) {
-                if (p_DivisibleBy(id->m[i], id->m[j], r)) {
+    for (i = k; i >= 0; i--)
+    {
+        for (j = k; j > i; j--)
+        {
+            if (id->m[j] != NULL)
+            {
+                if (p_DivisibleBy(id->m[i], id->m[j], r))
+                {
                     p_Delete(&id->m[j], r);
                 }
-                else if (p_DivisibleBy(id->m[j], id->m[i], r)) {
+                else if (p_DivisibleBy(id->m[j], id->m[i], r))
+                {
                     p_Delete(&id->m[i], r);
                     break;
                 }
@@ -333,7 +362,8 @@ static poly syzHeadFrame(const ideal G, const int i, const int j)
     poly head = p_Init(r);
     pSetCoeff0(head, n_Init(1, r->cf));
     long exp_i, exp_j, lcm;
-    for (int k = (int)r->N; k > 0; k--) {
+    for (int k = (int)r->N; k > 0; k--)
+    {
         exp_i = p_GetExp(f_i, k, r);
         exp_j = p_GetExp(f_j, k, r);
         lcm = si_max(exp_i, exp_j);
@@ -359,7 +389,8 @@ static poly syzHeadExtFrame(const ideal G, const int i, const int j)
     pSetCoeff0(head_ext, n_InpNeg(n_Div(pGetCoeff(f_i), pGetCoeff(f_j), r->cf),
                 r->cf));
     long exp_i, exp_j, lcm;
-    for (int k = (int)r->N; k > 0; k--) {
+    for (int k = (int)r->N; k > 0; k--)
+    {
         exp_i = p_GetExp(f_i, k, r);
         exp_j = p_GetExp(f_j, k, r);
         lcm = si_max(exp_i, exp_j);
@@ -388,14 +419,18 @@ static ideal syzM_i_unsorted(const ideal G, const int i,
     ideal M_i = NULL;
     unsigned long comp = __p_GetComp(G->m[i], r);
     int ncols = 0;
-    for (int j = i-1; j >= 0; j--) {
+    for (int j = i-1; j >= 0; j--)
+    {
         if (__p_GetComp(G->m[j], r) == comp) ncols++;
     }
-    if (ncols > 0) {
+    if (ncols > 0)
+    {
         M_i = idInit(ncols, G->ncols);
         int k = ncols-1;
-        for (int j = i-1; j >= 0; j--) {
-            if (__p_GetComp(G->m[j], r) == comp) {
+        for (int j = i-1; j >= 0; j--)
+        {
+            if (__p_GetComp(G->m[j], r) == comp)
+            {
                 M_i->m[k] = syzHead(G, i, j);
                 k--;
             }
@@ -421,9 +456,11 @@ static ideal syzM_i_sorted(const ideal G, const int i,
     while (__p_GetComp(G->m[index], r) == comp) index--;
     index++;
     int ncols = i-index;
-    if (ncols > 0) {
+    if (ncols > 0)
+    {
         M_i = idInit(ncols, G->ncols);
-        for (int j = ncols-1; j >= 0; j--) {
+        for (int j = ncols-1; j >= 0; j--)
+        {
             M_i->m[j] = syzHead(G, i, j+index);
         }
         id_DelDiv_no_test(M_i);
@@ -438,17 +475,22 @@ static ideal syzM_i_sorted(const ideal G, const int i,
 static ideal idConcat(const ideal *M, const int size, const int rank)
 {
     int ncols = 0;
-    for (int i = size-1; i >= 0; i--) {
-        if (M[i] != NULL) {
+    for (int i = size-1; i >= 0; i--)
+    {
+        if (M[i] != NULL)
+        {
             ncols += M[i]->ncols;
         }
     }
     if (ncols == 0) return idInit(1, rank);
     ideal result = idInit(ncols, rank);
     int k = ncols-1;
-    for (int i = size-1; i >= 0; i--) {
-        if (M[i] != NULL) {
-            for (int j = M[i]->ncols-1; j >= 0; j--) {
+    for (int i = size-1; i >= 0; i--)
+    {
+        if (M[i] != NULL)
+        {
+            for (int j = M[i]->ncols-1; j >= 0; j--)
+            {
                 result->m[k] = M[i]->m[j];
                 k--;
             }
@@ -481,9 +523,11 @@ static int compare_lex(const poly p_a, const poly p_b)
     int exp_b[r->N+1];
     p_GetExpV(p_a, exp_a, r);
     p_GetExpV(p_b, exp_b, r);
-    for (int i = r->N; i > 0; i--) {
+    for (int i = r->N; i > 0; i--)
+    {
         cmp = (exp_a[i] > exp_b[i]) - (exp_a[i] < exp_b[i]);
-        if (cmp != 0) {
+        if (cmp != 0)
+        {
             return cmp;
         }
     }
@@ -497,7 +541,8 @@ static int compare_Mi(const void* a, const void *b)
     int cmp;
     if ((cmp = compare_comp(p_a, p_b))
             || (cmp = compare_deg(p_a, p_b))
-            || (cmp = compare_lex(p_a, p_b))) {
+            || (cmp = compare_lex(p_a, p_b)))
+            {
         return cmp;
     }
     return 0;
@@ -511,12 +556,15 @@ static ideal computeFrame(const ideal G, syzM_i_Function syzM_i,
         syzHeadFunction *syzHead)
 {
     ideal *M = (ideal *)omalloc((G->ncols-1)*sizeof(ideal));
-    for (int i = G->ncols-2; i >= 0; i--) {
+    for (int i = G->ncols-2; i >= 0; i--)
+    {
         M[i] = syzM_i(G, i+1, syzHead);
     }
     ideal frame = idConcat(M, G->ncols-1, G->ncols);
-    for (int i = G->ncols-2; i >= 0; i--) {
-        if (M[i] != NULL) {
+    for (int i = G->ncols-2; i >= 0; i--)
+    {
+        if (M[i] != NULL)
+        {
             omFreeSize(M[i]->m, M[i]->ncols*sizeof(poly));
             omFreeBin(M[i], sip_sideal_bin);
         }
@@ -532,21 +580,25 @@ static ideal computeFrame(const ideal G, syzM_i_Function syzM_i,
 static void computeLiftings(const resolvente res, const int index,
         const std::vector<bool> &variables, const bool use_cache)
 {
-    if (use_cache) {
+    if (use_cache)
+    {
         initialize_cache(res[index-1]->ncols);
     }
     lt_struct **hash_previous_module
         = (lt_struct **)omAlloc((res[index-1]->rank+1)*sizeof(lt_struct *));
     initialize_hash(hash_previous_module, res[index-1]);
-    for (int j = res[index]->ncols-1; j >= 0; j--) {
+    for (int j = res[index]->ncols-1; j >= 0; j--)
+    {
         res[index]->m[j]->next->next = lift_ext_LT(res[index]->m[j],
                 res[index-1], variables, hash_previous_module, use_cache);
     }
-    for (int i = 0; i <= res[index-1]->rank; i++) {
+    for (int i = 0; i <= res[index-1]->rank; i++)
+    {
         omfree(hash_previous_module[i]);
     }
     omFree(hash_previous_module);
-    if (use_cache) {
+    if (use_cache)
+    {
         delete_cache(res[index-1]->ncols);
     }
 }
@@ -558,8 +610,10 @@ static inline bool contains_unused_variable(const poly m,
     const std::vector<bool> &variables)
 {
     const ring R = currRing;
-    for (int j = R->N; j > 0; j--) {
-        if (!variables[j-1] && p_GetExp(m, j, R) > 0) {
+    for (int j = R->N; j > 0; j--)
+    {
+        if (!variables[j-1] && p_GetExp(m, j, R) > 0)
+        {
             return true;
         }
     }
@@ -573,11 +627,15 @@ static inline bool contains_unused_variable(const poly m,
 static void delete_variables(resolvente res, const int index,
     const std::vector<bool> &variables)
 {
-    for (int i = 0; i < res[index]->ncols; i++) {
+    for (int i = 0; i < res[index]->ncols; i++)
+    {
         poly p_iter = res[index]->m[i]->next;
-        if (p_iter != NULL) {
-            while (p_iter->next != NULL) {
-                if (contains_unused_variable(p_iter->next, variables)) {
+        if (p_iter != NULL)
+        {
+            while (p_iter->next != NULL)
+            {
+                if (contains_unused_variable(p_iter->next, variables))
+                {
                     pLmDelete(&p_iter->next);
                 } else {
                     pIter(p_iter);
@@ -590,8 +648,10 @@ static void delete_variables(resolvente res, const int index,
 static void delete_tails(resolvente res, const int index)
 {
     const ring r = currRing;
-    for (int i = 0; i < res[index]->ncols; i++) {
-        if (res[index]->m[i] != NULL) {
+    for (int i = 0; i < res[index]->ncols; i++)
+    {
+        if (res[index]->m[i] != NULL)
+        {
             p_Delete(&(res[index]->m[i]->next), r);
         }
     }
@@ -607,18 +667,23 @@ static int computeResolution_iteration(resolvente res, const int max_index,
         const bool use_tensor_trick, std::vector<bool> &variables)
 {
     int index = 1;
-    while (!idIs0(res[index])) {
-        if (do_lifting) {
+    while (!idIs0(res[index]))
+    {
+        if (do_lifting)
+        {
             computeLiftings(res, index, variables, use_cache);
-            if (single_module) {
+            if (single_module)
+            {
                 delete_tails(res, index-1);
             }
             // we don't know if the input is a reduced SB:
-            if (index == 1) {
+            if (index == 1)
+            {
                 variables[currRing->N] = false;
             }
             update_variables(variables, res[index]);
-            if (use_tensor_trick) {
+            if (use_tensor_trick)
+            {
                 delete_variables(res, index, variables);
             }
         }
@@ -638,19 +703,23 @@ static int computeResolution(resolvente res, const int max_index,
         const bool single_module, const bool use_cache,
         const bool use_tensor_trick)
 {
-    if (idIs0(res[0])) {
+    if (idIs0(res[0]))
+    {
         return 1;
     }
     std::vector<bool> variables;
     variables.resize(currRing->N+1, true);
-    if (do_lifting) {
+    if (do_lifting)
+    {
         update_variables(variables, res[0]);
-        if (use_tensor_trick) {
+        if (use_tensor_trick)
+        {
             delete_variables(res, 0, variables);
         }
     }
     int index = 0;
-    if (max_index > 0) {
+    if (max_index > 0)
+    {
         res[1] = computeFrame(res[0], syzM_i_unsorted, syzHead);
         index = computeResolution_iteration(res, max_index, syzHead,
                 do_lifting, single_module, use_cache, use_tensor_trick,
@@ -663,22 +732,26 @@ static int computeResolution(resolvente res, const int max_index,
 static void set_options(syzHeadFunction **syzHead_ptr, bool *do_lifting_ptr,
         bool *single_module_ptr, const char *method)
 {
-    if (strcmp(method, "complete") == 0) {   // default
+    if (strcmp(method, "complete") == 0)
+    {   // default
         *syzHead_ptr = syzHeadExtFrame;
         *do_lifting_ptr = true;
         *single_module_ptr = false;
     }
-    else if (strcmp(method, "frame") == 0) {
+    else if (strcmp(method, "frame") == 0)
+    {
         *syzHead_ptr = syzHeadFrame;
         *do_lifting_ptr = false;
         *single_module_ptr = false;
     }
-    else if (strcmp(method, "extended frame") == 0) {
+    else if (strcmp(method, "extended frame") == 0)
+    {
         *syzHead_ptr = syzHeadExtFrame;
         *do_lifting_ptr = false;
         *single_module_ptr = false;
     }
-    else if (strcmp(method, "single module") == 0) {
+    else if (strcmp(method, "single module") == 0)
+    {
         *syzHead_ptr = syzHeadExtFrame;
         *do_lifting_ptr = true;
         *single_module_ptr = true;
@@ -719,8 +792,10 @@ static void insert_ext_induced_LTs(const resolvente res, const int length,
     const ring R = currRing;
     poly p, q;
     int index = (single_module ? length-1 : 1);
-    while (index < length && !idIs0(res[index])) {
-        for (int j = res[index]->ncols-1; j >= 0; j--) {
+    while (index < length && !idIs0(res[index]))
+    {
+        for (int j = res[index]->ncols-1; j >= 0; j--)
+        {
             insert_first_term(res[index]->m[j]->next, p, q, R);
             insert_first_term(res[index]->m[j], p, q, R);
         }
@@ -750,9 +825,12 @@ syStrategy syFrank(const ideal arg, const int length, const char *method,
 {
     syStrategy result = (syStrategy)omAlloc0(sizeof(ssyStrategy));
     resolvente res = (resolvente)omAlloc0((length+1)*sizeof(ideal));
-    if (strcmp(method, "frame") != 0) {
+    if (strcmp(method, "frame") != 0)
+    {
         res[0] = id_Copy(arg, currRing);
-    } else {
+    }
+    else
+    {
         res[0] = id_Head(arg, currRing);
     }
     syzHeadFunction *syzHead;
@@ -761,11 +839,13 @@ syStrategy syFrank(const ideal arg, const int length, const char *method,
     set_options(&syzHead, &do_lifting, &single_module, method);
     int new_length = computeResolution(res, length-1, syzHead, do_lifting,
             single_module, use_cache, use_tensor_trick);
-    if (new_length < length) {
+    if (new_length < length)
+    {
         res = (resolvente)omReallocSize(res, (length+1)*sizeof(ideal),
                 (new_length+1)*sizeof(ideal));
     }
-    if (strcmp(method, "frame") != 0) {
+    if (strcmp(method, "frame") != 0)
+    {
         insert_ext_induced_LTs(res, new_length, single_module);
     }
     result->fullres = res;
