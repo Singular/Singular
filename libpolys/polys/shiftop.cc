@@ -2,7 +2,7 @@
 #include "templates/p_MemCopy.h"
 
 /* #define SHIFT_MULT_DEBUG */
-#define SHIFT_MULT_COMPAT_MODE
+/* #define SHIFT_MULT_COMPAT_MODE */
 
 #ifdef SHIFT_MULT_DEBUG
 #include "../kernel/polys.h"
