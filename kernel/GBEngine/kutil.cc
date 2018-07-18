@@ -8434,7 +8434,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
         if (rHasGlobalOrdering(currRing))
         {
           h.p=redBba(h.p,strat->sl,strat);
-          if (h.p!=NULL)
+          if ((h.p!=NULL)&&(TEST_OPT_REDTAIL || TEST_OPT_REDSB))
           {
             h.p=redtailBba(h.p,strat->sl,strat);
           }

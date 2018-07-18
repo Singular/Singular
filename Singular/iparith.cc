@@ -3351,6 +3351,7 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
         // no warnung: this is legal, if i in std(i,p)
         // is homogeneous, but p not
         w=NULL;
+        hom=isNotHomog;
       }
       else
       {
