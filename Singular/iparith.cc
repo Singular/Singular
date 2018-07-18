@@ -2175,8 +2175,8 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     {
       // Allow imap/fetch to be make an exception only for:
       if (nCoeff_is_Extension(r->cf) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
-         ((n_SetMap(r->cf->extRing->cf,currRing->cf)!=NULL) 
-	 || (nCoeff_is_Extension(currRing->cf) && (n_SetMap(r->cf->extRing->cf,currRing->cf->extRing->cf)!=NULL))))
+         ((n_SetMap(r->cf->extRing->cf,currRing->cf)!=NULL)
+         || (nCoeff_is_Extension(currRing->cf) && (n_SetMap(r->cf->extRing->cf,currRing->cf->extRing->cf)!=NULL))))
       {
         par_perm_size=rPar(r);
       }
@@ -3295,13 +3295,14 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   ideal result;
   assumeStdFlag(u);
   ideal i1=(ideal)(u->Data());
+  int ii1=idElem(i1); /* size of i1 */
   ideal i0;
   int r=v->Typ();
   if ((/*v->Typ()*/r==POLY_CMD) ||(r==VECTOR_CMD))
   {
-    i0=idInit(1,i1->rank); // TODO: rank is wrong (if v is a vector!)
-    i0->m[0]=(poly)v->Data();
-    int ii0=idElem(i0); /* size of i0 */
+    poly p=(poly)v->Data();
+    i0=idInit(1,i1->rank);
+    i0->m[0]=p;
     i1=idSimpleAdd(i1,i0); //
     memset(i0->m,0,sizeof(poly)*IDELEMS(i0));
     idDelete(&i0);
@@ -3325,9 +3326,9 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
     BITSET save1;
     SI_SAVE_OPT1(save1);
     si_opt_1|=Sy_bit(OPT_SB_1);
-    /* ii0 appears to be the position of the first element of il that
+    /* ii1 appears to be the position of the first element of il that
        does not belong to the old SB ideal */
-    result=kStd(i1,currRing->qideal,hom,&w,NULL,0,ii0);
+    result=kStd(i1,currRing->qideal,hom,&w,NULL,0,ii1);
     SI_RESTORE_OPT1(save1);
     idDelete(&i1);
     idSkipZeroes(result);
@@ -3337,7 +3338,6 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   else /*IDEAL/MODULE*/
   {
     i0=(ideal)v->CopyD();
-    int ii0=idElem(i0); /* size of i0 */
     i1=idSimpleAdd(i1,i0); //
     memset(i0->m,0,sizeof(poly)*IDELEMS(i0));
     idDelete(&i0);
@@ -3358,20 +3358,13 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
         hom=isHomog;
       }
     }
-    if (ii0*4 >= 3*IDELEMS(i1)) // MAGIC: add few poly to large SB: 3/4
-    {
-      BITSET save1;
-      SI_SAVE_OPT1(save1);
-      si_opt_1|=Sy_bit(OPT_SB_1);
-      /* ii0 appears to be the position of the first element of il that
-       does not belong to the old SB ideal */
-      result=kStd(i1,currRing->qideal,hom,&w,NULL,0,ii0);
-      SI_RESTORE_OPT1(save1);
-    }
-    else
-    {
-      result=kStd(i1,currRing->qideal,hom,&w);
-    }
+    BITSET save1;
+    SI_SAVE_OPT1(save1);
+    si_opt_1|=Sy_bit(OPT_SB_1);
+    /* ii1 appears to be the position of the first element of i1 that
+     does not belong to the old SB ideal */
+    result=kStd(i1,currRing->qideal,hom,&w,NULL,0,ii1);
+    SI_RESTORE_OPT1(save1);
     idDelete(&i1);
     idSkipZeroes(result);
     if (w!=NULL) atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
@@ -6914,8 +6907,8 @@ static BOOLEAN jjFETCH_M(leftv res, leftv u)
     {
       // Allow imap/fetch to be make an exception only for:
       if (nCoeff_is_Extension(r->cf) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
-         ((n_SetMap(r->cf->extRing->cf,currRing->cf)!=NULL) 
-	 || (nCoeff_is_Extension(currRing->cf) && (n_SetMap(r->cf->extRing->cf,currRing->cf->extRing->cf)!=NULL))))
+         ((n_SetMap(r->cf->extRing->cf,currRing->cf)!=NULL)
+         || (nCoeff_is_Extension(currRing->cf) && (n_SetMap(r->cf->extRing->cf,currRing->cf->extRing->cf)!=NULL))))
       {
         par_perm_size=rPar(r);
       }
