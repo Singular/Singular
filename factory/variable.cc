@@ -261,9 +261,8 @@ int ExtensionLevel()
 void prune (Variable& alpha)
 {
   if (alpha.level()==LEVELBASE) return;
-  int i, n = strlen( var_names_ext );
-  ASSERT (n+1 >= -alpha.level(), "wrong variable");
   int last_var=-alpha.level();
+  if ((last_var <= 0)||(var_names_ext==NULL)) return;
   if (last_var == 1)
   {
     delete [] var_names_ext;
@@ -273,15 +272,17 @@ void prune (Variable& alpha)
     alpha= Variable();
     return;
   }
+  ASSERT (strlen(var_names_ext)+1 >= -alpha.level(), "wrong variable");
   char * newvarnames = new char [last_var+1];
-  for ( i = 0; i < last_var; i++ )
+  ext_entry * newalgext = new ext_entry [last_var];
+  for (int i = 0; i < last_var; i++ )
+  {
     newvarnames[i] = var_names_ext[i];
+    newalgext[i] = algextensions[i];
+  }
   newvarnames[last_var] = 0;
   delete [] var_names_ext;
   var_names_ext = newvarnames;
-  ext_entry * newalgext = new ext_entry [last_var];
-  for ( i = 0; i < last_var; i++ )
-    newalgext[i] = algextensions[i];
   delete [] algextensions;
   algextensions = newalgext;
   alpha= Variable();
