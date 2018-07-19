@@ -891,7 +891,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
     }
     if (n==0)
     {
-      res->m[0]=p_One(r);
+      if (res->m[0]==NULL) res->m[0]=p_One(r);
       // (**v)[0]=1; is already done
     }
     else
@@ -915,6 +915,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
   }
   //PrintS("S:");p_Write(f,r);PrintLn();
   // use factory/libfac in general ==============================
+  Variable dummy(-1); prune(dummy); // remove all (tmp.) extensions
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);
   CFFList L;
@@ -990,6 +991,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
         //  over Q(a)
         L= factorize (F, a);
       }
+      prune(a);
     }
     else
     {
@@ -1201,6 +1203,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
     n_Delete(&old_lead_coeff,r->cf);
   errorreported=save_errorreported;
 notImpl:
+  prune(a);
   if (res==NULL)
     WerrorS( feNotImplemented );
   if (NN!=NULL)
@@ -1473,7 +1476,7 @@ matrix singclap_irrCharSeries ( ideal I, const ring r)
         p=p_Copy(p,r);
         p_Cleardenom(p, r);
         L.append(convSingPFactoryP(p,r));
-	p_Delete(&p,r);
+        p_Delete(&p,r);
       }
     }
   }
@@ -1489,7 +1492,7 @@ matrix singclap_irrCharSeries ( ideal I, const ring r)
         p=p_Copy(p,r);
         p_Cleardenom(p, r);
         L.append(convSingTrPFactoryP(p,r));
-	p_Delete(&p,r);
+        p_Delete(&p,r);
       }
     }
   }
