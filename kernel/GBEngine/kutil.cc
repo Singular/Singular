@@ -10590,8 +10590,10 @@ BOOLEAN kCheckSpolyCreation(LObject *L, kStrategy strat, poly &m1, poly &m2)
   {
     return TRUE;
   }
-  poly p1_max = (strat->R[L->i_r1])->max_exp;
-  poly p2_max = (strat->R[L->i_r2])->max_exp;
+  poly p1_max=NULL;
+  if (L->i_r1>=0) p1_max = (strat->R[L->i_r1])->max_exp;
+  poly p2_max=NULL;
+  if (L->i_r2>=0) p2_max = (strat->R[L->i_r2])->max_exp;
 
   if (((p1_max != NULL) && !p_LmExpVectorAddIsOk(m1, p1_max, strat->tailRing)) ||
       ((p2_max != NULL) && !p_LmExpVectorAddIsOk(m2, p2_max, strat->tailRing)))
