@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version ntsolve.lib 4.1.1.0 Dec_2017 "; // $ID$
+version="version ntsolve.lib 4.1.1.2 Dec_2017 "; // $ID$
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  ntsolve.lib     Real Newton Solving of Polynomial Systems
@@ -54,7 +54,7 @@ EXAMPLE: example nt_solve; shows an example
 
     int prot = printlevel-voice+2;  // prot=printlevel (default:prot=0)
     if (i1 < 1){itmax = 100;}else{itmax = ipar[1];}
-    if (i1 < 2){acc = prec div 2;}else{acc = ipar[2];}
+    if (i1 < 2){acc = prec;}else{acc = ipar[2];}
     if ((acc <= 0)||(acc > prec-1)){acc = prec-1;}
 
     int dpl = di+1;
