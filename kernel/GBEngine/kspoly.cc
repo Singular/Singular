@@ -159,13 +159,6 @@ int ksReducePoly(LObject* PR,
   }
 #endif
 
-#if defined(KDEBUG) && defined(TEST_OPT_DEBUG_RED)
-  if (TEST_OPT_DEBUG)
-  {
-    Print(" to: "); PR->wrp(); Print("\n");
-    //printf("\nt^%i ", PR->ecart);pWrite(pHead(PR->p));
-  }
-#endif
   return ret;
 }
 

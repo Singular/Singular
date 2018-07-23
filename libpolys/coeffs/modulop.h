@@ -195,7 +195,7 @@ static inline long npInvMod(long a, const coeffs R)
    XGCD(d, s, t, a, R->ch);
    assume (d == 1);
 #else
-   long  u, v, u0, v0, u1, v1, u2, v2, q, r;
+   long  u, v, u0, v0, u1, u2, q, r;
 
    assume(a>0);
    u1=1; u2=0;
