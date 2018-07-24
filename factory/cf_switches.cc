@@ -34,7 +34,7 @@ CFSwitches::CFSwitches ()
   //Off(SW_USE_NTL_SORT);
 #endif
   On(SW_USE_EZGCD);
-  //On(SW_USE_EZGCD_P); // still testing
+  On(SW_USE_EZGCD_P);
   On(SW_USE_QGCD);
 }
 

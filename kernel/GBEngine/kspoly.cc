@@ -155,13 +155,6 @@ int ksReducePoly(LObject* PR,
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
   PR->LmDeleteAndIter();
 
-#if defined(KDEBUG) && defined(TEST_OPT_DEBUG_RED)
-  if (TEST_OPT_DEBUG)
-  {
-    Print(" to: "); PR->wrp(); Print("\n");
-    //printf("\nt^%i ", PR->ecart);pWrite(pHead(PR->p));
-  }
-#endif
   return ret;
 }
 

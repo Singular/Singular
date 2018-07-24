@@ -132,12 +132,14 @@ number nrzInit (long i, const coeffs)
   return (number) erg;
 }
 
-static void nrzDelete(number *a, const coeffs)
+void nrzDelete(number *a, const coeffs)
 {
-  if (*a == NULL) return;
-  mpz_clear((mpz_ptr) *a);
-  omFreeBin((ADDRESS) *a, gmp_nrz_bin);
-  *a = NULL;
+  if (*a != NULL)
+  {
+    mpz_clear((mpz_ptr) *a);
+    omFreeBin((ADDRESS) *a, gmp_nrz_bin);
+    *a = NULL;
+  }
 }
 
 static number nrzCopy(number a, const coeffs)
@@ -155,10 +157,13 @@ number nrzCopyMap(number a, const coeffs /*src*/, const coeffs dst)
 }
 #endif
 
-static int nrzSize(number a, const coeffs)
+int nrzSize(number a, const coeffs)
 {
-  if (a == NULL) return 0;
-  return (((mpz_ptr)a)->_mp_alloc);
+  mpz_ptr p=(mpz_ptr)a;
+  int s=p->_mp_alloc;
+  if (s==1) s=(mpz_cmp_ui(p,0)!=0);
+  return s;
+
 }
 
 /*
@@ -202,12 +207,12 @@ static BOOLEAN nrzIsZero (number  a, const coeffs)
 
 static BOOLEAN nrzIsOne (number a, const coeffs)
 {
-  return (a!=NULL) && (0 == mpz_cmp_ui((mpz_ptr) a, 1));
+  return (0 == mpz_cmp_ui((mpz_ptr) a, 1));
 }
 
 static BOOLEAN nrzIsMOne (number a, const coeffs)
 {
-  return (a!=NULL) && (0 == mpz_cmp_si((mpz_ptr) a, -1));
+  return (0 == mpz_cmp_si((mpz_ptr) a, -1));
 }
 
 static BOOLEAN nrzEqual (number a,number b, const coeffs)
@@ -302,7 +307,7 @@ static number  nrzInvers (number c, const coeffs r)
   if (!nrzIsUnit((number) c, r))
   {
     WerrorS("Non invertible element.");
-    return (number)0; //TODO
+    return (number)NULL;
   }
   return nrzCopy(c,r);
 }
@@ -568,6 +573,20 @@ static number nrzFarey(number r, number N, const coeffs R)
   return ab;
 }
 
+void nrzWriteFd(number n, const ssiInfo* d, const coeffs)
+{
+  mpz_out_str (d->f_write,SSI_BASE, (mpz_ptr)n);
+  fputc(' ',d->f_write);
+}
+
+number nrzReadFd(const ssiInfo *d, const coeffs)
+{
+  mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
+  mpz_init(erg);
+  s_readmpz_base(d->f_read,erg,SSI_BASE);
+  return (number)erg;
+}
+
 BOOLEAN nrzInitChar(coeffs r,  void *)
 {
   assume( getCoeffType(r) == n_Z );
@@ -619,6 +638,8 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->convFactoryNSingN=nrzConvFactoryNSingN;
   r->cfChineseRemainder=nlChineseRemainderSym;
   r->cfFarey=nrzFarey;
+  r->cfWriteFd=nrzWriteFd;
+  r->cfReadFd=nrzReadFd;
   // debug stuff
 
 #ifdef LDEBUG
@@ -684,7 +705,6 @@ static inline number nrz_short(number x)
 
 static int nrzSize(number a, const coeffs)
 {
-  if (a == NULL) return 0;
   if (a==INT_TO_SR(0)) return 0;
   if (n_Z_IS_SMALL(a)) return 1;
   return ((mpz_ptr)a)->_mp_alloc;
@@ -716,7 +736,8 @@ number _nrzMult (number a, number b, const coeffs R)
 number nrzMult (number a, number b, const coeffs R)
 #endif
 {
-  if (n_Z_IS_SMALL(a) && n_Z_IS_SMALL(b)) {
+  if (n_Z_IS_SMALL(a) && n_Z_IS_SMALL(b))
+  {
   //from longrat.cc
     if (SR_TO_INT(a)==0)
       return a;
@@ -1314,7 +1335,7 @@ static BOOLEAN nrzIsUnit (number a, const coeffs)
 
 static BOOLEAN nrzIsZero (number  a, const coeffs)
 {
-  return (a==NULL) || (a==INT_TO_SR(0));
+  return (a==INT_TO_SR(0));
 }
 
 static BOOLEAN nrzIsOne (number a, const coeffs)
@@ -1482,7 +1503,7 @@ static number  nrzInvers (number c, const coeffs r)
   if (!nrzIsUnit((number) c, r))
   {
     WerrorS("Non invertible element.");
-    return (number)0; //TODO
+    return (number)NULL;
   }
   return c; // has to be 1 or -1....
 }
@@ -1801,6 +1822,9 @@ static coeffs nrzQuot1(number c, const coeffs r)
     return(rr);
 }
 
+number nlReadFd(const ssiInfo *d, const coeffs);
+void nlWriteFd(number n, const ssiInfo* d, const coeffs);
+
 BOOLEAN nrzInitChar(coeffs r,  void *)
 {
   assume( getCoeffType(r) == n_Z );
@@ -1853,6 +1877,8 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->convFactoryNSingN = nrzConvFactoryNSingN;
   r->cfMPZ = nrzMPZ;
   r->cfFarey = nrzFarey;
+  r->cfWriteFd=nlWriteFd;
+  r->cfReadFd=nlReadFd;
 
   r->cfQuot1 = nrzQuot1;
   // requires conversion to factory:

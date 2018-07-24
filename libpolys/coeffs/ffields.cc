@@ -498,22 +498,9 @@ static void nfPower (number a, int i, number * result, const coeffs r)
 /*4
 * read an integer (with reduction mod p)
 */
-static const char* nfEati(const char *s, int *i, const coeffs r)
+static inline const char* nfEati(const char *s, int *i, const coeffs r)
 {
-  if (*s >= '0' && *s <= '9')
-  {
-    *i = 0;
-    do
-    {
-      *i *= 10;
-      *i += *s++ - '0';
-      if (*i > (MAX_INT_VAL / 10)) *i = *i % r->m_nfCharP;
-    }
-    while (*s >= '0' && *s <= '9');
-    if (*i >= r->m_nfCharP) *i = *i % r->m_nfCharP;
-  }
-  else *i = 1;
-  return s;
+  return nEati((char *)s,i,r->m_nfCharP);
 }
 
 /*2

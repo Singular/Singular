@@ -411,16 +411,12 @@ inline A cast_vptr_to_A( void * p )
 
 
 #ifdef __GNUC__
-#define likely(X)   (__builtin_expect(!!(X), 1))
-#define unlikely(X) (__builtin_expect(!!(X), 0))
+#define LIKELY(X)   (__builtin_expect(!!(X), 1))
+#define UNLIKELY(X) (__builtin_expect(!!(X), 0))
 #else
-#define likely(X)   (X)
-#define unlikely(X) (X)
+#define LIKELY(X)   (X)
+#define UNLIKELY(X) (X)
 #endif
-
-#define LIKELY   likely
-#define UNLIKELY unlikely
-
 
 #endif
 /* MISC_AUXILIARY_H */

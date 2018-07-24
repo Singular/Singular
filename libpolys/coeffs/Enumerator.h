@@ -128,10 +128,6 @@ class IEnumerator: public virtual IBaseEnumerator, public virtual IAccessor<T>
 
 #if 0
 // the following is not used for now //
-// the following is not used for now //
-// the following is not used for now //
-// the following is not used for now //
-// the following is not used for now //
 
 // include basic definitions
 //??// #include <iterator>

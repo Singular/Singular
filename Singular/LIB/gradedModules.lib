@@ -1054,9 +1054,8 @@ PURPOSE: create a valid graded object with a given matrix presentation, weightin
 EXAMPLE: example grobj; shows an example
 "
 {
-  ASSUME(0, size(w) >= nrows(A) );
-
   module M = module(A);
+  ASSUME(0, size(w) >= nrows(M) );
 
   attrib( M, "rank", size(w) );
   attrib( M, "isHomog", w );
@@ -1353,7 +1352,7 @@ EXAMPLE: example grprod; shows an example
 
   ASSUME(0, (size(a) == size(b)) && (a == b));  // == for intvec :(
 
-  return ( grobj( A*B, grrange(A), grdeg(B) ) );
+  return ( grobj( matrix(A)*matrix(B), grrange(A), grdeg(B) ) );
 }
 example
 { "EXAMPLE:"; echo = 2;

@@ -10,8 +10,8 @@ resolution M=mres(i,0);
 M;
 list l = M; l;
 // see the exactness at this point
-size(ideal(transpose(l[2])*transpose(l[1])));
+size(ideal(transpose(matrix(l[2]))*transpose(l[1])));
 print(matrix(M[3]));
 // see the exactness at this point
-size(ideal(transpose(l[3])*transpose(l[2])));
+size(ideal(transpose(matrix(l[3]))*transpose(l[2])));
 tst_status(1);$

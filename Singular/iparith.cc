@@ -833,6 +833,18 @@ static BOOLEAN jjPLUS_MA(leftv res, leftv u, leftv v)
   }
   return jjPLUSMINUS_Gen(res,u,v);
 }
+static BOOLEAN jjPLUS_SM(leftv res, leftv u, leftv v)
+{
+  ideal A=(ideal)u->Data(); ideal B=(ideal)v->Data();
+  res->data = (char *)(sm_Add(A , B, currRing));
+  if (res->data==NULL)
+  {
+     Werror("matrix size not compatible(%dx%d, %dx%d)",
+             (int)A->rank,IDELEMS(A),(int)B->rank,IDELEMS(B));
+     return TRUE;
+  }
+  return jjPLUSMINUS_Gen(res,u,v);
+}
 static BOOLEAN jjPLUS_MA_P(leftv res, leftv u, leftv v)
 {
   matrix m=(matrix)u->Data();
@@ -945,6 +957,19 @@ static BOOLEAN jjMINUS_MA(leftv res, leftv u, leftv v)
   {
      Werror("matrix size not compatible(%dx%d, %dx%d)",
              MATROWS(A),MATCOLS(A),MATROWS(B),MATCOLS(B));
+     return TRUE;
+  }
+  return jjPLUSMINUS_Gen(res,u,v);
+  return FALSE;
+}
+static BOOLEAN jjMINUS_SM(leftv res, leftv u, leftv v)
+{
+  ideal A=(ideal)u->Data(); ideal B=(ideal)v->Data();
+  res->data = (char *)(sm_Sub(A , B, currRing));
+  if (res->data==NULL)
+  {
+     Werror("matrix size not compatible(%dx%d, %dx%d)",
+             (int)A->rank,IDELEMS(A),(int)B->rank,IDELEMS(B));
      return TRUE;
   }
   return jjPLUSMINUS_Gen(res,u,v);
@@ -1129,6 +1154,21 @@ static BOOLEAN jjTIMES_MA(leftv res, leftv u, leftv v)
     return jjOP_REST(res,u,v);
   return FALSE;
 }
+static BOOLEAN jjTIMES_SM(leftv res, leftv u, leftv v)
+{
+  ideal A=(ideal)u->Data(); ideal B=(ideal)v->Data();
+  res->data = (char *)sm_Mult(A,B,currRing);
+  if (res->data==NULL)
+  {
+     Werror("matrix size not compatible(%dx%d, %dx%d) in *",
+             (int)A->rank,IDELEMS(A),(int)B->rank,IDELEMS(B));
+     return TRUE;
+  }
+  id_Normalize((ideal)res->data,currRing);
+  if ((v->next!=NULL) || (u->next!=NULL))
+    return jjOP_REST(res,u,v);
+  return FALSE;
+}
 static BOOLEAN jjGE_BI(leftv res, leftv u, leftv v)
 {
   number h=n_Sub((number)u->Data(),(number)v->Data(),coeffs_BIGINT);
@@ -1293,6 +1333,12 @@ static BOOLEAN jjEQUAL_I(leftv res, leftv u, leftv v)
 static BOOLEAN jjEQUAL_Ma(leftv res, leftv u, leftv v)
 {
   res->data = (char *)((long)mp_Equal((matrix)u->Data(),(matrix)v->Data(),currRing));
+  jjEQUAL_REST(res,u,v);
+  return FALSE;
+}
+static BOOLEAN jjEQUAL_SM(leftv res, leftv u, leftv v)
+{
+  res->data = (char *)((long)sm_Equal((ideal)u->Data(),(ideal)v->Data(),currRing));
   jjEQUAL_REST(res,u,v);
   return FALSE;
 }
@@ -2128,13 +2174,9 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     if ((nMap=n_SetMap(r->cf,currRing->cf))==NULL)
     {
       // Allow imap/fetch to be make an exception only for:
-      if ( (rField_is_Q_a(r) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
-            (rField_is_Q(currRing) || rField_is_Q_a(currRing) ||
-             (rField_is_Zp(currRing) || rField_is_Zp_a(currRing))))
-           ||
-           (rField_is_Zp_a(r) &&  // Zp(a..) -> Zp(a..) || Zp
-            (rField_is_Zp(currRing, r->cf->ch) ||
-             rField_is_Zp_a(currRing, r->cf->ch))) )
+      if (nCoeff_is_Extension(r->cf) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
+         ((n_SetMap(r->cf->extRing->cf,currRing->cf)!=NULL)
+         || (nCoeff_is_Extension(currRing->cf) && (n_SetMap(r->cf->extRing->cf,currRing->cf->extRing->cf)!=NULL))))
       {
         par_perm_size=rPar(r);
       }
@@ -3253,13 +3295,14 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   ideal result;
   assumeStdFlag(u);
   ideal i1=(ideal)(u->Data());
+  int ii1=idElem(i1); /* size of i1 */
   ideal i0;
   int r=v->Typ();
   if ((/*v->Typ()*/r==POLY_CMD) ||(r==VECTOR_CMD))
   {
-    i0=idInit(1,i1->rank); // TODO: rank is wrong (if v is a vector!)
-    i0->m[0]=(poly)v->Data();
-    int ii0=idElem(i0); /* size of i0 */
+    poly p=(poly)v->Data();
+    i0=idInit(1,i1->rank);
+    i0->m[0]=p;
     i1=idSimpleAdd(i1,i0); //
     memset(i0->m,0,sizeof(poly)*IDELEMS(i0));
     idDelete(&i0);
@@ -3283,9 +3326,9 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
     BITSET save1;
     SI_SAVE_OPT1(save1);
     si_opt_1|=Sy_bit(OPT_SB_1);
-    /* ii0 appears to be the position of the first element of il that
+    /* ii1 appears to be the position of the first element of il that
        does not belong to the old SB ideal */
-    result=kStd(i1,currRing->qideal,hom,&w,NULL,0,ii0);
+    result=kStd(i1,currRing->qideal,hom,&w,NULL,0,ii1);
     SI_RESTORE_OPT1(save1);
     idDelete(&i1);
     idSkipZeroes(result);
@@ -3295,7 +3338,6 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   else /*IDEAL/MODULE*/
   {
     i0=(ideal)v->CopyD();
-    int ii0=idElem(i0); /* size of i0 */
     i1=idSimpleAdd(i1,i0); //
     memset(i0->m,0,sizeof(poly)*IDELEMS(i0));
     idDelete(&i0);
@@ -3309,6 +3351,7 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
         // no warnung: this is legal, if i in std(i,p)
         // is homogeneous, but p not
         w=NULL;
+        hom=isNotHomog;
       }
       else
       {
@@ -3316,20 +3359,13 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
         hom=isHomog;
       }
     }
-    if (ii0*4 >= 3*IDELEMS(i1)) // MAGIC: add few poly to large SB: 3/4
-    {
-      BITSET save1;
-      SI_SAVE_OPT1(save1);
-      si_opt_1|=Sy_bit(OPT_SB_1);
-      /* ii0 appears to be the position of the first element of il that
-       does not belong to the old SB ideal */
-      result=kStd(i1,currRing->qideal,hom,&w,NULL,0,ii0);
-      SI_RESTORE_OPT1(save1);
-    }
-    else
-    {
-      result=kStd(i1,currRing->qideal,hom,&w);
-    }
+    BITSET save1;
+    SI_SAVE_OPT1(save1);
+    si_opt_1|=Sy_bit(OPT_SB_1);
+    /* ii1 appears to be the position of the first element of i1 that
+     does not belong to the old SB ideal */
+    result=kStd(i1,currRing->qideal,hom,&w,NULL,0,ii1);
+    SI_RESTORE_OPT1(save1);
     idDelete(&i1);
     idSkipZeroes(result);
     if (w!=NULL) atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
@@ -3348,7 +3384,32 @@ static BOOLEAN jjSYZ_2(leftv res, leftv u, leftv v)
   if (w!=NULL) delete w;
   if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
   return FALSE;
-
+}
+static BOOLEAN jjTENSOR(leftv res, leftv u, leftv v)
+{
+  ideal A=(ideal)u->Data();
+  ideal B=(ideal)v->Data();
+  res->data = (char *)sm_Tensor(A,B,currRing);
+  return FALSE;
+}
+static BOOLEAN jjTENSOR_Ma(leftv res, leftv u, leftv v)
+{
+  sleftv tmp_u,tmp_v,tmp_res;
+  int index=iiTestConvert(MATRIX_CMD,SMATRIX_CMD,dConvertTypes);
+  iiConvert(MATRIX_CMD,SMATRIX_CMD,index,u,&tmp_u,dConvertTypes);
+  iiConvert(MATRIX_CMD,SMATRIX_CMD,index,v,&tmp_v,dConvertTypes);
+  tmp_res.Init();
+  tmp_res.rtyp=SMATRIX_CMD;
+  BOOLEAN bo=jjTENSOR(&tmp_res,&tmp_u,&tmp_v);
+  if (!bo)
+  {
+    index=iiTestConvert(SMATRIX_CMD,MATRIX_CMD,dConvertTypes);
+    iiConvert(SMATRIX_CMD,MATRIX_CMD,index,&tmp_res,res,dConvertTypes);
+  }
+  tmp_u.CleanUp();
+  tmp_v.CleanUp();
+  tmp_res.CleanUp();
+  return bo;
 }
 static BOOLEAN jjVARSTR2(leftv res, leftv u, leftv v)
 {
@@ -5028,6 +5089,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
     case MAP_CMD:
     case PROC_CMD:
     case RING_CMD:
+    case SMATRIX_CMD:
     //case QRING_CMD:
     case INTMAT_CMD:
     case BIGINTMAT_CMD:
@@ -5430,6 +5492,35 @@ static BOOLEAN jjBRACK_Ma(leftv res, leftv u, leftv v,leftv w)
   {
     Werror("wrong range[%d,%d] in matrix %s(%d x %d)",r,c,u->Fullname(),
       MATROWS(m),MATCOLS(m));
+    return TRUE;
+  }
+  res->data=u->data; u->data=NULL;
+  res->rtyp=u->rtyp; u->rtyp=0;
+  res->name=u->name; u->name=NULL;
+  Subexpr e=jjMakeSub(v);
+          e->next=jjMakeSub(w);
+  if (u->e==NULL)
+    res->e=e;
+  else
+  {
+    Subexpr h=u->e;
+    while (h->next!=NULL) h=h->next;
+    h->next=e;
+    res->e=u->e;
+    u->e=NULL;
+  }
+  return FALSE;
+}
+static BOOLEAN jjBRACK_SM(leftv res, leftv u, leftv v,leftv w)
+{
+  ideal m= (ideal)u->Data();
+  int   r = (int)(long)v->Data();
+  int   c = (int)(long)w->Data();
+  //Print("gen. elem %d, %d\n",r,c);
+  if ((r<1)||(r>m->rank)||(c<1)||(c>IDELEMS(m)))
+  {
+    Werror("wrong range[%d,%d] in matrix %s(%d x %d)",r,c,u->Fullname(),
+      (int)m->rank,IDELEMS(m));
     return TRUE;
   }
   res->data=u->data; u->data=NULL;
@@ -6372,7 +6463,7 @@ static BOOLEAN jjMATRIX_Mo(leftv res, leftv u, leftv v,leftv w)
 {
   int mi=(int)(long)v->Data();
   int ni=(int)(long)w->Data();
-  if ((mi<1)||(ni<1))
+  if ((mi<0)||(ni<1))
   {
     Werror("converting module to matrix: dimensions must be positive(%dx%d)",mi,ni);
     return TRUE;
@@ -6405,6 +6496,19 @@ static BOOLEAN jjMATRIX_Ma(leftv res, leftv u, leftv v,leftv w)
   }
   id_Delete((ideal *)&I,currRing);
   res->data = (char *)m;
+  return FALSE;
+}
+static BOOLEAN jjSMATRIX_Mo(leftv res, leftv u, leftv v,leftv w)
+{
+  int mi=(int)(long)v->Data();
+  int ni=(int)(long)w->Data();
+  if ((mi<0)||(ni<1))
+  {
+    Werror("converting to smatrix: dimensions must be positive(%dx%d)",mi,ni);
+    return TRUE;
+  }
+  res->data = (char *)id_ResizeModule((ideal)u->CopyD(),
+           mi,ni,currRing);
   return FALSE;
 }
 static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
@@ -6803,13 +6907,9 @@ static BOOLEAN jjFETCH_M(leftv res, leftv u)
     if ((nMap=n_SetMap(r->cf,currRing->cf))==NULL)
     {
       // Allow imap/fetch to be make an exception only for:
-      if ( (rField_is_Q_a(r) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
-            (rField_is_Q(currRing) || rField_is_Q_a(currRing) ||
-             (rField_is_Zp(currRing) || rField_is_Zp_a(currRing))))
-           ||
-           (rField_is_Zp_a(r) &&  // Zp(a..) -> Zp(a..) || Zp
-            (rField_is_Zp(currRing, r->cf->ch) ||
-             rField_is_Zp_a(currRing, r->cf->ch))) )
+      if (nCoeff_is_Extension(r->cf) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
+         ((n_SetMap(r->cf->extRing->cf,currRing->cf)!=NULL)
+         || (nCoeff_is_Extension(currRing->cf) && (n_SetMap(r->cf->extRing->cf,currRing->cf->extRing->cf)!=NULL))))
       {
         par_perm_size=rPar(r);
       }

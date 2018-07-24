@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version atkins.lib 4.1.1.0 Dec_2017 ";
+version="version atkins.lib 4.1.1.2 Dec_2017 ";
 category="Teaching";
 info="
 LIBRARY:  atkins.lib     Procedures for teaching cryptography
@@ -367,9 +367,9 @@ EXAMPLE:example sqr; shows an example
 {
   poly f=var(1)^2-w;
   def S=basering;
-  ring R=(real,k),var(1),dp;
+  ring R=(real,k+1),var(1),dp;
   poly f=imap(S,f);
-  ideal I=nt_solve(f,1.1,list(k,k div 5));
+  ideal I=nt_solve(f,1.1,list(1000,k));
   number c=leadcoef(I[1]);
   setring S;
   number c=imap(R,c);

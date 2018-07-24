@@ -1698,26 +1698,9 @@ matrix mp_Wedge(matrix a, int ar, const ring R)
   return (result);
 }
 
-static void p_DecomposeComp(poly p, poly *a, int l, const ring r)
-{
-  poly h=p;
-  while(h!=NULL)
-  {
-    poly hh=pNext(h);
-    pNext(h)=a[__p_GetComp(h,r)-1];
-    a[__p_GetComp(h,r)-1]=h;
-    p_SetComp(h,0,r);
-    p_SetmComp(h,r);
-    h=hh;
-  }
-  for(int i=0;i<l;i++)
-  {
-    if(a[i]!=NULL) a[i]=pReverse(a[i]);
-  }
-}
-// helper for mp_Tensor
+// helper for sm_Tensor
 // destroyes f, keeps B
-static ideal mp_MultAndShift(poly f, ideal B, int s, const ring r)
+static ideal sm_MultAndShift(poly f, ideal B, int s, const ring r)
 {
   assume(f!=NULL);
   ideal res=idInit(IDELEMS(B),B->rank+s);
@@ -1734,9 +1717,9 @@ static ideal mp_MultAndShift(poly f, ideal B, int s, const ring r)
   p_Delete(&f,r);
   return res;
 }
-// helper for mp_Tensor
+// helper for sm_Tensor
 // updates res, destroyes contents of sm
-static void mp_AddSubMat(ideal res, ideal sm, int col, const ring r)
+static void sm_AddSubMat(ideal res, ideal sm, int col, const ring r)
 {
   for(int i=0;i<IDELEMS(sm);i++)
   {
@@ -1745,9 +1728,9 @@ static void mp_AddSubMat(ideal res, ideal sm, int col, const ring r)
   }
 }
 
-ideal mp_Tensor(ideal A, ideal B, const ring r)
+ideal sm_Tensor(ideal A, ideal B, const ring r)
 {
-  // size of the result n*q x m*p
+  // size of the result m*p x n*q
   int n=IDELEMS(A); // m x n
   int m=A->rank;
   int q=IDELEMS(B); // p x q
@@ -1757,16 +1740,16 @@ ideal mp_Tensor(ideal A, ideal B, const ring r)
   for(int i=0; i<n; i++)
   {
     memset(a,0,m*sizeof(poly));
-    p_DecomposeComp(p_Copy(A->m[i],r),a,m,r);
+    p_Vec2Array(A->m[i],a,m,r);
     for(int j=0;j<m;j++)
     {
       if (a[j]!=NULL)
       {
-        ideal sm=mp_MultAndShift(a[j], // A_i_j
+        ideal sm=sm_MultAndShift(a[j], // A_i_j
                                  B,
                                  j*p, // shift j*p down
                                  r);
-        mp_AddSubMat(res,sm,i*q,r); // add this columns to col i*q ff
+        sm_AddSubMat(res,sm,i*q,r); // add this columns to col i*q ff
         id_Delete(&sm,r); // delete the now empty ideal
       }
     }
@@ -1805,7 +1788,6 @@ ideal sm_Sub(ideal a, ideal b, const ring R)
   return c;
 }
 
-#define SMATELEM(A,i,j,R) p_Vec2Poly(A->m[j],i+1,R)
 ideal sm_Mult(ideal a, ideal b, const ring R)
 {
   int i, j, k;
@@ -1814,7 +1796,7 @@ ideal sm_Mult(ideal a, ideal b, const ring R)
   int q = IDELEMS(b);
 
   assume (IDELEMS(a)==b->rank);
-  ideal c = idInit(m,q);
+  ideal c = idInit(q,m);
 
   for (i=0; i<m; i++)
   {
@@ -1825,8 +1807,8 @@ ideal sm_Mult(ideal a, ideal b, const ring R)
       {
         for (j=0; j<q; j++)
         {
-          poly bkj;
-          if ((bkj=SMATELEM(b,k,j,R))!=NULL)
+          poly bkj=SMATELEM(b,k,j,R);
+          if (bkj!=NULL)
           {
             poly s = p_Mult_q(p_Copy(aik,R) /*SMATELEM(a,i,k)*/, bkj/*SMATELEM(b,k,j)*/, R);
             if (s!=NULL) p_SetComp(s,i+1,R);
@@ -1837,29 +1819,52 @@ ideal sm_Mult(ideal a, ideal b, const ring R)
       }
     }
   }
-  for(i=m-1;i>=0;i--) p_Normalize(c->m[i], R);
+  for(i=q-1;i>=0;i--) p_Normalize(c->m[i], R);
   return c;
 }
 
-ideal sm_Transp(ideal a, const ring R)
+ideal sm_Flatten(ideal a, const ring R)
 {
-  int    i, j, r = a->rank, c = IDELEMS(a);
-  poly *p;
-  ideal b =  idInit(c,r);
-  poly *m=(poly*)omAlloc0(r*sizeof(poly));
-  for(i=0;i<c;i++)
+  if (IDELEMS(a)==0) return id_Copy(a,R);
+  ideal res=idInit(1,IDELEMS(a)*a->rank);
+  for(int i=0;i<IDELEMS(a);i++)
   {
-    p_Vec2Polys(a->m[i],&m,&r,R);// m has A[1..r,i+1]
-    if (r>a->rank) Print("wrong rang (%d,%ld) in sm_Transp\n",r,a->rank);
-    for(j=0;j<r;j++)
+    if(a->m[i]!=NULL)
     {
-      // m[j] is A[j+1,i]
-      p_SetCompP(m[j],i+1,R);
-      b->m[j]=p_Add_q(b->m[j],m[j],R);
+      poly p=p_Copy(a->m[i],R);
+      if (i==0) res->m[0]=p;
+      else
+      {
+        p_Shift(&p,i*a->rank,R);
+        res->m[0]=p_Add_q(res->m[0],p,R);
+      }
     }
   }
-  omFreeSize(m,a->rank*sizeof(poly));
-  return b;
+  return res;
+}
+
+ideal sm_UnFlatten(ideal a, int col, const ring R)
+{
+  if ((IDELEMS(a)!=1)
+  ||((a->rank % col)!=0))
+  {
+    Werror("wrong format: %d x %d for unflatten",(int)a->rank,IDELEMS(a));
+    return NULL;
+  }
+  int row=a->rank/col;
+  ideal res=idInit(col,row);
+  poly p=a->m[0];
+  while(p!=NULL)
+  {
+    poly h=p_Head(p,R);
+    int comp=p_GetComp(h,R);
+    int c=(comp-1)/row;
+    int r=comp%row; if (r==0) r=row;
+    p_SetComp(h,r,R); p_SetmComp(h,R);
+    res->m[c]=p_Add_q(res->m[c],h,R);
+    pIter(p);
+  }
+  return res;
 }
 
 /*2
@@ -1893,5 +1898,29 @@ int sm_Compare(ideal a, ideal b, const ring R)
     j++;
   }
   return r;
+}
+
+BOOLEAN sm_Equal(ideal a, ideal b, const ring R)
+{
+  if ((a->rank!=b->rank) || (IDELEMS(a)!=IDELEMS(b)))
+    return FALSE;
+  int i=IDELEMS(a)-1;
+  while (i>=0)
+  {
+    if (a->m[i]==NULL)
+    {
+      if (b->m[i]!=NULL) return FALSE;
+    }
+    else if (b->m[i]==NULL) return FALSE;
+    else if (p_Cmp(a->m[i],b->m[i], R)!=0) return FALSE;
+    i--;
+  }
+  i=IDELEMS(a)-1;
+  while (i>=0)
+  {
+    if(!p_EqualPolys(a->m[i],b->m[i], R)) return FALSE;
+    i--;
+  }
+  return TRUE;
 }
 

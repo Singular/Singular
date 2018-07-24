@@ -6,7 +6,7 @@
 *           transcendental variables t_1, ..., t_s, where s >= 1.
 *           Denoting the implemented coeffs object by cf, then these numbers
 *           are represented as quotients of polynomials living in the
-*           polynomial ring K[t_1, .., t_s] represented by cf->extring.
+*           polynomial ring K[t_1, .., t_s] represented by cf->extRing.
 *
 *           An element of K(t_1, .., t_s) may have numerous representations,
 *           due to the possibility of common polynomial factors in the
@@ -2099,6 +2099,10 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
     {
       if (src->ch == dst->ch) return ntMapPP;         /// Z/p     --> Z/p(T)
       else return ntMapUP;                            /// Z/u     --> Z/p(T)
+    }
+    if (nCoeff_is_Zn(src) && nCoeff_is_Zn(bDst))
+    {
+      if (mpz_cmp(src->modNumber,bDst->modNumber)==0) return ntMapPP;         /// Z/p     --> Z/p(T)
     }
   }
   if (h != 1) return NULL;

@@ -203,7 +203,7 @@ LINKAGE BOOLEAN dbWrite(si_link l, leftv key)
 //   db = (GDBM_info *)omAlloc0(sizeof *db);
 //   db = (GDBM_info *)l->data;
   BOOLEAN b=TRUE;
-  register int ret;
+  REGISTER int ret;
 
   if (strcmp(l->mode,"rw")!=0) // r-mode
     {

@@ -47,9 +47,12 @@ inline poly kBucketClear(kBucket_pt bucket)
   return p;
 }
 
-// Canonicalizes Bpoly, i.e. converts polys of buckets into one poly in
-// one bucket: Returns number of bucket into which it is canonicalized
+/// Canonicalizes Bpoly, i.e. converts polys of buckets into one poly in
+/// one bucket: Returns number of bucket into which it is canonicalized
 int kBucketCanonicalize(kBucket_pt bucket);
+
+/// apply n_Normalize to all coefficients
+void kBucketNormalize(kBucket_pt bucket);
 
 /////////////////////////////////////////////////////////////////////////////
 // Extracts lm of Bpoly, i.e. Bpoly is changed s.t.

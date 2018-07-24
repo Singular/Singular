@@ -435,6 +435,46 @@ bool findeval (const CanonicalForm & F, const CanonicalForm & G,
       return false;
   }
 }
+static void gcd_mon_rec(CanonicalForm G, CanonicalForm &cf,int *exp,int pl)
+{  // prevoius level: pl
+  if (G.inCoeffDomain())
+  {
+    for(int i=pl-1;i>0;i--) exp[i]=0;
+    cf=gcd(cf,G);
+    return;
+  }
+  int l=G.level();
+  for(int i=pl-1;i>l;i--) exp[i]=0;
+  for(CFIterator i=G; i.hasTerms(); i++)
+  {
+    if (i.exp()<exp[l]) exp[l]=i.exp();
+    gcd_mon_rec(i.coeff(),cf,exp,l);
+  }
+}
+
+static CanonicalForm gcd_mon(CanonicalForm F, CanonicalForm G)
+{
+  // assume: size(F)==1
+  CanonicalForm cf=F;
+  int ll=tmax(F.level(),G.level());
+  int *exp=NEW_ARRAY(int,ll+1);
+  for(int i=ll;i>=0;i--) exp[i]=0;
+  CanonicalForm c=F;
+  while(!c.inCoeffDomain())
+  {
+    exp[c.level()]=c.degree();
+    c=c.LC();
+    cf=c;
+  }
+  gcd_mon_rec(G,cf,exp,G.level()+1);
+  CanonicalForm res=cf;
+  for(int i=0;i<=ll;i++)
+  {
+    if (exp[i]>0) res*=power(Variable(i),exp[i]);
+  }
+  DELETE_ARRAY(exp);
+  return res;
+}
 
 /// real implementation of EZGCD over Z
 static CanonicalForm
@@ -448,12 +488,13 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
   int sizeG= size (GG);
 
 
-  if ((sizeF==1) || (sizeG==1))
+  if (sizeF==1)
   {
-    Off(SW_USE_EZGCD);
-    CanonicalForm result=gcd( FF, GG );
-    On(SW_USE_EZGCD);
-    return result;
+    return gcd_mon( FF, GG );
+  }
+  else if (sizeG==1)
+  {
+    return gcd_mon( GG, FF );
   }
   if (!isRat)
     On (SW_RATIONAL);
@@ -826,6 +867,15 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   Variable a, oldA;
   int sizeF= size (FF);
   int sizeG= size (GG);
+
+  if (sizeF==1)
+  {
+    return gcd_mon( FF, GG );
+  }
+  else if (sizeG==1)
+  {
+    return gcd_mon( GG, FF );
+  }
 
   if (sizeF/maxNumVars > sizePerVars1 && sizeG/maxNumVars > sizePerVars1)
   {

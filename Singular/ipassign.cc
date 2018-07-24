@@ -686,12 +686,21 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
     {
       jjNormalizeQRingP(p);
     }
-    pDelete(&MATELEM(m,i,j));
-    MATELEM(m,i,j)=p;
-    /* for module: update rank */
-    if ((p!=NULL) && (pGetComp(p)!=0))
+    if (res->rtyp==SMATRIX_CMD)
     {
-      m->rank=si_max(m->rank,pMaxComp(p));
+      p=pSub(p,SMATELEM(m,i-1,j-1,currRing));
+      pSetCompP(p,i);
+      m->m[j-1]=pAdd(m->m[j-1],p);
+    }
+    else
+    {
+      pDelete(&MATELEM(m,i,j));
+      MATELEM(m,i,j)=p;
+      /* for module: update rank */
+      if ((p!=NULL) && (pGetComp(p)!=0))
+      {
+        m->rank=si_max(m->rank,pMaxComp(p));
+      }
     }
   }
   return FALSE;

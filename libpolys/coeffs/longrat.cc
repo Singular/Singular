@@ -3175,26 +3175,26 @@ static char* nlCoeffString(const coeffs r)
   else                 return omStrDup("ZZ");
 }
 
-static void nlWriteFd(number n,FILE* f, const coeffs)
+void nlWriteFd(number n, const ssiInfo* d, const coeffs)
 {
   if(SR_HDL(n) & SR_INT)
   {
     #if SIZEOF_LONG == 4
-    fprintf(f,"4 %ld ",SR_TO_INT(n));
+    fprintf(d->f_write,"4 %ld ",SR_TO_INT(n));
     #else
     long nn=SR_TO_INT(n);
     if ((nn<POW_2_28_32)&&(nn>= -POW_2_28_32))
     {
       int nnn=(int)nn;
-      fprintf(f,"4 %d ",nnn);
+      fprintf(d->f_write,"4 %d ",nnn);
     }
     else
     {
       mpz_t tmp;
       mpz_init_set_si(tmp,nn);
-      fputs("8 ",f);
-      mpz_out_str (f,SSI_BASE, tmp);
-      fputc(' ',f);
+      fputs("8 ",d->f_write);
+      mpz_out_str (d->f_write,SSI_BASE, tmp);
+      fputc(' ',d->f_write);
       mpz_clear(tmp);
     }
     #endif
@@ -3202,29 +3202,29 @@ static void nlWriteFd(number n,FILE* f, const coeffs)
   else if (n->s<2)
   {
     //gmp_fprintf(f,"%d %Zd %Zd ",n->s,n->z,n->n);
-    fprintf(f,"%d ",n->s+5);
-    mpz_out_str (f,SSI_BASE, n->z);
-    fputc(' ',f);
-    mpz_out_str (f,SSI_BASE, n->n);
-    fputc(' ',f);
+    fprintf(d->f_write,"%d ",n->s+5);
+    mpz_out_str (d->f_write,SSI_BASE, n->z);
+    fputc(' ',d->f_write);
+    mpz_out_str (d->f_write,SSI_BASE, n->n);
+    fputc(' ',d->f_write);
 
     //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: s=%d gmp/gmp \"%Zd %Zd\" ",n->s,n->z,n->n);
   }
   else /*n->s==3*/
   {
     //gmp_fprintf(d->f_write,"3 %Zd ",n->z);
-    fputs("8 ",f);
-    mpz_out_str (f,SSI_BASE, n->z);
-    fputc(' ',f);
+    fputs("8 ",d->f_write);
+    mpz_out_str (d->f_write,SSI_BASE, n->z);
+    fputc(' ',d->f_write);
 
     //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: gmp \"%Zd\" ",n->z);
   }
 }
 
-static number nlReadFd(s_buff f, const coeffs)
+number nlReadFd(const ssiInfo *d, const coeffs)
 {
   int sub_type=-1;
-  sub_type=s_readint(f);
+  sub_type=s_readint(d->f_read);
   switch(sub_type)
   {
      case 0:
@@ -3232,8 +3232,8 @@ static number nlReadFd(s_buff f, const coeffs)
        {// read mpz_t, mpz_t
          number n=nlRInit(0);
          mpz_init(n->n);
-         s_readmpz(f,n->z);
-         s_readmpz(f,n->n);
+         s_readmpz(d->f_read,n->z);
+         s_readmpz(d->f_read,n->n);
          n->s=sub_type;
          return n;
        }
@@ -3241,7 +3241,7 @@ static number nlReadFd(s_buff f, const coeffs)
      case 3:
        {// read mpz_t
          number n=nlRInit(0);
-         s_readmpz(f,n->z);
+         s_readmpz(d->f_read,n->z);
          n->s=3; /*sub_type*/
          #if SIZEOF_LONG == 8
          n=nlShort3(n);
@@ -3250,7 +3250,7 @@ static number nlReadFd(s_buff f, const coeffs)
        }
      case 4:
        {
-         LONG dd=s_readlong(f);
+         LONG dd=s_readlong(d->f_read);
          //#if SIZEOF_LONG == 8
          return INT_TO_SR(dd);
          //#else
@@ -3262,15 +3262,15 @@ static number nlReadFd(s_buff f, const coeffs)
        {// read raw mpz_t, mpz_t
          number n=nlRInit(0);
          mpz_init(n->n);
-         s_readmpz_base (f,n->z, SSI_BASE);
-         s_readmpz_base (f,n->n, SSI_BASE);
+         s_readmpz_base (d->f_read,n->z, SSI_BASE);
+         s_readmpz_base (d->f_read,n->n, SSI_BASE);
          n->s=sub_type-5;
          return n;
        }
      case 8:
        {// read raw mpz_t
          number n=nlRInit(0);
-         s_readmpz_base (f,n->z, SSI_BASE);
+         s_readmpz_base (d->f_read,n->z, SSI_BASE);
          n->s=sub_type=3; /*subtype-5*/
          #if SIZEOF_LONG == 8
          n=nlShort3(n);
@@ -3283,6 +3283,7 @@ static number nlReadFd(s_buff f, const coeffs)
   }
   return NULL;
 }
+
 BOOLEAN nlCoeffIsEqual(const coeffs r, n_coeffType n, void *p)
 {
   /* test, if r is an instance of nInitCoeffs(n,parameter) */

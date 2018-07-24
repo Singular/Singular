@@ -9,13 +9,7 @@
 
 #include "omalloc/omalloc.h"
 #include "reporter/reporter.h" // for assume etc.
-
-struct snumber;
-typedef struct snumber *   number;
-
-struct ip_sring;
-typedef struct ip_sring *         ring;
-typedef struct ip_sring const *   const_ring;
+#include "coeffs/coeffs.h" // ring,number
 
 /***************************************************************
  *

@@ -62,10 +62,12 @@ static void * iiBI2P(void *data)
   return (void *)p;
 }
 
-static void iiBu2P(leftv out, leftv in) /* non-destr.*/
+static void iiBu2P(leftv out, leftv in)
 {
-  sBucket_pt b=(sBucket_pt)in->Data();
-  out->data=(void*)pCopy(sBucketPeek(b));
+  sBucket_pt b=(sBucket_pt)in->CopyD();
+  poly p; int l;
+  sBucketDestroyAdd(b,&p,&l);
+  out->data=(void*)p;
 }
 
 static void * iiI2V(void *data)

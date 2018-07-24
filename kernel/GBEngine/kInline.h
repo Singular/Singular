@@ -334,6 +334,13 @@ KINLINE void sLObject::Normalize()
   {
     pNormalize(p);
   }
+  if (bucket!=NULL) kBucketNormalize(bucket);
+}
+
+KINLINE void sLObject::CanonicalizeP()
+{
+  if (bucket != NULL)
+    kBucketCanonicalize(bucket);
 }
 
 KINLINE void sLObject::HeadNormalize()
@@ -638,21 +645,6 @@ KINLINE poly sLObject::LmExtractAndIter()
 
   Set(pn, tailRing);
   return ret;
-}
-
-KINLINE poly sLObject::CanonicalizeP()
-{
-  //kTest_L(this);
-  int i = -1;
-
-  if (bucket != NULL)
-    i = kBucketCanonicalize(bucket);
-
-  if (p == NULL)
-    p = k_LmInit_tailRing_2_currRing(t_p, tailRing);
-
-  if (i >= 0) pNext(p) = bucket->buckets[i];
-  return p;
 }
 
 KINLINE poly sLObject::GetTP()

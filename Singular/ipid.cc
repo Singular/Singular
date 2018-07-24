@@ -159,6 +159,7 @@ void *idrecDataInit(int t)
     case IDEAL_CMD:
     case MODUL_CMD:
     case MATRIX_CMD:
+    case SMATRIX_CMD:
       return (void*) idInit(1,1);
     case MAP_CMD:
     {

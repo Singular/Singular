@@ -196,7 +196,7 @@ static proc vfiltmat(matrix B,int d)
       U=U+syz(power(jet(B,0)-e0[i],s0[i]));
     }
     B=lift(U,B*U);
-    V=V*U;
+    V=matrix(V)*matrix(U);
 
     for(i0,i=1,1;i0<=ncols(e0);i0++)
     {
@@ -246,7 +246,7 @@ static proc vfiltmat(matrix B,int d)
     U=U+syz(power(jet(B,0)-e0[i],s0[i]));
   }
   B=lift(U,B*U);
-  V=V*U;
+  V=matrix(V)*matrix(U);
 
   d=mindegree(V);
   V=V/var(1)^d;
@@ -374,7 +374,7 @@ static proc fsplit(ideal e0,ideal e,intvec s,module V,matrix B,module G)
     U=U0+U;
   }
 
-  V=V*U;
+  V=matrix(V)*matrix(U);
   G=lift(U,G);
   B=lift(U,B*U);
 
@@ -443,7 +443,7 @@ static proc glift(ideal e,module V,matrix B,module G)
     }
   }
 
-  G=V*G;
+  G=matrix(V)*matrix(G);
   G=G/var(1)^mindegree(G);
 
   return(G,A);
@@ -545,9 +545,9 @@ EXAMPLE:  example goodBasis; shows examples
 
         B=pidbasis(K2,L2);
       }
+      B0=std(coeffs(reduce(matrix(K,nrows(module(K)),nrows(B))*B,JS),b0));
 
-      B0=std(coeffs(reduce(matrix(K,nrows(K),nrows(B))*B,JS),b0));
-      b=matrix(K,nrows(K),nrows(B))*B;
+      b=matrix(K,nrows(module(K)),nrows(B))*B;
     }
 
     A=lift(B,reduce(coeffs(f*b+var(1)^2*diff(b,var(1)),M,product(X)),L1));

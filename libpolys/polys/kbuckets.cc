@@ -368,6 +368,7 @@ void kBucketInit(kBucket_pt bucket, poly lm, int length)
 
 int kBucketCanonicalize(kBucket_pt bucket)
 {
+#ifndef HAVE_PSEUDO_BUCKETS
   assume(bucket->buckets_used<=MAX_BUCKET);
   MULTIPLY_BUCKET(bucket,1);
   kbTest(bucket);
@@ -437,6 +438,20 @@ int kBucketCanonicalize(kBucket_pt bucket)
   //if (TEST_OPT_PROT) { Print("C(%d)",pl); }
   kbTest(bucket);
   return i;
+#endif
+}
+
+void kBucketNormalize(kBucket_pt bucket)
+{
+#ifdef HAVE_PSEUDO_BUCKETS
+  p_Normalize(bucket->p,bucket->bucket_ring);
+#else
+  MULTIPLY_BUCKET(bucket,1);
+  for (int i=0; i<=bucket->buckets_used; i++)
+  {
+    p_Normalize(bucket->buckets[i],bucket->bucket_ring);
+  }
+#endif
 }
 
 void kBucketClear(kBucket_pt bucket, poly *p, int *length)

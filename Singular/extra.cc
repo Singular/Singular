@@ -317,6 +317,32 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return TRUE;
     }
     else
+  /*==================== flatten =============================*/
+    if(strcmp(sys_cmd,"flatten")==0)
+    {
+      if ((h!=NULL) &&(h->Typ()==SMATRIX_CMD))
+      {
+        res->data=(char*)sm_Flatten((ideal)h->Data(),currRing);
+        res->rtyp=SMATRIX_CMD;
+        return FALSE;
+      }
+      else
+        WerrorS("smatrix expected");
+    }
+    else
+  /*==================== unflatten =============================*/
+    if(strcmp(sys_cmd,"unflatten")==0)
+    {
+      const short t1[]={2,SMATRIX_CMD,INT_CMD};
+      if (iiCheckTypes(h,t1,1))
+      {
+        res->data=(char*)sm_UnFlatten((ideal)h->Data(),(int)(long)h->next->Data(),currRing);
+        res->rtyp=SMATRIX_CMD;
+        return res->data==NULL;
+      }
+      else return TRUE;
+    }
+    else
   /*==================== neworder =============================*/
     if(strcmp(sys_cmd,"neworder")==0)
     {
@@ -3737,20 +3763,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       extern BOOLEAN jjUNIQLIST(leftv, leftv);
       if (h->Typ()==LIST_CMD)
         return jjUNIQLIST(res,h);
-      else
-        return TRUE;
-    }
-    else
-/*==================== tensor =================*/
-    if(strcmp(sys_cmd,"tensor")==0)
-    {
-      const short t[]={2,MODUL_CMD,MODUL_CMD};
-      if (iiCheckTypes(h,t,1))
-      {
-        res->data=(void*)mp_Tensor((ideal)h->Data(),(ideal)h->next->Data(),currRing);
-        res->rtyp=MODUL_CMD;
-        return FALSE;
-      }
       else
         return TRUE;
     }

@@ -1483,7 +1483,7 @@ static proc kerLinMapD1 (ideal W, poly L, poly p)
   i = ncols(l[1]) - size(l[1]);
   if (i<>0)
   {
-    K = module(W)*l[2];
+    K = matrix(W)*matrix(l[2]);
     K = K[1..i];
   }
   else

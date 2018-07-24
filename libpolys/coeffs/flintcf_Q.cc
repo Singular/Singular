@@ -44,37 +44,9 @@ static char * nlEatLong(char *s, mpz_ptr i)
   return s;
 }
 
-static const char* Eati(const char *s, int *i)
-{
-
-  if (((*s) >= '0') && ((*s) <= '9'))
-  {
-    unsigned long ii=0L;
-    do
-    {
-      ii *= 10;
-      ii += *s++ - '0';
-    }
-    while (((*s) >= '0') && ((*s) <= '9'));
-    *i=(int)ii;
-  }
-  else (*i) = 1;
-  return s;
-}
-
-
-
-static void CoeffWrite(const coeffs r, BOOLEAN details)
-{
-  PrintS("flint fmpq_poly");
-}
 static BOOLEAN CoeffIsEqual(const coeffs r, n_coeffType n, void * parameter)
 {
   return (r->type==n);
-}
-static void KillChar(coeffs r)
-{
-  // not yet
 }
 static void SetChar(const coeffs r)
 {
@@ -302,7 +274,7 @@ static const char* Read(const char * st, number * a, const coeffs r)
 {
 // we only read "monomials" (i.e. [-][digits][parameter]),
 // everythings else (+,*,^,()) is left to the singular interpreter
-  const char *s=st;
+  char *s=(char *)st;
   *a=(number)omAlloc(sizeof(fmpq_poly_t));
   fmpq_poly_init((fmpq_poly_ptr)(*a));
   BOOLEAN neg=FALSE;
@@ -328,7 +300,7 @@ static const char* Read(const char * st, number * a, const coeffs r)
     if(isdigit(*s))
     {
       int i=1;
-      s=Eati(s,&i);
+      s=nEati(s,&i,0);
       if (i!=1)
       {
         fmpq_poly_set_coeff_si((fmpq_poly_ptr)(*a),1,0);
@@ -485,12 +457,12 @@ static number Parameter(const int i, const coeffs r)
   fmpq_poly_set_coeff_si(res,1,1);
   return (number)res;
 }
-static void WriteFd(number a, FILE *f, const coeffs)
+static void WriteFd(number a, const ssiInfo *d, const coeffs)
 {
   // format: len a_len(num den) .. a_0
   fmpq_poly_ptr aa=(fmpq_poly_ptr)a;
   int l=fmpq_poly_length(aa);
-  fprintf(f,"%d ",l);
+  fprintf(d->f_write,"%d ",l);
   mpq_t m;
   mpq_init(m);
   mpz_t num,den;
@@ -501,21 +473,21 @@ static void WriteFd(number a, FILE *f, const coeffs)
     fmpq_poly_get_coeff_mpq(m,(fmpq_poly_ptr)a,i);
     mpq_get_num(num,m);
     mpq_get_den(den,m);
-    mpz_out_str (f,SSI_BASE, num);
-    fputc(' ',f);
-    mpz_out_str (f,SSI_BASE, den);
-    fputc(' ',f);
+    mpz_out_str (d->f_write,SSI_BASE, num);
+    fputc(' ',d->f_write);
+    mpz_out_str (d->f_write,SSI_BASE, den);
+    fputc(' ',d->f_write);
   }
   mpz_clear(den);
   mpz_clear(num);
   mpq_clear(m);
 }
-static number ReadFd(s_buff f, const coeffs)
+static number ReadFd(const ssiInfo *d, const coeffs)
 {
   // format: len a_len .. a_0
   fmpq_poly_ptr aa=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
   fmpq_poly_init(aa);
-  int l=s_readint(f);
+  int l=s_readint(d->f_read);
   mpz_t nm;
   mpz_init(nm);
   mpq_t m;
@@ -523,9 +495,9 @@ static number ReadFd(s_buff f, const coeffs)
   for (int i=l;i>=0;i--)
   {
 
-    s_readmpz_base (f,nm, SSI_BASE);
+    s_readmpz_base (d->f_read,nm, SSI_BASE);
     mpq_set_num(m,nm);
-    s_readmpz_base (f,nm, SSI_BASE);
+    s_readmpz_base (d->f_read,nm, SSI_BASE);
     mpq_set_den(m,nm);
     fmpq_poly_set_coeff_mpq(aa,i,m);
   }
@@ -545,11 +517,37 @@ static CanonicalForm ConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs 
 }
 char * CoeffName(const coeffs r)
 {
-  return (char*)"flint:Q[a]";
+  static char CoeffName_flint_Q[20];
+  sprintf(CoeffName_flint_Q,"flint:QQ[%s]",r->pParameterNames[0]);
+  return (char*)CoeffName_flint_Q;
+
 }
 static char* CoeffString(const coeffs r)
 {
-  return omStrDup(CoeffName(r));
+  char *buf=(char*)omAlloc(12+strlen(r->pParameterNames[0]));
+  sprintf(buf,"flintQ(\"%s\")",r->pParameterNames[0]);
+  return buf;
+}
+static void CoeffWrite(const coeffs r, BOOLEAN details)
+{
+  PrintS(CoeffName(r));
+}
+coeffs flintQInitCfByName(char *s,n_coeffType n)
+{
+  const char start[]="flint:QQ[";
+  const int start_len=strlen(start);
+  if (strncmp(s,start,start_len)==0)
+  {
+    s+=start_len;
+    char st[10];
+    int l=sscanf(s,"%s",st);
+    if (l==1)
+    {
+      while (st[strlen(st)-1]==']') st[strlen(st)-1]='\0';
+      return nInitChar(n,(void*)st);
+    }
+  }
+  return NULL;
 }
 #ifdef LDEBUG
 static BOOLEAN DBTest(number a, const char *f, const int l, const coeffs r)
@@ -557,8 +555,14 @@ static BOOLEAN DBTest(number a, const char *f, const int l, const coeffs r)
   return TRUE;
 }
 #endif
+static void KillChar(coeffs cf)
+{
+  omFree((ADDRESS)(cf->pParameterNames[0]));
+  omFreeSize(cf->pParameterNames,sizeof(char*));
+}
 BOOLEAN flintQ_InitChar(coeffs cf, void * infoStruct)
 {
+  char *pp=(char*)infoStruct;
   cf->cfCoeffString  = CoeffString;
   cf->cfCoeffName    = CoeffName;
   cf->cfCoeffWrite   = CoeffWrite;
@@ -624,7 +628,7 @@ BOOLEAN flintQ_InitChar(coeffs cf, void * infoStruct)
 
   cf->iNumberOfParameters = 1;
   char **pn=(char**)omAlloc0(sizeof(char*));
-  pn[0]=(char*)omStrDup("a");
+  pn[0]=omStrDup(pp);
   cf->pParameterNames = (const char **)pn;
   cf->has_simple_Inverse= FALSE;
   cf->has_simple_Alloc= FALSE;

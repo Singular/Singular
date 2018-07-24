@@ -7,5 +7,5 @@ linReduceIdeal(I,0,0); // no reductions of tails
 list l = linReduceIdeal(I,1); // reduces tails and shows reductions used
 l;
 module M = I;
-matrix(l[1]) - M*l[2];
+matrix(l[1]) - matrix(M)*l[2];
 tst_status(1);$

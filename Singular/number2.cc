@@ -35,12 +35,22 @@ void crPrint(coeffs c)
 BOOLEAN jjCRING_Zp(leftv res, leftv a, leftv b)
 {
   coeffs c1=(coeffs)a->Data();
-  int    i2=(int)(long)b->Data();
+  long   i2=(long)b->Data();
   if (c1->type==n_Z)
   {
     if (i2==IsPrime(i2))
     {
-      res->data=(void *)nInitChar(n_Zp,(void*)(long)i2);
+      #ifndef TEST_ZN_AS_ZP
+      res->data=(void *)nInitChar(n_Zp,(void*)i2);
+      #else
+      ZnmInfo info;
+      mpz_t modBase;
+      mpz_init_set_ui(modBase,i2);
+      info.base= modBase;
+      info.exp= 1;
+      res->data=(void *)nInitChar(n_Zn,&info);
+      mpz_clear(modBase);
+      #endif
     }
     else
     {
@@ -56,7 +66,7 @@ BOOLEAN jjCRING_Zp(leftv res, leftv a, leftv b)
         if (i2<(8*sizeof(unsigned long)))
         {
           mpz_clear(modBase);
-          res->data=(void *) nInitChar(n_Z2m,(void*)(long)i2);
+          res->data=(void *) nInitChar(n_Z2m,(void*)i2);
           return FALSE;
         }
         else

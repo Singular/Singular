@@ -222,7 +222,7 @@ public:
 
   // does not delete bucket, just canonicalizes it
   // returned poly is such that Lm(p) \in currRing, Tail(p) \in tailRing
-  KINLINE poly CanonicalizeP();
+  KINLINE void CanonicalizeP();
 
   // makes a copy of the poly of L
   KINLINE void Copy();
@@ -842,4 +842,18 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
 extern  int (*test_PosInT)(const TSet T,const int tl,LObject &h);
 extern  int (*test_PosInL)(const LSet set, const int length,
                 LObject* L,const kStrategy strat);
+
+static inline void kDeleteLcm(LObject *P)
+{
+ if (P->lcm!=NULL)
+ {
+ #ifdef HAVE_RINGS
+   if (rField_is_Ring(currRing))
+     pLmDelete(P->lcm);
+   else
+ #endif
+     pLmFree(P->lcm);
+   P->lcm=NULL;
+ }
+}
 #endif

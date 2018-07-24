@@ -13,19 +13,13 @@
 #include "coeffs/coeffs.h"
 #include "misc/intvec.h"
 #include "misc/int64vec.h"
+#include "coeffs/coeffs.h" // ring,number
 #include "polys/monomials/monomials.h"
 //#include "polys/monomials/polys-impl.h"
 //
 
 /* forward declaration of types */
 class idrec; typedef idrec *   idhdl; // _only_ for idhdl ip_sring::idroot
-//struct  spolyrec;
-//typedef struct spolyrec    polyrec;
-//typedef struct spolyrec *         poly;
-//typedef struct spolyrec const *   const_poly;
-struct ip_sring;
-typedef struct ip_sring *         ring;
-typedef struct ip_sring const *   const_ring;
 struct p_Procs_s;
 typedef struct p_Procs_s p_Procs_s;
 class kBucket;
@@ -513,6 +507,9 @@ static inline BOOLEAN rField_is_Q(const ring r)
 
 static inline BOOLEAN rField_is_Z(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Z(r->cf); }
+
+static inline BOOLEAN rField_is_Zn(const ring r)
+{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Zn(r->cf); }
 
 static inline BOOLEAN rField_is_numeric(const ring r) /* R, long R, long C */
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_numeric(r->cf); }

@@ -257,7 +257,7 @@ int redEcart (LObject* h,kStrategy strat)
     if (h->IsNull())
     {
       assume(!rField_is_Ring(currRing));
-      if (h->lcm!=NULL) pLmFree(h->lcm);
+      kDeleteLcm(h);
       h->Clear();
       return 0;
     }
@@ -360,7 +360,7 @@ int redRiloc (LObject* h,kStrategy strat)
       postReduceByMon(h, strat);
       if(h->p == NULL)
       {
-        if (h->lcm!=NULL) pLmDelete(h->lcm);
+        kDeleteLcm(h);
         h->Clear();
         return 0;
       }
@@ -371,7 +371,7 @@ int redRiloc (LObject* h,kStrategy strat)
           h->i_r1 = -1;
       if (h->GetLmTailRing() == NULL)
       {
-        if (h->lcm!=NULL) pLmDelete(h->lcm);
+        kDeleteLcm(h);
         h->Clear();
         return 0;
       }
@@ -453,7 +453,7 @@ int redRiloc (LObject* h,kStrategy strat)
     // are we done ???
     if (h->IsNull())
     {
-      if (h->lcm!=NULL) pLmDelete(h->lcm);
+      kDeleteLcm(h);
       h->Clear();
       return 0;
     }
@@ -574,7 +574,7 @@ int redFirst (LObject* h,kStrategy strat)
     if (h->IsNull())
     {
       assume(!rField_is_Ring(currRing));
-      if (h->lcm!=NULL) pLmFree(h->lcm);
+      kDeleteLcm(h);
       h->Clear();
       return 0;
     }
@@ -992,10 +992,8 @@ BOOLEAN hasPurePower (LObject *L,int last, int *length,kStrategy strat)
 {
   if (L->bucket != NULL)
   {
-    poly p = L->CanonicalizeP();
-    BOOLEAN ret = hasPurePower(p, last, length, strat);
-    pNext(p) = NULL;
-    return ret;
+    poly p = L->GetP();
+    return hasPurePower(p, last, length, strat);
   }
   else
   {
@@ -1702,14 +1700,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
 
       // clear strat->P
-      if (strat->P.lcm!=NULL)
-      {
-        if (rField_is_Ring(currRing))
-          pLmDelete(strat->P.lcm);
-        else
-          pLmFree(strat->P.lcm);
-        strat->P.lcm=NULL;
-      }
+      kDeleteLcm(&strat->P);
 
 #ifdef KDEBUG
       // make sure kTest_TS does not complain about strat->P
@@ -3320,12 +3311,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
       {
         // clean P
       }
-      if (strat->P.lcm!=NULL)
-#ifdef HAVE_RINGS
-        pLmDelete(strat->P.lcm);
-#else
-        pLmFree(strat->P.lcm);
-#endif
+      kDeleteLcm(&strat->P);
     }
 
 #ifdef KDEBUG

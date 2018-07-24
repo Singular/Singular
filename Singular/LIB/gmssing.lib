@@ -514,8 +514,8 @@ static proc transform(matrix A,matrix A0,ideal r,module H,module H0,ideal e,
       }
       V=inverse(U);
       A=V*A*U;
-      H=H*U;
-      H0=V*H0;
+      H=matrix(H)*matrix(U);
+      H0=matrix(V)*matrix(H0);
 
       dbprint(printlevel-voice+2,"// transform to reduce maximum of d by 1");
       for(i0,i=1,1;i0<=ncols(e);i0++)
@@ -580,8 +580,8 @@ static proc transform(matrix A,matrix A0,ideal r,module H,module H0,ideal e,
   }
   V=inverse(U);
   A=V*A*U;
-  H=H*U;
-  H0=V*H0;
+  H=matrix(H)*matrix(U);
+  H0=matrix(V)*matrix(H0);
 
   return(A,A0,r,H,H0,e,m,K0);
 }
@@ -842,7 +842,7 @@ EXAMPLE:  example vwfilt; shows examples
   matrix V=inverse(U);
   A=V*A*U;
   dbprint(printlevel-voice+2,"// compute standard basis of H''");
-  H=H*U;
+  H=matrix(H)*matrix(U);
   H0=std(V*H0);
 
   dbprint(printlevel-voice+2,"// compute spectral pairs");
@@ -854,7 +854,7 @@ EXAMPLE:  example vwfilt; shows examples
     a[i]=A[j,j]+ord(H0[i]) div deg(var(1))-1;
     w[i]=v[j]+n;
   }
-  H=H*H0;
+  H=matrix(H)*matrix(H0);
   H=simplify(jet(H/var(1)^(mindegree(H) div deg(var(1))),0),1);
 
   kill l;
@@ -957,7 +957,7 @@ static proc fsplit(ideal e0,intvec m0,matrix A,module H,module H0)
   }
 
   dbprint(printlevel-voice+2,"// transform to Hodge splitting basis");
-  H=H*U;
+  H=matrix(H)*matrix(U);
   H0=lift(U,H0);
   A=lift(U,A*U);
 
@@ -1028,7 +1028,7 @@ static proc glift(ideal e,matrix A,module H,module H0,int K)
     }
   }
 
-  H0=H*H0;
+  H0=matrix(H)*matrix(H0);
   H0=H0/var(1)^(mindegree(H0) div deg(var(1)));
 
   return(A0,H0);

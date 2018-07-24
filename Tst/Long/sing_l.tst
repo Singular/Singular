@@ -69,7 +69,7 @@ ring r    = 0,(x,y,z),ds;
    vdim(T);                   "// Tjurina number = dim_K(T_1), should be 3";
 //pause;
    list L=T_1(i,"");
-   print(transpose(L[3])*L[2]); "// should be 0 (mod i)";
+   print(transpose(matrix(L[3]))*matrix(L[2])); "// should be 0 (mod i)";
    L;
 //pause;
    kill r;

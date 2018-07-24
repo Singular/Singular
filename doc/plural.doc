@@ -2401,10 +2401,10 @@ resolution M=mres(i,0);
 M;
 list l = M; l;
 // see the exactness at this point
-size(ideal(transpose(l[2])*transpose(l[1])));
+size(ideal(transpose(matrix(l[2]))*transpose(matrix(l[1]))));
 print(matrix(M[3]));
 // see the exactness at this point
-size(ideal(transpose(l[3])*transpose(l[2])));
+size(ideal(transpose(matrix(l[3]))*transpose(matrix(l[2]))));
 @c example
 @end smallexample
 @end table
@@ -2595,9 +2595,9 @@ i = std(i);
 resolution F=nres(i,0); F;
 list l = F; l;
 // see the exactness at this point:
-size(ideal(transpose(l[2])*transpose(l[1])));
+size(ideal(transpose(matrix(l[2]))*transpose(matrix(l[1]))));
 // see the exactness at this point:
-size(ideal(transpose(l[3])*transpose(l[2])));
+size(ideal(transpose(matrix(l[3]))*transpose(matrix(l[2]))));
 print(betti(l), "betti");
 print(betti(minres(l)), "betti");
 @c example
@@ -3834,9 +3834,9 @@ print(matrix(l[1]));
 print(matrix(l[2]));
 ideal tst; // now let us show that the resolution is exact
 matrix TST;
-TST = transpose(l[3])*transpose(l[2]); // 2nd term
+TST = transpose(matrix(l[3]))*transpose(matrix(l[2])); // 2nd term
 size(ideal(TST));
-TST = transpose(l[2])*transpose(l[1]); // 1st term
+TST = transpose(matrix(l[2]))*transpose(matrix(l[1])); // 1st term
 size(ideal(TST));
 @c example
 @end smallexample

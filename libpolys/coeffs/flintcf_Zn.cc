@@ -57,9 +57,10 @@ static BOOLEAN CoeffIsEqual(const coeffs r, n_coeffType n, void * parameter)
           &&(r->pParameterNames!=NULL)
           &&(strcmp(r->pParameterNames[0],pp->name)==0);
 }
-static void KillChar(coeffs r)
+static void KillChar(coeffs cf)
 {
-  // not yet
+  omFree((ADDRESS)(cf->pParameterNames[0]));
+  omFreeSize(cf->pParameterNames,sizeof(char*));
 }
 static void SetChar(const coeffs r)
 {
@@ -427,31 +428,53 @@ static char * CoeffName(const coeffs r)
 static char* CoeffString(const coeffs r)
 {
   char *buf=(char*)omAlloc(12+10 /*ch*/+strlen(r->pParameterNames[0]));
-  sprintf(buf,"flintZ(%d,\"%s\")",r->ch,r->pParameterNames[0]);
+  sprintf(buf,"flintZn(%d,\"%s\")",r->ch,r->pParameterNames[0]);
   return buf;
 }
-static void WriteFd(number a, FILE *f, const coeffs)
+coeffs flintZnInitCfByName(char *s,n_coeffType n)
+{
+  const char start[]="flint:Z/";
+  const int start_len=strlen(start);
+  if (strncmp(s,start,start_len)==0)
+  {
+    s+=start_len;
+    int p;
+    char st[10];
+    int l=sscanf(s,"%d[%s",&p,st);
+    if (l==2)
+    {
+      flintZn_struct info;
+      info.ch=p;
+      while (st[strlen(st)-1]==']') st[strlen(st)-1]='\0';
+      info.name=st;
+      return nInitChar(n,(void*)&info);
+    }
+  }
+  return NULL;
+}
+static void WriteFd(number a, const ssiInfo *d, const coeffs)
 {
   // format: len a_len .. a_0
   nmod_poly_ptr aa=(nmod_poly_ptr)a;
   int l=nmod_poly_length(aa);
-  fprintf(f,"%d ",l);
+  fprintf(d->f_write,"%d ",l);
   for(int i=l; i>=0; i--)
   {
     ulong ul=nmod_poly_get_coeff_ui(aa,i);
-    fprintf(f,"%lu ", ul);
+    fprintf(d->f_write,"%lu ", ul);
   }
 }
-static number ReadFd(s_buff f, const coeffs r)
+
+static number ReadFd(const ssiInfo *d, const coeffs r)
 {
   // format: len a_len .. a_0
   nmod_poly_ptr aa=(nmod_poly_ptr)omAlloc(sizeof(nmod_poly_t));
   nmod_poly_init(aa,r->ch);
-  int l=s_readint(f);
+  int l=s_readint(d->f_read);
   unsigned long ul;
   for (int i=l;i>=0;i--)
   {
-    unsigned long ul=s_readlong(f);
+    unsigned long ul=s_readlong(d->f_read);
     nmod_poly_set_coeff_ui(aa,i,ul);
   }
   return (number)aa;
@@ -478,8 +501,8 @@ BOOLEAN flintZn_InitChar(coeffs cf, void * infoStruct)
   cf->cfAdd          = Add;
   cf->cfDiv          = Div;
   cf->cfExactDiv     = ExactDiv; // ???
-  cf->cfInit         =Init;
-  cf->cfInitMPZ      =InitMPZ;
+  cf->cfInit         = Init;
+  cf->cfInitMPZ      = InitMPZ;
   cf->cfSize         = Size;
   cf->cfInt          = Int;
   cf->cfMPZ          = MPZ;

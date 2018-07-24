@@ -422,7 +422,6 @@ static char* ngcCoeffName(const coeffs r)
 {
   static char ngcCoeffName_buf[40];
   const char *p=n_ParameterNames(r)[0];
-  if (ngcCoeffName_buf!=NULL) omFree(ngcCoeffName_buf);
   sprintf(ngcCoeffName_buf,"complex,%d,%d,%s",r->float_len,r->float_len2,p);
   return ngcCoeffName_buf;
 }

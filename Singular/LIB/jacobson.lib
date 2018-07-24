@@ -357,11 +357,11 @@ int ppl = printlevel-voice+2;
 
       if (flag mod 2 ==1)
       {
-        TrafoL=transpose(LT)*TrafoL;
+        TrafoL=transpose(matrix(LT))*matrix(TrafoL);
       }
       else
       {
-        TrafoR=TrafoR*LT;
+        TrafoR=matrix(TrafoR)*matrix(LT);
       }
 
 
@@ -412,8 +412,8 @@ int ppl = printlevel-voice+2;
         SORT=SORT,gen(j);
       }
       SORT=SORT,gen(1);
-      STD=STD*SORT;
-      TrafoR=TrafoR*SORT;
+      STD=matrix(STD)*matrix(SORT);
+      TrafoR=matrix(TrafoR)*matrix(SORT);
     }
 
     //zero rows to the end
@@ -438,8 +438,8 @@ int ppl = printlevel-voice+2;
       for(j=3;j<=COL;j++){SORT=SORT,gen(j);}
       SORT=SORT,gen(1);
       SORT=transpose(SORT);
-      STD=SORT*STD;
-      TrafoL=SORT*TrafoL;
+      STD=matrix(SORT)*matrix(STD);
+      TrafoL=matrix(SORT)*matrix(TrafoL);
     }
 
     setring R;
@@ -958,7 +958,7 @@ proc triangle(matrix MA, int B)
 
        if (flag mod 2 ==1)
         {
-         TrafoL=transpose(LT)*TrafoL;
+         TrafoL=transpose(matrix(LT))*matrix(TrafoL);
          dbprint(ppl-1,"Left transformation matrix:");
          dbprint(ppl-1,TrafoL);
          @s = texobj("",matrix(TrafoL));
@@ -967,7 +967,7 @@ proc triangle(matrix MA, int B)
         }
        else
         {
-         TrafoR=TrafoR*involution(LT,inv);
+         TrafoR=matrix(TrafoR)*matrix(involution(LT,inv));
          dbprint(ppl-1,"Right transformation matrix:");
          dbprint(ppl-1,matrix(TrafoR));
          @s = texobj("",TrafoR);

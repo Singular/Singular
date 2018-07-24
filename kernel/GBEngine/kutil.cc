@@ -1162,13 +1162,7 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
 {
   if (set[j].lcm!=NULL)
   {
-#ifdef HAVE_RINGS
-    if (rField_is_Ring(currRing)
-    && (pGetCoeff(set[j].lcm) != NULL))
-      pLmDelete(set[j].lcm);
-    else
-#endif
-      pLmFree(set[j].lcm);
+    kDeleteLcm(&set[j]);
   }
   if (set[j].sig!=NULL)
   {
@@ -1401,10 +1395,10 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
   poly pm1 = pp_Mult_mm(pNext(p), m1, strat->tailRing);
   poly sim2 = pp_Mult_mm(pNext(si), m2, strat->tailRing);
   pDelete(&si);
+  p_LmDelete(m1, currRing);
+  p_LmDelete(m2, currRing);
   if(sim2 == NULL)
   {
-    pDelete(&m1);
-    pDelete(&m2);
     if(pm1 == NULL)
     {
       if(h.lcm != NULL)
@@ -1435,8 +1429,6 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
     gcd = p_Add_q(pm1, sim2, strat->tailRing);
   }
   p_Test(gcd, strat->tailRing);
-  //p_LmDelete(m1, strat->tailRing);
-  //p_LmDelete(m2, strat->tailRing);
 #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
@@ -8415,7 +8407,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
       {
         deleteHC(&h,strat);
       }
-      else
+      else if (TEST_OPT_REDTAIL || TEST_OPT_REDSB)
       {
         h.p=redtailBba(h.p,strat->sl,strat);
       }
@@ -8451,7 +8443,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
         if (rHasGlobalOrdering(currRing))
         {
           h.p=redBba(h.p,strat->sl,strat);
-          if (h.p!=NULL)
+          if ((h.p!=NULL)&&(TEST_OPT_REDTAIL || TEST_OPT_REDSB))
           {
             h.p=redtailBba(h.p,strat->sl,strat);
           }
@@ -8559,7 +8551,7 @@ void initSSpecialSba (ideal F, ideal Q, ideal P,kStrategy strat)
       {
         deleteHC(&h,strat);
       }
-      else
+      else if (TEST_OPT_REDTAIL || TEST_OPT_REDSB)
       {
         h.p=redtailBba(h.p,strat->sl,strat);
       }
@@ -8595,7 +8587,7 @@ void initSSpecialSba (ideal F, ideal Q, ideal P,kStrategy strat)
         if (rHasGlobalOrdering(currRing))
         {
           h.p=redBba(h.p,strat->sl,strat);
-          if (h.p!=NULL)
+          if ((h.p!=NULL)&&(TEST_OPT_REDTAIL || TEST_OPT_REDSB))
           {
             h.p=redtailBba(h.p,strat->sl,strat);
           }
@@ -10616,8 +10608,10 @@ BOOLEAN kCheckSpolyCreation(LObject *L, kStrategy strat, poly &m1, poly &m2)
   {
     return TRUE;
   }
-  poly p1_max = (strat->R[L->i_r1])->max_exp;
-  poly p2_max = (strat->R[L->i_r2])->max_exp;
+  poly p1_max=NULL;
+  if (L->i_r1>=0) p1_max = (strat->R[L->i_r1])->max_exp;
+  poly p2_max=NULL;
+  if (L->i_r2>=0) p2_max = (strat->R[L->i_r2])->max_exp;
 
   if (((p1_max != NULL) && !p_LmExpVectorAddIsOk(m1, p1_max, strat->tailRing)) ||
       ((p2_max != NULL) && !p_LmExpVectorAddIsOk(m2, p2_max, strat->tailRing)))

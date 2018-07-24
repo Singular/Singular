@@ -30,6 +30,7 @@
 #include "coeffs/OPAEp.h"
 #include "coeffs/flintcf_Q.h"
 #include "coeffs/flintcf_Zn.h"
+#include "coeffs/rmodulon.h"
 
 #include "polys/ext_fields/algext.h"
 #include "polys/ext_fields/transext.h"
@@ -1222,16 +1223,11 @@ static BOOLEAN ii_pAE_init(leftv res,leftv a)
 #endif
 #ifdef HAVE_FLINT
 static n_coeffType n_FlintZn=n_unknown;
+static n_coeffType n_FlintQ=n_unknown;
 static BOOLEAN ii_FlintZn_init(leftv res,leftv a)
 {
-  if ((a->Typ()!=INT_CMD)
-  ||(a->next==NULL)
-  ||(a->next->Typ()!=STRING_CMD))
-  {
-    WerrorS("`int`i,`string` expected");
-    return TRUE;
-  }
-  else
+  const short t[]={2,INT_CMD,STRING_CMD};
+  if (iiCheckTypes(a,t,1))
   {
     flintZn_struct p;
     p.ch=(int)(long)a->Data();
@@ -1240,6 +1236,20 @@ static BOOLEAN ii_FlintZn_init(leftv res,leftv a)
     res->data=(void*)nInitChar(n_FlintZn,(void*)&p);
     return FALSE;
   }
+  return TRUE;
+}
+static BOOLEAN ii_FlintQ_init(leftv res,leftv a)
+{
+  const short t[]={1,STRING_CMD};
+  if (iiCheckTypes(a,t,1))
+  {
+    char* p;
+    p=(char*)a->Data();
+    res->rtyp=CRING_CMD;
+    res->data=(void*)nInitChar(n_FlintQ,(void*)p);
+    return FALSE;
+  }
+  return TRUE;
 }
 #endif
 
@@ -1309,12 +1319,7 @@ static BOOLEAN iiCrossProd(leftv res, leftv args)
 void siInit(char *name)
 {
 // factory default settings: -----------------------------------------------
-  On(SW_USE_EZGCD);
-  On(SW_USE_CHINREM_GCD);
-  //On(SW_USE_FF_MOD_GCD);
-  On(SW_USE_EZGCD_P);
-  On(SW_USE_QGCD);
-  Off(SW_USE_NTL_SORT); // may be changed by an command line option
+  //Off(SW_USE_NTL_SORT); // may be changed by an command line option
   factoryError=WerrorS;
 
 // NTL error handling (>= 9.3.0)
@@ -1413,6 +1418,7 @@ void siInit(char *name)
     IDDATA(h)=(char*)nInitChar(n_Q,NULL);
     h=enterid("ZZ",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
     IDDATA(h)=(char*)nInitChar(n_Z,NULL);
+    nRegisterCfByName(nrnInitCfByName,n_Zn); // and n_Znm
     iiAddCproc("kernel","crossprod",FALSE,iiCrossProd);
     iiAddCproc("kernel","Float",FALSE,iiFloat);
     //h=enterid("RR",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
@@ -1440,16 +1446,17 @@ void siInit(char *name)
     }
 #endif
     #ifdef HAVE_FLINT
-    t=nRegister(n_unknown,flintQ_InitChar);
-    if (t!=n_unknown)
+    n_FlintQ=nRegister(n_unknown,flintQ_InitChar);
+    if (n_FlintQ!=n_unknown)
     {
-      h=enterid("flint_poly_Q",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
-      IDDATA(h)=(char*)nInitChar(t,NULL);
+      iiAddCproc("kernel","flintQ",FALSE,ii_FlintQ_init);
+      nRegisterCfByName(flintQInitCfByName,n_FlintQ);
     }
     n_FlintZn=nRegister(n_unknown,flintZn_InitChar);
     if (n_FlintZn!=n_unknown)
     {
-      iiAddCproc("kernel","flintZ",FALSE,ii_FlintZn_init);
+      iiAddCproc("kernel","flintZn",FALSE,ii_FlintZn_init);
+      nRegisterCfByName(flintZnInitCfByName,n_FlintZn);
     }
     #endif
   }

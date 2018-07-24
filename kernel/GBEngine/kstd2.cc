@@ -461,7 +461,7 @@ int redRing (LObject* h,kStrategy strat)
       postReduceByMon(h, strat);
       if(h->p == NULL)
       {
-        if (h->lcm!=NULL) pLmDelete(h->lcm);
+        kDeleteLcm(h);
         h->Clear();
         return 0;
       }
@@ -475,7 +475,7 @@ int redRing (LObject* h,kStrategy strat)
             h->i_r1 = -1;
         if (h->GetLmTailRing() == NULL)
         {
-          if (h->lcm!=NULL) pLmDelete(h->lcm);
+          kDeleteLcm(h);
           h->Clear();
           return 0;
         }
@@ -488,10 +488,7 @@ int redRing (LObject* h,kStrategy strat)
     //printf("\nAfter small red: ");pWrite(h->p);
     if (h->GetLmTailRing() == NULL)
     {
-      if (h->lcm!=NULL) pLmDelete(h->lcm);
-#ifdef KDEBUG
-      h->lcm=NULL;
-#endif
+      kDeleteLcm(h);
       h->Clear();
       return 0;
     }
@@ -634,10 +631,7 @@ int redHomog (LObject* h,kStrategy strat)
     h_p = h->GetLmTailRing();
     if (h_p == NULL)
     {
-      if (h->lcm!=NULL) pLmFree(h->lcm);
-#ifdef KDEBUG
-      h->lcm=NULL;
-#endif
+      kDeleteLcm(h);
       return 0;
     }
     h->SetShortExpVector();
@@ -838,10 +832,7 @@ int redSig (LObject* h,kStrategy strat)
       h_p = h->GetLmTailRing();
       if (h_p == NULL)
       {
-        if (h->lcm!=NULL) pLmFree(h->lcm);
-#ifdef KDEBUG
-        h->lcm=NULL;
-#endif
+        kDeleteLcm(h);
         return 0;
       }
       h->SetShortExpVector();
@@ -946,7 +937,7 @@ int redSigRing (LObject* h,kStrategy strat)
             h->i_r1 = -1;
         if (h->GetLmTailRing() == NULL)
         {
-          if (h->lcm!=NULL) pLmDelete(h->lcm);
+          kDeleteLcm(h);
           h->Clear();
           return 0;
         }
@@ -1090,10 +1081,7 @@ int redSigRing (LObject* h,kStrategy strat)
       h_p = h->GetLmTailRing();
       if (h_p == NULL)
       {
-        if (h->lcm!=NULL) pLmFree(h->lcm);
-#ifdef KDEBUG
-        h->lcm=NULL;
-#endif
+        kDeleteLcm(h);
         return 0;
       }
       h->SetShortExpVector();
@@ -1340,10 +1328,7 @@ int redLazy (LObject* h,kStrategy strat)
 
     if (h_p == NULL)
     {
-      if (h->lcm!=NULL) pLmFree(h->lcm);
-#ifdef KDEBUG
-      h->lcm=NULL;
-#endif
+      kDeleteLcm(h);
       return 0;
     }
     h->SetShortExpVector();
@@ -1513,11 +1498,8 @@ int redHoney (LObject* h, kStrategy strat)
 #endif
     if(h->IsNull())
     {
+      kDeleteLcm(h);
       h->Clear();
-      if (h->lcm!=NULL) pLmFree(h->lcm);
-      #ifdef KDEBUG
-      h->lcm=NULL;
-      #endif
       return 0;
     }
     if (TEST_OPT_IDLIFT)
@@ -2033,7 +2015,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       strat->P.PrepareRed(strat->use_buckets);
     }
 
-    if (strat->P.p == NULL && strat->P.t_p == NULL)
+    if ((strat->P.p == NULL) && (strat->P.t_p == NULL))
     {
       red_result = 0;
     }
@@ -2143,12 +2125,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);
-      if (strat->P.lcm!=NULL)
-      {
-        if (rField_is_Ring(currRing)) pLmDelete(strat->P.lcm);
-        else                          pLmFree(strat->P.lcm);
-        strat->P.lcm=NULL;
-      }
+      kDeleteLcm(&strat->P);
       if (strat->s_poly!=NULL)
       {
         // the only valid entries are: strat->P.p,
@@ -2588,8 +2565,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
           int pos = posInSyz(strat, strat->P.sig);
           enterSyz(strat->P, strat, pos);
-          if (strat->P.lcm!=NULL)
-            pLmFree(strat->P.lcm);
+          kDeleteLcm(&strat->P);
           red_result = 2;
         }
         else
@@ -2892,7 +2868,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if(strat->sbaOrder == 0 || strat->sbaOrder == 3)
       {
         int cmp     = pGetComp(strat->P.sig);
-        int max_cmp = IDELEMS(F);
+        unsigned max_cmp = IDELEMS(F);
         int* vv = (int*)omAlloc((currRing->N+1)*sizeof(int));
         p_GetExpV (strat->P.p,vv,currRing);
         LObject Q;
@@ -2919,7 +2895,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         {
           // if the element is not the first one in the given index we build all
           // possible syzygies with elements of higher index
-          for (int i=cmp+1; i<=max_cmp; ++i)
+          for (unsigned i=cmp+1; i<=max_cmp; ++i)
           {
             pos = -1;
             for (int j=0; j<strat->sl; ++j)
@@ -2986,12 +2962,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);
-      if (strat->P.lcm!=NULL)
-#ifdef HAVE_RINGS
-        pLmDelete(strat->P.lcm);
-#else
-        pLmFree(strat->P.lcm);
-#endif
+      kDeleteLcm(&strat->P);
       if (strat->sl>srmax) srmax = strat->sl;
     }
     else
@@ -3763,12 +3734,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
         if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
       }
       //      Print("[%d]",hilbeledeg);
-      if (strat->P.lcm!=NULL)
-#ifdef HAVE_RINGS
-        pLmDelete(strat->P.lcm);
-#else
-      pLmFree(strat->P.lcm);
-#endif
+      kDeleteLcm(&strat->P);
       if (strat->sl>srmax) srmax = strat->sl;
     }
     else
@@ -4001,7 +3967,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         {
           strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
           strat->P.pCleardenom();
-          if (strat->redTailChange) { 
+          if (strat->redTailChange) {
             strat->P.t_p=NULL;
             strat->initEcart(&(strat->P));
           }
@@ -4057,10 +4023,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);
-      if (strat->P.lcm!=NULL) {
-        pLmFree(strat->P.lcm);
-        strat->P.lcm=NULL;
-      }
+      kDeleteLcm(&strat->P);
       if (strat->s_poly!=NULL)
       {
         // the only valid entries are: strat->P.p,
@@ -4224,7 +4187,7 @@ int redFirstShift (LObject* h,kStrategy strat)
 #endif
     if (h->IsNull())
     {
-      if (h->lcm!=NULL) pLmFree(h->lcm);
+      kDeleteLcm(h);
       h->Clear();
       return 0;
     }

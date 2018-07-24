@@ -1,0 +1,2836 @@
+////////////////////////////////////////////////////////////
+version="version ncrat.lib 1.5.1.1 June_2018 "; // $Id$
+category="Noncommutative";
+info="
+LIBRARY:      ncrat.lib Framework for working with nc rational functions
+
+AUTHOR:       Ricardo Schnur, email: ricardo.schnur@math.uni-sb.de
+
+SUPPORT:      This project is funded by the SFB-TRR 195
+  'Symbolic Tools in Mathematics and their Application'.
+
+OVERVIEW:     This library provides a framework for working with
+  non-commutative rational functions (or rather, expressions)
+  and their representations
+
+REFERENCES:   T. Mai: On the analytic theory of non-commutative
+   distributions in free probability. Universitaet des Saarlandes,
+   Dissertation, 2017
+
+KEYWORDS:     noncommutative, rational expressions;
+   rational functions; formal linear representations; minimal representations
+
+PROCEDURES:
+  ncInit(list);                 Set up framework, list contains nc variables
+  ncVarsGet();                  List nc variables that are in use
+  ncVarsAdd(list);              Add variables from list to 'NCRING'
+  ncratDefine();                Define element of type ncrat
+  ncratAdd();                   Addition of two ncrat's
+  ncratSubstract();             Substraction of two ncrat's
+  ncratMultiply();              Multiplication of two ncrat's
+  ncratInvert();                Invert an ncrat
+  ncratSPrint();                Print-to-string for ncrat
+  ncratPrint();                 Print for ncrat
+  ncratFromString();            Reads string into ncrat
+  ncratFromPoly();              Converts poly to ncrat
+  ncratPower();                 Raises ncrat to an integer power
+  ncratEvaluateAt();            Evaluate ncrat at scalar or matrix point
+  ncrepGet();                   Calculate representation of ncrat
+  ncrepAdd();                   Addition of two ncrep's
+  ncrepSubstract();             Substraction of two ncrep's
+  ncrepMultiply();              Multiplication of two ncrep's
+  ncrepInvert();                Invert an ncrep
+  ncrepPrint();                 Print for ncrep
+  ncrepDim();                   Return the size of ncrep
+  ncrepSubstitute();            Plug matrices into nc variables in ncrep
+  ncrepEvaluate();              Given (u, Q, v) calculate -u*Q^(-1)*v
+  ncrepEvaluateAt();            Evaluate ncrep at scalar or matrix point
+  ncrepIsDefinedDim();          Random matrix test if ncrep can be evaluated at size dim
+  ncrepIsDefined();             Random matrix test if domain of ncrep is not empty
+  ncrepIsRegular();             Random matrix test if ncrep can be evaluated at scalar point
+  ncrepRegularZeroMinimize();   Yields a minimal representation if regular at zero
+  ncrepRegularMinimize();       Yields a minimal representation if regular at scalar point
+  ncrepGetRegularZeroMinimal(); Get a minimal representation of ncrat regular at zero
+  ncrepGetRegularMinimal();     Get a minimal representation of ncrat regular at scalar point
+  ncrepPencilGet();             Given representation decompose its matrix in linear pencil
+  ncrepPencilCombine();         Given linear pencil add up its elements to single matrix
+";
+
+LIB "linalg.lib";
+LIB "random.lib";
+////////////////////////////////////////////////////////////
+
+/*##########################################################
+
+   STATIC PROCEDURES
+
+##########################################################*/
+
+/*##########################################################
+
+   GENERAL
+
+##########################################################*/
+
+// Check whether all entries of a matrix are 0
+static proc isMatrixEmpty(matrix M)
+{
+  int n = ncols(M);
+  int m = nrows(M);
+
+  int i, j;
+  int isZero = 1;
+  i = 1;
+  while (i <= n)
+  {
+    j = 1;
+    while (isZero and j <= m)
+    {
+      if (not(M[j, i] == 0))
+      {
+        isZero = 0;
+      }
+      j++;
+    }
+    i++;
+  }
+  return (isZero);
+}
+
+/*##########################################################
+
+   STRING
+
+##########################################################*/
+
+/*---------------------------------------------------------/
+
+  Some tools to work on strings
+
+/---------------------------------------------------------*/
+
+// Is first character a special character?
+static proc isSelfRepresented(string s)
+{
+  if (size(s) == 0)
+  {
+    ERROR("Called isSelfRepresented() with empty string.");
+  }
+  if (s[1] == ";" or s[1] == "(" or s[1] == ")" or s[1] == "+" or s[1] == "-" or
+      s[1] == "*" or s[1] == "^" or s[1] == "/")
+  {
+    return (1);
+  }
+  return (0);
+}
+
+// Is first character a whitespace?
+static proc isWhitespace(string s)
+{
+  if (size(s) == 0)
+  {
+    ERROR("Called isWhitespace() with empty string.");
+  }
+  if (s[1] == " " or s[1] == newline)
+  {
+    return (1);
+  }
+  return (0);
+}
+
+// Is first character a digit?
+static proc isDigit(string s)
+{
+  if (size(s) == 0)
+  {
+    ERROR("Called isDigit() with empty string.");
+  }
+  if (s[1] == "0" or s[1] == "1" or s[1] == "2" or s[1] == "3" or s[1] == "4" or
+      s[1] == "5" or s[1] == "6" or s[1] == "7" or s[1] == "8" or s[1] == "9")
+  {
+    return (1);
+  }
+  return (0);
+}
+
+// Is first character a letter?
+static proc isLetter(string s)
+{
+  if (size(s) == 0)
+  {
+    ERROR("Called isLetter() with empty string.");
+  }
+  if (s[1] == "A" or s[1] == "a" or s[1] == "B" or s[1] == "b" or s[1] == "C" or
+      s[1] == "c" or s[1] == "D" or s[1] == "d" or s[1] == "E" or s[1] == "e" or
+      s[1] == "F" or s[1] == "f" or s[1] == "G" or s[1] == "g" or s[1] == "H" or
+      s[1] == "h" or s[1] == "I" or s[1] == "i" or s[1] == "J" or s[1] == "j" or
+      s[1] == "K" or s[1] == "k" or s[1] == "L" or s[1] == "l" or s[1] == "M" or
+      s[1] == "m" or s[1] == "N" or s[1] == "n" or s[1] == "O" or s[1] == "o" or
+      s[1] == "P" or s[1] == "p" or s[1] == "Q" or s[1] == "q" or s[1] == "R" or
+      s[1] == "r" or s[1] == "S" or s[1] == "s" or s[1] == "T" or s[1] == "t" or
+      s[1] == "U" or s[1] == "u" or s[1] == "V" or s[1] == "v" or s[1] == "W" or
+      s[1] == "w" or s[1] == "X" or s[1] == "x" or s[1] == "Y" or s[1] == "y" or
+      s[1] == "Z" or s[1] == "z")
+  {
+    return (1);
+  }
+  return (0);
+}
+
+// Convert string representation of a number into number
+static proc digitToInt(string s)
+{
+  if (size(s) == 0)
+  {
+    ERROR("Called digitToInt() with empty string.");
+  }
+
+  if (s[1] == "0")
+  {
+    return (0);
+  }
+  if (s[1] == "1")
+  {
+    return (1);
+  }
+  if (s[1] == "2")
+  {
+    return (2);
+  }
+  if (s[1] == "3")
+  {
+    return (3);
+  }
+  if (s[1] == "4")
+  {
+    return (4);
+  }
+  if (s[1] == "5")
+  {
+    return (5);
+  }
+  if (s[1] == "6")
+  {
+    return (6);
+  }
+  if (s[1] == "7")
+  {
+    return (7);
+  }
+  if (s[1] == "8")
+  {
+    return (8);
+  }
+  if (s[1] == "9")
+  {
+    return (9);
+  }
+  ERROR("digitToInt() not a digit!");
+}
+
+// Convert string representation of a number into number
+static proc stringToNumber(string s)
+{
+  if (size(s) == 0)
+  {
+    ERROR("Called stringToNumber() with empty string.");
+  }
+
+  int i;
+  number n = 0;
+  for (i = 1; i <= size(s); i++)
+  {
+    n = n + number(digitToInt(s[i]) * 10 ^ (size(s) - i));
+  }
+
+  return (n);
+}
+
+/*##########################################################
+
+  END STRING
+
+##########################################################*/
+
+/*##########################################################
+
+   TOKEN
+
+##########################################################*/
+
+/*---------------------------------------------------------/
+
+  Constructors for token and tokenstream
+
+/---------------------------------------------------------*/
+
+// First argument is Kind
+// Optional arguments: Value, Name
+static proc makeToken(string s, list #)
+{
+  token t;
+  int i, n;
+
+  n = size(#);
+  t.kind = s;
+
+  for (i = 1; i <= n; i++)
+  {
+    if (typeof(#[i]) == "number")
+    {
+      t.value = #[i];
+    }
+    if (typeof(#[i]) == "int")
+    {
+      t.value = number(#[i]);
+    }
+    if (typeof(#[i]) == "string")
+    {
+      t.name = #[i];
+    }
+  }
+
+  return (t);
+}
+
+// Constructor for token_stream
+static proc makeTokenStream()
+{
+  tokenstream ts;
+  ts.full = 0;                    // buffer starts empty
+  ts.position = 0;                // initial position
+  ts.buffer = makeToken("empty"); // empty buffer
+  ts.input = "";                  // no input yet
+  return (ts);
+}
+
+/*---------------------------------------------------------/
+
+  Member functions for TOKENSTREAM
+
+/---------------------------------------------------------*/
+
+// Put token back into stream
+static proc tsPutback(token t)
+{
+  if (TOKENSTREAM.full)
+  {
+    ERROR("tsPutback() into full buffer!");
+  }
+  TOKENSTREAM.buffer = t;
+  TOKENSTREAM.full = 1;
+}
+
+// Compose next token
+static proc tsGet()
+{
+  // Check for token in buffer
+  if (TOKENSTREAM.full)
+  {
+    TOKENSTREAM.full = 0;
+    return (TOKENSTREAM.buffer);
+  }
+
+  // Return empty token if there are no others
+  if (TOKENSTREAM.position == 0 or
+      TOKENSTREAM.position > size(TOKENSTREAM.input))
+  {
+    return (makeToken("empty"));
+  }
+
+  // Get token from TOKENSTREAM.input
+  int i = TOKENSTREAM.position;
+  string s = TOKENSTREAM.input;
+
+  // Skip whitespace
+  while (isWhitespace(s[i]))
+  {
+    i++;
+  }
+
+  if (i > size(s))
+  {
+    ERROR("tsGet() reached end of string!");
+  }
+
+  // switch on s[i]
+  // characters that represent themselves
+  if (isSelfRepresented(s[i]))
+  {
+    TOKENSTREAM.position = i + 1;
+    return (makeToken(s[i]));
+  }
+
+  // numbers
+  if (isDigit(s[i]))
+  {
+    int start = i;
+
+    while (i < size(s))
+    {
+      if (isDigit(s[i + 1]) == 1)
+      {
+        i++;
+      }
+      else
+      {
+        break;
+      }
+    }
+
+    int length = i + 1 - start;
+    string str = s[start, length];
+    TOKENSTREAM.position = i + 1;
+
+    number n = stringToNumber(str);
+    return (makeToken("number", n));
+  }
+
+  // constants,variables and keywords
+  if (isLetter(s[i]))
+  {
+    int start = i;
+
+    while (i < size(s))
+    {
+      if (isLetter(s[i + 1]) == 1 or isDigit(s[i + 1]) == 1 or
+          s[i + 1] == "_")
+      {
+        i++;
+      }
+      else
+      {
+        break;
+      }
+    }
+
+    int length = i + 1 - start;
+    string name = s[start, length];
+    TOKENSTREAM.position = i + 1;
+
+    // keyword
+    if (name == "inv")
+    {
+      return (makeToken("inv"));
+    }
+
+    // constant or variable
+    int isVar = 0;
+    int isDef = 0;
+    string cmd = "if( defined(" + name + ") <> 0 ) {isDef = 1}";
+    execute(cmd);
+    if (isDef)
+    {
+      // constant
+      int isConst = 0;
+      cmd = "if( typeof(" + name + ") == \"number\" ) {isConst = 1}";
+      execute(cmd);
+      cmd = "if( typeof(" + name + ") == \"int\" ) {isConst = 1}";
+      execute(cmd);
+      if (isConst)
+      {
+        cmd = "number value = number(" + name + ");";
+        execute(cmd);
+        return (makeToken("number", value));
+      }
+
+      // variable
+      for (i = 1; i <= size(NCVARIABLES); i++)
+      {
+        if (name == NCVARIABLES[i])
+        {
+          return (makeToken("name", name));
+        }
+      }
+
+      // neither constant nor variable
+      ERROR(name + " already defined, but not a number or a nc variable!");
+    }
+
+    ERROR(name + " is undefined and not a nc variable!");
+  }
+
+  ERROR("Unrecognized input: " + s[i]);
+}
+
+/*##########################################################
+
+  END TOKEN
+
+##########################################################*/
+
+/*##########################################################
+
+   GRAMMAR
+
+##########################################################*/
+
+/*---------------------------------------------------------/
+
+  Input for ncrat function
+  according to the following grammar
+
+    Expression:
+        Term
+        Expression "+" Term
+        Expression "-" Term
+
+    Term:
+        Secondary
+        Term "*" Secondary
+
+    Secondary:
+        Primary
+        Primary "^" int
+        Primary "/" Primary
+
+    Primary:
+        Number
+        "(" Expression ")"
+        "+" Primary
+        "-" Primary
+        "inv(" Expression ")"
+        Name
+
+    Number:
+        digit
+        Number digit
+
+    Name:
+        letter
+        letter Sequence
+
+    Sequence:
+        letter
+        digit
+        "_"
+        letter Sequence
+        digit Sequence
+        "_" Sequence
+
+/---------------------------------------------------------*/
+
+static proc primary()
+{
+  token t = tsGet();
+
+  // switch on t.kind
+  // case "(" Expression ")"
+  if (t.kind == "(")
+  {
+    ncrat f = expression();
+
+    t = tsGet();
+    if (t.kind != ")")
+    {
+      ERROR("')' expected!");
+    }
+    return (f);
+  }
+
+  // unary +
+  if (t.kind == "+")
+  {
+    return (primary());
+  }
+
+  // unary -
+  if (t.kind == "-")
+  {
+    ncrat sign = "Const", list(number(-1));
+    return (sign * primary());
+  }
+
+  // variables and constants
+  if (t.kind == "name")
+  {
+    ncrat f = "Var", list(t.name);
+    return (f);
+  }
+  // numbers
+  if (t.kind == "number")
+  {
+    ncrat f = "Const", list(t.value);
+    return (f);
+  }
+  // inversion
+  if (t.kind == "inv")
+  {
+    t = tsGet();
+    if (t.kind != "(")
+    {
+      ERROR("'(' expected!");
+    }
+
+    ncrat f = expression();
+
+    t = tsGet();
+    if (t.kind != ")")
+    {
+      ERROR(")' expected!");
+    }
+
+    return (ncratInvert(f));
+  }
+
+  ERROR("Primary expected!");
+}
+
+static proc secondary()
+{
+  ncrat left = primary();
+
+  while (1)
+  {
+    token t = tsGet();
+    if (t.kind == "^")
+    {
+      ncrat right = primary();
+
+      if (not(right.kind == "Const"))
+      {
+        ERROR("Expected integer after '^'.");
+      }
+
+      int n = int(right.expr[1]);
+      if (not(number(n) == right.expr[1]))
+      {
+        ERROR(string(right.expr[1]) + " is not an integer!");
+      }
+
+      kill(right);
+      kill(t);
+      return (ncratPower(left, n));
+    }
+
+    if (t.kind == "/")
+    {
+      ncrat right = primary();
+
+      if (not(right.kind == "Const"))
+      {
+        ERROR("Expected number after '/'.");
+      }
+
+      left = left * ncratInvert(right);
+
+      kill(right);
+      kill(t);
+      return (left);
+    }
+
+    tsPutback(t);
+    kill(t);
+    return (left);
+  }
+}
+
+static proc term()
+{
+  ncrat left = secondary();
+
+  while (1)
+  {
+    token t = tsGet();
+    if (t.kind == "*")
+    {
+      ncrat right = secondary();
+      left = left * right;
+      kill(right);
+      kill(t);
+    }
+    else
+    {
+      tsPutback(t);
+      kill(t);
+      return (left);
+    }
+  }
+}
+
+static proc expression()
+{
+  ncrat left = term();
+
+  while (1)
+  {
+    token t = tsGet();
+    if (t.kind == "+")
+    {
+      ncrat right = term();
+      left = left + right;
+      kill(right);
+      kill(t);
+    }
+    else
+    {
+      if (t.kind == "-")
+      {
+        ncrat right = term();
+        left = left - right;
+        kill(right);
+        kill(t);
+      }
+      else
+      {
+        tsPutback(t);
+        kill(t);
+        return (left);
+      }
+    }
+  }
+}
+
+/*##########################################################
+
+  END GRAMMAR
+
+##########################################################*/
+
+/*##########################################################
+
+  END GENERAL
+
+##########################################################*/
+
+/*##########################################################
+
+   NCRAT
+
+##########################################################*/
+
+// Define ring 'NCRING' with variables from list
+static proc ncRingDefine()
+{
+  // Kill old ring if it already exists
+  if (not(defined(NCRING) == 0))
+  {
+    kill(NCRING);
+  }
+
+  // Build new ring
+  int i;
+  string s;
+
+  s = "ring NCRING = (0, I), (";
+  for (i = 1; i <= size(NCVARIABLES); i++)
+  {
+    if (i == 1)
+    {
+      s = s + NCVARIABLES[i];
+    }
+    else
+    {
+      s = s + ", " + NCVARIABLES[i];
+    }
+  }
+  s = s + "), dp; minpoly = I^2+1;";
+  execute(s);
+  short = 0;
+  exportto(Top, NCRING);
+}
+
+static proc ncratIsValid(string s, list l)
+{
+
+  while (1)
+  {
+    if (s == "Const")
+    {
+      if (not((size(l) == 1) and (typeof(l[1]) == "number")))
+      {
+        return (0);
+      }
+      break;
+    }
+
+    if (s == "Var")
+    {
+      if (not((size(l) == 1) and (typeof(l[1]) == "string")))
+      {
+        return (0);
+      }
+      break;
+    }
+
+    if (s == "Add" or s == "Sub" or s == "Mult")
+    {
+      if (not((size(l) == 2) and (typeof(l[1]) == "ncrat") and
+              (typeof(l[2]) == "ncrat")))
+      {
+        return (0);
+      }
+      break;
+    }
+
+    if (s == "Inv")
+    {
+      if (not((size(l) == 1) and (typeof(l[1]) == "ncrat")))
+      {
+        return (0);
+      }
+      break;
+    }
+
+    break;
+  }
+
+  return (1);
+}
+
+/*
+    The following procedures make it possible to evaluate a
+    ncrat f by substituting in the matrices in point for
+    the variables in var
+*/
+
+static proc ncratEvaluateConst(ncrat f, list vars, list point)
+{
+  int g = ncols(point[1]);
+  number n = f.expr[1];
+
+  matrix E[g][g];
+  E = E + 1;
+
+  matrix A = n * E;
+  return (A);
+}
+
+static proc ncratEvaluateAdd(ncrat f, list vars, list point)
+{
+  matrix A = ncratEvaluateAt(f.expr[1], vars, point);
+  matrix B = ncratEvaluateAt(f.expr[2], vars, point);
+  matrix C = A + B;
+  return (C);
+}
+
+static proc ncratEvaluateSub(ncrat f, list vars, list point)
+{
+  matrix A = ncratEvaluateAt(f.expr[1], vars, point);
+  matrix B = ncratEvaluateAt(f.expr[2], vars, point);
+  matrix C = A - B;
+  return (C);
+}
+
+static proc ncratEvaluateMult(ncrat f, list vars, list point)
+{
+  matrix A = ncratEvaluateAt(f.expr[1], vars, point);
+  matrix B = ncratEvaluateAt(f.expr[2], vars, point);
+  matrix C = A * B;
+  return (C);
+}
+
+static proc ncratEvaluateInv(ncrat f, list vars, list point)
+{
+  matrix A = ncratEvaluateAt(f.expr[1], vars, point);
+  matrix C = inverse(A);
+  return (C);
+}
+
+static proc ncratEvaluateVar(ncrat f, list vars, list point)
+{
+  poly p;
+  int i;
+  int index = 0;
+  int g = size(vars);
+
+  for (i = 1; i <= g and index == 0; i++)
+  {
+    p = vars[i];
+    if (string(p) == f.expr[1])
+    {
+      index = i;
+    }
+  }
+
+  matrix C = point[index];
+  return (C);
+}
+
+/*##########################################################
+
+  END NCRAT
+
+##########################################################*/
+
+/*##########################################################
+
+   NCREP
+
+##########################################################*/
+
+// Handle constants
+static proc ncrepConst(number n)
+{
+  ncrep q;
+  matrix left[1][2] = 0, 1;
+  matrix right[2][1] = 0, 1;
+  matrix Q[2][2] = n, -1, -1, 0;
+  q.lvec = left;
+  q.rvec = right;
+  q.mat = Q;
+  return (q);
+}
+
+// Handle variables
+static proc ncrepVar(poly p)
+{
+  ncrep q;
+  matrix left[1][2] = 0, 1;
+  matrix right[2][1] = 0, 1;
+  matrix Q[2][2] = p, -1, -1, 0;
+  q.lvec = left;
+  q.rvec = right;
+  q.mat = Q;
+  return (q);
+}
+
+// Substitute all occurences of VARIABLE*E in M with A
+static proc ncSubMat(matrix M, matrix A, poly VARIABLE)
+{
+  int N = ncols(A);
+  int N2 = ncols(M);
+  int N3 = N2 div N;
+  if (not(N * N3 == N2))
+  {
+    ERROR("Size of arg1 must be a multiple of size of arg2!");
+  }
+
+  int n, m, i, j;
+  poly p;
+  for (i = 1; i <= N3; i++)
+  {
+    for (j = 1; j <= N3; j++)
+    {
+      p = M[1 + (i - 1) * N, 1 + (j - 1) * N] / VARIABLE;
+      if (not(p == 0))
+      {
+        M[1 + (i - 1) * N..i * N, 1 + (j - 1) * N..j * N] = p * A;
+      }
+    }
+  }
+  return (M);
+}
+
+/*
+  list # = (x1, ..., xg) contains the nc variables
+  occuring in g
+  return list(Q0, Q1,... Qg) with scalar matrices Qi s.t.
+    Q = Q0 + Q1*x1 + ... + Qg*xg
+*/
+static proc ncrepLinearPencil(ncrep q, list #)
+{
+  int g = size(#);
+  int n = ncols(q.mat);
+
+  int i, j, k;
+  poly p;
+  matrix Q(0) = q.mat;
+  for (i = 1; i <= g; i++)
+  {
+    matrix Q(i)[n][n];
+    for (j = 1; j <= n; j++)
+    {
+      for (k = 1; k <= n; k++)
+      {
+        p = Q(0)[j, k] / #[i];
+        if (not(p == 0))
+        {
+          Q(i)
+          [j, k] = p;
+        }
+      }
+    }
+    Q(0) = Q(0) - #[i] * Q(i);
+  }
+
+  list l;
+  for (i = 0; i <= g; i++)
+  {
+    l = l + list(Q(i));
+  }
+
+  return (l);
+}
+
+/*##########################################################
+
+   REGULAR CASE
+
+##########################################################*/
+
+/*
+  g - number of nc variables
+  n - dimension
+  q - REGULAR ncrep
+  # - contains occuring ncvariables as 'poly'
+  Returns list(B, C, l) with l = list(A1, ..., Ag) such that
+  -u*Q^-1*v = C * (1 - A1*x1 - ... - Ag*xg)^-1 * B.
+
+  ASSUMPTION: q.mat has to be regular at zero
+*/
+static proc ncrepToMonicDescriptorRealization(int g, int n, ncrep q, list #)
+{
+  if (not(size(#) == g))
+  {
+    ERROR("List has wrong size!");
+  }
+
+  list l = ncrepLinearPencil(q, #);
+  matrix Q(0) = l[1];
+  matrix S = inverse(Q(0));
+
+  if (size(S) == 1 and S[1, 1] == 0)
+  {
+    ERROR("Q0 has to be invertible!");
+  }
+
+  list k;
+  int i;
+  for (i = 1; i <= g; i++)
+  {
+    matrix Q(i) = l[i + 1];
+    matrix A(i) = -S * Q(i);
+    k = k + list(A(i));
+  }
+
+  matrix C = -q.lvec;
+  matrix B = S * q.rvec;
+  return (list(B, C, k));
+}
+
+/*
+  g - number of nc variables
+  n - dimension
+  v - vector in C^n (that is, nx1-matrix)
+  # - list containing nxn-matrices A_1, ..., A_g
+
+  This procedure calculates the following subspace of C^n:
+    S = span { A_i1 ... A_ik v | k in N, 1 <= i1, ... ik <= g }
+
+  It returns a basis of this space.
+*/
+static proc calculateControllabilitySpace(int g, int n, matrix v, list #)
+{
+  if (size(#) != g)
+  {
+    ERROR("List has wrong size!");
+  }
+
+  if (not(ncols(v) == 1 and nrows(v) == n))
+  {
+    ERROR("Matrix must be of size " + string(n) + "x1!");
+  }
+
+  int i;
+  for (i = 1; i <= g; i++)
+  {
+    if (typeof(#[i]) != "matrix")
+    {
+      ERROR("List must only contain matrices!");
+    }
+    matrix A(i) = #[i];
+  }
+
+  // case v = 0
+  if (isMatrixEmpty(v))
+  {
+    return (list(v));
+  }
+
+  // case v != 0
+  // case n = 1
+  if (n == 1)
+  {
+    return (list(v));
+  }
+
+  // case n > 1
+  list b = list(v);
+  list s = b;
+  matrix baseMat = v;
+  matrix testMat;
+  int oldSize = size(b);
+  int j;
+
+  while (1)
+  {
+    list m;
+
+    // m = {A1, ..., Ag} * s
+    for (i = 1; i <= g; i++)
+    {
+      for (j = 1; j <= size(s); j++)
+      {
+        m = m + list(A(i) * s[j]);
+      }
+    }
+
+    // check if mi is linearly independent of b
+    // in this case append to b, and build new s
+    kill(s);
+    list s;
+
+    for (i = 1; i <= size(m); i++)
+    {
+      testMat = concat(baseMat, m[i]);
+
+      if (rank(testMat) == ncols(testMat))
+      {
+        s = s + list(m[i]);
+        b = b + list(m[i]);
+        baseMat = testMat;
+
+        if (size(b) == n)
+        {
+          return (b);
+        }
+      }
+    }
+
+    kill(m);
+    if (size(b) == oldSize)
+    {
+      return (b);
+    }
+    oldSize = size(b);
+  }
+}
+
+/*
+  n - dimension of whole space
+  b - list containing a basis of S
+
+  Calculates a list c containing a basis of S^ortho, i.e.,
+    C^n = S directsum S^ortho.
+*/
+static proc calculateComplement(int n, list b)
+{
+  list c;
+  int i;
+
+  // case S = C^n
+  if (size(b) == n)
+  {
+    return (c);
+  }
+
+  for (i = 1; i <= n; i++)
+  {
+    matrix e(i)[n][1];
+    e(i)[i, 1] = 1;
+  }
+
+  // case S = {0}
+  if (isMatrixEmpty(b[1]))
+  {
+    for (i = 1; i <= n; i++)
+    {
+      c = c + list(e(i));
+    }
+    return (c);
+  }
+
+  // case 0 < dim S < n
+  matrix baseMat = b[1];
+  for (i = 2; i <= size(b); i++)
+  {
+    baseMat = concat(baseMat, b[i]);
+  }
+
+  matrix testMat;
+  for (i = 1; i <= n; i++)
+  {
+    testMat = concat(baseMat, e(i));
+
+    if (rank(testMat) == ncols(testMat))
+    {
+      c = c + list(e(i));
+      baseMat = testMat;
+
+      if (ncols(baseMat) == n)
+      {
+        return (c);
+      }
+    }
+  }
+}
+
+// INPUT: list containing basis vectors
+// OUTPUT: orthogonal matrix, whose colums span the same space
+static proc orthogonalBase(list b)
+{
+  matrix B;
+
+  if (size(b) == 0)
+  {
+    return (B);
+  }
+
+  B = b[1];
+  int i;
+  for (i = 2; i <= size(b); i++)
+  {
+    B = concat(B, b[i]);
+  }
+  return (orthogonalize(B));
+}
+
+/*
+  bMat - orthogonal matrix whose columns span S
+  cMat - orthogonal matrix whose columns span S^ortho
+  # - matrices A1, ..., Ag
+  Returns ( P^-1 * B, C * P, list( P^-1 * Ai * P ) ), where P = (bMat cMat).
+*/
+static proc orthogonalTransform(matrix bMat, matrix cMat, matrix B, matrix C,
+                                list #)
+{
+  int i;
+  list l;
+  int bMatEmpty = isMatrixEmpty(bMat);
+  int cMatEmpty = isMatrixEmpty(cMat);
+
+  // Define orthogonal transformation
+  if (bMatEmpty)
+  {
+    if (cMatEmpty)
+    {
+      ERROR("Both empty!");
+    }
+    else
+    {
+      matrix P = cMat;
+    }
+  }
+  else
+  {
+    if (cMatEmpty)
+    {
+      matrix P = bMat;
+    }
+    else
+    {
+      matrix P = concat(bMat, cMat);
+    }
+  }
+
+  matrix PInv = inverse(P);
+  B = PInv * B;
+  C = C * P;
+
+  for (i = 1; i <= size(#); i++)
+  {
+    matrix A(i) = PInv * #[i] * P;
+    l = l + list(A(i));
+  }
+
+  return (list(B, C, l));
+}
+
+/*
+  n - dimension to cut down to
+  offset - where to cut out
+  # - matrices A1, ..., Ag
+  C * (1 - A1 x1 - .. - Ag xg)^(-1) * B monic descriptor realization
+*/
+static proc cutdown(int n, int offset, matrix B, matrix C, list #)
+{
+  int a = 1 + offset;
+  int b = n + offset;
+
+  // Case B or C is zero
+  if (isMatrixEmpty(B) or isMatrixEmpty(C))
+  {
+    matrix zero[1][1] = 0;
+    list zerolist;
+    int i;
+    for (i = 1; i <= size(#); i++)
+    {
+      zerolist = zerolist + list(zero);
+    }
+    return (zero, zero, zerolist);
+  }
+
+  // Case B and C not zero
+  matrix B2 = submat(B, a..b, 1..1);
+  matrix C2 = submat(C, 1..1, a..b);
+
+  list l;
+  int i;
+  for (i = 1; i <= size(#); i++)
+  {
+    matrix A2(i) = submat(#[i], a..b, a..b);
+    l = l + list(A2(i));
+  }
+
+  return (list(B2, C2, l));
+}
+
+/*##########################################################
+
+  END REGULAR CASE
+
+##########################################################*/
+
+/*##########################################################
+
+  END NCREP
+
+##########################################################*/
+
+/*##########################################################
+
+  END STATIC PROCEDURES
+
+##########################################################*/
+
+/*##########################################################
+
+   NON-STATIC PROCEDURES
+
+##########################################################*/
+
+/*##########################################################
+
+   GENERAL
+
+##########################################################*/
+
+proc ncInit(list vars)
+"USAGE:   ncInit(vars);
+  list vars containing strings
+
+RETURN:
+  datatypes ncrat and ncrep (and token, tokenstream,
+  but they are not meant for users),
+  sets ring as 'NCRING' with nc variables from list l
+
+EXAMPLE:  example ncInit;
+  shows an example"
+{
+  // Check if already initialized
+  // In this case just add missing variables
+  if (defined(NCRATINITIALIZE))
+  {
+    return ();
+  }
+  int NCRATINITIALIZE = 1;
+  export(NCRATINITIALIZE);
+
+  // Check if variables are specified
+  if (size(vars) == 0)
+  {
+    ERROR("No nc variables specified!");
+  }
+
+  /*---------------------------------------------------------/
+
+      Datatype 'ncrat' for nc rational functions
+
+      The following constructions are allowed:
+        ("Const", [number])           constant
+        ("Var",   [string])           variable
+        ("Add",   [ncrat, ncrat])     addition
+        ("Sub",   [ncrat, ncrat])     substraction
+        ("Mult",  [ncrat, ncrat])     multiplication
+        ("Inv",   [ncrat])            inverse
+
+  /---------------------------------------------------------*/
+
+  newstruct("ncrat", "
+    string kind,
+    list expr
+  ");
+
+
+  /*---------------------------------------------------------/
+
+      Struct for representations
+
+  /---------------------------------------------------------*/
+
+  newstruct("ncrep", "
+    matrix lvec,
+    matrix mat,
+    matrix rvec
+  ");
+
+
+  /*---------------------------------------------------------/
+
+      Structs for handling input
+
+  /---------------------------------------------------------*/
+
+  newstruct("token", "
+    string kind,
+    number value,
+    string name
+  ");
+
+
+  newstruct("tokenstream", "
+    int full,
+    int position,
+    token buffer,
+    string input
+  ");
+
+
+  /*---------------------------------------------------------/
+
+      Overloading operators for ncrat and ncrep
+
+  /---------------------------------------------------------*/
+
+  system("install", "ncrat", "=", ncratDefine, 1);
+  system("install", "ncrat", "+", ncratAdd, 2);
+  system("install", "ncrat", "-", ncratSubstract, 2);
+  system("install", "ncrat", "*", ncratMultiply, 2);
+  system("install", "ncrat", "^", ncratPower, 2);
+  system("install", "ncrat", "print", ncratPrint, 1);
+  system("install", "ncrep", "+", ncrepAdd, 2);
+  system("install", "ncrep", "-", ncrepSubstract, 2);
+  system("install", "ncrep", "*", ncrepMultiply, 2);
+  system("install", "ncrep", "print", ncrepPrint, 1);
+
+
+  /*---------------------------------------------------------/
+
+      Global objects
+
+  /---------------------------------------------------------*/
+
+  list NCVARIABLES = vars;
+  export(NCVARIABLES);
+
+  tokenstream TOKENSTREAM = makeTokenStream();
+  export(TOKENSTREAM);
+
+  ncRingDefine();
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  NCRING;
+}
+
+proc ncVarsGet()
+"USAGE:   ncVarsGet();
+
+RETURNS:
+  nc variables that are in use
+
+EXAMPLE:  example ncVarsGet;
+shows an example"
+{
+  string(NCVARIABLES);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncVarsGet();
+}
+
+proc ncVarsAdd(list vars)
+"USAGE:   ncVarsAdd(vars);
+  list vars contains variables
+
+RETURNS:
+  sets list elements as nc variables
+
+EXAMPLE:  example ncVarsAdd;
+shows an example"
+{
+  int i, j;
+  int exists = 0;
+
+  for (i = 1; i <= size(vars); i++)
+  {
+    for (j = 1; j <= size(NCVARIABLES); j++)
+    {
+      if (vars[i] == NCVARIABLES[j])
+      {
+        exists = 1;
+      }
+    }
+    if (exists == 0)
+    {
+      NCVARIABLES = NCVARIABLES + list(vars[i]);
+    }
+    else
+    {
+      exists = 0;
+    }
+  }
+
+  ncRingDefine();
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncVarsGet();
+  ncVarsAdd(list("a", "b", "c"));
+  ncVarsGet();
+}
+
+/*##########################################################
+
+  END GENERAL
+
+##########################################################*/
+
+/*##########################################################
+
+   NCRAT
+
+##########################################################*/
+
+proc ncratDefine(string s, list l)
+"USAGE:   ncrat f = ncratDefine(s, l);
+  string s contains kind, list l contains expressions
+
+RETURN:   ncrat with kind s and expressions l
+
+NOTE:
+  assignment operator '=' for ncrat is overloaded
+  with this procedure, hence
+      ncrat f = s, l;
+  yields the same result as
+      ncrat f = ncratDefine(s, l);
+
+EXAMPLE:  example ncratDefine;
+  shows an example"
+{
+  if (not(ncratIsValid(s, l)))
+  {
+    ERROR("Not a valid rational expression!");
+  }
+
+  ncrat f;
+  f.kind = s;
+  f.expr = l;
+  return (f);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  number n = 5;
+  ncrat f = ncratDefine("Const", list(n));
+  typeof(f);
+  f.kind;
+  f.expr;
+  f;
+  ncrat g = "Const", list(n);
+  g;
+}
+
+proc ncratAdd(ncrat f, ncrat g)
+"USAGE:   ncrat h = ncratAdd(f, g);
+  f, g both of type ncrat
+
+RETURN:   h = f + g
+
+NOTE:
+  operator '+' for ncrat is overloaded
+  with this procedure, hence
+      ncrat h = f + g;
+  yields the same result as
+      ncrat h = ncratAdd(f, g);
+
+EXAMPLE:  example ncratAdd;
+  shows an example"
+{
+  ncrat h = "Add", list(f, g);
+  return (h);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncrat f = ncratFromString("2*x*y");
+  print(f);
+  ncrat g = ncratFromString("z");
+  print(g);
+  ncrat h1, h2;
+  h1 = ncratAdd(f, g);
+  print(h1);
+  h2 = f + g;
+  print(h2);
+}
+
+proc ncratSubstract(ncrat f, ncrat g)
+"USAGE:   ncrat h = ncratSubstract(f, g);
+  f, g both of type ncrat
+
+RETURN:   h = f - g
+
+NOTE:
+  operator '-' for ncrat is overloaded
+  with this procedure, hence
+      ncrat h = f - g;
+  yields the same result as
+      ncrat h = ncratSubstract(f, g);
+
+EXAMPLE:  example ncratSubstract;
+  shows an example"
+{
+  ncrat h = "Sub", list(f, g);
+  return (h);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncrat f = ncratFromString("2*x*y");
+  print(f);
+  ncrat g = ncratFromString("z");
+  print(g);
+  ncrat h1, h2;
+  h1 = ncratSubstract(f, g);
+  print(h1);
+  h2 = f - g;
+  print(h2);
+}
+
+proc ncratMultiply(ncrat f, ncrat g)
+"USAGE:   ncrat h = ncratMultiply(f, g);
+  f, g both of type ncrat
+
+RETURN:   h = f * g
+
+NOTE:
+  operator '*' for ncrat is overloaded
+  with this procedure, hence
+      ncrat h = f * g;
+  yields the same result as
+      ncrat h = ncratMultiply(f, g);
+
+EXAMPLE:  example ncratMultiply;
+  shows an example"
+{
+  // Both factors are constants
+  if (f.kind == "Const" and g.kind == "Const")
+  {
+    ncrat h = "Const", list(f.expr[1] * g.expr[1]);
+    return (h)
+  }
+
+  // Only second factor is a constant
+  // Switch order of multiplication
+  if (g.kind == "Const")
+  {
+    return (ncratMultiply(g, f));
+  }
+
+  // Otherwise
+  ncrat h = "Mult", list(f, g);
+  return (h);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncrat f = ncratFromString("2*x*y");
+  print(f);
+  ncrat g = ncratFromString("z");
+  print(g);
+  ncrat h1, h2;
+  h1 = ncratMultiply(f, g);
+  print(h1);
+  h2 = f * g;
+  print(h2);
+}
+
+proc ncratInvert(ncrat f)
+"USAGE:   ncrat h = ncratInvert(f);
+  f of type ncrat
+
+RETURN:   h = inv(f)
+
+NOTE:
+      ncrat h = f^-1;
+  yields the same result as
+      ncrat h = ncratInvert(f);
+
+EXAMPLE:  example ncratInvert;
+  shows an example"
+{
+  ncrat h;
+  if (f.kind == "Const")
+  {
+    if (f.expr[1] != 0)
+    {
+      number n = 1;
+      number m = f.expr[1];
+      h = "Const", list(n / m);
+      return (h);
+    }
+  }
+  h = "Inv", list(f);
+  return (h);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncrat f = ncratFromString("2*x*y");
+  print(f);
+  ncrat h1, h2;
+  h1 = ncratInvert(f);
+  print(h1);
+  h2 = f ^ -1;
+  print(h2);
+}
+
+proc ncratSPrint(ncrat f)
+"USAGE:   string s = ncratSPrint(f);
+  f of type ncrat
+
+RETURN:   prints f to string
+
+EXAMPLE:  example ncratSPrint;
+  shows an example"
+{
+  string t, h, k;
+  string s = f.kind;
+  list l = f.expr;
+
+  if (s == "Const")
+  {
+    t = string(l[1]);
+  }
+
+  if (s == "Var")
+  {
+    t = l[1];
+  }
+
+  if (s == "Add")
+  {
+    t = ncratSPrint(l[1]) + "+" + ncratSPrint(l[2]);
+  }
+
+  if (s == "Sub")
+  {
+    if (l[2].kind == "Add" or l[2].kind == "Sub")
+    {
+      h = "(" + ncratSPrint(l[2]) + ")";
+    }
+    else
+    {
+      h = ncratSPrint(l[2]);
+    }
+    t = ncratSPrint(l[1]) + "-" + h;
+  }
+
+  if (s == "Mult")
+  {
+    if (l[1].kind == "Add" or l[1].kind == "Sub")
+    {
+      h = "(" + ncratSPrint(l[1]) + ")";
+    }
+    else
+    {
+      h = ncratSPrint(l[1]);
+    }
+    if (l[2].kind == "Add" or l[2].kind == "Sub")
+    {
+      k = "(" + ncratSPrint(l[2]) + ")";
+    }
+    else
+    {
+      k = ncratSPrint(l[2]);
+    }
+    t = h + "*" + k;
+  }
+
+  if (s == "Inv")
+  {
+    t = "inv(" + ncratSPrint(l[1]) + ")";
+  }
+
+  return (t);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncrat f = ncratFromString("2*x*y");
+  string s = ncratSPrint(f);
+  print(s);
+}
+
+proc ncratPrint(ncrat f)
+"USAGE:   ncratPrint(f);
+  f of type ncrat
+
+RETURN:   prints f
+
+NOTE:
+      print(f);
+  yields the same result as
+      ncratPrint(f);
+
+EXAMPLE:  example ncratPrint;
+  shows an example"
+{
+  print(ncratSPrint(f));
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncrat f = ncratFromString("2*x*y");
+  ncratPrint(f);
+  print(f);
+}
+
+proc ncratFromString(string s)
+"USAGE:   ncrat f = ncratFromString(s);
+  s of type string
+
+RETURN:   read string s into ncrat f
+
+EXAMPLE:  example ncratFromString;
+  shows an example"
+{
+  // Clear tokenstream
+  TOKENSTREAM.input = s;
+  TOKENSTREAM.position = 1;
+  TOKENSTREAM.full = 0;
+
+  ncrat f = expression();
+  return (f);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncrat f = ncratFromString("2*x*y");
+  print(f);
+}
+
+proc ncratFromPoly(poly p)
+"USAGE:   ncrat f = ncratFromPoly(p);
+  p of type poly
+
+RETURN:   convert poly to ncrat
+
+EXAMPLE:  example ncratFromPoly;
+  shows an example"
+{
+  string s = print(p);
+  ncrat f = ncratFromString(s);
+  return (f);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  poly p = 2 * x * y;
+  ncrat f = ncratFromPoly(p);
+  print(f);
+}
+
+proc ncratPower(ncrat f, int n)
+"USAGE:   ncrat h = ncratPower(f, n);
+  f of type ncrat, n integer
+
+RETURN:   h = f^n
+
+EXAMPLE:  example ncratPower;
+  shows an example"
+{
+  if (n < 0)
+  {
+    return (ncratInvert(ncratPower(f, -n)));
+  }
+
+  if (n == 0)
+  {
+    return (ncratFromString("1"));
+  }
+
+  if (n == 1)
+  {
+    return (f);
+  }
+
+  return (ncratPower(f, n - 1) * f);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncrat f = ncratFromString("2*x*y");
+  ncrat h = ncratPower(f, 3);
+  print(h);
+}
+
+proc ncratEvaluateAt(ncrat f, list vars, list point)
+"USAGE:   matrix M = ncratEvaluateAt(f, vars, point);
+
+RETURN:   Evaluate the ncrat f by substituting in the
+  matrices contained in point for the respective
+  variables contained in var, that is, calculate
+  f(point).
+
+EXAMPLE:  example ncratEvaluateAt;
+  shows an example"
+{
+  string s = f.kind;
+
+  if (s == "Const")
+  {
+    matrix A = ncratEvaluateConst(f, vars, point);
+    return (A);
+  }
+
+  if (s == "Add")
+  {
+    matrix A = ncratEvaluateAdd(f, vars, point);
+    return (A);
+  }
+
+  if (s == "Sub")
+  {
+    matrix A = ncratEvaluateSub(f, vars, point);
+    return (A);
+  }
+
+  if (s == "Mult")
+  {
+    matrix A = ncratEvaluateMult(f, vars, point);
+    return (A);
+  }
+
+  if (s == "Inv")
+  {
+    matrix A = ncratEvaluateInv(f, vars, point);
+    return (A);
+  }
+
+  if (s == "Var")
+  {
+    matrix A = ncratEvaluateVar(f, vars, point);
+    return (A);
+  }
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y"));
+  ncrat f = ncratFromString("x+y");
+  matrix A[2][2] = 1, 2, 3, 4;
+  matrix B[2][2] = 5, 6, 7, 8;
+  matrix M = ncratEvaluateAt(f, list(x, y), list(A, B));
+  print(M);
+}
+
+/*##########################################################
+
+  END NCRAT
+
+##########################################################*/
+
+/*##########################################################
+
+   NCREP
+
+##########################################################*/
+
+proc ncrepGet(ncrat f)
+"USAGE:   ncrep q = ncrepGet(f);
+  f of type ncrat
+
+RETURN:   q = (u, Q, v) linear representation of f
+
+EXAMPLE:  example ncrepGet;
+  shows an example"
+{
+  ncrep q;
+
+  // switch on f.kind
+  if (f.kind == "Const")
+  {
+    q = ncrepConst(f.expr[1]);
+    return (q);
+  }
+
+  if (f.kind == "Var")
+  {
+    string s = "poly p = " + f.expr[1] + ";";
+    execute(s);
+    q = ncrepVar(p);
+    return (q);
+  }
+
+  if (f.kind == "Add")
+  {
+    q = ncrepAdd(ncrepGet(f.expr[1]), ncrepGet(f.expr[2]));
+    return (q);
+  }
+
+  if (f.kind == "Sub")
+  {
+    q = ncrepSubstract(ncrepGet(f.expr[1]), ncrepGet(f.expr[2]));
+    return (q);
+  }
+
+  if (f.kind == "Mult")
+  {
+    // First factor is a non-zero constant
+    if (f.expr[1].kind == "Const")
+    {
+      if (f.expr[1].expr[1] != 0) {
+        q = ncrepGet(f.expr[2]);
+        q.mat = q.mat / f.expr[1].expr[1];
+        return (q);
+      }
+    }
+
+    // Second factor is a non-zero constant
+    if (f.expr[2].kind == "Const")
+    {
+      if (f.expr[2].expr[1] != 0) {
+        q = ncrepGet(f.expr[1]);
+        q.mat = q.mat / f.expr[2].expr[1];
+        return (q);
+      }
+    }
+
+    // No constant factors
+    q = ncrepMultiply(ncrepGet(f.expr[1]), ncrepGet(f.expr[2]));
+    return (q);
+  }
+
+  if (f.kind == "Inv")
+  {
+    q = ncrepInvert(ncrepGet(f.expr[1]));
+    return (q);
+  }
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncrat f = ncratFromString("2*x*y");
+  ncrep q = ncrepGet(f);
+  print(q);
+}
+
+proc ncrepAdd(ncrep s, ncrep t)
+"USAGE:   ncrep s = ncrepAdd(q, r);
+  q, r both of type ncrep
+
+RETURN:   representation s of h = f + g
+  if q, r are representations of f, g
+
+NOTE:
+  operator '+' for ncrep is overloaded
+  with this procedure, hence
+      ncrep s = q + r;
+  yields the same result as
+      ncrep s = ncrepAdd(q, r);
+
+EXAMPLE:  example ncrepAdd;
+  shows an example"
+{
+  ncrep q;
+  q.lvec = concat(s.lvec, t.lvec);
+  q.rvec = transpose(concat(transpose(s.rvec), transpose(t.rvec)));
+  q.mat = dsum(s.mat, t.mat);
+  return (q);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncrat f = ncratFromString("x");
+  ncrat g = ncratFromString("y");
+  ncrep q = ncrepGet(f);
+  ncrep r = ncrepGet(g);
+  ncrep s1, s2;
+  s1 = ncrepAdd(q, r);
+  print(s1);
+  s2 = q + r;
+  print(s2);
+}
+
+proc ncrepSubstract(ncrep s, ncrep t)
+"USAGE:   ncrep s = ncrepSubstract(q, r);
+  q, r both of type ncrep
+
+RETURN:   representation s of h = f - g
+  if q, r are representations of f, g
+
+NOTE:
+  operator '-' for ncrep is overloaded
+  with this procedure, hence
+      ncrep s = q - r;
+  yields the same result as
+      ncrep s = ncrepSubstract(q, r);
+
+EXAMPLE:  example ncrepSubstract;
+  shows an example"
+{
+  ncrep q;
+  q.lvec = concat(s.lvec, t.lvec);
+  q.rvec = transpose(concat(transpose(s.rvec), transpose(t.rvec)));
+  q.mat = dsum(s.mat, -t.mat);
+  return (q);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncrat f = ncratFromString("x");
+  ncrat g = ncratFromString("y");
+  ncrep q = ncrepGet(f);
+  ncrep r = ncrepGet(g);
+  ncrep s1, s2;
+  s1 = ncrepSubstract(q, r);
+  print(s1);
+  s2 = q - r;
+  print(s2);
+}
+
+proc ncrepMultiply(ncrep s, ncrep t)
+"USAGE:   ncrep s = ncrepMultiply(q, r);
+  q, r both of type ncrep
+
+RETURN:   representation s of h = f * g
+  if q, r are representations of f, g
+
+NOTE:
+  operator '*' for ncrep is overloaded
+  with this procedure, hence
+      ncrep s = q * r;
+  yields the same result as
+      ncrep s = ncrepMultiply(q, r);
+
+EXAMPLE:  example ncrepMultiply;
+  shows an example"
+{
+  ncrep q;
+  int dims = ncols(s.lvec);
+  int dimt = ncols(t.lvec);
+  matrix lzero[1][dimt] = 0;
+  matrix rzero[dims][1] = 0;
+  matrix mzero[dimt][dims] = 0;
+
+  q.lvec = concat(lzero, s.lvec);
+  q.rvec = transpose(concat(transpose(rzero), transpose(t.rvec)));
+
+  matrix A = concat(s.rvec * t.lvec, s.mat);
+  matrix B = concat(t.mat, mzero);
+  q.mat = transpose(concat(transpose(A), transpose(B)));
+
+  return (q);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncrat f = ncratFromString("x");
+  ncrat g = ncratFromString("y");
+  ncrep q = ncrepGet(f);
+  ncrep r = ncrepGet(g);
+  ncrep s1, s2;
+  s1 = ncrepMultiply(q, r);
+  print(s1);
+  s2 = q * r;
+  print(s2);
+}
+
+proc ncrepInvert(ncrep s)
+"USAGE:   ncrep s = ncrepInvert(q);
+  q of type ncrep
+
+RETURN:   representation of h = inv(f)
+  if q is a representation of f
+
+EXAMPLE:  example ncrepInvert;
+  shows an example"
+{
+  ncrep q;
+  int n = ncols(s.lvec);
+  matrix one[1][1] = 1;
+  matrix vzero[1][n] = 0;
+  matrix mzero[1][1] = 0;
+
+  q.lvec = concat(one, vzero);
+  q.rvec = transpose(q.lvec);
+
+  matrix A = concat(mzero, s.lvec);
+  matrix B = concat(s.rvec, -s.mat);
+  q.mat = transpose(concat(transpose(A), transpose(B)));
+
+  return (q);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncrat f = ncratFromString("2*x*y");
+  ncrep q = ncrepGet(f);
+  ncrep s = ncrepInvert(q);
+  print(s);
+}
+
+proc ncrepPrint(ncrep q)
+"USAGE:   ncrepPrint(q);
+  q of type ncrep
+
+RETURN:   prints q
+
+NOTE:
+      print(q);
+  yields the same result as
+      ncrepPrint(q);
+
+EXAMPLE:  example ncrepPrint;
+  shows an example"
+{
+  print("lvec=");
+  print(q.lvec);
+  print(newline + "mat=");
+  print(q.mat);
+  print(newline + "rvec=");
+  print(q.rvec);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncrat f = ncratFromString("2*x*y");
+  ncrep q = ncrepGet(f);
+  ncrepPrint(q);
+  print(q);
+}
+
+proc ncrepDim(ncrep q)
+"USAGE:   ncrepDim(q);
+  q of type ncrep
+
+RETURN:   dimension of q;
+  returns 0 if q represents the zero-function
+
+EXAMPLE:  example ncrepDim;
+  shows an example"
+{
+  int n = ncols(q.mat);
+  // Does q represent zero?
+  if (n == 1)
+  {
+    if (q.lvec == 0 or q.rvec == 0)
+    {
+      n = 0;
+    }
+  }
+  return (n);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncrat f = ncratFromString("2*x*y");
+  ncrep q = ncrepGet(f);
+  print(q);
+  ncrepDim(q);
+}
+
+proc ncrepSubstitute(ncrep q, list vars, list points)
+"USAGE:     ncrep s = ncrepSubstitute(q, l);
+  q of type ncrep, vars = (x1, ..., xg),
+  points = (A1, ... , Ag) with Ai matrices of the
+  same dimension and xi of type poly are nc variables
+
+RETURN:     substitutes in Ai for xi in q
+
+EXAMPLE:  example ncrepSubstitute;
+  shows an example"
+{
+  int g = size(vars);
+  if (not(size(points) == g))
+  {
+    ERROR("Number of variables and points does not match!");
+  }
+
+  // Lists empty
+  if (g == 0)
+  {
+    return (q.mat);
+  }
+
+  // Lists non-empty
+  int i;
+  list l = ncrepLinearPencil(q, vars);
+  for (i = 0; i <= g; i++)
+  {
+    matrix Q(i) = l[i + 1];
+  }
+
+  int n=1;
+  if (typeof(points[1])!="poly") { n = ncols(points[1]);}
+  matrix E[n][n];
+  E = E + 1;
+
+  matrix M = tensor(Q(0), E);
+  for (i = 1; i <= g; i++)
+  {
+    matrix A(i) = points[i];
+    M = M + tensor(Q(i), A(i));
+  }
+
+  ncrep q2;
+  q2.mat = M;
+  q2.lvec = tensor(q.lvec, E);
+  q2.rvec = tensor(q.rvec, E);
+
+  return (q2);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncrat f = ncratFromString("x+y");
+  ncrep q = ncrepGet(f);
+  matrix A[2][2] = 1, 2, 3, 4;
+  matrix B[2][2] = 5, 6, 7, 8;
+  ncrep s = ncrepSubstitute(q, list(x, y), list(A, B));
+  print(q);
+  print(s);
+}
+
+proc ncrepEvaluate(ncrep q)
+"USAGE:   matrix M = ncrepEvaluate(q);
+
+RETURN:   for q=(u, Q, v) calculate -u*Q^(-1)*v
+
+EXAMPLE:  example ncrepEvaluate;
+  shows an example"
+{
+  matrix QInv = inverse(q.mat);
+  if (size(QInv) == 1 and QInv[1, 1] == 0)
+  {
+    ERROR("Matrix not invertible!");
+  }
+  matrix M = -q.lvec * QInv * q.rvec;
+  return (M);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y", "z"));
+  ncrat f = ncratFromString("x+y");
+  ncrep q = ncrepGet(f);
+  matrix A[2][2] = 1, 2, 3, 4;
+  matrix B[2][2] = 5, 6, 7, 8;
+  ncrep s = ncrepSubstitute(q, list(x, y), list(A, B));
+  matrix M = ncrepEvaluate(s);
+  print(M);
+}
+
+proc ncrepEvaluateAt(ncrep q, list vars, list point)
+"USAGE:   matrix M = ncrepEvaluateAt(q, vars, point);
+
+RETURN:   For q=(u, Q, v) calculate -u*Q(point)^(-1)*v,
+  that is to say, evaluate the ncrat represented
+  by q at point (scalar or matrix point).
+
+EXAMPLE:  example ncrepEvaluateAt;
+  shows an example"
+{
+  ncrep r = ncrepSubstitute(q, vars, point);
+  matrix M = ncrepEvaluate(r);
+  return (M);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y"));
+  ncrat f = ncratFromString("x+y");
+  ncrep q = ncrepGet(f);
+  matrix A[2][2] = 1, 2, 3, 4;
+  matrix B[2][2] = 5, 6, 7, 8;
+  matrix M = ncrepEvaluateAt(q, list(x, y), list(A, B));
+  print(M);
+}
+
+proc ncrepIsDefinedDim(ncrep q, int N, list vars, int n, int maxcoeff)
+"USAGE:   list l = ncrepIsDefinedDim(q, N, vars, n, maxcoeff);
+
+RETURN:   list(k, list vars, list(A1, ..., Ak)), where:
+  If k = N then there are matrices A1, ..., Ak of size N
+  such that q is defined at A = (A1, ..., Ak), i.e.,
+  q.mat is invertible at A.
+  If k = 0 then no such point was found.
+
+NOTE:     Test whether q.mat is invertible via evaluation
+  at random matrix points with integer coefficients
+  in [-maxcoeff, maxcoeff]. Stops after n tries.
+  Use square matrices of dimension N. The list vars
+  contains the nc variables which occur in q.
+
+EXAMPLE:  example ncrepIsDefinedDim;
+  shows an example"
+{
+  int g = size(vars);
+  int i, k;
+  for (i = 1; i <= n; i++)
+  {
+    // Substitute random matrices
+    list points;
+    for (k = 1; k <= g; k++)
+    {
+      matrix A(k) = randommat(N, N, maxideal(0), maxcoeff);
+      points = points + list(A(k));
+      kill(A(k));
+    }
+    ncrep q2 = ncrepSubstitute(q, vars, points);
+
+    // Check for invertibility
+    if (mat_rk(q2.mat) == ncols(q2.mat))
+    {
+      list result = list(N) + list(vars) + list(points);
+      kill(q2);
+      kill(points);
+      return (result);
+    }
+    kill(q2);
+    kill(points);
+  }
+  list empty;
+  list result = list(0) + list(vars) + list(empty);
+  return (result);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y"));
+  ncrat f = ncratFromString("inv(x*y-y*x)");
+  ncrep q = ncrepGet(f);
+  ncrepIsDefinedDim(q, 1, list(x, y), 10, 100);
+  ncrepIsDefinedDim(q, 2, list(x, y), 10, 100);
+}
+
+proc ncrepIsDefined(ncrep q, list vars, int n, int maxcoeff)
+"USAGE:   list l = ncrepIsDefined(q, vars, n, maxcoeff);
+
+RETURN:   list(dim, list vars, list(A1, ..., Ak)), where:
+  If dim > 0 then there are matrices A1, ..., Ak of size dim
+  such that q is defined at A = (A1, ..., Ak), i.e.,
+  q.mat is invertible at A.
+  If dim = 0 then no such point was found.
+
+NOTE:     Test whether q.mat is invertible via evaluation
+  at random matrix points with integer coefficients
+  in [-maxcoeff, maxcoeff]. Stops after n tries.
+  Use ixi-matrix in i-th try. The list vars contains the
+  nc variables which occur in q.
+
+EXAMPLE:  example ncrepIsDefined;
+  shows an example"
+{
+  int i;
+  list l;
+  for (i = 1; i <= n; i++)
+  {
+    l = ncrepIsDefinedDim(q, i, vars, 1, maxcoeff);
+    if (l[1] > 0)
+    {
+      return (l);
+    }
+  }
+  return (l);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y"));
+  ncrat f = ncratFromString("inv(x*y-y*x)");
+  ncrep q = ncrepGet(f);
+  ncrepIsDefined(q, list(x, y), 5, 10);
+  ncrat g = ncratFromString("inv(x-x)");
+  ncrep r = ncrepGet(g);
+  ncrepIsDefined(r, list(x), 5, 10);
+}
+
+proc ncrepIsRegular(ncrep q, list vars, int n, int maxcoeff)
+"USAGE:   list l = ncrepIsRegular(q, vars, n, maxcoeff);
+
+RETURN:   list(k, list vars, list(a1, ..., ak)), where:
+  If k = 1 then there are scalars (1x1-matrices) a1, ..., ak
+  such that q is defined at a = (a1, ..., ak), i.e.,
+  q.mat is invertible at a.
+  If k = 0 then no such point was found.
+
+NOTE:     Test whether q.mat is invertible via evaluation
+  at random integers  in [-maxcoeff, maxcoeff].
+  Stops after n tries. The list vars
+  contains the nc variables which occur in q.
+
+EXAMPLE:  example ncrepIsRegular;
+  shows an example"
+{
+  list l = ncrepIsDefinedDim(q, 1, vars, n, maxcoeff);
+  return (l);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y"));
+  ncrat f = ncratFromString("inv(x*y-y*x)");
+  ncrep q = ncrepGet(f);
+  ncrepIsRegular(q, list(x, y), 10, 100);
+  ncrat g = ncratFromString("inv(1+x*y-y*x)");
+  ncrep r = ncrepGet(g);
+  ncrepIsRegular(r, list(x, y), 10, 100);
+}
+
+proc ncrepPencilGet(ncrep r, list vars)
+"USAGE:     list pencil = ncrepPencilGet(r, vars);
+
+RETURN:     pencil = list(vars, matrices),
+  where vars = list(1, x1, ..., xg) are the variables
+  occuring in r and matrices = (Q0, ..., Qg) is a list of
+  matrices such that
+    r.mat = Q0 * x0 + ... + Qg * xg
+  with x0 = 1
+
+NOTE:       list vars = list(x1, ..., xn) has to consist
+  exactly of the nc variables occuring in f
+
+EXAMPLE:    example ncrepPencilGet;
+  shows an example"
+{
+  poly p = 1;
+  list varsNew = list(p) + vars;
+  list matrices = ncrepLinearPencil(r, vars);
+  list l = list(varsNew, matrices);
+  return (l);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y"));
+  ncrat f = ncratFromString("x*y");
+  ncrep r = ncrepGet(f);
+  print(r.mat);
+  list l = ncrepPencilGet(r, list(x, y));
+  print(l[1]);
+  print(l[2][1]);
+  print(l[2][2]);
+  print(l[2][3]);
+}
+
+proc ncrepPencilCombine(list pencil)
+"USAGE:     matrix Q = ncrepPencilCombine(pencil);
+
+RETURN:     matrix Q = Q0*x0 + ... + Qg*xg,
+  where vars = list(x0, ..., xg) consists of polynomials
+  and matrices = (Q0, ..., Qg) is a list of matrices
+
+EXAMPLE:    example ncrepPencilCombine;
+  shows an example"
+{
+  int g = size(pencil[1]);
+  int n = ncols(pencil[2][1]);
+  matrix Q[n][n];
+  int i;
+  for (i = 1; i <= g; i++)
+  {
+    Q = Q + pencil[1][i] * pencil[2][i];
+  }
+  return (Q);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y"));
+  ncrat f = ncratFromString("x*y");
+  ncrep r = ncrepGet(f);
+  print(r.mat);
+  list l = ncrepPencilGet(r, list(x, y));
+  matrix Q = ncrepPencilCombine(l);
+  print(Q);
+}
+
+/*##########################################################
+
+   REGULAR CASE
+
+##########################################################*/
+
+proc ncrepRegularZeroMinimize(ncrep q, list #)
+"USAGE:     ncrep s = ncrepRegularZeroMinimize(q, l);
+
+RETURN:     ncrep s representing the same rational
+  function as ncrep q, where s is of minimal size
+
+ASSUMPTION: q is regular at zero, i.e.,
+  if one substitutes in 0 for all nc variables in q
+  then q.mat has to be invertible
+
+NOTE:       list l = list(x1, ..., xn) has to consist
+  exactly of the nc variables occuring in q
+
+EXAMPLE:    example ncrepRegularZeroMinimize;
+  shows an example"
+{
+  int i;
+  int g = size(#);
+  int n = ncols(q.mat);
+  int offset = 0;
+  list k = ncrepToMonicDescriptorRealization(g, n, q, #);
+
+  // cut down on controllable space
+  list b = calculateControllabilitySpace(g, n, k[1], k[3]);
+  list c = calculateComplement(n, b);
+  n = size(b);
+  matrix bMat = orthogonalBase(b);
+  matrix cMat = orthogonalBase(c);
+  k = orthogonalTransform(bMat, cMat, k[1], k[2], k[3]);
+  k = cutdown(n, offset, k[1], k[2], k[3]);
+
+  // cut down on observable space
+  n = size(b);
+  list l;
+
+  // switch to adjoint system
+  for (i = 1; i <= g; i++)
+  {
+    l = l + list(transpose(k[3][i]));
+  }
+  list ktp = list(transpose(k[2]), transpose(k[1]), l);
+
+  b = calculateControllabilitySpace(g, n, ktp[1], ktp[3]);
+  c = calculateComplement(n, b);
+  n = size(b);
+  offset = size(c);
+  bMat = orthogonalBase(b);
+  cMat = orthogonalBase(c);
+  ktp = orthogonalTransform(cMat, bMat, ktp[1], ktp[2], ktp[3]);
+  ktp = cutdown(n, offset, ktp[1], ktp[2], ktp[3]);
+
+  // build ncrep
+  n = size(b);
+  ncrep r;
+  r.lvec = -1 * transpose(ktp[1]);
+  r.rvec = transpose(ktp[2]);
+
+  matrix Q[n][n];
+  Q = Q + 1;
+  for (i = 1; i <= g; i++)
+  {
+    Q = Q - transpose(ktp[3][i]) * #[i];
+  }
+  r.mat = Q;
+
+  return (r);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y"));
+  ncrat f = ncratFromString("inv(1+x*y-y*x)");
+  ncrep q = ncrepGet(f);
+  ncrepDim(q);
+  ncrep s = ncrepRegularZeroMinimize(q, list(x, y));
+  ncrepDim(s);
+  s;
+}
+
+proc ncrepRegularMinimize(ncrep q, list vars, list point)
+"USAGE:     ncrep s = ncrepRegularMinimize(q, vars, point);
+
+RETURN:     ncrep s representing the same rational
+  function as ncrep q, where s is of minimal size
+
+ASSUMPTION: q is regular at scalar point a, i.e.,
+  if one substitutes in ai for all nc variables xi in q
+  then q.mat has to be invertible
+
+NOTE:       list vars = list(x1, ..., xn) has to consist
+  exactly of the nc variables occuring in q and
+  list point = list(a1, ..., an) consists of scalars
+
+EXAMPLE:    example ncrepRegularMinimize;
+  shows an example"
+{
+  int g = size(vars);
+  if (not(size(point) == g))
+  {
+    ERROR("Lists have to be of the same size!");
+  }
+
+  list shift, backshift;
+  int i;
+  poly p1, p2;
+
+  // point matrices?
+  if (g > 0 and typeof(point[1]) == "matrix")
+  {
+    if (ncols(point[1]) > 1)
+    {
+      ERROR("Not a scalar point!");
+    }
+    for (i = 1; i <= g; i++)
+    {
+      poly z(i) = point[i][1, 1];
+    }
+  }
+  // point scalars
+  else
+  {
+    for (i = 1; i <= g; i++)
+    {
+      poly z(i) = point[i];
+    }
+  }
+
+  for (i = 1; i <= g; i++)
+  {
+    p1 = vars[i] - z(i);
+    p2 = vars[i] + z(i);
+    shift = shift + list(p1);
+    backshift = backshift + list(p2);
+  }
+
+  ncrep s = ncrepSubstitute(q, vars, shift);
+  ncrep r = ncrepRegularZeroMinimize(s, vars);
+  ncrep q2 = ncrepSubstitute(r, vars, backshift);
+
+  return (q2);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y"));
+  ncrat f = ncratFromString("inv(x*y)");
+  ncrep q = ncrepGet(f);
+  ncrepDim(q);
+  ncrep s = ncrepRegularMinimize(q, list(x, y), list(1, 1));
+  ncrepDim(s);
+  s;
+}
+
+proc ncrepGetRegularZeroMinimal(ncrat f, list vars)
+"USAGE:     ncrep q = ncrepGetRegularZeroMinimal(f, vars);
+
+RETURN:     q is a representation of f with
+  minimal dimension
+
+ASSUMPTION: f is regular at zero, i.e.,
+  f(0) has to be defined
+
+NOTE:       list vars = list(x1, ..., xn) has to consist
+  exactly of the nc variables occuring in f
+
+EXAMPLE:    example ncrepGetRegularZeroMinimal;
+  shows an example"
+{
+  ncrep q = ncrepGet(f);
+  ncrep q2 = ncrepRegularZeroMinimize(q, vars);
+  return (q2);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  ncInit(list("x", "y"));
+  ncrat f = ncratFromString("inv(1+x*y-y*x)");
+  list vars = list(x, y);
+  ncrep q = ncrepGetRegularZeroMinimal(f, vars);
+  q;
+}
+
+proc ncrepGetRegularMinimal(ncrat f, list vars, list point)
+"USAGE:     ncrep q = ncrepGetRegularMinimal(f, vars, point);
+
+RETURN:     q is a representation of f with
+  minimal dimension
+
+ASSUMPTION: f is regular at point, i.e.,
+  f(point) has to be defined
+
+NOTE:       list vars = list(x1, ..., xn) has to consist
+  exactly of the nc variables occuring in f and
+  list point = (p1, ..., pn) of scalars such that
+  f(point) is defined
+
+EXAMPLE:    example ncrepGetRegularMinimal;
+  shows an example"
+{
+  ncrep q = ncrepGet(f);
+  ncrep q2 = ncrepRegularMinimize(q, vars, point);
+  return (q2);
+}
+example
+{
+  "EXAMPLE: (Hua's identity)";
+  echo = 2;
+  ncInit(list("x", "y"));
+  ncrat f = ncratFromString("inv(x+x*inv(y)*x)+inv(x+y)-inv(x)");
+  print(f);
+  ncrep r = ncrepGet(f);
+  ncrepDim(r);
+  ncrep s = ncrepGetRegularMinimal(f, list(x, y), list(1, 1));
+  ncrepDim(s);
+  print(s);
+}
+
+/*##########################################################
+
+  END REGULAR CASE
+
+##########################################################*/
+
+/*##########################################################
+
+  END NCREP
+
+##########################################################*/
+
+/*##########################################################
+
+  END NON-STATIC PROCEDURES
+
+##########################################################*/

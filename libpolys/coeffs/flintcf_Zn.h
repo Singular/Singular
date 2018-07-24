@@ -19,6 +19,8 @@ typedef struct
   char *name;
 } flintZn_struct;
 BOOLEAN flintZn_InitChar(coeffs cf, void * infoStruct);
+
+coeffs flintZnInitCfByName(char *s,n_coeffType n);
 #endif
 
 #endif
