@@ -2594,11 +2594,6 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   }
   if (h==testHomog)
   {
-    if (delete_w)
-    {
-      temp_w=new intvec((strat->ak)+1);
-      w = &temp_w;
-    }
     if (strat->ak == 0)
     {
       h = (tHomog)idHomIdeal(F,Q);

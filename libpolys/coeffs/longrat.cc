@@ -1638,6 +1638,9 @@ void _nlDelete_NoImm(number *a)
         (*a)->s=2;
 #endif
     }
+#ifdef LDEBUG
+    memset(*a,0,sizeof(**a));
+#endif
     FREE_RNUMBER(*a); // omFreeBin((void *) *a, rnumber_bin);
   }
 }
