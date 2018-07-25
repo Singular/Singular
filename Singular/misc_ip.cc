@@ -1318,18 +1318,6 @@ static BOOLEAN iiCrossProd(leftv res, leftv args)
 */
 void siInit(char *name)
 {
-// factory default settings: -----------------------------------------------
-  //Off(SW_USE_NTL_SORT); // may be changed by an command line option
-  factoryError=WerrorS;
-
-// NTL error handling (>= 9.3.0)
-#ifdef HAVE_NTL
-#if (((NTL_MAJOR_VERSION==9)&&(NTL_MINOR_VERSION>=3))||(NTL_MAJOR_VERSION>=10))
-  ErrorMsgCallback=WerrorS;
-  ErrorCallback=HALT;
-#endif
-#endif
-
 // memory initialization: -----------------------------------------------
     om_Opts.OutOfMemoryFunc = omSingOutOfMemoryFunc;
 #ifndef OM_NDEBUG
