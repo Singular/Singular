@@ -452,6 +452,10 @@ static number nrzConvFactoryNSingN(const CanonicalForm n, const coeffs r)
   {
     mpz_ptr m = (mpz_ptr) omAllocBin(gmp_nrz_bin);
     gmp_numerator(n,m);
+    if (!n.den().isOne())
+    {
+      WarnS("denominator is not 1 in factory");
+    }
     return (number) m;
   }
 }
