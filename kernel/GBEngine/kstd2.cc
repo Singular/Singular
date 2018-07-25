@@ -2208,7 +2208,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   /* postprocessing for GB over ZZ --------------------*/
   if (!errorreported)
   {
-    if(rField_is_Ring_Z(currRing))
+    if(rField_is_Z(currRing))
     {
       for(int i = 0;i<=strat->sl;i++)
       {

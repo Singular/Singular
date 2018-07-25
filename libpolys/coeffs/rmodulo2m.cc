@@ -681,15 +681,15 @@ static nMapFunc nr2mSetMap(const coeffs src, const coeffs dst)
     // to be done
     return nr2mMapProject;
   }
-  if ((src->rep==n_rep_gmp) && nCoeff_is_Ring_Z(src))
+  if ((src->rep==n_rep_gmp) && nCoeff_is_Z(src))
   {
     return nr2mMapGMP;
   }
-  if ((src->rep==n_rep_gap_gmp) /*&& nCoeff_is_Ring_Z(src)*/)
+  if ((src->rep==n_rep_gap_gmp) /*&& nCoeff_is_Z(src)*/)
   {
     return nr2mMapZ;
   }
-  if ((src->rep==n_rep_gap_rat) && (nCoeff_is_Q(src)||nCoeff_is_Ring_Z(src)))
+  if ((src->rep==n_rep_gap_rat) && (nCoeff_is_Q(src)||nCoeff_is_Z(src)))
   {
     return nr2mMapQ;
   }

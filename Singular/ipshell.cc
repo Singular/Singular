@@ -1809,7 +1809,7 @@ void rDecomposeRing_41(leftv h,const coeffs C)
   L->m[0].data=(void *)omStrDup("integer");
   // ----------------------------------------
   // 1: modulo
-  if (nCoeff_is_Ring_Z(C)) return;
+  if (nCoeff_is_Z(C)) return;
   lists LL=(lists)omAlloc0Bin(slists_bin);
   LL->Init(2);
   LL->m[0].rtyp=BIGINT_CMD;
@@ -1826,7 +1826,7 @@ void rDecomposeRing(leftv h,const ring R)
 {
 #ifdef HAVE_RINGS
   lists L=(lists)omAlloc0Bin(slists_bin);
-  if (rField_is_Ring_Z(R)) L->Init(1);
+  if (rField_is_Z(R)) L->Init(1);
   else                     L->Init(2);
   h->rtyp=LIST_CMD;
   h->data=(void *)L;
@@ -1838,7 +1838,7 @@ void rDecomposeRing(leftv h,const ring R)
   L->m[0].data=(void *)omStrDup("integer");
   // ----------------------------------------
   // 1: module
-  if (rField_is_Ring_Z(R)) return;
+  if (rField_is_Z(R)) return;
   lists LL=(lists)omAlloc0Bin(slists_bin);
   LL->Init(2);
   LL->m[0].rtyp=BIGINT_CMD;

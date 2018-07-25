@@ -475,9 +475,6 @@ static inline BOOLEAN rField_is_Ring_ModN(const ring r)
 static inline BOOLEAN rField_is_Ring_PtoM(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return ( nCoeff_is_Ring_PtoM(r->cf) ); }
 
-static inline BOOLEAN rField_is_Ring_Z(const ring r)
-{ assume(r != NULL); assume(r->cf != NULL); return ( nCoeff_is_Ring_Z(r->cf) ); }
-
 static inline BOOLEAN rField_is_Ring(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Ring(r->cf); }
 
@@ -491,7 +488,6 @@ static inline BOOLEAN rField_has_Units(const ring r)
 #define rField_is_Ring_2toM(A) (0)
 #define rField_is_Ring_ModN(A) (0)
 #define rField_is_Ring_PtoM(A) (0)
-#define rField_is_Ring_Z(A) (0)
 #define rField_is_Domain(A) (1)
 #define rField_has_Units(A) (1)
 #endif

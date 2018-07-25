@@ -815,11 +815,11 @@ void nrnWrite (number a, const coeffs cf)
 nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
 {
   /* dst = nrn */
-  if ((src->rep==n_rep_gmp) && nCoeff_is_Ring_Z(src))
+  if ((src->rep==n_rep_gmp) && nCoeff_is_Z(src))
   {
     return nrnMapZ;
   }
-  if ((src->rep==n_rep_gap_gmp) /*&& nCoeff_is_Ring_Z(src)*/)
+  if ((src->rep==n_rep_gap_gmp) /*&& nCoeff_is_Z(src)*/)
   {
     return nrnMapZ;
   }

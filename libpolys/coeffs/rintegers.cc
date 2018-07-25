@@ -346,11 +346,11 @@ static nMapFunc nrzSetMap(const coeffs src, const coeffs /*dst*/)
   /* dst = currRing */
   /* dst = nrn */
   if ((src->rep==n_rep_gmp)
-  && (nCoeff_is_Ring_Z(src) || nCoeff_is_Ring_ModN(src) || nCoeff_is_Ring_PtoM(src)))
+  && (nCoeff_is_Z(src) || nCoeff_is_Ring_ModN(src) || nCoeff_is_Ring_PtoM(src)))
   {
     return ndCopyMap; //nrzCopyMap;
   }
-  if ((src->rep==n_rep_gap_gmp) /*&& nCoeff_is_Ring_Z(src)*/)
+  if ((src->rep==n_rep_gap_gmp) /*&& nCoeff_is_Z(src)*/)
   {
     return ndCopyMap; //nrzCopyMap;
   }
@@ -1633,11 +1633,11 @@ static nMapFunc nrzSetMap(const coeffs src, const coeffs /*dst*/)
   if (src->rep==n_rep_gmp) //nCoeff_is_Ring_ModN(src) || nCoeff_is_Ring_PtoM(src))
     return nrzModNMap;
 
-  if ((src->rep==n_rep_gap_gmp) && nCoeff_is_Ring_Z(src))
+  if ((src->rep==n_rep_gap_gmp) && nCoeff_is_Z(src))
   {
     return ndCopyMap; //nrzCopyMap;
   }
-  if (src->rep==n_rep_gap_rat) /*&& nCoeff_is_Ring_Z(src)) Q, bigint*/
+  if (src->rep==n_rep_gap_rat) /*&& nCoeff_is_Z(src)) Q, bigint*/
   {
     return nrzMapQ;
   }

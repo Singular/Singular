@@ -10663,8 +10663,7 @@ BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat
 */
 poly preIntegerCheck(const ideal Forig, const ideal Q)
 {
-  assume(nCoeff_is_Ring_Z(currRing->cf));
-  if(!nCoeff_is_Ring_Z(currRing->cf))
+  if(!nCoeff_is_Z(currRing->cf))
     return NULL;
   ideal F = idCopy(Forig);
   idSkipZeroes(F);
@@ -10831,7 +10830,7 @@ poly preIntegerCheck(const ideal Forig, const ideal Q)
 */
 void postReduceByMon(LObject* h, kStrategy strat)
 {
-  if(!nCoeff_is_Ring_Z(currRing->cf))
+  if(!nCoeff_is_Z(currRing->cf))
       return;
   poly pH = h->GetP();
   poly p,pp;
@@ -10899,7 +10898,7 @@ void postReduceByMon(LObject* h, kStrategy strat)
 
 void postReduceByMonSig(LObject* h, kStrategy strat)
 {
-  if(!nCoeff_is_Ring_Z(currRing->cf))
+  if(!nCoeff_is_Z(currRing->cf))
       return;
   poly hSig = h->sig;
   poly pH = h->GetP();
@@ -10991,7 +10990,7 @@ void finalReduceByMon(kStrategy strat)
   assume(strat->tl<0); /* can only be called with no elements in T:
                           i.e. after exitBuchMora */
   /* do not use strat->S, strat->sl as they may be out of sync*/
-  if(!nCoeff_is_Ring_Z(currRing->cf))
+  if(!nCoeff_is_Z(currRing->cf))
       return;
   poly p,pp;
   for(int j = 0; j<IDELEMS(strat->Shdl); j++)

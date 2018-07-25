@@ -57,7 +57,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
   }
 
   Off(SW_RATIONAL);
-  if (rField_is_Q(r) || rField_is_Zp(r) || rField_is_Ring_Z(r)
+  if (rField_is_Q(r) || rField_is_Zp(r) || rField_is_Z(r)
   || (rField_is_Zn(r)&&(r->cf->convSingNFactoryN!=ndConvSingNFactoryN)))
   {
     setCharacteristic( rChar(r) );
@@ -511,16 +511,10 @@ poly singclap_pmult ( poly f, poly g, const ring r )
 {
   poly res=NULL;
   On(SW_RATIONAL);
-  if (rField_is_Zp(r) || rField_is_Q(r)
+  if (rField_is_Zp(r) || rField_is_Q(r) || rField_is_Z(r)
   || (rField_is_Zn(r)&&(r->cf->convSingNFactoryN!=ndConvSingNFactoryN)))
   {
-    setCharacteristic( rChar(r) );
-    CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g,r ) );
-    res = convFactoryPSingP( F * G,r );
-  }
-  else if (rField_is_Ring_Z(r))
-  {
-    Off(SW_RATIONAL);
+    if (rField_is_Z(r)) Off(SW_RATIONAL);
     setCharacteristic( rChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g,r ) );
     res = convFactoryPSingP( F * G,r );

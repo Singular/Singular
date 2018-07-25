@@ -5127,7 +5127,7 @@ n_coeffType rFieldType(ring r)
   if (rField_is_Zp_a(r))   return getCoeffType(r->cf);
   if (rField_is_Q_a(r))    return getCoeffType(r->cf);
   if (rField_is_long_C(r)) return n_long_C;
-  if (rField_is_Ring_Z(r)) return n_Z;
+  if (rField_is_Z(r))         return n_Z;
   if (rField_is_Ring_ModN(r)) return n_Zn;
   if (rField_is_Ring_PtoM(r)) return n_Znm;
   if (rField_is_Ring_2toM(r)) return  n_Z2m;
