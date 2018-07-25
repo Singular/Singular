@@ -42,13 +42,13 @@ static void nrnCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
   #ifdef TEST_ZN_AS_ZP
   if (l<10)
   {
-    if (nCoeff_is_Ring_ModN(r)) Print("ZZ/%s", s);
+    if (nCoeff_is_Zn(r)) Print("ZZ/%s", s);
     else if (nCoeff_is_Ring_PtoM(r)) Print("ZZ/(%s^%lu)", s, r->modExponent);
   }
   else
   #endif
   {
-    if (nCoeff_is_Ring_ModN(r)) Print("ZZ/bigint(%s)", s);
+    if (nCoeff_is_Zn(r)) Print("ZZ/bigint(%s)", s);
     else if (nCoeff_is_Ring_PtoM(r)) Print("ZZ/(bigint(%s)^%lu)", s, r->modExponent);
   }
 
@@ -93,7 +93,7 @@ static char* nrnCoeffName(const coeffs r)
   nrnCoeffName_buff=(char*)omAlloc(l);
   s= mpz_get_str (s, 10, r->modBase);
   int ll;
-  if (nCoeff_is_Ring_ModN(r))
+  if (nCoeff_is_Zn(r))
     ll=snprintf(nrnCoeffName_buff,l,"ZZ/bigint(%s)",s);
   else if (nCoeff_is_Ring_PtoM(r))
     ll=snprintf(nrnCoeffName_buff,l,"ZZ/bigint(%s)^%lu",s,r->modExponent);
@@ -116,7 +116,7 @@ static char* nrnCoeffString(const coeffs r)
   char* b = (char*) omAlloc(l);
   b= mpz_get_str (b, 10, r->modBase);
   char* s = (char*) omAlloc(15+l);
-  if (nCoeff_is_Ring_ModN(r)) sprintf(s,"ZZ/%s",b);
+  if (nCoeff_is_Zn(r)) sprintf(s,"ZZ/%s",b);
   else /*if (nCoeff_is_Ring_PtoM(r))*/ sprintf(s,"ZZ/(bigint(%s)^%lu)",b,r->modExponent);
   omFreeSize(b,l);
   return s;
@@ -828,7 +828,7 @@ nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
     return nrnMapQ;
   }
   // Some type of Z/n ring / field
-  if (nCoeff_is_Ring_ModN(src) || nCoeff_is_Ring_PtoM(src) ||
+  if (nCoeff_is_Zn(src) || nCoeff_is_Ring_PtoM(src) ||
       nCoeff_is_Ring_2toM(src) || nCoeff_is_Zp(src))
   {
     if (   (!nCoeff_is_Zp(src))

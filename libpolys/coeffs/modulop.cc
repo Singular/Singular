@@ -659,7 +659,7 @@ nMapFunc npSetMap(const coeffs src, const coeffs dst)
   {
     return npMapMachineInt;
   }
-  if (src->rep==n_rep_gmp) //nCoeff_is_Z(src) || nCoeff_is_Ring_PtoM(src) || nCoeff_is_Ring_ModN(src))
+  if (src->rep==n_rep_gmp) //nCoeff_is_Z(src) || nCoeff_is_Ring_PtoM(src) || nCoeff_is_Zn(src))
   {
     return npMapGMP;
   }

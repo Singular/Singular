@@ -346,7 +346,7 @@ static nMapFunc nrzSetMap(const coeffs src, const coeffs /*dst*/)
   /* dst = currRing */
   /* dst = nrn */
   if ((src->rep==n_rep_gmp)
-  && (nCoeff_is_Z(src) || nCoeff_is_Ring_ModN(src) || nCoeff_is_Ring_PtoM(src)))
+  && (nCoeff_is_Z(src) || nCoeff_is_Zn(src) || nCoeff_is_Ring_PtoM(src)))
   {
     return ndCopyMap; //nrzCopyMap;
   }
@@ -1630,7 +1630,7 @@ static number nrzMapQ(number from, const coeffs /* src */, const coeffs dst)
 static nMapFunc nrzSetMap(const coeffs src, const coeffs /*dst*/)
 {
   /* dst = rintegers */
-  if (src->rep==n_rep_gmp) //nCoeff_is_Ring_ModN(src) || nCoeff_is_Ring_PtoM(src))
+  if (src->rep==n_rep_gmp) //nCoeff_is_Zn(src) || nCoeff_is_Ring_PtoM(src))
     return nrzModNMap;
 
   if ((src->rep==n_rep_gap_gmp) && nCoeff_is_Z(src))

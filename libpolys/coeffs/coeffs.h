@@ -746,9 +746,6 @@ static FORCE_INLINE void   n_CoeffWrite(const coeffs r, BOOLEAN details = TRUE)
 static FORCE_INLINE BOOLEAN nCoeff_is_Ring_2toM(const coeffs r)
 { assume(r != NULL); return (getCoeffType(r)==n_Z2m); }
 
-static FORCE_INLINE BOOLEAN nCoeff_is_Ring_ModN(const coeffs r)
-{ assume(r != NULL); return (getCoeffType(r)==n_Zn); }
-
 static FORCE_INLINE BOOLEAN nCoeff_is_Ring_PtoM(const coeffs r)
 { assume(r != NULL); return (getCoeffType(r)==n_Znm); }
 
@@ -756,7 +753,6 @@ static FORCE_INLINE BOOLEAN nCoeff_is_Ring(const coeffs r)
 { assume(r != NULL); return (r->is_field==0); }
 #else
 #define nCoeff_is_Ring_2toM(A) 0
-#define nCoeff_is_Ring_ModN(A) 0
 #define nCoeff_is_Ring_PtoM(A) 0
 #define nCoeff_is_Ring(A)      0
 #endif
