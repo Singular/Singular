@@ -490,11 +490,17 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
 
   if (sizeF==1)
   {
-    return gcd_mon( FF, GG );
+    Off(SW_USE_EZGCD);
+    CanonicalForm result=gcd_mon( FF, GG );
+    On(SW_USE_EZGCD);
+    return result;
   }
   else if (sizeG==1)
   {
-    return gcd_mon( GG, FF );
+    Off(SW_USE_EZGCD);
+    CanonicalForm result=gcd_mon( GG, FF );
+    On(SW_USE_EZGCD);
+    return result;
   }
   if (!isRat)
     On (SW_RATIONAL);
