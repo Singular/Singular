@@ -805,6 +805,7 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{coef (} poly_expression@code{,} product_of_ringvars @code{)}
+@*@code{coef (} ideal_expression@code{,} product_of_ringvars @code{)}
 @item @strong{Type:}
 matrix
 @item @strong{Syntax:}
@@ -832,7 +833,10 @@ Thus,
   f = M[1,1]*M[2,1]+...+M[1,n]*M[2,n].
 @end ifinfo
 
-Second case: the second matrix (i.e., the 4th argument) contains the
+Second case: apply to all generators of the ideal and combine
+the results into one matrix.
+
+Third case: the second matrix (i.e., the 4th argument) contains the
 monomials, the first matrix (i.e., the 3rd argument) the corresponding
 coefficients of the monomials in the vector.
 
@@ -850,6 +854,7 @@ appropriate place if a monomial is not present.
   print(m);
   f=x20+xyz+xy+x2y+z3;
   print(coef(f,xy));
+  print(coef(maxideal(3),yz));
   vector v=[f,zy+77+xy];
   print(v);
   matrix mc; matrix mm;

@@ -1796,6 +1796,13 @@ static BOOLEAN jjCOEF(leftv res, leftv u, leftv v)
   res->data=(char *)mp_CoeffProc((poly)u->Data(),p /*(poly)v->Data()*/,currRing);
   return FALSE;
 }
+static BOOLEAN jjCOEF_Id(leftv res, leftv u, leftv v)
+{
+  poly p=(poly)v->Data();
+  if ((p==NULL)||(pNext(p)!=NULL)) return TRUE;
+  res->data=(char *)mp_CoeffProcId((ideal)u->Data(),p /*(poly)v->Data()*/,currRing);
+  return FALSE;
+}
 static BOOLEAN jjCOEFFS_Id(leftv res, leftv u, leftv v)
 {
   int i=pVar((poly)v->Data());
