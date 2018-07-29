@@ -770,18 +770,6 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
   if (T->p == NULL && T->t_p == NULL && i >= 0)
     return dReportError("%c[%d].poly is NULL", TN, i);
 
-  if (T->p!=NULL)
-  {
-    nTest(pGetCoeff(T->p));
-    if ((T->t_p==NULL)&&(pNext(T->p)!=NULL)) p_Test(pNext(T->p),currRing);
-  }
-  if (T->t_p!=NULL)
-  {
-    nTest(pGetCoeff(T->t_p));
-    if (pNext(T->t_p)!=NULL) p_Test(pNext(T->t_p),strat_tailRing);
-  }
-  if ((T->p!=NULL)&&(T->t_p!=NULL)) assume(pGetCoeff(T->p)==pGetCoeff(T->t_p));
-
   if (T->tailRing != currRing)
   {
     if (T->t_p == NULL && i > 0)
@@ -880,17 +868,6 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
 BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
                 BOOLEAN testp, int lpos, TSet T, int tlength)
 {
-  if (L->p!=NULL)
-  {
-    nTest(pGetCoeff(L->p));
-    if ((L->t_p==NULL)&&(pNext(L->p)!=NULL)) p_Test(pNext(L->p),currRing);
-  }
-  if (L->t_p!=NULL)
-  {
-    nTest(pGetCoeff(L->t_p));
-    if (pNext(L->t_p)!=NULL) p_Test(pNext(L->t_p),strat_tailRing);
-  }
-  if ((L->p!=NULL)&&(L->t_p!=NULL)) assume(pGetCoeff(L->p)==pGetCoeff(L->t_p));
   if (testp)
   {
     poly pn = NULL;
