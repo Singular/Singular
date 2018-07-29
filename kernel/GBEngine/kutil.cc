@@ -12474,7 +12474,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
     {
       strat->chainCrit(h,ecart,strat);
     }
-
+    kMergeBintoL(strat);
   }
 }
 #endif
