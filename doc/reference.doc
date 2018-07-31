@@ -7370,7 +7370,7 @@ See
 @*@code{std (} ideal_expression@code{,} poly_expression@code{,} intvec_expression@code{,} intvec_expression @code{)}
 @*@code{std (} module_expression@code{,} poly_expression@code{,} intvec_expression@code{,} intvec_expression @code{)}
 @item @strong{Type:}
-ideal or module
+ideal, module or smatrix
 @item @strong{Purpose:}
 returns a standard basis of an ideal or module with respect to the
 monomial ordering of the basering.

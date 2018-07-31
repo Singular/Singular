@@ -41,6 +41,7 @@ Changes in the kernel/build system:
 @item pseudo type @code{polyBucket}
 @item new type @code{smatrix}: sparse matrix (experimental) (@nref{smatrix}).
 @item extended @code{coef} to ideals (@nref{coef}).
+@item error and signal handling in @code{libSingular} (@nref{libSingular}).
 @end itemize
 
 @heading News for version 4-1-1
