@@ -930,7 +930,9 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #ifdef __GNUC__
               "(ver: " __VERSION__ ")"
 #endif
-              "\n",AC_CONFIGURE_ARGS, CC,CFLAGS, CXX,CXXFLAGS,  DEFS,CPPFLAGS,  LDFLAGS,LIBS);
+              "\n",AC_CONFIGURE_ARGS, CC,CFLAGS " " PTHREAD_CFLAGS,
+	      CXX,CXXFLAGS " " PTHREAD_CFLAGS,  DEFS,CPPFLAGS,  LDFLAGS,
+	      LIBS " " PTHREAD_LIBS);
               feStringAppendResources(0);
               feStringAppendBrowsers(0);
               StringAppendS("\n");
