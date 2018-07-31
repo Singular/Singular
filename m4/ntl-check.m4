@@ -51,10 +51,10 @@ for NTL_HOME in ${NTL_HOME_PATH}
 if test -r "$NTL_HOME/include/NTL/ZZ.h"; then
 
 	if test "x$NTL_HOME" != "x/usr"; then
-		NTL_CPPFLAGS="-I${NTL_HOME}/include"
+		NTL_CPPFLAGS="-std=c++11 -I${NTL_HOME}/include"
 		NTL_LIBS="-L${NTL_HOME}/lib -lntl"
 	else
-		NTL_CPPFLAGS=
+		NTL_CPPFLAGS="-std=c++11"
 		NTL_LIBS="-lntl"
 	fi
 ###	CFLAGS="${BACKUP_CFLAGS} ${NTL_CPPFLAGS} ${GMP_CPPFLAGS}"
