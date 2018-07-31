@@ -39,7 +39,7 @@ Changes in the kernel/build system:
 @itemize
 @item improved reading of long polynomials
 @item pseudo type @code{polyBucket}
-@item new type @code{smatrix}: sparese matrix
+@item new type @code{smatrix}: sparse matrix (experimental) (@nref{smatrix}).
 @end itemize
 
 @heading News for version 4-1-1
@@ -92,7 +92,7 @@ Changes in the kernel/build system:
 @item port to polymake 3.x.x
 @item port to NTL 10 with threads (needs also C++11: gcc6 or -std=c++11)
 @item p_Invers is only a helper for p_Series: now static
-@item p_Divide is now p_MDivide, pDivive is a new routine
+@item p_Divide is now p_MDivide, pDivide/p_Divide is a new routine
 @end itemize
 
 @heading News for version 4-1-0
