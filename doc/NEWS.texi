@@ -40,6 +40,7 @@ Changes in the kernel/build system:
 @item improved reading of long polynomials
 @item pseudo type @code{polyBucket}
 @item new type @code{smatrix}: sparse matrix (experimental) (@nref{smatrix}).
+@item extended @code{coef} to ideals (@nref{coef}).
 @end itemize
 
 @heading News for version 4-1-1
