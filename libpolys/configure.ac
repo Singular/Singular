@@ -36,6 +36,14 @@ LT_INIT([win32-dll])
 SING_WIN_FLAGS
 
 # Checks for libraries.
+# This test for -lpthread etc has to come before AX_PTHREAD,
+# because libtool tends to ignore -pthread in linking shared C++-libs
+# see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=25460
+# (happens with ubuntu 14.04)
+AC_SEARCH_LIBS(sem_wait,[rt pthreads pthread],[],[
+  AC_MSG_ERROR([sem_wait not found in rt,pthreads,pthread])
+])
+
 LB_CHECK_GMP(3.1.1,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 LB_CHECK_NTL(5.0,,AC_MSG_WARN([Unable to find NTL (which is strongly recommended) on your machine: please use --with-ntl=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 LB_CHECK_FLINT(2.4,,AC_MSG_WARN([Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
