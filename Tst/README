@@ -6,7 +6,12 @@ This is the test-suite for Singular. This directory contains
 regress.cmd	-- perl script which drives tests
 Short		-- directory containing "short" tests
 Long		-- directory containing "long" tests
-Old			-- directory containing "old" (TST) tests
+Old		-- directory containing "old" (TST) tests
+Manual		-- directory containing manual examples
+New		-- directory containing test for new features
+Buch		-- examples from the Singular book
+BuchDL		-- examples from another Singular book
+
 recommended set of tests:
 ./regress.cmd Old/universal.lst Buch/buch.lst Plural/short.lst Plural/dmod.lst Short/ok_s.lst Long/ok_l.lst
 
@@ -110,7 +115,6 @@ To add a new test for a library/commando to the test-suite:
   preamble:
          LIB "tst.lib";
          tst_init();
-	 tst_ignore("CVS ID $Id$"); // or, write own version number here
   tst_init() writes some general info to stdout (like date,
   uname, hostname, version, etc.). The library tst.lib (contained in
   the Singular distribution) provides, among others, the routines
