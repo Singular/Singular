@@ -98,6 +98,17 @@ fi
 done
 
 if test "x$ntl_found" = "xyes" ; then
+	AC_TRY_RUN(
+	[#include <NTL/version.h>
+	#include <NTL/config.h>
+	int main () { if (NTL_MAJOR_VERSION < 10) return -1; else return 0;}
+	],[
+	break
+	],[
+		NTL_CPPFLAGS="-I${NTL_HOME}/include"
+	],[
+	break
+	])
 	AC_SUBST(NTL_CPPFLAGS)
 	AC_SUBST(NTL_LIBS)
 	AC_DEFINE(HAVE_NTL,1,[Define if NTL is installed])
