@@ -51,6 +51,49 @@ for NTL_HOME in ${NTL_HOME_PATH}
 if test -r "$NTL_HOME/include/NTL/ZZ.h"; then
 
 	if test "x$NTL_HOME" != "x/usr"; then
+		NTL_CPPFLAGS="-I${NTL_HOME}/include"
+		NTL_LIBS="-L${NTL_HOME}/lib -lntl"
+	else
+		NTL_CPPFLAGS=""
+		NTL_LIBS="-lntl"
+	fi
+###	CFLAGS="${BACKUP_CFLAGS} ${NTL_CPPFLAGS} ${GMP_CPPFLAGS}"
+	CXXFLAGS="${BACKUP_CXXFLAGS} ${NTL_CPPFLAGS} ${GMP_CPPFLAGS}"
+	LIBS="${BACKUP_LIBS} ${NTL_LIBS} ${GMP_LIBS}"
+
+	AC_TRY_LINK(
+	[#include <NTL/ZZ.h>],
+	[NTL::ZZ a;],
+	[
+	AC_TRY_RUN(
+	[#include <NTL/version.h>
+	#include <NTL/config.h>
+	#ifndef NTL_GMP_LIP
+	int main() {return -1;}
+	#else
+	int main () { if (NTL_MAJOR_VERSION < 5) return -1; else return 0;}
+	#endif
+	],[
+	ntl_found="yes"
+	break
+	],[
+	ntl_problem="$problem $NTL_HOME"
+	unset NTL_CPPFLAGS
+	unset NTL_LIBS
+	],[
+	ntl_found="yes"
+	ntl_cross="yes"
+	break
+	])
+	],
+	[
+	ntl_found="no"
+	ntl_checked="$checked $NTL_HOME"
+	unset NTL_CPPFLAGS
+	unset NTL_LIBS
+	])
+dnl try again with -std=c++11 (for NTL >=10 with threads)
+	if test "x$NTL_HOME" != "x/usr"; then
 		NTL_CPPFLAGS="-std=c++11 -I${NTL_HOME}/include"
 		NTL_LIBS="-L${NTL_HOME}/lib -lntl"
 	else
@@ -98,17 +141,6 @@ fi
 done
 
 if test "x$ntl_found" = "xyes" ; then
-	AC_TRY_RUN(
-	[#include <NTL/version.h>
-	#include <NTL/config.h>
-	int main () { if (NTL_MAJOR_VERSION < 10) return -1; else return 0;}
-	],[
-	break
-	],[
-		NTL_CPPFLAGS="-I${NTL_HOME}/include"
-	],[
-	break
-	])
 	AC_SUBST(NTL_CPPFLAGS)
 	AC_SUBST(NTL_LIBS)
 	AC_DEFINE(HAVE_NTL,1,[Define if NTL is installed])
