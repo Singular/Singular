@@ -29,6 +29,7 @@ AC_ARG_WITH(ntl,
 			NTL_HOME_PATH="${DEFAULT_CHECKING_PATH}"
 	      elif test "$withval" != no ; then
 			NTL_HOME_PATH="$withval"
+			NTL_SHOULD_BE_PRESENT="yes"
 	     fi],
 	     [NTL_HOME_PATH="${DEFAULT_CHECKING_PATH}"])
 
@@ -158,6 +159,9 @@ elif test -n "$ntl_problem"; then
 	echo "Sorry, your NTL version is too old or not configured with NTL_GMP_LIP=on. Disabling."
 	ifelse([$3], , :, [$3])
 elif test   "x$ntl_found" = "xno";  then
+	if test "x$NTL_SHOULD_BE_PRESENT" = "xyes"; then
+		AC_MSG_ERROR([NTL support was requested but NTL could not be detected])
+	fi
 	AC_MSG_RESULT(not found)
 	ifelse([$3], , :, [$3])
 fi
