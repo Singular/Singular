@@ -288,7 +288,7 @@ EXAMPLE: example PrimdecB; shows an example
                                   // this is also a standard basis in (R[U])[A]
       @A[size(@A)]=")";
       execute("ring Rloc=("+charstr(basering)+","+@U+",("+@A+",(C,dp);");
-      ideal @N=imap(RAU,@N);
+      module @N=imap(RAU,@N);
       ideal @h;
       for(@j=ncols(@N);@j>=1;@j--)
       {

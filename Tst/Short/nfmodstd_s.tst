@@ -11,40 +11,40 @@ proc tst_test_nfmodstd(def I)
 
 ring r=(0,a),(x,y,z,w,u),dp;
 minpoly = a^2+1;
-ideal HIa=[(8+a)*x^2*y^2+5*x*y^3+(3-a)*x^3*z +x^2*y*z,
+ideal HIa=(8+a)*x^2*y^2+5*x*y^3+(3-a)*x^3*z +x^2*y*z,
 	  x^5+2*y^3*z^2+13*y^2*z^3+5*y*z^4,
 	  8*x^3+(12+a)*y^3+x*z^2+3,
-	  (7-a)*x^2*y^4+18*y^3*z^2+y^3*z^3];
+	  (7-a)*x^2*y^4+18*y^3*z^2+y^3*z^3;
 tst_test_nfmodstd(HIa);
-ideal HJa=[(2*a+3)*x*y^4*z^2 + (a+2)*x^2*y^3*z*w-x^2*y^3*z*w + 2*x*y*z^2*w^3 + (7*a-1)*y^3*w^4,
+ideal HJa=(2*a+3)*x*y^4*z^2 + (a+2)*x^2*y^3*z*w-x^2*y^3*z*w + 2*x*y*z^2*w^3 + (7*a-1)*y^3*w^4,
 	  2*x^2*y^4*z + x^2*y*z^2*w^2-a*x*y^2*z^2*w^2 + (a+11)*x^2*y*z*w^3 -12*x*w^6 + 12*y*w^6,
 	  2*y^5*z + x^2*y^2*z*w-x*y^3*z*w -x*y^3*w^2 +a*y^4*w^2 + 2*y^2*z*w^3,
 	  3*x*y^4*z^3 + x^2*y^2*z*w^3-x*y^3*z*w^3 +(4+a)*y^3*z^2*w^3 +3*x*y*z^3*w^3 +4*a*z^2*w^6
-	  -x*w^7+y*w^7];
+	  -x*w^7+y*w^7;
 
  tst_test_nfmodstd(HJa);
-ideal HBa =[x+(a/2147483647)*x*y+(a/2147483646)*y*z,
+ideal HBa =x+(a/2147483647)*x*y+(a/2147483646)*y*z,
 	  x^2*z + (a/2147483647)*y^3 + (a+1)*y*z^2,
-	  (2*a*x)/3-(7*a*y)/23 + (9*z)/7];
+	  (2*a*x)/3-(7*a*y)/23 + (9*z)/7;
 
   tst_test_nfmodstd(HBa);
 kill r;
 ring r=(0,a),(x,y,z,w,u),dp;
 minpoly =a^3+a+5;
-ideal ka=[(5+a)*x^3*y^2*z + (a+3)*y^3*x^2*z + (a+7)*x*y^2*z^2,
+ideal ka=(5+a)*x^3*y^2*z + (a+3)*y^3*x^2*z + (a+7)*x*y^2*z^2,
 	(a+3)*x*y^2*z^2 + (a+1)*x^5 + (a-11)*y^2*z^2,
-	(a+2)*x*y*z + (a+7)*x^3 + 12*y^3 + 1,3*x^3 +(a- 4)*y^3 + y*z^2];
+	(a+2)*x*y*z + (a+7)*x^3 + 12*y^3 + 1,3*x^3 +(a- 4)*y^3 + y*z^2;
 tst_test_nfmodstd(ka);
 
-ideal Hka=[(a+5)*x^3*y^2*z + (a-3)*y^3*x^2*z + (a+7)*x*y^2*z^2,
+ideal Hka=(a+5)*x^3*y^2*z + (a-3)*y^3*x^2*z + (a+7)*x*y^2*z^2,
 	  (a+3)*x*y^2*z^2 + a*x^5 + (a+11)*y^2*z*w^2,
 	  4*x*y*z + (a+7)*x^3 + 12*y^3 + a*z^3,
-	  3*x^3 +(a- 4)*y^3 + y*z^2];
+	  3*x^3 +(a- 4)*y^3 + y*z^2;
 tst_test_nfmodstd(Hka);
 
-ideal Ua = [a*x + (a-1)*y + z + (a+2)*w + u,x*y + (a-1)*y*z + z*w +
+ideal Ua = a*x + (a-1)*y + z + (a+2)*w + u,x*y + (a-1)*y*z + z*w +
 	  (a + 2)*x*w + a*w*u,a*x*y*z + (a + 5)*y*z*w + a*x*y*u + (a+2)*x*w*u + a*z*w*u,
-	  (a-11)*x*y*z*w + (a + 5)*x*y*z*u + a*x*y*w*u + a*x*z*w*u + a*y*z*w*u,(a + 3)*x*y*z*w*u + a+23];
+	  (a-11)*x*y*z*w + (a + 5)*x*y*z*u + a*x*y*w*u + a*x*z*w*u + a*y*z*w*u,(a + 3)*x*y*z*w*u + a+23;
 tst_test_nfmodstd(Ua);
 kill r;
 ring r = 0,(x,y,z),dp;

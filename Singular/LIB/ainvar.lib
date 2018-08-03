@@ -69,7 +69,8 @@ EXAMPLE: example derivate; shows an example
   { j = mh[1,1];
   }
   else
-  { j = mh[1];
+  { if (typeof(j)=="vector") { j = mh[1]; /*the first column*/ }
+    else { j = ideal(mh[1]);}
   }
   return(j);
 }
