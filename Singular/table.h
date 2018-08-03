@@ -1350,6 +1350,7 @@ const struct sValAssign dAssign[]=
 ,{D(jiA_BIGINTMAT),BIGINTMAT_CMD,  BIGINTMAT_CMD}
 ,{D(jiA_CRING),    CRING_CMD,      CRING_CMD }
 ,{D(jiA_IDEAL),    IDEAL_CMD,      IDEAL_CMD }
+,{D(jiA_IDEAL_Mo), IDEAL_CMD,      MODUL_CMD }
 ,{D(jiA_IDEAL_M),  IDEAL_CMD,      MATRIX_CMD }
 ,{D(jiA_INT),      INT_CMD,        INT_CMD }
 ,{D(jiA_1x1INTMAT), INT_CMD,       INTMAT_CMD }

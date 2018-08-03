@@ -890,6 +890,22 @@ static BOOLEAN jiA_IDEAL_M(leftv res, leftv a, Subexpr)
   if (TEST_V_QRING && (currRing->qideal!=NULL)) jjNormalizeQRingId(res);
   return FALSE;
 }
+static BOOLEAN jiA_IDEAL_Mo(leftv res, leftv a, Subexpr)
+{
+  ideal m=(ideal)a->CopyD(MODUL_CMD);
+  if (m->rank>1)
+  {
+    Werror("rank of module is %ld in assignment to ideal",m->rank);
+    return TRUE;
+  }
+  if (res->data!=NULL) idDelete((ideal*)&res->data);
+  id_Normalize(m, currRing);
+  id_Shift(m,-1,currRing);
+  m->rank=1;
+  res->data=(void *)m;
+  if (TEST_V_QRING && (currRing->qideal!=NULL)) jjNormalizeQRingId(res);
+  return FALSE;
+}
 static BOOLEAN jiA_LINK(leftv res, leftv a, Subexpr)
 {
   si_link l=(si_link)res->data;
