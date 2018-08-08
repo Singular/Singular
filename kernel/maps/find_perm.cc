@@ -11,7 +11,6 @@
 
 
 #include "kernel/mod2.h"
-#include "omalloc/omalloc.h"
 #include "polys/monomials/p_polys.h"
 #include "kernel/ideals.h"
 #include "polys/monomials/ring.h"

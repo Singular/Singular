@@ -6,11 +6,10 @@
  * reference: https://arxiv.org/abs/1502.01654
  */
 
-#include <kernel/GBEngine/syz.h>
-#include <omalloc/omalloc.h>
-#include <coeffs/numbers.h>
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
+#include "kernel/GBEngine/syz.h"
+#include "coeffs/numbers.h"
+#include "kernel/polys.h"
+#include "kernel/ideals.h"
 
 #include <vector>
 #include <map>

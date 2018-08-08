@@ -8,8 +8,6 @@
 
 #include "kernel/mod2.h"
 
-#include "omalloc/omalloc.h"
-
 #include "misc/options.h"
 #include "misc/intvec.h"
 

@@ -16,7 +16,12 @@
 #include "kernel/mod2.h"
 #include "misc/sirandom.h"
 
+#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
+#else
+#include "xalloc/omalloc.h"
+#endif
+
 #include "misc/mylimits.h"
 
 #include "reporter/si_signals.h"

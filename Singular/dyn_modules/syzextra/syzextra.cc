@@ -23,8 +23,6 @@
 
 #include "syzextra.h"
 
-#include "omalloc/omalloc.h"
-
 #include "misc/intvec.h"
 
 #include "coeffs/coeffs.h"

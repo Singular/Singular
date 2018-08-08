@@ -10,13 +10,8 @@
 
 #include "kernel/mod2.h"
 
-#include "omalloc/omalloc.h"
-
-//#ifdef HAVE_MPR
-
 //#define mprDEBUG_ALL
 
-//-> includes
 #include "misc/options.h"
 
 #include "coeffs/numbers.h"
@@ -1361,8 +1356,6 @@ void simplex::simp3( mprfloat **a, int i1, int k1, int ip, int kp )
 //<-
 
 //-----------------------------------------------------------------------------
-
-//#endif // HAVE_MPR
 
 // local Variables: ***
 // folded-file: t ***

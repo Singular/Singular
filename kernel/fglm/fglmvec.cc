@@ -16,7 +16,6 @@
 
 #include "kernel/mod2.h"
 
-#include "omalloc/omalloc.h"
 #include "kernel/structs.h"
 #include "coeffs/numbers.h"
 #include "fglm.h"

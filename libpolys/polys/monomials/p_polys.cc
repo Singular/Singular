@@ -10,8 +10,6 @@
 
 #include <ctype.h>
 
-#include "omalloc/omalloc.h"
-
 #include "misc/auxiliary.h"
 
 #include "misc/options.h"

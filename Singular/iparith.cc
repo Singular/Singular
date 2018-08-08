@@ -10,8 +10,6 @@
 
 #include "kernel/mod2.h"
 
-#include "omalloc/omalloc.h"
-
 #include "factory/factory.h"
 
 #include "coeffs/bigintmat.h"

@@ -8,7 +8,6 @@
 
 #include "kernel/mod2.h"
 #include "misc/options.h"
-#include "omalloc/omalloc.h"
 
 #include "Singular/tok.h"
 #include "Singular/subexpr.h"

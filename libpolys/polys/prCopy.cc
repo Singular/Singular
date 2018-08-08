@@ -8,7 +8,6 @@
 
 #include "misc/auxiliary.h"
 
-#include "omalloc/omalloc.h"
 #include "polys/monomials/ring.h"
 #include "polys/monomials/p_polys.h"
 #include "coeffs/numbers.h"

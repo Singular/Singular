@@ -1,3 +1,4 @@
+
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
@@ -7,12 +8,15 @@
 
 #include "misc/auxiliary.h"
 
-#include "omalloc/omalloc.h"
-
 #include "reporter/reporter.h"
 #include "resources/feResource.h"
 #include "resources/feFopen.h"
 //#include "options.h"
+#ifdef HAVE_OMALLOC
+#include "omalloc/omalloc.h"
+#else
+#include "xalloc/omalloc.h"
+#endif
 
 #include <stdlib.h>
 #include <stdio.h>

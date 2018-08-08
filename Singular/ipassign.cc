@@ -8,8 +8,6 @@
 
 #include "kernel/mod2.h"
 
-#include "omalloc/omalloc.h"
-
 #define TRANSEXT_PRIVATES
 #include "polys/ext_fields/transext.h"
 

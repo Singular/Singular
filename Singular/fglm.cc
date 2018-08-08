@@ -15,12 +15,8 @@
 *   lying in a 0-dimensional ideal.
 */
 
-
-
-
 #include "kernel/mod2.h"
 
-#include "omalloc/omalloc.h"
 #include "misc/options.h"
 
 #include "polys/monomials/ring.h"

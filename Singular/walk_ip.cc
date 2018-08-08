@@ -10,7 +10,11 @@
 #include "misc/options.h"
 #include "Singular/ipid.h"
 #include "misc/intvec.h"
+#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
+#else
+#include "xalloc/omalloc.h"
+#endif
 #include "kernel/polys.h"
 #include "kernel/ideals.h"
 #include "polys/matpol.h"

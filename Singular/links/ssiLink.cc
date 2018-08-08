@@ -9,8 +9,6 @@
 
 #include "kernel/mod2.h"
 
-#include "omalloc/omalloc.h"
-
 #include "misc/intvec.h"
 #include "misc/options.h"
 

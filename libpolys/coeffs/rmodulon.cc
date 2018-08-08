@@ -5,7 +5,6 @@
 * ABSTRACT: numbers modulo n
 */
 #include "misc/auxiliary.h"
-#include "omalloc/omalloc.h"
 
 #include "misc/mylimits.h"
 #include "misc/prime.h" // IsPrime

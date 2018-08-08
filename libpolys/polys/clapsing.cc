@@ -13,7 +13,6 @@
 
 #include "factory/factory.h"
 
-#include "omalloc/omalloc.h"
 #include "coeffs/numbers.h"
 #include "coeffs/coeffs.h"
 #include "coeffs/bigintmat.h"

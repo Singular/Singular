@@ -8,7 +8,6 @@
 */
 
 /* includes */
-#include "omalloc/omalloc.h"
 #include "misc/auxiliary.h"
 #include "coeffs/coeffs.h"
 #include "misc/intvec.h"

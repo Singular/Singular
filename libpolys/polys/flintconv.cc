@@ -16,7 +16,6 @@
 #include "coeffs/coeffs.h"
 #include "polys/monomials/p_polys.h"
 
-#include "omalloc/omalloc.h"
 #include "polys/sbuckets.h"
 #include "polys/clapconv.h"
 

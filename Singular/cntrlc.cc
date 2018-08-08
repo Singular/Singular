@@ -6,8 +6,6 @@
 */
 #include "kernel/mod2.h"
 
-#include "omalloc/omalloc.h"
-
 #include "reporter/si_signals.h"
 #include "Singular/fevoices.h"
 

@@ -10,12 +10,14 @@
 
 #include <string.h>
 
+#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#ifndef XMEMORY_H
 #include "omalloc/omallocClass.h"
+#else
+#include "xalloc/omalloc.h"
 #endif
-#include "misc/mylimits.h"
 
+#include "misc/mylimits.h"
 
 #include "kernel/polys.h"
 #include "polys/operations/pShallowCopyDelete.h"

@@ -2,7 +2,6 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-#include "omalloc/omalloc.h"
 #include "misc/auxiliary.h"
 #include "misc/options.h"
 

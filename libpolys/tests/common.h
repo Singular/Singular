@@ -9,7 +9,6 @@
 #include "cxxtest/GlobalFixture.h"
 
 #include "misc/auxiliary.h"
-#include "omalloc/omalloc.h"
 
 #include "coeffs/coeffs.h"
 #include "coeffs/numbers.h"

@@ -170,7 +170,7 @@ bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
 
 Singular_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
-Singular_LDADD = libSingular.la ${BUILTIN_FLAGS}
+Singular_LDADD = libSingular.la ${OMALLOC_LIBS} ${BUILTIN_FLAGS} 
 
 Singular_LDFLAGS = -static ${AM_LDFLAGS} ${BUILTIN_FLAGS}
 
@@ -187,7 +187,7 @@ dist_script_SCRIPTS = singularsurf singularsurf_jupyter singularsurf_win
 ESingular_CPPFLAGS = ${AM_CPPFLAGS} -DESINGULAR -DPROTO
 # ESingular_LDFLAGS = -static ${AM_LDFLAGS}
 ESingular_LDADD =  ${top_builddir}/libpolys/reporter/libreporter.la \
-${top_builddir}/libpolys/misc/libmisc.la ${top_builddir}/omalloc/libomalloc.la \
+${top_builddir}/libpolys/misc/libmisc.la ${OMALLOC_LIBS} \
 ${top_builddir}/resources/libsingular_resources.la
 
 
@@ -197,7 +197,7 @@ ESingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptES.inc feOpt.cc
 TSingular_CPPFLAGS = ${AM_CPPFLAGS} -DTSINGULAR -DPROTO
 # TSingular_LDFLAGS = -static ${AM_LDFLAGS}
 TSingular_LDADD = ${top_builddir}/libpolys/reporter/libreporter.la \
-${top_builddir}/libpolys/misc/libmisc.la ${top_builddir}/omalloc/libomalloc.la \
+${top_builddir}/libpolys/misc/libmisc.la ${OMALLOC_LIBS} \
 ${top_builddir}/resources/libsingular_resources.la
 
 TSingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptTS.inc feOpt.cc
@@ -209,7 +209,7 @@ libparse_CPPFLAGS = ${AM_CPPFLAGS} -DSTANDALONE_PARSER
 
 libparse_SOURCES = libparse.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
-libparse_LDADD = ${top_builddir}/omalloc/libomalloc.la
+libparse_LDADD = ${OMALLOC_LIBS}
 libparse_LDFLAGS = -static ${AM_LDFLAGS}
 
 #########################################################

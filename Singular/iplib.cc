@@ -10,7 +10,6 @@
 #include "Singular/tok.h"
 #include "misc/options.h"
 #include "Singular/ipid.h"
-#include "omalloc/omalloc.h"
 #include "polys/monomials/ring.h"
 #include "Singular/subexpr.h"
 #include "Singular/ipid.h"

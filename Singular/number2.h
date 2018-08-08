@@ -3,7 +3,12 @@
 
 #include "kernel/mod2.h"
 
+#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
+#else
+#include "xalloc/omalloc.h"
+#endif
+
 #include "coeffs/coeffs.h"
 #include "kernel/structs.h"
 #ifdef SINGULAR_4_2

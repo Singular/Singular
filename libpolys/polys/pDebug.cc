@@ -27,8 +27,6 @@
 // #undef PDEBUG
 // #define PDEBUG 2
 
-#include "omalloc/omalloc.h"
-
 #include "polys/monomials/ring.h"
 #include "polys/monomials/p_polys.h"
 

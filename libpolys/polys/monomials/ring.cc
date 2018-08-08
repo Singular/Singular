@@ -8,8 +8,6 @@
 /* includes */
 #include <cmath>
 
-#include "omalloc/omalloc.h"
-
 #include "misc/auxiliary.h"
 #include "misc/mylimits.h"
 #include "misc/options.h"

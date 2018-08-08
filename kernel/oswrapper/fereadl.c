@@ -10,7 +10,11 @@
 
 
 #include "kernel/mod2.h"
+#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
+#else
+#include "xalloc/omalloc.h"
+#endif
 
 #ifdef HAVE_FEREAD
   #include <unistd.h>

@@ -144,8 +144,6 @@ static void* GetGeneralProc(p_Proc proc)
 }
 
 #ifdef RDEBUG
-#include "omalloc/omalloc.h"
-
 static const char* GetGeneralProcName(p_Proc proc)
 {
   switch(proc)

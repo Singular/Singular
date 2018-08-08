@@ -36,7 +36,11 @@
 #include "misc/intvec.h"
 #include "Singular/cntrlc.h"
 #include "misc/options.h"
+#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
+#else
+#include "xalloc/omalloc.h"
+#endif
 #include "Singular/ipshell.h"
 #include "Singular/ipconv.h"
 #include "coeffs/ffields.h"

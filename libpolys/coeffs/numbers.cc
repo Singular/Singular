@@ -11,7 +11,6 @@
 
 #include "misc/auxiliary.h"
 #include "misc/mylimits.h"
-#include "omalloc/omalloc.h"
 #include "factory/factory.h"
 
 #include "reporter/reporter.h"

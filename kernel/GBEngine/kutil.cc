@@ -57,7 +57,6 @@
 
 #include "kernel/GBEngine/kutil.h"
 #include "polys/kbuckets.h"
-#include "omalloc/omalloc.h"
 #include "coeffs/numbers.h"
 #include "kernel/polys.h"
 #include "polys/monomials/ring.h"

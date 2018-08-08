@@ -7,7 +7,6 @@
 #define TRANSEXT_PRIVATES
 
 #include "kernel/mod2.h"
-#include "omalloc/omalloc.h"
 
 #include "coeffs/numbers.h"
 #include "coeffs/coeffs.h"

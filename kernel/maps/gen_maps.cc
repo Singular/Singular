@@ -2,7 +2,6 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 #include "kernel/mod2.h"
-#include "omalloc/omalloc.h"
 #include "misc/options.h"
 #include "polys/monomials/p_polys.h"
 #include "polys/prCopy.h"

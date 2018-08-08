@@ -11,7 +11,6 @@
 #ifndef P_PROCS_H
 #define P_PROCS_H
 
-#include "omalloc/omalloc.h"
 #include "polys/monomials/ring.h"
 
 /*------------- p_Proc stuff ----------------------*/

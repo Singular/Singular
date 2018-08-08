@@ -15,7 +15,12 @@
 #include "kernel/mod2.h"
 #ifdef HAVE_PYTHON
 
+#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
+#else
+#include "xalloc/omalloc.h"
+#endif
+
 #include "misc/intvec.h"
 
 #include "Singular/subexpr.h"

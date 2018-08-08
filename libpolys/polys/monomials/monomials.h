@@ -7,7 +7,6 @@
 * ABSTRACT
 */
 
-#include "omalloc/omalloc.h"
 #include "reporter/reporter.h" // for assume etc.
 #include "coeffs/coeffs.h" // ring,number
 
