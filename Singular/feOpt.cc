@@ -6,7 +6,7 @@
 */
 
 
-
+#include <string.h>
 
 #include "kernel/mod2.h"
 
