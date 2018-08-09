@@ -819,7 +819,7 @@ char * versionString(/*const bool bShowDetails = false*/ )
               StringAppend("FLINT(%s),",version);
 #endif
               StringAppendS("factory(" FACTORYVERSION "),\n\t");
-#ifdef XMEMORY_H
+#ifndef HAVE_OMALLOC
               StringAppendS("xalloc,");
 #else
               StringAppendS("omalloc,");

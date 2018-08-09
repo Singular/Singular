@@ -15,13 +15,6 @@
 
 #include "kernel/mod2.h"
 
-#ifdef HAVE_OMALLOC
-#include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
-
-
 #include "misc/options.h"
 #include "misc/intvec.h"
 

@@ -19,7 +19,7 @@
 
 
 class intvec
-#ifndef XMEMORY_H
+#ifdef HAVE_OMALLOC
              :public omallocClass
 #endif
 {

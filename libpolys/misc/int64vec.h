@@ -20,7 +20,7 @@
 #include "misc/intvec.h"
 
 class int64vec
-#ifndef XMEMORY_H
+#ifdef HAVE_OMALLOC
                :public omallocClass
 #endif
 {

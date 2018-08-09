@@ -262,7 +262,7 @@ public:
 extern int HCord;
 
 class skStrategy
-#ifndef XMEMORY_H
+#ifdef HAVE_OMALLOC
                  : public omallocClass
 #endif
 {

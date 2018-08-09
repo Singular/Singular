@@ -44,7 +44,7 @@ class tgb_matrix
 };
 
 class mac_poly_r
-#ifndef XMEMORY_H
+#ifdef HAVE_OMALLOC
                  :public omallocClass
 #endif
 {

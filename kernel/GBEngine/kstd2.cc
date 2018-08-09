@@ -60,11 +60,6 @@ long sba_interreduction_operations;
 
 #include "kernel/GBEngine/kutil.h"
 #include "misc/options.h"
-#ifdef HAVE_OMALLOC
-#include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
 #include "kernel/polys.h"
 #include "kernel/ideals.h"
 #include "kernel/GBEngine/kstd1.h"
