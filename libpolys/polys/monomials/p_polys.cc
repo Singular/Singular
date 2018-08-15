@@ -2595,63 +2595,40 @@ number p_InitContent(poly ph, const ring r)
 }
 #else
 {
+  /* ph has al least 2 terms */
   number d=pGetCoeff(ph);
-  int s;
-  int s2=-1;
-  if(rField_is_Q(r))
+  int s=n_Size(d,r->cf);
+  pIter(ph);
+  number d2=pGetCoeff(ph);
+  int s2=n_Size(d2,r->cf);
+  pIter(ph);
+  if (ph==NULL)
   {
-    if  (SR_HDL(d)&SR_INT) return d;
-    s=mpz_size1(d->z);
+    if (s<s2) return n_Copy(d,r->cf);
+    else      return n_Copy(d2,r->cf);
   }
-  else
-    s=n_Size(d,r->cf);
-  number d2=d;
-  loop
+  do
   {
-    pIter(ph);
-    if(ph==NULL)
+    number nd=pGetCoeff(ph);
+    int ns=n_Size(nd,r->cf);
+    if (ns<=2)
     {
-      if (s2==-1) return n_Copy(d,r->cf);
+      s2=s;
+      d2=d;
+      d=nd;
+      s=ns;
       break;
     }
-    if (rField_is_Q(r))
+    else if (ns<s)
     {
-      if (SR_HDL(pGetCoeff(ph))&SR_INT)
-      {
-        s2=s;
-        d2=d;
-        s=0;
-        d=pGetCoeff(ph);
-        if (s2==0) break;
-      }
-      else if (mpz_size1((pGetCoeff(ph)->z))<=s)
-      {
-        s2=s;
-        d2=d;
-        d=pGetCoeff(ph);
-        s=mpz_size1(d->z);
-      }
+      s2=s;
+      d2=d;
+      d=nd;
+      s=ns;
     }
-    else
-    {
-      int ns=n_Size(pGetCoeff(ph),r->cf);
-      if (ns<=3)
-      {
-        s2=s;
-        d2=d;
-        d=pGetCoeff(ph);
-        s=ns;
-        if (s2<=3) break;
-      }
-      else if (ns<s)
-      {
-        s2=s;
-        d2=d;
-        d=pGetCoeff(ph);
-        s=ns;
-      }
-    }
+    pIter(ph);
   }
+  while(ph!=NULL);
   return n_SubringGcd(d,d2,r->cf);
 }
 #endif
