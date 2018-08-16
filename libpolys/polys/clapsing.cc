@@ -647,6 +647,8 @@ poly singclap_pmod ( poly f, poly g, const ring r )
   return res;
 }
 
+#if 0
+// unused
 void singclap_divide_content ( poly f, const ring r )
 {
   if ( f==NULL )
@@ -743,6 +745,7 @@ void singclap_divide_content ( poly f, const ring r )
     // pTest(f);
   }
 }
+#endif
 
 BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac, const ring r)
 {
