@@ -82,7 +82,7 @@ long sba_interreduction_operations;
 
 // return -1 if no divisor is found
 //        number of first divisor, otherwise
-int kFindDivisibleByInTIntegers(const kStrategy strat, const LObject* L, const int start)
+int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int start)
 {
   unsigned long not_sev = ~L->sev;
   int j = start;
@@ -535,7 +535,7 @@ int redRing_Z (LObject* h,kStrategy strat)
      * this is postponed and checked directly before deciding how to reduce h */
     j = kFindDivisibleByInT(strat, h);
     if (j < 0) {
-      j = kFindDivisibleByInTIntegers(strat, h);
+      j = kFindDivisibleByInT_Z(strat, h);
       if (j < 0)
       {
         // over ZZ: cleanup coefficients by complete reduction with monomials
