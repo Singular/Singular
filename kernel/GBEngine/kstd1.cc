@@ -1347,7 +1347,7 @@ void initBba(kStrategy strat)
   }
   if (rField_is_Ring(currRing))
   {
-    if (rField_is_Ring_Z(currRing))
+    if (rField_is_Z(currRing))
       /* strat->red = redRing; */
       strat->red = redRingIntegers;
     else
