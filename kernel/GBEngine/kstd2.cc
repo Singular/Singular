@@ -510,7 +510,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
 /*2
 *  reduction procedure for the ring Z/2^m
 */
-int redRingIntegers (LObject* h,kStrategy strat)
+int redRing_Z (LObject* h,kStrategy strat)
 {
   if (h->IsNull()) return 0; // spoly is zero (can only occure with zero divisors)
   if (strat->tl<0) return 1;

@@ -1333,7 +1333,7 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
   }
   h.lcm = p_Lcm(p,strat->S[i],currRing);
   pSetCoeff0(h.lcm, n_Lcm(pGetCoeff(p), pGetCoeff(strat->S[i]), currRing->cf));
-  if(nIsZero(pGetCoeff(h.lcm)))
+  if (nIsZero(pGetCoeff(h.lcm)))
   {
       strat->cp++;
       pLmDelete(h.lcm);
