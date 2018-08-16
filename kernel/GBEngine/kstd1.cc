@@ -1347,7 +1347,11 @@ void initBba(kStrategy strat)
   }
   if (rField_is_Ring(currRing))
   {
-    strat->red = redRing;
+    if (rField_is_Z(currRing))
+      /* strat->red = redRing; */
+      strat->red = redRing_Z;
+    else
+      strat->red = redRing;
   }
   if (currRing->pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
