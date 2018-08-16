@@ -1526,19 +1526,21 @@ static BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,k
 
   k_GetStrongLeadTerms(p, si, currRing, m1, m2, gcd, strat->tailRing);
 
-  unsigned long sev = pGetShortExpVector(gcd);
+  if (!rHasMixedOrdering(currRing)) {
+    unsigned long sev = pGetShortExpVector(gcd);
 
-  for (int j = 0; j < strat->sl; j++) {
-    if (j == i)
-      continue;
+    for (int j = 0; j < strat->sl; j++) {
+      if (j == i)
+        continue;
 
-    if (n_DivBy(d, pGetCoeff(strat->S[j]), currRing->cf) &&
-        !(strat->sevS[j] & ~sev) &&
-        p_LmDivisibleBy(strat->S[j], gcd, currRing)) {
-      nDelete(&d);
-      nDelete(&s);
-      nDelete(&t);
-      return FALSE;
+      if (n_DivBy(d, pGetCoeff(strat->S[j]), currRing->cf) &&
+          !(strat->sevS[j] & ~sev) &&
+          p_LmDivisibleBy(strat->S[j], gcd, currRing)) {
+        nDelete(&d);
+        nDelete(&s);
+        nDelete(&t);
+        return FALSE;
+      }
     }
   }
 
@@ -1600,7 +1602,7 @@ static BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,k
   int posx;
   h.pCleardenom();
   strat->initEcart(&h);
-  h.sev = sev;
+  h.sev = pGetShortExpVector(h.p);
   h.i_r1 = -1;h.i_r2 = -1;
   if (currRing!=strat->tailRing)
     h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
