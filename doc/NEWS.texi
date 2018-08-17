@@ -38,6 +38,7 @@ Changed libraries:
 Changes in the kernel/build system:
 @itemize
 @item improved reading of long polynomials
+@item improved groebner bases over Z coefficients
 @item pseudo type @code{polyBucket}
 @item new type @code{smatrix}: sparse matrix (experimental) (@nref{smatrix}).
 @item extended @code{coef} to ideals (@nref{coef}).
