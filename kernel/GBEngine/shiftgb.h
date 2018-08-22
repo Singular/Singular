@@ -12,7 +12,6 @@
 #include "polys/nc/nc.h"
 
 poly p_LPshiftT(poly p, int sh, kStrategy strat, const ring r);
-int p_LastVblockT(poly p, kStrategy strat, const ring r);
 
 poly p_LPshift(poly p, int sh, const ring r);
 poly p_mLPshift(poly p, int sh, const ring r);

@@ -127,28 +127,6 @@ poly p_mLPshift(poly p, int sh, const ring r)
   return(p);
 }
 
-int p_LastVblockT(poly p, kStrategy strat, const ring r)
-{
-  /* returns the number of maximal block */
-  /* appearing among the monomials of p */
-  /* the 0th block is the 1st one */
-
-  /* p is like TObject: lm in currRing = r, tail in tailRing  */
-  assume(p_LmCheckIsFromRing(p,r));
-  assume(p_CheckIsFromRing(pNext(p),strat->tailRing));
-
-  int ans = p_mLastVblock(p, r); // Block of LM
-  poly q = pNext(p);
-  while (q != NULL)
-  {
-    int ansnew = p_mLastVblock(q, strat->tailRing);
-    ans       = si_max(ans,ansnew);
-    pIter(q);
-  }
-  /* do not need to delete q */
-  return(ans);
-}
-
 /* returns the number of maximal block */
 /* appearing among the monomials of p */
 /* the 0th block is the 1st one */
