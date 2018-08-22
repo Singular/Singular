@@ -9,7 +9,11 @@
 */
 #define USE_NORO 1
 
+#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
+#else
+#include "xalloc/omalloc.h"
+#endif
 
 //#define TGB_DEBUG
 #define FULLREDUCTIONS

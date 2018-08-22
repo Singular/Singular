@@ -8,7 +8,6 @@
 */
 
 #include "misc/auxiliary.h"
-#include "omalloc/omalloc.h"
 
 #include "reporter/reporter.h"
 

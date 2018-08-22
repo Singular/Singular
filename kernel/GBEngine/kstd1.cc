@@ -15,8 +15,6 @@
 
 #include "kernel/mod2.h"
 
-#include "omalloc/omalloc.h"
-
 #include "misc/options.h"
 #include "misc/intvec.h"
 
@@ -1349,7 +1347,11 @@ void initBba(kStrategy strat)
   }
   if (rField_is_Ring(currRing))
   {
-    strat->red = redRing;
+    if (rField_is_Z(currRing))
+      /* strat->red = redRing; */
+      strat->red = redRing_Z;
+    else
+      strat->red = redRing;
   }
   if (currRing->pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
@@ -1754,7 +1756,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 //      ecartWeights=NULL;
 //    }
 //  }
-  if(nCoeff_is_Ring_Z(currRing->cf))
+  if(nCoeff_is_Z(currRing->cf))
     finalReduceByMon(strat);
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
   SI_RESTORE_OPT1(save1);
@@ -2171,7 +2173,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   {
     #if PRE_INTEGER_CHECK
     //the preinteger check strategy is not for modules
-    if(rField_is_Ring(currRing) && nCoeff_is_Ring_Z(currRing->cf) && strat->ak <= 0)
+    if(nCoeff_is_Z(currRing->cf) && strat->ak <= 0)
     {
       ideal FCopy = idCopy(F);
       poly pFmon = preIntegerCheck(FCopy, Q);

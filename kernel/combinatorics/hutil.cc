@@ -6,13 +6,10 @@
 */
 
 #include "kernel/mod2.h"
-// #include "kernel/structs.h"
-#include "omalloc/omalloc.h"
 
 #include "polys/simpleideals.h"
 #include "polys/monomials/p_polys.h"
 
-// #include "kernel/ideals.h"
 #include "kernel/polys.h"
 #include "kernel/combinatorics/hutil.h"
 

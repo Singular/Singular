@@ -5,8 +5,6 @@
 * ABSTRACT - the mapping of polynomials to other rings
 */
 
-#include "omalloc/omalloc.h"
-
 #include "misc/auxiliary.h"
 #include "misc/options.h"
 

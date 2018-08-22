@@ -8,9 +8,11 @@
 */
 #include "coeffs/numbers.h"
 #include "polys/monomials/p_polys.h"
+#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#ifndef XMEMORY_H
 #include "omalloc/omallocClass.h"
+#else
+#include "xalloc/omalloc.h"
 #endif
 
 class slimgb_alg;
@@ -42,7 +44,7 @@ class tgb_matrix
 };
 
 class mac_poly_r
-#ifndef XMEMORY_H
+#ifdef HAVE_OMALLOC
                  :public omallocClass
 #endif
 {

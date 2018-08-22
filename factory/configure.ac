@@ -209,6 +209,10 @@ AC_CHECK_LIB(m, atof, , [ AC_MSG_ERROR(libm.a not found) ])
 LB_CHECK_GMP(3.1.1,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 
 #NTL 9.6.4 requires -lpthread/-pthread
+# This test for -lpthread etc has to come before AX_PTHREAD,
+# because libtool tends to ignore -pthread in linking shared C++-libs
+# see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=25460
+# (happens with ubuntu 14.04)
 AC_SEARCH_LIBS(sem_wait,[rt pthreads pthread],[],[
   AC_MSG_ERROR([sem_wait not found in rt,pthreads,pthread])
 ])
@@ -392,7 +396,7 @@ AC_SUBST(MAKEHEADERFLAGS)
 #AC_SUBST(installtargets)
 #AC_SUBST(uninstalltargets)
 
-factory_version="4.1.0"
+factory_version="4.1.1"
 factory_configuration="'$ac_configure_args' in `pwd`"
 AC_SUBST(factory_version)
 

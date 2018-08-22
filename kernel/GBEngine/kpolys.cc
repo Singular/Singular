@@ -3,10 +3,7 @@
 
 #include "kernel/mod2.h"
 
-#include "omalloc/omalloc.h"
-
 #include "kernel/polys.h"
-
 
 /* Returns TRUE if
      * LM(p) | LM(lcm)

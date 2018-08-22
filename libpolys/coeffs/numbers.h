@@ -7,7 +7,6 @@
 * ABSTRACT: compatility interface to coeffs
 */
 #include "coeffs/coeffs.h"
-#include "omalloc/omalloc.h" /* for SIZEOF_DOUBLE, SIZEOF_LONG*/
 
 // the access methods
 //

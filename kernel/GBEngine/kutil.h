@@ -10,12 +10,14 @@
 
 #include <string.h>
 
+#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#ifndef XMEMORY_H
 #include "omalloc/omallocClass.h"
+#else
+#include "xalloc/omalloc.h"
 #endif
-#include "misc/mylimits.h"
 
+#include "misc/mylimits.h"
 
 #include "kernel/polys.h"
 #include "polys/operations/pShallowCopyDelete.h"
@@ -263,7 +265,7 @@ public:
 extern int HCord;
 
 class skStrategy
-#ifndef XMEMORY_H
+#ifdef HAVE_OMALLOC
                  : public omallocClass
 #endif
 {
@@ -504,6 +506,7 @@ poly redNFTail (poly h,const int sl,kStrategy strat);
 int redHoney (LObject* h, kStrategy strat);
 #ifdef HAVE_RINGS
 int redRing (LObject* h,kStrategy strat);
+int redRing_Z (LObject* h,kStrategy strat);
 int redRiloc (LObject* h,kStrategy strat);
 void enterExtendedSpoly(poly h,kStrategy strat);
 void enterExtendedSpolySig(poly h,poly hSig,kStrategy strat);
@@ -572,6 +575,7 @@ void updateResult(ideal r,ideal Q,kStrategy strat);
 void completeReduce (kStrategy strat, BOOLEAN withT=FALSE);
 void kFreeStrat(kStrategy strat);
 void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR);
+void pairLcmCriterion(kStrategy strat);
 void chainCritNormal (poly p,int ecart,kStrategy strat);
 void chainCritOpt_1 (poly,int,kStrategy strat);
 void chainCritSig (poly p,int ecart,kStrategy strat);
@@ -591,6 +595,7 @@ int kFindInT(poly p, TSet T, int tlength);
 /// return -1 if no divisor is found
 ///        number of first divisor in T, otherwise
 int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start=0);
+int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int start=0);
 
 /// return -1 if no divisor is found
 ///        number of first divisor in S, otherwise
@@ -687,6 +692,12 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
 //         -1 tailRing change could not be performed due to exceeding exp
 //            bound of currRing
 int ksReducePoly(LObject* PR,
+                 TObject* PW,
+                 poly spNoether = NULL,
+                 number *coef = NULL,
+                 kStrategy strat = NULL);
+
+int ksReducePolyLC(LObject* PR,
                  TObject* PW,
                  poly spNoether = NULL,
                  number *coef = NULL,

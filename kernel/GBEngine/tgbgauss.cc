@@ -8,7 +8,6 @@
 #include "kernel/mod2.h"
 #include "misc/options.h"
 #include "kernel/GBEngine/tgbgauss.h"
-#include "omalloc/omalloc.h"
 #include <stdlib.h>
 #include "kernel/GBEngine/kutil.h"
 #include "kernel/polys.h"

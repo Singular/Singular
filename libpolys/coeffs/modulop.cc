@@ -6,7 +6,6 @@
 */
 
 #include "misc/auxiliary.h"
-#include "omalloc/omalloc.h"
 
 #include "factory/factory.h"
 
@@ -659,11 +658,11 @@ nMapFunc npSetMap(const coeffs src, const coeffs dst)
   {
     return npMapMachineInt;
   }
-  if (src->rep==n_rep_gmp) //nCoeff_is_Ring_Z(src) || nCoeff_is_Ring_PtoM(src) || nCoeff_is_Ring_ModN(src))
+  if (src->rep==n_rep_gmp) //nCoeff_is_Z(src) || nCoeff_is_Ring_PtoM(src) || nCoeff_is_Zn(src))
   {
     return npMapGMP;
   }
-  if (src->rep==n_rep_gap_gmp) //nCoeff_is_Ring_Z(src)
+  if (src->rep==n_rep_gap_gmp) //nCoeff_is_Z(src)
   {
     return npMapZ;
   }

@@ -16,8 +16,6 @@
 #ifndef P_POLYS_H
 #define P_POLYS_H
 
-#include "omalloc/omalloc.h"
-
 #include "misc/mylimits.h"
 #include "misc/intvec.h"
 #include "coeffs/coeffs.h"

@@ -6,7 +6,6 @@
 */
 
 #include "misc/auxiliary.h"
-#include "omalloc/omalloc.h"
 
 #include "factory/factory.h"
 

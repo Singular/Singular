@@ -8,14 +8,19 @@
 */
 #include <string.h>
 #include "misc/auxiliary.h"
+
+#include "misc/auxiliary.h"
+#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#ifndef XMEMORY_H
 #include "omalloc/omallocClass.h"
+#else
+#include "xalloc/omalloc.h"
 #endif
+
 #include "misc/intvec.h"
 
 class int64vec
-#ifndef XMEMORY_H
+#ifdef HAVE_OMALLOC
                :public omallocClass
 #endif
 {

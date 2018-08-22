@@ -18,7 +18,6 @@
 #include "kernel/ideals.h"
 #include "polys/monomials/ring.h"
 #include "polys/monomials/maps.h"
-#include "omalloc/omalloc.h"
 #include "fglmvec.h"
 #include "fglmgauss.h"
 #include "kernel/GBEngine/kstd1.h"

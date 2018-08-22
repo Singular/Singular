@@ -6,7 +6,6 @@
 #ifdef HAVE_F5
 #include "kernel/GBEngine/kutil.h"
 #include "kernel/structs.h"
-#include "omalloc/omalloc.h"
 #include "kernel/polys.h"
 #include "polys/monomials/p_polys.h"
 #include "kernel/ideals.h"

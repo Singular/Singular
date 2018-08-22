@@ -31,8 +31,6 @@
 #include "factory/templates/ftmpl_list.h"
 #include "factory/templates/ftmpl_list.cc"
 
-#include "omalloc/omalloc.h"
-
 #include "misc/options.h"
 #include "misc/intvec.h"
 

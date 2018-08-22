@@ -14,7 +14,6 @@
 
 #ifdef HAVE_DBM
 
-#  include "omalloc/omalloc.h"
 #  include "Singular/tok.h"
 #  include "Singular/ipid.h"
 #  include "Singular/links/silink.h"

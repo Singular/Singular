@@ -8,8 +8,6 @@
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
  *******************************************************************/
-#include "omalloc/omalloc.h"
-
 #include "misc/auxiliary.h"
 
 #include "polys/sbuckets.h"

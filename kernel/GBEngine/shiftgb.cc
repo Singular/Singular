@@ -19,7 +19,6 @@
 #include "polys/operations/p_Mult_q.h"
 #include "kernel/GBEngine/kutil.h"
 #include "kernel/structs.h"
-#include "omalloc/omalloc.h"
 #include "kernel/GBEngine/khstd.h"
 #include "polys/kbuckets.h"
 #include "polys/weight.h"

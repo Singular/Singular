@@ -207,7 +207,7 @@ ideal getMinorIdeal_toBeDone (const matrix mat, const int minorSize,
   else
   {
     if ((k == 0) && (strcmp(algorithm, "Bareiss") == 0)
-        && (!rField_is_Ring_Z(currRing)) && (!allDifferent))
+        && (!rField_is_Z(currRing)) && (!allDifferent))
     {
       /* In this case, we call an optimized procedure, dating back to
          Wilfried Pohl. It may be used whenever

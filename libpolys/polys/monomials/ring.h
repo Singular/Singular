@@ -8,7 +8,6 @@
 */
 
 /* includes */
-#include "omalloc/omalloc.h"
 #include "misc/auxiliary.h"
 #include "coeffs/coeffs.h"
 #include "misc/intvec.h"
@@ -469,14 +468,8 @@ BOOLEAN rRing_has_CompLastBlock(ring r);
 static inline BOOLEAN rField_is_Ring_2toM(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return ( nCoeff_is_Ring_2toM(r->cf) ); }
 
-static inline BOOLEAN rField_is_Ring_ModN(const ring r)
-{ assume(r != NULL); assume(r->cf != NULL); return ( nCoeff_is_Ring_ModN(r->cf) ); }
-
 static inline BOOLEAN rField_is_Ring_PtoM(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return ( nCoeff_is_Ring_PtoM(r->cf) ); }
-
-static inline BOOLEAN rField_is_Ring_Z(const ring r)
-{ assume(r != NULL); assume(r->cf != NULL); return ( nCoeff_is_Ring_Z(r->cf) ); }
 
 static inline BOOLEAN rField_is_Ring(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Ring(r->cf); }
@@ -489,9 +482,7 @@ static inline BOOLEAN rField_has_Units(const ring r)
 #else
 #define rField_is_Ring(A) (0)
 #define rField_is_Ring_2toM(A) (0)
-#define rField_is_Ring_ModN(A) (0)
 #define rField_is_Ring_PtoM(A) (0)
-#define rField_is_Ring_Z(A) (0)
 #define rField_is_Domain(A) (1)
 #define rField_has_Units(A) (1)
 #endif

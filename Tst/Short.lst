@@ -221,11 +221,6 @@ Short/ncfactor_inhomog_s.tst
 Short/ncfactor_koepfShift_s.tst
 Short/ncfactor_koepf_s.tst
 Short/ncfactor_tsai_s.tst
-Short/nchilb_test1.tst
-Short/nchilb_test2.tst
-Short/nchilb_test3.tst
-Short/nchilb_test4.tst
-Short/nchilb_test5.tst
 Short/nfmodstd_s
 Short/normal.tst
 Short/pAddManyVarsManyL_s.tst

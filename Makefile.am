@@ -1,10 +1,12 @@
 ACLOCAL_AMFLAGS = -I m4
 
-if ENABLE_FACTORY
-  USE_FACTORY = factory
+if ENABLE_OMALLOC
+  USE_OMALLOC = omalloc
+else
+  USE_OMALLOC = xalloc
 endif
 
-SUBDIRS = resources omalloc $(USE_FACTORY) \
+SUBDIRS = resources $(USE_OMALLOC) factory \
 libpolys gfanlib IntegerProgramming \
 kernel Singular \
 dox emacs redhat desktop

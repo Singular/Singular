@@ -805,6 +805,7 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{coef (} poly_expression@code{,} product_of_ringvars @code{)}
+@*@code{coef (} ideal_expression@code{,} product_of_ringvars @code{)}
 @item @strong{Type:}
 matrix
 @item @strong{Syntax:}
@@ -832,7 +833,10 @@ Thus,
   f = M[1,1]*M[2,1]+...+M[1,n]*M[2,n].
 @end ifinfo
 
-Second case: the second matrix (i.e., the 4th argument) contains the
+Second case: apply to all generators of the ideal and combine
+the results into one matrix.
+
+Third case: the second matrix (i.e., the 4th argument) contains the
 monomials, the first matrix (i.e., the 3rd argument) the corresponding
 coefficients of the monomials in the vector.
 
@@ -850,6 +854,7 @@ appropriate place if a monomial is not present.
   print(m);
   f=x20+xyz+xy+x2y+z3;
   print(coef(f,xy));
+  print(coef(maxideal(3),yz));
   vector v=[f,zy+77+xy];
   print(v);
   matrix mc; matrix mm;
@@ -4929,6 +4934,7 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{ncols (} matrix_expression @code{)}
+@*@code{ncols (} smatrix_expression @code{)}
 @*@code{ncols (} intmat_expression @code{)}
 @*@code{ncols (} ideal_expression @code{)}
 @item @strong{Type:}
@@ -4955,6 +4961,7 @@ of a given matrix or intmat.)
 @c ref
 See
 @ref{matrix};
+@ref{smatrix};
 @ref{nrows};
 @ref{size}.
 @c ref
@@ -5075,6 +5082,7 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{nrows (} matrix_expression @code{)}
+@*@code{nrows (} smatrix_expression @code{)}
 @*@code{nrows (} intmat_expression @code{)}
 @*@code{nrows (} intvec_expression @code{)}
 @*@code{nrows (} module_expression @code{)}
@@ -5104,6 +5112,7 @@ Use @code{ncols} to get the number of columns of a given matrix or intmat.
 See
 @ref{gen};
 @ref{matrix};
+@ref{smatrix};
 @ref{module};
 @ref{vector};
 @ref{ncols}.
@@ -7349,6 +7358,7 @@ See
 @item @strong{Syntax:}
 @code{std (} ideal_expression@code{)}
 @*@code{std (} module_expression@code{)}
+@*@code{std (} smatrix_expression@code{)}
 @*@code{std (} ideal_expression@code{,} intvec_expression @code{)}
 @*@code{std (} module_expression@code{,} intvec_expression @code{)}
 @*@code{std (} ideal_expression@code{,} intvec_expression@code{,} intvec_expression @code{)}
@@ -7360,7 +7370,7 @@ See
 @*@code{std (} ideal_expression@code{,} poly_expression@code{,} intvec_expression@code{,} intvec_expression @code{)}
 @*@code{std (} module_expression@code{,} poly_expression@code{,} intvec_expression@code{,} intvec_expression @code{)}
 @item @strong{Type:}
-ideal or module
+ideal, module or smatrix
 @item @strong{Purpose:}
 returns a standard basis of an ideal or module with respect to the
 monomial ordering of the basering.
@@ -7428,6 +7438,8 @@ chooses the "best" algorithm to compute a Groebner basis.
 @c ref
 See
 @ref{ideal};
+@ref{module};
+@ref{smatrix};
 @ref{ring};
 @ref{option};
 @ref{facstd};
@@ -7974,6 +7986,7 @@ See
 @item @strong{Syntax:}
 @code{transpose (} intmat_expression @code{)}
 @*@code{transpose (} matrix_expression @code{)}
+@*@code{transpose (} smatrix_expression @code{)}
 @*@code{transpose (} module_expression @code{)}
 @item @strong{Type:}
 intmat, matrix, or module, corresponding to the argument
@@ -7993,6 +8006,7 @@ transposes a matrix.
 See
 @ref{intmat};
 @ref{matrix};
+@ref{smatrix};
 @ref{module}.
 @c ref
 @c ---------------------------------------

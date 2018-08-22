@@ -38,7 +38,7 @@ int dim(ideal I, ring r)
     ideal vv = id_Head(I,currRing);
     if (i != -1) pDelete(&vv->m[i]);
     d = scDimInt(vv, currRing->qideal);
-    if (rField_is_Ring_Z(currRing) && (i==-1)) d++;
+    if (rField_is_Z(currRing) && (i==-1)) d++;
     idDelete(&vv);
     return d;
   }
@@ -151,7 +151,7 @@ tropicalStrategy::tropicalStrategy(const ideal I, const ring r,
   weightAdjustingAlgorithm2(nonvalued_adjustWeightUnderHomogeneity),
   extraReductionAlgorithm(noExtraReduction)
 {
-  assume(rField_is_Q(r) || rField_is_Zp(r) || rField_is_Ring_Z(r));
+  assume(rField_is_Q(r) || rField_is_Zp(r) || rField_is_Z(r));
   if (!completelyHomogeneous)
   {
     weightAdjustingAlgorithm1 = valued_adjustWeightForHomogeneity;

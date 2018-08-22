@@ -6,8 +6,6 @@
 */
 #include "kernel/mod2.h"
 
-#include "omalloc/omalloc.h"
-
 #include "reporter/si_signals.h"
 #include "Singular/fevoices.h"
 
@@ -19,6 +17,14 @@
 #include "Singular/misc_ip.h"
 #include "Singular/links/silink.h"
 #include "Singular/links/ssiLink.h"
+
+#ifdef HAVE_NTL
+#include <NTL/version.h>
+#include <NTL/tools.h>
+#ifdef NTL_CLIENT
+NTL_CLIENT
+#endif
+#endif
 
 /* undef, if you don't want GDB to come up on error */
 
@@ -549,11 +555,20 @@ static void stack_trace (char *const*args)
 
 #  endif /* !__OPTIMIZE__ */
 
-/*2
-* init signal handlers
-*/
+/// init signal handlers and error handling for libraries: NTL, factory
 void init_signals()
 {
+// NTL error handling (>= 9.3.0) ----------------------------------------
+#ifdef HAVE_NTL
+#if (((NTL_MAJOR_VERSION==9)&&(NTL_MINOR_VERSION>=3))||(NTL_MAJOR_VERSION>=10))
+  ErrorMsgCallback=WerrorS;
+  ErrorCallback=HALT;
+#endif
+#endif
+// factory error handling: -----------------------------------------------
+  factoryError=WerrorS;
+
+// signal handler -------------------------------------------------------
   #ifdef SIGSEGV
   si_set_signal(SIGSEGV,(si_hdl_typ)sigsegv_handler);
   #endif

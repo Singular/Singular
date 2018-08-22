@@ -12,7 +12,6 @@
 #include "misc/mylimits.h"
 
 #include "reporter/reporter.h"
-#include "omalloc/omalloc.h"
 
 #include "coeffs/numbers.h"
 #include "coeffs/coeffs.h"

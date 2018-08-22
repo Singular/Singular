@@ -96,7 +96,12 @@ static inline si_link slCopy(si_link l)
   return l;
 }
 
+#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
+#else
+#include "xalloc/omalloc.h"
+#endif
+
 static inline char* slString(si_link l)
 {
   if (l->name != NULL)

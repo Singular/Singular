@@ -8,7 +8,6 @@
 
 #include "misc/auxiliary.h"
 
-#include "omalloc/omalloc.h"
 #include "misc/mylimits.h"
 
 #include "misc/intvec.h"
@@ -31,6 +30,7 @@
 
 static poly mp_Exdiv ( poly m, poly d, poly vars, const ring);
 static poly mp_Select (poly fro, poly what, const ring);
+static poly mp_SelectId (ideal I, poly what, const ring R);
 
 /// create a r x c zero-matrix
 matrix mpNew(int r, int c)
@@ -410,7 +410,7 @@ matrix mp_CoeffProc (poly f, poly vars, const ring R)
   {
     co = mpNew(2, 1);
     MATELEM(co,1,1) = p_One(R);
-    MATELEM(co,2,1) = NULL;
+    //MATELEM(co,2,1) = NULL;
     return co;
   }
   sel = mp_Select(f, vars, R);
@@ -425,7 +425,7 @@ matrix mp_CoeffProc (poly f, poly vars, const ring R)
       pIter(sel);
       pNext(h)=NULL;
       MATELEM(co,1,i) = h;
-      MATELEM(co,2,i) = NULL;
+      //MATELEM(co,2,i) = NULL;
       if (p_IsConstant(h, R)) pos_of_1 = i;
     }
   }
@@ -437,7 +437,7 @@ matrix mp_CoeffProc (poly f, poly vars, const ring R)
       pIter(sel);
       pNext(h)=NULL;
       MATELEM(co,1,i) = h;
-      MATELEM(co,2,i) = NULL;
+      //MATELEM(co,2,i) = NULL;
       if (p_IsConstant(h, R)) pos_of_1 = i;
     }
   }
@@ -471,6 +471,86 @@ matrix mp_CoeffProc (poly f, poly vars, const ring R)
       i ++;
     }
     pIter(f);
+  }
+  return co;
+}
+
+matrix mp_CoeffProcId (ideal I, poly vars, const ring R)
+{
+  assume(vars!=NULL);
+  poly sel, h;
+  int l, i;
+  int pos_of_1 = -1;
+  matrix co;
+
+  if (idIs0(I))
+  {
+    co = mpNew(IDELEMS(I)+1,1);
+    MATELEM(co,1,1) = p_One(R);
+    return co;
+  }
+  sel = mp_SelectId(I, vars, R);
+  l = pLength(sel);
+  co = mpNew(IDELEMS(I)+1, l);
+
+  if (rHasLocalOrMixedOrdering(R))
+  {
+    for (i=l; i>=1; i--)
+    {
+      h = sel;
+      pIter(sel);
+      pNext(h)=NULL;
+      MATELEM(co,1,i) = h;
+      //MATELEM(co,2,i) = NULL;
+      if (p_IsConstant(h, R)) pos_of_1 = i;
+    }
+  }
+  else
+  {
+    for (i=1; i<=l; i++)
+    {
+      h = sel;
+      pIter(sel);
+      pNext(h)=NULL;
+      MATELEM(co,1,i) = h;
+      //MATELEM(co,2,i) = NULL;
+      if (p_IsConstant(h, R)) pos_of_1 = i;
+    }
+  }
+  for(int j=0;j<IDELEMS(I);j++)
+  {
+    poly f=I->m[j];
+    while (f!=NULL)
+    {
+      i = 1;
+      loop
+      {
+        if (i!=pos_of_1)
+        {
+          h = mp_Exdiv(f, MATELEM(co,1,i),vars, R);
+          if (h!=NULL)
+          {
+            MATELEM(co,j+2,i) = p_Add_q(MATELEM(co,j+2,i), h, R);
+            break;
+          }
+        }
+        if (i == l)
+        {
+          // check monom 1 last:
+          if (pos_of_1 != -1)
+          {
+            h = mp_Exdiv(f, MATELEM(co,1,pos_of_1),vars, R);
+            if (h!=NULL)
+            {
+              MATELEM(co,j+2,pos_of_1) = p_Add_q(MATELEM(co,j+2,pos_of_1), h, R);
+            }
+          }
+          break;
+        }
+        i ++;
+      }
+      pIter(f);
+    }
   }
   return co;
 }
@@ -681,6 +761,28 @@ static poly mp_Select (poly fro, poly what, const ring R)
     p_Setm(h, R);
     res = p_Insert(h, res, R);
     fro = fro->next;
+  }
+  return res;
+}
+
+static poly mp_SelectId (ideal I, poly what, const ring R)
+{
+  int i;
+  poly h, res;
+  res = NULL;
+  for(int j=0;j<IDELEMS(I);j++)
+  {
+    poly fro=I->m[j];
+    while (fro!=NULL)
+    {
+      h = p_One(R);
+      for (i=1; i<=rVar(R); i++)
+        p_SetExp(h,i, p_GetExp(fro,i, R) * p_GetExp(what, i, R), R);
+      p_SetComp(h, p_GetComp(fro, R), R);
+      p_Setm(h, R);
+      res = p_Insert(h, res, R);
+      fro = fro->next;
+    }
   }
   return res;
 }

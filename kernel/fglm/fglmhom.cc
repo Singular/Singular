@@ -27,7 +27,6 @@
 #include "kernel/ipid.h"
 #include "kernel/ipshell.h"
 #include "polys/monomials/maps.h"
-#include "omalloc/omalloc.h"
 #include "fglm.h"
 #include "fglmvec.h"
 #include "fglmgauss.h"

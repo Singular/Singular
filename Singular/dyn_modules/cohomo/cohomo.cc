@@ -7,7 +7,6 @@
 
 #include "kernel/mod2.h"
 
-#include "omalloc/omalloc.h"
 #include "misc/mylimits.h"
 #include "libpolys/misc/intvec.h"
 #include <assert.h>

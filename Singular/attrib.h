@@ -7,15 +7,17 @@
 * ABSTRACT: attributes to leftv and idhdl
 */
 #include "kernel/structs.h"
+#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#ifndef XMEMORY_H
 #include "omalloc/omallocClass.h"
+#else
+#include "xalloc/omalloc.h"
 #endif
 
 class sattr;
 typedef sattr * attr;
 class sattr
-#ifndef XMEMORY_H
+#ifdef HAVE_OMALLOC
             : public omallocClass
 #endif
 {

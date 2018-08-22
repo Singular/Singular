@@ -6,7 +6,6 @@
 */
 
 #include "misc/auxiliary.h"
-#include "omalloc/omalloc.h"
 
 #include "factory/factory.h"
 
@@ -2341,7 +2340,7 @@ nMapFunc nlSetMap(const coeffs src, const coeffs /*dst*/)
     return nlMapLongR; /* long R -> Q */
   }
 #ifdef HAVE_RINGS
-  if (src->rep==n_rep_gmp) // nCoeff_is_Ring_Z(src) || nCoeff_is_Ring_PtoM(src) || nCoeff_is_Ring_ModN(src))
+  if (src->rep==n_rep_gmp) // nCoeff_is_Z(src) || nCoeff_is_Ring_PtoM(src) || nCoeff_is_Zn(src))
   {
     return nlMapGMP;
   }

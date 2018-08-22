@@ -10,8 +10,6 @@
 
 #include "kernel/mod2.h"
 
-#include "omalloc/omalloc.h"
-
 #include "factory/factory.h"
 
 #include "coeffs/bigintmat.h"
@@ -1796,6 +1794,13 @@ static BOOLEAN jjCOEF(leftv res, leftv u, leftv v)
   res->data=(char *)mp_CoeffProc((poly)u->Data(),p /*(poly)v->Data()*/,currRing);
   return FALSE;
 }
+static BOOLEAN jjCOEF_Id(leftv res, leftv u, leftv v)
+{
+  poly p=(poly)v->Data();
+  if ((p==NULL)||(pNext(p)!=NULL)) return TRUE;
+  res->data=(char *)mp_CoeffProcId((ideal)u->Data(),p /*(poly)v->Data()*/,currRing);
+  return FALSE;
+}
 static BOOLEAN jjCOEFFS_Id(leftv res, leftv u, leftv v)
 {
   int i=pVar((poly)v->Data());
@@ -1914,7 +1919,7 @@ static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
     /* drop degree zero generator from vv (if any) */
     if (i != -1) pDelete(&vv->m[i]);
     long d = (long)scDimInt(vv, ww);
-    if (rField_is_Ring_Z(currRing) && (i == -1)) d++;
+    if (rField_is_Z(currRing) && (i == -1)) d++;
     res->data = (char *)d;
     idDelete(&vv); idDelete(&ww);
     return FALSE;
@@ -2373,7 +2378,7 @@ static BOOLEAN jjGCD_P(leftv res, leftv u, leftv v)
 static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
 {
 #ifdef HAVE_RINGS
-  if (rField_is_Ring_Z(currRing))
+  if (rField_is_Z(currRing))
   {
     PrintS("// NOTE: computation of Hilbert series etc. is being\n");
     PrintS("//       performed for generic fibre, that is, over Q\n");
@@ -3781,7 +3786,7 @@ static BOOLEAN jjDEGREE(leftv res, leftv v)
 {
   SPrintStart();
 #ifdef HAVE_RINGS
-  if (rField_is_Ring_Z(currRing))
+  if (rField_is_Z(currRing))
   {
     PrintS("// NOTE: computation of degree is being performed for\n");
     PrintS("//       generic fibre, that is, over Q\n");
@@ -3930,7 +3935,7 @@ static BOOLEAN jjDIM(leftv res, leftv v)
     if(j == -1)
     {
       d = (long)scDimInt(vv, currRing->qideal);
-      if(rField_is_Ring_Z(currRing))
+      if(rField_is_Z(currRing))
         d++;
     }
     else
@@ -3964,7 +3969,7 @@ static BOOLEAN jjDIM(leftv res, leftv v)
         if (j != -1) pDelete(&vc->m[j]);
         dcurr = (long)scDimInt(vc, currRing->qideal);
         // the following assumes the ground rings to be either zero- or one-dimensional
-        if((j==-1) && rField_is_Ring_Z(currRing))
+        if((j==-1) && rField_is_Z(currRing))
         {
           // should also be activated for other euclidean domains as groundfield
           dcurr++;
@@ -4144,7 +4149,7 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
 static BOOLEAN jjHILBERT(leftv, leftv v)
 {
 #ifdef HAVE_RINGS
-  if (rField_is_Ring_Z(currRing))
+  if (rField_is_Z(currRing))
   {
     PrintS("// NOTE: computation of Hilbert series etc. is being\n");
     PrintS("//       performed for generic fibre, that is, over Q\n");
@@ -4159,7 +4164,7 @@ static BOOLEAN jjHILBERT(leftv, leftv v)
 static BOOLEAN jjHILBERT_IV(leftv res, leftv v)
 {
 #ifdef HAVE_RINGS
-  if (rField_is_Ring_Z(currRing))
+  if (rField_is_Z(currRing))
   {
     PrintS("// NOTE: computation of Hilbert series etc. is being\n");
     PrintS("//       performed for generic fibre, that is, over Q\n");
@@ -5847,7 +5852,7 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
     return TRUE;
   }
 #ifdef HAVE_RINGS
-  if (rField_is_Ring_Z(currRing))
+  if (rField_is_Z(currRing))
   {
     PrintS("// NOTE: computation of Hilbert series etc. is being\n");
     PrintS("//       performed for generic fibre, that is, over Q\n");

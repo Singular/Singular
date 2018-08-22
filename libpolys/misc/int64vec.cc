@@ -12,7 +12,6 @@
 
 #include "misc/int64vec.h"
 #include "misc/intvec.h"
-#include "omalloc/omalloc.h"
 
 /*0 implementation*/
 

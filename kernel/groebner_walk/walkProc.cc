@@ -9,7 +9,6 @@
 #include "kernel/ideals.h"
 #include "polys/monomials/ring.h"
 #include "polys/monomials/maps.h"
-#include "omalloc/omalloc.h"
 #include "kernel/GBEngine/kstd1.h"
 #include "kernel/fglm/fglm.h"
 #include "kernel/groebner_walk/walkMain.h"

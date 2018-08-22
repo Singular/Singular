@@ -16,7 +16,12 @@
 #include "kernel/mod2.h"
 #include "misc/sirandom.h"
 
+#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
+#else
+#include "xalloc/omalloc.h"
+#endif
+
 #include "misc/mylimits.h"
 
 #include "reporter/si_signals.h"
@@ -814,7 +819,7 @@ char * versionString(/*const bool bShowDetails = false*/ )
               StringAppend("FLINT(%s),",version);
 #endif
               StringAppendS("factory(" FACTORYVERSION "),\n\t");
-#ifdef XMEMORY_H
+#ifndef HAVE_OMALLOC
               StringAppendS("xalloc,");
 #else
               StringAppendS("omalloc,");
@@ -930,7 +935,9 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #ifdef __GNUC__
               "(ver: " __VERSION__ ")"
 #endif
-              "\n",AC_CONFIGURE_ARGS, CC,CFLAGS, CXX,CXXFLAGS,  DEFS,CPPFLAGS,  LDFLAGS,LIBS);
+              "\n",AC_CONFIGURE_ARGS, CC,CFLAGS " " PTHREAD_CFLAGS,
+	      CXX,CXXFLAGS " " PTHREAD_CFLAGS,  DEFS,CPPFLAGS,  LDFLAGS,
+	      LIBS " " PTHREAD_LIBS);
               feStringAppendResources(0);
               feStringAppendBrowsers(0);
               StringAppendS("\n");
@@ -1318,18 +1325,6 @@ static BOOLEAN iiCrossProd(leftv res, leftv args)
 */
 void siInit(char *name)
 {
-// factory default settings: -----------------------------------------------
-  //Off(SW_USE_NTL_SORT); // may be changed by an command line option
-  factoryError=WerrorS;
-
-// NTL error handling (>= 9.3.0)
-#ifdef HAVE_NTL
-#if (((NTL_MAJOR_VERSION==9)&&(NTL_MINOR_VERSION>=3))||(NTL_MAJOR_VERSION>=10))
-  ErrorMsgCallback=WerrorS;
-  ErrorCallback=HALT;
-#endif
-#endif
-
 // memory initialization: -----------------------------------------------
     om_Opts.OutOfMemoryFunc = omSingOutOfMemoryFunc;
 #ifndef OM_NDEBUG

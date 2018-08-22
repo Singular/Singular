@@ -6,7 +6,6 @@
 */
 
 #include "kernel/mod2.h"
-#include "omalloc/omalloc.h"
 
 #include "misc/mylimits.h"
 #include "misc/options.h"

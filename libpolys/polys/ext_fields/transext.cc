@@ -34,7 +34,6 @@
 
 #include "misc/auxiliary.h"
 
-#include "omalloc/omalloc.h"
 #include "factory/factory.h"
 
 #include "reporter/reporter.h"
@@ -61,7 +60,7 @@
 /* constants for controlling the complexity of numbers */
 #define ADD_COMPLEXITY 1   /**< complexity increase due to + and - */
 #define MULT_COMPLEXITY 2   /**< complexity increase due to * and / */
-#define DIFF_COMPLEXITY 2   /**< complexity increase due to * and / */
+#define DIFF_COMPLEXITY 2   /**< complexity increase due to diff */
 #define BOUND_COMPLEXITY 10   /**< maximum complexity of a number */
 
 /// TRUE iff num. represents 1
@@ -1063,13 +1062,12 @@ static number ntMult(number a, number b, const coeffs cf)
 
     if(da == NULL)
     { // both fa && fb are ?? // NULL!
-      assume (da == NULL && db == NULL);
       DEN(result) = NULL;
       COM(result) = 0;
+      p_Normalize(g,ntRing);
     }
     else
     {
-      assume (da != NULL && db == NULL);
       DEN(result) = p_Copy(da, ntRing);
       COM(result) = COM(fa) + MULT_COMPLEXITY;
       heuristicGcdCancellation((number)result, cf);
@@ -1080,7 +1078,6 @@ static number ntMult(number a, number b, const coeffs cf)
   { // b = ?? / ??
     if (da == NULL)
     { // a == ? // NULL
-      assume( db != NULL && da == NULL);
       DEN(result) = p_Copy(db, ntRing);
       COM(result) = COM(fb) + MULT_COMPLEXITY;
       heuristicGcdCancellation((number)result, cf);
@@ -1088,7 +1085,6 @@ static number ntMult(number a, number b, const coeffs cf)
     }
     else /* both den's are != 1 */
     {
-      assume (da != NULL && db != NULL);
       DEN(result) = pp_Mult_qq(da, db, ntRing);
       COM(result) = COM(fa) + COM(fb) + MULT_COMPLEXITY;
       heuristicGcdCancellation((number)result, cf);

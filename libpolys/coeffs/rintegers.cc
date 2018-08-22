@@ -6,7 +6,6 @@
 */
 
 #include "misc/auxiliary.h"
-#include "omalloc/omalloc.h"
 
 #include "factory/factory.h"
 
@@ -271,6 +270,40 @@ static number nrzExactDiv (number a,number b, const coeffs)
   return (number) erg;
 }
 
+static number nrzSmallestQuotRem (number a, number b, number * r, const coeffs )
+{
+  mpz_ptr qq = (mpz_ptr) omAllocBin(gmp_nrz_bin);
+  mpz_init(qq);
+  mpz_ptr rr = (mpz_ptr) omAllocBin(gmp_nrz_bin);
+  mpz_init(rr);
+  int gsign = mpz_sgn((mpz_ptr) b);
+  mpz_t gg, ghalf;
+  mpz_init(gg);
+  mpz_init(ghalf);
+  mpz_abs(gg, (mpz_ptr) b);
+  mpz_fdiv_qr(qq, rr, (mpz_ptr) a, gg);
+  mpz_tdiv_q_2exp(ghalf, gg, 1);
+  if (mpz_cmp(rr, ghalf) > 0)  // r > ghalf
+    {
+      mpz_sub(rr, rr, gg);
+      mpz_add_ui(qq, qq, 1);
+    }
+  if (gsign < 0) mpz_neg(qq, qq);
+
+  mpz_clear(gg);
+  mpz_clear(ghalf);
+  if (r==NULL)
+  {
+    mpz_clear(rr);
+    omFreeBin(rr,gmp_nrz_bin);
+  }
+  else
+  {
+    *r=(number)rr;
+  }
+  return (number) qq;
+}
+
 static number nrzQuotRem (number a, number b, number * r, const coeffs )
 {
   mpz_ptr qq = (mpz_ptr) omAllocBin(gmp_nrz_bin);
@@ -346,11 +379,11 @@ static nMapFunc nrzSetMap(const coeffs src, const coeffs /*dst*/)
   /* dst = currRing */
   /* dst = nrn */
   if ((src->rep==n_rep_gmp)
-  && (nCoeff_is_Ring_Z(src) || nCoeff_is_Ring_ModN(src) || nCoeff_is_Ring_PtoM(src)))
+  && (nCoeff_is_Z(src) || nCoeff_is_Zn(src) || nCoeff_is_Ring_PtoM(src)))
   {
     return ndCopyMap; //nrzCopyMap;
   }
-  if ((src->rep==n_rep_gap_gmp) /*&& nCoeff_is_Ring_Z(src)*/)
+  if ((src->rep==n_rep_gap_gmp) /*&& nCoeff_is_Z(src)*/)
   {
     return ndCopyMap; //nrzCopyMap;
   }
@@ -452,6 +485,10 @@ static number nrzConvFactoryNSingN(const CanonicalForm n, const coeffs r)
   {
     mpz_ptr m = (mpz_ptr) omAllocBin(gmp_nrz_bin);
     gmp_numerator(n,m);
+    if (!n.den().isOne())
+    {
+      WarnS("denominator is not 1 in factory");
+    }
     return (number) m;
   }
 }
@@ -616,7 +653,7 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfExtGcd = nrzExtGcd;
   r->cfXExtGcd = nrzXExtGcd;
   r->cfDivBy = nrzDivBy;
-  r->cfQuotRem = nrzQuotRem;
+  r->cfQuotRem = nrzSmallestQuotRem;
   r->cfInpNeg   = nrzNeg;
   r->cfInvers= nrzInvers;
   r->cfCopy  = nrzCopy;
@@ -1626,14 +1663,14 @@ static number nrzMapQ(number from, const coeffs /* src */, const coeffs dst)
 static nMapFunc nrzSetMap(const coeffs src, const coeffs /*dst*/)
 {
   /* dst = rintegers */
-  if (src->rep==n_rep_gmp) //nCoeff_is_Ring_ModN(src) || nCoeff_is_Ring_PtoM(src))
+  if (src->rep==n_rep_gmp) //nCoeff_is_Zn(src) || nCoeff_is_Ring_PtoM(src))
     return nrzModNMap;
 
-  if ((src->rep==n_rep_gap_gmp) && nCoeff_is_Ring_Z(src))
+  if ((src->rep==n_rep_gap_gmp) && nCoeff_is_Z(src))
   {
     return ndCopyMap; //nrzCopyMap;
   }
-  if (src->rep==n_rep_gap_rat) /*&& nCoeff_is_Ring_Z(src)) Q, bigint*/
+  if (src->rep==n_rep_gap_rat) /*&& nCoeff_is_Z(src)) Q, bigint*/
   {
     return nrzMapQ;
   }
@@ -1853,7 +1890,7 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfAnn = nrzAnn;
   r->cfExtGcd = nrzExtGcd; // only for ring stuff
   r->cfXExtGcd = nrzXExtGcd; // only for ring stuff
-  r->cfQuotRem = nrzQuotRem;
+  r->cfQuotRem = nrzSmallestQuotRem;
   r->cfDivBy = nrzDivBy; // only for ring stuff
   //#endif
   r->cfInpNeg   = nrzNeg;

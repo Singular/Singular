@@ -1,13 +1,10 @@
 #include "misc/auxiliary.h"
-#include "omalloc/omalloc.h"
-
 
 #include "reporter/reporter.h"
 #include "resources/feResource.h"
 
 #include "coeffs/coeffs.h"
 #include "coeffs/numbers.h"
-
 
 // the following headers are private...
 #include "coeffs/longrat.h"
@@ -268,9 +265,9 @@ BOOLEAN Test(const n_coeffType type, void* p = NULLp)
       TS_ASSERT( !nCoeff_has_simple_Alloc( r )); // ?
 
       TS_ASSERT( !nCoeff_is_Ring_2toM( r ));
-      TS_ASSERT( !nCoeff_is_Ring_ModN( r ));
+      TS_ASSERT( !nCoeff_is_Zn( r ));
       TS_ASSERT( !nCoeff_is_Ring_PtoM( r ));
-      TS_ASSERT( !nCoeff_is_Ring_Z( r ));
+      TS_ASSERT( !nCoeff_is_Z( r ));
       TS_ASSERT( !nCoeff_is_Ring( r ));
       TS_ASSERT( !nCoeff_is_Zp( r ));
       TS_ASSERT( !nCoeff_is_numeric( r ));

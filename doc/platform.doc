@@ -56,7 +56,7 @@
 @code{-lSingular} the link parameter,@*
 @code{lib/pkgconfig/Singular.pc} provides all parameters in the pkconfig format.
 
-It contains all parts of @sc{Singular} with two exceptions:
+It contains all parts of @sc{Singular} with the following exceptions:
 @enumerate
 @item
 memory allocation functions for GMP
@@ -69,6 +69,9 @@ for the routines from @ref{parallel_lib}, @ref{modstd_lib}, @ref{modnormal_lib},
 If the child was started by @code{libSingular} the handler
 has to call @code{sig_chld_hdl} from @code{Singular/links/ssiLink.cc}
 or implement something similiar (call @code{slClose(l)} for ssi links).
+@item
+error handlers for factory, NTL
+(see @code{init_signals} in @code{Singular/cntrlc.cc}).@*
 @end enumerate
 @c ----------------------------------------------------------
 @node Download instructions
@@ -88,7 +91,7 @@ at
 Release versions of @sc{Singular} are also available
 from our FTP site
 @display
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/src/4-0-3/}.
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/src/4-1-1/}.
 @end display
 
 @c @include README_download.texi

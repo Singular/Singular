@@ -5,7 +5,6 @@
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
 #include "misc/auxiliary.h"
-#include "omalloc/omalloc.h"
 
 #include "misc/mylimits.h"
 #include "misc/sirandom.h"

@@ -57,7 +57,6 @@
 
 #include "kernel/GBEngine/kutil.h"
 #include "polys/kbuckets.h"
-#include "omalloc/omalloc.h"
 #include "coeffs/numbers.h"
 #include "kernel/polys.h"
 #include "polys/monomials/ring.h"
@@ -770,6 +769,18 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
   if (T->p == NULL && T->t_p == NULL && i >= 0)
     return dReportError("%c[%d].poly is NULL", TN, i);
 
+  if (T->p!=NULL)
+  {
+    nTest(pGetCoeff(T->p));
+    if ((T->t_p==NULL)&&(pNext(T->p)!=NULL)) p_Test(pNext(T->p),currRing);
+  }
+  if (T->t_p!=NULL)
+  {
+    nTest(pGetCoeff(T->t_p));
+    if (pNext(T->t_p)!=NULL) p_Test(pNext(T->t_p),strat_tailRing);
+  }
+  if ((T->p!=NULL)&&(T->t_p!=NULL)) assume(pGetCoeff(T->p)==pGetCoeff(T->t_p));
+
   if (T->tailRing != currRing)
   {
     if (T->t_p == NULL && i > 0)
@@ -868,6 +879,18 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
 BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
                 BOOLEAN testp, int lpos, TSet T, int tlength)
 {
+  if (L->p!=NULL)
+  {
+    nTest(pGetCoeff(L->p));
+    if ((L->t_p==NULL)&&(pNext(L->p)!=NULL)) p_Test(pNext(L->p),currRing);
+  }
+  if (L->t_p!=NULL)
+  {
+    nTest(pGetCoeff(L->t_p));
+    if (pNext(L->t_p)!=NULL) p_Test(pNext(L->t_p),strat_tailRing);
+  }
+  if ((L->p!=NULL)&&(L->t_p!=NULL)) assume(pGetCoeff(L->p)==pGetCoeff(L->t_p));
+
   if (testp)
   {
     poly pn = NULL;
@@ -1312,6 +1335,11 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
   h.ecart=0; h.length=0;
 #endif
   /*- computes the lcm(s[i],p) -*/
+  if(pHasNotCF(p,strat->S[i]))
+  {
+      strat->cp++;
+      return;
+  }
   h.lcm = p_Lcm(p,strat->S[i],currRing);
   pSetCoeff0(h.lcm, n_Lcm(pGetCoeff(p), pGetCoeff(strat->S[i]), currRing->cf));
   if (nIsZero(pGetCoeff(h.lcm)))
@@ -1506,6 +1534,25 @@ static BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,k
   }
 
   k_GetStrongLeadTerms(p, si, currRing, m1, m2, gcd, strat->tailRing);
+
+  if (!rHasMixedOrdering(currRing)) {
+    unsigned long sev = pGetShortExpVector(gcd);
+
+    for (int j = 0; j < strat->sl; j++) {
+      if (j == i)
+        continue;
+
+      if (n_DivBy(d, pGetCoeff(strat->S[j]), currRing->cf) &&
+          !(strat->sevS[j] & ~sev) &&
+          p_LmDivisibleBy(strat->S[j], gcd, currRing)) {
+        nDelete(&d);
+        nDelete(&s);
+        nDelete(&t);
+        return FALSE;
+      }
+    }
+  }
+
   //p_Test(m1,strat->tailRing);
   //p_Test(m2,strat->tailRing);
   /*if(!enterTstrong)
@@ -3881,8 +3928,21 @@ void initenterpairsSigRing (poly h,poly hSig,int hFrom,int k,int ecart,int isFro
 #endif
   }
 }
-
 #ifdef HAVE_RINGS
+// a first test for removing old pairs where
+// strat->P.p divides lcm of pair
+void pairLcmCriterion(kStrategy strat)
+{
+	number a  = pGetCoeff(strat->P.p);
+	poly t    = strat->P.p;
+	for (int l = 0; l < strat->Ll; ++l) {
+		if (n_DivBy(a, pGetCoeff(strat->L[l].p), currRing->cf) &&
+				p_LmDivisibleBy(strat->L[l].p, t, currRing)) {
+			deleteInL(strat->L, &strat->Ll, l, strat);
+		}
+	}
+}
+
 /*2
 *the pairset B of pairs of type (s[i],p) is complete now. It will be updated
 *using the chain-criterion in B and L and enters B to L
@@ -10657,8 +10717,7 @@ BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat
 */
 poly preIntegerCheck(const ideal Forig, const ideal Q)
 {
-  assume(nCoeff_is_Ring_Z(currRing->cf));
-  if(!nCoeff_is_Ring_Z(currRing->cf))
+  if(!nCoeff_is_Z(currRing->cf))
     return NULL;
   ideal F = idCopy(Forig);
   idSkipZeroes(F);
@@ -10825,7 +10884,7 @@ poly preIntegerCheck(const ideal Forig, const ideal Q)
 */
 void postReduceByMon(LObject* h, kStrategy strat)
 {
-  if(!nCoeff_is_Ring_Z(currRing->cf))
+  if(!nCoeff_is_Z(currRing->cf))
       return;
   poly pH = h->GetP();
   poly p,pp;
@@ -10893,7 +10952,7 @@ void postReduceByMon(LObject* h, kStrategy strat)
 
 void postReduceByMonSig(LObject* h, kStrategy strat)
 {
-  if(!nCoeff_is_Ring_Z(currRing->cf))
+  if(!nCoeff_is_Z(currRing->cf))
       return;
   poly hSig = h->sig;
   poly pH = h->GetP();
@@ -10985,7 +11044,7 @@ void finalReduceByMon(kStrategy strat)
   assume(strat->tl<0); /* can only be called with no elements in T:
                           i.e. after exitBuchMora */
   /* do not use strat->S, strat->sl as they may be out of sync*/
-  if(!nCoeff_is_Ring_Z(currRing->cf))
+  if(!nCoeff_is_Z(currRing->cf))
       return;
   poly p,pp;
   for(int j = 0; j<IDELEMS(strat->Shdl); j++)

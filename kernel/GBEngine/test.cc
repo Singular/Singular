@@ -1,7 +1,5 @@
 #include "kernel/mod2.h"
 
-#include "omalloc/omalloc.h"
-
 #include "resources/feFopen.h"
 #include "resources/feResource.h"
 

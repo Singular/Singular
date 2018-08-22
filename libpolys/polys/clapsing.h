@@ -31,7 +31,7 @@ poly singclap_pmult ( poly f, poly g, const ring r );
 poly singclap_pdivide ( poly f, poly g, const ring r );
 poly singclap_pmod ( poly f, poly g, const ring r );
 
-void singclap_divide_content ( poly f, const ring r);
+//void singclap_divide_content ( poly f, const ring r);
 
 ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r);
 
@@ -45,8 +45,8 @@ intvec* singntl_LLL(intvec* A);
 
 ideal singclap_absFactorize ( poly f, ideal & mipos, intvec ** exps, int & n, const ring r);
 
- matrix singclap_irrCharSeries ( ideal I, const ring r);
- char* singclap_neworder ( ideal I, const ring r);
+matrix singclap_irrCharSeries ( ideal I, const ring r);
+char* singclap_neworder ( ideal I, const ring r);
 
 poly singclap_det( const matrix m, const ring r );
 int singclap_det_i( intvec * m, const ring r );

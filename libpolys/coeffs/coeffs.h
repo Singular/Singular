@@ -10,7 +10,11 @@
 #define COEFFS_H
 
 #include "misc/auxiliary.h"
+#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
+#else
+#include "xalloc/omalloc.h"
+#endif
 
 #include "misc/sirandom.h"
 /* for assume: */
@@ -746,22 +750,14 @@ static FORCE_INLINE void   n_CoeffWrite(const coeffs r, BOOLEAN details = TRUE)
 static FORCE_INLINE BOOLEAN nCoeff_is_Ring_2toM(const coeffs r)
 { assume(r != NULL); return (getCoeffType(r)==n_Z2m); }
 
-static FORCE_INLINE BOOLEAN nCoeff_is_Ring_ModN(const coeffs r)
-{ assume(r != NULL); return (getCoeffType(r)==n_Zn); }
-
 static FORCE_INLINE BOOLEAN nCoeff_is_Ring_PtoM(const coeffs r)
 { assume(r != NULL); return (getCoeffType(r)==n_Znm); }
-
-static FORCE_INLINE BOOLEAN nCoeff_is_Ring_Z(const coeffs r)
-{ assume(r != NULL); return (getCoeffType(r)==n_Z); }
 
 static FORCE_INLINE BOOLEAN nCoeff_is_Ring(const coeffs r)
 { assume(r != NULL); return (r->is_field==0); }
 #else
 #define nCoeff_is_Ring_2toM(A) 0
-#define nCoeff_is_Ring_ModN(A) 0
 #define nCoeff_is_Ring_PtoM(A) 0
-#define nCoeff_is_Ring_Z(A)    0
 #define nCoeff_is_Ring(A)      0
 #endif
 
@@ -834,10 +830,24 @@ static FORCE_INLINE BOOLEAN nCoeff_is_Zp(const coeffs r, int p)
 { assume(r != NULL); return ((getCoeffType(r)==n_Zp) && (r->ch == p)); }
 
 static FORCE_INLINE BOOLEAN nCoeff_is_Q(const coeffs r)
-{ assume(r != NULL); return getCoeffType(r)==n_Q && (r->is_field); }
+{
+  assume(r != NULL);
+  #if SI_INTEGER_VARIANT==1
+  return getCoeffType(r)==n_Q && (r->is_field);
+  #else
+  return getCoeffType(r)==n_Q;
+  #endif
+}
 
 static FORCE_INLINE BOOLEAN nCoeff_is_Z(const coeffs r)
-{ assume(r != NULL); return getCoeffType(r)==n_Z || ((getCoeffType(r)==n_Q) && (!r->is_field)); }
+{
+  assume(r != NULL);
+  #if SI_INTEGER_VARIANT==1
+  return ((getCoeffType(r)==n_Q) && (!r->is_field));
+  #else
+  return getCoeffType(r)==n_Z;
+  #endif
+}
 
 static FORCE_INLINE BOOLEAN nCoeff_is_Zn(const coeffs r)
 { assume(r != NULL); return getCoeffType(r)==n_Zn; }

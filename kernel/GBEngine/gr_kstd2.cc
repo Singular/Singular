@@ -10,8 +10,6 @@
 
 #ifdef HAVE_PLURAL
 
-
-#include "omalloc/omalloc.h"
 #include "misc/options.h"
 #include "misc/intvec.h"
 

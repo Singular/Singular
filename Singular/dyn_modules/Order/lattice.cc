@@ -962,7 +962,7 @@ bigintmat * minkowksi(bigintmat ** elementarray,int size_elementarray, number * 
     }
 
     //char = 0
-    if ( !(nCoeff_is_Ring_Z(coef) || nCoeff_is_R(coef) || nCoeff_is_Q(coef) ||
+    if ( !(nCoeff_is_Z(coef) || nCoeff_is_R(coef) || nCoeff_is_Q(coef) ||
             nCoeff_is_long_R(coef) || nCoeff_is_long_C(coef)) ){
         WerrorS("Ground field not implemented!\n");
         return NULL;

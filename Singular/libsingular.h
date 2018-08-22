@@ -8,7 +8,11 @@
 #include "coeffs/numbers.h"
 #include "kernel/oswrapper/feread.h"
 #include "polys/monomials/ring.h"
+#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
+#else
+#include "xalloc/omalloc.h"
+#endif
 #include "polys/clapsing.h"
 #include "polys/monomials/maps.h"
 #include "kernel/GBEngine/kutil.h"

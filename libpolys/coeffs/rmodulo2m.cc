@@ -6,8 +6,6 @@
 */
 #include "misc/auxiliary.h"
 
-#include "omalloc/omalloc.h"
-
 #include "misc/mylimits.h"
 #include "reporter/reporter.h"
 
@@ -63,14 +61,17 @@ extern omBin gmp_nrz_bin; /* init in rintegers*/
 
 static char* nr2mCoeffName(const coeffs cf)
 {
-  static char n2mCoeffName_buf[22];
-  snprintf(n2mCoeffName_buf,21,"ZZ/(2^%lu)",cf->modExponent);
+  static char n2mCoeffName_buf[30];
+  if (cf->modExponent>32) /* for 32/64bit arch.*/
+    snprintf(n2mCoeffName_buf,21,"ZZ/(bigint(2)^%lu)",cf->modExponent);
+  else
+    snprintf(n2mCoeffName_buf,21,"ZZ/(2^%lu)",cf->modExponent);
   return n2mCoeffName_buf;
 }
 
 static void    nr2mCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
-  Print("ZZ/(2^%lu)", r->modExponent);
+  PrintS(nr2mCoeffName(r));
 }
 
 static BOOLEAN nr2mCoeffIsEqual(const coeffs r, n_coeffType n, void * p)
@@ -86,10 +87,7 @@ static BOOLEAN nr2mCoeffIsEqual(const coeffs r, n_coeffType n, void * p)
 
 static char* nr2mCoeffString(const coeffs r)
 {
-  // r->modExponent <=bitsize(long)
-  char* s = (char*) omAlloc(11+11);
-  sprintf(s,"ZZ/(2^%lu)",r->modExponent);
-  return s;
+  return omStrDup(nr2mCoeffName(r));
 }
 
 static coeffs nr2mQuot1(number c, const coeffs r)
@@ -681,15 +679,15 @@ static nMapFunc nr2mSetMap(const coeffs src, const coeffs dst)
     // to be done
     return nr2mMapProject;
   }
-  if ((src->rep==n_rep_gmp) && nCoeff_is_Ring_Z(src))
+  if ((src->rep==n_rep_gmp) && nCoeff_is_Z(src))
   {
     return nr2mMapGMP;
   }
-  if ((src->rep==n_rep_gap_gmp) /*&& nCoeff_is_Ring_Z(src)*/)
+  if ((src->rep==n_rep_gap_gmp) /*&& nCoeff_is_Z(src)*/)
   {
     return nr2mMapZ;
   }
-  if ((src->rep==n_rep_gap_rat) && (nCoeff_is_Q(src)||nCoeff_is_Ring_Z(src)))
+  if ((src->rep==n_rep_gap_rat) && (nCoeff_is_Q(src)||nCoeff_is_Z(src)))
   {
     return nr2mMapQ;
   }
@@ -698,7 +696,7 @@ static nMapFunc nr2mSetMap(const coeffs src, const coeffs dst)
     return nr2mMapZp;
   }
   if ((src->rep==n_rep_gmp) &&
-  (nCoeff_is_Ring_PtoM(src) || nCoeff_is_Ring_ModN(src)))
+  (nCoeff_is_Ring_PtoM(src) || nCoeff_is_Zn(src)))
   {
     if (mpz_divisible_2exp_p(src->modNumber,dst->modExponent))
       return nr2mMapGMP;

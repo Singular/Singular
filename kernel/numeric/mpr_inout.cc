@@ -10,11 +10,6 @@
 
 #include "kernel/mod2.h"
 
-//#ifdef HAVE_MPR
-
-//-> includes
-#include "omalloc/omalloc.h"
-
 #include "misc/mylimits.h"
 #include "misc/options.h"
 #include "misc/intvec.h"
@@ -197,8 +192,6 @@ poly u_resultant_det( ideal gls, int imtype )
 //<-
 
 //-----------------------------------------------------------------------------
-
-//#endif // HAVE_MPR
 
 // local Variables: ***
 // folded-file: t ***

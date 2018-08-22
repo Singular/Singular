@@ -4047,8 +4047,7 @@ is the value of the environment variable
 @code{SINGULAR_ROOT_DIR}, if set, or, if not set, @code{$BinDir/../}.
 @item @code{$DefaultDir}
 is the value of the environment variable
-@code{SINGULAR_DEFAULT_DIR}, if set, or @code{/usr/local/Singular/} on a
-Unix platform, @code{\Singular\} on a Windows 95/98/NT/XP/Vista platform.
+@code{SINGULAR_DEFAULT_DIR}, if set, or @code{/usr/local}.
 @end itemize
 
 @item

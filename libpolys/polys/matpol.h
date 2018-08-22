@@ -70,6 +70,7 @@ void   mp_Monomials(matrix c, int r, int var, matrix m, const ring R);
 matrix mp_Coeffs(ideal I, int var, const ring r);
 
 matrix mp_CoeffProc (poly f, poly vars, const ring r);
+matrix mp_CoeffProcId (ideal I, poly vars, const ring R);
 /// corresponds to Macauley's coef:
 /// the exponent vector of vars has to contain the variables, eg 'xy';
 /// then the poly f is searched for monomials in x and y, these monimials

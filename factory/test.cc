@@ -21,7 +21,7 @@ int test2 (int p)
   printf (", h==d? %d\n", (h == d));
   if (h != d)
     ret = -1;
-  for (int i= 3; i <= 11; i++)
+  for (int i= 3; i <= 7; i++)
   {
     printf ("p: %d, i: %d", p, i);
     d1 += power (Variable (i), i);

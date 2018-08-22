@@ -1,5 +1,4 @@
 #include "misc/auxiliary.h"
-#include "omalloc/omalloc.h"
 
 
 #ifdef SINGULAR_4_2
