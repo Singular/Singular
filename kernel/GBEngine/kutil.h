@@ -637,7 +637,7 @@ BOOLEAN kTest(kStrategy strat);
 // test strat, and test that S is contained in T
 BOOLEAN kTest_TS(kStrategy strat);
 // test LObject
-BOOLEAN kTest_L(LObject* L, ring tailRing = NULL,
+BOOLEAN kTest_L(LObject* L, ring tailRing,
                  BOOLEAN testp = FALSE, int lpos = -1,
                  TSet T = NULL, int tlength = -1);
 // test TObject
@@ -649,7 +649,7 @@ BOOLEAN kTest_S(kStrategy strat);
 #define kTest_TS(A)     (TRUE)
 #define kTest_T(T)      (TRUE)
 #define kTest_S(T)      (TRUE)
-#define kTest_L(T)      (TRUE)
+#define kTest_L(T,R)    (TRUE)
 #endif
 
 

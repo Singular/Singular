@@ -243,7 +243,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
 {
   if (strat->kHEdgeFound)
   {
-    kTest_L(L);
+    kTest_L(L,strat->tailRing);
     poly p1;
     poly p = L->GetLmTailRing();
     int l = 1;
@@ -310,7 +310,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
       else
         kBucketDestroy(&bucket);
     }
-    kTest_L(L);
+    kTest_L(L,strat->tailRing);
   }
 }
 
@@ -7540,7 +7540,7 @@ poly redtailBba (LObject* L, int end_pos, kStrategy strat, BOOLEAN withT, BOOLEA
 
   //if (TEST_OPT_PROT) { PrintS("N"); mflush(); }
   //L->Normalize(); // HANNES: should have a test
-  kTest_L(L);
+  kTest_L(L,strat->tailRing);
   return L->GetLmCurrRing();
 }
 
@@ -7655,7 +7655,7 @@ poly redtailBbaBound (LObject* L, int end_pos, kStrategy strat, int bound, BOOLE
 
   //if (TEST_OPT_PROT) { PrintS("N"); mflush(); }
   //L->Normalize(); // HANNES: should have a test
-  kTest_L(L);
+  kTest_L(L,strat->tailRing);
   return L->GetLmCurrRing();
 }
 
@@ -7770,7 +7770,7 @@ poly redtailBba_Z (LObject* L, int end_pos, kStrategy strat )
 
   //if (TEST_OPT_PROT) { PrintS("N"); mflush(); }
   //L->Normalize(); // HANNES: should have a test
-  kTest_L(L);
+  kTest_L(L,strat->tailRing);
   return L->GetLmCurrRing();
 }
 #endif
@@ -12680,7 +12680,7 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
     L->length = 0;
   }
   L->Normalize(); // HANNES: should have a test
-  kTest_L(L);
+  kTest_L(L,strat->tailRing);
   return L->GetLmCurrRing();
 }
 #endif
