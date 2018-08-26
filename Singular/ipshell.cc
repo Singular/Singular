@@ -2476,7 +2476,7 @@ static inline BOOLEAN rComposeVar(const lists  L, ring R)
       }
       else
       {
-        Werror("var name %d must be `string` (not %d)",i+1i, v->m[i].Typ());
+        Werror("var name %d must be `string` (not %d)",i+1, v->m[i].Typ());
         return TRUE;
       }
     }
