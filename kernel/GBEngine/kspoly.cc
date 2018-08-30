@@ -59,7 +59,7 @@ int ksReducePoly(LObject* PR,
 #endif
   int ret = 0;
   ring tailRing = PR->tailRing;
-  kTest_L(PR);
+  kTest_L(PR,tailRing);
   kTest_T(PW);
 
   poly p1 = PR->GetLmTailRing();   // p2 | p1
@@ -188,7 +188,7 @@ int ksReducePolyLC(LObject* PR,
    * p_Write(PR->p, currRing, PR->tailRing); */
   int ret = 0;
   ring tailRing = PR->tailRing;
-  kTest_L(PR);
+  kTest_L(PR,tailRing);
   kTest_T(PW);
 
   poly p1 = PR->GetLmTailRing();   // p2 | p1
@@ -332,7 +332,7 @@ int ksReducePolyBound(LObject* PR,
 #endif
   int ret = 0;
   ring tailRing = PR->tailRing;
-  kTest_L(PR);
+  kTest_L(PR,tailRing);
   kTest_T(PW);
 
   poly p1 = PR->GetLmTailRing();   // p2 | p1
@@ -465,7 +465,7 @@ int ksReducePolySig(LObject* PR,
 #endif
   int ret = 0;
   ring tailRing = PR->tailRing;
-  kTest_L(PR);
+  kTest_L(PR,tailRing);
   kTest_T(PW);
 
   // signature-based stuff:
@@ -659,7 +659,7 @@ int ksReducePolySigRing(LObject* PR,
 #endif
   int ret = 0;
   ring tailRing = PR->tailRing;
-  kTest_L(PR);
+  kTest_L(PR,tailRing);
   kTest_T(PW);
 
   // signature-based stuff:
@@ -896,7 +896,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
 #ifdef KDEBUG
   create_count++;
 #endif
-  kTest_L(Pair);
+  kTest_L(Pair,tailRing);
   poly p1 = Pair->p1;
   poly p2 = Pair->p2;
   Pair->tailRing = tailRing;
@@ -1030,7 +1030,7 @@ int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
   poly Lp =     PR->GetLmCurrRing();
   poly Save =   PW->GetLmCurrRing();
 
-  kTest_L(PR);
+  kTest_L(PR,PR->tailRing);
   kTest_T(PW);
   pAssume(pIsMonomOf(Lp, Current));
 
@@ -1072,7 +1072,7 @@ int ksReducePolyTailBound(LObject* PR, TObject* PW, int bound, poly Current, pol
   poly Lp =     PR->GetLmCurrRing();
   poly Save =   PW->GetLmCurrRing();
 
-  kTest_L(PR);
+  kTest_L(PR,PR->tailRing);
   kTest_T(PW);
   pAssume(pIsMonomOf(Lp, Current));
 

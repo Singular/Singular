@@ -1438,7 +1438,7 @@ poly redtailSba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
   }
   //if (TEST_OPT_PROT) { PrintS("N"); mflush(); }
   //L->Normalize(); // HANNES: should have a test
-  kTest_L(L);
+  kTest_L(L,strat->tailRing);
   return L->GetLmCurrRing();
 }
 

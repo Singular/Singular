@@ -2272,18 +2272,18 @@ void rComposeC(lists L, ring R)
   if (L->nr==2) // complex
     R->cf = nInitChar(n_long_C, NULL);
   else if ((r1<=SHORT_REAL_LENGTH)
-  && (r2=SHORT_REAL_LENGTH))
+  && (r2<=SHORT_REAL_LENGTH))
     R->cf = nInitChar(n_R, NULL);
   else
   {
     LongComplexInfo* p = (LongComplexInfo *)omAlloc0(sizeof(LongComplexInfo));
     p->float_len=r1;
     p->float_len2=r2;
-    R->cf = nInitChar(n_long_R, NULL);
+    R->cf = nInitChar(n_long_R, p);
   }
 
   if ((r1<=SHORT_REAL_LENGTH)   // should go into nInitChar
-  && (r2=SHORT_REAL_LENGTH))
+  && (r2<=SHORT_REAL_LENGTH))
   {
     R->cf->float_len=SHORT_REAL_LENGTH/2;
     R->cf->float_len2=SHORT_REAL_LENGTH;
@@ -2476,7 +2476,7 @@ static inline BOOLEAN rComposeVar(const lists  L, ring R)
       }
       else
       {
-        Werror("var name %d must be `string`",i+1);
+        Werror("var name %d must be `string` (not %d)",i+1, v->m[i].Typ());
         return TRUE;
       }
     }
