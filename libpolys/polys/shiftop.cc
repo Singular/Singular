@@ -343,8 +343,7 @@ void p_LPUnShift(poly p, const ring ri)
   p_Test(p, ri); // check if ordering was destroyed
 }
 
-// appends m2ExpV to m1ExpV where m1Last is the last Vblock of m1 and m2Last the last Vblock of m2
-// also adds their components (one of them is always zero)
+// appends m2ExpV to m1ExpV, also adds their components (one of them is always zero)
 void p_LPExpVappend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const ring ri) {
 #ifdef SHIFT_MULT_DEBUG
   PrintLn(); PrintS("Append");
@@ -365,8 +364,7 @@ void p_LPExpVappend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const 
 #endif
 }
 
-// prepends m2ExpV to m1ExpV where m1Last is the last Vblock of m1 and m2Last the last Vblock of m2
-// also adds their components (one of them is always zero)
+// prepends m2ExpV to m1ExpV, also adds their components (one of them is always zero)
 void p_LPExpVprepend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const ring ri) {
 #ifdef SHIFT_MULT_DEBUG
   PrintLn(); PrintS("Prepend");
@@ -375,10 +373,10 @@ void p_LPExpVprepend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const
 #endif
   assume(m1Length + m2Length <= ri->N);
 
-  // save m1
-  int *m1Tmp=(int *)omAlloc0((m1Length+1)*sizeof(int));
-  for (int i = 1; i < 1 + m1Length; ++i) {
-    m1Tmp[i] = m1ExpV[i];
+  // shift m1 by m2Length
+  for (int i = m2Length + m1Length; i >= 1 + m2Length; --i)
+  {
+    m1ExpV[i] = m1ExpV[i - m2Length];
   }
 
   // write m2 to m1
@@ -387,11 +385,6 @@ void p_LPExpVprepend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const
     assume(m2ExpV[i] <= 1);
     m1ExpV[i] = m2ExpV[i];
   }
-  // then append m1 again
-  for (int i = 1 + m2Length; i < 1 + m2Length + m1Length; ++i) {
-    m1ExpV[i] = m1Tmp[i - m2Length];
-  }
-  omFreeSize((ADDRESS) m1Tmp, (m1Length+1)*sizeof(int));
 
   assume(m1ExpV[0] == 0 || m2ExpV[0] == 0); // one component should be zero (otherwise this doesn't make any sense)
   m1ExpV[0] += m2ExpV[0]; // as in the commutative variant (they use MemAdd)
