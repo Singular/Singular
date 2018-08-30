@@ -307,7 +307,7 @@ poly shift_pp_Mult_Coeff_mm_DivSelect_STUB(poly p, const poly m, int &shorter, c
 // unshifts the monomial m
 void p_mLPUnShift(poly m, const ring ri)
 {
-  if (m == NULL || p_LmIsConstant(m,ri)) return;
+  if (m == NULL || p_LmIsConstantComp(m,ri)) return;
 
   int lV = ri->isLPring;
 
@@ -344,6 +344,7 @@ void p_LPUnShift(poly p, const ring ri)
 }
 
 // appends m2ExpV to m1ExpV where m1Last is the last Vblock of m1 and m2Last the last Vblock of m2
+// also adds their components (one of them is always zero)
 void p_LPExpVappend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const ring ri) {
 #ifdef SHIFT_MULT_DEBUG
   PrintLn(); PrintS("Append");
@@ -356,12 +357,16 @@ void p_LPExpVappend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const 
     assume(m2ExpV[i - m1Length] <= 1);
     m1ExpV[i] = m2ExpV[i - m1Length];
   }
+
+  assume(m1ExpV[0] == 0 || m2ExpV[0] == 0); // one component should be zero (otherwise this doesn't make any sense)
+  m1ExpV[0] += m2ExpV[0]; // as in the commutative variant (they use MemAdd)
 #ifdef SHIFT_MULT_DEBUG
   PrintLn(); WriteLPExpV(m1ExpV, ri);
 #endif
 }
 
 // prepends m2ExpV to m1ExpV where m1Last is the last Vblock of m1 and m2Last the last Vblock of m2
+// also adds their components (one of them is always zero)
 void p_LPExpVprepend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const ring ri) {
 #ifdef SHIFT_MULT_DEBUG
   PrintLn(); PrintS("Prepend");
@@ -387,6 +392,9 @@ void p_LPExpVprepend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const
     m1ExpV[i] = m1Tmp[i - m2Length];
   }
   omFreeSize((ADDRESS) m1Tmp, (m1Length+1)*sizeof(int));
+
+  assume(m1ExpV[0] == 0 || m2ExpV[0] == 0); // one component should be zero (otherwise this doesn't make any sense)
+  m1ExpV[0] += m2ExpV[0]; // as in the commutative variant (they use MemAdd)
 #ifdef SHIFT_MULT_DEBUG
   PrintLn(); WriteLPExpV(m1ExpV, ri);
 #endif

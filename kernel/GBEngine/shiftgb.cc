@@ -94,7 +94,7 @@ poly p_mLPshift(poly p, int sh, const ring r)
 
   int lV = r->isLPring;
 
-  if (sh == 0 || p == NULL || p_LmIsConstant(p,r)) return(p);
+  if (sh == 0 || p == NULL || p_LmIsConstantComp(p,r)) return(p);
 
   int L = p_mLastVblock(p,r);
   assume(L+sh>=1);
@@ -147,7 +147,7 @@ int p_LastVblock(poly p, const ring r)
 /* where a nonzero exponent is sitting */
 int p_mLastVblock(poly p, const ring r)
 {
-  if (p == NULL || p_LmIsConstant(p,r))
+  if (p == NULL || p_LmIsConstantComp(p,r))
   {
     return(0);
   }
@@ -191,7 +191,7 @@ int p_FirstVblock(poly p, const ring r)
 /* where a nonzero exponent is sitting */
 int p_mFirstVblock(poly p, const ring r)
 {
-  if (p == NULL || p_LmIsConstant(p,r))
+  if (p == NULL || p_LmIsConstantComp(p,r))
   {
     return(0);
   }
