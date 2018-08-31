@@ -1286,7 +1286,6 @@ leftv ssiRead1(si_link l)
              d->r=ssiReadRing(d);
              if (d->r==NULL) return NULL;
              res->data=(char*)d->r;
-             d->r->ref++;
              res->rtyp=RING_CMD;
              if (t==15) // setring
              {
