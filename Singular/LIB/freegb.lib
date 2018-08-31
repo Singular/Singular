@@ -22,6 +22,7 @@ setLetterplaceAttributes(R,d,b); supplies ring R with the letterplace structure
 freeGBasis(L, n);  computes two-sided Groebner basis of an ideal, encoded via list L, up to degree n
 
 shiftPoly(p,i); compute the i-th shift of letterplace polynomial p
+lpPower(f,n);   natural power of a letterplace polynomial
 lieBracket(a,b[, N]);  compute Lie bracket ab-ba of two letterplace polynomials
 
 lp2lstr(K, s);  convert a letterplace ideal into a list of modules
@@ -61,6 +62,7 @@ proc tstfreegb()
   example setLetterplaceAttributes;
   /* secondary */
   example   shiftPoly;
+  example   lpPower;
   example   lieBracket;
   example   lp2lstr;
   example   lst2str;
@@ -3204,37 +3206,36 @@ example
 //   lpMult(b,a);
 //   lpMult(a,b);
 // }
-// 
-// proc lpPower(poly f, int n)
-// "USAGE:  lpPower(f,n); f letterplace polynomial, int n
-// RETURN:  poly
-// ASSUME: basering has a letterplace ring structure
-// PURPOSE: compute the letterplace form of f^n
-// EXAMPLE: example lpPower; shows examples
-// "
-// {
-//   if (n<0) { ERROR("the power must be a natural number!"); }
-//   if (n==0) { return(poly(1)); }
-//   if (n==1) { return(f); }
-//   int i;
-//   poly p = 1;
-//   for(i=1; i<= n; i++)
-//   {
-//     p = lpMult(p,f);
-//   }
-//   return(p);
-// }
-// example
-// {
-//   "EXAMPLE:"; echo = 2;
-//   // define a ring in letterplace form as follows:
-//   ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp;
-//   def R = setLetterplaceAttributes(r,4,2); // supply R with letterplace structure
-//   setring R;
-//   poly a = x(1)*y(2) + y(1); poly b = y(1) - 1;
-//   lpPower(a,2);
-//   lpPower(b,4);
-// }
+
+proc lpPower(poly f, int n)
+"USAGE:  lpPower(f,n); f letterplace polynomial, int n
+RETURN:  poly
+ASSUME: basering has a letterplace ring structure
+PURPOSE: compute the letterplace form of f^n
+EXAMPLE: example lpPower; shows examples
+"
+{
+  if (n<0) { ERROR("the power must be a natural number!"); }
+  if (n==0) { return(poly(1)); }
+  if (n==1) { return(f); }
+  poly p = 1;
+  for(int i = 1; i <= n; i++)
+  {
+    p = p*f;
+  }
+  return(p);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // define a ring in letterplace form as follows:
+  ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp;
+  def R = setLetterplaceAttributes(r,4,2); // supply R with letterplace structure
+  setring R;
+  poly a = x(1)*y(2) + y(1); poly b = y(1) - 1;
+  lpPower(a,2);
+  lpPower(b,4);
+}
 
 // new: lp normal from by using shift-invariant data by Grischa Studzinski
 
