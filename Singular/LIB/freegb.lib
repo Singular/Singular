@@ -21,9 +21,7 @@ lpNF(f,I); two-sided normal form of f with respect to ideal I
 setLetterplaceAttributes(R,d,b); supplies ring R with the letterplace structure
 freeGBasis(L, n);  computes two-sided Groebner basis of an ideal, encoded via list L, up to degree n
 
-lpMult(f,g);    letterplace multiplication of letterplace polynomials
 shiftPoly(p,i); compute the i-th shift of letterplace polynomial p
-lpPower(f,n);   natural power of a letterplace polynomial
 lieBracket(a,b[, N]);  compute Lie bracket ab-ba of two letterplace polynomials
 
 lp2lstr(K, s);  convert a letterplace ideal into a list of modules
@@ -62,9 +60,7 @@ proc tstfreegb()
   example freeGBasis;
   example setLetterplaceAttributes;
   /* secondary */
-  example   lpMult;
   example   shiftPoly;
-  example   lpPower;
   example   lieBracket;
   example   lp2lstr;
   example   lst2str;
@@ -636,6 +632,7 @@ EXAMPLE: example freeGBasis; shows examples
   }
   L[3] = LR[3];
   def @R = ring(L);
+  @R = setLetterplaceAttributes(@R, D+1, nvars(save));
   setring @R;
   ideal I;
   poly @p;
@@ -685,10 +682,11 @@ EXAMPLE: example freeGBasis; shows examples
   // 3. compute GB
   setring @R;
   dbprint(ppl,"computing GB");
-  ideal J = system("freegb",I,d,nvars(save));
+  ideal J = system("freegb",I);
   //  ideal J = slimgb(I);
   dbprint(ppl,J);
   // 4. skip shifted elts
+  attrib(@R, "isLetterplaceRing", 0); // select1 doesn't want to work with letterplace enabled
   ideal K = select1(J,1..s); // s = size(OrigNames)
   dbprint(ppl,K);
   dbprint(ppl, "done with GB");
@@ -2462,7 +2460,6 @@ EXAMPLE: example lieBracket; shows examples
   }
   // alias ppLiebr;
   //if int N is given compute [a,[...[a,b]]]] left normed bracket
-  poly q;
   int N=1;
   if (size(#)>0)
   {
@@ -2472,15 +2469,10 @@ EXAMPLE: example lieBracket; shows examples
     }
   }
   if (N<=0) { return(q); }
-  while (b!=0)
-  {
-    q = q + pmLiebr(a,lead(b));
-    b = b - lead(b);
-  }
-  int i;
+  poly q = a*b - b*a;
   if (N >1)
   {
-    for(i=1; i<=N-1; i++)
+    for(int i=1; i<=N-1; i++)
     {
       q = lieBracket(a,q);
     }
@@ -2496,18 +2488,6 @@ example
   poly a = x(1)*y(2); poly b = y(1);
   lieBracket(a,b);
   lieBracket(x(1),y(1),2);
-}
-
-static proc pmLiebr(poly a, poly b)
-{
-  //  a poly, b mono
-  poly s;
-  while (a!=0)
-  {
-    s = s + mmLiebr(lead(a),lead(b));
-    a = a - lead(a);
-  }
-  return(s);
 }
 
 proc shiftPoly(poly a, int i)
@@ -2563,17 +2543,6 @@ example
   setring R;
   poly f = x(1)*z(2)*y(3) - 2*z(1)*y(2) + 3*x(1);
   lastBlock(f); // should be 3
-}
-
-static proc mmLiebr(poly a, poly b)
-{
-  // a,b, monomials
-  a = lead(a);
-  b = lead(b);
-  int sa = deg(a);
-  int sb = deg(b);
-  poly v = a*shiftPoly(b,sa) - b*shiftPoly(a,sb);
-  return(v);
 }
 
 static proc test_shift()
@@ -3132,140 +3101,140 @@ example
 
 */
 
-static proc lpMultX(poly f, poly g)
-{
-  /* multiplies two polys in a very general setting correctly */
-  /* alternative to lpMult, possibly better at non-positive orderings */
-
-  if (lpAssumeViolation())
-  {
-    ERROR("Incomplete Letterplace structure on the basering!");
-  }
-  // decompose f,g into graded pieces with inForm: need dmodapp.lib
-  int b = attrib(basering,"isLetterplaceRing");  // the length of the block
-  intvec w; // inherit the graded on the oridinal ring
-  int i;
-  for(i=1; i<=b; i++)
-  {
-    w[i] = deg(var(i));
-  }
-  intvec v = w;
-  for(i=1; i< attrib(basering,"uptodeg"); i++)
-  {
-    v = v,w;
-  }
-  w = v;
-  poly p,q,s, result;
-  s = g;
-  while (f!=0)
-  {
-    p = inForm(f,w)[1];
-    f = f - p;
-    s = g;
-    while (s!=0)
-    {
-      q = inForm(s,w)[1];
-      s = s - q;
-      result = result + lpMult(p,q);
-    }
-  }
-  // shrinking
-  //  result;
-  return( system("shrinktest",result,attrib(basering, "isLetterplaceRing")) );
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  // define a ring in letterplace form as follows:
-  ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp;
-  def R = setLetterplaceAttributes(r,4,2); // supply R with letterplace structure
-  setring R;
-  poly a = x(1)*y(2)+x(1)+y(1); poly b = y(1)+3;
-  lpMultX(b,a);
-  lpMultX(a,b);
-}
-
-// multiply two letterplace polynomials, lpMult: done
-// reduction/ Normalform? needs kernel stuff
-
-
-proc lpMult(poly f, poly g)
-"USAGE:  lpMult(f,g); f,g letterplace polynomials
-RETURN:  poly
-ASSUME: basering has a letterplace ring structure
-PURPOSE: compute the letterplace form of f*g
-EXAMPLE: example lpMult; shows examples
-"
-{
-
-  // changelog:
-  // VL oct 2010: deg -> deg(_,w) for the length
-  // shrink the result => don't need to decompose polys
-  // since the shift is big enough
-
-  // indeed it's better to have that
-  // ASSUME: both f and g are quasi-homogeneous
-
-  if (lpAssumeViolation())
-  {
-    ERROR("Incomplete Letterplace structure on the basering!");
-  }
-  intvec w = 1:nvars(basering);
-  int sf = deg(f,w); // VL Oct 2010: we need rather length than degree
-  int sg = deg(g,w); // esp. in the case of weighted ordering
-  int uptodeg = attrib(basering, "uptodeg");
-  if (sf+sg > uptodeg)
-  {
-    ERROR("degree bound violated by the product!");
-  }
-  //  if (sf>1) { sf = sf -1; }
-  poly v = f*shiftPoly(g,sf);
-  // bug, reported by Simon King: in nonhomog case [solved]
-  // we need to shrink
-  return( system("shrinktest",v,attrib(basering, "isLetterplaceRing")) );
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  // define a ring in letterplace form as follows:
-  ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp;
-  def R = setLetterplaceAttributes(r,4,2); // supply R with letterplace structure
-  setring R;
-  poly a = x(1)*y(2)+x(1)+y(1); poly b = y(1)+3;
-  lpMult(b,a);
-  lpMult(a,b);
-}
-
-proc lpPower(poly f, int n)
-"USAGE:  lpPower(f,n); f letterplace polynomial, int n
-RETURN:  poly
-ASSUME: basering has a letterplace ring structure
-PURPOSE: compute the letterplace form of f^n
-EXAMPLE: example lpPower; shows examples
-"
-{
-  if (n<0) { ERROR("the power must be a natural number!"); }
-  if (n==0) { return(poly(1)); }
-  if (n==1) { return(f); }
-  int i;
-  poly p = 1;
-  for(i=1; i<= n; i++)
-  {
-    p = lpMult(p,f);
-  }
-  return(p);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  // define a ring in letterplace form as follows:
-  ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp;
-  def R = setLetterplaceAttributes(r,4,2); // supply R with letterplace structure
-  setring R;
-  poly a = x(1)*y(2) + y(1); poly b = y(1) - 1;
-  lpPower(a,2);
-  lpPower(b,4);
-}
+// static proc lpMultX(poly f, poly g)
+// {
+//   /* multiplies two polys in a very general setting correctly */
+//   /* alternative to lpMult, possibly better at non-positive orderings */
+// 
+//   if (lpAssumeViolation())
+//   {
+//     ERROR("Incomplete Letterplace structure on the basering!");
+//   }
+//   // decompose f,g into graded pieces with inForm: need dmodapp.lib
+//   int b = attrib(basering,"isLetterplaceRing");  // the length of the block
+//   intvec w; // inherit the graded on the oridinal ring
+//   int i;
+//   for(i=1; i<=b; i++)
+//   {
+//     w[i] = deg(var(i));
+//   }
+//   intvec v = w;
+//   for(i=1; i< attrib(basering,"uptodeg"); i++)
+//   {
+//     v = v,w;
+//   }
+//   w = v;
+//   poly p,q,s, result;
+//   s = g;
+//   while (f!=0)
+//   {
+//     p = inForm(f,w)[1];
+//     f = f - p;
+//     s = g;
+//     while (s!=0)
+//     {
+//       q = inForm(s,w)[1];
+//       s = s - q;
+//       result = result + lpMult(p,q);
+//     }
+//   }
+//   // shrinking
+//   //  result;
+//   return( system("shrinktest",result,attrib(basering, "isLetterplaceRing")) );
+// }
+// example
+// {
+//   "EXAMPLE:"; echo = 2;
+//   // define a ring in letterplace form as follows:
+//   ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp;
+//   def R = setLetterplaceAttributes(r,4,2); // supply R with letterplace structure
+//   setring R;
+//   poly a = x(1)*y(2)+x(1)+y(1); poly b = y(1)+3;
+//   lpMultX(b,a);
+//   lpMultX(a,b);
+// }
+// 
+// // multiply two letterplace polynomials, lpMult: done
+// // reduction/ Normalform? needs kernel stuff
+// 
+// 
+// proc lpMult(poly f, poly g)
+// "USAGE:  lpMult(f,g); f,g letterplace polynomials
+// RETURN:  poly
+// ASSUME: basering has a letterplace ring structure
+// PURPOSE: compute the letterplace form of f*g
+// EXAMPLE: example lpMult; shows examples
+// "
+// {
+// 
+//   // changelog:
+//   // VL oct 2010: deg -> deg(_,w) for the length
+//   // shrink the result => don't need to decompose polys
+//   // since the shift is big enough
+// 
+//   // indeed it's better to have that
+//   // ASSUME: both f and g are quasi-homogeneous
+// 
+//   if (lpAssumeViolation())
+//   {
+//     ERROR("Incomplete Letterplace structure on the basering!");
+//   }
+//   intvec w = 1:nvars(basering);
+//   int sf = deg(f,w); // VL Oct 2010: we need rather length than degree
+//   int sg = deg(g,w); // esp. in the case of weighted ordering
+//   int uptodeg = attrib(basering, "uptodeg");
+//   if (sf+sg > uptodeg)
+//   {
+//     ERROR("degree bound violated by the product!");
+//   }
+//   //  if (sf>1) { sf = sf -1; }
+//   poly v = f*shiftPoly(g,sf);
+//   // bug, reported by Simon King: in nonhomog case [solved]
+//   // we need to shrink
+//   return( system("shrinktest",v,attrib(basering, "isLetterplaceRing")) );
+// }
+// example
+// {
+//   "EXAMPLE:"; echo = 2;
+//   // define a ring in letterplace form as follows:
+//   ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp;
+//   def R = setLetterplaceAttributes(r,4,2); // supply R with letterplace structure
+//   setring R;
+//   poly a = x(1)*y(2)+x(1)+y(1); poly b = y(1)+3;
+//   lpMult(b,a);
+//   lpMult(a,b);
+// }
+// 
+// proc lpPower(poly f, int n)
+// "USAGE:  lpPower(f,n); f letterplace polynomial, int n
+// RETURN:  poly
+// ASSUME: basering has a letterplace ring structure
+// PURPOSE: compute the letterplace form of f^n
+// EXAMPLE: example lpPower; shows examples
+// "
+// {
+//   if (n<0) { ERROR("the power must be a natural number!"); }
+//   if (n==0) { return(poly(1)); }
+//   if (n==1) { return(f); }
+//   int i;
+//   poly p = 1;
+//   for(i=1; i<= n; i++)
+//   {
+//     p = lpMult(p,f);
+//   }
+//   return(p);
+// }
+// example
+// {
+//   "EXAMPLE:"; echo = 2;
+//   // define a ring in letterplace form as follows:
+//   ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp;
+//   def R = setLetterplaceAttributes(r,4,2); // supply R with letterplace structure
+//   setring R;
+//   poly a = x(1)*y(2) + y(1); poly b = y(1) - 1;
+//   lpPower(a,2);
+//   lpPower(b,4);
+// }
 
 // new: lp normal from by using shift-invariant data by Grischa Studzinski
 
@@ -3386,7 +3355,7 @@ NOTE: computes p = \sum_{i,j} l_{ij} g_i r_{ij} + NF(p,I) = \sum_{i} L[2][i][2] 
 {
   poly p;
   for (int i = 1; i <= size(L[2]); i++) {
-    p = p + lpMult(lpMult(L[2][i][2], I[L[2][i][1]]), L[2][i][3]);
+    p = p + L[2][i][2] * I[L[2][i][1]] * L[2][i][3];
   }
   p = p + L[1];
   return (p);
@@ -3715,21 +3684,9 @@ static proc lpReduce(poly p, poly g, int s)
  kill K;
  for (i = 1; i <= size(g); i++)
  {
-   qt = qt + lpMult(lpMult(l,g[i]),r);
+   qt = qt + l*g[i]*r;
  }
  return(p - leadcoef(p)*normalize(qt));
-}
-
-
-static proc lpShrink(poly p)
-"
-"
-{int n;
- if (attrib(basering,"isLetterplaceRing")>0)
- {n = attrib(basering,"isLetterplaceRing");
-  return(system("shrinktest",p,n));
- }
- else {ERROR("Basering is not a Letterplace ring!");}
 }
 
 static proc checkAssumptions(poly p, ideal G)
@@ -3899,45 +3856,45 @@ static proc lpAssumeViolation()
   return(0);
 }
 
-static proc bugSKing()
-{
-  LIB "freegb.lib";
-  ring r=0,(a,b),dp;
-  def R = makeLetterplaceRing(5);
-  setring R;
-  poly p = a(1);
-  poly q = b(1);
-  poly p2 = lpPower(p,2);
-  lpMult(p2+q,q)-lpMult(p2,q)-lpMult(q,q); // now its 0
-}
-
-static proc bugRucker()
-{
-  // needs unstatic lpMultX
-  LIB "freegb.lib";
-  ring r=0,(a,b,c,d,p,q,r,s,t,u,v,w),(a(7,1,1,7),dp);
-  def R=makeLetterplaceRing(20,1);
-  setring R;
-  option(redSB); option(redTail);
-  ideal I=a(1)*b(2)*c(3)-p(1)*q(2)*r(3)*s(4)*t(5)*u(6),b(1)*c(2)*d(3)-v(1)*w(2);
-  poly ttt = a(1)*v(2)*w(3)-p(1)*q(2)*r(3)*s(4)*t(5)*u(6)*d(7);
-  // with lpMult
-  lpMult(I[1],d(1)) - lpMult(a(1),I[2]); // spoly; has been incorrect before
-  _ - ttt;
-  // with lpMultX
-  lpMultX(I[1],d(1)) - lpMultX(a(1),I[2]); // spoly; has been incorrect before
-  _ - ttt;
-}
-
-static proc checkWeightedExampleLP()
-{
-  ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),wp(2,1,2,1,2,1,2,1);
-  def R = setLetterplaceAttributes(r,4,2); // supply R with letterplace structure
-  setring R;
-  poly a = x(1)*y(2)+x(1)+y(1); poly b = y(1)+3;
-  lpMultX(b,a);
-  lpMultX(a,b); // seems to work properly
-}
+// static proc bugSKing()
+// {
+//   LIB "freegb.lib";
+//   ring r=0,(a,b),dp;
+//   def R = makeLetterplaceRing(5);
+//   setring R;
+//   poly p = a(1);
+//   poly q = b(1);
+//   poly p2 = lpPower(p,2);
+//   lpMult(p2+q,q)-lpMult(p2,q)-lpMult(q,q); // now its 0
+// }
+// 
+// static proc bugRucker()
+// {
+//   // needs unstatic lpMultX
+//   LIB "freegb.lib";
+//   ring r=0,(a,b,c,d,p,q,r,s,t,u,v,w),(a(7,1,1,7),dp);
+//   def R=makeLetterplaceRing(20,1);
+//   setring R;
+//   option(redSB); option(redTail);
+//   ideal I=a(1)*b(2)*c(3)-p(1)*q(2)*r(3)*s(4)*t(5)*u(6),b(1)*c(2)*d(3)-v(1)*w(2);
+//   poly ttt = a(1)*v(2)*w(3)-p(1)*q(2)*r(3)*s(4)*t(5)*u(6)*d(7);
+//   // with lpMult
+//   lpMult(I[1],d(1)) - lpMult(a(1),I[2]); // spoly; has been incorrect before
+//   _ - ttt;
+//   // with lpMultX
+//   lpMultX(I[1],d(1)) - lpMultX(a(1),I[2]); // spoly; has been incorrect before
+//   _ - ttt;
+// }
+// 
+// static proc checkWeightedExampleLP()
+// {
+//   ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),wp(2,1,2,1,2,1,2,1);
+//   def R = setLetterplaceAttributes(r,4,2); // supply R with letterplace structure
+//   setring R;
+//   poly a = x(1)*y(2)+x(1)+y(1); poly b = y(1)+3;
+//   lpMultX(b,a);
+//   lpMultX(a,b); // seems to work properly
+// }
 
 proc lpPrint(ideal I, def @r)
 "USAGE: lpPrint(I, r); I an ideal, r a ring

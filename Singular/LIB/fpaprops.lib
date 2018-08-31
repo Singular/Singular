@@ -1117,9 +1117,9 @@ EXAMPLE: example lpSubstitute; shows examples
         int subindex = lpIndexOf(s1, var(varindex));
         if (subindex > 0) {
           s2[subindex] = lpNF(s2[subindex],G);
-          fis = lpMult(fis, s2[subindex]);
+          fis = fis * s2[subindex];
         } else {
-          fis = lpMult(fis, lpNF(iv2lp(varindex),G));
+          fis = fis * lpNF(iv2lp(varindex),G);
         }
         /*fis = lpNF(fis,G);*/
         kill subindex;
@@ -1304,6 +1304,7 @@ checks, if a word IF is an infix of another word I
   return(0);
 }
 
+// TODO: use original ring attrib to create a new letterplace ring
 // removes a variable from a letterplace ring (a bit of a hack)
 static proc lpDelVar(int index) {
   int lV = attrib(basering, "isLetterplaceRing"); // number of variables in the main block

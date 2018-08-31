@@ -935,7 +935,7 @@ EXAMPLE: example iv2lp; shows examples
   int i = size(I);
   if (i > attrib(basering,"uptodeg")) {ERROR("polynomial exceeds degreebound");}
   int j; poly p = 1;
-  for (j = 1; j <= i; j++) {if (I[j] > 0) { p = lpMult(p,var(I[j]));}} //ignore zeroes, because they correspond to 1
+  for (j = 1; j <= i; j++) {if (I[j] > 0) { p = p*var(I[j]);}} //ignore zeroes, because they correspond to 1
   return(p);
 }
 example
@@ -1173,7 +1173,7 @@ ASSUME: - basering is a Letterplace ring
       // printf("for2 (j=%p, n=%p)", j, n);
       k = 1; b = 1;
       q = V[j];
-      w = lpNF(lpMult(p,q),LG);
+      w = lpNF(p*q,LG);
       if (w <> 0)
       {
         Iw = lp2iv(w);
