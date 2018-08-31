@@ -881,13 +881,22 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
 {
   if (L->p!=NULL)
   {
-    nTest(pGetCoeff(L->p));
-    if ((L->t_p==NULL)&&(pNext(L->p)!=NULL)) p_Test(pNext(L->p),currRing);
+    if ((L->t_p==NULL)
+    &&(pNext(L->p)!=NULL)
+    &&(pGetCoeff(pNext(L->p))!=NULL)) /* !=strat->tail*/
+    {
+      p_Test(pNext(L->p),currRing);
+      nTest(pGetCoeff(L->p));
+    }
   }
   if (L->t_p!=NULL)
   {
-    nTest(pGetCoeff(L->t_p));
-    if (pNext(L->t_p)!=NULL) p_Test(pNext(L->t_p),strat_tailRing);
+    if ((pNext(L->t_p)!=NULL)
+    &&(pGetCoeff(pNext(L->t_p))!=NULL)) /* !=strat->tail*/
+    {
+      p_Test(pNext(L->t_p),strat_tailRing);
+      nTest(pGetCoeff(L->t_p));
+    }
   }
   if ((L->p!=NULL)&&(L->t_p!=NULL)) assume(pGetCoeff(L->p)==pGetCoeff(L->t_p));
 
