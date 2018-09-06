@@ -30,12 +30,8 @@
 #define FACTORY_MAX_PRIME 536870909
 
 #ifdef USE_NTL_XGCD
-//ifdef HAVE_NTL // in ntl.a
-//extern void XGCD(long& d, long& s, long& t, long a, long b);
-#include <NTL/ZZ.h>
-#ifdef NTL_CLIENT
-NTL_CLIENT
-#endif
+// in ntl.a
+extern void XGCD(long& d, long& s, long& t, long a, long b);
 #endif
 
 struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
