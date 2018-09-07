@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS=-I ../../m4
 AM_CPPFLAGS=-I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
 ${FACTORY_INCLUDES} $(OMALLOC_INCLUDES) $(RESOURCES_INCLUDES) \
-${NTL_CPPFLAGS} $(FLINT_CFLAGS) ${GMP_CPPFLAGS}
+$(FLINT_CFLAGS) ${GMP_CPPFLAGS}
 
 noinst_LTLIBRARIES=liblinear_algebra.la
 liblinear_algebra_la_SOURCES= \

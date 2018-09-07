@@ -3,7 +3,7 @@ AM_CPPFLAGS=-I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_b
 ${FACTORY_INCLUDES} $(OMALLOC_INCLUDES) $(RESOURCES_INCLUDES) \
 $(FLINT_CFLAGS) ${GMP_CPPFLAGS}
 
-AM_CXXFLAGS=${NTL_CPPFLAGS}
+AM_CXXFLAGS=
 
 noinst_LTLIBRARIES=liboswrapper.la
 liboswrapper_la_SOURCES=feread.cc fereadl.c timer.cc rlimit.c

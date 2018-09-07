@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS=-I ../../m4
 AM_CPPFLAGS=-I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
 ${FACTORY_INCLUDES} $(OMALLOC_INCLUDES) $(RESOURCES_INCLUDES) \
-${NTL_CPPFLAGS} $(FLINT_CFLAGS) ${GMP_CPPFLAGS}
+$(FLINT_CFLAGS) ${GMP_CPPFLAGS}
 
 noinst_LTLIBRARIES=libcombinatorics.la
 libcombinatorics_la_SOURCES=hdegree.cc hilb.cc hutil.cc
