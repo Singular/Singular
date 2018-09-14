@@ -939,14 +939,11 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   {
     // note: because of the crits, p2 is never shifted
     int split = p_mFirstVblock(p1, tailRing);
-    // TODO: shouldn't we use p1 AND p2 here??
     k_SplitFrame(m1, m12, split, tailRing);
     k_SplitFrame(m2, m22, split, tailRing);
     // manually free the coeffs, because pSetCoeff0 is used in the next step
     n_Delete(&(m1->coef), tailRing->cf);
     n_Delete(&(m2->coef), tailRing->cf);
-
-    a1 = p_LPshift(p_Copy(a1, tailRing), 1 - split, tailRing); // unshift a1
   }
 
   pSetCoeff0(m1, lc2);
@@ -1007,7 +1004,6 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
     p_LmDelete(m12, tailRing);
     p_LmDelete(m22, tailRing);
     // m2 is already deleted
-    p_Delete(&a1, tailRing); // a1 is a copy: safe to destroy
   }
 
   if (co != 0)
@@ -1126,6 +1122,17 @@ int ksReducePolyTailBound(LObject* PR, TObject* PW, int bound, poly Current, pol
 poly ksCreateShortSpoly(poly p1, poly p2, ring tailRing)
 {
   poly a1 = pNext(p1), a2 = pNext(p2);
+#ifdef HAVE_SHIFTBBA
+  int shift1, shift2;
+  if (tailRing->isLPring) {
+    // assume: LM is shifted, tail unshifted
+    assume(p_FirstVblock(a1, tailRing) <= 1);
+    assume(p_FirstVblock(a2, tailRing) <= 1);
+    // save the shift of the LM so we can shift the other monomials on demand
+    shift1 = p_mFirstVblock(p1, tailRing) - 1;
+    shift2 = p_mFirstVblock(p2, tailRing) - 1;
+  }
+#endif
   long c1=p_GetComp(p1, currRing),c2=p_GetComp(p2, currRing);
   long c;
   poly m1,m2;
@@ -1156,6 +1163,14 @@ poly ksCreateShortSpoly(poly p1, poly p2, ring tailRing)
   }
 #endif
 
+#ifdef HAVE_SHIFTBBA
+  // shift the next monomial on demand
+  if (tailRing->isLPring)
+  {
+    a1 = p_LPCopyAndShiftLM(a1, shift1, tailRing);
+    a2 = p_LPCopyAndShiftLM(a2, shift2, tailRing);
+  }
+#endif
   if (a1==NULL)
   {
     if(a2!=NULL)
@@ -1376,6 +1391,13 @@ x1:
           t1 = nMult(pGetCoeff(a2),lc1);
         }
       }
+    }
+#endif
+#ifdef HAVE_SHIFTBBA
+    if (tailRing->isLPring)
+    {
+      a1 = p_LPCopyAndShiftLM(a1, shift1, tailRing);
+      a2 = p_LPCopyAndShiftLM(a2, shift2, tailRing);
     }
 #endif
     if (a2==NULL)
