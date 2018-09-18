@@ -427,6 +427,10 @@ EXAMPLE: example elim; shows an example
   {
     ERROR("## specify variables to be eliminated");
   }
+  if (isQuotientRing(basering))
+  {
+    ERROR("`elim` cannot eliminate in qring, use `eliminate`");
+  }
   int pr = printlevel - voice + 2;   //for ring display if printlevel > 0
   def BR = basering;
   intvec save_opt=option(get);
