@@ -1,13 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-//version="version ffmodstd.lib 4.1.1.0 Dec_2017 "; // $Id$
-version=" $ Id$ ";
+version="version ffmodstd.lib 4.1.1.0 Sep_2018 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:   ffmodstd.lib  Groebner bases of ideals in polynomial rings
                            over rational function fields
 AUTHORS:   D.K. Boku       boku@mathematik.uni-kl.de
-@*         W. Decker       decker@mathematik.uni-kl.de
-@*         C. Fieker       fieker@mathematik.uni-kl.de
+           W. Decker       decker@mathematik.uni-kl.dei
+           C. Fieker       fieker@mathematik.uni-kl.de
 
 OVERVIEW:
   A library for computing a Groebner basis of an ideal in a polynomial
@@ -52,7 +51,7 @@ REFERENCES:
 PROCEDURES:
   fareypoly(g,f);         univariate rational function reconstruction
   polyInterpolation(l,m);  univariate polynomial interpolation
-  modrationalInterpolation(l,m); modular univariate rational interpolation 
+  modrationalInterpolation(l,m); modular univariate rational interpolation
   BerlekampMassey(L,i);    Berlekamp/Massey algorithm
   modberlekampMassey(L,i)  modular Berlekamp/Massey algorithm
   sparseInterpolation(f,L,n); sparse multivariate polynomial interpolation
@@ -354,7 +353,7 @@ NOTE: The procedure applies the Berlekamp/Massey algorithm to the sequence L[j]
       f splits into linear factors with no multiplicity greater than one, then we say that
       the length of the sequence L is long enough. If this polynomial does not split into
       linear factors, an optional parameter M = BerlekampMassey(L',i) can be provided to
-      add more elements to the sequence. 
+      add more elements to the sequence.
 REFERENCES:
 @* [1] E. Kaltofen and W.-s. Lee: Early termination in sparse interpolation
       algorithms. J. Symb. Comput. 36, 365-400 (2003).
@@ -404,7 +403,7 @@ EXAMPLE: example BerlekampMassey; shows an example
        D1 = d;
        if(D1 == 0)
        {
-           if(j>1)//(2*l0) < j && 
+           if(j>1)//(2*l0) < j &&
            {
                // early termination is triggered here
                return(list(reverse_coef(g0,i), j-1));
@@ -412,7 +411,6 @@ EXAMPLE: example BerlekampMassey; shows an example
            g1 = g0;
            B1 = var(i)*B0;
            l1 = l0;
-           
        }
        else
        {
@@ -1134,7 +1132,7 @@ static proc generate_uniRationalFunctions(ideal I, list pr, list shift, int in,
         {
            vL[j] = T[j][1];
            if(evbd < T[j][3])
-           { 
+           {
              evbd = T[j][3];
            }
         }
@@ -1383,7 +1381,7 @@ static proc stdoverFF(ideal I, list pr, list shft,string Command, list JL)
 
 ///////////////////////////////////////////////////////////////////////////////
 // +++++++++++++++++ std for one parameter begins here +++++++++++++++++++
- 
+
 static proc test_fmodI(poly f,ideal I)
 {
     // test whether f in I or not
@@ -1490,7 +1488,7 @@ static proc stdone(ideal I, ideal cI, int in_value, list #)
             return(list(m_l[1]));
         }
     }
-    number Nd = 0; 
+    number Nd = 0;
     number Nn = 1;
     list Pl, Il, L, M;
     L[1] = lus;
@@ -1574,7 +1572,7 @@ static proc stdone(ideal I, ideal cI, int in_value, list #)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
- 
+
 static proc firststd(ideal I, ideal cI, int in_value, list #)
 {
     /* return std FJ of I together with a bound on the number of evaluation
@@ -2054,8 +2052,8 @@ static proc berlekamp_naive(list L)
           N = number(1)/leadcoef(r);
        }
        v = (v0-q*v1)*N;
-       v0 = v1; 
-       v1 = v; 
+       v0 = v1;
+       v1 = v;
        f = g1;
        g1= r*N;
      }
@@ -2119,7 +2117,7 @@ static proc pTest_massey(string Command, list args, ideal fareyResult, int Testp
 static proc finalTest_massey(string Command, list L, ideal fareyresult)
 {
     // check that whether the relation -L[j+t] = c_0*L[j] + ... + c_{t-1}*L[j+t-1]
-    // for all j >=1 where t= size(L)/2 
+    // for all j >=1 where t= size(L)/2
     int i, j;
     poly f = fareyresult[1];
     int l = size(L);
@@ -2135,7 +2133,7 @@ static proc finalTest_massey(string Command, list L, ideal fareyresult)
         if(k != -L[t+i+1])
         {
             return(0);
-        }      
+        }
     }
     return(1);
 }
@@ -2270,7 +2268,7 @@ static proc finalTest_Qinterpolation(string Command, list L, ideal fareyresult)
     * in the presence of bad evaluation points the conditions (r1/r2)(D[i])=E[i]
     * cannot be satisfied for all i
     */
-    return(1); 
+    return(1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
