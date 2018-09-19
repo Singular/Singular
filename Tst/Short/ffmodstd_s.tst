@@ -89,9 +89,44 @@ D = reduce(D, std(V));
 tst_test_fareypoly(D, V);
 kill R;
 
+proc tst_test_modrationalInterpolation(list D, list E, int vr)
+{
+   def F = modrationalInterpolation(D,E,vr);
+   F;
+}
+
+ring R = 0,x,dp;
+poly r = 16/3125*x^9+312/3125*x^8+108/125*x^7+13614/3125*x^6+44092/3125*x^5+95153/3125*x^4
+         +136872/3125*x^3+126584/3125*x^2+13664/625*x+656/125;
+poly t = x^16+412/5*x^15+79554/25*x^14+9556508/125*x^13+799356506/625*x^12
+         +1974684999/125*x^11   +93143851156/625*x^10+3422950835956/3125*x^9
+         +3961758888729/625*x^8+3622442847166/125*x^7+2607940162054/25*x^6
+         +1462807349256/5*x^5+626672547956*x^4+991121483395*x^3+1091504397900*x^2
+         +747836138000*x+240141160000;
+list D, E;
+int k1,  k2;
+k2 = 5;
+for(k1 = 1; k1 <= deg(r) + deg(t) +3; k1++)
+{
+     k2 = random(k2 +1, k2+5);
+     D[k1] = k2;
+}
+for (k1 = 1; k1 <= size(D); k1++)
+{
+    E[k1] = number(subst(r, x, D[k1]))/number(subst(t, x, D[k1]));
+}
+tst_test_modrationalInterpolation(D, E, 1);
+kill R;
+
 proc tst_test_BerlekampMassey(list L, int i, list #)
 {
    def F = BerlekampMassey(L,i, #);
+   F;
+}
+
+proc tst_test_modberlekampMassey(list L)
+{
+   def F = modberlekampMassey(L);
    F;
 }
 
@@ -114,6 +149,8 @@ for(i=0;i<=2*sz;i++)
 }
 
 tst_test_BerlekampMassey(La,1);
+tst_test_modberlekampMassey(La);
+
 
 poly Br = x24-15302x23+108153538x22-469822785006x21+1407508896239640x20-3091943125563504810x19
           +5168112767194393020422x18-6729723784556809568734354x17+6931464551637490752291339929x16
