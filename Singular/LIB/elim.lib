@@ -559,7 +559,6 @@ example
 
    ring S =  (0,a),(x,y,z,u,v),ws(1,2,3,4,5);
    minpoly = a2+1;
-   qring T = std(ideal(ax+y2+v3,(x+v)^2));
    ideal i=x-u,y-u2,az-u3,v-x+ay3;
    module m=i*gen(1)+i*gen(2);
    m=elim(m,xy);
