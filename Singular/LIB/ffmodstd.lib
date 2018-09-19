@@ -1549,6 +1549,7 @@ static proc stdone(ideal I, ideal cI, int in_value, list #)
                 fr = modrationalInterpolation(list(lus[1..sz-1]), list(lev[1..sz-1]), nx, L);
                 M = M + m_l;
                 L[1] = L[1] + lus;
+                L[2] = L[2] + lev;
                 Nd = number(subst(fr[1], var(nx), lus[sz])/subst(fr[2], var(nx), lus[sz]));
                 Nn = lev[sz];
                 if(Nd == Nn)
