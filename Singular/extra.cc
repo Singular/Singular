@@ -1163,28 +1163,24 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #ifdef HAVE_SHIFTBBA
     if (strcmp(sys_cmd, "stest") == 0)
     {
-      const short t[]={4,POLY_CMD,INT_CMD,INT_CMD,INT_CMD};
+      const short t[]={2,POLY_CMD,INT_CMD};
       if (iiCheckTypes(h,t,1))
       {
         poly p=(poly)h->CopyD();
         h=h->next;
         int sh=(int)((long)(h->Data()));
-        h=h->next;
-        int uptodeg=(int)((long)(h->Data()));
-        h=h->next;
-        int lVblock=(int)((long)(h->Data()));
         if (sh<0)
         {
           WerrorS("negative shift for pLPshift");
           return TRUE;
         }
-        int L = pLastVblock(p,lVblock);
-        if (L+sh > uptodeg)
+        int L = pLastVblock(p);
+        if (L+sh > currRing->N/currRing->isLPring)
         {
           WerrorS("pLPshift: too big shift requested\n");
           return TRUE;
         }
-        res->data = p_LPshift(p,sh,uptodeg,lVblock,currRing);
+        res->data = p_LPshift(p,sh,currRing);
         res->rtyp = POLY_CMD;
         return FALSE;
       }
@@ -1196,35 +1192,12 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #ifdef HAVE_SHIFTBBA
     if (strcmp(sys_cmd, "btest") == 0)
     {
-      const short t[]={2,POLY_CMD,INT_CMD};
+      const short t[]={1,POLY_CMD};
       if (iiCheckTypes(h,t,1))
       {
         poly p=(poly)h->CopyD();
-        h=h->next;
-        int lV=(int)((long)(h->Data()));
         res->rtyp = INT_CMD;
-        res->data = (void*)(long)pLastVblock(p, lV);
-        return FALSE;
-      }
-      else return TRUE;
-    }
-    else
-  #endif
-  /*==================== shrink-test for freeGB  =================*/
-  #ifdef HAVE_SHIFTBBA
-    if (strcmp(sys_cmd, "shrinktest") == 0)
-    {
-      const short t[]={2,POLY_CMD,INT_CMD};
-      if (iiCheckTypes(h,t,1))
-      {
-        poly p=(poly)h->Data();
-        h=h->next;
-        int lV=(int)((long)(h->Data()));
-        res->rtyp = POLY_CMD;
-        //        res->data = p_mShrink(p, lV, currRing);
-        //        kStrategy strat=new skStrategy;
-        //        strat->tailRing = currRing;
-        res->data = p_Shrink(p, lV, currRing);
+        res->data = (void*)(long)pLastVblock(p);
         return FALSE;
       }
       else return TRUE;
@@ -1503,18 +1476,14 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #ifdef HAVE_SHIFTBBA
     if (strcmp(sys_cmd, "freegb") == 0)
     {
-      const short t[]={3,IDEAL_CMD,INT_CMD,INT_CMD};
-      const short tM[]={3,MODUL_CMD,INT_CMD,INT_CMD};
+      const short t[]={1,IDEAL_CMD};
+      const short tM[]={1,MODUL_CMD};
       if (iiCheckTypes(h,tM,0)
       || (iiCheckTypes(h,t,0)))
       {
         res->rtyp=h->Typ();
         ideal I=(ideal)h->CopyD();
-        h=h->next;
-        int uptodeg=(int)((long)(h->Data()));
-        h=h->next;
-        int lVblock=(int)((long)(h->Data()));
-        res->data = freegb(I,uptodeg,lVblock);
+        res->data = freegb(I);
         if (res->data == NULL)
         {
           /* that is there were input errors */
@@ -1524,7 +1493,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
       else
       {
-        WerrorS("system(\"freegb\",`ideal/module`,`int`,`int`) expected");
+        WerrorS("system(\"freegb\",`ideal/module`) expected");
         return TRUE;
       }
     }

@@ -737,7 +737,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
   ||(rIsPluralRing(r)))
   {
     pSetCoeff0(m, n_InpNeg(pGetCoeff(m),r->cf));
-    p1=pp_Mult_mm(p,m,r);
+    p1=r->p_Procs->pp_mm_Mult(p,m,r);
     pSetCoeff0(m, n_InpNeg(pGetCoeff(m),r->cf));
     l1=pLength(p1);
     i = pLogLength(l1);
@@ -779,7 +779,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
       }
       else
       {
-        p1 = r->p_Procs->pp_Mult_mm(p1, m, r);
+        p1 = r->p_Procs->pp_mm_Mult(p1, m, r);
       }
       pSetCoeff0(m, n_InpNeg(pGetCoeff(m),r->cf));
     }

@@ -15,6 +15,7 @@
 
 #include "reporter/reporter.h"
 #include "misc/auxiliary.h"
+#include "shiftop.h"
 
 // extract p_Procs properties from a ring
 static inline p_Field p_FieldIs(ring r)
@@ -164,8 +165,20 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
       SetProcs_ring(RingGeneral,length,ord);
   }
   #endif
-  _p_procs->p_mm_Mult=_p_procs->p_Mult_mm;
-  _p_procs->pp_mm_Mult=_p_procs->pp_Mult_mm;
+  if (r->isLPring) {
+    _p_procs->pp_Mult_mm = shift_pp_Mult_mm;
+    _p_procs->p_Mult_mm = shift_p_Mult_mm;
+    _p_procs->p_mm_Mult = shift_p_mm_Mult;
+    _p_procs->pp_mm_Mult = shift_pp_mm_Mult;
+    _p_procs->p_Minus_mm_Mult_qq = shift_p_Minus_mm_Mult_qq;
+    // Unsupported
+    _p_procs->pp_Mult_mm_Noether = shift_pp_Mult_mm_Noether_STUB;
+    _p_procs->pp_Mult_Coeff_mm_DivSelect = shift_pp_Mult_Coeff_mm_DivSelect_STUB;
+    _p_procs->pp_Mult_Coeff_mm_DivSelectMult = shift_pp_Mult_Coeff_mm_DivSelectMult_STUB;
+  } else {
+    _p_procs->p_mm_Mult=_p_procs->p_Mult_mm;
+    _p_procs->pp_mm_Mult=_p_procs->pp_Mult_mm;
+  }
   CheckProc(p_Copy);
   CheckProc(p_Delete);
   CheckProc(p_ShallowCopyDelete);
