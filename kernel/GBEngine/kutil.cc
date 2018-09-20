@@ -5549,7 +5549,7 @@ int posInT_EcartpLength(const TSet set,const int length,LObject &p)
   int op=p.ecart;
 
   int oo=set[length].ecart;
-  if ((oo < op) || ((oo==op) && (set[length].length < ol)))
+  if ((oo < op) || ((oo==op) && (set[length].length <= ol)))
     return length+1;
 
   int i;
