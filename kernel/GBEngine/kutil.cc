@@ -3929,20 +3929,6 @@ void initenterpairsSigRing (poly h,poly hSig,int hFrom,int k,int ecart,int isFro
   }
 }
 #ifdef HAVE_RINGS
-// a first test for removing old pairs where
-// strat->P.p divides lcm of pair
-void pairLcmCriterion(kStrategy strat)
-{
-	number a  = pGetCoeff(strat->P.p);
-	poly t    = strat->P.p;
-	for (int l = 0; l < strat->Ll; ++l) {
-		if (n_DivBy(a, pGetCoeff(strat->L[l].p), currRing->cf) &&
-				p_LmDivisibleBy(strat->L[l].p, t, currRing)) {
-			deleteInL(strat->L, &strat->Ll, l, strat);
-		}
-	}
-}
-
 /*2
 *the pairset B of pairs of type (s[i],p) is complete now. It will be updated
 *using the chain-criterion in B and L and enters B to L
