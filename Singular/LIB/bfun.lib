@@ -337,13 +337,16 @@ EXAMPLE: example linReduceIdeal; shows examples
              posNonZero = posNonZero,i;
           }
         }
-         posNonZero = posNonZero[2..nrows(posNonZero)];
-         posNonZero = posNonZero[lJ[2]];
-         for (i=1; i<=size(lJ[1]); i++)
-         {
-           M[i+sZeros] = gen(posNonZero[i]);
-         }
-        kill posNonZero;
+        if (size(I)>0)
+        {
+          posNonZero = posNonZero[2..nrows(posNonZero)];
+          posNonZero = posNonZero[lJ[2]];
+          for (i=1; i<=size(lJ[1]); i++)
+          {
+             M[i+sZeros] = gen(posNonZero[i]);
+          }  
+          kill posNonZero;
+        }
       }
       else
       {
