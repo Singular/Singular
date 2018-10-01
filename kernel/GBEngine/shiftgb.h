@@ -11,13 +11,16 @@
 #ifdef HAVE_SHIFTBBA
 #include "polys/nc/nc.h"
 
-poly p_LPshiftT(poly p, int sh, kStrategy strat, const ring r);
-
 poly p_LPshift(poly p, int sh, const ring r);
 poly p_mLPshift(poly p, int sh, const ring r);
+poly p_LPCopyAndShiftLM(poly p, int sh, const ring r);
 
-int p_mLastVblock(poly p, const ring r);
+#define pLPshift(p, sh) p_LPshift(p, sh, currRing)
+#define pmLPshift(p, sh) p_mLPshift(p, sh, currRing)
+#define pLPCopyAndShiftLM(p, sh) p_LPCopyAndShiftLM(p, sh, currRing)
+
 int p_LastVblock(poly p, const ring r);
+int p_mLastVblock(poly p, const ring r);
 
 #define pLastVblock(p) p_LastVblock(p,currRing)
 #define pmLastVblock(p) p_mLastVblock(p,currRing)
