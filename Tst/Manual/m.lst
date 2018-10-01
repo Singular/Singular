@@ -843,7 +843,6 @@ createTorsionFreeGroup
 defrings
 dimH
 DLoc
-elim
 Elimination
 expo
 Ext

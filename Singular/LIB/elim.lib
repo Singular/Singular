@@ -402,7 +402,7 @@ proc elim (def id, list #)
          \"withWeigts\".
 RETURN: ideal/module obtained from id by eliminating either the variables
         with indices appearing in v or the variables appearing in p.
-        Works also in a qring.
+        Does not work in a qring.
 METHOD: elim uses elimRing to create a ring with an elimination ordering for
         the variables to be eliminated and then applies std if \"std\"
         is given, or slimgb if \"slimgb\" is given, or a heuristically chosen
@@ -426,6 +426,10 @@ EXAMPLE: example elim; shows an example
   if (size(#) == 0)
   {
     ERROR("## specify variables to be eliminated");
+  }
+  if (isQuotientRing(basering))
+  {
+    ERROR("`elim` cannot eliminate in qring, use `eliminate`");
   }
   int pr = printlevel - voice + 2;   //for ring display if printlevel > 0
   def BR = basering;
@@ -555,7 +559,6 @@ example
 
    ring S =  (0,a),(x,y,z,u,v),ws(1,2,3,4,5);
    minpoly = a2+1;
-   qring T = std(ideal(ax+y2+v3,(x+v)^2));
    ideal i=x-u,y-u2,az-u3,v-x+ay3;
    module m=i*gen(1)+i*gen(2);
    m=elim(m,xy);
@@ -617,9 +620,9 @@ EXAMPLE: example elim1; shows examples
 "
 {
    def br = basering;
-   if ( size(ideal(br)) != 0 )
+   if (isQuotientRing(br))
    {
-      ERROR ("elim1 cannot eliminate in a qring");
+      ERROR ("elim1 cannot eliminate in a qring, use eliminate");
    }
 //------------- create product vars of variables to be eliminated -------------
   poly vars;

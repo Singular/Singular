@@ -575,7 +575,6 @@ void updateResult(ideal r,ideal Q,kStrategy strat);
 void completeReduce (kStrategy strat, BOOLEAN withT=FALSE);
 void kFreeStrat(kStrategy strat);
 void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR);
-void pairLcmCriterion(kStrategy strat);
 void chainCritNormal (poly p,int ecart,kStrategy strat);
 void chainCritOpt_1 (poly,int,kStrategy strat);
 void chainCritSig (poly p,int ecart,kStrategy strat);
