@@ -21,7 +21,7 @@
 // commutativity:
 // ALLOW_NC: also for plural rings and letterplace rings
 // ALLOW_LP: also for letterplace rings, not for plural rings
-// ALLOW_PLURAL: not for letterplace rings, but also for plural rings
+// ALLOW_PLURAL: not for letterplace rings, but for plural rings
 // COMM_PLURAL: only for commuative subrings of plural rings
 // NO_NC: not for non-commutative rings
 //
@@ -434,7 +434,7 @@ const struct sValCmd2 dArith2[]=
 #endif
 ,{  jjWRONG2,     '*',            0,              MODUL_CMD, MODUL_CMD, ALLOW_NC | ALLOW_RING|NO_CONVERSION}
 ,{D(jjDIV_N),     '/',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_NC | ALLOW_RING}
-,{D(jjDIV_P),     '/',            POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_NC | ALLOW_RING} /* ! letterplace? */
+,{D(jjDIV_P),     '/',            POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjDIV_P),     '/',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjDIV_Ma),    '/',            MATRIX_CMD,     MATRIX_CMD, POLY_CMD, ALLOW_PLURAL | NO_RING}
 ,{D(jjDIVMOD_I),  '/',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
@@ -472,11 +472,11 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjPOWER_I),   '^',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjPOWER_BI),   '^',           BIGINT_CMD,     BIGINT_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjPOWER_N),   '^',            NUMBER_CMD,     NUMBER_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
-,{D(jjPOWER_P),   '^',            POLY_CMD,       POLY_CMD,   INT_CMD, ALLOW_NC | ALLOW_RING}
-,{D(jjPOWER_ID),  '^',            IDEAL_CMD,      IDEAL_CMD,  INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPOWER_P),   '^',            POLY_CMD,       POLY_CMD,   INT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjPOWER_ID),  '^',            IDEAL_CMD,      IDEAL_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 #ifdef SINGULAR_4_2
 ,{D(jjNUMBER2_POW),'^',           CNUMBER_CMD,    CNUMBER_CMD,INT_CMD, ALLOW_NC | ALLOW_RING}
-,{D(jjPOLY2_POW), '^',            CPOLY_CMD,      CPOLY_CMD,  INT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPOLY2_POW), '^',            CPOLY_CMD,      CPOLY_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 #endif
 ,{D(jjLE_I),      LE,             INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjLE_BI),     LE,             INT_CMD,        BIGINT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
