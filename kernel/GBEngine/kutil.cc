@@ -12034,15 +12034,11 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
 */
 static void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy strat, int atR)
 {
-  /* p comes from strat->P.p, that is LObject with LM in currRing and Tail in tailRing */
-
-  assume(p_LmCheckIsFromRing(p,currRing));
-  assume(p_CheckIsFromRing(pNext(p),strat->tailRing));
+  poly s = strat->S[i];
+  assume(i<=strat->sl); // from OnePair
 
   /* cycles through all shifts of s[i] until uptodeg - lastVblock(s[i]) */
   /* that is create the pairs (f, s \dot g)  */
-
-  poly qq = strat->S[i]; //  lm in currRing, tail in tailRing
 
   //  poly q = pCopy(pHead(strat->S[i])); // lm in currRing
   //  pNext(q) = prCopyR(pNext(strat->S[i]),strat->tailRing,currRing); // zero shift
@@ -12051,16 +12047,8 @@ static void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStra
   /* x(0)y(1)z(2) : lastVblock-1=2, to add until lastVblock=uptodeg-1 */
   /* hence, a total number of elt's to add is: */
   /*  int toInsert = 1 + (uptodeg-1) - (pLastVblock(p.p, lV) -1);  */
-  int toInsert =  itoInsert(qq, strat->tailRing);
+  int toInsert =  itoInsert(s, currRing);
 
-#ifdef KDEBUG
-    if (TEST_OPT_DEBUG)
-    {
-      //      Print("entered ManyShifts: with toInsert=%d",toInsert); PrintLn();
-    }
-#endif
-
-  assume(i<=strat->sl); // from OnePair
 
   /* these vars hold for all shifts of s[i] */
   int ecartq = 0; //Hans says it's ok; we're in the homog case, no ecart
@@ -12075,29 +12063,12 @@ static void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStra
     qfromQ = -1;
   }
 
-  int j;
-
-  poly q/*, s*/;
-
   // for the 0th shift: insert the orig. pair
-  enterOnePairShift(qq, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, 0, i);
+  enterOnePairShift(s, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, 0, i);
 
-  for (j=1; j<= toInsert; j++)
+  for (int j = 1; j <= toInsert; j++)
   {
-    //    q = pLPshift(strat->S[i],j,uptodeg,lV);
-    q = p_LPshiftT(qq, j, strat, currRing);
-    //    q = p_mLPshift(qq,j,uptodeg,lV,currRing); // lm in currRing, shift this monomial
-    //    s = p_LPshift(pNext(qq), j, uptodeg, lV, strat->tailRing); // from tailRing
-    //    pNext(q) = s; // in tailRing
-    /* here we need to call enterOnePair with two polys ... */
-
-#ifdef KDEBUG
-    //if (TEST_OPT_DEBUG)
-    //{
-    //      PrintS("ManyShifts: calling enterOnePairShift(q,p)");      PrintLn();
-    //}
-#endif
-    //kFindInTShift(q,atR,strat);
+    poly q = pLPCopyAndShiftLM(s, j);
     enterOnePairShift(q, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, j, i);
   }
 }
@@ -12110,58 +12081,19 @@ static void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStra
 */
 void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy strat, int /*atR*/)
 {
-
-  /* format: p,qq are in LObject form: lm in CR, tail in TR */
-  /* for true self pairs qq ==p  */
-  /* we test both qq and p */
-  assume(p_LmCheckIsFromRing(qq,currRing));
-  assume(p_CheckIsFromRing(pNext(qq),strat->tailRing));
-  assume(p_LmCheckIsFromRing(p,currRing));
-  assume(p_CheckIsFromRing(pNext(p),strat->tailRing));
-
-  /* since this proc is applied twice for (h, s*g) and (g,s*h), init j with 1 only */
-
-  //  int j = 0;
-  int j = 1;
-
-  /* for such self pairs start with 1, not with 0 */
-  if (qq == p) j=1;
-
   /* should cycle through all shifts of q until uptodeg - lastVblock(q) */
   /* that is create the pairs (f, s \dot g)  */
 
-  int toInsert =  itoInsert(qq, strat->tailRing);
-
-#ifdef KDEBUG
-  //if (TEST_OPT_DEBUG)
-  //{
-  //      Print("entered SelfShifts: with toInsert=%d",toInsert); PrintLn();
-  //}
-#endif
-
-  poly q;
+  int toInsert =  itoInsert(qq, currRing);
 
   /* these vars hold for all shifts of s[i] */
   int ecartq = 0; //Hans says it's ok; we're in the homog case, no ecart
   int qfromQ = 0; // strat->fromQ[i];
 
-  for (; j<= toInsert; j++)
+  /* since this proc is applied twice for (h, s*g) and (g,s*h), init j with 1 */
+  for (int j = 1; j<= toInsert; j++)
   {
-    //    q = pLPshift(strat->S[i],j,uptodeg,lV);
-    /* we increase shifts by one; must delete q there*/
-    //    q = qq; q = pMoveCurrTail2poly(q,strat);
-    //    q = pLPshift(q,j,uptodeg,lV); //,currRing);
-    q = p_LPshiftT(qq, j, strat, currRing);
-    //    q = p_mLPshift(qq,j,uptodeg,lV,currRing); // lm in currRing, shift this monomial
-    //    s = p_LPshift(pNext(qq), j, uptodeg, lV, strat->tailRing); // from tailRing
-    //    pNext(q) = s; // in tailRing
-    /* here we need to call enterOnePair with two polys ... */
-#ifdef KDEBUG
-    //if (TEST_OPT_DEBUG)
-    //{
-    //      PrintS("SelfShifts: calling enterOnePairShift(q,p)");      PrintLn();
-    //}
-#endif
+    poly q = pLPCopyAndShiftLM(qq, j);
     enterOnePairShift(q, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, j, -1);
   }
 }
@@ -12581,10 +12513,8 @@ void enterTShift(LObject p, kStrategy strat, int atT)
 
   for (int i = 1; i <= toInsert; i++)
   {
-    poly shifted = p_mLPshift(p_Head(p.p, currRing), i, currRing);
-    pNext(shifted) = pNext(p.p);
     LObject qq;
-    qq.p = shifted; // don't use Set() because it'll test the poly order
+    qq.p = pLPCopyAndShiftLM(p.p, i); // don't use Set() because it'll test the poly order
     qq.shift = i;
     strat->initEcart(&qq); // initEcartBBA sets length, pLength, FDeg and ecart
 

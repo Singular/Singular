@@ -34,46 +34,9 @@
 
 #define freeT(A,v) omFreeSize((ADDRESS)A,(v+1)*sizeof(int))
 
-poly p_LPshiftT(poly p, int sh, kStrategy strat, const ring r)
-{
-  /* assume shift takes place, shifts the poly p by sh */
-  /* p is like TObject: lm in currRing = r, tail in tailRing  */
-  /* copies p */
-
-  if (p==NULL) return(p);
-
-  assume(p_LmCheckIsFromRing(p,r));
-  assume(p_CheckIsFromRing(pNext(p),strat->tailRing));
-
-  /* assume sh and uptodeg agree  TODO check */
-
-  if (sh == 0) return(p); /* the zero shift */
-
-  poly q   = NULL;
-  poly s   = p_mLPshift(p_Head(p,r), sh, r); // lm in currRing
-  /* pNext(s) will be fixed below */
-  poly pp = pNext(p);
-
-  while (pp != NULL)
-  {
-    poly h=p_mLPshift(p_Head(pp,strat->tailRing),sh,strat->tailRing);
-    pIter(pp);
-
-    q = p_Add_q(q, h,strat->tailRing);
-  }
-  pNext(s) = q;
-  /* int version: returns TRUE if it was successful */
-  return(s);
-}
-
 poly p_LPshift(poly p, int sh, const ring r)
 {
-  /* assume shift takes place */
-  /* shifts the poly p from the ring r by sh */
-
-  /* assume sh and uptodeg agree TODO check */
-
-  if (sh == 0) return(p); /* the zero shift */
+  if (sh == 0 || p == NULL) return(p);
 
   poly q  = NULL;
   poly pp = p;
@@ -90,11 +53,9 @@ poly p_LPshift(poly p, int sh, const ring r)
 
 poly p_mLPshift(poly p, int sh, const ring r)
 {
-  /* p is a monomial from the ring r */
+  if (sh == 0 || p == NULL || p_LmIsConstantComp(p,r)) return(p);
 
   int lV = r->isLPring;
-
-  if (sh == 0 || p == NULL || p_LmIsConstantComp(p,r)) return(p);
 
   int L = p_mLastVblock(p,r);
   assume(L+sh>=1);
@@ -125,6 +86,14 @@ poly p_mLPshift(poly p, int sh, const ring r)
   //  number c = pGetCoeff(p);
   //  p_SetCoeff0(m,p_GetCoeff(p,r),r);
   return(p);
+}
+
+poly p_LPCopyAndShiftLM(poly p, int sh, const ring r)
+{
+  if (sh == 0 || p == NULL) return p;
+  poly q = p_mLPshift(p_Head(p, r), sh, r);
+  pNext(q) = pNext(p);
+  return q;
 }
 
 /* returns the number of maximal block */
@@ -327,7 +296,7 @@ void k_SplitFrame(poly &m1, poly &m2, int at, const ring r) {
   m2 = p_GetExp_k_n(m1, 1, hole, r);
   m1 = p_GetExp_k_n(m1, hole, r->N, r);
 
-  p_LPshift(m2, 1 - p_mFirstVblock(m2, r), r);
+  p_mLPshift(m2, 1 - p_mFirstVblock(m2, r), r);
   p_SetCoeff(m1, m1Coeff, r);
 }
 
