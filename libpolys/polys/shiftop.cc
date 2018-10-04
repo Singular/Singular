@@ -364,7 +364,7 @@ void p_mLPshift(poly m, int sh, const ring ri)
     assume(e[i]<=1);
     if (e[i]==1)
     {
-      assume(i + (sh*lV) <= r->N);
+      assume(i + (sh*lV) <= ri->N);
       assume(i + (sh*lV) >= 1);
       s[i + (sh*lV)] = e[i]; /* actually 1 */
     }
@@ -487,7 +487,7 @@ int p_mFirstVblock(poly p, int *expV, const ring ri)
   int j,b;
   j = 1;
   while ( (!expV[j]) && (j<=ri->N-1) ) j++;
-  assume(j <= r->N);
+  assume(j <= ri->N);
   b = (int)(j+lV-1)/lV; /* the number of the block, 1<= b <= r->N  */
   return b;
 }
