@@ -164,8 +164,8 @@ void k_SplitFrame(poly &m1, poly &m2, int at, const ring r) {
   p_mLPunshift(m2, r);
   p_SetCoeff(m1, m1Coeff, r);
 
-  assume(pFirstVblock(m1,r) <= 1);
-  assume(pFirstVblock(m2,r) <= 1);
+  assume(p_FirstVblock(m1,r) <= 1);
+  assume(p_FirstVblock(m2,r) <= 1);
 }
 
 #endif
