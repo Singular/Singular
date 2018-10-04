@@ -1,3 +1,8 @@
+#ifndef SHIFTOP_H
+#define SHIFTOP_H
+
+#ifdef HAVE_SHIFTBBA
+
 #include "misc/auxiliary.h"
 #include "monomials/ring.h"
 
@@ -34,3 +39,6 @@ void p_LPExpVappend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const 
 void p_LPExpVprepend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const ring ri);
 
 void WriteLPExpV(int *expV, ring ri);
+
+#endif
+#endif

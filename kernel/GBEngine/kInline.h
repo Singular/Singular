@@ -30,8 +30,6 @@
 
 #include "kernel/polys.h"
 
-#include "kernel/GBEngine/shiftgb.h"
-
 #define HAVE_TAIL_BIN
 // This doesn't really work, fixme, if necessary
 // #define HAVE_LM_BIN

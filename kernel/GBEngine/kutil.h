@@ -95,8 +95,9 @@ public:
   /*BOOLEAN*/ char is_special; // true, it is a new special S-poly (e.g. for SCA)
 #endif
 
-  // letterplace
+#ifdef HAVE_SHIFTBBA
   int shift;
+#endif
 
   // initialization
   KINLINE void Init(ring r = currRing);
