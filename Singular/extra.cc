@@ -56,7 +56,9 @@
 
 #include "polys/weight.h"
 
+#ifdef HAVE_SHIFTBBA
 #include "polys/shiftop.h"
+#endif
 
 #include "coeffs/bigintmat.h"
 #include "kernel/fast_mult.h"
