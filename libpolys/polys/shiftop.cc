@@ -1,5 +1,6 @@
 #include "shiftop.h"
 #include "templates/p_MemCopy.h"
+#include "monomials/p_polys.h"
 
 /* #define SHIFT_MULT_DEBUG */
 
@@ -30,10 +31,10 @@ poly shift_pp_Mult_mm(poly p, const poly m, const ring ri)
   poly _m = m; // temp hack because m is const
 #ifdef SHIFT_MULT_COMPAT_MODE
   _m = p_Copy(_m, ri);
-  p_mLPUnShift(_m, ri);
+  p_mLPunshift(_m, ri);
   p = p_Copy(p, ri);
   poly pCopyHead = p; // used to delete p later
-  p_LPUnShift(p, ri);
+  p_LPunshift(p, ri);
 #else
   assume(p_mFirstVblock(_m, ri) <= 1);
   assume(p_FirstVblock(p, ri) <= 1); // TODO check that each block is <=1
@@ -47,9 +48,9 @@ poly shift_pp_Mult_mm(poly p, const poly m, const ring ri)
   pAssume(!n_IsZero(mCoeff, ri->cf));
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
 
-  int mLength = p_mLastVblock(_m, ri) * lV;
   int *mExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
   p_GetExpV(_m,mExpV,ri);
+  int mLength = p_mLastVblock(_m, mExpV, ri) * lV;
   do
   {
     p_AllocBin(pNext(q), bin, ri);
@@ -58,7 +59,7 @@ poly shift_pp_Mult_mm(poly p, const poly m, const ring ri)
 
     int *pExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
     p_GetExpV(p, pExpV, ri);
-    p_LPExpVappend(pExpV, mExpV, p_mLastVblock(p, ri) * lV, mLength, ri);
+    p_LPExpVappend(pExpV, mExpV, p_mLastVblock(p, pExpV, ri) * lV, mLength, ri);
     p_MemCopy_LengthGeneral(q->exp, p->exp, ri->ExpL_Size); // otherwise q is not initialized correctly
     p_SetExpV(q, pExpV, ri);
     omFreeSize((ADDRESS) pExpV, (ri->N+1)*sizeof(int));
@@ -95,8 +96,8 @@ poly shift_p_Mult_mm(poly p, const poly m, const ring ri)
   poly _m = m; // temp hack because m is const
 #ifdef SHIFT_MULT_COMPAT_MODE
   _m = p_Copy(_m, ri);
-  p_mLPUnShift(_m, ri);
-  p_LPUnShift(p, ri);
+  p_mLPunshift(_m, ri);
+  p_LPunshift(p, ri);
 #else
   assume(p_mFirstVblock(_m, ri) <= 1);
   assume(p_FirstVblock(p, ri) <= 1); // TODO check that each block is <=1
@@ -108,9 +109,9 @@ poly shift_p_Mult_mm(poly p, const poly m, const ring ri)
   number pCoeff;
   pAssume(!n_IsZero(mCoeff, ri->cf));
 
-  int mLength = p_mLastVblock(_m, ri) * lV;
   int *mExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
   p_GetExpV(_m,mExpV,ri);
+  int mLength = p_mLastVblock(_m, mExpV, ri) * lV;
   while (p != NULL)
   {
     pCoeff = pGetCoeff(p);
@@ -119,7 +120,7 @@ poly shift_p_Mult_mm(poly p, const poly m, const ring ri)
 
     int *pExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
     p_GetExpV(p,pExpV,ri);
-    p_LPExpVappend(pExpV, mExpV, p_mLastVblock(p, ri) * lV, mLength, ri);
+    p_LPExpVappend(pExpV, mExpV, p_mLastVblock(p, pExpV, ri) * lV, mLength, ri);
     p_SetExpV(p, pExpV, ri);
     omFreeSize((ADDRESS) pExpV, (ri->N+1)*sizeof(int));
 
@@ -153,10 +154,10 @@ poly shift_pp_mm_Mult(poly p, const poly m, const ring ri)
   poly _m = m; // temp hack because m is const
 #ifdef SHIFT_MULT_COMPAT_MODE
   _m = p_Copy(_m, ri);
-  p_mLPUnShift(_m, ri);
+  p_mLPunshift(_m, ri);
   p = p_Copy(p, ri);
   poly pCopyHead = p; // used to delete p later
-  p_LPUnShift(p, ri);
+  p_LPunshift(p, ri);
 #else
   assume(p_mFirstVblock(_m, ri) <= 1);
   assume(p_FirstVblock(p, ri) <= 1); // TODO check that each block is <=1
@@ -170,9 +171,9 @@ poly shift_pp_mm_Mult(poly p, const poly m, const ring ri)
   pAssume(!n_IsZero(mCoeff, ri->cf));
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
 
-  int mLength = p_mLastVblock(_m, ri) * lV;
   int *mExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
   p_GetExpV(_m,mExpV,ri);
+  int mLength = p_mLastVblock(_m, mExpV, ri) * lV;
   do
   {
     p_AllocBin(pNext(q), bin, ri);
@@ -181,7 +182,7 @@ poly shift_pp_mm_Mult(poly p, const poly m, const ring ri)
 
     int *pExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
     p_GetExpV(p, pExpV, ri);
-    p_LPExpVprepend(pExpV, mExpV, p_mLastVblock(p, ri) * lV, mLength, ri);
+    p_LPExpVprepend(pExpV, mExpV, p_mLastVblock(p, pExpV, ri) * lV, mLength, ri);
     p_MemCopy_LengthGeneral(q->exp, p->exp, ri->ExpL_Size); // otherwise q is not initialized correctly
     p_SetExpV(q, pExpV, ri);
     omFreeSize((ADDRESS) pExpV, (ri->N+1)*sizeof(int));
@@ -218,8 +219,8 @@ poly shift_p_mm_Mult(poly p, const poly m, const ring ri)
   poly _m = m; // temp hack because m is const
 #ifdef SHIFT_MULT_COMPAT_MODE
   _m = p_Copy(_m, ri);
-  p_mLPUnShift(_m, ri);
-  p_LPUnShift(p, ri);
+  p_mLPunshift(_m, ri);
+  p_LPunshift(p, ri);
 #else
   assume(p_mFirstVblock(_m, ri) <= 1);
   assume(p_FirstVblock(p, ri) <= 1); // TODO check that each block is <=1
@@ -231,9 +232,9 @@ poly shift_p_mm_Mult(poly p, const poly m, const ring ri)
   number pCoeff;
   pAssume(!n_IsZero(mCoeff, ri->cf));
 
-  int mLength = p_mLastVblock(_m, ri) * lV;
   int *mExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
   p_GetExpV(_m,mExpV,ri);
+  int mLength = p_mLastVblock(_m, mExpV, ri) * lV;
   while (p != NULL)
   {
     pCoeff = pGetCoeff(p);
@@ -242,7 +243,7 @@ poly shift_p_mm_Mult(poly p, const poly m, const ring ri)
 
     int *pExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
     p_GetExpV(p,pExpV,ri);
-    p_LPExpVprepend(pExpV, mExpV, p_mLastVblock(p, ri) * lV, mLength, ri);
+    p_LPExpVprepend(pExpV, mExpV, p_mLastVblock(p, pExpV, ri) * lV, mLength, ri);
     p_SetExpV(p, pExpV, ri);
     omFreeSize((ADDRESS) pExpV, (ri->N+1)*sizeof(int));
 
@@ -310,7 +311,7 @@ poly shift_pp_Mult_Coeff_mm_DivSelect_STUB(poly p, const poly m, int &shorter, c
 // auxiliary
 
 // unshifts the monomial m
-void p_mLPUnShift(poly m, const ring ri)
+void p_mLPunshift(poly m, const ring ri)
 {
   if (m == NULL || p_LmIsConstantComp(m,ri)) return;
 
@@ -320,14 +321,12 @@ void p_mLPUnShift(poly m, const ring ri)
 
   if (shift == 0) return;
 
-  int L = p_mLastVblock(m, ri);
-
   int *e=(int *)omAlloc0((ri->N+1)*sizeof(int));
   int *s=(int *)omAlloc0((ri->N+1)*sizeof(int));
   p_GetExpV(m, e, ri);
 
   int expVoffset = shift*lV;
-  for (int i = 1 + expVoffset; i <= L*lV; ++i)
+  for (int i = 1 + expVoffset; i <= ri->N; i++)
   {
     assume(e[i] <= 1);
     s[i - expVoffset] = e[i];
@@ -338,14 +337,159 @@ void p_mLPUnShift(poly m, const ring ri)
 }
 
 // unshifts the polynomial p, note: the ordering can be destroyed if the shifts for the monomials are not equal
-void p_LPUnShift(poly p, const ring ri)
+void p_LPunshift(poly p, const ring ri)
 {
   while (p!=NULL)
   {
-    p_mLPUnShift(p, ri);
+    p_mLPunshift(p, ri);
     pIter(p);
   }
-  p_Test(p, ri); // check if ordering was destroyed
+}
+
+void p_mLPshift(poly m, int sh, const ring ri)
+{
+  if (sh == 0 || m == NULL || p_LmIsConstantComp(m,ri)) return;
+
+  int lV = ri->isLPring;
+
+  assume(p_mFirstVblock(m,ri) + sh >= 1);
+  assume(p_mLastVblock(m,ri) + sh <= ri->N/lV);
+
+  int *e=(int *)omAlloc0((ri->N+1)*sizeof(int));
+  int *s=(int *)omAlloc0((ri->N+1)*sizeof(int));
+  p_GetExpV(m,e,ri);
+
+  for (int i = 1; i <= ri->N; i++)
+  {
+    assume(e[i]<=1);
+    if (e[i]==1)
+    {
+      assume(i + (sh*lV) <= r->N);
+      assume(i + (sh*lV) >= 1);
+      s[i + (sh*lV)] = e[i]; /* actually 1 */
+    }
+  }
+  p_SetExpV(m,s,ri);
+  omFreeSize((ADDRESS) e, (ri->N+1)*sizeof(int));
+  omFreeSize((ADDRESS) s, (ri->N+1)*sizeof(int));
+}
+
+void p_LPshift(poly p, int sh, const ring ri)
+{
+  if (sh == 0) return;
+
+  while (p!=NULL)
+  {
+    p_mLPshift(p, sh, ri);
+    pIter(p);
+  }
+}
+
+/* returns the number of maximal block */
+/* appearing among the monomials of p */
+/* the 0th block is the 1st one */
+int p_LastVblock(poly p, const ring r)
+{
+  poly q = p;
+  int ans = 0;
+  while (q!=NULL)
+  {
+    int ansnew = p_mLastVblock(q, r);
+    ans    = si_max(ans,ansnew);
+    pIter(q);
+  }
+  return(ans);
+}
+
+/* for a monomial p, returns the number of the last block */
+/* where a nonzero exponent is sitting */
+int p_mLastVblock(poly p, const ring ri)
+{
+  if (p == NULL || p_LmIsConstantComp(p,ri))
+  {
+    return(0);
+  }
+
+  int *e=(int *)omAlloc0((ri->N+1)*sizeof(int));
+  p_GetExpV(p,e,ri);
+  int b = p_mLastVblock(p, e, ri);
+  omFreeSize((ADDRESS) e, (ri->N+1)*sizeof(int));
+  return b;
+}
+
+/* for a monomial p with exponent vector expV, returns the number of the last block */
+/* where a nonzero exponent is sitting */
+int p_mLastVblock(poly p, int *expV, const ring ri)
+{
+  if (p == NULL || p_LmIsConstantComp(p,ri))
+  {
+    return(0);
+  }
+
+  int lV = ri->isLPring;
+  int j,b;
+  j = ri->N;
+  while ( (!expV[j]) && (j>=1) ) j--;
+  assume(j>0);
+  b = (int)((j+lV-1)/lV); /* the number of the block, >=1 */
+  return b;
+}
+
+/* returns the number of maximal block */
+/* appearing among the monomials of p */
+/* the 0th block is the 1st one */
+int p_FirstVblock(poly p, const ring r)
+{
+  if (p == NULL) {
+    return 0;
+  }
+
+  poly q = p;
+  int ans = p_mFirstVblock(q, r);
+  while (q!=NULL)
+  {
+    int ansnew = p_mFirstVblock(q, r);
+    if (ansnew > 0) { // don't count constants
+      ans = si_min(ans,ansnew);
+    }
+    pIter(q);
+  }
+  /* do not need to delete q */
+  return(ans);
+}
+
+/* for a monomial p, returns the number of the first block */
+/* where a nonzero exponent is sitting */
+int p_mFirstVblock(poly p, const ring ri)
+{
+  if (p == NULL || p_LmIsConstantComp(p,ri))
+  {
+    return(0);
+  }
+
+  int *e=(int *)omAlloc0((ri->N+1)*sizeof(int));
+  p_GetExpV(p,e,ri);
+  int b = p_mFirstVblock(p, e, ri);
+  omFreeSize((ADDRESS) e, (ri->N+1)*sizeof(int));
+  return b;
+}
+
+/* for a monomial p with exponent vector expV, returns the number of the first block */
+/* where a nonzero exponent is sitting */
+int p_mFirstVblock(poly p, int *expV, const ring ri)
+{
+  if (p == NULL || p_LmIsConstantComp(p,ri))
+  {
+    return(0);
+  }
+
+  int lV = ri->isLPring;
+  int j,b;
+  j = 1;
+  while ( (!expV[j]) && (j<=ri->N-1) ) j++;
+  assume(j <= r->N);
+  b = (int)(j+lV-1)/lV; /* the number of the block, 1<= b <= r->N  */
+  return b;
 }
 
 // appends m2ExpV to m1ExpV, also adds their components (one of them is always zero)
@@ -355,7 +499,7 @@ void p_LPExpVappend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const 
   PrintLn(); WriteLPExpV(m1ExpV, ri);
   PrintLn(); WriteLPExpV(m2ExpV, ri);
 #endif
-  assume(m1Length + m2Length <= ri->N);
+  assume(m1Length + m2Length <= ri->N); // always throw an error?
   for (int i = 1 + m1Length; i < 1 + m1Length + m2Length; ++i)
   {
     assume(m2ExpV[i - m1Length] <= 1);
@@ -376,7 +520,7 @@ void p_LPExpVprepend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const
   PrintLn(); WriteLPExpV(m1ExpV, ri);
   PrintLn(); WriteLPExpV(m2ExpV, ri);
 #endif
-  assume(m1Length + m2Length <= ri->N);
+  assume(m1Length + m2Length <= ri->N); // always throw an error?
 
   // shift m1 by m2Length
   for (int i = m2Length + m1Length; i >= 1 + m2Length; --i)

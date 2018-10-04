@@ -20,6 +20,7 @@
 #include "kernel/polys.h"
 #endif
 #include "kernel/GBEngine/shiftgb.h"
+#include "polys/shiftop.h"
 
 #ifdef KDEBUG
 int red_count = 0;

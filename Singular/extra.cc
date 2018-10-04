@@ -56,6 +56,8 @@
 
 #include "polys/weight.h"
 
+#include "polys/shiftop.h"
+
 #include "coeffs/bigintmat.h"
 #include "kernel/fast_mult.h"
 #include "kernel/digitech.h"
@@ -65,7 +67,6 @@
 #include "kernel/GBEngine/syz.h"
 #include "kernel/GBEngine/kutil.h"
 
-#include "kernel/GBEngine/shiftgb.h"
 #include "kernel/linear_algebra/linearAlgebra.h"
 
 #include "kernel/combinatorics/hutil.h"
@@ -1180,7 +1181,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           WerrorS("pLPshift: too big shift requested\n");
           return TRUE;
         }
-        res->data = p_LPshift(p,sh,currRing);
+        p_LPshift(p,sh,currRing);
+        res->data = p;
         res->rtyp = POLY_CMD;
         return FALSE;
       }

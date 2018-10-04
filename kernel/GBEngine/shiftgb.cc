@@ -30,151 +30,16 @@
 #include "misc/intvec.h"
 #include "kernel/GBEngine/shiftgb.h"
 #include "polys/nc/sca.h"
-
-
-#define freeT(A,v) omFreeSize((ADDRESS)A,(v+1)*sizeof(int))
-
-poly p_LPshift(poly p, int sh, const ring r)
-{
-  if (sh == 0 || p == NULL) return(p);
-
-  poly q  = NULL;
-  poly pp = p;
-  while (pp!=NULL)
-  {
-    poly h=pp;
-    pIter(pp);
-    pNext(h)=NULL;
-    h=p_mLPshift(h,sh,r);
-    q = p_Add_q(q, h,r);
-  }
-  return(q);
-}
-
-poly p_mLPshift(poly p, int sh, const ring r)
-{
-  if (sh == 0 || p == NULL || p_LmIsConstantComp(p,r)) return(p);
-
-  int lV = r->isLPring;
-
-  int L = p_mLastVblock(p,r);
-  assume(L+sh>=1);
-  assume(L+sh<=r->N/lV);
-
-  int *e=(int *)omAlloc0((r->N+1)*sizeof(int));
-  int *s=(int *)omAlloc0((r->N+1)*sizeof(int));
-  p_GetExpV(p,e,r);
-
-  int j;
-  //  for (j=1; j<=r->N; j++)
-  // L*lV gives the last position of the last block
-  for (j=1; j<= L*lV ; j++)
-  {
-    assume(e[j]<=1);
-    if (e[j]==1)
-    {
-      assume(j + (sh*lV)<=r->N);
-      assume(j + (sh*lV)>=1);
-      s[j + (sh*lV)] = e[j]; /* actually 1 */
-    }
-  }
-  p_SetExpV(p,s,r);
-  freeT(e, r->N);
-  freeT(s, r->N);
-  /*  pSetm(m); */ /* done in the pSetExpV */
-  /* think on the component and coefficient */
-  //  number c = pGetCoeff(p);
-  //  p_SetCoeff0(m,p_GetCoeff(p,r),r);
-  return(p);
-}
+#include "polys/shiftop.h"
 
 poly p_LPCopyAndShiftLM(poly p, int sh, const ring r)
 {
   if (sh == 0 || p == NULL) return p;
-  poly q = p_mLPshift(p_Head(p, r), sh, r);
+
+  poly q = p_Head(p, r);
+  p_mLPshift(q, sh, r);
   pNext(q) = pNext(p);
   return q;
-}
-
-/* returns the number of maximal block */
-/* appearing among the monomials of p */
-/* the 0th block is the 1st one */
-int p_LastVblock(poly p, const ring r)
-{
-  poly q = p;
-  int ans = 0;
-  while (q!=NULL)
-  {
-    int ansnew = p_mLastVblock(q, r);
-    ans    = si_max(ans,ansnew);
-    pIter(q);
-  }
-  return(ans);
-}
-
-/* for a monomial p, returns the number of the last block */
-/* where a nonzero exponent is sitting */
-int p_mLastVblock(poly p, const ring r)
-{
-  if (p == NULL || p_LmIsConstantComp(p,r))
-  {
-    return(0);
-  }
-
-  int lV = r->isLPring;
-  int *e=(int *)omAlloc0((r->N+1)*sizeof(int));
-  p_GetExpV(p,e,r);
-  int j,b;
-  j = r->N;
-  while ( (!e[j]) && (j>=1) ) j--;
-  freeT(e, r->N);
-  assume(j>0);
-  b = (int)((j+lV-1)/lV); /* the number of the block, >=1 */
-  return (b);
-}
-
-/* returns the number of maximal block */
-/* appearing among the monomials of p */
-/* the 0th block is the 1st one */
-int p_FirstVblock(poly p, const ring r)
-{
-  if (p == NULL) {
-    return 0;
-  }
-
-  poly q = p;
-  int ans = p_mFirstVblock(q, r);
-  while (q!=NULL)
-  {
-    int ansnew = p_mFirstVblock(q, r);
-    if (ansnew > 0) { // don't count constants
-      ans = si_min(ans,ansnew);
-    }
-    pIter(q);
-  }
-  /* do not need to delete q */
-  return(ans);
-}
-
-/* for a monomial p, returns the number of the first block */
-/* where a nonzero exponent is sitting */
-int p_mFirstVblock(poly p, const ring r)
-{
-  if (p == NULL || p_LmIsConstantComp(p,r))
-  {
-    return(0);
-  }
-
-  int lV = r->isLPring;
-  int *e=(int *)omAlloc0((r->N+1)*sizeof(int));
-  p_GetExpV(p,e,r);
-  int j,b;
-  j = 1;
-  while ( (!e[j]) && (j<=r->N-1) ) j++;
-  freeT(e, r->N);
-  assume(j <= r->N);
-  b = (int)(j+lV-1)/lV; /* the number of the block, 1<= b <= r->N  */
-  return (b);
 }
 
 /* there should be two routines: */
@@ -211,7 +76,7 @@ int isInV(poly p, const ring r)
     if (B[j]!=0) break;
   }
   /* do not need e anymore */
-  freeT(e, currRing->N);
+  omFreeSize((ADDRESS) e, (currRing->N+1)*sizeof(int));
 
   if (j==0) goto ret_true;
 //   {
@@ -224,12 +89,12 @@ int isInV(poly p, const ring r)
   {
     if (B[j]!=1)
     {
-      freeT(B, b);
+      omFreeSize((ADDRESS) B, (b+1)*sizeof(int));
       return(0);
     }
   }
  ret_true:
-  freeT(B, b);
+  omFreeSize((ADDRESS) B, (b+1)*sizeof(int));
   return(1);
 }
 
@@ -296,8 +161,11 @@ void k_SplitFrame(poly &m1, poly &m2, int at, const ring r) {
   m2 = p_GetExp_k_n(m1, 1, hole, r);
   m1 = p_GetExp_k_n(m1, hole, r->N, r);
 
-  p_mLPshift(m2, 1 - p_mFirstVblock(m2, r), r);
+  p_mLPunshift(m2, r);
   p_SetCoeff(m1, m1Coeff, r);
+
+  assume(pFirstVblock(m1,r) <= 1);
+  assume(pFirstVblock(m2,r) <= 1);
 }
 
 #endif
