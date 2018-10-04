@@ -1,9 +1,8 @@
 #ifndef SHIFTOP_H
 #define SHIFTOP_H
 
-#ifdef HAVE_SHIFTBBA
-
 #include "misc/auxiliary.h"
+#ifdef HAVE_SHIFTBBA
 #include "monomials/ring.h"
 
 poly shift_pp_Mult_mm(poly p, const poly m, const ring r);

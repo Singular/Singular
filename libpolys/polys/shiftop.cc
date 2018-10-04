@@ -1,6 +1,7 @@
+#include "shiftop.h"
+
 #ifdef HAVE_SHIFTBBA
 
-#include "shiftop.h"
 #include "templates/p_MemCopy.h"
 #include "monomials/p_polys.h"
 
