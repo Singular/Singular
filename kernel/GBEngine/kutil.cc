@@ -564,9 +564,12 @@ void cleanT (kStrategy strat)
         }
         else
         {
-          if (currRing->isLPring && strat->T[j].shift > 0) {
+#ifdef HAVE_SHIFTBBA
+          if (currRing->isLPring && strat->T[j].shift > 0)
+          {
             pNext(p) = NULL; // pNext(p) points to the unshifted tail, don't try to delete it here
           }
+#endif
           pDelete(&p);
         }
         break;
@@ -835,11 +838,16 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
   {
     if (T->p == NULL && i > 0)
       return dReportError("%c[%d].p is NULL", TN, i);
-    if (currRing->isLPring && T->shift > 0) {
+#ifdef HAVE_SHIFTBBA
+    if (currRing->isLPring && T->shift > 0)
+    {
       // in this case, the order is not correct. test LM and tail separately
       pFalseReturn(p_LmTest(T->p, currRing));
       pFalseReturn(p_Test(pNext(T->p), currRing));
-    } else {
+    }
+    else
+#endif
+    {
       pFalseReturn(p_Test(T->p, currRing));
     }
   }
@@ -9333,11 +9341,16 @@ void enterT(LObject &p, kStrategy strat, int atT)
   int i;
 
 #ifdef PDEBUG
-  if (currRing->isLPring && p.shift > 0) {
+#ifdef HAVE_SHIFTBBA
+  if (currRing->isLPring && p.shift > 0)
+  {
     // in this case, the order is not correct. test LM and tail separately
     p_LmTest(p.p, currRing);
     p_Test(pNext(p.p), currRing);
-  } else {
+  }
+  else
+#endif
+  {
     pp_Test(p.p, currRing, p.tailRing);
   }
 #endif
@@ -9389,14 +9402,19 @@ void enterT(LObject &p, kStrategy strat, int atT)
     }
   }
 
-  // letterplace: if p.shift > 0 then pNext(p.p) is already in the tailBin
-  if ((strat->tailBin != NULL) && (pNext(p.p) != NULL) && !(currRing->isLPring && p.shift > 0))
+  if ((strat->tailBin != NULL) && (pNext(p.p) != NULL))
   {
-    pNext(p.p)=p_ShallowCopyDelete(pNext(p.p),
-                                   (strat->tailRing != NULL ?
-                                    strat->tailRing : currRing),
-                                   strat->tailBin);
-    if (p.t_p != NULL) pNext(p.t_p) = pNext(p.p);
+#ifdef HAVE_SHIFTBBA
+    // letterplace: if p.shift > 0 then pNext(p.p) is already in the tailBin
+    if (!(currRing->isLPring && p.shift > 0))
+#endif
+    {
+      pNext(p.p)=p_ShallowCopyDelete(pNext(p.p),
+          (strat->tailRing != NULL ?
+           strat->tailRing : currRing),
+          strat->tailBin);
+      if (p.t_p != NULL) pNext(p.t_p) = pNext(p.p);
+    }
   }
   strat->T[atT] = (TObject) p;
   //printf("\nenterT: add new: length = %i, ecart = %i\n",p.length,p.ecart);

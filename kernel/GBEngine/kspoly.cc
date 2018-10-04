@@ -19,8 +19,10 @@
 #ifdef HAVE_RINGS
 #include "kernel/polys.h"
 #endif
+#ifdef HAVE_SHIFTBBA
 #include "kernel/GBEngine/shiftgb.h"
 #include "polys/shiftop.h"
+#endif
 
 #ifdef KDEBUG
 int red_count = 0;
@@ -124,10 +126,12 @@ int ksReducePoly(LObject* PR,
     }
   }
 
+#ifdef HAVE_SHIFTBBA
   poly lmRight;
   if (tailRing->isLPring) {
     k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
   }
+#endif
 
   // take care of coef buisness
   if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
@@ -136,7 +140,9 @@ int ksReducePoly(LObject* PR,
     number an = pGetCoeff(p2);
     int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
     p_SetCoeff(lm, bn, tailRing);
+#ifdef HAVE_SHIFTBBA
     if (tailRing->isLPring) pSetCoeff0(p1, bn); // lm doesn't point to p1 anymore, if the coef was a pointer, it has been deleted
+#endif
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
@@ -149,9 +155,14 @@ int ksReducePoly(LObject* PR,
 
 
   // and finally,
-  if (tailRing->isLPring) {
+#ifdef HAVE_SHIFTBBA
+  if (tailRing->isLPring)
+  {
     PR->Tail_Minus_mm_Mult_qq(lm, tailRing->p_Procs->pp_Mult_mm(t2, lmRight, tailRing), pLength(t2), spNoether);
-  } else {
+  }
+  else
+#endif
+  {
     PR->Tail_Minus_mm_Mult_qq(lm, t2, pLength(t2) /*PW->GetpLength() - 1*/, spNoether);
   }
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
@@ -397,10 +408,12 @@ int ksReducePolyBound(LObject* PR,
     }
   }
 
+#ifdef HAVE_SHIFTBBA
   poly lmRight;
   if (tailRing->isLPring) {
     k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
   }
+#endif
 
   // take care of coef buisness
   if (! n_IsOne(pGetCoeff(p2), tailRing))
@@ -409,7 +422,9 @@ int ksReducePolyBound(LObject* PR,
     number an = pGetCoeff(p2);
     int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
     p_SetCoeff(lm, bn, tailRing);
+#ifdef HAVE_SHIFTBBA
     if (tailRing->isLPring) pSetCoeff0(p1, bn); // lm doesn't point to p1 anymore, if the coef was a pointer, it has been deleted
+#endif
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
@@ -422,9 +437,14 @@ int ksReducePolyBound(LObject* PR,
 
 
   // and finally,
-  if (tailRing->isLPring) {
+#ifdef HAVE_SHIFTBBA
+  if (tailRing->isLPring)
+  {
     PR->Tail_Minus_mm_Mult_qq(lm, tailRing->p_Procs->pp_Mult_mm(t2, lmRight, tailRing), pLength(t2), spNoether);
-  } else {
+  }
+  else
+#endif
+  {
     PR->Tail_Minus_mm_Mult_qq(lm, t2, pLength(t2) /*PW->GetpLength() - 1*/, spNoether);
   }
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
@@ -599,10 +619,12 @@ int ksReducePolySig(LObject* PR,
     }
   }
 
+#ifdef HAVE_SHIFTBBA
   poly lmRight;
   if (tailRing->isLPring) {
     k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
   }
+#endif
 
   // take care of coef buisness
   if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
@@ -611,7 +633,9 @@ int ksReducePolySig(LObject* PR,
     number an = pGetCoeff(p2);
     int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
     p_SetCoeff(lm, bn, tailRing);
+#ifdef HAVE_SHIFTBBA
     if (tailRing->isLPring) pSetCoeff0(p1, bn); // lm doesn't point to p1 anymore, if the coef was a pointer, it has been deleted
+#endif
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
@@ -624,9 +648,14 @@ int ksReducePolySig(LObject* PR,
 
 
   // and finally,
-  if (tailRing->isLPring) {
+#ifdef HAVE_SHIFTBBA
+  if (tailRing->isLPring)
+  {
     PR->Tail_Minus_mm_Mult_qq(lm, tailRing->p_Procs->pp_Mult_mm(t2, lmRight, tailRing), pLength(t2), spNoether);
-  } else {
+  }
+  else
+#endif
+  {
     PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
   }
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
@@ -834,16 +863,20 @@ int ksReducePolySigRing(LObject* PR,
     }
   }
 
+#ifdef HAVE_SHIFTBBA
   poly lmRight;
   if (tailRing->isLPring) {
     k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
   }
+#endif
 
   // take care of coef buisness
   if(rField_is_Ring(currRing))
   {
     p_SetCoeff(lm, nDiv(pGetCoeff(lm),pGetCoeff(p2)), tailRing);
+#ifdef HAVE_SHIFTBBA
     if (tailRing->isLPring) pSetCoeff0(p1, pGetCoeff(lm)); // lm doesn't point to p1 anymore, if the coef was a pointer, it has been deleted
+#endif
     if (coef != NULL) *coef = n_Init(1, tailRing->cf);
   }
   else
@@ -854,7 +887,9 @@ int ksReducePolySigRing(LObject* PR,
       number an = pGetCoeff(p2);
       int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
       p_SetCoeff(lm, bn, tailRing);
+#ifdef HAVE_SHIFTBBA
       if (tailRing->isLPring) pSetCoeff0(p1, bn); // lm doesn't point to p1 anymore, if the coef was a pointer, it has been deleted
+#endif
       if (((ct == 0) || (ct == 2)))
         PR->Tail_Mult_nn(an);
       if (coef != NULL) *coef = an;
@@ -867,9 +902,14 @@ int ksReducePolySigRing(LObject* PR,
   }
 
   // and finally,
-  if (tailRing->isLPring) {
+#ifdef HAVE_SHIFTBBA
+  if (tailRing->isLPring)
+  {
     PR->Tail_Minus_mm_Mult_qq(lm, tailRing->p_Procs->pp_Mult_mm(t2, lmRight, tailRing), pLength(t2), spNoether);
-  } else {
+  }
+  else
+#endif
+  {
     PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
   }
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
@@ -935,6 +975,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   if (m1 == NULL)
     k_GetLeadTerms(p1, p2, currRing, m1, m2, tailRing);
 
+#ifdef HAVE_SHIFTBBA
   poly m12, m22;
   if (tailRing->isLPring)
   {
@@ -946,6 +987,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
     n_Delete(&(m1->coef), tailRing->cf);
     n_Delete(&(m2->coef), tailRing->cf);
   }
+#endif
 
   pSetCoeff0(m1, lc2);
   pSetCoeff0(m2, lc1);  // and now, m1 * LT(p1) == m2 * LT(p2)
@@ -978,10 +1020,15 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
     assume(l2 == pLength(a2));
   }
   else
-    if (tailRing->isLPring) {
+#ifdef HAVE_SHIFTBBA
+    if (tailRing->isLPring)
+    {
       // m2*a2*m22
       a2 = tailRing->p_Procs->pp_Mult_mm(tailRing->p_Procs->pp_mm_Mult(a2, m2, tailRing), m22, tailRing);
-    } else {
+    }
+    else
+#endif
+    {
       a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, tailRing);
     }
 #ifdef HAVE_RINGS
@@ -990,10 +1037,15 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
 
   Pair->SetLmTail(m2, a2, l2, use_buckets, tailRing);
 
-  if (tailRing->isLPring) {
+#ifdef HAVE_SHIFTBBA
+  if (tailRing->isLPring)
+  {
     // get m2*a2*m22 - m1*a1*m12
     Pair->Tail_Minus_mm_Mult_qq(m1, tailRing->p_Procs->pp_Mult_mm(a1, m12, tailRing), l1, spNoether);
-  } else {
+  }
+  else
+#endif
+  {
     // get m2*a2 - m1*a1
     Pair->Tail_Minus_mm_Mult_qq(m1, a1, l1, spNoether);
   }
@@ -1001,11 +1053,14 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   // Clean-up time
   Pair->LmDeleteAndIter();
   p_LmDelete(m1, tailRing);
-  if (tailRing->isLPring) {
+#ifdef HAVE_SHIFTBBA
+  if (tailRing->isLPring)
+  {
     p_LmDelete(m12, tailRing);
     p_LmDelete(m22, tailRing);
     // m2 is already deleted
   }
+#endif
 
   if (co != 0)
   {
