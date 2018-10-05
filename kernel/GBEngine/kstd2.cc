@@ -565,7 +565,6 @@ int redRing_Z (LObject* h,kStrategy strat)
   if (h->IsNull()) return 0; // spoly is zero (can only occure with zero divisors)
   if (strat->tl<0) return 1;
 
-  number mult, rest;
   int at/*,i*/;
   long d;
   int j = 0;
@@ -578,61 +577,78 @@ int redRing_Z (LObject* h,kStrategy strat)
   long reddeg = h->GetpFDeg();
 
   h->SetShortExpVector();
-  TObject tj; // probably needed as special reducer
   loop
   {
-    /* we do not check divisibility of lead coefficients over rings.
-     * this is postponed and checked directly before deciding how to reduce h */
+    /* check if a reducer of the lead term exists */
     j = kFindDivisibleByInT(strat, h);
     if (j < 0) {
-      j = kFindDivisibleByInT_Z(strat, h);
-      if (j < 0)
-      {
-        // over ZZ: cleanup coefficients by complete reduction with monomials
-        postReduceByMon(h, strat);
-        if(h->p == NULL)
+      /* check if a reducer with the same lead monomial exists */
+      j = kFindSameLMInT_Z(strat, h);
+      if (j < 0) {
+        /* check if a reducer of the lead monomial exists, by the above
+         * check this is a real divisor of the lead monomial */
+        j = kFindDivisibleByInT_Z(strat, h);
+        if (j < 0)
         {
-          if (h->lcm!=NULL) pLmDelete(h->lcm);
-          h->Clear();
-          tj.Clear();
-          return 0;
-        }
-        if(nIsZero(pGetCoeff(h->p))) return 2;
-        j = kFindDivisibleByInT(strat, h);
-        if(j < 0)
-        {
-          if(strat->tl >= 0)
-              h->i_r1 = strat->tl;
-          else
-              h->i_r1 = -1;
-          if (h->GetLmTailRing() == NULL)
+          // over ZZ: cleanup coefficients by complete reduction with monomials
+          postReduceByMon(h, strat);
+          if(h->p == NULL)
           {
             if (h->lcm!=NULL) pLmDelete(h->lcm);
             h->Clear();
-            tj.Clear();
             return 0;
           }
-          return 1;
+          if(nIsZero(pGetCoeff(h->p))) return 2;
+          j = kFindDivisibleByInT(strat, h);
+          if(j < 0)
+          {
+            if(strat->tl >= 0)
+              h->i_r1 = strat->tl;
+            else
+              h->i_r1 = -1;
+            if (h->GetLmTailRing() == NULL)
+            {
+              if (h->lcm!=NULL) pLmDelete(h->lcm);
+              h->Clear();
+              return 0;
+            }
+            return 1;
+          }
+        } else {
+          /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
+           * => we try to cut down the lead coefficient at least */
+          /* first copy T[j] in order to multiply it with a coefficient later on */
+          number mult, rest;
+          TObject tj  = strat->T[j];
+          tj.Copy();
+          /* tj.max_exp = strat->T[j].max_exp; */
+          /* compute division with remainder of lc(h) and lc(T[j]) */
+          rest = n_QuotRem(pGetCoeff(h->p), pGetCoeff(strat->T[j].p),
+                  &mult, currRing->cf);
+          /* set corresponding new lead coefficient already. we do not
+           * remove the lead term in ksReducePolyLC, but only apply
+           * a lead coefficient reduction */
+          tj.Mult_nn(rest);
+          ksReducePolyLC(h, &tj, NULL, &mult, strat);
+          tj.Delete();
+          tj.Clear();
         }
       } else {
-        /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
-        * => gcd-poly reduction */
+        /* same lead monomial but lead coefficients do not divide each other:
+         * change the polys to h <- spoly(h,tj) and h2 <- gpoly(h,tj). */
+        LObject h2  = *h;
+        h2.Copy();
 
-        /* first copy T[j] in order to multiply it with a coefficient later on */
-        tj  = strat->T[j];
-        tj.Copy();
-        /* compute division with remainder of lc(h) and lc(T[j]) */
-        rest = n_QuotRem(pGetCoeff(h->p), pGetCoeff(strat->T[j].p),
-            &mult, currRing->cf);
-        /* set corresponding new lead coefficient already. we do not
-        * remove the lead term in ksReducePolyLC, but only apply
-        * a lead coefficient reduction */
-        tj.Mult_nn(rest);
-        ksReducePolyLC(h, &tj, NULL, &mult, strat);
-        tj.Delete();
+        ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
+        ksReducePolyGCD(&h2, &(strat->T[j]), NULL, NULL, strat);
+        postReduceByMon(&h2, strat);
+        redtailBbaAlsoLC_Z(&h2, j, strat);
+        /* replace h2 for tj in L (already generated pairs with tj), S and T */
+        replaceInLAndSAndT(h2, strat, j);
       }
     } else {
       ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
+      nr_reds++;
     }
     /* printf("\nAfter small red: ");pWrite(h->p); */
     if (h->GetLmTailRing() == NULL)
@@ -642,7 +658,6 @@ int redRing_Z (LObject* h,kStrategy strat)
       h->lcm=NULL;
 #endif
       h->Clear();
-      tj.Clear();
       return 0;
     }
     h->SetShortExpVector();
@@ -663,7 +678,6 @@ int redRing_Z (LObject* h,kStrategy strat)
 #endif
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);     // NOT RING CHECKED OLIVER
         h->Clear();
-        tj.Clear();
         return -1;
       }
     }
@@ -679,7 +693,6 @@ int redRing_Z (LObject* h,kStrategy strat)
           at = strat->posInL(strat->L,strat->Ll,h,strat);
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           h->Clear();
-          tj.Clear();
           return -1;
         }
       }
