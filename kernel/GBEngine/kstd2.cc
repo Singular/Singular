@@ -648,7 +648,6 @@ int redRing_Z (LObject* h,kStrategy strat)
       }
     } else {
       ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
-      nr_reds++;
     }
     /* printf("\nAfter small red: ");pWrite(h->p); */
     if (h->GetLmTailRing() == NULL)
