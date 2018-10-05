@@ -2324,6 +2324,11 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // in the ring case we cannot expect LC(f) = 1,
       // therefore we call pCleardenom instead of pNorm
       strat->redTailChange=FALSE;
+
+      /* if we are computing over Z we always want to try and cut down
+       * the coefficients in the tail terms */
+      if (rField_is_Z(currRing))
+        redtailBbaAlsoLC_Z(&(strat->P), strat->tl, strat);
       if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
       {
         strat->P.pCleardenom();
