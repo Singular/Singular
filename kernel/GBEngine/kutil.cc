@@ -4991,8 +4991,8 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
   assume (rField_is_Ring(currRing));
   // enter also zero divisor * poly, if this is non zero and of smaller degree
   if (!(rField_is_Domain(currRing))) enterExtendedSpoly(h, strat);
-  initenterpairs(h, k, ecart, 0, strat, atR);
   initenterstrongPairs(h, k, ecart, 0, strat, atR);
+  initenterpairs(h, k, ecart, 0, strat, atR);
   clearSbatch(h, k, pos, strat);
 }
 
