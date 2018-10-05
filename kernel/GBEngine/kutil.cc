@@ -9655,6 +9655,106 @@ void enterSSba (LObject &p,int atS,kStrategy strat, int atR)
 /*2
 * puts p to the set T at position atT
 */
+void replaceInLAndSAndT(LObject &p, kStrategy strat, int pos)
+{
+  p.GetP(strat->lmBin);
+  if (strat->homog) strat->initEcart(&p);
+      strat->redTailChange=FALSE;
+      if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
+      {
+        p.pCleardenom();
+        if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+        {
+          p.p = redtailBba(&p,strat->sl,strat, FALSE,!TEST_OPT_CONTENTSB);
+          p.pCleardenom();
+          if (strat->redTailChange) { p.t_p=NULL; }
+        }
+      }
+
+  assume(strat->tailRing == p.tailRing);
+  assume(p.pLength == 0 || pLength(p.p) == p.pLength || rIsSyzIndexRing(currRing)); // modulo syzring
+
+  int i, j, posS, irpos;
+
+  irpos = strat->T[pos].i_r;
+  posS  = posInS(strat, strat->sl, p.p, p.ecart);
+  clearSbatch(p.p, strat->sl, posS, strat);
+  pp_Test(p.p, currRing, p.tailRing);
+  assume(p.FDeg == p.pFDeg());
+  assume(!p.is_normalized || nIsOne(pGetCoeff(p.p)));
+
+  if (currRing != strat->tailRing) {
+      p.t_p = p.GetLmTailRing();
+  }
+  if ((strat->tailBin != NULL) && (pNext(p.p) != NULL))
+  {
+    pNext(p.p)=p_ShallowCopyDelete(pNext(p.p),
+                                   (strat->tailRing != NULL ?
+                                    strat->tailRing : currRing),
+                                   strat->tailBin);
+    if (p.t_p != NULL) pNext(p.t_p) = pNext(p.p);
+  }
+  /* replace all pairs where p.p appears as a generator */
+  for (i = 0; i <= strat->Ll; ++i) {
+    if (strat->L[i].p1 != NULL && strat->L[i].p2 != NULL) {
+      if (pLmEqual(strat->L[i].p1, p.p)) {
+        number d, s, t;
+        /* we need to check if we need to replace a strong poly or a usual spoly */
+        d = n_ExtGcd(pGetCoeff(strat->L[i].p1), pGetCoeff(strat->L[i].p2), &s, &t, currRing->cf);
+        if (nIsZero(s) || nIsZero(t)) {
+          j = replaceOneSPoly(p.p, strat->L[i].p2, strat, i);
+          strat->L[i].i_r1  = irpos; // might have changed
+        } else {
+          j = replaceOneStrongPoly(p.p, strat->L[i].p2, strat, i);
+          if (j == 0) {
+            i--;
+          } else {
+            strat->L[i].i_r1  = irpos; // might have changed
+          }
+        }
+        nDelete(&d);
+        nDelete(&s);
+        nDelete(&t);
+        continue;
+      }
+      if (pLmEqual(strat->L[i].p2, p.p)) {
+        number d, s, t;
+        /* we need to check if we need to replace a strong poly or a usual spoly */
+        d = n_ExtGcd(pGetCoeff(strat->L[i].p1), pGetCoeff(strat->L[i].p2), &s, &t, currRing->cf);
+
+        if (nIsZero(s) || nIsZero(t)) {
+          j = replaceOneSPoly(strat->L[i].p1, p.p, strat, i);
+          strat->L[i].i_r2  = irpos; // might have changed
+        } else {
+          j = replaceOneStrongPoly(strat->L[i].p1, p.p, strat, i);
+          if (j == 0) {
+            i--;
+          } else {
+            strat->L[i].i_r2  = irpos; // might have changed
+          }
+        }
+        nDelete(&d);
+        nDelete(&s);
+        nDelete(&t);
+      }
+    }
+  }
+
+  strat->enterS(p, posS, strat, irpos);
+  strat->T[pos].Delete();
+  strat->T[pos] = (TObject) p;
+  strat->T[pos].i_r = irpos;
+
+  if (pNext(p.p) != NULL)
+    strat->T[pos].max_exp = p_GetMaxExpP(pNext(p.p), strat->tailRing);
+  else
+    strat->T[pos].max_exp = NULL;
+
+  strat->R[irpos] = &(strat->T[pos]);
+  assume(p.sev == 0 || pGetShortExpVector(p.p) == p.sev);
+  strat->sevT[pos] = (p.sev == 0 ? pGetShortExpVector(p.p) : p.sev);
+}
+
 void enterT(LObject &p, kStrategy strat, int atT)
 {
   int i;
