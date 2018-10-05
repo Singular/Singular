@@ -103,12 +103,11 @@ int kFindSameLMInT_Z(const kStrategy strat, const LObject* L, const int start)
       if (j > strat->tl) return o;
       if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r) && p_LmEqual(T[j].p, p, r))
       {
-        mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p),
-            &rest, currRing->cf);
+        mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p), &rest, r->cf);
         if (!n_IsZero(mult, currRing)) {
           /* try to get the probably best one, i.e. with smallest coeff */
           if (o == -1 ||
-              n_Greater(pGetCoeff(T[o].p), pGetCoeff(T[j].p), currRing->cf))
+              n_Greater(pGetCoeff(T[o].p), pGetCoeff(T[j].p), r->cf))
             o = j;
         }
       }
@@ -124,12 +123,11 @@ int kFindSameLMInT_Z(const kStrategy strat, const LObject* L, const int start)
       if (j > strat->tl) return o;
       if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r) && p_LmEqual(T[j].p, p, r))
       {
-        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p),
-            &rest, currRing->cf);
+        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p), &rest, r->cf);
         if (!n_IsZero(mult, currRing)) {
           /* try to get the probably best one, i.e. with smallest coeff */
           if (o == -1 ||
-              n_Greater(pGetCoeff(T[o].p), pGetCoeff(T[j].p), currRing->cf))
+              n_Greater(pGetCoeff(T[o].p), pGetCoeff(T[j].p), r->cf))
             o = j;
         }
       }
@@ -161,19 +159,16 @@ int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int sta
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
       {
-        mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p),
-            &rest, currRing->cf);
-        if (!n_IsZero(mult, currRing)) {
+        mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p), &rest, r->cf);
+        if (!n_IsZero(mult, r)) {
           return j;
         }
       }
 #else
-      if (!(sevT[j] & not_sev) &&
-          p_LmDivisibleBy(T[j].p, p, r))
+      if (!(sevT[j] & not_sev) && p_LmDivisibleBy(T[j].p, p, r))
       {
-        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p),
-            &rest, currRing->cf);
-        if (!n_IsZero(mult, currRing)) {
+        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p), &rest, r->cf);
+        if (!n_IsZero(mult, r)) {
           return j;
         }
       }
@@ -192,19 +187,16 @@ int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int sta
       if (p_LmShortDivisibleBy(T[j].t_p, sevT[j],
             p, not_sev, r))
       {
-        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p),
-            &rest, currRing->cf);
-        if (!n_IsZero(mult, currRing)) {
+        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p), &rest, r->cf);
+        if (!n_IsZero(mult, r)) {
           return j;
         }
       }
 #else
-      if (!(sevT[j] & not_sev) &&
-          p_LmDivisibleBy(T[j].t_p, p, r))
+      if (!(sevT[j] & not_sev) && p_LmDivisibleBy(T[j].t_p, p, r))
       {
-        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p),
-            &rest, currRing->cf);
-        if (!n_IsZero(mult, currRing)) {
+        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p), &rest, r->cf);
+        if (!n_IsZero(mult, r)) {
           return j;
         }
       }
