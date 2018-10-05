@@ -182,7 +182,7 @@ int ksReducePolyGCD(LObject* PR,
 #endif
   int ret = 0;
   ring tailRing = PR->tailRing;
-  kTest_L(PR);
+  kTest_L(PR, tailRing);
   kTest_T(PW);
 
   poly p1 = PR->GetLmTailRing();

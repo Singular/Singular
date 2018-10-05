@@ -7987,7 +7987,7 @@ void redtailBbaAlsoLC_Z (LObject* L, int end_pos, kStrategy strat )
     L->pLength = 0;
   }
 
-  kTest_L(L);
+  kTest_L(L, strat->tailRing);
   return;
 }
 
