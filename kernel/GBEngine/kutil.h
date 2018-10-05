@@ -488,6 +488,7 @@ KINLINE poly redtailBbaBound (poly p,int end_pos,kStrategy strat,int bound,BOOLE
 #ifdef HAVE_RINGS
 KINLINE poly redtailBba_Z (poly p,int end_pos,kStrategy strat);
 poly redtailBba_Z (LObject* L, int end_pos, kStrategy strat );
+void redtailBbaAlsoLC_Z (LObject* L, int end_pos, kStrategy strat );
 #endif
 poly redtailBba (LObject *L, int end_pos,kStrategy strat,
                  BOOLEAN withT = FALSE,BOOLEAN normalize=FALSE);
@@ -554,6 +555,9 @@ void initSyzRules (kStrategy strat);
 void updateS(BOOLEAN toT,kStrategy strat);
 void enterSyz (LObject &p,kStrategy strat, int atT);
 void enterT (LObject &p,kStrategy strat, int atT = -1);
+void replaceInLAndSAndT(LObject &p, kStrategy strat, int pos);
+int replaceOneStrongPoly (poly si,poly p,kStrategy strat, int posInL);
+int replaceOneSPoly (poly si,poly p,kStrategy strat, int posInL);
 #ifdef HAVE_RINGS
 void enterT_strong (LObject &p,kStrategy strat, int atT = -1);
 #endif
@@ -593,6 +597,7 @@ int kFindInT(poly p, TSet T, int tlength);
 ///        number of first divisor in T, otherwise
 int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start=0);
 int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int start=0);
+int kFindSameLMInT_Z(const kStrategy strat, const LObject* L, const int start=0);
 
 /// return -1 if no divisor is found
 ///        number of first divisor in S, otherwise
@@ -695,6 +700,13 @@ int ksReducePoly(LObject* PR,
                  kStrategy strat = NULL);
 
 int ksReducePolyLC(LObject* PR,
+                 TObject* PW,
+                 poly spNoether = NULL,
+                 number *coef = NULL,
+                 kStrategy strat = NULL);
+
+
+int ksReducePolyGCD(LObject* PR,
                  TObject* PW,
                  poly spNoether = NULL,
                  number *coef = NULL,
