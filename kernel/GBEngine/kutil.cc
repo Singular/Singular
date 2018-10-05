@@ -7940,6 +7940,8 @@ void redtailBbaAlsoLC_Z (LObject* L, int end_pos, kStrategy strat )
             } while (!Ln.IsNull());
             goto all_done;
           }
+          /* we have to break since we did not cancel the term, but only decreased
+           * its coefficient. */
           break;
         }
       } else {
