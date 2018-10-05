@@ -82,6 +82,64 @@ long sba_interreduction_operations;
 
 // return -1 if no divisor is found
 //        number of first divisor, otherwise
+int kFindSameLMInT_Z(const kStrategy strat, const LObject* L, const int start)
+{
+  unsigned long not_sev = ~L->sev;
+  int j = start;
+  int o = -1;
+
+  const TSet T=strat->T;
+  const unsigned long* sevT=strat->sevT;
+  number rest, mult;
+  if (L->p!=NULL)
+  {
+    const ring r=currRing;
+    const poly p=L->p;
+
+    pAssume(~not_sev == p_GetShortExpVector(p, r));
+
+    loop
+    {
+      if (j > strat->tl) return o;
+      if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r) && p_LmEqual(T[j].p, p, r))
+      {
+        mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p),
+            &rest, currRing->cf);
+        if (!n_IsZero(mult, currRing)) {
+          /* try to get the probably best one, i.e. with smallest coeff */
+          if (o == -1 ||
+              n_Greater(pGetCoeff(T[o].p), pGetCoeff(T[j].p), currRing->cf))
+            o = j;
+        }
+      }
+      j++;
+    }
+  }
+  else
+  {
+    const poly p=L->t_p;
+    const ring r=strat->tailRing;
+    loop
+    {
+      if (j > strat->tl) return o;
+      if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r) && p_LmEqual(T[j].p, p, r))
+      {
+        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p),
+            &rest, currRing->cf);
+        if (!n_IsZero(mult, currRing)) {
+          /* try to get the probably best one, i.e. with smallest coeff */
+          if (o == -1 ||
+              n_Greater(pGetCoeff(T[o].p), pGetCoeff(T[j].p), currRing->cf))
+            o = j;
+        }
+      }
+      j++;
+    }
+  }
+
+  return o;
+}
+
 int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int start)
 {
   unsigned long not_sev = ~L->sev;
