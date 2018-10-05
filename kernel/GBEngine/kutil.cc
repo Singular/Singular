@@ -7866,6 +7866,129 @@ poly redtailBbaBound (LObject* L, int end_pos, kStrategy strat, int bound, BOOLE
 }
 
 #ifdef HAVE_RINGS
+void redtailBbaAlsoLC_Z (LObject* L, int end_pos, kStrategy strat )
+// normalize=FALSE, withT=FALSE, coeff=Z
+{
+  strat->redTailChange=FALSE;
+
+  poly h, p;
+  p = h = L->GetLmTailRing();
+  if ((h==NULL) || (pNext(h)==NULL))
+    return;
+
+  TObject* With;
+  LObject Ln(pNext(h), strat->tailRing);
+  Ln.GetpLength();
+
+  pNext(h) = NULL;
+  if (L->p != NULL)
+  {
+    pNext(L->p) = NULL;
+    if (L->t_p != NULL) pNext(L->t_p) = NULL;
+  }
+  L->pLength = 1;
+
+  Ln.PrepareRed(strat->use_buckets);
+
+  int cnt=REDTAIL_CANONICALIZE;
+
+  while(!Ln.IsNull())
+  {
+    loop
+    {
+      if (TEST_OPT_IDLIFT)
+      {
+        if (Ln.p!=NULL)
+        {
+          if (__p_GetComp(Ln.p,currRing)> strat->syzComp) break;
+        }
+        else
+        {
+          if (__p_GetComp(Ln.t_p,strat->tailRing)> strat->syzComp) break;
+        }
+      }
+      Ln.SetShortExpVector();
+      int j;
+      j = kFindDivisibleByInT(strat, &Ln);
+      if (j < 0) {
+        j = kFindDivisibleByInT_Z(strat, &Ln);
+        if (j < 0) {
+          break;
+        } else {
+          /* reduction not cancelling a tail term, but reducing its coefficient */
+          With = &(strat->T[j]);
+          assume(With->GetpLength()==pLength(With->p != __null ? With->p : With->t_p));
+          cnt--;
+          if (cnt==0)
+          {
+            cnt=REDTAIL_CANONICALIZE;
+            /*poly tmp=*/Ln.CanonicalizeP();
+          }
+          strat->redTailChange=TRUE;
+          /* reduction cancelling a tail term */
+          if (ksReducePolyTailLC_Z(L, With, &Ln))
+          {
+            // reducing the tail would violate the exp bound
+            //  set a flag and hope for a retry (in bba)
+            strat->completeReduce_retry=TRUE;
+            if ((Ln.p != NULL) && (Ln.t_p != NULL)) Ln.p=NULL;
+            do
+            {
+              pNext(h) = Ln.LmExtractAndIter();
+              pIter(h);
+              L->pLength++;
+            } while (!Ln.IsNull());
+            goto all_done;
+          }
+          break;
+        }
+      } else {
+        With = &(strat->T[j]);
+        assume(With->GetpLength()==pLength(With->p != __null ? With->p : With->t_p));
+        cnt--;
+        if (cnt==0)
+        {
+          cnt=REDTAIL_CANONICALIZE;
+          /*poly tmp=*/Ln.CanonicalizeP();
+        }
+        strat->redTailChange=TRUE;
+        /* reduction cancelling a tail term */
+        if (ksReducePolyTail_Z(L, With, &Ln))
+        {
+          // reducing the tail would violate the exp bound
+          //  set a flag and hope for a retry (in bba)
+          strat->completeReduce_retry=TRUE;
+          if ((Ln.p != NULL) && (Ln.t_p != NULL)) Ln.p=NULL;
+          do
+          {
+            pNext(h) = Ln.LmExtractAndIter();
+            pIter(h);
+            L->pLength++;
+          } while (!Ln.IsNull());
+          goto all_done;
+        }
+      }
+      if (Ln.IsNull()) goto all_done;
+    }
+    pNext(h) = Ln.LmExtractAndIter();
+    pIter(h);
+    L->pLength++;
+  }
+
+  all_done:
+  Ln.Delete();
+  if (L->p != NULL) pNext(L->p) = pNext(p);
+
+  if (strat->redTailChange)
+  {
+    L->length = 0;
+    L->pLength = 0;
+  }
+
+  kTest_L(L);
+  return;
+}
+
 poly redtailBba_Z (LObject* L, int end_pos, kStrategy strat )
 // normalize=FALSE, withT=FALSE, coeff=Z
 {
