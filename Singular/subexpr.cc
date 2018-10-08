@@ -1707,7 +1707,11 @@ void syMake(leftv v,const char * id, package pa)
       goto id_found;
     }
     /* 6. local ring: number/poly */
-    if ((currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest))
+    if ((currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest)
+    #ifdef HAVE_SHIFTBBA
+    && (currRing->isLPring==0)
+    #endif
+    )
     {
       BOOLEAN ok=FALSE;
       /*poly p = (!yyInRingConstruction) ? pmInit(id,ok) : (poly)NULL;*/
