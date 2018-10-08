@@ -3658,11 +3658,10 @@ static proc lpMonomialsWithHoles(int d)
 //secundary procedures, all static
 
 static proc getlpCoeffs(poly q, poly p)
-{list R; poly m; intvec cq,t,lv,rv,bla;
+{list R; intvec cq,t,lv,rv,bla;
  int n = attrib(basering,"isLetterplaceRing"); int d = attrib(basering,"uptodeg");
  int i;
- m = p/q;
- cq = leadexp(m);
+ cq = leadexp(p)-leadexp(q); /* p/q */
  for (i = 1; i<= d; i++)
  {bla = cq[((i-1)*n+1)..(i*n)];
   if (bla == 0) {lv = cq[1..i*n]; cq = cq[(i*n+1)..(d*n)]; break;}
