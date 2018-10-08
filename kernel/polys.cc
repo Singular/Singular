@@ -179,11 +179,11 @@ poly singclap_gcd ( poly f, poly g, const ring r )
   }
   else         return f; // g==0 => gcd=f (but do a p_Cleardenom/pNorm)
   if (f==NULL) return g; // f==0 => gcd=g (but do a p_Cleardenom/pNorm)
-  if(!rField_is_Ring(currRing)
-  && (p_IsConstant(f,currRing)
-  ||p_IsConstant(g,currRing)))
+  if(!rField_is_Ring(r)
+  && (p_IsConstant(f,r)
+  ||p_IsConstant(g,r)))
   {
-    res=p_One(currRing);
+    res=p_One(r);
   }
   else if (r->cf->convSingNFactoryN!=ndConvSingNFactoryN)
   {
