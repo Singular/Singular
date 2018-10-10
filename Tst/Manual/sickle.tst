@@ -3,7 +3,7 @@ LIB "fpadim.lib";
 ring r = 0,(x,y),dp;
 def R = makeLetterplaceRing(5); // constructs a Letterplace ring
 setring R; // sets basering to Letterplace ring
-ideal G = x(1)*x(2), y(1)*y(2),x(1)*y(2)*x(3);
+ideal G = x*x, y*y,x*y*x;
 // G contains a Groebner basis
 sickle(G,1,1,1); // computes mistletoes, K-dimension and the Hilbert series
 sickle(G,1,0,0); // computes mistletoes only
