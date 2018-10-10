@@ -396,7 +396,7 @@ ring   rEnvelope(ring r);
 /// we must always have this test!
 static inline BOOLEAN rIsPluralRing(const ring r)
 {
-  assume(r != NULL); assume(r->cf != NULL);
+  assume(r != NULL);
 #ifdef HAVE_PLURAL
   nc_struct *n;
   return ((n=r->GetNC()) != NULL) /*&& (n->type != nc_error)*/;
@@ -405,14 +405,19 @@ static inline BOOLEAN rIsPluralRing(const ring r)
 #endif
 }
 
-static inline BOOLEAN rIsNCRing(const ring r)
+static inline BOOLEAN rIsLPRing(const ring r)
 {
-  assume(r != NULL); assume(r->cf != NULL);
-#ifdef HAVE_PLURAL
-  return (r->isLPring!=0) || rIsPluralRing(r);
+  assume(r != NULL);
+#ifdef HAVE_SHIFTBBA
+  return (r->isLPring!=0);
 #else
   return FALSE;
 #endif
+}
+
+static inline BOOLEAN rIsNCRing(const ring r)
+{
+  return rIsLPRing(r) || rIsPluralRing(r);
 }
 
 static inline BOOLEAN rIsRatGRing(const ring r)

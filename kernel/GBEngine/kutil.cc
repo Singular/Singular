@@ -7838,9 +7838,10 @@ void messageStat (int hilbcount,kStrategy strat)
   //Print("%d/%d polynomials in set L (for lazy alg.)",lrmax+1,strat->Lmax);
   Print("product criterion:%d chain criterion:%d\n",strat->cp,strat->c3);
   if (hilbcount!=0) Print("hilbert series criterion:%d\n",hilbcount);
+  #ifdef HAVE_SHIFTBBA
   /* in usual case strat->cv is 0, it gets changed only in shift routines */
   if (strat->cv!=0) Print("shift V criterion:%d\n",strat->cv);
-  /*mflush();*/
+  #endif
 }
 
 void messageStatSBA (int hilbcount,kStrategy strat)
@@ -7851,9 +7852,10 @@ void messageStatSBA (int hilbcount,kStrategy strat)
   Print("syz criterion:%d rew criterion:%d\n",strat->nrsyzcrit,strat->nrrewcrit);
   //Print("product criterion:%d chain criterion:%d\n",strat->cp,strat->c3);
   if (hilbcount!=0) Print("hilbert series criterion:%d\n",hilbcount);
+  #ifdef HAVE_SHIFTBBA
   /* in usual case strat->cv is 0, it gets changed only in shift routines */
   if (strat->cv!=0) Print("shift V criterion:%d\n",strat->cv);
-  /*mflush();*/
+  #endif
 }
 
 #ifdef KDEBUG

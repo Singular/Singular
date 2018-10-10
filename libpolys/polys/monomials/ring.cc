@@ -416,7 +416,7 @@ void   rWrite(ring r, BOOLEAN details)
     }
 #endif
   }
-  if (r->isLPring)
+  if (rIsLPRing(r))
   {
     PrintS("\n// letterplace ring");
   }

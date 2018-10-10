@@ -2212,9 +2212,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
           c_par=currRing->cf->extRing->N;
           c_par_names=currRing->cf->extRing->names;
         }
-	#ifdef HAVE_SHIFTBBA
-	if (r->isLPring==0)
-	#endif
+	if (!rIsLPRing(r))
 	{
           maFindPerm(r->names,       r->N,       r_par_names, r_par,
                      currRing->names,currRing->N,c_par_names, c_par,
@@ -4439,12 +4437,14 @@ static BOOLEAN jjLISTRING(leftv res, leftv v)
   if (mm==0) mm=0x7fff;
   int isLetterplace=(int)(long)atGet(v,"isLetterplaceRing",INT_CMD);
   ring r=rCompose(l,TRUE,mm,isLetterplace);
+  #ifdef HAVE_SHIFTBBA
   if (isLetterplace)
   {
     r->ShortOut=FALSE;
     r->CanShortOut=FALSE;
     r->isLPring=TRUE;
   }
+  #endif
   res->data=(char *)r;
   return (r==NULL);
 }
@@ -9289,7 +9289,8 @@ static BOOLEAN check_valid(const int p, const int op)
     }
     /* else, ALLOW_PLURAL */
   }
-  else if (currRing->isLPring)
+  #ifdef HAVE_SHIFTBBA
+  else if (rIsLPRing(currRing))
   {
     if ((p & ALLOW_LP)==0)
     {
@@ -9297,6 +9298,7 @@ static BOOLEAN check_valid(const int p, const int op)
       return TRUE;
     }
   }
+  #endif
   #endif
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))

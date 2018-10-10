@@ -2894,7 +2894,9 @@ ring rCompose(const lists  L, const BOOLEAN check_comp, const long bitmask,const
   // ------------------------ ??????? --------------------
 
   if (!isLetterplace) rRenameVars(R);
+  #ifdef HAVE_SHIFTBBA
   else R->isLPring=isLetterplace;
+  #endif
   if (bitmask!=0x7fff) R->bitmask=bitmask*2;
   rComplete(R);
 
