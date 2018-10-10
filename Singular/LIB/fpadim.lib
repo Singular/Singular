@@ -935,7 +935,7 @@ EXAMPLE: example iv2lp; shows examples
   int i = size(I);
   if (i > attrib(basering,"uptodeg")) {ERROR("polynomial exceeds degreebound");}
   int j; poly p = 1;
-  for (j = 1; j <= i; j++) {if (I[j] > 0) { p = lpMult(p,var(I[j]));}} //ignore zeroes, because they correspond to 1
+  for (j = 1; j <= i; j++) {if (I[j] > 0) { p = p*var(I[j]);}} //ignore zeroes, because they correspond to 1
   return(p);
 }
 example
@@ -1034,7 +1034,7 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  ideal L = x(1)*x(2),y(1)*y(2),x(1)*y(2)*x(3);
+  ideal L = x*x,y*y,x*y*x;
   lpId2ivLi(L); // returns the corresponding intvecs as a list
 }
 
@@ -1072,8 +1072,8 @@ example
   ring r = 0,(x,y,z),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  poly p = x(1)*x(2)*z(3); poly q = y(1)*y(2)*x(3)*x(4);
-  poly w= z(1)*y(2)*x(3)*z(4)*z(5);
+  poly p = x*x*z; poly q = y*y*x*x;
+  poly w= z*y*x*z*z;
   // p,q,w are some polynomials we want to transform into their
   // intvec representation
   lp2iv(p); lp2iv(q); lp2iv(w);
@@ -1113,8 +1113,8 @@ example
   ring r = 0,(x,y,z),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  poly p = x(1)*x(2)*z(3); poly q = y(1)*y(2)*x(3)*x(4);
-  poly w = z(1)*y(2)*x(3)*z(4);
+  poly p = x*x*z; poly q = y*y*x*x;
+  poly w = z*y*x*z;
   // p,q,w are some polynomials we want to transform into their
   // intvec representation
   ideal G = p,q,w;
@@ -1173,7 +1173,7 @@ ASSUME: - basering is a Letterplace ring
       // printf("for2 (j=%p, n=%p)", j, n);
       k = 1; b = 1;
       q = V[j];
-      w = lpNF(lpMult(p,q),LG);
+      w = lpNF(p*q,LG);
       if (w <> 0)
       {
         Iw = lp2iv(w);
@@ -1932,7 +1932,7 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  ideal G = x(1)*x(2), y(1)*y(2),x(1)*y(2)*x(3); // ideal G contains a
+  ideal G = x*x, y*y,x*y*x; // ideal G contains a
   //Groebner basis
   lpDHilbert(G,5,2); // invokes procedure with degree bound 5 and 2 variables
   // note that the optional parameters are not necessary, due to the finiteness
@@ -1976,7 +1976,7 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  ideal G = x(1)*x(2), y(1)*y(2),x(1)*y(2)*x(3); // ideal G contains a
+  ideal G = x*x, y*y,x*y*x; // ideal G contains a
   //Groebner basis
   lpDHilbertSickle(G,5,2); //invokes procedure with degree bound 5 and 2 variables
   // note that the optional parameters are not necessary, due to the finiteness
@@ -2014,7 +2014,7 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  ideal G = x(1)*x(2), y(1)*y(2),x(1)*y(2)*x(3); // ideal G contains a
+  ideal G = x*x, y*y,x*y*x; // ideal G contains a
   //Groebner basis
   lpHilbert(G,5,2); // invokes procedure with degree bound 5 and 2 variables
   // note that the optional parameters are not necessary, due to the finiteness
@@ -2043,9 +2043,9 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  ideal G = x(1)*x(2), y(1)*y(2),x(1)*y(2)*x(3);
+  ideal G = x*x, y*y,x*y*x;
   // Groebner basis
-  ideal I = x(1)*x(2), y(1)*x(2)*y(3), x(1)*y(2)*x(3);
+  ideal I = x*x, y*x*y, x*y*x;
   // Groebner basis
   lpDimCheck(G); // invokes procedure, factor algebra is of finite K-dimension
   lpDimCheck(I); // invokes procedure, factor algebra is of infinite Kdimension
@@ -2078,7 +2078,7 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  ideal G = x(1)*x(2), y(1)*y(2),x(1)*y(2)*x(3);
+  ideal G = x*x, y*y,x*y*x;
   // ideal G contains a Groebner basis
   lpKDim(G); //procedure invoked with ring parameters
   // the factor algebra is finite, so the degree bound given by the Letterplace
@@ -2105,7 +2105,7 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  ideal L = x(1)*y(2),y(1)*x(2)*y(3);
+  ideal L = x*y,y*x*y;
   // ideal containing the mistletoes
   lpMis2Base(L); // returns the K-basis of the factor algebra
 }
@@ -2129,7 +2129,7 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  ideal L = x(1)*y(2),y(1)*x(2)*y(3);
+  ideal L = x*y,y*x*y;
   // ideal containing the mistletoes
   lpMis2Dim(L); // returns the K-dimension of the factor algebra
 }
@@ -2150,7 +2150,7 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  ideal M = x(1)*y(2)*x(3), y(1)*y(2)*x(3), x(1)*x(2), y(1)*x(2)*x(3)*x(4);
+  ideal M = x*y*x, y*y*x, x*x, y*x*x*x;
   // some monomials
   lpOrdMisLex(M); // orders the monomials lexicographically
 }
@@ -2185,7 +2185,7 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  ideal G = x(1)*x(2), y(1)*y(2),x(1)*y(2)*x(3); // ideal G contains a
+  ideal G = x*x, y*y,x*y*x; // ideal G contains a
   //Groebner basis
   lpSickle(G); //invokes the procedure with ring parameters
   // the factor algebra is finite, so the degree bound given by the Letterplace
@@ -2224,7 +2224,7 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  ideal G = x(1)*x(2), y(1)*y(2),x(1)*y(2)*x(3); // ideal G contains a
+  ideal G = x*x, y*y,x*y*x; // ideal G contains a
   //Groebner basis
   lpSickleDim(G); // invokes the procedure with ring parameters
   // the factor algebra is finite, so the degree bound given by the Letterplace
@@ -2265,7 +2265,7 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  ideal G = x(1)*x(2), y(1)*y(2),x(1)*y(2)*x(3); // ideal G contains a
+  ideal G = x*x, y*y,x*y*x; // ideal G contains a
   //Groebner basis
   lpSickleHil(G); // invokes the procedure with ring parameters
   // the factor algebra is finite, so the degree bound given by the Letterplace
@@ -2329,7 +2329,7 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  ideal G = x(1)*x(2), y(1)*y(2),x(1)*y(2)*x(3);
+  ideal G = x*x, y*y,x*y*x;
   // G contains a Groebner basis
   sickle(G,1,1,1); // computes mistletoes, K-dimension and the Hilbert series
   sickle(G,1,0,0); // computes mistletoes only
@@ -2495,7 +2495,7 @@ example
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(7); setring R;
-  ideal J = x(1)*y(2)*x(3) - y(1)*x(2)*y(3);
+  ideal J = x*y*x - y*x*y;
   option(redSB); option(redTail);
   J = letplaceGBasis(J);
   J;
@@ -2619,9 +2619,9 @@ proc tst_fpadim()
    int d =10; // degree
    def R = makeLetterplaceRing(d);
    setring R;
-   ideal I = y(1)*x(2)*y(3) - z(1)*y(2)*z(3), x(1)*y(2)*x(3) - z(1)*x(2)*y(3),
-   z(1)*x(2)*z(3) - y(1)*z(2)*x(3), x(1)*x(2)*x(3) + y(1)*y(2)*y(3) +
-   z(1)*z(2)*z(3) + x(1)*y(2)*z(3);
+   ideal I = y*x*y - z*y*z, x*y*x - z*x*y,
+   z*x*z - y*z*x, x*x*x + y*y*y +
+   z*z*z + x*y*z;
    option(prot);
    option(redSB);option(redTail);option(mem);
    ideal J = system("freegb",I,d,3);
@@ -2635,9 +2635,9 @@ proc tst_fpadim()
    int d =11; // degree
    def R = makeLetterplaceRing(d);
    setring R;
-   ideal I = y(1)*x(2)*y(3) - z(1)*y(2)*z(3), x(1)*y(2)*z(3) - z(1)*x(2)*y(3),
-   z(1)*x(2)*z(3) - y(1)*z(2)*x(3), x(1)*x(2)*x(3) + y(1)*y(2)*y(3) +
-   z(1)*z(2)*z(3) + x(1)*y(2)*z(3);
+   ideal I = y*x*y - z*y*z, x*y*z - z*x*y,
+   z*x*z - y*z*x, x*x*x + y*y*y +
+   z*z*z + x*y*z;
    option(prot);
    option(redSB);option(redTail);option(mem);
    ideal J = system("freegb",I,d,3);
@@ -2651,8 +2651,8 @@ proc tst_fpadim()
    int d  = 6; // degree
    def R  = makeLetterplaceRing(d);
    setring R;
-   ideal I = y(1)*x(2)*y(3) - z(1)*y(2)*z(3), x(1)*y(2)*x(3) - z(1)*x(2)*y(3),
-   z(1)*x(2)*z(3) - y(1)*z(2)*x(3), x(1)*x(2)*x(3) -2*y(1)*y(2)*y(3) + 3*z(1)*z(2)*z(3) -4*x(1)*y(2)*z(3) + 5*x(1)*z(2)*z(3)- 6*x(1)*y(2)*y(3) +7*x(1)*x(2)*z(3) - 8*x(1)*x(2)*y(3);
+   ideal I = y*x*y - z*y*z, x*y*x - z*x*y,
+   z*x*z - y*z*x, x*x*x -2*y*y*y + 3*z*z*z -4*x*y*z + 5*x*z*z- 6*x*y*y +7*x*x*z - 8*x*x*y;
    option(prot);
    option(redSB);option(redTail);option(mem);
    ideal J = system("freegb",I,d,3);
@@ -2670,7 +2670,7 @@ int d =10; // degree
 def R = makeLetterplaceRing(d);
 setring R;
 ideal I =
-z(1)*z(2)*z(3)*z(4) + y(1)*x(2)*y(3)*x(4) - x(1)*y(2)*y(3)*x(4) - 3*z(1)*y(2)*x(3)*z(4), x(1)*x(2)*x(3) + y(1)*x(2)*y(3) - x(1)*y(2)*x(3), z(1)*y(2)*x(3)-x(1)*y(2)*z(3) + z(1)*x(2)*z(3);
+z*z*z*z + y*x*y*x - x*y*y*x - 3*z*y*x*z, x*x*x + y*x*y - x*y*x, z*y*x-x*y*z + z*x*z;
 option(prot);
 option(redSB);option(redTail);option(mem);
 ideal J = system("freegb",I,d,nvars(r));
@@ -2683,7 +2683,7 @@ ring r = 0,(x,y,z),dp;
 int d =10; // degree
 def R = makeLetterplaceRing(d);
 setring R;
-ideal I = x(1)*y(2) + y(1)*z(2), x(1)*x(2) + x(1)*y(2) - y(1)*x(2) - y(1)*y(2);
+ideal I = x*y + y*z, x*x + x*y - y*x - y*y;
 option(prot);
 option(redSB);option(redTail);option(mem);
 ideal J = system("freegb",I,d,3);
@@ -2765,14 +2765,14 @@ sickle(J,1,1,1,d);
 
 proc TestGKAuslander3()
 {
-  ring r = (0,q),(z,x,y),(dp(1),dp(2));
+  ring r = (0,q),(z,x,y),(dp(2),dp(2));
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   R; setring R; // sets basering to Letterplace ring
   ideal I;
-  I = q*x(1)*y(2) - y(1)*x(2), z(1)*y(2) - y(1)*z(2), z(1)*x(2) - x(1)*z(2);
+  I = q*x*y - y*x, z*y - y*z, z*x - x*z;
   I = letplaceGBasis(I);
   lpGkDim(I); // must be 3
-  I = x(1)*y(2)*z(3) - y(1)*x(2), z(1)*y(2) - y(1)*z(2), z(1)*x(2) - x(1)*z(2);//gkDim = 2
+  I = x*y*z - y*x, z*y - y*z, z*x - x*z;//gkDim = 2
   I = letplaceGBasis(I); // not finite BUT contains a poly in x,y only
   lpGkDim(I); // must be 4
 
@@ -2780,9 +2780,9 @@ proc TestGKAuslander3()
   def R = makeLetterplaceRing(10); // constructs a Letterplace ring
   R; setring R; // sets basering to Letterplace ring
   ideal I;
-  I = x(1)*y(2)*z(3) - y(1)*x(2), z(1)*y(2) - y(1)*z(2), z(1)*x(2) - x(1)*z(2);//gkDim = 2
+  I = x*y*z - y*x, z*y - y*z, z*x - x*z;//gkDim = 2
   I = letplaceGBasis(I); // computed as it would be homogenized; infinite
-  poly p = x(1)*y(2)*y(3)*x(4)-y(1)*x(2)*x(3)*y(4);
+  poly p = x*y*y*x-y*x*x*y;
   lpNF(p, I); // 0 as expected
 
   // with inverse of z
@@ -2790,8 +2790,8 @@ proc TestGKAuslander3()
   def R = makeLetterplaceRing(11); // constructs a Letterplace ring
   R; setring R; // sets basering to Letterplace ring
   ideal I;
-  I = x(1)*y(2)*z(3) - y(1)*x(2), z(1)*y(2) - y(1)*z(2), z(1)*x(2) - x(1)*z(2),
-    iz(1)*y(2) - y(1)*iz(2), iz(1)*x(2) - x(1)*iz(2), iz(1)*z(2)-1, z(1)*iz(2) -1;
+  I = x*y*z - y*x, z*y - y*z, z*x - x*z,
+    iz*y - y*iz, iz*x - x*iz, iz*z-1, z*iz -1;
   I = letplaceGBasis(I); //
   setring r;
   def R2 = makeLetterplaceRing(23); // constructs a Letterplace ring
@@ -2800,12 +2800,12 @@ proc TestGKAuslander3()
   lpGkDim(I);
 
 
-  ring r = 0,(t,z,x,y),(dp(2),dp(2));
+  ring r = 0,(t,z,x,y),(dp,dp);
   def R = makeLetterplaceRing(20); // constructs a Letterplace ring
   R; setring R; // sets basering to Letterplace ring
   ideal I;
-  I = x(1)*y(2)*z(3) - y(1)*x(2)*t(3), z(1)*y(2) - y(1)*z(2), z(1)*x(2) - x(1)*z(2),
-    t(1)*y(2) - y(1)*t(2), t(1)*x(2) - x(1)*t(2), t(1)*z(2) - z(1)*t(2);//gkDim = 2
+  I = x*y*z - y*x*t, z*y - y*z, z*x - x*z,
+    t*y - y*t, t*x - x*t, t*z - z*t;//gkDim = 2
   I = letplaceGBasis(I); // computed as it would be homogenized; infinite
   LIB "elim.lib";
   ideal Inoz = nselect(I,intvec(2,6,10,14,18,22,26,30));
@@ -2813,16 +2813,16 @@ proc TestGKAuslander3()
   {
     Inoz=subst(Inoz,t(i),1);
   }
-  ideal J = x(1)*y(2)*y(3)*x(4)-y(1)*x(2)*x(3)*y(4);
+  ideal J = x*y*y*x-y*x*x*y;
   J = letplaceGBasis(J);
 
-  poly p = x(1)*y(2)*y(3)*x(4)-y(1)*x(2)*x(3)*y(4);
+  poly p = x*y*y*x-y*x*x*y;
   lpNF(p, I); // 0 as expected
 
   ring r2 = 0,(x,y),dp;
   def R2 = makeLetterplaceRing(50); // constructs a Letterplace ring
   setring R2;
-  ideal J = x(1)*y(2)*y(3)*x(4)-y(1)*x(2)*x(3)*y(4);
+  ideal J = x*y*y*x-y*x*x*y;
   J = letplaceGBasis(J);
 }
 
@@ -2834,10 +2834,10 @@ LIB "fpadim.lib";
 ring r = (0,a,b,g),(x,y),Dp;
 def R = makeLetterplaceRing(6); // constructs a Letterplace ring
 setring R;
-poly F1 = g*x(1);
-poly F2 = g*y(1);
-ideal J = x(1)*x(2)*y(3)-a*x(1)*y(2)*x(3) - b*y(1)*x(2)*x(3) - F1,
-x(1)*y(2)*y(3)-a*y(1)*x(2)*y(3) - b*y(1)*y(2)*x(3) - F2;
+poly F1 = g*x;
+poly F2 = g*y;
+ideal J = x*x*y-a*x*y*x - b*y*x*x - F1,
+x*y*y-a*y*x*y - b*y*y*x - F2;
 J = letplaceGBasis(J);
 lpGkDim(J); // 3 == correct
 
@@ -2846,7 +2846,7 @@ LIB "fpadim.lib";
 ring r = (0,a,b,g, p(1..7),q(1..7)),(x,y),Dp;
 def R = makeLetterplaceRing(6); // constructs a Letterplace ring
 setring R;
-ideal imn = 1, y(1)*y(2)*y(3), x(1)*y(2), y(1)*x(2), x(1)*x(2), y(1)*y(2), x(1), y(1);
+ideal imn = 1, y*y*y, x*y, y*x, x*x, y*y, x, y;
 int i;
 poly F1, F2;
 for(i=1;i<=7;i++)
@@ -2854,8 +2854,8 @@ for(i=1;i<=7;i++)
 F1 = F1 + p(i)*imn[i];
 F2 = F2 + q(i)*imn[i];
 }
-ideal J = x(1)*x(2)*y(3)-a*x(1)*y(2)*x(3) - b*y(1)*x(2)*x(3) - F1,
-x(1)*y(2)*y(3)-a*y(1)*x(2)*y(3) - b*y(1)*y(2)*x(3) - F2;
+ideal J = x*x*y-a*x*y*x - b*y*x*x - F1,
+x*y*y-a*y*x*y - b*y*y*x - F2;
 J = letplaceGBasis(J);
 lpGkDim(J); // 3 == correct
 

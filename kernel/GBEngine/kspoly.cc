@@ -19,6 +19,10 @@
 #ifdef HAVE_RINGS
 #include "kernel/polys.h"
 #endif
+#ifdef HAVE_SHIFTBBA
+#include "kernel/GBEngine/shiftgb.h"
+#include "polys/shiftop.h"
+#endif
 
 #ifdef KDEBUG
 int red_count = 0;
@@ -122,6 +126,13 @@ int ksReducePoly(LObject* PR,
     }
   }
 
+#ifdef HAVE_SHIFTBBA
+  poly lmRight;
+  if (tailRing->isLPring) {
+    k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
+  }
+#endif
+
   // take care of coef buisness
   if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
   {
@@ -129,6 +140,9 @@ int ksReducePoly(LObject* PR,
     number an = pGetCoeff(p2);
     int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
     p_SetCoeff(lm, bn, tailRing);
+#ifdef HAVE_SHIFTBBA
+    if (tailRing->isLPring) pSetCoeff0(p1, bn); // lm doesn't point to p1 anymore, if the coef was a pointer, it has been deleted
+#endif
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
@@ -141,23 +155,18 @@ int ksReducePoly(LObject* PR,
 
 
   // and finally,
-  PR->Tail_Minus_mm_Mult_qq(lm, t2, pLength(t2) /*PW->GetpLength() - 1*/, spNoether);
+#ifdef HAVE_SHIFTBBA
+  if (tailRing->isLPring)
+  {
+    PR->Tail_Minus_mm_Mult_qq(lm, tailRing->p_Procs->pp_Mult_mm(t2, lmRight, tailRing), pLength(t2), spNoether);
+  }
+  else
+#endif
+  {
+    PR->Tail_Minus_mm_Mult_qq(lm, t2, pLength(t2) /*PW->GetpLength() - 1*/, spNoether);
+  }
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
   PR->LmDeleteAndIter();
-
-  // the following is commented out: shrinking
-#ifdef HAVE_SHIFTBBA_NONEXISTENT
-  if ( (currRing->isLPring) && (!strat->homog) )
-  {
-    // assume? h->p in currRing
-    PR->GetP();
-    poly qq = p_Shrink(PR->p, currRing->isLPring, currRing);
-    PR->Clear(); // does the right things
-    PR->p = qq;
-    PR->t_p = NULL;
-    PR->SetShortExpVector();
-  }
-#endif
 
   return ret;
 }
@@ -399,6 +408,13 @@ int ksReducePolyBound(LObject* PR,
     }
   }
 
+#ifdef HAVE_SHIFTBBA
+  poly lmRight;
+  if (tailRing->isLPring) {
+    k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
+  }
+#endif
+
   // take care of coef buisness
   if (! n_IsOne(pGetCoeff(p2), tailRing))
   {
@@ -406,6 +422,9 @@ int ksReducePolyBound(LObject* PR,
     number an = pGetCoeff(p2);
     int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
     p_SetCoeff(lm, bn, tailRing);
+#ifdef HAVE_SHIFTBBA
+    if (tailRing->isLPring) pSetCoeff0(p1, bn); // lm doesn't point to p1 anymore, if the coef was a pointer, it has been deleted
+#endif
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
@@ -418,23 +437,18 @@ int ksReducePolyBound(LObject* PR,
 
 
   // and finally,
-  PR->Tail_Minus_mm_Mult_qq(lm, t2, pLength(t2) /*PW->GetpLength() - 1*/, spNoether);
+#ifdef HAVE_SHIFTBBA
+  if (tailRing->isLPring)
+  {
+    PR->Tail_Minus_mm_Mult_qq(lm, tailRing->p_Procs->pp_Mult_mm(t2, lmRight, tailRing), pLength(t2), spNoether);
+  }
+  else
+#endif
+  {
+    PR->Tail_Minus_mm_Mult_qq(lm, t2, pLength(t2) /*PW->GetpLength() - 1*/, spNoether);
+  }
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
   PR->LmDeleteAndIter();
-
-  // the following is commented out: shrinking
-#ifdef HAVE_SHIFTBBA_NONEXISTENT
-  if ( (currRing->isLPring) && (!strat->homog) )
-  {
-    // assume? h->p in currRing
-    PR->GetP();
-    poly qq = p_Shrink(PR->p, currRing->isLPring, currRing);
-    PR->Clear(); // does the right things
-    PR->p = qq;
-    PR->t_p = NULL;
-    PR->SetShortExpVector();
-  }
-#endif
 
 #if defined(KDEBUG) && defined(TEST_OPT_DEBUG_RED)
   if (TEST_OPT_DEBUG)
@@ -605,6 +619,13 @@ int ksReducePolySig(LObject* PR,
     }
   }
 
+#ifdef HAVE_SHIFTBBA
+  poly lmRight;
+  if (tailRing->isLPring) {
+    k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
+  }
+#endif
+
   // take care of coef buisness
   if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
   {
@@ -612,6 +633,9 @@ int ksReducePolySig(LObject* PR,
     number an = pGetCoeff(p2);
     int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
     p_SetCoeff(lm, bn, tailRing);
+#ifdef HAVE_SHIFTBBA
+    if (tailRing->isLPring) pSetCoeff0(p1, bn); // lm doesn't point to p1 anymore, if the coef was a pointer, it has been deleted
+#endif
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
@@ -624,23 +648,18 @@ int ksReducePolySig(LObject* PR,
 
 
   // and finally,
-  PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
+#ifdef HAVE_SHIFTBBA
+  if (tailRing->isLPring)
+  {
+    PR->Tail_Minus_mm_Mult_qq(lm, tailRing->p_Procs->pp_Mult_mm(t2, lmRight, tailRing), pLength(t2), spNoether);
+  }
+  else
+#endif
+  {
+    PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
+  }
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
   PR->LmDeleteAndIter();
-
-  // the following is commented out: shrinking
-#ifdef HAVE_SHIFTBBA_NONEXISTENT
-  if ( (currRing->isLPring) && (!strat->homog) )
-  {
-    // assume? h->p in currRing
-    PR->GetP();
-    poly qq = p_Shrink(PR->p, currRing->isLPring, currRing);
-    PR->Clear(); // does the right things
-    PR->p = qq;
-    PR->t_p = NULL;
-    PR->SetShortExpVector();
-  }
-#endif
 
 #if defined(KDEBUG) && defined(TEST_OPT_DEBUG_RED)
   if (TEST_OPT_DEBUG)
@@ -843,10 +862,21 @@ int ksReducePolySigRing(LObject* PR,
       ret = 1;
     }
   }
+
+#ifdef HAVE_SHIFTBBA
+  poly lmRight;
+  if (tailRing->isLPring) {
+    k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
+  }
+#endif
+
   // take care of coef buisness
   if(rField_is_Ring(currRing))
   {
     p_SetCoeff(lm, nDiv(pGetCoeff(lm),pGetCoeff(p2)), tailRing);
+#ifdef HAVE_SHIFTBBA
+    if (tailRing->isLPring) pSetCoeff0(p1, pGetCoeff(lm)); // lm doesn't point to p1 anymore, if the coef was a pointer, it has been deleted
+#endif
     if (coef != NULL) *coef = n_Init(1, tailRing->cf);
   }
   else
@@ -857,6 +887,9 @@ int ksReducePolySigRing(LObject* PR,
       number an = pGetCoeff(p2);
       int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
       p_SetCoeff(lm, bn, tailRing);
+#ifdef HAVE_SHIFTBBA
+      if (tailRing->isLPring) pSetCoeff0(p1, bn); // lm doesn't point to p1 anymore, if the coef was a pointer, it has been deleted
+#endif
       if (((ct == 0) || (ct == 2)))
         PR->Tail_Mult_nn(an);
       if (coef != NULL) *coef = an;
@@ -869,23 +902,19 @@ int ksReducePolySigRing(LObject* PR,
   }
 
   // and finally,
-  PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
+#ifdef HAVE_SHIFTBBA
+  if (tailRing->isLPring)
+  {
+    PR->Tail_Minus_mm_Mult_qq(lm, tailRing->p_Procs->pp_Mult_mm(t2, lmRight, tailRing), pLength(t2), spNoether);
+  }
+  else
+#endif
+  {
+    PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
+  }
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
   PR->LmDeleteAndIter();
 
-  // the following is commented out: shrinking
-#ifdef HAVE_SHIFTBBA_NONEXISTENT
-  if ( (currRing->isLPring) && (!strat->homog) )
-  {
-    // assume? h->p in currRing
-    PR->GetP();
-    poly qq = p_Shrink(PR->p, currRing->isLPring, currRing);
-    PR->Clear(); // does the right things
-    PR->p = qq;
-    PR->t_p = NULL;
-    PR->SetShortExpVector();
-  }
-#endif
 #if defined(KDEBUG) && defined(TEST_OPT_DEBUG_RED)
   if (TEST_OPT_DEBUG)
   {
@@ -946,6 +975,20 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   if (m1 == NULL)
     k_GetLeadTerms(p1, p2, currRing, m1, m2, tailRing);
 
+#ifdef HAVE_SHIFTBBA
+  poly m12, m22;
+  if (tailRing->isLPring)
+  {
+    // note: because of the crits, p2 is never shifted
+    int split = p_mFirstVblock(p1, tailRing);
+    k_SplitFrame(m1, m12, split, tailRing);
+    k_SplitFrame(m2, m22, split, tailRing);
+    // manually free the coeffs, because pSetCoeff0 is used in the next step
+    n_Delete(&(m1->coef), tailRing->cf);
+    n_Delete(&(m2->coef), tailRing->cf);
+  }
+#endif
+
   pSetCoeff0(m1, lc2);
   pSetCoeff0(m2, lc1);  // and now, m1 * LT(p1) == m2 * LT(p2)
 
@@ -977,19 +1020,47 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
     assume(l2 == pLength(a2));
   }
   else
-    a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, tailRing);
+#ifdef HAVE_SHIFTBBA
+    if (tailRing->isLPring)
+    {
+      // m2*a2*m22
+      a2 = tailRing->p_Procs->pp_Mult_mm(tailRing->p_Procs->pp_mm_Mult(a2, m2, tailRing), m22, tailRing);
+    }
+    else
+#endif
+    {
+      a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, tailRing);
+    }
 #ifdef HAVE_RINGS
   if (!(rField_is_Domain(currRing))) l2 = pLength(a2);
 #endif
 
   Pair->SetLmTail(m2, a2, l2, use_buckets, tailRing);
 
-  // get m2*a2 - m1*a1
-  Pair->Tail_Minus_mm_Mult_qq(m1, a1, l1, spNoether);
+#ifdef HAVE_SHIFTBBA
+  if (tailRing->isLPring)
+  {
+    // get m2*a2*m22 - m1*a1*m12
+    Pair->Tail_Minus_mm_Mult_qq(m1, tailRing->p_Procs->pp_Mult_mm(a1, m12, tailRing), l1, spNoether);
+  }
+  else
+#endif
+  {
+    // get m2*a2 - m1*a1
+    Pair->Tail_Minus_mm_Mult_qq(m1, a1, l1, spNoether);
+  }
 
   // Clean-up time
   Pair->LmDeleteAndIter();
   p_LmDelete(m1, tailRing);
+#ifdef HAVE_SHIFTBBA
+  if (tailRing->isLPring)
+  {
+    p_LmDelete(m12, tailRing);
+    p_LmDelete(m22, tailRing);
+    // m2 is already deleted
+  }
+#endif
 
   if (co != 0)
   {
@@ -1002,21 +1073,6 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
       p_SetCompP(p2,0, currRing, tailRing);
     }
   }
-
-  // the following is commented out: shrinking
-#ifdef HAVE_SHIFTBBA_NONEXISTENT
-  if (currRing->isLPring)
-  {
-    // assume? h->p in currRing
-    Pair->GetP();
-    poly qq = p_Shrink(Pair->p, currRing->isLPring, currRing);
-    Pair->Clear(); // does the right things
-    Pair->p = qq;
-    Pair->t_p = NULL;
-    Pair->SetShortExpVector();
-  }
-#endif
-
 }
 
 int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
@@ -1057,20 +1113,6 @@ int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
 
   if (Lp == Save)
     With.Delete();
-
-  // the following is commented out: shrinking
-#ifdef HAVE_SHIFTBBA_NONEXISTENT
-  if (currRing->isLPring)
-  {
-    // assume? h->p in currRing
-    PR->GetP();
-    poly qq = p_Shrink(PR->p, currRing->isLPring, currRing);
-    PR->Clear(); // does the right things
-    PR->p = qq;
-    PR->t_p = NULL;
-    PR->SetShortExpVector();
-  }
-#endif
 
   return ret;
 }
@@ -1114,20 +1156,6 @@ int ksReducePolyTailBound(LObject* PR, TObject* PW, int bound, poly Current, pol
   if (Lp == Save)
     With.Delete();
 
-  // the following is commented out: shrinking
-#ifdef HAVE_SHIFTBBA_NONEXISTENT
-  if (currRing->isLPring)
-  {
-    // assume? h->p in currRing
-    PR->GetP();
-    poly qq = p_Shrink(PR->p, currRing->isLPring, currRing);
-    PR->Clear(); // does the right things
-    PR->p = qq;
-    PR->t_p = NULL;
-    PR->SetShortExpVector();
-  }
-#endif
-
   return ret;
 }
 
@@ -1150,6 +1178,17 @@ int ksReducePolyTailBound(LObject* PR, TObject* PW, int bound, poly Current, pol
 poly ksCreateShortSpoly(poly p1, poly p2, ring tailRing)
 {
   poly a1 = pNext(p1), a2 = pNext(p2);
+#ifdef HAVE_SHIFTBBA
+  int shift1, shift2;
+  if (tailRing->isLPring) {
+    // assume: LM is shifted, tail unshifted
+    assume(p_FirstVblock(a1, tailRing) <= 1);
+    assume(p_FirstVblock(a2, tailRing) <= 1);
+    // save the shift of the LM so we can shift the other monomials on demand
+    shift1 = p_mFirstVblock(p1, tailRing) - 1;
+    shift2 = p_mFirstVblock(p2, tailRing) - 1;
+  }
+#endif
   long c1=p_GetComp(p1, currRing),c2=p_GetComp(p2, currRing);
   long c;
   poly m1,m2;
@@ -1180,6 +1219,14 @@ poly ksCreateShortSpoly(poly p1, poly p2, ring tailRing)
   }
 #endif
 
+#ifdef HAVE_SHIFTBBA
+  // shift the next monomial on demand
+  if (tailRing->isLPring)
+  {
+    a1 = p_LPCopyAndShiftLM(a1, shift1, tailRing);
+    a2 = p_LPCopyAndShiftLM(a2, shift2, tailRing);
+  }
+#endif
   if (a1==NULL)
   {
     if(a2!=NULL)
@@ -1400,6 +1447,13 @@ x1:
           t1 = nMult(pGetCoeff(a2),lc1);
         }
       }
+    }
+#endif
+#ifdef HAVE_SHIFTBBA
+    if (tailRing->isLPring)
+    {
+      a1 = p_LPCopyAndShiftLM(a1, shift1, tailRing);
+      a2 = p_LPCopyAndShiftLM(a2, shift2, tailRing);
     }
 #endif
     if (a2==NULL)

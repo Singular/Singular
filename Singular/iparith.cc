@@ -2212,9 +2212,22 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
           c_par=currRing->cf->extRing->N;
           c_par_names=currRing->cf->extRing->names;
         }
-        maFindPerm(r->names,       r->N,       r_par_names, r_par,
-                   currRing->names,currRing->N,c_par_names, c_par,
-                   perm,par_perm, currRing->cf->type);
+	#ifdef HAVE_SHIFTBBA
+	if (r->isLPring==0)
+	#endif
+	{
+          maFindPerm(r->names,       r->N,       r_par_names, r_par,
+                     currRing->names,currRing->N,c_par_names, c_par,
+                     perm,par_perm, currRing->cf->type);
+        }
+	#ifdef HAVE_SHIFTBBA
+	else
+	{
+          maFindPermLP(r->names,       r->N,       r_par_names, r_par,
+                     currRing->names,currRing->N,c_par_names, c_par,
+                     perm,par_perm, currRing->cf->type,r->isLPring);
+	}
+	#endif
       }
       else
       {

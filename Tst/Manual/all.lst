@@ -825,7 +825,6 @@ lpId2ivLi.tst
 lpKDim.tst
 lpMis2Base.tst
 lpMis2Dim.tst
-lpMult.tst
 lpNF.tst
 lpOrdMisLex.tst
 lpPower.tst
@@ -1238,7 +1237,6 @@ setring.tst
 sheafCoh.tst
 sheafCohBGG.tst
 sheafCohBGG2.tst
-shiftPoly.tst
 short.tst
 show.tst
 showNmzOptions.tst

@@ -227,6 +227,83 @@ void maFindPerm(char const * const * const preim_names, int preim_n, char const 
   }
 }
 
+#ifdef HAVE_SHIFTBBA
+void maFindPermLP(char const * const * const preim_names, int preim_n, char const * const * const preim_par, int preim_p,
+                char const * const * const names,       int n,       char const * const * const par,       int nop,
+                int * perm, int *par_perm, n_coeffType ch, int lV)
+{
+  int i,j,b;
+  /* find correspondig vars */
+  for  (b=0;b<preim_n/lV;b++)
+  {
+    for (i=b*lV; i<(b+1)*lV; i++)
+    {
+      int cnt=0;
+      for(j=0; j<n; j++)
+      {
+        if (strcmp(preim_names[i],names[j])==0)
+        {
+	  if (cnt==b)
+	  {
+            if (BVERBOSE(V_IMAP))
+              Print("// var %s: nr %d -> nr %d\n",preim_names[i],i+1,j+1);
+            /* var i+1 from preimage ring is var j+1  (index j+1) from image ring */
+            perm[i+1]=j+1;
+            break;
+	  }
+	  else cnt++;
+        }
+      }
+      if ((perm[i+1]==0)&&(par!=NULL)
+        // do not consider par of Fq
+         && (ch!=n_GF))
+      {
+        for(j=0; j<nop; j++)
+        {
+          if (strcmp(preim_names[i],par[j])==0)
+          {
+            if (BVERBOSE(V_IMAP))
+              Print("// var %s: nr %d -> par %d\n",preim_names[i],i+1,j+1);
+            /* var i+1 from preimage ring is par j+1 (index j) from image ring */
+            perm[i+1]=-(j+1);
+          }
+        }
+      }
+    }
+  }
+  if (par_perm!=NULL)
+  {
+    for (i=0; i<preim_p; i++)
+    {
+      for(j=0; j<n; j++)
+      {
+        if (strcmp(preim_par[i],names[j])==0)
+        {
+          if (BVERBOSE(V_IMAP))
+            Print("// par %s: par %d -> nr %d\n",preim_par[i],i+1,j+1);
+          /*par i+1 from preimage ring is var j+1  (index j+1) from image ring*/
+          par_perm[i]=j+1;
+          break;
+        }
+      }
+      if ((par!=NULL) && (par_perm[i]==0))
+      {
+        for(j=0; j<nop; j++)
+        {
+          if (strcmp(preim_par[i],par[j])==0)
+          {
+            if (BVERBOSE(V_IMAP))
+              Print("// par %s: nr %d -> par %d\n",preim_par[i],i+1,j+1);
+            /*par i+1 from preimage ring is par j+1 (index j) from image ring */
+            par_perm[i]=-(j+1);
+          }
+        }
+      }
+    }
+  }
+}
+#endif
+
 /*2
 * embeds poly p from the subring r into the current ring
 */
