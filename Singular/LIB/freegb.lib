@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="version freegb.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version freegb.lib 4.1.1.4 Oct_2018 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY: freegb.lib   Compute two-sided Groebner bases in free algebras via letterplace approach
