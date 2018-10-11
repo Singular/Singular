@@ -21,7 +21,6 @@ lpNF(f,I); two-sided normal form of f with respect to ideal I
 setLetterplaceAttributes(R,d,b); supplies ring R with the letterplace structure
 freeGBasis(L, n);  computes two-sided Groebner basis of an ideal, encoded via list L, up to degree n
 
-lpPower(f,n);   natural power of a letterplace polynomial
 lieBracket(a,b[, N]);  compute Lie bracket ab-ba of two letterplace polynomials
 
 lp2lstr(K, s);  convert a letterplace ideal into a list of modules
