@@ -608,6 +608,9 @@ static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
   }
   poly u_p=(poly)u->CopyD(POLY_CMD);
   if ((u_p!=NULL)
+  #ifdef HAVE_SHIFTBBA
+  && (!rIsLPRing(currRing))
+  #endif
   && ((v_i!=0) &&
       ((long)pTotaldegree(u_p) > (signed long)currRing->bitmask / (signed long)v_i/2)))
   {
@@ -4437,14 +4440,6 @@ static BOOLEAN jjLISTRING(leftv res, leftv v)
   if (mm==0) mm=0x7fff;
   int isLetterplace=(int)(long)atGet(v,"isLetterplaceRing",INT_CMD);
   ring r=rCompose(l,TRUE,mm,isLetterplace);
-  #ifdef HAVE_SHIFTBBA
-  if (isLetterplace)
-  {
-    r->ShortOut=FALSE;
-    r->CanShortOut=FALSE;
-    r->isLPring=TRUE;
-  }
-  #endif
   res->data=(char *)r;
   return (r==NULL);
 }

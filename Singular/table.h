@@ -472,7 +472,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjPOWER_I),   '^',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjPOWER_BI),   '^',           BIGINT_CMD,     BIGINT_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjPOWER_N),   '^',            NUMBER_CMD,     NUMBER_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
-,{D(jjPOWER_P),   '^',            POLY_CMD,       POLY_CMD,   INT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjPOWER_P),   '^',            POLY_CMD,       POLY_CMD,   INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjPOWER_ID),  '^',            IDEAL_CMD,      IDEAL_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 #ifdef SINGULAR_4_2
 ,{D(jjNUMBER2_POW),'^',           CNUMBER_CMD,    CNUMBER_CMD,INT_CMD, ALLOW_NC | ALLOW_RING}
