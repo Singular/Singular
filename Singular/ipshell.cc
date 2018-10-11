@@ -2895,7 +2895,12 @@ ring rCompose(const lists  L, const BOOLEAN check_comp, const long bitmask,const
 
   if (!isLetterplace) rRenameVars(R);
   #ifdef HAVE_SHIFTBBA
-  else R->isLPring=isLetterplace;
+  else
+  {
+    R->isLPring=isLetterplace;
+    R->ShortOut=FALSE;
+    R->CanShortOut=FALSE;
+  }
   #endif
   if (bitmask!=0x7fff) R->bitmask=bitmask*2;
   rComplete(R);
