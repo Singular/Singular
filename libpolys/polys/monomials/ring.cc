@@ -418,7 +418,7 @@ void   rWrite(ring r, BOOLEAN details)
   }
   if (rIsLPRing(r))
   {
-    PrintS("\n// letterplace ring");
+    Print("\n// letterplace ring (block size %d)",r->isLPring);
   }
 #endif
   if (r->qideal!=NULL)
