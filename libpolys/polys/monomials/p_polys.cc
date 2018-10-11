@@ -2151,7 +2151,11 @@ poly p_Power(poly p, int i, const ring r)
 
   if(p!=NULL)
   {
-    if ( (i > 0) && ((unsigned long ) i > (r->bitmask)))
+    if ( (i > 0) && ((unsigned long ) i > (r->bitmask))
+    #ifdef HAVE_SHIFTBBA
+    && (!rIsLPRing(r))
+    #endif
+    )
     {
       Werror("exponent %d is too large, max. is %ld",i,r->bitmask);
       return NULL;
