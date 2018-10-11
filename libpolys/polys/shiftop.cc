@@ -362,13 +362,11 @@ void p_mLPshift(poly m, int sh, const ring ri)
   int *s=(int *)omAlloc0((ri->N+1)*sizeof(int));
   p_GetExpV(m,e,ri);
 
-  for (int i = 1; i <= ri->N; i++)
+  for (int i = ri->N - sh*lV; i > 0; i--)
   {
     assume(e[i]<=1);
     if (e[i]==1)
     {
-      assume(i + (sh*lV) <= ri->N);
-      assume(i + (sh*lV) >= 1);
       s[i + (sh*lV)] = e[i]; /* actually 1 */
     }
   }
