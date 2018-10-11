@@ -92,7 +92,6 @@ NOTE: Activate the resulting ring by using @code{setring}
   attrib(RL, "isLetterplaceRing", lV);
   attrib(RL, "maxExp", 1);
   def @R = ring(RL);
-
   attrib(@R, "uptodeg", uptodeg);
   attrib(@R, "isLetterplaceRing", lV);
   return (@R);
@@ -627,6 +626,7 @@ EXAMPLE: example freeGBasis; shows examples
   }
   L[3] = LR[3];
   attrib(L,"isLetterplaceRing",s);
+  attrib(L, "maxExp", 1);
   def @R = ring(L);
   @R = setLetterplaceAttributes(@R, D+1, nvars(save));
   setring @R;
@@ -1618,6 +1618,7 @@ EXAMPLE: example freegbold; shows examples
     LR[3][nb*(D+1)+1] = tmp;
   }
   L[3] = LR[3];
+  attrib(L,"maxExp",1);
   attrib(L,"isLetterplaceRing",s);
   def @R = ring(L);
   setring @R;
@@ -3591,6 +3592,7 @@ example
   intvec weights = 1,1,1,1,1,1,1,2,3,1,1,1,1,1,1;
   RL[3][1][2] = weights;
   attrib(RL,"isLetterplaceRing",3);
+  attrib(RL,"maxExp",1);
   def Rw = setLetterplaceAttributes(ring(RL),5,3);
   setring Rw;
   printlevel = voice + 1;
