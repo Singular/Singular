@@ -25,6 +25,10 @@ For further details, please, refer to the papers
 [LL13]: Roberto La Scala and Viktor Levandovskyy, "Skew polynomial rings, Groebner bases and the letterplace embedding of the free associative algebra",
 Journal of Symbolic Computation, Volume 48, Issue 1, January 2013, Pages 1374-1393, see @url{http://dx.doi.org/10.1016/j.jsc.2012.05.003} and also @url{http://arxiv.org/abs/1009.4152}.
 
+[LSS13]: Viktor Levandovskyy, Grischa Studzinski and Benjamin Schnitzler , "Enhanced Computations of Groebner Bases in Free Algebras as a New Application of the Letterplace Paradigm", Proc. ISSAC 2013, ACM Press, 259-266, see @url{https://doi.org/10.1145/2465506.2465948}.
+
+[L14]: Roberto La Scala, "Extended letterplace correspondence for nongraded noncommutative ideals and related algorithms", International Journal of Algebra and Computation, Volume 24, Number 08, Pages 1157-1182, 2014, see also @url{https://doi.org/10.1142/S0218196714500519}.
+
 All algebras are assumed to be associative @math{K}-algebras for some field @math{K}.
 
 @menu
@@ -207,10 +211,10 @@ ideal I = x*y + y*z, x*x + x*y - y*x - y*y;
 option(redSB); option(redTail);
 ideal J = letplaceGBasis(I);
 J;
-// ----------------------------------
-lp2lstr(J,r); // export an object called @code{@LN} to the ring r
-setring r;  // change to the ring r
-lst2str(@LN,1); // output the string presentation
+@c // ----------------------------------
+@c lp2lstr(J,r); // export an object called @code{@LN} to the ring r
+@c setring r;  // change to the ring r
+@c lst2str(@LN,1); // output the string presentation
 @c example
 @end smallexample
 
