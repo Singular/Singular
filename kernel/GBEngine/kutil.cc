@@ -9674,85 +9674,19 @@ void replaceInLAndSAndT(LObject &p, kStrategy strat, int pos)
   assume(strat->tailRing == p.tailRing);
   assume(p.pLength == 0 || pLength(p.p) == p.pLength || rIsSyzIndexRing(currRing)); // modulo syzring
 
-  int i, j, posS, irpos;
+  int i, j, pos;
 
-  irpos = strat->T[pos].i_r;
-  posS  = posInS(strat, strat->sl, p.p, p.ecart);
-  clearSbatch(p.p, strat->sl, posS, strat);
+  pos = posInS(strat, strat->sl, p.p, p.ecart);
+
   pp_Test(p.p, currRing, p.tailRing);
   assume(p.FDeg == p.pFDeg());
-  assume(!p.is_normalized || nIsOne(pGetCoeff(p.p)));
 
-  if (currRing != strat->tailRing) {
-      p.t_p = p.GetLmTailRing();
-  }
-  if ((strat->tailBin != NULL) && (pNext(p.p) != NULL))
-  {
-    pNext(p.p)=p_ShallowCopyDelete(pNext(p.p),
-                                   (strat->tailRing != NULL ?
-                                    strat->tailRing : currRing),
-                                   strat->tailBin);
-    if (p.t_p != NULL) pNext(p.t_p) = pNext(p.p);
-  }
-  /* replace all pairs where p.p appears as a generator */
-  for (i = 0; i <= strat->Ll; ++i) {
-    if (strat->L[i].p1 != NULL && strat->L[i].p2 != NULL) {
-      if (pLmEqual(strat->L[i].p1, p.p)) {
-        number d, s, t;
-        /* we need to check if we need to replace a strong poly or a usual spoly */
-        d = n_ExtGcd(pGetCoeff(strat->L[i].p1), pGetCoeff(strat->L[i].p2), &s, &t, currRing->cf);
-        if (nIsZero(s) || nIsZero(t)) {
-          j = replaceOneSPoly(p.p, strat->L[i].p2, strat, i);
-          strat->L[i].i_r1  = irpos; // might have changed
-        } else {
-          j = replaceOneStrongPoly(p.p, strat->L[i].p2, strat, i);
-          if (j == 0) {
-            i--;
-          } else {
-            strat->L[i].i_r1  = irpos; // might have changed
-          }
-        }
-        nDelete(&d);
-        nDelete(&s);
-        nDelete(&t);
-        continue;
-      }
-      if (pLmEqual(strat->L[i].p2, p.p)) {
-        number d, s, t;
-        /* we need to check if we need to replace a strong poly or a usual spoly */
-        d = n_ExtGcd(pGetCoeff(strat->L[i].p1), pGetCoeff(strat->L[i].p2), &s, &t, currRing->cf);
-
-        if (nIsZero(s) || nIsZero(t)) {
-          j = replaceOneSPoly(strat->L[i].p1, p.p, strat, i);
-          strat->L[i].i_r2  = irpos; // might have changed
-        } else {
-          j = replaceOneStrongPoly(strat->L[i].p1, p.p, strat, i);
-          if (j == 0) {
-            i--;
-          } else {
-            strat->L[i].i_r2  = irpos; // might have changed
-          }
-        }
-        nDelete(&d);
-        nDelete(&s);
-        nDelete(&t);
-      }
-    }
-  }
-
-  strat->enterS(p, posS, strat, irpos);
-  strat->T[pos].Delete();
-  strat->T[pos] = (TObject) p;
-  strat->T[pos].i_r = irpos;
-
-  if (pNext(p.p) != NULL)
-    strat->T[pos].max_exp = p_GetMaxExpP(pNext(p.p), strat->tailRing);
-  else
-    strat->T[pos].max_exp = NULL;
-
-  strat->R[irpos] = &(strat->T[pos]);
-  assume(p.sev == 0 || pGetShortExpVector(p.p) == p.sev);
-  strat->sevT[pos] = (p.sev == 0 ? pGetShortExpVector(p.p) : p.sev);
+  /* enter p to T set */
+  enterT(p, strat);
+  /* generate new pairs with p, probably removing older, now useless pairs */
+  superenterpairs(p.p, strat->sl, p.ecart, pos, strat, strat->tl);
+  /* enter p to S set */
+  strat->enterS(p, pos, strat, strat->tl);
 }
 
 void enterT(LObject &p, kStrategy strat, int atT)
