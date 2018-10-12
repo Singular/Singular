@@ -555,9 +555,7 @@ void initSyzRules (kStrategy strat);
 void updateS(BOOLEAN toT,kStrategy strat);
 void enterSyz (LObject &p,kStrategy strat, int atT);
 void enterT (LObject &p,kStrategy strat, int atT = -1);
-void replaceInLAndSAndT(LObject &p, kStrategy strat, int pos);
-int replaceOneStrongPoly (poly si,poly p,kStrategy strat, int posInL);
-int replaceOneSPoly (poly si,poly p,kStrategy strat, int posInL);
+void replaceInLAndSAndT(LObject &p, kStrategy strat);
 #ifdef HAVE_RINGS
 void enterT_strong (LObject &p,kStrategy strat, int atT = -1);
 #endif

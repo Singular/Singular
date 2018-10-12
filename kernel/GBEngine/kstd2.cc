@@ -644,7 +644,7 @@ int redRing_Z (LObject* h,kStrategy strat)
         postReduceByMon(&h2, strat);
         redtailBbaAlsoLC_Z(&h2, j, strat);
         /* replace h2 for tj in L (already generated pairs with tj), S and T */
-        replaceInLAndSAndT(h2, strat, j);
+        replaceInLAndSAndT(h2, strat);
       }
     } else {
       ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
