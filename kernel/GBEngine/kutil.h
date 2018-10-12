@@ -77,6 +77,11 @@ public:
     length,     // as of pLDeg
     pLength,    // either == 0, or == pLength(p)
     i_r;        // index of TObject in R set, or -1 if not in T
+
+#ifdef HAVE_SHIFTBBA
+  int shift;
+#endif
+
   /*BOOLEAN*/ char is_normalized; // true, if pNorm was called on p, false otherwise
   // used in incremental sba() with F5C:
   // we know some of the redundant elements in
@@ -93,10 +98,6 @@ public:
 
 #ifdef HAVE_PLURAL
   /*BOOLEAN*/ char is_special; // true, it is a new special S-poly (e.g. for SCA)
-#endif
-
-#ifdef HAVE_SHIFTBBA
-  int shift;
 #endif
 
   // initialization
