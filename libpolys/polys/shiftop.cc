@@ -11,7 +11,7 @@
  * NOTE: it already works, but all tests and the libraries need to be updated first
  * -> wait until the new interface is released
 */
-#define SHIFT_MULT_COMPAT_MODE 
+#define SHIFT_MULT_COMPAT_MODE
 
 #ifdef SHIFT_MULT_DEBUG
 #include "../kernel/polys.h"
@@ -54,22 +54,23 @@ poly shift_pp_Mult_mm(poly p, const poly m, const ring ri)
   int *mExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
   p_GetExpV(_m,mExpV,ri);
   int mLength = p_mLastVblock(_m, mExpV, ri) * lV;
+  int *pExpV = (int *) omAlloc((ri->N+1)*sizeof(int));
   do
   {
+    memset(pExpV,0,(ri->N+1)*sizeof(int));
     p_AllocBin(pNext(q), bin, ri);
     pIter(q);
     pSetCoeff0(q, n_Mult(mCoeff, pGetCoeff(p), ri->cf));
 
-    int *pExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
     p_GetExpV(p, pExpV, ri);
     p_LPExpVappend(pExpV, mExpV, p_mLastVblock(p, pExpV, ri) * lV, mLength, ri);
     p_MemCopy_LengthGeneral(q->exp, p->exp, ri->ExpL_Size); // otherwise q is not initialized correctly
     p_SetExpV(q, pExpV, ri);
-    omFreeSize((ADDRESS) pExpV, (ri->N+1)*sizeof(int));
 
     pIter(p);
   }
   while (p != NULL);
+  omFreeSize((ADDRESS) pExpV, (ri->N+1)*sizeof(int));
   omFreeSize((ADDRESS) mExpV, (ri->N+1)*sizeof(int));
   pNext(q) = NULL;
 #ifdef SHIFT_MULT_COMPAT_MODE
@@ -115,20 +116,21 @@ poly shift_p_Mult_mm(poly p, const poly m, const ring ri)
   int *mExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
   p_GetExpV(_m,mExpV,ri);
   int mLength = p_mLastVblock(_m, mExpV, ri) * lV;
+  int *pExpV = (int *) omAlloc((ri->N+1)*sizeof(int));
   while (p != NULL)
   {
+    memset(pExpV,0,(ri->N+1)*sizeof(int));
     pCoeff = pGetCoeff(p);
     pSetCoeff0(p, n_Mult(mCoeff, pCoeff, ri->cf));
     n_Delete(&pCoeff, ri->cf); // delete the old coeff
 
-    int *pExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
     p_GetExpV(p,pExpV,ri);
     p_LPExpVappend(pExpV, mExpV, p_mLastVblock(p, pExpV, ri) * lV, mLength, ri);
     p_SetExpV(p, pExpV, ri);
-    omFreeSize((ADDRESS) pExpV, (ri->N+1)*sizeof(int));
 
     pIter(p);
   }
+  omFreeSize((ADDRESS) pExpV, (ri->N+1)*sizeof(int));
   omFreeSize((ADDRESS) mExpV, (ri->N+1)*sizeof(int));
 #ifdef SHIFT_MULT_COMPAT_MODE
   p_Delete(&_m, ri); // in this case we copied _m before
@@ -177,22 +179,23 @@ poly shift_pp_mm_Mult(poly p, const poly m, const ring ri)
   int *mExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
   p_GetExpV(_m,mExpV,ri);
   int mLength = p_mLastVblock(_m, mExpV, ri) * lV;
+  int *pExpV = (int *) omAlloc((ri->N+1)*sizeof(int));
   do
   {
+    memset(pExpV,0,(ri->N+1)*sizeof(int));
     p_AllocBin(pNext(q), bin, ri);
     pIter(q);
     pSetCoeff0(q, n_Mult(mCoeff, pGetCoeff(p), ri->cf));
 
-    int *pExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
     p_GetExpV(p, pExpV, ri);
     p_LPExpVprepend(pExpV, mExpV, p_mLastVblock(p, pExpV, ri) * lV, mLength, ri);
     p_MemCopy_LengthGeneral(q->exp, p->exp, ri->ExpL_Size); // otherwise q is not initialized correctly
     p_SetExpV(q, pExpV, ri);
-    omFreeSize((ADDRESS) pExpV, (ri->N+1)*sizeof(int));
 
     pIter(p);
   }
   while (p != NULL);
+  omFreeSize((ADDRESS) pExpV, (ri->N+1)*sizeof(int));
   omFreeSize((ADDRESS) mExpV, (ri->N+1)*sizeof(int));
   pNext(q) = NULL;
 #ifdef SHIFT_MULT_COMPAT_MODE
@@ -238,20 +241,21 @@ poly shift_p_mm_Mult(poly p, const poly m, const ring ri)
   int *mExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
   p_GetExpV(_m,mExpV,ri);
   int mLength = p_mLastVblock(_m, mExpV, ri) * lV;
+  int *pExpV = (int *) omAlloc((ri->N+1)*sizeof(int));
   while (p != NULL)
   {
+    memset(pExpV,0,(ri->N+1)*sizeof(int));
     pCoeff = pGetCoeff(p);
     pSetCoeff0(p, n_Mult(mCoeff, pCoeff, ri->cf));
     n_Delete(&pCoeff, ri->cf); // delete the old coeff
 
-    int *pExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
     p_GetExpV(p,pExpV,ri);
     p_LPExpVprepend(pExpV, mExpV, p_mLastVblock(p, pExpV, ri) * lV, mLength, ri);
     p_SetExpV(p, pExpV, ri);
-    omFreeSize((ADDRESS) pExpV, (ri->N+1)*sizeof(int));
 
     pIter(p);
   }
+  omFreeSize((ADDRESS) pExpV, (ri->N+1)*sizeof(int));
   omFreeSize((ADDRESS) mExpV, (ri->N+1)*sizeof(int));
 #ifdef SHIFT_MULT_COMPAT_MODE
   p_Delete(&_m, ri); // in this case we copied _m before
@@ -285,15 +289,19 @@ poly shift_pp_Mult_mm_Noether_STUB(poly p, const poly m, const poly spNoether, i
   PrintLn(); WarnS("pp_Mult_mm_Noether is not supported yet by Letterplace. Ignoring spNoether and using pp_Mult_mm. This might lead to unexpected behavior.");
 
   int pLen = 0;
-  if (ll >= 0) {
+  if (ll >= 0)
+  {
     pLen = pLength(p);
   }
 
   p = shift_pp_Mult_mm(p, m, ri);
 
-  if (ll >= 0) {
+  if (ll >= 0)
+  {
     ll = pLen - pLength(p);
-  } else {
+  }
+  else
+  {
     ll = pLength(p);
   }
 
@@ -515,7 +523,8 @@ void p_LPExpVappend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const 
 }
 
 // prepends m2ExpV to m1ExpV, also adds their components (one of them is always zero)
-void p_LPExpVprepend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const ring ri) {
+void p_LPExpVprepend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const ring ri)
+{
 #ifdef SHIFT_MULT_DEBUG
   PrintLn(); PrintS("Prepend");
   PrintLn(); WriteLPExpV(m1ExpV, ri);
@@ -543,13 +552,17 @@ void p_LPExpVprepend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const
 #endif
 }
 
-void WriteLPExpV(int *expV, ring ri) {
-  for (int i = 0; i <= ri->N; ++i) {
+void WriteLPExpV(int *expV, ring ri)
+{
+  for (int i = 0; i <= ri->N; ++i)
+  {
     Print("%d", expV[i]);
-    if (i == 0) {
+    if (i == 0)
+    {
       Print("| ");
     }
-    if (i % ri->isLPring == 0) {
+    if (i % ri->isLPring == 0)
+    {
       Print(" ");
     }
   }
