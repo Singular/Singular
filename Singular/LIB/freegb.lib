@@ -486,20 +486,7 @@ NOTE: the degree bound for this computation is read off the letterplace
 EXAMPLE: example letplaceGBasis; shows examples
 "
 {
-  if (lpAssumeViolation())
-  {
-    ERROR("Incomplete Letterplace structure on the basering!");
-  }
-  int ppl = printlevel-voice+2;
-  def save = basering;
-  // assumes of the ring have been checked
-  // run the computation - it will test assumes on the ideal
-  dbprint(ppl,"start computing GB");
-  def J = system("freegb",I);
-  dbprint(ppl,"finished computing GB");
-  dbprint(ppl-1,"the result is:");
-  dbprint(ppl-1,J);
-  return(J);
+  return(std(I));
 }
 example
 {
@@ -677,7 +664,7 @@ EXAMPLE: example freeGBasis; shows examples
   // 3. compute GB
   setring @R;
   dbprint(ppl,"computing GB");
-  ideal J = system("freegb",I);
+  ideal J = std(I);
   //  ideal J = slimgb(I);
   dbprint(ppl,J);
   // 4. skip shifted elts

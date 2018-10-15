@@ -2091,6 +2091,10 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   if(idIs0(F))
     return idInit(1,F->rank);
 
+#ifdef HAVE_SHIFTBBA
+  if(rIsLPRing(currRing)) return freegb(F);
+#endif
+
   ideal r;
   BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);

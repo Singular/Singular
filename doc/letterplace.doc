@@ -186,9 +186,7 @@ run the procedure @code{makeLetterplaceRing(d)}
 from the library @ref{freegb_lib}.
 This procedure creates a letterplace algebra with an ordering, induced from the given commutative ring @math{K[X]}.
 In this algebra, define an ideal @code{I} as a list of polynomials in the letterplace encoding
-and run the procedure @code{letplaceGBasis}. The output is given in the letterplace encoding as well.
-
-Alternatively, one can run the procedure @code{system("freegb",I,d,n)}, where @math{n} is the number of variables of the original commutative ring which does the same computations as @code{letplaceGBasis}.
+and run @code{std}.
 
 It is possible to convert the letterplace presentation of an ideal to a list of strings with the help of procedures @code{lp2lstr} and @code{lst2str} from the library @ref{freegb_lib}. This is shown in the second part of the example below.
 
@@ -205,7 +203,7 @@ def R = makeLetterplaceRing(d);
 setring R;
 ideal I = x*y + y*z, x*x + x*y - y*x - y*y;
 option(redSB); option(redTail);
-ideal J = letplaceGBasis(I);
+ideal J = std(I);
 J;
 // ----------------------------------
 lp2lstr(J,r); // export an object called @code{@LN} to the ring r
@@ -232,7 +230,7 @@ Restrictions of the @sc{Letterplace} package:
 computations with quasi-homogeneous and general inhomogeneous ideals are under development. (There are no automatic checks.)
 @item Since free algebra is not Noetherian, one has to define an explicit degree bound,
 up to which a partial Groebner basis will be computed. Note, that @code{makeLetterplaceRing} procedure
-stores the bound in the structure of the ring it creates. Thus running @code{letplaceGBasis} in such a
+stores the bound in the structure of the ring it creates. Thus running @code{std} in such a
 ring does not require the degree bound in its argument.
 @item the options @code{option(redSB); option(redTail);} must be always activated
 @item we advise to run the computations with the options  @code{option(prot);option(mem);}
@@ -241,6 +239,8 @@ in order to see the activity journal as well as the memory usage
 
 Operations for polynomials in letterplace rings are @code{+} (addition),
 @code{-} (subtraction), @code{*} (multiplication) and @code{^} (power).
+
+Functions for objects from letterplace rings are: @code{std}.
 
 Further functionality is provided in the libraries for the @sc{Letterpace} subsystem.
 
@@ -253,4 +253,9 @@ The @ref{fpadim_lib} contains procedures for computations with vector space basi
 of a factor algebra including finiteness check and dimension computation.
 
 The @ref{fpalgebras_lib} contains procedures for the generation of various algebras, including group algebras of finitely presented groups in the Letterplace ring.
+
+@c ref
+See
+@ref{std}.
+@c ref
 

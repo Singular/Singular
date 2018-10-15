@@ -1475,35 +1475,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== freeGB, twosided GB in free algebra =================*/
-  #ifdef HAVE_PLURAL
-  #ifdef HAVE_SHIFTBBA
-    if (strcmp(sys_cmd, "freegb") == 0)
-    {
-      const short t[]={1,IDEAL_CMD};
-      const short tM[]={1,MODUL_CMD};
-      if (iiCheckTypes(h,tM,0)
-      || (iiCheckTypes(h,t,0)))
-      {
-        res->rtyp=h->Typ();
-        ideal I=(ideal)h->CopyD();
-        res->data = freegb(I);
-        if (res->data == NULL)
-        {
-          /* that is there were input errors */
-          res->data = I;
-        }
-        return FALSE;
-      }
-      else
-      {
-        WerrorS("system(\"freegb\",`ideal/module`) expected");
-        return TRUE;
-      }
-    }
-    else
-  #endif /*SHIFTBBA*/
-  #endif /*PLURAL*/
   /*==================== walk stuff =================*/
   /*==================== walkNextWeight =================*/
   #ifdef HAVE_WALK
