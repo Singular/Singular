@@ -51,13 +51,12 @@ poly shift_pp_Mult_mm(poly p, const poly m, const ring ri)
   pAssume(!n_IsZero(mCoeff, ri->cf));
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
 
-  int *mExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
+  int *mExpV = (int *) omAlloc((ri->N+1)*sizeof(int));
   p_GetExpV(_m,mExpV,ri);
   int mLength = p_mLastVblock(_m, mExpV, ri) * lV;
   int *pExpV = (int *) omAlloc((ri->N+1)*sizeof(int));
   do
   {
-    memset(pExpV,0,(ri->N+1)*sizeof(int));
     p_AllocBin(pNext(q), bin, ri);
     pIter(q);
     pSetCoeff0(q, n_Mult(mCoeff, pGetCoeff(p), ri->cf));
@@ -113,13 +112,12 @@ poly shift_p_Mult_mm(poly p, const poly m, const ring ri)
   number pCoeff;
   pAssume(!n_IsZero(mCoeff, ri->cf));
 
-  int *mExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
+  int *mExpV = (int *) omAlloc((ri->N+1)*sizeof(int));
   p_GetExpV(_m,mExpV,ri);
   int mLength = p_mLastVblock(_m, mExpV, ri) * lV;
   int *pExpV = (int *) omAlloc((ri->N+1)*sizeof(int));
   while (p != NULL)
   {
-    memset(pExpV,0,(ri->N+1)*sizeof(int));
     pCoeff = pGetCoeff(p);
     pSetCoeff0(p, n_Mult(mCoeff, pCoeff, ri->cf));
     n_Delete(&pCoeff, ri->cf); // delete the old coeff
@@ -176,13 +174,12 @@ poly shift_pp_mm_Mult(poly p, const poly m, const ring ri)
   pAssume(!n_IsZero(mCoeff, ri->cf));
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
 
-  int *mExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
+  int *mExpV = (int *) omAlloc((ri->N+1)*sizeof(int));
   p_GetExpV(_m,mExpV,ri);
   int mLength = p_mLastVblock(_m, mExpV, ri) * lV;
   int *pExpV = (int *) omAlloc((ri->N+1)*sizeof(int));
   do
   {
-    memset(pExpV,0,(ri->N+1)*sizeof(int));
     p_AllocBin(pNext(q), bin, ri);
     pIter(q);
     pSetCoeff0(q, n_Mult(mCoeff, pGetCoeff(p), ri->cf));
@@ -238,13 +235,12 @@ poly shift_p_mm_Mult(poly p, const poly m, const ring ri)
   number pCoeff;
   pAssume(!n_IsZero(mCoeff, ri->cf));
 
-  int *mExpV = (int *) omAlloc0((ri->N+1)*sizeof(int));
+  int *mExpV = (int *) omAlloc((ri->N+1)*sizeof(int));
   p_GetExpV(_m,mExpV,ri);
   int mLength = p_mLastVblock(_m, mExpV, ri) * lV;
   int *pExpV = (int *) omAlloc((ri->N+1)*sizeof(int));
   while (p != NULL)
   {
-    memset(pExpV,0,(ri->N+1)*sizeof(int));
     pCoeff = pGetCoeff(p);
     pSetCoeff0(p, n_Mult(mCoeff, pCoeff, ri->cf));
     n_Delete(&pCoeff, ri->cf); // delete the old coeff
@@ -332,7 +328,7 @@ void p_mLPunshift(poly m, const ring ri)
 
   if (shift == 0) return;
 
-  int *e=(int *)omAlloc0((ri->N+1)*sizeof(int));
+  int *e=(int *)omAlloc((ri->N+1)*sizeof(int));
   int *s=(int *)omAlloc0((ri->N+1)*sizeof(int));
   p_GetExpV(m, e, ri);
 
@@ -366,7 +362,7 @@ void p_mLPshift(poly m, int sh, const ring ri)
   assume(p_mFirstVblock(m,ri) + sh >= 1);
   assume(p_mLastVblock(m,ri) + sh <= ri->N/lV);
 
-  int *e=(int *)omAlloc0((ri->N+1)*sizeof(int));
+  int *e=(int *)omAlloc((ri->N+1)*sizeof(int));
   int *s=(int *)omAlloc0((ri->N+1)*sizeof(int));
   p_GetExpV(m,e,ri);
 
@@ -419,7 +415,7 @@ int p_mLastVblock(poly p, const ring ri)
     return(0);
   }
 
-  int *e=(int *)omAlloc0((ri->N+1)*sizeof(int));
+  int *e=(int *)omAlloc((ri->N+1)*sizeof(int));
   p_GetExpV(p,e,ri);
   int b = p_mLastVblock(p, e, ri);
   omFreeSize((ADDRESS) e, (ri->N+1)*sizeof(int));
@@ -476,7 +472,7 @@ int p_mFirstVblock(poly p, const ring ri)
     return(0);
   }
 
-  int *e=(int *)omAlloc0((ri->N+1)*sizeof(int));
+  int *e=(int *)omAlloc((ri->N+1)*sizeof(int));
   p_GetExpV(p,e,ri);
   int b = p_mFirstVblock(p, e, ri);
   omFreeSize((ADDRESS) e, (ri->N+1)*sizeof(int));
