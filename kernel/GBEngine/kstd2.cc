@@ -642,7 +642,8 @@ int redRing_Z (LObject* h,kStrategy strat)
         ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
         ksReducePolyGCD(&h2, &(strat->T[j]), NULL, NULL, strat);
         postReduceByMon(&h2, strat);
-        redtailBbaAlsoLC_Z(&h2, j, strat);
+        if (!rHasLocalOrMixedOrdering(currRing))
+          redtailBbaAlsoLC_Z(&h2, j, strat);
         /* replace h2 for tj in L (already generated pairs with tj), S and T */
         replaceInLAndSAndT(h2, strat);
       }
@@ -2326,7 +2327,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       /* if we are computing over Z we always want to try and cut down
        * the coefficients in the tail terms */
-      if (rField_is_Z(currRing))
+      if (rField_is_Z(currRing) && !rHasLocalOrMixedOrdering(currRing))
         redtailBbaAlsoLC_Z(&(strat->P), strat->tl, strat);
       if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
       {
