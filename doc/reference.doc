@@ -7354,6 +7354,7 @@ See
 @node std, stdfglm, status, Functions
 @subsection std
 @cindex std
+@cindex Letterplace ring
 @table @code
 @item @strong{Syntax:}
 @code{std (} ideal_expression@code{)}
@@ -7374,6 +7375,7 @@ ideal, module or smatrix
 @item @strong{Purpose:}
 returns a standard basis of an ideal or module with respect to the
 monomial ordering of the basering.
+For Letterplace rings, a twosided Groebner basis is computed.
 A standard basis is a set of generators such that
 the leading terms generate the leading ideal, resp.@: module.
 @*Use an optional

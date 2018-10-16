@@ -4332,11 +4332,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
 ideal freegb(ideal I)
 {
-  if (!currRing->isLPring) {
-    WerrorS("freegb only works with Letterplace rings");
-    return NULL;
-  }
-
+  assume(rIsLPRing(currRing));
   assume(ideal_isInV(I, currRing));
   ideal RS = kStdShift(I,NULL, testHomog, NULL,NULL,0,0,NULL);
   idSkipZeroes(RS); // is this even necessary?
