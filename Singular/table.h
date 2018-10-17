@@ -351,7 +351,9 @@ const struct sValCmd2 dArith2[]=
 #endif
 ,{D(lAdd),        '+',            LIST_CMD,       LIST_CMD,   LIST_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjRSUM),      '+',            RING_CMD,       RING_CMD,   RING_CMD, ALLOW_NC | ALLOW_RING}
-,{D(jjPLUS_B_P),    '+',          BUCKET_CMD,     BUCKET_CMD, POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjRPLUS),     '+',            RING_CMD,       RING_CMD,   STRING_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjRPLUS),     '+',            RING_CMD,       STRING_CMD, RING_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjPLUS_B_P),  '+',            BUCKET_CMD,     BUCKET_CMD, POLY_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjMINUS_I),   '-',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjMINUS_BI),  '-',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjMINUS_N),   '-',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_NC | ALLOW_RING}
@@ -364,8 +366,8 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjMINUS_BIM), '-',            BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjOP_BIM_I),  '-',            BIGINTMAT_CMD,  BIGINTMAT_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjOP_I_BIM),  '-',            BIGINTMAT_CMD,  INT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
-,{D(jjOP_BIM_BI),  '-',           BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
-,{D(jjOP_BI_BIM),  '-',           BIGINTMAT_CMD,  BIGINT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_BIM_BI), '-',            BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_BI_BIM), '-',            BIGINTMAT_CMD,  BIGINT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjOP_IV_I),   '-',            INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjOP_IM_I),   '-',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjMINUS_IV),  '-',            INTVEC_CMD,     INTVEC_CMD, INTVEC_CMD, ALLOW_NC | ALLOW_RING}
@@ -381,6 +383,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjPOLY2_OP2), '-',            CPOLY_CMD,      INT_CMD,    CPOLY_CMD,  ALLOW_NC | ALLOW_RING}
 ,{D(jjMINUS_BIM), '-',            CMATRIX_CMD,    CMATRIX_CMD,CMATRIX_CMD, ALLOW_NC | ALLOW_RING}
 #endif
+,{D(jjRMINUS),    '-',            RING_CMD,       RING_CMD,   STRING_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjMINUS_B_P), '-',            BUCKET_CMD,     BUCKET_CMD, POLY_CMD, ALLOW_NC | ALLOW_RING}
 ,{  jjWRONG2 ,    '-',            NONE,           IDEAL_CMD,  IDEAL_CMD, ALLOW_NC | ALLOW_RING}
 ,{  jjWRONG2 ,    '-',            NONE,           MODUL_CMD,  MODUL_CMD, ALLOW_NC | ALLOW_RING}

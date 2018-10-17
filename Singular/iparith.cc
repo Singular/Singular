@@ -3158,6 +3158,25 @@ static BOOLEAN jjPFAC2(leftv res, leftv u, leftv v)
   res->data = (char*)l;
   return FALSE;
 }
+static BOOLEAN jjRMINUS(leftv res, leftv u, leftv v)
+{
+  ring r=rMinusVar((ring)u->Data(),(char*)v->Data());
+  res->data = (char *)r;
+  return r==NULL;
+}
+static BOOLEAN jjRPLUS(leftv res, leftv u, leftv v)
+{
+  int left;
+  if (u->Typ()==RING_CMD) left=0;
+  else
+  {
+    leftv h=u;u=v;v=h;
+    left=1;
+  }
+  ring r=rPlusVar((ring)u->Data(),(char*)v->Data(),left);
+  res->data = (char *)r;
+  return r==NULL;
+}
 static BOOLEAN jjRSUM(leftv res, leftv u, leftv v)
 {
   ring r;
