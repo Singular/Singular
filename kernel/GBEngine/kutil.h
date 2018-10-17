@@ -697,6 +697,15 @@ int ksReducePoly(LObject* PR,
                  number *coef = NULL,
                  kStrategy strat = NULL);
 
+/* like ksReducePoly, but if the reducer has only 1 term we still
+ * compute a possible coefficient multiplier for PR. this comes from
+ * a special situation in redRing_Z and it is used only there. */
+int ksReducePolyZ(LObject* PR,
+                 TObject* PW,
+                 poly spNoether = NULL,
+                 number *coef = NULL,
+                 kStrategy strat = NULL);
+
 int ksReducePolyLC(LObject* PR,
                  TObject* PW,
                  poly spNoether = NULL,
