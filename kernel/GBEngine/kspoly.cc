@@ -94,12 +94,24 @@ int ksReducePolyZ(LObject* PR,
   }
 #endif
 
-  /* if (t2==NULL)           // Divisor is just one term, therefore it will
-   * {                       // just cancel the leading term
-   *   PR->LmDeleteAndIter();
-   *   if (coef != NULL) *coef = n_Init(1, tailRing->cf);
-   *   return 0;
-   * } */
+  if (t2==NULL)           // Divisor is just one term, therefore it will
+  {                       // just cancel the leading term
+    // adjust lead coefficient if needed
+    if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
+    {
+      number bn = pGetCoeff(lm);
+      number an = pGetCoeff(p2);
+      int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
+      p_SetCoeff(lm, bn, tailRing);
+      if ((ct == 0) || (ct == 2))
+      PR->Tail_Mult_nn(an);
+      if (coef != NULL) *coef = an;
+      else n_Delete(&an, tailRing->cf);
+    }
+    PR->LmDeleteAndIter();
+    if (coef != NULL) *coef = n_Init(1, tailRing->cf);
+    return 0;
+  }
 
   p_ExpVectorSub(lm, p2, tailRing); // Calculate the Monomial we must multiply to p2
 
