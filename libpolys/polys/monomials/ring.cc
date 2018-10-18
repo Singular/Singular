@@ -5698,11 +5698,30 @@ ring rPlusVar(const ring r, char *v,int left)
   }
   ring R=rCopy0(r);
   char **names;
-  #ifdef HAVESHIFTBBA
+  #ifdef HAVE_SHIFTBBA
   if (rIsLPRing(r))
   {
-    WerrorS("not yet implemnted");
-    return NULL;
+    R->isLPring=r->isLPring+1;
+    R->N=((r->N)/r->isLPring)+r->N;
+    names=(char**)omAlloc(R->N*sizeof(char_ptr));
+    if (left)
+    {
+      for(int b=0;b<((r->N)/r->isLPring);b++)
+      {
+        names[b*R->isLPring]=omStrDup(v);
+        for(int i=R->isLPring-1;i>0;i--)
+          names[i+b*R->isLPring]=R->names[i-1+b*r->isLPring];
+      }
+    }
+    else
+    {
+      for(int b=0;b<((r->N)/r->isLPring);b++)
+      {
+        names[(b+1)*R->isLPring-1]=omStrDup(v);
+        for(int i=R->isLPring-2;i>=0;i--)
+          names[i+b*R->isLPring]=R->names[i-1+b*r->isLPring];
+      }
+    }
   }
   else
   #endif

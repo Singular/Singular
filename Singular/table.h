@@ -351,8 +351,8 @@ const struct sValCmd2 dArith2[]=
 #endif
 ,{D(lAdd),        '+',            LIST_CMD,       LIST_CMD,   LIST_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjRSUM),      '+',            RING_CMD,       RING_CMD,   RING_CMD, ALLOW_NC | ALLOW_RING}
-,{D(jjRPLUS),     '+',            RING_CMD,       RING_CMD,   STRING_CMD, ALLOW_NC | ALLOW_RING}
-,{D(jjRPLUS),     '+',            RING_CMD,       STRING_CMD, RING_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjRPLUS),     '+',            RING_CMD,       RING_CMD,   STRING_CMD, ALLOW_LP | ALLOW_RING}
+,{D(jjRPLUS),     '+',            RING_CMD,       STRING_CMD, RING_CMD, ALLOW_LP | ALLOW_RING}
 ,{D(jjPLUS_B_P),  '+',            BUCKET_CMD,     BUCKET_CMD, POLY_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjMINUS_I),   '-',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjMINUS_BI),  '-',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
@@ -383,7 +383,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjPOLY2_OP2), '-',            CPOLY_CMD,      INT_CMD,    CPOLY_CMD,  ALLOW_NC | ALLOW_RING}
 ,{D(jjMINUS_BIM), '-',            CMATRIX_CMD,    CMATRIX_CMD,CMATRIX_CMD, ALLOW_NC | ALLOW_RING}
 #endif
-,{D(jjRMINUS),    '-',            RING_CMD,       RING_CMD,   STRING_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjRMINUS),    '-',            RING_CMD,       RING_CMD,   STRING_CMD, ALLOW_LP | ALLOW_RING}
 ,{D(jjMINUS_B_P), '-',            BUCKET_CMD,     BUCKET_CMD, POLY_CMD, ALLOW_NC | ALLOW_RING}
 ,{  jjWRONG2 ,    '-',            NONE,           IDEAL_CMD,  IDEAL_CMD, ALLOW_NC | ALLOW_RING}
 ,{  jjWRONG2 ,    '-',            NONE,           MODUL_CMD,  MODUL_CMD, ALLOW_NC | ALLOW_RING}
