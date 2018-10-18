@@ -9443,32 +9443,44 @@ void enterSSba (LObject &p,int atS,kStrategy strat, int atR)
 /*2
 * puts p to the set T at position atT
 */
-void replaceInLAndSAndT(LObject &p, kStrategy strat)
+void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat)
 {
   p.GetP(strat->lmBin);
   if (strat->homog) strat->initEcart(&p);
-      strat->redTailChange=FALSE;
-      if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
-      {
-        p.pCleardenom();
-        if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
-        {
-          p.p = redtailBba(&p,strat->sl,strat, FALSE,!TEST_OPT_CONTENTSB);
-          p.pCleardenom();
-          if (strat->redTailChange) { p.t_p=NULL; }
-        }
-      }
+			strat->redTailChange=FALSE;
+	if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing))) {
+		p.pCleardenom();
+		if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL)) {
+			p.p = redtailBba(&p,strat->sl,strat, FALSE,!TEST_OPT_CONTENTSB);
+			p.pCleardenom();
+			if (strat->redTailChange)
+				p.t_p=NULL;
+		}
+  }
 
   assume(strat->tailRing == p.tailRing);
   assume(p.pLength == 0 || pLength(p.p) == p.pLength || rIsSyzIndexRing(currRing)); // modulo syzring
 
-  int i, j, pos;
+  int i, pos;
 
   pos = posInS(strat, strat->sl, p.p, p.ecart);
 
   pp_Test(p.p, currRing, p.tailRing);
   assume(p.FDeg == p.pFDeg());
 
+  poly tp = strat->T[tj].p;
+  /* remove useless pairs from L set */
+  for (i = 0; i <= strat->Ll; ++i) {
+    if (strat->L[i].p1 != NULL && pLtCmp(tp, strat->L[i].p1) == 0) {
+      deleteInL(strat->L, &(strat->Ll), i, strat);
+      i--;
+      continue;
+    }
+    if (strat->L[i].p2 != NULL && pLtCmp(tp, strat->L[i].p2) == 0) {
+      deleteInL(strat->L, &(strat->Ll), i, strat);
+      i--;
+    }
+  }
   /* enter p to T set */
   enterT(p, strat);
   /* generate new pairs with p, probably removing older, now useless pairs */

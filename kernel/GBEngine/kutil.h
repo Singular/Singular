@@ -555,7 +555,7 @@ void initSyzRules (kStrategy strat);
 void updateS(BOOLEAN toT,kStrategy strat);
 void enterSyz (LObject &p,kStrategy strat, int atT);
 void enterT (LObject &p,kStrategy strat, int atT = -1);
-void replaceInLAndSAndT(LObject &p, kStrategy strat);
+void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat);
 #ifdef HAVE_RINGS
 void enterT_strong (LObject &p,kStrategy strat, int atT = -1);
 #endif

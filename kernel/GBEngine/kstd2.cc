@@ -647,7 +647,7 @@ int redRing_Z (LObject* h,kStrategy strat)
           h2.pCleardenom();
         }
         /* replace h2 for tj in L (already generated pairs with tj), S and T */
-        replaceInLAndSAndT(h2, strat);
+        replaceInLAndSAndT(h2, j, strat);
       }
     } else {
       ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
