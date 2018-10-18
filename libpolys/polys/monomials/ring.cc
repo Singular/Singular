@@ -5717,9 +5717,9 @@ ring rPlusVar(const ring r, char *v,int left)
     {
       for(int b=0;b<((r->N)/r->isLPring);b++)
       {
-        names[(b+1)*R->isLPring-1]=omStrDup(v);
-        for(int i=R->isLPring-2;i>=0;i--)
-          names[i+b*R->isLPring]=R->names[i-1+b*r->isLPring];
+        for(int i=R->isLPring;i>0;i--)
+          names[i+b*R->isLPring-1]=R->names[i-2+b*r->isLPring];
+        names[b*R->isLPring]=omStrDup(v);
       }
     }
   }
