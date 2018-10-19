@@ -4241,6 +4241,16 @@ static BOOLEAN jjHOMOG1(leftv res, leftv v)
 }
 static BOOLEAN jjidMaxIdeal(leftv res, leftv v)
 {
+#ifdef HAVE_SHIFTBBA
+  if (currRing->isLPring)
+  {
+    int deg = (int)(long)v->Data();
+    if (deg > currRing->N/currRing->isLPring) {
+      WerrorS("deg of letterplace ring to small");
+      return TRUE;
+    }
+  }
+#endif
   res->data = (char *)idMaxIdeal((int)(long)v->Data());
   setFlag(res,FLAG_STD);
   return FALSE;
