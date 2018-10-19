@@ -4500,23 +4500,56 @@ ideal createG0()
 */
 void initenterstrongPairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR = -1)
 {
-  const int iCompH = pGetComp(h);
   if (!nIsOne(pGetCoeff(h)))
   {
     int j;
+    BOOLEAN new_pair=FALSE;
 
-    for (j=0; j<=k; j++)
+    if (pGetComp(h)==0)
     {
-      // Print("j:%d, Ll:%d\n",j,strat->Ll);
-//      if (((unsigned long) pGetCoeff(h) % (unsigned long) pGetCoeff(strat->S[j]) != 0) &&
-//         ((unsigned long) pGetCoeff(strat->S[j]) % (unsigned long) pGetCoeff(h) != 0))
-      if (((iCompH == pGetComp(strat->S[j]))
-      || (0 == pGetComp(strat->S[j])))
-      && ((iCompH<=strat->syzComp)||(strat->syzComp==0)))
+      /* for Q!=NULL: build pairs (f,q),(f1,f2), but not (q1,q2)*/
+      if ((isFromQ)&&(strat->fromQ!=NULL))
       {
-        enterOneStrongPoly(j,h,ecart,isFromQ,strat, atR, FALSE);
+        for (j=0; j<=k; j++)
+        {
+          if (!strat->fromQ[j])
+          {
+            new_pair=TRUE;
+            enterOneStrongPoly(j,h,ecart,isFromQ,strat, atR, FALSE);
+          }
+        }
+      }
+      else
+      {
+        new_pair=TRUE;
+        for (j=0; j<=k; j++)
+        {
+          enterOneStrongPoly(j,h,ecart,isFromQ,strat, atR, FALSE);
+        }
       }
     }
+    else
+    {
+      for (j=0; j<=k; j++)
+      {
+        if ((pGetComp(h)==pGetComp(strat->S[j]))
+        || (pGetComp(strat->S[j])==0))
+        {
+          new_pair=TRUE;
+          enterOneStrongPoly(j,h,ecart,isFromQ,strat, atR, FALSE);
+        }
+      }
+    }
+    if (new_pair)
+    {
+    #ifdef HAVE_RATGRING
+      if (currRing->real_var_start>0)
+        chainCritPart(h,ecart,strat);
+      else
+    #endif
+      strat->chainCrit(h,ecart,strat);
+    }
+    kMergeBintoL(strat);
   }
 }
 
