@@ -9461,32 +9461,45 @@ void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat)
   assume(strat->tailRing == p.tailRing);
   assume(p.pLength == 0 || pLength(p.p) == p.pLength || rIsSyzIndexRing(currRing)); // modulo syzring
 
-  int i, pos;
-
-  pos = posInS(strat, strat->sl, p.p, p.ecart);
-
-  pp_Test(p.p, currRing, p.tailRing);
-  assume(p.FDeg == p.pFDeg());
-
+  int i, j, pos;
   poly tp = strat->T[tj].p;
-  /* remove useless pairs from L set */
-  for (i = 0; i <= strat->Ll; ++i) {
-    if (strat->L[i].p1 != NULL && pLtCmp(tp, strat->L[i].p1) == 0) {
-      deleteInL(strat->L, &(strat->Ll), i, strat);
-      i--;
-      continue;
-    }
-    if (strat->L[i].p2 != NULL && pLtCmp(tp, strat->L[i].p2) == 0) {
-      deleteInL(strat->L, &(strat->Ll), i, strat);
-      i--;
-    }
-  }
+
   /* enter p to T set */
   enterT(p, strat);
-  /* generate new pairs with p, probably removing older, now useless pairs */
-  superenterpairs(p.p, strat->sl, p.ecart, pos, strat, strat->tl);
-  /* enter p to S set */
-  strat->enterS(p, pos, strat, strat->tl);
+
+  for (j = 0; j <= strat->sl; ++j) {
+    if (pLtCmp(tp, strat->S[j]) == 0) {
+      break;
+    }
+  }
+  /* it may be that the exchanged element is only in T and not in S,
+	 * then we only need to add the element to T (done above), but
+	 * nothing else needs to be done */
+  if (j <= strat->sl) {
+    deleteInS(j, strat);
+
+    pos = posInS(strat, strat->sl, p.p, p.ecart);
+
+    pp_Test(p.p, currRing, p.tailRing);
+    assume(p.FDeg == p.pFDeg());
+
+    /* remove useless pairs from L set */
+    for (i = 0; i <= strat->Ll; ++i) {
+      if (strat->L[i].p1 != NULL && pLtCmp(tp, strat->L[i].p1) == 0) {
+        deleteInL(strat->L, &(strat->Ll), i, strat);
+        i--;
+        continue;
+      }
+      if (strat->L[i].p2 != NULL && pLtCmp(tp, strat->L[i].p2) == 0) {
+        deleteInL(strat->L, &(strat->Ll), i, strat);
+        i--;
+      }
+    }
+    /* generate new pairs with p, probably removing older, now useless pairs */
+    superenterpairs(p.p, strat->sl, p.ecart, pos, strat, strat->tl);
+    /* enter p to S set */
+    strat->enterS(p, pos, strat, strat->tl);
+  }
 }
 
 void enterT(LObject &p, kStrategy strat, int atT)
