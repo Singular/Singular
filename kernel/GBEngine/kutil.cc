@@ -9472,34 +9472,33 @@ void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat)
       break;
     }
   }
-  /* it may be that the exchanged element is only in T and not in S,
-	 * then we only need to add the element to T (done above), but
-	 * nothing else needs to be done */
+  /* it may be that the exchanged element
+   * is until now only in T and not in S */
   if (j <= strat->sl) {
     deleteInS(j, strat);
-
-    pos = posInS(strat, strat->sl, p.p, p.ecart);
-
-    pp_Test(p.p, currRing, p.tailRing);
-    assume(p.FDeg == p.pFDeg());
-
-    /* remove useless pairs from L set */
-    for (i = 0; i <= strat->Ll; ++i) {
-      if (strat->L[i].p1 != NULL && pLtCmp(tp, strat->L[i].p1) == 0) {
-        deleteInL(strat->L, &(strat->Ll), i, strat);
-        i--;
-        continue;
-      }
-      if (strat->L[i].p2 != NULL && pLtCmp(tp, strat->L[i].p2) == 0) {
-        deleteInL(strat->L, &(strat->Ll), i, strat);
-        i--;
-      }
-    }
-    /* generate new pairs with p, probably removing older, now useless pairs */
-    superenterpairs(p.p, strat->sl, p.ecart, pos, strat, strat->tl);
-    /* enter p to S set */
-    strat->enterS(p, pos, strat, strat->tl);
   }
+
+  pos = posInS(strat, strat->sl, p.p, p.ecart);
+
+  pp_Test(p.p, currRing, p.tailRing);
+  assume(p.FDeg == p.pFDeg());
+
+  /* remove useless pairs from L set */
+  for (i = 0; i <= strat->Ll; ++i) {
+    if (strat->L[i].p1 != NULL && pLtCmp(tp, strat->L[i].p1) == 0) {
+      deleteInL(strat->L, &(strat->Ll), i, strat);
+      i--;
+      continue;
+    }
+    if (strat->L[i].p2 != NULL && pLtCmp(tp, strat->L[i].p2) == 0) {
+      deleteInL(strat->L, &(strat->Ll), i, strat);
+      i--;
+    }
+  }
+  /* generate new pairs with p, probably removing older, now useless pairs */
+  superenterpairs(p.p, strat->sl, p.ecart, pos, strat, strat->tl);
+  /* enter p to S set */
+  strat->enterS(p, pos, strat, strat->tl);
 }
 
 void enterT(LObject &p, kStrategy strat, int atT)
