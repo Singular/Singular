@@ -39,8 +39,9 @@
 
 #define BITS_PER_LONG 8*SIZEOF_LONG
 
+typedef char *             char_ptr;
 omBin sip_sring_bin = omGetSpecBin(sizeof(ip_sring));
-omBin char_ptr_bin =  omGetSpecBin(sizeof(char*));
+omBin char_ptr_bin =  omGetSpecBin(sizeof(char_ptr));
 
 
 static const char * const ringorder_name[] =
@@ -683,8 +684,6 @@ static int binaryPower (const int a, const int b)
    towards the SINGULAR svn trunk */
 int rChar(ring r) { return r->cf->ch; }
 
-// typedef char *             char_ptr;
-// omBin char_ptr_bin = omGetSpecBin(sizeof(char_ptr)); // deallocation?
 
 
 // creates a commutative nc extension; "converts" comm.ring to a Plural ring
@@ -3014,7 +3013,7 @@ static void rSetOutParams(ring r)
       // Hmm... sometimes (e.g., from maGetPreimage) new variables
       // are introduced, but their names are never set
       // hence, we do the following awkward trick
-      int N = omSizeOfAddr(r->names)/sizeof(char*);
+      int N = omSizeOfAddr(r->names)/sizeof(char_ptr);
       if (r->N < N) N = r->N;
 
       for (i=(N-1);i>=0;i--)
@@ -5663,4 +5662,128 @@ int n_IsParam(const number m, const ring r)
   Werror("n_IsParam: IsParam is not to be used for (coeff_type = %d)",getCoeffType(C));
 
   return 0;
+}
+
+ring rPlusVar(const ring r, char *v,int left)
+{
+  if (r->order[2]!=0)
+  {
+    WerrorS("only for rings with an ordering of one block");
+    return NULL;
+  }
+  int p;
+  if((r->order[0]==ringorder_C)
+  ||(r->order[0]==ringorder_c))
+    p=1;
+  else
+    p=0;
+  if((r->order[p]!=ringorder_dp)
+  && (r->order[p]!=ringorder_Dp)
+  && (r->order[p]!=ringorder_lp)
+  && (r->order[p]!=ringorder_rp)
+  && (r->order[p]!=ringorder_ds)
+  && (r->order[p]!=ringorder_Ds)
+  && (r->order[p]!=ringorder_ls))
+  {
+    WerrorS("ordering must be dp,Dp,lp,rp,ds,Ds or ls");
+    return NULL;
+  }
+  for(int i=r->N-1;i>=0;i--)
+  {
+    if (strcmp(r->names[i],v)==0)
+    {
+      Werror("duplicate variable name >>%s<<",v);
+      return NULL;
+    }
+  }
+  ring R=rCopy0(r);
+  char **names;
+  #ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(r))
+  {
+    R->isLPring=r->isLPring+1;
+    R->N=((r->N)/r->isLPring)+r->N;
+    names=(char**)omAlloc(R->N*sizeof(char_ptr));
+    if (left)
+    {
+      for(int b=0;b<((r->N)/r->isLPring);b++)
+      {
+        names[b*R->isLPring]=omStrDup(v);
+        for(int i=R->isLPring-1;i>0;i--)
+          names[i+b*R->isLPring]=R->names[i-1+b*r->isLPring];
+      }
+    }
+    else
+    {
+      for(int b=0;b<((r->N)/r->isLPring);b++)
+      {
+        for(int i=R->isLPring;i>0;i--)
+          names[i+b*R->isLPring-1]=R->names[i-2+b*r->isLPring];
+        names[b*R->isLPring]=omStrDup(v);
+      }
+    }
+  }
+  else
+  #endif
+  {
+    R->N++;
+    names=(char**)omAlloc(R->N*sizeof(char_ptr));
+    if (left)
+    {
+      names[0]=omStrDup(v);
+      for(int i=R->N-1;i>0;i--) names[i]=R->names[i-1];
+    }
+    else
+    {
+      names[R->N-1]=omStrDup(v);
+      for(int i=R->N-2;i>=0;i--) names[i]=R->names[i];
+    }
+  }
+  omFreeSize(R->names,r->N*sizeof(char_ptr));
+  R->names=names;
+  R->block1[p]=R->N;
+  rComplete(R);
+  return R;
+}
+
+ring rMinusVar(const ring r, char *v)
+{
+  if (r->order[2]!=0)
+  {
+    WerrorS("only for rings with an ordering of one block");
+    return NULL;
+  }
+  int p;
+  if((r->order[0]==ringorder_C)
+  ||(r->order[0]==ringorder_c))
+    p=1;
+  else
+    p=0;
+  if((r->order[p]!=ringorder_dp)
+  && (r->order[p]!=ringorder_Dp)
+  && (r->order[p]!=ringorder_lp)
+  && (r->order[p]!=ringorder_rp)
+  && (r->order[p]!=ringorder_ds)
+  && (r->order[p]!=ringorder_Ds)
+  && (r->order[p]!=ringorder_ls))
+  {
+    WerrorS("ordering must be dp,Dp,lp,rp,ds,Ds or ls");
+    return NULL;
+  }
+  ring R=rCopy0(r);
+  int i=R->N;
+  while(i>0)
+  {
+    if (strcmp(R->names[i],v)==0)
+    {
+      R->N--;
+      omFree(R->names[i]);
+      for(int j=i;j<R->N;j++) R->names[j]=R->names[j+1];
+      R->names=(char**)omReallocSize(R->names,r->N*sizeof(char_ptr),R->N*sizeof(char_ptr));
+    }
+    else i--;
+  }
+  R->block1[p]=R->N;
+  rComplete(R);
+  return R;
 }
