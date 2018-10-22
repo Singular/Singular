@@ -73,8 +73,9 @@ long sba_interreduction_operations;
 #endif
 // #include "timer.h"
 
-/* shiftgb stuff */
-#include "kernel/GBEngine/shiftgb.h"
+#ifdef HAVE_SHIFTBBA
+#include "polys/shiftop.h"
+#endif
 
   int (*test_PosInT)(const TSet T,const int tl,LObject &h);
   int (*test_PosInL)(const LSet set, const int length,
@@ -4333,10 +4334,10 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 ideal freegb(ideal I)
 {
   assume(rIsLPRing(currRing));
-  assume(ideal_isInV(I, currRing));
+  assume(idIsInV(I));
   ideal RS = kStdShift(I,NULL, testHomog, NULL,NULL,0,0,NULL);
   idSkipZeroes(RS); // is this even necessary?
-  assume(ideal_isInV(RS, currRing));
+  assume(idIsInV(RS));
   return(RS);
 }
 
