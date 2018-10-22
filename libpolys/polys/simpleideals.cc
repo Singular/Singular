@@ -1056,10 +1056,6 @@ static void lpmakemonoms(int vars, int deg, const ring r)
 */
 ideal id_MaxIdeal(int deg, const ring r)
 {
-  if (deg < 0)
-  {
-    WarnS("maxideal: power must be non-negative");
-  }
   if (deg < 1)
   {
     ideal I=idInit(1,1);

@@ -4281,6 +4281,7 @@ See
 @node maxideal, memory, max, Functions
 @subsection maxideal
 @cindex maxideal
+@cindex letterplace
 @table @code
 @item @strong{Syntax:}
 @code{maxideal (} int_expression @code{)}

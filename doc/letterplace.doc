@@ -240,7 +240,7 @@ in order to see the activity journal as well as the memory usage
 Operations for polynomials in letterplace rings are @code{+} (addition),
 @code{-} (subtraction), @code{*} (multiplication) and @code{^} (power).
 
-Functions for objects from letterplace rings are: @code{std}.
+Functions for objects from letterplace rings are: @ref{std}, @ref{maxideal}.
 
 Further functionality is provided in the libraries for the @sc{Letterpace} subsystem.
 
