@@ -3556,7 +3556,7 @@ void  p_Vec2Polys(poly v, poly* *p, int *len, const ring r)
 
   *len=p_MaxComp(v,r);
   if (*len==0) *len=1;
-  *p=(poly*)omAlloc0((*len)*sizeof(poly));
+  *p=(poly*)omAlloc((*len)*sizeof(poly));
   p_Vec2Array(v,*p,*len,r);
 }
 
@@ -3977,7 +3977,6 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
   {
     int* perm;
     perm=(int *)omAlloc0((rVar(srcExtRing)+1)*sizeof(int));
-    perm[0]= 0;
     for(int i=si_min(rVar(srcExtRing),rPar(dst));i>0;i--)
       perm[i]=-i;
     qq = p_PermPoly(zz, perm, srcExtRing, dst, nMap, NULL, rVar(srcExtRing)-1);

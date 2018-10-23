@@ -616,7 +616,7 @@ int p_mIsInV(poly p, const ring r)
   /* returns 1 iff p is in V */
   /* that is in each block up to a certain one there is only one nonzero exponent */
   /* lV = the length of V = the number of orig vars */
-  int *e = (int *)omAlloc0((r->N+1)*sizeof(int));
+  int *e = (int *)omAlloc((r->N+1)*sizeof(int));
   int  b = (int)((r->N+lV-1)/lV); /* the number of blocks */
   //int b  = (int)(currRing->N)/lV;
   int *B = (int *)omAlloc0((b+1)*sizeof(int)); /* the num of elements in a block */
