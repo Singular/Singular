@@ -256,6 +256,7 @@ The @ref{fpalgebras_lib} contains procedures for the generation of various algeb
 
 @c ref
 See
+@ref{maxideal};
 @ref{std}.
 @c ref
 
