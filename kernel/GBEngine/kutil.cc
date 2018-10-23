@@ -65,8 +65,10 @@
 #include "kernel/GBEngine/kstd1.h"
 #include "polys/operations/pShallowCopyDelete.h"
 
-/* shiftgb stuff */
-#include "kernel/GBEngine/shiftgb.h"
+#ifdef HAVE_SHIFTBBA
+#include "polys/shiftop.h"
+#endif
+
 #include "polys/prCopy.h"
 
 #ifdef HAVE_RATGRING
@@ -12162,7 +12164,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
   Lp.lcm = p_Lcm(p,q, currRing); // q is what was strat->S[i], so a poly in LM/TR presentation
 
   /* apply the V criterion */
-  if (!isInV(Lp.lcm, currRing))
+  if (!pIsInV(Lp.lcm))
   {
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)

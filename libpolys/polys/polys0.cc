@@ -13,6 +13,9 @@
 #include "coeffs/numbers.h"
 #include "polys/monomials/ring.h"
 #include "polys/monomials/p_polys.h"
+#ifdef HAVE_SHIFTBBA
+#include "polys/shiftop.h"
+#endif
 
 /*2
 * writes a monomial (p),
@@ -23,6 +26,27 @@ static void writemon(poly p, int ko, const ring r)
   assume(r != NULL);
   const coeffs C = r->cf;
   assume(C != NULL);
+
+#ifdef HAVE_SHIFTBBA
+  if (r->isLPring)
+  {
+    if (!p_mIsInV(p, r))
+    {
+      /*
+      * the monomial is not a valid letterplace monomial
+      * without this warning one cannot distinguish between
+      * x(1)*x(3) and x(1)*x(2) because they would both be displayed
+      * as x*x
+      */
+      int *expV = (int *) omAlloc((r->N+1)*sizeof(int));
+      p_GetExpV(p, expV, r);
+      char* s = LPExpVString(expV, r);
+      Warn("invalid letterplace monomial: (%s)", s);
+      omFreeSize((ADDRESS) expV, (r->N+1)*sizeof(int));
+      omFree(s);
+    }
+  }
+#endif
 
   BOOLEAN wroteCoef=FALSE,writeGen=FALSE;
   const BOOLEAN bNotShortOut = (rShortOut(r) == FALSE);
