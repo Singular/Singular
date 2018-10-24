@@ -9528,6 +9528,10 @@ See
 @node short, timer, printlevel, System variables
 @subsection short
 @cindex short
+@cindex monomial output
+@cindex writing monomials
+@cindex monomial, write
+@cindex outputting monomials
 @table @code
 @item @strong{Type:}
 int
