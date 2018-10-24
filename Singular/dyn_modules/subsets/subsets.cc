@@ -42,12 +42,12 @@ BOOLEAN subsets(leftv res, leftv args)
 
       lists Lt = (lists) omAllocBin(slists_bin);
       Lt->Init(lt.size());
-      for (int i=0; i<lt.size(); i++)
+      for (unsigned i=0; i<lt.size(); i++)
       {
         std::vector<int> lti = lt[i];
         lists Lti = (lists) omAllocBin(slists_bin);
         Lti->Init(k);
-        for(int j=0; j<lti.size(); j++)
+        for(unsigned j=0; j<lti.size(); j++)
         {
           Lti->m[j].rtyp = INT_CMD;
           Lti->m[j].data = (void*)(long)lti[j];
@@ -67,7 +67,7 @@ BOOLEAN subsets(leftv res, leftv args)
 
 //------------------------------------------------------------------------
 // initialisation of the module
-extern "C" int SI_MOD_INIT(customstd)(SModulFunctions* p)
+extern "C" int SI_MOD_INIT(subsets)(SModulFunctions* p)
 {
   p->iiAddCproc("subsets.so","subsets",FALSE,subsets);
   return (MAX_TOK);
