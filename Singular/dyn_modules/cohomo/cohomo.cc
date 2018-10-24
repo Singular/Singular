@@ -325,7 +325,7 @@ ideal idsrRing(ideal h)
       rsr=pp;
   //Print("This is the first quotient generators %d:\n",i);
   //id_print(rsr);
-      break;        
+      break;
     }
   }
   for(n=i+1;n<=rVar(currRing);n++)

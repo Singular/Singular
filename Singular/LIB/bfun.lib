@@ -344,7 +344,7 @@ EXAMPLE: example linReduceIdeal; shows examples
           for (i=1; i<=size(lJ[1]); i++)
           {
              M[i+sZeros] = gen(posNonZero[i]);
-          }  
+          }
           kill posNonZero;
         }
       }

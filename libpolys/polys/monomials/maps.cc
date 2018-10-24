@@ -243,15 +243,15 @@ void maFindPermLP(char const * const * const preim_names, int preim_n, char cons
       {
         if (strcmp(preim_names[i],names[j])==0)
         {
-	  if (cnt==b)
-	  {
+          if (cnt==b)
+          {
             if (BVERBOSE(V_IMAP))
               Print("// var %s: nr %d -> nr %d\n",preim_names[i],i+1,j+1);
             /* var i+1 from preimage ring is var j+1  (index j+1) from image ring */
             perm[i+1]=j+1;
             break;
-	  }
-	  else cnt++;
+          }
+          else cnt++;
         }
       }
       if ((perm[i+1]==0)&&(par!=NULL)

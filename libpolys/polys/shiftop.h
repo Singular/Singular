@@ -38,6 +38,14 @@ void p_LPExpVappend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const 
 void p_LPExpVprepend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const ring ri);
 
 void WriteLPExpV(int *expV, ring ri);
+char* LPExpVString(int *expV, ring ri);
+
+int id_IsInV(ideal I, const ring r);
+int p_IsInV(poly p, const ring r);
+int p_mIsInV(poly p, const ring r);
+#define idIsInV(I) id_IsInV(I, currRing)
+#define pIsInV(p) p_IsInV(p, currRing)
+#define pmIsInV(p) p_mIsInV(p, currRing)
 
 #endif
 #endif

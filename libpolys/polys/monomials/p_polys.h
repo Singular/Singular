@@ -1516,7 +1516,7 @@ static inline int p_LmCmp(poly p, poly q, const ring r)
     goto LengthGeneral_OrdGeneral_LoopTop;
   }
   const long* _ordsgn = (long*) r->ordsgn;
-#if 1 /* two variants*/ 
+#if 1 /* two variants*/
   if (_v1 > _v2)
   {
     return _ordsgn[_i];

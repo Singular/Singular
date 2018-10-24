@@ -156,5 +156,10 @@ ideal maMapIdeal(const ideal map_id, const ring preimage_r,const ideal image_id,
   return (ideal)m;
 }
 
-
-
+poly maMapPoly(const poly map_p, const ring map_r,const ideal image_id, const ring image_r, const nMapFunc nMap)
+{
+  matrix s=mpNew(map_r->N,maMaxDeg_P(map_p, map_r));
+  poly p=maEval((map)image_id, map_p, map_r, nMap, (ideal)s, image_r);
+  id_Delete((ideal*)&s,image_r);
+  return p;
+}
