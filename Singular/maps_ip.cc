@@ -62,12 +62,12 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
       {
         if (perm[prev_nonnull] > perm[i])
         {
-	  if (TEST_V_ALLWARN)
-	  {
+          if (TEST_V_ALLWARN)
+          {
             Warn("imap not usable for permuting variables, use map (%s <-> %s)",currRing->names[prev_nonnull-1],currRing->names[i-1]);
-	  }
+          }
           use_mult=TRUE;
-	  break;
+          break;
         }
         else
           prev_nonnull=i;
@@ -131,9 +131,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         res->data=(void *)p_PermPoly(sBucketPeek((sBucket_pt)data),perm,preimage_r,currRing, nMap,par_perm,P,use_mult);
       else /*if (what==MAP_CMD)*/
       {
-        matrix s=mpNew(N,maMaxDeg_P(sBucketPeek((sBucket_pt)data), preimage_r));
-        res->data=(void *)maEval(theMap, sBucketPeek((sBucket_pt)data), preimage_r, nMap, (ideal)s, currRing);
-        idDelete((ideal *)&s);
+        res->data=(void*)maMapPoly(sBucketPeek((sBucket_pt)data),preimage_r,(ideal)theMap,currRing,nMap);
       }
       if (nCoeff_is_Extension(currRing->cf))
         res->data=(void *)p_MinPolyNormalize(sBucketPeek((sBucket_pt)data), currRing);
@@ -148,9 +146,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
       else /*if (what==MAP_CMD)*/
       {
         p_Test((poly)data,preimage_r);
-        matrix s=mpNew(N,maMaxDeg_P((poly)data, preimage_r));
-        res->data=(void *)maEval(theMap, (poly)data, preimage_r, nMap, (ideal)s, currRing);
-        idDelete((ideal *)&s);
+        res->data=(void*)maMapPoly((poly)data,preimage_r,(ideal)theMap,currRing,nMap);
       }
       if (nCoeff_is_Extension(currRing->cf))
         res->data=(void *)p_MinPolyNormalize((poly)res->data, currRing);

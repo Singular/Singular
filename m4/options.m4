@@ -323,6 +323,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
  #### TODO Dynamic Modules???
   L=""
   bi_staticdemo=false
+  bi_subsets=false
   bi_syzextra=false
   bi_pyobject=false
   bi_gfanlib=false
@@ -357,6 +358,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
 
       case "${a}" in
        staticdemo ) bi_staticdemo=true;;
+       subsets ) bi_subsets=true;;
        syzextra ) bi_syzextra=true ;;
        pyobject ) bi_pyobject=true ;;
        gfanlib ) bi_gfanlib=true ;;
@@ -394,6 +396,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
  AC_SUBST(BUILTIN_MODULES)
 
  AM_CONDITIONAL([SI_BUILTIN_STATICDEMO], [test x$bi_staticdemo = xtrue])
+ AM_CONDITIONAL([SI_BUILTIN_SUBSETS], [test x$bi_subsets = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_SYZEXTRA], [test x$bi_syzextra = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_PYOBJECT], [test x$bi_pyobject = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_GFANLIB], [test x$bi_gfanlib = xtrue])

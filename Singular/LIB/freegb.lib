@@ -2864,101 +2864,7 @@ example
   lpGBPres2Poly(L,J); // we see, that it is equal to h from above
 }
 
-proc isOrderingShiftInvariant(int withHoles)
-  "USAGE: isOrderingShiftInvariant(b); b an integer interpreted as a boolean
-  RETURN: int
-  NOTE: Tests whether the ordering of the current ring is shift invariant, which is the case, when LM(p) > LM(p') for all p and p' where p' is p shifted by any number of places.
-@*      If withHoles != 0 even Letterplace polynomials with holes (eg. x(1)*y(4)) are considered.
-  ASSUME: - basering is a Letterplace ring.
-  "
-{
-  int shiftInvariant = 1;
 
-  int n = attrib(basering, "isLetterplaceRing");
-  int d = attrib(basering, "uptodeg");
-
-  ideal monomials;
-  if (withHoles) {
-    monomials = delete(lpMonomialsWithHoles(d-1), 1); // ignore the first element (1)
-  } else {
-    monomials = lpMaxIdeal(d-1, 0);
-  }
-
-  for (int i = 1; i <= size(monomials); i++) {
-    poly monom = monomials[i];
-    int lastblock = lastBlock(monom);
-    for (int s = 1; s <= d - lastblock; s++) {
-      for (int s2 = 0; s2 < s; s2++) { // paranoid, check every pair
-        poly first = shiftPoly(monom,s2);
-        poly second = shiftPoly(monom,s);
-        if (!(first > second)) {
-          dbprint(string(first) + " <= " + string(second));
-          shiftInvariant = 0;
-        }
-        kill first; kill second;
-      } kill s2;
-    } kill s;
-    kill monom; kill lastblock;
-  } kill i;
-
-  return(shiftInvariant);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y,z),dp;
-  def R = makeLetterplaceRing(5);
-  setring R;
-  isOrderingShiftInvariant(0);// should be 1
-  kill R; setring r;
-  def R = makeLetterplaceRing(5);
-  list RL = ringlist(R);
-  RL[3][1][1] = "wp";
-  intvec weights = 1,1,1,1,1,1,1,2,3,1,1,1,1,1,1;
-  RL[3][1][2] = weights;
-  attrib(RL,"isLetterplaceRing",3);
-  attrib(RL,"maxExp",1);
-  def Rw = setLetterplaceAttributes(ring(RL),5,3);
-  setring Rw;
-  printlevel = voice + 1;
-  isOrderingShiftInvariant(0);
-  isOrderingShiftInvariant(1);
-}
-
-static proc lpMonomialsWithHoles(int d)
-{
-  if (d < 0) {
-    ERROR("d must not be negative")
-  }
-
-  ideal monomials = 1;
-  if (d == 0) {
-     return (monomials);
-  }
-
-  int lV = attrib(basering, "isLetterplaceRing"); // variable count
-  ideal prevMonomials = lpMonomialsWithHoles(d - 1);
-
-  for (int i = 1; i <= size(prevMonomials); i++) {
-    /* if (deg(prevMonomials[i]) >= d - 1) { */
-      for (int j = 1; j <= lV; j++) {
-        poly m = prevMonomials[i];
-        m = m * var(j + (d-1)*lV);
-        monomials = monomials, m;
-        kill m;
-      } kill j;
-    /* } */
-  } kill i;
-
-  if (d > 1) {
-    // removes the 1
-    monomials[1] = 0;
-    monomials = simplify(monomials,2);
-
-    monomials = prevMonomials, monomials;
-  }
-  return (monomials);
-}
 
 
 //procedures to convert monomials into the DVec representation, all static
@@ -3156,7 +3062,105 @@ NOTE: Taking the first possible reduction
  return(p);
 }
 
-//secondary and auxiliary procedures, all static
+proc isOrderingShiftInvariant(int withHoles)
+  "USAGE: isOrderingShiftInvariant(b); b an integer interpreted as a boolean
+  RETURN: int
+  NOTE: Tests whether the ordering of the current ring is shift invariant, which is the case, when LM(p) > LM(p') for all p and p' where p' is p shifted by any number of places.
+@*      If withHoles != 0 even Letterplace polynomials with holes (eg. x(1)*y(4)) are considered.
+  ASSUME: - basering is a Letterplace ring.
+  "
+{
+  int shiftInvariant = 1;
+
+  int n = attrib(basering, "isLetterplaceRing");
+  int d = attrib(basering, "uptodeg");
+
+  ideal monomials;
+  if (withHoles) {
+    monomials = delete(lpMonomialsWithHoles(d-1), 1); // ignore the first element (1)
+  } else {
+    monomials = maxideal(0);
+    for (int i = 1; i <= d-1; i++) {
+      monomials = monomials, maxideal(i);
+    } kill i;
+  }
+
+  for (int i = 1; i <= size(monomials); i++) {
+    poly monom = monomials[i];
+    int lastblock = lastBlock(monom);
+    for (int s = 1; s <= d - lastblock; s++) {
+      for (int s2 = 0; s2 < s; s2++) { // paranoid, check every pair
+        poly first = shiftPoly(monom,s2);
+        poly second = shiftPoly(monom,s);
+        if (!(first > second)) {
+          dbprint(string(first) + " <= " + string(second));
+          shiftInvariant = 0;
+        }
+        kill first; kill second;
+      } kill s2;
+    } kill s;
+    kill monom; kill lastblock;
+  } kill i;
+
+  return(shiftInvariant);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  def R = makeLetterplaceRing(5);
+  setring R;
+  isOrderingShiftInvariant(0);// should be 1
+
+  ring r = 0,(x,y,z),dp;
+  def R = makeLetterplaceRing(5);
+  list RL = ringlist(R);
+  RL[3][1][1] = "wp";
+  intvec weights = 1,1,1,1,1,1,1,2,3,1,1,1,1,1,1;
+  RL[3][1][2] = weights;
+  attrib(RL,"isLetterplaceRing",3);
+  attrib(RL,"maxExp",1);
+  def Rw = setLetterplaceAttributes(ring(RL),5,3);
+  setring Rw;
+  printlevel = voice + 1;
+  isOrderingShiftInvariant(0);
+  isOrderingShiftInvariant(1);
+}
+
+static proc lpMonomialsWithHoles(int d)
+{
+  if (d < 0) {
+    ERROR("d must not be negative")
+  }
+
+  ideal monomials = 1;
+  if (d == 0) {
+     return (monomials);
+  }
+
+  int lV = attrib(basering, "isLetterplaceRing"); // variable count
+  ideal prevMonomials = lpMonomialsWithHoles(d - 1);
+
+  for (int i = 1; i <= size(prevMonomials); i++) {
+    /* if (deg(prevMonomials[i]) >= d - 1) { */
+      for (int j = 1; j <= lV; j++) {
+        poly m = prevMonomials[i];
+        m = m * var(j + (d-1)*lV);
+        monomials = monomials, m;
+        kill m;
+      } kill j;
+    /* } */
+  } kill i;
+
+  if (d > 1) {
+    // removes the 1
+    monomials[1] = 0;
+    monomials = simplify(monomials,2);
+
+    monomials = prevMonomials, monomials;
+  }
+  return (monomials);
+}
 
 static proc getlpCoeffs(poly q, poly p)
 {list R; intvec cq,t,lv,rv,bla;

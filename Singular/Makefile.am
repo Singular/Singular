@@ -170,7 +170,7 @@ bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
 
 Singular_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
-Singular_LDADD = libSingular.la ${OMALLOC_LIBS} ${BUILTIN_FLAGS} 
+Singular_LDADD = libSingular.la ${OMALLOC_LIBS} ${BUILTIN_FLAGS}
 
 Singular_LDFLAGS = -static ${AM_LDFLAGS} ${BUILTIN_FLAGS}
 

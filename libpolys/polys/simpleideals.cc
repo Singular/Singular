@@ -97,8 +97,19 @@ int id_PosConstant(ideal id, const ring r)
 /// initialise the maximal ideal (at 0)
 ideal id_MaxIdeal (const ring r)
 {
-  ideal hh = idInit(rVar(r), 1);
-  for (int l=rVar(r)-1; l>=0; l--)
+  int nvars;
+#ifdef HAVE_SHIFTBBA
+  if (r->isLPring)
+  {
+    nvars = r->isLPring;
+  }
+  else
+#endif
+  {
+    nvars = rVar(r);
+  }
+  ideal hh = idInit(nvars, 1);
+  for (int l=nvars-1; l>=0; l--)
   {
     hh->m[l] = p_One(r);
     p_SetExp(hh->m[l],l+1,1,r);
@@ -997,15 +1008,54 @@ static void makemonoms(int vars,int actvar,int deg,int monomdeg, const ring r)
   }
 }
 
+#ifdef HAVE_SHIFTBBA
+/*2
+*computes recursively all letterplace monomials of a certain degree
+*vars is the number of original variables (lV)
+*deg is the degree of the monomials to compute
+*
+*NOTE: We use idpowerpoint as the last index of the previous call
+*/
+static void lpmakemonoms(int vars, int deg, const ring r)
+{
+  assume(deg <= r->N/r->isLPring);
+  if (deg == 0)
+  {
+    idpower[0] = p_One(r);
+    return;
+  }
+  else
+  {
+    lpmakemonoms(vars, deg - 1, r);
+  }
+
+  int size = idpowerpoint + 1;
+  for (int j = 2; j <= vars; j++)
+  {
+    for (int i = 0; i < size; i++)
+    {
+      idpowerpoint = (j-1)*size + i;
+      idpower[idpowerpoint] = p_Copy(idpower[i], r);
+    }
+  }
+  for (int j = 1; j <= vars; j++)
+  {
+    for (int i = 0; i < size; i++)
+    {
+      idpowerpoint = (j-1)*size + i;
+      p_SetExp(idpower[idpowerpoint], ((deg - 1)*vars) + j, 1, r);
+      p_Setm(idpower[idpowerpoint],r);
+      p_Test(idpower[idpowerpoint],r);
+    }
+  }
+}
+#endif
+
 /*2
 *returns the deg-th power of the maximal ideal of 0
 */
 ideal id_MaxIdeal(int deg, const ring r)
 {
-  if (deg < 0)
-  {
-    WarnS("maxideal: power must be non-negative");
-  }
   if (deg < 1)
   {
     ideal I=idInit(1,1);
@@ -1017,13 +1067,38 @@ ideal id_MaxIdeal(int deg, const ring r)
     return id_MaxIdeal(r);
   }
 
-  int vars = rVar(r);
-  int i = binom(vars+deg-1,deg);
+  int vars, i;
+#ifdef HAVE_SHIFTBBA
+  if (r->isLPring)
+  {
+    vars = r->isLPring;
+    i = 1;
+    // i = vars^deg
+    for (int j = 0; j < deg; j++)
+    {
+      i *= vars;
+    }
+  }
+  else
+#endif
+  {
+    vars = rVar(r);
+    i = binom(vars+deg-1,deg);
+  }
   if (i<=0) return idInit(1,1);
   ideal id=idInit(i,1);
   idpower = id->m;
   idpowerpoint = 0;
-  makemonoms(vars,1,deg,0,r);
+#ifdef HAVE_SHIFTBBA
+  if (r->isLPring)
+  {
+    lpmakemonoms(vars, deg, r);
+  }
+  else
+#endif
+  {
+    makemonoms(vars,1,deg,0,r);
+  }
   idpower = NULL;
   idpowerpoint = 0;
   return id;

@@ -83,6 +83,7 @@ static proc mod_init()
 {
   LIB "gfanlib.so";
   LIB "gitfan.so";
+  //LIB "subsets.so";
   newstruct("permutation","intvec image");
   system("install","permutation","*",composePermutations,2);
   system("install","permutation","^",permutationPower,2);

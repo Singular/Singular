@@ -91,8 +91,6 @@ lpSickleHil(G[,d,n]);      computes the mistletoes and Hilbert series of A/<G>
 lpSickleDim(G[,d,n]);      computes the mistletoes and the K-dimension of A/<G>
 sickle(G[,m,d,h]);         can be used to access all lp main procedures
 
-ivMaxIdeal(l,lonly);       computes a list of free monomials in intvec presentation
-lpMaxIdeal(d,donly);       computes a list of free monomials
 monomialBasis(d, donly, J); computes a list of free monomials not contained in J
 
 ivL2lpI(L);           transforms a list of intvecs into an ideal of lp monomials
@@ -2337,78 +2335,6 @@ example
   sickle(G,0,0,1); // computes Hilbert series only
 }
 
-proc ivMaxIdeal(int l, int lonly)
-  "USAGE: lpMaxIdeal(l, lonly); l an integer, lonly an integer
-  RETURN: list
-  PURPOSE: computes a list of free monomials in intvec presentation
-  @*       with length <= l
-  @*       if donly <> 0, only monomials of degree d are returned
-  ASSUME: - basering is a Letterplace ring.
-  NOTE: see also lpMaxIdeal()
-  "
-{
-  if (l < 0) {
-    ERROR("l must not be negative")
-  }
-  list words;
-  if (l == 0) {
-     words = 0;
-     return (words);
-  }
-  int lV = attrib(basering, "isLetterplaceRing"); // variable count
-  list prevWords;
-  if (l > 1) {
-    prevWords = ivMaxIdeal(l - 1, lonly);
-  } else {
-    prevWords = 0;
-  }
-  for (int i = 1; i <= size(prevWords); i++) {
-    if (size(prevWords[i]) >= l - 1) {
-      for (int j = 1; j <= lV; j++) {
-        intvec word = prevWords[i];
-        word[l] = j;
-        words = insert(words, word);
-        kill word;
-      } kill j;
-    }
-  } kill i;
-  if (!lonly && l > 1) {
-    words = prevWords + words;
-  }
-  return (words);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(a,b,c),dp;
-  def R = makeLetterplaceRing(7); setring R;
-  ivMaxIdeal(1,0);
-  ivMaxIdeal(2,0);
-  ivMaxIdeal(2,1);
-}
-
-proc lpMaxIdeal(int d, int donly)
-  "USAGE: lpMaxIdeal(d, donly); d an integer, donly an integer
-  RETURN: ideal
-  PURPOSE: computes a list of free monomials of degree at most d
-  @*       if donly <> 0, only monomials of degree d are returned
-  ASSUME: - basering is a Letterplace ring.
-  @*      - d <= attrib(basering,uptodeg) holds.
-  NOTE: analogous to maxideal(d) in the commutative case
-  "
-{
-  return(ivL2lpI(ivMaxIdeal(d, donly)));
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(a,b,c),dp;
-  def R = makeLetterplaceRing(7); setring R;
-  lpMaxIdeal(1,0);
-  lpMaxIdeal(2,0);
-  lpMaxIdeal(2,1);
-}
-
 proc monomialBasis(int d, int donly, ideal J)
   "USAGE: monomialBasis(d, donly, J); d, donly integers, J an ideal
   RETURN: ideal
@@ -2434,13 +2360,15 @@ proc monomialBasis(int d, int donly, ideal J)
   ideal I;
   if (size(J)==0)
   {
-    I = lpMaxIdeal(d,donly);
+    I = maxideal(d);
     if (!donly)
     {
-      // append 1 as the first element; d>=1
-      I = 1, I;
+      for (int i = d-1; i >= 0; i--)
+      {
+        I = maxideal(i), I;
+      } kill i;
     }
-    return( I );
+    return(I);
   }
   // ok, Sickle misbehaves: have to remove all
   // elts from J of degree >d
@@ -2605,8 +2533,6 @@ proc tst_fpadim()
   example lp2iv;
   example lp2ivId;
   example lpId2ivLi;
-  example ivMaxIdeal;
-  example lpMaxIdeal;
   example monomialBasis;
 }
 

@@ -184,7 +184,7 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjCALL1MANY),  LIST_CMD,        LIST_CMD,       DEF_CMD       , ALLOW_NC |ALLOW_RING}
 ,{  jjWRONG ,      MAP_CMD,         0,              ANY_TYPE      , ALLOW_NC |ALLOW_RING}
 ,{D(jjDUMMY),      MATRIX_CMD,      MATRIX_CMD,     MATRIX_CMD    , ALLOW_NC |ALLOW_RING}
-,{D(jjidMaxIdeal), MAXID_CMD,       IDEAL_CMD,      INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjidMaxIdeal), MAXID_CMD,       IDEAL_CMD,      INT_CMD       , ALLOW_NC |ALLOW_RING}
 ,{D(jjMEMORY),     MEMORY_CMD,      BIGINT_CMD,     INT_CMD       , ALLOW_NC |ALLOW_RING}
 ,{D(jjidMinBase),  MINBASE_CMD,     IDEAL_CMD,      IDEAL_CMD     , NO_NC |NO_RING}
 ,{D(jjidMinBase),  MINBASE_CMD,     MODUL_CMD,      MODUL_CMD     , NO_NC |NO_RING}
@@ -1320,13 +1320,13 @@ const struct sConvertTypes dConvertTypes[] =
    { RESOLUTION_CMD,  LIST_CMD,       NULL_VAL , D(iiR2L_l) },
 // list -> resolution
    { LIST_CMD,        RESOLUTION_CMD, NULL_VAL ,  D(iiL2R) },
-// matrix -> smatrix   
+// matrix -> smatrix
    { MATRIX_CMD,      SMATRIX_CMD,    D(iiMa2Mo), NULL_VAL },
-// module -> smatrix   
+// module -> smatrix
    { MODUL_CMD,       SMATRIX_CMD,    D(iiDummy), NULL_VAL },
-// smatrix -> matrix   
+// smatrix -> matrix
    { SMATRIX_CMD,     MATRIX_CMD,     D(iiMo2Ma) , NULL_VAL },
-// smatrix -> module   
+// smatrix -> module
    { SMATRIX_CMD,     MODUL_CMD,      D(iiDummy) , NULL_VAL },
 #ifdef SINGULAR_4_2
    { INT_CMD,         CNUMBER_CMD,    D(iiI2NN) , NULL_VAL },

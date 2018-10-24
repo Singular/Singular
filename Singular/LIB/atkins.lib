@@ -247,7 +247,6 @@ EXAMPLE:example CornacchiaModified; shows an example
         bigint root_c=intRoot(c);
         if((((4*p-b^2) mod absValue(D))!=0)||(c!=root_c^2))
         {
-	"3";
           return(-1);
           // ERROR("The Diophantine equation has no solution!");
         }

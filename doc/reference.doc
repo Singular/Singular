@@ -4281,6 +4281,7 @@ See
 @node maxideal, memory, max, Functions
 @subsection maxideal
 @cindex maxideal
+@cindex letterplace
 @table @code
 @item @strong{Syntax:}
 @code{maxideal (} int_expression @code{)}
@@ -9527,6 +9528,10 @@ See
 @node short, timer, printlevel, System variables
 @subsection short
 @cindex short
+@cindex monomial output
+@cindex writing monomials
+@cindex monomial, write
+@cindex outputting monomials
 @table @code
 @item @strong{Type:}
 int

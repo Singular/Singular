@@ -4,6 +4,7 @@
 
 #include "templates/p_MemCopy.h"
 #include "monomials/p_polys.h"
+#include "polys/simpleideals.h"
 
 /* #define SHIFT_MULT_DEBUG */
 
@@ -550,18 +551,113 @@ void p_LPExpVprepend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const
 
 void WriteLPExpV(int *expV, ring ri)
 {
+  char *s = LPExpVString(expV, ri);
+  PrintS(s);
+  omFree(s);
+}
+
+char* LPExpVString(int *expV, ring ri)
+{
+  StringSetS("");
   for (int i = 0; i <= ri->N; ++i)
   {
-    Print("%d", expV[i]);
+    StringAppend("%d", expV[i]);
     if (i == 0)
     {
-      Print("| ");
+      StringAppendS("| ");
     }
     if (i % ri->isLPring == 0)
     {
-      Print(" ");
+      StringAppendS(" ");
     }
   }
+  return StringEndS();
+}
+
+/* tests whether each polynomial of an ideal I lies in in V */
+int id_IsInV(ideal I, const ring r)
+{
+  int i;
+  int s    = IDELEMS(I)-1;
+  for(i = 0; i <= s; i++)
+  {
+    if ( !p_IsInV(I->m[i], r) )
+    {
+      return(0);
+    }
+  }
+  return(1);
+}
+
+/* tests whether the whole polynomial p in in V */
+int p_IsInV(poly p, const ring r)
+{
+  poly q = p;
+  while (q!=NULL)
+  {
+    if ( !p_mIsInV(q, r) )
+    {
+      return(0);
+    }
+    q = pNext(q);
+  }
+  return(1);
+}
+
+/* there should be two routines: */
+/* 1. test place-squarefreeness: in homog this suffices: isInV */
+/* 2. test the presence of a hole -> in the tail??? */
+
+int p_mIsInV(poly p, const ring r)
+{
+  int lV = r->isLPring;
+  /* investigate only the leading monomial of p in currRing */
+  if ( p_Totaldegree(p, r)==0 ) return(1);
+  /* returns 1 iff p is in V */
+  /* that is in each block up to a certain one there is only one nonzero exponent */
+  /* lV = the length of V = the number of orig vars */
+  int *e = (int *)omAlloc((r->N+1)*sizeof(int));
+  int  b = (int)((r->N+lV-1)/lV); /* the number of blocks */
+  //int b  = (int)(currRing->N)/lV;
+  int *B = (int *)omAlloc0((b+1)*sizeof(int)); /* the num of elements in a block */
+  p_GetExpV(p,e,r);
+  int i,j;
+  for (j=1; j<=b; j++)
+  {
+    /* we go through all the vars */
+    /* by blocks in lV vars */
+    for (i=(j-1)*lV + 1; i<= j*lV; i++)
+    {
+      if (e[i]) B[j] = B[j]+1;
+    }
+  }
+  //  j = b;
+  //  while ( (!B[j]) && (j>=1)) j--;
+  for (j=b; j>=1; j--)
+  {
+    if (B[j]!=0) break;
+  }
+  /* do not need e anymore */
+  omFreeSize((ADDRESS) e, (r->N+1)*sizeof(int));
+
+  if (j==0) goto ret_true;
+//   {
+//     /* it is a zero exp vector, which is in V */
+//     freeT(B, b);
+//     return(1);
+//   }
+  /* now B[j] != 0 and we test place-squarefreeness */
+  for (; j>=1; j--)
+  {
+    if (B[j]!=1)
+    {
+      omFreeSize((ADDRESS) B, (b+1)*sizeof(int));
+      return(0);
+    }
+  }
+ ret_true:
+  omFreeSize((ADDRESS) B, (b+1)*sizeof(int));
+  return(1);
 }
 
 #endif
