@@ -4,7 +4,7 @@ category="Noncommutative";
 info="
 LIBRARY: fpalgebras.lib
 AUTHORS: Karim Abou Zeid,       karim.abou.zeid at rwth-aachen.de
-         Viktor Levandovskyy,   viktor.levandovskyy@math.rwth-aachen.de
+         Viktor Levandovskyy,   viktor.levandovskyy at math.rwth-aachen.de
          Grischa Studzinski,    grischa.studzinski at rwth-aachen.de
 
 Support: Project II.6 in the transregional collaborative research centre
@@ -14,7 +14,7 @@ OVERVIEW:
 Generation of various algebras, including group algebras of finitely presented groups in the Letterplace ring.
 FPA stands for finitely presented algebra.
 
-KEYWORDS: free associative algebra; finitely presented algebra; finitely presented group
+KEYWORDS: free associative algebra; finitely presented algebra; finitely presented group; Serre relations
 
 PROCEDURES:
 operatorAlgebra(string a, int d); description of some common algebras of operators
@@ -55,7 +55,7 @@ LIB "general.lib";
 
 proc tstfpalgebras()
 {
-  example operatorAlgebra;	
+  example operatorAlgebra;
   example serreRelations;
   example fullSerreRelations;
   example ademRelations;
@@ -450,8 +450,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
         shift1
         weyl1inverse
 
-      This is a collection of common algebras
-
+      This is a collection of common algebras.
 "
 {
   if (d < 2) {
@@ -569,7 +568,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       - in the group case: A = a^(-1), B = b^(-1)
       - negative input is only allowed in the group case!
       - d gives a degreebound and must be >m,n
-	  - varying n and m produces a family of examples
+      - varying n and m produces a family of examples
 "
 {
   int isGroup = 0;
@@ -1399,7 +1398,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       - only positive exponents are allowed
       - no inverse generators needed
       - d gives the degreebound for the Letterplace ring
-	  - varying n and P produces a family of examples
+      - varying n and P produces a family of examples
 "
 {
  int baseringdef,i,j;
@@ -1453,7 +1452,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       - The Fibonacci group F(2, m) with the following presentation
         < x_1, x_2, ... , x_m | x_i * x_(i + 1) = x_(i + 2) >
       - d gives the degreebound for the Letterplace ring
-	  - varying m produces a family of examples
+      - varying m produces a family of examples
 "
 {
 // TODO: basefield Q oder F2?
@@ -1506,7 +1505,7 @@ RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
       - g gives the number of the example (1 - 5)
       - d gives the degreebound for the Letterplace ring
-	  - varying g produces a family of examples
+      - varying g produces a family of examples
 
 The examples are found in ``Classification of the finite generalized tetrahedron groups''
 by Gerhard Rosenberger and Martin Scheer.
@@ -1571,7 +1570,7 @@ RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
       - g gives the number of the example (1 - 14)
       - d gives the degreebound for the Letterplace ring
-	  - varying g produces a family of examples
+      - varying g produces a family of examples
 
 The examples are found in
 Classification of the finite generalized tetrahedron groups
