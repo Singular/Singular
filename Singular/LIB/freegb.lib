@@ -2,11 +2,17 @@
 version="version freegb.lib 4.1.1.4 Oct_2018 "; // $Id$
 category="Noncommutative";
 info="
-LIBRARY: freegb.lib   Compute two-sided Groebner bases in free algebras via letterplace approach
-AUTHORS: Viktor Levandovskyy,     viktor.levandovskyy@math.rwth-aachen.de
-       Grischa Studzinski,      grischa.studzinski@math.rwth-aachen.de
+LIBRARY: freegb.lib   Two-sided Groebner bases in free algebras and tools via letterplace approach
+AUTHORS: Viktor Levandovskyy,   viktor.levandovskyy at math.rwth-aachen.de
+         Grischa Studzinski,    grischa.studzinski at math.rwth-aachen.de
+         Karim Abou Zeid,       karim.abou.zeid at rwth-aachen.de
 
-OVERVIEW: For the theory, see chapter 'Letterplace' in the @sc{Singular} Manual
+OVERVIEW: For the theory, see chapter 'Letterplace' in the @sc{Singular} Manual.
+This library provides access to kernel functions and also contains legacy code (partially as
+ static procedures) for compatibility reasons.
+
+KEYWORDS: free associative algebra; tensor algebra; free noncommutative Groebner basis;
+Letterplace Groebner basis; finitely presented algebra
 
 Support: Joint projects LE 2697/2-1 and KR 1907/3-1 of the Priority Programme SPP 1489:
 'Algorithmische und Experimentelle Methoden in Algebra, Geometrie und Zahlentheorie'
@@ -15,59 +21,53 @@ and Project II.6 of the transregional collaborative research centre
 SFB-TRR 195 'Symbolic Tools in Mathematics and their Application' of the German DFG
 
 PROCEDURES:
-makeLetterplaceRing(d); creates a ring with d blocks of shifted original variables
-letplaceGBasis(I); computes two-sided Groebner basis of a letterplace ideal I up to a degree bound
-lpNF(f,I); two-sided normal form of f with respect to ideal I
+makeLetterplaceRing(d);          creates a ring with d blocks of shifted original variables
 setLetterplaceAttributes(R,d,b); supplies ring R with the letterplace structure
-freeGBasis(L, n);  computes two-sided Groebner basis of an ideal, encoded via list L, up to degree n
+lieBracket(a,b[, N]);            Lie bracket ab-ba of two letterplace polynomials
+letplaceGBasis(I);               two-sided Groebner basis of a letterplace ideal I
+lpNF(f,I);                       two-sided normal form of f with respect to ideal I
+lpDivision(f,I);                 two-sided division with remainder
+lpGBPres2Poly(L,I);              reconstructs a polynomial from the output of lpDivision
+isOrderingShiftInvariant(i);     tests shift-invariance of the monomial ordering
 
-lieBracket(a,b[, N]);  compute Lie bracket ab-ba of two letterplace polynomials
+isVar(p);                        check whether p is a power of a single variable
+lpPrint(I, r); represents Letterplace ideal in the form of words (legacy routine)
+freeGBasis(L, n);  computes two-sided Groebner basis of an ideal, encoded via list L (legacy routine)
 
+SEE ALSO: fpadim_lib, fpaprops_lib, fpalgebras_lib, LETTERPLACE
+";
+
+/* more legacy:
 lp2lstr(K, s);  convert a letterplace ideal into a list of modules
 lst2str(L[, n]); convert a list (of modules) into polynomials in free algebra via strings
 mod2str(M[, n]); convert a module into a polynomial in free algebra via strings
 vct2str(M[, n]);   convert a vector into a word in free algebra
-
-serreRelations(A,z); compute the homogeneous part of Serre's relations associated to a generalized Cartan matrix A
-fullSerreRelations(A,N,C,P,d); compute the ideal of all Serre's relations associated to a generalized Cartan matrix A
-isVar(p);              check whether p is a power of a single variable
-ademRelations(i,j);    compute the ideal of Adem relations for i<2j in char 0
-
-SEE ALSO: fpadim_lib, LETTERPLACE
-";
-
-// this library computes two-sided GB of an ideal
-// in a free associative algebra
-
-// a monomial is encoded via a vector V
-// where V[1] = coefficient
-// V[1+i] = the corresponding symbol
+//also, there were
+shiftPoly;
+lpPower;
+*/
 
 LIB "qhmoduli.lib"; // for Max
 LIB "bfun.lib"; // for inForm
 LIB "fpadim.lib"; // for intvec conversion
+LIB "fpalgebras.lib"; // for compatibility
 
 proc tstfreegb()
 {
-    /* tests all procs for consistency */
-  /* adding the new proc, add it here */
+  /* tests all procs for consistency */
+  /* after adding the new proc, add it here */
   example makeLetterplaceRing;
   example letplaceGBasis;
   example lpNF;
+  example lpDivision;
+  example lpGBPres2Poly;
   example freeGBasis;
   example setLetterplaceAttributes;
+  example isOrderingShiftInvariant;
   /* secondary */
-  example   shiftPoly;
-  example   lpPower;
-  example   lieBracket;
-  example   lp2lstr;
-  example   lst2str;
-  example   mod2str;
-  example   vct2str;
-  example   serreRelations;
-  example   fullSerreRelations;
-  example   isVar;
-  example   ademRelations;
+  example lieBracket;
+  example lpPrint;
+  example isVar;
 }
 
 proc setLetterplaceAttributes(def R, int uptodeg, int lV)
@@ -105,78 +105,7 @@ example
 }
 
 
-// obsolete?
-
-static proc lshift(module M, int s, string varing, def lpring)
-{
-  // FINALLY IMPLEMENTED AS A PART OT THE CODE
-  // shifts a polynomial from the ring R to s positions
-  // M lives in varing, the result in lpring
-  // to be run from varing
-  int i, j, k, sm, sv;
-  vector v;
-  //  execute("setring "+lpring);
-  setring lpring;
-  poly @@p;
-  ideal I;
-  execute("setring "+varing);
-  sm = ncols(M);
-  for (i=1; i<=s; i++)
-  {
-    // modules, e.g. free polynomials
-    for (j=1; j<=sm; j++)
-    {
-      //vectors, e.g. free monomials
-      v  = M[j];
-      sv = size(v);
-      sp = "@@p = @@p + ";
-      for (k=2; k<=sv; k++)
-      {
-        sp = sp + string(v[k])+"("+string(k-1+s)+")*";
-      }
-      sp = sp + string(v[1])+";"; // coef;
-      setring lpring;
-      //      execute("setring "+lpring);
-      execute(sp);
-      execute("setring "+varing);
-    }
-    setring lpring;
-    //    execute("setring "+lpring);
-    I = I,@@p;
-    @@p = 0;
-  }
-  setring lpring;
-  //execute("setring "+lpring);
-  export(I);
-  //  setring varing;
-  execute("setring "+varing);
-}
-
-static proc skip0(vector v)
-{
-  // skips zeros in a vector, producing another vector
-  if ( (v[1]==0) || (v==0) ) { return(vector(0)); }
-  int sv = nrows(v);
-  int sw = size(v);
-  if (sv == sw)
-  {
-    return(v);
-  }
-  int i;
-  int j=1;
-  vector w;
-  for (i=1; i<=sv; i++)
-  {
-    if (v[i] != 0)
-    {
-      w = w + v[i]*gen(j);
-      j++;
-    }
-  }
-  return(w);
-}
-
-proc lst2str(list L, list #)
+static proc lst2str(list L, list #)
 "USAGE:  lst2str(L[,n]);  L a list of modules, n an optional integer
 RETURN:  list (of strings)
 PURPOSE: convert a list (of modules) into polynomials in free algebra
@@ -229,7 +158,7 @@ example
 }
 
 
-proc mod2str(module M, list #)
+static proc mod2str(module M, list #)
 "USAGE:  mod2str(M[,n]);  M a module, n an optional integer
 RETURN:  string
 PURPOSE: convert a module into a polynomial in free algebra
@@ -287,7 +216,7 @@ example
   mod2str(M,1);
 }
 
-proc vct2str(vector v, list #)
+static proc vct2str(vector v, list #)
 "USAGE:  vct2str(v[,n]);  v a vector, n an optional integer
 RETURN:  string
 PURPOSE: convert a vector into a word in free algebra
@@ -425,62 +354,13 @@ example
   isVar(i);
 }
 
-// new conversion routines
-
-static proc id2words(ideal I, int d)
-{
-  // NOT FINISHED
-  // input: ideal I of polys in letter-place notation
-  // in the ring with d real vars
-  // output: the list of strings: associative words
-  // extract names of vars
-  int i,m,n; string s; string place = "(1)";
-  list lv;
-  for(i=1; i<=d; i++)
-  {
-    s = string(var(i));
-    // get rid of place
-    n = find(s, place);
-    if (n>0)
-    {
-      s = s[1..n-1];
-    }
-    lv[i] = s;
-  }
-  poly p,q;
-  for (i=1; i<=ncols(I); i++)
-  {
-    if (I[i] != 0)
-    {
-      p = I[i];
-      while (p!=0)
-      {
-         q = leadmonom(p);
-      }
-    }
-  }
-
-  return(lv);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x(1),y(1),z(1),x(2),y(2),z(2)),dp;
-  ideal I = x(1)*y(2) -z(1)*x(2);
-  id2words(I,3);
-}
-
-static proc mono2word(poly p, int d)
-{
-}
-
 proc letplaceGBasis(def I)
 "USAGE: letplaceGBasis(I);  I an ideal/module
 RETURN: ideal/module
 ASSUME: basering is a Letterplace ring, input consists of Letterplace
 @*      polynomials
 PURPOSE: compute the two-sided Groebner basis of I via Letterplace
-@*       algorithm
+@*       algorithm (legacy routine)
 NOTE: the degree bound for this computation is read off the letterplace
 @*    structure of basering
 EXAMPLE: example letplaceGBasis; shows examples
@@ -498,12 +378,99 @@ example
   ideal I = -x*y-7*y*y+3*x*x, x*y*x-y*x*y;
   ideal J = letplaceGBasis(I);
   J;
+}
+
+/*
+//// this was the part of example in the old good Letterplace
   // now transfom letterplace polynomials into strings of words
   lp2lstr(J,r); // export an object called @code{@LN} to the ring r
   setring r;  // change to the ring r
   lst2str(@LN,1);
+*/
+
+
+proc lieBracket(poly a, poly b, list #)
+"USAGE:  lieBracket(a,b[,N]); a,b letterplace polynomials, N an optional integer
+RETURN:  poly
+ASSUME: basering has a letterplace ring structure
+PURPOSE:compute the Lie bracket [a,b] = ab - ba between letterplace polynomials
+NOTE: if N>1 is specified, then the left normed bracket [a,[...[a,b]]]] is
+@*    computed.
+EXAMPLE: example lieBracket; shows examples
+"
+{
+  if (lpAssumeViolation())
+  {
+    //    ERROR("Either 'uptodeg' or 'lV' global variables are not set!");
+    ERROR("Incomplete Letterplace structure on the basering!");
+  }
+  // alias ppLiebr;
+  //if int N is given compute [a,[...[a,b]]]] left normed bracket
+  int N=1;
+  if (size(#)>0)
+  {
+    if (typeof(#[1])=="int")
+    {
+      N = int(#[1]);
+    }
+  }
+  if (N<=0) { return(q); }
+  poly q = a*b - b*a;
+  if (N >1)
+  {
+    for(int i=1; i<=N-1; i++)
+    {
+      q = lieBracket(a,q);
+    }
+  }
+  return(q);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(4,2); // R with letterplace structure
+  setring R;
+  poly a = x*y; poly b = y;
+  lieBracket(a,b);
+  lieBracket(x,y,2);
 }
 
+proc lpPrint(ideal I, def @r)
+"USAGE: lpPrint(I, r); I an ideal, r a ring
+RETURN: list of strings
+PURPOSE: represent Letterplace ideal in the form of words (legacy routine)
+ASSUME: - basering is a Letterplace ring, r is the commutative ring
+from which basering has been built
+EXAMPLE: example lpPrint; shows example
+"
+{
+  def save = basering;
+  lp2lstr(I,@r); // export an object called @code{@LN} to the ring r
+  setring @r;  // change to the ring r
+  list @L = lst2str(@LN,1);
+  export @L;
+  setring save;
+  list @@L = @L;
+  setring @r;
+  kill @L;
+  kill @LN;
+  setring save;
+  return(@@L);
+}
+example
+{
+ "EXAMPLE:"; echo = 2;
+ ring r = (0,a,b,g),(x,y),Dp;
+ def R = makeLetterplaceRing(4); // constructs a Letterplace ring
+ setring R; // downup algebra A
+ ideal J = x*x*y-a*x*y*x - b*y*x*x - g*x,
+ x*y*y-a*y*x*y - b*y*y*x - g*y;
+ list L = lpPrint(J,r);
+ L;
+}
+
+/* HISTORICAL STUFF from 2007
 // given the element -7xy^2x, it is represented as [-7,x,y^2,x] or as [-7,x,y,y,x]
 // use the orig ord on (x,y,z) and expand it blockwise to (x(i),y(i),z(i))
 
@@ -519,6 +486,7 @@ example
 // 4. skip shifted elts (check that no such exist?)
 // 5. go back to orig vars, produce strings/modules
 // 6. return the result
+*/
 
 proc freeGBasis(list LM, int d)
 "USAGE:  freeGBasis(L, d);  L a list of modules, d an integer
@@ -950,7 +918,7 @@ static proc polylen(ideal I)
   return(J);
 }
 
-// new: uniting both mLR1 (homog) and mLR2 (nonhomog)
+// united all previous makes, including mLR1 (homog) and mLR2 (nonhomog)
 proc makeLetterplaceRing(int d, list #)
 "USAGE:  makeLetterplaceRing(d [,h]); d an integer, h an optional integer
 RETURN:  ring
@@ -1476,7 +1444,6 @@ example
   // strange answer CHECK
 }
 
-
 //static proc ex_nonhomog_3()
 {
   option(prot);
@@ -1781,42 +1748,6 @@ example
 
 /* begin older procs and tests
 
-static proc sgb(ideal I, int d)
-{
-  // new code
-  // map x_i to x_i(1) via map()
-  //LIB "freegb.lib";
-  def save = basering;
-  //int d =7;// degree
-  int nv = nvars(save);
-  def R = makeLetterplaceRing(d);
-  setring R;
-  int i;
-  ideal Imap;
-  for (i=1; i<=nv; i++)
-  {
-    Imap[i] = var(i);
-  }
-  //ideal I = x(1)*y(2), y(1)*x(2)+z(1)*z(2);
-  ideal I = x(1)*x(2),x(1)*y(2) + z(1)*x(2);
-  option(prot);
-  //option(teach);
-  ideal J = system("freegb",I,d,nv);
-}
-
-static proc checkCeq()
-{
-  ring r = 0,(x,y),Dp;
-  def A = makeLetterplaceRing(4);
-  setring A;
-  A;
-  // I = x2-xy
-  ideal I = x(1)*x(2) - x(1)*y(2), x(2)*x(3) - x(2)*y(3), x(3)*x(4) - x(3)*y(4);
-  ideal C = x(2)-x(1),x(3)-x(2),x(4)-x(3),y(2)-y(1),y(3)-y(2),y(4)-y(3);
-  ideal K = I,C;
-  groebner(K);
-}
-
 static proc exHom1()
 {
   // we start with
@@ -1894,92 +1825,7 @@ static proc test3()
   ideal J = system("freegb",I,d,3);
 }
 
-static proc schur2-3()
-{
-  // nonhomog:
-  //  h^4-10*h^2+9,f*e-e*f+h, h*2-e*h-2*e,h*f-f*h+2*f
-  // homogenized with t
-  //  h^4-10*h^2*t^2+9*t^4,f*e-e*f+h*t, h*2-e*h-2*e*t,h*f-f*h+2*f*t,
-  // t*h - h*t, t*f - f*t, t*e - e*t
-}
-
 end older procs and tests */
-
-proc ademRelations(int i, int j)
-"USAGE:  ademRelations(i,j); i,j int
-RETURN:  ring (and exports ideal)
-ASSUME: there are at least i+j variables in the basering
-PURPOSE: compute the ideal of Adem relations for i<2j in characteristic 0
-@*  the ideal is exported under the name AdemRel in the output ring
-EXAMPLE: example ademRelations; shows examples
-"
-{
-  // produces Adem relations for i<2j in char 0
-  // assume: 0<i<2j
-  // requires presence of vars up to i+j
-  if ( (i<0) || (i >= 2*j) )
-  {
-    ERROR("arguments out of range"); return(0);
-  }
-  ring @r = 0,(s(i+j..0)),lp;
-  poly p,q;
-  number n;
-  int ii = i div 2; int k;
-  // k=0 => s(0)=1
-  n = binomial(j-1,i);
-  q = n*s(i+j)*s(0);
-  //  printf("k=0, term=%s",q);
-  p = p + q;
-  for (k=1; k<= ii; k++)
-  {
-    n = binomial(j-k-1,i-2*k);
-    q = n*s(i+j-k)*s(k);;
-    //    printf("k=%s, term=%s",k,q);
-    p = p + q;
-  }
-  poly AdemRel = p;
-  export AdemRel;
-  return(@r);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  def A = ademRelations(2,5);
-  setring A;
-  AdemRel;
-}
-
-/*
-1,1: 0
-1,2: s(3)*s(0) == s(3) -> def for s(3):=s(1)s(2)
-2,1: adm
-2,2: s(3)*s(1) == s(1)s(2)s(1)
-1,3: 0 ( since 2*s(4)*s(0) = 0 mod 2)
-3,1: adm
-2,3: s(5)*s(0)+s(4)*s(1) == s(5)+s(4)*s(1)
-3,2: 0
-3,3: s(5)*s(1)
-1,4: 3*s(5)*s(0) == s(5)  -> def for s(5):=s(1)*s(4)
-4,1: adm
-2,4: 3*s(6)*s(0)+s(5)*s(1) == s(6) + s(5)*s(1) == s(6) + s(1)*s(4)*s(1)
-4,2: adm
-4,3: s(5)*s(2)
-3,4: s(7)*s(0)+2*s(6)*s(1) == s(7) -> def for s(7):=s(3)*s(4)
-4,4: s(7)*s(1)+s(6)*s(2)
-*/
-
-/* s1,s2:
-s1*s1 =0, s2*s2 = s1*s2*s1
-*/
-
-/*
-try char 0:
-s1,s2:
-s1*s1 =0, s2*s2 = s1*s2*s1, s(1)*s(3)== s(1)*s(1)*s(3) == 0 = 2*s(4) ->def for s(4)
-hence 2==0! only in char 2
- */
-
-  // Adem rels modulo 2 are interesting
 
 static proc stringpoly2lplace(string s)
 {
@@ -2411,54 +2257,9 @@ example
   strpower2rep("-a^2*x^4");
 }
 
-proc lieBracket(poly a, poly b, list #)
-"USAGE:  lieBracket(a,b[,N]); a,b letterplace polynomials, N an optional integer
-RETURN:  poly
-ASSUME: basering has a letterplace ring structure
-PURPOSE:compute the Lie bracket [a,b] = ab - ba between letterplace polynomials
-NOTE: if N>1 is specified, then the left normed bracket [a,[...[a,b]]]] is
-@*    computed.
-EXAMPLE: example lieBracket; shows examples
-"
-{
-  if (lpAssumeViolation())
-  {
-    //    ERROR("Either 'uptodeg' or 'lV' global variables are not set!");
-    ERROR("Incomplete Letterplace structure on the basering!");
-  }
-  // alias ppLiebr;
-  //if int N is given compute [a,[...[a,b]]]] left normed bracket
-  int N=1;
-  if (size(#)>0)
-  {
-    if (typeof(#[1])=="int")
-    {
-      N = int(#[1]);
-    }
-  }
-  if (N<=0) { return(q); }
-  poly q = a*b - b*a;
-  if (N >1)
-  {
-    for(int i=1; i<=N-1; i++)
-    {
-      q = lieBracket(a,q);
-    }
-  }
-  return(q);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(4,2); // R with letterplace structure
-  setring R;
-  poly a = x*y; poly b = y;
-  lieBracket(a,b);
-  lieBracket(x,y,2);
-}
 
-proc shiftPoly(poly a, int i)
+
+static proc shiftPoly(poly a, int i)
 "USAGE:  shiftPoly(p,i); p letterplace poly, i int
 RETURN: poly
 ASSUME: basering has letterplace ring structure
@@ -2486,7 +2287,7 @@ example
   shiftPoly(f,2);
 }
 
-proc lastBlock(poly p)
+static proc lastBlock(poly p)
 "USAGE:  lastBlock(p); p letterplace poly
 RETURN: int
 ASSUME: basering has letterplace ring structure
@@ -2525,291 +2326,6 @@ static proc test_shift()
   setring R;
   poly p = mmLiebr(a,b);
   poly p = lieBracket(a,b);
-}
-
-proc serreRelations(intmat A, int zu)
-"USAGE:  serreRelations(A,z); A an intmat, z an int
-RETURN:  ideal
-ASSUME: basering has a letterplace ring structure and
-@*          A is a generalized Cartan matrix with integer entries
-PURPOSE: compute the ideal of Serre's relations associated to A
-EXAMPLE: example serreRelations; shows examples
-"
-{
-  // zu = 1 -> with commutators [f_i,f_j]; zu == 0 without them
-  // suppose that A is cartan matrix
-  // then Serre's relations are
-  // (ad f_j)^{1-A_{ij}} ( f_i)
-  int ppl = printlevel-voice+2;
-  int n = ncols(A); // hence n variables
-  int i,j,k,el;
-  poly p,q;
-  ideal I;
-  for (i=1; i<=n; i++)
-  {
-    for (j=1; j<=n; j++)
-    {
-      el = 1 - A[i,j];
-      //     printf("i:%s, j: %s, l: %s",i,j,l);
-      dbprint(ppl,"i, j, l: ",i,j,el);
-      //      if ((i!=j) && (l >0))
-      //      if ( (i!=j) &&  ( ((zu ==0) &&  (l >=2)) || ((zu ==1) &&  (l >=1)) ) )
-      if ((i!=j) && (el >0))
-      {
-        q = lieBracket(var(j),var(i));
-        dbprint(ppl,"first bracket: ",q);
-        //        if (l >=2)
-        //        {
-          for (k=1; k<=el-1; k++)
-          {
-            q = lieBracket(var(j),q);
-            dbprint(ppl,"further bracket:",q);
-          }
-          //        }
-      }
-      if (q!=0) { I = I,q; q=0;}
-    }
-  }
-  I = simplify(I,2);
-  return(I);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  intmat A[3][3] =
-    2, -1, 0,
-    -1, 2, -3,
-    0, -1, 2; // G^1_2 Cartan matrix
-  ring r = 0,(f1,f2,f3),dp;
-  int uptodeg = 5;
-  def R = makeLetterplaceRing(uptodeg);
-  setring R;
-  ideal I = serreRelations(A,1); I = simplify(I,1+2+8);
-  I;
-}
-
-/* setup for older example:
-  intmat A[2][2] = 2, -1, -1, 2; // sl_3 == A_2
-  ring r = 0,(f1,f2),dp;
-  int uptodeg = 5; int lV = 2;
-*/
-
-proc fullSerreRelations(intmat A, ideal rNegative, ideal rCartan, ideal rPositive, int uptodeg)
-"USAGE:  fullSerreRelations(A,N,C,P,d); A an intmat, N,C,P ideals, d an int
-RETURN:  ring (and ideal)
-PURPOSE: compute the inhomogeneous Serre's relations associated to A in given
-@*       variable names
-ASSUME: three ideals in the input are of the same sizes and contain merely
-@* variables which are interpreted as follows: N resp. P stand for negative
-@* resp. positive roots, C stand for Cartan elements. d is the degree bound for
-@* letterplace ring, which will be returned.
-@* The matrix A is a generalized Cartan matrix with integer entries
-@* The result is the ideal called 'fsRel' in the returned ring.
-EXAMPLE: example fullSerreRelations; shows examples
-"
-{
-  /* SerreRels on rNeg and rPos plus Cartans etc. */
-  int ppl = printlevel -voice+2;
-  /* ideals must be written in variables: assume each term is of degree 1 */
-  int i,j,k;
-  int N = nvars(basering);
-  def save = basering;
-  int comFlag = 0;
-  /* assume:  (size(rNegative) == size(rPositive)) */
-  /* assume:  (size(rNegative) == size(rCartan)) i.e. nonsimple Cartans */
-  if ( (size(rNegative) != size(rPositive)) || (size(rNegative) != size(rCartan)) )
-  {
-    ERROR("All input ideals must be of the same size");
-  }
-
-//   if (size(rNegative) != size(rPositive))
-//   {
-//     ERROR("The 1st and the 3rd input ideals must be of the same size");
-//   }
-
-  /* assume:  2*size(rNegative) + size(rCartan) >= nvars(basering) */
-  i = 2*size(rNegative) + size(rCartan);
-  if (i>N)
-  {
-    string s1="The total number of elements in input ideals";
-    string s2="must not exceed the dimension of the ground ring";
-    ERROR(s1+s2);
-  }
-  if (i < N)
-  {
-    comFlag = N-i; // so many elements will commute
-    "Warning: some elements will be treated as mutually commuting";
-  }
-  /* extract varnames from input ideals */
-  intvec iNeg = varIdeal2intvec(rNegative);
-  intvec iCartan = varIdeal2intvec(rCartan);
-  intvec iPos = varIdeal2intvec(rPositive);
-  /* for each vector in rNeg and rPositive, go into the corr. ring and create SerreRels */
-  /* rNegative: */
-  list L = ringlist(save);
-  def LPsave = makeLetterplaceRing2(uptodeg); setring save;
-  list LNEG = L; list tmp;
-  /* L[1] field as is; L[2] vars: a subset; L[3] ordering: dp, L[4] as is */
-  for (i=1; i<=size(iNeg); i++)
-  {
-    tmp[i] = string(var(iNeg[i]));
-  }
-  LNEG[2] = tmp; LNEG[3] = list(list("dp",intvec(1:size(iNeg))), list("C",0));
-  def RNEG = ring(LNEG); setring RNEG;
-  def RRNEG = makeLetterplaceRing2(uptodeg);
-  setring RRNEG;
-  ideal I = serreRelations(A,1); I = simplify(I,1+2+8);
-  setring LPsave;
-  ideal srNeg = imap(RRNEG,I);
-  dbprint(ppl,"0-1 ideal of negative relations is ready");
-  dbprint(ppl-1,srNeg);
-  setring save; kill L,tmp,RRNEG,RNEG, LNEG;
-  /* rPositive: */
-  list L = ringlist(save);
-  list LPOS = L; list tmp;
-  /* L[1] field as is; L[2] vars: a subset; L[3] ordering: dp, L[4] as is */
-  for (i=1; i<=size(iPos); i++)
-  {
-    tmp[i] = string(var(iPos[i]));
-  }
-  LPOS[2] = tmp; LPOS[3] = list(list("dp",intvec(1:size(iPos))), list("C",0));
-  def RPOS = ring(LPOS); setring RPOS;
-  def RRPOS = makeLetterplaceRing2(uptodeg);
-  setring RRPOS;
-  ideal I = serreRelations(A,1); I = simplify(I,1+2+8);
-  setring LPsave;
-  ideal srPos = imap(RRPOS,I);
-  dbprint(ppl,"0-2 ideal of positive relations is ready");
-  dbprint(ppl-1,srPos);
-  setring save; kill L,tmp,RRPOS,RPOS, LPOS;
-  string sMap = "ideal Mmap =";
-  for (i=1; i<=nvars(save); i++)
-  {
-    sMap = sMap + string(var(i))+",";
-  }
-  sMap[size(sMap)] = ";";
-  /* cartans: h_j h_i = h_i h_j */
-  setring LPsave;
-  ideal ComCartan;
-  for (i=1; i<size(iCartan); i++)
-  {
-    for (j=i+1; j<=size(iCartan); j++)
-    {
-      ComCartan =  ComCartan + lieBracket(var(iCartan[j]),var(iCartan[i]));
-    }
-  }
-  ComCartan = simplify(ComCartan,1+2+8);
-  execute(sMap); // defines an ideal Mmap
-  map F = save, Mmap;
-  dbprint(ppl,"1. commuting Cartans: ");
-  dbprint(ppl-1,ComCartan);
-  /* [e_i, f_j] =0 if i<>j */
-  ideal ComPosNeg; // assume: #Neg=#Pos
-  for (i=1; i<size(iPos); i++)
-  {
-    for (j=1; j<=size(iPos); j++)
-    {
-      if (j !=i)
-      {
-        ComPosNeg =  ComPosNeg + lieBracket(var(iPos[i]),var(iNeg[j]));
-        ComPosNeg =  ComPosNeg + lieBracket(var(iPos[j]),var(iNeg[i]));
-      }
-    }
-  }
-  ComPosNeg = simplify(ComPosNeg,1+2+8);
-  dbprint(ppl,"2. commuting Positive and Negative:");
-  dbprint(ppl-1,ComPosNeg);
-  /* [e_i, f_i] = h_i */
-  poly tempo;
-  for (i=1; i<=size(iCartan); i++)
-  {
-    tempo = lieBracket(var(iPos[i]),var(iNeg[i])) - var(iCartan[i]);
-    ComPosNeg =  ComPosNeg + tempo;
-  }
-  //  ComPosNeg = simplify(ComPosNeg,1+2+8);
-  dbprint(ppl,"3. added sl2 triples [e_i,f_i]=h_i");
-  dbprint(ppl-1,ComPosNeg);
-
-  /* [h_i, e_j] = A_ij e_j */
-  /* [h_i, f_j] = -A_ij f_j */
-  ideal ActCartan; // assume: #Neg=#Pos
-  for (i=1; i<=size(iCartan); i++)
-  {
-    for (j=1; j<=size(iCartan); j++)
-    {
-      tempo = lieBracket(var(iCartan[i]),var(iPos[j])) - A[i,j]*var(iPos[j]);
-      ActCartan = ActCartan + tempo;
-      tempo = lieBracket(var(iCartan[i]),var(iNeg[j])) + A[i,j]*var(iNeg[j]);
-      ActCartan = ActCartan + tempo;
-    }
-  }
-  ActCartan = simplify(ActCartan,1+2+8);
-  dbprint(ppl,"4. actions of Cartan:");
-  dbprint(ppl-1, ActCartan);
-
-  /* final part: prepare the output */
-  setring LPsave;
-  ideal fsRel = srNeg, srPos, ComPosNeg, ComCartan, ActCartan;
-  export fsRel;
-  setring save;
-  return(LPsave);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  intmat A[2][2] =
-    2, -1,
-    -1, 2; // A_2 = sl_3 Cartan matrix
-  ring r = 0,(f1,f2,h1,h2,e1,e2),dp;
-  ideal negroots = f1,f2; ideal cartans = h1,h2; ideal posroots = e1,e2;
-  int uptodeg = 5;
-  def RS = fullSerreRelations(A,negroots,cartans,posroots,uptodeg);
-  setring RS; fsRel;
-}
-
-/* intmat A[2][2] =
-    2, -1,
-    -3, 2; // G_2 Cartan matrix
-*/
-
-
-static proc varIdeal2intvec(ideal I)
-{
-  // used in SerreRelations
-  /* assume1:  input ideal is a list of variables of the ground ring */
-  int i,j; intvec V;
-  for (i=1; i<= size(I); i++)
-  {
-    j = univariate(I[i]);
-    if (j<=0)
-    {
-      ERROR("input ideal must contain only variables");
-    }
-    V[i] = j;
-  }
-  dbprint(printlevel-voice+2,V);
-  /* now we make a smaller list of non-repeating entries */
-  ideal iW = simplify(ideal(V),2+4); // no zeros, no repetitions
-  if (size(iW) < size(V))
-  {
-    /* extract intvec from iW */
-    intvec inW;
-    for(j=1; j<=size(iW); j++)
-    {
-      inW[j] = int(leadcoef(iW[j]));
-    }
-    return(inW);
-  }
-  return(V);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y,z),dp;
-  ideal I = x,z;
-  varIdeal2intvec(I);
-  varIdeal2intvec(ideal(x2,y^3,x+1));
-  varIdeal2intvec(ideal(x*y,y,x+1));
 }
 
 proc lp2lstr(ideal K, def save)
@@ -3049,23 +2565,6 @@ example
   lst2str(@LN,1); // agree!
 }
 
-//static proc doc_example()
-{
-  LIB "freegb.lib";
-  ring r = 0,(x,y,z),dp;
-  int d =4; // degree bound
-  def R = makeLetterplaceRing(d);
-  setring R;
-  ideal I = x(1)*y(2) + y(1)*z(2), x(1)*x(2) + x(1)*y(2) - y(1)*x(2) - y(1)*y(2);
-  option(redSB);option(redTail);
-  ideal J = system("freegb",I,d,nvars(r));
-  J;
-  // visualization:
-  lp2lstr(J,r); // export an object called @LN to the ring r
-  setring r;  // change to the ring r
-  lst2str(@LN,1); // output the strings
-}
-
 */
 
 // static proc lpMultX(poly f, poly g)
@@ -3172,7 +2671,7 @@ example
 //   lpMult(a,b);
 // }
 
-proc lpPower(poly f, int n)
+static proc lpPower(poly f, int n)
 "USAGE:  lpPower(f,n); f letterplace polynomial, int n
 RETURN:  poly
 ASSUME: basering has a letterplace ring structure
@@ -3202,16 +2701,10 @@ example
   lpPower(b,4);
 }
 
-// new: lp normal from by using shift-invariant data by Grischa Studzinski
-
-/////////////////////////////////////////////////////////
-//   ASSUMPTIONS: every polynomial is an element of V',
-//@* else there wouldn't be an dvec representation
-
-//Main procedure for the user
-
+//Main normal form procedure for the user
+// TODO Oct 18: replace by legacy call to the kernel function
 proc lpNF(poly p, ideal G)
-"USAGE: lpNF(p,G); f letterplace polynomial, ideal I
+"USAGE: lpNF(p,G); poly p, ideal G
 RETURN: poly
 PURPOSE: computation of the normal form of p with respect to G
 ASSUME: p is a Letterplace polynomial, G is a set Letterplace polynomials,
@@ -3230,6 +2723,19 @@ EXAMPLE: example lpNF; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(4); setring R;
+  ideal I = x*x + y*y - 1; // 2D sphere
+  ideal J = letplaceGBasis(I); // compute a Letterplace Groebner basis
+  J; // it is finite and nice
+  poly f = lieBracket(x,y); f;
+  lpNF(f,J);
+  poly g = lieBracket(x,y*y); g;
+  lpNF(g,J);
+}
+/* old and more complicated example
+{
+  "EXAMPLE:"; echo = 2;
 ring r = 0,(x,y,z),dp;
 int d =5; // degree
 def R = makeLetterplaceRing(d);
@@ -3241,15 +2747,20 @@ poly q = z*x*z*y*z - y*z*x*y*z;
 lpNF(p,J);
 lpNF(q,J);
 }
-
+*/
+// analog of division(); but the output HAS different structure
 proc lpDivision(poly p, ideal I)
-"ASSUME: I is a Groebner basis G = {g1,...,gN}, the original ring of the Letterplace ring has the name 'r' and no variable is called 'tag_i' for i in 1...N
+"USAGE: lpDivision(p,G); poly p, ideal G
+PURPOSE: compute a two-sided division with remainder of p wrt G; two-sided noncommutative analogue of the procedure division
+ASSUME: G = {g1,...,gN} is a Groebner basis, the original ring of the Letterplace ring has the name 'r' and no variable is called 'tag_i' for i in 1...N
 RETURN: list L
-NOTE: - L[1] NF(p,I)
-      - L[2] list of expressions [i,l_{ij},r_{ij}] with \sum_{i,j} l_{ij} g_i r_{ij} = p - NF(p,I)
+NOTE: - L[1] is NF(p,I)
+      - L[2] is the list of expressions [i,l_{ij},r_{ij}] with \sum_{i,j} l_{ij} g_i r_{ij} = p - NF(p,I)
+      - procedure lpGBPres2Poly, applied to L, reconstructs p
+EXAMPLE: example lpDivision; shows examples
 "
 {
-  if (p == 0 || size(I) == 0) {
+ if (p == 0 || size(I) == 0) {
     list L = 0;
     list empty;
     L[2] = empty;
@@ -3260,16 +2771,15 @@ NOTE: - L[1] NF(p,I)
 
   // make new ring
   def save = basering;
-  int norigvars = nvars(r);
-  string tagvarstr = "(tag_1";
-  for (int i = 2; i <= size(I); i++) {
-    tagvarstr = tagvarstr + ",tag_" + string(i);
+  int norigvars = attrib(save, "isLetterplaceRing");
+  def Rtagged; def temp = save;
+  for (int i = 1; i <= size(I); i++) {
+     Rtagged = temp + ("tag_" + string(i));
+     temp = Rtagged;
   } kill i;
-  tagvarstr = tagvarstr + ")";
-  string field = string(ringlist(r)[1]);
-  execute("ring @tags = " + field + "," + tagvarstr + ",dp;");
-  ring @tagged = (r + @tags);
-  def @R = makeLetterplaceRing(attrib(save,"uptodeg")); setring @R;
+  // currently R + "var" doesn't preserve uptodeg
+  Rtagged = setLetterplaceAttributes(Rtagged, attrib(Rtagged, "isLetterplaceRing"), attrib(save, "uptodeg"));
+  setring Rtagged;
 
   // restore vars
   poly p = imap(save, p);
@@ -3309,14 +2819,29 @@ NOTE: - L[1] NF(p,I)
   L[2] = summands;
 
   setring save;
-  list L = imap(@R,L);
+  list L = imap(Rtagged,L);
   return (L);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(4); setring R;
+  ideal I = x*x + y*y - 1; // 2D sphere
+  ideal J = letplaceGBasis(I); // compute a Letterplace Groebner basis
+  J; // it is finite and nice
+  poly h = x*x*y-y*x*x+x*y;
+  lpDivision(h,J); // what means that the NF of h wrt J is x*y
+  h - lpNF(h,J); // and this poly has the folowing two-sided Groebner presentation:
+  -y*J[1] + J[1]*y;
 }
 
 proc lpGBPres2Poly(list L, ideal I)
-"ASSUME: L is a valid Groebner presentation as for example the result of lpDivision
+"USAGE: lpGBPres2Poly(p,G); poly p, ideal G
+ASSUME: L is a valid Groebner presentation like the result of lpDivision
 RETURN: poly
-NOTE: computes p = \sum_{i,j} l_{ij} g_i r_{ij} + NF(p,I) = \sum_{i} L[2][i][2] I[L[2][i][1]] L[2][i][3] + L[1]
+NOTE: assembles p = \sum_{i,j} l_{ij} g_i r_{ij} + NF(p,I) = \sum_{i} L[2][i][2] I[L[2][i][1]] L[2][i][3] + L[1]
+EXAMPLE: example lpGBPres2Poly; shows examples
 "
 {
   poly p;
@@ -3326,6 +2851,115 @@ NOTE: computes p = \sum_{i,j} l_{ij} g_i r_{ij} + NF(p,I) = \sum_{i} L[2][i][2] 
   p = p + L[1];
   return (p);
 }
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(4); setring R;
+  ideal I = x*x + y*y - 1; // 2D sphere
+  ideal J = letplaceGBasis(I); // compute a Letterplace Groebner basis
+  J; // it is finite and nice
+  poly h = x*x*y-y*x*x+x*y;
+  list L = lpDivision(h,J); // what means that the NF of h wrt J is x*y
+  lpGBPres2Poly(L,J); // we see, that it is equal to h from above
+}
+
+proc isOrderingShiftInvariant(int withHoles)
+  "USAGE: isOrderingShiftInvariant(b); b an integer interpreted as a boolean
+  RETURN: int
+  NOTE: Tests whether the ordering of the current ring is shift invariant, which is the case, when LM(p) > LM(p') for all p and p' where p' is p shifted by any number of places.
+@*      If withHoles != 0 even Letterplace polynomials with holes (eg. x(1)*y(4)) are considered.
+  ASSUME: - basering is a Letterplace ring.
+  "
+{
+  int shiftInvariant = 1;
+
+  int n = attrib(basering, "isLetterplaceRing");
+  int d = attrib(basering, "uptodeg");
+
+  ideal monomials;
+  if (withHoles) {
+    monomials = delete(lpMonomialsWithHoles(d-1), 1); // ignore the first element (1)
+  } else {
+    monomials = lpMaxIdeal(d-1, 0);
+  }
+
+  for (int i = 1; i <= size(monomials); i++) {
+    poly monom = monomials[i];
+    int lastblock = lastBlock(monom);
+    for (int s = 1; s <= d - lastblock; s++) {
+      for (int s2 = 0; s2 < s; s2++) { // paranoid, check every pair
+        poly first = shiftPoly(monom,s2);
+        poly second = shiftPoly(monom,s);
+        if (!(first > second)) {
+          dbprint(string(first) + " <= " + string(second));
+          shiftInvariant = 0;
+        }
+        kill first; kill second;
+      } kill s2;
+    } kill s;
+    kill monom; kill lastblock;
+  } kill i;
+
+  return(shiftInvariant);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  def R = makeLetterplaceRing(5);
+  setring R;
+  isOrderingShiftInvariant(0);// should be 1
+  kill R; setring r;
+  def R = makeLetterplaceRing(5);
+  list RL = ringlist(R);
+  RL[3][1][1] = "wp";
+  intvec weights = 1,1,1,1,1,1,1,2,3,1,1,1,1,1,1;
+  RL[3][1][2] = weights;
+  attrib(RL,"isLetterplaceRing",3);
+  attrib(RL,"maxExp",1);
+  def Rw = setLetterplaceAttributes(ring(RL),5,3);
+  setring Rw;
+  printlevel = voice + 1;
+  isOrderingShiftInvariant(0);
+  isOrderingShiftInvariant(1);
+}
+
+static proc lpMonomialsWithHoles(int d)
+{
+  if (d < 0) {
+    ERROR("d must not be negative")
+  }
+
+  ideal monomials = 1;
+  if (d == 0) {
+     return (monomials);
+  }
+
+  int lV = attrib(basering, "isLetterplaceRing"); // variable count
+  ideal prevMonomials = lpMonomialsWithHoles(d - 1);
+
+  for (int i = 1; i <= size(prevMonomials); i++) {
+    /* if (deg(prevMonomials[i]) >= d - 1) { */
+      for (int j = 1; j <= lV; j++) {
+        poly m = prevMonomials[i];
+        m = m * var(j + (d-1)*lV);
+        monomials = monomials, m;
+        kill m;
+      } kill j;
+    /* } */
+  } kill i;
+
+  if (d > 1) {
+    // removes the 1
+    monomials[1] = 0;
+    monomials = simplify(monomials,2);
+
+    monomials = prevMonomials, monomials;
+  }
+  return (monomials);
+}
+
 
 //procedures to convert monomials into the DVec representation, all static
 ////////////////////////////////////////////////////////
@@ -3446,7 +3080,6 @@ ASSUME: V,W are DVecs of monomials contained in V'
 }
 
 //the first normal form procedure, if a user want not to presort the ideal, just make it not static
-
 static proc lpNormalForm1(poly p, ideal G, list L)
 "USUAGE:lpNormalForm1(p,G);
 RETURN:poly
@@ -3473,8 +3106,7 @@ NOTE: Taking the first possible reduction
  }
 }
 
-
-// new VL; called from lpNF
+// VL; called from lpNF
 static proc lpNormalForm2(poly pp, ideal G, list L)
 "USUAGE:lpNormalForm2(p,G);
 RETURN:poly
@@ -3524,105 +3156,7 @@ NOTE: Taking the first possible reduction
  return(p);
 }
 
-proc isOrderingShiftInvariant(int withHoles)
-  "USAGE: isOrderingShiftInvariant(b); b an integer interpreted as a boolean
-  RETURN: int
-  NOTE: Tests whether the ordering of the current ring is shift invariant, which is the case, when LM(p) > LM(p') for all p and p' where p' is p shifted by any number of places.
-@*      If withHoles != 0 even Letterplace polynomials with holes (eg. x(1)*y(4)) are considered.
-  ASSUME: - basering is a Letterplace ring.
-  "
-{
-  int shiftInvariant = 1;
-
-  int n = attrib(basering, "isLetterplaceRing");
-  int d = attrib(basering, "uptodeg");
-
-  ideal monomials;
-  if (withHoles) {
-    monomials = delete(lpMonomialsWithHoles(d-1), 1); // ignore the first element (1)
-  } else {
-    monomials = lpMaxIdeal(d-1, 0);
-  }
-
-  for (int i = 1; i <= size(monomials); i++) {
-    poly monom = monomials[i];
-    int lastblock = lastBlock(monom);
-    for (int s = 1; s <= d - lastblock; s++) {
-      for (int s2 = 0; s2 < s; s2++) { // paranoid, check every pair
-        poly first = shiftPoly(monom,s2);
-        poly second = shiftPoly(monom,s);
-        if (!(first > second)) {
-          dbprint(string(first) + " <= " + string(second));
-          shiftInvariant = 0;
-        }
-        kill first; kill second;
-      } kill s2;
-    } kill s;
-    kill monom; kill lastblock;
-  } kill i;
-
-  return(shiftInvariant);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y,z),dp;
-  def R = makeLetterplaceRing(5);
-  setring R;
-  isOrderingShiftInvariant(0);// should be 1
-
-  ring r = 0,(x,y,z),dp;
-  def R = makeLetterplaceRing(5);
-  list RL = ringlist(R);
-  RL[3][1][1] = "wp";
-  intvec weights = 1,1,1,1,1,1,1,2,3,1,1,1,1,1,1;
-  RL[3][1][2] = weights;
-  attrib(RL,"isLetterplaceRing",3);
-  attrib(RL,"maxExp",1);
-  def Rw = setLetterplaceAttributes(ring(RL),5,3);
-  setring Rw;
-  printlevel = voice + 1;
-  isOrderingShiftInvariant(0);
-  isOrderingShiftInvariant(1);
-}
-
-static proc lpMonomialsWithHoles(int d)
-{
-  if (d < 0) {
-    ERROR("d must not be negative")
-  }
-
-  ideal monomials = 1;
-  if (d == 0) {
-     return (monomials);
-  }
-
-  int lV = attrib(basering, "isLetterplaceRing"); // variable count
-  ideal prevMonomials = lpMonomialsWithHoles(d - 1);
-
-  for (int i = 1; i <= size(prevMonomials); i++) {
-    /* if (deg(prevMonomials[i]) >= d - 1) { */
-      for (int j = 1; j <= lV; j++) {
-        poly m = prevMonomials[i];
-        m = m * var(j + (d-1)*lV);
-        monomials = monomials, m;
-        kill m;
-      } kill j;
-    /* } */
-  } kill i;
-
-  if (d > 1) {
-    // removes the 1
-    monomials[1] = 0;
-    monomials = simplify(monomials,2);
-
-    monomials = prevMonomials, monomials;
-  }
-  return (monomials);
-}
-
-
-//secundary procedures, all static
+//secondary and auxiliary procedures, all static
 
 static proc getlpCoeffs(poly q, poly p)
 {list R; intvec cq,t,lv,rv,bla;
@@ -3717,11 +3251,10 @@ static proc isContainedInVp(poly p)
  return(1);
 }
 
-// under development for Roberto
 static proc extractLinearPart(module M)
 {
   /* returns vectors from a module whose max leadexp is 1 */
-  /* does not take place nonlinearity into account yet */
+  /* does not take nonlinearity into account yet */
   /* use rather kernel function isinV to get really nonlinear things */
   int i; int s = ncols(M);
   int answer = 1;
@@ -3737,9 +3270,9 @@ static proc extractLinearPart(module M)
   return(Ret);
 }
 
-// under development for Roberto
 static proc isLinearVector(vector v)
 {
+  /* vector v consists of polynomials */
   /* returns true iff max leadexp is 1 */
   int i,j,k;
   intvec w;
@@ -3815,6 +3348,76 @@ static proc lpAssumeViolation()
   return(0);
 }
 
+// obsolete
+static proc lshift(module M, int s, string varing, def lpring)
+{
+  // FINALLY IMPLEMENTED AS A PART OT THE C CODE
+  // shifts a polynomial from the ring R to s positions
+  // M lives in varing, the result in lpring
+  // to be run from varing
+  int i, j, k, sm, sv;
+  vector v;
+  //  execute("setring "+lpring);
+  setring lpring;
+  poly @@p;
+  ideal I;
+  execute("setring "+varing);
+  sm = ncols(M);
+  for (i=1; i<=s; i++)
+  {
+    // modules, e.g. free polynomials
+    for (j=1; j<=sm; j++)
+    {
+      //vectors, e.g. free monomials
+      v  = M[j];
+      sv = size(v);
+      sp = "@@p = @@p + ";
+      for (k=2; k<=sv; k++)
+      {
+        sp = sp + string(v[k])+"("+string(k-1+s)+")*";
+      }
+      sp = sp + string(v[1])+";"; // coef;
+      setring lpring;
+      //      execute("setring "+lpring);
+      execute(sp);
+      execute("setring "+varing);
+    }
+    setring lpring;
+    //    execute("setring "+lpring);
+    I = I,@@p;
+    @@p = 0;
+  }
+  setring lpring;
+  //execute("setring "+lpring);
+  export(I);
+  //  setring varing;
+  execute("setring "+varing);
+}
+
+static proc skip0(vector v)
+{
+  // skips zeros in a vector, producing another vector
+  if ( (v[1]==0) || (v==0) ) { return(vector(0)); }
+  int sv = nrows(v);
+  int sw = size(v);
+  if (sv == sw)
+  {
+    return(v);
+  }
+  int i;
+  int j=1;
+  vector w;
+  for (i=1; i<=sv; i++)
+  {
+    if (v[i] != 0)
+    {
+      w = w + v[i]*gen(j);
+      j++;
+    }
+  }
+  return(w);
+}
+
 // static proc bugSKing()
 // {
 //   LIB "freegb.lib";
@@ -3855,416 +3458,3 @@ static proc lpAssumeViolation()
 //   lpMultX(a,b); // seems to work properly
 // }
 
-proc lpPrint(ideal I, def @r)
-"USAGE: lpPrint(I, r); I an ideal, r a ring
-RETURN: list of strings
-PURPOSE: represent Letterplace ideal in the form of words
-ASSUME: - basering is a Letterplace ring, r is the commutative ring
-from which basering has been built
-EXAMPLE: example lpPrint; shows example
-"
-{
-  def save = basering;
-  lp2lstr(I,@r); // export an object called @code{@LN} to the ring r
-  setring @r;  // change to the ring r
-  list @L = lst2str(@LN,1);
-  export @L;
-  setring save;
-  list @@L = @L;
-  setring @r;
-  kill @L;
-  kill @LN;
-  setring save;
-  return(@@L);
-}
-example
-{
- "EXAMPLE:"; echo = 2;
- ring r = (0,a,b,g),(x,y),Dp;
- def R = makeLetterplaceRing(4); // constructs a Letterplace ring
- setring R; // downup algebra A
- ideal J = x*x*y-a*x*y*x - b*y*x*x - g*x,
- x*y*y-a*y*x*y - b*y*y*x - g*y;
- list L = lpPrint(J,r);
- L;
-}
-
-/* THE FOLLOWING ARE UNDER DEVELOPMENT
-// copied following from freegb_wrkcp.lib by Karim Abou Zeid on 07.04.2017:
-// makeLetterplaceRingElim(int d)
-// makeLetterplaceRingNDO(int d)
-// setLetterplaceAttributesElim(def R, int uptodeg, int lV)
-// lpElimIdeal(ideal I)
-// makeLetterplaceRingWt(int d, intvec W)
-
-static proc makeLetterplaceRingElim(int d)
-"USAGE:  makeLetterplaceRingElim(d); d integers
-RETURN:  ring
-PURPOSE: creates a ring with an elimination ordering
-NOTE: the matrix for the ordering looks as follows: first row is 1,..,0,1,0,..
-@* then 0,1,0,...,0,0,1,0... and so on, lastly its lp
-@* this ordering is only correct if only polys with same shift are compared
-EXAMPLE: example makeLetterplaceRingElim; shows examples
-"
-{
-
-  // ToDo future: inherit positive weights in the orig ring
-  // complain on nonpositive ones
-
-  // d = up to degree, will be shifted to d+1
-  if (d<1) {"bad d"; return(0);}
-
-  int uptodeg = d; int lV = nvars(basering);
-
-  int ppl = printlevel-voice+2;
-  string err = "";
-
-  int i,j,s; intvec iV,iVl;
-  def save = basering;
-  int D = d-1;
-  list LR  = ringlist(save);
-  list L, tmp, tmp2, tmp3;
-  L[1] = LR[1]; // ground field
-  L[4] = LR[4]; // quotient ideal
-  tmp  = LR[2]; // varnames
-  s = size(LR[2]);
-  for (i=1; i<=D; i++)
-  {
-    for (j=1; j<=s; j++)
-    {
-      tmp[i*s+j] = tmp[j];
-    }
-  }
-  L[2] = tmp;
-  L[3] = list();
-  list OrigNames = LR[2];
-  s = size(LR[3]);
-  //creation of first block
-
-  if (s==2)
-  {
-    // not a blockord, 1 block + module ord
-    tmp = LR[3][s]; // module ord
-    for (i = 1; i <= lV;  i++)
-    {
-      iV = (0: lV);
-      iV[i] = 1;
-      iVl = iV;
-      for (j = 1; j <= D; j++)
-       { iVl = iVl,iV; }
-      L[3][i] = list("a",iVl);
-    }
-//    for (i=1; i<=d; i++)
-//    {
-//      LR[3][s-1+i] = LR[3][1];
-//    }
-    //    LR[3][s+D] = tmp;
-    //iV = (1:(d*lV));
-    L[3][lV+1] = list("lp",(1:(d*lV)));
-    L[3][lV+2] = tmp;
-  }
-  else {ERROR("Please set the ordering of basering to dp");}
-//  if (s>2)
-//  {
-//    // there are s-1 blocks
-//    int nb = s-1;
-//    tmp = LR[3][s]; // module ord to place at the very end
-//   tmp2 = LR[3]; tmp2 = tmp2[1..nb];
-//    LR[3][1] = list("a",LTO);
-//    //tmp3[1] = list("a",intvec(1: int(d*lV))); // deg-ord, insert as the 1st
-//    for (i=1; i<=d; i++)
-//    {
-//      tmp3 = tmp3 + tmp2;
-//    }
-//    tmp3 = tmp3 + list(tmp);
-//    LR[3] = tmp3;
-//     for (i=1; i<=d; i++)
-//     {
-//       for (j=1; j<=nb; j++)
-//       {
-//         //        LR[3][i*nb+j+1]= LR[3][j];
-//         LR[3][i*nb+j+1]= tmp2[j];
-//       }
-//     }
-//     //    size(LR[3]);
-//     LR[3][(s-1)*d+2] = tmp;
-//     LR[3] = list("a",intvec(1: int(d*lV))) + LR[3]; // deg-ord, insert as the 1st
-    // remove everything behind nb*(D+1)+1 ?
-    //    tmp = LR[3];
-    //    LR[3] = tmp[1..size(tmp)-1];
- // }
- // L[3] = LR[3];
-  attrib(L,"maxExp",1);
-  attrib(basering,"isLetterplaceRing",lV);
-  def @R = ring(L);
-  //  setring @R;
-  //  int uptodeg = d; int lV = nvars(basering); // were defined before
-  def @@R = setLetterplaceAttributesElim(@R,uptodeg,lV);
-  return (@@R);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y,z),lp;
-  def A = makeLetterplaceRingElim(2);
-  setring A;
-  A;
-  attrib(A,"isLetterplaceRing"); // number of variables in the main block
-  attrib(A,"uptodeg");  // degree bound
-}
-
-
-
-static proc makeLetterplaceRingNDO(int d)
-"USAGE:  makeLetterplaceRingNDO(d); d an integer
-RETURN:  ring
-PURPOSE: creates a ring with a non-degree first ordering, suitable for
-@* the use of non-homogeneous letterplace
-NOTE: the matrix for the ordering looks as follows:
-@*    'd' blocks of shifted original variables
-EXAMPLE: example makeLetterplaceRingNDO; shows examples
-"
-{
-
-  // ToDo future: inherit positive weights in the orig ring
-  // complain on nonpositive ones
-
-  // d = up to degree, will be shifted to d+1
-  if (d<1) {"bad d"; return(0);}
-
-  int uptodeg = d; int lV = nvars(basering);
-
-  int ppl = printlevel-voice+2;
-  string err = "";
-
-  int i,j,s;
-  def save = basering;
-  int D = d-1;
-  list LR  = ringlist(save);
-  list L, tmp, tmp2, tmp3;
-  L[1] = LR[1]; // ground field
-  L[4] = LR[4]; // quotient ideal
-  tmp  = LR[2]; // varnames
-  s = size(LR[2]);
-  for (i=1; i<=D; i++)
-  {
-    for (j=1; j<=s; j++)
-    {
-      tmp[i*s+j] = tmp[j];
-    }
-  }
-  L[2] = tmp;
-  list OrigNames = LR[2];
-  // ordering: one 1..1 a above
-  // ordering: d blocks of the ord on r
-  // try to get whether the ord on r is blockord itself
-  // TODO: make L(2) ordering! exponent is maximally 2
-  s = size(LR[3]);
-  if (s==2)
-  {
-    // not a blockord, 1 block + module ord
-    tmp = LR[3][s]; // module ord
-    for (i=1; i<=d; i++)
-    {
-      LR[3][i] = LR[3][1];
-    }
-    //    LR[3][s+D] = tmp;
-    LR[3][d+1] = tmp;
-    //LR[3][1] = list("a",intvec(1: int(d*lV))); // deg-ord not wanted here
-  }
-  if (s>2)
-  {
-    // there are s-1 blocks
-    int nb = s-1;
-    tmp = LR[3][s]; // module ord to place at the very end
-    tmp2 = LR[3]; tmp2 = tmp2[1..nb];
-    //tmp3[1] = list("a",intvec(1: int(d*lV))); // deg-ord not wanted here
-    for (i=1; i<=d; i++)
-    {
-      tmp3 = tmp3 + tmp2;
-    }
-    tmp3 = tmp3 + list(tmp);
-    LR[3] = tmp3;
-//     for (i=1; i<=d; i++)
-//     {
-//       for (j=1; j<=nb; j++)
-//       {
-//         //        LR[3][i*nb+j+1]= LR[3][j];
-//         LR[3][i*nb+j+1]= tmp2[j];
-//       }
-//     }
-//     //    size(LR[3]);
-//     LR[3][(s-1)*d+2] = tmp;
-//     LR[3] = list("a",intvec(1: int(d*lV))) + LR[3]; // deg-ord, insert as the 1st
-    // remove everything behind nb*(D+1)+1 ?
-    //    tmp = LR[3];
-    //    LR[3] = tmp[1..size(tmp)-1];
-  }
-  L[3] = LR[3];
-  def @R = ring(L);
-  //  setring @R;
-  //  int uptodeg = d; int lV = nvars(basering); // were defined before
-  def @@R = setLetterplaceAttributes(@R,uptodeg,lV);
-  return (@@R);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y,z),lp;
-  def A = makeLetterplaceRingNDO(2);
-  setring A;
-  A;
-  attrib(A,"isLetterplaceRing"); // number of variables in the main block
-  attrib(A,"uptodeg");  // degree bound
-}
-
-static proc setLetterplaceAttributesElim(def R, int uptodeg, int lV)
-"USAGE: setLetterplaceAttributesElim(R, d, b, eV); R a ring, b,d, eV integers
-RETURN: ring with special attributes set
-PURPOSE: sets attributes for a letterplace ring:
-@*      'isLetterplaceRing' = true, 'uptodeg' = d, 'lV' = b, 'eV' = eV, where
-@*      'uptodeg' stands for the degree bound,
-@*      'lV' for the number of variables in the block 0
-@*      'eV' for the number of elimination variables
-NOTE: Activate the resulting ring by using @code{setring}
-"
-{
-  if (uptodeg*lV != nvars(R))
-  {
-    ERROR("uptodeg and lV do not agree on the basering!");
-  }
-
-
-    // Set letterplace-specific attributes for the output ring!
-  attrib(R, "uptodeg", uptodeg);
-  attrib(R, "isLetterplaceRing", lV);
-  attrib(R, "HasElimOrd", 1);
-  return (R);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp;
-  def R = setLetterplaceAttributesElim(r, 4, 2, 1); setring R;
-  attrib(R,"isLetterplaceRing");
-  lieBracket(x(1),y(1),2);
-}
-
-
-static proc lpElimIdeal(ideal I)
-"
-does not work for degree reasons (deg function does not work for lp rings -> newone!)
-"
-{
-  def lpring = attrib(basering,"isLetterplaceRing");
-  def lpEO =  attrib(basering,"HasElimOrd");
-  if ( lpring)==0 && typeof(lpEO)!="int")
-  {
-    ERROR("Ring is not a lp-ring with an elimination ordering");
-  }
-
-  //int nE = attrib(basering, "eV");
-
-  return(letplaceGBasis(I));
-}
-
-
-static proc makeLetterplaceRingWt(int d, intvec W)
-"USAGE:  makeLetterplaceRingWt(d,W); d an integer, W a vector of positive integers
-RETURN:  ring
-PURPOSE: creates a ring with a special ordering, suitable for
-@* the use of non-homogeneous letterplace
-NOTE: the matrix for the ordering looks as follows: first row is W,W,W,...
-@* then there come 'd' blocks of shifted original variables
-EXAMPLE: example makeLetterplaceRing2; shows examples
-"
-{
-
-  // ToDo future: inherit positive weights in the orig ring
-  // complain on nonpositive ones
-
-  // d = up to degree, will be shifted to d+1
-  if (d<1) {"bad d"; return(0);}
-
-  int uptodeg = d; int lV = nvars(basering);
-
-  //check weightvector
-  if (size(W) <> lV) {"bad weights"; return(0);}
-
-  int i;
-  for (i = 1; i <= size(W); i++) {if (W[i] < 0) {"bad weights"; return(0);}}
-  intvec Wt = W;
-  for (i = 2; i <= d; i++) {Wt = Wt, W;}
-  kill i;
-
-  int ppl = printlevel-voice+2;
-  string err = "";
-
-  int i,j,s;
-  def save = basering;
-  int D = d-1;
-  list LR  = ringlist(save);
-  list L, tmp, tmp2, tmp3;
-  L[1] = LR[1]; // ground field
-  L[4] = LR[4]; // quotient ideal
-  tmp  = LR[2]; // varnames
-  s = size(LR[2]);
-  for (i=1; i<=D; i++)
-  {
-    for (j=1; j<=s; j++)
-    {
-      tmp[i*s+j] = tmp[j];
-    }
-  }
-  L[2] = tmp;
-  list OrigNames = LR[2];
-  // ordering: one 1..1 a above
-  // ordering: d blocks of the ord on r
-  // try to get whether the ord on r is blockord itself
-  // TODO: make L(2) ordering! exponent is maximally 2
-  s = size(LR[3]);
-  if (s==2)
-  {
-    // not a blockord, 1 block + module ord
-    tmp = LR[3][s]; // module ord
-    for (i=1; i<=d; i++)
-    {
-      LR[3][s-1+i] = LR[3][1];
-    }
-    //    LR[3][s+D] = tmp;
-    LR[3][s+1+D] = tmp;
-    LR[3][1] = list("a",Wt); // deg-ord
-  }
-  if (s>2)
-  {
-    // there are s-1 blocks
-    int nb = s-1;
-    tmp = LR[3][s]; // module ord to place at the very end
-    tmp2 = LR[3]; tmp2 = tmp2[1..nb];
-    tmp3[1] = list("a",Wt); // deg-ord, insert as the 1st
-    for (i=1; i<=d; i++)
-    {
-      tmp3 = tmp3 + tmp2;
-    }
-    tmp3 = tmp3 + list(tmp);
-    LR[3] = tmp3;
-
-  }
-  L[3] = LR[3];
-  def @R = ring(L);
-  //  setring @R;
-  //  int uptodeg = d; int lV = nvars(basering); // were defined before
-  def @@R = setLetterplaceAttributes(@R,uptodeg,lV);
-  return (@@R);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y,z),(dp(1),dp(2));
-  def A = makeLetterplaceRingWt(2,intvec(1,2,3));
-  setring A;
-  A;
-  attrib(A,"isLetterplaceRing"); // number of variables in the main block
-  attrib(A,"uptodeg");  // degree bound
-}
-*/
