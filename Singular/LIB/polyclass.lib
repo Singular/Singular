@@ -23,11 +23,11 @@ a real root of the minimal polynomial (which is stored in the variable minpoly o
 ring containing normalFormEquation, that is, in normalFormEquation.in), or if no minimal
 polynomial is defined then an interval containing the rational parameter value.
 
-Acknowledgements: This research was supported by 
-the Staff Exchange Bursary Programme of the University of Pretoria, DFG SPP 1489, 
+Acknowledgements: This research was supported by
+the Staff Exchange Bursary Programme of the University of Pretoria, DFG SPP 1489,
 DFG TRR 195. The financial assistance of the National Research Foundation (NRF),
-South Africa, towards this research is hereby acknowledged. Opinions expressed 
-and conclusions arrived at are those of the author and are not necessarily to be 
+South Africa, towards this research is hereby acknowledged. Opinions expressed
+and conclusions arrived at are those of the author and are not necessarily to be
 attributed to the National Research Foundation, South Africa.
 
 

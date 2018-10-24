@@ -207,7 +207,7 @@ static proc removeDouble(list L)
       for(j=i+1; j<=size(L); j++){                //check if it appearace again
         if(isEqual(L[i],L[j])){                //and tag those appearances with 0
           L1[j] = 0;
-	}
+        }
       }
     }
   }

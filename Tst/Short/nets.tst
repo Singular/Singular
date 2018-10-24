@@ -52,7 +52,7 @@ ring r = 7,(x(1..6)),(lp(3),dp);
 netRing(r);
 
 kill r;
-ring r = 0,(x,y,z,a,b,c),(ds(3), dp(3)); 
+ring r = 0,(x,y,z,a,b,c),(ds(3), dp(3));
 netRing(r);
 
 kill r;
@@ -241,8 +241,8 @@ p;
 netPoly(p);
 kill r;
 
-ring r=7,(x,y,z),lp;	
-poly p=17x2+24y;	
+ring r=7,(x,y,z),lp;
+poly p=17x2+24y;
 p;
 netPoly(p);
 kill r;

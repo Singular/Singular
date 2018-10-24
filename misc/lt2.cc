@@ -31,7 +31,7 @@ BOOLEAN same_lt2(leftv res, leftv arg)
         }
       }
     }
-    return FALSE; /* not found */  
+    return FALSE; /* not found */
   }
   WerrorS("same_lt(ideal)");
   return TRUE;

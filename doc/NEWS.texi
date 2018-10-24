@@ -31,7 +31,7 @@ Changed libraries:
 @itemize
 @item freegb.lib: lpDivision, lpPrint (@nref{freegb_lib})
 @item fpadim.lib (@nref{fpadim_lib})
-@item schreyer.lib: deprecated 
+@item schreyer.lib: deprecated
 @item goettsche.lib: new, extended version (The Nakajima-Yoshioka formula up to n-th degree,Poincare Polynomial of the punctual Quot-scheme of rank r on n planar points Betti numbers of the punctual Quot-scheme of rank r on n planar points)(@nref{goettsche_lib})
 @item grobcov.lib: small bug fix (@nref{grobcov_lib})
 @end itemize

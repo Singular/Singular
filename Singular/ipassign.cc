@@ -1146,7 +1146,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
 
   if (lt==DEF_CMD)
   {
-      
+
     if (TEST_V_ALLWARN
     && (rt!=RING_CMD)
     && (l->name!=NULL)

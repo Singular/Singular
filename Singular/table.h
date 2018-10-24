@@ -1320,13 +1320,13 @@ const struct sConvertTypes dConvertTypes[] =
    { RESOLUTION_CMD,  LIST_CMD,       NULL_VAL , D(iiR2L_l) },
 // list -> resolution
    { LIST_CMD,        RESOLUTION_CMD, NULL_VAL ,  D(iiL2R) },
-// matrix -> smatrix   
+// matrix -> smatrix
    { MATRIX_CMD,      SMATRIX_CMD,    D(iiMa2Mo), NULL_VAL },
-// module -> smatrix   
+// module -> smatrix
    { MODUL_CMD,       SMATRIX_CMD,    D(iiDummy), NULL_VAL },
-// smatrix -> matrix   
+// smatrix -> matrix
    { SMATRIX_CMD,     MATRIX_CMD,     D(iiMo2Ma) , NULL_VAL },
-// smatrix -> module   
+// smatrix -> module
    { SMATRIX_CMD,     MODUL_CMD,      D(iiDummy) , NULL_VAL },
 #ifdef SINGULAR_4_2
    { INT_CMD,         CNUMBER_CMD,    D(iiI2NN) , NULL_VAL },

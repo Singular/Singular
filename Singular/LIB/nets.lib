@@ -18,7 +18,7 @@ the command net.
 KEYWORDS: net
 
 TYPES:
-Net                     		The class of all nets
+Net                         The class of all nets
 
 PROCEDURES:
 catNets(Net,Net)              horizontal concatenation
@@ -55,51 +55,51 @@ LIB "methods.lib";
 LIB "combinat.lib";
 
 
-/*	test rings
+/*  test rings
 //
-	ring r1 = 32003,(x,y,z),dp;
+  ring r1 = 32003,(x,y,z),dp;
 //
-	ring r2 = 32003,(x(1..10)),dp;
+  ring r2 = 32003,(x(1..10)),dp;
 //
-	ring r3 = 32003,(x(1..5)(1..8)),dp;
+  ring r3 = 32003,(x(1..5)(1..8)),dp;
 //
-	ring r4 = 0,(a,b,c,d),lp;
+  ring r4 = 0,(a,b,c,d),lp;
 //
-	ring r5 = 7,(x,y,z),ds;
+  ring r5 = 7,(x,y,z),ds;
 //
-	ring r6 = 10,(x,y,z),ds;
+  ring r6 = 10,(x,y,z),ds;
 //
-	ring r7 = 7,(x(1..6)),(lp(3),dp);
+  ring r7 = 7,(x(1..6)),(lp(3),dp);
 //
-	ring r8 = 0,(x,y,z,a,b,c),(ds(3), dp(3));
+  ring r8 = 0,(x,y,z,a,b,c),(ds(3), dp(3));
 //
-	ring r9 = 0,(x,y,z),(c,wp(2,1,3));
+  ring r9 = 0,(x,y,z),(c,wp(2,1,3));
 //
-	ring r10 = (7,a,b,c),(x,y,z),Dp;
+  ring r10 = (7,a,b,c),(x,y,z),Dp;
 //
-	ring r11 = (7,a),(x,y,z),dp;
-	minpoly = a^2+a+3;
+  ring r11 = (7,a),(x,y,z),dp;
+  minpoly = a^2+a+3;
 //
-	ring r12 = (7^2,a),(x,y,z),dp;
+  ring r12 = (7^2,a),(x,y,z),dp;
 //
-	ring r13 = real,(x,y,z),dp;
+  ring r13 = real,(x,y,z),dp;
 //
-	ring r14 = (real,50),(x,y,z),dp;
+  ring r14 = (real,50),(x,y,z),dp;
 //
-	ring r15 = (real,10,50),(x,y,z),dp;
+  ring r15 = (real,10,50),(x,y,z),dp;
 //
-	ring r16 = (complex,30,j),(x,y,z),dp;
+  ring r16 = (complex,30,j),(x,y,z),dp;
 //
-	ring r17 = complex,(x,y,z),dp;
+  ring r17 = complex,(x,y,z),dp;
 //
-	ring R = 7,(x,y,z), dp;
-	qring r18 = std(maxideal(2));
+  ring R = 7,(x,y,z), dp;
+  qring r18 = std(maxideal(2));
 //
-	ring r19 = integer,(x,y,z), dp;
+  ring r19 = integer,(x,y,z), dp;
 //
-	ring r20 = (integer, 6, 3),(x,y,z), dp;
+  ring r20 = (integer, 6, 3),(x,y,z), dp;
 //
-	ring r21 = (integer, 100),(x,y,z), dp;
+  ring r21 = (integer, 100),(x,y,z), dp;
 */
 
 
@@ -108,14 +108,14 @@ LIB "combinat.lib";
 //
 static proc mod_init()
 {
-	LIB "methods.lib";
-	newstruct("Net","list rows");
-	system("install","Net","print",printNet,1);
-	system("install","Net","+",catNets,2);
+  LIB "methods.lib";
+  newstruct("Net","list rows");
+  system("install","Net","print",printNet,1);
+  system("install","Net","+",catNets,2);
     HashTable F = hashTable(list(list("ring"),list("matrix"),list("int"),list("string"),list("list"),list("poly"),list("map"),list("number"),list("bigint"),list("vector"),list("ideal"),list("intvec"),list("intmat"),list("bigintmat")),
                         list("netRing",   "netmatrix",   "netInt",   "netString",   "netList",   "netPoly",   "netMap",   "netNumber",   "netBigInt",   "netvector",   "netIdeal",   "netIntVector","netIntMat","netBigIntMat"));
-	Method net_ = method(F);
-	export(net_);
+  Method net_ = method(F);
+  export(net_);
     installMethod(net_,"net");
 }
 
@@ -126,11 +126,11 @@ static proc mod_init()
 //
 static proc emptyString(int n)
 {
-	string S="";
-	for (int j=1; j<=n; j++)
-	{
-  		S=S+" ";
-	}
+  string S="";
+  for (int j=1; j<=n; j++)
+  {
+      S=S+" ";
+  }
 
 return(S);
 }
@@ -141,12 +141,12 @@ return(S);
 //  printNet
 //
 static proc printNet(Net N)
-	{
-	list L = N.rows;
-	for (int j=1; j<=size(L); j++)
-	{
-  	 print(L[j]);
-	}
+  {
+  list L = N.rows;
+  for (int j=1; j<=size(L); j++)
+  {
+     print(L[j]);
+  }
 }
 
 
@@ -162,10 +162,10 @@ KEYWORDS: Output
 EXAMPLE: example stackNets; shows an example
 "
 {
-	list LN=N.rows;
-	list LM=M.rows;
-	Net NM;
-	NM.rows=LN+LM;
+  list LN=N.rows;
+  list LM=M.rows;
+  Net NM;
+  NM.rows=LN+LM;
 
 return(NM);
 }
@@ -191,22 +191,22 @@ KEYWORDS: Output
 EXAMPLE: example catNets; shows an example
 "
 {
-	list L, MAX;
-	list LN=N.rows;
-	list LM=M.rows;
-	int widthN=size(LN[1]);
-	int widthM=size(LM[1]);
-	MAX[1]=size(LN);
-	MAX[2]=size(LM);
-	int nm=Max(MAX); /*Eine Funktion max() ist in der Bib qhmoduli.lib und heißt Max(), als Argumente nimmt die Funktion Integer-Vektoren oder -Listen*/
-	for (int j=1; j<=nm; j++)
-	{
-   	if (j>size(LN)){LN[j]=emptyString(widthN);}
-    	if (j>size(LM)){LM[j]=emptyString(widthM);}
-    	L[j]=LN[j]+LM[j];
-	}
-	Net NM;
-	NM.rows=L;
+  list L, MAX;
+  list LN=N.rows;
+  list LM=M.rows;
+  int widthN=size(LN[1]);
+  int widthM=size(LM[1]);
+  MAX[1]=size(LN);
+  MAX[2]=size(LM);
+  int nm=Max(MAX); /*Eine Funktion max() ist in der Bib qhmoduli.lib und heißt Max(), als Argumente nimmt die Funktion Integer-Vektoren oder -Listen*/
+  for (int j=1; j<=nm; j++)
+  {
+     if (j>size(LN)){LN[j]=emptyString(widthN);}
+      if (j>size(LM)){LM[j]=emptyString(widthM);}
+      L[j]=LN[j]+LM[j];
+  }
+  Net NM;
+  NM.rows=L;
 
 return(NM);
 }
@@ -344,13 +344,13 @@ KEYWORDS: Output
 EXAMPLE: example netPrimePower; shows an example
 "
 {
-	/*
-	if (r==1)
-	{
-		return(string("n"));
-	}
-	*/
-	string S=string(n)+string("^")+string(m);
+  /*
+  if (r==1)
+  {
+    return(string("n"));
+  }
+  */
+  string S=string(n)+string("^")+string(m);
 return(net(/*(n)+net("^")+net(r)*/ S));
 }
 example{
@@ -375,7 +375,7 @@ KEYWORDS: Output
 EXAMPLE: example netRing; shows an example
 "
 {
- 	list RL = ringlist(R);
+   list RL = ringlist(R);
         if (size(RL[4])==0){
              Net N=netCoefficientRing(R)+net("[")+net(string(RL[2]))+net("]");
         } else {
@@ -387,61 +387,61 @@ return(N);
 example
 {
 "EXAMPLE:"; // from 3.3.1 Examples of ring declarations
-	ring r1 = 32003,(x,y,z),dp;
-	netRing(r1);
+  ring r1 = 32003,(x,y,z),dp;
+  netRing(r1);
 //
-	ring r2 = 32003,(x(1..10)),dp;
-	netRing(r2);
+  ring r2 = 32003,(x(1..10)),dp;
+  netRing(r2);
 //
-	ring r3 = 32003,(x(1..5)(1..8)),dp;
-	netRing(r3);
+  ring r3 = 32003,(x(1..5)(1..8)),dp;
+  netRing(r3);
 //
-	ring r4 = 0,(a,b,c,d),lp;
-	netRing(r4);
+  ring r4 = 0,(a,b,c,d),lp;
+  netRing(r4);
 //
-	ring r5 = 7,(x,y,z),ds;
-	netRing(r5);
+  ring r5 = 7,(x,y,z),ds;
+  netRing(r5);
 //
-	ring r6 = 10,(x,y,z),ds;
-	netRing(r6);
+  ring r6 = 10,(x,y,z),ds;
+  netRing(r6);
 //
-	ring r7 = 7,(x(1..6)),(lp(3),dp);
-	netRing(r7);
+  ring r7 = 7,(x(1..6)),(lp(3),dp);
+  netRing(r7);
 //
-	ring r8 = 0,(x,y,z,a,b,c),(ds(3), dp(3));
-	netRing(r8);
+  ring r8 = 0,(x,y,z,a,b,c),(ds(3), dp(3));
+  netRing(r8);
 //
-	ring r9 = 0,(x,y,z),(c,wp(2,1,3));
-	netRing(r9);
+  ring r9 = 0,(x,y,z),(c,wp(2,1,3));
+  netRing(r9);
 //
-	ring r10 = (7,a,b,c),(x,y,z),Dp;
-	netRing(r10);
+  ring r10 = (7,a,b,c),(x,y,z),Dp;
+  netRing(r10);
 //
-	ring r11 = (7,a),(x,y,z),dp;
-	minpoly = a^2+a+3;
-	netRing(r11);
+  ring r11 = (7,a),(x,y,z),dp;
+  minpoly = a^2+a+3;
+  netRing(r11);
 //
-	ring r12 = (7^2,a),(x,y,z),dp;
-	netRing(r12);
+  ring r12 = (7^2,a),(x,y,z),dp;
+  netRing(r12);
 //
-	ring r13 = real,(x,y,z),dp;
-	netRing(r13);
+  ring r13 = real,(x,y,z),dp;
+  netRing(r13);
 //
-	ring r14 = (real,50),(x,y,z),dp;
-	netRing(r14);
+  ring r14 = (real,50),(x,y,z),dp;
+  netRing(r14);
 //
-	ring r15 = (real,10,50),(x,y,z),dp;
-	netRing(r15);
+  ring r15 = (real,10,50),(x,y,z),dp;
+  netRing(r15);
 //
-	ring r16 = (complex,30,j),(x,y,z),dp;
-	netRing(r16);
+  ring r16 = (complex,30,j),(x,y,z),dp;
+  netRing(r16);
 //
-	ring r17 = complex,(x,y,z),dp;
-	netRing(r17);
+  ring r17 = complex,(x,y,z),dp;
+  netRing(r17);
 //
-	ring R = 7,(x,y,z), dp;
-	qring r18 = std(maxideal(2));
-	netRing(r18);
+  ring R = 7,(x,y,z), dp;
+  qring r18 = std(maxideal(2));
+  netRing(r18);
 }
 
 
@@ -460,30 +460,30 @@ EXAMPLE: example netMap; shows an example
 "
 {
 // 0
-	list Output;
-	string Map, Source, Target;
-	int i, v, empty;
-	Net M;
+  list Output;
+  string Map, Source, Target;
+  int i, v, empty;
+  Net M;
 
 // 1
-	Map=string(nameof(f));
-	Source=string(nameof(preimage(f)));
-	Target=string(nameof(basering));
-	Output[1]="Map"+": "+Source+" --> "+Target;
-	v=size(ringlist(preimage(f))[2]);
-	empty=size(Output[1]);
-	Output[1]=Output[1]+" , "+string(ringlist(preimage(f))[2][1])+" -> "+string(f[1]);
+  Map=string(nameof(f));
+  Source=string(nameof(preimage(f)));
+  Target=string(nameof(basering));
+  Output[1]="Map"+": "+Source+" --> "+Target;
+  v=size(ringlist(preimage(f))[2]);
+  empty=size(Output[1]);
+  Output[1]=Output[1]+" , "+string(ringlist(preimage(f))[2][1])+" -> "+string(f[1]);
 
 // 2
-	for (i=2; i<=v; i++){// +2
-		Output[i]=emptyString(empty)+" , "+string(ringlist(preimage(f))[2][i])+" -> "+string(f[i]);
-	}// -2
+  for (i=2; i<=v; i++){// +2
+    Output[i]=emptyString(empty)+" , "+string(ringlist(preimage(f))[2][i])+" -> "+string(f[i]);
+  }// -2
 
 // 3
-	M.rows=Output;
+  M.rows=Output;
 
 // -
-	return(M);
+  return(M);
 }
 
 example
@@ -510,30 +510,30 @@ EXAMPLE: example netMap2; shows an example
 "
 {
 // 0
-	list Output;
-	string Map, Source, Target;
-	int i, v, empty;
-	Net M;
+  list Output;
+  string Map, Source, Target;
+  int i, v, empty;
+  Net M;
 
 // 1
-	Map=string(nameof(f));
-	Source=string(nameof(preimage(f)));
-	Target=string(nameof(basering));
-	Output[1]=Map+": "+Source+" --> "+Target;
-	v=size(ringlist(preimage(f))[2]);
-	empty=size(Output[1]);
-	Output[1]=Output[1]+" , "+string(ringlist(preimage(f))[2][1])+" -> "+string(f[1]);
+  Map=string(nameof(f));
+  Source=string(nameof(preimage(f)));
+  Target=string(nameof(basering));
+  Output[1]=Map+": "+Source+" --> "+Target;
+  v=size(ringlist(preimage(f))[2]);
+  empty=size(Output[1]);
+  Output[1]=Output[1]+" , "+string(ringlist(preimage(f))[2][1])+" -> "+string(f[1]);
 
 // 2
-	for (i=2; i<=v; i++){// +2
-		Output[1]=Output[1]+" , "+string(ringlist(preimage(f))[2][i])+" -> "+string(f[i]);
-	}// -2
+  for (i=2; i<=v; i++){// +2
+    Output[1]=Output[1]+" , "+string(ringlist(preimage(f))[2][i])+" -> "+string(f[i]);
+  }// -2
 
 // 3
-	M.rows=Output;
+  M.rows=Output;
 
 // -
-	return(M);
+  return(M);
 }
 example
 {
@@ -559,10 +559,10 @@ EXAMPLE: example netBigIntMatrix; shows an example
 "
 {
 // 0
-	int Length=100; //Length of Output
+  int Length=100; //Length of Output
 
 // -
-	return(netBigIntMatShort(M,Length));
+  return(netBigIntMatShort(M,Length));
 }
 example
 {
@@ -591,66 +591,66 @@ EXAMPLE: example netBigIntMatShort; shows an example
 "
 {
 // 0
- 	int Length=10; // Länge der Ausgabe
- 	string S;
+   int Length=10; // Länge der Ausgabe
+   string S;
     list L, SizeCol, SizeColShort;
     int wd,defect;
     int i,j;
 
 // 1
-	if( size(#)!=0 ){// + 1
-		Length=#[1];
-	}// - 1
+  if( size(#)!=0 ){// + 1
+    Length=#[1];
+  }// - 1
 
 // 2
    for (j=1; j <= ncols(M); j++){// +2
-		SizeCol[j]=0;
-	}// -2
+    SizeCol[j]=0;
+  }// -2
 
 // 3
-	for (j=1; j <= ncols(M); j++){// +3
-		SizeColShort[j]=0;
-	}// -3
+  for (j=1; j <= ncols(M); j++){// +3
+    SizeColShort[j]=0;
+  }// -3
 
 // 4
-	for (j=1; j <= ncols(M); j++){// +4
-		for (i=1; i <= nrows(M) ; i++){// +4.1
-			if ( SizeColShort[j] < size(string(M[i,j])) ){// +4.1.1
-				SizeCol[j]=size(string(M[i,j]));
-				SizeColShort[j]=size(string(M[i,j]));
-			}// -4.1.1
-		}// -4.1
-	}// -4
+  for (j=1; j <= ncols(M); j++){// +4
+    for (i=1; i <= nrows(M) ; i++){// +4.1
+      if ( SizeColShort[j] < size(string(M[i,j])) ){// +4.1.1
+        SizeCol[j]=size(string(M[i,j]));
+        SizeColShort[j]=size(string(M[i,j]));
+      }// -4.1.1
+    }// -4.1
+  }// -4
 
 // 5
-	for (j=1; j <= ncols(M); j++){// +5
-		if( SizeColShort[j] > Length ){// +5.1
-			SizeColShort[j]=Length;
-		}// -5.1
-	}// -5
+  for (j=1; j <= ncols(M); j++){// +5
+    if( SizeColShort[j] > Length ){// +5.1
+      SizeColShort[j]=Length;
+    }// -5.1
+  }// -5
 
 // 6
     for (i=1; i<=nrows(M); i++ ){// +6
-    	for (j=1; j<=ncols(M); j++ ){// +6.1
-    		if ( j!=1 ){// +6.1.1
-    			S=S+" ";
-    		}// -6.1.1
-    		if ( SizeCol[j] > Length ){// -6.1.2
-    			if ( size(string(M[i,j])) > Length ){// +6.1.2.1
-    				S=S+string(M[i,j])[1,Length]+"...";
-    			}// -6.1.2.1
-    			else{// +6.1.2.2
-    				defect=SizeColShort[j]+3-size(string(M[i,j]));
-    				S=S+string(M[i,j])+emptyString(defect);
-     			}// -6.1.2.2
-     		}// -6.1.2
-     		else{// +6.1.3
-     			defect=SizeColShort[j]-size(string(M[i,j]));
-     			S=S+string(M[i,j])+emptyString(defect);
-     		}// -6.1.3
-     	}// -6.1
-      	L[i]=S;
-      	S="";
+      for (j=1; j<=ncols(M); j++ ){// +6.1
+        if ( j!=1 ){// +6.1.1
+          S=S+" ";
+        }// -6.1.1
+        if ( SizeCol[j] > Length ){// -6.1.2
+          if ( size(string(M[i,j])) > Length ){// +6.1.2.1
+            S=S+string(M[i,j])[1,Length]+"...";
+          }// -6.1.2.1
+          else{// +6.1.2.2
+            defect=SizeColShort[j]+3-size(string(M[i,j]));
+            S=S+string(M[i,j])+emptyString(defect);
+           }// -6.1.2.2
+         }// -6.1.2
+         else{// +6.1.3
+           defect=SizeColShort[j]-size(string(M[i,j]));
+           S=S+string(M[i,j])+emptyString(defect);
+         }// -6.1.3
+       }// -6.1
+        L[i]=S;
+        S="";
     }// -6
 
 // 7
@@ -663,7 +663,7 @@ EXAMPLE: example netBigIntMatShort; shows an example
     NM.rows=L;
 
 // -
-	return(NM);
+  return(NM);
 }
 example
 {
@@ -692,15 +692,15 @@ EXAMPLE: example netBigIntMat; shows an example
 "
 {
 // 0
-	int m=nrows(M);
-	int n=ncols(M);
+  int m=nrows(M);
+  int n=ncols(M);
 
 // 1
-	bigintmat B[m][n]=M;
-	Net Output=netBigIntMat(B);
+  bigintmat B[m][n]=M;
+  Net Output=netBigIntMat(B);
 
 // -
-	return(Output);
+  return(Output);
 }
 example
 {
@@ -729,22 +729,22 @@ EXAMPLE: example netIntMatShort; shows an example
 "
 {
 // 0
-	int m=nrows(M);
-	int n=ncols(M);
+  int m=nrows(M);
+  int n=ncols(M);
 
 // 1
-	bigintmat B[m][n]=bigintmat(M);
+  bigintmat B[m][n]=bigintmat(M);
 
 // 2
-	if( size(#)!=0 ){// +2.1
-		Net Output=netBigIntMatShort(B, #[1]);
-	}// -2.1
-	else{// +2.1
-		Net Output=netBigIntMatShort(B);
-	}// -2.2
+  if( size(#)!=0 ){// +2.1
+    Net Output=netBigIntMatShort(B, #[1]);
+  }// -2.1
+  else{// +2.1
+    Net Output=netBigIntMatShort(B);
+  }// -2.2
 
 // -
-	return(Output);
+  return(Output);
 }
 example
 {
@@ -778,14 +778,14 @@ EXAMPLE: example netIntVector; shows an example
 "
 {
 // 0
-	intmat M=intmat(V);
+  intmat M=intmat(V);
 
 // 1
-	Net Output;
-	Output=netIntMat(M);
+  Net Output;
+  Output=netIntMat(M);
 
 // -
-	return(Output);
+  return(Output);
 }
 example
 {
@@ -814,21 +814,21 @@ EXAMPLE: example netIntVectorShort; shows an example
 "
 {
 // 0
-	intmat M=intmat(V);
+  intmat M=intmat(V);
 
 // 1
-	Net Output;
+  Net Output;
 
 // 2
-	if( size(#) != 0){// +2.1
-		Output=netIntMatShort(M, #[1]);
-	}// -2.1
-	else{// +2.2
-		Output=netIntMatShort(M);
-	}// -2.2
+  if( size(#) != 0){// +2.1
+    Output=netIntMatShort(M, #[1]);
+  }// -2.1
+  else{// +2.2
+    Output=netIntMatShort(M);
+  }// -2.2
 
 // -
-	return(Output);
+  return(Output);
 }
 example
 {
@@ -857,29 +857,29 @@ EXAMPLE: example netmatrix; shows an example
 "
 {
 // 0
-	int Size=50;
+  int Size=50;
 
 // 1
-	if( size(#)!=0 ){// +1
-		Size=#[1];
-	}// -1
+  if( size(#)!=0 ){// +1
+    Size=#[1];
+  }// -1
 
 // -
-	return(netmatrixShort(M, Size));
+  return(netmatrixShort(M, Size));
 }
 example
 {
-	"EXAMPLE:";
-	ring r1=101,(x,y,z),lp;
-	poly a=2x3y4+300xy-234z23;
-	poly b=2x3y4z;
-	poly c=x3y4z5;
-	poly d=5x6y7z10;
-	poly e=2x3y;
-	poly f=4y5z8;
-	matrix M[2][3]=a,b,c,d,e,f;
-	print(M);
-	netmatrix(M);
+  "EXAMPLE:";
+  ring r1=101,(x,y,z),lp;
+  poly a=2x3y4+300xy-234z23;
+  poly b=2x3y4z;
+  poly c=x3y4z5;
+  poly d=5x6y7z10;
+  poly e=2x3y;
+  poly f=4y5z8;
+  matrix M[2][3]=a,b,c,d,e,f;
+  print(M);
+  netmatrix(M);
 }
 
 
@@ -896,45 +896,45 @@ KEYWORDS: Output
 EXAMPLE: example netmatrixShort; shows an example
 "
 {
-	int i, j;
-	list breite = list();
-	Net Output;
-	string Zeile;
+  int i, j;
+  list breite = list();
+  Net Output;
+  string Zeile;
 
-	//maximale Spaltenbreite setzen
-	for (i=1; i<=ncols(M); i++){
-		breite = breite + list(0);
-		for (j=1; j<=nrows(M); j++){
-			if (breite[i] < size(string(M[j,i]))){
-				breite[i] = size(string(M[j,i]));
-			}
-		}
-	}
+  //maximale Spaltenbreite setzen
+  for (i=1; i<=ncols(M); i++){
+    breite = breite + list(0);
+    for (j=1; j<=nrows(M); j++){
+      if (breite[i] < size(string(M[j,i]))){
+        breite[i] = size(string(M[j,i]));
+      }
+    }
+  }
 
-	//einfügen
-	for (i=1; i<=nrows(M); i++){
-		Zeile = "| ";
-		for (j=1; j<=ncols(M); j++){
-			Zeile = Zeile + string(M[i,j]) + emptyString( breite[j] - size(string(M[i,j])) + 1);
+  //einfügen
+  for (i=1; i<=nrows(M); i++){
+    Zeile = "| ";
+    for (j=1; j<=ncols(M); j++){
+      Zeile = Zeile + string(M[i,j]) + emptyString( breite[j] - size(string(M[i,j])) + 1);
 
-		}
-		Output.rows[i] = Zeile + "|";
-	}
+    }
+    Output.rows[i] = Zeile + "|";
+  }
 
-	return (Output);
+  return (Output);
 }
 example
 {
-	"EXAMPLE:";
-	ring r1=101,(x,y,z),lp;
-	poly a=2x3y4+300xy-234z23;
-	poly b=2x3y4z;
-	poly c=x3y4z5;
-	poly d=5x6y7z10;
-	poly e=2x3y-2x3y4+300xy-234z23;
-	poly f=4y5z8;
-	matrix M[2][3]=a,b,c,d,e,f;
-	netmatrixShort(M, 10);
+  "EXAMPLE:";
+  ring r1=101,(x,y,z),lp;
+  poly a=2x3y4+300xy-234z23;
+  poly b=2x3y4z;
+  poly c=x3y4z5;
+  poly d=5x6y7z10;
+  poly e=2x3y-2x3y4+300xy-234z23;
+  poly f=4y5z8;
+  matrix M[2][3]=a,b,c,d,e,f;
+  netmatrixShort(M, 10);
 }
 
 
@@ -952,22 +952,22 @@ EXAMPLE: example netInt; shows an example
 "
 {
 // 0
-	Net N;
-  	list L;
+  Net N;
+    list L;
 
 // 1
- 	 L[1]=string(M);
- 	 N.rows=L;
+    L[1]=string(M);
+    N.rows=L;
 
 // -
-	return(N);
+  return(N);
 }
 example
 {
-	"EXAMPLE:";
-	ring r;
-	int M=5;
-	netInt(M);
+  "EXAMPLE:";
+  ring r;
+  int M=5;
+  netInt(M);
 }
 
 
@@ -982,22 +982,22 @@ EXAMPLE: example netBigInt; shows an example
 "
 {
 // 0
-	Net N;
-  	list L;
+  Net N;
+    list L;
 
 // 1
- 	 L[1]=string(M);
- 	 N.rows=L;
+    L[1]=string(M);
+    N.rows=L;
 
 // -
-	return(N);
+  return(N);
 }
 example
 {
-	"EXAMPLE:";
-	ring r;
-	bigint M=5;
-	netBigInt(M);
+  "EXAMPLE:";
+  ring r;
+  bigint M=5;
+  netBigInt(M);
 }
 
 
@@ -1014,21 +1014,21 @@ EXAMPLE: example netString; shows an example
 "
 {
 // 0
- 	Net N;
-	list L;
+   Net N;
+  list L;
 
 // 1
-	L[1]=M;
-  	N.rows=L;
+  L[1]=M;
+    N.rows=L;
 
 // -
-	return(N);
+  return(N);
 }
 example
 {
-	"EXAMPLE:";
-	string M="Hallo";
-	netString(M);
+  "EXAMPLE:";
+  string M="Hallo";
+  netString(M);
 }
 
 
@@ -1046,33 +1046,33 @@ EXAMPLE: example netvector; shows an example
 "
 {
 // 0
-	matrix M=matrix(V);
-	int Size=25;
+  matrix M=matrix(V);
+  int Size=25;
 
 // 1
-	if( size(#)!=0 ){// +1
-		Size=#{1};
-	}// -1
+  if( size(#)!=0 ){// +1
+    Size=#{1};
+  }// -1
 
 // 2
-	Net Output;
-	Output=netmatrix(M, Size);
+  Net Output;
+  Output=netmatrix(M, Size);
 
 // -
-	return(Output);
+  return(Output);
 }
 example
 {
-	"EXAMPLE:";
-	ring r1=101,(x,y,z),lp;
-	poly a=2x3y4;
-	poly b=2x3y4z;
-	poly c=x3y4z5;
-	poly d=5x6y7z10;
-	poly e=2x3y;
-	poly f=4y5z8;
-	vector V=[a,b,c,d,e,f];
-	netvector(V);
+  "EXAMPLE:";
+  ring r1=101,(x,y,z),lp;
+  poly a=2x3y4;
+  poly b=2x3y4z;
+  poly c=x3y4z5;
+  poly d=5x6y7z10;
+  poly e=2x3y;
+  poly f=4y5z8;
+  vector V=[a,b,c,d,e,f];
+  netvector(V);
 }
 
 
@@ -1090,33 +1090,33 @@ EXAMPLE: example netvectorShort; shows an example
 "
 {
 // 0
-	matrix M=matrix(V);
-	Net Output;
-	int Size=10;
+  matrix M=matrix(V);
+  Net Output;
+  int Size=10;
 
 // 1
-	if( size(#)!=0 ){// +1
-		Size=#[1];
-	}// -1
+  if( size(#)!=0 ){// +1
+    Size=#[1];
+  }// -1
 
 // 2
-	Output=netmatrixShort(M, Size);
+  Output=netmatrixShort(M, Size);
 
 // -
-	return(Output);
+  return(Output);
 }
 example
 {
-	"EXAMPLE:";
-	ring r1=101,(x,y,z),lp;
-	poly a=2x3y4;
-	poly b=2x3y4z-5x6y7z10;
-	poly c=x3y4z5;
-	poly d=5x6y7z10;
-	poly e=2x3y;
-	poly f=4y5z8+5x6y7z10;
-	vector V=[a,b,c,d,e,f];
-	netvectorShort(V);
+  "EXAMPLE:";
+  ring r1=101,(x,y,z),lp;
+  poly a=2x3y4;
+  poly b=2x3y4z-5x6y7z10;
+  poly c=x3y4z5;
+  poly d=5x6y7z10;
+  poly e=2x3y;
+  poly f=4y5z8+5x6y7z10;
+  vector V=[a,b,c,d,e,f];
+  netvectorShort(V);
 }
 
 
@@ -1133,261 +1133,261 @@ KEYWORDS: Output
 EXAMPLE: example netPoly; shows an example
 "
 {
-	/*
-	0. Erstellung der benötigten Datenstrukturen
-	2. Überprüfung ob P das Nullpolynom ist und dieses gegenfalls ausgeben
-	3. Entscheidung ob es sich um den ersten Term handel oder nicht
-		3.1 Verarbeitung des ersten Term
-		3.2 Verarbeitung foldender Terme
-	*/
+  /*
+  0. Erstellung der benötigten Datenstrukturen
+  2. Überprüfung ob P das Nullpolynom ist und dieses gegenfalls ausgeben
+  3. Entscheidung ob es sich um den ersten Term handel oder nicht
+    3.1 Verarbeitung des ersten Term
+    3.2 Verarbeitung foldender Terme
+  */
 
 // (0.)
-	poly Q;
-	list Output;
-	Net N;
-	string Up, Down, Test;
-	int S, i;
+  poly Q;
+  list Output;
+  Net N;
+  string Up, Down, Test;
+  int S, i;
 
-	if( P == 0 ) { // (1a)
-		Down="0";
-		Up=" ";
-		} // (1a)
+  if( P == 0 ) { // (1a)
+    Down="0";
+    Up=" ";
+    } // (1a)
 
-	if( P == 1 ) { // (1b)
-		Down="1";
-		Up=" ";
-		P=0;
-		} // (1b)
+  if( P == 1 ) { // (1b)
+    Down="1";
+    Up=" ";
+    P=0;
+    } // (1b)
 
-	if( P == -1 ) { // (1c)
-		Down="-1";
-		Up="  ";
-		P=0;
-		} // (1c)
+  if( P == -1 ) { // (1c)
+    Down="-1";
+    Up="  ";
+    P=0;
+    } // (1c)
 
 // (2.)
-	while ( P != 0 ) { // (2)
+  while ( P != 0 ) { // (2)
 // (3.)
 // (3.1.)
-			if ( Down == "" ){ // (2.1)
-				Q=lead(P);
-				P=P-lead(P);
-				if ( leadcoef(Q) == 1 ) { // (2.1.1)
-				} // (2.1.1)
-				else { // (2.1.2)
-					Test=string( leadcoef(Q) );
-					if( Test[1] == "-" ) { // (2.1.2.1))
-						if ( Test[2] == "1" && Test[3] == "" ) { // (2.1.2.1.1)
-							Down=Down+"-";
-							Up=Up+emptyString(1);
-						} // (2.1.2.1.1)
-						else { // (2.1.2.1.2)
-						Down=Down+string( leadcoef(Q) );
-						Up=Up+emptyString( size( string( leadcoef(Q) ) ) ); //size(leadcoef(-1))=1, deshalb size(string ...
-						}// (2.1.2.1.2)
-					} // (2.1.2.1)
-					else { // (2.1.2.2)
-						Down=Down+string( leadcoef(Q) ); // leading coef
-						Up=Up+emptyString( size( string( leadcoef(Q) ) ) );
-					}// (2.1.2.2
-				} // (2.1.2)
-				S=size( ringlist(basering)[2] ); //variables
-				for ( i=1; i<=S; i++) { // (2.1.1)
-					if ( leadexp(Q)[i] == 0 ) { // (2.1.1.1)
-					}
-	  				else { // (2.1.1.2))
-						Down=Down+string( ringlist( basering )[2][i] );
-						Up=Up+emptyString( size (string( ringlist( basering )[2][i] ) ) );
-						if ( leadexp(Q)[i] == 1 ){ // (2.1.1.2.1))
-						} // (2.1.1.2.1)
-						else { // (2.1.1.2.2)
-							Up=Up+string( leadexp(Q)[i] );
-							Down=Down+emptyString( size( string( leadexp(Q)[i]) ) );
-						} // (2.1.1.2.2)
-					} // (2.2.5.2)
-				} // (2.1.1)
-			}  // (2.1)
+      if ( Down == "" ){ // (2.1)
+        Q=lead(P);
+        P=P-lead(P);
+        if ( leadcoef(Q) == 1 ) { // (2.1.1)
+        } // (2.1.1)
+        else { // (2.1.2)
+          Test=string( leadcoef(Q) );
+          if( Test[1] == "-" ) { // (2.1.2.1))
+            if ( Test[2] == "1" && Test[3] == "" ) { // (2.1.2.1.1)
+              Down=Down+"-";
+              Up=Up+emptyString(1);
+            } // (2.1.2.1.1)
+            else { // (2.1.2.1.2)
+            Down=Down+string( leadcoef(Q) );
+            Up=Up+emptyString( size( string( leadcoef(Q) ) ) ); //size(leadcoef(-1))=1, deshalb size(string ...
+            }// (2.1.2.1.2)
+          } // (2.1.2.1)
+          else { // (2.1.2.2)
+            Down=Down+string( leadcoef(Q) ); // leading coef
+            Up=Up+emptyString( size( string( leadcoef(Q) ) ) );
+          }// (2.1.2.2
+        } // (2.1.2)
+        S=size( ringlist(basering)[2] ); //variables
+        for ( i=1; i<=S; i++) { // (2.1.1)
+          if ( leadexp(Q)[i] == 0 ) { // (2.1.1.1)
+          }
+            else { // (2.1.1.2))
+            Down=Down+string( ringlist( basering )[2][i] );
+            Up=Up+emptyString( size (string( ringlist( basering )[2][i] ) ) );
+            if ( leadexp(Q)[i] == 1 ){ // (2.1.1.2.1))
+            } // (2.1.1.2.1)
+            else { // (2.1.1.2.2)
+              Up=Up+string( leadexp(Q)[i] );
+              Down=Down+emptyString( size( string( leadexp(Q)[i]) ) );
+            } // (2.1.1.2.2)
+          } // (2.2.5.2)
+        } // (2.1.1)
+      }  // (2.1)
 // (3.2.)
-			else { // (2.2)
-				Q=lead(P);
-				P=P-lead(P);
-				if ( leadcoef(Q) == 1 ) { // (2.2.1)
-					Down=Down+"+";
-					Up=Up+" ";
-				} // (2.2.1)
-				else { // (2.2.2)
-					Test=string( leadcoef(Q) );
-					if ( Test[1] == "-" ) { // (2.2.2.1)
-						if ( Test[2] == "1" && Test[3] == "" ) { // (2.2.2.1.1))
-							Down=Down+"-";
-							Up=Up+emptyString(1);
-						} // (2.2.2.1.1)
-						else { // ()
-						Down=Down+string( leadcoef(Q) );
-						Up=Up+emptyString( size( string( leadcoef(Q) ) ) ); //size(leadcoef(-1))=1
-						}// (2.2.2.1.2)
-					} // (2.2.2.1)
-					else { // (2.2.2.2)
-						Down=Down+"+";
-						Up=Up+" ";
-						Down=Down+string( leadcoef(Q) ); // leading coef
-						Up=Up+emptyString( size( string( leadcoef(Q) ) ) );
-					} // (2.2.2.2)
-				} // (2.2.2)
+      else { // (2.2)
+        Q=lead(P);
+        P=P-lead(P);
+        if ( leadcoef(Q) == 1 ) { // (2.2.1)
+          Down=Down+"+";
+          Up=Up+" ";
+        } // (2.2.1)
+        else { // (2.2.2)
+          Test=string( leadcoef(Q) );
+          if ( Test[1] == "-" ) { // (2.2.2.1)
+            if ( Test[2] == "1" && Test[3] == "" ) { // (2.2.2.1.1))
+              Down=Down+"-";
+              Up=Up+emptyString(1);
+            } // (2.2.2.1.1)
+            else { // ()
+            Down=Down+string( leadcoef(Q) );
+            Up=Up+emptyString( size( string( leadcoef(Q) ) ) ); //size(leadcoef(-1))=1
+            }// (2.2.2.1.2)
+          } // (2.2.2.1)
+          else { // (2.2.2.2)
+            Down=Down+"+";
+            Up=Up+" ";
+            Down=Down+string( leadcoef(Q) ); // leading coef
+            Up=Up+emptyString( size( string( leadcoef(Q) ) ) );
+          } // (2.2.2.2)
+        } // (2.2.2)
 
-				S=size( ringlist(basering)[2] ); //variables
-				for ( i=1; i<=S; i++) { // (2.2.3)
-					if ( leadexp(Q)[i] == 0 ) { // (2.2.3.1)
-					} // (2.2.3.1)
-	  				else { // (2.2.3.2)
-						Down=Down+string( ringlist( basering )[2][i] );
-						Up=Up+emptyString( size (string( ringlist( basering )[2][i] ) ) );
-						if ( leadexp(Q)[i] == 1 ){ // (2.2.3.2.1)
-						} // (2.2.3.2.1)
-						else { // (2.2.3.2.2)
-							Up=Up+string( leadexp(Q)[i] );
-							Down=Down+emptyString( size( string( leadexp(Q)[i]) ) );
-						} // (2.2.3.2.2)
-					} // (2.2.3.2)
-				} // (2.2.3)
+        S=size( ringlist(basering)[2] ); //variables
+        for ( i=1; i<=S; i++) { // (2.2.3)
+          if ( leadexp(Q)[i] == 0 ) { // (2.2.3.1)
+          } // (2.2.3.1)
+            else { // (2.2.3.2)
+            Down=Down+string( ringlist( basering )[2][i] );
+            Up=Up+emptyString( size (string( ringlist( basering )[2][i] ) ) );
+            if ( leadexp(Q)[i] == 1 ){ // (2.2.3.2.1)
+            } // (2.2.3.2.1)
+            else { // (2.2.3.2.2)
+              Up=Up+string( leadexp(Q)[i] );
+              Down=Down+emptyString( size( string( leadexp(Q)[i]) ) );
+            } // (2.2.3.2.2)
+          } // (2.2.3.2)
+        } // (2.2.3)
 
-			} // (2.2)
-	} // (2)
+      } // (2.2)
+  } // (2)
 
 // 4
-	Output=Up,Down;
-	N.rows=Output;
+  Output=Up,Down;
+  N.rows=Output;
 
 // -
-	return(N);
+  return(N);
 }
 example
 {
 "EXAMPLE:"; // from 3.3.1 Examples of ring declarations
 //
-	ring R1 = 32003,(x,y,z),dp;
-	poly q6=1;
-	print(q6);
-	netPoly(q6);
-	poly q7=-1;
-	print(q7);
-	netPoly(q7);
-	poly q8=2;
-	print(q8);
-	netPoly(q8);
-	poly q9=-2;
-	print(q9);
-	netPoly(q9);
-	poly q1=x+y+z;
-	print(q1);
-	netPoly(q1);
-	poly q2=xy+xz+yz;
-	print(q2);
-	netPoly(q2);
-	poly q3=2x3y3z4-3x4y5z6;
-	print(q3);
-	netPoly(q3);
-	poly q4=x3y3z4-x4y5z6;
-	print(q4);
-	netPoly(q4);
-	poly q5=-x3y3z4+x4y5z6;
-	print(q5);
-	netPoly(q5);
+  ring R1 = 32003,(x,y,z),dp;
+  poly q6=1;
+  print(q6);
+  netPoly(q6);
+  poly q7=-1;
+  print(q7);
+  netPoly(q7);
+  poly q8=2;
+  print(q8);
+  netPoly(q8);
+  poly q9=-2;
+  print(q9);
+  netPoly(q9);
+  poly q1=x+y+z;
+  print(q1);
+  netPoly(q1);
+  poly q2=xy+xz+yz;
+  print(q2);
+  netPoly(q2);
+  poly q3=2x3y3z4-3x4y5z6;
+  print(q3);
+  netPoly(q3);
+  poly q4=x3y3z4-x4y5z6;
+  print(q4);
+  netPoly(q4);
+  poly q5=-x3y3z4+x4y5z6;
+  print(q5);
+  netPoly(q5);
 
-	ring R2 = 32003,(x(1..10)),dp;
+  ring R2 = 32003,(x(1..10)),dp;
 
-	poly w6=1;
-	print(w6);
-	netPoly(w6);
+  poly w6=1;
+  print(w6);
+  netPoly(w6);
 
-	poly w7=-1;
-	print(w7);
-	netPoly(w7);
+  poly w7=-1;
+  print(w7);
+  netPoly(w7);
 
-	poly w2=-x(1)-(2)-x(3);
-	print(w2);
-	netPoly(w2);
+  poly w2=-x(1)-(2)-x(3);
+  print(w2);
+  netPoly(w2);
 
-	poly w3=x(1)*x(2)+x(1)*x(2)+x(2)*x(3);
-	print(w3);
-	netPoly(w3);
+  poly w3=x(1)*x(2)+x(1)*x(2)+x(2)*x(3);
+  print(w3);
+  netPoly(w3);
 
-	poly w4=x(1)*x(2)-x(1)*x(2)-x(2)*x(3);
-	print(w4);
-	netPoly(w4);
+  poly w4=x(1)*x(2)-x(1)*x(2)-x(2)*x(3);
+  print(w4);
+  netPoly(w4);
 
-	poly w5=x(1)^2*x(2)^3*x(3)^4;
-	print(w5);
-	netPoly(w5);
+  poly w5=x(1)^2*x(2)^3*x(3)^4;
+  print(w5);
+  netPoly(w5);
 
-	poly w8=x(1)+x(2)+x(3);
-	print(w8);
-	netPoly(w8);
+  poly w8=x(1)+x(2)+x(3);
+  print(w8);
+  netPoly(w8);
 
-	poly w9=x(1)+x(2)+x(3);
-	print(w9);
-	netPoly(w9);
+  poly w9=x(1)+x(2)+x(3);
+  print(w9);
+  netPoly(w9);
 
-	ring R3 = 32003,(x(1..5)(1..8)),dp;
+  ring R3 = 32003,(x(1..5)(1..8)),dp;
 
-	poly e1=x(1)(1)+x(2)(2)+x(3)(3);
-	print(e1);
-	netPoly(e1);
+  poly e1=x(1)(1)+x(2)(2)+x(3)(3);
+  print(e1);
+  netPoly(e1);
 
-	poly e2=x(1)(1)*x(2)(2)*x(3)(3);
-	print(e2);
-	netPoly(e2);
+  poly e2=x(1)(1)*x(2)(2)*x(3)(3);
+  print(e2);
+  netPoly(e2);
 
-	poly e3=x(1)(1)^2*x(2)(2)^3*x(3)(3)^4;
-	print(e3);
-	netPoly(e3);
+  poly e3=x(1)(1)^2*x(2)(2)^3*x(3)(3)^4;
+  print(e3);
+  netPoly(e3);
 
-	poly e4=-x(1)(1)^2*x(2)(2)^3*x(3)(3)^4-x(1)(1)^3*x(2)(2)^3*x(3)(3)^4;
-	print(e4);
-	netPoly(e4);
+  poly e4=-x(1)(1)^2*x(2)(2)^3*x(3)(3)^4-x(1)(1)^3*x(2)(2)^3*x(3)(3)^4;
+  print(e4);
+  netPoly(e4);
 
-	ring r=32003,(x,y,z),lp;
-	poly p=x4+4y4+4z4-x3-3y3-3z3+1x2+2y2+z2-x-1y-z1;
-	p;
-	netPoly(p);
+  ring r=32003,(x,y,z),lp;
+  poly p=x4+4y4+4z4-x3-3y3-3z3+1x2+2y2+z2-x-1y-z1;
+  p;
+  netPoly(p);
 
-	poly p2=x3yz+xy3z+xyz3-2x2yz-2xy2z-2xyz2+1xyz+x1yzxy1z;
-	p2;
-	netPoly(p2);
+  poly p2=x3yz+xy3z+xyz3-2x2yz-2xy2z-2xyz2+1xyz+x1yzxy1z;
+  p2;
+  netPoly(p2);
 
-	poly p3=x+y+z-x2-3y-4z4+xy+xz+2xy-x2y-xz2-y2z2;
-	p3;
-	netPoly(p3);
+  poly p3=x+y+z-x2-3y-4z4+xy+xz+2xy-x2y-xz2-y2z2;
+  p3;
+  netPoly(p3);
 
-	ring r2=32003,(x(1..10)),lp;
-	poly p=x(1)*x(2)*x(3)+2*x(1)^2+2*x(1)*x(2);
-	p;
-	netPoly(p);
+  ring r2=32003,(x(1..10)),lp;
+  poly p=x(1)*x(2)*x(3)+2*x(1)^2+2*x(1)*x(2);
+  p;
+  netPoly(p);
 
-	poly p2=x(1)^2*x(2)^3*x(3)^4-2*x(1)^1*x(2)^2+2*x(1)*x(2)*x(10);
-	p2;
-	netPoly(p2);
+  poly p2=x(1)^2*x(2)^3*x(3)^4-2*x(1)^1*x(2)^2+2*x(1)*x(2)*x(10);
+  p2;
+  netPoly(p2);
 
-	ring r3=7,(x,y,z),lp;
-	poly p=17x2+24y;
-	p;
+  ring r3=7,(x,y,z),lp;
+  poly p=17x2+24y;
+  p;
         netPoly(p);
 
-	ring r4=(7,a,b,c),(x,y,z),Dp;
-	poly p=2ax2+by-cz3;
-	p;
-	netPoly(p);
+  ring r4=(7,a,b,c),(x,y,z),Dp;
+  poly p=2ax2+by-cz3;
+  p;
+  netPoly(p);
 
-	ring r5=(7,a),(x,y,z),dp;
-	minpoly = a^2+a+3;
-	poly p=2ax2+y-az3;
-	p;
-	netPoly(p);
+  ring r5=(7,a),(x,y,z),dp;
+  minpoly = a^2+a+3;
+  poly p=2ax2+y-az3;
+  p;
+  netPoly(p);
 
-	ring r6 = (complex,30,j),(x,y,z),dp;
-	poly p=2x2+y-z3+20*j;
-	p;
-	netPoly(p);
+  ring r6 = (complex,30,j),(x,y,z),dp;
+  poly p=2x2+y-z3+20*j;
+  p;
+  netPoly(p);
 }
 
 
@@ -1403,21 +1403,21 @@ KEYWORDS: Output
 EXAMPLE: example netIdeal; shows an example
 "
 {
-	string N=string("<");
+  string N=string("<");
 
-	for (int i=1; i<size(I); i++){ // (1)
-		N=N+string(I[i])+string(", ");
- 	} // (1)
+  for (int i=1; i<size(I); i++){ // (1)
+    N=N+string(I[i])+string(", ");
+   } // (1)
 
-	N=N+string(I[size(I)])+string(">");
-	return(net(N));
+  N=N+string(I[size(I)])+string(">");
+  return(net(N));
 }
 example
 {
 "EXAMPLE:";
-	ring r;
-	ideal I=2x3y4,2x3y4z+x3y4z5,5x6y7z10-2x3y+4y5z8;
-	netIdeal(I);
+  ring r;
+  ideal I=2x3y4,2x3y4z+x3y4z5,5x6y7z10-2x3y+4y5z8;
+  netIdeal(I);
 }
 
 
