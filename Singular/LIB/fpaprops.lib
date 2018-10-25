@@ -271,15 +271,19 @@ static proc inOutCommingEdgesInCycles(intmat G, int v, intvec visited, intvec pa
 proc lpIsSemiPrime(ideal G)
 "USAGE: lpIsSemiPrime(G); G an ideal in a Letterplace ring
 RETURN: boolean
-PURPOSE: Check whether A/<LM(G)> is semi prime, that is when p * (A/<LM(G)>) * p != 0 for all p in (A/<LM(G)> - {0}).
+PURPOSE: Check whether A/<LM(G)> is semi-prime ring,
+alternatively whether <LM(G)> is a semi-prime ideal in A.
 ASSUME: - basering is a Letterplace ring
       - G is a Groebner basis
-THEORY: lpIsSemiPrime works with the monomial algebra A/<LM(G)>.
+THEORY: A (two-sided) ideal I in the ring A is semi-prime, if for any a in A one has
+aAa subseteq I implies a in I.
+NOTE: lpIsSemiPrime works with the monomial algebra A/<LM(G)>.
 A positive answer holds for both A/<LM(G)> and A/<G>, while
 a negative answer applies only to A/<LM(G)> and not necessarily to
 A/<G>.
 "
 {
+    // old theory part: that is when p * (A/<LM(G)>) * p != 0 for all p in (A/<LM(G)> - {0}).
   G = lead(G);
   G = simplify(G, 2+4+8);
 
@@ -376,14 +380,18 @@ static proc isCyclicInUfGraph(intmat UG, list LV, intvec u)
 proc lpIsPrime(ideal G)
 "USAGE: lpIsPrime(G); G an ideal in a Letterplace ring
 RETURN: boolean
-PURPOSE: Check whether A/<LM(G)> is prime, that is when p1 * (A/<LM(G)>) * p2 != 0 for all p1, p2 in (A/<LM(G)> - {0}).
+PURPOSE: Check whether A/<LM(G)> is prime ring,
+alternatively whether <LM(G)> is a prime ideal in A.
 ASSUME: - basering is a Letterplace ring
       - G is a Groebner basis
-THEORY: lpIsPrime works with the monomial algebra A/<LM(G)>.
+THEORY: A (two-sided) ideal I in the ring A is prime, if for any a,b in A one has
+aAb subseteq I implies a in I or b in I.
+NOTE: lpIsPrime works with the monomial algebra A/<LM(G)>.
 A positive answer holds for both A/<LM(G)> and A/<G>, while
 a negative answer applies only to A/<LM(G)> and not necessarily to A/<G>.
 "
 {
+    // old theory part: that is when p1 * (A/<LM(G)>) * p2 != 0 for all p1, p2 in (A/<LM(G)> - {0}).
   G = lead(G);
   G = simplify(G, 2+4+8);
 
