@@ -608,6 +608,9 @@ static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
   }
   poly u_p=(poly)u->CopyD(POLY_CMD);
   if ((u_p!=NULL)
+  #ifdef HAVE_SHIFTBBA
+  && (!rIsLPRing(currRing))
+  #endif
   && ((v_i!=0) &&
       ((long)pTotaldegree(u_p) > (signed long)currRing->bitmask / (signed long)v_i/2)))
   {
@@ -2212,9 +2215,20 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
           c_par=currRing->cf->extRing->N;
           c_par_names=currRing->cf->extRing->names;
         }
-        maFindPerm(r->names,       r->N,       r_par_names, r_par,
-                   currRing->names,currRing->N,c_par_names, c_par,
-                   perm,par_perm, currRing->cf->type);
+	if (!rIsLPRing(r))
+	{
+          maFindPerm(r->names,       r->N,       r_par_names, r_par,
+                     currRing->names,currRing->N,c_par_names, c_par,
+                     perm,par_perm, currRing->cf->type);
+        }
+	#ifdef HAVE_SHIFTBBA
+	else
+	{
+          maFindPermLP(r->names,       r->N,       r_par_names, r_par,
+                     currRing->names,currRing->N,c_par_names, c_par,
+                     perm,par_perm, currRing->cf->type,r->isLPring);
+	}
+	#endif
       }
       else
       {
@@ -3143,6 +3157,25 @@ static BOOLEAN jjPFAC2(leftv res, leftv u, leftv v)
   n_Delete(&n1, coeffs_BIGINT);
   res->data = (char*)l;
   return FALSE;
+}
+static BOOLEAN jjRMINUS(leftv res, leftv u, leftv v)
+{
+  ring r=rMinusVar((ring)u->Data(),(char*)v->Data());
+  res->data = (char *)r;
+  return r==NULL;
+}
+static BOOLEAN jjRPLUS(leftv res, leftv u, leftv v)
+{
+  int left;
+  if (u->Typ()==RING_CMD) left=0;
+  else
+  {
+    leftv h=u;u=v;v=h;
+    left=1;
+  }
+  ring r=rPlusVar((ring)u->Data(),(char*)v->Data(),left);
+  res->data = (char *)r;
+  return r==NULL;
 }
 static BOOLEAN jjRSUM(leftv res, leftv u, leftv v)
 {
@@ -4208,6 +4241,16 @@ static BOOLEAN jjHOMOG1(leftv res, leftv v)
 }
 static BOOLEAN jjidMaxIdeal(leftv res, leftv v)
 {
+#ifdef HAVE_SHIFTBBA
+  if (currRing->isLPring)
+  {
+    int deg = (int)(long)v->Data();
+    if (deg > currRing->N/currRing->isLPring) {
+      WerrorS("deg of letterplace ring to small");
+      return TRUE;
+    }
+  }
+#endif
   res->data = (char *)idMaxIdeal((int)(long)v->Data());
   setFlag(res,FLAG_STD);
   return FALSE;
@@ -4426,12 +4469,6 @@ static BOOLEAN jjLISTRING(leftv res, leftv v)
   if (mm==0) mm=0x7fff;
   int isLetterplace=(int)(long)atGet(v,"isLetterplaceRing",INT_CMD);
   ring r=rCompose(l,TRUE,mm,isLetterplace);
-  if (isLetterplace)
-  {
-    r->ShortOut=FALSE;
-    r->CanShortOut=FALSE;
-    r->isLPring=TRUE;
-  }
   res->data=(char *)r;
   return (r==NULL);
 }
@@ -9276,7 +9313,8 @@ static BOOLEAN check_valid(const int p, const int op)
     }
     /* else, ALLOW_PLURAL */
   }
-  else if (currRing->isLPring)
+  #ifdef HAVE_SHIFTBBA
+  else if (rIsLPRing(currRing))
   {
     if ((p & ALLOW_LP)==0)
     {
@@ -9284,6 +9322,7 @@ static BOOLEAN check_valid(const int p, const int op)
       return TRUE;
     }
   }
+  #endif
   #endif
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))

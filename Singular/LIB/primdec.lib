@@ -8387,7 +8387,7 @@ EXAMPLE: example newDecompStep; shows an example
             setring gnir;
             ser=imap(@Phelp,ser);
           }
-	  // }
+        // }
        }
        if(abspri)
        {

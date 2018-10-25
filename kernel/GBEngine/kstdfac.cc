@@ -227,9 +227,6 @@ kStrategy kStratCopy(kStrategy o)
   s->noTailReduction=o->noTailReduction;
   s->fromT=o->fromT;
   s->noetherSet=o->noetherSet;
-#ifdef HAVE_SHIFTBBA
-  s->lV=o->lV;
-#endif
 #ifdef HAVE_PLURAL
   s->no_prod_crit=o->no_prod_crit;
 #endif

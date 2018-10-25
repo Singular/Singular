@@ -880,7 +880,6 @@ primList
 rel_orbit_variety
 rightInverse
 rightModulo
-shiftPoly
 spnf
 spoly
 syndrome
@@ -918,7 +917,6 @@ ivMis2Base
 ivSickle
 lift_kbase
 linearMapKernel
-lpMult
 makeMalgrange
 makeUf4
 makeUso6

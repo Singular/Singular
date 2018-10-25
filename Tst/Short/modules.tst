@@ -101,7 +101,7 @@ LIB "modules.lib";
  ring r;
  matrix m[2][2]=x,y3,z,xz;
  Matrix Ma=m;
- FreeModule M=Source(Ma); 
+ FreeModule M=Source(Ma);
  M;
  Degree(M);
  kill r;kill M;kill m;

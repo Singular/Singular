@@ -2894,7 +2894,14 @@ ring rCompose(const lists  L, const BOOLEAN check_comp, const long bitmask,const
   // ------------------------ ??????? --------------------
 
   if (!isLetterplace) rRenameVars(R);
-  else R->isLPring=isLetterplace;
+  #ifdef HAVE_SHIFTBBA
+  else
+  {
+    R->isLPring=isLetterplace;
+    R->ShortOut=FALSE;
+    R->CanShortOut=FALSE;
+  }
+  #endif
   if (bitmask!=0x7fff) R->bitmask=bitmask*2;
   rComplete(R);
 
@@ -2929,7 +2936,7 @@ ring rCompose(const lists  L, const BOOLEAN check_comp, const long bitmask,const
           if ( (rField_is_Q_a(orig_ring) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
             (rField_is_Q(currRing) || rField_is_Q_a(currRing) ||
              rField_is_Zp(currRing) || rField_is_Zp_a(currRing) ||
-	     rField_is_Zn(currRing)))
+             rField_is_Zn(currRing)))
            ||
            (rField_is_Zp_a(orig_ring) &&  // Zp(a..) -> Zp(a..) || Zp
             (rField_is_Zp(currRing, rInternalChar(orig_ring)) ||
@@ -5635,9 +5642,9 @@ ring rInit(leftv pn, leftv rv, leftv ord)
           Warn("%d is invalid as characteristic of the ground field. 32003 is used.", ch);
           ch=32003;
         }
-	#ifndef TEST_ZN_AS_ZP
+        #ifndef TEST_ZN_AS_ZP
         cf = nInitChar(n_Zp, (void*)(long)ch);
-	#else
+        #else
         mpz_t modBase;
         mpz_init_set_ui(modBase, (long)ch);
         ZnmInfo info;
@@ -5647,7 +5654,7 @@ ring rInit(leftv pn, leftv rv, leftv ord)
         cf->is_field=1;
         cf->is_domain=1;
         cf->has_simple_Inverse=1;
-	#endif
+        #endif
       }
       else
         cf = nInitChar(n_Q, (void*)(long)ch);

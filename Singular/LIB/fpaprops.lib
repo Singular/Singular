@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version="version fpaprops.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version fpaprops.lib 4.1.1.4 Oct_2018 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY: fpaprops.lib   Algorithms for the properties of quotient algebras in the letterplace case
@@ -140,7 +140,7 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5);
   setring R;
-  ideal G = x(1)*x(2), y(1)*x(2); // K<x,y>/<xx,yx> is right noetherian
+  ideal G = x*x, y*x; // K<x,y>/<xx,yx> is right noetherian
   lpNoetherian(G);
 }
 
@@ -315,7 +315,7 @@ example
   ring r = 0,(x1,x2),dp;
   def R = makeLetterplaceRing(5);
   setring R;
-  ideal G = x1(1)*x2(2), x2(1)*x1(2); // K<x1,x2>/<x1*x2,x2*x1> is semi prime
+  ideal G = x1*x2, x2*x1; // K<x1,x2>/<x1*x2,x2*x1> is semi prime
   lpIsSemiPrime(G);
 }
 
@@ -432,7 +432,7 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5);
   setring R;
-  ideal G = x(1)*x(2), y(1)*y(2); // K<x,y>/<xx,yy> is prime
+  ideal G = x*x, y*y; // K<x,y>/<xx,yy> is prime
   lpIsPrime(G);
 }
 
@@ -752,7 +752,7 @@ example
   ring r = 0,(x,y,z),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  ideal I = x(1)*y(2), x(1)*z(2), z(1)*y(2), z(1)*z(2);
+  ideal I = x*y, x*z, z*y, z*z;
   lpUfGraph(I);
   lpUfGraph(I,1);
 }
@@ -894,11 +894,11 @@ example
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   R;
   setring R; // sets basering to Letterplace ring
-  ideal I = z(1);//an example of infinite GK dimension
+  ideal I = z;//an example of infinite GK dimension
   lpGkDim(I);
-  I = x(1),y(1),z(1); // gkDim = 0
+  I = x,y,z; // gkDim = 0
   lpGkDim(I);
-  I = x(1)*y(2), x(1)*z(2), z(1)*y(2), z(1)*z(2);//gkDim = 2
+  I = x*y, x*z, z*y, z*z;//gkDim = 2
   lpGkDim(I);
 }
 
@@ -990,7 +990,7 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  ideal G = x(1)*x(2), y(1)*y(2),x(1)*y(2)*x(3); // ideal G contains a
+  ideal G = x*x, y*y,x*y*x; // ideal G contains a
   //Groebner basis
   lpGlDimBound(G); // invokes procedure with Groebner basis G
 }
@@ -1117,9 +1117,9 @@ EXAMPLE: example lpSubstitute; shows examples
         int subindex = lpIndexOf(s1, var(varindex));
         if (subindex > 0) {
           s2[subindex] = lpNF(s2[subindex],G);
-          fis = lpMult(fis, s2[subindex]);
+          fis = fis * s2[subindex];
         } else {
-          fis = lpMult(fis, lpNF(iv2lp(varindex),G));
+          fis = fis * lpNF(iv2lp(varindex),G);
         }
         /*fis = lpNF(fis,G);*/
         kill subindex;
@@ -1142,11 +1142,11 @@ example
   def R = makeLetterplaceRing(4);
   setring R;
 
-  ideal G = x(1)*y(2); // optional
+  ideal G = x*y; // optional
 
-  poly f = 3*x(1)*x(2)+y(1)*x(2);
-  ideal s1 = x(1), y(1);
-  ideal s2 = y(1)*z(2)*z(3), x(1);
+  poly f = 3*x*x+y*x;
+  ideal s1 = x, y;
+  ideal s2 = y*z*z, x;
 
   // the substitution probably needs a higher degbound
   int minDegBound = lpCalcSubstDegBounds(f,s1,s2);
@@ -1162,12 +1162,12 @@ example
   def R = makeLetterplaceRing(4);
   setring R;
 
-  poly f = 3*x(1)*x(2)+y(1)*x(2);
-  poly g = z(1)*x(2)+y(1);
-  poly h = 7*x(1)*z(2)+x(1);
+  poly f = 3*x*x+y*x;
+  poly g = z*x+y;
+  poly h = 7*x*z+x;
   ideal I = f,g,h;
-  ideal s1 = x(1), y(1);
-  ideal s2 = y(1)*z(2)*z(3), x(1);
+  ideal s1 = x, y;
+  ideal s2 = y*z*z, x;
 
   int minDegBound = lpCalcSubstDegBounds(I,s1,s2);
   setring r;
@@ -1304,6 +1304,7 @@ checks, if a word IF is an infix of another word I
   return(0);
 }
 
+// TODO: use original ring attrib to create a new letterplace ring
 // removes a variable from a letterplace ring (a bit of a hack)
 static proc lpDelVar(int index) {
   int lV = attrib(basering, "isLetterplaceRing"); // number of variables in the main block

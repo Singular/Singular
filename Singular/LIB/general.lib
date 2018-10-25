@@ -368,7 +368,7 @@ EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
       {
         if ( @marie[@joni] != "LIB" && @marie[@joni] != "Top"
              && typeof(`@marie[@joni]`) != "proc"
-	     && typeof(`@marie[@joni]`) != "cring")
+             && typeof(`@marie[@joni]`) != "cring")
         {
           no_kill = 0;
           for (j=2; j<= size(#); j++)

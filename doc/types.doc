@@ -4119,7 +4119,7 @@ Like polynomials they can
 only be defined or accessed with respect to a basering.
 
 Objects of type @code{smatrix} can be converted to and from @code{matrix} and @code{module}.
-Operations are @code{+}, @code{-}, @code{*}, @code{==}, @code{<>}. 
+Operations are @code{+}, @code{-}, @code{*}, @code{==}, @code{<>}.
 Functions are @code{ncols}, @code{nrows}, @code{std}, @code{transpose}, @code{tensor}.
 Additional @code{flatten(m)} and @code{system("unflatten",m,col)}.
 @*Resizing can be done via @code{smatrix(m,r,c)} where m is of type @code{module} or @code{smatrix}.

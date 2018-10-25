@@ -184,7 +184,7 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjCALL1MANY),  LIST_CMD,        LIST_CMD,       DEF_CMD       , ALLOW_NC |ALLOW_RING}
 ,{  jjWRONG ,      MAP_CMD,         0,              ANY_TYPE      , ALLOW_NC |ALLOW_RING}
 ,{D(jjDUMMY),      MATRIX_CMD,      MATRIX_CMD,     MATRIX_CMD    , ALLOW_NC |ALLOW_RING}
-,{D(jjidMaxIdeal), MAXID_CMD,       IDEAL_CMD,      INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjidMaxIdeal), MAXID_CMD,       IDEAL_CMD,      INT_CMD       , ALLOW_NC |ALLOW_RING}
 ,{D(jjMEMORY),     MEMORY_CMD,      BIGINT_CMD,     INT_CMD       , ALLOW_NC |ALLOW_RING}
 ,{D(jjidMinBase),  MINBASE_CMD,     IDEAL_CMD,      IDEAL_CMD     , NO_NC |NO_RING}
 ,{D(jjidMinBase),  MINBASE_CMD,     MODUL_CMD,      MODUL_CMD     , NO_NC |NO_RING}
@@ -269,9 +269,9 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjSort_Id),    SORTVEC_CMD,     INTVEC_CMD,     IDEAL_CMD     , ALLOW_NC |ALLOW_RING}
 ,{D(jjSort_Id),    SORTVEC_CMD,     INTVEC_CMD,     MODUL_CMD     , ALLOW_NC |ALLOW_RING}
 ,{D(jjSQR_FREE),   SQR_FREE_CMD,    LIST_CMD,      POLY_CMD      , NO_NC |NO_RING}
-,{D(jjSTD),        STD_CMD,         IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjSTD),        STD_CMD,         MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjSTD),        STD_CMD,         SMATRIX_CMD,    SMATRIX_CMD   , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjSTD),        STD_CMD,         IDEAL_CMD,      IDEAL_CMD     , ALLOW_NC |ALLOW_RING}
+,{D(jjSTD),        STD_CMD,         MODUL_CMD,      MODUL_CMD     , ALLOW_NC |ALLOW_RING}
+,{D(jjSTD),        STD_CMD,         SMATRIX_CMD,    SMATRIX_CMD   , ALLOW_NC |ALLOW_RING}
 ,{D(jjDUMMY),      STRING_CMD,      STRING_CMD,     STRING_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjSYZYGY),     SYZYGY_CMD,      MODUL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSYZYGY),     SYZYGY_CMD,      MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
@@ -351,7 +351,9 @@ const struct sValCmd2 dArith2[]=
 #endif
 ,{D(lAdd),        '+',            LIST_CMD,       LIST_CMD,   LIST_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjRSUM),      '+',            RING_CMD,       RING_CMD,   RING_CMD, ALLOW_NC | ALLOW_RING}
-,{D(jjPLUS_B_P),    '+',          BUCKET_CMD,     BUCKET_CMD, POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjRPLUS),     '+',            RING_CMD,       RING_CMD,   STRING_CMD, ALLOW_LP | ALLOW_RING}
+,{D(jjRPLUS),     '+',            RING_CMD,       STRING_CMD, RING_CMD, ALLOW_LP | ALLOW_RING}
+,{D(jjPLUS_B_P),  '+',            BUCKET_CMD,     BUCKET_CMD, POLY_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjMINUS_I),   '-',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjMINUS_BI),  '-',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjMINUS_N),   '-',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_NC | ALLOW_RING}
@@ -364,8 +366,8 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjMINUS_BIM), '-',            BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjOP_BIM_I),  '-',            BIGINTMAT_CMD,  BIGINTMAT_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjOP_I_BIM),  '-',            BIGINTMAT_CMD,  INT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
-,{D(jjOP_BIM_BI),  '-',           BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
-,{D(jjOP_BI_BIM),  '-',           BIGINTMAT_CMD,  BIGINT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_BIM_BI), '-',            BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjOP_BI_BIM), '-',            BIGINTMAT_CMD,  BIGINT_CMD, BIGINTMAT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjOP_IV_I),   '-',            INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjOP_IM_I),   '-',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjMINUS_IV),  '-',            INTVEC_CMD,     INTVEC_CMD, INTVEC_CMD, ALLOW_NC | ALLOW_RING}
@@ -381,6 +383,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjPOLY2_OP2), '-',            CPOLY_CMD,      INT_CMD,    CPOLY_CMD,  ALLOW_NC | ALLOW_RING}
 ,{D(jjMINUS_BIM), '-',            CMATRIX_CMD,    CMATRIX_CMD,CMATRIX_CMD, ALLOW_NC | ALLOW_RING}
 #endif
+,{D(jjRMINUS),    '-',            RING_CMD,       RING_CMD,   STRING_CMD, ALLOW_LP | ALLOW_RING}
 ,{D(jjMINUS_B_P), '-',            BUCKET_CMD,     BUCKET_CMD, POLY_CMD, ALLOW_NC | ALLOW_RING}
 ,{  jjWRONG2 ,    '-',            NONE,           IDEAL_CMD,  IDEAL_CMD, ALLOW_NC | ALLOW_RING}
 ,{  jjWRONG2 ,    '-',            NONE,           MODUL_CMD,  MODUL_CMD, ALLOW_NC | ALLOW_RING}
@@ -472,7 +475,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjPOWER_I),   '^',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjPOWER_BI),   '^',           BIGINT_CMD,     BIGINT_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjPOWER_N),   '^',            NUMBER_CMD,     NUMBER_CMD, INT_CMD, ALLOW_NC | ALLOW_RING}
-,{D(jjPOWER_P),   '^',            POLY_CMD,       POLY_CMD,   INT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjPOWER_P),   '^',            POLY_CMD,       POLY_CMD,   INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjPOWER_ID),  '^',            IDEAL_CMD,      IDEAL_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 #ifdef SINGULAR_4_2
 ,{D(jjNUMBER2_POW),'^',           CNUMBER_CMD,    CNUMBER_CMD,INT_CMD, ALLOW_NC | ALLOW_RING}
@@ -638,7 +641,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjFAREY_ID),  FAREY_CMD,      MODUL_CMD,      MODUL_CMD,   BIGINT_CMD, ALLOW_PLURAL |NO_RING}
 ,{D(jjFAREY_ID),  FAREY_CMD,      MATRIX_CMD,     MATRIX_CMD,  BIGINT_CMD, ALLOW_PLURAL |NO_RING}
 ,{D(jjFAREY_LI),  FAREY_CMD,      LIST_CMD,       LIST_CMD,    BIGINT_CMD, ALLOW_PLURAL |NO_RING}
-,{D(jjFETCH),     FETCH_CMD,      ANY_TYPE/*set by p*/,RING_CMD,  ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjFETCH),     FETCH_CMD,      ANY_TYPE/*set by p*/,RING_CMD,  ANY_TYPE, ALLOW_NC |ALLOW_RING}
 ,{D(fglmProc),    FGLM_CMD,       IDEAL_CMD,      RING_CMD,   DEF_CMD, NO_NC |NO_RING}
 ,{D(fglmQuotProc),FGLMQUOT_CMD,   IDEAL_CMD,      IDEAL_CMD,  POLY_CMD, NO_NC |NO_RING}
 ,{D(jjFIND2),     FIND_CMD,       INT_CMD,        STRING_CMD, STRING_CMD, ALLOW_NC |ALLOW_RING}
@@ -950,7 +953,7 @@ const struct sValCmdM dArithM[]=
 ,{D(jjSTATUS_M),  STATUS_CMD,      INT_CMD,             4      , ALLOW_NC |ALLOW_RING}
 ,{D(loSimplex),   SIMPLEX_CMD,     LIST_CMD,            6      , NO_NC |NO_RING}
 ,{D(nuUResSolve), URSOLVE_CMD,     LIST_CMD,            4      , NO_NC |NO_RING}
-,{D(jjCALL1ARG),  STD_CMD,         IDEAL_CMD,           1      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCALL1ARG),  STD_CMD,         IDEAL_CMD/* or set by p*/,1 , ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL2ARG),  STD_CMD,         IDEAL_CMD,           2      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL3ARG),  STD_CMD,         IDEAL_CMD,           3      , NO_NC |ALLOW_RING}
 ,{D(jjSTD_HILB_WP), STD_CMD,       IDEAL_CMD,           4      , NO_NC |NO_RING}
@@ -1317,13 +1320,13 @@ const struct sConvertTypes dConvertTypes[] =
    { RESOLUTION_CMD,  LIST_CMD,       NULL_VAL , D(iiR2L_l) },
 // list -> resolution
    { LIST_CMD,        RESOLUTION_CMD, NULL_VAL ,  D(iiL2R) },
-// matrix -> smatrix   
+// matrix -> smatrix
    { MATRIX_CMD,      SMATRIX_CMD,    D(iiMa2Mo), NULL_VAL },
-// module -> smatrix   
+// module -> smatrix
    { MODUL_CMD,       SMATRIX_CMD,    D(iiDummy), NULL_VAL },
-// smatrix -> matrix   
+// smatrix -> matrix
    { SMATRIX_CMD,     MATRIX_CMD,     D(iiMo2Ma) , NULL_VAL },
-// smatrix -> module   
+// smatrix -> module
    { SMATRIX_CMD,     MODUL_CMD,      D(iiDummy) , NULL_VAL },
 #ifdef SINGULAR_4_2
    { INT_CMD,         CNUMBER_CMD,    D(iiI2NN) , NULL_VAL },
