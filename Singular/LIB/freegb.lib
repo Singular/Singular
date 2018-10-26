@@ -2,7 +2,7 @@
 version="version freegb.lib 4.1.1.4 Oct_2018 "; // $Id$
 category="Noncommutative";
 info="
-LIBRARY: freegb.lib   Two-sided Groebner bases in free algebras and tools via letterplace approach
+LIBRARY: freegb.lib   Two-sided Groebner bases in free algebras and tools via Letterplace approach
 AUTHORS: Viktor Levandovskyy,   viktor.levandovskyy at math.rwth-aachen.de
          Grischa Studzinski,    grischa.studzinski at math.rwth-aachen.de
          Karim Abou Zeid,       karim.abou.zeid at rwth-aachen.de
@@ -52,10 +52,11 @@ LIB "bfun.lib"; // for inForm
 LIB "fpadim.lib"; // for intvec conversion
 LIB "fpalgebras.lib"; // for compatibility
 
+/* very fast and cheap test of consistency and functionality
+  DO NOT make it static !
+  after adding the new proc, add it here */
 proc tstfreegb()
 {
-  /* tests all procs for consistency */
-  /* after adding the new proc, add it here */
   example makeLetterplaceRing;
   example letplaceGBasis;
   example lpNF;

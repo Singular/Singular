@@ -2,7 +2,7 @@
 version="version fpaprops.lib 4.1.1.4 Oct_2018 "; // $Id$
 category="Noncommutative";
 info="
-LIBRARY: fpaprops.lib   Algorithms for the properties of finitely presented algebras (Letterplace)
+LIBRARY: fpaprops.lib   Algorithmic ring-theoretic properties of finitely presented algebras (Letterplace)
 AUTHORS: Karim Abou Zeid,       karim.abou.zeid at rwth-aachen.de
 
 Support: Project II.6 in the transregional collaborative research centre
@@ -16,15 +16,18 @@ Applicability: Letterplace rings.
 REFERENCES:
 Huishi Li: Groebner bases in ring theory. World Scientific, 2010.
 
+KEYWORDS: finitely presented algebra; ring theory; Letterplace Groebner basis; 
+growth of algebra; Gelfand-Kirillov dimension; global homological dimension; semi-prime ideal; Ufnarovski graph;
+
 SEE ALSO:  fpadim_lib, freegb_lib
 
 PROCEDURES:
   lpNoetherian(<GB>);     check whether A/<LM(GB)> is (left/right) Noetherian
-  lpIsSemiPrime(<GB>);    check whether A/<LM(GB)> is semi prime
+  lpIsSemiPrime(<GB>);    check whether A/<LM(GB)> is semi-prime
   lpIsPrime(<GB>);        check whether A/<LM(GB)> is prime
   lpGkDim(<GB>);          compute the Gelfand Kirillov dimension of A/<GB>
   lpGlDimBound(<GB>);     compute an upper bound for the global dimension of A/<GB>
-  lpSubstitute();         substitute variable with polynomials
+  lpSubstitute();         substitute a variable with polynomials (ring homomorphism)
   lpUfGraph(<GB>);        constructs the Ufnarovskij graph for <LM(GB)>
   lpCalcSubstDegBound();  utility for lpSubstitute
   lpCalcSubstDegBounds(); utility for lpSubstitute
@@ -32,7 +35,9 @@ PROCEDURES:
 
 LIB "fpadim.lib";
 
-// very fast and cheap test of functionality
+/* very fast and cheap test of consistency and functionality
+  DO NOT make it static !
+  after adding the new proc, add it here */
 proc tstfpaprops()
 {
     example lpNoetherian;

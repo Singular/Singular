@@ -2,7 +2,7 @@
 version="version fpalgebras.lib 4.1.1.4 Oct_2018 "; // $Id$
 category="Noncommutative";
 info="
-LIBRARY: fpalgebras.lib
+LIBRARY: fpalgebras.lib    Definitions of some finitely presented algebras and groups (Letterplace)
 AUTHORS: Karim Abou Zeid,       karim.abou.zeid at rwth-aachen.de
          Viktor Levandovskyy,   viktor.levandovskyy at math.rwth-aachen.de
          Grischa Studzinski,    grischa.studzinski at rwth-aachen.de
@@ -53,6 +53,9 @@ LIB "freegb.lib";
 LIB "general.lib";
 ////////////////////////////////////////////////////////////////////
 
+/* very fast and cheap test of consistency and functionality
+  DO NOT make it static !
+  after adding the new proc, add it here */
 proc tstfpalgebras()
 {
   example operatorAlgebra;
