@@ -30,6 +30,10 @@
 
 #include "kernel/polys.h"
 
+#ifdef HAVE_SHIFTBBA
+#include "polys/shiftop.h"
+#endif
+
 
 #define HAVE_TAIL_BIN
 // This doesn't really work, fixme, if necessary
@@ -124,12 +128,32 @@ KINLINE void sTObject::Set(poly p_in, ring r)
   if (r != currRing)
   {
     assume(r == tailRing);
-    p_Test(p_in, r);
+#ifdef HAVE_SHIFTBBA
+    if (r->isLPring)
+    {
+      shift = p_mFirstVblock(p_in, r);
+      if (!shift) p_Test(p_in, r);
+    }
+    else
+#endif
+    {
+      p_Test(p_in, r);
+    }
     t_p = p_in;
   }
   else
   {
-    p_Test(p_in, currRing);
+#ifdef HAVE_SHIFTBBA
+    if (currRing->isLPring)
+    {
+      shift = p_mFirstVblock(p_in, currRing);
+      if (!shift) p_Test(p_in, currRing);
+    }
+    else
+#endif
+    {
+      p_Test(p_in, currRing);
+    }
     p = p_in;
   }
   pLength=::pLength(p_in);
@@ -146,7 +170,17 @@ KINLINE void sTObject::Set(poly p_in, ring c_r, ring t_r)
   if (c_r != t_r)
   {
     assume(c_r == currRing && t_r == tailRing);
-    p_Test(p_in, currRing);
+#ifdef HAVE_SHIFTBBA
+    if (c_r->isLPring)
+    {
+      shift = p_mFirstVblock(p_in, c_r);
+      if (!shift) p_Test(p_in, currRing);
+    }
+    else
+#endif
+    {
+      p_Test(p_in, currRing);
+    }
     p = p_in;
     pLength=::pLength(p_in);
   }

@@ -3521,7 +3521,16 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   si_opt_1|=Sy_bit(OPT_REDTAIL);
   initBuchMoraCrit(strat);
   strat->initEcart = initEcartBBA;
-  strat->enterS = enterSBba;
+#ifdef HAVE_SHIFTBBA
+  if (strat->tailRing->isLPring)
+  {
+    strat->enterS = enterSBbaShift;
+  }
+  else
+#endif
+  {
+    strat->enterS = enterSBba;
+  }
 #ifndef NO_BUCKETS
   strat->use_buckets = (!TEST_OPT_NOT_BUCKETS) && (!rIsPluralRing(currRing));
 #endif
@@ -3563,6 +3572,21 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   assume(strat->R==NULL);//omfree(strat->R);
   omfree(strat->S_2_R);
   omfree(strat->fromQ);
+#ifdef HAVE_SHIFTBBA
+  // only LM of elements in S is shifted
+  // necessary to prevent deleting the tail multiple times
+  if (strat->tailRing->isLPring && strat->Shdl != NULL && strat->Shdl->m != NULL)
+  {
+    for (int j = 0; j < strat->Shdl->nrows * strat->Shdl->ncols; j++)
+    {
+      if (strat->Shdl->m[j]!=NULL && pmFirstVblock(strat->Shdl->m[j]) > 1)
+      {
+        // otherwise the tail would be freed multiple times
+        pNext(strat->Shdl->m[j]) = NULL;
+      }
+    }
+  }
+#endif
   idDelete(&strat->Shdl);
   SI_RESTORE_OPT1(save1);
   if (TEST_OPT_PROT) PrintLn();
@@ -3664,7 +3688,16 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   si_opt_1|=Sy_bit(OPT_REDTAIL);
   initBuchMoraCrit(strat);
   strat->initEcart = initEcartBBA;
-  strat->enterS = enterSBba;
+#ifdef HAVE_SHIFTBBA
+  if (strat->tailRing->isLPring)
+  {
+    strat->enterS = enterSBbaShift;
+  }
+  else
+#endif
+  {
+    strat->enterS = enterSBba;
+  }
   /*- set S -*/
   strat->sl = -1;
 #ifndef NO_BUCKETS
@@ -3708,6 +3741,21 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   assume(strat->R==NULL);//omfree(strat->R);
   omfree(strat->S_2_R);
   omfree(strat->fromQ);
+#ifdef HAVE_SHIFTBBA
+  // only LM of elements in S is shifted
+  // necessary to prevent deleting the tail multiple times
+  if (strat->tailRing->isLPring && strat->Shdl != NULL && strat->Shdl->m != NULL)
+  {
+    for (int j = 0; j < strat->Shdl->nrows * strat->Shdl->ncols; j++)
+    {
+      if (strat->Shdl->m[j]!=NULL && pmFirstVblock(strat->Shdl->m[j]) > 1)
+      {
+        // otherwise the tail would be freed multiple times
+        pNext(strat->Shdl->m[j]) = NULL;
+      }
+    }
+  }
+#endif
   idDelete(&strat->Shdl);
   SI_RESTORE_OPT1(save1);
   if (TEST_OPT_PROT) PrintLn();

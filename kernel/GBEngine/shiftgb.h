@@ -16,6 +16,5 @@ poly p_LPCopyAndShiftLM(poly p, int sh, const ring r);
 
 int itoInsert(poly p, const ring r);
 
-void k_SplitFrame(poly &m1, poly &m2, int at, const ring r);
 #endif
 #endif

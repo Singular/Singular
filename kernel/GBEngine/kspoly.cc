@@ -20,7 +20,6 @@
 #include "kernel/polys.h"
 #endif
 #ifdef HAVE_SHIFTBBA
-#include "kernel/GBEngine/shiftgb.h"
 #include "polys/shiftop.h"
 #endif
 

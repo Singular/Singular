@@ -423,6 +423,7 @@ static inline LSet initL (int nr=setmaxL)
 void deleteInL(LSet set, int *length, int j,kStrategy strat);
 void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at);
 void enterSBba (LObject &p,int atS,kStrategy strat, int atR = -1);
+void enterSBbaShift (LObject &p,int atS,kStrategy strat, int atR = -1);
 void enterSSba (LObject &p,int atS,kStrategy strat, int atR = -1);
 void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 void initEcartPairMora (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
