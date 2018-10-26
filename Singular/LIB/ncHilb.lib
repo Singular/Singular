@@ -24,7 +24,8 @@ PROCEDURES:
 ";
 
 LIB "freegb.lib";
-
+// under construction by VL
+/*
 proc fpahilb(ideal I, list #)
 "USAGE: fpahilb(I[, L]), ideal I, optional list L
 PURPOSE: compute Hilbert series of a non-commutative algebra, presented by I
@@ -186,6 +187,7 @@ example
     nchilb(l5,7,1,2,11,"p");
     //'11' is to compute the truncated HS up to degree 10.
 }
+*/
 
 // overhauled by VL
 proc rcolon(ideal I, poly W)
@@ -224,7 +226,6 @@ example
 }
 
 
-/*
 proc nchilb(list L_wp, int d, list #)
 "USAGE: fpahilb(I, d[, L]), ideal I, int d, optional list L
 PURPOSE: compute Hilbert series of a non-commutative algebra
@@ -446,7 +447,6 @@ example
     nchilb(l5,7,1,2,11,"p");
     //'11' is to compute the truncated HS up to degree 10.
 }
-*/
 
 /*
 // orig version of the procedure
