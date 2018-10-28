@@ -1553,7 +1553,7 @@ static BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,k
 
   k_GetStrongLeadTerms(p, si, currRing, m1, m2, gcd, strat->tailRing);
 
-  if (!rHasMixedOrdering(currRing)) {
+  if (!rHasLocalOrMixedOrdering(currRing)) {
     unsigned long sev = pGetShortExpVector(gcd);
 
     for (int j = 0; j < strat->sl; j++) {
