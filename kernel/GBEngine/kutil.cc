@@ -1354,7 +1354,7 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
   h.ecart=0; h.length=0;
 #endif
   /*- computes the lcm(s[i],p) -*/
-  if(pHasNotCF(p,strat->S[i]))
+  if(pHasNotCFRing(p,strat->S[i]))
   {
       strat->cp++;
       return;

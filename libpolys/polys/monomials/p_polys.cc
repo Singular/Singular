@@ -1332,6 +1332,28 @@ BOOLEAN p_HasNotCF(poly p1, poly p2, const ring r)
   }
 }
 
+BOOLEAN p_HasNotCFRing(poly p1, poly p2, const ring r)
+{
+
+  if (p_GetComp(p1,r) > 0 || p_GetComp(p2,r) > 0)
+    return FALSE;
+  int i = rVar(r);
+  loop
+  {
+    if ((p_GetExp(p1, i, r) > 0) && (p_GetExp(p2, i, r) > 0))
+      return FALSE;
+    i--;
+    if (i == 0) {
+      if (n_DivBy(pGetCoeff(p1), pGetCoeff(p2), r->cf) ||
+          n_DivBy(pGetCoeff(p2), pGetCoeff(p1), r->cf)) {
+        return FALSE;
+      } else {
+        return TRUE;
+      }
+    }
+  }
+}
+
 /*2
 * convert monomial given as string to poly, e.g. 1x3y5z
 */
