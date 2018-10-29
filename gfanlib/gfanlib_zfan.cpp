@@ -281,9 +281,10 @@ namespace gfan
       return complex->getAmbientDimension()-complex->getMaxDim();
     if(coneCollection)
     {
-      if(coneCollection->isEmpty())
-        return -1;
-      return coneCollection->getAmbientDimension()-coneCollection->getMaxDimension();
+            if(coneCollection->isEmpty())
+                    return -1;
+            else
+                    return coneCollection->getAmbientDimension()-coneCollection->getMaxDimension();
     }
     assert(0);
     return 0;
@@ -294,9 +295,10 @@ namespace gfan
       return complex->getMaxDim();
     if(coneCollection)
     {
-      if(coneCollection->isEmpty())
-        return -1;
-      return coneCollection->getMaxDimension();
+            if(coneCollection->isEmpty())
+                    return -1;
+            else
+                    return coneCollection->getMaxDimension();
     }
     assert(0);
     return 0;
@@ -306,7 +308,12 @@ namespace gfan
     if(complex)
       return complex->getLinDim();
     if(coneCollection)
-      return coneCollection->dimensionOfLinealitySpace();
+    {
+            if(coneCollection->isEmpty())
+                    return getAmbientDimension();
+            else
+                    return coneCollection->dimensionOfLinealitySpace();
+    }
     assert(0);
     return 0;
   }

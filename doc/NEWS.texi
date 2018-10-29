@@ -45,6 +45,7 @@ Changes in the kernel/build system:
 @item new type @code{smatrix}: sparse matrix (experimental) (@nref{smatrix}).
 @item extended @code{coef} to ideals (@nref{coef}).
 @item error and signal handling in @code{libSingular} (@nref{libSingular}).
+@item updated gfanlib to version 0.6.2
 @end itemize
 
 @heading News for version 4-1-1

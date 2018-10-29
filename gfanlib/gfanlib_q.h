@@ -11,7 +11,6 @@
 #include <string.h>
 #include <ostream>
 #include <assert.h>
-#include <stddef.h>
 #include "gmp.h"
 
 #include "gfanlib_z.h"
