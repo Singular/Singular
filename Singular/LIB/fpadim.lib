@@ -13,7 +13,7 @@ of the German DFG (2010-2013)
 and Project II.6 of the transregional collaborative research centre
 SFB-TRR 195 'Symbolic Tools in Mathematics and their Application' of the German DFG  (from 2017 on)
 
-KEYWORDS: finitely presented algebra; Letterplace Groebner basis; K-basis; K-dimension; Hilbert series;
+KEYWORDS: finitely presented algebra; Letterplace Groebner basis; K-basis; K-dimension; Hilbert series
 
 PROCEDURES:
 lpKDimCheck(G);            checks whether the K-dimension of A/<G> is finite
