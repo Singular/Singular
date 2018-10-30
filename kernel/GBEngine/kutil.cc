@@ -1328,6 +1328,7 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
   assume(atR >= 0);
   assume(i<=strat->sl);
   assume(p!=NULL);
+  assume(rField_is_Ring(currRing));
   #if ALL_VS_JUST
   //Over rings, if we construct the strong pair, do not add the spair
   if(rField_is_Ring(currRing))
@@ -1354,7 +1355,7 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
   h.ecart=0; h.length=0;
 #endif
   /*- computes the lcm(s[i],p) -*/
-  if(pHasNotCF(p,strat->S[i]))
+  if(pHasNotCFRing(p,strat->S[i]))
   {
       strat->cp++;
       return;
@@ -1520,7 +1521,6 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
   kTest_TS(strat);
 }
 
-
 /*2
 * put the  lcm(s[i],p)  into the set B
 */
@@ -1529,6 +1529,7 @@ static BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,k
 {
   number d, s, t;
   assume(atR >= 0);
+  assume(rField_is_Ring(currRing));
   poly m1, m2, gcd,si;
   if(!enterTstrong)
   {
@@ -1554,7 +1555,7 @@ static BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,k
 
   k_GetStrongLeadTerms(p, si, currRing, m1, m2, gcd, strat->tailRing);
 
-  if (!rHasMixedOrdering(currRing)) {
+  if (!rHasLocalOrMixedOrdering(currRing)) {
     unsigned long sev = pGetShortExpVector(gcd);
 
     for (int j = 0; j < strat->sl; j++) {
@@ -4520,23 +4521,56 @@ ideal createG0()
 */
 void initenterstrongPairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR = -1)
 {
-  const int iCompH = pGetComp(h);
   if (!nIsOne(pGetCoeff(h)))
   {
     int j;
+    BOOLEAN new_pair=FALSE;
 
-    for (j=0; j<=k; j++)
+    if (pGetComp(h)==0)
     {
-      // Print("j:%d, Ll:%d\n",j,strat->Ll);
-//      if (((unsigned long) pGetCoeff(h) % (unsigned long) pGetCoeff(strat->S[j]) != 0) &&
-//         ((unsigned long) pGetCoeff(strat->S[j]) % (unsigned long) pGetCoeff(h) != 0))
-      if (((iCompH == pGetComp(strat->S[j]))
-      || (0 == pGetComp(strat->S[j])))
-      && ((iCompH<=strat->syzComp)||(strat->syzComp==0)))
+      /* for Q!=NULL: build pairs (f,q),(f1,f2), but not (q1,q2)*/
+      if ((isFromQ)&&(strat->fromQ!=NULL))
       {
-        enterOneStrongPoly(j,h,ecart,isFromQ,strat, atR, FALSE);
+        for (j=0; j<=k; j++)
+        {
+          if (!strat->fromQ[j])
+          {
+            new_pair=TRUE;
+            enterOneStrongPoly(j,h,ecart,isFromQ,strat, atR, FALSE);
+          }
+        }
+      }
+      else
+      {
+        new_pair=TRUE;
+        for (j=0; j<=k; j++)
+        {
+          enterOneStrongPoly(j,h,ecart,isFromQ,strat, atR, FALSE);
+        }
       }
     }
+    else
+    {
+      for (j=0; j<=k; j++)
+      {
+        if ((pGetComp(h)==pGetComp(strat->S[j]))
+        || (pGetComp(strat->S[j])==0))
+        {
+          new_pair=TRUE;
+          enterOneStrongPoly(j,h,ecart,isFromQ,strat, atR, FALSE);
+        }
+      }
+    }
+    if (new_pair)
+    {
+    #ifdef HAVE_RATGRING
+      if (currRing->real_var_start>0)
+        chainCritPart(h,ecart,strat);
+      else
+    #endif
+      strat->chainCrit(h,ecart,strat);
+    }
+    kMergeBintoL(strat);
   }
 }
 
@@ -4799,8 +4833,8 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
   assume (rField_is_Ring(currRing));
   // enter also zero divisor * poly, if this is non zero and of smaller degree
   if (!(rField_is_Domain(currRing))) enterExtendedSpoly(h, strat);
-  initenterpairs(h, k, ecart, 0, strat, atR);
   initenterstrongPairs(h, k, ecart, 0, strat, atR);
+  initenterpairs(h, k, ecart, 0, strat, atR);
   clearSbatch(h, k, pos, strat);
 }
 
@@ -7674,6 +7708,131 @@ poly redtailBbaBound (LObject* L, int end_pos, kStrategy strat, int bound, BOOLE
 }
 
 #ifdef HAVE_RINGS
+void redtailBbaAlsoLC_Z (LObject* L, int end_pos, kStrategy strat )
+// normalize=FALSE, withT=FALSE, coeff=Z
+{
+  strat->redTailChange=FALSE;
+
+  poly h, p;
+  p = h = L->GetLmTailRing();
+  if ((h==NULL) || (pNext(h)==NULL))
+    return;
+
+  TObject* With;
+  LObject Ln(pNext(h), strat->tailRing);
+  Ln.GetpLength();
+
+  pNext(h) = NULL;
+  if (L->p != NULL)
+  {
+    pNext(L->p) = NULL;
+    if (L->t_p != NULL) pNext(L->t_p) = NULL;
+  }
+  L->pLength = 1;
+
+  Ln.PrepareRed(strat->use_buckets);
+
+  int cnt=REDTAIL_CANONICALIZE;
+
+  while(!Ln.IsNull())
+  {
+    loop
+    {
+      if (TEST_OPT_IDLIFT)
+      {
+        if (Ln.p!=NULL)
+        {
+          if (__p_GetComp(Ln.p,currRing)> strat->syzComp) break;
+        }
+        else
+        {
+          if (__p_GetComp(Ln.t_p,strat->tailRing)> strat->syzComp) break;
+        }
+      }
+      Ln.SetShortExpVector();
+      int j;
+      j = kFindDivisibleByInT(strat, &Ln);
+      if (j < 0) {
+        j = kFindDivisibleByInT_Z(strat, &Ln);
+        if (j < 0) {
+          break;
+        } else {
+          /* reduction not cancelling a tail term, but reducing its coefficient */
+          With = &(strat->T[j]);
+          assume(With->GetpLength()==pLength(With->p != __null ? With->p : With->t_p));
+          cnt--;
+          if (cnt==0)
+          {
+            cnt=REDTAIL_CANONICALIZE;
+            /*poly tmp=*/Ln.CanonicalizeP();
+          }
+          strat->redTailChange=TRUE;
+          /* reduction cancelling a tail term */
+          if (ksReducePolyTailLC_Z(L, With, &Ln))
+          {
+            // reducing the tail would violate the exp bound
+            //  set a flag and hope for a retry (in bba)
+            strat->completeReduce_retry=TRUE;
+            if ((Ln.p != NULL) && (Ln.t_p != NULL)) Ln.p=NULL;
+            do
+            {
+              pNext(h) = Ln.LmExtractAndIter();
+              pIter(h);
+              L->pLength++;
+            } while (!Ln.IsNull());
+            goto all_done;
+          }
+          /* we have to break since we did not cancel the term, but only decreased
+           * its coefficient. */
+          break;
+        }
+      } else {
+        With = &(strat->T[j]);
+        assume(With->GetpLength()==pLength(With->p != __null ? With->p : With->t_p));
+        cnt--;
+        if (cnt==0)
+        {
+          cnt=REDTAIL_CANONICALIZE;
+          /*poly tmp=*/Ln.CanonicalizeP();
+        }
+        strat->redTailChange=TRUE;
+        /* reduction cancelling a tail term */
+        if (ksReducePolyTail_Z(L, With, &Ln))
+        {
+          // reducing the tail would violate the exp bound
+          //  set a flag and hope for a retry (in bba)
+          strat->completeReduce_retry=TRUE;
+          if ((Ln.p != NULL) && (Ln.t_p != NULL)) Ln.p=NULL;
+          do
+          {
+            pNext(h) = Ln.LmExtractAndIter();
+            pIter(h);
+            L->pLength++;
+          } while (!Ln.IsNull());
+          goto all_done;
+        }
+      }
+      if (Ln.IsNull()) goto all_done;
+    }
+    pNext(h) = Ln.LmExtractAndIter();
+    pIter(h);
+    L->pLength++;
+  }
+
+  all_done:
+  Ln.Delete();
+  if (L->p != NULL) pNext(L->p) = pNext(p);
+
+  if (strat->redTailChange)
+  {
+    L->length = 0;
+    L->pLength = 0;
+  }
+
+  kTest_L(L, strat->tailRing);
+  return;
+}
+
 poly redtailBba_Z (LObject* L, int end_pos, kStrategy strat )
 // normalize=FALSE, withT=FALSE, coeff=Z
 {
@@ -9335,6 +9494,64 @@ void enterSSba (LObject &p,int atS,kStrategy strat, int atR)
   }
   PrintS("--- LIST S END ---\n");
 #endif
+}
+
+void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat)
+{
+  p.GetP(strat->lmBin);
+  if (strat->homog) strat->initEcart(&p);
+      strat->redTailChange=FALSE;
+  if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing))) {
+    p.pCleardenom();
+    if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL)) {
+      p.p = redtailBba(&p,strat->sl,strat, FALSE,!TEST_OPT_CONTENTSB);
+      p.pCleardenom();
+      if (strat->redTailChange)
+        p.t_p=NULL;
+    }
+  }
+
+  assume(strat->tailRing == p.tailRing);
+  assume(p.pLength == 0 || pLength(p.p) == p.pLength || rIsSyzIndexRing(currRing)); // modulo syzring
+
+  int i, j, pos;
+  poly tp = strat->T[tj].p;
+
+  /* enter p to T set */
+  enterT(p, strat);
+
+  for (j = 0; j <= strat->sl; ++j) {
+    if (pLtCmp(tp, strat->S[j]) == 0) {
+      break;
+    }
+  }
+  /* it may be that the exchanged element
+   * is until now only in T and not in S */
+  if (j <= strat->sl) {
+    deleteInS(j, strat);
+  }
+
+  pos = posInS(strat, strat->sl, p.p, p.ecart);
+
+  pp_Test(p.p, currRing, p.tailRing);
+  assume(p.FDeg == p.pFDeg());
+
+  /* remove useless pairs from L set */
+  for (i = 0; i <= strat->Ll; ++i) {
+    if (strat->L[i].p1 != NULL && pLtCmp(tp, strat->L[i].p1) == 0) {
+      deleteInL(strat->L, &(strat->Ll), i, strat);
+      i--;
+      continue;
+    }
+    if (strat->L[i].p2 != NULL && pLtCmp(tp, strat->L[i].p2) == 0) {
+      deleteInL(strat->L, &(strat->Ll), i, strat);
+      i--;
+    }
+  }
+  /* generate new pairs with p, probably removing older, now useless pairs */
+  superenterpairs(p.p, strat->sl, p.ecart, pos, strat, strat->tl);
+  /* enter p to S set */
+  strat->enterS(p, pos, strat, strat->tl);
 }
 
 /*2

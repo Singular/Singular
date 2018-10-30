@@ -1980,6 +1980,7 @@ static inline BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2,
 }
 void      p_Split(poly p, poly * r);   /*p => IN(p), r => REST(p) */
 BOOLEAN p_HasNotCF(poly p1, poly p2, const ring r);
+BOOLEAN p_HasNotCFRing(poly p1, poly p2, const ring r);
 poly      p_mInit(const char *s, BOOLEAN &ok, const ring r); /* monom s -> poly, interpreter */
 const char *    p_Read(const char *s, poly &p,const ring r); /* monom -> poly */
 poly      p_MDivide(poly a, poly b, const ring r);

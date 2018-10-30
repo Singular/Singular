@@ -270,6 +270,15 @@ static number nrzExactDiv (number a,number b, const coeffs)
   return (number) erg;
 }
 
+static number nrzEucNorm (number a, const coeffs )
+{
+  mpz_ptr abs = (mpz_ptr) omAllocBin(gmp_nrz_bin);
+  mpz_init(abs);
+  mpz_abs(abs, (mpz_ptr)a);
+
+  return (number) abs;
+}
+
 static number nrzSmallestQuotRem (number a, number b, number * r, const coeffs )
 {
   mpz_ptr qq = (mpz_ptr) omAllocBin(gmp_nrz_bin);
@@ -653,6 +662,7 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfExtGcd = nrzExtGcd;
   r->cfXExtGcd = nrzXExtGcd;
   r->cfDivBy = nrzDivBy;
+  r->cfEucNorm = nrzEucNorm;
   r->cfQuotRem = nrzSmallestQuotRem;
   r->cfInpNeg   = nrzNeg;
   r->cfInvers= nrzInvers;
@@ -1890,6 +1900,7 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfAnn = nrzAnn;
   r->cfExtGcd = nrzExtGcd; // only for ring stuff
   r->cfXExtGcd = nrzXExtGcd; // only for ring stuff
+  r->cfEucNorm = nrzEucNorm;
   r->cfQuotRem = nrzSmallestQuotRem;
   r->cfDivBy = nrzDivBy; // only for ring stuff
   //#endif

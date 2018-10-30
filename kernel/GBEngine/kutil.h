@@ -492,6 +492,7 @@ KINLINE poly redtailBbaBound (poly p,int end_pos,kStrategy strat,int bound,BOOLE
 #ifdef HAVE_RINGS
 KINLINE poly redtailBba_Z (poly p,int end_pos,kStrategy strat);
 poly redtailBba_Z (LObject* L, int end_pos, kStrategy strat );
+void redtailBbaAlsoLC_Z (LObject* L, int end_pos, kStrategy strat );
 #endif
 poly redtailBba (LObject *L, int end_pos,kStrategy strat,
                  BOOLEAN withT = FALSE,BOOLEAN normalize=FALSE);
@@ -558,6 +559,7 @@ void initSyzRules (kStrategy strat);
 void updateS(BOOLEAN toT,kStrategy strat);
 void enterSyz (LObject &p,kStrategy strat, int atT);
 void enterT (LObject &p,kStrategy strat, int atT = -1);
+void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat);
 #ifdef HAVE_RINGS
 void enterT_strong (LObject &p,kStrategy strat, int atT = -1);
 #endif
@@ -597,6 +599,7 @@ int kFindInT(poly p, TSet T, int tlength);
 ///        number of first divisor in T, otherwise
 int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start=0);
 int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int start=0);
+int kFindSameLMInT_Z(const kStrategy strat, const LObject* L, const int start=0);
 
 /// return -1 if no divisor is found
 ///        number of first divisor in S, otherwise
@@ -698,7 +701,23 @@ int ksReducePoly(LObject* PR,
                  number *coef = NULL,
                  kStrategy strat = NULL);
 
+/* like ksReducePoly, but if the reducer has only 1 term we still
+ * compute a possible coefficient multiplier for PR. this comes from
+ * a special situation in redRing_Z and it is used only there. */
+int ksReducePolyZ(LObject* PR,
+                 TObject* PW,
+                 poly spNoether = NULL,
+                 number *coef = NULL,
+                 kStrategy strat = NULL);
+
 int ksReducePolyLC(LObject* PR,
+                 TObject* PW,
+                 poly spNoether = NULL,
+                 number *coef = NULL,
+                 kStrategy strat = NULL);
+
+
+int ksReducePolyGCD(LObject* PR,
                  TObject* PW,
                  poly spNoether = NULL,
                  number *coef = NULL,
