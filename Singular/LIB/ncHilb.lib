@@ -19,12 +19,12 @@ KEYWORDS: finitely presented algebra; infinitely presented algebra; graded Hilbe
 PROCEDURES:
           fpahilb(L,d,#); Hilbert series of a non-commutative algebra
           rcolon(I, w, d); Right colon ideal of a two-sided monomial ideal with respect to a monomial w
-
 ";
 
 LIB "freegb.lib";
-// under construction by VL
-/*
+
+// under construction by VL; need kernel adjustments by Tiwari
+
 proc fpahilb(ideal I, list #)
 "USAGE: fpahilb(I[, L]), ideal I, optional list L
 PURPOSE: compute Hilbert series of a non-commutative algebra, presented by I
@@ -48,7 +48,7 @@ EXAMPLE: example fpahilb; shows an example "
       ERROR("Basering should be Letterplace ring");
 	}
 	def save = basering; 
-    int sz=size(#);
+	int sz=size(#);
     int lV=attrib(save,"uptodeg");
     int ig=0;
     int mgrad=0;
@@ -100,17 +100,22 @@ EXAMPLE: example fpahilb; shows an example "
     {
       ERROR("error:only int 1,2, >2, and a string are allowed as optional parameters");
     }
-    /* new: truncation should be < than degbound/2 */
-	if (tdeg > lV div 2 + 1) 
+    // new: truncation should be < than degbound/2 
+	if (tdeg > (lV-1) div 2) 
 	{
-       ERROR("degree bound is too high");
+       ERROR("Degree bound on the basering Should be at least 2*N+1");
 	}
-    ideal J_lm = I;
-    for(i=1;i<=size(I);i++)
+	def save2 = basering;
+	setring save2;
+    ideal J_lm = imap(save,I);
+    for(i=1;i<=size(J_lm);i++)
     {
-        J_lm[i]=leadmonom(I[i]);
+        J_lm[i]=leadmonom(J_lm[i]);
     }
     //compute the Hilbert series
+	// system call : HilbertSeries_OrbitData: sharwan need to change it as well...
+	//(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp, int trunDegHs)
+
     if(odp == "")
     {
       system("nc_hilb", J_lm, lV, ig, mgrad,tdeg);
@@ -119,29 +124,44 @@ EXAMPLE: example fpahilb; shows an example "
     {
       system("nc_hilb", J_lm, lV, ig, mgrad,tdeg, odp);
 	}
+	setring save;
+	kill save2;
 }
 
 example
 {
 "EXAMPLE:"; echo = 2;
   ring r=0,(X,Y,Z),dp;
-  def R = makeLetterplaceRing(10); setring R;
-  ideal I = Y*Z, Y*Z*X, Y*Z*Z*X, Y*Z*Z*Z*X, Y*Z*Z*Z*Z*X, Y*Z*Z*Z*Z*Z*X, Y*Z*Z*Z*Z*Z*Z*X, Y*Z*Z*Z*Z*Z*Z*Z*X;
-  fpahilb(I,5);
-  kill R;
+  def R = makeLetterplaceRing(12); setring R;
+  ideal I = Y*Z, Y*Z*X, Y*Z*Z*X, Y*Z*Z*Z*X;
+  fpahilb(I,3,"p");
+}
+
+static proc conversion_problems()
+{	
+// problems:
+// a) words description of the Orbit:
+//1    x    z    // ** invalid letterplace monomial: --> Karim?
+// caused by pWrite0 --> writemon
+// b) HilbertSeries_OrbitData changes currRing [doesn't help while doing copies]
+// second call of same procedure changes the input
 	
+// (10,3) ok; (10,4) segfault
+// (12,3) (12,4) (12,5) ok (12,6) bound violated
+  LIB "./ncHilb.lib";
   ring r2=0,(x,y,z),dp;
-  def R2 = makeLetterplaceRing(11); setring R2;
+  def R2 = makeLetterplaceRing(12); setring R2;
   ideal I = y*z-z*y, x*z*x-z*x*z, x*z^2*x*z-z*x*z^2*x, x*z^3*x*z-z*x*z^2*x^2;
-  ideal J = std(I); // compute a Groebner basis up to degree 11
+  ideal J = std(I); // compute a Groebner basis up to degree bound, which is 12
+  fpahilb(J,6,1,"p");
   // inspecting J we see that this is a homogeneous Groebner basis
   // which is potentially infinite, i.e. J is not finitely generated
   fpahilb(J,5,1,2,"p"); // '1' i for non-finitely generated case, string to print details
   //'5' here is to compute the truncated HS up to degree 5.
   //'2' is to compute multi-graded Hilbert series
-  fpahilb(J,3,1,"p");
+  fpahilb(J,7,1,"p");
 }
-*/
+
 
 // overhauled by VL
 proc rcolon(ideal I, poly W)
@@ -176,7 +196,7 @@ example
   J; // new generators, which need to be added to I
 }
 
-
+/*
 proc nchilb(list L_wp, int d, list #)
 "USAGE: fpahilb(I, d[, L]), ideal I, int d, optional list L
 PURPOSE: compute Hilbert series of a non-commutative algebra
@@ -398,6 +418,7 @@ example
     nchilb(l5,7,1,2,11,"p");
     //'11' is to compute the truncated HS up to degree 10.
 }
+*/
 
 /*
 // orig version of the procedure
