@@ -267,6 +267,14 @@ int ksReducePoly(LObject* PR,
     }
   }
 
+#ifdef HAVE_SHIFTBBA
+  poly lmRight;
+  if (tailRing->isLPring)
+  {
+    k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
+  }
+#endif
+
   // take care of coef buisness
   if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
   {
@@ -274,6 +282,9 @@ int ksReducePoly(LObject* PR,
     number an = pGetCoeff(p2);
     int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
     p_SetCoeff(lm, bn, tailRing);
+#ifdef HAVE_SHIFTBBA
+    if (tailRing->isLPring) pSetCoeff0(p1, bn); // lm doesn't point to p1 anymore, if the coef was a pointer, it has been deleted
+#endif
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
@@ -286,23 +297,18 @@ int ksReducePoly(LObject* PR,
 
 
   // and finally,
-  PR->Tail_Minus_mm_Mult_qq(lm, t2, pLength(t2) /*PW->GetpLength() - 1*/, spNoether);
+#ifdef HAVE_SHIFTBBA
+  if (tailRing->isLPring)
+  {
+    PR->Tail_Minus_mm_Mult_qq(lm, tailRing->p_Procs->pp_Mult_mm(t2, lmRight, tailRing), pLength(t2), spNoether);
+  }
+  else
+#endif
+  {
+    PR->Tail_Minus_mm_Mult_qq(lm, t2, pLength(t2) /*PW->GetpLength() - 1*/, spNoether);
+  }
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
   PR->LmDeleteAndIter();
-
-  // the following is commented out: shrinking
-#ifdef HAVE_SHIFTBBA_NONEXISTENT
-  if ( (currRing->isLPring) && (!strat->homog) )
-  {
-    // assume? h->p in currRing
-    PR->GetP();
-    poly qq = p_Shrink(PR->p, currRing->isLPring, currRing);
-    PR->Clear(); // does the right things
-    PR->p = qq;
-    PR->t_p = NULL;
-    PR->SetShortExpVector();
-  }
-#endif
 
   return ret;
 }

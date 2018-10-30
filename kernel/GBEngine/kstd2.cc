@@ -81,8 +81,6 @@ long sba_interreduction_operations;
   int (*test_PosInL)(const LSet set, const int length,
                 LObject* L,const kStrategy strat);
 
-// return -1 if no divisor is found
-//        number of first divisor, otherwise
 int kFindSameLMInT_Z(const kStrategy strat, const LObject* L, const int start)
 {
   unsigned long not_sev = ~L->sev;
@@ -136,7 +134,8 @@ int kFindSameLMInT_Z(const kStrategy strat, const LObject* L, const int start)
     }
   }
 }
-
+// return -1 if no divisor is found
+//        number of first divisor, otherwise
 int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int start)
 {
   unsigned long not_sev = ~L->sev;

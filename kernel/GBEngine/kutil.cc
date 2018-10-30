@@ -1328,6 +1328,7 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
   assume(atR >= 0);
   assume(i<=strat->sl);
   assume(p!=NULL);
+  assume(rField_is_Ring(currRing));
   #if ALL_VS_JUST
   //Over rings, if we construct the strong pair, do not add the spair
   if(rField_is_Ring(currRing))
@@ -1528,6 +1529,7 @@ static BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,k
 {
   number d, s, t;
   assume(atR >= 0);
+  assume(rField_is_Ring(currRing));
   poly m1, m2, gcd,si;
   if(!enterTstrong)
   {
@@ -9494,22 +9496,19 @@ void enterSSba (LObject &p,int atS,kStrategy strat, int atR)
 #endif
 }
 
-/*2
-* puts p to the set T at position atT
-*/
 void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat)
 {
   p.GetP(strat->lmBin);
   if (strat->homog) strat->initEcart(&p);
-			strat->redTailChange=FALSE;
-	if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing))) {
-		p.pCleardenom();
-		if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL)) {
-			p.p = redtailBba(&p,strat->sl,strat, FALSE,!TEST_OPT_CONTENTSB);
-			p.pCleardenom();
-			if (strat->redTailChange)
-				p.t_p=NULL;
-		}
+      strat->redTailChange=FALSE;
+  if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing))) {
+    p.pCleardenom();
+    if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL)) {
+      p.p = redtailBba(&p,strat->sl,strat, FALSE,!TEST_OPT_CONTENTSB);
+      p.pCleardenom();
+      if (strat->redTailChange)
+        p.t_p=NULL;
+    }
   }
 
   assume(strat->tailRing == p.tailRing);
@@ -9555,6 +9554,9 @@ void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat)
   strat->enterS(p, pos, strat, strat->tl);
 }
 
+/*2
+* puts p to the set T at position atT
+*/
 void enterT(LObject &p, kStrategy strat, int atT)
 {
   int i;
