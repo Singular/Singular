@@ -31,13 +31,13 @@ lpGBPres2Poly(L,I);              reconstructs a polynomial from the output of lp
 isOrderingShiftInvariant(i);     tests shift-invariance of the monomial ordering
 
 isVar(p);                        check whether p is a power of a single variable
-lpPrint(I, r); represents Letterplace ideal in the form of words (legacy routine)
-freeGBasis(L, n);  computes two-sided Groebner basis of an ideal, encoded via list L (legacy routine)
 
 SEE ALSO: fpadim_lib, fpaprops_lib, fpalgebras_lib, LETTERPLACE
 ";
 
 /* more legacy:
+lpPrint(I, r); represents Letterplace ideal in the form of words (legacy routine)
+freeGBasis(L, n);  computes two-sided Groebner basis of an ideal, encoded via list L (legacy routine)
 lp2lstr(K, s);  convert a letterplace ideal into a list of modules
 lst2str(L[, n]); convert a list (of modules) into polynomials in free algebra via strings
 mod2str(M[, n]); convert a module into a polynomial in free algebra via strings
