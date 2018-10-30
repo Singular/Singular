@@ -14,7 +14,7 @@ REFERENCES:
 
           La Scala R., Tiwari Sharwan K.: Multigraded Hilbert Series of noncommutative modules, https://arxiv.org/abs/1705.01083.
 
-KEYWORDS: finitely presented algebra; infinitely presented algebra; graded Hilbert series; multi-graded Hilbert series;
+KEYWORDS: finitely presented algebra; infinitely presented algebra; graded Hilbert series; multi-graded Hilbert series
 		  
 PROCEDURES:
           fpahilb(L,d,#); Hilbert series of a non-commutative algebra
