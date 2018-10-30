@@ -17,7 +17,7 @@ REFERENCES:
 Huishi Li: Groebner bases in ring theory. World Scientific, 2010.
 
 KEYWORDS: finitely presented algebra; ring theory; Letterplace Groebner basis; 
-growth of algebra; Gelfand-Kirillov dimension; global homological dimension; semi-prime ideal; Ufnarovski graph;
+growth of algebra; Gelfand-Kirillov dimension; global homological dimension; semi-prime ideal; Ufnarovski graph
 
 SEE ALSO:  fpadim_lib, freegb_lib
 
