@@ -254,6 +254,7 @@ poly singclap_gcd ( poly f, poly g, const ring r );
 typedef poly*   polyset;
 
 /*-------------predicate on polys ----------------------*/
+#define  pHasNotCFRing(p1,p2)   p_HasNotCFRing(p1,p2,currRing)
 #define  pHasNotCF(p1,p2)   p_HasNotCF(p1,p2,currRing)
                                 /*has no common factor ?*/
 #define  pSplit(p,r)        p_Split(p,r)

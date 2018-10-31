@@ -36,8 +36,8 @@ namespace gfan{
         }
         void initializeCddlibIfRequired() // calling this frequently will cause memory leaks because deinitialisation is not possible with old versions of cddlib.
         {
-	  if (dd_statStartTime==0)
-	  {
+          if (dd_statStartTime==0)
+          {
                 dd_set_global_constants();
           }
         }

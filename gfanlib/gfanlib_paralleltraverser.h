@@ -26,9 +26,9 @@ namespace gfan{
 class Traverser
 {
 public:
-        bool aborting;                      // Added by Anders
+        bool aborting;                                         // Added by Anders
         void abort(){aborting=true;}        // Added by Anders
-        Traverser():aborting(false){}       // Added by Anders
+        Traverser():aborting(false){}        // Added by Anders
   // Virtual destructor
   virtual ~Traverser( void ) {};
 

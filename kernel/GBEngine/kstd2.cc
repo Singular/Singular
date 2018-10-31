@@ -81,43 +81,97 @@ long sba_interreduction_operations;
   int (*test_PosInL)(const LSet set, const int length,
                 LObject* L,const kStrategy strat);
 
+int kFindSameLMInT_Z(const kStrategy strat, const LObject* L, const int start)
+{
+  unsigned long not_sev = ~L->sev;
+  int j = start;
+  int o = -1;
+
+  const TSet T=strat->T;
+  const unsigned long* sevT=strat->sevT;
+  number gcd, ogcd;
+  if (L->p!=NULL)
+  {
+    const ring r=currRing;
+    const poly p=L->p;
+    ogcd = pGetCoeff(p);
+
+    pAssume(~not_sev == p_GetShortExpVector(p, r));
+
+    loop
+    {
+      if (j > strat->tl) return o;
+      if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r) && p_LmEqual(T[j].p, p, r))
+      {
+        gcd = n_Gcd(pGetCoeff(p), pGetCoeff(T[j].p), r->cf);
+        if (o == -1 ||
+            n_Greater(n_EucNorm(ogcd, r->cf), n_EucNorm(gcd, r->cf), r->cf) == TRUE) {
+          ogcd = gcd;
+          o = j;
+        }
+      }
+      j++;
+    }
+  }
+  else
+  {
+    const ring r=strat->tailRing;
+    const poly p=L->t_p;
+    ogcd = pGetCoeff(p);
+    loop
+    {
+      if (j > strat->tl) return o;
+      if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r) && p_LmEqual(T[j].p, p, r))
+      {
+        gcd = n_Gcd(pGetCoeff(p), pGetCoeff(T[j].p), r->cf);
+        if (o == -1 ||
+            n_Greater(n_EucNorm(ogcd, r->cf), n_EucNorm(gcd, r->cf), r->cf) == TRUE) {
+          ogcd = gcd;
+          o = j;
+        }
+      }
+      j++;
+    }
+  }
+}
 // return -1 if no divisor is found
 //        number of first divisor, otherwise
 int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int start)
 {
   unsigned long not_sev = ~L->sev;
   int j = start;
+  int o = -1;
 
   const TSet T=strat->T;
   const unsigned long* sevT=strat->sevT;
-  number rest, mult;
+  number rest, orest, mult;
   if (L->p!=NULL)
   {
     const ring r=currRing;
     const poly p=L->p;
+    orest = pGetCoeff(p);
 
     pAssume(~not_sev == p_GetShortExpVector(p, r));
 
     loop
     {
-      if (j > strat->tl) return -1;
+      if (j > strat->tl) return o;
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
       {
-        mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p),
-            &rest, currRing->cf);
-        if (!n_IsZero(mult, currRing)) {
-          return j;
+        mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p), &rest, r->cf);
+        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
+          o = j;
+          orest = rest;
         }
       }
 #else
-      if (!(sevT[j] & not_sev) &&
-          p_LmDivisibleBy(T[j].p, p, r))
+      if (!(sevT[j] & not_sev) && p_LmDivisibleBy(T[j].p, p, r))
       {
-        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p),
-            &rest, currRing->cf);
-        if (!n_IsZero(mult, currRing)) {
-          return j;
+        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p), &rest, r->cf);
+        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
+          o = j;
+          orest = rest;
         }
       }
 #endif
@@ -126,29 +180,29 @@ int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int sta
   }
   else
   {
-    const poly p=L->t_p;
     const ring r=strat->tailRing;
+    const poly p=L->t_p;
+    orest = pGetCoeff(p);
     loop
     {
-      if (j > strat->tl) return -1;
+      if (j > strat->tl) return o;
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if (p_LmShortDivisibleBy(T[j].t_p, sevT[j],
             p, not_sev, r))
       {
-        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p),
-            &rest, currRing->cf);
-        if (!n_IsZero(mult, currRing)) {
-          return j;
+        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p), &rest, r->cf);
+        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
+          o = j;
+          orest = rest;
         }
       }
 #else
-      if (!(sevT[j] & not_sev) &&
-          p_LmDivisibleBy(T[j].t_p, p, r))
+      if (!(sevT[j] & not_sev) && p_LmDivisibleBy(T[j].t_p, p, r))
       {
-        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p),
-            &rest, currRing->cf);
-        if (!n_IsZero(mult, currRing)) {
-          return j;
+        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p), &rest, r->cf);
+        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
+          o = j;
+          orest = rest;
         }
       }
 #endif
@@ -516,7 +570,6 @@ int redRing_Z (LObject* h,kStrategy strat)
   if (h->IsNull()) return 0; // spoly is zero (can only occure with zero divisors)
   if (strat->tl<0) return 1;
 
-  number mult, rest;
   int at/*,i*/;
   long d;
   int j = 0;
@@ -529,58 +582,77 @@ int redRing_Z (LObject* h,kStrategy strat)
   long reddeg = h->GetpFDeg();
 
   h->SetShortExpVector();
-  TObject tj; // probably needed as special reducer
   loop
   {
-    /* we do not check divisibility of lead coefficients over rings.
-     * this is postponed and checked directly before deciding how to reduce h */
+    /* check if a reducer of the lead term exists */
     j = kFindDivisibleByInT(strat, h);
     if (j < 0) {
-      j = kFindDivisibleByInT_Z(strat, h);
-      if (j < 0)
-      {
-        // over ZZ: cleanup coefficients by complete reduction with monomials
-        postReduceByMon(h, strat);
-        if(h->p == NULL)
+      /* check if a reducer with the same lead monomial exists */
+      j = kFindSameLMInT_Z(strat, h);
+      if (j < 0) {
+        /* check if a reducer of the lead monomial exists, by the above
+         * check this is a real divisor of the lead monomial */
+        j = kFindDivisibleByInT_Z(strat, h);
+        if (j < 0)
         {
-          if (h->lcm!=NULL) pLmDelete(h->lcm);
-          h->Clear();
-          tj.Clear();
-          return 0;
-        }
-        if(nIsZero(pGetCoeff(h->p))) return 2;
-        j = kFindDivisibleByInT(strat, h);
-        if(j < 0)
-        {
-          if(strat->tl >= 0)
-              h->i_r1 = strat->tl;
-          else
-              h->i_r1 = -1;
-          if (h->GetLmTailRing() == NULL)
+          // over ZZ: cleanup coefficients by complete reduction with monomials
+          if (rHasLocalOrMixedOrdering(currRing))
+            postReduceByMon(h, strat);
+          if(h->p == NULL)
           {
             if (h->lcm!=NULL) pLmDelete(h->lcm);
             h->Clear();
-            tj.Clear();
             return 0;
           }
-          return 1;
+          if(nIsZero(pGetCoeff(h->p))) return 2;
+          j = kFindDivisibleByInT(strat, h);
+          if(j < 0)
+          {
+            if(strat->tl >= 0)
+              h->i_r1 = strat->tl;
+            else
+              h->i_r1 = -1;
+            if (h->GetLmTailRing() == NULL)
+            {
+              if (h->lcm!=NULL) pLmDelete(h->lcm);
+              h->Clear();
+              return 0;
+            }
+            return 1;
+          }
+        } else {
+          /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
+           * => we try to cut down the lead coefficient at least */
+          /* first copy T[j] in order to multiply it with a coefficient later on */
+          number mult, rest;
+          TObject tj  = strat->T[j];
+          tj.Copy();
+          /* tj.max_exp = strat->T[j].max_exp; */
+          /* compute division with remainder of lc(h) and lc(T[j]) */
+          mult = n_QuotRem(pGetCoeff(h->p), pGetCoeff(strat->T[j].p),
+                  &rest, currRing->cf);
+          /* set corresponding new lead coefficient already. we do not
+           * remove the lead term in ksReducePolyLC, but only apply
+           * a lead coefficient reduction */
+          tj.Mult_nn(mult);
+          ksReducePolyLC(h, &tj, NULL, &rest, strat);
+          tj.Delete();
+          tj.Clear();
         }
       } else {
-        /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
-        * => gcd-poly reduction */
+        /* same lead monomial but lead coefficients do not divide each other:
+         * change the polys to h <- spoly(h,tj) and h2 <- gpoly(h,tj). */
+        LObject h2  = *h;
+        h2.Copy();
 
-        /* first copy T[j] in order to multiply it with a coefficient later on */
-        tj  = strat->T[j];
-        tj.Copy();
-        /* compute division with remainder of lc(h) and lc(T[j]) */
-        rest = n_QuotRem(pGetCoeff(h->p), pGetCoeff(strat->T[j].p),
-            &mult, currRing->cf);
-        /* set corresponding new lead coefficient already. we do not
-        * remove the lead term in ksReducePolyLC, but only apply
-        * a lead coefficient reduction */
-        tj.Mult_nn(rest);
-        ksReducePolyLC(h, &tj, NULL, &mult, strat);
-        tj.Delete();
+        ksReducePolyZ(h, &(strat->T[j]), NULL, NULL, strat);
+        ksReducePolyGCD(&h2, &(strat->T[j]), NULL, NULL, strat);
+        if (!rHasLocalOrMixedOrdering(currRing)) {
+          redtailBbaAlsoLC_Z(&h2, j, strat);
+          h2.pCleardenom();
+        }
+        /* replace h2 for tj in L (already generated pairs with tj), S and T */
+        replaceInLAndSAndT(h2, j, strat);
       }
     } else {
       ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
@@ -593,7 +665,6 @@ int redRing_Z (LObject* h,kStrategy strat)
       h->lcm=NULL;
 #endif
       h->Clear();
-      tj.Clear();
       return 0;
     }
     h->SetShortExpVector();
@@ -614,7 +685,6 @@ int redRing_Z (LObject* h,kStrategy strat)
 #endif
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);     // NOT RING CHECKED OLIVER
         h->Clear();
-        tj.Clear();
         return -1;
       }
     }
@@ -630,7 +700,6 @@ int redRing_Z (LObject* h,kStrategy strat)
           at = strat->posInL(strat->L,strat->Ll,h,strat);
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           h->Clear();
-          tj.Clear();
           return -1;
         }
       }
@@ -2262,6 +2331,14 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // in the ring case we cannot expect LC(f) = 1,
       // therefore we call pCleardenom instead of pNorm
       strat->redTailChange=FALSE;
+
+      /* if we are computing over Z we always want to try and cut down
+       * the coefficients in the tail terms */
+      if (rField_is_Z(currRing) && !rHasLocalOrMixedOrdering(currRing)) {
+        redtailBbaAlsoLC_Z(&(strat->P), strat->tl, strat);
+        strat->P.pCleardenom();
+      }
+
       if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
       {
         strat->P.pCleardenom();

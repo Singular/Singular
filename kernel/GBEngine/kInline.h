@@ -1024,6 +1024,44 @@ KINLINE void k_GetStrongLeadTerms(const poly p1, const poly p2, const ring leadR
  * Misc things
  *
  ***************************************************************/
+KINLINE int ksReducePolyTailLC_Z(LObject* PR, TObject* PW, LObject* Red)
+{
+  BOOLEAN ret;
+  number mult, rest;
+  TObject red = *PW;
+  red.Copy();
+  rest = n_QuotRem(pGetCoeff(Red->p), pGetCoeff(red.p),
+          &mult, currRing->cf);
+  red.Mult_nn(rest);
+
+  assume(PR->GetLmCurrRing() != red.GetLmCurrRing());
+  ret = ksReducePolyLC(Red, &red, NULL, &mult);
+  red.Delete();
+  red.Clear();
+
+  return ret;
+}
+
+KINLINE int ksReducePolyTail_Z(LObject* PR, TObject* PW, LObject* Red)
+{
+  BOOLEAN ret;
+  number coef;
+
+  assume(PR->GetLmCurrRing() != PW->GetLmCurrRing());
+  ret = ksReducePoly(Red, PW, NULL, &coef);
+
+  if (!ret)
+  {
+    if (! n_IsOne(coef, currRing->cf))
+    {
+      PR->Mult_nn(coef);
+      // HANNES: mark for Normalize
+    }
+    n_Delete(&coef, currRing->cf);
+  }
+  return ret;
+}
+
 KINLINE int ksReducePolyTail(LObject* PR, TObject* PW, LObject* Red)
 {
   BOOLEAN ret;

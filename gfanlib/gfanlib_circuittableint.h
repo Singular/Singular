@@ -40,7 +40,8 @@ class CircuitTableInt32{
                 { // A good place to read about these tricks seems to be the book "Hacker's Delight" by Warren.
                         v=a.v;
                         shift=0;
-                        uint32_t t=v;
+                        int32_t t=v;
+//                        uint32_t t=v;
                         assert(t);
                         while(!(t&1)){t>>=        1;shift++;}
                         uint32_t inverse=t;
@@ -110,6 +111,7 @@ public:
                 return 0;
         }
         std::string toString()const{std::stringstream s;s<<v;return s.str();}
+        friend std::ostream &operator<<(std::ostream &f, CircuitTableInt32 const &a){f<<(int)a.v;return f;}
         Double extend()const{Double ret;ret.v=v;return ret;}
         CircuitTableInt32 &maddWithOverflowChecking(CircuitTableInt32 const &a, CircuitTableInt32 const&b){Double t=this->extend();t+=extendedMultiplication(a,b);*this=t.castToSingle();return *this;}
         CircuitTableInt32 &msubWithOverflowChecking(CircuitTableInt32 const &a, CircuitTableInt32 const&b){Double s=this->extend();s-=extendedMultiplication(a,b);*this=s.castToSingle();return *this;}
