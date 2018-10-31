@@ -2,20 +2,20 @@
 version="version nc_hilb.lib 4.1.1.0 Dec_2017 "; // $Id$
 category="Noncommutative";
 info="
-LIBRARY:  fpahilb.lib: Computation of graded and multi-graded Hilbert series of non-commutative algebras (Letterplace). 
+LIBRARY:  fpahilb.lib: Computation of graded and multi-graded Hilbert series of non-commutative algebras (Letterplace).
 
 AUTHOR:   Sharwan K. Tiwari   shrawant@gmail.com
           Roberto La Scala
-		  Viktor Levandovskyy (adaptation to the new Letterplace release)
-		  
+                  Viktor Levandovskyy (adaptation to the new Letterplace release)
+
 REFERENCES:
-          La Scala R.: Monomial right ideals and the Hilbert series of non-commutative modules, 
-		  Journal of Symbolic Computation (2016).
+          La Scala R.: Monomial right ideals and the Hilbert series of non-commutative modules,
+                  Journal of Symbolic Computation (2016).
 
           La Scala R., Tiwari Sharwan K.: Multigraded Hilbert Series of noncommutative modules, https://arxiv.org/abs/1705.01083.
 
 KEYWORDS: finitely presented algebra; infinitely presented algebra; graded Hilbert series; multi-graded Hilbert series
-		  
+
 PROCEDURES:
           fpahilb(L,d,#); Hilbert series of a non-commutative algebra
           rcolon(I, w, d); Right colon ideal of a two-sided monomial ideal with respect to a monomial w
@@ -29,26 +29,26 @@ proc fpahilb(ideal I, list #)
 "USAGE: fpahilb(I[, L]), ideal I, optional list L
 PURPOSE: compute Hilbert series of a non-commutative algebra, presented by I
 RETURN: nothing (prints data out)
-ASSUME: basering is a Letterplace ring, I is given via its Groebner basis 
+ASSUME: basering is a Letterplace ring, I is given via its Groebner basis
 NOTE: the appearance of following values among the optional arguments triggers the following:
 @* 1: computation for non-finitely generated regular ideals,
 @* 2: computation of multi-graded Hilbert series,
 @* N>2: computation of truncated Hilbert series up to degree N-1, and
-@* nonempty string: the details about the orbit and system of equations will be printed. 
-Let the orbit be @code{O_I = {T_{w_1}(I),...,T_{w_r}(I)} ($w_i\in W$)}, where we assume that if @code{T_{w_i}(I)=T_{w_i'}(I)}
-for some @code{w'_i\in W}, then @code{deg(w_i)\leq deg(w'_i)} follows.
-Then the description of orbit in the form @code{w_1,...,w_r} will be printed.
-It also prints the maximal degree and the cardinality of @code{\sum_j R(w_i, b_j)} corresponding to each @code{w_i}, 
-where @code{{b_j}} is a basis of I. 
+@* nonempty string: the details about the orbit and system of equations will be printed.
+Let the orbit be O_I = T_(w_1)(I),...,T_(w_r)(I)} (w_i in W), where we assume that if T_(w_i)(I)=T_(w_i')(I)
+for some w'_i in W, then deg(w_i) <= deg(w'_i) follows.
+Then the description of orbit in the form w_1,...,w_r will be printed.
+It also prints the maximal degree and the cardinality of sum_j R(w_i, b_j) corresponding to each w_i,
+where b_j is a basis of I.
 Moreover, it also prints the linear system (for the information about adjacency matrix).
 EXAMPLE: example fpahilb; shows an example "
 {
-	if (attrib(basering, "isLetterplaceRing")==0)
-	{
+        if (attrib(basering, "isLetterplaceRing")==0)
+        {
       ERROR("Basering should be Letterplace ring");
-	}
-	def save = basering; 
-	int sz=size(#);
+        }
+        def save = basering;
+        int sz=size(#);
     int lV=attrib(save,"uptodeg");
     int ig=0;
     int mgrad=0;
@@ -100,32 +100,32 @@ EXAMPLE: example fpahilb; shows an example "
     {
       ERROR("error:only int 1,2, >2, and a string are allowed as optional parameters");
     }
-    // new: truncation should be < than degbound/2 
-	if (tdeg > (lV-1) div 2) 
-	{
+    // new: truncation should be < than degbound/2
+        if (tdeg > (lV-1) div 2)
+        {
        ERROR("Degree bound on the basering Should be at least 2*N+1");
-	}
-	def save2 = basering;
-	setring save2;
+        }
+        def save2 = basering;
+        setring save2;
     ideal J_lm = imap(save,I);
     for(i=1;i<=size(J_lm);i++)
     {
         J_lm[i]=leadmonom(J_lm[i]);
     }
     //compute the Hilbert series
-	// system call : HilbertSeries_OrbitData: sharwan need to change it as well...
-	//(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp, int trunDegHs)
+        // system call : HilbertSeries_OrbitData: sharwan need to change it as well...
+        //(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp, int trunDegHs)
 
     if(odp == "")
     {
       system("nc_hilb", J_lm, lV, ig, mgrad,tdeg);
-	}
+        }
     else
     {
       system("nc_hilb", J_lm, lV, ig, mgrad,tdeg, odp);
-	}
-	setring save;
-	kill save2;
+        }
+        setring save;
+        kill save2;
 }
 
 example
@@ -138,14 +138,14 @@ example
 }
 
 static proc conversion_problems()
-{	
+{
 // problems:
 // a) words description of the Orbit:
 //1    x    z    // ** invalid letterplace monomial: --> Karim?
 // caused by pWrite0 --> writemon
 // b) HilbertSeries_OrbitData changes currRing [doesn't help while doing copies]
 // second call of same procedure changes the input
-	
+
 // (10,3) ok; (10,4) segfault
 // (12,3) (12,4) (12,5) ok (12,6) bound violated
   LIB "./ncHilb.lib";
@@ -165,25 +165,25 @@ static proc conversion_problems()
 
 // overhauled by VL
 proc rcolon(ideal I, poly W)
-"USAGE:  rcolon(I,w); ideal I, poly w 
+"USAGE:  rcolon(I,w); ideal I, poly w
 RETURNS: ideal
-ASSUME: - basering is a Letterplace ring 
-- W is a monomial 
+ASSUME: - basering is a Letterplace ring
+- W is a monomial
 - I is a monomial ideal
-PURPOSE: compute a right colon ideal of I by a monomial w 
+PURPOSE: compute a right colon ideal of I by a monomial w
 NOTE: Output is the set of generators, which should be added to I
 EXAMPLE: example rcolon; shows an example"
 {
-	int lV =  attrib(R,"isLetterplaceRing"); //nvars(save);
-	if (lV == 0)
-	{
+        int lV =  attrib(R,"isLetterplaceRing"); //nvars(save);
+        if (lV == 0)
+        {
       ERROR("Basering must be a Letterplace ring");
-	}
+        }
     poly wc = leadmonom(W);
-	ideal II = lead(I);
+        ideal II = lead(I);
     ideal J = system("rcolon", II, wc, lV);
     // VL: printlevel here? before only printing was there, no output
-	return(J);
+        return(J);
  }
 example
 {
@@ -206,12 +206,12 @@ NOTE: d is an integer for the degree bound (maximal total degree of
 #[]=1, computation for non-finitely generated regular ideals,
 #[]=2, computation of multi-graded Hilbert series,
 #[]=tdeg, for obtaining the truncated Hilbert series up to the total degree tdeg-1 (tdeg should be > 2), and
-#[]=string(p), to print the details about the orbit and system of equations. 
+#[]=string(p), to print the details about the orbit and system of equations.
 Let the orbit is O_I = {T_{w_1}(I),...,T_{w_r}(I)} ($w_i\in W$), where we assume that if T_{w_i}(I)=T_{w_i'}(I)$
 for some $w'_i\in W$, then $deg(w_i)\leq deg(w'_i)$.
 Then, it prints words description of orbit: w_1,...,w_r.
-It also prints the maximal degree and the cardinality of \sum_j R(w_i, b_j) corresponding to each w_i, 
-where {b_j} is a basis of I. 
+It also prints the maximal degree and the cardinality of \sum_j R(w_i, b_j) corresponding to each w_i,
+where {b_j} is a basis of I.
 Moreover, it also prints the linear system (for the information about adjacency matrix) and its solving time.
 
 NOTE  : A Groebner basis of two-sided ideal of the input should be given in a
@@ -522,3 +522,4 @@ example
     rcolon(l1,w,10);
 }
 */
+
