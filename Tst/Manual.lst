@@ -799,7 +799,6 @@ Manual/invunit.tst
 Manual/iostruct.tst
 Manual/isGroup.tst
 Manual/isGroupHomomorphism.tst
-Manual/ivMis2Dim.tst
 Manual/Jacobi.tst
 Manual/KoszulHomology.tst
 Manual/leftInverse.tst
@@ -842,7 +841,6 @@ Manual/SymGroup.tst
 Manual/tail.tst
 Manual/texcoef.tst
 Manual/texring.tst
-Manual/vct2str.tst
 Manual/Weyl.tst
 Manual/zeroOpt.tst
 Manual/autonomDim.tst
@@ -866,7 +864,6 @@ Manual/inverse_L.tst
 Manual/isPrimitiveSublattice.tst
 Manual/isSublattice.tst
 Manual/iv2lpList.tst
-Manual/ivOrdMisLex.tst
 Manual/linear_relations.tst
 Manual/list_operations.tst
 Manual/listvar.tst
@@ -924,10 +921,6 @@ Manual/intersection.tst
 Manual/intersectionValRings.tst
 Manual/isCMcod2.tst
 Manual/isFlat.tst
-Manual/ivDHilbert.tst
-Manual/ivDimCheck.tst
-Manual/ivMis2Base.tst
-Manual/ivSickle.tst
 Manual/lift_kbase.tst
 Manual/linearMapKernel.tst
 Manual/makeMalgrange.tst
@@ -989,7 +982,6 @@ Manual/isInt.tst
 Manual/isPositive.tst
 Manual/isZeroElement.tst
 Manual/iv2lpMat.tst
-Manual/ivHilbert.tst
 Manual/lift_rel_kb.tst
 Manual/liftstd_BR_PLURAL_BR.tst
 Manual/_lll.tst
@@ -1046,12 +1038,10 @@ Manual/isAntiEndo.tst
 Manual/isRational.tst
 Manual/isTorsionFree.tst
 Manual/linSyzSolve.tst
-Manual/lpMis2Base.tst
 Manual/map_BR_PLURAL_BR_operations.tst
 Manual/maxEord.tst
 Manual/minipoly.tst
 Manual/minres_BR_PLURAL_BR.tst
-Manual/mod2str.tst
 Manual/mod_versal.tst
 Manual/ModEqn.tst
 Manual/ncdetection.tst
@@ -1093,9 +1083,6 @@ Manual/Invariants_of_plane_curve_singularities.tst
 Manual/involution.tst
 Manual/isFsat.tst
 Manual/isVar.tst
-Manual/ivSickleDim.tst
-Manual/lpMis2Dim.tst
-Manual/lpPower.tst
 Manual/makeQsl2.tst
 Manual/makeUsp1.tst
 Manual/mres_BR_PLURAL_BR.tst
@@ -1127,7 +1114,6 @@ Manual/GBWeight.tst
 Manual/getModuleGrading.tst
 Manual/intersectionValRingIdeals.tst
 Manual/invariants.tst
-Manual/ivKDim.tst
 Manual/lieBracket.tst
 Manual/lp2iv.tst
 Manual/makeQsl3.tst
@@ -1159,9 +1145,6 @@ Manual/exp2pt.tst
 Manual/Gamma.tst
 Manual/irred_secondary_no_molien.tst
 Manual/isCM.tst
-Manual/ivDHilbertSickle.tst
-Manual/ivSickleHil.tst
-Manual/lp2lstr.tst
 Manual/makeUsl.tst
 Manual/makeUsp3.tst
 Manual/makeUsp5.tst
@@ -1171,7 +1154,6 @@ Manual/normaliz.tst
 Manual/prepareAss.tst
 Manual/restrictionIdeal.tst
 Manual/secondary_char0.tst
-Manual/sickle.tst
 Manual/annfsParamBM.tst
 Manual/bFactor.tst
 Manual/bfctVarIn.tst
@@ -1179,11 +1161,10 @@ Manual/countPoints.tst
 Manual/findAuto.tst
 Manual/findInvoDiag.tst
 Manual/invariant_ring.tst
-Manual/letplaceGBasis.tst
+Manual/letterplace_std.tst
 Manual/linReduceIdeal.tst
 Manual/lpId2ivLi.tst
 Manual/lpKDim.tst
-Manual/lst2str.tst
 Manual/makeLetterplaceRing.tst
 Manual/makeUso11.tst
 Manual/number_pi.tst
@@ -1220,7 +1201,6 @@ Manual/bernsteinLift.tst
 Manual/determinecenter.tst
 Manual/Gauss-Manin_connection_1.tst
 Manual/KSpencerKernel.tst
-Manual/lpSickleHil.tst
 Manual/makeUe6.tst
 Manual/orthogonalize.tst
 Manual/pIntersect.tst
@@ -1230,14 +1210,11 @@ Manual/EOrdlist.tst
 Manual/findInvo.tst
 Manual/_invariantRing.tst
 Manual/lpHilbert.tst
-Manual/lpOrdMisLex.tst
 Manual/sheafCoh.tst
 Manual/sheafCohBGG.tst
 Manual/charInfo.tst
 Manual/_delta.tst
 Manual/G_a_-Invariants.tst
-Manual/lpDHilbert.tst
-Manual/lpSickle.tst
 Manual/multiDegGroebner.tst
 Manual/multsequence.tst
 Manual/nres_BR_PLURAL_BR.tst
@@ -1249,7 +1226,8 @@ Manual/Example_of_use_of_@sc{Letterplace}.tst
 Manual/findifs_example.tst
 Manual/Gauss-Manin_connection.tst
 Manual/lcmofall.tst
-Manual/lpDimCheck.tst
+Manual/lpKDimCheck.tst
+Manual/lpMonomialBasis.tst
 Manual/modDec.tst
 Manual/nashmult.tst
 Manual/normalI.tst
@@ -1257,7 +1235,6 @@ Manual/PrimdecA.tst
 Manual/spectrum.tst
 Manual/vwfilt.tst
 Manual/constructH.tst
-Manual/lpDHilbertSickle.tst
 Manual/lpSickleDim.tst
 Manual/monodromyB.tst
 Manual/semigroup.tst
