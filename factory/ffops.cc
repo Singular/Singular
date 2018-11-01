@@ -51,11 +51,8 @@ int ff_newinv ( const int a )
       r2 -= r1 * q;
       if (r2 == 1)
       {
-#if defined(NTL_AVOID_BRANCHING)
-        y2 += (y2 >> 31) & p;
-#else
-        if (y2 < 0) y2 += p;
-#endif
+        if (y2 < 0)
+          y2 += p;
         ff_invtab[y2] = a;
         return (ff_invtab[a] = y2);
       }
@@ -64,11 +61,8 @@ int ff_newinv ( const int a )
       r1 -= r2 * q;
       if (r1 == 1)
       {
-#if defined(NTL_AVOID_BRANCHING)
-        y1 += (y1 >> 31) & p;
-#else
-        if (y1 < 0) y1 += p;
-#endif
+        if (y1 < 0)
+          y1 += p;
         ff_invtab[y1] = a;
         return (ff_invtab[a] = y1);
       }
@@ -95,24 +89,20 @@ int ff_biginv ( const int a )
       r2 -= r1 * q;
       if (r2 == 1)
       {
-#if defined(NTL_AVOID_BRANCHING)
-        y2 += (y2 >> 31) & p;
-#else
-        if (y2 < 0) y2+=p;
-        return y2;
-#endif
+        if (y2 > 0)
+          return y2;
+        else
+          return p + y2;
       }
       q = r1 / r2;
       y1 -= y2 * q;
       r1 -= r2 * q;
       if (r1 == 1)
       {
-#if defined(NTL_AVOID_BRANCHING)
-        y1 += (y1 >> 31) & p;
-#else
-        if (y1 < 0) y1+=p;
-        return y1;
-#endif
+        if (y1 > 0)
+          return y1;
+        else
+          return p + y1;
       }
     }
 }
