@@ -43,13 +43,13 @@ where b_j is a basis of I.
 Moreover, it also prints the linear system (for the information about adjacency matrix).
 EXAMPLE: example fpahilb; shows an example "
 {
-        if (attrib(basering, "isLetterplaceRing")==0)
-        {
+    if (attrib(basering, "isLetterplaceRing")==0)
+    {
       ERROR("Basering should be Letterplace ring");
-        }
-        def save = basering;
-        int sz=size(#);
-    int lV=attrib(save,"uptodeg");
+    }
+	def save = basering; 
+	int sz=size(#);
+    int lV=attrib(save,"isLetterplaceRing");
     int ig=0;
     int mgrad=0;
     int tdeg=0;
@@ -101,12 +101,13 @@ EXAMPLE: example fpahilb; shows an example "
       ERROR("error:only int 1,2, >2, and a string are allowed as optional parameters");
     }
     // new: truncation should be < than degbound/2
-        if (tdeg > (lV-1) div 2)
-        {
+    int degbnd = attrib(save,"uptodeg");
+	if (tdeg > (degbnd-1) div 2) 
+	{
        ERROR("Degree bound on the basering Should be at least 2*N+1");
-        }
-        def save2 = basering;
-        setring save2;
+    }
+    def save2 = basering;
+    setring save2;
     ideal J_lm = imap(save,I);
     for(i=1;i<=size(J_lm);i++)
     {
@@ -150,10 +151,10 @@ static proc conversion_problems()
 // (12,3) (12,4) (12,5) ok (12,6) bound violated
   LIB "./ncHilb.lib";
   ring r2=0,(x,y,z),dp;
-  def R2 = makeLetterplaceRing(12); setring R2;
+  def R2 = makeLetterplaceRing(13); setring R2;
   ideal I = y*z-z*y, x*z*x-z*x*z, x*z^2*x*z-z*x*z^2*x, x*z^3*x*z-z*x*z^2*x^2;
   ideal J = std(I); // compute a Groebner basis up to degree bound, which is 12
-  fpahilb(J,6,1,"p");
+  fpahilb(I,6,1,"p");
   // inspecting J we see that this is a homogeneous Groebner basis
   // which is potentially infinite, i.e. J is not finitely generated
   fpahilb(J,5,1,2,"p"); // '1' i for non-finitely generated case, string to print details

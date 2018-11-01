@@ -49,24 +49,24 @@ OVERVIEW: Given the free associative algebra A = K<x_1,...,x_n> and a (finite) G
 @*      set M = {m in V | there is no edge from m to another monomial in V} is
 @*      called the set of mistletoes. As one can easily see it consists of
 @*      the endpoints of the graph. Since there is a unique path to every
-@*      monomial in V the whole graph can be described only from the knowledge
+@*      monomial in V, the whole graph can be described only from the knowledge
 @*      of the mistletoes. Note that V corresponds to a basis of A/<GB>, so
 @*      knowing the mistletoes we know a K-basis. The name mistletoes was given
 @*      to those points because of these miraculous value and the algorithm is
 @*      named sickle, because a sickle is the tool to harvest mistletoes.
 @*      For more details see [Stu]. This package uses the Letterplace
-@*      format introduced by [LL]. The algebra can either be represented as a
+@*      format introduced by [LL09]. The algebra can either be represented as a
 @*      Letterplace ring or via integer vectors: Every variable will only be
 @*      represented by its number, so variable one is represented as 1,
 @*      variable two as 2 and so on. The monomial x_1*x_3*x_2 for example will
 @*      be stored as (1,3,2). Multiplication is concatenation. Note that the
 @*      approach in this library does not need an algorithm for computing the normal
-@*      form yet. Note that fpa is an acronym for Finitely Presented Algebra.
+@*      form. Note that fpa is an acronym for Finitely Presented Algebra.
 @*
 
 REFERENCES:
 @*   [Ufn] V. Ufnarovskij: Combinatorical and asymptotic methods in algebra, 1990.
-@*   [LL] R. La Scala, V. Levandovskyy: Letterplace ideals and non-commutative
+@*   [LL09] R. La Scala, V. Levandovskyy: Letterplace ideals and non-commutative
 Groebner bases, Journal of Symbolic Computation, 2009.
 @*   [Stu] G. Studzinski: Dimension computations in non-commutative,
 associative algebras, Diploma thesis, RWTH Aachen, 2010.
@@ -74,7 +74,8 @@ associative algebras, Diploma thesis, RWTH Aachen, 2010.
 SEE ALSO: freegb_lib, fpaprops_lib, ncHilb_lib
 ";
 
-// iv2lp, lp2iv etc not in HEADER because they should not be used anymore and will be removed in soon
+// Remark Oct 2018: iv2lp, lp2iv etc are NOT IN HEADER because 
+// they should not be used anymore and will be removed soon
 
 LIB "freegb.lib"; //for letterplace rings
 LIB "general.lib";//for sorting mistletoes
@@ -2000,8 +2001,8 @@ PURPOSE: Compute the truncated Hilbert series of K<X>/<G> up to a degree bound
 ASSUME: - basering is a Letterplace ring.
 @*      - if you specify a different degree bound degbound,
 @*        degbound <= attrib(basering,uptodeg) holds.
-THEORY: Hilbert series of an algebra K<X>/<G> is sum h_i t^i,
-where h_i is the K-dimension of the space of monomials of degree i,
+THEORY: Hilbert series of an algebra K<X>/<G> is @code{\sum_{i=0} h_i t^i},
+where @code{h_i} is the K-dimension of the space of monomials of degree i,
 not contained in <G>. For finitely presented algebras Hilbert series NEED
 NOT be a rational function, though it happens often. Therefore in general
 there is no notion of a Hilbert polynomial.
@@ -2010,7 +2011,7 @@ NOTE: - If degbound is set, there will be a degree bound added. 0 means no
 @*    - n is the number of variables, which can be set to a different number.
 @*      Default: attrib(basering, lV).
 @*    - In the output intvec I, I[k] is the (k-1)-th coefficient of the Hilbert
-@*      series, i.e. h_(k-1) as above.
+@*      series, i.e. @code{h_{k-1}} as above.
 EXAMPLE: example lpHilbert; shows examples
 SEE ALSO: ncHilb_lib
 "
@@ -2700,4 +2701,3 @@ x*y*y-a*y*x*y - b*y*y*x - F2;
 J = letplaceGBasis(J);
 lpGkDim(J); // 3 == correct
  */
-
