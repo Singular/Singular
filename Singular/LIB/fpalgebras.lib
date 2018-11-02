@@ -361,7 +361,6 @@ example
 proc ademRelations(int i, int j)
 "USAGE:  ademRelations(i,j); i,j int
 RETURN:  ring (and exports ideal)
-ASSUME: there are at least i+j variables in the basering
 PURPOSE: compute the ideal of Adem relations for i<2j in characteristic 0
 @*  the ideal is exported under the name AdemRel in the output ring
 EXAMPLE: example ademRelations; shows examples
@@ -735,8 +734,8 @@ example
 /* proc crystallographicGroupP2(int d) */
 /* " */
 /* p2 group with the following presentation */
-/* < x, y, r | [x, y] = r^2 = 1, r^-1*x*r = x^-1, r^-1*y*r = y^-1 > */
-/* Note: r = r^-1 */
+/* < x, y, r | [x, y] = r^2 = 1, r^(-1)*x*r = x^(-1), r^(-1)*y*r = y^(-1) > */
+/* Note: r = r^(-1) */
 /* " */
 /* { */
 /*  if (d < 3){ERROR("Degreebound is to small for choosen example!");} */
@@ -763,7 +762,7 @@ proc crystallographicGroupPM(int d)
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
       - pm group with the following presentation
-        < x, y, m | [x, y] = m^2 = 1, m^-1*x*m = x, m^-1*y*m = y^-1 >
+        < x, y, m | [x, y] = m^2 = 1, m^(-1)*x*m = x, m^(-1)*y*m = y^(-1) >
       - d gives the degreebound for the Letterplace ring
 "
 {
@@ -797,7 +796,7 @@ proc crystallographicGroupPG(int d)
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
       - pg group with the following presentation
-        < x, y, t | [x, y] = 1, t^2 = x, t^-1*y*t = y^-1 >
+        < x, y, t | [x, y] = 1, t^2 = x, t^(-1)*y*t = y^(-1) >
       - d gives the degreebound for the Letterplace ring
 "
 {
@@ -832,7 +831,7 @@ proc crystallographicGroupP2MM(int d)
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
       - p2mm group with the following presentation
-        < x, y, p, q | [x, y] = [p, q] = p^2 = q^2 = 1, p^-1*x*p = x, q^-1*x*q = x^-1, p^-1*y*p = y^-1, q^-1*y*q = y >
+        < x, y, p, q | [x, y] = [p, q] = p^2 = q^2 = 1, p^(-1)*x*p = x, q^(-1)*x*q = x^(-1), p^(-1)*y*p = y^(-1), q^(-1)*y*q = y >
       - d gives the degreebound for the Letterplace ring
 "
 {
@@ -867,7 +866,7 @@ proc crystallographicGroupP2(int d)
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
       - p2 group with the following presentation
-        < x, y, m, t | [x, y] = t^2 = 1, m^2 = y, t^-1*x*t = x, m^-1*x*m = x^-1, t^-1*y*t = y^-1, t^-1*m*t = m^-1 >
+        < x, y, m, t | [x, y] = t^2 = 1, m^2 = y, t^(-1)*x*t = x, m^(-1)*x*m = x^(-1), t^(-1)*y*t = y^(-1), t^(-1)*m*t = m^(-1) >
       - d gives the degreebound for the Letterplace ring
 "
 {
@@ -902,7 +901,7 @@ proc crystallographicGroupP2GG(int d)
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
       - p2gg group with the following presentation
-        < x, y, u, v | [x, y] = (u*v)^2 = 1, u^2 = x, v^2 = y, v^-1*x*v = x^-1, u^-1*y*u = y^-1 >
+        < x, y, u, v | [x, y] = (u*v)^2 = 1, u^2 = x, v^2 = y, v^(-1)*x*v = x^(-1), u^(-1)*y*u = y^(-1) >
       - d gives the degreebound for the Letterplace ring
 "
 {
@@ -937,7 +936,7 @@ proc crystallographicGroupCM(int d)
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
       - cm group with the following presentation
-        < x, y, t | [x, y] = t^2 = 1, t^-1*x*t = x*y, t^-1*y*t = y^-1 >
+        < x, y, t | [x, y] = t^2 = 1, t^(-1)*x*t = x*y, t^(-1)*y*t = y^(-1) >
       - d gives the degreebound for the Letterplace ring
 "
 {
@@ -972,7 +971,7 @@ proc crystallographicGroupC2MM(int d)
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
       - c2mm group with the following presentation
-        < x, y, m, r | [x, y] = m^2 = r^2 = 1, m^-1*y*m = y^-1, m^-1*x*m = x*y, r^-1*y*r = y^-1, r^-1*x*r = x^-1, m^-1*r*m = r^-1 >
+        < x, y, m, r | [x, y] = m^2 = r^2 = 1, m^(-1)*y*m = y^(-1), m^(-1)*x*m = x*y, r^(-1)*y*r = y^(-1), r^(-1)*x*r = x^(-1), m^(-1)*r*m = r^(-1) >
       - d gives the degreebound for the Letterplace ring
 "
 {
@@ -1007,7 +1006,7 @@ proc crystallographicGroupP4(int d)
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
       - p4 group with the following presentation
-        < x, y, r | [x, y] = r^4 = 1, r^-1*x*r = x^-1, r^-1*x*r = y >
+        < x, y, r | [x, y] = r^4 = 1, r^(-1)*x*r = x^(-1), r^(-1)*x*r = y >
       - d gives the degreebound for the Letterplace ring
 "
 {
@@ -1042,7 +1041,7 @@ proc crystallographicGroupP4MM(int d)
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
       - p4mm group with the following presentation
-        < x, y, r, m | [x, y] = r^4 = m^2 = 1, r^-1*y*r = x^-1, r^-1*x*r = y, m^-1*x*m = y, m^-1*r*m = r^-1 >
+        < x, y, r, m | [x, y] = r^4 = m^2 = 1, r^(-1)*y*r = x^(-1), r^(-1)*x*r = y, m^(-1)*x*m = y, m^(-1)*r*m = r^(-1) >
       - d gives the degreebound for the Letterplace ring
 "
 {
@@ -1077,7 +1076,7 @@ proc crystallographicGroupP4GM(int d)
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
       - p4gm group with the following presentation
-        < x, y, r, t | [x, y] = r^4 = t^2 = 1, r^-1*y*r = x^-1, r^-1*x*r = y, t^-1*x*t = y, t^-1*r*t = x^-1*r^-1>
+        < x, y, r, t | [x, y] = r^4 = t^2 = 1, r^(-1)*y*r = x^(-1), r^(-1)*x*r = y, t^(-1)*x*t = y, t^(-1)*r*t = x^(-1)*r^(-1)>
       - d gives the degreebound for the Letterplace ring
 "
 {
@@ -1112,7 +1111,7 @@ proc crystallographicGroupP3(int d)
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
       - p3 group with the following presentation
-        < x, y, r | [x, y] = r^3 = 1, r^-1*x*r = x^-1*y, r^-1*y*r = x^-1>
+        < x, y, r | [x, y] = r^3 = 1, r^(-1)*x*r = x^(-1)*y, r^(-1)*y*r = x^(-1)>
       - d gives the degreebound for the Letterplace ring
 "
 {
@@ -1146,7 +1145,7 @@ proc crystallographicGroupP31M(int d)
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
       - p31m group with the following presentation
-        < x, y, r, t | [x, y] = r^2 = t^2 = (t*r)^3 = 1, r^-1*x*r = x, t^-1*y*t = y, t^-1*x*t = x^-1*y, r^-1*y*r = x*y^-1 >
+        < x, y, r, t | [x, y] = r^2 = t^2 = (t*r)^3 = 1, r^(-1)*x*r = x, t^(-1)*y*t = y, t^(-1)*x*t = x^(-1)*y, r^(-1)*y*r = x*y^(-1) >
       - d gives the degreebound for the Letterplace ring
 "
 {
@@ -1183,7 +1182,7 @@ proc crystallographicGroupP3M1(int d)
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
       - p3m1 group with the following presentation
-        < x, y, r, m | [x, y] = r^3 = m^2 = 1, m^-1*r*m = r^2, r^-1*x*r = x^-1*y, r^-1*y*r = x^-1, m^-1*x*m = x^-1, m^-1*y*m = x^-1*y >
+        < x, y, r, m | [x, y] = r^3 = m^2 = 1, m^(-1)*r*m = r^2, r^(-1)*x*r = x^(-1)*y, r^(-1)*y*r = x^(-1), m^(-1)*x*m = x^(-1), m^(-1)*y*m = x^(-1)*y >
       - d gives the degreebound for the Letterplace ring
 "
 {
@@ -1218,7 +1217,7 @@ proc crystallographicGroupP6(int d)
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
       - p6 group with the following presentation
-        < x, y, r | [x, y] = r^6 = 1, r^-1*x*r = y, r^-1*y*r = x^-1*y>
+        < x, y, r | [x, y] = r^6 = 1, r^(-1)*x*r = y, r^(-1)*y*r = x^(-1)*y>
       - d gives the degreebound for the Letterplace ring
 "
 {
@@ -1253,7 +1252,7 @@ proc crystallographicGroupP6MM(int d)
 RETURN: ring
 NOTE: - the ring contains the ideal I, which contains the required relations
       - p6mm group with the following presentation
-        < x, y, r, m | [x, y] = r^6 = m^2 = 1, r^-1*y*r = x^-1*y, r^-1*x*r = y, m^-1*x*m = x^-1, m^-1*y*m = x^-1*y, m^-1*r*m = r^-1*y>
+        < x, y, r, m | [x, y] = r^6 = m^2 = 1, r^(-1)*y*r = x^(-1)*y, r^(-1)*x*r = y, m^(-1)*x*m = x^(-1), m^(-1)*y*m = x^(-1)*y, m^(-1)*r*m = r^(-1)*y>
       - d gives the degreebound for the Letterplace ring
 "
 {

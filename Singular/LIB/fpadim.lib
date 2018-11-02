@@ -30,15 +30,16 @@ NOTE:
 In the procedures below, 'iv' stands for intvec representation
 and 'lp' for the letterplace representation of monomials
 
-OVERVIEW: Given the free associative algebra A = K<x_1,...,x_n> and a (finite) Groebner basis
-      GB = {g_1,..,g_w}, one is interested in the K-dimension and in the
-      explicit monomial K-basis of A/<GB>.
-      Therefore one is interested in the following data:
+OVERVIEW: Given the free associative algebra A = K<x_1,...,x_n> and 
+          a (finite or truncated) Groebner basis GB, one is interested in 
+		  the following data:
+	  - the K-dimension of A/<GB> (check for finiteness or explicit value)
+	  - the Hilbert series of A/<GB>
+	  - the explicit monomial K-basis of A/<GB>
+	    In order to determine these, we need
       - the Ufnarovskij graph induced by GB
-      - the mistletoes of A/<GB> (special monomials in a basis)
-      - the K-dimension of A/<GB>
-      - the Hilbert series of A/<GB>
-
+      - the mistletoes of A/<GB> (which are special monomials in a basis)
+      
 @*      The Ufnarovskij graph is used to determine whether A/<GB> has finite
 @*      K-dimension. One has to check if the graph contains cycles.
 @*      For the whole theory we refer to [Ufn]. Given a
@@ -75,7 +76,7 @@ SEE ALSO: freegb_lib, fpaprops_lib, ncHilb_lib
 ";
 
 // Remark Oct 2018: iv2lp, lp2iv etc are NOT IN HEADER because 
-// they should not be used anymore and will be removed soon
+// they should not be used anymore
 
 LIB "freegb.lib"; //for letterplace rings
 LIB "general.lib";//for sorting mistletoes
@@ -953,10 +954,12 @@ example
   ring r = 0,(x,y,z),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; //sets basering to Letterplace ring
-  intvec u = 1,1,2; intvec v = 2,1,3; intvec w = 3,1,1;
   // u = x^2y, v = yxz, w = zx^2 in intvec representation
+  intvec u = 1,1,2; 
   iv2lp(u); // invokes the procedure and returns the corresponding poly
+  intvec v = 2,1,3; 
   iv2lp(v);
+  intvec w = 3,1,1;
   iv2lp(w);
 }
 
@@ -1050,7 +1053,7 @@ example
 proc lp2iv(poly p)
 "USAGE: lp2iv(p); p a poly (deprecated, will be removed soon)
 RETURN: intvec
-PURPOSE:Transforming a monomial into the corresponding intvec
+PURPOSE: Transforming a monomial into the corresponding intvec
 ASSUME: - basering has to be a Letterplace ring
 NOTE:   - Assumptions will not be checked!
 EXAMPLE: example lp2iv; shows examples
@@ -1072,7 +1075,6 @@ EXAMPLE: example lp2iv; shows examples
     else { if (lep[i] > 1) {ERROR("monomial has a not allowed multidegree");}}
   }
   if (I[1] == 0) {ERROR("monomial has a not allowed multidegree");}
-
   return(I);
 }
 example
@@ -1081,11 +1083,10 @@ example
   ring r = 0,(x,y,z),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  poly p = x*x*z; poly q = y*y*x*x;
-  poly w= z*y*x*z*z;
-  // p,q,w are some polynomials we want to transform into their
-  // intvec representation
-  lp2iv(p); lp2iv(q); lp2iv(w);
+  poly p = x*x*z; 
+  lp2iv(p); // transforms p into the intvec representation
+  lp2iv(y*y*x*x);
+  lp2iv(z*y*x*z*z);  
 }
 
 proc lp2ivId(ideal G)
@@ -1122,13 +1123,13 @@ example
   ring r = 0,(x,y,z),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  poly p = x*x*z; poly q = y*y*x*x;
+  poly p = x*x*z; 
+  poly q = y*y*x*x;
   poly w = z*y*x*z;
   // p,q,w are some polynomials we want to transform into their
   // intvec representation
   ideal G = p,q,w;
-  // define the ideal containing p,q and w
-  lp2ivId(G); // and return the list of intmats for this ideal
+  lp2ivId(G); // returns the list of intmats for this ideal
 }
 
 // -----------------main procedures----------------------
@@ -2001,8 +2002,8 @@ PURPOSE: Compute the truncated Hilbert series of K<X>/<G> up to a degree bound
 ASSUME: - basering is a Letterplace ring.
 @*      - if you specify a different degree bound degbound,
 @*        degbound <= attrib(basering,uptodeg) holds.
-THEORY: Hilbert series of an algebra K<X>/<G> is @code{\sum_{i=0} h_i t^i},
-where @code{h_i} is the K-dimension of the space of monomials of degree i,
+THEORY: Hilbert series of an algebra K<X>/<G> is sum h_i t^i,
+where h_i is the K-dimension of the space of monomials of degree i,
 not contained in <G>. For finitely presented algebras Hilbert series NEED
 NOT be a rational function, though it happens often. Therefore in general
 there is no notion of a Hilbert polynomial.
@@ -2011,7 +2012,7 @@ NOTE: - If degbound is set, there will be a degree bound added. 0 means no
 @*    - n is the number of variables, which can be set to a different number.
 @*      Default: attrib(basering, lV).
 @*    - In the output intvec I, I[k] is the (k-1)-th coefficient of the Hilbert
-@*      series, i.e. @code{h_{k-1}} as above.
+@*      series, i.e. h_(k-1) as above.
 EXAMPLE: example lpHilbert; shows examples
 SEE ALSO: ncHilb_lib
 "

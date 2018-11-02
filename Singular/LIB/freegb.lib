@@ -2756,7 +2756,7 @@ PURPOSE: compute a two-sided division with remainder of p wrt G; two-sided nonco
 ASSUME: G = {g1,...,gN} is a Groebner basis, the original ring of the Letterplace ring has the name 'r' and no variable is called 'tag_i' for i in 1...N
 RETURN: list L
 NOTE: - L[1] is NF(p,I)
-      - L[2] is the list of expressions [i,l_{ij},r_{ij}] with \sum_{i,j} l_{ij} g_i r_{ij} = p - NF(p,I)
+      - L[2] is the list of expressions [i,l_(ij),r_(ij)] with \sum_(i,j) l_(ij) g_i r_(ij) = p - NF(p,I)
       - procedure lpGBPres2Poly, applied to L, reconstructs p
 EXAMPLE: example lpDivision; shows examples
 "
@@ -2841,7 +2841,7 @@ proc lpGBPres2Poly(list L, ideal I)
 "USAGE: lpGBPres2Poly(p,G); poly p, ideal G
 ASSUME: L is a valid Groebner presentation like the result of lpDivision
 RETURN: poly
-NOTE: assembles p = \sum_{i,j} l_{ij} g_i r_{ij} + NF(p,I) = \sum_{i} L[2][i][2] I[L[2][i][1]] L[2][i][3] + L[1]
+NOTE: assembles p = \sum_(i,j) l_(ij) g_i r_(ij) + NF(p,I) = \sum_(i) L[2][i][2] I[L[2][i][1]] L[2][i][3] + L[1]
 EXAMPLE: example lpGBPres2Poly; shows examples
 "
 {

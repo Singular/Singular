@@ -180,22 +180,13 @@ $K$-algebra operations of the letterplace algebra and simultaneous shifting of p
 @node Example of use of Letterplace, Release notes, Letterplace correspondence,LETTERPLACE
 @subsection Example of use of @sc{Letterplace}
 
-The input monomials must be given in a letterplace notation (though we recommend to
-get used to the letterplace notation, the procedure @code{freeGBasis } from the @ref{freegb_lib}
-provides an alternative).
-
-We recommend first to define a commutative ring @math{K[X]} in @sc{Singular} and equip it with
-a degree well-ordering. Then, decide what should be the degree bound d and
-run the procedure @code{makeLetterplaceRing(d)}
-@c @code{freegbRing(d)}
-from the library @ref{freegb_lib}.
-This procedure creates a letterplace algebra with an ordering, induced from the given commutative ring @math{K[X]}.
-In this algebra, define an ideal @code{I} as a list of polynomials in the letterplace encoding
-and run @code{std}.
-
-It is possible to convert the letterplace presentation of an ideal to a list of strings with the help of procedures @code{lp2lstr} and @code{lst2str} from the library @ref{freegb_lib}. This is shown in the second part of the example below.
-
-Yet another anternative is to use the procedure @code{freeGBasis} from @ref{freegb_lib} in order to use a different encoding for polynomials in free algebra. No conversion tools are needed in that case.
+First, define a commutative ring @math{K[X]} in @sc{Singular} and equip it with
+a degree well-ordering. Then, decide what should be the degree bound @math{d} and
+run the procedure @code{makeLetterplaceRing(d)} from the library @ref{freegb_lib}.
+This procedure creates a Letterplace ring with an ordering, induced from the given commutative ring @math{K[X]}.
+In this @math{K}-algebra, define an ideal @code{I} as a list of polynomials in the 
+free algebra (x*y and y*x are different) and run @code{std}. The answer is a two-sided Groebner bases of
+the two-sided ideal @math{I}.
 
 We illustrate the approach with the following example:
 
@@ -212,6 +203,7 @@ J;
 @end smallexample
 
 There are various conversion routines in the library @code{freegb_lib} (see @ref{freegb_lib}).
+Many algebras are predefined in the library @code{fpalgebras_lib} (see @ref{fpalgebras_lib}).
 We work further on implementing more algorithms for non-commutative ideals and modules over free associative algebra.
 
 @c ---------------------------------------------------------------------------
@@ -246,7 +238,6 @@ Further functionality is provided in the libraries for the @sc{Letterpace} subsy
 In the @ref{freegb_lib} one finds e.g. letterplace arithmetics procedures, conversion tools,
 procedures for creating some common ideals of relations as well as the normal form
 procedure, providing effective ideal membership test.
-
 
 The @ref{fpadim_lib} contains procedures for computations with vector space basis
 of a factor algebra including finiteness check and dimension computation.
