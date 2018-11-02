@@ -2001,8 +2001,8 @@ PURPOSE: Compute the truncated Hilbert series of K<X>/<G> up to a degree bound
 ASSUME: - basering is a Letterplace ring.
 @*      - if you specify a different degree bound degbound,
 @*        degbound <= attrib(basering,uptodeg) holds.
-THEORY: Hilbert series of an algebra K<X>/<G> is @code{\sum_{i=0} h_i t^i},
-where @code{h_i} is the K-dimension of the space of monomials of degree i,
+THEORY: Hilbert series of an algebra K<X>/<G> is sum h_i t^i,
+where h_i is the K-dimension of the space of monomials of degree i,
 not contained in <G>. For finitely presented algebras Hilbert series NEED
 NOT be a rational function, though it happens often. Therefore in general
 there is no notion of a Hilbert polynomial.
@@ -2011,7 +2011,7 @@ NOTE: - If degbound is set, there will be a degree bound added. 0 means no
 @*    - n is the number of variables, which can be set to a different number.
 @*      Default: attrib(basering, lV).
 @*    - In the output intvec I, I[k] is the (k-1)-th coefficient of the Hilbert
-@*      series, i.e. @code{h_{k-1}} as above.
+@*      series, i.e. h_(k-1) as above.
 EXAMPLE: example lpHilbert; shows examples
 SEE ALSO: ncHilb_lib
 "
