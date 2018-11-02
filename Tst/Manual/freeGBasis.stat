@@ -1,4 +1,4 @@
-1 >> tst_memory_0 :: 1541005131:4113, 64 bit:4.1.1:x86_64-Darwin:161-029.eduroam.rwth-aachen.de:931736
-1 >> tst_memory_1 :: 1541005131:4113, 64 bit:4.1.1:x86_64-Darwin:161-029.eduroam.rwth-aachen.de:2097168
-1 >> tst_memory_2 :: 1541005131:4113, 64 bit:4.1.1:x86_64-Darwin:161-029.eduroam.rwth-aachen.de:2121872
-1 >> tst_timer_1 :: 1541005131:4113, 64 bit:4.1.1:x86_64-Darwin:161-029.eduroam.rwth-aachen.de:78
+1 >> tst_memory_0 :: 1541167540:4113, 64 bit:4.1.1:x86_64-Linux:megrez:509016
+1 >> tst_memory_1 :: 1541167540:4113, 64 bit:4.1.1:x86_64-Linux:megrez:2215936
+1 >> tst_memory_2 :: 1541167540:4113, 64 bit:4.1.1:x86_64-Linux:megrez:2215936
+1 >> tst_timer_1 :: 1541167540:4113, 64 bit:4.1.1:x86_64-Linux:megrez:8
