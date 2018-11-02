@@ -930,6 +930,9 @@ example
   lpGkDim(I);
   I = x*y, x*z, z*y, z*z;//gkDim = 2
   lpGkDim(I);
+  ideal G = y*x - x*y, z*x - x*z, z*y - y*z; G = std(G); 
+  G;
+  lpGkDim(G); // 3, as expected for K[x,y,z]
 }
 
 proc lpGlDimBound(ideal G)
@@ -1020,9 +1023,10 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  ideal G = x*x, y*y,x*y*x; // ideal G contains a
-  //Groebner basis
-  lpGlDimBound(G); // invokes procedure with Groebner basis G
+  ideal G = x*x, y*y,x*y*x; // it is a monomial Groebner basis
+  lpGlDimBound(G); 
+  ideal H = y*x - x*y; H = std(H); // H is a Groebner basis
+  lpGlDimBound(H); // gl dim of K[x,y] is 2, as expected
 }
 
 static proc imHasLoops(intmat A) {

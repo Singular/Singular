@@ -169,22 +169,22 @@ proc rcolon(ideal I, poly W)
 "USAGE:  rcolon(I,w); ideal I, poly w
 RETURNS: ideal
 ASSUME: - basering is a Letterplace ring
-- W is a monomial
 - I is a monomial ideal
+- w is a monomial
 PURPOSE: compute a right colon ideal of I by a monomial w
 NOTE: Output is the set of generators, which should be added to I
 EXAMPLE: example rcolon; shows an example"
 {
-        int lV =  attrib(R,"isLetterplaceRing"); //nvars(save);
-        if (lV == 0)
-        {
+    int lV =  attrib(R,"isLetterplaceRing"); //nvars(save);
+    if (lV == 0)
+    {
       ERROR("Basering must be a Letterplace ring");
-        }
+    }
     poly wc = leadmonom(W);
-        ideal II = lead(I);
+    ideal II = lead(I);
     ideal J = system("rcolon", II, wc, lV);
     // VL: printlevel here? before only printing was there, no output
-        return(J);
+    return(J);
  }
 example
 {
@@ -198,8 +198,9 @@ example
 }
 
 /*
+original version of the proc 
 proc nchilb(list L_wp, int d, list #)
-"USAGE: fpahilb(I, d[, L]), ideal I, int d, optional list L
+"USAGE: nchilb(I, d[, L]), list I, int d, optional list L
 PURPOSE: compute Hilbert series of a non-commutative algebra
 ASSUME:
 NOTE: d is an integer for the degree bound (maximal total degree of
@@ -422,7 +423,7 @@ example
 */
 
 /*
-// orig version of the procedure
+// original version of the procedure
 proc rcolon(list L_wp, module W, int d)
 "USAGE:  rcolon(list of relations, a monomial, an integer);
          L is a list of modules (each module represents a monomial),
