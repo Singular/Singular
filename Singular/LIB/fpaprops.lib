@@ -29,8 +29,7 @@ PROCEDURES:
   lpGlDimBound(<GB>);     compute an upper bound for the global dimension of A/<GB>
   lpSubstitute();         substitute a variable with polynomials (ring homomorphism)
   lpUfGraph(<GB>);        constructs the Ufnarovskij graph for <LM(GB)>
-  lpCalcSubstDegBound();  utility for lpSubstitute
-  lpCalcSubstDegBounds(); utility for lpSubstitute
+  lpCalcSubstDegBound(); utility for lpSubstitute
 ";
 
 LIB "fpadim.lib";
@@ -47,6 +46,7 @@ proc tstfpaprops()
     example lpGlDimBound;
     example lpSubstitute;
     example lpUfGraph;
+	example lpCalcSubstDegBound;
 };
 
 
@@ -1105,19 +1105,6 @@ static proc contains(list L, def item)
   return (0);
 }
 
-/*proc lpSubstituteExpandRing(poly f, list s1, list s2) {*/
-/*int minDegBound = lpCalcSubstDegBound(f,s1,s2);*/
-/**/
-/*def R = basering; // curr lp ring*/
-/*setring ORIGINALRING; // non lp ring TODO*/
-/*def R1 = makeLetterplaceRing(minDegBound);*/
-/*setring R1;*/
-/**/
-/*poly g = lpSubstitute(imap(R,f), imap(R,s1), imap(R,s2));*/
-/**/
-/*return (R1); // return the new ring*/
-/*}*/
-
 proc lpSubstitute(poly f, ideal s1, ideal s2, list #)
 "USAGE: lpSubstitute(f,s1,s2[,G]); f poly, s1 list (ideal) of variables
   to replace, s2 list (ideal) of polynomials to replace with, G optional ideal to
@@ -1173,7 +1160,6 @@ EXAMPLE: example lpSubstitute; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-  //////// EXAMPLE A ////////
   ring r = 0,(x,y,z),dp;
   def R = makeLetterplaceRing(4);
   setring R;
@@ -1182,7 +1168,7 @@ example
   ideal s1 = x, y;
   ideal s2 = y*z*z, x; // i.e. x --> yzz and y --> x
   // the substitution probably needs a higher degbound
-  int minDegBound = lpCalcSubstDegBounds(f,s1,s2);
+  int minDegBound = lpCalcSubstDegBound(f,s1,s2);
   minDegBound; // thus the bound needs to be increased
   setring r; // back to original r
   def R1 = makeLetterplaceRing(minDegBound);
@@ -1207,7 +1193,7 @@ example
   ideal s1 = x, y;
   ideal s2 = y*z*z, x;
 
-  int minDegBound = lpCalcSubstDegBounds(I,s1,s2);
+  int minDegBound = lpCalcSubstDegBound(I,s1,s2);
   setring r;
   def R1 = makeLetterplaceRing(minDegBound);
   setring R1;
@@ -1239,12 +1225,12 @@ static proc ivIndexOf(list L, intvec iv) {
 }
 
 
-proc lpCalcSubstDegBound(poly f, ideal s1, ideal s2)
-"USAGE: lpCalcSubstDegBound(f,s1,s2); f letterplace polynomial, s1 list (ideal) of variables
+static proc lpCalcSubstDegBoundSingle(poly f, ideal s1, ideal s2)
+"USAGE: lpCalcSubstDegBoundSingle(f,s1,s2); f letterplace polynomial, s1 list (ideal) of variables
   to replace, s2 list (ideal) of polynomials to replace with
 RETURN: int, the min degbound required to perform the substitution
 ASSUME: - basering is a Letterplace ring
-EXAMPLE: example lpSubstitute; shows examples
+EXAMPLE: example lpCalcSubstDegBoundSingle; shows examples
 "
 {
   int maxDegBound = 0;
@@ -1278,21 +1264,20 @@ EXAMPLE: example lpSubstitute; shows examples
 }
 example
 {
-  // see lpSubstitute()
+  // see lpCalcSubstDegBound()
 }
 
-proc lpCalcSubstDegBounds(ideal I, ideal s1, ideal s2)
-"USAGE: lpCalcSubstDegBounds(I,s1,s2); I list (ideal) of letterplace polynomials, s1 list (ideal)
-  of variables to replace, s2 list (ideal) of polynomials to replace with
+proc lpCalcSubstDegBound(ideal I, ideal s1, ideal s2)
+"USAGE: lpCalcSubstDegBound(I,s1,s2); I ideal of polynomials, s1 ideal of variables to replace, s2 ideal of polynomials to replace with
 RETURN: int, the min degbound required to perform all of the substitutions
 ASSUME: - basering is a Letterplace ring
-EXAMPLE: example lpSubstitute; shows examples
+EXAMPLE: example lpCalcSubstDegBound; shows examples
 NOTE: convenience method
 "
 {
   int maxDegBound = 0;
   for (int i = 1; i <= size(I); i++) {
-    int tmpDegBound = lpCalcSubstDegBound(I[i], s1, s2, #);
+    int tmpDegBound = lpCalcSubstDegBoundSingle(I[i], s1, s2, #);
     if (tmpDegBound > maxDegBound) {
       maxDegBound = tmpDegBound;
     }
@@ -1302,7 +1287,16 @@ NOTE: convenience method
 }
 example
 {
-  // see lpSubstitute()
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  def R = makeLetterplaceRing(4);
+  setring R;
+  ideal I = 3*x*x+y*x, x*y*x - z;
+  ideal s1 = x, y; // z --> z
+  ideal s2 = y*z*z, x; // i.e. x --> yzz and y --> x
+  // the substitution probably needs a higher degbound
+  lpCalcSubstDegBound(I,s1,s2);
+  lpCalcSubstDegBound(I[1],s1,s2);
 }
 
 static proc isSF(intvec S, intvec I)
