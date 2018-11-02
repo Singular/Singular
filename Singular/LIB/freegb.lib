@@ -3080,8 +3080,8 @@ proc isOrderingShiftInvariant(int withHoles)
   if (withHoles) {
     monomials = delete(lpMonomialsWithHoles(d-1), 1); // ignore the first element (1)
   } else {
-    monomials = maxideal(0);
-    for (int i = 1; i <= d-1; i++) {
+    monomials = maxideal(1);
+    for (int i = 2; i <= d-1; i++) {
       monomials = monomials, maxideal(i);
     } kill i;
   }
