@@ -3094,7 +3094,9 @@ proc isOrderingShiftInvariant(int withHoles)
         poly first = shiftPoly(monom,s2);
         poly second = shiftPoly(monom,s);
         if (!(first > second)) {
-          dbprint(string(first) + " <= " + string(second));
+          if (printlevel >= voice) { // otherwise string() is always evaluated
+            dbprint(string(first) + " <= " + string(second));
+          }
           shiftInvariant = 0;
         }
         kill first; kill second;
@@ -3123,7 +3125,7 @@ example
   attrib(RL,"maxExp",1);
   def Rw = setLetterplaceAttributes(ring(RL),5,3);
   setring Rw;
-  printlevel = voice + 1;
+  /* printlevel = voice + 1; */
   isOrderingShiftInvariant(0);
   isOrderingShiftInvariant(1);
 }
