@@ -2002,7 +2002,7 @@ PURPOSE: Compute the truncated Hilbert series of K<X>/<G> up to a degree bound
 ASSUME: - basering is a Letterplace ring.
 @*      - if you specify a different degree bound degbound,
 @*        degbound <= attrib(basering,uptodeg) holds.
-THEORY: Hilbert series of an algebra K<X>/<G> is sum h_i t^i,
+THEORY: Hilbert series of an algebra K<X>/<G> is sum_(i>=0) h_i t^i,
 where h_i is the K-dimension of the space of monomials of degree i,
 not contained in <G>. For finitely presented algebras Hilbert series NEED
 NOT be a rational function, though it happens often. Therefore in general
@@ -2213,7 +2213,7 @@ example
 proc lpSickleDim(ideal G, list #)
 "USAGE: lpSickleDim(G[,degbound,n]); G an ideal, degbound, n optional integers
 RETURN: list
-PURPOSE:Compute the K-dimension and the mistletoes
+PURPOSE:Compute the K-dimension and the mistletoes of K<X>/<G>
 ASSUME: - basering is a Letterplace ring.
 @*      - if you specify a different degree bound degbound,
 @*        degbound <= attrib(basering,uptodeg) holds.
@@ -2241,11 +2241,10 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  ideal G = x*x, y*y,x*y*x; // ideal G contains a
-  //Groebner basis
+  ideal G = x*x, y*y,x*y*x; // G is a monomial Groebner basis
   lpSickleDim(G); // invokes the procedure with ring parameters
-  // the factor algebra is finite, so the degree bound given by the Letterplace
-  // ring is not necessary
+  // the factor algebra is finite, so the degree bound, given 
+  // by the Letterplace ring is not necessary
   lpSickleDim(G,0); // procedure without any degree bound
 }
 
@@ -2355,15 +2354,15 @@ example
 }
 
 proc lpMonomialBasis(int d, int donly, ideal J)
-  "USAGE: lpMonomialBasis(d, donly, J); d, donly integers, J an ideal
-  RETURN: ideal
-  PURPOSE: computes a list of free monomials in a Letterplace
-  @*       basering R of degree at most d and not contained in <LM(J)>
-  @*       if donly <> 0, only monomials of degree d are returned
-  ASSUME: - basering is a Letterplace ring.
-  @*      - d <= attrib(basering,uptodeg) holds.
-  @*      - J is a Groebner basis
-  "
+"USAGE: lpMonomialBasis(d, donly, J); d, donly integers, J an ideal
+RETURN: ideal
+PURPOSE: computes a list of free monomials in a Letterplace
+@*       basering R of degree at most d and not contained in <LM(J)>
+@*       if donly <> 0, only monomials of degree d are returned
+ASSUME: - basering is a Letterplace ring.
+@*      - d <= attrib(basering,uptodeg) holds.
+@*      - J is a Groebner basis
+"
 {
   int nv = attrib(basering,"uptodeg");
   if ((d>nv) || (d<0) )
@@ -2445,9 +2444,13 @@ example
   option(redSB); option(redTail);
   J = letplaceGBasis(J);
   J;
+  //monomials of degree 2 only in K<x,y>:
   lpMonomialBasis(2,1,ideal(0));
+  //monomials of degree <=2 in K<x,y>
   lpMonomialBasis(2,0,ideal(0));
+  //monomials of degree 3 only in K<x,y>/J
   lpMonomialBasis(3,1,J);
+  //monomials of degree <=3 in K<x,y>/J
   lpMonomialBasis(3,0,J);
 }
 
