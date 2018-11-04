@@ -7,6 +7,7 @@ LIBRARY:   ffmodstd.lib  Groebner bases of ideals in polynomial rings
 AUTHORS:   D.K. Boku       boku@mathematik.uni-kl.de
            W. Decker       decker@mathematik.uni-kl.dei
            C. Fieker       fieker@mathematik.uni-kl.de
+           A. Steenpass    steenpass@mathematik.uni-kl.de
 
 OVERVIEW:
   A library for computing a Groebner basis of an ideal in a polynomial
@@ -1833,7 +1834,7 @@ EXAMPLE: example ffmodStd; shows an example
         else
         {
             print("FAIL");
-            if(GF[3] < d){ GF[3] = d;}
+            if(GF[3] < evbd){ GF[3] = evbd;}
             return(ffmodStdOne(I, GF[3]+3));
         }
     }
@@ -1952,7 +1953,7 @@ EXAMPLE: example ffmodStd; shows an example
     else
     {
         print("FAIL");
-        if(rJ[2] < in_value){ rJ[2] = in_value;}
+        if(rJ[2] < invalue){ rJ[2] = invalue;}
         return(ffmodStd(I, rJ[2]+3));
     }
 }
