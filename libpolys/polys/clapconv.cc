@@ -88,14 +88,14 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
   int e, n = rVar(r);
   BOOLEAN setChar=TRUE;
 
-  p=pReverse(p);
+//  p=pReverse(p);
   poly op=p;
   while ( p!=NULL )
   {
     CanonicalForm term=r->cf->convSingNFactoryN(pGetCoeff( p ),setChar, r->cf);
     if (errorreported) break;
     setChar=FALSE;
-    for ( int i = n; i >0; i-- )
+    for ( int i = 1; i <=n; i++ )
     {
       if ( (e = p_GetExp( p, i, r)) != 0 )
         term *= CanonicalForm( Variable( i ), e );
@@ -103,7 +103,7 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
     result += term;
     pIter( p );
  }
- op=pReverse(op);
+// op=pReverse(op);
  return result;
 }
 
