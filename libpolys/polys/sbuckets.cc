@@ -355,7 +355,9 @@ poly sBucketSortMerge(poly p, const ring r)
 
   p_Test(pn, r);
   assume(l_dummy == pLength(pn));
+#ifndef SING_NDEBUG
   assume(l_in == l_dummy);
+#endif
   return pn;
 }
 
