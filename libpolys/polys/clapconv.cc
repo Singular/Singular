@@ -127,7 +127,7 @@ CanonicalForm convSingAPFactoryAP ( poly p , const Variable & a, const ring r)
     for ( int i = 1; i <= n; i++ )
     {
       if ( (e = p_GetExp( p, i, r )) != 0 )
-        term *= power( Variable( i + off), e );
+        term *= CanonicalForm( Variable( i + off), e );
     }
     result += term;
     pIter( p );
