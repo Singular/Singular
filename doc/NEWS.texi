@@ -40,12 +40,14 @@ Changes in the kernel/build system:
 @itemize
 @item improved reading of long polynomials
 @item improved groebner bases over Z coefficients
-@item improved free algebras (letterplace rings)
+@item code for free algebras (letterplace rings) rewritten
+(using now the standrad @code{+,-,*,^,std},...)
 @item pseudo type @code{polyBucket}
 @item new type @code{smatrix}: sparse matrix (experimental) (@nref{smatrix}).
 @item extended @code{coef} to ideals (@nref{coef}).
 @item error and signal handling in @code{libSingular} (@nref{libSingular}).
 @item updated gfanlib to version 0.6.2
+@item port to NTL 11 (needs C++11: gcc6 or -std=c++11), which does not conflict with polymake (needs C++14)
 @end itemize
 
 @heading News for version 4-1-1
