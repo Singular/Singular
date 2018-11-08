@@ -1567,7 +1567,8 @@ static proc sortMons(list BL){
   // translate back to R:
   setring R;
 
-  map g = S, T(nvars(basering)..1);
+  ideal mi=maxideal(1);
+  map g = S, mi[nvars(basering)..1];
   MON = g(MONS);
 
   return(MON);
