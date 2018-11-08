@@ -2104,7 +2104,10 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
           {
             nok=iiConvert(ht,etyp,j,hh,&t);
             hh->next=t.next;
-            if (nok) break;
+            if (nok)
+            { Werror("can not convert %s(%s) -> %s",Tok2Cmdname(ht),hh->Name(),Tok2Cmdname(etyp));
+               break;
+            }
             lm->m[i]=(poly)t.CopyD(etyp);
             pNormalize(lm->m[i]);
             if (module_assign) rk=si_max(rk,(int)pMaxComp(lm->m[i]));
@@ -2115,7 +2118,10 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
           {
             nok=iiConvert(ht,mtyp,j,hh,&t);
             hh->next=t.next;
-            if (nok) break;
+            if (nok)
+            { Werror("can not convert %s(%s) -> %s",Tok2Cmdname(ht),hh->Name(),Tok2Cmdname(mtyp));
+               break;
+            }
             rm = (matrix)t.CopyD(mtyp);
             if (module_assign)
             {
@@ -2135,6 +2141,9 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
           else
           {
             nok=TRUE;
+            if (nok)
+            { Werror("can not convert %s(%s) -> %s",Tok2Cmdname(ht),hh->Name(),Tok2Cmdname(mtyp));
+            }
             break;
           }
           t.next=NULL;t.CleanUp();
