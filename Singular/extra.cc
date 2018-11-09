@@ -1208,6 +1208,40 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
+  /*==================== divide-test for freeGB  =================*/
+  #ifdef HAVE_SHIFTBBA
+    if (strcmp(sys_cmd, "lpdivides") == 0)
+    {
+      const short t[]={2,POLY_CMD,POLY_CMD};
+      if (iiCheckTypes(h,t,1))
+      {
+        poly p=(poly)h->CopyD();
+        poly q=(poly)h->next->CopyD();
+        res->rtyp = INT_CMD;
+        res->data = (void*)(long)p_LPDivisibleBy(p, q, currRing);
+        return FALSE;
+      }
+      else return TRUE;
+    }
+    else
+  #endif
+  /*==================== get var for freeGB  ====================*/
+  #ifdef HAVE_SHIFTBBA
+    if (strcmp(sys_cmd, "lpVarAt") == 0)
+    {
+      const short t[]={2,POLY_CMD,INT_CMD};
+      if (iiCheckTypes(h,t,1))
+      {
+        poly p=(poly)h->CopyD();
+        int pos=(int)((long)(h->next->Data()));
+        res->rtyp = POLY_CMD;
+        res->data = p_LPVarAt(p, pos, currRing);
+        return FALSE;
+      }
+      else return TRUE;
+    }
+    else
+  #endif
   /*==================== pcv ==================================*/
   #ifdef HAVE_PCV
     if(strcmp(sys_cmd,"pcvLAddL")==0)

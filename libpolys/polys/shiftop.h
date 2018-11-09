@@ -47,6 +47,12 @@ int p_mIsInV(poly p, const ring r);
 #define pIsInV(p) p_IsInV(p, currRing)
 #define pmIsInV(p) p_mIsInV(p, currRing)
 
+BOOLEAN p_LPDivisibleBy(poly a, poly b, const ring r);
+BOOLEAN p_LPLmDivisibleBy(poly a, poly b, const ring r);
+BOOLEAN _p_LPLmDivisibleByNoComp(poly a, poly b, const ring r);
+
+poly p_LPVarAt(poly p, int pos, const ring r);
+
 ring freeAlgebra(ring r, int d);
 #endif
 #endif
