@@ -779,14 +779,9 @@ static BOOLEAN nfCoeffIsEqual(const coeffs, n_coeffType, void*);
 static void nfKillChar(coeffs r)
 {
   char** p = (char**)n_ParameterNames(r);
-
-  const int P = n_NumberOfParameters(r);
-
-  for( int i = 1; i <= P; i++ )
-    if (p[i-1] != NULL)
-      omFree( (ADDRESS)p[i-1] );
-
-  omFreeSize((ADDRESS)p, P * sizeof(char*));
+  /* only one parameter */
+  omFree( (ADDRESS)p[0] );
+  omFreeSize((ADDRESS)p, sizeof(char*));
 }
 
 static char* nfCoeffString(const coeffs r)
@@ -910,16 +905,12 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   r->iNumberOfParameters = 1;
   r->cfParameter = nfParameter;
 
-  char ** pParameterNames = (char **) omAlloc0(sizeof(char *));
-  pParameterNames[0] = omStrDup(name); //TODO use omAlloc for allocating memory and use strcpy?
-
+  char ** pParameterNames = (char **) omAlloc(sizeof(char *));
   assume( pParameterNames != NULL );
+  pParameterNames[0] = omStrDup(name);
   assume( pParameterNames[0] != NULL );
 
   r->pParameterNames = (const char**)pParameterNames;
-  // NOTE: r->m_nfParameter was replaced by n_ParameterNames(r)[0]
-
-  // TODO: nfKillChar MUST destroy r->pParameterNames[0] (0-term. string) && r->pParameterNames (array of size 1)
 
   r->m_nfPlus1Table= NULL;
 
@@ -966,6 +957,5 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   assume( r->m_nfPlus1Table != NULL );
 
   return FALSE;
-
 }
 
