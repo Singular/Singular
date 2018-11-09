@@ -9,6 +9,7 @@
 #include "misc/auxiliary.h"
 
 #ifdef HAVE_RINGS
+#include "coeffs/coeffs.h"
 
 #if SI_INTEGER_VARIANT == 3
 #define SR_HDL(A) ((long)(A))

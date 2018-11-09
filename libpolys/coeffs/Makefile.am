@@ -42,3 +42,5 @@ check_PROGRAMS = $(TESTS)
 
 test_SOURCES = test.cc
 test_LDADD   = libcoeffs.la $(libcoeffs_la_LIBADD)
+
+EXTRA_DIST = rintegers2.cc rinteger3.cc
