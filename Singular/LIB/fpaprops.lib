@@ -2,32 +2,54 @@
 version="version fpaprops.lib 4.1.1.4 Oct_2018 "; // $Id$
 category="Noncommutative";
 info="
-LIBRARY: fpaprops.lib   Algorithms for the properties of quotient algebras in the letterplace case
+LIBRARY: fpaprops.lib   Algorithmic ring-theoretic properties of finitely presented algebras (Letterplace)
 AUTHORS: Karim Abou Zeid,       karim.abou.zeid at rwth-aachen.de
 
 Support: Project II.6 in the transregional collaborative research centre
 SFB-TRR 195 'Symbolic Tools in Mathematics and their Application' of the German DFG
 
 OVERVIEW:
-Algorithms for computing various properties of quotient algebras in the letterplace case.
+In this library, algorithms for computing various ring-theoretic properties of
+finitely presented algebras are implemented.
+Applicability: Letterplace rings.
 
 REFERENCES:
 Huishi Li: Groebner bases in ring theory. World Scientific, 2010.
+
+KEYWORDS: finitely presented algebra; ring theory; Letterplace Groebner basis; 
+growth of algebra; Gelfand-Kirillov dimension; global homological dimension; semi-prime ideal; Ufnarovski graph
 
 SEE ALSO:  fpadim_lib, freegb_lib
 
 PROCEDURES:
   lpNoetherian(<GB>);     check whether A/<LM(GB)> is (left/right) Noetherian
-  lpIsSemiPrime(<GB>);    check whether A/<LM(GB)> is semi prime
+  lpIsSemiPrime(<GB>);    check whether A/<LM(GB)> is semi-prime
   lpIsPrime(<GB>);        check whether A/<LM(GB)> is prime
   lpGkDim(<GB>);          compute the Gelfand Kirillov dimension of A/<GB>
   lpGlDimBound(<GB>);     compute an upper bound for the global dimension of A/<GB>
-  lpSubstitute();         substitute variable with polynomials
-  lpCalcSubstDegBound();  utility for lpSubstitute
-  lpCalcSubstDegBounds(); utility for lpSubstitute
+  lpSubstitute();         substitute a variable with polynomials (ring homomorphism)
+  lpUfGraph(<GB>);        constructs the Ufnarovskij graph for <LM(GB)>
+  lpCalcSubstDegBound(); utility for lpSubstitute
 ";
 
 LIB "fpadim.lib";
+
+/* very fast and cheap test of consistency and functionality
+  DO NOT make it static !
+  after adding the new proc, add it here */
+proc tstfpaprops()
+{
+    example lpNoetherian;
+    example lpIsSemiPrime;
+    example lpIsPrime;
+    example lpGkDim;
+    example lpGlDimBound;
+    example lpSubstitute;
+    example lpUfGraph;
+	example lpCalcSubstDegBound;
+};
+
+
 ////////////////////////////////////////////////////////////////////
 proc lpNoetherian(ideal G)
 "USAGE: lpNoetherian(G); G an ideal in a Letterplace ring
@@ -254,15 +276,19 @@ static proc inOutCommingEdgesInCycles(intmat G, int v, intvec visited, intvec pa
 proc lpIsSemiPrime(ideal G)
 "USAGE: lpIsSemiPrime(G); G an ideal in a Letterplace ring
 RETURN: boolean
-PURPOSE: Check whether A/<LM(G)> is semi prime, that is when p * (A/<LM(G)>) * p != 0 for all p in (A/<LM(G)> - {0}).
+PURPOSE: Check whether A/<LM(G)> is semi-prime ring,
+alternatively whether <LM(G)> is a semi-prime ideal in A.
 ASSUME: - basering is a Letterplace ring
       - G is a Groebner basis
-THEORY: lpIsSemiPrime works with the monomial algebra A/<LM(G)>.
+THEORY: A (two-sided) ideal I in the ring A is semi-prime, if for any a in A one has
+aAa subseteq I implies a in I.
+NOTE: lpIsSemiPrime works with the monomial algebra A/<LM(G)>.
 A positive answer holds for both A/<LM(G)> and A/<G>, while
 a negative answer applies only to A/<LM(G)> and not necessarily to
 A/<G>.
 "
 {
+    // old theory part: that is when p * (A/<LM(G)>) * p != 0 for all p in (A/<LM(G)> - {0}).
   G = lead(G);
   G = simplify(G, 2+4+8);
 
@@ -359,14 +385,18 @@ static proc isCyclicInUfGraph(intmat UG, list LV, intvec u)
 proc lpIsPrime(ideal G)
 "USAGE: lpIsPrime(G); G an ideal in a Letterplace ring
 RETURN: boolean
-PURPOSE: Check whether A/<LM(G)> is prime, that is when p1 * (A/<LM(G)>) * p2 != 0 for all p1, p2 in (A/<LM(G)> - {0}).
+PURPOSE: Check whether A/<LM(G)> is prime ring,
+alternatively whether <LM(G)> is a prime ideal in A.
 ASSUME: - basering is a Letterplace ring
       - G is a Groebner basis
-THEORY: lpIsPrime works with the monomial algebra A/<LM(G)>.
+THEORY: A (two-sided) ideal I in the ring A is prime, if for any a,b in A one has
+aAb subseteq I implies a in I or b in I.
+NOTE: lpIsPrime works with the monomial algebra A/<LM(G)>.
 A positive answer holds for both A/<LM(G)> and A/<G>, while
 a negative answer applies only to A/<LM(G)> and not necessarily to A/<G>.
 "
 {
+    // old theory part: that is when p1 * (A/<LM(G)>) * p2 != 0 for all p1, p2 in (A/<LM(G)> - {0}).
   G = lead(G);
   G = simplify(G, 2+4+8);
 
@@ -900,6 +930,9 @@ example
   lpGkDim(I);
   I = x*y, x*z, z*y, z*z;//gkDim = 2
   lpGkDim(I);
+  ideal G = y*x - x*y, z*x - x*z, z*y - y*z; G = std(G); 
+  G;
+  lpGkDim(G); // 3, as expected for K[x,y,z]
 }
 
 proc lpGlDimBound(ideal G)
@@ -990,9 +1023,10 @@ example
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  ideal G = x*x, y*y,x*y*x; // ideal G contains a
-  //Groebner basis
-  lpGlDimBound(G); // invokes procedure with Groebner basis G
+  ideal G = x*x, y*y,x*y*x; // it is a monomial Groebner basis
+  lpGlDimBound(G); 
+  ideal H = y*x - x*y; H = std(H); // H is a Groebner basis
+  lpGlDimBound(H); // gl dim of K[x,y] is 2, as expected
 }
 
 static proc imHasLoops(intmat A) {
@@ -1075,28 +1109,21 @@ static proc contains(list L, def item)
   return (0);
 }
 
-/*proc lpSubstituteExpandRing(poly f, list s1, list s2) {*/
-/*int minDegBound = lpCalcSubstDegBound(f,s1,s2);*/
-/**/
-/*def R = basering; // curr lp ring*/
-/*setring ORIGINALRING; // non lp ring TODO*/
-/*def R1 = makeLetterplaceRing(minDegBound);*/
-/*setring R1;*/
-/**/
-/*poly g = lpSubstitute(imap(R,f), imap(R,s1), imap(R,s2));*/
-/**/
-/*return (R1); // return the new ring*/
-/*}*/
-
 proc lpSubstitute(poly f, ideal s1, ideal s2, list #)
-"USAGE: lpSubstitute(f,s1,s2[,G]); f letterplace polynomial, s1 list (ideal) of variables
+"USAGE: lpSubstitute(f,s1,s2[,G]); f poly, s1 list (ideal) of variables
   to replace, s2 list (ideal) of polynomials to replace with, G optional ideal to
   reduce with.
 RETURN: poly, the substituted polynomial
 ASSUME: - basering is a Letterplace ring
-      - G is a groebner basis,
-      - the current ring has a sufficient degbound (can be calculated with
-      lpCalcSubstDegBound())
+      - s1 contains a subset of the set of variables
+      - s2 and s1 are of the same size
+      - G is a Groebner basis,
+      - the current ring has a sufficient degbound (which also can be calculated with lpCalcSubstDegBound())
+NOTE: the procedure implements the image of a polynomial f
+under an endomorphism of a free algebra, defined by s1 and s2:
+variables, not present in s1, are left unchanged;
+variable s1[k] is mapped to a polynomial s2[k].
+- An optional ideal G extends the endomorphism as above to the morphism into the factor algebra K<X>/G.
 EXAMPLE: example lpSubstitute; shows examples
 "
 {
@@ -1137,26 +1164,27 @@ EXAMPLE: example lpSubstitute; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-  //////// EXAMPLE A ////////
   ring r = 0,(x,y,z),dp;
   def R = makeLetterplaceRing(4);
   setring R;
-
   ideal G = x*y; // optional
-
   poly f = 3*x*x+y*x;
   ideal s1 = x, y;
-  ideal s2 = y*z*z, x;
-
+  ideal s2 = y*z*z, x; // i.e. x --> yzz and y --> x
   // the substitution probably needs a higher degbound
-  int minDegBound = lpCalcSubstDegBounds(f,s1,s2);
-  setring r;
+  int minDegBound = lpCalcSubstDegBound(f,s1,s2);
+  minDegBound; // thus the bound needs to be increased
+  setring r; // back to original r
   def R1 = makeLetterplaceRing(minDegBound);
   setring R1;
-
-  // the last parameter is optional
+  lpSubstitute(imap(R,f), imap(R,s1), imap(R,s2));
+  // the last parameter is optional; above it was G=<xy>
+  // the output will be reduced with respect to G
   lpSubstitute(imap(R,f), imap(R,s1), imap(R,s2), imap(R,G));
+}
 
+// another example:
+/*
   //////// EXAMPLE B ////////
   ring r = 0,(x,y,z),dp;
   def R = makeLetterplaceRing(4);
@@ -1169,7 +1197,7 @@ example
   ideal s1 = x, y;
   ideal s2 = y*z*z, x;
 
-  int minDegBound = lpCalcSubstDegBounds(I,s1,s2);
+  int minDegBound = lpCalcSubstDegBound(I,s1,s2);
   setring r;
   def R1 = makeLetterplaceRing(minDegBound);
   setring R1;
@@ -1180,7 +1208,7 @@ example
   for (int i = 1; i <= size(I); i++) {
     lpSubstitute(I[i], s1, s2);
   }
-}
+*/
 
 static proc lpIndexOf(ideal I, poly p) {
   for (int i = 1; i <= size(I); i++) {
@@ -1201,12 +1229,12 @@ static proc ivIndexOf(list L, intvec iv) {
 }
 
 
-proc lpCalcSubstDegBound(poly f, ideal s1, ideal s2)
-"USAGE: lpCalcSubstDegBound(f,s1,s2); f letterplace polynomial, s1 list (ideal) of variables
+static proc lpCalcSubstDegBoundSingle(poly f, ideal s1, ideal s2)
+"USAGE: lpCalcSubstDegBoundSingle(f,s1,s2); f letterplace polynomial, s1 list (ideal) of variables
   to replace, s2 list (ideal) of polynomials to replace with
 RETURN: int, the min degbound required to perform the substitution
 ASSUME: - basering is a Letterplace ring
-EXAMPLE: example lpSubstitute; shows examples
+EXAMPLE: example lpCalcSubstDegBoundSingle; shows examples
 "
 {
   int maxDegBound = 0;
@@ -1240,21 +1268,20 @@ EXAMPLE: example lpSubstitute; shows examples
 }
 example
 {
-  // see lpSubstitute()
+  // see lpCalcSubstDegBound()
 }
 
-proc lpCalcSubstDegBounds(ideal I, ideal s1, ideal s2)
-"USAGE: lpCalcSubstDegBounds(I,s1,s2); I list (ideal) of letterplace polynomials, s1 list (ideal)
-  of variables to replace, s2 list (ideal) of polynomials to replace with
+proc lpCalcSubstDegBound(ideal I, ideal s1, ideal s2)
+"USAGE: lpCalcSubstDegBound(I,s1,s2); I ideal of polynomials, s1 ideal of variables to replace, s2 ideal of polynomials to replace with
 RETURN: int, the min degbound required to perform all of the substitutions
 ASSUME: - basering is a Letterplace ring
-EXAMPLE: example lpSubstitute; shows examples
+EXAMPLE: example lpCalcSubstDegBound; shows examples
 NOTE: convenience method
 "
 {
   int maxDegBound = 0;
   for (int i = 1; i <= size(I); i++) {
-    int tmpDegBound = lpCalcSubstDegBound(I[i], s1, s2, #);
+    int tmpDegBound = lpCalcSubstDegBoundSingle(I[i], s1, s2, #);
     if (tmpDegBound > maxDegBound) {
       maxDegBound = tmpDegBound;
     }
@@ -1264,7 +1291,16 @@ NOTE: convenience method
 }
 example
 {
-  // see lpSubstitute()
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  def R = makeLetterplaceRing(4);
+  setring R;
+  ideal I = 3*x*x+y*x, x*y*x - z;
+  ideal s1 = x, y; // z --> z
+  ideal s2 = y*z*z, x; // i.e. x --> yzz and y --> x
+  // the substitution probably needs a higher degbound
+  lpCalcSubstDegBound(I,s1,s2);
+  lpCalcSubstDegBound(I[1],s1,s2);
 }
 
 static proc isSF(intvec S, intvec I)
@@ -1354,4 +1390,3 @@ example
   setring A; A;
   def R = lpDelVar(2); setring R; R;
 }
-

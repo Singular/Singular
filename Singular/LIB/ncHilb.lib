@@ -1,50 +1,475 @@
 //////////////////////////////////////////////////////////////////////////////
 version="version nc_hilb.lib 4.1.1.0 Dec_2017 "; // $Id$
-category="Noncommutative algebra";
+category="Noncommutative";
 info="
-LIBRARY:  ncHilb.lib: A library for computing graded and multi-graded Hilbert
-                      series of non-commutative algebras. It also computes
-                      the truncated Hilbert series of the algebras whose Hilbert
-                      series are possibly not rational or unknown.
+LIBRARY:  ncHilb.lib: Computation of graded and multi-graded Hilbert series of non-commutative algebras (Letterplace).
 
 AUTHOR:   Sharwan K. Tiwari   shrawant@gmail.com
           Roberto La Scala
+          Viktor Levandovskyy (adaptation to the new Letterplace release)
 
 REFERENCES:
-          La Scala R.: Monomial right ideals and the Hilbert series of
-          non-commutative modules, J. of Symb. Comp. (2016).
+          La Scala R.: Monomial right ideals and the Hilbert series of non-commutative modules,
+                  Journal of Symbolic Computation (2016).
 
-          La Scala R., Tiwari Sharwan K.: Multigraded Hilbert Series of
-          noncommutative modules, https://arxiv.org/abs/1705.01083.
+          La Scala R., Tiwari Sharwan K.: Multigraded Hilbert Series of noncommutative modules, https://arxiv.org/abs/1705.01083.
+
+KEYWORDS: finitely presented algebra; infinitely presented algebra; graded Hilbert series; multi-graded Hilbert series
 
 PROCEDURES:
           nchilb(L,d,#); Hilbert series of a non-commutative algebra
-          rcolon(L, w, d); Right colon ideal of a two-sided monomial ideal
-                           with respect to a monomial w
-
+          rcolon(I, w, d); Right colon ideal of a two-sided monomial ideal with respect to a monomial w
 ";
+
+
+/*
+// NEW HEADER 
+info="
+LIBRARY:  fpahilb.lib: Computation of graded and multi-graded Hilbert series of non-commutative algebras (Letterplace).
+
+AUTHOR:   Sharwan K. Tiwari   shrawant@gmail.com
+          Roberto La Scala
+          Viktor Levandovskyy (adaptation to the new Letterplace release)
+
+REFERENCES:
+          La Scala R.: Monomial right ideals and the Hilbert series of non-commutative modules,
+                  Journal of Symbolic Computation (2016).
+
+          La Scala R., Tiwari Sharwan K.: Multigraded Hilbert Series of noncommutative modules, https://arxiv.org/abs/1705.01083.
+
+KEYWORDS: finitely presented algebra; infinitely presented algebra; graded Hilbert series; multi-graded Hilbert series
+
+PROCEDURES:
+          fpahilb(L,d,#); Hilbert series of a non-commutative algebra
+          rcolon(I, w, d); Right colon ideal of a two-sided monomial ideal with respect to a monomial w
+";
+*/
+
 
 LIB "freegb.lib";
 
-proc nchilb(list L_wp, int d, list #)
-"USAGE:  nchilb(list of relations, an integer, optional);
-         L is a list of modules (each module represents a free-polynomial),
-         d is an integer for the degree bound (maximal total degree of
-         polynomials of the generating set of the input ideal),
-         #[]=1, computation for non-finitely generated regular ideals,
-         #[]=2, computation of multi-graded Hilbert series,
-         #[]=tdeg, for obtaining the truncated Hilbert series up to the
-              total degree tdeg-1 (tdeg should be > 2), and
+// under construction by VL; need kernel adjustments by Sharwan Tiwari
 
-         #[]=string(p), to print the details about the orbit and system of
-             equations. Let the orbit is O_I = {T_{w_1}(I),...,T_{w_r}(I)}
-             ($w_i\in W$), where we assume that if T_{w_i}(I)=T_{w_i'}(I)$
-             for some $w'_i\in W$, then $deg(w_i)\leq deg(w'_i)$.
-             Then, it prints words description of orbit: w_1,...,w_r.
-             It also prints the maximal degree and the cardinality of
-             \sum_j R(w_i, b_j) corresponding to each w_i, where {b_j} is a
-             basis of I. Moreover, it also prints the linear system (for the
-             information about adjacency matrix) and its solving time.
+static proc fpahilb(ideal I, list #)
+"USAGE: fpahilb(I[, L]), ideal I, optional list L
+PURPOSE: compute Hilbert series of a non-commutative algebra, presented by I
+RETURN: nothing (prints data out)
+ASSUME: basering is a Letterplace ring, I is given via its Groebner basis
+NOTE: the appearance of following values among the optional arguments triggers the following:
+@* 1: computation for non-finitely generated regular ideals,
+@* 2: computation of multi-graded Hilbert series,
+@* N>2: computation of truncated Hilbert series up to degree N-1, and
+@* nonempty string: the details about the orbit and system of equations will be printed.
+Let the orbit be O_I = T_(w_1)(I),...,T_(w_r)(I)} (w_i in W), where we assume that if T_(w_i)(I)=T_(w_i')(I)
+for some w'_i in W, then deg(w_i) <= deg(w'_i) follows.
+Then the description of orbit in the form w_1,...,w_r will be printed.
+It also prints the maximal degree and the cardinality of sum_j R(w_i, b_j) corresponding to each w_i,
+where b_j is a basis of I.
+Moreover, it also prints the linear system (for the information about adjacency matrix).
+EXAMPLE: example fpahilb; shows an example "
+{
+    if (attrib(basering, "isLetterplaceRing")==0)
+    {
+      ERROR("Basering should be Letterplace ring");
+    }
+	def save = basering; 
+	int sz=size(#);
+    int lV=attrib(save,"isLetterplaceRing"); // nvars(orig comm ring)
+    int ig=0;
+    int mgrad=0;
+    int tdeg=0;
+    string odp="";
+    int i;
+    for(i=sz; i >= 1; i--)
+    {
+      if(typeof(#[i])=="string")
+      {
+        if(#[i]!="")
+        {
+          odp = "p";
+        }
+        # = delete(#,i);
+        sz = sz-1;
+        break;
+      }
+    }
+    i=1;
+// VL: changing the old "only one optional parameter (for printing the details) is allowed as a string."
+    while( (typeof(#[i])=="int") && (i<=sz) )
+    {
+      if( (#[i] == 1) && (ig==0) )
+      {
+        ig = 1;
+      }
+      else
+      {
+        if ( (#[i] == 2) && (mgrad==0) )
+        {
+          mgrad = 2;
+        }
+        else
+        {
+          if ( (#[i] > 2) && (tdeg==0) )
+          {
+            tdeg = #[i];
+          }
+          else
+          {
+            ERROR("error: only int 1,2 and >2 are allowed as optional parameters");
+          }
+        }
+      }
+      i = i + 1;
+    }
+    if( i <= sz)
+    {
+      ERROR("error:only int 1,2, >2, and a string are allowed as optional parameters");
+    }
+	int maxdegJ = 0;
+	ideal J_lm = I; 
+    for(i=1; i<=size(J_lm); i++)
+    {
+        J_lm[i]=leadmonom(J_lm[i]);
+		if ( deg(J_lm[i]) > maxdegJ )
+		{
+		  maxdegJ = deg(J_lm[i]);
+		}
+    }
+    // new: truncation should be < than degbound/2
+    int degbnd = attrib(save,"uptodeg");
+	if (tdeg == 0)
+	{
+		// orig code: LPRing is created with degree bound=2*d
+		// therefore check here, that maxdeg(gens) <=uptodeg/2
+		if ( 2*maxdegJ != degbnd)
+		{
+			ERROR("Degree bound on the basering should be precisely "+ string(2*maxdegJ));
+		}
+	}
+	else 
+	{ // ie tdeg>0
+		// orig code: LPRing is created with degree bound=2*(tdeg-1)
+		if ( 2*(tdeg - 1) != degbnd)
+		{
+			ERROR("Degree bound on the basering should be precisely "+ string(2*(tdeg - 1)));
+		}
+	}
+	// if (tdeg > (degbnd-1) div 2) 
+	// {
+       // ERROR("Degree bound on the basering should be at least 2*N+1");
+    // }
+//    def save2 = basering;
+//    setring save2;
+    //compute the Hilbert series
+        // system call : HilbertSeries_OrbitData: sharwan need to change it as well...
+        //(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp, int trunDegHs)
+
+    "Debug: nc hilb is called with with lV="+string(lV)+", ig="+string(ig)+", mgrad="+string(mgrad)+", tdeg="+string(tdeg);
+    if(odp == "")
+    {
+      system("nc_hilb", J_lm, lV, ig, mgrad,tdeg);
+    }
+    else
+    {
+      system("nc_hilb", J_lm, lV, ig, mgrad,tdeg, odp);
+    }    
+}
+
+example
+{
+"EXAMPLE:"; echo = 2;
+  ring r=0,(X,Y,Z),dp;
+  def R = makeLetterplaceRing(4); setring R;
+  ideal I = Y*Z, Y*Z*X, Y*Z*Z*X, Y*Z*Z*Z*X;
+  fpahilb(I,3,"p");
+}
+
+/*
+// // examples
+//test_1: 
+ ring r=0,(X,Y,Z),dp;
+    module p1 =[1,Y,Z];             //represents the poly Y*Z
+    module p2 =[1,Y,Z,X];          //represents the poly Y*Z*X
+    module p3 =[1,Y,Z,Z,X,Z];
+    module p4 =[1,Y,Z,Z,Z,X,Z];
+    module p5 =[1,Y,Z,Z,Z,Z,X,Z];
+    module p6 =[1,Y,Z,Z,Z,Z,Z,X,Z];
+    module p7 =[1,Y,Z,Z,Z,Z,Z,Z,X,Z];
+    module p8 =[1,Y,Z,Z,Z,Z,Z,Z,Z,X,Z];
+    list l1=list(p1,p2,p3,p4,p5,p6,p7,p8);
+    nchilb(l1,10);
+
+    ring r=0,(x,y,z),dp;
+
+    module p1=[1,y,z],[-1,z,y];               //y*z-z*y
+    module p2=[1,x,z,x],[-1,z,x,z];           // x*z*x-z*x*z
+    module p3=[1,x,z,z,x,z],[-1,z,x,z,z,x];   // x*z^2*x*z-z*x*z^2*x
+    module p4=[1,x,z,z,z,x,z];[-1,z,x,z,z,x,x]; // x*z^3*x*z-z*x*z^2*x^2
+    list l2=list(p1,p2,p3,p4);
+
+    nchilb(l2,6,1); //third argument '1' is for non-finitely generated case
+// ** TEST 3: ORIG
+    ring r=0,(a,b),dp;
+    module p1=[1,a,a,a];
+    module p2=[1,a,b,b];
+    module p3=[1,a,a,b];
+    list l3=list(p1,p2,p3);
+	nchilb(l3,5); // new vl: usual HS
+    nchilb(l3,5,2);//third argument '2' is to compute multi-graded HS
+// ** TEST 3: NEW
+  LIB "./ncHilb.lib";
+  ring r=0,(a,b),dp;
+  def R2 = makeLetterplaceRing(8); setring R2; // tdeg=5 => dgb = 2*4=8
+  ideal I = a*a*a, a*b*b, a*a*b;
+  fpahilb(I,4,"p");//fpahilb(I,5,"p");
+  //nchilb(l3,5);// no third argument '2' = to compute the usual HS
+  fpahilb(I,5,2,"p");
+  //nchilb(l3,5,2);//third argument '2' is to compute multi-graded HS
+	
+
+*/
+
+static proc conversion_problems()
+{
+// b) HilbertSeries_OrbitData changes currRing [doesn't help while doing copies]
+// second call of same procedure changes the input: FIXED
+
+// a) still we get very different results (suspected: via TwordMap() )
+  
+  // very easy:
+  LIB "ncHilb.lib";
+  ring r=0,(a,b),dp;
+  module p1=[1,a,a,a];
+  module p2=[1,a,b,b];
+  module p3=[1,a,a,b];
+  list l3=list(p1,p2,p3);
+  nchilb(l3,5,2);//third argument '2' is to compute multi-graded HS
+// output ORIG:
+/*
+maximal length of words = 3
+length of the Orbit = 5
+Hilbert series:
+(t1^2+t1+1)/(t1*t2^2-t1*t2-t2+1)
+*/
+  nchilb(l3,5);// usual graded HS
+// output ORIG:
+/*
+*/
+//input new Letterplace:
+  LIB "./ncHilb.lib";
+  ring r=0,(a,b),dp;
+  def R2 = makeLetterplaceRing(8); setring R2; // tdeg=5 => dgb = 2*4=8
+  ideal I = a*a*a, a*b*b, a*a*b;
+  fpahilb(I,5,2,"p");
+// output NEWLP
+/*
+Debug: nc hilb is called with with lV=2, ig=0, mgrad=2, tdeg=5
+Truncation degree = 5
+maximal length of words = 4
+length of the Orbit = 12
+words description of the Orbit:
+1    a    b    a*a    a*b    b*a    b*b    a*a*a    a*b*a    b*a*a    b*a*b    a*b*a*a
+
+maximal degree,  #(sum_j R(w,w_j))
+NULL
+2,  3
+NULL
+1,  2
+1,  1
+2,  3
+NULL
+0,  1
+2,  3
+1,  2
+1,  1
+1,  2
+
+linear system:
+H(1) = (t1)*H(2) + (t2)*H(3) +  1
+H(2) = (t1)*H(4) + (t2)*H(5) +  1
+H(3) = (t1)*H(6) + (t2)*H(7) +  1
+H(4) = (t1)*H(8) + (t2)*H(8) +  1
+H(5) = (t1)*H(9) + (t2)*H(8) +  1
+H(6) = (t1)*H(10) + (t2)*H(11) +  1
+H(7) = (t1)*H(9) + (t2)*H(9) +  1
+H(8) = (t1)*H(8) + (t2)*H(8) +  0
+H(9) = (t1)*H(12) + (t2)*H(12) +  1
+H(10) = (t1)*H(8) + (t2)*H(8) +  1
+H(11) = (t1)*H(12) + (t2)*H(8) +  1
+H(12) = (t1)*H(8) + (t2)*H(8) +  1
+where H(1) represents the series corresp. to input ideal
+
+Hilbert series:
+(t1^3*t2+3*t1^2*t2^2+2*t1^2*t2+t1^2+2*t1*t2^3+2*t1*t2^2+2*t1*t2+t1+t2^4+t2^3+t2^2+t2+1)
+*/
+
+  fpahilb(I,5,"p");
+// output NEWLP
+/*
+Debug: nc hilb is called with with lV=2, ig=0, mgrad=0, tdeg=5
+Truncation degree = 5
+maximal length of words = 4
+length of the Orbit = 12
+words description of the Orbit:
+1    a    b    a*a    a*b    b*a    b*b    a*a*a    a*b*a    b*a*a    b*a*b    a*b*a*a
+maximal degree,  #(sum_j R(w,w_j))
+NULL
+2,  3
+NULL
+1,  2
+1,  1
+2,  3
+NULL
+0,  1
+2,  3
+1,  2
+1,  1
+1,  2
+
+linear system:
+H(1) = (t)*H(2) + (t)*H(3) +  1
+H(2) = (t)*H(4) + (t)*H(5) +  1
+H(3) = (t)*H(6) + (t)*H(7) +  1
+H(4) = (t)*H(8) + (t)*H(8) +  1
+H(5) = (t)*H(9) + (t)*H(8) +  1
+H(6) = (t)*H(10) + (t)*H(11) +  1
+H(7) = (t)*H(9) + (t)*H(9) +  1
+H(8) = (t)*H(8) + (t)*H(8) +  0
+H(9) = (t)*H(12) + (t)*H(12) +  1
+H(10) = (t)*H(8) + (t)*H(8) +  1
+H(11) = (t)*H(12) + (t)*H(8) +  1
+H(12) = (t)*H(8) + (t)*H(8) +  1
+where H(1) represents the series corresp. to input ideal
+and i^th summand in the rhs of an eqn. is according
+to the right colon map corresp. to the i^th variable
+
+Hilbert series:
+(7t4+5t3+4t2+2t+1)
+*/
+
+  nchilb(l3,5,"p");// no third argument: usual HS
+  // output:
+  /* maximal length of words = 3
+length of the Orbit = 5
+words description of the Orbit: 
+1    a(1)    a(1)*a(2)    a(1)*b(2)    a(1)*a(2)*a(3)    
+maximal degree,  #(sum_j R(w,w_j))
+NULL
+2,  3 
+1,  2 
+1,  1 
+0,  1 
+linear system:
+H(1) = (t)*H(2) + (t)*H(1) +  1
+H(2) = (t)*H(3) + (t)*H(4) +  1
+H(3) = (t)*H(5) + (t)*H(5) +  1
+H(4) = (t)*H(2) + (t)*H(5) +  1
+H(5) = (t)*H(5) + (t)*H(5) +  0
+where H(1) represents the series corresp. to input ideal
+and i^th summand in the rhs of an eqn. is according
+to the right colon map corresp. to the i^th variable
+Hilbert series:
+(t2+t+1)/(t3-t2-t+1)
+*/
+}
+
+static proc boo()
+{  
+// very different input; long example
+  LIB "./ncHilb.lib";
+  ring r2=0,(x,y,z),dp;
+  def R2 = makeLetterplaceRing(10); setring R2; // tdeg=6 => dgb = 2*5=10
+  ideal I = y*z-z*y, x*z*x-z*x*z, x*z^2*x*z-z*x*z^2*x, x*z^3*x*z-z*x*z^2*x^2;
+  //ideal J = std(I); // compute a Groebner basis up to degree bound, which is 12
+  fpahilb(I,6,1,"p");
+  // inspecting J we see that this is a homogeneous Groebner basis
+  // which is potentially infinite, i.e. J is not finitely generated
+  fpahilb(J,5,1,2,"p"); // '1' i for non-finitely generated case, string to print details
+  //'5' here is to compute the truncated HS up to degree 5.
+  //'2' is to compute multi-graded Hilbert series
+  fpahilb(J,7,1,"p");
+}
+
+
+// overhauled by VL, seem to work fine
+static proc rcolon_new(ideal I, poly W)
+"USAGE:  rcolon(I,w); ideal I, poly w
+RETURNS: ideal
+ASSUME: - basering is a Letterplace ring
+- I is a monomial ideal
+- w is a monomial
+PURPOSE: compute a right colon ideal of I by a monomial w
+NOTE: Output is the set of generators, which should be added to I
+EXAMPLE: example rcolon; shows an example"
+{
+    int lV =  attrib(R,"isLetterplaceRing"); //nvars(save);
+    if (lV == 0)
+    {
+      ERROR("Basering must be a Letterplace ring");
+    }
+	// test whether degree bound == 2*maxdeg(elts of the ideal)
+	int maxdegI = 0;
+	int i;
+	for(i=1; i<=ncols(I); i++)
+    {
+        I[i]=leadmonom(I[i]);
+		if ( deg(I[i]) > maxdegI )
+		{
+		  maxdegI = deg(I[i]);
+		}
+    }
+	int degbnd = attrib(R,"uptodeg");
+	if ( 2*maxdegI != degbnd)
+	{
+      ERROR("Degree bound on the basering should be precisely "+ string(2*maxdegI));
+	}
+    poly wc = leadmonom(W);
+	"Debug: rcolon is called with lV="+string(lV);
+    ideal J = system("rcolon", I, wc, lV);
+    // VL: printlevel here? before only printing was there, no output
+    return(J);
+ }
+example
+{
+"EXAMPLE:"; echo = 2;
+  ring r=0,(X,Y,Z),dp;
+  def R = makeLetterplaceRing(10); setring R;
+  ideal I = Y*Z, Y*Z*X, Y*Z*Z*X, Y*Z*Z*Z*X;
+  //, Y*Z*Z*Z*Z*X, Y*Z*Z*Z*Z*Z*X, Y*Z*Z*Z*Z*Z*Z*X, Y*Z*Z*Z*Z*Z*Z*Z*X;
+  poly w = Y;
+  ideal J = rcolon_new(I,w);
+  J; // new generators, which need to be added to I
+  rcolon_new(I,Y*Z);
+}
+/*
+// second example, original
+  ring r=0,(X,Y,Z),dp;
+  def R = makeLetterplaceRing(20); setring R;
+  ideal I = Y*Z, Y*Z*X, Y*Z*Z*X, Y*Z*Z*Z*X, Y*Z*Z*Z*Z*X, Y*Z*Z*Z*Z*Z*X, Y*Z*Z*Z*Z*Z*Z*X, Y*Z*Z*Z*Z*Z*Z*Z*X;
+  poly w = Y;
+  ideal J = rcolon(I,w);
+  J; // new generators, which need to be added to I
+*/
+
+
+// original version of the proc + 
+// minor fixes by VL in the example: redefine ring excluded, binomial fixed
+proc nchilb(list L_wp, int d, list #)
+"USAGE: nchilb(I, d[, L]), list I, int d, optional list L
+PURPOSE: compute Hilbert series of a non-commutative algebra
+ASSUME:
+NOTE: d is an integer for the degree bound (maximal total degree of
+         polynomials of the generating set of the input ideal),
+#[]=1, computation for non-finitely generated regular ideals,
+#[]=2, computation of multi-graded Hilbert series,
+#[]=tdeg, for obtaining the truncated Hilbert series up to the total degree tdeg-1 (tdeg should be > 2), and
+#[]=string(p), to print the details about the orbit and system of equations.
+Let the orbit is O_I = {T_{w_1}(I),...,T_{w_r}(I)} ($w_i\in W$), where we assume that if T_{w_i}(I)=T_{w_i'}(I)$
+for some $w'_i\in W$, then $deg(w_i)\leq deg(w'_i)$.
+Then, it prints words description of orbit: w_1,...,w_r.
+It also prints the maximal degree and the cardinality of \sum_j R(w_i, b_j) corresponding to each w_i,
+where {b_j} is a basis of I.
+Moreover, it also prints the linear system (for the information about adjacency matrix) and its solving time.
 
 NOTE  : A Groebner basis of two-sided ideal of the input should be given in a
         special form. This form is a list of modules, where each generator
@@ -190,17 +615,17 @@ example
     list l1=list(p1,p2,p3,p4,p5,p6,p7,p8);
     nchilb(l1,10);
 
-    ring r=0,(x,y,z),dp;
+    ring r2=0,(x,y,z),dp;
 
     module p1=[1,y,z],[-1,z,y];               //y*z-z*y
     module p2=[1,x,z,x],[-1,z,x,z];           // x*z*x-z*x*z
     module p3=[1,x,z,z,x,z],[-1,z,x,z,z,x];   // x*z^2*x*z-z*x*z^2*x
-    module p4=[1,x,z,z,z,x,z];[-1,z,x,z,z,x,x]; // x*z^3*x*z-z*x*z^2*x^2
+    module p4=[1,x,z,z,z,x,z],[-1,z,x,z,z,x,x]; // x*z^3*x*z-z*x*z^2*x^2
     list l2=list(p1,p2,p3,p4);
 
     nchilb(l2,6,1); //third argument '1' is for non-finitely generated case
 
-    ring r=0,(a,b),dp;
+    ring r3=0,(a,b),dp;
     module p1=[1,a,a,a];
     module p2=[1,a,b,b];
     module p3=[1,a,a,b];
@@ -208,7 +633,7 @@ example
     list l3=list(p1,p2,p3);
     nchilb(l3,5,2);//third argument '2' is to compute multi-graded HS
 
-    ring r=0,(x,y,z),dp;
+    ring r4=0,(x,y,z),dp;
     module p1=[1,x,z,y,z,x,z];
     module p2=[1,x,z,x];
     module p3=[1,x,z,y,z,z,x,z];
@@ -218,7 +643,10 @@ example
     list l4=list(p1,p2,p3,p4,p5);
     nchilb(l4,7,"p"); //third argument "p" is to print the details
                      // of the orbit and system
+}
 
+/*
+// long orig example
     ring r=0,(x,y,z),dp;
 
     module p1=[1,y,z,z];
@@ -250,7 +678,10 @@ example
     nchilb(l5,7,1,2,11,"p");
     //'11' is to compute the truncated HS up to degree 10.
 }
+*/
 
+
+// original version of the procedure
 proc rcolon(list L_wp, module W, int d)
 "USAGE:  rcolon(list of relations, a monomial, an integer);
          L is a list of modules (each module represents a monomial),
@@ -328,10 +759,11 @@ EXAMPLE: example rcolon; shows an example "
     if(J==1)
     {"<1>"}
     else{
-    lp2lstr(J,save);
-    setring save;
-    lst2str(@LN, 1);
+    //lp2lstr(J,save);
+	J;
+    //lst2str(@LN, 1);
     "+ generators of the given ideal;";}
+	setring save;
  }
 example
 {
@@ -350,4 +782,3 @@ example
     list l1=list(p1,p2,p3,p4,p5,p6,p7,p8);
     rcolon(l1,w,10);
 }
-
