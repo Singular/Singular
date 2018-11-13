@@ -15,6 +15,7 @@
 #endif
 #include "polys/clapsing.h"
 #include "polys/monomials/maps.h"
+#include "polys/shiftop.h"
 #include "kernel/GBEngine/kutil.h"
 #include "kernel/GBEngine/kstd1.h"
 #include "kernel/GBEngine/tgb.h"

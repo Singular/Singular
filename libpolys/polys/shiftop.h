@@ -47,5 +47,6 @@ int p_mIsInV(poly p, const ring r);
 #define pIsInV(p) p_IsInV(p, currRing)
 #define pmIsInV(p) p_mIsInV(p, currRing)
 
+ring freeAlgebra(ring r, int d);
 #endif
 #endif
