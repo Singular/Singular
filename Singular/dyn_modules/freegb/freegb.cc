@@ -33,7 +33,7 @@ static BOOLEAN freegb(leftv res, leftv args)
 extern "C" int SI_MOD_INIT(freegb)(SModulFunctions* p)
 {
 #ifdef HAVE_SHIFTBBA
-  p->iiAddCproc("freegb.so","freegb",FALSE,freegb);
+  p->iiAddCproc("freegb.so","freeAlgebra",FALSE,freegb);
 #endif
   return (MAX_TOK);
 }
