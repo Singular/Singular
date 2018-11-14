@@ -2123,78 +2123,24 @@ PURPOSE: computes a list of free monomials in a Letterplace
 ASSUME: - basering is a Letterplace ring.
 @*      - d <= attrib(basering,uptodeg) holds.
 @*      - J is a Groebner basis
+NOTE: will be replaced with reduce(maxideal(d), J); soon
 "
 {
-  int nv = attrib(basering,"uptodeg");
-  if ((d>nv) || (d<0) )
-  {
-    ERROR("incorrect degree");
+  if (d < 0) {
+    return (delete(ideal(0), 1)); // no monomials
   }
-  nv = attrib(basering,"isLetterplaceRing"); // nvars
-  if (d==0)
-  {
-    return(ideal(1));
+  ideal I = maxideal(d);
+  if (!donly) {
+    for (int i = d-1; i >= 0; i--) {
+      I = maxideal(i), I;
+    } kill i;
   }
-  /* from now on d>=1 */
-  ideal I;
-  if (size(J)==0)
-  {
-    I = maxideal(d);
-    if (!donly)
-    {
-      for (int i = d-1; i >= 0; i--)
-      {
-        I = maxideal(i), I;
-      } kill i;
+  for (int i = ncols(I); i >= 1; i--) {
+    if (lpLmDivides(J, I[i])) {
+      I = delete(I, i);
     }
-    return(I);
-  }
-  // ok, Sickle misbehaves: have to remove all
-  // elts from J of degree >d
-  ideal JJ;
-  int j; int sj = ncols(J);
-  int cnt=0;
-  for(j=1;j<=sj;j++)
-  {
-    if (deg(J[j]) <= d)
-    {
-      cnt++;
-      JJ[cnt]=lead(J[j]); // only LMs are needed
-    }
-  }
-  if (cnt==0)
-  {
-    // there are no elements in J of degree <= d
-    // return free stuff and the 1
-    I = lpMonomialBasis(d, donly, ideal(0));
-    if (!donly)
-    {
-      I = 1, I;
-    }
-    return(I);
-  }
-  // from here on, Ibase is not zero
-  ideal Ibase = lpMis2Base(lpSickle(JJ,d)); // the complete K-basis modulo J up to d
-  if (!donly)
-  {
-    // for not donly, give everything back
-    Ibase = sort(Ibase)[1];
-    return(Ibase);
-  }
-  /* !donly: pick out only monomials of degree d */
-  int i; int si = ncols(Ibase);
-  cnt=0;
-  I=0;
-  for(i=1;i<=si;i++)
-  {
-    if (deg(Ibase[i]) == d)
-    {
-      cnt++;
-      I[cnt]=Ibase[i];
-    }
-  }
-  kill Ibase;
-  return(I);
+  } kill i;
+  return (I);
 }
 example
 {
