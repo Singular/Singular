@@ -628,7 +628,7 @@ static proc UfGraphGrowth(intmat UG)
   int maxCycleCount = 0;
   for (int v = 1; v <= n; v++) {
     countedCycles = countCycles(UG, v, visited, cyclic, 0, countedCycles);
-    dbprint("counted: " + string(v) + "/" + string(n));
+    dbprint("counted " + string(countedCycles[v]) + " cycles from vertex " + string(v) + "/" + string(n) + " (cache: " + string(countedCycles) + ")");
     if (countedCycles[v] == -1) {
       return(-1);
     }
@@ -723,7 +723,6 @@ ASSUME: Basering is a Letterplace ring
       }
     }
   } kill w;
-  // printf("Path: %s countCycles: %s", path, cycles); // DEBUG
   countedCycles[v] = cycles;
   return (countedCycles);
 }
@@ -935,7 +934,9 @@ ASSUME: - basering is a Letterplace ring
 
   dbprint("computing Ufnarovskii graph");
   intmat UG = lpUfGraph(G);
-  dbprint("Ufnarovskii graph: ", string(UG));
+  if (printlevel >= voice + 1) {
+    UG;
+  }
 
   // check special case 2
   intmat zero[nrows(UG)][ncols(UG)];
@@ -946,6 +947,9 @@ ASSUME: - basering is a Letterplace ring
   // check special case 3
   dbprint("topological sorting of Ufnarovskii graph");
   UG = topologicalSort(UG);
+  if (printlevel >= voice + 1) {
+    UG;
+  }
 
   dbprint("check if Ufnarovskii graph is DAG");
   if (imIsUpRightTriangle(UG)) {
