@@ -32,6 +32,9 @@ isOrderingShiftInvariant(i);     tests shift-invariance of the monomial ordering
 
 isVar(p);                        check whether p is a power of a single variable
 
+lpLmDivides(ideal I, poly p)     tests if there is a polynomial q in I with LM(q)|LM(p)
+lpVarAt(poly p, int pos)         returns the variable (as a poly) at position pos of the poly p
+
 SEE ALSO: fpadim_lib, fpaprops_lib, fpalgebras_lib, LETTERPLACE
 ";
 
@@ -353,6 +356,53 @@ example
   isVar(h);
   poly i = 1;
   isVar(i);
+}
+
+proc lpLmDivides(ideal I, poly p)
+"USAGE: lpLmDivides(I); I an ideal
+RETURN: boolean
+ASSUME: basering is a Letterplace ring
+PURPOSE: tests if there is a polynomial q in I with LM(q)|LM(p)
+EXAMPLE: example lpLmDivides; shows examples
+"
+{
+  for (int i = 1; i <= ncols(I); i++) {
+    if (system("lpLmDivides", I[i], p)) {
+      return (1);
+    }
+  } kill i;
+  return (0);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(5);
+  setring R;
+  poly p = x*y*y;
+  lpLmDivides(y*y, p);
+  lpLmDivides(y*x, p);
+  lpLmDivides(ideal(y*y, y*x), p);
+}
+
+proc lpVarAt(poly p, int pos)
+"USAGE: lpVarAt(p, pos); p a poly, pos an int
+RETURN: poly
+ASSUME: basering is a Letterplace ring
+PURPOSE: returns the variable (as a poly) at position pos of the poly p
+EXAMPLE: example lpVarAt; shows examples
+"
+{
+  return (system("lpVarAt", p, pos));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(5);
+  setring R;
+  poly p = y*y*x;
+  lpVarAt(p, 3);
 }
 
 proc letplaceGBasis(def I)

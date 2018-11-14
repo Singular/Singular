@@ -1210,7 +1210,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #endif
   /*==================== divide-test for freeGB  =================*/
   #ifdef HAVE_SHIFTBBA
-    if (strcmp(sys_cmd, "lpdivides") == 0)
+    if (strcmp(sys_cmd, "lpLmDivides") == 0)
     {
       const short t[]={2,POLY_CMD,POLY_CMD};
       if (iiCheckTypes(h,t,1))

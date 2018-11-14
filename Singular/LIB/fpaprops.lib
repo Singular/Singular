@@ -766,7 +766,7 @@ ASSUME: - basering is a Letterplace ring
         v_overlap = v_overlap[(lV+1) .. (l-1)*lV];
         w_overlap = w_overlap[1 .. (l-2)*lV];
       }
-      if (v_overlap == w_overlap && !lpdivides(G, v * lpVarAt(w, l - 1))) {
+      if (v_overlap == w_overlap && !lpLmDivides(G, v * lpVarAt(w, l - 1))) {
         UG[i,j] = 1;
       }
       kill v; kill w; kill v_overlap; kill w_overlap;
@@ -807,10 +807,6 @@ static proc maxDeg(ideal G)
   return (l);
 }
 
-static proc lpVarAt(poly p, int pos) {
-  return (system("lpVarAt", p, pos));
-}
-
 static proc lpStandardWords(ideal G, int length)
 "ASSUME: G is simplified
 "
@@ -821,7 +817,7 @@ static proc lpStandardWords(ideal G, int length)
 
   ideal words = maxideal(length);
   for (int i = ncols(words); i >= 1; i--) {
-    if (lpdivides(G, words[i])) {
+    if (lpLmDivides(G, words[i])) {
       words = delete(words, i);
     }
   } kill i;
@@ -866,15 +862,6 @@ static proc ivStandardWordsUpToLength(list G, int length)
     words = words + ivStandardWords(G, i);
   } kill i;
   return (words);
-}
-
-proc lpdivides(ideal I, poly p) {
-  for (int i = 1; i <= ncols(I); i++) {
-    if (system("lpdivides", I[i], p)) {
-      return (1);
-    }
-  } kill i;
-  return (0);
 }
 
 static proc ivdivides(list G, intvec iv) {
