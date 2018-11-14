@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version ffmodstd.lib 4.1.1.0 Sep_2018 "; // $Id$
+version="version ffmodstd.lib 4.1.1.4 Sep_2018 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:   ffmodstd.lib  Groebner bases of ideals in polynomial rings
@@ -33,20 +33,20 @@ OVERVIEW:
   version [6]. The set G is then a Groebner basis of I with high probability.
 
 REFERENCES:
-    [1] E. A. Arnold: Modular algorithms for computing Groebner bases.
-      J. Symb. Comput. 35, 403-419 (2003).
- @* [2] R. L. Burden and J. D. Faires: Numerical analysis. 9th ed. (1993).
- @* [3] M. Ben-Or and P. Tiwari: A deterministic algorithm for sparse multivariate
+[1] E. A. Arnold: Modular algorithms for computing Groebner bases.
+    J. Symb. Comput. 35, 403-419 (2003).
+[2] R. L. Burden and J. D. Faires: Numerical analysis. 9th ed. (1993).
+[3] M. Ben-Or and P. Tiwari: A deterministic algorithm for sparse multivariate
       polynomial interpolation. Proc. of the 20th Annual ACM Symposium on
       Theory of Computing, 301-309 (1988).
- @* [4] A. Cuyt and W.-s. Lee: Sparse interpolation of multivariate rational functions.
+[4] A. Cuyt and W.-s. Lee: Sparse interpolation of multivariate rational functions.
       Theor. Comput. Sci. 412, 1445-1456 (2011).
- @* [5] E. Kaltofen and W.-s. Lee: Early termination in sparse interpolation algorithms.
+[5] E. Kaltofen and W.-s. Lee: Early termination in sparse interpolation algorithms.
       J. Symb. Comput. 36, 365-400 (2003).
- @* [6] E. Kaltofen, W.-s. Lee and A. A. Lobo: Early termination in Ben-Or/Tiwari
+[6] E. Kaltofen, W.-s. Lee and A. A. Lobo: Early termination in Ben-Or/Tiwari
       sparse interpolation and a hybrid of Zippel's algorithm. Proc. ISSAC
       (ISSAC '00), 192-201 (2000).
- @* [7] K. Sara and M. Monagan: Fast Rational Function Reconstruction. Proc. ISSAC
+[7] K. Sara and M. Monagan: Fast Rational Function Reconstruction. Proc. ISSAC
       (ISSAC '06), 184-190 (2006).
 
 PROCEDURES:

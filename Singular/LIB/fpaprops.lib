@@ -16,7 +16,7 @@ Applicability: Letterplace rings.
 REFERENCES:
 Huishi Li: Groebner bases in ring theory. World Scientific, 2010.
 
-KEYWORDS: finitely presented algebra; ring theory; Letterplace Groebner basis; 
+KEYWORDS: finitely presented algebra; ring theory; Letterplace Groebner basis;
 growth of algebra; Gelfand-Kirillov dimension; global homological dimension; semi-prime ideal; Ufnarovski graph
 
 SEE ALSO:  fpadim_lib, freegb_lib
@@ -46,7 +46,7 @@ proc tstfpaprops()
     example lpGlDimBound;
     example lpSubstitute;
     example lpUfGraph;
-	example lpCalcSubstDegBound;
+    example lpCalcSubstDegBound;
 };
 
 
@@ -930,7 +930,7 @@ example
   lpGkDim(I);
   I = x*y, x*z, z*y, z*z;//gkDim = 2
   lpGkDim(I);
-  ideal G = y*x - x*y, z*x - x*z, z*y - y*z; G = std(G); 
+  ideal G = y*x - x*y, z*x - x*z, z*y - y*z; G = std(G);
   G;
   lpGkDim(G); // 3, as expected for K[x,y,z]
 }
@@ -1024,7 +1024,7 @@ example
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   ideal G = x*x, y*y,x*y*x; // it is a monomial Groebner basis
-  lpGlDimBound(G); 
+  lpGlDimBound(G);
   ideal H = y*x - x*y; H = std(H); // H is a Groebner basis
   lpGlDimBound(H); // gl dim of K[x,y] is 2, as expected
 }

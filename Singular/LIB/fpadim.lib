@@ -30,52 +30,53 @@ NOTE:
 In the procedures below, 'iv' stands for intvec representation
 and 'lp' for the letterplace representation of monomials
 
-OVERVIEW: Given the free associative algebra A = K<x_1,...,x_n> and 
-          a (finite or truncated) Groebner basis GB, one is interested in 
-		  the following data:
-	  - the K-dimension of A/<GB> (check for finiteness or explicit value)
-	  - the Hilbert series of A/<GB>
-	  - the explicit monomial K-basis of A/<GB>
-	    In order to determine these, we need
+OVERVIEW:
+      Given the free associative algebra A = K<x_1,...,x_n> and
+      a (finite or truncated) Groebner basis GB, one is interested in
+      the following data:
+          - the K-dimension of A/<GB> (check for finiteness or explicit value)
+          - the Hilbert series of A/<GB>
+          - the explicit monomial K-basis of A/<GB>
+      In order to determine these, we need
       - the Ufnarovskij graph induced by GB
       - the mistletoes of A/<GB> (which are special monomials in a basis)
-      
-@*      The Ufnarovskij graph is used to determine whether A/<GB> has finite
-@*      K-dimension. One has to check if the graph contains cycles.
-@*      For the whole theory we refer to [Ufn]. Given a
-@*      reduced set of monomials GB one can define the basis tree, whose vertex
-@*      set V consists of all normal monomials w.r.t. GB. For every two
-@*      monomials m_1, m_2 in V there is a direct edge from m_1 to m_2, if and
-@*      only if there exists x_k in {x_1,..,x_n}, such that m_1*x_k = m_2. The
-@*      set M = {m in V | there is no edge from m to another monomial in V} is
-@*      called the set of mistletoes. As one can easily see it consists of
-@*      the endpoints of the graph. Since there is a unique path to every
-@*      monomial in V, the whole graph can be described only from the knowledge
-@*      of the mistletoes. Note that V corresponds to a basis of A/<GB>, so
-@*      knowing the mistletoes we know a K-basis. The name mistletoes was given
-@*      to those points because of these miraculous value and the algorithm is
-@*      named sickle, because a sickle is the tool to harvest mistletoes.
-@*      For more details see [Stu]. This package uses the Letterplace
-@*      format introduced by [LL09]. The algebra can either be represented as a
-@*      Letterplace ring or via integer vectors: Every variable will only be
-@*      represented by its number, so variable one is represented as 1,
-@*      variable two as 2 and so on. The monomial x_1*x_3*x_2 for example will
-@*      be stored as (1,3,2). Multiplication is concatenation. Note that the
-@*      approach in this library does not need an algorithm for computing the normal
-@*      form. Note that fpa is an acronym for Finitely Presented Algebra.
-@*
+
+      The Ufnarovskij graph is used to determine whether A/<GB> has finite
+      K-dimension. One has to check if the graph contains cycles.
+      For the whole theory we refer to [Ufn]. Given a
+      reduced set of monomials GB one can define the basis tree, whose vertex
+      set V consists of all normal monomials w.r.t. GB. For every two
+      monomials m_1, m_2 in V there is a direct edge from m_1 to m_2, if and
+      only if there exists x_k in {x_1,..,x_n}, such that m_1*x_k = m_2. The
+      set M = {m in V | there is no edge from m to another monomial in V} is
+      called the set of mistletoes. As one can easily see it consists of
+      the endpoints of the graph. Since there is a unique path to every
+      monomial in V, the whole graph can be described only from the knowledge
+      of the mistletoes. Note that V corresponds to a basis of A/<GB>, so
+      knowing the mistletoes we know a K-basis. The name mistletoes was given
+      to those points because of these miraculous value and the algorithm is
+      named sickle, because a sickle is the tool to harvest mistletoes.
+      For more details see [Stu]. This package uses the Letterplace
+      format introduced by [LL09]. The algebra can either be represented as a
+      Letterplace ring or via integer vectors: Every variable will only be
+      represented by its number, so variable one is represented as 1,
+      variable two as 2 and so on. The monomial x_1*x_3*x_2 for example will
+      be stored as (1,3,2). Multiplication is concatenation. Note that the
+      approach in this library does not need an algorithm for computing the normal
+      form. Note that fpa is an acronym for Finitely Presented Algebra.
+
 
 REFERENCES:
-@*   [Ufn] V. Ufnarovskij: Combinatorical and asymptotic methods in algebra, 1990.
-@*   [LL09] R. La Scala, V. Levandovskyy: Letterplace ideals and non-commutative
+[Ufn] V. Ufnarovskij: Combinatorical and asymptotic methods in algebra, 1990.
+[LL09] R. La Scala, V. Levandovskyy: Letterplace ideals and non-commutative
 Groebner bases, Journal of Symbolic Computation, 2009.
-@*   [Stu] G. Studzinski: Dimension computations in non-commutative,
+[Stu] G. Studzinski: Dimension computations in non-commutative,
 associative algebras, Diploma thesis, RWTH Aachen, 2010.
 
 SEE ALSO: freegb_lib, fpaprops_lib, ncHilb_lib
 ";
 
-// Remark Oct 2018: iv2lp, lp2iv etc are NOT IN HEADER because 
+// Remark Oct 2018: iv2lp, lp2iv etc are NOT IN HEADER because
 // they should not be used anymore
 
 LIB "freegb.lib"; //for letterplace rings
@@ -955,9 +956,9 @@ example
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; //sets basering to Letterplace ring
   // u = x^2y, v = yxz, w = zx^2 in intvec representation
-  intvec u = 1,1,2; 
+  intvec u = 1,1,2;
   iv2lp(u); // invokes the procedure and returns the corresponding poly
-  intvec v = 2,1,3; 
+  intvec v = 2,1,3;
   iv2lp(v);
   intvec w = 3,1,1;
   iv2lp(w);
@@ -1083,10 +1084,10 @@ example
   ring r = 0,(x,y,z),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  poly p = x*x*z; 
+  poly p = x*x*z;
   lp2iv(p); // transforms p into the intvec representation
   lp2iv(y*y*x*x);
-  lp2iv(z*y*x*z*z);  
+  lp2iv(z*y*x*z*z);
 }
 
 proc lp2ivId(ideal G)
@@ -1123,7 +1124,7 @@ example
   ring r = 0,(x,y,z),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-  poly p = x*x*z; 
+  poly p = x*x*z;
   poly q = y*y*x*x;
   poly w = z*y*x*z;
   // p,q,w are some polynomials we want to transform into their
@@ -2243,7 +2244,7 @@ example
   setring R; // sets basering to Letterplace ring
   ideal G = x*x, y*y,x*y*x; // G is a monomial Groebner basis
   lpSickleDim(G); // invokes the procedure with ring parameters
-  // the factor algebra is finite, so the degree bound, given 
+  // the factor algebra is finite, so the degree bound, given
   // by the Letterplace ring is not necessary
   lpSickleDim(G,0); // procedure without any degree bound
 }

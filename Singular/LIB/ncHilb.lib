@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version nc_hilb.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version nc_hilb.lib 4.1.1.4 Nov_2018 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY:  ncHilb.lib: Computation of graded and multi-graded Hilbert series of non-commutative algebras (Letterplace).
@@ -23,7 +23,7 @@ PROCEDURES:
 
 
 /*
-// NEW HEADER 
+// NEW HEADER
 info="
 LIBRARY:  fpahilb.lib: Computation of graded and multi-graded Hilbert series of non-commutative algebras (Letterplace).
 
@@ -72,8 +72,8 @@ EXAMPLE: example fpahilb; shows an example "
     {
       ERROR("Basering should be Letterplace ring");
     }
-	def save = basering; 
-	int sz=size(#);
+    def save = basering;
+    int sz=size(#);
     int lV=attrib(save,"isLetterplaceRing"); // nvars(orig comm ring)
     int ig=0;
     int mgrad=0;
@@ -125,37 +125,37 @@ EXAMPLE: example fpahilb; shows an example "
     {
       ERROR("error:only int 1,2, >2, and a string are allowed as optional parameters");
     }
-	int maxdegJ = 0;
-	ideal J_lm = I; 
+    int maxdegJ = 0;
+    ideal J_lm = I;
     for(i=1; i<=size(J_lm); i++)
     {
         J_lm[i]=leadmonom(J_lm[i]);
-		if ( deg(J_lm[i]) > maxdegJ )
-		{
-		  maxdegJ = deg(J_lm[i]);
-		}
+        if ( deg(J_lm[i]) > maxdegJ )
+        {
+          maxdegJ = deg(J_lm[i]);
+        }
     }
     // new: truncation should be < than degbound/2
     int degbnd = attrib(save,"uptodeg");
-	if (tdeg == 0)
-	{
-		// orig code: LPRing is created with degree bound=2*d
-		// therefore check here, that maxdeg(gens) <=uptodeg/2
-		if ( 2*maxdegJ != degbnd)
-		{
-			ERROR("Degree bound on the basering should be precisely "+ string(2*maxdegJ));
-		}
-	}
-	else 
-	{ // ie tdeg>0
-		// orig code: LPRing is created with degree bound=2*(tdeg-1)
-		if ( 2*(tdeg - 1) != degbnd)
-		{
-			ERROR("Degree bound on the basering should be precisely "+ string(2*(tdeg - 1)));
-		}
-	}
-	// if (tdeg > (degbnd-1) div 2) 
-	// {
+    if (tdeg == 0)
+    {
+        // orig code: LPRing is created with degree bound=2*d
+        // therefore check here, that maxdeg(gens) <=uptodeg/2
+        if ( 2*maxdegJ != degbnd)
+        {
+            ERROR("Degree bound on the basering should be precisely "+ string(2*maxdegJ));
+        }
+    }
+    else
+    { // ie tdeg>0
+        // orig code: LPRing is created with degree bound=2*(tdeg-1)
+        if ( 2*(tdeg - 1) != degbnd)
+        {
+            ERROR("Degree bound on the basering should be precisely "+ string(2*(tdeg - 1)));
+        }
+    }
+    // if (tdeg > (degbnd-1) div 2)
+    // {
        // ERROR("Degree bound on the basering should be at least 2*N+1");
     // }
 //    def save2 = basering;
@@ -172,7 +172,7 @@ EXAMPLE: example fpahilb; shows an example "
     else
     {
       system("nc_hilb", J_lm, lV, ig, mgrad,tdeg, odp);
-    }    
+    }
 }
 
 example
@@ -186,7 +186,7 @@ example
 
 /*
 // // examples
-//test_1: 
+//test_1:
  ring r=0,(X,Y,Z),dp;
     module p1 =[1,Y,Z];             //represents the poly Y*Z
     module p2 =[1,Y,Z,X];          //represents the poly Y*Z*X
@@ -214,7 +214,7 @@ example
     module p2=[1,a,b,b];
     module p3=[1,a,a,b];
     list l3=list(p1,p2,p3);
-	nchilb(l3,5); // new vl: usual HS
+    nchilb(l3,5); // new vl: usual HS
     nchilb(l3,5,2);//third argument '2' is to compute multi-graded HS
 // ** TEST 3: NEW
   LIB "./ncHilb.lib";
@@ -225,7 +225,7 @@ example
   //nchilb(l3,5);// no third argument '2' = to compute the usual HS
   fpahilb(I,5,2,"p");
   //nchilb(l3,5,2);//third argument '2' is to compute multi-graded HS
-	
+
 
 */
 
@@ -235,7 +235,7 @@ static proc conversion_problems()
 // second call of same procedure changes the input: FIXED
 
 // a) still we get very different results (suspected: via TwordMap() )
-  
+
   // very easy:
   LIB "ncHilb.lib";
   ring r=0,(a,b),dp;
@@ -351,14 +351,14 @@ Hilbert series:
   // output:
   /* maximal length of words = 3
 length of the Orbit = 5
-words description of the Orbit: 
-1    a(1)    a(1)*a(2)    a(1)*b(2)    a(1)*a(2)*a(3)    
+words description of the Orbit:
+1    a(1)    a(1)*a(2)    a(1)*b(2)    a(1)*a(2)*a(3)
 maximal degree,  #(sum_j R(w,w_j))
 NULL
-2,  3 
-1,  2 
-1,  1 
-0,  1 
+2,  3
+1,  2
+1,  1
+0,  1
 linear system:
 H(1) = (t)*H(2) + (t)*H(1) +  1
 H(2) = (t)*H(3) + (t)*H(4) +  1
@@ -374,7 +374,7 @@ Hilbert series:
 }
 
 static proc boo()
-{  
+{
 // very different input; long example
   LIB "./ncHilb.lib";
   ring r2=0,(x,y,z),dp;
@@ -407,24 +407,24 @@ EXAMPLE: example rcolon; shows an example"
     {
       ERROR("Basering must be a Letterplace ring");
     }
-	// test whether degree bound == 2*maxdeg(elts of the ideal)
-	int maxdegI = 0;
-	int i;
-	for(i=1; i<=ncols(I); i++)
+    // test whether degree bound == 2*maxdeg(elts of the ideal)
+    int maxdegI = 0;
+    int i;
+    for(i=1; i<=ncols(I); i++)
     {
         I[i]=leadmonom(I[i]);
-		if ( deg(I[i]) > maxdegI )
-		{
-		  maxdegI = deg(I[i]);
-		}
+        if ( deg(I[i]) > maxdegI )
+        {
+          maxdegI = deg(I[i]);
+        }
     }
-	int degbnd = attrib(R,"uptodeg");
-	if ( 2*maxdegI != degbnd)
-	{
+    int degbnd = attrib(R,"uptodeg");
+    if ( 2*maxdegI != degbnd)
+    {
       ERROR("Degree bound on the basering should be precisely "+ string(2*maxdegI));
-	}
+    }
     poly wc = leadmonom(W);
-	"Debug: rcolon is called with lV="+string(lV);
+    "Debug: rcolon is called with lV="+string(lV);
     ideal J = system("rcolon", I, wc, lV);
     // VL: printlevel here? before only printing was there, no output
     return(J);
@@ -452,7 +452,7 @@ example
 */
 
 
-// original version of the proc + 
+// original version of the proc +
 // minor fixes by VL in the example: redefine ring excluded, binomial fixed
 proc nchilb(list L_wp, int d, list #)
 "USAGE: nchilb(I, d[, L]), list I, int d, optional list L
@@ -760,10 +760,10 @@ EXAMPLE: example rcolon; shows an example "
     {"<1>"}
     else{
     //lp2lstr(J,save);
-	J;
+    J;
     //lst2str(@LN, 1);
     "+ generators of the given ideal;";}
-	setring save;
+    setring save;
  }
 example
 {
