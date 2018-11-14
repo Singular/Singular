@@ -505,7 +505,10 @@ void p_LPExpVappend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const 
   PrintLn(); WriteLPExpV(m1ExpV, ri);
   PrintLn(); WriteLPExpV(m2ExpV, ri);
 #endif
-  assume(m1Length + m2Length <= ri->N); // always throw an error?
+  if (m1Length + m2Length > ri->N)
+  {
+    WarnS("letterplace degree bound too low for this multiplication");
+  }
   for (int i = 1 + m1Length; i < 1 + m1Length + m2Length; ++i)
   {
     assume(m2ExpV[i - m1Length] <= 1);
@@ -527,7 +530,10 @@ void p_LPExpVprepend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const
   PrintLn(); WriteLPExpV(m1ExpV, ri);
   PrintLn(); WriteLPExpV(m2ExpV, ri);
 #endif
-  assume(m1Length + m2Length <= ri->N); // always throw an error?
+  if (m1Length + m2Length > ri->N)
+  {
+    WarnS("letterplace degree bound too low for this multiplication");
+  }
 
   // shift m1 by m2Length
   for (int i = m2Length + m1Length; i >= 1 + m2Length; --i)
