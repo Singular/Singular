@@ -566,7 +566,7 @@ char* LPExpVString(int *expV, ring ri)
     {
       StringAppendS("| ");
     }
-    if (i % ri->isLPring == 0)
+    if (i % ri->isLPring == 0 && i != ri->N)
     {
       StringAppendS(" ");
     }
