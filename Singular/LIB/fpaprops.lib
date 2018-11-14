@@ -918,8 +918,8 @@ ASSUME: - basering is a Letterplace ring
     }
     kill d;
   } kill i;
-  // if longest word has length 1 we handle it as a special case
-  if (l == 1) {
+  // if longest word has length 1, or G is the zero ideal, we handle it as a special case
+  if (l == 1 || size(G) == 0) {
     int n = attrib(basering, "isLetterplaceRing"); // variable count
     int k = size(G);
     if (k == n) { // V = {1} no edges
