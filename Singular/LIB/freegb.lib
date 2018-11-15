@@ -3261,6 +3261,30 @@ static proc lpReduce(poly p, poly g, int s)
  return(p - leadcoef(p)*normalize(qt));
 }
 
+static proc entryViolation(intmat M, int n)
+"PURPOSE:checks, if all entries in M are variable-related
+"
+{int i,j;
+  for (i = 1; i <= nrows(M); i++)
+  {for (j = 1; j <= ncols(M); j++)
+    {if(!((1<=M[i,j])&&(M[i,j]<=n))) {return(1);}}
+  }
+  return(0);
+}
+
+static proc checkAssumptionsLPIV(int d, list L)
+"PURPOSE: Checks, if all the Assumptions are holding
+"
+{if (attrib(basering,"isLetterplaceRing")==0) {ERROR("Basering is not a Letterplace ring!");}
+  if (d > attrib(basering,"uptodeg")) {ERROR("Specified degree bound exceeds ring parameter!");}
+  int i;
+  for (i = 1; i <= size(L); i++)
+  {if (entryViolation(L[i], attrib(basering,"isLetterplaceRing")))
+    {ERROR("Not allowed monomial/intvec found!");}
+  }
+  return();
+}
+
 static proc checkAssumptions(poly p, ideal G)
 "
 "
@@ -3606,7 +3630,7 @@ ASSUME: - The rows of each intmat in L must correspond to a Letterplace monomial
 @*      - basering has to be a Letterplace ring
 EXAMPLE: example iv2lpList; shows examples
 "
-{checkAssumptions(0,L);
+{checkAssumptionsLPIV(0,L);
   ideal G;
   int i;
   for (i = 1; i <= size(L); i++){G = G + iv2lpMat(L[i]);}
@@ -3636,7 +3660,7 @@ ASSUME: - The rows of M must correspond to Letterplace monomials
 EXAMPLE: example iv2lpMat; shows examples
 "
 {list L = M;
-  checkAssumptions(0,L);
+  checkAssumptionsLPIV(0,L);
   kill L;
   ideal G; poly p;
   int i; intvec I;
@@ -3671,7 +3695,7 @@ EXAMPLE: example lpId2ivLi; shows examples
 {
   int i,j,k;
   list M;
-  checkAssumptions(0,M);
+  checkAssumptionsLPIV(0,M);
   for (i = 1; i <= size(G); i++) {M[i] = lp2iv(G[i]);}
   return(M);
 }
@@ -3734,7 +3758,7 @@ EXAMPLE: example lp2ivId; shows examples
 "
 {G = normalize(lead(G));
   intvec I; list L;
-  checkAssumptions(0,G);
+  checkAssumptionsLPIV(0,L);
   int i,md;
   for (i = 1; i <= size(G); i++) { if (md <= deg(G[i])) {md = deg(G[i]);}}
   while (size(G) > 0)
