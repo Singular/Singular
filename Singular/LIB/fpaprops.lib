@@ -621,27 +621,25 @@ static proc UfGraphGrowth(intmat UG)
   int n = ncols(UG); // number of vertices
   // iterate through all vertices
 
-  intvec visited;
-  visited[n] = 0;
-
-  intvec cyclic;
-  cyclic[n] = 0;
+  intvec visited = 0:n;
+  intvec cyclic = 0:n;
+  intvec countedCycles = -2:n;
 
   int maxCycleCount = 0;
   for (int v = 1; v <= n; v++) {
-    int cycleCount = countCycles(UG, v, visited, cyclic, 0);
-    if (cycleCount == -1) {
+    countedCycles = countCycles(UG, v, visited, cyclic, 0, countedCycles);
+    dbprint("counted " + string(countedCycles[v]) + " cycles from vertex " + string(v) + "/" + string(n) + " (cache: " + string(countedCycles) + ")");
+    if (countedCycles[v] == -1) {
       return(-1);
     }
-    if (cycleCount > maxCycleCount) {
-      maxCycleCount = cycleCount;
+    if (countedCycles[v] > maxCycleCount) {
+      maxCycleCount = countedCycles[v];
     }
-    kill cycleCount;
   } kill v;
-  return(maxCycleCount);
+  return (maxCycleCount);
 }
 
-static proc countCycles(intmat G, int v, intvec visited, intvec cyclic, intvec path)
+static proc countCycles(intmat G, int v, intvec visited, intvec cyclic, intvec path, intvec countedCycles)
 "USAGE: countCycles(G, v, visited, cyclic, path); G a Graph, v the vertex to
 start. The parameter visited, cyclic and path should be 0.
 RETURN: int
@@ -650,6 +648,9 @@ PURPOSE: Calculate the maximal number of distinct cycles in a single path starti
 ASSUME: Basering is a Letterplace ring
 "
 {
+  if (countedCycles[v] > -2) {
+    return (countedCycles);
+  }
   // Mark the current vertex as visited
   visited[v] = 1;
 
@@ -668,7 +669,8 @@ ASSUME: Basering is a Letterplace ring
         for (int j = size(path); j >= 1; j--) {
           if(cyclic[path[j]] == 1) {
             // 1.1 if yes, return -1
-            return (-1);
+            countedCycles[v] = -1;
+            return (countedCycles);
           }
           if (path[j] == w) {
             break;
@@ -693,14 +695,14 @@ ASSUME: Basering is a Letterplace ring
         // 3. countCycles() on all these vertices
         int maxCycleCount = 0;
         for (int j = size(path); j >= 1; j--) {
-          int cycleCount = countCycles(G, path[j], visited, cyclic, path);
-          if(cycleCount == -1) {
-            return (-1);
+          countedCycles = countCycles(G, path[j], visited, cyclic, path, countedCycles);
+          if(countedCycles[path[j]] == -1) {
+            countedCycles[v] = -1;
+            return (countedCycles);
           }
-          if (cycleCount > maxCycleCount) {
-            maxCycleCount = cycleCount;
+          if (countedCycles[path[j]] > maxCycleCount) {
+            maxCycleCount = countedCycles[path[j]];
           }
-          kill cycleCount;
           if (path[j] == w) {
             break;
           }
@@ -710,19 +712,19 @@ ASSUME: Basering is a Letterplace ring
         }
         kill maxCycleCount;
       } else {
-        int cycleCount = countCycles(G, w, visited, cyclic, path);
-        if (cycleCount == -1) {
-          return(-1);
+        countedCycles = countCycles(G, w, visited, cyclic, path, countedCycles);
+        if (countedCycles[w] == -1) {
+          countedCycles[v] = -1;
+          return (countedCycles);
         }
-        if (cycleCount > cycles) {
-          cycles = cycleCount;
+        if (countedCycles[w] > cycles) {
+          cycles = countedCycles[w];
         }
-        kill cycleCount;
       }
     }
   } kill w;
-  // printf("Path: %s countCycles: %s", path, cycles); // DEBUG
-  return(cycles);
+  countedCycles[v] = cycles;
+  return (countedCycles);
 }
 
 proc lpUfGraph(ideal G, list #)
@@ -737,32 +739,37 @@ ASSUME: - basering is a Letterplace ring
       - G are the leading monomials of a Groebner basis
 "
 {
+  dbprint("computing maxDeg");
   int l = maxDeg(G);
-  list LG = lpId2ivLi(G);
-  list SW = ivStandardWords(LG, l - 1); // vertices
-  int n = size(SW);
+  if (l - 1 == 0) {
+    // TODO: how should the graph look like when l - 1 = 0 ?
+    ERROR("Ufnarovskij graph not implemented for l = 1");
+  }
+  int lV = attrib(basering, "isLetterplaceRing");
+  // TODO: what if l <= 0?
+  dbprint("computing standard words");
+  ideal SW = lpStandardWords(G, l - 1); // vertices
+  int n = ncols(SW);
+  dbprint("n = " + string(n));
   intmat UG[n][n]; // Ufnarovskij graph
   for (int i = 1; i <= n; i++) {
     for (int j = 1; j <= n; j++) {
+      dbprint("Ufnarovskii graph: " + string((i-1)*n + j) + "/" + string(n*n) + " entries");
       // [Studzinski page 76]
-      intvec v = SW[i];
-      intvec w = SW[j];
+      poly v = SW[i];
+      poly w = SW[j];
       intvec v_overlap;
       intvec w_overlap;
-      //TODO how should the graph look like when l - 1 = 0 ?
-      if (l - 1 == 0) {
-        ERROR("Ufnarovskij graph not implemented for l = 1");
-      }
       if (l - 1 > 1) {
-        v_overlap = v[2 .. l-1];
-        w_overlap = w[1 .. l-2];
+        v_overlap = leadexp(v);
+        w_overlap = leadexp(w);
+        v_overlap = v_overlap[(lV+1) .. (l-1)*lV];
+        w_overlap = w_overlap[1 .. (l-2)*lV];
       }
-      intvec vw = v;
-      vw[l] = w[l-1];
-      if (v_overlap == w_overlap && !ivdivides(LG, vw)) {
+      if (v_overlap == w_overlap && !lpLmDivides(G, v * lpVarAt(w, l - 1))) {
         UG[i,j] = 1;
       }
-      kill v; kill w; kill v_overlap; kill w_overlap; kill vw;
+      kill v; kill w; kill v_overlap; kill w_overlap;
     } kill j;
   } kill i;
   if (size(#) > 0) {
@@ -798,6 +805,23 @@ static proc maxDeg(ideal G)
     kill d;
   } kill i;
   return (l);
+}
+
+static proc lpStandardWords(ideal G, int length)
+"ASSUME: G is simplified
+"
+{
+  if (length < 0) {
+    return (delete(ideal(0), 1)); // no standard words
+  }
+
+  ideal words = maxideal(length);
+  for (int i = ncols(words); i >= 1; i--) {
+    if (lpLmDivides(G, words[i])) {
+      words = delete(words, i);
+    }
+  } kill i;
+  return (words);
 }
 
 static proc ivStandardWords(list G, int length)
@@ -857,7 +881,7 @@ proc lpGkDim(ideal G)
 "USAGE: lpGkDim(G); G an ideal in a letterplace ring
 RETURN: int
 PURPOSE: Determines the Gelfand Kirillov dimension of A/<G>
-@*       -1 means it is positive infinite
+@*       -1 means positive infinite
 ASSUME: - basering is a Letterplace ring
 @*      - G is a Groebner basis
 "
@@ -876,12 +900,12 @@ ASSUME: - basering is a Letterplace ring
 
     // also if G is the whole ring return minus infinity
     if (leadmonom(G[i]) == 1) {
-      ERROR("Gk-Dim not defined for 0-ring")
+      ERROR("GK-Dim not defined for 0-ring")
     }
     kill d;
   } kill i;
-  // if longest word has length 1 we handle it as a special case
-  if (l == 1) {
+  // if longest word has length 1, or G is the zero ideal, we handle it as a special case
+  if (l == 1 || size(G) == 0) {
     int n = attrib(basering, "isLetterplaceRing"); // variable count
     int k = size(G);
     if (k == n) { // V = {1} no edges
@@ -895,7 +919,11 @@ ASSUME: - basering is a Letterplace ring
     }
   }
 
+  dbprint("computing Ufnarovskii graph");
   intmat UG = lpUfGraph(G);
+  if (printlevel >= voice + 1) {
+    UG;
+  }
 
   // check special case 2
   intmat zero[nrows(UG)][ncols(UG)];
@@ -904,17 +932,24 @@ ASSUME: - basering is a Letterplace ring
   }
 
   // check special case 3
+  dbprint("topological sorting of Ufnarovskii graph");
   UG = topologicalSort(UG);
+  if (printlevel >= voice + 1) {
+    UG;
+  }
 
+  dbprint("check if Ufnarovskii graph is DAG");
   if (imIsUpRightTriangle(UG)) {
     UG = eliminateZerosUpTriangle(UG);
     if (ncols(UG) == 0 || nrows(UG) == 0) { // when the diagonal was zero
       return (0)
     }
+    dbprint("DAG detected, using URTNZD growth alg");
     return(UfGraphURTNZDGrowth(UG));
   }
 
   // otherwise count cycles in the Ufnarovskij Graph
+  dbprint("not a DAG, using regular growth alg");
   return(UfGraphGrowth(UG));
 }
 example

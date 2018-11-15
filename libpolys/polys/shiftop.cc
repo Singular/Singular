@@ -566,7 +566,7 @@ char* LPExpVString(int *expV, ring ri)
     {
       StringAppendS("| ");
     }
-    if (i % ri->isLPring == 0)
+    if (i % ri->isLPring == 0 && i != ri->N)
     {
       StringAppendS(" ");
     }
@@ -658,6 +658,74 @@ int p_mIsInV(poly p, const ring r)
  ret_true:
   omFreeSize((ADDRESS) B, (b+1)*sizeof(int));
   return(1);
+}
+
+BOOLEAN p_LPDivisibleBy(poly a, poly b, const ring r)
+{
+  pIfThen1(b!=NULL, p_LmCheckPolyRing1(b, r));
+  pIfThen1(a!=NULL, p_LmCheckPolyRing1(a, r));
+
+  if (b == NULL) return TRUE;
+  if (a != NULL && (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r)))
+      return _p_LPLmDivisibleByNoComp(a,b,r);
+  return FALSE;
+}
+
+BOOLEAN p_LPLmDivisibleBy(poly a, poly b, const ring r)
+{
+  p_LmCheckPolyRing1(b, r);
+  pIfThen1(a != NULL, p_LmCheckPolyRing1(b, r));
+  if (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r))
+    return _p_LPLmDivisibleByNoComp(a, b, r);
+  return FALSE;
+}
+
+BOOLEAN _p_LPLmDivisibleByNoComp(poly a, poly b, const ring r)
+{
+  if(p_LmIsConstantComp(a, r))
+    return TRUE;
+#ifdef SHIFT_MULT_COMPAT_MODE
+  a = p_Head(a, r);
+  p_mLPunshift(a, r);
+  b = p_Head(b, r);
+  p_mLPunshift(b, r);
+#endif
+  int i = (r->N / r->isLPring) - p_LastVblock(a, r);
+  do {
+    int j = r->N - (i * r->isLPring);
+    bool divisible = true;
+    do
+    {
+      if (p_GetExp(a, j, r) > p_GetExp(b, j + (i * r->isLPring), r))
+      {
+        divisible = false;
+        break;
+      }
+      j--;
+    }
+    while (j);
+    if (divisible) return TRUE;
+    i--;
+  }
+  while (i > -1);
+#ifdef SHIFT_MULT_COMPAT_MODE
+  p_Delete(&a, r);
+  p_Delete(&b, r);
+#endif
+  return FALSE;
+}
+
+poly p_LPVarAt(poly p, int pos, const ring r)
+{
+  if (p == NULL || pos < 1 || pos > (r->N / r->isLPring)) return NULL;
+  poly v = p_One(r);
+  for (int i = (pos-1) * r->isLPring + 1; i <= pos * r->isLPring; i++) {
+    if (p_GetExp(p, i, r)) {
+      p_SetExp(v, i - (pos-1) * r->isLPring, 1, r);
+      return v;
+    }
+  }
+  return v;
 }
 
 ring freeAlgebra(ring r, int d)
