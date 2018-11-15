@@ -776,7 +776,7 @@ ASSUME: - basering is a Letterplace ring
     if (typeof(#[1]) == "int") {
       if (#[1] != 0) {
         list ret = UG;
-        ret[2] = ivL2lpI(SW); // the vertices
+        ret[2] = SW; // the vertices
         return (ret);
       }
     }
