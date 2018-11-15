@@ -100,11 +100,15 @@ public:
   groebnerCones tropicalNeighbours() const;
 
   /**
+   * Return 1 if w points is in the dual of the polyhedral cone, 0 otherwise
+   */
+  bool pointsOutwards(const gfan::ZVector w) const;
+
+  /**
    * Debug tools.
    */
   #ifndef NDEBUG
   bool checkFlipConeInput(const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const;
-  bool pointsOutwards(const gfan::ZVector) const;
   #endif
 };
 
