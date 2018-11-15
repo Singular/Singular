@@ -1,7 +1,7 @@
 @comment -*-texinfo-*-
 @comment this file describes polynomial graded commutative algebras and their implementation in Singular
 
-@node Graded commutative algebras (SCA),LETTERPLACE,Mathematical background (plural),Non-commutative subsystem
+@node Graded commutative algebras (SCA)
 @section Graded commutative algebras (SCA)
 @cindex Graded commutative algebras
 @cindex super-commutative algebras

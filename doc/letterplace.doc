@@ -10,7 +10,7 @@
 %**start
 @end ignore
 
-@node LETTERPLACE,Non-commutative libraries,Graded commutative algebras (SCA),Non-commutative subsystem
+@node LETTERPLACE
 @section LETTERPLACE
 @cindex LETTERPLACE
 @cindex Letterplace
@@ -250,3 +250,43 @@ See
 @ref{std}.
 @c ref
 
+@c ---------------------------------------------------------------------------
+@node LETTERPLACE libraries
+@section LETTERPLACE libraries
+@cindex LETTERPLACE libraries
+@cindex Letterplace libraries
+
+@menu
+* fpadim_lib::  Algorithms for quotient algebras in the letterplace case
+* fpalgebras_lib:: Generation of various algebras in the letterplace case
+* fpaprops_lib:: Algorithms for properties of quotient algebras in letterplace case
+* freegb_lib::  Two-sided Groebner bases in free algebras via Letterplace
+* ncHilb_lib:: Hilbert functio for non-commutative rings
+* ncrat_lib::  nc rational functions
+@end menu
+
+@c ----------------------------------------------------------
+@node fpadim_lib
+@subsection fpadim_lib
+@c lib fpadim.lib
+@c ----------------------------------------------------------
+@node fpalgebras_lib
+@subsection fpalgebras_lib
+@c lib fpalgebras.lib
+@c ----------------------------------------------------------
+@node fpaprops_lib
+@subsection fpaprops_lib
+@c lib fpaprops.lib
+@c ----------------------------------------------------------
+@node freegb_lib
+@subsection freegb_lib
+@c lib freegb.lib
+@c ----------------------------------------------------------
+@node ncHilb_lib
+@subsection ncHilb_lib
+@c lib ncHilb.lib
+@c ----------------------------------------------------------
+@node ncrat_lib
+@subsection ncrat_lib
+Status: experimental
+@c lib ncrat.lib

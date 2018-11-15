@@ -1,10 +1,9 @@
 @c -*-texinfo-*-
 
 @c --------------------------------------------------------------------
-@node Non-commutative libraries, , LETTERPLACE, Non-commutative subsystem
-@section Non-commutative libraries
-@cindex  Non-commutative libraries
-@cindex  Non-commutative LIBs
+@node PLURAL libraries
+@section PLURAL libraries
+@cindex  PLURAL libraries
 @cindex  PLURAL LIBs
 
 @c @sc{Plural} comes with a set of standard libraries.
@@ -26,22 +25,20 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 * dmod_lib:: Fundamental algorithms for algebraic D-modules
 * dmodapp_lib::  Applications of algebraic D-modules
 * dmodvar_lib:: Algebraic D-modules and Bernstein-Sato polynomial for varieties
-* fpadim_lib::  Algorithms for quotient algebras in the letterplace case
-* fpalgebras_lib:: Generation of various algebras in the letterplace case
-* fpaprops_lib:: Algorithms for properties of quotient algebras in letterplace case
-* freegb_lib::  Two-sided Groebner bases in free algebras via Letterplace
 * involut_lib::  Computations and operations with involutions
 * gkdim_lib::  Computation of the Gelfand-Kirillov dimension of modules
 * ncalg_lib::  Definitions of important G- and GR-algebras
 * ncdecomp_lib::  Algorithmic decomposition of a module with central characters
 * ncfactor_lib::  Tools for factorization in some noncommutative algebras
+* ncfrac_lib:: fractions in Ore localizations of a G-algebras
+* ncloc_lib:: Ore-localization in G-Algebras
 * ncpreim_lib:: Non-commutative elimination and preimage computations
 * nctools_lib::  General tools for noncommutative algebras
+* olga_lib:: Ore-localization in G-Algebras
 * perron_lib::  Method of Perron to compute algebraic dependence
 * qmatrix_lib::  Quantum matrices, quantum minors and symmetric groups
 * purityfiltration_lib:: purity filtration of a given module
 * nchomolog_lib:: Noncommutative Homological Algebra
-* ncrat_lib::  nc rational functions
 * ratgb_lib:: Groebner bases in Ore localizations of noncommutative G-algebras
 * dmodloc_lib:: Localization of algebraic D-modules
 @end menu
@@ -73,22 +70,6 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 @node dmodvar_lib
 @section dmodvar_lib
 @c lib dmodvar.lib
-@c ----------------------------------------------------------
-@node fpadim_lib
-@section fpadim_lib
-@c lib fpadim.lib
-@c ----------------------------------------------------------
-@node fpalgebras_lib
-@section fpalgebras_lib
-@c lib fpalgebras.lib
-@c ----------------------------------------------------------
-@node fpaprops_lib
-@section fpaprops_lib
-@c lib fpaprops.lib
-@c ----------------------------------------------------------
-@node freegb_lib
-@section freegb_lib
-@c lib freegb.lib
 @c ----------------------------------------------------------
 @node involut_lib
 @section involut_lib
@@ -136,17 +117,12 @@ Status: experimental
 Status: experimental
 @c lib nchomolog.lib
 @c ----------------------------------------------------------
-@node ncrat_lib
-@section ncrat_lib
-Status: experimental
-@c lib ncrat.lib
-@c ----------------------------------------------------------
 @node ratgb_lib
 @section ratgb_lib
 Status: experimental
 @c lib ratgb.lib
 @c ----------------------------------------------------------
-@c @node bimodules_lib, dmodloc_lib, ratgb_lib, Non-commutative libraries
+@c @node bimodules_lib
 @c @section bimodules_lib
 @c Status: experimental
 @c @c lib bimodules.lib
@@ -155,6 +131,18 @@ Status: experimental
 @section dmodloc_lib
 Status: experimental
 @c lib dmodloc.lib
+@c ----------------------------------------------------------
+@node ncfrac_lib
+@section ncfrac_lib
+@c lib ncfrac.lib
+@c ----------------------------------------------------------
+@node ncloc_lib
+@section ncloc_lib
+@c lib ncloc.lib
+@c ----------------------------------------------------------
+@node olga_lib
+@section olga_lib
+@c lib olga.lib
 @c ----------------------------------------------------------
 @raisesections
 

@@ -172,9 +172,10 @@ This is the texinfo file describing Singular (version @value{VERSION})
 * Data types (plural)::
 * Functions  (plural)::
 * Mathematical background (plural)::
+* PLURAL libraries::
 * Graded commutative algebras (SCA)::
 * LETTERPLACE::
-* Non-commutative libraries::
+* LETTERPLACE libraries::
 @end menu
 @include s-plural.tex
 @include sca.tex
@@ -220,7 +221,7 @@ Use the @code{LIB} command (see @ref{LIB}) for loading of single libraries,
 and the command @code{LIB "all.lib";} for loading all libraries.
 
 @ifset withplural
-See also @ref{Non-commutative libraries}.
+See also @ref{PLURAL libraries}.
 @end ifset
 
 @strong{Interpreter libraries:}
@@ -243,7 +244,7 @@ See also @ref{Non-commutative libraries}.
 * Experimental libraries::
 @end menu
 @ifset withplural
-@xref{Non-commutative libraries}.
+@xref{PLURAL libraries}.
 @end ifset
 
 @c ----------------------------------------------------------
@@ -1065,13 +1066,9 @@ Comments should be send to the author of the library directly.
 * modules_lib:: Representations of Modules
 * modwalk_lib:: Groebner basis convertion
 * multigrading_lib:: Multigradings and related computations
-* ncHilb_lib:: Hilbert functio for non-commutative rings
-* ncfrac_lib:: fractions in Ore localizations of a G-algebras
-* ncloc_lib:: Ore-localization in G-Algebras
 * nets_lib:: Pretty printing
 * nfmodstd_lib:: Groebner bases of ideals in rings over algebraic number fields
 * nfmodsyz_lib:: Syzygy modules of submodules of free modules over algebraic number fields
-* olga_lib:: Ore-localization in G-Algebras
 * realclassify_lib:: Classification of real singularities
 * rootisolation_lib:: real root isolation with intervals
 * rstandard_lib:: Janet bases and border bases for ideals
@@ -1192,18 +1189,6 @@ Todos/Issues:
 
 @c lib multigrading.lib
 @c ----------------------------------------------------------
-@node ncHilb_lib
-@subsection ncHilb_lib
-@c lib ncHilb.lib
-@c ----------------------------------------------------------
-@node ncfrac_lib
-@subsection ncfrac_lib
-@c lib ncfrac.lib
-@c ----------------------------------------------------------
-@node ncloc_lib
-@subsection ncloc_lib
-@c lib ncloc.lib
-@c ----------------------------------------------------------
 @node nets_lib
 @subsection nets_lib
 @c lib nets.lib
@@ -1215,10 +1200,6 @@ Todos/Issues:
 @node nfmodsyz_lib
 @subsection nfmodsyz_lib
 @c lib nfmodsyz.lib
-@c ----------------------------------------------------------
-@node olga_lib
-@subsection olga_lib
-@c lib olga.lib
 @c ----------------------------------------------------------
 @node realclassify_lib
 @subsection realclassify_lib

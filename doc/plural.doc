@@ -31,7 +31,7 @@ and non-commutative rings.
 
 
 With @sc{Plural}, one can set up a non-commutative @math{G}-algebra, say @math{A}, with
-a Poincar@'e-Birkhoff-Witt (PBW) basis, (see @ref{G-algebras} for step-by-step building instructions and also @ref{Non-commutative libraries}
+a Poincar@'e-Birkhoff-Witt (PBW) basis, (see @ref{G-algebras} for step-by-step building instructions and also @ref{PLURAL libraries}
 for procedures for setting many important algebras easily).
 
 Functionalities of @sc{Plural} (enlisted in @ref{Functions  BR_PLURAL_BR}) are accessible as soon as the basering becomes non-commutative (see @ref{nc_algebra}).
@@ -1478,14 +1478,14 @@ name of the n-th ring variable (see @ref{varstr})
 
 @raisesections
 @c ----------------------------------------------------------------------------
-@node Functions BR_PLURAL_BR, Mathematical background BR_PLURAL_BR, Data types BR_PLURAL_BR, Non-commutative subsystem
+@node Functions BR_PLURAL_BR
 
 @section Functions BR_PLURAL_BR
 
 @cindex commands BR_PLURAL_BR
 
 This chapter gives a complete reference of all functions and commands of the @sc{Plural} kernel, i.e. all built-in commands
-(for the @sc{Plural} libraries see @ref{Non-commutative libraries}).
+(for the @sc{Plural} libraries see @ref{PLURAL libraries}).
 
 The general syntax of a function is
 @format
@@ -3310,8 +3310,7 @@ See also
 @c ref
 @c -------------------------------------------------------------------------
 
-@node Mathematical background BR_PLURAL_BR, Graded commutative algebras (SCA), Functions BR_PLURAL_BR, Non-commutative subsystem
-
+@node Mathematical background BR_PLURAL_BR
 @section Mathematical background BR_PLURAL_BR
 @cindex Mathematical background BR_PLURAL_BR
 
@@ -3333,7 +3332,7 @@ All algebras are assumed to be associative @math{K}-algebras for some field @mat
 
 
 @c ---------------------------------------------------------------------------
-@node G-algebras, Groebner bases in G-algebras,  , Mathematical background BR_PLURAL_BR
+@node G-algebras
 @subsection G-algebras
 @cindex G-algebra
 
@@ -3559,7 +3558,7 @@ hold but it provides a procedure @ref{ndcond} from the library @ref{nctools_lib}
 
 
 @c ---------------------------------------------------------------------------
-@node Groebner bases in G-algebras, Syzygies and resolutions BR_PLURAL_BR, G-algebras, Mathematical background BR_PLURAL_BR
+@node Groebner bases in G-algebras
 @subsection Groebner bases in G-algebras
 @cindex Groebner bases in G-algebras
 
@@ -3720,7 +3719,7 @@ f is in I if and only if left the normal form NF(f|G) = 0.
 @end ifinfo
 
 @c ---------------------------------------------------------------------------
-@node Syzygies and resolutions BR_PLURAL_BR, References BR_PLURAL_BR, Groebner bases in G-algebras, Mathematical background BR_PLURAL_BR
+@node Syzygies and resolutions BR_PLURAL_BR
 @subsection Syzygies and resolutions BR_PLURAL_BR
 @cindex Syzygies and resolutions BR_PLURAL_BR
 
@@ -3843,7 +3842,7 @@ size(ideal(TST));
 @end table
 
 @c ---------------------------------------------------------------------------
-@node References BR_PLURAL_BR, , Syzygies and resolutions BR_PLURAL_BR, Mathematical background BR_PLURAL_BR
+@node References BR_PLURAL_BR
 @subsection References BR_PLURAL_BR
 @cindex References BR_PLURAL_BR
 
