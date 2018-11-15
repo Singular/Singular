@@ -3302,9 +3302,15 @@ static proc isContainedInVp(poly p)
  int n = attrib(basering,"isLetterplaceRing"); int d = attrib(basering,"uptodeg");
  int i,j,c,c1;
  while (1 <= d)
- {w = l[1..n];
-  if (w<>intvec(0)){break;}
-   else {l = l[(n+1)..(n*d)]; d = d-1;}
+ {
+   w = l[1..n];
+   if (w<>(0:n)) {break;}
+   else
+   {
+     if (size(w)==size(l)) break;
+     l = l[(n+1)..(n*d)];
+     d = d-1;
+   }
  }
 
  while (1 <= d)
@@ -3543,8 +3549,9 @@ EXAMPLE: example ivL2lpI; shows examples
   int i; ideal G;
   poly p;
   for (i = 1; i <= size(L); i++)
-  {p = iv2lp(L[i]);
-    G[(size(G) + 1)] = p;
+  {
+    p = iv2lp(L[i]);
+    G[(ncols(G) + 1)] = p;
   }
   return(G);
 }
@@ -3727,7 +3734,7 @@ EXAMPLE: example lp2ivId; shows examples
 "
 {G = normalize(lead(G));
   intvec I; list L;
-  checkAssumptions(0,L);
+  checkAssumptions(0,G);
   int i,md;
   for (i = 1; i <= size(G); i++) { if (md <= deg(G[i])) {md = deg(G[i]);}}
   while (size(G) > 0)
