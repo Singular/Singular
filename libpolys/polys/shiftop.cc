@@ -734,6 +734,25 @@ poly p_LPVarAt(poly p, int pos, const ring r)
   return v;
 }
 
+/// substitute weights from orderings a,wp,Wp
+/// by d copies of it at position p
+static BOOLEAN freeAlgebra_weights(const ring old_ring, ring new_ring, int p, int d)
+{
+  omFree(new_ring->wvhdl[p]);
+  int *w=(int*)omAlloc(new_ring->N*sizeof(int));
+  for(int b=0;b<d;b++)
+  {
+    for(int i=old_ring->N-1;i>=0;i--)
+    {
+      if (old_ring->wvhdl[p][i]<-0) return TRUE;
+      w[b*old_ring->N+i]=old_ring->wvhdl[p][i];
+    }
+  }
+  new_ring->wvhdl[p]=w;
+  new_ring->block1[p]=new_ring->N;
+  return FALSE;
+}
+
 ring freeAlgebra(ring r, int d)
 {
   ring R=rCopy0(r);
@@ -746,8 +765,19 @@ ring freeAlgebra(ring r, int d)
   // create R->N
   R->N=r->N*d;
   R->isLPring=r->N;
-  R->block1[p]=R->N; /* only dp,Dp,wp,Wp; will be discarded for lp*/
   // create R->order
+  BOOLEAN has_order_a=FALSE;
+  while (r->order[p]==ringorder_a)
+  {
+    if (freeAlgebra_weights(r,R,p,d))
+    {
+      WerrorS("weights must be positive");
+      return NULL;
+    }
+    has_order_a=TRUE;
+    p++;
+  }
+  R->block1[p]=R->N; /* only dp,Dp,wp,Wp; will be discarded for lp*/
   switch(r->order[p])
   {
     case ringorder_dp:
@@ -755,20 +785,20 @@ ring freeAlgebra(ring r, int d)
       break;
     case ringorder_wp:
     case ringorder_Wp:
-    {
-      omFree(R->wvhdl[p]);
-      int *w=(int*)omAlloc(R->N*sizeof(int));
-      for(int b=1;b<d;b++)
+      if (freeAlgebra_weights(r,R,p,d))
       {
-        for(int i=r->N-1;i>=0;i--)
-          w[b*r->N+i]=r->wvhdl[p][i];
+        WerrorS("weights must be positive");
+        return NULL;
       }
-      R->wvhdl[p]=w;
       break;
-    }
     case ringorder_lp:
     case ringorder_rp:
     {
+      if(has_order_a)
+      {
+        WerrorS("ordering (a(..),lp/rp not implemented for LP-rings");
+        return NULL;
+      }
       int ** wvhdl=(int**)omAlloc0((r->N+2)*sizeof(int*));
       rRingOrder_t* ord=(rRingOrder_t*)omAlloc0((r->N+2)*sizeof(rRingOrder_t));
       int* blk0=(int*)omAlloc0((r->N+2)*sizeof(int));
@@ -797,7 +827,12 @@ ring freeAlgebra(ring r, int d)
       blk1[r->N+p]=R->N;
       // copy component order
       if (p==1) ord[0]=r->order[0];
-      else /*p==0*/ ord[r->N+1]=r->order[1];
+      else if (p==0) ord[r->N+1]=r->order[1];
+      else
+      { // should never happen:
+        WerrorS("ordering not implemented for LP-rings");
+        return NULL;
+      }
       break;
     }
     default: WerrorS("ordering not implemented for LP-rings");

@@ -13,10 +13,22 @@ static BOOLEAN freegb(leftv res, leftv args)
       WerrorS("degree must be >=2");
       return TRUE;
     }
-    if ((r->order[2]!=0)
+    int i=0;
+    while(r->order[i]!=0)
+    {
+      if ((r->order[i]==ringorder_c) ||(r->order[i]==ringorder_C)) i++;
+      else if ((r->block0[i]==1)&&(r->block1[i]==r->N)) i++;
+      else
+      {
+        WerrorS("only for rings with a global ordering of one block");
+	return TRUE;
+      }
+    }
+    if ((r->order[i]!=0)
     || (rHasLocalOrMixedOrdering(r)))
     {
-      WerrorS("only for rings with a global ordering of one block");
+      //WerrorS("only for rings with a global ordering of one block");
+      Werror("only for rings with a global ordering of one block,i=%d, o=%d",i,r->order[i]);
       return TRUE;
     }
     ring R=freeAlgebra(r,d);

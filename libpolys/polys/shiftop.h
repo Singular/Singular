@@ -53,6 +53,7 @@ BOOLEAN _p_LPLmDivisibleByNoComp(poly a, poly b, const ring r);
 
 poly p_LPVarAt(poly p, int pos, const ring r);
 
+/// create the letterplace ring corresponding to r up to degree d
 ring freeAlgebra(ring r, int d);
 #endif
 #endif
