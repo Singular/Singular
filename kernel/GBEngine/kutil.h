@@ -850,8 +850,6 @@ poly pCopyL2p(LObject h, kStrategy strat);
 
 void enterTShift(LObject p, kStrategy strat, int atT = -1);
 
-void initBuchMoraShift (ideal F,ideal Q,kStrategy strat);
-
 void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy strat, int atR);
 
 void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS);

@@ -10187,6 +10187,9 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   /*- creating temp data structures------------------- -*/
   strat->cp = 0;
   strat->c3 = 0;
+#ifdef HAVE_SHIFTBBA
+  strat->cv = 0;
+#endif
   strat->tail = pInit();
   /*- set s -*/
   strat->sl = -1;
@@ -10248,6 +10251,11 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   || (rField_is_Ring(currRing))
   )
   {
+#ifdef HAVE_SHIFTBBA
+    if (currRing->isLPring)
+      updateS(FALSE,strat); // T is filled by updateSShift() later
+    else
+#endif
     updateS(TRUE,strat);
   }
   if (strat->fromQ!=NULL) omFreeSize(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
@@ -12188,82 +12196,6 @@ void updateSShift(kStrategy strat)
     enterTShift(h,strat,atT);
   }
   /* what about setting strat->tl? */
-}
-#endif
-
-#ifdef HAVE_SHIFTBBA
-void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
-{
-  strat->interpt = BTEST1(OPT_INTERRUPT);
-  strat->kHEdge=NULL;
-  if (rHasGlobalOrdering(currRing)) strat->kHEdgeFound=FALSE;
-  /*- creating temp data structures------------------- -*/
-  strat->cp = 0;
-  strat->c3 = 0;
-  strat->cv = 0;
-  strat->tail = pInit();
-  /*- set s -*/
-  strat->sl = -1;
-  /*- set L -*/
-  strat->Lmax = setmaxL;
-  strat->Ll = -1;
-  strat->L = initL();
-  /*- set B -*/
-  strat->Bmax = setmaxL;
-  strat->Bl = -1;
-  strat->B = initL();
-  /*- set T -*/
-  strat->tl = -1;
-  strat->tmax = setmaxT;
-  strat->T = initT();
-  strat->R = initR();
-  strat->sevT = initsevT();
-  /*- init local data struct.---------------------------------------- -*/
-  strat->P.ecart=0;
-  strat->P.length=0;
-  if (rHasLocalOrMixedOrdering(currRing))
-  {
-    if (strat->kHEdge!=NULL) pSetComp(strat->kHEdge, strat->ak);
-    if (strat->kNoether!=NULL) pSetComp(strat->kNoetherTail(), strat->ak);
-  }
-  if(rField_is_Ring(currRing))
-  {
-    /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
-  }
-  {
-    if(TEST_OPT_SB_1)
-    {
-      int i;
-      ideal P=idInit(IDELEMS(F)-strat->newIdeal,F->rank);
-      for (i=strat->newIdeal;i<IDELEMS(F);i++)
-      {
-        P->m[i-strat->newIdeal] = F->m[i];
-        F->m[i] = NULL;
-      }
-      initSSpecial(F,Q,P,strat);
-      for (i=strat->newIdeal;i<IDELEMS(F);i++)
-      {
-        F->m[i] = P->m[i-strat->newIdeal];
-        P->m[i-strat->newIdeal] = NULL;
-      }
-      idDelete(&P);
-    }
-    else
-    {
-      /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
-      // /*Shdl=*/initS(F, Q,strat); /*sets also S, ecartS, fromQ */
-    }
-  }
-  strat->fromT = FALSE;
-  if (!TEST_OPT_SB_1)
-  {
-    /* the only change: we do not fill the set T*/
-    if(!rField_is_Ring(currRing)) updateS(FALSE,strat);
-  }
-  if (strat->fromQ!=NULL) omFreeSize(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
-  strat->fromQ=NULL;
-  /* more changes: fill the set T with all the shifts of elts of S*/
-  /* is done by other procedure */
 }
 #endif
 
