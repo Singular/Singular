@@ -437,8 +437,8 @@ const struct sValCmd2 dArith2[]=
 #endif
 ,{  jjWRONG2,     '*',            0,              MODUL_CMD, MODUL_CMD, ALLOW_NC | ALLOW_RING|NO_CONVERSION}
 ,{D(jjDIV_N),     '/',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_NC | ALLOW_RING}
-,{D(jjDIV_P),     '/',            POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjDIV_P),     '/',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjDIV_P),     '/',            POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_NC | ALLOW_RING}
+,{D(jjDIV_P),     '/',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjDIV_Ma),    '/',            MATRIX_CMD,     MATRIX_CMD, POLY_CMD, ALLOW_PLURAL | NO_RING}
 ,{D(jjDIVMOD_I),  '/',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjDIV_BI),    '/',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_NC | ALLOW_RING}

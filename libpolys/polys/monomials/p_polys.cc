@@ -1561,33 +1561,41 @@ poly p_DivideM(poly a, poly b, const ring r)
 {
   if (a==NULL) { p_Delete(&b,r); return NULL; }
   poly result=a;
-  poly prev=NULL;
-  number inv=pGetCoeff(b);
 
-  while (a!=NULL)
+  if(!p_IsConstant(b,r))
   {
-    if (p_DivisibleBy(b,a,r))
+    if (rIsLPRing(r))
     {
-      p_ExpVectorSub(a,b,r);
-      prev=a;
-      pIter(a);
+      WerrorS("not implemented for letterplace rings");
+      return NULL;
     }
-    else
+    poly prev=NULL;
+    while (a!=NULL)
     {
-      if (prev==NULL)
+      if (p_DivisibleBy(b,a,r))
       {
-        p_LmDelete(&result,r);
-        a=result;
+        p_ExpVectorSub(a,b,r);
+        prev=a;
+        pIter(a);
       }
       else
       {
-        p_LmDelete(&pNext(prev),r);
-        a=pNext(prev);
+        if (prev==NULL)
+        {
+          p_LmDelete(&result,r);
+          a=result;
+        }
+        else
+        {
+          p_LmDelete(&pNext(prev),r);
+          a=pNext(prev);
+        }
       }
     }
   }
   if (result!=NULL)
   {
+    number inv=pGetCoeff(b);
     //if ((!rField_is_Ring(r)) || n_IsUnit(inv,r->cf))
     if (rField_is_Zp(r))
     {

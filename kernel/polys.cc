@@ -42,6 +42,11 @@ poly p_Divide(poly p, poly q, const ring r)
   }
   if (pNext(q)!=NULL)
   { /* This means that q != 0 consists of at least two terms*/
+    if (rIsLPRing(r))
+    {
+      WerrorS("not implemented for letterplace rings");
+      return NULL;
+    }
     if(p_GetComp(p,r)==0)
     {
       if ((r->cf->convSingNFactoryN!=ndConvSingNFactoryN)
