@@ -9150,6 +9150,10 @@ void updateS(BOOLEAN toT,kStrategy strat)
         strat->initEcart(&h);
         enterT(h,strat);
         strat->S_2_R[i] = strat->tl;
+#ifdef HAVE_SHIFTBBA
+        if (currRing->isLPring)
+          enterTShift(h, strat);
+#endif
       }
     }
   }
@@ -9246,6 +9250,10 @@ void updateS(BOOLEAN toT,kStrategy strat)
       /*puts the elements of S also to T*/
       enterT(h,strat);
       strat->S_2_R[i] = strat->tl;
+#ifdef HAVE_SHIFTBBA
+      if (currRing->isLPring)
+        enterTShift(h, strat);
+#endif
     }
     if (suc!= -1) updateS(toT,strat);
   }
@@ -10251,11 +10259,6 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   || (rField_is_Ring(currRing))
   )
   {
-#ifdef HAVE_SHIFTBBA
-    if (currRing->isLPring)
-      updateS(FALSE,strat); // T is filled by updateSShift() later
-    else
-#endif
     updateS(TRUE,strat);
   }
   if (strat->fromQ!=NULL) omFreeSize(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
@@ -12169,35 +12172,6 @@ poly pCopyL2p(LObject H, kStrategy strat)
 //   //  pTest(p);
 //   return(p);
 // }
-
-#ifdef HAVE_SHIFTBBA
-/* including the self pairs */
-void updateSShift(kStrategy strat)
-{
-  /* to use after updateS(toT=FALSE,strat) */
-  /* fills T with shifted elt's of S */
-  int i;
-  LObject h;
-  int atT = -1; // or figure out smth better
-  strat->tl = -1; // init
-  for (i=0; i<=strat->sl; i++)
-  {
-    memset(&h,0,sizeof(h));
-    h.p =  strat->S[i];
-    strat->initEcart(&h);
-    h.sev = strat->sevS[i];
-    h.t_p = NULL;
-    h.GetTP(); // creates correct t_p
-    /*puts the elements of S with their shifts to T*/
-    //    int atT, int uptodeg, int lV)
-    strat->S_2_R[i] = strat->tl + 1; // the el't with shift 0 will be inserted first
-    // need a small check for above; we insert >=1 elements
-    // insert this check into kTest_TS ?
-    enterTShift(h,strat,atT);
-  }
-  /* what about setting strat->tl? */
-}
-#endif
 
 #ifdef HAVE_SHIFTBBA
 /*1

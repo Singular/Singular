@@ -856,8 +856,6 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 
 void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR);
 
-void updateSShift(kStrategy strat);
-
 void initBbaShift(kStrategy strat);
 
 poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN normalize);

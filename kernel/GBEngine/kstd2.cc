@@ -4129,8 +4129,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   initHilbCrit(F,Q,&hilb,strat); /*NO CHANGES*/
   initBbaShift(strat); /* DONE */
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
-  /*Shdl=*/initBuchMora(F, Q,strat); /* updateS with no toT, i.e. no init for T */
-  updateSShift(strat); /* initializes T */
+  /*Shdl=*/initBuchMora(F, Q,strat);
   if (strat->minim>0) strat->M=idInit(IDELEMS(F),F->rank);
   reduc = olddeg = 0;
 
