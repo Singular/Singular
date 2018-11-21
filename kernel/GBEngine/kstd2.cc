@@ -3522,7 +3522,7 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   initBuchMoraCrit(strat);
   strat->initEcart = initEcartBBA;
 #ifdef HAVE_SHIFTBBA
-  if (strat->tailRing->isLPring)
+  if (rIsLPRing(currRing))
   {
     strat->enterS = enterSBbaShift;
   }
@@ -3575,9 +3575,9 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
 #ifdef HAVE_SHIFTBBA
   // only LM of elements in S is shifted
   // necessary to prevent deleting the tail multiple times
-  if (strat->tailRing->isLPring && strat->Shdl != NULL && strat->Shdl->m != NULL)
+  if (rIsLPRing(currRing) && strat->Shdl != NULL)
   {
-    for (int j = 0; j < strat->Shdl->nrows * strat->Shdl->ncols; j++)
+    for (int j = 0; j < IDELEMS(strat->Shdl); j++)
     {
       if (strat->Shdl->m[j]!=NULL && pmFirstVblock(strat->Shdl->m[j]) > 1)
       {
@@ -3689,7 +3689,7 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   initBuchMoraCrit(strat);
   strat->initEcart = initEcartBBA;
 #ifdef HAVE_SHIFTBBA
-  if (strat->tailRing->isLPring)
+  if (rIsLPRing(currRing))
   {
     strat->enterS = enterSBbaShift;
   }
@@ -3744,9 +3744,9 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
 #ifdef HAVE_SHIFTBBA
   // only LM of elements in S is shifted
   // necessary to prevent deleting the tail multiple times
-  if (strat->tailRing->isLPring && strat->Shdl != NULL && strat->Shdl->m != NULL)
+  if (rIsLPRing(currRing) && strat->Shdl != NULL)
   {
-    for (int j = 0; j < strat->Shdl->nrows * strat->Shdl->ncols; j++)
+    for (int j = 0; j < IDELEMS(strat->Shdl); j++)
     {
       if (strat->Shdl->m[j]!=NULL && pmFirstVblock(strat->Shdl->m[j]) > 1)
       {
