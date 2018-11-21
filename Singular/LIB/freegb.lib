@@ -3575,7 +3575,7 @@ EXAMPLE: example ivL2lpI; shows examples
   for (i = 1; i <= size(L); i++)
   {
     p = iv2lp(L[i]);
-    G[(ncols(G) + 1)] = p;
+    G[(size(G) + 1)] = p;
   }
   return(G);
 }
