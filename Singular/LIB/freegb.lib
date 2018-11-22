@@ -7,7 +7,7 @@ AUTHORS: Viktor Levandovskyy,   viktor.levandovskyy at math.rwth-aachen.de
          Grischa Studzinski,    grischa.studzinski at math.rwth-aachen.de
          Karim Abou Zeid,       karim.abou.zeid at rwth-aachen.de
 
-OVERVIEW: For the theory, see chapter 'Letterplace' in the @sc{Singular} Manual.
+OVERVIEW: For the theory, see chapter 'Letterplace' in the Singular Manual.
 This library provides access to kernel functions and also contains legacy code (partially as
  static procedures) for compatibility reasons.
 
@@ -3127,12 +3127,12 @@ NOTE: Taking the first possible reduction
 }
 
 proc isOrderingShiftInvariant(int withHoles)
-  "USAGE: isOrderingShiftInvariant(b); b an integer interpreted as a boolean
-  RETURN: int
-  NOTE: Tests whether the ordering of the current ring is shift invariant, which is the case, when LM(p) > LM(p') for all p and p' where p' is p shifted by any number of places.
+"USAGE: isOrderingShiftInvariant(b); b an integer interpreted as a boolean
+RETURN: int
+NOTE: Tests whether the ordering of the current ring is shift invariant, which is the case, when LM(p) > LM(p') for all p and p' where p' is p shifted by any number of places.
 @*      If withHoles != 0 even Letterplace polynomials with holes (eg. x(1)*y(4)) are considered.
-  ASSUME: - basering is a Letterplace ring.
-  "
+ASSUME: - basering is a Letterplace ring.
+"
 {
   int shiftInvariant = 1;
 

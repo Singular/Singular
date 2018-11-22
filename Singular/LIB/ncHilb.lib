@@ -2,7 +2,7 @@
 version="version nc_hilb.lib 4.1.1.4 Nov_2018 "; // $Id$
 category="Noncommutative";
 info="
-LIBRARY:  ncHilb.lib: Computation of graded and multi-graded Hilbert series of non-commutative algebras (Letterplace).
+LIBRARY:  ncHilb.lib Computation of graded and multi-graded Hilbert series of non-commutative algebras (Letterplace).
 
 AUTHOR:   Sharwan K. Tiwari   shrawant@gmail.com
           Roberto La Scala
