@@ -3575,7 +3575,7 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
 #ifdef HAVE_SHIFTBBA
   // only LM of elements in S is shifted
   // necessary to prevent deleting the tail multiple times
-  if (rIsLPRing(currRing) && strat->Shdl != NULL)
+  if (rIsLPRing(currRing))
   {
     for (int j = 0; j < IDELEMS(strat->Shdl); j++)
     {
@@ -3744,7 +3744,7 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
 #ifdef HAVE_SHIFTBBA
   // only LM of elements in S is shifted
   // necessary to prevent deleting the tail multiple times
-  if (rIsLPRing(currRing) && strat->Shdl != NULL)
+  if (rIsLPRing(currRing))
   {
     for (int j = 0; j < IDELEMS(strat->Shdl); j++)
     {
