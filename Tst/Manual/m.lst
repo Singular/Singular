@@ -161,6 +161,7 @@ isuni
 laxfrX
 leadexp
 leadmonom
+letterplace_reduce
 Loading_a_library
 map_declarations
 Matrix_orderings
