@@ -9357,6 +9357,22 @@ void enterSBba (LObject &p,int atS,kStrategy strat, int atR)
   strat->sl++;
 }
 
+#ifdef HAVE_SHIFTBBA
+void enterSBbaShift (LObject &p,int atS,kStrategy strat, int atR)
+{
+  int toInsert = itoInsert(p.p, strat->tailRing);
+  for (int i = toInsert; i > 0; i--)
+  {
+    LObject qq;
+    qq.p = pLPCopyAndShiftLM(p.p, i); // don't use Set() because it'll test the poly order
+    qq.shift = i;
+    strat->initEcart(&qq); // initEcartBBA sets length, pLength, FDeg and ecart
+    enterSBba(qq, atS, strat, -1);
+  }
+  enterSBba(p, atS, strat, atR);
+}
+#endif
+
 /*2
 * -puts p to the standardbasis s at position at
 * -saves the result in S

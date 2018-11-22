@@ -2853,7 +2853,16 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
   poly res;
 
   if (rHasLocalOrMixedOrdering(currRing))
+  {
+#ifdef HAVE_SHIFTBBA
+    if (currRing->isLPring)
+    {
+      WerrorS("No local ordering possible for shift algebra");
+      return(NULL);
+    }
+#endif
     res=kNF1(F,Q,pp,strat,lazyReduce);
+  }
   else
     res=kNF2(F,Q,pp,strat,lazyReduce);
   delete(strat);
@@ -2948,7 +2957,16 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
   }
 
   if (rHasLocalOrMixedOrdering(currRing))
+  {
+#ifdef HAVE_SHIFTBBA
+    if (currRing->isLPring)
+    {
+      WerrorS("No local ordering possible for shift algebra");
+      return(NULL);
+    }
+#endif
     res=kNF1(F,Q,pp,strat,lazyReduce);
+  }
   else
     res=kNF2(F,Q,pp,strat,lazyReduce);
   delete(strat);
