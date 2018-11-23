@@ -6287,6 +6287,7 @@ See
 @subsection reduce
 @cindex reduce
 @cindex NF
+@cindex letterplace
 @table @code
 @item @strong{Syntax:}
 @code{reduce (} poly_expression@code{,} ideal_expression @code{)}

@@ -40,6 +40,9 @@ void p_LPExpVprepend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const
 void WriteLPExpV(int *expV, ring ri);
 char* LPExpVString(int *expV, ring ri);
 
+void k_SplitFrame(poly &m1, poly &m2, int at, const ring r);
+#define kSplitFrame(m1, m2, at) k_SplitFrame(m1, m2, at, currRing);
+
 int id_IsInV(ideal I, const ring r);
 int p_IsInV(poly p, const ring r);
 int p_mIsInV(poly p, const ring r);

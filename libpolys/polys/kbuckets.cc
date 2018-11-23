@@ -11,6 +11,10 @@
 #include "polys/monomials/ring.h"
 #include "polys/kbuckets.h"
 
+#ifdef HAVE_SHIFTBBA
+#include "polys/shiftop.h"
+#endif
+
 #ifdef HAVE_COEF_BUCKETS
 #define USE_COEF_BUCKETS
 #endif
@@ -1139,6 +1143,14 @@ number kBucketPolyRed(kBucket_pt bucket,
   l1--;
 
   assume((unsigned)l1==pLength(a1));
+
+#ifdef HAVE_SHIFTBBA
+  poly lmRight;
+  if (r->isLPring) {
+    int firstBlock = p_mFirstVblock(p1, r);
+    k_SplitFrame(lm, lmRight, firstBlock, r);
+  }
+#endif
 #if 0
   BOOLEAN backuped=FALSE;
   number coef;
@@ -1159,7 +1171,16 @@ number kBucketPolyRed(kBucket_pt bucket,
   }
 #endif
 
-  kBucket_Minus_m_Mult_p(bucket, lm, a1, &l1, spNoether);
+#ifdef HAVE_SHIFTBBA
+  if (r->isLPring)
+  {
+    kBucket_Minus_m_Mult_p(bucket, lm, r->p_Procs->pp_Mult_mm(a1, lmRight, r), &l1, spNoether);
+  }
+  else
+#endif
+  {
+    kBucket_Minus_m_Mult_p(bucket, lm, a1, &l1, spNoether);
+  }
 
 #if 0
   if (backuped)
@@ -1167,6 +1188,12 @@ number kBucketPolyRed(kBucket_pt bucket,
 #endif
 
   p_LmDelete(&lm, r);
+#ifdef HAVE_SHIFTBBA
+  if (r->isLPring)
+  {
+    p_LmDelete(&lmRight, r);
+  }
+#endif
   if (reset_vec) p_SetCompP(a1, 0, r);
   kbTest(bucket);
   return rn;

@@ -580,6 +580,25 @@ char* LPExpVString(int *expV, ring ri)
   return StringEndS();
 }
 
+// splits a frame (e.g. x(1)*y(5)) m1 into m1 and m2 (e.g. m1=x(1) and m2=y(1))
+// according to p which is inside the frame
+void k_SplitFrame(poly &m1, poly &m2, int at, const ring r)
+{
+  int lV = r->isLPring;
+
+  number m1Coeff = pGetCoeff(m1);
+
+  int hole = lV * at;
+  m2 = p_GetExp_k_n(m1, 1, hole, r);
+  m1 = p_GetExp_k_n(m1, hole, r->N, r);
+
+  p_mLPunshift(m2, r);
+  p_SetCoeff(m1, m1Coeff, r);
+
+  assume(p_FirstVblock(m1,r) <= 1);
+  assume(p_FirstVblock(m2,r) <= 1);
+}
+
 /* tests whether each polynomial of an ideal I lies in in V */
 int id_IsInV(ideal I, const ring r)
 {

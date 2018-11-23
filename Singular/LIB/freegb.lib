@@ -25,7 +25,6 @@ makeLetterplaceRing(d);          creates a ring with d blocks of shifted origina
 setLetterplaceAttributes(R,d,b); supplies ring R with the letterplace structure
 lieBracket(a,b[, N]);            Lie bracket ab-ba of two letterplace polynomials
 letplaceGBasis(I);               two-sided Groebner basis of a letterplace ideal I
-lpNF(f,I);                       two-sided normal form of f with respect to ideal I
 lpDivision(f,I);                 two-sided division with remainder
 lpGBPres2Poly(L,I);              reconstructs a polynomial from the output of lpDivision
 isOrderingShiftInvariant(i);     tests shift-invariance of the monomial ordering
@@ -2769,7 +2768,7 @@ example
 //Main normal form procedure for the user
 // TODO Oct 18: replace by legacy call to the kernel function
 proc lpNF(poly p, ideal G)
-"USAGE: lpNF(p,G); poly p, ideal G
+"USAGE: lpNF(p,G); poly p, ideal G (deprecated in favor of reduce(). will be removed soon)
 RETURN: poly
 PURPOSE: computation of the normal form of p with respect to G
 ASSUME: p is a Letterplace polynomial, G is a set Letterplace polynomials,
@@ -3575,7 +3574,7 @@ EXAMPLE: example ivL2lpI; shows examples
   for (i = 1; i <= size(L); i++)
   {
     p = iv2lp(L[i]);
-    G[(ncols(G) + 1)] = p;
+    G[(size(G) + 1)] = p;
   }
   return(G);
 }
