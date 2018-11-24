@@ -10277,8 +10277,13 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   {
     updateS(TRUE,strat);
   }
-  if (strat->fromQ!=NULL) omFreeSize(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
-  strat->fromQ=NULL;
+#ifdef HAVE_SHIFTBBA
+  if (!(rIsLPRing(currRing) && strat->rightGB)) // we need to check later whether a poly is from Q
+#endif
+  {
+    if (strat->fromQ!=NULL) omFreeSize(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
+    strat->fromQ=NULL;
+  }
   assume(kTest_TS(strat));
 }
 
