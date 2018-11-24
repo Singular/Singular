@@ -367,6 +367,7 @@ public:
   #endif
   #ifdef HAVE_SHIFTBBA
   int cv; // in shift bases: counting V criterion
+  /*BOOLEAN*/ char rightGB;
   #endif
   /*BOOLEAN*/ char interpt;
   /*BOOLEAN*/ char homog;
@@ -863,7 +864,8 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
 
 int redFirstShift (LObject* h,kStrategy strat); // ok
 
-ideal freegb(ideal I);
+ideal freegb(ideal F);
+ideal rightgb(ideal F, ideal Q);
 
 ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
 // test syz strategy: // will be removed soon

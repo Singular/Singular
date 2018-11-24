@@ -4455,11 +4455,21 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 }
 
 
-ideal freegb(ideal I)
+ideal freegb(ideal F)
 {
   assume(rIsLPRing(currRing));
-  assume(idIsInV(I));
-  ideal RS = kStdShift(I,NULL, testHomog, NULL,NULL,0,0,NULL);
+  assume(idIsInV(F));
+  ideal RS = kStdShift(F, NULL, testHomog, NULL);
+  idSkipZeroes(RS); // is this even necessary?
+  assume(idIsInV(RS));
+  return(RS);
+}
+
+ideal rightgb(ideal F, ideal Q)
+{
+  assume(rIsLPRing(currRing));
+  assume(idIsInV(F));
+  ideal RS = kStdShift(F, Q, testHomog, NULL, NULL, 0, 0, NULL, TRUE);
   idSkipZeroes(RS); // is this even necessary?
   assume(idIsInV(RS));
   return(RS);

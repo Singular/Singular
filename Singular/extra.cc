@@ -1242,6 +1242,23 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
+  /*==================== rightgb for freeGB  ====================*/
+  #ifdef HAVE_SHIFTBBA
+    if (strcmp(sys_cmd, "rightgb") == 0)
+    {
+      const short t[]={2,IDEAL_CMD,IDEAL_CMD};
+      if (iiCheckTypes(h,t,1))
+      {
+        ideal F=(ideal)h->CopyD();
+        ideal Q=(ideal)(h->next->CopyD());
+        res->rtyp = IDEAL_CMD;
+        res->data = rightgb(F, Q);
+        return FALSE;
+      }
+      else return TRUE;
+    }
+    else
+  #endif
   /*==================== pcv ==================================*/
   #ifdef HAVE_PCV
     if(strcmp(sys_cmd,"pcvLAddL")==0)
