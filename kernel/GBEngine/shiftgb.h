@@ -14,7 +14,8 @@
 poly p_LPCopyAndShiftLM(poly p, int sh, const ring r);
 #define pLPCopyAndShiftLM(p, sh) p_LPCopyAndShiftLM(p, sh, currRing)
 
-int itoInsert(poly p, const ring r);
+int p_mLPmaxPossibleShift(poly p, const ring r);
+#define pmLPmaxPossibleShift(p, r) p_mLPmaxPossibleShift(p, currRing)
 
 #endif
 #endif

@@ -9368,8 +9368,8 @@ void enterSBba (LObject &p,int atS,kStrategy strat, int atR)
 #ifdef HAVE_SHIFTBBA
 void enterSBbaShift (LObject &p,int atS,kStrategy strat, int atR)
 {
-  int toInsert = itoInsert(p.p, strat->tailRing);
-  for (int i = toInsert; i > 0; i--)
+  int maxPossibleShift = p_mLPmaxPossibleShift(p.p, strat->tailRing);
+  for (int i = maxPossibleShift; i > 0; i--)
   {
     LObject qq;
     qq.p = pLPCopyAndShiftLM(p.p, i); // don't use Set() because it'll test the poly order
@@ -12751,9 +12751,9 @@ void enterTShift(LObject p, kStrategy strat, int atT)
   /*  int toInsert = 1 + (uptodeg-1) - (pLastVblock(p.p, lV) -1);  */
   pAssume(p.p != NULL);
 
-  int toInsert = itoInsert(p.p, strat->tailRing);
+  int maxPossibleShift = p_mLPmaxPossibleShift(p.p, strat->tailRing);
 
-  for (int i = 1; i <= toInsert; i++)
+  for (int i = 1; i <= maxPossibleShift; i++)
   {
     LObject qq;
     qq.p = pLPCopyAndShiftLM(p.p, i); // don't use Set() because it'll test the poly order

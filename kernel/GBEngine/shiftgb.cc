@@ -42,25 +42,10 @@ poly p_LPCopyAndShiftLM(poly p, int sh, const ring r)
   return q;
 }
 
-/* for poly in lmCR/tailTR presentation */
-int itoInsert(poly p, const ring r)
+int p_mLPmaxPossibleShift(poly p, const ring r)
 {
-  /* the below situation (commented out) might happen! */
-//   if (r == currRing)
-//   {
-//     "Current ring is not expected in toInsert";
-//     return(0);
-//   }
-  /* compute the number of insertions */
-  int i = p_mLastVblock(p, currRing);
-  if (pNext(p) != NULL)
-  {
-    i = si_max(i, p_LastVblock(pNext(p), r) );
-  }
-  //  i = uptodeg  - i +1;
   int uptodeg = r->N/r->isLPring;
-  //  p_wrp(p,currRing,r); Print("----i:%d",i); PrintLn();
-  return uptodeg - i;
+  return uptodeg - p_mLastVblock(p, r);
 }
 
 #endif
