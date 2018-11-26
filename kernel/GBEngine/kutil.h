@@ -852,8 +852,6 @@ poly pCopyL2p(LObject h, kStrategy strat);
 
 void enterTShift(LObject p, kStrategy strat, int atT = -1);
 
-void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy strat, int atR);
-
 void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS);
 
 void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR);
