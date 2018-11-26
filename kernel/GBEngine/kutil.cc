@@ -8034,6 +8034,8 @@ void messageSets (kStrategy strat)
     {
       Print("\n  %d:",i);
       p_wrp(strat->S[i], currRing, strat->tailRing);
+      if (strat->fromQ!=NULL && strat->fromQ[i])
+        Print(" (from Q)");
     }
     strat->news = FALSE;
   }
