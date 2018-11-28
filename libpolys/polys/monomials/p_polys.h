@@ -1917,7 +1917,7 @@ static inline BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, const ri
  ***************************************************************/
 
 
-// like the respective p_LmIs* routines, except that p might be empty
+/// like the respective p_LmIs* routines, except that p might be empty
 static inline BOOLEAN p_IsConstantComp(const poly p, const ring r)
 {
   if (p == NULL) return TRUE;

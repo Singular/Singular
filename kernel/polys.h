@@ -226,10 +226,10 @@ poly singclap_gcd ( poly f, poly g, const ring r );
  * Predicates on polys/Lm's
  *
  ***************************************************************/
-/// return true if all p is eihter NULL, or if all exponents
-/// of p are 0 and Comp of p is zero
+/// return true if p is either NULL, or if all exponents
+/// of p are 0, Comp of p might be != 0
 #define   pIsConstantComp(p)        p_IsConstantComp(p, currRing)
-/// like above, except that Comp might be != 0
+/// like above, except that Comp must be 0
 #define   pIsConstant(p)            p_IsConstant(p,currRing)
 /// return true if the Lm is a constant <>0
 #define   pIsUnit(p)            p_IsUnit(p,currRing)
