@@ -93,7 +93,7 @@ while test $# -gt 0; do
 	;;
 
     --libs)
-	${ECHOn} " -L${libdir} -lSingular @USEPPROCSDYNAMICLD@"
+	${ECHOn} " -L${libdir} -lSingular -lpolys -lsingular_resources -lfactory -lomalloc @USEPPROCSDYNAMICLD@"
 	;;
 
     *)
