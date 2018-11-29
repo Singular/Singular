@@ -9,5 +9,7 @@ ideal J = std(I); // compute a Letterplace Groebner basis
 poly p = y*x*y*z*y - y*z*z*y + z*y*z;
 poly q = z*x*z*y*z - y*z*x*y*z;
 lpNF(p,J);
+reduce(p,J);
 lpNF(q,J);
-tst_status;$
+reduce(q,J);
+tst_status(1);$
