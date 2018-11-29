@@ -93,7 +93,7 @@ while test $# -gt 0; do
 	;;
 
     --libs)
-	${ECHOn} " -L${libdir} -lpolys"
+	${ECHOn} " -L${libdir} -lpolys -lfactory -lsingular_resources -lomalloc"
 	;;
 
     *)
