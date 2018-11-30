@@ -317,7 +317,7 @@ The development of @sc{Singular} has been supported by
     the Stiftung Rheinland-Pfalz f@"ur Innovation,
     the Volkswagen Stiftung, and
     the European Union.
-From 2010 to 2016, it was part of 
+From 2010 to 2016, it was part of
     the DFG Priority Project SPP 1489.
 It is currently funded by
     the DFG transregional collaborative research centre (SFB-TRR) 195 Symbolic Tools in Mathematics and their Application
