@@ -44,8 +44,10 @@ poly p_LPCopyAndShiftLM(poly p, int sh, const ring r)
 
 int p_mLPmaxPossibleShift(poly p, const ring r)
 {
+  int lastBlock = p_mLastVblock(p, r);
+  if (lastBlock == 0) return 0;
   int uptodeg = r->N/r->isLPring;
-  return uptodeg - p_mLastVblock(p, r);
+  return uptodeg - lastBlock;
 }
 
 #endif
