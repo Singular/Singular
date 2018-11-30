@@ -67,7 +67,7 @@ static void writemon(poly p, int ko, const ring r)
 
   int i;
 #ifdef HAVE_SHIFTBBA
-  if (rIsLPRing(r))
+  if (rIsLPRing(r)) // this implies bNotShortOut
   {
     int lV = r->isLPring;
     int lastVar = p_mLastVblock(p, r) * lV;
@@ -85,7 +85,7 @@ static void writemon(poly p, int ko, const ring r)
           else if (wroteCoef)
             StringAppendS("*");
           //else
-          wroteCoef=(bNotShortOut);
+          wroteCoef=TRUE; //(bNotShortOut);
           writeGen=TRUE;
           if (writeEmptyBlock)
             StringAppendS("_");
@@ -94,8 +94,7 @@ static void writemon(poly p, int ko, const ring r)
             StringAppendS(rRingVar(i, r));
             if (ee != 1L)
             {
-              if (bNotShortOut) StringAppendS("^");
-              StringAppend("%ld", ee);
+              StringAppend("^%ld", ee);
             }
             wroteBlock = TRUE;
           }
