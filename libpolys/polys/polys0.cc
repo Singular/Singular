@@ -27,27 +27,6 @@ static void writemon(poly p, int ko, const ring r)
   const coeffs C = r->cf;
   assume(C != NULL);
 
-#ifdef HAVE_SHIFTBBA
-  if (r->isLPring)
-  {
-    if (!p_mIsInV(p, r))
-    {
-      /*
-      * the monomial is not a valid letterplace monomial
-      * without this warning one cannot distinguish between
-      * x(1)*x(3) and x(1)*x(2) because they would both be displayed
-      * as x*x
-      */
-      int *expV = (int *) omAlloc((r->N+1)*sizeof(int));
-      p_GetExpV(p, expV, r);
-      char* s = LPExpVString(expV, r);
-      Warn("invalid letterplace monomial: (%s)", s);
-      omFreeSize((ADDRESS) expV, (r->N+1)*sizeof(int));
-      omFree(s);
-    }
-  }
-#endif
-
   BOOLEAN wroteCoef=FALSE,writeGen=FALSE;
   const BOOLEAN bNotShortOut = (rShortOut(r) == FALSE);
 
@@ -87,22 +66,65 @@ static void writemon(poly p, int ko, const ring r)
   }
 
   int i;
-  for (i=0; i<rVar(r); i++)
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(r))
   {
+    int lV = r->isLPring;
+    int lastVar = p_mLastVblock(p, r) * lV;
+    BOOLEAN wroteBlock = FALSE;
+    for (i=0; i<rVar(r); i++)
     {
-      long ee = p_GetExp(p,i+1,r);
-      if (ee!=0L)
       {
-        if (wroteCoef)
-          StringAppendS("*");
-        //else
-          wroteCoef=(bNotShortOut);
-        writeGen=TRUE;
-        StringAppendS(rRingVar(i, r));
-        if (ee != 1L)
+        long ee = p_GetExp(p,i+1,r);
+        BOOLEAN endOfBlock = ((i+1) % lV) == 0;
+        BOOLEAN writeEmptyBlock = ee==0L && endOfBlock && !wroteBlock && i < lastVar;
+        if (ee!=0L || writeEmptyBlock)
         {
-          if (bNotShortOut) StringAppendS("^");
-          StringAppend("%ld", ee);
+          if (wroteBlock)
+            StringAppendS("&");
+          else if (wroteCoef)
+            StringAppendS("*");
+          //else
+          wroteCoef=(bNotShortOut);
+          writeGen=TRUE;
+          if (writeEmptyBlock)
+            StringAppendS("_");
+          else
+          {
+            StringAppendS(rRingVar(i, r));
+            if (ee != 1L)
+            {
+              if (bNotShortOut) StringAppendS("^");
+              StringAppend("%ld", ee);
+            }
+            wroteBlock = TRUE;
+          }
+        }
+        if (endOfBlock)
+          wroteBlock = FALSE;
+      }
+    }
+  }
+  else
+#endif
+  {
+    for (i=0; i<rVar(r); i++)
+    {
+      {
+        long ee = p_GetExp(p,i+1,r);
+        if (ee!=0L)
+        {
+          if (wroteCoef)
+            StringAppendS("*");
+          //else
+          wroteCoef=(bNotShortOut);
+          writeGen=TRUE;
+          StringAppendS(rRingVar(i, r));
+          if (ee != 1L)
+          {
+            if (bNotShortOut) StringAppendS("^");
+            StringAppend("%ld", ee);
+          }
         }
       }
     }
