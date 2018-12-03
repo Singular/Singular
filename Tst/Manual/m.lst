@@ -975,6 +975,7 @@ liftstd_BR_PLURAL_BR
 _lll
 localInvar
 lp2ivId
+lpMonomialPrinting
 magnitude
 makeHeisenberg
 makeUgl
