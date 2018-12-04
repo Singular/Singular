@@ -4350,7 +4350,8 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
         // posInS only depends on the leading term
         strat->enterS(strat->P, pos, strat, strat->tl);
-        enterTShift(strat->P, strat);
+        if (!strat->rightGB)
+          enterTShift(strat->P, strat);
       }
 
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
@@ -4370,7 +4371,8 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           enterT(strat->P, strat);
           enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
           strat->enterS(strat->P, pos, strat, strat->tl);
-          enterTShift(strat->P,strat);
+          if (!strat->rightGB)
+            enterTShift(strat->P,strat);
         }
       }
     }
@@ -4391,6 +4393,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   {
     for (int k = 0; k <= strat->sl; ++k)
     {
+      if ((strat->fromQ!=NULL) && (strat->fromQ[k])) continue; // do not reduce Q_k
       for (int j = 0; j<=strat->tl; ++j)
       {
         // this is like clearS in bba, but we reduce with elements from T, because it contains the shifts too

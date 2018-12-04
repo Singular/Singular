@@ -12609,8 +12609,46 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
 
     if (pGetComp(h)==0)
     {
+      if (strat->rightGB)
+      {
+        if (isFromQ)
+        {
+          // pairs (shifts(h),s[1..k]), (h, s[1..k])
+          for (i=0; i<=maxShift; i++)
+          {
+            poly hh = pLPCopyAndShiftLM(h, i);
+            for (j=0; j<=k; j++)
+            {
+              if (strat->fromQ == NULL || !strat->fromQ[j])
+              {
+                new_pair=TRUE;
+                poly s = strat->S[j];
+                enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, pmLastVblock(s), i);
+              }
+            }
+          }
+        }
+        else
+        {
+          new_pair=TRUE;
+          for (j=0; j<=k; j++)
+          {
+            poly s = strat->S[j];
+            if (strat->fromQ != NULL && strat->fromQ[j])
+            {
+              // pairs (shifts(s[j]),h), (s[j],h)
+              enterOnePairWithShifts(j, s, h, ecart, isFromQ, strat, atR, h_lastVblock, pmLastVblock(s));
+            }
+            else
+            {
+              // pair (h, s[j])
+              enterOnePairWithoutShifts(j, h, s, ecart, isFromQ, strat, atR, pmLastVblock(s), 0);
+            }
+          }
+        }
+      }
       /* for Q!=NULL: build pairs (f,q),(f1,f2), but not (q1,q2)*/
-      if ((isFromQ)&&(strat->fromQ!=NULL))
+      else if ((isFromQ)&&(strat->fromQ!=NULL))
       {
         // pairs (shifts(s[1..k]),h), (s[1..k],h)
         for (j=0; j<=k; j++) {
@@ -12663,29 +12701,54 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
     else
     {
       new_pair=TRUE;
-      // pairs (shifts(s[1..k]),h), (s[1..k],h)
-      for (j=0; j<=k; j++) {
-        if ((pGetComp(h)==pGetComp(strat->S[j]))
-        || (pGetComp(strat->S[j])==0))
-        {
-          poly s = strat->S[j];
-          enterOnePairWithShifts(j, s, h, ecart, isFromQ, strat, atR, h_lastVblock, pmLastVblock(s));
-        }
-      }
-      // pairs (shifts(h),s[1..k]), (shifts(h), h)
-      for (i=1; i<=maxShift; i++)
+      if (strat->rightGB)
       {
-        poly hh = pLPCopyAndShiftLM(h, i);
         for (j=0; j<=k; j++)
         {
           if ((pGetComp(h)==pGetComp(strat->S[j]))
-          || (pGetComp(strat->S[j])==0))
+              || (pGetComp(strat->S[j])==0))
           {
+            assume(isFromQ == 0); // this case is not handeled here and should also never happen
             poly s = strat->S[j];
-            enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, pmLastVblock(s), i);
+            if (strat->fromQ != NULL && strat->fromQ[j])
+            {
+              // pairs (shifts(s[j]),h), (s[j],h)
+              enterOnePairWithShifts(j, s, h, ecart, isFromQ, strat, atR, h_lastVblock, pmLastVblock(s));
+            }
+            else
+            {
+              // pair (h, s[j])
+              enterOnePairWithoutShifts(j, h, s, ecart, isFromQ, strat, atR, pmLastVblock(s), 0);
+            }
           }
         }
-        enterOnePairWithoutShifts(-1, hh, h, ecart, isFromQ, strat, atR, h_lastVblock, i);
+      }
+      else
+      {
+        // pairs (shifts(s[1..k]),h), (s[1..k],h)
+        for (j=0; j<=k; j++) {
+          if ((pGetComp(h)==pGetComp(strat->S[j]))
+              || (pGetComp(strat->S[j])==0))
+          {
+            poly s = strat->S[j];
+            enterOnePairWithShifts(j, s, h, ecart, isFromQ, strat, atR, h_lastVblock, pmLastVblock(s));
+          }
+        }
+        // pairs (shifts(h),s[1..k]), (shifts(h), h)
+        for (i=1; i<=maxShift; i++)
+        {
+          poly hh = pLPCopyAndShiftLM(h, i);
+          for (j=0; j<=k; j++)
+          {
+            if ((pGetComp(h)==pGetComp(strat->S[j]))
+                || (pGetComp(strat->S[j])==0))
+            {
+              poly s = strat->S[j];
+              enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, pmLastVblock(s), i);
+            }
+          }
+          enterOnePairWithoutShifts(-1, hh, h, ecart, isFromQ, strat, atR, h_lastVblock, i);
+        }
       }
     }
 
@@ -12720,8 +12783,8 @@ void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
     {
       if (j > k) break;
       // TODO this currently doesn't clear all possible elements because of commutative division
-      // for rightGB this is already correct
-      clearS(h,h_sev, &j,&k,strat);
+      if (!(strat->rightGB && strat->fromQ != NULL && strat->fromQ[j]))
+        clearS(h,h_sev, &j,&k,strat);
       j++;
     }
   }
