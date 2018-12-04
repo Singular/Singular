@@ -12262,16 +12262,19 @@ static void enterOnePairWithoutShifts (int p_inS /*also i*/, poly q, poly p, int
 void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS)
 {
 #ifdef CRITERION_DEBUG
-  Print("Consider pair (%s, %s)\n", pString(q), pString(p));
-  // also write the LMs in separate lines:
-  poly lmq = pHead(q);
-  poly lmp = pHead(p);
-  pSetCoeff(lmq, n_Init(1, currRing->cf));
-  pSetCoeff(lmp, n_Init(1, currRing->cf));
-  Print("    %s\n", pString(lmq));
-  Print("    %s\n", pString(lmp));
-  pLmDelete(lmq);
-  pLmDelete(lmp);
+  if (TEST_OPT_DEBUG)
+  {
+    PrintS("Consider pair ("); wrp(q); PrintS(", "); wrp(p); PrintS(")"); PrintLn();
+    // also write the LMs in separate lines:
+    poly lmq = pHead(q);
+    poly lmp = pHead(p);
+    pSetCoeff(lmq, n_Init(1, currRing->cf));
+    pSetCoeff(lmp, n_Init(1, currRing->cf));
+    Print("    %s\n", pString(lmq));
+    Print("    %s\n", pString(lmp));
+    pLmDelete(lmq);
+    pLmDelete(lmp);
+  }
 #endif
 
   /* Format: q and p are like strat->P.p, so lm in CR, tail in TR */
@@ -12281,17 +12284,6 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
   assume(p_CheckIsFromRing(pNext(q),strat->tailRing));
   assume(p_LmCheckIsFromRing(p,currRing));
   assume(p_CheckIsFromRing(pNext(p),strat->tailRing));
-
-#ifdef KDEBUG
-//    if (TEST_OPT_DEBUG)
-//    {
-//       PrintS("enterOnePairShift(q,p) invoked with q = ");
-//       wrp(q); //      wrp(pHead(q));
-//       PrintS(", p = ");
-//       wrp(p); //wrp(pHead(p));
-//       PrintLn();
-//    }
-#endif
 
   /* poly q stays for s[i], ecartq = ecart(q), qisFromQ = applies to q */
 
@@ -12309,24 +12301,13 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
   /*- computes the lcm(s[i],p) -*/
   Lp.lcm = p_Lcm(p,q, currRing); // q is what was strat->S[i], so a poly in LM/TR presentation
 
-  /* apply the V criterion */
+  /* the V criterion */
   if (!pmIsInV(Lp.lcm))
   {
-#ifdef KDEBUG
-    if (TEST_OPT_DEBUG)
-    {
-      PrintS("V crit applied to q = ");
-      wrp(q); //      wrp(pHead(q));
-      PrintS(", p = ");
-      wrp(p); //wrp(pHead(p));
-      PrintLn();
-    }
-#endif
+    strat->cv++; // counter for applying the V criterion
     pLmFree(Lp.lcm);
-    /* + counter for applying the V criterion */
-    strat->cv++;
 #ifdef CRITERION_DEBUG
-    PrintS("--- V crit\n");
+    if (TEST_OPT_DEBUG) PrintS("--- V crit\n");
 #endif
     return;
   }
@@ -12353,7 +12334,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
       strat->cp++;
       pLmFree(Lp.lcm);
 #ifdef CRITERION_DEBUG
-      PrintS("--- prod crit\n");
+      if (TEST_OPT_DEBUG) PrintS("--- prod crit\n");
 #endif
       return;
     }
@@ -12363,7 +12344,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
     {
       pLmFree(Lp.lcm);
 #ifdef CRITERION_DEBUG
-      PrintS("--- ecartq > ecart\n");
+      if (TEST_OPT_DEBUG) PrintS("--- ecartq > ecart\n");
 #endif
       return;
       /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
@@ -12388,7 +12369,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
           {
             pLmFree(Lp.lcm);
 #ifdef CRITERION_DEBUG
-            Print("--- divided by B[%d]\n", j);
+            if (TEST_OPT_DEBUG) Print("--- divided by B[%d]\n", j);
 #endif
             return;
           }
@@ -12400,7 +12381,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
         {
           deleteInL(strat->B,&strat->Bl,j,strat);
 #ifdef CRITERION_DEBUG
-          Print("divides B[%d] -> delete B[%d]\n", j, j);
+          if (TEST_OPT_DEBUG) Print("divides B[%d] -> delete B[%d]\n", j, j);
 #endif
           strat->c3++;
         }
@@ -12432,7 +12413,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
           strat->cp++;
           pLmFree(Lp.lcm);
 #ifdef CRITERION_DEBUG
-          PrintS("--- prod crit\n");
+          if (TEST_OPT_DEBUG) PrintS("--- prod crit\n");
 #endif
           return;
       }
@@ -12440,7 +12421,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
       {
         pLmFree(Lp.lcm);
 #ifdef CRITERION_DEBUG
-        PrintS("--- ecartq > ecart\n");
+        if (TEST_OPT_DEBUG) PrintS("--- ecartq > ecart\n");
 #endif
         return;
         /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
@@ -12461,7 +12442,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
           {
             pLmFree(Lp.lcm);
 #ifdef CRITERION_DEBUG
-            Print("--- divided by B[%d]\n", j);
+            if (TEST_OPT_DEBUG) Print("--- divided by B[%d]\n", j);
 #endif
             return;
           }
@@ -12472,7 +12453,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
         {
           deleteInL(strat->B,&strat->Bl,j,strat);
 #ifdef CRITERION_DEBUG
-          Print("divides B[%d] -> delete B[%d]\n", j, j);
+          if (TEST_OPT_DEBUG) Print("divides B[%d] -> delete B[%d]\n", j, j);
 #endif
           strat->c3++;
         }
@@ -12488,7 +12469,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
   if ((q==NULL) || (p==NULL))
   {
 #ifdef CRITERION_DEBUG
-    PrintS("--- q == NULL || p == NULL\n");
+    if (TEST_OPT_DEBUG) PrintS("--- q == NULL || p == NULL\n");
 #endif
     return;
   }
@@ -12496,7 +12477,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
   {
     Lp.p=NULL;
 #ifdef CRITERION_DEBUG
-    PrintS("--- pair from Q\n");
+    if (TEST_OPT_DEBUG) PrintS("--- pair from Q\n");
 #endif
   }
   else
@@ -12557,7 +12538,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
     */
     if (Lp.lcm!=NULL) pLmFree(Lp.lcm);
 #ifdef CRITERION_DEBUG
-    PrintS("--- S-poly = 0\n");
+    if (TEST_OPT_DEBUG) PrintS("--- S-poly = 0\n");
 #endif
   }
   else
@@ -12596,7 +12577,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
     l = strat->posInL(strat->B,strat->Bl,&Lp,strat);
     enterL(&strat->B,&strat->Bl,&strat->Bmax,Lp,l);
 #ifdef CRITERION_DEBUG
-    PrintS("+++ Entered pair\n");
+    if (TEST_OPT_DEBUG) PrintS("+++ Entered pair\n");
 #endif
   }
 }
