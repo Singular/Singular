@@ -1335,8 +1335,7 @@ proc getCone()
 ASSUME:  d is between 0 and ambientDimension(f)
          i is between 1 and numberOfConesOfDimension(f,d,o,m)
 RETURN:  cone, returns in the fan f of all cones in dimension d the i-th cone
-         if o=1, it will enumerate over cone orbits (deactivated for now)
-         if m=1, it will enumerate over maximal cones
+         if m!=0, it will enumerate over maximal cones only
 EXAMPLE: example getCone; shows an example
 "
 {
