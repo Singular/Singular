@@ -1096,6 +1096,7 @@ BOOLEAN randomPoint(leftv res, leftv args)
     if ((v != NULL) && (v->Typ() == INT_CMD))
     {
       b = (int) (long) v->Data();
+      b = b+1;
     }
 
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
@@ -1772,6 +1773,26 @@ BOOLEAN faceContaining(leftv res, leftv args)
 }
 
 
+BOOLEAN onesVector(leftv res, leftv args)
+{
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == INT_CMD))
+  {
+    int n = (int) (long) u->Data();
+    if (n>0)
+    {
+      intvec* v = new intvec(n);
+      for (int i=0; i<n; i++)
+        (*v)[i]=1;
+      res->rtyp = INTVEC_CMD;
+      res->data = (void*) v;
+      return FALSE;
+    }
+  }
+  WerrorS("onesVector: unexpected parameters");
+  return TRUE;
+}
+
 /***
  * Computes a relative interior point for each facet of zc
  **/
@@ -2040,6 +2061,7 @@ void bbcone_setup(SModulFunctions* p)
   p->iiAddCproc("gfan.lib","span",FALSE,impliedEquations);
   p->iiAddCproc("gfan.lib","uniquePoint",FALSE,uniquePoint);
   p->iiAddCproc("gfan.lib","faceContaining",FALSE,faceContaining);
+  p->iiAddCproc("gfan.lib","onesVector",FALSE,onesVector);
   coneID=setBlackboxStuff(b,"cone");
 }
 

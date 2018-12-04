@@ -66,6 +66,7 @@ PROCEDURES:
        dualPolytope(p);       the dual of p
        newtonPolytope(f);     convex hull of all exponent vectors of f
        vertices(p);           vertices of p
+       onesVector(n);         intvec of length n with all entries 1
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1682,6 +1683,21 @@ example
     1,1,1;
   polytope p=polytopeViaPoints(M);
   vertices(p);
+}
+
+proc onesVector()
+"USAGE:   onesVector(n);  n int
+RETURN:  intvec, intvec of length n with all entries 1
+EXAMPLE: example onesVector; shows an example
+"
+{
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intvec w = onesVector(3);
+  w;
 }
 
 static proc mod_init()
