@@ -1573,96 +1573,6 @@ BOOLEAN containsInSupport(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN convexIntersectionOld(leftv res, leftv args)
-{
-  gfan::initializeCddlibIfRequired();
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
-  {
-    leftv v = u->next;
-    if ((v != NULL) && (v->Typ() == coneID))
-    {
-      gfan::ZCone* zc1 = (gfan::ZCone*)u->Data();
-      gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
-      int d1 = zc1->ambientDimension();
-      int d2 = zc2->ambientDimension();
-      if (d1 != d2)
-      {
-        Werror("expected ambient dims of both cones to coincide\n"
-                "but got %d and %d", d1, d2);
-        return TRUE;
-      }
-      gfan::ZCone zc3 = gfan::intersection(*zc1, *zc2);
-      zc3.canonicalize();
-      res->rtyp = coneID;
-      res->data = (void *)new gfan::ZCone(zc3);
-      return FALSE;
-    }
-    if ((v != NULL) && (v->Typ() == polytopeID))
-    {
-      gfan::ZCone* zc11 = (gfan::ZCone*)u->Data();
-      gfan::ZCone zc1 = liftUp(*zc11);
-      gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
-      int d1 = zc1.ambientDimension();
-      int d2 = zc2->ambientDimension();
-      if (d1 != d2)
-      {
-        Werror("expected ambient dims of both cones to coincide\n"
-                "but got %d and %d", d1, d2);
-        return TRUE;
-      }
-      gfan::ZCone zc3 = gfan::intersection(zc1, *zc2);
-      zc3.canonicalize();
-      res->rtyp = polytopeID;
-      res->data = (void *)new gfan::ZCone(zc3);
-      return FALSE;
-    }
-  }
-  if ((u != NULL) && (u->Typ() == polytopeID))
-  {
-    leftv v = u->next;
-    if ((v != NULL) && (v->Typ() == coneID))
-    {
-      gfan::ZCone* zc1 = (gfan::ZCone*)u->Data();
-      gfan::ZCone* zc22 = (gfan::ZCone*)v->Data();
-      gfan::ZCone zc2 = liftUp(*zc22);
-      int d1 = zc1->ambientDimension();
-      int d2 = zc2.ambientDimension();
-      if (d1 != d2)
-      {
-        Werror("expected ambient dims of both cones to coincide\n"
-                "but got %d and %d", d1, d2);
-        return TRUE;
-      }
-      gfan::ZCone zc3 = gfan::intersection(*zc1, zc2);
-      zc3.canonicalize();
-      res->rtyp = polytopeID;
-      res->data = (void *)new gfan::ZCone(zc3);
-      return FALSE;
-    }
-    if ((v != NULL) && (v->Typ() == polytopeID))
-    {
-      gfan::ZCone* zc1 = (gfan::ZCone*)u->Data();
-      gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
-      int d1 = zc1->ambientDimension();
-      int d2 = zc2->ambientDimension();
-      if (d1 != d2)
-      {
-        Werror("expected ambient dims of both cones to coincide\n"
-                "but got %d and %d", d1, d2);
-        return TRUE;
-      }
-      gfan::ZCone zc3 = gfan::intersection(*zc1, *zc2);
-      zc3.canonicalize();
-      res->rtyp = polytopeID;
-      res->data = (void *)new gfan::ZCone(zc3);
-      return FALSE;
-    }
-  }
-  WerrorS("convexIntersectionOld: unexpected parameters");
-  return TRUE;
-}
-
 BOOLEAN containsRelatively(leftv res, leftv args)
 {
   leftv u = args;
@@ -2085,7 +1995,6 @@ void bbcone_setup(SModulFunctions* p)
   p->iiAddCproc("gfan.lib","containsRelatively",FALSE,containsRelatively);
   p->iiAddCproc("gfan.lib","convexHull",FALSE,convexHull);
   p->iiAddCproc("gfan.lib","convexIntersection",FALSE,intersectCones);
-  p->iiAddCproc("gfan.lib","convexIntersectionOld",FALSE,convexIntersectionOld);
   p->iiAddCproc("gfan.lib","dimension",FALSE,dimension);
   p->iiAddCproc("gfan.lib","dualCone",FALSE,dualCone);
   p->iiAddCproc("gfan.lib","equations",FALSE,equations);
