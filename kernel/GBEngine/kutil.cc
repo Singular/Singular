@@ -12202,6 +12202,8 @@ static void enterOnePairWithShifts (int q_inS /*also i*/, poly q, poly p, int ec
 {
   // note: ecart and isFromQ is for p
   assume(q_inS < 0 || strat->S[q_inS] == q); // if q is from S, q_inS should be the index of q in S
+  assume(pmFirstVblock(p) == 1);
+  assume(pmFirstVblock(q) == 1);
   assume(p_lastVblock == pmLastVblock(p));
   assume(q_lastVblock == pmLastVblock(q));
 
@@ -12231,6 +12233,7 @@ static void enterOnePairWithoutShifts (int p_inS /*also i*/, poly q, poly p, int
 {
   // note: ecart and isFromQ is for p
   assume(p_inS < 0 || strat->S[p_inS] == p); // if p is from S, p_inS should be the index of p in S
+  assume(pmFirstVblock(p) == 1);
   assume(p_lastVblock == pmLastVblock(p));
   assume(q_shift == pmFirstVblock(q) - 1);
 
@@ -12607,6 +12610,11 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 */
 void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, int atR)
 {
+  int h_lastVblock = pmLastVblock(h);
+  assume(h_lastVblock != 0 || pLmIsConstantComp(h));
+  // TODO: is it allowed to skip pairs with constants? also with constants from other components?
+  if (h_lastVblock == 0) return;
+  assume(pmFirstVblock(h) == 1);
   /* h comes from strat->P.p, that is LObject with LM in currRing and Tail in tailRing */
   //  atR = -1;
   if ((strat->syzComp==0)
@@ -12616,7 +12624,6 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
     BOOLEAN new_pair=FALSE;
 
     int degbound = currRing->N/currRing->isLPring;
-    int h_lastVblock = pmLastVblock(h);
     int maxShift = degbound - h_lastVblock;
 
     if (pGetComp(h)==0)
