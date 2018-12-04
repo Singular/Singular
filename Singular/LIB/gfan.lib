@@ -1050,7 +1050,10 @@ example
 
 proc randomPoint()
 "USAGE:   randomPoint(c);  c cone
+         randomPoint(c,b);  c cone, b int
 RETURN:  bigintmat, a random point in the relative interior of c
+NOTE:    returns a weighted sum over all its rays
+         if b is given and b>0, only chooses weights between 1 and b
 EXAMPLE: example randomPoint; shows an example
 "
 {
@@ -1059,13 +1062,14 @@ EXAMPLE: example randomPoint; shows an example
 example
 {
   "EXAMPLE:"; echo = 2;
-  intmat M[3][2]=
+  intmat M[2][2]=
     1,0,
-    0,1,
-    -1,0;
+    0,1;
   cone c=coneViaPoints(M);
   bigintmat Q=randomPoint(c);
   print(Q);
+  bigintmat P=randomPoint(c,5);
+  print(P);
 }
 
 proc rays()

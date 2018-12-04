@@ -1052,23 +1052,34 @@ BOOLEAN uniquePoint(leftv res, leftv args)
   return TRUE;
 }
 
-gfan::ZVector randomPoint(const gfan::ZCone* zc)
+int siRandBound(const int b)
+{
+  int n = 0;
+  while (n==0)
+  {
+    n = siRand();
+    if (b>1)
+    {
+      n = n % b;
+    }
+  }
+  return n;
+}
+
+gfan::ZVector randomPoint(const gfan::ZCone* zc, const int b)
 {
   gfan::ZVector rp = gfan::ZVector(zc->ambientDimension());
 
   gfan::ZMatrix rays = zc->extremeRays();
   for (int i=0; i<rays.getHeight(); i++)
-  {
-    int n = siRand();
-    rp = rp + n * rays[i].toVector();
-  }
+    rp += siRandBound(b) * rays[i].toVector();
 
-  gfan::ZMatrix lins = zc->generatorsOfLinealitySpace();
-  for (int i=0; i<lins.getHeight(); i++)
-  {
-    int n = siRand();
-    rp = rp + n * lins[i].toVector();
-  }
+  // gfan::ZMatrix lins = zc->generatorsOfLinealitySpace();
+  // for (int i=0; i<lins.getHeight(); i++)
+  // {
+  //   int n = siRandBound(b);
+  //   rp = rp + n * lins[i].toVector();
+  // }
 
   return rp;
 }
@@ -1079,8 +1090,17 @@ BOOLEAN randomPoint(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == coneID))
   {
     gfan::initializeCddlibIfRequired();
+
+    int b = 0;
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == INT_CMD))
+    {
+      b = (int) (long) v->Data();
+    }
+
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-    gfan::ZVector zv = randomPoint(zc);
+    gfan::ZVector zv = randomPoint(zc,b);
+
     res->rtyp = BIGINTMAT_CMD;
     res->data = (void*) zVectorToBigintmat(zv);
     gfan::deinitializeCddlibIfRequired();
