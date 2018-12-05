@@ -5450,6 +5450,12 @@ static BOOLEAN jjnlInt(leftv res, leftv u)
   res->data=(char *)(long)iin_Int(n,coeffs_BIGINT );
   return FALSE;
 }
+static BOOLEAN jjBim2Im(leftv res, leftv u)
+{
+  bigintmat* b=(bigintmat*)u->Data();
+  res->data=(char *)bim2iv(b);
+  return FALSE;
+}
 /*=================== operations with 3 args.: static proc =================*/
 /* must be ordered: first operations for chars (infix ops),
  * then alphabetically */
