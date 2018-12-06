@@ -3933,7 +3933,7 @@ static BOOLEAN jjDET_S(leftv res, leftv v)
   ideal I=(ideal)v->Data();
   poly p;
   if (IDELEMS(I)<1) return TRUE;
-  if (sm_CheckDet(I,IDELEMS(I),FALSE, currRing))
+  if (!sm_CheckDet(I,IDELEMS(I),FALSE, currRing))
   {
     matrix m=id_Module2Matrix(id_Copy(I,currRing),currRing);
     p=singclap_det(m,currRing);

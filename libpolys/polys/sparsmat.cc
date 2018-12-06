@@ -308,44 +308,27 @@ BOOLEAN sm_CheckDet(ideal I, int d, BOOLEAN sw, const ring r)
   poly p;
 
   if (d>100)
-    return sw;
+    return TRUE;
   if (!rField_is_Q(r))
-    return sw;
+    return TRUE;
   s = t = 0;
-  if (sw)
+  // now: field is Q, n<=100
+  for(i=IDELEMS(I)-1;i>=0;i--)
   {
-    for(i=IDELEMS(I)-1;i>=0;i--)
+    p=I->m[i];
+    if (p!=NULL)
     {
-      p=I->m[i];
-      if (p!=NULL)
-      {
-        if(!p_IsConstant(p,r))
-          return sw;
-        s++;
-        t+=n_Size(pGetCoeff(p),r->cf);
-      }
-    }
-  }
-  else
-  {
-    for(i=IDELEMS(I)-1;i>=0;i--)
-    {
-      p=I->m[i];
-      if (!p_IsConstantPoly(p,r))
-        return sw;
-      while (p!=NULL)
-      {
-        s++;
-        t+=n_Size(pGetCoeff(p),r->cf);
-        pIter(p);
-      }
+      if(!p_IsConstant(p,r))
+        return TRUE;
+      s++;
+      t+=n_Size(pGetCoeff(p),r->cf);
     }
   }
   s*=15;
   if (t>s)
-    return !sw;
+    return FALSE;// few large constanst entries
   else
-    return sw;
+    return TRUE; //many small entries
 }
 
 /* ----------------- basics (used from 'C') ------------------ */
