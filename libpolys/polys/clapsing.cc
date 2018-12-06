@@ -1703,7 +1703,7 @@ matrix singntl_HNF(matrix  m, const ring s )
     return NULL;
   }
 
-  matrix res=mp_New(r,r);
+  matrix res=mpNew(r,r);
 
   if (rField_is_Q(s))
   {
@@ -1796,7 +1796,7 @@ matrix singntl_LLL(matrix  m, const ring s )
 {
   int r=m->rows();
   int c=m->cols();
-  matrix res=mp_New(r,c);
+  matrix res=mpNew(r,c);
   if (rField_is_Q(s))
   {
     CFMatrix M(r,c);

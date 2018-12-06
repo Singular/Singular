@@ -31,14 +31,11 @@ class ip_smatrix
 typedef ip_smatrix *       matrix;
 
 matrix mpNew(int r, int c);
-static inline matrix mp_New(int r, int c){ return mpNew(r,c); }
 
-// matrix mpCopy(matrix a);
 void   mp_Delete(matrix* a, const ring r);
 matrix mp_Copy(const matrix a, const ring rSrc, const ring rDst);
 
 matrix mp_Copy(matrix a, const ring r);
-// static inline matrix mp_Copy(matrix a, const ring r){ return mp_Copy(a, r, r); }
 
 matrix mp_InitP(int r, int c, poly p, const ring R);
 matrix mp_InitI(int r, int c, int v, const ring R);
@@ -53,7 +50,6 @@ BOOLEAN mp_Equal(matrix a, matrix b, const ring r);
 poly mp_Trace ( matrix a, const ring r);
 poly TraceOfProd ( matrix a, matrix b, int n, const ring r);
 
-// poly mp_Det (matrix m, const ring r);
 matrix mp_Wedge(matrix a, int ar, const ring r);
 
 // BOOLEAN mpJacobi(leftv res,leftv a);
