@@ -226,26 +226,24 @@ matrix mp_Mult(matrix a, matrix b, const ring R)
   }
   matrix c = mpNew(m,q);
 
-  for (i=1; i<=m; i++)
+  for (i=0; i<m; i++)
   {
-    for (k=1; k<=p; k++)
+    for (k=0; k<p; k++)
     {
       poly aik;
-      if ((aik=MATELEM(a,i,k))!=NULL)
+      if ((aik=MATELEM0(a,i,k))!=NULL)
       {
-        for (j=1; j<=q; j++)
+        for (j=0; j<q; j++)
         {
           poly bkj;
-          if ((bkj=MATELEM(b,k,j))!=NULL)
+          if ((bkj=MATELEM0(b,k,j))!=NULL)
           {
-            poly *cij=&(MATELEM(c,i,j));
-            poly s = pp_Mult_qq(aik /*MATELEM(a,i,k)*/, bkj/*MATELEM(b,k,j)*/, R);
-            (*cij)/*MATELEM(c,i,j)*/ = p_Add_q((*cij) /*MATELEM(c,i,j)*/ ,s, R);
+            poly *cij=&(MATELEM0(c,i,j));
+            poly s = pp_Mult_qq(aik /*MATELEM0(a,i,k)*/, bkj/*MATELEM0(b,k,j)*/, R);
+            (*cij)/*MATELEM0(c,i,j)*/ = p_Add_q((*cij) /*MATELEM0(c,i,j)*/ ,s, R);
           }
         }
       }
-    //  pNormalize(t);
-    //  MATELEM(c,i,j) = t;
     }
   }
   for(i=m*q-1;i>=0;i--) p_Normalize(c->m[i], R);
