@@ -25,7 +25,10 @@ class ip_smatrix
 
   #define MATROWS(i) ((i)->nrows)
   #define MATCOLS(i) ((i)->ncols)
+  /// 1-based access to matrix
   #define MATELEM(mat,i,j) ((mat)->m)[MATCOLS((mat)) * ((i)-1) + (j)-1]
+  /// 0-based access to matrix
+  #define MATELEM0(mat,i,j) ((mat)->m)[MATCOLS((mat)) * (i) + (j)]
 };
 
 typedef ip_smatrix *       matrix;
@@ -56,6 +59,8 @@ matrix mp_Wedge(matrix a, int ar, const ring r);
 // BOOLEAN mpKoszul(leftv res,leftv b/*in*/, leftv c/*ip*/, leftv id=NULL);
 
 poly mp_DetBareiss (matrix a, const ring r);
+poly mp_DetMu(matrix A, const ring R);
+
 
 //matrix mp_Homogen(matrix a, int v, const ring r);
 
