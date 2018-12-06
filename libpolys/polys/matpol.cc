@@ -2036,8 +2036,8 @@ static void mu(matrix A, matrix &X, const ring R)
     *
     *   Input:
     *   int n: Dimension der Matrix
-    *   int A: Matrix der Größe n*n
-    *   int X: Speicherplatz für Output
+    *   int A: Matrix der Groesse n*n
+    *   int X: Speicherplatz fuer Output
     *
     *   In der Matrix X speichert man die Matrix mu
     */
@@ -2045,7 +2045,7 @@ static void mu(matrix A, matrix &X, const ring R)
     // X als n*n Null-Matrix initalisieren
     X=mpNew(n,n);
 
-    //  Diagonaleinträge von X berrechnen
+    //  Diagonaleintraege von X berrechnen
     poly sum = NULL;
     for (int i = n-1; i >= 0; i--)
     {
@@ -2053,7 +2053,7 @@ static void mu(matrix A, matrix &X, const ring R)
         sum=p_Sub(sum,p_Copy(MATELEM0(A,i,i),R),R);
     }
 
-    //  Einträge aus dem oberen Dreieck von A nach X übertragen
+    //  Eintraege aus dem oberen Dreieck von A nach X uebertragen
     for (int i = 0; i < n; i++)
     {
         for (int j = i+1; j < n; j++)
