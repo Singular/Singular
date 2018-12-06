@@ -263,7 +263,7 @@ for(ll=1; ll<=size(P);ll++)
    }
 }
 ////////////////////////////////////////////////////////////////////
-proc mod_init()
+static proc mod_init()
 "USAGE:     mod_init();
 RETURN:   struct: jmp
 EXAMPLE:  example  mod_init; shows an example"
