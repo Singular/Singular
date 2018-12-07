@@ -3,8 +3,8 @@ version="version fpalgebras.lib 4.1.1.4 Oct_2018 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY: fpalgebras.lib    Definitions of some finitely presented algebras and groups (Letterplace)
-AUTHORS: Karim Abou Zeid,       karim.abou.zeid at rwth-aachen.de
-         Viktor Levandovskyy,   viktor.levandovskyy at math.rwth-aachen.de
+AUTHORS: Karim Abou Zeid,       karim.abou.zeid at rwth-aachen.de@*
+         Viktor Levandovskyy,   viktor.levandovskyy at math.rwth-aachen.de@*
          Grischa Studzinski,    grischa.studzinski at rwth-aachen.de
 
 Support: Project II.6 in the transregional collaborative research centre
