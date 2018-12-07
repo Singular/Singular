@@ -818,10 +818,10 @@ ring freeAlgebra(ring r, int d)
         WerrorS("ordering (a(..),lp/rp not implemented for LP-rings");
         return NULL;
       }
-      int ** wvhdl=(int**)omAlloc0((r->N+2)*sizeof(int*));
-      rRingOrder_t* ord=(rRingOrder_t*)omAlloc0((r->N+2)*sizeof(rRingOrder_t));
-      int* blk0=(int*)omAlloc0((r->N+2)*sizeof(int));
-      int* blk1=(int*)omAlloc0((r->N+2)*sizeof(int));
+      int ** wvhdl=(int**)omAlloc0((r->N+3)*sizeof(int*));
+      rRingOrder_t* ord=(rRingOrder_t*)omAlloc0((r->N+3)*sizeof(rRingOrder_t));
+      int* blk0=(int*)omAlloc0((r->N+3)*sizeof(int));
+      int* blk1=(int*)omAlloc0((r->N+3)*sizeof(int));
       omFree(R->wvhdl);  R->wvhdl=wvhdl;
       omFree(R->order);  R->order=ord;
       omFree(R->block0); R->block0=blk0;
@@ -829,6 +829,7 @@ ring freeAlgebra(ring r, int d)
       for(int i=0;i<r->N;i++)
       {
         ord[i+p]=ringorder_a;
+        //Print("entry:%d->a\n",i+p);
         blk0[i+p]=1;
         blk1[i+p]=R->N;
         wvhdl[i+p]=(int*)omAlloc0(R->N*sizeof(int));
@@ -842,6 +843,7 @@ ring freeAlgebra(ring r, int d)
         }
       }
       ord[r->N+p]=r->order[p]; /* lp or rp */
+      //Print("entry:%d->lp\n",r->N+p);
       blk0[r->N+p]=1;
       blk1[r->N+p]=R->N;
       // copy component order
@@ -852,6 +854,8 @@ ring freeAlgebra(ring r, int d)
         WerrorS("ordering not implemented for LP-rings");
         return NULL;
       }
+      //if (p==1) PrintS("entry:0 ->c/C\n");
+      //else if (p==0) Print("entry:%d ->c/C\n",r->N+1);
       break;
     }
     default: WerrorS("ordering not implemented for LP-rings");
