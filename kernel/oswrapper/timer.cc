@@ -12,8 +12,6 @@
 #include "kernel/mod2.h"
 
 #include <sys/resource.h>
-#include <time.h>
-#include <sys/time.h>
 #include <unistd.h>
 
 int        timerv = 0;

@@ -46,7 +46,7 @@ LIB "qhmoduli.lib";
 LIB "monomialideal.lib";
 LIB "ring.lib";
 ////////////////////////////////////////////////////////////////////
-proc mod_init()
+static proc mod_init()
 "USAGE:     mod_init();
 RETURN:   struct: jmp
 EXAMPLE:  example  mod_init; shows an example"

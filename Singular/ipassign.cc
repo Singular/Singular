@@ -106,16 +106,14 @@ static BOOLEAN jjSHORTOUT(leftv, leftv a)
   if (currRing != NULL)
   {
     BOOLEAN shortOut = (BOOLEAN)((long)a->Data());
-#if HAVE_CAN_SHORT_OUT
-    if (!shortOut)
+    if (shortOut==0)
       currRing->ShortOut = 0;
     else
     {
       if (currRing->CanShortOut)
         currRing->ShortOut = 1;
     }
-#else
-    currRing->ShortOut = shortOut;
+    shortOut = currRing->ShortOut;
     coeffs cf = currRing->cf;
     while (nCoeff_is_Extension(cf))
     {
@@ -123,7 +121,6 @@ static BOOLEAN jjSHORTOUT(leftv, leftv a)
       assume(cf->extRing != NULL);
       cf = cf->extRing->cf;
     }
-#endif
   }
   return FALSE;
 }

@@ -226,27 +226,24 @@ matrix mp_Mult(matrix a, matrix b, const ring R)
   }
   matrix c = mpNew(m,q);
 
-  for (i=1; i<=m; i++)
+  for (i=0; i<m; i++)
   {
-    for (k=1; k<=p; k++)
+    for (k=0; k<p; k++)
     {
       poly aik;
-      if ((aik=MATELEM(a,i,k))!=NULL)
+      if ((aik=MATELEM0(a,i,k))!=NULL)
       {
-        for (j=1; j<=q; j++)
+        for (j=0; j<q; j++)
         {
           poly bkj;
-          if ((bkj=MATELEM(b,k,j))!=NULL)
+          if ((bkj=MATELEM0(b,k,j))!=NULL)
           {
-            poly *cij=&(MATELEM(c,i,j));
-            poly s = pp_Mult_qq(aik /*MATELEM(a,i,k)*/, bkj/*MATELEM(b,k,j)*/, R);
-            if (/*MATELEM(c,i,j)*/ (*cij)==NULL) (*cij)=s;
-            else (*cij) = p_Add_q((*cij) /*MATELEM(c,i,j)*/ ,s, R);
+            poly *cij=&(MATELEM0(c,i,j));
+            poly s = pp_Mult_qq(aik /*MATELEM0(a,i,k)*/, bkj/*MATELEM0(b,k,j)*/, R);
+            (*cij)/*MATELEM0(c,i,j)*/ = p_Add_q((*cij) /*MATELEM0(c,i,j)*/ ,s, R);
           }
         }
       }
-    //  pNormalize(t);
-    //  MATELEM(c,i,j) = t;
     }
   }
   for(i=m*q-1;i>=0;i--) p_Normalize(c->m[i], R);
@@ -2024,5 +2021,89 @@ BOOLEAN sm_Equal(ideal a, ideal b, const ring R)
     i--;
   }
   return TRUE;
+}
+
+/*
+*   mu-Algorithmus:
+*/
+
+//  mu-Matrix
+static void mu(matrix A, matrix &X, const ring R)
+{
+  int n=MATROWS(A);
+  assume(MATCOLS(A)==n);
+    /*  Die Funktion erstellt die Matrix mu
+    *
+    *   Input:
+    *   int n: Dimension der Matrix
+    *   int A: Matrix der Groesse n*n
+    *   int X: Speicherplatz fuer Output
+    *
+    *   In der Matrix X speichert man die Matrix mu
+    */
+
+    // X als n*n Null-Matrix initalisieren
+    X=mpNew(n,n);
+
+    //  Diagonaleintraege von X berrechnen
+    poly sum = NULL;
+    for (int i = n-1; i >= 0; i--)
+    {
+        MATELEM0(X,i,i) = p_Copy(sum,R);
+        sum=p_Sub(sum,p_Copy(MATELEM0(A,i,i),R),R);
+    }
+
+    //  Eintraege aus dem oberen Dreieck von A nach X uebertragen
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = i+1; j < n; j++)
+        {
+            MATELEM0(X,i,j)=p_Copy(MATELEM0(A,i,j),R);
+        }
+    }
+}
+
+// Funktion muDet
+poly mp_DetMu(matrix A, const ring R)
+{
+  int n=MATROWS(A);
+  assume(MATCOLS(A)==n);
+    /*
+    *   Intput:
+    *   int n: Dimension der Matrix
+    *   int A: n*n Matrix
+    *
+    *   Berechnet n-1 mal: X = mu(X)*A
+    *
+    *   Output: det(A)
+    */
+
+    //speichere A ab:
+    matrix B=mp_Copy(A,R);
+    A=mp_Copy(A,R);
+
+    // berechen X = mu(X)*A
+    matrix X;
+    for (int i = 0; i < n-1; i++)
+    {
+        mu(A,X,R);
+        id_Delete((ideal*)&A,R);
+        A=mp_Mult(X,B,R);
+        id_Delete((ideal*)&X,R);
+    }
+
+    // berrechne det(A)
+    poly res;
+    if (n%2 == 0)
+    {
+        res=p_Neg(MATELEM0(A,0,0),R);
+    }
+    else
+    {
+        res=MATELEM0(A,0,0);
+    }
+    MATELEM0(A,0,0)=NULL;
+    id_Delete((ideal*)&A,R);
+    return res;
 }
 

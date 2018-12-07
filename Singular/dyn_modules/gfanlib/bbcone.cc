@@ -1052,23 +1052,34 @@ BOOLEAN uniquePoint(leftv res, leftv args)
   return TRUE;
 }
 
-gfan::ZVector randomPoint(const gfan::ZCone* zc)
+int siRandBound(const int b)
+{
+  int n = 0;
+  while (n==0)
+  {
+    n = siRand();
+    if (b>1)
+    {
+      n = n % b;
+    }
+  }
+  return n;
+}
+
+gfan::ZVector randomPoint(const gfan::ZCone* zc, const int b)
 {
   gfan::ZVector rp = gfan::ZVector(zc->ambientDimension());
 
   gfan::ZMatrix rays = zc->extremeRays();
   for (int i=0; i<rays.getHeight(); i++)
-  {
-    int n = siRand();
-    rp = rp + n * rays[i].toVector();
-  }
+    rp += siRandBound(b) * rays[i].toVector();
 
-  gfan::ZMatrix lins = zc->generatorsOfLinealitySpace();
-  for (int i=0; i<lins.getHeight(); i++)
-  {
-    int n = siRand();
-    rp = rp + n * lins[i].toVector();
-  }
+  // gfan::ZMatrix lins = zc->generatorsOfLinealitySpace();
+  // for (int i=0; i<lins.getHeight(); i++)
+  // {
+  //   int n = siRandBound(b);
+  //   rp = rp + n * lins[i].toVector();
+  // }
 
   return rp;
 }
@@ -1079,8 +1090,18 @@ BOOLEAN randomPoint(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == coneID))
   {
     gfan::initializeCddlibIfRequired();
+
+    int b = 0;
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == INT_CMD))
+    {
+      b = (int) (long) v->Data();
+      b = b+1;
+    }
+
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-    gfan::ZVector zv = randomPoint(zc);
+    gfan::ZVector zv = randomPoint(zc,b);
+
     res->rtyp = BIGINTMAT_CMD;
     res->data = (void*) zVectorToBigintmat(zv);
     gfan::deinitializeCddlibIfRequired();
@@ -1573,96 +1594,6 @@ BOOLEAN containsInSupport(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN convexIntersectionOld(leftv res, leftv args)
-{
-  gfan::initializeCddlibIfRequired();
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
-  {
-    leftv v = u->next;
-    if ((v != NULL) && (v->Typ() == coneID))
-    {
-      gfan::ZCone* zc1 = (gfan::ZCone*)u->Data();
-      gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
-      int d1 = zc1->ambientDimension();
-      int d2 = zc2->ambientDimension();
-      if (d1 != d2)
-      {
-        Werror("expected ambient dims of both cones to coincide\n"
-                "but got %d and %d", d1, d2);
-        return TRUE;
-      }
-      gfan::ZCone zc3 = gfan::intersection(*zc1, *zc2);
-      zc3.canonicalize();
-      res->rtyp = coneID;
-      res->data = (void *)new gfan::ZCone(zc3);
-      return FALSE;
-    }
-    if ((v != NULL) && (v->Typ() == polytopeID))
-    {
-      gfan::ZCone* zc11 = (gfan::ZCone*)u->Data();
-      gfan::ZCone zc1 = liftUp(*zc11);
-      gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
-      int d1 = zc1.ambientDimension();
-      int d2 = zc2->ambientDimension();
-      if (d1 != d2)
-      {
-        Werror("expected ambient dims of both cones to coincide\n"
-                "but got %d and %d", d1, d2);
-        return TRUE;
-      }
-      gfan::ZCone zc3 = gfan::intersection(zc1, *zc2);
-      zc3.canonicalize();
-      res->rtyp = polytopeID;
-      res->data = (void *)new gfan::ZCone(zc3);
-      return FALSE;
-    }
-  }
-  if ((u != NULL) && (u->Typ() == polytopeID))
-  {
-    leftv v = u->next;
-    if ((v != NULL) && (v->Typ() == coneID))
-    {
-      gfan::ZCone* zc1 = (gfan::ZCone*)u->Data();
-      gfan::ZCone* zc22 = (gfan::ZCone*)v->Data();
-      gfan::ZCone zc2 = liftUp(*zc22);
-      int d1 = zc1->ambientDimension();
-      int d2 = zc2.ambientDimension();
-      if (d1 != d2)
-      {
-        Werror("expected ambient dims of both cones to coincide\n"
-                "but got %d and %d", d1, d2);
-        return TRUE;
-      }
-      gfan::ZCone zc3 = gfan::intersection(*zc1, zc2);
-      zc3.canonicalize();
-      res->rtyp = polytopeID;
-      res->data = (void *)new gfan::ZCone(zc3);
-      return FALSE;
-    }
-    if ((v != NULL) && (v->Typ() == polytopeID))
-    {
-      gfan::ZCone* zc1 = (gfan::ZCone*)u->Data();
-      gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
-      int d1 = zc1->ambientDimension();
-      int d2 = zc2->ambientDimension();
-      if (d1 != d2)
-      {
-        Werror("expected ambient dims of both cones to coincide\n"
-                "but got %d and %d", d1, d2);
-        return TRUE;
-      }
-      gfan::ZCone zc3 = gfan::intersection(*zc1, *zc2);
-      zc3.canonicalize();
-      res->rtyp = polytopeID;
-      res->data = (void *)new gfan::ZCone(zc3);
-      return FALSE;
-    }
-  }
-  WerrorS("convexIntersectionOld: unexpected parameters");
-  return TRUE;
-}
-
 BOOLEAN containsRelatively(leftv res, leftv args)
 {
   leftv u = args;
@@ -1841,6 +1772,26 @@ BOOLEAN faceContaining(leftv res, leftv args)
   return TRUE;
 }
 
+
+BOOLEAN onesVector(leftv res, leftv args)
+{
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == INT_CMD))
+  {
+    int n = (int) (long) u->Data();
+    if (n>0)
+    {
+      intvec* v = new intvec(n);
+      for (int i=0; i<n; i++)
+        (*v)[i]=1;
+      res->rtyp = INTVEC_CMD;
+      res->data = (void*) v;
+      return FALSE;
+    }
+  }
+  WerrorS("onesVector: unexpected parameters");
+  return TRUE;
+}
 
 /***
  * Computes a relative interior point for each facet of zc
@@ -2056,6 +2007,97 @@ BOOLEAN bbcone_deserialize(blackbox **b, void **d, si_link f)
   return FALSE;
 }
 
+BOOLEAN convexIntersectionOld(leftv res, leftv args)
+{
+  gfan::initializeCddlibIfRequired();
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == coneID))
+    {
+      gfan::ZCone* zc1 = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
+      int d1 = zc1->ambientDimension();
+      int d2 = zc2->ambientDimension();
+      if (d1 != d2)
+      {
+        Werror("expected ambient dims of both cones to coincide\n"
+                "but got %d and %d", d1, d2);
+        return TRUE;
+      }
+      gfan::ZCone zc3 = gfan::intersection(*zc1, *zc2);
+      zc3.canonicalize();
+      res->rtyp = coneID;
+      res->data = (void *)new gfan::ZCone(zc3);
+      return FALSE;
+    }
+    if ((v != NULL) && (v->Typ() == polytopeID))
+    {
+      gfan::ZCone* zc11 = (gfan::ZCone*)u->Data();
+      gfan::ZCone zc1 = liftUp(*zc11);
+      gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
+      int d1 = zc1.ambientDimension();
+      int d2 = zc2->ambientDimension();
+      if (d1 != d2)
+      {
+        Werror("expected ambient dims of both cones to coincide\n"
+                "but got %d and %d", d1, d2);
+        return TRUE;
+      }
+      gfan::ZCone zc3 = gfan::intersection(zc1, *zc2);
+      zc3.canonicalize();
+      res->rtyp = polytopeID;
+      res->data = (void *)new gfan::ZCone(zc3);
+      return FALSE;
+    }
+  }
+  if ((u != NULL) && (u->Typ() == polytopeID))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == coneID))
+    {
+      gfan::ZCone* zc1 = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zc22 = (gfan::ZCone*)v->Data();
+      gfan::ZCone zc2 = liftUp(*zc22);
+      int d1 = zc1->ambientDimension();
+      int d2 = zc2.ambientDimension();
+      if (d1 != d2)
+      {
+        Werror("expected ambient dims of both cones to coincide\n"
+                "but got %d and %d", d1, d2);
+        return TRUE;
+      }
+      gfan::ZCone zc3 = gfan::intersection(*zc1, zc2);
+      zc3.canonicalize();
+      res->rtyp = polytopeID;
+      res->data = (void *)new gfan::ZCone(zc3);
+      return FALSE;
+    }
+    if ((v != NULL) && (v->Typ() == polytopeID))
+    {
+      gfan::ZCone* zc1 = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
+      int d1 = zc1->ambientDimension();
+      int d2 = zc2->ambientDimension();
+      if (d1 != d2)
+      {
+        Werror("expected ambient dims of both cones to coincide\n"
+                "but got %d and %d", d1, d2);
+        return TRUE;
+      }
+      gfan::ZCone zc3 = gfan::intersection(*zc1, *zc2);
+      zc3.canonicalize();
+      res->rtyp = polytopeID;
+      res->data = (void *)new gfan::ZCone(zc3);
+      return FALSE;
+    }
+  }
+  WerrorS("convexIntersectionOld: unexpected parameters");
+  return TRUE;
+}
+
+
 void bbcone_setup(SModulFunctions* p)
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
@@ -2085,7 +2127,6 @@ void bbcone_setup(SModulFunctions* p)
   p->iiAddCproc("gfan.lib","containsRelatively",FALSE,containsRelatively);
   p->iiAddCproc("gfan.lib","convexHull",FALSE,convexHull);
   p->iiAddCproc("gfan.lib","convexIntersection",FALSE,intersectCones);
-  p->iiAddCproc("gfan.lib","convexIntersectionOld",FALSE,convexIntersectionOld);
   p->iiAddCproc("gfan.lib","dimension",FALSE,dimension);
   p->iiAddCproc("gfan.lib","dualCone",FALSE,dualCone);
   p->iiAddCproc("gfan.lib","equations",FALSE,equations);
@@ -2111,6 +2152,8 @@ void bbcone_setup(SModulFunctions* p)
   p->iiAddCproc("gfan.lib","span",FALSE,impliedEquations);
   p->iiAddCproc("gfan.lib","uniquePoint",FALSE,uniquePoint);
   p->iiAddCproc("gfan.lib","faceContaining",FALSE,faceContaining);
+  p->iiAddCproc("gfan.lib","onesVector",FALSE,onesVector);
+  p->iiAddCproc("gfan.lib","convexIntersectionOld",FALSE,convexIntersectionOld);
   coneID=setBlackboxStuff(b,"cone");
 }
 

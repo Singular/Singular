@@ -1248,14 +1248,14 @@ ideal id_Matrix2Module(matrix mat, const ring R)
 
   for(j=0;j<mc /*MATCOLS(mat)*/;j++) /* j is also index in result->m */
   {
-    for (i=1;i<=mr /*MATROWS(mat)*/;i++)
+    for (i=0;i<mr /*MATROWS(mat)*/;i++)
     {
-      h = MATELEM(mat,i,j+1);
+      h = MATELEM0(mat,i,j);
       if (h!=NULL)
       {
         l=pLength(h);
-        MATELEM(mat,i,j+1)=NULL;
-        p_SetCompP(h,i, R);
+        MATELEM0(mat,i,j)=NULL;
+        p_SetCompP(h,i+1, R);
         sBucket_Merge_p(bucket, h, l);
       }
     }
@@ -1297,19 +1297,19 @@ matrix id_Module2Matrix(ideal mod, const ring R)
         int k,l,o=mod->rank;
         mod->rank=cp;
         matrix d=mpNew(mod->rank,IDELEMS(mod));
-        for (l=1; l<=o; l++)
+        for (l=0; l<o; l++)
         {
-          for (k=1; k<=IDELEMS(mod); k++)
+          for (k=0; k<IDELEMS(mod); k++)
           {
-            MATELEM(d,l,k)=MATELEM(result,l,k);
-            MATELEM(result,l,k)=NULL;
+            MATELEM0(d,l,k)=MATELEM0(result,l,k);
+            MATELEM0(result,l,k)=NULL;
           }
         }
         id_Delete((ideal *)&result,R);
         result=d;
       }
 #endif
-      MATELEM(result,cp,i+1) = p_Add_q(MATELEM(result,cp,i+1),h,R);
+      MATELEM0(result,cp-1,i) = p_Add_q(MATELEM0(result,cp-1,i),h,R);
     }
   }
   // obachman 10/99: added the following line, otherwise memory leack!
@@ -1339,7 +1339,7 @@ matrix id_Module2formatedMatrix(ideal mod,int rows, int cols, const ring R)
       {
         p_SetComp(h,0,R);
         p_SetmComp(h,R);
-        MATELEM(result,cp,i+1) = p_Add_q(MATELEM(result,cp,i+1),h,R);
+        MATELEM0(result,cp-1,i) = p_Add_q(MATELEM0(result,cp-1,i),h,R);
       }
       else
         p_Delete(&h,R);

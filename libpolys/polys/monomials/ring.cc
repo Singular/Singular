@@ -344,6 +344,18 @@ void   rWrite(ring r, BOOLEAN details)
 
     if (r->wvhdl[l]!=NULL)
     {
+      #ifndef SING_NDEBUG
+      if((r->order[l] != ringorder_wp)
+      &&(r->order[l] != ringorder_Wp)
+      &&(r->order[l] != ringorder_ws)
+      &&(r->order[l] != ringorder_Ws)
+      &&(r->order[l] != ringorder_a)
+      &&(r->order[l] != ringorder_am)
+      &&(r->order[l] != ringorder_M))
+      {
+        Warn("should not have wvhdl entry at pos. %d",l);
+      }
+      #endif
       for (int j= 0;
            j<(r->block1[l]-r->block0[l]+1)*(r->block1[l]-r->block0[l]+1);
            j+=i)
@@ -533,37 +545,53 @@ char * rOrdStr(ring r)
     {
       if (r->wvhdl[l]!=NULL)
       {
-        StringAppendS("(");
-        for (int j= 0;
-             j<(r->block1[l]-r->block0[l]+1)*(r->block1[l]-r->block0[l]+1);
-             j+=i+1)
+        #ifndef SING_NDEBUG
+        if((r->order[l] != ringorder_wp)
+        &&(r->order[l] != ringorder_Wp)
+        &&(r->order[l] != ringorder_ws)
+        &&(r->order[l] != ringorder_Ws)
+        &&(r->order[l] != ringorder_a)
+        &&(r->order[l] != ringorder_am)
+        &&(r->order[l] != ringorder_M))
         {
-          char c=',';
-          if(r->order[l]==ringorder_a64)
+          Warn("should not have wvhdl entry at pos. %d",l);
+          StringAppend("(%d)",r->block1[l]-r->block0[l]+1);
+        }
+        else
+        #endif
+        {
+          StringAppendS("(");
+          for (int j= 0;
+               j<(r->block1[l]-r->block0[l]+1)*(r->block1[l]-r->block0[l]+1);
+               j+=i+1)
           {
-            int64 * w=(int64 *)r->wvhdl[l];
-            for (i = 0; i<r->block1[l]-r->block0[l]; i++)
+            char c=',';
+            if(r->order[l]==ringorder_a64)
             {
-              StringAppend("%lld," ,w[i]);
+              int64 * w=(int64 *)r->wvhdl[l];
+              for (i = 0; i<r->block1[l]-r->block0[l]; i++)
+              {
+                StringAppend("%lld," ,w[i]);
+              }
+              StringAppend("%lld)" ,w[i]);
+              break;
             }
-            StringAppend("%lld)" ,w[i]);
-            break;
-          }
-          else
-          {
-            for (i = 0; i<r->block1[l]-r->block0[l]; i++)
+            else
             {
-              StringAppend("%d," ,r->wvhdl[l][i+j]);
+              for (i = 0; i<r->block1[l]-r->block0[l]; i++)
+              {
+                StringAppend("%d," ,r->wvhdl[l][i+j]);
+              }
             }
+            if (r->order[l]!=ringorder_M)
+            {
+              StringAppend("%d)" ,r->wvhdl[l][i+j]);
+              break;
+            }
+            if (j+i+1==(r->block1[l]-r->block0[l]+1)*(r->block1[l]-r->block0[l]+1))
+              c=')';
+            StringAppend("%d%c" ,r->wvhdl[l][i+j],c);
           }
-          if (r->order[l]!=ringorder_M)
-          {
-            StringAppend("%d)" ,r->wvhdl[l][i+j]);
-            break;
-          }
-          if (j+i+1==(r->block1[l]-r->block0[l]+1)*(r->block1[l]-r->block0[l]+1))
-            c=')';
-          StringAppend("%d%c" ,r->wvhdl[l][i+j],c);
         }
       }
       else
