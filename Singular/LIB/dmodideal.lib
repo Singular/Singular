@@ -18,31 +18,31 @@ D(R)[s] := D(R) tensored with K[s]:=K[s_1,...,s_r] over K.
 We often write just D for D(R) and D[s] for D(R)[s].
 
 One is interested in the computation of the following data:
-- Ann_{D[s]} F^s, the annihilator of F^s in D[s]; see annihilatorMultiFs
-- Ann^{1}_{D[s]} F^s, the logarithmic annihilator of F^s in D[s]; see annfsLogIdeal
-- several kinds of global Bernstein-Sato ideals in K[s],
+@*- Ann_{D[s]} F^s, the annihilator of F^s in D[s]; see annihilatorMultiFs
+@*- Ann^{1}_{D[s]} F^s, the logarithmic annihilator of F^s in D[s]; see annfsLogIdeal
+@*- several kinds of global Bernstein-Sato ideals in K[s],
      cf. (CU) and (Bud12); see BernsteinSatoIdeal and BSidealFromAnn
-- Ann_{D} F^alpha for alpha from K^r, the annihilator of F^alpha in D; see annfalphaI
-- sub- and over-ideals, bounding the Bernstein-Sato ideal; see BFBoundsBudur
+@*- Ann_{D} F^alpha for alpha from K^r, the annihilator of F^alpha in D; see annfalphaI
+@*- sub- and over-ideals, bounding the Bernstein-Sato ideal; see BFBoundsBudur
 
 REFERENCES:
 (BM) the Ann F^s algorithm by Briancon and Maisonobe (Remarques sur
-       l'ideal de Bernstein associe a des polynomes, preprint, 2002)
-(LM08) V. Levandovskyy and J. Martin-Morales, ISSAC 2008
-(CU) Castro and Ucha, On the computation of Bernstein-Sato ideals, JSC 2005
+       l'ideal de Bernstein associe a des polynomes, preprint, 2002)@*
+(LM08) V. Levandovskyy and J. Martin-Morales, ISSAC 2008@*
+(CU) Castro and Ucha, On the computation of Bernstein-Sato ideals, JSC 2005@*
 (SST) Saito, Sturmfels, Takayama 'Groebner Deformations of Hypergeometric
-       Differential Equations', Springer, 2000
+       Differential Equations', Springer, 2000@*
 (Bud12) N. Budur, Bernstein-Sato ideals and local systems, Annales de
-        l'Institut Fourier,  Volume 65 (2015) no. 2
+        l'Institut Fourier,  Volume 65 (2015) no. 2@*
 (OT99) T. Oaku and N. Takayama, An algorithm for de Rham cohomology groups of
        the complement of an affine variety via D-module computation,
        Journal of Pure and Applied Algebra, 1999
 
 PROCEDURES:
 annfsLogIdeal(F);       compute the logarithmic annihilator Ann^(1) F^s in D
-annihilatorMultiFs(F [,eng,us,ord]);       compute the annihilator Ann F^s in D
-BSidealFromAnn(F, @R [,eng,met]);       compute several kinds of Bernstein-Sato ideals, given Ann F^s
-BernsteinSatoIdeal(F [,eng,met,us]);       compute several kinds of Bernstein-Sato ideals, given only F
+annihilatorMultiFs(F[,eng,us,ord]);    compute the annihilator Ann F^s in D
+BSidealFromAnn(F, @R [,eng,met]);      compute several kinds of Bernstein-Sato ideals, given Ann F^s
+BernsteinSatoIdeal(F [,eng,met,us]);   compute several kinds of Bernstein-Sato ideals, given only F
 BFBoundsBudur(F,m);       compute upper and lower bounds of several kinds of Bernstein-Sato ideals with the method of (Bud12)
 annfalphaI(f,alpha);       compute Ann F^alpha in D, where alpha is an ideal from the ground field
 extractS(I,r);       give I as ideal in the commutative polynomial ring in the first r variables
@@ -805,14 +805,13 @@ RETURN:  ring
 PURPOSE: compute two kinds of Bernstein-Sato ideals, associated to
    f = F[1]*..*F[P], with the multivariate algorithm by Briancon and Maisonobe.
 ASSUME:  basering is a commutative polynomial ring in characteristic 0
-NOTE:    activate the output ring with the @code{setring} command. In this ring,
-         - the ideal LD is the annihilator of F[1]^s_1*..*F[P]^s_p,
+NOTE:    activate the output ring with the @code{setring} command. In this ring,@*
+         - the ideal LD is the annihilator of F[1]^s_1*..*F[P]^s_p,@*
          - the list or ideal BS is a Bernstein-Sato ideal of a polynomial
            f = F[1]*..*F[P].
          If eng <>0, @code{std} is used for Groebner basis computations,
          otherwise, and by default @code{slimgb} is used.
-         If met <0, the B-Sigma ideal (cf. Castro and Ucha,
-         'On the computation of Bernstein-Sato ideals', 2005) is computed.
+         If met <0, the B-Sigma ideal (cf. Castro and Ucha, 'On the computation of Bernstein-Sato ideals', 2005) is computed.
          If 0 < met < P, then the ideal B_P (cf. the paper) is computed.
          If met is an intvec, Budurs generalized Bernstein-Sato ideal
          associated to met is computed.
