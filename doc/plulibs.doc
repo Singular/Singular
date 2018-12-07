@@ -24,6 +24,7 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 * central_lib:: Computation of centralizer and center in GR-algebras
 * dmod_lib:: Fundamental algorithms for algebraic D-modules
 * dmodapp_lib::  Applications of algebraic D-modules
+* dmodideal_lib:: Algorithms for Bernstein-Sato ideals of morphisms
 * dmodvar_lib:: Algebraic D-modules and Bernstein-Sato polynomial for varieties
 * involut_lib::  Computations and operations with involutions
 * gkdim_lib::  Computation of the Gelfand-Kirillov dimension of modules
@@ -66,6 +67,10 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 @node dmodapp_lib
 @section dmodapp_lib
 @c lib dmodapp.lib
+@c ----------------------------------------------------------
+@node dmodideal_lib
+@section dmodideal_lib
+@c lib dmodideal.lib
 @c ----------------------------------------------------------
 @node dmodvar_lib
 @section dmodvar_lib
