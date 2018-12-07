@@ -21,7 +21,8 @@ and Project II.6 of the transregional collaborative research centre
 SFB-TRR 195 'Symbolic Tools in Mathematics and their Application' of the German DFG
 
 PROCEDURES:
-makeLetterplaceRing(d);          creates a ring with d blocks of shifted original variables
+freeAlgebra(r, d);               creates a ring with d blocks of shifted original variables
+makeLetterplaceRing(d);          (deprecated) creates a ring with d blocks of shifted original variables
 setLetterplaceAttributes(R,d,b); supplies ring R with the letterplace structure
 lieBracket(a,b[, N]);            Lie bracket ab-ba of two letterplace polynomials
 letplaceGBasis(I);               two-sided Groebner basis of a letterplace ideal I
@@ -982,18 +983,39 @@ static proc polylen(ideal I)
   return(J);
 }
 
+proc freeAlgebra(def r, int d)
+"USAGE:  freeAlgebra(r, d); r a ring, d an integer
+RETURN:  ring
+PURPOSE: creates a letterplace ring with the ordering of r
+EXAMPLE: example freeAlgebra; shows examples
+"
+{
+  return (system("freeAlgebra", r, d));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  def R = freeAlgebra(r, 7);
+  R;
+  ring r2 = 0,(x,y,z),lp;
+  def R2 = freeAlgebra(r2, 7);
+  R2;
+}
+
 // united all previous makes, including mLR1 (homog) and mLR2 (nonhomog)
 proc makeLetterplaceRing(int d, list #)
-"USAGE:  makeLetterplaceRing(d [,h]); d an integer, h an optional integer
+"USAGE:  makeLetterplaceRing(d [,h]); d an integer, h an optional integer (deprecated, use freeAlgebra instead)
 RETURN:  ring
 PURPOSE: creates a ring with the ordering, used in letterplace computations
-NOTE: h = 0 (default) : Dp ordering will be used
+NOTE: h = -1 (default) : the ordering of the current ring will be used
+h = 0 : Dp ordering will be used
 h = 2 : weights 1 used for all the variables, a tie breaker is a list of block of original ring
 h = 1 : the pure homogeneous letterplace block ordering (applicable in the situation of homogeneous input ideals) will be used.
 EXAMPLE: example makeLetterplaceRing; shows examples
 "
 {
-  int alternativeVersion = 0;
+  int alternativeVersion = -1;
   if ( size(#)>0 )
   {
     if (typeof(#[1]) == "int")
@@ -1011,7 +1033,13 @@ EXAMPLE: example makeLetterplaceRing; shows examples
       def @A = makeLetterplaceRing2(d);
     }
     else {
-      def @A = makeLetterplaceRing4(d);
+      if (alternativeVersion == 0)
+      {
+        def @A = makeLetterplaceRing4(d);
+      }
+      else {
+        def @A = freeAlgebra(basering, d);
+      }
     }
   }
   return(@A);

@@ -1242,6 +1242,23 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
+ /*==================== freeAlgebra for freeGB  ==================*/
+  #ifdef HAVE_SHIFTBBA
+    if (strcmp(sys_cmd, "freeAlgebra") == 0)
+    {
+      const short t[]={2,RING_CMD,INT_CMD};
+      if (iiCheckTypes(h,t,1))
+      {
+        ring r=(ring)h->CopyD();
+        int d=(int)((long)h->next->Data());
+        res->rtyp = RING_CMD;
+        res->data = freeAlgebra(r, d);
+        return FALSE;
+      }
+      else return TRUE;
+    }
+    else
+  #endif
   /*==================== pcv ==================================*/
   #ifdef HAVE_PCV
     if(strcmp(sys_cmd,"pcvLAddL")==0)
