@@ -445,6 +445,7 @@ example
   J;
 }
 
+// temporary name for testing
 proc lpRightStd(ideal F, ideal Q)
 {
   return (system("rightgb", F, Q));
