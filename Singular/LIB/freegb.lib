@@ -445,6 +445,11 @@ example
   J;
 }
 
+proc lpRightStd(ideal F, ideal Q)
+{
+  return (system("rightgb", F, Q));
+}
+
 /*
 //// this was the part of example in the old good Letterplace
   // now transfom letterplace polynomials into strings of words

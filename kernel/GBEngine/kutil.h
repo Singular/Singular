@@ -367,6 +367,7 @@ public:
   #endif
   #ifdef HAVE_SHIFTBBA
   int cv; // in shift bases: counting V criterion
+  /*BOOLEAN*/ char rightGB;
   #endif
   /*BOOLEAN*/ char interpt;
   /*BOOLEAN*/ char homog;
@@ -851,15 +852,9 @@ poly pCopyL2p(LObject h, kStrategy strat);
 
 void enterTShift(LObject p, kStrategy strat, int atT = -1);
 
-void initBuchMoraShift (ideal F,ideal Q,kStrategy strat);
-
-void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy strat, int atR);
-
 void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS);
 
 void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR);
-
-void updateSShift(kStrategy strat);
 
 void initBbaShift(kStrategy strat);
 
@@ -867,7 +862,8 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
 
 int redFirstShift (LObject* h,kStrategy strat); // ok
 
-ideal freegb(ideal I);
+ideal freegb(ideal F);
+ideal rightgb(ideal F, ideal Q);
 
 ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
 // test syz strategy: // will be removed soon
