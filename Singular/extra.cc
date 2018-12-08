@@ -1246,14 +1246,39 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #ifdef HAVE_SHIFTBBA
     if (strcmp(sys_cmd, "freeAlgebra") == 0)
     {
+      // copied from freegb.cc
       const short t[]={2,RING_CMD,INT_CMD};
       if (iiCheckTypes(h,t,1))
       {
-        ring r=(ring)h->CopyD();
+        ring r=(ring)h->Data();
         int d=(int)((long)h->next->Data());
-        res->rtyp = RING_CMD;
-        res->data = freeAlgebra(r, d);
-        return FALSE;
+        if (d<2)
+        {
+          WerrorS("degree must be >=2");
+          return TRUE;
+        }
+        int i=0;
+        while(r->order[i]!=0)
+        {
+          if ((r->order[i]==ringorder_c) ||(r->order[i]==ringorder_C)) i++;
+          else if ((r->block0[i]==1)&&(r->block1[i]==r->N)) i++;
+          else
+          {
+            WerrorS("only for rings with a global ordering of one block");
+            return TRUE;
+          }
+        }
+        if ((r->order[i]!=0)
+            || (rHasLocalOrMixedOrdering(r)))
+        {
+          //WerrorS("only for rings with a global ordering of one block");
+          Werror("only for rings with a global ordering of one block,i=%d, o=%d",i,r->order[i]);
+          return TRUE;
+        }
+        ring R=freeAlgebra(r,d);
+        res->rtyp=RING_CMD;
+        res->data=R;
+        return R==NULL;
       }
       else return TRUE;
     }
