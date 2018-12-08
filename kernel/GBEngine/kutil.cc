@@ -10280,7 +10280,7 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
     updateS(TRUE,strat);
   }
 #ifdef HAVE_SHIFTBBA
-  if (!(rIsLPRing(currRing) && strat->rightGB)) // we need to check later whether a poly is from Q
+  if (!(rIsLPRing(currRing) && strat->rightGB)) // for right GB, we need to check later whether a poly is from Q
 #endif
   {
     if (strat->fromQ!=NULL) omFreeSize(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
@@ -10305,6 +10305,14 @@ void exitBuchMora (kStrategy strat)
   omFreeSize(strat->B,(strat->Bmax)*sizeof(LObject));
   pLmFree(&strat->tail);
   strat->syzComp=0;
+
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing) && strat->rightGB)
+  {
+    if (strat->fromQ!=NULL) omFreeSize(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
+    strat->fromQ=NULL;
+  }
+#endif
 }
 
 void initSbaPos (kStrategy strat)

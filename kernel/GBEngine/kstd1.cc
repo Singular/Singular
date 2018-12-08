@@ -2575,7 +2575,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   kStrategy strat=new skStrategy;
   intvec* temp_w=NULL;
 
-  if (rightGB) strat->rightGB = TRUE;
+  strat->rightGB = rightGB;
 
   if(!TEST_OPT_RETURN_SB)
     strat->syzComp = syzComp;
