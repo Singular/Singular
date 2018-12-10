@@ -1,10 +1,16 @@
 #ifndef IPSHELL_H
 #define IPSHELL_H
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT
+
+
 */
 #include <stdio.h>
 //#include "kernel/structs.h"
@@ -28,7 +34,11 @@ BOOLEAN iiARROW (leftv, char*,char *);
 
 extern leftv iiCurrArgs;
 extern idhdl iiCurrProc;
-extern int iiOp; /* the current operation*/
+extern int iiOp; /*!
+!
+ the current operation
+
+*/
 extern const char *  currid;
 extern int     iiRETURNEXPR_len;
 extern sleftv  iiRETURNEXPR;
@@ -40,7 +50,11 @@ extern int printlevel;
 extern int si_echo;
 
 
-extern BOOLEAN yyInRingConstruction; /* 1: during ring construction */
+extern BOOLEAN yyInRingConstruction; /*!
+!
+ 1: during ring construction 
+
+*/
 
 int     IsCmd(const char *n, int & tok);
 
@@ -68,9 +82,13 @@ char *  iiGetLibProcBuffer( procinfov pi, int part=1 );
 char *  iiProcName(char *buf, char & ct, char* &e);
 char *  iiProcArgs(char *e,BOOLEAN withParenth);
 BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN force );
-/* sees wheter library lib has already been loaded
+/*!
+!
+ sees wheter library lib has already been loaded
    if yes, writes filename of lib into where and returns TRUE,
    if  no, returns FALSE
+
+
 */
 /// load lib/module given in v
 BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport = FALSE);
@@ -109,8 +127,16 @@ syStrategy syConvList(lists li);
 BOOLEAN syBetti1(leftv res, leftv u);
 BOOLEAN syBetti2(leftv res, leftv u, leftv w);
 
-/* ================================================================== */
-/* Expressions : */
+/*!
+!
+ ================================================================== 
+
+*/
+/*!
+!
+ Expressions : 
+
+*/
 BOOLEAN iiExprArith1(leftv res, sleftv* a, int op);
 BOOLEAN iiExprArith2(leftv res, sleftv* a, int op, sleftv* b,
                      BOOLEAN proccall=FALSE);
@@ -157,7 +183,11 @@ struct sValCmdM
   proc1 p;
   short cmd;
   short res;
-  short number_of_args; /* -1: any, -2: any >0, .. */
+  short number_of_args; /*!
+!
+ -1: any, -2: any >0, .. 
+
+*/
   short valid_for;
 };
 extern const struct sValCmd2 dArith2[];
@@ -166,8 +196,16 @@ extern const struct sValCmd3 dArith3[];
 extern const struct sValCmdM dArithM[];
 #endif
 
-/* ================================================================== */
-/* Assigments : */
+/*!
+!
+ ================================================================== 
+
+*/
+/*!
+!
+ Assigments : 
+
+*/
 BOOLEAN iiAssign(leftv left, leftv right, BOOLEAN toplevel=TRUE);
 
 typedef BOOLEAN (*proci)(leftv,leftv,Subexpr);
@@ -189,7 +227,11 @@ BOOLEAN iiParameter(leftv p);
 BOOLEAN iiAlias(leftv p);
 
 int iiTokType(int op);
-/* ================================================================== */
+/*!
+!
+ ================================================================== 
+
+*/
 int     iiDeclCommand(leftv sy, leftv name, int lev, int t, idhdl* root,
   BOOLEAN isring = FALSE, BOOLEAN init_b=TRUE);
 BOOLEAN iiMake_proc(idhdl pn, package pack, leftv sl);
@@ -198,9 +240,17 @@ void* iiCallLibProcM(const char*n, void **args, int *arg_types, BOOLEAN &err);
 // from misc.cc:
 char *  showOption();
 BOOLEAN setOption(leftv res, leftv v);
-/* ================================================================== */
+/*!
+!
+ ================================================================== 
+
+*/
 char * versionString();
-/* ================================================================== */
+/*!
+!
+ ================================================================== 
+
+*/
 void  singular_example(char *str);
 
 BOOLEAN iiTryLoadLib(leftv v, const char *id);
@@ -222,7 +272,15 @@ idhdl rFindHdl(ring r, idhdl n);
 void   rKill(idhdl h);
 void   rKill(ring r);
 lists scIndIndset(ideal S, BOOLEAN all, ideal Q);
-BOOLEAN mpKoszul(leftv res,leftv c/*ip*/, leftv b/*in*/, leftv id);
+BOOLEAN mpKoszul(leftv res,leftv c/*!
+!
+ip
+
+*/, leftv b/*!
+!
+in
+
+*/, leftv id);
 BOOLEAN mpJacobi(leftv res,leftv a);
 BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w);
 BOOLEAN kQHWeight(leftv res,leftv v);
@@ -235,20 +293,36 @@ BOOLEAN nuVanderSys( leftv res, leftv arg1, leftv arg2, leftv arg3);
 BOOLEAN nuUResSolve( leftv res, leftv args );
 
 BOOLEAN jjCHARSERIES(leftv res, leftv u);
-/*
+/*!
+!
+
 BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w);
 #if 0
 BOOLEAN jjIS_SQR_FREE(leftv res, leftv u);
 #endif
+
+
 */
-/* ================================================================== */
+/*!
+!
+ ================================================================== 
+
+*/
 void paPrint(const char *n,package p);
-/* ================================================================== */
+/*!
+!
+ ================================================================== 
+
+*/
 
 
 BOOLEAN iiTestAssume(leftv a, leftv b);
 
-/* table interface for iiAddCproc */
+/*!
+!
+ table interface for iiAddCproc 
+
+*/
 /// apply an operation 'op' to an argument a
 /// return TRUE on failure
 BOOLEAN iiExprArith1Tab(leftv res,///< [out] pre-allocated result

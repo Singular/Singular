@@ -1,4 +1,6 @@
 /*!
+!
+!
  \page singular_page Singular Interpreter and related functionality
 
 
@@ -15,4 +17,6 @@
  \verbinclude Singular/README
 
  TODO: The sub-package structure is not yet defined for Singular package...
+
+
 */

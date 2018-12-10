@@ -1,8 +1,14 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: frwalk: interpreter link
+
+
 */
 
 #include "kernel/mod2.h"

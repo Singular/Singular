@@ -1,6 +1,8 @@
 // -*- c++ -*-
 //*****************************************************************************
-/** @file countedref.h
+/*!
+!
+* @file countedref.h
  *
  * This file defines reusable classes supporting reference counted interpreter
  * objects and initiates the @c blackbox operations for high-level types
@@ -30,7 +32,9 @@
 #include "Singular/subexpr.h"
 #include "Singular/idrec.h"
 #include "Singular/ipid.h"
-/** @class CountedRefPtr
+/*!
+!
+* @class CountedRefPtr
  * This class implements a smart pointer which handles pointer-style access
  * to a reference-counted structure and destructing the latter after use.
  *
@@ -110,7 +114,9 @@ private:
   ptr_type m_ptr;
 };
 
-/** @class RefCounter
+/*!
+!
+* @class RefCounter
  * This class implements implements a refernce counter which we can use
  * as a public base of objects managed by @CountedRefPtr.
  **/
@@ -211,7 +217,9 @@ private:
 
 
 
-/** @class LeftvHelper
+/*!
+!
+* @class LeftvHelper
  * This class implements some recurrent code sniplets to be used with
  * @c leftv and @c idhdl.implements a refernce counter which we can use
  **/
@@ -279,7 +287,9 @@ public:
 
 };
 
-/** @class LeftvShallow
+/*!
+!
+* @class LeftvShallow
  * Ths class wraps @c leftv by taking into acount memory allocation, destruction
  * as well as shallowly copying of a given @c leftv, i.e. we just copy auxiliary
  * information (like subexpressions), but not the actual data.
@@ -315,8 +325,16 @@ public:
 
   /// @name Pointer-style access
   //@{
-  /*const*/ leftv operator->() const { return m_data;  }
-  /*^ warning: 'const' type qualifier on return type has no effect!!! */
+  /*!
+!
+const
+
+*/ leftv operator->() const { return m_data;  }
+  /*!
+!
+^ warning: 'const' type qualifier on return type has no effect!!! 
+
+*/
   leftv operator->() { return m_data;  }
   //@]
 
@@ -325,7 +343,9 @@ protected:
   leftv m_data;
 };
 
-/** @class LeftvDeep
+/*!
+!
+* @class LeftvDeep
  * This class wraps @c leftv by taking into acount memory allocation, destruction
  * as well as deeply copying of a given @c leftv, i.e. we also take over
  * ownership of the @c leftv data.
@@ -467,5 +487,9 @@ countedref_init()
 }
 
 
-#endif /*SINGULAR_COUNTEDREF_H_ */
+#endif /*!
+!
+SINGULAR_COUNTEDREF_H_ 
+
+*/
 

@@ -5,7 +5,9 @@
 #include "Singular/lists.h"
 #include "kernel/linear_algebra/linearAlgebra.h"
 
-/**
+/*!
+!
+*
  * Computes all eigenvalues of a given real quadratic matrix with
  * multiplicites.
  *
@@ -30,11 +32,27 @@
  * @return a list with one entry (int)0, or two entries which are again lists
  **/
 lists qrDoubleShift(
-       const matrix A,     /**< [in]  the quadratic matrix         */
-       const number tol1,  /**< [in]  tolerance for deflation      */
-       const number tol2,  /**< [in]  tolerance for square roots   */
-       const number tol3,   /**< [in]  tolerance for distinguishing
-                                      eigenvalues                  */
+       const matrix A,     /*!
+!
+*< [in]  the quadratic matrix         
+
+*/
+       const number tol1,  /*!
+!
+*< [in]  tolerance for deflation      
+
+*/
+       const number tol2,  /*!
+!
+*< [in]  tolerance for square roots   
+
+*/
+       const number tol3,   /*!
+!
+*< [in]  tolerance for distinguishing
+                                      eigenvalues                  
+
+*/
        const ring r= currRing
                    );
 
@@ -45,7 +63,11 @@ lists qrDoubleShift(const matrix A, const number tol1, const number tol2,
   matrix* queue = new matrix[n];
   queue[0] = mp_Copy(A,R); int queueL = 1;
   number* eigenVs = new number[n]; int eigenL = 0;
-  /* here comes the main call: */
+  /*!
+!
+ here comes the main call: 
+
+*/
   bool worked = qrDS(n, queue, queueL, eigenVs, eigenL, tol1, tol2,R);
   lists result = (lists)omAlloc(sizeof(slists));
   if (!worked)
@@ -58,19 +80,31 @@ lists qrDoubleShift(const matrix A, const number tol1, const number tol2,
     delete [] queue;
     result->Init(1);
     result->m[0].rtyp = INT_CMD;
-    result->m[0].data = (void*)0;   /* a list with a single entry
-                                             which is the int zero */
+    result->m[0].data = (void*)0;   /*!
+!
+ a list with a single entry
+                                             which is the int zero 
+
+*/
   }
   else
   {
-    /* now eigenVs[0..eigenL-1] contain all eigenvalues; among them, there
-       may be equal entries */
+    /*!
+!
+ now eigenVs[0..eigenL-1] contain all eigenvalues; among them, there
+       may be equal entries 
+
+*/
     number* distinctEVs = new number[n]; int distinctC = 0;
     int* mults = new int[n];
     for (int i = 0; i < eigenL; i++)
     {
       int index = similar(distinctEVs, distinctC, eigenVs[i], tol3);
-      if (index == -1) /* a new eigenvalue */
+      if (index == -1) /*!
+!
+ a new eigenvalue 
+
+*/
       {
         distinctEVs[distinctC] = nCopy(eigenVs[i]);
         mults[distinctC++] = 1;

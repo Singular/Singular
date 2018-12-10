@@ -1,8 +1,16 @@
-/*****************************************
+/*!
+!
+****************************************
 *  Computer Algebra System SINGULAR      *
-*****************************************/
-/*
+****************************************
+
+*/
+/*!
+!
+
 * ABSTRACT: Gauss-Manin system normal form
+
+
 */
 
 
@@ -137,5 +145,9 @@ BOOLEAN gmsNF(leftv res,leftv h)
   return TRUE;
 }
 
-#endif /* HAVE_GMS */
+#endif /*!
+!
+ HAVE_GMS 
+
+*/
 

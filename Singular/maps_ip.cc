@@ -1,8 +1,14 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT - the mapping of polynomials to other rings
+
+
 */
 #define TRANSEXT_PRIVATES
 
@@ -31,16 +37,24 @@
 #include "lists.h"
 #include "tok.h"
 
-/* debug output: Tok2Cmdname in maApplyFetch*/
+/*!
+!
+ debug output: Tok2Cmdname in maApplyFetch
+
+*/
 #include "ipshell.h"
 
-/*2
+/*!
+!
+2
 * maps the expression w to res,
 * switch what: MAP_CMD: use theMap for mapping, N for preimage ring
 *              //FETCH_CMD: use pOrdPoly for mapping
 *              IMAP_CMD: use perm for mapping, N for preimage ring
 *              default: map only poly-structures,
 *                       use perm and par_perm, N and P,
+
+
 */
 BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
                      int *perm, int *par_perm, int P, nMapFunc nMap)
@@ -107,14 +121,18 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         if (nCoeff_is_Extension(currRing->cf))
         {
           n_Normalize(a, currRing->cf);
-/*
+/*!
+!
+
           number a = (number)res->data;
           number one = nInit(1);
           number product = nMult(a, one );
           nDelete(&one);
           nDelete(&a);
           res->data=(void *)product;
- */
+ 
+
+*/
         }
         #ifdef LDEBUG
         n_Test(a, currRing->cf);
@@ -127,9 +145,25 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
       if ((what==FETCH_CMD)&& (preimage_r->cf==currRing->cf))
         res->data=(void *)prCopyR(sBucketPeek((sBucket_pt)data), preimage_r, currRing);
       else
-        if ( (what==IMAP_CMD) || /*(*/ (what==FETCH_CMD) /*)*/) /* && (nMap!=nCopy)*/
+        if ( (what==IMAP_CMD) || /*!
+!
+(
+
+*/ (what==FETCH_CMD) /*!
+!
+)
+
+*/) /*!
+!
+ && (nMap!=nCopy)
+
+*/
         res->data=(void *)p_PermPoly(sBucketPeek((sBucket_pt)data),perm,preimage_r,currRing, nMap,par_perm,P,use_mult);
-      else /*if (what==MAP_CMD)*/
+      else /*!
+!
+if (what==MAP_CMD)
+
+*/
       {
         res->data=(void*)maMapPoly(sBucketPeek((sBucket_pt)data),preimage_r,(ideal)theMap,currRing,nMap);
       }
@@ -141,9 +175,25 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
       if ((what==FETCH_CMD)&& (preimage_r->cf==currRing->cf))
         res->data=(void *)prCopyR( (poly)data, preimage_r, currRing);
       else
-        if ( (what==IMAP_CMD) || /*(*/ (what==FETCH_CMD) /*)*/) /* && (nMap!=nCopy)*/
+        if ( (what==IMAP_CMD) || /*!
+!
+(
+
+*/ (what==FETCH_CMD) /*!
+!
+)
+
+*/) /*!
+!
+ && (nMap!=nCopy)
+
+*/
         res->data=(void *)p_PermPoly((poly)data,perm,preimage_r,currRing, nMap,par_perm,P,use_mult);
-      else /*if (what==MAP_CMD)*/
+      else /*!
+!
+if (what==MAP_CMD)
+
+*/
       {
         p_Test((poly)data,preimage_r);
         res->data=(void*)maMapPoly((poly)data,preimage_r,(ideal)theMap,currRing,nMap);
@@ -185,7 +235,11 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
           pTest(m->m[i]);
         }
       }
-      else /* (what==MAP_CMD) */
+      else /*!
+!
+ (what==MAP_CMD) 
+
+*/
       {
         assume(what==MAP_CMD);
         matrix s=mpNew(N,maMaxDeg_Ma((ideal)data,preimage_r));
@@ -253,9 +307,13 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
   return FALSE;
 }
 
-/*2
+/*!
+!
+2
 * substitutes the parameter par (from 1..N) by image,
 * does not destroy p and  image
+
+
 */
 poly pSubstPar(poly p, int par, poly image)
 {
@@ -373,9 +431,13 @@ poly pSubstPar(poly p, int par, poly image)
   return res;
 }
 
-/*2
+/*!
+!
+2
 * substitute the n-th parameter by the poly e in id
 * does not destroy id and e
+
+
 */
 ideal  idSubstPar(ideal id, int n, poly e)
 {
@@ -390,9 +452,13 @@ ideal  idSubstPar(ideal id, int n, poly e)
   return res;
 }
 
-/*2
+/*!
+!
+2
 * substitutes the variable var (from 1..N) by image,
 * does not destroy p and  image
+
+
 */
 poly pSubstPoly(poly p, int var, poly image)
 {
@@ -406,9 +472,13 @@ poly pSubstPoly(poly p, int var, poly image)
   return p_SubstPoly(p,var,image,currRing,currRing,ndCopyMap);
 }
 
-/*2
+/*!
+!
+2
 * substitute the n-th variable by the poly e in id
 * does not destroy id and e
+
+
 */
 ideal  idSubstPoly(ideal id, int n, poly e)
 {

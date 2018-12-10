@@ -1,6 +1,10 @@
-/*
+/*!
+!
+
  * part of modgen
- */
+ 
+
+*/
 
 // #include "kernel/mod2.h"
 #include "Singular/tok.h"

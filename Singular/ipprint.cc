@@ -1,8 +1,14 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: interpreter: printing
+
+
 */
 
 #include "kernel/mod2.h"
@@ -21,11 +27,19 @@
 #include "ipprint.h"
 #include "attrib.h"
 
-/*2
+/*!
+!
+2
 * print for: int, string, poly, vector, ideal
+
+
 */
-/*2
+/*!
+!
+2
 * print for: intvec
+
+
 */
 static BOOLEAN ipPrint_INTVEC(intvec* v)
 {
@@ -34,8 +48,12 @@ static BOOLEAN ipPrint_INTVEC(intvec* v)
   return FALSE;
 }
 
-/*2
+/*!
+!
+2
 * print for: intmat
+
+
 */
 static BOOLEAN ipPrint_INTMAT(intvec* v)
 {
@@ -51,8 +69,12 @@ static BOOLEAN ipPrint_INTMAT(intvec* v)
   return FALSE;
 }
 
-/*2
+/*!
+!
+2
 * internal print for: matrix
+
+
 */
 void ipPrint_MA0(matrix m, const char *name)
 {
@@ -64,13 +86,21 @@ void ipPrint_MA0(matrix m, const char *name)
     int i,j,k;
     int vl=si_max(colmax/MATCOLS(m),8);
 
-    /* make enough space for the "largest" name*/
+    /*!
+!
+ make enough space for the "largest" name
+
+*/
     ss=(char *)omAlloc(14+strlen(name));
     sprintf(ss,"%s[%d,%d]",name,MATCOLS(m),MATROWS(m));
     vl=si_max(vl,(int)strlen(ss));
     omFree(ss);
 
-    /* convert all polys to string */
+    /*!
+!
+ convert all polys to string 
+
+*/
     i=MATCOLS(m)*MATROWS(m)-1;
     ss=pString(m->m[i]);
     if ((int)strlen(ss)>colmax) { s[i]=NULL; omFree(ss); }
@@ -84,8 +114,16 @@ void ipPrint_MA0(matrix m, const char *name)
       if ((int)strlen(ss)>colmax) s[i]=NULL;
       else                        s[i]=ss;
     }
-    /* look up the width of all columns, put it in l[col_nr] */
-    /* insert names for very long entries */
+    /*!
+!
+ look up the width of all columns, put it in l[col_nr] 
+
+*/
+    /*!
+!
+ insert names for very long entries 
+
+*/
     for(i=MATROWS(m)-1;i>=0;i--)
     {
       for(j=MATCOLS(m)-1;j>=0;j--)
@@ -106,7 +144,11 @@ void ipPrint_MA0(matrix m, const char *name)
         if (k>l[j]) l[j]=k;
       }
     }
-    /* does it fit on a line ? */
+    /*!
+!
+ does it fit on a line ? 
+
+*/
     int maxlen=0;
     for(j=MATCOLS(m)-1;j>=0;j--)
     {
@@ -114,16 +156,36 @@ void ipPrint_MA0(matrix m, const char *name)
     }
     if (maxlen>colmax)
     {
-      /* NO, it does not fit, so retry: */
-      /* look up the width of all columns, clear very long entriess */
-      /* put length in l[col_nr] */
-      /* insert names for cleared entries */
+      /*!
+!
+ NO, it does not fit, so retry: 
+
+*/
+      /*!
+!
+ look up the width of all columns, clear very long entriess 
+
+*/
+      /*!
+!
+ put length in l[col_nr] 
+
+*/
+      /*!
+!
+ insert names for cleared entries 
+
+*/
       for(j=MATCOLS(m)-1;j>=0;j--)
       {
         for(i=MATROWS(m)-1;i>=0;i--)
         {
           k=strlen(s[i*MATCOLS(m)+j]);
-          if (/*strlen(s[i*MATCOLS(m)+j])*/ k > vl)
+          if (/*!
+!
+strlen(s[i*MATCOLS(m)+j])
+
+*/ k > vl)
           {
             omFree((ADDRESS)s[i*MATCOLS(m)+j]);
             ss=(char *)omAlloc(14+strlen(name));
@@ -140,7 +202,11 @@ void ipPrint_MA0(matrix m, const char *name)
 //#ifdef TEST
 //              PrintS("pagewidth too small in print(matrix)\n");
 //#endif
-              vl=l[j]; /* make large names fit*/
+              vl=l[j]; /*!
+!
+ make large names fit
+
+*/
             }
             i=MATROWS(m);
           }
@@ -151,7 +217,11 @@ void ipPrint_MA0(matrix m, const char *name)
         }
       }
     }
-    /*output of the matrix*/
+    /*!
+!
+output of the matrix
+
+*/
     for(i=0;i<MATROWS(m);i++)
     {
       k=l[0];
@@ -170,15 +240,23 @@ void ipPrint_MA0(matrix m, const char *name)
       }
       PrintLn();
     }
-    /* clean up */
+    /*!
+!
+ clean up 
+
+*/
     omFreeSize((ADDRESS)s,MATCOLS(m)*MATROWS(m)*sizeof(char*));
     omFreeSize((ADDRESS)l,MATCOLS(m)*sizeof(int));
   }
   else Print("%d x %d zero matrix\n",MATROWS(m),MATCOLS(m));
 }
 
-/*2
+/*!
+!
+2
 * print for: matrix
+
+
 */
 static BOOLEAN ipPrint_MA(leftv u)
 {
@@ -187,8 +265,12 @@ static BOOLEAN ipPrint_MA(leftv u)
   return FALSE;
 }
 
-/*2
+/*!
+!
+2
 * print for: ring
+
+
 */
 static BOOLEAN ipPrint_RING(ring r)
 {
@@ -218,16 +300,28 @@ static BOOLEAN ipPrint_CRING(coeffs r)
   PrintS(nCoeffName(r));
   return FALSE;
 }
-/*2
+/*!
+!
+2
 * print for: vector
+
+
 */
 static BOOLEAN ipPrint_V(poly u)
 {
   polyset m=NULL;
   int l,j;
-  /*convert into an array of the components*/
+  /*!
+!
+convert into an array of the components
+
+*/
   p_Vec2Polys(u, &m, &l, currRing);
-  /*output*/
+  /*!
+!
+output
+
+*/
   PrintS("[");
   j=0;
   loop
@@ -241,7 +335,11 @@ static BOOLEAN ipPrint_V(poly u)
       break;
     }
   }
-  /* clean up */
+  /*!
+!
+ clean up 
+
+*/
   for(j=l-1;j>=0;j--) pDelete(&m[j]);
   omFreeSize((ADDRESS)m,l*sizeof(poly));
   return FALSE;
@@ -310,8 +408,12 @@ BOOLEAN jjPRINT(leftv res, leftv u)
 }
 
 
-/*2
+/*!
+!
+2
 * dbprint
+
+
 */
 BOOLEAN jjDBPRINT(leftv res, leftv u)
 {
@@ -383,12 +485,20 @@ static void ipPrintBetti(leftv u)
 }
 
 
-/*2
+/*!
+!
+2
 * print(...,"format")
+
+
 */
 BOOLEAN jjPRINT_FORMAT(leftv res, leftv u, leftv v)
 {
-/* ==================== betti ======================================== */
+/*!
+!
+ ==================== betti ======================================== 
+
+*/
   if ((u->Typ()==INTMAT_CMD)&&(strcmp((char *)v->Data(),"betti")==0))
   {
     SPrintStart();
@@ -398,7 +508,11 @@ BOOLEAN jjPRINT_FORMAT(leftv res, leftv u, leftv v)
     res->data=s;
   }
   else
-/* ======================== end betti ================================= */
+/*!
+!
+ ======================== end betti ================================= 
+
+*/
   {
     char* ns = omStrDup((char*) v->Data());
     int dim = 1;

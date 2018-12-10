@@ -45,7 +45,11 @@ lib_types type_of_LIB(const char *newlib, char *libnamebuf)
     }
     i++;
   }
-  char        buf[BYTES_TO_CHECK+1];        /* one extra for terminating '\0' */
+  char        buf[BYTES_TO_CHECK+1];        /*!
+!
+ one extra for terminating '\0' 
+
+*/
   struct stat sb;
   int nbytes = 0;
   int ret;
@@ -69,15 +73,27 @@ lib_types type_of_LIB(const char *newlib, char *libnamebuf)
   if ((nbytes = fread((char *)buf, sizeof(char), BYTES_TO_CHECK, fp)) == -1)
   {
     goto lib_type_end;
-    /*NOTREACHED*/
+    /*!
+!
+NOTREACHED
+
+*/
   }
   if (nbytes == 0)
     goto lib_type_end;
   else
   {
-    buf[nbytes++] = '\0';        /* null-terminate it */
+    buf[nbytes++] = '\0';        /*!
+!
+ null-terminate it 
+
+*/
   }
-  if( (strncmp(buf, "\177ELF", 4)==0)) /* generic ELF */
+  if( (strncmp(buf, "\177ELF", 4)==0)) /*!
+!
+ generic ELF 
+
+*/
   {
     LT = LT_ELF;
     //omFree(newlib);
@@ -85,7 +101,11 @@ lib_types type_of_LIB(const char *newlib, char *libnamebuf)
     goto lib_type_end;
   }
 
-  if( (strncmp(buf, (const char *)mach_o, 4)==0) || (strncmp(buf, (const char *)mach_O, 4)==0)) /* generic Mach-O module */
+  if( (strncmp(buf, (const char *)mach_o, 4)==0) || (strncmp(buf, (const char *)mach_O, 4)==0)) /*!
+!
+ generic Mach-O module 
+
+*/
   {
     LT = LT_MACH_O;
     //omFree(newlib);
@@ -93,7 +113,11 @@ lib_types type_of_LIB(const char *newlib, char *libnamebuf)
     goto lib_type_end;
   }
 
-  if( (strncmp(buf, (const char *)mach_o64, 4)==0) || (strncmp(buf, (const char *)mach_O64, 4)==0)) /* generic Mach-O 64-bit module */
+  if( (strncmp(buf, (const char *)mach_o64, 4)==0) || (strncmp(buf, (const char *)mach_O64, 4)==0)) /*!
+!
+ generic Mach-O 64-bit module 
+
+*/
   {
     LT = LT_MACH_O;
     //omFree(newlib);
@@ -101,7 +125,11 @@ lib_types type_of_LIB(const char *newlib, char *libnamebuf)
     goto lib_type_end;
   }
 
-  if( (strncmp(buf, (const char *)mach_FAT, 4)==0) || (strncmp(buf, (const char *)mach_fat, 4)==0)) /* generic Mach-O fat universal module */
+  if( (strncmp(buf, (const char *)mach_FAT, 4)==0) || (strncmp(buf, (const char *)mach_fat, 4)==0)) /*!
+!
+ generic Mach-O fat universal module 
+
+*/
   {
     LT = LT_MACH_O;
     //omFree(newlib);

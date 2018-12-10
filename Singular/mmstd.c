@@ -1,9 +1,15 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: standard version of C-memory management alloc func
 * i.e. (malloc/realloc/free)
+
+
 */
 
 
@@ -17,19 +23,43 @@
 #include "xalloc/omalloc.h"
 #endif
 
-/* we provide these functions, so that the settings of OM_CHECK
+/*!
+!
+ we provide these functions, so that the settings of OM_CHECK
 * and OM_TRACK are used, but only provide them if omalloc is not based
 * on them
-* already provided in libomalloc */
+* already provided in libomalloc 
+
+*/
 #if !defined(OMALLOC_USES_MALLOC) && !defined(X_OMALLOC)
 
-/* in mmstd.c, for some architectures freeSize() unconditionally uses the *system* free() */
-/* sage ticket 5344: http://trac.sagemath.org/sage_trac/ticket/5344 */
-/* solution: correctly check OMALLOC_USES_MALLOC from omalloc.h, */
-/* do not rely on the default in Singular as libsingular may be different */
+/*!
+!
+ in mmstd.c, for some architectures freeSize() unconditionally uses the *system* free() 
 
-/* define this so that all addr allocated there are marked
-* as static, i.e. not metioned by omPrintUsedAddr*/
+*/
+/*!
+!
+ sage ticket 5344: http://trac.sagemath.org/sage_trac/ticket/5344 
+
+*/
+/*!
+!
+ solution: correctly check OMALLOC_USES_MALLOC from omalloc.h, 
+
+*/
+/*!
+!
+ do not rely on the default in Singular as libsingular may be different 
+
+*/
+
+/*!
+!
+ define this so that all addr allocated there are marked
+* as static, i.e. not metioned by omPrintUsedAddr
+
+*/
 #define OM_MALLOC_MARK_AS_STATIC
 #define strdup_ strdup__
 #include "omalloc/omalloc.c" /// UGLY!!!!!!!!!!!!!!!!

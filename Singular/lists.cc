@@ -1,8 +1,14 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: handling of the list type
+
+
 */
 // to produce a non-inline version from lists.h
 #define LISTS_CC
@@ -45,8 +51,12 @@ lists lCopy(lists L)
   return N;
 }
 
-/*2
+/*!
+!
+2
 * concat 2 lists
+
+
 */
 BOOLEAN lAdd(leftv res, leftv u, leftv v)
 {
@@ -81,8 +91,12 @@ BOOLEAN lAdd(leftv res, leftv u, leftv v)
   return FALSE;
 }
 
-/*2
+/*!
+!
+2
 * insert v into list ul, destroys u
+
+
 */
 lists lInsert0(lists ul, leftv v, int pos)
 {
@@ -114,8 +128,12 @@ lists lInsert0(lists ul, leftv v, int pos)
   return l;
 }
 
-/*2
+/*!
+!
+2
 * insert v into list u, at the beginning
+
+
 */
 BOOLEAN lInsert(leftv res, leftv u, leftv v)
 {
@@ -129,8 +147,12 @@ BOOLEAN lInsert(leftv res, leftv u, leftv v)
   return FALSE;
 }
 
-/*2
+/*!
+!
+2
 * insert v into list u at pos w
+
+
 */
 BOOLEAN lInsert3(leftv res, leftv u, leftv v, leftv w)
 {
@@ -145,8 +167,12 @@ BOOLEAN lInsert3(leftv res, leftv u, leftv v, leftv w)
   return FALSE;
 }
 
-/*2
+/*!
+!
+2
 * append v to list u
+
+
 */
 BOOLEAN lAppend(leftv res, leftv u, leftv v)
 {
@@ -155,8 +181,12 @@ BOOLEAN lAppend(leftv res, leftv u, leftv v)
   return (res->data==NULL);
 }
 
-/*2
+/*!
+!
+2
 * delete v-th element from list u
+
+
 */
 BOOLEAN lDelete(leftv res, leftv u, leftv v)
 {
@@ -193,8 +223,12 @@ BOOLEAN lDelete(leftv res, leftv u, leftv v)
   return TRUE;
 }
 
-/*2
+/*!
+!
+2
 * check, if a list contains any ring dependend data
+
+
 */
 BOOLEAN lRingDependend(lists L)
 {
@@ -203,10 +237,22 @@ BOOLEAN lRingDependend(lists L)
   while (i>=0)
   {
     REGISTER int t=L->m[i].rtyp;
-    if ((BEGIN_RING<t /*L->m[i].rtyp*/)
-    && (/*L->m[i].rtyp*/ t<END_RING))
+    if ((BEGIN_RING<t /*!
+!
+L->m[i].rtyp
+
+*/)
+    && (/*!
+!
+L->m[i].rtyp
+
+*/ t<END_RING))
       return TRUE;
-    if ((/*L->m[i].rtyp*/ t==LIST_CMD)&&lRingDependend((lists)L->m[i].data))
+    if ((/*!
+!
+L->m[i].rtyp
+
+*/ t==LIST_CMD)&&lRingDependend((lists)L->m[i].data))
       return TRUE;
     i--;
   }

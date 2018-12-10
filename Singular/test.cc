@@ -238,7 +238,9 @@ int main( int, char *argv[] )
 
 
 
-/*
+/*!
+!
+
   ring R=rDefault(32003,3,n);
   // make R the default ring:
   rChangeCurrRing(R);
@@ -264,6 +266,8 @@ int main( int, char *argv[] )
 
   rDelete(R);
   rChangeCurrRing(NULL);
+
+
 
 */
 
@@ -333,8 +337,16 @@ int main( int, char *argv[] )
   // changing a ring for the interpreter
   // re-using n and R from above
   ring R = rDefault(32003, 3, n);
-  idhdl newRingHdl=enterid("R" /* ring name*/,
-                           0, /*nesting level, 0=global*/
+  idhdl newRingHdl=enterid("R" /*!
+!
+ ring name
+
+*/,
+                           0, /*!
+!
+nesting level, 0=global
+
+*/
                            RING_CMD,
                            &IDROOT,
                            FALSE);

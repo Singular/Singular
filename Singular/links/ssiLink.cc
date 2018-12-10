@@ -1,11 +1,16 @@
-/****************************************
+/*!
+***************************************
  * Computer Algebra System SINGULAR     *
  ****************************************/
-/***************************************************************
+/*!
+**************************************************************
  * File:    ssiLink.h
  *  Purpose: declaration of sl_link routines for ssi
- ***************************************************************/
-#define TRANSEXT_PRIVATES 1 /* allow access to transext internals */
+ **************************************************************
+*/
+#define TRANSEXT_PRIVATES 1 /*!
+ allow access to transext internals 
+*/
 
 #include "kernel/mod2.h"
 
@@ -43,10 +48,16 @@
 #endif
 
 #include <errno.h>
-#include <sys/types.h>          /* for portability */
-#include <ctype.h>   /*for isdigit*/
+#include <sys/types.h>          /*!
+ for portability 
+*/
+#include <ctype.h>   /*!
+for isdigit
+*/
 #include <netdb.h>
-#include <netinet/in.h> /* for htons etc.*/
+#include <netinet/in.h> /*!
+ for htons etc.
+*/
 
 #define SSI_VERSION 12
 // 5->6: changed newstruct representation
@@ -67,7 +78,9 @@ poly ssiReadPoly_R(const ssiInfo *D, const ring r);
 ideal ssiReadIdeal_R(const ssiInfo *d,const ring r);
 
 // the helper functions:
-BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
+BOOLEAN ssiSetCurrRing(const ring r) /*!
+ returned: not accepted 
+*/
 {
   //  if (currRing!=NULL)
   //  Print("need to change the ring, currRing:%s, switch to: ssiRing%d\n",IDID(currRingHdl),nr);
@@ -155,10 +168,18 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
 
 void ssiWriteRing_R(ssiInfo *d,const ring r)
 {
-  /* 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <extRing> <Q-ideal> */
-  /* ch=-1: transext, coeff ring follows */
-  /* ch=-2: algext, coeff ring and minpoly follows */
-  /* ch=-3: cf name follows */
+  /*!
+ 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <extRing> <Q-ideal> 
+*/
+  /*!
+ ch=-1: transext, coeff ring follows 
+*/
+  /*!
+ ch=-2: algext, coeff ring and minpoly follows 
+*/
+  /*!
+ ch=-3: cf name follows 
+*/
   if (r!=NULL)
   {
     if (rField_is_Q(r) || rField_is_Zp(r))
@@ -167,7 +188,9 @@ void ssiWriteRing_R(ssiInfo *d,const ring r)
       fprintf(d->f_write,"-1 %d ",r->N);
     else if (rFieldType(r)==n_algExt)
       fprintf(d->f_write,"-2 %d ",r->N);
-    else /*dummy*/
+    else /*!
+dummy
+*/
     {
       fprintf(d->f_write,"-3 %d ",r->N);
       ssiWriteString(d,nCoeffName(r->cf));
@@ -178,12 +201,16 @@ void ssiWriteRing_R(ssiInfo *d,const ring r)
     {
       fprintf(d->f_write,"%d %s ",(int)strlen(r->names[i]),r->names[i]);
     }
-    /* number of orderings:*/
+    /*!
+ number of orderings:
+*/
     i=0;
     // remember dummy ring: everything 0:
     if (r->order!=NULL) while (r->order[i]!=0) i++;
     fprintf(d->f_write,"%d ",i);
-    /* each ordering block: */
+    /*!
+ each ordering block: 
+*/
     i=0;
     if (r->order!=NULL) while(r->order[i]!=0)
     {
@@ -217,30 +244,48 @@ void ssiWriteRing_R(ssiInfo *d,const ring r)
     if ((rFieldType(r)==n_transExt)
     || (rFieldType(r)==n_algExt))
     {
-      ssiWriteRing_R(d,r->cf->extRing); /* includes alg.ext if rFieldType(r)==n_algExt */
+      ssiWriteRing_R(d,r->cf->extRing); /*!
+ includes alg.ext if rFieldType(r)==n_algExt 
+*/
     }
-    /* Q-ideal :*/
+    /*!
+ Q-ideal :
+*/
     if (r->qideal!=NULL)
     {
       ssiWriteIdeal_R(d,IDEAL_CMD,r->qideal,r);
     }
     else
     {
-      fputs("0 ",d->f_write/*ideal with 0 entries */);
+      fputs("0 ",d->f_write/*!
+ideal with 0 entries 
+*/);
     }
   }
-  else /* dummy ring r==NULL*/
+  else /*!
+ dummy ring r==NULL
+*/
   {
-    fputs("0 0 0 0 "/*,r->ch,r->N, blocks, q-ideal*/,d->f_write);
+    fputs("0 0 0 0 "/*!
+,r->ch,r->N, blocks, q-ideal
+*/,d->f_write);
   }
 }
 
 void ssiWriteRing(ssiInfo *d,const ring r)
 {
-  /* 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <extRing> <Q-ideal> */
-  /* ch=-1: transext, coeff ring follows */
-  /* ch=-2: algext, coeff ring and minpoly follows */
-  /* ch=-3: cf name follows */
+  /*!
+ 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <extRing> <Q-ideal> 
+*/
+  /*!
+ ch=-1: transext, coeff ring follows 
+*/
+  /*!
+ ch=-2: algext, coeff ring and minpoly follows 
+*/
+  /*!
+ ch=-3: cf name follows 
+*/
   if ((r==NULL)||(r->cf==NULL))
   {
     WerrorS("undefined ring");
@@ -253,11 +298,15 @@ void ssiWriteRing(ssiInfo *d,const ring r)
   }
   if (r!=NULL)
   {
-    /*d->*/r->ref++;
+    /*!
+d->
+*/r->ref++;
   }
   ssiWriteRing_R(d,r);
 }
-void ssiWritePoly_R(const ssiInfo *d, int /*typ*/, poly p, const ring r)
+void ssiWritePoly_R(const ssiInfo *d, int /*!
+typ
+*/, poly p, const ring r)
 {
   fprintf(d->f_write,"%d ",pLength(p));//number of terms
 
@@ -384,7 +433,9 @@ char *ssiReadString(const ssiInfo *d)
   int l;
   l=s_readint(d->f_read);
   buf=(char*)omAlloc0(l+1);
-  int throwaway =s_getc(d->f_read); /* skip ' '*/
+  int throwaway =s_getc(d->f_read); /*!
+ skip ' '
+*/
   throwaway=s_readbytes(buf,l,d->f_read);
   //if (throwaway!=l) printf("want %d, got %d bytes\n",l,throwaway);
   buf[l]='\0';
@@ -438,7 +489,9 @@ number ssiReadNumber(const ssiInfo *d)
 
 ring ssiReadRing(const ssiInfo *d)
 {
-/* syntax is <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <Q-ideal> */
+/*!
+ syntax is <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <Q-ideal> 
+*/
   int ch, N,i;
   char **names;
   ch=s_readint(d->f_read);
@@ -512,9 +565,13 @@ ring ssiReadRing(const ssiInfo *d)
   else
   {
     ring r=NULL;
-    if (ch>=0) /* Q, Z/p */
+    if (ch>=0) /*!
+ Q, Z/p 
+*/
       r=rDefault(ch,N,names,num_ord,ord,block0,block1,wvhdl);
-    else if (ch==-1) /* trans ext. */
+    else if (ch==-1) /*!
+ trans ext. 
+*/
     {
       TransExtInfo T;
       T.r=ssiReadRing(d);
@@ -522,10 +579,14 @@ ring ssiReadRing(const ssiInfo *d)
       cf=nInitChar(n_transExt,&T);
       r=rDefault(cf,N,names,num_ord,ord,block0,block1,wvhdl);
     }
-    else if (ch==-2) /* alg ext. */
+    else if (ch==-2) /*!
+ alg ext. 
+*/
     {
       TransExtInfo T;
-      T.r=ssiReadRing(d); /* includes qideal */
+      T.r=ssiReadRing(d); /*!
+ includes qideal 
+*/
       if (T.r==NULL) return NULL;
       cf=nInitChar(n_algExt,&T);
       r=rDefault(cf,N,names,num_ord,ord,block0,block1,wvhdl);
@@ -832,16 +893,22 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         {
           WerrorS("could not fork");
         }
-        if (pid==0) /*fork: child*/
+        if (pid==0) /*!
+fork: child
+*/
         {
-          /* block SIGINT */
+          /*!
+ block SIGINT 
+*/
           sigset_t sigint;
           sigemptyset(&sigint);
           sigaddset(&sigint, SIGINT);
           sigprocmask(SIG_BLOCK, &sigint, NULL);
 
           link_list hh=(link_list)ssiToBeClosed->next;
-          /* we know: l is the first entry in ssiToBeClosed-list */
+          /*!
+ we know: l is the first entry in ssiToBeClosed-list 
+*/
           while(hh!=NULL)
           {
             SI_LINK_SET_CLOSE_P(hh->l);
@@ -882,20 +949,28 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           {
             if (!SI_LINK_OPEN_P(l)) m2_end(0);
             if(d->f_read->is_eof) m2_end(0);
-            leftv h=ssiRead1(l); /*contains an exit.... */
+            leftv h=ssiRead1(l); /*!
+contains an exit.... 
+*/
             if (feErrors != NULL && *feErrors != '\0')
             {
               // handle errors:
-              PrintS(feErrors); /* currently quite simple */
+              PrintS(feErrors); /*!
+ currently quite simple 
+*/
               *feErrors = '\0';
             }
             ssiWrite(l,h);
             h->CleanUp();
             omFreeBin(h, sleftv_bin);
           }
-          /* never reached*/
+          /*!
+ never reached
+*/
         }
-        else if (pid>0) /*fork: parent*/
+        else if (pid>0) /*!
+fork: parent
+*/
         {
           d->pid=pid;
           si_close(pc[0]); si_close(cp[1]);
@@ -974,7 +1049,9 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       }
     }
     // =========================================================================
-    else /*l->name=NULL*/
+    else /*!
+l->name=NULL
+*/
     {
       // tcp mode
       if(strcmp(mode,"tcp")==0)
@@ -1330,7 +1407,9 @@ leftv ssiRead1(si_link l)
              if (nok) WerrorS("error in eval");
              break;
            }
-    case 12: /*DEF_CMD*/
+    case 12: /*!
+DEF_CMD
+*/
            {
              res->rtyp=0;
              res->name=(char *)ssiReadString(d);
@@ -1454,10 +1533,16 @@ BOOLEAN ssiWrite(si_link l, leftv data)
     if ((dd==NULL) && (data->name!=NULL) && (tt==0)) tt=DEF_CMD;
       // return pure undefined names as def
 
-    switch(tt /*data->Typ()*/)
+    switch(tt /*!
+data->Typ()
+*/)
     {
-          case 0: /*error*/
-          case NONE/* nothing*/:fputs("16 ",d->f_write);
+          case 0: /*!
+error
+*/
+          case NONE/*!
+ nothing
+*/:fputs("16 ",d->f_write);
                           break;
           case STRING_CMD: fputs("2 ",d->f_write);
                            ssiWriteString(d,(char *)dd);
@@ -1530,7 +1615,9 @@ BOOLEAN ssiWrite(si_link l, leftv data)
                    fputs("11 ",d->f_write);
                    ssiWriteCommand(l,(command)dd);
                    break;
-          case DEF_CMD: /* not evaluated stuff in quotes */
+          case DEF_CMD: /*!
+ not evaluated stuff in quotes 
+*/
                    fputs("12 ",d->f_write);
                    ssiWriteString(d,data->Name());
                    break;
@@ -1610,25 +1697,41 @@ const char* slStatusSsi(si_link l, const char* request)
     if (s_isready(d->f_read)) return "ready";
     loop
     {
-      /* Don't block. Return socket status immediately. */
+      /*!
+ Don't block. Return socket status immediately. 
+*/
       wt.tv_sec  = 0;
       wt.tv_usec = 0;
 
       FD_ZERO(&mask);
       FD_SET(d->fd_read, &mask);
       //Print("test fd %d\n",d->fd_read);
-    /* check with select: chars waiting: no -> not ready */
+    /*!
+ check with select: chars waiting: no -> not ready 
+*/
       switch (si_select(d->fd_read+1, &mask, NULL, NULL, &wt))
       {
-        case 0: /* not ready */ return "not ready";
-        case -1: /*error*/      return "error";
-        case 1: /*ready ? */    break;
+        case 0: /*!
+ not ready 
+*/ return "not ready";
+        case -1: /*!
+error
+*/      return "error";
+        case 1: /*!
+ready ? 
+*/    break;
       }
-    /* yes: read 1 char*/
-    /* if \n, check again with select else ungetc(c), ready*/
+    /*!
+ yes: read 1 char
+*/
+    /*!
+ if \n, check again with select else ungetc(c), ready
+*/
       int c=s_getc(d->f_read);
       //Print("try c=%d\n",c);
-      if (c== -1) return "eof"; /* eof or error */
+      if (c== -1) return "eof"; /*!
+ eof or error 
+*/
       else if (isdigit(c))
       { s_ungetc(c,d->f_read); return "ready"; }
       else if (c>' ')
@@ -1636,7 +1739,9 @@ const char* slStatusSsi(si_link l, const char* request)
         Werror("unknown char in ssiLink(%d)",c);
         return "error";
       }
-      /* else: next char */
+      /*!
+ else: next char 
+*/
     }
   }
   else if (strcmp(request, "read") == 0)
@@ -1671,9 +1776,13 @@ int slStatusSsiL(lists L, int timeout)
   fd_set  mask, fdmask;
   FD_ZERO(&fdmask);
   FD_ZERO(&mask);
-  int max_fd=0; /* 1 + max fd in fd_set */
+  int max_fd=0; /*!
+ 1 + max fd in fd_set 
+*/
 
-  /* timeout */
+  /*!
+ timeout 
+*/
   struct timeval wt;
   struct timeval *wt_ptr=&wt;
   int startingtime = getRTimer()/TIMER_RESOLUTION;  // in seconds
@@ -1687,15 +1796,21 @@ int slStatusSsiL(lists L, int timeout)
     wt.tv_usec = timeout % 1000000;
   }
 
-  /* auxiliary variables */
+  /*!
+ auxiliary variables 
+*/
   int i;
   int j;
   int k;
   int s;
   char fdmaskempty;
 
-  /* check the links and fill in fdmask */
-  /* check ssi links for ungetc_buf */
+  /*!
+ check the links and fill in fdmask 
+*/
+  /*!
+ check ssi links for ungetc_buf 
+*/
   for(i=L->nr; i>=0; i--)
   {
     if (L->m[i].Typ()!=DEF_CMD)
@@ -1734,7 +1849,9 @@ int slStatusSsiL(lists L, int timeout)
   max_fd++;
 
 do_select:
-  /* copy fdmask to mask */
+  /*!
+ copy fdmask to mask 
+*/
   FD_ZERO(&mask);
   for(k = 0; k < max_fd; k++)
   {
@@ -1744,18 +1861,26 @@ do_select:
     }
   }
 
-  /* check with select: chars waiting: no -> not ready */
+  /*!
+ check with select: chars waiting: no -> not ready 
+*/
   s = si_select(max_fd, &mask, NULL, NULL, wt_ptr);
   if (s==-1)
   {
     WerrorS("error in select call");
-    return -2; /*error*/
+    return -2; /*!
+error
+*/
   }
   if (s==0)
   {
-    return 0; /*poll: not ready */
+    return 0; /*!
+poll: not ready 
+*/
   }
-  else /* s>0, at least one ready  (the number of fd which are ready is s)*/
+  else /*!
+ s>0, at least one ready  (the number of fd which are ready is s)
+*/
   {
     j=0;
     while (j<=max_fd) { if (FD_ISSET(j,&mask)) break; j++; }
@@ -1780,12 +1905,20 @@ do_select:
     // only ssi links:
     loop
     {
-      /* yes: read 1 char*/
-      /* if \n, check again with select else ungetc(c), ready*/
-      /* setting: d: current ssiInfo, j current fd, i current entry in L*/
+      /*!
+ yes: read 1 char
+*/
+      /*!
+ if \n, check again with select else ungetc(c), ready
+*/
+      /*!
+ setting: d: current ssiInfo, j current fd, i current entry in L
+*/
       int c=s_getc(d->f_read);
       //Print("try c=%d\n",c);
-      if (c== -1) /* eof */
+      if (c== -1) /*!
+ eof 
+*/
       {
         FD_CLR(j,&fdmask);
         fdmaskempty = 1;
@@ -1818,14 +1951,18 @@ do_select:
         Werror("unknown char in ssiLink(%d)",c);
         return -2;
       }
-      /* else: next char */
+      /*!
+ else: next char 
+*/
       goto do_select;
     }
   }
 }
 
 int ssiBatch(const char *host, const char * port)
-/* return 0 on success, >0 else*/
+/*!
+ return 0 on success, >0 else
+*/
 {
   si_link l=(si_link) omAlloc0Bin(sip_link_bin);
   char *buf=(char*)omAlloc(256);
@@ -1840,18 +1977,24 @@ int ssiBatch(const char *host, const char * port)
 
   loop
   {
-    leftv h=ssiRead1(l); /*contains an exit.... */
+    leftv h=ssiRead1(l); /*!
+contains an exit.... 
+*/
     if (feErrors != NULL && *feErrors != '\0')
     {
       // handle errors:
-      PrintS(feErrors); /* currently quite simple */
+      PrintS(feErrors); /*!
+ currently quite simple 
+*/
       *feErrors = '\0';
     }
     ssiWrite(l,h);
     h->CleanUp();
     omFreeBin(h, sleftv_bin);
   }
-  /* never reached*/
+  /*!
+ never reached
+*/
   exit(0);
 }
 
@@ -1952,8 +2095,11 @@ si_link ssiCommandLink()
   }
   return l;
 }
-/*---------------------------------------------------------------------*/
-/**
+/*!
+---------------------------------------------------------------------
+*/
+/*!
+*
  * @brief additional default signal handler
 
   // some newer Linux version cannot have SIG_IGN for SIGCHLD,
@@ -1965,7 +2111,9 @@ si_link ssiCommandLink()
 
  @param[in] sig
 **/
-/*---------------------------------------------------------------------*/
+/*!
+---------------------------------------------------------------------
+*/
 void sig_chld_hdl(int)
 {
   pid_t kidpid;
@@ -1976,12 +2124,18 @@ void sig_chld_hdl(int)
     kidpid = si_waitpid(-1, &status, WNOHANG);
     if (kidpid==-1)
     {
-      /* continue on interruption (EINTR): */
+      /*!
+ continue on interruption (EINTR): 
+*/
       if (errno == EINTR) continue;
-      /* break on anything else (EINVAL or ECHILD according to manpage): */
+      /*!
+ break on anything else (EINVAL or ECHILD according to manpage): 
+*/
       break;
     }
-    else if (kidpid==0) break; /* no more children to process, so break */
+    else if (kidpid==0) break; /*!
+ no more children to process, so break 
+*/
 
     //printf("Child %ld terminated\n", kidpid);
     link_list hh=ssiToBeClosed;
@@ -2130,11 +2284,15 @@ BOOLEAN ssiGetDump(si_link l)
   {
     if (!SI_LINK_OPEN_P(l)) break;
     if (s_iseof(d->f_read)) break;
-    leftv h=ssiRead1(l); /*contains an exit.... */
+    leftv h=ssiRead1(l); /*!
+contains an exit.... 
+*/
     if (feErrors != NULL && *feErrors != '\0')
     {
       // handle errors:
-      PrintS(feErrors); /* currently quite simple */
+      PrintS(feErrors); /*!
+ currently quite simple 
+*/
       return TRUE;
       *feErrors = '\0';
     }

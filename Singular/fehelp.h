@@ -2,11 +2,15 @@
 #define FEHELP_H
 
 
-/*****************************************************************
+/*!
+!
+****************************************************************
  *
  * help system (fehelp.cc)
  *
- *****************************************************************/
+ ****************************************************************
+
+*/
 // if str != NULL display help for str
 // display general help, otherwise
 void feHelp(char* str = NULL);
@@ -21,4 +25,8 @@ const char* feHelpBrowser(char* browser = NULL, int warn = -1);
 
 void feStringAppendBrowsers(int warn = -1);
 
-#endif /*  FEHELP_H */
+#endif /*!
+!
+  FEHELP_H 
+
+*/

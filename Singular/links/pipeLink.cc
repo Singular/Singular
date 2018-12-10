@@ -1,10 +1,13 @@
-/****************************************
+/*!
+***************************************
  * Computer Algebra System SINGULAR     *
  ****************************************/
-/***************************************************************
+/*!
+**************************************************************
  * File:    pipeLink.h
  *  Purpose: declaration of sl_link routines for pipe
- ***************************************************************/
+ **************************************************************
+*/
 
 #include "kernel/mod2.h"
 
@@ -18,19 +21,27 @@
 #include "pipeLink.h"
 
 #include <errno.h>
-#include <sys/types.h>          /* for portability */
+#include <sys/types.h>          /*!
+ for portability 
+*/
 
 typedef struct
 {
   FILE *f_read;
   FILE *f_write;
-  pid_t pid; /* only valid for fork/tcp mode*/
-  int fd_read,fd_write; /* only valid for fork/tcp mode*/
+  pid_t pid; /*!
+ only valid for fork/tcp mode
+*/
+  int fd_read,fd_write; /*!
+ only valid for fork/tcp mode
+*/
   char level;
 } pipeInfo;
 
 //**************************************************************************/
-BOOLEAN pipeOpen(si_link l, short flag, leftv /*u*/)
+BOOLEAN pipeOpen(si_link l, short flag, leftv /*!
+u
+*/)
 {
   pipeInfo *d=(pipeInfo*)omAlloc0(sizeof(pipeInfo));
   if (flag & SI_LINK_OPEN)
@@ -42,18 +53,26 @@ BOOLEAN pipeOpen(si_link l, short flag, leftv /*u*/)
   pipe(pc);
   pipe(cp);
   pid_t pid=fork();
-  if (pid==0) /*child*/
+  if (pid==0) /*!
+child
+*/
   {
-    /* close unnecessary pipe descriptors for a clean environment */
+    /*!
+ close unnecessary pipe descriptors for a clean environment 
+*/
     si_close(pc[1]); si_close(cp[0]);
-    /* dup pipe read/write to stdin/stdout */
+    /*!
+ dup pipe read/write to stdin/stdout 
+*/
     si_dup2( pc[0], STDIN_FILENO );
     si_dup2( cp[1], STDOUT_FILENO  );
     int r=system(l->name);
     si_close(pc[0]);
     si_close(cp[1]);
     exit(r);
-        /* never reached*/
+        /*!
+ never reached
+*/
   }
   else if (pid>0)
   {
@@ -174,23 +193,35 @@ const char* slStatusPipe(si_link l, const char* request)
     if ((!SI_LINK_R_OPEN_P(l)) || (feof(d->f_read))) s=0;
     else
     {
-      fd_set  mask/*, fdmask*/;
+      fd_set  mask/*!
+, fdmask
+*/;
       struct timeval wt;
-      /* Don't block. Return socket status immediately. */
+      /*!
+ Don't block. Return socket status immediately. 
+*/
       wt.tv_sec  = 0;
       wt.tv_usec = 0;
 
       FD_ZERO(&mask);
       FD_SET(d->fd_read, &mask);
       //Print("test fd %d\n",d->fd_read);
-      /* check with select: chars waiting: no -> not ready */
+      /*!
+ check with select: chars waiting: no -> not ready 
+*/
       s=si_select(d->fd_read+1, &mask, NULL, NULL, &wt);
     }
     switch (s)
     {
-      case 0: /* not ready */ return "not ready";
-      case -1: /*error*/      return "error";
-      default: /*1: ready ? */return "ready";
+      case 0: /*!
+ not ready 
+*/ return "not ready";
+      case -1: /*!
+error
+*/      return "error";
+      default: /*!
+1: ready ? 
+*/return "ready";
     }
   }
   else if (strcmp(request, "write") == 0)

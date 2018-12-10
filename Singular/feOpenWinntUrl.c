@@ -1,13 +1,23 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: encapsulation of call to Win32 ShellExecute call for opening
             a URL
+
+
 */
 
-/* you can try this out by compiling with -DTEST and runing:
-   a.exe file|url [not-local]*/
+/*!
+!
+ you can try this out by compiling with -DTEST and runing:
+   a.exe file|url [not-local]
+
+*/
 #ifdef WINNT
 #include <windows.h>
 
@@ -25,7 +35,11 @@ void heOpenWinntUrl(const char* url, int local)
     char path[MAXPATHLEN];
     char *p;
     cygwin_conv_to_full_win32_path(url, path);
-    /* seems like I can not open url's wit # at the end */
+    /*!
+!
+ seems like I can not open url's wit # at the end 
+
+*/
     if ((p=strchr(path, '#')) != NULL) *p = '\0';
 #ifdef TEST
     printf("path:%s:local:%d\n", path, local);

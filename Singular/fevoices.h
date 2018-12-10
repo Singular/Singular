@@ -1,11 +1,17 @@
 #ifndef FEVOICES_H
 #define FEVOICES_H
-/****************************************
+/*!
+!
+***************************************
  * *  Computer Algebra System SINGULAR     *
  * ****************************************/
-/*
+/*!
+!
+
  * * ABSTRACT: class Voice
- * */
+ * 
+
+*/
 
 #include "reporter/reporter.h"
 
@@ -40,7 +46,11 @@ enum noeof_t
   noeof_comment,
   noeof_procname,
   noeof_string
-};  /* for scanner.l */
+};  /*!
+!
+ for scanner.l 
+
+*/
 
 extern int yylineno;
 extern char my_yylinebuf[80];
@@ -48,7 +58,11 @@ extern const char sNoName_fe[];
 
 #ifdef __cplusplus
 
-/* the C++-part: */
+/*!
+!
+ the C++-part: 
+
+*/
 
 // LANG_TOP     : Toplevel package only
 // LANG_SINGULAR:
@@ -77,10 +91,14 @@ class Voice
                           // BI_buffer: buffer
                           // BI_file: files
     char   ifsw;          // if-switch:
-            /*1 ifsw==0: no if statement, else is invalid
+            /*!
+!
+1 ifsw==0: no if statement, else is invalid
             *       ==1: if (0) processed, execute else
             *       ==2: if (1) processed, else allowed but not executed
-            */
+            
+
+*/
     feBufferTypes   typ;  // buffer type: see BT_..
 
   Voice() { memset(this,0,sizeof(*this));}
@@ -97,7 +115,11 @@ void    VoiceBackTrack();
 BOOLEAN contBuffer(feBufferTypes typ);
 BOOLEAN exitBuffer(feBufferTypes typ);
 BOOLEAN exitVoice();
-void    monitor(void *F, int mode); /* FILE*, int */
+void    monitor(void *F, int mode); /*!
+!
+ FILE*, int 
+
+*/
 BOOLEAN newFile(char* fname);
 void    newBuffer(char* s, feBufferTypes t, procinfo *pname = NULL, int start_lineno = 0);
 void *  myynewbuffer();

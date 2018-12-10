@@ -1,12 +1,22 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: i/o system
+
+
 */
 #include "kernel/mod2.h"
 
-/* I need myfread in standalone_parser */
+/*!
+!
+ I need myfread in standalone_parser 
+
+*/
 #ifndef STANDALONE_PARSER
 
 #ifdef HAVE_OMALLOC
@@ -31,7 +41,11 @@
 #endif
 
 #define fePutChar(c) fputc((unsigned char)(c),stdout)
-/*0 implementation */
+/*!
+!
+0 implementation 
+
+*/
 
 
 char fe_promptstr[] ="  ";
@@ -42,21 +56,35 @@ FILE *File_Profiling=NULL;
 // this is an upper limit for the size of monomials/numbers read via the interpreter
 #define MAX_FILE_BUFFER 4*4096
 
-/**************************************************************************
+/*!
+!
+*************************************************************************
 * handling of 'voices'
 **************************************************************************/
 
-extern int blocknest; /* scaner.l internal */
+extern int blocknest; /*!
+!
+ scaner.l internal 
+
+*/
 
 int    yy_noeof=0;     // the scanner "state"
 int    yy_blocklineno; // to get the lineno of the block start from scanner
 Voice  *currentVoice = NULL;
-// FILE   *feFilePending; /*temp. storage for grammar.y */
+// FILE   *feFilePending; /*!
+!
+temp. storage for grammar.y 
+
+*/
 
 //static const char * BT_name[]={"BT_none","BT_break","BT_proc","BT_example",
 //                               "BT_file","BT_execute","BT_if","BT_else"};
-/*2
+/*!
+!
+2
 * the name of the current 'Voice': the procname (or filename)
+
+
 */
 const char sNoName_fe[]="_";
 const char * VoiceName()
@@ -67,8 +95,12 @@ const char * VoiceName()
   return sNoName_fe;
 }
 
-/*2
+/*!
+!
+2
 * the calling chain of Voices
+
+
 */
 void VoiceBackTrack()
 {
@@ -84,8 +116,12 @@ void VoiceBackTrack()
   }
 }
 
-/*2
+/*!
+!
+2
 * init a new voice similar to the current
+
+
 */
 void Voice::Next()
 {
@@ -118,9 +154,13 @@ feBufferTypes Voice::Typ()
   }
 }
 
-/*2
+/*!
+!
+2
 * start the file 'fname' (STDIN is stdin) as a new voice (cf.VFile)
 * return FALSE on success, TRUE if an error occurs (file cannot be opened)
+
+
 */
 BOOLEAN newFile(char *fname)
 {
@@ -137,7 +177,11 @@ BOOLEAN newFile(char *fname)
   }
   else
   {
-    currentVoice->sw = BI_file; /* needed by exitVoice below */
+    currentVoice->sw = BI_file; /*!
+!
+ needed by exitVoice below 
+
+*/
     currentVoice->files = feFopen(fname,"r",NULL,TRUE);
     if (currentVoice->files==NULL)
     {
@@ -225,9 +269,13 @@ void newBuffer(char* s, feBufferTypes t, procinfo* pi, int lineno)
   //PrintS("----------------\n");
 }
 
-/*2
+/*!
+!
+2
 * exit Buffer of type 'typ':
 * returns 1 if buffer type could not be found
+
+
 */
 BOOLEAN exitBuffer(feBufferTypes typ)
 {
@@ -244,14 +292,22 @@ BOOLEAN exitBuffer(feBufferTypes typ)
   //PrintS("----------------\n");
   if (typ == BT_break)  // valid inside for, while. may skip if, else
   {
-    /*4 first check for valid buffer type, skip if/else*/
+    /*!
+!
+4 first check for valid buffer type, skip if/else
+
+*/
     Voice *p=currentVoice;
     loop
     {
       if ((p->typ != BT_if)
       &&(p->typ != BT_else))
       {
-        if (p->typ == BT_break /*typ*/)
+        if (p->typ == BT_break /*!
+!
+typ
+
+*/)
         {
           while (p != currentVoice)
           {
@@ -265,8 +321,16 @@ BOOLEAN exitBuffer(feBufferTypes typ)
       if (p->prev==NULL) break;
       p=p->prev;
     }
-    /*4 break not inside a for/while: return an error*/
-    if (/*typ*/ BT_break != currentVoice->typ) return 1;
+    /*!
+!
+4 break not inside a for/while: return an error
+
+*/
+    if (/*!
+!
+typ
+
+*/ BT_break != currentVoice->typ) return 1;
     return exitVoice();
   }
 
@@ -290,12 +354,20 @@ BOOLEAN exitBuffer(feBufferTypes typ)
       p=p->prev;
     }
   }
-  /*4 return not inside a proc: return an error*/
+  /*!
+!
+4 return not inside a proc: return an error
+
+*/
   return TRUE;
 }
 
-/*2
+/*!
+!
+2
 * jump to the beginning of a buffer
+
+
 */
 BOOLEAN contBuffer(feBufferTypes typ)
 {
@@ -310,7 +382,11 @@ BOOLEAN contBuffer(feBufferTypes typ)
       if ((p->typ != BT_if)
         &&(p->typ != BT_else))
       {
-        if (p->typ == BT_break /*typ*/)
+        if (p->typ == BT_break /*!
+!
+typ
+
+*/)
         {
           while (p != currentVoice)
           {
@@ -329,10 +405,14 @@ BOOLEAN contBuffer(feBufferTypes typ)
   return TRUE;
 }
 
-/*2
+/*!
+!
+2
 * leave a voice: kill local variables
 * setup everything from the previous level
 * return 1 if leaving the top level, 0 otherwise
+
+
 */
 BOOLEAN exitVoice()
 {
@@ -399,19 +479,31 @@ BOOLEAN exitVoice()
   return currentVoice==NULL;
 }
 
-/*2
+/*!
+!
+2
 * set prompt_char
 * only called with currentVoice->sw == BI_stdin
+
+
 */
 static void feShowPrompt(void)
 {
   fe_promptstr[0]=prompt_char;
 }
 
-/*2
+/*!
+!
+2
 * print echo (si_echo or TRACE), set my_yylinebuf
+
+
 */
-static int fePrintEcho(char *anf, char */*b*/)
+static int fePrintEcho(char *anf, char 
+
+*/*b
+
+*/)
 {
   char *ss=strrchr(anf,'\n');
   int len_s;
@@ -490,7 +582,11 @@ static int fePrintEcho(char *anf, char */*b*/)
 int feReadLine(char* b, int l)
 {
   char *s=NULL;
-  int offset = 0; /* will not be used if s==NULL*/
+  int offset = 0; /*!
+!
+ will not be used if s==NULL
+
+*/
   // try to read from the buffer into b, max l chars
   if (currentVoice!=NULL)
   {
@@ -505,7 +601,11 @@ int feReadLine(char* b, int l)
       loop
       {
         REGISTER char c=
-        b[i]=currentVoice->buffer[tmp_ptr/*currentVoice->fptr*/];
+        b[i]=currentVoice->buffer[tmp_ptr/*!
+!
+currentVoice->fptr
+
+*/];
         i++;
         if (yy_noeof==noeof_block)
         {
@@ -521,8 +621,16 @@ int feReadLine(char* b, int l)
             break;
         }
         if (i>=l) break;
-        tmp_ptr++;/*currentVoice->fptr++;*/
-        if(currentVoice->buffer[tmp_ptr/*currentVoice->fptr*/]=='\0') break;
+        tmp_ptr++;/*!
+!
+currentVoice->fptr++;
+
+*/
+        if(currentVoice->buffer[tmp_ptr/*!
+!
+currentVoice->fptr
+
+*/]=='\0') break;
       }
       currentVoice->fptr=tmp_ptr;
       b[i]='\0';
@@ -539,7 +647,11 @@ int feReadLine(char* b, int l)
           else          len=ss-anf;
           show_echo=TRUE;
         }
-        else if (/*(startfptr>0) &&*/
+        else if (/*!
+!
+(startfptr>0) &&
+
+*/
         (currentVoice->buffer[startfptr-1]=='\n'))
         {
           anf=currentVoice->buffer+startfptr;
@@ -582,7 +694,11 @@ int feReadLine(char* b, int l)
                        omSizeOfAddr(currentVoice->buffer)-1-offset);
       //int i=0;
       //if (s!=NULL)
-      //  while((s[i]!='\0') /*&& (i<MAX_FILE_BUFFER)*/) {s[i] &= (char)127;i++;}
+      //  while((s[i]!='\0') /*!
+!
+&& (i<MAX_FILE_BUFFER)
+
+*/) {s[i] &= (char)127;i++;}
     }
     else if (currentVoice->sw==BI_file)
     {
@@ -597,7 +713,11 @@ int feReadLine(char* b, int l)
           currentVoice->ftellptr=0;
       }
     }
-    //else /* BI_buffer */ s==NULL  => return 0
+    //else /*!
+!
+ BI_buffer 
+
+*/ s==NULL  => return 0
     // done by the default return
   }
   if (s!=NULL)
@@ -620,7 +740,11 @@ int feReadLine(char* b, int l)
     }
     goto NewBuff;
   }
-  /* else if (s==NULL) */
+  /*!
+!
+ else if (s==NULL) 
+
+*/
   {
     const char *err;
     switch(yy_noeof)
@@ -642,7 +766,11 @@ int feReadLine(char* b, int l)
         err="proc";
         break;
       case noeof_comment:
-        err="/*...*/";
+        err="/*!
+!
+...
+
+*/";
         break;
       default:
         return 0;
@@ -652,8 +780,12 @@ int feReadLine(char* b, int l)
   }
 }
 
-/*2
+/*!
+!
+2
 * init all data structures
+
+
 */
 #ifndef STDIN_FILENO
 #define STDIN_FILENO 0

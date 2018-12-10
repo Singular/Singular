@@ -1,9 +1,15 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/*
+/*!
+!
+
 * ABSTRACT: identfier handling
+
+
 */
 
 
@@ -40,7 +46,11 @@
 #endif
 #ifdef HAVE_DYNAMIC_LOADING
 #include "polys/mod_raw.h"
-#endif /* HAVE_DYNAMIC_LOADING */
+#endif /*!
+!
+ HAVE_DYNAMIC_LOADING 
+
+*/
 
 omBin sip_command_bin = omGetSpecBin(sizeof(sip_command));
 omBin sip_package_bin = omGetSpecBin(sizeof(sip_package));
@@ -60,7 +70,11 @@ idhdl currRingHdl = NULL;
 
 void paCleanUp(package pack);
 
-/*0 implementation*/
+/*!
+!
+0 implementation
+
+*/
 
 int iiS2I(const char *s)
 {
@@ -119,7 +133,11 @@ idhdl idrec::get(const char * s, int level)
 //    omFree((ADDRESS)id);
 //    id=NULL;
 //  }
-//  /* much more !! */
+//  /*!
+!
+ much more !! 
+
+*/
 //}
 
 void *idrecDataInit(int t)
@@ -242,7 +260,11 @@ idhdl idrec::set(const char * s, int level, int t, BOOLEAN init)
     if (t == QRING_CMD)
     {
       // IDRING(h)=rCopy(currRing);
-      /* QRING_CMD is ring dep => currRing !=NULL */
+      /*!
+!
+ QRING_CMD is ring dep => currRing !=NULL 
+
+*/
     }
 #endif
   }
@@ -478,7 +500,11 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   if (h == (*ih))
   {
     // h is at the beginning of the list
-    *ih = IDNEXT(h) /* ==*ih */;
+    *ih = IDNEXT(h) /*!
+!
+ ==*ih 
+
+*/;
   }
   else if (ih!=NULL)
   {
@@ -504,7 +530,11 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
 }
 
 #if 0
-idhdl ggetid(const char *n, BOOLEAN /*local*/, idhdl *packhdl)
+idhdl ggetid(const char *n, BOOLEAN /*!
+!
+local
+
+*/, idhdl *packhdl)
 {
   idhdl h = IDROOT->get(n,myynest);
   idhdl h2=NULL;
@@ -544,18 +574,34 @@ void ipListFlag(idhdl h)
 lists ipNameList(idhdl root)
 {
   idhdl h=root;
-  /* compute the length */
+  /*!
+!
+ compute the length 
+
+*/
   int l=0;
   while (h!=NULL) { l++; h=IDNEXT(h); }
-  /* allocate list */
+  /*!
+!
+ allocate list 
+
+*/
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(l);
-  /* copy names */
+  /*!
+!
+ copy names 
+
+*/
   h=root;
   l=0;
   while (h!=NULL)
   {
-    /* list is initialized with 0 => no need to clear anything */
+    /*!
+!
+ list is initialized with 0 => no need to clear anything 
+
+*/
     L->m[l].rtyp=STRING_CMD;
     L->m[l].data=omStrDup(IDID(h));
     l++;
@@ -567,20 +613,36 @@ lists ipNameList(idhdl root)
 lists ipNameListLev(idhdl root, int lev)
 {
   idhdl h=root;
-  /* compute the length */
+  /*!
+!
+ compute the length 
+
+*/
   int l=0;
   while (h!=NULL) { if (IDLEV(h)==lev) l++; h=IDNEXT(h); }
-  /* allocate list */
+  /*!
+!
+ allocate list 
+
+*/
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(l);
-  /* copy names */
+  /*!
+!
+ copy names 
+
+*/
   h=root;
   l=0;
   while (h!=NULL)
   {
     if (IDLEV(h)==lev)
     {
-      /* list is initialized with 0 => no need to clear anything */
+      /*!
+!
+ list is initialized with 0 => no need to clear anything 
+
+*/
       L->m[l].rtyp=STRING_CMD;
       L->m[l].data=omStrDup(IDID(h));
       l++;
@@ -590,17 +652,33 @@ lists ipNameListLev(idhdl root, int lev)
   return L;
 }
 
-/*
+/*!
+!
+
 * move 'tomove' from root1 list to root2 list
+
+
 */
 static int ipSwapId(idhdl tomove, idhdl &root1, idhdl &root2)
 {
   idhdl h;
-  /* search 'tomove' in root2 : if found -> do nothing */
+  /*!
+!
+ search 'tomove' in root2 : if found -> do nothing 
+
+*/
   h=root2;
   while ((h!=NULL) && (h!=tomove)) h=IDNEXT(h);
-  if (h!=NULL) return FALSE; /*okay */
-  /* search predecessor of h in root1, remove 'tomove' */
+  if (h!=NULL) return FALSE; /*!
+!
+okay 
+
+*/
+  /*!
+!
+ search predecessor of h in root1, remove 'tomove' 
+
+*/
   h=root1;
   if (tomove==h)
   {
@@ -609,10 +687,18 @@ static int ipSwapId(idhdl tomove, idhdl &root1, idhdl &root2)
   else
   {
     while ((h!=NULL) && (IDNEXT(h)!=tomove)) h=IDNEXT(h);
-    if (h==NULL) return TRUE; /* not in the list root1 -> do nothing */
+    if (h==NULL) return TRUE; /*!
+!
+ not in the list root1 -> do nothing 
+
+*/
     IDNEXT(h)=IDNEXT(tomove);
   }
-  /* add to root2 list */
+  /*!
+!
+ add to root2 list 
+
+*/
   IDNEXT(tomove)=root2;
   root2=tomove;
   return FALSE;
@@ -625,13 +711,21 @@ void  ipMoveId(idhdl tomove)
     if (RingDependend(IDTYP(tomove))
     || ((IDTYP(tomove)==LIST_CMD) && (lRingDependend(IDLIST(tomove)))))
     {
-      /*move 'tomove' to ring id's*/
+      /*!
+!
+move 'tomove' to ring id's
+
+*/
       if (ipSwapId(tomove,IDROOT,currRing->idroot))
       ipSwapId(tomove,basePack->idroot,currRing->idroot);
     }
     else
     {
-      /*move 'tomove' to global id's*/
+      /*!
+!
+move 'tomove' to global id's
+
+*/
       ipSwapId(tomove,currRing->idroot,IDROOT);
     }
   }
@@ -710,9 +804,17 @@ void paCleanUp(package pack)
       Print("//dlclose(%s)\n",pack->libname);
 #ifdef HAVE_DYNAMIC_LOADING
       dynl_close (pack->handle);
-#endif /* HAVE_DYNAMIC_LOADING */
+#endif /*!
+!
+ HAVE_DYNAMIC_LOADING 
+
+*/
     }
-#endif /* HAVE_STATIC */
+#endif /*!
+!
+ HAVE_STATIC 
+
+*/
     omFree((ADDRESS)pack->libname);
     memset((void *) pack, 0, sizeof(sip_package));
     pack->language=LANG_NONE;

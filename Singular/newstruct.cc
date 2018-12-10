@@ -25,8 +25,16 @@ typedef struct newstruct_proc_a *newstruct_proc;
 struct  newstruct_proc_a
 {
   newstruct_proc next;
-  int            t; /*tok id */
-  int            args; /* number of args */
+  int            t; /*!
+!
+tok id 
+
+*/
+  int            args; /*!
+!
+ number of args 
+
+*/
   procinfov      p;
 };
 
@@ -529,7 +537,11 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
   return blackboxDefaultOpM(op,res,args);
 }
 
-void newstruct_destroy(blackbox */*b*/, void *d)
+void newstruct_destroy(blackbox 
+
+*/*b
+
+*/, void *d)
 {
   if (d!=NULL)
   {
@@ -559,7 +571,11 @@ void *newstruct_Init(blackbox *b)
   return l;
 }
 
-BOOLEAN newstruct_CheckAssign(blackbox */*b*/, leftv L, leftv R)
+BOOLEAN newstruct_CheckAssign(blackbox 
+
+*/*b
+
+*/, leftv L, leftv R)
 {
   int lt=L->Typ();
   int rt=R->Typ();
@@ -582,7 +598,9 @@ BOOLEAN newstruct_CheckAssign(blackbox */*b*/, leftv L, leftv R)
   return FALSE;
 }
 
-/* check internal structure:
+/*!
+!
+ check internal structure:
 * BOOLEAN newstruct_Check(blackbox *b, void *d)
 {
   newstruct_desc n=(newstruct_desc)b->data;
@@ -602,6 +620,8 @@ BOOLEAN newstruct_CheckAssign(blackbox */*b*/, leftv L, leftv R)
   }
   return FALSE;
 }
+
+
 */
 
 BOOLEAN newstruct_serialize(blackbox *b, void *d, si_link f)
@@ -765,7 +785,11 @@ static newstruct_desc scanNewstructFromString(const char *s, newstruct_desc res)
     *p='\0';
     elem->typ=t;
     elem->pos=res->size;
-    if ((*start=='\0') /*empty name*/||(isdigit(*start)))
+    if ((*start=='\0') /*!
+!
+empty name
+
+*/||(isdigit(*start)))
     {
       WerrorS("illegal/empty name for element");
       goto error_in_newstruct_def;
@@ -880,14 +904,30 @@ BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinf
     if((t=iiOpsTwoChar(func))!=0)
     {
       p->t=t;
-      tt=CMD_2; /* ..,::, ==, <=, <>, >= !=i and +,-,*,/,%,.... */
+      tt=CMD_2; /*!
+!
+ ..,::, ==, <=, <>, >= !=i and +,-,*,/,%,.... 
+
+*/
       if ((t==PLUSPLUS)
       ||(t==MINUSMINUS)
       ||(t=='='))
-        tt=CMD_1; /* ++,--,= */
-      else if (t=='(') /* proc call */
+        tt=CMD_1; /*!
+!
+ ++,--,= 
+
+*/
+      else if (t=='(') /*!
+!
+ proc call 
+
+*/
         tt=CMD_M;
-      else if (t=='-') /* unary and binary - */
+      else if (t=='-') /*!
+!
+ unary and binary - 
+
+*/
         tt=CMD_12;
     }
     else

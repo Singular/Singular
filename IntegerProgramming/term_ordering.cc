@@ -1,13 +1,13 @@
-// term_ordering.cc
+/// term_ordering.cc
 
-// implementation of class term ordering
+/// implementation of class term ordering
 
 #ifndef TERM_ORDERING_CC
 #define TERM_ORDERING_CC
 
 #include "binomial__term_ordering.h"
 
-/////////////// constructors and destructor ///////////////////////////////////
+////////////////////// constructors and destructor ////////////////////////////////////////////////////
 
 term_ordering::term_ordering(const BOOLEAN& _homogeneous)
     :homogeneous(_homogeneous)
@@ -28,13 +28,13 @@ term_ordering::term_ordering(const short& number_of_weighted_variables,
      homogeneous(_homogeneous)
 {
   if((_weighted_ordering<4) || (_weighted_ordering>7))
-    // unknown ordering refining the weight, set "error flag"
+    /// unknown ordering refining the weight, set "error flag"
     weighted_block_size=-1;
   else
     weighted_ordering=_weighted_ordering;
 
   if(weighted_block_size<0)
-    // argument out of range, set "error flag"
+    /// argument out of range, set "error flag"
     weighted_block_size=-1;
 
   if(weighted_block_size>0)
@@ -43,12 +43,12 @@ term_ordering::term_ordering(const short& number_of_weighted_variables,
 
     BOOLEAN negative_weight=FALSE;
     BOOLEAN zero_weight=FALSE;
-    // for checking the input
+    /// for checking the input
 
     for(short i=0;i<weighted_block_size;i++)
     {
       weight_vector[i]=weights[i];
-      // initialize weight vector with weights
+      /// initialize weight vector with weights
 
       if(weight_vector[i]<0)
         negative_weight=TRUE;
@@ -91,19 +91,19 @@ term_ordering::term_ordering(const short& number_of_weighted_variables,
      homogeneous(_homogeneous)
 {
   if((_weighted_ordering<4) || (_weighted_ordering>7))
-    // unknown ordering refining the weight, set "error flag"
+    /// unknown ordering refining the weight, set "error flag"
     weighted_block_size=-1;
   else
     weighted_ordering=_weighted_ordering;
 
   if((_elimination_ordering<1) || (_elimination_ordering>3))
-    // unknown ordering on the elimination variables, set "error flag"
+    /// unknown ordering on the elimination variables, set "error flag"
     weighted_block_size=-1;
   else
     elimination_ordering=_elimination_ordering;
 
   if((weighted_block_size<0)||(elimination_block_size<0))
-    // argument out of range, set "error flag"
+    /// argument out of range, set "error flag"
     weighted_block_size=-1;
 
   if(weighted_block_size>0)
@@ -112,12 +112,12 @@ term_ordering::term_ordering(const short& number_of_weighted_variables,
 
     BOOLEAN negative_weight=FALSE;
     BOOLEAN zero_weight=FALSE;
-    // for checking the input
+    /// for checking the input
 
     for(short i=0;i<weighted_block_size;i++)
     {
       weight_vector[i]=weights[i];
-      // initialize weight vector with weights
+      /// initialize weight vector with weights
 
       if(weight_vector[i]<0)
         negative_weight=TRUE;
@@ -154,7 +154,7 @@ term_ordering::term_ordering(ifstream& input, const short& _weighted_ordering,
 {
 
   if((_weighted_ordering<4) || (_weighted_ordering>7))
-    // unknown ordering refining the weight, set "error flag"
+    /// unknown ordering refining the weight, set "error flag"
     weighted_block_size=-1;
   else
     weighted_ordering=_weighted_ordering;
@@ -162,10 +162,10 @@ term_ordering::term_ordering(ifstream& input, const short& _weighted_ordering,
 
   input>>weighted_block_size;
   if(!input)
-    // input failure, set "error flag"
+    /// input failure, set "error flag"
     weighted_block_size=-2;
   if(weighted_block_size<0)
-    // input out of range, set error flag
+    /// input out of range, set error flag
     weighted_block_size=-1;
 
   if(weighted_block_size>0)
@@ -174,14 +174,14 @@ term_ordering::term_ordering(ifstream& input, const short& _weighted_ordering,
 
     BOOLEAN negative_weight=FALSE;
     BOOLEAN zero_weight=FALSE;
-    // for checking the input
+    /// for checking the input
 
     for(short i=0;i<weighted_block_size;i++)
     {
       input>>weight_vector[i];
 
       if(!input)
-      // input failure, set "error flag"
+      /// input failure, set "error flag"
       {
         weighted_block_size=-2;
         cerr<<"\nWARNING: term_ordering::term_ordering(ifstream&, const "
@@ -222,13 +222,13 @@ term_ordering::term_ordering(const short& n, ifstream& input,
     :homogeneous(_homogeneous)
 {
   if((_weighted_ordering<4) || (_weighted_ordering>7))
-    // unknown ordering refining the weight, set "error flag"
+    /// unknown ordering refining the weight, set "error flag"
     weighted_block_size=-1;
   else
     weighted_ordering=_weighted_ordering;
 
   if(n<0)
-    // input out of range, set error flag
+    /// input out of range, set error flag
     weighted_block_size=-1;
   else
     weighted_block_size=n;
@@ -239,14 +239,14 @@ term_ordering::term_ordering(const short& n, ifstream& input,
 
     BOOLEAN negative_weight=FALSE;
     BOOLEAN zero_weight=FALSE;
-    // for checking the input
+    /// for checking the input
 
     for(short i=0;i<weighted_block_size;i++)
     {
       input>>weight_vector[i];
 
       if(!input)
-      // input failure, set "error flag"
+      /// input failure, set "error flag"
       {
         weighted_block_size=-2;
         cerr<<"\nWARNING: term_ordering::term_ordering(const short&, "
@@ -317,7 +317,7 @@ term_ordering::~term_ordering()
 
 
 
-/////////////// object properties /////////////////////////////////////////
+////////////////////// object properties /////////////////////////////////////////////////////////////
 
 
 
@@ -387,7 +387,7 @@ BOOLEAN term_ordering::is_positive() const
 
 
 
-/////////////// frequently used comparison functions //////////////////////
+////////////////////// frequently used comparison functions /////////////////////////////////
 
 
 
@@ -408,7 +408,7 @@ short term_ordering::compare_to_zero(const Integer* v) const
   unsigned short last_index=weighted_block_size+elimination_block_size;
   double w=0;
 
-  // First check the elimination variables.
+  /// First check the elimination variables.
 
   if(elimination_block_size>0)
     switch(elimination_ordering)
@@ -428,7 +428,7 @@ short term_ordering::compare_to_zero(const Integer* v) const
 
         case DEG_LEX:
 
-          // compute the degree
+          /// compute the degree
           for(short i=weighted_block_size;i<last_index;i++)
             w+=v[i];
 
@@ -437,8 +437,8 @@ short term_ordering::compare_to_zero(const Integer* v) const
           if(w<0)
             return -1;
 
-          // if the degree is zero:
-          // tie breaking with the lexicographical ordering
+          /// if the degree is zero:
+          /// tie breaking with the lexicographical ordering
           for(short i=weighted_block_size;i<last_index;i++)
           {
             Integer actual_component=v[i];
@@ -452,7 +452,7 @@ short term_ordering::compare_to_zero(const Integer* v) const
 
         case DEG_REV_LEX:
 
-          //compute the degree
+          ///compute the degree
           for(short i=weighted_block_size;i<last_index;i++)
             w+=v[i];
 
@@ -460,8 +460,8 @@ short term_ordering::compare_to_zero(const Integer* v) const
             return 1;
           if(w<0)
             return -1;
-          // if the degree is zero:
-          // tie breaking with the reverse lexicographical ordering
+          /// if the degree is zero:
+          /// tie breaking with the reverse lexicographical ordering
           for(short i=last_index-1;i>=weighted_block_size;i--)
           {
             Integer actual_component=v[i];
@@ -473,10 +473,10 @@ short term_ordering::compare_to_zero(const Integer* v) const
     }
 
 
-  // When reaching this line, the vector components corresponding to
-  // elimination variables are all zero.
-  // Compute the weight.
-  // If the term ordering is a homogeneous one, this is superfluous.
+  /// When reaching this line, the vector components corresponding to
+  /// elimination variables are all zero.
+  /// Compute the weight.
+  /// If the term ordering is a homogeneous one, this is superfluous.
 
   if(!homogeneous)
   {
@@ -488,9 +488,9 @@ short term_ordering::compare_to_zero(const Integer* v) const
   }
 
 
-  // When reaching this line, the weight of the vector components corresponding
-  // to weighted variables is zero.
-  // Tie breaking with the term ordering refining the weight.
+  /// When reaching this line, the weight of the vector components corresponding
+  /// to weighted variables is zero.
+  /// Tie breaking with the term ordering refining the weight.
 
   switch(weighted_ordering)
   {
@@ -562,7 +562,7 @@ short term_ordering::compare_to_zero(const Integer* v) const
 
   }
 
-  // When reaching this line, the argument vector is the zero vector.
+  /// When reaching this line, the argument vector is the zero vector.
 
   return 0;
 
@@ -580,11 +580,11 @@ short term_ordering::compare(const binomial& bin1, const binomial& bin2) const
   Integer* v1=bin1.exponent_vector;
   Integer* v2=bin2.exponent_vector;
 
-  // First compare the heads of the input binomials.
-  // The code is analogous to the routine compare_to_zero(...), except
-  // from the fact that we must consider the sign of the vector components.
+  /// First compare the heads of the input binomials.
+  /// The code is analogous to the routine compare_to_zero(...), except
+  /// from the fact that we must consider the sign of the vector components.
 
-  // First check the elimination variables.
+  /// First check the elimination variables.
 
   if(elimination_block_size>0)
     switch(elimination_ordering)
@@ -609,7 +609,7 @@ short term_ordering::compare(const binomial& bin1, const binomial& bin2) const
 
         case DEG_LEX:
 
-          // compute the degree of the heads in the elimination variables
+          /// compute the degree of the heads in the elimination variables
           for(short i=weighted_block_size;i<last_index;i++)
           {
             Integer comp1=v1[i];
@@ -626,8 +626,8 @@ short term_ordering::compare(const binomial& bin1, const binomial& bin2) const
           if(w1<w2)
             return -1;
 
-          // if the degree is equal:
-          // tie breaking with the lexicographical ordering
+          /// if the degree is equal:
+          /// tie breaking with the lexicographical ordering
           for(short i=weighted_block_size;i<last_index;i++)
           {
             Integer comp1=v1[i];
@@ -646,7 +646,7 @@ short term_ordering::compare(const binomial& bin1, const binomial& bin2) const
 
         case DEG_REV_LEX:
 
-          //compute the degree of the heads in the elimination variables
+          ///compute the degree of the heads in the elimination variables
           for(short i=weighted_block_size;i<last_index;i++)
           {
             Integer comp1=v1[i];
@@ -662,8 +662,8 @@ short term_ordering::compare(const binomial& bin1, const binomial& bin2) const
             return 1;
           if(w1<w2)
             return -1;
-          // if the degree is equal:
-          // tie breaking with the reverse lexicographical ordering
+          /// if the degree is equal:
+          /// tie breaking with the reverse lexicographical ordering
           for(short i=last_index-1;i>=weighted_block_size;i--)
           {
             Integer comp1=v1[i];
@@ -680,9 +680,9 @@ short term_ordering::compare(const binomial& bin1, const binomial& bin2) const
     }
 
 
-  // When reaching this line, the heads are equal in the elimination
-  // variables.
-  // Compute the weight of the heads.
+  /// When reaching this line, the heads are equal in the elimination
+  /// variables.
+  /// Compute the weight of the heads.
 
   w1=0;
   for(short i=0;i<weighted_block_size;i++)
@@ -706,9 +706,9 @@ short term_ordering::compare(const binomial& bin1, const binomial& bin2) const
     return -1;
 
 
-  // When reaching this line, the weight of the heads in the weighted
-  // variables are equal.
-  // Tie breaking with the term ordering refining the weight.
+  /// When reaching this line, the weight of the heads in the weighted
+  /// variables are equal.
+  /// Tie breaking with the term ordering refining the weight.
 
   switch(weighted_ordering)
   {
@@ -816,20 +816,20 @@ short term_ordering::compare(const binomial& bin1, const binomial& bin2) const
   }
 
 
-  // When reaching this line, the heads of the binomials are equal.
-  // Now we decide by the tails.
-  // This part of the code could also be omitted in the current context:
-  // The compare(...)-function is only called when dealing with ordered
-  // lists. This is done in two cases:
-  // - When computing with ordered S-pair lists, it doesn't really matter
-  //   if such similar binomials are in the right order.
-  // - When outputting a reduced Groebner basis, it cannot happen that two
-  //   heads are equal.
+  /// When reaching this line, the heads of the binomials are equal.
+  /// Now we decide by the tails.
+  /// This part of the code could also be omitted in the current context:
+  /// The compare(...)-function is only called when dealing with ordered
+  /// lists. This is done in two cases:
+  /// - When computing with ordered S-pair lists, it doesn't really matter
+  ///   if such similar binomials are in the right order.
+  /// - When outputting a reduced Groebner basis, it cannot happen that two
+  ///   heads are equal.
 
   w1=0;
   w2=0;
 
-  // First check the elimination variables.
+  /// First check the elimination variables.
 
   if(elimination_block_size>0)
     switch(elimination_ordering)
@@ -854,7 +854,7 @@ short term_ordering::compare(const binomial& bin1, const binomial& bin2) const
 
         case DEG_LEX:
 
-          // compute the degree of the tails in the elimination variables
+          /// compute the degree of the tails in the elimination variables
           for(short i=weighted_block_size;i<last_index;i++)
           {
             Integer comp1=-v1[i];
@@ -871,8 +871,8 @@ short term_ordering::compare(const binomial& bin1, const binomial& bin2) const
           if(w1<w2)
             return -1;
 
-          // if the degree is equal:
-          // tie breaking with the lexicographical ordering
+          /// if the degree is equal:
+          /// tie breaking with the lexicographical ordering
           for(short i=weighted_block_size;i<last_index;i++)
           {
             Integer comp1=-v1[i];
@@ -891,7 +891,7 @@ short term_ordering::compare(const binomial& bin1, const binomial& bin2) const
 
         case DEG_REV_LEX:
 
-          // compute the degree of the tails in the elimination variables
+          /// compute the degree of the tails in the elimination variables
           for(short i=weighted_block_size;i<last_index;i++)
           {
             Integer comp1=-v1[i];
@@ -907,8 +907,8 @@ short term_ordering::compare(const binomial& bin1, const binomial& bin2) const
             return 1;
           if(w1<w2)
             return -1;
-          // if the degree is equal:
-          // tie breaking with the reverse lexicographical ordering
+          /// if the degree is equal:
+          /// tie breaking with the reverse lexicographical ordering
           for(short i=last_index-1;i>=weighted_block_size;i--)
           {
             Integer comp1=-v1[i];
@@ -925,9 +925,9 @@ short term_ordering::compare(const binomial& bin1, const binomial& bin2) const
     }
 
 
-  // When reaching this line, the tails are equal in the elimination
-  // variables.
-  // Compute the weight of the tails.
+  /// When reaching this line, the tails are equal in the elimination
+  /// variables.
+  /// Compute the weight of the tails.
 
   w1=0;
   for(short i=0;i<weighted_block_size;i++)
@@ -951,9 +951,9 @@ short term_ordering::compare(const binomial& bin1, const binomial& bin2) const
     return -1;
 
 
-  // When reaching this line, the weight of the tails in the weighted
-  // variables are equal.
-  // Tie breaking with the term ordering refining the weight.
+  /// When reaching this line, the weight of the tails in the weighted
+  /// variables are equal.
+  /// Tie breaking with the term ordering refining the weight.
 
   switch(weighted_ordering)
   {
@@ -1067,8 +1067,8 @@ short term_ordering::compare(const binomial& bin1, const binomial& bin2) const
 
 
 
-///////// operators and routines needed by the IP-algorithms ////////////////
-///////// to manipulate the term ordering ////////////////////////////////
+///////////// operators and routines needed by the IP-algorithms ////////////////////////
+///////////// to manipulate the term ordering ////////////////////////////////////////////////
 
 
 
@@ -1134,13 +1134,13 @@ term_ordering& term_ordering::convert_to_elimination_ordering
  const short& _elimination_ordering)
 {
   if((_elimination_ordering<1) || (_elimination_ordering>3))
-    // unknown ordering on the elimination variables, set "error flag"
+    /// unknown ordering on the elimination variables, set "error flag"
     weighted_block_size=-1;
   else
     elimination_ordering=_elimination_ordering;
 
   if(number_of_elimination_variables<0)
-    // argument out of range, set error flag
+    /// argument out of range, set error flag
     weighted_block_size=-1;
   else
     elimination_block_size=number_of_elimination_variables;
@@ -1230,7 +1230,7 @@ term_ordering& term_ordering::swap_weights(const short& i, const short& j)
 
 
 
-/////////////////// output ///////////////////////////////////////////////
+//////////////////////////// output //////////////////////////////////////////////////////////////////////
 
 
 
@@ -1454,4 +1454,4 @@ void term_ordering::format_print_weight_vector(ofstream& output) const
     output<<setw(6)<<setprecision(2)<<weight_vector[i];
   output<<endl;
 }
-#endif  // TERM_ORDERING_CC
+#endif  /// TERM_ORDERING_CC

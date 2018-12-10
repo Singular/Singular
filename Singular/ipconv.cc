@@ -1,8 +1,14 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: automatic type conversions
+
+
 */
 
 
@@ -428,9 +434,13 @@ static void iiL2R(leftv out, leftv in)
 #define D(A)     A
 #define NULL_VAL NULL
 #include "Singular/table.h"
-/*2
+/*!
+!
+2
 * try to convert 'input' of type 'inputType' to 'output' of type 'outputType'
 * return FALSE on success
+
+
 */
 BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv output,const struct sConvertTypes *dConvertTypes)
 {
@@ -447,11 +457,19 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
   {
     output->rtyp=ANY_TYPE;
     output->data=(char *)(long)input->Typ();
-    /* the name of the object:*/
+    /*!
+!
+ the name of the object:
+
+*/
     if (input->e==NULL)
     {
       if (input->rtyp==IDHDL)
-      /* preserve name: copy it */
+      /*!
+!
+ preserve name: copy it 
+
+*/
         output->name=omStrDup(IDID((idhdl)(input->data)));
       else if (input->name!=NULL)
       {
@@ -502,7 +520,11 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
       }
       else
       {
-        /* no need to preserve name: use it */
+        /*!
+!
+ no need to preserve name: use it 
+
+*/
         output->name=input->name;
         input->name=NULL;
       }
@@ -512,7 +534,11 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
     if (!errorreported) input->CleanUp();
     return errorreported;
   }
-  if (index!=0) /* iiTestConvert does not returned 'failure' */
+  if (index!=0) /*!
+!
+ iiTestConvert does not returned 'failure' 
+
+*/
   {
     index--;
 
@@ -568,9 +594,13 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
   return TRUE;
 }
 
-/*2
+/*!
+!
+2
 * try to convert 'inputType' in 'outputType'
 * return 0 on failure, an index (<>0) on success
+
+
 */
 int iiTestConvert (int inputType, int outputType,const struct sConvertTypes *dConvertTypes)
 {

@@ -1,4 +1,5 @@
-/*************************************************************************
+/*!
+************************************************************************
 Copyright (c) 1992-2007 The University of Tennessee.  All rights reserved.
 
 Contributors:
@@ -34,7 +35,8 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*************************************************************************/
+************************************************************************
+*/
 
 #ifndef _rotations_h
 #define _rotations_h
@@ -71,7 +73,8 @@ namespace rotations
         amp::ampf<Precision>& r);
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Application of a sequence of  elementary rotations to a matrix
 
     The algorithm pre-multiplies the matrix by a sequence of rotation
@@ -95,7 +98,8 @@ namespace rotations
         A           -   transformed matrix.
 
     Utility subroutine.
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void applyrotationsfromtheleft(bool isforward,
         int m1,
@@ -209,7 +213,8 @@ namespace rotations
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Application of a sequence of  elementary rotations to a matrix
 
     The algorithm post-multiplies the matrix by a sequence of rotation
@@ -233,7 +238,8 @@ namespace rotations
         A           -   transformed matrix.
 
     Utility subroutine.
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void applyrotationsfromtheright(bool isforward,
         int m1,
@@ -343,14 +349,16 @@ namespace rotations
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     The subroutine generates the elementary rotation, so that:
 
     [  CS  SN  ]  .  [ F ]  =  [ R ]
     [ -SN  CS  ]     [ G ]     [ 0 ]
 
     CS**2 + SN**2 = 1
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void generaterotation(amp::ampf<Precision> f,
         amp::ampf<Precision> g,

@@ -1,4 +1,5 @@
-/*************************************************************************
+/*!
+************************************************************************
 Copyright (c) 1992-2007 The University of Tennessee.  All rights reserved.
 
 Contributors:
@@ -34,7 +35,8 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*************************************************************************/
+************************************************************************
+*/
 
 #ifndef _bdsvd_h
 #define _bdsvd_h
@@ -104,7 +106,8 @@ namespace bdsvd
         amp::ampf<Precision>& csl);
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Singular value decomposition of a bidiagonal matrix (extended algorithm)
 
     The algorithm performs the singular value decomposition  of  a  bidiagonal
@@ -181,7 +184,8 @@ namespace bdsvd
          Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
          Courant Institute, Argonne National Lab, and Rice University
          October 31, 1999.
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     bool rmatrixbdsvd(ap::template_1d_array< amp::ampf<Precision> >& d,
         ap::template_1d_array< amp::ampf<Precision> > e,
@@ -213,7 +217,8 @@ namespace bdsvd
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Obsolete 1-based subroutine. See RMatrixBDSVD for 0-based replacement.
 
     History:
@@ -224,7 +229,8 @@ namespace bdsvd
          Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
          Courant Institute, Argonne National Lab, and Rice University
          October 31, 1999.
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     bool bidiagonalsvddecomposition(ap::template_1d_array< amp::ampf<Precision> >& d,
         ap::template_1d_array< amp::ampf<Precision> > e,
@@ -246,9 +252,11 @@ namespace bdsvd
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Internal working subroutine for bidiagonal decomposition
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     bool bidiagonalsvddecompositioninternal(ap::template_1d_array< amp::ampf<Precision> >& d,
         ap::template_1d_array< amp::ampf<Precision> > e,

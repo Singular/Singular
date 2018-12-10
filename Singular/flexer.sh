@@ -32,8 +32,12 @@ if [ -z $goodversion ];
 	  then
 	  dummy=0;
       else
-	  #echo `echo $arg|sed -e "s/-.*/SPECIALVALUE/"`
-	  if  [ SPECIALVALUE = `echo $arg|sed -e "s/-.*/SPECIALVALUE/"` ];
+	  #echo `echo $arg|sed -e "s/-.
+
+*/SPECIALVALUE/"`
+	  if  [ SPECIALVALUE = `echo $arg|sed -e "s/-.
+
+*/SPECIALVALUE/"` ];
 
 	      then
 	      dummy=0;

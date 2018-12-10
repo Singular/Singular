@@ -1,4 +1,5 @@
-/*************************************************************************
+/*!
+************************************************************************
 Copyright (c) 1992-2007 The University of Tennessee.  All rights reserved.
 
 Contributors:
@@ -34,7 +35,8 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*************************************************************************/
+************************************************************************
+*/
 
 #ifndef _qr_h
 #define _qr_h
@@ -81,7 +83,8 @@ namespace qr
         ap::template_2d_array< amp::ampf<Precision> >& r);
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     QR decomposition of a rectangular matrix of size MxN
 
     Input parameters:
@@ -118,7 +121,8 @@ namespace qr
          February 29, 1992.
          Translation from FORTRAN to pseudocode (AlgoPascal)
          by Sergey Bochkanov, ALGLIB project, 2005-2007.
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void rmatrixqr(ap::template_2d_array< amp::ampf<Precision> >& a,
         int m,
@@ -169,7 +173,8 @@ namespace qr
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Partial unpacking of matrix Q from the QR decomposition of a matrix A
 
     Input parameters:
@@ -188,7 +193,8 @@ namespace qr
 
       -- ALGLIB --
          Copyright 2005 by Bochkanov Sergey
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void rmatrixqrunpackq(const ap::template_2d_array< amp::ampf<Precision> >& a,
         int m,
@@ -250,7 +256,8 @@ namespace qr
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Unpacking of matrix R from the QR decomposition of a matrix A
 
     Input parameters:
@@ -264,7 +271,8 @@ namespace qr
 
       -- ALGLIB --
          Copyright 2005 by Bochkanov Sergey
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void rmatrixqrunpackr(const ap::template_2d_array< amp::ampf<Precision> >& a,
         int m,
@@ -296,9 +304,11 @@ namespace qr
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Obsolete 1-based subroutine. See RMatrixQR for 0-based replacement.
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void qrdecomposition(ap::template_2d_array< amp::ampf<Precision> >& a,
         int m,
@@ -347,9 +357,11 @@ namespace qr
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Obsolete 1-based subroutine. See RMatrixQRUnpackQ for 0-based replacement.
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void unpackqfromqr(const ap::template_2d_array< amp::ampf<Precision> >& a,
         int m,
@@ -413,9 +425,11 @@ namespace qr
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Obsolete 1-based subroutine. See RMatrixQR for 0-based replacement.
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void qrdecompositionunpacked(ap::template_2d_array< amp::ampf<Precision> > a,
         int m,

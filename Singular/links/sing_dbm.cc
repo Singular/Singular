@@ -1,4 +1,5 @@
-/****************************************
+/*!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
@@ -268,10 +269,14 @@ LINKAGE BOOLEAN dbWrite(si_link l, leftv key)
   gdbm_sync(db->db);
   return b;
 }
-#endif /* USE_GDBM */
+#endif /*!
+ USE_GDBM 
+*/
 
 #ifndef USE_GDBM
-/* These are the routines in dbm. */
+/*!
+ These are the routines in dbm. 
+*/
 #  include "ndbm.h"
 typedef struct {
   DBM *db;        // pointer to open database
@@ -279,7 +284,9 @@ typedef struct {
 } DBM_info;
 
 //**************************************************************************/
-LINKAGE BOOLEAN dbOpen(si_link l, short flag, leftv /*u*/)
+LINKAGE BOOLEAN dbOpen(si_link l, short flag, leftv /*!
+u
+*/)
 {
   const char *mode = "r";
   DBM_info *db;
@@ -449,5 +456,9 @@ LINKAGE BOOLEAN dbWrite(si_link l, leftv key)
 //}
 //**************************************************************************/
 
-#endif /* USE_GDBM */
-#endif /* HAVE_DBM */
+#endif /*!
+ USE_GDBM 
+*/
+#endif /*!
+ HAVE_DBM 
+*/

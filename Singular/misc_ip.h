@@ -1,7 +1,13 @@
-/*****************************************************************************\
+/*!
+!
+****************************************************************************\
  * Computer Algebra System SINGULAR
-\*****************************************************************************/
-/** @file misc_ip.h
+\****************************************************************************
+
+*/
+/*!
+!
+* @file misc_ip.h
  *
  * This file provides miscellaneous functionality.
  *
@@ -18,7 +24,9 @@
  *
  *
  **/
-/*****************************************************************************/
+/*!
+!
+****************************************************************************/
 
 #ifndef MISC_H
 #define MISC_H
@@ -30,7 +38,9 @@
 
 #include "Singular/lists.h"
 
-/**
+/*!
+!
+*
  * Factorises a given bigint number n into its prime factors less
  * than or equal to a given bound, with corresponding multiplicities.
  *
@@ -54,9 +64,17 @@
  * @return the factorisation data in a SINGULAR-internal list
  **/
 lists primeFactorisation(
-       const number n,     /**< [in]  the bigint > 0 to be factorised   */
-       const int pBound    /**< [in]  bound on the prime factors
-                                      seeked                            */
+       const number n,     /*!
+!
+*< [in]  the bigint > 0 to be factorised   
+
+*/
+       const int pBound    /*!
+!
+*< [in]  bound on the prime factors
+                                      seeked                            
+
+*/
                         );
 
 
@@ -64,11 +82,19 @@ lists primeFactorisation(
 #ifdef PDEBUG
 #if (OM_TRACK > 2) && defined(OM_TRACK_CUSTOM)
 // #include "kernel/polys.h"
-/* Needed for debug Version of p_SetRingOfLeftv, Oliver */
+/*!
+!
+ Needed for debug Version of p_SetRingOfLeftv, Oliver 
+
+*/
 #include "kernel/structs.h"
 void p_SetRingOfLeftv(leftv l, ring r);
 #endif
 #endif
 
 #endif
-/* MISC_H */
+/*!
+!
+ MISC_H 
+
+*/

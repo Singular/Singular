@@ -1,4 +1,5 @@
-/****************************************
+/*!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
@@ -22,26 +23,32 @@
 #ifndef HPUX_9
 #include <strings.h>
 #endif
-/*
+/*!
+
  * Copyright (c) 1983 Regents of the University of California.
  * All rights reserved.  The Berkeley software License Agreement
  * specifies the terms and conditions for redistribution.
  * for details see ndbm.h
- */
+ 
+*/
 
 //**************************************************************************/
 
-/* alternative:
+/*!
+ alternative:
 * #   define EPERM 1
 * #   define ENOMEM 23
 * #   define ENOSPC 28
+
 */
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #ifndef HAVE_BCOPY
 #   define bcopy(a,b,c) memmove(b,a,c)
-#endif /* not HAVE_BCOPY */
+#endif /*!
+ not HAVE_BCOPY 
+*/
 
 #define BYTESIZ 8
 #undef setbit
@@ -408,11 +415,13 @@ static int finddatum(char buf[PBLKSIZ], datum item)
 }
 
 static  int hitab[16]
-/* ken's
+/*!
+ ken's
 {
         055,043,036,054,063,014,004,005,
         010,064,077,000,035,027,025,071,
 };
+
 */
  = {    61, 57, 53, 49, 45, 41, 37, 33,
         29, 25, 21, 17, 13,  9,  5,  1,
@@ -459,9 +468,11 @@ static long dcalchash(datum item)
   return (long)(hashl);
 }
 
-/*
+/*!
+
  * Delete pairs of items (n & n+1).
- */
+ 
+*/
 static int delitem(char buf[PBLKSIZ], int n)
 {
   short *sp, *sp1;
@@ -491,9 +502,11 @@ static int delitem(char buf[PBLKSIZ], int n)
   return (1);
 }
 
-/*
+/*!
+
  * Add pairs of items (item & item1).
- */
+ 
+*/
 static int additem(char buf[PBLKSIZ], datum item, datum item1)
 {
   short *sp;
@@ -535,4 +548,6 @@ static chkblk(char buf[PBLKSIZ])
 }
 #endif
 
-#endif /* HAVE_DBM */
+#endif /*!
+ HAVE_DBM 
+*/

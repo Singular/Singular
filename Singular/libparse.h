@@ -1,10 +1,16 @@
 #ifndef LIBPARSE_H
 #define LIBPARSE_H
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: lib parsing
+
+
 */
 typedef enum { OLD_LIBSTYLE, NEW_LIBSTYLE } lib_style_types;
 typedef enum { LOAD_LIB, GET_INFO } lp_modes;
@@ -101,6 +107,10 @@ extern char * text_buffer;
 #define myfread fread
 #  endif
 
-#endif /* LIBPARSE_H */
+#endif /*!
+!
+ LIBPARSE_H 
+
+*/
 
 

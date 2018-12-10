@@ -1,8 +1,14 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT:
+
+
 */
 
 #include "kernel/mod2.h"
@@ -79,7 +85,11 @@ const char *lastreserved=NULL;
 
 static BOOLEAN iiNoKeepRing=TRUE;
 
-/*0 implementation*/
+/*!
+!
+0 implementation
+
+*/
 
 const char * iiTwoOps(int t)
 {
@@ -116,7 +126,11 @@ const char * iiTwoOps(int t)
 
 int iiOpsTwoChar(const char *s)
 {
-/* not handling: &&, ||, ** */
+/*!
+!
+ not handling: &&, ||, ** 
+
+*/
   if (s[1]=='\0') return s[0];
   else if (s[2]!='\0') return 0;
   switch(s[0])
@@ -221,7 +235,11 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                    break;
     case RING_CMD:
                    if ((IDRING(h)==currRing) && (currRingHdl!=h))
-                     PrintS("(*)"); /* this is an alias to currRing */
+                     PrintS("(*)"); /*!
+!
+ this is an alias to currRing 
+
+*/
 #ifdef RDEBUG
                    if (traceit &TRACE_SHOW_RINGS)
                      Print(" <%lx>",(long)(IDRING(h)));
@@ -241,7 +259,11 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                       break;
                    }
 #endif
-    /*default:     break;*/
+    /*!
+!
+default:     break;
+
+*/
   }
   PrintLn();
 }
@@ -391,13 +413,21 @@ void killlocals(int v)
   if (iiRETURNEXPR_len > myynest)
   {
     int t=iiRETURNEXPR.Typ();
-    if (/*iiRETURNEXPR.Typ()*/ t==RING_CMD)
+    if (/*!
+!
+iiRETURNEXPR.Typ()
+
+*/ t==RING_CMD)
     {
       leftv h=&iiRETURNEXPR;
       if (((ring)h->data)->idroot!=NULL)
         killlocals0(v,&(((ring)h->data)->idroot),(ring)h->data);
     }
-    else if (/*iiRETURNEXPR.Typ()*/ t==LIST_CMD)
+    else if (/*!
+!
+iiRETURNEXPR.Typ()
+
+*/ t==LIST_CMD)
     {
       leftv h=&iiRETURNEXPR;
       changed |=killlocals_list(v,(lists)h->data);
@@ -595,7 +625,11 @@ BOOLEAN iiWRITE(leftv,leftv v)
     return TRUE;
   }
 
-  BOOLEAN b=slWrite(l,vf.next); /* iiConvert preserves next */
+  BOOLEAN b=slWrite(l,vf.next); /*!
+!
+ iiConvert preserves next 
+
+*/
   if (b)
   {
     const char *s;
@@ -734,7 +768,11 @@ leftv iiMap(map theMap, const char * what)
           v->data=maMapIdeal(IDIDEAL(w), src_ring, (ideal)theMap, currRing,nMap);
           theMap->preimage=tmp; // map gets its preimage back
         }
-        if (v->data==NULL) /*i.e. not IDEAL_CMD/MODUL_CMD/MATRIX_CMD/MAP */
+        if (v->data==NULL) /*!
+!
+i.e. not IDEAL_CMD/MODUL_CMD/MATRIX_CMD/MAP 
+
+*/
         {
           if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,src_ring,NULL,NULL,0,nMap))
           {
@@ -824,7 +862,11 @@ void  iiMakeResolv(resolvente r, int length, int rlen, char * name, int typ0,
 //    omFreeSize((ADDRESS)s,strlen(name)+5);
 //    return NULL;
 //  }
-//  r=(ideal *)omAlloc(/*(len+1)*/ i*sizeof(ideal));
+//  r=(ideal *)omAlloc(/*!
+!
+(len+1)
+
+*/ i*sizeof(ideal));
 //  memset(r,0,(*len)*sizeof(ideal));
 //  i=-1;
 //  *typ0=MODUL_CMD;
@@ -1014,7 +1056,11 @@ void iiDebug()
   {
     iiDebugMarker=TRUE;
   }
-#endif /* MDEBUG */
+#endif /*!
+!
+ MDEBUG 
+
+*/
   else
   {
     strcat( s, "\n;~\n");
@@ -1152,7 +1198,11 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
     {
       sy->rtyp=IDHDL;
       currid=sy->name=IDID((idhdl)sy->data);
-      // name->name=NULL; /* used in enterid */
+      // name->name=NULL; /*!
+!
+ used in enterid 
+
+*/
       //sy->e = NULL;
       if (name->next!=NULL)
       {
@@ -1291,7 +1341,11 @@ BOOLEAN iiParameter(leftv p)
     return TRUE;
   }
   leftv h=iiCurrArgs;
-  leftv rest=h->next; /*iiCurrArgs is not NULL here*/
+  leftv rest=h->next; /*!
+!
+iiCurrArgs is not NULL here
+
+*/
   BOOLEAN is_default_list=FALSE;
   if (strcmp(p->name,"#")==0)
   {
@@ -1439,7 +1493,11 @@ BOOLEAN iiExport (leftv v, int toLev)
   return nok;
 }
 
-/*assume root!=idroot*/
+/*!
+!
+assume root!=idroot
+
+*/
 BOOLEAN iiExport (leftv v, int toLev, package pack)
 {
 //  if ((pack==basePack)&&(pack!=currPack))
@@ -1580,28 +1638,60 @@ idhdl rDefault(const char *s)
   r->cf->has_simple_Inverse=1;
   #endif
   r->N      = 3;
-  /*r->P     = 0; Alloc0 in idhdl::set, ipid.cc*/
-  /*names*/
+  /*!
+!
+r->P     = 0; Alloc0 in idhdl::set, ipid.cc
+
+*/
+  /*!
+!
+names
+
+*/
   r->names = (char **) omAlloc0(3 * sizeof(char_ptr));
   r->names[0]  = omStrDup("x");
   r->names[1]  = omStrDup("y");
   r->names[2]  = omStrDup("z");
-  /*weights: entries for 3 blocks: NULL*/
+  /*!
+!
+weights: entries for 3 blocks: NULL
+
+*/
   r->wvhdl = (int **)omAlloc0(3 * sizeof(int_ptr));
-  /*order: dp,C,0*/
+  /*!
+!
+order: dp,C,0
+
+*/
   r->order = (rRingOrder_t *) omAlloc(3 * sizeof(rRingOrder_t *));
   r->block0 = (int *)omAlloc0(3 * sizeof(int *));
   r->block1 = (int *)omAlloc0(3 * sizeof(int *));
-  /* ringorder dp for the first block: var 1..3 */
+  /*!
+!
+ ringorder dp for the first block: var 1..3 
+
+*/
   r->order[0]  = ringorder_dp;
   r->block0[0] = 1;
   r->block1[0] = 3;
-  /* ringorder C for the second block: no vars */
+  /*!
+!
+ ringorder C for the second block: no vars 
+
+*/
   r->order[1]  = ringorder_C;
-  /* the last block: everything is 0 */
+  /*!
+!
+ the last block: everything is 0 
+
+*/
   r->order[2]  = (rRingOrder_t)0;
 
-  /* complete ring intializations */
+  /*!
+!
+ complete ring intializations 
+
+*/
   rComplete(r);
   rSetHdl(tmp);
   return currRingHdl;
@@ -1693,7 +1783,11 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
         case ringorder_lp:
           for(;j>=0; j--) (*iv)[j]=1;
           break;
-        default: /* do nothing */;
+        default: /*!
+!
+ do nothing 
+
+*/;
       }
     }
     else
@@ -1722,7 +1816,11 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
   // ----------------------------------------
 }
 static void rDecomposeC_41(leftv h,const coeffs C)
-/* field is R or C */
+/*!
+!
+ field is R or C 
+
+*/
 {
   lists L=(lists)omAlloc0Bin(slists_bin);
   if (nCoeff_is_long_C(C)) L->Init(3);
@@ -1756,7 +1854,11 @@ static void rDecomposeC_41(leftv h,const coeffs C)
   // ----------------------------------------
 }
 static void rDecomposeC(leftv h,const ring R)
-/* field is R or C */
+/*!
+!
+ field is R or C 
+
+*/
 {
   lists L=(lists)omAlloc0Bin(slists_bin);
   if (rField_is_long_C(R)) L->Init(3);
@@ -1792,7 +1894,11 @@ static void rDecomposeC(leftv h,const ring R)
 
 #ifdef HAVE_RINGS
 void rDecomposeRing_41(leftv h,const coeffs C)
-/* field is R or C */
+/*!
+!
+ field is R or C 
+
+*/
 {
   lists L=(lists)omAlloc0Bin(slists_bin);
   if (nCoeff_is_Ring(C)) L->Init(1);
@@ -1820,7 +1926,11 @@ void rDecomposeRing_41(leftv h,const coeffs C)
 #endif
 
 void rDecomposeRing(leftv h,const ring R)
-/* field is R or C */
+/*!
+!
+ field is R or C 
+
+*/
 {
 #ifdef HAVE_RINGS
   lists L=(lists)omAlloc0Bin(slists_bin);
@@ -2020,7 +2130,11 @@ lists rDecompose_list_cf(const ring r)
         case ringorder_lp:
           for(;j>=0; j--) (*iv)[j]=1;
           break;
-        default: /* do nothing */;
+        default: /*!
+!
+ do nothing 
+
+*/;
       }
     }
     else
@@ -2206,7 +2320,11 @@ lists rDecompose(const ring r)
         case ringorder_lp:
           for(;j>=0; j--) (*iv)[j]=1;
           break;
-        default: /* do nothing */;
+        default: /*!
+!
+ do nothing 
+
+*/;
       }
     }
     else
@@ -2240,7 +2358,11 @@ lists rDecompose(const ring r)
 }
 
 void rComposeC(lists L, ring R)
-/* field is R or C */
+/*!
+!
+ field is R or C 
+
+*/
 {
   // ----------------------------------------
   // 0: char/ cf - ring
@@ -2311,7 +2433,11 @@ void rComposeC(lists L, ring R)
 
 #ifdef HAVE_RINGS
 void rComposeRing(lists L, ring R)
-/* field is R or C */
+/*!
+!
+ field is R or C 
+
+*/
 {
   // ----------------------------------------
   // 0: string: integer
@@ -2376,8 +2502,12 @@ void rComposeRing(lists L, ring R)
     //R->cf->ch = R->cf->modExponent;
     if ((mpz_cmp_ui(modBase, 2) == 0) && (modExponent <= 8*sizeof(unsigned long)))
     {
-      /* this branch should be active for modExponent = 2..32 resp. 2..64,
-           depending on the size of a long on the respective platform */
+      /*!
+!
+ this branch should be active for modExponent = 2..32 resp. 2..64,
+           depending on the size of a long on the respective platform 
+
+*/
       R->cf=nInitChar(n_Z2m,(void*)(long)modExponent);       // Use Z/2^ch
     }
     else
@@ -2676,8 +2806,16 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
            case 0:
            case ringorder_unspec:
              break;
-           case ringorder_L: /* cannot happen */
-           case ringorder_a64: /*not implemented */
+           case ringorder_L: /*!
+!
+ cannot happen 
+
+*/
+           case ringorder_a64: /*!
+!
+not implemented 
+
+*/
              WerrorS("ring order not implemented");
              return TRUE;
         }
@@ -3039,8 +3177,12 @@ rCompose_err:
 
 // from matpol.cc
 
-/*2
+/*!
+!
+2
 * compute the jacobi matrix of an ideal
+
+
 */
 BOOLEAN mpJacobi(leftv res,leftv a)
 {
@@ -3060,11 +3202,23 @@ BOOLEAN mpJacobi(leftv res,leftv a)
   return FALSE;
 }
 
-/*2
+/*!
+!
+2
 * returns the Koszul-matrix of degree d of a vectorspace with dimension n
 * uses the first n entrees of id, if id <> NULL
+
+
 */
-BOOLEAN mpKoszul(leftv res,leftv c/*ip*/, leftv b/*in*/, leftv id)
+BOOLEAN mpKoszul(leftv res,leftv c/*!
+!
+ip
+
+*/, leftv b/*!
+!
+in
+
+*/, leftv id)
 {
   int n=(int)(long)b->Data();
   int d=(int)(long)c->Data();
@@ -3116,9 +3270,13 @@ BOOLEAN mpKoszul(leftv res,leftv c/*ip*/, leftv b/*in*/, leftv id)
 }
 
 // from syz1.cc
-/*2
+/*!
+!
+2
 * read out the Betti numbers from resolution
 * (interpreter interface)
+
+
 */
 BOOLEAN syBetti2(leftv res, leftv u, leftv w)
 {
@@ -3152,8 +3310,12 @@ BOOLEAN syBetti1(leftv res, leftv u)
   return syBetti2(res,u,&tmp);
 }
 
-/*3
+/*!
+!
+3
 * converts a resolution into a list of modules
+
+
 */
 lists syConvRes(syStrategy syzstr,BOOLEAN toDel,int add_row_shift)
 {
@@ -3224,8 +3386,12 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel,int add_row_shift)
   return li;
 }
 
-/*3
+/*!
+!
+3
 * converts a list of modules into a resolution
+
+
 */
 syStrategy syConvList(lists li)
 {
@@ -3253,8 +3419,12 @@ syStrategy syConvList(lists li)
   return result;
 }
 
-/*3
+/*!
+!
+3
 * converts a list of modules into a minimal resolution
+
+
 */
 syStrategy syForceMin(lists li)
 {
@@ -3301,7 +3471,11 @@ BOOLEAN kQHWeight(leftv res,leftv v)
     res->data=(char *)new intvec(rVar(currRing));
   return FALSE;
 }
-/*==============================================================*/
+/*!
+!
+==============================================================
+
+*/
 // from clapsing.cc
 #if 0
 BOOLEAN jjIS_SQR_FREE(leftv res, leftv u)
@@ -3354,7 +3528,11 @@ void copy_deep( spectrum& spec, lists l )
 //  singular lists  constructor for  spectrum
 // ----------------------------------------------------------------------------
 
-spectrum /*former spectrum::spectrum ( lists l )*/
+spectrum /*!
+!
+former spectrum::spectrum ( lists l )
+
+*/
 spectrumFromList( lists l )
 {
     spectrum result;
@@ -3366,7 +3544,11 @@ spectrumFromList( lists l )
 //  generate a Singular  lists  from a spectrum
 // ----------------------------------------------------------------------------
 
-/* former spectrum::thelist ( void )*/
+/*!
+!
+ former spectrum::thelist ( void )
+
+*/
 lists   getList( spectrum& spec )
 {
     lists   L  = (lists)omAllocBin( slists_bin);
@@ -3539,7 +3721,11 @@ enum    spectrumState
 //  Compute the spectrum of a  spectrumPolyList
 // ----------------------------------------------------------------------------
 
-/* former spectrumPolyList::spectrum ( lists*, int) */
+/*!
+!
+ former spectrumPolyList::spectrum ( lists*, int) 
+
+*/
 spectrumState   spectrumStateFromList( spectrumPolyList& speclist, lists *L,int fast )
 {
   spectrumPolyNode  **node = &speclist.root;
@@ -3828,7 +4014,11 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
     *L = (lists)omAllocBin( slists_bin);
     (*L)->Init( 1 );
     (*L)->m[0].rtyp = INT_CMD;    //  milnor number
-    /* (*L)->m[0].data = (void*)0;a  -- done by Init */
+    /*!
+!
+ (*L)->m[0].data = (void*)0;a  -- done by Init 
+
+*/
 
     return  spectrumNoSingularity;
   }
@@ -3916,7 +4106,11 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
     *L = (lists)omAllocBin( slists_bin);
     (*L)->Init( 1 );
     (*L)->m[0].rtyp = INT_CMD;    //  milnor number
-    /* (*L)->m[0].data = (void*)0;a  -- done by Init */
+    /*!
+!
+ (*L)->m[0].data = (void*)0;a  -- done by Init 
+
+*/
 
     return  spectrumNoSingularity;
   }
@@ -4015,7 +4209,11 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
 
   poly    wc = ( fast==0 ? pCopy( hc ) :
                ( fast==1 ? computeWC( nph,(Rational)rVar(currRing), currRing ) :
-              /* fast==2 */computeWC( nph,
+              /*!
+!
+ fast==2 
+
+*/computeWC( nph,
                       ((Rational)rVar(currRing))/(Rational)2, currRing ) ) );
 
   #ifdef SPECTRUM_DEBUG
@@ -4527,7 +4725,11 @@ BOOLEAN    semicProc   ( leftv res,leftv u,leftv v )
   sleftv tmp;
   memset(&tmp,0,sizeof(tmp));
   tmp.rtyp=INT_CMD;
-  /* tmp.data = (void *)0;  -- done by memset */
+  /*!
+!
+ tmp.data = (void *)0;  -- done by memset 
+
+*/
 
   return  semicProc3(res,u,v,&tmp);
 }
@@ -4815,9 +5017,13 @@ BOOLEAN nuVanderSys( leftv res, leftv arg1, leftv arg2, leftv arg3)
       (int)pow((double)tdg+1,(double)n));
     return TRUE;
   }
-  if ( !(rField_is_Q(currRing) /* ||
+  if ( !(rField_is_Q(currRing) /*!
+!
+ ||
          rField_is_R() || rField_is_long_R() ||
-         rField_is_long_C()*/ ) )
+         rField_is_long_C()
+
+*/ ) )
          {
     WerrorS("Ground field not implemented!");
     return TRUE;
@@ -5107,7 +5313,11 @@ void rSetHdl(idhdl h)
       //memset(&sLastPrinted,0,sizeof(sleftv)); // done by Cleanup,Init
     }
 
-    if (rg!=currRing)/*&&(currRing!=NULL)*/
+    if (rg!=currRing)/*!
+!
+&&(currRing!=NULL)
+
+*/
     {
       if (rg->cf!=currRing->cf)
       {
@@ -5139,7 +5349,11 @@ void rSetHdl(idhdl h)
       IDRING(h)=rg;
     }
   }
-   /*------------ change the global ring -----------------------*/
+   /*!
+!
+------------ change the global ring -----------------------
+
+*/
   rChangeCurrRing(rg);
   currRingHdl = h;
 }
@@ -5309,7 +5523,11 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
   // set last _C order, if no c/C order was given
   if (i == 0) R->order[n-2] = ringorder_C;
 
-  /* init orders */
+  /*!
+!
+ init orders 
+
+*/
   sl=ord;
   n=-1;
   while (sl!=NULL)
@@ -5320,11 +5538,15 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
     {
       n++;
 
-      /* the format of an ordering:
+      /*!
+!
+ the format of an ordering:
        *  iv[0]: factor
        *  iv[1]: ordering
        *  iv[2..end]: weights
-       */
+       
+
+*/
       R->order[n] = (rRingOrder_t)((*iv)[1]);
       typ=1;
       switch ((*iv)[1])
@@ -5583,7 +5805,11 @@ ring rInit(leftv pn, leftv rv, leftv ord)
   ring R = NULL;
   //BOOLEAN ffChar=FALSE;
 
-  /* ch -------------------------------------------------------*/
+  /*!
+!
+ ch -------------------------------------------------------
+
+*/
   // get ch of ground field
 
   // allocated ring
@@ -5598,7 +5824,11 @@ ring rInit(leftv pn, leftv rv, leftv ord)
   {
     cf=(coeffs)pn->CopyD();
     leftv pnn=pn;
-    if(P>1) /*parameter*/
+    if(P>1) /*!
+!
+parameter
+
+*/
     {
       pnn = pnn->next;
       const int pars = pnn->listLength();
@@ -5629,7 +5859,11 @@ ring rInit(leftv pn, leftv rv, leftv ord)
     int ch = (int)(long)pn->Data();
     leftv pnn=pn;
 
-    /* parameter? -------------------------------------------------------*/
+    /*!
+!
+ parameter? -------------------------------------------------------
+
+*/
     pnn = pnn->next;
 
     if (pnn == NULL) // no params!?
@@ -5804,8 +6038,12 @@ ring rInit(leftv pn, leftv rv, leftv ord)
     {
       if ((mpz_cmp_ui(modBase, 2) == 0) && (modExponent <= 8*sizeof(unsigned long)))
       {
-        /* this branch should be active for modExponent = 2..32 resp. 2..64,
-           depending on the size of a long on the respective platform */
+        /*!
+!
+ this branch should be active for modExponent = 2..32 resp. 2..64,
+           depending on the size of a long on the respective platform 
+
+*/
         //ringtype = 1;       // Use Z/2^ch
         cf=nInitChar(n_Z2m,(void*)(long)modExponent);
       }
@@ -5871,10 +6109,20 @@ ring rInit(leftv pn, leftv rv, leftv ord)
     goto rInitError;
   }
 
-  /*every entry in the new ring is initialized to 0*/
+  /*!
+!
+every entry in the new ring is initialized to 0
 
-  /* characteristic -----------------------------------------------*/
-  /* input: 0 ch=0 : Q     parameter=NULL    ffChar=FALSE   float_len
+*/
+
+  /*!
+!
+ characteristic -----------------------------------------------
+
+*/
+  /*!
+!
+ input: 0 ch=0 : Q     parameter=NULL    ffChar=FALSE   float_len
    *         0    1 : Q(a,...)        *names         FALSE
    *         0   -1 : R               NULL           FALSE  0
    *         0   -1 : R               NULL           FALSE  prec. >6
@@ -5882,7 +6130,9 @@ ring rInit(leftv pn, leftv rv, leftv ord)
    *         p    p : Fp              NULL           FALSE
    *         p   -p : Fp(a)           *names         FALSE
    *         q    q : GF(q=p^n)       *names         TRUE
-  */
+  
+
+*/
   if (cf==NULL)
   {
     WerrorS("Invalid ground field specification");
@@ -5895,7 +6145,11 @@ ring rInit(leftv pn, leftv rv, leftv ord)
 
   R->cf = cf;
 
-  /* names and number of variables-------------------------------------*/
+  /*!
+!
+ names and number of variables-------------------------------------
+
+*/
   {
     int l=rv->listLength();
 
@@ -5904,7 +6158,11 @@ ring rInit(leftv pn, leftv rv, leftv ord)
       Werror("too many ring variables(%d), max is %d",l,MAX_SHORT);
        goto rInitError;
     }
-    R->N = l; /*rv->listLength();*/
+    R->N = l; /*!
+!
+rv->listLength();
+
+*/
   }
   R->names   = (char **)omAlloc0(R->N * sizeof(char_ptr));
   if (rSleftvList2StringArray(rv, R->names))
@@ -5913,9 +6171,17 @@ ring rInit(leftv pn, leftv rv, leftv ord)
     goto rInitError;
   }
 
-  /* check names and parameters for conflicts ------------------------- */
+  /*!
+!
+ check names and parameters for conflicts ------------------------- 
+
+*/
   rRenameVars(R); // conflicting variables will be renamed
-  /* ordering -------------------------------------------------------------*/
+  /*!
+!
+ ordering -------------------------------------------------------------
+
+*/
   if (rSleftvOrdering2Ordering(ord, R))
     goto rInitError;
 
@@ -5923,14 +6189,18 @@ ring rInit(leftv pn, leftv rv, leftv ord)
   if (rComplete(R,1))
     goto rInitError;
 
-/*#ifdef HAVE_RINGS
+/*!
+!
+#ifdef HAVE_RINGS
 // currently, coefficients which are ring elements require a global ordering:
   if (rField_is_Ring(R) && (R->OrdSgn==-1))
   {
     WerrorS("global ordering required for these coefficients");
     goto rInitError;
   }
-#endif*/
+#endif
+
+*/
 
   rTest(R);
 
@@ -5965,7 +6235,11 @@ ring rSubring(ring org_ring, sleftv* rv)
   int *perm=(int *)omAlloc0((org_ring->N+1)*sizeof(int));
   int n = rBlocks(org_ring), i=0, j;
 
-  /* names and number of variables-------------------------------------*/
+  /*!
+!
+ names and number of variables-------------------------------------
+
+*/
   {
     int l=rv->listLength();
     if (l>MAX_SHORT)
@@ -5973,7 +6247,11 @@ ring rSubring(ring org_ring, sleftv* rv)
       Werror("too many ring variables(%d), max is %d",l,MAX_SHORT);
        goto rInitError;
     }
-    R->N = l; /*rv->listLength();*/
+    R->N = l; /*!
+!
+rv->listLength();
+
+*/
   }
   omFree(R->names);
   R->names   = (char **)omAlloc0(R->N * sizeof(char_ptr));
@@ -5983,7 +6261,11 @@ ring rSubring(ring org_ring, sleftv* rv)
     goto rInitError;
   }
 
-  /* check names for subring in org_ring ------------------------- */
+  /*!
+!
+ check names for subring in org_ring ------------------------- 
+
+*/
   {
     i=0;
 
@@ -6006,7 +6288,11 @@ ring rSubring(ring org_ring, sleftv* rv)
   }
   //Print("perm=");
   //for(i=1;i<org_ring->N;i++) Print("v%d -> v%d\n",i,perm[i]);
-  /* ordering -------------------------------------------------------------*/
+  /*!
+!
+ ordering -------------------------------------------------------------
+
+*/
 
   for(i=0;i<n;i++)
   {
@@ -6160,7 +6446,11 @@ void rKill(ring r)
       currRingHdl=NULL;
     }
 
-    /* nKillChar(r); will be called from inside of rDelete */
+    /*!
+!
+ nKillChar(r); will be called from inside of rDelete 
+
+*/
     rDelete(r);
     return;
   }
@@ -6413,7 +6703,11 @@ BOOLEAN iiApply(leftv res, leftv a, int op, leftv proc)
 {
   memset(res,0,sizeof(sleftv));
   res->rtyp=a->Typ();
-  switch (res->rtyp /*a->Typ()*/)
+  switch (res->rtyp /*!
+!
+a->Typ()
+
+*/)
   {
     case INTVEC_CMD:
     case INTMAT_CMD:
@@ -6460,7 +6754,11 @@ BOOLEAN iiTestAssume(leftv a, leftv b)
 
 BOOLEAN iiARROW(leftv r, char* a, char *s)
 {
-  char *ss=(char*)omAlloc(strlen(a)+strlen(s)+30); /* max. 27 currently */
+  char *ss=(char*)omAlloc(strlen(a)+strlen(s)+30); /*!
+!
+ max. 27 currently 
+
+*/
   // find end of s:
   int end_s=strlen(s);
   while ((end_s>0) && ((s[end_s]<=' ')||(s[end_s]==';'))) end_s--;

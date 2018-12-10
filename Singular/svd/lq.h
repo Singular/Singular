@@ -1,4 +1,5 @@
-/*************************************************************************
+/*!
+************************************************************************
 Copyright (c) 2005-2007, Sergey Bochkanov (ALGLIB project).
 
 Redistribution and use in source and binary forms, with or without
@@ -28,7 +29,8 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*************************************************************************/
+************************************************************************
+*/
 
 #ifndef _lq_h
 #define _lq_h
@@ -75,7 +77,8 @@ namespace lq
         ap::template_2d_array< amp::ampf<Precision> >& q);
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     LQ decomposition of a rectangular matrix of size MxN
 
     Input parameters:
@@ -108,7 +111,8 @@ namespace lq
 
       -- ALGLIB --
          Copyright 2005-2007 by Bochkanov Sergey
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void rmatrixlq(ap::template_2d_array< amp::ampf<Precision> >& a,
         int m,
@@ -153,7 +157,8 @@ namespace lq
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Partial unpacking of matrix Q from the LQ decomposition of a matrix A
 
     Input parameters:
@@ -172,7 +177,8 @@ namespace lq
 
       -- ALGLIB --
          Copyright 2005 by Bochkanov Sergey
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void rmatrixlqunpackq(const ap::template_2d_array< amp::ampf<Precision> >& a,
         int m,
@@ -234,7 +240,8 @@ namespace lq
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Unpacking of matrix L from the LQ decomposition of a matrix A
 
     Input parameters:
@@ -248,7 +255,8 @@ namespace lq
 
       -- ALGLIB --
          Copyright 2005 by Bochkanov Sergey
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void rmatrixlqunpackl(const ap::template_2d_array< amp::ampf<Precision> >& a,
         int m,
@@ -280,10 +288,12 @@ namespace lq
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Obsolete 1-based subroutine
     See RMatrixLQ for 0-based replacement.
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void lqdecomposition(ap::template_2d_array< amp::ampf<Precision> >& a,
         int m,
@@ -334,10 +344,12 @@ namespace lq
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Obsolete 1-based subroutine
     See RMatrixLQUnpackQ for 0-based replacement.
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void unpackqfromlq(const ap::template_2d_array< amp::ampf<Precision> >& a,
         int m,
@@ -401,9 +413,11 @@ namespace lq
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Obsolete 1-based subroutine
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void lqdecompositionunpacked(ap::template_2d_array< amp::ampf<Precision> > a,
         int m,

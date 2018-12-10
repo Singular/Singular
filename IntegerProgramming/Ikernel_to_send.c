@@ -1,60 +1,60 @@
-/*---------------------------------------------------------------------------
-/                         Integral Kernel using LLL Algorithm               |
-/                                                                           |
-/                           Implemented by                                  |
-/            Alfredo Sánchez-Navarro and Alberto Vigneron-Tenorio           |
-/            alfredo.sanchez@uca.es  alberto.vigneron@uca.es,               |
-/                 E.U.E.Empresariales de Jerez.                             |
-/                   Universidad de Cádiz                                    |
-/                   Porvera 54.                                             |
-/                 Jerez de la Frontera (Cádiz, Spain)                       |
-/                                                                           |
-/                                                                           |
-/ This application computes the LLL-reduced basis of the Z-kernel of a      |
-/ matrix using the algorithm 2.7.2 appeared in:                             |
-/ Cohen, H. A course in computational algebraic number theory.              |
-/ GTM 138, Springer 1996.                                                   |
-/                                                                           |
-/ The Input is a file with the structure:                                   |
-/ Number of coordinates, Number of vectors,                                 |
-/ b11 b12 b13 ... b1C                                                       |
-/ b21 b22 b23 ... b2C                                                       |
-/       ...                                                                 |
-/ bF1 bF2 bF3 ... bFC                                                       |
-/                                                                           |
-/ All these inputs are integer numbers.                                     |
-/                                                                           |
-/ The Output is a LLL-reduced basis of the kernel of the matrix            |
-/ b11 b21 b31 ... bF1                                                       |
-/ b12 b22 b32 ... bF2                                                       |
-/       ...                                                                 |
-/ b1C b2C bC3 ... bFC                                                       |
-/                                                                           |
-/                                                                           |
-/ All these outputs are integer numbers.                                    |
----------------------------------------------------------------------------*/
+/// ---------------------------------------------------------------------------
+///                         Integral Kernel using LLL Algorithm               |
+///                                                                           |
+///                           Implemented by                                  |
+///            Alfredo Sánchez-Navarro and Alberto Vigneron-Tenorio           |
+///            alfredo.sanchez@uca.es  alberto.vigneron@uca.es,               |
+///                 E.U.E.Empresariales de Jerez.                             |
+///                   Universidad de Cádiz                                    |
+///                   Porvera 54.                                             |
+///                 Jerez de la Frontera (Cádiz, Spain)                       |
+///                                                                           |
+///                                                                           |
+/// This application computes the LLL-reduced basis of the Z-kernel of a      |
+/// matrix using the algorithm 2.7.2 appeared in:                             |
+/// Cohen, H. A course in computational algebraic number theory.              |
+/// GTM 138, Springer 1996.                                                   |
+///                                                                           |
+/// The Input is a file with the structure:                                   |
+/// Number of coordinates, Number of vectors,                                 |
+/// b11 b12 b13 ... b1C                                                       |
+/// b21 b22 b23 ... b2C                                                       |
+///       ...                                                                 |
+/// bF1 bF2 bF3 ... bFC                                                       |
+///                                                                           |
+/// All these inputs are integer numbers.                                     |
+///                                                                           |
+/// The Output is a LLL-reduced basis of the kernel of the matrix            |
+/// b11 b21 b31 ... bF1                                                       |
+/// b12 b22 b32 ... bF2                                                       |
+///       ...                                                                 |
+/// b1C b2C bC3 ... bFC                                                       |
+///                                                                           |
+///                                                                           |
+/// All these outputs are integer numbers.                                    |
+///----------------------------------------------------------------------------
 
 
-/*---------------------------------------------------------------------------
-| EXAMPLE:                                                                  |
-|                                                                           |
-| Let prf be the file:                                                      |
-| 4,3                                                                       |
-| 1 -3 2                                                                    |
-| 1 0 -1                                                                    |
-| 2 -4 2                                                                    |
-| 4 -7 3                                                                    |
-| then:                                                                     |
-|                                                                           |
-| ./ikernel <prf                                                            |
-| Output:                                                                   |
-|  -4  -2  3  0                                                             |
-|  -9  -5  5  1                                                             |
-|                                                                           |
-| The output is a LLL-reduced basis of the Z-kernel of ZxZxZxZ generated by |
-| (-4,-2,3,0), (-9,-5,5,1)                                                  |
-|                                                                           |
----------------------------------------------------------------------------*/
+/// ---------------------------------------------------------------------------
+/// | EXAMPLE:                                                                  |
+/// |                                                                           |
+/// | Let prf be the file:                                                      |
+/// | 4,3                                                                       |
+/// | 1 -3 2                                                                    |
+/// | 1 0 -1                                                                    |
+/// | 2 -4 2                                                                    |
+/// | 4 -7 3                                                                    |
+/// | then:                                                                     |
+/// |                                                                           |
+/// | .///ikernel <prf                                                            |
+/// | Output:                                                                   |
+/// |  -4  -2  3  0                                                             |
+/// |  -9  -5  5  1                                                             |
+/// |                                                                           |
+/// | The output is a LLL-reduced basis of the Z-kernel of ZxZxZxZ generated by |
+/// | (-4,-2,3,0), (-9,-5,5,1)                                                  |
+/// |                                                                           |
+/// ----------------------------------------------------------------------------
 
 
 #include <stdio.h>
@@ -66,7 +66,7 @@
 
 #define llln_max(a,b) (a > b ? a : b)
 
-/* Global variables */
+///* Global variables *///
 mpz_t *llln_d;
 int *llln_f;
 mpz_t **llln_lambda;
@@ -78,7 +78,8 @@ void llln_swapk (int k, int kmax, int C, int F);
 void llln_redi (int k, int l, int C, int F);
 void llln_test (int *k, int kma, int C, int n);
 void llln_producto (mpz_t *a, mpz_t *f, int n, mpz_t *prod);
-//int llln_max (int a, int b);
+
+///int llln_max (int a, int b);
 
 void main (void)
 {
@@ -225,12 +226,12 @@ void main (void)
   delete[]llln_b;
 }
 
-/*---------------------------------------------------------------------------
-| proc_entrada {}:                             |
-| Read the input file.                           |
-|___________________________________________________________________________|*/
+///---------------------------------------------------------------------------
+///| proc_entrada {}:                             |
+///| Read the input file.                           |
+///|___________________________________________________________________________|
 
-mpz_t **llln_proc_entrada (int *F, int *C) /* Inputs */
+mpz_t **llln_proc_entrada (int *F, int *C) ///* Inputs *///
 {
   int numF, numC;
   int i, j, c;
@@ -255,11 +256,11 @@ mpz_t **llln_proc_entrada (int *F, int *C) /* Inputs */
         do {
           aux[c++]=caux;
           if (c==tamano) {
-            char *nuevo=new char[3*tamano/2];
+            char *nuevo=new char[3*tamano///2];
             memcpy (nuevo, aux, tamano);
             delete[] aux;
             aux=nuevo;
-            tamano=3*tamano/2;
+            tamano=3*tamano///2;
           }
           caux=getc(stdin);
         }
@@ -279,10 +280,10 @@ mpz_t **llln_proc_entrada (int *F, int *C) /* Inputs */
   return (base);
 }
 
-/*---------------------------------------------------------------------------
-| llln_producto {}:                              |
-| Multiply the integer vectors a and f with n coordinates.          |
-|___________________________________________________________________________|*/
+/// ---------------------------------------------------------------------------
+/// | llln_producto {}:                              |
+/// | Multiply the integer vectors a and f with n coordinates.          |
+/// |___________________________________________________________________________|
 
 void  llln_producto (mpz_t * a, mpz_t * f, int n, mpz_t * prod)
 {
@@ -315,10 +316,10 @@ void llln_test (int *k, int kma, int C, int n)
 }
 
 
-/*---------------------------------------------------------------------------
-| lll_redi {}:                                                              |
-| Make some changes in global variables.                                    |
-|___________________________________________________________________________|*/
+///---------------------------------------------------------------------------
+/// | lll_redi {}:                                                              |
+/// | Make some changes in global variables.                                    |
+/// |___________________________________________________________________________|
 
 
 void llln_redi (int k, int l, int C, int F)
@@ -362,10 +363,10 @@ void llln_redi (int k, int l, int C, int F)
 }
 
 
-/*---------------------------------------------------------------------------
-| lll_swapi {}:                                                             |
-| Exchange some global variables                                            |
-|___________________________________________________________________________|*/
+///---------------------------------------------------------------------------
+///| lll_swapi {}:                                                             |
+///| Exchange some global variables                                            |
+///|___________________________________________________________________________|
 
 
 void llln_swapk (int k, int kmax, int C, int F)

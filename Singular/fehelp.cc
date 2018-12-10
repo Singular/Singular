@@ -1,8 +1,14 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: help system
+
+
 */
 
 #include "kernel/mod2.h"
@@ -30,11 +36,15 @@
 #include "tok.h"
 #include "fehelp.h"
 
-/*****************************************************************
+/*!
+!
+****************************************************************
  *
  * Declarations: Data  structures
  *
- *****************************************************************/
+ ****************************************************************
+
+*/
 #define MAX_HE_ENTRY_LENGTH 160
 typedef struct
 {
@@ -58,11 +68,15 @@ typedef struct
 } heBrowser_s;
 typedef heBrowser_s * heBrowser;
 
-/*****************************************************************
+/*!
+!
+****************************************************************
  *
  * Declarations: Local functions
  *
- *****************************************************************/
+ ****************************************************************
+
+*/
 static char* strclean(char* str);
 static BOOLEAN heKey2Entry(char* filename, char* key, heEntry hentry);
 static int heReKey2Entry (char* filename, char* key, heEntry hentry);
@@ -81,20 +95,28 @@ static heBrowser heCurrentHelpBrowser = NULL;
 static int heCurrentHelpBrowserIndex= -1;
 
 
-/*****************************************************************
+/*!
+!
+****************************************************************
  *
  * Definition: available help browsers
  *
- *****************************************************************/
+ ****************************************************************
+
+*/
 // order is important -- first possible help is chosen
 // moved to LIB/help.cnf
 static heBrowser_s *heHelpBrowsers=NULL;
 
-/*****************************************************************
+/*!
+!
+****************************************************************
  *
  * Implementation: public function
  *
- *****************************************************************/
+ ****************************************************************
+
+*/
 void feHelp(char *str)
 {
   str = strclean(str);
@@ -108,7 +130,11 @@ void feHelp(char *str)
 
   heEntry_s hentry;
   memset(&hentry,0,sizeof(hentry));
-  char* idxfile = feResource('x' /*"IdxFile"*/);
+  char* idxfile = feResource('x' /*!
+!
+"IdxFile"
+
+*/);
 
   // Try exact match of help string with key in index
   if (!key_is_regexp && (idxfile != NULL) && heKey2Entry(idxfile, str, &hentry))
@@ -363,11 +389,15 @@ void  feStringAppendBrowsers(int warn)
 }
 
 
-/*****************************************************************
+/*!
+!
+****************************************************************
  *
  * Implementation: local function
  *
- *****************************************************************/
+ ****************************************************************
+
+*/
 // Remove whitspaces from beginning and end, return NULL if only whitespaces
 static char* strclean(char* str)
 {
@@ -413,7 +443,11 @@ static BOOLEAN heKey2Entry(char* filename, char* key, heEntry hentry)
   {
     if (c < k)
     {
-      /* Skip line */
+      /*!
+!
+ Skip line 
+
+*/
       while (getc(fd) != '\n') {};
       if (i)
       {
@@ -647,7 +681,11 @@ static BOOLEAN heOnlineHelp(char* s)
       return TRUE;
     }
     else Print("package %s not found\n",s);
-    return TRUE; /* do not search the manual */
+    return TRUE; /*!
+!
+ do not search the manual 
+
+*/
   }
   h=IDROOT->get(s,myynest);
   // try help for a procedure
@@ -766,11 +804,15 @@ static long heKeyChksum(char* key)
   return 0;
 }
 
-/*****************************************************************
+/*!
+!
+****************************************************************
  *
  * Implementation : Help Browsers
  *
- *****************************************************************/
+ ****************************************************************
+
+*/
 
 static BOOLEAN feHelpCalled = FALSE;
 
@@ -827,24 +869,48 @@ static BOOLEAN heGenInit(int warn, int br)
     {
       case '#': break;
       case ' ': break;
-      case 'i': /* singular.hlp */
-      case 'x': /* singular.idx */
-      case 'h': /* html dir */
+      case 'i': /*!
+!
+ singular.hlp 
+
+*/
+      case 'x': /*!
+!
+ singular.idx 
+
+*/
+      case 'h': /*!
+!
+ html dir 
+
+*/
                if (feResource(*p, warn) == NULL)
                {
                  if (warn) Warn("resource `%c` not found",*p);
                  return FALSE;
                }
                break;
-      case 'D': /* DISPLAY */
+      case 'D': /*!
+!
+ DISPLAY 
+
+*/
                if (getenv("DISPLAY") == NULL)
                {
                  if (warn) WarnS("resource `D` not found");
                  return FALSE;
                }
                break;
-      case 'E': /* executable: E:xterm: */
-      case 'O': /* OS: O:ix86Mac-darwin/ppcMac-darwin: */
+      case 'E': /*!
+!
+ executable: E:xterm: 
+
+*/
+      case 'O': /*!
+!
+ OS: O:ix86Mac-darwin/ppcMac-darwin: 
+
+*/
                {
                  char name[128];
                  char exec[128];
@@ -890,17 +956,41 @@ static void heGenHelp(heEntry hentry, int br)
       p++;
       switch (*p)
       {
-        case 'f': /* local html:file */
-        case 'h': /* local html:URL */
-        case 'H': /* www html */
+        case 'f': /*!
+!
+ local html:file 
+
+*/
+        case 'h': /*!
+!
+ local html:URL 
+
+*/
+        case 'H': /*!
+!
+ www html 
+
+*/
                  {
                    char temp[256];
-                   char *htmldir = feResource('h' /*"HtmlDir"*/);
+                   char *htmldir = feResource('h' /*!
+!
+"HtmlDir"
+
+*/);
                    if ((*p=='h')&&(htmldir!=NULL))
                      strcat(sys,"file://localhost");
                    else if ((*p=='H')||(htmldir==NULL))
-                     htmldir = feResource('u' /* %H -> "ManualUrl"*/);
-                     /* always defined */
+                     htmldir = feResource('u' /*!
+!
+ %H -> "ManualUrl"
+
+*/);
+                     /*!
+!
+ always defined 
+
+*/
                    if (hentry != NULL && *(hentry->url) != '\0')
                    #ifdef HAVE_VSNPRINTF
                    {
@@ -966,7 +1056,11 @@ static void heGenHelp(heEntry hentry, int br)
                    i=strlen(sys);
                    break;
                  }
-        case 'i': /* singular.hlp */
+        case 'i': /*!
+!
+ singular.hlp 
+
+*/
                  {
                    char *i_res=feResource('i');
                    if (i_res!=NULL) strcat(sys,i_res);
@@ -978,7 +1072,11 @@ static void heGenHelp(heEntry hentry, int br)
                    i=strlen(sys);
                    break;
                  }
-        case 'n': /* info node */
+        case 'n': /*!
+!
+ info node 
+
+*/
                  {
                    char temp[256];
                    if ((hentry!=NULL) && (*(hentry->node) != '\0'))
@@ -991,7 +1089,11 @@ static void heGenHelp(heEntry hentry, int br)
                    i=strlen(sys);
                    break;
                  }
-        case 'v': /* version number*/
+        case 'v': /*!
+!
+ version number
+
+*/
                  {
                    char temp[256];
                    sprintf(temp,"%d-%d-%d",SINGULAR_VERSION/1000,
@@ -1015,20 +1117,48 @@ static void heGenHelp(heEntry hentry, int br)
   (void) system(sys);
 }
 
-static BOOLEAN heDummyInit(int /*warn*/, int /*br*/)
+static BOOLEAN heDummyInit(int /*!
+!
+warn
+
+*/, int /*!
+!
+br
+
+*/)
 {
   return TRUE;
 }
-static void heDummyHelp(heEntry /*hentry*/, int /*br*/)
+static void heDummyHelp(heEntry /*!
+!
+hentry
+
+*/, int /*!
+!
+br
+
+*/)
 {
   WerrorS("No functioning help browser available.");
 }
 
-static BOOLEAN heEmacsInit(int /*warn*/, int /*br*/)
+static BOOLEAN heEmacsInit(int /*!
+!
+warn
+
+*/, int /*!
+!
+br
+
+*/)
 {
   return TRUE;
 }
-static void heEmacsHelp(heEntry hentry, int /*br*/)
+static void heEmacsHelp(heEntry hentry, int /*!
+!
+br
+
+*/)
 {
   WarnS("Your help command could not be executed. Use");
   Warn("C-h C-s %s",
@@ -1037,7 +1167,11 @@ static void heEmacsHelp(heEntry hentry, int /*br*/)
   WarnS("information on Singular running under Emacs, type C-h m.");
 }
 static int singular_manual(char *str, BOOLEAN isIndexEntry);
-static void heBuiltinHelp(heEntry hentry, int /*br*/)
+static void heBuiltinHelp(heEntry hentry, int /*!
+!
+br
+
+*/)
 {
   char* node = omStrDup(hentry != NULL && *(hentry->key) != '\0' ?
                        hentry->key : "Top");
@@ -1046,7 +1180,11 @@ static void heBuiltinHelp(heEntry hentry, int /*br*/)
 }
 
 
-/* ========================================================================== */
+/*!
+!
+ ========================================================================== 
+
+*/
 // old, stupid builtin_help
 // This could be implemented much more clever, but I'm too lazy to do this now
 //
@@ -1063,7 +1201,9 @@ static inline char tolow(char p)
   return p;
 }
 
-/*************************************************/
+/*!
+!
+************************************************/
 static int show(unsigned long offset, char *close)
 { char buffer[BUF_LEN+1];
   int  lines = 0;
@@ -1103,7 +1243,9 @@ static int show(unsigned long offset, char *close)
   return HELP_OK;
 }
 
-/*************************************************/
+/*!
+!
+************************************************/
 static int singular_manual(char *str, BOOLEAN isIndexEntry)
 { FILE *index=NULL;
   unsigned long offset;
@@ -1121,7 +1263,11 @@ static int singular_manual(char *str, BOOLEAN isIndexEntry)
 
   if (!isIndexEntry)
   {
-    for(p=str; *p; p++) *p = tolow(*p);/* */
+    for(p=str; *p; p++) *p = tolow(*p);/*!
+!
+ 
+
+*/
     do
     {
       p--;
@@ -1142,12 +1288,20 @@ static int singular_manual(char *str, BOOLEAN isIndexEntry)
 
   while(!feof(index))
   {
-    if (fgets(buffer, BUF_LEN, index)==NULL) break; /*fill buffer */
+    if (fgets(buffer, BUF_LEN, index)==NULL) break; /*!
+!
+fill buffer 
+
+*/
     if (si_sscanf(buffer, "Node:%[^\177]\177%ld\n", Index, &offset)!=2)
       continue;
     if (!isIndexEntry)
     {
-      for(p=Index; *p; p++) *p = tolow(*p);/* */
+      for(p=Index; *p; p++) *p = tolow(*p);/*!
+!
+ 
+
+*/
       (void)strcat(Index, " ");
       if( strstr(Index, String)!=NULL)
       {
@@ -1171,4 +1325,6 @@ static int singular_manual(char *str, BOOLEAN isIndexEntry)
   }
   return HELP_OK;
 }
-/*************************************************/
+/*!
+!
+************************************************/

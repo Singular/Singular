@@ -1,4 +1,5 @@
-/*************************************************************************
+/*!
+************************************************************************
 Copyright (c) 1992-2007 The University of Tennessee.  All rights reserved.
 
 Contributors:
@@ -34,7 +35,8 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*************************************************************************/
+************************************************************************
+*/
 
 #ifndef _reflections_h
 #define _reflections_h
@@ -67,7 +69,8 @@ namespace reflections
         ap::template_1d_array< amp::ampf<Precision> >& work);
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Generation of an elementary reflection transformation
 
     The subroutine generates elementary reflection H of order N, so that, for
@@ -107,7 +110,8 @@ namespace reflections
          Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
          Courant Institute, Argonne National Lab, and Rice University
          September 30, 1994
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void generatereflection(ap::template_1d_array< amp::ampf<Precision> >& x,
         int n,
@@ -175,7 +179,8 @@ namespace reflections
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Application of an elementary reflection to a rectangular matrix of size MxN
 
     The algorithm pre-multiplies the matrix by an elementary reflection transformation
@@ -202,7 +207,8 @@ namespace reflections
          Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
          Courant Institute, Argonne National Lab, and Rice University
          September 30, 1994
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void applyreflectionfromtheleft(ap::template_2d_array< amp::ampf<Precision> >& c,
         amp::ampf<Precision> tau,
@@ -248,7 +254,8 @@ namespace reflections
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Application of an elementary reflection to a rectangular matrix of size MxN
 
     The algorithm post-multiplies the matrix by an elementary reflection transformation
@@ -275,7 +282,8 @@ namespace reflections
          Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
          Courant Institute, Argonne National Lab, and Rice University
          September 30, 1994
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void applyreflectionfromtheright(ap::template_2d_array< amp::ampf<Precision> >& c,
         amp::ampf<Precision> tau,

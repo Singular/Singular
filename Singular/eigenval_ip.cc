@@ -1,8 +1,16 @@
-/*****************************************
+/*!
+!
+****************************************
 *  Computer Algebra System SINGULAR      *
-*****************************************/
-/*
+****************************************
+
+*/
+/*!
+!
+
 * ABSTRACT: eigenvalues of constant square matrices
+
+
 */
 
 
@@ -282,4 +290,8 @@ BOOLEAN evEigenvals(leftv res,leftv h)
   return TRUE;
 }
 
-#endif /* HAVE_EIGENVAL */
+#endif /*!
+!
+ HAVE_EIGENVAL 
+
+*/

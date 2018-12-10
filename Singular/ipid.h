@@ -1,11 +1,17 @@
 #ifndef IPID_H
 #define IPID_H
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/*
+/*!
+!
+
 * ABSTRACT: identfier handling
+
+
 */
 #include "Singular/idrec.h"
 #include "Singular/subexpr.h"
@@ -23,16 +29,40 @@ typedef ip_command *       command;
 
 struct sip_command
 {
-  sleftv arg1; /*arg1 to build_in, proc to proc_call*/
-  sleftv arg2; /*NULL or arg2 to build_in, args to proc_call*/
-  sleftv arg3; /*NULL or arg3*/
-  short argc; /*0,1,2,3 to build_in, -1 otherwise*/
-  short op;   /* build_in or PROC_CMD*/
+  sleftv arg1; /*!
+!
+arg1 to build_in, proc to proc_call
+
+*/
+  sleftv arg2; /*!
+!
+NULL or arg2 to build_in, args to proc_call
+
+*/
+  sleftv arg3; /*!
+!
+NULL or arg3
+
+*/
+  short argc; /*!
+!
+0,1,2,3 to build_in, -1 otherwise
+
+*/
+  short op;   /*!
+!
+ build_in or PROC_CMD
+
+*/
 };
 
 struct sip_package
 {
-  idhdl         idroot; /* local objects */
+  idhdl         idroot; /*!
+!
+ local objects 
+
+*/
   char          *libname;
   short         ref;
   language_defs language;
@@ -75,16 +105,32 @@ typedef struct
 
 
 extern idhdl      currRingHdl;
-/* ================================================================== */
-/* module support */
+/*!
+!
+ ================================================================== 
+
+*/
+/*!
+!
+ module support 
+
+*/
 typedef int (*SModulFunc_t)(SModulFunctions*);
 BOOLEAN load_builtin(const char *newlib, BOOLEAN autoexport, SModulFunc_t init);
 void module_help_main(const char *newlib,const char *help);
 void module_help_proc(const char *newlib,const char *p, const char *help);
 
-/* ================================================================== */
+/*!
+!
+ ================================================================== 
 
-/*extern ring     currRing;  in ring.h */
+*/
+
+/*!
+!
+extern ring     currRing;  in ring.h 
+
+*/
 
 idhdl enterid(const char * a, int lev, int t, idhdl* root, BOOLEAN init=TRUE, BOOLEAN serach=TRUE);
 idhdl ggetid(const char *n);
@@ -141,7 +187,11 @@ extern omBin sleftv_bin;
 
 extern coeffs coeffs_BIGINT;
 
-/* options */
+/*!
+!
+ options 
+
+*/
 struct soptionStruct
 {
   const char * name;

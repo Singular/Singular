@@ -1,10 +1,16 @@
 #ifndef LISTS_H
 #define LISTS_H
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: handling of the list type
+
+
 */
 #ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
@@ -45,9 +51,21 @@ class slists
       omFreeBin((ADDRESS)this,slists_bin);
     }
     INLINE_THIS void Init(int l=0);
-    int    nr; /* the number of elements in the list -1 */
-               /* -1: empty list */
-    sleftv  *m;  /* field of sleftv */
+    int    nr; /*!
+!
+ the number of elements in the list -1 
+
+*/
+               /*!
+!
+ -1: empty list 
+
+*/
+    sleftv  *m;  /*!
+!
+ field of sleftv 
+
+*/
 };
 
 typedef slists *           lists;

@@ -15,23 +15,51 @@ static int blackboxTableCnt=0;
 #define BLACKBOX_OFFSET (MAX_TOK+1)
 blackbox* getBlackboxStuff(const int t)
 {
-  if (t>MAX_TOK)  /*MAX_TOK+1 is BLACKBOX_OFFSET*/
+  if (t>MAX_TOK)  /*!
+!
+MAX_TOK+1 is BLACKBOX_OFFSET
+
+*/
     return (blackboxTable[t-BLACKBOX_OFFSET]);
   else
     return NULL;
 }
 
 
-void blackbox_default_destroy(blackbox */*b*/, void */*d*/)
+void blackbox_default_destroy(blackbox 
+
+*/*b
+
+*/, void 
+
+*/*d
+
+*/)
 {
   WerrorS("missing blackbox_destroy");
 }
-char *blackbox_default_String(blackbox */*b*/,void */*d*/)
+char *blackbox_default_String(blackbox 
+
+*/*b
+
+*/,void 
+
+*/*d
+
+*/)
 {
   WerrorS("missing blackbox_String");
   return omStrDup("");
 }
-void *blackbox_default_Copy(blackbox */*b*/,void */*d*/)
+void *blackbox_default_Copy(blackbox 
+
+*/*b
+
+*/,void 
+
+*/*d
+
+*/)
 {
   WerrorS("missing blackbox_Copy");
   return NULL;
@@ -42,18 +70,46 @@ void blackbox_default_Print(blackbox *b,void *d)
   PrintS(s);
   omFree(s);
 }
-void *blackbox_default_Init(blackbox */*b*/)
+void *blackbox_default_Init(blackbox 
+
+*/*b
+
+*/)
 {
   return NULL;
 }
 
-BOOLEAN blackbox_default_serialize(blackbox */*b*/, void */*d*/, si_link /*f*/)
+BOOLEAN blackbox_default_serialize(blackbox 
+
+*/*b
+
+*/, void 
+
+*/*d
+
+*/, si_link /*!
+!
+f
+
+*/)
 {
   WerrorS("blackbox_serialize is not implemented");
   return TRUE;
 }
 
-BOOLEAN blackbox_default_deserialize(blackbox **/*b*/, void **/*d*/, si_link /*f*/)
+BOOLEAN blackbox_default_deserialize(blackbox **/*!
+!
+b
+
+*/, void **/*!
+!
+d
+
+*/, si_link /*!
+!
+f
+
+*/)
 {
   WerrorS("blackbox_deserialize is not implemented");
   return TRUE;
@@ -78,12 +134,48 @@ BOOLEAN blackboxDefaultOp1(int op,leftv l, leftv r)
   return TRUE;
 }
 
-BOOLEAN blackboxDefaultOp2(int /*op*/,leftv /*l*/, leftv /*r1*/, leftv /*r2*/)
+BOOLEAN blackboxDefaultOp2(int /*!
+!
+op
+
+*/,leftv /*!
+!
+l
+
+*/, leftv /*!
+!
+r1
+
+*/, leftv /*!
+!
+r2
+
+*/)
 {
   return TRUE;
 }
 
-BOOLEAN blackboxDefaultOp3(int /*op*/,leftv /*l*/, leftv /*r1*/,leftv /*r2*/, leftv /*r3*/)
+BOOLEAN blackboxDefaultOp3(int /*!
+!
+op
+
+*/,leftv /*!
+!
+l
+
+*/, leftv /*!
+!
+r1
+
+*/,leftv /*!
+!
+r2
+
+*/, leftv /*!
+!
+r3
+
+*/)
 {
   return TRUE;
 }

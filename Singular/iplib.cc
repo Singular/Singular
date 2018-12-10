@@ -1,8 +1,14 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: interpreter: LIB and help
+
+
 */
 
 #include "kernel/mod2.h"
@@ -44,10 +50,18 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport);
 
 #ifdef HAVE_LIBPARSER
 #  include "libparse.h"
-#else /* HAVE_LIBPARSER */
+#else /*!
+!
+ HAVE_LIBPARSER 
+
+*/
 procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
               const char *procname, int line, long pos, BOOLEAN pstatic=FALSE);
-#endif /* HAVE_LIBPARSER */
+#endif /*!
+!
+ HAVE_LIBPARSER 
+
+*/
 
 extern int iiArithAddCmd(const char *szName, short nAlias, short nTokval,
                          short nToktype, short nPos);
@@ -67,8 +81,12 @@ libstackv library_stack;
 //int IsCmd(char *n, int tok);
 char mytolower(char c);
 
-/*2
+/*!
+!
+2
 * return TRUE if the libray libname is already loaded
+
+
 */
 BOOLEAN iiGetLibStatus(char *lib)
 {
@@ -84,12 +102,16 @@ BOOLEAN iiGetLibStatus(char *lib)
   return (strcmp(lib,IDPACKAGE(hl)->libname)==0);
 }
 
-/*2
+/*!
+!
+2
 * given a line 'proc[ ]+{name}[ \t]*'
 * return a pointer to name and set the end of '\0'
 * changes the input!
 * returns: e: pointer to 'end of name'
 *          ct: changed char at the end of s
+
+
 */
 char* iiProcName(char *buf, char & ct, char* &e)
 {
@@ -102,8 +124,12 @@ char* iiProcName(char *buf, char & ct, char* &e)
   return s;
 }
 
-/*2
+/*!
+!
+2
 * given a line with args, return the argstr
+
+
 */
 char * iiProcArgs(char *e,BOOLEAN withParenth)
 {
@@ -158,7 +184,11 @@ char * iiProcArgs(char *e,BOOLEAN withParenth)
     {
       *e='\0';
       // check for space:
-      if ((int)strlen(argstr)+12 /* parameter + ;*/ +(int)strlen(s)>= argstrlen)
+      if ((int)strlen(argstr)+12 /*!
+!
+ parameter + ;
+
+*/ +(int)strlen(s)>= argstrlen)
       {
         argstrlen*=2;
         char *a=(char *)omAlloc( argstrlen);
@@ -179,7 +209,9 @@ char * iiProcArgs(char *e,BOOLEAN withParenth)
   return argstr;
 }
 
-/*2
+/*!
+!
+2
 * locate `procname` in lib `libname` and find the part `part`:
 *  part=0: help, between, but excluding the line "proc ..." and "{...":
 *    => return
@@ -187,6 +219,8 @@ char * iiProcArgs(char *e,BOOLEAN withParenth)
 *    => set pi->data.s.body, return NULL
 *  part=2: example, between, but excluding the line "exapmle {..." and "}":
 *    => return
+
+
 */
 char* iiGetLibProcBuffer(procinfo *pi, int part )
 {
@@ -274,7 +308,11 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
       return NULL; // example part does not exist
     // load example
     fseek(fp, pi->data.s.example_start, SEEK_SET);
-    /*char *dummy=*/ (void) fgets(buf, sizeof(buf), fp); // skip line with "example"
+    /*!
+!
+char *dummy=
+
+*/ (void) fgets(buf, sizeof(buf), fp); // skip line with "example"
     procbuflen = pi->data.s.proc_end - pi->data.s.example_start - strlen(buf);
     //Print("Example=%ld-%ld=%d\n", pi->data.s.proc_end,
     //  pi->data.s.example_start, procbuflen);
@@ -294,7 +332,15 @@ BOOLEAN iiAllStart(procinfov pi, char *p,feBufferTypes t, int l)
   // see below:
   BITSET save1=si_opt_1;
   BITSET save2=si_opt_2;
-  newBuffer( omStrDup(p /*pi->data.s.body*/), t /*BT_proc*/,
+  newBuffer( omStrDup(p /*!
+!
+pi->data.s.body
+
+*/), t /*!
+!
+BT_proc
+
+*/,
                pi, l );
   BOOLEAN err=yyparse();
   if (sLastPrinted.rtyp!=0)
@@ -343,11 +389,15 @@ BOOLEAN iiAllStart(procinfov pi, char *p,feBufferTypes t, int l)
   }
   return err;
 }
-/*2
+/*!
+!
+2
 * start a proc
 * parameters are built as exprlist
 * TODO:interrupt
 * return FALSE on success, TRUE if an error occurs
+
+
 */
 BOOLEAN iiPStart(idhdl pn, leftv v)
 {
@@ -356,8 +406,16 @@ BOOLEAN iiPStart(idhdl pn, leftv v)
   BOOLEAN err=FALSE;
   char save_flags=0;
 
-  /* init febase ======================================== */
-  /* we do not enter this case if filename != NULL !! */
+  /*!
+!
+ init febase ======================================== 
+
+*/
+  /*!
+!
+ we do not enter this case if filename != NULL !! 
+
+*/
   if (pn!=NULL)
   {
     pi = IDPROC(pn);
@@ -375,7 +433,11 @@ BOOLEAN iiPStart(idhdl pn, leftv v)
     }
   }
   else return TRUE;
-  /* generate argument list ======================================*/
+  /*!
+!
+ generate argument list ======================================
+
+*/
   //iiCurrArgs should be NULL here, as the assignment for the parameters
   // of the prevouis call are already done befor calling another routine
   if (v!=NULL)
@@ -389,7 +451,11 @@ BOOLEAN iiPStart(idhdl pn, leftv v)
     iiCurrArgs=NULL;
   }
   iiCurrProc=pn;
-  /* start interpreter ======================================*/
+  /*!
+!
+ start interpreter ======================================
+
+*/
   myynest++;
   if (myynest > SI_MAX_NEST)
   {
@@ -468,7 +534,11 @@ static void iiShowLevRings()
   if (currRing==NULL) PrintS("curr:NULL\n");
   else                Print ("curr:%lx\n",(long)currRing);
 }
-#endif /* RDEBUG */
+#endif /*!
+!
+ RDEBUG 
+
+*/
 
 static void iiCheckNest()
 {
@@ -691,9 +761,13 @@ void* iiCallLibProcM(const char*n, void **args, int* arg_types, BOOLEAN &err)
   }
   return NULL;
 }
-/*2
+/*!
+!
+2
 * start an example (as a proc),
 * destroys the string 'example'
+
+
 */
 BOOLEAN iiEStart(char* example, procinfo *pi)
 {
@@ -759,7 +833,11 @@ iiGetBuiltinModInit(const char* libname)
 
 
 
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
 BOOLEAN iiTryLoadLib(leftv v, const char *id)
 {
   BOOLEAN LoadResult = TRUE;
@@ -803,10 +881,18 @@ BOOLEAN iiTryLoadLib(leftv v, const char *id)
   return LoadResult;
 }
 
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-/* check, if library lib has already been loaded
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
+/*!
+!
+ check, if library lib has already been loaded
    if yes, writes filename of lib into where and returns TRUE,
       no, returns FALSE
+
+
 */
 BOOLEAN iiLocateLib(const char* lib, char* where)
 {
@@ -865,7 +951,11 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN f
 
  return LoadResult;
 }
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
 static void iiCleanProcs(idhdl &root)
 {
   idhdl prev=NULL;
@@ -910,7 +1000,11 @@ static void iiRunInit(package p)
     yylineno=save;
   }
 }
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
 BOOLEAN iiLoadLIB(FILE *fp, const char *libnamebuf, const char*newlib,
              idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror)
 {
@@ -986,7 +1080,11 @@ BOOLEAN iiLoadLIB(FILE *fp, const char *libnamebuf, const char*newlib,
 }
 
 
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
 procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
               const char *procname, int, long pos, BOOLEAN pstatic)
 {
@@ -1000,7 +1098,11 @@ procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
   return(pi);
 }
 
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
 int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
                BOOLEAN(*func)(leftv res, leftv v))
 {
@@ -1085,7 +1187,11 @@ int iiAddCprocTop(const char *libname, const char *procname, BOOLEAN pstatic,
   return r;
 }
 
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
 #ifdef HAVE_DYNAMIC_LOADING
 BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
 {
@@ -1093,10 +1199,14 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
   WerrorS("mod_init: static version can not load modules");
   return TRUE;
 #else
-/*
+/*!
+!
+
   typedef int (*fktn_t)(int(*iiAddCproc)(const char *libname, const char *procname,
                                BOOLEAN pstatic,
                                BOOLEAN(*func)(leftv res, leftv v)));
+
+
 */
   SModulFunc_t fktn;
   idhdl pl;
@@ -1117,8 +1227,12 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
     Werror("'%s' is resered identifier\n", plib);
     goto load_modules_end;
   }
-  pl = basePack->idroot->get(plib,0); /* packages only in top level
-                                        (see enterid) */
+  pl = basePack->idroot->get(plib,0); /*!
+!
+ packages only in top level
+                                        (see enterid) 
+
+*/
   if ((pl!=NULL)
   &&(IDTYP(pl)==PACKAGE_CMD))
   {
@@ -1138,7 +1252,11 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
   else
   {
     pl = enterid( plib,0, PACKAGE_CMD, &IDROOT, TRUE );
-    omFree(plib); /* enterid copied plib*/
+    omFree(plib); /*!
+!
+ enterid copied plib
+
+*/
     IDPACKAGE(pl)->libname=omStrDup(newlib);
   }
   IDPACKAGE(pl)->language = LANG_C;
@@ -1176,7 +1294,11 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
         Warn("loaded %s for a different version of Singular(expected MAX_TOK: %d, got %d)",fullname,MAX_TOK,ver);
       }
       currPack->loaded=1;
-      currPack=s; /* reset currPack to previous */
+      currPack=s; /*!
+!
+ reset currPack to previous 
+
+*/
       RET=FALSE;
     }
     else
@@ -1190,18 +1312,34 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
 
   load_modules_end:
   return RET;
-#endif /*STATIC */
+#endif /*!
+!
+STATIC 
+
+*/
 }
-#endif /* HAVE_DYNAMIC_LOADING */
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+#endif /*!
+!
+ HAVE_DYNAMIC_LOADING 
+
+*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
 BOOLEAN load_builtin(const char *newlib, BOOLEAN autoexport, SModulFunc_t init)
 {
   int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
                  BOOLEAN(*func)(leftv res, leftv v));
-/*
+/*!
+!
+
   typedef int (*fktn_t)(int(*iiAddCproc)(const char *libname, const char *procname,
                                BOOLEAN pstatic,
                                BOOLEAN(*func)(leftv res, leftv v)));
+
+
 */
   // SModulFunc_t fktn;
   idhdl pl;
@@ -1245,7 +1383,11 @@ BOOLEAN load_builtin(const char *newlib, BOOLEAN autoexport, SModulFunc_t init)
 
   return FALSE;
 }
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
 void module_help_main(const char *newlib,const char *help)
 {
   char *plib = iiConvName(newlib);
@@ -1280,7 +1422,11 @@ void module_help_proc(const char *newlib,const char *p, const char *help)
     currPack=s;
   }
 }
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
 
 #ifdef HAVE_DYNAMIC_LOADING
 // loads a dynamic module from the binary path and returns a named function
@@ -1308,7 +1454,11 @@ void* binary_module_function(const char* newlib, const char* funcname)
 }
 #endif
 
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
 char mytoupper(char c)
 {
   if(c>=97 && c<=(97+26)) c-=32;
@@ -1321,7 +1471,11 @@ char mytolower(char c)
   return(c);
 }
 
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
 //#if defined(WINNT)
 //#  define  FS_SEP '\\'
 //#else
@@ -1347,8 +1501,16 @@ char *iiConvName(const char *libname)
   return(r);
 }
 
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-#if 0 /* debug only */
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
+#if 0 /*!
+!
+ debug only 
+
+*/
 void piShowProcList()
 {
   idhdl h;
@@ -1384,7 +1546,11 @@ void piShowProcList()
 }
 #endif
 
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
 //char *iiLineNo(char *procname, int lineno)
 //{
 //  char buf[256];
@@ -1396,9 +1562,17 @@ void piShowProcList()
 //  //  lineno + pi->data.s.body_lineno);
 //  return(buf);
 //}
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
 #ifdef HAVE_LIBPARSER
-void libstack::push(const char */*p*/, char *libn)
+void libstack::push(const char 
+
+*/*p
+
+*/, char *libn)
 {
   libstackv lp;
   if( !iiGetLibStatus(libn))
@@ -1419,7 +1593,11 @@ void libstack::push(const char */*p*/, char *libn)
   }
 }
 
-libstackv libstack::pop(const char */*p*/)
+libstackv libstack::pop(const char 
+
+*/*p
+
+*/)
 {
   libstackv ls = this;
   //omFree((ADDRESS)ls->libname);
@@ -1428,5 +1606,13 @@ libstackv libstack::pop(const char */*p*/)
   return(library_stack);
 }
 
-#endif /* HAVE_LIBPARSER */
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+#endif /*!
+!
+ HAVE_LIBPARSER 
+
+*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/

@@ -1,8 +1,14 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: generate iparith.inc etc.
+
+
 */
 
 #include <stdlib.h>
@@ -55,7 +61,11 @@ int produce_convert_table=0;
 // bit 5: do no try automatic conversions
 #define NO_CONVERSION    32
 
-/*=============== types =====================*/
+/*!
+!
+=============== types =====================
+
+*/
 struct _scmdnames
 {
   const char *name;
@@ -98,7 +108,11 @@ struct sValCmdM
   int p;
   short cmd;
   short res;
-  short number_of_args; /* -1: any, -2: any >0, .. */
+  short number_of_args; /*!
+!
+ -1: any, -2: any >0, .. 
+
+*/
   short valid_for;
 };
 struct sValAssign_sys
@@ -181,8 +195,14 @@ const char * Tok2Cmdname(int tok)
   return cmds[0].name;
   #endif
 }
-/*---------------------------------------------------------------------*/
-/**
+/*!
+!
+---------------------------------------------------------------------
+
+*/
+/*!
+!
+*
  * @brief compares to entry of cmdsname-list
 
  @param[in] a
@@ -190,7 +210,11 @@ const char * Tok2Cmdname(int tok)
 
  @return <ReturnValue>
 **/
-/*---------------------------------------------------------------------*/
+/*!
+!
+---------------------------------------------------------------------
+
+*/
 static int _gentable_sort_cmds( const void *a, const void *b )
 {
   cmdnames *pCmdL = (cmdnames*)a;
@@ -198,23 +222,43 @@ static int _gentable_sort_cmds( const void *a, const void *b )
 
   if(a==NULL || b==NULL)             return 0;
 
-  /* empty entries goes to the end of the list for later reuse */
+  /*!
+!
+ empty entries goes to the end of the list for later reuse 
+
+*/
   if(pCmdL->name==NULL) return 1;
   if(pCmdR->name==NULL) return -1;
 
-  /* $INVALID$ must come first */
+  /*!
+!
+ $INVALID$ must come first 
+
+*/
   if(strcmp(pCmdL->name, "$INVALID$")==0) return -1;
   if(strcmp(pCmdR->name, "$INVALID$")==0) return  1;
 
-  /* tokval=-1 are reserved names at the end */
+  /*!
+!
+ tokval=-1 are reserved names at the end 
+
+*/
   if (pCmdL->tokval==-1)
   {
     if (pCmdR->tokval==-1)
        return strcmp(pCmdL->name, pCmdR->name);
-    /* pCmdL->tokval==-1, pCmdL goes at the end */
+    /*!
+!
+ pCmdL->tokval==-1, pCmdL goes at the end 
+
+*/
     return 1;
   }
-  /* pCmdR->tokval==-1, pCmdR goes at the end */
+  /*!
+!
+ pCmdR->tokval==-1, pCmdR goes at the end 
+
+*/
   if(pCmdR->tokval==-1) return -1;
 
   return strcmp(pCmdL->name, pCmdR->name);
@@ -227,11 +271,19 @@ static int _texi_sort_cmds( const void *a, const void *b )
 
   if(a==NULL || b==NULL)             return 0;
 
-  /* empty entries goes to the end of the list for later reuse */
+  /*!
+!
+ empty entries goes to the end of the list for later reuse 
+
+*/
   if(pCmdL->name==NULL) return 1;
   if(pCmdR->name==NULL) return -1;
 
-  /* $INVALID$ must come first */
+  /*!
+!
+ $INVALID$ must come first 
+
+*/
   if(strcmp(pCmdL->name, "$INVALID$")==0) return -1;
   if(strcmp(pCmdR->name, "$INVALID$")==0) return  1;
   char *ls=strdup(pCmdL->name);
@@ -241,23 +293,39 @@ static int _texi_sort_cmds( const void *a, const void *b )
   s=rs;
   while (*s) { *s=tolower(*s); s++; }
 
-  /* tokval=-1 are reserved names at the end */
+  /*!
+!
+ tokval=-1 are reserved names at the end 
+
+*/
   if (pCmdL->tokval==-1)
   {
     if (pCmdR->tokval==-1)
        { int r=strcmp(ls,rs); free(ls); free(rs); return r; }
-    /* pCmdL->tokval==-1, pCmdL goes at the end */
+    /*!
+!
+ pCmdL->tokval==-1, pCmdL goes at the end 
+
+*/
     free(ls);free(rs);
     return 1;
   }
-  /* pCmdR->tokval==-1, pCmdR goes at the end */
+  /*!
+!
+ pCmdR->tokval==-1, pCmdR goes at the end 
+
+*/
   if(pCmdR->tokval==-1)
   { free(ls);free(rs);return -1;}
 
   { int r=strcmp(ls,rs); free(ls); free(rs); return r; }
 }
 
-/*generic*/
+/*!
+!
+generic
+
+*/
 const char * iiTwoOps(int t)
 {
   if (t<127)
@@ -293,10 +361,14 @@ const char * iiTwoOps(int t)
 //
 // automatic conversions:
 //
-/*2
+/*!
+!
+2
 * try to convert 'inputType' in 'outputType'
 * return 0 on failure, an index (<>0) on success
 * GENTABLE variant!
+
+
 */
 int iiTestConvert (int inputType, int outputType)
 {
@@ -340,10 +412,16 @@ void ttGen1()
   FILE *outfile = fopen(iparith_inc,"w");
   int i,j,l1=0,l2=0;
   fprintf(outfile,
-  "/****************************************\n"
+  "/*!
+!
+***************************************\n"
   "*  Computer Algebra System SINGULAR     *\n"
   "****************************************/\n\n");
-/*-------------------------------------------------------------------*/
+/*!
+!
+-------------------------------------------------------------------
+
+*/
   fprintf(outfile,"// syntax table for Singular\n//\n");
   fprintf(outfile,"// - search for an exact match of the argument types\n");
   fprintf(outfile,"// - otherwise search for the first possibility\n");
@@ -379,7 +457,11 @@ void ttGen1()
     fprintf(outfile,"\n");
     i++;
   }
-  fprintf(outfile,"/*---------------------------------------------*/\n");
+  fprintf(outfile,"/*!
+!
+---------------------------------------------
+
+*/\n");
   i=0;
   while ((op=dArith2[i].cmd)!=0)
   {
@@ -411,7 +493,11 @@ void ttGen1()
     fprintf(outfile,"\n");
     i++;
   }
-  fprintf(outfile,"/*---------------------------------------------*/\n");
+  fprintf(outfile,"/*!
+!
+---------------------------------------------
+
+*/\n");
   i=0;
   while ((op=dArith3[i].cmd)!=0)
   {
@@ -445,7 +531,11 @@ void ttGen1()
     fprintf(outfile,"\n");
     i++;
   }
-  fprintf(outfile,"/*---------------------------------------------*/\n");
+  fprintf(outfile,"/*!
+!
+---------------------------------------------
+
+*/\n");
   i=0;
   while ((op=dArithM[i].cmd)!=0)
   {
@@ -467,18 +557,38 @@ void ttGen1()
     }
     i++;
   }
-  fprintf(outfile,"/*---------------------------------------------*/\n");
+  fprintf(outfile,"/*!
+!
+---------------------------------------------
+
+*/\n");
   i=0;
   while ((op=dAssign[i].res)!=0)
   {
     fprintf(outfile,"// assign: %s =  %s\n",
-          Tok2Cmdname(op/*dAssign[i].res*/),
+          Tok2Cmdname(op/*!
+!
+dAssign[i].res
+
+*/),
           Tok2Cmdname(dAssign[i].arg));
     i++;
   }
-/*-------------------------------------------------------------------*/
-  fprintf(outfile,"/*---------------------------------------------*/\n");
-  FILE *doctable=NULL; /*to silence "may be used uninitialized"*/
+/*!
+!
+-------------------------------------------------------------------
+
+*/
+  fprintf(outfile,"/*!
+!
+---------------------------------------------
+
+*/\n");
+  FILE *doctable=NULL; /*!
+!
+to silence "may be used uninitialized"
+
+*/
   if (produce_convert_table)
   {
     doctable=fopen("convert_table.texi","w");
@@ -510,8 +620,14 @@ void ttGen1()
     fprintf(doctable,"@end multitable\n");
     fclose(doctable);
   }
-  fprintf(outfile,"/*---------------------------------------------*/\n");
-  char ops[]="=><+*/[.^,%(;";
+  fprintf(outfile,"/*!
+!
+---------------------------------------------
+
+*/\n");
+  char ops[]="=><+
+
+*/[.^,%(;";
   for(i=0;ops[i]!='\0';i++)
     fprintf(outfile,"// token %d : %c\n", (int)ops[i], ops[i]);
   for (i=257;i<=MAX_TOK;i++)
@@ -522,10 +638,26 @@ void ttGen1()
       fprintf(outfile,"// token %d : %s\n", i, s);
     }
   }
-/*-------------------------------------------------------------------*/
-  fprintf(outfile,"/*--max. token: %d, gr: %d --*/\n",MAX_TOK,UMINUS);
-/*-------------------------------------------------------------------*/
-  fprintf(outfile,"/*---------------------------------------------*/\n");
+/*!
+!
+-------------------------------------------------------------------
+
+*/
+  fprintf(outfile,"/*!
+!
+--max. token: %d, gr: %d --
+
+*/\n",MAX_TOK,UMINUS);
+/*!
+!
+-------------------------------------------------------------------
+
+*/
+  fprintf(outfile,"/*!
+!
+---------------------------------------------
+
+*/\n");
   fprintf(outfile,
   "const struct sValCmdTab dArithTab1[]=\n"
   "{\n");
@@ -543,7 +675,11 @@ void ttGen1()
   }
   fprintf(outfile," { 10000,0 }\n};\n");
   fprintf(outfile,"#define JJTAB1LEN %d\n",l1);
-/*-------------------------------------------------------------------*/
+/*!
+!
+-------------------------------------------------------------------
+
+*/
   fprintf(outfile,
   "const struct sValCmdTab dArithTab2[]=\n"
   "{\n");
@@ -563,11 +699,21 @@ void ttGen1()
   fprintf(outfile,"#define JJTAB2LEN %d\n",l2);
   fclose(outfile);
 }
-/*---------------------------------------------------------------------*/
-/**
+/*!
+!
+---------------------------------------------------------------------
+
+*/
+/*!
+!
+*
  * @brief generate cmds initialisation
 **/
-/*---------------------------------------------------------------------*/
+/*!
+!
+---------------------------------------------------------------------
+
+*/
 
 void ttGen2b()
 {
@@ -575,10 +721,16 @@ void ttGen2b()
 
   FILE *outfile = fopen(iparith_inc,"a");
   fprintf(outfile,
-  "/****************************************\n"
+  "/*!
+!
+***************************************\n"
   "*  Computer Algebra System SINGULAR     *\n"
   "****************************************/\n\n");
-/*-------------------------------------------------------------------*/
+/*!
+!
+-------------------------------------------------------------------
+
+*/
   fprintf(outfile,"// identifier table for Singular\n//\n");
 
   fprintf(
@@ -632,14 +784,30 @@ void ttGen2b()
 #if 0
           fprintf(outfile,"  iiArithAddCmd(\"%s\", %*d,  -1, 0 );\n",
               cmds[m].name, 20-strlen(cmds[m].name),
-              0/*cmds[m].alias*/
-              /*-1 cmds[m].tokval*/
-              /*0 cmds[m].toktype*/);
+              0/*!
+!
+cmds[m].alias
+
+*/
+              /*!
+!
+-1 cmds[m].tokval
+
+*/
+              /*!
+!
+0 cmds[m].toktype
+
+*/);
 #endif
     }
     fprintf(outfile,", %d);\n", m);
   }
-  fprintf(outfile, "/* end of list marker */\n");
+  fprintf(outfile, "/*!
+!
+ end of list marker 
+
+*/\n");
   fprintf(outfile,
           "  sArithBase.nLastIdentifier = %d;\n",
           id_nr);
@@ -671,7 +839,11 @@ void ttGen2c()
 
   FILE *outfile = fopen("reference_table.texi","w");
   fprintf(outfile, "@menu\n");
-/*-------------------------------------------------------------------*/
+/*!
+!
+-------------------------------------------------------------------
+
+*/
   qsort(&cmds, cmd_size, sizeof(cmdnames), (&_texi_sort_cmds));
 
   int m;
@@ -840,7 +1012,11 @@ void ttGen2c()
   }
   fclose(outfile);
 }
-/*-------------------------------------------------------------------*/
+/*!
+!
+-------------------------------------------------------------------
+
+*/
 void ttGen4()
 {
   FILE *outfile = fopen("plural_cmd.xx","w");
@@ -850,7 +1026,11 @@ void ttGen4()
   "@c *****************************************\n"
   "@c *  Computer Algebra System SINGULAR     *\n"
   "@c *****************************************\n\n");
-/*-------------------------------------------------------------------*/
+/*!
+!
+-------------------------------------------------------------------
+
+*/
   fprintf(outfile,"@multicolumn .45 .45\n");
   int op;
   i=0;
@@ -974,13 +1154,21 @@ void ttGen4()
   fclose(outfile);
   rename("plural_cmd.xx","plural_cmd.inc");
 }
-/*-------------------------------------------------------------------*/
+/*!
+!
+-------------------------------------------------------------------
+
+*/
 
 int main(int argc, char**)
 {
   if (argc>1)
   {
-    produce_convert_table=1; /* for ttGen1 */
+    produce_convert_table=1; /*!
+!
+ for ttGen1 
+
+*/
     ttGen1();
     unlink(iparith_inc);
     ttGen4();

@@ -1,10 +1,16 @@
 #ifndef MMEMORY_H
 #define MMEMORY_H
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: declaration of routines for memory stuff
+
+
 */
 
 #undef reallocSize

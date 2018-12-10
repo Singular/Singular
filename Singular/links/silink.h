@@ -1,10 +1,13 @@
 #ifndef SILINK_H
 #define SILINK_H
-/****************************************
+/*!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+
 * ABSTRACT: general interface to links
+
 */
 
 #include "singularconfig.h"

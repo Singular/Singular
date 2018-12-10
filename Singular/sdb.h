@@ -1,10 +1,16 @@
 #ifndef SDB_H
 #define SDB_H
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: Singular debugger
+
+
 */
 
 #define HAVE_SDB

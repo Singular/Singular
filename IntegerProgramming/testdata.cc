@@ -1,6 +1,6 @@
-// testdata.cc
+/// testdata.cc
 
-// Implements the data generation routines declared in testdata.h.
+/// Implements the data generation routines declared in testdata.h.
 
 #ifndef TESTDATA_CC
 #define TESTDATA_CC
@@ -16,7 +16,7 @@ int random_matrix(const short& rows, const short& columns,
                   const Integer& lower_bound, const Integer& upper_bound,
                   ofstream& MATRIX)
 {
-  // check arguments
+  /// check arguments
 
   if(rows<=0)
   {
@@ -54,30 +54,30 @@ int random_matrix(const short& rows, const short& columns,
     return 0;
   }
 
-  // create test file
+  /// create test file
 
   MATRIX<<"MATRIX"<<endl<<endl;
 
   MATRIX<<"columns:"<<endl;
   MATRIX<<columns<<endl<<endl;
 
-  // random cost vector
+  /// random cost vector
   MATRIX<<"cost vector:"<<endl;
   for(short j=0;j<columns;j++)
     MATRIX<<setw(4)<<rand()%(upper_bound+1);
-  // random entries between 0 and upper_bound
+  /// random entries between 0 and upper_bound
   MATRIX<<endl;
 
   MATRIX<<"rows:"<<endl;
   MATRIX<<rows<<endl<<endl;
 
-  // random matrix
+  /// random matrix
   MATRIX<<"matrix:"<<endl;
   for(short i=0;i<rows;i++)
   {
     for(short j=0;j<columns;j++)
       MATRIX<<setw(4)<<rand()%(upper_bound-lower_bound+1)+lower_bound;
-    // random entries between lower_bound and upper_bound
+    /// random entries between lower_bound and upper_bound
     MATRIX<<endl;
   }
   MATRIX<<endl;
@@ -94,7 +94,7 @@ int random_matrix(const short& rows, const short& columns,
 int transportation_problem(const short& sources, const short& targets,
                            const Integer& upper_bound, ofstream& MATRIX)
 {
-  // check arguments
+  /// check arguments
 
   if(sources<=0)
   {
@@ -123,29 +123,29 @@ int transportation_problem(const short& sources, const short& targets,
     return 0;
   }
 
-  // create test file
+  /// create test file
 
   MATRIX<<"MATRIX"<<endl<<endl;
 
   MATRIX<<"columns:"<<endl;
   MATRIX<<sources*targets<<endl<<endl;
 
-  // random cost vector
+  /// random cost vector
   MATRIX<<"cost vector:"<<endl;
   for(short j=0;j<sources*targets;j++)
     MATRIX<<setw(4)<<rand()%(upper_bound+1);
-  // random entries between 0 and upper_bound
+  /// random entries between 0 and upper_bound
   MATRIX<<endl;
 
   MATRIX<<"rows:"<<endl;
   MATRIX<<sources+targets<<endl<<endl;
 
-  // constraint matrix in the usual formulation of the transportation problem
-  // as an IP problem
+  /// constraint matrix in the usual formulation of the transportation problem
+  /// as an IP problem
   MATRIX<<"matrix:"<<endl;
 
   for(int i=0;i<targets;i++)
-    // generate matrix
+    /// generate matrix
   {
     for(int k=0;k<targets;k++)
       for(int j=0;j<sources;j++)
@@ -178,7 +178,7 @@ int random_problems(const short& vector_dimension,
                     const Integer& lower_bound, const Integer& upper_bound,
                     ofstream& PROBLEM)
 {
-  // check arguments
+  /// check arguments
 
   if(vector_dimension<=0)
   {
@@ -207,7 +207,7 @@ int random_problems(const short& vector_dimension,
     return 0;
   }
 
-  // create random problems
+  /// create random problems
 
   PROBLEM<<"PROBLEM"<<endl<<endl;
 
@@ -222,11 +222,11 @@ int random_problems(const short& vector_dimension,
   {
     for(short j=0;j<vector_dimension;j++)
       PROBLEM<<setw(4)<<rand()%(upper_bound+1);
-    // random entries between 0 and upper_bound
+    /// random entries between 0 and upper_bound
     PROBLEM<<endl;
   }
   PROBLEM<<endl;
 
   return 1;
 }
-#endif  // TESTDATA_CC
+#endif  /// TESTDATA_CC

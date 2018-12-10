@@ -1,11 +1,19 @@
-/*****************************************
+/*!
+!
+****************************************
 *  Computer Algebra System SINGULAR      *
-*****************************************/
-/*
+****************************************
+
+*/
+/*!
+!
+
 * ABSTRACT: general interface to internals of Singular ("system" command)
 * jjSYSTEM: official commands, must be documented in the manual,
 *           #defines must be local to each command
 * jjEXTENDED_SYSTEM: tests, temporary comands etc.
+
+
 */
 
 #define HAVE_WALK 1
@@ -129,8 +137,16 @@
 #endif
 #endif
 
-#ifdef __CYGWIN__ /* only for the DLLTest */
-/* #include "WinDllTest.h" */
+#ifdef __CYGWIN__ /*!
+!
+ only for the DLLTest 
+
+*/
+/*!
+!
+ #include "WinDllTest.h" 
+
+*/
 #ifdef HAVE_DL
 #include "polys/mod_raw.h"
 #endif
@@ -168,11 +184,15 @@
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h);
 #endif
 
-/* expects a SINGULAR square matrix with number entries
+/*!
+!
+ expects a SINGULAR square matrix with number entries
    where currRing is expected to be over some field F_p;
    returns a long** matrix with the "same", i.e.,
    appropriately mapped entries;
-   leaves singularMatrix unmodified */
+   leaves singularMatrix unmodified 
+
+*/
 unsigned long** singularMatrixToLongMatrix(matrix singularMatrix)
 {
   int n = singularMatrix->rows();
@@ -200,11 +220,15 @@ unsigned long** singularMatrixToLongMatrix(matrix singularMatrix)
   return longMatrix;
 }
 
-/* expects an array of unsigned longs with valid indices 0..degree;
+/*!
+!
+ expects an array of unsigned longs with valid indices 0..degree;
    returns the following poly, where x denotes the first ring variable
    of currRing, and d = degree:
       polyCoeffs[d] * x^d + polyCoeffs[d-1] * x^(d-1) + ... + polyCoeffs[0]
-   leaves polyCoeffs unmodified */
+   leaves polyCoeffs unmodified 
+
+*/
 poly longCoeffsToSingularPoly(unsigned long *polyCoeffs, const int degree)
 {
   poly result = NULL;
@@ -225,8 +249,12 @@ poly longCoeffsToSingularPoly(unsigned long *polyCoeffs, const int degree)
 }
 
 //void emStart();
-/*2
+/*!
+!
+2
 *  the "system" command
+
+
 */
 BOOLEAN jjSYSTEM(leftv res, leftv args)
 {
@@ -236,7 +264,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     leftv h=args->next;
 // ONLY documented system calls go here
 // Undocumented system calls go down into jjEXTENDED_SYSTEM (#ifdef HAVE_EXTENDED_SYSTEM)
-/*==================== nblocks ==================================*/
+/*!
+!
+==================== nblocks ==================================
+
+*/
     if (strcmp(sys_cmd, "nblocks") == 0)
     {
       ring r;
@@ -265,7 +297,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       res->data = (void*) (long)(rBlocks(r) - 1);
       return FALSE;
     }
-/*==================== version ==================================*/
+/*!
+!
+==================== version ==================================
+
+*/
     if(strcmp(sys_cmd,"version")==0)
     {
       res->rtyp=INT_CMD;
@@ -273,7 +309,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-/*==================== alarm ==================================*/
+/*!
+!
+==================== alarm ==================================
+
+*/
       if(strcmp(sys_cmd,"alarm")==0)
       {
         if ((h!=NULL) &&(h->Typ()==INT_CMD))
@@ -291,7 +331,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           WerrorS("int expected");
       }
       else
-/*==================== cpu ==================================*/
+/*!
+!
+==================== cpu ==================================
+
+*/
     if(strcmp(sys_cmd,"cpu")==0)
     {
       long cpu=1; //feOptValue(FE_OPT_CPUS);
@@ -305,7 +349,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-/*==================== executable ==================================*/
+/*!
+!
+==================== executable ==================================
+
+*/
     if(strcmp(sys_cmd,"executable")==0)
     {
       if ((h!=NULL) && (h->Typ()==STRING_CMD))
@@ -320,7 +368,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return TRUE;
     }
     else
-  /*==================== flatten =============================*/
+  /*!
+!
+==================== flatten =============================
+
+*/
     if(strcmp(sys_cmd,"flatten")==0)
     {
       if ((h!=NULL) &&(h->Typ()==SMATRIX_CMD))
@@ -333,7 +385,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         WerrorS("smatrix expected");
     }
     else
-  /*==================== unflatten =============================*/
+  /*!
+!
+==================== unflatten =============================
+
+*/
     if(strcmp(sys_cmd,"unflatten")==0)
     {
       const short t1[]={2,SMATRIX_CMD,INT_CMD};
@@ -346,7 +402,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       else return TRUE;
     }
     else
-  /*==================== neworder =============================*/
+  /*!
+!
+==================== neworder =============================
+
+*/
     if(strcmp(sys_cmd,"neworder")==0)
     {
       if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
@@ -359,7 +419,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         WerrorS("ideal expected");
     }
     else
-/*===== nc_hilb ===============================================*/
+/*!
+!
+===== nc_hilb ===============================================
+
+*/
    // Hilbert series of non-commutative monomial algebras
     if(strcmp(sys_cmd,"nc_hilb") == 0)
     {
@@ -406,7 +470,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return(FALSE);
     }
     else
-/*===== rcolon ===============================================*/
+/*!
+!
+===== rcolon ===============================================
+
+*/
   if(strcmp(sys_cmd,"rcolon") == 0)
   {
     const short t1[]={3,IDEAL_CMD,POLY_CMD,INT_CMD};
@@ -426,7 +494,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   }
   else
 
-/*==================== sh ==================================*/
+/*!
+!
+==================== sh ==================================
+
+*/
     if(strcmp(sys_cmd,"sh")==0)
     {
       if (feOptValue(FE_OPT_NO_SHELL))
@@ -443,7 +515,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-/*========reduce procedure like the global one but with jet bounds=======*/
+/*!
+!
+========reduce procedure like the global one but with jet bounds=======
+
+*/
     if(strcmp(sys_cmd,"reduce_bound")==0)
     {
       poly p;
@@ -462,17 +538,33 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
       else return TRUE;
       //int htype;
-      res->rtyp= h->Typ(); /*htype*/
+      res->rtyp= h->Typ(); /*!
+!
+htype
+
+*/
       ideal q = (ideal)h->next->CopyD();
       int bound = (int)(long)h->next->next->Data();
-      if (pid==NULL) /*(htype == POLY_CMD || htype == VECTOR_CMD)*/
+      if (pid==NULL) /*!
+!
+(htype == POLY_CMD || htype == VECTOR_CMD)
+
+*/
         res->data = (char *)kNFBound(q,currRing->qideal,p,bound);
-      else /*(htype == IDEAL_CMD || htype == MODUL_CMD)*/
+      else /*!
+!
+(htype == IDEAL_CMD || htype == MODUL_CMD)
+
+*/
         res->data = (char *)kNFBound(q,currRing->qideal,pid,bound);
       return FALSE;
     }
     else
-/*==================== uname ==================================*/
+/*!
+!
+==================== uname ==================================
+
+*/
     if(strcmp(sys_cmd,"uname")==0)
     {
       res->rtyp=STRING_CMD;
@@ -480,7 +572,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-/*==================== with ==================================*/
+/*!
+!
+==================== with ==================================
+
+*/
     if(strcmp(sys_cmd,"with")==0)
     {
       if (h==NULL)
@@ -532,7 +628,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return TRUE;
     }
     else
-  /*==================== browsers ==================================*/
+  /*!
+!
+==================== browsers ==================================
+
+*/
     if (strcmp(sys_cmd,"browsers")==0)
     {
       res->rtyp = STRING_CMD;
@@ -542,7 +642,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-  /*==================== pid ==================================*/
+  /*!
+!
+==================== pid ==================================
+
+*/
     if (strcmp(sys_cmd,"pid")==0)
     {
       res->rtyp=INT_CMD;
@@ -550,7 +654,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-  /*==================== getenv ==================================*/
+  /*!
+!
+==================== getenv ==================================
+
+*/
     if (strcmp(sys_cmd,"getenv")==0)
     {
       if ((h!=NULL) && (h->Typ()==STRING_CMD))
@@ -568,7 +676,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
     }
     else
-  /*==================== setenv ==================================*/
+  /*!
+!
+==================== setenv ==================================
+
+*/
     if (strcmp(sys_cmd,"setenv")==0)
     {
   #ifdef HAVE_SETENV
@@ -591,7 +703,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #endif
     }
     else
-  /*==================== Singular ==================================*/
+  /*!
+!
+==================== Singular ==================================
+
+*/
     if (strcmp(sys_cmd, "Singular") == 0)
     {
       res->rtyp=STRING_CMD;
@@ -610,7 +726,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-  /*==================== options ==================================*/
+  /*!
+!
+==================== options ==================================
+
+*/
     if (strstr(sys_cmd, "--") == sys_cmd)
     {
       if (strcmp(sys_cmd, "--") == 0)
@@ -676,7 +796,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-  /*==================== HC ==================================*/
+  /*!
+!
+==================== HC ==================================
+
+*/
     if (strcmp(sys_cmd,"HC")==0)
     {
       res->rtyp=INT_CMD;
@@ -684,7 +808,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-  /*==================== random ==================================*/
+  /*!
+!
+==================== random ==================================
+
+*/
     if(strcmp(sys_cmd,"random")==0)
     {
       const short t[]={1,INT_CMD};
@@ -707,7 +835,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-  /*==================== std_syz =================*/
+  /*!
+!
+==================== std_syz =================
+
+*/
     if (strcmp(sys_cmd, "std_syz") == 0)
     {
       ideal i1;
@@ -728,7 +860,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-  /*======================= demon_list =====================*/
+  /*!
+!
+======================= demon_list =====================
+
+*/
     if (strcmp(sys_cmd,"denom_list")==0)
     {
       res->rtyp=LIST_CMD;
@@ -737,7 +873,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-    /*==================== complexNearZero ======================*/
+    /*!
+!
+==================== complexNearZero ======================
+
+*/
     if(strcmp(sys_cmd,"complexNearZero")==0)
     {
       const short t[]={2,NUMBER_CMD,INT_CMD};
@@ -762,7 +902,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
     }
     else
-  /*==================== getPrecDigits ======================*/
+  /*!
+!
+==================== getPrecDigits ======================
+
+*/
     if(strcmp(sys_cmd,"getPrecDigits")==0)
     {
       if ( (currRing==NULL)
@@ -778,7 +922,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-  /*==================== lduDecomp ======================*/
+  /*!
+!
+==================== lduDecomp ======================
+
+*/
     if(strcmp(sys_cmd, "lduDecomp")==0)
     {
       const short t[]={1,MATRIX_CMD};
@@ -807,10 +955,16 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
     }
     else
-  /*==================== lduSolve ======================*/
+  /*!
+!
+==================== lduSolve ======================
+
+*/
     if(strcmp(sys_cmd, "lduSolve")==0)
     {
-      /* for solving a linear equation system A * x = b, via the
+      /*!
+!
+ for solving a linear equation system A * x = b, via the
            given LDU-decomposition of the matrix A;
            There is one valid parametrisation:
            1) exactly eight arguments P, L, D, U, l, u, lTimesU, b;
@@ -827,7 +981,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
               H is the matrix with column vectors spanning the homogeneous
               solution space.
            The method produces an error if matrix and vector sizes do not
-           fit. */
+           fit. 
+
+*/
       const short t[]={7,MATRIX_CMD,MATRIX_CMD,MATRIX_CMD,MATRIX_CMD,POLY_CMD,POLY_CMD,MATRIX_CMD};
       if (!iiCheckTypes(h,t,1))
       {
@@ -881,8 +1037,12 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       solvable = luSolveViaLDUDecomp(pMat, lMat, dMat, uMat, l, u, lTimesU,
                                        bVec, xVec, homogSolSpace);
 
-      /* build the return structure; a list with either one or
-           three entries */
+      /*!
+!
+ build the return structure; a list with either one or
+           three entries 
+
+*/
       lists ll = (lists)omAllocBin(slists_bin);
       if (solvable)
       {
@@ -901,7 +1061,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-  /*==== countedref: reference and shared ====*/
+  /*!
+!
+==== countedref: reference and shared ====
+
+*/
     if (strcmp(sys_cmd, "shared") == 0)
     {
       #ifndef SI_COUNTEDREF_AUTOLOAD
@@ -921,7 +1085,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-/*==================== semaphore =================*/
+/*!
+!
+==================== semaphore =================
+
+*/
 #ifdef HAVE_SIMPLEIPC
     if (strcmp(sys_cmd,"semaphore")==0)
     {
@@ -942,7 +1110,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
 #endif
-/*==================== reserved port =================*/
+/*!
+!
+==================== reserved port =================
+
+*/
     if (strcmp(sys_cmd,"reserve")==0)
     {
       int ssiReservePort(int clients);
@@ -957,7 +1129,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return TRUE;
     }
     else
-/*==================== reserved link =================*/
+/*!
+!
+==================== reserved link =================
+
+*/
     if (strcmp(sys_cmd,"reservedLink")==0)
     {
       res->rtyp=LINK_CMD;
@@ -966,7 +1142,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return (p==NULL);
     }
     else
-/*==================== install newstruct =================*/
+/*!
+!
+==================== install newstruct =================
+
+*/
     if (strcmp(sys_cmd,"install")==0)
     {
       const short t[]={4,STRING_CMD,STRING_CMD,PROC_CMD,INT_CMD};
@@ -979,7 +1159,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return TRUE;
     }
     else
-/*==================== newstruct =================*/
+/*!
+!
+==================== newstruct =================
+
+*/
     if (strcmp(sys_cmd,"newstruct")==0)
     {
       const short t[]={1,STRING_CMD};
@@ -1004,14 +1188,22 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return TRUE;
     }
     else
-/*==================== blackbox =================*/
+/*!
+!
+==================== blackbox =================
+
+*/
     if (strcmp(sys_cmd,"blackbox")==0)
     {
       printBlackboxTypes();
       return FALSE;
     }
     else
-  /*================= absBiFact ======================*/
+  /*!
+!
+================= absBiFact ======================
+
+*/
     #ifdef HAVE_NTL
     if (strcmp(sys_cmd, "absFact") == 0)
     {
@@ -1044,7 +1236,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
     #endif
-  /* =================== LLL via NTL ==============================*/
+  /*!
+!
+ =================== LLL via NTL ==============================
+
+*/
   #ifdef HAVE_NTL
     if (strcmp(sys_cmd, "LLL") == 0)
     {
@@ -1067,7 +1263,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /* =================== LLL via Flint ==============================*/
+  /*!
+!
+ =================== LLL via Flint ==============================
+
+*/
   #ifdef HAVE_FLINT
   #if __FLINT_RELEASE >= 20500
     if (strcmp(sys_cmd, "LLL_Flint") == 0)
@@ -1162,7 +1362,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
   #endif
   #endif
-  /*==================== shift-test for freeGB  =================*/
+  /*!
+!
+==================== shift-test for freeGB  =================
+
+*/
   #ifdef HAVE_SHIFTBBA
     if (strcmp(sys_cmd, "stest") == 0)
     {
@@ -1192,7 +1396,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== block-test for freeGB  =================*/
+  /*!
+!
+==================== block-test for freeGB  =================
+
+*/
   #ifdef HAVE_SHIFTBBA
     if (strcmp(sys_cmd, "btest") == 0)
     {
@@ -1208,7 +1416,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== divide-test for freeGB  =================*/
+  /*!
+!
+==================== divide-test for freeGB  =================
+
+*/
   #ifdef HAVE_SHIFTBBA
     if (strcmp(sys_cmd, "lpLmDivides") == 0)
     {
@@ -1225,7 +1437,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== get var for freeGB  ====================*/
+  /*!
+!
+==================== get var for freeGB  ====================
+
+*/
   #ifdef HAVE_SHIFTBBA
     if (strcmp(sys_cmd, "lpVarAt") == 0)
     {
@@ -1242,7 +1458,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== pcv ==================================*/
+  /*!
+!
+==================== pcv ==================================
+
+*/
   #ifdef HAVE_PCV
     if(strcmp(sys_cmd,"pcvLAddL")==0)
     {
@@ -1280,7 +1500,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== hessenberg/eigenvalues ==================================*/
+  /*!
+!
+==================== hessenberg/eigenvalues ==================================
+
+*/
   #ifdef HAVE_EIGENVAL
     if(strcmp(sys_cmd,"hessenberg")==0)
     {
@@ -1288,7 +1512,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== eigenvalues ==================================*/
+  /*!
+!
+==================== eigenvalues ==================================
+
+*/
   #ifdef HAVE_EIGENVAL
     if(strcmp(sys_cmd,"eigenvals")==0)
     {
@@ -1296,7 +1524,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== rowelim ==================================*/
+  /*!
+!
+==================== rowelim ==================================
+
+*/
   #ifdef HAVE_EIGENVAL
     if(strcmp(sys_cmd,"rowelim")==0)
     {
@@ -1304,7 +1536,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== rowcolswap ==================================*/
+  /*!
+!
+==================== rowcolswap ==================================
+
+*/
   #ifdef HAVE_EIGENVAL
     if(strcmp(sys_cmd,"rowcolswap")==0)
     {
@@ -1312,7 +1548,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== Gauss-Manin system ==================================*/
+  /*!
+!
+==================== Gauss-Manin system ==================================
+
+*/
   #ifdef HAVE_GMS
     if(strcmp(sys_cmd,"gmsnf")==0)
     {
@@ -1320,7 +1560,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== contributors =============================*/
+  /*!
+!
+==================== contributors =============================
+
+*/
     if(strcmp(sys_cmd,"contributors") == 0)
     {
       res->rtyp=STRING_CMD;
@@ -1329,7 +1573,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-  /*==================== spectrum =============================*/
+  /*!
+!
+==================== spectrum =============================
+
+*/
     #ifdef HAVE_SPECTRUM
     if(strcmp(sys_cmd,"spectrum") == 0)
     {
@@ -1350,7 +1598,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return spectrumProc(res,h);
     }
     else
-  /*==================== semic =============================*/
+  /*!
+!
+==================== semic =============================
+
+*/
     if(strcmp(sys_cmd,"semic") == 0)
     {
       if ((h->next!=NULL)
@@ -1365,7 +1617,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return TRUE;
     }
     else
-  /*==================== spadd =============================*/
+  /*!
+!
+==================== spadd =============================
+
+*/
     if(strcmp(sys_cmd,"spadd") == 0)
     {
       const short t[]={2,LIST_CMD,LIST_CMD};
@@ -1376,7 +1632,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return TRUE;
     }
     else
-  /*==================== spmul =============================*/
+  /*!
+!
+==================== spmul =============================
+
+*/
     if(strcmp(sys_cmd,"spmul") == 0)
     {
       const short t[]={2,LIST_CMD,INT_CMD};
@@ -1388,7 +1648,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-/*==================== tensorModuleMult ========================= */
+/*!
+!
+==================== tensorModuleMult ========================= 
+
+*/
   #define HAVE_SHEAFCOH_TRICKS 1
 
   #ifdef HAVE_SHEAFCOH_TRICKS
@@ -1408,7 +1672,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== twostd  =================*/
+  /*!
+!
+==================== twostd  =================
+
+*/
   #ifdef HAVE_PLURAL
     if (strcmp(sys_cmd, "twostd") == 0)
     {
@@ -1427,7 +1695,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== lie bracket =================*/
+  /*!
+!
+==================== lie bracket =================
+
+*/
   #ifdef HAVE_PLURAL
     if (strcmp(sys_cmd, "bracket") == 0)
     {
@@ -1445,7 +1717,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== env ==================================*/
+  /*!
+!
+==================== env ==================================
+
+*/
   #ifdef HAVE_PLURAL
     if (strcmp(sys_cmd, "env")==0)
     {
@@ -1464,7 +1740,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-/* ============ opp ======================== */
+/*!
+!
+ ============ opp ======================== 
+
+*/
   #ifdef HAVE_PLURAL
     if (strcmp(sys_cmd, "opp")==0)
     {
@@ -1483,7 +1763,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== oppose ==================================*/
+  /*!
+!
+==================== oppose ==================================
+
+*/
   #ifdef HAVE_PLURAL
     if (strcmp(sys_cmd, "oppose")==0)
     {
@@ -1509,8 +1793,16 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== walk stuff =================*/
-  /*==================== walkNextWeight =================*/
+  /*!
+!
+==================== walk stuff =================
+
+*/
+  /*!
+!
+==================== walkNextWeight =================
+
+*/
   #ifdef HAVE_WALK
   #ifdef OWNW
     if (strcmp(sys_cmd, "walkNextWeight") == 0)
@@ -1540,7 +1832,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
   #endif
   #endif
-  /*==================== walkNextWeight =================*/
+  /*!
+!
+==================== walkNextWeight =================
+
+*/
   #ifdef HAVE_WALK
   #ifdef OWNW
     if (strcmp(sys_cmd, "walkInitials") == 0)
@@ -1557,7 +1853,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
   #endif
   #endif
-  /*==================== walkAddIntVec =================*/
+  /*!
+!
+==================== walkAddIntVec =================
+
+*/
   #ifdef HAVE_WALK
   #ifdef WAIV
     if (strcmp(sys_cmd, "walkAddIntVec") == 0)
@@ -1573,7 +1873,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
   #endif
   #endif
-  /*==================== MwalkNextWeight =================*/
+  /*!
+!
+==================== MwalkNextWeight =================
+
+*/
   #ifdef HAVE_WALK
   #ifdef MwaklNextWeight
     if (strcmp(sys_cmd, "MwalkNextWeight") == 0)
@@ -1598,7 +1902,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
   #endif //MWalkNextWeight
   #endif
-  /*==================== Mivdp =================*/
+  /*!
+!
+==================== Mivdp =================
+
+*/
   #ifdef HAVE_WALK
     if(strcmp(sys_cmd, "Mivdp") == 0)
     {
@@ -1621,7 +1929,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== Mivlp =================*/
+  /*!
+!
+==================== Mivlp =================
+
+*/
   #ifdef HAVE_WALK
     if(strcmp(sys_cmd, "Mivlp") == 0)
     {
@@ -1644,7 +1956,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== MpDiv =================*/
+  /*!
+!
+==================== MpDiv =================
+
+*/
   #ifdef HAVE_WALK
   #ifdef MpDiv
     if(strcmp(sys_cmd, "MpDiv") == 0)
@@ -1661,7 +1977,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
   #endif
   #endif
-  /*==================== MpMult =================*/
+  /*!
+!
+==================== MpMult =================
+
+*/
   #ifdef HAVE_WALK
   #ifdef MpMult
     if(strcmp(sys_cmd, "MpMult") == 0)
@@ -1678,13 +1998,19 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
   #endif
   #endif
-  /*==================== MivSame =================*/
+  /*!
+!
+==================== MivSame =================
+
+*/
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "MivSame") == 0)
     {
       const short t[]={2,INTVEC_CMD,INTVEC_CMD};
       if (!iiCheckTypes(h,t,1)) return TRUE;
-      /*
+      /*!
+!
+
       if (((intvec*) h->Data())->length() != currRing->N ||
       ((intvec*) h->next->Data())->length() != currRing->N)
       {
@@ -1692,27 +2018,39 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
                currRing->N);
         return TRUE;
       }
-      */
+      
+
+*/
       intvec* arg1 = (intvec*) h->Data();
       intvec* arg2 = (intvec*) h->next->Data();
-      /*
+      /*!
+!
+
       poly result = (poly) MivSame(arg1, arg2);
       res->rtyp = POLY_CMD;
       res->data =  (poly) result;
-      */
+      
+
+*/
       res->rtyp = INT_CMD;
       res->data = (void*)(long) MivSame(arg1, arg2);
       return FALSE;
     }
     else
   #endif
-  /*==================== M3ivSame =================*/
+  /*!
+!
+==================== M3ivSame =================
+
+*/
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "M3ivSame") == 0)
     {
       const short t[]={3,INTVEC_CMD,INTVEC_CMD,INTVEC_CMD};
       if (!iiCheckTypes(h,t,1)) return TRUE;
-      /*
+      /*!
+!
+
       if (((intvec*) h->Data())->length() != currRing->N ||
         ((intvec*) h->next->Data())->length() != currRing->N ||
         ((intvec*) h->next->next->Data())->length() != currRing->N )
@@ -1721,22 +2059,32 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
               currRing->N);
         return TRUE;
       }
-      */
+      
+
+*/
       intvec* arg1 = (intvec*) h->Data();
       intvec* arg2 = (intvec*) h->next->Data();
       intvec* arg3 = (intvec*) h->next->next->Data();
-      /*
+      /*!
+!
+
       poly result = (poly) M3ivSame(arg1, arg2, arg3);
       res->rtyp = POLY_CMD;
       res->data =  (poly) result;
-      */
+      
+
+*/
       res->rtyp = INT_CMD;
       res->data = (void*)(long) M3ivSame(arg1, arg2, arg3);
       return FALSE;
     }
     else
   #endif
-  /*==================== MwalkInitialForm =================*/
+  /*!
+!
+==================== MwalkInitialForm =================
+
+*/
   #ifdef HAVE_WALK
     if(strcmp(sys_cmd, "MwalkInitialForm") == 0)
     {
@@ -1757,9 +2105,15 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== MivMatrixOrder =================*/
+  /*!
+!
+==================== MivMatrixOrder =================
+
+*/
   #ifdef HAVE_WALK
-    /************** Perturbation walk **********/
+    /*!
+!
+************* Perturbation walk **********/
     if(strcmp(sys_cmd, "MivMatrixOrder") == 0)
     {
       if(h==NULL || h->Typ() != INTVEC_CMD)
@@ -1775,7 +2129,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== MivMatrixOrderdp =================*/
+  /*!
+!
+==================== MivMatrixOrderdp =================
+
+*/
   #ifdef HAVE_WALK
     if(strcmp(sys_cmd, "MivMatrixOrderdp") == 0)
     {
@@ -1792,7 +2150,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== MPertVectors =================*/
+  /*!
+!
+==================== MPertVectors =================
+
+*/
   #ifdef HAVE_WALK
     if(strcmp(sys_cmd, "MPertVectors") == 0)
     {
@@ -1808,7 +2170,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== MPertVectorslp =================*/
+  /*!
+!
+==================== MPertVectorslp =================
+
+*/
   #ifdef HAVE_WALK
     if(strcmp(sys_cmd, "MPertVectorslp") == 0)
     {
@@ -1824,7 +2190,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-    /************** fractal walk **********/
+    /*!
+!
+************* fractal walk **********/
   #ifdef HAVE_WALK
     if(strcmp(sys_cmd, "Mfpertvector") == 0)
     {
@@ -1839,7 +2207,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== MivUnit =================*/
+  /*!
+!
+==================== MivUnit =================
+
+*/
   #ifdef HAVE_WALK
     if(strcmp(sys_cmd, "MivUnit") == 0)
     {
@@ -1853,7 +2225,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== MivWeightOrderlp =================*/
+  /*!
+!
+==================== MivWeightOrderlp =================
+
+*/
   #ifdef HAVE_WALK
     if(strcmp(sys_cmd, "MivWeightOrderlp") == 0)
     {
@@ -1867,7 +2243,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== MivWeightOrderdp =================*/
+  /*!
+!
+==================== MivWeightOrderdp =================
+
+*/
   #ifdef HAVE_WALK
     if(strcmp(sys_cmd, "MivWeightOrderdp") == 0)
     {
@@ -1885,7 +2265,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== MivMatrixOrderlp =================*/
+  /*!
+!
+==================== MivMatrixOrderlp =================
+
+*/
   #ifdef HAVE_WALK
     if(strcmp(sys_cmd, "MivMatrixOrderlp") == 0)
     {
@@ -1902,7 +2286,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== MkInterRedNextWeight =================*/
+  /*!
+!
+==================== MkInterRedNextWeight =================
+
+*/
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "MkInterRedNextWeight") == 0)
     {
@@ -1925,7 +2313,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== MPertNextWeight =================*/
+  /*!
+!
+==================== MPertNextWeight =================
+
+*/
   #ifdef HAVE_WALK
   #ifdef MPertNextWeight
     if (strcmp(sys_cmd, "MPertNextWeight") == 0)
@@ -1949,7 +2341,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
   #endif //MPertNextWeight
   #endif
-  /*==================== Mivperttarget =================*/
+  /*!
+!
+==================== Mivperttarget =================
+
+*/
   #ifdef HAVE_WALK
   #ifdef Mivperttarget
     if (strcmp(sys_cmd, "Mivperttarget") == 0)
@@ -1966,7 +2362,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
   #endif //Mivperttarget
   #endif
-  /*==================== Mwalk =================*/
+  /*!
+!
+==================== Mwalk =================
+
+*/
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "Mwalk") == 0)
     {
@@ -1992,7 +2392,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== Mpwalk =================*/
+  /*!
+!
+==================== Mpwalk =================
+
+*/
   #ifdef HAVE_WALK
   #ifdef MPWALK_ORIG
     if (strcmp(sys_cmd, "Mwalk") == 0)
@@ -2045,7 +2449,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
     #endif
   #endif
-  /*==================== Mrwalk =================*/
+  /*!
+!
+==================== Mrwalk =================
+
+*/
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "Mrwalk") == 0)
     {
@@ -2074,7 +2482,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== MAltwalk1 =================*/
+  /*!
+!
+==================== MAltwalk1 =================
+
+*/
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "MAltwalk1") == 0)
     {
@@ -2099,7 +2511,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== MAltwalk1 =================*/
+  /*!
+!
+==================== MAltwalk1 =================
+
+*/
   #ifdef HAVE_WALK
   #ifdef MFWALK_ALT
     if (strcmp(sys_cmd, "Mfwalk_alt") == 0)
@@ -2125,7 +2541,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
   #endif
   #endif
-  /*==================== Mfwalk =================*/
+  /*!
+!
+==================== Mfwalk =================
+
+*/
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "Mfwalk") == 0)
     {
@@ -2150,19 +2570,27 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== Mfrwalk =================*/
+  /*!
+!
+==================== Mfrwalk =================
+
+*/
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "Mfrwalk") == 0)
     {
       const short t[]={6,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD,INT_CMD,INT_CMD,INT_CMD};
       if (!iiCheckTypes(h,t,1)) return TRUE;
-/*
+/*!
+!
+
       if (((intvec*) h->next->Data())->length() != currRing->N &&
           ((intvec*) h->next->next->Data())->length() != currRing->N)
       {
         Werror("system(\"Mfrwalk\" ...) intvecs not of length %d\n",currRing->N);
         return TRUE;
       }
+
+
 */
       if((((intvec*) h->next->Data())->length() != currRing->N &&
          ((intvec*) h->next->next->Data())->length() != currRing->N ) &&
@@ -2186,7 +2614,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-  /*==================== Mprwalk =================*/
+  /*!
+!
+==================== Mprwalk =================
+
+*/
     if (strcmp(sys_cmd, "Mprwalk") == 0)
     {
       const short t[]={9,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD,INT_CMD,INT_CMD,INT_CMD,INT_CMD,INT_CMD,INT_CMD};
@@ -2216,7 +2648,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== TranMImprovwalk =================*/
+  /*!
+!
+==================== TranMImprovwalk =================
+
+*/
   #ifdef HAVE_WALK
   #ifdef TRAN_Orig
     if (strcmp(sys_cmd, "TranMImprovwalk") == 0)
@@ -2241,7 +2677,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
   #endif
   #endif
-  /*==================== MAltwalk2 =================*/
+  /*!
+!
+==================== MAltwalk2 =================
+
+*/
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "MAltwalk2") == 0)
     {
@@ -2264,7 +2704,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== MAltwalk2 =================*/
+  /*!
+!
+==================== MAltwalk2 =================
+
+*/
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "TranMImprovwalk") == 0)
     {
@@ -2288,7 +2732,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
-  /*==================== TranMrImprovwalk =================*/
+  /*!
+!
+==================== TranMrImprovwalk =================
+
+*/
   #if 0
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "TranMrImprovwalk") == 0)
@@ -2323,7 +2771,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
   #endif
   #endif
-  /*================= Extended system call ========================*/
+  /*!
+!
+================= Extended system call ========================
+
+*/
     {
        #ifndef MAKE_DISTRIBUTION
        return(jjEXTENDED_SYSTEM(res, args));
@@ -2331,7 +2783,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
        Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
        #endif
     }
-  } /* typ==string */
+  } /*!
+!
+ typ==string 
+
+*/
   return TRUE;
 }
 
@@ -2353,7 +2809,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     {
       char *sys_cmd=(char *)(h->Data());
       h=h->next;
-  /*==================== test syz strat =================*/
+  /*!
+!
+==================== test syz strat =================
+
+*/
       if (strcmp(sys_cmd, "syz") == 0)
       {
          if ((h!=NULL) && (h->Typ()==STRING_CMD))
@@ -2396,7 +2856,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
          return FALSE;
       }
       else
-  /*==================== locNF ======================================*/
+  /*!
+!
+==================== locNF ======================================
+
+*/
       if(strcmp(sys_cmd,"locNF")==0)
       {
         const short t[]={4,VECTOR_CMD,MODUL_CMD,INT_CMD,INTVEC_CMD};
@@ -2411,7 +2875,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           h=h->next;
           intvec *v=(intvec *)h->Data();
 
-          /* == now the work starts == */
+          /*!
+!
+ == now the work starts == 
+
+*/
 
           short * iv=iv2array(v, currRing);
           poly r=0;
@@ -2440,7 +2908,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
               if (j==s-1)
               {
                 r=pAdd(r,pHead(hp));
-                hp=pLmDeleteAndNext(hp); /* hp=pSub(hp,pHead(hp));*/
+                hp=pLmDeleteAndNext(hp); /*!
+!
+ hp=pSub(hp,pHead(hp));
+
+*/
                 j=0;
               }
               else
@@ -2471,7 +2943,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           return TRUE;
       }
       else
-  /*==================== poly debug ==================================*/
+  /*!
+!
+==================== poly debug ==================================
+
+*/
         if(strcmp(sys_cmd,"p")==0)
         {
 #  ifdef RDEBUG
@@ -2482,7 +2958,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           return FALSE;
         }
         else
-  /*==================== setsyzcomp ==================================*/
+  /*!
+!
+==================== setsyzcomp ==================================
+
+*/
       if(strcmp(sys_cmd,"setsyzcomp")==0)
       {
         if ((h!=NULL) && (h->Typ()==INT_CMD))
@@ -2494,7 +2974,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           }
         }
       }
-  /*==================== ring debug ==================================*/
+  /*!
+!
+==================== ring debug ==================================
+
+*/
         if(strcmp(sys_cmd,"r")==0)
         {
 #  ifdef RDEBUG
@@ -2505,13 +2989,21 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           return FALSE;
         }
         else
-  /*==================== changeRing ========================*/
-        /* The following code changes the names of the variables in the
+  /*!
+!
+==================== changeRing ========================
+
+*/
+        /*!
+!
+ The following code changes the names of the variables in the
            current ring to "x1", "x2", ..., "xN", where N is the number
            of variables in the current ring.
            The purpose of this rewriting is to eliminate indexed variables,
            as they may cause problems when generating scripts for Magma,
-           Maple, or Macaulay2. */
+           Maple, or Macaulay2. 
+
+*/
         if(strcmp(sys_cmd,"changeRing")==0)
         {
           int varN = currRing->N;
@@ -2528,7 +3020,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           return FALSE;
         }
         else
-  /*==================== mtrack ==================================*/
+  /*!
+!
+==================== mtrack ==================================
+
+*/
       if(strcmp(sys_cmd,"mtrack")==0)
       {
   #ifdef OM_TRACK
@@ -2561,7 +3057,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   #endif
       }
       else
-  /*==================== backtrace ==================================*/
+  /*!
+!
+==================== backtrace ==================================
+
+*/
   #ifndef OM_NDEBUG
       if(strcmp(sys_cmd,"backtrace")==0)
       {
@@ -2572,7 +3072,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   #endif
 
 #if !defined(OM_NDEBUG)
-  /*==================== omMemoryTest ==================================*/
+  /*!
+!
+==================== omMemoryTest ==================================
+
+*/
       if (strcmp(sys_cmd,"omMemoryTest")==0)
       {
 
@@ -2637,7 +3141,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
 #endif
-  /*==================== pDivStat =============================*/
+  /*!
+!
+==================== pDivStat =============================
+
+*/
   #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if(strcmp(sys_cmd,"pDivStat")==0)
       {
@@ -2647,7 +3155,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-  /*==================== red =============================*/
+  /*!
+!
+==================== red =============================
+
+*/
   #if 0
       if(strcmp(sys_cmd,"red")==0)
       {
@@ -2663,7 +3175,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-  /*==================== fastcomb =============================*/
+  /*!
+!
+==================== fastcomb =============================
+
+*/
       if(strcmp(sys_cmd,"fastcomb")==0)
       {
         if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
@@ -2684,7 +3200,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           WerrorS("ideal expected");
       }
       else
-  /*==================== comb =============================*/
+  /*!
+!
+==================== comb =============================
+
+*/
       if(strcmp(sys_cmd,"comb")==0)
       {
         if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
@@ -2705,8 +3225,16 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           WerrorS("ideal expected");
       }
       else
-  #if 0 /* debug only */
-  /*==================== listall ===================================*/
+  #if 0 /*!
+!
+ debug only 
+
+*/
+  /*!
+!
+==================== listall ===================================
+
+*/
       if(strcmp(sys_cmd,"listall")==0)
       {
         void listall(int showproc);
@@ -2717,8 +3245,16 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-  #if 0 /* debug only */
-  /*==================== proclist =================================*/
+  #if 0 /*!
+!
+ debug only 
+
+*/
+  /*!
+!
+==================== proclist =================================
+
+*/
       if(strcmp(sys_cmd,"proclist")==0)
       {
         void piShowProcList();
@@ -2727,7 +3263,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-  /* ==================== newton ================================*/
+  /*!
+!
+ ==================== newton ================================
+
+*/
   #ifdef HAVE_NEWTON
       if(strcmp(sys_cmd,"newton")==0)
       {
@@ -2818,8 +3358,14 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-  /*==== connection to Sebastian Jambor's code ======*/
-  /* This code connects Sebastian Jambor's code for
+  /*!
+!
+==== connection to Sebastian Jambor's code ======
+
+*/
+  /*!
+!
+ This code connects Sebastian Jambor's code for
      computing the minimal polynomial of an (n x n) matrix
      with entries in F_p to SINGULAR. Two conversion methods
      are needed; see further up in this file:
@@ -2828,7 +3374,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
             the numbers are coefficients in currRing;
         (2) conversion of an array of longs (encoding the
             coefficients of the minimal polynomial) to a
-            SINGULAR poly living in currRing. */
+            SINGULAR poly living in currRing. 
+
+*/
       if (strcmp(sys_cmd, "minpoly") == 0)
       {
         if ((h == NULL) || (h->Typ() != MATRIX_CMD) || h->next != NULL)
@@ -2860,7 +3408,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         }
       }
       else
-  /*==================== sdb_flags =================*/
+  /*!
+!
+==================== sdb_flags =================
+
+*/
   #ifdef HAVE_SDB
       if (strcmp(sys_cmd, "sdb_flags") == 0)
       {
@@ -2877,7 +3429,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-  /*==================== sdb_edit =================*/
+  /*!
+!
+==================== sdb_edit =================
+
+*/
   #ifdef HAVE_SDB
       if (strcmp(sys_cmd, "sdb_edit") == 0)
       {
@@ -2895,7 +3451,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-  /*==================== GF =================*/
+  /*!
+!
+==================== GF =================
+
+*/
   #if 0 // for testing only
       if (strcmp(sys_cmd, "GF") == 0)
       {
@@ -2912,7 +3472,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-  /*==================== SVD =================*/
+  /*!
+!
+==================== SVD =================
+
+*/
   #ifdef HAVE_SVD
        if (strcmp(sys_cmd, "svd") == 0)
        {
@@ -2925,10 +3489,18 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   #endif
 
 
-  /*==================== DLL =================*/
+  /*!
+!
+==================== DLL =================
+
+*/
   #ifdef __CYGWIN__
   #ifdef HAVE_DL
-  /* testing the DLL functionality under Win32 */
+  /*!
+!
+ testing the DLL functionality under Win32 
+
+*/
         if (strcmp(sys_cmd, "DLL") == 0)
         {
           typedef void  (*Void_Func)();
@@ -2959,7 +3531,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   #endif
   #endif
   #ifdef HAVE_RING2TOM
-  /*==================== ring-GB ==================================*/
+  /*!
+!
+==================== ring-GB ==================================
+
+*/
       if (strcmp(sys_cmd, "findZeroPoly")==0)
       {
         ring r = currRing;
@@ -2969,11 +3545,17 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return(FALSE);
       }
       else
-  /*==================== Creating zero polynomials =================*/
+  /*!
+!
+==================== Creating zero polynomials =================
+
+*/
   #ifdef HAVE_VANIDEAL
       if (strcmp(sys_cmd, "createG0")==0)
       {
-        /* long exp[50];
+        /*!
+!
+ long exp[50];
         int N = 0;
         while (h != NULL)
         {
@@ -2987,7 +3569,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         poly t_p;
         res->rtyp=POLY_CMD;
         res->data= (poly) kCreateZeroPoly(exp, -1, &t_p, currRing, currRing);
-        return(FALSE); */
+        return(FALSE); 
+
+*/
 
         res->rtyp = IDEAL_CMD;
         res->data = (ideal) createG0();
@@ -2995,7 +3579,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-  /*==================== redNF_ring =================*/
+  /*!
+!
+==================== redNF_ring =================
+
+*/
       if (strcmp(sys_cmd, "redNF_ring")==0)
       {
         ring r = currRing;
@@ -3008,7 +3596,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-  /*==================== Roune Hilb  =================*/
+  /*!
+!
+==================== Roune Hilb  =================
+
+*/
        if (strcmp(sys_cmd, "hilbroune") == 0)
        {
          if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
@@ -3019,7 +3611,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
          return FALSE;
        }
       else
-  /*==================== F5 Implementation =================*/
+  /*!
+!
+==================== F5 Implementation =================
+
+*/
   #ifdef HAVE_F5
       if (strcmp(sys_cmd, "f5")==0)
       {
@@ -3061,7 +3657,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-  /*==================== Testing groebner basis =================*/
+  /*!
+!
+==================== Testing groebner basis =================
+
+*/
   #ifdef HAVE_RINGS
       if (strcmp(sys_cmd, "NF_ring")==0)
       {
@@ -3096,7 +3696,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-    /*==================== sca:AltVar ==================================*/
+    /*!
+!
+==================== sca:AltVar ==================================
+
+*/
   #ifdef HAVE_PLURAL
       if ( (strcmp(sys_cmd, "AltVarStart") == 0) || (strcmp(sys_cmd, "AltVarEnd") == 0) )
       {
@@ -3124,7 +3728,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-  /*==================== RatNF, noncomm rational coeffs =================*/
+  /*!
+!
+==================== RatNF, noncomm rational coeffs =================
+
+*/
   #ifdef HAVE_RATGRING
       if (strcmp(sys_cmd, "intratNF") == 0)
       {
@@ -3178,7 +3786,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return FALSE;
       }
       else
-  /*==================== RatNF, noncomm rational coeffs =================*/
+  /*!
+!
+==================== RatNF, noncomm rational coeffs =================
+
+*/
       if (strcmp(sys_cmd, "ratNF") == 0)
       {
         poly p,q;
@@ -3212,7 +3824,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return FALSE;
       }
       else
-        /*==================== RatSpoly, noncomm rational coeffs =================*/
+        /*!
+!
+==================== RatSpoly, noncomm rational coeffs =================
+
+*/
       if (strcmp(sys_cmd, "ratSpoly") == 0)
       {
         poly p,q;
@@ -3246,7 +3862,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif // HAVE_RATGRING
-  /*==================== Rat def =================*/
+  /*!
+!
+==================== Rat def =================
+
+*/
       if (strcmp(sys_cmd, "ratVar") == 0)
       {
         int start,end;
@@ -3267,7 +3887,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return (start==0)||(end==0)||(start>end);
       }
       else
-  /*==================== t-rep-GB ==================================*/
+  /*!
+!
+==================== t-rep-GB ==================================
+
+*/
       if (strcmp(sys_cmd, "unifastmult")==0)
       {
         poly f = (poly)h->Data();
@@ -3338,7 +3962,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return(FALSE);
       }
       else
-  /*==================== gcd-varianten =================*/
+  /*!
+!
+==================== gcd-varianten =================
+
+*/
       if (strcmp(sys_cmd, "gcd") == 0)
       {
         if (h==NULL)
@@ -3369,12 +3997,20 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         else return TRUE;
       }
       else
-  /*==================== subring =================*/
+  /*!
+!
+==================== subring =================
+
+*/
       if (strcmp(sys_cmd, "subring") == 0)
       {
         if (h!=NULL)
         {
-          extern ring rSubring(ring r,leftv v); /* ipshell.cc*/
+          extern ring rSubring(ring r,leftv v); /*!
+!
+ ipshell.cc
+
+*/
           res->data=(char *)rSubring(currRing,h);
           res->rtyp=RING_CMD;
           return res->data==NULL;
@@ -3382,7 +4018,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         else return TRUE;
       }
       else
-  /*==================== HNF =================*/
+  /*!
+!
+==================== HNF =================
+
+*/
   #ifdef HAVE_NTL
       if (strcmp(sys_cmd, "HNF") == 0)
       {
@@ -3413,7 +4053,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         else return TRUE;
       }
       else
-  /*================= probIrredTest ======================*/
+  /*!
+!
+================= probIrredTest ======================
+
+*/
       if (strcmp (sys_cmd, "probIrredTest") == 0)
       {
         if (h!=NULL && (h->Typ()== POLY_CMD) && ((h->next != NULL) && h->next->Typ() == STRING_CMD))
@@ -3430,7 +4074,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-  /*==================== mpz_t loader ======================*/
+  /*!
+!
+==================== mpz_t loader ======================
+
+*/
     if(strcmp(sys_cmd, "GNUmpLoad")==0)
     {
       if ((h != NULL) && (h->Typ() == STRING_CMD))
@@ -3457,13 +4105,21 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
     }
     else
-  /*==================== intvec matching ======================*/
-    /* Given two non-empty intvecs, the call
+  /*!
+!
+==================== intvec matching ======================
+
+*/
+    /*!
+!
+ Given two non-empty intvecs, the call
             'system("intvecMatchingSegments", ivec, jvec);'
          computes all occurences of jvec in ivec, i.e., it returns
          a list of int indices k such that ivec[k..size(jvec)+k-1] = jvec.
          If no such k exists (e.g. when ivec is shorter than jvec), an
-         intvec with the single entry 0 is being returned. */
+         intvec with the single entry 0 is being returned. 
+
+*/
     if(strcmp(sys_cmd, "intvecMatchingSegments")==0)
     {
       if ((h       != NULL) && (h->Typ()       == INTVEC_CMD) &&
@@ -3500,12 +4156,20 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
     }
     else
-  /* ================== intvecOverlap ======================= */
-    /* Given two non-empty intvecs, the call
+  /*!
+!
+ ================== intvecOverlap ======================= 
+
+*/
+    /*!
+!
+ Given two non-empty intvecs, the call
             'system("intvecOverlap", ivec, jvec);'
          computes the longest intvec kvec such that ivec ends with kvec
          and jvec starts with kvec. The length of this overlap is being
-         returned. If there is no overlap at all, then 0 is being returned. */
+         returned. If there is no overlap at all, then 0 is being returned. 
+
+*/
     if(strcmp(sys_cmd, "intvecOverlap")==0)
     {
       if ((h       != NULL) && (h->Typ()       == INTVEC_CMD) &&
@@ -3515,7 +4179,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         intvec* ivec = (intvec*)h->Data();
         intvec* jvec = (intvec*)h->next->Data();
         int ir = ivec->rows(); int jr = jvec->rows();
-        int r = jr; if (ir < jr) r = ir;   /* r = min{ir, jr} */
+        int r = jr; if (ir < jr) r = ir;   /*!
+!
+ r = min{ir, jr} 
+
+*/
         while ((r >= 1) && (memcmp(&(*ivec)[ir - r], &(*jvec)[0],
                                      sizeof(int) * r) != 0))
           r--;
@@ -3530,7 +4198,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
     }
     else
-  /*==================== Hensel's lemma ======================*/
+  /*!
+!
+==================== Hensel's lemma ======================
+
+*/
     if(strcmp(sys_cmd, "henselfactors")==0)
     {
       if ((h != NULL) && (h->Typ() == INT_CMD) &&
@@ -3567,7 +4239,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
     }
     else
-  /*==================== Approx_Step  =================*/
+  /*!
+!
+==================== Approx_Step  =================
+
+*/
   #ifdef HAVE_PLURAL
     if (strcmp(sys_cmd, "astep") == 0)
     {
@@ -3585,7 +4261,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
   #endif
-  /*==================== PrintMat  =================*/
+  /*!
+!
+==================== PrintMat  =================
+
+*/
   #ifdef HAVE_PLURAL
     if (strcmp(sys_cmd, "PrintMat") == 0)
     {
@@ -3626,7 +4306,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
   #endif
-/* ============ NCUseExtensions ======================== */
+/*!
+!
+ ============ NCUseExtensions ======================== 
+
+*/
   #ifdef HAVE_PLURAL
     if(strcmp(sys_cmd,"NCUseExtensions")==0)
     {
@@ -3639,7 +4323,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
   #endif
-/* ============ NCGetType ======================== */
+/*!
+!
+ ============ NCGetType ======================== 
+
+*/
   #ifdef HAVE_PLURAL
     if(strcmp(sys_cmd,"NCGetType")==0)
     {
@@ -3652,7 +4340,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
   #endif
-/* ============ ForceSCA ======================== */
+/*!
+!
+ ============ ForceSCA ======================== 
+
+*/
   #ifdef HAVE_PLURAL
     if(strcmp(sys_cmd,"ForceSCA")==0)
     {
@@ -3676,7 +4368,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
   #endif
-/* ============ ForceNewNCMultiplication ======================== */
+/*!
+!
+ ============ ForceNewNCMultiplication ======================== 
+
+*/
   #ifdef HAVE_PLURAL
     if(strcmp(sys_cmd,"ForceNewNCMultiplication")==0)
     {
@@ -3688,7 +4384,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
   #endif
-/* ============ ForceNewOldNCMultiplication ======================== */
+/*!
+!
+ ============ ForceNewOldNCMultiplication ======================== 
+
+*/
   #ifdef HAVE_PLURAL
     if(strcmp(sys_cmd,"ForceNewOldNCMultiplication")==0)
     {
@@ -3700,7 +4400,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
   #endif
-/*==================== test64 =================*/
+/*!
+!
+==================== test64 =================
+
+*/
   #if 0
     if(strcmp(sys_cmd,"test64")==0)
     {
@@ -3723,7 +4427,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
    #endif
-/*==================== n_SwitchChinRem =================*/
+/*!
+!
+==================== n_SwitchChinRem =================
+
+*/
     if(strcmp(sys_cmd,"cache_chinrem")==0)
     {
       extern int n_SwitchChinRem;
@@ -3733,7 +4441,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
-/*==================== LU for bigintmat =================*/
+/*!
+!
+==================== LU for bigintmat =================
+
+*/
 #ifdef SINGULAR_4_2
     if(strcmp(sys_cmd,"LU")==0)
     {
@@ -3756,7 +4468,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-/*==================== sort =================*/
+/*!
+!
+==================== sort =================
+
+*/
     if(strcmp(sys_cmd,"sort")==0)
     {
       extern BOOLEAN jjSORTLIST(leftv,leftv);
@@ -3766,7 +4482,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return TRUE;
     }
     else
-/*==================== uniq =================*/
+/*!
+!
+==================== uniq =================
+
+*/
     if(strcmp(sys_cmd,"uniq")==0)
     {
       extern BOOLEAN jjUNIQLIST(leftv, leftv);
@@ -3776,7 +4496,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return TRUE;
     }
     else
-/*==================== GF(p,n) ==================================*/
+/*!
+!
+==================== GF(p,n) ==================================
+
+*/
     if(strcmp(sys_cmd,"GF")==0)
     {
       const short t[]={3,INT_CMD,INT_CMD,STRING_CMD};
@@ -3798,7 +4522,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return TRUE;
     }
     else
-/*==================== power* ==================================*/
+/*!
+!
+==================== power* ==================================
+
+*/
     #if 0
     if(strcmp(sys_cmd,"power1")==0)
     {
@@ -3857,7 +4585,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
     #endif
-/*==================== Error =================*/
+/*!
+!
+==================== Error =================
+
+*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
   return TRUE;

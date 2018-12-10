@@ -1,10 +1,16 @@
 #ifndef IDREC_H
 #define IDREC_H
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT interpreter type for variables
+
+
 */
 
 #include "Singular/lists.h"
@@ -34,7 +40,11 @@ union uutypes
 class idrec
 {
   public:
-  /* !! do not change the first 6 entries !! (see subexpr.h: sleftv) */
+  /*!
+!
+ !! do not change the first 6 entries !! (see subexpr.h: sleftv) 
+
+*/
   idhdl      next;
   const char *id;
   utypes     data;
@@ -48,7 +58,11 @@ class idrec
 
   idrec() { memset(this,0,sizeof(*this)); }
   idhdl get(const char * s, int lev);
-  idhdl set(const char * s, int lev, int t/*typ*/, BOOLEAN init=TRUE);
+  idhdl set(const char * s, int lev, int t/*!
+!
+typ
+
+*/, BOOLEAN init=TRUE);
   char * String(BOOLEAN typed = FALSE);
 //  ~idrec();
 };

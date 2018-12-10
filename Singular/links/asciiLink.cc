@@ -1,10 +1,13 @@
-/****************************************
+/*!
+***************************************
  * *  Computer Algebra System SINGULAR     *
  * ****************************************/
 
-/*
+/*!
+
  * ABSTRACT: ascii links (standard)
- */
+ 
+*/
 
 #include "kernel/mod2.h"
 #include "misc/options.h"
@@ -18,7 +21,9 @@
 #include "Singular/ipshell.h"
 #include "Singular/links/silink.h"
 
-/* declarations */
+/*!
+ declarations 
+*/
 static BOOLEAN DumpAscii(FILE *fd, idhdl h,char ***list_of_libs);
 static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h,char ***list_of_libs);
 static const char* GetIdString(idhdl h);
@@ -30,8 +35,12 @@ static BOOLEAN CollectLibs(char *name, char ***list_of_libs);
 
 extern si_link_extension si_link_root;
 
-/* =============== ASCII ============================================= */
-BOOLEAN slOpenAscii(si_link l, short flag, leftv /*h*/)
+/*!
+ =============== ASCII ============================================= 
+*/
+BOOLEAN slOpenAscii(si_link l, short flag, leftv /*!
+h
+*/)
 {
   const char *mode;
   if (flag & SI_LINK_OPEN)
@@ -205,7 +214,9 @@ const char* slStatusAscii(si_link l, const char* request)
   else return "unknown status request";
 }
 
-/*------------------ Dumping in Ascii format -----------------------*/
+/*!
+------------------ Dumping in Ascii format -----------------------
+*/
 
 BOOLEAN slDumpAscii(si_link l)
 {
@@ -497,7 +508,9 @@ static int DumpRhs(FILE *fd, idhdl h)
     procinfov pi = IDPROC(h);
     if (pi->language == LANG_SINGULAR)
     {
-      /* pi-Libname==NULL */
+      /*!
+ pi-Libname==NULL 
+*/
       char *pstr = pi->data.s.body;
       fputc('"', fd);
       while (*pstr != '\0')

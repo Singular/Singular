@@ -1,5 +1,7 @@
 %{
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 #include <stdio.h>
@@ -22,7 +24,11 @@
 int feReadLine(char* b, int l);
 #define ALLOC(a) omAlloc((a))
 #ifndef NEW_FLEX
-#endif /* NEW_LEX */
+#endif /*!
+!
+ NEW_LEX 
+
+*/
 int blocknest = 0;
 extern char * yytext;
 //extern unsigned char * yytext;
@@ -114,7 +120,11 @@ realnum        {digit}*"."{digit}+("e"[+-]{digit}+)?
 name           ({letter}({letter}*{digit}*_*)*|_)
 parname        #
 
-/* %start START */
+/*!
+!
+ %start START 
+
+*/
 %option always-interactive
 
 %x string
@@ -128,7 +138,9 @@ parname        #
 %%
 \/\/[^\n]*
 ^[ \r\t\n]*#![^\n]*
-"/*"                     {
+"/*!
+!
+"                     {
                            yy_noeof=noeof_comment;
                            loop
                            {
@@ -137,7 +149,11 @@ parname        #
                              if ( c == '*' )
                              {
                                while ( (c = yyinput()) == '*' );
-                               if ( c == '/' ) break; /* found the end */
+                               if ( c == '/' ) break; /*!
+!
+ found the end 
+
+*/
                              }
                              else
                              {
@@ -278,7 +294,11 @@ proc[ \t]+{name}[ \t]*\( {
                            return STRINGTOK;
                          }
 
-[ \t\r\n]                /* skip whitespace */
+[ \t\r\n]                /*!
+!
+ skip whitespace 
+
+*/
 ".."                     { return DOTDOT; }
 "::"                     { return COLONCOLON; }
 "--"                     { return MINUSMINUS; }
@@ -335,7 +355,11 @@ newline                  {
                          }
 
 ({parname}|{name})       {
-                           /* {name} */
+                           /*!
+!
+ {name} 
+
+*/
                            int rc=0;
                            if (yytext[strlen((char *)yytext)-1] == '\n')
                            {
@@ -351,19 +375,35 @@ newline                  {
                          }
 
 .                       {
-                           /*if (*yytext == '\n') REJECT;*/
+                           /*!
+!
+if (*yytext == '\n') REJECT;
+
+*/
                            REGISTER char ch= *yytext;
                            lvalp->i = ch;
                            switch(ch)
                            {
-                             /* case '&': */
+                             /*!
+!
+ case '&': 
+
+*/
                              case '|':
                                return LOGIC_OP;
-                             /* case '/': */
+                             /*!
+!
+ case '/': 
+
+*/
                              case '%':
                              case '*':
                                return MULDIV_OP;
-                             /* case '<': */
+                             /*!
+!
+ case '<': 
+
+*/
                              case '>':
                                return COMP_OP;
                              default:

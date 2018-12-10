@@ -1,9 +1,15 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/*
+/*!
+!
+
 * ABSTRACT: attributes to leftv and idhdl
+
+
 */
 
 #include "kernel/mod2.h"
@@ -55,7 +61,11 @@ attr sattr::Copy()
 
 static void attr_free(attr h, const ring r=currRing)
 {
-  if (h->data!=NULL) /*avoid assume failure */
+  if (h->data!=NULL) /*!
+!
+avoid assume failure 
+
+*/
   {
     s_internalDelete(h->atyp,h->data,r);
     h->data=NULL;
@@ -285,31 +295,51 @@ BOOLEAN atATTRIB2(leftv res,leftv v,leftv b)
     res->data=(void *)(long)hasFlag(v,FLAG_STD);
     if (at!=NULL) res->data=(void *)(long)(hasFlag(v,FLAG_STD)||(hasFlag(at,FLAG_STD)));
   }
-  else if ((strcmp(name,"rank")==0)&&(/*v->Typ()*/t==MODUL_CMD))
+  else if ((strcmp(name,"rank")==0)&&(/*!
+!
+v->Typ()
+
+*/t==MODUL_CMD))
   {
     res->rtyp=INT_CMD;
     res->data=(void *)(((ideal)v->Data())->rank);
   }
   else if ((strcmp(name,"global")==0)
-  &&(/*v->Typ()*/t==RING_CMD))
+  &&(/*!
+!
+v->Typ()
+
+*/t==RING_CMD))
   {
     res->rtyp=INT_CMD;
     res->data=(void *)(((ring)v->Data())->OrdSgn==1);
   }
   else if ((strcmp(name,"maxExp")==0)
-  &&(/*v->Typ()*/t==RING_CMD))
+  &&(/*!
+!
+v->Typ()
+
+*/t==RING_CMD))
   {
     res->rtyp=INT_CMD;
     res->data=(void *)(long)(((ring)v->Data())->bitmask/2);
   }
   else if ((strcmp(name,"ring_cf")==0)
-  &&(/*v->Typ()*/t==RING_CMD))
+  &&(/*!
+!
+v->Typ()
+
+*/t==RING_CMD))
   {
     res->rtyp=INT_CMD;
     res->data=(void *)(long)(rField_is_Ring((ring)v->Data()));
   }
   else if ((strcmp(name,"cf_class")==0)
-  &&(/*v->Typ()*/t==RING_CMD))
+  &&(/*!
+!
+v->Typ()
+
+*/t==RING_CMD))
   {
     res->rtyp=INT_CMD;
     coeffs cf;
@@ -325,7 +355,11 @@ BOOLEAN atATTRIB2(leftv res,leftv v,leftv b)
   }
 #ifdef HAVE_SHIFTBBA
   else if ((strcmp(name,"isLetterplaceRing")==0)
-  &&(/*v->Typ()*/t==RING_CMD))
+  &&(/*!
+!
+v->Typ()
+
+*/t==RING_CMD))
   {
     res->rtyp=INT_CMD;
     res->data=(void *)(long)(((ring)v->Data())->isLPring);
@@ -354,7 +388,11 @@ BOOLEAN atATTRIB2(leftv res,leftv v,leftv b)
   }
   return FALSE;
 }
-BOOLEAN atATTRIB3(leftv /*res*/,leftv v,leftv b,leftv c)
+BOOLEAN atATTRIB3(leftv /*!
+!
+res
+
+*/,leftv v,leftv b,leftv c)
 {
   idhdl h=(idhdl)v->data;
   if (v->e!=NULL)
@@ -403,7 +441,11 @@ BOOLEAN atATTRIB3(leftv /*res*/,leftv v,leftv b,leftv c)
       resetFlag(v,FLAG_QRING);
     }
   }
-  else if ((strcmp(name,"rank")==0)&&(/*v->Typ()*/t==MODUL_CMD))
+  else if ((strcmp(name,"rank")==0)&&(/*!
+!
+v->Typ()
+
+*/t==MODUL_CMD))
   {
     if (c->Typ()!=INT_CMD)
     {
@@ -418,14 +460,22 @@ BOOLEAN atATTRIB3(leftv /*res*/,leftv v,leftv b,leftv c)
     || (strcmp(name,"cf_class")==0)
     || (strcmp(name,"ring_cf")==0)
     || (strcmp(name,"maxExp")==0))
-  &&(/*v->Typ()*/t==RING_CMD))
+  &&(/*!
+!
+v->Typ()
+
+*/t==RING_CMD))
   {
     Werror("can not set attribute `%s`",name);
     return TRUE;
   }
 #ifdef HAVE_SHIFTBBA
   else if ((strcmp(name,"isLetterplaceRing")==0)
-  &&(/*v->Typ()*/t==RING_CMD))
+  &&(/*!
+!
+v->Typ()
+
+*/t==RING_CMD))
   {
     if (c->Typ()==INT_CMD)
       ((ring)v->Data())->isLPring=(int)(long)c->Data();
@@ -439,13 +489,25 @@ BOOLEAN atATTRIB3(leftv /*res*/,leftv v,leftv b,leftv c)
   else
   {
     int typ=c->Typ();
-    if (h!=NULL) atSet(h,omStrDup(name),c->CopyD(typ),typ/*c->T(yp()*/);
-    else         atSet(v,omStrDup(name),c->CopyD(typ),typ/*c->T(yp()*/);
+    if (h!=NULL) atSet(h,omStrDup(name),c->CopyD(typ),typ/*!
+!
+c->T(yp()
+
+*/);
+    else         atSet(v,omStrDup(name),c->CopyD(typ),typ/*!
+!
+c->T(yp()
+
+*/);
   }
   return FALSE;
 }
 
-BOOLEAN atKILLATTR1(leftv /*res*/,leftv a)
+BOOLEAN atKILLATTR1(leftv /*!
+!
+res
+
+*/,leftv a)
 {
   idhdl h=NULL;
   if ((a->rtyp==IDHDL)&&(a->e==NULL))
@@ -462,7 +524,11 @@ BOOLEAN atKILLATTR1(leftv /*res*/,leftv a)
   else atKillAll(a);
   return FALSE;
 }
-BOOLEAN atKILLATTR2(leftv /*res*/,leftv a,leftv b)
+BOOLEAN atKILLATTR2(leftv /*!
+!
+res
+
+*/,leftv a,leftv b)
 {
   if ((a->rtyp!=IDHDL)||(a->e!=NULL))
   {

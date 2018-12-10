@@ -1,7 +1,8 @@
 #include "svd_si.h"
 #ifdef HAVE_SVD
 
-/************************************************************************
+/*!
+***********************************************************************
 Storage of mpfr lists
 ************************************************************************/
 std::vector< amp::mpfr_record* > _mpfr_storage_v;
@@ -46,7 +47,8 @@ gmp_randstate_t* amp::mpfr_storage::getRandState()
     return &_mpfr_storage_rs;
 }
 
-/*amp::mpfr_storage::clearStorage()
+/*!
+amp::mpfr_storage::clearStorage()
 {
     unsigned int i;
     amp::mpfr_record *p;
@@ -58,7 +60,8 @@ gmp_randstate_t* amp::mpfr_storage::getRandState()
             delete _mpfr_storage_v[i];
             _mpfr_storage_v[i] = p;
         }
-}*/
+}
+*/
 
 amp::mpfr_record_ptr& amp::mpfr_storage::getList(unsigned int Precision)
 {
@@ -76,7 +79,8 @@ amp::mpfr_record_ptr& amp::mpfr_storage::getList(unsigned int Precision)
 }
 
 
-/************************************************************************
+/*!
+***********************************************************************
 Storage of mpfr lists
 ************************************************************************/
 amp::mpfr_reference::mpfr_reference()

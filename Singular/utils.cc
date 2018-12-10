@@ -38,7 +38,11 @@ static void usage(char *progname)
 
 static char* lib_file = NULL;
 
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
 void main_init(int argc, char *argv[])
 {
   char c;
@@ -107,8 +111,16 @@ void main_init(int argc, char *argv[])
   }
 }
 
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-void main_result(char */*libname*/)
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
+void main_result(char 
+
+*/*libname
+
+*/)
 {
   if(!found_info)    printf("*** No info-string found!\n");
   if(!found_version) printf("*** No version-string found!\n");
@@ -118,17 +130,29 @@ void main_result(char */*libname*/)
   if(found_version && warning_version)
     printf("*** VERSION-string should come before every procedure definition.\n");
 }
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
 procinfo *iiInitSingularProcinfo(procinfo* pi, const char *libname,
                                  const char *procname, int line, long pos,
-                                 BOOLEAN pstatic /*= FALSE*/)
+                                 BOOLEAN pstatic /*!
+!
+= FALSE
+
+*/)
 {
   pi->libname = (char *)malloc(strlen(libname)+1);
   memcpy(pi->libname, libname, strlen(libname));
   *(pi->libname+strlen(libname)) = '\0';
 
   pi->procname = (char *)malloc(strlen(procname)+1);
-  strcpy(pi->procname, procname/*, strlen(procname)*/);
+  strcpy(pi->procname, procname/*!
+!
+, strlen(procname)
+
+*/);
   pi->language = LANG_SINGULAR;
   pi->ref = 1;
   pi->is_static = pstatic;
@@ -146,7 +170,11 @@ procinfo *iiInitSingularProcinfo(procinfo* pi, const char *libname,
   return(pi);
 }
 
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
 void pi_clear(procinfov pi)
 {
   free(pi->libname);
@@ -154,7 +182,11 @@ void pi_clear(procinfov pi)
   free(pi);
 }
 
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
 
 #ifndef SEEK_SET
 #define SEEK_SET 0
@@ -186,7 +218,11 @@ void printpi(procinfov pi)
 {
   // char *buf, name[256];
   // int len1, len2;
-  /* pi->libname is badly broken -- use file, instead */
+  /*!
+!
+ pi->libname is badly broken -- use file, instead 
+
+*/
   FILE *fp = fopen( lib_file, "rb");
 
   if (fp == NULL)
@@ -246,5 +282,9 @@ void printpi(procinfov pi)
 
 }
 
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/*!
+!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+*/
 #endif

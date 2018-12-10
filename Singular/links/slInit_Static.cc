@@ -1,12 +1,15 @@
-/****************************************
+/*!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/***************************************************************
+/*!
+**************************************************************
  *  File:    slInit_Static.cc
  *  Purpose: link initialization for static linking
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *******************************************************************/
+ ******************************************************************
+*/
 
 
 
@@ -36,4 +39,6 @@ si_link_extension slInitDBMExtension(si_link_extension s)
   s->type="DBM";
   return s;
 }
-#endif /* #ifdef HAVE_DBM */
+#endif /*!
+ #ifdef HAVE_DBM 
+*/

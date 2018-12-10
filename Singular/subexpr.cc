@@ -1,8 +1,14 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: handling of leftv
+
+
 */
 
 #include "kernel/mod2.h"
@@ -103,7 +109,11 @@ void sleftv::Print(leftv store, int spaces)
     void *d=Data();
     if (errorreported) return;
 
-    switch (t /*=Typ()*/)
+    switch (t /*!
+!
+=Typ()
+
+*/)
       {
         case CRING_CMD:
           crPrint((coeffs)d);
@@ -317,7 +327,11 @@ void sleftv::Print(leftv store, int spaces)
           }
           else
           ::Print("Print:unknown type %s(%d)", Tok2Cmdname(t),t);
-      } /* end switch: (Typ()) */
+      } /*!
+!
+ end switch: (Typ()) 
+
+*/
     if ((store!=NULL)&&(store!=this))
       store->CleanUp();
   }
@@ -338,12 +352,28 @@ void sleftv::Print(leftv store, int spaces)
     if ((store!=NULL)
     && (store!=this))
     {
-      if((t/*Typ()*/!=LINK_CMD)
-      && (t/*Typ()*/!=PACKAGE_CMD)
-      && (t/*Typ()*/!=DEF_CMD)
+      if((t/*!
+!
+Typ()
+
+*/!=LINK_CMD)
+      && (t/*!
+!
+Typ()
+
+*/!=PACKAGE_CMD)
+      && (t/*!
+!
+Typ()
+
+*/!=DEF_CMD)
       )
       {
-        store->rtyp=t/*Typ()*/;
+        store->rtyp=t/*!
+!
+Typ()
+
+*/;
         store->data=CopyD();
         if(attribute!=NULL)
         {
@@ -502,8 +532,16 @@ static inline void * s_internalCopy(const int t,  void *d)
       return (void*)syCopy((syStrategy)d);
     case DEF_CMD:
     case NONE:
-    case 0: /* type in error case */
-      break; /* error recovery: do nothing */
+    case 0: /*!
+!
+ type in error case 
+
+*/
+      break; /*!
+!
+ error recovery: do nothing 
+
+*/
     //case COMMAND:
     default:
     {
@@ -578,7 +616,11 @@ void s_internalDelete(const int t,  void *d, const ring r)
       map m=(map)d;
       omFreeBinAddr((ADDRESS)m->preimage);
       m->preimage=NULL;
-      /* no break: continue as IDEAL*/
+      /*!
+!
+ no break: continue as IDEAL
+
+*/
     }
     case SMATRIX_CMD:
     case MATRIX_CMD:
@@ -673,8 +715,16 @@ void s_internalDelete(const int t,  void *d, const ring r)
     case VSHORTOUT:
     case VNOETHER:
     case VMINPOLY:
-    case 0: /* type in error case */
-      break; /* error recovery: do nothing */
+    case 0: /*!
+!
+ type in error case 
+
+*/
+      break; /*!
+!
+ error recovery: do nothing 
+
+*/
     //case COMMAND:
     //case COMMAND:
     default:
@@ -811,7 +861,11 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
   {
     char *s;
     int t=Typ();
-    switch (t /*Typ()*/)
+    switch (t /*!
+!
+Typ()
+
+*/)
     {
         case INT_CMD:
           if (typed)
@@ -849,7 +903,11 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           {
             char* ps = pString((poly) d);
             s = (char*) omAlloc(strlen(ps) + 10);
-            sprintf(s,"%s(%s)", (t /*Typ()*/ == POLY_CMD ? "poly" : "vector"), ps);
+            sprintf(s,"%s(%s)", (t /*!
+!
+Typ()
+
+*/ == POLY_CMD ? "poly" : "vector"), ps);
             omFree(ps);
             return s;
           }
@@ -914,9 +972,17 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           if (typed)
           {
             char* ns = (char*) omAlloc(strlen(s) + 10);
-            if ((t/*Typ()*/==IDEAL_CMD)||(t==MAP_CMD))
+            if ((t/*!
+!
+Typ()
+
+*/==IDEAL_CMD)||(t==MAP_CMD))
               sprintf(ns, "ideal(%s)", s);
-            else /*MODUL_CMD, SMATRIX_CMD */
+            else /*!
+!
+MODUL_CMD, SMATRIX_CMD 
+
+*/
               sprintf(ns, "module(%s)", s);
             omFree(s);
             omCheckAddr(ns);
@@ -932,7 +998,11 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           if (typed)
           {
             char* ns;
-            if (t/*Typ()*/ == INTMAT_CMD)
+            if (t/*!
+!
+Typ()
+
+*/ == INTMAT_CMD)
             {
               ns = (char*) omAlloc(strlen(s) + 40);
               sprintf(ns, "intmat(intvec(%s),%d,%d)", s, v->rows(), v->cols());
@@ -1034,7 +1104,11 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             blackbox *bb=getBlackboxStuff(t);
             if (bb!=NULL) return bb->blackbox_String(bb,d);
           }
-    } /* end switch: (Typ()) */
+    } /*!
+!
+ end switch: (Typ()) 
+
+*/
   }
   return omStrDup("");
 }
@@ -1209,7 +1283,11 @@ void * sleftv::Data()
       case VMINPOLY:
         if ( (currRing != NULL)  && nCoeff_is_algExt(currRing->cf) && !nCoeff_is_GF(currRing->cf))
         {
-          /* Q(a), Fp(a), but not GF(q) */
+          /*!
+!
+ Q(a), Fp(a), but not GF(q) 
+
+*/
           const ring A = currRing->cf->extRing;
 
           assume( A != NULL );
@@ -1229,7 +1307,11 @@ void * sleftv::Data()
         return data;
     }
   }
-  /* e != NULL : */
+  /*!
+!
+ e != NULL : 
+
+*/
   int t=rtyp;
   void *d=data;
   if (t==IDHDL)
@@ -1580,14 +1662,20 @@ BOOLEAN assumeStdFlag(leftv h)
   return TRUE;
 }
 
-/*2
+/*!
+!
+2
 * transforms a name (as an string created by omAlloc or omStrDup)
 * into an expression (sleftv), deletes the string
 * utility for grammar and iparith
+
+
 */
 void syMake(leftv v,const char * id, package pa)
 {
-  /* resolv an identifier: (to DEF_CMD, if siq>0)
+  /*!
+!
+ resolv an identifier: (to DEF_CMD, if siq>0)
   * 1) reserved id: done by scanner
   * 2) `basering` / 'Current`
   * 3) existing identifier, local
@@ -1600,7 +1688,9 @@ void syMake(leftv v,const char * id, package pa)
   * 8) basering
   * 9) `_`
   * 10) everything else is of type 0
-  */
+  
+
+*/
 #ifdef TEST
   if ((*id<' ')||(*id>(char)126))
   {
@@ -1634,7 +1724,11 @@ void syMake(leftv v,const char * id, package pa)
         else
         {
           v->name = id;
-          return; /* undefined */
+          return; /*!
+!
+ undefined 
+
+*/
         }
       }
       else if (strcmp(id,"Current")==0)
@@ -1648,7 +1742,11 @@ void syMake(leftv v,const char * id, package pa)
         else
         {
           v->name = id;
-          return; /* undefined */
+          return; /*!
+!
+ undefined 
+
+*/
         }
       }
       if(v->req_packhdl!=currPack)
@@ -1657,10 +1755,18 @@ void syMake(leftv v,const char * id, package pa)
       }
       else
       h=ggetid(id);
-      /* 3) existing identifier, local */
+      /*!
+!
+ 3) existing identifier, local 
+
+*/
       if ((h!=NULL) && (IDLEV(h)==myynest))
       {
-        if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id); /*assume strlen(id) <1000 */
+        if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id); /*!
+!
+assume strlen(id) <1000 
+
+*/
         goto id_found;
       }
     }
@@ -1668,9 +1774,17 @@ void syMake(leftv v,const char * id, package pa)
     {
       currRingHdl=NULL;
     }
-    /* 4. local ring: ringvar */
+    /*!
+!
+ 4. local ring: ringvar 
+
+*/
     if ((currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest)
-    /*&& (!yyInRingConstruction)*/)
+    /*!
+!
+&& (!yyInRingConstruction)
+
+*/)
     {
       int vnr;
       if ((vnr=r_IsRingVar(id, currRing->names,currRing->N))>=0)
@@ -1700,13 +1814,25 @@ void syMake(leftv v,const char * id, package pa)
         }
       }
     }
-    /* 5. existing identifier, global */
+    /*!
+!
+ 5. existing identifier, global 
+
+*/
     if (h!=NULL)
     {
-      if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id);  /*assume strlen(id) <1000 */
+      if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id);  /*!
+!
+assume strlen(id) <1000 
+
+*/
       goto id_found;
     }
-    /* 6. local ring: number/poly */
+    /*!
+!
+ 6. local ring: number/poly 
+
+*/
     if ((currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest)
     #ifdef HAVE_SHIFTBBA
     && (currRing->isLPring==0)
@@ -1714,7 +1840,11 @@ void syMake(leftv v,const char * id, package pa)
     )
     {
       BOOLEAN ok=FALSE;
-      /*poly p = (!yyInRingConstruction) ? pmInit(id,ok) : (poly)NULL;*/
+      /*!
+!
+poly p = (!yyInRingConstruction) ? pmInit(id,ok) : (poly)NULL;
+
+*/
       poly p = pmInit(id,ok);
       if (ok)
       {
@@ -1746,13 +1876,29 @@ void syMake(leftv v,const char * id, package pa)
         return;
       }
     }
-    /* 7. non-local ring: number/poly */
+    /*!
+!
+ 7. non-local ring: number/poly 
+
+*/
     {
       BOOLEAN ok=FALSE;
-      poly p = ((currRing!=NULL)     /* ring required */
+      poly p = ((currRing!=NULL)     /*!
+!
+ ring required 
+
+*/
                && (currRingHdl!=NULL)
-               /*&& (!yyInRingConstruction) - not in decl */
-               && (IDLEV(currRingHdl)!=myynest)) /* already in case 4/6 */
+               /*!
+!
+&& (!yyInRingConstruction) - not in decl 
+
+*/
+               && (IDLEV(currRingHdl)!=myynest)) /*!
+!
+ already in case 4/6 
+
+*/
                      ? pmInit(id,ok) : (poly)NULL;
       if (ok)
       {
@@ -1777,7 +1923,11 @@ void syMake(leftv v,const char * id, package pa)
           v->rtyp = POLY_CMD;
           v->name = id;
         }
-        //if (TEST_V_ALLWARN /*&& (myynest>0)*/
+        //if (TEST_V_ALLWARN /*!
+!
+&& (myynest>0)
+
+*/
         //&& ((r_IsRingVar(id, currRing->names,currRing->N)>=0)
         //  || ((n_NumberOfParameters(currRing->cf)>0)
         //     &&(r_IsRingVar(id, (char**)n_ParameterNames(currRing->cf),
@@ -1789,12 +1939,20 @@ void syMake(leftv v,const char * id, package pa)
         return;
       }
     }
-    /* 8. basering ? */
+    /*!
+!
+ 8. basering ? 
+
+*/
     if ((myynest>1)&&(currRingHdl!=NULL))
     {
       if (strcmp(id,IDID(currRingHdl))==0)
       {
-        if (IDID(currRingHdl)!=id) omFreeBinAddr((ADDRESS)id); /*assume strlen (id) <1000 */
+        if (IDID(currRingHdl)!=id) omFreeBinAddr((ADDRESS)id); /*!
+!
+assume strlen (id) <1000 
+
+*/
         h=currRingHdl;
         goto id_found;
       }
@@ -1804,7 +1962,11 @@ void syMake(leftv v,const char * id, package pa)
       h=basePack->idroot->get(id,myynest);
       if (h!=NULL)
       {
-        if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id); /*assume strlen(id) <1000 */
+        if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id); /*!
+!
+assume strlen(id) <1000 
+
+*/
         v->req_packhdl=basePack;
         goto id_found;
       }
@@ -1814,7 +1976,11 @@ void syMake(leftv v,const char * id, package pa)
   else
     v->rtyp=DEF_CMD;
 #endif
-  /* 9: _ */
+  /*!
+!
+ 9: _ 
+
+*/
   if (strcmp(id,"_")==0)
   {
     omFreeBinAddr((ADDRESS)id);
@@ -1822,8 +1988,16 @@ void syMake(leftv v,const char * id, package pa)
   }
   else
   {
-    /* 10: everything else */
-    /* v->rtyp = UNKNOWN;*/
+    /*!
+!
+ 10: everything else 
+
+*/
+    /*!
+!
+ v->rtyp = UNKNOWN;
+
+*/
     v->name = id;
   }
   currRingHdl=save_ring;

@@ -1,8 +1,12 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* Getopt for GNU.
+/*!
+!
+ Getopt for GNU.
    NOTE: getopt is now part of the C library, so if you don't know what
    "Keep this file name-space clean" means, talk to roland@gnu.ai.mit.edu
    before changing it!
@@ -22,12 +26,18 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
+   Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  
 
-/*
+*/
+
+/*!
+!
+
    obachman 9/99: adapted to Singular by
     * adding prefix fe_ to global variables
     * extended fe_option structure
+
+
 */
 
 
@@ -42,36 +52,70 @@
 #  endif
 #endif
 
-/* This tells Alpha OSF/1 not to define a getopt prototype in <stdio.h>.  */
+/*!
+!
+ This tells Alpha OSF/1 not to define a getopt prototype in <stdio.h>.  
+
+*/
 #ifndef _NO_PROTO
 #define _NO_PROTO
 #endif
 
 #include <stdio.h>
-/* #include "tailor.h" */
+/*!
+!
+ #include "tailor.h" 
 
-/* Comment out all this code if we are using the GNU C Library, and are not
+*/
+
+/*!
+!
+ Comment out all this code if we are using the GNU C Library, and are not
    actually compiling the library itself.  This code is part of the GNU C
    Library, but also included in many other GNU distributions.  Compiling
    and linking in this code is a waste when using the GNU C library
    (especially if it is a shared library).  Rather than having every GNU
    program understand `configure --with-gnu-libc' and omit the object files,
-   it is simpler to just do this in the source for each such file.  */
+   it is simpler to just do this in the source for each such file.  
 
-/* This needs to come after some library #include
-   to get __GNU_LIBRARY__ defined.  */
+*/
+
+/*!
+!
+ This needs to come after some library #include
+   to get __GNU_LIBRARY__ defined.  
+
+*/
 #ifdef  __GNU_LIBRARY__
-/* Don't include stdlib.h for non-GNU C libraries because some of them
-   contain conflicting prototypes for getopt.  */
+/*!
+!
+ Don't include stdlib.h for non-GNU C libraries because some of them
+   contain conflicting prototypes for getopt.  
+
+*/
 #include <stdlib.h>
-#endif  /* GNU C library.  */
+#endif  /*!
+!
+ GNU C library.  
 
-/* If GETOPT_COMPAT is defined, `+' as well as `--' can introduce a
+*/
+
+/*!
+!
+ If GETOPT_COMPAT is defined, `+' as well as `--' can introduce a
    long-named option.  Because this is not POSIX.2 compliant, it is
-   being phased out.  */
-/* #define GETOPT_COMPAT */
+   being phased out.  
 
-/* This version of `getopt' appears to the caller like standard Unix `getopt'
+*/
+/*!
+!
+ #define GETOPT_COMPAT 
+
+*/
+
+/*!
+!
+ This version of `getopt' appears to the caller like standard Unix `getopt'
    but it behaves differently for the user, since it allows the user
    to intersperse the options with the other arguments.
 
@@ -83,19 +127,27 @@
    Then the behavior is completely standard.
 
    GNU application programs can use a third alternative mode in which
-   they can distinguish the relative order of options and other arguments.  */
+   they can distinguish the relative order of options and other arguments.  
+
+*/
 
 #include "Singular/fegetopt.h"
 
-/* For communication from `getopt' to the caller.
+/*!
+!
+ For communication from `getopt' to the caller.
    When `getopt' finds an option that takes an argument,
    the argument value is returned here.
    Also, when `ordering' is RETURN_IN_ORDER,
-   each non-option ARGV-element is returned here.  */
+   each non-option ARGV-element is returned here.  
+
+*/
 
 char *fe_optarg = 0;
 
-/* Index in ARGV of the next element to be scanned.
+/*!
+!
+ Index in ARGV of the next element to be scanned.
    This is used for communication to and from the caller
    and for communication between successive calls to `getopt'.
 
@@ -105,33 +157,53 @@ char *fe_optarg = 0;
    non-option elements that the caller should itself scan.
 
    Otherwise, `fe_optind' communicates from one call to the next
-   how much of ARGV has been scanned so far.  */
+   how much of ARGV has been scanned so far.  
 
-/* XXX 1003.2 says this must be 1 before any call.  */
+*/
+
+/*!
+!
+ XXX 1003.2 says this must be 1 before any call.  
+
+*/
 int fe_optind = 0;
 
-/* The next char to be scanned in the option-element
+/*!
+!
+ The next char to be scanned in the option-element
    in which the last option character we returned was found.
    This allows us to pick up the scan where we left off.
 
    If this is zero, or a null string, it means resume the scan
-   by advancing to the next ARGV-element.  */
+   by advancing to the next ARGV-element.  
+
+*/
 
 static char *nextchar;
 
-/* Callers store zero here to inhibit the error message
-   for unrecognized options.  */
+/*!
+!
+ Callers store zero here to inhibit the error message
+   for unrecognized options.  
+
+*/
 
 int fe_opterr = 1;
 
-/* Set to an option character which was unrecognized.
+/*!
+!
+ Set to an option character which was unrecognized.
    This must be initialized on some systems to avoid linking in the
-   system's own getopt implementation.  */
+   system's own getopt implementation.  
+
+*/
 
 #define BAD_OPTION '\0'
 int fe_optopt = BAD_OPTION;
 
-/* Describe how to deal with options that follow non-option ARGV-elements.
+/*!
+!
+ Describe how to deal with options that follow non-option ARGV-elements.
 
    If the caller did not specify anything,
    the default is REQUIRE_ORDER if the environment variable
@@ -158,7 +230,9 @@ int fe_optopt = BAD_OPTION;
 
    The special argument `--' forces an end of option-scanning regardless
    of the value of `ordering'.  In the case of RETURN_IN_ORDER, only
-   `--' can cause `getopt' to return EOF with `fe_optind' != ARGC.  */
+   `--' can cause `getopt' to return EOF with `fe_optind' != ARGC.  
+
+*/
 
 static enum
 {
@@ -166,17 +240,25 @@ static enum
 } ordering;
 
 #ifdef  __GNU_LIBRARY__
-/* We want to avoid inclusion of string.h with non-GNU libraries
+/*!
+!
+ We want to avoid inclusion of string.h with non-GNU libraries
    because there are many ways it can cause trouble.
    On some systems, it contains special magic macros that don't work
-   in GCC.  */
+   in GCC.  
+
+*/
 #include <string.h>
 #define my_index        strchr
 #define my_strlen       strlen
 #else
 
-/* Avoid depending on library functions or files
-   whose names are inconsistent.  */
+/*!
+!
+ Avoid depending on library functions or files
+   whose names are inconsistent.  
+
+*/
 
 #if __STDC__ || defined(PROTO)
 extern char *getenv(const char *name);
@@ -208,18 +290,32 @@ static const char * my_index (const char *str, int chr)
   return 0;
 }
 
-#endif                          /* GNU C library.  */
+#endif                          /*!
+!
+ GNU C library.  
 
-/* Handle permutation of arguments.  */
+*/
 
-/* Describe the part of ARGV that contains non-options that have
+/*!
+!
+ Handle permutation of arguments.  
+
+*/
+
+/*!
+!
+ Describe the part of ARGV that contains non-options that have
    been skipped.  `first_nonopt' is the index in ARGV of the first of them;
-   `last_nonopt' is the index after the last of them.  */
+   `last_nonopt' is the index after the last of them.  
+
+*/
 
 static int first_nonopt;
 static int last_nonopt;
 
-/* Exchange two adjacent subsequences of ARGV.
+/*!
+!
+ Exchange two adjacent subsequences of ARGV.
    One subsequence is elements [first_nonopt,last_nonopt)
    which contains all the non-options that have been skipped so far.
    The other is elements [last_nonopt,fe_optind), which contains all
@@ -236,6 +332,8 @@ static int last_nonopt;
        reverse all:         -y -x c b a
        reverse options:     -x -y c b a
        reverse non options: -x -y a b c
+
+
 */
 
 #if __STDC__ || defined(PROTO)
@@ -246,13 +344,21 @@ static void exchange (char **argv)
 {
   char *temp, **first, **last;
 
-  /* Reverse all the elements [first_nonopt, fe_optind) */
+  /*!
+!
+ Reverse all the elements [first_nonopt, fe_optind) 
+
+*/
   first = &argv[first_nonopt];
   last  = &argv[fe_optind-1];
   while (first < last) {
     temp = *first; *first = *last; *last = temp; first++; last--;
   }
-  /* Put back the options in order */
+  /*!
+!
+ Put back the options in order 
+
+*/
   first = &argv[first_nonopt];
   first_nonopt += (fe_optind - last_nonopt);
   last  = &argv[first_nonopt - 1];
@@ -260,7 +366,11 @@ static void exchange (char **argv)
     temp = *first; *first = *last; *last = temp; first++; last--;
   }
 
-  /* Put back the non options in order */
+  /*!
+!
+ Put back the non options in order 
+
+*/
   first = &argv[first_nonopt];
   last_nonopt = fe_optind;
   last  = &argv[last_nonopt-1];
@@ -269,7 +379,9 @@ static void exchange (char **argv)
   }
 }
 
-/* Scan elements of ARGV (whose length is ARGC) for option characters
+/*!
+!
+ Scan elements of ARGV (whose length is ARGC) for option characters
    given in OPTSTRING.
 
    If an element of ARGV starts with '-', and is not exactly "-" or "--",
@@ -322,7 +434,9 @@ static void exchange (char **argv)
    recent call.
 
    If LONG_ONLY is nonzero, '-' as well as '--' can introduce
-   long-named options.  */
+   long-named options.  
+
+*/
 
 int _fe_getopt_internal (
      int argc,
@@ -336,10 +450,14 @@ int _fe_getopt_internal (
 
   fe_optarg = 0;
 
-  /* Initialize the internal data when the first call is made.
+  /*!
+!
+ Initialize the internal data when the first call is made.
      Start processing options with ARGV-element 1 (since ARGV-element 0
      is the program name); the sequence of previously skipped
-     non-option ARGV-elements is empty.  */
+     non-option ARGV-elements is empty.  
+
+*/
 
   if (fe_optind == 0)
     {
@@ -347,7 +465,11 @@ int _fe_getopt_internal (
 
       nextchar = NULL;
 
-      /* Determine how to handle the ordering of options and nonoptions.  */
+      /*!
+!
+ Determine how to handle the ordering of options and nonoptions.  
+
+*/
 
       if (optstring[0] == '-')
         {
@@ -369,32 +491,48 @@ int _fe_getopt_internal (
     {
       if (ordering == PERMUTE)
         {
-          /* If we have just processed some options following some non-options,
-             exchange them so that the options come first.  */
+          /*!
+!
+ If we have just processed some options following some non-options,
+             exchange them so that the options come first.  
+
+*/
 
           if (first_nonopt != last_nonopt && last_nonopt != fe_optind)
             exchange ((char **) argv);
           else if (last_nonopt != fe_optind)
             first_nonopt = fe_optind;
 
-          /* Now skip any additional non-options
-             and extend the range of non-options previously skipped.  */
+          /*!
+!
+ Now skip any additional non-options
+             and extend the range of non-options previously skipped.  
+
+*/
 
           while (fe_optind < argc
                  && (argv[fe_optind][0] != '-' || argv[fe_optind][1] == '\0')
 #ifdef GETOPT_COMPAT
                  && (longopts == NULL
                      || argv[fe_optind][0] != '+' || argv[fe_optind][1] == '\0')
-#endif                          /* GETOPT_COMPAT */
+#endif                          /*!
+!
+ GETOPT_COMPAT 
+
+*/
                  )
             fe_optind++;
           last_nonopt = fe_optind;
         }
 
-      /* Special ARGV-element `--' means premature end of options.
+      /*!
+!
+ Special ARGV-element `--' means premature end of options.
          Skip it like a null option,
          then exchange with previous non-options as if it were an option,
-         then skip everything else like a non-option.  */
+         then skip everything else like a non-option.  
+
+*/
 
       if (fe_optind != argc && !strcmp (argv[fe_optind], "--"))
         {
@@ -409,26 +547,42 @@ int _fe_getopt_internal (
           fe_optind = argc;
         }
 
-      /* If we have done all the ARGV-elements, stop the scan
-         and back over any non-options that we skipped and permuted.  */
+      /*!
+!
+ If we have done all the ARGV-elements, stop the scan
+         and back over any non-options that we skipped and permuted.  
+
+*/
 
       if (fe_optind == argc)
         {
-          /* Set the next-arg-index to point at the non-options
-             that we previously skipped, so the caller will digest them.  */
+          /*!
+!
+ Set the next-arg-index to point at the non-options
+             that we previously skipped, so the caller will digest them.  
+
+*/
           if (first_nonopt != last_nonopt)
             fe_optind = first_nonopt;
           return EOF;
         }
 
-      /* If we have come to a non-option and did not permute it,
-         either stop the scan or describe it to the caller and pass it by.  */
+      /*!
+!
+ If we have come to a non-option and did not permute it,
+         either stop the scan or describe it to the caller and pass it by.  
+
+*/
 
       if ((argv[fe_optind][0] != '-' || argv[fe_optind][1] == '\0')
 #ifdef GETOPT_COMPAT
           && (longopts == NULL
               || argv[fe_optind][0] != '+' || argv[fe_optind][1] == '\0')
-#endif                          /* GETOPT_COMPAT */
+#endif                          /*!
+!
+ GETOPT_COMPAT 
+
+*/
           )
         {
           if (ordering == REQUIRE_ORDER)
@@ -437,8 +591,12 @@ int _fe_getopt_internal (
           return 1;
         }
 
-      /* We have found another option-ARGV-element.
-         Start decoding its characters.  */
+      /*!
+!
+ We have found another option-ARGV-element.
+         Start decoding its characters.  
+
+*/
 
       nextchar = (argv[fe_optind] + 1
                   + (longopts != NULL && argv[fe_optind][1] == '-'));
@@ -449,7 +607,11 @@ int _fe_getopt_internal (
            && (argv[fe_optind][1] == '-' || long_only))
 #ifdef GETOPT_COMPAT
           || argv[fe_optind][0] == '+'
-#endif                          /* GETOPT_COMPAT */
+#endif                          /*!
+!
+ GETOPT_COMPAT 
+
+*/
           ))
     {
       const struct fe_option *p;
@@ -462,14 +624,22 @@ int _fe_getopt_internal (
       while (*s && *s != '=')
         s++;
 
-      /* Test all options for either exact match or abbreviated matches.  */
+      /*!
+!
+ Test all options for either exact match or abbreviated matches.  
+
+*/
       for (p = longopts, option_index = 0; p->name;
            p++, option_index++)
         if (!strncmp (p->name, nextchar, s - nextchar))
           {
             if (s - nextchar == my_strlen (p->name))
               {
-                /* Exact match found.  */
+                /*!
+!
+ Exact match found.  
+
+*/
                 pfound = p;
                 indfound = option_index;
                 exact = 1;
@@ -477,12 +647,20 @@ int _fe_getopt_internal (
               }
             else if (pfound == NULL)
               {
-                /* First nonexact match found.  */
+                /*!
+!
+ First nonexact match found.  
+
+*/
                 pfound = p;
                 indfound = option_index;
               }
             else
-              /* Second nonexact match found.  */
+              /*!
+!
+ Second nonexact match found.  
+
+*/
               ambig = 1;
           }
 
@@ -502,8 +680,12 @@ int _fe_getopt_internal (
           fe_optind++;
           if (*s)
             {
-              /* Don't test has_arg with >, because some C compilers don't
-                 allow it to be used on enums.  */
+              /*!
+!
+ Don't test has_arg with >, because some C compilers don't
+                 allow it to be used on enums.  
+
+*/
               if (pfound->has_arg)
                 fe_optarg = s + 1;
               else
@@ -511,12 +693,20 @@ int _fe_getopt_internal (
                   if (fe_opterr)
                     {
                       if (argv[fe_optind - 1][1] == '-')
-                        /* --option */
+                        /*!
+!
+ --option 
+
+*/
                         fprintf (stderr,
                                  "%s: option `--%s' doesn't allow an argument\n",
                                  argv[0], pfound->name);
                       else
-                        /* +option or -option */
+                        /*!
+!
+ +option or -option 
+
+*/
                         fprintf (stderr,
                              "%s: option `%c%s' doesn't allow an argument\n",
                              argv[0], argv[fe_optind - 1][0], pfound->name);
@@ -543,24 +733,40 @@ int _fe_getopt_internal (
             *longind = option_index;
           return pfound->val;
         }
-      /* Can't find it as a long option.  If this is not getopt_long_only,
+      /*!
+!
+ Can't find it as a long option.  If this is not getopt_long_only,
          or the option starts with '--' or is not a valid short
          option, then it's an error.
-         Otherwise interpret it as a short option.  */
+         Otherwise interpret it as a short option.  
+
+*/
       if (!long_only || argv[fe_optind][1] == '-'
 #ifdef GETOPT_COMPAT
           || argv[fe_optind][0] == '+'
-#endif                          /* GETOPT_COMPAT */
+#endif                          /*!
+!
+ GETOPT_COMPAT 
+
+*/
           || my_index (optstring, *nextchar) == NULL)
         {
           if (fe_opterr)
             {
               if (argv[fe_optind][1] == '-')
-                /* --option */
+                /*!
+!
+ --option 
+
+*/
                 fprintf (stderr, "%s: unrecognized option `--%s'\n",
                          argv[0], nextchar);
               else
-                /* +option or -option */
+                /*!
+!
+ +option or -option 
+
+*/
                 fprintf (stderr, "%s: unrecognized option `%c%s'\n",
                          argv[0], argv[fe_optind][0], nextchar);
             }
@@ -570,13 +776,21 @@ int _fe_getopt_internal (
         }
     }
 
-  /* Look at and handle the next option-character.  */
+  /*!
+!
+ Look at and handle the next option-character.  
+
+*/
 
   {
     char c = *nextchar++;
     const char *temp = my_index (optstring, c);
 
-    /* Increment `fe_optind' when we start to process its last character.  */
+    /*!
+!
+ Increment `fe_optind' when we start to process its last character.  
+
+*/
     if (*nextchar == '\0')
       ++fe_optind;
 
@@ -591,7 +805,11 @@ int _fe_getopt_internal (
             else
               fprintf (stderr, "%s: unrecognized option `-%c'\n", argv[0], c);
 #else
-            /* 1003.2 specifies the format of this message.  */
+            /*!
+!
+ 1003.2 specifies the format of this message.  
+
+*/
             fprintf (stderr, "%s: illegal option -- %c\n", argv[0], c);
 #endif
           }
@@ -602,7 +820,11 @@ int _fe_getopt_internal (
       {
         if (temp[2] == ':')
           {
-            /* This is an option that accepts an argument optionally.  */
+            /*!
+!
+ This is an option that accepts an argument optionally.  
+
+*/
             if (*nextchar != '\0')
               {
                 fe_optarg = nextchar;
@@ -614,12 +836,20 @@ int _fe_getopt_internal (
           }
         else
           {
-            /* This is an option that requires an argument.  */
+            /*!
+!
+ This is an option that requires an argument.  
+
+*/
             if (*nextchar != '\0')
               {
                 fe_optarg = nextchar;
-                /* If we end this ARGV-element by taking the rest as an arg,
-                   we must advance to the next element now.  */
+                /*!
+!
+ If we end this ARGV-element by taking the rest as an arg,
+                   we must advance to the next element now.  
+
+*/
                 fe_optind++;
               }
             else if (fe_optind == argc)
@@ -630,7 +860,11 @@ int _fe_getopt_internal (
                     fprintf (stderr, "%s: option `-%c' requires an argument\n",
                              argv[0], c);
 #else
-                    /* 1003.2 specifies the format of this message.  */
+                    /*!
+!
+ 1003.2 specifies the format of this message.  
+
+*/
                     fprintf (stderr, "%s: option requires an argument -- %c\n",
                              argv[0], c);
 #endif
@@ -642,8 +876,12 @@ int _fe_getopt_internal (
                   c = BAD_OPTION;
               }
             else
-              /* We already incremented `fe_optind' once;
-                 increment it again when taking next ARGV-elt as argument.  */
+              /*!
+!
+ We already incremented `fe_optind' once;
+                 increment it again when taking next ARGV-elt as argument.  
+
+*/
               fe_optarg = argv[fe_optind++];
             nextchar = NULL;
           }
@@ -685,8 +923,12 @@ int fe_getopt_long_only (
 
 #ifdef TEST_GETOPT
 
-/* Compile with -DTEST_GETOPT to make an executable for use in testing
-   the above definition of `getopt'.  */
+/*!
+!
+ Compile with -DTEST_GETOPT to make an executable for use in testing
+   the above definition of `getopt'.  
+
+*/
 
 int main (int argc, char **argv)
 {
@@ -750,4 +992,8 @@ int main (int argc, char **argv)
   exit (0);
 }
 
-#endif /* TEST_GETOPT */
+#endif /*!
+!
+ TEST_GETOPT 
+
+*/

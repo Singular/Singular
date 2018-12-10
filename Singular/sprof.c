@@ -82,7 +82,11 @@ int main(int argc, char** argv)
     && (strncmp(buf,"(none)",6)!=0)
     && (strncmp(buf,"::",2)!=0))
     {
-      /* get fn */
+      /*!
+!
+ get fn 
+
+*/
       int i=0;
       char c;
       int line_no;

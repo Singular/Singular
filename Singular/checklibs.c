@@ -49,7 +49,11 @@ void get_next()
       if (buf[i]>=127) { non_ascii_found=1;non_ascii++;non_ascii_line=lines; break; }
     }
     if (non_ascii_found) printf("non-ascii:>>%s<<\n",buf);
-    if (footer==0) /* we are still in the header */
+    if (footer==0) /*!
+!
+ we are still in the header 
+
+*/
     {
       if (strstr(buf,"@*")!=NULL) star_nl++;
     }
@@ -81,10 +85,22 @@ void scan_proc(int *l)
     else if (strstr(buf,"LIB ")!=NULL) break;
     else if (strstr(buf,"LIB\"")!=NULL) break;
     else if (strstr(buf,"proc ")!=NULL) break;
-    else if (strncmp(buf,"\";",2)==0) break; /* poor mans end-of-info*/
+    else if (strncmp(buf,"\";",2)==0) break; /*!
+!
+ poor mans end-of-info
+
+*/
     else if ((p=strstr(buf,":"))!=NULL)
-    { /* handles all capital letters + : */
-      /* SEE ALSO, KEYWORDS, NOTE, ... */
+    { /*!
+!
+ handles all capital letters + : 
+
+*/
+      /*!
+!
+ SEE ALSO, KEYWORDS, NOTE, ... 
+
+*/
       int ch;
       unsigned char *pp=buf;
       while((*pp==' ')||(*pp=='\t')) pp++;
@@ -102,12 +118,20 @@ void scan_proc(int *l)
 
 void scan_keywords(int *l)
 {
-  /* the main problem with KEYWORDS: seperator between is ;,
-   * but it MUST NOT appear at the end */
+  /*!
+!
+ the main problem with KEYWORDS: seperator between is ;,
+   * but it MUST NOT appear at the end 
+
+*/
   unsigned char *p;
   while(!feof(f))
   {
-    p=strrchr(buf,';'); /* the last ; in the line*/
+    p=strrchr(buf,';'); /*!
+!
+ the last ; in the line
+
+*/
     if (p==NULL) { get_next(); (*l)++; return; }
     while (*p==' ') p++;
     if (isalpha(*p)) { get_next(); (*l)++; return; }
@@ -115,10 +139,22 @@ void scan_keywords(int *l)
     else if (strstr(buf,"LIB ")!=NULL) break;
     else if (strstr(buf,"LIB\"")!=NULL) break;
     else if (strstr(buf,"proc ")!=NULL) break;
-    else if (strncmp(buf,"\";",2)==0) break; /* poor mans end-of-info*/
+    else if (strncmp(buf,"\";",2)==0) break; /*!
+!
+ poor mans end-of-info
+
+*/
     else if ((p=strstr(buf,":"))!=NULL)
-    { /* handles all capital letters + : */
-      /* SEE ALSO, KEYWORDS, NOTE, ... */
+    { /*!
+!
+ handles all capital letters + : 
+
+*/
+      /*!
+!
+ SEE ALSO, KEYWORDS, NOTE, ... 
+
+*/
       int ch;
       unsigned char *pp=buf;
       while((*pp==' ')||(*pp=='\t')) pp++;
@@ -166,7 +202,11 @@ void scan_info(int *l)
     if (strstr(buf,"LIBRARY: ")!=NULL)
     {
       have_LIBRARY++;
-      /* musrt be first*/
+      /*!
+!
+ musrt be first
+
+*/
       if (have_other+have_AUTHORS+have_PROCEDURES+have_KEYWORDS+have_SEEALSO!=0)
         printf("error: LIBRARY: must be the first section in info\n");
     }
@@ -225,7 +265,11 @@ void scan_info(int *l)
       ch=strspn(pp,"ABCDEFGHIJKLMNOPQRSTUVWXYZ");
       if ((ch>1)||(pp+ch==p))
       {
-        /* check for other allowed sections: REFERENCES*/
+        /*!
+!
+ check for other allowed sections: REFERENCES
+
+*/
         if ((ch!=10)||(strncmp(pp,"REFERENCES",10)!=0))
         {
           printf("error: unknown section in library header: %s",buf);
@@ -235,7 +279,11 @@ void scan_info(int *l)
           printf("error: only KEYWORDS/SEE ALSO may follow PROCEDURES\n");
       }
     }
-    else if (strncmp(buf,"\";",2)==0) goto e_o_info; /* poor mans end-of-info*/
+    else if (strncmp(buf,"\";",2)==0) goto e_o_info; /*!
+!
+ poor mans end-of-info
+
+*/
     else
     {
       p=buf;
@@ -298,7 +346,11 @@ int main(int argc, char** argv)
   get_next(); header++;
   if (strncmp(buf,"//",2)!=0) { printf("error: lib must start with //\n"); }
   else { get_next(); header++; }
-  /* pass 1: check header */
+  /*!
+!
+ pass 1: check header 
+
+*/
   while(1)
   {
     if ((p=strstr(buf,"version="))!=NULL)
@@ -314,10 +366,14 @@ int main(int argc, char** argv)
         have_version++;
         pp=p+8;
         while((*pp)==' ') pp++;
-	/* syntax of version string: "version <filename> <version> <date> "
+	/*!
+!
+ syntax of version string: "version <filename> <version> <date> "
         if (*pp)!='"')
           printf("error: version string should ....");
-	*/
+	
+
+*/
       }
     }
     if ((p=strstr(buf,"category="))!=NULL)
@@ -345,25 +401,41 @@ int main(int argc, char** argv)
       printf("error: use a space between LIB and \"\n");
       if (p!=buf)
       { printf("end of header ? LIB should be in col. 1:>>%s<<\n",buf); }
-      break; /* end of header */
+      break; /*!
+!
+ end of header 
+
+*/
     }
     if ((p=strstr(buf,"LIB \""))!=NULL)
     {
       if (p!=buf)
       { printf("end of header ? LIB should be in col. 1:>>%s<<\n",buf); }
-      break; /* end of header */
+      break; /*!
+!
+ end of header 
+
+*/
     }
     if ((p=strstr(buf,"proc "))!=NULL)
     {
       if ((p!=buf)&&(strncmp(buf,"static proc ",12)!=0))
       { printf("end of header ? proc should be in col. 1:>>%s<<\n",buf); }
-      break; /* end of header */
+      break; /*!
+!
+ end of header 
+
+*/
     }
     get_next(); header++;
     if(feof(f)) break;
   }
   printf("header parsed: %d lines of %s\n\n",header,argv[1]);
-  /* part 2: procs */
+  /*!
+!
+ part 2: procs 
+
+*/
   while(!feof(f))
   {
     if ((strstr(buf,"static")==(char*)buf) && (strstr(buf,"proc")==NULL))
@@ -383,9 +455,17 @@ int main(int argc, char** argv)
       }
       else if (pp!=p)
       {
-        footer++; get_next(); continue; /* this is not a proc start*/
+        footer++; get_next(); continue; /*!
+!
+ this is not a proc start
+
+*/
       }
-      p+=5; /* skip proc+blank*/
+      p+=5; /*!
+!
+ skip proc+blank
+
+*/
       while(*p==' ') p++;
       pp=p;
       while(isalnum(*p)||(*p=='_')) p++;
@@ -402,13 +482,25 @@ int main(int argc, char** argv)
       else
       {
         proc_found[i]=1;
-        footer++; get_next(); /* doc should start at next line */
+        footer++; get_next(); /*!
+!
+ doc should start at next line 
+
+*/
         p=buf;
         while(*p==' ') p++;
         if (*p == '"') have_doc[i]=1;
-	/* scan proc help*/
+	/*!
+!
+ scan proc help
+
+*/
 	scan_proc_help(proc[i]);
-        /* serach for example */
+        /*!
+!
+ serach for example 
+
+*/
         while(!feof(f))
         {
            if(strncmp(buf,"proc ",5)==0) break;
@@ -436,7 +528,11 @@ int main(int argc, char** argv)
       }
     }
   }
-  /* part 3: summary*/
+  /*!
+!
+ part 3: summary
+
+*/
   printf("\nproc part parsed: %d lines of %s\n",footer,argv[1]);
   if (have_version!=1) printf("version missing/duplicate (%d)\n",have_version);
   if (have_category!=1) printf("category missing/duplicate (%d)\n",have_category);

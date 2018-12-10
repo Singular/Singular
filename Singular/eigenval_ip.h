@@ -1,8 +1,14 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: eigenvalues of constant square matrices
+
+
 */
 
 #ifndef EIGENVAL_IP_H
@@ -17,5 +23,13 @@ BOOLEAN evHessenberg(leftv res,leftv h);
 lists evEigenvals(matrix M);
 BOOLEAN evEigenvals(leftv res,leftv h);
 
-#endif /* ifdef HAVE_EIGENVAL */
-#endif /* EIGENVAL_IP_H */
+#endif /*!
+!
+ ifdef HAVE_EIGENVAL 
+
+*/
+#endif /*!
+!
+ EIGENVAL_IP_H 
+
+*/

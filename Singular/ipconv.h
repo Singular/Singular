@@ -1,10 +1,16 @@
 #ifndef IPCONVERT_H
 #define IPCONVERT_H
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: interpreter: converting types
+
+
 */
 #include "kernel/structs.h"
 

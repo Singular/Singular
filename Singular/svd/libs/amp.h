@@ -54,7 +54,9 @@ namespace amp
     public:
         static mpfr_record* newMpfr(unsigned int Precision);
         static void deleteMpfr(mpfr_record* ref);
-        /*static void clearStorage();*/
+        /*!
+static void clearStorage();
+*/
         static gmp_randstate_t* getRandState();
     private:
         static mpfr_record_ptr& getList(unsigned int Precision);
@@ -240,11 +242,13 @@ namespace amp
         mpfr_record *rval;
     };
 
-    /*void ampf<Precision>::CheckPrecision()
+    /*!
+void ampf<Precision>::CheckPrecision()
     {
         if( Precision<32 )
             throw incorrectPrecision();
-    }***/
+    }**
+*/
 
     template<unsigned int Precision>
     void ampf<Precision>::CheckPrecision()

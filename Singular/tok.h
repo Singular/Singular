@@ -1,10 +1,16 @@
 #ifndef TOK_H
 #define TOK_H
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: tokens, types for interpreter; general macros
+
+
 */
 
 #ifndef UMINUS
@@ -19,14 +25,22 @@ extern char     my_yylinebuf[80];
 extern int  yyparse(void);
 #endif
 
-/* the follwing defines for infix operators should not be changed: *
+/*!
+!
+ the follwing defines for infix operators should not be changed: *
 *  grammar.y does not use the symbolic names                       *
-*  scanner.l uses the identies for some optimzations              */
+*  scanner.l uses the identies for some optimzations              
+
+*/
 #define LOGIC_OP         '&'
 #define MULDIV_OP        '/'
 #define COMP_OP          '<'
 
-#define COMMAND           UMINUS+2 /* in tok.h */
+#define COMMAND           UMINUS+2 /*!
+!
+ in tok.h 
+
+*/
 #define ANY_TYPE          UMINUS+3
 #define IDHDL             UMINUS+4
 
@@ -191,7 +205,11 @@ enum {
   TWOSTD_CMD,
   TYPEOF_CMD,
   UNIVARIATE_CMD,
-  UNLOAD_CMD, /* unused*/
+  UNLOAD_CMD, /*!
+!
+ unused
+
+*/
   URSOLVE_CMD,
   VANDER_CMD,
   VARIABLES_CMD,
@@ -202,7 +220,11 @@ enum {
   WEDGE_CMD,
   WEIGHT_CMD,
   WRITE_CMD,
-  /* start system var section: VECHO */
+  /*!
+!
+ start system var section: VECHO 
+
+*/
   VECHO,
   VCOLMAX,
   VTIMER,
@@ -211,9 +233,17 @@ enum {
   VOICE,
   VSHORTOUT,
   VPRINTLEVEL,
-  /* end system var section: VPRINTLEVEL */
+  /*!
+!
+ end system var section: VPRINTLEVEL 
 
-  MAX_TOK /* must be the last, biggest token number */
+*/
+
+  MAX_TOK /*!
+!
+ must be the last, biggest token number 
+
+*/
 };
 
 #define NONE END_RING

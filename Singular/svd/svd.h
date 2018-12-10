@@ -1,4 +1,5 @@
-/*************************************************************************
+/*!
+************************************************************************
 Copyright (c) 2005-2007, Sergey Bochkanov (ALGLIB project).
 
 Redistribution and use in source and binary forms, with or without
@@ -28,36 +29,55 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*************************************************************************/
+************************************************************************
+*/
 
 #ifndef _svd_h
 #define _svd_h
 
-/*MAKEHEADER*/
+/*!
+MAKEHEADER
+*/
 #include "ap.h"
 
-/*MAKEHEADER*/
+/*!
+MAKEHEADER
+*/
 #include "amp.h"
 
-/*MAKEHEADER*/
+/*!
+MAKEHEADER
+*/
 #include "reflections.h"
 
-/*MAKEHEADER*/
+/*!
+MAKEHEADER
+*/
 #include "bidiagonal.h"
 
-/*MAKEHEADER*/
+/*!
+MAKEHEADER
+*/
 #include "qr.h"
 
-/*MAKEHEADER*/
+/*!
+MAKEHEADER
+*/
 #include "lq.h"
 
-/*MAKEHEADER*/
+/*!
+MAKEHEADER
+*/
 #include "blas.h"
 
-/*MAKEHEADER*/
+/*!
+MAKEHEADER
+*/
 #include "rotations.h"
 
-/*MAKEHEADER*/
+/*!
+MAKEHEADER
+*/
 #include "bdsvd.h"
 
 namespace svd
@@ -84,7 +104,8 @@ namespace svd
         ap::template_2d_array< amp::ampf<Precision> >& vt);
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Singular value decomposition of a rectangular matrix.
 
     The algorithm calculates the singular value decomposition of a matrix of
@@ -135,7 +156,8 @@ namespace svd
 
       -- ALGLIB --
          Copyright 2005 by Bochkanov Sergey
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     bool rmatrixsvd(ap::template_2d_array< amp::ampf<Precision> > a,
         int m,
@@ -400,10 +422,12 @@ namespace svd
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Obsolete 1-based subroutine.
     See RMatrixSVD for 0-based replacement.
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     bool svddecomposition(ap::template_2d_array< amp::ampf<Precision> > a,
         int m,

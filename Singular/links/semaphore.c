@@ -24,10 +24,12 @@
 sipc_sem_t *semaphore[SIPC_MAX_SEMAPHORES];
 int sem_acquired[SIPC_MAX_SEMAPHORES];
 
-/* return 1 on success,
+/*!
+ return 1 on success,
  *        0 if already initialized,
  *       -1 for errors
- */
+ 
+*/
 int sipc_semaphore_init(int id, int count)
 {
   char buf[100];

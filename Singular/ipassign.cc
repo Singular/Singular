@@ -1,9 +1,15 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: interpreter:
 *           assignment of expressions and lists to objects or lists
+
+
 */
 
 #include "kernel/mod2.h"
@@ -48,7 +54,11 @@
 #include "blackbox.h"
 #include "Singular/number2.h"
 
-/*=================== proc =================*/
+/*!
+!
+=================== proc =================
+
+*/
 static BOOLEAN jjECHO(leftv, leftv a)
 {
   si_echo=(int)((long)(a->Data()));
@@ -311,7 +321,11 @@ static BOOLEAN jjNOETHER(leftv, leftv a)
   (currRing->ppNoether)=p;
   return FALSE;
 }
-/*=================== proc =================*/
+/*!
+!
+=================== proc =================
+
+*/
 static void jiAssignAttr(leftv l,leftv r)
 {
   // get the attribute of th right side
@@ -668,7 +682,11 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
       }
       else if (j<=0)
       {
-        Werror("index[%d] must be positive",j/*e->start*/);
+        Werror("index[%d] must be positive",j/*!
+!
+e->start
+
+*/);
         return TRUE;
       }
     }
@@ -691,7 +709,11 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
     {
       pDelete(&MATELEM(m,i,j));
       MATELEM(m,i,j)=p;
-      /* for module: update rank */
+      /*!
+!
+ for module: update rank 
+
+*/
       if ((p!=NULL) && (pGetComp(p)!=0))
       {
         m->rank=si_max(m->rank,pMaxComp(p));
@@ -702,7 +724,19 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
 }
 static BOOLEAN jiA_1x1INTMAT(leftv res, leftv a,Subexpr e)
 {
-  if (/*(*/ res->rtyp!=INTMAT_CMD /*)*/) /*|| (e!=NULL) - TRUE because of type int */
+  if (/*!
+!
+(
+
+*/ res->rtyp!=INTMAT_CMD /*!
+!
+)
+
+*/) /*!
+!
+|| (e!=NULL) - TRUE because of type int 
+
+*/
   {
     // no error message: assignment simply fails
     return TRUE;
@@ -724,7 +758,19 @@ static BOOLEAN jiA_1x1INTMAT(leftv res, leftv a,Subexpr e)
 }
 static BOOLEAN jiA_1x1MATRIX(leftv res, leftv a,Subexpr e)
 {
-  if (/*(*/ res->rtyp!=MATRIX_CMD /*)*/) /*|| (e!=NULL) - TRUE because of type poly */
+  if (/*!
+!
+(
+
+*/ res->rtyp!=MATRIX_CMD /*!
+!
+)
+
+*/) /*!
+!
+|| (e!=NULL) - TRUE because of type poly 
+
+*/
   {
     // no error message: assignment simply fails
     return TRUE;
@@ -855,7 +901,11 @@ static BOOLEAN jiA_RESOLUTION(leftv res, leftv a, Subexpr)
   return FALSE;
 }
 static BOOLEAN jiA_MODUL_P(leftv res, leftv a, Subexpr)
-/* module = poly */
+/*!
+!
+ module = poly 
+
+*/
 {
   if (res->data!=NULL) idDelete((ideal*)&res->data);
   ideal I=idInit(1,1);
@@ -1009,7 +1059,11 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
   if ((idElem(qid)>1) || rIsSCA(currRing) || (currRing->qideal!=NULL))
     assumeStdFlag(a);
 
-  if (currRing->qideal!=NULL) /* we are already in a qring! */
+  if (currRing->qideal!=NULL) /*!
+!
+ we are already in a qring! 
+
+*/
   {
     ideal tmp=idSimpleAdd(qid,currRing->qideal);
     // both ideals should be GB, so dSimpleAdd is sufficient
@@ -1104,14 +1158,26 @@ static BOOLEAN jiA_CRING(leftv res, leftv a, Subexpr)
   return FALSE;
 }
 
-/*=================== table =================*/
+/*!
+!
+=================== table =================
+
+*/
 #define IPASSIGN
 #define D(A)     A
 #define NULL_VAL NULL
 #include "table.h"
-/*=================== operations ============================*/
-/*2
+/*!
+!
+=================== operations ============================
+
+*/
+/*!
+!
+2
 * assign a = b
+
+
 */
 static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
 {
@@ -1148,7 +1214,11 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
     && (rt!=RING_CMD)
     && (l->name!=NULL)
     && (l->e==NULL)
-    && (iiCurrArgs==NULL) /* not in proc header */
+    && (iiCurrArgs==NULL) /*!
+!
+ not in proc header 
+
+*/
     )
     {
       Warn("use `%s` instead of `def` in %s:%d:%s",Tok2Cmdname(rt),
@@ -1210,7 +1280,11 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
     if (traceit&TRACE_ASSIGN) Print("assign %s=%s\n",Tok2Cmdname(lt),Tok2Cmdname(rt));
     BOOLEAN b;
     b=dAssign[i].p(ld,r,l->e);
-    if(l!=ld) /* i.e. l is IDHDL, l->data is ld */
+    if(l!=ld) /*!
+!
+ i.e. l is IDHDL, l->data is ld 
+
+*/
     {
       l->flag=ld->flag;
       l->attribute=ld->attribute;
@@ -1247,7 +1321,11 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
         }
         else
         {
-          if(l!=ld) /* i.e. l is IDHDL, l->data is ld */
+          if(l!=ld) /*!
+!
+ i.e. l is IDHDL, l->data is ld 
+
+*/
           {
             l->flag=ld->flag;
             l->attribute=ld->attribute;
@@ -1283,8 +1361,12 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
   }
   return TRUE;
 }
-/*2
+/*!
+!
+2
 * assign sys_var = val
+
+
 */
 static BOOLEAN iiAssign_sys(leftv l, leftv r)
 {
@@ -1362,7 +1444,11 @@ static BOOLEAN iiAssign_sys(leftv l, leftv r)
 }
 static BOOLEAN jiA_INTVEC_L(leftv l,leftv r)
 {
-  /* right side is intvec, left side is list (of int)*/
+  /*!
+!
+ right side is intvec, left side is list (of int)
+
+*/
   BOOLEAN nok;
   int i=0;
   leftv l1=l;
@@ -1388,7 +1474,11 @@ static BOOLEAN jiA_INTVEC_L(leftv l,leftv r)
 }
 static BOOLEAN jiA_VECTOR_L(leftv l,leftv r)
 {
-  /* right side is vector, left side is list (of poly)*/
+  /*!
+!
+ right side is vector, left side is list (of poly)
+
+*/
   BOOLEAN nok;
   leftv l1=l;
   ideal I=idVec2Ideal((poly)r->Data());
@@ -1428,8 +1518,12 @@ static BOOLEAN jiA_VECTOR_L(leftv l,leftv r)
   return FALSE;
 }
 static BOOLEAN jjA_L_LIST(leftv l, leftv r)
-/* left side: list/def, has to be a "real" variable
+/*!
+!
+ left side: list/def, has to be a "real" variable
 *  right side: expression list
+
+
 */
 {
   int sl = r->listLength();
@@ -1442,10 +1536,14 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
   L->Init(sl);
   for (i=0;i<sl;i++)
   {
-    if (h!=NULL) { /* e.g. not in the first step:
+    if (h!=NULL) { /*!
+!
+ e.g. not in the first step:
                    * h is the pointer to the old sleftv,
                    * r is the pointer to the next sleftv
-                   * (in this moment) */
+                   * (in this moment) 
+
+*/
                    h->next=r;
                  }
     h=r;
@@ -1494,7 +1592,11 @@ err:
 }
 static BOOLEAN jjA_L_INTVEC(leftv l,leftv r,intvec *iv)
 {
-  /* left side is intvec/intmat, right side is list (of int,intvec,intmat)*/
+  /*!
+!
+ left side is intvec/intmat, right side is list (of int,intvec,intmat)
+
+*/
   leftv hh=r;
   int i = 0;
   while (hh!=NULL)
@@ -1543,7 +1645,11 @@ static BOOLEAN jjA_L_INTVEC(leftv l,leftv r,intvec *iv)
 }
 static BOOLEAN jjA_L_BIGINTMAT(leftv l,leftv r,bigintmat *bim)
 {
-  /* left side is bigintmat, right side is list (of int,intvec,intmat)*/
+  /*!
+!
+ left side is bigintmat, right side is list (of int,intvec,intmat)
+
+*/
   leftv hh=r;
   int i = 0;
   if (bim->length()==0) { WerrorS("bigintmat is 1x0"); delete bim; return TRUE; }
@@ -1568,7 +1674,9 @@ static BOOLEAN jjA_L_BIGINTMAT(leftv l,leftv r,bigintmat *bim)
     {
       bim->set(i++, (number)(hh->Data()));
     }
-    /*
+    /*!
+!
+
     ((hh->Typ() == INTVEC_CMD)
             ||(hh->Typ() == INTMAT_CMD))
     {
@@ -1578,7 +1686,9 @@ static BOOLEAN jjA_L_BIGINTMAT(leftv l,leftv r,bigintmat *bim)
       {
         (*iv)[i++] = (*ivv)[ll++];
       }
-    }*/
+    }
+
+*/
     else
     {
       delete bim;
@@ -1592,13 +1702,21 @@ static BOOLEAN jjA_L_BIGINTMAT(leftv l,leftv r,bigintmat *bim)
 }
 static BOOLEAN jjA_L_STRING(leftv l,leftv r)
 {
-  /* left side is string, right side is list of string*/
+  /*!
+!
+ left side is string, right side is list of string
+
+*/
   leftv hh=r;
   int sl = 1;
   char *s;
   char *t;
   int tl;
-  /* find the length */
+  /*!
+!
+ find the length 
+
+*/
   while (hh!=NULL)
   {
     if (hh->Typ()!= STRING_CMD)
@@ -1626,7 +1744,11 @@ static BOOLEAN jjA_L_STRING(leftv l,leftv r)
 }
 static BOOLEAN jiA_MATRIX_L(leftv l,leftv r)
 {
-  /* right side is matrix, left side is list (of poly)*/
+  /*!
+!
+ right side is matrix, left side is list (of poly)
+
+*/
   BOOLEAN nok=FALSE;
   int i;
   matrix m=(matrix)r->CopyD(MATRIX_CMD);
@@ -1640,7 +1762,11 @@ static BOOLEAN jiA_MATRIX_L(leftv l,leftv r)
   loop
   {
     i=0;
-    while ((i<mxn /*MATROWS(m)*MATCOLS(m)*/)&&(l!=NULL))
+    while ((i<mxn /*!
+!
+MATROWS(m)*MATCOLS(m)
+
+*/)&&(l!=NULL))
     {
       t.data=(char *)m->m[i];
       m->m[i]=NULL;
@@ -1702,10 +1828,22 @@ ende:
 }
 static BOOLEAN jiA_STRING_L(leftv l,leftv r)
 {
-  /*left side are strings, right side is a string*/
-  /*e.g. s[2..3]="12" */
-  /*the case s=t[1..4] is handled in iiAssign,
-  * the case s[2..3]=t[3..4] is handled in iiAssgn_rec*/
+  /*!
+!
+left side are strings, right side is a string
+
+*/
+  /*!
+!
+e.g. s[2..3]="12" 
+
+*/
+  /*!
+!
+the case s=t[1..4] is handled in iiAssign,
+  * the case s[2..3]=t[3..4] is handled in iiAssgn_rec
+
+*/
   BOOLEAN nok=FALSE;
   sleftv t;
   leftv h,l1=l;
@@ -1777,8 +1915,12 @@ static BOOLEAN jiAssign_list(leftv l, leftv r)
   BOOLEAN b;
   sleftv tmp;
   memset(&tmp,0,sizeof(sleftv));
-  if (/*(ld->rtyp!=LIST_CMD)
-  &&*/(ld->e==NULL)
+  if (/*!
+!
+(ld->rtyp!=LIST_CMD)
+  &&
+
+*/(ld->e==NULL)
   && (ld->Typ()!=r->Typ()))
   {
     tmp.rtyp=DEF_CMD;
@@ -1852,7 +1994,11 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
   l->flag=0;
   if (ll==1)
   {
-    /* l[..] = ... */
+    /*!
+!
+ l[..] = ... 
+
+*/
     if(l->e!=NULL)
     {
       BOOLEAN like_lists=0;
@@ -1911,7 +2057,11 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
     rl=r->listLength();
     if (rl==1)
     {
-      /* system variables = ... */
+      /*!
+!
+ system variables = ... 
+
+*/
       if(((l->rtyp>=VECHO)&&(l->rtyp<=VPRINTLEVEL))
       ||((l->rtyp>=VALTVARS)&&(l->rtyp<=VMINPOLY)))
       {
@@ -1921,7 +2071,11 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
         return b;
       }
       rt=r->Typ();
-      /* a = ... */
+      /*!
+!
+ a = ... 
+
+*/
       if ((lt!=MATRIX_CMD)
       &&(lt!=BIGINTMAT_CMD)
       &&(lt!=CMATRIX_CMD)
@@ -2023,7 +2177,11 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
       {
         omFree((ADDRESS)IDMAP((idhdl)l->data)->preimage);
         IDMAP((idhdl)l->data)->preimage = omStrDup (r->Fullname());
-        /* advance the expressionlist to get the next element after the ring */
+        /*!
+!
+ advance the expressionlist to get the next element after the ring 
+
+*/
         hh = r->next;
       }
       else
@@ -2032,7 +2190,11 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
         nok=TRUE;
         break;
       }
-      if (hh==NULL) /* map-assign: map f=r; */
+      if (hh==NULL) /*!
+!
+ map-assign: map f=r; 
+
+*/
       {
         WerrorS("expected image ideal");
         nok=TRUE;
@@ -2040,7 +2202,11 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
       }
       if ((hh->next==NULL)&&(hh->Typ()==IDEAL_CMD))
       {
-        BOOLEAN bo=jiAssign_1(l,hh,toplevel); /* map-assign: map f=r,i; */
+        BOOLEAN bo=jiAssign_1(l,hh,toplevel); /*!
+!
+ map-assign: map f=r,i; 
+
+*/
         omFreeBin(hh,sleftv_bin);
         return bo;
       }
@@ -2055,18 +2221,38 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
       matrix olm = (matrix)l->Data();
       int rk;
       char *pr=((map)olm)->preimage;
-      BOOLEAN module_assign=(/*l->Typ()*/ lt==MODUL_CMD);
+      BOOLEAN module_assign=(/*!
+!
+l->Typ()
+
+*/ lt==MODUL_CMD);
       matrix lm ;
       int  num;
       int j,k;
       int i=0;
-      int mtyp=MATRIX_CMD; /*Type of left side object*/
-      int etyp=POLY_CMD;   /*Type of elements of left side object*/
+      int mtyp=MATRIX_CMD; /*!
+!
+Type of left side object
 
-      if (lt /*l->Typ()*/==MATRIX_CMD)
+*/
+      int etyp=POLY_CMD;   /*!
+!
+Type of elements of left side object
+
+*/
+
+      if (lt /*!
+!
+l->Typ()
+
+*/==MATRIX_CMD)
       {
         rk=olm->rows();
-        num=olm->cols()*rk /*olm->rows()*/;
+        num=olm->cols()*rk /*!
+!
+olm->rows()
+
+*/;
         lm=mpNew(olm->rows(),olm->cols());
         int el;
         if ((traceit&TRACE_ASSIGN) && (num!=(el=exprlist_length(hh))))
@@ -2074,7 +2260,11 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
           Warn("expression list length(%d) does not match matrix size(%d)",el,num);
         }
       }
-      else /* IDEAL_CMD or MODUL_CMD */
+      else /*!
+!
+ IDEAL_CMD or MODUL_CMD 
+
+*/
       {
         num=exprlist_length(hh);
         lm=(matrix)idInit(num,1);
@@ -2179,7 +2369,11 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
       WerrorS("assign not impl.");
       nok=TRUE;
       break;
-  } /* end switch: typ */
+  } /*!
+!
+ end switch: typ 
+
+*/
   if (nok && (!errorreported)) WerrorS("incompatible type in list assignment");
   r->CleanUp();
   return nok;
@@ -2236,7 +2430,11 @@ BOOLEAN jjIMPORTFROM(leftv, leftv u, leftv v)
   //Print("importfrom %s::%s ->.\n",v->Name(),u->Name() );
   assume(u->Typ()==PACKAGE_CMD);
   char *vn=(char *)v->Name();
-  idhdl h=((package)(u->Data()))->idroot->get(vn /*v->Name()*/, myynest);
+  idhdl h=((package)(u->Data()))->idroot->get(vn /*!
+!
+v->Name()
+
+*/, myynest);
   if (h!=NULL)
   {
     //check for existence
@@ -2245,7 +2443,11 @@ BOOLEAN jjIMPORTFROM(leftv, leftv u, leftv v)
       WarnS("source and destination packages are identical");
       return FALSE;
     }
-    idhdl t=basePack->idroot->get(vn /*v->Name()*/, myynest);
+    idhdl t=basePack->idroot->get(vn /*!
+!
+v->Name()
+
+*/, myynest);
     if (t!=NULL)
     {
       if (BVERBOSE(V_REDEFINE)) Warn("redefining %s (%s)",vn,my_yylinebuf);

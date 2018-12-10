@@ -1,8 +1,16 @@
-/*****************************************
+/*!
+!
+****************************************
 *  Computer Algebra System SINGULAR      *
-*****************************************/
-/*
+****************************************
+
+*/
+/*!
+!
+
 * ABSTRACT: conversion between polys and coef vectors
+
+
 */
 
 
@@ -480,4 +488,8 @@ BOOLEAN pcvBasis(leftv res,leftv h)
   return TRUE;
 }
 
-#endif /* HAVE_PCV */
+#endif /*!
+!
+ HAVE_PCV 
+
+*/

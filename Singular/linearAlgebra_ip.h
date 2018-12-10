@@ -3,7 +3,9 @@
 #include "Singular/lists.h"
 #include "kernel/linear_algebra/linearAlgebra.h"
 
-/**
+/*!
+!
+*
  * Computes all eigenvalues of a given real quadratic matrix with
  * multiplicites.
  *
@@ -28,11 +30,27 @@
  * @return a list with one entry (int)0, or two entries which are again lists
  **/
 lists qrDoubleShift(
-       const matrix A,     /**< [in]  the quadratic matrix         */
-       const number tol1,  /**< [in]  tolerance for deflation      */
-       const number tol2,  /**< [in]  tolerance for square roots   */
-       const number tol3,   /**< [in]  tolerance for distinguishing
-                                      eigenvalues                  */
+       const matrix A,     /*!
+!
+*< [in]  the quadratic matrix         
+
+*/
+       const number tol1,  /*!
+!
+*< [in]  tolerance for deflation      
+
+*/
+       const number tol2,  /*!
+!
+*< [in]  tolerance for square roots   
+
+*/
+       const number tol3,   /*!
+!
+*< [in]  tolerance for distinguishing
+                                      eigenvalues                  
+
+*/
        const ring r= currRing
                    );
 #endif

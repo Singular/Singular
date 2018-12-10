@@ -1,10 +1,16 @@
 #ifndef CNTRLC_H
 #define CNTRLC_H
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT - interupt and signal handling
+
+
 */
 #include <setjmp.h>
 #include "kernel/mod2.h"
@@ -16,9 +22,17 @@ extern int siRandomStart;
 void init_signals();
 
 extern BOOLEAN singular_in_batchmode;
-/* TRUE for child of a fork or started with --batch*/
+/*!
+!
+ TRUE for child of a fork or started with --batch
 
-/* for deferring the call of m2_end() in SIGTERM handler if necessary */
+*/
+
+/*!
+!
+ for deferring the call of m2_end() in SIGTERM handler if necessary 
+
+*/
 extern volatile BOOLEAN do_shutdown;
 extern volatile int defer_shutdown;
 

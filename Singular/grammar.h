@@ -1,6 +1,12 @@
-/* A Bison parser, made by GNU Bison 2.4.3.  */
+/*!
+!
+ A Bison parser, made by GNU Bison 2.4.3.  
 
-/* Skeleton interface for Bison's Yacc-like parsers in C
+*/
+
+/*!
+!
+ Skeleton interface for Bison's Yacc-like parsers in C
    
       Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
    2009, 2010 Free Software Foundation, Inc.
@@ -16,9 +22,13 @@
    GNU General Public License for more details.
    
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  
 
-/* As a special exception, you may create a larger work that contains
+*/
+
+/*!
+!
+ As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
    under terms of your choice, so long as that work isn't itself a
    parser generator using the skeleton or a modified version thereof
@@ -29,14 +39,24 @@
    License without this special exception.
    
    This special exception was added by the Free Software Foundation in
-   version 2.2 of Bison.  */
+   version 2.2 of Bison.  
+
+*/
 
 
-/* Tokens.  */
+/*!
+!
+ Tokens.  
+
+*/
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
+   /*!
+!
+ Put the tokens into the symbol table, so that GDB and other debuggers
+      know about them.  
+
+*/
    enum yytokentype {
      DOTDOT = 258,
      EQUAL_EQUAL = 259,
@@ -130,7 +150,11 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
-# define yystype YYSTYPE /* obsolescent; will be withdrawn */
+# define yystype YYSTYPE /*!
+!
+ obsolescent; will be withdrawn 
+
+*/
 # define YYSTYPE_IS_DECLARED 1
 #endif
 

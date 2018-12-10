@@ -1,10 +1,16 @@
 #ifndef SUBEXPR_H
 #define SUBEXPR_H
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: handling of leftv
+
+
 */
 
 #include <string.h>
@@ -17,7 +23,11 @@
 #include "Singular/grammar.h"
 #include "Singular/tok.h"
 #include "Singular/attrib.h"
-#include "Singular/fevoices.h" /* for sNoName_fe*/
+#include "Singular/fevoices.h" /*!
+!
+ for sNoName_fe
+
+*/
 
 typedef enum { LANG_NONE, LANG_TOP, LANG_SINGULAR, LANG_C, LANG_MIX, LANG_MAX} language_defs;
 class proc_singular
@@ -82,14 +92,20 @@ typedef sleftv * leftv;
 class sleftv
 {
   public:
-  /* !! do not change the first 6 entries !! (see ipid.h: idrec) */
+  /*!
+!
+ !! do not change the first 6 entries !! (see ipid.h: idrec) 
+
+*/
     leftv       next;
     const char *name;
     void *      data;
     attr        attribute;
     BITSET      flag;
     int         rtyp;
-                 /* the type of the expression, describes the data field
+                 /*!
+!
+ the type of the expression, describes the data field
                   * (E) markes the type field in iparith
                   * (S) markes the rtyp in sleftv
                   * ANY_TYPE:   data is int: real type or 0    (E)
@@ -101,8 +117,14 @@ class sleftv
                   * INTVEC_CMD:   intvec constant, data is intvec * (E,S)
                   * POLY_CMD:     poly constant, data is poly (E,S)
                   * ....
-                  */
-    Subexpr e;    /* holds the indices for indexed values */
+                  
+
+*/
+    Subexpr e;    /*!
+!
+ holds the indices for indexed values 
+
+*/
     package     req_packhdl;
     inline void Init() { memset(this,0,sizeof(*this)); }
     void CleanUp(ring r=currRing);
@@ -128,14 +150,26 @@ class sleftv
       else return sNoName_fe;
     }
     int  Typ();
-    int  LTyp(); /* returns LIST_CMD for l[i], otherwise returns Typ() */
+    int  LTyp(); /*!
+!
+ returns LIST_CMD for l[i], otherwise returns Typ() 
+
+*/
     void * Data();
-    leftv LData(); /* returns &(l[i]) for l[i], otherwise returns this */
+    leftv LData(); /*!
+!
+ returns &(l[i]) for l[i], otherwise returns this 
+
+*/
     //leftv LHdl();
     attr * Attribute();
     inline leftv Next() { return next; }
     int listLength();
-    int Eval(); /*replace a COMMAND by its result otherwise by CopyD*/
+    int Eval(); /*!
+!
+replace a COMMAND by its result otherwise by CopyD
+
+*/
     BOOLEAN RingDependend();
 };
 
@@ -168,7 +202,11 @@ class libstack
   libstackv pop(const char *p);
   inline char *get() { return(libname); }
 };
-#endif /* HAVE_LIBPARSER */
+#endif /*!
+!
+ HAVE_LIBPARSER 
+
+*/
 
 extern omBin sSubexpr_bin;
 extern omBin procinfo_bin;

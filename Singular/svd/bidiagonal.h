@@ -1,4 +1,5 @@
-/*************************************************************************
+/*!
+************************************************************************
 Copyright (c) 1992-2007 The University of Tennessee.  All rights reserved.
 
 Contributors:
@@ -34,7 +35,8 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*************************************************************************/
+************************************************************************
+*/
 
 #ifndef _bidiagonal_h
 #define _bidiagonal_h
@@ -140,7 +142,8 @@ namespace bidiagonal
         ap::template_1d_array< amp::ampf<Precision> >& e);
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Reduction of a rectangular matrix to  bidiagonal form
 
     The algorithm reduces the rectangular matrix A to  bidiagonal form by
@@ -189,7 +192,8 @@ namespace bidiagonal
 
     Here vi and ui are vectors which form H(i) and G(i), and d and e -
     are the diagonal and off-diagonal elements of matrix B.
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void rmatrixbd(ap::template_2d_array< amp::ampf<Precision> >& a,
         int m,
@@ -323,7 +327,8 @@ namespace bidiagonal
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Unpacking matrix Q which reduces a matrix to bidiagonal form.
 
     Input parameters:
@@ -343,7 +348,8 @@ namespace bidiagonal
 
       -- ALGLIB --
          Copyright 2005 by Bochkanov Sergey
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void rmatrixbdunpackq(const ap::template_2d_array< amp::ampf<Precision> >& qp,
         int m,
@@ -389,7 +395,8 @@ namespace bidiagonal
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Multiplication by matrix Q which reduces matrix A to  bidiagonal form.
 
     The algorithm allows pre- or post-multiply by Q or Q'.
@@ -417,7 +424,8 @@ namespace bidiagonal
 
       -- ALGLIB --
          Copyright 2005 by Bochkanov Sergey
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void rmatrixbdmultiplybyq(const ap::template_2d_array< amp::ampf<Precision> >& qp,
         int m,
@@ -550,7 +558,8 @@ namespace bidiagonal
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Unpacking matrix P which reduces matrix A to bidiagonal form.
     The subroutine returns transposed matrix P.
 
@@ -570,7 +579,8 @@ namespace bidiagonal
 
       -- ALGLIB --
          Copyright 2005-2007 by Bochkanov Sergey
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void rmatrixbdunpackpt(const ap::template_2d_array< amp::ampf<Precision> >& qp,
         int m,
@@ -616,7 +626,8 @@ namespace bidiagonal
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Multiplication by matrix P which reduces matrix A to  bidiagonal form.
 
     The algorithm allows pre- or post-multiply by P or P'.
@@ -644,7 +655,8 @@ namespace bidiagonal
 
       -- ALGLIB --
          Copyright 2005-2007 by Bochkanov Sergey
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void rmatrixbdmultiplybyp(const ap::template_2d_array< amp::ampf<Precision> >& qp,
         int m,
@@ -779,7 +791,8 @@ namespace bidiagonal
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Unpacking of the main and secondary diagonals of bidiagonal decomposition
     of matrix A.
 
@@ -800,7 +813,8 @@ namespace bidiagonal
 
       -- ALGLIB --
          Copyright 2005-2007 by Bochkanov Sergey
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void rmatrixbdunpackdiagonals(const ap::template_2d_array< amp::ampf<Precision> >& b,
         int m,
@@ -842,10 +856,12 @@ namespace bidiagonal
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Obsolete 1-based subroutine.
     See RMatrixBD for 0-based replacement.
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void tobidiagonal(ap::template_2d_array< amp::ampf<Precision> >& a,
         int m,
@@ -973,10 +989,12 @@ namespace bidiagonal
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Obsolete 1-based subroutine.
     See RMatrixBDUnpackQ for 0-based replacement.
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void unpackqfrombidiagonal(const ap::template_2d_array< amp::ampf<Precision> >& qp,
         int m,
@@ -1047,10 +1065,12 @@ namespace bidiagonal
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Obsolete 1-based subroutine.
     See RMatrixBDMultiplyByQ for 0-based replacement.
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void multiplybyqfrombidiagonal(const ap::template_2d_array< amp::ampf<Precision> >& qp,
         int m,
@@ -1188,10 +1208,12 @@ namespace bidiagonal
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Obsolete 1-based subroutine.
     See RMatrixBDUnpackPT for 0-based replacement.
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void unpackptfrombidiagonal(const ap::template_2d_array< amp::ampf<Precision> >& qp,
         int m,
@@ -1262,10 +1284,12 @@ namespace bidiagonal
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Obsolete 1-based subroutine.
     See RMatrixBDMultiplyByP for 0-based replacement.
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void multiplybypfrombidiagonal(const ap::template_2d_array< amp::ampf<Precision> >& qp,
         int m,
@@ -1405,10 +1429,12 @@ namespace bidiagonal
     }
 
 
-    /*************************************************************************
+    /*!
+************************************************************************
     Obsolete 1-based subroutine.
     See RMatrixBDUnpackDiagonals for 0-based replacement.
-    *************************************************************************/
+    ************************************************************************
+*/
     template<unsigned int Precision>
     void unpackdiagonalsfrombidiagonal(const ap::template_2d_array< amp::ampf<Precision> >& b,
         int m,

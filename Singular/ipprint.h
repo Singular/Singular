@@ -1,10 +1,16 @@
 #ifndef IPPRINT_H
 #define IPPRINT_H
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: interpreter: printing
+
+
 */
 #include "kernel/structs.h"
 

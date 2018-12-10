@@ -1,9 +1,15 @@
 // emacs edit mode for this file is -*- C++ -*-
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT - instantiation of all templates
+
+
 */
 
 
@@ -50,7 +56,11 @@ template    OSTREAM &   operator << ( OSTREAM&,const KMatrix<Rational>& );
 template    static  void    print_rational( OSTREAM&,int,const Rational& );
 #endif
 
-#endif /* HAVE_SPECTRUM */
+#endif /*!
+!
+ HAVE_SPECTRUM 
+
+*/
 // ----------------------------------------------------------------------------
 //  kmatrix.cc
 //  end of file
@@ -113,7 +123,11 @@ template void noro_step<tgb_uint32>(poly*p,int &pn,slimgb_alg* c);
 //
 #endif
 
-/* next lines are templates used in new minor code */
+/*!
+!
+ next lines are templates used in new minor code 
+
+*/
 #include <list>
 #include "kernel/linear_algebra/Minor.h"
 #include "kernel/linear_algebra/Cache.h"
@@ -124,11 +138,15 @@ template class std::list<IntMinorValue>;
 template class std::list<PolyMinorValue>;
 
 
-/*
+/*!
+!
+
 template class std::_List_base<IntMinorValue, std::allocator<IntMinorValue> >;
 template class std::_List_base<int, std::allocator<int> >;
 template class std::_List_base<MinorKey, std::allocator<MinorKey> >;
 template class std::_List_base<PolyMinorValue, std::allocator<PolyMinorValue> >;
+
+
 */
 
 template class Cache<MinorKey, IntMinorValue>;

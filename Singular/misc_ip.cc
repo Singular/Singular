@@ -1,14 +1,22 @@
-/*****************************************************************************\
+/*!
+!
+****************************************************************************\
  * Computer Algebra System SINGULAR
-\*****************************************************************************/
-/** @file misc_ip.cc
+\****************************************************************************
+
+*/
+/*!
+!
+* @file misc_ip.cc
  *
  * This file provides miscellaneous functionality.
  *
  * For more general information, see the documentation in misc_ip.h.
  *
  **/
-/*****************************************************************************/
+/*!
+!
+****************************************************************************/
 
 // include header files
 #define PLURAL_INTERNAL_DECLARATIONS 1
@@ -92,8 +100,16 @@ static FORCE_INLINE number mpz2number(mpz_t m){ return mpz2number(m, coeffs_BIGI
 
 
 void setListEntry(lists L, int index, mpz_t n)
-{ /* assumes n > 0 */
-  /* try to fit nn into an int: */
+{ /*!
+!
+ assumes n > 0 
+
+*/
+  /*!
+!
+ try to fit nn into an int: 
+
+*/
   if (mpz_size1(n)<=1)
   {
     int ui=(int)mpz_get_si(n);
@@ -109,8 +125,16 @@ void setListEntry(lists L, int index, mpz_t n)
 }
 
 void setListEntry_ui(lists L, int index, unsigned long ui)
-{ /* assumes n > 0 */
-  /* try to fit nn into an int: */
+{ /*!
+!
+ assumes n > 0 
+
+*/
+  /*!
+!
+ try to fit nn into an int: 
+
+*/
   int i=(int)ui;
   if ((((unsigned long)i)==ui) && (((i<<3)>>3)==i))
   {
@@ -123,7 +147,11 @@ void setListEntry_ui(lists L, int index, unsigned long ui)
   }
 }
 
-/* Factoring with Pollard's rho method. stolen from GMP/demos */
+/*!
+!
+ Factoring with Pollard's rho method. stolen from GMP/demos 
+
+*/
 static unsigned add[] = {4, 2, 4, 2, 4, 6, 2, 6};
 
 static int factor_using_division (mpz_t t, unsigned int limit,lists primes, int *multiplicities,int &index, unsigned long bound)
@@ -288,7 +316,11 @@ static void factor_using_pollard_rho (mpz_t n, unsigned long a, lists primes, in
     }
     while (mpz_cmp_ui (t1, 1) == 0);
 
-    mpz_divexact (n, n, t1);        /* divide by t1, before t1 is overwritten */
+    mpz_divexact (n, n, t1);        /*!
+!
+ divide by t1, before t1 is overwritten 
+
+*/
 
     if (!mpz_probab_prime_p (t1, 10))
     {
@@ -351,7 +383,11 @@ static void factor_gmp (mpz_t t,lists primes,int *multiplicities,int &index,unsi
   if (mpz_sgn (t) == 0)
     return;
 
-  /* Set the trial division limit according the size of t.  */
+  /*!
+!
+ Set the trial division limit according the size of t.  
+
+*/
   division_limit = mpz_sizeinbase (t, 2);
   if (division_limit > 1000)
     division_limit = 1000 * 1000;
@@ -373,7 +409,11 @@ static void factor_gmp (mpz_t t,lists primes,int *multiplicities,int &index,unsi
     }
   }
 }
-/* n and pBound are assumed to be bigint numbers */
+/*!
+!
+ n and pBound are assumed to be bigint numbers 
+
+*/
 lists primeFactorisation(const number n, const int pBound)
 {
   int i;
@@ -431,10 +471,16 @@ lists primeFactorisation(const number n, const int pBound)
 
 //#ifdef HAVE_LIBPARSER
 //#  include "libparse.h"
-//#endif /* HAVE_LIBPARSER */
+//#endif /*!
+!
+ HAVE_LIBPARSER 
+
+*/
 
 
-/*2
+/*!
+!
+2
 * the renice routine for very large jobs
 * works only on unix machines,
 * testet on : linux, HP 9.0
@@ -449,6 +495,8 @@ lists primeFactorisation(const number n, const int pBound)
 *#endif
 *  sleep(10);
 *}
+
+
 */
 
 void singular_example(char *str)
@@ -538,23 +586,43 @@ const struct soptionStruct optionStruct[]=
   {"sugarCrit",    Sy_bit(OPT_SUGARCRIT),      ~Sy_bit(OPT_SUGARCRIT)   },
   {"teach",        Sy_bit(OPT_DEBUG),          ~Sy_bit(OPT_DEBUG)  },
   {"notSyzMinim",  Sy_bit(OPT_NO_SYZ_MINIM),   ~Sy_bit(OPT_NO_SYZ_MINIM)  },
-  /* 9 return SB in syz, quotient, intersect */
+  /*!
+!
+ 9 return SB in syz, quotient, intersect 
+
+*/
   {"returnSB",     Sy_bit(OPT_RETURN_SB),      ~Sy_bit(OPT_RETURN_SB)  },
   {"fastHC",       Sy_bit(OPT_FASTHC),         ~Sy_bit(OPT_FASTHC)  },
-  /* 11-19 sort in L/T */
+  /*!
+!
+ 11-19 sort in L/T 
+
+*/
   {"staircaseBound",Sy_bit(OPT_STAIRCASEBOUND),~Sy_bit(OPT_STAIRCASEBOUND)  },
   {"multBound",    Sy_bit(OPT_MULTBOUND),      ~Sy_bit(OPT_MULTBOUND)  },
   {"degBound",     Sy_bit(OPT_DEGBOUND),       ~Sy_bit(OPT_DEGBOUND)  },
-  /* 25 no redTail(p)/redTail(s) */
+  /*!
+!
+ 25 no redTail(p)/redTail(s) 
+
+*/
   {"redTail",      Sy_bit(OPT_REDTAIL),        ~Sy_bit(OPT_REDTAIL)  },
   {"redThrough",   Sy_bit(OPT_REDTHROUGH),     ~Sy_bit(OPT_REDTHROUGH)  },
   {"lazy",         Sy_bit(OPT_OLDSTD),         ~Sy_bit(OPT_OLDSTD)  },
   {"intStrategy",  Sy_bit(OPT_INTSTRATEGY),    ~Sy_bit(OPT_INTSTRATEGY)  },
   {"infRedTail",   Sy_bit(OPT_INFREDTAIL),     ~Sy_bit(OPT_INFREDTAIL)  },
-  /* 30: use not regularity for syz */
+  /*!
+!
+ 30: use not regularity for syz 
+
+*/
   {"notRegularity",Sy_bit(OPT_NOTREGULARITY),  ~Sy_bit(OPT_NOTREGULARITY)  },
   {"weightM",      Sy_bit(OPT_WEIGHTM),        ~Sy_bit(OPT_WEIGHTM)  },
-/*special for "none" and also end marker for showOption:*/
+/*!
+!
+special for "none" and also end marker for showOption:
+
+*/
   {"ne",           0,                          0 }
 };
 
@@ -584,7 +652,11 @@ const struct soptionStruct verboseStruct[]=
   {"warn",     Sy_bit(V_ALLWARN),   ~Sy_bit(V_ALLWARN)},
   {"intersectSyz",Sy_bit(V_INTERSECT_SYZ), ~Sy_bit(V_INTERSECT_SYZ)},
   {"intersectElim",Sy_bit(V_INTERSECT_ELIM), ~Sy_bit(V_INTERSECT_ELIM)},
-/*special for "none" and also end marker for showOption:*/
+/*!
+!
+special for "none" and also end marker for showOption:
+
+*/
   {"ne",         0,          0 }
 };
 
@@ -691,7 +763,11 @@ BOOLEAN setOption(leftv res, leftv v)
         si_opt_2 |= verboseStruct[i].setval;
         #ifdef YYDEBUG
         #if YYDEBUG
-        /*debugging the bison grammar --> grammar.cc*/
+        /*!
+!
+debugging the bison grammar --> grammar.cc
+
+*/
         extern int    yydebug;
         if (BVERBOSE(V_YACC)) yydebug=1;
         else                  yydebug=0;
@@ -705,7 +781,11 @@ BOOLEAN setOption(leftv res, leftv v)
         si_opt_2 &= verboseStruct[i].resetval;
         #ifdef YYDEBUG
         #if YYDEBUG
-        /*debugging the bison grammar --> grammar.cc*/
+        /*!
+!
+debugging the bison grammar --> grammar.cc
+
+*/
         extern int    yydebug;
         if (BVERBOSE(V_YACC)) yydebug=1;
         else                  yydebug=0;
@@ -776,7 +856,11 @@ char * showOption()
   return StringEndS();
 }
 
-/* version strings */
+/*!
+!
+ version strings 
+
+*/
 #ifdef HAVE_FLINT
 extern "C"
 {
@@ -791,7 +875,11 @@ extern "C"
 const char *singular_date=__DATE__ " " __TIME__;
 #endif
 
-char * versionString(/*const bool bShowDetails = false*/ )
+char * versionString(/*!
+!
+const bool bShowDetails = false
+
+*/ )
 {
   StringSetS("");
   StringAppend("Singular for %s version %s (%d, %d bit) %s #%s",
@@ -991,7 +1079,11 @@ void p_SetRingOfLeftv(leftv l, ring r)
 #endif
 #endif
 
-#if 0 /* debug only */
+#if 0 /*!
+!
+ debug only 
+
+*/
 void listall(int showproc)
 {
       idhdl hh=basePack->idroot;
@@ -1093,14 +1185,22 @@ int singular_fstat(int fd, struct stat *buf)
   return si_fstat(fd,buf);
 }
 
-/*2
+/*!
+!
+2
 * the global exit routine of Singular
+
+
 */
 extern "C" {
-/* Note: We cannot use a mutex here because mutexes are not async-safe, but
+/*!
+!
+ Note: We cannot use a mutex here because mutexes are not async-safe, but
  * m2_end is called by sig_term_hdl(). Anyway, the race condition in the first
  * few lines of m2_end() should not matter.
- */
+ 
+
+*/
 volatile BOOLEAN m2_end_called = FALSE;
 
 void m2_end(int i)
@@ -1206,7 +1306,11 @@ extern "C"
     fprintf(stderr, "\nSingular error: no more memory\n");
     omPrintStats(stderr);
     m2_end(14);
-    /* should never get here */
+    /*!
+!
+ should never get here 
+
+*/
     exit(1);
   }
 }
@@ -1320,8 +1424,12 @@ static BOOLEAN iiCrossProd(leftv res, leftv args)
     WerrorS("expected `crossprod(coeffs, ...)`");
     return TRUE;
 }
-/*2
+/*!
+!
+2
 * initialize components of Singular
+
+
 */
 void siInit(char *name)
 {
@@ -1331,10 +1439,18 @@ void siInit(char *name)
 #ifndef __OPTIMIZE__
     om_Opts.ErrorHook = dErrorBreak;
 #else
-    om_Opts.Keep = 0; /* !OM_NDEBUG, __OPTIMIZE__*/
+    om_Opts.Keep = 0; /*!
+!
+ !OM_NDEBUG, __OPTIMIZE__
+
+*/
 #endif
 #else
-    om_Opts.Keep = 0; /* OM_NDEBUG */
+    om_Opts.Keep = 0; /*!
+!
+ OM_NDEBUG 
+
+*/
 #endif
     omInitInfo();
 
@@ -1409,29 +1525,101 @@ void siInit(char *name)
 // default coeffs
   {
     idhdl h;
-    h=enterid("QQ",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+    h=enterid("QQ",0/*!
+!
+level
+
+*/, CRING_CMD,&(basePack->idroot),FALSE /*!
+!
+init
+
+*/,FALSE /*!
+!
+search
+
+*/);
     IDDATA(h)=(char*)nInitChar(n_Q,NULL);
-    h=enterid("ZZ",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+    h=enterid("ZZ",0/*!
+!
+level
+
+*/, CRING_CMD,&(basePack->idroot),FALSE /*!
+!
+init
+
+*/,FALSE /*!
+!
+search
+
+*/);
     IDDATA(h)=(char*)nInitChar(n_Z,NULL);
     nRegisterCfByName(nrnInitCfByName,n_Zn); // and n_Znm
     iiAddCproc("kernel","crossprod",FALSE,iiCrossProd);
     iiAddCproc("kernel","Float",FALSE,iiFloat);
-    //h=enterid("RR",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+    //h=enterid("RR",0/*!
+!
+level
+
+*/, CRING_CMD,&(basePack->idroot),FALSE /*!
+!
+init
+
+*/,FALSE /*!
+!
+search
+
+*/);
     //IDDATA(h)=(char*)nInitChar(n_R,NULL);
-    //h=enterid("CC",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+    //h=enterid("CC",0/*!
+!
+level
+
+*/, CRING_CMD,&(basePack->idroot),FALSE /*!
+!
+init
+
+*/,FALSE /*!
+!
+search
+
+*/);
     //IDDATA(h)=(char*)nInitChar(n_long_C,NULL);
     n_coeffType t;
 #ifdef SINGULAR_4_2
     t=nRegister(n_unknown,n_AEInitChar);
     if (t!=n_unknown)
     {
-      h=enterid("AE",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+      h=enterid("AE",0/*!
+!
+level
+
+*/, CRING_CMD,&(basePack->idroot),FALSE /*!
+!
+init
+
+*/,FALSE /*!
+!
+search
+
+*/);
       IDDATA(h)=(char*)nInitChar(t,NULL);
     }
     t=nRegister(n_unknown,n_QAEInitChar);
     if (t!=n_unknown)
     {
-      h=enterid("QAE",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+      h=enterid("QAE",0/*!
+!
+level
+
+*/, CRING_CMD,&(basePack->idroot),FALSE /*!
+!
+init
+
+*/,FALSE /*!
+!
+search
+
+*/);
       IDDATA(h)=(char*)nInitChar(t,NULL);
     }
     n_pAE=nRegister(n_unknown,n_pAEInitChar);

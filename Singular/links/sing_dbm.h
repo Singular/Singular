@@ -1,10 +1,13 @@
 #ifndef SING_DBM_H
 #define SING_DBM_H
-/****************************************
+/*!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+
 * ABSTRACT: interface to DBM links
+
 */
 
 struct s_si_link_extension;

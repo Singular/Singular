@@ -1,6 +1,8 @@
 // -*- c++ -*-
 //*****************************************************************************
-/** @file pyobject_setup.cc
+/*!
+!
+* @file pyobject_setup.cc
  *
  * @author Alexander Dreyer
  * @date 2010-12-15
@@ -30,7 +32,15 @@ void* pyobject_autoload(blackbox* bbx)
     NULL: bbx->blackbox_Init(bbx));
 }
 
-void pyobject_default_destroy(blackbox  */*b*/, void */*d*/)
+void pyobject_default_destroy(blackbox  
+
+*/*b
+
+*/, void 
+
+*/*d
+
+*/)
 {
   WerrorS("Python-based functionality not available!");
 }

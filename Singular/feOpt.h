@@ -1,10 +1,16 @@
 #ifndef FEOPTS_H
 #define FEOPTS_H
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: Declarations for working with Options
+
+
 */
 
 #include "Singular/fegetopt.h"
@@ -13,10 +19,18 @@
 
 extern const char SHORT_OPTS_STRING[];
 
-/* specifies format of options */
+/*!
+!
+ specifies format of options 
+
+*/
 extern struct fe_option feOptSpec[];
 
-/* provides feOptIndex enum type for fast accesses to feOptSpec */
+/*!
+!
+ provides feOptIndex enum type for fast accesses to feOptSpec 
+
+*/
 #if ! defined(GENERATE_DEPEND)
 
 # ifdef ESINGULAR
@@ -78,6 +92,14 @@ const char* feSetOptValue(feOptIndex opt, char* optarg);
 
 void fePrintOptValues();
 
-#endif /* __cplusplus */
+#endif /*!
+!
+ __cplusplus 
 
-#endif /*  FEOPTS_H */
+*/
+
+#endif /*!
+!
+  FEOPTS_H 
+
+*/

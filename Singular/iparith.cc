@@ -1,9 +1,15 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/*
+/*!
+!
+
 * ABSTRACT: table driven kernel interface, used by interpreter
+
+
 */
 //long all_farey=0L;
 //long farey_cnt=0L;
@@ -86,9 +92,17 @@
   #include "polys/nc/nc.h"
   #include "polys/nc/sca.h"
   #define  NC_MASK (3+64)
-#else /* HAVE_PLURAL */
+#else /*!
+!
+ HAVE_PLURAL 
+
+*/
   #define  NC_MASK     0
-#endif /* HAVE_PLURAL */
+#endif /*!
+!
+ HAVE_PLURAL 
+
+*/
 
 #ifdef HAVE_RINGS
   #define RING_MASK        4
@@ -117,7 +131,11 @@
 
 static BOOLEAN check_valid(const int p, const int op);
 
-/*=============== types =====================*/
+/*!
+!
+=============== types =====================
+
+*/
 struct sValCmdTab
 {
   short cmd;
@@ -171,51 +189,99 @@ struct sValCmdM
   proc1 p;
   short cmd;
   short res;
-  short number_of_args; /* -1: any, -2: any >0, .. */
+  short number_of_args; /*!
+!
+ -1: any, -2: any >0, .. 
+
+*/
   short valid_for;
 };
 
 typedef struct
 {
-  cmdnames *sCmds;             /**< array of existing commands */
+  cmdnames *sCmds;             /*!
+!
+*< array of existing commands 
+
+*/
   struct sValCmd1 *psValCmd1;
   struct sValCmd2 *psValCmd2;
   struct sValCmd3 *psValCmd3;
   struct sValCmdM *psValCmdM;
-  unsigned nCmdUsed;      /**< number of commands used */
-  unsigned nCmdAllocated; /**< number of commands-slots allocated */
-  unsigned nLastIdentifier; /**< valid indentifieres are slot 1..nLastIdentifier */
+  unsigned nCmdUsed;      /*!
+!
+*< number of commands used 
+
+*/
+  unsigned nCmdAllocated; /*!
+!
+*< number of commands-slots allocated 
+
+*/
+  unsigned nLastIdentifier; /*!
+!
+*< valid indentifieres are slot 1..nLastIdentifier 
+
+*/
 } SArithBase;
 
-/*---------------------------------------------------------------------*
+/*!
+!
+---------------------------------------------------------------------*
  * File scope Variables (Variables share by several functions in
  *                       the same file )
  *
- *---------------------------------------------------------------------*/
-static SArithBase sArithBase;  /**< Base entry for arithmetic */
+ *---------------------------------------------------------------------
 
-/*---------------------------------------------------------------------*
+*/
+static SArithBase sArithBase;  /*!
+!
+*< Base entry for arithmetic 
+
+*/
+
+/*!
+!
+---------------------------------------------------------------------*
  * Extern Functions declarations
  *
- *---------------------------------------------------------------------*/
+ *---------------------------------------------------------------------
+
+*/
 static int _gentable_sort_cmds(const void *a, const void *b);
 extern int iiArithRemoveCmd(char *szName);
 extern int iiArithAddCmd(const char *szName, short nAlias, short nTokval,
                          short nToktype, short nPos=-1);
 
-/*============= proc =======================*/
+/*!
+!
+============= proc =======================
+
+*/
 static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op);
 static Subexpr jjMakeSub(leftv e);
 
-/*============= vars ======================*/
+/*!
+!
+============= vars ======================
+
+*/
 extern int cmdtok;
 extern BOOLEAN expected_parms;
 
 #define ii_div_by_0 "div. by 0"
 
-int iiOp; /* the current operation*/
+int iiOp; /*!
+!
+ the current operation
 
-/*=================== simple helpers =================*/
+*/
+
+/*!
+!
+=================== simple helpers =================
+
+*/
 static int iin_Int(number &n,coeffs cf)
 {
   long l=n_Int(n,cf);
@@ -238,9 +304,17 @@ int iiTokType(int op)
   return 0;
 }
 
-/*=================== operations with 2 args.: static proc =================*/
-/* must be ordered: first operations for chars (infix ops),
- * then alphabetically */
+/*!
+!
+=================== operations with 2 args.: static proc =================
+
+*/
+/*!
+!
+ must be ordered: first operations for chars (infix ops),
+ * then alphabetically 
+
+*/
 
 static BOOLEAN jjOP_BIM_I(leftv res, leftv u, leftv v)
 {
@@ -357,7 +431,11 @@ static BOOLEAN jjCOMPARE_IV(leftv res, leftv u, leftv v)
       res->data  = (char *) (r>=0);
       break;
     case EQUAL_EQUAL:
-    case NOTEQUAL: /* negation handled by jjEQUAL_REST */
+    case NOTEQUAL: /*!
+!
+ negation handled by jjEQUAL_REST 
+
+*/
       res->data  = (char *) (r==0);
       break;
   }
@@ -385,7 +463,11 @@ static BOOLEAN jjCOMPARE_BIM(leftv res, leftv u, leftv v)
       res->data  = (char *) (r>=0);
       break;
     case EQUAL_EQUAL:
-    case NOTEQUAL: /* negation handled by jjEQUAL_REST */
+    case NOTEQUAL: /*!
+!
+ negation handled by jjEQUAL_REST 
+
+*/
       res->data  = (char *) (r==0);
       break;
   }
@@ -413,7 +495,11 @@ static BOOLEAN jjCOMPARE_IV_I(leftv res, leftv u, leftv v)
       res->data  = (char *) (r>=0);
       break;
     case EQUAL_EQUAL:
-    case NOTEQUAL: /* negation handled by jjEQUAL_REST */
+    case NOTEQUAL: /*!
+!
+ negation handled by jjEQUAL_REST 
+
+*/
       res->data  = (char *) (r==0);
       break;
   }
@@ -441,7 +527,11 @@ static BOOLEAN jjCOMPARE_MA(leftv res, leftv u, leftv v)
       res->data  = (char *) (long)(r >= 0);
       break;
     case EQUAL_EQUAL:
-    case NOTEQUAL: /* negation handled by jjEQUAL_REST */
+    case NOTEQUAL: /*!
+!
+ negation handled by jjEQUAL_REST 
+
+*/
       res->data  = (char *)(long) (r == 0);
       break;
   }
@@ -468,7 +558,11 @@ static BOOLEAN jjCOMPARE_P(leftv res, leftv u, leftv v)
       res->data  = (char *) (r >= 0);
       break;
     //case EQUAL_EQUAL:
-    //case NOTEQUAL: /* negation handled by jjEQUAL_REST */
+    //case NOTEQUAL: /*!
+!
+ negation handled by jjEQUAL_REST 
+
+*/
     //  res->data  = (char *) (r == 0);
     //  break;
   }
@@ -495,7 +589,11 @@ static BOOLEAN jjCOMPARE_S(leftv res, leftv u, leftv v)
       res->data  = (char *) (result  >= 0);
       break;
     case EQUAL_EQUAL:
-    case NOTEQUAL: /* negation handled by jjEQUAL_REST */
+    case NOTEQUAL: /*!
+!
+ negation handled by jjEQUAL_REST 
+
+*/
       res->data  = (char *) (result  == 0);
       break;
   }
@@ -621,7 +719,11 @@ static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
   }
   res->data = (char *)pPower(u_p,v_i);
   if (u!=NULL) return jjOP_REST(res,u,v);
-  return errorreported; /* pPower may set errorreported via Werror */
+  return errorreported; /*!
+!
+ pPower may set errorreported via Werror 
+
+*/
 }
 static BOOLEAN jjPOWER_ID(leftv res, leftv u, leftv v)
 {
@@ -635,8 +737,16 @@ static BOOLEAN jjPLUSMINUS_Gen(leftv res, leftv u, leftv v)
   v=v->next;
   if (u==NULL)
   {
-    if (v==NULL) return FALSE;      /* u==NULL, v==NULL */
-    if (iiOp=='-')                  /* u==NULL, v<>NULL, iiOp=='-'*/
+    if (v==NULL) return FALSE;      /*!
+!
+ u==NULL, v==NULL 
+
+*/
+    if (iiOp=='-')                  /*!
+!
+ u==NULL, v<>NULL, iiOp=='-'
+
+*/
     {
       do
       {
@@ -653,7 +763,11 @@ static BOOLEAN jjPLUSMINUS_Gen(leftv res, leftv u, leftv v)
       } while (v!=NULL);
       return FALSE;
     }
-    loop                            /* u==NULL, v<>NULL, iiOp=='+' */
+    loop                            /*!
+!
+ u==NULL, v<>NULL, iiOp=='+' 
+
+*/
     {
       res->next = (leftv)omAlloc0Bin(sleftv_bin);
       res=res->next;
@@ -663,7 +777,11 @@ static BOOLEAN jjPLUSMINUS_Gen(leftv res, leftv u, leftv v)
       if (v==NULL) return FALSE;
     }
   }
-  if (v!=NULL)                     /* u<>NULL, v<>NULL */
+  if (v!=NULL)                     /*!
+!
+ u<>NULL, v<>NULL 
+
+*/
   {
     do
     {
@@ -681,7 +799,11 @@ static BOOLEAN jjPLUSMINUS_Gen(leftv res, leftv u, leftv v)
     } while ((u!=NULL) && (v!=NULL));
     return FALSE;
   }
-  loop                             /* u<>NULL, v==NULL */
+  loop                             /*!
+!
+ u<>NULL, v==NULL 
+
+*/
   {
     res->next = (leftv)omAlloc0Bin(sleftv_bin);
     res=res->next;
@@ -1101,7 +1223,11 @@ static BOOLEAN jjTIMES_MA_BI2(leftv res, leftv u, leftv v)
 static BOOLEAN jjTIMES_MA_P1(leftv res, leftv u, leftv v)
 {
   poly p=(poly)v->CopyD(POLY_CMD);
-  int r=pMaxComp(p);/* recompute the rank for the case ideal*vector*/
+  int r=pMaxComp(p);/*!
+!
+ recompute the rank for the case ideal*vector
+
+*/
   ideal I= (ideal)mp_MultP((matrix)u->CopyD(MATRIX_CMD),p,currRing);
   if (r>0) I->rank=r;
   id_Normalize(I,currRing);
@@ -1111,7 +1237,11 @@ static BOOLEAN jjTIMES_MA_P1(leftv res, leftv u, leftv v)
 static BOOLEAN jjTIMES_MA_P2(leftv res, leftv u, leftv v)
 {
   poly p=(poly)u->CopyD(POLY_CMD);
-  int r=pMaxComp(p);/* recompute the rank for the case ideal*vector*/
+  int r=pMaxComp(p);/*!
+!
+ recompute the rank for the case ideal*vector
+
+*/
   ideal I= (ideal)pMultMp(p,(matrix)v->CopyD(MATRIX_CMD),currRing);
   if (r>0) I->rank=r;
   id_Normalize(I,currRing);
@@ -1284,10 +1414,22 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
 {
   poly q=(poly)v->CopyD();
   poly p=(poly)(u->CopyD());
-  res->data=(void*)(p_Divide(p /*(poly)(u->CopyD())*/ ,
-                                         q /*(poly)(v->CopyD())*/ ,currRing));
+  res->data=(void*)(p_Divide(p /*!
+!
+(poly)(u->CopyD())
+
+*/ ,
+                                         q /*!
+!
+(poly)(v->CopyD())
+
+*/ ,currRing));
   if (res->data!=NULL) pNormalize((poly)res->data);
-  return errorreported; /*there may be errors in p_Divide: div. ny 0, etc.*/
+  return errorreported; /*!
+!
+there may be errors in p_Divide: div. ny 0, etc.
+
+*/
 }
 static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
 {
@@ -1309,7 +1451,11 @@ static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
       if (pNext(q)!=NULL)
       {
         MATELEM(mm,i,j) = singclap_pdivide( MATELEM(m,i,j) ,
-                                           q /*(poly)(v->Data())*/, currRing );
+                                           q /*!
+!
+(poly)(v->Data())
+
+*/, currRing );
       }
       else
         MATELEM(mm,i,j) = pDivideM(pCopy(MATELEM(m,i,j)),pHead(q));
@@ -1794,14 +1940,22 @@ static BOOLEAN jjCOEF(leftv res, leftv u, leftv v)
 {
   poly p=(poly)v->Data();
   if ((p==NULL)||(pNext(p)!=NULL)) return TRUE;
-  res->data=(char *)mp_CoeffProc((poly)u->Data(),p /*(poly)v->Data()*/,currRing);
+  res->data=(char *)mp_CoeffProc((poly)u->Data(),p /*!
+!
+(poly)v->Data()
+
+*/,currRing);
   return FALSE;
 }
 static BOOLEAN jjCOEF_Id(leftv res, leftv u, leftv v)
 {
   poly p=(poly)v->Data();
   if ((p==NULL)||(pNext(p)!=NULL)) return TRUE;
-  res->data=(char *)mp_CoeffProcId((ideal)u->Data(),p /*(poly)v->Data()*/,currRing);
+  res->data=(char *)mp_CoeffProcId((ideal)u->Data(),p /*!
+!
+(poly)v->Data()
+
+*/,currRing);
   return FALSE;
 }
 static BOOLEAN jjCOEFFS_Id(leftv res, leftv u, leftv v)
@@ -1913,13 +2067,21 @@ static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
     ideal vid = (ideal)v->Data();
     int i = idPosConstant(vid);
     if ((i != -1) && (n_IsUnit(pGetCoeff(vid->m[i]),currRing->cf)))
-    { /* ideal v contains unit; dim = -1 */
+    { /*!
+!
+ ideal v contains unit; dim = -1 
+
+*/
       res->data = (char *)-1;
       return FALSE;
     }
     ideal vv = id_Copy(vid, currRing);
     ideal ww = id_Copy((ideal)w->Data(), currRing);
-    /* drop degree zero generator from vv (if any) */
+    /*!
+!
+ drop degree zero generator from vv (if any) 
+
+*/
     if (i != -1) pDelete(&vv->m[i]);
     long d = (long)scDimInt(vv, ww);
     if (rField_is_Z(currRing) && (i == -1)) d++;
@@ -2043,8 +2205,16 @@ static BOOLEAN jjEXTGCD_I(leftv res, leftv u, leftv v)
   }
   int a = f0;
   int b = g0;
-  if ( uu /*(int)(long)u->Data()*/ < 0 ) a=-a;
-  if ( vv /*(int)(long)v->Data()*/ < 0 ) b=-b;
+  if ( uu /*!
+!
+(int)(long)u->Data()
+
+*/ < 0 ) a=-a;
+  if ( vv /*!
+!
+(int)(long)v->Data()
+
+*/ < 0 ) b=-b;
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(3);
   L->m[0].rtyp=INT_CMD;   L->m[0].data=(void *)(long)p0;
@@ -2281,11 +2451,15 @@ err_fetch:
 }
 static BOOLEAN jjFIND2(leftv res, leftv u, leftv v)
 {
-  /*4
+  /*!
+!
+4
   * look for the substring what in the string where
   * return the position of the first char of what in where
   * or 0
-  */
+  
+
+*/
   char *where=(char *)u->Data();
   char *what=(char *)v->Data();
   char *found = strstr(where,what);
@@ -2293,7 +2467,11 @@ static BOOLEAN jjFIND2(leftv res, leftv u, leftv v)
   {
     res->data=(char *)((found-where)+1);
   }
-  /*else res->data=NULL;*/
+  /*!
+!
+else res->data=NULL;
+
+*/
   return FALSE;
 }
 
@@ -2314,9 +2492,13 @@ static BOOLEAN jjFRES3(leftv res, leftv u, leftv v, leftv w)
         }
     }
     char *method = (char *)w->Data();
-    /* For the moment, only "complete" (default), "frame", or "extended frame"
+    /*!
+!
+ For the moment, only "complete" (default), "frame", or "extended frame"
      * are allowed. Another useful option would be "linear strand".
-     */
+     
+
+*/
     if (strcmp(method, "complete") != 0
             && strcmp(method, "frame") != 0
             && strcmp(method, "extended frame") != 0
@@ -2571,11 +2753,23 @@ static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
   setFlag(res,FLAG_STD); v->flag=0;
   return FALSE;
 }
-static BOOLEAN jjLOAD2(leftv /*res*/, leftv/* LIB */ , leftv v)
+static BOOLEAN jjLOAD2(leftv /*!
+!
+res
+
+*/, leftv/*!
+!
+ LIB 
+
+*/ , leftv v)
 {
   return jjLOAD((char*)v->Data(),TRUE);
 }
-static BOOLEAN jjLOAD_E(leftv /*res*/, leftv v, leftv u)
+static BOOLEAN jjLOAD_E(leftv /*!
+!
+res
+
+*/, leftv v, leftv u)
 {
   char * s=(char *)u->Data();
   if(strcmp(s, "with")==0)
@@ -2671,8 +2865,16 @@ static BOOLEAN jjMOD_P(leftv res, leftv u, leftv v)
     res->data=NULL;
     return FALSE;
   }
-  res->data=(void*)(singclap_pmod(p /*(poly)(u->Data())*/ ,
-                                  q /*(poly)(v->Data())*/ ,currRing));
+  res->data=(void*)(singclap_pmod(p /*!
+!
+(poly)(u->Data())
+
+*/ ,
+                                  q /*!
+!
+(poly)(v->Data())
+
+*/ ,currRing));
   return FALSE;
 }
 static BOOLEAN jjMONITOR2(leftv res, leftv u,leftv v);
@@ -2877,7 +3079,11 @@ static BOOLEAN jjBRACKET(leftv res, leftv a, leftv b)
 }
 static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
 {
-  /* number, poly, vector, ideal, module, matrix */
+  /*!
+!
+ number, poly, vector, ideal, module, matrix 
+
+*/
   ring  r = (ring)a->Data();
   if (r == currRing)
   {
@@ -2898,7 +3104,11 @@ static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
     {
     case NUMBER_CMD:
       {
-        /* since basefields are equal, we can apply nCopy */
+        /*!
+!
+ since basefields are equal, we can apply nCopy 
+
+*/
         res->data = nCopy((number)IDDATA(w));
         res->rtyp = argtype;
         break;
@@ -2946,7 +3156,11 @@ static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
   }
   return FALSE;
 }
-#endif /* HAVE_PLURAL */
+#endif /*!
+!
+ HAVE_PLURAL 
+
+*/
 
 static BOOLEAN jjQUOT(leftv res, leftv u, leftv v)
 {
@@ -3020,7 +3234,19 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   ideal u_id=(ideal)u->Data();
 
   maxl--;
-  if (/*(*/ maxl==-1 /*)*/) /*&& (iiOp!=MRES_CMD)*/
+  if (/*!
+!
+(
+
+*/ maxl==-1 /*!
+!
+)
+
+*/) /*!
+!
+&& (iiOp!=MRES_CMD)
+
+*/
   {
     maxl = currRing->N-1+2*(iiOp==MRES_CMD);
     if (currRing->qideal!=NULL)
@@ -3333,10 +3559,18 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   ideal result;
   assumeStdFlag(u);
   ideal i1=(ideal)(u->Data());
-  int ii1=idElem(i1); /* size of i1 */
+  int ii1=idElem(i1); /*!
+!
+ size of i1 
+
+*/
   ideal i0;
   int r=v->Typ();
-  if ((/*v->Typ()*/r==POLY_CMD) ||(r==VECTOR_CMD))
+  if ((/*!
+!
+v->Typ()
+
+*/r==POLY_CMD) ||(r==VECTOR_CMD))
   {
     poly p=(poly)v->Data();
     i0=idInit(1,i1->rank);
@@ -3364,8 +3598,12 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
     BITSET save1;
     SI_SAVE_OPT1(save1);
     si_opt_1|=Sy_bit(OPT_SB_1);
-    /* ii1 appears to be the position of the first element of il that
-       does not belong to the old SB ideal */
+    /*!
+!
+ ii1 appears to be the position of the first element of il that
+       does not belong to the old SB ideal 
+
+*/
     result=kStd(i1,currRing->qideal,hom,&w,NULL,0,ii1);
     SI_RESTORE_OPT1(save1);
     idDelete(&i1);
@@ -3373,7 +3611,11 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
     if (w!=NULL) atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
     res->data = (char *)result;
   }
-  else /*IDEAL/MODULE*/
+  else /*!
+!
+IDEAL/MODULE
+
+*/
   {
     i0=(ideal)v->CopyD();
     i1=idSimpleAdd(i1,i0); //
@@ -3400,8 +3642,12 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
     BITSET save1;
     SI_SAVE_OPT1(save1);
     si_opt_1|=Sy_bit(OPT_SB_1);
-    /* ii1 appears to be the position of the first element of i1 that
-     does not belong to the old SB ideal */
+    /*!
+!
+ ii1 appears to be the position of the first element of i1 that
+     does not belong to the old SB ideal 
+
+*/
     result=kStd(i1,currRing->qideal,hom,&w,NULL,0,ii1);
     SI_RESTORE_OPT1(save1);
     idDelete(&i1);
@@ -3479,7 +3725,11 @@ static BOOLEAN jjWAIT1ST2(leftv res, leftv u, leftv v)
     WerrorS("negative timeout"); return TRUE;
   }
   int i = slStatusSsiL(Lforks, t*1000);
-  if(i == -2) /* error */
+  if(i == -2) /*!
+!
+ error 
+
+*/
   {
     return TRUE;
   }
@@ -3509,7 +3759,11 @@ static BOOLEAN jjWAITALL2(leftv res, leftv u, leftv v)
   for(unsigned nfinished = 0; nfinished < ((unsigned)Lforks->nr)+1; nfinished++)
   {
     i = slStatusSsiL(Lforks, timeout);
-    if(i > 0) /* Lforks[i] is ready */
+    if(i > 0) /*!
+!
+ Lforks[i] is ready 
+
+*/
     {
       ret = 1;
       Lforks->m[i-1].CleanUp();
@@ -3517,13 +3771,25 @@ static BOOLEAN jjWAITALL2(leftv res, leftv u, leftv v)
       Lforks->m[i-1].data=NULL;
       timeout = si_max(0,timeout - 1000*(getRTimer()/TIMER_RESOLUTION - t));
     }
-    else /* terminate the for loop */
+    else /*!
+!
+ terminate the for loop 
+
+*/
     {
-      if(i == -2) /* error */
+      if(i == -2) /*!
+!
+ error 
+
+*/
       {
         return TRUE;
       }
-      if(i == 0) /* timeout */
+      if(i == 0) /*!
+!
+ timeout 
+
+*/
       {
         ret = 0;
       }
@@ -3546,9 +3812,17 @@ static BOOLEAN jjWRONG(leftv, leftv)
   return TRUE;
 }
 
-/*=================== operations with 1 arg.: static proc =================*/
-/* must be ordered: first operations for chars (infix ops),
- * then alphabetically */
+/*!
+!
+=================== operations with 1 arg.: static proc =================
+
+*/
+/*!
+!
+ must be ordered: first operations for chars (infix ops),
+ * then alphabetically 
+
+*/
 
 static BOOLEAN jjDUMMY(leftv res, leftv u)
 {
@@ -3790,7 +4064,11 @@ static BOOLEAN jjCOUNT_RG(leftv res, leftv v)
   else if (rField_is_GF(r)) elems=r->cf->m_nfCharQ;
   else if (rField_is_Zp_a(r) && (r->cf->type==n_algExt))
   {
-    extern int ipower ( int b, int n ); /* factory/cf_util */
+    extern int ipower ( int b, int n ); /*!
+!
+ factory/cf_util 
+
+*/
     elems=ipower(r->cf->ch,r->cf->extRing->pFDeg(r->cf->extRing->qideal->m[0],r->cf->extRing));
   }
   res->data = (char *)(long)elems;
@@ -3957,7 +4235,11 @@ static BOOLEAN jjDIM(leftv res, leftv v)
     ideal vid = (ideal)v->Data();
     int i = idPosConstant(vid);
     if ((i != -1) && (n_IsUnit(pGetCoeff(vid->m[i]),currRing->cf)))
-    { /* ideal v contains unit; dim = -1 */
+    { /*!
+!
+ ideal v contains unit; dim = -1 
+
+*/
       res->data = (char *)-1L;
       return FALSE;
     }
@@ -4058,7 +4340,11 @@ static BOOLEAN jjEXECUTE(leftv, leftv v)
 static BOOLEAN jjFACSTD(leftv res, leftv v)
 {
   lists L=(lists)omAllocBin(slists_bin);
-  if (currRing->cf->convSingNFactoryN!=ndConvSingNFactoryN) /* conversion to factory*/
+  if (currRing->cf->convSingNFactoryN!=ndConvSingNFactoryN) /*!
+!
+ conversion to factory
+
+*/
   {
     ideal_list p,h;
     h=kStdfac((ideal)v->Data(),NULL,testHomog,NULL);
@@ -4369,13 +4655,17 @@ static BOOLEAN jjDIFF_COEF(leftv res, leftv u, leftv v)
   res->data = ntDiff(n,k,currRing->cf);
   return FALSE;
 }
-/*2
+/*!
+!
+2
  * compute Jacobi matrix of a module/matrix
  * Jacobi(M) := ( diff(Mt,var(1))|, ... ,| diff(Mt,var(currRing->N))  ),
  * where Mt := transpose(M)
  * Note that this is consistent with the current conventions for jacob in Singular,
  * whereas M2 computes its transposed.
- */
+ 
+
+*/
 static BOOLEAN jjJACOB_M(leftv res, leftv a)
 {
   ideal id = (ideal)a->Data();
@@ -4458,7 +4748,11 @@ static BOOLEAN jjLEADMONOM(leftv res, leftv v)
   }
   return FALSE;
 }
-static BOOLEAN jjLOAD1(leftv /*res*/, leftv v)
+static BOOLEAN jjLOAD1(leftv /*!
+!
+res
+
+*/, leftv v)
 {
   return jjLOAD((char*)v->Data(),FALSE);
 }
@@ -4474,8 +4768,12 @@ static BOOLEAN jjLISTRING(leftv res, leftv v)
 }
 static BOOLEAN jjPFAC1(leftv res, leftv v)
 {
-  /* call method jjPFAC2 with second argument = 0 (meaning that no
-     valid bound for the prime factors has been given) */
+  /*!
+!
+ call method jjPFAC2 with second argument = 0 (meaning that no
+     valid bound for the prime factors has been given) 
+
+*/
   sleftv tmp;
   memset(&tmp, 0, sizeof(tmp));
   tmp.rtyp = INT_CMD;
@@ -4483,13 +4781,17 @@ static BOOLEAN jjPFAC1(leftv res, leftv v)
 }
 static BOOLEAN jjLU_DECOMP(leftv res, leftv v)
 {
-  /* computes the LU-decomposition of a matrix M;
+  /*!
+!
+ computes the LU-decomposition of a matrix M;
      i.e., M = P * L * U, where
         - P is a row permutation matrix,
         - L is in lower triangular form,
         - U is in upper row echelon form
      Then, we also have P * M = L * U.
-     A list [P, L, U] is returned. */
+     A list [P, L, U] is returned. 
+
+*/
   matrix mat = (const matrix)v->Data();
   if (!idIsConstant((ideal)mat))
   {
@@ -4699,7 +5001,11 @@ err:
 static BOOLEAN jjP2I(leftv res, leftv v)
 {
   poly p=(poly)v->Data();
-  if (p==NULL) { /*res->data=(char *)0;*/ return FALSE; }
+  if (p==NULL) { /*!
+!
+res->data=(char *)0;
+
+*/ return FALSE; }
   if ((pNext(p)!=NULL)|| (!pIsConstant(p)))
   {
     WerrorS("poly must be constant");
@@ -5212,7 +5518,11 @@ BOOLEAN jjWAIT1ST1(leftv res, leftv u)
 //          i>0: (at least) u[i] is ready
   lists Lforks = (lists)u->Data();
   int i = slStatusSsiL(Lforks, -1);
-  if(i == -2) /* error */
+  if(i == -2) /*!
+!
+ error 
+
+*/
   {
     return TRUE;
   }
@@ -5232,7 +5542,11 @@ BOOLEAN jjWAITALL1(leftv res, leftv u)
   for(int nfinished = 0; nfinished < Lforks->nr+1; nfinished++)
   {
     i = slStatusSsiL(Lforks, -1);
-    if(i == -2) /* error */
+    if(i == -2) /*!
+!
+ error 
+
+*/
     {
       return TRUE;
     }
@@ -5257,7 +5571,11 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
 
 #ifdef HAVE_DYNAMIC_LOADING
   extern BOOLEAN load_modules(const char *newlib, char *fullpath, BOOLEAN autoexport);
-#endif /* HAVE_DYNAMIC_LOADING */
+#endif /*!
+!
+ HAVE_DYNAMIC_LOADING 
+
+*/
   switch(LT)
   {
       default:
@@ -5284,7 +5602,11 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
           omFree(plib);
           return TRUE;
         }
-        else /* package */
+        else /*!
+!
+ package 
+
+*/
         {
           package pa=IDPACKAGE(pl);
           if ((pa->language==LANG_C)
@@ -5314,10 +5636,18 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
       case LT_HPUX:
 #ifdef HAVE_DYNAMIC_LOADING
         return load_modules(s, libnamebuf, autoexport);
-#else /* HAVE_DYNAMIC_LOADING */
+#else /*!
+!
+ HAVE_DYNAMIC_LOADING 
+
+*/
         WerrorS("Dynamic modules are not supported by this version of Singular");
         break;
-#endif /* HAVE_DYNAMIC_LOADING */
+#endif /*!
+!
+ HAVE_DYNAMIC_LOADING 
+
+*/
   }
   return TRUE;
 }
@@ -5450,9 +5780,17 @@ static BOOLEAN jjnlInt(leftv res, leftv u)
   res->data=(char *)(long)iin_Int(n,coeffs_BIGINT );
   return FALSE;
 }
-/*=================== operations with 3 args.: static proc =================*/
-/* must be ordered: first operations for chars (infix ops),
- * then alphabetically */
+/*!
+!
+=================== operations with 3 args.: static proc =================
+
+*/
+/*!
+!
+ must be ordered: first operations for chars (infix ops),
+ * then alphabetically 
+
+*/
 static BOOLEAN jjBRACK_S(leftv res, leftv u, leftv v,leftv w)
 {
   char *s= (char *)u->Data();
@@ -5616,7 +5954,11 @@ static BOOLEAN jjBRACK_Ma_I_IV(leftv res, leftv u, leftv v,leftv w)
       nok=jjBRACK_Ma(p,u,v,&t);
     else if (u->Typ() == BIGINTMAT_CMD)
       nok=jjBRACK_Bim(p,u,v,&t);
-    else /* INTMAT_CMD */
+    else /*!
+!
+ INTMAT_CMD 
+
+*/
       nok=jjBRACK_Im(p,u,v,&t);
     if (nok)
     {
@@ -5666,7 +6008,11 @@ static BOOLEAN jjBRACK_Ma_IV_I(leftv res, leftv u, leftv v,leftv w)
       nok=jjBRACK_Ma(p,u,&t,w);
     else if (u->Typ() == BIGINTMAT_CMD)
       nok=jjBRACK_Bim(p,u,&t,w);
-    else /* INTMAT_CMD */
+    else /*!
+!
+ INTMAT_CMD 
+
+*/
       nok=jjBRACK_Im(p,u,&t,w);
     if (nok)
     {
@@ -5722,7 +6068,11 @@ static BOOLEAN jjBRACK_Ma_IV_IV(leftv res, leftv u, leftv v,leftv w)
         nok=jjBRACK_Ma(p,u,&t1,&t2);
       else if (u->Typ() == BIGINTMAT_CMD)
         nok=jjBRACK_Bim(p,u,&t1,&t2);
-      else /* INTMAT_CMD */
+      else /*!
+!
+ INTMAT_CMD 
+
+*/
         nok=jjBRACK_Im(p,u,&t1,&t2);
       if (nok)
       {
@@ -5841,12 +6191,16 @@ static BOOLEAN jjELIMIN_HILB(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjFIND3(leftv res, leftv u, leftv v, leftv w)
 {
-  /*4
+  /*!
+!
+4
   * look for the substring what in the string where
   * starting at position n
   * return the position of the first char of what in where
   * or 0
-  */
+  
+
+*/
   int n=(int)(long)w->Data();
   char *where=(char *)u->Data();
   char *what=(char *)v->Data();
@@ -5914,7 +6268,11 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
   WerrorS(feNotImplemented);
   return TRUE;
 }
-static BOOLEAN jjHOMOG_ID_W(leftv res, leftv u, leftv v, leftv /*w*/)
+static BOOLEAN jjHOMOG_ID_W(leftv res, leftv u, leftv v, leftv /*!
+!
+w
+
+*/)
 {
   PrintS("TODO\n");
   int i=pVar((poly)v->Data());
@@ -5932,7 +6290,11 @@ static BOOLEAN jjHOMOG_ID_W(leftv res, leftv u, leftv v, leftv /*w*/)
     WerrorS("variable must have weight 1");
   return (d!=1);
 }
-static BOOLEAN jjHOMOG_P_W(leftv res, leftv u, leftv v,leftv /*w*/)
+static BOOLEAN jjHOMOG_P_W(leftv res, leftv u, leftv v,leftv /*!
+!
+w
+
+*/)
 {
   PrintS("TODO\n");
   int i=pVar((poly)v->Data());
@@ -6021,7 +6383,9 @@ static BOOLEAN jjJET_ID_M(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjMINOR_M(leftv res, leftv v)
 {
-  /* Here's the use pattern for the minor command:
+  /*!
+!
+ Here's the use pattern for the minor command:
         minor ( matrix_expression m, int_expression minorSize,
                 optional ideal_expression IasSB, optional int_expression k,
                 optional string_expression algorithm,
@@ -6046,7 +6410,9 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
        most. (Cached monomials are counted over all cached polynomials.)
        If these two additional arguments are not provided, 200 and 100000
        will be used as defaults.
-  */
+  
+
+*/
   matrix m;
   leftv u=v->next;
   v->next=NULL;
@@ -6080,7 +6446,11 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
   bool noCacheMinors = true; bool noCacheMonomials = true;
   ideal IasSB; int k; char* algorithm; int cacheMinors; int cacheMonomials;
 
-  /* here come the different cases of correct argument sets */
+  /*!
+!
+ here come the different cases of correct argument sets 
+
+*/
   if ((u->next != NULL) && (u->next->Typ() == IDEAL_CMD))
   {
     IasSB = (ideal)u->next->Data();
@@ -6151,7 +6521,11 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
     }
   }
 
-  /* upper case conversion for the algorithm if present */
+  /*!
+!
+ upper case conversion for the algorithm if present 
+
+*/
   if (!noAlgorithm)
   {
     if (strcmp(algorithm, "bareiss") == 0)
@@ -6163,7 +6537,11 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
   }
 
   v->next=u;
-  /* here come some tests */
+  /*!
+!
+ here come some tests 
+
+*/
   if (!noIdeal)
   {
     assumeStdFlag(u->next);
@@ -6204,7 +6582,11 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
     cacheMonomials = 100000;
   }
 
-  /* here come the actual procedure calls */
+  /*!
+!
+ here come the actual procedure calls 
+
+*/
   if (noAlgorithm)
     res->data = getMinorIdealHeuristic(m, mk, (noK ? 0 : k),
                                        (noIdeal ? 0 : IasSB), false);
@@ -6300,7 +6682,11 @@ static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
   }
   res->data=(char *)maGetPreimage(rr,mapping,image,currRing);
   if (kernel_cmd) idDelete(&image);
-  return (res->data==NULL/* is of type ideal, should not be NULL*/);
+  return (res->data==NULL/*!
+!
+ is of type ideal, should not be NULL
+
+*/);
 }
 static BOOLEAN jjRANDOM_Im(leftv res, leftv u, leftv v, leftv w)
 {
@@ -6708,9 +7094,17 @@ static BOOLEAN jjSTD_HILB_W(leftv res, leftv u, leftv v, leftv w)
   return FALSE;
 }
 
-/*=================== operations with many arg.: static proc =================*/
-/* must be ordered: first operations for chars (infix ops),
- * then alphabetically */
+/*!
+!
+=================== operations with many arg.: static proc =================
+
+*/
+/*!
+!
+ must be ordered: first operations for chars (infix ops),
+ * then alphabetically 
+
+*/
 static BOOLEAN jjBREAK0(leftv, leftv)
 {
 #ifdef HAVE_SDB
@@ -7090,7 +7484,11 @@ static BOOLEAN jjINTERSECT_PL(leftv res, leftv v)
   {
     if (h->Typ()==t)
     {
-      r[i]=(ideal)h->Data(); /*no copy*/
+      r[i]=(ideal)h->Data(); /*!
+!
+no copy
+
+*/
       h=h->next;
     }
     else if(iiConvert(h->Typ(),t,iiTestConvert(h->Typ(),t),h,&tmp))
@@ -7102,7 +7500,11 @@ static BOOLEAN jjINTERSECT_PL(leftv res, leftv v)
     }
     else
     {
-      r[i]=(ideal)tmp.Data(); /*now it's a copy*/
+      r[i]=(ideal)tmp.Data(); /*!
+!
+now it's a copy
+
+*/
       copied[i]=TRUE;
       h=tmp.next;
     }
@@ -7121,7 +7523,9 @@ static BOOLEAN jjINTERSECT_PL(leftv res, leftv v)
 }
 static BOOLEAN jjLU_INVERSE(leftv res, leftv v)
 {
-  /* computation of the inverse of a quadratic matrix A
+  /*!
+!
+ computation of the inverse of a quadratic matrix A
      using the L-U-decomposition of A;
      There are two valid parametrisations:
      1) exactly one argument which is just the matrix A,
@@ -7133,7 +7537,9 @@ static BOOLEAN jjLU_INVERSE(leftv res, leftv v)
      If A is invertible, the list [1, A^(-1)] is returned,
      otherwise the list [0] is returned. Thus, the user may
      inspect the first entry of the returned list to see
-     whether A is invertible. */
+     whether A is invertible. 
+
+*/
   matrix iMat; int invertible;
   const short t1[]={1,MATRIX_CMD};
   const short t2[]={3,MATRIX_CMD,MATRIX_CMD,MATRIX_CMD};
@@ -7183,7 +7589,11 @@ static BOOLEAN jjLU_INVERSE(leftv res, leftv v)
     return TRUE;
   }
 
-  /* build the return structure; a list with either one or two entries */
+  /*!
+!
+ build the return structure; a list with either one or two entries 
+
+*/
   lists ll = (lists)omAllocBin(slists_bin);
   if (invertible)
   {
@@ -7202,7 +7612,9 @@ static BOOLEAN jjLU_INVERSE(leftv res, leftv v)
 }
 static BOOLEAN jjLU_SOLVE(leftv res, leftv v)
 {
-  /* for solving a linear equation system A * x = b, via the
+  /*!
+!
+ for solving a linear equation system A * x = b, via the
      given LU-decomposition of the matrix A;
      There is one valid parametrisation:
      1) exactly four arguments P, L, U, b;
@@ -7217,7 +7629,9 @@ static BOOLEAN jjLU_SOLVE(leftv res, leftv v)
         x is any solution of the given linear system,
         H is the matrix with column vectors spanning the homogeneous
         solution space.
-     The method produces an error if matrix and vector sizes do not fit. */
+     The method produces an error if matrix and vector sizes do not fit. 
+
+*/
   const short t[]={4,MATRIX_CMD,MATRIX_CMD,MATRIX_CMD,MATRIX_CMD};
   if (!iiCheckTypes(v,t))
   {
@@ -7263,7 +7677,11 @@ static BOOLEAN jjLU_SOLVE(leftv res, leftv v)
   }
   solvable = luSolveViaLUDecomp(pMat, lMat, uMat, bVec, xVec, homogSolSpace);
 
-  /* build the return structure; a list with either one or three entries */
+  /*!
+!
+ build the return structure; a list with either one or three entries 
+
+*/
   lists ll = (lists)omAllocBin(slists_bin);
   if (solvable)
   {
@@ -7462,7 +7880,11 @@ static BOOLEAN jjLIFT_4(leftv res, leftv U)
   {
     // see jjLIFT3
     ideal I=(ideal)u->Data();
-    int ul= IDELEMS(I /*(ideal)u->Data()*/);
+    int ul= IDELEMS(I /*!
+!
+(ideal)u->Data()
+
+*/);
     int vl= IDELEMS((ideal)v->Data());
     GbVariant alg=syGetAlgorithm((char*)u4->Data(),currRing,I);
     ideal m
@@ -7535,10 +7957,14 @@ BOOLEAN jjLIST_PL(leftv res, leftv v)
     for (i=0;i<sl;i++)
     {
       if (h!=NULL)
-      { /* e.g. not in the first step:
+      { /*!
+!
+ e.g. not in the first step:
          * h is the pointer to the old sleftv,
          * v is the pointer to the next sleftv
-         * (in this moment) */
+         * (in this moment) 
+
+*/
          h->next=v;
       }
       h=v;
@@ -7775,7 +8201,9 @@ extern "C"
 #endif
 static BOOLEAN jjFactModD_M(leftv res, leftv v)
 {
-  /* compute two factors of h(x,y) modulo x^(d+1) in K[[x]][y],
+  /*!
+!
+ compute two factors of h(x,y) modulo x^(d+1) in K[[x]][y],
      see a detailed documentation in /kernel/linear_algebra/linearAlgebra.h
 
      valid argument lists:
@@ -7790,14 +8218,24 @@ static BOOLEAN jjFactModD_M(leftv res, leftv v)
       has exactly two distinct monic factors [possibly with exponent > 1].)
      result:
      - list with the two factors f and g such that
-       h(x,y) = f(x,y)*g(x,y) mod x^(d+1)   */
+       h(x,y) = f(x,y)*g(x,y) mod x^(d+1)   
+
+*/
 
   poly h      = NULL;
   int  d      =    1;
   poly f0     = NULL;
   poly g0     = NULL;
-  int  xIndex =    1;   /* default index if none provided */
-  int  yIndex =    2;   /* default index if none provided */
+  int  xIndex =    1;   /*!
+!
+ default index if none provided 
+
+*/
+  int  yIndex =    2;   /*!
+!
+ default index if none provided 
+
+*/
 
   leftv u = v; int factorsGiven = 0;
   if ((u == NULL) || (u->Typ() != POLY_CMD))
@@ -7849,7 +8287,11 @@ static BOOLEAN jjFactModD_M(leftv res, leftv v)
     return TRUE;
   }
 
-  /* checks for provided arguments */
+  /*!
+!
+ checks for provided arguments 
+
+*/
   if (pIsConstant(h) || (factorsGiven && (pIsConstant(f0) || pIsConstant(g0))))
   {
     WerrorS("expected non-constant polynomial argument(s)");
@@ -7872,7 +8314,11 @@ static BOOLEAN jjFactModD_M(leftv res, leftv v)
     return TRUE;
   }
 
-  /* computation of f0 and g0 if missing */
+  /*!
+!
+ computation of f0 and g0 if missing 
+
+*/
   if (factorsGiven == 0)
   {
     poly h0 = pSubst(pCopy(h), xIndex, NULL);
@@ -7982,10 +8428,26 @@ static BOOLEAN jjQRDS(leftv res, leftv INPUT)
 }
 static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
 { ideal result;
-  leftv u = INPUT;    /* an ideal, weighted homogeneous and standard */
-  leftv v = u->next;  /* one additional polynomial or ideal */
-  leftv h = v->next;  /* Hilbert vector */
-  leftv w = h->next;  /* weight vector */
+  leftv u = INPUT;    /*!
+!
+ an ideal, weighted homogeneous and standard 
+
+*/
+  leftv v = u->next;  /*!
+!
+ one additional polynomial or ideal 
+
+*/
+  leftv h = v->next;  /*!
+!
+ Hilbert vector 
+
+*/
+  leftv w = h->next;  /*!
+!
+ weight vector 
+
+*/
   assumeStdFlag(u);
   ideal i1=(ideal)(u->Data());
   ideal i0;
@@ -7997,7 +8459,11 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
     return TRUE;
   }
   intvec *vw=(intvec *)w->Data(); // weights of vars
-  /* merging std_hilb_w and std_1 */
+  /*!
+!
+ merging std_hilb_w and std_1 
+
+*/
   if (vw->length()!=currRing->N)
   {
     Werror("%d weights for %d variables",vw->length(),currRing->N);
@@ -8011,7 +8477,11 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
     i0->m[0]=(poly)v->Data();
     cleanup_i0=TRUE;
   }
-  else if (r==IDEAL_CMD)/* IDEAL */
+  else if (r==IDEAL_CMD)/*!
+!
+ IDEAL 
+
+*/
   {
     i0=(ideal)v->Data();
   }
@@ -8029,7 +8499,11 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
   }
   intvec *ww=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   tHomog hom=testHomog;
-  /* u_id from jjSTD_W is now i1 as in jjSTD_1 */
+  /*!
+!
+ u_id from jjSTD_W is now i1 as in jjSTD_1 
+
+*/
   if (ww!=NULL)
   {
     if (!idTestHomModule(i1,currRing->qideal,ww))
@@ -8114,9 +8588,17 @@ static BOOLEAN jjRESTART(leftv, leftv u)
 
 #include "iparith.inc"
 
-/*=================== operations with 2 args. ============================*/
-/* must be ordered: first operations for chars (infix ops),
- * then alphabetically */
+/*!
+!
+=================== operations with 2 args. ============================
+
+*/
+/*!
+!
+ must be ordered: first operations for chars (infix ops),
+ * then alphabetically 
+
+*/
 
 static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
                                     BOOLEAN proccall,
@@ -8169,7 +8651,11 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
       leftv an = (leftv)omAlloc0Bin(sleftv_bin);
       leftv bn = (leftv)omAlloc0Bin(sleftv_bin);
       BOOLEAN failed=FALSE;
-      i=0; /*iiTabIndex(dArithTab2,JJTAB2LEN,op);*/
+      i=0; /*!
+!
+iiTabIndex(dArithTab2,JJTAB2LEN,op);
+
+*/
       //Print("op: %c, type: %s %s\n",op,Tok2Cmdname(at),Tok2Cmdname(bt));
       while (dA2[i].cmd==op)
       {
@@ -8240,7 +8726,11 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
         Werror("`%s` is not defined",s);
       else
       {
-        i=0; /*iiTabIndex(dArithTab2,JJTAB2LEN,op);*/
+        i=0; /*!
+!
+iiTabIndex(dArithTab2,JJTAB2LEN,op);
+
+*/
         s = iiTwoOps(op);
         if (proccall)
         {
@@ -8346,9 +8836,17 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
   return TRUE;
 }
 
-/*==================== operations with 1 arg. ===============================*/
-/* must be ordered: first operations for chars (infix ops),
- * then alphabetically */
+/*!
+!
+==================== operations with 1 arg. ===============================
+
+*/
+/*!
+!
+ must be ordered: first operations for chars (infix ops),
+ * then alphabetically 
+
+*/
 
 BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, const struct sValCmd1* dA1, int at, const struct sConvertTypes *dConvertTypes)
 {
@@ -8535,9 +9033,17 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
   return TRUE;
 }
 
-/*=================== operations with 3 args. ============================*/
-/* must be ordered: first operations for chars (infix ops),
- * then alphabetically */
+/*!
+!
+=================== operations with 3 args. ============================
+
+*/
+/*!
+!
+ must be ordered: first operations for chars (infix ops),
+ * then alphabetically 
+
+*/
 
 static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv c,
   const struct sValCmd3* dA3, int at, int bt, int ct,
@@ -8762,9 +9268,17 @@ BOOLEAN iiExprArith3Tab(leftv res, leftv a, int op,
   a->CleanUp(); // to cleanup the chain, content already done
   return bo;
 }
-/*==================== operations with many arg. ===============================*/
-/* must be ordered: first operations for chars (infix ops),
- * then alphabetically */
+/*!
+!
+==================== operations with many arg. ===============================
+
+*/
+/*!
+!
+ must be ordered: first operations for chars (infix ops),
+ * then alphabetically 
+
+*/
 
 #if 0 // unused
 static BOOLEAN jjANY2LIST(leftv res, leftv v, int cnt)
@@ -8806,13 +9320,21 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
           case 3:
             memcpy(&d->arg3,a->next->next,sizeof(sleftv));
             a->next->next->Init();
-            /* no break */
+            /*!
+!
+ no break 
+
+*/
           case 2:
             memcpy(&d->arg2,a->next,sizeof(sleftv));
             a->next->Init();
             a->next->next=d->arg2.next;
             d->arg2.next=NULL;
-            /* no break */
+            /*!
+!
+ no break 
+
+*/
           case 1:
             a->Init();
             a->next=d->arg1.next;
@@ -8891,7 +9413,11 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
   return TRUE;
 }
 
-/*=================== general utilities ============================*/
+/*!
+!
+=================== general utilities ============================
+
+*/
 int IsCmd(const char *n, int & tok)
 {
   int i;
@@ -8940,7 +9466,11 @@ int IsCmd(const char *n, int & tok)
       {
         an=i+1;
       }
-      else /*v==0*/
+      else /*!
+!
+v==0
+
+*/
       {
         break;
       }
@@ -9060,8 +9590,14 @@ const char * Tok2Cmdname(int tok)
 }
 
 
-/*---------------------------------------------------------------------*/
-/**
+/*!
+!
+---------------------------------------------------------------------
+
+*/
+/*!
+!
+*
  * @brief compares to entry of cmdsname-list
 
  @param[in] a
@@ -9069,7 +9605,11 @@ const char * Tok2Cmdname(int tok)
 
  @return <ReturnValue>
 **/
-/*---------------------------------------------------------------------*/
+/*!
+!
+---------------------------------------------------------------------
+
+*/
 static int _gentable_sort_cmds( const void *a, const void *b )
 {
   cmdnames *pCmdL = (cmdnames*)a;
@@ -9077,44 +9617,82 @@ static int _gentable_sort_cmds( const void *a, const void *b )
 
   if(a==NULL || b==NULL)             return 0;
 
-  /* empty entries goes to the end of the list for later reuse */
+  /*!
+!
+ empty entries goes to the end of the list for later reuse 
+
+*/
   if(pCmdL->name==NULL) return 1;
   if(pCmdR->name==NULL) return -1;
 
-  /* $INVALID$ must come first */
+  /*!
+!
+ $INVALID$ must come first 
+
+*/
   if(strcmp(pCmdL->name, "$INVALID$")==0) return -1;
   if(strcmp(pCmdR->name, "$INVALID$")==0) return  1;
 
-  /* tokval=-1 are reserved names at the end */
+  /*!
+!
+ tokval=-1 are reserved names at the end 
+
+*/
   if (pCmdL->tokval==-1)
   {
     if (pCmdR->tokval==-1)
        return strcmp(pCmdL->name, pCmdR->name);
-    /* pCmdL->tokval==-1, pCmdL goes at the end */
+    /*!
+!
+ pCmdL->tokval==-1, pCmdL goes at the end 
+
+*/
     return 1;
   }
-  /* pCmdR->tokval==-1, pCmdR goes at the end */
+  /*!
+!
+ pCmdR->tokval==-1, pCmdR goes at the end 
+
+*/
   if(pCmdR->tokval==-1) return -1;
 
   return strcmp(pCmdL->name, pCmdR->name);
 }
 
-/*---------------------------------------------------------------------*/
-/**
+/*!
+!
+---------------------------------------------------------------------
+
+*/
+/*!
+!
+*
  * @brief initialisation of arithmetic structured data
 
  @retval 0 on success
 
 **/
-/*---------------------------------------------------------------------*/
+/*!
+!
+---------------------------------------------------------------------
+
+*/
 int iiInitArithmetic()
 {
   //printf("iiInitArithmetic()\n");
   memset(&sArithBase, 0, sizeof(sArithBase));
   iiInitCmdName();
-  /* fix last-identifier */
+  /*!
+!
+ fix last-identifier 
+
+*/
 #if 0
-  /* we expect that gentable allready did every thing */
+  /*!
+!
+ we expect that gentable allready did every thing 
+
+*/
   for(sArithBase.nLastIdentifier=sArithBase.nCmdUsed-1;
       sArithBase.nLastIdentifier>0; sArithBase.nLastIdentifier--) {
     if(sArithBase.sCmds[sArithBase.nLastIdentifier].tokval>=0) break;
@@ -9189,7 +9767,11 @@ int iiArithFindCmd(const char *szName)
       {
         an=i+1;
       }
-      else /*v==0*/
+      else /*!
+!
+v==0
+
+*/
       {
         //Print("RET-i=%d %s\n", i, sArithBase.sCmds[i].name);
         return i;
@@ -9227,7 +9809,11 @@ int iiArithRemoveCmd(const char *szName)
         (&_gentable_sort_cmds));
   sArithBase.nCmdUsed--;
 
-  /* fix last-identifier */
+  /*!
+!
+ fix last-identifier 
+
+*/
   for(sArithBase.nLastIdentifier=sArithBase.nCmdUsed-1;
       sArithBase.nLastIdentifier>0; sArithBase.nLastIdentifier--)
   {
@@ -9271,13 +9857,21 @@ int iiArithAddCmd(
 
     if(sArithBase.nCmdUsed>=sArithBase.nCmdAllocated)
     {
-      /* needs to create new slots */
+      /*!
+!
+ needs to create new slots 
+
+*/
       unsigned long nSize = (sArithBase.nCmdAllocated+1)*sizeof(cmdnames);
       sArithBase.sCmds = (cmdnames *)omRealloc(sArithBase.sCmds, nSize);
       if(sArithBase.sCmds==NULL) return -1;
       sArithBase.nCmdAllocated++;
     }
-    /* still free slots available */
+    /*!
+!
+ still free slots available 
+
+*/
     sArithBase.sCmds[sArithBase.nCmdUsed].name    = omStrDup(szName);
     sArithBase.sCmds[sArithBase.nCmdUsed].alias   = nAlias;
     sArithBase.sCmds[sArithBase.nCmdUsed].tokval  = nTokval;
@@ -9311,7 +9905,11 @@ static BOOLEAN check_valid(const int p, const int op)
       Warn("assume commutative subalgebra for cmd `%s` in >>%s<<",Tok2Cmdname(op),my_yylinebuf);
       return FALSE;
     }
-    /* else, ALLOW_PLURAL */
+    /*!
+!
+ else, ALLOW_PLURAL 
+
+*/
   }
   #ifdef HAVE_SHIFTBBA
   else if (rIsLPRing(currRing))
@@ -9327,19 +9925,31 @@ static BOOLEAN check_valid(const int p, const int op)
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
-    if ((p & RING_MASK)==0 /*NO_RING*/)
+    if ((p & RING_MASK)==0 /*!
+!
+NO_RING
+
+*/)
     {
       WerrorS("not implemented for rings with rings as coeffients");
       return TRUE;
     }
-    /* else ALLOW_RING */
+    /*!
+!
+ else ALLOW_RING 
+
+*/
     else if (((p & ZERODIVISOR_MASK)==NO_ZERODIVISOR)
     &&(!rField_is_Domain(currRing)))
     {
       WerrorS("domain required as coeffients");
       return TRUE;
     }
-    /* else ALLOW_ZERODIVISOR */
+    /*!
+!
+ else ALLOW_ZERODIVISOR 
+
+*/
     else if(((p & WARN_RING)==WARN_RING)&&(myynest==0))
     {
       WarnS("considering the image in Q[...]");
@@ -9374,7 +9984,11 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     {
       // create a tmp list of the correct size
       lists res_l=(lists)omAllocBin(slists_bin);
-      res_l->Init(rl /*c->nr+1*/);
+      res_l->Init(rl /*!
+!
+c->nr+1
+
+*/);
       BOOLEAN bo=FALSE;
       int tab_pos=iiTabIndex(dArithTab2,JJTAB2LEN,CHINREM_CMD);
       for (unsigned i=0;i<=(unsigned)c->nr;i++)
@@ -9564,7 +10178,11 @@ static int jjCOMPARE_ALL(const void * aa, const void * bb)
     else if (ad==bd) return 0;
     else return 1;
   }
-  else if (tmp.data==NULL) /* not < */
+  else if (tmp.data==NULL) /*!
+!
+ not < 
+
+*/
   {
     iiOp=EQUAL_EQUAL;
     tab_pos=iiTabIndex(dArithTab2,JJTAB2LEN,EQUAL_EQUAL);
@@ -9578,7 +10196,11 @@ static int jjCOMPARE_ALL(const void * aa, const void * bb)
       else if (ad==bd) return 0;
       else return 1;
     }
-    else if (tmp.data==NULL) /* not <,== */ return 1;
+    else if (tmp.data==NULL) /*!
+!
+ not <,== 
+
+*/ return 1;
     else return 0;
   }
   else return -1;

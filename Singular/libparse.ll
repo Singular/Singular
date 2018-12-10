@@ -1,5 +1,7 @@
 %{
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 #include <stdio.h>
@@ -39,10 +41,26 @@ void print_version(lp_modes mode, char *p);
 void copy_string(lp_modes mode);
 void make_version(char *p, int what);
 
-int brace1 = 0;  /* { } */
-int brace2 = 0;  /* ( ) */
-int brace3 = 0;  /* [ ] */
-int quote  = 0;  /* " */
+int brace1 = 0;  /*!
+!
+ { } 
+
+*/
+int brace2 = 0;  /*!
+!
+ ( ) 
+
+*/
+int brace3 = 0;  /*!
+!
+ [ ] 
+
+*/
+int quote  = 0;  /*!
+!
+ " 
+
+*/
 int offset = 0;
 BOOLEAN p_static = FALSE;
 int old_state = 0;
@@ -55,7 +73,11 @@ long string_start;
 char *yylp_buffer_start;
 #ifndef NEW_FLEX
 int yylplineno = 1;
-#endif /* NEW_FLEX */
+#endif /*!
+!
+ NEW_FLEX 
+
+*/
 int lpverbose = 0, check = 0;
 int texinfo_out = 0;
 int found_info=0,
@@ -66,18 +88,66 @@ int found_info=0,
 
 const char *yylp_errlist[]= {
    "",
-   "missing close bracket ')' for proc definition in line %d.",  /*  1 */
-   "missing close bracket ')' for procbody in line %d.",         /*  2 */
-   "missing close bracket ']' for procbody in line %d.",         /*  3 */
-   "too many ')' closed brackets in line %d.",                   /*  4 */
-   "too many ']' closed brackets in line %d.",                   /*  5 */
-   "missing close bracket ')' for example in line %d.",          /*  6 */
-   "missing close bracket ']' for example in line %d.",          /*  7 */
-   "cannot assign character '%c' in line %d to any group.",      /*  8 */
-   "there must be a quote missing somewhere before line %d.",    /*  9 */
-   "missing close bracket '}' at end of library in line %d.",    /* 10 */
-   "missing close bracket ')' at end of library in line %d.",    /* 11 */
-   "missing close bracket ']' at end of library in line %d.",    /* 12 */
+   "missing close bracket ')' for proc definition in line %d.",  /*!
+!
+  1 
+
+*/
+   "missing close bracket ')' for procbody in line %d.",         /*!
+!
+  2 
+
+*/
+   "missing close bracket ']' for procbody in line %d.",         /*!
+!
+  3 
+
+*/
+   "too many ')' closed brackets in line %d.",                   /*!
+!
+  4 
+
+*/
+   "too many ']' closed brackets in line %d.",                   /*!
+!
+  5 
+
+*/
+   "missing close bracket ')' for example in line %d.",          /*!
+!
+  6 
+
+*/
+   "missing close bracket ']' for example in line %d.",          /*!
+!
+  7 
+
+*/
+   "cannot assign character '%c' in line %d to any group.",      /*!
+!
+  8 
+
+*/
+   "there must be a quote missing somewhere before line %d.",    /*!
+!
+  9 
+
+*/
+   "missing close bracket '}' at end of library in line %d.",    /*!
+!
+ 10 
+
+*/
+   "missing close bracket ')' at end of library in line %d.",    /*!
+!
+ 11 
+
+*/
+   "missing close bracket ']' at end of library in line %d.",    /*!
+!
+ 12 
+
+*/
    NULL
 };
 int yylp_errno = 0;
@@ -92,7 +162,11 @@ extern "C" {
 }
 void main_init(int argc, char *argv[]);
 void main_result(char *libname);
-#else /* STANDALONE_PARSER */
+#else /*!
+!
+ STANDALONE_PARSER 
+
+*/
 idhdl h0;
 idhdl h_top;
 #define pi IDPROC(h0)
@@ -101,7 +175,11 @@ extern "C"
   int yylpwrap();
 }
 extern libstackv library_stack;
-#endif /* STANDALONE_PARSER */
+#endif /*!
+!
+ STANDALONE_PARSER 
+
+*/
 
 static unsigned long help_chksum;
 
@@ -209,7 +287,11 @@ tos            ([ \t]*)
 eq             ([ \t]*+=[ \t]*)
 eqnl           ([ \t\n\r]*+=[ \t\n\r]*)
 
-/* %start START */
+/*!
+!
+ %start START 
+
+*/
 
 %x header
 %x help
@@ -232,7 +314,9 @@ eqnl           ([ \t\n\r]*+=[ \t\n\r]*)
 
 %%
 (\/\/[^\n]*)|(^#![^\n]*)|([ \t]) { }
-\/\/*      { old_state = YYSTATE; BEGIN(comment); }
+\/\/*!
+!
+      { old_state = YYSTATE; BEGIN(comment); }
 
 (info+{eqnl}+{quote}+{strings}+{quote}) {
          yyless(4); old_state = YYSTATE; BEGIN(info);
@@ -316,22 +400,38 @@ static     { p_static=TRUE; }
              pi = (procinfo *)malloc(sizeof(procinfo));
              iiInitSingularProcinfo(pi, newlib, proc, yylplineno,
                                     current_pos(0), p_static);
-             #else /*STANDALONE_PARSER*/
+             #else /*!
+!
+STANDALONE_PARSER
+
+*/
              if( mode == LOAD_LIB)
              {
-               h0 = enterid( proc, 0 /*myynest*/, PROC_CMD,
+               h0 = enterid( proc, 0 /*!
+!
+myynest
+
+*/, PROC_CMD,
                                  &(IDPACKAGE(pl)->idroot), TRUE, !p_static);
                if (h0==NULL) return(1);
                if((!p_static) && autoexport)
                {
                   package save=currPack;
                   currPack=basePack;
-                  h_top = enterid( proc, 0 /*myynest*/, PROC_CMD,
+                  h_top = enterid( proc, 0 /*!
+!
+myynest
+
+*/, PROC_CMD,
                                  &(basePack->idroot), FALSE );
                   currPack=save;
                   if (h_top==NULL) return(1);
                }
-               /* omCheckAddr(IDID(h0)); */
+               /*!
+!
+ omCheckAddr(IDID(h0)); 
+
+*/
                if (h0!=NULL)
                {
                  iiInitSingularProcinfo(IDPROC(h0), newlib, proc,
@@ -346,7 +446,11 @@ static     { p_static=TRUE; }
                  if (BVERBOSE(V_LOAD_PROC))
                    Warn( "     proc '%s' registered", proc );
                }
-               #endif /*STANDALONE_PARSER*/
+               #endif /*!
+!
+STANDALONE_PARSER
+
+*/
                SET_DEF_END(mode, pi, current_pos(yyleng+1));
                #if YYLPDEBUG
                if(lpverbose)
@@ -360,7 +464,11 @@ static     { p_static=TRUE; }
                p_static=FALSE;
              #ifndef STANDALONE_PARSER
              }
-             #endif /*STANDALONE_PARSER*/
+             #endif /*!
+!
+STANDALONE_PARSER
+
+*/
            }
 example    {
              BEGIN(pexample);
@@ -474,7 +582,11 @@ LIB[ \t]*"(\"" { quote++; brace2++;
              {
                library_stack->push(newlib, yytext);
              }
-             #endif /* STANDALONE_PARSER */
+             #endif /*!
+!
+ STANDALONE_PARSER 
+
+*/
              #if YYLPDEBUG
              if(lpverbose>1) printf("LIB:'%s'\n", yytext);
              #endif
@@ -487,7 +599,11 @@ LIB[ \t]*"(\"" { quote++; brace2++;
              {
                library_stack->push(newlib, yytext);
              }
-             #endif /* STANDALONE_PARSER */
+             #endif /*!
+!
+ STANDALONE_PARSER 
+
+*/
              #if YYLPDEBUG
              if(lpverbose>1) printf("LIB:'%s'\n", yytext);
              #endif
@@ -544,7 +660,9 @@ LIB[ \t]*"(\"" { quote++; brace2++;
               }
             }
 <pdef>({comment}[^\n]*)  { }
-<pdef>\/\/*      { old_state = YYSTATE; BEGIN(comment); }
+<pdef>\/\/*!
+!
+      { old_state = YYSTATE; BEGIN(comment); }
 <pdef>.    {
              if(brace2<=0)
              {
@@ -638,7 +756,11 @@ LIB[ \t]*"(\"" { quote++; brace2++;
 
 <pbody>({comment}[^\n]*) { }
 <pbody>{quote} { quote++; old_state = YYSTATE;
-                 BEGIN(string); /* printf("%s", yytext); */
+                 BEGIN(string); /*!
+!
+ printf("%s", yytext); 
+
+*/
                }
 
 <pbody>proc+{tos}+{name}+{tnl}+{paramlist}+{tnl}+"{" {
@@ -684,20 +806,36 @@ LIB[ \t]*"(\"" { quote++; brace2++;
                            }
                          }
 <pbody>"("               {
-                           brace2++; /* printf("%s", yytext); */
+                           brace2++; /*!
+!
+ printf("%s", yytext); 
+
+*/
                          }
 <pbody>")"               {
-                           brace2--; /* printf("%s", yytext); */
+                           brace2--; /*!
+!
+ printf("%s", yytext); 
+
+*/
                            if(brace2<0) {
                              yylp_errno = YYLP_BODY_TMBR2;
                              return(1);
                            }
                          }
 <pbody>"["               {
-                           brace3++; /* printf("%s", yytext); */
+                           brace3++; /*!
+!
+ printf("%s", yytext); 
+
+*/
                          }
 <pbody>"]"               {
-                           brace3--; /* printf("%s", yytext); */
+                           brace3--; /*!
+!
+ printf("%s", yytext); 
+
+*/
                            if(brace3<0) {
                              yylp_errno = YYLP_BODY_TMBR3;
                              return(1);
@@ -734,7 +872,11 @@ LIB[ \t]*"(\"" { quote++; brace2++;
                            {
                               SET_HELP_END(mode, pi, current_pos(0));
                            }
-                           BEGIN(old_state); /* printf("%s", yytext); */
+                           BEGIN(old_state); /*!
+!
+ printf("%s", yytext); 
+
+*/
                          }
 <string>(\\\\)|(\\\")    { if (old_state == phelp) IncrCheckSum(*yytext);}
 <string>\n               { yylplineno++; if (old_state == phelp) IncrCheckSum('\n');}
@@ -742,13 +884,25 @@ LIB[ \t]*"(\"" { quote++; brace2++;
 
 <pexample>(\/\/[^\n]*)  { }
 <pexample>"\""           { quote++; old_state = YYSTATE;
-                           BEGIN(string); /* printf("%s", yytext); */
+                           BEGIN(string); /*!
+!
+ printf("%s", yytext); 
+
+*/
                          }
 <pexample>"{"            {
-                           brace1++; /* printf("(%d)%s", brace1, yytext); */
+                           brace1++; /*!
+!
+ printf("(%d)%s", brace1, yytext); 
+
+*/
                          }
 <pexample>"}"            {
-                           brace1--; /* printf("(%d)%s", brace1, yytext); */
+                           brace1--; /*!
+!
+ printf("(%d)%s", brace1, yytext); 
+
+*/
                            if(brace1<=0) {
                              if(brace2>0) { yylp_errno=YYLP_EX_BR2; return(1); }
                              if(brace3>0) { yylp_errno=YYLP_EX_BR3; return(1); }
@@ -757,22 +911,42 @@ LIB[ \t]*"(\"" { quote++; brace2++;
                            }
                          }
 <pexample>"("            {
-                           brace2++; /* printf("%s", yytext); */
+                           brace2++; /*!
+!
+ printf("%s", yytext); 
+
+*/
                          }
 <pexample>")"            {
-                           brace2--; /* printf("%s", yytext); */
+                           brace2--; /*!
+!
+ printf("%s", yytext); 
+
+*/
                          }
 <pexample>"["            {
-                           brace3++; /* printf("%s", yytext); */
+                           brace3++; /*!
+!
+ printf("%s", yytext); 
+
+*/
                          }
 <pexample>"]"            {
-                           brace3--; /* printf("%s", yytext); */
+                           brace3--; /*!
+!
+ printf("%s", yytext); 
+
+*/
                          }
 <pexample>\n             { yylplineno++; }
 <pexample>.              { }
 
 <pestr>"\""              { quote--;
-                           BEGIN(pexample); /* printf("%s", yytext); */
+                           BEGIN(pexample); /*!
+!
+ printf("%s", yytext); 
+
+*/
                          }
 <pestr>\\\\              { }
 <pestr>\\\"              { }
@@ -940,7 +1114,11 @@ void copy_string(lp_modes mode)
       if(offset>0) text_buffer[i-offset] = text_buffer[i];
     }
   }
-#endif /* STANDALONE_PARSER */
+#endif /*!
+!
+ STANDALONE_PARSER 
+
+*/
 }
 
 void print_init()
@@ -994,5 +1172,13 @@ int main( int argc, char *argv[] )
   return 0;
 }
 
-#endif /* STANDALONE_PARSER */
-#endif /* HAVE_LIBPARSE */
+#endif /*!
+!
+ STANDALONE_PARSER 
+
+*/
+#endif /*!
+!
+ HAVE_LIBPARSE 
+
+*/

@@ -1,9 +1,12 @@
-/****************************************
+/*!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/*
+/*!
+
 * ABSTRACT: general interface to links
+
 */
 
 #include "kernel/mod2.h"
@@ -40,7 +43,9 @@ omBin s_si_link_extension_bin = omGetSpecBin(sizeof(s_si_link_extension));
 omBin sip_link_bin = omGetSpecBin(sizeof(sip_link));
 omBin ip_link_bin = omGetSpecBin(sizeof(ip_link));
 
-/* ====================================================================== */
+/*!
+ ====================================================================== 
+*/
 static si_link_extension slTypeInit(si_link_extension s, const char* type);
 si_link_extension si_link_root=NULL;
 
@@ -402,7 +407,9 @@ BOOLEAN slGetDump(si_link l)
   }
 }
 
-/*------------Initialization at Start-up time------------------------*/
+/*!
+------------Initialization at Start-up time------------------------
+*/
 
 
 static si_link_extension slTypeInit(si_link_extension s, const char* type)

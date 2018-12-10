@@ -1,8 +1,14 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT - interupt handling
+
+
 */
 #include "kernel/mod2.h"
 
@@ -26,7 +32,11 @@ NTL_CLIENT
 #endif
 #endif
 
-/* undef, if you don't want GDB to come up on error */
+/*!
+!
+ undef, if you don't want GDB to come up on error 
+
+*/
 
 #define CALL_GDB
 
@@ -64,7 +74,11 @@ NTL_CLIENT
 si_link pipeLastLink=NULL;
 BOOLEAN singular_in_batchmode=FALSE;
 
-void sig_pipe_hdl(int /*sig*/)
+void sig_pipe_hdl(int /*!
+!
+sig
+
+*/)
 {
  if (pipeLastLink!=NULL)
  {
@@ -77,7 +91,11 @@ void sig_pipe_hdl(int /*sig*/)
 volatile BOOLEAN do_shutdown = FALSE;
 volatile int defer_shutdown = 0;
 
-void sig_term_hdl(int /*sig*/)
+void sig_term_hdl(int /*!
+!
+sig
+
+*/)
 {
   do_shutdown = TRUE;
   if (!defer_shutdown)
@@ -86,12 +104,20 @@ void sig_term_hdl(int /*sig*/)
   }
 }
 
-/*---------------------------------------------------------------------*
+/*!
+!
+---------------------------------------------------------------------*
  * File scope Variables (Variables shared by several functions in
  *                       the same file )
  *
- *---------------------------------------------------------------------*/
-/* data */
+ *---------------------------------------------------------------------
+
+*/
+/*!
+!
+ data 
+
+*/
 jmp_buf si_start_jmpbuf;
 int siRandomStart;
 short si_restart=0;
@@ -99,17 +125,35 @@ short si_restart=0;
 typedef void (*si_hdl_typ)(int);
 
 
-/*0 implementation*/
-/*---------------------------------------------------------------------*
+/*!
+!
+0 implementation
+
+*/
+/*!
+!
+---------------------------------------------------------------------*
  * Functions declarations
  *
- *---------------------------------------------------------------------*/
-void sigint_handler(int /*sig*/);
+ *---------------------------------------------------------------------
+
+*/
+void sigint_handler(int /*!
+!
+sig
+
+*/);
 
 si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler);
 
-/*---------------------------------------------------------------------*/
-/**
+/*!
+!
+---------------------------------------------------------------------
+
+*/
+/*!
+!
+*
  * @brief meta function for binding a signal to an handler
 
  @param[in] sig             Signal number
@@ -117,7 +161,11 @@ si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler);
 
  @return value of signal()
 **/
-/*---------------------------------------------------------------------*/
+/*!
+!
+---------------------------------------------------------------------
+
+*/
 si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler)
 {
 #if 0
@@ -127,14 +175,22 @@ si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler)
      fprintf(stderr, "Unable to init signal %d ... exiting...\n", sig);
   }
   si_siginterrupt(sig, 0);
-  /*system calls will be restarted if interrupted by  the  specified
+  /*!
+!
+system calls will be restarted if interrupted by  the  specified
    * signal sig.  This is the default behavior in Linux.
-   */
+   
+
+*/
 #else
   struct sigaction new_action,old_action;
   memset(&new_action, 0, sizeof(struct sigaction));
 
-  /* Set up the structure to specify the new action. */
+  /*!
+!
+ Set up the structure to specify the new action. 
+
+*/
   new_action.sa_handler = signal_handler;
   if (sig==SIGINT)
     sigemptyset (&new_action.sa_mask);
@@ -150,10 +206,18 @@ si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler)
   }
 #endif
   return retval;
-}                               /* si_set_signal */
+}                               /*!
+!
+ si_set_signal 
+
+*/
 
 
-/*---------------------------------------------------------------------*/
+/*!
+!
+---------------------------------------------------------------------
+
+*/
 #if defined(__linux__) && defined(__i386)
   #if !defined(HAVE_SIGCONTEXT) && !defined(HAVE_ASM_SIGCONTEXT_H)
 // we need the following structure sigcontext_struct.
@@ -195,14 +259,24 @@ typedef struct sigcontext_struct sigcontext;
 
 
 #if defined(HAVE_SIGSTRUCT)
-/*2---------------------------------------------------------------------*/
-/**
+/*!
+!
+2---------------------------------------------------------------------
+
+*/
+/*!
+!
+*
  * @brief signal handler for run time errors, linux/i386, x86_64 version
 
  @param[in] sig
  @param[in] s
 **/
-/*---------------------------------------------------------------------*/
+/*!
+!
+---------------------------------------------------------------------
+
+*/
 void sigsegv_handler(int sig, sigcontext s)
 {
   fprintf(stderr,"Singular : signal %d (v: %d):\n",sig,SINGULAR_VERSION);
@@ -213,7 +287,11 @@ void sigsegv_handler(int sig, sigcontext s)
                    "please inform the authors\n",
                    #ifdef __i386__
                    (long)s.eip,
-                   #else /* x86_64*/
+                   #else /*!
+!
+ x86_64
+
+*/
                    (long)s.rip,
                    #endif
                    (long)s.cr2,siRandomStart);
@@ -226,21 +304,41 @@ void sigsegv_handler(int sig, sigcontext s)
     init_signals();
     longjmp(si_start_jmpbuf,1);
   }
-#endif /* __OPTIMIZE__ */
+#endif /*!
+!
+ __OPTIMIZE__ 
+
+*/
 #ifdef CALL_GDB
   if (sig!=SIGINT)
   {
     if (singular_in_batchmode) debug(STACK_TRACE);
     else                       debug(INTERACTIVE);
   }
-#endif /* CALL_GDB */
+#endif /*!
+!
+ CALL_GDB 
+
+*/
   exit(0);
 }
 
-/*---------------------------------------------------------------------*/
-#elif defined(SunOS) /*SPARC_SUNOS*/
-/*2
+/*!
+!
+---------------------------------------------------------------------
+
+*/
+#elif defined(SunOS) /*!
+!
+SPARC_SUNOS
+
+*/
+/*!
+!
+2
 * signal handler for run time errors, sparc sunos 4 version
+
+
 */
 void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
 {
@@ -261,18 +359,34 @@ void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
     init_signals();
     longjmp(si_start_jmpbuf,1);
   }
-#endif /* __OPTIMIZE__ */
+#endif /*!
+!
+ __OPTIMIZE__ 
+
+*/
 #ifdef CALL_GDB
   if (sig!=SIGINT) debug(STACK_TRACE);
-#endif /* CALL_GDB */
+#endif /*!
+!
+ CALL_GDB 
+
+*/
   exit(0);
 }
 
 #else
 
-/*---------------------------------------------------------------------*/
-/*2
+/*!
+!
+---------------------------------------------------------------------
+
+*/
+/*!
+!
+2
 * signal handler for run time errors, general version
+
+
 */
 void sigsegv_handler(int sig)
 {
@@ -293,25 +407,45 @@ void sigsegv_handler(int sig)
     init_signals();
     longjmp(si_start_jmpbuf,1);
   }
-  #endif /* __OPTIMIZE__ */
+  #endif /*!
+!
+ __OPTIMIZE__ 
+
+*/
   #ifdef CALL_GDB
   if (sig!=SIGINT) debug(STACK_TRACE);
-  #endif /* CALL_GDB */
+  #endif /*!
+!
+ CALL_GDB 
+
+*/
   exit(0);
 }
 #endif
 
 
-/*2
+/*!
+!
+2
 * signal handler for SIGINT
+
+
 */
 int sigint_handler_cnt=0;
-void sigint_handler(int /*sig*/)
+void sigint_handler(int /*!
+!
+sig
+
+*/)
 {
   mflush();
   #ifdef HAVE_FEREAD
   if (fe_is_raw_tty) fe_temp_reset();
-  #endif /* HAVE_FEREAD */
+  #endif /*!
+!
+ HAVE_FEREAD 
+
+*/
   char default_opt=' ';
   if ((feOptSpec[FE_OPT_CNTRLC].value!=NULL)
       && ((char*)(feOptSpec[FE_OPT_CNTRLC].value))[0])
@@ -374,7 +508,11 @@ void sigint_handler(int /*sig*/)
       case 'c':
                 if ((feOptValue(FE_OPT_EMACS) == NULL) && (default_opt!=' '))
                 {
-                  /* Read until a newline or EOF */
+                  /*!
+!
+ Read until a newline or EOF 
+
+*/
                   while (c != EOF && c != '\n') c = fgetc(stdin);
                 }
                 si_set_signal(SIGINT ,(si_hdl_typ)sigint_handler);
@@ -416,7 +554,11 @@ static void debug (int method)
 
   #ifdef HAVE_FEREAD
   if (fe_is_raw_tty) fe_temp_reset();
-  #endif /* HAVE_FEREAD */
+  #endif /*!
+!
+ HAVE_FEREAD 
+
+*/
 
   sprintf (buf, "%d", getpid ());
 
@@ -456,7 +598,11 @@ static void debug_stop (char *const*args)
   perror ("exec failed");
   _exit (0);
 }
-#    endif /* CALL_GDB */
+#    endif /*!
+!
+ CALL_GDB 
+
+*/
 
 static void stack_trace (char *const*args)
 {
@@ -479,11 +625,27 @@ static void stack_trace (char *const*args)
   pid = fork ();
   if (pid == 0)
   {
-    si_close (0); si_dup2 (in_fd[0],0);   /* set the stdin to the in pipe */
-    si_close (1); si_dup2 (out_fd[1],1);  /* set the stdout to the out pipe */
-    si_close (2); si_dup2 (out_fd[1],2);  /* set the stderr to the out pipe */
+    si_close (0); si_dup2 (in_fd[0],0);   /*!
+!
+ set the stdin to the in pipe 
 
-    execvp (args[0], args);      /* exec gdb */
+*/
+    si_close (1); si_dup2 (out_fd[1],1);  /*!
+!
+ set the stdout to the out pipe 
+
+*/
+    si_close (2); si_dup2 (out_fd[1],2);  /*!
+!
+ set the stderr to the out pipe 
+
+*/
+
+    execvp (args[0], args);      /*!
+!
+ exec gdb 
+
+*/
     perror ("exec failed");
     m2_end(999);
   }
@@ -553,7 +715,11 @@ static void stack_trace (char *const*args)
   m2_end(0);
 }
 
-#  endif /* !__OPTIMIZE__ */
+#  endif /*!
+!
+ !__OPTIMIZE__ 
+
+*/
 
 /// init signal handlers and error handling for libraries: NTL, factory
 void init_signals()

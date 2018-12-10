@@ -1,10 +1,16 @@
 #ifndef STYPE_H
 #define STYPE_H
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: flex/bison interface
+
+
 */
 
 #include "kernel/structs.h"

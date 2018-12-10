@@ -1,8 +1,14 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: Implementation of option buisness
+
+
 */
 
 
@@ -266,10 +272,26 @@ static const char* feOptAction(feOptIndex opt)
         {
           // print EmacsDir and InfoFile so that Emacs
           // mode can pcik it up
-          Warn("EmacsDir: %s", (feResource('e' /*"EmacsDir"*/) != NULL ?
-                                feResource('e' /*"EmacsDir"*/) : ""));
-          Warn("InfoFile: %s", (feResource('i' /*"InfoFile"*/) != NULL ?
-                                feResource('i' /*"InfoFile"*/) : ""));
+          Warn("EmacsDir: %s", (feResource('e' /*!
+!
+"EmacsDir"
+
+*/) != NULL ?
+                                feResource('e' /*!
+!
+"EmacsDir"
+
+*/) : ""));
+          Warn("InfoFile: %s", (feResource('i' /*!
+!
+"InfoFile"
+
+*/) != NULL ?
+                                feResource('i' /*!
+!
+"InfoFile"
+
+*/) : ""));
         }
         return NULL;
 

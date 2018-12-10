@@ -1,12 +1,22 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: i/o system
+
+
 */
 #include "kernel/mod2.h"
 
-/* I need myfread in standalone_parser */
+/*!
+!
+ I need myfread in standalone_parser 
+
+*/
 #ifndef STANDALONE_PARSER
 
 #ifdef HAVE_OMALLOC
@@ -27,7 +37,11 @@
 #endif
 
 #define fePutChar(c) fputc((unsigned char)(c),stdout)
-/*0 implementation */
+/*!
+!
+0 implementation 
+
+*/
 
 // char fe_promptstr[] ="  ";
 
@@ -41,7 +55,11 @@ int     si_echo = 0;
 int     printlevel = 0;
 int     colmax = 80;
 int     pagelength = 24;
-char    prompt_char = '>'; /*1 either '>' or '.'*/
+char    prompt_char = '>'; /*!
+!
+1 either '>' or '.'
+
+*/
 int     yylineno  = 0;
 int  myynest = -1;
 int  traceit = 0;

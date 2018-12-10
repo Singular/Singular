@@ -1,10 +1,16 @@
 #ifndef ATTRIB_H
 #define ATTRIB_H
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: attributes to leftv and idhdl
+
+
 */
 #include "kernel/structs.h"
 #ifdef HAVE_OMALLOC
@@ -26,13 +32,29 @@ class sattr
     char *  name;
     void *  data;
     attr    next;
-    int     atyp; /* the type of the attribut, describes the data field
-                  */
+    int     atyp; /*!
+!
+ the type of the attribut, describes the data field
+                  
+
+*/
 
     void Print();
-    attr Copy(); /* copy all arguments */
-    void * CopyA(); /* copy the data of this attribute */
-    attr set(char * s, void * data, int t); /* eats s, data */
+    attr Copy(); /*!
+!
+ copy all arguments 
+
+*/
+    void * CopyA(); /*!
+!
+ copy the data of this attribute 
+
+*/
+    attr set(char * s, void * data, int t); /*!
+!
+ eats s, data 
+
+*/
     attr get(const char * s);
     void kill(const ring r);
     void killAll(const ring r);

@@ -1,9 +1,15 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/*
+/*!
+!
+
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
+
+
 */
 
 
@@ -51,9 +57,21 @@ int mmInit( void )
 {
 #ifndef X_OMALLOC
 #if defined(OMALLOC_USES_MALLOC)
-    /* in mmstd.c, for some architectures freeSize() unconditionally uses the *system* free() */
-    /* sage ticket 5344: http://trac.sagemath.org/sage_trac/ticket/5344 */
-    /* do not rely on the default in Singular as libsingular may be different */
+    /*!
+!
+ in mmstd.c, for some architectures freeSize() unconditionally uses the *system* free() 
+
+*/
+    /*!
+!
+ sage ticket 5344: http://trac.sagemath.org/sage_trac/ticket/5344 
+
+*/
+    /*!
+!
+ do not rely on the default in Singular as libsingular may be different 
+
+*/
     mp_set_memory_functions(omMallocFunc,omReallocSizeFunc,omFreeSizeFunc);
 #else
     mp_set_memory_functions(malloc,reallocSize,freeSize);
@@ -62,10 +80,26 @@ int mmInit( void )
   return 1;
 }
 
-/*0 implementation*/
-int main(          /* main entry to Singular */
-    int argc,      /* number of parameter */
-    char** argv)   /* parameter array */
+/*!
+!
+0 implementation
+
+*/
+int main(          /*!
+!
+ main entry to Singular 
+
+*/
+    int argc,      /*!
+!
+ number of parameter 
+
+*/
+    char** argv)   /*!
+!
+ parameter array 
+
+*/
 {
   mmInit();
   // Don't worry: ifdef OM_NDEBUG, then all these calls are undef'ed
@@ -128,7 +162,11 @@ int main(          /* main entry to Singular */
     }
   }
 
-  /* say hello */
+  /*!
+!
+ say hello 
+
+*/
 
   if (TEST_V_QUIET)
   {
@@ -150,9 +188,13 @@ int main(          /* main entry to Singular */
   {
     if (feOptValue(FE_OPT_SORT)) On(SW_USE_NTL_SORT);
     dup2(1,2);
-    /* alternative:
+    /*!
+!
+ alternative:
     *    memcpy(stderr,stdout,sizeof(FILE));
-    */
+    
+
+*/
   }
 
 #ifdef SINGULAR_PYOBJECT_SETUP_H
@@ -216,7 +258,11 @@ int main(          /* main entry to Singular */
     }
   }
 
-  /* start shell */
+  /*!
+!
+ start shell 
+
+*/
   if (fe_fgets_stdin==fe_fgets_dummy)
   {
     singular_in_batchmode=TRUE;

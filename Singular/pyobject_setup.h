@@ -1,6 +1,8 @@
 // -*- c++ -*-
 //*****************************************************************************
-/** @file pyobject_setup.h
+/*!
+!
+* @file pyobject_setup.h
  *
  * @author Alexander Dreyer
  * @date 2010-12-15

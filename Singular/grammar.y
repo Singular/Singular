@@ -1,8 +1,14 @@
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT: SINGULAR shell grammatik
+
+
 */
 %{
 
@@ -86,7 +92,9 @@ void debug_list(leftv v)
 }
 #endif
 
-/* From the bison docu:
+/*!
+!
+ From the bison docu:
 
      By defining the macro `YYMAXDEPTH', you can control how deep the
 parser stack can become before a stack overflow occurs.  Define the
@@ -102,6 +110,8 @@ Therefore, you do not need to make `YYMAXDEPTH' painfully small merely
 to save space for ordinary inputs that do not need much stack.
 
    The default value of `YYMAXDEPTH', if you do not define it, is 10000.
+
+
 */
 #define YYMAXDEPTH MAX_INT_VAL
 
@@ -176,10 +186,18 @@ void yyerror(const char * fmt)
 
 %}
 
-/* %expect 22 */
+/*!
+!
+ %expect 22 
+
+*/
 %pure_parser
 
-/* special symbols */
+/*!
+!
+ special symbols 
+
+*/
 %token DOTDOT
 %token EQUAL_EQUAL
 %token GE
@@ -191,16 +209,28 @@ void yyerror(const char * fmt)
 %token COLONCOLON
 %token ARROW
 
-/* types, part 1 (ring indep.)*/
+/*!
+!
+ types, part 1 (ring indep.)
+
+*/
 %token <i> GRING_CMD
 %token <i> BIGINTMAT_CMD
 %token <i> INTMAT_CMD
 %token <i> PROC_CMD
 %token <i> RING_CMD
 
-/* valid when ring defined ! */
+/*!
+!
+ valid when ring defined ! 
+
+*/
 %token <i> BEGIN_RING
-/* types, part 2 */
+/*!
+!
+ types, part 2 
+
+*/
 %token <i> BUCKET_CMD
 %token <i> IDEAL_CMD
 %token <i> MAP_CMD
@@ -211,9 +241,17 @@ void yyerror(const char * fmt)
 %token <i> RESOLUTION_CMD
 %token <i> SMATRIX_CMD
 %token <i> VECTOR_CMD
-/* end types */
+/*!
+!
+ end types 
 
-/* ring dependent cmd, with argumnts indep. of a ring*/
+*/
+
+/*!
+!
+ ring dependent cmd, with argumnts indep. of a ring
+
+*/
 %token <i> BETTI_CMD
 %token <i> E_CMD
 %token <i> FETCH_CMD
@@ -227,7 +265,11 @@ void yyerror(const char * fmt)
 %token <i> PREIMAGE_CMD
 %token <i> VAR_CMD
 
-/*system variables in ring block*/
+/*!
+!
+system variables in ring block
+
+*/
 %token <i> VALTVARS
 %token <i> VMAXDEG
 %token <i> VMAXMULT
@@ -235,7 +277,11 @@ void yyerror(const char * fmt)
 %token <i> VMINPOLY
 
 %token <i> END_RING
-/* end of ring definitions */
+/*!
+!
+ end of ring definitions 
+
+*/
 
 %token <i> CMD_1
 %token <i> CMD_2
@@ -246,13 +292,29 @@ void yyerror(const char * fmt)
 %token <i> CMD_123
 %token <i> CMD_M
 %token <i> ROOT_DECL
-        /* put variables of this type into the idroot list */
+        /*!
+!
+ put variables of this type into the idroot list 
+
+*/
 %token <i> ROOT_DECL_LIST
-        /* put variables of this type into the idroot list */
+        /*!
+!
+ put variables of this type into the idroot list 
+
+*/
 %token <i> RING_DECL
-        /* put variables of this type into the currRing list */
+        /*!
+!
+ put variables of this type into the currRing list 
+
+*/
 %token <i> RING_DECL_LIST
-        /* put variables of this type into the currRing list */
+        /*!
+!
+ put variables of this type into the currRing list 
+
+*/
 %token <i> EXAMPLE_CMD
 %token <i> EXPORT_CMD
 %token <i> HELP_CMD
@@ -265,7 +327,11 @@ void yyerror(const char * fmt)
 %token <name> STRINGTOK BLOCKTOK INT_CONST
 %token <name> UNKNOWN_IDENT RINGVAR PROC_DEF
 
-/* control */
+/*!
+!
+ control 
+
+*/
 %token <i> APPLY
 %token <i> ASSUME_CMD
 %token <i> BREAK_CMD
@@ -280,7 +346,11 @@ void yyerror(const char * fmt)
 %token <i> RETURN
 %token <i> PARAMETER
 
-/* system variables */
+/*!
+!
+ system variables 
+
+*/
 %token <i> SYSVAR
 
 %type <name> extendedid
@@ -299,8 +369,16 @@ void yyerror(const char * fmt)
 %type <i>    '/' '[' ']' '^' ',' ';'
 
 
-/*%nonassoc '=' PLUSEQUAL DOTDOT*/
-/*%nonassoc '=' DOTDOT COLONCOLON*/
+/*!
+!
+%nonassoc '=' PLUSEQUAL DOTDOT
+
+*/
+/*!
+!
+%nonassoc '=' DOTDOT COLONCOLON
+
+*/
 %nonassoc '='
 %left ','
 %left '&'
@@ -320,7 +398,11 @@ void yyerror(const char * fmt)
 
 %%
 lines:
-        /**/
+        /*!
+!
+
+
+*/
         | lines pprompt
           {
             if (timerv)
@@ -343,7 +425,11 @@ lines:
               while((currentVoice!=NULL) && (currentVoice->prev!=NULL)) exitVoice();
               if (currentVoice!=NULL) currentVoice->ifsw=0;
             }
-            if (errorreported) /* also catches abort... */
+            if (errorreported) /*!
+!
+ also catches abort... 
+
+*/
             {
               yyerror("");
             }
@@ -355,10 +441,22 @@ lines:
         ;
 
 pprompt:
-        flowctrl                       /* if, while, for, proc */
-        | command ';'                  /* commands returning no value */
+        flowctrl                       /*!
+!
+ if, while, for, proc 
+
+*/
+        | command ';'                  /*!
+!
+ commands returning no value 
+
+*/
           {currentVoice->ifsw=0;}
-        | declare_ip_variable ';'      /* default initialization */
+        | declare_ip_variable ';'      /*!
+!
+ default initialization 
+
+*/
           { $1.CleanUp(); currentVoice->ifsw=0;}
         | returncmd
           {
@@ -369,7 +467,11 @@ pprompt:
             currentVoice->ifsw=0;
             iiDebug();
           }
-        | ';'                    /* ignore empty statements */
+        | ';'                    /*!
+!
+ ignore empty statements 
+
+*/
           {currentVoice->ifsw=0;}
         | error ';'
           {
@@ -380,7 +482,11 @@ pprompt:
             currentVoice->ifsw=0;
             if (inerror)
             {
-/*  bison failed here*/
+/*!
+!
+  bison failed here
+
+*/
               if ((inerror!=3) && ($1<UMINUS) && ($1>' '))
               {
                 // 1: yyerror called
@@ -389,7 +495,11 @@ pprompt:
                 inerror=3;
                 Print(" error at token `%s`\n",iiTwoOps($1));
               }
-/**/
+/*!
+!
+
+
+*/
 
             }
             if (!errorreported) WerrorS("...parse error");
@@ -502,7 +612,11 @@ elemexpr:
               sleftv tmp;
               memset(&tmp,0,sizeof(tmp));
               i=iiTestConvert((t=v->Typ()),POLY_CMD);
-              if((i==0) || (iiConvert(t /*v->Typ()*/,POLY_CMD,i,v,&tmp)))
+              if((i==0) || (iiConvert(t /*!
+!
+v->Typ()
+
+*/,POLY_CMD,i,v,&tmp)))
               {
                 pDelete((poly *)&$$.data);
                 $2.CleanUp();
@@ -521,12 +635,20 @@ elemexpr:
           {
             memset(&$$,0,sizeof($$));
             int i = atoi($1);
-            /*remember not to omFree($1)
-            *because it is a part of the scanner buffer*/
+            /*!
+!
+remember not to omFree($1)
+            *because it is a part of the scanner buffer
+
+*/
             $$.rtyp  = INT_CMD;
             $$.data = (void *)(long)i;
 
-            /* check: out of range input */
+            /*!
+!
+ check: out of range input 
+
+*/
             int l = strlen($1)+2;
             number n;
             if (l >= MAX_INT_LEN)
@@ -799,7 +921,11 @@ expr_arithmetic:
             if(iiExprArith2(&$$,&$1,'-',&$3)) YYERROR;
           }
         | expr '/' expr
-          { /* also for *,% */
+          { /*!
+!
+ also for *,% 
+
+*/
             if(iiExprArith2(&$$,&$1,$<i>2,&$3)) YYERROR;
           }
         | expr '^' expr
@@ -807,11 +933,19 @@ expr_arithmetic:
             if(iiExprArith2(&$$,&$1,'^',&$3)) YYERROR;
           }
         | expr '<' expr
-          { /* also for > */
+          { /*!
+!
+ also for > 
+
+*/
             if(iiExprArith2(&$$,&$1,$<i>2,&$3)) YYERROR;
           }
         | expr '&' expr
-          { /* also for |*/
+          { /*!
+!
+ also for |
+
+*/
             if(iiExprArith2(&$$,&$1,$<i>2,&$3)) YYERROR;
           }
         | expr NOTEQUAL expr
@@ -1101,9 +1235,21 @@ mat_cmd: MATRIX_CMD
         | BIGINTMAT_CMD
           ;
 
-/* --------------------------------------------------------------------*/
-/* section of pure commands                                            */
-/* --------------------------------------------------------------------*/
+/*!
+!
+ --------------------------------------------------------------------
+
+*/
+/*!
+!
+ section of pure commands                                            
+
+*/
+/*!
+!
+ --------------------------------------------------------------------
+
+*/
 
 filecmd:
         '<' stringexpr
@@ -1275,15 +1421,39 @@ ringcmd1:
 ringcmd:
         ringcmd1
           elemexpr cmdeq
-          rlist     ','      /* description of coeffs */
-          rlist     ','      /* var names */
-          ordering           /* list of (multiplier ordering (weight(s))) */
+          rlist     ','      /*!
+!
+ description of coeffs 
+
+*/
+          rlist     ','      /*!
+!
+ var names 
+
+*/
+          ordering           /*!
+!
+ list of (multiplier ordering (weight(s))) 
+
+*/
           {
             const char *ring_name = $2.name;
             ring b=
-            rInit(&$4,            /* characteristik and list of parameters*/
-                  &$6,            /* names of ringvariables */
-                  &$8);            /* ordering */
+            rInit(&$4,            /*!
+!
+ characteristik and list of parameters
+
+*/
+                  &$6,            /*!
+!
+ names of ringvariables 
+
+*/
+                  &$8);            /*!
+!
+ ordering 
+
+*/
             idhdl newRingHdl=NULL;
 
             if (b!=NULL)
@@ -1442,9 +1612,21 @@ typecmd:
           }
         ;
 
-/* --------------------------------------------------------------------*/
-/* section of flow control                                             */
-/* --------------------------------------------------------------------*/
+/*!
+!
+ --------------------------------------------------------------------
+
+*/
+/*!
+!
+ section of flow control                                             
+
+*/
+/*!
+!
+ --------------------------------------------------------------------
+
+*/
 
 ifcmd: IF_CMD '(' expr ')' BLOCKTOK
           {
@@ -1500,7 +1682,11 @@ ifcmd: IF_CMD '(' expr ')' BLOCKTOK
 whilecmd:
         WHILE_CMD STRINGTOK BLOCKTOK
           {
-            /* -> if(!$2) break; $3; continue;*/
+            /*!
+!
+ -> if(!$2) break; $3; continue;
+
+*/
             char * s = (char *)omAlloc( strlen($2) + strlen($3) + 36);
             sprintf(s,"whileif (!(%s)) break;\n%scontinue;\n " ,$2,$3);
             newBuffer(s,BT_break);
@@ -1512,8 +1698,16 @@ whilecmd:
 forcmd:
         FOR_CMD STRINGTOK STRINGTOK STRINGTOK BLOCKTOK
           {
-            /* $2 */
-            /* if (!$3) break; $5; $4; continue; */
+            /*!
+!
+ $2 
+
+*/
+            /*!
+!
+ if (!$3) break; $5; $4; continue; 
+
+*/
             char * s = (char *)omAlloc( strlen($3)+strlen($4)+strlen($5)+36);
             sprintf(s,"forif (!(%s)) break;\n%s%s;\ncontinue;\n "
                    ,$3,$5,$4);

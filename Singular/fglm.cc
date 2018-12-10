@@ -1,9 +1,13 @@
 // emacs edit mode for this file is -*- C++ -*-
 
-/****************************************
+/*!
+!
+***************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
+/*!
+!
+
 * ABSTRACT - The FGLM-Algorithm plus extension
 *   Calculate a reduced groebner basis for one ordering, given a
 *   reduced groebner basis for another ordering.
@@ -13,6 +17,8 @@
 *   not implemented ).
 *   The extension (finduni) finds minimal univariate Polynomials
 *   lying in a 0-dimensional ideal.
+
+
 */
 
 #include "kernel/mod2.h"

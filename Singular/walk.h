@@ -1,8 +1,16 @@
-/*****************************************
+/*!
+!
+****************************************
 *  Computer Algebra System SINGULAR      *
-*****************************************/
-/*
+****************************************
+
+*/
+/*!
+!
+
 * ABSTRACT: Declaration of the Groebner walk
+
+
 */
 
 #ifndef WALK_H
@@ -50,7 +58,11 @@ intvec* Mivperttarget(ideal G, int ndeg);
 
 intvec* MSimpleIV(intvec* iv);
 
-/* Okt -- Nov'01 */
+/*!
+!
+ Okt -- Nov'01 
+
+*/
 // compute a Groebner basis of an ideal G w.r.t. lexicographic order
 //ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M);
 ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M, ring baseRing, int reduction, int printout);
@@ -59,27 +71,55 @@ ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M, ring baseRing, int reduc
 
 ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int pert_deg, int reduction, int printout);
 
-/* the perturbation walk algorithm */
+/*!
+!
+ the perturbation walk algorithm 
+
+*/
 
 ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,intvec* target_weight, int nP, int reduction, int printout);
 
-/* the perturbation walk algorithm with random element */
+/*!
+!
+ the perturbation walk algorithm with random element 
+
+*/
 ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int op_deg, int tp_deg, int nP, int reduction, int printout);
 
-/* The fractal walk algorithm */
+/*!
+!
+ The fractal walk algorithm 
+
+*/
 ideal Mfwalk(ideal G, intvec* ivstart, intvec* ivtarget, int reduction, int printout);
 
-/* The fractal walk algorithm with random element */
+/*!
+!
+ The fractal walk algorithm with random element 
+
+*/
 ideal Mfrwalk(ideal G, intvec* ivstart, intvec* ivtarget, int weight_rad, int reduction, int printout);
 
-/* Implement Tran's idea */
+/*!
+!
+ Implement Tran's idea 
+
+*/
 intvec* TranMPertVectorslp(ideal G);
 ideal TranMImprovwalk(ideal Go, intvec* curr_weight,intvec* target_weight, int nP);
 
-/* the first alternative algorithm */
+/*!
+!
+ the first alternative algorithm 
+
+*/
 ideal MAltwalk1(ideal G,int op,int tp,intvec* curr_weight,intvec* target_weight);
 
-/* the second alternative algorithm */
+/*!
+!
+ the second alternative algorithm 
+
+*/
 ideal MAltwalk2(ideal G, intvec* curr_weight, intvec* target_weight);
 
 #endif  //WALK_H
