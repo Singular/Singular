@@ -1,7 +1,7 @@
-/// change_cost.cc
+// change_cost.cc
 
-/// This file provides an interface for changing the cost vector in IP-problems
-/// and for recomputing Groebner basis of toric ideals.
+// This file provides an interface for changing the cost vector in IP-problems
+// and for recomputing Groebner basis of toric ideals.
 
 #ifndef CHANGE_COST_CC
 #define CHANGE_COST_CC
@@ -11,36 +11,36 @@
 int main(int argc, char *argv[])
 {
 
-  /// initialize arguments for the IP-algorithms (Buchberger)
-  /// with default settings
+  // initialize arguments for the IP-algorithms (Buchberger)
+  // with default settings
   BOOLEAN verbose=FALSE;
   short version=1;
   short S_pair_criteria=11;
   double interreduction_percentage=12.0;
 
 
-///////////////////////////////////// parse options ///////////////////////////////////////////////////////
+///////////////////////// parse options /////////////////////////////////////
 
 
   if(argc>=3)
-    /// argc has to be at least 3 (except when help is required, see below):
-    /// program name, GROEBNER file, NEW_COST file
+    // argc has to be at least 3 (except when help is required, see below):
+    // program name, GROEBNER file, NEW_COST file
   {
 
     for(short i=1;i<argc-2;i++)
-      /// these are the input options
+      // these are the input options
     {
 
       if(!strcmp(argv[i],"-v") || !strcmp(argv[i],"--verbose"))
       {
         verbose=TRUE;
         continue;
-        /// read next argument
+        // read next argument
       }
 
       if(!strcmp(argv[i],"-V") || !strcmp(argv[i],"-version"))
       {
-        /// check if next argument is a valid version number
+        // check if next argument is a valid version number
         i++;
 
         if(!strcmp(argv[i],"1"))
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
           continue;
         }
 
-        /// When reaching this line, the version argument was invalid.
+        // When reaching this line, the version argument was invalid.
         cerr<<"ERROR: invalid version argument"<<endl
             <<"Type `change_cost --help' for help on options."<<endl;
         return 1;
@@ -72,17 +72,17 @@ int main(int argc, char *argv[])
 
       if(!strcmp(argv[i],"-S"))
       {
-        /// initialize argument to the use of no criteria
+        // initialize argument to the use of no criteria
         S_pair_criteria=0;
 
         do
         {
-          /// Check what S-pair criterion the next argument indicates.
-          /// If none: The algorithm is called without S-pair criteria.
+          // Check what S-pair criterion the next argument indicates.
+          // If none: The algorithm is called without S-pair criteria.
           i++;
 
           if(i>=argc-2)
-            /// file arguments reached
+            // file arguments reached
             break;
 
           if(!strcmp(argv[i],"RP"))
@@ -111,33 +111,33 @@ int main(int argc, char *argv[])
             continue;
           }
 
-          /// option does not belong to an S-pair criterion
+          // option does not belong to an S-pair criterion
           break;
 
         }
         while(1);
 
-        i--;        /// reset counter so that the outer loop
-        continue;   /// continues with the just considered argument
+        i--;        // reset counter so that the outer loop
+        continue;   // continues with the just considered argument
       }
 
       if(!strcmp(argv[i],"-p"))
       {
-        /// read interreduction percentage
+        // read interreduction percentage
         i++;
 
         char** rest;
         interreduction_percentage=strtod(argv[i],rest);
-        /// The function strtod converts a string into a double. As the
-        /// specification is not correct, it may cause trouble...
-        /// For example, if the argument can be read as a float, the value
-        /// of rest should be NULL. This is not the case. Therefore, we can
-        /// only check by the following string comparison if a float has been
-        /// built. An argument as 15xy is thereby considered as valid
-        /// (with interreduction_percentage==15.0).
+        // The function strtod converts a string into a double. As the
+        // specification is not correct, it may cause trouble...
+        // For example, if the argument can be read as a float, the value
+        // of rest should be NULL. This is not the case. Therefore, we can
+        // only check by the following string comparison if a float has been
+        // built. An argument as 15xy is thereby considered as valid
+        // (with interreduction_percentage==15.0).
 
         if(!(strcmp(argv[i],*rest)))
-          /// argument was no float
+          // argument was no float
         {
           cerr<<"ERROR: invalid argument for interreduction percentage"<<endl
               <<"Type `change_cost --help' for help on options."<<endl;
@@ -147,16 +147,16 @@ int main(int argc, char *argv[])
         continue;
       }
 
-      /// When reaching this line, the argument is no legal option.
+      // When reaching this line, the argument is no legal option.
       cerr<<"ERROR: invalid option "<<argv[i]<<endl
           <<"Type `change_cost --help' for help on options."<<endl;
       return 1;
     }
 
 
-/////////////////////////////// call IP-algorithms //////////////////////////////////////////////////////
+///////////////////// call IP-algorithms ////////////////////////////////////
 
-    /// open first input stream (GROEBNER file)
+    // open first input stream (GROEBNER file)
     ifstream first_input(argv[argc-2]);
 
     if(!first_input)
@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
       return 1;
     }
 
-    /// open second input stream (NEW_COST file)
+    // open second input stream (NEW_COST file)
     ifstream second_input(argv[argc-1]);
 
     if(!second_input)
@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
       return 1;
     }
 
-    /// change term ordering
+    // change term ordering
     int success=change_cost(argv[argc-2], argv[argc-1], version,
                             S_pair_criteria, interreduction_percentage,
                             verbose);
@@ -185,28 +185,28 @@ int main(int argc, char *argv[])
       return 1;
     }
 
-    /// Groebner basis successfully changed
+    // Groebner basis successfully changed
     return 0;
   }
 
 
-////////////////////////////////// provide help text ////////////////////////////////////////////////////
+/////////////////////// provide help text ///////////////////////////////////
 
-  /// handle the case of "missing" arguments
+  // handle the case of "missing" arguments
 
   if((argc==2) && !strcmp(argv[1],"--help"))
-    /// help required
+    // help required
   {
     system("less change_cost.hlp");
     return 0;
   }
 
   else
-    /// invalid arguments
+    // invalid arguments
     cerr<<"USAGE: change_cost [options] groebner_file new_cost_file"<<endl
         <<"Type `change_cost --help' for help on options."<<endl;
 
   return 1;
 
 }
-#endif  /// CHANGE_COST_CC
+#endif  // CHANGE_COST_CC

@@ -1,6 +1,6 @@
-/// ideal.cc
+// ideal.cc
 
-/// implementation of some general ideal functions
+// implementation of some general ideal functions
 
 #ifndef IDEAL_CC
 #define IDEAL_CC
@@ -8,11 +8,11 @@
 #include <climits>
 #include "ideal.h"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////// private member functions /////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+////////////////// private member functions /////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 
-/////////////////// subset_tree data structure //////////////////////////////////////////////////////
+///////////// subset_tree data structure ////////////////////////////////////
 
 #ifdef SUPPORT_DRIVEN_METHODS_EXTENDED
 
@@ -21,35 +21,35 @@ void ideal::create_subset_tree()
   for(int i=0;i<Number_of_Lists;i++)
   {
 
-/// First determine the number of binary vectors whose support is a subset
-/// of the support of i (i read as binary vector).
-/// The support of i is a set of cardinality s, where s is the number of
-/// bits in i that are 1. Hence the desired number is 2^s.
+// First determine the number of binary vectors whose support is a subset
+// of the support of i (i read as binary vector).
+// The support of i is a set of cardinality s, where s is the number of
+// bits in i that are 1. Hence the desired number is 2^s.
 
     int s=0;
 
     for(int k=0;k<List_Support_Variables;k++)
       if( (i&(1<<k)) == (1<<k) )
-        /// bit k of i is 1
+        // bit k of i is 1
         s++;
 
     S.number_of_subsets[i]=(1<<s);
-    /// (1<<s) == 2^s
+    // (1<<s) == 2^s
 
-/// Now determine the concrete binary vectors whose support is a subset
-/// of that of i. This is done in a very simple manner by comparing
-/// the support of each number between 0 and i (read as binary vector)
-/// with that of i. (Efficiency considerations are absolutely unimportant
-/// in this function.)
+// Now determine the concrete binary vectors whose support is a subset
+// of that of i. This is done in a very simple manner by comparing
+// the support of each number between 0 and i (read as binary vector)
+// with that of i. (Efficiency considerations are absolutely unimportant
+// in this function.)
 
     S.subsets_of_support[i]=new int[S.number_of_subsets[i]];
-    /// memory allocation for subsets_of_support[i]
+    // memory allocation for subsets_of_support[i]
 
     int index=0;
     for(int j=0;j<Number_of_Lists;j++)
       if((i&j)==j)
-        /// If the support of j as a bit vector is contained in the support of
-        /// i as a bit vector, j is saved in the list subsets_of_support[i].
+        // If the support of j as a bit vector is contained in the support of
+        // i as a bit vector, j is saved in the list subsets_of_support[i].
           {
             S.subsets_of_support[i][index]=j;
             index++;
@@ -61,51 +61,51 @@ void ideal::destroy_subset_tree()
 {
   for(int i=0;i<Number_of_Lists;i++)
     delete[] S.subsets_of_support[i];
-  /// The arrays number_of_subsets and subsets_of_support (the (int*)-array)
-  /// are not dynamically allocated and do not have to be deleted.
+  // The arrays number_of_subsets and subsets_of_support (the (int*)-array)
+  // are not dynamically allocated and do not have to be deleted.
 }
-#endif  /// SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
-//////////////// subroutines for Buchberger´s algorithm ///////////////////////////////////////
+/////////// subroutines for Buchberger´s algorithm //////////////////////////
 
 ideal& ideal::add_new_generator(binomial& bin)
 {
 #ifdef SUPPORT_DRIVEN_METHODS_EXTENDED
 
   new_generators[(bin.head_support)%Number_of_Lists].insert(bin);
-  /// insert the bin according to its support,
-  /// considering only the first List_Support_Variables variables.
+  // insert the bin according to its support,
+  // considering only the first List_Support_Variables variables.
 
-#endif  /// SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
 #ifdef NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
   new_generators.insert(bin);
 
-#endif  /// NO_SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
   return(*this);
 }
 
 ideal& ideal::add_generator(binomial& bin)
 {
-/// Beside its function as a auxiliary routine for a shorter code, this routine
-/// offers a good way to hide if SUPPORT_DRIVEN_METHODS_EXTENDED are used or
-/// not. So the constructors do not have to care about this.
+// Beside its function as a auxiliary routine for a shorter code, this routine
+// offers a good way to hide if SUPPORT_DRIVEN_METHODS_EXTENDED are used or
+// not. So the constructors do not have to care about this.
 
 #ifdef SUPPORT_DRIVEN_METHODS_EXTENDED
 
   generators[(bin.head_support)%Number_of_Lists].insert(bin);
-  /// insert the bin according to its support,
-  /// considering only the first List_Support_Variables variables.
+  // insert the bin according to its support,
+  // considering only the first List_Support_Variables variables.
 
-#endif  /// SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
 #ifdef NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
   generators.insert(bin);
 
-#endif  /// NO_SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
   size++;
   number_of_new_binomials++;
@@ -113,51 +113,51 @@ ideal& ideal::add_generator(binomial& bin)
   return(*this);
 }
 
-////////////////////////////// constructor subroutines ////////////////////////////////////////////////
+//////////////////// constructor subroutines ////////////////////////////////
 
 ideal& ideal::Conti_Traverso_ideal(matrix& A,const term_ordering& _w)
 {
 
-  /// A may have negative entries; to model this with binomials, we need an
-  /// inversion variable.
+  // A may have negative entries; to model this with binomials, we need an
+  // inversion variable.
 
   w=_w;
-  /// The argument term ordering should be given by the objective function.
+  // The argument term ordering should be given by the objective function.
 
   w.convert_to_elimination_ordering(A.rows+1,LEX);
-  /// extend term ordering into an elimination ordering of the appropriate
-  /// size
+  // extend term ordering into an elimination ordering of the appropriate
+  // size
 
   Integer *generator=new Integer[A.columns+A.rows+1];
-  /// A.columns + A.rows +1 is the number of variables for the Conti-Traverso
-  /// algorithm with "inversion variable".
+  // A.columns + A.rows +1 is the number of variables for the Conti-Traverso
+  // algorithm with "inversion variable".
 
-  /// build initial ideal generators
+  // build initial ideal generators
   for(int j=0;j<A.columns;j++)
   {
     for(int k=0;k<A.columns;k++)
-      /// original variables
+      // original variables
       if(j==k)
         generator[k]=-1;
       else
         generator[k]=0;
 
     for(int i=0;i<A.rows;i++)
-      /// elimination variables
+      // elimination variables
       generator[A.columns+i]=A.coefficients[i][j];
 
     generator[A.columns+A.rows]=0;
-    /// inversion variable
+    // inversion variable
 
-    /// Note that the relative order of the variables is important:
-    /// If the elimination variables do not follow the other variables,
-    /// the conversion of the term ordering has not the desired effect.
+    // Note that the relative order of the variables is important:
+    // If the elimination variables do not follow the other variables,
+    // the conversion of the term ordering has not the desired effect.
 
     binomial* bin=new binomial(A.rows+1+A.columns,generator,w);
     add_generator(*bin);
   }
 
-  /// now add the "inversion generator"
+  // now add the "inversion generator"
   for(int j=0;j<A.columns;j++)
     generator[j]=0;
   for(int i=0;i<A.rows+1;i++)
@@ -172,37 +172,37 @@ ideal& ideal::Conti_Traverso_ideal(matrix& A,const term_ordering& _w)
 ideal& ideal::Positive_Conti_Traverso_ideal(matrix& A,const term_ordering& _w)
 {
 
-  /// A is assumed to have only nonnegative entries;then we need no
-  /// "inversion variable".
+  // A is assumed to have only nonnegative entries;then we need no
+  // "inversion variable".
 
   w=_w;
-  /// The argument term ordering should be given by the objective function.
+  // The argument term ordering should be given by the objective function.
 
   w.convert_to_elimination_ordering(A.rows, LEX);
-  /// extend term ordering into an elimination ordering of the appropriate
-  /// size
+  // extend term ordering into an elimination ordering of the appropriate
+  // size
 
   Integer *generator=new Integer[A.columns+A.rows];
-  /// A.columns + A.rows is the number of variables for the Conti-Traverso
-  /// algorithm without "inversion variable".
+  // A.columns + A.rows is the number of variables for the Conti-Traverso
+  // algorithm without "inversion variable".
 
-  /// build the initial ideal generators
+  // build the initial ideal generators
   for(int j=0;j<A.columns;j++)
   {
     for(int k=0;k<A.columns;k++)
-      /// original variables
+      // original variables
       if(j==k)
         generator[k]=-1;
       else
         generator[k]=0;
 
     for(int i=0;i<A.rows;i++)
-      /// elimination variables
+      // elimination variables
       generator[A.columns+i]=A.coefficients[i][j];
 
-    /// Note that the relative order of the variables is important:
-    /// If the elimination variables do not follow the other variables,
-    /// the conversion of the term ordering has not the desired effect.
+    // Note that the relative order of the variables is important:
+    // If the elimination variables do not follow the other variables,
+    // the conversion of the term ordering has not the desired effect.
 
     binomial* bin=new binomial(A.rows+A.columns,generator,w);
     add_generator(*bin);
@@ -215,17 +215,17 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
 {
 
   w=_w;
-  /// The argument term_ordering should be given by the objective function.
+  // The argument term_ordering should be given by the objective function.
 
   w.convert_to_elimination_ordering(1,LEX);
-  /// add one elimination variable used to saturate the ideal
+  // add one elimination variable used to saturate the ideal
 
   if(A._kernel_dimension==-2)
-    /// kernel of A not yet computed, do this now
+    // kernel of A not yet computed, do this now
     A.LLL_kernel_basis();
 
   if((A._kernel_dimension==-1) &&  (A.columns<0))
-    /// error occurred in kernel computation or matrix corrupt
+    // error occurred in kernel computation or matrix corrupt
   {
     cout<<"\nWARNING: ideal& ideal::Pottier_ideal(matrix&, const "
       "term_ordering&):\ncannot build ideal from a corrupt input matrix"<<endl;
@@ -234,20 +234,20 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
   }
 
   Integer *generator=new Integer[A.columns+1];
-  /// This is the number of variables needed for Pottier's algorithm.
+  // This is the number of variables needed for Pottier's algorithm.
 
 
-  /// compute initial generating system from the kernel of A
+  // compute initial generating system from the kernel of A
   for(int j=0;j<A._kernel_dimension;j++)
   {
 
     for(int k=0;k<A.columns;k++)
     {
 
-      /// We should first verifie if the components of the LLL-reduced lattice
-      /// basis fit into the basic data type (Integer as defined in globals.h).
-      /// This overflow control does of course not detect overflows in the
-      /// course of the LLL-algorithm!
+      // We should first verifie if the components of the LLL-reduced lattice
+      // basis fit into the basic data type (Integer as defined in globals.h).
+      // This overflow control does of course not detect overflows in the
+      // course of the LLL-algorithm!
 
 #ifdef _SHORT_
 
@@ -262,7 +262,7 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
         return *this;
       }
 
-#endif /// _SHORT_
+#endif // _SHORT_
 
 #ifdef _INT_
 
@@ -277,7 +277,7 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
         return *this;
       }
 
-#endif  /// _INT_
+#endif  // _INT_
 
 #ifdef _LONG_
 
@@ -292,28 +292,28 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
         return *this;
       }
 
-#endif  /// _LONG_
+#endif  // _LONG_
 
       generator[k]=(A.H)[j][k];
     }
 
     generator[A.columns]=0;
-    /// elimination variable
+    // elimination variable
 
-    /// Note that the relative order of the variables is important:
-    /// If the elimination variable does not follow the other variables,
-    /// the conversion of the term ordering has not the desired effect.
+    // Note that the relative order of the variables is important:
+    // If the elimination variable does not follow the other variables,
+    // the conversion of the term ordering has not the desired effect.
 
     binomial* bin=new binomial(A.columns+1,generator,w);
     add_generator(*bin);
   }
 
-  /// build "saturation generator"
+  // build "saturation generator"
 
 
-  /// The use of the hosten_shapiro procedure is useful here because the head
-  /// of the computed saturation generator is smaller if less variables are
-  /// involved.
+  // The use of the hosten_shapiro procedure is useful here because the head
+  // of the computed saturation generator is smaller if less variables are
+  // involved.
   int* sat_var = NULL;
   int number_of_sat_var = A.hosten_shapiro(sat_var);
   if( (number_of_sat_var == 0) || (sat_var == NULL) )
@@ -332,8 +332,8 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
 
   binomial* bin=new binomial(A.columns+1,generator,w);
   add_generator(*bin);
-  /// The "saturation generator" seems to be a monomial, but is interpreted
-  /// as a binomial with tail 1 by the designed data structures.
+  // The "saturation generator" seems to be a monomial, but is interpreted
+  // as a binomial with tail 1 by the designed data structures.
 
   delete[] sat_var;
   delete[] generator;
@@ -344,21 +344,21 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
 ideal& ideal::Hosten_Sturmfels_ideal(matrix& A, const term_ordering& _w)
 {
 
-  /// check term ordering
+  // check term ordering
   if((_w.weight_refinement()!=W_REV_LEX) && (_w.is_positive()==FALSE))
     cerr<<"\nWARNING: ideal& ideal::Hosten_Sturmfels_ideal(matrix&, const "
       "term_ordering&):\nargument term ordering should be a weighted reverse"
       "lexicographical \nwith positive weights"<<endl;
 
   w=_w;
-  /// The argument term_ordering should be given by a homogeneous grading.
+  // The argument term_ordering should be given by a homogeneous grading.
 
   if(A._kernel_dimension==-2)
-    /// kernel of A not yet computed, do this now
+    // kernel of A not yet computed, do this now
     A.LLL_kernel_basis();
 
   if((A._kernel_dimension==-1) &&  (A.columns<0))
-    /// error occurred in kernel computation or matrix corrupt
+    // error occurred in kernel computation or matrix corrupt
   {
     cout<<"\nWARNING: ideal& ideal::Hosten_Sturmfels_ideal(matrix&, const "
       "term_ordering&):\ncannot build ideal from a corrupt input matrix"<<endl;
@@ -367,21 +367,21 @@ ideal& ideal::Hosten_Sturmfels_ideal(matrix& A, const term_ordering& _w)
   }
 
   Integer * generator=new Integer[A.columns];
-  /// The algorithm of Hosten and Sturmfels does not need supplementary
-  /// variables.
+  // The algorithm of Hosten and Sturmfels does not need supplementary
+  // variables.
 
 
-  /// compute initial generating system from the kernel of A
+  // compute initial generating system from the kernel of A
   for(int j=0;j<A._kernel_dimension;j++)
   {
 
     for(int k=0;k<A.columns;k++)
     {
 
-      /// We should first verifie if the components of the LLL-reduced lattice
-      /// basis fit into the basic data type (Integer as defined in globals.h).
-      /// This overflow control does of course not detect overflows in the
-      /// course of the LLL-algorithm!
+      // We should first verifie if the components of the LLL-reduced lattice
+      // basis fit into the basic data type (Integer as defined in globals.h).
+      // This overflow control does of course not detect overflows in the
+      // course of the LLL-algorithm!
 
 #ifdef _SHORT_
 
@@ -395,7 +395,7 @@ ideal& ideal::Hosten_Sturmfels_ideal(matrix& A, const term_ordering& _w)
         return *this;
       }
 
-#endif /// _SHORT_
+#endif // _SHORT_
 
 #ifdef _INT_
 
@@ -409,7 +409,7 @@ ideal& ideal::Hosten_Sturmfels_ideal(matrix& A, const term_ordering& _w)
         return *this;
       }
 
-#endif  /// _INT_
+#endif  // _INT_
 
 #ifdef _LONG_
 
@@ -423,12 +423,12 @@ ideal& ideal::Hosten_Sturmfels_ideal(matrix& A, const term_ordering& _w)
         return *this;
       }
 
-#endif  /// _LONG_
+#endif  // _LONG_
 
       generator[k]=(A.H)[j][k];
     }
 
-    /// verifie term ordering
+    // verifie term ordering
     if(w.weight(generator)!=0)
       cerr<<"\nWARNING: ideal& ideal::Hosten_Sturmfels_ideal(matrix&, "
         "const term_ordering&):\nInvalid row space vector does not induce "
@@ -447,11 +447,11 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
   w=_w;
 
   if(A._kernel_dimension==-2)
-    /// kernel of A not yet computed, do this now
+    // kernel of A not yet computed, do this now
     A.LLL_kernel_basis();
 
   if((A._kernel_dimension==-1) &&  (A.columns<0))
-    /// error occurred in kernel computation or matrix corrupt
+    // error occurred in kernel computation or matrix corrupt
   {
     cout<<"\nWARNING: ideal& ideal::DiBiase_Urbanke_ideal(matrix&, const "
       "term_ordering&):\ncannot build ideal from a corrupt input matrix"<<endl;
@@ -459,14 +459,14 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
     return *this;
   }
 
-  /// now compute flip variables
+  // now compute flip variables
 
   int* F;
-  /// set of flip variables
-  /// If F[i]==j, x_j will be flipped.
+  // set of flip variables
+  // If F[i]==j, x_j will be flipped.
 
   int r=A.compute_flip_variables(F);
-  /// number of flip variables
+  // number of flip variables
 
   if(r<0)
   {
@@ -476,7 +476,7 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
     return *this;
   }
 
-  /// check term ordering (as far as possible)
+  // check term ordering (as far as possible)
   BOOLEAN ordering_okay=TRUE;
 
   if(_w.weight_refinement()!=W_LEX)
@@ -494,20 +494,20 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
       "term_ordering&):\nargument term ordering might be inappropriate"<<endl;
 
   Integer *generator=new Integer[A.columns];
-  /// The algorithm of DiBiase and Urbanke does not need supplementary
-  /// variables.
+  // The algorithm of DiBiase and Urbanke does not need supplementary
+  // variables.
 
-  /// compute initial generating system from the kernel of A
+  // compute initial generating system from the kernel of A
   for(int j=0;j<A._kernel_dimension;j++)
   {
 
     for(int k=0;k<A.columns;k++)
     {
 
-      /// We should first verifie if the components of the LLL-reduced lattice
-      /// basis fit into the basic data type (Integer as defined in globals.h).
-      /// This overflow control does of course not detect overflows in the
-      /// course of the LLL-algorithm!
+      // We should first verifie if the components of the LLL-reduced lattice
+      // basis fit into the basic data type (Integer as defined in globals.h).
+      // This overflow control does of course not detect overflows in the
+      // course of the LLL-algorithm!
 
 #ifdef _SHORT_
 
@@ -521,7 +521,7 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
         return *this;
       }
 
-#endif /// _SHORT_
+#endif // _SHORT_
 
 #ifdef _INT_
 
@@ -535,7 +535,7 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
         return *this;
       }
 
-#endif  /// _INT_
+#endif  // _INT_
 
 #ifdef _LONG_
 
@@ -549,11 +549,11 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
         return *this;
       }
 
-#endif  /// _LONG_
+#endif  // _LONG_
       generator[k]=(A.H)[j][k];
     }
 
-    /// flip variables
+    // flip variables
     for(int l=0;l<r;l++)
       generator[F[l]]*=-1;
 
@@ -568,21 +568,21 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
 ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
 {
 
-  /// check term ordering
+  // check term ordering
   if((_w.weight_refinement()!=W_REV_LEX) && (_w.is_positive()==FALSE))
     cerr<<"\nWARNING: ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix&, "
       "const term_ordering&):\nargument term ordering should be a weighted  "
       "reverse lexicographical \nwith positive weights"<<endl;
 
   w=_w;
-  /// The argument term_ordering should be given by a homogeneous grading.
+  // The argument term_ordering should be given by a homogeneous grading.
 
   if(A._kernel_dimension==-2)
-    /// kernel of A not yet computed, do this now
+    // kernel of A not yet computed, do this now
     A.LLL_kernel_basis();
 
   if((A._kernel_dimension==-1) &&  (A.columns<0))
-    /// error occurred in kernel computation or matrix corrupt
+    // error occurred in kernel computation or matrix corrupt
   {
     cout<<"\nWARNING: ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix&, "
       "const term_ordering&):\n"
@@ -591,13 +591,13 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
     return *this;
   }
 
-  /// now compute saturation variables
+  // now compute saturation variables
 
-  /// The techniques for computing a small set of saturation variables are
-  /// useful here for the following two reasons:
-  /// - The head of the saturation generator involves less variables, is
-  ///   smaller in term ordering.
-  /// - The weight of the pseudo-elimination variable is smaller.
+  // The techniques for computing a small set of saturation variables are
+  // useful here for the following two reasons:
+  // - The head of the saturation generator involves less variables, is
+  //   smaller in term ordering.
+  // - The weight of the pseudo-elimination variable is smaller.
   int* sat_var;
   int number_of_sat_var=A.hosten_shapiro(sat_var);
 
@@ -606,13 +606,13 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
     weight+=w[sat_var[i]];
 
   w.append_weighted_variable(weight);
-  /// one supplementary variable used to saturate the ideal
+  // one supplementary variable used to saturate the ideal
 
   Integer *generator=new Integer[A.columns+1];
-  /// The algorithm of Bigatti, LaScala and Robbiano needs one supplementary
-  /// weighted variable.
+  // The algorithm of Bigatti, LaScala and Robbiano needs one supplementary
+  // weighted variable.
 
-  /// first build "saturation generator"
+  // first build "saturation generator"
   for(int k=0;k<A.columns;k++)
     generator[k]=0;
   for(int i=0;i<number_of_sat_var;i++)
@@ -624,15 +624,15 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
   binomial* bin=new binomial(A.columns+1,generator,w);
   add_generator(*bin);
 
-  /// compute initial generating system from the kernel of A
+  // compute initial generating system from the kernel of A
   for(int j=0;j<A._kernel_dimension;j++)
   {
     for(int k=0;k<A.columns;k++)
     {
-      /// We should first verifie if the components of the LLL-reduced lattice
-      /// basis fit into the basic data type (Integer as defined in globals.h).
-      /// This overflow control does of course not detect overflows in the
-      /// course of the LLL-algorithm!
+      // We should first verifie if the components of the LLL-reduced lattice
+      // basis fit into the basic data type (Integer as defined in globals.h).
+      // This overflow control does of course not detect overflows in the
+      // course of the LLL-algorithm!
 
 #ifdef _SHORT_
 
@@ -646,7 +646,7 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
         return *this;
       }
 
-#endif /// _SHORT_
+#endif // _SHORT_
 
 #ifdef _INT_
 
@@ -660,7 +660,7 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
         return *this;
       }
 
-#endif  /// _INT_
+#endif  // _INT_
 
 #ifdef _LONG_
 
@@ -673,13 +673,13 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
         return *this;
       }
 
-#endif  /// _LONG_
+#endif  // _LONG_
       generator[k]=(A.H)[j][k];
     }
     generator[A.columns]=0;
-    /// saturation variable
-    /// Note that the relative order of the variables is important (because
-    /// of the reverse lexicographical refinement of the weight).
+    // saturation variable
+    // Note that the relative order of the variables is important (because
+    // of the reverse lexicographical refinement of the weight).
 
     if(w.weight(generator)!=0)
       cerr<<"\nWARNING: ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix&, "
@@ -688,22 +688,22 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
 
     binomial* bin=new binomial(A.columns+1,generator,w);
     add_generator(*bin);
-    /// insert generator
+    // insert generator
   }
   delete[] generator;
   return *this;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////// public member functions //////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//////////////// public member functions ////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////// constructors and destructor ///////////////////////////////////////////
+/////////////////// constructors and destructor /////////////////////////////
 
 ideal::ideal(matrix& A, const term_ordering& _w, const int& algorithm)
 {
 
-  /// check arguments as far as possible
+  // check arguments as far as possible
 
   if(A.error_status()<0)
   {
@@ -730,13 +730,13 @@ ideal::ideal(matrix& A, const term_ordering& _w, const int& algorithm)
 
   create_subset_tree();
 
-#endif  /// SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
   size=0;
 
-  /// initialize the S-pair flags with the default value
-  /// (this is not really necessray, but looks nicer when outputting the
-  /// ideal without having computed a Groebner basis)
+  // initialize the S-pair flags with the default value
+  // (this is not really necessray, but looks nicer when outputting the
+  // ideal without having computed a Groebner basis)
   rel_primeness=1;
   M_criterion=2;
   F_criterion=0;
@@ -745,7 +745,7 @@ ideal::ideal(matrix& A, const term_ordering& _w, const int& algorithm)
 
   interreduction_percentage=12.0;
 
-  /// construct the ideal according to the algorithm
+  // construct the ideal according to the algorithm
   switch(algorithm)
   {
       case CONTI_TRAVERSO:
@@ -783,7 +783,7 @@ ideal::ideal(const ideal& I)
       "trying to create ideal from a corrupt one"<<endl;
 
   size=0;
-  /// the size is automatically incremented when copying the generators
+  // the size is automatically incremented when copying the generators
 
   w=I.w;
 
@@ -795,9 +795,9 @@ ideal::ideal(const ideal& I)
 
   interreduction_percentage=I.interreduction_percentage;
 
-  /// copy generators
-  /// To be sure to get a real copy of the argument ideal, the lists
-  /// aux_list and new_generators are also copied.
+  // copy generators
+  // To be sure to get a real copy of the argument ideal, the lists
+  // aux_list and new_generators are also copied.
   list_iterator iter;
 
 
@@ -821,7 +821,7 @@ ideal::ideal(const ideal& I)
     iter.next();
   }
 
-#endif  /// NO_SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
 #ifdef SUPPORT_DRIVEN_METHODS_EXTENDED
 
@@ -851,7 +851,7 @@ ideal::ideal(const ideal& I)
     }
   }
 
-#endif  /// SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
   iter.set_to_list(I.aux_list);
 
@@ -877,9 +877,9 @@ ideal::ideal(ifstream& input, const term_ordering& _w, const int&
 
   w=_w;
 
-  /// initialize the S-pair flags with the default value
-  /// (this is not really necessray, but looks nicer when outputting the
-  /// ideal without having computed a Groebner basis)
+  // initialize the S-pair flags with the default value
+  // (this is not really necessray, but looks nicer when outputting the
+  // ideal without having computed a Groebner basis)
   rel_primeness=1;
   M_criterion=2;
   F_criterion=0;
@@ -892,7 +892,7 @@ ideal::ideal(ifstream& input, const term_ordering& _w, const int&
 
   create_subset_tree();
 
-#endif  /// SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
   int number_of_variables=
     w.number_of_elimination_variables()+w.number_of_weighted_variables();
@@ -905,7 +905,7 @@ ideal::ideal(ifstream& input, const term_ordering& _w, const int&
       input>>generator[j];
 
       if(!input)
-        /// input failure, set "error flag"
+        // input failure, set "error flag"
       {
         cerr<<"\nWARNING: ideal::ideal(ifstream&, const term_ordering&, "
           "const int&): \ninput failure when reading generator "<<i<<endl;
@@ -929,12 +929,12 @@ ideal::~ideal()
 
   destroy_subset_tree();
 
-#endif  /// SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
-  /// The destructor of the lists is automatically called.
+  // The destructor of the lists is automatically called.
 }
 
-/////////////////////////////// object information //////////////////////////////////////////////////////
+///////////////////// object information ////////////////////////////////////
 
 long ideal::number_of_generators() const
 {
@@ -949,7 +949,7 @@ int ideal::error_status() const
     return 0;
 }
 
-////////////////////////////////////////// output /////////////////////////////////////////////////////////////
+//////////////////////////// output /////////////////////////////////////////
 
 void ideal::print() const
 {
@@ -963,13 +963,13 @@ void ideal::print() const
   for(int i=0;i<Number_of_Lists;i++)
     generators[i].ordered_print(w);
 
-#endif  /// SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
 #ifdef NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
     generators.ordered_print(w);
 
-#endif  /// NO_SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
   printf("\nnumber of generators: %ld\n",size);
 }
@@ -1004,13 +1004,13 @@ void ideal::print(FILE *output) const
   for(int i=0;i<Number_of_Lists;i++)
     generators[i].ordered_print(output,w);
 
-#endif  /// SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
 #ifdef NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
     generators.ordered_print(output,w);
 
-#endif  /// NO_SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
   fprintf(output,"\nnumber of generators: %ld\n",size);
 
@@ -1045,13 +1045,13 @@ void ideal::print(ofstream& output) const
   for(int i=0;i<Number_of_Lists;i++)
     generators[i].ordered_print(output,w);
 
-#endif  /// SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
 #ifdef NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
     generators.ordered_print(output,w);
 
-#endif  /// NO_SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
     output<<"\nnumber of generators: "<<size<<endl;
 }
@@ -1081,12 +1081,12 @@ void ideal::format_print(ofstream& output) const
   for(int i=0;i<Number_of_Lists;i++)
     generators[i].ordered_format_print(output,w);
 
-#endif  /// SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
 #ifdef NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
     generators.ordered_format_print(output,w);
 
-#endif  /// NO_SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 }
-#endif  /// IDEAL_CC
+#endif  // IDEAL_CC

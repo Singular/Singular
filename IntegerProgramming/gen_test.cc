@@ -1,6 +1,6 @@
-/// gentest.cc
+// gentest.cc
 
-/// a program that generates some test data
+// a program that generates some test data
 
 
 #ifndef GEN_TEST_CC

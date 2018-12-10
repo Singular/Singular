@@ -1,15 +1,15 @@
-/// BigInt.cc
+// BigInt.cc
 
 #ifndef BIG_INT_CC
 #define BIG_INT_CC
 
 #include "BigInt.h"
 
-///
-/// Konstruktoren fuer die Klasse BigInt
-///
+//
+// Konstruktoren fuer die Klasse BigInt
+//
 
-/// Default-Konstruktor
+// Default-Konstruktor
 
 BigInt::BigInt()
 {
@@ -22,7 +22,7 @@ BigInt::BigInt(int a)
   mpz_set_si(value,(long)a);
 }
 
-/// Copy-Konstruktor
+// Copy-Konstruktor
 
 BigInt::BigInt(const BigInt& a)
 {
@@ -30,15 +30,15 @@ BigInt::BigInt(const BigInt& a)
   mpz_set(value,a.value);
 }
 
-/// Destruktor
+// Destruktor
 BigInt::~BigInt()
 {
   mpz_clear(value);
 }
 
-///
-/// Zuweisungsoperatoren
-///
+//
+// Zuweisungsoperatoren
+//
 
 BigInt& BigInt::operator=(int a)
 {
@@ -52,9 +52,9 @@ BigInt& BigInt::operator=(const BigInt& a)
   return *this;
 }
 
-///
-/// Type-Conversion
-///
+//
+// Type-Conversion
+//
 
 BigInt::operator bool()
 {
@@ -76,11 +76,11 @@ BigInt::operator short()
   return (short)ret_val;
 }
 
-///
-/// unary arithmetic operators
-///
+//
+// unary arithmetic operators
+//
 
-/// unary Minus
+// unary Minus
 BigInt BigInt::operator-()
 {
   BigInt erg;
@@ -88,7 +88,7 @@ BigInt BigInt::operator-()
   return erg;
 }
 
-/// += Operator
+// += Operator
 BigInt& BigInt::operator+=(const BigInt &a)
 {
   BigInt aux;
@@ -97,7 +97,7 @@ BigInt& BigInt::operator+=(const BigInt &a)
   return *this;
 }
 
-/// -= Operator
+// -= Operator
 BigInt& BigInt::operator-=(const BigInt &a)
 {
   BigInt aux;
@@ -106,7 +106,7 @@ BigInt& BigInt::operator-=(const BigInt &a)
   return *this;
 }
 
-/// *= Operator
+// *= Operator
 BigInt& BigInt::operator*=(const BigInt &a)
 {
   BigInt aux;
@@ -115,7 +115,7 @@ BigInt& BigInt::operator*=(const BigInt &a)
   return *this;
 }
 
-/// /= Operator
+// /= Operator
 BigInt& BigInt::operator/=(const BigInt &a)
 {
   BigInt aux;
@@ -124,7 +124,7 @@ BigInt& BigInt::operator/=(const BigInt &a)
   return *this;
 }
 
-/// prefix ++
+// prefix ++
 BigInt& BigInt::operator++()
 {
   BigInt aux;
@@ -133,7 +133,7 @@ BigInt& BigInt::operator++()
   return *this;
 }
 
-/// postfix ++
+// postfix ++
 BigInt BigInt::operator++(int)
 {
   BigInt erg;
@@ -141,7 +141,7 @@ BigInt BigInt::operator++(int)
   return erg;
 }
 
-/// prefix --
+// prefix --
 BigInt& BigInt::operator--()
 {
   BigInt aux;
@@ -150,7 +150,7 @@ BigInt& BigInt::operator--()
   return *this;
 }
 
-/// postfix --
+// postfix --
 BigInt BigInt::operator--(int)
 {
   BigInt erg;
@@ -165,9 +165,9 @@ BigInt operator-(const BigInt& r)
   return erg;
 }
 
-///
-/// Vergleichsoperatorn
-///
+//
+// Vergleichsoperatorn
+//
 
 bool operator<(const BigInt& a,const BigInt& b)
 {
@@ -277,9 +277,9 @@ bool operator!=(const BigInt& a,const int& b)
   return true;
 }
 
-///
-/// die Grundoperationen
-///
+//
+// die Grundoperationen
+//
 
 BigInt operator+(const BigInt& a,const BigInt &b)
 {
@@ -353,13 +353,13 @@ BigInt operator/(const BigInt& a,const int &b)
   return erg/=BigInt(b);
 }
 
-/// liefert das Vorzeichen
+// liefert das Vorzeichen
 int sgn(const BigInt& a)
 {
   return mpz_sgn(a.value);
 }
 
-/// liefert den Absolutbetrag
+// liefert den Absolutbetrag
 BigInt abs(const BigInt& a)
 {
   BigInt erg;
@@ -370,4 +370,4 @@ BigInt abs(const BigInt& a)
   return erg;
 }
 
-#endif  /// BIG_INT_CC
+#endif  // BIG_INT_CC

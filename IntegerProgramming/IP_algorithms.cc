@@ -1,4 +1,4 @@
-/// IP_algorithms.cc
+// IP_algorithms.cc
 
 #ifndef IP_ALGORITHMS_CC
 #define IP_ALGORITHMS_CC
@@ -7,7 +7,7 @@
 #include <time.h>
 #include <unistd.h>
 
-////////////////////// method for printing compilation settings //////////////////////////////
+/////////////// method for printing compilation settings ////////////////////
 
 void print_flags(ofstream& output)
 {
@@ -37,7 +37,7 @@ void print_flags(ofstream& output)
   output<<"SUPPORT_VARIABLES_LAST"<<endl;
 #endif
 
-#endif  /// SUPPORT_DRIVEN_METHODS
+#endif  // SUPPORT_DRIVEN_METHODS
 
 #ifdef DL_LIST
   output<<"doubly linked lists"<<endl<<endl;
@@ -52,9 +52,9 @@ void print_flags(ofstream& output)
 
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////// IP algorithms ////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+///////////////////// IP algorithms ////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -67,15 +67,15 @@ int Conti_Traverso(INPUT_FILE MATRIX,
 {
 
 
-//////////////////////////////////////// input /////////////////////////////////////////////////////////////
+/////////////////////////// input /////////////////////////////////////////
 
-  char format_string[128]; /// to verifie file format
-  int constraints;       /// number of equality constraints
-  int variables;         /// number of variables (without auxiliary variables)
+  char format_string[128]; // to verifie file format
+  int constraints;       // number of equality constraints
+  int variables;         // number of variables (without auxiliary variables)
 
   ifstream input(MATRIX);
 
-  /// verfifie existence of file
+  // verfifie existence of file
 
   if(!input)
   {
@@ -84,7 +84,7 @@ int Conti_Traverso(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read format specification
+  // read format specification
 
   input>>format_string;
 
@@ -100,7 +100,7 @@ int Conti_Traverso(INPUT_FILE MATRIX,
     cerr<<"Warning: int Conti_Traverso(INPUT_FILE, const BOOLEAN&):\n"
       "input file has suspicious format"<<endl;
 
-  /// read number of variables
+  // read number of variables
 
   input>>format_string;
 
@@ -133,7 +133,7 @@ int Conti_Traverso(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read term ordering
+  // read term ordering
 
   input>>format_string;
 
@@ -180,7 +180,7 @@ int Conti_Traverso(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read number of constraints
+  // read number of constraints
 
   input>>format_string;
 
@@ -211,13 +211,13 @@ int Conti_Traverso(INPUT_FILE MATRIX,
   {
     cerr<<"ERROR: int Conti_Traverso(INPUT_FILE, const BOOLEAN&):\n"
       "number of constraints / matrix rows must be positive"<<endl;
-    /// Solving problems without constraints is possible, but not very
-    /// interesting (because trivial). To avoid the problems and the overhead
-    /// incurred by an "empty" matrix, such problems are refused.
+    // Solving problems without constraints is possible, but not very
+    // interesting (because trivial). To avoid the problems and the overhead
+    // incurred by an "empty" matrix, such problems are refused.
     return 0;
   }
 
-  /// read matrix
+  // read matrix
 
   input>>format_string;
 
@@ -242,26 +242,26 @@ int Conti_Traverso(INPUT_FILE MATRIX,
   }
 
 
-///////////////////////////////////// computation ////////////////////////////////////////////////////////////
+///////////////////////// computation ////////////////////////////////////////
 
-  /// prepare time measurement
+  // prepare time measurement
   clock_t start, end;
 
-  /// create toric ideal
+  // create toric ideal
   ideal I(A,w,CONTI_TRAVERSO);
 
-  /// compute the standard basis
+  // compute the standard basis
   start=clock();
   I.reduced_Groebner_basis(version,S_pair_criteria,interred_percentage);
   end=clock();
 
-  /// time measurement
+  // time measurement
   float elapsed=((float) (end-start))/CLOCKS_PER_SEC;
 
 
-///////////////////////////////////// output //////////////////////////////////////////////////////////////////
+///////////////////////// output ////////////////////////////////////////////
 
-  /// create output file
+  // create output file
 
   char GROEBNER[128];
   int i=0;
@@ -275,10 +275,10 @@ int Conti_Traverso(INPUT_FILE MATRIX,
 
   ofstream output(GROEBNER);
 
-  /// format output file
+  // format output file
 
   output.flags(output.flags()|ios::fixed);
-  /// output of fixed point numbers
+  // output of fixed point numbers
 
   output<<"GROEBNER"<<endl<<endl;
 
@@ -291,11 +291,11 @@ int Conti_Traverso(INPUT_FILE MATRIX,
 
   output<<"term ordering:"<<endl;
   output<<"elimination block"<<endl;
-  /// elimination variables (>0)
+  // elimination variables (>0)
   output<<constraints+1<<endl;
   output<<"LEX"<<endl;
   output<<"weighted block"<<endl;
-  /// weighted variables (>0)
+  // weighted variables (>0)
   output<<variables<<endl;
   output<<"W_LEX"<<endl;
   w.format_print_weight_vector(output);
@@ -340,9 +340,9 @@ int Conti_Traverso(INPUT_FILE MATRIX,
 
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -355,15 +355,15 @@ int Positive_Conti_Traverso(INPUT_FILE MATRIX,
 {
 
 
-//////////////////////////////////////// input /////////////////////////////////////////////////////////////
+/////////////////////////// input /////////////////////////////////////////
 
-  char format_string[128]; /// to verifie file format
-  int constraints;       /// number of equality constraints
-  int variables;         /// number of variables (without auxiliary variables)
+  char format_string[128]; // to verifie file format
+  int constraints;       // number of equality constraints
+  int variables;         // number of variables (without auxiliary variables)
 
   ifstream input(MATRIX);
 
-  /// verfifie existence of file
+  // verfifie existence of file
 
   if(!input)
   {
@@ -372,7 +372,7 @@ int Positive_Conti_Traverso(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read format specification
+  // read format specification
 
   input>>format_string;
 
@@ -388,7 +388,7 @@ int Positive_Conti_Traverso(INPUT_FILE MATRIX,
     cerr<<"Warning: int Positive_Conti_Traverso(INPUT_FILE, const BOOLEAN&):\n"
       "input file has suspicious format"<<endl;
 
-  /// read number of variables
+  // read number of variables
 
   input>>format_string;
 
@@ -421,7 +421,7 @@ int Positive_Conti_Traverso(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read term ordering
+  // read term ordering
 
   input>>format_string;
 
@@ -468,7 +468,7 @@ int Positive_Conti_Traverso(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read number of constraints
+  // read number of constraints
 
   input>>format_string;
 
@@ -499,13 +499,13 @@ int Positive_Conti_Traverso(INPUT_FILE MATRIX,
   {
     cerr<<"ERROR: int Positive_Conti_Traverso(INPUT_FILE, const BOOLEAN&):\n"
       "number of constraints / matrix rows must be positive"<<endl;
-    /// Solving problems without constraints is possible, but not very
-    /// interesting (because trivial). To avoid the problems and the overhead
-    /// incurred by an "empty" matrix, such problems are refused.
+    // Solving problems without constraints is possible, but not very
+    // interesting (because trivial). To avoid the problems and the overhead
+    // incurred by an "empty" matrix, such problems are refused.
     return 0;
   }
 
-  /// read matrix
+  // read matrix
 
   input>>format_string;
 
@@ -538,26 +538,26 @@ int Positive_Conti_Traverso(INPUT_FILE MATRIX,
   }
 
 
-///////////////////////////////////// computation ////////////////////////////////////////////////////////////
+///////////////////////// computation ////////////////////////////////////////
 
-  /// prepare time measurement
+  // prepare time measurement
   clock_t start, end;
 
-  /// create toric ideal
+  // create toric ideal
   ideal I(A,w,POSITIVE_CONTI_TRAVERSO);
 
-  /// compute the standard basis
+  // compute the standard basis
   start=clock();
   I.reduced_Groebner_basis(version,S_pair_criteria,interred_percentage);
   end=clock();
 
-  /// time measurement
+  // time measurement
   float elapsed=((float) (end-start))/CLOCKS_PER_SEC;
 
 
-///////////////////////////////////// output //////////////////////////////////////////////////////////////////
+///////////////////////// output ////////////////////////////////////////////
 
-  /// create output file
+  // create output file
 
   char GROEBNER[128];
   int i=0;
@@ -571,10 +571,10 @@ int Positive_Conti_Traverso(INPUT_FILE MATRIX,
 
   ofstream output(GROEBNER);
 
-  /// format output file
+  // format output file
 
   output.flags(output.flags()|ios::fixed);
-  /// output of fixed point numbers
+  // output of fixed point numbers
 
   output<<"GROEBNER"<<endl<<endl;
 
@@ -587,11 +587,11 @@ int Positive_Conti_Traverso(INPUT_FILE MATRIX,
 
   output<<"term ordering:"<<endl;
   output<<"elimination block"<<endl;
-  /// elimination variables (>0)
+  // elimination variables (>0)
   output<<constraints<<endl;
   output<<"LEX"<<endl;
   output<<"weighted block"<<endl;
-  /// weighted variables (>0)
+  // weighted variables (>0)
   output<<variables<<endl;
   output<<"W_LEX"<<endl;
   w.format_print_weight_vector(output);
@@ -637,9 +637,9 @@ int Positive_Conti_Traverso(INPUT_FILE MATRIX,
 
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -652,15 +652,15 @@ int Elim_Conti_Traverso(INPUT_FILE MATRIX,
 {
 
 
-//////////////////////////////////////// input /////////////////////////////////////////////////////////////
+/////////////////////////// input /////////////////////////////////////////
 
-  char format_string[128]; /// to verifie file format
-  int constraints;       /// number of equality constraints
-  int variables;         /// number of variables (without auxiliary variables)
+  char format_string[128]; // to verifie file format
+  int constraints;       // number of equality constraints
+  int variables;         // number of variables (without auxiliary variables)
 
   ifstream input(MATRIX);
 
-  /// verfifie existence of file
+  // verfifie existence of file
 
   if(!input)
   {
@@ -669,7 +669,7 @@ int Elim_Conti_Traverso(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read format specification
+  // read format specification
 
   input>>format_string;
 
@@ -685,7 +685,7 @@ int Elim_Conti_Traverso(INPUT_FILE MATRIX,
     cerr<<"Warning: int Elim_Conti_Traverso(INPUT_FILE, const BOOLEAN&):\n"
       "input file has suspicious format"<<endl;
 
-  /// read number of variables
+  // read number of variables
 
   input>>format_string;
 
@@ -718,7 +718,7 @@ int Elim_Conti_Traverso(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read term ordering
+  // read term ordering
 
   input>>format_string;
 
@@ -765,7 +765,7 @@ int Elim_Conti_Traverso(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read number of constraints
+  // read number of constraints
 
   input>>format_string;
 
@@ -796,13 +796,13 @@ int Elim_Conti_Traverso(INPUT_FILE MATRIX,
   {
     cerr<<"ERROR: int Elim_Conti_Traverso(INPUT_FILE, const BOOLEAN&):\n"
       "number of constraints / matrix rows must be positive"<<endl;
-    /// Solving problems without constraints is possible, but not very
-    /// interesting (because trivial). To avoid the problems and the overhead
-    /// incurred by an "empty" matrix, such problems are refused.
+    // Solving problems without constraints is possible, but not very
+    // interesting (because trivial). To avoid the problems and the overhead
+    // incurred by an "empty" matrix, such problems are refused.
     return 0;
   }
 
-  /// read matrix
+  // read matrix
 
   input>>format_string;
 
@@ -827,28 +827,28 @@ int Elim_Conti_Traverso(INPUT_FILE MATRIX,
   }
 
 
-///////////////////////////////////// computation ////////////////////////////////////////////////////////////
+///////////////////////// computation ////////////////////////////////////////
 
-  /// prepare time measurement
+  // prepare time measurement
   clock_t start, end;
 
-  /// create toric ideal: this is done with the CONTI_TRAVERSO constructor;
-  /// some elimination has to be done later
+  // create toric ideal: this is done with the CONTI_TRAVERSO constructor;
+  // some elimination has to be done later
   ideal I(A,w,CONTI_TRAVERSO);
 
-  /// compute the standard basis and eliminate auxiliary variables
+  // compute the standard basis and eliminate auxiliary variables
   start=clock();
   I.reduced_Groebner_basis(version,S_pair_criteria,interred_percentage);
   I.eliminate();
   end=clock();
 
-  /// time measurement
+  // time measurement
   float elapsed=((float) (end-start))/CLOCKS_PER_SEC;
 
 
-///////////////////////////////////// output //////////////////////////////////////////////////////////////////
+///////////////////////// output ////////////////////////////////////////////
 
-  /// create output file
+  // create output file
 
   char GROEBNER[128];
   int i=0;
@@ -862,10 +862,10 @@ int Elim_Conti_Traverso(INPUT_FILE MATRIX,
 
   ofstream output(GROEBNER);
 
-  /// format output file
+  // format output file
 
   output.flags(output.flags()|ios::fixed);
-  /// output of fixed point numbers
+  // output of fixed point numbers
 
   output<<"GROEBNER"<<endl<<endl;
 
@@ -878,10 +878,10 @@ int Elim_Conti_Traverso(INPUT_FILE MATRIX,
 
   output<<"term ordering:"<<endl;
   output<<"elimination block"<<endl;
-  /// elimination variables (=0)
+  // elimination variables (=0)
   output<<0<<endl;
   output<<"weighted block"<<endl;
-  /// weighted variables (>0)
+  // weighted variables (>0)
   output<<variables<<endl;
   output<<"W_LEX"<<endl;
   w.format_print_weight_vector(output);
@@ -926,9 +926,9 @@ int Elim_Conti_Traverso(INPUT_FILE MATRIX,
 
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -941,15 +941,15 @@ int Pottier(INPUT_FILE MATRIX,
 {
 
 
-//////////////////////////////////////// input /////////////////////////////////////////////////////////////
+/////////////////////////// input /////////////////////////////////////////
 
-  char format_string[128]; /// to verifie file format
-  int constraints;       /// number of equality constraints
-  int variables;         /// number of variables (without auxiliary variables)
+  char format_string[128]; // to verifie file format
+  int constraints;       // number of equality constraints
+  int variables;         // number of variables (without auxiliary variables)
 
   ifstream input(MATRIX);
 
-  /// verfifie existence of file
+  // verfifie existence of file
 
   if(!input)
   {
@@ -958,7 +958,7 @@ int Pottier(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read format specification
+  // read format specification
 
   input>>format_string;
 
@@ -974,7 +974,7 @@ int Pottier(INPUT_FILE MATRIX,
     cerr<<"Warning: int Pottier(INPUT_FILE, const BOOLEAN&):\n"
       "input file has suspicious format"<<endl;
 
-  /// read number of variables
+  // read number of variables
 
   input>>format_string;
 
@@ -1007,7 +1007,7 @@ int Pottier(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read term ordering
+  // read term ordering
 
   input>>format_string;
 
@@ -1054,7 +1054,7 @@ int Pottier(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read number of constraints
+  // read number of constraints
 
   input>>format_string;
 
@@ -1085,13 +1085,13 @@ int Pottier(INPUT_FILE MATRIX,
   {
     cerr<<"ERROR: int Pottier(INPUT_FILE, const BOOLEAN&):\n"
       "number of constraints / matrix rows must be positive"<<endl;
-    /// Solving problems without constraints is possible, but not very
-    /// interesting (because trivial). To avoid the problems and the overhead
-    /// incurred by an "empty" matrix, such problems are refused.
+    // Solving problems without constraints is possible, but not very
+    // interesting (because trivial). To avoid the problems and the overhead
+    // incurred by an "empty" matrix, such problems are refused.
     return 0;
   }
 
-  /// read matrix
+  // read matrix
 
   input>>format_string;
 
@@ -1116,27 +1116,27 @@ int Pottier(INPUT_FILE MATRIX,
   }
 
 
-///////////////////////////////////// computation ////////////////////////////////////////////////////////////
+///////////////////////// computation ////////////////////////////////////////
 
-  /// prepare time measurement
+  // prepare time measurement
   clock_t start, end;
 
-  /// create toric ideal
+  // create toric ideal
   ideal I(A,w,POTTIER);
 
-  /// compute the standard basis and eliminate auxiliary variable
+  // compute the standard basis and eliminate auxiliary variable
   start=clock();
   I.reduced_Groebner_basis(version,S_pair_criteria,interred_percentage);
   I.eliminate();
   end=clock();
 
-  /// time measurement
+  // time measurement
   float elapsed=((float) (end-start))/CLOCKS_PER_SEC;
 
 
-///////////////////////////////////// output //////////////////////////////////////////////////////////////////
+///////////////////////// output ////////////////////////////////////////////
 
-  /// create output file
+  // create output file
 
   char GROEBNER[128];
   int i=0;
@@ -1150,10 +1150,10 @@ int Pottier(INPUT_FILE MATRIX,
 
   ofstream output(GROEBNER);
 
-  /// format output file
+  // format output file
 
   output.flags(output.flags()|ios::fixed);
-  /// output of fixed point numbers
+  // output of fixed point numbers
 
   output<<"GROEBNER"<<endl<<endl;
 
@@ -1166,10 +1166,10 @@ int Pottier(INPUT_FILE MATRIX,
 
   output<<"term ordering:"<<endl;
   output<<"elimination block"<<endl;
-  /// elimination variables (=0)
+  // elimination variables (=0)
   output<<0<<endl;
   output<<"weighted block"<<endl;
-  /// weighted variables (>0)
+  // weighted variables (>0)
   output<<variables<<endl;
   output<<"W_LEX"<<endl;
   w.format_print_weight_vector(output);
@@ -1214,9 +1214,9 @@ int Pottier(INPUT_FILE MATRIX,
 
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -1229,15 +1229,15 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
 {
 
 
-//////////////////////////////////////// input /////////////////////////////////////////////////////////////
+/////////////////////////// input /////////////////////////////////////////
 
-  char format_string[128]; /// to verifie file format
-  int constraints;       /// number of equality constraints
-  int variables;         /// number of variables
+  char format_string[128]; // to verifie file format
+  int constraints;       // number of equality constraints
+  int variables;         // number of variables
 
   ifstream input(MATRIX);
 
-  /// verfifie existence of file
+  // verfifie existence of file
 
   if(!input)
   {
@@ -1246,7 +1246,7 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read format specification
+  // read format specification
 
   input>>format_string;
 
@@ -1262,7 +1262,7 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
     cerr<<"Warning: int Hosten_Sturmfels(INPUT_FILE, const BOOLEAN&):\n"
       "input file has suspicious format"<<endl;
 
-  /// read number of variables
+  // read number of variables
 
   input>>format_string;
 
@@ -1295,7 +1295,7 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read term ordering
+  // read term ordering
 
   input>>format_string;
 
@@ -1342,7 +1342,7 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read number of constraints
+  // read number of constraints
 
   input>>format_string;
 
@@ -1373,13 +1373,13 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
   {
     cerr<<"ERROR: int Hosten_Sturmfels(INPUT_FILE, const BOOLEAN&):\n"
       "number of constraints / matrix rows must be positive"<<endl;
-    /// Solving problems without constraints is possible, but not very
-    /// interesting (because trivial). To avoid the problems and the overhead
-    /// incurred by an "empty" matrix, such problems are refused.
+    // Solving problems without constraints is possible, but not very
+    // interesting (because trivial). To avoid the problems and the overhead
+    // incurred by an "empty" matrix, such problems are refused.
     return 0;
   }
 
-  /// read matrix
+  // read matrix
 
   input>>format_string;
 
@@ -1403,8 +1403,8 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read positive vector in the row space of the matrix
-  /// such a vector induces a homogenous grading on the ideal
+  // read positive vector in the row space of the matrix
+  // such a vector induces a homogenous grading on the ideal
 
   input>>format_string;
 
@@ -1487,67 +1487,67 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
   }
 
 
-///////////////////////////////////// computation ////////////////////////////////////////////////////////////
+///////////////////////// computation ////////////////////////////////////////
 
-  /// prepare time measurement
+  // prepare time measurement
   clock_t start, end;
 
-  /// construct homogenous term ordering
+  // construct homogenous term ordering
   term_ordering w(variables, hom_grad, W_REV_LEX, HOMOGENEOUS);
 
   delete[] hom_grad;
 
-  /// create toric ideal
+  // create toric ideal
   ideal I(A,w,HOSTEN_STURMFELS);
 
-  /// compute the standard basis of the saturation:
+  // compute the standard basis of the saturation:
 
   start=clock();
 
-  /// determine saturation variables
+  // determine saturation variables
   int *sat_var;
   int number_of_sat_var=A.hosten_shapiro(sat_var);
-  /// memory for sat_var is allocated in the hosten_shapiro procedure
+  // memory for sat_var is allocated in the hosten_shapiro procedure
 
-  /// saturate the ideal
+  // saturate the ideal
   for(int i=0;i<number_of_sat_var;i++)
   {
     I.swap_variables(sat_var[i],variables-1);
-    /// This operation simply makes the i-th saturation variable the cheapest.
-    /// This involves swapping the weights in the ideal's term ordering,
-    /// the variables in the generating binomials and rebuilding the
-    /// list structure if SUPPORT_DRIVEN_METHODS_EXTENDED are used.
+    // This operation simply makes the i-th saturation variable the cheapest.
+    // This involves swapping the weights in the ideal's term ordering,
+    // the variables in the generating binomials and rebuilding the
+    // list structure if SUPPORT_DRIVEN_METHODS_EXTENDED are used.
 
     I.reduced_Groebner_basis(version,S_pair_criteria,interred_percentage);
-    /// This calculation saturates the ideal with respect to the i-th
-    /// variable.
+    // This calculation saturates the ideal with respect to the i-th
+    // variable.
 
     I.swap_variables_unsafe(sat_var[i],variables-1);
-    /// This operation does the same as ideal::swap_variables(...) except
-    /// from rebuilding the list structure. It may cause an inconsistent
-    /// structure, but is more efficient then the safe method. Before
-    /// performing a Groebner basis computation, however, the ideal structure
-    /// has to be rebuild. Procedures like ideal::swap_variables(...) and
-    /// ideal::change_term_ordering_to(...) do this. But these are exactly
-    /// the operations that follow.
+    // This operation does the same as ideal::swap_variables(...) except
+    // from rebuilding the list structure. It may cause an inconsistent
+    // structure, but is more efficient then the safe method. Before
+    // performing a Groebner basis computation, however, the ideal structure
+    // has to be rebuild. Procedures like ideal::swap_variables(...) and
+    // ideal::change_term_ordering_to(...) do this. But these are exactly
+    // the operations that follow.
   }
 
   delete[] sat_var;
 
-  /// Now the ideal is saturated. The last Groebner basis computation is done
-  /// with respect to the term ordering induced by the objective function.
+  // Now the ideal is saturated. The last Groebner basis computation is done
+  // with respect to the term ordering induced by the objective function.
   I.change_term_ordering_to(c);
   I.reduced_Groebner_basis(version,S_pair_criteria,interred_percentage);
 
   end=clock();
 
-  /// time measurement
+  // time measurement
   float elapsed=((float) (end-start))/CLOCKS_PER_SEC;
 
 
-///////////////////////////////////// output //////////////////////////////////////////////////////////////////
+///////////////////////// output ////////////////////////////////////////////
 
-  /// create output file
+  // create output file
 
   char GROEBNER[128];
   int i=0;
@@ -1561,10 +1561,10 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
 
   ofstream output(GROEBNER);
 
-  /// format output file
+  // format output file
 
   output.flags(output.flags()|ios::fixed);
-  /// output of fixed point numbers
+  // output of fixed point numbers
 
   output<<"GROEBNER"<<endl<<endl;
 
@@ -1577,10 +1577,10 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
 
   output<<"term ordering:"<<endl;
   output<<"elimination block"<<endl;
-  /// elimination variables (=0)
+  // elimination variables (=0)
   output<<0<<endl;
   output<<"weighted block"<<endl;
-  /// weighted variables (>0)
+  // weighted variables (>0)
   output<<variables<<endl;
   output<<"W_LEX"<<endl;
   c.format_print_weight_vector(output);
@@ -1625,9 +1625,9 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
 
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -1640,15 +1640,15 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
 {
 
 
-//////////////////////////////////////// input /////////////////////////////////////////////////////////////
+/////////////////////////// input /////////////////////////////////////////
 
-  char format_string[128]; /// to verify file format
-  int constraints;       /// number of equality constraints
-  int variables;         /// number of variables
+  char format_string[128]; // to verify file format
+  int constraints;       // number of equality constraints
+  int variables;         // number of variables
 
   ifstream input(MATRIX);
 
-  /// verfifie existence of file
+  // verfifie existence of file
 
   if(!input)
   {
@@ -1657,7 +1657,7 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read format specification
+  // read format specification
 
   input>>format_string;
 
@@ -1673,7 +1673,7 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
     cerr<<"Warning: int DiBiase_Urbanke(INPUT_FILE, const BOOLEAN&):\n"
       "input file has suspicious format"<<endl;
 
-  /// read number of variables
+  // read number of variables
 
   input>>format_string;
 
@@ -1706,7 +1706,7 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read term ordering
+  // read term ordering
 
   input>>format_string;
 
@@ -1753,7 +1753,7 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read number of constraints
+  // read number of constraints
 
   input>>format_string;
 
@@ -1784,13 +1784,13 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
   {
     cerr<<"ERROR: int DiBiase_Urbanke(INPUT_FILE, const BOOLEAN&):\n"
       "number of constraints / matrix rows must be positive"<<endl;
-    /// Solving problems without constraints is possible, but not very
-    /// interesting (because trivial). To avoid the problems and the overhead
-    /// incurred by an "empty" matrix, such problems are refused.
+    // Solving problems without constraints is possible, but not very
+    // interesting (because trivial). To avoid the problems and the overhead
+    // incurred by an "empty" matrix, such problems are refused.
     return 0;
   }
 
-  /// read matrix
+  // read matrix
 
   input>>format_string;
 
@@ -1815,17 +1815,17 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
   }
 
 
-///////////////////////////////////// computation ////////////////////////////////////////////////////////////
+///////////////////////// computation ////////////////////////////////////////
 
-  /// prepare time measurement
+  // prepare time measurement
   clock_t start, end;
 
-  /// compute flip variables (also to check the suitability of the algorithm)
+  // compute flip variables (also to check the suitability of the algorithm)
   int* F;
   int r=A.compute_flip_variables(F);
 
   if(r<0)
-    /// algorithm not suitable
+    // algorithm not suitable
   {
     cout<<"ERROR: DiBiase_Urbanke(INPUT_FILE, const BOOLEAN&):\n"
       "Kernel of the input matrix contains no vector with nonzero "
@@ -1835,15 +1835,15 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
   }
 
   ideal *I;
-  /// We use a pointer here because we need to distinguish two cases
-  /// for the ideal construction.
+  // We use a pointer here because we need to distinguish two cases
+  // for the ideal construction.
 
   start=clock();
 
   if(r==0)
-    /// no variable flip needed
-    /// create toric ideal from the lattice basis already with respect to the
-    /// objective function
+    // no variable flip needed
+    // create toric ideal from the lattice basis already with respect to the
+    // objective function
   {
     I=new ideal(A,c,DIBIASE_URBANKE);
     I->reduced_Groebner_basis(version,S_pair_criteria,interred_percentage);
@@ -1851,14 +1851,14 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
 
   else
   {
-    /// construct term ordering to start with
-    /// Here we have much freedom: The term ordering must only be an
-    /// elimination ordering for the actual flip variable.
-    /// To avoid supplementary functions to manipulate term orderings, we
-    /// simply realize this as follows: The weight of the actual
-    /// flip variable is set to 1, all other weights are set to zero. This
-    /// still allows the use of different term orderings (by setting the
-    /// refining ordering).
+    // construct term ordering to start with
+    // Here we have much freedom: The term ordering must only be an
+    // elimination ordering for the actual flip variable.
+    // To avoid supplementary functions to manipulate term orderings, we
+    // simply realize this as follows: The weight of the actual
+    // flip variable is set to 1, all other weights are set to zero. This
+    // still allows the use of different term orderings (by setting the
+    // refining ordering).
 
     float* weights=new float[variables];
     for(int j=0;j<variables;j++)
@@ -1866,33 +1866,33 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
     weights[F[0]]=1;
 
     term_ordering w(variables, weights, W_LEX);
-    /// Which term ordering is the best here?
+    // Which term ordering is the best here?
 
     delete[] weights;
 
-    /// create toric ideal
+    // create toric ideal
     I=new ideal(A,w,DIBIASE_URBANKE);
 
     I->reduced_Groebner_basis(version,S_pair_criteria,interred_percentage);
     I->flip_variable_unsafe(F[0]);
-    /// "unsafe" means that head and tail can be exchanged (cf. the routine
-    /// ideal::swap_variables_unsafe(...) )
-    /// But the following change of the term ordering will correct this.
+    // "unsafe" means that head and tail can be exchanged (cf. the routine
+    // ideal::swap_variables_unsafe(...) )
+    // But the following change of the term ordering will correct this.
 
     for(int l=1;l<r;l++)
     {
       w.swap_weights(F[l-1],F[l]);
-      /// This means concretely:
-      /// The weight of x_F[l-1] is set to zero, that of x_F[l] to one.
-      /// Now, x_F[l] is the elimination variable.
+      // This means concretely:
+      // The weight of x_F[l-1] is set to zero, that of x_F[l] to one.
+      // Now, x_F[l] is the elimination variable.
 
       I->change_term_ordering_to(w);
       I->reduced_Groebner_basis(version,S_pair_criteria,interred_percentage);
       I->flip_variable_unsafe(F[l]);
     }
 
-    /// Now we have a generating system of the saturated ideal.
-    /// Compute Groebner basis with respect to the objective function.
+    // Now we have a generating system of the saturated ideal.
+    // Compute Groebner basis with respect to the objective function.
     I->change_term_ordering_to(c);
     I->reduced_Groebner_basis(version,S_pair_criteria,interred_percentage);
 
@@ -1900,13 +1900,13 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
 
   end=clock();
 
-  /// time measurement
+  // time measurement
   float elapsed=((float) (end-start))/CLOCKS_PER_SEC;
 
 
-///////////////////////////////////// output //////////////////////////////////////////////////////////////////
+///////////////////////// output ////////////////////////////////////////////
 
-  /// create output file
+  // create output file
 
   char GROEBNER[128];
   int i=0;
@@ -1920,10 +1920,10 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
 
   ofstream output(GROEBNER);
 
-  /// format output file
+  // format output file
 
   output.flags(output.flags()|ios::fixed);
-  /// output of fixed point numbers
+  // output of fixed point numbers
 
   output<<"GROEBNER"<<endl<<endl;
 
@@ -1936,10 +1936,10 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
 
   output<<"term ordering:"<<endl;
   output<<"elimination block"<<endl;
-  /// elimination variables (=0)
+  // elimination variables (=0)
   output<<0<<endl;
   output<<"weighted block"<<endl;
-  /// weighted variables (>0)
+  // weighted variables (>0)
   output<<variables<<endl;
   output<<"W_LEX"<<endl;
   c.format_print_weight_vector(output);
@@ -1979,7 +1979,7 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
   }
 
 
-///////////////////////////////////////////// memory cleanup ////////////////////////////////////////////////
+////////////////////////////// memory cleanup ////////////////////////////////
 
   if(r>0)
     delete[] F;
@@ -1991,9 +1991,9 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
 
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -2006,15 +2006,15 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
 {
 
 
-//////////////////////////////////////// input /////////////////////////////////////////////////////////////
+/////////////////////////// input /////////////////////////////////////////
 
-  char format_string[128];     /// to verifie file format
-  int constraints;       /// number of equality constraints
-  int variables;         /// number of variables
+  char format_string[128];     // to verifie file format
+  int constraints;       // number of equality constraints
+  int variables;         // number of variables
 
   ifstream input(MATRIX);
 
-  /// verfifie existence of file
+  // verfifie existence of file
 
   if(!input)
   {
@@ -2023,7 +2023,7 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read format specification
+  // read format specification
 
   input>>format_string;
 
@@ -2040,7 +2040,7 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
       "\n"
       "input file has suspicious format"<<endl;
 
-  /// read number of variables
+  // read number of variables
 
   input>>format_string;
 
@@ -2074,7 +2074,7 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read term ordering
+  // read term ordering
 
   input>>format_string;
 
@@ -2123,7 +2123,7 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read number of constraints
+  // read number of constraints
 
   input>>format_string;
 
@@ -2155,13 +2155,13 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
   {
     cerr<<"ERROR: int Bigatti_LaScala_Robbiano(INPUT_FILE, const BOOLEAN&):\n"
       "number of constraints / matrix rows must be positive"<<endl;
-    /// Solving problems without constraints is possible, but not very
-    /// interesting (because trivial). To avoid the problems and the overhead
-    /// incurred by an "empty" matrix, such problems are refused.
+    // Solving problems without constraints is possible, but not very
+    // interesting (because trivial). To avoid the problems and the overhead
+    // incurred by an "empty" matrix, such problems are refused.
     return 0;
   }
 
-  /// read matrix
+  // read matrix
 
   input>>format_string;
 
@@ -2186,9 +2186,9 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
     return 0;
   }
 
-  /// read positive vector in the row space of the matrix
-  /// such a vector induces a grading with respect to which the ideal is
-  /// homogenous
+  // read positive vector in the row space of the matrix
+  // such a vector induces a grading with respect to which the ideal is
+  // homogenous
 
   input>>format_string;
 
@@ -2278,49 +2278,49 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
 
 
 
-///////////////////////////////////// computation ////////////////////////////////////////////////////////////
+///////////////////////// computation ////////////////////////////////////////
 
-  /// prepare time measurement
+  // prepare time measurement
   clock_t start, end;
 
-  /// construct homogenous term ordering
+  // construct homogenous term ordering
   term_ordering w(variables, hom_grad, W_REV_LEX, HOMOGENEOUS);
 
   delete[] hom_grad;
 
-  /// create toric ideal
+  // create toric ideal
   ideal I(A,w,BIGATTI_LASCALA_ROBBIANO);
 
-  /// compute the standard basis
+  // compute the standard basis
   start=clock();
   I.reduced_Groebner_basis(version,S_pair_criteria,interred_percentage);
 
-  /// now we have a generating system
-  /// to perform the substitution of the auxiliary variable U by the saturation
-  /// variables:
-  /// make U the revlex most expensive variable by swapping with the first,
-  /// recompute the Groebner basis, undo the swap
+  // now we have a generating system
+  // to perform the substitution of the auxiliary variable U by the saturation
+  // variables:
+  // make U the revlex most expensive variable by swapping with the first,
+  // recompute the Groebner basis, undo the swap
   I.swap_variables(0,variables);
   I.reduced_Groebner_basis(version,S_pair_criteria,interred_percentage);
   I.swap_variables(0,variables);
 
   I.pseudo_eliminate();
-  /// eliminate the auxiliary variable
+  // eliminate the auxiliary variable
 
-  /// Now the ideal is saturated. Compute the Groebner basis
-  /// with respect to the term ordering induced by the objective function.
+  // Now the ideal is saturated. Compute the Groebner basis
+  // with respect to the term ordering induced by the objective function.
   I.change_term_ordering_to(c);
   I.reduced_Groebner_basis(version,S_pair_criteria,interred_percentage);
 
   end=clock();
 
-  /// time measurement
+  // time measurement
   float elapsed=((float) (end-start))/CLOCKS_PER_SEC;
 
 
-///////////////////////////////////// output //////////////////////////////////////////////////////////////////
+///////////////////////// output ////////////////////////////////////////////
 
-  /// create output file
+  // create output file
 
   char GROEBNER[128];
   int i=0;
@@ -2334,10 +2334,10 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
 
   ofstream output(GROEBNER);
 
-  /// format output file
+  // format output file
 
   output.flags(output.flags()|ios::fixed);
-  /// output of fixed point numbers
+  // output of fixed point numbers
 
   output<<"GROEBNER"<<endl<<endl;
 
@@ -2350,10 +2350,10 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
 
   output<<"term ordering:"<<endl;
   output<<"elimination block"<<endl;
-  /// elimination variables (00)
+  // elimination variables (00)
   output<<0<<endl;
   output<<"weighted block"<<endl;
-  /// weighted variables (>0)
+  // weighted variables (>0)
   output<<variables<<endl;
   output<<"W_LEX"<<endl;
   c.format_print_weight_vector(output);
@@ -2398,9 +2398,9 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
 
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -2421,7 +2421,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
   ifstream problem(PROBLEM);
   ifstream groebner(GROEBNER);
 
-  /// verfifie existence of files
+  // verfifie existence of files
 
   if(!problem)
   {
@@ -2437,9 +2437,9 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
     return 0;
   }
 
-/// read GROEBNER file
+// read GROEBNER file
 
-  /// read format specification
+  // read format specification
 
   groebner>>format_string;
 
@@ -2455,7 +2455,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
     cerr<<"WARNING: int solve(INPUT_FILE, INPUT_FILE):\n"
       "second input file has suspicious format"<<endl;
 
-  /// read algorithm
+  // read algorithm
 
   groebner>>format_string;
 
@@ -2516,7 +2516,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
     cerr<<"WARNING: int solve(INPUT_FILE, INPUT_FILE):\n"
       "second input file computed with unknown algorithm"<<endl;
 
-  /// override optional lines
+  // override optional lines
 
   do
   {
@@ -2532,7 +2532,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
   }
   while(strcmp(format_string,"term"));
 
-  /// read term ordering
+  // read term ordering
 
   groebner>>format_string;
 
@@ -2730,7 +2730,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
     }
   }
 
-  /// read ideal
+  // read ideal
 
   groebner>>format_string;
 
@@ -2808,9 +2808,9 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
     return 0;
   }
 
-/// read PROBLEM file
+// read PROBLEM file
 
-  /// read format specification
+  // read format specification
 
   problem>>format_string;
 
@@ -2826,7 +2826,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
     cerr<<"WARNING: int solve(INPUT_FILE, INPUT_FILE):\n"
       "first input file has suspicious format"<<endl;
 
-  /// read vector dimension
+  // read vector dimension
 
   problem>>format_string;
 
@@ -2873,9 +2873,9 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
     return 0;
   }
 
-  /// consistency with respect to the number of variables is checked later
+  // consistency with respect to the number of variables is checked later
 
-  /// read number of instances
+  // read number of instances
 
   problem>>format_string;
 
@@ -2937,10 +2937,10 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
     cerr<<"WARNING: int solve(INPUT_FILE, INPUT_FILE):\n"
       "number of instances is <1, no output file created"<<endl;
     return 1;
-    /// no error
+    // no error
   }
 
-  /// read problem vectors (first part)
+  // read problem vectors (first part)
 
   problem>>format_string;
 
@@ -3026,13 +3026,13 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
     cerr<<"WARNING: int solve(INPUT_FILE, INPUT_FILE):\n"
       "first input file has suspicious format"<<endl;
 
-  /// the vectors are read in the section "computation" because we need to
-  /// distinguish between the different algorithms
+  // the vectors are read in the section "computation" because we need to
+  // distinguish between the different algorithms
 
 
-////////////////////////////// output (first part) ////////////////////////////////////////////////////
+//////////////////// output (first part) ///////////////////////////////////
 
-  /// open output file (append mode)
+  // open output file (append mode)
 
   char SOLUTION[128];
 
@@ -3048,10 +3048,10 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
 
   ofstream output(SOLUTION,ios::app);
 
-  /// format output file
+  // format output file
 
   output.flags(output.flags()|ios::fixed);
-  /// output of fixed point numbers
+  // output of fixed point numbers
 
   output<<"SOLUTION"<<endl<<endl;
 
@@ -3061,14 +3061,14 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
   output<<GROEBNER<<endl;
 
 
-//////////////// computation and output (second part) ///////////////////////////////////////
+/////////// computation and output (second part) //////////////////////////
 
-  /// distinguish 3 cases to verifie the consistency of the vector dimension
-  /// and the number of variables
+  // distinguish 3 cases to verifie the consistency of the vector dimension
+  // and the number of variables
 
-  /// Conti-Traverso: vectors are read as right hand vectors
-  /// vector dimension = number of elimination variables without inversion
-  /// variable
+  // Conti-Traverso: vectors are read as right hand vectors
+  // vector dimension = number of elimination variables without inversion
+  // variable
   if(!strcmp(algorithm,"ct"))
   {
     if(problem_variables!=elimination_variables-1)
@@ -3084,12 +3084,12 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
 
     for(int k=0;k<instances;k++)
     {
-      /// at the beginning, the variables of interest are zero
+      // at the beginning, the variables of interest are zero
       for(i=0;i<weighted_variables;i++)
         right_hand[i]=0;
 
-      /// right hand vector is read from the input stream into the
-      /// elimination variables
+      // right hand vector is read from the input stream into the
+      // elimination variables
       for(i=weighted_variables;
           i<weighted_variables+elimination_variables-1;i++)
       {
@@ -3105,44 +3105,44 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
         }
       }
 
-      /// determine the exponent of the inversion variable, i.e.
-      /// - min{negative components of right_hand}.
+      // determine the exponent of the inversion variable, i.e.
+      // - min{negative components of right_hand}.
       Integer min=0;
       for(i=weighted_variables;
           i<weighted_variables+elimination_variables-1;i++)
         if(right_hand[i]<min)
           min=right_hand[i];
 
-      /// transform right_hand so that all components are nonnegative
+      // transform right_hand so that all components are nonnegative
       if(min<0)
         for(i=weighted_variables;
             i<weighted_variables+elimination_variables-1;i++)
           right_hand[i]-=min;
 
-      /// set exponent of the inversion variable
+      // set exponent of the inversion variable
       right_hand[weighted_variables+elimination_variables-1]=-min;
 
-      /// construct binomial to reduce
+      // construct binomial to reduce
       binomial to_reduce(weighted_variables+elimination_variables,right_hand);
 
-      /// prepare time measurement
+      // prepare time measurement
       clock_t start, end;
 
-      /// reduce binomial
+      // reduce binomial
       start=clock();
       I.reduce(to_reduce,TRUE);
       end=clock();
 
-      /// time measurement
+      // time measurement
       float elapsed=((float) (end-start))/CLOCKS_PER_SEC;
 
-      /// output
+      // output
 
       output<<"right hand vector:"<<endl;
       for(i=weighted_variables;
           i<weighted_variables+elimination_variables-1;i++)
         output<<setw(6)<<right_hand[i]+min;
-        /// original vector
+        // original vector
       output<<endl;
 
       output<<"solvable:"<<endl;
@@ -3173,8 +3173,8 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
   }
 
   else
-    /// Positive Conti-Traverso: vectors are read as right hand vectors
-    /// vector dimension = number of elimination variables
+    // Positive Conti-Traverso: vectors are read as right hand vectors
+    // vector dimension = number of elimination variables
     if(!strcmp(algorithm,"pct"))
     {
       if(problem_variables!=elimination_variables)
@@ -3187,16 +3187,16 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
       }
 
       Integer right_hand[weighted_variables+elimination_variables];
-      BOOLEAN error=FALSE;    /// to test legality of right hand vectors
+      BOOLEAN error=FALSE;    // to test legality of right hand vectors
 
       for(int k=0;k<instances;k++)
       {
-        /// at the beginning, the variables of interest are zero
+        // at the beginning, the variables of interest are zero
         for(i=0;i<weighted_variables;i++)
           right_hand[i]=0;
 
-        /// right hand vector is read from the input stream into the
-        /// elimination variables
+        // right hand vector is read from the input stream into the
+        // elimination variables
         for(i=weighted_variables;
             i<weighted_variables+elimination_variables;i++)
         {
@@ -3225,31 +3225,31 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
         {
           error=FALSE;
           continue;
-          /// for-loop
+          // for-loop
         }
 
-        /// construct binomial to reduce
+        // construct binomial to reduce
         binomial to_reduce(weighted_variables+elimination_variables,
                            right_hand);
 
-        /// prepare time measurement
+        // prepare time measurement
         clock_t start, end;
 
-        /// reduce binomial
+        // reduce binomial
         start=clock();
         I.reduce(to_reduce,TRUE);
         end=clock();
 
-        /// time measurement
+        // time measurement
         float elapsed=((float) (end-start))/CLOCKS_PER_SEC;
 
-        /// output
+        // output
 
         output<<"right hand vector:"<<endl;
         for(i=weighted_variables;
             i<weighted_variables+elimination_variables;i++)
           output<<setw(6)<<right_hand[i];
-        /// original vector
+        // original vector
         output<<endl;
 
         output<<"solvable:"<<endl;
@@ -3280,8 +3280,8 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
     }
 
     else
-      /// other algorithms: vectors are read as initial solutions
-      /// vector dimension = number of weighted variables
+      // other algorithms: vectors are read as initial solutions
+      // vector dimension = number of weighted variables
     {
       if(problem_variables!=weighted_variables)
       {
@@ -3296,8 +3296,8 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
 
       for(int k=0;k<instances;k++)
       {
-        /// initial solution vector is read from the input stream into the
-        /// elimination variables
+        // initial solution vector is read from the input stream into the
+        // elimination variables
         for(i=0;i<weighted_variables;i++)
         {
           problem>>initial_solution[i];
@@ -3316,26 +3316,26 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
               "initial solution vectors should be nonnegative"<<endl;
         }
 
-        /// construct binomial to reduce
+        // construct binomial to reduce
         binomial to_reduce(weighted_variables,initial_solution);
 
-        /// prepare time measurement
+        // prepare time measurement
         clock_t start, end;
 
-        /// reduce binomial
+        // reduce binomial
         start=clock();
         I.reduce(to_reduce,TRUE);
         end=clock();
 
-        /// time measurement
+        // time measurement
         float elapsed=((float) (end-start))/CLOCKS_PER_SEC;
 
-        /// output
+        // output
 
         output<<"initial solution vector:"<<endl;
         for(i=0;i<weighted_variables;i++)
           output<<setw(6)<<initial_solution[i];
-        /// original vector
+        // original vector
         output<<endl;
 
         output<<"optimal solution:"<<endl;
@@ -3354,9 +3354,9 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
 
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -3380,7 +3380,7 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
   ifstream old(GROEBNER);
   ifstream _new(NEW_COST);
 
-  /// verifie existence of files
+  // verifie existence of files
 
   if(!old)
   {
@@ -3397,9 +3397,9 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
   }
 
 
-/// read first part of GROEBNER file (until term ordering reached)
+// read first part of GROEBNER file (until term ordering reached)
 
-  /// read format specification
+  // read format specification
 
   old>>format_string;
 
@@ -3417,7 +3417,7 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
       "first input file has suspicious format"<<endl;
   }
 
-  /// read algorithm
+  // read algorithm
 
   old>>format_string;
 
@@ -3486,7 +3486,7 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
       "first input file computed with unknown algorithm"<<endl;
   }
 
-  /// override optional lines
+  // override optional lines
 
   do
   {
@@ -3502,7 +3502,7 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
   }
   while(strcmp(format_string,"term"));
 
-  /// read term ordering
+  // read term ordering
 
   old>>format_string;
 
@@ -3662,9 +3662,9 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
     return 0;
   }
 
-/// read NEW_COST file
+// read NEW_COST file
 
-  /// read format specification
+  // read format specification
 
   _new>>format_string;
 
@@ -3682,7 +3682,7 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
       "second input file has suspicious format"<<endl;
   }
 
-  /// read number of variables
+  // read number of variables
 
   _new>>format_string;
 
@@ -3715,8 +3715,8 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
     return 0;
   }
 
-  /// Now we can verifie consistency of both files with respect to the number
-  /// of weighted variables:
+  // Now we can verifie consistency of both files with respect to the number
+  // of weighted variables:
 
   if(weighted_variables!=new_variables)
   {
@@ -3725,7 +3725,7 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
     return 0;
   }
 
-  /// read term ordering
+  // read term ordering
 
   _new>>format_string;
 
@@ -3755,8 +3755,8 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
     cerr<<"WARNING: int change_cost(INPUT_FILE, INPUT_FILE):\n"
       "second input file has suspicious format"<<endl;
 
-  /// the term ordering to refine the weight is taken to be the same as that
-  /// for the old Groebner basis
+  // the term ordering to refine the weight is taken to be the same as that
+  // for the old Groebner basis
   int weighted_ref;
   if(!strcmp(weighted_refinement,"W_LEX"))
     weighted_ref=W_LEX;
@@ -3804,9 +3804,9 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
     }
   }
 
-/// read second part of the GROEBNER file
+// read second part of the GROEBNER file
 
-  /// override old weight vector
+  // override old weight vector
 
   do
   {
@@ -3822,7 +3822,7 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
   }
   while(strcmp(format_string,"size:"));
 
-  /// read old Groebner basis
+  // read old Groebner basis
 
   old>>old_size;
 
@@ -3873,8 +3873,8 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
       "first input file has suspicious format"<<endl;
   }
 
-  /// read ideal generators from first input file, already with respect to
-  /// the new term ordering
+  // read ideal generators from first input file, already with respect to
+  // the new term ordering
   ideal I(old,w,old_size);
 
   if(!old)
@@ -3893,23 +3893,23 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
   }
 
 
-///////////////////////////////////// computation ////////////////////////////////////////////////////////////
+///////////////////////// computation ////////////////////////////////////////
 
-  /// prepare time measurement
+  // prepare time measurement
   clock_t start, end;
 
-  /// compute new Groebner basis
+  // compute new Groebner basis
   start=clock();
   I.reduced_Groebner_basis(version,S_pair_criteria,interred_percentage);
   end=clock();
 
-  /// time measurement
+  // time measurement
   float elapsed=((float) (end-start))/CLOCKS_PER_SEC;
 
 
-///////////////////////////////////// output //////////////////////////////////////////////////////////////////
+///////////////////////// output ////////////////////////////////////////////
 
-  /// create output file
+  // create output file
 
   char NEW_GROEBNER[128];
 
@@ -3925,10 +3925,10 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
 
   ofstream output(NEW_GROEBNER);
 
-  /// format output file
+  // format output file
 
   output.flags(output.flags()|ios::fixed);
-  /// output of fixed point numbers
+  // output of fixed point numbers
 
   output<<"GROEBNER"<<endl<<endl;
 
@@ -3941,12 +3941,12 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
 
   output<<"term ordering:"<<endl;
   output<<"elimination block"<<endl;
-  /// elimination variables
+  // elimination variables
   output<<elimination_variables<<endl;
   if(elimination_variables>0)
     output<<elimination_refinement<<endl;
   output<<"weighted block"<<endl;
-  /// weighted variables (>0)
+  // weighted variables (>0)
   output<<weighted_variables<<endl;
   output<<weighted_refinement<<endl;
   w.format_print_weight_vector(output);
@@ -3988,4 +3988,4 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
   return 1;
 }
 
-#endif /// IP_ALGORITHMS_CC
+#endif // IP_ALGORITHMS_CC

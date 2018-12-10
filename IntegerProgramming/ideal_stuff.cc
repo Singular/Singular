@@ -1,31 +1,31 @@
-/// ideal_stuff.cc
+// ideal_stuff.cc
 
-/// implementation of the special ideal features needed by the IP-algorithms
+// implementation of the special ideal features needed by the IP-algorithms
 
 #ifndef IDEAL_STUFF_CC
 #define IDEAL_STUFF_CC
 
 #include "ideal.h"
 
-///////////////////////////////// elimination stuff ////////////////////////////////////////////////////
+////////////////////// elimination stuff ///////////////////////////////////
 
 ideal& ideal::eliminate()
 {
-/// eliminates the generators of the ideal involving elimination variables
-/// with respect to w
+// eliminates the generators of the ideal involving elimination variables
+// with respect to w
 
   if(w.number_of_elimination_variables()<=0)
-    /// elimination unnecessary
+    // elimination unnecessary
     return *this;
 
   list_iterator iter;
 
 #ifdef NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
-/// Simply iterate over the generator list and delete the elements involving
-/// elimination variables.
-/// There is no need to change the done/undone or the reduced/unreduced mark of
-/// an element.
+// Simply iterate over the generator list and delete the elements involving
+// elimination variables.
+// There is no need to change the done/undone or the reduced/unreduced mark of
+// an element.
 
   iter.set_to_list(generators);
 
@@ -45,25 +45,25 @@ ideal& ideal::eliminate()
     }
   }
 
-#endif  /// NO_SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
 
 #ifdef SUPPORT_DRIVEN_METHODS_EXTENDED
 
-/// Iterate over the generator lists and check whether the elements involve
-/// elimination variables.
-/// As the set of support variables can be changed by the elimination, the
-/// elements that are not deleted are first moved to the aux_list and then
-/// reinserted according to their new support.
-/// The elimination variables are droppd while reinserting.
-/// In general, elimination is done only once. The time needed for this is
-/// linear in the number of generators (in the Groebner basis). The elimination
-/// itself is therefore very fast in comparison to the Groebner basis
-/// computation needed for it... So we renounce to a complicated optimization
-/// of this procedure (the support information is not used). In fact, tests
-/// show that elimination time is really negligible.
+// Iterate over the generator lists and check whether the elements involve
+// elimination variables.
+// As the set of support variables can be changed by the elimination, the
+// elements that are not deleted are first moved to the aux_list and then
+// reinserted according to their new support.
+// The elimination variables are droppd while reinserting.
+// In general, elimination is done only once. The time needed for this is
+// linear in the number of generators (in the Groebner basis). The elimination
+// itself is therefore very fast in comparison to the Groebner basis
+// computation needed for it... So we renounce to a complicated optimization
+// of this procedure (the support information is not used). In fact, tests
+// show that elimination time is really negligible.
 
-  /// elimination
+  // elimination
   for(int i=0;i<Number_of_Lists;i++)
   {
     iter.set_to_list(generators[i]);
@@ -81,13 +81,13 @@ ideal& ideal::eliminate()
       {
         aux_list._insert(bin);
         iter.extract_element();
-        /// As the generators are reinserted later, we do not decrement the
-        /// size (and so do not need to increment it during reinsertion).
+        // As the generators are reinserted later, we do not decrement the
+        // size (and so do not need to increment it during reinsertion).
       }
     }
   }
 
-  /// reinsertion
+  // reinsertion
   iter.set_to_list(aux_list);
 
   while(iter.is_at_end()==FALSE)
@@ -95,14 +95,14 @@ ideal& ideal::eliminate()
     binomial& bin=iter.get_element();
     bin.drop_elimination_variables(w);
     generators[bin.head_support%Number_of_Lists].insert(bin);
-    /// size is not incremented, see above...
+    // size is not incremented, see above...
     iter.extract_element();
   }
 
-#endif  /// SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
 
-  /// finally adapt term ordering
+  // finally adapt term ordering
   w.convert_to_weighted_ordering();
 
   return *this;
@@ -129,10 +129,10 @@ ideal& ideal::pseudo_eliminate()
 
 #ifdef NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
-/// Simply iterate over the generator list and delete the elements involving
-/// the last weighted variable.
-/// There is no need to change the done/undone or the reduced/unreduced mark of
-/// an element.
+// Simply iterate over the generator list and delete the elements involving
+// the last weighted variable.
+// There is no need to change the done/undone or the reduced/unreduced mark of
+// an element.
 
   iter.set_to_list(generators);
 
@@ -141,7 +141,7 @@ ideal& ideal::pseudo_eliminate()
     binomial& bin=iter.get_element();
 
     if(bin[last_weighted_variable]!=0)
-      /// weighted variable to drop is involved in bin
+      // weighted variable to drop is involved in bin
     {
       iter.delete_element();
       size--;
@@ -153,18 +153,18 @@ ideal& ideal::pseudo_eliminate()
     }
   }
 
-#endif  /// NO_SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
 
 #ifdef SUPPORT_DRIVEN_METHODS_EXTENDED
 
-/// Iterate over the generator lists and check whether the elements involve
-/// the last weighted variable.
-/// As the set of support variables can be changed by the pseudo-elimination,
-/// the elements that are not deleted are first moved to the aux_list and then
-/// reinserted according to their new support.
-/// The last weight variable is dropped while reinserting.
-/// For the time needed by this function see the remarks for ideal::eliminate().
+// Iterate over the generator lists and check whether the elements involve
+// the last weighted variable.
+// As the set of support variables can be changed by the pseudo-elimination,
+// the elements that are not deleted are first moved to the aux_list and then
+// reinserted according to their new support.
+// The last weight variable is dropped while reinserting.
+// For the time needed by this function see the remarks for ideal::eliminate().
 
   for(int i=0;i<Number_of_Lists;i++)
   {
@@ -183,8 +183,8 @@ ideal& ideal::pseudo_eliminate()
       {
         aux_list._insert(bin);
         iter.extract_element();
-        /// As the generators are reinserted later, we do not decrement the
-        /// size (and so do not need to increment it during reinsertion).
+        // As the generators are reinserted later, we do not decrement the
+        // size (and so do not need to increment it during reinsertion).
       }
     }
   }
@@ -197,13 +197,13 @@ ideal& ideal::pseudo_eliminate()
     binomial& bin=iter.get_element();
     bin.drop_last_weighted_variable(w);
     generators[bin.head_support%Number_of_Lists].insert(bin);
-    /// size is not incremented, see above...
+    // size is not incremented, see above...
     iter.extract_element();
   }
 
-#endif  /// SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
-  /// finally adapt term ordering
+  // finally adapt term ordering
   w.delete_last_weighted_variable();
 
   return *this;
@@ -212,7 +212,7 @@ ideal& ideal::pseudo_eliminate()
 
 
 
-//////////////////////////// management of the term ordering /////////////////////////////////////
+/////////////////// management of the term ordering /////////////////////////
 
 
 
@@ -220,7 +220,7 @@ ideal& ideal::pseudo_eliminate()
 ideal& ideal::change_term_ordering_to(const term_ordering& _w)
 {
 
-  /// first check compatibility
+  // first check compatibility
   if((w.number_of_weighted_variables()+w.number_of_elimination_variables())!=
      (_w.number_of_weighted_variables()+_w.number_of_elimination_variables()))
   {
@@ -230,7 +230,7 @@ ideal& ideal::change_term_ordering_to(const term_ordering& _w)
     return *this;
   }
 
-  /// change term ordering
+  // change term ordering
   w=_w;
 
   list_iterator iter;
@@ -238,8 +238,8 @@ ideal& ideal::change_term_ordering_to(const term_ordering& _w)
 
 #ifdef NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
-/// Simply iterate over the generator list. Because the change of the term
-/// ordering, the "done" and "reduced" marks of the elements have to be deleted.
+// Simply iterate over the generator list. Because the change of the term
+// ordering, the "done" and "reduced" marks of the elements have to be deleted.
 
   iter.set_to_list(generators);
 
@@ -251,13 +251,13 @@ ideal& ideal::change_term_ordering_to(const term_ordering& _w)
     iter.next();
   }
 
-#endif  /// NO_SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
 
 #ifdef SUPPORT_DRIVEN_METHODS_EXTENDED
 
-/// As head and tail might have to be exchanged, the elements are first moved to
-/// the aux_list and then reinserted according to their new head.
+// As head and tail might have to be exchanged, the elements are first moved to
+// the aux_list and then reinserted according to their new head.
 
   for(int i=0;i<Number_of_Lists;i++)
   {
@@ -268,19 +268,19 @@ ideal& ideal::change_term_ordering_to(const term_ordering& _w)
       binomial& bin=iter.get_element();
 
       if(bin.adapt_to_term_ordering(w)==-1)
-        /// head and tail exchanged
+        // head and tail exchanged
       {
         aux_list._insert(bin);
         iter.extract_element();
-        /// As the generators are reinserted later, we do not decrement the
-        /// size (and so do not need to increment it during reinsertion).
+        // As the generators are reinserted later, we do not decrement the
+        // size (and so do not need to increment it during reinsertion).
       }
       else
       {
-        /// Although the S-pairs of the remaining elements have already been
-        /// computed once, the "done" marks have to be deleted: With a new
-        /// term ordering, the results of the S-pair reduction can change -
-        /// as well as the interreduction results.
+        // Although the S-pairs of the remaining elements have already been
+        // computed once, the "done" marks have to be deleted: With a new
+        // term ordering, the results of the S-pair reduction can change -
+        // as well as the interreduction results.
         iter.mark_element_undone();
         iter.mark_element_head_unreduced();
         iter.next();
@@ -288,18 +288,18 @@ ideal& ideal::change_term_ordering_to(const term_ordering& _w)
     }
   }
 
-  /// reinsertion
+  // reinsertion
   iter.set_to_list(aux_list);
 
   while(iter.is_at_end()==FALSE)
   {
     binomial& bin=iter.get_element();
     generators[bin.head_support%Number_of_Lists].insert(bin);
-    /// size is not incremented, see above...
+    // size is not incremented, see above...
     iter.extract_element();
   }
 
-#endif  /// SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
 
   return *this;
@@ -308,14 +308,14 @@ ideal& ideal::change_term_ordering_to(const term_ordering& _w)
 
 
 
-//////////////// manipulation of the variables ////////////////////////////////////////////////////
+/////////// manipulation of the variables ///////////////////////////////////
 
 
 
 
 ideal& ideal::swap_variables_unsafe(const int& i, const int& j)
 {
-  /// first check arguments
+  // first check arguments
   if((i<0) || (i>=w.number_of_weighted_variables())
      || (j<0) || (j>=w.number_of_weighted_variables()))
   {
@@ -327,7 +327,7 @@ ideal& ideal::swap_variables_unsafe(const int& i, const int& j)
 
   if(i==j)
     return(*this);
-  /// special case to avoid unnecessary overhead
+  // special case to avoid unnecessary overhead
 
 
   list_iterator iter;
@@ -343,16 +343,16 @@ ideal& ideal::swap_variables_unsafe(const int& i, const int& j)
     iter.next();
   }
 
-#endif  /// NO_SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
 
 #ifdef SUPPORT_DRIVEN_METHODS_EXTENDED
 
-/// As head_support and tail_support are manipulated, the elements are first
-/// moved to the aux_list and then reinserted according to their new head.
-/// But head and tail are not adapted to the new term ordering induced by
-/// the change of the variable order - this is only done in the "safe"
-/// routine swap_variables(const int&, const int&).
+// As head_support and tail_support are manipulated, the elements are first
+// moved to the aux_list and then reinserted according to their new head.
+// But head and tail are not adapted to the new term ordering induced by
+// the change of the variable order - this is only done in the "safe"
+// routine swap_variables(const int&, const int&).
 
   for(int l=0;l<Number_of_Lists;l++)
   {
@@ -364,26 +364,26 @@ ideal& ideal::swap_variables_unsafe(const int& i, const int& j)
       bin.swap_variables(i,j);
       aux_list._insert(bin);
       iter.extract_element();
-      /// As the generators are reinserted later, we do not decrement the
-      /// size (and so do not need to increment it during reinsertion).
+      // As the generators are reinserted later, we do not decrement the
+      // size (and so do not need to increment it during reinsertion).
     }
   }
 
-  /// reinsertion
+  // reinsertion
   iter.set_to_list(aux_list);
 
   while(iter.is_at_end()==FALSE)
   {
     binomial& bin=iter.get_element();
     generators[bin.head_support%Number_of_Lists].insert(bin);
-    /// size is not incremented, see above...
+    // size is not incremented, see above...
     iter.extract_element();
   }
 
-#endif  /// SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
 
-  /// finally adapt term ordering
+  // finally adapt term ordering
   w.swap_weights(i,j);
 
   return *this;
@@ -398,7 +398,7 @@ ideal& ideal::swap_variables(const int& i, const int& j)
   swap_variables_unsafe(i,j);
 
   change_term_ordering_to(w);
-  /// This rebuilds the list structure...
+  // This rebuilds the list structure...
 
   return *this;
 }
@@ -408,7 +408,7 @@ ideal& ideal::swap_variables(const int& i, const int& j)
 
 ideal& ideal::flip_variable_unsafe(const int& i)
 {
-  /// first check argument
+  // first check argument
   if((i<0) || (i>=w.number_of_weighted_variables()))
   {
     cout<<"WARNING: ideal::flip_variables(const int&):\n"
@@ -430,13 +430,13 @@ ideal& ideal::flip_variable_unsafe(const int& i)
     iter.next();
   }
 
-#endif  /// NO_SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
 
 #ifdef SUPPORT_DRIVEN_METHODS_EXTENDED
 
-/// As head_support and tail_support can change, the elements are first moved
-/// to the aux_list and then reinserted according to their new head.
+// As head_support and tail_support can change, the elements are first moved
+// to the aux_list and then reinserted according to their new head.
 
   for(int l=0;l<Number_of_Lists;l++)
   {
@@ -448,12 +448,12 @@ ideal& ideal::flip_variable_unsafe(const int& i)
       bin.flip_variable(i);
       aux_list._insert(bin);
       iter.extract_element();
-      /// As the generators are reinserted later, we do not decrement the
-      /// size (and so do not need to increment it during reinsertion).
+      // As the generators are reinserted later, we do not decrement the
+      // size (and so do not need to increment it during reinsertion).
     }
   }
 
-  /// reinsertion
+  // reinsertion
   iter.set_to_list(aux_list);
 
   while(iter.is_at_end()==FALSE)
@@ -461,11 +461,11 @@ ideal& ideal::flip_variable_unsafe(const int& i)
     binomial& bin=iter.get_element();
     generators[bin.head_support%Number_of_Lists].insert(bin);
     iter.extract_element();
-    /// size is not incremented, see above...
+    // size is not incremented, see above...
   }
 
-#endif  /// SUPPORT_DRIVEN_METHODS_EXTENDED
+#endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
   return *this;
 }
-#endif  /// IDEAL_STUFF_CC
+#endif  // IDEAL_STUFF_CC

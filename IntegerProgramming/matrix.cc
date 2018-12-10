@@ -1,13 +1,13 @@
-/// matrix.cc
+// matrix.cc
 
-/// implementation of class matrix
+// implementation of class matrix
 
 #ifndef MATRIX_CC
 #define MATRIX_CC
 
 #include "matrix.h"
 
-///////////////////// constructors and destructor ///////////////////////////////////////////////////
+////////////// constructors and destructor //////////////////////////////////
 typedef Integer* IntegerP;
 typedef BigInt* BigIntP;
 
@@ -15,11 +15,11 @@ matrix::matrix(const int& row_number, const int& column_number)
     :rows(row_number),columns(column_number)
 {
   _kernel_dimension=-2;
-  /// LLL-algorithm not yet performed
+  // LLL-algorithm not yet performed
 
-  /// argument check
+  // argument check
   if((rows<=0)||(columns<=0))
-    /// bad input, set "error flag"
+    // bad input, set "error flag"
   {
     cerr<<"\nWARNING: matrix::matrix(const int&, const int&):\n"
       "argument out of range"<<endl;
@@ -27,7 +27,7 @@ matrix::matrix(const int& row_number, const int& column_number)
     return;
   }
 
-  /// memory allocation and initialization
+  // memory allocation and initialization
 
   coefficients=new IntegerP[rows];
   for(int i=0;i<rows;i++)
@@ -42,11 +42,11 @@ matrix::matrix(const int& row_number, const int& column_number,
     :rows(row_number),columns(column_number)
 {
   _kernel_dimension=-2;
-  /// LLL-algorithm not yet performed
+  // LLL-algorithm not yet performed
 
-  /// argument check
+  // argument check
   if((rows<=0)||(columns<=0))
-    /// bad input, set "error flag"
+    // bad input, set "error flag"
   {
     cerr<<"\nWARNING: matrix::matrix(const int&, const int&, Integr**):\n"
       "argument out of range"<<endl;
@@ -54,7 +54,7 @@ matrix::matrix(const int& row_number, const int& column_number,
     return;
   }
 
-  /// memory allocation and initialization
+  // memory allocation and initialization
 
   coefficients=new IntegerP[rows];
   for(int i=0;i<rows;i++)
@@ -62,7 +62,7 @@ matrix::matrix(const int& row_number, const int& column_number,
   for(int i=0;i<rows;i++)
     for(int j=0;j<columns;j++)
       coefficients[i][j]=entries[i][j];
-  /// coefficients[i] is the i-th row vector
+  // coefficients[i] is the i-th row vector
 }
 
 
@@ -71,11 +71,11 @@ matrix::matrix(const int& row_number, const int& column_number,
 matrix::matrix(ifstream& input)
 {
   _kernel_dimension=-2;
-  /// LLL-algorithm not yet performed
+  // LLL-algorithm not yet performed
 
   input>>rows;
   if(!input)
-    /// input failure, set "error flag"
+    // input failure, set "error flag"
   {
     cerr<<"\nWARNING: matrix::matrix(ifstream&): input failure"<<endl;
     columns=-2;
@@ -84,7 +84,7 @@ matrix::matrix(ifstream& input)
 
   input>>columns;
   if(!input)
-    /// input failure, set "error flag"
+    // input failure, set "error flag"
   {
     cerr<<"\nWARNING: matrix::matrix(ifstream&): input failure"<<endl;
     columns=-2;
@@ -92,7 +92,7 @@ matrix::matrix(ifstream& input)
   }
 
   if((rows<=0)||(columns<=0))
-    /// bad input, set "error flag"
+    // bad input, set "error flag"
   {
     cerr<<"\nWARNING: matrix::matrix(ifstream&): bad input"<<endl;
     columns=-1;
@@ -107,7 +107,7 @@ matrix::matrix(ifstream& input)
     {
       input>>coefficients[i][j];
       if(!input)
-        /// bad input, set error flag
+        // bad input, set error flag
       {
         cerr<<"\nWARNING: matrix::matrix(ifstream&): input failure"<<endl;
         columns=-2;
@@ -122,11 +122,11 @@ matrix::matrix(ifstream& input)
 matrix::matrix(const int& m, const int& n, ifstream& input)
 {
   _kernel_dimension=-2;
-  /// LLL-algorithm not yet performed
+  // LLL-algorithm not yet performed
 
-  /// argument check
+  // argument check
   if((m<=0) || (n<=0))
-    /// bad input, set "error flag"
+    // bad input, set "error flag"
   {
     cerr<<"\nWARNING: matrix::matrix(const int&, const int&, ifstream&):\n"
       "argument out of range"<<endl;
@@ -137,7 +137,7 @@ matrix::matrix(const int& m, const int& n, ifstream& input)
   rows=m;
   columns=n;
 
-  /// memory allocation and initialization
+  // memory allocation and initialization
 
   coefficients=new IntegerP[rows];
   for(int i=0;i<rows;i++)
@@ -147,7 +147,7 @@ matrix::matrix(const int& m, const int& n, ifstream& input)
     {
       input>>coefficients[i][j];
       if(!input)
-        /// bad input, set error flag
+        // bad input, set error flag
       {
         columns=-2;
         return;
@@ -169,7 +169,7 @@ matrix::matrix(const matrix& A)
     return;
   }
 
-  /// memory allocation and initialization (also for H)
+  // memory allocation and initialization (also for H)
 
   coefficients=new IntegerP[rows];
   for(int i=0;i<rows;i++)
@@ -199,7 +199,7 @@ matrix::~matrix()
   delete[] coefficients;
 
   if(_kernel_dimension>0)
-    /// LLL-algorithm performed
+    // LLL-algorithm performed
   {
     for(int i=0;i<_kernel_dimension;i++)
       delete[] H[i];
@@ -210,7 +210,7 @@ matrix::~matrix()
 
 
 
-////////////////////////////// object properties /////////////////////////////////////////////////////////
+//////////////////// object properties //////////////////////////////////////
 
 
 
@@ -251,7 +251,7 @@ int matrix::column_number() const
 
 
 
-/////////////// special routines for the IP-algorithms /////////////////////////////////////
+////////// special routines for the IP-algorithms /////////////////////////
 
 
 
@@ -259,8 +259,8 @@ int matrix::column_number() const
 int matrix::LLL_kernel_basis()
 {
 
-  /// copy the column vectors of the actual matrix
-  /// (They are modified by the LLL-algorithm!)
+  // copy the column vectors of the actual matrix
+  // (They are modified by the LLL-algorithm!)
   BigInt** b=new BigIntP[columns];
   for(int n=0;n<columns;n++)
     b[n]=new BigInt[rows];
@@ -268,13 +268,13 @@ int matrix::LLL_kernel_basis()
     for(int m=0;m<rows;m++)
       b[n][m]=coefficients[m][n];
 
-  /// compute a LLL-reduced basis of the relations of b[0],...,b[columns-1]
+  // compute a LLL-reduced basis of the relations of b[0],...,b[columns-1]
   _kernel_dimension=relations(b,columns,rows,H);
 
-  /// The kernel lattice basis is now stored in the member H (vectors
-  /// H[0],...,H[_kernel_dimension-1]).
+  // The kernel lattice basis is now stored in the member H (vectors
+  // H[0],...,H[_kernel_dimension-1]).
 
-  /// delete auxiliary vectors
+  // delete auxiliary vectors
   for(int n=0;n<columns;n++)
     delete[] b[n];
   delete[] b;
@@ -289,7 +289,7 @@ int matrix::compute_nonzero_kernel_vector()
 {
 
   if(_kernel_dimension==-2)
-    /// lattice basis not yet computed
+    // lattice basis not yet computed
     LLL_kernel_basis();
 
   if(_kernel_dimension==-1)
@@ -306,17 +306,17 @@ int matrix::compute_nonzero_kernel_vector()
     return 0;
   }
 
-  /// Now, the kernel dimension is positive.
+  // Now, the kernel dimension is positive.
 
   BigInt *M=new BigInt[_kernel_dimension];
-  /// M stores a number by which the algorithm decides which vector to
-  /// take next.
+  // M stores a number by which the algorithm decides which vector to
+  // take next.
 
 
-/// STEP 1: Determine the vector with the least zero components (if it is not
-/// unique, choose the smallest).
+// STEP 1: Determine the vector with the least zero components (if it is not
+// unique, choose the smallest).
 
-  /// determine number of zero components
+  // determine number of zero components
   for(int i=0;i<_kernel_dimension;i++)
   {
     M[i]=0;
@@ -325,28 +325,28 @@ int matrix::compute_nonzero_kernel_vector()
         M[i]++;
   }
 
-  /// determine minimal number of zero components
+  // determine minimal number of zero components
   BigInt min=columns;
-  /// columns is an upper bound (not reached because the kernel basis cannot
-  /// contain the zero vector)
+  // columns is an upper bound (not reached because the kernel basis cannot
+  // contain the zero vector)
   for(int i=0;i<_kernel_dimension;i++)
     if(M[i]<min)
       min=M[i];
 
-  /// add the square of the norm to the vectors with the least zero components
-  /// and discard the others (the norm computation is why we have chosen the
-  /// M[i] to be BigInts)
+  // add the square of the norm to the vectors with the least zero components
+  // and discard the others (the norm computation is why we have chosen the
+  // M[i] to be BigInts)
   for(int i=0;i<_kernel_dimension;i++)
     if(M[i]!=min)
       M[i]=-1;
     else
       for(int j=0;j<columns;j++)
         M[i]+=H[i][j]*H[i][j];
-  /// As the lattice basis does not contain the zero vector, at least one M[i]
-  /// is positive!
+  // As the lattice basis does not contain the zero vector, at least one M[i]
+  // is positive!
 
-  /// determine the start vector, i.e. the one with least zero components, but
-  /// smallest possible (euclidian) norm
+  // determine the start vector, i.e. the one with least zero components, but
+  // smallest possible (euclidian) norm
   int min_index=-1;
   for(int i=0;i<_kernel_dimension;i++)
     if(M[i]>BigInt(0))
@@ -357,9 +357,9 @@ int matrix::compute_nonzero_kernel_vector()
         min_index=i;
     }
 
-  /// Now, H[min_index] is the vector to be transformed into a nonnegative one.
-  /// For a better overview, it is swapped with the first vector
-  /// (only pointers).
+  // Now, H[min_index] is the vector to be transformed into a nonnegative one.
+  // For a better overview, it is swapped with the first vector
+  // (only pointers).
 
   if(min_index!=0)
   {
@@ -369,21 +369,21 @@ int matrix::compute_nonzero_kernel_vector()
   }
 
 
-/// Now construct the desired vector.
-/// This is done by adding a linear combination of
-/// H[1],...,H[_kernel_dimension-1] to H[0]. It is important that the final
-/// result, written as a linear combination of
-/// H[0],...,H[_kernel_dimension-1], has coefficient 1 or -1 at H[0]
-/// (to make sure that it is together with H[1],...,H[_kernel_dimension]
-/// still a  l a t t i c e   basis).
+// Now construct the desired vector.
+// This is done by adding a linear combination of
+// H[1],...,H[_kernel_dimension-1] to H[0]. It is important that the final
+// result, written as a linear combination of
+// H[0],...,H[_kernel_dimension-1], has coefficient 1 or -1 at H[0]
+// (to make sure that it is together with H[1],...,H[_kernel_dimension]
+// still a  l a t t i c e   basis).
 
   for(int current_position=1;current_position<columns;current_position++)
-    /// in fact, this loop will terminate before the condition in the
-    /// for-statement is satisfied...
+    // in fact, this loop will terminate before the condition in the
+    // for-statement is satisfied...
   {
 
 
-/// STEP 2: Nonnegative vector already found?
+// STEP 2: Nonnegative vector already found?
 
     BOOLEAN found=TRUE;
     for(int j=0;j<columns;j++)
@@ -391,16 +391,16 @@ int matrix::compute_nonzero_kernel_vector()
         found=FALSE;
 
     if(found==TRUE)
-      /// H[0] has only positive entries,
+      // H[0] has only positive entries,
       return 1;
-    /// else there are further zero components
+    // else there are further zero components
 
 
-/// STEP 3: Can a furhter zero component be "eliminated"?
-/// If this is the case, find a basis vector that can do this.
+// STEP 3: Can a furhter zero component be "eliminated"?
+// If this is the case, find a basis vector that can do this.
 
-    /// determine number of components in each remaining vector that are zero
-    /// in the vector itself as well as in the already constructed vector
+    // determine number of components in each remaining vector that are zero
+    // in the vector itself as well as in the already constructed vector
     for(int i=current_position;i<_kernel_dimension;i++)
       M[i]=0;
 
@@ -415,33 +415,33 @@ int matrix::compute_nonzero_kernel_vector()
             M[i]++;
       }
 
-    /// determine minimal number of such components
+    // determine minimal number of such components
     min=remaining_zero_components;
-    /// this is the number of zero components in H[0] and an upper bound
-    /// for the M[i]
+    // this is the number of zero components in H[0] and an upper bound
+    // for the M[i]
     for(int i=current_position;i<_kernel_dimension;i++)
       if(M[i]<min)
         min=M[i];
 
     if(min==(const BigInt&)remaining_zero_components)
-      /// all zero components in H[0] are zero in each remaining vector
-      /// => desired vector does not exist
+      // all zero components in H[0] are zero in each remaining vector
+      // => desired vector does not exist
       return 0;
 
-    /// add the square of the norm to the vectors with the least common zero
-    /// components
-    /// discard the others
+    // add the square of the norm to the vectors with the least common zero
+    // components
+    // discard the others
     for(int i=current_position;i<_kernel_dimension;i++)
       if(M[i]!=min)
         M[i]=-1;
       else
         for(int j=0;j<columns;j++)
           M[i]+=H[i][j]*H[i][j];
-    ///  Again, at least one M[i] is positive!
+    //  Again, at least one M[i] is positive!
 
-    /// determine vector to proceed with
-    /// This is the vector with the least common zero components with respect
-    /// to H[0], but the smallest possible norm.
+    // determine vector to proceed with
+    // This is the vector with the least common zero components with respect
+    // to H[0], but the smallest possible norm.
     int min_index=0;
     for(int i=current_position;i<_kernel_dimension;i++)
       if(M[i]>BigInt(0))
@@ -452,10 +452,10 @@ int matrix::compute_nonzero_kernel_vector()
           min_index=i;
       }
 
-    /// Now, a multiple of H[min_index] will be added to the already constructed
-    /// vector H[0].
-    /// For a better handling, it is swapped with the vector at current_position
-    /// (only pointers).
+    // Now, a multiple of H[min_index] will be added to the already constructed
+    // vector H[0].
+    // For a better handling, it is swapped with the vector at current_position
+    // (only pointers).
 
     if(min_index!=current_position)
     {
@@ -465,11 +465,11 @@ int matrix::compute_nonzero_kernel_vector()
     }
 
 
-/// STEP 4: Choose a convenient multiple of H[current_position] to add to H[0].
-/// The number of factors "mult" that have to be tested is bounded by the
-/// number of nonzero components in H[0] (for each such components, there is at
-/// most one such factor that will eliminate it in the linear combination
-/// H[0] + mult*H[current_position].
+// STEP 4: Choose a convenient multiple of H[current_position] to add to H[0].
+// The number of factors "mult" that have to be tested is bounded by the
+// number of nonzero components in H[0] (for each such components, there is at
+// most one such factor that will eliminate it in the linear combination
+// H[0] + mult*H[current_position].
 
     found=FALSE;
 
@@ -477,8 +477,8 @@ int matrix::compute_nonzero_kernel_vector()
     {
       found=TRUE;
 
-      /// check if any component !=0 of H[0] becomes zero by adding
-      /// mult*H[current_position]
+      // check if any component !=0 of H[0] becomes zero by adding
+      // mult*H[current_position]
       for(int j=0;j<columns;j++)
         if(H[0][j]!=BigInt(0))
           if(H[0][j]+(const BigInt&)mult*H[current_position][j]
@@ -489,13 +489,13 @@ int matrix::compute_nonzero_kernel_vector()
         for(int j=0;j<columns;j++)
           H[0][j]+=(const BigInt&)mult*H[current_position][j];
       else
-        /// try -mult
+        // try -mult
       {
 
         found=TRUE;
 
-        /// check if any component !=0 of H[0] becomes zero by subtracting
-        /// mult*H[current_position]
+        // check if any component !=0 of H[0] becomes zero by subtracting
+        // mult*H[current_position]
         for(int j=0;j<columns;j++)
           if(H[0][j]!=BigInt(0))
             if(H[0][j]-(const BigInt&)mult*H[current_position][j]
@@ -509,14 +509,14 @@ int matrix::compute_nonzero_kernel_vector()
     }
   }
 
-/// When reaching this line, an error must have occurred.
+// When reaching this line, an error must have occurred.
   cerr<<"FATAL ERROR in int matrix::compute_nonnegative_vector()"<<endl;
   abort();
 }
 
 int matrix::compute_flip_variables(int*& F)
 {
-  /// first compute nonzero vector
+  // first compute nonzero vector
   int okay=compute_nonzero_kernel_vector();
 
   if(!okay)
@@ -527,25 +527,25 @@ int matrix::compute_flip_variables(int*& F)
     return -1;
   }
 
-  /// compute variables to flip; these might either be those corresponding
-  /// to the positive components of the kernel vector without zero components
-  /// or those corresponding to the negative ones
+  // compute variables to flip; these might either be those corresponding
+  // to the positive components of the kernel vector without zero components
+  // or those corresponding to the negative ones
 
   int r=0;
-  /// number of flip variables
+  // number of flip variables
 
   for(int j=0;j<columns;j++)
     if(H[0][j]<BigInt(0))
       r++;
-  /// remember that all components of H[0] are !=0
+  // remember that all components of H[0] are !=0
 
   if(r==0)
-    /// no flip variables
+    // no flip variables
     return 0;
 
   if(2*r>columns)
-    /// more negative than positive components in H[0]
-    /// all variables corresponding to positive components will be flipped
+    // more negative than positive components in H[0]
+    // all variables corresponding to positive components will be flipped
   {
     r=columns-r;
     F=new int[r];
@@ -559,8 +559,8 @@ int matrix::compute_flip_variables(int*& F)
       }
   }
   else
-    /// more (or as many) positive than negative components in v
-    /// all variables corresponding to negative components will be flipped
+    // more (or as many) positive than negative components in v
+    // all variables corresponding to negative components will be flipped
   {
     F=new int[r];
     memset(F,0,r*sizeof(int));
@@ -583,7 +583,7 @@ int matrix::hosten_shapiro(int*& sat_var)
 {
 
   if(_kernel_dimension==-2)
-    /// lattice basis not yet computed
+    // lattice basis not yet computed
     LLL_kernel_basis();
 
   if(_kernel_dimension==-1)
@@ -594,15 +594,15 @@ int matrix::hosten_shapiro(int*& sat_var)
   }
 
   if(_kernel_dimension==0)
-    /// the toric ideal corresponding to the kernel lattice is the zero ideal,
-    /// no saturation variables necessary
+    // the toric ideal corresponding to the kernel lattice is the zero ideal,
+    // no saturation variables necessary
     return 0;
 
-  /// Now, the kernel dimension is positive.
+  // Now, the kernel dimension is positive.
 
   if(columns==1)
-    /// matrix consists of one zero column, kernel is generated by the vector
-    /// (1) corresponding to the toric ideal <x-1> which is already staurated
+    // matrix consists of one zero column, kernel is generated by the vector
+    // (1) corresponding to the toric ideal <x-1> which is already staurated
     return 0;
 
   int number_of_sat_var=0;
@@ -610,15 +610,15 @@ int matrix::hosten_shapiro(int*& sat_var)
   memset(sat_var,0,sizeof(int)*(columns/2));
 
   BOOLEAN* ideal_saturated_by_var=new BOOLEAN[columns];
-  /// auxiliary array used to remember by which variables the ideal has still to
-  /// be saturated
+  // auxiliary array used to remember by which variables the ideal has still to
+  // be saturated
   for(int j=0;j<columns;j++)
     ideal_saturated_by_var[j]=FALSE;
 
   for(int k=0;k<_kernel_dimension;k++)
   {
-    /// determine number of positive and negative components in H[k]
-    /// corresponding to variables by which the ideal has still to be saturated
+    // determine number of positive and negative components in H[k]
+    // corresponding to variables by which the ideal has still to be saturated
     int pos_sat_var=0;
     int neg_sat_var=0;
 
@@ -635,23 +635,23 @@ int matrix::hosten_shapiro(int*& sat_var)
     }
 
 
-    /// now add the smaller set to the saturation variables
+    // now add the smaller set to the saturation variables
     if(pos_sat_var<=neg_sat_var)
     {
       for(int j=0;j<columns;j++)
         if(ideal_saturated_by_var[j]==FALSE)
         {
           if(H[k][j]> BigInt(0))
-            /// ideal has to be saturated by the variables corresponding
-            /// to positive components
+            // ideal has to be saturated by the variables corresponding
+            // to positive components
           {
             sat_var[number_of_sat_var]=j;
             ideal_saturated_by_var[j]=TRUE;
             number_of_sat_var++;
           }
           else if(H[k][j]< BigInt(0))
-              /// then the ideal is automatically saturated by the variables
-              /// corresponding to negative components
+              // then the ideal is automatically saturated by the variables
+              // corresponding to negative components
               ideal_saturated_by_var[j]=TRUE;
         }
     }
@@ -661,22 +661,22 @@ int matrix::hosten_shapiro(int*& sat_var)
         if(ideal_saturated_by_var[j]==FALSE)
         {
           if(H[k][j]< BigInt(0))
-            /// ideal has to be saturated by the variables corresponding
-            /// to negative components
+            // ideal has to be saturated by the variables corresponding
+            // to negative components
           {
             sat_var[number_of_sat_var]=j;
             ideal_saturated_by_var[j]=TRUE;
             number_of_sat_var++;
           }
           else if(H[k][j]> BigInt(0))
-              /// then the ideal is automatically saturated by the variables
-              /// corresponding to positive components
+              // then the ideal is automatically saturated by the variables
+              // corresponding to positive components
               ideal_saturated_by_var[j]=TRUE;
         }
     }
   }
 
-  /// clean up memory
+  // clean up memory
   delete[] ideal_saturated_by_var;
 
   return number_of_sat_var;
@@ -685,7 +685,7 @@ int matrix::hosten_shapiro(int*& sat_var)
 
 
 
-////////////////////////////// output //////////////////////////////////////////////////////////////////////
+//////////////////// output ///////////////////////////////////////////////
 
 
 
@@ -727,4 +727,4 @@ void matrix::print(ofstream& output) const
     output<<endl;
   }
 }
-#endif  /// matrix.cc
+#endif  // matrix.cc

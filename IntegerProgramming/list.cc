@@ -1,17 +1,17 @@
-/// list.cc
+// list.cc
 
-/// implementation of class list and class list iterator
+// implementation of class list and class list iterator
 
 #ifndef LIST_CC
 #define LIST_CC
 
 #include "list.h"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////// class list ////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+///////////////////////// class list ////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////// constructors and destructor ///////////////////////////////////////////
+/////////////////// constructors and destructor /////////////////////////////
 
 list::list()
 {
@@ -20,7 +20,7 @@ list::list()
 
   element* begin_dummy=new element;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
   element* end_dummy=new element;
 
@@ -33,7 +33,7 @@ list::list()
   begin_dummy->head_reduced=FALSE;
   end_dummy->previous=begin_dummy;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
   end_dummy->next=NULL;
   end_dummy->entry=NULL;
@@ -44,42 +44,42 @@ list::list()
 
   start=begin_dummy;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 #ifdef SL_LIST
 
   start=end_dummy;
 
-#endif  /// SL_LIST
+#endif  // SL_LIST
 
 }
 
-/// The dummy elements have the following functions:
-/// - The end_dummy guarantees that the deletion method of the simply linked
-///   list works: Deletion is done by copying the next element to the actual
-///   position and then deleting the original, see below for an explaination.
-///   This would cause problems when deleting the last element; then the
-///   next-pointer of the preceeding element would reference freed memory
-///   (it cannot be manipulated, is unknown). So the end_dummy as an
-///   artificial last element avoids this problem.
-/// - With the described deletion method for a simply linked list, the start
-///   pointer of a list has never to be changed by the list_iterator class
-///   (as long as the list is not empty; but with the end_dummy, the list
-///   never becomes empty). So a list iterator must never know on which list
-///   he operates on.
-///   Doubly linked lists use another, more secure deletion method (which
-///   really deletes the actual element). Therefore, the comfort of a start
-///   pointer which has never to be manipulated by the iterators must be
-///   reached in another way: This is the purpose of the begin_dummy, an
-///   artificial first element which is referenced by the start pointer and
-///   never changed.
-/// - With the dummy elements, we do need to distinguish the cases of inserting
-///   or deleting at the beginning or the end of a list.
-/// - Furthermore, the end_dummy is a stopper for Buchberger's algorithm:
-///   By setting all flags to TRUE, we can eliminate many calls of the
-///   is_at_end()-function of the list iterator class.
-/// The dummy elements should never be deleted (the dletion method is not
-/// secure)!
+// The dummy elements have the following functions:
+// - The end_dummy guarantees that the deletion method of the simply linked
+//   list works: Deletion is done by copying the next element to the actual
+//   position and then deleting the original, see below for an explaination.
+//   This would cause problems when deleting the last element; then the
+//   next-pointer of the preceeding element would reference freed memory
+//   (it cannot be manipulated, is unknown). So the end_dummy as an
+//   artificial last element avoids this problem.
+// - With the described deletion method for a simply linked list, the start
+//   pointer of a list has never to be changed by the list_iterator class
+//   (as long as the list is not empty; but with the end_dummy, the list
+//   never becomes empty). So a list iterator must never know on which list
+//   he operates on.
+//   Doubly linked lists use another, more secure deletion method (which
+//   really deletes the actual element). Therefore, the comfort of a start
+//   pointer which has never to be manipulated by the iterators must be
+//   reached in another way: This is the purpose of the begin_dummy, an
+//   artificial first element which is referenced by the start pointer and
+//   never changed.
+// - With the dummy elements, we do need to distinguish the cases of inserting
+//   or deleting at the beginning or the end of a list.
+// - Furthermore, the end_dummy is a stopper for Buchberger's algorithm:
+//   By setting all flags to TRUE, we can eliminate many calls of the
+//   is_at_end()-function of the list iterator class.
+// The dummy elements should never be deleted (the dletion method is not
+// secure)!
 
 
 
@@ -91,7 +91,7 @@ list::list(const list& l)
 
   element* begin_dummy=new element;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
   element* end_dummy=new element;
 
@@ -105,7 +105,7 @@ list::list(const list& l)
 
   end_dummy->previous=NULL;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
   end_dummy->next=NULL;
   end_dummy->entry=NULL;
@@ -117,13 +117,13 @@ list::list(const list& l)
   start=begin_dummy;
   element *iter=(l.start)->next;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 #ifdef SL_LIST
 
   element* iter=l.start;
 
-#endif  /// SL_LIST
+#endif  // SL_LIST
 
   if(iter==NULL)
   {
@@ -133,7 +133,7 @@ list::list(const list& l)
   }
 
   while((iter->next)!=NULL)
-    /// end_dummy not reached
+    // end_dummy not reached
   {
     copy_insert(*(iter->entry));
     iter=iter->next;
@@ -151,16 +151,16 @@ list::~list()
 
   element *iter=start->next;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 #ifdef SL_LIST
 
   element *iter=start;
 
-#endif  /// SL_LIST
+#endif  // SL_LIST
 
   while(iter->next!=NULL)
-    /// delete non-dummy elements
+    // delete non-dummy elements
   {
     element* aux=iter;
     iter=iter->next;
@@ -168,25 +168,25 @@ list::~list()
     delete aux;
   }
 
-  /// end_dummy reached, delete it
+  // end_dummy reached, delete it
   delete iter;
 
 #ifdef DL_LIST
 
-  /// delete begin_dummy
+  // delete begin_dummy
   delete start;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 }
 
 
 
 
-/////////////////////////////// inserting //////////////////////////////////////////////////////////////////
+///////////////////// inserting ////////////////////////////////////////////
 
-/// For a better overview, the code for the simply and for the doubly linked
-/// list is separated (except from the "copy-insert"-routines).
+// For a better overview, the code for the simply and for the doubly linked
+// list is separated (except from the "copy-insert"-routines).
 
 
 
@@ -198,15 +198,15 @@ list::~list()
 
 list& list::insert(binomial& bin)
 {
-  /// insert at the beginning (after the begin_dummy)
+  // insert at the beginning (after the begin_dummy)
 
-  /// initialize element
+  // initialize element
   element* aux=new element;
   aux->entry=&bin;
   aux->done=FALSE;
   aux->head_reduced=FALSE;
 
-  /// set pointers
+  // set pointers
   aux->next=start->next;
   aux->next->previous=aux;
   aux->previous=start;
@@ -220,13 +220,13 @@ list& list::insert(binomial& bin)
 
 list& list::_insert(binomial& bin)
 {
-  /// insert at the beginning
+  // insert at the beginning
 
-  /// initialize element
+  // initialize element
   element* aux=new element;
   aux->entry=&bin;
 
-  /// set pointers
+  // set pointers
   aux->next=start->next;
   aux->next->previous=aux;
   aux->previous=start;
@@ -241,28 +241,28 @@ list& list::_insert(binomial& bin)
 list& list::ordered_insert(binomial& bin, const term_ordering& w)
 {
 
-  /// search for the place to insert
+  // search for the place to insert
   element* iter=start->next;
   while(iter->entry!=NULL)
-    /// end_dummy not reached
+    // end_dummy not reached
   {
     if(w.compare(*(iter->entry),bin)<=0)
-      /// bin is bigger in term ordering then the referenced binomial
+      // bin is bigger in term ordering then the referenced binomial
       iter=iter->next;
     else
       break;
   }
 
-  /// now bin is smaller in term ordering then the referenced binomial
-  /// or the referenced binomial is the end_dummy
+  // now bin is smaller in term ordering then the referenced binomial
+  // or the referenced binomial is the end_dummy
 
-  /// initialize element
+  // initialize element
   element*aux=new element;
   aux->entry=&bin;
   aux->done=FALSE;
   aux->head_reduced=FALSE;
 
-  /// set pointers
+  // set pointers
   aux->previous=iter->previous;
   aux->previous->next=aux;
   aux->next=iter;
@@ -276,26 +276,26 @@ list& list::ordered_insert(binomial& bin, const term_ordering& w)
 
 list& list::_ordered_insert(binomial& bin, const term_ordering& w)
 {
-  /// search for the place to insert
+  // search for the place to insert
   element* iter=start->next;
   while(iter->entry!=NULL)
-    /// end_dummy not reached
+    // end_dummy not reached
   {
     if(w.compare(*(iter->entry),bin)<=0)
-      /// bin is bigger in term ordering then the referenced binomial
+      // bin is bigger in term ordering then the referenced binomial
       iter=iter->next;
     else
       break;
   }
 
-  /// now bin is smaller in term ordering then the referenced binomial
-  /// or the referenced binomial is the end_dummy
+  // now bin is smaller in term ordering then the referenced binomial
+  // or the referenced binomial is the end_dummy
 
-  /// initialize element
+  // initialize element
   element*aux=new element;
   aux->entry=&bin;
 
-  /// set pointers
+  // set pointers
   aux->previous=iter->previous;
   aux->previous->next=aux;
   aux->next=iter;
@@ -307,7 +307,7 @@ list& list::_ordered_insert(binomial& bin, const term_ordering& w)
 
 
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 
 
@@ -319,15 +319,15 @@ list& list::_ordered_insert(binomial& bin, const term_ordering& w)
 
 list& list::insert(binomial& bin)
 {
-  /// insert at the beginning
+  // insert at the beginning
 
-  /// initialize element
+  // initialize element
   element* aux=new element;
   aux->entry=&bin;
   aux->done=FALSE;
   aux->head_reduced=FALSE;
 
-  /// set pointers
+  // set pointers
   aux->next=start;
   start=aux;
 
@@ -339,13 +339,13 @@ list& list::insert(binomial& bin)
 
 list& list::_insert(binomial& bin)
 {
-  /// insert at the beginning
+  // insert at the beginning
 
-  /// initialize element
+  // initialize element
   element* aux=new element;
   aux->entry=&bin;
 
-  /// set pointers
+  // set pointers
   aux->next=start;
   start=aux;
 
@@ -357,37 +357,37 @@ list& list::_insert(binomial& bin)
 
 list& list::ordered_insert(binomial& bin, const term_ordering& w)
 {
-  /// search for the place to insert
+  // search for the place to insert
   element* iter=start;
   while(iter->entry!=NULL)
-    /// end_dummy not reached
+    // end_dummy not reached
   {
     if(w.compare(*(iter->entry),bin)<=0)
-      /// bin is bigger in term ordering then the referenced binomial
+      // bin is bigger in term ordering then the referenced binomial
       iter=iter->next;
     else
       break;
   }
 
-  /// now bin is smaller in term ordering then the referenced binomial
-  /// or the referenced binomial is the end_dummy
+  // now bin is smaller in term ordering then the referenced binomial
+  // or the referenced binomial is the end_dummy
 
-  /// here we have to consider a special case
+  // here we have to consider a special case
   if(iter==start)
     return insert(bin);
 
-  /// insert new element by first allocating a new list place behind the
-  /// referenced element, then moving the referenced element to that
-  /// new place...
+  // insert new element by first allocating a new list place behind the
+  // referenced element, then moving the referenced element to that
+  // new place...
   element*aux=new element;
   aux->entry=iter->entry;
   aux->done=iter->done;
   aux->head_reduced=iter->head_reduced;
   aux->next=iter->next;
 
-  /// .. and finally inserting bin at the old place
-  /// Remember that we cannot insert a new element between the referenced
-  /// element and its preceeding (we do not know the preceeding element)
+  // .. and finally inserting bin at the old place
+  // Remember that we cannot insert a new element between the referenced
+  // element and its preceeding (we do not know the preceeding element)
   iter->entry=&bin;
   iter->done=FALSE;
   iter->head_reduced=FALSE;
@@ -401,35 +401,35 @@ list& list::ordered_insert(binomial& bin, const term_ordering& w)
 
 list& list::_ordered_insert(binomial& bin, const term_ordering& w)
 {
-  /// search for the place to insert
+  // search for the place to insert
   element* iter=start;
   while(iter->entry!=NULL)
-    /// end_dummy not reached
+    // end_dummy not reached
   {
     if(w.compare(*(iter->entry),bin)<=0)
-      /// bin is bigger in term ordering then the referenced binomial
+      // bin is bigger in term ordering then the referenced binomial
       iter=iter->next;
     else
       break;
   }
 
-  /// now bin is smaller in term ordering then the referenced binomial
-  /// or the referenced binomial is the end_dummy
+  // now bin is smaller in term ordering then the referenced binomial
+  // or the referenced binomial is the end_dummy
 
-  /// here we have to consider a special case
+  // here we have to consider a special case
   if(iter==start)
     return _insert(bin);
 
-  /// insert new element by first allocating a new list place behind the
-  /// referenced element, then moving the referenced element to that
-  /// new place...
+  // insert new element by first allocating a new list place behind the
+  // referenced element, then moving the referenced element to that
+  // new place...
   element*aux=new element;
   aux->entry=iter->entry;
   aux->next=iter->next;
 
-  /// .. and finally inserting bin at the old place
-  /// Remember that we cannot insert a new element between the referenced
-  /// element and its preceeding (we do not know the preceeding element)
+  // .. and finally inserting bin at the old place
+  // Remember that we cannot insert a new element between the referenced
+  // element and its preceeding (we do not know the preceeding element)
   iter->entry=&bin;
   iter->next=aux;
 
@@ -439,12 +439,12 @@ list& list::_ordered_insert(binomial& bin, const term_ordering& w)
 
 
 
-#endif  /// SL_LIST
+#endif  // SL_LIST
 
 
 
 
-/// copy-insert routines
+// copy-insert routines
 
 list& list::copy_insert(const binomial& bin)
 {
@@ -476,7 +476,7 @@ list& list::_ordered_copy_insert(const binomial& bin, const term_ordering& w)
 
 
 
-//////////////////////////////////////// output ///////////////////////////////////////////////////////////////
+/////////////////////////// output //////////////////////////////////////////
 
 
 
@@ -488,13 +488,13 @@ void list::print() const
 
   element* iter=start->next;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 #ifdef SL_LIST
 
   element *iter=start;
 
-#endif  /// SL_LIST
+#endif  // SL_LIST
 
   if(iter==NULL)
   {
@@ -520,13 +520,13 @@ void list::ordered_print(const term_ordering& w) const
 
   element* iter=start->next;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 #ifdef SL_LIST
 
   element *iter=start;
 
-#endif  /// SL_LIST
+#endif  // SL_LIST
 
   if(iter==NULL)
   {
@@ -545,14 +545,14 @@ void list::ordered_print(const term_ordering& w) const
 
   aux.print();
 
-  /// delete aux, but only the element structs, not the binomials
-  /// (these are still stored in the actual list!)
+  // delete aux, but only the element structs, not the binomials
+  // (these are still stored in the actual list!)
 
 #ifdef DL_LIST
 
   iter=aux.start->next;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 #ifdef SL_LIST
 
@@ -561,14 +561,14 @@ void list::ordered_print(const term_ordering& w) const
 #endif
 
   while(iter->next!=NULL)
-    /// end_dummy not reached
+    // end_dummy not reached
   {
     element* aux2=iter->next;
     iter->next=iter->next->next;
     delete aux2;
   }
 
-  /// the dummy elements are deleted by the destructor
+  // the dummy elements are deleted by the destructor
 
 }
 
@@ -582,13 +582,13 @@ void list::print(FILE* output) const
 
   element* iter=start->next;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 #ifdef SL_LIST
 
   element *iter=start;
 
-#endif  /// SL_LIST
+#endif  // SL_LIST
 
   if(iter==NULL)
   {
@@ -616,13 +616,13 @@ void list::ordered_print(FILE* output, const term_ordering& w) const
 
   element* iter=start->next;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 #ifdef SL_LIST
 
   element *iter=start;
 
-#endif  /// SL_LIST
+#endif  // SL_LIST
 
   if(iter==NULL)
   {
@@ -643,14 +643,14 @@ void list::ordered_print(FILE* output, const term_ordering& w) const
 
   aux.print(output);
 
-  /// delete aux, but only the element structs, not the binomials
-  /// (these are still stored in the actual list!)
+  // delete aux, but only the element structs, not the binomials
+  // (these are still stored in the actual list!)
 
 #ifdef DL_LIST
 
   iter=aux.start->next;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 #ifdef SL_LIST
 
@@ -659,14 +659,14 @@ void list::ordered_print(FILE* output, const term_ordering& w) const
 #endif
 
   while(iter->next!=NULL)
-    /// end_dummy not reached
+    // end_dummy not reached
   {
     element* aux2=iter->next;
     iter->next=iter->next->next;
     delete aux2;
   }
 
-  /// the dummy elements are deleted by the destructor
+  // the dummy elements are deleted by the destructor
 }
 
 
@@ -679,13 +679,13 @@ void list::print(ofstream& output) const
 
   element* iter=start->next;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 #ifdef SL_LIST
 
   element *iter=start;
 
-#endif  /// SL_LIST
+#endif  // SL_LIST
 
   if(iter==NULL)
   {
@@ -713,13 +713,13 @@ void list::ordered_print(ofstream& output, const term_ordering& w) const
 
   element* iter=start->next;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 #ifdef SL_LIST
 
   element *iter=start;
 
-#endif  /// SL_LIST
+#endif  // SL_LIST
 
   if(iter==NULL)
   {
@@ -741,14 +741,14 @@ void list::ordered_print(ofstream& output, const term_ordering& w) const
 
   aux.print(output);
 
-  /// delete aux, but only the element structs, not the binomials
-  /// (these are still stored in the actual list!)
+  // delete aux, but only the element structs, not the binomials
+  // (these are still stored in the actual list!)
 
 #ifdef DL_LIST
 
   iter=(aux.start)->next;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 #ifdef SL_LIST
 
@@ -765,7 +765,7 @@ void list::ordered_print(ofstream& output, const term_ordering& w) const
     delete aux1;
   }
 
-  /// the dummy elements are deleted by the destructor
+  // the dummy elements are deleted by the destructor
 }
 
 
@@ -778,13 +778,13 @@ void list::format_print(ofstream& output) const
 
   element* iter=start->next;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 #ifdef SL_LIST
 
   element *iter=start;
 
-#endif  /// SL_LIST
+#endif  // SL_LIST
 
   if(iter==NULL)
   {
@@ -812,13 +812,13 @@ void list::ordered_format_print(ofstream& output, const term_ordering& w) const
 
   element* iter=start->next;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 #ifdef SL_LIST
 
   element *iter=start;
 
-#endif  /// SL_LIST
+#endif  // SL_LIST
 
   if(iter==NULL)
   {
@@ -841,14 +841,14 @@ void list::ordered_format_print(ofstream& output, const term_ordering& w) const
 
   aux.format_print(output);
 
-  /// delete aux, but only the element structs, not the binomials
-  /// (these are still stored in the actual list!)
+  // delete aux, but only the element structs, not the binomials
+  // (these are still stored in the actual list!)
 
 #ifdef DL_LIST
 
   iter=(aux.start)->next;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 #ifdef SL_LIST
 
@@ -865,25 +865,25 @@ void list::ordered_format_print(ofstream& output, const term_ordering& w) const
     delete aux1;
   }
 
-  /// the dummy elements are deleted by the destructor
+  // the dummy elements are deleted by the destructor
 }
 
 
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////// class list_iterator ///////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+////////////////////// class list_iterator //////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 
-/// implementation of class list_iterator
-/// Most of these function can be inlined. I have tried this and not improved
-/// the performance. Perhaps the compiler does this automatically...
-
-
+// implementation of class list_iterator
+// Most of these function can be inlined. I have tried this and not improved
+// the performance. Perhaps the compiler does this automatically...
 
 
-///////////////////////////////////// constructors and destructor //////////////////////////////////
+
+
+///////////////////////// constructors and destructor ///////////////////////
 
 
 
@@ -902,13 +902,13 @@ list_iterator::list_iterator(list& l)
 
   actual=(l.start)->next;
 
-#endif /// DL_LIST
+#endif // DL_LIST
 
 #ifdef SL_LIST
 
   actual=l.start;
 
-#endif /// SL_LIST
+#endif // SL_LIST
 
 }
 
@@ -928,7 +928,7 @@ list_iterator::~list_iterator()
 
 
 
-//////////////////////////// object information ///////////////////////////////////////////////////////
+/////////////////// object information /////////////////////////////////////
 
 
 
@@ -948,21 +948,21 @@ BOOLEAN list_iterator::element_is_marked_head_reduced() const
 BOOLEAN list_iterator::is_at_end() const
 {
   if(actual==NULL)
-  /// actual references no list
+  // actual references no list
     return(TRUE);
 
   if(actual->next==NULL)
-  /// actual references dummy element
+  // actual references dummy element
     return(TRUE);
 
-  /// actual references a real element
+  // actual references a real element
   return(FALSE);
 }
 
 
 
 
-/////////////////////////////////////// assignment //////////////////////////////////////////////////////////
+////////////////////////// assignment ///////////////////////////////////////
 
 
 
@@ -974,13 +974,13 @@ list_iterator& list_iterator::set_to_list(const list& l)
 
   actual=(l.start)->next;
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 #ifdef SL_LIST
 
   actual=l.start;
 
-#endif  /// SL_LIST
+#endif  // SL_LIST
 
   return *this;
 }
@@ -1005,7 +1005,7 @@ list_iterator& list_iterator::next()
 
 
 
-//////////////////////////// comparison //////////////////////////////////////////////////////////////////
+/////////////////// comparison ////////////////////////////////////////////
 
 
 
@@ -1030,10 +1030,10 @@ int list_iterator::next_is(const list_iterator& iter) const
 
 
 
-///////////////////// manipulation of list elements /////////////////////////////////////////////
+////////////// manipulation of list elements //////////////////////////////
 
-/// For a better overview, the code of the delete- and extract-routine is
-/// separated for simply and doubly linked lists.
+// For a better overview, the code of the delete- and extract-routine is
+// separated for simply and doubly linked lists.
 
 
 
@@ -1085,18 +1085,18 @@ list_iterator& list_iterator::extract_element()
 
 
 
-#endif  /// DL_LIST
+#endif  // DL_LIST
 
 
 
 
 #ifdef SL_LIST
 
-/// When deleting or extracting an element of a simply linked list, the
-/// next-pointer of the previous element cannot be manipulated (is unkonwn!).
-/// So deletion must be done by copying the next element to the actual position
-/// and then deleting the original. Notice that only pointers are copies, never
-/// binomials.
+// When deleting or extracting an element of a simply linked list, the
+// next-pointer of the previous element cannot be manipulated (is unkonwn!).
+// So deletion must be done by copying the next element to the actual position
+// and then deleting the original. Notice that only pointers are copies, never
+// binomials.
 
 
 
@@ -1132,7 +1132,7 @@ list_iterator& list_iterator::extract_element()
   delete aux;
   return *this;
 }
-#endif  /// SL_LIST
+#endif  // SL_LIST
 
 list_iterator& list_iterator::mark_element_done()
 {
@@ -1163,4 +1163,4 @@ list_iterator& list_iterator::mark_element_head_unreduced()
   actual->head_reduced=FALSE;
   return *this;
 }
-#endif  /// LIST_CC
+#endif  // LIST_CC

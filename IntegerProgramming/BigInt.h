@@ -1,7 +1,7 @@
-/// BigInt.h
+// BigInt.h
 
-/// A BigInt-class with not much more functions than needed by the
-/// LLL-algorithm. Wrapper class for the GNU MP library.
+// A BigInt-class with not much more functions than needed by the
+// LLL-algorithm. Wrapper class for the GNU MP library.
 
 #ifndef BIG_INT_H
 #define BIG_INT_H
@@ -80,4 +80,4 @@ BigInt operator - ( const BigInt&, const int& );
 BigInt operator * ( const BigInt&, const int& );
 BigInt operator / ( const BigInt&, const int& );
 
-#endif  /// BIG_INT_H
+#endif  // BIG_INT_H
