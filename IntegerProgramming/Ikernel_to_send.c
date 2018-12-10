@@ -66,7 +66,9 @@
 
 #define llln_max(a,b) (a > b ? a : b)
 
-///* Global variables *///
+///*!
+ Global variables 
+*///
 mpz_t *llln_d;
 int *llln_f;
 mpz_t **llln_lambda;
@@ -231,7 +233,9 @@ void main (void)
 ///| Read the input file.                           |
 ///|___________________________________________________________________________|
 
-mpz_t **llln_proc_entrada (int *F, int *C) ///* Inputs *///
+mpz_t **llln_proc_entrada (int *F, int *C) ///*!
+ Inputs 
+*///
 {
   int numF, numC;
   int i, j, c;
