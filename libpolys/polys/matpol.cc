@@ -22,6 +22,7 @@
 #include "simpleideals.h"
 #include "matpol.h"
 #include "prCopy.h"
+#include "clapsing.h"
 
 #include "sparsmat.h"
 
@@ -2107,3 +2108,74 @@ poly mp_DetMu(matrix A, const ring R)
     return res;
 }
 
+DetVariant mp_GetAlgorithmDet(matrix m, const ring r)
+{
+  if (MATROWS(m)>15) return DetMu;
+  if (rField_is_Q(r))
+  {
+    BOOLEAN isConst=TRUE;
+    int s,t; s=0;t=0;
+    for(int i=MATCOLS(m)*MATROWS(m)-1;i>=0;i--)
+    {
+      poly p=m->m[i];
+      if (p!=NULL)
+      {
+        if(!p_IsConstant(p,r)) isConst=FALSE;
+        s++;
+        t+=n_Size(pGetCoeff(p),r->cf);
+      }
+    }
+    if (isConst) return DetFactory;
+    if (s*15>t) // few large constanst entries
+      return DetSBareiss;
+   }
+  if (rField_is_Zp(r))
+    return DetFactory;
+  return DetMu;
+}
+DetVariant mp_GetAlgorithmDet(const char *s)
+{
+  if (strcmp(s,"Bareiss")==0) return DetBareiss;
+  if (strcmp(s,"SBareiss")==0) return DetSBareiss;
+  if (strcmp(s,"Mu")==0) return DetMu;
+  if (strcmp(s,"Factory")==0) return DetFactory;
+  WarnS("unknown method for det");
+  return DetDefault;
+}
+
+
+poly mp_Det(matrix a, const ring r, DetVariant d/*=DetDefault*/)
+{
+  if ((MATCOLS(a)==0)
+  && (MATROWS(a)==0))
+    return p_One(r);
+  if (d==DetDefault) d=mp_GetAlgorithmDet(a,r);
+  switch (d)
+  {
+    case DetBareiss: return mp_DetBareiss(a,r);
+    case DetMu: return mp_DetMu(a,r);
+    case DetFactory: return singclap_det(a,r);
+    case DetSBareiss:
+    {
+      ideal I=id_Matrix2Module(mp_Copy(a, r),r);
+      poly p=sm_CallDet(I, r);
+      id_Delete(&I, r);
+      return p;
+    }
+    default:
+      WerrorS("unknown algorith for det");
+  }
+}
+
+poly sm_Det(ideal a, const ring r, DetVariant d/*=DetDefault*/)
+{
+  if ((MATCOLS(a)==0)
+  && (MATROWS(a)==0))
+    return p_One(r);
+  if (d==DetDefault) d=mp_GetAlgorithmDet((matrix)a,r);
+  if (d==DetSBareiss) return sm_CallDet(a,r);
+  matrix m=id_Module2Matrix(id_Copy(a,r),r);
+  poly p=mp_Det(m,r,d);
+  id_Delete((ideal *)&m,r);
+  return p;
+}

@@ -615,6 +615,8 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjDelete_ID), DELETE_CMD,     IDEAL_CMD,      IDEAL_CMD,  INT_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjDelete_ID), DELETE_CMD,     MODUL_CMD,      MODUL_CMD,  INT_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(lDelete),     DELETE_CMD,     LIST_CMD,       LIST_CMD,   INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjDET2),      DET_CMD,        POLY_CMD,       MATRIX_CMD, STRING_CMD, NO_NC |ALLOW_RING}
+,{D(jjDET2_S),    DET_CMD,        POLY_CMD,       MODUL_CMD,  STRING_CMD, NO_NC |NO_RING}
 ,{D(jjDIFF_P),    DIFF_CMD,       POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDIFF_P),    DIFF_CMD,       VECTOR_CMD,     VECTOR_CMD, POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDIFF_ID),   DIFF_CMD,       IDEAL_CMD,      IDEAL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -1010,7 +1012,7 @@ cmdnames cmds[] =
   { "degree",      0, DEGREE_CMD ,        CMD_1},
   { "delete",      0, DELETE_CMD ,        CMD_2},
   { "denominator", 0, DENOMINATOR_CMD ,   CMD_1},
-  { "det",         0, DET_CMD ,           CMD_1},
+  { "det",         0, DET_CMD ,           CMD_12},
   { "diff",        0, DIFF_CMD ,          CMD_2},
   { "dim",         0, DIM_CMD ,           CMD_12},
   { "div",         0, INTDIV_CMD ,        MULDIV_OP},
