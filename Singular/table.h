@@ -119,8 +119,8 @@ const struct sValCmd1 dArith1[]=
 #endif
 ,{D(jjDET_BI),     DET_CMD,         BIGINT_CMD,     BIGINTMAT_CMD , ALLOW_NC |ALLOW_RING}
 ,{D(jjDET_I),      DET_CMD,         INT_CMD,        INTMAT_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjDET_S),      DET_CMD,         POLY_CMD,       SMATRIX_CMD   , NO_NC |NO_RING}
 ,{D(jjDET),        DET_CMD,         POLY_CMD,       MATRIX_CMD    , NO_NC |ALLOW_RING}
-,{D(jjDET_S),      DET_CMD,         POLY_CMD,       MODUL_CMD     , NO_NC |NO_RING}
 ,{D(jjDIM),        DIM_CMD,         INT_CMD,        IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDIM),        DIM_CMD,         INT_CMD,        MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDIM_R),      DIM_CMD,         INT_CMD,        RESOLUTION_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -615,8 +615,8 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjDelete_ID), DELETE_CMD,     IDEAL_CMD,      IDEAL_CMD,  INT_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjDelete_ID), DELETE_CMD,     MODUL_CMD,      MODUL_CMD,  INT_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(lDelete),     DELETE_CMD,     LIST_CMD,       LIST_CMD,   INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjDET2_S),    DET_CMD,        POLY_CMD,       SMATRIX_CMD,STRING_CMD, NO_NC |NO_RING}
 ,{D(jjDET2),      DET_CMD,        POLY_CMD,       MATRIX_CMD, STRING_CMD, NO_NC |ALLOW_RING}
-,{D(jjDET2_S),    DET_CMD,        POLY_CMD,       MODUL_CMD,  STRING_CMD, NO_NC |NO_RING}
 ,{D(jjDIFF_P),    DIFF_CMD,       POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDIFF_P),    DIFF_CMD,       VECTOR_CMD,     VECTOR_CMD, POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDIFF_ID),   DIFF_CMD,       IDEAL_CMD,      IDEAL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
