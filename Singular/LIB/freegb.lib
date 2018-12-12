@@ -22,18 +22,24 @@ SFB-TRR 195 'Symbolic Tools in Mathematics and their Application' of the German 
 
 PROCEDURES:
 freeAlgebra(r, d);               creates a ring with d blocks of shifted original variables
-makeLetterplaceRing(d);          (deprecated) creates a ring with d blocks of shifted original variables
-setLetterplaceAttributes(R,d,b); supplies ring R with the letterplace structure
-lieBracket(a,b[, N]);            Lie bracket ab-ba of two letterplace polynomials
+lpDegbound(R);                   returns the degree bound of a letterplace ring
+lpBlockSize(R);                  returns the size of the letterplace blocks
+lpIsFreeAlgebra(r);              check whether r is a letterplace ring (free algebra)
+
 letplaceGBasis(I);               two-sided Groebner basis of a letterplace ideal I
+
 lpDivision(f,I);                 two-sided division with remainder
 lpGBPres2Poly(L,I);              reconstructs a polynomial from the output of lpDivision
-isOrderingShiftInvariant(i);     tests shift-invariance of the monomial ordering
 
+lieBracket(a,b[, N]);            Lie bracket ab-ba of two letterplace polynomials
+isOrderingShiftInvariant(i);     tests shift-invariance of the monomial ordering
 isVar(p);                        check whether p is a power of a single variable
 
 lpLmDivides(ideal I, poly p)     tests if there is a polynomial q in I with LM(q)|LM(p)
 lpVarAt(poly p, int pos)         returns the variable (as a poly) at position pos of the poly p
+
+makeLetterplaceRing(d);          (deprecated) creates a ring with d blocks of shifted original variables
+setLetterplaceAttributes(R,d,b); (for testing) supplies ring R with the letterplace structure
 
 SEE ALSO: fpadim_lib, fpaprops_lib, fpalgebras_lib, LETTERPLACE
 ";
@@ -987,6 +993,70 @@ static proc polylen(ideal I)
   printf("the sum of length %s",s);
   //  print(s);
   return(J);
+}
+
+proc lpDegBound(def R)
+"USAGE:  lpDegBound(R); R a letterplace ring
+RETURN:  int
+PURPOSE: returns the degree bound of the letterplace ring
+EXAMPLE: example lpDegBound; shows examples
+"
+{
+  int lV = attrib(R, "isLetterplaceRing");
+  if (lV < 1) {
+    ERROR("not a letterplace ring");
+  }
+  return (nvars(R) div lV);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  def R = freeAlgebra(r, 7);
+  lpDegBound(R);
+}
+
+proc lpBlockSize(def R)
+"USAGE:  lpBlockSize(R); R a letterplace ring
+RETURN:  int
+PURPOSE: returns the block size of the letterplace ring, that is the number of variables of the original ring.
+EXAMPLE: example lpBlockSize; shows examples
+"
+{
+  int lV = attrib(R, "isLetterplaceRing");
+  if (lV < 1) {
+    ERROR("not a letterplace ring");
+  }
+  return (lV);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  def R = freeAlgebra(r, 7);
+  lpBlockSize(R);
+}
+
+proc lpIsFreeAlgebra(def r)
+"USAGE:  lpIsFreeAlgebra(r); r a ring
+RETURN:  boolean
+PURPOSE: check whether R is a letterplace ring (free algebra)
+EXAMPLE: example lpIsFreeAlgebra; shows examples
+"
+{
+  int lV = attrib(r, "isLetterplaceRing");
+  if (lV < 1) {
+    return (0);
+  }
+  return (1);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  lpIsFreeAlgebra(r);
+  def R = freeAlgebra(r, 7);
+  lpIsFreeAlgebra(R);
 }
 
 proc freeAlgebra(def r, int d)
