@@ -2082,16 +2082,15 @@ poly mp_DetMu(matrix A, const ring R)
     */
 
     //speichere A ab:
-    matrix B=mp_Copy(A,R);
-    A=mp_Copy(A,R);
+    matrix workA=mp_Copy(A,R);
 
     // berechen X = mu(X)*A
     matrix X;
     for (int i = n-1; i >0; i--)
     {
-        X=mu(A,R);
-        id_Delete((ideal*)&A,R);
-        A=mp_Mult(X,B,R);
+        X=mu(workA,R);
+        id_Delete((ideal*)&workA,R);
+        workA=mp_Mult(X,A,R);
         id_Delete((ideal*)&X,R);
     }
 
@@ -2099,14 +2098,14 @@ poly mp_DetMu(matrix A, const ring R)
     poly res;
     if (n%2 == 0)
     {
-        res=p_Neg(MATELEM0(A,0,0),R);
+        res=p_Neg(MATELEM0(workA,0,0),R);
     }
     else
     {
-        res=MATELEM0(A,0,0);
+        res=MATELEM0(workA,0,0);
     }
-    MATELEM0(A,0,0)=NULL;
-    id_Delete((ideal*)&A,R);
+    MATELEM0(workA,0,0)=NULL;
+    id_Delete((ideal*)&workA,R);
     return res;
 }
 
