@@ -90,7 +90,7 @@ the acc (ascending chain condition).
   } kill i;
   // if longest word has length 1 we handle it as a special case
   if (l == 1) {
-    int n = attrib(basering, "isLetterplaceRing"); // variable count
+    int n = lpBlockSize(basering); // variable count
     int k = size(G);
     if (k == n) { // only the field left
       return(3); // every field is noetherian
@@ -745,7 +745,7 @@ ASSUME: - basering is a Letterplace ring
     // TODO: how should the graph look like when l - 1 = 0 ?
     ERROR("Ufnarovskij graph not implemented for l = 1");
   }
-  int lV = attrib(basering, "isLetterplaceRing");
+  int lV = lpBlockSize(basering);
   // TODO: what if l <= 0?
   dbprint("computing standard words");
   ideal SW = lpStandardWords(G, l - 1); // vertices
@@ -835,7 +835,7 @@ static proc ivStandardWords(list G, int length)
     }
     return (words); // no standard words
   }
-  int lV = attrib(basering, "isLetterplaceRing"); // variable count
+  int lV = lpBlockSize(basering); // variable count
   list prevWords = ivStandardWords(G, length - 1);
   list words;
   for (int i = 1; i <= lV; i++) {
@@ -906,7 +906,7 @@ ASSUME: - basering is a Letterplace ring
   } kill i;
   // if longest word has length 1, or G is the zero ideal, we handle it as a special case
   if (l == 1 || size(G) == 0) {
-    int n = attrib(basering, "isLetterplaceRing"); // variable count
+    int n = lpBlockSize(basering); // variable count
     int k = size(G);
     if (k == n) { // V = {1} no edges
       return(0);
@@ -1003,8 +1003,8 @@ NOTE: if I = LM(I), then the global dimension is equal the Gelfand
   ring R = basering;
   if (size(G1) > 0) {
     while (size(G1) > 0) {
-      if (attrib(R, "isLetterplaceRing") > 1) {
-        ring R = lpDelVar(lp2iv(G1[1])[1]);
+      if (lpBlockSize(R) > 1) {
+        ring R = lpDelVar(lp2iv(G1[1])[1]); // TODO replace with proper method
         ideal G1 = imap(save,G1);
         G1 = simplify(G1, 2); // remove zero generators
       } else {
@@ -1077,7 +1077,7 @@ static proc imHasLoops(intmat A) {
 static proc lpGraphOfNChains(ideal G) // G must be reduced
 {
   list LG = lpId2ivLi(lead(G));
-  int n = attrib(basering, "isLetterplaceRing");
+  int n = lpBlockSize(basering);
   int degbound = attrib(basering, "uptodeg");
 
   list V;
@@ -1378,7 +1378,7 @@ checks, if a word IF is an infix of another word I
 // TODO: use original ring attrib to create a new letterplace ring
 // removes a variable from a letterplace ring (a bit of a hack)
 static proc lpDelVar(int index) {
-  int lV = attrib(basering, "isLetterplaceRing"); // number of variables in the main block
+  int lV = lpBlockSize(basering); // number of variables in the main block
   int d = attrib(basering, "uptodeg"); // degree bround
   list LR = ringlist(basering);
 
