@@ -22,9 +22,9 @@ SFB-TRR 195 'Symbolic Tools in Mathematics and their Application' of the German 
 
 PROCEDURES:
 freeAlgebra(r, d);               creates a ring with d blocks of shifted original variables
-lpDegbound(R);                   returns the degree bound of a letterplace ring
+isFreeAlgebra(r);                check whether r is a letterplace ring (free algebra)
+lpDegBound(R);                   returns the degree bound of a letterplace ring
 lpBlockSize(R);                  returns the size of the letterplace blocks
-lpIsFreeAlgebra(r);              check whether r is a letterplace ring (free algebra)
 
 letplaceGBasis(I);               two-sided Groebner basis of a letterplace ideal I
 
@@ -1037,11 +1037,11 @@ example
   lpBlockSize(R);
 }
 
-proc lpIsFreeAlgebra(def r)
-"USAGE:  lpIsFreeAlgebra(r); r a ring
+proc isFreeAlgebra(def r)
+"USAGE:  isFreeAlgebra(r); r a ring
 RETURN:  boolean
 PURPOSE: check whether R is a letterplace ring (free algebra)
-EXAMPLE: example lpIsFreeAlgebra; shows examples
+EXAMPLE: example isFreeAlgebra; shows examples
 "
 {
   int lV = attrib(r, "isLetterplaceRing");
@@ -1054,9 +1054,9 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
-  lpIsFreeAlgebra(r);
+  isFreeAlgebra(r);
   def R = freeAlgebra(r, 7);
-  lpIsFreeAlgebra(R);
+  isFreeAlgebra(R);
 }
 
 proc freeAlgebra(def r, int d)
