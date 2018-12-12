@@ -2029,7 +2029,7 @@ BOOLEAN sm_Equal(ideal a, ideal b, const ring R)
 */
 
 //  mu-Matrix
-static void mu(matrix A, matrix &X, const ring R)
+static matrix mu(matrix A, const ring R)
 {
   int n=MATROWS(A);
   assume(MATCOLS(A)==n);
@@ -2044,7 +2044,7 @@ static void mu(matrix A, matrix &X, const ring R)
     */
 
     // X als n*n Null-Matrix initalisieren
-    X=mpNew(n,n);
+    matrix X=mpNew(n,n);
 
     //  Diagonaleintraege von X berrechnen
     poly sum = NULL;
@@ -2053,15 +2053,17 @@ static void mu(matrix A, matrix &X, const ring R)
         MATELEM0(X,i,i) = p_Copy(sum,R);
         sum=p_Sub(sum,p_Copy(MATELEM0(A,i,i),R),R);
     }
+    p_Delete(&sum,R);
 
     //  Eintraege aus dem oberen Dreieck von A nach X uebertragen
-    for (int i = 0; i < n; i++)
+    for (int i = n-1; i >=0; i--)
     {
         for (int j = i+1; j < n; j++)
         {
             MATELEM0(X,i,j)=p_Copy(MATELEM0(A,i,j),R);
         }
     }
+    return X;
 }
 
 // Funktion muDet
@@ -2085,9 +2087,9 @@ poly mp_DetMu(matrix A, const ring R)
 
     // berechen X = mu(X)*A
     matrix X;
-    for (int i = 0; i < n-1; i++)
+    for (int i = n-1; i >0; i--)
     {
-        mu(A,X,R);
+        X=mu(A,R);
         id_Delete((ideal*)&A,R);
         A=mp_Mult(X,B,R);
         id_Delete((ideal*)&X,R);
@@ -2110,27 +2112,23 @@ poly mp_DetMu(matrix A, const ring R)
 
 DetVariant mp_GetAlgorithmDet(matrix m, const ring r)
 {
-  if (MATROWS(m)>15) return DetMu;
-  if (rField_is_Q(r))
+  if (MATROWS(m)+2*r->N>20) return DetMu;
+  if (MATROWS(m)<6) return DetSBareiss;
+  if ((MATROWS(m)<15) && rField_is_Q(r)) return DetSBareiss;
+  BOOLEAN isConst=TRUE;
+  int s; s=0;
+  for(int i=MATCOLS(m)*MATROWS(m)-1;i>=0;i--)
   {
-    BOOLEAN isConst=TRUE;
-    int s,t; s=0;t=0;
-    for(int i=MATCOLS(m)*MATROWS(m)-1;i>=0;i--)
+    poly p=m->m[i];
+    if (p!=NULL)
     {
-      poly p=m->m[i];
-      if (p!=NULL)
-      {
-        if(!p_IsConstant(p,r)) isConst=FALSE;
-        s++;
-        t+=n_Size(pGetCoeff(p),r->cf);
-      }
+      if(!p_IsConstant(p,r)) isConst=FALSE;
+      s++;
     }
-    if (isConst) return DetFactory;
-    if (s*15>t) // few large constanst entries
-      return DetSBareiss;
-   }
-  if (rField_is_Zp(r))
-    return DetFactory;
+  }
+  if (isConst && rField_is_Q(r)) return DetFactory;
+  if (s*2<MATCOLS(m)*MATROWS(m)) // few entries
+    return DetSBareiss;
   return DetMu;
 }
 DetVariant mp_GetAlgorithmDet(const char *s)
