@@ -4,7 +4,7 @@
  *  Created on: Apr 10, 2016
  *      Author: anders
  */
-
+#include <stddef.h>
 #include "gfanlib_mixedvolume.h"
 
 #include "gfanlib_circuittableint.h"

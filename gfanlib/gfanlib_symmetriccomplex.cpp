@@ -5,6 +5,7 @@
  *      Author: anders
  */
 
+#include <stddef.h>
 #include "gfanlib_symmetriccomplex.h"
 #include "gfanlib_polymakefile.h"
 

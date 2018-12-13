@@ -4,7 +4,7 @@
  *  Created on: Oct 22, 2010
  *      Author: anders
  */
-
+#include <stddef.h>
 #include "gfanlib_symmetry.h"
 #include <map>
 

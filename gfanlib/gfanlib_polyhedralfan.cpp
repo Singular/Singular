@@ -5,6 +5,7 @@
  *      Author: anders
  */
 
+#include <stddef.h>
 #include <sstream>
 #include "gfanlib_polyhedralfan.h"
 #include "gfanlib_polymakefile.h"
