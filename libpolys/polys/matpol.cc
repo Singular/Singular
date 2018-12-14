@@ -2111,11 +2111,10 @@ poly mp_DetMu(matrix A, const ring R)
 
 DetVariant mp_GetAlgorithmDet(matrix m, const ring r)
 {
-  if (MATROWS(m)+2*r->N>20) return DetMu;
-  if (MATROWS(m)<6) return DetSBareiss;
-  if ((MATROWS(m)<15) && rField_is_Q(r)) return DetSBareiss;
+  if (MATROWS(m)+2*r->N>20+5*rField_is_Zp(r)) return DetMu;
+  if (MATROWS(m)<10+5*rField_is_Zp(r)) return DetSBareiss;
   BOOLEAN isConst=TRUE;
-  int s; s=0;
+  int s=0;
   for(int i=MATCOLS(m)*MATROWS(m)-1;i>=0;i--)
   {
     poly p=m->m[i];
