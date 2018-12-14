@@ -131,7 +131,7 @@ KINLINE void sTObject::Set(poly p_in, ring r)
 #ifdef HAVE_SHIFTBBA
     if (r->isLPring)
     {
-      shift = p_mFirstVblock(p_in, r);
+      shift = si_max(p_mFirstVblock(p_in, r) - 1, 0);
       if (!shift) p_Test(p_in, r);
     }
     else
@@ -146,7 +146,7 @@ KINLINE void sTObject::Set(poly p_in, ring r)
 #ifdef HAVE_SHIFTBBA
     if (currRing->isLPring)
     {
-      shift = p_mFirstVblock(p_in, currRing);
+      shift = si_max(p_mFirstVblock(p_in, currRing) - 1, 0);
       if (!shift) p_Test(p_in, currRing);
     }
     else
@@ -173,7 +173,7 @@ KINLINE void sTObject::Set(poly p_in, ring c_r, ring t_r)
 #ifdef HAVE_SHIFTBBA
     if (c_r->isLPring)
     {
-      shift = p_mFirstVblock(p_in, c_r);
+      shift = si_max(p_mFirstVblock(p_in, c_r) - 1, 0);
       if (!shift) p_Test(p_in, currRing);
     }
     else
