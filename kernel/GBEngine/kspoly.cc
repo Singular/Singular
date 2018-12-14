@@ -142,8 +142,7 @@ int ksReducePolyZ(LObject* PR,
   if (tailRing->isLPring)
   {
     assume(PR->shift == 0);
-    assume(PR->shift == si_max(p_mFirstVblock(p1, tailRing) - 1, 0));
-    assume(PW->shift == si_max(p_mFirstVblock(p2, tailRing) - 1, 0));
+    assume(PW->shift == si_max(p_mFirstVblock(PW->p, tailRing) - 1, 0));
     k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
   }
 #endif
@@ -275,8 +274,7 @@ int ksReducePoly(LObject* PR,
   if (tailRing->isLPring)
   {
     assume(PR->shift == 0);
-    assume(PR->shift == si_max(p_mFirstVblock(p1, tailRing) - 1, 0));
-    assume(PW->shift == si_max(p_mFirstVblock(p2, tailRing) - 1, 0));
+    assume(PW->shift == si_max(p_mFirstVblock(PW->p, tailRing) - 1, 0));
     k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
   }
 #endif
@@ -632,8 +630,7 @@ int ksReducePolyBound(LObject* PR,
   if (tailRing->isLPring)
   {
     assume(PR->shift == 0);
-    assume(PR->shift == si_max(p_mFirstVblock(p1, tailRing) - 1, 0));
-    assume(PW->shift == si_max(p_mFirstVblock(p2, tailRing) - 1, 0));
+    assume(PW->shift == si_max(p_mFirstVblock(PW->p, tailRing) - 1, 0));
     k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
   }
 #endif
@@ -847,8 +844,7 @@ int ksReducePolySig(LObject* PR,
   if (tailRing->isLPring)
   {
     assume(PR->shift == 0);
-    assume(PR->shift == si_max(p_mFirstVblock(p1, tailRing) - 1, 0));
-    assume(PW->shift == si_max(p_mFirstVblock(p2, tailRing) - 1, 0));
+    assume(PW->shift == si_max(p_mFirstVblock(PW->p, tailRing) - 1, 0));
     k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
   }
 #endif
@@ -1095,8 +1091,7 @@ int ksReducePolySigRing(LObject* PR,
   if (tailRing->isLPring)
   {
     assume(PR->shift == 0);
-    assume(PR->shift == si_max(p_mFirstVblock(p1, tailRing) - 1, 0));
-    assume(PW->shift == si_max(p_mFirstVblock(p2, tailRing) - 1, 0));
+    assume(PW->shift == si_max(p_mFirstVblock(PW->p, tailRing) - 1, 0));
     k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
   }
 #endif
