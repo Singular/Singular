@@ -4,10 +4,11 @@ category="Noncommutative";
 info="
 LIBRARY: freegb.lib   Two-sided Groebner bases in free algebras and tools via Letterplace approach
 AUTHORS: Viktor Levandovskyy,   viktor.levandovskyy at math.rwth-aachen.de
-         Grischa Studzinski,    grischa.studzinski at math.rwth-aachen.de
-         Karim Abou Zeid,       karim.abou.zeid at rwth-aachen.de
+@*       Karim Abou Zeid,       karim.abou.zeid at rwth-aachen.de
+@*       Grischa Studzinski,    grischa.studzinski at math.rwth-aachen.de
 
 OVERVIEW: For the theory, see chapter 'Letterplace' in the Singular Manual.
+
 This library provides access to kernel functions and also contains legacy code (partially as
  static procedures) for compatibility reasons.
 
@@ -21,7 +22,7 @@ and Project II.6 of the transregional collaborative research centre
 SFB-TRR 195 'Symbolic Tools in Mathematics and their Application' of the German DFG
 
 PROCEDURES:
-makeLetterplaceRing(d);          creates a ring with d blocks of shifted original variables
+makeLetterplaceRing(d);          creates a Letterplace ring out of given data
 setLetterplaceAttributes(R,d,b); supplies ring R with the letterplace structure
 lieBracket(a,b[, N]);            Lie bracket ab-ba of two letterplace polynomials
 letplaceGBasis(I);               two-sided Groebner basis of a letterplace ideal I
@@ -31,8 +32,8 @@ isOrderingShiftInvariant(i);     tests shift-invariance of the monomial ordering
 
 isVar(p);                        check whether p is a power of a single variable
 
-lpLmDivides(ideal I, poly p)     tests if there is a polynomial q in I with LM(q)|LM(p)
-lpVarAt(poly p, int pos)         returns the variable (as a poly) at position pos of the poly p
+lpLmDivides(ideal I, poly p);    tests whether there exists q in I, such that LM(q)|LM(p)
+lpVarAt(poly p, int pos);        returns the variable (as a poly) at position pos of the poly p
 
 SEE ALSO: fpadim_lib, fpaprops_lib, fpalgebras_lib, LETTERPLACE
 ";
