@@ -22,6 +22,7 @@
 #include "simpleideals.h"
 #include "matpol.h"
 #include "prCopy.h"
+#include "clapsing.h"
 
 #include "sparsmat.h"
 
@@ -2028,7 +2029,7 @@ BOOLEAN sm_Equal(ideal a, ideal b, const ring R)
 */
 
 //  mu-Matrix
-static void mu(matrix A, matrix &X, const ring R)
+static matrix mu(matrix A, const ring R)
 {
   int n=MATROWS(A);
   assume(MATCOLS(A)==n);
@@ -2043,7 +2044,7 @@ static void mu(matrix A, matrix &X, const ring R)
     */
 
     // X als n*n Null-Matrix initalisieren
-    X=mpNew(n,n);
+    matrix X=mpNew(n,n);
 
     //  Diagonaleintraege von X berrechnen
     poly sum = NULL;
@@ -2052,15 +2053,17 @@ static void mu(matrix A, matrix &X, const ring R)
         MATELEM0(X,i,i) = p_Copy(sum,R);
         sum=p_Sub(sum,p_Copy(MATELEM0(A,i,i),R),R);
     }
+    p_Delete(&sum,R);
 
     //  Eintraege aus dem oberen Dreieck von A nach X uebertragen
-    for (int i = 0; i < n; i++)
+    for (int i = n-1; i >=0; i--)
     {
         for (int j = i+1; j < n; j++)
         {
             MATELEM0(X,i,j)=p_Copy(MATELEM0(A,i,j),R);
         }
     }
+    return X;
 }
 
 // Funktion muDet
@@ -2079,16 +2082,15 @@ poly mp_DetMu(matrix A, const ring R)
     */
 
     //speichere A ab:
-    matrix B=mp_Copy(A,R);
-    A=mp_Copy(A,R);
+    matrix workA=mp_Copy(A,R);
 
     // berechen X = mu(X)*A
     matrix X;
-    for (int i = 0; i < n-1; i++)
+    for (int i = n-1; i >0; i--)
     {
-        mu(A,X,R);
-        id_Delete((ideal*)&A,R);
-        A=mp_Mult(X,B,R);
+        X=mu(workA,R);
+        id_Delete((ideal*)&workA,R);
+        workA=mp_Mult(X,A,R);
         id_Delete((ideal*)&X,R);
     }
 
@@ -2096,14 +2098,80 @@ poly mp_DetMu(matrix A, const ring R)
     poly res;
     if (n%2 == 0)
     {
-        res=p_Neg(MATELEM0(A,0,0),R);
+        res=p_Neg(MATELEM0(workA,0,0),R);
     }
     else
     {
-        res=MATELEM0(A,0,0);
+        res=MATELEM0(workA,0,0);
     }
-    MATELEM0(A,0,0)=NULL;
-    id_Delete((ideal*)&A,R);
+    MATELEM0(workA,0,0)=NULL;
+    id_Delete((ideal*)&workA,R);
     return res;
 }
 
+DetVariant mp_GetAlgorithmDet(matrix m, const ring r)
+{
+  if (MATROWS(m)+2*r->N>20+5*rField_is_Zp(r)) return DetMu;
+  if (MATROWS(m)<10+5*rField_is_Zp(r)) return DetSBareiss;
+  BOOLEAN isConst=TRUE;
+  int s=0;
+  for(int i=MATCOLS(m)*MATROWS(m)-1;i>=0;i--)
+  {
+    poly p=m->m[i];
+    if (p!=NULL)
+    {
+      if(!p_IsConstant(p,r)) isConst=FALSE;
+      s++;
+    }
+  }
+  if (isConst && rField_is_Q(r)) return DetFactory;
+  if (s*2<MATCOLS(m)*MATROWS(m)) // few entries
+    return DetSBareiss;
+  return DetMu;
+}
+DetVariant mp_GetAlgorithmDet(const char *s)
+{
+  if (strcmp(s,"Bareiss")==0) return DetBareiss;
+  if (strcmp(s,"SBareiss")==0) return DetSBareiss;
+  if (strcmp(s,"Mu")==0) return DetMu;
+  if (strcmp(s,"Factory")==0) return DetFactory;
+  WarnS("unknown method for det");
+  return DetDefault;
+}
+
+
+poly mp_Det(matrix a, const ring r, DetVariant d/*=DetDefault*/)
+{
+  if ((MATCOLS(a)==0)
+  && (MATROWS(a)==0))
+    return p_One(r);
+  if (d==DetDefault) d=mp_GetAlgorithmDet(a,r);
+  switch (d)
+  {
+    case DetBareiss: return mp_DetBareiss(a,r);
+    case DetMu: return mp_DetMu(a,r);
+    case DetFactory: return singclap_det(a,r);
+    case DetSBareiss:
+    {
+      ideal I=id_Matrix2Module(mp_Copy(a, r),r);
+      poly p=sm_CallDet(I, r);
+      id_Delete(&I, r);
+      return p;
+    }
+    default:
+      WerrorS("unknown algorith for det");
+  }
+}
+
+poly sm_Det(ideal a, const ring r, DetVariant d/*=DetDefault*/)
+{
+  if ((MATCOLS(a)==0)
+  && (MATROWS(a)==0))
+    return p_One(r);
+  if (d==DetDefault) d=mp_GetAlgorithmDet((matrix)a,r);
+  if (d==DetSBareiss) return sm_CallDet(a,r);
+  matrix m=id_Module2Matrix(id_Copy(a,r),r);
+  poly p=mp_Det(m,r,d);
+  id_Delete((ideal *)&m,r);
+  return p;
+}

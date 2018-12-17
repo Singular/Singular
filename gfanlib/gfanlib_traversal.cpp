@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include "gfanlib_traversal.h"
 #include "gfanlib_symmetry.h"
 

@@ -1449,16 +1449,18 @@ See
 @item @strong{Syntax:}
 @code{det (} intmat_expression @code{)}
 @*@code{det (} matrix_expression @code{)}
-@*@code{det (} module_expression @code{)}
+@*@code{det (} smatrix_expression @code{)}
+@*@code{det (} matrix_expression @code{,} string_expression @code{)}
+@*@code{det (} smatrix_expression @code{,} string_expression @code{)}
 @item @strong{Type:}
 int, resp.@: poly
 @item @strong{Purpose:}
-returns the determinant of a square matrix. A module is considered
-as a matrix. The applied algorithms depend on type of input.
-If the input is a module or matrix with symbolic entries the
-Bareiss algorithm is used. In the other cases the chinese remainder
-algorithm is used. For large sparse problems the input as a module
-has advantages.
+returns the determinant of a square matrix.
+The applied algorithms depend on type of input or the optional second argument.@*
+The optional second argument  specifies the algorith to use.
+Possible values are @code{"Bareiss"}, @code{"SBareiss"}, @code{"Mu"} and
+@code{"Factory"}.
+
 @item @strong{Example:}
 @smallexample
 @c example

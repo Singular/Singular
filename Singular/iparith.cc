@@ -1873,6 +1873,20 @@ static BOOLEAN jjDelete_ID(leftv res, leftv u, leftv v)
   res->data=(void*)id_Delete_Pos(I,pos-1,currRing);
   return res->data==NULL;
 }
+static BOOLEAN jjDET2(leftv res, leftv u, leftv v)
+{
+  matrix m=(matrix)u->Data();
+  DetVariant d=mp_GetAlgorithmDet((char*)v->Data());
+  res ->data = mp_Det(m,currRing,d);
+  return FALSE;
+}
+static BOOLEAN jjDET2_S(leftv res, leftv u, leftv v)
+{
+  DetVariant d=mp_GetAlgorithmDet((char*)v->Data());
+  ideal m=(ideal)u->Data();
+  res ->data = sm_Det(m,currRing,d);
+  return FALSE;
+}
 static BOOLEAN jjDIFF_P(leftv res, leftv u, leftv v)
 {
   int i=pVar((poly)v->Data());
@@ -3866,16 +3880,7 @@ static BOOLEAN jjNUMERATOR(leftv res, leftv v)
 static BOOLEAN jjDET(leftv res, leftv v)
 {
   matrix m=(matrix)v->Data();
-  poly p;
-  if (sm_CheckDet((ideal)m,m->cols(),TRUE, currRing))
-  {
-    ideal I=id_Matrix2Module(mp_Copy(m, currRing),currRing);
-    p=sm_CallDet(I, currRing);
-    idDelete(&I);
-  }
-  else
-    p=singclap_det(m,currRing);
-  res ->data = (char *)p;
+  res ->data = mp_Det(m,currRing);
   return FALSE;
 }
 static BOOLEAN jjDET_BI(leftv res, leftv v)
@@ -3931,17 +3936,7 @@ static BOOLEAN jjDET_I(leftv res, leftv v)
 static BOOLEAN jjDET_S(leftv res, leftv v)
 {
   ideal I=(ideal)v->Data();
-  poly p;
-  if (IDELEMS(I)<1) return TRUE;
-  if (!sm_CheckDet(I,IDELEMS(I),FALSE, currRing))
-  {
-    matrix m=id_Module2Matrix(id_Copy(I,currRing),currRing);
-    p=singclap_det(m,currRing);
-    idDelete((ideal *)&m);
-  }
-  else
-    p=sm_CallDet(I, currRing);
-  res->data = (char *)p;
+  res->data=(char*)sm_Det(I,currRing);
   return FALSE;
 }
 static BOOLEAN jjDIM(leftv res, leftv v)

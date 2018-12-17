@@ -31,5 +31,4 @@ ideal sm_CallSolv(ideal I, const ring);
 ring sm_RingChange(const ring, long);
 void sm_KillModifiedRing(ring r);
 long sm_ExpBound(ideal, int, int, int, const ring);
-BOOLEAN sm_CheckDet(ideal, int, BOOLEAN, const ring);
 #endif

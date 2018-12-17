@@ -4,7 +4,7 @@
  *  Created on: Sep 29, 2010
  *      Author: anders
  */
-
+#include <stddef.h>
 #include "gfanlib_zcone.h"
 
 #include <vector>

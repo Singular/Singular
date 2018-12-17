@@ -294,43 +294,6 @@ void sm_KillModifiedRing(ring r)
   rKillModifiedRing(r);
 }
 
-/*2
-* Bareiss or Chinese remainder ?
-* I is dXd
-* sw = TRUE  -> I Matrix
-*      FALSE -> I Module
-* return True  -> change Type
-*        FALSE -> same Type
-*/
-BOOLEAN sm_CheckDet(ideal I, int d, BOOLEAN sw, const ring r)
-{
-  int s,t,i;
-  poly p;
-
-  if (d>100)
-    return TRUE;
-  if (!rField_is_Q(r))
-    return TRUE;
-  s = t = 0;
-  // now: field is Q, n<=100
-  for(i=IDELEMS(I)-1;i>=0;i--)
-  {
-    p=I->m[i];
-    if (p!=NULL)
-    {
-      if(!p_IsConstant(p,r))
-        return TRUE;
-      s++;
-      t+=n_Size(pGetCoeff(p),r->cf);
-    }
-  }
-  s*=15;
-  if (t>s)
-    return FALSE;// few large constanst entries
-  else
-    return TRUE; //many small entries
-}
-
 /* ----------------- basics (used from 'C') ------------------ */
 /*2
 *returns the determinant of the module I;

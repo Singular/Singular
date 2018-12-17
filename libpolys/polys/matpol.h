@@ -31,6 +31,15 @@ class ip_smatrix
   #define MATELEM0(mat,i,j) ((mat)->m)[MATCOLS((mat)) * (i) + (j)]
 };
 
+enum DetVariant
+{
+  DetDefault=0,
+  DetBareiss,
+  DetSBareiss,
+  DetMu,
+  DetFactory
+};
+
 typedef ip_smatrix *       matrix;
 
 matrix mpNew(int r, int c);
@@ -58,6 +67,7 @@ matrix mp_Wedge(matrix a, int ar, const ring r);
 // BOOLEAN mpJacobi(leftv res,leftv a);
 // BOOLEAN mpKoszul(leftv res,leftv b/*in*/, leftv c/*ip*/, leftv id=NULL);
 
+poly mp_Det(matrix a, const ring r, DetVariant d=DetDefault);
 poly mp_DetBareiss (matrix a, const ring r);
 poly mp_DetMu(matrix A, const ring R);
 
@@ -105,6 +115,9 @@ poly sm_Trace ( ideal a, const ring R);
 int sm_Compare(ideal a, ideal b, const ring R);
 BOOLEAN sm_Equal(ideal a, ideal b, const ring R);
 ideal sm_Tensor(ideal A, ideal B, const ring r);
+poly sm_Det(ideal I, const ring, DetVariant d=DetDefault);
+DetVariant mp_GetAlgorithmDet(matrix m, const ring r);
+DetVariant mp_GetAlgorithmDet(const char *s);
 
 #define SMATELEM(A,i,j,R) p_Vec2Poly(A->m[j],i+1,R)
 
