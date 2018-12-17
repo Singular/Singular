@@ -1,0 +1,448 @@
+////////////////////////////////////////////////////////////////
+version="version nchilbert.lib 1.0.0.0 Feb_2014";
+category="Noncommutative";
+info="
+LIBRARY: nchilbert.lib   Hilbert series, polynomial and multiplicity for G-Algebras (Plural)
+
+AUTHORS: Andre Ranft,     andre.ranft at rwth-aachen.de
+@*       Viktor Levandovskyy, levandov at rwth-aachen.de
+
+OVERVIEW:  The theory is found in the book by Bueso, Gomez-Torrecillas, and Verschoren
+ Algorithmic Methods in Non-Commutative Algebra. Applications to Quantum Groups.
+and in the bachelor thesis by
+Andre Ranft, Hilbert polynomials of modules over noncommutative G-algebras, RWTH Aachen, 2014.
+
+PROCEDURES:
+ncHilb(M,j);    computes first resp. second Hilbert series of a module as intvec
+ncHilbertSeries(M,j); computes first resp. second Hilbert series of a module as a poly
+ncHilbertPolynomial(M,j); computes the Hilbert polynomial of coker(M)
+ncHilbertMultiplicity(M); computes the (Hilbert) multiplicity of coker(M)
+GKExp(M); computes the Gelfand-Kirillov dimension of coker(M)
+mondim(B,i); computes the dimension of the monoid ideal B
+
+KEYWORDS: G-algebra; Hilbert function; Hilbert series; Hilbert polynomial; multiplicity
+
+SEE ALSO: hilb, rinvar_lib, multigrading_lib
+";
+
+////////////////////////////////////////////////////////////////////
+LIB "ncalg.lib";
+LIB "gkdim.lib";
+
+proc ncHilb(module I, int j)
+"USAGE:     ncHilb(M,j); M a module, j an int
+RETURN:     intvec
+ASSUME:
+- M is given via a Groebner basis; j is 1 or 2;
+- the weights of all the ring variables are positive
+NOTE:
+- computes the first (if j=1) or second (j=2) Hilbert series of I as intvec
+- the procedure works analogously to the commutative procedure @code{hilb}
+- If the returned vector has the form @code{v=(v_0,v_1,...,v_d,0)}, then
+the Hilbert series is @code{v_0 + v_1*t + ... + v_d*t^d}
+SEE ALSO:   hilb
+KEYWORDS:   Hilbert function; Hilbert series; G-algebra
+EXAMPLE:    example ncHilb;
+"
+{
+    // check: I is a GB?
+    // do not prune the presentation! let a user decide
+    if ( attrib(I,"isSB") != 1)
+    {
+      "Warning: the input generators are not a Groebner basis";
+      "The result might have no meaning";
+      attrib(I,"isSB", 1);
+    }
+    // check: j in 1,2
+    if ( ! ( (j == 1) || (j==2) ))
+    {
+    ERROR("The integer must either be 1 or 2");
+    }
+    def R = basering;
+    int nv = nvars(R);
+    int k;
+    // check: weights are strictly positive
+    intvec weights;
+    for(k=1; k<= nv; k++)
+    {
+     weights[k] = deg(var(k));
+     if ((weights[k]) <=0)
+     {
+     ERROR("The weights of variables must be nonnegative!");
+     }
+    }
+    def Rhelp= ringlist(R);
+    ideal LI = lead(I);
+    list L = Rhelp[1],Rhelp[2],Rhelp[3],Rhelp[4];
+    // Question: in case of GR-algebra, do we need to replace the factor ideal
+    // by its gr-part? Answer: no
+    def KomR = ring(L);
+    setring KomR;
+    def J = std(imap(R,LI));
+    intvec hl = hilb(J,j,weights);
+    setring R;
+    // cleanup:
+    kill KomR; kill Rhelp;
+    return ( hl );
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+    def A = makeUsl2(); setring A;
+    ideal I = e,h-1; I = std(I);
+    ncHilb(I,1); // first Hilbert series of A/I
+    ncHilb(I,2); // second Hilbert series of A/I
+    ideal J = I, f^2; J = std(J);
+    ncHilb(J,2);
+        // now with weights 1,2,3
+    ring r = 0,(e,f,h),wp(1,2,3);
+    matrix D[3][3]; D[1,2]=-h; D[1,3]=2*e;D[2,3]=-2*f;
+    def R = nc_algebra(1,D); setring R;
+    ideal I = imap(A,I); I = std(I);
+    ncHilb(I,1); // first weighted Hilbert series of R/I
+    ncHilb(I,2); // second weighted Hilbert series of R/I
+    matrix M[2][5] =
+    e,h-1,f^2, 0,0,
+    0,0,0, e,h+1;
+    module G = std(M);
+    print(G);
+    ncHilb(G,1); // first weighted Hilbert series of R^2/G
+    ncHilb(G,2); // second weighted Hilbert series of R^2/G
+}
+
+proc ncHilbertSeries(module I, int j)
+"USAGE:     ncHilbertSeries(M,j); M  is a module, j is an int
+RETURN:     ring
+PURPOSE:    computes the first (if j=1) and second (j=2) Hilbert Series of A^m/M
+ASSUME:
+- M is given via a Groebner basis; j is 1 or 2;
+- the weights of all the ring variables are positive
+NOTE:
+- the procedure returns an univariate ring and a polynomial called @code{ncHS} in it.
+EXAMPLE:    example ncHilbertSeries;
+"
+{
+// note, that ALL assumes are checked by the procedure ncHilb
+    intvec ser=ncHilb(I,j);
+    ring R=0,(t),dp;
+    setring R;
+    int i;
+    int n=size(ser);
+    poly p=0;
+    for ( i=1; i <= n-1; i=i+1){
+        p=p+ser[i]*t^(i-1);
+    }
+    poly ncHS = p;
+    export ncHS;
+    return(R);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+    def A = makeUsl2(); setring A;
+    ideal I = e,h-1; I = std(I);
+    def r = ncHilbertSeries(I,1); setring r;
+    ncHS;
+    setring A; kill r;
+    def s= ncHilbertSeries(I,2); setring s;
+    ncHS;
+    // now consider admissible weights 1,2,3
+    ring r = 0,(e,f,h),wp(1,2,3);
+    matrix D[3][3]; D[1,2]=-h; D[1,3]=2*e;D[2,3]=-2*f;
+    def R = nc_algebra(1,D); setring R;
+    matrix M[2][5] =
+    e,h-1,f^2, 0,0,
+    0,0,0, e,h+1;
+    module G = std(M);
+    print(G);
+    def r= ncHilbertSeries(G,1);  setring r;
+    ncHS; // first weighted Hilbert series of R^2/G
+    setring R; kill r;
+    def s=ncHilbertSeries(G,2); setring s;
+    ncHS;// second weighted Hilbert series of R^2/G
+}
+
+proc ncHilbertMultiplicity(module I)
+"USAGE:     ncHilbertMultiplicity(M); M is a module
+RETURN:     int
+PURPOSE:    compute the (Hilbert) multiplicity of the module coker(M)
+ASSUME:
+- M is given via a Groebner basis
+- the weights of all the ring variables are positive
+NOTE: the multiplicity depends on the selected weights of variables
+EXAMPLE:  example ncHilbertMultiplicity;
+"
+{
+// note, that ALL assumes are checked by the procedure ncHilb
+    int k,l;
+    intvec ser = ncHilb(I,2);
+    for (k=1; k<=size(ser)-1; k++)
+    {
+        l=l+ser[k];
+    }
+    return (l);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+    def A = makeUsl2(); setring A;
+    ideal I = e,h-1; I = std(I);
+    ncHilbertMultiplicity(I); // multiplicity of A/I
+    ideal J = I, f^2; J = std(J);
+    ncHilbertMultiplicity(J);
+    // now the same algebra with weights 1,2,3
+    ring r = 0,(e,f,h),wp(1,2,3);
+    matrix D[3][3]; D[1,2]=-h; D[1,3]=2*e;D[2,3]=-2*f;
+    def R = nc_algebra(1,D); setring R;
+    ideal I = imap(A,I); I = std(I);
+    ncHilbertMultiplicity(I);
+    matrix M[2][5] =
+    e,h-1,f^2, 0,0,
+    0,0,0, e,h+1;
+    module G = std(M);
+    print(G);
+    ncHilbertMultiplicity(G);
+}
+//copied from poly.lib
+static proc bino(int a, int b)
+{
+//computes binomial var(1)+a over b
+   int i;
+   if(b==0){return(1);}
+   poly p=(var(1)+a)/b;
+   for(i=1;i<=b-1;i++)
+   {
+      p=p*(var(1)+a-i)/i;
+   }
+   return(p);
+}
+
+proc ncHilbertPolynomial(module I)
+"USAGE:     ncHilbertPolynomial(M); M is a module
+RETURN:     ring
+PURPOSE:    computes the Hilbert polynomial of A^m/M
+ASSUME:
+- M is given via a Groebner basis
+- the weights of all the ring variables are positive
+NOTE:
+- the procedure returns an univariate ring and a polynomial called @code{ncHP} in it.
+SEE ALSO: hilbPoly in poly.lib
+EXAMPLE:  example ncHilbertPolynomial;
+"
+{
+    //code is similar to hilbpoly in poly.lib
+    // note, that ALL assumes are checked by the procedure ncHilb
+    def R=basering;
+    int i;
+    if(!attrib(I,"isSB")){I=std(I);}
+    intvec G=ncHilb(I,2);//2nd Hilbert series
+    int s=dim(I); //GKdim
+    int d=size(G)-1;    //deg of the second Hilbert series
+    ring @@t=0,(t),dp; setring @@t;
+    poly p=0;
+    if (s==0){
+        poly ncHP=p;
+        export ncHP;
+        return (@@t);
+    }
+    for ( i=1; i <= d; i=i+1){
+        p=p+G[i]*bino(s-i,s-1);
+    }
+    poly ncHP=p;
+    export ncHP;
+    return (@@t);
+}
+example
+{
+    "EXAMPLE:"; echo = 2;
+    def A = makeUsl2(); setring A;
+    ideal I = h^4,e*f*h^3,e^2*f^2*h^2+2*e*f*h^2; I = std(I);
+    dim(I); // 2
+    def r = ncHilbertPolynomial(I); setring r;
+    ncHP; // 2t+7
+    kill r;
+    // now consider admissible weights 1,2,3
+    ring r = 0,(e,f,h),wp(1,2,3);
+    matrix D[3][3]; D[1,2]=-h; D[1,3]=2*e;D[2,3]=-2*f;
+    def R = nc_algebra(1,D); setring R;
+    ideal I = imap(A,I);
+    I = std(I);
+    dim(I); // 2
+    def r = ncHilbertPolynomial(I); setring r;
+    ncHP; // 6t+18
+}
+
+/* descr of former gkdimexp_lib:
+ This library includes the procedure GKExp() which computes the Gelfand Kirillov dimension
+ of a finitely presented Module A^m/M, where A is a G-Algebra
+by computing the dimension of the exponent of M via mondim().
+*/
+
+////////////////////////////////////////////////////////////////////
+proc mondim(list B, int i)
+"USAGE: mondim(B,i); B is list of elements of N_0^i,
+RETURN:   int
+PURPOSE:  computes the dimension of the monoid ideal generated by B
+KEYWORDS: monoideal, dimension
+EXAMPLE:  example mondim;
+"
+{
+// check assumes/correctness of the input
+    int l,lhelp;
+    int maxlength=0;
+    if (i<0)
+    {
+        ERROR("the rank of monoid module should be >=0");
+    }
+    if (size(B) == 0)
+    {
+      return (i);
+    }
+    for (l=1;l<=size(B); l=l+1){
+        lhelp=size(B[l]);
+        if (lhelp > maxlength){
+            maxlength=lhelp;
+        }
+    }
+    if (maxlength > i) {
+        ERROR("The elements of B should have less entries then i");
+    }
+    // TODO: elaborate assume for the generators: imagine
+    // smth like non-reduced monomial GB is given
+    int d,dj,j,k,z;
+    list Bj;
+    list Bhelp;
+    int n = nvars(basering);
+    for(j = 1; j <= maxlength; j=j+1)
+    {
+
+        if(B[1][j] <> 0)
+        {
+            d=0;
+            Bj = list();
+            for(k=2; k <= size(B); k++)
+            {
+                Bhelp=list();
+                if(B[k][j] == 0)
+                {
+
+                    for (l=1;l<=size(B[k]);l=l+1){
+                        Bhelp=insert(Bhelp,B[k][l],l-1);
+                    }
+                    Bhelp=delete(Bhelp,j);
+                    Bj = insert(Bj,Bhelp);
+                }
+            }
+            dj = mondim(Bj,i-1);
+            if(dj > d)
+            {
+                d=dj;
+            }
+        }
+    }
+return (d);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring A = 0,(x,y,z),dp;
+  setring A;
+  list I = [1,0,1],[0,1,1]; // belongs to the ideal <xz,yz>
+  mondim(I,3);
+  mondim(I,5); // treat generators of I as extended in N_0^5
+}
+
+proc GKExp(module M)
+"USAGE: GKExp(M); M a module
+RETURN: int
+PURPOSE: computes the Gelfand-Kirillov-Dimension of coker(M) via Exp(M)
+ASSUME: basering is G-Algebra
+NOTE:  for zero module -1 is returned
+SEE ALSO:   GKdim, dim(Plural)
+KEYWORDS: Gelfand-Kirillov dimension, G-Algebra
+EXAMPLE: example GKExp;
+"
+{
+    module G;
+    int d=0;
+    if (attrib(M,"isSB")==1)
+    {
+        G = M;
+        attrib(G,"isSB",1);
+    }
+    else
+    {
+        "Warning: the input generators are not a Groebner basis";
+        "Proceed with Groebner basis computation";
+        G = std(M);
+    }
+    intvec temp;
+    int j;
+    list E;
+    int m = nrows(G);
+    int n = nvars(basering);
+    int dtemp = 0;
+    int empty;
+    list L;
+    int i,k;
+    for(j = 1; j <= size(G); j = j+1)
+    {
+        L[j] = leadexp(G[j]);
+    }
+    for(i = 1; i <= m; i = i+1)
+    {
+        E = list();
+        for(k=1; k<=size(L); k=k+1)
+        {
+            if((L[k])[n+1]==i)
+            {
+                temp = L[k];
+                temp = temp[1..n];
+                E = insert(E,temp);
+            }
+        }
+        if(size(E) == 0)
+        {
+            return (n);
+        }
+        else
+        {
+            for(j = 1; j <= size(E); j=j+1)
+            {
+                if (E[j]==0)
+                {
+                    empty = 1;
+                    break;
+                }
+            }
+            if(empty)
+            {
+                dtemp = 0;
+            }
+            else
+            {
+                dtemp = mondim(E,n);
+            }
+        }
+        if(dtemp > d)
+        {
+            d = dtemp;
+        }
+    }
+    return (d);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+ def A = makeUsl2(); setring A;
+ ideal I = e,h-1; I = std(I);
+ GKExp(I); // computes GKdim(A/I), should be 1
+ ideal J = I, f^2; J = std(J);
+ GKExp(J); // should be 0
+ matrix M[2][4] =
+ e,h-1,0,0,
+ 0,0,e,h+1;
+ module G = std(M);
+ print(G);
+ GKExp(G);
+}
