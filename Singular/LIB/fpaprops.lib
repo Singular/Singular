@@ -1070,7 +1070,7 @@ example
 
 static proc imHasLoops(intmat A) {
   int n = ncols(A);
-  for (int i = 1; i < n; i++) {
+  for (int i = 1; i <= n; i++) {
     if (A[i,i] == 1) {
       return (1);
     }
