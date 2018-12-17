@@ -11,12 +11,7 @@
 
 #include "misc/intvec.h"
 #include "misc/options.h"
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
-
 
 #pragma GCC push_options
 #pragma GCC optimize ("wrapv")

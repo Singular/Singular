@@ -8,6 +8,8 @@
 #include "omalloc.h"
 #include "omDefaultConfig.h"
 
+#ifdef HAVE_OMALLOC
+
 omOpts_t om_Opts =
 {
   OM_DEFAULT_MIN_TRACK,
@@ -22,3 +24,4 @@ omOpts_t om_Opts =
   OM_DEFAULT_MEMORY_LOW_FUNC,
   OM_DEFAULT_ERROR_HOOK
 };
+#endif

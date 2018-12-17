@@ -15,19 +15,10 @@
 
 #include "kernel/mod2.h"
 #include "misc/sirandom.h"
-
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
-
 #include "misc/mylimits.h"
-
 #include "reporter/si_signals.h"
-
 #include "factory/factory.h"
-
 #include "coeffs/si_gmp.h"
 #include "coeffs/coeffs.h"
 #include "coeffs/OPAE.h"
@@ -36,7 +27,6 @@
 #include "coeffs/flintcf_Q.h"
 #include "coeffs/flintcf_Zn.h"
 #include "coeffs/rmodulon.h"
-
 #include "polys/ext_fields/algext.h"
 #include "polys/ext_fields/transext.h"
 #include "polys/nc/gb_hack.h"

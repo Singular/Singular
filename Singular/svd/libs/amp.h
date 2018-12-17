@@ -1,12 +1,6 @@
 #ifndef _AMP_R_H
 #define _AMP_R_H
 
-#ifdef HAVE_OMALLOC
-#include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
-
 #include <gmp.h>
 #include <mpfr.h>
 #include <stdexcept>

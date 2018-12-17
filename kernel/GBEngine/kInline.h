@@ -17,14 +17,8 @@
  * (remark: NO_KINLINE is defined by KDEBUG, i.e. in the debug version)
  */
 
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
-
 #include "misc/options.h"
-
 #include "polys/monomials/p_polys.h"
 #include "polys/kbuckets.h"
 

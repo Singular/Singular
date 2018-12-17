@@ -105,8 +105,6 @@ AC_DEFUN([SING_CHECK_OMALLOC],
     AC_MSG_CHECKING([  OMALLOC_LIBS?..])
     AC_MSG_RESULT(${OMALLOC_LIBS:-unset})
   fi
-
-  AM_CONDITIONAL([ENABLE_OMALLOC],[test "x$ENABLE_OMALLOC" = xyes])
 ])
 
 AC_DEFUN([SING_USE_OMALLOC],
@@ -147,14 +145,12 @@ AC_DEFUN([SING_USE_OMALLOC],
   AC_SUBST(PKG_REQUIRE)
  else
   OMALLOC_INCLUDES="-I$ac_abs_top_srcdir"
-  OMALLOC_LIBS="$ac_abs_top_builddir/xalloc/libomalloc.la"
+  OMALLOC_LIBS="$ac_abs_top_builddir/omalloc/libomalloc.la"
   AC_SUBST(OMALLOC_INCLUDES)
   AC_SUBST(OMALLOC_LIBS)
   AC_MSG_RESULT(no)
  fi
 
-
- AM_CONDITIONAL([ENABLE_OMALLOC],[test "x$ENABLE_OMALLOC" = xyes])
 ])
 
 AC_DEFUN([SING_USE_RESOURCES],

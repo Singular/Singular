@@ -215,7 +215,6 @@ AC_CONFIG_FILES([dox/Makefile])
 
 AC_CONFIG_SUBDIRS([resources])
 AC_CONFIG_SUBDIRS([omalloc])
-AC_CONFIG_SUBDIRS([xalloc])
 
 if test "x$ENABLE_FACTORY" = xyes; then
  AC_CONFIG_SUBDIRS([factory])

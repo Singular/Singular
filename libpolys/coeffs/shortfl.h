@@ -7,11 +7,7 @@
 * ABSTRACT
 */
 #include "misc/auxiliary.h"
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
 
 #if SIZEOF_DOUBLE == SIZEOF_LONG
 #define SI_FLOAT double

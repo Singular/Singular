@@ -19,12 +19,7 @@
 #endif
 #endif
 
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
-
 #include "kernel/spectrum/GMPrat.h"
 
 // ----------------------------------------------------------------------------

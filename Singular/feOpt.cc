@@ -135,12 +135,7 @@ feOptIndex feGetOptIndex(int optc)
 //         "error-string" on error
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
 
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
-
 #include "resources/feResource.h"
 #include "kernel/oswrapper/feread.h"
 #include "kernel/oswrapper/timer.h"

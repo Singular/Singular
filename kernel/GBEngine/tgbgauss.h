@@ -8,11 +8,9 @@
 */
 #include "coeffs/numbers.h"
 #include "polys/monomials/p_polys.h"
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
+#ifdef HAVE_OMALLOC
 #include "omalloc/omallocClass.h"
-#else
-#include "xalloc/omalloc.h"
 #endif
 
 class slimgb_alg;

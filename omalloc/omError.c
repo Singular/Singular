@@ -8,6 +8,8 @@
 #include <stdarg.h>
 #include "omalloc.h"
 
+#ifdef HAVE_OMALLOC
+
 omError_t om_ErrorStatus = omError_NoError;
 omError_t om_InternalErrorStatus = omError_NoError;
 
@@ -134,3 +136,4 @@ omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,
 /* this is a dummy function and used as default for om_Opts.ErrorHook */
 extern void omErrorBreak()
 {}
+#endif

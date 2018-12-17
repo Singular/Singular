@@ -6,9 +6,12 @@
  *******************************************************************/
 #include <unistd.h>
 #include "omConfig.h"
+
+#ifdef HAVE_OMALLOC
 #include "omDefaultConfig.h"
 #include "omMalloc.h"
 #include "omalloc.h"
+
 
 omInfo_t om_Info = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -143,3 +146,9 @@ void omPrintInfo(FILE* fd)
   fprintf(fd, "BytesValloc:     %8ldk  %8ldk\n", om_Info.UsedBytesFromValloc/1024, om_Info.AvailBytesFromValloc/1024);
   fprintf(fd, "Pages:           %8ld   %8ld\n", om_Info.UsedPages, om_Info.AvailPages);
 }
+#else
+#include "omalloc/xalloc.h"
+int om_sing_opt_show_mem; /* dummy */
+struct omInfo_s om_Info; /* dummy */
+struct omOpts_s om_Opts; /* dummy */
+#endif

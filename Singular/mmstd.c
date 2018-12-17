@@ -10,12 +10,7 @@
 
 
 #include "kernel/mod2.h"
-
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
 
 /* we provide these functions, so that the settings of OM_CHECK
 * and OM_TRACK are used, but only provide them if omalloc is not based

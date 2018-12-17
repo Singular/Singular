@@ -6,6 +6,8 @@
  *******************************************************************/
 #include "omConfig.h"
 
+#ifdef HAVE_OMALLOC
+
 #ifndef NULL
 #define NULL ((void*) 0)
 #endif
@@ -256,4 +258,5 @@ omError_t _omCheckSortedList(void* list, int next, int long_field, int level, om
   }
   return omError_NoError;
 }
+#endif
 #endif

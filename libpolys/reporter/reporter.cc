@@ -12,11 +12,7 @@
 #include "resources/feResource.h"
 #include "resources/feFopen.h"
 //#include "options.h"
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
 
 #include <stdlib.h>
 #include <stdio.h>
