@@ -1000,11 +1000,15 @@ NOTE: if I = LM(I), then the global dimension is equal the Gelfand
 
   // delete variables in LM(G1) from the ring
   def save = basering;
-  ring R = basering;
+  def R = basering;
   if (size(G1) > 0) {
     while (size(G1) > 0) {
       if (lpBlockSize(R) > 1) {
-        ring R = lpDelVar(lp2iv(G1[1])[1]); // TODO replace with proper method
+        def @R = R - string(G1[1]);
+        R = @R;
+        kill @R;
+        setring R;
+        /* ring R = lpDelVar(lp2iv(G1[1])[1]); // TODO replace with proper method */
         ideal G1 = imap(save,G1);
         G1 = simplify(G1, 2); // remove zero generators
       } else {
@@ -1078,7 +1082,7 @@ static proc lpGraphOfNChains(ideal G) // G must be reduced
 {
   list LG = lpId2ivLi(lead(G));
   int n = lpBlockSize(basering);
-  int degbound = attrib(basering, "uptodeg");
+  int degbound = lpDegBound(basering);
 
   list V;
   for (int i = 0; i <= n; i++) {
@@ -1375,53 +1379,54 @@ checks, if a word IF is an infix of another word I
   return(0);
 }
 
-// TODO: use original ring attrib to create a new letterplace ring
-// removes a variable from a letterplace ring (a bit of a hack)
-static proc lpDelVar(int index) {
-  int lV = lpBlockSize(basering); // number of variables in the main block
-  int d = attrib(basering, "uptodeg"); // degree bround
-  list LR = ringlist(basering);
+// no longer working with new interface and new orderings
+/* // TODO: use original ring attrib to create a new letterplace ring */
+/* // removes a variable from a letterplace ring (a bit of a hack) */
+/* static proc lpDelVar(int index) { */
+/*   int lV = lpBlockSize(basering); // number of variables in the main block */
+/*   int d = lpDegBound(basering); // degree bround */
+/*   list LR = ringlist(basering); */
 
-  if (!(index >= 1 && index <= lV)) { return (basering); } // invalid index
+/*   if (!(index >= 1 && index <= lV)) { return (basering); } // invalid index */
 
-  // remove frome the variable list
-  for (int i = (d-1)*lV + index; i >= 1; i = i - lV) {
-    LR[2] = delete(LR[2], i);
-  } kill i;
+/*   // remove frome the variable list */
+/*   for (int i = (d-1)*lV + index; i >= 1; i = i - lV) { */
+/*     LR[2] = delete(LR[2], i); */
+/*   } kill i; */
 
-  // remove from a ordering
-  intvec aiv = LR[3][1][2];
-  aiv = aiv[1..(d*lV-d)];
-  LR[3][1][2] = aiv;
+/*   // remove from a ordering */
+/*   intvec aiv = LR[3][1][2]; */
+/*   aiv = aiv[1..(d*lV-d)]; */
+/*   LR[3][1][2] = aiv; */
 
-  // remove block orderings
-  int del = (lV - index);
-  int cnt = -1;
-  for (int i = size(LR[3]); i >= 2; i--) {
-    if (LR[3][i][2] != 0) {
-      for (int j = size(LR[3][i][2]); j >= 1; j--) {
-        cnt++; // next 1
-        if (cnt%lV == del) {
-          // delete
-          if (size(LR[3][i][2]) > 1) { // if we have more than one element left, delete one
-            LR[3][i][2] = delete(LR[3][i][2],j);
-          } else { // otherwise delete the whole block
-            LR[3] = delete(LR[3], i);
-            break;
-          }
-        }
-      } kill j;
-    }
-  } kill i;
+/*   // remove block orderings */
+/*   int del = (lV - index); */
+/*   int cnt = -1; */
+/*   for (int i = size(LR[3]); i >= 2; i--) { */
+/*     if (LR[3][i][2] != 0) { */
+/*       for (int j = size(LR[3][i][2]); j >= 1; j--) { */
+/*         cnt++; // next 1 */
+/*         if (cnt%lV == del) { */
+/*           // delete */
+/*           if (size(LR[3][i][2]) > 1) { // if we have more than one element left, delete one */
+/*             LR[3][i][2] = delete(LR[3][i][2],j); */
+/*           } else { // otherwise delete the whole block */
+/*             LR[3] = delete(LR[3], i); */
+/*             break; */
+/*           } */
+/*         } */
+/*       } kill j; */
+/*     } */
+/*   } kill i; */
 
-  def R = setLetterplaceAttributes(ring(LR),d,lV-1);
-  return (R);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y,z),dp;
-  def A = makeLetterplaceRing(3);
-  setring A; A;
-  def R = lpDelVar(2); setring R; R;
-}
+/*   def R = setLetterplaceAttributes(ring(LR),d,lV-1); */
+/*   return (R); */
+/* } */
+/* example */
+/* { */
+/*   "EXAMPLE:"; echo = 2; */
+/*   ring r = 0,(x,y,z),dp; */
+/*   def A = makeLetterplaceRing(3); */
+/*   setring A; A; */
+/*   def R = lpDelVar(2); setring R; R; */
+/* } */

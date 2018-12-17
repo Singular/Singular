@@ -3240,7 +3240,6 @@ ASSUME: - basering is a Letterplace ring.
 {
   int shiftInvariant = 1;
 
-  int n = lpDegBound(basering);
   int d = lpDegBound(basering);
 
   ideal monomials;
