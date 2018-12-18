@@ -94,6 +94,20 @@ AC_ARG_WITH(
 AC_ARG_ENABLE(
   debug,
   [ --enable-debug    include backtrace stuff])
+
+AC_ARG_ENABLE(omalloc,
+   [AS_HELP_STRING([--disable-omalloc], [do NOT use omalloc but xalloc])],
+   [if test "x$enableval"  = "xyes"; then
+     ENABLE_OMALLOC=yes
+     AH_TEMPLATE([HAVE_OMALLOC], [define if build with OMALLOC])
+     AC_DEFINE([HAVE_OMALLOC],[1])
+   else
+     ENABLE_OMALLOC=no
+   fi],
+   [ENABLE_OMALLOC=yes
+     AH_TEMPLATE([HAVE_OMALLOC], [define if build with OMALLOC])
+     AC_DEFINE([HAVE_OMALLOC],[1])
+   ])
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl compiler/make  config
 dnl

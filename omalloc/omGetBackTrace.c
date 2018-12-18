@@ -4,6 +4,9 @@
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
  *******************************************************************/
+#include "omalloc/omConfig.h"
+
+#ifdef HAVE_OMALLOC
 #ifndef OM_NDEBUG
 
 #if __GNUC__ > 1
@@ -78,3 +81,4 @@ int omGetBackTrace(void** bt, int start, int max)
 #endif /* __GNUC__ > 1 */
 
 #endif /* ! OM_NDEBUG */
+#endif

@@ -1,13 +1,8 @@
 #include "kernel/mod2.h"
 
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
 
 #include "factory/factory.h" // :(
-
 
 #include "misc/intvec.h"
 #include "misc/int64vec.h"

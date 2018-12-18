@@ -39,6 +39,7 @@ Changed libraries:
 
 Changes in the kernel/build system:
 @itemize
+@item integrated xalloc into omalloc: (@code{./configure --disable-omalloc})
 @item improved heuristic for @code{det} (@nref{det})
 @item improved reading of long polynomials
 @item improved groebner bases over Z coefficients

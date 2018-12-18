@@ -10,11 +10,7 @@
 #include <gmp.h>
 
 #include "misc/auxiliary.h"
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
 
 #include "reporter/s_buff.h"
 #include "reporter/si_signals.h"

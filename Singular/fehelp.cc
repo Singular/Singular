@@ -6,20 +6,11 @@
 */
 
 #include "kernel/mod2.h"
-
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
-
 #include "misc/mylimits.h"
-
 #include "resources/feResource.h"
 #include "reporter/reporter.h"
-
 #include "resources/omFindExec.h"
-
 #include "reporter/si_signals.h"
 
 #include "ipid.h"

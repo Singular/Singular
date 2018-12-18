@@ -20,12 +20,7 @@
 #ifndef SINGULAR_COUNTEDREF_H_
 #define SINGULAR_COUNTEDREF_H_
 
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
-
 #include "kernel/structs.h"
 #include "Singular/subexpr.h"
 #include "Singular/idrec.h"

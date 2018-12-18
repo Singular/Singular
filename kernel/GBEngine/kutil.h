@@ -10,11 +10,9 @@
 
 #include <string.h>
 
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
+#ifdef HAVE_OMALLOC
 #include "omalloc/omallocClass.h"
-#else
-#include "xalloc/omalloc.h"
 #endif
 
 #include "misc/mylimits.h"

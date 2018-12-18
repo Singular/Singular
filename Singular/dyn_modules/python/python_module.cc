@@ -16,12 +16,7 @@
 
 #include "Singular/locals.h"
 
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
-
 
 #include <stdio.h>
 #include <stdlib.h>

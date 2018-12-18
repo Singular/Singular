@@ -11,6 +11,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "omalloc/omConfig.h"
+#ifndef HAVE_OMALLOC
+#include "omalloc/xalloc.h"
+#else
+
 #ifdef __cplusplus
 extern "C" {
   #if __cplusplus >= 201402L
@@ -25,7 +30,6 @@ extern "C" {
   #define REGISTER register
 #endif
 
-#include "omalloc/omConfig.h"
 
 #if defined(OM_NDEBUG) && !defined(OM_ALLOC_INTERNAL)
 #if (SIZEOF_LONG == 8)
@@ -61,4 +65,5 @@ extern "C" {
 }
 #endif
 
+#endif /* HAVE_OMALLOC */
 #endif /* OM_ALLOC_H */

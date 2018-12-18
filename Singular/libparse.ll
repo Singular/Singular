@@ -20,11 +20,7 @@
   #include "Singular/ipid.h"
   #include "Singular/tok.h"
   #include "misc/options.h"
-  #ifdef HAVE_OMALLOC
   #include "omalloc/omalloc.h"
-  #else
-  #include "xalloc/omalloc.h"
-  #endif
 #endif
 #include "Singular/libparse.h"
 

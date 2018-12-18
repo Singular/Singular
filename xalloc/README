@@ -1,8 +1,0 @@
-README for xalloc: a debug helper and alternative to omalloc
-
-- substitute in <topdir>/configure.ac and <topdir>/Makefile.am
-   omalloc by xalloc
-- in <topdir> run ./autogen.sh
-- run <topdir>/configure .....   in <builddir>
-- in <builddir> and <topdir>: save omalloc to omalloc.org, ln -s xalloc omalloc
-- run make in <builddir>

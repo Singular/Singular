@@ -6,6 +6,8 @@
  *******************************************************************/
 #include <limits.h>
 #include "omalloc.h"
+
+#ifdef HAVE_OMALLOC
 #include "omDefaultConfig.h"
 
 /*******************************************************************
@@ -610,3 +612,4 @@ int omIsAddrOnFreeBinPage(void* addr)
 }
 
 #endif /* ! OM_NDEBUG */
+#endif /* HAVE_OMALLOC*/

@@ -6,7 +6,9 @@
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
  *******************************************************************/
+#include "omalloc/omConfig.h"
 
+#ifdef HAVE_OMALLOC
 #define malloc      omMallocFunc
 #define calloc      omCallocFunc
 #define free        omFreeFunc
@@ -19,3 +21,4 @@
 
 #define OMALLOC_FUNC
 #include <omalloc/omalloc.c>
+#endif

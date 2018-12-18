@@ -8,13 +8,7 @@
 
 /* I need myfread in standalone_parser */
 #ifndef STANDALONE_PARSER
-
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
-
 #include "misc/options.h"
 #include "reporter/reporter.h"
 #include "kernel/oswrapper/feread.h"

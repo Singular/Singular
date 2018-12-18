@@ -12,6 +12,8 @@
 
 
 #include "omConfig.h"
+
+#ifdef HAVE_OMALLOC
 #include "omDefaultConfig.h"
 #include "omMalloc.h"
 #include "omalloc.h"
@@ -363,4 +365,5 @@ void omVfreeToSystem(void* page, size_t size)
   OM_VFREE_HOOK(size);
 }
 
+#endif /*HAVE_OMALLOC*/
 #endif /* OM_ALLOC_SYSTEM_C */

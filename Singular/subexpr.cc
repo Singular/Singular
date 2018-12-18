@@ -6,21 +6,12 @@
 */
 
 #include "kernel/mod2.h"
-
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
-
 #include "misc/intvec.h"
 #include "misc/options.h"
-
 #include "coeffs/numbers.h"
 #include "coeffs/bigintmat.h"
-
 #include "coeffs/ffields.h" // nfShowMipo // minpoly printing...
-
 #include "polys/monomials/maps.h"
 #include "polys/matpol.h"
 #include "polys/monomials/ring.h"
@@ -32,7 +23,6 @@
 #include "kernel/GBEngine/kstd1.h"
 #include "kernel/GBEngine/syz.h"
 #include "kernel/oswrapper/timer.h"
-
 #include "Singular/tok.h"
 #include "Singular/ipid.h"
 #include "Singular/ipshell.h"

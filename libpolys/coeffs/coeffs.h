@@ -10,11 +10,7 @@
 #define COEFFS_H
 
 #include "misc/auxiliary.h"
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
 
 #include "misc/sirandom.h"
 /* for assume: */

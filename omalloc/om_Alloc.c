@@ -8,6 +8,8 @@
 #define OM_ALLOC_C
 
 #include "omalloc.h"
+
+#ifdef HAVE_OMALLOC
 /*******************************************************************
  *
  *  global variables
@@ -261,4 +263,5 @@ void* omDoRealloc(void* old_addr, size_t new_size, int flag)
     return new_addr;
   }
 }
+#endif
 #endif /* OM_ALLOC_C */

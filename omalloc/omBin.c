@@ -8,6 +8,8 @@
 #include "omalloc.h"
 /* this should go away */
 
+#ifdef HAVE_OMALLOC
+
 #ifdef OM_INTERNAL_DEBUG
 size_t omSizeOfBinAddr(void* addr)
 {
@@ -795,3 +797,4 @@ long omGetUsedBinBytes()
   }
   return used;
 }
+#endif

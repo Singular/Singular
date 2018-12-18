@@ -7,6 +7,8 @@
 #include <limits.h>
 #include <string.h>
 #include "omConfig.h"
+
+#ifdef HAVE_OMALLOC
 #include "omDerivedConfig.h"
 
 #ifdef OM_HAVE_TRACK
@@ -766,3 +768,4 @@ int omIsInKeptAddrList(void* addr)
   return ret;
 }
 #endif /*!OM_NDEBUG*/
+#endif

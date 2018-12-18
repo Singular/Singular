@@ -7,20 +7,10 @@
 */
 
 
-
-
 #include "kernel/mod2.h"
-
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
-
 #include "misc/options.h"
-
 #include "factory/factory.h"
-
 #include "kernel/oswrapper/feread.h"
 #include "Singular/fevoices.h"
 #include "kernel/oswrapper/timer.h"

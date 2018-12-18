@@ -10,11 +10,9 @@
 #include "misc/auxiliary.h"
 
 #include "misc/auxiliary.h"
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
+#ifdef HAVE_OMALLOC
 #include "omalloc/omallocClass.h"
-#else
-#include "xalloc/omalloc.h"
 #endif
 
 #include "misc/intvec.h"

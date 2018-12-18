@@ -6,11 +6,7 @@
 /*
 * ABSTRACT: handling of the list type
 */
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
 
 #include "kernel/structs.h"
 #include "kernel/ideals.h"

@@ -167,6 +167,10 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @node Non-commutative subsystem, Examples, Tricks and pitfalls, Top
 @chapter Non-commutative subsystem
 @cindex Non-commutative subsystem
+
+@sc{Singular} has three non-commutative subsystems, handling various classes of associative
+non-commutative rings: @sc{Plural}, @sc{SCA} and @sc{Letterplace}. 
+
 @menu
 * PLURAL::
 * Data types (plural)::

@@ -18,22 +18,10 @@
 #include <errno.h>
 #include <unistd.h>
 
-
-
-
-
 #include "misc/auxiliary.h"
-
 #include "reporter/reporter.h"
-
 #include "resources/feResource.h"
-
-#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
-#else
-#include "xalloc/omalloc.h"
-#endif
-
 #include "mod_raw.h"
 
 #ifdef HAVE_STATIC
