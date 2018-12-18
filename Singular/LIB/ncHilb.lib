@@ -68,13 +68,13 @@ where b_j is a basis of I.
 Moreover, it also prints the linear system (for the information about adjacency matrix).
 EXAMPLE: example fpahilb; shows an example "
 {
-    if (attrib(basering, "isLetterplaceRing")==0)
+    if (!isFreeAlgebra(basering))
     {
       ERROR("Basering should be Letterplace ring");
     }
     def save = basering;
     int sz=size(#);
-    int lV=attrib(save,"isLetterplaceRing"); // nvars(orig comm ring)
+    int lV=lpVarBlockSize(save); // nvars(orig comm ring)
     int ig=0;
     int mgrad=0;
     int tdeg=0;
@@ -136,7 +136,7 @@ EXAMPLE: example fpahilb; shows an example "
         }
     }
     // new: truncation should be < than degbound/2
-    int degbnd = attrib(save,"uptodeg");
+    int degbnd = lpDegBound(save);
     if (tdeg == 0)
     {
         // orig code: LPRing is created with degree bound=2*d
@@ -402,7 +402,7 @@ PURPOSE: compute a right colon ideal of I by a monomial w
 NOTE: Output is the set of generators, which should be added to I
 EXAMPLE: example rcolon; shows an example"
 {
-    int lV =  attrib(R,"isLetterplaceRing"); //nvars(save);
+    int lV =  lpVarBlockSize(R); //nvars(save);
     if (lV == 0)
     {
       ERROR("Basering must be a Letterplace ring");
@@ -418,7 +418,7 @@ EXAMPLE: example rcolon; shows an example"
           maxdegI = deg(I[i]);
         }
     }
-    int degbnd = attrib(R,"uptodeg");
+    int degbnd = lpDegBound(R);
     if ( 2*maxdegI != degbnd)
     {
       ERROR("Degree bound on the basering should be precisely "+ string(2*maxdegI));

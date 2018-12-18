@@ -367,6 +367,10 @@ void p_mLPshift(poly m, int sh, const ring ri)
   int *s=(int *)omAlloc0((ri->N+1)*sizeof(int));
   p_GetExpV(m,e,ri);
 
+  if (p_mLastVblock(m, e, ri) + sh > ri->N/lV)
+  {
+    Werror("letterplace degree bound is %d, but at least %d is needed for this shift", ri->N/lV, p_mLastVblock(m, e, ri) + sh);
+  }
   for (int i = ri->N - sh*lV; i > 0; i--)
   {
     assume(e[i]<=1);
@@ -505,11 +509,13 @@ void p_LPExpVappend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const 
   PrintLn(); WriteLPExpV(m1ExpV, ri);
   PrintLn(); WriteLPExpV(m2ExpV, ri);
 #endif
-  if (m1Length + m2Length > ri->N)
+  int last = m1Length + m2Length;
+  if (last > ri->N)
   {
-    WarnS("letterplace degree bound too low for this multiplication");
+    Werror("letterplace degree bound is %d, but at least %d is needed for this multiplication", ri->N/ri->isLPring, last/ri->isLPring);
+    last = ri->N;
   }
-  for (int i = 1 + m1Length; i < 1 + m1Length + m2Length; ++i)
+  for (int i = 1 + m1Length; i < 1 + last; ++i)
   {
     assume(m2ExpV[i - m1Length] <= 1);
     m1ExpV[i] = m2ExpV[i - m1Length];
@@ -530,13 +536,15 @@ void p_LPExpVprepend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const
   PrintLn(); WriteLPExpV(m1ExpV, ri);
   PrintLn(); WriteLPExpV(m2ExpV, ri);
 #endif
-  if (m1Length + m2Length > ri->N)
+  int last = m1Length + m2Length;
+  if (last > ri->N)
   {
-    WarnS("letterplace degree bound too low for this multiplication");
+    Werror("letterplace degree bound is %d, but at least %d is needed for this multiplication", ri->N/ri->isLPring, last/ri->isLPring);
+    last = ri->N;
   }
 
   // shift m1 by m2Length
-  for (int i = m2Length + m1Length; i >= 1 + m2Length; --i)
+  for (int i = last; i >= 1 + m2Length; --i)
   {
     m1ExpV[i] = m1ExpV[i - m2Length];
   }

@@ -1,6 +1,6 @@
 LIB "tst.lib"; tst_init();
 LIB "fpadim.lib";
-ring r = 0,(x,y),dp;
+ring r = 0,(x,y),Dp;
 def R = makeLetterplaceRing(7); setring R;
 ideal J = x*y*x - y*x*y;
 option(redSB); option(redTail);
