@@ -1124,7 +1124,7 @@ EXAMPLE: example makeLetterplaceRing; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y,z),(dp(1),dp(2));
+  ring r = 0,(x,y,z),Dp;
   def A = makeLetterplaceRing(2); // same as  makeLetterplaceRing(2,0)
   setring A;  A;
   lpVarBlockSize(A);
