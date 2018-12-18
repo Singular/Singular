@@ -25,7 +25,7 @@ PROCEDURES:
 freeAlgebra(r, d);               creates a Letterplace ring out of given data
 isFreeAlgebra(r);                check whether r is a letterplace ring (free algebra)
 lpDegBound(R);                   returns the degree bound of a letterplace ring
-lpBlockSize(R);                  returns the size of the letterplace blocks
+lpVarBlockSize(R);               returns the size of the letterplace blocks
 
 letplaceGBasis(I);               (deprecated, use twostd) two-sided Groebner basis of a letterplace ideal I
 
@@ -125,7 +125,7 @@ example
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp;
   def R = setLetterplaceAttributes(r, 4, 2); setring R;
-  lpBlockSize(R);
+  lpVarBlockSize(R);
   lieBracket(x(1),y(1),2);
 }
 
@@ -1017,11 +1017,11 @@ example
   lpDegBound(R);
 }
 
-proc lpBlockSize(def R)
-"USAGE:  lpBlockSize(R); R a letterplace ring
+proc lpVarBlockSize(def R)
+"USAGE:  lpVarBlockSize(R); R a letterplace ring
 RETURN:  int
-PURPOSE: returns the block size of the letterplace ring, that is the number of variables of the original ring.
-EXAMPLE: example lpBlockSize; shows examples
+PURPOSE: returns the variable block size of the letterplace ring, that is the number of variables of the original ring.
+EXAMPLE: example lpVarBlockSize; shows examples
 "
 {
   int lV = attrib(R, "isLetterplaceRing");
@@ -1035,7 +1035,7 @@ example
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
   def R = freeAlgebra(r, 7);
-  lpBlockSize(R);
+  lpVarBlockSize(R);
 }
 
 proc isFreeAlgebra(def r)
@@ -1127,11 +1127,11 @@ example
   ring r = 0,(x,y,z),(dp(1),dp(2));
   def A = makeLetterplaceRing(2); // same as  makeLetterplaceRing(2,0)
   setring A;  A;
-  lpBlockSize(A);
+  lpVarBlockSize(A);
   lpDegBound(A);  // degree bound
   setring r; def B = makeLetterplaceRing(2,1); // to compare:
   setring B;  B;
-  lpBlockSize(B);
+  lpVarBlockSize(B);
   lpDegBound(B);  // degree bound
   setring r; def C = makeLetterplaceRing(2,2); // to compare:
   setring C;  C;
@@ -1218,7 +1218,7 @@ example
   def A = makeLetterplaceRing1(2);
   setring A;
   A;
-  lpBlockSize(A);// number of variables in the main block
+  lpVarBlockSize(A);// number of variables in the main block
   lpDegBound(A);  // degree bound
 }
 
@@ -1323,7 +1323,7 @@ example
   def A = makeLetterplaceRing2(2);
   setring A;
   A;
-  lpBlockSize(A); // number of variables in the main block
+  lpVarBlockSize(A); // number of variables in the main block
   lpDegBound(A);  // degree bound
 }
 
@@ -1387,7 +1387,7 @@ example
   def A = makeLetterplaceRing4(2);
   setring A;
   A;
-  lpBlockSize(A); // number of variables in the main block
+  lpVarBlockSize(A); // number of variables in the main block
   lpDegBound(A);  // degree bound
 }
 
@@ -1493,7 +1493,7 @@ example
   def A = makeLetterplaceRing3(2);
   setring A;
   A;
-  lpBlockSize(A); // number of variables in the main block
+  lpVarBlockSize(A); // number of variables in the main block
   lpDegBound(A);  // degree bound
 }
 
@@ -2940,14 +2940,14 @@ EXAMPLE: example lpDivision; shows examples
 
   // make new ring
   def save = basering;
-  int norigvars = lpBlockSize(save);
+  int norigvars = lpVarBlockSize(save);
   def Rtagged; def temp = save;
   for (int i = 1; i <= size(I); i++) {
      Rtagged = temp + ("tag_" + string(i));
      temp = Rtagged;
   } kill i;
   // currently R + "var" doesn't preserve uptodeg
-  Rtagged = setLetterplaceAttributes(Rtagged, lpBlockSize(Rtagged), lpDegBound(save));
+  Rtagged = setLetterplaceAttributes(Rtagged, lpVarBlockSize(Rtagged), lpDegBound(save));
   setring Rtagged;
 
   // restore vars
@@ -3059,7 +3059,7 @@ ASSUME: Intvec is an exponent vector of a letterplace monomial contained in V'
 "
 {if (I==intvec(0)) {return(intvec(0));}
  int j,k,l;
- int n = lpBlockSize(basering); int d = lpDegBound(basering);
+ int n = lpVarBlockSize(basering); int d = lpDegBound(basering);
  intvec w; j = 1;
  while (j <= d)
  {w = I[1..n];
@@ -3095,7 +3095,7 @@ PURPOSE: Converts an modified exponent vector into an Dvec
 NOTE: Superfluos zero blocks must have been deleted befor using this procedure
 "
 {int i,j,k,r1,r2; intvec D;
- int n = lpBlockSize(basering);
+ int n = lpVarBlockSize(basering);
  k = size(V) div n; r1 = 0; r2 = 0;
  for (i=1; i<= k; i++)
   {for (j=(1+((i-1)*n)); j <= (i*n); j++)
@@ -3140,7 +3140,7 @@ ASSUME: V,W are DVecs of monomials contained in V'
 {if(size(V)<size(W)){return(list(-1));}
 
  int i,j,r; intvec T; list R;
- int n = lpBlockSize(basering);
+ int n = lpVarBlockSize(basering);
  int k = size(V) - size(W) + 1;
  if (intvec(V[1..size(W)])-W == 0){R[1]=0;}
  for (i =2; i <=k; i++)
@@ -3308,7 +3308,7 @@ static proc lpMonomialsWithHoles(int d)
      return (monomials);
   }
 
-  int lV = lpBlockSize(basering); // variable count
+  int lV = lpVarBlockSize(basering); // variable count
   ideal prevMonomials = lpMonomialsWithHoles(d - 1);
 
   for (int i = 1; i <= size(prevMonomials); i++) {
@@ -3334,7 +3334,7 @@ static proc lpMonomialsWithHoles(int d)
 
 static proc getlpCoeffs(poly q, poly p)
 {list R; intvec cq,t,lv,rv,bla;
- int n = lpBlockSize(basering); int d = lpDegBound(basering);
+ int n = lpVarBlockSize(basering); int d = lpDegBound(basering);
  int i;
  cq = leadexp(p)-leadexp(q); /* p/q */
  for (i = 1; i<= d; i++)
@@ -3382,7 +3382,7 @@ static proc checkAssumptionsLPIV(int d, list L)
   if (d > lpDegBound(basering)) {ERROR("Specified degree bound exceeds ring parameter!");}
   int i;
   for (i = 1; i <= size(L); i++)
-  {if (entryViolation(L[i], lpBlockSize(basering)))
+  {if (entryViolation(L[i], lpVarBlockSize(basering)))
     {ERROR("Not allowed monomial/intvec found!");}
   }
   return();
@@ -3426,7 +3426,7 @@ static proc isContainedInVp(poly p)
 "
 {int r = 0; intvec w;
  intvec l = leadexp(p);
- int n = lpBlockSize(basering); int d = lpDegBound(basering);
+ int n = lpVarBlockSize(basering); int d = lpDegBound(basering);
  int i,j,c,c1;
  while (1 <= d)
  {
@@ -3821,11 +3821,11 @@ EXAMPLE: example lp2iv; shows examples
   if (p == 1) {return(I);}
   if (p == 0) {ERROR("Monomial is not allowed to equal zero");}
   intvec lep = leadexp(p);
-  for ( i = 1; i <= lpBlockSize(basering); i++) {if (lep[i] == 1) {I = i; break;}}
-  for (i = (lpBlockSize(basering)+1); i <= size(lep); i++)
+  for ( i = 1; i <= lpVarBlockSize(basering); i++) {if (lep[i] == 1) {I = i; break;}}
+  for (i = (lpVarBlockSize(basering)+1); i <= size(lep); i++)
   {if (lep[i] == 1)
-    { j = (i mod lpBlockSize(basering));
-      if (j == 0) {I = I,lpBlockSize(basering);}
+    { j = (i mod lpVarBlockSize(basering));
+      if (j == 0) {I = I,lpVarBlockSize(basering);}
       else {I = I,j;}
     }
     else { if (lep[i] > 1) {ERROR("monomial has a not allowed multidegree");}}

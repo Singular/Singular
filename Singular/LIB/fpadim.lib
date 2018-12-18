@@ -135,7 +135,7 @@ static proc checkAssumptions(int d, list L)
   if (d > lpDegBound(basering)) {ERROR("Specified degree bound exceeds ring parameter!");}
   int i;
   for (i = 1; i <= size(L); i++)
-  {if (entryViolation(L[i], lpBlockSize(basering)))
+  {if (entryViolation(L[i], lpVarBlockSize(basering)))
     {ERROR("Not allowed monomial/intvec found!");}
   }
   return();
@@ -906,7 +906,7 @@ ASSUME: - basering is a Letterplace ring
 {
   // construct the Graph of normal words [Studzinski page 78]
   // construct set of vertices
-  int v = lpBlockSize(basering); int d = lpDegBound(basering);
+  int v = lpVarBlockSize(basering); int d = lpDegBound(basering);
   ideal V; poly p,q,w;
   ideal LG = lead(G);
   int i,j,k,b; intvec E,Et;
@@ -1690,7 +1690,7 @@ NOTE: - If L is the list returned, then L[1] is an integer corresponding to the
 @*    - If the K-dimension is known to be infinite, a degree bound is needed
 EXAMPLE: example lpDHilbert; shows examples
 "
-{int degbound = lpDegBound(basering);int n = lpBlockSize(basering);
+{int degbound = lpDegBound(basering);int n = lpVarBlockSize(basering);
   if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
   if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
   list L;
@@ -1732,7 +1732,7 @@ NOTE: - If L is the list returned, then L[1] is an integer, the K-dimension,
 @*    - If the K-dimension is known to be infinite, a degree bound is needed
 EXAMPLE: example lpDHilbertSickle; shows examples
 "
-{int degbound = lpDegBound(basering);int n = lpBlockSize(basering);
+{int degbound = lpDegBound(basering);int n = lpVarBlockSize(basering);
   if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
   if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
   list L;
@@ -1777,7 +1777,7 @@ NOTE: - If degbound is set, there will be a degree bound added. 0 means no
 EXAMPLE: example lpHilbert; shows examples
 SEE ALSO: ncHilb_lib
 "
-{int degbound = lpDegBound(basering);int n = lpBlockSize(basering);
+{int degbound = lpDegBound(basering);int n = lpVarBlockSize(basering);
   if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
   if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
   list L;
@@ -1808,7 +1808,7 @@ PURPOSE:Checking a factor algebra for finiteness of the K-dimension
 ASSUME: - basering is a Letterplace ring.
 EXAMPLE: example lpKDimCheck; shows examples
 "
-{int n = lpBlockSize(basering);
+{int n = lpVarBlockSize(basering);
   list L;
   ideal R;
   R = normalize(lead(G));
@@ -1843,7 +1843,7 @@ NOTE: - If degbound is set, there will be a degree bound added. 0 means no
 @*    - If the K-dimension is known to be infinite, a degree bound is needed
 EXAMPLE: example lpKDim; shows examples
 "
-{int degbound = lpDegBound(basering);int n = lpBlockSize(basering);
+{int degbound = lpDegBound(basering);int n = lpVarBlockSize(basering);
   if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
   if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
   list L;
@@ -1947,7 +1947,7 @@ NOTE: - If degbound is set, there will be a degree bound added. 0 means no
 @*    - If the K-dimension is known to be infinite, a degree bound is needed
 EXAMPLE: example lpSickle; shows examples
 "
-{int degbound = lpDegBound(basering); int n = lpBlockSize(basering);
+{int degbound = lpDegBound(basering); int n = lpVarBlockSize(basering);
   if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
   if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
   list L; ideal R;
@@ -1987,7 +1987,7 @@ NOTE: - If L is the list returned, then L[1] is an integer, the K-dimension,
 @*    - If the K-dimension is known to be infinite, a degree bound is needed
 EXAMPLE: example lpSickleDim; shows examples
 "
-{int degbound = lpDegBound(basering);int n = lpBlockSize(basering);
+{int degbound = lpDegBound(basering);int n = lpVarBlockSize(basering);
   if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
   if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
   list L;
@@ -2027,7 +2027,7 @@ NOTE: - If L is the list returned, then L[1] is an intvec, corresponding to the
 @*    - If the K-dimension is known to be infinite, a degree bound is needed
 EXAMPLE: example lpSickleHil; shows examples
 "
-{int degbound = lpDegBound(basering);int n = lpBlockSize(basering);
+{int degbound = lpDegBound(basering);int n = lpVarBlockSize(basering);
   if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
   if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
   list L;
@@ -2081,22 +2081,22 @@ EXAMPLE: example sickle; shows examples
   if (size(#) > 3) {if (typeof(#[1])=="int"){if (#[4] >= 0) {degbound = #[4];}}}
   if (m == 1)
   {if (d == 0)
-    {if (h == 0) {return(lpSickle(G,degbound,lpBlockSize(basering)));}
-      else        {return(lpSickleHil(G,degbound,lpBlockSize(basering)));}
+    {if (h == 0) {return(lpSickle(G,degbound,lpVarBlockSize(basering)));}
+      else        {return(lpSickleHil(G,degbound,lpVarBlockSize(basering)));}
     }
     else
-    {if (h == 0) {return(lpSickleDim(G,degbound,lpBlockSize(basering)));}
-      else {return(lpDHilbertSickle(G,degbound,lpBlockSize(basering)));}
+    {if (h == 0) {return(lpSickleDim(G,degbound,lpVarBlockSize(basering)));}
+      else {return(lpDHilbertSickle(G,degbound,lpVarBlockSize(basering)));}
     }
   }
   else
   {if (d == 0)
     {if (h == 0) {ERROR("You request to do nothing, so relax and do so");}
-      else        {return(lpHilbert(G,degbound,lpBlockSize(basering)));}
+      else        {return(lpHilbert(G,degbound,lpVarBlockSize(basering)));}
     }
     else
-    {if (h == 0) {return(lpKDim(G,degbound,lpBlockSize(basering)));}
-      else {return(lpDHilbert(G,degbound,lpBlockSize(basering)));}
+    {if (h == 0) {return(lpKDim(G,degbound,lpVarBlockSize(basering)));}
+      else {return(lpDHilbert(G,degbound,lpVarBlockSize(basering)));}
     }
   }
 }

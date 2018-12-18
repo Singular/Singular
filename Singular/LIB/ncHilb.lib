@@ -74,7 +74,7 @@ EXAMPLE: example fpahilb; shows an example "
     }
     def save = basering;
     int sz=size(#);
-    int lV=lpBlockSize(save); // nvars(orig comm ring)
+    int lV=lpVarBlockSize(save); // nvars(orig comm ring)
     int ig=0;
     int mgrad=0;
     int tdeg=0;
@@ -402,7 +402,7 @@ PURPOSE: compute a right colon ideal of I by a monomial w
 NOTE: Output is the set of generators, which should be added to I
 EXAMPLE: example rcolon; shows an example"
 {
-    int lV =  lpBlockSize(R); //nvars(save);
+    int lV =  lpVarBlockSize(R); //nvars(save);
     if (lV == 0)
     {
       ERROR("Basering must be a Letterplace ring");
