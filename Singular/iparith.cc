@@ -5102,12 +5102,12 @@ static BOOLEAN jjENVELOPE(leftv res, leftv a)
 static BOOLEAN jjTWOSTD(leftv res, leftv a)
 {
   ideal result;
+  ideal v_id=(ideal)a->Data();
   if (rIsPluralRing(currRing))
-    result=(ideal)twostd((ideal)a->Data());
+    result=(ideal)twostd(v_id);
   else /*commutative or shiftalgebra*/
   {
-    result=kStd(v_id,currRing->qideal,hom,&w);
-    idSkipZeroes(result);
+    return jjSTD(res,a);
   }
   res->data = (char *)result;
   setFlag(res,FLAG_STD);
