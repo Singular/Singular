@@ -369,7 +369,7 @@ void p_mLPshift(poly m, int sh, const ring ri)
 
   if (p_mLastVblock(m, e, ri) + sh > ri->N/lV)
   {
-    Werror("letterplace degree bound is %d, but at least %d is needed for this shift", ri->N/lV, p_mLastVblock(m, e, ri) + sh);
+    Werror("degree bound of Letterplace ring is %d, but at least %d is needed for this shift", ri->N/lV, p_mLastVblock(m, e, ri) + sh);
   }
   for (int i = ri->N - sh*lV; i > 0; i--)
   {
@@ -512,7 +512,7 @@ void p_LPExpVappend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const 
   int last = m1Length + m2Length;
   if (last > ri->N)
   {
-    Werror("letterplace degree bound is %d, but at least %d is needed for this multiplication", ri->N/ri->isLPring, last/ri->isLPring);
+    Werror("degree bound of Letterplace ring is %d, but at least %d is needed for this multiplication", ri->N/ri->isLPring, last/ri->isLPring);
     last = ri->N;
   }
   for (int i = 1 + m1Length; i < 1 + last; ++i)
@@ -539,7 +539,7 @@ void p_LPExpVprepend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const
   int last = m1Length + m2Length;
   if (last > ri->N)
   {
-    Werror("letterplace degree bound is %d, but at least %d is needed for this multiplication", ri->N/ri->isLPring, last/ri->isLPring);
+    Werror("degree bound of Letterplace ring is %d, but at least %d is needed for this multiplication", ri->N/ri->isLPring, last/ri->isLPring);
     last = ri->N;
   }
 
@@ -823,7 +823,7 @@ ring freeAlgebra(ring r, int d)
     {
       if(has_order_a)
       {
-        WerrorS("ordering (a(..),lp/rp not implemented for LP-rings");
+        WerrorS("ordering (a(..),lp/rp not implemented for Letterplace rings");
         return NULL;
       }
       int ** wvhdl=(int**)omAlloc0((r->N+3)*sizeof(int*));
@@ -859,14 +859,14 @@ ring freeAlgebra(ring r, int d)
       else if (p==0) ord[r->N+1]=r->order[1];
       else
       { // should never happen:
-        WerrorS("ordering not implemented for LP-rings");
+        WerrorS("ordering not implemented for Letterplace rings");
         return NULL;
       }
       //if (p==1) PrintS("entry:0 ->c/C\n");
       //else if (p==0) Print("entry:%d ->c/C\n",r->N+1);
       break;
     }
-    default: WerrorS("ordering not implemented for LP-rings");
+    default: WerrorS("ordering not implemented for Letterplace rings");
       return NULL;
   }
   // create R->names

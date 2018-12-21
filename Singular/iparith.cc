@@ -4241,7 +4241,7 @@ static BOOLEAN jjidMaxIdeal(leftv res, leftv v)
   {
     int deg = (int)(long)v->Data();
     if (deg > currRing->N/currRing->isLPring) {
-      WerrorS("deg of letterplace ring to small");
+      WerrorS("degree bound of Letterplace ring is to small");
       return TRUE;
     }
   }
