@@ -8,10 +8,10 @@
 @ifhtml
 @html
 <CENTER>
-<A HREF="http://www.singular.uni-kl.de/plural">
+<A HREF="http://www.singular.uni-kl.de">
 <IMG SRC="plural.jpg" ALT="Singular:Plural logo"></A><br>
 </CENTER>
-<h3> A Computer Algebra Subsystem for Non-commutative Polynomial Algebras </h3>
+<h3> A Subsystem for Non-commutative Polynomial G-Algebras </h3>
 <p></p>
 @end html
 @end ifhtml
@@ -20,21 +20,24 @@
 @item @strong{What is and what does @sc{Plural}?}
 
 @sc{Plural} is a kernel extension of @sc{Singular},
-providing many algorithms for computations within certain non-commutative algebras
+providing many algorithms for computations within non-commutative @math{G-} and @math{GR-}algebras
 (see @ref{Mathematical background BR_PLURAL_BR} for detailed information on algebras and algorithms).
 
-It uses the same data structures, sometimes interpreting them in a different way
-and/or modifying them for its own purposes.
+It uses the same data structures as @sc{Singular}, sometimes interpreting them 
+in a different way and/or modifying them for its own purposes.
 In spite of such a difference, one can always transfer
-objects between commutative rings of @sc{Singular}
-and non-commutative rings.
+objects between commutative rings of @sc{Singular} and non-commutative rings of @sc{Plural}.
 
 
 With @sc{Plural}, one can set up a non-commutative @math{G}-algebra, say @math{A}, with
-a Poincar@'e-Birkhoff-Witt (PBW) basis, (see @ref{G-algebras} for step-by-step building instructions and also @ref{PLURAL libraries}
-for procedures for setting many important algebras easily).
+a Poincar@'e-Birkhoff-Witt (PBW) basis, (see @ref{G-algebras} for step-by-step building instructions 
+and also @ref{PLURAL libraries} for procedures for setting many important algebras easily).
+Afterwards, one can proceed to the factor-algebra of @math{A} modulo a two-sided ideal (see @ref{twostd}), thus
+obtaining a @math{GR}-algebra (see @ref{qring BR_PLURAL_BR} type).
 
-Functionalities of @sc{Plural} (enlisted in @ref{Functions  BR_PLURAL_BR}) are accessible as soon as the basering becomes non-commutative (see @ref{nc_algebra}).
+Functionalities of @sc{Plural} (enlisted in @ref{Functions  BR_PLURAL_BR}) are accessible as soon 
+as the basering becomes non-commutative (see @ref{nc_algebra} and the library @ref{ncalg_lib}
+with many readily predefined algebras).
 
 One can perform various computations with polynomials and ideals in @math{A} and with
 vectors and submodules of a free module
@@ -45,8 +48,6 @@ $A^n$.
 A^n.
 @end ifinfo
 
-One can work also within factor algebras of @math{G}-algebras (see @ref{qring BR_PLURAL_BR} type)
-by two-sided ideals (see @ref{twostd}).
 @end table
 
 @table @strong
@@ -54,23 +55,22 @@ by two-sided ideals (see @ref{twostd}).
 @itemize
 
 @item
-@sc{Plural} does not perform computations in the free algebra or in its general factor algebras (instead, these
-computations can be possibly done due to @ref{LETTERPLACE}).
+@sc{Plural} does not perform computations in the free algebra or in its general factor algebras 
+(instead, these computations can be possibly done due to @ref{Letterplace}).
 
 In @sc{Plural} one can only work with @math{G}-algebras and with their factor-algebras
 by two-sided ideals (@math{GR}-algebras).
 
-@item @sc{Plural} requires a monomial ordering but it does not work generally with local and mixed orderings.
-Right now, one can use only global orderings in @sc{Plural} (see @ref{General definitions for orderings}),
-save for SCA, where we provide the possibility of computations in a tensor product of a non-commutative algebra
-(with a global ordering) with a commutative algebra (with any ordering). In the future, this will be enhanced for
-other algebras, as well.
+@item @sc{Plural} requires a global monomial ordering (see @ref{General definitions for orderings})
+However, @sc{SCA} provides the possibility of computations in a tensor product of 
+a non-commutative graded commutative algebra (equipped with a global ordering) 
+with a commutative algebra (equipped with any ordering). 
 
-@item @sc{Plural} does not handle non-commutative parameters.
-
+@item @sc{Plural} does not handle non-commutative parameters, i.e. the elements of
+the coefficient field (or a ring) mutually commute with all variables.
 Defining parameters, one @strong{cannot} impose non-commutative relations
 on them. Moreover, it is impossible to introduce parameters which do not commute with variables.
-
+However, @ref{olga_lib} offers a rich functionality to work with Ore localizations of @math{G}-algebras.
 @end itemize
 @end table
 
@@ -84,32 +84,23 @@ in the non-commutative case, the correct multiplication of @code{y} by
  @code{x} must be written as @code{y*x}.
 @* Both expressions @code{yx} and @code{xy} are equal, since they are
 interpreted as commutative expressions. See example in @ref{poly expressions BR_PLURAL_BR}.
-@* Note, that @sc{Plural} output consists only of monomials, hence the signs @code{*} are omitted.
+@* Note, that @sc{Plural} output consists only of monomials, even when the signs @code{*} are omitted.
 
-@item   @code{ideal} BR_PLURAL_BR
+@item  @code{ideal} BR_PLURAL_BR
 
-Unless stated otherwise, an @code{ideal} as understood by @sc{Plural}, is a list of generators
-of a @strong{left} ideal. For more information see @ref{ideal BR_PLURAL_BR}.
- @* For a @strong{two-sided ideal} @code{T}, use command @ref{twostd} in order to compute
+Unless stated otherwise, an expression of type @code{ideal} as understood by @sc{Plural}
+as a list of generators of a @strong{left} ideal. For more information see @ref{ideal BR_PLURAL_BR}.
+ @* For a @strong{two-sided ideal} @code{T}, use the command @ref{twostd} for computing
 the two-sided Groebner basis of @code{T}.
-@c ( at the same time it is a left Groebner basis).
+ @* For a @strong{right ideal} @code{I}, use @ref{rightStd} from @code{nctools_lib} for computing the right 
+ Groebner basis of @code{I}.
 
 @item @code{module} BR_PLURAL_BR
 Unless stated otherwise, a @code{module} as understood by @sc{Plural}, is
 @strong{either} a fininitely generated @strong{left} submodule of a free module (of finite rank)
 @* @strong{or} a factor module of a free module (of finite rank) by its left submodule (see @ref{module BR_PLURAL_BR} for details).
 
-@c @item ordering BR_PLURAL_BR
-@c @sc{Plural} works with @strong{global} orderings  only.
-@c @ifset singularmanual
-@c See @ref{ General definitions for orderings }
-@c @end ifset
-@c @ifclear singularmanual
-@c See @sc{Singular} manual section General definitions for orderings.
-@c @end ifclear
-
 @item @code{qring} BR_PLURAL_BR
-
 In @sc{Plural} it is only possible to build factor-algebras modulo @strong{two-sided} ideals (see @ref{qring BR_PLURAL_BR}).
 @end table
 
@@ -3342,7 +3333,7 @@ All algebras are assumed to be associative @math{K}-algebras for some field @mat
 @tex
  Let $K$ be a field, and let a $K$-algebra $A$ be generated by
 variables $x_1, \ldots ,x_n$ subject to some relations.
-We call $A$ an algebra with {\bf PBW basis} (Poincar\'e-Birkhoff-Witt basis), if a $K$--basis of
+We call $A$ an algebra with {\bf PBW basis} (Poincar\'e-Birkhoff-Witt basis), if a $K$-basis of
 $A$ is Mon$(x_1,\dots,x_n)=\{x^{a_1}_1 x^{a_2}_2 \dots x^{a_n}_n \mid a_i \in N \cup \{0\} \}$,
 where a power-product $x^{a_1}_1 x^{a_2}_2 \dots x^{a_n}_n$ (in this particular order) is called
 {\bf a monomial}. For example, $x_1 x_2$ is a monomial, while $x_2 x_1$ is, in general, not
@@ -3353,7 +3344,7 @@ a monomial.
  Let K be a field, and let a K-algebra A be generated by
 variables x_1, ... ,x_n subject to some relations.
 @* We call A an algebra with PBW basis (Poincare-Birkhoff-Witt basis),
-if a K--basis of A is Mon(x_1,...,x_n) =@{x^a1_1 x^a2_2 ... x^an_n  a_i in N union @{0@} @},
+if a K-basis of A is Mon(x_1,...,x_n) =@{x^a1_1 x^a2_2 ... x^an_n  a_i in N union @{0@} @},
 where a power-product x^a1_1 x^a2_2 ... x^an_n (in this particular order) is called
 @strong{a monomial}. For example, x_1 x_2 is a monomial, while x_2 x_1 is, in general, not a monomial.
 @end ifinfo
@@ -3457,10 +3448,10 @@ A is an integral domain.
 
 @c @item
 @c @tex
-@c $A$ has left and right quotient rings.
+@c $A$ has left and right quotient rings (fields of fractions).
 @c @end tex
 @c @ifinfo
-@c A has left and right quotient rings.
+@c A has left and right quotient rings (fields of fractions).
 @c @end ifinfo
 
 @end itemize
@@ -3553,7 +3544,7 @@ C and D.
 
 @end itemize
 
-At present, @sc{Plural} does not check automatically whether the non-degeneracy conditions
+@sc{Plural} does not check automatically whether the non-degeneracy conditions
 hold but it provides a procedure @ref{ndcond} from the library @ref{nctools_lib} to check this.
 
 
@@ -3571,7 +3562,7 @@ the left submodule of a free module $A^r$, generated by elements $\{g_1, \dots, 
 @end tex
 
 @tex
-Let $<$ be a fixed monomial well-ordering on the $G$--algebra $A$ with the Poincar@'e-Birkhoff-Witt (PBW) basis
+Let $<$ be a fixed monomial well-ordering on the $G$-algebra $A$ with the Poincar@'e-Birkhoff-Witt (PBW) basis
 $\{x^{\alpha} = x^{a_1}_1 x^{a_2}_2 \dots x^{a_n}_n\}$.
 For a given free module $A^r$ with the basis $\{e_1,\ldots, e_r\}$, $<$ denotes also a
 fixed module ordering on the set of monomials $\{x^{\alpha} e_i \mid \alpha\in {\bf N}^n, 1\leq i\leq r \}$.
@@ -3596,7 +3587,7 @@ a in N^n, 1<= i <= r @}.
 @subheading Definition
 @tex
 For a set $S \subset A^r$, define
-$L(S)$ to be the $K$--vector space, spanned on the leading monomials
+$L(S)$ to be the $K$-vector space, spanned on the leading monomials
 of elements of $S$, $L(S) = \oplus \{K x^{\alpha} e_i \mid \exists s \in S, \hbox{LM(s)}=x^{\alpha}e_i\}$.
 We call $L(S)$ the \textbf{span of leading monomials} of $S$.
 @end tex
@@ -3625,7 +3616,7 @@ We call L(S) the @strong{span of leading monomials} of S.
 @c of elements of $I$, i.e. by $\left\{\hbox{lm(f)} \mid f \in I\right\}$.
 
 @tex
-Let $I \subset A^r$ be a left $A$--submodule.
+Let $I \subset A^r$ be a left $A$-submodule.
 A finite set $G\subset I$ is called {\bf a left  Groebner basis} of $I$ if and
 only if $L(G)=L(I)$, that is for any $f \in I\setminus \{ 0 \}$ there exists a $g\in G$
 satisfying $ \hbox{LM}(g) \mid \hbox{LM}(f)$, i.e., if $\hbox{LM}(f) = x^{\alpha}e_i$, then
@@ -3640,8 +3631,9 @@ LM(f) = x^b e_i with b_j <= a_j, 1<= j <= n.
 @end ifinfo
 
 
-@*@strong{Remark:} In general non-commutative algorithms are working with well-orderings
-only (see @ref{PLURAL}, @ref{Monomial orderings} and @ref{Term orderings}), unless we deal with grade commutative algebras.
+@*@strong{Remark:} In general non-commutative algorithms are working with global well-orderings
+only (see @ref{PLURAL}, @ref{Monomial orderings} and @ref{Term orderings}), unless we deal with 
+graded commutative algebras via @ref{SCA}.
 
 @tex
 A Groebner basis $G\subset A^r$ is called {\bf minimal} (or {\bf reduced}) if $0\notin G$ and if
@@ -3702,8 +3694,8 @@ NF(f|G) is called a @strong{left normal form of} f @strong{with respect to}
 
 @*@strong{ Remark:}
 As we have already mentioned in the definitions @code{ideal} and @code{module} (see
- @ref{PLURAL}), @sc{Plural} works with left normal form only.
-
+ @ref{PLURAL}), by @code{NF} @sc{Plural} understands a left normal form. 
+ Note, that @code{rightNF} from @ref{nctools_lib} allows to compute a right normal form. 
 
 @subheading Left ideal membership
 @cindex Left ideal membership
@@ -3714,8 +3706,8 @@ $f \in I$ if and only if the left normal form $\hbox{NF}(f|G) = 0$.
 @end tex
 
 @ifinfo
-For a leftGroebner basis G of I the following holds:
-f is in I if and only if left the normal form NF(f|G) = 0.
+For a left Groebner basis G of I the following holds:
+f is in I if and only if the left normal form NF(f|G) = 0.
 @end ifinfo
 
 @c ---------------------------------------------------------------------------
@@ -3742,17 +3734,20 @@ right) A-submodule S of A^k.
 @end ifinfo
 
 
-
 @*@strong{Remark:}
-With respect to the definitions of @code{ideal} and  @code{module}  (see @ref{PLURAL}), @sc{Plural} works with left
-syzygies only (by @code{syz} we understand  a  left syzygy).
-If @code{S} is a matrix of a left syzygy module of left submodule given by matrix @code{M}, then @code{transpose(S)*transpose(M) = 0}
- (but, in general,
+With respect to the definitions of @code{ideal} and @code{module} (see @ref{PLURAL}), 
+by @code{syz} @sc{Plural} understands an inquiry to compute the left syzygy module.
+
+Note, that @code{rightModulo(M,std(0))} from @ref{nctools_lib} computes the right syzygy module of @code{M}.
+
+If @code{S} is a matrix of a left syzygy module of left submodule given by matrix @code{M}, 
+then @code{transpose(S)*transpose(M) = 0}
+(but, in general,
 @tex
 $M \cdot S \not=0$).
 @end tex
 @ifinfo
-M S <> 0
+M S <> 0 ).
 @end ifinfo
 
 Note, that the syzygy modules of @math{I} depend on a choice of generators
@@ -3803,7 +3798,7 @@ generate @math{I}. Note, that resolutions over factor-algebras need not to be of
 @subheading Generalized Hilbert Syzygy Theorem
 @cindex Generalized Hilbert Syzygy Theorem
 @tex
-For a $G$--algebra $A$, generated by $n$
+For a $G$-algebra $A$, generated by $n$
 @end tex
 @ifinfo
 For a @math{G}-algebra @math{A}, generated by @math{n}
@@ -3848,7 +3843,7 @@ size(ideal(TST));
 
 The Centre for Computer Algebra Kaiserslautern publishes a series of preprints
 which are electronically available at
-@code{http://www.mathematik.uni-kl.de/~zca/Reports_on_ca}.
+@url{https://www.mathematik.uni-kl.de/organisation/zca/reports-on-ca/}.
 Other sources to check are the following books and articles:
 
 @subheading Text books
@@ -3857,8 +3852,7 @@ Other sources to check are the following books and articles:
 @item
 @c DK  book
  [DK] Y. Drozd and V. Kirichenko.
-    Finite dimensional algebras. With an appendix by Vlastimil
-  Dlab.
+    Finite dimensional algebras. With an appendix by Vlastimil Dlab.
    Springer, 1994
 
 @item
@@ -3878,7 +3872,8 @@ Other sources to check are the following books and articles:
 @c Kr  Book
  [Kr] Kredel, H.
      Solvable polynomial rings.
-  Shaker, 1993
+	Shaker, 1993
+	@url{http://krum.rz.uni-mannheim.de/kredel/kredel_solvable_polynomial_rings.pdf}
 
 @item
 @c HLi  Book
@@ -3898,15 +3893,6 @@ Graduate Studies in Mathematics. 30. Providence, RI: American Mathematical Socie
 @subheading Descriptions of algorithms and problems
 
 @itemize @bullet
-
-@item
-@c{HKP} art
-  Havlicek, M. and Klimyk, A. and Posta, S.
-   Central elements of the algebras
-@tex
- $U'_q({\rm so}_m)$ and $U'_q({\rm iso}_m)$.
-  {arXiv. math. QA/9911130}, (1999)
-@end tex
 
 @item
 @c{AP} art
@@ -3957,28 +3943,10 @@ J. Gomez Torrecillas and F.J. Lobillo.
 
 
 @item
-@c I1  InProc
-N. Iorgov.
-@tex
- On the Center of $q$-Deformed Algebra $U'_q( \rm so _3)$ Related to
-  Quantum Gravity at $q$ a Root of $1$.
-@end tex
-In Proceedings of IV Int. Conf. "Symmetry in Nonlinear
-  Mathematical Physics",(2001) Kyiv, Ukraine
-
-@item
 @c KW  art
 A. Kandri-Rody and V. Weispfenning.
   Non-commutative Gr@"obner bases in algebras of solvable type.
     J. Symbolic Computation, 9(1):1-26, 1990.
-
-
-@item
-@c LV2  Inproc
- Levandovskyy, V.
-   On Gr@"obner bases for non-commutative G-algebras.
-  In  Kredel, H. and Seiler, W.K., editor,    Proceedings of the
-  8th Rhine Workshop on Computer Algebra, 2002.
 
 @item
 @c NDC  InProc
@@ -4024,7 +3992,8 @@ A. Kandri-Rody and V. Weispfenning.
 @c NS  art
 T. N@"u@ss{}ler and H. Sch@"onemann.
   Gr@"obner bases in algebras with zero-divisors.
-     Preprint 244, Universit@"at Kaiserslautern, 1993. Available online at @code{http://www.mathematik.uni-kl.de/~zca/Reports_on_ca/index.html}.
+     Preprint 244, Universit@"at Kaiserslautern, 1993. 
+	 @url{https://www.mathematik.uni-kl.de/organisation/zca/reports-on-ca/}.
 
 @item
 @c S:03  InColl
@@ -4039,7 +4008,3 @@ T. Yan.
   The geobucket data structure for polynomials.
    J. Symbolic Computation, 25(3):285-294, March 1998.
 @end itemize
-
-
-@c @subheading Descriptions of algorithms
-
