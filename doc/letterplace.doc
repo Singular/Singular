@@ -47,17 +47,6 @@ Each such ring is constructed from a commutative ring
 This encodes a sub-@math{K}-vector space (or a filtered part) of @math{K} @math{<x_1},@dots{},@math{x_n >},
 spanned by all monomials of @strong{length} at most @math{d}.
 
-MODELS OF COMPUTATION?
-
-if the set of input polynomials is weighted homogeneous, that is there exists
-a vector of strictly positive weights for variables, computing up to a 
-weighted degree bound @math{d} () results in the truncated Groebner basis @math{G_d}, i.e. trimming elements
-of degree exceeding @math{d} from the complete Groebner basis @math{G} results in @math{G_d}.
-
-In general, if you have a set @math{G(d)}, which is the result of Groebner basis computation 
-up to weighted degree bound @math{d}, then it is the complete finite Groebner basis, if
-@math{G(2d-1)}=@math{G_d}.
-
 @menu
 * Free associative algebras::
 * Monomial orderings on free algebras::
@@ -302,8 +291,20 @@ define a @strong{leading ideal} of @math{G} to be the two-sided ideal
 @math{LM(G)  =}  @{ @math{lm(g) | g} in @math{G}\@{0@} @} in @math{T}.
 
 Let @math{<} be a fixed monomial ordering on @math{T}.
-We say that a subset @math{G} of @math{I} is a (two-sided) Groebner basis for the ideal @math{I} with respect to @math{<}, if @math{LM(G) = LM(I)}. That is for all @math{f} from @math{I}\@{0@} there exists @math{g} in @math{G}, such that @math{lm(g)} divides @math{lm(f)}.
+We say that a subset @math{G} of @math{I} is a @strong{(two-sided) Groebner basis} for the ideal @math{I} with respect to @math{<}, if @math{LM(G) = LM(I)}. That is for all @math{f} from @math{I}\@{0@} there exists @math{g} in @math{G}, such that @math{lm(g)} divides @math{lm(f)}.
 @end ifinfo
+
+Suppose, that the weights of the ring variables are strictly positive. 
+We can interprete these weights as defining a nonstandard grading on the ring.
+If the set of input polynomials is weighted homogeneous with respect to the given 
+weights of the ring variables, then computing up to a weighted degree (and thus, also length) bound @math{d} 
+results in the @strong{truncated Groebner basis} @math{G(d)}. In other words, by trimming elements
+of degree exceeding @math{d} from the complete Groebner basis @math{G}, one obtains precisely @math{G(d)}.
+
+In general, given a set @math{G(d)}, which is the result of Groebner basis computation 
+up to weighted degree bound @math{d}, then 
+it is the complete finite Groebner basis, if and only if @math{G(2d-1)}=@math{G(d)} holds.
+
 
 @c ---------------------------------------------------------------------------
 @node Letterplace correspondence, Example of use of Letterplace, Groebner bases for two-sided ideals in free associative algebras,LETTERPLACE
