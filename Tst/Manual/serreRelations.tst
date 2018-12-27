@@ -4,7 +4,7 @@ intmat A[3][3] =
 2, -1, 0,
 -1, 2, -3,
 0, -1, 2; // G^1_2 Cartan matrix
-ring r = 0,(f1,f2,f3),dp;
+ring r = 0,(f1,f2,f3),Dp;
 int uptodeg = 5;
 def R = makeLetterplaceRing(uptodeg);
 setring R;

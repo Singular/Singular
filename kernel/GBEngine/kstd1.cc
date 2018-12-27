@@ -2567,13 +2567,15 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
 
 #ifdef HAVE_SHIFTBBA
 ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
-                int newIdeal, intvec *vw)
+                int newIdeal, intvec *vw, BOOLEAN rightGB)
 {
   ideal r;
   BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
   kStrategy strat=new skStrategy;
   intvec* temp_w=NULL;
+
+  strat->rightGB = rightGB;
 
   if(!TEST_OPT_RETURN_SB)
     strat->syzComp = syzComp;

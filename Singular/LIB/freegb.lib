@@ -22,18 +22,25 @@ and Project II.6 of the transregional collaborative research centre
 SFB-TRR 195 'Symbolic Tools in Mathematics and their Application' of the German DFG
 
 PROCEDURES:
-makeLetterplaceRing(d);          creates a Letterplace ring out of given data
-setLetterplaceAttributes(R,d,b); supplies ring R with the letterplace structure
-lieBracket(a,b[, N]);            Lie bracket ab-ba of two letterplace polynomials
-letplaceGBasis(I);               two-sided Groebner basis of a letterplace ideal I
+freeAlgebra(r, d);               creates a Letterplace ring out of given data
+isFreeAlgebra(r);                check whether r is a letterplace ring (free algebra)
+lpDegBound(R);                   returns the degree bound of a letterplace ring
+lpVarBlockSize(R);               returns the size of the letterplace blocks
+
+letplaceGBasis(I);               (deprecated, use twostd) two-sided Groebner basis of a letterplace ideal I
+
 lpDivision(f,I);                 two-sided division with remainder
 lpGBPres2Poly(L,I);              reconstructs a polynomial from the output of lpDivision
-isOrderingShiftInvariant(i);     tests shift-invariance of the monomial ordering
 
+lieBracket(a,b[, N]);            Lie bracket ab-ba of two letterplace polynomials
+isOrderingShiftInvariant(i);     tests shift-invariance of the monomial ordering
 isVar(p);                        check whether p is a power of a single variable
 
 lpLmDivides(ideal I, poly p);    tests whether there exists q in I, such that LM(q)|LM(p)
 lpVarAt(poly p, int pos);        returns the variable (as a poly) at position pos of the poly p
+
+makeLetterplaceRing(d);          (deprecated, use freeAlgebra) creates a Letterplace ring out of given data
+setLetterplaceAttributes(R,d,b); (for testing purposes) supplies ring R with the letterplace structure
 
 SEE ALSO: fpadim_lib, fpaprops_lib, fpalgebras_lib, LETTERPLACE
 ";
@@ -109,7 +116,7 @@ NOTE: Activate the resulting ring by using @code{setring}
   attrib(RL, "isLetterplaceRing", lV);
   attrib(RL, "maxExp", 1);
   def @R = ring(RL);
-  attrib(@R, "uptodeg", uptodeg);
+  attrib(@R, "uptodeg", uptodeg); // no longer needed
   attrib(@R, "isLetterplaceRing", lV);
   return (@R);
 }
@@ -118,7 +125,7 @@ example
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp;
   def R = setLetterplaceAttributes(r, 4, 2); setring R;
-  attrib(R,"isLetterplaceRing");
+  lpVarBlockSize(R);
   lieBracket(x(1),y(1),2);
 }
 
@@ -436,7 +443,7 @@ EXAMPLE: example letplaceGBasis; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y,z),(dp(1),dp(2));
+  ring r = 0,(x,y,z),Dp;
   int degree_bound = 5;
   def R = makeLetterplaceRing(5);
   setring R;
@@ -444,6 +451,12 @@ example
   ideal J = letplaceGBasis(I);
   J;
 }
+
+/* // temporary name for testing */
+/* proc lpRightStd(ideal F, ideal Q) */
+/* { */
+/*   return (system("rightgb", F, Q)); */
+/* } */
 
 /*
 //// this was the part of example in the old good Letterplace
@@ -983,18 +996,103 @@ static proc polylen(ideal I)
   return(J);
 }
 
+proc lpDegBound(def R)
+"USAGE:  lpDegBound(R); R a letterplace ring
+RETURN:  int
+PURPOSE: returns the degree bound of the letterplace ring
+EXAMPLE: example lpDegBound; shows examples
+"
+{
+  int lV = attrib(R, "isLetterplaceRing");
+  if (lV < 1) {
+    ERROR("not a letterplace ring");
+  }
+  return (nvars(R) div lV);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  def R = freeAlgebra(r, 7);
+  lpDegBound(R);
+}
+
+proc lpVarBlockSize(def R)
+"USAGE:  lpVarBlockSize(R); R a letterplace ring
+RETURN:  int
+PURPOSE: returns the variable block size of the letterplace ring, that is the number of variables of the original ring.
+EXAMPLE: example lpVarBlockSize; shows examples
+"
+{
+  int lV = attrib(R, "isLetterplaceRing");
+  if (lV < 1) {
+    ERROR("not a letterplace ring");
+  }
+  return (lV);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  def R = freeAlgebra(r, 7);
+  lpVarBlockSize(R);
+}
+
+proc isFreeAlgebra(def r)
+"USAGE:  isFreeAlgebra(r); r a ring
+RETURN:  boolean
+PURPOSE: check whether R is a letterplace ring (free algebra)
+EXAMPLE: example isFreeAlgebra; shows examples
+"
+{
+  int lV = attrib(r, "isLetterplaceRing");
+  if (lV < 1) {
+    return (0);
+  }
+  return (1);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  isFreeAlgebra(r);
+  def R = freeAlgebra(r, 7);
+  isFreeAlgebra(R);
+}
+
+proc freeAlgebra(def r, int d)
+"USAGE:  freeAlgebra(r, d); r a ring, d an integer
+RETURN:  ring
+PURPOSE: creates a letterplace ring with the ordering of r
+EXAMPLE: example freeAlgebra; shows examples
+"
+{
+  return (system("freeAlgebra", r, d));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  def R = freeAlgebra(r, 7);
+  R;
+  ring r2 = 0,(x,y,z),lp;
+  def R2 = freeAlgebra(r2, 7);
+  R2;
+}
+
 // united all previous makes, including mLR1 (homog) and mLR2 (nonhomog)
 proc makeLetterplaceRing(int d, list #)
-"USAGE:  makeLetterplaceRing(d [,h]); d an integer, h an optional integer
+"USAGE:  makeLetterplaceRing(d [,h]); d an integer, h an optional integer (deprecated, use freeAlgebra instead)
 RETURN:  ring
 PURPOSE: creates a ring with the ordering, used in letterplace computations
-NOTE: h = 0 (default) : Dp ordering will be used
+NOTE: h = -1 (default) : the ordering of the current ring will be used
+h = 0 : Dp ordering will be used
 h = 2 : weights 1 used for all the variables, a tie breaker is a list of block of original ring
 h = 1 : the pure homogeneous letterplace block ordering (applicable in the situation of homogeneous input ideals) will be used.
 EXAMPLE: example makeLetterplaceRing; shows examples
 "
 {
-  int alternativeVersion = 0;
+  int alternativeVersion = -1;
   if ( size(#)>0 )
   {
     if (typeof(#[1]) == "int")
@@ -1012,7 +1110,13 @@ EXAMPLE: example makeLetterplaceRing; shows examples
       def @A = makeLetterplaceRing2(d);
     }
     else {
-      def @A = makeLetterplaceRing4(d);
+      if (alternativeVersion == 0)
+      {
+        def @A = makeLetterplaceRing4(d);
+      }
+      else {
+        def @A = freeAlgebra(basering, d);
+      }
     }
   }
   return(@A);
@@ -1020,19 +1124,19 @@ EXAMPLE: example makeLetterplaceRing; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y,z),(dp(1),dp(2));
+  ring r = 0,(x,y,z),Dp;
   def A = makeLetterplaceRing(2); // same as  makeLetterplaceRing(2,0)
   setring A;  A;
-  attrib(A,"isLetterplaceRing");
-  attrib(A,"uptodeg");  // degree bound
+  lpVarBlockSize(A);
+  lpDegBound(A);  // degree bound
   setring r; def B = makeLetterplaceRing(2,1); // to compare:
   setring B;  B;
-  attrib(B,"isLetterplaceRing");
-  attrib(B,"uptodeg");  // degree bound
+  lpVarBlockSize(B);
+  lpDegBound(B);  // degree bound
   setring r; def C = makeLetterplaceRing(2,2); // to compare:
   setring C;  C;
-  attrib(C,"isLetterplaceRing");
-  attrib(C,"uptodeg");  // degree bound
+  lpDegBound(C);
+  lpDegBound(C);  // degree bound
 }
 
 static proc makeLetterplaceRing1(int d)
@@ -1114,8 +1218,8 @@ example
   def A = makeLetterplaceRing1(2);
   setring A;
   A;
-  attrib(A,"isLetterplaceRing");// number of variables in the main block
-  attrib(A,"uptodeg");  // degree bound
+  lpVarBlockSize(A);// number of variables in the main block
+  lpDegBound(A);  // degree bound
 }
 
 static proc makeLetterplaceRing2(int d)
@@ -1219,8 +1323,8 @@ example
   def A = makeLetterplaceRing2(2);
   setring A;
   A;
-  attrib(A,"isLetterplaceRing"); // number of variables in the main block
-  attrib(A,"uptodeg");  // degree bound
+  lpVarBlockSize(A); // number of variables in the main block
+  lpDegBound(A);  // degree bound
 }
 
 static proc makeLetterplaceRing4(int d)
@@ -1283,8 +1387,8 @@ example
   def A = makeLetterplaceRing4(2);
   setring A;
   A;
-  attrib(A,"isLetterplaceRing"); // number of variables in the main block
-  attrib(A,"uptodeg");  // degree bound
+  lpVarBlockSize(A); // number of variables in the main block
+  lpDegBound(A);  // degree bound
 }
 
 // P[s;sigma] approach
@@ -1389,8 +1493,8 @@ example
   def A = makeLetterplaceRing3(2);
   setring A;
   A;
-  attrib(A,"isLetterplaceRing"); // number of variables in the main block
-  attrib(A,"uptodeg");  // degree bound
+  lpVarBlockSize(A); // number of variables in the main block
+  lpDegBound(A);  // degree bound
 }
 
 /* EXAMPLES:
@@ -2650,7 +2754,7 @@ example
 //     w[i] = deg(var(i));
 //   }
 //   intvec v = w;
-//   for(i=1; i< attrib(basering,"uptodeg"); i++)
+//   for(i=1; i< lpDegBound(basering); i++)
 //   {
 //     v = v,w;
 //   }
@@ -2836,14 +2940,14 @@ EXAMPLE: example lpDivision; shows examples
 
   // make new ring
   def save = basering;
-  int norigvars = attrib(save, "isLetterplaceRing");
+  int norigvars = lpVarBlockSize(save);
   def Rtagged; def temp = save;
   for (int i = 1; i <= size(I); i++) {
      Rtagged = temp + ("tag_" + string(i));
      temp = Rtagged;
   } kill i;
   // currently R + "var" doesn't preserve uptodeg
-  Rtagged = setLetterplaceAttributes(Rtagged, attrib(Rtagged, "isLetterplaceRing"), attrib(save, "uptodeg"));
+  Rtagged = setLetterplaceAttributes(Rtagged, lpVarBlockSize(Rtagged), lpDegBound(save));
   setring Rtagged;
 
   // restore vars
@@ -2955,7 +3059,7 @@ ASSUME: Intvec is an exponent vector of a letterplace monomial contained in V'
 "
 {if (I==intvec(0)) {return(intvec(0));}
  int j,k,l;
- int n = attrib(basering,"isLetterplaceRing"); int d = attrib(basering,"uptodeg");
+ int n = lpVarBlockSize(basering); int d = lpDegBound(basering);
  intvec w; j = 1;
  while (j <= d)
  {w = I[1..n];
@@ -2991,7 +3095,7 @@ PURPOSE: Converts an modified exponent vector into an Dvec
 NOTE: Superfluos zero blocks must have been deleted befor using this procedure
 "
 {int i,j,k,r1,r2; intvec D;
- int n = attrib(basering,"isLetterplaceRing");
+ int n = lpVarBlockSize(basering);
  k = size(V) div n; r1 = 0; r2 = 0;
  for (i=1; i<= k; i++)
   {for (j=(1+((i-1)*n)); j <= (i*n); j++)
@@ -3036,7 +3140,7 @@ ASSUME: V,W are DVecs of monomials contained in V'
 {if(size(V)<size(W)){return(list(-1));}
 
  int i,j,r; intvec T; list R;
- int n = attrib(basering,"isLetterplaceRing");
+ int n = lpVarBlockSize(basering);
  int k = size(V) - size(W) + 1;
  if (intvec(V[1..size(W)])-W == 0){R[1]=0;}
  for (i =2; i <=k; i++)
@@ -3137,8 +3241,7 @@ ASSUME: - basering is a Letterplace ring.
 {
   int shiftInvariant = 1;
 
-  int n = attrib(basering, "isLetterplaceRing");
-  int d = attrib(basering, "uptodeg");
+  int d = lpDegBound(basering);
 
   ideal monomials;
   if (withHoles) {
@@ -3205,7 +3308,7 @@ static proc lpMonomialsWithHoles(int d)
      return (monomials);
   }
 
-  int lV = attrib(basering, "isLetterplaceRing"); // variable count
+  int lV = lpVarBlockSize(basering); // variable count
   ideal prevMonomials = lpMonomialsWithHoles(d - 1);
 
   for (int i = 1; i <= size(prevMonomials); i++) {
@@ -3231,7 +3334,7 @@ static proc lpMonomialsWithHoles(int d)
 
 static proc getlpCoeffs(poly q, poly p)
 {list R; intvec cq,t,lv,rv,bla;
- int n = attrib(basering,"isLetterplaceRing"); int d = attrib(basering,"uptodeg");
+ int n = lpVarBlockSize(basering); int d = lpDegBound(basering);
  int i;
  cq = leadexp(p)-leadexp(q); /* p/q */
  for (i = 1; i<= d; i++)
@@ -3275,11 +3378,11 @@ static proc entryViolation(intmat M, int n)
 static proc checkAssumptionsLPIV(int d, list L)
 "PURPOSE: Checks, if all the Assumptions are holding
 "
-{if (attrib(basering,"isLetterplaceRing")==0) {ERROR("Basering is not a Letterplace ring!");}
-  if (d > attrib(basering,"uptodeg")) {ERROR("Specified degree bound exceeds ring parameter!");}
+{if (!isFreeAlgebra(basering)) {ERROR("Basering is not a Letterplace ring!");}
+  if (d > lpDegBound(basering)) {ERROR("Specified degree bound exceeds ring parameter!");}
   int i;
   for (i = 1; i <= size(L); i++)
-  {if (entryViolation(L[i], attrib(basering,"isLetterplaceRing")))
+  {if (entryViolation(L[i], lpVarBlockSize(basering)))
     {ERROR("Not allowed monomial/intvec found!");}
   }
   return();
@@ -3297,7 +3400,7 @@ static proc checkAssumptions(poly p, ideal G)
 static proc checkLPRing();
 "
 "
-{if (attrib(basering,"isLetterplaceRing")==0) {ERROR("Basering is not a Letterplace ring!");}
+{if (!isFreeAlgebra(basering)) {ERROR("Basering is not a Letterplace ring!");}
  return();
 }
 
@@ -3323,7 +3426,7 @@ static proc isContainedInVp(poly p)
 "
 {int r = 0; intvec w;
  intvec l = leadexp(p);
- int n = attrib(basering,"isLetterplaceRing"); int d = attrib(basering,"uptodeg");
+ int n = lpVarBlockSize(basering); int d = lpDegBound(basering);
  int i,j,c,c1;
  while (1 <= d)
  {
@@ -3435,18 +3538,12 @@ static proc lpAssumeViolation()
   // checks whether the global vars
   // uptodeg and lV are defined
   // returns Boolean : yes/no [for assume violation]
-  def uptodeg = attrib(basering,"uptodeg");
+  def uptodeg = lpDegBound(basering);
   if ( typeof(uptodeg)!="int" )
   {
     return(1);
   }
-  int lV = attrib(basering,"isLetterplaceRing");
-  // isLetterplaceRing for rings is always defined and of type int
-  if ( lV==0 )
-  {
-    return(1);
-  }
-  return(0);
+  return (!isFreeAlgebra(basering))
 }
 
 // obsolete
@@ -3602,7 +3699,7 @@ EXAMPLE: example iv2lp; shows examples
 "
 {if (I[1] == 0) {return(1);}
   int i = size(I);
-  if (i > attrib(basering,"uptodeg")) {ERROR("polynomial exceeds degreebound");}
+  if (i > lpDegBound(basering)) {ERROR("polynomial exceeds degreebound");}
   int j; poly p = 1;
   for (j = 1; j <= i; j++) {if (I[j] > 0) { p = p*var(I[j]);}} //ignore zeroes, because they correspond to 1
   return(p);
@@ -3720,15 +3817,15 @@ EXAMPLE: example lp2iv; shows examples
 {p = normalize(lead(p));
   intvec I;
   int i,j;
-  if (deg(p) > attrib(basering,"uptodeg")) {ERROR("Monomial exceeds degreebound");}
+  if (deg(p) > lpDegBound(basering)) {ERROR("Monomial exceeds degreebound");}
   if (p == 1) {return(I);}
   if (p == 0) {ERROR("Monomial is not allowed to equal zero");}
   intvec lep = leadexp(p);
-  for ( i = 1; i <= attrib(basering,"isLetterplaceRing"); i++) {if (lep[i] == 1) {I = i; break;}}
-  for (i = (attrib(basering,"isLetterplaceRing")+1); i <= size(lep); i++)
+  for ( i = 1; i <= lpVarBlockSize(basering); i++) {if (lep[i] == 1) {I = i; break;}}
+  for (i = (lpVarBlockSize(basering)+1); i <= size(lep); i++)
   {if (lep[i] == 1)
-    { j = (i mod attrib(basering,"isLetterplaceRing"));
-      if (j == 0) {I = I,attrib(basering,"isLetterplaceRing");}
+    { j = (i mod lpVarBlockSize(basering));
+      if (j == 0) {I = I,lpVarBlockSize(basering);}
       else {I = I,j;}
     }
     else { if (lep[i] > 1) {ERROR("monomial has a not allowed multidegree");}}

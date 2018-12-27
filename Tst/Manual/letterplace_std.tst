@@ -1,6 +1,6 @@
 LIB "tst.lib"; tst_init();
 LIB "freegb.lib";
-ring r = 0,(x,y,z),(dp(1),dp(2));
+ring r = 0,(x,y,z),Dp;
 int degree_bound = 5;
 def R = makeLetterplaceRing(5);
 setring R;

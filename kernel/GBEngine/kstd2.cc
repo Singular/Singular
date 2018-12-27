@@ -4177,8 +4177,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   initHilbCrit(F,Q,&hilb,strat); /*NO CHANGES*/
   initBbaShift(strat); /* DONE */
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
-  /*Shdl=*/initBuchMoraShift(F, Q,strat); /* updateS with no toT, i.e. no init for T */
-  updateSShift(strat); /* initializes T */
+  /*Shdl=*/initBuchMora(F, Q,strat);
   if (strat->minim>0) strat->M=idInit(IDELEMS(F),F->rank);
   reduc = olddeg = 0;
 
@@ -4351,7 +4350,8 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
         // posInS only depends on the leading term
         strat->enterS(strat->P, pos, strat, strat->tl);
-        enterTShift(strat->P, strat);
+        if (!strat->rightGB)
+          enterTShift(strat->P, strat);
       }
 
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
@@ -4368,10 +4368,11 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           // we have to add it also to S/T
           // and add pairs
           int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
-          int atR=strat->tl+1; // enterTShift introduces P.p=T[tl+1], T[tl+2]...
-          enterTShift(strat->P,strat,-1);
-          enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, atR);
-          strat->enterS(strat->P, pos, strat, atR);
+          enterT(strat->P, strat);
+          enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+          strat->enterS(strat->P, pos, strat, strat->tl);
+          if (!strat->rightGB)
+            enterTShift(strat->P,strat);
         }
       }
     }
@@ -4392,6 +4393,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   {
     for (int k = 0; k <= strat->sl; ++k)
     {
+      if ((strat->fromQ!=NULL) && (strat->fromQ[k])) continue; // do not reduce Q_k
       for (int j = 0; j<=strat->tl; ++j)
       {
         // this is like clearS in bba, but we reduce with elements from T, because it contains the shifts too
@@ -4456,11 +4458,21 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 }
 
 
-ideal freegb(ideal I)
+ideal freegb(ideal F)
 {
   assume(rIsLPRing(currRing));
-  assume(idIsInV(I));
-  ideal RS = kStdShift(I,NULL, testHomog, NULL,NULL,0,0,NULL);
+  assume(idIsInV(F));
+  ideal RS = kStdShift(F, NULL, testHomog, NULL);
+  idSkipZeroes(RS); // is this even necessary?
+  assume(idIsInV(RS));
+  return(RS);
+}
+
+ideal rightgb(ideal F, ideal Q)
+{
+  assume(rIsLPRing(currRing));
+  assume(idIsInV(F));
+  ideal RS = kStdShift(F, Q, testHomog, NULL, NULL, 0, 0, NULL, TRUE);
   idSkipZeroes(RS); // is this even necessary?
   assume(idIsInV(RS));
   return(RS);

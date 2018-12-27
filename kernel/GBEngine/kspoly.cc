@@ -139,7 +139,10 @@ int ksReducePolyZ(LObject* PR,
 
 #ifdef HAVE_SHIFTBBA
   poly lmRight;
-  if (tailRing->isLPring) {
+  if (tailRing->isLPring)
+  {
+    assume(PR->shift == 0);
+    assume(PW->shift == si_max(p_mFirstVblock(PW->p, tailRing) - 1, 0));
     k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
   }
 #endif
@@ -270,6 +273,8 @@ int ksReducePoly(LObject* PR,
   poly lmRight;
   if (tailRing->isLPring)
   {
+    assume(PR->shift == 0);
+    assume(PW->shift == si_max(p_mFirstVblock(PW->p, tailRing) - 1, 0));
     k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
   }
 #endif
@@ -622,7 +627,10 @@ int ksReducePolyBound(LObject* PR,
 
 #ifdef HAVE_SHIFTBBA
   poly lmRight;
-  if (tailRing->isLPring) {
+  if (tailRing->isLPring)
+  {
+    assume(PR->shift == 0);
+    assume(PW->shift == si_max(p_mFirstVblock(PW->p, tailRing) - 1, 0));
     k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
   }
 #endif
@@ -833,7 +841,10 @@ int ksReducePolySig(LObject* PR,
 
 #ifdef HAVE_SHIFTBBA
   poly lmRight;
-  if (tailRing->isLPring) {
+  if (tailRing->isLPring)
+  {
+    assume(PR->shift == 0);
+    assume(PW->shift == si_max(p_mFirstVblock(PW->p, tailRing) - 1, 0));
     k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
   }
 #endif
@@ -1077,7 +1088,10 @@ int ksReducePolySigRing(LObject* PR,
 
 #ifdef HAVE_SHIFTBBA
   poly lmRight;
-  if (tailRing->isLPring) {
+  if (tailRing->isLPring)
+  {
+    assume(PR->shift == 0);
+    assume(PW->shift == si_max(p_mFirstVblock(PW->p, tailRing) - 1, 0));
     k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
   }
 #endif
@@ -1191,7 +1205,8 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   poly m12, m22;
   if (tailRing->isLPring)
   {
-    // note: because of the crits, p2 is never shifted
+    assume(si_max(p_mFirstVblock(p2, tailRing) - 1, 0) == 0);
+    // note: because of how the pairs are created, p2 should never be shifted
     int split = p_mFirstVblock(p1, tailRing);
     k_SplitFrame(m1, m12, split, tailRing);
     k_SplitFrame(m2, m22, split, tailRing);
@@ -1268,6 +1283,10 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
 #ifdef HAVE_SHIFTBBA
   if (tailRing->isLPring)
   {
+    // just to be sure, check that the shift is correct
+    assume(Pair->shift == 0);
+    assume(si_max(p_mFirstVblock(Pair->p, tailRing) - 1, 0) == Pair->shift); // == 0
+
     p_LmDelete(m12, tailRing);
     p_LmDelete(m22, tailRing);
     // m2 is already deleted
