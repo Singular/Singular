@@ -56,12 +56,12 @@ A^n.
 
 @item
 @sc{Plural} does not perform computations in the free algebra or in its general factor algebras 
-(instead, these computations can be possibly done due to @ref{Letterplace}).
+(instead, these computations can be possibly done by @ref{Letterplace}).
 
 In @sc{Plural} one can only work with @math{G}-algebras and with their factor-algebras
 by two-sided ideals (@math{GR}-algebras).
 
-@item @sc{Plural} requires a global monomial ordering (see @ref{General definitions for orderings})
+@item @sc{Plural} requires a global monomial ordering (see @ref{General definitions for orderings}).
 However, @sc{SCA} provides the possibility of computations in a tensor product of 
 a non-commutative graded commutative algebra (equipped with a global ordering) 
 with a commutative algebra (equipped with any ordering). 
@@ -70,7 +70,7 @@ with a commutative algebra (equipped with any ordering).
 the coefficient field (or a ring) mutually commute with all variables.
 Defining parameters, one @strong{cannot} impose non-commutative relations
 on them. Moreover, it is impossible to introduce parameters which do not commute with variables.
-However, @ref{olga_lib} offers a rich functionality to work with Ore localizations of @math{G}-algebras.
+However, @ref{olga_lib} offers a rich functionality for working within Ore localizations of @math{G}-algebras.
 @end itemize
 @end table
 
@@ -1057,7 +1057,7 @@ the sum of monomials at the indicated places w.r.t. the monomial ordering
 
 @table @code
 @item bracket
-computes the Lie bracket of two polinomials (see @ref{bracket})
+computes the Lie bracket of two polynomials (see @ref{bracket})
 @item lead
 leading term (see @ref{lead})
 @item leadcoef
@@ -2546,7 +2546,7 @@ none
 Works like @ref{nc_algebra} but changes the basering.
 
 @item @strong{Remark:}
-This function is @strong{depreciated} and should be substituted by @code{nc_algebra},
+This function is @strong{deprecated} and should be substituted by @code{nc_algebra},
 since it violates the general @sc{Singular} policy: only @ref{ring} and @ref{setring} can change the basering. More concretely,
 replace by @code{def A = nc_algebra(C, D); setring A;} which will additionally introduce a new ring. Afterwards, some objects may have to be
 mapped into the new ring.
@@ -2959,7 +2959,8 @@ matrix C from the definition of @ref{G-algebras})
 @item square matrix, containing structural polynomials of a G-algebra
 (this corresponds to the matrix D from the definition of @ref{G-algebras})
 @end enumerate
-@item @strong{Note:} After modifying a list aquired with @code{ringlist}, one can construct a corresponding ring with @code{ring(list)}.
+@item @strong{Note:} 
+After modifying a list aquired with @code{ringlist}, one can construct a corresponding ring with @code{ring(list)}.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3633,7 +3634,7 @@ LM(f) = x^b e_i with b_j <= a_j, 1<= j <= n.
 
 @*@strong{Remark:} In general non-commutative algorithms are working with global well-orderings
 only (see @ref{PLURAL}, @ref{Monomial orderings} and @ref{Term orderings}), unless we deal with 
-graded commutative algebras via @ref{SCA}.
+graded commutative algebras via @ref{Graded commutative algebras (SCA)}.
 
 @tex
 A Groebner basis $G\subset A^r$ is called {\bf minimal} (or {\bf reduced}) if $0\notin G$ and if

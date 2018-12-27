@@ -38,7 +38,7 @@ All considered algebras are assumed to be associative @math{K}-algebras for some
 @itemize
 @item Definition
 
-Polynomial graded commutative algebras are factors of tensor products of commutative algebras
+@strong{Polynomial graded commutative algebras} are factors of tensor products of commutative algebras
 with an exterior algebra over a ground field @math{K}.
 
 These algebras can be naturally endowed with a @math{Z/2Z}-grading, where anti-commutative algebra generators
@@ -67,7 +67,7 @@ where only the non-commutative variables are required to be global.
 In particular, commutative variables are allowed to be local.
 This means that one can work in tensor products of any commutative ring with an exterior algebra.
 
-@item Example of defining graded commutative algebras in @sc{Singular:SCA}
+@item Example of defining graded commutative algebras in @sc{Singular:SCA} and computing with them
 
 Given a commutative polynomial ring @math{r}, super-commutative structure on it can be introduced as follows:
 
@@ -80,7 +80,7 @@ ring r = 0,(a, b, x,y,z, Q, W),(lp(2), dp(3), Dp(2));
 def S = superCommutative(3, 5, ideal(a*W + b*Q*x + z) ); setring S; S;
 ideal I = a*x*y + z*Q + b, y*Q + a; I;
 std(I); // Groebner basis is used here since > is global
-kill r;
+kill r, S; 
 // Let's do the same but this time with some local commutative variables:
 ring r = 0,(a, b, x,y,z, Q, W),(dp(1), ds(1), lp(3), ds(2));
 def S = superCommutative(3, 5, ideal(a*W + b*Q*x + z) ); setring S; S;
