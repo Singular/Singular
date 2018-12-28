@@ -7,19 +7,30 @@
 @cindex super-commutative algebras
 @cindex SCA
 
+@ifhtml
+@html
+<CENTER>
+<A HREF="http://www.singular.uni-kl.de">
+<IMG SRC="sca.jpg" ALT="Singular:SCA logo"></A><br>
+</CENTER>
+<h3> A Subsystem for Graded Commutative Algebras </h3>
+<p></p>
+@end html
+@end ifhtml
+
 This section describes basic mathematical notions, definition, and a little bit the implementation of
-the experimental non-commutative kernel extension @sc{Sca} of @sc{Singular}
+the experimental non-commutative kernel extension @sc{SCA} of @sc{Singular}
 which improves performance of many algorithms in graded commutative algebras.
 
 In order to improve performance of @sc{Singular} in specific non-commutative algebras
 one can extend the internal implementation for them in a virtual-method-overloading-like manner.
 At the moment graded commutative algebras (SCA) and in particular exterior algebras are implemented this way.
 
-Note that grade commutative algebras require no special user actions apart from
+Note that graded commutative algebras require no special user actions apart from
 defining an appropriate non-commutative GR-algebra in @sc{Singular}.
 Upon doing that, the supper-commutative structure will be automatically detected and
 special multiplication will be used.
-Moreover, in most SCA-aware (e.g. @code{std}) algorithms special internal improvements will be used
+Moreover, in most @sc{SCA}-aware (e.g. @code{std}) algorithms special internal improvements will be used
 (otherwise standard generic non-commutative implementations will be used).
 
 All considered algebras are assumed to be associative @math{K}-algebras for some ground field @math{K}.
@@ -27,10 +38,10 @@ All considered algebras are assumed to be associative @math{K}-algebras for some
 @itemize
 @item Definition
 
-Polynomial graded commutative algebras are factors of tensor products of commutative algebras
+@strong{Polynomial graded commutative algebras} are factors of tensor products of commutative algebras
 with an exterior algebra over a ground field @math{K}.
 
-These algebras can be naturally endowed with a @math{Z_2}-grading, where anti-commutative algebra generators
+These algebras can be naturally endowed with a @math{Z/2Z}-grading, where anti-commutative algebra generators
 have degree @math{1} and commutative algebra generators (and naturally scalars) have degree @math{0}.
 In this particular case they may be considered as super-commutative algebras.
 
@@ -39,19 +50,24 @@ In this particular case they may be considered as super-commutative algebras.
 A graded commutative algebra with @math{n} commutative and @math{m} anti-commutative algebra generators can be represented
 as factors of the following GR-algebra by some two-sided ideal:
 @tex
-$$K\left\langle x_1, \ldots, x_n; y_1, \ldots, y_m \mid y_j * y_i = - y_i y_j, j > i \right\rangle / \left\langle y_1^2, \ldots, y_m^2  \right\rangle.$$
+$$K\left\langle x_1, \ldots, x_n; y_1, \ldots, y_m \mid y_j * y_i = - y_i y_j, i<j \right\rangle / \left\langle y_1^2, \ldots, y_m^2  \right\rangle.$$
 @end tex
+@ifinfo
+K< x_1,@dots{},x_n; y_1, @dots{},y_m | y_j * y_i = - y_i y_j, i<j  > / < y_1^2, @dots{}, y_m^2 >.
+@end ifinfo
 
 @item Distinctive features
 
-Graded commutative algebras have zero divisors iff @math{m > 0}: @math{y_i * y_i = 0}.
+Graded commutative algebras are Noetherian.
+
+Graded commutative algebras have zero divisors if and only if @math{m > 0}: @math{y_i * y_i = 0}.
 
 Unlike other non-commutative algebras one may use any monomial ordering
 where only the non-commutative variables are required to be global.
 In particular, commutative variables are allowed to be local.
 This means that one can work in tensor products of any commutative ring with an exterior algebra.
 
-@item Example of defining graded commutative algebras in @sc{Singular}
+@item Example of defining graded commutative algebras in @sc{Singular:SCA} and computing with them
 
 Given a commutative polynomial ring @math{r}, super-commutative structure on it can be introduced as follows:
 
@@ -64,7 +80,7 @@ ring r = 0,(a, b, x,y,z, Q, W),(lp(2), dp(3), Dp(2));
 def S = superCommutative(3, 5, ideal(a*W + b*Q*x + z) ); setring S; S;
 ideal I = a*x*y + z*Q + b, y*Q + a; I;
 std(I); // Groebner basis is used here since > is global
-kill r;
+kill r, S; 
 // Let's do the same but this time with some local commutative variables:
 ring r = 0,(a, b, x,y,z, Q, W),(dp(1), ds(1), lp(3), ds(2));
 def S = superCommutative(3, 5, ideal(a*W + b*Q*x + z) ); setring S; S;
@@ -74,6 +90,6 @@ std(I);
 @end smallexample
 @end itemize
 
-See example of @code{superCommutative} from the library @code{nctools.lib}.
+See example of @ref{superCommutative} from the library @code{nctools.lib}.
 
-Reference: Ph.D thesis by Oleksandr Motsak (2010).
+Reference: Ph.D thesis by Oleksandr Motsak (2010), @url{https://nbn-resolving.org/urn:nbn:de:hbz:386-kluedo-26479}.
