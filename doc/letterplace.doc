@@ -143,14 +143,14 @@ $N_0$
 @ifinfo
 @math{N_0}
 @end ifinfo
-for @math{1}<={}@math{i}<={}@math{n}. As a special case, define the @strong{length} 
+for @math{1}<=@math{i}<=@math{n}. As a special case, define the @strong{length} 
 @tex 
 len:$ \langle X\rangle\rightarrow N_0$
 @end tex
 @ifinfo
 @math{len:<X>->N_0}
 @end ifinfo
- by @math{len(x_i)=1} for @math{1}<={}@math{i}<={}@math{n}. For any ordering << on <@math{X}> and any weight 
+ by @math{len(x_i)=1} for @math{1}<=@math{i}<=@math{n}. For any ordering << on <@math{X}> and any weight 
 @tex 
 $w: \langle X\rangle\rightarrow N_0$
 @end tex
@@ -204,27 +204,27 @@ With respect to the ordering @samp{Wp(1, 2, 1)}, the test monomials are ordered 
 @c what about <_{i+1}? As it is now, this might be wrong ...
 @item @code{lp}
 @tex
-Let $w^{(i)}$ be weights uniquely determined by $w^{(i)}(x_j)=\delta_{i,j}$ for $1\leq i,j\leq n$ where $\delta$ denotes the Kronecker delta. Let $<_n$ be the $w^{(n)}$-weight extension of the left lexicographical ordering on $\langle X\rangle$ and inductively $<_i$ be the $w^{(i)}$-weight extension of $<_{i+1}$ for all $1\leq i<n$.\\
+Let $w^{(i)}$ be weights uniquely determined by $w^{(i)}(x_j)=\delta_{i,j}$ for $1\leq i,j\leq n$ where $\delta$ denotes the Kronecker delta. Let $<_n$ be the $w^{(n)}$-weight extension of the left lexicographical ordering on $\langle X\rangle$ and inductively $<_i$ be the $w^{(i)}$-weight extension of $<_{i+1}$ for all $1\leq i<n$.
 The monomial ordering lp corresponds to $<_1$ and eliminates $x_1,...,x_j$ for all $1<=j<n$.
 @end tex
 @ifinfo
-Let @math{w^i} be weights uniquely determined by @math{w^i(x_j)=\d^i_j}$ for @math{1}<={}@math{i},@math{j}<={}@math{n} where @math{d} denotes the Kronecker delta. Let @math{<_n} be the @math{w^n}-weight extension of the left lexicographical ordering on <@math{X}> and inductively @math{<_i} be the @math{w^i}-weight extension of @math{<_i+1} for all @math{1}<={}@math{i}<@math{n}
+Let @math{w^i} be weights uniquely determined by @math{w^i(x_j)=\d^i_j}$ for @math{1}<=@math{i},@math{j}<=@math{n} where @math{d} denotes the Kronecker delta. Let @math{<_n} be the @math{w^n}-weight extension of the left lexicographical ordering on <@math{X}> and inductively @math{<_i} be the @math{w^i}-weight extension of @math{<_i+1} for all @math{1}<=@math{i}<@math{n}
 @end ifinfo
 
-The monomial ordering @samp{lp} corresponds to @math{<_1} and eliminates @{@math{x_1},@dots{},@math{x_j}@} for all @math{1}<={}@math{j}<@math{n}.
+The monomial ordering @samp{lp} corresponds to @math{<_1} and eliminates @{@math{x_1},@dots{},@math{x_j}@} for all @math{1}<=@math{j}<@math{n}.
 
 With respect to the ordering @samp{lp}, the test monomials are ordered as follows:
 @math{x_1 x_1 x_1 > x_1 x_2 x_3 > x_3 x_2 x_1 > x_1 x_3 > x_3 x_1 > x_1 > x_2 x_2 > x_2 x_3 > x_2 > x_3 x_3 x_3 > x_3}
 @item @code{rp}
 @tex
-Let $w^{(i)}$ be weights uniquely determined by $w^{(i)}(x_j)=\delta_{i,j}$ for $1\leq i,j\leq n$ where $\delta$ denotes the Kronecker delta. Let $<_1$ be the $w^{(1)}$-weight extension of the left lexicographical ordering on $\langle X\rangle$ and inductively $<_i$ be the $w^{(i)}$-weight extension of $<_{i-1}$ for all $1<i\leq n$.\\
+Let $w^{(i)}$ be weights uniquely determined by $w^{(i)}(x_j)=\delta_{i,j}$ for $1\leq i,j\leq n$ where $\delta$ denotes the Kronecker delta. Let $<_1$ be the $w^{(1)}$-weight extension of the left lexicographical ordering on $\langle X\rangle$ and inductively $<_i$ be the $w^{(i)}$-weight extension of $<_{i-1}$ for all $1<i\leq n$.
 The monomial ordering \texttt{rp} corresponds to $<_n$ and eliminates $\{x_j,\ldots,x_n\}$ for all $1<j\leq n$.
 @end tex
 @ifinfo
-Let @math{w^i} be weights uniquely determined by @math{w^i(x_j)=\d^i_j}$ for @math{1}<={}@math{i},@math{j}<={}@math{n} where @math{d} denotes the Kronecker delta. Let @math{<_1} be the @math{w^n}-weight extension of the left lexicographical ordering on <@math{X}> and inductively @math{<_i} be the @math{w^i}-weight extension of @math{<_i-1} for all @math{1}<@math{i}<={}@math{n}.
+Let @math{w^i} be weights uniquely determined by @math{w^i(x_j)=\d^i_j}$ for @math{1}<=@math{i},@math{j}<=@math{n} where @math{d} denotes the Kronecker delta. Let @math{<_1} be the @math{w^n}-weight extension of the left lexicographical ordering on <@math{X}> and inductively @math{<_i} be the @math{w^i}-weight extension of @math{<_i-1} for all @math{1}<@math{i}<=@math{n}.
 @end ifinfo
 
-The monomial ordering @samp{rp} corresponds to @math{<_n} and eliminates @{\@math{x_j},@dots{},@math{x_n}@} for all @math{1}<@math{j}<={} @math{n}.
+The monomial ordering @samp{rp} corresponds to @math{<_n} and eliminates @{\@math{x_j},...,@math{x_n}@} for all @math{1}<@math{j}<= @math{n}.
 
 With respect to the ordering @samp{rp}, the test monomials are ordered as follows:
 @math{x_3 x_3 x_3 > x_1 x_2 x_3 > x_3 x_2 x_1 > x_2 x_3 > x_1 x_3 > x_3 x_1 > x_3 > x_2 x_2 > x_2 > x_1 x_1 x_1 > x_1}
@@ -234,7 +234,7 @@ With respect to the ordering @samp{rp}, the test monomials are ordered as follow
 For weight $v:\langle X\rangle\rightarrow N_0$ determined by $v(x_i)=v_i\in N_0$ with $1\leq i\leq n$ and monomial ordering $\prec$ on $\langle X\rangle$, the $v$\emph{-weight extension} of $\prec$ corresponds to \texttt{(a(v), o)}. As a choice for $\prec$ there are currently two options implemented, which are \texttt{dp} and \texttt{Dp}. Notice that this ordering eliminates $\{x_i\in X\mid v(x_i)\not=0\}$.
 @end tex
 @ifinfo
-For weight @math{v:<X>->N_0} determined by @math{v(x_i)=v_i} in @math{N_0} with @math{1}<={}@math{i}<={}@math{n} and monomial ordering << on <@math{X}>, the @math{v}-weight extension of << corresponds to @samp{(a(v), o)}. As a choice for << there are currently two options implemented, which are @samp{dp} and @samp{Dp}. Notice that this ordering eliminates @{@math{x_i}:@math{v(x_i)}!=@math{0}@}.
+For weight @math{v:<X>->N_0} determined by @math{v(x_i)=v_i} in @math{N_0} with @math{1}<=@math{i}<=@math{n} and monomial ordering << on <@math{X}>, the @math{v}-weight extension of << corresponds to @samp{(a(v), o)}. As a choice for << there are currently two options implemented, which are @samp{dp} and @samp{Dp}. Notice that this ordering eliminates @{@math{x_i}:@math{v(x_i)}!=@math{0}@}.
 @end ifinfo
 
 With respect to the ordering @samp{( a(1, 0, 0), Dp)}, the test monomials are ordered as follows:
@@ -334,7 +334,7 @@ its modules up to a given degree bound.
 @end ifinfo
 
 Subject to the given degree (length) bound @math{d}, the truncated letterplace algebra 
-@math{K[X x @{1, @dots{}, d @}]} is finitely generated commutative polynomial @math{K}-algebra.
+@math{K[X x (1, ..., d) ]} is finitely generated commutative polynomial @math{K}-algebra.
 
 In [LL09] a natural shifting on letterplace polynomials was introduced and used.
 Indeed, there is 1-to-1 correspondence between two-sided ideals

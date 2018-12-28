@@ -56,7 +56,7 @@ A^n.
 
 @item
 @sc{Plural} does not perform computations in the free algebra or in its general factor algebras 
-(instead, these computations can be possibly done by @ref{Letterplace}).
+(instead, these computations can be possibly done by @ref{LETTERPLACE}).
 
 In @sc{Plural} one can only work with @math{G}-algebras and with their factor-algebras
 by two-sided ideals (@math{GR}-algebras).
