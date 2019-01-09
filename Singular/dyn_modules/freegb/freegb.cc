@@ -133,10 +133,10 @@ extern "C" int SI_MOD_INIT(freegb)(SModulFunctions* p)
 {
 #ifdef HAVE_SHIFTBBA
   p->iiAddCproc("freegb.so","freeAlgebra",FALSE,freegb);
+  p->iiAddCproc("freegb.so","lpLmDivides",FALSE,lpLmDivides);
+  p->iiAddCproc("freegb.so","lpVarAt",FALSE,lpVarAt);
   p->iiAddCproc("freegb.so","stest",TRUE,stest);
   p->iiAddCproc("freegb.so","btest",TRUE,btest);
-  p->iiAddCproc("freegb.so","lpLmDivides",TRUE,lpLmDivides);
-  p->iiAddCproc("freegb.so","lpVarAt",TRUE,lpVarAt);
 #endif
   return (MAX_TOK);
 }
