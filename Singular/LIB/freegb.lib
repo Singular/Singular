@@ -387,12 +387,7 @@ PURPOSE: tests if there is a polynomial q in I with LM(q)|LM(p)
 EXAMPLE: example lpLmDivides; shows examples
 "
 {
-  for (int i = 1; i <= ncols(I); i++) {
-    if (system("lpLmDivides", I[i], p)) {
-      return (1);
-    }
-  } kill i;
-  return (0);
+  ERROR(" freegb.so not loaded");
 }
 example
 {
@@ -414,7 +409,7 @@ PURPOSE: returns the variable (as a poly) at position pos of the poly p
 EXAMPLE: example lpVarAt; shows examples
 "
 {
-  return (system("lpVarAt", p, pos));
+  ERROR(" freegb.so not loaded");
 }
 example
 {
@@ -1067,7 +1062,7 @@ PURPOSE: creates a letterplace ring with the ordering of r
 EXAMPLE: example freeAlgebra; shows examples
 "
 {
-  return (system("freeAlgebra", r, d));
+  ERROR(" freegb.so not loaded");
 }
 example
 {
@@ -1512,12 +1507,12 @@ example
   I;
   poly p = I[2]; // I[8];
   p;
-  system("stest",p,7,7,3); // error -> the world is ok
-  poly q1 = system("stest",p,1,7,3); //ok
-  poly q6 = system("stest",p,6,7,3); //ok
-  system("btest",p,3); //ok
-  system("btest",q1,3); //ok
-  system("btest",q6,3); //ok
+  stest(p,7,7,3); // error -> the world is ok
+  poly q1 = stest(p,1,7,3); //ok
+  poly q6 = stest(p,6,7,3); //ok
+  btest(p,3); //ok
+  btest(q1,3); //ok
+  btest(q6,3); //ok
 }
 
 //static proc test_shrink()
@@ -2442,7 +2437,7 @@ EXAMPLE: example shiftPoly; shows examples
   {
     ERROR("Incomplete Letterplace structure on the basering!");
   }
-  return(system("stest",a,i));
+  return(stest(a,i));
 }
 example
 {
@@ -2469,7 +2464,7 @@ EXAMPLE: example lastBlock; shows examples
     ERROR("Incomplete Letterplace structure on the basering!");
   }
   // calls pLastVblock(p);
-  return(system("btest",p));
+  return(btest(p));
 }
 example
 {
@@ -3886,4 +3881,9 @@ example
   // intvec representation
   ideal G = p,q,w;
   lp2ivId(G); // returns the list of intmats for this ideal
+}
+
+static proc mod_init()
+{
+  LIB"freegb.so";
 }
