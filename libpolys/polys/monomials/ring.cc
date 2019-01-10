@@ -4488,6 +4488,11 @@ BOOLEAN rHasTDeg(ring r)
 ring rAssure_TDeg(ring r, int &pos)
 {
   int i;
+  if (r->N==1) // special: dp(1)==lp(1)== no entry in typ
+  {
+    pos=r->VarL_LowIndex;
+    return r;
+  }
   if (r->typ!=NULL)
   {
     for(i=r->OrdSize-1;i>=0;i--)
