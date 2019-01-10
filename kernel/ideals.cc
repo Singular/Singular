@@ -1245,7 +1245,6 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
       if (s_rest->m[j-1]!=NULL)
       {
         p_Shift(&(s_rest->m[j-1]),-1,currRing);
-        s_rest->m[j-1] = s_rest->m[j-1];
       }
     }
   }
