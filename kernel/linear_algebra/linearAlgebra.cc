@@ -968,7 +968,7 @@ void hessenberg(const matrix aMat, matrix &pMat, matrix &hessenbergMat,
 
 /**
  * Performs one transformation step on the given matrix H as part of
- * the gouverning QR double shift algorith.
+ * the gouverning QR double shift algorithm.
  * The method will change the given matrix H side-effect-wise. The resulting
  * matrix H' will be in Hessenberg form.
  * The iteration index is needed, since for the 11th and 21st iteration,

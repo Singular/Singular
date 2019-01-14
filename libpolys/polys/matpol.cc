@@ -2159,7 +2159,7 @@ poly mp_Det(matrix a, const ring r, DetVariant d/*=DetDefault*/)
       return p;
     }
     default:
-      WerrorS("unknown algorith for det");
+      WerrorS("unknown algorithm for det");
   }
 }
 
