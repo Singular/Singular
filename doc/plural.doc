@@ -137,8 +137,8 @@ For the general syntax of a declaration see @ref{General command syntax}.
 
 @node ideal BR_PLURAL_BR, map BR_PLURAL_BR, Data types BR_PLURAL_BR, Data types BR_PLURAL_BR
 @section ideal BR_PLURAL_BR
-@c @cindex ideal
-@cindex  untyped definitions
+@cindex ideal BR_PLURAL_BR
+@cindex untyped definitions
 
 For @sc{Plural} ideals are @strong{left} ideals, unless stated otherwise.
 @* Ideals are represented as lists of polynomials which are interpreted as
@@ -195,10 +195,7 @@ ncols(i);
 @end smallexample
 @end table
 
-
-
 @c ------------------------------
-
 @node ideal expressions BR_PLURAL_BR, ideal operations BR_PLURAL_BR, ideal declarations BR_PLURAL_BR, ideal BR_PLURAL_BR
 @subsection ideal expressions BR_PLURAL_BR
 @cindex ideal expressions BR_PLURAL_BR
@@ -244,9 +241,7 @@ j;
 @c example
 @end smallexample
 
-
 @c ------------------------------
-
 @node ideal operations BR_PLURAL_BR, ideal related functions BR_PLURAL_BR, ideal expressions BR_PLURAL_BR, ideal BR_PLURAL_BR
 @subsection ideal operations BR_PLURAL_BR
 @cindex ideal operations BR_PLURAL_BR
@@ -300,9 +295,7 @@ II;
 @c example
 @end smallexample
 
-
 @c ------------------------------
-
 @node ideal related functions BR_PLURAL_BR,  , ideal operations BR_PLURAL_BR, ideal BR_PLURAL_BR
 @subsection ideal related functions BR_PLURAL_BR
 @cindex ideal related functions BR_PLURAL_BR
@@ -369,7 +362,6 @@ two-sided Groebner basis computation (see @ref{twostd})
 @item vdim
 vector space dimension of basering modulo the leading ideal (see @ref{vdim BR_PLURAL_BR})
 @end table
-
 
 @c ---------------------------------------
 @node map BR_PLURAL_BR, module BR_PLURAL_BR, ideal BR_PLURAL_BR, Data types BR_PLURAL_BR
