@@ -149,29 +149,21 @@ convertnmod_poly_t2FacCF (const nmod_poly_t poly, const Variable& x)
 void convertCF2Fmpq (fmpq_t result, const CanonicalForm& f)
 {
   //ASSERT (isOn (SW_RATIONAL), "expected rational");
-  fmpz_t tmp1, tmp2;
-  fmpz_init (tmp1);
-  fmpz_init (tmp2);
   if (f.isImm ())
   {
-    fmpz_set_si (tmp1, f.num().intval());
-    fmpz_set_si (tmp2, f.den().intval());
+    fmpz_set_si (fmpq_numref (result), f.num().intval());
+    fmpz_set_si (fmpq_denref (result), f.den().intval());
   }
   else
   {
     mpz_t gmp_val;
     gmp_numerator (f, gmp_val);
-    fmpz_set_mpz (tmp1, gmp_val);
+    fmpz_set_mpz (fmpq_numref (result), gmp_val);
     mpz_clear (gmp_val);
     gmp_denominator (f, gmp_val);
-    fmpz_set_mpz (tmp2, gmp_val);
+    fmpz_set_mpz (fmpq_denref (result), gmp_val);
     mpz_clear (gmp_val);
   }
-
-  fmpz_set (fmpq_numref (result), tmp1);
-  fmpz_set (fmpq_denref (result), tmp2);
-  fmpz_clear (tmp1);
-  fmpz_clear (tmp2);
 }
 
 CanonicalForm convertFmpq_t2CF (const fmpq_t q)
