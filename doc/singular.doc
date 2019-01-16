@@ -1058,6 +1058,7 @@ Comments should be send to the author of the library directly.
 * combinat_lib:: Some useful functions from combinatoric
 * curveInv_lib:: invariants of curves
 * deRham_lib:: Computation of deRham cohomology
+* difform_lib:: Procedures for differential forms
 * divisors_lib:: Divisors and P-Divisors
 * ffmodstd_lib::  Groebner bases in polynomial rings over rational function fields
 * finitediff_lib:: finite difference schemes for linear differential equations
@@ -1126,6 +1127,10 @@ Comments should be send to the author of the library directly.
 @node deRham_lib
 @subsection deRham_lib
 @c lib deRham.lib
+@c ----------------------------------------------------------
+@node difform_lib
+@subsection difform_lib
+@c lib difform.lib
 @c ----------------------------------------------------------
 @node divisors_lib
 @subsection divisors_lib
