@@ -33,11 +33,11 @@ SLIB0 = absfact.lib ainvar.lib aksaka.lib alexpoly.lib algebra.lib \
 # libs in beta testing:
 # the will be included in share.tar.gz, but not in all.lib
 # (they should be ordered alphabetically)
-SLIB1 = arr.lib \
+SLIB1 = arr.lib arnoldclassify.lib \
 	brillnoether.lib\
 	classify2.lib classifyMapGerms.lib classifyceq.lib classifyci.lib classify_aeq.lib\
 	chern.lib cimonom.lib combinat.lib customstd.lib curveInv.lib \
-	deRham.lib dmodloc.lib divisors.lib \
+	deRham.lib difform.lib dmodloc.lib divisors.lib \
 	ellipticcovers.lib \
         ffsolve.lib ffmodstd.lib decomp.lib template.lib \
         findifs.lib finitediff.lib \
@@ -52,7 +52,7 @@ SLIB1 = arr.lib \
 	parallel.lib polyclass.lib polymake.lib polybori.lib \
 	realclassify.lib realizationMatroids.lib resources.lib ringgb.lib \
 	rootisolation.lib rwalk.lib rstandard.lib \
-	schreyer.lib sets.lib symodstd.lib schubert.lib swalk.lib \
+	schreyer.lib sets.lib SingularityDBM.lib symodstd.lib schubert.lib swalk.lib \
 	tasks.lib tropical.lib tropicalNewton.lib
 
 PLIBS = bimodules.lib bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib\
