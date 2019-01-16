@@ -4467,27 +4467,8 @@ ring rAssure_SyzComp(const ring r, BOOLEAN complete)
   return res;
 }
 
-BOOLEAN rHasTDeg(ring r)
-{
-  int i;
-  if (r->typ!=NULL)
-  {
-    for(i=r->OrdSize-1;i>=0;i--)
-    {
-      if ((r->typ[i].ord_typ==ro_dp)
-      && (r->typ[i].data.dp.start==1)
-      && (r->typ[i].data.dp.end==r->N))
-      {
-        return TRUE;
-      }
-    }
-  }
-  return FALSE;
-}
-
 ring rAssure_TDeg(ring r, int &pos)
 {
-  int i;
   if (r->N==1) // special: dp(1)==lp(1)== no entry in typ
   {
     pos=r->VarL_LowIndex;
@@ -4495,7 +4476,7 @@ ring rAssure_TDeg(ring r, int &pos)
   }
   if (r->typ!=NULL)
   {
-    for(i=r->OrdSize-1;i>=0;i--)
+    for(int i=r->OrdSize-1;i>=0;i--)
     {
       if ((r->typ[i].ord_typ==ro_dp)
       && (r->typ[i].data.dp.start==1)
@@ -4518,7 +4499,7 @@ ring rAssure_TDeg(ring r, int &pos)
     id_Delete(&res->qideal,r);
   }
 
-  i=rBlocks(r);
+  int i=rBlocks(r);
   int j;
 
   res->ExpL_Size=r->ExpL_Size+1; // one word more in each monom

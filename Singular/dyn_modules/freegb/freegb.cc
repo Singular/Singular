@@ -27,8 +27,8 @@ static BOOLEAN freegb(leftv res, leftv args)
     if ((r->order[i]!=0)
     || (rHasLocalOrMixedOrdering(r)))
     {
-      //WerrorS("only for rings with a global ordering of one block");
-      Werror("only for rings with a global ordering of one block,i=%d, o=%d",i,r->order[i]);
+      WerrorS("only for rings with a global ordering of one block");
+      //Werror("only for rings with a global ordering of one block,i=%d, o=%d",i,r->order[i]);
       return TRUE;
     }
     ring R=freeAlgebra(r,d);
