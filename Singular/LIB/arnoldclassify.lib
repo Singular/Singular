@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version arnoldClassify.lib 4.1.0.0 Sep_2017 "; //
+version="version arnoldclassify.lib 4.1.1.4 Sep_2017 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:  arnoldClassify.lib     Arnol'd Classifier of Singularities
