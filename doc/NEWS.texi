@@ -22,6 +22,7 @@
 @heading News for version @value{VERSION}
 New libraries:
 @itemize
+@item arnoldclassify.lib: Arnol'd Classifier of Singularities (@nref{arnoldclassify_lib})
 @item dmodideal.lib: Algorithms for Bernstein-Sato ideals of morphisms (@nref{dmodideal_lib})
 @item fpalgebras.lib: Generation of various algebras in the letterplace case (@nref{fpalgebras_lib})
 @item ncrat.lib: non-commutatie rational functions
