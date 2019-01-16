@@ -1,0 +1,2017 @@
+///////////////////////////////////////////////////////////////////////////////
+version="version arnoldClassify.lib 4.1.0.0 Sep_2017 "; //
+category="Singularities";
+info="
+LIBRARY:  arnoldClassify.lib     Arnol'd Classifier of Singularities
+AUTHOR:   Eva Maria Hemmerling,  ehemmerl@rhrk.uni-kl.de
+
+OVERVIEW:
+   A library for classifying isolated hypersurface singularities
+   from the list of V.I. Arnol'd w.r.t. right equivalence up to corank 2.
+   The method relies on Baciu's list of Milnor codes and Newton's rotating
+   ruler method to distinguish the Y- and Z- singularities.
+
+REFERENCES:
+[AVG85] Arnold, Varchenko, Gusein-Zade: Singularities of Differentiable Maps.
+Vol. 1: The classification of critical points caustics and wave fronts.
+Birkh\"auser, Boston 1985
+
+[Bac01] Corina Baciu: The classification of Hypersurface Singularities
+using the Milnor Code, Diplomarbeit, Universit\"at Kaiserslautern, 2001.
+
+[GP12] Greuel, Pfister: A SINGULAR Introduction to Commutative Algebra,
+Springer Science and Business Media, 2012
+
+[Hem17] Eva Maria Hemmerling: Algorithmic Arnol'd Classification in SINGULAR,
+Master Thesis, TU Kaiserslautern, 2017.
+
+SEE ALSO:  classify_lib, realclassify_lib
+
+KEYWORDS: singularities; Arnol'd; classification; Milnor code
+
+PROCEDURES:
+arnoldListAllSeries();   list of all singularity series up to corank 2
+arnoldShowSeries(S);     data defining a singularity series S
+arnoldNormalForm(S,#);   normalform for a singularity series S
+arnoldClassify(f);       singularity class of a power series f
+arnoldCorank(f);         corank of singularity defined by f
+arnoldDeterminacy(f,#);  upper bound for the determinacy of f
+arnoldMilnorCode(f,#);   Milnor Code of a singularity f
+arnoldMorseSplit(f,#);   result of Splitting Lemma applied to f
+";
+
+LIB "inout.lib";
+LIB "elim.lib";
+LIB "sing.lib";
+LIB "findifs.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+static proc mod_init()
+{
+//* define new datastruct singclass
+newstruct("singclass", "string Restrictions, string NormalForm,
+intvec MilnorCode, int Tjurina, int Determinacy, int Milnor, int Corank,
+int Modality, int s, int r, int k, string Class, string Series ");
+
+//* define new datastruct singclass
+newstruct("singseries", " string Restrictions, string MilnorCode,
+ string MilnorNumber, string Corank, string Modality, string SpecialForm,
+ string NormalForm, string Series ");
+
+LIB "SingularityDBM.lib";
+arnold_classify_init();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc arnoldClassify( poly fPoly )
+"USAGE:   arnoldClassify (f); f poly
+ASSUME:  The basering is local of characteristic at most 13 and f defines an
+         isolated singularity from Arnol'd's list of corank at most 2.
+COMPUTE: singularity class respect to right equivalence and
+         invariants used in the process of classification
+RETURN:  Singularity class of f of type singclass containing
+         @* - name of singularity series as listed by arnoldListAllSeries(),
+         @* - name of singularity class,
+         @* - parameters k,r,s defining the singularity class, -1 if not used,
+         @* - modality, corank, Milnor number, determinacy,
+         @* - Tjurina number, -2 if not computed, -1 if infinite,
+         @* - Milnor code, -1 if not computed,
+         @* - normal form of the singularity series from Arnol'd's list,
+         @* - restrictions on parameters as string in SINGULAR syntax.
+EXAMPLE: example arnoldClassify; shows an example
+"
+{
+
+//* initialisation
+//* new datastructure singclass to save intrinsic information
+ singclass f;
+ f = init_newsingclass( f );
+
+//* Check the basering
+ if( check_basering() )
+ {
+  f.Class = "NoClass";
+ }
+
+//* Detect units
+ if(jet(fPoly,0) != 0 )
+   {
+   return( ERROR("The polynomial is a unit." ));
+ }
+
+//* Compute Basic Invariants: Corank, Determinacy and Milnornumber
+ ideal Jf = std(jacob( fPoly ));
+ f.Milnor = vdim( Jf );
+ if( f.Milnor < 0 )
+ { ERROR("Milnornumber of the singularity must be finite.")}
+ f.Determinacy = arnoldDeterminacy( Jf , f.Milnor);
+ f.Corank = arnoldCorank( fPoly );
+
+//* Check if Milnornumber is finite
+ if( f.Milnor < 0 ){
+  f.Class = "NoClass";
+  ERROR("Milnornumber of the singularity must be finite.")
+  return( f );
+ }
+
+//* Singularities with Milnornumber = 0 belong to A[0];
+ if( f.Milnor == 0 ){
+  f.Class = "A[0]";
+  f.Series = "A[k]";
+  f.k = 0;
+  f.r = -1;
+  f.s = -1;
+  f.Modality = 0;
+  f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+  return( f );
+ }
+
+//* Singularities with Corank <=1 belong to A[k];
+ if( f.Corank <= 1){
+  f.Class = "A["+string(f.Milnor)+"]";
+  f.Series = "A[k]";
+  f.k = f.Milnor;
+  f.r = -1;
+  f.s = -1;
+  f.Modality = 0;
+  f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+  return( f );
+ }
+
+//* Reduce f to f.Determinacy-jet
+  if(f.Determinacy >0 ){
+   fPoly = jet(fPoly, f.Determinacy);
+  }
+
+//* Classification of singularities of Corank 2
+ if( f.Corank == 2 ){
+   return( Classify_Corank2(f, fPoly));
+ }
+
+//* Classification of singularities of Corank 3
+ if( f.Corank == 3 ){
+  return( Classify_Corank3(f, fPoly));
+ }
+
+//* No classification for singularities of corank > 3
+ f.Class = "NoClass";
+ return( f );
+
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r = 0,(x,y),ds;
+  int k = random(3,10);
+  poly g = x4 + x2*y^(2*k+1)+x*y^(3*k+1)+ y^(4*k +1);
+  arnoldClassify(g);
+  map phi=r,y-x^2,x+y;
+  phi(g);
+  arnoldClassify(phi(g));
+  ring C = (0,i), (x,y), ds;
+  minpoly = i2 + 1;
+  poly f =(x2+y2)^2+x5;
+  arnoldClassify(f);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc Classify_Corank2( singclass f, poly fPoly)
+{
+//* Classifies Singularities of Corank 2; Series D,J,E,W,X,Y,Z
+ def br = basering;
+
+//* Zero 4-jet is no listed singularity
+ if( jet( fPoly, 4) == 0 ){
+  f.Class = "NoClass";
+  return(f);
+ }
+
+//* Compute MilnorCode
+ f.MilnorCode = arnoldMilnorCode( fPoly );
+
+//* Classification of the series D,J and E using MilnorCode
+//* (have Nonzero 3-jet and milnorcode of length 3)
+ if (size( f.MilnorCode ) == 3 ){
+  def g = Classify_Corank2_MC_3( f );
+  return( g );
+ }
+
+//* Classification of series W, X and class Z[k,r,s] using MilnorCode
+//* (have zero 3-jet and milnorcode of length 5)
+ if ( size( f.MilnorCode ) == 5 ){
+  def g = Classify_Corank2_MC_5( f, fPoly );
+  if( g.Class != ""){
+   return( g );
+  }
+
+//* Classification of series Y and Z except Z[k,r,s]
+//* Splitting Lemma needed
+  f.k = (f.MilnorCode[3]+1) div 2;
+   return( Classify_Z_Y( f, fPoly ));
+ }
+ ERROR("MilnorCode must have length 3 or 5.");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc Classify_Z_Y( singclass f, poly fPoly )
+{
+
+//* classifies singularity f defined by polynomial fPoly which is of type
+//* Z or Y with zero 3-jet and non-zero 4-jet.
+//* The idea is to transform the Newton Polygon of fPoly until we can decide
+//* wether f is of type Z or Y. For further information abouth the algorithm
+//* refer to [Hem17]
+
+//* Apply Splitting lemma if needed such that fPoly is given in two variables
+ if( nvars(basering) > f.Corank ){
+  fPoly = Morse_arnold( fPoly, f.Determinacy );
+
+  //* Reduce number of variables
+  def br = basering;
+  list L = ringlist(br);
+  if( size(L[1]) == 0 )
+  { ring redbr = char(basering), (x(1..f.Corank)), (c,ds); }
+  else{
+    number m = leadcoef(L[1][4][1]);
+    ring redbr = (char(basering),t), (x(1..f.Corank)), (c,ds);
+    number m = imap(br, m);
+    minpoly = m;
+  }
+   map MapReduce = br, maxideal(1);
+  poly fPoly = MapReduce( fPoly );
+ }
+
+//* Newton Polygon transformation, not needed if f.k = 1
+if( f.k > 1 ){
+ fPoly = Transform_Newton_Polygon( f, fPoly );
+}
+
+//* Check if quasihomogeneous part of fPoly ( w.r.t. to (k,1)) has
+//* linear factor of multiplicity 3
+ def b = Check_linear_factor_mult_3( f, fPoly );
+
+if( b==1){return ( Classify_Y( f, fPoly ));}
+else{ return ( Classify_Z( f ) );}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc Check_linear_factor_mult_3( singclass f, poly fPoly)
+{
+ //* set weights;
+ intvec weights = f.k,1;
+
+ //* Compute quasihomogeneous part of fPoly and set y=1
+ poly h1 = jet( fPoly, 4*weights[1], weights);
+ poly h2 = subst(h1, var(2), 1);
+ //* Compute gcd of h and derivative twice
+ h2 = gcd( h2, diff(h2,var(1)));
+ h2 = gcd( h2, diff(h2, var(1)));
+
+ //* Switch coordinates and repeat the last step
+ if( deg(h2) == 0 ){
+  h2 = subst(h1, var(1), 1);
+  //* Compute gcd of h and derivative
+  h2 = gcd( h2, diff(h2,var(2)));
+  h2 = gcd( h2, diff(h2, var(2)));
+ }
+
+ if (deg(h2) > 0){ return( 0 );}
+ else{ return( 1 ); }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc Transform_Newton_Polygon( singclass f, poly fPoly)
+{
+//* Check that 3-jet is zero and 4-jet is not zero
+ if( jet( fPoly, 3 ) != 0 ){ERROR( "Three-jet must be zero.");}
+ if( jet( fPoly, 4 ) == 0 ){ERROR("Four-jet must not be zero.");}
+
+ //* Make sure var(1) is contained in the 4-jet
+ if( diff( jet(fPoly,4) , var(1)) == 0 ){
+  map CoordSwitch = basering, var(2), var(1);
+  fPoly = CoordSwitch(fPoly);
+ }
+
+ //* Eliminate all monomials with weighted degree smaller than 4k (= 4*f.k)
+ return( Classify_Z_Y_EliminateMonomials( f, fPoly ));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc Classify_Z_Y_EliminateMonomials( singclass f, poly fPoly)
+{
+//* Eliminates all monomials with weighted degree smaller than 4k (= 4*f.k)
+
+//* Computes the weights for the first monomial to eliminate
+//* Use Newtons Rulers Method
+intvec weights = Classify_Z_Y_FindWeights( fPoly, f.k);
+
+//* if the weights are (k,1), no monomials to eliminate, return fPoly
+if (weights[1] == f.k && weights[2] ==1 ){ return (fPoly);}
+
+//* Compute quasihomogeneous part w.r.t to weights
+poly fquasi = jet( fPoly, 4*weights[1], weights);
+
+//* Check if fquasi contains monomial of the form y^l
+if ( Coeff (fquasi, var(2), var(2)^(4*weights[1] div weights[2])) == 0 )
+{
+ int counter = 1;
+
+ while ( counter < 10){
+  //* Find genereous transformation
+  int ran = random(-50,50);
+  map Phi = basering, x + ran*t*var(2)^( (d div weights[2] - 2) div 2 ),y;
+  if (Coeff (Phi(fquasi), var(2), var(2)^(d div weights[2])) != 0 )
+  { counter = 11;}
+  counter = counter+1;
+ }
+ fPoly = Phi(fPoly);
+}
+
+//* Compute the fourthzero if fquasi has one
+poly factor = Classify_Z_Y_FourthZero( fquasi );
+
+//* If fquasi has a fourth zero
+if( factor == 0 ){ ERROR("Field extension needed.")}
+
+poly inversefactor =
+number ( 1 /leadcoef(factor)) * (2*lead(factor) - factor);
+map CoordChange = basering, inversefactor, var(2);
+fPoly = CoordChange( fPoly );
+fPoly = jet( fPoly, f.Determinacy);
+
+return (Classify_Z_Y_EliminateMonomials( f, fPoly ) );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+static proc Classify_Z_Y_FindWeights( poly fPoly, int k )
+{
+//* Input poly f with zero 3-jet and non-zero 4-jet with var(1) contained
+//* in 4-jet. Computes the weights for all monomials lying in the Newton
+//* Diagramm under the line defined by x^4 and x^3y^k and returns the
+//* smallest one. In case there is no other monomial than x^4, return
+//* weights (k,1)
+
+//* Cut off monomials above the line x^4 and x^3y^k
+ intvec weights = k, 1;
+ fPoly = jet( fPoly, 4*k, weights );
+
+//* Check if leading term of f is x^4;
+ poly firstlead = lead(fPoly);
+ if( leadmonom(firstlead) != var(1)^4 ){ ERROR("Something went wrong");}
+
+//* Compute the the minimal weights
+ fPoly = fPoly - firstlead;
+ intvec weights2;
+ while( fPoly != 0 ){
+  weights2 = qhweight( firstlead + lead( fPoly ));
+  if (weights2[1] * weights[2] < weights2[2] * weights[1]){ weights = weights2;}
+  fPoly = fPoly - lead(fPoly);
+ }
+ return(weights);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc Classify_Z_Y_FourthZero( poly fPoly )
+{
+//* Assume f = (ax + by^l)^4
+//* Differentiate three times w.r.t x ( f''' = 24a^3(ax +by^l) )
+//* and take gcd of f and f'''
+
+poly f3 = diff(diff(diff( fPoly, var(1)), var(1)), var(1));
+poly factor = gcd( f3, fPoly);
+
+//* Check if the factor^4 is equal input f
+if( factor^4 == fPoly){ return(factor); }
+else{ return(0);}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc Classify_Y( singclass f, poly fPoly)
+{
+//* Determines the parameters r and s of the singularity f of type Y[k,r,s]
+//* Case k = 1
+intvec weights;
+  if ( f.k ==1 ){
+   //* Set an upper bound
+   int bound = f.Milnor + 1;
+
+   //* Transform Newton Polygon and compute intersection point of y axis
+   weights, fPoly = Transform_Newton_Polygon_Y( f, fPoly, bound );
+    int b1 = int(( 2*weights[1]+ 2*f.k*weights[2] )div weights[2] - 4) ;
+
+   //* Switch variables and repeat the last step
+   map CoordChange = basering, var(2), var(1);
+   weights, fPoly =
+   Transform_Newton_Polygon_Y( f, CoordChange(fPoly), bound );
+   int b2 = int(( 2*weights[1]+ 2*f.k*weights[2] )div weights[2] - 4) ;
+
+   //* Y-class
+   f.Series = "Y[1,r,s]";
+   f.s = min(b1,b2);
+   f.r =  int(f.Milnor - 9 - f.s);
+   f.Class = "Y["+string(f.k)+","+string(f.r)+","+string(f.s)+"]";
+   f.Modality = 3*f.k - 2;
+   return( f );
+  }
+  else{
+  //* Set an upper bound = r+s;
+   int bound = 4*f.k + (f.Milnor - 12*f.k +3);
+   weights, fPoly = Transform_Newton_Polygon_Y( f, fPoly, bound);
+   int b1 =
+   int((2*weights[1] + 2* f.k*weights[2]) div weights[2]  - 4*f.k);
+   int b2 = f.Milnor - 12*f.k +3 - b1;
+
+   //* Y-class
+   f.Series = "Y[k,r,s]";
+   f.r = max(b1,b2);
+   f.s =  min(b1,b2);
+   f.Class = "Y["+string(f.k)+","+string(f.r)+","+string(f.s)+"]";
+   f.Modality = 3*f.k - 2;
+   return( f );
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc Transform_Newton_Polygon_Y( singclass f, poly fPoly, int bound )
+{
+//* Eliminates Monomials until the Newton Polygon of fPoly coincides
+//* with the Newton Polygon of the normalform
+
+//* Reduce fPoly to monomials which might get eliminated
+  def weights1 = qhweight(var(1)^2*var(2)^(2*f.k) + var(2)^bound);
+  intvec weights2 = 1,0;
+  poly fquasi = jet( jet(fPoly, 2*weights1[1]+2*f.k*weights1[2], weights1),2, weights2) ;
+
+//* Find minimal ("steepest") weights
+  def weights3 = Classify_Y_FindWeights( fquasi, f.k, weights1);
+
+//* if the weights are (k,1), no monomials to eliminate, return fPoly
+  if (weights3 == weights1 )
+  { return (ERROR("Parameters r and s must be greater 0."));}
+
+//* Compute quasihomogeneous jet w.r.t to weight
+  def d =  2*weights3[1]+2*f.k*weights3[2];
+  fquasi = jet(fPoly, d, weights3);
+
+//* Check if monomial of the form y^l is contained in fquasi
+  if ( Coeff (fquasi, var(2), var(2)^(d div weights3[2])) == 0 )
+  {
+   int counter = 1;
+
+   while ( counter < 10){
+    //* Find genereous transformation
+    int ran = random(-50,50);
+    map Phi = basering,x+ran*t*var(2)^((d div weights3[2] - 2)div 2 ),y;
+    if (Coeff (Phi(fquasi), var(2), var(2)^(d div weights3[2])) != 0 )
+    { counter = 11;}
+    counter = counter+1;
+   }
+  fPoly = Phi(fPoly);
+  }
+
+//* Compute the zero of multiplicity 2 if fquasi has one
+
+ poly factor = jet(fPoly,2*weights3[1]+2*f.k*weights3[2],weights3);
+ factor =
+ Classify_Y_TwoZero(factor);
+
+//* If fquasi has a zero with mult 2
+ if( factor == 0 ){ return( weights3, fPoly );}
+
+ poly inversefactor =number(1/leadcoef(factor))*(2*lead(factor)-factor);
+ map CoordChange = basering, inversefactor, var(2);
+ fPoly = CoordChange( fPoly );
+ fPoly = jet( fPoly, f.Determinacy);
+
+ fquasi =
+ jet( jet(fPoly, 2*weights3[1]+2*f.k*weights3[2], weights3), 2, weights2);
+ if( leadmonom(fquasi) != var(1)^2*var(2)^(2*f.k))
+ { return( weights3, fPoly ); }
+
+return (Transform_Newton_Polygon_Y( f, fPoly, bound ) );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+static proc Classify_Y_FindWeights( poly f, int k, intvec weights1 )
+{
+//* Assume f is a polynomial with no polynomials lying in the Newton
+//* Diagramm above the line defined by x^2y^2 and x^2y^(bound)
+//* Computes the weight of all monomials lying under the line and
+//* returns the smallest one
+
+//* Check if leading term of f is x^2y^2k;
+ poly firstlead = lead(f);
+
+ if( leadmonom(firstlead) != var(1)^2*var(2)^(2*k) )
+ { ERROR("Something went wrong");}
+
+//* Compute the the minimal weights
+ f = f - firstlead;
+ intvec weights2;
+ while( f != 0 ){
+  weights2 = qhweight( firstlead + lead( f ));
+  if (weights2[1] * weights1[2] < weights2[2] * weights1[1])
+  { weights1 = weights2;}
+  f = f - lead(f);
+ }
+ return( weights1 );
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc Classify_Y_TwoZero( poly f )
+{
+//* Assume f = (ax + by^l)^2* x^2
+
+def factors = factorize ( f );
+
+for( int i = 1; i<= size(factors[2]); i++)
+{
+ if( factors[2][i] == 2 )
+ {
+   if ( factors[1][i] != 1 && factors[1][i] - lead(factors[1][i]) != 0)
+  { return( factors[1][i]);}
+ }
+}
+return( 0 );
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc Classify_Corank3( singclass f, poly fPoly)
+{
+return( "Not implemented yet.")
+//* todo
+
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc Classify_Corank2_MC_3 ( singclass f )
+{
+//* Classifies the singularities of corank 2 with non-zero 3-jet using
+//* the Milnor code.
+
+ intvec mc = f.MilnorCode;
+
+ if( mc[1] != 1 ){
+  f.Class = "NoClass";
+   return( f ); }
+
+//* Check type "D[k]"
+ if( mc[2] == 1 ){
+    f.Class = "D["+string(mc[3]+3)+"]";
+  f.Series = "D[k]";
+  f.k = mc[3]+3;
+  f.r = -1;
+  f.s = -1;
+  f.Modality = 0;
+  f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+  return( f );
+ }
+
+//* Check type "J[k,r]"
+ if(mc[3] > mc[2]&& mc[2]>1){
+  f.k = (mc[2]+1) div 2;
+  f.r = f.Milnor - 3*mc[2]-1;
+  f.s = -1;
+  f.Class = "J["+string(f.k)+","+string(f.r)+"]";
+  f.Series = "J[k,r]";
+  f.Modality = f.k-1;
+  f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+  return( f );
+ }
+
+ else{
+
+//* Check type "J[k,0]"
+  if( f.Milnor mod 6 == 4 ){
+           f.k = (f.Milnor + 2 ) div 6;
+   f.Class ="J[" + string(f.k) + "," + string(0) +"]";
+   f.Series = "J[k,0]";
+   f.r = -1;
+   f.s = -1;
+   f.Modality = f.k-1;
+   f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+   return( f );
+        }
+
+//* Check type "E[6k]"
+  if(f.Milnor mod 6 == 0 ){
+   f.k = f.Milnor div 6;
+   f.r = -1;
+   f.s = -1;
+   f.Class = "E[" + string(6*f.k)+ "]";
+   f.Series = "E[6k]";
+   f.Modality = f.k - 1;
+   f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+   return( f );
+  }
+
+//* Check type "E[6k+1]"
+  if( f.Milnor mod 6 == 1 ){
+   f.k = (f.Milnor - 1) div 6;
+   f.r = -1;
+   f.s = -1;
+   f.Class = "E[" + string(6*f.k+1) + "]";
+   f.Series = "E[6k+1]";
+   f.Modality = f.k -1;
+   f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+   return( f );
+  }
+
+//* Check type "E[6k+2]"
+  if( f.Milnor mod 6 == 2 ){
+   f.k = (f.Milnor - 2) div 6;
+   f.r = -1;
+   f.s = -1;
+   f.Class = "E[" + string(6*f.k+2) + "]";
+   f.Series = "E[6k+2]";
+   f.Modality = f.k - 1;
+   f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+   return( f );
+  }
+
+ }
+ f.Class = "NoClass";
+ return( f );
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc Classify_Corank2_MC_5 ( singclass f , poly fPoly)
+{
+
+//* Classifies the singularity classes of the series W, Z and the singularity
+//* class Z[k,r,s] using the Milnor code. They are of corank 2, have
+//* zero 3-jet, non-zero 4-jet and the Milnor code is of length 5.
+
+ intvec mc = f.MilnorCode;
+ if( mc[1] != 1 || mc[2]!= 1){  f.Class = "NoClass"; return(f);}
+ if( mc[3] mod 2 == 0 )
+ {
+
+//* Check type "W#[k,2r]"
+  if( mc[3] == mc[5] && mc[3] < mc[4] ){
+   f.k = mc[3] div 2;
+   f.r = mc[4]-mc[3];
+   f.s = -1;
+   f.Class = "W#[" + string(f.k) + "," + string (2*f.r) +"]";
+   f.Series = "W#[k,2r]";
+   f.Modality = 3*f.k -1;
+   f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+   return(f);
+  }
+
+//* Check type "W[k,r]"
+  if( mc[3]==mc[4] && mc[3]<mc[5] ){
+   f.k = mc[3] div 2;
+   f.r = mc[5] - mc[3];
+   f.s = -1;
+   f.Class = "W[" +string(f.k) +"," + string(f.r) + "]";
+   f.Series = "W[k,r]";
+   f.Modality = 3*f.k - 1;
+   f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+   return(f);
+  }
+
+//* Check type "W#[k,2r-1]"
+  if(mc[5] < mc[3] && mc[3] < mc[4]
+  && f.Milnor mod 2 == 0
+  && 2*mc[4]+mc[5]+2> f.Milnor div 2){
+   f.k = mc[3] div 2;
+   f.r = (f.Milnor - 12*f.k-2) div 2;
+   f.s = -1;
+   f.Class = "W#[" +string(f.k) +"," +string(2*f.r-1) +"]";
+   f.Series = "W#[k,2r-1]";
+   f.Modality = 3*f.k -1;
+   f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+   return(f);
+  }
+ }
+
+//* Check type "X[k,0]"
+ if( f.Milnor mod 12 == 9 && mc[3]>=mc[5] && mc[5]<=3*mc[3]-2*mc[4] ){
+  f.k = (f.Milnor + 3) div 12;
+  f.r = 0;
+  f.s = -1;
+  f.Class = "X[" + string(f.k) +",0]";
+  if(f.k == 1){f.Series = "X[1,0]";}
+  else{f.Series = "X[k,0]";}
+  f.Modality = 3*f.k -2;
+  f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+  return(f);
+ }
+
+//* Check type "W[12k+1]"
+ if( f.Milnor mod 12 == 1 && mc[3]==mc[5] && mc[4]<mc[3] ){
+   f.k = (f.Milnor - 1) div 12;
+  f.r = -1;
+  f.s = -1;
+   f.Class = "W[" + string(12*f.k+1) +"]";
+  f.Series = "W[12k+1]";
+  f.Modality = 3*f.k -2;
+  f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+   return(f);
+ }
+
+//* Check type "W[12k+5]"
+ if( f.Milnor mod 12 == 5 && mc[3]==mc[5] && mc[4]<mc[3]){
+   f.k = (f.Milnor - 5) div 12;
+  f.r = -1;
+  f.s = -1;
+   f.Class = "W[" + string(12*f.k+5) +"]";
+  f.Series = "W[12k+5]";
+  f.Modality = 3*f.k -1;
+  f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+   return(f);
+ }
+
+//* Check type "W[12k+6]"
+ if( mc[3] >= mc[5] && f.Milnor mod 12 == 6  &&
+  (2*mc[4]+mc[5]+2) < (f.Milnor div 2) && mc[3]> mc[5]){
+   f.k = (f.Milnor-6) div 12;
+   f.r = -1;
+   f.s = -1;
+   f.Class = "W[" +string(12*f.k+6) +"]";
+   f.Series = "W[12k+6]";
+   f.Modality = 3*f.k -1;
+   f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+   return(f);
+ }
+
+//* Check type "W[k,0]"
+ if( f.Milnor mod 12 == 3  && mc[5]<= (3*mc[3] -2*mc[4])){
+  f.k = (f.Milnor - 3) div 12;
+  f.r = -1;
+  f.s = -1;
+  f.Class = "W["+ string(f.k) +",0]";
+  f.Series = "W[k,0]";
+  f.Modality = 3*f.k -1;
+  f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+  return(f);
+ }
+
+//* Check type "W[12k]"
+ if(f.Milnor mod 12 == 0  && mc[3]> mc[5] &&
+  2*mc[4]+ mc[5]+ 2 < (f.Milnor div 2)){
+  f.k = f.Milnor div 12;
+  f.r = -1;
+  f.s = -1;
+  f.Class = "W[" + string(12*f.k) +"]";
+  f.Series = "W[12k]";
+  f.Modality = 3*f.k -2;
+  f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+  return(f);
+ }
+
+//* Check type "X[k,r]"
+ if( (mc[4] < mc[3] && mc[3] < mc[5] ) ||
+ (mc[3]==mc[4] && mc[3] < mc[5] ) ){
+  f.k = (2*mc[3] + mc[4] + 3) div 6;
+  f.r = mc[5] - mc[3];
+  f.s = -1;
+  f.Class = "X[" + string(f.k) +"," + string(f.r)+ "]";
+  if(f.k == 1){f.Series = "X[1,r]";}
+  else{f.Series = "X[k,r]";}
+  f.Modality = 3*f.k -2;
+  f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+  return(f);
+ }
+
+ //* Need Tjurina number to classify Z[k,r,s]
+ //* Check type "Z[k,r,s]"
+ f.Tjurina = tjurina(fPoly);
+ if( mc[3]<mc[4] && mc[4] < mc[5] &&
+   f.Milnor > ( 3* (mc[3] + mc[4] +1)) &&
+   mc[4] mod 2 == 1 &&
+   f.Tjurina == f.Milnor - (mc[4] + mc[3]) div 2 ){
+
+   f.k = (mc[3]+1) div 2;
+   f.r = (mc[4] - mc[3]) div 2;
+   f.s = mc[5] - mc[4];
+   f.Class = "Z[" + string(f.k) +"," + string(f.r)+ ","+string(f.s)+"]";
+   if(f.k == 1){f.Series = "Z[1,r,s]";}
+   else{f.Series = "Z[k,r,s]";}
+   f.Modality = 3*f.k +f.r -2;
+   f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+   return(f);
+ }
+
+ if( mc[3] mod 2 == 1){
+  return(f);
+ }
+ f.Class = "NoClass";
+ return(f);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc Classify_Z( singclass f)
+{
+//* If the input is a singularity of the series Z, this procedure determines
+//* the class and the parameters.
+
+ intvec mc = f.MilnorCode;
+ f.k = (mc[3]+1) div 2;
+
+//* Check type "Z[k,r]"
+ if (f.Milnor mod 6 == 3 && mc[5]<=mc[4]){
+  f.r = (mc[4] - mc[3]) div 2;
+  f.s = -1;
+  f.Class = "Z["+string(f.k)+","+string(f.r)+"]";
+  if(f.k == 1){ f.Series = "Z[1,r]";}
+  else {f.Series = "Z[k,r]";}
+  f.Modality = 3*f.k + f.r-2;
+  f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+  return(f);
+ }
+
+//* Check type "Z[k,12k+6r]"
+ if (f.Milnor mod 6 ==0 && mc[4]==mc[5] && mc[3]<mc[5]){
+  f.r = (f.Milnor - 12*f.k) div 6;
+  f.s = -1;
+     f.Class = "Z["+string(f.k)+","+string(12*f.k+6*f.r)+"]";
+  if(f.k == 1){ f.Series = "Z[1,6r+12]";}
+  else {f.Series = "Z[k,12k+6r]";}
+  f.Modality = 3*f.k + f.r - 2;
+  f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+  return(f);
+ }
+
+//* Check type "Z[k,12k+6r+1]"
+ if (f.Milnor mod 6 == 1 && mc[5] mod 2 ==1 ){
+  f.r = (f.Milnor - 12*f.k -1) div 6;
+  f.s = -1;
+     f.Class = "Z["+string(f.k)+","+string(12*f.k+6*f.r+1)+"]";
+  if(f.k == 1){ f.Series = "Z[1,6r+13]";}
+  else {f.Series = "Z[k,12k+6r+1]";}
+  f.Modality = 3*f.k +f.r - 2;
+  f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+  return(f);
+ }
+
+//* Check type "Z[k,12k+6r-1]"
+ if (f.Milnor mod 6 ==5 && mc[4] > mc[5]  ){
+  f.r = (f.Milnor - 12*f.k +1) div 6 ;
+  f.s = -1;
+     f.Class = "Z["+string(f.k)+","+string(12*f.k+6*f.r-1)+"]";
+  if(f.k == 1){ f.Series = "Z[1,6r+11]";}
+  else {f.Series = "Z[k,12k+6r-1]";}
+  f.Modality = 3*f.k + f.r -2;
+  f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+  return(f);
+ }
+
+ //* Check type "Z[k,r,s]"
+ if( mc[3]<mc[4] && mc[4]<mc[5] &&
+  f.Milnor>3*(mc[4]+mc[3]+1) && mc[4] mod 2 ==1){
+        f.r = (mc[4] - mc[3]) div 2;
+        f.s = mc[5] - mc[4];
+  f.Class = "Z["+string(f.k)+","+string(f.r)+","+string(f.s)+"]";
+  if(f.k == 1){ f.Series = "Z[1,r,s]";}
+  else {f.Series = "Z[k,r,s]";}
+  f.Modality = 3*f.k +f.r -2;
+  f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
+  return(f);
+ }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc arnold_classify_init()
+{
+ // Check or create Singularity Database
+   string s;
+   link l="DBM:r Singularitylist";
+   s = read(l,"VERSION");
+   if (s == "" ) {
+     create_singularity_dbm();
+   }
+   close(l);
+   l="DBM:r Singularitylist";
+   s = read(l,"VERSION");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc arnoldMorseSplit ( poly f, list # )
+"USAGE:   arnoldMorseSplit(f); f poly
+ASSUME:  base ring is local, f in maxideal(2) has isolated critical point at 0
+COMPUTE: result of Splitting Lemma applied to f
+RETURN:  poly g in maxideal(3) right equivalent to f
+EXAMPLE: example arnoldMorseSplit; shows an example
+"
+{
+//* save basering
+ def br = basering;
+ int n = nvars(basering);
+
+//* Set Determinacy (Needed for Splitting Lemma) wether given in # or compute
+ int Determinacy;
+ if (size(#) == 0 ){
+  Determinacy = arnoldDeterminacy(std(jacob(f)));
+ }
+ else{
+  Determinacy = #[1];
+ }
+//* define ring_ext to change variable names in x(1), ..., x(n)
+//* requirement for procedure morse_arnold
+ ring ring_ext = char(basering), (x(1..n)), (c, ds);
+ map Phi = br, maxideal(1);
+
+
+//* Apply Splitting Lemma
+ poly f = Morse_arnold( Phi( f ), Determinacy );
+
+//* Define inverse map to map f back into original ring
+ setring br;
+ map Phi_inverse = ring_ext, maxideal(1);
+
+ return( Phi_inverse(f) );
+
+}
+example
+{ "EXAMPLE"; echo=2;
+   ring r=0,(x,y,z),ds;
+   export r;
+   poly f=(x2+3y-2z)^2+xyz-(x-y3+x2*z3)^3;
+   poly g=arnoldMorseSplit(f);
+   g;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc Morse_arnold( poly f , int Determinacy)
+{
+//* find g(x_1, ..., x_s) such that f ~ g + x_s+1^2 + ... + x_n^2
+//* s = Corank(f);
+
+//* initialisation
+ int n, i, j, k;
+ poly f2, imagef, Q, P;
+ ideal B1, B2;
+ map Phi, Phi2;
+
+//* save basering;
+ def br = basering;
+ n = nvars(basering);
+
+//* Check if Determinacy is finite
+ if (Determinacy < 0 ){
+  ERROR("Determinacy must be finite.");
+ }
+ f = jet(f, Determinacy);
+
+//* Change order of variables sorted by frequency of appearance ->
+//* improves running time
+ f = ReorderVar(f);
+
+//* B1 defines the map which renumerates the variables such that
+//* g depends on the first s variables
+ B1 = maxideal(1);
+ i = 1;  //Variable x_i
+ j = 1;  //running index for B1, coordinate transformation x_i -> x_j
+
+//* While-loop over the variables,
+//* Write f = Q x_i^2 + P x_i + R,
+//* Either Q=P=0 and g depends on x_i or g is independent from x_i
+//*  and eliminate P
+ while( i <= n )
+ {
+  f2 = jet(f,2);
+  k = i+1; //* Variable for coordinate transformation
+
+  if((f2 - subst( f2, var(i), 0 )) == 0 ){
+   //* g depends on x_i -> send x_i via B1 to x_j
+   B1[i] = var(j);
+   j = j+1;
+  }
+  else{
+   //* Write f = Q x_i^2 + P x_i + R;
+      Q = Coeff( f2, var(i), var(i)^2);
+
+   //* Check if
+   if( Q == 0 && i == n ){
+    ERROR("Someting went wrong");
+   }
+
+   //* Find coordinate change Phi2 such that Q(0) != 0
+   Phi2 = br, maxideal(1);  //* Identity
+   while( Q == 0 && i<n && k <= n ){
+    B2 = maxideal(1);
+    B2[k]= var(k)+ var(i);
+    Phi2 = br, B2;
+    imagef = Phi2( f );
+    Q = Coeff( jet(imagef,2), var(i), var(i)^2);
+    k = k+1;
+   }
+   f = Phi2(f);
+   f = jet(f, Determinacy);
+
+   P = Coeff( f , var(i), var(i) );
+   //* Apply coordinate changes until P = 0
+   while( P != 0 ){
+    //* Raise ord(P) by completing the square until > determinacy
+     P = P / number(2*Q);
+     B2 = maxideal(1);
+     B2[i] = var(i) - P;
+     Phi2 = br, B2;
+     f = Phi2(f);
+     f = jet(f, Determinacy);
+     P = Coeff( f, var(i), var(i));
+   }
+  B1[i] = 0;
+  f = subst(f, var(i), 0);
+  }
+ i = i+1;
+ }
+ Phi = br, B1;
+ f = Phi(f);
+ return( f );
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc Coeff(poly f, list #)
+{
+//* initialisation
+  poly   a, term;
+  int    n, i;
+  matrix K;
+
+  n     = nvars(basering);
+  i     = 1;
+  term  = #[2];
+  K     = coef(f, #[1]);
+
+  while( (i<=ncols(K)) && (K[1,i] != term) )
+  { i++;
+    if(i>ncols(K)) { break; }
+  }
+  if(i<=ncols(K)) { a = K[2,i]; }
+  if(i>ncols(K)) { a = 0; }
+
+  return(a);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc ReorderVar( poly f )
+"USAGE:    GetRf();"
+{
+//* Initialisation
+ intvec frequ;
+ int maxim, maxim_var, i, j, n;
+ ideal B = maxideal(1);
+
+//* save basering;
+ def br = basering;
+ n = nvars(basering);
+
+//* frequ[i] determines the frequency of appearance of x_i in f
+ for ( i=1; i <= n; i=i+1 ){
+  frequ[i] = ncols( coef( f, var(i) ));
+  if( Coeff(f, var(i), 0) == 0 ) { frequ[i] = frequ[i]+1; }
+ }
+
+//* Determines the order of the variables, lowest frequency first
+ for( i=n; i>0; i=i-1 ){
+  maxim = 0;
+  maxim_var = 0;
+  for (j = 1; j<= n; j=j+1 ){
+   if(frequ[j] > maxim ){ maxim = frequ[j]; maxim_var = j;}
+  }
+  B[maxim_var]= var(i);
+  frequ[maxim_var]=-1;
+ }
+
+//* Reorder variables
+ map Phi = br, B;
+ return (Phi(f));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc Hcode (intvec a)
+"USAGE:   Hcode(a); a intvec
+RETURN:  intvec consisting of the numbers of successive repetitions of
+         entries in a
+EXAMPLE: example Hcode; shows an example."
+{
+  int n=size(a)-1;
+  a[n+1]=0;
+  int i,j,k=1,0,k;
+  int a0=a[i];
+  intvec c;
+
+  while( i <= n )
+  {
+    j++;
+    k=0;
+    while( i <= n && a0 == a[i] )
+    {
+      i++;
+      k++;
+    }
+    c[j]=k;
+    a0=a[i];
+  }
+
+  return(c);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  intvec v = 1,3,4,4,4,4,4,4,4,3,9,9,9,9,1;
+  Hcode(v);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc arnoldMilnorCode (poly f, list #)
+"USAGE:   arnoldMilnorCode(f[,e]); f poly, e int
+ASSUME:  basering is local, f has isolated critical point at 0
+COMPUTE: Milnor code of f consisting of the numbers of successive repetitions
+         of coefficients of the 2nd Hilbert series of basering/(jacob(f)^e),
+         see [Bac01].
+RETURN:  Milnor code of f as intvec where e=1 by default
+EXAMPLE: example arnoldMilnorCode; shows an example"
+{
+  int  e=1;
+  if(size(#)==1) { e=#[1]; }
+  ideal jf=std(jacob(f)^e);
+  intvec v=hilb(jf,2);
+
+  return(Hcode(v));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,(x,y,z),ds;
+  poly f=x2y+y3+z2;
+  arnoldMilnorCode(f);
+  arnoldMilnorCode(f,2);
+  // a big second argument may result in memory overflow
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc arnoldDeterminacy( I, list # )
+"USAGE:   arnoldDeterminacy( I[, m]); I poly or ideal, m int.
+ASSUME:  the basering is local, I is (the Jacobian ideal of) a poly f
+         with isolated critical point at 0, m is the Milnor number of f
+COMPUTE: determinacy bound k for f w.r.t. right equivalence
+RETURN:  int k s.th. f is right-k-determined, -1 for infinity
+NOTE:    uses [Cor. A.9.7,GP12]
+EXAMPLE: example arnoldDeterminacy; shows an example"
+{
+ //* Case: input = poly *//
+ if(typeof(I)=="poly")
+ {
+  ideal J=std(jacob(I));
+  return(arnoldDeterminacy(J, #));
+  }
+ //* Case Input = Ideal *//
+  if (typeof(I)=="ideal")
+  {
+  int k;   //* upper bound of determinacy
+  int time;
+
+  //* Computation of Milnor number *//
+  if( size(#) > 0){  k = #[1] + 1; }
+  else { k = vdim(std(I)) + 1;}
+
+  //* If milnor number infinite > return -1 otherwise apply A.9.7.
+  if( k == -1 ){ return (-1); }
+
+   int m;
+   I=std(I);
+  for(int i=0;i<=2;i++)
+  {
+   m = deg(highcorner(I))+2-i;
+   if(m<k){ k = m;}
+
+   //* if the computation of the standard bases for takes > 10 sek
+   //* algo breaks and returns upper bound found so far
+   time = timer;
+   if(i<2){ I = std(maxideal(1)* I); }
+   if( timer - time > 12 ){ break; }
+  }
+    return( k );
+  }
+ ERROR("The input has to be a Jacobian ideal or a polynomial");
+}
+examples
+{
+  ring r=0,(x,y),ds;
+  poly f=x3+xy3;
+  ideal I=std(jacob(f));
+  int k=arnoldDeterminacy(I);
+  print(k);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc arnoldCorank(poly f)
+"USAGE:   arnoldCorank(f);  f poly
+ASSUME:  basering is local, f in maxideal(2) has isolated critical point at 0
+RETURN:  corank of the Hessian matrix of f
+EXAMPLE: example arnoldCorank; shows an example"
+{
+  matrix M = jacob(jacob(jet(f,2)));
+  list lba = bareiss(M);
+  int cr = nvars(basering) - size(module(lba[1]));
+  return(cr);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,(x,y,z),ds;
+  poly f=(x2+3y-2z)^2+xyz-(x-y3+x2*z3)^3;
+  arnoldCorank(f);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc check_basering()
+{
+  if( char(basering) >= 13 )
+  {
+    ERROR("The characteristic of the basering must be at most 13.");
+    return(1);
+  }
+  int n=nvars(basering);
+  int i=1;
+  while( i<n && 1>var(i) ) { i++; }
+  if( 1<var(i) )
+  {
+    ERROR("The basering must be local.");
+    return(1);
+  }
+  return(0);  // basering is OK, return (0)
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc init_newsingclass( singclass f )
+"USAGE:  creates a new singclass, sets the iPoly to the f_input and
+        the integer values to -1 resp. -2 to indicate that these values
+        have not been computed yet
+RETURN: singclass f"
+{
+ f.Corank = -1;
+ f.Milnor = -2;
+ f.Determinacy = -2;
+ f.Tjurina = -2;
+ f.Modality = -1;
+ intvec mc = -1;
+ f.MilnorCode = mc;
+ f.k=-1;
+ f.r=-1;
+ f.s=-1;
+
+ return(f);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc arnoldShowSeries( string typ )
+"USAGE:   arnoldShowSeries( S );  S string
+ASSUME:  S is the name of a singularity series listed by arnoldListAllSeries().
+RETURN:  data of the singularity series S of type singseries including
+         @* - Milnor number of S,
+         @* - Corank of S,
+         @* - Milnor code of S (see [Bac01]),
+         @* - normal form of S as string with parameters k,r,s and a,b,c,d,
+         @* - restrictions on parameters in the normal form in SINGULAR syntax,
+         @* - normal form with special (valid) parameters.
+EXAMPLE: example arnoldShowSeries; shows an example
+"
+{
+ string DatabasePath, Database, value;
+
+//* Defining the link to the database Singularitylist which stores
+//* the singularities
+ string DBMPATH=system("getenv","DBMPATH");
+ if( DBMPATH != "" ) { DatabasePath = DBMPATH+"/Singularitylist"; }
+ else { DatabasePath = "Singularitylist"; }
+ Database="DBM: ",DatabasePath;
+
+//* link to the database
+ link dbmLink=Database;
+//* database Singularitylist entry for key
+ value = read(dbmLink, typ);
+if(value =="")
+   {ERROR("SingularitySeries not known. Call arnoldListAllSeries() to get
+    a list of all valid Singularity types.");}
+ close(dbmLink);
+ execute(value);
+ return( f );
+}
+example
+{ "EXAMPLE:"; echo=2;
+  arnoldShowSeries("Z[k,12k+6r]");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc normalformDB( typ )
+{
+ if( typeof(typ) == "string" )
+  {
+  def f = arnoldShowSeries(typ);
+  return( f.NormalForm );
+  }
+
+ if( typeof(typ) =="singclass")
+  {
+  def f = arnoldShowSeries( typ.Series );
+  return( f.NormalForm );
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc NormalFormAndRestrictionsDB( typ )
+{
+ if( typeof(typ) == "string" )
+  {
+  def f = arnoldShowSeries(typ);
+  return( f.NormalForm, f.Restrictions);
+  }
+
+ if( typeof(typ) =="singclass")
+  {
+  def f = arnoldShowSeries( typ.Series );
+  return( f.NormalForm, f.Restrictions );
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc specialformDB( typ )
+{
+ if( typeof(typ) == "string" )
+  {
+  def f = arnoldShowSeries(typ);
+  return( f.SpecialForm );
+  }
+
+ if( typeof(typ) =="singclass")
+  {
+  def f = arnoldShowSeries( typ.Series );
+  return( f.SpecialForm );
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc restrictionsDB( typ )
+{
+ if( typeof(typ) == "string" )
+  {
+  def f = arnoldShowSeries(typ);
+  return( f.Restrictions );
+  }
+
+ if( typeof(typ) =="singclass")
+  {
+  def f = arnoldShowSeries( typ.Series );
+  return( f.Restrictions );
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc arnoldNormalForm( typ, list #)
+"USAGE:   arnoldNormalForm( S [, l]), S string or singclass, l list
+ASSUME:  If S is of type string, then S is the name of a singularity series
+         as listed by arnoldListAllSeries() and l may contain suitable
+         integer parameters k,r,s. Otherwise S of type singclass is a
+         singularity class from Arnol'd's list.
+         Optional suitable polynomial parameters a,b,c,d can be appended to l.
+         If a,b,c,d are not given, valid values are chosen automatically.
+RETURN:  string NF is the normal form of the series S if no parameters given,
+         or poly NF is the normal form of the class S with paramaters k,r,s.
+EXAMPLE: example arnoldNormalForm; shows an example"
+{
+
+//* Sort list entries by type
+ int noparas = 1;
+ list polys;
+ for( int i = 1; i<=size(#); i++)
+ {
+  if(typeof( #[i] ) == "int" )
+  {
+   if( noparas == 1 ){ intvec paras = #[1]; noparas =0; }
+   else{ paras[size(paras)+1] = #[i];}
+  }
+  if( typeof(#[i]) == "poly")
+  {
+   polys[size(polys)+1] = #[i];
+  }
+  if( typeof(#[i]) != "int" && typeof(#[i]) != "poly")
+  {ERROR("Entries of list # must be of type poly or int.");}
+ }
+
+//* If no paras and typ = "string" -> string
+  if( (typeof (typ) == "string") && (noparas == 1) )
+  { return( specialformDB(typ) ); }
+
+//* Set parameter k,r,s
+ if( typeof( typ ) == "singclass" )
+ { int k = typ.k; int r = typ.r; int s = typ.s; string Series = typ.Series; }
+ if( typeof( typ ) == "string" )
+ { int k,r,s = paras; string Series = typ; }
+
+//* Check if basering is defined
+ if(!defined(basering)){
+  ERROR("No basering defined!")}
+
+//* Check case k=1
+ if( k == 1 ){
+  if( Series[1] == "Y"){ Series = replace( Series, "k", string(k)); }
+  if( Series[1] == "X"){ Series = replace( Series, "k", string(k)); }
+  if( Series[1] == "Z"){ Series = replace( Series, "k", string(k)); }
+ }
+
+//* If no polynomial parameter Specialform
+  if(size(polys) != 0 && size(polys) <4 )
+  {ERROR("Not enough polynomial parameter as input.")}
+  if(size(polys) == 0 ){
+    //* Define ring for the NF; NF given in C(x,y)
+    def br = basering;
+      if(defined(RingNF) != 0 ) { kill RingNF; }
+    ring RingNF=char(basering),(x,y),(c, ds);
+    map Conv = br,maxideal(1);
+
+    string nf_str = specialformDB(Series);
+    }
+  else{
+
+   //* Set polynomial parameter
+   poly a,b,c,d;
+   a = polys[1];
+   b = polys[2];
+   c = polys[3];
+   d = polys[4];
+
+   //* Define ring for the NF; NF given in C(x,y)
+    def br = basering;
+     if(defined(RingNF) != 0 ) { kill RingNF; }
+     ring RingNF=char(basering),(x,y),(c, ds);
+     map Conv = br,maxideal(1);
+
+   //* Map Polynomial parameter
+   poly a = Conv(a);
+   poly b = Conv(b);
+   poly c = Conv(c);
+   poly d = Conv(d);
+
+   //* Get NormalForm from Databank
+   string nf_str = normalformDB(Series);
+
+   //* Replace polynomial parameter
+   nf_str = replace( nf_str, "a(y)", "("+string(a)+")");
+   nf_str = replace( nf_str, "b(y)", "("+string(b)+")");
+   nf_str = replace( nf_str, "c(y)", "("+string(c)+")");
+   nf_str = replace( nf_str, "d(y)", "("+string(d)+")");
+
+   //* Check parameter
+   int okay = 0;
+   string res = restrictionsDB(Series);
+   string str = "if(" + res + "){okay = 1;};";
+   execute(str);
+   if(okay!=1)
+   {ERROR("Parameter do not satisfy restrictions of
+   the singularity series.")}
+ }
+
+ //* Replace integer parameter
+ nf_str = replace( nf_str, "k", string(k));
+ nf_str = replace( nf_str, "r", string(r));
+ nf_str = replace( nf_str, "s", string(s));
+
+ //* Generate polynomial nf
+ nf_str = "poly nf  = " + nf_str;
+ execute( nf_str );
+
+ //* Map poly nf back to basering;
+ setring br;
+ map ConvBack = RingNF, maxideal(1);
+  return( ConvBack(nf) );
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R = 0, (x,y), ds;
+ poly a,b,c,d;
+ a= 1+y2;
+ c= 3+y;
+ int k = 5;
+ int r = 4;
+ int s = 3;
+ arnoldNormalForm ("W[12k+1]", k,r,s,a,b,c,d);
+ def f = _;
+ def sf = arnoldClassify( f );
+ arnoldNormalForm(sf, a,b,c,d);
+ arnoldNormalForm("W[12k+1]");
+ arnoldNormalForm(sf);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc arnoldListAllSeries()
+"USAGE:    arnoldListAllSeries();
+RETRURN:  list of names of singularity series listed by Arnol'd up to corank 2
+EXAMPLE:  example arnoldListAllSeries; shows an example"
+{
+list l=
+"A[k]",
+"D[k]",
+"E[6k]",
+"E[6k+1]",
+"E[6k+2]",
+"J[k,0]",
+"J[k,r]",
+"W[12k]",
+"W[12k+1]",
+"W[12k+5]",
+"W[12k+6]",
+"W[k,0]",
+"W[k,r]",
+"W#[k,2r]",
+"W#[k,2r-1]",
+"X[k,0]",
+"X[k,r]",
+"Y[k,r,s]",
+"Z[k,r]",
+"Z[k,r,s]",
+"Z[1,6r+11]",
+"Z[1,6r+12]",
+"Z[1,6r+13]",
+"Z[k,12k+6r]",
+"Z[k,12k+6r+1]",
+"Z[k,12k+6r-1]";
+
+return(l);
+}
+example
+{ arnoldListAllSeries();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//* The following part of the library generates two files, Singularitylist.dir
+//* and Singularitylist.pag containing a data base for singularities up to
+//* corank 2 listed by Arnol'd.
+
+///////////////////////////////////////////////////////////////////////////////
+static proc makedbm_init()
+{
+//* Generates file containing a data base for singularities up to corank 2
+//* listed by Arnol'd. This file is needed for arnoldclassify.lib.
+
+  string s;
+  link l="DBM:r Singularitylist";
+  s = read(l,"VERSION");
+  if (s == "" ) {
+    "Need to create database...";
+    create_singularity_dbm();
+  }
+  close(l);
+  l="DBM:r Singularitylist";
+  s = read(l,"VERSION");
+  "Creation done. Current version:", s;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc dbm_read (link l)
+{
+  string s="";
+  s=read(l);
+  while( s != "" )
+  {
+    s,"=",read(l,s);
+    s=read(l);
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc dbm_getnext (link l)
+{
+  string s="";
+  s=read(l);
+  if( s != "" ) { s,"=",read(l,s); }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc create_singularity_dbm
+{
+  link l="DBM:rw Singularitylist";
+
+//*Data typ singseries;
+  string s;
+
+//* A[k]
+    s = "singseries f;
+    f.Series = \"A[k]\";
+    f.Modality = \"0\";
+    f.Corank = \"1\";
+    f.MilnorNumber = \"k\";
+    f.MilnorCode = \"k\";
+    f.NormalForm = \"x^(k+1)\";
+    f.SpecialForm = \"x^(k+1)\";
+    f.Restrictions = \"(k>1)\";";
+  write(l, "A[k]", s);
+
+//* D[k]
+    s = "singseries f;
+    f.Series = \"D[k]\";
+    f.Modality = \"0\";
+    f.Corank = \"2\";
+    f.MilnorNumber = \"k\";
+    f.MilnorCode = \"1,1,k-3\";
+    f.NormalForm = \"x^2*y+y^(k-1)\";
+    f.SpecialForm = \"x^2*y+y^(k-1)\";
+    f.Restrictions = \"(k>=4)\";";
+  write(l, "D[k]", s);
+
+//* J[k,0]
+    s = "singseries f;
+    f.Series = \"J[k,0]\";
+    f.Modality = \"0\";
+    f.Corank = \"2\";
+    f.MilnorNumber = \"6*k-2\";
+    f.MilnorCode = \"1,2*k+j,2*k-2*j-3\";
+    f.NormalForm = \"x^3 + b(y)*x^2*y^k+c(y)*x*y^(2*k+1)+y^(3*k)\";
+    f.SpecialForm = \"x^3 + x^2*y^k+y^(3*k)\";
+    f.Restrictions = \"(k>1)&& (4*b^3 + 27 != 0)&&
+     (deg(b)==0)&&(deg(c)<=(k-3))&&(k>2||c==0)\";";
+  write(l, "J[k,0]", s);
+
+//* J[k,r]
+    s = "singseries f;
+    f.Series = \"J[k,r]\";
+    f.Modality = \"0\";
+    f.Corank = \"2\";
+    f.MilnorNumber = \"6*k-2+r\";
+    f.MilnorCode = \"1,2*k-1,2*k+r-1\";
+    f.NormalForm = \"x^3 + x^2*y^k+a(y)*y^(3*k+r)\";
+    f.SpecialForm = \"x^3 + x^2*y^k+y^(3*k+r)\";
+    f.Restrictions = \"(k>1)&&(r>0)&&(jet(a,0)!= 0)&&(deg(a)<=(k-2)) \";";
+  write(l, "J[k,r]", s);
+
+//* E[6k]
+    s = "singseries f;
+    f.Series = \"E[6k]\";
+    f.Modality = \"0\";
+    f.Corank = \"2\";
+    f.MilnorNumber = \"6*k\";
+    f.MilnorCode = \"1,2*k+j,2*k-2j-1\";
+    f.NormalForm = \"x^3 + a(y)*x*y^(2*k+1)+y^(3*k+1)\";
+    f.SpecialForm = \"x^3+y^(3*k+1)\";
+    f.Restrictions = \"(k>=1)&&(k>1||a==0)&&(deg(a)<=(k-2))\";";
+  write(l, "E[6k]", s);
+
+//* E[6k+1]
+    s = "singseries f;
+    f.Series = \"E[6k+1]\";
+    f.Modality = \"0\";
+    f.Corank = \"2\";
+    f.MilnorNumber = \"6*k+1\";
+    f.MilnorCode = \"1,2*k,2*k\";
+    f.NormalForm = \"x^3 + x*y^(2*k+1)+a(y)*y^(3*k+2)\";
+    f.SpecialForm = \"x^3 + x*y^(2*k+1)\";
+    f.Restrictions = \"(k>=1)&&(k>1||a==0)&&(deg(a)<=(k-2))\";";
+  write(l, "E[6k+1]", s);
+
+//* E[6k+2]
+    s = "singseries f;
+    f.Series = \"E[6k+2]\";
+    f.Modality = \"0\";
+    f.Corank = \"2\";
+    f.MilnorNumber = \"6*k+2\";
+    f.MilnorCode = \"1,2*k+j+1,2*k-2j-1\";
+    f.NormalForm = \"x^3 + a(y)*x*y^(2*k+2)+y^(3*k+2)\";
+    f.SpecialForm = \"x^3 +y^(3*k+2)\";
+    f.Restrictions = \"(k>=1)&&(k>1||a==0)&&(deg(a)<=(k-2))\";";
+  write(l, "E[6k+2]", s);
+
+//* X[k,0]
+    s = "singseries f;
+    f.Series = \"X[k,0]\";
+    f.Modality = \"3*k-2\";
+    f.Corank = \"2\";
+    f.MilnorNumber = \"12*k-3\";
+    f.MilnorCode = \"1,1,2*k-1+j,2k-1-2*j+t,2*k-1+j-2t\";
+    f.NormalForm = \"x^4 + b(y)*x^3*y^k + a(y)*x^2*y^(2*k) + x*y^(3*k)\";
+    f.SpecialForm = \"x^4 + x^3*y^k + x*y^(3*k)\";
+    f.Restrictions = \"(jet(a,0)*jet(b,0)!=9)&&(k>1)&&(4*(jet(a,0)^3+jet(b,0)^3)
+     - jet(a,0)^2*jet(b,0)^2-18* jet(a,0)*jet(b,0) + 27 !=0)&&(deg(a)<=(k-2))
+     &&(deg(b)<=(2*k-2))\";";
+  write(l, "X[k,0]", s);
+
+    //* X[1,0]
+        s = "singseries f;
+        f.Series = \"X[1,0]\";
+        f.Modality = \"1\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"9\";
+        f.MilnorCode = \"1,1,1+j,1-2*j+t,1+j-2t\";
+        f.NormalForm = \"x^4 + a(y)*x^2*y^2 + y^4\";
+        f.SpecialForm = \"x^4 + x^2*y^2 + y^4\";
+        f.Restrictions = \"(deg(a)==0)&&(jet(a,0)^2!=4)\";";
+      write(l, "X[1,0]", s);
+
+    //* X[k,r]
+        s = "singseries f;
+        f.Series = \"X[k,r]\";
+        f.Modality = \"3*k-2\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"12*k-3+r\";
+        f.MilnorCode = \"1,1,2*k-1+j,2k-1-2*j,2*k-1+j+r\";
+        f.NormalForm = \"x4+a(y)*x3*y^(k)+x^2*y^(2*k)+b(y)*y^(4*k+r)\";
+        f.SpecialForm = \"x4+x3*y^(k)+x^2*y^(2*k)+y^(4*k+r)\";
+        f.Restrictions = \"(k>1)&&(r>0)&&(deg(a)<=(k-2))&&(jet(a,0)^2!=4)&&
+        (jet(b,0)!=0)&&(deg(b)<=(2*k-2))\";";
+      write(l, "X[k,r]", s);
+
+    //* X[1,r]
+        s = "singseries f;
+        f.Series = \"X[1,r]\";
+        f.Modality = \"1\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"9+r\";
+        f.MilnorCode = \"1,1,1+j,1-2*j,1+j+r\";
+        f.NormalForm = \"x4+x^2*y^2+a(y)*y^(4+r)\";
+        f.SpecialForm = \"x4+x^2*y^2+y^(4+r)\";
+        f.Restrictions = \"(deg(a)==0)&&(jet(a,0)!=0)\";";
+        write(l, "X[1,r]", s);
+
+    //* Y[k,r,s]
+        s = "singseries f;
+        f.Series = \"Y[k,r,s]\";
+        f.Modality = \"3*k-2\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"12*k-3+r+s\";
+        f.MilnorCode = \"1,1,2*k-1,2*k-1+j,2*k-1-2*j+r+s\";
+        f.NormalForm = \"((x + a(y)*y^k)^2 + b(y)*y^(2*k+s))*(x2 + y^(2*k+r))\";
+        f.SpecialForm = \"((x + y^k)^2 + y^(2*k+s))*(x2 + y^(2*k+r))\";
+        f.Restrictions = \"(jet(a,0)!=0)&&(deg(a)<=(k-2))&&(k>1)&&(jet(b,0)!=0)
+        &&(1<=s)&&(s<=7)\";";
+        write(l, "Y[k,r,s]", s);
+
+    //* Y[1,r,s]
+        s = "singseries f;
+        f.Series = \"Y[1,r,s]\";
+        f.Modality = \"1\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"9+r+s\";
+        f.MilnorCode = \"1,1,1,1+j,1-2*j+r+s\";
+        f.NormalForm = \" x^(4+r)+ a(y)*x2*y2 + y^(4+s)\";
+        f.SpecialForm = \" x^(4+r)+ x2*y2 + y^(4+s)\";
+        f.Restrictions = \"(deg(a)==0)&&(jet(a,0)!=0)&&(1<=s)&&(s<=7)\";";
+        write(l, "Y[1,r,s]", s);
+
+    //* Z[k,r]
+        s = "singseries f;
+        f.Series = \"Z[k,r]\";
+        f.Modality = \"3*k+r-2\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"12*k-3+6*r\";
+        f.MilnorCode = \"1,1,2*k-1,2*k-1+j,2*k-1+6*r-2*j\";
+        f.NormalForm = \"(x + a(y)*y^k)*(x^3 + d(y)*x2*y^(k+1) +
+        c(y)*x*y^(2*k+2*r+1) + y^(3*k+3*r))\";
+        f.SpecialForm = \"(x + y^k)*(x^3 + 2*y^(k+1) + x*y^(2*k+2*r+1) +
+        y^(3*k+3*r))\";
+        f.Restrictions = \"(k>1)&&(r>=0)&&(4*d^3+27!=0)&&(deg(d)==0)&&
+        (deg(c)<=(2*k+r-3))&&(deg(a)<=(k-2))\";";
+        write(l, "Z[k,r]", s);
+
+    //* Z[1,r]
+        s = "singseries f;
+        f.Series = \"Z[1,r]\";
+        f.Modality = \"1+r\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"9+6*r\";
+        f.MilnorCode = \"1,1,1,1+j,1+6*r-2*j\";
+        f.NormalForm = \"y*(x^3 + d(y)*x^2*y^(2) + c(y)*x*y^(2+2*r+1) +
+        y^(3+3*r))\";
+        f.SpecialForm = \"y*(x^3 + x^2*y^(2) + x*y^(2+2*r+1) +
+        y^(3+3*r))\";
+        f.Restrictions = \"(r>=0)&&(4*d^3+27!=0)&&(deg(d)==0)
+        &&(deg(c)<=(r-1))\";";
+        write(l, "Z[1,r]", s);
+
+    //* Z[k,r,s]
+        s = "singseries f;
+        f.Series = \"Z[k,r,s]\";
+        f.Modality = \"3*k+r-2\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"12*k+6*r+s-3\";
+        f.MilnorCode = \"1,1,2*k-1,2*k-1+2*r,2*k-1+2*r-s\";
+        f.NormalForm = \"(x^2 + a(y)*x*y^k + b(y)*y^(2*k+r))*
+        (x^2 + y^(2*k+2*r+s))\";
+        f.SpecialForm = \"(x^2 + x*y^k + y^(2*k+r))*(x^2 + y^(2*k+2*r+s))\";
+        f.Restrictions = \"(k>1)&&(r>=0)&&(deg(a)<=(k-2))&&(jet(a,0)!=0)&&
+        (jet(b,0)!=0)&&(deg(b)<=(2*k+r-2))\";";
+        write(l, "Z[k,r,s]", s);
+
+    //* Z[1,r,s]
+        s = "singseries f;
+        f.Series = \"Z[1,r,s]\";
+        f.Modality = \"1+r\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"9+6*r+s\";
+        f.MilnorCode = \"1,1,1,1+2*r,1+2*r-s\";
+        f.NormalForm = \"y*(x^3 + x^2*y^(r+1) + b(y)*y^(3*r+s+3))\";
+        f.SpecialForm = \"y*(x^3 + x^2*y^(r+1) + y^(3*r+s+3))\";
+        f.Restrictions = \"(r>=0)&&(jet(b,0)!=0)&&(deg(b)<=(2*k+r-2))\";";
+        write(l, "Z[1,r,s]", s);
+
+    //* Z[k,12k+6r-1]
+        s = "singseries f;
+        f.Series = \"Z[k,12k+6r-1]\";
+        f.Modality = \"3*k+r-2\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"12*k+6r-1\";
+        f.MilnorCode = \"1,1,2k-1,2k-1+j,2k+1+6*r-2*j\";
+        f.NormalForm = \"(x + a(y)*y^k)*(x^3 + b(y)*x*y^(2*k+2*r+1) +
+         y^(3*k+3*r+1))\";
+        f.SpecialForm = \"(x + y^k)*(x^3 + x*y^(2*k+2*r+1) + y^(3*k+3*r+1))\";
+        f.Restrictions = \" (k>1)&&(r>=0)&&(deg(a)<=(k-2))&&(jet(a,0)!=0)&&
+        (jet(b,0)!=0)&&(deg(b)<=(2*k+r-2))\";";
+        write(l, "Z[k,12k+6r-1]", s);
+
+        //* Z[1,6r+11]
+            s = "singseries f;
+            f.Series = \"Z[1,6r+11]\";
+            f.Modality = \"1+r\";
+            f.Corank = \"2\";
+            f.MilnorNumber = \"6r+11\";
+            f.MilnorCode = \"1,1,1,1+j,3+6*r-2*j\";
+            f.NormalForm = \"y*(x^3 + b(y)*x*y^(2+2*r+1) + y^(3+3*r+1))\";
+            f.SpecialForm = \"y*(x^3 + x*y^(2+2*r+1) + y^(3+3*r+1))\";
+            f.Restrictions = \"(r>=0)&&(deg(b)<=(r))\";";
+            write(l, "Z[1,6r+11]", s);
+
+    //* Z[k,12k+6r+1]
+        s = "singseries f;
+        f.Series = \"Z[k,12k+6r+1]\";
+        f.Modality = \"3*k+r-2\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"12*k+6r+1\";
+        f.MilnorCode = \"1,1,2k-1,2k-1+j,2k+3+6*r-2*j\";
+        f.NormalForm = \"(x + a(y)*y^k)*(x^3 + b(y)*x*y^(2*k+2*r+2) +
+         y^(3*k+3*r+2))\";
+        f.SpecialForm = \"(x + y^k)*(x^3 + x*y^(2*k+2*r+2) + y^(3*k+3*r+2))\";
+        f.Restrictions = \" (k>1)&&(r>=0)&&(deg(a)<=(k-2))&&(jet(a,0)!=0)&&
+        (jet(b,0)!=0)&&(deg(b)<=(2*k+r-2))\";";
+        write(l, "Z[k,12k+6r+1]", s);
+
+    //* Z[1,6r+13]
+        s = "singseries f;
+        f.Series = \"Z[1,6r+13]\";
+        f.Modality = \"1+r\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"6r+13\";
+        f.MilnorCode = \"1,1,1,1+j,5+6*r-2*j\";
+        f.NormalForm = \"y*(x^3 + b(y)*x*y^(2*r+4) + y^(3*r+5))\";
+        f.SpecialForm = \"y*(x^3 + x*y^(2*r+4) + y^(3*r+5))\";
+        f.Restrictions = \" (r>=0)&&(deg(b)<=(r))\";";
+        write(l, "Z[1,6r+13]", s);
+
+    //* Z[k,12k+6r]
+        s = "singseries f;
+        f.Series = \"Z[k,12k+6r]\";
+        f.Modality = \"3*k+r-2\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"12*k+6r\";
+        f.MilnorCode = \"1,1,2k-1,2k-1+2*r,2k+2*r\";
+        f.NormalForm = \"(x + a(y)*y^k)*(x^3 + x*y^(2*k+2*r+1) +
+        b(y)* y^(3*k+3*r+2))\";
+        f.SpecialForm = \"(x + y^k)*(x^3 + x*y^(2*k+2*r+1) +y^(3*k+3*r+2))\";
+        f.Restrictions = \" (k>1)&&(r>=0)&&(deg(a)<=(k-2))&&(jet(a,0)!=0)&&
+        (jet(b,0)!=0)&&(deg(b)<=(2*k+r-2))\";";
+        write(l, "Z[k,12k+6r]", s);
+
+
+    //* Z[1,6r+12]
+        s = "singseries f;
+        f.Series = \"Z[1,6r+12]\";
+        f.Modality = \"1+r\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"6*r+12\";
+        f.MilnorCode = \"1,1,1,1+2*r,2+2*r\";
+        f.NormalForm = \"y*(x^3 + x*y^(2*r+3) +b(y)* y^(3*r+5))\";
+        f.SpecialForm = \"y*(x^3 + x*y^(2*r+3) +y^(3*r+5))\";
+        f.Restrictions = \"(r>=0)&&(deg(b)<=(r))\";";
+        write(l, "Z[1,6r+12]", s);
+
+
+    //* W[k,r]
+        s = "singseries f;
+        f.Series = \"W[k,r]\";
+        f.Modality = \"3*k-1\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"12*k+3+r\";
+        f.MilnorCode = \"1,1,2k,2k,2k+r\";
+        f.NormalForm = \"x4+a(y)*x^3*y^(k+1)+x^2*y^(2*k+1)+b(y)*y^(4*k+2+r) \";
+        f.SpecialForm = \"x4+x^2*y^(2*k+1)+y^(4*k+2+r) \";
+        f.Restrictions = \"(k>=1)&&(r>0)&&(k>1||a==0)&&(deg(a)<=(k-2))&&
+        (jet(b,0)!=0)&&(deg(b)<=(2*k-1))\";";
+        write(l, "W[k,r]", s);
+
+    //* W[k,0]
+        s = "singseries f;
+        f.Series = \"W[k,0]\";
+        f.Modality = \"3*k-1\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"12*k+3\";
+        f.MilnorCode = \"1,1,2k+j,2k-2-2*j+t,2k+6+j+2*t\";
+        f.NormalForm = \"x4+b(y)*x2*y^(2*k+1)+a(y)*x*y^(3*k+2)+y^(4*k+2) \";
+        f.SpecialForm = \"x4+x2*y^(2*k+1)+y^(4*k+2) \";
+        f.Restrictions = \" (k>=1)&&(k>1||a==0)&&(deg(a)<=(k-2))&&
+        (jet(b,0)^2!=4)&&(deg(b)<=(2*k-1))\";";
+        write(l, "W[k,0]", s);
+
+    //* W[12k]
+        s = "singseries f;
+        f.Series = \"W[12k]\";
+        f.Modality = \"3*k-2\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"12*k\";
+        f.MilnorCode = \"1,1,2k+j,2k-3-2*j+t,2k+3+j-2*t\";
+        f.NormalForm = \"x4+a(y)*x*y^(3*k+1)+c(y)*x^2*y^(2*k+1)+y^(4*k+1)\";
+        f.SpecialForm = \"x4+x^2*y^(2*k+1)+y^(4*k+1)\";
+        f.Restrictions = \"(k>=1)&&(k>1||a==0)&&(deg(a)<=(k-2))&&
+        (deg(c)<=(2*k-2))\";";
+        write(l, "W[12k]", s);
+
+    //* W[12k+1]
+        s = "singseries f;
+        f.Series = \"W[12k+1]\";
+        f.Modality = \"3*k-2\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"12*k+1\";
+        f.MilnorCode = \"1,1,2k+j,2k-1-2*j,2k+j\";
+        f.NormalForm = \"x4+x*y^(3*k+1)+a(y)*x^2*y^(2*k+1)+c(y)*y^(4*k+2) \";
+        f.SpecialForm = \"x4+x*y^(3*k+1)+y^(4*k+2) \";
+        f.Restrictions = \"(k>=1)&&(k>1||a==0)&&(deg(a)<=(k-2))&&
+        (deg(c)<=(2*k-2))\";";
+        write(l, "W[12k+1]", s);
+
+    //* W[12k+5]
+        s = "singseries f;
+        f.Series = \"W[12k+5]\";
+        f.Modality = \"3*k-1\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"12*k+5\";
+        f.MilnorCode = \"1,1,2k+j,2k+1-2*j,2k+j\";
+        f.NormalForm = \"x4+x*y^(3*k+2)+a(y)*x^2*y^(2*k+2)+b(y)*y^(4*k+3) \";
+        f.SpecialForm = \"x4+x*y^(3*k+2)+y^(4*k+3) \";
+        f.Restrictions = \"(k>=1)&&(k>1||a==0)&&(deg(a)<=(k-2))&&
+        (deg(b)<=(2*k-1))\";";
+        write(l, "W[12k+5]", s);
+
+    //* W[12k+6]
+        s = "singseries f;
+        f.Series = \"W[12k+6]\";
+        f.Modality = \"3*k-1\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"12*k+6\";
+        f.MilnorCode = \"1,1,2k+j,2k-3-2*j+t,2k+9+j-2*t\";
+        f.NormalForm = \"x4+a(y)*x*y^(3*k+3)+b(y)*x^2*y^(2*k+2)+y^(4*k+3) \";
+        f.SpecialForm = \"x4+x^2*y^(2*k+2)+y^(4*k+3) \";
+        f.Restrictions = \"(k>=1)&&(k>1||a==0)&&(deg(a)<=(k-2))&&
+        (deg(b)<=(2*k-1))\";";
+        write(l, "W[12k+6]", s);
+
+    //* W#[k,2r]
+        s = "singseries f;
+        f.Series = \"W#[k,2r]\";
+        f.Modality = \"3*k-1\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"12*k+3+2*r\";
+        f.MilnorCode = \"1,1,2k,2k+r,2k\";
+        f.NormalForm = \"(x2+y^(2*k+1))^2+b(y)*x^2*y^(2*k+1+r)+
+        a(y)*x*y^(3*k+2+r) \";
+        f.SpecialForm = \"(x2+y^(2*k+1))^2+x^2*y^(2*k+1+r) \";
+        f.Restrictions = \"(k>=1)&&(r>0)&&(k>1||a==0)&&(deg(a)<=(k-2))&&
+        (jet(b,0)!=0)&&(deg(b)<=(2*k-1))\";";
+        write(l, "W#[k,2r]", s);
+
+    //* W#[k,2r-1]
+        s = "singseries f;
+        f.Series = \"W#[k,2r-1]\";
+        f.Modality = \"3*k-1\";
+        f.Corank = \"2\";
+        f.MilnorNumber = \"12*k+2+2*r\";
+        f.MilnorCode = \"1,1,2k,2k-3+j,2*k+5+2*r-2*j\";
+        f.NormalForm = \"(x2+y^(2*k+1))^2+b(y)*x*y^(3*k+1+r)+
+        a(y)*y^(4*k+2+r)\";
+        f.SpecialForm = \"(x2+y^(2*k+1))^2+x*y^(3*k+1+r)\";
+        f.Restrictions = \"(k>=1)&&(r>0)&&(k>1||a==0)&&(deg(a)<=(k-2))
+        &&(jet(b,0)!=0)&&(deg(b)<=(2*k-1))\";";
+        write(l, "W#[k,2r-1]", s);
+
+ write(l,"VERSION", "1.0");
+  close(l);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc read_singularity_db( string typ )
+{
+  string DBMPATH=system("getenv","DBMPATH");
+  string DatabasePath, Database, S, Text, Tp;
+
+  if( DBMPATH != "" ) { DatabasePath = DBMPATH+"/Singularitylist"; }
+  else { DatabasePath = "Singularitylist"; }
+  Database="DBM: ",DatabasePath;
+
+  link dbmLink=Database;
+  Tp = read(dbmLink, typ);
+    return(Tp);
+
+}
+

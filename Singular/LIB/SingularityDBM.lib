@@ -1,0 +1,491 @@
+/////////////////////////////////////////////////////////////////////////////
+version="version singularityDBM.lib 4.1.0.0 Sep_2017 "; // 
+category="Singularities";
+info="
+LIBRARY:  singularityDBM.lib     Data Base of Singularities for the Arnold-Classifier
+AUTHOR:   Eva Maria Hemmerling,  ehemmerl@rhrk.uni-kl.de
+
+PROCEDURES:
+ makedbm_init();
+ dbm_read(l);          read all entries from a DBM-databaes pointed by l
+ dbm_getnext(l);       read next entry from a DBM-databaes pointed by l
+ create_singularity_dbm();
+ read_singularity_db();
+";
+
+//=============================================================================
+
+static proc makedbm_init()
+{
+//* Generates file containing a data base for singularities up to corank 2 
+//* listed by Arnol'd. This file is needed for arnoldclassify.lib.
+
+  string s;
+  link l="DBM:r Singularitylist";
+  s = read(l,"VERSION");
+  if (s == "" ) {
+    "Need to create database...";
+    create_singularity_dbm();
+  }
+  close(l);
+  l="DBM:r Singularitylist";
+  s = read(l,"VERSION");
+  "Creation done. Current version:", s;
+}
+//=============================================================================
+
+static proc dbm_read (link l)
+{
+  string s="";
+  s=read(l);
+  while( s != "" )
+  {
+    s,"=",read(l,s);
+    s=read(l);
+  }
+}
+
+//=============================================================================
+static proc dbm_getnext (link l)
+{
+  string s="";
+  s=read(l);
+  if( s != "" ) { s,"=",read(l,s); }
+}
+
+//=============================================================================
+proc create_singularity_dbm
+"USAGE:   create_singularity_dbm();
+COMPUTE: Generates two files,  Singularitylist.dir and Singularitylist.pag
+         containing a data base for singularities up to corank 2 listed 
+				 by Arnol'd.
+RETURN:  Nothing
+"
+{
+  link l="DBM:rw Singularitylist";
+
+//*Data typ singseries;
+  string s;
+
+//* A[k]	
+	s = "singseries f;
+	f.Series = \"A[k]\"; 
+	f.Modality = \"0\";
+	f.Corank = \"1\";
+	f.MilnorNumber = \"k\";
+	f.MilnorCode = \"k\"; 
+	f.NormalForm = \"x^(k+1)\";
+	f.SpecialForm = \"x^(k+1)\";
+	f.Restrictions = \"(k>1)\";";
+  write(l, "A[k]", s);
+	
+//* D[k]	
+	s = "singseries f;
+	f.Series = \"D[k]\"; 
+	f.Modality = \"0\";
+	f.Corank = \"2\";
+	f.MilnorNumber = \"k\";
+	f.MilnorCode = \"1,1,k-3\"; 
+	f.NormalForm = \"x^2*y+y^(k-1)\";
+	f.SpecialForm = \"x^2*y+y^(k-1)\";
+	f.Restrictions = \"(k>=4)\";";
+  write(l, "D[k]", s);
+
+//* J[k,0]
+	s = "singseries f;
+	f.Series = \"J[k,0]\"; 
+	f.Modality = \"0\";
+	f.Corank = \"2\";
+	f.MilnorNumber = \"6*k-2\";
+	f.MilnorCode = \"1,2*k+j,2*k-2*j-3\"; 
+	f.NormalForm = \"x^3 + b(y)*x^2*y^k+c(y)*x*y^(2*k+1)+y^(3*k)\";
+	f.SpecialForm = \"x^3 + x^2*y^k+y^(3*k)\";
+	f.Restrictions = \"(k>1)&& (4*b^3 + 27 != 0)&&
+	 (deg(b)==0)&&(deg(c)<=(k-3))&&(k>2||c==0)\";";
+  write(l, "J[k,0]", s);
+
+//* J[k,r]
+	s = "singseries f;
+	f.Series = \"J[k,r]\"; 
+	f.Modality = \"0\";
+	f.Corank = \"2\";
+	f.MilnorNumber = \"6*k-2+r\";
+	f.MilnorCode = \"1,2*k-1,2*k+r-1\"; 
+	f.NormalForm = \"x^3 + x^2*y^k+a(y)*y^(3*k+r)\";
+	f.SpecialForm = \"x^3 + x^2*y^k+y^(3*k+r)\";
+	f.Restrictions = \"(k>1)&&(r>0)&&(jet(a,0)!= 0)&&(deg(a)<=(k-2)) \";";
+  write(l, "J[k,r]", s);
+
+//* E[6k]
+	s = "singseries f;
+	f.Series = \"E[6k]\"; 
+	f.Modality = \"0\";
+	f.Corank = \"2\";
+	f.MilnorNumber = \"6*k\";
+	f.MilnorCode = \"1,2*k+j,2*k-2j-1\"; 
+	f.NormalForm = \"x^3 + a(y)*x*y^(2*k+1)+y^(3*k+1)\";
+	f.SpecialForm = \"x^3+y^(3*k+1)\";
+	f.Restrictions = \"(k>=1)&&(k>1||a==0)&&(deg(a)<=(k-2))\";";
+  write(l, "E[6k]", s);
+
+//* E[6k+1]	
+	s = "singseries f;
+	f.Series = \"E[6k+1]\"; 
+	f.Modality = \"0\";
+	f.Corank = \"2\";
+	f.MilnorNumber = \"6*k+1\";
+	f.MilnorCode = \"1,2*k,2*k\"; 
+	f.NormalForm = \"x^3 + x*y^(2*k+1)+a(y)*y^(3*k+2)\";
+	f.SpecialForm = \"x^3 + x*y^(2*k+1)\";
+	f.Restrictions = \"(k>=1)&&(k>1||a==0)&&(deg(a)<=(k-2))\";";
+  write(l, "E[6k+1]", s);
+
+//* E[6k+2]	
+	s = "singseries f;
+	f.Series = \"E[6k+2]\"; 
+	f.Modality = \"0\";
+	f.Corank = \"2\";
+	f.MilnorNumber = \"6*k+2\";
+	f.MilnorCode = \"1,2*k+j+1,2*k-2j-1\"; 
+	f.NormalForm = \"x^3 + a(y)*x*y^(2*k+2)+y^(3*k+2)\";
+	f.SpecialForm = \"x^3 +y^(3*k+2)\";
+	f.Restrictions = \"(k>=1)&&(k>1||a==0)&&(deg(a)<=(k-2))\";";
+  write(l, "E[6k+2]", s);
+
+//* X[k,0]
+	s = "singseries f;
+	f.Series = \"X[k,0]\"; 
+	f.Modality = \"3*k-2\";
+	f.Corank = \"2\";
+	f.MilnorNumber = \"12*k-3\";
+	f.MilnorCode = \"1,1,2*k-1+j,2k-1-2*j+t,2*k-1+j-2t\"; 
+	f.NormalForm = \"x^4 + b(y)*x^3*y^k + a(y)*x^2*y^(2*k) + x*y^(3*k)\";
+	f.SpecialForm = \"x^4 + x^3*y^k + x*y^(3*k)\";
+	f.Restrictions = \"(jet(a,0)*jet(b,0)!=9)&&(k>1)&&(4*(jet(a,0)^3+jet(b,0)^3)
+	 - jet(a,0)^2*jet(b,0)^2-18* jet(a,0)*jet(b,0) + 27 !=0)&&(deg(a)<=(k-2)) 
+	 &&(deg(b)<=(2*k-2))\";";
+  write(l, "X[k,0]", s);
+	
+	//* X[1,0]
+		s = "singseries f;
+		f.Series = \"X[1,0]\"; 
+		f.Modality = \"1\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"9\";
+		f.MilnorCode = \"1,1,1+j,1-2*j+t,1+j-2t\"; 
+		f.NormalForm = \"x^4 + a(y)*x^2*y^2 + y^4\";
+		f.SpecialForm = \"x^4 + x^2*y^2 + y^4\";
+		f.Restrictions = \"(deg(a)==0)&&(jet(a,0)^2!=4)\";";
+	  write(l, "X[1,0]", s);
+	
+	//* X[k,r]	
+		s = "singseries f;
+		f.Series = \"X[k,r]\"; 
+		f.Modality = \"3*k-2\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"12*k-3+r\";
+		f.MilnorCode = \"1,1,2*k-1+j,2k-1-2*j,2*k-1+j+r\"; 
+		f.NormalForm = \"x4+a(y)*x3*y^(k)+x^2*y^(2*k)+b(y)*y^(4*k+r)\";
+		f.SpecialForm = \"x4+x3*y^(k)+x^2*y^(2*k)+y^(4*k+r)\";
+		f.Restrictions = \"(k>1)&&(r>0)&&(deg(a)<=(k-2))&&(jet(a,0)^2!=4)&&
+		(jet(b,0)!=0)&&(deg(b)<=(2*k-2))\";";
+	  write(l, "X[k,r]", s);
+		
+	//* X[1,r]
+		s = "singseries f;
+		f.Series = \"X[1,r]\"; 
+		f.Modality = \"1\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"9+r\";
+		f.MilnorCode = \"1,1,1+j,1-2*j,1+j+r\"; 
+		f.NormalForm = \"x4+x^2*y^2+a(y)*y^(4+r)\";
+		f.SpecialForm = \"x4+x^2*y^2+y^(4+r)\";
+		f.Restrictions = \"(deg(a)==0)&&(jet(a,0)!=0)\";";
+		write(l, "X[1,r]", s);
+		
+	//* Y[k,r,s]
+		s = "singseries f;
+		f.Series = \"Y[k,r,s]\"; 
+		f.Modality = \"3*k-2\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"12*k-3+r+s\";
+		f.MilnorCode = \"1,1,2*k-1,2*k-1+j,2*k-1-2*j+r+s\"; 
+		f.NormalForm = \"((x + a(y)*y^k)^2 + b(y)*y^(2*k+s))*(x2 + y^(2*k+r))\";
+		f.SpecialForm = \"((x + y^k)^2 + y^(2*k+s))*(x2 + y^(2*k+r))\";
+		f.Restrictions = \"(jet(a,0)!=0)&&(deg(a)<=(k-2))&&(k>1)&&(jet(b,0)!=0)
+		&&(1<=s)&&(s<=7)\";";
+		write(l, "Y[k,r,s]", s);
+	
+	//* Y[1,r,s]
+		s = "singseries f;
+		f.Series = \"Y[1,r,s]\"; 
+		f.Modality = \"1\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"9+r+s\";
+		f.MilnorCode = \"1,1,1,1+j,1-2*j+r+s\"; 
+		f.NormalForm = \" x^(4+r)+ a(y)*x2*y2 + y^(4+s)\";
+		f.SpecialForm = \" x^(4+r)+ x2*y2 + y^(4+s)\";
+		f.Restrictions = \"(deg(a)==0)&&(jet(a,0)!=0)&&(1<=s)&&(s<=7)\";";
+		write(l, "Y[1,r,s]", s);
+		
+	//* Z[k,r]
+		s = "singseries f;
+		f.Series = \"Z[k,r]\"; 
+		f.Modality = \"3*k+r-2\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"12*k-3+6*r\";
+		f.MilnorCode = \"1,1,2*k-1,2*k-1+j,2*k-1+6*r-2*j\"; 
+		f.NormalForm = \"(x + a(y)*y^k)*(x^3 + d(y)*x2*y^(k+1) + 
+		c(y)*x*y^(2*k+2*r+1) + y^(3*k+3*r))\";
+		f.SpecialForm = \"(x + y^k)*(x^3 + 2*y^(k+1) + x*y^(2*k+2*r+1) + 
+		y^(3*k+3*r))\";
+		f.Restrictions = \"(k>1)&&(r>=0)&&(4*d^3+27!=0)&&(deg(d)==0)&&
+		(deg(c)<=(2*k+r-3))&&(deg(a)<=(k-2))\";";
+		write(l, "Z[k,r]", s);
+		
+	//* Z[1,r]
+		s = "singseries f;
+		f.Series = \"Z[1,r]\"; 
+		f.Modality = \"1+r\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"9+6*r\";
+		f.MilnorCode = \"1,1,1,1+j,1+6*r-2*j\"; 
+		f.NormalForm = \"y*(x^3 + d(y)*x^2*y^(2) + c(y)*x*y^(2+2*r+1) + 
+		y^(3+3*r))\";
+		f.SpecialForm = \"y*(x^3 + x^2*y^(2) + x*y^(2+2*r+1) + 
+		y^(3+3*r))\";
+		f.Restrictions = \"(r>=0)&&(4*d^3+27!=0)&&(deg(d)==0)
+		&&(deg(c)<=(r-1))\";";
+		write(l, "Z[1,r]", s);
+
+	//* Z[k,r,s]
+		s = "singseries f;
+		f.Series = \"Z[k,r,s]\"; 
+		f.Modality = \"3*k+r-2\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"12*k+6*r+s-3\";
+		f.MilnorCode = \"1,1,2*k-1,2*k-1+2*r,2*k-1+2*r-s\"; 
+		f.NormalForm = \"(x^2 + a(y)*x*y^k + b(y)*y^(2*k+r))*
+		(x^2 + y^(2*k+2*r+s))\";
+		f.SpecialForm = \"(x^2 + x*y^k + y^(2*k+r))*(x^2 + y^(2*k+2*r+s))\";
+		f.Restrictions = \"(k>1)&&(r>=0)&&(deg(a)<=(k-2))&&(jet(a,0)!=0)&&
+		(jet(b,0)!=0)&&(deg(b)<=(2*k+r-2))\";";
+		write(l, "Z[k,r,s]", s);
+		
+	//* Z[1,r,s]
+		s = "singseries f;
+		f.Series = \"Z[1,r,s]\"; 
+		f.Modality = \"1+r\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"9+6*r+s\";
+		f.MilnorCode = \"1,1,1,1+2*r,1+2*r-s\"; 
+		f.NormalForm = \"y*(x^3 + x^2*y^(r+1) + b(y)*y^(3*r+s+3))\";
+		f.SpecialForm = \"y*(x^3 + x^2*y^(r+1) + y^(3*r+s+3))\";
+		f.Restrictions = \"(r>=0)&&(jet(b,0)!=0)&&(deg(b)<=(2*k+r-2))\";";
+		write(l, "Z[1,r,s]", s);
+		
+	//* Z[k,12k+6r-1]	
+		s = "singseries f;
+		f.Series = \"Z[k,12k+6r-1]\"; 
+		f.Modality = \"3*k+r-2\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"12*k+6r-1\";
+		f.MilnorCode = \"1,1,2k-1,2k-1+j,2k+1+6*r-2*j\"; 
+		f.NormalForm = \"(x + a(y)*y^k)*(x^3 + b(y)*x*y^(2*k+2*r+1) +
+		 y^(3*k+3*r+1))\";
+		f.SpecialForm = \"(x + y^k)*(x^3 + x*y^(2*k+2*r+1) + y^(3*k+3*r+1))\";
+		f.Restrictions = \" (k>1)&&(r>=0)&&(deg(a)<=(k-2))&&(jet(a,0)!=0)&&
+		(jet(b,0)!=0)&&(deg(b)<=(2*k+r-2))\";";
+		write(l, "Z[k,12k+6r-1]", s);
+		
+		//* Z[1,6r+11]	
+			s = "singseries f;
+			f.Series = \"Z[1,6r+11]\"; 
+			f.Modality = \"1+r\";
+			f.Corank = \"2\";
+			f.MilnorNumber = \"6r+11\";
+			f.MilnorCode = \"1,1,1,1+j,3+6*r-2*j\"; 
+			f.NormalForm = \"y*(x^3 + b(y)*x*y^(2+2*r+1) + y^(3+3*r+1))\";
+			f.SpecialForm = \"y*(x^3 + x*y^(2+2*r+1) + y^(3+3*r+1))\";
+			f.Restrictions = \"(r>=0)&&(deg(b)<=(r))\";";
+			write(l, "Z[1,6r+11]", s);
+		
+	//* Z[k,12k+6r+1]	
+		s = "singseries f;
+		f.Series = \"Z[k,12k+6r+1]\"; 
+		f.Modality = \"3*k+r-2\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"12*k+6r+1\";
+		f.MilnorCode = \"1,1,2k-1,2k-1+j,2k+3+6*r-2*j\"; 
+		f.NormalForm = \"(x + a(y)*y^k)*(x^3 + b(y)*x*y^(2*k+2*r+2) +
+		 y^(3*k+3*r+2))\";
+		f.SpecialForm = \"(x + y^k)*(x^3 + x*y^(2*k+2*r+2) + y^(3*k+3*r+2))\";
+		f.Restrictions = \" (k>1)&&(r>=0)&&(deg(a)<=(k-2))&&(jet(a,0)!=0)&&
+		(jet(b,0)!=0)&&(deg(b)<=(2*k+r-2))\";";
+		write(l, "Z[k,12k+6r+1]", s);
+		
+	//* Z[1,6r+13]
+		s = "singseries f;
+		f.Series = \"Z[1,6r+13]\"; 
+		f.Modality = \"1+r\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"6r+13\";
+		f.MilnorCode = \"1,1,1,1+j,5+6*r-2*j\"; 
+		f.NormalForm = \"y*(x^3 + b(y)*x*y^(2*r+4) + y^(3*r+5))\";
+		f.SpecialForm = \"y*(x^3 + x*y^(2*r+4) + y^(3*r+5))\";
+		f.Restrictions = \" (r>=0)&&(deg(b)<=(r))\";";
+		write(l, "Z[1,6r+13]", s);
+		
+	//* Z[k,12k+6r]	
+		s = "singseries f;
+		f.Series = \"Z[k,12k+6r]\"; 
+		f.Modality = \"3*k+r-2\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"12*k+6r\";
+		f.MilnorCode = \"1,1,2k-1,2k-1+2*r,2k+2*r\"; 
+		f.NormalForm = \"(x + a(y)*y^k)*(x^3 + x*y^(2*k+2*r+1) +
+		b(y)* y^(3*k+3*r+2))\";
+		f.SpecialForm = \"(x + y^k)*(x^3 + x*y^(2*k+2*r+1) +y^(3*k+3*r+2))\";
+		f.Restrictions = \" (k>1)&&(r>=0)&&(deg(a)<=(k-2))&&(jet(a,0)!=0)&&
+		(jet(b,0)!=0)&&(deg(b)<=(2*k+r-2))\";";
+		write(l, "Z[k,12k+6r]", s);
+		
+		
+	//* Z[1,6r+12]
+		s = "singseries f;
+		f.Series = \"Z[1,6r+12]\"; 
+		f.Modality = \"1+r\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"6*r+12\";
+		f.MilnorCode = \"1,1,1,1+2*r,2+2*r\"; 
+		f.NormalForm = \"y*(x^3 + x*y^(2*r+3) +b(y)* y^(3*r+5))\";
+		f.SpecialForm = \"y*(x^3 + x*y^(2*r+3) +y^(3*r+5))\";
+		f.Restrictions = \"(r>=0)&&(deg(b)<=(r))\";";
+		write(l, "Z[1,6r+12]", s);
+		
+		
+	//* W[k,r]
+		s = "singseries f;
+		f.Series = \"W[k,r]\"; 
+		f.Modality = \"3*k-1\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"12*k+3+r\";
+		f.MilnorCode = \"1,1,2k,2k,2k+r\"; 
+		f.NormalForm = \"x4+a(y)*x^3*y^(k+1)+x^2*y^(2*k+1)+b(y)*y^(4*k+2+r) \";
+		f.SpecialForm = \"x4+x^2*y^(2*k+1)+y^(4*k+2+r) \";
+		f.Restrictions = \"(k>=1)&&(r>0)&&(k>1||a==0)&&(deg(a)<=(k-2))&&
+		(jet(b,0)!=0)&&(deg(b)<=(2*k-1))\";";
+		write(l, "W[k,r]", s);
+
+	//* W[k,0]
+		s = "singseries f;
+		f.Series = \"W[k,0]\"; 
+		f.Modality = \"3*k-1\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"12*k+3\";
+		f.MilnorCode = \"1,1,2k+j,2k-2-2*j+t,2k+6+j+2*t\"; 
+		f.NormalForm = \"x4+b(y)*x2*y^(2*k+1)+a(y)*x*y^(3*k+2)+y^(4*k+2) \";
+		f.SpecialForm = \"x4+x2*y^(2*k+1)+y^(4*k+2) \";
+		f.Restrictions = \" (k>=1)&&(k>1||a==0)&&(deg(a)<=(k-2))&&
+		(jet(b,0)^2!=4)&&(deg(b)<=(2*k-1))\";";
+		write(l, "W[k,0]", s);
+
+	//* W[12k]
+		s = "singseries f;
+		f.Series = \"W[12k]\"; 
+		f.Modality = \"3*k-2\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"12*k\";
+		f.MilnorCode = \"1,1,2k+j,2k-3-2*j+t,2k+3+j-2*t\"; 
+		f.NormalForm = \"x4+a(y)*x*y^(3*k+1)+c(y)*x^2*y^(2*k+1)+y^(4*k+1)\";
+		f.SpecialForm = \"x4+x^2*y^(2*k+1)+y^(4*k+1)\";
+		f.Restrictions = \"(k>=1)&&(k>1||a==0)&&(deg(a)<=(k-2))&&
+		(deg(c)<=(2*k-2))\";";
+		write(l, "W[12k]", s);
+		
+	//* W[12k+1]
+		s = "singseries f;
+		f.Series = \"W[12k+1]\"; 
+		f.Modality = \"3*k-2\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"12*k+1\";
+		f.MilnorCode = \"1,1,2k+j,2k-1-2*j,2k+j\"; 
+		f.NormalForm = \"x4+x*y^(3*k+1)+a(y)*x^2*y^(2*k+1)+c(y)*y^(4*k+2) \";
+		f.SpecialForm = \"x4+x*y^(3*k+1)+y^(4*k+2) \";
+		f.Restrictions = \"(k>=1)&&(k>1||a==0)&&(deg(a)<=(k-2))&&
+		(deg(c)<=(2*k-2))\";";
+		write(l, "W[12k+1]", s);
+
+	//* W[12k+5]
+		s = "singseries f;
+		f.Series = \"W[12k+5]\"; 
+		f.Modality = \"3*k-1\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"12*k+5\";
+		f.MilnorCode = \"1,1,2k+j,2k+1-2*j,2k+j\"; 
+		f.NormalForm = \"x4+x*y^(3*k+2)+a(y)*x^2*y^(2*k+2)+b(y)*y^(4*k+3) \";
+		f.SpecialForm = \"x4+x*y^(3*k+2)+y^(4*k+3) \";
+		f.Restrictions = \"(k>=1)&&(k>1||a==0)&&(deg(a)<=(k-2))&&
+		(deg(b)<=(2*k-1))\";";
+		write(l, "W[12k+5]", s);
+		
+	//* W[12k+6]
+		s = "singseries f;
+		f.Series = \"W[12k+6]\"; 
+		f.Modality = \"3*k-1\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"12*k+6\";
+		f.MilnorCode = \"1,1,2k+j,2k-3-2*j+t,2k+9+j-2*t\"; 
+		f.NormalForm = \"x4+a(y)*x*y^(3*k+3)+b(y)*x^2*y^(2*k+2)+y^(4*k+3) \";
+		f.SpecialForm = \"x4+x^2*y^(2*k+2)+y^(4*k+3) \";
+		f.Restrictions = \"(k>=1)&&(k>1||a==0)&&(deg(a)<=(k-2))&&
+		(deg(b)<=(2*k-1))\";";
+		write(l, "W[12k+6]", s);
+		
+	//* W#[k,2r]
+		s = "singseries f;
+		f.Series = \"W#[k,2r]\"; 
+		f.Modality = \"3*k-1\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"12*k+3+2*r\";
+		f.MilnorCode = \"1,1,2k,2k+r,2k\"; 
+		f.NormalForm = \"(x2+y^(2*k+1))^2+b(y)*x^2*y^(2*k+1+r)+
+		a(y)*x*y^(3*k+2+r) \";
+		f.SpecialForm = \"(x2+y^(2*k+1))^2+x^2*y^(2*k+1+r) \";
+		f.Restrictions = \"(k>=1)&&(r>0)&&(k>1||a==0)&&(deg(a)<=(k-2))&&
+		(jet(b,0)!=0)&&(deg(b)<=(2*k-1))\";";
+		write(l, "W#[k,2r]", s);	
+
+	//* W#[k,2r-1]
+		s = "singseries f;
+		f.Series = \"W#[k,2r-1]\"; 
+		f.Modality = \"3*k-1\";
+		f.Corank = \"2\";
+		f.MilnorNumber = \"12*k+2+2*r\";
+		f.MilnorCode = \"1,1,2k,2k-3+j,2*k+5+2*r-2*j\"; 
+		f.NormalForm = \"(x2+y^(2*k+1))^2+b(y)*x*y^(3*k+1+r)+
+		a(y)*y^(4*k+2+r)\";
+		f.SpecialForm = \"(x2+y^(2*k+1))^2+x*y^(3*k+1+r)\";
+		f.Restrictions = \"(k>=1)&&(r>0)&&(k>1||a==0)&&(deg(a)<=(k-2))
+		&&(jet(b,0)!=0)&&(deg(b)<=(2*k-1))\";";
+		write(l, "W#[k,2r-1]", s);		
+		
+ write(l,"VERSION", "1.0");
+  close(l);
+}
+
+//=============================================================================
+static proc read_singularity_db( string typ )
+{
+  string DBMPATH=system("getenv","DBMPATH");
+  string DatabasePath, Database, S, Text, Tp;
+
+  if( DBMPATH != "" ) { DatabasePath = DBMPATH+"/Singularitylist"; }
+  else { DatabasePath = "Singularitylist"; }
+  Database="DBM: ",DatabasePath;
+	
+  link dbmLink=Database;
+  Tp = read(dbmLink, typ);
+	return(Tp);
+
+}
