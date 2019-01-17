@@ -933,7 +933,6 @@ BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinf
     case RING_DECL_LIST:
     case ROOT_DECL_LIST:
     case CMD_M:
-      if(args!=4) { Warn("args must be 4 in %s",my_yylinebuf);args=4;}
       break;
     default:
       Werror("unknown token type %d in %s",tt,my_yylinebuf);
