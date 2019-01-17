@@ -549,7 +549,6 @@ NOTE:       - if all generators of the differential algebra are needed, apply th
             - the list of generators is sorted with respect to the monomial ordering on the
             differential algebra
 KEYWORDS:   generators; graded
-SEE ALSO:   diffAlgebraIntToDual
 EXAMPLE:    example diffAlgebraListGen; shows an example"
 {
 
