@@ -65,9 +65,9 @@ arnold_classify_init();
 ///////////////////////////////////////////////////////////////////////////////
 proc arnoldClassify( poly fPoly )
 "USAGE:   arnoldClassify (f); f poly
-ASSUME:  The basering is local of characteristic at most 13 and f defines an
+ASSUME:  The basering is local of characteristic 0 and f defines an
          isolated singularity from Arnol'd's list of corank at most 2.
-COMPUTE: singularity class respect to right equivalence and
+COMPUTE: singularity class with respect to right equivalence and
          invariants used in the process of classification
 RETURN:  Singularity class of f of type singclass containing
          @* - name of singularity series as listed by arnoldListAllSeries(),
@@ -177,7 +177,6 @@ example
 static proc Classify_Corank2( singclass f, poly fPoly)
 {
 //* Classifies Singularities of Corank 2; Series D,J,E,W,X,Y,Z
- def br = basering;
 
 //* Zero 4-jet is no listed singularity
  if( jet( fPoly, 4) == 0 ){
@@ -226,17 +225,17 @@ static proc Classify_Z_Y( singclass f, poly fPoly )
   fPoly = Morse_arnold( fPoly, f.Determinacy );
 
   //* Reduce number of variables
-  def br = basering;
-  list L = ringlist(br);
+  def @br = basering;
+  list L = ringlist(@br);
   if( size(L[1]) == 0 )
-  { ring redbr = char(basering), (x(1..f.Corank)), (c,ds); }
+  { ring red@br = char(basering), (x(1..f.Corank)), (c,ds); }
   else{
     number m = leadcoef(L[1][4][1]);
-    ring redbr = (char(basering),t), (x(1..f.Corank)), (c,ds);
-    number m = imap(br, m);
+    ring red@br = (char(basering),t), (x(1..f.Corank)), (c,ds);
+    number m = imap(@br, m);
     minpoly = m;
   }
-   map MapReduce = br, maxideal(1);
+   map MapReduce = @br, maxideal(1);
   poly fPoly = MapReduce( fPoly );
  }
 
@@ -410,6 +409,7 @@ intvec weights;
    f.r =  int(f.Milnor - 9 - f.s);
    f.Class = "Y["+string(f.k)+","+string(f.r)+","+string(f.s)+"]";
    f.Modality = 3*f.k - 2;
+   f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
    return( f );
   }
   else{
@@ -426,6 +426,7 @@ intvec weights;
    f.s =  min(b1,b2);
    f.Class = "Y["+string(f.k)+","+string(f.r)+","+string(f.s)+"]";
    f.Modality = 3*f.k - 2;
+   f.NormalForm, f.Restrictions = NormalFormAndRestrictionsDB(f.Series);
    return( f );
   }
 }
@@ -894,12 +895,12 @@ proc arnoldMorseSplit ( poly f, list # )
 "USAGE:   arnoldMorseSplit(f); f poly
 ASSUME:  base ring is local, f in maxideal(2) has isolated critical point at 0
 COMPUTE: result of Splitting Lemma applied to f
-RETURN:  poly g in maxideal(3) right equivalent to f
+RETURN:  polynomial g in maxideal(3) right equivalent to f
 EXAMPLE: example arnoldMorseSplit; shows an example
 "
 {
 //* save basering
- def br = basering;
+ def @br = basering;
  int n = nvars(basering);
 
 //* Set Determinacy (Needed for Splitting Lemma) wether given in # or compute
@@ -913,14 +914,14 @@ EXAMPLE: example arnoldMorseSplit; shows an example
 //* define ring_ext to change variable names in x(1), ..., x(n)
 //* requirement for procedure morse_arnold
  ring ring_ext = char(basering), (x(1..n)), (c, ds);
- map Phi = br, maxideal(1);
+ map Phi = @br, maxideal(1);
 
 
 //* Apply Splitting Lemma
  poly f = Morse_arnold( Phi( f ), Determinacy );
 
 //* Define inverse map to map f back into original ring
- setring br;
+ setring @br;
  map Phi_inverse = ring_ext, maxideal(1);
 
  return( Phi_inverse(f) );
@@ -949,7 +950,7 @@ static proc Morse_arnold( poly f , int Determinacy)
  map Phi, Phi2;
 
 //* save basering;
- def br = basering;
+ def @br = basering;
  n = nvars(basering);
 
 //* Check if Determinacy is finite
@@ -992,11 +993,11 @@ static proc Morse_arnold( poly f , int Determinacy)
    }
 
    //* Find coordinate change Phi2 such that Q(0) != 0
-   Phi2 = br, maxideal(1);  //* Identity
+   Phi2 = @br, maxideal(1);  //* Identity
    while( Q == 0 && i<n && k <= n ){
     B2 = maxideal(1);
     B2[k]= var(k)+ var(i);
-    Phi2 = br, B2;
+    Phi2 = @br, B2;
     imagef = Phi2( f );
     Q = Coeff( jet(imagef,2), var(i), var(i)^2);
     k = k+1;
@@ -1011,7 +1012,7 @@ static proc Morse_arnold( poly f , int Determinacy)
      P = P / number(2*Q);
      B2 = maxideal(1);
      B2[i] = var(i) - P;
-     Phi2 = br, B2;
+     Phi2 = @br, B2;
      f = Phi2(f);
      f = jet(f, Determinacy);
      P = Coeff( f, var(i), var(i));
@@ -1021,7 +1022,7 @@ static proc Morse_arnold( poly f , int Determinacy)
   }
  i = i+1;
  }
- Phi = br, B1;
+ Phi = @br, B1;
  f = Phi(f);
  return( f );
 }
@@ -1059,7 +1060,7 @@ static proc ReorderVar( poly f )
  ideal B = maxideal(1);
 
 //* save basering;
- def br = basering;
+ def @br = basering;
  n = nvars(basering);
 
 //* frequ[i] determines the frequency of appearance of x_i in f
@@ -1080,7 +1081,7 @@ static proc ReorderVar( poly f )
  }
 
 //* Reorder variables
- map Phi = br, B;
+ map Phi = @br, B;
  return (Phi(f));
 }
 
@@ -1147,10 +1148,10 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc arnoldDeterminacy( I, list # )
 "USAGE:   arnoldDeterminacy( I[, m]); I poly or ideal, m int.
-ASSUME:  the basering is local, I is (the Jacobian ideal of) a poly f
+ASSUME:  the basering is local, I is the Jacobian ideal of a polynomial f
          with isolated critical point at 0, m is the Milnor number of f
 COMPUTE: determinacy bound k for f w.r.t. right equivalence
-RETURN:  int k s.th. f is right-k-determined, -1 for infinity
+RETURN:  integer k s.th. f is right-k-determined, -1 for infinity
 NOTE:    uses [Cor. A.9.7,GP12]
 EXAMPLE: example arnoldDeterminacy; shows an example"
 {
@@ -1421,10 +1422,10 @@ EXAMPLE: example arnoldNormalForm; shows an example"
   {ERROR("Not enough polynomial parameter as input.")}
   if(size(polys) == 0 ){
     //* Define ring for the NF; NF given in C(x,y)
-    def br = basering;
+    def @br = basering;
       if(defined(RingNF) != 0 ) { kill RingNF; }
     ring RingNF=char(basering),(x,y),(c, ds);
-    map Conv = br,maxideal(1);
+    map Conv = @br,maxideal(1);
 
     string nf_str = specialformDB(Series);
     }
@@ -1438,10 +1439,10 @@ EXAMPLE: example arnoldNormalForm; shows an example"
    d = polys[4];
 
    //* Define ring for the NF; NF given in C(x,y)
-    def br = basering;
+    def @br = basering;
      if(defined(RingNF) != 0 ) { kill RingNF; }
      ring RingNF=char(basering),(x,y),(c, ds);
-     map Conv = br,maxideal(1);
+     map Conv = @br,maxideal(1);
 
    //* Map Polynomial parameter
    poly a = Conv(a);
@@ -1478,7 +1479,7 @@ EXAMPLE: example arnoldNormalForm; shows an example"
  execute( nf_str );
 
  //* Map poly nf back to basering;
- setring br;
+ setring @br;
  map ConvBack = RingNF, maxideal(1);
   return( ConvBack(nf) );
 }
@@ -1738,7 +1739,7 @@ static proc create_singularity_dbm
         f.NormalForm = \"((x + a(y)*y^k)^2 + b(y)*y^(2*k+s))*(x2 + y^(2*k+r))\";
         f.SpecialForm = \"((x + y^k)^2 + y^(2*k+s))*(x2 + y^(2*k+r))\";
         f.Restrictions = \"(jet(a,0)!=0)&&(deg(a)<=(k-2))&&(k>1)&&(jet(b,0)!=0)
-        &&(1<=s)&&(s<=7)\";";
+        &&(1<=s)&&(s<=r)\";";
         write(l, "Y[k,r,s]", s);
 
     //* Y[1,r,s]
@@ -1750,7 +1751,7 @@ static proc create_singularity_dbm
         f.MilnorCode = \"1,1,1,1+j,1-2*j+r+s\";
         f.NormalForm = \" x^(4+r)+ a(y)*x2*y2 + y^(4+s)\";
         f.SpecialForm = \" x^(4+r)+ x2*y2 + y^(4+s)\";
-        f.Restrictions = \"(deg(a)==0)&&(jet(a,0)!=0)&&(1<=s)&&(s<=7)\";";
+        f.Restrictions = \"(deg(a)==0)&&(jet(a,0)!=0)&&(1<=s)&&(s<=r)\";";
         write(l, "Y[1,r,s]", s);
 
     //* Z[k,r]
