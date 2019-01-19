@@ -33,13 +33,14 @@ All algebras are assumed to be associative @math{K}-algebras for some field @mat
 
 What is @sc{Letterplace}? It is a subsystem of @sc{Singular}, providing the
 manipulations and computations within free associative algebras
-K < x_1, ..., x_n >
+@math{K} @math{<x_1},@dots{},@math{x_n >} 
 as well as in the factor-algebras of those by two-sided ideal.
 
 Free algebras are represented in @sc{Singular} as so-called Letterplace rings. 
-Each such ring is constructed from a commutative ring 
-@math{K}[ @math{x_1},@dots{},@math{x_n} ] and a @strong{degree (length) bound} @math{d}.
-This encodes a sub-@math{K}-vector space (or a filtered part) of @math{K} @math{<x_1},@dots{},@math{x_n >},
+Each such ring is constructed from a commutative ring @math{K}[ @math{x_1},@dots{},@math{x_n} ] 
+and a @strong{degree (length) bound} @math{d}.
+
+This encodes a sub-@math{K}-vector space (also called a filtered part) of @math{K} @math{<x_1},@dots{},@math{x_n >},
 spanned by all monomials of @strong{length} at most @math{d}.
 
 @menu
@@ -47,8 +48,8 @@ spanned by all monomials of @strong{length} at most @math{d}.
 * Monomial orderings on free algebras::
 * Groebner bases for two-sided ideals in free associative algebras::
 * Letterplace correspondence::
-* Example of use of Letterplace::
-* Release notes::
+* Examples of use of Letterplace::
+* Functionality and release notes::
 * References and history::
 @end menu
 
@@ -59,18 +60,21 @@ spanned by all monomials of @strong{length} at most @math{d}.
 @cindex free associative algebra, tensor algebra
 
 Let @math{V} be a @math{K}-vector space, spanned by the symbols @math{x_1},@dots{},@math{x_n}.
-A free associative algebra in @math{x_1},@dots{},@math{x_n} over @math{K}, denoted by @math{K}< @math{x_1},@dots{},@math{x_n} >
-is also known as the tensor algebra @math{T(V)} of @math{V}; it is also the monoid @math{K}-algebra of the free monoid
-@math{< x_1},@dots{},@math{x_n >}. The elements of this free monoid constitute an infinite @math{K}-basis of @math{K} @math{< x_1},@dots{},@math{x_n >}, where the identity element (the empty word) of the free monoid is identified with the @math{1} in @math{K}. 
+A free associative algebra in @math{x_1},@dots{},@math{x_n} over @math{K}, denoted by @math{K} @math{< x_1},@dots{},@math{x_n >}
+is also known as the tensor algebra @math{T(V)} of @math{V}; 
+it is also the monoid @math{K}-algebra of the free monoid @math{< x_1},@dots{},@math{x_n >}. 
+The elements of this free monoid constitute an infinite @math{K}-basis of @math{K} @math{< x_1},@dots{},@math{x_n >}, 
+where the identity element (the empty word) of the free monoid is identified with the @math{1} in @math{K}. 
 Yet in other words, the monomials of @math{K} @math{< x_1},@dots{},@math{x_n >} are the words
 of finite length in the finite alphabet @{ @math{x_1},@dots{},@math{x_n} @}. 
 
-The algebra @math{K}< @math{x_1},@dots{},@math{x_n} > is an integral domain, which is not (left, right, weak or two-sided) Noetherian for @math{n>=2}; hence, a Groebner basis of a finitely generated ideal might be infinite. 
-Therefore, a general computation takes place up to an explicit degree (length) bound, provided by the user.
+The algebra @math{K} @math{< x_1},@dots{},@math{x_n >} is an integral domain, which is not (left, right, weak or two-sided) Noetherian for @math{n>1}; hence, a Groebner basis of a finitely generated ideal might be infinite. 
+Therefore, a general computation takes place @strong{up to an explicit degree (length) bound}, provided by the user.
 The free associative algebra can be regarded as a graded algebra in a natural way.
 
-Definition. An associative algebra @math{A} is called @strong{finitely presented (f.p.)}, if it is isomorphic to 
-@math{K}< @math{x_1},@dots{},@math{x_n} > @math{I}, 
+@strong{Definition}. An associative algebra @math{A} is called @strong{finitely presented (f.p.)}, if it is isomorphic to 
+@math{K} @math{< x_1},@dots{},@math{x_n > /I}, 
+@c @tex{K <x_1, \ldots, x_n > / I}. 
 where @math{I} is a two-sided ideal. 
 @math{A} is called @strong{standard finitely presented (s.f.p.)}, if there exists a monomial ordering,
 such that @math{I} is given via its @strong{finite} Groebner basis @math{G}.
@@ -92,13 +96,13 @@ bases with respect to the given ordering.
 Let @math{X} = @{@math{x_1},@dots{},@math{x_n}@} be a set of symbols. A total ordering < on the free monoid @math{< X >} with @math{1} as the neutral element is called a @strong{monomial ordering} if 
 @itemize
 @item it is a well-ordering, i.e., every non empty subset has a least element with respect to <, and
-@item it respects multiplication, that is @math{u < v} implies @math{aub < avb} for all @math{u}, @math{v}, @math{a} and @math{b} in < @math{X} >
+@item it respects multiplication, that is @math{u < v} implies @math{aub < avb} for all @math{u}, @math{v}, @math{a} and @math{b} in @math{<X>}.
 @end itemize
-Note that the latter implies @math{1}<=@math{m} for all @math{m} in < @math{X} >.
+Note that the latter implies @math{1 <= m} for all @math{m} in @math{<X>}.
 
 @c let , set ?
-The @strong{left lexicographical ordering} on < @math{X} > with @math{x_1}>@dots{}>@math{x_n} is defined as follows: 
-For arbitrary @math{a}, @math{b} in < @math{X} > we say that @math{a<b}, if 
+The @strong{left lexicographical ordering} on @math{<X>} with @math{x_1> x_2 > }@dots{}@math{ > x_n} is defined as follows: 
+For arbitrary @math{a}, @math{b} in @math{<X>} we say that @math{a<b}, if 
 @itemize
 @item 
 @tex
@@ -114,12 +118,13 @@ $\exists u,\,v,\,w\in \langle X\rangle\;\exists x_i,\,x_j\in X: a=ux_iv,\;b=ux_j
 @end tex
 
 @ifinfo
-there exists @math{u}, @math{v}, @math{w} in < @math{X} > and there exists @math{x_i}, @math{x_j} in @math{X} such that @math{a=ux_i v}, @math{b=ux_j w} and @math{i>j} holds.
+there exists @math{u}, @math{v}, @math{w} in @math{<X>} and there exists @math{x_i}, @math{x_j} in @math{X} such that @math{a=ux_i v}, @math{b=ux_j w} and @math{i>j} holds.
 @end ifinfo
 
 @end itemize
 
-Note: left lex is @strong{not} a monomial ordering, though it is a natural choice to break ties in further definitions. 
+@strong{Note}: left lex is @strong{not} a monomial ordering, though it is a natural choice to break ties in further definitions. 
+
 In a similar manner one can define the @strong{right lexicographical ordering}.
 
 On the monoid 
@@ -143,40 +148,39 @@ $N_0$
 @ifinfo
 @math{N_0}
 @end ifinfo
-for @math{1}<=@math{i}<=@math{n}. As a special case, define the @strong{length} 
+for @math{1 <= i <= n}. As a special case, define the @strong{length} 
 @tex 
 len:$ \langle X\rangle\rightarrow N_0$
 @end tex
 @ifinfo
 @math{len:<X>->N_0}
 @end ifinfo
- by @math{len(x_i)=1} for @math{1}<=@math{i}<=@math{n}. For any ordering << on <@math{X}> and any weight 
+ by @math{len(x_i)=1} for @math{1 <= i <= n}. For any ordering << on @math{<X>} and any weight 
 @tex 
 $w: \langle X\rangle\rightarrow N_0$
 @end tex
 @ifinfo
 @math{w:<X>->N_0}
 @end ifinfo 
- define an ordering <, the @math{w}-@strong{weight extension of} << as follows: For arbitrary @math{a}, @math{b} in <@math{X}> we say that @math{a<b} if 
+ define an ordering <, the @math{w}-@strong{weight extension of} << as follows: For arbitrary @math{a}, @math{b} in @math{<X>} we say that @math{a<b} if 
 @itemize
 @item @math{w(a)<w(b)} or 
 @item @math{w(a)=w(b)} and @math{a}<<@math{b} holds.
 @end itemize
-An ordering < on <@math{X}> @strong{eliminates} a certain subset 
+An ordering < on @math{<X>} @strong{eliminates} a certain subset 
 @tex
 $\emptyset\not=Y\subset X$ if for all $f\in K\langle X\rangle\setminus\{0\}$ one has $ lm(f)\in  K\langle X\setminus Y\rangle\Rightarrow f\in K\langle X\setminus Y\rangle\subseteq K\langle X\rangle$.
 @end tex
 @ifinfo
-@{@}!=@math{Y}!=@math{X} of @math{X} if for all @math{f}!=@math{0} in @math{K}<@math{X}> the condition @math{lm(f)} in @math{K}<@math{X-Y}> implies @math{f} in @math{K}<@math{X-Y}>.
-
+@{@}!=@math{Y}!=@math{X} of @math{X} if for all @math{f}!=@math{0} in @math{K<X>} the condition @math{lm(f)} in @math{K<X-Y>} implies @math{f} in @math{K<X-Y>}.
 @end ifinfo
 
 @c -----------------------------------------------------------------------------------------------------
 
 In a ring declaration, @sc{Letterplace} supports the following monomial orderings. 
-We illustrate each of the available choices by an example on the free monoid < @math{x_1},@math{x_2},@math{x_3} >, 
-where we order the monomials @math{x_1 x_1 x_1}, @math{x_3 x_2 x_1}, @math{x_1 x_2 x_3}, @math{x_3 x_3 x_3}, 
-@math{x_3 x_1}, @math{x_2 x_2}, @math{x_1 x_3}, @math{x_2 x_3}, @math{x_1}, @math{x_2} and @math{x_3} correspondingly.
+We illustrate each of the available choices by an example on the free monoid @math{<x_1},@math{x_2},@math{x_3>}, 
+where we order the monomials 
+@math{x_1 x_1 x_1}, @math{x_3 x_2 x_1}, @math{x_1 x_2 x_3}, @math{x_3 x_3 x_3}, @math{x_3 x_1}, @math{x_2 x_2}, @math{x_1 x_3}, @math{x_2 x_3}, @math{x_1}, @math{x_2} and @math{x_3} correspondingly.
 @table @samp
 @item @code{dp}
 The @strong{degree right lexicographical ordering} is the length-weight extension of the right lexicographical ordering.
@@ -188,7 +192,7 @@ The @strong{degree left lexicographical ordering} is the length-weight extension
 
 With respect to the ordering @samp{Dp}, the test monomials are ordered as follows:
 @math{x_1 x_1 x_1 > x_1 x_2 x_3 > x_3 x_2 x_1 > x_3 x_3 x_3 > x_1 x_3 > x_2 x_2 > x_2 x_3 > x_3 x_1 > x_1 > x_2 > x_3}
-@item @code{Wp(intvec)}
+@item @code{Wp(w)} for intvec w
 The @strong{weighted degree left lexicographical ordering} is the @math{w}-weight extension of the left lexicographical ordering with weight 
 @tex 
 $w: \langle X\rangle\rightarrow N_0$
@@ -205,10 +209,10 @@ With respect to the ordering @samp{Wp(1, 2, 1)}, the test monomials are ordered 
 @item @code{lp}
 @tex
 Let $w^{(i)}$ be weights uniquely determined by $w^{(i)}(x_j)=\delta_{i,j}$ for $1\leq i,j\leq n$ where $\delta$ denotes the Kronecker delta. Let $<_n$ be the $w^{(n)}$-weight extension of the left lexicographical ordering on $\langle X\rangle$ and inductively $<_i$ be the $w^{(i)}$-weight extension of $<_{i+1}$ for all $1\leq i<n$.
-The monomial ordering lp corresponds to $<_1$ and eliminates $x_1,...,x_j$ for all $1<=j<n$.
+The monomial ordering lp corresponds to $<_1$ and eliminates $x_1,...,x_j$ for all $1\leq j<n$.
 @end tex
 @ifinfo
-Let @math{w^i} be weights uniquely determined by @math{w^i(x_j)=\d^i_j}$ for @math{1}<=@math{i},@math{j}<=@math{n} where @math{d} denotes the Kronecker delta. Let @math{<_n} be the @math{w^n}-weight extension of the left lexicographical ordering on <@math{X}> and inductively @math{<_i} be the @math{w^i}-weight extension of @math{<_i+1} for all @math{1}<=@math{i}<@math{n}
+Let @math{w^i} be weights uniquely determined by @math{w^i(x_j)=\d^i_j}$ for @math{1}<=@math{i},@math{j}<=@math{n} where @math{d} denotes the Kronecker delta. Let @math{<_n} be the @math{w^n}-weight extension of the left lexicographical ordering on @math{<X>} and inductively @math{<_i} be the @math{w^i}-weight extension of @math{<_i+1} for all @math{1<= i< n}.
 @end ifinfo
 
 The monomial ordering @samp{lp} corresponds to @math{<_1} and eliminates @{@math{x_1},@dots{},@math{x_j}@} for all @math{1}<=@math{j}<@math{n}.
@@ -224,12 +228,12 @@ The monomial ordering \texttt{rp} corresponds to $<_n$ and eliminates $\{x_j,\ld
 Let @math{w^i} be weights uniquely determined by @math{w^i(x_j)=\d^i_j}$ for @math{1}<=@math{i},@math{j}<=@math{n} where @math{d} denotes the Kronecker delta. Let @math{<_1} be the @math{w^n}-weight extension of the left lexicographical ordering on <@math{X}> and inductively @math{<_i} be the @math{w^i}-weight extension of @math{<_i-1} for all @math{1}<@math{i}<=@math{n}.
 @end ifinfo
 
-The monomial ordering @samp{rp} corresponds to @math{<_n} and eliminates @{\@math{x_j},...,@math{x_n}@} for all @math{1}<@math{j}<= @math{n}.
+The monomial ordering @samp{rp} corresponds to @math{<_n} and eliminates @{@math{x_j},...,@math{x_n}@} for all @math{1 < j <= n}.
 
 With respect to the ordering @samp{rp}, the test monomials are ordered as follows:
 @math{x_3 x_3 x_3 > x_1 x_2 x_3 > x_3 x_2 x_1 > x_2 x_3 > x_1 x_3 > x_3 x_1 > x_3 > x_2 x_2 > x_2 > x_1 x_1 x_1 > x_1}
 
-@item @code{(a( intvec ), ordering)}
+@item @code{(a(v), ordering)} for intvec v
 @tex
 For weight $v:\langle X\rangle\rightarrow N_0$ determined by $v(x_i)=v_i\in N_0$ with $1\leq i\leq n$ and monomial ordering $\prec$ on $\langle X\rangle$, the $v$\emph{-weight extension} of $\prec$ corresponds to \texttt{(a(v), o)}. As a choice for $\prec$ there are currently two options implemented, which are \texttt{dp} and \texttt{Dp}. Notice that this ordering eliminates $\{x_i\in X\mid v(x_i)\not=0\}$.
 @end tex
@@ -260,18 +264,18 @@ wr;
 
 @c Hence the notions like a leading monomial and a leading coefficient transfer to this situation.
 
-We say that a monomial @math{v} divides (or divides bilaterally) a monomial @math{w}, if there exist monomials
+We say that a monomial @math{v} divides (two-sided or bilaterally) a monomial @math{w}, if there exist monomials
 @tex
 $p,s \in X$, such that $w = p \cdot v \cdot s$,
 @end tex
 @ifinfo
 @math{p,s} in @math{X}, such that @math{w = p} .  @math{v} .  @math{s},
 @end ifinfo
-in other words @math{v} is a subword of @math{w}.
+ in other words @math{v} is a subword of @math{w}.
 
 @tex
-For a subset $G \subset T := K\langle x_1,\dots,x_n \rangle$,
-define a \textbf{leading ideal} of $G$ to be the two-sided ideal
+For a subset $G \subset K\langle x_1,\dots,x_n \rangle =: T$,
+define the \textbf{leading ideal} of $G$ to be the two-sided ideal
 $LM(G) \; = \; {}_{T} \langle$ $\; \{lm(g) \;|\; g \in G\setminus\{0\} \}$ $\; \rangle_{T} \subseteq T$.
 
 Let $<$ be a fixed monomial ordering on $T$.
@@ -281,7 +285,7 @@ $lm(g)$ divides $lm(f)$.
 
 
 @ifinfo
-For a subset @math{G} in @math{T} := @math{K< x_1},@dots{},@math{x_n >},
+For a subset @math{G} in @math{K< x_1},@dots{},@math{x_n > =: T},
 define a @strong{leading ideal} of @math{G} to be the two-sided ideal
 @math{LM(G)  =}  @{ @math{lm(g) | g} in @math{G}\@{0@} @} in @math{T}.
 
@@ -298,11 +302,11 @@ of degree exceeding @math{d} from the complete Groebner basis @math{G}, one obta
 
 In general, given a set @math{G(d)}, which is the result of Groebner basis computation 
 up to weighted degree bound @math{d}, then 
-it is the complete finite Groebner basis, if and only if @math{G(2d-1)}=@math{G(d)} holds.
+it is the complete finite Groebner basis, if and only if @math{G(2d-1)=G(d)} holds.
 
 
 @c ---------------------------------------------------------------------------
-@node Letterplace correspondence, Example of use of Letterplace, Groebner bases for two-sided ideals in free associative algebras,LETTERPLACE
+@node Letterplace correspondence, Examples of use of Letterplace, Groebner bases for two-sided ideals in free associative algebras,LETTERPLACE
 @subsection Letterplace correspondence
 @cindex letterplace correspondence
 
@@ -318,7 +322,7 @@ $x(i_1 | 1) x(i_2 | 2) \dots x(i_m | m) \in K[X\times N]$, where $X=\{x_1,\ldots
 and $N$ is the monoid of natural numbers, starting with 1 as the first possible place.
 Note, that the letterplace algebra $K[X \times N]$ is an infinitely generated commutative polynomial $K$-algebra.
 Since $K\langle x_1,\ldots,x_n \rangle$ is not Noetherian, it is common to perform the computations with 
-its modules up to a given degree bound.
+its ideals and modules up to a given degree bound.
 @end tex
 @ifinfo
 Already Feynman and Rota encoded
@@ -330,11 +334,17 @@ via the double-indexed letterplace
 and @math{N} is the monoid of natural numbers, starting with 1 as the first possible place.
 Note, that the letterplace algebra @math{K[X \times N]} is an infinitely generated commutative polynomial @math{K}-algebra.
 Since @math{K<} @math{x_1},@dots{},@math{x_n} @math{>} is not Noetherian, it is common to perform the computations with
-its modules up to a given degree bound.
+its ideals and modules up to a given degree bound.
 @end ifinfo
 
+@tex
+Subject to the given degree (length) bound $d$, the truncated letterplace algebra 
+$K[X \times (1, ..., d)]$ is finitely generated commutative polynomial $K$-algebra.
+@end tex
+@ifinfo
 Subject to the given degree (length) bound @math{d}, the truncated letterplace algebra 
 @math{K[X x (1, ..., d) ]} is finitely generated commutative polynomial @math{K}-algebra.
+@end ifinfo
 
 In [LL09] a natural shifting on letterplace polynomials was introduced and used.
 Indeed, there is 1-to-1 correspondence between two-sided ideals
@@ -353,15 +363,15 @@ polynomials subject to two kind of operations:
 
 the
 @tex
-$K$-algebra operations of the letterplace algebra and simultaneous shifting of places by any natural number $n$.
+$K$-algebra operations of the letterplace algebra \textbf{and} simultaneous shifting of places by any natural number $n$.
 @end tex
 @ifinfo
-@math{K}-algebra operations of the letterplace algebra and simultaneous shifting of places by any natural number @math{n}.
+@math{K}-algebra operations of the letterplace algebra @strong{and} simultaneous shifting of places by any natural number @math{n}.
 @end ifinfo
 
 @c ---------------------------------------------------------------------------
-@node Example of use of Letterplace, Release notes, Letterplace correspondence,LETTERPLACE
-@subsection Example of use of @sc{Letterplace}
+@node Examples of use of Letterplace, Functionality and release notes, Letterplace correspondence,LETTERPLACE
+@subsection Examples of use of @sc{Letterplace}
 
 First, define a commutative ring @math{K[X]} in @sc{Singular}, equipped with a monomial well-ordering
 and call it, say, @code{r}. 
@@ -379,7 +389,7 @@ We illustrate the approach with the following example:
 @c example
 LIB "freegb.lib";
 ring r = 0,(x,y,z),dp;
-def R = freeAlgebra(r, 4);  // degree bound 4; the ordering will be degree right lex
+def R = freeAlgebra(r, 4);  // degree (length) bound 4; the ordering will be degree right lex
 setring R;
 ideal I = x*y + y*z, x*x + x*y - z;
 ideal J = twostd(I);
@@ -393,8 +403,8 @@ Important ring-theoretic properties can be established with the help of the libr
 We work further on implementing more algorithms for non-commutative ideals and modules over free associative algebra.
 
 @c ---------------------------------------------------------------------------
-@node Release notes, References and history, Example of use of Letterplace, LETTERPLACE
-@subsection Release notes of @sc{Letterplace}
+@node Functionality and release notes, References and history, Examples of use of Letterplace, LETTERPLACE
+@subsection Functionality and release notes of @sc{Letterplace}
 
 With this functionality it is possible to compute two-sided Groebner basis
 of an arbitrary two-sided ideal in a free associative algebra up to a given degree. 
@@ -402,18 +412,18 @@ The weights of variables are determined by the current monomial ordering.
 
 Restrictions of the @sc{Letterplace} package:
 @itemize
-@item Since free algebra is not Noetherian, one has to define an explicit degree bound,
+@item Since free algebra is not Noetherian, one has to define an explicit degree (length) bound,
 up to which a partial Groebner basis will be computed. Note, that @code{makeLetterplaceRing} procedure
-stores the bound in the structure of the ring it creates. Thus running @code{std} in such a
-ring does not require the degree bound in its argument.
-@item the options @code{redSB, redTail} are effective for Groebner basis computations
-@item the options @code{prot, mem} are effective for the whole @sc{Letterplace}
+stores the bound in the structure of the ring it creates. Thus running @code{twostd} or @code{std} in such a
+ring does not require the degree bound in its argument,
+@item the options @code{redSB, redTail} are effective for Groebner basis computations,
+@item the options @code{prot, mem} are effective for the whole @sc{Letterplace}.
 @end itemize
 
 Operations for polynomials in letterplace rings are @code{+} (addition),
 @code{-} (subtraction), @code{*} (multiplication) and @code{^} (power).
 
-Functions for objects from Letterplace rings are: @ref{std}, @ref{maxideal}, @ref{reduce}.
+Functions for objects from Letterplace rings are: @ref{twostd}, @ref{std}, @ref{maxideal}, @ref{reduce}.
 
 Further functionality is provided in the libraries for the @sc{Letterpace} subsystem.
 
@@ -429,15 +439,18 @@ including Gelfand-Kirillov dimension.
 
 The @ref{fpalgebras_lib} contains procedures for the generation of various algebras, including group algebras of finitely presented groups in the Letterplace ring.
 
+The @ref{ncfactor_lib} contains the procedure @code{ncfactor} for factorizing polynomials in the Letterplace ring.
+
 @c ref
 See
 @ref{maxideal};
 @ref{reduce};
-@ref{std}.
+@ref{std};
+@ref{twostd}.
 @c ref
 
 @c ---------------------------------------------------------------------------
-@node References and history, , Release notes, LETTERPLACE
+@node References and history, , Functionality and release notes, LETTERPLACE
 @subsection References and history of @sc{Letterplace}
 
 @sc{Letterplace} has undergone several stages of development. 
