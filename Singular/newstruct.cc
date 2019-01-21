@@ -94,7 +94,11 @@ char * newstruct_String(blackbox *b, void *d)
         {
           StringAppendS("<list>");
         }
-        else
+        else if (l->m[a->pos].rtyp==STRING_CMD)
+	{
+          StringAppendS((char*)l->m[a->pos].Data());
+	}
+	else
         {
           char *tmp2=omStrDup(l->m[a->pos].String());
           if ((strlen(tmp2)>80)||(strchr(tmp2,'\n')!=NULL))
