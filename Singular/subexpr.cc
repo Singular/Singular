@@ -1697,11 +1697,7 @@ void syMake(leftv v,const char * id, package pa)
       goto id_found;
     }
     /* 6. local ring: number/poly */
-    if ((currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest)
-    #ifdef HAVE_SHIFTBBA
-    && (currRing->isLPring==0)
-    #endif
-    )
+    if ((currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest))
     {
       BOOLEAN ok=FALSE;
       /*poly p = (!yyInRingConstruction) ? pmInit(id,ok) : (poly)NULL;*/
@@ -1729,9 +1725,18 @@ void syMake(leftv v,const char * id, package pa)
         }
         else
         {
+          v->name = id;
+        #ifdef HAVE_SHIFTBBA
+          if ((currRing->isLPring!=0)
+          && (p_Totaldegree(p,currRing)>1))
+          {
+            p_Delete(&p,currRing);
+            /* v->rtyp = UNKNOWN; - already set */
+            return; /* error, report "unknown id" */
+          }
+        #endif
           v->data = p;
           v->rtyp = POLY_CMD;
-          v->name = id;
         }
         return;
       }
