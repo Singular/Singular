@@ -11,6 +11,7 @@
 #endif
 
 #ifdef __cplusplus
+#include "../factory/globaldefs.h"
 /*****************************************************************
  *
  * Resource management (feResources.cc)

@@ -8,6 +8,8 @@
 #ifndef GFANLIB_CIRCUITTABLEINT_H_
 #define GFANLIB_CIRCUITTABLEINT_H_
 
+#include "../factory/globaldefs.h"
+
 #include <cstdint>
 #include <exception>
 #include <sstream>

@@ -14,8 +14,8 @@
 #include "config.h"
 
 
-#include "cf_switches.h"
 #include "cf_defs.h"
+#include "cf_switches.h"
 
 /** CFSwitches::CFSwitches ()
  *
