@@ -59,7 +59,7 @@ void yylprestart (FILE *input_file );
 int current_pos(int i=0);
 extern int yylp_errno;
 extern int yylplineno;
-extern char *yylp_errlist[];
+extern const char *yylp_errlist[];
 void print_init();
 libstackv library_stack;
 #endif
@@ -1087,7 +1087,37 @@ int iiAddCprocTop(const char *libname, const char *procname, BOOLEAN pstatic,
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 #ifdef HAVE_DYNAMIC_LOADING
-BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
+#include <map>
+#include <string>
+#include <pthread.h>
+
+STATIC_VAR std::map<std::string, void *> *dyn_modules;
+
+bool registered_dyn_module(char *fullname) {
+  if (dyn_modules == NULL)
+    return false;
+  std::string fname = fullname;
+  return !(dyn_modules->count(fname));
+}
+
+void register_dyn_module(char *fullname, void * handle) {
+  std::string fname = fullname;
+  if (dyn_modules == NULL)
+    dyn_modules = new std::map<std::string, void *>();
+  dyn_modules->insert(std::pair<std::string, void *>(fname, handle));
+}
+
+void close_all_dyn_modules() {
+  for (std::map<std::string, void *>::iterator it = dyn_modules->begin();
+       it != dyn_modules->end();
+       it++)
+  {
+    dynl_close(it->second);
+  }
+  delete dyn_modules;
+  dyn_modules = NULL;
+}
+BOOLEAN load_modules_aux(const char *newlib, char *fullname, BOOLEAN autoexport)
 {
 #ifdef HAVE_STATIC
   WerrorS("mod_init: static version can not load modules");
@@ -1142,7 +1172,7 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
     IDPACKAGE(pl)->libname=omStrDup(newlib);
   }
   IDPACKAGE(pl)->language = LANG_C;
-  if (dynl_check_opened(FullName))
+  if (registered_dyn_module(FullName))
   {
     if (BVERBOSE(V_LOAD_LIB)) Warn( "%s already loaded as C library", fullname);
     return FALSE;
@@ -1177,6 +1207,7 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
       }
       currPack->loaded=1;
       currPack=s; /* reset currPack to previous */
+      register_dyn_module(fullname, IDPACKAGE(pl)->handle);
       RET=FALSE;
     }
     else
@@ -1191,6 +1222,14 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
   load_modules_end:
   return RET;
 #endif /*STATIC */
+}
+
+BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport) {
+  GLOBAL_VAR static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+  pthread_mutex_lock(&mutex);
+  BOOLEAN r = load_modules_aux(newlib, fullname, autoexport);
+  pthread_mutex_unlock(&mutex);
+  return r;
 }
 #endif /* HAVE_DYNAMIC_LOADING */
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/

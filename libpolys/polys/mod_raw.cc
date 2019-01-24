@@ -146,6 +146,8 @@ void *dynl_open(
   char *filename    /* I: filename to load */
   )
 {
+  return dlopen(filename, RTLD_NOW|RTLD_GLOBAL);
+#if 0
 // glibc 2.2:
   if ((filename==NULL) || (dlopen(filename,RTLD_NOW|RTLD_NOLOAD)==NULL))
     return(dlopen(filename, RTLD_NOW|RTLD_GLOBAL));
@@ -154,6 +156,7 @@ void *dynl_open(
   return NULL;
 // alternative
 //    return(dlopen(filename, RTLD_NOW|RTLD_GLOBAL));
+#endif
 }
 
 void *dynl_sym(void *handle, const char *symbol)
