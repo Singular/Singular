@@ -20,7 +20,7 @@ namespace CxxTest
 
     const char *byteToHex( unsigned char byte )
     {
-        static char asHex[3];
+        STATIC_VAR char asHex[3];
         asHex[0] = digitToChar( byte >> 4 );
         asHex[1] = digitToChar( byte & 0x0F );
         asHex[2] = '\0';

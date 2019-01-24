@@ -227,7 +227,7 @@ struct cache_compare
 
 typedef std::map<poly, poly, cache_compare> cache_term;
 
-static cache_term *Cache;
+STATIC_VAR cache_term *Cache;
 
 static void initialize_cache(const int size)
 {

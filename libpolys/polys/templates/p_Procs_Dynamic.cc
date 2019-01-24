@@ -47,10 +47,10 @@ const BOOLEAN p_procs_dynamic = TRUE;
 // define to bound for length of p_Proc name
 #define MAX_PROCNAME_LEN 200
 
-static void* p_procs_handle_FieldIndep = NULL;
-static void* p_procs_handle_FieldZp = NULL;
-static void* p_procs_handle_FieldQ = NULL;
-static void* p_procs_handle_FieldGeneral = NULL;
+STATIC_VAR void* p_procs_handle_FieldIndep = NULL;
+STATIC_VAR void* p_procs_handle_FieldZp = NULL;
+STATIC_VAR void* p_procs_handle_FieldQ = NULL;
+STATIC_VAR void* p_procs_handle_FieldGeneral = NULL;
 
 static void* p_ProcInitHandle(void** handle, const char* module)
 {

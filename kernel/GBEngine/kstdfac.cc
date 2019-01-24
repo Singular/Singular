@@ -18,7 +18,7 @@
 #include "kernel/ideals.h"
 #include "kernel/GBEngine/kstdfac.h"
 
-int strat_nr=0;
+VAR int strat_nr=0;
 /*3
 * copy o->T to n->T, assumes that n->S is already copied
 */

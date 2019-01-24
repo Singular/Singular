@@ -18,9 +18,9 @@
 
 
 extern "C" {
-void (*WerrorS_callback)(const char *s) = NULL;
-void (*PrintS_callback)(const char *s) = NULL;
-short errorreported=0;
+VAR void (*WerrorS_callback)(const char *s) = NULL;
+VAR void (*PrintS_callback)(const char *s) = NULL;
+VAR short errorreported=0;
 void WerrorS(const char *s)
 {
   if (WerrorS_callback == NULL)

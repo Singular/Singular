@@ -21,7 +21,7 @@ namespace CxxTest
 
     TestTracker & TestTracker::tracker()
     {
-        static TestTracker theTracker;
+        STATIC_INST_VAR TestTracker theTracker;
         return theTracker;
     }
 

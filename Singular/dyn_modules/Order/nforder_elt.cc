@@ -10,7 +10,7 @@
 
 
 #ifdef SINGULAR_4_2
-extern n_coeffType nforder_type;
+EXTERN_VAR n_coeffType nforder_type;
 
 static void WriteRing(const coeffs r, BOOLEAN details)
 {

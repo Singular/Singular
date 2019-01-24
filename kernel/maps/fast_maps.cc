@@ -131,8 +131,8 @@ void maPoly_Out(mapoly mpoly, ring src_r, ring dest_r)
 **
 *F  mapolyCreate  . . . . . . . . . . . . . . .  Creates mapoly
 */
-static omBin mapolyBin = omGetSpecBin(sizeof(mapoly_s));
-static omBin macoeffBin = omGetSpecBin(sizeof(macoeff_s));
+STATIC_VAR omBin mapolyBin = omGetSpecBin(sizeof(mapoly_s));
+STATIC_VAR omBin macoeffBin = omGetSpecBin(sizeof(macoeff_s));
 
 mapoly maMonomial_Create(poly p, ring /*r_p*/, sBucket_pt bucket)
 {

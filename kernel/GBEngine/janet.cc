@@ -26,20 +26,20 @@
 
 
 //------GLOBALS-------
-static int /*m_s,v_s,vectorized,VarN1,*/offset;
-static jList *T,*Q;
-static TreeM *G;
+STATIC_VAR int /*m_s,v_s,vectorized,VarN1,*/offset;
+STATIC_VAR jList *T,*Q;
+STATIC_VAR TreeM *G;
 // static Poly *phD;
-static NodeM *FreeNodes;
-static int degree_compatible;
-static int (*ListGreatMove)(jList *,jList *,poly);
-static int Mask[8]={0x80,0x40,0x20,0x10,0x8,0x4,0x2,0x1};
+STATIC_VAR NodeM *FreeNodes;
+STATIC_VAR int degree_compatible;
+STATIC_VAR int (*ListGreatMove)(jList *,jList *,poly);
+STATIC_VAR int Mask[8]={0x80,0x40,0x20,0x10,0x8,0x4,0x2,0x1};
 
 //#define DebugPrint
 
 //#define pow_(x) pTotaldegree((x))
 //#define pow_(x) p_Deg((x,currRing))
-pFDegProc jDeg;
+VAR pFDegProc jDeg;
 #define pow_(x) jDeg((x),currRing)
 
 #if 0
@@ -752,7 +752,7 @@ int GB_length()
   return l;
 }
 
-static Poly *temp_l;
+STATIC_VAR Poly *temp_l;
 
 NodeM* create()
 {
@@ -968,7 +968,7 @@ void Initialization(char *Ord)
   Define(&G);
 }
 
-static Poly *h/*,*f*/;
+STATIC_VAR Poly *h/*,*f*/;
 
 #if 0
 void insert_in_G(Poly *x)

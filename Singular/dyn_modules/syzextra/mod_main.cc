@@ -524,5 +524,5 @@ extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   ADD("Tail", FALSE, Tail);
 
 #undef ADD
-  return MAX_TOK;
+  VAR return MAX_TOK;
 }

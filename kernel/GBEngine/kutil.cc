@@ -85,7 +85,7 @@
 #define DEBUGF5 2
 #endif
 
-denominator_list DENOMINATOR_LIST=NULL;
+VAR denominator_list DENOMINATOR_LIST=NULL;
 
 
 #ifdef ENTER_USE_MYMEMMOVE
@@ -233,9 +233,9 @@ static inline int pDivComp(poly p, poly q)
 }
 
 
-int     HCord;
-int     Kstd1_deg;
-int     Kstd1_mu=32000;
+VAR int     HCord;
+VAR int     Kstd1_deg;
+VAR int     Kstd1_mu=32000;
 
 /*2
 *deletes higher monomial of p, re-compute ecart and length
@@ -761,7 +761,7 @@ static const char* kTest_LmEqual(poly p, poly t_p, ring tailRing)
   return NULL;
 }
 
-static BOOLEAN sloppy_max = FALSE;
+STATIC_VAR BOOLEAN sloppy_max = FALSE;
 BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
 {
   ring tailRing = T->tailRing;

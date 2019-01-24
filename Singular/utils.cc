@@ -11,16 +11,16 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-extern FILE *yylpin;
-extern char *optarg;
-extern int optind, opterr, optopt;
-extern int lpverbose, check;
-extern int texinfo_out;
+EXTERN_VAR FILE *yylpin;
+EXTERN_VAR char *optarg;
+EXTERN_VAR int optind, opterr, optopt;
+EXTERN_VAR int lpverbose, check;
+EXTERN_VAR int texinfo_out;
 
-extern int category_out;
+EXTERN_VAR int category_out;
 
-extern int found_version, found_info, found_oldhelp, found_proc_in_proc;
-int warning_info = 0, warning_version = 0;
+EXTERN_VAR int found_version, found_info, found_oldhelp, found_proc_in_proc;
+VAR int warning_info = 0, warning_version = 0;
 
 static void usage(char *progname)
 {
@@ -36,7 +36,7 @@ static void usage(char *progname)
   exit(1);
 }
 
-static char* lib_file = NULL;
+STATIC_VAR char* lib_file = NULL;
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 void main_init(int argc, char *argv[])

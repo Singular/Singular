@@ -1,7 +1,7 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-static int deb_level = -1;
-char * deb_level_msg = (char *)"";
+STATIC_VAR int deb_level = -1;
+VAR char * deb_level_msg = (char *)"";
 
 void deb_inc_level()
 {

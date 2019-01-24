@@ -966,7 +966,7 @@ const struct sValCmdM dArithM[]=
 #ifdef GENTABLE
 // this table MUST be order alphabetically by its first entry:
 // cannot be declared const because it will be sorted by qsort
-cmdnames cmds[] =
+VAR cmdnames cmds[] =
 // alias: 0: real name, 1: this is an alias, 2: this is an outdated alias
 {  // name-string alias tokval          toktype
   { "$INVALID$",   0, -1,                 0},

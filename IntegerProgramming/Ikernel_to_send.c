@@ -67,11 +67,11 @@
 #define llln_max(a,b) (a > b ? a : b)
 
 /* Global variables */
-mpz_t *llln_d;
-int *llln_f;
-mpz_t **llln_lambda;
-mpz_t **llln_b;
-mpz_t **llln_H;
+VAR mpz_t *llln_d;
+VAR int *llln_f;
+VAR mpz_t **llln_lambda;
+VAR mpz_t **llln_b;
+VAR mpz_t **llln_H;
 
 mpz_t **llln_proc_entrada (int *F, int *C);
 void llln_swapk (int k, int kmax, int C, int F);

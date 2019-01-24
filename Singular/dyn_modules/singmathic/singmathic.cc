@@ -596,7 +596,7 @@ extern "C" int SI_MOD_INIT(singmathic)(SModulFunctions* psModulFunctions)
     FALSE,
     prOrderX
   );
-  return MAX_TOK;
+  VAR return MAX_TOK;
 }
 
 /* #else

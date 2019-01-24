@@ -89,7 +89,7 @@ extern "C" int mod_init(SModulFunctions* psModulFunctions)
   module_help_main(
      (currPack->libname? currPack->libname: ""),// the library name,
     "partition"); // the help string for the module
-  return MAX_TOK;
+  VAR return MAX_TOK;
 }
 
 

@@ -61,8 +61,8 @@ NTL_CLIENT
    static void stack_trace (char *const*args);
  #endif
 
-si_link pipeLastLink=NULL;
-BOOLEAN singular_in_batchmode=FALSE;
+VAR si_link pipeLastLink=NULL;
+VAR BOOLEAN singular_in_batchmode=FALSE;
 
 void sig_pipe_hdl(int /*sig*/)
 {
@@ -74,8 +74,8 @@ void sig_pipe_hdl(int /*sig*/)
  }
 }
 
-volatile BOOLEAN do_shutdown = FALSE;
-volatile int defer_shutdown = 0;
+VAR volatile BOOLEAN do_shutdown = FALSE;
+VAR volatile int defer_shutdown = 0;
 
 void sig_term_hdl(int /*sig*/)
 {
@@ -92,9 +92,9 @@ void sig_term_hdl(int /*sig*/)
  *
  *---------------------------------------------------------------------*/
 /* data */
-jmp_buf si_start_jmpbuf;
-int siRandomStart;
-short si_restart=0;
+VAR jmp_buf si_start_jmpbuf;
+VAR int siRandomStart;
+VAR short si_restart=0;
 
 typedef void (*si_hdl_typ)(int);
 
@@ -305,7 +305,7 @@ void sigsegv_handler(int sig)
 /*2
 * signal handler for SIGINT
 */
-int sigint_handler_cnt=0;
+VAR int sigint_handler_cnt=0;
 void sigint_handler(int /*sig*/)
 {
   mflush();
@@ -401,7 +401,7 @@ void sigint_handler(int /*sig*/)
 //}
 
 #  ifndef __OPTIMIZE__
-volatile int si_stop_stack_trace_x;
+VAR volatile int si_stop_stack_trace_x;
 #    ifdef CALL_GDB
 static void debug (int method)
 {

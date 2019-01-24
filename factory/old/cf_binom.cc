@@ -14,13 +14,13 @@
 
 #define INITPT 10
 
-CFArray * ptZ = 0;
-CFArray * ptF = 0;
+VAR CFArray * ptZ = 0;
+VAR CFArray * ptF = 0;
 
-int charac = 0;
-int gfdeg = 0;
-int ptZmax = INITPT;
-int ptFmax = 0;
+VAR int charac = 0;
+VAR int gfdeg = 0;
+VAR int ptZmax = INITPT;
+VAR int ptFmax = 0;
 
 void
 resetFPT()
@@ -31,7 +31,7 @@ resetFPT()
 void
 initPT ( )
 {
-    static bool initialized = false;
+    STATIC_VAR bool initialized = false;
 
     if ( ! initialized ) {
         initialized = true;

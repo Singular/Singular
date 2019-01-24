@@ -32,7 +32,7 @@ const int gf_maxbuffer = 200;
 
 const int gf_primes_len = 42;
 #ifndef NOASSERT
-static unsigned short gf_primes [] =
+STATIC_VAR unsigned short gf_primes [] =
 {
       2,   3,   5,   7,  11,  13,  17,  19,
      23,  29,  31,  37,  41,  43,  47,  53,
@@ -44,16 +44,16 @@ static unsigned short gf_primes [] =
 };
 #endif
 
-int gf_q = 0;
-int gf_p = 0;
-int gf_n = 0;
-int gf_q1 = 0;
-int gf_m1 = 0;
-char gf_name = 'Z';
+VAR int gf_q = 0;
+VAR int gf_p = 0;
+VAR int gf_n = 0;
+VAR int gf_q1 = 0;
+VAR int gf_m1 = 0;
+VAR char gf_name = 'Z';
 
-unsigned short * gf_table = 0;
+VAR unsigned short * gf_table = 0;
 
-CanonicalForm gf_mipo=0L;
+INST_VAR CanonicalForm gf_mipo=0L;
 
 static CanonicalForm intVec2CF ( int degree, int * coeffs, int level )
 {
@@ -66,7 +66,7 @@ static CanonicalForm intVec2CF ( int degree, int * coeffs, int level )
     return result;
 }
 
-static char *gftable_dir;
+STATIC_VAR char *gftable_dir;
 extern "C" {
   void set_gftable_dir(char *d){
     gftable_dir = d;

@@ -24,11 +24,11 @@
 
 #include "simpleideals.h"
 
-omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));
+VAR omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));
 
-static poly * idpower;
+STATIC_VAR poly * idpower;
 /*collects the monomials in makemonoms, must be allocated befor*/
-static int idpowerpoint;
+STATIC_VAR int idpowerpoint;
 /*index of the actual monomial in idpower*/
 
 /// initialise an ideal / module
@@ -1890,7 +1890,7 @@ ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring r)
   number *x=(number *)omAlloc(rl*sizeof(number));
   poly *p=(poly *)omAlloc(rl*sizeof(poly));
   CFArray inv_cache(rl);
-  extern int n_SwitchChinRem; //TEST
+  EXTERN_VAR int n_SwitchChinRem; //TEST
   int save_n_SwitchChinRem=n_SwitchChinRem;
   n_SwitchChinRem=1;
   for(i=cnt-1;i>=0;i--)

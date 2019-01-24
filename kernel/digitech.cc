@@ -10,7 +10,7 @@
 #include "kernel/digitech.h"
 #include "polys/kbuckets.h"
 #include "kernel/ideals.h"
-static ideal zero_ideal;
+STATIC_INST_VAR ideal zero_ideal;
 
 void bit_reduce(poly & f,ring r)
 {

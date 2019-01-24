@@ -38,7 +38,7 @@
  *
  ***************************************************************/
 // avoid recursive calls
-static BOOLEAN d_poly_error_reporting = FALSE;
+STATIC_VAR BOOLEAN d_poly_error_reporting = FALSE;
 BOOLEAN dPolyReportError(poly p, ring r, const char* fmt, ...)
 {
   if (d_poly_error_reporting) return FALSE;
@@ -357,9 +357,9 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level)
 #endif // PDEBUG
 
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
-static unsigned long pDivisibleBy_number = 1;
-static unsigned long pDivisibleBy_FALSE = 1;
-static unsigned long pDivisibleBy_ShortFalse = 1;
+STATIC_VAR unsigned long pDivisibleBy_number = 1;
+STATIC_VAR unsigned long pDivisibleBy_FALSE = 1;
+STATIC_VAR unsigned long pDivisibleBy_ShortFalse = 1;
 
 BOOLEAN pDebugLmShortDivisibleBy(poly p1, unsigned long sev_1, ring r_1,
                                poly p2, unsigned long not_sev_2, ring r_2)
