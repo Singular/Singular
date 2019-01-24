@@ -1174,7 +1174,7 @@ BOOLEAN load_modules_aux(const char *newlib, char *fullname, BOOLEAN autoexport)
     IDPACKAGE(pl)->libname=omStrDup(newlib);
   }
   IDPACKAGE(pl)->language = LANG_C;
-  if (registered_dyn_module(FullName))
+  if (dynl_check_opened(FullName))
   {
     if (BVERBOSE(V_LOAD_LIB)) Warn( "%s already loaded as C library", fullname);
     return FALSE;
