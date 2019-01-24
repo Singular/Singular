@@ -11,7 +11,7 @@
 #include "cf_iter.h"
 #include "fac_util.h"
 
-static CanonicalForm PK, PKHALF;
+STATIC_INST_VAR CanonicalForm PK, PKHALF;
 
 static CanonicalForm mappk ( const CanonicalForm& );
 

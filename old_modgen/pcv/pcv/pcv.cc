@@ -83,9 +83,9 @@ void fill_example_package(idhdl pl);
 extern "C"
 int mod_init(int(*iiAddCproc)())
 {
-  idhdl h;
-  idhdl helphdl = enter_id("Help", NULL, PACKAGE_CMD);
-  idhdl examplehdl = enter_id("Example", NULL, PACKAGE_CMD);
+  VAR idhdl h;
+  VAR idhdl helphdl = enter_id("Help", NULL, PACKAGE_CMD);
+  VAR idhdl examplehdl = enter_id("Example", NULL, PACKAGE_CMD);
 
 
    if( helphdl == NULL)

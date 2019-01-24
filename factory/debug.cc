@@ -1,7 +1,8 @@
 /* emacs edit mode for this file is -*- C++ -*- */
+#include "../factory/globaldefs.h"
 
-static int deb_level = -1;
-char * deb_level_msg = (char *)"";
+STATIC_VAR int deb_level = -1;
+VAR char * deb_level_msg = (char *)"";
 
 void deb_inc_level()
 {

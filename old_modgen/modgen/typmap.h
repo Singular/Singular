@@ -10,7 +10,7 @@
 #include <Singular/tok.h>
 #undef MYYSTYPE
 
-extern char type_conv[MAX_TOK][32];
+EXTERN_VAR char type_conv[MAX_TOK][32];
 void init_type_conv() ;
 
 

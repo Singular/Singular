@@ -137,11 +137,11 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, CFArray &inv_cach
  *
  ***************************************************************/
 // this is special for the syz stuff
-static int* _components = NULL;
-static long* _componentsShifted = NULL;
-static int _componentsExternal = 0;
+STATIC_VAR int* _components = NULL;
+STATIC_VAR long* _componentsShifted = NULL;
+STATIC_VAR int _componentsExternal = 0;
 
-BOOLEAN pSetm_error=0;
+VAR BOOLEAN pSetm_error=0;
 
 #ifndef SING_NDEBUG
 # define MYTEST 0
@@ -3617,9 +3617,9 @@ void pRestoreDegProcs(ring r, pFDegProc old_FDeg, pLDegProc old_lDeg)
 /*
 * the module weights for std
 */
-static pFDegProc pOldFDeg;
-static pLDegProc pOldLDeg;
-static BOOLEAN pOldLexOrder;
+STATIC_VAR pFDegProc pOldFDeg;
+STATIC_VAR pLDegProc pOldLDeg;
+STATIC_VAR BOOLEAN pOldLexOrder;
 
 static long pModDeg(poly p, ring r)
 {

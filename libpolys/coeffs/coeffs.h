@@ -81,7 +81,7 @@ typedef IEnumerator<number> ICoeffsEnumerator;
 /// Additionally returns a number;
 typedef void (*nCoeffsEnumeratorFunc)(ICoeffsEnumerator& numberCollectionEnumerator, number& output, const coeffs r);
 
-extern omBin rnumber_bin;
+EXTERN_VAR omBin rnumber_bin;
 
 #define FREE_RNUMBER(x) omFreeBin((void *)x, rnumber_bin)
 #define ALLOC_RNUMBER() (number)omAllocBin(rnumber_bin)

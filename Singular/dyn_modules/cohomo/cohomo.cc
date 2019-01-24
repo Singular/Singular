@@ -3186,7 +3186,7 @@ std::vector<std::vector<int> > value1l(std::vector<std::vector<int> > mvs, std::
 }
 
 /***************************************************/
-clock_t t_begin, t_mark, t_start, t_construct=0, t_solve=0, t_value=0, t_total=0;
+VAR clock_t t_begin, t_mark, t_start, t_construct=0, t_solve=0, t_value=0, t_total=0;
 /**************************************************/
 
 
@@ -5330,7 +5330,7 @@ void firstorderdef_setup(SModulFunctions* p)
 extern "C" int SI_MOD_INIT0(cohomo)(SModulFunctions* p)
 {
   firstorderdef_setup(p);
-  return MAX_TOK;
+  VAR return MAX_TOK;
 }
 
 

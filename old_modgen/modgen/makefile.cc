@@ -17,7 +17,7 @@
 #include "typmap.h"
 #include "pathnames.h"
 
-extern char* inst_dir;
+EXTERN_VAR char* inst_dir;
 
 extern void mod_create_makefile(moddefv module);
 extern void build_head_section(FILE *fp, moddefv module);
@@ -25,7 +25,7 @@ extern void build_clean_section(FILE *fp, moddefv module);
 extern void build_install_section(FILE *fp, moddefv module);
 extern void build_compile_section(FILE *fp, moddefv module);
 
-extern int do_create_srcdir;
+EXTERN_VAR int do_create_srcdir;
 
 static char *object_name(char *p);
 /*========================================================================*/

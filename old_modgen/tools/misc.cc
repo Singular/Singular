@@ -32,7 +32,7 @@
 #  define logx
 #endif
 
-char *DYNAinclude[] = {
+VAR char *DYNAinclude[] = {
    "",
    "#include <dlfcn.h>",
    "#include <dl.h>",
@@ -43,12 +43,12 @@ char *DYNAinclude[] = {
    NULL
 };
 
-int systyp = SYSTYP_NONE;
+VAR int systyp = SYSTYP_NONE;
 
-BOOLEAN    expected_parms;
-int        cmdtok;
-BOOLEAN siq=FALSE;
-char *lastreserved=NULL;
+VAR BOOLEAN    expected_parms;
+VAR int        cmdtok;
+VAR BOOLEAN siq=FALSE;
+VAR char *lastreserved=NULL;
 #define SELF_CMD MAX_TOK+1
 
 void enter_id(FILE *fp, char *name, char *value);

@@ -18,7 +18,7 @@ typedef union
   paramdef  tp;
 } MYYSTYPE;
 #define YYSTYPE MYYSTYPE
-extern YYSTYPE  yylval;
+EXTERN_VAR YYSTYPE  yylval;
 
 int yylex(MYYSTYPE *l);
 

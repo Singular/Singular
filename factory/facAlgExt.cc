@@ -97,7 +97,7 @@ static CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, in
   TIMING_END_AND_PRINT (fac_alg_resultant, "time to compute resultant0: ");
 
   i= 0;
-  int k;
+  VAR int k;
   if (degree (gcd (deriv (norm, y), norm)) <= 0)
     return norm;
   i= 1;

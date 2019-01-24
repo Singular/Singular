@@ -16,7 +16,7 @@
 #include "bbfan.h"
 #include "gfan.h"
 
-int fanID;
+VAR int fanID;
 
 void* bbfan_Init(blackbox* /*b*/)
 {

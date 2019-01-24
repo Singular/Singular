@@ -93,7 +93,7 @@
    Also, when `ordering' is RETURN_IN_ORDER,
    each non-option ARGV-element is returned here.  */
 
-char *fe_optarg = 0;
+VAR char *fe_optarg = 0;
 
 /* Index in ARGV of the next element to be scanned.
    This is used for communication to and from the caller
@@ -108,7 +108,7 @@ char *fe_optarg = 0;
    how much of ARGV has been scanned so far.  */
 
 /* XXX 1003.2 says this must be 1 before any call.  */
-int fe_optind = 0;
+VAR int fe_optind = 0;
 
 /* The next char to be scanned in the option-element
    in which the last option character we returned was found.
@@ -117,19 +117,19 @@ int fe_optind = 0;
    If this is zero, or a null string, it means resume the scan
    by advancing to the next ARGV-element.  */
 
-static char *nextchar;
+STATIC_VAR char *nextchar;
 
 /* Callers store zero here to inhibit the error message
    for unrecognized options.  */
 
-int fe_opterr = 1;
+VAR int fe_opterr = 1;
 
 /* Set to an option character which was unrecognized.
    This must be initialized on some systems to avoid linking in the
    system's own getopt implementation.  */
 
 #define BAD_OPTION '\0'
-int fe_optopt = BAD_OPTION;
+VAR int fe_optopt = BAD_OPTION;
 
 /* Describe how to deal with options that follow non-option ARGV-elements.
 
@@ -216,8 +216,8 @@ static const char * my_index (const char *str, int chr)
    been skipped.  `first_nonopt' is the index in ARGV of the first of them;
    `last_nonopt' is the index after the last of them.  */
 
-static int first_nonopt;
-static int last_nonopt;
+STATIC_VAR int first_nonopt;
+STATIC_VAR int last_nonopt;
 
 /* Exchange two adjacent subsequences of ARGV.
    One subsequence is elements [first_nonopt,last_nonopt)

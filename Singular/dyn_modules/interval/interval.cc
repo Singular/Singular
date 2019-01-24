@@ -133,8 +133,8 @@ box& box::setInterval(int i, interval *I)
  * TYPE IDs
  */
 
-static int intervalID;
-static int boxID;
+STATIC_VAR int intervalID;
+STATIC_VAR int boxID;
 
 /*
  * INTERVAL FUNCTIONS
@@ -1220,7 +1220,7 @@ static BOOLEAN evalPolyAtBox(leftv result, leftv args)
 
 extern "C" int SI_MOD_INIT(interval)(SModulFunctions* psModulFunctions)
 {
-  blackbox *b_iv = (blackbox*) omAlloc0(sizeof(blackbox)),
+  VAR blackbox *b_iv = (blackbox*) omAlloc0(sizeof(blackbox)),
            *b_bx = (blackbox*) omAlloc0(sizeof(blackbox));
 
   b_iv->blackbox_Init        = interval_Init;
@@ -1252,6 +1252,6 @@ extern "C" int SI_MOD_INIT(interval)(SModulFunctions* psModulFunctions)
   psModulFunctions->iiAddCproc("rootisolation.lib", "evalPolyAtBox", FALSE,
     evalPolyAtBox);
 
-  return MAX_TOK;
+  VAR return MAX_TOK;
 }
 // vim: spell spelllang=en

@@ -152,10 +152,10 @@ typedef enum { VAR_NONE, VAR_MODULE, VAR_HELP, VAR_INFO, VAR_VERSION,
 /*
  *
  */
-extern int modlineno;    /* lineno within module */
-extern int debug;
-extern int trace;
-extern int xyz;
+EXTERN_VAR int modlineno;    /* lineno within module */
+EXTERN_VAR int debug;
+EXTERN_VAR int trace;
+EXTERN_VAR int xyz;
 
 extern int IsCmd(char *n, int & tok);
 extern char * decl2str(int n, char *name);

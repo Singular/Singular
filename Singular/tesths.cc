@@ -36,6 +36,9 @@
 
 
 extern int siInit(char *);
+#ifdef PSINGULAR
+GLOBAL_VAR char *global_argv0;
+#endif
 
 int mmInit( void )
 {
@@ -62,6 +65,9 @@ int main(          /* main entry to Singular */
   omInitRet_2_Info(argv[0]);
   omInitGetBackTrace();
 
+#ifdef PSINGULAR
+  global_argv0 = argv[0];
+#endif
   siInit(argv[0]);
   init_signals();
   #ifdef HAVE_NTL

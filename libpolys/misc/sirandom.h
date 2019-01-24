@@ -3,7 +3,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern int siSeed;
+EXTERN_VAR int siSeed;
 int siRand();
 
 typedef int (*siRandProc)();

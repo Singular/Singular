@@ -28,8 +28,8 @@ typedef sem_t sipc_sem_t;
 #endif
 
 
-extern sipc_sem_t *semaphore[SIPC_MAX_SEMAPHORES];
-extern int sem_acquired[SIPC_MAX_SEMAPHORES];
+EXTERN_VAR sipc_sem_t *semaphore[SIPC_MAX_SEMAPHORES];
+EXTERN_VAR int sem_acquired[SIPC_MAX_SEMAPHORES];
 
 int sipc_semaphore_init(int id, int count);
 int sipc_semaphore_exists(int id);

@@ -39,5 +39,5 @@ BOOLEAN same_lt(leftv res, leftv arg)
 extern "C" int mod_init(SModulFunctions* psModulFunctions)
 {
   psModulFunctions->iiAddCproc((currPack->libname? currPack->libname: ""),"same_lt",FALSE,same_lt);
-  return MAX_TOK;
+  VAR return MAX_TOK;
 }

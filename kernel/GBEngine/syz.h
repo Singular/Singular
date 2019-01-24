@@ -114,8 +114,8 @@ void syPrint(syStrategy syzstr,   const char *currRingName /* = currRingHdl->id 
 syStrategy syMinimize(syStrategy syzstr);
 void syKillEmptyEntres(resolvente res,int length);
 
-extern int *  currcomponents;
-extern long *  currShiftedComponents;
+EXTERN_VAR int *  currcomponents;
+EXTERN_VAR long *  currShiftedComponents;
 
 void syDeletePair(SObject * so);
 void syInitializePair(SObject * so);

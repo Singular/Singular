@@ -18,7 +18,7 @@
 #include "ring_wrap.h"
 #include "intvec_wrap.h"
 #include "poly_wrap.h"
-extern int inerror;
+EXTERN_VAR int inerror;
 using namespace boost::python;
 using boost::python::extract;
 static void free_leftv(leftv args)

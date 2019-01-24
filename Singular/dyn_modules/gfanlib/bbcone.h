@@ -11,7 +11,7 @@
 
 #include "gfanlib/gfanlib.h"
 
-extern int coneID;
+EXTERN_VAR int coneID;
 
 void bbcone_setup(SModulFunctions* p);
 

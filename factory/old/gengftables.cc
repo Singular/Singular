@@ -42,7 +42,7 @@ using namespace std;
 const int maxtable = 32767;
 
 const int primes_len = 42;
-static unsigned short primes [] =
+STATIC_VAR unsigned short primes [] =
 {
       2,   3,   5,   7,  11,  13,  17,  19,
      23,  29,  31,  37,  41,  43,  47,  53,
