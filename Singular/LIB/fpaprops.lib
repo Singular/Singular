@@ -160,7 +160,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5);
+  def R = freeAlgebra(r, 5);
   setring R;
   ideal G = x*x, y*x; // K<x,y>/<xx,yx> is right noetherian
   lpNoetherian(G);
@@ -339,7 +339,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x1,x2),dp;
-  def R = makeLetterplaceRing(5);
+  def R = freeAlgebra(r, 5);
   setring R;
   ideal G = x1*x2, x2*x1; // K<x1,x2>/<x1*x2,x2*x1> is semi prime
   lpIsSemiPrime(G);
@@ -460,7 +460,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5);
+  def R = freeAlgebra(r, 5);
   setring R;
   ideal G = x*x, y*y; // K<x,y>/<xx,yy> is prime
   lpIsPrime(G);
@@ -787,7 +787,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   ideal I = x*y, x*z, z*y, z*z;
   lpUfGraph(I);
@@ -956,7 +956,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   R;
   setring R; // sets basering to Letterplace ring
   ideal I = z;//an example of infinite GK dimension
@@ -1060,7 +1060,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   ideal G = x*x, y*y,x*y*x; // it is a monomial Groebner basis
   lpGlDimBound(G);
@@ -1204,7 +1204,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
-  def R = makeLetterplaceRing(4);
+  def R = freeAlgebra(r, 4);
   setring R;
   ideal G = x*y; // optional
   poly f = 3*x*x+y*x;
@@ -1214,7 +1214,7 @@ example
   int minDegBound = lpCalcSubstDegBound(f,s1,s2);
   minDegBound; // thus the bound needs to be increased
   setring r; // back to original r
-  def R1 = makeLetterplaceRing(minDegBound);
+  def R1 = freeAlgebra(r, minDegBound);
   setring R1;
   lpSubstitute(imap(R,f), imap(R,s1), imap(R,s2));
   // the last parameter is optional; above it was G=<xy>
@@ -1226,7 +1226,7 @@ example
 /*
   //////// EXAMPLE B ////////
   ring r = 0,(x,y,z),dp;
-  def R = makeLetterplaceRing(4);
+  def R = freeAlgebra(r, 4);
   setring R;
 
   poly f = 3*x*x+y*x;
@@ -1238,7 +1238,7 @@ example
 
   int minDegBound = lpCalcSubstDegBound(I,s1,s2);
   setring r;
-  def R1 = makeLetterplaceRing(minDegBound);
+  def R1 = freeAlgebra(r, minDegBound);
   setring R1;
 
   ideal I = imap(R,I);
@@ -1332,7 +1332,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
-  def R = makeLetterplaceRing(4);
+  def R = freeAlgebra(r, 4);
   setring R;
   ideal I = 3*x*x+y*x, x*y*x - z;
   ideal s1 = x, y; // z --> z
@@ -1426,7 +1426,7 @@ checks, if a word IF is an infix of another word I
 /* { */
 /*   "EXAMPLE:"; echo = 2; */
 /*   ring r = 0,(x,y,z),dp; */
-/*   def A = makeLetterplaceRing(3); */
+/*   def A = freeAlgebra(r, 3); */
 /*   setring A; A; */
 /*   def R = lpDelVar(2); setring R; R; */
 /* } */

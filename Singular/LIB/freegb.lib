@@ -393,7 +393,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5);
+  def R = freeAlgebra(r, 5);
   setring R;
   poly p = x*y*y;
   lpLmDivides(y*y, p);
@@ -415,7 +415,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5);
+  def R = freeAlgebra(r, 5);
   setring R;
   poly p = y*y*x;
   lpVarAt(p, 3);
@@ -440,7 +440,7 @@ example
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),Dp;
   int degree_bound = 5;
-  def R = makeLetterplaceRing(5);
+  def R = freeAlgebra(r, 5);
   setring R;
   ideal I = -x*y-7*y*y+3*x*x, x*y*x-y*x*y;
   ideal J = letplaceGBasis(I);
@@ -502,7 +502,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(4,2); // R with letterplace structure
+  def R = freeAlgebra(r, 4,2); // R with letterplace structure
   setring R;
   poly a = x*y; poly b = y;
   lieBracket(a,b);
@@ -535,7 +535,7 @@ example
 {
  "EXAMPLE:"; echo = 2;
  ring r = (0,a,b,g),(x,y),Dp;
- def R = makeLetterplaceRing(4); // constructs a Letterplace ring
+ def R = freeAlgebra(r, 4); // constructs a Letterplace ring
  setring R; // downup algebra A
  ideal J = x*x*y-a*x*y*x - b*y*x*x - g*x,
  x*y*y-a*y*x*y - b*y*y*x - g*y;
@@ -1520,7 +1520,7 @@ example
   LIB "freegb.lib";
   ring r =0,(x,y,z),dp;
   int d = 5;
-  def R = makeLetterplaceRing(d);
+  def R = freeAlgebra(r, d);
   setring R;
   poly p1 = x(1)*y(2)*z(3);
   poly p2 = x(1)*y(4)*z(5);
@@ -1953,7 +1953,7 @@ static proc test1()
   LIB "freegb.lib";
   ring r = 0,(x,y),Dp;
   int d = 10; // degree
-  def R = makeLetterplaceRing(d);
+  def R = freeAlgebra(r, d);
   setring R;
   ideal I = x(1)*x(2) - y(1)*y(2);
   option(prot);
@@ -1967,7 +1967,7 @@ static proc test2()
   LIB "freegb.lib";
   ring r = 0,(x,y),Dp;
   int d = 10; // degree
-  def R = makeLetterplaceRing(d);
+  def R = freeAlgebra(r, d);
   setring R;
   ideal I = x(1)*x(2) - x(1)*y(2);
   option(prot);
@@ -1981,7 +1981,7 @@ static proc test3()
   LIB "freegb.lib";
   ring r = 0,(x,y,z),dp;
   int d =5; // degree
-  def R = makeLetterplaceRing(d);
+  def R = freeAlgebra(r, d);
   setring R;
   ideal I = x(1)*y(2), y(1)*x(2)+z(1)*z(2);
   option(prot);
@@ -2444,7 +2444,7 @@ example
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
   int uptodeg = 5; int lV = 3;
-  def R = makeLetterplaceRing(uptodeg);
+  def R = freeAlgebra(r, uptodeg);
   setring R;
   poly f = x*z*y - 2*z*y + 3*x;
   shiftPoly(f,1);
@@ -2471,7 +2471,7 @@ example
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
   int uptodeg = 5;
-  def R = makeLetterplaceRing(uptodeg);
+  def R = freeAlgebra(r, uptodeg);
   setring R;
   poly f = x*z*y - 2*z*y + 3*x;
   lastBlock(f); // should be 3
@@ -2482,7 +2482,7 @@ static proc test_shift()
   LIB "freegb.lib";
   ring r = 0,(a,b),dp;
   int d =5;
-  def R = makeLetterplaceRing(d);
+  def R = freeAlgebra(r, d);
   setring R;
   int uptodeg = d;
   int lV = 2;
@@ -2603,7 +2603,7 @@ example
   "EXAMPLE:"; echo = 2;
   intmat A[2][2] = 2, -1, -1, 2; // sl_3 == A_2
   ring r = 0,(f1,f2),dp;
-  def R = makeLetterplaceRing(3);
+  def R = freeAlgebra(r, 3);
   setring R;
   ideal I = serreRelations(A,1);
   lp2lstr(I,r);
@@ -2642,7 +2642,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r =0,(x,y,z,t),Dp;
-  def A = makeLetterplaceRing(4);
+  def A = freeAlgebra(r, 4);
   setring A;
   string t = "-2*y*z*y*z + y*t*z*z - z*x*x*y  + 2*z*y*z*y";
   list L = sent2lplace(t);
@@ -2702,7 +2702,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r =0,(x,y,z,t),dp;
-  def A = makeLetterplaceRing(4);
+  def A = freeAlgebra(r, 4);
   setring A;
   string fn = "myfile";
   string s1 = "z*y*y*y - 3*y*z*x*y  + 3*y*y*z*y - y*x*y*z,";
@@ -2720,7 +2720,7 @@ example
 //first app of file2lplace
   ring r =0,(x,y,z,t),dp;
   int d = 10;
-  def A = makeLetterplaceRing(d);
+  def A = freeAlgebra(r, d);
   setring A;
   ideal I = file2lplace("./ls3nilp.bg");
   // and now test the correctness: go back from lplace to strings
@@ -2858,7 +2858,7 @@ example
   "EXAMPLE:"; echo = 2;
   // define a ring in letterplace form as follows:
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(4,2); // supply R with letterplace structure
+  def R = freeAlgebra(r, 4,2); // supply R with letterplace structure
   setring R;
   poly a = x*y + y; poly b = y - 1;
   lpPower(a,2);
@@ -2888,7 +2888,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(4); setring R;
+  def R = freeAlgebra(r, 4); setring R;
   ideal I = x*x + y*y - 1; // 2D sphere
   ideal J = letplaceGBasis(I); // compute a Letterplace Groebner basis
   J; // it is finite and nice
@@ -2902,7 +2902,7 @@ example
   "EXAMPLE:"; echo = 2;
 ring r = 0,(x,y,z),dp;
 int d =5; // degree
-def R = makeLetterplaceRing(d);
+def R = freeAlgebra(r, d);
 setring R;
 ideal I = y*x*y - z*y*z, x*y*x - z*x*y, z*x*z - y*z*x, x*x*x + y*y*y + z*z*z + x*y*z;
 ideal J = letplaceGBasis(I); // compute a Letterplace Groebner basis
@@ -2990,7 +2990,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(4); setring R;
+  def R = freeAlgebra(r, 4); setring R;
   ideal I = x*x + y*y - 1; // 2D sphere
   ideal J = letplaceGBasis(I); // compute a Letterplace Groebner basis
   J; // it is finite and nice
@@ -3019,7 +3019,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(4); setring R;
+  def R = freeAlgebra(r, 4); setring R;
   ideal I = x*x + y*y - 1; // 2D sphere
   ideal J = letplaceGBasis(I); // compute a Letterplace Groebner basis
   J; // it is finite and nice
@@ -3273,12 +3273,12 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
-  def R = makeLetterplaceRing(5);
+  def R = freeAlgebra(r, 5);
   setring R;
   isOrderingShiftInvariant(0);// should be 1
 
   ring r = 0,(x,y,z),dp;
-  def R = makeLetterplaceRing(5);
+  def R = freeAlgebra(r, 5);
   list RL = ringlist(R);
   RL[3][1][1] = "wp";
   intvec weights = 1,1,1,1,1,1,1,2,3,1,1,1,1,1,1;
@@ -3615,7 +3615,7 @@ static proc skip0(vector v)
 // {
 //   LIB "freegb.lib";
 //   ring r=0,(a,b),dp;
-//   def R = makeLetterplaceRing(5);
+//   def R = freeAlgebra(r, 5);
 //   setring R;
 //   poly p = a(1);
 //   poly q = b(1);
@@ -3628,7 +3628,7 @@ static proc skip0(vector v)
 //   // needs unstatic lpMultX
 //   LIB "freegb.lib";
 //   ring r=0,(a,b,c,d,p,q,r,s,t,u,v,w),(a(7,1,1,7),dp);
-//   def R=makeLetterplaceRing(20,1);
+//   def R=freeAlgebra(r, 20,1);
 //   setring R;
 //   option(redSB); option(redTail);
 //   ideal I=a(1)*b(2)*c(3)-p(1)*q(2)*r(3)*s(4)*t(5)*u(6),b(1)*c(2)*d(3)-v(1)*w(2);
@@ -3675,7 +3675,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
-  def R = makeLetterplaceRing(5);// constructs a Letterplace ring
+  def R = freeAlgebra(r, 5);// constructs a Letterplace ring
   setring R; //sets basering to Letterplace ring
   intvec u = 1,1,2; intvec v = 2,1,3; intvec w = 3,1,1;
   // u = x^2y, v = yxz, w = zx^2 in intvec representation
@@ -3703,7 +3703,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; //sets basering to Letterplace ring
   // u = x^2y, v = yxz, w = zx^2 in intvec representation
   intvec u = 1,1,2;
@@ -3732,7 +3732,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   intmat u[3][1] = 1,1,2; intmat v[1][3] = 2,1,3; intmat w[2][3] = 3,1,1,2,3,1;
   // defines intmats of different size containing intvec representations of
@@ -3767,7 +3767,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   intmat u[3][1] = 1,1,2; intmat v[1][3] = 2,1,3; intmat w[2][3] = 3,1,1,2,3,1;
   // defines intmats of different size containing intvec representations of
@@ -3795,7 +3795,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   ideal L = x*x,y*y,x*y*x;
   lpId2ivLi(L); // returns the corresponding intvecs as a list
@@ -3832,7 +3832,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   poly p = x*x*z;
   lp2iv(p); // transforms p into the intvec representation
@@ -3872,7 +3872,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   poly p = x*x*z;
   poly q = y*y*x*x;
