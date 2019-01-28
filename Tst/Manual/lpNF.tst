@@ -2,7 +2,7 @@ LIB "tst.lib"; tst_init();
 LIB "freegb.lib";
 ring r = 0,(x,y,z),dp;
 int d =5; // degree
-def R = makeLetterplaceRing(d);
+def R = freeAlgebra(r,d);
 setring R;
 ideal I = y*x*y - z*y*z, x*y*x - z*x*y, z*x*z - y*z*x, x*x*x + y*y*y + z*z*z + x*y*z;
 ideal J = std(I); // compute a Letterplace Groebner basis
