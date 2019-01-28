@@ -128,7 +128,7 @@ example
     0, -1, 2; // G^1_2 Cartan matrix
   ring r = 0,(f1,f2,f3),dp;
   int uptodeg = 5;
-  def R = makeLetterplaceRing(uptodeg);
+  def R = freeAlgebra(r, uptodeg);
   setring R;
   ideal I = serreRelations(A,1); I = simplify(I,1+2+8);
   I;
@@ -193,7 +193,7 @@ EXAMPLE: example fullSerreRelations; shows examples
   /* for each vector in rNeg and rPositive, go into the corr. ring and create SerreRels */
   /* rNegative: */
   list L = ringlist(save);
-  def LPsave = makeLetterplaceRing(uptodeg); setring save;
+  def LPsave = freeAlgebra(basering, uptodeg); setring save;
   list LNEG = L; list tmp;
   /* L[1] field as is; L[2] vars: a subset; L[3] ordering: dp, L[4] as is */
   for (i=1; i<=size(iNeg); i++)
@@ -202,7 +202,7 @@ EXAMPLE: example fullSerreRelations; shows examples
   }
   LNEG[2] = tmp; LNEG[3] = list(list("dp",intvec(1:size(iNeg))), list("C",0));
   def RNEG = ring(LNEG); setring RNEG;
-  def RRNEG = makeLetterplaceRing(uptodeg);
+  def RRNEG = freeAlgebra(basering, uptodeg);
   setring RRNEG;
   ideal I = serreRelations(A,1); I = simplify(I,1+2+8);
   setring LPsave;
@@ -220,7 +220,7 @@ EXAMPLE: example fullSerreRelations; shows examples
   }
   LPOS[2] = tmp; LPOS[3] = list(list("dp",intvec(1:size(iPos))), list("C",0));
   def RPOS = ring(LPOS); setring RPOS;
-  def RRPOS = makeLetterplaceRing(uptodeg);
+  def RRPOS = freeAlgebra(basering, uptodeg);
   setring RRPOS;
   ideal I = serreRelations(A,1); I = simplify(I,1+2+8);
   setring LPsave;
@@ -467,7 +467,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
 
   if (a == "integrodiff3") {
     ring r = 0,(D,II,x),dp;
-    def R = makeLetterplaceRing(d);
+    def R = freeAlgebra(r, d);
     setring(R);
     ideal I = D*x-x*D-1,
           II*x-x*II+II*II,
@@ -475,19 +475,19 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   }
   if (a == "toeplitz") {
     ring r = 0,(y,x),dp;
-    def R = makeLetterplaceRing(d);
+    def R = freeAlgebra(r, d);
     setring(R);
     ideal I = y*x-1;
   }
   if (a == "weyl1") {
     ring r = 0,(D,x),dp;
-    def R = makeLetterplaceRing(d);
+    def R = freeAlgebra(r, d);
     setring(R);
     ideal I = D*x-x*D-1;
   }
   if (a == "usl2") {
     ring r = 0,(h,f,e),dp;
-    def R = makeLetterplaceRing(d);
+    def R = freeAlgebra(r, d);
     setring(R);
     ideal I = f*e-e*f+h,
           h*e-e*h-2*e,
@@ -495,7 +495,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   }
   if (a == "usl2h") {
     ring r = 0,(H,h,f,e),dp;
-    def R = makeLetterplaceRing(d);
+    def R = freeAlgebra(r, d);
     setring(R);
     ideal I = f*e-e*f+h*H,
           h*e-e*h-2*e*H,
@@ -506,7 +506,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   }
   if (a == "shift1inverse") {
     ring r = 0,(D,x,t),dp;
-    def R = makeLetterplaceRing(d);
+    def R = freeAlgebra(r, d);
     setring(R);
     ideal I = D*x-x*D-D,
           t*x-1,
@@ -514,7 +514,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   }
   if (a == "exterior2") {
     ring r = 0,(y,x),dp;
-    def R = makeLetterplaceRing(d);
+    def R = freeAlgebra(r, d);
     setring(R);
     ideal I = y*x+x*y,
           x*x,
@@ -522,7 +522,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   }
   if (a == "quadrowmm") {
     ring r = 0,(y,x),dp;
-    def R = makeLetterplaceRing(d);
+    def R = freeAlgebra(r, d);
     setring(R);
     ideal I = y*x-x*y,
           x*x,
@@ -530,13 +530,13 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   }
   if (a == "shift1") {
     ring r = 0,(s,x),dp;
-    def R = makeLetterplaceRing(d);
+    def R = freeAlgebra(r, d);
     setring(R);
     ideal I = s*x-x*s-s;
   }
   if (a == "weyl1inverse") {
     ring r = 0,(D,x,t),dp;
-    def R = makeLetterplaceRing(d);
+    def R = freeAlgebra(r, d);
     setring(R);
     ideal I = D*x-x*D-1,
           t*x-1,
@@ -588,7 +588,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
    if (d < 1 || d < m || d < n) {ERROR("Degree bound must be positiv and greater then m,n!");}
    int i;
    ring mr = 0,(a,b),Dp;
-   def Mr = makeLetterplaceRing(d);
+   def Mr = freeAlgebra(mr, d);
    setring Mr;
    poly p,q;
    if (n==0) {p = b;}
@@ -619,7 +619,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
    int i;
    if (d < 1 || d < absValue(m) || d < absValue(n)) {ERROR("Degree bound must be positiv and greater then |m|,|n|!");}
    ring gr = 0,(a,b,A,B),Dp;
-   def Gr = makeLetterplaceRing(d);
+   def Gr = freeAlgebra(gr, d);
    setring Gr;
    poly p,q;
    if (n==0) {p = b;}
@@ -675,7 +675,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
  if (d < 1 || d < m || d < n) {ERROR("degreebound must be positiv and larger than n and m!");}
  int i;
  ring r = 0,(a,b),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(r, d);
  setring R;
  poly p,q;
  p = 1; q = 1;
@@ -715,7 +715,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring r = 2,(x,y,X,Y),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(r, d);
  setring R;
  ideal I = x*y-y*x-1, X*x-1, x*X-1, y*Y-1, Y*y-1;
  I = simplify(I,2);
@@ -747,7 +747,7 @@ example
 /*   baseringdef = 1; */
 /*  } */
 /*  ring r = 2,(x,y,r,X,Y),dp; */
-/*  def R = makeLetterplaceRing(d); */
+/*  def R = freeAlgebra(r, d); */
 /*  setring R; */
 /*  ideal I = x*y-y*x-1, x*y-y*x-r*r, r*r-1, r*x*r-X, r*y*r-Y,x*X-1, */
 /* X*x-1, Y*y-1,  y*Y-1; */
@@ -775,7 +775,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring r = 2,(x,y,m,X,Y),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(r, d);
  setring R;
  ideal I = x*y-y*x-1, x*y-y*x-m*m, m*m-1, m*x*m-x, m*y*m-Y,x*X-1,
 X*x-1, Y*y-1,  y*Y-1;
@@ -809,7 +809,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring r = 2,(x,y,t,X,Y,T),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(r, d);
  setring R;
  ideal I = x*y-y*x-1, t*t - x, T*y*t-Y, X*x-1, x*X-1,
 Y*y-1,  y*Y-1, t*T-1, T*t-1;
@@ -844,7 +844,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring r = 2,(x,y,p,q,X,Y),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(r, d);
  setring R;
  ideal I = x*y-y*x-1, p*q-q*p-1, p*p - 1, q*q - 1, p*y*p-Y, p*x*p-x,
  q*y*q-y, q*x*q-X, X*x-1, x*X-1,  Y*y-1,  y*Y-1,  x*y-y*x- p*p,
@@ -879,7 +879,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring r = 2,(x,y,m,t,X,Y,M),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(r, d);
  setring R;
  ideal I = x*y-y*x-1, x*y-y*x-t*t, m*m-y, t*t - 1, t*x*t-x,
 M*x*m-X, t*y*t-Y, t*m*t-M, X*x-1, x*X-1,  Y*y-1,  y*Y-1,
@@ -914,7 +914,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring r = 2,(x,y,u,v,X,Y,U,V),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(r, d);
  setring R;
  ideal I = x*y-y*x-1, x*y-y*x-u*v*u*v, u*v*u*v-1, u*u-x, v*v - y,
 V*x*v-X, U*y*u-Y,
@@ -949,7 +949,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring r = 2,(x,y,t,X,Y),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(r, d);
  setring R;
  ideal I = x*y-y*x-1, x*y-y*x-t*t, t*t-1,
 t*x*t-x*y, t*y*t-Y,
@@ -984,7 +984,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring rr = 2,(x,y,m,r,X,Y),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(rr, d);
  setring R;
  ideal I = x*y-y*x-1, x*y-y*x-m*m, x*y-y*x-r*r, m*m-1,  r*r-1,
  m*m-r*r, m*y*m-Y, m*x*m-x*y, r*y*r-Y, r*x*r-X, m*r*m-r,
@@ -1019,7 +1019,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring rr = 2,(x,y,r,X,Y),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(rr, d);
  setring R;
  ideal I = x*y-y*x-1, x*y-y*x-r*r*r*r, r*r*r*r-1,
  r*r*r*x*r-X, r*r*r*x*r-y,
@@ -1054,7 +1054,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring rr = 2,(x,y,r,m,X,Y),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(rr, d);
  setring R;
  ideal I = x*y-y*x-1, x*y-y*x-r*r*r*r,  r*r*r*r-1,
  r*r*r*x*r-X, r*r*r*x*r-y,
@@ -1089,7 +1089,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring rr = 2,(x,y,r,t,X,Y),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(rr, d);
  setring R;
  ideal I = x*y-y*x-1, x*y-y*x-r*r*r*r,  r*r*r*r-1, x*y-y*x-t*t,
  t*t-1,  r*r*r*r-t*t,  r*r*r*y*r-X, r*r*r*x*r-y,
@@ -1124,7 +1124,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring rr = 2,(x,y,r,X,Y),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(rr, d);
  setring R;
  ideal I = x*y-y*x-1, x*y-y*x-r*r*r,  r*r*r-1,
   r*r*x*r-X*y,  r*r*y*r-X, X*x-1, x*X-1,  Y*y-1,  y*Y-1;
@@ -1158,7 +1158,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring rr = 2,(x,y,r,t,X,Y),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(rr, d);
  setring R;
  ideal I = x*y-y*x-1, x*y-y*x-r*r, x*y-y*x-t*t, r*r-1, t*t-1,
  t*r*t*r*t*r-1, r*r-t*t,  x*y-y*x-t*r*t*r*t*r,
@@ -1195,7 +1195,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring rr = 2,(x,y,r,m,X,Y),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(rr, d);
  setring R;
  ideal I = x*y-y*x-1, x*y-y*x-r*r*r, x*y-y*x-m*m, r*r*r-1, m*m-1,
  r*r*r-m*m,  m*r*m-r*r, r*r*x*r-X*y, r*r*y*r-X,m*x*m-X,
@@ -1230,7 +1230,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring rr = 2,(x,y,r,X,Y),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(rr, d);
  setring R;
  ideal I = x*y-y*x-1, x*y-y*x-r*r*r*r*r*r, r*r*r*r*r*r-1,
  r*r*r*r*r*x*r-y, r*r*r*r*r*y*r-X*y,
@@ -1265,7 +1265,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring rr = 2,(x,y,r,m,X,Y),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(rr, d);
  setring R;
  ideal I = x*y-y*x-1, x*y-y*x-r*r*r*r*r*r, r*r*r*r*r*r-1,
  x*y-y*x-m*m, r*r*r*r*r*r-m*m, m*m-1, m*x*m-X,  m*y*m-X*y,
@@ -1311,7 +1311,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring r = 2,(x(1..n),Y(1..n)),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(r, d);
  setring R;
  ideal I; poly p,q;
  p = 1; q = 1;
@@ -1362,7 +1362,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring r = 2,(x(1..n),Y(1..n)),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(r, d);
  setring R;
  ideal I; poly p;
  p = 1;
@@ -1416,7 +1416,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring r = 2,x(1..n),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(r, d);
  setring R;
  ideal I; poly p;
  p = 1;
@@ -1468,7 +1468,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
   baseringdef = 1;
  }
  ring r = 2,(x(1..m),Y(1..m)),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(r, d);
  setring R;
  ideal I; poly p;
  for (i = 1; i < m-1; i++)
@@ -1527,7 +1527,7 @@ not equivalent to a presentation for an ordinary tetrahedron group.
   baseringdef = 1;
  }
  ring r = 2,(x,y,z),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(r, d);
  setring R;
  ideal I;
  if (g == 1)
@@ -1591,7 +1591,7 @@ The 14 examples are denoted in theorem 2.12
   baseringdef = 1;
  }
  ring r = 2,(a,b),dp;
- def R = makeLetterplaceRing(d);
+ def R = freeAlgebra(r, d);
  setring R;
  ideal I;
 
