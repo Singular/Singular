@@ -403,7 +403,7 @@ The weights of variables are determined by the current monomial ordering.
 Restrictions of the @sc{Letterplace} package:
 @itemize
 @item Since free algebra is not Noetherian, one has to define an explicit degree bound,
-up to which a partial Groebner basis will be computed. Note, that @code{makeLetterplaceRing} procedure
+up to which a partial Groebner basis will be computed. Note, that @code{freeAlgebra} procedure
 stores the bound in the structure of the ring it creates. Thus running @code{std} in such a
 ring does not require the degree bound in its argument.
 @item the options @code{redSB, redTail} are effective for Groebner basis computations
