@@ -502,7 +502,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = freeAlgebra(r, 4,2); // R with letterplace structure
+  def R = freeAlgebra(r, 4); // R with letterplace structure
   setring R;
   poly a = x*y; poly b = y;
   lieBracket(a,b);
