@@ -44,5 +44,5 @@ extern "C" int SI_MOD_INIT(bigintm)(SModulFunctions* psModulFunctions)
    psModulFunctions->iiAddCproc(currPack->libname,(char*)"bigintm_setup",FALSE, bigintm_setup0);
 
    // Q: should we call 'bigintm_setup' here??!?!?
-   VAR return MAX_TOK;
+   return MAX_TOK;
 }

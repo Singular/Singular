@@ -1,0 +1,89 @@
+# MAKEFLAGS=-j4
+
+BUILDDIR=@BUILDDIR@
+BINDIR=@BINDIR@
+TESTOBJ=@TESTOBJ@
+LIBSRC=@LIBSRC@
+LIBOBJ=@LIBOBJ@
+LIBHDR=@LIBHDR@
+PROGSRC=@PROGSRC@
+PROGOBJ=@PROGOBJ@
+PROGHDR=@PROGHDR@
+GENSRC=@GENSRC@
+TESTS=@TESTS@
+TARGETS=$(PROG) $(TESTS)
+CONFIGITEMS=@CONFIGITEMS@
+ADLIB=$(BUILDDIR)/adlib.a
+LIBS=@LIBS@
+INCLUDES=@INCLUDES@
+CC=@CC@
+CXX=@CXX@
+OPT=@OPT@
+DEBUG=@DEBUG@
+DEFINES=-DADLIB_DEBUG=$(DEBUG)
+CFLAGS=$(OPT) $(DEFINES) @CFLAGS@
+CXXFLAGS=$(OPT) $(DEFINES) @CFLAGS@
+LDFLAGS=
+MKDIR=@mkdir -p
+RM=rm
+RE2C=@RE2C@
+GCFLAGS=-DGC_FASTCALL= -DGC_CLIBDECL= -DGC_GETENV_SKIP
+DEFAULT_TARGET=@DEFAULT_TARGET@
+
+all: $(DEFAULT_TARGET) .FORCE
+
+@EXTRA@
+
+PROGNAME?=main
+RE2CFLAGS?=@RE2CFLAGS@
+PROG=$(BINDIR)/$(PROGNAME)
+
+debug: .FORCE
+	$(MAKE) DEBUG=1
+prog: $(PROG) .FORCE
+source: $(GENSRC) .FORCE
+
+$(PROG): $(PROGOBJ) $(ADLIB)
+	$(MKDIR) $(BINDIR)
+	$(CXX) $(CXXFLAGS) -o $(PROG) $(PROGOBJ) $(ADLIB) $(LIBS)
+
+$(ADLIB): $(LIBOBJ)
+	$(RM) -f $(ADLIB)
+	@AR@ rsc $(ADLIB) $(LIBOBJ)
+test: $(TESTS) .FORCE
+	@for test in @TESTS@; do \
+	  echo === $$test ===; \
+	  $$test; \
+	done
+tests: $(TESTS) .FORCE
+build.sh: .FORCE
+	# GNU Make only rule
+	@echo Generating $@ ...
+	@cat cnf/build-preamble.sh >$@
+	@$(MAKE) -nB CC=cc CXX=cxx prog \
+		| egrep ^mkdir | sort -u >>$@
+	@$(MAKE) -nB CC=cc CXX=cxx prog \
+		| egrep -v '^(mkdir|re2c)' >>$@
+	@echo finish >>$@
+	@chmod 755 $@
+tar: build.sh .FORCE
+	ln -s . $(PROGNAME)
+	tar czf $(PROGNAME).tar.gz $(PROGNAME)/{build.sh,adlib,src,gclib,cnf/*.*}
+	$(RM) -f $(PROGNAME)
+reformat: .FORCE
+	clang-format -style=file -i `find adlib src -name '*.cc' -o -name '*.h'`
+config: .FORCE
+	./configure @CONFIG_ARGS@
+clean: .FORCE
+	$(RM) -f $(LIBOBJ) $(PROGOBJ) $(TESTOBJ) $(ADLIB)
+cleanall: clean .FORCE
+	$(RM) -f $(TARGETS)
+distclean: cleanall .FORCE
+	$(RM) -f $(CONFIGITEMS)
+scrub: distclean .FORCE
+	$(RM) -f $(GENSRC) Makefile autosetup/jimsh0
+	$(RM) -rf $(BUILDDIR)
+.FORCE:
+.PHONY: test tests all debug prog source tar debug \
+	config clean cleanall distclean scrub reformat
+@RULES@

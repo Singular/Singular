@@ -835,7 +835,7 @@ string MinorKey::toString() const
 }
 */
 
-int MinorValue::g_rankingStrategy = -1;
+THREAD_VAR int MinorValue::g_rankingStrategy = -1;
 
 int MinorValue::getWeight () const
 {

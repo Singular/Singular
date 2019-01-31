@@ -713,7 +713,7 @@ BOOLEAN setOption(leftv res, leftv v)
   } while (v!=NULL);
 
    // set global variable to show memory usage
-  EXTERN_VAR int om_sing_opt_show_mem;
+  int om_sing_opt_show_mem;
   if (BVERBOSE(V_SHOW_MEM)) om_sing_opt_show_mem = 1;
   else om_sing_opt_show_mem = 0;
 

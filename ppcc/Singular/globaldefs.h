@@ -9,10 +9,6 @@
 #define EXTERN_INST_VAR extern
 #define STATIC_INST_VAR static
 #define GLOBAL_VAR
-#define THREAD_VAR
-#else
-#define GLOBAL_VAR
-#define THREAD_VAR __thread
 #endif
 
 #endif // _SINGULAR_GLOBALDEFS_H
