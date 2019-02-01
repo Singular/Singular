@@ -23,7 +23,8 @@ static BOOLEAN DumpAscii(FILE *fd, idhdl h,char ***list_of_libs);
 static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h,char ***list_of_libs);
 static const char* GetIdString(idhdl h);
 static int DumpRhs(FILE *fd, idhdl h);
-static BOOLEAN DumpQring(FILE *fd, idhdl h, const char *type_str);
+static BOOLEAN DumpQring(FILE *fd, idhdl h);
+static BOOLEAN DumpNCring(FILE *fd, idhdl h);
 static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl);
 static BOOLEAN CollectLibs(char *name, char ***list_of_libs);
 //static BOOLEAN DumpLibs(FILE *fd, char ***list_of_libs);
@@ -293,6 +294,7 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h, char ***list_of_libs)
   {
     if (strcmp(IDID(h),"Top")==0) return FALSE; // do not dump "Top"
     if (IDPACKAGE(h)->language==LANG_SINGULAR) return FALSE;
+    if (IDPACKAGE(h)->language==LANG_MIX) return FALSE;
   }
   if (type_id == CRING_CMD)
   {
@@ -309,9 +311,13 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h, char ***list_of_libs)
   if (type_str == NULL)
     return FALSE;
 
+  // handle nc-rings separately
+  if ((type_id == RING_CMD)&&(rIsNCRing(IDRING(h))))
+    return DumpNCring(fd,h);
+
   // handle qrings separately
   if ((type_id == RING_CMD)&&(IDRING(h)->qideal!=NULL))
-    return DumpQring(fd, h, type_str);
+    return DumpQring(fd, h);
 
   // C-proc not to be dumped
   if ((type_id == PROC_CMD) && (IDPROC(h)->language == LANG_C))
@@ -367,13 +373,16 @@ static const char* GetIdString(idhdl h)
   switch(type)
   {
     case LIST_CMD:
-    {
-      lists l = IDLIST(h);
-      int i, nl = l->nr + 1;
-
-      for (i=0; i<nl; i++)
-        if (GetIdString((idhdl) &(l->m[i])) == NULL) return NULL;
-    }
+    //{
+    //
+    //
+    //  lists l = IDLIST(h);
+    //  int i, nl = l->nr + 1;
+//
+    //  for (i=0; i<nl; i++)
+    //    if (GetIdString((idhdl) &(l->m[i])) == NULL) return NULL;
+    //  break;
+    //}
     case CRING_CMD:
     #ifdef SINGULAR_4_2
     case CNUMBER_CMD:
@@ -407,16 +416,46 @@ static const char* GetIdString(idhdl h)
   }
 }
 
-static BOOLEAN DumpQring(FILE *fd, idhdl h, const char *type_str)
+static BOOLEAN DumpNCring(FILE *fd, idhdl h)
 {
   char *ring_str = h->String();
-  if (fprintf(fd, "%s temp_ring = %s;\n", Tok2Cmdname(RING_CMD), ring_str)
-              == EOF) return TRUE;
-  if (fprintf(fd, "%s temp_ideal = %s;\n", Tok2Cmdname(IDEAL_CMD),
-              iiStringMatrix((matrix) IDRING(h)->qideal, 1, currRing, n_GetChar(currRing->cf)))
+  ring r=IDRING(h);
+
+  if (rIsPluralRing(r))
+  {
+    if (fprintf(fd, "ring temp_ring = %s;\n", ring_str)
+      == EOF) return TRUE;
+    if (fprintf(fd, "ideal temp_C = %s;\n",
+              iiStringMatrix((matrix) r->GetNC()->C, 2, r, n_GetChar(r->cf)))
+      == EOF) return TRUE;
+    if (fprintf(fd, "ideal temp_D = %s;\n",
+              iiStringMatrix((matrix) r->GetNC()->D, 2, r, n_GetChar(r->cf)))
+      == EOF) return TRUE;
+    if (fprintf(fd, "def %s = nc_algebra(temp_C,temp_D);\n",IDID(h)) == EOF)
+      return TRUE;
+    if (fputs("kill temp_ring;\n",fd) == EOF) return TRUE;
+  }
+  if (rIsLPRing(r))
+  {
+    //if (fprintf(fd, "ring %s = %s;\n", IDID(h), ring_str) == EOF) return TRUE;
+    //if (fprintf(fd, "attrib(%s,\"isLetterplaceRing\",%d);\n",IDID(h),r->isLPring) ==EOF) return TRUE;
+    Warn("cannot write LP ring %s",IDID(h));
+    return TRUE;
+  }
+  omFree(ring_str);
+  return FALSE;
+}
+
+static BOOLEAN DumpQring(FILE *fd, idhdl h)
+{
+  char *ring_str = h->String();
+  ring r=IDRING(h);
+  if (fprintf(fd, "ring temp_ring = %s;\n", ring_str) == EOF) return TRUE;
+  if (fprintf(fd, "ideal temp_ideal = %s;\n",
+              iiStringMatrix((matrix) r->qideal, 1, currRing, n_GetChar(r->cf)))
       == EOF) return TRUE;
   if (fputs("attrib(temp_ideal, \"isSB\", 1);\n",fd) == EOF) return TRUE;
-  if (fprintf(fd, "%s %s = temp_ideal;\n", type_str, IDID(h)) == EOF)
+  if (fprintf(fd, "qring %s = temp_ideal;\n",IDID(h)) == EOF)
     return TRUE;
   if (fputs("kill temp_ring;\n",fd) == EOF) return TRUE;
   else
