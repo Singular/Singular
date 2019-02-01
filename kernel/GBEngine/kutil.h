@@ -860,7 +860,7 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
 
 int redFirstShift (LObject* h,kStrategy strat); // ok
 
-ideal freegb(ideal F);
+ideal freegb(ideal F, ideal Q);
 ideal rightgb(ideal F, ideal Q);
 
 ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
