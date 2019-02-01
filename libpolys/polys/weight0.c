@@ -25,9 +25,9 @@ void wSecondSearch(int *A, int *x, int *lpol,
 void wGcd(int *x, int n);
 /*0 implementation*/
 
-short * ecartWeights=NULL;
+VAR short * ecartWeights=NULL;
 
-double (*wFunctional)(int *degw, int *lpol, int npol,
+VAR double (*wFunctional)(int *degw, int *lpol, int npol,
        double *rel, double wx, double wNsqr);
 
 

@@ -33,7 +33,7 @@ extern "C" {
    Also, when `ordering' is RETURN_IN_ORDER,
    each non-option ARGV-element is returned here.  */
 
-extern char *fe_optarg;
+EXTERN_VAR char *fe_optarg;
 
 /* Index in ARGV of the next element to be scanned.
    This is used for communication to and from the caller
@@ -47,16 +47,16 @@ extern char *fe_optarg;
    Otherwise, `optind' communicates from one call to the next
    how much of ARGV has been scanned so far.  */
 
-extern int fe_optind;
+EXTERN_VAR int fe_optind;
 
 /* Callers store zero here to inhibit the error message `getopt' prints
    for unrecognized options.  */
 
-extern int fe_opterr;
+EXTERN_VAR int fe_opterr;
 
 /* Set to an option character which was unrecognized.  */
 
-extern int fe_optopt;
+EXTERN_VAR int fe_optopt;
 
 /* Describe the long-named options requested by the application.
    The LONG_OPTIONS argument to getopt_long or getopt_long_only is a vector

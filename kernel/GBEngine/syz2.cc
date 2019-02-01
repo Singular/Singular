@@ -44,11 +44,11 @@
 #define USE_HEURISTIC2
 
 #ifdef SHOW_CRIT
-static int crit;
-static int crit1;
-static int spfl;
-static int cons_pairs;
-static int crit_fails;
+STATIC_VAR int crit;
+STATIC_VAR int crit1;
+STATIC_VAR int spfl;
+STATIC_VAR int cons_pairs;
+STATIC_VAR int crit_fails;
 #endif
 typedef struct sopen_pairs open_pairs;
 typedef open_pairs* crit_pairs;

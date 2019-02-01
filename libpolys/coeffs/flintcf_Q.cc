@@ -516,7 +516,7 @@ static CanonicalForm ConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs 
 }
 char * CoeffName(const coeffs r)
 {
-  static char CoeffName_flint_Q[20];
+  STATIC_VAR char CoeffName_flint_Q[20];
   sprintf(CoeffName_flint_Q,"flint:QQ[%s]",r->pParameterNames[0]);
   return (char*)CoeffName_flint_Q;
 

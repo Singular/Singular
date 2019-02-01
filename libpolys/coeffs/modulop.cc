@@ -346,7 +346,7 @@ number npConvFactoryNSingN( const CanonicalForm n, const coeffs r)
 
 static char* npCoeffName(const coeffs cf)
 {
-  static char npCoeffName_buf[15];
+  STATIC_VAR char npCoeffName_buf[15];
   snprintf(npCoeffName_buf,14,"ZZ/%d",cf->ch);
   return npCoeffName_buf;
 }

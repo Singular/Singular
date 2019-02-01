@@ -284,7 +284,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
 //  n_Delete(&p, currRing->cf); // doesn't expect 0/ NULL :(
   if (!redefine_from_algext)
   {
-    extern omBin fractionObjectBin;
+    EXTERN_VAR omBin fractionObjectBin;
     NUM((fractionObject *)p) = NULL; // not necessary, but still...
     omFreeBin((ADDRESS)p, fractionObjectBin);
   }

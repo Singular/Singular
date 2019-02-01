@@ -39,7 +39,7 @@
 
 
 /* the list of all options which give a warning by test */
-BITSET kOptions=Sy_bit(OPT_PROT)           /*  0 */
+VAR BITSET kOptions=Sy_bit(OPT_PROT)           /*  0 */
                 |Sy_bit(OPT_REDSB)         /*  1 */
                 |Sy_bit(OPT_NOT_SUGAR)     /*  3 */
                 |Sy_bit(OPT_INTERRUPT)     /*  4 */
@@ -54,7 +54,7 @@ BITSET kOptions=Sy_bit(OPT_PROT)           /*  0 */
 
 /* the list of all options which may be used by option and test */
 /* defintion of ALL options: libpolys/misc/options.h */
-BITSET validOpts=Sy_bit(0)
+VAR BITSET validOpts=Sy_bit(0)
                 |Sy_bit(1)
                 |Sy_bit(2) // obachman 10/00: replaced by notBucket
                 |Sy_bit(3)
@@ -2060,7 +2060,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   return res;
 }
 
-intvec * kModW, * kHomW;
+VAR intvec * kModW, * kHomW;
 
 long kModDeg(poly p, ring r)
 {

@@ -57,11 +57,11 @@ static inline number nr2mSubM(number a, number b, const coeffs r)
 #define nr2mNegM(A,r) (number)((r->mod2mMask+1 - (unsigned long)(A)) & r->mod2mMask)
 #define nr2mEqualM(A,B)  ((A)==(B))
 
-extern omBin gmp_nrz_bin; /* init in rintegers*/
+EXTERN_VAR omBin gmp_nrz_bin; /* init in rintegers*/
 
 static char* nr2mCoeffName(const coeffs cf)
 {
-  static char n2mCoeffName_buf[30];
+  STATIC_VAR char n2mCoeffName_buf[30];
   if (cf->modExponent>32) /* for 32/64bit arch.*/
     snprintf(n2mCoeffName_buf,21,"ZZ/(bigint(2)^%lu)",cf->modExponent);
   else

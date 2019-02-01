@@ -1,7 +1,7 @@
 LIB "tst.lib"; tst_init();
 LIB "freegb.lib";
 ring r = 0,(x,y,z),dp;
-def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+def R = freeAlgebra(r,5); // constructs a Letterplace ring
 setring R; // sets basering to Letterplace ring
 var(1);
 var(5);

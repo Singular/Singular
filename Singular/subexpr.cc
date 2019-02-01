@@ -37,15 +37,15 @@
 
 #include <ctype.h>
 
-omBin sSubexpr_bin = omGetSpecBin(sizeof(_ssubexpr));
-omBin sleftv_bin = omGetSpecBin(sizeof(sleftv));
-omBin procinfo_bin = omGetSpecBin(sizeof(procinfo));
-omBin libstack_bin = omGetSpecBin(sizeof(libstack));
-static omBin size_two_bin = omGetSpecBin(2);
+VAR omBin sSubexpr_bin = omGetSpecBin(sizeof(_ssubexpr));
+VAR omBin sleftv_bin = omGetSpecBin(sizeof(sleftv));
+VAR omBin procinfo_bin = omGetSpecBin(sizeof(procinfo));
+VAR omBin libstack_bin = omGetSpecBin(sizeof(libstack));
+STATIC_VAR omBin size_two_bin = omGetSpecBin(2);
 
-sleftv     sLastPrinted;
+INST_VAR sleftv     sLastPrinted;
 #ifdef SIQ
-BOOLEAN siq=FALSE;
+VAR BOOLEAN siq=FALSE;
 #endif
 
 int sleftv::listLength()
@@ -1170,8 +1170,8 @@ int  sleftv::LTyp()
 }
 
 #ifdef SINGULAR_4_2
-static snumber2 iiNumber2Data[4];
-static int iiCmatrix_index=0;
+STATIC_VAR snumber2 iiNumber2Data[4];
+STATIC_VAR int iiCmatrix_index=0;
 #endif
 void * sleftv::Data()
 {
@@ -1697,11 +1697,7 @@ void syMake(leftv v,const char * id, package pa)
       goto id_found;
     }
     /* 6. local ring: number/poly */
-    if ((currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest)
-    #ifdef HAVE_SHIFTBBA
-    && (currRing->isLPring==0)
-    #endif
-    )
+    if ((currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest))
     {
       BOOLEAN ok=FALSE;
       /*poly p = (!yyInRingConstruction) ? pmInit(id,ok) : (poly)NULL;*/
@@ -1729,9 +1725,18 @@ void syMake(leftv v,const char * id, package pa)
         }
         else
         {
+          v->name = id;
+        #ifdef HAVE_SHIFTBBA
+          if ((currRing->isLPring!=0)
+          && (p_Totaldegree(p,currRing)>1))
+          {
+            p_Delete(&p,currRing);
+            /* v->rtyp = UNKNOWN; - already set */
+            return; /* error, report "unknown id" */
+          }
+        #endif
           v->data = p;
           v->rtyp = POLY_CMD;
-          v->name = id;
         }
         return;
       }

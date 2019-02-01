@@ -46,12 +46,12 @@
 
 // counts sba's reduction steps
 #if SBA_PRINT_REDUCTION_STEPS
-long sba_reduction_steps;
-long sba_interreduction_steps;
+VAR long sba_reduction_steps;
+VAR long sba_interreduction_steps;
 #endif
 #if SBA_PRINT_OPERATIONS
-long sba_operations;
-long sba_interreduction_operations;
+VAR long sba_operations;
+VAR long sba_interreduction_operations;
 #endif
 
 /***********************************************
@@ -77,8 +77,8 @@ long sba_interreduction_operations;
 #include "polys/shiftop.h"
 #endif
 
-  int (*test_PosInT)(const TSet T,const int tl,LObject &h);
-  int (*test_PosInL)(const LSet set, const int length,
+  VAR int (*test_PosInT)(const TSet T,const int tl,LObject &h);
+  VAR int (*test_PosInL)(const LSet set, const int length,
                 LObject* L,const kStrategy strat);
 
 int kFindSameLMInT_Z(const kStrategy strat, const LObject* L, const int start)

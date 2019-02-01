@@ -63,12 +63,12 @@ static ideal BBA_Proc_Dummy (const ideal, const ideal, const intvec *, const int
 
 // the following funtion poiters are quasi-static:
 // they will be set in siInit and never changes afterwards:
-NF_Proc nc_NF=NF_Proc_Dummy;
-BBA_Proc gnc_gr_bba=BBA_Proc_Dummy;
-BBA_Proc gnc_gr_mora=BBA_Proc_Dummy;
-BBA_Proc sca_bba=BBA_Proc_Dummy;
-BBA_Proc sca_mora=BBA_Proc_Dummy;
-BBA_Proc sca_gr_bba=BBA_Proc_Dummy;
+VAR NF_Proc nc_NF=NF_Proc_Dummy;
+VAR BBA_Proc gnc_gr_bba=BBA_Proc_Dummy;
+VAR BBA_Proc gnc_gr_mora=BBA_Proc_Dummy;
+VAR BBA_Proc sca_bba=BBA_Proc_Dummy;
+VAR BBA_Proc sca_mora=BBA_Proc_Dummy;
+VAR BBA_Proc sca_gr_bba=BBA_Proc_Dummy;
 
 /* copy : */
 poly nc_p_CopyGet(poly a, const ring r);
@@ -77,7 +77,7 @@ poly nc_p_CopyPut(poly a, const ring r);
 poly nc_p_Bracket_qq(poly p, const poly q, const ring r);
 
 // only SCA can be used by default, formulas are off by default
-int  iNCExtensions = SCAMASK | NOFORMULAMASK;
+VAR int  iNCExtensions = SCAMASK | NOFORMULAMASK;
 
 int& getNCExtensions()
 {
@@ -1654,8 +1654,8 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
   p_LmFree(&pL,r);
 
   /* zero exponents !? */
-  poly M1    = nc_mm_Mult_p(m1,p_Head(p1,r),r); // M1 = m1 * lt(p1)
-  poly M2    = nc_mm_Mult_p(m2,p_Head(p2,r),r); // M2 = m2 * lt(p2)
+  VAR poly M1    = nc_mm_Mult_p(m1,p_Head(p1,r),r); // M1 = m1 * lt(p1)
+  VAR poly M2    = nc_mm_Mult_p(m2,p_Head(p2,r),r); // M2 = m2 * lt(p2)
 
 #ifdef PDEBUG
   p_Test(M1,r);
@@ -1687,11 +1687,11 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
        return(NULL);
   }
 
-  number C1  = p_GetCoeff(M1,r);      // C1 = lc(M1)
-  number C2  = p_GetCoeff(M2,r);      // C2 = lc(M2)
+  VAR number C1  = p_GetCoeff(M1,r);      // C1 = lc(M1)
+  VAR number C2  = p_GetCoeff(M2,r);      // C2 = lc(M2)
 
   /* GCD stuff */
-  number C = n_SubringGcd(C1, C2, r->cf);           // C = gcd(C1, C2)
+  VAR number C = n_SubringGcd(C1, C2, r->cf);           // C = gcd(C1, C2)
 
   if (!n_IsOne(C, r->cf))                              // if C != 1
   {
@@ -1850,11 +1850,11 @@ void gnc_ReduceSpolyTail(poly p1, poly q, poly q2, poly spNoether, const ring r)
   p_Test(m,r);
 #endif
   /* pSetComp(m,r)=0? */
-  poly M = nc_mm_Mult_pp(m, p1,r);
-  number C=p_GetCoeff(M,r);
+  VAR poly M = nc_mm_Mult_pp(m, p1,r);
+  VAR number C=p_GetCoeff(M,r);
   M=p_Add_q(M,nc_mm_Mult_p(m,p_LmDeleteAndNext(p_Copy(p1,r),r),r),r); // _pp?
   q=__p_Mult_nn(q,C,r);
-  number MinusOne=n_Init(-1,r->cf);
+  VAR number MinusOne=n_Init(-1,r->cf);
   if (!n_Equal(cQ,MinusOne,r->cf))
   {
     cQ=nInpNeg(cQ);

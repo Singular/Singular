@@ -664,7 +664,7 @@ _L99:
 
 };
 
-LpSolver lpSolver;
+INST_VAR LpSolver lpSolver;
 
 bool ZCone::isInStateMinimum(int s)const
 {

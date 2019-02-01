@@ -98,8 +98,8 @@
 
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 
-extern int yyleng;
-extern FILE *yyin, *yyout;
+EXTERN_VAR int yyleng;
+EXTERN_VAR FILE *yyin, *yyout;
 
 #define EOB_ACT_CONTINUE_SCAN 0
 #define EOB_ACT_END_OF_FILE 1
@@ -198,7 +198,7 @@ struct yy_buffer_state
 #define YY_BUFFER_EOF_PENDING 2
 	};
 
-static YY_BUFFER_STATE yy_current_buffer = 0;
+STATIC_VAR YY_BUFFER_STATE yy_current_buffer = 0;
 
 /* We provide macros for accessing buffer states in case in the
  * future we want to put the buffer states in a more general
@@ -208,22 +208,22 @@ static YY_BUFFER_STATE yy_current_buffer = 0;
 
 
 /* yy_hold_char holds the character lost when yytext is formed. */
-static char yy_hold_char;
+STATIC_VAR char yy_hold_char;
 
-static int yy_n_chars;		/* number of characters read into yy_ch_buf */
+STATIC_VAR int yy_n_chars;		/* number of characters read into yy_ch_buf */
 
 
-int yyleng;
+VAR int yyleng;
 
 /* Points to current character in buffer. */
-static char *yy_c_buf_p = (char *) 0;
-static int yy_init = 1;		/* whether we need to initialize */
-static int yy_start = 0;	/* start state number */
+STATIC_VAR char *yy_c_buf_p = (char *) 0;
+STATIC_VAR int yy_init = 1;		/* whether we need to initialize */
+STATIC_VAR int yy_start = 0;	/* start state number */
 
 /* Flag which is used to allow yywrap()'s to do buffer switches
  * instead of setting up a fresh yyin.  A bit of a hack ...
  */
-static int yy_did_buffer_switch_on_eof;
+STATIC_VAR int yy_did_buffer_switch_on_eof;
 
 void yyrestart YY_PROTO(( FILE *input_file ));
 
@@ -262,9 +262,9 @@ static void yy_flex_free YY_PROTO(( void * ));
 #define YY_AT_BOL() (yy_current_buffer->yy_at_bol)
 
 typedef unsigned char YY_CHAR;
-FILE *yyin = (FILE *) 0, *yyout = (FILE *) 0;
+VAR FILE *yyin = (FILE *) 0, *yyout = (FILE *) 0;
 typedef int yy_state_type;
-extern char *yytext;
+EXTERN_VAR char *yytext;
 #define yytext_ptr yytext
 
 static yy_state_type yy_get_previous_state YY_PROTO(( void ));
@@ -682,19 +682,19 @@ static yyconst short int yy_chk[902] =
       383
     } ;
 
-static yy_state_type yy_last_accepting_state;
-static char *yy_last_accepting_cpos;
+STATIC_VAR yy_state_type yy_last_accepting_state;
+STATIC_VAR char *yy_last_accepting_cpos;
 
 /* The intent behind this definition is that it'll catch
  * any uses of REJECT which flex missed.
  */
 #define REJECT reject_used_but_not_detected
-static int yy_more_flag = 0;
-static int yy_more_len = 0;
+STATIC_VAR int yy_more_flag = 0;
+STATIC_VAR int yy_more_len = 0;
 #define yymore() (yy_more_flag = 1)
 #define YY_MORE_ADJ yy_more_len
 #define YY_RESTORE_YY_MORE_OFFSET
-char *yytext;
+VAR char *yytext;
 #line 1 "scanner.l"
 #define INITIAL 0
 #line 2 "scanner.l"
@@ -727,22 +727,22 @@ char *yytext;
 #  define YYLP_MISS_BR2   11
 #  define YYLP_MISS_BR3   12
 
-  extern int iseof;
+  EXTERN_VAR int iseof;
 
-  int offset = 0;
-  int yylineno = 1;
-  int do_return = 0;
+  VAR int offset = 0;
+  VAR int yylineno = 1;
+  VAR int do_return = 0;
 
-  int state_level = -1;
-  int state_max = 0;
-  char *yylp_buffer_start;
+  VAR int state_level = -1;
+  VAR int state_max = 0;
+  VAR char *yylp_buffer_start;
 
-  extern int sectnum;
-  static int oldsectnum = 1;
-  extern moddef module_def;
-  extern procdef procedure_decl;
+  EXTERN_VAR int sectnum;
+  STATIC_VAR int oldsectnum = 1;
+  EXTERN_INST_VAR moddef module_def;
+  EXTERN_INST_VAR procdef procedure_decl;
 
-  char *sectname[] = { "sect -0", "section 1",
+  VAR char *sectname[] = { "sect -0", "section 1",
                        "Singular", "procedures", "C-part"
   };
 
@@ -861,9 +861,9 @@ static int input YY_PROTO(( void ));
 #endif
 
 #if YY_STACK_USED
-static int yy_start_stack_ptr = 0;
-static int yy_start_stack_depth = 0;
-static int *yy_start_stack = 0;
+STATIC_VAR int yy_start_stack_ptr = 0;
+STATIC_VAR int yy_start_stack_depth = 0;
+STATIC_VAR int *yy_start_stack = 0;
 #ifndef YY_NO_PUSH_STATE
 static void yy_push_state YY_PROTO(( int new_state ));
 #endif
@@ -982,10 +982,10 @@ YY_DECL
 
 #line 149 "scanner.l"
 
-       static int brace1 = 0;  /* { } */
-       static int brace2 = 0;  /* ( ) */
-       static int brace3 = 0;  /* [ ] */
-       static int quote  = 0;  /* " */
+       STATIC_VAR int brace1 = 0;  /* { } */
+       STATIC_VAR int brace2 = 0;  /* ( ) */
+       STATIC_VAR int brace3 = 0;  /* [ ] */
+       STATIC_VAR int quote  = 0;  /* " */
 
 
 	if ( yy_init )
@@ -2211,7 +2211,7 @@ static void yyunput( int c, register char *yy_bp )
 #else
 static void yyunput( c, yy_bp )
 int c;
-register char *yy_bp;
+VAR register char *yy_bp;
 #endif
 	{
 	register char *yy_cp = yy_c_buf_p;
@@ -2388,7 +2388,7 @@ YY_BUFFER_STATE yy_create_buffer( FILE *file, int size )
 #else
 YY_BUFFER_STATE yy_create_buffer( file, size )
 FILE *file;
-int size;
+VAR int size;
 #endif
 	{
 	YY_BUFFER_STATE b;
@@ -2440,7 +2440,7 @@ void yy_init_buffer( YY_BUFFER_STATE b, FILE *file )
 #else
 void yy_init_buffer( b, file )
 YY_BUFFER_STATE b;
-FILE *file;
+VAR FILE *file;
 #endif
 
 
@@ -2498,7 +2498,7 @@ YY_BUFFER_STATE yy_scan_buffer( char *base, yy_size_t size )
 #else
 YY_BUFFER_STATE yy_scan_buffer( base, size )
 char *base;
-yy_size_t size;
+VAR yy_size_t size;
 #endif
 	{
 	YY_BUFFER_STATE b;
@@ -2553,7 +2553,7 @@ YY_BUFFER_STATE yy_scan_bytes( yyconst char *bytes, int len )
 #else
 YY_BUFFER_STATE yy_scan_bytes( bytes, len )
 yyconst char *bytes;
-int len;
+VAR int len;
 #endif
 	{
 	YY_BUFFER_STATE b;
@@ -2680,7 +2680,7 @@ static void yy_flex_strncpy( char *s1, yyconst char *s2, int n )
 static void yy_flex_strncpy( s1, s2, n )
 char *s1;
 yyconst char *s2;
-int n;
+VAR int n;
 #endif
 	{
 	register int i;
@@ -2721,7 +2721,7 @@ static void *yy_flex_realloc( void *ptr, yy_size_t size )
 #else
 static void *yy_flex_realloc( ptr, size )
 void *ptr;
-yy_size_t size;
+VAR yy_size_t size;
 #endif
 	{
 	/* The cast to (char *) in the following accommodates both

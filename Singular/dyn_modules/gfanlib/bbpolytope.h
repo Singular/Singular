@@ -8,7 +8,7 @@
 #include "Singular/ipid.h"
 #include "gfanlib/gfanlib.h"
 
-extern int polytopeID;
+EXTERN_VAR int polytopeID;
 
 void bbpolytope_setup(SModulFunctions* p);
 

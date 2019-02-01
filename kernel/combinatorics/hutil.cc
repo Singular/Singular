@@ -13,12 +13,12 @@
 #include "kernel/polys.h"
 #include "kernel/combinatorics/hutil.h"
 
-scfmon hexist, hstc, hrad, hwork;
-scmon hpure, hpur0;
-varset hvar, hsel;
-int  hNexist, hNstc, hNrad, hNvar, hNpure;
-int hisModule;
-monf stcmem, radmem;
+VAR scfmon hexist, hstc, hrad, hwork;
+VAR scmon hpure, hpur0;
+VAR varset hvar, hsel;
+VAR int  hNexist, hNstc, hNrad, hNvar, hNpure;
+VAR int hisModule;
+VAR monf stcmem, radmem;
 
 // Making a global "security" copy of the allocated exponent vectors
 // is a dirty fix for correct memory disallocation: It would be
@@ -26,7 +26,7 @@ monf stcmem, radmem;
 // (i.e. changed) except in hInit, or, if hInit would return the
 // "security" copy as well. But then, all the relevant data is held in
 // global variables, so we might do that here, as well.
-static scfmon hsecure= NULL;
+STATIC_VAR scfmon hsecure= NULL;
 
 scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
 {

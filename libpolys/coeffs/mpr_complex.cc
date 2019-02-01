@@ -39,10 +39,10 @@
 #define EXTRABYTES 4
 
 #define DEFPREC        20         // minimum number of digits (output operations)
-size_t gmp_output_digits= DEFPREC;
+VAR size_t gmp_output_digits= DEFPREC;
 
-static gmp_float *gmpRel=NULL;
-static gmp_float *diff=NULL;
+STATIC_VAR gmp_float *gmpRel=NULL;
+STATIC_VAR gmp_float *diff=NULL;
 
 
 /** Set size of mantissa

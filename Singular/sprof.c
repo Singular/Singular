@@ -2,13 +2,13 @@
 #include <string.h>
 #include <malloc.h>
 
-FILE *f;
+VAR FILE *f;
 #define NUM_FILES 200
 
-char* file_names[NUM_FILES];
-int*   line_buf[NUM_FILES];
-char buf[200];
-int fn_cnt=0;
+VAR char* file_names[NUM_FILES];
+VAR int*   line_buf[NUM_FILES];
+VAR char buf[200];
+VAR int fn_cnt=0;
 
 void add_line(int fn,int l)
 {

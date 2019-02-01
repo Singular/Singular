@@ -6,7 +6,7 @@
 #include "tropicalTraversal.h"
 
 
-BITSET groebnerBitsetSave1, groebnerBitsetSave2;
+VAR BITSET groebnerBitsetSave1, groebnerBitsetSave2;
 
 /***
  * sets option(redSB)

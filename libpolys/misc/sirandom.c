@@ -1,3 +1,4 @@
+#include "misc/auxiliary.h"
 #include "sirandom.h"
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
@@ -26,7 +27,7 @@
 #define  R         2836        /*  M % A                  */
 
 
-int siSeed = 1;
+VAR int siSeed = 1;
 
 int siRandNext(int r)
 {

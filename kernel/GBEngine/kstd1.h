@@ -44,11 +44,11 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** mw, intvec *hilb=NULL,
 /* the following global data are defined in kutil.cc */
 //extern int syzComp;
   /*stop building pairs after that component --> ideals.cc, syz.cc */
-extern int LazyPass,LazyDegree,Kstd1_mu,Kstd1_deg;
+EXTERN_VAR int LazyPass,LazyDegree,Kstd1_mu,Kstd1_deg;
   /*parameters for Lazy or global stops --> ipshell.cc, grammar.y*/
-extern BITSET kOptions;
+EXTERN_VAR BITSET kOptions;
   /*the known test options (a constant)*/
-extern BITSET validOpts;
+EXTERN_VAR BITSET validOpts;
 
 void initMora(ideal F,kStrategy strat);
 
@@ -63,8 +63,8 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M,
               intvec *hilb=NULL, int syzComp=0,int reduced=0);
 
 
-extern intvec * kModW;
-extern intvec * kHomW;
+EXTERN_VAR intvec * kModW;
+EXTERN_VAR intvec * kHomW;
 
 
 /* options:

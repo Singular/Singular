@@ -23,7 +23,7 @@ extern "C" int SI_MOD_INIT(gfanlib)(SModulFunctions* p)
   bbfan_setup(p);
   bbpolytope_setup(p);
   tropical_setup(p);
-  return MAX_TOK;
+  VAR return MAX_TOK;
 }
 
 #endif

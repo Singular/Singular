@@ -19,6 +19,8 @@
 /* please include libpolysconfig.h exclusively via <misc/auxiliary.h> and before any other header */
 #include "libpolysconfig.h"
 
+#include "factory/globaldefs.h"
+
 /* the following cunstruct is to make it painless to add -DHAVE_NUMSTATS to CPPFLAGS for configure */
 #ifndef HAVE_NUMSTATS
 /* #define HAVE_NUMSTATS */

@@ -73,5 +73,5 @@ extern "C" int mod_init(SModulFunctions* psModulFunctions)
 {
   psModulFunctions->iiAddCproc((currPack->libname? currPack->libname: ""),"same_lt2",FALSE,same_lt2);
   psModulFunctions->iiAddCproc((currPack->libname? currPack->libname: ""),"cf_at",FALSE,cf_at);
-  return MAX_TOK;
+  VAR return MAX_TOK;
 }

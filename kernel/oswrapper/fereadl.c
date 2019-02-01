@@ -56,21 +56,21 @@
 
 #define feCTRL(C) ((C) & 0x1F)    /* <ctrl> character  */
 
-struct termios fe_saved_attributes;
+VAR struct termios fe_saved_attributes;
 
-static BOOLEAN fe_stdout_is_tty;
-static BOOLEAN fe_stdin_is_tty;
-BOOLEAN fe_use_fgets=FALSE;
-static BOOLEAN fe_is_initialized=FALSE;
+STATIC_VAR BOOLEAN fe_stdout_is_tty;
+STATIC_VAR BOOLEAN fe_stdin_is_tty;
+VAR BOOLEAN fe_use_fgets=FALSE;
+STATIC_VAR BOOLEAN fe_is_initialized=FALSE;
 
-FILE *  fe_echo; /*the output file for echoed characters*/
+VAR FILE *  fe_echo; /*the output file for echoed characters*/
 
 #define fe_hist_max 32
-char ** fe_hist=NULL;
-short   fe_hist_pos;
-BOOLEAN fe_is_raw_tty=0;
-short   fe_cursor_pos; /* 0..colmax-1*/
-short   fe_cursor_line; /* 0..pagelength-1*/
+VAR char ** fe_hist=NULL;
+VAR short   fe_hist_pos;
+VAR BOOLEAN fe_is_raw_tty=0;
+VAR short   fe_cursor_pos; /* 0..colmax-1*/
+VAR short   fe_cursor_line; /* 0..pagelength-1*/
 
 #ifndef HAVE_ATEXIT
   int on_exit(void (*f)(int, void *), void *arg);
@@ -130,7 +130,7 @@ void fe_temp_set (void)
   }
 }
 
-static char termcap_buff[2048];
+STATIC_VAR char termcap_buff[2048];
 static int fe_out_char(int c)
 {
   fputc(c,fe_echo);
@@ -196,9 +196,9 @@ static void fe_init (void)
     else
     {
       #ifndef __CYGWIN__
-      extern char *BC;
-      extern char *UP;
-      extern char PC;
+      EXTERN_VAR char *BC;
+      EXTERN_VAR char *UP;
+      EXTERN_VAR char PC;
       #endif
       /* OB: why this ? HS: char t_buf[128] does not work with glibc2 systems */
       char *t_buf=(char *)omAlloc(128);
@@ -712,18 +712,18 @@ char * fe_fgets_stdin_fe(char *pr,char *s, int size)
 
   char *(*fe_filename_completion_function)(); /* 3 */
   char *(* fe_readline) ();                   /* 4 */
-  void (*fe_add_history) ();                  /* 5 */
-  char ** fe_rl_readline_name;                /* 6 */
-  char **fe_rl_line_buffer;                   /* 7 */
+  VAR void (*fe_add_history) ();                  /* 5 */
+  VAR char ** fe_rl_readline_name;                /* 6 */
+  VAR char **fe_rl_line_buffer;                   /* 7 */
   char **(*fe_completion_matches)();          /* 8 */
-  CPPFunction **fe_rl_attempted_completion_function; /* 9 */
-  FILE ** fe_rl_outstream;                    /* 10 */
-  int (*fe_write_history) ();                 /* 11 */
-  int (*fe_history_total_bytes) ();           /* 12 */
-  void (*fe_using_history) ();                /* 13 */
-  int (*fe_read_history) ();                  /* 14 */
+  VAR CPPFunction **fe_rl_attempted_completion_function; /* 9 */
+  VAR FILE ** fe_rl_outstream;                    /* 10 */
+  VAR int (*fe_write_history) ();                 /* 11 */
+  VAR int (*fe_history_total_bytes) ();           /* 12 */
+  VAR void (*fe_using_history) ();                /* 13 */
+  VAR int (*fe_read_history) ();                  /* 14 */
 
-void * fe_rl_hdl=NULL;
+VAR void * fe_rl_hdl=NULL;
 
 char *command_generator (char *text, int state);
 

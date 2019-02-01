@@ -27,10 +27,10 @@ extern "C"
 {
 #endif
 
-extern short errorreported;
+EXTERN_VAR short errorreported;
 void    WerrorS(const char *s);
-extern void (*WerrorS_callback)(const char *s);
-extern void (*PrintS_callback)(const char *s);
+EXTERN_VAR void (*WerrorS_callback)(const char *s);
+EXTERN_VAR void (*PrintS_callback)(const char *s);
 
 #ifdef __cplusplus
 }

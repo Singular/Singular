@@ -47,8 +47,8 @@ namespace testsvdunit
     bool testsvdunit_test();
 
 
-    static int failcount;
-    static int succcount;
+    STATIC_VAR int failcount;
+    STATIC_VAR int succcount;
 
 
     /*************************************************************************

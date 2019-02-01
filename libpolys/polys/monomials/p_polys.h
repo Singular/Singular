@@ -821,6 +821,7 @@ static inline poly p_Copy(poly p, const ring r)
     return NULL;
 }
 
+/// copy the i(leading) term of p
 static inline poly p_Head(poly p, const ring r)
 {
   if (p == NULL) return NULL;
@@ -834,7 +835,10 @@ static inline poly p_Head(poly p, const ring r)
   return np;
 }
 
-// returns a copy of p with Lm(p) from lmRing and Tail(p) from tailRing
+/// like p_Head, but with coefficient 1
+poly p_CopyPowerProduct(poly p, const ring r);
+
+/// returns a copy of p with Lm(p) from lmRing and Tail(p) from tailRing
 static inline poly p_Copy(poly p, const ring lmRing, const ring tailRing)
 {
   if (p != NULL)

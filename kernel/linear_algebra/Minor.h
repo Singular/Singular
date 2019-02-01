@@ -538,7 +538,7 @@ class MinorValue
     * private store for the current value ranking strategy;
     * This member can be set using MinorValue::SetRankingStrategy (const int).
     */
-    static int g_rankingStrategy;
+    STATIC_VAR int g_rankingStrategy;
 
     /**
     * Accessor for the static private field g_rankingStrategy.
