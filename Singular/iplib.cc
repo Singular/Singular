@@ -81,7 +81,9 @@ BOOLEAN iiGetLibStatus(char *lib)
   {
     return FALSE;
   }
-  return (strcmp(lib,IDPACKAGE(hl)->libname)==0);
+  if ((IDPACKAGE(hl)->language!=LANG_C)&&(IDPACKAGE(hl)->libname!=NULL))
+    return (strcmp(lib,IDPACKAGE(hl)->libname)==0);
+  return FALSE;
 }
 
 /*2
