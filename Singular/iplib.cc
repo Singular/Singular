@@ -70,7 +70,7 @@ char mytolower(char c);
 /*2
 * return TRUE if the libray libname is already loaded
 */
-BOOLEAN iiGetLibStatus(char *lib)
+BOOLEAN iiGetLibStatus(const char *lib)
 {
   idhdl hl;
 
