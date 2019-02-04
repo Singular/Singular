@@ -61,8 +61,6 @@ lpPower;
 */
 
 LIB "qhmoduli.lib"; // for Max
-LIB "bfun.lib"; // for inForm
-LIB "fpadim.lib"; // for intvec conversion
 LIB "fpalgebras.lib"; // for compatibility
 
 /* very fast and cheap test of consistency and functionality
