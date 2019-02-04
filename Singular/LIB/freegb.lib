@@ -387,7 +387,7 @@ PURPOSE: tests if there is a polynomial q in I with LM(q)|LM(p)
 EXAMPLE: example lpLmDivides; shows examples
 "
 {
-  ERROR(" freegb.so not loaded");
+  ERROR(" freealgebra.so not loaded");
 }
 example
 {
@@ -409,7 +409,7 @@ PURPOSE: returns the variable (as a poly) at position pos of the poly p
 EXAMPLE: example lpVarAt; shows examples
 "
 {
-  ERROR(" freegb.so not loaded");
+  ERROR(" freealgebra.so not loaded");
 }
 example
 {
@@ -1062,7 +1062,7 @@ PURPOSE: creates a letterplace ring with the ordering of r
 EXAMPLE: example freeAlgebra; shows examples
 "
 {
-  ERROR(" freegb.so not loaded");
+  ERROR(" freealgebra.so not loaded");
 }
 example
 {
@@ -3885,5 +3885,5 @@ example
 
 static proc mod_init()
 {
-  LIB"freegb.so";
+  LIB"freealgebra.so";
 }

@@ -1,7 +1,7 @@
 #include "Singular/libsingular.h"
 
 #ifdef HAVE_SHIFTBBA
-static BOOLEAN freegb(leftv res, leftv args) // freeAlgebra
+static BOOLEAN freeAlgebra(leftv res, leftv args)
 {
   const short t1[]={2,RING_CMD,INT_CMD};
   if (iiCheckTypes(args,t1,1))
@@ -143,12 +143,12 @@ static BOOLEAN rightStd(leftv res, leftv h)
 extern "C" int SI_MOD_INIT(freegb)(SModulFunctions* p)
 {
 #ifdef HAVE_SHIFTBBA
-  p->iiAddCproc("freegb.so","freeAlgebra",FALSE,freegb);
-  p->iiAddCproc("freegb.so","lpLmDivides",FALSE,lpLmDivides);
-  p->iiAddCproc("freegb.so","lpVarAt",FALSE,lpVarAt);
-  p->iiAddCproc("freegb.so","stest",TRUE,stest);
-  p->iiAddCproc("freegb.so","btest",TRUE,btest);
-  p->iiAddCproc("freegb.so","rightstd",FALSE,rightStd);
+  p->iiAddCproc("freealgebra.so","freeAlgebra",FALSE,freeAlgebra);
+  p->iiAddCproc("freealgebra.so","lpLmDivides",FALSE,lpLmDivides);
+  p->iiAddCproc("freealgebra.so","lpVarAt",FALSE,lpVarAt);
+  p->iiAddCproc("freealgebra.so","stest",TRUE,stest);
+  p->iiAddCproc("freealgebra.so","btest",TRUE,btest);
+  p->iiAddCproc("freealgebra.so","rightstd",FALSE,rightStd);
 #endif
   return (MAX_TOK);
 }
