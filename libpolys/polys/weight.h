@@ -23,7 +23,7 @@ long totaldegreeWecart_IV(poly p, ring r, const short *w);
 short * iv2array(intvec * iv, const ring R);
 
 // internal:
-extern "C" double (*wFunctional)(int *degw, int *lpol, int npol,
+extern "C" THREAD_VAR double (*wFunctional)(int *degw, int *lpol, int npol,
        double *rel, double wx, double wNsqr);
 extern "C" double wFunctionalBuch(int *degw, int *lpol, int npol,
        double *rel, double wx, double wNsqr);

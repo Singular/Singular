@@ -5330,14 +5330,17 @@ static void WerrorS_dummy(const char *)
 }
 BOOLEAN jjLOAD_TRY(const char *s)
 {
-  void (*WerrorS_save)(const char *s) = WerrorS_callback;
-  WerrorS_callback=WerrorS_dummy;
-  WerrorS_dummy_cnt=0;
-  BOOLEAN bo=jjLOAD(s,TRUE);
-  if (TEST_OPT_PROT && (bo || (WerrorS_dummy_cnt>0)))
-    Print("loading of >%s< failed\n",s);
-  WerrorS_callback=WerrorS_save;
-  errorreported=0;
+  if (!iiGetLibStatus(s))
+  {
+    void (*WerrorS_save)(const char *s) = WerrorS_callback;
+    WerrorS_callback=WerrorS_dummy;
+    WerrorS_dummy_cnt=0;
+    BOOLEAN bo=jjLOAD(s,TRUE);
+    if (TEST_OPT_PROT && (bo || (WerrorS_dummy_cnt>0)))
+      Print("loading of >%s< failed\n",s);
+    WerrorS_callback=WerrorS_save;
+    errorreported=0;
+  }
   return FALSE;
 }
 

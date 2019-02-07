@@ -1,0 +1,185 @@
+diff --git a/Singular/blackbox.cc b/Singular/blackbox.cc
+index bf4cc32f2..15e9fcb12 100644
+--- a/Singular/blackbox.cc
++++ b/Singular/blackbox.cc
+@@ -9,9 +9,9 @@
+ #define MAX_BB_TYPES 256
+ // #define BLACKBOX_DEVEL 1
+ 
+-static blackbox* blackboxTable[MAX_BB_TYPES];
+-static char *    blackboxName[MAX_BB_TYPES];
+-static int blackboxTableCnt=0;
++GLOBAL_VAR static blackbox* blackboxTable[MAX_BB_TYPES];
++GLOBAL_VAR static char *    blackboxName[MAX_BB_TYPES];
++GLOBAL_VAR static int blackboxTableCnt=0;
+ #define BLACKBOX_OFFSET (MAX_TOK+1)
+ blackbox* getBlackboxStuff(const int t)
+ {
+@@ -125,19 +125,28 @@ BOOLEAN blackbox_default_Check(blackbox *,leftv,leftv)
+ }
+ int setBlackboxStuff(blackbox *bb, const char *n)
+ {
+-  int where=-1;
+-  if (MAX_BB_TYPES<=blackboxTableCnt)
++  int where = -1;   
++  for (int i=0;i<MAX_BB_TYPES;i++)      
+   {
+-    // second try, find empty slot from removed bb:
+-    for (int i=0;i<MAX_BB_TYPES;i++)
+-    {
+-      if (blackboxTable[i]==NULL) { where=i; break; }
++    if (blackboxTable[i]!=NULL && strcmp(blackboxName[i],n)==0) {
++      where = i;
++      break;
+     }
+   }
+-  else
+-  {
+-    where=blackboxTableCnt;
+-    blackboxTableCnt++;
++  if (where < 0) {
++    if (MAX_BB_TYPES<=blackboxTableCnt)
++    {
++      // second try, find empty slot from removed bb:
++      for (int i=0;i<MAX_BB_TYPES;i++)
++      {
++        if (blackboxTable[i]==NULL) { where=i; break; }
++      }
++    }
++    else
++    {
++      where=blackboxTableCnt;
++      blackboxTableCnt++;
++    }
+   }
+   if (where==-1)
+   {
+diff --git a/Singular/iplib.cc b/Singular/iplib.cc
+index 130bc1104..0f0f98e97 100644
+--- a/Singular/iplib.cc
++++ b/Singular/iplib.cc
+@@ -59,7 +59,7 @@ void yylprestart (FILE *input_file );
+ int current_pos(int i=0);
+ extern int yylp_errno;
+ extern int yylplineno;
+-extern char *yylp_errlist[];
++extern const char *yylp_errlist[];
+ void print_init();
+ libstackv library_stack;
+ #endif
+@@ -1087,7 +1087,37 @@ int iiAddCprocTop(const char *libname, const char *procname, BOOLEAN pstatic,
+ 
+ /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+ #ifdef HAVE_DYNAMIC_LOADING
+-BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
++#include <map>
++#include <string>
++#include <pthread.h>
++
++STATIC_VAR std::map<std::string, void *> *dyn_modules;
++
++bool registered_dyn_module(char *fullname) {
++  if (dyn_modules == NULL)
++    return false;
++  std::string fname = fullname;
++  return !(dyn_modules->count(fname));
++}
++
++void register_dyn_module(char *fullname, void * handle) {
++  std::string fname = fullname;
++  if (dyn_modules == NULL)
++    dyn_modules = new std::map<std::string, void *>();
++  dyn_modules->insert(std::pair<std::string, void *>(fname, handle));
++}
++
++void close_all_dyn_modules() {
++  for (std::map<std::string, void *>::iterator it = dyn_modules->begin();
++       it != dyn_modules->end();
++       it++)
++  {
++    dynl_close(it->second);
++  }
++  delete dyn_modules;
++  dyn_modules = NULL;
++}
++BOOLEAN load_modules_aux(const char *newlib, char *fullname, BOOLEAN autoexport)
+ {
+ #ifdef HAVE_STATIC
+   WerrorS("mod_init: static version can not load modules");
+@@ -1142,7 +1172,7 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
+     IDPACKAGE(pl)->libname=omStrDup(newlib);
+   }
+   IDPACKAGE(pl)->language = LANG_C;
+-  if (dynl_check_opened(FullName))
++  if (registered_dyn_module(FullName))
+   {
+     if (BVERBOSE(V_LOAD_LIB)) Warn( "%s already loaded as C library", fullname);
+     return FALSE;
+@@ -1177,6 +1207,7 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
+       }
+       currPack->loaded=1;
+       currPack=s; /* reset currPack to previous */
++      register_dyn_module(fullname, IDPACKAGE(pl)->handle);
+       RET=FALSE;
+     }
+     else
+@@ -1192,6 +1223,14 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
+   return RET;
+ #endif /*STATIC */
+ }
++
++BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport) {
++  GLOBAL_VAR static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
++  pthread_mutex_lock(&mutex);
++  BOOLEAN r = load_modules_aux(newlib, fullname, autoexport);
++  pthread_mutex_unlock(&mutex);
++  return r;
++}
+ #endif /* HAVE_DYNAMIC_LOADING */
+ /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+ BOOLEAN load_builtin(const char *newlib, BOOLEAN autoexport, SModulFunc_t init)
+diff --git a/Singular/tesths.cc b/Singular/tesths.cc
+index a4344e18f..8294da86d 100644
+--- a/Singular/tesths.cc
++++ b/Singular/tesths.cc
+@@ -36,6 +36,9 @@
+ 
+ 
+ extern int siInit(char *);
++#ifdef PSINGULAR
++GLOBAL_VAR char *global_argv0;
++#endif
+ 
+ int mmInit( void )
+ {
+@@ -62,6 +65,9 @@ int main(          /* main entry to Singular */
+   omInitRet_2_Info(argv[0]);
+   omInitGetBackTrace();
+ 
++#ifdef PSINGULAR
++  global_argv0 = argv[0];
++#endif
+   siInit(argv[0]);
+   init_signals();
+   #ifdef HAVE_NTL
+diff --git a/libpolys/polys/mod_raw.cc b/libpolys/polys/mod_raw.cc
+index 5ea09fa3c..183aab6e5 100644
+--- a/libpolys/polys/mod_raw.cc
++++ b/libpolys/polys/mod_raw.cc
+@@ -146,6 +146,8 @@ void *dynl_open(
+   char *filename    /* I: filename to load */
+   )
+ {
++  return dlopen(filename, RTLD_NOW|RTLD_GLOBAL);
++#if 0
+ // glibc 2.2:
+   if ((filename==NULL) || (dlopen(filename,RTLD_NOW|RTLD_NOLOAD)==NULL))
+     return(dlopen(filename, RTLD_NOW|RTLD_GLOBAL));
+@@ -154,6 +156,7 @@ void *dynl_open(
+   return NULL;
+ // alternative
+ //    return(dlopen(filename, RTLD_NOW|RTLD_GLOBAL));
++#endif
+ }
+ 
+ void *dynl_sym(void *handle, const char *symbol)

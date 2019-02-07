@@ -1,0 +1,145 @@
+diff --git a/Singular/libparse.cc b/Singular/libparse.cc
+index a62c50fdb..1e6f92611 100644
+--- a/Singular/libparse.cc
++++ b/Singular/libparse.cc
+@@ -28,6 +28,8 @@
+ 
+ #include <stdio.h>
+ 
++#include "globaldefs.h"
++
+ 
+ /* cfront 1.2 defines "c_plusplus" instead of "__cplusplus" */
+ #ifdef c_plusplus
+diff --git a/Singular/scanner.cc b/Singular/scanner.cc
+index 1d779e1da..9e6748a63 100644
+--- a/Singular/scanner.cc
++++ b/Singular/scanner.cc
+@@ -10,6 +10,7 @@
+ 
+ #include <stdio.h>
+ 
++#include "globaldefs.h"
+ 
+ /* cfront 1.2 defines "c_plusplus" instead of "__cplusplus" */
+ #ifdef c_plusplus
+diff --git a/Singular/svd_si.h b/Singular/svd_si.h
+index 0d5c9dfc2..69f6f0f77 100644
+--- a/Singular/svd_si.h
++++ b/Singular/svd_si.h
+@@ -13,6 +13,7 @@ See www.alglib.net or alglib.sources.ru for details.
+ 
+ #include <stdlib.h>
+ #include <math.h>
++#include "globaldefs.h"
+ #include "resources/feFopen.h"
+ #include "kernel/mod2.h"
+ 
+diff --git a/factory/cf_defs.h b/factory/cf_defs.h
+index ba1645515..7ba0ffbd9 100644
+--- a/factory/cf_defs.h
++++ b/factory/cf_defs.h
+@@ -9,6 +9,7 @@
+ #ifndef INCL_CF_DEFS_H
+ #define INCL_CF_DEFS_H
+ 
++#include "../Singular/globaldefs.h"
+ // #include "config.h"
+ 
+ /*BEGINPUBLIC*/
+diff --git a/factory/cf_globals.h b/factory/cf_globals.h
+index 8fd986e59..75d45c85b 100644
+--- a/factory/cf_globals.h
++++ b/factory/cf_globals.h
+@@ -3,6 +3,8 @@
+ #ifndef INCL_CF_GLOBALS_H
+ #define INCL_CF_GLOBALS_H
+ 
++#include "../Singular/globaldefs.h"
++
+ //{{{ docu
+ //
+ // cf_globals.h - header to cf_globals.cc.
+diff --git a/factory/cf_switches.cc b/factory/cf_switches.cc
+index e4ed64842..7d4d39df0 100644
+--- a/factory/cf_switches.cc
++++ b/factory/cf_switches.cc
+@@ -14,8 +14,8 @@
+ #include "config.h"
+ 
+ 
+-#include "cf_switches.h"
+ #include "cf_defs.h"
++#include "cf_switches.h"
+ 
+ /** CFSwitches::CFSwitches ()
+  *
+diff --git a/factory/cf_util.cc b/factory/cf_util.cc
+index acd04c253..2aa5fb6c9 100644
+--- a/factory/cf_util.cc
++++ b/factory/cf_util.cc
+@@ -12,6 +12,7 @@
+ **/
+ 
+ 
++#include "../Singular/globaldefs.h"
+ #include "config.h"
+ 
+ 
+diff --git a/factory/debug.cc b/factory/debug.cc
+index 886ee6756..7509b83dc 100644
+--- a/factory/debug.cc
++++ b/factory/debug.cc
+@@ -1,4 +1,5 @@
+ /* emacs edit mode for this file is -*- C++ -*- */
++#include "../Singular/globaldefs.h"
+ 
+ STATIC_VAR int deb_level = -1;
+ VAR char * deb_level_msg = (char *)"";
+diff --git a/gfanlib/gfanlib_circuittableint.h b/gfanlib/gfanlib_circuittableint.h
+index 730fd7190..3bf5cab7f 100644
+--- a/gfanlib/gfanlib_circuittableint.h
++++ b/gfanlib/gfanlib_circuittableint.h
+@@ -8,6 +8,8 @@
+ #ifndef GFANLIB_CIRCUITTABLEINT_H_
+ #define GFANLIB_CIRCUITTABLEINT_H_
+ 
++#include "../Singular/globaldefs.h"
++
+ #include <cstdint>
+ #include <exception>
+ #include <sstream>
+diff --git a/libpolys/misc/auxiliary.h b/libpolys/misc/auxiliary.h
+index 9bd51777b..d1ee2fc0f 100644
+--- a/libpolys/misc/auxiliary.h
++++ b/libpolys/misc/auxiliary.h
+@@ -19,6 +19,8 @@
+ /* please include libpolysconfig.h exclusively via <misc/auxiliary.h> and before any other header */
+ #include "libpolysconfig.h"
+ 
++#include "../Singular/globaldefs.h"
++
+ /* the following cunstruct is to make it painless to add -DHAVE_NUMSTATS to CPPFLAGS for configure */
+ #ifndef HAVE_NUMSTATS
+ /* #define HAVE_NUMSTATS */
+diff --git a/libpolys/misc/sirandom.c b/libpolys/misc/sirandom.c
+index a17ca7148..e067077f1 100644
+--- a/libpolys/misc/sirandom.c
++++ b/libpolys/misc/sirandom.c
+@@ -1,3 +1,4 @@
++#include "misc/auxiliary.h"
+ #include "sirandom.h"
+ 
+ /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+diff --git a/resources/feResource.h b/resources/feResource.h
+index a525d8d05..18096de51 100644
+--- a/resources/feResource.h
++++ b/resources/feResource.h
+@@ -11,6 +11,7 @@
+ #endif
+ 
+ #ifdef __cplusplus
++#include "../Singular/globaldefs.h"
+ /*****************************************************************
+  *
+  * Resource management (feResources.cc)

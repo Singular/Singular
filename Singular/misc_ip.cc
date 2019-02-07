@@ -713,7 +713,7 @@ BOOLEAN setOption(leftv res, leftv v)
   } while (v!=NULL);
 
    // set global variable to show memory usage
-  EXTERN_VAR int om_sing_opt_show_mem;
+  int om_sing_opt_show_mem;
   if (BVERBOSE(V_SHOW_MEM)) om_sing_opt_show_mem = 1;
   else om_sing_opt_show_mem = 0;
 
@@ -1091,7 +1091,7 @@ extern "C" {
  * m2_end is called by sig_term_hdl(). Anyway, the race condition in the first
  * few lines of m2_end() should not matter.
  */
-VAR volatile BOOLEAN m2_end_called = FALSE;
+volatile BOOLEAN m2_end_called = FALSE;
 
 void m2_end(int i)
 {

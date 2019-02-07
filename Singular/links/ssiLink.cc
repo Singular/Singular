@@ -1347,6 +1347,7 @@ leftv ssiRead1(si_link l)
              d->r=ssiReadRing(d);
              if (d->r==NULL) return NULL;
              res->data=(char*)d->r;
+             d->r->ref++;
              res->rtyp=RING_CMD;
              if (t==15) // setring
              {
@@ -1464,7 +1465,7 @@ leftv ssiRead1(si_link l)
   && (currRing!=d->r)
   && (res->RingDependend()))
   {
-    if(ssiSetCurrRing(d->r)) { d->r=currRing; d->r->ref++; }
+    if(ssiSetCurrRing(d->r)) { d->r=currRing; }
   }
   return res;
 no_ring: WerrorS("no ring");

@@ -25,7 +25,9 @@ class MVMachineIntegerOverflow: public std::exception
   }
 };
 
-EXTERN_INST_VAR MVMachineIntegerOverflow MVMachineIntegerOverflow;
+typedef MVMachineIntegerOverflow MVMachineIntegerOverflowType;
+
+EXTERN_INST_VAR MVMachineIntegerOverflowType MVMachineIntegerOverflow;
 
 /*
  * The philosophy here is that if this class overflows, then the computation needs to be restarted. Therefore

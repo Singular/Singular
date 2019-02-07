@@ -1663,6 +1663,10 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
   if (r1 == NULL || r2 == NULL) return FALSE;
   if (r1->cf!=r2->cf) return FALSE;
   if (rVar(r1)!=rVar(r2)) return FALSE;
+  if (r1->bitmask!=r2->bitmask) return FALSE;
+  #ifdef HAVE_SHIFTBBA
+  if (r1->isLPring!=r2->isLPring) return FALSE;
+  #endif
 
   if( !rSamePolyRep(r1, r2) )
     return FALSE;

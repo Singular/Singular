@@ -70,7 +70,7 @@ char mytolower(char c);
 /*2
 * return TRUE if the libray libname is already loaded
 */
-BOOLEAN iiGetLibStatus(char *lib)
+BOOLEAN iiGetLibStatus(const char *lib)
 {
   idhdl hl;
 
@@ -1095,13 +1095,13 @@ int iiAddCprocTop(const char *libname, const char *procname, BOOLEAN pstatic,
 #include <string>
 #include <pthread.h>
 
-STATIC_VAR std::map<std::string, void *> *dyn_modules;
+THREAD_VAR std::map<std::string, void *> *dyn_modules;
 
 bool registered_dyn_module(char *fullname) {
   if (dyn_modules == NULL)
     return false;
   std::string fname = fullname;
-  return !(dyn_modules->count(fname));
+  return dyn_modules->count(fname) != 0;
 }
 
 void register_dyn_module(char *fullname, void * handle) {
