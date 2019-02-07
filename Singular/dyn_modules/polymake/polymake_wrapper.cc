@@ -1978,11 +1978,11 @@ extern "C" int SI_MOD_INIT(polymake)(SModulFunctions* p)
   p->iiAddCproc("polymakeInterface.lib","vertexAdjacencyGraph",FALSE,PMvertexAdjacencyGraph);
   p->iiAddCproc("polymakeInterface.lib","vertexEdgeGraph",FALSE,PMvertexEdgeGraph);
 
-  VAR blackbox* b=getBlackboxStuff(polytopeID);
+  blackbox* b=getBlackboxStuff(polytopeID);
   b->blackbox_Op2=bbpolytope_Op2;
 
   init_polymake_help();
-  VAR return MAX_TOK;
+  return MAX_TOK;
 }
 
 #endif /* HAVE_POLYMAKE */

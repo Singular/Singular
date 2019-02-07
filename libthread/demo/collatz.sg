@@ -1,0 +1,40 @@
+LIB "threadtasks.lib";
+
+createTaskSystem(4);
+initWorkersFromString("proc collatz(int n) {
+  int s = 1;
+  int k = n;
+  while (k > 1) {
+    if (k % 2 == 0) {
+      k = k div 2;
+    } else {
+      k = k * 3 + 1;
+    }
+    s++;
+  }
+  return(s);
+}");
+startTaskSystem();
+proc mapFunc(proc fn, list data) {
+  list result;
+  for (int i = 1; i <= size(data); i++) {
+    result[i] = fn(data[i]);
+  }
+}
+list args;
+list tasks;
+list results;
+int n = 10000;
+int i;
+for (i = 1; i <= n; i++) {
+  args[i] = i;
+}
+tasks = apply(args, x->{runTask("collatz", x)});
+results = apply(tasks, getResult);
+int s = 0;
+int k;
+for (i = 1; i <= n; i++) {
+  s = s + results[i];
+}
+printf("Total # of iterations:   %s", s);
+printf("Average # of iterations: %s", (s + n div 2) div n);

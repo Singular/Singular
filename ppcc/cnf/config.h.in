@@ -1,0 +1,29 @@
+#pragma once
+
+#include "config-defs.h"
+
+typedef @Word@ Word;
+typedef @Word8@ Word8;
+typedef @Word16@ Word16;
+typedef @Word32@ Word32;
+typedef @Word64@ Word64;
+typedef @LongWord@ LongWord;
+
+typedef @Int@ Int;
+typedef @Int8@ Int8;
+typedef @Int16@ Int16;
+typedef @Int32@ Int32;
+typedef @Int64@ Int64;
+typedef @LongInt@ LongInt;
+
+@if HAVE_OFF_T
+typedef @Offset@ Offset;
+@endif
+
+#ifdef HAVE_DIRENT_H
+#define HAVE_DIR_SUPPORT
+#endif
+
+#define LONG_FMT "@LONG_FMT@"
+#define WORD_FMT "@WORD_FMT@"
+

@@ -716,8 +716,8 @@ blackbox* pyobject_blackbox(int& tok) {
 
 extern "C" int SI_MOD_INIT(pyobject)(SModulFunctions* psModulFunctions)
 {
-  VAR int tok = -1;
-  VAR blackbox* bbx = pyobject_blackbox(tok);
+  int tok = -1;
+  blackbox* bbx = pyobject_blackbox(tok);
   if (bbx->blackbox_Init != pyobject_Init)
   {
     bbx->blackbox_destroy = pyobject_destroy;
@@ -737,7 +737,7 @@ extern "C" int SI_MOD_INIT(pyobject)(SModulFunctions* psModulFunctions)
     PYOBJECT_ADD_C_PROC(python_eval);
     PYOBJECT_ADD_C_PROC(python_run);
   }
-  VAR return MAX_TOK;
+  return MAX_TOK;
 }
 #undef PYOBJECT_ADD_C_PROC
 

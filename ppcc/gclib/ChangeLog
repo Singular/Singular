@@ -1,0 +1,10 @@
+
+== [2.6] 2010-12-04 ==
+
+* GC_set/get_start_callback: New API functions.
+* GC_allow_register_threads, GC_[un]register_my_thread: Hide in gc.h
+unless multi-threaded mode.
+
+== [2.5] 2009-12-20 ==
+
+* First public release.

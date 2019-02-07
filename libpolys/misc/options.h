@@ -10,8 +10,8 @@
 /*the general set of std-options : si_opt_1(test) */
 /*the general set of verbose-options : si_opt_2(verbose) */
 #ifdef __cplusplus
-extern "C" unsigned si_opt_1; //< NOTE: Original option variable name: test
-extern "C" unsigned si_opt_2; //< NOTE: Original option variable name: verbose
+extern "C" VAR unsigned si_opt_1; //< NOTE: Original option variable name: test
+extern "C" VAR unsigned si_opt_2; //< NOTE: Original option variable name: verbose
 extern "C" BOOLEAN siCntrlc;
 #else
 EXTERN_VAR unsigned si_opt_1;
