@@ -1091,7 +1091,7 @@ extern "C" {
  * m2_end is called by sig_term_hdl(). Anyway, the race condition in the first
  * few lines of m2_end() should not matter.
  */
-VAR volatile BOOLEAN m2_end_called = FALSE;
+volatile BOOLEAN m2_end_called = FALSE;
 
 void m2_end(int i)
 {
