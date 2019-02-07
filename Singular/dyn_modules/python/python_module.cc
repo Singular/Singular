@@ -79,6 +79,6 @@ path.insert(0,'.')\n");
   init_Singular();
 
   psModulFunctions->iiAddCproc(currPack->libname,"python",FALSE, mod_python);
-  VAR return MAX_TOK;
+  return MAX_TOK;
 }
 #endif

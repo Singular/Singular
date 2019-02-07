@@ -1252,6 +1252,6 @@ extern "C" int SI_MOD_INIT(interval)(SModulFunctions* psModulFunctions)
   psModulFunctions->iiAddCproc("rootisolation.lib", "evalPolyAtBox", FALSE,
     evalPolyAtBox);
 
-  VAR return MAX_TOK;
+  return MAX_TOK;
 }
 // vim: spell spelllang=en
