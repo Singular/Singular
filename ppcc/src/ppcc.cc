@@ -159,13 +159,19 @@ int ParseOpt(Str *opt, char *arg) {
 
 void TestOutputExecutable() {
   if (mode == LINK) {
-    Str *path = S("factory/threadsupport.cc");
-    for (Int i = 0; i < 4; i++) {
-      if (FileStat(path)) {
-        ExtraArgs->add(path);
-        return;
-      }
-      path = S("../")->add(path);
+    if (Output && FileExtension(Output)->len() != 0) {
+      return;
+    }
+    Str *path = DirName(ProgramPath());
+    if (path) {
+      path->add("/../Singular/threadsupport.cc");
+      path = NormalizePath(path);
+    }
+    if (path && FileStat(path)) {
+      ExtraArgs->add(path);
+    } else {
+      PrintLn(path);
+      Error("cannot locate ppcc directory");
     }
   }
 }

@@ -17,7 +17,7 @@
 #include "polys/weight.h"
 
 /*0 implementation*/
-extern "C" double (*wFunctional)(int *degw, int *lpol, int npol,
+extern "C" THREAD_VAR double (*wFunctional)(int *degw, int *lpol, int npol,
        double *rel, double wx, double wNsqr);
 extern "C" double wFunctionalMora(int *degw, int *lpol, int npol,
        double *rel, double wx, double wNsqr);

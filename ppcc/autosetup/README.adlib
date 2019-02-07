@@ -1,0 +1,17 @@
+The autosetup version in this directory has been modified in order
+to meet AdLib's needs. All changes can be found in the adlib.patch
+file. They do the following:
+
+* Always rely on the built-in JimTcl implementation and never on
+  system tclsh to ensure that the build is reproducible and does
+  not rely on tclsh-specific details that may not be available
+  everywhere.
+* Do not use ccache. We do not need it, as build times are fast
+  enough, and during deployment we typically build only once,
+  anyway.
+* Prioritize gcc > clang > system cc, g++ > clang++ > system c++.
+  We do not want to accidentally end up with a less powerful
+  C/C++ compiler.
+* Do not prepopulate CFLAGS with "-g -O2". For AdLib, optimization
+  and debug flags go in OPT, not in CFLAGS.
+* Add a missing message to cc-check-tools.

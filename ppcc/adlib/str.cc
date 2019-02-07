@@ -10,6 +10,8 @@ Str *Str::chomp() {
 }
 
 StrArr *Str::split(const char *s, Int n) {
+  if (n == 1)
+    return split(s[0]);
   Arr<Int> *parts = new Arr<Int>();
   parts->add(-n);
   for (Int i = 0; i < _len - n; i++) {
@@ -95,10 +97,15 @@ StrArr *Str::splitLines() {
 Str *StrJoin(StrArr *arr, const char *sep, Int n) {
   if (arr->len() == 0)
     return new Str();
-  Str *result = new Str(arr->len() * (n + 1));
+  Int len = (arr->len() - 1) * n;
+  for (Int i = 0; i < arr->len(); i++) {
+    len += arr->at(i)->len();
+  }
+  Str *result = new Str(len);
   result->add(arr->first());
   for (Int i = 1; i < arr->len(); i++) {
-    result->add(sep, n);
+    if (n >= 0)
+      result->add(sep, n);
     result->add(arr->at(i));
   }
   return result;

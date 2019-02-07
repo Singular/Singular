@@ -57,4 +57,6 @@ void Main() {
   // modulo arithmetic without division.
   Check(sum_tree(tree) * 2 == counter * (counter - 1),
       "stress test memory allocation");
+  Check(NormalizePath(S("/foo/x/../bar/./"))->eq("/foo/bar"), "normalize path");
+  Check(BaseName(ProgramPath())->eq("test1"), "program path");
 }

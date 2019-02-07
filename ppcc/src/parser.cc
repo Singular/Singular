@@ -1,5 +1,6 @@
 #include "adlib/lib.h"
 #include "adlib/map.h"
+#include "adlib/set.h"
 #include "pplex.h"
 
 #ifdef GCC
@@ -17,6 +18,8 @@ static Str *decl_static_var;
 static StrArr *init_list;
 static Dict *class_vars;
 static Dict *class_types;
+static StrSet *type_prefix_set;
+static Dict *namespaced;
 
 enum DeclType {
   ExternDecl,
@@ -36,6 +39,14 @@ INIT(DeclParser, {
   GCVar(init_list, A());
   GCVar(class_vars, new Dict());
   GCVar(class_types, new Dict());
+  GCVar(type_prefix_set, new StrSet());
+  type_prefix_set->add(S("class"));
+  type_prefix_set->add(S("struct"));
+  type_prefix_set->add(S("typedef"));
+  // special treatment for some gfanlib variables for now.
+  GCVar(namespaced, new Dict());
+  namespaced->add(S("MVMachineIntegerOverflow"), S("gfan"));
+  namespaced->add(S("lpSolver"), S("gfan"));
 });
 
 struct State {
@@ -243,8 +254,9 @@ void EmitDecl(Parser *parser, Str *storage_class,
     class_types->add(var_name, parser->token(type_start).str);
   }
   if ((is_class && !is_extern) || init_start >= 0) {
-    if (is_toplevel)
+    if (is_toplevel) {
       init_list->add(var_name);
+    }
     Token var_init = Token(SymGen, var_name->clone()->add("__INIT__"));
     parser->emit(static_token);
     parser->emit(space);
@@ -261,9 +273,9 @@ void EmitDecl(Parser *parser, Str *storage_class,
     if (!is_toplevel && !parser->c_source()) {
       parser->init_count++;
       parser->emit(Token(SymGen, S(
-        "static pSingular_register_init_var(void *, void *, long);"
+        "void pSingular_register_init_var(void *, void *, long);"
         "class %s__CONSTR__ {\n"
-        "  %s__CONSTR__() {\n"
+        "  public: %s__CONSTR__() {\n"
         "    pSingular_register_init_var(&%s, &%s__INIT__, sizeof(%s));\n"
         "  }\n"
         "} %s__AUX__;\n"
@@ -280,7 +292,11 @@ void EmitEpilogue(Parser *parser) {
   for (Int i = 0; i < output->len(); i++) {
     Token &token = output->at(i);
     if (token.sym == SymIdent && class_vars->contains(token.str)) {
-      token.str = class_vars->at(token.str);
+      Int j = i-1;
+      while (j >= 0 && TEST(SymsWS | BIT(SymAst), output->at(j).sym))
+        j--;
+      if (j < 0 || !type_prefix_set->contains(output->at(j).str))
+        token.str = class_vars->at(token.str);
     }
   }
   if (init_list->len() == 0)
@@ -317,6 +333,10 @@ void EmitEpilogue(Parser *parser) {
     Str *var_name = init_list->at(i);
     if (class_vars->contains(var_name)) {
       Str *type = class_types->at(var_name);
+      if (namespaced->contains(var_name)) {
+        type = namespaced->at(var_name)->clone()->add("::")->add(type);
+        var_name = namespaced->at(var_name)->clone()->add("::")->add(var_name);
+      }
       init_part->add(S(
         "  %s = (%c *)pSingular_alloc_var((long)sizeof(%c));\n"
         "  pSingular_init_var(%s, &%s__INIT__, (long) sizeof(%s));\n"
@@ -373,7 +393,7 @@ void TransformVarDecl(Parser *parser, Str *storage_class,
   for(;;) {
     Int var_pos = -1, var_start = -1, var_end = -1;
     var_start = parser->current_pos();
-    parser->skip_while(SymsTypePrefix | BIT(SymWS));
+    parser->skip_while(SymsTypePrefix | BIT(SymWS) | BIT(SymClass));
     if (TEST(SymsEndDecl | BIT(SymLBrkt), parser->current_sym())) {
       // We are one symbol past the initial variable identifier.
       var_pos = parser->find_back_until(BIT(SymIdent));
@@ -480,6 +500,7 @@ TokenList *Transform(SourceFile *source) {
       case SymRBrace:
         if (toplevel->len() > 0)
           toplevel->pop();
+        tl = 0;
         parser->advance();
         break;
       case SymEOF:

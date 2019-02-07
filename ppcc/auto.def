@@ -116,8 +116,8 @@ proc def-int-type {name prefix size} {
 
 proc check-tmp-flags {flags} {
   msg-checking "Checking whether the C++ compiler accepts $flags..."
-  set iquote [cctest -cflags "-iquote ."]
-  if {$iquote} {
+  set works [cctest -cflags $flags]
+  if {$works} {
     msg-result yes
     return 1
   } else {
@@ -191,8 +191,6 @@ cc-with {-lang c++} {
     define WORD_FMT ""
   }
   cc-check-includes dirent.h
-  # -iquote vs. -I
-  set iquote [check-tmp-flags "-iquote"]
   define OPT ""
   foreach opt {{-g -O2} {-g -O} {-g}} {
     if {[check-tmp-flags $opt]} {
@@ -286,7 +284,7 @@ set libsrc {}
 set libobj {}
 set adlibsrc [glob adlib/*.cc]
 if {!$boehm} {
-  lappend adlibsrc "gclib/tinygc.c"
+  lappend adlibsrc "gclib/gc.c"
 }
 
 foreach file $adlibsrc {
@@ -322,6 +320,7 @@ set libhdr "[glob adlib/*.h] [glob gclib/*.h] adlib/config.h"
 set libhdr [lsort -unique $libhdr]
 set progre [glob -nocomplain src/*.re]
 set proghdr [glob -nocomplain src/*.h]
+set testsrc [lsort -unique $testsrc]
 set gensrc {}
 foreach file $progre {
   lappend progsrc "[file rootname $file].cc"

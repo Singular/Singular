@@ -1,0 +1,29 @@
+#ifndef _CONFIG_DEFS_H
+#define _CONFIG_DEFS_H
+#define HAVE_64BIT_SUPPORT 1
+#define HAVE_DIRENT_H 1
+#define HAVE_ISATTY 1
+#define HAVE_LONG_LONG 1
+#define HAVE_OFF_T 1
+#define HAVE_STDLIB_H 1
+#define HAVE_SYS_TYPES_H 1
+#define HAVE_UNISTD_H 1
+#define SIZEOF_CHAR 1
+#define SIZEOF_INT 8
+#define SIZEOF_INT16 2
+#define SIZEOF_INT32 4
+#define SIZEOF_INT64 8
+#define SIZEOF_INT8 1
+#define SIZEOF_LONG 8
+#define SIZEOF_LONG_LONG 8
+#define SIZEOF_OFFSET 8
+#define SIZEOF_OFF_T 8
+#define SIZEOF_SHORT 2
+#define SIZEOF_VOID_P 8
+#define SIZEOF_WORD 8
+#define SIZEOF_WORD16 2
+#define SIZEOF_WORD32 4
+#define SIZEOF_WORD64 8
+#define SIZEOF_WORD8 1
+/* #undef USE_BOEHM_GC */
+#endif

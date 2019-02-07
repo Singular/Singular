@@ -8,5 +8,5 @@
 #include "gfanlib_circuittableint.h"
 
 namespace gfan{
-INST_VAR class MVMachineIntegerOverflow MVMachineIntegerOverflow;
+INST_VAR MVMachineIntegerOverflowType MVMachineIntegerOverflow;
 }

@@ -1,12 +1,14 @@
-This license applies to all parts of this software project that are not
-third-party libraries. The third-party libraries are:
+The AdLib system is distributed under the terms of the Boost Software
+License 1.0 (see below). This license applies to all files in this directory
+or any of its subdirectories that are not third-party libraries. The
+following parts are third-party libraries:
 
-* The Tiny GC garbage collector (comprising all files in the gclib
-  directory).
-* The autosetup code (comprising all files in the autosetup directory).
+* The Tiny GC garbage collector and Doug Lea's malloc() implementation
+  (comprising the files in the gclib directory).
+* The autosetup code (comprising the files in the autosetup directory).
 
-These libraries have their own licenses whose terms differ from the
-terms below.
+These third-party libraries have their own licenses whose terms differ from
+those of the Boost Software License.
 
 ---------------------------------------------------------------------------
 Boost Software License - Version 1.0 - August 17th, 2003
@@ -33,5 +35,4 @@ FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 ---------------------------------------------------------------------------
-
 

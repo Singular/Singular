@@ -21,6 +21,6 @@ void Main() {
   Check(System(S("exit"), StrArrLit(args)) == 17, "invoke shell");
   Check(ListFiles(".")->len() > 0, "reading directories");
   StrSet *files = new StrSet(ListFiles("adlib"));
-  files = new StrSet(ListFileTree(Pwd(), ListFilesRelative));
+  files = new StrSet(ListFileTree(CurrentDir(), ListFilesRelative));
   Check(files->contains(S(__FILE__)), "reading directories recursively");
 }
