@@ -3478,7 +3478,7 @@ SEE ALSO: ncfactor
   }
   def r = basering;
   list factorizeOutput;
-  if (size(ringlist(basering))<=4 && ( !(attrib(r, "isLetterplaceRing") >= 1) ) )
+  if (size(ringlist(basering))<=4 && (attrib(r, "isLetterplaceRing") == 0) )
   {//commutative ring case
     dbprint(p,dbprintWhitespace + "We are in a commutative ring. Factoring h using factorize.");
     factorizeOutput = factorize(h);
@@ -3486,7 +3486,7 @@ SEE ALSO: ncfactor
   else
   {//commutative subring case;
     dbprint(p,dbprintWhitespace + "We are in a commutative subring. Generating commutative ring.");
-    if ( !(attrib(r, "isLetterplaceRing") >= 1) )
+    if (attrib(r, "isLetterplaceRing") == 0)
     {//G-algebra case
       def rList = ringlist(basering);
       rList = delete(rList,5);
