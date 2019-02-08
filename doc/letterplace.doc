@@ -478,23 +478,6 @@ References:
 
 [L14]: Roberto La Scala, "Extended letterplace correspondence for nongraded noncommutative ideals and related algorithms", International Journal of Algebra and Computation, Volume 24, Number 08, Pages 1157-1182, 2014, see also @url{https://doi.org/10.1142/S0218196714500519}.
 
-
-@c ---------------------------------------------------------------------------
-@node Data types BR_LETTERPLACE_BR
-@section Data types BR_LETTERPLACE_BR
-@cindex Data types BR_LETTERPLACE_BR
-
-@menu
-* ideal BR_LETTERPLACE_BR::
-@c * map BR_LETTERPLACE_BR::
-@c * module BR_LETTERPLACE_BR::
-* poly BR_LETTERPLACE_BR::
-* qring BR_LETTERPLACE_BR::
-* ring BR_LETTERPLACE_BR::
-@end menu
-
-@c TODO Data types!
-
 @c ---------------------------------------------------------------------------
 
 @node Functions BR_LETTERPLACE_BR
@@ -514,21 +497,45 @@ Note, that both @strong{Control structures} and @strong{System variables} of
 @sc{Letterplace} are the same as of @sc{Singular} (see @ref{Control structures}, @ref{System variables}).
 
 @menu
-@c * bracket::
-@c * fetch BR_LETTERPLACE_BR::
-@c * imap BR_LETTERPLACE_BR::
-@c intersect BR_LETTERPLACE_BR::
-@c * modulo BR_LETTERPLACE_BR::
-@c * oppose::
-@c * opposite::
+* freeAlgebra BR_LETTERPLACE_BR::
 * reduce BR_LETTERPLACE_BR::
-@c * ringlist BR_LETTERPLACE_BR::
 * std BR_LETTERPLACE_BR::
 * twostd BR_LETTERPLACE_BR::
 @end menu
 
 @c ------------------------------
-@node reduce BR_LETTERPLACE_BR, std BR_LETTERPLACE_BR, , Functions BR_LETTERPLACE_BR
+@node freeAlgebra BR_LETTERPLACE_BR, reduce BR_LETTERPLACE_BR, , Functions BR_LETTERPLACE_BR
+@subsection freeAlgebra BR_LETTERPLACE_BR
+@cindex freeAlgebra BR_LETTERPLACE_BR
+
+@table @code
+@item @strong{Syntax:}
+@*@code{freeAlgebra(} ring_expression r, int_expression d @code{)}
+@item @strong{Type:}
+ring
+@item @strong{Purpose:}
+Creates a free (letterplace) ring with the variables of the ring @code{r} up to
+the degree (length) bound @code{d}, with the monomial ordering, determined 
+by those on the ring @code{r}.
+@item @strong{Example:}
+@smallexample
+ring r = 0,(x,y,z),dp;
+def R = freeAlgebra(r, 7); // this ordering is degree right lex
+R;
+ring r2 = 0,(x,y,z),lp;
+def R2 = freeAlgebra(r2, 7); // note, that this ordering is NOT left or right lex
+R2;
+@c example
+@c example
+@end smallexample
+@end table
+@c ref
+See @ref{Monomial orderings on free algebras}.
+@c ref
+
+
+@c ------------------------------
+@node reduce BR_LETTERPLACE_BR, std BR_LETTERPLACE_BR, freeAlgebra BR_LETTERPLACE_BR, Functions BR_LETTERPLACE_BR
 @subsection reduce BR_LETTERPLACE_BR
 @cindex reduce BR_LETTERPLACE_BR
 @cindex NF BR_LETTERPLACE_BR
@@ -544,8 +551,8 @@ Note, that both @strong{Control structures} and @strong{System variables} of
 @item @strong{Type:}
 the type of the first argument
 @item @strong{Purpose:}
-reduces a polynomial, vector, or ideal to its @strong{two-sided} normal form with
-respect to an ideal represented by a two-sided Groebner basis, if the second argument is such a basis.
+reduces a polynomial, vector, or ideal (the first argument) to its @strong{two-sided} normal form with
+respect to the second argument, meant to be an ideal, represented by its two-sided Groebner basis.
 @*returns 0 if and only if the polynomial (resp.@: vector, ideal)
 is an element (resp.@: subideal) of the ideal.
 @*Otherwise, the result may have no meaning.
@@ -555,13 +562,14 @@ The commands @code{reduce} and @code{NF} are synonymous.
 @item @strong{Example:}
 @smallexample
 @c example
+LIB "freegb.lib";
 ring r = 0,(x,y),dp;
 def R = freeAlgebra(r,5); setring R;
 ideal I = x*x + y*y - 1; // 2D sphere
 ideal J = twostd(I); // computes a two-sided Groebner basis
 J; // it is finite and nice
 poly g = x*y*y - y*y*x;
-reduce(g,J); // hence g belongs to J
+reduce(g,J); // 0, hence g belongs to J
 poly h = x*y*y*x - y*x*x;
 reduce(h,J); // the rest of two-sided division of h by J
 @c example
@@ -570,7 +578,7 @@ reduce(h,J); // the rest of two-sided division of h by J
 
 @c ref
 See also
-@ref{ideal BR_LETTERPLACE_BR};
+@c @ref{ideal BR_LETTERPLACE_BR};
 @ref{twostd BR_LETTERPLACE_BR}.
 @c ref
 
@@ -607,6 +615,7 @@ See @ref{std}
 @item @strong{Example:}
 @smallexample
 @c example
+LIB "freegb.lib";
 ring r = 3,(x,d),dp; // notice: we work over Z/3Z
 def R = freeAlgebra(r,5); setring R;
 ideal I = x^4, d^3, d*x - x*d - 1;
@@ -616,7 +625,6 @@ twostd(J); // the whole ring
 @c example
 @end smallexample
 @end table
-@c -------------------------------------------------------------------------
 
 @c ---------------------------------------------------------------------------
 @node LETTERPLACE libraries
