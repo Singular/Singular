@@ -413,8 +413,8 @@ The weights of variables are determined by the current monomial ordering.
 Restrictions/conventions of the @sc{Letterplace} subsystem:
 @itemize
 @item Since free algebra is not Noetherian, one has to define an explicit degree (length) bound,
-up to which a partial Groebner basis will be computed. Note, that @code{freeAlgebra} call stores the bound 
-in the structure of the ring it creates. Thus running @code{twostd} or @code{std} in such a
+up to which a partial Groebner basis will be computed. Note, that @code{freeAlgebra (letterplace)} call stores the bound 
+in the structure of the ring it creates. Thus running @code{twostd (letterplace)} or @code{std (letterplace)} in such a
 ring does not require the degree bound in its argument.
 @item The options @code{redSB, redTail} are effective for Groebner basis computations,
 @item The options @code{prot, mem} are effective for the whole @sc{Letterplace} subsystem. 
@@ -423,7 +423,7 @@ ring does not require the degree bound in its argument.
 Operations for polynomials in Letterplace rings are @code{+} (addition),
 @code{-} (subtraction), @code{*} (multiplication) and @code{^} (power).
 
-Functions for objects from Letterplace rings are: @ref{twostd}, @ref{std}, @ref{maxideal}, @ref{reduce}.
+Functions for objects from Letterplace rings are: @ref{twostd (letterplace)}, @ref{std (letterplace)}, @ref{maxideal (letterplace)}, @ref{reduce (letterplace)}.
 
 Further functionality is provided in the libraries for the @sc{Letterpace} subsystem.
 
@@ -499,6 +499,7 @@ Note, that both @strong{Control structures} and @strong{System variables} of
 @menu
 * freeAlgebra BR_LETTERPLACE_BR::
 * reduce BR_LETTERPLACE_BR::
+* rightstd BR_LETTERPLACE_BR::
 * std BR_LETTERPLACE_BR::
 * twostd BR_LETTERPLACE_BR::
 @end menu
@@ -581,6 +582,34 @@ See also
 @c @ref{ideal BR_LETTERPLACE_BR};
 @ref{twostd BR_LETTERPLACE_BR}.
 @c ref
+
+@c ------------------------------
+@node rightstd BR_LETTERPLACE_BR, std BR_LETTERPLACE_BR, reduce BR_LETTERPLACE_BR, Functions BR_LETTERPLACE_BR
+@subsection rightstd BR_LETTERPLACE_BR
+@cindex rightstd BR_LETTERPLACE_BR
+@table @code
+@item @strong{Syntax:}
+  @code{rightstd(} ideal_expression@code{)};
+@item @strong{Type:}
+ideal
+@item @strong{Purpose:}
+Compute a right Groebner basis of the set of generators of the input ideal. 
+It is also effective in factor rings.
+@end table
+@smallexample
+@c example
+LIB "freegb.lib";
+ring r = 0,(x,z),dp; 
+def R = freeAlgebra(r,7); setring R;
+ideal I = z,x*z,x*x*z;
+rightstd(I); // a right GB of I in K<x,z>
+qring Q = twostd(x*z); // now we change to the factor algebra modulo x*z
+ideal I = imap(R,I);
+rightstd(I); // a right GB in a factor algebra
+reduce(I,twostd(0)); // an explanation for the latter
+@c example
+@end smallexample
+@end table
 
 
 @c ------------------------------

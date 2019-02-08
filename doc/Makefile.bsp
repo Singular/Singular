@@ -133,23 +133,23 @@ all: info dvi html singular.idx
 # info stuff
 info: singular.hlp
 
-singular.hlp: ${MANUAL_FILES} singular.tex s-plural.tex s-plulibs.tex
+singular.hlp: ${MANUAL_FILES} singular.tex s-plural.tex s-plulibs.tex s-letterplace.tex
 	- ${MAKEINFO} --no-split singular.tex
 
 # dvi stuff
 dvi: manual.dvi usercard.dvi
 
-singular.dvi: ${MANUAL_FILES} singular.tex s-plural.tex s-plulibs.tex
+singular.dvi: ${MANUAL_FILES} singular.tex s-plural.tex s-plulibs.tex s-letterplace.tex
 	tex singular.tex
 	texindex singular.cp
 	tex singular.tex
 	texindex singular.cp
 	tex singular.tex
 
-singular.pdf: ${MANUAL_FILES} singular.tex s-plural.tex s-plulibs.tex
+singular.pdf: ${MANUAL_FILES} singular.tex s-plural.tex s-plulibs.tex s-letterplace.tex
 	${TEXI2PDF} singular.tex
 
-manual.dvi: ${MANUAL_FILES} manual.tex s-plural.tex s-plulibs.tex
+manual.dvi: ${MANUAL_FILES} manual.tex s-plural.tex s-plulibs.tex  s-letterplace.tex
 	tex manual.tex
 	texindex manual.cp
 	tex manual.tex
@@ -173,6 +173,9 @@ s-plural.tex: plural.tex
 s-plulibs.tex: plulibs.tex
 	sed -e "s/BR_PLURAL_BR/(plural)/g" <plulibs.tex >s-plulibs.tex
 
+s-letterplace.tex: letterplace.tex
+	sed -e "s/BR_LETTERPLACE_BR/(letterplace)/g" <letterplace.tex >s-letterplace.tex
+	
 # postscript stuff
 ps: dvi manual.ps usercard.ps
 
@@ -269,7 +272,7 @@ install-standalone: standalone
 # html targets
 #
 html: ${TMP_DIR} ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${IMAGES_HTML} $(STANDALONE_TEXI_FILES)
-${HTML_SUBDIR}/${HTML_MANUAL_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} singular.tex s-plural.tex
+${HTML_SUBDIR}/${HTML_MANUAL_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} singular.tex s-plural.tex s-letterplace.tex
 	${PERL} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_MANUAL_PREFIX} \
         -top_file ${HTML_MANUAL_TOP} singular.tex
 
@@ -383,7 +386,7 @@ mostlyclean:
 	/bin/rm -f Z* *.tst *.pag *.dir *.lst *.log *.aux *.cp *.cps
 	/bin/rm -f *.fn *.fns *.ky *.kys *.log *.pg *.pgs *.toc *.tp
 	/bin/rm -f *.tps *.vr *.vrs *.dvi *.ps
-	/bin/rm -f s-plural.tex
+	/bin/rm -f s-plural.tex s-plulibs.tex s-letterplace.tex
 	/bin/rm -f singular.hlp manual.hlp  ${DOC2TEX_FILES} singular.idx
 	/bin/rm -f manual.hlp
 	/bin/rm -f ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${HTML_SUBDIR}/${HTML_TUTOR_TOP}
