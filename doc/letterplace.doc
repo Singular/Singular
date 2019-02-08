@@ -53,7 +53,6 @@ spanned by all monomials of @strong{length} at most @math{d}.
 * References and history::
 @end menu
 
-
 @c ---------------------------------------------------------------------------
 @node Free associative algebras, Monomial orderings on free algebras, , LETTERPLACE
 @subsection Free associative algebras
@@ -228,7 +227,7 @@ The monomial ordering \texttt{rp} corresponds to $<_n$ and eliminates $\{x_j,\ld
 Let @math{w^i} be weights uniquely determined by @math{w^i(x_j)=\d^i_j}$ for @math{1}<=@math{i},@math{j}<=@math{n} where @math{d} denotes the Kronecker delta. Let @math{<_1} be the @math{w^n}-weight extension of the left lexicographical ordering on <@math{X}> and inductively @math{<_i} be the @math{w^i}-weight extension of @math{<_i-1} for all @math{1}<@math{i}<=@math{n}.
 @end ifinfo
 
-The monomial ordering @samp{rp} corresponds to @math{<_n} and eliminates @{@math{x_j},...,@math{x_n}@} for all @math{1 < j <= n}.
+The monomial ordering @samp{rp} corresponds to @math{<_n} and eliminates @{@math{x_j},@dots{},@math{x_n}@} for all @math{1 < j <= n}.
 
 With respect to the ordering @samp{rp}, the test monomials are ordered as follows:
 @math{x_3 x_3 x_3 > x_1 x_2 x_3 > x_3 x_2 x_1 > x_2 x_3 > x_1 x_3 > x_3 x_1 > x_3 > x_2 x_2 > x_2 > x_1 x_1 x_1 > x_1}
@@ -455,12 +454,15 @@ See
 @subsection References and history of @sc{Letterplace}
 
 @sc{Letterplace} has undergone several stages of development. 
+
 The first one, the pure Letterplace implementation for homogeneous
 ideals, was created by V. Levandovskyy and H. Schoenemann in 2007-2009. 
+
 Later in 2010-2014, experiments with advanced
 (among other, with shift-invariant) data structures were performed by
 V. Levandovskyy, B. Schnitzler and G. Studzinski, and new libraries 
 for @math{K}-dimension, @math{K}-bases, and Ufnarovskij graph were written.
+
 The next stage started in 2017, when K. Abou Zeid joined the team of 
 H. Schoenemann and V. Levandovskyy. Those recent activities led to the change 
 of interface to the one, usual in the free algebra. The Letterplace data structure
@@ -476,6 +478,145 @@ References:
 
 [L14]: Roberto La Scala, "Extended letterplace correspondence for nongraded noncommutative ideals and related algorithms", International Journal of Algebra and Computation, Volume 24, Number 08, Pages 1157-1182, 2014, see also @url{https://doi.org/10.1142/S0218196714500519}.
 
+
+@c ---------------------------------------------------------------------------
+@node Data types BR_LETTERPLACE_BR
+@section Data types BR_LETTERPLACE_BR
+@cindex Data types BR_LETTERPLACE_BR
+
+@menu
+* ideal BR_LETTERPLACE_BR::
+@c * map BR_LETTERPLACE_BR::
+@c * module BR_LETTERPLACE_BR::
+* poly BR_LETTERPLACE_BR::
+* qring BR_LETTERPLACE_BR::
+* ring BR_LETTERPLACE_BR::
+@end menu
+
+@c TODO Data types!
+
+@c ---------------------------------------------------------------------------
+
+@node Functions BR_LETTERPLACE_BR
+@section Functions BR_LETTERPLACE_BR
+@cindex commands BR_LETTERPLACE_BR
+
+This chapter gives a complete reference of all functions and commands of the @sc{Letterplace} kernel, i.e. all built-in commands
+(for the numerous @sc{Letterplace} libraries see @ref{LETTERPLACE libraries}).
+
+The general syntax of a function is
+@format
+                   [target =] function_name (<arguments>);
+@end format
+
+
+Note, that both @strong{Control structures} and @strong{System variables} of
+@sc{Letterplace} are the same as of @sc{Singular} (see @ref{Control structures}, @ref{System variables}).
+
+@menu
+@c * bracket::
+@c * fetch BR_LETTERPLACE_BR::
+@c * imap BR_LETTERPLACE_BR::
+@c intersect BR_LETTERPLACE_BR::
+@c * modulo BR_LETTERPLACE_BR::
+@c * oppose::
+@c * opposite::
+* reduce BR_LETTERPLACE_BR::
+@c * ringlist BR_LETTERPLACE_BR::
+* std BR_LETTERPLACE_BR::
+* twostd BR_LETTERPLACE_BR::
+@end menu
+
+@c ------------------------------
+@node reduce BR_LETTERPLACE_BR, std BR_LETTERPLACE_BR, , Functions BR_LETTERPLACE_BR
+@subsection reduce BR_LETTERPLACE_BR
+@cindex reduce BR_LETTERPLACE_BR
+@cindex NF BR_LETTERPLACE_BR
+@table @code
+@item @strong{Syntax:}
+@code{reduce (} poly_expression@code{,} ideal_expression @code{)}
+@*@code{reduce (} poly_expression@code{,} ideal_expression@code{,} int_expression @code{)}
+@*@code{reduce (} vector_expression@code{,} ideal_expression @code{)}
+@*@code{reduce (} vector_expression@code{,} ideal_expression@code{,} int_expression @code{)}
+@*@code{reduce (} vector_expression@code{,} module_expression@code{,} int_expression @code{)}
+@*@code{reduce (} ideal_expression@code{,} ideal_expression @code{)}
+@*@code{reduce (} ideal_expression@code{,} ideal_expression@code{,} int_expression @code{)}
+@item @strong{Type:}
+the type of the first argument
+@item @strong{Purpose:}
+reduces a polynomial, vector, or ideal to its @strong{two-sided} normal form with
+respect to an ideal represented by a two-sided Groebner basis, if the second argument is such a basis.
+@*returns 0 if and only if the polynomial (resp.@: vector, ideal)
+is an element (resp.@: subideal) of the ideal.
+@*Otherwise, the result may have no meaning.
+@*The third (optional) argument 1 of type int forces a reduction which considers only the leading term and does no tail reduction.
+@item @strong{Note:}
+The commands @code{reduce} and @code{NF} are synonymous.
+@item @strong{Example:}
+@smallexample
+@c example
+ring r = 0,(x,y),dp;
+def R = freeAlgebra(r,5); setring R;
+ideal I = x*x + y*y - 1; // 2D sphere
+ideal J = twostd(I); // computes a two-sided Groebner basis
+J; // it is finite and nice
+poly g = x*y*y - y*y*x;
+reduce(g,J); // hence g belongs to J
+poly h = x*y*y*x - y*x*x;
+reduce(h,J); // the rest of two-sided division of h by J
+@c example
+@end smallexample
+@end table
+
+@c ref
+See also
+@ref{ideal BR_LETTERPLACE_BR};
+@ref{twostd BR_LETTERPLACE_BR}.
+@c ref
+
+
+@c ------------------------------
+@node std BR_LETTERPLACE_BR, twostd BR_LETTERPLACE_BR, reduce BR_LETTERPLACE_BR, Functions BR_LETTERPLACE_BR
+@subsection std BR_LETTERPLACE_BR
+@cindex std BR_LETTERPLACE_BR
+@table @code
+@item @strong{Syntax:}
+  @code{std(} ideal_expression@code{)};
+@item @strong{Type:}
+ideal
+@item @strong{Purpose:}
+Alias to @ref{twostd}.
+@end table
+
+@c ------------------------------
+@node twostd BR_LETTERPLACE_BR, , std BR_LETTERPLACE_BR, Functions BR_LETTERPLACE_BR
+@subsection twostd BR_LETTERPLACE_BR
+@cindex twostd BR_LETTERPLACE_BR
+
+@table @code
+@item @strong{Syntax:}
+  @code{twostd(} ideal_expression@code{)};
+@item @strong{Type:}
+ideal
+@item @strong{Purpose:}
+returns a two-sided Groebner basis of the two-sided ideal,
+generated by the input, which is treated as a set of two-sided generators.
+@ifset singularmanual
+See @ref{std}
+@end ifset
+@item @strong{Example:}
+@smallexample
+@c example
+ring r = 3,(x,d),dp; // notice: we work over Z/3Z
+def R = freeAlgebra(r,5); setring R;
+ideal I = x^4, d^3, d*x - x*d - 1;
+twostd(I); // a proper ideal, note x^3 as a generator
+ideal J = x^2, d^3, d*x - x*d - 1; 
+twostd(J); // the whole ring
+@c example
+@end smallexample
+@end table
+@c -------------------------------------------------------------------------
 
 @c ---------------------------------------------------------------------------
 @node LETTERPLACE libraries
