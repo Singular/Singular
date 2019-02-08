@@ -123,19 +123,6 @@ static BOOLEAN lpVarAt(leftv res, leftv h)
   }
   else return TRUE;
 }
-
-static BOOLEAN rightStd(leftv res, leftv h)
-{
-  const short t[]={1,IDEAL_CMD};
-  if (iiCheckTypes(h,t,1))
-  {
-    ideal id=(ideal)h->Data();
-    res->rtyp = IDEAL_CMD;
-    res->data = rightgb(id, currRing->qideal);
-    return FALSE;
-  }
-  return TRUE;
-}
 #endif
 
 //------------------------------------------------------------------------
@@ -148,7 +135,6 @@ extern "C" int SI_MOD_INIT(freegb)(SModulFunctions* p)
   p->iiAddCproc("freealgebra.so","lpVarAt",FALSE,lpVarAt);
   p->iiAddCproc("freealgebra.so","stest",TRUE,stest);
   p->iiAddCproc("freealgebra.so","btest",TRUE,btest);
-  p->iiAddCproc("freealgebra.so","rightstd",FALSE,rightStd);
 #endif
   return (MAX_TOK);
 }

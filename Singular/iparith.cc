@@ -43,6 +43,7 @@
 #include "kernel/GBEngine/kstdfac.h"
 #include "kernel/GBEngine/syz.h"
 #include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/kutil.h"
 #include "kernel/GBEngine/units.h"
 #include "kernel/GBEngine/tgb.h"
 
@@ -5115,7 +5116,65 @@ static BOOLEAN jjTWOSTD(leftv res, leftv a)
   return FALSE;
 }
 #endif
+#ifdef HAVE_SHIFTBBA // do not place above jjSTD in this file because we need to reference it
+static BOOLEAN jjRIGHTSTD(leftv res, leftv v)
+{
+  if (rIsLPRing(currRing))
+  {
+    if (rField_is_numeric(currRing))
+      WarnS("groebner base computations with inexact coefficients can not be trusted due to rounding errors");
+    ideal result;
+    ideal v_id=(ideal)v->Data();
+    /* intvec *w=(intvec *)atGet(v,"isHomog",INTVEC_CMD); */
+    /* tHomog hom=testHomog; */
+    /* if (w!=NULL) */
+    /* { */
+    /*   if (!idTestHomModule(v_id,currRing->qideal,w)) */
+    /*   { */
+    /*     WarnS("wrong weights"); */
+    /*     w=NULL; */
+    /*   } */
+    /*   else */
+    /*   { */
+    /*     hom=isHomog; */
+    /*     w=ivCopy(w); */
+    /*   } */
+    /* } */
+    /* result=kStd(v_id,currRing->qideal,hom,&w); */
+    result = rightgb(v_id, currRing->qideal);
+    idSkipZeroes(result);
+    res->data = (char *)result;
+    if(!TEST_OPT_DEGBOUND) setFlag(res,FLAG_STD);
+    /* if (w!=NULL) atSet(res,omStrDup("isHomog"),w,INTVEC_CMD); */
+    return FALSE;
+  }
+  else if (rIsPluralRing(currRing))
+  {
+    ideal I=(ideal)v->Data();
 
+    ring A = currRing;
+    ring Aopp = rOpposite(A);
+    currRing = Aopp;
+    ideal Iopp = idOppose(A, I, Aopp);
+    ideal Jopp = kStd(Iopp,currRing->qideal,testHomog,NULL);
+    currRing = A;
+    ideal J = idOppose(Aopp, Jopp, A);
+
+    id_Delete(&Iopp, Aopp);
+    id_Delete(&Jopp, Aopp);
+    rDelete(Aopp);
+
+    idSkipZeroes(J);
+    res->data = (char *)J;
+    if(!TEST_OPT_DEGBOUND) setFlag(res,FLAG_STD);
+    return FALSE;
+  }
+  else
+  {
+    return jjSTD(res, v);
+  }
+}
+#endif
 static BOOLEAN jjTYPEOF(leftv res, leftv v)
 {
   int t=(int)(long)v->data;
