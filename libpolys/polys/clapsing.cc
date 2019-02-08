@@ -83,6 +83,8 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
     }
     else
     {
+      convSingTrP(f,r);
+      convSingTrP(g,r);
       CanonicalForm F( convSingTrPFactoryP( f,r ) ), G( convSingTrPFactoryP( g,r ) );
       res= convFactoryPSingTrP( gcd( F, G ),r );
     }
