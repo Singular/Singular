@@ -40,8 +40,8 @@
 #define BITS_PER_LONG 8*SIZEOF_LONG
 
 typedef char *             char_ptr;
-omBin sip_sring_bin = omGetSpecBin(sizeof(ip_sring));
-omBin char_ptr_bin =  omGetSpecBin(sizeof(char_ptr));
+VAR omBin sip_sring_bin = omGetSpecBin(sizeof(ip_sring));
+VAR omBin char_ptr_bin =  omGetSpecBin(sizeof(char_ptr));
 
 
 static const char * const ringorder_name[] =
@@ -1663,6 +1663,10 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
   if (r1 == NULL || r2 == NULL) return FALSE;
   if (r1->cf!=r2->cf) return FALSE;
   if (rVar(r1)!=rVar(r2)) return FALSE;
+  if (r1->bitmask!=r2->bitmask) return FALSE;
+  #ifdef HAVE_SHIFTBBA
+  if (r1->isLPring!=r2->isLPring) return FALSE;
+  #endif
 
   if( !rSamePolyRep(r1, r2) )
     return FALSE;
@@ -4995,7 +4999,7 @@ BOOLEAN rSetISReference(const ring r, const ideal F, const int i, const int p)
 }
 
 #ifdef PDEBUG
-int pDBsyzComp=0;
+VAR int pDBsyzComp=0;
 #endif
 
 
@@ -5065,7 +5069,7 @@ void rSetSyzComp(int k, const ring r)
     dReportError("syzcomp in incompatible ring");
   }
 #ifdef PDEBUG
-  extern int pDBsyzComp;
+  EXTERN_VAR int pDBsyzComp;
   pDBsyzComp=k;
 #endif
 }

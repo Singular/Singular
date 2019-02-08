@@ -1,0 +1,393 @@
+# vim:set ft=tcl:
+
+global builddir bindir
+
+set builddir "build"
+set bindir "bin"
+
+define CONFIG_ARGS $::argv
+
+use cc cc-lib cc-db cc-shared
+
+set preconf "src/preconf.tcl"
+set postconf "src/postconf.tcl"
+set postsetup "src/postsetup.tcl"
+set makeextra "src/Makefile.extra"
+
+if {[file exists $preconf]} {
+  source $preconf
+}
+
+options {
+  with-boehm-gc:=yes => "Use the Boehm GC; the argument can be yes, no, or a path to the GC's installation directory."
+  without-re2c => "Do not use re2c."
+  adlibdev => "Change Makefile defaults for AdLib core development."
+  devel => "Enable debug mode by default (implied by --adlibdev)."
+}
+
+set includes "-I."
+set libs {}
+
+set boehmarg "no"
+opt-str with-boehm-gc boehmarg
+
+if {[opt-bool adlibdev]} {
+  define DEFAULT_TARGET "\$(TARGETS)"
+  define DEBUG 1
+} else {
+  define DEFAULT_TARGET "prog"
+  define DEBUG 0
+}
+
+if {[opt-bool devel]} {
+  define DEBUG 1
+}
+
+switch -glob -- $boehmarg {
+  yes -
+  1 -
+  on {
+    set boehm 1
+    set libs "-lgc"
+  }
+  no -
+  0 -
+  "" -
+  off {
+    set boehm 0
+  }
+  * {
+    set boehm 1
+    if {![file isdirectory $boehmarg]} {
+      user-error "Boehm GC option does not specify a valid directory"
+    }
+    lappend includes "-I$boehmarg/include"
+    lappend libs "-L$boehmarg/lib" "-lgc"
+  }
+}
+
+define USE_BOEHM_GC $boehm
+
+proc localname {path} {
+  return [regsub {[a-z]+/(.*)\.[a-z]+} $path "\\1"]
+}
+
+proc fmt-files {files} {
+  set output [join $files]
+  if {[string length $output] < 60} {
+    return $output
+  }
+  set output " \\"
+  set line "  "
+  foreach file $files {
+    if {[string length $line] > 2 && [string length "$line $file"] > 72} {
+      append line "\\"
+      append output "\n" $line
+      set line "  "
+    }
+    append line $file " "
+  }
+  if {[string length $line] > 2} {
+    append output "\n" [string trimright $line]
+  }
+  return $output
+}
+
+global inttypes csize iquote
+set inttypes {char short int long}
+
+proc def-int-type {name prefix size} {
+  global inttypes csize have_long_long
+  foreach type $inttypes {
+    if {$csize($type) == $size} {
+      define $name "$prefix $type"
+      define SIZEOF_[string toupper $name] $size
+      return
+    }
+  }
+  if {$have_long_long} {
+    define $name "$prefix long long"
+    define SIZEOF_[string toupper $name] $csize(long long)
+  } else {
+    define $name "$prefix long"
+    define SIZEOF_[string toupper $name] $csize(long)
+  }
+}
+
+proc check-tmp-flags {flags} {
+  msg-checking "Checking whether the C++ compiler accepts $flags..."
+  set works [cctest -cflags $flags]
+  if {$works} {
+    msg-result yes
+    return 1
+  } else {
+    msg-result no
+    return 0
+  }
+}
+
+cc-check-tools ar
+if {[opt-bool without-re2c]} {
+  set re2c 0
+} else {
+  cc-check-progs re2c
+  msg-checking "Checking re2c version..."
+  if {[catch {exec re2c --version} re2cout]} {
+    set re2c 0
+    msg-result "unknown (disable re2c)"
+  } else {
+    set re2c 1
+    switch -glob -- $re2cout {
+      "re2c 1.*.*" {
+        msg-result "($re2cout) ok"
+      }
+      * {
+        msg-result "($re2cout) outdated"
+      }
+    }
+  }
+}
+
+define RE2CFLAGS ""
+if {![is-defined RE2C]} {
+  define RE2C false
+}
+cc-with {-lang c++} {
+  # Does long long exist as a type?
+  global have_long_long
+  set have_long_long [cc-check-types "long long"]
+  if {$have_long_long} {
+    lappend inttypes "long long"
+    define LongWord "unsigned long long"
+    define LongInt "long long"
+    define LONG_FMT "ll"
+  } else {
+    define LongWord "unsigned long"
+    define LongInt "long"
+    define LONG_FMT "l"
+  }
+  # Check all int sizes
+  foreach type $inttypes {
+    set csize($type) [cc-check-sizeof $type]
+  }
+  set csize(voidp) [cc-check-sizeof "void *"]
+  if {$have_long_long && $csize(long long) >= 8} {
+    define HAVE_64BIT_SUPPORT 2
+  }
+  if {$csize(long) >= 8} {
+    define HAVE_64BIT_SUPPORT 1
+  }
+  cc-with {-includes sys/types.h} {
+    set have_off_t [cc-check-types "off_t"]
+    if {$have_off_t} {
+      set csize(off_t) [cc-check-sizeof "off_t"]
+    }
+  }
+  if {$csize(long) == $csize(voidp)} {
+    define WORD_FMT "l"
+  } elseif {$have_long_long && $csize(long long) == $csize(voidp)} {
+    define WORD_FMT "ll"
+  } else {
+    define WORD_FMT ""
+  }
+  cc-check-includes dirent.h
+  define OPT ""
+  foreach opt {{-g -O2} {-g -O} {-g}} {
+    if {[check-tmp-flags $opt]} {
+      define OPT $opt
+      break
+    }
+  }
+  msg-checking "Checking for isatty()..."
+  if {[cctest -code {isatty(0);} -includes unistd.h]} {
+    msg-result yes
+    define HAVE_ISATTY 1
+  } else {
+    msg-result no
+  }
+}
+
+define RULES ""
+
+global rules
+set rules ""
+
+proc add-rule {rule} {
+  global rules
+  append rules $rule\n
+}
+
+proc objpath {path} {
+  global builddir
+  return [regsub {[a-z]+/(.*)\.[a-z]+} $path "\$(BUILDDIR)/\\1.o"]
+}
+
+proc libobjpath {path} {
+  global builddir
+  return [regsub {[a-z]+/(.*)\.[a-z]+} $path "\$(BUILDDIR)/lib\\1.o"]
+}
+
+proc make-lib-rule {src} {
+  set obj [libobjpath $src]
+  add-rule "$obj: $src \$(LIBHDR)"
+  add-rule "\t\$(MKDIR) \$(BUILDDIR)"
+  switch -glob -- $src {
+    *.c {
+      add-rule "\t\$(CC) \$(CFLAGS) \$(GCFLAGS) \$(INCLUDES) -c -o $obj $src"
+    }
+    * {
+      add-rule "\t\$(CXX) \$(CXXFLAGS) \$(INCLUDES) -c -o $obj $src"
+    }
+  }
+}
+
+proc make-prog-rule {src} {
+  set obj [objpath $src]
+  add-rule "$obj: $src \$(LIBHDR) \$(PROGHDR)"
+  add-rule "\t\$(MKDIR) \$(BUILDDIR)"
+  add-rule "\t\$(CXX) \$(CXXFLAGS) \$(INCLUDES) -c -o $obj $src"
+}
+
+proc test-rule {src} {
+  global builddir
+  set obj [objpath $src]
+  set name [localname $src]
+  set test "$builddir/$name"
+  add-rule "$test: $obj \$(ADLIB)"
+  add-rule "\t\$(MKDIR) \$(BUILDDIR)"
+  add-rule "\t\$(CXX) \$(OPT) -o $test $obj \$(ADLIB) \$(LIBS)"
+  add-rule "$name: $test .FORCE"
+  add-rule "\t@echo === $test ==="
+  add-rule "\t@$test"
+}
+
+def-int-type Word unsigned $csize(voidp)
+def-int-type Word8 unsigned 1
+def-int-type Word16 unsigned 2
+def-int-type Word32 unsigned 4
+def-int-type Word64 unsigned 8
+def-int-type Int signed $csize(voidp)
+def-int-type Int8 signed 1
+def-int-type Int16 signed 2
+def-int-type Int32 signed 4
+def-int-type Int64 signed 8
+
+if {$have_off_t} {
+  def-int-type Offset signed $csize(off_t)
+}
+
+define BUILDDIR $builddir
+define BINDIR $bindir
+set testsrc {}
+set testobj {}
+set libsrc {}
+set libobj {}
+set adlibsrc [glob adlib/*.cc]
+if {!$boehm} {
+  lappend adlibsrc "gclib/gc.c"
+}
+
+foreach file $adlibsrc {
+  switch -glob -- $file {
+    */test?* {
+      lappend testsrc $file
+      lappend testobj [objpath $file]
+    }
+    * {
+      lappend libsrc $file
+      lappend libobj [libobjpath $file]
+    }
+  }
+}
+
+set progsrc {}
+set progobj {}
+
+foreach file [glob -nocomplain src/*.cc] {
+  switch -glob -- $file {
+    */test?* {
+      lappend testsrc $file
+      lappend testobj [objpath $file]
+    }
+    * {
+      lappend progsrc $file
+      lappend progobj [objpath $file]
+    }
+  }
+}
+
+set libhdr "[glob adlib/*.h] [glob gclib/*.h] adlib/config.h"
+set libhdr [lsort -unique $libhdr]
+set progre [glob -nocomplain src/*.re]
+set proghdr [glob -nocomplain src/*.h]
+set testsrc [lsort -unique $testsrc]
+set gensrc {}
+foreach file $progre {
+  lappend progsrc "[file rootname $file].cc"
+  lappend gensrc "[file rootname $file].cc"
+  lappend progobj [objpath $file]
+}
+
+set progsrc [lsort -unique $progsrc]
+set progobj [lsort -unique $progobj]
+
+define LIBSRC [fmt-files $libsrc]
+define LIBHDR [fmt-files $libhdr]
+define LIBOBJ [fmt-files $libobj]
+define PROGSRC [fmt-files $progsrc]
+define PROGOBJ [fmt-files $progobj]
+define PROGHDR [fmt-files $proghdr]
+define TESTOBJ [fmt-files $testobj]
+define GENSRC [fmt-files $gensrc]
+
+set targets "\$(BINDIR)/\$(PROGNAME)"
+
+set tests {}
+foreach file $testsrc {
+  lappend tests "$builddir/[localname $file]"
+  lappend targets "$builddir/[localname $file]"
+  test-rule $file
+}
+
+define TESTS [fmt-files $tests]
+
+foreach file $progsrc {
+  make-prog-rule $file
+}
+
+if {$re2c} {
+  foreach file $progre {
+    set ccfile "[file rootname $file].cc"
+    add-rule "$ccfile: $file"
+    add-rule "\t\$(RE2C) \$(RE2CFLAGS) -o $ccfile $file"
+  }
+}
+
+foreach file $libsrc {
+  make-lib-rule $file
+}
+
+foreach file $testsrc {
+  make-prog-rule $file
+}
+
+define EXTRA [readfile $makeextra]
+
+define RULES $rules
+define LIBS [join $libs]
+define INCLUDES [join $includes]
+
+define CONFIGITEMS "adlib/config.h adlib/config-defs.h"
+
+if {[file exists $postconf]} {
+  source $postconf
+}
+
+make-config-header adlib/config-defs.h -auto USE_* 
+make-template cnf/config.h.in adlib/config.h
+make-template cnf/Makefile.in Makefile
+
+if {[file exists $postsetup]} {
+  source $postsetup
+}
+

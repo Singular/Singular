@@ -22,11 +22,11 @@
 #include "Singular/ipshell.h"
 #include "Singular/pcv.h"
 
-static int pcvMaxDegree;
-static int pcvTableSize;
-static int pcvIndexSize;
-static unsigned* pcvTable=NULL;
-static unsigned** pcvIndex=NULL;
+STATIC_VAR int pcvMaxDegree;
+STATIC_VAR int pcvTableSize;
+STATIC_VAR int pcvIndexSize;
+STATIC_VAR unsigned* pcvTable=NULL;
+STATIC_VAR unsigned** pcvIndex=NULL;
 
 lists pcvLAddL(lists l1,lists l2)
 {

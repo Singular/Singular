@@ -30,7 +30,7 @@ struct generic_pair
   number a2;
 };
 typedef struct generic_pair *gcp;
-coeffs coeffs1,coeffs2;
+VAR coeffs coeffs1,coeffs2;
 
 static void gCoeffWrite(const coeffs r, BOOLEAN b)
 {

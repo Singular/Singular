@@ -12,11 +12,11 @@
 #include "coeffs/bigintmat.h"
 
 #ifdef SINGULAR_4_2
-static int nforder_type_id=0;
-n_coeffType nforder_type =n_unknown;
+STATIC_VAR int nforder_type_id=0;
+VAR n_coeffType nforder_type =n_unknown;
 
 // coeffs stuff: -----------------------------------------------------------
-static coeffs nforder_AE=NULL;
+STATIC_VAR coeffs nforder_AE=NULL;
 static void nforder_Register()
 {
   puts("nforder_Register called");

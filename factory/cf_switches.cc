@@ -14,8 +14,8 @@
 #include "config.h"
 
 
-#include "cf_switches.h"
 #include "cf_defs.h"
+#include "cf_switches.h"
 
 /** CFSwitches::CFSwitches ()
  *
@@ -38,5 +38,5 @@ CFSwitches::CFSwitches ()
   On(SW_USE_QGCD);
 }
 
-CFSwitches cf_glob_switches;
+INST_VAR CFSwitches cf_glob_switches;
 

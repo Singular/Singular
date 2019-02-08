@@ -42,21 +42,21 @@
 #include "polys/mod_raw.h"
 #endif /* HAVE_DYNAMIC_LOADING */
 
-omBin sip_command_bin = omGetSpecBin(sizeof(sip_command));
-omBin sip_package_bin = omGetSpecBin(sizeof(sip_package));
+VAR omBin sip_command_bin = omGetSpecBin(sizeof(sip_command));
+VAR omBin sip_package_bin = omGetSpecBin(sizeof(sip_package));
 //omBin ip_package_bin = omGetSpecBin(sizeof(ip_package));
-omBin idrec_bin = omGetSpecBin(sizeof(idrec));
+VAR omBin idrec_bin = omGetSpecBin(sizeof(idrec));
 
-coeffs coeffs_BIGINT;
+VAR coeffs coeffs_BIGINT;
 
-proclevel *procstack=NULL;
+VAR proclevel *procstack=NULL;
 //idhdl idroot = NULL;
 
-idhdl currPackHdl = NULL;
-idhdl basePackHdl = NULL;
-package currPack = NULL;
-package basePack = NULL;
-idhdl currRingHdl = NULL;
+VAR idhdl currPackHdl = NULL;
+VAR idhdl basePackHdl = NULL;
+VAR package currPack = NULL;
+VAR package basePack = NULL;
+VAR idhdl currRingHdl = NULL;
 
 void paCleanUp(package pack);
 

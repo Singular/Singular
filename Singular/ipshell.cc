@@ -73,11 +73,11 @@
 #include "Singular/number2.h"
 #include "coeffs/bigintmat.h"
 #endif
-leftv iiCurrArgs=NULL;
-idhdl iiCurrProc=NULL;
+VAR leftv iiCurrArgs=NULL;
+VAR idhdl iiCurrProc=NULL;
 const char *lastreserved=NULL;
 
-static BOOLEAN iiNoKeepRing=TRUE;
+STATIC_VAR BOOLEAN iiNoKeepRing=TRUE;
 
 /*0 implementation*/
 
@@ -85,7 +85,7 @@ const char * iiTwoOps(int t)
 {
   if (t<127)
   {
-    static char ch[2];
+    STATIC_VAR char ch[2];
     switch (t)
     {
       case '&':
@@ -982,7 +982,7 @@ int iiRegularity(lists L)
   return reg+1+add_row_shift;
 }
 
-BOOLEAN iiDebugMarker=TRUE;
+VAR BOOLEAN iiDebugMarker=TRUE;
 #define BREAK_LINE_LENGTH 80
 void iiDebug()
 {

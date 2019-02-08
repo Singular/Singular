@@ -1,0 +1,30 @@
+// Program that computes fib(n) in parallel; the purpose of this
+// program is to stress-test the scheduler by generating tens
+// of thousands of jobs. Other than that, this is slower than even
+// a naive sequential fibonacci calculation would be.
+
+LIB "systhreads.lib";
+threadpool pool = createThreadPool(4);
+threadPoolExecString(pool,
+"
+proc const(int n) {
+  return(n);
+}
+proc add(int x, int y) {
+  return(x+y);
+}
+"
+);
+proc fib(int n) {
+  if (n <= 1) {
+    return(startJob(pool, "const", 1));
+  } else {
+    job j1 = fib(n-1);
+    job j2 = fib(n-2);
+    job res = scheduleJob(pool, "add", j1, j2);
+    return(res);
+  }
+}
+
+job f = fib(22);
+waitJob(f);

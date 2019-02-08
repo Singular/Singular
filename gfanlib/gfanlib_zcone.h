@@ -8,6 +8,7 @@
 #ifndef LIB_CONE_H_
 #define LIB_CONE_H_
 
+#include "../factory/globaldefs.h"
 #include "gfanlib_matrix.h"
 
 namespace gfan{

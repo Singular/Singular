@@ -13,6 +13,7 @@ See www.alglib.net or alglib.sources.ru for details.
 
 #include <stdlib.h>
 #include <math.h>
+#include "factory/globaldefs.h"
 #include "resources/feFopen.h"
 #include "kernel/mod2.h"
 

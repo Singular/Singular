@@ -6,25 +6,25 @@
 #define NUM_PROC 200
 #define LINE_LEN 200
 #define RECOMMENDED_LEN 100
-FILE *f;
-int trailing_spaces=0;
-int tabs=0;
-int verylong_lines=0;
-int lines=0;
-unsigned char buf[LINE_LEN];
-int proc_cnt=0;
-unsigned char *proc[NUM_PROC];
-unsigned char have_doc[NUM_PROC];
-unsigned char have_example[NUM_PROC];
-unsigned char proc_found[NUM_PROC];
-int non_ascii=0;
-int non_ascii_line=0;
-int star_nl=0;
-int footer=0;
-int header=0;
-int crlf=0;
-int proc_help_lines=0;
-int proc_help_texinfo=0;
+VAR FILE *f;
+VAR int trailing_spaces=0;
+VAR int tabs=0;
+VAR int verylong_lines=0;
+VAR int lines=0;
+VAR unsigned char buf[LINE_LEN];
+VAR int proc_cnt=0;
+VAR unsigned char *proc[NUM_PROC];
+VAR unsigned char have_doc[NUM_PROC];
+VAR unsigned char have_example[NUM_PROC];
+VAR unsigned char proc_found[NUM_PROC];
+VAR int non_ascii=0;
+VAR int non_ascii_line=0;
+VAR int star_nl=0;
+VAR int footer=0;
+VAR int header=0;
+VAR int crlf=0;
+VAR int proc_help_lines=0;
+VAR int proc_help_texinfo=0;
 
 void get_next()
 {

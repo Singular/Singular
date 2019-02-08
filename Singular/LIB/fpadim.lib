@@ -1012,7 +1012,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   R;
   setring R; // sets basering to Letterplace ring
   //some intmats, which contain monomials in intvec representation as rows
@@ -1063,7 +1063,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   R;
   setring R; // sets basering to Letterplace ring
   //some intmats, which contain monomials in intvec representation as rows
@@ -1118,7 +1118,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   R;
   setring R; // sets basering to Letterplace ring
   //some intmats, which contain monomials in intvec representation as rows
@@ -1202,7 +1202,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   R;
   setring R; // sets basering to Letterplace ring
   //some intmats, which contain monomials in intvec representation as rows
@@ -1285,7 +1285,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   R;
   setring R; // sets basering to Letterplace ring
   //some intmats, which contain monomials in intvec representation as rows
@@ -1345,7 +1345,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   R;
   setring R; // sets basering to Letterplace ring
   intvec i1 = 1,2; intvec i2 = 2,1,2;
@@ -1382,7 +1382,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   R;
   setring R; // sets basering to Letterplace ring
   intvec i1 = 1,2; intvec i2 = 2,1,2;
@@ -1409,7 +1409,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   intvec i1 = 1,2,1; intvec i2 = 2,2,1; intvec i3 = 1,1; intvec i4 = 2,1,1,1;
   // the corresponding monomials are xyx,y^2x,x^2,yx^3
@@ -1482,7 +1482,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   //some intmats, which contain monomials in intvec representation as rows
   intmat I1 [2][2] = 1,1,2,2; intmat I2 [1][3]  = 1,2,1;
@@ -1569,7 +1569,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   //some intmats, which contain monomials in intvec representation as rows
   intmat I1 [2][2] = 1,1,2,2; intmat I2 [1][3]  = 1,2,1;
@@ -1656,7 +1656,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   //some intmats, which contain monomials in intvec representation as rows
   intmat I1[2][2] = 1,1,2,2; intmat I2[1][3]  = 1,2,1;
@@ -1701,7 +1701,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   ideal G = x*x, y*y,x*y*x; // ideal G contains a
   //Groebner basis
@@ -1745,7 +1745,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   ideal G = x*x, y*y,x*y*x; // ideal G contains a
   //Groebner basis
@@ -1788,7 +1788,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   ideal G = y*y,x*y*x; // G is a Groebner basis
   lpHilbert(G); // procedure with default parameters
@@ -1819,7 +1819,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   ideal G = x*x, y*y,x*y*x;
   // Groebner basis
@@ -1854,7 +1854,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   ideal G = x*x, y*y,x*y*x;
   // ideal G contains a Groebner basis
@@ -1881,7 +1881,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   ideal L = x*y,y*x*y;
   // ideal containing the mistletoes
@@ -1905,7 +1905,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   ideal L = x*y,y*x*y;
   // ideal containing the mistletoes
@@ -1926,7 +1926,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   ideal M = x*y*x, y*y*x, x*x, y*x*x*x;
   // some monomials
@@ -1961,7 +1961,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   ideal G = x*x, y*y,x*y*x; // ideal G contains a
   //Groebner basis
@@ -2000,7 +2000,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   ideal G = x*x, y*y,x*y*x; // G is a monomial Groebner basis
   lpSickleDim(G); // invokes the procedure with ring parameters
@@ -2040,7 +2040,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   ideal G = x*x, y*y,x*y*x; // ideal G contains a
   //Groebner basis
@@ -2104,7 +2104,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   ideal G = x*x, y*y,x*y*x;
   // G contains a Groebner basis
@@ -2146,7 +2146,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = makeLetterplaceRing(7); setring R;
+  def R = freeAlgebra(r, 7); setring R;
   ideal J = x*y*x - y*x*y;
   option(redSB); option(redTail);
   J = letplaceGBasis(J);
@@ -2170,7 +2170,7 @@ example
    LIB "fpadim.lib";
    ring r = 0,(x,y,z),dp;
    int d =10; // degree
-   def R = makeLetterplaceRing(d);
+   def R = freeAlgebra(r, d);
    setring R;
    ideal I = y*x*y - z*y*z, x*y*x - z*x*y,
    z*x*z - y*z*x, x*x*x + y*y*y +
@@ -2186,7 +2186,7 @@ example
    LIB "fpadim.lib";
    ring r = 0,(x,y,z),dp;
    int d =11; // degree
-   def R = makeLetterplaceRing(d);
+   def R = freeAlgebra(r, d);
    setring R;
    ideal I = y*x*y - z*y*z, x*y*z - z*x*y,
    z*x*z - y*z*x, x*x*x + y*y*y +
@@ -2202,7 +2202,7 @@ example
    LIB "fpadim.lib";
    ring r = 0,(x,y,z),dp;
    int d  = 6; // degree
-   def R  = makeLetterplaceRing(d);
+   def R  = freeAlgebra(r, d);
    setring R;
    ideal I = y*x*y - z*y*z, x*y*x - z*x*y,
    z*x*z - y*z*x, x*x*x -2*y*y*y + 3*z*z*z -4*x*y*z + 5*x*z*z- 6*x*y*y +7*x*x*z - 8*x*x*y;
@@ -2220,7 +2220,7 @@ example
 LIB "fpadim.lib";
 ring r = 0,(x,y,z),dp;
 int d =10; // degree
-def R = makeLetterplaceRing(d);
+def R = freeAlgebra(r, d);
 setring R;
 ideal I =
 z*z*z*z + y*x*y*x - x*y*y*x - 3*z*y*x*z, x*x*x + y*x*y - x*y*x, z*y*x-x*y*z + z*x*z;
@@ -2234,7 +2234,7 @@ sickle(J,1,1,1,d); // dimension is 24872
 LIB "fpadim.lib";
 ring r = 0,(x,y,z),dp;
 int d =10; // degree
-def R = makeLetterplaceRing(d);
+def R = freeAlgebra(r, d);
 setring R;
 ideal I = x*y + y*z, x*x + x*y - y*x - y*y;
 option(prot);
@@ -2262,7 +2262,7 @@ sickle(J,1,1,1,d);
    baseringdef = 1;
    }
    ring r = 0,(d(1..n),x(1..n),e(1..n)),dp;
-   def R = makeLetterplaceRing(d);
+   def R = freeAlgebra(r, d);
    setring R;
    ideal I; int i,j;
 
@@ -2319,7 +2319,7 @@ sickle(J,1,1,1,d);
 proc TestGKAuslander3()
 {
   ring r = (0,q),(z,x,y),(dp(2),dp(2));
-  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   R; setring R; // sets basering to Letterplace ring
   ideal I;
   I = q*x*y - y*x, z*y - y*z, z*x - x*z;
@@ -2330,7 +2330,7 @@ proc TestGKAuslander3()
   lpGkDim(I); // must be 4
 
   ring r = 0,(y,x,z),dp;
-  def R = makeLetterplaceRing(10); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 10); // constructs a Letterplace ring
   R; setring R; // sets basering to Letterplace ring
   ideal I;
   I = x*y*z - y*x, z*y - y*z, z*x - x*z;//gkDim = 2
@@ -2340,21 +2340,21 @@ proc TestGKAuslander3()
 
   // with inverse of z
   ring r = 0,(iz,z,x,y),dp;
-  def R = makeLetterplaceRing(11); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 11); // constructs a Letterplace ring
   R; setring R; // sets basering to Letterplace ring
   ideal I;
   I = x*y*z - y*x, z*y - y*z, z*x - x*z,
     iz*y - y*iz, iz*x - x*iz, iz*z-1, z*iz -1;
   I = letplaceGBasis(I); //
   setring r;
-  def R2 = makeLetterplaceRing(23); // constructs a Letterplace ring
+  def R2 = freeAlgebra(r, 23); // constructs a Letterplace ring
   setring R2; // sets basering to Letterplace ring
   ideal I = imap(R,I);
   lpGkDim(I);
 
 
   ring r = 0,(t,z,x,y),(dp,dp);
-  def R = makeLetterplaceRing(20); // constructs a Letterplace ring
+  def R = freeAlgebra(r, 20); // constructs a Letterplace ring
   R; setring R; // sets basering to Letterplace ring
   ideal I;
   I = x*y*z - y*x*t, z*y - y*z, z*x - x*z,
@@ -2373,7 +2373,7 @@ proc TestGKAuslander3()
   lpNF(p, I); // 0 as expected
 
   ring r2 = 0,(x,y),dp;
-  def R2 = makeLetterplaceRing(50); // constructs a Letterplace ring
+  def R2 = freeAlgebra(r2, 50); // constructs a Letterplace ring
   setring R2;
   ideal J = x*y*y*x-y*x*x*y;
   J = letplaceGBasis(J);
@@ -2385,7 +2385,7 @@ proc TestGKAuslander3()
 /*   more tests : downup algebra A
 LIB "fpadim.lib";
 ring r = (0,a,b,g),(x,y),Dp;
-def R = makeLetterplaceRing(6); // constructs a Letterplace ring
+def R = freeAlgebra(r, 6); // constructs a Letterplace ring
 setring R;
 poly F1 = g*x;
 poly F2 = g*y;
@@ -2397,7 +2397,7 @@ lpGkDim(J); // 3 == correct
 // downup algebra B
 LIB "fpadim.lib";
 ring r = (0,a,b,g, p(1..7),q(1..7)),(x,y),Dp;
-def R = makeLetterplaceRing(6); // constructs a Letterplace ring
+def R = freeAlgebra(r, 6); // constructs a Letterplace ring
 setring R;
 ideal imn = 1, y*y*y, x*y, y*x, x*x, y*y, x, y;
 int i;

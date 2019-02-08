@@ -11,18 +11,18 @@
 #include "misc/auxiliary.h"
 #include "resources/feFopen.h"
 
-extern char*  feErrors;
-extern int    feErrorsLen;
-extern FILE*  feProtFile;
-extern int    pagelength, colmax;
-extern int    yy_blocklineno;
-extern int    yy_noeof;
+EXTERN_VAR char*  feErrors;
+EXTERN_VAR int    feErrorsLen;
+EXTERN_VAR FILE*  feProtFile;
+EXTERN_VAR int    pagelength, colmax;
+EXTERN_VAR int    yy_blocklineno;
+EXTERN_VAR int    yy_noeof;
 extern const char feNotImplemented[];
-extern int     feProt;
-extern BOOLEAN feWarn;
-extern BOOLEAN feOut;
-extern int  traceit ;
-extern void (*WarnS_callback)(const char *s);
+EXTERN_VAR int     feProt;
+EXTERN_VAR BOOLEAN feWarn;
+EXTERN_VAR BOOLEAN feOut;
+EXTERN_VAR int  traceit ;
+EXTERN_VAR void (*WarnS_callback)(const char *s);
 
 // show entering/leaving proc:
 #define TRACE_SHOW_PROC   1

@@ -48,7 +48,7 @@
 #include <netdb.h>
 #include <netinet/in.h> /* for htons etc.*/
 
-#define SSI_VERSION 12
+#define SSI_VERSION 13
 // 5->6: changed newstruct representation
 // 6->7: attributes
 // 7->8: qring
@@ -56,9 +56,10 @@
 // 9->10: tokens in grammar.h/tok.h reorganized
 // 10->11: extended ring descr. for named coeffs (not in used until 4.1)
 // 11->12: add rank to ideal/module, add smatrix
+// 12->13: NC rings
 
-link_list ssiToBeClosed=NULL;
-volatile BOOLEAN ssiToBeClosed_inactive=TRUE;
+VAR link_list ssiToBeClosed=NULL;
+VAR volatile BOOLEAN ssiToBeClosed_inactive=TRUE;
 
 // forward declarations:
 void ssiWritePoly_R(const ssiInfo *d, int typ, poly p, const ring r);
@@ -232,6 +233,27 @@ void ssiWriteRing_R(ssiInfo *d,const ring r)
   else /* dummy ring r==NULL*/
   {
     fputs("0 0 0 0 "/*,r->ch,r->N, blocks, q-ideal*/,d->f_write);
+  }
+  if (rIsLPRing(r)) // cannot be combined with 23 2
+  {
+    fprintf(d->f_write,"23 1 %d %d ",SI_LOG2(r->bitmask),r->isLPring);
+  }
+  else
+  {
+    unsigned long bm=0;
+    int b=0;
+    bm=rGetExpSize(bm,b,r->N);
+    if (r->bitmask!=bm)
+    {
+      fprintf(d->f_write,"23 0 %d ",SI_LOG2(r->bitmask));
+    }
+    if (rIsPluralRing(r))
+    {
+      fputs("23 2 ",d->f_write);
+      void ssiWriteIdeal(const ssiInfo *d, int typ,const ideal I);
+      ssiWriteIdeal(d,MATRIX_CMD,(ideal)r->GetNC()->C);
+      ssiWriteIdeal(d,MATRIX_CMD,(ideal)r->GetNC()->D);
+    }
   }
 }
 
@@ -779,6 +801,45 @@ void ssiReadAttrib(leftv res, si_link l)
   }
   res->flag=fl;
 }
+void ssiReadRingProperties(si_link l)
+{
+  ssiInfo *d=(ssiInfo*)l->data;
+  int what=s_readint(d->f_read);
+  switch(what)
+  {
+    case 0: // bitmask
+    {
+      int lb=s_readint(d->f_read);
+      unsigned long bm=~0L;
+      bm=bm<<lb;
+      bm=~bm;
+      rUnComplete(d->r);
+      d->r->bitmask=bm;
+      rComplete(d->r);
+      break;
+    }
+    case 1: // LPRing
+    {
+      int lb=s_readint(d->f_read);
+      int isLPring=s_readint(d->f_read);
+      unsigned long bm=~0L;
+      bm=bm<<lb;
+      bm=~bm;
+      rUnComplete(d->r);
+      d->r->bitmask=bm;
+      d->r->isLPring=isLPring;
+      rComplete(d->r);
+      break;
+    }
+    case 2: // Plural rings
+    {
+      matrix C=ssiReadMatrix(d);
+      matrix D=ssiReadMatrix(d);
+      nc_CallPlural(C,D,NULL,NULL,d->r,true,true,false,d->r,false);
+      break;
+    }
+  }
+}
 //**************************************************************************/
 
 BOOLEAN ssiOpen(si_link l, short flag, leftv u)
@@ -1286,6 +1347,7 @@ leftv ssiRead1(si_link l)
              d->r=ssiReadRing(d);
              if (d->r==NULL) return NULL;
              res->data=(char*)d->r;
+             d->r->ref++;
              res->rtyp=RING_CMD;
              if (t==15) // setring
              {
@@ -1359,6 +1421,9 @@ leftv ssiRead1(si_link l)
              break;
     case 21: ssiReadAttrib(res,l);
              break;
+    case 23: ssiReadRingProperties(l);
+             return ssiRead1(l);
+             break;
     // ------------
     case 98: // version
              {
@@ -1400,7 +1465,7 @@ leftv ssiRead1(si_link l)
   && (currRing!=d->r)
   && (res->RingDependend()))
   {
-    if(ssiSetCurrRing(d->r)) { d->r=currRing; d->r->ref++; }
+    if(ssiSetCurrRing(d->r)) { d->r=currRing; }
   }
   return res;
 no_ring: WerrorS("no ring");
@@ -1519,7 +1584,7 @@ BOOLEAN ssiWrite(si_link l, leftv data)
                         if(tt==IDEAL_CMD)       fputs("7 ",d->f_write);
                         else if(tt==MATRIX_CMD) fputs("8 ",d->f_write);
                         else if(tt==SMATRIX_CMD) fputs("22 ",d->f_write);
-                        else
+                        else /* tt==MODUL_CMD*/
                         {
                           ideal M=(ideal)dd;
                           fprintf(d->f_write,"10 %d ",(int)M->rank);
@@ -1855,10 +1920,10 @@ int ssiBatch(const char *host, const char * port)
   exit(0);
 }
 
-static int ssiReserved_P=0;
-static int ssiReserved_sockfd;
-static  struct sockaddr_in ssiResverd_serv_addr;
-static int  ssiReserved_Clients;
+STATIC_VAR int ssiReserved_P=0;
+STATIC_VAR int ssiReserved_sockfd;
+STATIC_VAR struct sockaddr_in ssiResverd_serv_addr;
+STATIC_VAR int  ssiReserved_Clients;
 int ssiReservePort(int clients)
 {
   if (ssiReserved_P!=0)
@@ -1894,7 +1959,7 @@ int ssiReservePort(int clients)
   return portno;
 }
 
-extern si_link_extension si_link_root;
+EXTERN_VAR si_link_extension si_link_root;
 si_link ssiCommandLink()
 {
   if (ssiReserved_P==0)
@@ -2167,6 +2232,9 @@ BOOLEAN ssiGetDump(si_link l)
 // 20 blackbox <name> 1 <len> ...
 // 21 attrib <bit-attrib> <len> <a-name1> <val1>... <data>
 // 22 smatrix
+// 23 0 <log(bitmask)> ring properties: max.exp.
+// 23 1 <log(bitmask)> <r->IsLPRing> ring properties:LPRing
+// 23 2 <matrix C> <matrix D> ring properties: PLuralRing
 //
 // 98: verify version: <ssi-version> <MAX_TOK> <OPT1> <OPT2>
 // 99: quit Singular

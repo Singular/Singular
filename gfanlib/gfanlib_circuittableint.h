@@ -8,6 +8,8 @@
 #ifndef GFANLIB_CIRCUITTABLEINT_H_
 #define GFANLIB_CIRCUITTABLEINT_H_
 
+#include "../factory/globaldefs.h"
+
 #include <cstdint>
 #include <exception>
 #include <sstream>
@@ -23,7 +25,9 @@ class MVMachineIntegerOverflow: public std::exception
   }
 };
 
-extern MVMachineIntegerOverflow MVMachineIntegerOverflow;
+typedef MVMachineIntegerOverflow MVMachineIntegerOverflowType;
+
+EXTERN_INST_VAR MVMachineIntegerOverflowType MVMachineIntegerOverflow;
 
 /*
  * The philosophy here is that if this class overflows, then the computation needs to be restarted. Therefore

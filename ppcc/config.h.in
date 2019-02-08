@@ -1,0 +1,18 @@
+#pragma once
+
+@if USE_BOEHM_GC
+#define USE_BOEHM_GC 1
+@else
+#undef USE_BOEHM_GC
+@endif
+
+typedef @Word@ Word;
+typedef @Word16@ Word16;
+typedef @Word32@ Word32;
+typedef @Word64@ Word64;
+
+typedef @Int@ Int;
+typedef @Int16@ Int16;
+typedef @Int32@ Int32;
+typedef @Int64@ Int64;
+

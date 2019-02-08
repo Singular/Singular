@@ -1,0 +1,9 @@
+This is a version of Tiny GC (see README file) preconfigured in
+gc.c for AdLib's needs and using Doug Lea's malloc implementation
+(in dlmalloc.c) instead of a potentially slow system malloc. In
+particular, we don't use locks around dlmalloc() and dlfree(), as
+we know that they will only be called from Tiny GC.
+
+Note that dlmalloc.c is public domain and can be used separately
+from Tiny GC's license. The gc.c file is distributed under Tiny
+GC's license (the GPL v2, see COPYING).

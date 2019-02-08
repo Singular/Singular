@@ -1,7 +1,7 @@
 LIB "tst.lib"; tst_init();
 LIB "fpadim.lib";
 ring r = 0,(x,y,z),dp;
-def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+def R = freeAlgebra(r,5); // constructs a Letterplace ring
 setring R; // sets basering to Letterplace ring
 poly p = x*x*z; poly q = y*y*x*x;
 poly w = z*y*x*z;

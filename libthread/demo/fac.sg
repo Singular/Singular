@@ -1,0 +1,42 @@
+// Simple parallel computation to computer the factorial.
+// Note that because the bulk of the work is done by the
+// last multiplication (which is inherenty sequentially),
+// potential for parallelization is limited.
+
+LIB "systhreads.lib";
+
+threadpool pool = createThreadPool(4);
+string code =
+"
+proc seqprod(int lo, int hi) {
+  bigint result = 1;
+  for (int i = lo; i <= hi; i++) {
+    result = result * i;
+  }
+  return(result);
+}
+proc multiply(bigint x, bigint y) {
+  return(x*y);
+}
+";
+threadPoolExecString(pool, code);
+execute(code);
+
+proc prod(int lo, int hi) {
+  if (hi - lo <= 3) {
+    return(startJob(pool, "seqprod", lo, hi));
+  } else {
+    int mid = (lo + hi) div 2;
+    job j1 = prod(lo, mid);
+    job j2 = prod(mid+1, hi);
+    job res = scheduleJob(pool, "multiply", j1, j2);
+    return(res);
+  }
+}
+
+proc fac(int n) {
+  return(prod(1, n));
+}
+
+waitJob(fac(10000));
+closeThreadPool(pool);

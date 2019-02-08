@@ -112,7 +112,7 @@ mprState mprIdealCheck( const ideal theIdeal,
 
 ideal loNewtonPolytope( const ideal id );
 
-extern size_t gmp_output_digits;
+EXTERN_VAR size_t gmp_output_digits;
 //%e
 #endif /*MPR_BASE_H*/
 

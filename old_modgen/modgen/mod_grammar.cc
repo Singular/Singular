@@ -50,13 +50,13 @@
 #include "typmap.h"
 #include "stype.h"
 
-int sectnum = 1;
-int iseof = 0;
-int initdone = 0;
-extern moddef module_def;
-extern int yylineno;
-extern int do_create_makefile;
-extern char *sectname[];
+VAR int sectnum = 1;
+VAR int iseof = 0;
+VAR int initdone = 0;
+EXTERN_INST_VAR moddef module_def;
+EXTERN_VAR int yylineno;
+EXTERN_VAR int do_create_makefile;
+EXTERN_VAR char *sectname[];
 
 extern int init_modgen(moddef *module_def, char *filename);
 extern int write_intro(moddefv module);
@@ -64,7 +64,7 @@ extern void write_mod_init(moddefv module, FILE *fp);
 extern void enter_id(FILE *fp, char *name, char *value,
                      int lineno, char *file);
 
-procdef procedure_decl;
+INST_VAR procdef procedure_decl;
 
 
 void yyerror(char * fmt)
@@ -440,20 +440,20 @@ while (0)
 
 #ifndef YYPURE
 
-int	yychar;			/*  the lookahead symbol		*/
-YYSTYPE	yylval;			/*  the semantic value of the		*/
+VAR int	yychar;			/*  the lookahead symbol		*/
+VAR YYSTYPE	yylval;			/*  the semantic value of the		*/
 				/*  lookahead symbol			*/
 
 #ifdef YYLSP_NEEDED
-YYLTYPE yylloc;			/*  location data for the lookahead	*/
+VAR YYLTYPE yylloc;			/*  location data for the lookahead	*/
 				/*  symbol				*/
 #endif
 
-int yynerrs;			/*  number of parse errors so far       */
+VAR int yynerrs;			/*  number of parse errors so far       */
 #endif  /* not YYPURE */
 
 #if YYDEBUG != 0
-int yydebug;			/*  nonzero means print parse trace	*/
+VAR int yydebug;			/*  nonzero means print parse trace	*/
 /* Since this is uninitialized, it does not stop multiple parsers
    from coexisting.  */
 #endif
@@ -490,8 +490,8 @@ int yydebug;			/*  nonzero means print parse trace	*/
 static void
 __yy_memcpy (to, from, count)
      char *to;
-     char *from;
-     unsigned int count;
+     VAR char *from;
+     VAR unsigned int count;
 {
   register char *f = from;
   register char *t = to;

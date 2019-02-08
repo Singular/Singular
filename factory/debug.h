@@ -27,7 +27,7 @@
 #endif
 void deb_inc_level();
 void deb_dec_level();
-extern char * deb_level_msg;
+EXTERN_VAR char * deb_level_msg;
 #define DEBINCLEVEL(stream, msg) \
 (std::stream << deb_level_msg << "entering << " << msg << " >>" << std::endl, deb_inc_level())
 #define DEBDECLEVEL(stream, msg) \

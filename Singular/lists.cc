@@ -20,7 +20,7 @@
 #include "misc/intvec.h"
 #include "Singular/lists.h"
 
-omBin slists_bin = omGetSpecBin(sizeof(slists));
+VAR omBin slists_bin = omGetSpecBin(sizeof(slists));
 
 int lSize(lists L)
 {

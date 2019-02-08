@@ -26,21 +26,21 @@ BOOLEAN iiAssignCR(leftv, leftv);
 
 BOOLEAN iiARROW (leftv, char*,char *);
 
-extern leftv iiCurrArgs;
-extern idhdl iiCurrProc;
-extern int iiOp; /* the current operation*/
+EXTERN_VAR leftv iiCurrArgs;
+EXTERN_VAR idhdl iiCurrProc;
+EXTERN_VAR int iiOp; /* the current operation*/
 extern const char *  currid;
-extern int     iiRETURNEXPR_len;
-extern sleftv  iiRETURNEXPR;
-extern ring   *iiLocalRing;
+EXTERN_VAR int     iiRETURNEXPR_len;
+EXTERN_INST_VAR sleftv  iiRETURNEXPR;
+EXTERN_VAR ring   *iiLocalRing;
 //extern cmdnames cmds[];
 extern const char *lastreserved;
-extern int myynest;
-extern int printlevel;
-extern int si_echo;
+EXTERN_VAR int myynest;
+EXTERN_VAR int printlevel;
+EXTERN_VAR int si_echo;
 
 
-extern BOOLEAN yyInRingConstruction; /* 1: during ring construction */
+EXTERN_VAR BOOLEAN yyInRingConstruction; /* 1: during ring construction */
 
 int     IsCmd(const char *n, int & tok);
 
@@ -96,6 +96,7 @@ void    iiDebug();
 BOOLEAN iiCheckRing(int i);
 poly    iiHighCorner(ideal i, int ak);
 char *  iiConvName(const char *libname);
+BOOLEAN iiGetLibStatus(const char *lib);
 BOOLEAN iiLoadLIB(FILE *fp, const char *libnamebuf, const char *newlib,
                          idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror);
 

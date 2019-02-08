@@ -165,14 +165,14 @@ to save space for ordinary inputs that do not need much stack.
 */
 #define YYMAXDEPTH MAX_INT_VAL
 
-extern int   yylineno;
-extern FILE* yyin;
+EXTERN_VAR int   yylineno;
+EXTERN_VAR FILE* yyin;
 
 const  char *  currid;
-BOOLEAN    yyInRingConstruction=FALSE;
-BOOLEAN    expected_parms;
-int        cmdtok;
-int        inerror = 0;
+VAR BOOLEAN    yyInRingConstruction=FALSE;
+VAR BOOLEAN    expected_parms;
+VAR int        cmdtok;
+VAR int        inerror = 0;
 
 #define TESTSETINT(a,i)                                \
    if ((a).Typ() != INT_CMD)                           \
@@ -1802,7 +1802,7 @@ do {					\
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
    multiple parsers can coexist.  */
-int yydebug;
+VAR int yydebug;
 #else /* !YYDEBUG */
 # define YYDPRINTF(Args)
 # define YY_SYMBOL_PRINT(Title, Type, Value, Location)

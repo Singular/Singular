@@ -542,7 +542,7 @@ static char* nnCoeffString(const coeffs r)
 }
 
 typedef char si_char_SI_BUF_SIZE[SI_BUF_SIZE];
-static si_char_SI_BUF_SIZE nnCoeffName_buf;
+STATIC_VAR si_char_SI_BUF_SIZE nnCoeffName_buf;
 static char* nnCoeffName(const coeffs r)
 {
   coeffs_array d=(coeffs_array)r->data;

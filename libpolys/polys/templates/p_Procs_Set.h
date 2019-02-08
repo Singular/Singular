@@ -113,11 +113,11 @@ static inline p_Ord p_OrdIs(ring r)
 }
 
 // fields of this struct are set by DoSetProc
-static p_Procs_s *_p_procs;
+STATIC_VAR p_Procs_s *_p_procs;
 
 #ifdef RDEBUG
 // if set, then SetProcs sets only names, instead of functions
-static int set_names = 0;
+STATIC_VAR int set_names = 0;
 #endif
 
 // (which##_Proc_Ptr)F ->-> cast_vptr_to_A<which##_Proc_Ptr>(F)?

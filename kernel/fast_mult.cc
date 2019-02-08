@@ -10,7 +10,7 @@
 
 typedef poly fastmultrec(poly f, poly g, ring r);
 static const int pass_option=1;
-static int mults=0;
+STATIC_VAR int mults=0;
 int Mults()
 {
   return mults;
@@ -426,7 +426,7 @@ poly pFastPower(poly f, int n, ring r)
   omfree(int_pot_array);
   return erg;
 }
-static omBin lm_bin=NULL;
+STATIC_VAR omBin lm_bin=NULL;
 /*3
 * compute for monomials p*q
 * destroys p, keeps q

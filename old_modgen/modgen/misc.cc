@@ -57,12 +57,12 @@ typedef struct {
  *                       the same file )
  *
  *---------------------------------------------------------------------*/
-static SArithBase sArithBase;  /**< Base entry for arithmetic */
+STATIC_VAR SArithBase sArithBase;  /**< Base entry for arithmetic */
 
 
-BOOLEAN    expected_parms;
-int        cmdtok;
-BOOLEAN siq=FALSE;
+VAR BOOLEAN    expected_parms;
+VAR int        cmdtok;
+VAR BOOLEAN siq=FALSE;
 const char *lastreserved=NULL;
 #define SELF_CMD MAX_TOK+1
 
@@ -80,7 +80,7 @@ extern void write_enter_id(FILE *fp);
 extern void write_add_singular_proc(FILE *fp);
 
 static void  mod_write_ctext(FILE *fp, FILE *fp_in);
-char type_conv[MAX_TOK][32];
+VAR char type_conv[MAX_TOK][32];
 
 extern void write_intro(moddefv module);
 

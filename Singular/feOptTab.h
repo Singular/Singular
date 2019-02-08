@@ -5,9 +5,9 @@
 
 // Define here which cmd-line options are recognized
 #ifndef FE_OPT_STRUCTURE
-extern struct fe_option feOptSpec[];
+EXTERN_VAR struct fe_option feOptSpec[];
 #else
-struct fe_option feOptSpec[] =
+VAR struct fe_option feOptSpec[] =
 {
 //
 //  Has to be of the form

@@ -16,7 +16,7 @@
 #include "coeffs/numbers.h"
 #include "coeffs/longrat.h"
 
-omBin rnumber_bin = omGetSpecBin(sizeof(snumber)); // TODO: move this into coeffs-struct (for Q)?!
+VAR omBin rnumber_bin = omGetSpecBin(sizeof(snumber)); // TODO: move this into coeffs-struct (for Q)?!
 
 
 #define SR_HDL(A) ((long)(A))
