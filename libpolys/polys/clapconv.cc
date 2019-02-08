@@ -317,6 +317,20 @@ CanonicalForm convSingTrPFactoryP ( poly p, const ring r )
   return result;
 }
 
+BOOLEAN convSingTrP(poly p, const ring r )
+{
+  while ( p!=NULL )
+  {
+    n_Normalize(p_GetCoeff(p, r), r->cf);
+
+    // test if denominator is constant
+    if (!p_IsConstantPoly(DEN ((fraction)p_GetCoeff (p,r)),r->cf->extRing))
+      return FALSE;
+    pIter(p);
+  }
+  return TRUE;
+}
+
 poly convFactoryPSingTrP ( const CanonicalForm & f, const ring r )
 {
   int n = rVar(r)+1;
