@@ -1395,21 +1395,14 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-proc rightStd(def I)
+proc rightStd(def I)// just an alias for compatibility
 "USAGE:  rightStd(I); I an ideal/ module
 PURPOSE: compute a right Groebner basis of I
 RETURN:  the same type as input
 EXAMPLE: example rightStd; shows examples
 "
 {
-  def A = basering;
-  def Aopp = opposite(A);
-  setring Aopp;
-  def Iopp = oppose(A,I);
-  def Jopp = groebner(Iopp);
-  setring A;
-  def J = oppose(Aopp,Jopp);
-  return(J);
+  return(rightstd(I));
 }
 example
 { "EXAMPLE:"; echo = 2;
