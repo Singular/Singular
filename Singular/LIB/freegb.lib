@@ -22,7 +22,6 @@ and Project II.6 of the transregional collaborative research centre
 SFB-TRR 195 'Symbolic Tools in Mathematics and their Application' of the German DFG
 
 PROCEDURES:
-freeAlgebra(r, d);               creates a Letterplace ring out of given data
 isFreeAlgebra(r);                check whether r is a letterplace ring (free algebra)
 lpDegBound(R);                   returns the degree bound of a letterplace ring
 lpVarBlockSize(R);               returns the size of the letterplace blocks
@@ -35,9 +34,6 @@ lpGBPres2Poly(L,I);              reconstructs a polynomial from the output of lp
 lieBracket(a,b[, N]);            Lie bracket ab-ba of two letterplace polynomials
 isOrderingShiftInvariant(i);     tests shift-invariance of the monomial ordering
 isVar(p);                        check whether p is a power of a single variable
-
-lpLmDivides(ideal I, poly p);    tests whether there exists q in I, such that LM(q)|LM(p)
-lpVarAt(poly p, int pos);        returns the variable (as a poly) at position pos of the poly p
 
 makeLetterplaceRing(d);          (deprecated, use freeAlgebra) creates a Letterplace ring out of given data
 setLetterplaceAttributes(R,d,b); (for testing purposes) supplies ring R with the letterplace structure
@@ -80,9 +76,6 @@ proc tstfreegb()
   example lieBracket;
   example lpPrint;
   example isVar;
-
-  example lpLmDivides;
-  example lpVarAt;
 
   example ivL2lpI;
   example iv2lp;
@@ -375,48 +368,6 @@ example
   isVar(h);
   poly i = 1;
   isVar(i);
-}
-
-proc lpLmDivides(ideal I, poly p)
-"USAGE: lpLmDivides(I); I an ideal
-RETURN: boolean
-ASSUME: basering is a Letterplace ring
-PURPOSE: tests if there is a polynomial q in I with LM(q)|LM(p)
-EXAMPLE: example lpLmDivides; shows examples
-"
-{
-  ERROR(" freealgebra.so not loaded");
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y),dp;
-  def R = freeAlgebra(r, 5);
-  setring R;
-  poly p = x*y*y;
-  lpLmDivides(y*y, p);
-  lpLmDivides(y*x, p);
-  lpLmDivides(ideal(y*y, y*x), p);
-}
-
-proc lpVarAt(poly p, int pos)
-"USAGE: lpVarAt(p, pos); p a poly, pos an int
-RETURN: poly
-ASSUME: basering is a Letterplace ring
-PURPOSE: returns the variable (as a poly) at position pos of the poly p
-EXAMPLE: example lpVarAt; shows examples
-"
-{
-  ERROR(" freealgebra.so not loaded");
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y),dp;
-  def R = freeAlgebra(r, 5);
-  setring R;
-  poly p = y*y*x;
-  lpVarAt(p, 3);
 }
 
 proc letplaceGBasis(def I)
@@ -1051,26 +1002,6 @@ example
   isFreeAlgebra(r);
   def R = freeAlgebra(r, 7);
   isFreeAlgebra(R);
-}
-
-proc freeAlgebra(def r, int d)
-"USAGE:  freeAlgebra(r, d); r a ring, d an integer
-RETURN:  ring
-PURPOSE: creates a letterplace ring with the ordering of r
-EXAMPLE: example freeAlgebra; shows examples
-"
-{
-  ERROR(" freealgebra.so not loaded");
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y,z),dp;
-  def R = freeAlgebra(r, 7);
-  R;
-  ring r2 = 0,(x,y,z),lp;
-  def R2 = freeAlgebra(r2, 7);
-  R2;
 }
 
 // united all previous makes, including mLR1 (homog) and mLR2 (nonhomog)
