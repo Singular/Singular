@@ -183,7 +183,7 @@ non-commutative rings: @sc{Plural}, @sc{SCA} and @sc{Letterplace}.
 @end menu
 @include s-plural.tex
 @include sca.tex
-@include letterplace.tex
+@include s-letterplace.tex
 @include s-plulibs.tex
 @end ifset
 
