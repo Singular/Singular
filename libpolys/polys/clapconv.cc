@@ -289,10 +289,10 @@ CanonicalForm convSingTrPFactoryP ( poly p, const ring r )
 
   while ( p!=NULL )
   {
-    n_Normalize(p_GetCoeff(p, r), r->cf);
+    //n_Normalize(p_GetCoeff(p, r), r->cf);
 
     // test if denominator is constant
-    if (!p_IsConstantPoly(DEN ((fraction)p_GetCoeff (p,r)),r->cf->extRing) && !errorreported)
+    if (!errorreported && !p_IsConstantPoly(DEN ((fraction)p_GetCoeff (p,r)),r->cf->extRing))
       WerrorS("conversion error: denominator!= 1");
 
     CanonicalForm term=convSingPFactoryP(NUM ((fraction)p_GetCoeff(p, r)),r->cf->extRing);
@@ -315,6 +315,20 @@ CanonicalForm convSingTrPFactoryP ( poly p, const ring r )
     p = pNext( p );
   }
   return result;
+}
+
+BOOLEAN convSingTrP(poly p, const ring r )
+{
+  while ( p!=NULL )
+  {
+    n_Normalize(p_GetCoeff(p, r), r->cf);
+
+    // test if denominator is constant
+    if (!p_IsConstantPoly(DEN ((fraction)p_GetCoeff (p,r)),r->cf->extRing))
+      return FALSE;
+    pIter(p);
+  }
+  return TRUE;
 }
 
 poly convFactoryPSingTrP ( const CanonicalForm & f, const ring r )

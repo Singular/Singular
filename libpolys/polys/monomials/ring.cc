@@ -5131,25 +5131,6 @@ BOOLEAN rRing_has_CompLastBlock(ring r)
   return (r->order[lb] == ringorder_c || r->order[lb] == ringorder_C);
 }
 
-n_coeffType rFieldType(ring r)
-{
-  return (r->cf->type);
-  if (rField_is_Zp(r))     return n_Zp;
-  if (rField_is_Q(r))      return n_Q;
-  if (rField_is_R(r))      return n_R;
-  if (rField_is_GF(r))     return n_GF;
-  if (rField_is_long_R(r)) return n_long_R;
-  if (rField_is_Zp_a(r))   return getCoeffType(r->cf);
-  if (rField_is_Q_a(r))    return getCoeffType(r->cf);
-  if (rField_is_long_C(r)) return n_long_C;
-  if (rField_is_Z(r))         return n_Z;
-  if (rField_is_Zn(r))        return n_Zn;
-  if (rField_is_Ring_PtoM(r)) return n_Znm;
-  if (rField_is_Ring_2toM(r)) return  n_Z2m;
-
-  return n_unknown;
-}
-
 int64 * rGetWeightVec(const ring r)
 {
   assume(r!=NULL);

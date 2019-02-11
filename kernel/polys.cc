@@ -6,6 +6,7 @@
 #include "kernel/ideals.h"
 #include "kernel/ideals.h"
 #include "polys/clapsing.h"
+#include "polys/clapconv.h"
 
 /// Widely used global variable which specifies the current polynomial ring for Singular interpreter and legacy implementatins.
 /// @Note: one should avoid using it in newer designs, for example due to possible problems in parallelization with threads.
@@ -49,7 +50,16 @@ poly p_Divide(poly p, poly q, const ring r)
     }
     if(p_GetComp(p,r)==0)
     {
-      if ((r->cf->convSingNFactoryN!=ndConvSingNFactoryN)
+      if((rFieldType(r)==n_transExt)
+      &&(convSingTrP(p,r))
+      &&(convSingTrP(q,r)))
+      {
+        poly res=singclap_pdivide(p, q, r);
+        p_Delete(&p,r);
+        p_Delete(&q,r);
+        return res;
+      }
+      else if ((r->cf->convSingNFactoryN!=ndConvSingNFactoryN)
       &&(!rField_is_Ring(r)))
       {
         poly res=singclap_pdivide(p, q, r);
@@ -70,13 +80,9 @@ poly p_Divide(poly p, poly q, const ring r)
         ideal m = idLift(vi,ui,&R, FALSE,TRUE,TRUE,&U);
         SI_RESTORE_OPT1(save_opt);
         if (r!=save_ring) rChangeCurrRing(save_ring);
-        if (idIs0(R))
-        {
-          matrix T = id_Module2formatedMatrix(m,1,1,r);
-          p=MATELEM(T,1,1); MATELEM(T,1,1)=NULL;
-          id_Delete((ideal *)&T,r);
-        }
-        else p=NULL;
+        matrix T = id_Module2formatedMatrix(m,1,1,r);
+        p=MATELEM(T,1,1); MATELEM(T,1,1)=NULL;
+        id_Delete((ideal *)&T,r);
         id_Delete((ideal *)&U,r);
         id_Delete(&R,r);
         //vi->m[0]=NULL; ui->m[0]=NULL;
@@ -108,7 +114,13 @@ poly p_Divide(poly p, poly q, const ring r)
       {
         if (I->m[i]!=NULL)
         {
-          if ((r->cf->convSingNFactoryN!=ndConvSingNFactoryN)
+          if((rFieldType(r)==n_transExt)
+          &&(convSingTrP(I->m[i],r))
+          &&(convSingTrP(q,r)))
+          {
+            h=singclap_pdivide(I->m[i],q,r);
+          }
+          else if ((r->cf->convSingNFactoryN!=ndConvSingNFactoryN)
           &&(!rField_is_Ring(r)))
             h=singclap_pdivide(I->m[i],q,r);
           else
@@ -163,7 +175,77 @@ poly p_Divide(poly p, poly q, const ring r)
 #endif
     return p_DivideM(p,q,r);
   }
-  return FALSE;
+  return NULL;
+}
+
+poly p_DivRem(poly p, poly q, poly &rest, const ring r)
+{
+  assume(q!=NULL);
+  rest=NULL;
+  if (q==NULL)
+  {
+    WerrorS("div. by 0");
+    return NULL;
+  }
+  if (p==NULL)
+  {
+    p_Delete(&q,r);
+    return NULL;
+  }
+  if (rIsLPRing(r))
+  {
+    WerrorS("not implemented for letterplace rings");
+    return NULL;
+  }
+  if(p_GetComp(p,r)==0)
+  {
+    if((rFieldType(r)==n_transExt)
+    &&(convSingTrP(p,r))
+    &&(convSingTrP(q,r)))
+    {
+      poly res=singclap_pdivide(p, q, r);
+      rest=singclap_pmod(p,q,r);
+      p_Delete(&p,r);
+      p_Delete(&q,r);
+      return res;
+    }
+    else if ((r->cf->convSingNFactoryN!=ndConvSingNFactoryN)
+    &&(!rField_is_Ring(r)))
+    {
+      poly res=singclap_pdivide(p, q, r);
+      rest=singclap_pmod(p,q,r);
+      p_Delete(&p,r);
+      p_Delete(&q,r);
+      return res;
+    }
+    else
+    {
+      ideal vi=idInit(1,1); vi->m[0]=q;
+      ideal ui=idInit(1,1); ui->m[0]=p;
+      ideal R; matrix U;
+      ring save_ring=currRing;
+      if (r!=currRing) rChangeCurrRing(r);
+      int save_opt;
+      SI_SAVE_OPT1(save_opt);
+      si_opt_1 &= ~(Sy_bit(OPT_PROT));
+      ideal m = idLift(vi,ui,&R, FALSE,TRUE,TRUE,&U);
+      SI_RESTORE_OPT1(save_opt);
+      if (r!=save_ring) rChangeCurrRing(save_ring);
+      matrix T = id_Module2formatedMatrix(m,1,1,r);
+      p=MATELEM(T,1,1); MATELEM(T,1,1)=NULL;
+      id_Delete((ideal *)&T,r);
+      T = id_Module2formatedMatrix(R,1,1,r);
+      rest=MATELEM(T,1,1); MATELEM(T,1,1)=NULL;
+      id_Delete((ideal *)&T,r);
+      id_Delete((ideal *)&U,r);
+      id_Delete(&R,r);
+      //vi->m[0]=NULL; ui->m[0]=NULL;
+      id_Delete(&vi,r);
+      id_Delete(&ui,r);
+      return p;
+    }
+  }
+  return NULL;
 }
 
 poly singclap_gcd ( poly f, poly g, const ring r )
