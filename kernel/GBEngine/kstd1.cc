@@ -2092,7 +2092,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     return idInit(1,F->rank);
 
 #ifdef HAVE_SHIFTBBA
-  if(rIsLPRing(currRing)) return freegb(F);
+  if(rIsLPRing(currRing)) return freegb(F, Q);
 #endif
 
   ideal r;

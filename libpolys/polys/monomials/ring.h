@@ -547,7 +547,8 @@ static inline BOOLEAN rField_has_simple_inverse(const ring r)
 static inline BOOLEAN rField_has_simple_Alloc(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_has_simple_Alloc(r->cf); }
 
-n_coeffType rFieldType(const ring r);
+/// the type of the coefficient filed of r (n_Zp, n_Q, etc)
+static inline n_coeffType rFieldType(const ring r) { return (r->cf->type); }
 
 /// this needs to be called whenever a new ring is created: new fields
 /// in ring are created (like VarOffset), unless they already exist

@@ -29,6 +29,7 @@ CanonicalForm convSingAFactoryA ( poly p , const Variable & a, const ring r );
 poly convFactoryASingA ( const CanonicalForm & f, const ring r );
 
 CanonicalForm convSingTrPFactoryP ( poly p, const ring r );
+BOOLEAN convSingTrP(poly p, const ring r );
 poly convFactoryPSingTrP ( const CanonicalForm & f, const ring r );
 
 #endif /* INCL_SINGCONV_H */

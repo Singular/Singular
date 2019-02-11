@@ -1395,21 +1395,14 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-proc rightStd(def I)
+proc rightStd(def I)// just an alias for compatibility
 "USAGE:  rightStd(I); I an ideal/ module
 PURPOSE: compute a right Groebner basis of I
 RETURN:  the same type as input
 EXAMPLE: example rightStd; shows examples
 "
 {
-  def A = basering;
-  def Aopp = opposite(A);
-  setring Aopp;
-  def Iopp = oppose(A,I);
-  def Jopp = groebner(Iopp);
-  setring A;
-  def J = oppose(Aopp,Jopp);
-  return(J);
+  return(rightstd(I));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -1770,7 +1763,7 @@ proc makeModElimRing(list #)
 "USAGE:  makeModElimRing(L); L a list
 RETURN:  ring
 PURPOSE: create a copy of a given ring equipped with the
-@* elimination ordering for module components @code{(c,<)}
+   elimination ordering for module components @code{(c,<)}
 NOTE: usually the list argument contains a ring to work with
 EXAMPLE: example makeModElimRing; shows an example
 "

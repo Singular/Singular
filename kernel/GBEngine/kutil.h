@@ -860,9 +860,6 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
 
 int redFirstShift (LObject* h,kStrategy strat); // ok
 
-ideal freegb(ideal F);
-ideal rightgb(ideal F, ideal Q);
-
 ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
 // test syz strategy: // will be removed soon
 EXTERN_VAR int (*test_PosInT)(const TSet T,const int tl,LObject &h);
