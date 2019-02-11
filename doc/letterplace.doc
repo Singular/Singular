@@ -443,10 +443,11 @@ The @ref{ncfactor_lib} contains the procedure @code{ncfactor} for factorizing po
 
 @c ref
 See
-@ref{maxideal};
-@ref{reduce};
-@ref{std};
-@ref{twostd}.
+@ref{maxideal (letterplace)};
+@ref{reduce (letterplace)};
+@ref{rightstd (letterplace)};
+@ref{std (letterplace)};
+@ref{twostd (letterplace)}.
 @c ref
 
 @c ---------------------------------------------------------------------------
