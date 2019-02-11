@@ -179,7 +179,8 @@ non-commutative rings: @sc{Plural}, @sc{SCA} and @sc{Letterplace}.
 * PLURAL libraries::
 * Graded commutative algebras (SCA)::
 * LETTERPLACE::
-* Functions (letterplace)::
+* Functions  (letterplace)::
+* Mathematical background (letterplace)::
 * LETTERPLACE libraries::
 @end menu
 @include s-plural.tex
@@ -226,7 +227,7 @@ Use the @code{LIB} command (see @ref{LIB}) for loading of single libraries,
 and the command @code{LIB "all.lib";} for loading all libraries.
 
 @ifset withplural
-See also @ref{PLURAL libraries}.
+See also non-commutative @ref{PLURAL libraries} and @ref{LETTERPLACE libraries}.
 @end ifset
 
 @strong{Interpreter libraries:}
@@ -288,7 +289,7 @@ See also @ref{PLURAL libraries}.
 * Experimental libraries::
 @end menu
 @ifset withplural
-@xref{PLURAL libraries}.
+@xref{PLURAL libraries}, @xref{LETTERPLACE libraries}.
 @end ifset
 
 @c ----------------------------------------------------------
