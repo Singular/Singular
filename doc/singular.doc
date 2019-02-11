@@ -179,6 +179,7 @@ non-commutative rings: @sc{Plural}, @sc{SCA} and @sc{Letterplace}.
 * PLURAL libraries::
 * Graded commutative algebras (SCA)::
 * LETTERPLACE::
+* Functions (letterplace)::
 * LETTERPLACE libraries::
 @end menu
 @include s-plural.tex
