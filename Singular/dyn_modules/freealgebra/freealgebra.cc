@@ -127,7 +127,7 @@ static BOOLEAN lpVarAt(leftv res, leftv h)
 
 //------------------------------------------------------------------------
 // initialisation of the module
-extern "C" int SI_MOD_INIT(freegb)(SModulFunctions* p)
+extern "C" int SI_MOD_INIT(freealgebra)(SModulFunctions* p)
 {
 #ifdef HAVE_SHIFTBBA
   p->iiAddCproc("freealgebra.so","freeAlgebra",FALSE,freeAlgebra);
