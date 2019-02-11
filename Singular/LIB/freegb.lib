@@ -28,7 +28,6 @@ lpVarBlockSize(R);               returns the size of the letterplace blocks
 lpDivision(f,I);                 two-sided division with remainder
 lpGBPres2Poly(L,I);              reconstructs a polynomial from the output of lpDivision
 isOrderingShiftInvariant(i);     tests shift-invariance of the monomial ordering
-isVar(p);                        check whether p is a power of a single variable
 makeLetterplaceRing(d);          (deprecated, use freeAlgebra) creates a Letterplace ring out of given data
 letplaceGBasis(I);               (deprecated, use twostd) two-sided Groebner basis of a letterplace ideal I
 lieBracket(a,b[, N]);            (deprecated, use bracket) Lie bracket ab-ba of two letterplace polynomials
@@ -71,7 +70,6 @@ proc tstfreegb()
   /* secondary */
   example lieBracket;
   example lpPrint;
-  example isVar;
 
   example ivL2lpI;
   example iv2lp;
@@ -322,7 +320,7 @@ example
   vct2str(w,1);
 }
 
-proc isVar(poly p)
+static proc isVar(poly p)
 "USAGE:  isVar(p);  poly p
 RETURN:  int
 PURPOSE: check, whether leading monomial of p is a power of a single variable
