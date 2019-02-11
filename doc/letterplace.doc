@@ -50,7 +50,7 @@ spanned by all monomials of @strong{length} at most @math{d}.
 * Letterplace correspondence::
 * Examples of use of Letterplace::
 * Functionality and release notes::
-* References and history::
+* References and history of Letterplace::
 @end menu
 
 @c ---------------------------------------------------------------------------
@@ -406,7 +406,7 @@ while K-dimension and monomial bases and Hilbert data - with the help of the lib
 We work further on implementing more algorithms for non-commutative ideals and modules over free associative algebra.
 
 @c ---------------------------------------------------------------------------
-@node Functionality and release notes, References and history, Examples of use of Letterplace, LETTERPLACE
+@node Functionality and release notes
 @subsection Functionality and release notes of @sc{Letterplace}
 @cindex Functionality and release notes
 
@@ -455,9 +455,9 @@ See
 @c ref
 
 @c ---------------------------------------------------------------------------
-@node References and history, , Functionality and release notes, LETTERPLACE
+@node References and history of Letterplace
 @subsection References and history of @sc{Letterplace}
-@cindex Letterplace: References and history
+@cindex References and history of Letterplace
 
 @sc{Letterplace} has undergone several stages of development. 
 
