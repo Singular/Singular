@@ -50,12 +50,13 @@ spanned by all monomials of @strong{length} at most @math{d}.
 * Letterplace correspondence::
 * Examples of use of Letterplace::
 * Functionality and release notes::
-* References and history::
+* References and history of Letterplace::
 @end menu
 
 @c ---------------------------------------------------------------------------
 @node Free associative algebras, Monomial orderings on free algebras, , LETTERPLACE
 @subsection Free associative algebras
+@cindex Free associative algebras
 @cindex free associative algebra, tensor algebra
 
 Let @math{V} be a @math{K}-vector space, spanned by the symbols @math{x_1},@dots{},@math{x_n}.
@@ -259,6 +260,7 @@ wr;
 @c ---------------------------------------------------------------------------
 @node Groebner bases for two-sided ideals in free associative algebras, Letterplace correspondence, Monomial orderings on free algebras, LETTERPLACE
 @subsection Groebner bases for two-sided ideals in free associative algebras
+@cindex Groebner bases for two-sided ideals in free associative algebras
 @cindex Groebner bases in free associative algebras
 
 @c Hence the notions like a leading monomial and a leading coefficient transfer to this situation.
@@ -307,7 +309,7 @@ it is the complete finite Groebner basis, if and only if @math{G(2d-1)=G(d)} hol
 @c ---------------------------------------------------------------------------
 @node Letterplace correspondence, Examples of use of Letterplace, Groebner bases for two-sided ideals in free associative algebras,LETTERPLACE
 @subsection Letterplace correspondence
-@cindex letterplace correspondence
+@cindex Letterplace correspondence
 
 The name letteplace has been inspired by the work of Rota and, independently, Feynman.
 
@@ -371,6 +373,7 @@ $K$-algebra operations of the letterplace algebra \textbf{and} simultaneous shif
 @c ---------------------------------------------------------------------------
 @node Examples of use of Letterplace, Functionality and release notes, Letterplace correspondence,LETTERPLACE
 @subsection Examples of use of @sc{Letterplace}
+@cindex Examples of use of Letterplace
 
 First, define a commutative ring @math{K[X]} in @sc{Singular}, equipped with a monomial well-ordering
 and call it, say, @code{r}. 
@@ -407,8 +410,9 @@ while K-dimension and monomial bases and Hilbert data - with the help of the lib
 We work further on implementing more algorithms for non-commutative ideals and modules over free associative algebra.
 
 @c ---------------------------------------------------------------------------
-@node Functionality and release notes, References and history, Examples of use of Letterplace, LETTERPLACE
+@node Functionality and release notes
 @subsection Functionality and release notes of @sc{Letterplace}
+@cindex Functionality and release notes
 
 With the present functionality it is possible to compute two-sided Groebner basis
 of an arbitrary two-sided ideal in a free associative algebra up to a given degree. 
@@ -455,8 +459,9 @@ See
 @c ref
 
 @c ---------------------------------------------------------------------------
-@node References and history, , Functionality and release notes, LETTERPLACE
+@node References and history of Letterplace
 @subsection References and history of @sc{Letterplace}
+@cindex References and history of Letterplace
 
 @sc{Letterplace} has undergone several stages of development. 
 
@@ -487,6 +492,7 @@ References:
 
 @node Functions BR_LETTERPLACE_BR
 @section Functions BR_LETTERPLACE_BR
+@cindex Functions BR_LETTERPLACE_BR
 @cindex commands BR_LETTERPLACE_BR
 
 This chapter gives a complete reference of all functions and commands of the @sc{Letterplace} kernel, i.e. all built-in commands
@@ -510,7 +516,7 @@ Note, that both @strong{Control structures} and @strong{System variables} of
 @end menu
 
 @c ------------------------------
-@node freeAlgebra BR_LETTERPLACE_BR, reduce BR_LETTERPLACE_BR, , Functions BR_LETTERPLACE_BR
+@node freeAlgebra BR_LETTERPLACE_BR
 @subsection freeAlgebra BR_LETTERPLACE_BR
 @cindex freeAlgebra BR_LETTERPLACE_BR
 
@@ -541,7 +547,7 @@ See @ref{Monomial orderings on free algebras}.
 
 
 @c ------------------------------
-@node reduce BR_LETTERPLACE_BR, std BR_LETTERPLACE_BR, freeAlgebra BR_LETTERPLACE_BR, Functions BR_LETTERPLACE_BR
+@node reduce BR_LETTERPLACE_BR
 @subsection reduce BR_LETTERPLACE_BR
 @cindex reduce BR_LETTERPLACE_BR
 @cindex NF BR_LETTERPLACE_BR
@@ -584,12 +590,12 @@ reduce(h,J); // the rest of two-sided division of h by J
 
 @c ref
 See also
-@c @ref{ideal BR_LETTERPLACE_BR};
+@c @ref{ideal};
 @ref{twostd BR_LETTERPLACE_BR}.
 @c ref
 
 @c ------------------------------
-@node rightstd BR_LETTERPLACE_BR, std BR_LETTERPLACE_BR, reduce BR_LETTERPLACE_BR, Functions BR_LETTERPLACE_BR
+@node rightstd BR_LETTERPLACE_BR
 @subsection rightstd BR_LETTERPLACE_BR
 @cindex rightstd BR_LETTERPLACE_BR
 @table @code
@@ -600,7 +606,6 @@ ideal
 @item @strong{Purpose:}
 Compute a right Groebner basis of the set of generators of the input ideal. 
 It is also effective in factor rings.
-@end table
 @smallexample
 @c example
 LIB "freegb.lib";
@@ -618,7 +623,7 @@ reduce(I,twostd(0)); // an explanation for the latter
 
 
 @c ------------------------------
-@node std BR_LETTERPLACE_BR, twostd BR_LETTERPLACE_BR, reduce BR_LETTERPLACE_BR, Functions BR_LETTERPLACE_BR
+@node std BR_LETTERPLACE_BR
 @subsection std BR_LETTERPLACE_BR
 @cindex std BR_LETTERPLACE_BR
 @table @code
@@ -627,11 +632,11 @@ reduce(I,twostd(0)); // an explanation for the latter
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
-Alias to @ref{twostd}.
+Alias to @ref{twostd BR_LETTERPLACE_BR}.
 @end table
 
 @c ------------------------------
-@node twostd BR_LETTERPLACE_BR, , std BR_LETTERPLACE_BR, Functions BR_LETTERPLACE_BR
+@node twostd BR_LETTERPLACE_BR
 @subsection twostd BR_LETTERPLACE_BR
 @cindex twostd BR_LETTERPLACE_BR
 
