@@ -320,7 +320,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
   L=""
   bi_staticdemo=false
   bi_subsets=false
-  bi_freegb=false
+  bi_freealgebra=false
   bi_syzextra=false
   bi_pyobject=false
   bi_gfanlib=false
@@ -356,7 +356,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
       case "${a}" in
        staticdemo ) bi_staticdemo=true;;
        subsets ) bi_subsets=true;;
-       freegb ) bi_freegb=true;;
+       freealgebra ) bi_freealgebra=true;;
        syzextra ) bi_syzextra=true ;;
        pyobject ) bi_pyobject=true ;;
        gfanlib ) bi_gfanlib=true ;;
@@ -395,7 +395,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
 
  AM_CONDITIONAL([SI_BUILTIN_STATICDEMO], [test x$bi_staticdemo = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_SUBSETS], [test x$bi_subsets = xtrue])
- AM_CONDITIONAL([SI_BUILTIN_FREEGB], [test x$bi_freegb = xtrue])
+ AM_CONDITIONAL([SI_BUILTIN_FREEALGEBRA], [test x$bi_freealgebra = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_SYZEXTRA], [test x$bi_syzextra = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_PYOBJECT], [test x$bi_pyobject = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_GFANLIB], [test x$bi_gfanlib = xtrue])

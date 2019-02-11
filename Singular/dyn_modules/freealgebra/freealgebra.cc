@@ -1,7 +1,7 @@
 #include "Singular/libsingular.h"
 
 #ifdef HAVE_SHIFTBBA
-static BOOLEAN freegb(leftv res, leftv args)
+static BOOLEAN freeAlgebra(leftv res, leftv args)
 {
   const short t1[]={2,RING_CMD,INT_CMD};
   if (iiCheckTypes(args,t1,1))
@@ -79,7 +79,6 @@ static BOOLEAN btest(leftv res, leftv h)
   else return TRUE;
 }
 
-/*==================== divide-test for freeGB  =================*/
 static BOOLEAN lpLmDivides(leftv res, leftv h)
 {
   const short t1[]={2,POLY_CMD,POLY_CMD};
@@ -111,7 +110,6 @@ static BOOLEAN lpLmDivides(leftv res, leftv h)
   else return TRUE;
 }
 
-/*==================== get var for freeGB  ====================*/
 static BOOLEAN lpVarAt(leftv res, leftv h)
 {
   const short t[]={2,POLY_CMD,INT_CMD};
@@ -129,14 +127,14 @@ static BOOLEAN lpVarAt(leftv res, leftv h)
 
 //------------------------------------------------------------------------
 // initialisation of the module
-extern "C" int SI_MOD_INIT(freegb)(SModulFunctions* p)
+extern "C" int SI_MOD_INIT(freealgebra)(SModulFunctions* p)
 {
 #ifdef HAVE_SHIFTBBA
-  p->iiAddCproc("freegb.so","freeAlgebra",FALSE,freegb);
-  p->iiAddCproc("freegb.so","lpLmDivides",FALSE,lpLmDivides);
-  p->iiAddCproc("freegb.so","lpVarAt",FALSE,lpVarAt);
-  p->iiAddCproc("freegb.so","stest",TRUE,stest);
-  p->iiAddCproc("freegb.so","btest",TRUE,btest);
+  p->iiAddCproc("freealgebra.so","freeAlgebra",FALSE,freeAlgebra);
+  p->iiAddCproc("freealgebra.so","lpLmDivides",FALSE,lpLmDivides);
+  p->iiAddCproc("freealgebra.so","lpVarAt",FALSE,lpVarAt);
+  p->iiAddCproc("freealgebra.so","stest",TRUE,stest);
+  p->iiAddCproc("freealgebra.so","btest",TRUE,btest);
 #endif
   return (MAX_TOK);
 }
