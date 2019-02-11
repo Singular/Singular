@@ -54,14 +54,14 @@ proc tstfpaprops()
 proc lpNoetherian(ideal G)
 "USAGE: lpNoetherian(G); G an ideal in a Letterplace ring
 RETURN: int
-@*      0 not Noetherian
-@*      1 left Noetherian
-@*      2 right Noetherian
-@*      3 Noetherian
-@*      4 weak Noetherian
+      0 not Noetherian
+      1 left Noetherian
+      2 right Noetherian
+      3 Noetherian
+      4 weak Noetherian
 PURPOSE: Check whether the monomial algebra A/<LM(G)> is (left/right) noetherian
 ASSUME: - basering is a Letterplace ring
-@*      - G is a Groebner basis
+      - G is a Groebner basis
 THEORY: lpNoetherian works with the monomial algebra A/<LM(G)>.
 If it gives an affirmative answer for one of the properties, then it
 holds for both A/<LM(G)> and A/<G>. However, a negative answer applies
@@ -643,7 +643,7 @@ static proc countCycles(intmat G, int v, intvec visited, intvec cyclic, intvec p
 "USAGE: countCycles(G, v, visited, cyclic, path); G a Graph, v the vertex to
 start. The parameter visited, cyclic and path should be 0.
 RETURN: int
-@*:     Maximal number of distinct cycles
+     Maximal number of distinct cycles
 PURPOSE: Calculate the maximal number of distinct cycles in a single path starting at v
 ASSUME: Basering is a Letterplace ring
 "
@@ -729,7 +729,6 @@ ASSUME: Basering is a Letterplace ring
 
 proc lpUfGraph(ideal G, list #)
 "USAGE: lpUfGraph(G); G a set of monomials in a letterplace ring.
-@*      lpUfGraph(G,1); G a set of monomials in a letterplace ring.
 RETURN: intmat or list
 NOTE: lpUfGraph(G); returns intmat. lpUfGraph(G,1); returns list L with L[1] an intmat and L[2] an ideal.
       The intmat is the Ufnarovskij Graph and the ideal contains the vertices.
@@ -881,9 +880,9 @@ proc lpGkDim(ideal G)
 "USAGE: lpGkDim(G); G an ideal in a letterplace ring
 RETURN: int
 PURPOSE: Determines the Gelfand Kirillov dimension of A/<G>
-@*       -1 means positive infinite
+       -1 means positive infinite
 ASSUME: - basering is a Letterplace ring
-@*      - G is a Groebner basis
+      - G is a Groebner basis
 "
 {
   G = lead(G);
