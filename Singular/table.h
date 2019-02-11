@@ -1173,7 +1173,7 @@ VAR cmdnames cmds[] =
   { "restart",     0, RESTART_CMD,        CMD_1},
   { "return",      0, RETURN ,            RETURN},
   { "RETURN",      0, END_GRAMMAR ,       RETURN},
-#ifdef HAVE_PLURAL
+#ifdef HAVE_SHIFTBBA
   { "rightstd",    0, RIGHTSTD_CMD ,      CMD_1},
 #endif /* HAVE_PLURAL */
   { "ring",        0, RING_CMD ,          RING_CMD},

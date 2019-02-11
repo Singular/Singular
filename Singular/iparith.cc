@@ -43,7 +43,6 @@
 #include "kernel/GBEngine/kstdfac.h"
 #include "kernel/GBEngine/syz.h"
 #include "kernel/GBEngine/kstd1.h"
-#include "kernel/GBEngine/kutil.h"
 #include "kernel/GBEngine/units.h"
 #include "kernel/GBEngine/tgb.h"
 

@@ -32,7 +32,7 @@ objects between commutative rings of @sc{Singular} and non-commutative rings of 
 With @sc{Plural}, one can set up a non-commutative @math{G}-algebra, say @math{A}, with
 a Poincar@'e-Birkhoff-Witt (PBW) basis, (see @ref{G-algebras} for step-by-step building instructions 
 and also @ref{PLURAL libraries} for procedures for setting many important algebras easily).
-Afterwards, one can proceed to the factor-algebra of @math{A} modulo a two-sided ideal (see @ref{twostd}), thus
+Afterwards, one can proceed to the factor-algebra of @math{A} modulo a two-sided ideal (see @ref{twostd BR_PLURAL_BR}), thus
 obtaining a @math{GR}-algebra (see @ref{qring BR_PLURAL_BR} type).
 
 Functionalities of @sc{Plural} (enlisted in @ref{Functions  BR_PLURAL_BR}) are accessible as soon 
@@ -90,7 +90,7 @@ interpreted as commutative expressions. See example in @ref{poly expressions BR_
 
 Unless stated otherwise, an expression of type @code{ideal} as understood by @sc{Plural}
 as a list of generators of a @strong{left} ideal. For more information see @ref{ideal BR_PLURAL_BR}.
- @* For a @strong{two-sided ideal} @code{T}, use the command @ref{twostd} for computing
+ @* For a @strong{two-sided ideal} @code{T}, use the command @ref{twostd BR_PLURAL_BR} for computing
 the two-sided Groebner basis of @code{T}.
  @* For a @strong{right ideal} @code{I}, use @ref{rightStd} from @code{nctools_lib} for computing the right 
  Groebner basis of @code{I}.
@@ -143,8 +143,7 @@ For the general syntax of a declaration see @ref{General command syntax}.
 For @sc{Plural} ideals are @strong{left} ideals, unless stated otherwise.
 @* Ideals are represented as lists of polynomials which are interpreted as
 left generators of the ideal.
-@* For the operations with two-sided ideals see
- @ref{twostd}.
+@* For the operations with two-sided ideals see @ref{twostd BR_PLURAL_BR}.
 
 
 Like polynomials, ideals can only be defined or accessed with respect to a basering.
@@ -358,7 +357,7 @@ substitute a ring variable (see @ref{subst BR_PLURAL_BR})
 @item syz
 computation of the first syzygy module (see @ref{syz BR_PLURAL_BR})
 @item twostd
-two-sided Groebner basis computation (see @ref{twostd})
+two-sided Groebner basis computation (see @ref{twostd BR_PLURAL_BR})
 @item vdim
 vector space dimension of basering modulo the leading ideal (see @ref{vdim BR_PLURAL_BR})
 @end table
@@ -1080,7 +1079,7 @@ the indicated variable of the ring (see @ref{var})
 
 @sc{Plural} offers the possibility to compute within
 factor-rings modulo two-sided ideals.  The ideal has to be given
-as a two-sided Groebner basis (see @ref{twostd} command).
+as a two-sided Groebner basis (see @ref{twostd BR_PLURAL_BR} command).
 
 @* For a detailed description of the concept of rings and quotient rings see
 @ifclear singularmanual
@@ -1509,7 +1508,7 @@ Note, that both @strong{Control structures} and @strong{System variables} of
 * std BR_PLURAL_BR::
 * subst  BR_PLURAL_BR::
 * syz BR_PLURAL_BR::
-* twostd::
+* twostd BR_PLURAL_BR::
 * vdim BR_PLURAL_BR::
 @end menu
 
@@ -2865,7 +2864,7 @@ See
 @node reduce BR_PLURAL_BR, ringlist BR_PLURAL_BR, quotient BR_PLURAL_BR, Functions BR_PLURAL_BR
 @subsection reduce BR_PLURAL_BR
 @cindex reduce BR_PLURAL_BR
-@cindex NF
+@cindex NF BR_PLURAL_BR
 @table @code
 @item @strong{Syntax:}
 
@@ -3146,7 +3145,7 @@ C2;
 
 
 @c -------------------------------------------------
-@node syz BR_PLURAL_BR, twostd, subst  BR_PLURAL_BR, Functions BR_PLURAL_BR
+@node syz BR_PLURAL_BR, twostd BR_PLURAL_BR, subst  BR_PLURAL_BR, Functions BR_PLURAL_BR
 @subsection syz BR_PLURAL_BR
 @cindex syz BR_PLURAL_BR
 @table @code
@@ -3204,9 +3203,9 @@ See also
 
 
 @c ------------------------------
-@node twostd, vdim BR_PLURAL_BR, syz BR_PLURAL_BR, Functions BR_PLURAL_BR
-@subsection twostd
-@cindex twostd
+@node twostd BR_PLURAL_BR, vdim BR_PLURAL_BR, syz BR_PLURAL_BR, Functions BR_PLURAL_BR
+@subsection twostd BR_PLURAL_BR
+@cindex twostd BR_PLURAL_BR
 
 @table @code
 @item @strong{Syntax:}
@@ -3247,7 +3246,7 @@ print(matrix(K));
 
 
 @c -------------------------------------------------------------------------
-@node vdim BR_PLURAL_BR,, twostd, Functions BR_PLURAL_BR
+@node vdim BR_PLURAL_BR,, twostd BR_PLURAL_BR, Functions BR_PLURAL_BR
 @subsection vdim BR_PLURAL_BR
 @cindex vdim BR_PLURAL_BR
 @table @code

@@ -1763,7 +1763,7 @@ proc makeModElimRing(list #)
 "USAGE:  makeModElimRing(L); L a list
 RETURN:  ring
 PURPOSE: create a copy of a given ring equipped with the
-@* elimination ordering for module components @code{(c,<)}
+   elimination ordering for module components @code{(c,<)}
 NOTE: usually the list argument contains a ring to work with
 EXAMPLE: example makeModElimRing; shows an example
 "

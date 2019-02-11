@@ -77,7 +77,7 @@ proc serreRelations(intmat A, int zu)
 "USAGE:  serreRelations(A,z); A an intmat, z an int
 RETURN:  ideal
 ASSUME: basering has a letterplace ring structure and
-@*          A is a generalized Cartan matrix with integer entries
+        A is a generalized Cartan matrix with integer entries
 PURPOSE: compute the ideal of Serre's relations associated to A
 EXAMPLE: example serreRelations; shows examples
 "
@@ -144,13 +144,13 @@ proc fullSerreRelations(intmat A, ideal rNegative, ideal rCartan, ideal rPositiv
 "USAGE:  fullSerreRelations(A,N,C,P,d); A an intmat, N,C,P ideals, d an int
 RETURN:  ring (and ideal)
 PURPOSE: compute the inhomogeneous Serre's relations associated to A in given
-@*       variable names
+         variable names
 ASSUME: three ideals in the input are of the same sizes and contain merely
-@* variables which are interpreted as follows: N resp. P stand for negative
-@* resp. positive roots, C stand for Cartan elements. d is the degree bound for
-@* letterplace ring, which will be returned.
-@* The matrix A is a generalized Cartan matrix with integer entries
-@* The result is the ideal called 'fsRel' in the returned ring.
+   variables which are interpreted as follows: N resp. P stand for negative
+   resp. positive roots, C stand for Cartan elements. d is the degree bound for
+   letterplace ring, which will be returned.
+   The matrix A is a generalized Cartan matrix with integer entries
+   The result is the ideal called 'fsRel' in the returned ring.
 EXAMPLE: example fullSerreRelations; shows examples
 "
 {
@@ -362,7 +362,7 @@ proc ademRelations(int i, int j)
 "USAGE:  ademRelations(i,j); i,j int
 RETURN:  ring (and exports ideal)
 PURPOSE: compute the ideal of Adem relations for i<2j in characteristic 0
-@*  the ideal is exported under the name AdemRel in the output ring
+    the ideal is exported under the name AdemRel in the output ring
 EXAMPLE: example ademRelations; shows examples
 "
 {
