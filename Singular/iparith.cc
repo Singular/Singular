@@ -2875,7 +2875,7 @@ static BOOLEAN jjBRACKET(leftv res, leftv a, leftv b)
 {
   res->data=NULL;
 
-  if (rIsPluralRing(currRing))
+  if (rIsPluralRing(currRing) || rIsLPRing(currRing))
   {
     const poly q = (poly)b->Data();
 
@@ -2883,8 +2883,57 @@ static BOOLEAN jjBRACKET(leftv res, leftv a, leftv b)
     {
       if( (poly)a->Data() != NULL )
       {
-        poly p = (poly)a->CopyD(POLY_CMD); // p = copy!
-        res->data = nc_p_Bracket_qq(p,q, currRing); // p will be destroyed!
+        if (rIsPluralRing(currRing))
+        {
+          poly p = (poly)a->CopyD(POLY_CMD); // p = copy!
+          res->data = nc_p_Bracket_qq(p,q, currRing); // p will be destroyed!
+        }
+        else if (rIsLPRing(currRing))
+        {
+          const poly p = (poly)a->Data();
+          res->data = pAdd(ppMult_qq(p,q), pNeg(ppMult_qq(q,p)));
+        }
+      }
+    }
+  }
+  return FALSE;
+}
+static BOOLEAN jjBRACKET_REC(leftv res, leftv a, leftv b, leftv c)
+{
+  res->data=NULL;
+
+  if (rIsLPRing(currRing) || rIsPluralRing(currRing))
+  {
+    const poly q = (poly)b->Data();
+    if(q != NULL)
+    {
+      if((poly)a->Data() != NULL)
+      {
+        const poly p = (poly)a->Data();
+        int k=(int)(long)c->Data();
+        if (k > 0)
+        {
+          poly qq = pCopy(q);
+          for (int i = 0; i < k; i++)
+          {
+            poly qq_ref = qq;
+            if (rIsLPRing(currRing))
+            {
+              qq = pAdd(ppMult_qq(p,qq), pNeg(ppMult_qq(qq,p)));
+            }
+            else if (rIsPluralRing(currRing))
+            {
+              qq = nc_p_Bracket_qq(pCopy(p), qq, currRing);
+            }
+            pDelete(&qq_ref);
+            if (qq == NULL) break;
+          }
+          res->data = qq;
+        }
+        else
+        {
+          Werror("invalid number of iterations");
+        }
       }
     }
   }
