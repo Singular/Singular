@@ -596,7 +596,6 @@ ideal
 @item @strong{Purpose:}
 Compute a right Groebner basis of the set of generators of the input ideal. 
 It is also effective in factor rings.
-@end table
 @smallexample
 @c example
 LIB "freegb.lib";
