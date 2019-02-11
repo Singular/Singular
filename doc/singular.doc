@@ -183,9 +183,9 @@ non-commutative rings: @sc{Plural}, @sc{SCA} and @sc{Letterplace}.
 * LETTERPLACE libraries::
 @end menu
 @include s-plural.tex
+@include s-plulibs.tex
 @include sca.tex
 @include s-letterplace.tex
-@include s-plulibs.tex
 @end ifset
 
 @c ----------------------------------------------------------------------------
@@ -212,6 +212,45 @@ non-commutative rings: @sc{Plural}, @sc{SCA} and @sc{Letterplace}.
 @appendix Mathematical background
 @cindex Mathematical background
 @include math.tex
+
+@c ----------------------------------------------------------------------------
+@node SINGULAR libraries, Release Notes, Mathematical background, Top
+@appendix SINGULAR libraries
+@cindex SINGULAR libraries
+@cindex LIBs
+
+@sc{Singular} comes with a set of standard libraries. Their content is
+described in the following subsections.
+
+Use the @code{LIB} command (see @ref{LIB}) for loading of single libraries,
+and the command @code{LIB "all.lib";} for loading all libraries.
+
+@ifset withplural
+See also @ref{PLURAL libraries}.
+@end ifset
+
+@strong{Interpreter libraries:}
+
+
+
+@c ----------------------------------------------------------
+@node Release Notes, Index, SINGULAR libraries, Top
+@chapter Release Notes
+@cindex Release Notes
+@include platform.tex
+
+@c ----------------------------------------------------------
+@node Index, , Release Notes, Top
+@chapter Index
+@cindex Index
+@printindex cp
+@c ---------------------------------------------------------
+
+@c generate table of content and short table of content
+@contents
+@bye
+
+
 
 @c ----------------------------------------------------------------------------
 @node SINGULAR libraries, Release Notes, Mathematical background, Top
