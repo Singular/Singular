@@ -22,5 +22,7 @@ poly maMapPoly(const poly map_p, const ring map_r,const ideal image_id, const ri
 poly p_SubstPoly (poly p, int var, poly image, const ring preimage_r, const ring image_r, const nMapFunc nMap, matrix cache=NULL);
 ideal id_SubstPoly (ideal id, int var, poly image, const ring preimage_r, const ring image_r, const nMapFunc nMap);
 
+/// evaluate the polynomial p at the pt given by the array pt
+number maEvalAt(const poly p,const number* pt, const ring r);
 #endif
 

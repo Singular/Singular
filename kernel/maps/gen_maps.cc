@@ -163,3 +163,17 @@ poly maMapPoly(const poly map_p, const ring map_r,const ideal image_id, const ri
   id_Delete((ideal*)&s,image_r);
   return p;
 }
+
+number maEvalAt(const poly p,const number* pt, const ring r)
+{
+  ideal map=idInit(r->N,1);
+  for(int i=r->N-1;i>=0;i--)
+  {
+    map->m[i]=p_NSet(n_Copy(pt[i],r->cf),r);
+  }
+  poly v=maMapPoly(p,r,map,r,ndCopyMap);
+  id_Delete(&map,r);
+  number vv=pGetCoeff(v);
+  p_LmFree(&v,r);
+  return vv;
+}
