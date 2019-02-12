@@ -592,8 +592,8 @@ const struct sValCmd2 dArith2[]=
 ,{D(syBetti2),    BETTI_CMD,      INTMAT_CMD,     RESOLUTION_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjBETTI2_ID), BETTI_CMD,      INTMAT_CMD,     IDEAL_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjBETTI2_ID), BETTI_CMD,      INTMAT_CMD,     MODUL_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-#ifdef HAVE_PLURAL
-,{D(jjBRACKET),   BRACKET_CMD,    POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_PLURAL | NO_RING}
+#if defined(HAVE_PLURAL) || defined(HAVE_SHIFTBBA)
+,{D(jjBRACKET),   BRACKET_CMD,    POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_NC | NO_RING}
 #endif
 ,{D(jjCHINREM_BI),CHINREM_CMD,    BIGINT_CMD,     INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
 //,{D(jjCHINREM_P), CHINREM_CMD,    POLY_CMD,       LIST_CMD,   INTVEC_CMD, ALLOW_PLURAL}
@@ -786,6 +786,9 @@ const struct sValCmd3 dArith3[]=
 ,{D(jjBRACK_Ma_I_IV),  '[',        POLY_CMD,   MATRIX_CMD, INT_CMD,    INTVEC_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjBRACK_Ma_IV_I),  '[',        POLY_CMD,   MATRIX_CMD, INTVEC_CMD, INT_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjBRACK_Ma_IV_IV), '[',        POLY_CMD,   MATRIX_CMD, INTVEC_CMD, INTVEC_CMD, ALLOW_NC |ALLOW_RING}
+#if defined(HAVE_SHIFTBBA) || defined(HAVE_PLURAL)
+,{D(jjBRACKET_REC),    BRACKET_CMD,POLY_CMD,   POLY_CMD,   POLY_CMD,   INT_CMD, ALLOW_NC | NO_RING}
+#endif
 ,{D(jjRING_2),         '[',        RING_CMD,   CRING_CMD,  ANY_TYPE,   ANY_TYPE, ALLOW_NC |ALLOW_RING}
 #ifdef SINGULAR_4_2
 ,{D(jjBRACK_Bim),      '[',        CNUMBER_CMD, CMATRIX_CMD, INT_CMD, INT_CMD, ALLOW_NC |ALLOW_RING}
@@ -985,8 +988,8 @@ VAR cmdnames cmds[] =
   { "bigint",      0, BIGINT_CMD ,        ROOT_DECL},
   { "bigintmat",   0, BIGINTMAT_CMD ,     BIGINTMAT_CMD},
   { "branchTo",    0, BRANCHTO_CMD ,      CMD_M},
-  #ifdef HAVE_PLURAL
-  { "bracket",     0, BRACKET_CMD ,       CMD_2},
+  #if defined(HAVE_SHIFTBBA) || defined(HAVE_PLURAL)
+  { "bracket",     0, BRACKET_CMD ,       CMD_23},
   #endif
   { "break",       0, BREAK_CMD ,         BREAK_CMD},
   { "breakpoint",  0, BREAKPOINT_CMD ,    CMD_M},

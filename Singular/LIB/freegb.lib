@@ -25,13 +25,12 @@ PROCEDURES:
 isFreeAlgebra(r);                check whether r is a letterplace ring (free algebra)
 lpDegBound(R);                   returns the degree bound of a letterplace ring
 lpVarBlockSize(R);               returns the size of the letterplace blocks
-letplaceGBasis(I);               (deprecated) two-sided Groebner basis of a letterplace ideal I
 lpDivision(f,I);                 two-sided division with remainder
 lpGBPres2Poly(L,I);              reconstructs a polynomial from the output of lpDivision
-lieBracket(a,b[, N]);            Lie bracket ab-ba of two letterplace polynomials
 isOrderingShiftInvariant(i);     tests shift-invariance of the monomial ordering
-isVar(p);                        check whether p is a power of a single variable
-makeLetterplaceRing(d);          (deprecated) creates a Letterplace ring out of given data
+makeLetterplaceRing(d);          (deprecated, use freeAlgebra) creates a Letterplace ring out of given data
+letplaceGBasis(I);               (deprecated, use twostd) two-sided Groebner basis of a letterplace ideal I
+lieBracket(a,b[, N]);            (deprecated, use bracket) Lie bracket ab-ba of two letterplace polynomials
 setLetterplaceAttributes(R,d,b); (for testing purposes) supplies ring R with the letterplace structure
 
 SEE ALSO: fpadim_lib, fpaprops_lib, fpalgebras_lib, LETTERPLACE
@@ -71,7 +70,6 @@ proc tstfreegb()
   /* secondary */
   example lieBracket;
   example lpPrint;
-  example isVar;
 
   example ivL2lpI;
   example iv2lp;
@@ -322,7 +320,7 @@ example
   vct2str(w,1);
 }
 
-proc isVar(poly p)
+static proc isVar(poly p)
 "USAGE:  isVar(p);  poly p
 RETURN:  int
 PURPOSE: check, whether leading monomial of p is a power of a single variable
@@ -415,13 +413,6 @@ computed.
 EXAMPLE: example lieBracket; shows examples
 "
 {
-  if (lpAssumeViolation())
-  {
-    //    ERROR("Either 'uptodeg' or 'lV' global variables are not set!");
-    ERROR("Incomplete Letterplace structure on the basering!");
-  }
-  // alias ppLiebr;
-  //if int N is given compute [a,[...[a,b]]]] left normed bracket
   int N=1;
   if (size(#)>0)
   {
@@ -430,16 +421,33 @@ EXAMPLE: example lieBracket; shows examples
       N = int(#[1]);
     }
   }
-  if (N<=0) { return(q); }
-  poly q = a*b - b*a;
-  if (N >1)
-  {
-    for(int i=1; i<=N-1; i++)
-    {
-      q = lieBracket(a,q);
-    }
-  }
-  return(q);
+  return (bracket(a,b,N));
+
+  /* if (lpAssumeViolation()) */
+  /* { */
+  /*   //    ERROR("Either 'uptodeg' or 'lV' global variables are not set!"); */
+  /*   ERROR("Incomplete Letterplace structure on the basering!"); */
+  /* } */
+  /* // alias ppLiebr; */
+  /* //if int N is given compute [a,[...[a,b]]]] left normed bracket */
+  /* int N=1; */
+  /* if (size(#)>0) */
+  /* { */
+  /*   if (typeof(#[1])=="int") */
+  /*   { */
+  /*     N = int(#[1]); */
+  /*   } */
+  /* } */
+  /* if (N<=0) { return(q); } */
+  /* poly q = a*b - b*a; */
+  /* if (N >1) */
+  /* { */
+  /*   for(int i=1; i<=N-1; i++) */
+  /*   { */
+  /*     q = lieBracket(a,q); */
+  /*   } */
+  /* } */
+  /* return(q); */
 }
 example
 {
