@@ -48,12 +48,12 @@ A variety of monomial orderings is supported.
 
 @menu
 * Examples of use of Letterplace::
-* Functionality and release notes::
+* Functionality and release notes of Letterplace::
 * References and history of Letterplace::
 @end menu
 
 @c ---------------------------------------------------------------------------
-@node Examples of use of Letterplace, Functionality and release notes, ,LETTERPLACE
+@node Examples of use of Letterplace
 @subsection Examples of use of @sc{Letterplace}
 @cindex Examples of use of Letterplace
 
@@ -92,9 +92,9 @@ while K-dimension and monomial bases and Hilbert data - with the help of the lib
 We work further on implementing more algorithms for non-commutative ideals and modules over free associative algebra.
 
 @c ---------------------------------------------------------------------------
-@node Functionality and release notes
+@node Functionality and release notes of Letterplace
 @subsection Functionality and release notes of @sc{Letterplace}
-@subsection Functionality and release notes of Letterplace
+@cindex Functionality and release notes of Letterplace
 
 With the present functionality it is possible to compute two-sided Groebner basis
 of an arbitrary two-sided ideal in a free associative algebra up to a given degree.
@@ -213,13 +213,14 @@ the degree (length) bound @code{d}, with the monomial ordering, determined
 by those on the ring @code{r}.
 @item @strong{Example:}
 @smallexample
+@c example
+LIB "freegb.lib";
 ring r = 0,(x,y,z),dp;
 def R = freeAlgebra(r, 7); // this ordering is degree right lex
 R;
 ring r2 = 0,(x,y,z),lp;
 def R2 = freeAlgebra(r2, 7); // note, that this ordering is NOT left or right lex
 R2;
-@c example
 @c example
 @end smallexample
 @end table
@@ -385,7 +386,7 @@ such that @math{I} is given via its @strong{finite} Groebner basis @math{G}.
 @cindex finitely presented algebra, standard finitely presented algebra
 
 @c ---------------------------------------------------------------------------
-@node Monomial orderings on free algebras, Groebner bases for two-sided ideals in free associative algebras, Free associative algebras, Mathematical background BR_LETTERPLACE_BR
+@node Monomial orderings on free algebras
 @subsection Monomial orderings on free algebras
 @cindex Monomial orderings on free algebras
 
@@ -560,7 +561,7 @@ wr;
 @end smallexample
 
 @c ---------------------------------------------------------------------------
-@node Groebner bases for two-sided ideals in free associative algebras, Letterplace correspondence, Monomial orderings on free algebras, Mathematical background BR_LETTERPLACE_BR
+@node Groebner bases for two-sided ideals in free associative algebras
 @subsection Groebner bases for two-sided ideals in free associative algebras
 @cindex Groebner bases for two-sided ideals in free associative algebras
 @cindex Groebner bases in free associative algebras
@@ -609,7 +610,7 @@ it is the complete finite Groebner basis, if and only if @math{G(2d-1)=G(d)} hol
 
 
 @c ---------------------------------------------------------------------------
-@node Letterplace correspondence, Examples of use of Letterplace, Groebner bases for two-sided ideals in free associative algebras, Mathematical background BR_LETTERPLACE_BR
+@node Letterplace correspondence
 @subsection Letterplace correspondence
 @cindex Letterplace correspondence
 
