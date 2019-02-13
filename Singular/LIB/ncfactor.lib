@@ -24,6 +24,7 @@ PROCEDURES:
   facSubWeyl(h,X,D);         Factorization in the first Weyl algebra as a subalgebra
   facShift(h);               Factorization in the n'th shift algebra
   facFirstShift(h);          Factorization in the first shift algebra
+  homogfacNthWeyl(h);        Homogeneous factorization in the n'th Weyl algebra
   homogfacNthQWeyl(h);       Homogeneous factorization in the n'th Q-Weyl algebra
   homogfacFirstQWeyl(h);     Homogeneous factorization in the first Q-Weyl algebra
   homogfacNthQWeyl_all(h);   Homogeneous factorization (complete) in the n'th Q-Weyl algebra
@@ -5256,7 +5257,7 @@ static proc test_sortFactorizations()
 //*******N'TH WEYL ALGEBRA SECTION***************
 //////////////////////////////////////////////////
 
-static proc homogfacNthWeyl(poly h)
+proc homogfacNthWeyl(poly h)
 "USAGE: homogfacNthWeyl(h); h is a homogeneous polynomial in the
  nth Weyl algebra with respect to the -1,1-grading
 RETURN: list
