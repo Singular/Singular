@@ -5272,8 +5272,6 @@ THEORY: @code{homogfacFirstWeyl} returns a list with a factorization of the give
 GENERAL ASSUMPTIONS:
  - The basering is the nth Weyl algebra and has the form, that the first n variables represent
    x1, ..., xn, and the second n variables do represent the d1, ..., dn.
-
-SEE ALSO: homogfacFirstWeyl_all
 "
 {//proc homogfacNthWeyl
   int p = printlevel-voice+2;//for dbprint
