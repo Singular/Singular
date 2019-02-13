@@ -25,6 +25,7 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 * dmod_lib:: Fundamental algorithms for algebraic D-modules
 * dmodapp_lib::  Applications of algebraic D-modules
 * dmodideal_lib:: Algorithms for Bernstein-Sato ideals of morphisms
+* dmodloc_lib:: Localization of algebraic D-modules
 * dmodvar_lib:: Algebraic D-modules and Bernstein-Sato polynomial for varieties
 * involut_lib::  Computations and operations with involutions
 * gkdim_lib::  Computation of the Gelfand-Kirillov dimension of modules
@@ -32,16 +33,15 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 * ncdecomp_lib::  Algorithmic decomposition of a module with central characters
 * ncfactor_lib::  Tools for factorization in some noncommutative algebras
 * ncfrac_lib:: fractions in Ore localizations of a G-algebras
+* nchomolog_lib:: Noncommutative Homological Algebra
 * ncloc_lib:: Ore-localization in G-Algebras
 * ncpreim_lib:: Non-commutative elimination and preimage computations
 * nctools_lib::  General tools for noncommutative algebras
 * olga_lib:: Ore-localization in G-Algebras
 * perron_lib::  Method of Perron to compute algebraic dependence
-* qmatrix_lib::  Quantum matrices, quantum minors and symmetric groups
 * purityfiltration_lib:: purity filtration of a given module
-* nchomolog_lib:: Noncommutative Homological Algebra
+* qmatrix_lib::  Quantum matrices, quantum minors and symmetric groups
 * ratgb_lib:: Groebner bases in Ore localizations of noncommutative G-algebras
-* dmodloc_lib:: Localization of algebraic D-modules
 @end menu
 
 @c as @c lib generates parts of sections, but we need subsections:
@@ -150,4 +150,3 @@ Status: experimental
 @c lib olga.lib
 @c ----------------------------------------------------------
 @raisesections
-

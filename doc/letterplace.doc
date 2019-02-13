@@ -219,7 +219,7 @@ ring r = 0,(x,y,z),dp;
 def R = freeAlgebra(r, 7); // this ordering is degree right lex
 R;
 ring r2 = 0,(x,y,z),lp;
-def R2 = freeAlgebra(r2, 7); // note, that this ordering is NOT left or right lex
+def R2 = freeAlgebra(r2, 5); // note, that this ordering is NOT left or right lex
 R2;
 @c example
 @end smallexample
@@ -340,6 +340,13 @@ ideal I = x^4, d^3, d*x - x*d - 1;
 twostd(I); // a proper ideal, note x^3 as a generator
 ideal J = x^2, d^3, d*x - x*d - 1;
 twostd(J); // the whole ring
+ideal T = twostd(ideal(d*x - x*d - 1)); 
+T;
+qring Q = T; // thus Q is the Weyl algebra over Z/3z
+ideal I = x^4, d^3;
+twostd(I);
+ideal J = x^2, d^3;
+twostd(J);
 @c example
 @end smallexample
 @end table
