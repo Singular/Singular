@@ -66,8 +66,75 @@ static void writemon(poly p, int ko, const ring r)
   }
 
   int i;
+  {
+    for (i=0; i<rVar(r); i++)
+    {
+      {
+        long ee = p_GetExp(p,i+1,r);
+        if (ee!=0L)
+        {
+          if (wroteCoef)
+            StringAppendS("*");
+          //else
+          wroteCoef=(bNotShortOut);
+          writeGen=TRUE;
+          StringAppendS(rRingVar(i, r));
+          if (ee != 1L)
+          {
+            if (bNotShortOut) StringAppendS("^");
+            StringAppend("%ld", ee);
+          }
+        }
+      }
+    }
+  }
+  //StringAppend("{%d}",p->Order);
+  if (p_GetComp(p, r) != (long)ko)
+  {
+    if (writeGen) StringAppendS("*");
+    StringAppend("gen(%d)", p_GetComp(p, r));
+  }
+}
+
+/*2
+* writes a monomial (p),
+* uses form x*gen(.) if ko != coloumn number of p
+*/
 #ifdef HAVE_SHIFTBBA
-  if (rIsLPRing(r)) // this implies bNotShortOut
+static void writemonLP(poly p, int ko, const ring r)
+{
+  assume(r != NULL);
+  const coeffs C = r->cf;
+  assume(C != NULL);
+
+  BOOLEAN wroteCoef=FALSE,writeGen=FALSE;
+
+  if (((p_GetComp(p,r) == ko)
+    &&(p_LmIsConstantComp(p, r)))
+  || ((!n_IsOne(pGetCoeff(p),C))
+    && (!n_IsMOne(pGetCoeff(p),C))
+  )
+  )
+  {
+    n_WriteLong(pGetCoeff(p),C);
+
+    wroteCoef=TRUE;
+    writeGen=TRUE;
+  }
+  else if (n_IsMOne(pGetCoeff(p),C))
+  {
+    if (n_GreaterZero(pGetCoeff(p),C))
+    {
+      n_WriteLong(pGetCoeff(p),C);
+
+      wroteCoef=TRUE;
+      writeGen=TRUE;
+    }
+    else
+      StringAppendS("-");
+  }
+
+  int i;
   {
     int lV = r->isLPring;
     int lastVar = p_mLastVblock(p, r) * lV;
@@ -104,30 +171,6 @@ static void writemon(poly p, int ko, const ring r)
       }
     }
   }
-  else
-#endif
-  {
-    for (i=0; i<rVar(r); i++)
-    {
-      {
-        long ee = p_GetExp(p,i+1,r);
-        if (ee!=0L)
-        {
-          if (wroteCoef)
-            StringAppendS("*");
-          //else
-          wroteCoef=(bNotShortOut);
-          writeGen=TRUE;
-          StringAppendS(rRingVar(i, r));
-          if (ee != 1L)
-          {
-            if (bNotShortOut) StringAppendS("^");
-            StringAppend("%ld", ee);
-          }
-        }
-      }
-    }
-  }
   //StringAppend("{%d}",p->Order);
   if (p_GetComp(p, r) != (long)ko)
   {
@@ -135,6 +178,7 @@ static void writemon(poly p, int ko, const ring r)
     StringAppend("gen(%d)", p_GetComp(p, r));
   }
 }
+#endif
 
 /// if possible print p in a short way...
 void p_String0Short(const poly p, ring lmRing, ring tailRing)
@@ -187,41 +231,90 @@ void p_String0(poly p, ring lmRing, ring tailRing)
   if ((n_GetChar(lmRing->cf) == 0)
   && (nCoeff_is_transExt(lmRing->cf)))
     p_Normalize(p,lmRing); /* Manual/absfact.tst */
-  if ((p_GetComp(p, lmRing) == 0) || (!lmRing->VectorOut))
+#ifdef HAVE_SHIFTBBA
+  if(lmRing->isLPring)
   {
-    writemon(p,0, lmRing);
-    p = pNext(p);
-    while (p!=NULL)
+    if ((p_GetComp(p, lmRing) == 0) || (!lmRing->VectorOut))
     {
-      assume((p->coef==NULL)||(!n_IsZero(p->coef,tailRing->cf)));
-      if ((p->coef==NULL)||n_GreaterZero(p->coef,tailRing->cf))
-        StringAppendS("+");
-      writemon(p,0, tailRing);
+      writemonLP(p,0, lmRing);
       p = pNext(p);
+      while (p!=NULL)
+      {
+        assume((p->coef==NULL)||(!n_IsZero(p->coef,tailRing->cf)));
+        if ((p->coef==NULL)||n_GreaterZero(p->coef,tailRing->cf))
+          StringAppendS("+");
+        writemonLP(p,0, tailRing);
+        p = pNext(p);
+      }
+      return;
     }
-    return;
+  }
+  else
+#endif
+  {
+    if ((p_GetComp(p, lmRing) == 0) || (!lmRing->VectorOut))
+    {
+      writemon(p,0, lmRing);
+      p = pNext(p);
+      while (p!=NULL)
+      {
+        assume((p->coef==NULL)||(!n_IsZero(p->coef,tailRing->cf)));
+        if ((p->coef==NULL)||n_GreaterZero(p->coef,tailRing->cf))
+          StringAppendS("+");
+        writemon(p,0, tailRing);
+        p = pNext(p);
+      }
+      return;
+    }
   }
 
   long k = 1;
   StringAppendS("[");
-  loop
+#ifdef HAVE_SHIFTBBA
+  if(lmRing->isLPring)
   {
-    while (k < p_GetComp(p,lmRing))
+    loop
     {
-      StringAppendS("0,");
+      while (k < p_GetComp(p,lmRing))
+      {
+        StringAppendS("0,");
+        k++;
+      }
+      writemonLP(p,k,lmRing);
+      pIter(p);
+      while ((p!=NULL) && (k == p_GetComp(p, tailRing)))
+      {
+        if (n_GreaterZero(p->coef,tailRing->cf)) StringAppendS("+");
+        writemonLP(p,k,tailRing);
+        pIter(p);
+      }
+      if (p == NULL) break;
+      StringAppendS(",");
       k++;
     }
-    writemon(p,k,lmRing);
-    pIter(p);
-    while ((p!=NULL) && (k == p_GetComp(p, tailRing)))
+  }
+  else
+#endif
+  {
+    loop
     {
-      if (n_GreaterZero(p->coef,tailRing->cf)) StringAppendS("+");
-      writemon(p,k,tailRing);
+      while (k < p_GetComp(p,lmRing))
+      {
+        StringAppendS("0,");
+        k++;
+      }
+      writemon(p,k,lmRing);
       pIter(p);
+      while ((p!=NULL) && (k == p_GetComp(p, tailRing)))
+      {
+        if (n_GreaterZero(p->coef,tailRing->cf)) StringAppendS("+");
+        writemon(p,k,tailRing);
+        pIter(p);
+      }
+      if (p == NULL) break;
+      StringAppendS(",");
+      k++;
     }
-    if (p == NULL) break;
-    StringAppendS(",");
-    k++;
   }
   StringAppendS("]");
 }

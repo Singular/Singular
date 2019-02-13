@@ -1730,7 +1730,7 @@ void syMake(leftv v,const char * id, package pa)
           if ((currRing->isLPring!=0)
           && (p_Totaldegree(p,currRing)>1))
           {
-            p_Delete(&p,currRing);
+            p_LmDelete(&p,currRing);
             /* v->rtyp = UNKNOWN; - already set */
             return; /* error, report "unknown id" */
           }
