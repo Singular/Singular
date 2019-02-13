@@ -509,6 +509,6 @@ extern "C" int SI_MOD_INIT(Order)(SModulFunctions* psModulFunctions)
   module_help_main(
      (currPack->libname? currPack->libname: "NFOrder"),// the library name,
     "nforder: orders in number fields"); // the help string for the module
-  VAR return MAX_TOK;
+  return MAX_TOK;
 }
 #endif

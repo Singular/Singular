@@ -208,5 +208,5 @@ extern "C" int mod_init(SModulFunctions* psModulFunctions)
   psModulFunctions->iiAddCproc((currPack->libname? currPack->libname: ""),"intersect_set",FALSE,intersect_set);
   psModulFunctions->iiAddCproc((currPack->libname? currPack->libname: ""),"insert_set",FALSE,insert_set);
   psModulFunctions->iiAddCproc((currPack->libname? currPack->libname: ""),"equal_set",FALSE,equal_set);
-  VAR return MAX_TOK;
+  return MAX_TOK;
 }

@@ -12,7 +12,7 @@
 #ifdef __cplusplus
 extern "C" VAR unsigned si_opt_1; //< NOTE: Original option variable name: test
 extern "C" VAR unsigned si_opt_2; //< NOTE: Original option variable name: verbose
-extern "C" BOOLEAN siCntrlc;
+extern "C" VAR BOOLEAN siCntrlc;
 #else
 EXTERN_VAR unsigned si_opt_1;
 EXTERN_VAR unsigned si_opt_2;
