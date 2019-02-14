@@ -110,9 +110,9 @@ anonymous ftp through the following addresses:
 @* @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Factory}
 @item Singular-libfac
 @copyright{}  Messollen, University of Saarbr@"ucken:
-@* @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Libfac}
+@* @uref{ftp://jim.mathematik.uni-kl.de/pub/Math/Singular/Libfac/}
 @item @sc{Singular} binaries and sources
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/} or via a
+@uref{ftp://jim.mathematik.uni-kl.de/pub/Math/Singular/} or via a
 WWW brow@-ser from
 @uref{http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/}
 @item Cygwin
@@ -138,7 +138,7 @@ Some external programs are optional:
 @copyright{} Stephan Endrass
 @* @uref{http://surf.sf.net}
 @item surfer (used by surf.lib, @pxref{surf_lib})
-@uref{http://www.imaginary2008.de/surfer.php}
+@uref{https://imaginary.org/program/surfer}
 @item surfex (used by surfex.lib, @pxref{surfex_lib})
 @copyright{} Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
 @* @uref{https://github.com/Singular/Sources/tree/spielwiese/Singular/LIB/surfex}
