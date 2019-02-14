@@ -281,6 +281,8 @@ const struct sValCmd1 dArith1[]=
 #ifdef HAVE_PLURAL
 ,{D(jjENVELOPE),   ENVELOPE_CMD,    RING_CMD,       RING_CMD      , ALLOW_PLURAL |NO_RING}
 ,{D(jjOPPOSITE),   OPPOSITE_CMD,    RING_CMD,       RING_CMD      , ALLOW_PLURAL |NO_RING}
+#endif
+#if defined(HAVE_PLURAL) || defined(HAVE_SHIFTBBA)
 ,{D(jjTWOSTD),     TWOSTD_CMD,      IDEAL_CMD,      IDEAL_CMD     , ALLOW_NC |NO_RING}
 #endif
 //,{  jjWRONG ,      TRACE_CMD,       0,              INTVEC_CMD    , ALLOW_NC |ALLOW_RING}
@@ -1204,7 +1206,7 @@ VAR cmdnames cmds[] =
   { "test",        0, TEST_CMD ,          CMD_M},
   { "trace",       0, TRACE_CMD ,         CMD_1},
   { "transpose",   0, TRANSPOSE_CMD ,     CMD_1},
-#ifdef HAVE_PLURAL
+#if defined(HAVE_PLURAL) || defined(HAVE_SHIFTBBA)
   { "twostd",      0, TWOSTD_CMD ,        CMD_1},
 #endif /* HAVE_PLURAL */
   { "type",        0, TYPE_CMD ,          TYPE_CMD},
