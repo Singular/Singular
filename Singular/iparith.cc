@@ -5164,7 +5164,7 @@ static BOOLEAN jjTWOSTD(leftv res, leftv a)
   return FALSE;
 }
 #endif
-#ifdef HAVE_SHIFTBBA // do not place above jjSTD in this file because we need to reference it
+#if defined(HAVE_SHIFTBBA) || defined(HAVE_PLURAL)// do not place above jjSTD in this file because we need to reference it
 static BOOLEAN jjRIGHTSTD(leftv res, leftv v)
 {
   if (rIsLPRing(currRing))
