@@ -1220,7 +1220,7 @@ static BOOLEAN evalPolyAtBox(leftv result, leftv args)
 
 extern "C" int SI_MOD_INIT(interval)(SModulFunctions* psModulFunctions)
 {
-  VAR blackbox *b_iv = (blackbox*) omAlloc0(sizeof(blackbox)),
+  blackbox *b_iv = (blackbox*) omAlloc0(sizeof(blackbox)),
            *b_bx = (blackbox*) omAlloc0(sizeof(blackbox));
 
   b_iv->blackbox_Init        = interval_Init;

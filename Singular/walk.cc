@@ -3730,7 +3730,7 @@ static intvec* TranPertVector(ideal G, intvec* iva)
   mpz_clear(deg_tmp);
   mpz_clear(ndeg);
 
-  VAR return repr_vector;
+  return repr_vector;
 }
 #endif
 
@@ -3826,7 +3826,7 @@ static intvec* TranPertVector_lp(ideal G)
   mpz_clear(ndeg);
   mpz_clear(sing_int);
 
-  VAR return repr_vector;
+  return repr_vector;
 }
 #endif
 
