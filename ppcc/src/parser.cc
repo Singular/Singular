@@ -55,7 +55,7 @@ struct State {
 
 class Parser : public GC {
 public:
-  TokenList *input, *output;
+  TokenList *input, *output, *prologue;
   SourceFile *source;
   Int pos, marker;
   Int init_count;
@@ -65,6 +65,7 @@ public:
     if (input->len() == 0 || input->last().sym != SymEOF)
       input->add(eof);
     output = new TokenList();
+    prologue = new TokenList();
     pos = 0;
     marker = 0;
   }
@@ -273,10 +274,9 @@ void EmitDecl(Parser *parser, Str *storage_class,
     if (!is_toplevel && !parser->c_source()) {
       parser->init_count++;
       parser->emit(Token(SymGen, S(
-        "void pSingular_register_init_var(void *, void *, long);"
         "class %s__CONSTR__ {\n"
         "  public: %s__CONSTR__() {\n"
-        "    pSingular_register_init_var(&%s, &%s__INIT__, sizeof(%s));\n"
+        "    pSingular_register_init_var((void *)&%s, (void *)&%s__INIT__, sizeof(%s));\n"
         "  }\n"
         "} %s__AUX__;\n"
       )->replace_all(S("%s"), var_name)));
@@ -285,7 +285,7 @@ void EmitDecl(Parser *parser, Str *storage_class,
 }
 
 void EmitEpilogue(Parser *parser) {
-  if (init_list->len() == 0 && class_vars->count() == 0)
+  if (parser->init_count == 0 && init_list->len() == 0 && class_vars->count() == 0)
     return;
   Str *modulename = parser->source->modulename;
   TokenList *output = parser->output;
@@ -299,7 +299,7 @@ void EmitEpilogue(Parser *parser) {
         token.str = class_vars->at(token.str);
     }
   }
-  if (init_list->len() == 0)
+  if (parser->init_count == 0 && init_list->len() == 0)
     return;
   Str *init_part;
   if (parser->c_source()) {
@@ -349,6 +349,10 @@ void EmitEpilogue(Parser *parser) {
     }
   }
   init_part->add("}\n");
+  if (parser->init_count) {
+    parser->prologue->add(Token(SymGen,
+      S("static void pSingular_register_init_var(void *, void *, long);\n")));
+  }
   init_part = init_part->replace_all(S("%n"), S(parser->init_count+1));
   parser->emit(Token(SymGen, init_part));
   Str *init_rest;
@@ -511,7 +515,7 @@ TokenList *Transform(SourceFile *source) {
     }
   }
   EmitEpilogue(parser);
-  return parser->output;
+  return parser->prologue->clone()->add(parser->output);
 }
 
 Str *TestPreProcessor(Str *filename) {
@@ -530,7 +534,8 @@ Str *TestPreProcessor(Str *filename) {
 Str *RunPreProcessor(Str *filename, Str *filedata) {
   SourceFile *source = ReadSource(filename, filedata);
   TokenList *tokens = Transform(source);
-  Str *result = new Str();  for (Int i = 0; i < tokens->len(); i++) {
+  Str *result = new Str();
+  for (Int i = 0; i < tokens->len(); i++) {
     result->add(tokens->at(i).str);
   }
   return result;
