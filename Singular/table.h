@@ -244,7 +244,7 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjL2R),        RESOLUTION_CMD,  RESOLUTION_CMD, LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDUMMY),      RESOLUTION_CMD,  RESOLUTION_CMD, RESOLUTION_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjRESTART),    RESTART_CMD,     NONE,           INT_CMD,        ALLOW_NC |ALLOW_RING}
-#ifdef HAVE_SHIFTBBA
+#if defined(HAVE_SHIFTBBA) || defined(HAVE_PLURAL)
 ,{D(jjRIGHTSTD),   RIGHTSTD_CMD,    IDEAL_CMD,      IDEAL_CMD     , ALLOW_NC |NO_RING}
 #endif
 ,{D(jjRINGLIST),   RINGLIST_CMD,    LIST_CMD,       RING_CMD      , ALLOW_NC |ALLOW_RING}
@@ -1175,7 +1175,7 @@ VAR cmdnames cmds[] =
   { "restart",     0, RESTART_CMD,        CMD_1},
   { "return",      0, RETURN ,            RETURN},
   { "RETURN",      0, END_GRAMMAR ,       RETURN},
-#ifdef HAVE_SHIFTBBA
+#if defined(HAVE_SHIFTBBA) || defined(HAVE_PLURAL)
   { "rightstd",    0, RIGHTSTD_CMD ,      CMD_1},
 #endif /* HAVE_PLURAL */
   { "ring",        0, RING_CMD ,          RING_CMD},
