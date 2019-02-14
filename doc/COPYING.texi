@@ -24,7 +24,7 @@
 @center @uref{http://www.mathematik.uni-kl.de/,,Department of Mathematics} and  @uref{http://www.mathematik.uni-kl.de/~zca/,,Centre for Computer Algebra}
 @center Authors: @uref{http://www.mathematik.uni-kl.de/~decker,,W. Decker}, @uref{http://www.mathematik.uni-kl.de/~greuel,,G.-M. Greuel}, @uref{http://www.mathematik.uni-kl.de/~pfister,,G. Pfister}, @uref{http://www.mathematik.uni-kl.de/~hannes,,H. Schoenemann}
 
-@center Copyright @copyright{} 1986-2018
+@center Copyright @copyright{} 1986-@value{VERSION_DATE}
 @sp 2
 @center @strong{NOTICE}
 
