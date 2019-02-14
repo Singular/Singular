@@ -17,6 +17,7 @@
  * necessary for the templates to translate.
  *
 **/
+#include "factory/globaldefs.h"
 
 /*MAKEHEADER*/
 #include "config.h"

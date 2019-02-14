@@ -6,7 +6,7 @@
 // The actual work is done in CountingListenerProxy,
 // but this way avoids cyclic references TestListener<->CountingListenerProxy
 //
-
+#include "factory/globaldefs.h"
 #include <cxxtest/TestListener.h>
 #include <cxxtest/DummyDescriptions.h>
 
