@@ -62,7 +62,7 @@ In @sc{Plural} one can only work with @math{G}-algebras and with their factor-al
 by two-sided ideals (@math{GR}-algebras).
 
 @item @sc{Plural} requires a global monomial ordering (see @ref{General definitions for orderings}).
-However, @sc{SCA} provides the possibility of computations in a tensor product of 
+However, @sc{Sca} provides the possibility of computations in a tensor product of 
 a non-commutative graded commutative algebra (equipped with a global ordering) 
 with a commutative algebra (equipped with any ordering). 
 

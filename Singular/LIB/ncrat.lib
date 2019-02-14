@@ -2,16 +2,16 @@
 version="version ncrat.lib 1.5.1.1 June_2018 "; // $Id$
 category="Noncommutative";
 info="
-LIBRARY:      ncrat.lib Framework for working with nc rational functions
+LIBRARY:      ncrat.lib Framework for working with non-commutative rational functions
 
 AUTHOR:       Ricardo Schnur, email: ricardo.schnur@math.uni-sb.de
 
-SUPPORT:      This project is funded by the SFB-TRR 195
+SUPPORT:      This project has been funded by the SFB-TRR 195
   'Symbolic Tools in Mathematics and their Application'.
 
 OVERVIEW:     This library provides a framework for working with
   non-commutative rational functions (or rather, expressions)
-  and their representations
+  and their linearized representations
 
 REFERENCES:   T. Mai: On the analytic theory of non-commutative
    distributions in free probability. Universitaet des Saarlandes,
@@ -20,6 +20,9 @@ REFERENCES:   T. Mai: On the analytic theory of non-commutative
 KEYWORDS:     noncommutative, rational expressions;
    rational functions; formal linear representations; minimal representations
 
+NOTE: an almost self-explaining introduction to the posibilities of the framework
+can be achieved by running the example for the procedure ncrepGetRegularMinimal.
+   
 PROCEDURES:
   ncInit(list);                 Set up framework, list contains nc variables
   ncVarsGet();                  List nc variables that are in use
@@ -2807,6 +2810,10 @@ example
 {
   "EXAMPLE: (Hua's identity)";
   echo = 2;
+  // We want to prove the Hua's identity, telling that for two
+  // invertible elements x,y from a division ring, one has
+  // inv(x+x*inv(y)*x)+inv(x+y) = inv(x)
+  // where inv(t) stands for the two-sided inverse of t
   ncInit(list("x", "y"));
   ncrat f = ncratFromString("inv(x+x*inv(y)*x)+inv(x+y)-inv(x)");
   print(f);
@@ -2815,6 +2822,7 @@ example
   ncrep s = ncrepGetRegularMinimal(f, list(x, y), list(1, 1));
   ncrepDim(s);
   print(s);
+  // since s represents the zero element, Hua's identity holds.
 }
 
 /*##########################################################

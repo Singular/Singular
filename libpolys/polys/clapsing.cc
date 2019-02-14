@@ -611,7 +611,7 @@ poly singclap_pmod ( poly f, poly g, const ring r )
   {
     setCharacteristic( rChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g,r ) );
-    res = convFactoryPSingP( F % G,r );
+    res = convFactoryPSingP( F-(F/G)*G,r );
   }
   // mod is not implemented for ZZ coeffs in factory
   else if (r->cf->extRing!=NULL)
@@ -625,13 +625,13 @@ poly singclap_pmod ( poly f, poly g, const ring r )
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f,a,r ) ),
                     G( convSingAPFactoryAP( g,a,r ) );
-      res= convFactoryAPSingAP(  F % G, r  );
+      res= convFactoryAPSingAP( F-(F/G)*G, r  );
       prune (a);
     }
     else
     {
       CanonicalForm F( convSingTrPFactoryP( f,r ) ), G( convSingTrPFactoryP( g,r ) );
-      res= convFactoryPSingTrP(  F % G,r  );
+      res= convFactoryPSingTrP(  F-(F/G)*G,r  );
     }
   }
 #if 0 // not yet working

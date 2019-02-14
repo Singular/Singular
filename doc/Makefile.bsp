@@ -10,32 +10,12 @@ SHELL=/bin/sh
 ##
 SINGUNAME       = spielwiese
 
-## directory where info files are installed
-prefix          = /scratch/hannes/billbo-sw
-infodir	        = ${prefix}/info
 bindir	        = @bindir@
-htmldir         = ${prefix}/html
-exdir           = ${prefix}/examples
-
-localdir        = /usr/local
-install_prefix  = ${localdir}/share
-install_infodir = ${install_prefix}/info
-install_htmldir = ${install_prefix}/html
-install_docdir  = ${install_prefix}/doc
-install_exdir   = ${install_prefix}/examples
-
-# directory where files for ftp site go
-ftpdir          = /tmp
 
 ##
 ## needed programs
 ##
-LN_S            = ln -s
-INSTALL	        = ../install-sh -c
-INSTALL_PROGRAM = ${INSTALL}
-INSTALL_DATA    = ${INSTALL} -m 644
 MKINSTALLDIRS   = mkdir -p
-GZIP            = gzip
 UUDECODE        = uudecode
 
 PERL            = perl
@@ -220,12 +200,6 @@ singular.idx: singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx doc2idx.p
 	${PERL} doc2idx.pl singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx ${CHKSUM_DB} > singular.idx
 
 ###########################################################
-# stand-alone targest
-#
-
-STANDALONE_TXT_FILES := $(STANDALONE_TEXI_FILES:.texi=.txt)
-STANDALONE_HTML_FILES := $(STANDALONE_TEXI_FILES:.texi=.html)
-STANDALONE_FILES      := $(STANDALONE_TEXI_FILES:.texi=)
 
 ifeq ($(SINGUNAME),@SINGUNAME@)
 UNAME_OPT = -D UNAME
@@ -246,27 +220,6 @@ endif
 
 % : %.txt
 	cp $< $@
-
-standalone: standalone-txt standalone-html ${STANDALONE_FILES}
-
-standalone-html: ${STANDALONE_HTML_FILES}
-standalone-txt:  ${STANDALONE_TXT_FILES}
-
-WWW_DIR	= /singular/www/2-0/
-FTP_DIR = /ftp/pub/Math/Singular/Development
-
-install-standalone: standalone
-	cp INSTALL_unix.html COPYING.html INSTALL_win.html ${WWW_DIR}
-	cp COPYING COPYING.html ${FTP_DIR}
-	cp INSTALL_unix INSTALL_unix.html ${FTP_DIR}
-	cp INSTALL_win INSTALL_win.html ${FTP_DIR}
-	cp README_ftp.html ${FTP_DIR}/README.html
-	cp README_ftp ${FTP_DIR}/README
-	cp NEWS.html NEWS ${FTP_DIR}
-	cp NEWS.html ${WWW_DIR}
-	- chmod g+w ${FTP_DIR}/*
-
-
 
 ###########################################################
 # html targets
@@ -304,78 +257,7 @@ ${IMAGES_HTML} : ${IMAGES_SRC}
 ###########################################################
 # misc targets
 #
-install: singular.hlp html singular.idx standalone
-	${MKINSTALLDIRS} ${infodir}
-	${INSTALL_DATA} singular.hlp ${infodir}
-	test -r ${htmldir} || ln -s `pwd`/${HTML_SUBDIR} ${htmldir}
-	test -r ${exdir} || ln -s `pwd`/${EX_SUBDIR} ${exdir}
-
-install_all: install
-
-uninstall:
-	rm -f ${infodir}/singular.hlp
-	- rmdir ${infodir}
-
-#stupid HP's don't allow copy with many arguments
-install-sharedist: singular.hlp html singular.idx \
-                   ${STANDALONE_HTML_FILES} ${STANDALONE_TXT_FILES}
-	${MKINSTALLDIRS} ${install_prefix}
-	${MKINSTALLDIRS} ${install_infodir}
-	${INSTALL_DATA} singular.hlp ${install_infodir}
-	chmod -R +rX ${install_infodir}
-	${MKINSTALLDIRS} ${install_htmldir}
-	cp ${HTML_SUBDIR}/*.htm ${install_htmldir}
-	cp ${HTML_SUBDIR}/*.gif ${install_htmldir}
-	-cp ${HTML_SUBDIR}/*.png ${install_htmldir}
-	cp ${HTML_SUBDIR}/*.jpg ${install_htmldir}
-	chmod -R +rX ${install_htmldir}
-	${MKINSTALLDIRS} ${install_docdir}
-	${INSTALL_DATA} singular.idx ${install_docdir}
-	${INSTALL_DATA} ../GPL2 ${install_prefix}/GPL2
-	${INSTALL_DATA} ../GPL3 ${install_prefix}/GPL3
-	${INSTALL_DATA} COPYING.txt ${install_prefix}/COPYING
-	${INSTALL_DATA} COPYING.html ${install_prefix}
-	${INSTALL_DATA} NEWS.txt ${install_prefix}/NEWS
-	${INSTALL_DATA} NEWS.html ${install_prefix}
-	${INSTALL_DATA} README_distribution.txt ${install_prefix}/README
-	${INSTALL_DATA} README_distribution.html ${install_prefix}/README.html
-	chmod -R +rX ${install_docdir}
-	chmod -R +rX ${install_prefix}
-	${MKINSTALLDIRS} ${install_exdir}
-	cp -R examples ${install_prefix}
-	/bin/rm -f ${install_prefix}/examples/[A-Z]*.res
-	/bin/rm -f ${install_prefix}/examples/*.res
-	/bin/rm -f ${install_prefix}/examples/[A-Z]*.inc
-	/bin/rm -f ${install_prefix}/examples/*.inc
-	chmod -R +rX ${install_prefix}/
-
-# use 'make INSTALL_unix.olaf.txt INSTALL_unix.olaf.html SINGUNAME=olaf'
-# to generate these files for uname 'olaf'
-install-bindist: INSTALL_unix.${SINGUNAME}.txt INSTALL_unix.${SINGUNAME}.html
-	${MKINSTALLDIRS} ${install_prefix}
-	${INSTALL_DATA} INSTALL_unix.${SINGUNAME}.txt ${install_prefix}/INSTALL
-	${INSTALL_DATA} INSTALL_unix.${SINGUNAME}.html ${install_prefix}/INSTALL.html
-
-install-ftp: ${STANDALONE_HTML_FILES} ${STANDALONE_TXT_FILES}
-	${INSTALL_DATA} NEWS.txt ${ftpdir}/NEWS
-	${INSTALL_DATA} NEWS.html ${ftpdir}
-	${INSTALL_DATA} COPYING.txt ${ftpdir}/COPYING
-	${INSTALL_DATA} COPYING.html ${ftpdir}
-	${INSTALL_DATA} INSTALL_unix.txt ${ftpdir}/INSTALL_unix
-	${INSTALL_DATA} INSTALL_unix.html ${ftpdir}
-	${INSTALL_DATA} README_ftp.txt ${ftpdir}/README
-	${INSTALL_DATA} README_ftp.html ${ftpdir}/README.html
-
 texi2html = $(TEXI2HTML:%.pl=%)
-
-lib2doc.tar.gz:
-	rm -rf lib2doc lib2doc.tar.gz
-	mkdir lib2doc
-	cp Makefile.lib2doc lib2doc/Makefile
-	${MAKEINFO} --no-header --paragraph-indent none -o lib2doc/README lib2doc.texi
-	cp pl2doc.pl doc2tex.pl ${texi2html} lib2doc
-	tar cf lib2doc.tar lib2doc
-	${GZIP} lib2doc.tar
 
 clean: mostlyclean
 	/bin/rm -rf singular.tex manual.tex ${DOC_SUBDIR} ${EX_SUBDIR}
@@ -404,8 +286,5 @@ depend:
 
 ${SINGULAR}:
 #	cd ..; ${MAKE} ${SINGULAR}
-
-Makefile: Makefile.in
-	cd ..; 	CONFIG_FILES="doc/Makefile" CONFIG_HEADERS= ./config.status
 
 html-done: ${MANUAL_FILES}
