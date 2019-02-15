@@ -1048,7 +1048,7 @@ the sum of monomials at the indicated places w.r.t. the monomial ordering
 
 @table @code
 @item bracket
-computes the Lie bracket of two polynomials (see @ref{bracket})
+computes the (iterated) Lie bracket of two polynomials (see @ref{bracket})
 @item lead
 leading term (see @ref{lead})
 @item leadcoef
@@ -1589,15 +1589,19 @@ print(betti(R),"betti");
 @node bracket, dim BR_PLURAL_BR, betti BR_PLURAL_BR, Functions BR_PLURAL_BR
 @subsection bracket
 @cindex bracket
+@cindex Lie bracket
 
 @table @code
 @item @strong{Syntax:}
 @code{bracket (} poly_expression, poly_expression @code{)}
+@*@code{bracket (} poly_expression, poly_expression, int_expression @code{)}
 @item @strong{Type:}
 poly
 @item @strong{Purpose:}
 Computes the Lie bracket @code{[p,q]=pq-qp} of the first polynomial with
-the second. Uses special routines, based on the Leibniz rule.
+the second. Uses special routines, based on the Leibniz rule. 
+If the third argument is @code{N>1}, then the right normed bracket 
+@code{[a,[...[a,b]]]]} will be computed.
 @item @strong{Example:}
 @smallexample
 @c example
