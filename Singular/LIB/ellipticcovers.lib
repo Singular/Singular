@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version ellipticcovers.lib 4.1.1.0 Dec_2017 ";
+version="version ellipticcovers.lib 4.1.2.0 Feb_2019 ";
 category="Commutative algebra";
 info="
 LIBRARY:  ellipticCovers.lib    Gromov-Witten numbers of elliptic curves

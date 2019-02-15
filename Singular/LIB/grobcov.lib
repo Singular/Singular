@@ -1,5 +1,5 @@
-//
-version="version grobcov.lib 4.1.1.0 Feb_2018 "; // $Id$
+//////////////////////////////////////////////////////////////////////////
+version="version grobcov.lib 4.1.2.0 Feb_2019 "; // $Id$
            // version N4; February 2018;
            // Two routines for Automatic Deduction of Geometric Theorems
             // have been added: ADGT, intersectpar.

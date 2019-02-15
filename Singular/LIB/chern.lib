@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version = "version chern.lib 0.706 Jun_2018 ";      //$Id$
+version = "version chern.lib 0.706 Jun_2018 ";      // $Id$
 category = "Chern classes";
 info="
 LIBRARY:  chern.lib    Symbolic Computations with Chern classes,

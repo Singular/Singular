@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version="version nchilbert.lib 1.0.0.0 Feb_2014";
+version="version nchilbert.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY: nchilbert.lib   Hilbert series, polynomial and multiplicity for G-Algebras (Plural)

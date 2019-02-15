@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version ffmodstd.lib 4.1.1.4 Sep_2018 "; // $Id$
+version="version ffmodstd.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:   ffmodstd.lib  Groebner bases of ideals in polynomial rings

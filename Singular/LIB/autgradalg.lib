@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="version autgradalg.lib 4.1.1.4 Nov_2018 "; // $Id$
+version="version autgradalg.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Commutative Algebra, Algebraic Geometry";
 info="
 LIBRARY: autgradalg.lib   Compute automorphism groups of pointedly graded algebras and of Mori dream spaces.

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////
-version="version decomp.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version decomp.lib 4.1.2.0 Feb_2019 "; // $Id$
 
 // last changed  21.5.12 C.G. reversal wieder eingefuegt (standalone)
 category = "general";

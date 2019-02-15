@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="version aksaka.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version aksaka.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Teaching";
 info="
 LIBRARY: aksaka.lib     Procedures for primality testing after Agrawal, Saxena, Kayal

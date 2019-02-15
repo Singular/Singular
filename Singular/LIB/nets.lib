@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version nets.lib 4.1.1.0 Jan_2018 "; // $Id$
+version="version nets.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Miscellaneous";
 info="
 LIBRARY:  net.lib    Net structures for pretty printing

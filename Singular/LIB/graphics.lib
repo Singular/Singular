@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version graphics.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version graphics.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Visualization";
 info="
 LIBRARY: graphics.lib    Procedures to use Graphics with Mathematica

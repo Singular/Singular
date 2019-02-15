@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version modstd.lib 4.1.1.3 Aug_2018 "; // $Id$
+version="version modstd.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  modstd.lib      Groebner bases of ideals/modules using modular methods

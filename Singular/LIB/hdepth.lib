@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version hdepth.lib 4.1.1.0 Dec_2017 "; //
+version="version hdepth.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: hdepth.lib     Procedures for computing hdepth_1

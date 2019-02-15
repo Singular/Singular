@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version classify2.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version classify2.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: classify2.lib   Classification of isolated singularities

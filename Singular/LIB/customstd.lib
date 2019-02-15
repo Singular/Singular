@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version polymake.lib 4.1.1.0 Dec_2017 ";
+version="version customstd.lib 4.1.2.0 Feb_2019 ";
 category = "Commutative Algebra";
 info="
 LIBRARY:  customstd.lib   Load customstd.so

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version sets.lib 4.1.1.0 Dec_2017 "; //$id$
+version="version sets.lib 4.1.2.0 Feb_2019 "; //$id$
 category="Miscellaneous";
 info="
 LIBRARY:  sets.lib    Sets in Singular
