@@ -12227,7 +12227,7 @@ static void enterOnePairWithShifts (int q_inS /*also i*/, poly q, poly p, int ec
   int maxPossibleShift = degbound - q_lastVblock;
   int maxShift = si_min(neededShift, maxPossibleShift);
   int firstShift = (q == p ? 1 : 0); // do not add (q,p) if q=p
-  for (int j = firstShift; j <= maxShift; j++) 
+  for (int j = firstShift; j <= maxShift; j++)
   {
     poly qq = pLPCopyAndShiftLM(q, j);
     enterOnePairShift(qq, p, ecartp, p_isFromQ, strat, -1, ecartq, q_isFromQ, j, q_inS);

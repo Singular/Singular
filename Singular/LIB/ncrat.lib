@@ -22,7 +22,7 @@ KEYWORDS:     noncommutative, rational expressions;
 
 NOTE: an almost self-explaining introduction to the posibilities of the framework
 can be achieved by running the example for the procedure ncrepGetRegularMinimal.
-   
+
 PROCEDURES:
   ncInit(list);                 Set up framework, list contains nc variables
   ncVarsGet();                  List nc variables that are in use

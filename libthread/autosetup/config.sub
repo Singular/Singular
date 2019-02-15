@@ -798,10 +798,10 @@ case $basic_machine in
 		basic_machine=i370-ibm
 		os=-mvs
 		;;
-	msys) 
-		basic_machine=i386-pc 
-		os=-msys 
-	 ;; 
+	msys)
+		basic_machine=i386-pc
+		os=-msys
+	 ;;
 	ncr3000)
 		basic_machine=i486-ncr
 		os=-sysv4

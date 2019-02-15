@@ -125,8 +125,8 @@ BOOLEAN blackbox_default_Check(blackbox *,leftv,leftv)
 }
 int setBlackboxStuff(blackbox *bb, const char *n)
 {
-  int where = -1;   
-  for (int i=0;i<MAX_BB_TYPES;i++)      
+  int where = -1;
+  for (int i=0;i<MAX_BB_TYPES;i++)
   {
     if (blackboxTable[i]!=NULL && strcmp(blackboxName[i],n)==0) {
       where = i;

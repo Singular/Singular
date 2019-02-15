@@ -87,7 +87,7 @@ bool Tokenize(SourceFile *source) {
   Token token;
   while (!done) {
     const char *last = cursor;
-    
+
 #line 92 "src/pplex.cc"
 {
 	unsigned char yych;
@@ -2123,7 +2123,7 @@ yy207:
 #line 164 "src/pplex.re"
 
     comment:
-    
+
 #line 2128 "src/pplex.cc"
 {
 	unsigned char yych;

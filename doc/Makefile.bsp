@@ -155,7 +155,7 @@ s-plulibs.tex: plulibs.tex
 
 s-letterplace.tex: letterplace.tex
 	sed -e "s/BR_LETTERPLACE_BR/(letterplace)/g" <letterplace.tex >s-letterplace.tex
-	
+
 # postscript stuff
 ps: dvi manual.ps usercard.ps
 

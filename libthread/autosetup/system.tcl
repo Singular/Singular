@@ -108,7 +108,7 @@ proc write-if-changed {file buf {script {}}} {
 #
 # Each pattern of the form @define@ is replaced the the corresponding
 # define, if it exists, or left unchanged if not.
-# 
+#
 # The special value @srcdir@ is substituted with the relative
 # path to the source directory from the directory where the output
 # file is created, while the special value @top_srcdir@ is substituted

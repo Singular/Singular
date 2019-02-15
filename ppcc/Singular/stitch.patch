@@ -5,7 +5,7 @@ index bf4cc32f2..15e9fcb12 100644
 @@ -9,9 +9,9 @@
  #define MAX_BB_TYPES 256
  // #define BLACKBOX_DEVEL 1
- 
+
 -static blackbox* blackboxTable[MAX_BB_TYPES];
 -static char *    blackboxName[MAX_BB_TYPES];
 -static int blackboxTableCnt=0;
@@ -21,8 +21,8 @@ index bf4cc32f2..15e9fcb12 100644
  {
 -  int where=-1;
 -  if (MAX_BB_TYPES<=blackboxTableCnt)
-+  int where = -1;   
-+  for (int i=0;i<MAX_BB_TYPES;i++)      
++  int where = -1;
++  for (int i=0;i<MAX_BB_TYPES;i++)
    {
 -    // second try, find empty slot from removed bb:
 -    for (int i=0;i<MAX_BB_TYPES;i++)
@@ -68,7 +68,7 @@ index 130bc1104..0f0f98e97 100644
  libstackv library_stack;
  #endif
 @@ -1087,7 +1087,37 @@ int iiAddCprocTop(const char *libname, const char *procname, BOOLEAN pstatic,
- 
+
  /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
  #ifdef HAVE_DYNAMIC_LOADING
 -BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
@@ -143,19 +143,19 @@ index a4344e18f..8294da86d 100644
 --- a/Singular/tesths.cc
 +++ b/Singular/tesths.cc
 @@ -36,6 +36,9 @@
- 
- 
+
+
  extern int siInit(char *);
 +#ifdef PSINGULAR
 +GLOBAL_VAR char *global_argv0;
 +#endif
- 
+
  int mmInit( void )
  {
 @@ -62,6 +65,9 @@ int main(          /* main entry to Singular */
    omInitRet_2_Info(argv[0]);
    omInitGetBackTrace();
- 
+
 +#ifdef PSINGULAR
 +  global_argv0 = argv[0];
 +#endif
@@ -181,5 +181,5 @@ index 5ea09fa3c..183aab6e5 100644
  //    return(dlopen(filename, RTLD_NOW|RTLD_GLOBAL));
 +#endif
  }
- 
+
  void *dynl_sym(void *handle, const char *symbol)

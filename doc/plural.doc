@@ -23,19 +23,19 @@
 providing many algorithms for computations within non-commutative @math{G-} and @math{GR-}algebras
 (see @ref{Mathematical background BR_PLURAL_BR} for detailed information on algebras and algorithms).
 
-It uses the same data structures as @sc{Singular}, sometimes interpreting them 
+It uses the same data structures as @sc{Singular}, sometimes interpreting them
 in a different way and/or modifying them for its own purposes.
 In spite of such a difference, one can always transfer
 objects between commutative rings of @sc{Singular} and non-commutative rings of @sc{Plural}.
 
 
 With @sc{Plural}, one can set up a non-commutative @math{G}-algebra, say @math{A}, with
-a Poincar@'e-Birkhoff-Witt (PBW) basis, (see @ref{G-algebras} for step-by-step building instructions 
+a Poincar@'e-Birkhoff-Witt (PBW) basis, (see @ref{G-algebras} for step-by-step building instructions
 and also @ref{PLURAL libraries} for procedures for setting many important algebras easily).
 Afterwards, one can proceed to the factor-algebra of @math{A} modulo a two-sided ideal (see @ref{twostd BR_PLURAL_BR}), thus
 obtaining a @math{GR}-algebra (see @ref{qring BR_PLURAL_BR} type).
 
-Functionalities of @sc{Plural} (enlisted in @ref{Functions  BR_PLURAL_BR}) are accessible as soon 
+Functionalities of @sc{Plural} (enlisted in @ref{Functions  BR_PLURAL_BR}) are accessible as soon
 as the basering becomes non-commutative (see @ref{nc_algebra} and the library @ref{ncalg_lib}
 with many readily predefined algebras).
 
@@ -55,16 +55,16 @@ A^n.
 @itemize
 
 @item
-@sc{Plural} does not perform computations in the free algebra or in its general factor algebras 
+@sc{Plural} does not perform computations in the free algebra or in its general factor algebras
 (instead, these computations can be possibly done by @ref{LETTERPLACE}).
 
 In @sc{Plural} one can only work with @math{G}-algebras and with their factor-algebras
 by two-sided ideals (@math{GR}-algebras).
 
 @item @sc{Plural} requires a global monomial ordering (see @ref{General definitions for orderings}).
-However, @sc{Sca} provides the possibility of computations in a tensor product of 
-a non-commutative graded commutative algebra (equipped with a global ordering) 
-with a commutative algebra (equipped with any ordering). 
+However, @sc{Sca} provides the possibility of computations in a tensor product of
+a non-commutative graded commutative algebra (equipped with a global ordering)
+with a commutative algebra (equipped with any ordering).
 
 @item @sc{Plural} does not handle non-commutative parameters, i.e. the elements of
 the coefficient field (or a ring) mutually commute with all variables.
@@ -92,7 +92,7 @@ Unless stated otherwise, an expression of type @code{ideal} as understood by @sc
 as a list of generators of a @strong{left} ideal. For more information see @ref{ideal BR_PLURAL_BR}.
  @* For a @strong{two-sided ideal} @code{T}, use the command @ref{twostd BR_PLURAL_BR} for computing
 the two-sided Groebner basis of @code{T}.
- @* For a @strong{right ideal} @code{I}, use @ref{rightStd} from @code{nctools_lib} for computing the right 
+ @* For a @strong{right ideal} @code{I}, use @ref{rightStd} from @code{nctools_lib} for computing the right
  Groebner basis of @code{I}.
 
 @item @code{module} BR_PLURAL_BR
@@ -1599,8 +1599,8 @@ print(betti(R),"betti");
 poly
 @item @strong{Purpose:}
 Computes the Lie bracket @code{[p,q]=pq-qp} of the first polynomial with
-the second. Uses special routines, based on the Leibniz rule. 
-If the third argument is @code{N>1}, then the right normed bracket 
+the second. Uses special routines, based on the Leibniz rule.
+If the third argument is @code{N>1}, then the right normed bracket
 @code{[a,[...[a,b]]]]} will be computed.
 @item @strong{Example:}
 @smallexample
@@ -2954,7 +2954,7 @@ matrix C from the definition of @ref{G-algebras})
 @item square matrix, containing structural polynomials of a G-algebra
 (this corresponds to the matrix D from the definition of @ref{G-algebras})
 @end enumerate
-@item @strong{Note:} 
+@item @strong{Note:}
 After modifying a list aquired with @code{ringlist}, one can construct a corresponding ring with @code{ring(list)}.
 @item @strong{Example:}
 @smallexample
@@ -3628,7 +3628,7 @@ LM(f) = x^b e_i with b_j <= a_j, 1<= j <= n.
 
 
 @*@strong{Remark:} In general non-commutative algorithms are working with global well-orderings
-only (see @ref{PLURAL}, @ref{Monomial orderings} and @ref{Term orderings}), unless we deal with 
+only (see @ref{PLURAL}, @ref{Monomial orderings} and @ref{Term orderings}), unless we deal with
 graded commutative algebras via @ref{Graded commutative algebras (SCA)}.
 
 @tex
@@ -3690,8 +3690,8 @@ NF(f|G) is called a @strong{left normal form of} f @strong{with respect to}
 
 @*@strong{ Remark:}
 As we have already mentioned in the definitions @code{ideal} and @code{module} (see
- @ref{PLURAL}), by @code{NF} @sc{Plural} understands a left normal form. 
- Note, that @code{rightNF} from @ref{nctools_lib} allows to compute a right normal form. 
+ @ref{PLURAL}), by @code{NF} @sc{Plural} understands a left normal form.
+ Note, that @code{rightNF} from @ref{nctools_lib} allows to compute a right normal form.
 
 @subheading Left ideal membership
 @cindex Left ideal membership
@@ -3731,12 +3731,12 @@ right) A-submodule S of A^k.
 
 
 @*@strong{Remark:}
-With respect to the definitions of @code{ideal} and @code{module} (see @ref{PLURAL}), 
+With respect to the definitions of @code{ideal} and @code{module} (see @ref{PLURAL}),
 by @code{syz} @sc{Plural} understands an inquiry to compute the left syzygy module.
 
 Note, that @code{rightModulo(M,std(0))} from @ref{nctools_lib} computes the right syzygy module of @code{M}.
 
-If @code{S} is a matrix of a left syzygy module of left submodule given by matrix @code{M}, 
+If @code{S} is a matrix of a left syzygy module of left submodule given by matrix @code{M},
 then @code{transpose(S)*transpose(M) = 0}
 (but, in general,
 @tex
@@ -3988,7 +3988,7 @@ A. Kandri-Rody and V. Weispfenning.
 @c NS  art
 T. N@"u@ss{}ler and H. Sch@"onemann.
   Gr@"obner bases in algebras with zero-divisors.
-     Preprint 244, Universit@"at Kaiserslautern, 1993. 
+     Preprint 244, Universit@"at Kaiserslautern, 1993.
 	 @url{https://www.mathematik.uni-kl.de/organisation/zca/reports-on-ca/}.
 
 @item
