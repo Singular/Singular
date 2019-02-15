@@ -30,7 +30,7 @@ lpGBPres2Poly(L,I);              reconstructs a polynomial from the output of lp
 isOrderingShiftInvariant(i);     tests shift-invariance of the monomial ordering
 makeLetterplaceRing(d);          (deprecated, use freeAlgebra) creates a Letterplace ring out of given data
 letplaceGBasis(I);               (deprecated, use twostd) two-sided Groebner basis of a letterplace ideal I
-lieBracket(a,b[, N]);            (deprecated, use bracket) Lie bracket ab-ba of two letterplace polynomials
+lieBracket(a,b[, N]);            (deprecated, use bracket) iterated Lie bracket of two letterplace polynomials
 setLetterplaceAttributes(R,d,b); (for testing purposes) supplies ring R with the letterplace structure
 
 SEE ALSO: fpadim_lib, fpaprops_lib, fpalgebras_lib, LETTERPLACE
@@ -84,7 +84,7 @@ proc setLetterplaceAttributes(def R, int uptodeg, int lV)
 "USAGE: setLetterplaceAttributes(R, d, b); R a ring, b,d integers
 RETURN: ring with special attributes set
 PURPOSE: sets attributes for a letterplace ring:
-  'isLetterplaceRing' = true, 'uptodeg' = d, 'lV' = b, where
+  'isLetterplaceRing' = 'lV' = b, 'uptodeg' = d, where
   'uptodeg' stands for the degree bound,
   'lV' for the number of variables in the block 0.
 NOTE: Activate the resulting ring by using @code{setring}
@@ -101,7 +101,7 @@ NOTE: Activate the resulting ring by using @code{setring}
   attrib(RL, "isLetterplaceRing", lV);
   attrib(RL, "maxExp", 1);
   def @R = ring(RL);
-  attrib(@R, "uptodeg", uptodeg); // no longer needed
+  //attrib(@R, "uptodeg", uptodeg); // no longer needed
   attrib(@R, "isLetterplaceRing", lV);
   return (@R);
 }
@@ -429,7 +429,7 @@ EXAMPLE: example lieBracket; shows examples
   /*   ERROR("Incomplete Letterplace structure on the basering!"); */
   /* } */
   /* // alias ppLiebr; */
-  /* //if int N is given compute [a,[...[a,b]]]] left normed bracket */
+  /* //if int N is given compute [a,[...[a,b]]]] right normed bracket */
   /* int N=1; */
   /* if (size(#)>0) */
   /* { */
@@ -2858,7 +2858,8 @@ EXAMPLE: example lpDivision; shows examples
     L[2] = empty;
     return (L);
   }
-  poly pNF = lpNF(p,I);
+  //poly pNF = lpNF(p,I);
+  poly pNF = reduce(p,I);
   p = p - pNF;
 
   // make new ring
@@ -3206,9 +3207,9 @@ example
   setring R;
   isOrderingShiftInvariant(0);// should be 1
 
-  ring r = 0,(x,y,z),dp;
-  def R = freeAlgebra(r, 5);
-  list RL = ringlist(R);
+  ring r2 = 0,(x,y,z),dp;
+  def R2 = freeAlgebra(r2, 5);
+  list RL = ringlist(R2);
   RL[3][1][1] = "wp";
   intvec weights = 1,1,1,1,1,1,1,2,3,1,1,1,1,1,1;
   RL[3][1][2] = weights;
@@ -3333,7 +3334,7 @@ static proc checkAssumptionIdeal(ideal G)
 "
 {ideal L = lead(normalize(G));
  int i;
- for (i = 1; i <= ncols(G); i++) {if (!isContainedInVp(G[i])) {ERROR("Ideal containes elements not contained in V'");}}
+ for (i = 1; i <= ncols(G); i++) {if (!isContainedInVp(G[i])) {ERROR("Ideal contains elements not contained in V'");}}
  return();
 }
 
