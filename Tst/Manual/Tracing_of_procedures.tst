@@ -7,4 +7,5 @@ LIB "tst.lib"; tst_init();
   }
   TRACE=3;
   t1();
+  TRACE=0;
 tst_status(1);$
