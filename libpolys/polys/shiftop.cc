@@ -58,7 +58,7 @@ poly shift_pp_Mult_mm(poly p, const poly m, const ring ri)
   int *pExpV = (int *) omAlloc((ri->N+1)*sizeof(int));
   do
   {
-    p_AllocBin(pNext(q), bin, ri);
+    p_Alloc0Bin(pNext(q), bin, ri);
     pIter(q);
     pSetCoeff0(q, n_Mult(mCoeff, pGetCoeff(p), ri->cf));
 
@@ -181,7 +181,7 @@ poly shift_pp_mm_Mult(poly p, const poly m, const ring ri)
   int *pExpV = (int *) omAlloc((ri->N+1)*sizeof(int));
   do
   {
-    p_AllocBin(pNext(q), bin, ri);
+    p_Alloc0Bin(pNext(q), bin, ri);
     pIter(q);
     pSetCoeff0(q, n_Mult(mCoeff, pGetCoeff(p), ri->cf));
 
