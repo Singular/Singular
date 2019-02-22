@@ -9,6 +9,7 @@ bug_misc
 bug_minpoly
 bug_minpoly2
 bug_minpoly_frac
+bug_mod
 bug_naGreater
 bug_newstruct
 bug_newstruct3
@@ -86,6 +87,7 @@ bug_tr806
 bug_tr820
 bug_tr822
 bug_tr834
+bug_tr844
 bug_genus_etc
 conv_bi
 facstd
