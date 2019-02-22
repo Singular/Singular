@@ -2321,11 +2321,33 @@ number nlCopyMap(number a, const coeffs /*src*/, const coeffs /*dst*/)
   return _nlCopy_NoImm(a);
 }
 
-nMapFunc nlSetMap(const coeffs src, const coeffs /*dst*/)
+number nlMapQtoZ(number a, const coeffs src, const coeffs dst)
+{
+  if ((SR_HDL(a) & SR_INT)||(a==NULL))
+  {
+    return a;
+  }
+  if (a->s==3) return _nlCopy_NoImm(a);
+  number a0=a;
+  BOOLEAN a1=FALSE;
+  if (a->s==0) { a0=_nlCopy_NoImm(a); a1=TRUE; }
+  number b1=nlGetNumerator(a0,src);
+  number b2=nlGetDenom(a0,src);
+  number b=nlIntDiv(b1,b2,dst);
+  nlDelete(&b1,src);
+  nlDelete(&b2,src);
+  if (a1)  _nlDelete_NoImm(&a0);
+  return b;
+}
+
+nMapFunc nlSetMap(const coeffs src, const coeffs dst)
 {
   if (src->rep==n_rep_gap_rat)  /*Q, coeffs_BIGINT */
   {
-    return ndCopyMap;
+    if ((src->is_field==dst->is_field) /* Q->Q, Z->Z*/
+    || (src->is_field==FALSE))         /* Z->Q */
+      return nlCopyMap;
+    return nlMapQtoZ;        /* Q->Z */
   }
   if ((src->rep==n_rep_int) && nCoeff_is_Zp(src))
   {
