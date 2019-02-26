@@ -193,8 +193,6 @@ matrix  idCoeffOfKBase(ideal arg, ideal kbase, poly how);
 
 // intvec *idQHomWeight(ideal id);
 
-ideal idXXX (ideal  h1, int k);
-
 poly id_GCD(poly f, poly g, const ring r);
 
 ideal id_Farey(ideal x, number N, const ring r);

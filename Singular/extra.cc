@@ -707,27 +707,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-  /*==================== std_syz =================*/
-    if (strcmp(sys_cmd, "std_syz") == 0)
-    {
-      ideal i1;
-      int i2;
-      if ((h!=NULL) && (h->Typ()==MODUL_CMD))
-      {
-        i1=(ideal)h->CopyD();
-        h=h->next;
-      }
-      else return TRUE;
-      if ((h!=NULL) && (h->Typ()==INT_CMD))
-      {
-        i2=(int)((long)h->Data());
-      }
-      else return TRUE;
-      res->rtyp=MODUL_CMD;
-      res->data=idXXX(i1,i2);
-      return FALSE;
-    }
-    else
   /*======================= demon_list =====================*/
     if (strcmp(sys_cmd,"denom_list")==0)
     {

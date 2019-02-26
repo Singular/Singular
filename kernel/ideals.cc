@@ -871,51 +871,6 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
   return s_h3;
 }
 
-/*2
-*/
-ideal idXXX (ideal  h1, int k)
-{
-  ideal s_h1;
-  intvec *w=NULL;
-
-  assume(currRing != NULL);
-  ring orig_ring=currRing;
-  ring syz_ring=rAssure_SyzComp(orig_ring,TRUE);
-  rSetSyzComp(k,syz_ring);
-  rChangeCurrRing(syz_ring);
-
-  if (orig_ring != syz_ring)
-  {
-    s_h1=idrCopyR_NoSort(h1,orig_ring, syz_ring);
-  }
-  else
-  {
-    s_h1 = h1;
-  }
-
-  ideal s_h3=kStd(s_h1,NULL,testHomog,&w,NULL,k);
-
-  if (s_h3==NULL)
-  {
-    return idFreeModule(IDELEMS(h1));
-  }
-
-  if (orig_ring != syz_ring)
-  {
-    idDelete(&s_h1);
-    idSkipZeroes(s_h3);
-    rChangeCurrRing(orig_ring);
-    s_h3 = idrMoveR_NoSort(s_h3, syz_ring, orig_ring);
-    rDelete(syz_ring);
-    idTest(s_h3);
-    return s_h3;
-  }
-
-  idSkipZeroes(s_h3);
-  idTest(s_h3);
-  return s_h3;
-}
-
 /*
 *computes a standard basis for h1 and stores the transformation matrix
 * in ma
