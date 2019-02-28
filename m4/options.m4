@@ -411,6 +411,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
  AM_CONDITIONAL([SI_BUILTIN_ORDER], [test x$bi_Order = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_GITFAN], [test x$bi_gitfan = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_INTERVAL], [test x$bi_interval = xtrue])
+ AM_CONDITIONAL([SI_BUILTIN_SYSTHREADS], [test x$bi_systhreads = xtrue])
 
  AC_MSG_CHECKING([BUILTIN_LIBS...])
  AC_MSG_RESULT(${BUILTIN_LIBS:-unset})
