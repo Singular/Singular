@@ -333,6 +333,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
   bi_Order=false
   bi_gitfan=false
   bi_interval=false
+  bi_systhreads=false
 
 
  if test -z "$with_builtinmodules"; then
@@ -370,6 +371,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
        Order ) bi_Order=true ;;
        gitfan ) bi_gitfan=true ;;
        interval ) bi_interval=true ;;
+       systhreads ) bi_systhreads=true;;
       esac
 
 ###### In case of out-of tree building: the build dir is empty in configure time!!!

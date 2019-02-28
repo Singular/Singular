@@ -3078,7 +3078,7 @@ BOOLEAN getSharedName(leftv result, leftv arg) {
 using namespace LibThread;
 
 
-extern "C" int mod_init(SModulFunctions *fn)
+extern "C" int SI_MOD_INIT(systhreads)(SModulFunctions *fn)
 {
   const char *libname = currPack->libname;
   if (!libname) libname = "";
