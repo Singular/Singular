@@ -297,13 +297,13 @@ static proc ineqvecfield(VecField V,VecField W)
 
 
 proc applyVecField(VecField V,p,list #)
-    "
-    USAGE:  applyVecField(VecField V, poly/ideal p [,int n])
-    RETURN: if p is a polynomial, return a polynomial V(p), if p is an ideal, the ideal V(p).
+"
+USAGE:  applyVecField(VecField V, poly/ideal p [,int n])
+RETURN: if p is a polynomial, return a polynomial V(p), if p is an ideal, the ideal V(p).
     If an optional n is given, only the parts of V up to and including degree n are
     applied to p.
-    EXAMPLE: example applyVecField
-    "
+EXAMPLE: example applyVecField
+"
 {
     int n = -1;
     if(size(#) > 0)
@@ -361,14 +361,14 @@ example
 }
 
 proc changeCoordinates(VecField V, map psi)
-    "
-    USAGE:  changeCoordinates(vecField V, map psi), where psi is an algebra morphism
+"
+USAGE:  changeCoordinates(vecField V, map psi), where psi is an algebra morphism
     k[x1,...,xn]->k[y1,...,ym] expressing the new basis in terms of the old.
-    RETURN: A new vecfield in the new coordinates.
-    NOTE:   the coordinate change necessitates inverting psi.
+RETURN: A new vecfield in the new coordinates.
+NOTE:   the coordinate change necessitates inverting psi.
     The inversion will be correct up to the precision of V.
-    EXAMPLE: example changeCoordinates
-    "
+EXAMPLE: example changeCoordinates
+"
 {
 
     int n = V.precision;
@@ -421,13 +421,13 @@ example
 
 
 proc jordanVecField(VecField V)
-    "
-    USAGE:  jordanVecField(VecField V)
-    RETURN: new vecfield W in coordinates s.t. W.lin is in Jordan normal
+"
+USAGE:  jordanVecField(VecField V)
+RETURN: new vecfield W in coordinates s.t. W.lin is in Jordan normal
     form.
-    ASSUME: eigenvalues of V.lin in basefield.
-    EXAMPLE: example jordanVecField
-    "
+ASSUME: eigenvalues of V.lin in basefield.
+EXAMPLE: example jordanVecField
+"
 {
     list l = jordanbasis(V.lin); // l[1] is the transformation matrix
     matrix trafoMat = inverse(l[1]);
@@ -457,13 +457,13 @@ example
 }
 
 proc diagonalizeVecFieldLin(list #)
-    "
-    USAGE:  diagonalizeVecFieldLin(list l), where l is a list of VecFields
-    RETURN: list W of the same VecFields in new coords s.t. the linear parts are diagonal,
+"
+USAGE:  diagonalizeVecFieldLin(list l), where l is a list of VecFields
+RETURN: list W of the same VecFields in new coords s.t. the linear parts are diagonal,
     all in the same coordinates
-    ASSUME: All linear parts of the entries of l are simultaneously diagonalizable.
-    EXAMPLE: example diagonalizeVecFieldLin
-    "
+ASSUME: All linear parts of the entries of l are simultaneously diagonalizable.
+EXAMPLE: example diagonalizeVecFieldLin
+"
 {
     list l = #;
     list matrices;
@@ -505,11 +505,11 @@ example
 
 
 proc SaitoBase(VecField V)
-    "
-    USAGE:  SaitoBase(VecField V)
-    RETURN: new VecField W in the base from [1] thm. 3.1, where semisimple and
+"
+USAGE:  SaitoBase(VecField V)
+RETURN: new VecField W in the base from [1] thm. 3.1, where semisimple and
     nilpotent components are easily read off.
-    NOTE:   the algorithm requires inversions of algebra morphisms. These will be
+NOTE:   the algorithm requires inversions of algebra morphisms. These will be
     exact to the precision of V. Warning: The algorithm assumes
     standard coordinates. If V is not given in standard coordinates, it will
     be converted to standard coordinates, but not converted back at the end,
@@ -519,8 +519,8 @@ proc SaitoBase(VecField V)
     transformation manually.
     Note that weight vectors only take Int64,
     making the algorithm fail for very large entries in V.vec.
-    EXAMPLE: example SaitoBase
-    "
+EXAMPLE: example SaitoBase
+"
 {
 
     // Saito works on standard coordinates, so we replace the coordinates of V by the
@@ -618,8 +618,6 @@ proc SaitoBase(VecField V)
     // exact up to V.precision.
 
     return(W);
-
-
 }
 example
 {
@@ -637,11 +635,11 @@ example
 }
 
 proc diagonalizeVecField(list #)
-    "
-    USAGE:  diagonalizeVecField(list l), l a list of VecFields
-    RETURN: list of VecFields W such that they are all simultaneously diagonal.
-    ASSUME: all input VecFields have to be simultaneously diagonalizable.
-    NOTE:   the algorithm requires inversions of algebra morphisms. These will be
+"
+USAGE:  diagonalizeVecField(list l), l a list of VecFields
+RETURN: list of VecFields W such that they are all simultaneously diagonal.
+ASSUME: all input VecFields have to be simultaneously diagonalizable.
+NOTE:   the algorithm requires inversions of algebra morphisms. These will be
     exact to the precision of l[1]. Warning: The algorithm assumes
     standard coordinates. If V is not given in standard coordinates, it will
     be converted to standard coordinates, but not converted back at the end,
@@ -651,8 +649,8 @@ proc diagonalizeVecField(list #)
     transformation manually.
     Note that weight vectors only take Int64,
     making the algorithm fail for very large entries in V.vec.
-    EXAMPLE: example diagonalizeVecField
-    "
+EXAMPLE: example diagonalizeVecField
+"
 {
     // note: comments are sparse in this procedure as it is essentially the same as SaitoBase(),
     // just with lists. See SaitoBase() for more documentation.
@@ -820,11 +818,11 @@ example
 }
 
 proc vecFieldToMatrix(VecField V,ideal W)
-    "
-    USAGE: vecFieldToMatrix(VecField V,ideal W)
-    RETURN: the matrix representation of V restricted to span(W), in the basis specified by W.
-    "
-    EXAMPLE: example vecFieldToMatrix
+"
+USAGE: vecFieldToMatrix(VecField V,ideal W)
+RETURN: the matrix representation of V restricted to span(W), in the basis specified by W.
+EXAMPLE: example vecFieldToMatrix
+"
 {
     matrix D[ncols(W)][ncols(W)]; // this will hold the matrix representation
 
@@ -874,18 +872,18 @@ example
 }
 
 proc    decomposeVecField(list #)
-    "
-    USAGE:  decomposeVecField(VecField V) or decomposeVecField(list s), s a list of VecFields
-    RETURN: list l containing two VecFields, where l[1] is the semisimple part of V, l[2] the
+"
+USAGE:  decomposeVecField(VecField V) or decomposeVecField(list s), s a list of VecFields
+RETURN: list l containing two VecFields, where l[1] is the semisimple part of V, l[2] the
     nilpotent part. If called with a list, l[2n-1] is the semisimple part of the
     n-th VecField, l[2n] its nilpotent part.
-    ASSUME: The algorithm assumes standard coordinates. If V is not given in standard
+ASSUME: The algorithm assumes standard coordinates. If V is not given in standard
     coordinates, it will be converted to standard coordinates, but not converted back
     at the end, so the resulting transformation is from standard coordinates to the
     new coordinates. If you want the entire transformation from your original coordinates
     to the new ones, add the inverse of your original coordinate transformation manually.
-    EXAMPLE: example decomposeVecField
-    "
+EXAMPLE: example decomposeVecField
+"
 {
     if(size(#) == 1)
     {
@@ -933,15 +931,15 @@ example
 
 
 proc invertAlgebraMorphism(p,int n)
-    "
-    USAGE: invertAlgebraMorphism(map p,int n), where p is an algebra
+"
+USAGE: invertAlgebraMorphism(map p,int n), where p is an algebra
     morphism k[x1,...,xn]->k[y1,...,ym],
     or invertAlgebraMorphism(ideal p,int n) if you represent the map as an ideal
-    RETURN: the inverse of p mod (maxideal)^n.
+RETURN: the inverse of p mod (maxideal)^n.
     If n=-1, try for infinite precision. If input was an ideal, return an ideal.
-    NOTE: the algorithm used is described in [1], chapter 3.2
-    EXAMPLE: example invertAlgebraMorphism
-    "
+NOTE: the algorithm used is described in [1], chapter 3.2
+EXAMPLE: example invertAlgebraMorphism
+"
 {
     if(typeof(p) == "map")
     {
@@ -1069,13 +1067,13 @@ example
 }
 
 proc diagonalizeMatrixSimul(list l)
-    "
-    USAGE: diagonalizeMatrixSimul(list l), where l is a list of quadratic matrices
+"
+USAGE: diagonalizeMatrixSimul(list l), where l is a list of quadratic matrices
     of same dimensions
-    RETURN: trafo matrix U s.t. U*A*inv(U) is diagonal for each A in l
-    ASSUME: matrices are simultaneously diagonalizable, nvars(basering)>=dimension of the matrices
-    EXAMPLE: example diagonalizeMatrixSimul
-    "
+RETURN: trafo matrix U s.t. U*A*inv(U) is diagonal for each A in l
+ASSUME: matrices are simultaneously diagonalizable, nvars(basering)>=dimension of the matrices
+EXAMPLE: example diagonalizeMatrixSimul
+"
 {
     if(size(l)==0)
     {
@@ -1188,12 +1186,12 @@ static proc diagonalizeMatrixSimulRec(list matrices,list spaces)
 }
 
 static proc homogeneousPolyToVec(poly p,ideal W)
-    "
-    USAGE: homogeneousPolyToVec(poly p, ideal W)
-    ASSUME: p homogeneous and contained in the space spanned by W,
+"
+USAGE: homogeneousPolyToVec(poly p, ideal W)
+ASSUME: p homogeneous and contained in the space spanned by W,
     e.g. p quasihomogeneous and W is the result of weaklyHomogeneousSpace(...)
-    RETURN: nx1 matrix containing the coefficients of p in the order given by W
-    "
+RETURN: nx1 matrix containing the coefficients of p in the order given by W
+"
 {
     matrix v[ncols(W)][1];
     matrix thecoeffs = coef(p,productOfRingVars());
@@ -1211,11 +1209,11 @@ static proc homogeneousPolyToVec(poly p,ideal W)
 }
 
 static proc vecToHomogeneousPoly(matrix v,ideal W)
-    "
-    USAGE: vecToHomogeneousPoly(vec v,ideal W)
-    ASSUME: v is a nx1 matrix, where n=ncols(W)
-    RETURN: the polynomial in W whose coefficients are v (W represents the basis)
-    "
+"
+USAGE: vecToHomogeneousPoly(vec v,ideal W)
+ASSUME: v is a nx1 matrix, where n=ncols(W)
+RETURN: the polynomial in W whose coefficients are v (W represents the basis)
+"
 {
     poly p;
     for(int j=1;j<=ncols(W);j++)
@@ -1226,14 +1224,14 @@ static proc vecToHomogeneousPoly(matrix v,ideal W)
 }
 
 static proc weaklyHomogeneousSpace(int n, int lambda, intvec weights)
-    "
-    USAGE: weaklyHomogeneousSpace(int n, int lambda, intvec weights)
-    RETURN: ideal of all monomials which are homogeneous of degree n
+"
+USAGE: weaklyHomogeneousSpace(int n, int lambda, intvec weights)
+RETURN: ideal of all monomials which are homogeneous of degree n
     AND weakly homogeneous of degree lambda with the given weights
-    ASSUME: weights has exactly as many entries as nvars(basering)
-    NOTE: if no such monomials exist, the zero ideal is returned.
+ASSUME: weights has exactly as many entries as nvars(basering)
+NOTE: if no such monomials exist, the zero ideal is returned.
     The monomials in the returned ideal are sorted according to the basering's ordering.
-    "
+"
 {
     ideal H = maxideal(n); // contains all homogeneous monomials of degree n
     ideal W; // this will hold those monomials that lie in the WHS
@@ -1265,14 +1263,14 @@ static proc weaklyHomogeneousSpace(int n, int lambda, intvec weights)
 }
 
 static proc weaklyHomogeneousSpaceComplement(int n, int lambda, intvec weights)
-    "
-    USAGE: weaklyHomogeneousSpaceComplement(int n, int lambda, intvec weights)
-    RETURN: ideal of all monomials which are homogeneous of degree n
+"
+USAGE: weaklyHomogeneousSpaceComplement(int n, int lambda, intvec weights)
+RETURN: ideal of all monomials which are homogeneous of degree n
     but NOT weakly homogeneous of degree lambda with the given weights
-    ASSUME: size(weights)==nvars(basering)
-    NOTE: if no such monomials exist, the zero ideal is returned.
+ASSUME: size(weights)==nvars(basering)
+NOTE: if no such monomials exist, the zero ideal is returned.
     The monomials in the returned ideal are sorted according to the ring ordering.
-    "
+"
 {
     // for documentation see weaklyHomogeneousSpace();
     // this is the same except we only return the monomials
@@ -1300,11 +1298,11 @@ static proc weaklyHomogeneousSpaceComplement(int n, int lambda, intvec weights)
 }
 
 static proc extendMatrix(matrix A,int rows,int cols)
-    "
-    USAGE: extendMatrix(matrix A,int rows,int cols)
-    RETURN: A extended with zeroes s.t. it is now a rowsxcols matrix
-    ASSUME: nrows(A) <= rows, ncols(A) <= cols
-    "
+"
+USAGE: extendMatrix(matrix A,int rows,int cols)
+RETURN: A extended with zeroes s.t. it is now a rowsxcols matrix
+ASSUME: nrows(A) <= rows, ncols(A) <= cols
+"
 {
     matrix B[rows][cols];
     for(int i=1;i<=ncols(A);i++)
@@ -1318,10 +1316,10 @@ static proc extendMatrix(matrix A,int rows,int cols)
 }
 
 static proc eqIdeal(ideal I,ideal J)
-    "
-    USAGE: eqIdeal(ideal I, ideal J)
-    RETURN: 1 if ideals are equal, 0 otherwise
-    "
+"
+USAGE: eqIdeal(ideal I, ideal J)
+RETURN: 1 if ideals are equal, 0 otherwise
+"
 {
     J = std(J);
     I = std(I);
@@ -1341,11 +1339,11 @@ static proc eqIdeal(ideal I,ideal J)
 
 
 static proc eqMap(map f, map g)
-    "
-    USAGE: eqMap(map f,map g)
-    ASSUME: domain of f,g are the same, codomain of f, g are the same, domain is current basering
-    RETURN: 1 if maps are equal, 0 otherwise
-    "
+"
+USAGE: eqMap(map f,map g)
+ASSUME: domain of f,g are the same, codomain of f, g are the same, domain is current basering
+RETURN: 1 if maps are equal, 0 otherwise
+"
 {
     // note: maps are equal iff they are equal on each ring variable
     ideal P = maxideal(1);
@@ -1363,10 +1361,10 @@ static proc eqMap(map f, map g)
 
 
 static proc identityMap() // this does not yet exist in SINGULAR ...
-    "
-    USAGE: identityMap()
-    RETURN: a map basering -> basering which is the identity map
-    "
+"
+USAGE: identityMap()
+RETURN: a map basering -> basering which is the identity map
+"
 {
     ideal P = maxideal(1);
     map f = basering,P;
@@ -1374,10 +1372,10 @@ static proc identityMap() // this does not yet exist in SINGULAR ...
 }
 
 static proc pvector()
-    "
-    USAGE: pvector()
-    RETURN: a nvars x 1 matrix consisting of the ring variables in order
-    "
+"
+USAGE: pvector()
+RETURN: a nvars x 1 matrix consisting of the ring variables in order
+"
 {
     ideal I = maxideal(1);
     matrix v[nvars(basering)][1] = [I[1..nvars(basering)]];
@@ -1399,10 +1397,10 @@ static proc mirrorMatrixHorizontal(matrix m)
 }
 
 static proc mirrorMatrixVertictal(matrix m)
-    "
-    USAGE: mirrorMatrixVertical(matrix m)
-    RETURN: m mirrored about the horizontal axis
-    "
+"
+USAGE: mirrorMatrixVertical(matrix m)
+RETURN: m mirrored about the horizontal axis
+"
 {
     matrix n[nrows(m)][ncols(m)];
     for(int i=1;i<=nrows(m);i++)
@@ -1436,10 +1434,10 @@ static proc isInverse(map phi,map psi)
 }
 
 static proc homogeneousPart(poly f, int n)
-    "
-    USAGE: homogeneousPart(poly f, int n)
-    RETURN: the homogeneous part of f of degree n
-    "
+"
+USAGE: homogeneousPart(poly f, int n)
+RETURN: the homogeneous part of f of degree n
+"
 {
     poly g = jet(f,n);
     poly c = 0;
@@ -1459,11 +1457,11 @@ static proc homogeneousPart(poly f, int n)
 }
 
 static proc diagEntries(matrix A)
-    "
-    USAGE: diagEntries(matrix A)
-    ASSUME: A is quadratic
-    RETURN: nx1 matrix containing the diagonal entries of A
-    "
+"
+USAGE: diagEntries(matrix A)
+ASSUME: A is quadratic
+RETURN: nx1 matrix containing the diagonal entries of A
+"
 {
     matrix v[ncols(A)][1];
     for(int i=1;i<=ncols(A);i++)
@@ -1474,10 +1472,10 @@ static proc diagEntries(matrix A)
 }
 
 static proc productOfRingVars()
-    "
-    USAGE: productOfRingVars()
-    RETURN: poly which is the product of all ring variables
-    "
+"
+USAGE: productOfRingVars()
+RETURN: poly which is the product of all ring variables
+"
 {
     poly p = 1;
     for(int i=1;i<=nvars(basering);i++)
@@ -1489,11 +1487,11 @@ static proc productOfRingVars()
 
 
 static proc vecToIntvec(matrix v)
-    "
-    USAGE: vecToIntVec(matrix v)
-    RETURN: an intvec containing the entries of v
-    ASSUME: v is mx1 and contains only integers
-    "
+"
+USAGE: vecToIntVec(matrix v)
+RETURN: an intvec containing the entries of v
+ASSUME: v is mx1 and contains only integers
+"
 {
     intvec ret = (0:nrows(v));
     for(int i=1;i<=nrows(v);i++)
@@ -1504,10 +1502,10 @@ static proc vecToIntvec(matrix v)
 }
 
 static proc matrixRow(matrix m, int n)
-    "
-    USAGE: matrixRow(matrix m, int n)
-    RETURN: the n-th row of m (as a matrix with one row). If n>nrows(m), returns a zero row.
-    "
+"
+USAGE: matrixRow(matrix m, int n)
+RETURN: the n-th row of m (as a matrix with one row). If n>nrows(m), returns a zero row.
+"
 {
     matrix ret[1][ncols(m)];
     if(n>nrows(m))
@@ -1522,11 +1520,11 @@ static proc matrixRow(matrix m, int n)
 }
 
 static proc matrixCol(matrix m, int n)
-    "
-    USAGE: matrixCol(matrix m, int n)
-    RETURN: the n-th column of m (as a matrix with one column).
+"
+USAGE: matrixCol(matrix m, int n)
+RETURN: the n-th column of m (as a matrix with one column).
     If n>ncols(m), returns a zero column.
-    "
+"
 {
     matrix ret[nrows(m)][1];
     if(n>ncols(m))
