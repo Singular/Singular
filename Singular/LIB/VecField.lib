@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version="version VecField.lib 4.1.1.0 Feb_2019"; //$Id$
+version="version VecField.lib 4.1.1.0 Feb_2019 "; //$Id$
 category="Non-commutative Algebra";
 info="
 LIBRARY: VecField.lib   vector fields, with algorithms for
@@ -499,7 +499,7 @@ example
     map phi = r, x-2y2+z3,2y+y3+z,z;
     VecField W = changeCoordinates(V,phi);
     VecField X = [-2,1,0];
-    list diag = diagonalizeVecFieldLin(W,X);
+    list d = diagonalizeVecFieldLin(W,X);
     printlevel = oldp;
 }
 
