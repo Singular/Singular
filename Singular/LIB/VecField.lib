@@ -533,6 +533,7 @@ EXAMPLE: example SaitoBase
         matrix newbase[W.dimension][1];
 
         // i loop: compute one new coordinate in the current step of the sequence:
+        map newbasemap;
         for(i=1;i<=W.dimension;i++)
         {
             //print("DEBUG: i");print(i);
@@ -597,7 +598,7 @@ EXAMPLE: example SaitoBase
 
         // new basis is represented as polynomials in terms of the old basis.
         // View them as a map to change W accordingly.
-        map newbasemap = basering,newbase[1..W.dimension,1];
+        newbasemap = basering,newbase[1..W.dimension,1];
         //print("DEBUG: newbasemap=");print(newbasemap);
         W = changeCoordinates(W,newbasemap);
         //print("DEBUG: new W = ");print(W);
@@ -675,6 +676,7 @@ EXAMPLE: example diagonalizeVecField
         matrix newbase[W[1].dimension][1];
 
         // i-loop: compute one new coordinate in the current step of the sequence
+        map newbasemap;
         for(i=1;i<=W[1].dimension;i++)
         {
             //print("DEBUG: i");print(i);
@@ -776,7 +778,7 @@ EXAMPLE: example diagonalizeVecField
             }
         } // end of i-loop
 
-        map newbasemap = basering,newbase[1..W[1].dimension,1];
+        newbasemap = basering,newbase[1..W[1].dimension,1];
         //print("DEBUG: newbasemap=");print(newbasemap);
         for(i=1;i<=size(W);i++)
         {
@@ -821,7 +823,7 @@ EXAMPLE: example vecFieldToMatrix
         poly p = applyVecField(Vtemp,W[j]);
 
         // find out how to write this in the basis again by brute force:
-	poly mon,lcoef;
+        poly mon,lcoef;
         while(p != 0)
         {
             mon = leadmonom(p);
@@ -1231,7 +1233,7 @@ NOTE: if no such monomials exist, the zero ideal is returned.
         matrix expos[nvars(basering)][1] = leadexp(mon);
         expos = transpose(expos);
         res = expos*w;
-	kill expos;
+        kill expos;
         if(res[1,1] == lambda)
         {
             W = (W,mon);
@@ -1273,7 +1275,7 @@ NOTE: if no such monomials exist, the zero ideal is returned.
         matrix expos[nvars(basering)][1] = leadexp(mon);
         expos = transpose(expos);
         res = expos*w;
-	kill expos;
+        kill expos;
         if(res[1,1] != lambda) // this line is the only difference to weaklyHomogeneousSpace()
         {
             W = (W,mon);
