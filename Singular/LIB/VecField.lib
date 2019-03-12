@@ -468,9 +468,10 @@ EXAMPLE: example diagonalizeVecFieldLin
     map coordChange = basering,I;
 
     list W;
+    VecField temp;
     for(i=1;i<=size(l);i++)
     {
-        VecField temp = changeCoordinates(l[i],coordChange);
+        temp = changeCoordinates(l[i],coordChange);
         W = insert(W,temp,size(W));
     }
     return(W);
@@ -820,10 +821,11 @@ EXAMPLE: example vecFieldToMatrix
         poly p = applyVecField(Vtemp,W[j]);
 
         // find out how to write this in the basis again by brute force:
+	poly mon,lcoef;
         while(p != 0)
         {
-            poly mon = leadmonom(p);
-            poly lcoef = leadcoef(p);
+            mon = leadmonom(p);
+            lcoef = leadcoef(p);
             p = p-mon*lcoef;
             for(int h=1;h<=ncols(W);h++)
             {
@@ -1068,10 +1070,12 @@ EXAMPLE: example diagonalizeMatrixSimul
     matrix ret[numRows][numRows]; // this will be the transformation matrix.
     int pos=1;
     int i,j,k;
+    module M;
+    matrix m;
     for(i=1;i<=size(spaces);i++)
     {
-        module M = spaces[i];
-        matrix m = M;
+        M = spaces[i];
+        m = M;
         for(j=1;j<=ncols(m);j++)
         {
             for(k=1;k<=nrows(m);k++)
@@ -1219,12 +1223,15 @@ NOTE: if no such monomials exist, the zero ideal is returned.
 
     // we compute this by brute force: for each monomial in H,
     // check whether it is wh of lambda,weights.
+    poly mon;
+    matrix res;
     for(int j=1;j<=ncols(H);j++)
     {
-        poly mon = H[j];
+        mon = H[j];
         matrix expos[nvars(basering)][1] = leadexp(mon);
         expos = transpose(expos);
-        matrix res = expos*w;
+        res = expos*w;
+	kill expos;
         if(res[1,1] == lambda)
         {
             W = (W,mon);
@@ -1258,12 +1265,15 @@ NOTE: if no such monomials exist, the zero ideal is returned.
     ideal H = maxideal(n);
     ideal W;
     matrix w[nvars(basering)][1] = weights;
+    poly mon;
+    matrix res;
     for(int j=1;j<=ncols(H);j++)
     {
-        poly mon = H[j];
+        mon = H[j];
         matrix expos[nvars(basering)][1] = leadexp(mon);
         expos = transpose(expos);
-        matrix res = expos*w;
+        res = expos*w;
+	kill expos;
         if(res[1,1] != lambda) // this line is the only difference to weaklyHomogeneousSpace()
         {
             W = (W,mon);
@@ -1423,9 +1433,10 @@ RETURN: the homogeneous part of f of degree n
     poly g = jet(f,n);
     poly c = 0;
     int origSize = size(g);
+    poly mon;
     for(int j=1;j <= origSize;j++)
     {
-        poly mon = leadmonom(g);
+        mon = leadmonom(g);
         mon = mon*leadcoef(g);
         g = g-mon;
         if(deg(mon)==n)
