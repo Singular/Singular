@@ -922,6 +922,7 @@ NOTE: the algorithm used is described in [1], chapter 3.2
 EXAMPLE: example invertAlgebraMorphism
 "
 {
+    int myindex;
     if(typeof(p) == "map")
     {
         // to do this, we apply p to each ring variable,
@@ -977,7 +978,7 @@ EXAMPLE: example invertAlgebraMorphism
             I = qslimgb(I);
 
             ideal Inew;
-            for(int j=1;j<=ncols(I);j++)
+            for(j=1;j<=ncols(I);j++)
             {
                 if(deg(I[j],(1:numvars,0:numvars)) > 0)
                 {
@@ -988,7 +989,7 @@ EXAMPLE: example invertAlgebraMorphism
             I = Inew[2..ncols(Inew)];
 
             // normalize groebner basis
-            for(int j=1;j<=ncols(I);j++)
+            for(j=1;j<=ncols(I);j++)
             {
                 I[j] = I[j]/leadcoef(I[j]);
             }
@@ -1007,7 +1008,7 @@ EXAMPLE: example invertAlgebraMorphism
 
             for(j=1;j<=numvars;j++)
             {
-                int myindex = varNum(leadmonom(I[j]));
+                myindex = varNum(leadmonom(I[j]));
                 if(myindex < 1)
                 {
                     ERROR("ERROR in invertAlgebraMorphismIdeal: map not invertible");
