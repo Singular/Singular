@@ -855,7 +855,7 @@ example
     printlevel = oldp;
 }
 
-proc    decomposeVecField(list #)
+proc decomposeVecField(list #)
 "
 USAGE:  decomposeVecField(VecField V) or decomposeVecField(list s), s a list of VecFields
 RETURN: list l containing two VecFields, where l[1] is the semisimple part of V, l[2] the
@@ -889,7 +889,7 @@ EXAMPLE: example decomposeVecField
     else
     {
         list l;
-        for(i=1;i<=size(#);i++)
+        for(int i=1;i<=size(#);i++)
         {
             list temp = decomposeVecField(#[i]);
             l = insert(l,temp[1],size(l));
