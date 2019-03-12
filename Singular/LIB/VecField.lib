@@ -89,13 +89,13 @@ static proc mod_init()
 // PROCEDURES
 
 static proc defvecfield(v)
-    "
-    USAGE:   defvecfield(vector v), where v are the coefficients of the vector field
-    RETURN:  new vector field of same dimension as base ring
-    ASSUME:  v has at most nvars() entries
-    NOTE:    if you want a different precision than the default of 1, manually set V.precision
+"
+USAGE:   defvecfield(vector v), where v are the coefficients of the vector field
+RETURN:  new vector field of same dimension as base ring
+ASSUME:  v has at most nvars() entries
+NOTE:    if you want a different precision than the default of 1, manually set V.precision
     after declaration.
-    "
+"
 {
     VecField V;
     // dimension: automatically the same as the base ring
@@ -143,14 +143,14 @@ static proc defvecfield(v)
 }
 
 static proc addvecfield(VecField V,VecField W)
-    "
-    USAGE:  addvecfield(VecField V,VecField W)
-    ASSUME: V and W are of same dimension
-    RETURN: new vector field V+W
-    NOTE:   if V,W have different coordinate maps, this converts W to the same
+"
+USAGE:  addvecfield(VecField V,VecField W)
+ASSUME: V and W are of same dimension
+RETURN: new vector field V+W
+NOTE:   if V,W have different coordinate maps, this converts W to the same
     coordinates as V. If V,W have different precision,
     the precision of V is used.
-    "
+"
 {
     if(V.dimension != W.dimension)
     {
@@ -168,7 +168,8 @@ static proc addvecfield(VecField V,VecField W)
         N.precision = V.precision;
         N.coordinates = V.coordinates;
         return(N);
-    } else
+    }
+    else
     {
         matrix newV = V.vec+W.vec;
         VecField N = [newV[1..nrows(newV),1]];
@@ -179,13 +180,13 @@ static proc addvecfield(VecField V,VecField W)
 }
 
 static proc subvecfield(VecField V,VecField W)
-    "
-    USAGE:  subvecfield(VecField V,VecField W)
-    ASSUME: V,W have same dimension
-    RETURN: new vector field V-W
-    NOTE:   if V,W have different coordinate maps, this converts W to the same
+"
+USAGE:  subvecfield(VecField V,VecField W)
+ASSUME: V,W have same dimension
+RETURN: new vector field V-W
+NOTE:   if V,W have different coordinate maps, this converts W to the same
     coordinates as V. If V,W have different precision, the precision of V is used.
-    "
+"
 {
     if(V.dimension == W.dimension)
     {
@@ -225,13 +226,13 @@ static proc VecFieldMult(VecField V,p)
 }
 
 static proc liebracket(VecField V,VecField W)
-    "
-    USAGE:  liebracket(VecField V,VecField W)
-    ASSUME: linear parts of V and W have same dimension as matrices,
+"
+USAGE:  liebracket(VecField V,VecField W)
+ASSUME: linear parts of V and W have same dimension as matrices,
     and V,W are given in the same coordinates
-    RETURN: [V,W]
-    NOTE:   precision is taken from V.
-    "
+RETURN: [V,W]
+NOTE:   precision is taken from V.
+"
 {
     if(nrows(V.lin)!=nrows(W.lin) || ncols(V.lin)!=ncols(W.lin))
     {
@@ -251,10 +252,10 @@ static proc liebracket(VecField V,VecField W)
 }
 
 static proc cmpvecfield(VecField V,VecField W)
-    "
-    USAGE:  cmpvecfield(VecField V,VecField W)
-    RETURN: 0 if V==W, -1 if dimensions are different, 1 otherwise
-    "
+"
+USAGE:  cmpvecfield(VecField V,VecField W)
+RETURN: 0 if V==W, -1 if dimensions are different, 1 otherwise
+"
 {
     if(V.dimension != W.dimension)
     {
@@ -271,26 +272,19 @@ static proc cmpvecfield(VecField V,VecField W)
 }
 
 static proc eqvecfield(VecField V,VecField W)
-    "
-    USAGE: eqvecfield(VecField V,VecField W)
-    RETURN: 1 if V==W, 0 otherwise
-    "
+"
+USAGE: eqvecfield(VecField V,VecField W)
+RETURN: 1 if V==W, 0 otherwise
+"
 {
-    if(cmpvecfield(V,W)==0)
-    {
-        return(1);
-    }
-    else
-    {
-        return(0);
-    }
+    return(cmpvecfield(V,W)==0);
 }
 
 static proc ineqvecfield(VecField V,VecField W)
-    "
-    USAGE: ineqvecfield(VecField V,VecField W)
-    RETURN: 0 if V==W, 1 otherwise
-    "
+"
+USAGE: ineqvecfield(VecField V,VecField W)
+RETURN: 0 if V==W, 1 otherwise
+"
 {
     return(!eqvecfield(V,W));
 }
@@ -408,15 +402,12 @@ EXAMPLE: example changeCoordinates
 example
 {
     "EXAMPLE: "; echo = 2;
-    int oldp = printlevel;
-    printlevel = 1;
     ring r = 0, (x, y, z),ds;
     vector v = [-1,-1,-1];
     VecField V = v;
     V.precision = 4;
     map phi = r, x-2y2+z3,2y+y3+z,z;
     VecField W = changeCoordinates(V,phi);
-    printlevel = oldp;
 }
 
 
@@ -444,8 +435,6 @@ EXAMPLE: example jordanVecField
 example
 {
     "EXAMPLE: "; echo = 2;
-    int oldp = printlevel;
-    printlevel = 1;
     ring r = 0, (x, y, z),ds;
     vector v = [-1,-1,-1];
     VecField V = v;
@@ -453,7 +442,6 @@ example
     map phi = r, x-2y2+z3,2y+y3+z,z;
     VecField W = changeCoordinates(V,phi);
     VecField X = jordanVecField(W);
-    printlevel = oldp;
 }
 
 proc diagonalizeVecFieldLin(list #)
@@ -467,7 +455,8 @@ EXAMPLE: example diagonalizeVecFieldLin
 {
     list l = #;
     list matrices;
-    for(int i=1;i<=size(l);i++)
+    int i;
+    for(i=1;i<=size(l);i++)
     {
         matrices = insert(matrices,l[i].lin,size(matrices));
     }
@@ -479,19 +468,16 @@ EXAMPLE: example diagonalizeVecFieldLin
     map coordChange = basering,I;
 
     list W;
-    for(int i=1;i<=size(l);i++)
+    for(i=1;i<=size(l);i++)
     {
         VecField temp = changeCoordinates(l[i],coordChange);
         W = insert(W,temp,size(W));
     }
-
     return(W);
 }
 example
 {
     "EXAMPLE: "; echo = 2;
-    int oldp = printlevel;
-    printlevel = 1;
     ring r = 0, (x, y, z),ds;
     vector v = [-1,-1,-1];
     VecField V = v;
@@ -500,7 +486,6 @@ example
     VecField W = changeCoordinates(V,phi);
     VecField X = [-2,1,0];
     list d = diagonalizeVecFieldLin(W,X);
-    printlevel = oldp;
 }
 
 
@@ -534,7 +519,8 @@ EXAMPLE: example SaitoBase
     VecField W = jordanVecField(V);
 
     // k loop: compute one step in the sequence of coordinate systems:
-    for(int k=2;k<=1+V.precision;k++)
+    int i,k;
+    for(k=2;k<=1+V.precision;k++)
     {
         //print("DEBUG: k=");print(k);
         //print("DEBUG: W=");print(W);
@@ -546,7 +532,7 @@ EXAMPLE: example SaitoBase
         matrix newbase[W.dimension][1];
 
         // i loop: compute one new coordinate in the current step of the sequence:
-        for(int i=1;i<=W.dimension;i++)
+        for(i=1;i<=W.dimension;i++)
         {
             //print("DEBUG: i");print(i);
             // compute the complement of the weakly homogeneous space (see below)
@@ -622,8 +608,6 @@ EXAMPLE: example SaitoBase
 example
 {
     "EXAMPLE: "; echo = 2;
-    int oldp = printlevel;
-    printlevel = 1;
     ring r = 0, (x, y, z),ds;
     vector v = [-1,-1,-1];
     VecField V = v;
@@ -631,7 +615,6 @@ example
     map phi = r, x-2y2+z3,2y+y3+z,z;
     VecField W = changeCoordinates(V,phi);
     VecField WS = SaitoBase(W);
-    printlevel = oldp;
 }
 
 proc diagonalizeVecField(list #)
@@ -657,12 +640,13 @@ EXAMPLE: example diagonalizeVecField
     list l = #;
     // Saito works on standard coordinates
     list oldcoords;
-    for(int i=1;i<=size(l);i++)
+    int i,j,k;
+    for(i=1;i<=size(l);i++)
     {
         oldcoords = insert(oldcoords,l[i].coordinates,size(oldcoords));
     }
     map standardCoords = basering,(maxideal(1));
-    for(int i=1;i<=size(l);i++)
+    for(i=1;i<=size(l);i++)
     {
         l[i].coordinates = standardCoords;
     }
@@ -673,13 +657,13 @@ EXAMPLE: example diagonalizeVecField
 
     // k-loop: compute one step in the sequence of coordinate systems:
     int numSteps = W[1].precision;
-    for(int k=2;k<=1+numSteps;k++)
+    for(k=2;k<=1+numSteps;k++)
     {
         //print("DEBUG: k=");print(k);
         // eigenvals will contain a list of arrays, where the n-th array contains
         // all eigenvals of the n-th vecfield
         list eigenvals;
-        for(int i=1;i<=size(W);i++)
+        for(i=1;i<=size(W);i++)
         {
             matrix t = diagEntries(W[i].lin);
             eigenvals = insert(eigenvals,t,size(eigenvals));
@@ -690,12 +674,12 @@ EXAMPLE: example diagonalizeVecField
         matrix newbase[W[1].dimension][1];
 
         // i-loop: compute one new coordinate in the current step of the sequence
-        for(int i=1;i<=W[1].dimension;i++)
+        for(i=1;i<=W[1].dimension;i++)
         {
             //print("DEBUG: i");print(i);
             list weights;
             list myLeadCoefs;
-            for(int j=1;j<=size(W);j++)
+            for(j=1;j<=size(W);j++)
             {
                 weights = insert(weights,vecToIntvec(eigenvals[j]),size(weights));
                 matrix curEigVals = eigenvals[j];
@@ -706,7 +690,7 @@ EXAMPLE: example diagonalizeVecField
 
             int nontrivialFlag = 0;
 
-            for(int j=1;j<=size(W);j++)
+            for(j=1;j<=size(W);j++)
             {
                 //print("DEBUG: j");print(j);
                 ideal M = maxideal(k);
@@ -743,7 +727,7 @@ EXAMPLE: example diagonalizeVecField
             {
                 // paste all Ds together into one single matrix
                 int numRows = 0;
-                for(int j=1;j<=size(W);j++)
+                for(j=1;j<=size(W);j++)
                 {
                     numRows = numRows + nrows(D[j]);
                 }
@@ -753,7 +737,7 @@ EXAMPLE: example diagonalizeVecField
                 // they are all diagonal, we skip that step.
 
                 // compute the polynomials g
-                for(int j=1;j<=size(W);j++)
+                for(j=1;j<=size(W);j++)
                 {
                     matrix curVec = W[j].vec;
                     poly g(j) = curVec[i,1];
@@ -765,7 +749,7 @@ EXAMPLE: example diagonalizeVecField
                 // paste the vector representations of all g(j) together into one big vector:
                 matrix g[numRows][1];
                 int counter = 1;
-                for(int j=1;j<=size(W);j++)
+                for(j=1;j<=size(W);j++)
                 {
                     matrix gj = homogeneousPolyToVec(g(j),maxideal(k));
                     for(int irow=1;irow<=nrows(D[j]);irow++)
@@ -793,7 +777,7 @@ EXAMPLE: example diagonalizeVecField
 
         map newbasemap = basering,newbase[1..W[1].dimension,1];
         //print("DEBUG: newbasemap=");print(newbasemap);
-        for(int i=1;i<=size(W);i++)
+        for(i=1;i<=size(W);i++)
         {
             W[i] = changeCoordinates(W[i],newbasemap);
             //print("DEBUG: new W[i] = ");print(W[i]);
@@ -905,7 +889,7 @@ EXAMPLE: example decomposeVecField
     else
     {
         list l;
-        for(int i=1;i<=size(#);i++)
+        for(i=1;i<=size(#);i++)
         {
             list temp = decomposeVecField(#[i]);
             l = insert(l,temp[1],size(l));
@@ -917,8 +901,6 @@ EXAMPLE: example decomposeVecField
 example
 {
     "EXAMPLE: "; echo = 2;
-    int oldp = printlevel;
-    printlevel = 1;
     ring r = 0, (x, y, z),ds;
     vector v = [-1,-1,-1];
     VecField V = v;
@@ -926,7 +908,6 @@ example
     map phi = r, x-2y2+z3,2y+y3+z,z;
     VecField W = changeCoordinates(V,phi);
     list l = decomposeVecField(W);
-    printlevel = oldp;
 }
 
 
@@ -951,7 +932,9 @@ EXAMPLE: example invertAlgebraMorphism
         ideal J = invertAlgebraMorphism(I,n);
         map f = basering,J;
         return(f);
-    } else {
+    }
+    else
+    {
         if(typeof(p) == "ideal")
         {
             ring oldbasering = basering;
@@ -1011,7 +994,7 @@ EXAMPLE: example invertAlgebraMorphism
             }
 
             // I should now be of the form in thm. 3.2.1i. Extract the Gs:
-            for(int j=ncols(I)+1;j<=numvars;j++) // fill with zeroes if I too short
+            for(j=ncols(I)+1;j<=numvars;j++) // fill with zeroes if I too short
             {
                 I = (I,0);
                 // this should not happen unless there is an error in my code.
@@ -1022,7 +1005,7 @@ EXAMPLE: example invertAlgebraMorphism
             // sort I by leading monomial
             ideal J = (0:numvars);
 
-            for(int j=1;j<=numvars;j++)
+            for(j=1;j<=numvars;j++)
             {
                 int myindex = varNum(leadmonom(I[j]));
                 if(myindex < 1)
@@ -1055,15 +1038,12 @@ EXAMPLE: example invertAlgebraMorphism
 example
 {
     "EXAMPLE: "; echo = 2;
-    int oldp = printlevel;
-    printlevel = 1;
     ring r = 0, (x, y, z),ds;
     vector v = [-1,-1,-1];
     VecField V = v;
     V.precision = 4;
     map phi = r, x-2y2+z3,2y+y3+z,z;
     map phiinv = invertAlgebraMorphism(phi,4);
-    printlevel = oldp;
 }
 
 proc diagonalizeMatrixSimul(list l)
@@ -1086,27 +1066,25 @@ EXAMPLE: example diagonalizeMatrixSimul
 
     matrix ret[numRows][numRows]; // this will be the transformation matrix.
     int pos=1;
-    for(int i=1;i<=size(spaces);i++)
+    int i,j,k;
+    for(i=1;i<=size(spaces);i++)
     {
         module M = spaces[i];
         matrix m = M;
-        for(int j=1;j<=ncols(m);j++)
+        for(j=1;j<=ncols(m);j++)
         {
-            for(int k=1;k<=nrows(m);k++)
+            for(k=1;k<=nrows(m);k++)
             {
                 ret[k,pos] = m[k,j];
             }
             pos++;
         }
     }
-
     return(ret);
 }
 example
 {
     "EXAMPLE: "; echo = 2;
-    int oldp = printlevel;
-    printlevel = 1;
     ring r = 0,(x(1),x(2),x(3),x(4)),dp;
 
     matrix a[4][4] = 2,0,0,0, 0,3,0,0, 0,0,3,0, 0,0,0,5 ;
@@ -1123,7 +1101,6 @@ example
     l = insert(l,bt);
 
     matrix diagtrafo = diagonalizeMatrixSimul(l);
-    printlevel = oldp;
 }
 
 
@@ -1151,11 +1128,12 @@ static proc diagonalizeMatrixSimulRec(list matrices,list spaces)
 
     matrices = delete(matrices,1); // shorten list for the recursion
     int i = 1;
+    int j;
     while(i<=nrows(trafoMat))
     {
         int range = 0;
         // increment range s.t. range+1 is the dimension of the current eigenspace
-        for(int j=1;j+i<=nrows(eigenvals);j++)
+        for(j=1;j+i<=nrows(eigenvals);j++)
         {
             if(eigenvals[j+i,1]==eigenvals[i,1])
             {
@@ -1164,12 +1142,12 @@ static proc diagonalizeMatrixSimulRec(list matrices,list spaces)
         }
 
         module eigenspace;
-        for(int j=i;j<=i+range;j++)
+        for(j=i;j<=i+range;j++)
         {
             eigenspace = (eigenspace,matrixCol(trafoMat,j));
         }
 
-        for(int j=1;j<=size(spaces);j++)
+        for(j=1;j<=size(spaces);j++)
         {
             module toIntersect = spaces[j];
             module M = intersect(eigenspace,toIntersect);
@@ -1195,9 +1173,10 @@ RETURN: nx1 matrix containing the coefficients of p in the order given by W
 {
     matrix v[ncols(W)][1];
     matrix thecoeffs = coef(p,productOfRingVars());
-    for(int j=1;j<=ncols(W);j++)
+    int j,k;
+    for(j=1;j<=ncols(W);j++)
     {
-        for(int k = 1;k<=ncols(thecoeffs);k++)
+        for(k = 1;k<=ncols(thecoeffs);k++)
         {
             if(thecoeffs[1,k] == W[j])
             {
@@ -1305,9 +1284,10 @@ ASSUME: nrows(A) <= rows, ncols(A) <= cols
 "
 {
     matrix B[rows][cols];
-    for(int i=1;i<=ncols(A);i++)
+    int i,j;
+    for(i=1;i<=ncols(A);i++)
     {
-        for(int j=1;j<=nrows(A);j++)
+        for(j=1;j<=nrows(A);j++)
         {
             B[j,i] = A[j,i];
         }
