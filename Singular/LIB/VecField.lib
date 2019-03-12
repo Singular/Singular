@@ -521,27 +521,28 @@ EXAMPLE: example SaitoBase
 
     // k loop: compute one step in the sequence of coordinate systems:
     int i,k;
+    map newbasemap; ideal WHS; matrix eigenvals,D,thesolution; intvec weights;
+    list l,sols; poly h,g;
     for(k=2;k<=1+V.precision;k++)
     {
         //print("DEBUG: k=");print(k);
         //print("DEBUG: W=");print(W);
         // we need the eigenvalues of W to use as homogeneous weights later on
-        matrix eigenvals = diagEntries(W.lin);
-        intvec weights = vecToIntvec(eigenvals);
+        eigenvals = diagEntries(W.lin);
+        weights = vecToIntvec(eigenvals);
         // newbase will hold the new coordinates. We compute an entire step k,
         // then convert W to newbase.
         matrix newbase[W.dimension][1];
 
         // i loop: compute one new coordinate in the current step of the sequence:
-        map newbasemap;
         for(i=1;i<=W.dimension;i++)
         {
             //print("DEBUG: i");print(i);
             // compute the complement of the weakly homogeneous space (see below)
-            ideal WHS = weaklyHomogeneousSpaceComplement(k,int(leadcoef(eigenvals[i,1])),weights);
+            WHS = weaklyHomogeneousSpaceComplement(k,int(leadcoef(eigenvals[i,1])),weights);
             // use this to compute the matrix representation of W restricted to WHS in
             // the monomial basis
-            matrix D = vecFieldToMatrix(W,WHS);
+            D = vecFieldToMatrix(W,WHS);
             // subtract current eigenvalue (see algorithm)
             D = D-eigenvals[i,1]*unitmat(ncols(D));
             //print("DEBUG: curEigVal");print(eigenvals[i,1]);
@@ -558,25 +559,25 @@ EXAMPLE: example SaitoBase
             else
             {
                 // compute the polynomial g from the algorithm
-                poly g(i) = W.vec[i,1];
-                g(i) = homogeneousPart(g(i),k);
-                g(i) = -g(i); // g(i) is now -{g_m(x_m)}_m+1,_x_m
-                //print("DEBUG: g(i)");print(g(i));
+                g = W.vec[i,1];
+                g = homogeneousPart(g,k);
+                g = -g; // g is now -{g_m(x_m)}_m+1,_x_m
+                //print("DEBUG: g");print(g);
 
-                // see whether g(i) is already weakly quasihomogeneous. If so, set h=0:
-                if(deg(g(i),weights) == eigenvals[i,1])
+                // see whether g is already weakly quasihomogeneous. If so, set h=0:
+                if(deg(g,weights) == eigenvals[i,1])
                 {
-                    //print("DEBUG: g(i) is already weakly quasihomogeneous in SaitoBase");
+                    //print("DEBUG: g is already weakly quasihomogeneous in SaitoBase");
                     newbase[i,1] = var(i);
                     i++; // continue does not increment for us!
                     continue; // newbase is same as old base, can skip to the next component
                 }
 
-                // g(i) is not weakly quasihomogeneous. Satio: there exists h(i) s.t. D*h(i) = g(i)
-                // compute h(i) via LU decomposition, representing g(i) as a
+                // g is not weakly quasihomogeneous. Satio: there exists h(i) s.t. D*h(i) = g
+                // compute h(i) via LU decomposition, representing g as a
                 // vector in the basis of WHS.
-                list l = ludecomp(D);
-                list sols =lusolve(l[1],l[2],l[3],homogeneousPolyToVec(g(i),WHS));
+                l = ludecomp(D);
+                sols =lusolve(l[1],l[2],l[3],homogeneousPolyToVec(g,WHS));
 
                 // by Saito, there should be a solution. If no solutions are found for a valid
                 // input, then my code is incorrect.
@@ -587,8 +588,8 @@ EXAMPLE: example SaitoBase
                             This implies a mistake in the library.");
                 }
 
-                matrix thesolution = sols[2]; // this is h from p.137, represented as a vector.
-                poly h = vecToHomogeneousPoly(thesolution,WHS);
+                thesolution = sols[2]; // this is h from p.137, represented as a vector.
+                h = vecToHomogeneousPoly(thesolution,WHS);
                 //print("DEBUG: h=");print(h);
 
                 // x_(i+1) = x_(i)+h.
@@ -602,6 +603,7 @@ EXAMPLE: example SaitoBase
         //print("DEBUG: newbasemap=");print(newbasemap);
         W = changeCoordinates(W,newbasemap);
         //print("DEBUG: new W = ");print(W);
+        kill newbase;
     } // end of k-loop: we have computed enough steps in the coordinate sequence to be
     // exact up to V.precision.
 
@@ -659,15 +661,17 @@ EXAMPLE: example diagonalizeVecField
 
     // k-loop: compute one step in the sequence of coordinate systems:
     int numSteps = W[1].precision;
+    poly h,p; matrix thesolution,curVec,curEigVals,gj,t;
+    list sols,eigenvals,myLeadCoefs,weights; ideal M;
+    int counter,numRows,nontrivialFlag,irow,a; map newbasemap;
     for(k=2;k<=1+numSteps;k++)
     {
         //print("DEBUG: k=");print(k);
         // eigenvals will contain a list of arrays, where the n-th array contains
         // all eigenvals of the n-th vecfield
-        list eigenvals;
         for(i=1;i<=size(W);i++)
         {
-            matrix t = diagEntries(W[i].lin);
+            t = diagEntries(W[i].lin);
             eigenvals = insert(eigenvals,t,size(eigenvals));
         }
 
@@ -676,27 +680,24 @@ EXAMPLE: example diagonalizeVecField
         matrix newbase[W[1].dimension][1];
 
         // i-loop: compute one new coordinate in the current step of the sequence
-        map newbasemap;
         for(i=1;i<=W[1].dimension;i++)
         {
             //print("DEBUG: i");print(i);
-            list weights;
-            list myLeadCoefs;
             for(j=1;j<=size(W);j++)
             {
                 weights = insert(weights,vecToIntvec(eigenvals[j]),size(weights));
-                matrix curEigVals = eigenvals[j];
+                curEigVals = eigenvals[j];
                 myLeadCoefs = insert(myLeadCoefs,int(leadcoef(curEigVals[i,1])),size(myLeadCoefs));
             }
 
             list D; // one matrix D per vecfield
 
-            int nontrivialFlag = 0;
+            nontrivialFlag = 0;
 
             for(j=1;j<=size(W);j++)
             {
                 //print("DEBUG: j");print(j);
-                ideal M = maxideal(k);
+                M = maxideal(k);
                 // notable difference to SaitoBase():
                 // we do not compute the weakly homogeneous space.
                 // Instead, as we know the vector fields are diagonalizable,
@@ -704,14 +705,14 @@ EXAMPLE: example diagonalizeVecField
                 // all homogeneous monomials
                 // and use the resulting coefficients as diagonal entries.
                 matrix Dcur[ncols(M)][ncols(M)];
-                for(int a=1;a<=ncols(M);a++)
+                for(a=1;a<=ncols(M);a++)
                 {
-                    poly p = applyVecField(W[j],M[a],1);//apply W.lin to all monomials of deg k
+                    p = applyVecField(W[j],M[a],1);//apply W.lin to all monomials of deg k
                     //print("DEBUG: M[a],p");print(M[a]);print(p);
                     Dcur[a,a] = leadcoef(p);
                 }
                 D = insert(D,Dcur,size(D));
-                matrix curEigVals = eigenvals[j];
+                curEigVals = eigenvals[j];
                 //print("DEBUG: curEigVals");print(curEigVals);
                 D[j] = D[j]-curEigVals[i,1]*unitmat(ncols(D[j]));
                 //print("DEBUG: D[j]");print(D[j]);
@@ -719,6 +720,7 @@ EXAMPLE: example diagonalizeVecField
                 {
                     nontrivialFlag = 1;
                 }
+                kill Dcur;
             }
             if(nontrivialFlag == 0)
             {
@@ -729,7 +731,7 @@ EXAMPLE: example diagonalizeVecField
             else
             {
                 // paste all Ds together into one single matrix
-                int numRows = 0;
+                numRows = 0;
                 for(j=1;j<=size(W);j++)
                 {
                     numRows = numRows + nrows(D[j]);
@@ -742,7 +744,7 @@ EXAMPLE: example diagonalizeVecField
                 // compute the polynomials g
                 for(j=1;j<=size(W);j++)
                 {
-                    matrix curVec = W[j].vec;
+                    curVec = W[j].vec;
                     poly g(j) = curVec[i,1];
                     g(j) = homogeneousPart(g(j),k);
                     g(j) = -g(j); // g(j) is now -{g_m(x_m)}_m+1,_x_m
@@ -751,11 +753,12 @@ EXAMPLE: example diagonalizeVecField
 
                 // paste the vector representations of all g(j) together into one big vector:
                 matrix g[numRows][1];
-                int counter = 1;
+                counter = 1;
                 for(j=1;j<=size(W);j++)
                 {
-                    matrix gj = homogeneousPolyToVec(g(j),maxideal(k));
-                    for(int irow=1;irow<=nrows(D[j]);irow++)
+                    gj = homogeneousPolyToVec(g(j),maxideal(k));
+                    kill g(j);
+                    for(irow=1;irow<=nrows(D[j]);irow++)
                     {
                         g[counter,1] = gj[irow,1];
                         counter++;
@@ -763,19 +766,20 @@ EXAMPLE: example diagonalizeVecField
                 }
                 //print("DEBUG: g");print(g);
                 //exists h(i): D*h(i) = g(i)
-                list l = ludecomp(Dcomp);
-                list sols =lusolve(l[1],l[2],l[3],g);
+                l = ludecomp(Dcomp);
+                sols =lusolve(l[1],l[2],l[3],g);
                 if(sols[1]==0)
                 {
                     //print("DEBUG: Dcomp=");print(Dcomp);
                     ERROR("error in diagonalizeVecField: no solutions found");
                 }
-                matrix thesolution = sols[2];
-                poly h = vecToHomogeneousPoly(thesolution,maxideal(k));
+                thesolution = sols[2];
+                h = vecToHomogeneousPoly(thesolution,maxideal(k));
                 //print("DEBUG: h=");print(h);
 
                 newbase[i,1] = var(i)+h;
             }
+            kill Dcomp,D;
         } // end of i-loop
 
         newbasemap = basering,newbase[1..W[1].dimension,1];
@@ -812,24 +816,26 @@ EXAMPLE: example vecFieldToMatrix
 "
 {
     matrix D[ncols(W)][ncols(W)]; // this will hold the matrix representation
-
+    matrix linpart;
+    VecField Vtemp;
+    poly p,mon,lcoef;
+    int h;
     for(int j=1;j<=ncols(W);j++)
     {
         // compute the image of the j-th basis vector:
         // only the image of the linear part of V is interesting
-        matrix linpart = V.lin * pvector();
-        VecField Vtemp = [linpart[1..nrows(linpart),1]];
+        linpart = V.lin * pvector();
+        Vtemp = [linpart[1..nrows(linpart),1]];
         Vtemp.precision = V.precision;
-        poly p = applyVecField(Vtemp,W[j]);
+        p = applyVecField(Vtemp,W[j]);
 
         // find out how to write this in the basis again by brute force:
-        poly mon,lcoef;
         while(p != 0)
         {
             mon = leadmonom(p);
             lcoef = leadcoef(p);
             p = p-mon*lcoef;
-            for(int h=1;h<=ncols(W);h++)
+            for(h=1;h<=ncols(W);h++)
             {
                 if(mon == W[h])
                 {
