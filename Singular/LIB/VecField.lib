@@ -779,7 +779,7 @@ EXAMPLE: example diagonalizeVecField
 
                 newbase[i,1] = var(i)+h;
             }
-            kill Dcomp,D;
+            kill Dcomp,D,g;
         } // end of i-loop
 
         newbasemap = basering,newbase[1..W[1].dimension,1];
@@ -789,6 +789,7 @@ EXAMPLE: example diagonalizeVecField
             W[i] = changeCoordinates(W[i],newbasemap);
             //print("DEBUG: new W[i] = ");print(W[i]);
         }
+        kill newbase;
     } // end of k-loop
     return(W);
 }
@@ -898,10 +899,10 @@ EXAMPLE: example decomposeVecField
     }
     else
     {
-        list l;
+        list l,temp;
         for(int i=1;i<=size(#);i++)
         {
-            list temp = decomposeVecField(#[i]);
+            temp = decomposeVecField(#[i]);
             l = insert(l,temp[1],size(l));
             l = insert(l,temp[2],size(l));
         }
@@ -1078,7 +1079,6 @@ EXAMPLE: example diagonalizeMatrixSimul
     matrix ret[numRows][numRows]; // this will be the transformation matrix.
     int pos=1;
     int i,j,k;
-    module M;
     matrix m;
     for(i=1;i<=size(spaces);i++)
     {
@@ -1141,10 +1141,11 @@ static proc diagonalizeMatrixSimulRec(list matrices,list spaces)
 
     matrices = delete(matrices,1); // shorten list for the recursion
     int i = 1;
-    int j;
+    int j,range;
+    module M,toIntersect;
     while(i<=nrows(trafoMat))
     {
-        int range = 0;
+        range = 0;
         // increment range s.t. range+1 is the dimension of the current eigenspace
         for(j=1;j+i<=nrows(eigenvals);j++)
         {
@@ -1162,8 +1163,8 @@ static proc diagonalizeMatrixSimulRec(list matrices,list spaces)
 
         for(j=1;j<=size(spaces);j++)
         {
-            module toIntersect = spaces[j];
-            module M = intersect(eigenspace,toIntersect);
+            toIntersect = spaces[j];
+            M = intersect(eigenspace,toIntersect);
             if(size(M) != 0)
             {
                 intersectedSpaces = insert(intersectedSpaces,M,size(intersectedSpaces));
@@ -1171,6 +1172,7 @@ static proc diagonalizeMatrixSimulRec(list matrices,list spaces)
         }
 
         i = i+range+1;
+        kill eigenspace;
     }
 
     return(diagonalizeMatrixSimulRec(matrices,intersectedSpaces));

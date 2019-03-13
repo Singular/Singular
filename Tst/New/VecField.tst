@@ -1,7 +1,6 @@
 LIB "tst.lib"; tst_init();
 
 LIB "VecField.lib";
-option(noredefine); //option(prot);
 ring r = 0, (x, y, z),ds;
 poly f = x3 + y3 + z3;
 ideal J = std(jacob(f));
@@ -52,13 +51,13 @@ VecField W2 = SaitoBase(V2);
 print("W2 = "); print(W2);
 
 ///////Computations for J///////////////////////////////////////
-
 ///////Check for J//////////////////////////////////////////////
 
 vector v1 = - y*gen(2) - z4*gen(1);
 vector v2 = - y*gen(2) - y4*gen(1) - x4*gen(3);
 vector v3 = - x*gen(1) - x4*gen(3) - x4*gen(2);
 
+kill V1,V2,W1,W2;
 VecField V1 = v1;
 VecField V2 = v2;
 VecField V3 = v3;
@@ -170,7 +169,7 @@ print("X1*X3 = "); print(X1*X3);
 print("X2*X3 = "); print(X2*X3);
 
 //Diagonalize them simultaneously:
-
+kill U1,U2,U3,W1,W2,W3;
 VecField U1 = changeCoordinates(X1, phi1);
 print("U1 = "); print(U1);
 VecField U2 = changeCoordinates(X2, phi1);
