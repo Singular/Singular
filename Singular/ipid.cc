@@ -294,7 +294,7 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
         else
         {
           if (BVERBOSE(V_REDEFINE))
-            Warn("redefining %s (%s)",s,my_yylinebuf);
+            Warn("redefining %s (%s) %s:%d",s,my_yylinebuf,VoiceName(), yylineno);
           if (s==IDID(h)) IDID(h)=NULL;
           killhdl2(h,root,currRing);
         }
@@ -313,7 +313,7 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
         if ((IDTYP(h) == t)||(t==DEF_CMD))
         {
           if (BVERBOSE(V_REDEFINE))
-            Warn("redefining %s (%s)",s,my_yylinebuf);
+            Warn("redefining %s (%s) %s:%d",s,my_yylinebuf,VoiceName(), yylineno);
           if (s==IDID(h)) IDID(h)=NULL;
           killhdl2(h,&currRing->idroot,currRing);
         }
@@ -332,7 +332,7 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
         if ((IDTYP(h) == t)||(t==DEF_CMD))
         {
           if (BVERBOSE(V_REDEFINE))
-            Warn("redefining %s (%s)",s,my_yylinebuf);
+            Warn("redefining %s (%s) %s:%d",s,my_yylinebuf,VoiceName(), yylineno);
           if (s==IDID(h)) IDID(h)=NULL;
           killhdl2(h,&IDROOT,NULL);
         }
