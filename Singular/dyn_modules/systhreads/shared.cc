@@ -28,6 +28,8 @@ using namespace std;
 extern char *global_argv0;
 #endif
 
+extern "C" void pSingular_initialize_thread();
+
 namespace LibThread {
 
 #ifdef ENABLE_THREADS
@@ -1373,7 +1375,6 @@ void thread_init() {
   thread_id = ++thread_counter;
   master_lock.unlock();
 #ifdef ENABLE_THREADS
-  extern void pSingular_initialize_thread();
   pSingular_initialize_thread();
   siInit(global_argv0);
 #endif
