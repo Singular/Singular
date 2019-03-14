@@ -1,7 +1,4 @@
 #include "threadconf.h"
-#ifdef ENABLE_THREADS
-#include <factory/prelude.h>
-#endif
 #include "lintree.h"
 #include <iostream>
 
