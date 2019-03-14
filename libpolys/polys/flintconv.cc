@@ -14,6 +14,7 @@
 #ifdef HAVE_FLINT
 #if __FLINT_RELEASE >= 20500
 #include "coeffs/coeffs.h"
+#include "coeffs/longrat.h"
 #include "polys/monomials/p_polys.h"
 
 #include "polys/sbuckets.h"
@@ -42,10 +43,56 @@ void convFlintNSingN (mpz_t z, fmpz_t f)
   fmpz_get_mpz(z,f);
 }
 
-void convSingNFlintN(fmpz_t f, mpz_t z)
+number convFlintNSingN (fmpz_t f)
+{
+  mpz_t z;
+  mpz_init(z);
+  fmpz_get_mpz(z,f);
+  number n;
+  nlMPZ(z,n,NULL);
+  return n;
+}
+number convFlintNSingN (fmpq_t f)
+{
+  number z=ALLOC_RNUMBER();
+#if defined(LDEBUG)
+  z->debug=123456;
+#endif
+  fmpz_get_mpz_frac(z->z,z->n,f);
+  nlNormalize(z,NULL);
+  return z;
+}
+
+void convSingNFlintN(fmpz_t f, mpz_t n)
 {
   fmpz_init(f);
-  fmpz_set_mpz(f,z);
+  fmpz_set_mpz(f,n);
+}
+
+void convSingNFlintN(fmpz_t f, number n)
+{
+  fmpz_init(f);
+  fmpz_set_mpz(f,(mpz_ptr)n);
+}
+
+void convSingNFlintN(fmpq_t f, number n)
+{
+  fmpq_init(f);
+  if (SR_HDL(n)&SR_INT)
+    fmpq_set_si(f,SR_TO_INT(n),1);
+  else if (n->s<3)
+  {
+    fmpz_set_mpz(fmpq_numref(f), n->z);
+    fmpz_set_mpz(fmpq_denref(f), n->n);
+  }
+  else
+  {
+    mpz_t one;
+    mpz_init_set_si(one,1);
+    fmpz_set_mpz(fmpq_numref(f), n->z);
+    fmpz_set_mpz(fmpq_denref(f), one);
+    mpz_clear(one);
+  }
 }
 
 

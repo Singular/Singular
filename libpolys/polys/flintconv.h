@@ -40,6 +40,11 @@ int convFlintISingI (fmpz_t f);
 void convSingIFlintI(fmpz_t f, int p);
 void convFlintNSingN (mpz_t z, fmpz_t f);
 void convSingNFlintN(fmpz_t f, mpz_t z);
+void convSingNFlintN(fmpz_t f, number n);
+void convSingNFlintN(fmpq_t f, number n);
+number convFlintNSingN (fmpz_t f);
+number convFlintNSingN (fmpq_t f);
+
 bigintmat*  singflint_LLL(bigintmat* A, bigintmat* T);
 intvec* singflint_LLL(intvec* A, intvec* T);
 #endif
