@@ -1,9 +1,4 @@
 #include "threadconf.h"
-#ifdef ENABLE_THREADS
-#include <factory/prelude.h>
-#else
-#define SIMPLE_THREAD_VAR
-#endif
 #include <iostream>
 #include "kernel/mod2.h"
 #include "Singular/ipid.h"
@@ -230,7 +225,7 @@ Lock global_objects_lock;
 SharedObjectTable global_objects;
 Lock master_lock(true);
 Lock name_lock(true);
-SIMPLE_THREAD_VAR long thread_id;
+VAR long thread_id;
 long thread_counter;
 
 int type_region;
@@ -1378,7 +1373,8 @@ void thread_init() {
   thread_id = ++thread_counter;
   master_lock.unlock();
 #ifdef ENABLE_THREADS
-  onThreadInit();
+  extern void pSingular_initialize_thread();
+  pSingular_initialize_thread();
   siInit(global_argv0);
 #endif
   setOption('q');
@@ -1629,8 +1625,8 @@ struct SchedInfo {
   int num;
 };
 
-static SIMPLE_THREAD_VAR ThreadPool *currentThreadPoolRef;
-static SIMPLE_THREAD_VAR Job *currentJobRef;
+STATIC_VAR ThreadPool *currentThreadPoolRef;
+STATIC_VAR Job *currentJobRef;
 
 class ThreadPool : public SharedObject {
 public:

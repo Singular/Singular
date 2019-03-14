@@ -13,7 +13,7 @@ KEYWORDS: parallel computing
 ";
 
 static proc mod_init() {
-  LIB "systhreads.so";
+  load("systhreads.so");
 }
 
 proc threadLoadLib(thread th, string libname) {
