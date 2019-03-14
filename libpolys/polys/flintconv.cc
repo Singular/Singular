@@ -58,7 +58,7 @@ number convFlintNSingN (fmpq_t f)
 #if defined(LDEBUG)
   z->debug=123456;
 #endif
-  fmpz_get_mpz_frac(z->z,z->n,f);
+  fmpq_get_mpz_frac(z->z,z->n,f);
   nlNormalize(z,NULL);
   return z;
 }
