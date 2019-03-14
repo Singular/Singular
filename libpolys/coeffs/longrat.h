@@ -101,6 +101,7 @@ static FORCE_INLINE BOOLEAN nlIsInteger(number q, const coeffs r)
   return ( q->s == 3 );
 }
 
+void nlMPZ(mpz_t m, number &n, const coeffs r);
 number nlModP(number q, const coeffs Q, const coeffs Zp);
 void   nlNormalize(number &x, const coeffs r);
 void   nlInpGcd(number &a, number b, const coeffs r);

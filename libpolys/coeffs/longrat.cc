@@ -2669,7 +2669,7 @@ LINLINE void nlInpMult(number &a, number b, const coeffs r)
 
 #ifndef P_NUMBERS_H
 
-static void nlMPZ(mpz_t m, number &n, const coeffs r)
+void nlMPZ(mpz_t m, number &n, const coeffs r)
 {
   nlTest(n, r);
   nlNormalize(n, r);
