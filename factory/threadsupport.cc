@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+#ifdef PSINGULAR
 typedef struct InitList {
   struct InitList *next;
   void (*func)();
@@ -36,6 +37,7 @@ void *pSingular_alloc_var(long n) {
   return malloc(n);
 }
 
+#endif
 #ifdef __cplusplus
 }
 #endif
