@@ -10,13 +10,13 @@
 
 #define HAVE_WALK 1
 
-#ifdef HAVE_CCLUSTER
-#include "ccluster/ccluster.h"
-#endif
-
 #include "kernel/mod2.h"
 #include "misc/sirandom.h"
 #include "resources/omFindExec.h"
+
+#ifdef HAVE_CCLUSTER
+#include "ccluster/ccluster.h"
+#endif
 
 #include "factory/factory.h"
 
@@ -3764,7 +3764,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #ifdef HAVE_CCLUSTER
     if(strcmp(sys_cmd,"ccluster")==0)
     {
-      if (rField_is_Q(currRing))
+      if ((currRing!=NULL) && rField_is_Q(currRing))
       {
         const short t[]={5,POLY_CMD,NUMBER_CMD,NUMBER_CMD,NUMBER_CMD,NUMBER_CMD};
 	if (iiCheckTypes(h,t,1))
