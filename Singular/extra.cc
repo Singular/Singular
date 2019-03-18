@@ -10,6 +10,10 @@
 
 #define HAVE_WALK 1
 
+#ifdef HAVE_CCLUSTER
+#include "ccluster/ccluster.h"
+#endif
+
 #include "kernel/mod2.h"
 #include "misc/sirandom.h"
 #include "resources/omFindExec.h"
@@ -3756,6 +3760,61 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
     #endif
+/* ccluster --------------------------------------------------------------*/
+#ifdef HAVE_CCLUSTER
+    if(strcmp(sys_cmd,"ccluster")==0)
+    {
+      if (rField_is_Q(currRing))
+      {
+        const short t[]={5,POLY_CMD,NUMBER_CMD,NUMBER_CMD,NUMBER_CMD,NUMBER_CMD};
+	if (iiCheckTypes(h,t,1))
+	{
+	  // convert first arg. to fmpq_poly_t
+	  fmpq_poly_t f;
+	  convSingPFlintP(f,(poly)h->Data(),currRing); h=h->next;
+	  // convert box-center(re,im), box-size, epsilon
+	  fmpq_t center_re,center_im,boxsize,eps;
+	  convSingNFlintN(center_re,(number)h->Data()); h=h->next;
+	  convSingNFlintN(center_im,(number)h->Data()); h=h->next;
+	  convSingNFlintN(boxsize,(number)h->Data()); h=h->next;
+	  convSingNFlintN(eps,(number)h->Data()); h=h->next;
+	  // alloc arrays
+	  int n=fmpq_poly_length(f);
+	  fmpq_t* re_part=(fmpq_t*)omAlloc(n*sizeof(fmpq_t));
+	  fmpq_t* im_part=(fmpq_t*)omAlloc(n*sizeof(fmpq_t));
+	  int *mult      =(int*)   omAlloc(n*sizeof(int));
+	  for(int i=0; i<n;i++)
+	  { fmpq_init(re_part[i]); fmpq_init(im_part[i]); }
+	  // call cccluster, adjust n
+	  int nn=ccluster_interface_poly_real(re_part,im_part,mult,f,center_re,center_im,boxsize,eps,23,1);
+	  // convert to list
+	  lists l=(lists)omAlloc0Bin(slists_bin);
+	  l->Init(nn);
+	  for(int i=0; i<nn;i++)
+	  {
+	    lists ll=(lists)omAlloc0Bin(slists_bin);
+	    l->m[i].rtyp=LIST_CMD;
+	    l->m[i].data=ll;
+	    ll->Init(2);
+	    ll->m[0].rtyp=NUMBER_CMD;
+	    ll->m[1].rtyp=NUMBER_CMD;
+	    ll->m[0].data=convFlintNSingN(re_part[i]);
+	    ll->m[1].data=convFlintNSingN(im_part[i]);
+	  }
+	  // clear re, im
+	  for(int i=n-1;i>=0;i--) { fmpq_clear(re_part[i]); fmpq_clear(im_part[i]); }
+	  omFree(re_part);
+	  omFree(im_part);
+	  // result
+	  res->rtyp=LIST_CMD;
+	  res->data=l;
+	  return FALSE;
+	}
+      }
+      return TRUE;
+    }
+    else
+#endif
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
