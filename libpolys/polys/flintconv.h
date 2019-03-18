@@ -33,6 +33,7 @@
 #include <flint/fmpz.h>
 #include <flint/fmpq.h>
 #include <flint/fmpz_poly.h>
+#include <flint/fmpq_poly.h>
 #include <flint/fmpz_poly_mat.h>
 #include <flint/fmpz_lll.h>
 
@@ -44,6 +45,8 @@ void convSingNFlintN(fmpz_t f, number n);
 void convSingNFlintN(fmpq_t f, number n);
 number convFlintNSingN (fmpz_t f);
 number convFlintNSingN (fmpq_t f);
+void convSingPFlintP(fmpq_poly_t res, poly p, const ring r);
+poly convFlintPSingP(fmpq_poly_t f, const ring r);
 
 bigintmat*  singflint_LLL(bigintmat* A, bigintmat* T);
 intvec* singflint_LLL(intvec* A, intvec* T);

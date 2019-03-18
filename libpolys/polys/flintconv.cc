@@ -95,6 +95,39 @@ void convSingNFlintN(fmpq_t f, number n)
   }
 }
 
+void convSingPFlintP(fmpq_poly_t res, poly p, const ring r)
+{
+  int d=p_GetExp(p,1,r);
+  fmpq_poly_init2(res,d+1);
+  _fmpq_poly_set_length (res, d + 1);
+  while(p!=NULL)
+  {
+    number n=pGetCoeff(p);
+    fmpq_t c;
+    convSingNFlintN(c,n);
+    fmpq_poly_set_coeff_fmpq(res,p_GetExp(p,1,r),c);
+    fmpq_clear(c);
+    pIter(p);
+  }
+}
+
+poly convFlintPSingP(fmpq_poly_t f, const ring r)
+{
+  int d=fmpq_poly_length(f);
+  poly p=NULL;
+  for(int i=0; i<=d; i++)
+  {
+    fmpq_t c;
+    fmpq_poly_get_coeff_fmpq(c,f,i);
+    number n=convFlintNSingN(c);
+    poly pp=p_Init(r);
+    pSetCoeff0(pp,n);
+    p_SetExp(pp,1,i,r);
+    p_Setm(pp,r);
+    p=p_Add_q(p,pp,r);
+  }
+  return p;
+}
 
 bigintmat* singflint_LLL(bigintmat*  m, bigintmat* T)
 {
