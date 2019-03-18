@@ -58,6 +58,8 @@ number convFlintNSingN (fmpq_t f)
 #if defined(LDEBUG)
   z->debug=123456;
 #endif
+  mpz_init(z->z);
+  mpz_init(z->n);
   fmpq_get_mpz_frac(z->z,z->n,f);
   nlNormalize(z,NULL);
   return z;
