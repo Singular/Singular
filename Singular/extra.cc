@@ -3795,16 +3795,19 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	    lists ll=(lists)omAlloc0Bin(slists_bin);
 	    l->m[i].rtyp=LIST_CMD;
 	    l->m[i].data=ll;
-	    ll->Init(2);
+	    ll->Init(3);
 	    ll->m[0].rtyp=NUMBER_CMD;
 	    ll->m[1].rtyp=NUMBER_CMD;
+	    ll->m[2].rtyp=INT_CMD;
 	    ll->m[0].data=convFlintNSingN(re_part[i]);
 	    ll->m[1].data=convFlintNSingN(im_part[i]);
+	    ll->m[2].data=(char*)(long)mult[i];
 	  }
 	  // clear re, im
 	  for(int i=n-1;i>=0;i--) { fmpq_clear(re_part[i]); fmpq_clear(im_part[i]); }
-	  omFree(re_part);
-	  omFree(im_part);
+	  omFreeSize(re_part,n*sizeof(fmpq_t));
+	  omFreeSize(im_part,n*sizeof(fmpq_t));
+	  omFreeSize(mult,n*sizeof(int));
 	  // result
 	  res->rtyp=LIST_CMD;
 	  res->data=l;
