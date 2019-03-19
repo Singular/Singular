@@ -3774,10 +3774,10 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	  convSingPFlintP(f,(poly)h->Data(),currRing); h=h->next;
 	  // convert box-center(re,im), box-size, epsilon
 	  fmpq_t center_re,center_im,boxsize,eps;
-	  convSingNFlintN(center_re,(number)h->Data()); h=h->next;
-	  convSingNFlintN(center_im,(number)h->Data()); h=h->next;
-	  convSingNFlintN(boxsize,(number)h->Data()); h=h->next;
-	  convSingNFlintN(eps,(number)h->Data()); h=h->next;
+	  convSingNFlintN(center_re,(number)h->Data(),currRing->cf); h=h->next;
+	  convSingNFlintN(center_im,(number)h->Data(),currRing->cf); h=h->next;
+	  convSingNFlintN(boxsize,(number)h->Data(),currRing->cf); h=h->next;
+	  convSingNFlintN(eps,(number)h->Data(),currRing->cf); h=h->next;
 	  // alloc arrays
 	  int n=fmpq_poly_length(f);
 	  fmpq_t* re_part=(fmpq_t*)omAlloc(n*sizeof(fmpq_t));
@@ -3799,8 +3799,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	    ll->m[0].rtyp=NUMBER_CMD;
 	    ll->m[1].rtyp=NUMBER_CMD;
 	    ll->m[2].rtyp=INT_CMD;
-	    ll->m[0].data=convFlintNSingN(re_part[i]);
-	    ll->m[1].data=convFlintNSingN(im_part[i]);
+	    ll->m[0].data=convFlintNSingN(re_part[i],currRing->cf);
+	    ll->m[1].data=convFlintNSingN(im_part[i],currRing->cf);
 	    ll->m[2].data=(char*)(long)mult[i];
 	  }
 	  // clear re, im

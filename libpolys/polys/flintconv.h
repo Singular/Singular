@@ -42,9 +42,9 @@ void convSingIFlintI(fmpz_t f, int p);
 void convFlintNSingN (mpz_t z, fmpz_t f);
 void convSingNFlintN(fmpz_t f, mpz_t z);
 void convSingNFlintN(fmpz_t f, number n);
-void convSingNFlintN(fmpq_t f, number n);
+void convSingNFlintN(fmpq_t f, number n, const coeffs cf);
 number convFlintNSingN (fmpz_t f);
-number convFlintNSingN (fmpq_t f);
+number convFlintNSingN (fmpq_t f, const coeffs cf);
 void convSingPFlintP(fmpq_poly_t res, poly p, const ring r);
 poly convFlintPSingP(fmpq_poly_t f, const ring r);
 
