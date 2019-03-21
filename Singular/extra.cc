@@ -3767,52 +3767,77 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if ((currRing!=NULL) && rField_is_Q(currRing))
       {
         const short t[]={5,POLY_CMD,NUMBER_CMD,NUMBER_CMD,NUMBER_CMD,NUMBER_CMD};
-	if (iiCheckTypes(h,t,1))
-	{
-	  // convert first arg. to fmpq_poly_t
-	  fmpq_poly_t f;
-	  convSingPFlintP(f,(poly)h->Data(),currRing); h=h->next;
-	  // convert box-center(re,im), box-size, epsilon
-	  fmpq_t center_re,center_im,boxsize,eps;
-	  convSingNFlintN(center_re,(number)h->Data(),currRing->cf); h=h->next;
-	  convSingNFlintN(center_im,(number)h->Data(),currRing->cf); h=h->next;
-	  convSingNFlintN(boxsize,(number)h->Data(),currRing->cf); h=h->next;
-	  convSingNFlintN(eps,(number)h->Data(),currRing->cf); h=h->next;
-	  // alloc arrays
-	  int n=fmpq_poly_length(f);
-	  fmpq_t* re_part=(fmpq_t*)omAlloc(n*sizeof(fmpq_t));
-	  fmpq_t* im_part=(fmpq_t*)omAlloc(n*sizeof(fmpq_t));
-	  int *mult      =(int*)   omAlloc(n*sizeof(int));
-	  for(int i=0; i<n;i++)
-	  { fmpq_init(re_part[i]); fmpq_init(im_part[i]); }
-	  // call cccluster, adjust n
-	  int nn=ccluster_interface_poly_real(re_part,im_part,mult,f,center_re,center_im,boxsize,eps,23,1);
-	  // convert to list
-	  lists l=(lists)omAlloc0Bin(slists_bin);
-	  l->Init(nn);
-	  for(int i=0; i<nn;i++)
-	  {
-	    lists ll=(lists)omAlloc0Bin(slists_bin);
-	    l->m[i].rtyp=LIST_CMD;
-	    l->m[i].data=ll;
-	    ll->Init(3);
-	    ll->m[0].rtyp=NUMBER_CMD;
-	    ll->m[1].rtyp=NUMBER_CMD;
-	    ll->m[2].rtyp=INT_CMD;
-	    ll->m[0].data=convFlintNSingN(re_part[i],currRing->cf);
-	    ll->m[1].data=convFlintNSingN(im_part[i],currRing->cf);
-	    ll->m[2].data=(char*)(long)mult[i];
-	  }
-	  // clear re, im
-	  for(int i=n-1;i>=0;i--) { fmpq_clear(re_part[i]); fmpq_clear(im_part[i]); }
-	  omFreeSize(re_part,n*sizeof(fmpq_t));
-	  omFreeSize(im_part,n*sizeof(fmpq_t));
-	  omFreeSize(mult,n*sizeof(int));
-	  // result
-	  res->rtyp=LIST_CMD;
-	  res->data=l;
-	  return FALSE;
-	}
+        const short t2[]={6,POLY_CMD,POLY_CMD,NUMBER_CMD,NUMBER_CMD,NUMBER_CMD,NUMBER_CMD};
+
+//         printf("test t : %d\n", h->Typ()==POLY_CMD);
+//         printf("test t : %d\n", h->next->Typ()==POLY_CMD);
+        int pol_with_complex_coeffs=0;
+        if (h->next->Typ()==POLY_CMD)
+            pol_with_complex_coeffs=1;
+
+        if ( (pol_with_complex_coeffs==0 && iiCheckTypes(h,t,1))
+       ||(pol_with_complex_coeffs==1 && iiCheckTypes(h,t2,1)) )
+        {
+          // convert first arg. to fmpq_poly_t
+          fmpq_poly_t fre, fim;
+          convSingPFlintP(fre,(poly)h->Data(),currRing); h=h->next;
+      if (pol_with_complex_coeffs==1) { // convert second arg. to fmpq_poly_t
+          convSingPFlintP(fim,(poly)h->Data(),currRing); h=h->next;
+      }
+          // convert box-center(re,im), box-size, epsilon
+          fmpq_t center_re,center_im,boxsize,eps;
+          convSingNFlintN(center_re,(number)h->Data(),currRing->cf); h=h->next;
+          convSingNFlintN(center_im,(number)h->Data(),currRing->cf); h=h->next;
+          convSingNFlintN(boxsize,(number)h->Data(),currRing->cf); h=h->next;
+          convSingNFlintN(eps,(number)h->Data(),currRing->cf); h=h->next;
+          // alloc arrays
+          int n=fmpq_poly_length(fre);
+          fmpq_t* re_part=(fmpq_t*)omAlloc(n*sizeof(fmpq_t));
+          fmpq_t* im_part=(fmpq_t*)omAlloc(n*sizeof(fmpq_t));
+          int *mult      =(int*)   omAlloc(n*sizeof(int));
+          for(int i=0; i<n;i++)
+          { fmpq_init(re_part[i]); fmpq_init(im_part[i]); }
+          // call cccluster, adjust n
+          int verbosity =0; //nothing is printed
+          int strategy = 23; //default strategy
+          int nn=0;
+          long nb_threads = (long) feOptValue(FE_OPT_CPUS);
+          strategy = strategy+(nb_threads<<6);
+//       printf("nb threads: %ld\n", nb_threads);
+//       printf("strategy: %ld\n", strategy);
+          if (pol_with_complex_coeffs==0)
+            nn=ccluster_interface_poly_real(re_part,im_part,mult,fre,center_re,center_im,boxsize,eps,strategy,verbosity);
+          else
+            nn=ccluster_interface_poly_real_imag(re_part,im_part,mult,fre,fim,center_re,center_im,boxsize,eps,strategy,verbosity);
+          // convert to list
+          lists l=(lists)omAlloc0Bin(slists_bin);
+          l->Init(nn);
+          for(int i=0; i<nn;i++)
+          {
+            lists ll=(lists)omAlloc0Bin(slists_bin);
+            l->m[i].rtyp=LIST_CMD;
+            l->m[i].data=ll;
+            ll->Init(3);
+            ll->m[0].rtyp=NUMBER_CMD;
+            ll->m[1].rtyp=NUMBER_CMD;
+            ll->m[2].rtyp=INT_CMD;
+            ll->m[0].data=convFlintNSingN(re_part[i],currRing->cf);
+            ll->m[1].data=convFlintNSingN(im_part[i],currRing->cf);
+            ll->m[2].data=(void *)(long)mult[i];
+          }
+          //clear re, im, mults, fre, fim
+          for(int i=n-1;i>=0;i--) { fmpq_clear(re_part[i]); fmpq_clear(im_part[i]); }
+          omFree(re_part);
+          omFree(im_part);
+          omFree(mult);
+          fmpq_clear(center_re); fmpq_clear(center_im); fmpq_clear(boxsize); fmpq_clear(eps);
+          fmpq_poly_clear(fre);
+          if (pol_with_complex_coeffs==1) fmpq_poly_clear(fim);
+          // result
+          res->rtyp=LIST_CMD;
+          res->data=l;
+          return FALSE;
+        }
       }
       return TRUE;
     }
