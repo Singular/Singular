@@ -3764,7 +3764,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #ifdef HAVE_CCLUSTER
     if(strcmp(sys_cmd,"ccluster")==0)
     {
-      if ((currRing!=NULL) && rField_is_Q(currRing))
+      if ((currRing!=NULL) 
+      && (rField_is_Q(currRing) || rField_is_R(currRing) || rField_is_long_R(currRing)))
       {
         const short t[]={5,POLY_CMD,NUMBER_CMD,NUMBER_CMD,NUMBER_CMD,NUMBER_CMD};
         const short t2[]={6,POLY_CMD,POLY_CMD,NUMBER_CMD,NUMBER_CMD,NUMBER_CMD,NUMBER_CMD};
