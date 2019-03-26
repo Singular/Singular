@@ -142,7 +142,7 @@ void *idrecDataInit(int t)
       else
       {
         WerrorS("need basering for polyBucket");
-	return NULL;
+        return NULL;
       }
     case INTVEC_CMD:
     case INTMAT_CMD:
@@ -294,7 +294,13 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
         else
         {
           if (BVERBOSE(V_REDEFINE))
-            Warn("redefining %s (%s) %s:%d",s,my_yylinebuf,VoiceName(), yylineno);
+          {
+            const char *f=VoiceName();
+            if (strcmp(f,"STDIN")==0)
+              Warn("redefining %s (%s)",s,my_yylinebuf);
+            else
+              Warn("redefining %s (%s) %s:%d",s,my_yylinebuf,f, yylineno);
+          }
           if (s==IDID(h)) IDID(h)=NULL;
           killhdl2(h,root,currRing);
         }
@@ -313,7 +319,13 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
         if ((IDTYP(h) == t)||(t==DEF_CMD))
         {
           if (BVERBOSE(V_REDEFINE))
-            Warn("redefining %s (%s) %s:%d",s,my_yylinebuf,VoiceName(), yylineno);
+          {
+            const char *f=VoiceName();
+            if (strcmp(f,"STDIN")==0)
+              Warn("redefining %s (%s)",s,my_yylinebuf);
+            else
+              Warn("redefining %s (%s) %s:%d",s,my_yylinebuf,f, yylineno);
+          }
           if (s==IDID(h)) IDID(h)=NULL;
           killhdl2(h,&currRing->idroot,currRing);
         }
@@ -332,7 +344,13 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
         if ((IDTYP(h) == t)||(t==DEF_CMD))
         {
           if (BVERBOSE(V_REDEFINE))
-            Warn("redefining %s (%s) %s:%d",s,my_yylinebuf,VoiceName(), yylineno);
+          {
+            const char *f=VoiceName();
+            if (strcmp(f,"STDIN")==0)
+              Warn("redefining %s (%s)",s,my_yylinebuf);
+            else
+              Warn("redefining %s (%s) %s:%d",s,my_yylinebuf,f, yylineno);
+          }
           if (s==IDID(h)) IDID(h)=NULL;
           killhdl2(h,&IDROOT,NULL);
         }
