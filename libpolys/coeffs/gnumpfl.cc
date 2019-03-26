@@ -468,6 +468,12 @@ static number ngfMapC(number from, const coeffs src, const coeffs dst)
   return (number)res;
 }
 
+static number ngfInitMPZ(mpz_t m, const coeffs)
+{
+  gmp_float *res=new gmp_float(m);
+  return (number)res;
+}
+
 static nMapFunc ngfSetMap(const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(dst) == n_long_R );
@@ -521,8 +527,9 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
 
   n->cfDelete  = ngfDelete;
   //n->cfNormalize=ndNormalize;
-  n->cfInit   = ngfInit;
-  n->cfInt    = ngfInt;
+  n->cfInit    = ngfInit;
+  n->cfInitMPZ = ngfInitMPZ;
+  n->cfInt     = ngfInt;
   n->cfAdd     = ngfAdd;
   n->cfSub     = ngfSub;
   n->cfMult    = ngfMult;
