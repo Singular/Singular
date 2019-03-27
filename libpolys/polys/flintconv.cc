@@ -54,6 +54,7 @@ number convFlintNSingN (fmpz_t f)
 }
 number convFlintNSingN (fmpq_t f, const coeffs cf)
 {
+#if __FLINT_RELEASE > 20502
   number z;
   if (nCoeff_is_Q(cf))
   {
@@ -76,9 +77,15 @@ number convFlintNSingN (fmpq_t f, const coeffs cf)
     z=n_Div(na,nb,cf);
     n_Delete(&na,cf);
     n_Delete(&nb,cf);
+    mpz_clear(a);
+    mpz_clear(b);
   }
   n_Normalize(z,cf);
   return z;
+#else
+  WerrorS("not implemented");
+  return NULL;
+#endif
 }
 
 void convSingNFlintN(fmpz_t f, mpz_t n)
@@ -127,6 +134,16 @@ void convSingNFlintN(fmpq_t f, number n, const coeffs cf)
   }
 }
 
+void convSingNFlintNN(fmpq_t re, fmpq_t im, number n, const coeffs cf)
+{
+  number n_2=n_RePart(n,cf);
+  convSingNFlintN(re,n_2,cf);
+  n_Delete(&n_2,cf);
+  n_2=n_ImPart(n,cf);
+  convSingNFlintN(im,n_2,cf);
+  n_Delete(&n_2,cf);
+}
+
 void convSingPFlintP(fmpq_poly_t res, poly p, const ring r)
 {
   int d=p_GetExp(p,1,r);
@@ -139,6 +156,23 @@ void convSingPFlintP(fmpq_poly_t res, poly p, const ring r)
     convSingNFlintN(c,n,r->cf);
     fmpq_poly_set_coeff_fmpq(res,p_GetExp(p,1,r),c);
     fmpq_clear(c);
+    pIter(p);
+  }
+}
+
+void convSingImPFlintP(fmpq_poly_t res, poly p, const ring r)
+{
+  int d=p_GetExp(p,1,r);
+  fmpq_poly_init2(res,d+1);
+  _fmpq_poly_set_length (res, d + 1);
+  while(p!=NULL)
+  {
+    number n=n_ImPart(pGetCoeff(p),r->cf);
+    fmpq_t c;
+    convSingNFlintN(c,n,r->cf);
+    fmpq_poly_set_coeff_fmpq(res,p_GetExp(p,1,r),c);
+    fmpq_clear(c);
+    n_Delete(&n,r->cf);
     pIter(p);
   }
 }
