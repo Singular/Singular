@@ -4,7 +4,6 @@
 
  Main header(s) in `/kernel/GBEngine/`:
  - \ref kernel/GBEngine/F4.h
- - \ref kernel/GBEngine/f5c.h
  - \ref kernel/GBEngine/f5data.h
  - \ref kernel/GBEngine/f5gb.h
  - \ref kernel/GBEngine/f5lists.h

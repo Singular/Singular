@@ -37,15 +37,9 @@ f = sba(i,1,0);
 f = sba(i,1,1);
 f = sba(i,0,0);
 f = sba(i,0,1);
-killall;
 string bench = cyclicnh(8);
 sprintf(bench);
 ideal f;
 f = sba(i,0,1);
-killall;
 
 tst_status(1);$
-LIB "poly.lib";
-killall();
-killall("proc");
-exit;
