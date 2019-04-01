@@ -62,23 +62,11 @@ void paCleanUp(package pack);
 
 /*0 implementation*/
 
-int iiS2I(const char *s)
+static inline long iiS2I(const char *s)
 {
-  int i;
-  i=s[0];
-  if (s[1]!='\0')
-  {
-    i=(i<<8)+s[1];
-    if (s[2]!='\0')
-    {
-      i=(i<<8)+s[2];
-      if (s[3]!='\0')
-      {
-        i=(i<<8)+s[3];
-      }
-    }
-  }
-  return i;
+  long l;
+  strncpy((char*)&l,s,SIZEOF_LONG);
+  return l;
 }
 
 idhdl idrec::get(const char * s, int level)
@@ -89,8 +77,8 @@ idhdl idrec::get(const char * s, int level)
   idhdl found=NULL;
   int l;
   const char *id_;
-  int i=iiS2I(s);
-  int less4=(i < (1<<24));
+  unsigned long i=iiS2I(s);
+  int less4=(i < (1L<<((SIZEOF_LONG-1)*8)));
   while (h!=NULL)
   {
     omCheckAddr((ADDRESS)IDID(h));
@@ -100,9 +88,9 @@ idhdl idrec::get(const char * s, int level)
       if (i==h->id_i)
       {
         id_=IDID(h);
-        if (less4 || (0 == strcmp(s+4,id_+4)))
+        if (less4 || (0 == strcmp(s+SIZEOF_LONG,id_+SIZEOF_LONG)))
         {
-          if (l==level) return h;
+          if(l==level) return h;
           found=h;
         }
       }

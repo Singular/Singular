@@ -1646,7 +1646,9 @@ void syMake(leftv v,const char * id, package pa)
         h=v->req_packhdl->idroot->get(id,myynest);
       }
       else
-      h=ggetid(id);
+      {
+        h=ggetid(id);
+      }
       /* 3) existing identifier, local */
       if ((h!=NULL) && (IDLEV(h)==myynest))
       {

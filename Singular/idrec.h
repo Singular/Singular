@@ -44,7 +44,7 @@ class idrec
 
   short      lev;
   short      ref;
-  int        id_i;
+  unsigned long id_i;
 
   idrec() { memset(this,0,sizeof(*this)); }
   idhdl get(const char * s, int lev);
