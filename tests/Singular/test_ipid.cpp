@@ -12,7 +12,6 @@ using namespace Singular::tests;
 CPPUNIT_TEST_SUITE_REGISTRATION( Singular::tests::IpIdTest );
 
 /* To be tested:
-int     iiS2I(const char *s)
 idhdl   enterid(const char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
 void    killid(const char * id, idhdl * ih)
 void    killhdl(idhdl h, package proot)
@@ -38,9 +37,6 @@ void proclevel::push(char *n)
 void proclevel::pop()
  */
 
-extern int iiS2I(const char *s);
-
-
 IpIdTest::IpIdTest() {
   _basePack=(package)omAlloc0(sizeof(*basePack));
   basePack=_basePack;
@@ -56,14 +52,6 @@ void IpIdTest::setUp() {
 }
 
 void IpIdTest::tearDown() {
-}
-
-void IpIdTest::test_iiS2I()
-{
-  const char *s1 = "1233";
-  printf("iiS2I(%s)=%d\n", s1, iiS2I(s1));
-
-  return;
 }
 
 void IpIdTest::test_enterid() {
