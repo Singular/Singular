@@ -300,7 +300,7 @@ newline                  {
                          }
 {integer}\/{integer}     {
                            lvalp->name = (char *)yytext;
-                           return RINGVAR;
+                           return MONOM;
                          }
 \$                        {
                            m2_end(-1);
@@ -319,15 +319,15 @@ newline                  {
 
 {rgvars}|{realnum}       {
                            lvalp->name = (char *)yytext;
-                           return RINGVAR;
+                           return MONOM;
                          }
 [0-9]+\."e"[+-][0-9]+    {
                            lvalp->name = (char *)yytext;
-                           return RINGVAR;
+                           return MONOM;
                          }
 [0-9]+\./[^\.]           {
                            lvalp->name = (char *)yytext;
-                           return RINGVAR;
+                           return MONOM;
                          }
 
 ({parname}|{name})       {

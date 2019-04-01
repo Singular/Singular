@@ -259,7 +259,7 @@ void yyerror(const char * fmt)
 %token <i> TYPE_CMD
 
 %token <name> STRINGTOK BLOCKTOK INT_CONST
-%token <name> UNKNOWN_IDENT RINGVAR PROC_DEF
+%token <name> UNKNOWN_IDENT MONOM PROC_DEF
 
 /* control */
 %token <i> APPLY
@@ -450,7 +450,7 @@ assign: left_value exprlist
         ;
 
 elemexpr:
-        RINGVAR
+        MONOM
           {
             if (currRing==NULL) MYYERROR("no ring active");
             syMake(&$$,omStrDup($1));

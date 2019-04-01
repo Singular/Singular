@@ -1318,7 +1318,7 @@ YY_RULE_SETUP
 #line 298 "scanner.l"
 {
                            lvalp->name = (char *)yytext;
-                           return RINGVAR;
+                           return MONOM;
                          }
 	YY_BREAK
 case 59:
@@ -1348,7 +1348,7 @@ YY_RULE_SETUP
 #line 317 "scanner.l"
 {
                            lvalp->name = (char *)yytext;
-                           return RINGVAR;
+                           return MONOM;
                          }
 	YY_BREAK
 case 62:
@@ -1356,7 +1356,7 @@ YY_RULE_SETUP
 #line 321 "scanner.l"
 {
                            lvalp->name = (char *)yytext;
-                           return RINGVAR;
+                           return MONOM;
                          }
 	YY_BREAK
 case 63:
@@ -1367,7 +1367,7 @@ YY_RULE_SETUP
 #line 325 "scanner.l"
 {
                            lvalp->name = (char *)yytext;
-                           return RINGVAR;
+                           return MONOM;
                          }
 	YY_BREAK
 case 64:

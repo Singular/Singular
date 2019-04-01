@@ -106,7 +106,7 @@
      BLOCKTOK = 323,
      INT_CONST = 324,
      UNKNOWN_IDENT = 325,
-     RINGVAR = 326,
+     MONOM = 326,
      PROC_DEF = 327,
      APPLY = 328,
      ASSUME_CMD = 329,
