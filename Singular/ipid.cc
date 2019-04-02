@@ -541,6 +541,7 @@ idhdl ggetid(const char *n, BOOLEAN /*local*/, idhdl *packhdl)
 }
 #endif
 
+#if 0
 idhdl ggetid(const char *n)
 {
   if (currRing!=NULL)
@@ -560,6 +561,23 @@ idhdl ggetid(const char *n)
     return basePack->idroot->get(n,myynest);
   return NULL;
 }
+#endif
+#if 1
+idhdl ggetid(const char *n)
+{
+  idhdl h = IDROOT->get(n,myynest);
+  if ((h!=NULL)&&(IDLEV(h)==myynest)) return h;
+  if (currRing!=NULL)
+  {
+    idhdl h2 = currRing->idroot->get(n,myynest);
+    if (h2!=NULL) return h2;
+  }
+  if (h!=NULL) return h;
+  if (basePack!=currPack)
+    return basePack->idroot->get(n,myynest);
+  return NULL;
+}
+#endif
 
 void ipListFlag(idhdl h)
 {
