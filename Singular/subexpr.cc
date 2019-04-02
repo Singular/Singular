@@ -1611,50 +1611,47 @@ void syMake(leftv v,const char * id, package pa)
   if (siq<=0)
 #endif
   {
-    if (!isdigit(id[0]))
+    if (strcmp(id,"basering")==0)
     {
-      if (strcmp(id,"basering")==0)
+      if (currRingHdl!=NULL)
       {
-        if (currRingHdl!=NULL)
-        {
-          if (id!=IDID(currRingHdl)) omFreeBinAddr((ADDRESS)id);
-          h=currRingHdl;
-          goto id_found;
-        }
-        else
-        {
-          v->name = id;
-          return; /* undefined */
-        }
-      }
-      else if (strcmp(id,"Current")==0)
-      {
-        if (currPackHdl!=NULL)
-        {
-          omFreeBinAddr((ADDRESS)id);
-          h=currPackHdl;
-          goto id_found;
-        }
-        else
-        {
-          v->name = id;
-          return; /* undefined */
-        }
-      }
-      if(v->req_packhdl!=currPack)
-      {
-        h=v->req_packhdl->idroot->get(id,myynest);
+        if (id!=IDID(currRingHdl)) omFreeBinAddr((ADDRESS)id);
+        h=currRingHdl;
+        goto id_found;
       }
       else
       {
-        h=ggetid(id);
+        v->name = id;
+        return; /* undefined */
       }
-      /* 3) existing identifier, local */
-      if ((h!=NULL) && (IDLEV(h)==myynest))
+    }
+    else if (strcmp(id,"Current")==0)
+    {
+      if (currPackHdl!=NULL)
       {
-        if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id); /*assume strlen(id) <1000 */
+        omFreeBinAddr((ADDRESS)id);
+        h=currPackHdl;
         goto id_found;
       }
+      else
+      {
+        v->name = id;
+        return; /* undefined */
+      }
+    }
+    if(v->req_packhdl!=currPack)
+    {
+      h=v->req_packhdl->idroot->get(id,myynest);
+    }
+    else
+    {
+      h=ggetid(id);
+    }
+    /* 3) existing identifier, local */
+    if ((h!=NULL) && (IDLEV(h)==myynest))
+    {
+      if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id); /*assume strlen(id) <1000 */
+      goto id_found;
     }
     if (yyInRingConstruction)
     {
@@ -1843,6 +1840,10 @@ id_found: // we have an id (in h) found, to set the data in from h
 
 void syMakeMonom(leftv v,const char * id)
 {
+  if (!isdigit(id[0]))
+  {
+    Print("non-digit:%s\n",id);
+  }
   /* resolv an identifier: (to DEF_CMD, if siq>0)
   * 6) monom (resp. number), local ring
   * 7) monom (resp. number), non-local ring
@@ -1903,7 +1904,9 @@ void syMakeMonom(leftv v,const char * id)
   }
 #ifdef SIQ
   else
+  {
     v->rtyp=DEF_CMD;
+  }
 #endif
   /* 9: _ */
   if (strcmp(id,"_")==0)
