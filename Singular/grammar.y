@@ -453,7 +453,7 @@ elemexpr:
         MONOM
           {
             if (currRing==NULL) MYYERROR("no ring active");
-            syMake(&$$,omStrDup($1));
+            syMakeMonom(&$$,$1);
           }
         | extendedid
           {

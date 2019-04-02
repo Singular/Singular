@@ -2523,7 +2523,7 @@ yyreduce:
 #line 454 "grammar.y"
     {
             if (currRing==NULL) MYYERROR("no ring active");
-            syMake(&(yyval.lv),omStrDup((yyvsp[(1) - (1)].name)));
+            syMakeMonom(&(yyval.lv),(yyvsp[(1) - (1)].name));
           ;}
     break;
 
