@@ -100,6 +100,32 @@ idhdl idrec::get(const char * s, int level)
   return found;
 }
 
+idhdl idrec::get_level(const char * s, int level)
+{
+  assume(s!=NULL);
+  assume((level>=0) && (level<=1000)); //not really, but if it isnt in that bounds..
+  idhdl h = this;
+  int l;
+  const char *id_;
+  unsigned long i=iiS2I(s);
+  int less4=(i < (1L<<((SIZEOF_LONG-1)*8)));
+  while (h!=NULL)
+  {
+    omCheckAddr((ADDRESS)IDID(h));
+    l=IDLEV(h);
+    if ((l==level)&&(i==h->id_i))
+    {
+      id_=IDID(h);
+      if (less4 || (0 == strcmp(s+SIZEOF_LONG,id_+SIZEOF_LONG)))
+      {
+        return h;
+      }
+    }
+    h = IDNEXT(h);
+  }
+  return NULL;
+}
+
 //idrec::~idrec()
 //{
 //  if (id!=NULL)
@@ -265,86 +291,77 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
     }
   }
   // is it already defined in root ?
-  if ((h=(*root)->get(s,lev))!=NULL)
+  if ((h=(*root)->get_level(s,lev))!=NULL)
   {
-    if (IDLEV(h)==lev)
+    if ((IDTYP(h) == t)||(t==DEF_CMD))
+    {
+      if (IDTYP(h)==PACKAGE_CMD)
+      {
+        if (strcmp(s,"Top")==0)
+        {
+          goto errlabel;
+        }
+        else return h;
+      }
+      else
+      {
+        if (BVERBOSE(V_REDEFINE))
+        {
+          const char *f=VoiceName();
+          if (strcmp(f,"STDIN")==0)
+            Warn("redefining %s (%s)",s,my_yylinebuf);
+          else
+            Warn("redefining %s (%s) %s:%d",s,my_yylinebuf,f, yylineno);
+        }
+        if (s==IDID(h)) IDID(h)=NULL;
+        killhdl2(h,root,currRing);
+      }
+    }
+    else
+      goto errlabel;
+  }
+  // is it already defined in currRing->idroot ?
+  else if (search && (currRing!=NULL)&&((*root) != currRing->idroot))
+  {
+    if ((h=currRing->idroot->get_level(s,lev))!=NULL)
     {
       if ((IDTYP(h) == t)||(t==DEF_CMD))
       {
-        if (IDTYP(h)==PACKAGE_CMD)
+        if (BVERBOSE(V_REDEFINE))
         {
-          if (strcmp(s,"Top")==0)
-          {
-            goto errlabel;
-          }
-          else return h;
+          const char *f=VoiceName();
+          if (strcmp(f,"STDIN")==0)
+            Warn("redefining %s (%s)",s,my_yylinebuf);
+          else
+            Warn("redefining %s (%s) %s:%d",s,my_yylinebuf,f, yylineno);
         }
-        else
-        {
-          if (BVERBOSE(V_REDEFINE))
-          {
-            const char *f=VoiceName();
-            if (strcmp(f,"STDIN")==0)
-              Warn("redefining %s (%s)",s,my_yylinebuf);
-            else
-              Warn("redefining %s (%s) %s:%d",s,my_yylinebuf,f, yylineno);
-          }
-          if (s==IDID(h)) IDID(h)=NULL;
-          killhdl2(h,root,currRing);
-        }
+        if (s==IDID(h)) IDID(h)=NULL;
+        killhdl2(h,&currRing->idroot,currRing);
       }
       else
         goto errlabel;
     }
   }
-  // is it already defined in currRing->idroot ?
-  else if (search && (currRing!=NULL)&&((*root) != currRing->idroot))
-  {
-    if ((h=currRing->idroot->get(s,lev))!=NULL)
-    {
-      if (IDLEV(h)==lev)
-      {
-        if ((IDTYP(h) == t)||(t==DEF_CMD))
-        {
-          if (BVERBOSE(V_REDEFINE))
-          {
-            const char *f=VoiceName();
-            if (strcmp(f,"STDIN")==0)
-              Warn("redefining %s (%s)",s,my_yylinebuf);
-            else
-              Warn("redefining %s (%s) %s:%d",s,my_yylinebuf,f, yylineno);
-          }
-          if (s==IDID(h)) IDID(h)=NULL;
-          killhdl2(h,&currRing->idroot,currRing);
-        }
-        else
-          goto errlabel;
-      }
-    }
-  }
   // is it already defined in idroot ?
   else if (search && (*root != IDROOT))
   {
-    if ((h=IDROOT->get(s,lev))!=NULL)
+    if ((h=IDROOT->get_level(s,lev))!=NULL)
     {
-      if (IDLEV(h)==lev)
+      if ((IDTYP(h) == t)||(t==DEF_CMD))
       {
-        if ((IDTYP(h) == t)||(t==DEF_CMD))
+        if (BVERBOSE(V_REDEFINE))
         {
-          if (BVERBOSE(V_REDEFINE))
-          {
-            const char *f=VoiceName();
-            if (strcmp(f,"STDIN")==0)
-              Warn("redefining %s (%s)",s,my_yylinebuf);
-            else
-              Warn("redefining %s (%s) %s:%d",s,my_yylinebuf,f, yylineno);
-          }
-          if (s==IDID(h)) IDID(h)=NULL;
-          killhdl2(h,&IDROOT,NULL);
+          const char *f=VoiceName();
+          if (strcmp(f,"STDIN")==0)
+            Warn("redefining %s (%s)",s,my_yylinebuf);
+          else
+            Warn("redefining %s (%s) %s:%d",s,my_yylinebuf,f, yylineno);
         }
-        else
-          goto errlabel;
+        if (s==IDID(h)) IDID(h)=NULL;
+        killhdl2(h,&IDROOT,NULL);
       }
+      else
+        goto errlabel;
     }
   }
   *root = (*root)->set(s, lev, t, init);
@@ -526,14 +543,19 @@ idhdl ggetid(const char *n, BOOLEAN /*local*/, idhdl *packhdl)
 
 idhdl ggetid(const char *n)
 {
-  idhdl h = IDROOT->get(n,myynest);
-  if ((h!=NULL)&&(IDLEV(h)==myynest)) return h;
   if (currRing!=NULL)
   {
     idhdl h2 = currRing->idroot->get(n,myynest);
+    if ((h2!=NULL)&&(IDLEV(h2)==myynest)) return h2;
+    idhdl h = IDROOT->get(n,myynest);
+    if (h!=NULL) return h;
     if (h2!=NULL) return h2;
   }
-  if (h!=NULL) return h;
+  else
+  {
+    idhdl h = IDROOT->get(n,myynest);
+    if (h!=NULL) return h;
+  }
   if (basePack!=currPack)
     return basePack->idroot->get(n,myynest);
   return NULL;
