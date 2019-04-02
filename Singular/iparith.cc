@@ -5380,7 +5380,7 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
       case LT_SINGULAR:
       {
         char *plib = iiConvName(s);
-        idhdl pl = IDROOT->get(plib,0);
+        idhdl pl = IDROOT->get_level(plib,0);
         if (pl==NULL)
         {
           pl = enterid( plib,0, PACKAGE_CMD, &(basePack->idroot), TRUE );

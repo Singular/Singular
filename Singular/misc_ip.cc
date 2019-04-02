@@ -453,7 +453,7 @@ void singular_example(char *str)
     *ss='\0';
     ss--;
   }
-  idhdl h=IDROOT->get(s,myynest);
+  idhdl h=IDROOT->get_level(s,0);
   if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
   {
     char *lib=iiGetLibName(IDPROC(h));
