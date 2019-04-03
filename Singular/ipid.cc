@@ -542,6 +542,33 @@ idhdl ggetid(const char *n, BOOLEAN /*local*/, idhdl *packhdl)
 #endif
 
 #if 0
+// debug version
+idhdl ggetid(const char *n)
+{
+  if (currRing!=NULL)
+  {
+    idhdl h2 = currRing->idroot->get(n,myynest);
+    idhdl h = IDROOT->get(n,myynest);
+    if ((h!=NULL)&&(h2!=NULL)&&(IDLEV(h)==IDLEV(h2)))
+    {
+      Warn("SHADOW %s(%s) vs %s(%s) in %s\n",IDID(h),Tok2Cmdname(IDTYP(h)),IDID(h2),Tok2Cmdname(IDTYP(h2)),my_yylinebuf);
+    }
+    if ((h2!=NULL)&&(IDLEV(h2)==myynest)) return h2;
+    if (h!=NULL) return h;
+    if (h2!=NULL) return h2;
+  }
+  else
+  {
+    idhdl h = IDROOT->get(n,myynest);
+    if (h!=NULL) return h;
+  }
+  if (basePack!=currPack)
+    return basePack->idroot->get(n,myynest);
+  return NULL;
+}
+#endif
+#if 1
+// try currRing before non-ring stuff
 idhdl ggetid(const char *n)
 {
   if (currRing!=NULL)
@@ -562,7 +589,8 @@ idhdl ggetid(const char *n)
   return NULL;
 }
 #endif
-#if 1
+#if 0
+// try non-ring stuff before ring stuff
 idhdl ggetid(const char *n)
 {
   idhdl h = IDROOT->get(n,myynest);
