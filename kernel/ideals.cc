@@ -801,6 +801,14 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
       idSkipZeroes(s_h3);
     }
     #endif
+    if (*w!=NULL)
+    {
+      int vl=(*w)->length()-k;
+      intvec *v=new intvec(vl);
+      for(int i=0;i<vl;i++) (*v)[i]=(**w)[i+k];
+      delete *w;
+      *w=v;
+    }
     idTest(s_h3);
     return s_h3;
   }
