@@ -1395,13 +1395,19 @@ void hDegreeSeries(intvec *s1, intvec *s2, int *co, int *mu)
   *co = i - j;
 }
 
-static void hPrintHilb(intvec *hseries)
+static void hPrintHilb(intvec *hseries,intvec *modul_weight)
 {
   int  i, j, l, k;
   if (hseries == NULL)
     return;
   l = hseries->length()-1;
   k = (*hseries)[l];
+  if ((modul_weight!=NULL)&&(modul_weight->compare(0)!=0))
+  {
+    char *s=modul_weight->ivString(1,0,1);
+    Print("module weights:%s\n",s);
+    omFree(s);
+  }
   for (i = 0; i < l; i++)
   {
     j = (*hseries)[i];
@@ -1422,7 +1428,7 @@ void hLookSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree, ring ta
   intvec *hseries1 = hFirstSeries(S, modulweight, Q, wdegree, tailRing);
   if (errorreported) return;
 
-  hPrintHilb(hseries1);
+  hPrintHilb(hseries1,modulweight);
 
   const int l = hseries1->length()-1;
 
@@ -1432,7 +1438,7 @@ void hLookSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree, ring ta
   hDegreeSeries(hseries1, hseries2, &co, &mu);
 
   PrintLn();
-  hPrintHilb(hseries2);
+  hPrintHilb(hseries2,modulweight);
   if ((l == 1) &&(mu == 0))
     scPrintDegree(rVar(currRing)+1, 0);
   else
