@@ -5067,7 +5067,7 @@ static BOOLEAN jjSQR_FREE(leftv res, leftv u)
   res->data=(void *)l;
   return FALSE;
 }
-#if 0
+#if 1
 static BOOLEAN jjSYZYGY(leftv res, leftv v)
 {
   intvec *w=NULL;
@@ -5101,7 +5101,6 @@ static BOOLEAN jjSYZYGY(leftv res, leftv v)
   res->data = (char *)idSyzygies(v_id,hom,&w);
   if (w!=NULL)
   {
-    (*w)+=add_row_shift;
     atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
   }
   return FALSE;
