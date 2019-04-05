@@ -2229,20 +2229,20 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
           c_par=currRing->cf->extRing->N;
           c_par_names=currRing->cf->extRing->names;
         }
-	if (!rIsLPRing(r))
-	{
+        if (!rIsLPRing(r))
+        {
           maFindPerm(r->names,       r->N,       r_par_names, r_par,
                      currRing->names,currRing->N,c_par_names, c_par,
                      perm,par_perm, currRing->cf->type);
         }
-	#ifdef HAVE_SHIFTBBA
-	else
-	{
+        #ifdef HAVE_SHIFTBBA
+        else
+        {
           maFindPermLP(r->names,       r->N,       r_par_names, r_par,
                      currRing->names,currRing->N,c_par_names, c_par,
                      perm,par_perm, currRing->cf->type,r->isLPring);
-	}
-	#endif
+        }
+        #endif
       }
       else
       {
@@ -2606,15 +2606,19 @@ static BOOLEAN jjMODULO(leftv res, leftv u, leftv v)
   tHomog hom=testHomog;
   if (w_u!=NULL)
   {
+    //PrintS("modulo: wu:");w_u->show(INTVEC_CMD);PrintLn();
     w_u=ivCopy(w_u);
     hom=isHomog;
   }
+  //else PrintS("modulo: wu:none\n");
   intvec *w_v=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
   if (w_v!=NULL)
   {
+    //PrintS("modulo: wv:");w_v->show(INTVEC_CMD);PrintLn();
     w_v=ivCopy(w_v);
     hom=isHomog;
   }
+  //else PrintS("modulo: wv:none\n");
   if ((w_u!=NULL) && (w_v==NULL))
     w_v=ivCopy(w_u);
   if ((w_v!=NULL) && (w_u==NULL))
@@ -5067,7 +5071,7 @@ static BOOLEAN jjSQR_FREE(leftv res, leftv u)
   res->data=(void *)l;
   return FALSE;
 }
-#if 1
+#if 0
 static BOOLEAN jjSYZYGY(leftv res, leftv v)
 {
   intvec *w=NULL;
@@ -5080,29 +5084,63 @@ static BOOLEAN jjSYZYGY(leftv res, leftv v)
 // activate, if idSyz handle module weights correctly !
 static BOOLEAN jjSYZYGY(leftv res, leftv v)
 {
-  intvec *w=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
+  intvec *ww=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
+  intvec *w=NULL;
   ideal v_id=(ideal)v->Data();
   tHomog hom=testHomog;
   int add_row_shift=0;
-  if (w!=NULL)
+  if (ww!=NULL)
   {
-    w=ivCopy(w);
-    add_row_shift=w->min_in();
-    (*w)-=add_row_shift;
-    if (idTestHomModule(v_id,currRing->qideal,w))
+    if (idTestHomModule(v_id,currRing->qideal,ww))
+    {
+      w=ivCopy(ww);
+      add_row_shift=w->min_in();
+      (*w)-=add_row_shift;
       hom=isHomog;
+    }
     else
     {
       //WarnS("wrong weights");
-      delete w; w=NULL;
+      delete ww; ww=NULL;
       hom=testHomog;
     }
   }
-  res->data = (char *)idSyzygies(v_id,hom,&w);
-  if (w!=NULL)
+  else
   {
-    atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
+    if (v->Typ()==IDEAL_CMD)
+      if (idHomIdeal(v_id,currRing->qideal))
+        hom=isHomog;
   }
+  ideal S=idSyzygies(v_id,hom,&w);
+  res->data = (char *)S;
+  if (hom==isHomog)
+  {
+    int vl=S->rank;
+    intvec *vv=new intvec(vl);
+    if ((v->Typ()==IDEAL_CMD)||(ww==NULL))
+    {
+      for(int i=0;i<vl;i++)
+      {
+        if (v_id->m[i]!=NULL)
+          (*vv)[i]=p_Deg(v_id->m[i],currRing);
+      }
+    }
+    else
+    {
+      p_SetModDeg(ww, currRing);
+      for(int i=0;i<vl;i++)
+      {
+        if (v_id->m[i]!=NULL)
+          (*vv)[i]=currRing->pFDeg(v_id->m[i],currRing);
+      }
+      p_SetModDeg(NULL, currRing);
+    }
+    if (idTestHomModule(S,currRing->qideal,vv))
+      atSet(res,omStrDup("isHomog"),vv,INTVEC_CMD);
+    else
+      delete vv;
+  }
+  if (w!=NULL) delete w;
   return FALSE;
 }
 #endif
