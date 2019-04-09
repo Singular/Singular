@@ -3901,19 +3901,16 @@ void rUnComplete(ring r)
         if( r->typ[i].ord_typ == ro_is) // Search for suffixes! (prefix have the same VarOffset)
         {
           id_Delete(&r->typ[i].data.is.F, r);
-          r->typ[i].data.is.F = NULL; // ?
 
           if( r->typ[i].data.is.pVarOffset != NULL )
           {
             omFreeSize((ADDRESS)r->typ[i].data.is.pVarOffset, (r->N +1)*sizeof(int));
-            r->typ[i].data.is.pVarOffset = NULL; // ?
           }
         }
         else if (r->typ[i].ord_typ == ro_syz)
         {
           if(r->typ[i].data.syz.limit > 0)
             omFreeSize(r->typ[i].data.syz.syz_index, ((r->typ[i].data.syz.limit) +1)*sizeof(int));
-          r->typ[i].data.syz.syz_index = NULL;
         }
         else if (r->typ[i].ord_typ == ro_syzcomp)
         {
@@ -3932,12 +3929,20 @@ void rUnComplete(ring r)
       omUnGetSpecBin(&(r->PolyBin));
 
     omFreeSize((ADDRESS)r->VarOffset, (r->N +1)*sizeof(int));
+    r->VarOffset=NULL;
 
     if (r->ordsgn != NULL && r->CmpL_Size != 0)
+    {
       omFreeSize((ADDRESS)r->ordsgn,r->ExpL_Size*sizeof(long));
+      r->ordsgn=NULL;
+    }
     if (r->p_Procs != NULL)
+    {
       omFreeSize(r->p_Procs, sizeof(p_Procs_s));
+      r->p_Procs=NULL;
+    }
     omfreeSize(r->VarL_Offset, r->VarL_Size*sizeof(int));
+    r->VarL_Offset=NULL;
   }
   if (r->NegWeightL_Offset!=NULL)
   {
