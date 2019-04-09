@@ -4894,3 +4894,15 @@ poly p_CopyPowerProduct(poly p, const ring r)
   return np;
 }
 
+int p_MaxExpPerVar(poly p, int i, const ring r)
+{
+  int m=0;
+  while(p!=NULL)
+  {
+    int mm=p_GetExp(p,i,r);
+    if (mm>m) m=mm;
+    pIter(p);
+  }
+  return m;
+}
+

@@ -6549,10 +6549,11 @@ static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
   poly p=(poly)u->Data();
   if (ringvar>0)
   {
-    if ((monomexpr!=NULL) && (p!=NULL) && (pTotaldegree(p)!=0) &&
-    ((unsigned long)pTotaldegree(monomexpr) > (currRing->bitmask / (unsigned long)pTotaldegree(p)/2)))
+    int mm=p_MaxExpPerVar(p,ringvar,currRing);
+    if ((monomexpr!=NULL) && (p!=NULL) && (mm!=0) &&
+    ((unsigned long)pTotaldegree(monomexpr) > (currRing->bitmask / (unsigned long)mm/2)))
     {
-      Warn("possible OVERFLOW in subst, max exponent is %ld, substituting deg %d by deg %d",currRing->bitmask/2, pTotaldegree(monomexpr), pTotaldegree(p));
+      Warn("possible OVERFLOW in subst, max exponent is %ld, substituting deg %d by deg %d",currRing->bitmask/2, pTotaldegree(monomexpr), mm);
       //return TRUE;
     }
     if ((monomexpr==NULL)||(pNext(monomexpr)==NULL))
@@ -6582,8 +6583,9 @@ static BOOLEAN jjSUBST_Id(leftv res, leftv u, leftv v,leftv w)
       for(int i=IDELEMS(id)-1;i>=0;i--)
       {
         poly p=id->m[i];
-        if ((p!=NULL) && (pTotaldegree(p)!=0) &&
-        ((unsigned long)deg_monexp > (currRing->bitmask / (unsigned long)pTotaldegree(p)/2)))
+        int mm=p_MaxExpPerVar(p,ringvar,currRing);
+        if ((p!=NULL) && (mm!=0) &&
+        ((unsigned long)deg_monexp > (currRing->bitmask / (unsigned long)mm/2)))
         {
           overflow=TRUE;
           break;

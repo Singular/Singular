@@ -2084,5 +2084,9 @@ poly p_GcdMon(poly f, poly g, const ring r);
 
 /// divide polynomial by monomial
 poly p_Div_mm(poly p, const poly m, const ring r);
+
+
+/// max exponent of variable x_i in p
+int p_MaxExpPerVar(poly p, int i, const ring r);
 #endif // P_POLYS_H
 
