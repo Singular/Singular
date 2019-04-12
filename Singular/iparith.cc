@@ -2313,34 +2313,39 @@ static BOOLEAN jjFIND2(leftv res, leftv u, leftv v)
 
 static BOOLEAN jjFRES3(leftv res, leftv u, leftv v, leftv w)
 {
-    assumeStdFlag(u);
-    ideal id = (ideal)u->Data();
-    int max_length = (int)(long)v->Data();
-    if (max_length < 0) {
-        WerrorS("length for fres must not be negative");
-        return TRUE;
+  assumeStdFlag(u);
+  ideal id = (ideal)u->Data();
+  int max_length = (int)(long)v->Data();
+  if (max_length < 0)
+  {
+    WerrorS("length for fres must not be negative");
+    return TRUE;
+  }
+  if (max_length == 0)
+  {
+    max_length = currRing->N+1;
+    if (currRing->qideal != NULL)
+    {
+      Warn("full resolution in a qring may be infinite, "
+           "setting max length to %d", max_length);
     }
-    if (max_length == 0) {
-        max_length = currRing->N+1;
-        if (currRing->qideal != NULL) {
-            Warn("full resolution in a qring may be infinite, "
-                "setting max length to %d", max_length);
-        }
-    }
-    char *method = (char *)w->Data();
-    /* For the moment, only "complete" (default), "frame", or "extended frame"
-     * are allowed. Another useful option would be "linear strand".
-     */
-    if (strcmp(method, "complete") != 0
-            && strcmp(method, "frame") != 0
-            && strcmp(method, "extended frame") != 0
-            && strcmp(method, "single module") != 0) {
-        WerrorS("wrong optional argument for fres");
-    }
-    syStrategy r = syFrank(id, max_length, method);
-    assume(r->fullres != NULL);
-    res->data = (void *)r;
-    return FALSE;
+  }
+  char *method = (char *)w->Data();
+  /* For the moment, only "complete" (default), "frame", or "extended frame"
+   * are allowed. Another useful option would be "linear strand".
+   */
+  if (strcmp(method, "complete") != 0
+  && strcmp(method, "frame") != 0
+  && strcmp(method, "extended frame") != 0
+  && strcmp(method, "single module") != 0)
+  {
+    WerrorS("wrong optional argument for fres");
+    return TRUE;
+  }
+  syStrategy r = syFrank(id, max_length, method);
+  assume(r->fullres != NULL);
+  res->data = (void *)r;
+  return FALSE;
 }
 
 static BOOLEAN jjFRES(leftv res, leftv u, leftv v)
@@ -3482,11 +3487,63 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
 static BOOLEAN jjSYZ_2(leftv res, leftv u, leftv v)
 {
   // see jjSYZYGY
+  intvec *ww=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   intvec *w=NULL;
+  tHomog hom=testHomog;
   ideal I=(ideal)u->Data();
   GbVariant alg=syGetAlgorithm((char*)v->Data(),currRing,I);
-  res->data = (char *)idSyzygies(I,testHomog,&w,TRUE,FALSE,NULL,alg);
+  if (ww!=NULL)
+  {
+    if (idTestHomModule(I,currRing->qideal,ww))
+    {
+      w=ivCopy(ww);
+      int add_row_shift=w->min_in();
+      (*w)-=add_row_shift;
+      hom=isHomog;
+    }
+    else
+    {
+      //WarnS("wrong weights");
+      delete ww; ww=NULL;
+      hom=testHomog;
+    }
+  }
+  else
+  {
+    if (u->Typ()==IDEAL_CMD)
+      if (idHomIdeal(I,currRing->qideal))
+        hom=isHomog;
+  }
+  ideal S=idSyzygies(I,hom,&w,TRUE,FALSE,NULL,alg);
   if (w!=NULL) delete w;
+  res->data = (char *)S;
+  if (hom==isHomog)
+  {
+    int vl=S->rank;
+    intvec *vv=new intvec(vl);
+    if ((u->Typ()==IDEAL_CMD)||(ww==NULL))
+    {
+      for(int i=0;i<vl;i++)
+      {
+        if (I->m[i]!=NULL)
+          (*vv)[i]=p_Deg(I->m[i],currRing);
+      }
+    }
+    else
+    {
+      p_SetModDeg(ww, currRing);
+      for(int i=0;i<vl;i++)
+      {
+        if (I->m[i]!=NULL)
+          (*vv)[i]=currRing->pFDeg(I->m[i],currRing);
+      }
+      p_SetModDeg(NULL, currRing);
+    }
+    if (idTestHomModule(S,currRing->qideal,vv))
+      atSet(res,omStrDup("isHomog"),vv,INTVEC_CMD);
+    else
+      delete vv;
+  }
   if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
   return FALSE;
 }
@@ -3619,7 +3676,9 @@ static BOOLEAN jjWRONG(leftv, leftv)
 
 static BOOLEAN jjDUMMY(leftv res, leftv u)
 {
-  res->data = (char *)u->CopyD();
+//  res->data = (char *)u->CopyD();
+// also copy attributes:
+  res->Copy(u);
   return FALSE;
 }
 static BOOLEAN jjNULL(leftv, leftv)
@@ -4445,7 +4504,6 @@ static BOOLEAN jjJACOB_M(leftv res, leftv a)
   return FALSE;
 }
 
-
 static BOOLEAN jjKBASE(leftv res, leftv v)
 {
   assumeStdFlag(v);
@@ -5088,13 +5146,12 @@ static BOOLEAN jjSYZYGY(leftv res, leftv v)
   intvec *w=NULL;
   ideal v_id=(ideal)v->Data();
   tHomog hom=testHomog;
-  int add_row_shift=0;
   if (ww!=NULL)
   {
     if (idTestHomModule(v_id,currRing->qideal,ww))
     {
       w=ivCopy(ww);
-      add_row_shift=w->min_in();
+      int add_row_shift=w->min_in();
       (*w)-=add_row_shift;
       hom=isHomog;
     }
