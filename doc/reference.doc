@@ -337,7 +337,7 @@ basis like
 @code{degree}, @code{mult}, @code{hilb}, @code{vdim}, @code{kbase}
 @item isHomog (for ideal, module)
 the weight vector of module generators for homogeneous or quasihomogeneous ideals/modules,
-@*used by @code(betti}, @code{degree}, @code{highcorner}, @code{hilbert},
+@*used by @code{betti}, @code{degree}, @code{highcorner}, @code{hilbert},
 @code{homog}, @code{prune}, @code{sba}, @code{slimgb}, @code{std}, @code{syz}, 
 @code{kbase}, @code{modulo}, @code{mres}, @code{nres}, @code{stdhilb}. 
 @item isCI
