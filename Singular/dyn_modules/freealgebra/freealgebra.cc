@@ -248,7 +248,7 @@ static std::vector<int> countCycles(const intvec* _G, int v, std::vector<int> pa
 }
 
 // -1 is infinity
-static int graphGrowth(intvec G)
+static int graphGrowth(const intvec G)
 {
   // init
   int n = G.cols();
@@ -273,23 +273,24 @@ static int graphGrowth(intvec G)
 }
 
 // -1 is infinity, -2 is error
-static int id_LPGkDim(ideal G)
+static int id_LPGkDim(const ideal _G)
 {
   if (rField_is_Ring(currRing)) {
       WerrorS("GK-Dim not implemented for rings");
       return -2;
   }
 
-  idSkipZeroes(G); // remove zeros
-  for (int i=IDELEMS(G)-1;i>=0; i--)
+  for (int i=IDELEMS(_G)-1;i>=0; i--)
   {
-    G->m[i]->next = NULL; // G = LM(G)
-    if (pGetComp(G->m[i]) != 0)
+    if (pGetComp(_G->m[i]) != 0)
     {
       WerrorS("GK-Dim not implemented for modules");
       return -2;
     }
   }
+
+  ideal G = id_Head(_G, currRing); // G = LM(G) (and copy)
+  idSkipZeroes(G); // remove zeros
   id_DelLmEquals(G, currRing); // remove duplicates
 
   // get the max deg
@@ -329,7 +330,7 @@ static BOOLEAN lpGkDim(leftv res, leftv h)
   if (iiCheckTypes(h,t,1))
   {
     assumeStdFlag(h);
-    ideal G=(ideal)h->Data();
+    ideal G = (ideal) h->Data();
     res->rtyp = INT_CMD;
     res->data = (void*)(long) id_LPGkDim(G);
     if (errorreported) return TRUE;
