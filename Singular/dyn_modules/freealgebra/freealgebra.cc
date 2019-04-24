@@ -1,4 +1,5 @@
 #include "Singular/libsingular.h"
+#include <vector>
 
 #ifdef HAVE_SHIFTBBA
 static BOOLEAN freeAlgebra(leftv res, leftv args)
@@ -123,6 +124,219 @@ static BOOLEAN lpVarAt(leftv res, leftv h)
   }
   else return TRUE;
 }
+
+static intvec ufnarovskiGraph(ideal G)
+{
+  long l = 0;
+  for (int i = 0; i < IDELEMS(G); i++)
+    l = si_max(pTotaldegree(G->m[i]), l);
+  l--;
+  if (l <= 0)
+    WerrorS("Ufnarovski graph not implemented for l <= 0");
+  int lV = currRing->isLPring;
+
+  ideal words = idMaxIdeal(l);
+  ideal standardWords = kNF(G, currRing->qideal, words);
+  idSkipZeroes(standardWords);
+
+  int n = IDELEMS(standardWords);
+  intvec UG(n, n, 0);
+  for (int i = 0; i < n; i++)
+  {
+    for (int j = 0; j < n; j++)
+    {
+      poly v = standardWords->m[i];
+      poly w = standardWords->m[j];
+
+      // check whether v*x1 = x2*w (overlap)
+      bool overlap = true;
+      for (int k = 1; k <= (l - 1) * lV; k++)
+      {
+        if (pGetExp(v, k + lV) != pGetExp(w, k)) {
+          overlap = false;
+          break;
+        }
+      }
+
+      if (overlap)
+      {
+        // create the overlap
+        poly p = pMult(pCopy(v), p_LPVarAt(w, l, currRing));
+
+        // check whether the overlap is normal
+        bool normal = true;
+        for (int k = 0; k < IDELEMS(G); k++)
+        {
+          if (p_LPDivisibleBy(G->m[k], p, currRing))
+          {
+            normal = false;
+            break;
+          }
+        }
+
+        if (normal)
+        {
+          IMATELEM(UG, i + 1, j + 1) = 1;
+        }
+      }
+    }
+  }
+  return UG;
+}
+
+static std::vector<int> countCycles(const intvec* _G, int v, std::vector<int> path, std::vector<BOOLEAN> visited, std::vector<BOOLEAN> cyclic, std::vector<int> cache)
+{
+  intvec* G = ivCopy(_G); // modifications must be local
+
+  if (cache[v] != -2) return cache; // value is already cached
+
+  visited[v] = TRUE;
+  path.push_back(v);
+
+  int cycles = 0;
+  for (int w = 0; w < G->cols(); w++)
+  {
+    if (IMATELEM(*G, v + 1, w + 1)) // edge v -> w exists in G
+    {
+      if (!visited[w])
+      { // continue with w
+        cache = countCycles(G, w, path, visited, cyclic, cache);
+        if (cache[w] == -1)
+        {
+          cache[v] = -1;
+          return cache;
+        }
+        cycles = si_max(cycles, cache[w]);
+      }
+      else
+      { // found new cycle
+        int pathIndexOfW = -1;
+        for (int i = path.size() - 1; i >= 0; i--) {
+          if (cyclic[path[i]] == 1) { // found an already cyclic vertex
+            cache[v] = -1;
+            return cache;
+          }
+          cyclic[path[i]] = TRUE;
+
+          if (path[i] == w) { // end of the cycle
+            assume(IMATELEM(*G, v + 1, w + 1) != 0);
+            IMATELEM(*G, v + 1, w + 1) = 0; // remove edge v -> w
+            pathIndexOfW = i;
+            break;
+          } else {
+            assume(IMATELEM(*G, path[i - 1] + 1, path[i] + 1) != 0);
+            IMATELEM(*G, path[i - 1] + 1, path[i] + 1) = 0; // remove edge vi-1 -> vi
+          }
+        }
+        assume(pathIndexOfW != -1); // should never happen
+        for (int i = path.size() - 1; i >= pathIndexOfW; i--) {
+          cache = countCycles(G, path[i], path, visited, cyclic, cache);
+          if (cache[path[i]] == -1)
+          {
+            cache[v] = -1;
+            return cache;
+          }
+          cycles = si_max(cycles, cache[path[i]] + 1);
+        }
+      }
+    }
+  }
+  cache[v] = cycles;
+
+  delete G;
+  return cache;
+}
+
+// -1 is infinity
+static int graphGrowth(intvec G)
+{
+  // init
+  int n = G.cols();
+  std::vector<int> path;
+  std::vector<BOOLEAN> visited;
+  std::vector<BOOLEAN> cyclic;
+  std::vector<int> cache;
+  visited.resize(n, FALSE);
+  cyclic.resize(n, FALSE);
+  cache.resize(n, -2);
+
+  // get max number of cycles
+  int cycles = 0;
+  for (int v = 0; v < n; v++)
+  {
+    cache = countCycles(&G, v, path, visited, cyclic, cache);
+    if (cache[v] == -1)
+      return -1;
+    cycles = si_max(cycles, cache[v]);
+  }
+  return cycles;
+}
+
+// -1 is infinity, -2 is error
+static int id_LPGkDim(ideal G)
+{
+  if (rField_is_Ring(currRing)) {
+      WerrorS("GK-Dim not implemented for rings");
+      return -2;
+  }
+
+  idSkipZeroes(G); // remove zeros
+  for (int i=IDELEMS(G)-1;i>=0; i--)
+  {
+    G->m[i]->next = NULL; // G = LM(G)
+    if (pGetComp(G->m[i]) != 0)
+    {
+      WerrorS("GK-Dim not implemented for modules");
+      return -2;
+    }
+  }
+  id_DelLmEquals(G, currRing); // remove duplicates
+
+  // get the max deg
+  long maxDeg = 0;
+  for (int i = 0; i < IDELEMS(G); i++)
+  {
+    maxDeg = si_max(maxDeg, pTotaldegree(G->m[i]));
+
+    // also check whether G = <1>
+    if (pIsConstantComp(G->m[i]))
+    {
+      WerrorS("GK-Dim not defined for 0-ring");
+      return -2;
+    }
+  }
+
+  // early termination if G \subset X
+  if (maxDeg <= 1)
+  {
+    int lV = currRing->isLPring;
+    if (IDELEMS(G) == lV) // V = {1} no edges
+      return 0;
+    if (IDELEMS(G) == lV - 1) // V = {1} with loop
+      return 1;
+    if (IDELEMS(G) <= lV - 2) // V = {1} with more than one loop
+      return -1;
+  }
+
+  intvec UG = ufnarovskiGraph(G);
+  return graphGrowth(UG);
+}
+
+
+static BOOLEAN lpGkDim(leftv res, leftv h)
+{
+  const short t[]={1,IDEAL_CMD};
+  if (iiCheckTypes(h,t,1))
+  {
+    assumeStdFlag(h);
+    ideal G=(ideal)h->Data();
+    res->rtyp = INT_CMD;
+    res->data = (void*)(long) id_LPGkDim(G);
+    if (errorreported) return TRUE;
+    return FALSE;
+  }
+  else return TRUE;
+}
 #endif
 
 //------------------------------------------------------------------------
@@ -133,6 +347,8 @@ extern "C" int SI_MOD_INIT(freealgebra)(SModulFunctions* p)
   p->iiAddCproc("freealgebra.so","freeAlgebra",FALSE,freeAlgebra);
   p->iiAddCproc("freealgebra.so","lpLmDivides",FALSE,lpLmDivides);
   p->iiAddCproc("freealgebra.so","lpVarAt",FALSE,lpVarAt);
+  p->iiAddCproc("freealgebra.so","lpGkDim",FALSE,lpGkDim);
+
   p->iiAddCproc("freealgebra.so","stest",TRUE,stest);
   p->iiAddCproc("freealgebra.so","btest",TRUE,btest);
 #endif

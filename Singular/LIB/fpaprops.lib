@@ -876,7 +876,7 @@ static proc ivdivides(list G, intvec iv) {
   return (0);
 }
 
-proc lpGkDim(ideal G)
+proc lpGkDim_lib(ideal G)
 "USAGE: lpGkDim(G); G an ideal in a letterplace ring
 RETURN: int
 PURPOSE: Determines the Gelfand Kirillov dimension of A/<G>
