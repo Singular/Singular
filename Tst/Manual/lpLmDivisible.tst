@@ -3,8 +3,11 @@ LIB"freegb.lib";
 
 ring r = 0,(x,y),Dp;
 ring R = freeAlgebra(r, 5);
-lpLmDivides(1, x) == 1;
-lpLmDivides(x, 1) == 0;
+lpLmDivides(poly(0), poly(0)) == 1;
+lpLmDivides(poly(0), x) == 0;
+lpLmDivides(x, poly(0)) == 1;
+lpLmDivides(poly(1), x) == 1;
+lpLmDivides(x, poly(1)) == 0;
 lpLmDivides(x*y, x) == 0;
 lpLmDivides(x*y, y) == 0;
 lpLmDivides(x*y, x*x) == 0;
