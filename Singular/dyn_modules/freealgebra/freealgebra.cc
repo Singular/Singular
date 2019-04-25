@@ -125,14 +125,18 @@ static BOOLEAN lpVarAt(leftv res, leftv h)
   else return TRUE;
 }
 
-static intvec ufnarovskiGraph(ideal G)
+// NULL if graph is undefined
+static intvec* ufnarovskiGraph(ideal G)
 {
   long l = 0;
   for (int i = 0; i < IDELEMS(G); i++)
     l = si_max(pTotaldegree(G->m[i]), l);
   l--;
   if (l <= 0)
+  {
     WerrorS("Ufnarovski graph not implemented for l <= 0");
+    return NULL;
+  }
   int lV = currRing->isLPring;
 
   ideal words = idMaxIdeal(l);
@@ -140,7 +144,7 @@ static intvec ufnarovskiGraph(ideal G)
   idSkipZeroes(standardWords);
 
   int n = IDELEMS(standardWords);
-  intvec UG(n, n, 0);
+  intvec* UG = new intvec(n, n, 0);
   for (int i = 0; i < n; i++)
   {
     for (int j = 0; j < n; j++)
@@ -176,7 +180,7 @@ static intvec ufnarovskiGraph(ideal G)
 
         if (normal)
         {
-          IMATELEM(UG, i + 1, j + 1) = 1;
+          IMATELEM(*UG, i + 1, j + 1) = 1;
         }
       }
     }
@@ -248,10 +252,10 @@ static std::vector<int> countCycles(const intvec* _G, int v, std::vector<int> pa
 }
 
 // -1 is infinity
-static int graphGrowth(const intvec G)
+static int graphGrowth(const intvec* G)
 {
   // init
-  int n = G.cols();
+  int n = G->cols();
   std::vector<int> path;
   std::vector<BOOLEAN> visited;
   std::vector<BOOLEAN> cyclic;
@@ -264,7 +268,7 @@ static int graphGrowth(const intvec G)
   int cycles = 0;
   for (int v = 0; v < n; v++)
   {
-    cache = countCycles(&G, v, path, visited, cyclic, cache);
+    cache = countCycles(G, v, path, visited, cyclic, cache);
     if (cache[v] == -1)
       return -1;
     cycles = si_max(cycles, cache[v]);
@@ -319,7 +323,8 @@ static int id_LPGkDim(const ideal _G)
       return -1;
   }
 
-  intvec UG = ufnarovskiGraph(G);
+  intvec* UG = ufnarovskiGraph(G);
+  if (errorreported || UG == NULL) return -2;
   return graphGrowth(UG);
 }
 
