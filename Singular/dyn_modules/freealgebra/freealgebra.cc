@@ -80,6 +80,18 @@ static BOOLEAN btest(leftv res, leftv h)
   else return TRUE;
 }
 
+static BOOLEAN p_LPDivisibleBy(ideal I, poly p, ring r)
+{
+  for(int i = 0; i < IDELEMS(I); i++)
+  {
+    if (p_LPDivisibleBy(I->m[i], p, r))
+    {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
 static BOOLEAN lpLmDivides(leftv res, leftv h)
 {
   const short t1[]={2,POLY_CMD,POLY_CMD};
@@ -97,15 +109,7 @@ static BOOLEAN lpLmDivides(leftv res, leftv h)
     ideal I=(ideal)h->Data();
     poly q=(poly)h->next->Data();
     res->rtyp = INT_CMD;
-    for(int i=0;i<IDELEMS(I);i++)
-    {
-      if (p_LPDivisibleBy(I->m[i],q, currRing))
-      {
-        res->data=(void*)(long)1;
-        return FALSE;
-      }
-    }
-    res->data=(void*)(long)0;
+    res->data=(void*)(long) p_LPDivisibleBy(I, q, currRing);
     return FALSE;
   }
   else return TRUE;
@@ -125,6 +129,61 @@ static BOOLEAN lpVarAt(leftv res, leftv h)
   else return TRUE;
 }
 
+static void _computeStandardWords(ideal words, int n, ideal M, int& last)
+{
+  if (n <= 0){
+    words->m[0] = pOne();
+    last = 0;
+    return;
+  }
+
+  _computeStandardWords(words, n - 1, M, last);
+
+  int nVars = currRing->isLPring;
+
+  for (int j = nVars - 1; j >= 0; j--)
+  {
+    for (int i = last; i >= 0; i--)
+    {
+      int index = (j * (last + 1)) + i;
+
+      if (words->m[i] != NULL)
+      {
+        if (j > 0) {
+          words->m[index] = pCopy(words->m[i]);
+        }
+
+        int varOffset = ((n - 1) * nVars) + 1;
+        pSetExp(words->m[index], varOffset + j, 1);
+        pSetm(words->m[index]);
+        pTest(words->m[index]);
+
+        if (p_LPDivisibleBy(M, words->m[index], currRing))
+        {
+          pDelete(&words->m[index]);
+          words->m[index] = NULL;
+        }
+      }
+    }
+  }
+
+  last = nVars * last + nVars - 1;
+}
+
+static ideal computeStandardWords(int n, ideal M)
+{
+  int nVars = currRing->isLPring;
+
+  int maxElems = 1;
+  for (int i = 0; i < n; i++) // maxElems = nVars^n
+    maxElems *= nVars;
+  ideal words = idInit(maxElems);
+  int last;
+  _computeStandardWords(words, n, M, last);
+  idSkipZeroes(words);
+  return words;
+}
+
 // NULL if graph is undefined
 static intvec* ufnarovskiGraph(ideal G)
 {
@@ -139,9 +198,7 @@ static intvec* ufnarovskiGraph(ideal G)
   }
   int lV = currRing->isLPring;
 
-  ideal words = idMaxIdeal(l);
-  ideal standardWords = kNF(G, currRing->qideal, words);
-  idSkipZeroes(standardWords);
+  ideal standardWords = computeStandardWords(l, G);
 
   int n = IDELEMS(standardWords);
   intvec* UG = new intvec(n, n, 0);
@@ -277,7 +334,7 @@ static int graphGrowth(const intvec* G)
 }
 
 // -1 is infinity, -2 is error
-static int id_LPGkDim(const ideal _G)
+static int gkDim(const ideal _G)
 {
   if (rField_is_Ring(currRing)) {
       WerrorS("GK-Dim not implemented for rings");
@@ -337,7 +394,7 @@ static BOOLEAN lpGkDim(leftv res, leftv h)
     assumeStdFlag(h);
     ideal G = (ideal) h->Data();
     res->rtyp = INT_CMD;
-    res->data = (void*)(long) id_LPGkDim(G);
+    res->data = (void*)(long) gkDim(G);
     if (errorreported) return TRUE;
     return FALSE;
   }

@@ -717,32 +717,25 @@ BOOLEAN p_LPLmDivisibleBy(poly a, poly b, const ring r)
 
 BOOLEAN _p_LPLmDivisibleByNoComp(poly a, poly b, const ring r)
 {
-  if(p_LmIsConstantComp(a, r))
-    return TRUE;
 #ifdef SHIFT_MULT_COMPAT_MODE
   a = p_Head(a, r);
   p_mLPunshift(a, r);
   b = p_Head(b, r);
   p_mLPunshift(b, r);
 #endif
-  int i = (r->N / r->isLPring) - p_LastVblock(a, r);
-  do {
-    int j = r->N - (i * r->isLPring);
+  for (int i = (r->N / r->isLPring) - p_LastVblock(a, r); i >= 0; i--)
+  {
     bool divisible = true;
-    do
+    for (int j = r->N - (i * r->isLPring); j >= 0; j--)
     {
       if (p_GetExp(a, j, r) > p_GetExp(b, j + (i * r->isLPring), r))
       {
         divisible = false;
         break;
       }
-      j--;
     }
-    while (j);
     if (divisible) return TRUE;
-    i--;
   }
-  while (i > -1);
 #ifdef SHIFT_MULT_COMPAT_MODE
   p_Delete(&a, r);
   p_Delete(&b, r);
