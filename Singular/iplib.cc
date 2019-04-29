@@ -643,7 +643,21 @@ void* iiCallLibProc1(const char*n, void *arg, int arg_type, BOOLEAN &err)
   }
   return NULL;
 }
-/// args: NULL terminated arry of arguments
+
+ideal iiCallLibProcIdeal(const char *lib,const char *proc, ideal arg, BOOLEAN &err)
+{
+  char *plib = iiConvName(lib);
+  idhdl h=ggetid(plib);
+  omFree(plib);
+  if (h==NULL)
+  {
+    BOOLEAN bo=iiLibCmd(omStrDup(lib),TRUE,TRUE,FALSE);
+    if (bo) { err=TRUE; return NULL; }
+  }
+  return (ideal)iiCallLibProc1(proc,idCopy(arg),IDEAL_CMD,err);
+}
+
+/// args: NULL terminated array of arguments
 /// arg_types: 0 terminated array of corresponding types
 void* iiCallLibProcM(const char*n, void **args, int* arg_types, BOOLEAN &err)
 {
