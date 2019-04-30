@@ -644,7 +644,8 @@ void* iiCallLibProc1(const char*n, void *arg, int arg_type, BOOLEAN &err)
   return NULL;
 }
 
-ideal iiCallLibProcIdeal(const char *lib,const char *proc, ideal arg, BOOLEAN &err)
+// return NULL on failure
+ideal iiCallLibProcIdeal(const char *lib,const char *proc, ideal arg)
 {
   char *plib = iiConvName(lib);
   idhdl h=ggetid(plib);
@@ -652,9 +653,12 @@ ideal iiCallLibProcIdeal(const char *lib,const char *proc, ideal arg, BOOLEAN &e
   if (h==NULL)
   {
     BOOLEAN bo=iiLibCmd(omStrDup(lib),TRUE,TRUE,FALSE);
-    if (bo) { err=TRUE; return NULL; }
+    if (bo) return NULL;
   }
-  return (ideal)iiCallLibProc1(proc,idCopy(arg),IDEAL_CMD,err);
+  BOOLEAN err;
+  ideal I=(ideal)iiCallLibProc1(proc,idCopy(arg),IDEAL_CMD,err);
+  if (err) return NULL;
+  return I;
 }
 
 /// args: NULL terminated array of arguments
