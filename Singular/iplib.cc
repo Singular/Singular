@@ -645,7 +645,7 @@ void* iiCallLibProc1(const char*n, void *arg, int arg_type, BOOLEAN &err)
 }
 
 // return NULL on failure
-ideal iiCallLibProcIdeal(const char *lib,const char *proc, ideal arg)
+ideal iiCallProcId2Id(const char *lib,const char *proc, ideal arg)
 {
   char *plib = iiConvName(lib);
   idhdl h=ggetid(plib);
