@@ -197,6 +197,7 @@ BOOLEAN iiMake_proc(idhdl pn, package pack, leftv sl);
 void* iiCallLibProc1(const char* n, void *arg, int arg_type, BOOLEAN &err);
 void* iiCallLibProcM(const char* n, void **args, int *arg_types, BOOLEAN &err);
 ideal iiCallProcId2Id(const char* lib,const char* proc, ideal arg);
+int iiCallProcId2Int(const char* lib,const char* proc, ideal arg);
 // from misc.cc:
 char *  showOption();
 BOOLEAN setOption(leftv res, leftv v);

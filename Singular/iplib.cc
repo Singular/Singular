@@ -661,6 +661,22 @@ ideal iiCallProcId2Id(const char *lib,const char *proc, ideal arg)
   return I;
 }
 
+int iiCallProcId2Int(const char *lib,const char *proc, ideal arg)
+{
+  char *plib = iiConvName(lib);
+  idhdl h=ggetid(plib);
+  omFree(plib);
+  if (h==NULL)
+  {
+    BOOLEAN bo=iiLibCmd(omStrDup(lib),TRUE,TRUE,FALSE);
+    if (bo) return 0;
+  }
+  BOOLEAN err;
+  int I=(int)(long)iiCallLibProc1(proc,idCopy(arg),IDEAL_CMD,err);
+  if (err) return 0;
+  return I;
+}
+
 /// args: NULL terminated array of arguments
 /// arg_types: 0 terminated array of corresponding types
 void* iiCallLibProcM(const char*n, void **args, int* arg_types, BOOLEAN &err)
