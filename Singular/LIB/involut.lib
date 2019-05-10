@@ -820,7 +820,6 @@ EXAMPLE: example findAuto; shows examples
   {
     execute("ring @@KK=(0,"+Par+"),("+@ss+"), dp;");
   }
-  //  execute("setring @@KK;");
   //  basering;
   ideal J = imap(@@K,J); // ideal, considered in @@KK now
   string snv = "["+string(NVars)+"]";

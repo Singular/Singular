@@ -2985,7 +2985,6 @@ EXAMPLE:  example primeClosure; shows an example
           return (-1);
       }
       ker=simplify(interred(ker),15);
-      //execute ("ring R0="+charstr(R)+",("+varstr(R)+"),("+ordstr(R)+");");
       // Rlist may be not defined in this new ring, so we define it again.
       list Rlist2 = ringlist(R);
       def R0 = ring(Rlist2);
@@ -3301,10 +3300,6 @@ EXAMPLE:  example closureFrac; shows an example
              def S(k) = ring(gnirlist);
              setring S(k);
 
-             //execute ("ring S(k) = "+charstr(R(k))+",("+varstr(R(k))+",
-             //          Z(1.."+string(ncols(phi))+")),(dp("+string(nvars(R(k)))
-             //          +"),dp("+string(ncols(phi))+"));");
-
               ideal phi = imap(R(k),phi);
               ideal J = imap (R(k),ker);
               for (l=1;l<=ncols(phi);l++)
@@ -3336,7 +3331,6 @@ EXAMPLE:  example closureFrac; shows an example
               //{
               //  mapstr=mapstr+"0,";
               //}
-              //execute (mapstr+"maxideal(1);");
               poly p;
           }
           p=NF(backmap(h),std(ker));
@@ -3489,10 +3483,6 @@ proc closureGenerators(list L);
          def S(k) = ring(gnirlist);
          setring S(k);
 
-        // execute ("ring S(k) = "+charstr(R(k))+",("+varstr(R(k))+",
-        //           Z(1.."+string(ncols(phi))+")),(dp("+string(nvars(R(k)))
-        //           +"),dp("+string(ncols(phi))+"));");
-
           ideal phi = imap(R(k),phi);
           ideal J = imap (R(k),ker);
           for ( l=1; l<=ncols(phi); l++ )
@@ -3522,7 +3512,6 @@ proc closureGenerators(list L);
            //{
            //  mapstr=mapstr+"0,";
            //}
-           //execute (mapstr+"maxideal(1);");
 
            poly p;
         }

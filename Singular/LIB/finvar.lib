@@ -1516,8 +1516,6 @@ EXAMPLE: example invariant_basis; shows an example
   ring tmpR = char(br),(p(1..m)),dp;
   def T = br+tmpR;
   setring T;
-  // execute("ring T=("+charstr(br)+"),("+varstr(br)+",p(1..m)),lp;");
-  // p(1..m) are the general coefficients of the general polynomial of degree g
   ideal vars = fetch(br,vars);
   map f;
   ideal mon=imap(br,mon);
