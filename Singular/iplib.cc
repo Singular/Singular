@@ -645,7 +645,7 @@ void* iiCallLibProc1(const char*n, void *arg, int arg_type, BOOLEAN &err)
 }
 
 // return NULL on failure
-ideal iiCallProcId2Id(const char *lib,const char *proc, ideal arg)
+ideal ii_CallProcId2Id(const char *lib,const char *proc, ideal arg, const ring R)
 {
   char *plib = iiConvName(lib);
   idhdl h=ggetid(plib);
@@ -655,13 +655,16 @@ ideal iiCallProcId2Id(const char *lib,const char *proc, ideal arg)
     BOOLEAN bo=iiLibCmd(omStrDup(lib),TRUE,TRUE,FALSE);
     if (bo) return NULL;
   }
+  ring oldR=currRing;
+  rChangeCurrRing(R);
   BOOLEAN err;
   ideal I=(ideal)iiCallLibProc1(proc,idCopy(arg),IDEAL_CMD,err);
+  rChangeCurrRing(oldR);
   if (err) return NULL;
   return I;
 }
 
-int iiCallProcId2Int(const char *lib,const char *proc, ideal arg)
+int ii_CallProcId2Int(const char *lib,const char *proc, ideal arg, const ring R)
 {
   char *plib = iiConvName(lib);
   idhdl h=ggetid(plib);
@@ -672,7 +675,10 @@ int iiCallProcId2Int(const char *lib,const char *proc, ideal arg)
     if (bo) return 0;
   }
   BOOLEAN err;
+  ring oldR=currRing;
+  rChangeCurrRing(R);
   int I=(int)(long)iiCallLibProc1(proc,idCopy(arg),IDEAL_CMD,err);
+  rChangeCurrRing(oldR);
   if (err) return 0;
   return I;
 }
