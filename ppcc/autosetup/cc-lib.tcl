@@ -166,7 +166,7 @@ proc cc-check-c11 {} {
 # defines 'HAVE_ALLOCA' and returns 1 if it exists.
 proc cc-check-alloca {} {
 	cc-check-some-feature alloca {
-		cctest -includes alloca.h -code { alloca (2 * sizeof (int)); }
+		cctest -includes stdlib.h -code { alloca (2 * sizeof (int)); }
 	}
 }
 
