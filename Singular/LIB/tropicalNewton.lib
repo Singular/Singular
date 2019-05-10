@@ -1099,38 +1099,7 @@ example
 
 // disabled routines to check characteristic-freeness of tropical points
 
-// proc saturateWithRespectToVariable(ideal I, int k)
-// {
-//   ASSUME(1,k>=1);
-//   ASSUME(1,k<=nvars(basering));
 
-//   def origin = basering;
-//   int n = nvars(basering);
-//   intvec weightVector = ringlist(origin)[3][1][2];
-
-//   string newVars;
-//   for (int i=1; i<k; i++)
-//   {
-//     newVars = newVars+string(var(i))+",";
-//   }
-//   for (i=k+1; i<=n; i++)
-//   {
-//     newVars = newVars+string(var(i))+",";
-//   }
-//   newVars = newVars+string(var(k));
-//   execute("ring ringForSaturation = ("+charstr(origin)+"),("+newVars+"),dp;");
-
-//   ideal I = satstd(imap(origin,I));
-//   if (I==-1)
-//   {
-//     return (-1);
-//   }
-//   I = simplify(I,2+4+32);
-
-//   setring origin;
-//   I = imap(ringForSaturation,I);
-//   return (I);
-// }
 
 // proc stepwiseSaturation(ideal I)
 // {
@@ -1157,30 +1126,3 @@ example
 // }
 
 
-// proc checkForContainmentInTropicalVariety(ideal I, intvec w, int charInt)
-// {
-//   def origin = basering;
-//   intvec wOne = oneVector(nvars(origin));
-//   execute("ring rInitialIdeal = ("+string(charInt)+"),("+varstr(origin)+"),(a(wOne),wp(w));");
-
-//   ideal I = imap(origin,I);
-//   int tinI = timer;
-//   option(redSB);
-//   ideal stdI = satstd(I);
-//   attrib(stdI,"isSB",1);
-//   ideal inI = initial(stdI,w);
-//   tinI = timer-tinI;
-//   dbprint("time used computing initial ideal: "+string(tinI));
-
-//   int tsat = timer;
-//   ideal satinI = stepwiseSaturation(inI);
-//   tsat = timer-tsat;
-//   dbprint("time used computing saturation: "+string(tsat));
-
-
-//   export(I);
-//   export(stdI);
-//   export(inI);
-//   export(satinI);
-//   return (rInitialIdeal);
-// }

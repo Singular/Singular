@@ -299,7 +299,6 @@ EXAMPLE: example getMaxPoints; shows an example
     }
   }
 
-  //execute("ring outR =(complex,"+string(prec)+"),(x(1.."+string(n)+")),dp;");
   ring outR=(complex,prec),x(1..n),dp;
   list MPOINTS = imap(R,L2);
   list LHESSIANS = imap(R,hessi2);
@@ -496,7 +495,6 @@ EXAMPLE: example maxPointsProb; shows an example
     vals=list();
   }
 
-  //execute("ring outR =(complex,"+string(prec)+"),(x(1.."+string(n)+")),dp;");
   ring outR=(complex,prec),x(1..n),dp;
   list MPOINTS = imap(R,L2);
   list LHESSIANS = imap(R,hessi2);

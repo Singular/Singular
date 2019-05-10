@@ -3480,7 +3480,6 @@ static proc lshift(module M, int s, string varing, def lpring)
   // to be run from varing
   int i, j, k, sm, sv;
   vector v;
-  //  execute("setring "+lpring);
   setring lpring;
   poly @@p;
   ideal I;

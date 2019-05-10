@@ -844,7 +844,6 @@ Sub-procedure: asking for and reading your input
     int l,l1;
     for (l=1;l<=t1;l=l+1)
     {
-// old:   execute("l1= "+columnes[2*l-1]+";");
       l1=vvvv[l];
       B[l] = A[l1];
       if(flag) { C[l]=D[l1];}
