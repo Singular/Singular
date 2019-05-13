@@ -452,7 +452,7 @@ assign: left_value exprlist
 elemexpr:
         MONOM
           {
-            if (currRing==NULL) MYYERROR("no ring active");
+            if (currRing==NULL) MYYERROR("no ring active (7)");
             syMakeMonom(&$$,$1);
           }
         | extendedid
@@ -487,7 +487,7 @@ elemexpr:
           }
         | '[' exprlist ']'
           {
-            if (currRing==NULL) MYYERROR("no ring active");
+            if (currRing==NULL) MYYERROR("no ring active (8)");
             int j = 0;
             memset(&$$,0,sizeof(sleftv));
             $$.rtyp=VECTOR_CMD;

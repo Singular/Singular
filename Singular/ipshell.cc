@@ -1502,7 +1502,7 @@ BOOLEAN iiCheckRing(int i)
     #endif
       if (RingDependend(i))
       {
-        WerrorS("no ring active");
+        WerrorS("no ring active (9)");
         return TRUE;
       }
     #ifdef SIQ

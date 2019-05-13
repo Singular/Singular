@@ -4768,7 +4768,7 @@ static BOOLEAN jjPARSTR1(leftv res, leftv v)
 {
   if (currRing==NULL)
   {
-    WerrorS("no ring active");
+    WerrorS("no ring active (1)");
     return TRUE;
   }
   int i=(int)(long)v->Data();
@@ -5389,7 +5389,7 @@ static BOOLEAN jjVARSTR1(leftv res, leftv v)
 {
   if (currRing==NULL)
   {
-    WerrorS("no ring active");
+    WerrorS("no ring active (2)");
     return TRUE;
   }
   int i=(int)(long)v->Data();
@@ -8354,7 +8354,7 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
         {
           if (RingDependend(dA2[i].res))
           {
-            WerrorS("no ring active");
+            WerrorS("no ring active (3)");
             break;
           }
         }
@@ -8398,7 +8398,7 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
               {
                 if (RingDependend(dA2[i].res))
                 {
-                  WerrorS("no ring active");
+                  WerrorS("no ring active (4)");
                   break;
                 }
               }
@@ -8581,7 +8581,7 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, const struct sValCmd1* dA1, 
         {
           if (RingDependend(dA1[i].res))
           {
-            WerrorS("no ring active");
+            WerrorS("no ring active (5)");
             break;
           }
         }
@@ -8624,7 +8624,7 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, const struct sValCmd1* dA1, 
             {
               if (RingDependend(dA1[i].res))
               {
-                WerrorS("no ring active");
+                WerrorS("no ring active (6)");
                 break;
               }
             }
