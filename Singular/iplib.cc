@@ -483,7 +483,7 @@ static void iiCheckNest()
     iiRETURNEXPR_len+=16;
   }
 }
-BOOLEAN iiMake_proc(idhdl pn, package pack, leftv sl)
+BOOLEAN iiMake_proc(idhdl pn, package pack, leftv args)
 {
   int err;
   procinfov pi = IDPROC(pn);
@@ -530,11 +530,11 @@ BOOLEAN iiMake_proc(idhdl pn, package pack, leftv sl)
                    currPackHdl=packFindHdl(currPack);
                    //Print("set pack=%s\n",IDID(currPackHdl));
                  }
-                 err=iiPStart(pn,sl);
+                 err=iiPStart(pn,args);
                  break;
     case LANG_C:
                  leftv res = (leftv)omAlloc0Bin(sleftv_bin);
-                 err = (pi->data.o.function)(res, sl);
+                 err = (pi->data.o.function)(res, args);
                  memcpy(&iiRETURNEXPR,res,sizeof(iiRETURNEXPR));
                  omFreeBin((ADDRESS)res,  sleftv_bin);
                  break;
@@ -706,7 +706,7 @@ leftv ii_CallLibProcM(const char*n, void **args, int* arg_types, const ring R, B
     tmp.rtyp=arg_types[0];
     while(arg_types[i]!=0)
     {
-      tt->next=(leftv)omAlloc0(sizeof(sleftv));
+      tt->next=(leftv)omAlloc0Bin(sleftv_bin);
       tt=tt->next;
       tt->rtyp=arg_types[i];
       tt->data=args[i];
