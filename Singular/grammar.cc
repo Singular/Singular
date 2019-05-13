@@ -2587,7 +2587,7 @@ yyreduce:
 /* Line 1464 of yacc.c  */
 #line 489 "grammar.y"
     {
-            if (currRingHdl==NULL) MYYERROR("no ring active");
+            if (currRing==NULL) MYYERROR("no ring active");
             int j = 0;
             memset(&(yyval.lv),0,sizeof(sleftv));
             (yyval.lv).rtyp=VECTOR_CMD;

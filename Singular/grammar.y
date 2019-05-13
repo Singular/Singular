@@ -487,7 +487,7 @@ elemexpr:
           }
         | '[' exprlist ']'
           {
-            if (currRingHdl==NULL) MYYERROR("no ring active");
+            if (currRing==NULL) MYYERROR("no ring active");
             int j = 0;
             memset(&$$,0,sizeof(sleftv));
             $$.rtyp=VECTOR_CMD;
