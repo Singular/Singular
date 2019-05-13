@@ -573,17 +573,17 @@ static void iiCallLibProcBegin()
   idhdl tmp_ring=NULL;
   if (currRing!=NULL)
   {
-    if (IDRING(currRingHdl)!=currRing)
+    if ((currRingHdl!=NULL) && (IDRING(currRingHdl)!=currRing))
     {
       // clean up things depending on currRingHdl:
       sLastPrinted.CleanUp(IDRING(currRingHdl));
       sLastPrinted.Init();
-      // need to define a ring-hdl for currRingHdl
-      tmp_ring=enterid(" tmpRing",myynest,RING_CMD,&IDROOT,FALSE);
-      IDRING(tmp_ring)=currRing;
-      currRing->ref++;
-      rSetHdl(tmp_ring);
     }
+    // need to define a ring-hdl for currRingHdl
+    tmp_ring=enterid(" tmpRing",myynest,RING_CMD,&IDROOT,FALSE);
+    IDRING(tmp_ring)=currRing;
+    currRing->ref++;
+    rSetHdl(tmp_ring);
   }
 }
 static void iiCallLibProcEnd(idhdl save_ringhdl, ring save_ring)
