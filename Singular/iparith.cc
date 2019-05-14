@@ -7691,8 +7691,8 @@ static BOOLEAN jjLIFT_4(leftv res, leftv U)
 }
 static BOOLEAN jjLIFTSTD_4(leftv res, leftv U)
 {
-  const short t1[]={4,IDEAL_CMD,IDEAL_CMD,MATRIX_CMD,STRING_CMD};
-  const short t2[]={4,MODUL_CMD,MODUL_CMD,MATRIX_CMD,STRING_CMD};
+  const short t1[]={4,IDEAL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD};
+  const short t2[]={4,MODUL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD};
   leftv u=U;
   leftv v=u->next;
   leftv w=v->next;
