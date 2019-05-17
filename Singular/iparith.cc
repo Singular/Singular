@@ -7684,7 +7684,7 @@ static BOOLEAN jjLIFT_4(leftv res, leftv U)
   else
   {
     Werror("%s(`ideal`,`ideal`,`matrix`,`string`)\n"
-           "or (`module`,`module`,`matrix`,`string`)expected",
+           "or (`module`,`module`,`matrix`,`string`) expected",
            Tok2Cmdname(iiOp));
     return TRUE;
   }
@@ -7715,8 +7715,8 @@ static BOOLEAN jjLIFTSTD_4(leftv res, leftv U)
   }
   else
   {
-    Werror("%s(`ideal`,`ideal`,`matrix`,`string`)\n"
-           "or (`module`,`module`,`matrix`,`string`)expected",
+    Werror("%s(`ideal`,`matrix`,`module`,`string`)\n"
+           "or (`module`,`matrix`,`module`,`string`) expected",
            Tok2Cmdname(iiOp));
     return TRUE;
   }
