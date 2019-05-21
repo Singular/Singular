@@ -3327,11 +3327,6 @@ EXAMPLE:  example closureFrac; shows an example
               maxi = maxi,maxideal(1);
               map backmap = S(k),maxi;
 
-              //mapstr=" map backmap = S(k),";
-              //for (l=1;l<=nvars(R(k));l++)
-              //{
-              //  mapstr=mapstr+"0,";
-              //}
               poly p;
           }
           p=NF(backmap(h),std(ker));
@@ -3507,12 +3502,6 @@ proc closureGenerators(list L);
            maxi[nvars(R(k))] = 0;
            maxi = maxi,maxideal(1);
            map backmap = S(k),maxi;
-
-           //mapstr=" map backmap = S(k),";
-           //for (l=1;l<=nvars(R(k));l++)
-           //{
-           //  mapstr=mapstr+"0,";
-           //}
 
            poly p;
         }
