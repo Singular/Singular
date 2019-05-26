@@ -223,3 +223,23 @@ void printBlackboxTypes()
        Print("type %d: %s\n",i,blackboxName[i]);
   }
 }
+
+struct blackbox_list *getBlackboxTypes()
+{
+	int i = 0;
+	void **l = (void **)omalloc(blackboxTableCnt * sizeof(void *));
+	struct blackbox_list *list_struct = (struct blackbox_list *) omalloc(sizeof(struct blackbox_list));
+	list_struct->count = blackboxTableCnt;
+	list_struct->list = l;
+
+	for (i = blackboxTableCnt-1; i >= 0 ;i--)
+	{
+		if (blackboxName[i]!=NULL) {
+			l[i] = (void *)omStrDup(blackboxName[i]);
+			//Print("type %d: %s\n",i,blackboxName[i]);
+		} else {
+			l[i] = NULL;
+		}
+	}
+	return list_struct;
+}

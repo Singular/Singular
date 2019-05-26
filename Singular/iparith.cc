@@ -7929,6 +7929,74 @@ static BOOLEAN jjRESERVED0(leftv, leftv)
   printBlackboxTypes();
   return FALSE;
 }
+
+static BOOLEAN jjRESERVEDLIST0(leftv res, leftv)
+{
+	unsigned i=1;
+	int l = 0;
+	int k = 0;
+	lists L = (lists)omAllocBin(slists_bin);
+	struct blackbox_list *bb_list = NULL;
+	unsigned nCount = (sArithBase.nCmdUsed-1) / 3;
+	if ((3*nCount) < sArithBase.nCmdUsed) {
+		nCount++;
+	}
+	bb_list = getBlackboxTypes();
+	// count the  number of entries;
+	for (i=0; i<nCount; i++) {
+		l++;
+		if (i + 1 + nCount < sArithBase.nCmdUsed) {
+			l++;
+		}
+		if(i+1+2*nCount<sArithBase.nCmdUsed) {
+			l++;
+		}
+	}
+	for (i = 0; i < bb_list->count; i++) {
+		if (bb_list->list[i] != NULL) {
+			l++;
+		}
+	}
+	// initiate list
+	L->Init(l);
+	k = 0;
+	for (i=0; i<nCount; i++) {
+		L->m[k].rtyp = STRING_CMD;
+		L->m[k].data = omStrDup(sArithBase.sCmds[i+1].name);
+		k++;
+		// Print("%-20s", sArithBase.sCmds[i+1].name);
+		if (i + 1 + nCount < sArithBase.nCmdUsed) {
+			L->m[k].rtyp = STRING_CMD;
+			L->m[k].data = omStrDup(sArithBase.sCmds[i+1+nCount].name);
+			k++;
+			// Print("%-20s", sArithBase.sCmds[i+1 + nCount].name);
+		}
+		if(i+1+2*nCount<sArithBase.nCmdUsed) {
+			L->m[k].rtyp = STRING_CMD;
+			L->m[k].data = omStrDup(sArithBase.sCmds[i+1+2*nCount].name);
+			k++;
+			// Print("%-20s", sArithBase.sCmds[i+1+2*nCount].name);
+		}
+		// PrintLn();
+	}
+
+	// assign blackbox types
+	for (i = 0; i < bb_list->count; i++) {
+		if (bb_list->list[i] != NULL) {
+			L->m[k].rtyp = STRING_CMD;
+			// already used strdup in getBlackBoxTypes
+			L->m[k].data = bb_list->list[i];
+			k++;
+		}
+	}
+	// free the struct (not the list itself)
+	omfree(bb_list);
+
+	// pass the resultant list to the res datastructure
+	res->data=(void *)L;
+
+	return FALSE;
+}
 static BOOLEAN jjSTRING_PL(leftv res, leftv v)
 {
   if (v == NULL)
@@ -8151,7 +8219,7 @@ static BOOLEAN jjSUBST_M(leftv res, leftv u)
   if (v==NULL) return TRUE;
   leftv w = v->next;
   if (w==NULL) return TRUE;
-  leftv rest = w->next;;
+  leftv rest = w->next;
 
   u->next = NULL;
   v->next = NULL;
@@ -9756,7 +9824,7 @@ static int jjCOMPARE_ALL(const void * aa, const void * bb)
   leftv a=(leftv)aa;
   int at=a->Typ();
   leftv b=(leftv)bb;
-  int bt=b->Typ();;
+  int bt=b->Typ();
   if (at < bt) return -1;
   if (at > bt) return 1;
   int tab_pos=iiTabIndex(dArithTab2,JJTAB2LEN,'<');
