@@ -536,7 +536,7 @@ int redRiloc_Z (LObject* h,kStrategy strat)
          * T[0] is 0 (constant). This is only efficient if T[0] is short, thus
          * we ask for the length of T[0] to be <= 2 */
         if (strat->T[0].GetpFDeg() == 0 && strat->T[0].length <= 2) {
-            j = kFindDivisibleByInT_Z_only_first(strat, h);
+            j = kTestDivisibleByT0_Z(strat, h);
             if (j == 0 && n_DivBy(pGetCoeff(h->p), pGetCoeff(strat->T[j].p), currRing->cf) == FALSE) {
                 if (strat->T[j].ecart <= h->ecart) {
                     /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
@@ -985,7 +985,7 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
          * T[0] is 0 (constant). This is only efficient if T[0] is short, thus
          * we ask for the length of T[0] to be <= 2 */
         if (strat->T[0].GetpFDeg() == 0 && strat->T[0].length <= 2) {
-            j0 = kFindDivisibleByInT_Z_only_first(strat, &H);
+            j0 = kTestDivisibleByT0_Z(strat, &H);
             if (j0 == 0 && n_DivBy(pGetCoeff(H.p), pGetCoeff(strat->T[j0].p), currRing->cf) == FALSE) {
                 if (strat->T[j0].ecart <= H.ecart) {
                     /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))

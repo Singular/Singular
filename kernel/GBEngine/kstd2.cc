@@ -134,72 +134,68 @@ int kFindSameLMInT_Z(const kStrategy strat, const LObject* L, const int start)
     }
   }
 }
-// return -1 if no divisor is found
-//        number of first divisor, otherwise
-int kFindDivisibleByInT_Z_only_first(const kStrategy strat, const LObject* L, const int start)
+// return -1 if T[0] does not divide the leading monomial
+int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
 {
     if (strat->tl < 1)
         return -1;
 
-  unsigned long not_sev = ~L->sev;
-  int j = start;
-  int o = -1;
+    unsigned long not_sev     = ~L->sev;
+    const unsigned long sevT0 = strat->sevT[0];
+    number rest, orest, mult;
+    if (L->p!=NULL)
+    {
+        const poly T0p  = strat->T[0].p;
+        const ring r    = currRing;
+        const poly p    = L->p;
+        orest           = pGetCoeff(p);
 
-  const TSet T=strat->T;
-  const unsigned long* sevT=strat->sevT;
-  number rest, orest, mult;
-  if (L->p!=NULL)
-  {
-    const ring r=currRing;
-    const poly p=L->p;
-    orest = pGetCoeff(p);
-
-    pAssume(~not_sev == p_GetShortExpVector(p, r));
+        pAssume(~not_sev == p_GetShortExpVector(p, r));
 
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
-      if (p_LmShortDivisibleBy(strat->T[0].p, strat->sevT[0],p, not_sev, r))
-      {
-        mult= n_QuotRem(pGetCoeff(p), pGetCoeff(strat->T[0].p), &rest, r->cf);
-        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
-            return 0;
+        if (p_LmShortDivisibleBy(T0p, sevT0, not_sev, r))
+        {
+            mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
+            if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
+                return 0;
+            }
         }
-      }
 #else
-      if (!(strat->sevT[0] & not_sev) && p_LmDivisibleBy(strat->T[0].p, p, r))
-      {
-        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(strat->T[0].p), &rest, r->cf);
-        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
-            return 0;
+        if (!(sevT0 & not_sev) && p_LmDivisibleBy(T0p, p, r))
+        {
+            mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
+            if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
+                return 0;
+            }
         }
-      }
 #endif
-  }
-  else
-  {
-    const ring r=strat->tailRing;
-    const poly p=L->t_p;
-    orest = pGetCoeff(p);
-      if (j > strat->tl) return o;
+    }
+    else
+    {
+        const poly T0p  = strat->T[0].t_p;
+        const ring r    = strat->tailRing;
+        const poly p    = L->t_p;
+        orest           = pGetCoeff(p);
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
-      if (p_LmShortDivisibleBy(strat->T[0].t_p, sevT[j],
-            p, not_sev, r))
-      {
-        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(strat->T[0].p), &rest, r->cf);
-        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
-            return 0;
+        if (p_LmShortDivisibleBy(strat->T[0].t_p, sevT[j],
+                    p, not_sev, r))
+        {
+            mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
+            if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
+                return 0;
+            }
         }
-      }
 #else
-      if (!(strat->sevT[0] & not_sev) && p_LmDivisibleBy(strat->T[0].t_p, p, r))
-      {
-        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(strat->T[0].p), &rest, r->cf);
-        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
-            return 0;
+        if (!(sevT0 & not_sev) && p_LmDivisibleBy(T0p, p, r))
+        {
+            mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
+            if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
+                return 0;
+            }
         }
-      }
 #endif
-  }
-  return -1;
+    }
+    return -1;
 }
 
 int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int start)
@@ -256,7 +252,7 @@ int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int sta
       if (p_LmShortDivisibleBy(T[j].t_p, sevT[j],
             p, not_sev, r))
       {
-        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p), &rest, r->cf);
+        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].t_p), &rest, r->cf);
         if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
           o = j;
           orest = rest;
@@ -265,7 +261,7 @@ int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int sta
 #else
       if (!(sevT[j] & not_sev) && p_LmDivisibleBy(T[j].t_p, p, r))
       {
-        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p), &rest, r->cf);
+        mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].t_p), &rest, r->cf);
         if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
           o = j;
           orest = rest;
