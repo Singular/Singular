@@ -526,36 +526,42 @@ int redRiloc_Z (LObject* h,kStrategy strat)
     int j = 0;
     int pass = 0;
     long d,reddeg;
+    int docoeffred  = 0;
+    poly T0p        = strat->T[0].p;
+    int T0ecart     = strat->T[0].ecart;
+
 
     d = h->GetpFDeg()+ h->ecart;
     reddeg = strat->LazyDegree+d;
     h->SetShortExpVector();
+    if (strat->T[0].GetpFDeg() == 0 && strat->T[0].length <= 2) {
+        docoeffred  = 1;
+    }
     loop
     {
         /* cut down the lead coefficients, only possible if the degree of
          * T[0] is 0 (constant). This is only efficient if T[0] is short, thus
          * we ask for the length of T[0] to be <= 2 */
-        if (strat->T[0].GetpFDeg() == 0 && strat->T[0].length <= 2) {
+        if (docoeffred) {
             j = kTestDivisibleByT0_Z(strat, h);
-            if (j == 0 && n_DivBy(pGetCoeff(h->p), pGetCoeff(strat->T[j].p), currRing->cf) == FALSE) {
-                if (strat->T[j].ecart <= h->ecart) {
-                    /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
-                     * => we try to cut down the lead coefficient at least */
-                    /* first copy T[j] in order to multiply it with a coefficient later on */
-                    number mult, rest;
-                    TObject tj  = strat->T[j];
-                    tj.Copy();
-                    /* compute division with remainder of lc(h) and lc(T[j]) */
-                    mult = n_QuotRem(pGetCoeff(h->p), pGetCoeff(strat->T[j].p),
-                            &rest, currRing->cf);
-                    /* set corresponding new lead coefficient already. we do not
-                     * remove the lead term in ksReducePolyLC, but only apply
-                     * a lead coefficient reduction */
-                    tj.Mult_nn(mult);
-                    ksReducePolyLC(h, &tj, NULL, &rest, strat);
-                    tj.Delete();
-                    tj.Clear();
-                }
+            if (j == 0 && n_DivBy(pGetCoeff(h->p), pGetCoeff(T0p), currRing->cf) == FALSE
+                    && T0ecart <= h->ecart) {
+                /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
+                 * => we try to cut down the lead coefficient at least */
+                /* first copy T[j] in order to multiply it with a coefficient later on */
+                number mult, rest;
+                TObject tj  = strat->T[0];
+                tj.Copy();
+                /* compute division with remainder of lc(h) and lc(T[j]) */
+                mult = n_QuotRem(pGetCoeff(h->p), pGetCoeff(T0p),
+                        &rest, currRing->cf);
+                /* set corresponding new lead coefficient already. we do not
+                 * remove the lead term in ksReducePolyLC, but only apply
+                 * a lead coefficient reduction */
+                tj.Mult_nn(mult);
+                ksReducePolyLC(h, &tj, NULL, &rest, strat);
+                tj.Delete();
+                tj.Clear();
             }
         }
         j = kFindDivisibleByInT(strat, h);
@@ -974,37 +980,42 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
     H.p = h;
     int j0, j = 0;
     int z = 10;
+    int docoeffred  = 0;
+    poly T0p    = strat->T[0].p;
+    int T0ecart = strat->T[0].ecart;
     int o = H.SetpFDeg();
     H.ecart = currRing->pLDeg(H.p,&H.length,currRing)-o;
     if ((flag & 2) == 0) cancelunit(&H,TRUE);
     H.sev = pGetShortExpVector(H.p);
     unsigned long not_sev = ~ H.sev;
+    if (strat->T[0].GetpFDeg() == 0 && strat->T[0].length <= 2) {
+        docoeffred  = 1;
+    }
     loop
     {
         /* cut down the lead coefficients, only possible if the degree of
          * T[0] is 0 (constant). This is only efficient if T[0] is short, thus
          * we ask for the length of T[0] to be <= 2 */
-        if (strat->T[0].GetpFDeg() == 0 && strat->T[0].length <= 2) {
+        if (docoeffred) {
             j0 = kTestDivisibleByT0_Z(strat, &H);
-            if (j0 == 0 && n_DivBy(pGetCoeff(H.p), pGetCoeff(strat->T[j0].p), currRing->cf) == FALSE) {
-                if (strat->T[j0].ecart <= H.ecart) {
-                    /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
-                     * => we try to cut down the lead coefficient at least */
-                    /* first copy T[j0] in order to multiply it with a coefficient later on */
-                    number mult, rest;
-                    TObject tj  = strat->T[j0];
-                    tj.Copy();
-                    /* compute division with remainder of lc(h) and lc(T[j]) */
-                    mult = n_QuotRem(pGetCoeff(H.p), pGetCoeff(strat->T[j0].p),
-                            &rest, currRing->cf);
-                    /* set corresponding new lead coefficient already. we do not
-                     * remove the lead term in ksReducePolyLC, but only apply
-                     * a lead coefficient reduction */
-                    tj.Mult_nn(mult);
-                    ksReducePolyLC(&H, &tj, NULL, &rest, strat);
-                    tj.Delete();
-                    tj.Clear();
-                }
+            if (j0 == 0 && n_DivBy(pGetCoeff(H.p), pGetCoeff(T0p), currRing->cf) == FALSE
+                    && T0ecart <= H.ecart) {
+                /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
+                 * => we try to cut down the lead coefficient at least */
+                /* first copy T[j0] in order to multiply it with a coefficient later on */
+                number mult, rest;
+                TObject tj  = strat->T[0];
+                tj.Copy();
+                /* compute division with remainder of lc(h) and lc(T[j]) */
+                mult = n_QuotRem(pGetCoeff(H.p), pGetCoeff(T0p),
+                        &rest, currRing->cf);
+                /* set corresponding new lead coefficient already. we do not
+                 * remove the lead term in ksReducePolyLC, but only apply
+                 * a lead coefficient reduction */
+                tj.Mult_nn(mult);
+                ksReducePolyLC(&H, &tj, NULL, &rest, strat);
+                tj.Delete();
+                tj.Clear();
             }
         }
         if (j > strat->tl)
