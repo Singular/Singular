@@ -981,7 +981,6 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
     unsigned long not_sev = ~ H.sev;
     loop
     {
-#if 1
         /* cut down the lead coefficients, only possible if the degree of
          * T[0] is 0 (constant). This is only efficient if T[0] is short, thus
          * we ask for the length of T[0] to be <= 2 */
@@ -1008,7 +1007,6 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
                 }
             }
         }
-#endif
         if (j > strat->tl)
         {
             return H.p;
