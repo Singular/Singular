@@ -153,7 +153,7 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
         pAssume(~not_sev == p_GetShortExpVector(p, r));
 
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
-        if (p_LmShortDivisibleBy(T0p, sevT0, not_sev, r))
+        if (p_LmShortDivisibleBy(T0p, sevT0, p, not_sev, r))
         {
             mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
             if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
@@ -177,7 +177,7 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
         const poly p    = L->t_p;
         orest           = pGetCoeff(p);
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
-        if (p_LmShortDivisibleBy(strat->T[0].t_p, sevT[j],
+        if (p_LmShortDivisibleBy(T0p, sevT0,
                     p, not_sev, r))
         {
             mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
