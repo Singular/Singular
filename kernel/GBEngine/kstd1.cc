@@ -519,6 +519,221 @@ int redRiloc (LObject* h,kStrategy strat)
     }
   }
 }
+
+int redRiloc_Z (LObject* h,kStrategy strat)
+{
+    int i,at,ei,li,ii;
+    int j = 0;
+    int pass = 0;
+    long d,reddeg;
+    int docoeffred  = 0;
+    poly T0p        = strat->T[0].p;
+    int T0ecart     = strat->T[0].ecart;
+
+
+    d = h->GetpFDeg()+ h->ecart;
+    reddeg = strat->LazyDegree+d;
+    h->SetShortExpVector();
+    if (strat->T[0].GetpFDeg() == 0 && strat->T[0].length <= 2) {
+        docoeffred  = 1;
+    }
+    loop
+    {
+        /* cut down the lead coefficients, only possible if the degree of
+         * T[0] is 0 (constant). This is only efficient if T[0] is short, thus
+         * we ask for the length of T[0] to be <= 2 */
+        if (docoeffred) {
+            j = kTestDivisibleByT0_Z(strat, h);
+            if (j == 0 && n_DivBy(pGetCoeff(h->p), pGetCoeff(T0p), currRing->cf) == FALSE
+                    && T0ecart <= h->ecart) {
+                /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
+                 * => we try to cut down the lead coefficient at least */
+                /* first copy T[j] in order to multiply it with a coefficient later on */
+                number mult, rest;
+                TObject tj  = strat->T[0];
+                tj.Copy();
+                /* compute division with remainder of lc(h) and lc(T[j]) */
+                mult = n_QuotRem(pGetCoeff(h->p), pGetCoeff(T0p),
+                        &rest, currRing->cf);
+                /* set corresponding new lead coefficient already. we do not
+                 * remove the lead term in ksReducePolyLC, but only apply
+                 * a lead coefficient reduction */
+                tj.Mult_nn(mult);
+                ksReducePolyLC(h, &tj, NULL, &rest, strat);
+                tj.Delete();
+                tj.Clear();
+            }
+        }
+        j = kFindDivisibleByInT(strat, h);
+        if (j < 0)
+        {
+            // over ZZ: cleanup coefficients by complete reduction with monomials
+            postReduceByMon(h, strat);
+            if(h->p == NULL)
+            {
+                kDeleteLcm(h);
+                h->Clear();
+                return 0;
+            }
+            if (strat->honey) h->SetLength(strat->length_pLength);
+            if(strat->tl >= 0)
+                h->i_r1 = strat->tl;
+            else
+                h->i_r1 = -1;
+            if (h->GetLmTailRing() == NULL)
+            {
+                kDeleteLcm(h);
+                h->Clear();
+                return 0;
+            }
+            return 1;
+        }
+
+        ei = strat->T[j].ecart;
+        ii = j;
+#if 1
+        if (ei > h->ecart && ii < strat->tl)
+        {
+            li = strat->T[j].length;
+            // the polynomial to reduce with (up to the moment) is;
+            // pi with ecart ei and length li
+            // look for one with smaller ecart
+            i = j;
+            loop
+            {
+                /*- takes the first possible with respect to ecart -*/
+                i++;
+#if 1
+                if (i > strat->tl) break;
+                if ((strat->T[i].ecart < ei || (strat->T[i].ecart == ei &&
+                                strat->T[i].length < li))
+                        &&
+                        p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i], h->GetLmTailRing(), ~h->sev, strat->tailRing)
+                        &&
+                        n_DivBy(h->p->coef,strat->T[i].p->coef,strat->tailRing->cf))
+#else
+                    j = kFindDivisibleByInT(strat, h, i);
+                if (j < 0) break;
+                i = j;
+                if (strat->T[i].ecart < ei || (strat->T[i].ecart == ei &&
+                            strat->T[i].length < li))
+#endif
+                {
+                    // the polynomial to reduce with is now
+                    ii = i;
+                    ei = strat->T[i].ecart;
+                    if (ei <= h->ecart) break;
+                    li = strat->T[i].length;
+                }
+            }
+        }
+#endif
+
+        // end of search: have to reduce with pi
+        if (ei > h->ecart)
+        {
+            // It is not possible to reduce h with smaller ecart;
+            // if possible h goes to the lazy-set L,i.e
+            // if its position in L would be not the last one
+            strat->fromT = TRUE;
+            if (!TEST_OPT_REDTHROUGH && strat->Ll >= 0) /*- L is not empty -*/
+            {
+                h->SetLmCurrRing();
+                if (strat->honey && strat->posInLDependsOnLength)
+                    h->SetLength(strat->length_pLength);
+                assume(h->FDeg == h->pFDeg());
+                at = strat->posInL(strat->L,strat->Ll,h,strat);
+                if (at <= strat->Ll && pLmCmp(h->p, strat->L[strat->Ll].p) != 0 && !nEqual(h->p->coef, strat->L[strat->Ll].p->coef))
+                {
+                    /*- h will not become the next element to reduce -*/
+                    enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+#ifdef KDEBUG
+                    if (TEST_OPT_DEBUG) Print(" ecart too big; -> L%d\n",at);
+#endif
+                    h->Clear();
+                    strat->fromT = FALSE;
+                    return -1;
+                }
+            }
+            doRed(h,&(strat->T[ii]),strat->fromT,strat,TRUE);
+        }
+        else
+        {
+            // now we finally can reduce
+            doRed(h,&(strat->T[ii]),strat->fromT,strat,FALSE);
+        }
+        strat->fromT=FALSE;
+        // are we done ???
+        if (h->IsNull())
+        {
+            kDeleteLcm(h);
+            h->Clear();
+            return 0;
+        }
+
+        // NO!
+        h->SetShortExpVector();
+        h->SetpFDeg();
+        if (strat->honey)
+        {
+            if (ei <= h->ecart)
+                h->ecart = d-h->GetpFDeg();
+            else
+                h->ecart = d-h->GetpFDeg()+ei-h->ecart;
+        }
+        else
+            // this has the side effect of setting h->length
+            h->ecart = h->pLDeg(strat->LDegLast) - h->GetpFDeg();
+        /*- try to reduce the s-polynomial -*/
+        pass++;
+        d = h->GetpFDeg()+h->ecart;
+        /*
+         *test whether the polynomial should go to the lazyset L
+         *-if the degree jumps
+         *-if the number of pre-defined reductions jumps
+         */
+        if (!TEST_OPT_REDTHROUGH && (strat->Ll >= 0)
+                && ((d >= reddeg) || (pass > strat->LazyPass)))
+        {
+            h->SetLmCurrRing();
+            if (strat->honey && strat->posInLDependsOnLength)
+                h->SetLength(strat->length_pLength);
+            assume(h->FDeg == h->pFDeg());
+            at = strat->posInL(strat->L,strat->Ll,h,strat);
+            if (at <= strat->Ll)
+            {
+                int dummy=strat->sl;
+                if (kFindDivisibleByInS(strat, &dummy, h) < 0)
+                {
+                    if (strat->honey && !strat->posInLDependsOnLength)
+                        h->SetLength(strat->length_pLength);
+                    return 1;
+                }
+                enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+#ifdef KDEBUG
+                if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
+#endif
+                h->Clear();
+                return -1;
+            }
+        }
+        else if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d >= reddeg))
+        {
+            Print(".%ld",d);mflush();
+            reddeg = d+1;
+            if (h->pTotalDeg()+h->ecart >= (int)strat->tailRing->bitmask)
+            {
+                strat->overflow=TRUE;
+                //Print("OVERFLOW in redEcart d=%ld, max=%ld",d,strat->tailRing->bitmask);
+                h->GetP();
+                at = strat->posInL(strat->L,strat->Ll,h,strat);
+                enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+                h->Clear();
+                return -1;
+            }
+        }
+    }
+}
 #endif
 
 /*2
@@ -761,103 +976,134 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
 #ifdef HAVE_RINGS
 static poly redMoraNFRing (poly h,kStrategy strat, int flag)
 {
-  LObject H;
-  H.p = h;
-  int j = 0;
-  int z = 10;
-  int o = H.SetpFDeg();
-  H.ecart = currRing->pLDeg(H.p,&H.length,currRing)-o;
-  if ((flag & 2) == 0) cancelunit(&H,TRUE);
-  H.sev = pGetShortExpVector(H.p);
-  unsigned long not_sev = ~ H.sev;
-  loop
-  {
-    if (j > strat->tl)
-    {
-      return H.p;
+    LObject H;
+    H.p = h;
+    int j0, j = 0;
+    int z = 10;
+    int docoeffred  = 0;
+    poly T0p    = strat->T[0].p;
+    int T0ecart = strat->T[0].ecart;
+    int o = H.SetpFDeg();
+    H.ecart = currRing->pLDeg(H.p,&H.length,currRing)-o;
+    if ((flag & 2) == 0) cancelunit(&H,TRUE);
+    H.sev = pGetShortExpVector(H.p);
+    unsigned long not_sev = ~ H.sev;
+    if (strat->T[0].GetpFDeg() == 0 && strat->T[0].length <= 2) {
+        docoeffred  = 1;
     }
-    if (TEST_V_DEG_STOP)
+    loop
     {
-      if (kModDeg(H.p)>Kstd1_deg) pLmDelete(&H.p);
-      if (H.p==NULL) return NULL;
-    }
-    if (p_LmShortDivisibleBy(strat->T[j].GetLmTailRing(), strat->sevT[j], H.GetLmTailRing(), not_sev, strat->tailRing)
-        && (n_DivBy(H.p->coef, strat->T[j].p->coef,strat->tailRing->cf))
-        )
-    {
-      /*- remember the found T-poly -*/
-      // poly pi = strat->T[j].p;
-      int ei = strat->T[j].ecart;
-      int li = strat->T[j].length;
-      int ii = j;
-      /*
-      * the polynomial to reduce with (up to the moment) is;
-      * pi with ecart ei and length li
-      */
-      loop
-      {
-        /*- look for a better one with respect to ecart -*/
-        /*- stop, if the ecart is small enough (<=ecart(H)) -*/
-        j++;
-        if (j > strat->tl) break;
-        if (ei <= H.ecart) break;
-        if (((strat->T[j].ecart < ei)
-          || ((strat->T[j].ecart == ei)
-        && (strat->T[j].length < li)))
-        && pLmShortDivisibleBy(strat->T[j].p,strat->sevT[j], H.p, not_sev)
-        && (n_DivBy(H.p->coef, strat->T[j].p->coef,strat->tailRing->cf))
-        )
-        {
-          /*
-          * the polynomial to reduce with is now;
-          */
-          // pi = strat->T[j].p;
-          ei = strat->T[j].ecart;
-          li = strat->T[j].length;
-          ii = j;
+        /* cut down the lead coefficients, only possible if the degree of
+         * T[0] is 0 (constant). This is only efficient if T[0] is short, thus
+         * we ask for the length of T[0] to be <= 2 */
+        if (docoeffred) {
+            j0 = kTestDivisibleByT0_Z(strat, &H);
+            if (j0 == 0 && n_DivBy(pGetCoeff(H.p), pGetCoeff(T0p), currRing->cf) == FALSE
+                    && T0ecart <= H.ecart) {
+                /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
+                 * => we try to cut down the lead coefficient at least */
+                /* first copy T[j0] in order to multiply it with a coefficient later on */
+                number mult, rest;
+                TObject tj  = strat->T[0];
+                tj.Copy();
+                /* compute division with remainder of lc(h) and lc(T[j]) */
+                mult = n_QuotRem(pGetCoeff(H.p), pGetCoeff(T0p),
+                        &rest, currRing->cf);
+                /* set corresponding new lead coefficient already. we do not
+                 * remove the lead term in ksReducePolyLC, but only apply
+                 * a lead coefficient reduction */
+                tj.Mult_nn(mult);
+                ksReducePolyLC(&H, &tj, NULL, &rest, strat);
+                tj.Delete();
+                tj.Clear();
+            }
         }
-      }
-      /*
-      * end of search: have to reduce with pi
-      */
-      z++;
-      if (z>10)
-      {
-        pNormalize(H.p);
-        z=0;
-      }
-      if ((ei > H.ecart) && (!strat->kHEdgeFound))
-      {
-        /*
-        * It is not possible to reduce h with smaller ecart;
-        * we have to reduce with bad ecart: H has to enter in T
-        */
-        doRed(&H,&(strat->T[ii]),TRUE,strat,TRUE);
-        if (H.p == NULL)
-          return NULL;
-      }
-      else
-      {
-        /*
-        * we reduce with good ecart, h need not to be put to T
-        */
-        doRed(&H,&(strat->T[ii]),FALSE,strat,TRUE);
-        if (H.p == NULL)
-          return NULL;
-      }
-      /*- try to reduce the s-polynomial -*/
-      o = H.SetpFDeg();
-      if ((flag &2 ) == 0) cancelunit(&H,TRUE);
-      H.ecart = currRing->pLDeg(H.p,&(H.length),currRing)-o;
-      j = 0;
-      H.sev = pGetShortExpVector(H.p);
-      not_sev = ~ H.sev;
+        if (j > strat->tl)
+        {
+            return H.p;
+        }
+        if (TEST_V_DEG_STOP)
+        {
+            if (kModDeg(H.p)>Kstd1_deg) pLmDelete(&H.p);
+            if (H.p==NULL) return NULL;
+        }
+        if (p_LmShortDivisibleBy(strat->T[j].GetLmTailRing(), strat->sevT[j], H.GetLmTailRing(), not_sev, strat->tailRing)
+                && (n_DivBy(H.p->coef, strat->T[j].p->coef,strat->tailRing->cf))
+           )
+        {
+            /*- remember the found T-poly -*/
+            // poly pi = strat->T[j].p;
+            int ei = strat->T[j].ecart;
+            int li = strat->T[j].length;
+            int ii = j;
+            /*
+             * the polynomial to reduce with (up to the moment) is;
+             * pi with ecart ei and length li
+             */
+            loop
+            {
+                /*- look for a better one with respect to ecart -*/
+                /*- stop, if the ecart is small enough (<=ecart(H)) -*/
+                j++;
+                if (j > strat->tl) break;
+                if (ei <= H.ecart) break;
+                if (((strat->T[j].ecart < ei)
+                            || ((strat->T[j].ecart == ei)
+                                && (strat->T[j].length < li)))
+                        && pLmShortDivisibleBy(strat->T[j].p,strat->sevT[j], H.p, not_sev)
+                        && (n_DivBy(H.p->coef, strat->T[j].p->coef,strat->tailRing->cf))
+                   )
+                {
+                    /*
+                     * the polynomial to reduce with is now;
+                     */
+                    // pi = strat->T[j].p;
+                    ei = strat->T[j].ecart;
+                    li = strat->T[j].length;
+                    ii = j;
+                }
+            }
+            /*
+             * end of search: have to reduce with pi
+             */
+            z++;
+            if (z>10)
+            {
+                pNormalize(H.p);
+                z=0;
+            }
+            if ((ei > H.ecart) && (!strat->kHEdgeFound))
+            {
+                /*
+                 * It is not possible to reduce h with smaller ecart;
+                 * we have to reduce with bad ecart: H has to enter in T
+                 */
+                doRed(&H,&(strat->T[ii]),TRUE,strat,TRUE);
+                if (H.p == NULL)
+                    return NULL;
+            }
+            else
+            {
+                /*
+                 * we reduce with good ecart, h need not to be put to T
+                 */
+                doRed(&H,&(strat->T[ii]),FALSE,strat,TRUE);
+                if (H.p == NULL)
+                    return NULL;
+            }
+            /*- try to reduce the s-polynomial -*/
+            o = H.SetpFDeg();
+            if ((flag &2 ) == 0) cancelunit(&H,TRUE);
+            H.ecart = currRing->pLDeg(H.p,&(H.length),currRing)-o;
+            j = 0;
+            H.sev = pGetShortExpVector(H.p);
+            not_sev = ~ H.sev;
+        }
+        else
+        {
+            j++;
+        }
     }
-    else
-    {
-      j++;
-    }
-  }
 }
 #endif
 
@@ -1485,8 +1731,12 @@ void initMora(ideal F,kStrategy strat)
     strat->HCord = 32000;/*- very large -*/
   }
 
-  if (rField_is_Ring(currRing))
-    strat->red = redRiloc;
+  if (rField_is_Ring(currRing)) {
+    if (rField_is_Z(currRing))
+      strat->red = redRiloc_Z;
+    else
+      strat->red = redRiloc;
+  }
 
   /*reads the ecartWeights used for Graebes method from the
    *intvec ecart and set ecartWeights

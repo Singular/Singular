@@ -601,6 +601,8 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
 int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int start=0);
 int kFindSameLMInT_Z(const kStrategy strat, const LObject* L, const int start=0);
 
+/// tests if T[0] divides the leading monomial of L, returns -1 if not
+int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L);
 /// return -1 if no divisor is found
 ///        number of first divisor in S, otherwise
 int kFindDivisibleByInS(const kStrategy strat, int *max_ind, LObject* L);
