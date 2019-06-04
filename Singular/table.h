@@ -1330,8 +1330,10 @@ const struct sConvertTypes dConvertTypes[] =
 //  matrix -> module
    { MATRIX_CMD,      MODUL_CMD,      D(iiMa2Mo) , NULL_VAL },
 //  intvec
-//  link
+//  string -> link
    { STRING_CMD,      LINK_CMD,       D(iiS2Link) , NULL_VAL },
+//  string -> int
+   { STRING_CMD,      INT_CMD,        D(iiS2I) , NULL_VAL },
 // resolution -> list
    { RESOLUTION_CMD,  LIST_CMD,       NULL_VAL , D(iiR2L_l) },
 // list -> resolution
