@@ -195,7 +195,7 @@ int     iiDeclCommand(leftv sy, leftv name, int lev, int t, idhdl* root,
   BOOLEAN isring = FALSE, BOOLEAN init_b=TRUE);
 BOOLEAN iiMake_proc(idhdl pn, package pack, leftv sl);
 void* iiCallLibProc1(const char* n, void *arg, int arg_type, BOOLEAN &err);
-void* iiCallLibProcM(const char* n, void **args, int *arg_types, BOOLEAN &err);
+leftv ii_CallLibProcM(const char* n, void **args, int *arg_types, const ring R, BOOLEAN &err);
 ideal ii_CallProcId2Id(const char* lib,const char* proc, ideal arg,const ring R);
 int ii_CallProcId2Int(const char* lib,const char* proc, ideal arg,const ring R);
 // from misc.cc:

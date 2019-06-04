@@ -4768,7 +4768,7 @@ static BOOLEAN jjPARSTR1(leftv res, leftv v)
 {
   if (currRing==NULL)
   {
-    WerrorS("no ring active");
+    WerrorS("no ring active (1)");
     return TRUE;
   }
   int i=(int)(long)v->Data();
@@ -5389,7 +5389,7 @@ static BOOLEAN jjVARSTR1(leftv res, leftv v)
 {
   if (currRing==NULL)
   {
-    WerrorS("no ring active");
+    WerrorS("no ring active (2)");
     return TRUE;
   }
   int i=(int)(long)v->Data();
@@ -7684,15 +7684,15 @@ static BOOLEAN jjLIFT_4(leftv res, leftv U)
   else
   {
     Werror("%s(`ideal`,`ideal`,`matrix`,`string`)\n"
-           "or (`module`,`module`,`matrix`,`string`)expected",
+           "or (`module`,`module`,`matrix`,`string`) expected",
            Tok2Cmdname(iiOp));
     return TRUE;
   }
 }
 static BOOLEAN jjLIFTSTD_4(leftv res, leftv U)
 {
-  const short t1[]={4,IDEAL_CMD,IDEAL_CMD,MATRIX_CMD,STRING_CMD};
-  const short t2[]={4,MODUL_CMD,MODUL_CMD,MATRIX_CMD,STRING_CMD};
+  const short t1[]={4,IDEAL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD};
+  const short t2[]={4,MODUL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD};
   leftv u=U;
   leftv v=u->next;
   leftv w=v->next;
@@ -7715,8 +7715,8 @@ static BOOLEAN jjLIFTSTD_4(leftv res, leftv U)
   }
   else
   {
-    Werror("%s(`ideal`,`ideal`,`matrix`,`string`)\n"
-           "or (`module`,`module`,`matrix`,`string`)expected",
+    Werror("%s(`ideal`,`matrix`,`module`,`string`)\n"
+           "or (`module`,`matrix`,`module`,`string`) expected",
            Tok2Cmdname(iiOp));
     return TRUE;
   }
@@ -7928,6 +7928,74 @@ static BOOLEAN jjRESERVED0(leftv, leftv)
   PrintLn();
   printBlackboxTypes();
   return FALSE;
+}
+
+static BOOLEAN jjRESERVEDLIST0(leftv res, leftv)
+{
+	unsigned i=1;
+	int l = 0;
+	int k = 0;
+	lists L = (lists)omAllocBin(slists_bin);
+	struct blackbox_list *bb_list = NULL;
+	unsigned nCount = (sArithBase.nCmdUsed-1) / 3;
+	if ((3*nCount) < sArithBase.nCmdUsed) {
+		nCount++;
+	}
+	bb_list = getBlackboxTypes();
+	// count the  number of entries;
+	for (i=0; i<nCount; i++) {
+		l++;
+		if (i + 1 + nCount < sArithBase.nCmdUsed) {
+			l++;
+		}
+		if(i+1+2*nCount<sArithBase.nCmdUsed) {
+			l++;
+		}
+	}
+	for (i = 0; i < bb_list->count; i++) {
+		if (bb_list->list[i] != NULL) {
+			l++;
+		}
+	}
+	// initiate list
+	L->Init(l);
+	k = 0;
+	for (i=0; i<nCount; i++) {
+		L->m[k].rtyp = STRING_CMD;
+		L->m[k].data = omStrDup(sArithBase.sCmds[i+1].name);
+		k++;
+		// Print("%-20s", sArithBase.sCmds[i+1].name);
+		if (i + 1 + nCount < sArithBase.nCmdUsed) {
+			L->m[k].rtyp = STRING_CMD;
+			L->m[k].data = omStrDup(sArithBase.sCmds[i+1+nCount].name);
+			k++;
+			// Print("%-20s", sArithBase.sCmds[i+1 + nCount].name);
+		}
+		if(i+1+2*nCount<sArithBase.nCmdUsed) {
+			L->m[k].rtyp = STRING_CMD;
+			L->m[k].data = omStrDup(sArithBase.sCmds[i+1+2*nCount].name);
+			k++;
+			// Print("%-20s", sArithBase.sCmds[i+1+2*nCount].name);
+		}
+		// PrintLn();
+	}
+
+	// assign blackbox types
+	for (i = 0; i < bb_list->count; i++) {
+		if (bb_list->list[i] != NULL) {
+			L->m[k].rtyp = STRING_CMD;
+			// already used strdup in getBlackBoxTypes
+			L->m[k].data = bb_list->list[i];
+			k++;
+		}
+	}
+	// free the struct (not the list itself)
+	omfree(bb_list);
+
+	// pass the resultant list to the res datastructure
+	res->data=(void *)L;
+
+	return FALSE;
 }
 static BOOLEAN jjSTRING_PL(leftv res, leftv v)
 {
@@ -8151,7 +8219,7 @@ static BOOLEAN jjSUBST_M(leftv res, leftv u)
   if (v==NULL) return TRUE;
   leftv w = v->next;
   if (w==NULL) return TRUE;
-  leftv rest = w->next;;
+  leftv rest = w->next;
 
   u->next = NULL;
   v->next = NULL;
@@ -8354,7 +8422,7 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
         {
           if (RingDependend(dA2[i].res))
           {
-            WerrorS("no ring active");
+            WerrorS("no ring active (3)");
             break;
           }
         }
@@ -8398,7 +8466,7 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
               {
                 if (RingDependend(dA2[i].res))
                 {
-                  WerrorS("no ring active");
+                  WerrorS("no ring active (4)");
                   break;
                 }
               }
@@ -8581,7 +8649,7 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, const struct sValCmd1* dA1, 
         {
           if (RingDependend(dA1[i].res))
           {
-            WerrorS("no ring active");
+            WerrorS("no ring active (5)");
             break;
           }
         }
@@ -8624,7 +8692,7 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, const struct sValCmd1* dA1, 
             {
               if (RingDependend(dA1[i].res))
               {
-                WerrorS("no ring active");
+                WerrorS("no ring active (6)");
                 break;
               }
             }
@@ -9756,7 +9824,7 @@ static int jjCOMPARE_ALL(const void * aa, const void * bb)
   leftv a=(leftv)aa;
   int at=a->Typ();
   leftv b=(leftv)bb;
-  int bt=b->Typ();;
+  int bt=b->Typ();
   if (at < bt) return -1;
   if (at > bt) return 1;
   int tab_pos=iiTabIndex(dArithTab2,JJTAB2LEN,'<');

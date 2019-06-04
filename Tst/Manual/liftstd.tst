@@ -10,4 +10,8 @@ LIB "tst.lib"; tst_init();
   module s;
   sm=liftstd(i,T,s);
   print(s);
+  sm=liftstd(i,T,s,"std");
+  print(s);
+  sm=liftstd(i,T,s,"slimgb");
+  print(s);
 tst_status(1);$

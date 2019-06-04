@@ -2522,7 +2522,7 @@ yyreduce:
 /* Line 1464 of yacc.c  */
 #line 454 "grammar.y"
     {
-            if (currRing==NULL) MYYERROR("no ring active");
+            if (currRing==NULL) MYYERROR("no ring active (7)");
             syMakeMonom(&(yyval.lv),(yyvsp[(1) - (1)].name));
           ;}
     break;
@@ -2587,7 +2587,7 @@ yyreduce:
 /* Line 1464 of yacc.c  */
 #line 489 "grammar.y"
     {
-            if (currRingHdl==NULL) MYYERROR("no ring active");
+            if (currRing==NULL) MYYERROR("no ring active (8)");
             int j = 0;
             memset(&(yyval.lv),0,sizeof(sleftv));
             (yyval.lv).rtyp=VECTOR_CMD;

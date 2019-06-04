@@ -932,9 +932,9 @@ const struct sValCmdM dArithM[]=
 ,{D(jjCALL2ARG),  LIFT_CMD,        MATRIX_CMD,          2  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL3ARG),  LIFT_CMD,        MATRIX_CMD,          3  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLIFT_4),    LIFT_CMD,        MATRIX_CMD,          4  , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCALL2ARG),  LIFTSTD_CMD,     MODUL_CMD,/*or IDEAL*/2  , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCALL3ARG),  LIFTSTD_CMD,     MODUL_CMD,/*or IDEAL*/3  , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjLIFTSTD_4), LIFTSTD_CMD,     MODUL_CMD,/*or IDEAL*/4  , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCALL2ARG),  LIFTSTD_CMD,     IDEAL_CMD,/*or MODUL*/2  , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCALL3ARG),  LIFTSTD_CMD,     IDEAL_CMD,/*or MODUL*/3  , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjLIFTSTD_4), LIFTSTD_CMD,     IDEAL_CMD,/*or MODUL*/4  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLIST_PL),   LIST_CMD,        LIST_CMD,           -1      , ALLOW_NC |ALLOW_RING}
 ,{D(jjLU_INVERSE),LUI_CMD,         LIST_CMD,           -2      , NO_NC |NO_RING}
 ,{D(jjLU_SOLVE),  LUS_CMD,         LIST_CMD,           -2      , NO_NC |NO_RING}
@@ -952,6 +952,8 @@ const struct sValCmdM dArithM[]=
 ,{D(jjREDUCE5),   REDUCE_CMD,      IDEAL_CMD/*or set by p*/,  5, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL1ARG),  RESERVEDNAME_CMD, INT_CMD,            1      , ALLOW_NC |ALLOW_RING}
 ,{D(jjRESERVED0), RESERVEDNAME_CMD, NONE,               0      , ALLOW_NC |ALLOW_RING}
+//,{D(jjCALL1ARG),  RESERVEDNAMELIST_CMD, LIST_CMD,            1      , ALLOW_NC |ALLOW_RING}
+,{D(jjRESERVEDLIST0), RESERVEDNAMELIST_CMD, LIST_CMD,               0      , ALLOW_NC |ALLOW_RING}
 ,{D(jjSTRING_PL), STRING_CMD,      STRING_CMD,         -1      , ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL3ARG),  SUBST_CMD,       NONE/*set by p*/,   3       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSUBST_M),   SUBST_CMD,       NONE/*set by p*/,   -2      , ALLOW_PLURAL |ALLOW_RING}
@@ -1170,6 +1172,7 @@ VAR cmdnames cmds[] =
   { "regularity",  0, REGULARITY_CMD ,    CMD_1},
   { "repart",      0, REPART_CMD ,        CMD_1},
   { "reservedName",0, RESERVEDNAME_CMD ,  CMD_M},
+  { "reservedNameList",0, RESERVEDNAMELIST_CMD ,  CMD_M},
   { "resolution",  0, RESOLUTION_CMD ,    RING_DECL},
   { "resultant",   0, RESULTANT_CMD,      CMD_3},
   { "restart",     0, RESTART_CMD,        CMD_1},

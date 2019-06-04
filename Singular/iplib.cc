@@ -483,7 +483,7 @@ static void iiCheckNest()
     iiRETURNEXPR_len+=16;
   }
 }
-BOOLEAN iiMake_proc(idhdl pn, package pack, leftv sl)
+BOOLEAN iiMake_proc(idhdl pn, package pack, leftv args)
 {
   int err;
   procinfov pi = IDPROC(pn);
@@ -530,11 +530,11 @@ BOOLEAN iiMake_proc(idhdl pn, package pack, leftv sl)
                    currPackHdl=packFindHdl(currPack);
                    //Print("set pack=%s\n",IDID(currPackHdl));
                  }
-                 err=iiPStart(pn,sl);
+                 err=iiPStart(pn,args);
                  break;
     case LANG_C:
                  leftv res = (leftv)omAlloc0Bin(sleftv_bin);
-                 err = (pi->data.o.function)(res, sl);
+                 err = (pi->data.o.function)(res, args);
                  memcpy(&iiRETURNEXPR,res,sizeof(iiRETURNEXPR));
                  omFreeBin((ADDRESS)res,  sleftv_bin);
                  break;
@@ -573,17 +573,17 @@ static void iiCallLibProcBegin()
   idhdl tmp_ring=NULL;
   if (currRing!=NULL)
   {
-    if (IDRING(currRingHdl)!=currRing)
+    if ((currRingHdl!=NULL) && (IDRING(currRingHdl)!=currRing))
     {
       // clean up things depending on currRingHdl:
       sLastPrinted.CleanUp(IDRING(currRingHdl));
       sLastPrinted.Init();
-      // need to define a ring-hdl for currRingHdl
-      tmp_ring=enterid(" tmpRing",myynest,RING_CMD,&IDROOT,FALSE);
-      IDRING(tmp_ring)=currRing;
-      currRing->ref++;
-      rSetHdl(tmp_ring);
     }
+    // need to define a ring-hdl for currRingHdl
+    tmp_ring=enterid(" tmpRing",myynest,RING_CMD,&IDROOT,FALSE);
+    IDRING(tmp_ring)=currRing;
+    currRing->ref++;
+    rSetHdl(tmp_ring);
   }
 }
 static void iiCallLibProcEnd(idhdl save_ringhdl, ring save_ring)
@@ -601,10 +601,6 @@ static void iiCallLibProcEnd(idhdl save_ringhdl, ring save_ring)
       else prev->next=hh->next;
       omFree((ADDRESS)IDID(hh));
       omFreeBin((ADDRESS)hh, idrec_bin);
-    }
-    else
-    {
-      WarnS("internal: lost ring in iiCallLib");
     }
   }
   currRingHdl=save_ringhdl;
@@ -685,7 +681,7 @@ int ii_CallProcId2Int(const char *lib,const char *proc, ideal arg, const ring R)
 
 /// args: NULL terminated array of arguments
 /// arg_types: 0 terminated array of corresponding types
-void* iiCallLibProcM(const char*n, void **args, int* arg_types, BOOLEAN &err)
+leftv ii_CallLibProcM(const char*n, void **args, int* arg_types, const ring R, BOOLEAN &err)
 {
   idhdl h=ggetid(n);
   if ((h==NULL)
@@ -697,6 +693,7 @@ void* iiCallLibProcM(const char*n, void **args, int* arg_types, BOOLEAN &err)
   // ring handling
   idhdl save_ringhdl=currRingHdl;
   ring save_ring=currRing;
+  rChangeCurrRing(R);
   iiCallLibProcBegin();
   // argument:
   if (arg_types[0]!=0)
@@ -709,7 +706,7 @@ void* iiCallLibProcM(const char*n, void **args, int* arg_types, BOOLEAN &err)
     tmp.rtyp=arg_types[0];
     while(arg_types[i]!=0)
     {
-      tt->next=(leftv)omAlloc0(sizeof(sleftv));
+      tt->next=(leftv)omAlloc0Bin(sleftv_bin);
       tt=tt->next;
       tt->rtyp=arg_types[i];
       tt->data=args[i];
@@ -726,10 +723,10 @@ void* iiCallLibProcM(const char*n, void **args, int* arg_types, BOOLEAN &err)
   // return
   if (err==FALSE)
   {
-    void*r=iiRETURNEXPR.data;
-    iiRETURNEXPR.data=NULL;
-    iiRETURNEXPR.CleanUp();
-    return r;
+    leftv h=(leftv)omAllocBin(sleftv_bin);
+    memcpy(h,&iiRETURNEXPR,sizeof(sleftv));
+    memset(&iiRETURNEXPR,0,sizeof(sleftv));
+    return h;
   }
   return NULL;
 }

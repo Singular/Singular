@@ -96,37 +96,6 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 @section ncfactor_lib
 @c lib ncfactor.lib
 @c ----------------------------------------------------------
-@node ncpreim_lib
-@section ncpreim_lib
-@c lib ncpreim.lib
-@c ----------------------------------------------------------
-@node nctools_lib
-@section nctools_lib
-@c lib nctools.lib
-@c ----------------------------------------------------------
-@node perron_lib
-@section perron_lib
-@c lib perron.lib
-@c ---------------------------------------------------------
-@node qmatrix_lib
-@section qmatrix_lib
-@c lib qmatrix.lib
-@c ----------------------------------------------------------
-@node purityfiltration_lib
-@section purityfiltration_lib
-Status: experimental
-@c lib purityfiltration.lib
-@c ----------------------------------------------------------
-@node nchomolog_lib
-@section nchomolog_lib
-Status: experimental
-@c lib nchomolog.lib
-@c ----------------------------------------------------------
-@node ratgb_lib
-@section ratgb_lib
-Status: experimental
-@c lib ratgb.lib
-@c ----------------------------------------------------------
 @c @node bimodules_lib
 @c @section bimodules_lib
 @c Status: experimental
@@ -141,13 +110,44 @@ Status: experimental
 @section ncfrac_lib
 @c lib ncfrac.lib
 @c ----------------------------------------------------------
+@node nchomolog_lib
+@section nchomolog_lib
+Status: experimental
+@c lib nchomolog.lib
+@c ----------------------------------------------------------
 @node ncloc_lib
 @section ncloc_lib
 @c lib ncloc.lib
 @c ----------------------------------------------------------
+@node ncpreim_lib
+@section ncpreim_lib
+@c lib ncpreim.lib
+@c ----------------------------------------------------------
+@node nctools_lib
+@section nctools_lib
+@c lib nctools.lib
+@c ----------------------------------------------------------
 @node olga_lib
 @section olga_lib
 @c lib olga.lib
+@c ----------------------------------------------------------
+@node perron_lib
+@section perron_lib
+@c lib perron.lib
+@c ---------------------------------------------------------
+@node purityfiltration_lib
+@section purityfiltration_lib
+Status: experimental
+@c lib purityfiltration.lib
+@c ----------------------------------------------------------
+@node qmatrix_lib
+@section qmatrix_lib
+@c lib qmatrix.lib
+@c ----------------------------------------------------------
+@node ratgb_lib
+@section ratgb_lib
+Status: experimental
+@c lib ratgb.lib
 @c ----------------------------------------------------------
 @raisesections
 
