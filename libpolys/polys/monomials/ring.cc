@@ -5107,7 +5107,7 @@ int rGetMaxSyzComp(int i, const ring r)
   }
 }
 
-BOOLEAN rRing_is_Homog(ring r)
+BOOLEAN rRing_is_Homog(const ring r)
 {
   if (r == NULL) return FALSE;
   int i, j, nb = rBlocks(r);
@@ -5129,11 +5129,41 @@ BOOLEAN rRing_is_Homog(ring r)
   return TRUE;
 }
 
-BOOLEAN rRing_has_CompLastBlock(ring r)
+BOOLEAN rRing_has_CompLastBlock(const ring r)
 {
   assume(r != NULL);
   int lb = rBlocks(r) - 2;
   return (r->order[lb] == ringorder_c || r->order[lb] == ringorder_C);
+}
+
+BOOLEAN rRing_ord_pure_dp(const ring r)
+{
+  if ((r->order[0]==ringorder_dp) &&(r->block0[0]==1) &&(r->block0[0]==r->N))
+    return TRUE;
+  if (((r->order[0]==ringorder_c)||(r->order[0]==ringorder_C))
+  && ((r->order[1]==ringorder_dp) &&(r->block0[1]==1) &&(r->block0[1]==r->N)))
+    return TRUE;
+  return FALSE;
+}
+
+BOOLEAN rRing_ord_pure_Dp(const ring r)
+{
+  if ((r->order[0]==ringorder_Dp) &&(r->block0[0]==1) &&(r->block0[0]==r->N))
+    return TRUE;
+  if (((r->order[0]==ringorder_c)||(r->order[0]==ringorder_C))
+  && ((r->order[1]==ringorder_Dp) &&(r->block0[1]==1) &&(r->block0[1]==r->N)))
+    return TRUE;
+  return FALSE;
+}
+
+BOOLEAN rRing_ord_pure_lp(const ring r)
+{
+  if ((r->order[0]==ringorder_lp) &&(r->block0[0]==1) &&(r->block0[0]==r->N))
+    return TRUE;
+  if (((r->order[0]==ringorder_c)||(r->order[0]==ringorder_C))
+  && ((r->order[1]==ringorder_lp) &&(r->block0[1]==1) &&(r->block0[1]==r->N)))
+    return TRUE;
+  return FALSE;
 }
 
 int64 * rGetWeightVec(const ring r)
