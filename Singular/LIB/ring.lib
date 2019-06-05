@@ -1340,28 +1340,107 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 /*
- * parses "(v1,v2,v3,v4,v5)" to list("v1", "v2", "v3", "v4", "v5")
+ * parses
+ * "(v1,v2,v3,v4,v5)" to list("v1", "v2", "v3", "v4", "v5"),
+ * "(dp(3), a(1,2,3), ds(3))" to list("dp(3)", "a(1,2,3)", "ds(3)"), and
+ * "(1,2,3,4)" to list("1", "2", "3", "4")
  */
-static proc parse_L2(string l2)
+static proc tuple_to_tokens(string s)
 {
-  list V;
+  list L;
   int index = 1;
   int curr = 2;
-  int next = find(l2, ",", curr+1);
+  while (s[curr] == " ")
+  {
+    curr++;
+  }
+  int next = find(s, ",", curr+1);
+  int b = find(s, "(", curr+1);
+  if (b != 0 && b < next)
+  {
+    next = find(s, ",", find(s, ")", b+1)+1);
+  }
   while (next != 0)
   {
-    V[index] = l2[curr..(next-1)];
+    L[index] = string(s[curr, next-curr]);
     index++;
     curr = next+1;
-    next = find(l2, ",", curr+1);
+    while (s[curr] == " ")
+    {
+      curr++;
+    }
+    next = find(s, ",", curr+1);
+    b = find(s, "(", curr+1);
+    if (b != 0 && b < next)
+    {
+      next = find(s, ",", find(s, ")", b+1)+1);
+    }
   }
-  V[index] = l2[curr..(size(l2)-1)];
+  L[index] = string(s[curr, size(s)-curr]);
+  return(L);
+}
+
+static proc parse_L2(string l2)
+{
+  list V = tuple_to_tokens(l2);
   return(V);
+}
+
+/*
+ * parses
+ * "dp" to list("dp", 1:n_vars),
+ * "dp(3)" to list("dp", 1:3),
+ * "c" to list("c", intvec(0)), and
+ * "wp(3,4)" to list("wp", intvec(3, 4))
+ */
+static proc parse_ordering(string ordering, int n_vars)
+{
+  string name;
+  intvec w;
+  int b1 = find(ordering, "(", 1);
+  if (b1 == 0)   // no parentheses
+  {
+    name = ordering;
+    if (name == "C" || name == "c")
+    {
+      w = intvec(0);
+    }
+    else
+    {
+      w = 1:n_vars;
+    }
+  }
+  else
+  {
+    name = ordering[1, b1-1];
+    int b2 = find(ordering, ")", b1+1);
+    int c = find(ordering, ",", b1+1);
+    if (c == 0)
+    {
+      w = 1:int(ordering[b1+1, b2-b1-1]);
+    }
+    else
+    {
+      list W = tuple_to_tokens(ordering[b1, b2-b1+1]);
+      w = intvec(int(W[1..size(W)]));
+    }
+  }
+  return(list(name, w));
 }
 
 static proc parse_L3(string l3, int n_vars)
 {
-  list L =  list(list(l3, intvec(n_vars)), list("C", intvec(0)));
+  if (l3[1] != "(")
+  {
+    list L =  parse_ordering(l3, n_vars);
+    return(L);
+  }
+  // block orderings
+  list L = tuple_to_tokens(l3);
+  for (int i = size(L); i > 0; i--)
+  {
+    L[i] = parse_ordering(L[i], n_vars);
+  }
   return(L);
 }
 
@@ -1376,9 +1455,9 @@ NOTE:    l1, l2, l3, l4 are assumed to be the four entries of ringlist(R)
          in l1, if present, is set to 0.
          @* Shortcuts: Strings such as \"(x,y,z)\" can be given as l2.
          Indexed variables as in \"(x(1..3),y,z)\" are not supported.
-         Strings representing simple orderings such as \"dp\" or \"lp\" can
-         be given as l3, but more complicated cases such as \"(c,dp)\" are
-         not supported.
+         Strings representing orderings such as \"dp\" or \"(lp(3), ds(2))\"
+         can be given as l3, except matrix orderings given by
+         \"M([intmat_expression])\".
 EXAMPLE: example create_ring; shows an example
 "
 {
