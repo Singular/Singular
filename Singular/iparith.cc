@@ -4960,6 +4960,11 @@ static BOOLEAN jjRPAR(leftv res, leftv v)
   res->data = (char *)(long)rPar(((ring)v->Data()));
   return FALSE;
 }
+static BOOLEAN jjS2I(leftv res, leftv v)
+{
+  res->data = (char *)(long)atoi((char*)v->Data());
+  return FALSE;
+}
 static BOOLEAN jjSLIM_GB(leftv res, leftv u)
 {
   const bool bIsSCA = rIsSCA(currRing);

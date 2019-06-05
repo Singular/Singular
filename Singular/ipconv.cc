@@ -396,13 +396,6 @@ static void * iiS2Link(void *data)
   return (void *)l;
 }
 
-static void *iiS2I(void *data)
-{
-  int i = atoi((char*)data);
-  omFree((ADDRESS)data);
-  return (void*)(long)i;
-}
-
 static void iiR2L_l(leftv out, leftv in)
 {
   int add_row_shift = 0;

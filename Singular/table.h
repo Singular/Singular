@@ -151,6 +151,7 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjnlInt),      INT_CMD,         INT_CMD,        BIGINT_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjnInt),       INT_CMD,         INT_CMD,        NUMBER_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjP2I),        INT_CMD,         INT_CMD,        POLY_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjS2I),        INT_CMD,         INT_CMD,        STRING_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjINTERRED),   INTERRED_CMD,    IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |NO_RING}
 ,{D(jjINTERRED),   INTERRED_CMD,    MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |NO_RING}
 ,{D(jjBI2IM),      INTMAT_CMD,      INTMAT_CMD,     BIGINTMAT_CMD  , ALLOW_PLURAL |ALLOW_RING}
@@ -1332,8 +1333,6 @@ const struct sConvertTypes dConvertTypes[] =
 //  intvec
 //  string -> link
    { STRING_CMD,      LINK_CMD,       D(iiS2Link) , NULL_VAL },
-//  string -> int
-   { STRING_CMD,      INT_CMD,        D(iiS2I) , NULL_VAL },
 // resolution -> list
    { RESOLUTION_CMD,  LIST_CMD,       NULL_VAL , D(iiR2L_l) },
 // list -> resolution
