@@ -11,7 +11,7 @@
  *
  * This file is work in progress and currently not part of the official Singular
  *
- * @note the code is garded by the version test __FLINT_RELEASE >= 20500 (>=2.5)
+ * @note the code is garded by the version test __FLINT_RELEASE >= 20503 (>=2.5.3)
  * In its current form it will never become an official part.
  * (conversion routines may be moved to other files/directories, etc.)
  *
@@ -27,7 +27,7 @@
 #ifdef HAVE_FLINT
 #include <flint/flint.h>
 
-#if __FLINT_RELEASE >= 20500
+#if __FLINT_RELEASE >= 20503
 #include "polys/matpol.h"
 #include "coeffs/bigintmat.h"
 #include <flint/fmpz.h>

@@ -22,6 +22,8 @@
 #include "polys/templates/p_MemCmp.h"
 #include "polys/templates/p_MemAdd.h"
 #include "polys/templates/p_MemCopy.h"
+#include "polys/flintconv.h"
+#include "polys/flint_mpoly.h"
 
 #include "p_Mult_q.h"
 
@@ -290,6 +292,31 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
     l = lp;
     lp = lq;
     lq = l;
+  }
+  #define MIN_FLINT_QQ 1
+  #define MIN_FLINT_Zp 1
+  if (lq>MIN_FLINT_QQ)
+  {
+    fmpq_mpoly_ctx_t ctx;
+    if ((p_GetComp(p,r)==0) && (p_GetComp(q,r)==0)
+    && rField_is_Q(r) && !convSingRFlintR(ctx,r))
+    {
+      lp=pLength(p);
+      //printf("mul in flint\n");
+      return Flint_Mult_MP(p,lp,q,lq,ctx,r);
+    }
+  }
+  //if (lq>MIN_FLINT_Zp)
+  if(0)
+  {
+    nmod_mpoly_ctx_t ctx;
+    if ((p_GetComp(p,r)==0) && (p_GetComp(q,r)==0)
+    && rField_is_Zp(r) && !convSingRFlintR(ctx,r))
+    {
+      lp=pLength(p);
+      //printf("mul in flint\n");
+      return Flint_Mult_MP(p,lp,q,lq,ctx,r);
+    }
   }
   if (lq < MIN_LENGTH_BUCKET || TEST_OPT_NOT_BUCKETS)
     return _p_Mult_q_Normal(p, q, copy, r);

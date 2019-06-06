@@ -12,7 +12,7 @@
 #include "flintconv.h"
 
 #ifdef HAVE_FLINT
-#if __FLINT_RELEASE >= 20500
+#if __FLINT_RELEASE >= 20503
 #include "coeffs/coeffs.h"
 #include "coeffs/longrat.h"
 #include "polys/monomials/p_polys.h"
@@ -50,6 +50,7 @@ number convFlintNSingN (fmpz_t f)
   fmpz_get_mpz(z,f);
   number n;
   nlMPZ(z,n,NULL);
+  mpz_clear(z);
   return n;
 }
 number convFlintNSingN (fmpq_t f, const coeffs cf)
@@ -62,6 +63,7 @@ number convFlintNSingN (fmpq_t f, const coeffs cf)
     #if defined(LDEBUG)
     z->debug=123456;
     #endif
+    z->s=0;
     mpz_init(z->z);
     mpz_init(z->n);
     fmpq_get_mpz_frac(z->z,z->n,f);
@@ -81,6 +83,7 @@ number convFlintNSingN (fmpq_t f, const coeffs cf)
     mpz_clear(b);
   }
   n_Normalize(z,cf);
+  n_Test(z,cf);
   return z;
 #else
   WerrorS("not implemented");
@@ -192,6 +195,7 @@ poly convFlintPSingP(fmpq_poly_t f, const ring r)
     p_Setm(pp,r);
     p=p_Add_q(p,pp,r);
   }
+  p_Test(p,r);
   return p;
 }
 

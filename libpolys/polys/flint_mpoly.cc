@@ -1,0 +1,198 @@
+// emacs edit mode for this file is -*- C++ -*-
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+/*
+* ABSTRACT: flint mpoly
+*/
+
+#include "misc/auxiliary.h"
+#include "flintconv.h"
+#include "flint_mpoly.h"
+
+#ifdef HAVE_FLINT
+#if __FLINT_RELEASE >= 20503
+#include "coeffs/coeffs.h"
+#include "coeffs/longrat.h"
+#include "polys/monomials/p_polys.h"
+
+BOOLEAN convSingRFlintR(fmpq_mpoly_ctx_t ctx, const ring r)
+{
+  if (rRing_ord_pure_dp(r))
+  {
+    fmpq_mpoly_ctx_init(ctx,r->N,ORD_DEGREVLEX);
+    return FALSE;
+  }
+  else if (rRing_ord_pure_Dp(r))
+  {
+    fmpq_mpoly_ctx_init(ctx,r->N,ORD_DEGLEX);
+    return FALSE;
+  }
+  else if (rRing_ord_pure_lp(r))
+  {
+    fmpq_mpoly_ctx_init(ctx,r->N,ORD_LEX);
+    return FALSE;
+  }
+  return TRUE;
+}
+
+void convSingPFlintMP(fmpq_mpoly_t res, fmpq_mpoly_ctx_t ctx, poly p, int lp, const ring r)
+{
+  int bits=SI_LOG2(r->bitmask);
+  fmpq_mpoly_init3(res,lp,bits,ctx);
+  fmpq_mpoly_resize(res,lp,ctx);
+  ulong* exp=(ulong*)omAlloc((r->N+1)*sizeof(ulong));
+  int i=0;
+  while(p!=NULL)
+  {
+    number n=pGetCoeff(p);
+    fmpq_t c;
+    convSingNFlintN(c,n,r->cf);
+    #if SIZEOF_LONG==8
+    p_GetExpVL(p,(int64*)exp,r);
+    fmpq_mpoly_set_term_exp_ui(res,i,exp,ctx);
+    #else
+    p_GetExpV(p,(int*)exp,r);
+    fmpq_mpoly_set_term_exp_ui(res,i,&(exp[1]),ctx);
+    #endif
+    fmpq_mpoly_set_term_coeff_fmpq(res,i,c,ctx);
+    fmpq_clear(c);
+    i++;
+    pIter(p);
+  }
+  //fmpq_mpoly_print_pretty(res,r->names,ctx);PrintLn();
+  omFreeSize(exp,(r->N+1)*sizeof(ulong));
+}
+
+poly convFlintMPSingP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, const ring r)
+{
+  int d=fmpq_mpoly_length(f,ctx)-1;
+  poly p=NULL;
+  ulong* exp=(ulong*)omAlloc0((r->N+1)*sizeof(ulong));
+  for(int i=d; i>=0; i--)
+  {
+    fmpq_t c;
+    fmpq_mpoly_get_term_coeff_fmpq(c,f,i,ctx);
+    poly pp=p_Init(r);
+    #if SIZEOF_LONG==8
+    fmpq_mpoly_get_term_exp_ui(exp,f,i,ctx);
+    p_SetExpVL(pp,(int64*)exp,r);
+    #else
+    fmpq_mpoly_get_term_exp_ui(&(exp[1]),f,i,ctx);
+    p_SetExpV(pp,(int*)exp,r);
+    #endif
+    p_Setm(pp,r);
+    number n=convFlintNSingN(c,r->cf);
+    //fmpq_clear(c); // LEAK?
+    pSetCoeff0(pp,n);
+    pNext(pp)=p;
+    p=pp;
+  }
+  p_Test(p,r);
+  return p;
+}
+
+poly Flint_Mult_MP(poly p,int lp, poly q, int lq, fmpq_mpoly_ctx_t ctx, const ring r)
+{
+  fmpq_mpoly_t pp,qq,res;
+  convSingPFlintMP(pp,ctx,p,lp,r);
+  convSingPFlintMP(qq,ctx,q,lq,r);
+  int bits=SI_LOG2(r->bitmask);
+  fmpq_mpoly_init3(res,lp*lq,bits,ctx);
+  fmpq_mpoly_mul(res,pp,qq,ctx);
+  poly pres=convFlintMPSingP(res,ctx,r);
+  fmpq_mpoly_clear(res,ctx);
+  fmpq_mpoly_clear(pp,ctx);
+  fmpq_mpoly_clear(qq,ctx);
+  fmpq_mpoly_ctx_clear(ctx);
+  p_Test(pres,r);
+  return pres;
+}
+BOOLEAN convSingRFlintR(nmod_mpoly_ctx_t ctx, const ring r)
+{
+  if (rRing_ord_pure_dp(r))
+  {
+    nmod_mpoly_ctx_init(ctx,r->N,ORD_DEGREVLEX,r->cf->ch);
+    return FALSE;
+  }
+  else if (rRing_ord_pure_Dp(r))
+  {
+    nmod_mpoly_ctx_init(ctx,r->N,ORD_DEGLEX,r->cf->ch);
+    return FALSE;
+  }
+  else if (rRing_ord_pure_lp(r))
+  {
+    nmod_mpoly_ctx_init(ctx,r->N,ORD_LEX,r->cf->ch);
+    return FALSE;
+  }
+  return TRUE;
+}
+
+poly convFlintMPSingP(nmod_mpoly_t f, nmod_mpoly_ctx_t ctx, const ring r)
+{
+  int d=nmod_mpoly_length(f,ctx)-1;
+  poly p=NULL;
+  ulong* exp=(ulong*)omAlloc0((r->N+1)*sizeof(ulong));
+  for(int i=d; i>=0; i--)
+  {
+    ulong c=nmod_mpoly_get_term_coeff_ui(f,i,ctx);
+    poly pp=p_Init(r);
+    #if SIZEOF_LONG==8
+    nmod_mpoly_get_term_exp_ui(exp,f,i,ctx);
+    p_SetExpVL(pp,(int64*)exp,r);
+    #else
+    nmod_mpoly_get_term_exp_ui(&(exp[1]),f,i,ctx);
+    p_SetExpV(pp,(int*)exp,r);
+    #endif
+    p_Setm(pp,r);
+    pSetCoeff0(pp,(number)c);
+    pNext(pp)=p;
+    p=pp;
+  }
+  p_Test(p,r);
+  return p;
+}
+
+void convSingPFlintMP(nmod_mpoly_t res, nmod_mpoly_ctx_t ctx, poly p, int lp,const ring r)
+{
+  int bits=SI_LOG2(r->bitmask);
+  nmod_mpoly_init3(res,lp,bits,ctx);
+  nmod_mpoly_resize(res,lp,ctx);
+  ulong* exp=(ulong*)omAlloc((r->N+1)*sizeof(ulong));
+  int i=0;
+  while(p!=NULL)
+  {
+    number n=pGetCoeff(p);
+    #if SIZEOF_LONG==8
+    p_GetExpVL(p,(int64*)exp,r);
+    nmod_mpoly_set_term_exp_ui(res,i,exp,ctx);
+    #else
+    p_GetExpV(p,(int*)exp,r);
+    nmod_mpoly_set_term_exp_ui(res,i,&(exp[1]),ctx);
+    #endif
+    nmod_mpoly_set_term_coeff_ui(res,i,(ulong)n,ctx);
+    i++;
+    pIter(p);
+  }
+  //nmod_mpoly_print_pretty(res,r->names,ctx);PrintLn();
+  omFreeSize(exp,(r->N+1)*sizeof(ulong));
+}
+
+poly Flint_Mult_MP(poly p,int lp, poly q, int lq, nmod_mpoly_ctx_t ctx, const ring r)
+{
+  nmod_mpoly_t pp,qq,res;
+  convSingPFlintMP(pp,ctx,p,lp,r);
+  convSingPFlintMP(qq,ctx,q,lq,r);
+  int bits=SI_LOG2(r->bitmask);
+  nmod_mpoly_init3(res,lp*lq,bits,ctx);
+  nmod_mpoly_mul(res,pp,qq,ctx);
+  poly pres=convFlintMPSingP(res,ctx,r);
+  nmod_mpoly_clear(res,ctx);
+  nmod_mpoly_clear(pp,ctx);
+  nmod_mpoly_clear(qq,ctx);
+  nmod_mpoly_ctx_clear(ctx);
+  p_Test(pres,r);
+  return pres;
+}
+#endif
+#endif
