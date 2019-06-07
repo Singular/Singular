@@ -187,6 +187,7 @@ poly convFlintPSingP(fmpq_poly_t f, const ring r)
   for(int i=0; i<=d; i++)
   {
     fmpq_t c;
+    fmpq_init(c);
     fmpq_poly_get_coeff_fmpq(c,f,i);
     number n=convFlintNSingN(c,r->cf);
     poly pp=p_Init(r);
