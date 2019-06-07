@@ -47,7 +47,7 @@ void convSingPFlintMP(fmpq_mpoly_t res, fmpq_mpoly_ctx_t ctx, poly p, int lp, co
   {
     number n=pGetCoeff(p);
     fmpq_t c;
-    convSingNFlintN(c,n,r->cf);
+    convSingNFlintN_QQ(c,n);
     #if SIZEOF_LONG==8
     p_GetExpVL(p,(int64*)exp,r);
     fmpq_mpoly_set_term_exp_ui(res,i,exp,ctx);
@@ -82,7 +82,7 @@ poly convFlintMPSingP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, const ring r)
     p_SetExpV(pp,(int*)exp,r);
     #endif
     p_Setm(pp,r);
-    number n=convFlintNSingN(c,r->cf);
+    number n=convFlintNSingN_QQ(c,r->cf);
     //fmpq_clear(c); // LEAK?
     pSetCoeff0(pp,n);
     pNext(pp)=p;

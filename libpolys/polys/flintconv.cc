@@ -53,6 +53,7 @@ number convFlintNSingN (fmpz_t f)
   mpz_clear(z);
   return n;
 }
+
 number convFlintNSingN (fmpq_t f, const coeffs cf)
 {
 #if __FLINT_RELEASE > 20502
@@ -82,6 +83,26 @@ number convFlintNSingN (fmpq_t f, const coeffs cf)
     mpz_clear(a);
     mpz_clear(b);
   }
+  n_Normalize(z,cf);
+  n_Test(z,cf);
+  return z;
+#else
+  WerrorS("not implemented");
+  return NULL;
+#endif
+}
+
+number convFlintNSingN_QQ (fmpq_t f, const coeffs cf)
+{
+#if __FLINT_RELEASE > 20502
+  number z=ALLOC_RNUMBER();
+  #if defined(LDEBUG)
+  z->debug=123456;
+  #endif
+  z->s=0;
+  mpz_init(z->z);
+  mpz_init(z->n);
+  fmpq_get_mpz_frac(z->z,z->n,f);
   n_Normalize(z,cf);
   n_Test(z,cf);
   return z;
@@ -134,6 +155,26 @@ void convSingNFlintN(fmpq_t f, number n, const coeffs cf)
       convSingNFlintN(f,nn,QQ);
     }
     nKillChar(QQ);
+  }
+}
+
+void convSingNFlintN_QQ(fmpq_t f, number n)
+{
+  fmpq_init(f);
+  if (SR_HDL(n)&SR_INT)
+    fmpq_set_si(f,SR_TO_INT(n),1);
+  else if (n->s<3)
+  {
+    fmpz_set_mpz(fmpq_numref(f), n->z);
+    fmpz_set_mpz(fmpq_denref(f), n->n);
+  }
+  else
+  {
+    mpz_t one;
+    mpz_init_set_si(one,1);
+    fmpz_set_mpz(fmpq_numref(f), n->z);
+    fmpz_set_mpz(fmpq_denref(f), one);
+    mpz_clear(one);
   }
 }
 
