@@ -1486,6 +1486,7 @@ static inline void p_SetExpVL(poly p, int64 *ev, const ring r)
   p_LmCheckPolyRing1(p, r);
   for (unsigned j = r->N; j!=0; j--)
       p_SetExp(p, j, ev[j-1], r);
+  p_SetComp(p, 0,r);
 
   p_Setm(p, r);
 }
