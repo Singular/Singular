@@ -309,7 +309,13 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
     {
       lp=pLength(p);
       //printf("mul in flint\n");
-      return Flint_Mult_MP(p,lp,q,lq,ctx,r);
+      poly res=Flint_Mult_MP(p,lp,q,lq,ctx,r);
+      if (!copy)
+      {
+        p_Delete(&p,r);
+        p_Delete(&q,r);
+      }
+      return res;
     }
   }
   if (lq>MIN_FLINT_Zp)
@@ -320,7 +326,13 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
     {
       lp=pLength(p);
       //printf("mul in flint\n");
-      return Flint_Mult_MP(p,lp,q,lq,ctx,r);
+      poly res=Flint_Mult_MP(p,lp,q,lq,ctx,r);
+      if (!copy)
+      {
+        p_Delete(&p,r);
+        p_Delete(&q,r);
+      }
+      return res;
     }
   }
   #endif
