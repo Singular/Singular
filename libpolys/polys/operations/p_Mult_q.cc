@@ -271,7 +271,8 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 
 // Use factory if min(pLength(p), pLength(q)) >= MIN_LENGTH_FACTORY (>MIN_LENGTH_BUCKET)
 // Not thoroughly tested what is best
-#define MIN_LENGTH_FACTORY 60
+#define MIN_LENGTH_FACTORY 200
+#define MIN_LENGTH_FACTORY_QQ 60
 #define MIN_FLINT_QQ 10
 #define MIN_FLINT_Zp 20
 
@@ -299,13 +300,13 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
     lp = lq;
     lq = l;
   }
+  BOOLEAN pure_polys=(p_GetComp(p,r)==0) && (p_GetComp(q,r)==0);
   #ifdef HAVE_FLINT
   #if __FLINT_RELEASE >= 20503
   if (lq>MIN_FLINT_QQ)
   {
     fmpq_mpoly_ctx_t ctx;
-    if ((p_GetComp(p,r)==0) && (p_GetComp(q,r)==0)
-    && rField_is_Q(r) && !convSingRFlintR(ctx,r))
+    if (pure_polys && rField_is_Q(r) && !convSingRFlintR(ctx,r))
     {
       lp=pLength(p);
       //printf("mul in flint\n");
@@ -321,8 +322,7 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   if (lq>MIN_FLINT_Zp)
   {
     nmod_mpoly_ctx_t ctx;
-    if ((p_GetComp(p,r)==0) && (p_GetComp(q,r)==0)
-    && rField_is_Zp(r) && !convSingRFlintR(ctx,r))
+    if (pure_polys && rField_is_Zp(r) && !convSingRFlintR(ctx,r))
     {
       lp=pLength(p);
       //printf("mul in flint\n");
@@ -339,8 +339,11 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   #endif
   if (lq < MIN_LENGTH_BUCKET || TEST_OPT_NOT_BUCKETS)
     return _p_Mult_q_Normal(p, q, copy, r);
-  else if ((lq >= MIN_LENGTH_FACTORY)
-  && (r->cf->convSingNFactoryN!=ndConvSingNFactoryN))
+  else if (pure_polys
+  && (((lq >= MIN_LENGTH_FACTORY)
+    && (r->cf->convSingNFactoryN!=ndConvSingNFactoryN))
+  || ((lq >= MIN_LENGTH_FACTORY_QQ)
+    && rField_is_Q(r))))
   {
     poly h=singclap_pmult(p,q,r);
     if (!copy)
