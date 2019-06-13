@@ -561,8 +561,10 @@ void init_signals()
 // NTL error handling (>= 9.3.0) ----------------------------------------
 #ifdef HAVE_NTL
 #if (((NTL_MAJOR_VERSION==9)&&(NTL_MINOR_VERSION>=3))||(NTL_MAJOR_VERSION>=10))
+#if ((!defined(NTL_THREADS)) || (!defined(__APPLE__)))
   ErrorMsgCallback=WerrorS;
   ErrorCallback=HALT;
+#endif
 #endif
 #endif
 // factory error handling: -----------------------------------------------
