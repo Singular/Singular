@@ -27,7 +27,6 @@
 #ifdef HAVE_FLINT
 #include <flint/flint.h>
 
-#if __FLINT_RELEASE >= 20503
 #include "polys/matpol.h"
 #include "coeffs/bigintmat.h"
 #include <flint/fmpz.h>
@@ -54,7 +53,6 @@ poly convFlintPSingP(fmpq_poly_t f, const ring r);
 
 bigintmat*  singflint_LLL(bigintmat* A, bigintmat* T);
 intvec* singflint_LLL(intvec* A, intvec* T);
-#endif
 #endif
 #endif
 // LIBPOLYS_POLYS_FLINTCONV_H
