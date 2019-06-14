@@ -34,7 +34,9 @@
 #include <flint/fmpz_poly.h>
 #include <flint/fmpq_poly.h>
 #include <flint/fmpz_poly_mat.h>
+#if __FLINT_RELEASE >= 20500
 #include <flint/fmpz_lll.h>
+#endif
 
 int convFlintISingI (fmpz_t f);
 void convSingIFlintI(fmpz_t f, int p);
