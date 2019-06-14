@@ -897,14 +897,12 @@ EXAMPLE: example groebner;  shows an example"
 
 //----------------------- save the given method ---------------------------
   string method;                //all given methods as a coma separated string
-  list Method;                  //all given methods as a list
   int k;
   for (k=1; k<=size(#); k++)
   {
      if (typeof(#[k]) == "string")
      {
        method = method + "," + #[k];
-       Method = Method + list(#[k]);
      }
   }
 
