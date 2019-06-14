@@ -12,7 +12,6 @@
 #include "flintconv.h"
 
 #ifdef HAVE_FLINT
-#if __FLINT_RELEASE >= 20503
 #include "coeffs/coeffs.h"
 #include "coeffs/longrat.h"
 #include "polys/monomials/p_polys.h"
@@ -369,5 +368,4 @@ intvec* singflint_LLL(intvec*  m, intvec* T)
   }
   return res;
 }
-#endif
 #endif
