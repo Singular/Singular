@@ -162,9 +162,8 @@ feOptTS_CPPFLAGS = ${AM_CPPFLAGS} -DTSINGULAR
 
 EXTRA_PROGRAMS =  libparse Singulard
 
-# the "optional_programs" variable should be defined in the configure
+# the "optional_Singular_programs" variable should be defined in the configure
 # script, and listed in an AC_SUBST macro
-optional_Singular_programs =
 
 bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
 
