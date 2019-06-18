@@ -701,10 +701,10 @@ KINLINE poly sLObject::GetP(omBin lmBin)
   if (p == NULL)
   {
     p = k_LmInit_tailRing_2_currRing(t_p, tailRing,
-                                     (lmBin!=NULL?lmBin:currRing->PolyBin));
+                                     ((lmBin!=NULL)?lmBin:currRing->PolyBin));
     FDeg = pFDeg();
   }
-  else if (lmBin != NULL && lmBin != currRing->PolyBin)
+  else if ((lmBin != NULL) && (lmBin != currRing->PolyBin))
   {
     p = p_LmShallowCopyDelete(p, currRing);
     FDeg = pFDeg();
