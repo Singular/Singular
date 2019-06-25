@@ -1011,17 +1011,17 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
   poly b;
   if (v->next==NULL)
   {
-    a=(poly)u->CopyD(POLY_CMD); // works also for VECTOR_CMD
+    a=(poly)u->Data(POLY_CMD); // works also for VECTOR_CMD
     if (u->next==NULL)
     {
-      b=(poly)v->CopyD(POLY_CMD); // works also for VECTOR_CMD
+      b=(poly)v->Data(POLY_CMD); // works also for VECTOR_CMD
       if ((a!=NULL) && (b!=NULL)
       && ((long)pTotaldegree(a)>si_max((long)rVar(currRing),(long)currRing->bitmask/2)-(long)pTotaldegree(b)))
       {
         Warn("possible OVERFLOW in mult(d=%ld, d=%ld, max=%ld)",
           pTotaldegree(a),pTotaldegree(b),currRing->bitmask/2);
       }
-      res->data = (char *)(pMult( a, b));
+      res->data = (char *)(pp_Mult_qq( a, b, currRing));
       pNormalize((poly)res->data);
       return FALSE;
     }
