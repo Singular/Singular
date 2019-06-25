@@ -1046,7 +1046,7 @@ BOOLEAN kTest_TS(kStrategy strat)
       return dReportError("T[%d].i_r with R out of sync", i);
   }
   // test containment of S inT
-  if (strat->S != NULL)
+  if ((strat->S != NULL)&&(strat->tl>=0))
   {
     for (i=0; i<=strat->sl; i++)
     {
@@ -1062,8 +1062,10 @@ BOOLEAN kTest_TS(kStrategy strat)
   #ifdef HAVE_SHIFTBBA
   if (strat->red!=redFirstShift) // not from bbaShift
   #endif
-  for (i=0; i<=strat->Ll; i++)
+  if (strat->L!=NULL)
   {
+   for (i=0; i<=strat->Ll; i++)
+   {
     if (strat->L[i].p1 != NULL && strat->L[i].p2)
     {
       if (strat->L[i].i_r1 < 0 ||
@@ -1084,6 +1086,7 @@ BOOLEAN kTest_TS(kStrategy strat)
     }
     if (strat->L[i].i_r != -1)
       return dReportError("L[%d].i_r out of sync", i);
+  }
   }
   return TRUE;
 }
@@ -10945,9 +10948,9 @@ BOOLEAN kCheckSpolyCreation(LObject *L, kStrategy strat, poly &m1, poly &m2)
     return TRUE;
   }
   poly p1_max=NULL;
-  if (L->i_r1>=0) p1_max = (strat->R[L->i_r1])->max_exp;
+  if ((L->i_r1>=0)&&(strat->R[L->i_r1]!=NULL)) p1_max = (strat->R[L->i_r1])->max_exp;
   poly p2_max=NULL;
-  if (L->i_r2>=0) p2_max = (strat->R[L->i_r2])->max_exp;
+  if ((L->i_r2>=0)&&(strat->R[L->i_r2]!=NULL)) p2_max = (strat->R[L->i_r2])->max_exp;
 
   if (((p1_max != NULL) && !p_LmExpVectorAddIsOk(m1, p1_max, strat->tailRing)) ||
       ((p2_max != NULL) && !p_LmExpVectorAddIsOk(m2, p2_max, strat->tailRing)))
@@ -11774,7 +11777,7 @@ skStrategy::~skStrategy()
     omMergeStickyBinIntoBin(lmBin, currRing->PolyBin);
   if (tailBin != NULL)// && !rField_is_Ring(currRing))
     omMergeStickyBinIntoBin(tailBin,
-                            (tailRing != NULL ? tailRing->PolyBin:
+                            ((tailRing != NULL) ? tailRing->PolyBin:
                              currRing->PolyBin));
   if (t_kHEdge != NULL)
     p_LmFree(t_kHEdge, tailRing);
