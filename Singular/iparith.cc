@@ -1011,10 +1011,10 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
   poly b;
   if (v->next==NULL)
   {
-    a=(poly)u->Data(POLY_CMD); // works also for VECTOR_CMD
+    a=(poly)u->Data(); // works also for VECTOR_CMD
     if (u->next==NULL)
     {
-      b=(poly)v->Data(POLY_CMD); // works also for VECTOR_CMD
+      b=(poly)v->Data(); // works also for VECTOR_CMD
       if ((a!=NULL) && (b!=NULL)
       && ((long)pTotaldegree(a)>si_max((long)rVar(currRing),(long)currRing->bitmask/2)-(long)pTotaldegree(b)))
       {
