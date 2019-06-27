@@ -1,0 +1,17 @@
+////////////////////////////////////////////////////////////////////////////
+version="version dummy.lib 1.0.0.0 June_2019 "; // $Id$
+category="General purpose";
+info="
+LIBRARY:  dummy.lib      dummy library for testing purposes
+AUTHORS:  S. Gutsche
+
+PROCEDURES:
+ dummy(def);           dummy function that returns its argument
+";
+
+///////////////////////////////////////////////////////////////////////////////
+proc dummy(def a)
+{
+   return(a);
+}
+
