@@ -291,7 +291,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
   return NULL;
 }
 
-BOOLEAN iiAllStart(procinfov pi, char *p,feBufferTypes t, int l)
+BOOLEAN iiAllStart(procinfov pi, const char *p, feBufferTypes t, int l)
 {
   // see below:
   BITSET save1=si_opt_1;
