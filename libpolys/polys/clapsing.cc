@@ -62,6 +62,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
     setCharacteristic( rChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g, r ) );
     res=convFactoryPSingP( gcd( F, G ) , r);
+    if (rField_is_Zp(r)) p_Norm(res,r);
   }
   // and over Q(a) / Fp(a)
   else if ( r->cf->extRing!=NULL )
