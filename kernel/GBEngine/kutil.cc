@@ -9153,10 +9153,10 @@ void updateS(BOOLEAN toT,kStrategy strat)
         h.sev = strat->sevS[i];
         /*puts the elements of S also to T*/
         strat->initEcart(&h);
-        enterT(h,strat);
+        /*if (toT) - already checked*/ enterT(h,strat);
         strat->S_2_R[i] = strat->tl;
 #ifdef HAVE_SHIFTBBA
-        if (currRing->isLPring)
+        if (/*(toT) && */(currRing->isLPring))
           enterTShift(h, strat);
 #endif
       }
