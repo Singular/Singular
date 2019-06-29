@@ -729,7 +729,7 @@ EXAMPLE: example rad_con; shows an example
   string mp=string(minpoly);
   if (attrib(br,"global")==1)
   {
-    execute("ring R=("+charstr(br)+"),(@x(1..n),@z),dp;");
+    ring R = create_ring(ringlist(br)[1],"(@x(1..n),@z)","dp","no_minpoly");
   }
   else
   {

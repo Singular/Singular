@@ -280,7 +280,7 @@ EXAMPLE: example squarefree; shows some examples.
  //---- test: char = (p^k,a) (-> gcd not implemented) or (p,a) (gcd works) ----
   //if ((char(basering)!=0) and (charstr(basering)!=string(char(basering))))
   int gcd_ok= ! hasGFCoefficient(basering);
-  execute("ring rsqrf = ("+charstr(altring)+"),(x,y),dp;");
+  ring rsqrf = create_ring(ringlist(altring)[1],"(x,y)","dp","no_minpoly");
   if ((gcd_ok!=0) && (mipl!="0")) { execute("minpoly="+mipl+";"); }
   poly f=fetch(altring,f);
   poly dif,g,l;
@@ -364,7 +364,7 @@ EXAMPLE: example allsquarefree;  shows an example
  {
    ERROR(" Sorry -- not implemented for this ring (gcd doesn't work)");
  }
- execute("ring rsqrf = ("+charstr(altring)+"),(x,y),dp;");
+ ring rsqrf = create_ring(ringlist(altring)[1],"(x,y)","dp","no_minpoly");
  if (mipl!="0") { execute("minpoly="+mipl+";"); }
  poly f=fetch(altring,f);
  poly l=fetch(altring,l);
@@ -551,7 +551,7 @@ EXAMPLES: example develop;         shows an example
  def altring = basering;
  if (ringwechsel) {
    string mipl=string(minpoly);
-   execute("ring guenstig = ("+charstr(altring)+"),(x,y),ls;");
+   ring guenstig = create_ring(ringlist(altring)[1],"(x,y)","ls","no_minpoly");
    if ((char(basering)==0) && (mipl!="0")) {
      execute("minpoly="+mipl+";");
    }}
@@ -2167,7 +2167,7 @@ EXAMPLE: example newtonpoly;  shows an example
   if (defined(is_ls)<=0)
   {
     def @Rold=basering;
-    execute("ring @RR=("+charstr(basering)+"),("+varstr(basering)+"),ls;");
+    ring @RR = create_ring(ringlist(basering)[1],"("+varstr(basering)+")","ls","no_minpoly");
     poly f=imap(@Rold,f);
   }
   intvec A=(0,ord(subst(f,var(1),0)));
@@ -2456,8 +2456,8 @@ EXAMPLE: example extdevelop;  shows an example
      if (!hasGFCoefficient(basering))
      {
        if (npars(basering)>1) {         // ring (p,a,..),...
-        execute("ring extdguenstig=("+charstr(basering)+"),(x,y),ls;");
-       }
+        ring extdguenstig = create_ring(ringlist(basering)[1],"(x,y)","ls","no_minpoly");
+     }
        else {                                  // ring (p,a),...
         string mipl=string(minpoly);
         ring extdguenstig=(p,`parstr(basering)`),(x,y),ls;
@@ -2465,7 +2465,7 @@ EXAMPLE: example extdevelop;  shows an example
        }
      }
      else {
-       execute("ring extdguenstig=("+charstr(basering)+"),(x,y),ls;");
+       ring extdguenstig = create_ring(ringlist(basering)[1],"(x,y)","ls","no_minpoly");
      }
   }
   else {                               // charstr(basering)== p : no parameter
@@ -2921,7 +2921,7 @@ RETURN: list:  first entry = HNEring  (containing list hne, poly f)
      "// ** We try to develop this polynomial, but if the need for a field";
      "// ** extension occurs during the calculation, we cannot proceed with";
      "// ** the corresponding branches.";
-     execute("ring HNEring=("+charstr(basering)+"),(x,y),ls;");
+     ring HNEring = create_ring(ringlist(basering)[1],"(x,y)","ls","no_minpoly");
    }
    else {
     string pa=parstr(altring);
@@ -4052,8 +4052,7 @@ RETURN: list: first entry = list of HNErings,
    if (number_of_letztring!=EXTHNEnumber)
    { // Ringwechsel hatte stattgefunden
      string mipl_alt = string(minpoly);
-     execute("ring tempRing = ("+charstr(basering)+"),("+varstr(basering)+
-                              "),("+ordstr(basering)+");");
+     ring tempRing = create_ring(ringlist(basering)[1],"("+varstr(basering)+")","("+ordstr(basering)+")","no_minpoly");
      execute("minpoly="+ mipl_alt +";");
      list HNEs=imap(EXTHNEring(EXTHNEnumber),HNEs);
      export HNEs;

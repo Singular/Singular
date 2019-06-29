@@ -656,7 +656,7 @@ EXAMPLE: example alexanderpolynomial;  shows an example
   int r=ncols(tm);
   int e=ncols(gr);
   // Define the Ring for the Alexander Polynomial and the Zeta Function of the Monodromy.
-  execute("ring ALEXring=("+charstr(basering)+"),(t,t(1..r)),dp;");
+  ring ALEXring = create_ring(ringlist(basering)[1],"(t,t(1..r))","dp","no_minpoly");
   poly hilfspoly=1;
   poly alexnumerator=1;    // numerator of the Alexander polynomial
   poly alexdenominator=1;  // denominator of the Alexander polynomial

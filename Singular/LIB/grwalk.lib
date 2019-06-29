@@ -235,7 +235,8 @@ EXAMPLE: example gwalk; shows an example"
    option(redSB);
    def xR = basering;
 
-   execute("ring ostR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");
+   ring ostR = create_ring(ringlist(xR)[1],"("+varstr(xR)+")",ord_str,"no_minpoly");
+   
    def old_ring = basering;
 
    //print("//** help ring = " + string(basering));
@@ -291,7 +292,7 @@ proc awalk1_tmp(ideal Go, int n2, list #)
 
    def xR = basering;
 
-   execute("ring ostR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");
+   ring ostR = create_ring(ringlist(xR)[1],"("+varstr(xR)+")",ord_str,"no_minpoly");
    def old_ring = basering;
    //print("//** help ring = " + string(basering));
 
@@ -327,8 +328,7 @@ EXAMPLE: example fwalk; shows an example"
    kill OSCTW;
    option(redSB);
    def xR = basering;
-
-   execute("ring ostR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");
+   ring ostR = create_ring(ringlist(xR)[1],"("+varstr(xR)+")",ord_str,"no_minpoly");
    def old_ring = basering;
    //print("//** help ring = " + string(basering));
 
@@ -376,7 +376,7 @@ EXAMPLE: example awalk2; shows an example"
    kill OSCTW;
    option(redSB);   def xR = basering;
 
-   execute("ring ostR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");
+   ring ostR = create_ring(ringlist(xR)[1],"("+varstr(xR)+")",ord_str,"no_minpoly");
    def old_ring = basering;
 
    //print("//** help ring = " + string(basering));
@@ -434,7 +434,7 @@ EXAMPLE: example pwalk; shows an example"
 
   def xR = basering;
 
-  execute("ring ostR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");
+  ring ostR = create_ring(ringlist(xR)[1],"("+varstr(xR)+")",ord_str,"no_minpoly");
   def old_ring = basering;
 
   ideal G = fetch(xR, Go);
@@ -482,7 +482,7 @@ EXAMPLE: example twalk; shows an example"
   option(redSB);
   def xR = basering;
 
-  execute("ring ostR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");
+  ring ostR = create_ring(ringlist(xR)[1],"("+varstr(xR)+")",ord_str,"no_minpoly");
   def old_ring = basering;
 
   //print("//** help ring = " + string(basering));

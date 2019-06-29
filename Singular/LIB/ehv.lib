@@ -741,8 +741,8 @@ EXAMPLE: example decompEHV; shows an example"
                   //...take a non-trivial factor g1 of g ...
                   poly g1 = L[1][1];
                   //..and insert f in g1...
-                  execute("ring newR = (" + charstr(R) + "),(y(1)),(" + ordstr(R) + ");");
-                  poly g2 = imap(R,g1);
+                  ring newR = create_ring(ringlist(R)[1], "(y(1))", "(" + ordstr(R) + ")", "no_minpoly");
+		  poly g2 = imap(R,g1);
                   setring base;
                   h = fetch(newR,g2);
                   h = subst(h,var(1),f);
@@ -1038,8 +1038,8 @@ EXAMPLE: example AssEHV; shows an example"
               setring homoR;
               ideal homoJ = fetch(base,K);
               homoJ = groebner(homoJ);
-              execute("ring newR = (" + charstr(base) + "),(x(1..n),t),dp;");
-              ideal homoK = fetch(homoR,homoJ);
+              ring newR = create_ring(ringlist(base)[1], "(x(1..n),t)", "dp", "no_minpoly");
+	      ideal homoK = fetch(homoR,homoJ);
               homoK = homog(homoK,t);
               attrib(homoK,"isEquidimensional",1);
               attrib(homoK,"isRadical",1);

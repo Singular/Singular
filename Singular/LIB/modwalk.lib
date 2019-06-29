@@ -480,7 +480,7 @@ static proc finalTest_std(string command, alias list args, ideal result)
    }
    ideal xI = args[1];
    ring xR = basering;
-   execute("ring yR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");
+   ring yR = create_ring(ringlist(xR)[1], "("+varstr(xR)+")", ord_str, "no_minpoly");
    ideal yI = fetch(xR,xI);
    ideal yresult = fetch(xR,result);
    attrib(yI, "isSB", 1);
