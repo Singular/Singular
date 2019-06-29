@@ -12,9 +12,7 @@
 #include <flint/flint.h>
 
 #if __FLINT_RELEASE >= 20503
-#include <flint/fmpz.h>
 #include <flint/fmpq.h>
-#include <flint/fmpz_poly.h>
 #include <flint/fmpq_poly.h>
 #include <flint/fmpq_mpoly.h>
 
@@ -26,6 +24,8 @@ BOOLEAN convSingRFlintR(nmod_mpoly_ctx_t ctx, const ring r);
 void convSingPFlintMP(nmod_mpoly_t res, nmod_mpoly_ctx_t ctx, poly p, int lp,const ring r);
 poly convFlintMPSingP(nmod_mpoly_t p, nmod_mpoly_ctx_t ctx, const ring r);
 poly Flint_Mult_MP(poly p,int lp,poly q,int lq,nmod_mpoly_ctx_t ctx, const ring r);
+poly Flint_GCD_MP(poly p,int lp,poly q,int lq,nmod_mpoly_ctx_t ctx,const ring r);
+poly Flint_GCD_MP(poly p,int lp,poly q,int lq,fmpq_mpoly_ctx_t ctx,const ring r);
 #endif
 #endif
 #endif

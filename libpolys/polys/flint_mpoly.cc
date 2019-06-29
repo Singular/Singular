@@ -194,5 +194,54 @@ poly Flint_Mult_MP(poly p,int lp, poly q, int lq, nmod_mpoly_ctx_t ctx, const ri
   p_Test(pres,r);
   return pres;
 }
+poly Flint_GCD_MP(poly p,int lp,poly q,int lq,nmod_mpoly_ctx_t ctx,const ring r)
+{
+  nmod_mpoly_t pp,qq,res;
+  convSingPFlintMP(pp,ctx,p,lp,r);
+  convSingPFlintMP(qq,ctx,q,lq,r);
+  int bits=SI_LOG2(r->bitmask);
+  nmod_mpoly_init3(res,lp*lq,bits,ctx);
+  int ok=nmod_mpoly_gcd(res,pp,qq,ctx);
+  poly pres;
+  if (ok)
+  {
+    pres=convFlintMPSingP(res,ctx,r);
+    p_Test(pres,r);
+  }
+  else
+  {
+    pres=p_One(r);
+  }
+  nmod_mpoly_clear(res,ctx);
+  nmod_mpoly_clear(pp,ctx);
+  nmod_mpoly_clear(qq,ctx);
+  nmod_mpoly_ctx_clear(ctx);
+  return pres;
+}
+
+poly Flint_GCD_MP(poly p,int lp,poly q,int lq,fmpq_mpoly_ctx_t ctx,const ring r)
+{
+  fmpq_mpoly_t pp,qq,res;
+  convSingPFlintMP(pp,ctx,p,lp,r);
+  convSingPFlintMP(qq,ctx,q,lq,r);
+  int bits=SI_LOG2(r->bitmask);
+  fmpq_mpoly_init3(res,lp*lq,bits,ctx);
+  int ok=fmpq_mpoly_gcd(res,pp,qq,ctx);
+  poly pres;
+  if (ok)
+  {
+    pres=convFlintMPSingP(res,ctx,r);
+    p_Test(pres,r);
+  }
+  else
+  {
+    pres=p_One(r);
+  }
+  fmpq_mpoly_clear(res,ctx);
+  fmpq_mpoly_clear(pp,ctx);
+  fmpq_mpoly_clear(qq,ctx);
+  fmpq_mpoly_ctx_clear(ctx);
+  return pres;
+}
 #endif
 #endif
