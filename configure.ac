@@ -269,7 +269,8 @@ AC_CONFIG_FILES([Singular/Makefile])
 
 AC_CONFIG_FILES([IntegerProgramming/Makefile])
 
-AC_CONFIG_FILES([libsingular-config Singular.pc])
+AC_CONFIG_FILES([libsingular-config], [chmod +x libsingular-config])
+AC_CONFIG_FILES([Singular.pc])
 
 AC_CONFIG_FILES([emacs/Makefile])
 
