@@ -143,6 +143,7 @@ inline BOOLEAN RingDependend(int t) { return (BEGIN_RING<t)&&(t<END_RING); }
 EXTERN_INST_VAR sleftv sLastPrinted;
 
 void syMake(leftv v,const char * name, package pa = NULL);
+void syMakeMonom(leftv v,const char * name);
 BOOLEAN assumeStdFlag(leftv h);
 
 inline procinfov piCopy(procinfov pi)

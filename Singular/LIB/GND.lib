@@ -1,5 +1,5 @@
-///////////////////////////////////////////////////////////////////////////////////////////
-version="version GND.lib 4.1.1.0 Dec_2017 ";
+////////////////////////////////////////////////////////////////////////////////
+version="version GND.lib 4.1.2.0 Feb_2019 ";
 category="Commutative Algebra";
 
 info="
@@ -1291,7 +1291,6 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
     {
       "And this is the map:";
     }
-    //execute("ideal themap = vidjet[nrx+1..size(vidjet)],"+t+",invssp;");
     invssp = 1/invssp;
     if(debug)
     {
@@ -1299,7 +1298,6 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
     }
     string zz = "Z";
     def newvar2 = findnewvar(zz);
-    //execute("ring Efinalbase = (0,"+parstr(E)+"),("+varstr(E)+","+newvar2+"),dp;");
     def q = imap(E,e2);
     poly teta = var(nvars(Efinalbase)) * imap(E,ss)*imap(E,ssp) - 1;
     qring Efinal = std(q,teta);

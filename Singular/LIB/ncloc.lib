@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////
-version="version ncloc.lib 4.0.0.0 Dec_2017 "; // $Id$
+version="version ncloc.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY:   ncloc.lib  Ore-localization in G-Algebras

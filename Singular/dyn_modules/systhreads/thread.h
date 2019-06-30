@@ -4,7 +4,7 @@
 #include <limits.h>
 #include <pthread.h>
 #include <stdint.h>
-#include <alloca.h>
+#include <stdlib.h>
 #include <cstddef>
 #include <exception>
 

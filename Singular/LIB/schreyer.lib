@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version schreyer.lib 4.1.1.1 Feb_2018 "; // $Id$
+version="version schreyer.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="General purpose";
 info="
 LIBRARY: schreyer.lib helpers for derham.lib

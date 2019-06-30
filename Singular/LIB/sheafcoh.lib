@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version sheafcoh.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version sheafcoh.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  sheafcoh.lib   Procedures for Computing Sheaf Cohomology

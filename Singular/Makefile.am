@@ -2,7 +2,7 @@ ACLOCAL_AMFLAGS = -I../m4
 
 GIT_VERSION := $(shell $(top_srcdir)/git-version-gen $(top_srcdir)/.tarball-git-version)
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(FACTORY_INCLUDES)  $(GMP_CPPFLAGS) $(FLINT_CFLAGS) -DGIT_VERSION='"$(GIT_VERSION)"'
+AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(FACTORY_INCLUDES) $(CCLUSTER_CPPFLAGS)  $(GMP_CPPFLAGS) $(FLINT_CFLAGS) -DGIT_VERSION='"$(GIT_VERSION)"'
 
 AM_CXXFLAGS=$(NTL_CPPFLAGS)
 
@@ -135,7 +135,7 @@ SingularHEADERS = \
 # plural_cmd.inc
 nodist_libSingular_la_SOURCES = feOpt.inc iparith.inc
 
-libSingular_la_LDFLAGS    =$(SINGULAR_LDFLAGS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION} ${PTHREAD_LDFLAGS}
+libSingular_la_LDFLAGS    =$(SINGULAR_LDFLAGS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION} $(CCLUSTER_LIBS) ${PTHREAD_LDFLAGS}
 libSingular_la_LIBADD     =${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${BUILTIN_FLAGS} ${top_builddir}/kernel/libkernel.la ${PTHREAD_LIBS}
 
 libSingular_includedir = ${includedir}/singular/Singular
@@ -162,9 +162,8 @@ feOptTS_CPPFLAGS = ${AM_CPPFLAGS} -DTSINGULAR
 
 EXTRA_PROGRAMS =  libparse Singulard
 
-# the "optional_programs" variable should be defined in the configure
+# the "optional_Singular_programs" variable should be defined in the configure
 # script, and listed in an AC_SUBST macro
-optional_Singular_programs =
 
 bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
 
@@ -181,7 +180,7 @@ Singulard_LDADD = libSingular.la ${BUILTIN_FLAGS}
 Singulard_LDFLAGS = -shared ${AM_LDFLAGS} ${BUILTIN_FLAGS}
 
 scriptdir = $(libexecdir)/singular/MOD
-dist_script_SCRIPTS = singularsurf singularsurf_jupyter singularsurf_win
+dist_script_SCRIPTS = singularsurf singularsurf_jupyter singularsurf_win surfex
 
 #### ESingular
 ESingular_CPPFLAGS = ${AM_CPPFLAGS} -DESINGULAR -DPROTO

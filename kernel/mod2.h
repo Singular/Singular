@@ -52,14 +52,6 @@
 /* linear algebra extensions from pcv.h/pcv.cc */
 #define HAVE_PCV 1
 
-/* procedures to compute groebner bases with the f5 implementation */
-/* still testing */
-#undef HAVE_F5
-
-/* procedures to compute groebner bases with the f5c implementation */
-/* still testing */
-#undef HAVE_F5C
-
 /* procedures to compute with units */
 #define HAVE_UNITS
 

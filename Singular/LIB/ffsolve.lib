@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////
-version="version ffsolve.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version ffsolve.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Symbolic-numerical solving";
 info="
 LIBRARY: ffsolve.lib        multivariate equation solving over finite fields
@@ -480,7 +480,7 @@ ASSUME:         basering is a finite field of type (p^n,a)
           multivar_part = multivar_part+I[i];
         }
       }
-      varinfo = varaibles(univar_part);
+      varinfo = variables(univar_part);
       unsolved_vars = varinfo[3];
       unsolved_var_nums = varinfo[4];
       number_new_vars = ncols(unsolved_vars);

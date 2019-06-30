@@ -1,9 +1,9 @@
 PROGNAME=ppcc
 TCLSH=`autosetup/autosetup-find-tclsh`
 PREPROC_TCL=$(TCLSH) src/script/preproc.tcl
-src/pplex.h: src/pplex.h.in 
+src/pplex.h: src/pplex.h.in
 	$(PREPROC_TCL) src/pplex.h.in
-src/pplex.re: src/pplex.re.in 
+src/pplex.re: src/pplex.re.in
 	$(PREPROC_TCL) src/pplex.re.in
 CONFIGITEMS += src/pplex.h src/pplex.re
 RE2CFLAGS= --no-generation-date --no-version

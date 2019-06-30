@@ -1611,48 +1611,47 @@ void syMake(leftv v,const char * id, package pa)
   if (siq<=0)
 #endif
   {
-    if (!isdigit(id[0]))
+    if (strcmp(id,"basering")==0)
     {
-      if (strcmp(id,"basering")==0)
+      if (currRingHdl!=NULL)
       {
-        if (currRingHdl!=NULL)
-        {
-          if (id!=IDID(currRingHdl)) omFreeBinAddr((ADDRESS)id);
-          h=currRingHdl;
-          goto id_found;
-        }
-        else
-        {
-          v->name = id;
-          return; /* undefined */
-        }
-      }
-      else if (strcmp(id,"Current")==0)
-      {
-        if (currPackHdl!=NULL)
-        {
-          omFreeBinAddr((ADDRESS)id);
-          h=currPackHdl;
-          goto id_found;
-        }
-        else
-        {
-          v->name = id;
-          return; /* undefined */
-        }
-      }
-      if(v->req_packhdl!=currPack)
-      {
-        h=v->req_packhdl->idroot->get(id,myynest);
-      }
-      else
-      h=ggetid(id);
-      /* 3) existing identifier, local */
-      if ((h!=NULL) && (IDLEV(h)==myynest))
-      {
-        if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id); /*assume strlen(id) <1000 */
+        if (id!=IDID(currRingHdl)) omFreeBinAddr((ADDRESS)id);
+        h=currRingHdl;
         goto id_found;
       }
+      else
+      {
+        v->name = id;
+        return; /* undefined */
+      }
+    }
+    else if (strcmp(id,"Current")==0)
+    {
+      if (currPackHdl!=NULL)
+      {
+        omFreeBinAddr((ADDRESS)id);
+        h=currPackHdl;
+        goto id_found;
+      }
+      else
+      {
+        v->name = id;
+        return; /* undefined */
+      }
+    }
+    if(v->req_packhdl!=currPack)
+    {
+      h=v->req_packhdl->idroot->get(id,myynest);
+    }
+    else
+    {
+      h=ggetid(id);
+    }
+    /* 3) existing identifier, local */
+    if ((h!=NULL) && (IDLEV(h)==myynest))
+    {
+      if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id); /*assume strlen(id) <1000 */
+      goto id_found;
     }
     if (yyInRingConstruction)
     {
@@ -1836,6 +1835,90 @@ id_found: // we have an id (in h) found, to set the data in from h
   }
   v->name = IDID(h);
   v->data = (char *)h;
+  currRingHdl=save_ring;
+}
+
+void syMakeMonom(leftv v,const char * id)
+{
+  if (!isdigit(id[0]))
+  {
+    Print("non-digit:%s\n",id);
+  }
+  /* resolv an identifier: (to DEF_CMD, if siq>0)
+  * 6) monom (resp. number), local ring
+  * 7) monom (resp. number), non-local ring
+  * 10) everything else is of type 0
+  */
+#ifdef TEST
+  if ((*id<' ')||(*id>(char)126))
+  {
+    Print("wrong id :%s:\n",id);
+  }
+#endif
+  idhdl save_ring=currRingHdl;
+  v->Init();
+  v->req_packhdl = currPack;
+  idhdl h=NULL;
+#ifdef SIQ
+  if (siq<=0)
+#endif
+  {
+    /* 6. local ring: number/poly */
+    BOOLEAN ok=FALSE;
+    poly p = pmInit(id,ok);
+    if (ok)
+    {
+      if (p==NULL)
+      {
+        v->data = (void *)nInit(0);
+        v->rtyp = NUMBER_CMD;
+        #ifdef HAVE_PLURAL
+        // in this case we may have monomials equal to 0 in p_Read
+        if (rIsPluralRing(currRing)) v->name = omStrDup(id);
+        #endif
+      }
+      else if (pIsConstant(p))
+      {
+        v->data = pGetCoeff(p);
+        pGetCoeff(p)=NULL;
+        pLmFree(p);
+        v->rtyp = NUMBER_CMD;
+      }
+      else
+      {
+        v->name = omStrDup(id);
+        #ifdef HAVE_SHIFTBBA
+        if ((currRing->isLPring!=0)
+        && (p_Totaldegree(p,currRing)>1))
+        {
+          p_LmDelete(&p,currRing);
+          /* v->rtyp = UNKNOWN; - already set */
+          return; /* error, report "unknown id" */
+        }
+        #endif
+        v->data = p;
+        v->rtyp = POLY_CMD;
+      }
+      return;
+    }
+  }
+#ifdef SIQ
+  else
+  {
+    v->rtyp=DEF_CMD;
+  }
+#endif
+  /* 9: _ */
+  if (strcmp(id,"_")==0)
+  {
+    v->Copy(&sLastPrinted);
+  }
+  else
+  {
+    /* 10: everything else */
+    /* v->rtyp = UNKNOWN;*/
+    v->name = omStrDup(id);
+  }
   currRingHdl=save_ring;
 }
 

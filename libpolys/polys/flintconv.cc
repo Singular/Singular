@@ -14,6 +14,7 @@
 #ifdef HAVE_FLINT
 #if __FLINT_RELEASE >= 20500
 #include "coeffs/coeffs.h"
+#include "coeffs/longrat.h"
 #include "polys/monomials/p_polys.h"
 
 #include "polys/sbuckets.h"
@@ -42,12 +43,203 @@ void convFlintNSingN (mpz_t z, fmpz_t f)
   fmpz_get_mpz(z,f);
 }
 
-void convSingNFlintN(fmpz_t f, mpz_t z)
+number convFlintNSingN (fmpz_t f)
 {
-  fmpz_init(f);
-  fmpz_set_mpz(f,z);
+  mpz_t z;
+  mpz_init(z);
+  fmpz_get_mpz(z,f);
+  number n;
+  nlMPZ(z,n,NULL);
+  mpz_clear(z);
+  return n;
 }
 
+number convFlintNSingN (fmpq_t f, const coeffs cf)
+{
+#if __FLINT_RELEASE > 20502
+  number z;
+  if (nCoeff_is_Q(cf))
+  {
+    z=ALLOC_RNUMBER();
+    #if defined(LDEBUG)
+    z->debug=123456;
+    #endif
+    z->s=0;
+    mpz_init(z->z);
+    mpz_init(z->n);
+    fmpq_get_mpz_frac(z->z,z->n,f);
+  }
+  else
+  {
+    mpz_t a,b;
+    mpz_init(a);
+    mpz_init(b);
+    fmpq_get_mpz_frac(a,b,f);
+    number na=n_InitMPZ(a,cf);
+    number nb=n_InitMPZ(b,cf);
+    z=n_Div(na,nb,cf);
+    n_Delete(&na,cf);
+    n_Delete(&nb,cf);
+    mpz_clear(a);
+    mpz_clear(b);
+  }
+  n_Normalize(z,cf);
+  n_Test(z,cf);
+  return z;
+#else
+  WerrorS("not implemented");
+  return NULL;
+#endif
+}
+
+number convFlintNSingN_QQ (fmpq_t f, const coeffs cf)
+{
+#if __FLINT_RELEASE > 20502
+  number z=ALLOC_RNUMBER();
+  #if defined(LDEBUG)
+  z->debug=123456;
+  #endif
+  z->s=0;
+  mpz_init(z->z);
+  mpz_init(z->n);
+  fmpq_get_mpz_frac(z->z,z->n,f);
+  n_Normalize(z,cf);
+  n_Test(z,cf);
+  return z;
+#else
+  WerrorS("not implemented");
+  return NULL;
+#endif
+}
+
+void convSingNFlintN(fmpz_t f, mpz_t n)
+{
+  fmpz_init(f);
+  fmpz_set_mpz(f,n);
+}
+
+void convSingNFlintN(fmpz_t f, number n)
+{
+  fmpz_init(f);
+  fmpz_set_mpz(f,(mpz_ptr)n);
+}
+
+void convSingNFlintN(fmpq_t f, number n, const coeffs cf)
+{
+  if (nCoeff_is_Q(cf))
+  {
+    fmpq_init(f);
+    if (SR_HDL(n)&SR_INT)
+      fmpq_set_si(f,SR_TO_INT(n),1);
+    else if (n->s<3)
+    {
+      fmpz_set_mpz(fmpq_numref(f), n->z);
+      fmpz_set_mpz(fmpq_denref(f), n->n);
+    }
+    else
+    {
+      mpz_t one;
+      mpz_init_set_si(one,1);
+      fmpz_set_mpz(fmpq_numref(f), n->z);
+      fmpz_set_mpz(fmpq_denref(f), one);
+      mpz_clear(one);
+    }
+  }
+  else
+  {
+    coeffs QQ=nInitChar(n_Q,NULL);
+    nMapFunc nMap=n_SetMap(cf,QQ);
+    if (nMap!=NULL)
+    {
+      number nn=nMap(n,cf,QQ);
+      convSingNFlintN(f,nn,QQ);
+    }
+    nKillChar(QQ);
+  }
+}
+
+void convSingNFlintN_QQ(fmpq_t f, number n)
+{
+  fmpq_init(f);
+  if (SR_HDL(n)&SR_INT)
+    fmpq_set_si(f,SR_TO_INT(n),1);
+  else if (n->s<3)
+  {
+    fmpz_set_mpz(fmpq_numref(f), n->z);
+    fmpz_set_mpz(fmpq_denref(f), n->n);
+  }
+  else
+  {
+    mpz_t one;
+    mpz_init_set_si(one,1);
+    fmpz_set_mpz(fmpq_numref(f), n->z);
+    fmpz_set_mpz(fmpq_denref(f), one);
+    mpz_clear(one);
+  }
+}
+
+void convSingNFlintNN(fmpq_t re, fmpq_t im, number n, const coeffs cf)
+{
+  number n_2=n_RePart(n,cf);
+  convSingNFlintN(re,n_2,cf);
+  n_Delete(&n_2,cf);
+  n_2=n_ImPart(n,cf);
+  convSingNFlintN(im,n_2,cf);
+  n_Delete(&n_2,cf);
+}
+
+void convSingPFlintP(fmpq_poly_t res, poly p, const ring r)
+{
+  int d=p_GetExp(p,1,r);
+  fmpq_poly_init2(res,d+1);
+  _fmpq_poly_set_length (res, d + 1);
+  while(p!=NULL)
+  {
+    number n=pGetCoeff(p);
+    fmpq_t c;
+    convSingNFlintN(c,n,r->cf);
+    fmpq_poly_set_coeff_fmpq(res,p_GetExp(p,1,r),c);
+    fmpq_clear(c);
+    pIter(p);
+  }
+}
+
+void convSingImPFlintP(fmpq_poly_t res, poly p, const ring r)
+{
+  int d=p_GetExp(p,1,r);
+  fmpq_poly_init2(res,d+1);
+  _fmpq_poly_set_length (res, d + 1);
+  while(p!=NULL)
+  {
+    number n=n_ImPart(pGetCoeff(p),r->cf);
+    fmpq_t c;
+    convSingNFlintN(c,n,r->cf);
+    fmpq_poly_set_coeff_fmpq(res,p_GetExp(p,1,r),c);
+    fmpq_clear(c);
+    n_Delete(&n,r->cf);
+    pIter(p);
+  }
+}
+
+poly convFlintPSingP(fmpq_poly_t f, const ring r)
+{
+  int d=fmpq_poly_length(f);
+  poly p=NULL;
+  for(int i=0; i<=d; i++)
+  {
+    fmpq_t c;
+    fmpq_init(c);
+    fmpq_poly_get_coeff_fmpq(c,f,i);
+    number n=convFlintNSingN(c,r->cf);
+    poly pp=p_Init(r);
+    pSetCoeff0(pp,n);
+    p_SetExp(pp,1,i,r);
+    p_Setm(pp,r);
+    p=p_Add_q(p,pp,r);
+  }
+  p_Test(p,r);
+  return p;
+}
 
 bigintmat* singflint_LLL(bigintmat*  m, bigintmat* T)
 {

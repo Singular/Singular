@@ -125,8 +125,8 @@ BOOLEAN blackbox_default_Check(blackbox *,leftv,leftv)
 }
 int setBlackboxStuff(blackbox *bb, const char *n)
 {
-  int where = -1;   
-  for (int i=0;i<MAX_BB_TYPES;i++)      
+  int where = -1;
+  for (int i=0;i<MAX_BB_TYPES;i++)
   {
     if (blackboxTable[i]!=NULL && strcmp(blackboxName[i],n)==0) {
       where = i;
@@ -222,4 +222,24 @@ void printBlackboxTypes()
     if (blackboxName[i]!=NULL)
        Print("type %d: %s\n",i,blackboxName[i]);
   }
+}
+
+struct blackbox_list *getBlackboxTypes()
+{
+	int i = 0;
+	void **l = (void **)omalloc(blackboxTableCnt * sizeof(void *));
+	struct blackbox_list *list_struct = (struct blackbox_list *) omalloc(sizeof(struct blackbox_list));
+	list_struct->count = blackboxTableCnt;
+	list_struct->list = l;
+
+	for (i = blackboxTableCnt-1; i >= 0 ;i--)
+	{
+		if (blackboxName[i]!=NULL) {
+			l[i] = (void *)omStrDup(blackboxName[i]);
+			//Print("type %d: %s\n",i,blackboxName[i]);
+		} else {
+			l[i] = NULL;
+		}
+	}
+	return list_struct;
 }

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////
-version="version dmodloc.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version dmodloc.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY: dmodloc.lib     Localization of algebraic D-modules and applications

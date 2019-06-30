@@ -64,7 +64,7 @@ diff -cr a/autosetup/cc.tcl b/autosetup/cc.tcl
   		user-error "Failed to find $exe"
 ***************
 *** 505,511 ****
-  
+
   	# Build the command line
   	set cmdline {}
 - 	lappend cmdline {*}[get-define CCACHE]
@@ -75,7 +75,7 @@ diff -cr a/autosetup/cc.tcl b/autosetup/cc.tcl
 ***************
 *** 659,665 ****
   }
-  
+
   # Initialise some values from the environment or commandline or default settings
 ! foreach i {LDFLAGS LIBS CPPFLAGS LINKFLAGS {CFLAGS "-g -O2"}} {
   	lassign $i var default
@@ -83,7 +83,7 @@ diff -cr a/autosetup/cc.tcl b/autosetup/cc.tcl
   }
 --- 661,667 ----
   }
-  
+
   # Initialise some values from the environment or commandline or default settings
 ! foreach i {LDFLAGS LIBS CPPFLAGS LINKFLAGS CFLAGS} {
   	lassign $i var default
@@ -113,13 +113,13 @@ diff -cr a/autosetup/cc.tcl b/autosetup/cc.tcl
   } else {
 ! 	define CXX [find-an-executable [get-define cross]c++ [get-define cross]g++ false]
   }
-  
+
   # CXXFLAGS default to CFLAGS if not specified
   define CXXFLAGS [get-env CXXFLAGS [get-define CFLAGS]]
-  
+
   # May need a CC_FOR_BUILD, so look for one
 ! define CC_FOR_BUILD [find-an-executable [get-env CC_FOR_BUILD ""] cc gcc false]
-  
+
   if {[get-define CC] eq ""} {
   	user-error "Could not find a C compiler. Tried: [join $try ", "]"
 --- 685,698 ----
@@ -128,33 +128,33 @@ diff -cr a/autosetup/cc.tcl b/autosetup/cc.tcl
   } else {
 ! 	define CXX [find-an-executable [get-define cross]g++ [get-define cross]clang++ [get-define cross]c++ false]
   }
-  
+
   # CXXFLAGS default to CFLAGS if not specified
   define CXXFLAGS [get-env CXXFLAGS [get-define CFLAGS]]
-  
+
   # May need a CC_FOR_BUILD, so look for one
 ! define CC_FOR_BUILD [find-an-executable [get-env CC_FOR_BUILD ""] gcc clang cc false]
-  
+
   if {[get-define CC] eq ""} {
   	user-error "Could not find a C compiler. Tried: [join $try ", "]"
 ***************
 *** 711,719 ****
   cc-store-settings {-cflags {} -includes {} -declare {} -link 0 -lang c -libs {} -code {} -nooutput 0}
   set autosetup(cc-include-deps) {}
-  
+
 ! msg-result "C compiler...[get-define CCACHE] [get-define CC] [get-define CFLAGS]"
   if {[get-define CXX] ne "false"} {
 ! 	msg-result "C++ compiler...[get-define CCACHE] [get-define CXX] [get-define CXXFLAGS]"
   }
   msg-result "Build C compiler...[get-define CC_FOR_BUILD]"
-  
+
 --- 713,721 ----
   cc-store-settings {-cflags {} -includes {} -declare {} -link 0 -lang c -libs {} -code {} -nooutput 0}
   set autosetup(cc-include-deps) {}
-  
+
 ! msg-result "C compiler...[get-define CC] [get-define CFLAGS]"
   if {[get-define CXX] ne "false"} {
 ! 	msg-result "C++ compiler...[get-define CXX] [get-define CXXFLAGS]"
   }
   msg-result "Build C compiler...[get-define CC_FOR_BUILD]"
-  
+

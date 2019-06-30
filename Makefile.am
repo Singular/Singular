@@ -18,7 +18,6 @@ install-data-local:
 	   mkdir $(DESTDIR)$(datadir)/info;\
 	   mkdir $(DESTDIR)$(datadir)/doc;\
 	   mv  $(DESTDIR)$(datadir)/singular/singular.hlp  $(DESTDIR)$(datadir)/info/.;\
-	   mv  $(DESTDIR)$(datadir)/singular/singular.idx  $(DESTDIR)$(datadir)/doc/.;\
 	fi
 
 uninstall-local:

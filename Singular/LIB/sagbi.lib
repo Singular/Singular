@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version sagbi.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version sagbi.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: sagbi.lib  Compute SAGBI basis (subalgebra bases analogous to Groebner bases for ideals) of a subalgebra
@@ -1111,9 +1111,6 @@ EXAMPLE: example sagbiReduction; shows an example"
 
     //------------- change the basering bsr to bsr[@(0),...,@(z)] ----------
     def s=addNvarsTo(basering,z+1,,"@",0); setring s;
-    // Ev hier die Reihenfolge der Vars aendern. Dazu muss unten aber entsprechend
-    // geaendert werden:
-    //  execute("ring s="+charstr(basering)+",(@(0..z),"+varstr(basering)+"),dp;");
 
     //constructs the leading ideal of dom=(p-@(0),dom[1]-@(1),...,dom[z]-@(z))
     ideal dom=imap(bsr,dom);

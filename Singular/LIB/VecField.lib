@@ -1,0 +1,1542 @@
+////////////////////////////////////////////////////////////////
+version="version VecField.lib 4.1.1.0 Feb_2019 "; //$Id$
+category="Non-commutative Algebra";
+info="
+LIBRARY: VecField.lib   vector fields, with algorithms for
+                        jordan and diagonal forms
+AUTHORS: Adrian Rettich, rettich@mathematik.uni-kl.de
+         Raul Epure,     epure@mathematik.uni-kl.de
+REFERENCES: [1] Kyoji Saito, Quasihomogene isolierte
+                Singularitaeten von Hyperflaechen, 1971
+OVERVIEW:
+
+Implements a class VecField, represented by a vector.
+For example, 'VecField V = [x3,xy]' declares the vector field
+v = x3 d_x+xy d_y. Instead of a vector, an nx1 matrix is also
+accepted. The vector can be recovered as V.vec.
+Supports coordinate transformations (via maps), which are
+represented by tracking a map 'V.coordinates' which maps
+the standard coordinates to those in which V is currently
+represented. V.dimension stores the vector field's dimension,
+which is just nvars(basering), and V.lin yields the linear part
+of V. You may set an additional parameter V.precision,
+which dictates the degree to which operations on the
+vector field should be exact.
+The default precision is 1. Precision is preserved across
+transformations, additions, and all other manipulations
+of vector fields.
+
+PROCEDURES:
+
+applyVecField(VecField V, ..., [int n]); apply V to a poly p / an ideal I as an operator;
+                                         you can also use 'V*p'/'V*I'. If an integer n is passed,
+                                         consider V up to degree n.
+
+changeCoordinates(VecField V, map psi);  transform V by psi; you can also use 'V*phi'
+
+jordanVecField(VecField V);              transform V s.t. the linear part is in Jordan normal form
+
+diagonalizeVecFieldLin(list l);          l a list of VecFields. Change coordinates s.t. all
+                                         linear parts are diagonal simultaneously.
+
+SaitoBase(VecField V);                   algorithm to find a basis where the semisimple
+                                         and nilpotent parts are easily read off
+
+diagonalizeVecField(list l);             diagonalize all VecFields in l simultaneously
+
+vecFieldToMatrix(VecField V,ideal W);    matrix representation of V in the basis W
+
+decomposeVecField(...);                  split a vectorfield V / all entries of a list of
+                                         vectorfields l into semisimple and nilpotent components
+
+diagonalizeMatrixSimul(list l);          find transformation which simultaneously diagonalizes
+                                         all matrices in l
+
+invertAlgebraMorphism(map p,int n);      return inverse of p exact up to degree n
+";
+
+LIB "poly.lib";
+LIB "linalg.lib";
+LIB "matrix.lib";
+LIB "arr.lib";
+
+/////////////////////////////////////////////////////////////
+
+// CONSTRUCTOR
+
+static proc mod_init()
+{
+    // dimension: dimension of the vector field (taken from basering)
+    // vec: coefficients of the new vector field, a (dimension)x1 matrix
+    // lin: the linear part of the vector field
+    // coordinates: a map phi:basering --> basering mapping the standard
+    // coordinates to those in which the VecField is represented
+    // precision: default degree up to which calculations shall be
+    // exact. precision=-1 means infinity
+    newstruct("VecField","int dimension,matrix vec,matrix lin,map coordinates,int precision");
+    // override operators:
+    system("install","VecField","=",defvecfield,1);
+    system("install","VecField","==",eqvecfield,2);
+    system("install","VecField","!=",ineqvecfield,2);
+    system("install","VecField",">",cmpvecfield,2);
+    system("install","VecField","<",cmpvecfield,2);
+    system("install","VecField","+",addvecfield,2);
+    system("install","VecField","-",subvecfield,2);
+    system("install","VecField","*",VecFieldMult,2);
+
+}
+
+// PROCEDURES
+
+static proc defvecfield(v)
+"
+USAGE:   defvecfield(vector v), where v are the coefficients of the vector field
+RETURN:  new vector field of same dimension as base ring
+ASSUME:  v has at most nvars() entries
+NOTE:    if you want a different precision than the default of 1, manually set V.precision
+    after declaration.
+"
+{
+    VecField V;
+    // dimension: automatically the same as the base ring
+    V.dimension = nvars(basering);
+    if(nrows(v) > V.dimension)
+    {
+        ERROR("ERROR in defvecfield: vector should have at most nvars() entries");
+    }
+    // if vector has fewer entries than expected, fill with zeroes.
+    matrix vtemp[V.dimension][1];
+    for(int i=1;i<=nrows(v);i++)
+    {
+        if(typeof(v) == "vector")
+        {
+            vtemp[i,1] = v[i];
+        }
+        else
+        {
+            if(typeof(v) == "matrix")
+            {
+                vtemp[i,1] = v[i,1];
+            }
+            else
+            {
+                ERROR("ERROR while defining VecField: right-handside must be a vector or matrix");
+            }
+        }
+    }
+    V.vec = vtemp;
+
+    // V.lin is just the linear part of the jacobian of v
+    V.lin = jet(jacob(ideal(v)),0);
+    if(ncols(V.lin) < V.dimension || nrows(V.lin) < V.dimension)
+    {
+        V.lin = extendMatrix(V.lin,V.dimension,V.dimension);
+    }
+
+    // coordinates: start out with the base coordinates, i.e. the identity map
+    V.coordinates = identityMap();
+
+    // set default precision to 1
+    V.precision = 1;
+
+    return(V);
+}
+
+static proc addvecfield(VecField V,VecField W)
+"
+USAGE:  addvecfield(VecField V,VecField W)
+ASSUME: V and W are of same dimension
+RETURN: new vector field V+W
+NOTE:   if V,W have different coordinate maps, this converts W to the same
+    coordinates as V. If V,W have different precision,
+    the precision of V is used.
+"
+{
+    if(V.dimension != W.dimension)
+    {
+        ERROR("ERROR in addvecfield: vector fields must be of same dimension");
+    }
+
+    if(! eqMap(V.coordinates,W.coordinates))
+    {
+        map f = invertAlgebraMorphism(W.coordinates,V.precision);
+        map g = V.coordinates;
+        map h = g(f);
+        VecField WW = changeCoordinates(W,h);
+        matrix newV = V.vec + WW.vec;
+        VecField N = [newV[1..nrows(newV),1]];
+        N.precision = V.precision;
+        N.coordinates = V.coordinates;
+        return(N);
+    }
+    else
+    {
+        matrix newV = V.vec+W.vec;
+        VecField N = [newV[1..nrows(newV),1]];
+        N.precision = V.precision;
+        N.coordinates = V.coordinates;
+        return(N);
+    }
+}
+
+static proc subvecfield(VecField V,VecField W)
+"
+USAGE:  subvecfield(VecField V,VecField W)
+ASSUME: V,W have same dimension
+RETURN: new vector field V-W
+NOTE:   if V,W have different coordinate maps, this converts W to the same
+    coordinates as V. If V,W have different precision, the precision of V is used.
+"
+{
+    if(V.dimension == W.dimension)
+    {
+        matrix newV = -W.vec;
+        VecField N = [newV[1..nrows(newV),1]];
+        N.coordinates = W.coordinates;
+        N.precision = W.precision;
+        return(addvecfield(V,N));
+    }
+    else
+    {
+        ERROR("ERROR in subvecfield: vector fields must be of same dimension");
+    }
+}
+static proc VecFieldMult(VecField V,p)
+{
+    if(typeof(p) == "VecField")
+    {
+        return(liebracket(V,p));
+    }
+    else
+    {
+        if((typeof(p) == "poly") or (typeof(p) == "ideal"))
+        {
+            return(applyVecField(V,p));
+        }
+        else
+        {
+            if(typeof(p) == "map")
+            {
+                return(changeCoordinates(V,p));
+            }
+        }
+    }
+    ERROR("ERROR in multiplying VecField: right-hand side
+            must be of type VecField, poly, or ideal");
+}
+
+static proc liebracket(VecField V,VecField W)
+"
+USAGE:  liebracket(VecField V,VecField W)
+ASSUME: linear parts of V and W have same dimension as matrices,
+    and V,W are given in the same coordinates
+RETURN: [V,W]
+NOTE:   precision is taken from V.
+"
+{
+    if(nrows(V.lin)!=nrows(W.lin) || ncols(V.lin)!=ncols(W.lin))
+    {
+        ERROR("error in liebracket: dimensions must agree");
+    }
+    if(! eqMap(V.coordinates,W.coordinates))
+    {
+        ERROR("error in liebracket: coordinate systems must be the same");
+    }
+
+    matrix A = jacob(ideal(V.vec))*W.vec -jacob(ideal(W.vec))*V.vec;
+    vector v = A[1];
+    VecField X = v;
+    X.coordinates = V.coordinates;
+    X.precision = V.precision;
+    return(X);
+}
+
+static proc cmpvecfield(VecField V,VecField W)
+"
+USAGE:  cmpvecfield(VecField V,VecField W)
+RETURN: 0 if V==W, -1 if dimensions are different, 1 otherwise
+"
+{
+    if(V.dimension != W.dimension)
+    {
+        return(-1);
+    }
+    if(V.vec == W.vec)
+    {
+        if(eqMap(V.coordinates,W.coordinates))
+        {
+            return(0);
+        }
+    }
+    return(1);
+}
+
+static proc eqvecfield(VecField V,VecField W)
+"
+USAGE: eqvecfield(VecField V,VecField W)
+RETURN: 1 if V==W, 0 otherwise
+"
+{
+    return(cmpvecfield(V,W)==0);
+}
+
+static proc ineqvecfield(VecField V,VecField W)
+"
+USAGE: ineqvecfield(VecField V,VecField W)
+RETURN: 0 if V==W, 1 otherwise
+"
+{
+    return(!eqvecfield(V,W));
+}
+
+
+proc applyVecField(VecField V,p,list #)
+"
+USAGE:  applyVecField(VecField V, poly/ideal p [,int n])
+RETURN: if p is a polynomial, return a polynomial V(p), if p is an ideal, the ideal V(p).
+    If an optional n is given, only the parts of V up to and including degree n are
+    applied to p.
+EXAMPLE: example applyVecField
+"
+{
+    int n = -1;
+    if(size(#) > 0)
+    {
+        if(typeof(#[1]) == "int")
+        {
+            n = #[1];
+        }
+    }
+
+    if(typeof(p) == "poly")
+    {
+        poly q = 0;
+        for(int j=1;j<=V.dimension;j++)
+        {
+            if(n == -1)
+            {
+                q = q+V.vec[j,1]*diff(p,var(j));
+            }
+            else
+            {
+                q = q+jet(V.vec[j,1],n)*diff(p,var(j));
+            }
+        }
+        return(q);
+    }
+    else
+    {
+        if(typeof(p) != "ideal")
+        {
+            ERROR("ERROR in applyVecField: p must be of type poly or ideal");
+        }
+        ideal J = 0;
+        for(int j=1;j<=ncols(p);j++)
+        {
+            J = (J,applyVecField(V,p[j],n));
+        }
+        J = J[2..ncols(J)]; // delete the leading '0' generator
+        return(J);
+    }
+}
+example
+{
+    "EXAMPLE: "; echo = 2;
+    int oldp = printlevel;
+    printlevel = 1;
+    ring r = 0, (x, y, z),ds;
+    vector v = [-1,-1,-1];
+    VecField V = v;
+    poly f = x3+2y3+xz2;
+    poly g = V*f;
+    ideal I = (x2,y);
+    ideal J = V*I;
+    printlevel = oldp;
+}
+
+proc changeCoordinates(VecField V, map psi)
+"
+USAGE:  changeCoordinates(vecField V, map psi), where psi is an algebra morphism
+    k[x1,...,xn]->k[y1,...,ym] expressing the new basis in terms of the old.
+RETURN: A new vecfield in the new coordinates.
+NOTE:   the coordinate change necessitates inverting psi.
+    The inversion will be correct up to the precision of V.
+EXAMPLE: example changeCoordinates
+"
+{
+
+    int n = V.precision;
+    map prevcoords = V.coordinates;
+    map prevcoordsinv = invertAlgebraMorphism(prevcoords,n);
+    map psiinv = invertAlgebraMorphism(psi,n);
+    map compo = psi(prevcoords);
+    map compoinv = prevcoordsinv(psiinv);
+
+    ideal p = maxideal(1);
+    ideal F = psiinv(p);
+    ideal G = substitute(V.vec,p,F);
+    ideal H = G;
+    matrix m[nvars(basering)][1] = H[1..ncols(H)];
+
+    matrix JacIntermittent = jacob(ideal(psi));
+    matrix Jac = substitute(JacIntermittent,p,F);
+
+    matrix result = Jac*m;
+    if(V.precision>=0)
+    {
+        result = jet(result,V.precision);
+    }
+
+    VecField W = [result[1..nrows(result),1]];
+    ideal newcoords = ideal(prevcoords(psi));
+    if(V.precision>=0)
+    {
+        newcoords = jet(newcoords,V.precision);
+    }
+    map newmap = basering,newcoords;
+    W.coordinates = newmap;
+    W.precision = V.precision;
+
+    return(W);
+}
+example
+{
+    "EXAMPLE: "; echo = 2;
+    ring r = 0, (x, y, z),ds;
+    vector v = [-1,-1,-1];
+    VecField V = v;
+    V.precision = 4;
+    map phi = r, x-2y2+z3,2y+y3+z,z;
+    VecField W = changeCoordinates(V,phi);
+}
+
+
+proc jordanVecField(VecField V)
+"
+USAGE:  jordanVecField(VecField V)
+RETURN: new vecfield W in coordinates s.t. W.lin is in Jordan normal
+    form.
+ASSUME: eigenvalues of V.lin in basefield.
+EXAMPLE: example jordanVecField
+"
+{
+    list l = jordanbasis(V.lin); // l[1] is the transformation matrix
+    matrix trafoMat = inverse(l[1]);
+    // SINGULAR puts the ones below the diagonal, just like we want
+    matrix v = pvector();
+    matrix X = trafoMat*v;
+    vector x = [X[1..nrows(X),1]];
+    ideal J = transpose(x);
+    map j = basering,J;
+    VecField W = changeCoordinates(V,j);
+    W.precision = V.precision;
+    return(W);
+}
+example
+{
+    "EXAMPLE: "; echo = 2;
+    ring r = 0, (x, y, z),ds;
+    vector v = [-1,-1,-1];
+    VecField V = v;
+    V.precision = 4;
+    map phi = r, x-2y2+z3,2y+y3+z,z;
+    VecField W = changeCoordinates(V,phi);
+    VecField X = jordanVecField(W);
+}
+
+proc diagonalizeVecFieldLin(list #)
+"
+USAGE:  diagonalizeVecFieldLin(list l), where l is a list of VecFields
+RETURN: list W of the same VecFields in new coords s.t. the linear parts are diagonal,
+    all in the same coordinates
+ASSUME: All linear parts of the entries of l are simultaneously diagonalizable.
+EXAMPLE: example diagonalizeVecFieldLin
+"
+{
+    list l = #;
+    list matrices;
+    int i;
+    for(i=1;i<=size(l);i++)
+    {
+        matrices = insert(matrices,l[i].lin,size(matrices));
+    }
+    matrix diagtrafo = diagonalizeMatrixSimul(matrices);
+
+    matrix trafo = inverse(diagtrafo)*pvector();
+    ideal I = (transpose(trafo));
+
+    map coordChange = basering,I;
+
+    list W;
+    VecField temp;
+    for(i=1;i<=size(l);i++)
+    {
+        temp = changeCoordinates(l[i],coordChange);
+        W = insert(W,temp,size(W));
+    }
+    return(W);
+}
+example
+{
+    "EXAMPLE: "; echo = 2;
+    ring r = 0, (x, y, z),ds;
+    vector v = [-1,-1,-1];
+    VecField V = v;
+    V.precision = 4;
+    map phi = r, x-2y2+z3,2y+y3+z,z;
+    VecField W = changeCoordinates(V,phi);
+    VecField X = [-2,1,0];
+    list d = diagonalizeVecFieldLin(W,X);
+}
+
+
+proc SaitoBase(VecField V)
+"
+USAGE:  SaitoBase(VecField V)
+RETURN: new VecField W in the base from [1] thm. 3.1, where semisimple and
+    nilpotent components are easily read off.
+NOTE:   the algorithm requires inversions of algebra morphisms. These will be
+    exact to the precision of V. Warning: The algorithm assumes
+    standard coordinates. If V is not given in standard coordinates, it will
+    be converted to standard coordinates, but not converted back at the end,
+    so the resulting transformation is from standard coordinates to the
+    Saito coordinates. If you want the entire transformation from your original
+    coordinates to the Saito ones, add the inverse of your original coordinate
+    transformation manually.
+    Note that weight vectors only take Int64,
+    making the algorithm fail for very large entries in V.vec.
+EXAMPLE: example SaitoBase
+"
+{
+
+    // Saito works on standard coordinates, so we replace the coordinates of V by the
+    // standard coordinates.
+    // Note that we do not convert back, the user would have to do that themselves.
+    map oldcoords = V.coordinates;
+    map standardCoords = basering,(maxideal(1));
+    V.coordinates = standardCoords;
+
+    // step one is just choosing coordinates s.t. the linear part of V is in JNF.
+    VecField W = jordanVecField(V);
+
+    // k loop: compute one step in the sequence of coordinate systems:
+    int i,k;
+    map newbasemap; ideal WHS; matrix eigenvals,D,thesolution; intvec weights;
+    list l,sols; poly h,g;
+    for(k=2;k<=1+V.precision;k++)
+    {
+        //print("DEBUG: k=");print(k);
+        //print("DEBUG: W=");print(W);
+        // we need the eigenvalues of W to use as homogeneous weights later on
+        eigenvals = diagEntries(W.lin);
+        weights = vecToIntvec(eigenvals);
+        // newbase will hold the new coordinates. We compute an entire step k,
+        // then convert W to newbase.
+        matrix newbase[W.dimension][1];
+
+        // i loop: compute one new coordinate in the current step of the sequence:
+        for(i=1;i<=W.dimension;i++)
+        {
+            //print("DEBUG: i");print(i);
+            // compute the complement of the weakly homogeneous space (see below)
+            WHS = weaklyHomogeneousSpaceComplement(k,int(leadcoef(eigenvals[i,1])),weights);
+            // use this to compute the matrix representation of W restricted to WHS in
+            // the monomial basis
+            D = vecFieldToMatrix(W,WHS);
+            // subtract current eigenvalue (see algorithm)
+            D = D-eigenvals[i,1]*unitmat(ncols(D));
+            //print("DEBUG: curEigVal");print(eigenvals[i,1]);
+            //print("DEBUG: WHS");print(WHS);
+            //print("DEBUG: D");print(D);
+
+            // D should not be the zero matrix. if it is, we can continue by skipping
+            // the current step, but something may have gone wrong.
+            if(ncols(D) <= 0)
+            {
+                print("WARNING: D is the zero matrix in SaitoBase");
+                newbase[i,1] = var(i);
+            }
+            else
+            {
+                // compute the polynomial g from the algorithm
+                g = W.vec[i,1];
+                g = homogeneousPart(g,k);
+                g = -g; // g is now -{g_m(x_m)}_m+1,_x_m
+                //print("DEBUG: g");print(g);
+
+                // see whether g is already weakly quasihomogeneous. If so, set h=0:
+                if(deg(g,weights) == eigenvals[i,1])
+                {
+                    //print("DEBUG: g is already weakly quasihomogeneous in SaitoBase");
+                    newbase[i,1] = var(i);
+                    i++; // continue does not increment for us!
+                    continue; // newbase is same as old base, can skip to the next component
+                }
+
+                // g is not weakly quasihomogeneous. Satio: there exists h(i) s.t. D*h(i) = g
+                // compute h(i) via LU decomposition, representing g as a
+                // vector in the basis of WHS.
+                l = ludecomp(D);
+                sols =lusolve(l[1],l[2],l[3],homogeneousPolyToVec(g,WHS));
+
+                // by Saito, there should be a solution. If no solutions are found for a valid
+                // input, then my code is incorrect.
+                if(sols[1]==0)
+                {
+                    //print("DEBUG: D=");print(D);
+                    ERROR("ERROR in SaitoBase: no solutions found.
+                            This implies a mistake in the library.");
+                }
+
+                thesolution = sols[2]; // this is h from p.137, represented as a vector.
+                h = vecToHomogeneousPoly(thesolution,WHS);
+                //print("DEBUG: h=");print(h);
+
+                // x_(i+1) = x_(i)+h.
+                newbase[i,1] = var(i)+h;
+            }
+        } // end of i-loop: we have computed a new basis.
+
+        // new basis is represented as polynomials in terms of the old basis.
+        // View them as a map to change W accordingly.
+        newbasemap = basering,newbase[1..W.dimension,1];
+        //print("DEBUG: newbasemap=");print(newbasemap);
+        W = changeCoordinates(W,newbasemap);
+        //print("DEBUG: new W = ");print(W);
+        kill newbase;
+    } // end of k-loop: we have computed enough steps in the coordinate sequence to be
+    // exact up to V.precision.
+
+    return(W);
+}
+example
+{
+    "EXAMPLE: "; echo = 2;
+    ring r = 0, (x, y, z),ds;
+    vector v = [-1,-1,-1];
+    VecField V = v;
+    V.precision = 4;
+    map phi = r, x-2y2+z3,2y+y3+z,z;
+    VecField W = changeCoordinates(V,phi);
+    VecField WS = SaitoBase(W);
+}
+
+proc diagonalizeVecField(list #)
+"
+USAGE:  diagonalizeVecField(list l), l a list of VecFields
+RETURN: list of VecFields W such that they are all simultaneously diagonal.
+ASSUME: all input VecFields have to be simultaneously diagonalizable.
+NOTE:   the algorithm requires inversions of algebra morphisms. These will be
+    exact to the precision of l[1]. Warning: The algorithm assumes
+    standard coordinates. If V is not given in standard coordinates, it will
+    be converted to standard coordinates, but not converted back at the end,
+    so the resulting transformation is from standard coordinates to the
+    Saito coordinates. If you want the entire transformation from your original
+    coordinates to the Saito ones, add the inverse of your original coordinate
+    transformation manually.
+    Note that weight vectors only take Int64,
+    making the algorithm fail for very large entries in V.vec.
+EXAMPLE: example diagonalizeVecField
+"
+{
+    // note: comments are sparse in this procedure as it is essentially the same as SaitoBase(),
+    // just with lists. See SaitoBase() for more documentation.
+    list l = #;
+    // Saito works on standard coordinates
+    list oldcoords;
+    int i,j,k;
+    for(i=1;i<=size(l);i++)
+    {
+        oldcoords = insert(oldcoords,l[i].coordinates,size(oldcoords));
+    }
+    map standardCoords = basering,(maxideal(1));
+    for(i=1;i<=size(l);i++)
+    {
+        l[i].coordinates = standardCoords;
+    }
+
+    // step one of the algorithm
+    list W = diagonalizeVecFieldLin(l);
+    //print("DEBUG: W after diagonalizeSimul");print(W);
+
+    // k-loop: compute one step in the sequence of coordinate systems:
+    int numSteps = W[1].precision;
+    poly h,p; matrix thesolution,curVec,curEigVals,gj,t;
+    list sols,eigenvals,myLeadCoefs,weights; ideal M;
+    int counter,numRows,nontrivialFlag,irow,a; map newbasemap;
+    for(k=2;k<=1+numSteps;k++)
+    {
+        //print("DEBUG: k=");print(k);
+        // eigenvals will contain a list of arrays, where the n-th array contains
+        // all eigenvals of the n-th vecfield
+        for(i=1;i<=size(W);i++)
+        {
+            t = diagEntries(W[i].lin);
+            eigenvals = insert(eigenvals,t,size(eigenvals));
+        }
+
+        // the new base will be the same for all vecfields, so need
+        // only one matrix here, not a list
+        matrix newbase[W[1].dimension][1];
+
+        // i-loop: compute one new coordinate in the current step of the sequence
+        for(i=1;i<=W[1].dimension;i++)
+        {
+            //print("DEBUG: i");print(i);
+            for(j=1;j<=size(W);j++)
+            {
+                weights = insert(weights,vecToIntvec(eigenvals[j]),size(weights));
+                curEigVals = eigenvals[j];
+                myLeadCoefs = insert(myLeadCoefs,int(leadcoef(curEigVals[i,1])),size(myLeadCoefs));
+            }
+
+            list D; // one matrix D per vecfield
+
+            nontrivialFlag = 0;
+
+            for(j=1;j<=size(W);j++)
+            {
+                //print("DEBUG: j");print(j);
+                M = maxideal(k);
+                // notable difference to SaitoBase():
+                // we do not compute the weakly homogeneous space.
+                // Instead, as we know the vector fields are diagonalizable,
+                // we can simply apply V to
+                // all homogeneous monomials
+                // and use the resulting coefficients as diagonal entries.
+                matrix Dcur[ncols(M)][ncols(M)];
+                for(a=1;a<=ncols(M);a++)
+                {
+                    p = applyVecField(W[j],M[a],1);//apply W.lin to all monomials of deg k
+                    //print("DEBUG: M[a],p");print(M[a]);print(p);
+                    Dcur[a,a] = leadcoef(p);
+                }
+                D = insert(D,Dcur,size(D));
+                curEigVals = eigenvals[j];
+                //print("DEBUG: curEigVals");print(curEigVals);
+                D[j] = D[j]-curEigVals[i,1]*unitmat(ncols(D[j]));
+                //print("DEBUG: D[j]");print(D[j]);
+                if(ncols(D[j])>0)
+                {
+                    nontrivialFlag = 1;
+                }
+                kill Dcur;
+            }
+            if(nontrivialFlag == 0)
+            {
+                // this should not happen. Something must be wrong.
+                print("WARNING: all D are the zero matrix in diagonalizeVecField");
+                newbase[i,1] = var(i);
+            }
+            else
+            {
+                // paste all Ds together into one single matrix
+                numRows = 0;
+                for(j=1;j<=size(W);j++)
+                {
+                    numRows = numRows + nrows(D[j]);
+                }
+
+                matrix Dcomp[numRows][ncols(D[1])] = transpose(concat(D));
+                // note: ordinarily we would need to transpose each D[j] first, but as
+                // they are all diagonal, we skip that step.
+
+                // compute the polynomials g
+                for(j=1;j<=size(W);j++)
+                {
+                    curVec = W[j].vec;
+                    poly g(j) = curVec[i,1];
+                    g(j) = homogeneousPart(g(j),k);
+                    g(j) = -g(j); // g(j) is now -{g_m(x_m)}_m+1,_x_m
+                    //print("DEBUG: g(j)");print(g(j));
+                }
+
+                // paste the vector representations of all g(j) together into one big vector:
+                matrix g[numRows][1];
+                counter = 1;
+                for(j=1;j<=size(W);j++)
+                {
+                    gj = homogeneousPolyToVec(g(j),maxideal(k));
+                    kill g(j);
+                    for(irow=1;irow<=nrows(D[j]);irow++)
+                    {
+                        g[counter,1] = gj[irow,1];
+                        counter++;
+                    }
+                }
+                //print("DEBUG: g");print(g);
+                //exists h(i): D*h(i) = g(i)
+                l = ludecomp(Dcomp);
+                sols =lusolve(l[1],l[2],l[3],g);
+                if(sols[1]==0)
+                {
+                    //print("DEBUG: Dcomp=");print(Dcomp);
+                    ERROR("error in diagonalizeVecField: no solutions found");
+                }
+                thesolution = sols[2];
+                h = vecToHomogeneousPoly(thesolution,maxideal(k));
+                //print("DEBUG: h=");print(h);
+
+                newbase[i,1] = var(i)+h;
+            }
+            kill Dcomp,D,g;
+        } // end of i-loop
+
+        newbasemap = basering,newbase[1..W[1].dimension,1];
+        //print("DEBUG: newbasemap=");print(newbasemap);
+        for(i=1;i<=size(W);i++)
+        {
+            W[i] = changeCoordinates(W[i],newbasemap);
+            //print("DEBUG: new W[i] = ");print(W[i]);
+        }
+        kill newbase;
+    } // end of k-loop
+    return(W);
+}
+example
+{
+    "EXAMPLE: "; echo = 2;
+    int oldp = printlevel;
+    printlevel = 1;
+    ring r = 0, (x, y, z),ds;
+    vector v = [-1,-1,-1];
+    VecField V = v;
+    V.precision = 4;
+    map phi = r, x-2y2+z3,2y+y3+z,z;
+    VecField W = changeCoordinates(V,phi);
+    VecField X = [-2,1,0];
+    VecField WS = diagonalizeVecField(W,X);
+    printlevel = oldp;
+}
+
+proc vecFieldToMatrix(VecField V,ideal W)
+"
+USAGE: vecFieldToMatrix(VecField V,ideal W)
+RETURN: the matrix representation of V restricted to span(W), in the basis specified by W.
+EXAMPLE: example vecFieldToMatrix
+"
+{
+    matrix D[ncols(W)][ncols(W)]; // this will hold the matrix representation
+    matrix linpart;
+    VecField Vtemp;
+    poly p,mon,lcoef;
+    int h;
+    for(int j=1;j<=ncols(W);j++)
+    {
+        // compute the image of the j-th basis vector:
+        // only the image of the linear part of V is interesting
+        linpart = V.lin * pvector();
+        Vtemp = [linpart[1..nrows(linpart),1]];
+        Vtemp.precision = V.precision;
+        p = applyVecField(Vtemp,W[j]);
+
+        // find out how to write this in the basis again by brute force:
+        while(p != 0)
+        {
+            mon = leadmonom(p);
+            lcoef = leadcoef(p);
+            p = p-mon*lcoef;
+            for(h=1;h<=ncols(W);h++)
+            {
+                if(mon == W[h])
+                {
+                    D[h,j] = lcoef;
+                } else
+                {
+                    D[h,j] = 0;
+                }
+            }
+        }
+    }
+
+    return(D);
+}
+example
+{
+    "EXAMPLE: "; echo = 2;
+    int oldp = printlevel;
+    printlevel = 1;
+    ring r = 0, (x, y, z),ds;
+    vector v = [-1,-1,-1];
+    VecField V = v;
+    V.precision = 4;
+    map phi = r, x-2y2+z3,2y+y3+z,z;
+    VecField W = changeCoordinates(V,phi);
+    matrix m = vecFieldToMatrix(W,maxideal(2));
+    printlevel = oldp;
+}
+
+proc decomposeVecField(list #)
+"
+USAGE:  decomposeVecField(VecField V) or decomposeVecField(list s), s a list of VecFields
+RETURN: list l containing two VecFields, where l[1] is the semisimple part of V, l[2] the
+    nilpotent part. If called with a list, l[2n-1] is the semisimple part of the
+    n-th VecField, l[2n] its nilpotent part.
+ASSUME: The algorithm assumes standard coordinates. If V is not given in standard
+    coordinates, it will be converted to standard coordinates, but not converted back
+    at the end, so the resulting transformation is from standard coordinates to the
+    new coordinates. If you want the entire transformation from your original coordinates
+    to the new ones, add the inverse of your original coordinate transformation manually.
+EXAMPLE: example decomposeVecField
+"
+{
+    if(size(#) == 1)
+    {
+        VecField W = SaitoBase(#[1]);
+        map backtrafo = invertAlgebraMorphism(W.coordinates,W.precision);
+        matrix diagMatrix = diag(diagEntries(W.lin));
+        matrix diagPart = diagMatrix * pvector();
+        VecField l1 = [diagPart[1..nrows(diagPart),1]];
+        l1.precision = W.precision;
+        l1.coordinates = W.coordinates; // since l1 was not computed by a coord change,
+        // force the correct coordinates
+        VecField l2 = W - l1;
+        l2.precision = W.precision;
+        l1 = changeCoordinates(l1,backtrafo);
+        l2 = changeCoordinates(l2,backtrafo);
+        list l = l1,l2;
+        return(l);
+    }
+    else
+    {
+        list l,temp;
+        for(int i=1;i<=size(#);i++)
+        {
+            temp = decomposeVecField(#[i]);
+            l = insert(l,temp[1],size(l));
+            l = insert(l,temp[2],size(l));
+        }
+        return(l);
+    }
+}
+example
+{
+    "EXAMPLE: "; echo = 2;
+    ring r = 0, (x, y, z),ds;
+    vector v = [-1,-1,-1];
+    VecField V = v;
+    V.precision = 4;
+    map phi = r, x-2y2+z3,2y+y3+z,z;
+    VecField W = changeCoordinates(V,phi);
+    list l = decomposeVecField(W);
+}
+
+
+proc invertAlgebraMorphism(p,int n)
+"
+USAGE: invertAlgebraMorphism(map p,int n), where p is an algebra
+    morphism k[x1,...,xn]->k[y1,...,ym],
+    or invertAlgebraMorphism(ideal p,int n) if you represent the map as an ideal
+RETURN: the inverse of p mod (maxideal)^n.
+    If n=-1, try for infinite precision. If input was an ideal, return an ideal.
+NOTE: the algorithm used is described in [1], chapter 3.2
+EXAMPLE: example invertAlgebraMorphism
+"
+{
+    int myindex;
+    if(typeof(p) == "map")
+    {
+        // to do this, we apply p to each ring variable,
+        // then use the algorithm that inverts morphisms
+        // when they are represented as an ideal
+        ideal P = maxideal(1);
+        ideal I = p(P);
+        ideal J = invertAlgebraMorphism(I,n);
+        map f = basering,J;
+        return(f);
+    }
+    else
+    {
+        if(typeof(p) == "ideal")
+        {
+            ring oldbasering = basering;
+            int numvars = nvars(basering);
+
+            // we only invert to the n-th exponent, so the (n+1)-th should be modded out
+            // n=-1 means "infinity"
+            if(n>=0)
+            {
+                ideal Max = maxideal(n+1);
+            }
+
+            // choose ordering s.t. y^n < x^1:
+            ring k = 0,(x(1..numvars),y(1..numvars)),lp;
+
+            // the x are copies of the original ring variables
+            map inclusionmap = oldbasering,x(1..numvars);
+
+            ideal F = inclusionmap(p);
+            ideal Max = inclusionmap(Max);
+
+            // if precision is not infinity, pass to quotient ring
+            if(n>=0)
+            {
+                qring qk = std(Max);
+                ideal F = fetch(k,F);
+            }
+
+            ideal I; // I will be the ideal I from the paper
+            for(int j=1;j<=numvars;j++)
+            {
+                I = (I,y(j)-F[j]);
+            }
+
+
+            I = I[2..ncols(I)]; // cut leading '0' entry
+            // I is now the ideal from van den Essen, p64
+
+            option(redSB); // need to do this for the algo to work
+            I = qslimgb(I);
+
+            ideal Inew;
+            for(j=1;j<=ncols(I);j++)
+            {
+                if(deg(I[j],(1:numvars,0:numvars)) > 0)
+                {
+                    Inew = (Inew,I[j]);
+                }
+            }
+
+            I = Inew[2..ncols(Inew)];
+
+            // normalize groebner basis
+            for(j=1;j<=ncols(I);j++)
+            {
+                I[j] = I[j]/leadcoef(I[j]);
+            }
+
+            // I should now be of the form in thm. 3.2.1i. Extract the Gs:
+            for(j=ncols(I)+1;j<=numvars;j++) // fill with zeroes if I too short
+            {
+                I = (I,0);
+                // this should not happen unless there is an error in my code.
+                print("WARNING: I was too short in invertAlgebraMorphismIdeal");
+            }
+            I = -1*I;
+
+            // sort I by leading monomial
+            ideal J = (0:numvars);
+
+            for(j=1;j<=numvars;j++)
+            {
+                myindex = varNum(leadmonom(I[j]));
+                if(myindex < 1)
+                {
+                    ERROR("ERROR in invertAlgebraMorphismIdeal: map not invertible");
+                }
+                J[myindex] = I[j]+leadmonom(I[j]);
+            }
+
+            // J should be the inverse of p now; just have to get it back to
+            // the original ring
+            // in particular, J hopefully contains no xs anymore, just ys.
+            // we have phiinverse(xi)=Gi(y1,...,yn).
+            // as in our case yi=xi, simply map back:
+            setring(oldbasering);
+            ideal allvars = (maxideal(1),maxideal(1));
+            if(n>=0)
+            {
+                map backmap = qk,allvars;
+            } else
+            {
+                map backmap = k,allvars;
+            }
+            ideal result = backmap(J);
+            return(result);
+        }
+    }
+    ERROR("ERROR in invertAlgebraMorphism: input must be of type map or ideal");
+}
+example
+{
+    "EXAMPLE: "; echo = 2;
+    ring r = 0, (x, y, z),ds;
+    vector v = [-1,-1,-1];
+    VecField V = v;
+    V.precision = 4;
+    map phi = r, x-2y2+z3,2y+y3+z,z;
+    map phiinv = invertAlgebraMorphism(phi,4);
+}
+
+proc diagonalizeMatrixSimul(list l)
+"
+USAGE: diagonalizeMatrixSimul(list l), where l is a list of quadratic matrices
+    of same dimensions
+RETURN: trafo matrix U s.t. U*A*inv(U) is diagonal for each A in l
+ASSUME: matrices are simultaneously diagonalizable, nvars(basering)>=dimension of the matrices
+EXAMPLE: example diagonalizeMatrixSimul
+"
+{
+    if(size(l)==0)
+    {
+        matrix m[1][1];
+        return(m);
+    }
+    int numRows = nrows(l[1]);
+    module M = unitmat(numRows);
+    list spaces = diagonalizeMatrixSimulRec(l,M); // now holds the intersected eigenspaces
+
+    matrix ret[numRows][numRows]; // this will be the transformation matrix.
+    int pos=1;
+    int i,j,k;
+    matrix m;
+    for(i=1;i<=size(spaces);i++)
+    {
+        M = spaces[i];
+        m = M;
+        for(j=1;j<=ncols(m);j++)
+        {
+            for(k=1;k<=nrows(m);k++)
+            {
+                ret[k,pos] = m[k,j];
+            }
+            pos++;
+        }
+    }
+    return(ret);
+}
+example
+{
+    "EXAMPLE: "; echo = 2;
+    ring r = 0,(x(1),x(2),x(3),x(4)),dp;
+
+    matrix a[4][4] = 2,0,0,0, 0,3,0,0, 0,0,3,0, 0,0,0,5 ;
+    matrix b[4][4] = 6,0,0,0, 0,6,0,0, 0,0,2,0, 0,0,0,7 ;
+
+    matrix trafo[4][4] = 3,3,0,0, 0,1,3,0, 2,0,1,0, 0,2,2,3;
+    matrix invtrafo = inverse(trafo);
+
+    matrix at = invtrafo * a * trafo;
+    matrix bt = invtrafo * b * trafo;
+
+    list l;
+    l = insert(l,at);
+    l = insert(l,bt);
+
+    matrix diagtrafo = diagonalizeMatrixSimul(l);
+}
+
+
+///////////////////////////////////////////
+// AUXILIARY FUNCTIONS ////////////////////
+///////////////////////////////////////////
+
+// this is the recursive implementation of simultaneous
+// diagonalization. Do not call this by hand;
+// instead use diagonalizeMatrixSimul().
+// matrices is a list of matrices of same dimension,
+// spaces a list of modules (intersections of eigenspaces)
+static proc diagonalizeMatrixSimulRec(list matrices,list spaces)
+{
+    if(size(matrices) == 0)
+    {
+        return(spaces); // this ends the recursion
+    }
+
+    list intersectedSpaces; // this will hold the intersected spaces
+    list jordanb = jordanbasis(matrices[1]); // jordanb[1] is the transformation matrix
+    matrix diagMat = inverse(jordanb[1]) * matrices[1] * jordanb[1];
+    matrix trafoMat = jordanb[1];
+    matrix eigenvals = diagEntries(diagMat);
+
+    matrices = delete(matrices,1); // shorten list for the recursion
+    int i = 1;
+    int j,range;
+    module M,toIntersect;
+    while(i<=nrows(trafoMat))
+    {
+        range = 0;
+        // increment range s.t. range+1 is the dimension of the current eigenspace
+        for(j=1;j+i<=nrows(eigenvals);j++)
+        {
+            if(eigenvals[j+i,1]==eigenvals[i,1])
+            {
+                range++;
+            }
+        }
+
+        module eigenspace;
+        for(j=i;j<=i+range;j++)
+        {
+            eigenspace = (eigenspace,matrixCol(trafoMat,j));
+        }
+
+        for(j=1;j<=size(spaces);j++)
+        {
+            toIntersect = spaces[j];
+            M = intersect(eigenspace,toIntersect);
+            if(size(M) != 0)
+            {
+                intersectedSpaces = insert(intersectedSpaces,M,size(intersectedSpaces));
+            }
+        }
+
+        i = i+range+1;
+        kill eigenspace;
+    }
+
+    return(diagonalizeMatrixSimulRec(matrices,intersectedSpaces));
+}
+
+static proc homogeneousPolyToVec(poly p,ideal W)
+"
+USAGE: homogeneousPolyToVec(poly p, ideal W)
+ASSUME: p homogeneous and contained in the space spanned by W,
+    e.g. p quasihomogeneous and W is the result of weaklyHomogeneousSpace(...)
+RETURN: nx1 matrix containing the coefficients of p in the order given by W
+"
+{
+    matrix v[ncols(W)][1];
+    matrix thecoeffs = coef(p,productOfRingVars());
+    int j,k;
+    for(j=1;j<=ncols(W);j++)
+    {
+        for(k = 1;k<=ncols(thecoeffs);k++)
+        {
+            if(thecoeffs[1,k] == W[j])
+            {
+                v[j,1] = thecoeffs[2,k];
+            }
+        }
+    }
+    return(v);
+}
+
+static proc vecToHomogeneousPoly(matrix v,ideal W)
+"
+USAGE: vecToHomogeneousPoly(vec v,ideal W)
+ASSUME: v is a nx1 matrix, where n=ncols(W)
+RETURN: the polynomial in W whose coefficients are v (W represents the basis)
+"
+{
+    poly p;
+    for(int j=1;j<=ncols(W);j++)
+    {
+        p = p+v[j,1]*W[j];
+    }
+    return(p);
+}
+
+static proc weaklyHomogeneousSpace(int n, int lambda, intvec weights)
+"
+USAGE: weaklyHomogeneousSpace(int n, int lambda, intvec weights)
+RETURN: ideal of all monomials which are homogeneous of degree n
+    AND weakly homogeneous of degree lambda with the given weights
+ASSUME: weights has exactly as many entries as nvars(basering)
+NOTE: if no such monomials exist, the zero ideal is returned.
+    The monomials in the returned ideal are sorted according to the basering's ordering.
+"
+{
+    ideal H = maxideal(n); // contains all homogeneous monomials of degree n
+    ideal W; // this will hold those monomials that lie in the WHS
+    matrix w[nvars(basering)][1] = weights;
+
+    // we compute this by brute force: for each monomial in H,
+    // check whether it is wh of lambda,weights.
+    poly mon;
+    matrix res;
+    for(int j=1;j<=ncols(H);j++)
+    {
+        mon = H[j];
+        matrix expos[nvars(basering)][1] = leadexp(mon);
+        expos = transpose(expos);
+        res = expos*w;
+        kill expos;
+        if(res[1,1] == lambda)
+        {
+            W = (W,mon);
+        }
+    }
+
+    // if ncols(W)==1, then W=0 => WHS is empty.
+    if(ncols(W)==1)
+    {
+        return(W);
+    }
+
+    W = W[2..ncols(W)]; // delete leading 0 entry
+    return(W);
+    // the monomials in W are now sorted accordingly to the ring ordering
+}
+
+static proc weaklyHomogeneousSpaceComplement(int n, int lambda, intvec weights)
+"
+USAGE: weaklyHomogeneousSpaceComplement(int n, int lambda, intvec weights)
+RETURN: ideal of all monomials which are homogeneous of degree n
+    but NOT weakly homogeneous of degree lambda with the given weights
+ASSUME: size(weights)==nvars(basering)
+NOTE: if no such monomials exist, the zero ideal is returned.
+    The monomials in the returned ideal are sorted according to the ring ordering.
+"
+{
+    // for documentation see weaklyHomogeneousSpace();
+    // this is the same except we only return the monomials
+    // that fail the check instead of those that pass.
+    ideal H = maxideal(n);
+    ideal W;
+    matrix w[nvars(basering)][1] = weights;
+    poly mon;
+    matrix res;
+    for(int j=1;j<=ncols(H);j++)
+    {
+        mon = H[j];
+        matrix expos[nvars(basering)][1] = leadexp(mon);
+        expos = transpose(expos);
+        res = expos*w;
+        kill expos;
+        if(res[1,1] != lambda) // this line is the only difference to weaklyHomogeneousSpace()
+        {
+            W = (W,mon);
+        }
+    }
+    if(ncols(W)==1)
+    {
+        return(W);
+    }
+    W = W[2..ncols(W)]; // delete leading 0 entry
+    return(W);
+}
+
+static proc extendMatrix(matrix A,int rows,int cols)
+"
+USAGE: extendMatrix(matrix A,int rows,int cols)
+RETURN: A extended with zeroes s.t. it is now a rowsxcols matrix
+ASSUME: nrows(A) <= rows, ncols(A) <= cols
+"
+{
+    matrix B[rows][cols];
+    int i,j;
+    for(i=1;i<=ncols(A);i++)
+    {
+        for(j=1;j<=nrows(A);j++)
+        {
+            B[j,i] = A[j,i];
+        }
+    }
+    return(B);
+}
+
+static proc eqIdeal(ideal I,ideal J)
+"
+USAGE: eqIdeal(ideal I, ideal J)
+RETURN: 1 if ideals are equal, 0 otherwise
+"
+{
+    J = std(J);
+    I = std(I);
+    if(ncols(I) != ncols(J))
+    {
+        return(0);
+    }
+    for(int j=1;j<=ncols(I);j++)
+    {
+        if(I[j]!=J[j])
+        {
+            return(0);
+        }
+    }
+    return(1);
+}
+
+
+static proc eqMap(map f, map g)
+"
+USAGE: eqMap(map f,map g)
+ASSUME: domain of f,g are the same, codomain of f, g are the same, domain is current basering
+RETURN: 1 if maps are equal, 0 otherwise
+"
+{
+    // note: maps are equal iff they are equal on each ring variable
+    ideal P = maxideal(1);
+    ideal F = f(P);
+    ideal G = g(P);
+    for(int j=1;j<=ncols(F);j++)
+    {
+        if(F[j]!=G[j])
+        {
+            return(0);
+        }
+    }
+    return(1);
+}
+
+
+static proc identityMap() // this does not yet exist in SINGULAR ...
+"
+USAGE: identityMap()
+RETURN: a map basering -> basering which is the identity map
+"
+{
+    ideal P = maxideal(1);
+    map f = basering,P;
+    return(f);
+}
+
+static proc pvector()
+"
+USAGE: pvector()
+RETURN: a nvars x 1 matrix consisting of the ring variables in order
+"
+{
+    ideal I = maxideal(1);
+    matrix v[nvars(basering)][1] = [I[1..nvars(basering)]];
+    return(v);
+}
+
+static proc mirrorMatrixHorizontal(matrix m)
+    "
+    USAGE: mirrorMatrixHorizontal(matrix m)
+    RETURN: m mirrored about the vertical axis
+    "
+{
+    matrix n[nrows(m)][ncols(m)];
+    for(int i=1;i<=ncols(m);i++)
+    {
+        n[1..nrows(m),i] = m[1..nrows(m),ncols(m)-i+1];
+    }
+    return(n);
+}
+
+static proc mirrorMatrixVertictal(matrix m)
+"
+USAGE: mirrorMatrixVertical(matrix m)
+RETURN: m mirrored about the horizontal axis
+"
+{
+    matrix n[nrows(m)][ncols(m)];
+    for(int i=1;i<=nrows(m);i++)
+    {
+        n[i,1..ncols(m)] = m[nrows(m)-i+1,1..ncols(m)];
+    }
+    return(n);
+}
+
+static proc isInverse(map phi,map psi)
+    "
+    USAGE: isInverse(map phi, map psi)
+    RETURN: 1 if the maps are inverse to each other, 0 otherwise
+    ASSUME: both phi and psi are maps basering -> basering
+    "
+{
+    map phipsi = phi(psi);
+    map psiphi = psi(phi);
+    for(int i=1;i<=nvars(basering);i++)
+    {
+        if(phipsi(var(i)) != var(i))
+        {
+            return(0);
+        }
+        if(psiphi(var(i)) != var(i))
+        {
+            return(0);
+        }
+    }
+    return(1);
+}
+
+static proc homogeneousPart(poly f, int n)
+"
+USAGE: homogeneousPart(poly f, int n)
+RETURN: the homogeneous part of f of degree n
+"
+{
+    poly g = jet(f,n);
+    poly c = 0;
+    int origSize = size(g);
+    poly mon;
+    for(int j=1;j <= origSize;j++)
+    {
+        mon = leadmonom(g);
+        mon = mon*leadcoef(g);
+        g = g-mon;
+        if(deg(mon)==n)
+        {
+            c = c+mon;
+        }
+    }
+    // c now consists of the homogeneous part of degree n
+    return(c);
+}
+
+static proc diagEntries(matrix A)
+"
+USAGE: diagEntries(matrix A)
+ASSUME: A is quadratic
+RETURN: nx1 matrix containing the diagonal entries of A
+"
+{
+    matrix v[ncols(A)][1];
+    for(int i=1;i<=ncols(A);i++)
+    {
+        v[i,1] = A[i,i];
+    }
+    return(v);
+}
+
+static proc productOfRingVars()
+"
+USAGE: productOfRingVars()
+RETURN: poly which is the product of all ring variables
+"
+{
+    poly p = 1;
+    for(int i=1;i<=nvars(basering);i++)
+    {
+        p = p*var(i);
+    }
+    return(p);
+}
+
+
+static proc vecToIntvec(matrix v)
+"
+USAGE: vecToIntVec(matrix v)
+RETURN: an intvec containing the entries of v
+ASSUME: v is mx1 and contains only integers
+"
+{
+    intvec ret = (0:nrows(v));
+    for(int i=1;i<=nrows(v);i++)
+    {
+        ret[i] = int(leadcoef(v[i,1]));
+    }
+    return(ret);
+}
+
+static proc matrixRow(matrix m, int n)
+"
+USAGE: matrixRow(matrix m, int n)
+RETURN: the n-th row of m (as a matrix with one row). If n>nrows(m), returns a zero row.
+"
+{
+    matrix ret[1][ncols(m)];
+    if(n>nrows(m))
+    {
+        return(ret);
+    }
+    for(int i=1;i<=ncols(m);i++)
+    {
+        ret[1,i] = m[n,i];
+    }
+    return(ret);
+}
+
+static proc matrixCol(matrix m, int n)
+"
+USAGE: matrixCol(matrix m, int n)
+RETURN: the n-th column of m (as a matrix with one column).
+    If n>ncols(m), returns a zero column.
+"
+{
+    matrix ret[nrows(m)][1];
+    if(n>ncols(m))
+    {
+        return(ret);
+    }
+    for(int i=1;i<=nrows(m);i++)
+    {
+        ret[i,1] = m[i,n];
+    }
+    return(ret);
+}
+

@@ -470,6 +470,7 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
     for (i=0;i<size;i++) dd[i] = qp[i];
     bl = 1-e;
     nn = (mp_ptr)allocfunc(sizeof(mp_limb_t)*bl);
+    memset(nn,0,sizeof(mp_limb_t)*bl);
     nn[bl-1] = 1;
     ndest = res->n;
     ndest->_mp_d = nn;
@@ -481,6 +482,7 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
     al = dest->_mp_size = size+e;
     if (al<2) al = 2;
     dd = (mp_ptr)allocfunc(sizeof(mp_limb_t)*al);
+    memset(dd,0,sizeof(mp_limb_t)*al);
     for (i=0;i<size;i++) dd[i+e] = qp[i];
     for (i=0;i<e;i++) dd[i] = 0;
     res->s = 3;
@@ -2321,11 +2323,33 @@ number nlCopyMap(number a, const coeffs /*src*/, const coeffs /*dst*/)
   return _nlCopy_NoImm(a);
 }
 
-nMapFunc nlSetMap(const coeffs src, const coeffs /*dst*/)
+number nlMapQtoZ(number a, const coeffs src, const coeffs dst)
+{
+  if ((SR_HDL(a) & SR_INT)||(a==NULL))
+  {
+    return a;
+  }
+  if (a->s==3) return _nlCopy_NoImm(a);
+  number a0=a;
+  BOOLEAN a1=FALSE;
+  if (a->s==0) { a0=_nlCopy_NoImm(a); a1=TRUE; }
+  number b1=nlGetNumerator(a0,src);
+  number b2=nlGetDenom(a0,src);
+  number b=nlIntDiv(b1,b2,dst);
+  nlDelete(&b1,src);
+  nlDelete(&b2,src);
+  if (a1)  _nlDelete_NoImm(&a0);
+  return b;
+}
+
+nMapFunc nlSetMap(const coeffs src, const coeffs dst)
 {
   if (src->rep==n_rep_gap_rat)  /*Q, coeffs_BIGINT */
   {
-    return ndCopyMap;
+    if ((src->is_field==dst->is_field) /* Q->Q, Z->Z*/
+    || (src->is_field==FALSE))         /* Z->Q */
+      return nlCopyMap;
+    return nlMapQtoZ;        /* Q->Z */
   }
   if ((src->rep==n_rep_int) && nCoeff_is_Zp(src))
   {
@@ -2647,7 +2671,7 @@ LINLINE void nlInpMult(number &a, number b, const coeffs r)
 
 #ifndef P_NUMBERS_H
 
-static void nlMPZ(mpz_t m, number &n, const coeffs r)
+void nlMPZ(mpz_t m, number &n, const coeffs r)
 {
   nlTest(n, r);
   nlNormalize(n, r);

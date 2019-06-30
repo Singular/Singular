@@ -167,25 +167,6 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
       SetProcs_ring(RingGeneral,length,ord);
   }
   #endif
-#ifdef HAVE_SHIFTBBA
-  if (r->isLPring)
-  {
-    _p_procs->pp_Mult_mm = shift_pp_Mult_mm;
-    _p_procs->p_Mult_mm = shift_p_Mult_mm;
-    _p_procs->p_mm_Mult = shift_p_mm_Mult;
-    _p_procs->pp_mm_Mult = shift_pp_mm_Mult;
-    _p_procs->p_Minus_mm_Mult_qq = shift_p_Minus_mm_Mult_qq;
-    // Unsupported procs:
-    _p_procs->pp_Mult_mm_Noether = shift_pp_Mult_mm_Noether_STUB;
-    _p_procs->pp_Mult_Coeff_mm_DivSelect = shift_pp_Mult_Coeff_mm_DivSelect_STUB;
-    _p_procs->pp_Mult_Coeff_mm_DivSelectMult = shift_pp_Mult_Coeff_mm_DivSelectMult_STUB;
-  }
-  else
-#endif
-  {
-    _p_procs->p_mm_Mult=_p_procs->p_Mult_mm;
-    _p_procs->pp_mm_Mult=_p_procs->pp_Mult_mm;
-  }
   CheckProc(p_Copy);
   CheckProc(p_Delete);
   CheckProc(p_ShallowCopyDelete);
@@ -207,6 +188,10 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
          p_Procs->p_Minus_mm_Mult_qq == p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral ||
          r->OrdSgn == 1 || r->LexOrder);
 */
+  {
+    _p_procs->p_mm_Mult=_p_procs->p_Mult_mm;
+    _p_procs->pp_mm_Mult=_p_procs->pp_Mult_mm;
+  }
 #ifdef HAVE_PLURAL
 #ifndef SING_NDEBUG
   if (rIsPluralRing(r))
@@ -215,6 +200,20 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
     nc_p_ProcsSet(r, _p_procs); // Setup non-commutative p_Procs table!
   }
 #endif
+#endif
+#ifdef HAVE_SHIFTBBA
+  if (r->isLPring)
+  {
+    _p_procs->pp_Mult_mm = shift_pp_Mult_mm;
+    _p_procs->p_Mult_mm = shift_p_Mult_mm;
+    _p_procs->p_mm_Mult = shift_p_mm_Mult;
+    _p_procs->pp_mm_Mult = shift_pp_mm_Mult;
+    _p_procs->p_Minus_mm_Mult_qq = shift_p_Minus_mm_Mult_qq;
+    // Unsupported procs:
+    _p_procs->pp_Mult_mm_Noether = shift_pp_Mult_mm_Noether_STUB;
+    _p_procs->pp_Mult_Coeff_mm_DivSelect = shift_pp_Mult_Coeff_mm_DivSelect_STUB;
+    _p_procs->pp_Mult_Coeff_mm_DivSelectMult = shift_pp_Mult_Coeff_mm_DivSelectMult_STUB;
+  }
 #endif
 }
 

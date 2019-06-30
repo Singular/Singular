@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="version freegb.lib 4.1.1.4 Oct_2018 "; // $Id$
+version="version freegb.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY: freegb.lib   Two-sided Groebner bases in free algebras and tools via Letterplace approach
@@ -3480,7 +3480,6 @@ static proc lshift(module M, int s, string varing, def lpring)
   // to be run from varing
   int i, j, k, sm, sv;
   vector v;
-  //  execute("setring "+lpring);
   setring lpring;
   poly @@p;
   ideal I;

@@ -312,7 +312,7 @@ considerably speed up computations.
 @cindex cf_class
 @cindex global
 @cindex isSB
-@cindex isHomg
+@cindex isHomog
 @cindex maxExp
 @cindex rank
 @cindex ring_cf
@@ -336,7 +336,10 @@ basis like
 @code{groebner}, @code{std}, @code{stdhilb} etc.; used by @code{lift}, @code{dim},
 @code{degree}, @code{mult}, @code{hilb}, @code{vdim}, @code{kbase}
 @item isHomog (for ideal, module)
-the weight vector for homogeneous or quasihomogeneous ideals/modules
+the weight vector of module generators for homogeneous or quasihomogeneous ideals/modules,
+@*used by @code{betti}, @code{degree}, @code{highcorner}, @code{hilbert},
+@code{homog}, @code{prune}, @code{sba}, @code{slimgb}, @code{std}, @code{syz}, 
+@code{kbase}, @code{modulo}, @code{mres}, @code{nres}, @code{stdhilb}. 
 @item isCI
 complete intersection property
 @item isCM
@@ -7553,10 +7556,6 @@ returns a string about available help browsers.
 @cindex bracket
 returns the Lie bracket [p,q].
 @c ..........................
-@item @code{system("btest",} poly, i2 @code{)}
-@cindex system, btest
-internal for shift algebra (with i2 variables): last block of the poly
-@c ..........................
 @item @code{system("complexNearZero",} number_expression @code{)}
 @cindex system, complexNearZero
 checks for a small value for floating point numbers
@@ -7595,11 +7594,6 @@ See @code{system("opp")}.
 returns the path of the command given as argument or the empty string (for: not found)
 See @code{system("Singular")}.
 See @code{system("getenv","PATH")}.
-@c ..........................
-@item @code{system("freegb",} ideal, i2, i3 @code{)}
-@cindex system, freegb
-returns the standrda basis in the shift algebra i(with i3 variables) up to degree i2.
-See @code{system("opp")}.
 @c ..........................
 @item @code{system("getenv",} string_expression@code{)}
 @cindex getenv
@@ -7787,10 +7781,6 @@ computes from list of spectrum numbers the multiple of it.
 @item @code{system("std_syz",} module, int @code{)}
 @cindex system, std_syz
 compute a partial groebner base of a module, stopp after the given column
-@c ..........................
-@item @code{system("stest",} poly, i2, i3, i4 @code{)}
-@cindex system, stest
-internal for shift algebra (with i4 variables): shift the poly by i2, up to degree i3
 @c ..........................
 @item @code{system("tensorModuleMult",} int, module @code{)}
 @cindex system, tensorModuleMult

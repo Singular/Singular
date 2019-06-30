@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version realclassify.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version realclassify.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:  realclassify.lib   Classification of real singularities
@@ -1332,10 +1332,10 @@ static proc caseJ10(poly rf, br1)
   poly k = var(1)^3+d*var(1)+e;
   ring R = 0,x,dp;
   poly k = fetch(br,k);
-  int n = nrroots(k);
+  int nn = nrroots(k);
   kill R;
   setring br;
-  if(n==1)
+  if(nn==1)
   {
     typeofsing1 = "J[10]+";
     if(e<0)
@@ -1363,33 +1363,33 @@ static proc caseJ10(poly rf, br1)
       number n2 = 0;
     }
     if(deg(MP)==1)
-      {
-        number a = -number(subst(MP,var(1),0));
-        setring br1;
-        number a = fetch(br,a);
-      }
-      else
-      {
-        string mord = ringlist(br1)[3][1][1];
-        ring R1 = (0,a),(var(1),var(2)),ds;
-        list L1 = ringlist(R1);
-        L1[3][1][1]=mord;
-        def R2 = ring(L1);
-        setring R2;
-        kill R1;
-        poly ff = fetch(br,MP);
-        minpoly = number(subst(ff,var(1),a));
-      }
-      Poly nfe1 = var(1)^3+a*var(1)^2*var(2)^2+var(1)*var(2)^4;
-      number n1 = fetch(br,n1);
-      number n2 = fetch(br,n2);
-      interval1 = list(n1,n2);
-      NormalFormEquation F1;
-      F1.normalFormEquation = nfe1;
-      F1.parameters = list(list(a*var(1)^2*var(2)^2,interval1));
-      F1.singularityType = typeofsing1;
-      setring br;
-      return(F1)
+    {
+      number a = -number(subst(MP,var(1),0));
+      setring br1;
+      number a = fetch(br,a);
+    }
+    else
+    {
+      string mord = ringlist(br1)[3][1][1];
+      ring R1 = (0,a),(var(1),var(2)),ds;
+      list L1 = ringlist(R1);
+      L1[3][1][1]=mord;
+      def R2 = ring(L1);
+      setring R2;
+      kill R1;
+      poly ff = fetch(br,MP);
+      minpoly = number(subst(ff,var(1),a));
+    }
+    Poly nfe1 = var(1)^3+a*var(1)^2*var(2)^2+var(1)*var(2)^4;
+    number n1 = fetch(br,n1);
+    number n2 = fetch(br,n2);
+    interval1 = list(n1,n2);
+    NormalFormEquation F1;
+    F1.normalFormEquation = nfe1;
+    F1.parameters = list(list(a*var(1)^2*var(2)^2,interval1));
+    F1.singularityType = typeofsing1;
+    setring br;
+    return(F1);
   }
   else
   {
@@ -1461,17 +1461,17 @@ static proc caseJ10(poly rf, br1)
       }
       kill r;
       kill j;
-      int k = size(r1);
+      int kk = size(r1);
       setring R1;
       list r2;
-      for(int i=1; i<=k;i++)
+      for(int ii=1; ii<=kk;ii++)
       {
          number m;
-         m=number(r1[i])/(10^(epsilon));
+         m=number(r1[ii])/(10^(epsilon));
          r2 = insert(r2,m);
          kill m;
       }
-      kill i;
+      kill ii;
       list L1 = ringlist(br1);
       number t = (number(epsilon))^(-1);
       number n1 = sturm(pplus,r2[1]-t,r2[1]+t);
@@ -1503,17 +1503,17 @@ static proc caseJ10(poly rf, br1)
         }
         kill r;
         kill j;
-        k = size(r1);
         setring R1;
+        kk = size(r1);
         list r2;
-        for(int i=1; i<=k;i++)
+        for(int ii=1; ii<=kk;ii++)
         {
            number m;
-           m=number(r1[i])/(10^(epsilon));
+           m=number(r1[ii])/(10^(epsilon));
            r2 = insert(r2,m);
            kill m;
         }
-        kill i;
+        kill ii;
         number t = (number(epsilon))^(-1);
         number n1 = sturm(pplus,r2[1]-t,r2[1]+t);
         number n2 = sturm(pplus,r2[2]-t,r2[2]+t);
@@ -1523,14 +1523,15 @@ static proc caseJ10(poly rf, br1)
       setring br;
       kill R1;
       list r2;
-      for(int i=1; i<=k;i++)
+      kk = size(r1);
+      for(int ii=1; ii<=kk;ii++)
       {
          number m;
-         m=number(r1[i])/(10^(epsilon));
+         m=number(r1[ii])/(10^(epsilon));
          r2 = insert(r2,m);
          kill m;
       }
-      kill i;
+      kill ii;
       number t = (number(epsilon))^(-1);
       typeofsing1 = "J[10]-";
       typeofsing2 = "J[10]+";

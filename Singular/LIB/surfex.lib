@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version surfex.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version surfex.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Visualization";
 info="
 LIBRARY: surfex.lib      Procedures for visualizing and rotating surfaces.
@@ -957,7 +957,7 @@ EXAMPLE: example surfEqn; shows an example
     def base=basering;
     int mynvars = nvars(basering);
 
-    intvec ind=num_of_vars(p);
+    intvec ind=Surf::num_of_vars(p);
 
     int i,j,n;
     int minp = 0;
@@ -1112,7 +1112,7 @@ USAGE: num_vars_id(ideal I)
 RETURN: The number of ring-variables occurring in the ideal I.
 "
 {
-    intvec v = num_of_vars(I);
+    intvec v = Surf::num_of_vars(I);
     int num = 0;
     for(int i=size(v);i>0;i--)
     {

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="version singularityDBM.lib 4.1.0.0 Sep_2017 "; // $Id$
+version="version singularityDBM.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:  singularityDBM.lib     Data Base of Singularities for the Arnold-Classifier

@@ -44,10 +44,11 @@ class idrec
 
   short      lev;
   short      ref;
-  int        id_i;
+  unsigned long id_i;
 
   idrec() { memset(this,0,sizeof(*this)); }
   idhdl get(const char * s, int lev);
+  idhdl get_level(const char * s, int lev);
   idhdl set(const char * s, int lev, int t/*typ*/, BOOLEAN init=TRUE);
   char * String(BOOLEAN typed = FALSE);
 //  ~idrec();

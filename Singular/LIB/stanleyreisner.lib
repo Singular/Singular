@@ -1,19 +1,15 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version stanleyreisner.lib 1.0.0.0 April_2018 "; // $Id$
+version="version stanleyreisner.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  stanleyreisner.lib   Deformations of Stanley-Reiser ideals
 AUTHORS:
 
-OVERVIEW: (skip here!)
+OVERVIEW:
 
 Firstly, we implement the graded pieces has certain degree of cotangent modules
 T1 and T2 for a general Stanley-Reiser ring. And the graded pieces of homomorphisms
 are represented by lists of integers.
-
-
-
-
 
 
 KEYWORDS: Stanely-Reisner ideals, Stanley-Reisner rings, deformations

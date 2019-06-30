@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version spectrum.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version spectrum.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:  spectrum.lib  Singularity Spectrum for Nondegenerate Singularities

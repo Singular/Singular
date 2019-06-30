@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////
-version="version sing4ti2.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version sing4ti2.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  sing4ti2.lib          Communication Interface to 4ti2

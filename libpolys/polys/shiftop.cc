@@ -60,6 +60,7 @@ poly shift_pp_Mult_mm(poly p, const poly m, const ring ri)
   {
     p_AllocBin(pNext(q), bin, ri);
     pIter(q);
+    pNext(q)=NULL;
     pSetCoeff0(q, n_Mult(mCoeff, pGetCoeff(p), ri->cf));
 
     p_GetExpV(p, pExpV, ri);
@@ -183,6 +184,7 @@ poly shift_pp_mm_Mult(poly p, const poly m, const ring ri)
   {
     p_AllocBin(pNext(q), bin, ri);
     pIter(q);
+    pNext(q)=NULL;
     pSetCoeff0(q, n_Mult(mCoeff, pGetCoeff(p), ri->cf));
 
     p_GetExpV(p, pExpV, ri);

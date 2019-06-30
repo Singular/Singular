@@ -1504,15 +1504,14 @@ BOOLEAN ssiWrite(si_link l, leftv data)
     int tt=data->Typ();
     void *dd=data->Data();
     attr *aa=data->Attribute();
-    BOOLEAN with_attr=FALSE;
-    if ((aa!=NULL) && ((*aa)!=NULL))
+    if ((aa!=NULL) && ((*aa)!=NULL)) // n user attributes
     {
       attr a=*aa;
       int n=0;
       while(a!=NULL) { n++; a=a->next;}
       fprintf(d->f_write,"21 %d %d ",data->flag,n);
     }
-    else if (data->flag!=0)
+    else if (data->flag!=0) // only "flag" attributes
     {
       fprintf(d->f_write,"21 %d 0 ",data->flag);
     }

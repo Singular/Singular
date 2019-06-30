@@ -1485,9 +1485,9 @@ static inline void p_SetExpVL(poly p, int64 *ev, const ring r)
 {
   p_LmCheckPolyRing1(p, r);
   for (unsigned j = r->N; j!=0; j--)
-      p_SetExp(p, j, ev[j], r);
+      p_SetExp(p, j, ev[j-1], r);
+  p_SetComp(p, 0,r);
 
-  if(ev[0]!=0) p_SetComp(p, ev[0],r);
   p_Setm(p, r);
 }
 
@@ -2084,5 +2084,9 @@ poly p_GcdMon(poly f, poly g, const ring r);
 
 /// divide polynomial by monomial
 poly p_Div_mm(poly p, const poly m, const ring r);
+
+
+/// max exponent of variable x_i in p
+int p_MaxExpPerVar(poly p, int i, const ring r);
 #endif // P_POLYS_H
 

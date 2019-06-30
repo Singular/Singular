@@ -19,6 +19,8 @@
 
 #include "monomials/ring.h"
 #include "simpleideals.h"
+#include "polys/flintconv.h"
+#include "polys/flint_mpoly.h"
 
 
 //#include "polys.h"
@@ -54,7 +56,28 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
   {
     return p_GcdMon(g,f,r);
   }
-
+  #ifdef HAVE_FLINT
+  #if __FLINT_RELEASE >= 20503
+  if (rField_is_Zp(r))
+  {
+    nmod_mpoly_ctx_t ctx;
+    if (!convSingRFlintR(ctx,r))
+    {
+      return Flint_GCD_MP(f,pLength(f),g,pLength(g),ctx,r);
+    }
+  }
+  else if (rField_is_Q(r))
+  {
+    fmpq_mpoly_ctx_t ctx;
+    if (!convSingRFlintR(ctx,r))
+    {
+//    printf("FlintQ\n");
+      poly res=Flint_GCD_MP(f,pLength(f),g,pLength(g),ctx,r);
+      res=p_Cleardenom(res,r);
+    }
+  }
+  #endif
+  #endif
   Off(SW_RATIONAL);
   if (rField_is_Q(r) || rField_is_Zp(r) || rField_is_Z(r)
   || (rField_is_Zn(r)&&(r->cf->convSingNFactoryN!=ndConvSingNFactoryN)))
@@ -62,6 +85,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
     setCharacteristic( rChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g, r ) );
     res=convFactoryPSingP( gcd( F, G ) , r);
+    if ( rField_is_Zp(r)) p_Norm(res,r);
   }
   // and over Q(a) / Fp(a)
   else if ( r->cf->extRing!=NULL )
@@ -611,7 +635,10 @@ poly singclap_pmod ( poly f, poly g, const ring r )
   {
     setCharacteristic( rChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g,r ) );
-    res = convFactoryPSingP( F-(F/G)*G,r );
+    CanonicalForm Q,R;
+    divrem(F,G,Q,R);
+    res = convFactoryPSingP(R,r);
+    //res = convFactoryPSingP( F-(F/G)*G,r );
   }
   // mod is not implemented for ZZ coeffs in factory
   else if (r->cf->extRing!=NULL)
@@ -625,13 +652,19 @@ poly singclap_pmod ( poly f, poly g, const ring r )
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f,a,r ) ),
                     G( convSingAPFactoryAP( g,a,r ) );
-      res= convFactoryAPSingAP( F-(F/G)*G, r  );
+      CanonicalForm Q,R;
+      divrem(F,G,Q,R);
+      res = convFactoryAPSingAP(R,r);
+      //res= convFactoryAPSingAP( F-(F/G)*G, r  );
       prune (a);
     }
     else
     {
       CanonicalForm F( convSingTrPFactoryP( f,r ) ), G( convSingTrPFactoryP( g,r ) );
-      res= convFactoryPSingTrP(  F-(F/G)*G,r  );
+      CanonicalForm Q,R;
+      divrem(F,G,Q,R);
+      res = convFactoryPSingTrP(R,r);
+      //res= convFactoryPSingTrP(  F-(F/G)*G,r  );
     }
   }
 #if 0 // not yet working

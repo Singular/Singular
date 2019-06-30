@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////
-version="version ncfactor.lib 4.0.0.0 _2017 "; //$Id$
+version="version ncfactor.lib 4.1.2.0 Feb_2019 "; //$Id$
 category="Noncommutative";
 info="
 LIBRARY: ncfactor.lib  Tools for factorization in some noncommutative algebras
@@ -11148,7 +11148,7 @@ SEE ALSO: facWeyl, facSubWeyl, testNCfac
 example
 {
   "EXAMPLE:";echo=2;
-  // first, an example with PLURAL 
+  // first, an example with PLURAL
   def R = makeUsl2();
   setring(R);
   poly p = e^3*f+e^2*f^2-e^3+e^2*f+2*e*f^2-3*e^2*h-2*e*f*h-8*e^2

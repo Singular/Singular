@@ -436,74 +436,39 @@ static number nrMapQ(number from, const coeffs aRing, const coeffs r)
   assume( getCoeffType(r) == n_R );
   assume( aRing->rep == n_rep_gap_rat );
 
-  mpz_ptr z;
-  mpz_ptr zz=NULL;
   if (IS_IMM(from))
   {
-     zz=(mpz_ptr)omAlloc(sizeof(mpz_t));
-     mpz_init_set_si(zz,SR_TO_INT(from));
-     z=zz;
+    SI_FLOAT f = (SI_FLOAT)SR_TO_INT(from);
+    return nf(nf(f).F()).N();
   }
   else
   {
     /* read out the enumerator */
-    z=GET_NOM(from);
-  }
-
-  int i = mpz_size1(z);
-  mpf_t e;
-  mpf_init(e);
-  mpf_set_z(e,z);
-  int sign= mpf_sgn(e);
-  mpf_abs (e, e);
-
-  if (zz!=NULL)
-  {
-    mpz_clear(zz);
-    omFreeSize(zz,sizeof(mpz_t));
-  }
-  /* if number was an integer, we are done*/
-  if(IS_IMM(from)|| IS_INT(from))
-  {
-    if(i>4)
+    if (IS_INT(from))
     {
-      WerrorS("SI_FLOAT overflow");
-      return nf(0.0).N();
+      mpf_t e;
+      mpf_init(e);
+      mpf_set_z(e,GET_NOM(from));
+      SI_FLOAT f = mpf_get_d(e);
+      mpf_clear(e);
+      return nf(nf(f).F()).N();
     }
-    double basis;
-    signed long int exp;
-    basis = mpf_get_d_2exp(&exp, e);
-    SI_FLOAT f= sign*ldexp(basis,exp);
-    mpf_clear(e);
-    return nf(f).N();
+    else /*quotient*/
+    {
+      mpf_t z,n,q;
+      mpf_init(z);
+      mpf_init(n);
+      mpf_init(q);
+      mpf_set_z(z,GET_NOM(from));
+      mpf_set_z(n,GET_DENOM(from));
+      mpf_div(q,z,n);
+      mpf_clear(z);
+      mpf_clear(n);
+      SI_FLOAT f = mpf_get_d(q);
+      mpf_clear(q);
+      return nf(nf(f).F()).N();
+    }
   }
-
-  /* else read out the denominator */
-  mpz_ptr n = GET_DENOM(from);
-  int j = mpz_size1(n);
-  if(j-i>4)
-  {
-    WerrorS("SI_FLOAT overflow");
-    mpf_clear(e);
-    return nf(0.0).N();
-  }
-  mpf_t d;
-  mpf_init(d);
-  mpf_set_z(d,n);
-
-  /* and compute the quotient */
-  mpf_t q;
-  mpf_init(q);
-  mpf_div(q,e,d);
-
-  double basis;
-  signed long int exp;
-  basis = mpf_get_d_2exp(&exp, q);
-  SI_FLOAT f = sign*ldexp(basis,exp);
-  mpf_clear(e);
-  mpf_clear(d);
-  mpf_clear(q);
-  return nf(f).N();
 }
 
 static number nrMapZ(number from, const coeffs aRing, const coeffs r)

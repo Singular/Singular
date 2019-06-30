@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////
-version="version ncrat.lib 1.5.1.1 June_2018 "; // $Id$
+version="version ncrat.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY:      ncrat.lib Framework for working with non-commutative rational functions
@@ -22,7 +22,7 @@ KEYWORDS:     noncommutative, rational expressions;
 
 NOTE: an almost self-explaining introduction to the posibilities of the framework
 can be achieved by running the example for the procedure ncrepGetRegularMinimal.
-   
+
 PROCEDURES:
   ncInit(list);                 Set up framework, list contains nc variables
   ncVarsGet();                  List nc variables that are in use

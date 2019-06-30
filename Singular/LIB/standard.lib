@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version standard.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version standard.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -897,14 +897,12 @@ EXAMPLE: example groebner;  shows an example"
 
 //----------------------- save the given method ---------------------------
   string method;                //all given methods as a coma separated string
-  list Method;                  //all given methods as a list
   int k;
   for (k=1; k<=size(#); k++)
   {
      if (typeof(#[k]) == "string")
      {
        method = method + "," + #[k];
-       Method = Method + list(#[k]);
      }
   }
 

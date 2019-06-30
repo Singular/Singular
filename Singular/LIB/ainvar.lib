@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version ainvar.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version ainvar.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Invariant theory";
 info="
 LIBRARY: ainvar.lib    Invariant Rings of the Additive Group
@@ -214,9 +214,6 @@ EXAMPLE: example reduction; shows an example
 
   //------------- changes the basering bsr to bsr[@(0),...,@(z)] ----------
   execute("ring s="+charstr(basering)+",("+varstr(basering)+",@(0..z)),dp;");
-// Ev hier die Reihenfolge der Vars aendern. Dazu muss unten aber entsprechend
-// geaendert werden:
-//  execute("ring s="+charstr(basering)+",(@(0..z),"+varstr(basering)+"),dp;");
 
   //constructs the leading ideal of dom=(p-@(0),dom[1]-@(1),...,dom[z]-@(z))
      ideal dom=imap(bsr,dom);

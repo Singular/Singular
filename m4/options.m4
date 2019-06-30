@@ -321,6 +321,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
   bi_staticdemo=false
   bi_subsets=false
   bi_freealgebra=false
+  bi_partialgb=false
   bi_syzextra=false
   bi_pyobject=false
   bi_gfanlib=false
@@ -332,6 +333,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
   bi_Order=false
   bi_gitfan=false
   bi_interval=false
+  bi_systhreads=false
 
 
  if test -z "$with_builtinmodules"; then
@@ -357,6 +359,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
        staticdemo ) bi_staticdemo=true;;
        subsets ) bi_subsets=true;;
        freealgebra ) bi_freealgebra=true;;
+       partialgb ) bi_partialgb=true;;
        syzextra ) bi_syzextra=true ;;
        pyobject ) bi_pyobject=true ;;
        gfanlib ) bi_gfanlib=true ;;
@@ -368,6 +371,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
        Order ) bi_Order=true ;;
        gitfan ) bi_gitfan=true ;;
        interval ) bi_interval=true ;;
+       systhreads ) bi_systhreads=true;;
       esac
 
 ###### In case of out-of tree building: the build dir is empty in configure time!!!
@@ -396,6 +400,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
  AM_CONDITIONAL([SI_BUILTIN_STATICDEMO], [test x$bi_staticdemo = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_SUBSETS], [test x$bi_subsets = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_FREEALGEBRA], [test x$bi_freealgebra = xtrue])
+ AM_CONDITIONAL([SI_BUILTIN_PARTIALGB], [test x$bi_partialgb = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_SYZEXTRA], [test x$bi_syzextra = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_PYOBJECT], [test x$bi_pyobject = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_GFANLIB], [test x$bi_gfanlib = xtrue])
@@ -408,6 +413,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
  AM_CONDITIONAL([SI_BUILTIN_ORDER], [test x$bi_Order = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_GITFAN], [test x$bi_gitfan = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_INTERVAL], [test x$bi_interval = xtrue])
+ AM_CONDITIONAL([SI_BUILTIN_SYSTHREADS], [test x$bi_systhreads = xtrue])
 
  AC_MSG_CHECKING([BUILTIN_LIBS...])
  AC_MSG_RESULT(${BUILTIN_LIBS:-unset})

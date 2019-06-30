@@ -1,0 +1,5 @@
+glob:*.o
+glob:*.so
+glob:*.tar.gz
+^Makefile$
+^config.log$

@@ -1,5 +1,5 @@
-//
-version="version tropical.lib 4.1.1.0 Dec_2017 ";
+////////////////////////////////////////////////////////////////////////////////
+version="version tropical.lib 4.1.2.0 Feb_2019 ";
 category="Tropical Geometry";
 info="
 LIBRARY:         tropical.lib  Computations in Tropical Geometry

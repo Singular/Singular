@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version graal.lib 4.1.1.0 Dec_2017 "; // $Id$
+version="version graal.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  graal.lib          localization at prime ideals and their associated graded rings

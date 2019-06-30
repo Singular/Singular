@@ -332,7 +332,7 @@ void yyerror(const char * fmt)
      BLOCKTOK = 323,
      INT_CONST = 324,
      UNKNOWN_IDENT = 325,
-     RINGVAR = 326,
+     MONOM = 326,
      PROC_DEF = 327,
      APPLY = 328,
      ASSUME_CMD = 329,
@@ -780,7 +780,7 @@ static const char *const yytname[] =
   "CMD_13", "CMD_23", "CMD_123", "CMD_M", "ROOT_DECL", "ROOT_DECL_LIST",
   "RING_DECL", "RING_DECL_LIST", "EXAMPLE_CMD", "EXPORT_CMD", "HELP_CMD",
   "KILL_CMD", "LIB_CMD", "LISTVAR_CMD", "SETRING_CMD", "TYPE_CMD",
-  "STRINGTOK", "BLOCKTOK", "INT_CONST", "UNKNOWN_IDENT", "RINGVAR",
+  "STRINGTOK", "BLOCKTOK", "INT_CONST", "UNKNOWN_IDENT", "MONOM",
   "PROC_DEF", "APPLY", "ASSUME_CMD", "BREAK_CMD", "CONTINUE_CMD",
   "ELSE_CMD", "EVAL", "QUOTE", "FOR_CMD", "IF_CMD", "SYS_BREAK",
   "WHILE_CMD", "RETURN", "PARAMETER", "SYSVAR", "'='", "'<'", "'+'", "'-'",
@@ -2522,8 +2522,8 @@ yyreduce:
 /* Line 1464 of yacc.c  */
 #line 454 "grammar.y"
     {
-            if (currRing==NULL) MYYERROR("no ring active");
-            syMake(&(yyval.lv),omStrDup((yyvsp[(1) - (1)].name)));
+            if (currRing==NULL) MYYERROR("no ring active (7)");
+            syMakeMonom(&(yyval.lv),(yyvsp[(1) - (1)].name));
           ;}
     break;
 
@@ -2587,7 +2587,7 @@ yyreduce:
 /* Line 1464 of yacc.c  */
 #line 489 "grammar.y"
     {
-            if (currRingHdl==NULL) MYYERROR("no ring active");
+            if (currRing==NULL) MYYERROR("no ring active (8)");
             int j = 0;
             memset(&(yyval.lv),0,sizeof(sleftv));
             (yyval.lv).rtyp=VECTOR_CMD;

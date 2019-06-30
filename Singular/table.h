@@ -151,6 +151,7 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjnlInt),      INT_CMD,         INT_CMD,        BIGINT_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjnInt),       INT_CMD,         INT_CMD,        NUMBER_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjP2I),        INT_CMD,         INT_CMD,        POLY_CMD      , ALLOW_NC |ALLOW_RING}
+,{D(jjS2I),        INT_CMD,         INT_CMD,        STRING_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjINTERRED),   INTERRED_CMD,    IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |NO_RING}
 ,{D(jjINTERRED),   INTERRED_CMD,    MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |NO_RING}
 ,{D(jjBI2IM),      INTMAT_CMD,      INTMAT_CMD,     BIGINTMAT_CMD  , ALLOW_PLURAL |ALLOW_RING}
@@ -662,7 +663,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjHILBERT2),  HILBERT_CMD,    INTVEC_CMD,     IDEAL_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING | NO_ZERODIVISOR}
 ,{D(jjHILBERT2),  HILBERT_CMD,    INTVEC_CMD,     MODUL_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING | NO_ZERODIVISOR}
 ,{D(jjHOMOG1_W),  HOMOG_CMD,      INT_CMD,        IDEAL_CMD,  INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjHOMOG1_W),  HOMOG_CMD,      INT_CMD,        MODUL_CMD,   INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjHOMOG1_W),  HOMOG_CMD,      INT_CMD,        MODUL_CMD,  INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjHOMOG_P),   HOMOG_CMD,      POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjHOMOG_P),   HOMOG_CMD,      VECTOR_CMD,     VECTOR_CMD, POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjHOMOG_ID),  HOMOG_CMD,      IDEAL_CMD,      IDEAL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -932,9 +933,9 @@ const struct sValCmdM dArithM[]=
 ,{D(jjCALL2ARG),  LIFT_CMD,        MATRIX_CMD,          2  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL3ARG),  LIFT_CMD,        MATRIX_CMD,          3  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLIFT_4),    LIFT_CMD,        MATRIX_CMD,          4  , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCALL2ARG),  LIFTSTD_CMD,     MODUL_CMD,/*or IDEAL*/2  , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCALL3ARG),  LIFTSTD_CMD,     MODUL_CMD,/*or IDEAL*/3  , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjLIFTSTD_4), LIFTSTD_CMD,     MODUL_CMD,/*or IDEAL*/4  , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCALL2ARG),  LIFTSTD_CMD,     IDEAL_CMD,/*or MODUL*/2  , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCALL3ARG),  LIFTSTD_CMD,     IDEAL_CMD,/*or MODUL*/3  , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjLIFTSTD_4), LIFTSTD_CMD,     IDEAL_CMD,/*or MODUL*/4  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLIST_PL),   LIST_CMD,        LIST_CMD,           -1      , ALLOW_NC |ALLOW_RING}
 ,{D(jjLU_INVERSE),LUI_CMD,         LIST_CMD,           -2      , NO_NC |NO_RING}
 ,{D(jjLU_SOLVE),  LUS_CMD,         LIST_CMD,           -2      , NO_NC |NO_RING}
@@ -952,6 +953,8 @@ const struct sValCmdM dArithM[]=
 ,{D(jjREDUCE5),   REDUCE_CMD,      IDEAL_CMD/*or set by p*/,  5, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL1ARG),  RESERVEDNAME_CMD, INT_CMD,            1      , ALLOW_NC |ALLOW_RING}
 ,{D(jjRESERVED0), RESERVEDNAME_CMD, NONE,               0      , ALLOW_NC |ALLOW_RING}
+//,{D(jjCALL1ARG),  RESERVEDNAMELIST_CMD, LIST_CMD,            1      , ALLOW_NC |ALLOW_RING}
+,{D(jjRESERVEDLIST0), RESERVEDNAMELIST_CMD, LIST_CMD,               0      , ALLOW_NC |ALLOW_RING}
 ,{D(jjSTRING_PL), STRING_CMD,      STRING_CMD,         -1      , ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL3ARG),  SUBST_CMD,       NONE/*set by p*/,   3       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSUBST_M),   SUBST_CMD,       NONE/*set by p*/,   -2      , ALLOW_PLURAL |ALLOW_RING}
@@ -1170,6 +1173,7 @@ VAR cmdnames cmds[] =
   { "regularity",  0, REGULARITY_CMD ,    CMD_1},
   { "repart",      0, REPART_CMD ,        CMD_1},
   { "reservedName",0, RESERVEDNAME_CMD ,  CMD_M},
+  { "reservedNameList",0, RESERVEDNAMELIST_CMD ,  CMD_M},
   { "resolution",  0, RESOLUTION_CMD ,    RING_DECL},
   { "resultant",   0, RESULTANT_CMD,      CMD_3},
   { "restart",     0, RESTART_CMD,        CMD_1},
@@ -1327,7 +1331,7 @@ const struct sConvertTypes dConvertTypes[] =
 //  matrix -> module
    { MATRIX_CMD,      MODUL_CMD,      D(iiMa2Mo) , NULL_VAL },
 //  intvec
-//  link
+//  string -> link
    { STRING_CMD,      LINK_CMD,       D(iiS2Link) , NULL_VAL },
 // resolution -> list
    { RESOLUTION_CMD,  LIST_CMD,       NULL_VAL , D(iiR2L_l) },

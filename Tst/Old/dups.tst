@@ -13,6 +13,6 @@ listvar(all);
 diff(p,x);
 listvar(all);
 setring r;
-"poly p is shadowed by int p!!";
+"int p is shadowed by poly p!!";
 diff(p,x);
 LIB "tst.lib";tst_status(1);$
