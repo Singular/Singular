@@ -58,6 +58,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
   }
   #ifdef HAVE_FLINT
   #if __FLINT_RELEASE >= 20503
+  #if 0
   if (rField_is_Zp(r))
   {
     nmod_mpoly_ctx_t ctx;
@@ -66,16 +67,19 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
       return Flint_GCD_MP(f,pLength(f),g,pLength(g),ctx,r);
     }
   }
-  else if (rField_is_Q(r))
+  else 
+  #endif
+  #if 0
+  if (rField_is_Q(r))
   {
     fmpq_mpoly_ctx_t ctx;
     if (!convSingRFlintR(ctx,r))
     {
-//    printf("FlintQ\n");
       poly res=Flint_GCD_MP(f,pLength(f),g,pLength(g),ctx,r);
       res=p_Cleardenom(res,r);
     }
   }
+  #endif
   #endif
   #endif
   Off(SW_RATIONAL);
