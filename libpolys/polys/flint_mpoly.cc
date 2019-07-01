@@ -200,7 +200,7 @@ poly Flint_GCD_MP(poly p,int lp,poly q,int lq,nmod_mpoly_ctx_t ctx,const ring r)
   convSingPFlintMP(pp,ctx,p,lp,r);
   convSingPFlintMP(qq,ctx,q,lq,r);
   int bits=SI_LOG2(r->bitmask);
-  nmod_mpoly_init3(res,lp*lq,bits,ctx);
+  nmod_mpoly_init3(res,si_max(lp,lq),bits,ctx);
   int ok=nmod_mpoly_gcd(res,pp,qq,ctx);
   poly pres;
   if (ok)
@@ -225,7 +225,7 @@ poly Flint_GCD_MP(poly p,int lp,poly q,int lq,fmpq_mpoly_ctx_t ctx,const ring r)
   convSingPFlintMP(pp,ctx,p,lp,r);
   convSingPFlintMP(qq,ctx,q,lq,r);
   int bits=SI_LOG2(r->bitmask);
-  fmpq_mpoly_init3(res,lp*lq,bits,ctx);
+  fmpq_mpoly_init3(res,si_max(lp,lq),bits,ctx);
   int ok=fmpq_mpoly_gcd(res,pp,qq,ctx);
   poly pres;
   if (ok)
