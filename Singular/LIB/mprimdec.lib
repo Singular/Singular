@@ -1550,7 +1550,7 @@ EXAMPLE: example GTZmod; shows an example
     szIndep=size(indep[@k1]);
     for (@k2=1;@k2<=szIndep;@k2++)
     {
-      ring RAU = create_ring(ringlist(basering)[1],"("+indep[@k1][@k2][1]+","+indep[@k1][@k2][2]+")","indep[@k1][@k2][3]","no_minpoly");
+      ring RAU = create_ring(ringlist(basering)[1], "("+indep[@k1][@k2][1]+","+indep[@k1][@k2][2]+")", indep[@k1][@k2][3], "no_minpoly");
       module @N=std(imap(BAS,@N)); // the standard basis in (R[U])[A]
       execute("ring Rloc=("+charstr(basering)+","+indep[@k1][@k2][2]+"),("+indep[@k1][@k2][1]+"),(C,dp);");
       module @N=imap(RAU,@N); //std in lokalisierung
