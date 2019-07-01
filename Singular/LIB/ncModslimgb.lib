@@ -1,26 +1,27 @@
 //////////////////////////////////////////////////////////////////////////////
 version="version ncModslimgb.lib 4.1.2.0 Feb_2019 "; // $Id$
-category="Noncommutative algebras";
+category="Noncommutative";
 info="
 LIBRARY:  ncModslimgb.lib A library for computing Groebner bases over G-algebras
                          defined over the rationals using modular techniques.
 
-AUTHORS:    W. Decker, C. Eder, V. Levandovskyy, and Sharwan K. Tiwari
+AUTHORS:    W. Decker, C. Eder, V. Levandovskyy, and 
+ Sharwan K. Tiwari shrawant@gmail.com
 
 REFERENCES:
-             Wolfram Decker, Christian Eder, Viktor Levandovskyy, and
-             Sharwan K. Tiwari, Modular Techniques For Noncommutative
-             Groebner Bases, https://arxiv.org/abs/1704.02852.
+ Wolfram Decker, Christian Eder, Viktor Levandovskyy, and
+ Sharwan K. Tiwari, Modular Techniques For Noncommutative
+ Groebner Bases, https://arxiv.org/abs/1704.02852.
 
-             E. A. Arnold, Modular algorithms for computing Groebner bases.
-             J. Symb. Comp. 35, 403-419 (2003).
+ E. A. Arnold, Modular algorithms for computing Groebner bases.
+ Journal of Symbolic Computation 35, 403-419 (2003).
 
-             N. Idrees, G. Pfister, S. Steidel, Parallelization of Modular
-             Algorithms, J. Symb. Comp. 46, 672-684 (2011).
+ N. Idrees, G. Pfister, S. Steidel, Parallelization of Modular
+ Algorithms, Journal of Symbolic Computation 46, 672-684 (2011).
+
 PROCEDURES:
-          ncmodslimgb(ideal I, list #); Groebner basis of a given left ideal I
-                                        using modular methods (Chinese remainder
-                                        theorem and Farey map).
+ ncmodslimgb(ideal I, list #); Groebner basis of a given left ideal I
+ using modular methods (Chinese remainder theorem and Farey map).
 
 ";
 
@@ -34,18 +35,17 @@ static proc mod_init()
 }
 
 //==========================Main Procedure===================================
-
 proc ncmodslimgb(ideal I, list #)
 "USAGE:  ncmodslimgb(I[, exactness, ncores]); I ideal, optional integers exactness and n(umber of )cores
 RETURN:  ideal
-PURPOSE: compute a left Groebner basis of I
+PURPOSE: compute a left Groebner basis of I by modular approach
 ASSUME: basering is a G-algebra; base field is prime field Q of rationals.
-NOTE:  - If the given algebra and ideal are graded, then the computed Groebner
+NOTE:  - If the given algebra and ideal are graded (it is not checked by this command), then the computed Groebner
 basis will be exact. Otherwise, the result will be correct with a very high probability.
 - The optional parameter `exactness` justifies, whether the final (expensive) 
 verification step will be performed or not (exactness=0, default value is 1).
 - The optional parameter `ncores` (default value is 1) provides an integer to use
-the number of cores (of course ncores must not exceed the number of available cores in the computing machine).
+the number of cores (this must not exceed the number of available cores in the computing machine).
 EXAMPLE: example ncmodslimgb; shows an example
 "
 {
@@ -234,15 +234,14 @@ EXAMPLE: example ncmodslimgb; shows an example
 example
 {
   "EXAMPLE:"; echo = 2;
-  def r = reiffen(3,4);
-  setring r; RC; // a Reiffen curve
-  def A = Sannfs(RC);
-  setring A;
-  ideal bs = LD, imap(r,RC); // computation of the Bernstein-Sato polynomial
+  ring r = 0,(x,y),dp;
+  poly P = y^4+x^3+x*y^3; // a (3,4)-Reiffen curve
+  def A = Sannfs(P); setring A; // computed D-module data from P
+  ideal bs = LD, imap(r,P); // preparing the computation of the Bernstein-Sato polynomial
   ideal I1 = ncmodslimgb(bs,0,2); // no final verification, use 2 cores
-  I1[1]; // the Bernstein-Sato polynomial, univariate in s
+  I1[1]; // the Bernstein-Sato polynomial of P, univariate in s
   ideal I2 = ncmodslimgb(bs); // do the final verification, use 1 core (default)
-  I2[1]; // the Bernstein-Sato polynomial, univariate in s
+  I2[1]; // the Bernstein-Sato polynomial of P, univariate in s
 }
 
 /*
@@ -394,7 +393,7 @@ example
    W;
 }
 
-proc PrimeTestCommutatorRel(int p)
+static proc PrimeTestCommutatorRel(int p)
 "USAGE:  PrimeTestCommutatorRel(p); p a prime integer
 RETURN:  1 if p does not divide any coefficient of any defining relation of
          G-algebra, 0 otherwise.
@@ -468,16 +467,15 @@ example
  int p1 = 2147483647;
  int p2 = 2147483629;
  int p3 = 2147483549;
-
  PrimeTestCommutatorRel(p1);
  PrimeTestCommutatorRel(p2);
  PrimeTestCommutatorRel(p3);
 }
 
-proc PrimeTestId(def II, bigint p)
+static proc PrimeTestId(def II, bigint p)
 "USAGE:  PrimeTestId(I, p); I ideal, p a prime integer
 RETURN:  1 if p does not divide any numerator or denominator of any coefficient
-         of any generating polynomial of I, 0 otherwise.
+         in any polynomial of I, 0 otherwise.
 EXAMPLE: example PrimeTestId; shows an example
 {
   if(typeof(II) == "string")
@@ -529,15 +527,15 @@ example
  int p1 = 2147483647;
  int p2 = 2147483629;
  int p3 = 2147483549;
-
  PrimeTestId(I,p1);
  PrimeTestId(I,p2);
  PrimeTestId(I,p3);
 }
 
-proc ModpSlim(ideal I, int p)
+static proc ModpSlim(ideal I, int p)
 "USAGE:  ModpSlim(I, p); I ideal, p a prime
 RETURN:  The reduced Groebner basis of I mod p.
+ASSUME:  The base field is precisely Q.
 EXAMPLE: example ModpSlim; shows an example
 {
   def R0 = basering;
