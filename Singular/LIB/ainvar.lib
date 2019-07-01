@@ -20,6 +20,7 @@ PROCEDURES:
 LIB "inout.lib";
 LIB "general.lib";
 LIB "algebra.lib";
+LIB "ring.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sortier(def id)

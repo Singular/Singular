@@ -110,6 +110,7 @@ KEYWORDS:       Intersection theory; Enumerative geometry; Schubert calculus;
 LIB "general.lib";
 LIB "homolog.lib";
 LIB "parallel.lib";
+LIB "ring.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
 /////////// create new objects in this library  ////////////////////////////////

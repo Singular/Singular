@@ -18,6 +18,8 @@ KEYWORDS: walk, groebner;Groebnerwalk
 ZSEE ALSO: rwalk_lib; swalk_lib
 ";
 
+LIB "ring.lib";
+
 //////////////////////////////////////////////////////////////////////////////
 
 static proc OrderStringalp_NP(string Wpal,list #)

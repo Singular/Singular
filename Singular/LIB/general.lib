@@ -36,6 +36,7 @@ PROCEDURES:
 LIB "inout.lib";
 LIB "poly.lib";
 LIB "matrix.lib";
+LIB "ring.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc A_Z (string s,int n)

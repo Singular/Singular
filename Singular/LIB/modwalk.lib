@@ -28,6 +28,7 @@ SEE ALSO: grwalk_lib;swalk_lib;rwalk_lib
 LIB "rwalk.lib";
 LIB "grwalk.lib";
 LIB "modular.lib";
+LIB "ring.lib";
 
 proc modWalk(ideal I, list #)
 "USAGE:   modWalk(I, [, v, w]); I ideal, v intvec or string, w intvec
