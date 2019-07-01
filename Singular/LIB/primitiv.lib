@@ -12,6 +12,7 @@ PROCEDURES:
 ";
 
 LIB "random.lib";
+LIB "ring.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc primitive(ideal i)
@@ -39,9 +40,9 @@ EXAMPLE:  example primitive;  shows an example
 "
 {
  def altring=basering;
- execute("ring deglexring=("+charstr(altring)+"),("+varstr(altring)+"),dp;");
+ ring deglexring = create_ring(ringlist(altring)[1],"("+varstr(altring)+")","dp","no_minpoly");
  ideal j;
- execute("ring lexring=("+charstr(altring)+"),("+varstr(altring)+"),lp;");
+ ring lexring = create_ring(ringlist(altring)[1],"("+varstr(altring)+")","lp","no_minpoly");
  ideal i=fetch(altring,i);
 
  int k,schlecht,Fehlversuche,maxtry;

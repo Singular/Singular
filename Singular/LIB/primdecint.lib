@@ -31,6 +31,7 @@ KEYWORDS: primary decomposition
 ";
 
 LIB "primdec.lib";
+LIB "ring.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1240,7 +1241,7 @@ static proc quotientOneZ(ideal I, poly f)
    //ideal K=intersect(I,ideal(f));
    //=== K[i]/f; does not work in rings with integer! This should be replaced
    //=== later
-   execute("ring Rhelp=0,("+varstr(R)+"),dp;");
+   ring Rhelp = create_ring(0, "("+varstr(R)+")", "dp");
    ideal K=imap(R,K);
    poly f=imap(R,f);
    ASSUME(1, ncols(K)==size(K) || size(K)==0 ); // postcondition intersectZ
@@ -1281,7 +1282,7 @@ static proc reduceZ(poly f, ideal I)
    if(f==0){return(f);}
    if (not attrib(I,"isSB") ) { print ("// ** I is no standard basis"); }
    def R=basering;
-   execute("ring Rhelp=0,("+varstr(R)+"),dp;");
+   ring Rhelp = create_ring(0, "("+varstr(R)+")", "dp");
    ideal I=imap(R,I);
    poly f=imap(R,f);
    int i,j;

@@ -2416,17 +2416,16 @@ EXAMPLE: example genus; shows an example
    }
    poly p=I[1];
 
-   execute("ring S=("+charstr(R)+"),(x,y,t),dp;");
+   ring S = create_ring(ringlist(R)[1],"(x,y,t)","dp","no_minpoly");
    ideal L=maxideal(1);
-   execute("ring C=("+charstr(R)+"),(x,y),ds;");
+   ring C = create_ring(ringlist(R)[1], "(x,y)", "ds", "no_minpoly");
    ideal I;
-   execute("ring A=("+charstr(R)+"),(x,t),dp;");
+   ring A = create_ring(ringlist(R)[1], "(x,t)", "dp", "no_minpoly");
    map phi=S,1,x,t;
    map psi=S,x,1,t;
    poly g,h;
    ideal I,I1;
-   execute("ring B=("+charstr(R)+"),(x,t),ds;");
-
+   ring B = create_ring(ringlist(R)[1], "(x,t)", "ds", "no_minpoly");
    setring S;
    if(o)
    {
@@ -2504,7 +2503,7 @@ EXAMPLE: example genus; shows an example
       }
       "singularities at (x,y,1):";"";
    }
-   execute("ring newR=("+charstr(R)+"),(x,y),dp;");
+   ring newR = create_ring(ringlist(R)[1], "(x,y)", "dp", "no_minpoly");
    //the singularities at the affine part
    map sigma=S,var(1),var(2),1;
    ideal I=sigma(F);
@@ -2719,11 +2718,12 @@ EXAMPLE: example deltaLoc;  shows an example
          co=leadcoef(singL[1]);
       }
 
-      execute("ring B=("+charstr(S)+"),a,dp;");
+      ring B = create_ring(ringlist(R)[1], "(a)", "dp", "no_minpoly");
       map beta=S,a,a;
       poly p=beta(p);
 
-      execute("ring C=("+charstr(S)+",a),(x,y),ds;");
+      list L1 = char(S), list("a"), list(list("lp", intvec(1))), ideal(0);
+      ring C = create_ring(L1, "(x,y)", "ds");
       minpoly=number(imap(B,p));
 
       map iota=S,a,a;
@@ -3326,11 +3326,6 @@ EXAMPLE:  example closureFrac; shows an example
               maxi = maxi,maxideal(1);
               map backmap = S(k),maxi;
 
-              //mapstr=" map backmap = S(k),";
-              //for (l=1;l<=nvars(R(k));l++)
-              //{
-              //  mapstr=mapstr+"0,";
-              //}
               poly p;
           }
           p=NF(backmap(h),std(ker));
@@ -3506,12 +3501,6 @@ proc closureGenerators(list L);
            maxi[nvars(R(k))] = 0;
            maxi = maxi,maxideal(1);
            map backmap = S(k),maxi;
-
-           //mapstr=" map backmap = S(k),";
-           //for (l=1;l<=nvars(R(k));l++)
-           //{
-           //  mapstr=mapstr+"0,";
-           //}
 
            poly p;
         }

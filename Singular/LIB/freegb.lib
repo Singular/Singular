@@ -3471,51 +3471,6 @@ static proc lpAssumeViolation()
   return (!isFreeAlgebra(basering))
 }
 
-// obsolete
-static proc lshift(module M, int s, string varing, def lpring)
-{
-  // FINALLY IMPLEMENTED AS A PART OT THE C CODE
-  // shifts a polynomial from the ring R to s positions
-  // M lives in varing, the result in lpring
-  // to be run from varing
-  int i, j, k, sm, sv;
-  vector v;
-  setring lpring;
-  poly @@p;
-  ideal I;
-  execute("setring "+varing);
-  sm = ncols(M);
-  for (i=1; i<=s; i++)
-  {
-    // modules, e.g. free polynomials
-    for (j=1; j<=sm; j++)
-    {
-      //vectors, e.g. free monomials
-      v  = M[j];
-      sv = size(v);
-      sp = "@@p = @@p + ";
-      for (k=2; k<=sv; k++)
-      {
-        sp = sp + string(v[k])+"("+string(k-1+s)+")*";
-      }
-      sp = sp + string(v[1])+";"; // coef;
-      setring lpring;
-      //      execute("setring "+lpring);
-      execute(sp);
-      execute("setring "+varing);
-    }
-    setring lpring;
-    //    execute("setring "+lpring);
-    I = I,@@p;
-    @@p = 0;
-  }
-  setring lpring;
-  //execute("setring "+lpring);
-  export(I);
-  //  setring varing;
-  execute("setring "+varing);
-}
-
 static proc skip0(vector v)
 {
   // skips zeros in a vector, producing another vector

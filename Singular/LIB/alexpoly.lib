@@ -33,6 +33,7 @@ KEYWORDS: Hamburger-Noether expansion; Puiseux expansion; curve singularities;
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 LIB "hnoether.lib";
+LIB "ring.lib";
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 proc resolutiongraph (def INPUT,list #)
@@ -656,7 +657,12 @@ EXAMPLE: example alexanderpolynomial;  shows an example
   int r=ncols(tm);
   int e=ncols(gr);
   // Define the Ring for the Alexander Polynomial and the Zeta Function of the Monodromy.
-  execute("ring ALEXring=("+charstr(basering)+"),(t,t(1..r)),dp;");
+  list l2 = "t";
+  for (int ii = 1; ii <= r; ii++)
+  {
+    l2[ii+1] = "t("+string(ii)+")";
+  }
+  ring ALEXring = create_ring(ringlist(basering)[1], l2, "dp", "no_minpoly");
   poly hilfspoly=1;
   poly alexnumerator=1;    // numerator of the Alexander polynomial
   poly alexdenominator=1;  // denominator of the Alexander polynomial
