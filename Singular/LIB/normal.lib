@@ -2723,7 +2723,7 @@ EXAMPLE: example deltaLoc;  shows an example
       poly p=beta(p);
 
       list L1 = char(S), list("a"), list(list("lp", intvec(1))), ideal(0);
-      ring C = create_ring(L1, "(x,y)", "ds");  
+      ring C = create_ring(L1, "(x,y)", "ds");
       minpoly=number(imap(B,p));
 
       map iota=S,a,a;
@@ -2797,7 +2797,6 @@ EXAMPLE: example deltaLoc;  shows an example
 
       if(w>=1){"Newton-Polygon is degenerated";"";}
 /* need to re-consider the degree bound (de):
-      execute
       // the following can certainly be made more efficient when replacing
       // 'hnexpansion' (used only for computing number of branches) by
       // successive blowing-up + test if Newton polygon degenerate:

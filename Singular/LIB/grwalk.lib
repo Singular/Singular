@@ -236,7 +236,6 @@ EXAMPLE: example gwalk; shows an example"
    def xR = basering;
 
    ring ostR = create_ring(ringlist(xR)[1],"("+varstr(xR)+")",ord_str,"no_minpoly");
-   
    def old_ring = basering;
 
    //print("//** help ring = " + string(basering));

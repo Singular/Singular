@@ -1906,7 +1906,7 @@ EXAMPLE:    example projectiveSpace; shows examples
     }
     variety P;
     P.dimension = n;
-    ring r = create_ring(0,"("+h+")","wp(1)","no_minpoly");
+    ring r = create_ring(0, "("+h+")", "wp(1)");
     setring r;
     P.baseRing = r;
     ideal rels = var(1)^(n+1);
@@ -1964,7 +1964,7 @@ EXAMPLE:    example projectiveBundle; shows examples
     int r = rankSheaf(S);
     A.dimension = r - 1 + B.dimension;
     poly c = totalChernClass(S);
-    ring P = create_ring(0,"("+z+")","wp(1)","no_minpoly");
+    ring P = create_ring(0, "("+z+")", "wp(1)");
     def CR = P + R;
     setring CR;
     A.baseRing = CR;

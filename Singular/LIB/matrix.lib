@@ -1067,7 +1067,12 @@ EXAMPLE:  example symmetricBasis; shows an example"
   }
 
 //------------------------- create ring container for symmetric power basis-
-  ring @@@SYM_POWER_RING_NAME = create_ring(0,"("+S+"(1.."+string(n)+"))","dp","no_minpoly");
+  list l2;
+  for (int ii = 1; ii <= n; ii++)
+  {
+    l2[ii] = S+"("+string(ii)+")";
+  }
+  ring @@@SYM_POWER_RING_NAME = create_ring(0, l2, "dp");
 //------------------------- choose symmetric basis -------------------------
   ideal symBasis = maxideal(k);
 
@@ -1114,7 +1119,12 @@ EXAMPLE:  example exteriorBasis; shows an example"
   }
 
 //------------------------- create ring container for symmetric power basis-
-  ring @@@EXT_POWER_RING_NAME = create_ring(0,"("+S+"(1.."+string(n)+"))","dp","no_minpoly");
+  list l2;
+  for (int ii = 1; ii <= n; ii++)
+  {
+    l2[ii] = S+"("+string(ii)+")";
+  }
+  ring @@@EXT_POWER_RING_NAME = create_ring(0, l2, "dp");
 
 //------------------------- choose exterior basis -------------------------
   def T = superCommutative(); setring T;

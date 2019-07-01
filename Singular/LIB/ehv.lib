@@ -742,7 +742,7 @@ EXAMPLE: example decompEHV; shows an example"
                   poly g1 = L[1][1];
                   //..and insert f in g1...
                   ring newR = create_ring(ringlist(R)[1], "(y(1))", "(" + ordstr(R) + ")", "no_minpoly");
-		  poly g2 = imap(R,g1);
+                  poly g2 = imap(R,g1);
                   setring base;
                   h = fetch(newR,g2);
                   h = subst(h,var(1),f);
@@ -1038,8 +1038,14 @@ EXAMPLE: example AssEHV; shows an example"
               setring homoR;
               ideal homoJ = fetch(base,K);
               homoJ = groebner(homoJ);
-              ring newR = create_ring(ringlist(base)[1], "(x(1..n),t)", "dp", "no_minpoly");
-	      ideal homoK = fetch(homoR,homoJ);
+              list l2;
+              for (int ii = 1; ii <= n; ii++)
+              {
+                l2[i] = "x("+string(ii)+")";
+              }
+              l2[n+1] = "t";
+              ring newR = create_ring(ringlist(base)[1], l2, "dp", "no_minpoly");
+              ideal homoK = fetch(homoR,homoJ);
               homoK = homog(homoK,t);
               attrib(homoK,"isEquidimensional",1);
               attrib(homoK,"isRadical",1);

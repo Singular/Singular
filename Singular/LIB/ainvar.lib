@@ -213,7 +213,12 @@ EXAMPLE: example reduction; shows an example
      poly v=product(maxideal(1));
 
   //------------- changes the basering bsr to bsr[@(0),...,@(z)] ----------
-  ring s = create_ring(ringlist(basering)[1],"("+varstr(basering)+",@(0..z))","dp","no_minpoly");
+  list l2 = ringlist(basering)[2];
+  for (int ii = 0; ii <= z; ii++)
+  {
+    l2[size(l2)+1] = "@("+string(ii)+")";
+  }
+  ring s = create_ring(ringlist(basering)[1], l2, "dp", "no_minpoly");
   //constructs the leading ideal of dom=(p-@(0),dom[1]-@(1),...,dom[z]-@(z))
      ideal dom=imap(bsr,dom);
      for (i=1;i<=z;i++)

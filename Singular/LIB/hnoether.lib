@@ -2457,7 +2457,7 @@ EXAMPLE: example extdevelop;  shows an example
      {
        if (npars(basering)>1) {         // ring (p,a,..),...
         ring extdguenstig = create_ring(ringlist(basering)[1],"(x,y)","ls","no_minpoly");
-     }
+       }
        else {                                  // ring (p,a),...
         string mipl=string(minpoly);
         ring extdguenstig=(p,`parstr(basering)`),(x,y),ls;

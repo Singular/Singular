@@ -772,7 +772,7 @@ proc lcm_chr(poly @i, poly @j)
        string strg=parstr(basering)+",";
      }
   }
-  ring PRing = create_ring(ringlist(basering)[1],"("+strg+varstr(basering)+")","dp","no_minpoly");
+  ring PRing = create_ring(char(basering), "("+strg+varstr(basering)+")", "dp");
   ideal @a=ideal(imap(LBAS,@i),imap(LBAS,@j));
   poly @p=lcm(@a);
   setring LBAS;

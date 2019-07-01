@@ -3471,8 +3471,6 @@ static proc lpAssumeViolation()
   return (!isFreeAlgebra(basering))
 }
 
-
-
 static proc skip0(vector v)
 {
   // skips zeros in a vector, producing another vector
