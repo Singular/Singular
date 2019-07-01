@@ -1405,6 +1405,16 @@ static proc parse_L1(string l1)
   return(L);
 }
 
+static proc parse_var(string v)
+{
+  if (v[1, 4] == "var(" && defined(basering))
+  {
+      int i = int(v[5,size(v)-5]);
+      v = ringlist(basering)[2][i];
+  }
+  return(v);
+}
+
 /*
  * parses
  * "x" to list("x") and
@@ -1414,9 +1424,13 @@ static proc parse_L2(string l2)
 {
   if (find(l2, "(", 1) == 0)   // no parentheses
   {
-      return(list(l2));
+      return(list(parse_var(l2)));
   }
   list V = tuple_to_tokens(l2);
+  for (int i = size(V); i > 0; i--)
+  {
+      V[i] = parse_var(V[i]);
+  }
   return(V);
 }
 
@@ -1526,7 +1540,7 @@ EXAMPLE: example create_ring; shows an example
   }
 
   /* L[1] */
-  if (typeof(l2) == "list")
+  if (typeof(l1) == "list")
   {
     if (no_minpoly)
     {
@@ -1541,6 +1555,9 @@ EXAMPLE: example create_ring; shows an example
         }
       }
     }
+  }
+  if (typeof(l1) == "list" || typeof(l1) == "int")
+  {
     L[1] = l1;
   }
   else
