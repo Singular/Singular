@@ -58,28 +58,27 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
   }
   #ifdef HAVE_FLINT
   #if __FLINT_RELEASE >= 20503
-  #if 0
-  if (rField_is_Zp(r))
+  if (rField_is_Zp(r) && (r->cf->ch>500))
   {
     nmod_mpoly_ctx_t ctx;
     if (!convSingRFlintR(ctx,r))
     {
+      // leading coef. 1
       return Flint_GCD_MP(f,pLength(f),g,pLength(g),ctx,r);
     }
   }
   else 
-  #endif
-  #if 0
   if (rField_is_Q(r))
   {
     fmpq_mpoly_ctx_t ctx;
     if (!convSingRFlintR(ctx,r))
     {
+      // leading coef. positive, all coeffs in Z
       poly res=Flint_GCD_MP(f,pLength(f),g,pLength(g),ctx,r);
       res=p_Cleardenom(res,r);
+      return res;
     }
   }
-  #endif
   #endif
   #endif
   Off(SW_RATIONAL);
@@ -89,7 +88,10 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
     setCharacteristic( rChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g, r ) );
     res=convFactoryPSingP( gcd( F, G ) , r);
-    if ( rField_is_Zp(r)) p_Norm(res,r);
+    if ( rField_is_Zp(r))
+      p_Norm(res,r); // leading coef. 1
+    else if (rField_is_Q(r) && (!n_GreaterZero(pGetCoeff(res),r->cf)))
+      res = p_Neg(res,r); // leading coef. positive, all coeffs in Z
   }
   // and over Q(a) / Fp(a)
   else if ( r->cf->extRing!=NULL )
