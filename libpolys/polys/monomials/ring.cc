@@ -5805,8 +5805,8 @@ ring rMinusVar(const ring r, char *v)
     return NULL;
   }
   ring R=rCopy0(r);
-  int i=R->N;
-  while(i>0)
+  int i=R->N-1;
+  while(i>=0)
   {
     if (strcmp(R->names[i],v)==0)
     {
