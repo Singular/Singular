@@ -425,7 +425,7 @@ CanonicalForm::degree( const Variable & v ) const
       case GFMARK:  return imm_iszero_gf( value ) ? -1 : 0;
       case 0: if ( value->inBaseDomain() )
               return value->degree();
-	      break;
+              break;
     }
 #endif
 
@@ -706,15 +706,18 @@ CanonicalForm::operator *= ( const CanonicalForm & cf )
         value = value->mulcoeff( cf.value );
     else  if ( value->level() == cf.value->level() ) {
 #if (HAVE_NTL && HAVE_FLINT && __FLINT_RELEASE >= 20400)
-        if (value->levelcoeff() == cf.value->levelcoeff() && cf.isUnivariate() && (*this).isUnivariate())
+        if (value->levelcoeff() == cf.value->levelcoeff())
         {
-          if (value->level() < 0 || CFFactory::gettype() == GaloisFieldDomain || (size (cf) <= 10 || size (*this) <= 10) )
-            value = value->mulsame( cf.value );
+          if(cf.isUnivariate() && (*this).isUnivariate())
+          {
+            if (value->level() < 0 || CFFactory::gettype() == GaloisFieldDomain || (size (cf) <= 10 || size (*this) <= 10) )
+              value = value->mulsame( cf.value );
+            else
+              *this= mulNTL (*this, cf);
+          }
           else
-            *this= mulNTL (*this, cf);
-        }
-        else if (value->levelcoeff() == cf.value->levelcoeff() && (!cf.isUnivariate() || !(*this).isUnivariate()))
             value = value->mulsame( cf.value );
+        }
 #else
         if ( value->levelcoeff() == cf.value->levelcoeff() )
             value = value->mulsame( cf.value );
