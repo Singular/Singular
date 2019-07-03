@@ -2,7 +2,7 @@
 
 #include <vector>
 
-void subset(std::vector<int> &arr, int size, int left, int index, std::vector<int> &l, std::vector<std::vector<int> > &L)
+static void s_subset(std::vector<int> &arr, int size, int left, int index, std::vector<int> &l, std::vector<std::vector<int> > &L)
 {
   if(left==0)
   {
@@ -13,7 +13,7 @@ void subset(std::vector<int> &arr, int size, int left, int index, std::vector<in
   for(int i=index; i<size;i++)
   {
     l.push_back(arr[i]);
-    subset(arr,size,left-1,i+1,l,L);
+    s_subset(arr,size,left-1,i+1,l,L);
     l.pop_back();
   }
 }
@@ -23,7 +23,7 @@ void subset(std::vector<int> &arr, int size, int left, int index, std::vector<in
 //          representing subsets of {1,...,n} of cardinality k
 // NOTE:    the lists will be sorted lexicographically
 //          and the elements in each of the lists are sorted naturally
-BOOLEAN subsets(leftv res, leftv args)
+static BOOLEAN subsets(leftv res, leftv args)
 {
   leftv u = args;
   if ((u!=NULL) && (u->Typ()==INT_CMD))
@@ -38,7 +38,7 @@ BOOLEAN subsets(leftv res, leftv args)
         array[i]=i+1;
       std::vector<int> ltemp;
       std::vector<std::vector<int> > lt;
-      subset(array,n,k,0,ltemp,lt);
+      s_subset(array,n,k,0,ltemp,lt);
 
       lists Lt = (lists) omAllocBin(slists_bin);
       Lt->Init(lt.size());
