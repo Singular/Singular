@@ -78,7 +78,6 @@ LIB "customstd.lib";
 LIB "linalg.lib";
 LIB "multigrading.lib";
 LIB "parallel.lib";
-LIB "ring.lib";
 
 static proc mod_init()
 {
@@ -266,7 +265,8 @@ static proc saturateWithRespectToVariable(ideal I, int k)
   }
   newVars = newVars+string(var(k));
   newWeightVector[n]=weightVector[k];
-  ring ringForSaturation = create_ring(ringlist(origin)[1],"("+newVars+")","(wp(newWeightVector))","no_minpoly");
+  execute("ring ringForSaturation = ("+charstr(origin)+"),("+newVars+"),(wp(newWeightVector));");
+
   ideal I = satstd(imap(origin,I));
   I = simplify(I,2+4+32);
 

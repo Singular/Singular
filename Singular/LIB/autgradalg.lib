@@ -2829,7 +2829,6 @@ example
   setBaseMultigrading(Q);
 
   ideal I = T(1)*T(2) + T(3)^2 + T(4)^2;
-  list TOR = 2;
 
   intvec w0 = 2,1,0;
   def RR = autXhat(I, w0, TOR);
