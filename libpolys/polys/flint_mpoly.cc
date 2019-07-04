@@ -16,6 +16,8 @@
 #include "coeffs/longrat.h"
 #include "polys/monomials/p_polys.h"
 
+/****** ring conversion ******/
+
 BOOLEAN convSingRFlintR(fmpq_mpoly_ctx_t ctx, const ring r)
 {
   if (rRing_ord_pure_dp(r))
@@ -35,6 +37,28 @@ BOOLEAN convSingRFlintR(fmpq_mpoly_ctx_t ctx, const ring r)
   }
   return TRUE;
 }
+
+BOOLEAN convSingRFlintR(nmod_mpoly_ctx_t ctx, const ring r)
+{
+  if (rRing_ord_pure_dp(r))
+  {
+    nmod_mpoly_ctx_init(ctx,r->N,ORD_DEGREVLEX,r->cf->ch);
+    return FALSE;
+  }
+  else if (rRing_ord_pure_Dp(r))
+  {
+    nmod_mpoly_ctx_init(ctx,r->N,ORD_DEGLEX,r->cf->ch);
+    return FALSE;
+  }
+  else if (rRing_ord_pure_lp(r))
+  {
+    nmod_mpoly_ctx_init(ctx,r->N,ORD_LEX,r->cf->ch);
+    return FALSE;
+  }
+  return TRUE;
+}
+
+/******** polynomial conversion ***********/
 
 void convSingPFlintMP(fmpq_mpoly_t res, fmpq_mpoly_ctx_t ctx, poly p, int lp, const ring r)
 {
@@ -89,43 +113,6 @@ poly convFlintMPSingP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, const ring r)
   return p;
 }
 
-poly Flint_Mult_MP(poly p,int lp, poly q, int lq, fmpq_mpoly_ctx_t ctx, const ring r)
-{
-  fmpq_mpoly_t pp,qq,res;
-  convSingPFlintMP(pp,ctx,p,lp,r);
-  convSingPFlintMP(qq,ctx,q,lq,r);
-  int bits=SI_LOG2(r->bitmask);
-  fmpq_mpoly_init3(res,lp*lq,bits,ctx);
-  fmpq_mpoly_mul(res,pp,qq,ctx);
-  poly pres=convFlintMPSingP(res,ctx,r);
-  fmpq_mpoly_clear(res,ctx);
-  fmpq_mpoly_clear(pp,ctx);
-  fmpq_mpoly_clear(qq,ctx);
-  fmpq_mpoly_ctx_clear(ctx);
-  p_Test(pres,r);
-  return pres;
-}
-
-BOOLEAN convSingRFlintR(nmod_mpoly_ctx_t ctx, const ring r)
-{
-  if (rRing_ord_pure_dp(r))
-  {
-    nmod_mpoly_ctx_init(ctx,r->N,ORD_DEGREVLEX,r->cf->ch);
-    return FALSE;
-  }
-  else if (rRing_ord_pure_Dp(r))
-  {
-    nmod_mpoly_ctx_init(ctx,r->N,ORD_DEGLEX,r->cf->ch);
-    return FALSE;
-  }
-  else if (rRing_ord_pure_lp(r))
-  {
-    nmod_mpoly_ctx_init(ctx,r->N,ORD_LEX,r->cf->ch);
-    return FALSE;
-  }
-  return TRUE;
-}
-
 poly convFlintMPSingP(nmod_mpoly_t f, nmod_mpoly_ctx_t ctx, const ring r)
 {
   int d=nmod_mpoly_length(f,ctx)-1;
@@ -168,6 +155,26 @@ void convSingPFlintMP(nmod_mpoly_t res, nmod_mpoly_ctx_t ctx, poly p, int lp,con
     pIter(p);
   }
   omFreeSize(exp,(r->N+1)*sizeof(ulong));
+}
+
+
+/****** polynomial operations ***********/
+
+poly Flint_Mult_MP(poly p,int lp, poly q, int lq, fmpq_mpoly_ctx_t ctx, const ring r)
+{
+  fmpq_mpoly_t pp,qq,res;
+  convSingPFlintMP(pp,ctx,p,lp,r);
+  convSingPFlintMP(qq,ctx,q,lq,r);
+  int bits=SI_LOG2(r->bitmask);
+  fmpq_mpoly_init3(res,lp*lq,bits,ctx);
+  fmpq_mpoly_mul(res,pp,qq,ctx);
+  poly pres=convFlintMPSingP(res,ctx,r);
+  fmpq_mpoly_clear(res,ctx);
+  fmpq_mpoly_clear(pp,ctx);
+  fmpq_mpoly_clear(qq,ctx);
+  fmpq_mpoly_ctx_clear(ctx);
+  p_Test(pres,r);
+  return pres;
 }
 
 poly Flint_Mult_MP(poly p,int lp, poly q, int lq, nmod_mpoly_ctx_t ctx, const ring r)
@@ -236,5 +243,6 @@ poly Flint_GCD_MP(poly p,int lp,poly q,int lq,fmpq_mpoly_ctx_t ctx,const ring r)
   fmpq_mpoly_ctx_clear(ctx);
   return pres;
 }
+
 #endif
 #endif
