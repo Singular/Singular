@@ -69,9 +69,10 @@ poly convFlintMPSingP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, const ring r)
   int d=fmpq_mpoly_length(f,ctx)-1;
   poly p=NULL;
   ulong* exp=(ulong*)omAlloc0((r->N+1)*sizeof(ulong));
+  fmpq_t c;
+  fmpq_init(c);
   for(int i=d; i>=0; i--)
   {
-    fmpq_t c;
     fmpq_mpoly_get_term_coeff_fmpq(c,f,i,ctx);
     poly pp=p_Init(r);
     #if SIZEOF_LONG==8
@@ -88,6 +89,7 @@ poly convFlintMPSingP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, const ring r)
     pNext(pp)=p;
     p=pp;
   }
+  fmpq_clear(c);
   p_Test(p,r);
   return p;
 }
