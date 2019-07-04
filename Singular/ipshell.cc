@@ -2584,6 +2584,11 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
         else
           iv=ivCopy((intvec*)vv->m[1].Data()); //assume INTVEC
         int iv_len=iv->length();
+        if (iv_len==0)
+        {
+          Werror("empty intvec for ordering %d (%s)",j_in_R,rSimpleOrdStr(R->order[j_in_R]));
+          return TRUE;
+        }
         if ((R->order[j_in_R]!=ringorder_s)
         &&(R->order[j_in_R]!=ringorder_c)
         &&(R->order[j_in_R]!=ringorder_C))
