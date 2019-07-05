@@ -329,11 +329,16 @@ void convSingPFlintMP(fmpq_mpoly_t res, fmpq_mpoly_ctx_t ctx, poly p, int lp, co
     base.init_poly(p);
 
     convert_sing_to_fmpq_mpoly_arg * args = new convert_sing_to_fmpq_mpoly_arg[base.num_threads];
+    slong cur_idx = 0;
     for (slong i = 0; i < base.num_threads; i++)
     {
+        slong next_idx = i + 1 < base.num_threads ? (i + 1)*base.length/base.num_threads : base.length;
+        next_idx = FLINT_MAX(next_idx, cur_idx);
+        next_idx = FLINT_MIN(next_idx, base.length);
         args[i].base = &base;
-        args[i].start_idx = (i+0)*base.length/base.num_threads;
-        args[i].end_idx   = (i+1)*base.length/base.num_threads;
+        args[i].start_idx = cur_idx;
+        args[i].end_idx   = next_idx;
+        cur_idx = next_idx;
     }
 
     /* get content */
@@ -463,11 +468,17 @@ poly convFlintMPSingP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, const ring r)
     convert_fmpq_mpoly_to_sing_base base(num_handles + 1, f, ctx, r);
 
     convert_fmpq_mpoly_to_sing_arg * args = new convert_fmpq_mpoly_to_sing_arg[base.num_threads];
+    slong cur_idx = 0;
     for (slong i = 0; i < base.num_threads; i++)
     {
+        slong next_idx = i + 1 < base.num_threads ? (i + 1)*base.f->zpoly->length/base.num_threads
+                                                  : base.f->zpoly->length;
+        next_idx = FLINT_MAX(next_idx, cur_idx);
+        next_idx = FLINT_MIN(next_idx, base.f->zpoly->length);
         args[i].base = &base;
-        args[i].start_idx = (i+0)*base.f->zpoly->length/base.num_threads;
-        args[i].end_idx   = (i+1)*base.f->zpoly->length/base.num_threads;
+        args[i].start_idx = cur_idx;
+        args[i].end_idx   = next_idx;
+        cur_idx = next_idx;
         args[i].poly_end = NULL;
         args[i].poly_start = NULL;
     }
@@ -608,11 +619,17 @@ void convSingPFlintMP(nmod_mpoly_t res, nmod_mpoly_ctx_t ctx, poly p, int lp, co
     base.init_poly(p);
 
     convert_sing_to_nmod_mpoly_arg * args = new convert_sing_to_nmod_mpoly_arg[base.num_threads];
+    slong cur_idx = 0;
     for (slong i = 0; i < base.num_threads; i++)
     {
+        slong next_idx = i + 1 < base.num_threads ? (i + 1)*base.length/base.num_threads
+                                                  : base.length;
+        next_idx = FLINT_MAX(next_idx, cur_idx);
+        next_idx = FLINT_MIN(next_idx, base.length);
         args[i].base = &base;
-        args[i].start_idx = (i+0)*base.length/base.num_threads;
-        args[i].end_idx   = (i+1)*base.length/base.num_threads;
+        args[i].start_idx = cur_idx;
+        args[i].end_idx   = next_idx;
+        cur_idx = next_idx;
     }
 
     /* fill in res */
@@ -716,11 +733,17 @@ poly convFlintMPSingP(nmod_mpoly_t f, nmod_mpoly_ctx_t ctx, const ring r)
     convert_nmod_mpoly_to_sing_base base(num_handles + 1, f, ctx, r);
 
     convert_nmod_mpoly_to_sing_arg * args = new convert_nmod_mpoly_to_sing_arg[base.num_threads];
+    slong cur_idx = 0;
     for (slong i = 0; i < base.num_threads; i++)
     {
+        slong next_idx = i + 1 < base.num_threads ? (i + 1)*base.f->length/base.num_threads
+                                                  : base.f->length;
+        next_idx = FLINT_MAX(next_idx, cur_idx);
+        next_idx = FLINT_MIN(next_idx, base.f->length);
         args[i].base = &base;
-        args[i].start_idx = (i+0)*base.f->length/base.num_threads;
-        args[i].end_idx   = (i+1)*base.f->length/base.num_threads;
+        args[i].start_idx = cur_idx;
+        args[i].end_idx   = next_idx;
+        cur_idx = next_idx;
         args[i].poly_end = NULL;
         args[i].poly_start = NULL;
     }
