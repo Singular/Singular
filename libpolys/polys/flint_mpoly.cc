@@ -822,6 +822,16 @@ poly Flint_GCD_MP(poly p,int lp,poly q,int lq,fmpq_mpoly_ctx_t ctx,const ring r)
   poly pres;
   if (ok)
   {
+    // Flint normalizes the gcd to be monic.
+    // Singular wants a gcd defined over ZZ that is primitive and has a positive leading coeff.
+    if (!fmpq_mpoly_is_zero(res, ctx))
+    {
+      fmpq_t content;
+      fmpq_init(content);
+      fmpq_mpoly_content(content, res, ctx);
+      fmpq_mpoly_scalar_div_fmpq(res, res, content, ctx);
+      fmpq_clear(content);
+    }
     pres=convFlintMPSingP(res,ctx,r);
     p_Test(pres,r);
   }
