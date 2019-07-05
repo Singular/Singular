@@ -5815,9 +5815,9 @@ ring rMinusVar(const ring r, char *v)
       for(int j=i;j<R->N;j++) R->names[j]=R->names[j+1];
       R->names=(char**)omReallocSize(R->names,r->N*sizeof(char_ptr),R->N*sizeof(char_ptr));
     }
-    else i--;
+    i--;
   }
   R->block1[p]=R->N;
-  rComplete(R);
+  rComplete(R,1);
   return R;
 }
