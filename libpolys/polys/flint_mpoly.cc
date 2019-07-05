@@ -62,7 +62,8 @@ BOOLEAN convSingRFlintR(nmod_mpoly_ctx_t ctx, const ring r)
 
 /******** polynomial conversion ***********/
 
-#if 0
+#if 1
+// malloc is not thread safe; singular polynomials must be constructed in serial
 
 void convSingPFlintMP(fmpq_mpoly_t res, fmpq_mpoly_ctx_t ctx, poly p, int lp, const ring r)
 {
@@ -107,12 +108,12 @@ poly convFlintMPSingP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, const ring r)
     #endif
     p_Setm(pp,r);
     number n=convFlintNSingN_QQ(c,r->cf);
-    //fmpq_clear(c); // LEAK?
     pSetCoeff0(pp,n);
     pNext(pp)=p;
     p=pp;
   }
   fmpq_clear(c);
+  omFreeSize(exp,(r->N+1)*sizeof(ulong));
   p_Test(p,r);
   return p;
 }
@@ -138,6 +139,7 @@ poly convFlintMPSingP(nmod_mpoly_t f, nmod_mpoly_ctx_t ctx, const ring r)
     pNext(pp)=p;
     p=pp;
   }
+  omFreeSize(exp,(r->N+1)*sizeof(ulong));
   p_Test(p,r);
   return p;
 }
@@ -162,6 +164,7 @@ void convSingPFlintMP(nmod_mpoly_t res, nmod_mpoly_ctx_t ctx, poly p, int lp,con
 }
 
 #else
+// malloc is thread safe; singular polynomials may be constructed in serial
 
 // like convSingNFlintN_QQ but it takes an initialized fmpq_t f
 static void my_convSingNFlintN_QQ(fmpq_t f, number n)
@@ -233,7 +236,7 @@ public:
     ~convert_sing_to_fmpq_mpoly_arg() {fmpq_clear(content);}
 };
 
-void convert_sing_to_fmpq_mpoly_content_worker(void * varg)
+static void convert_sing_to_fmpq_mpoly_content_worker(void * varg)
 {
     convert_sing_to_fmpq_mpoly_arg* arg = (convert_sing_to_fmpq_mpoly_arg*) varg;
     fmpq_t c;
@@ -261,7 +264,7 @@ void convert_sing_to_fmpq_mpoly_content_worker(void * varg)
     fmpq_clear(c);
 }
 
-void convert_sing_to_fmpq_mpoly_zpoly_worker(void * varg)
+static void convert_sing_to_fmpq_mpoly_zpoly_worker(void * varg)
 {
     convert_sing_to_fmpq_mpoly_arg * arg = (convert_sing_to_fmpq_mpoly_arg *) varg;
     convert_sing_to_fmpq_mpoly_base * base = arg->base;
@@ -410,11 +413,11 @@ public:
     convert_fmpq_mpoly_to_sing_base* base;
 };
 
-void convert_fmpq_mpoly_to_sing_worker(void * varg)
+static void convert_fmpq_mpoly_to_sing_worker(void * varg)
 {
     convert_fmpq_mpoly_to_sing_arg * arg = (convert_fmpq_mpoly_to_sing_arg *) varg;
     convert_fmpq_mpoly_to_sing_base * base = arg->base;
-    ulong* exp = (ulong*) flint_malloc((base->r->N + 1)*sizeof(ulong));
+    ulong* exp = (ulong*) flint_calloc(base->r->N + 1, sizeof(ulong));
     fmpq_t c;
     fmpq_init(c);
 
@@ -444,7 +447,6 @@ void convert_fmpq_mpoly_to_sing_worker(void * varg)
     flint_free(exp);
     fmpq_clear(c);
 }
-
 
 poly convFlintMPSingP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, const ring r)
 {
@@ -559,8 +561,7 @@ public:
     convert_sing_to_nmod_mpoly_base* base;
 };
 
-
-void convert_sing_to_nmod_mpoly_worker(void * varg)
+static void convert_sing_to_nmod_mpoly_worker(void * varg)
 {
     convert_sing_to_nmod_mpoly_arg * arg = (convert_sing_to_nmod_mpoly_arg *) varg;
     convert_sing_to_nmod_mpoly_base * base = arg->base;
@@ -679,11 +680,11 @@ public:
     convert_nmod_mpoly_to_sing_base* base;
 };
 
-void convert_nmod_mpoly_to_sing_worker(void * varg)
+static void convert_nmod_mpoly_to_sing_worker(void * varg)
 {
     convert_nmod_mpoly_to_sing_arg * arg = (convert_nmod_mpoly_to_sing_arg *) varg;
     convert_nmod_mpoly_to_sing_base * base = arg->base;
-    ulong* exp = (ulong*) flint_malloc((base->r->N + 1)*sizeof(ulong));
+    ulong* exp = (ulong*) flint_calloc(base->r->N + 1, sizeof(ulong));
 
     for (slong idx = arg->end_idx - 1; idx >= arg->start_idx; idx--)
     {
@@ -709,7 +710,6 @@ void convert_nmod_mpoly_to_sing_worker(void * varg)
 
     flint_free(exp);
 }
-
 
 poly convFlintMPSingP(nmod_mpoly_t f, nmod_mpoly_ctx_t ctx, const ring r)
 {
