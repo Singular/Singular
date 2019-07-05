@@ -313,9 +313,9 @@ static const char* feOptAction(feOptIndex opt)
 
       #ifdef HAVE_FLINT
       #if __FLINT_RELEASE >= 20503
-      case FE_OPT_THREADS:
+      case FE_OPT_FLINT_THREADS:
       {
-        slong nthreads = (slong)feOptSpec[FE_OPT_THREADS].value;
+        slong nthreads = (slong)feOptSpec[FE_OPT_FLINT_THREADS].value;
         nthreads = FLINT_MAX(nthreads, WORD(1));
         flint_set_num_threads(nthreads);
         int * cpu_affinities = new int[nthreads];

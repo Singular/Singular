@@ -163,7 +163,8 @@ void convSingPFlintMP(nmod_mpoly_t res, nmod_mpoly_ctx_t ctx, poly p, int lp,con
 
 #else
 
-void my_convSingNFlintN_QQ(fmpq_t f, number n)
+// like convSingNFlintN_QQ but it takes an initialized fmpq_t f
+static void my_convSingNFlintN_QQ(fmpq_t f, number n)
 {
     if (SR_HDL(n)&SR_INT)
     {
