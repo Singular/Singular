@@ -277,7 +277,6 @@ EXAMPLE: example inSubring; shows an example
   //the intersection of ideal nett=(p-y(0),I[1]-y(1),...)
   //with the ring k[y(0),...,y(n)] is computed, the result is ker
    execute ("ring r1= ("+charstr(basering)+"),(x(1..n),y(0..z)),lp;");
- //  execute ("ring r1= ("+charstr(basering)+"),(y(0..z),x(1..n)),dp;");
   if (mp!="0")
   { execute ("minpoly=number("+mp+");"); }
   ideal va = x(1..n);
