@@ -24,6 +24,8 @@ PROCEDURES:
 // hilbRing([i])          ring for computing the (weighted) hilbert series
 // quotientList(L,...)    ringlist for creating a correct quotient ring
 
+LIB "ring.lib";
+
 //////////////////////////////////////////////////////////////////////////////
 
 proc stdfglm (ideal i, list #)
@@ -72,13 +74,13 @@ EXAMPLE: example stdfglm; shows an example"
     }
     if (sQ!=0 )
     {
-      execute("ring Rfglm=("+charstr(P)+"),("+varstr(P)+"),"+os+";");
+      ring Rfglm = create_ring(ringlist(P)[1], "("+varstr(P)+")", os, "no_minpoly");
       ideal Qideal = fetch(P,Qideal);
       qring Pfglm = groebner(Qideal,"std","slimgb");
     }
     else
     {
-      execute("ring Pfglm=("+charstr(P)+"),("+varstr(P)+"),"+os+";");
+      ring Pfglm = create_ring(ringlist(P)[1], "("+varstr(P)+")", os, "no_minpoly");
     }
     if ( sM!=0 )
     {
@@ -1664,8 +1666,7 @@ RETURN:  the quotient of m1 and m2"
 static proc intersect1(ideal i,ideal j)
 {
   def R=basering;
-  execute("ring gnir = ("+charstr(basering)+"),
-                       ("+varstr(basering)+",@t),(C,dp);");
+  ring gnir = create_ring(ringlist(basering)[1], "("+varstr(basering)+",@t)", "(C,dp)", "no_minpoly");
   ideal i=var(nvars(basering))*imap(R,i)+(var(nvars(basering))-1)*imap(R,j);
   ideal j=eliminate(i,var(nvars(basering)));
   setring R;

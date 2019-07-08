@@ -42,7 +42,7 @@ PROCEDURES:
 LIB "gfan.lib";
 LIB "triang.lib";
 LIB "linalg.lib";
-
+LIB "ring.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc setUniformizingParameter(number p)
@@ -509,7 +509,7 @@ EXAMPLE: example tropicalPointNewton; shows an example
   subststr = string(subststr[1..size(subststr)-1])+");";
   execute(subststr);
 
-  execute("ring s = ("+charstr(origin)+"),("+vars+"),lp;");
+  ring s = create_ring(ringlist(origin)[1], "("+vars+")", "lp", "no_minpoly");
   ideal J = imap(origin,J);
   int tstdlp = timer;
   dbprint("computing triangular decomposition (picking first factor)");
@@ -736,7 +736,7 @@ EXAMPLE: example switchRingsAndComputeInitialIdeal; shows an example
 {
   def origin = basering;
   intvec wOne = oneVector(nvars(origin));
-  execute("ring rInitialIdeal = ("+charstr(origin)+"),("+varstr(origin)+"),(a(wOne),wp(w));");
+  ring rInitialIdeal = create_ring(ringlist(origin)[1], "("+varstr(origin)+")", "(a(wOne),wp(w))", "no_minpoly");
   ideal I = imap(origin,I);
   int tinI = timer;
   option(redSB);
@@ -826,7 +826,7 @@ static proc substRing(int i, string orderstring)
       intvec p = 1..i-1,i+1..n;
     }
   }
-  execute("ring ssub = (0,t),("+varstrIntvec(p)+"),"+orderstring+";");
+  ring ssub = create_ring("(0,t)", "("+varstrIntvec(p)+")", orderstring);
   return (ssub);
 }
 
@@ -929,7 +929,7 @@ EXAMPLE: example tropicalLinkNewton; shows an example
   }
   resVars = resVars[1..size(resVars)-1];
 
-  execute("ring srestr = ("+string(char(origin))+",t),("+resVars+"),dp;");
+  ring srestr = create_ring("("+string(char(origin))+",t)", "("+resVars+")", "dp");
   number uniformizingParameter = t;
   map resMap = origin,imap(origin,resImage);
   ideal inI = resMap(inI);
