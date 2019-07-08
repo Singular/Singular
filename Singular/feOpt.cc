@@ -22,6 +22,9 @@
 
 #include "fehelp.h"
 
+#ifdef HAVE_FLINT
+#include <flint/flint.h>
+#endif
 
 const char SHORT_OPTS_STRING[] = "bdhpqstvxec:r:u:";
 
@@ -307,6 +310,23 @@ static const char* feOptAction(feOptIndex opt)
         feOptDumpVersionTuple();
         return NULL;
       }
+
+      #ifdef HAVE_FLINT
+      #if __FLINT_RELEASE >= 20503
+      case FE_OPT_FLINT_THREADS:
+      {
+        slong nthreads = (slong)feOptSpec[FE_OPT_FLINT_THREADS].value;
+        nthreads = FLINT_MAX(nthreads, WORD(1));
+        flint_set_num_threads(nthreads);
+        int * cpu_affinities = new int[nthreads];
+        for (slong i = 0; i < nthreads; i++)
+          cpu_affinities[i] = (int)i;
+        flint_set_thread_affinity(cpu_affinities, nthreads);
+        delete[] cpu_affinities;
+        return NULL;
+      }
+      #endif
+      #endif
 
       default:
         return NULL;

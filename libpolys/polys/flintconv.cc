@@ -225,10 +225,10 @@ poly convFlintPSingP(fmpq_poly_t f, const ring r)
 {
   int d=fmpq_poly_length(f);
   poly p=NULL;
+  fmpq_t c;
+  fmpq_init(c);
   for(int i=0; i<=d; i++)
   {
-    fmpq_t c;
-    fmpq_init(c);
     fmpq_poly_get_coeff_fmpq(c,f,i);
     number n=convFlintNSingN(c,r->cf);
     poly pp=p_Init(r);
@@ -237,6 +237,7 @@ poly convFlintPSingP(fmpq_poly_t f, const ring r)
     p_Setm(pp,r);
     p=p_Add_q(p,pp,r);
   }
+  fmpq_clear(c);
   p_Test(p,r);
   return p;
 }
