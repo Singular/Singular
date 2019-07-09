@@ -372,7 +372,7 @@ void fePrintOptValues()
 void feOptHelp(const char* name)
 {
   int i = 0;
-  char tmp[20];
+  char tmp[60];
 #if defined(ESINGULAR)
   printf("ESingular starts up Singular within emacs;\n");
 #elif defined(TSINGULAR)
