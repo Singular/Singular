@@ -123,6 +123,120 @@ static BOOLEAN lpVarAt(leftv res, leftv h)
   }
   else return TRUE;
 }
+
+// copied from iparith.cc
+// NOTE: they do not set res->rtyp
+static BOOLEAN jjSYZYGY(leftv res, leftv v)
+{
+  intvec *ww=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
+  intvec *w=NULL;
+  ideal v_id=(ideal)v->Data();
+  tHomog hom=testHomog;
+  if (ww!=NULL)
+  {
+    if (idTestHomModule(v_id,currRing->qideal,ww))
+    {
+      w=ivCopy(ww);
+      int add_row_shift=w->min_in();
+      (*w)-=add_row_shift;
+      hom=isHomog;
+    }
+    else
+    {
+      //WarnS("wrong weights");
+      delete ww; ww=NULL;
+      hom=testHomog;
+    }
+  }
+  else
+  {
+    if (v->Typ()==IDEAL_CMD)
+      if (idHomIdeal(v_id,currRing->qideal))
+        hom=isHomog;
+  }
+  ideal S=idSyzygies(v_id,hom,&w);
+  res->data = (char *)S;
+  if (hom==isHomog)
+  {
+    int vl=S->rank;
+    intvec *vv=new intvec(vl);
+    if ((v->Typ()==IDEAL_CMD)||(ww==NULL))
+    {
+      for(int i=0;i<vl;i++)
+      {
+        if (v_id->m[i]!=NULL)
+          (*vv)[i]=p_Deg(v_id->m[i],currRing);
+      }
+    }
+    else
+    {
+      p_SetModDeg(ww, currRing);
+      for(int i=0;i<vl;i++)
+      {
+        if (v_id->m[i]!=NULL)
+          (*vv)[i]=currRing->pFDeg(v_id->m[i],currRing);
+      }
+      p_SetModDeg(NULL, currRing);
+    }
+    if (idTestHomModule(S,currRing->qideal,vv))
+      atSet(res,omStrDup("isHomog"),vv,INTVEC_CMD);
+    else
+      delete vv;
+  }
+  if (w!=NULL) delete w;
+  return FALSE;
+}
+
+static ring tagRing(ideal I)
+{
+  ring tagRing = currRing;
+  for (int i = 1; i <= IDELEMS(I); i++)
+  {
+    char *varname=(char *)omAlloc(256);
+    sprintf(varname, "ncgen(%d)", i);
+    tagRing = rPlusVar(tagRing, varname, 0);
+    omFreeSize(varname, 256);
+  }
+  return tagRing;
+}
+
+static BOOLEAN lpSyzRing(leftv res, leftv v)
+{
+  const short t1[]={1,IDEAL_CMD};
+  const short t2[]={1,MODUL_CMD};
+  if (iiCheckTypes(v,t1,1) || iiCheckTypes(v,t2,1))
+  {
+    ring origRing = currRing;
+    currRing = tagRing((ideal)v->Data());
+
+    BOOLEAN error = jjSYZYGY(res, v);
+    if (error || errorreported) return TRUE;
+
+    ideal syzygy = (ideal) res->data;
+    for (int i = 0; i < IDELEMS(syzygy); i++)
+    {
+      pWrite(syzygy->m[i]);
+    }
+
+    res->rtyp = RING_CMD;
+    res->data = currRing;
+    currRing = origRing;
+    return FALSE;
+  }
+  else return TRUE;
+}
+
+static BOOLEAN lpTagRing(leftv res, leftv v)
+{
+  const short t[]={1,IDEAL_CMD};
+  if (iiCheckTypes(v,t,1))
+  {
+    res->rtyp = RING_CMD;
+    res->data = tagRing((ideal)v->Data());
+    return FALSE;
+  }
+  else return TRUE;
+}
 #endif
 
 //------------------------------------------------------------------------
@@ -133,6 +247,8 @@ extern "C" int SI_MOD_INIT(freealgebra)(SModulFunctions* p)
   p->iiAddCproc("freealgebra.so","freeAlgebra",FALSE,freeAlgebra);
   p->iiAddCproc("freealgebra.so","lpLmDivides",FALSE,lpLmDivides);
   p->iiAddCproc("freealgebra.so","lpVarAt",FALSE,lpVarAt);
+  p->iiAddCproc("freealgebra.so","lpSyzRing",FALSE,lpSyzRing);
+  p->iiAddCproc("freealgebra.so","lpTagRing",FALSE,lpTagRing);
   p->iiAddCproc("freealgebra.so","stest",TRUE,stest);
   p->iiAddCproc("freealgebra.so","btest",TRUE,btest);
 #endif

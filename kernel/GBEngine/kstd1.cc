@@ -37,6 +37,9 @@
 
 #include "kernel/GBEngine/kInline.h"
 
+#ifdef HAVE_SHIFTBBA
+#include "polys/shiftop.h"
+#endif
 
 /* the list of all options which give a warning by test */
 VAR BITSET kOptions=Sy_bit(OPT_PROT)           /*  0 */
@@ -2342,7 +2345,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     return idInit(1,F->rank);
 
 #ifdef HAVE_SHIFTBBA
-  if(rIsLPRing(currRing)) return freegb(F, Q);
+  if(rIsLPRing(currRing)) return kStdShift(F, Q, h, w, hilb, syzComp, newIdeal, vw, FALSE);
 #endif
 
   ideal r;
@@ -2819,6 +2822,8 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
 ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
                 int newIdeal, intvec *vw, BOOLEAN rightGB)
 {
+  assume(rIsLPRing(currRing));
+  assume(idIsInV(F));
   ideal r;
   BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
@@ -2826,9 +2831,15 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   intvec* temp_w=NULL;
 
   strat->rightGB = rightGB;
+  // this relies on the implementation of idPrepare,
+  // nonMultiplicativeVars should be the number of rows added in idPrepare() (relevant for syzygies)
+  strat->nonMultiplicativeVars = syzComp > 0 ? F->rank - syzComp : 0;
+  assume(syzComp <= 0 || strat->nonMultiplicativeVars == IDELEMS(F));
+  Print("#tagvars: %d\n", strat->nonMultiplicativeVars);
 
   if(!TEST_OPT_RETURN_SB)
     strat->syzComp = syzComp;
+  Print("syzComp: %d\n", strat->syzComp);
   if (TEST_OPT_SB_1)
     if(!rField_is_Ring(currRing))
       strat->newIdeal = newIdeal;
@@ -2912,6 +2923,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   HCord=strat->HCord;
   delete(strat);
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
+  assume(idIsInV(r));
   return r;
 }
 #endif

@@ -12270,6 +12270,7 @@ static void enterOnePairWithoutShifts (int p_inS /*also i*/, poly q, poly p, int
 /*2
 * put the pair (q,p)  into the set B, ecart=ecart(p), q is the shift of some s[i]
 */
+#define CRITERION_DEBUG
 void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS)
 {
 #ifdef CRITERION_DEBUG
@@ -12311,6 +12312,28 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 #endif
   /*- computes the lcm(s[i],p) -*/
   Lp.lcm = p_Lcm(p,q, currRing); // q is what was strat->S[i], so a poly in LM/TR presentation
+
+  BOOLEAN lcmHasNonMultiplicativeVar = FALSE;
+  int lV = currRing->isLPring;
+  int degbound = currRing->N/lV;
+  for (int i = 1; i <= degbound; i++)
+  {
+    for (int j = i*lV; j > (i*lV - strat->nonMultiplicativeVars); j--)
+    {
+      if (pGetExp(Lp.lcm,j))
+      {
+        if (lcmHasNonMultiplicativeVar) {
+          pLmFree(Lp.lcm);
+#ifdef CRITERION_DEBUG
+          /* if (TEST_OPT_DEBUG) PrintS("--- NCGEN crit\n"); */
+          if (TEST_OPT_DEBUG) PrintS("--- NCGEN crit\n");
+#endif
+          return;
+        }
+        lcmHasNonMultiplicativeVar = TRUE;
+      }
+    }
+  }
 
   /* the V criterion */
   if (!pmIsInV(Lp.lcm))

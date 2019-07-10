@@ -366,6 +366,7 @@ public:
   #ifdef HAVE_SHIFTBBA
   int cv; // in shift bases: counting V criterion
   /*BOOLEAN*/ char rightGB;
+  int nonMultiplicativeVars; // number of variables at the end that are non multipicative (needed for syzygies)
   #endif
   /*BOOLEAN*/ char interpt;
   /*BOOLEAN*/ char homog;
