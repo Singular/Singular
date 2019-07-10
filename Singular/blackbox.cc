@@ -227,8 +227,8 @@ void printBlackboxTypes()
 struct blackbox_list *getBlackboxTypes()
 {
 	int i = 0;
-	void **l = (void **)omalloc(blackboxTableCnt * sizeof(void *));
-	struct blackbox_list *list_struct = (struct blackbox_list *) omalloc(sizeof(struct blackbox_list));
+	void **l = (void **)omalloc0(blackboxTableCnt * sizeof(void *));
+	struct blackbox_list *list_struct = (struct blackbox_list *) omAlloc0(sizeof(struct blackbox_list));
 	list_struct->count = blackboxTableCnt;
 	list_struct->list = l;
 
