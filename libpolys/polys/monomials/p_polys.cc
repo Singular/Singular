@@ -1612,6 +1612,61 @@ poly p_DivideM(poly a, poly b, const ring r)
   return result;
 }
 
+poly pp_DivideM(poly a, poly b, const ring r)
+{
+  if (a==NULL) { return NULL; }
+  poly result=a;
+
+  if(!p_IsConstant(b,r))
+  {
+    if (rIsLPRing(r))
+    {
+      WerrorS("not implemented for letterplace rings");
+      return NULL;
+    }
+    poly prev=NULL;
+    a=p_Copy(a,r);
+    while (a!=NULL)
+    {
+      if (p_DivisibleBy(b,a,r))
+      {
+        p_ExpVectorSub(a,b,r);
+        prev=a;
+        pIter(a);
+      }
+      else
+      {
+        if (prev==NULL)
+        {
+          p_LmDelete(&result,r);
+          a=result;
+        }
+        else
+        {
+          p_LmDelete(&pNext(prev),r);
+          a=pNext(prev);
+        }
+      }
+    }
+  }
+  if (result!=NULL)
+  {
+    number inv=pGetCoeff(b);
+    //if ((!rField_is_Ring(r)) || n_IsUnit(inv,r->cf))
+    if (rField_is_Zp(r))
+    {
+      inv = n_Invers(inv,r->cf);
+      __p_Mult_nn(result,inv,r);
+      n_Delete(&inv, r->cf);
+    }
+    else
+    {
+      result = p_Div_nn(result,inv,r);
+    }
+  }
+  return result;
+}
+
 #ifdef HAVE_RINGS
 /* TRUE iff LT(f) | LT(g) */
 BOOLEAN p_DivisibleByRingCase(poly f, poly g, const ring r)

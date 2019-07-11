@@ -163,6 +163,10 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
 /// via singclap_pdivide resp. idLift
 /// destroyes a,b
 poly p_Divide(poly a, poly b, const ring r);
+/// polynomial division a/b, ignoring the rest
+/// via singclap_pdivide resp. idLift
+/// does not destroy a,b
+poly pp_Divide(poly a, poly b, const ring r);
 poly p_DivRem(poly a, poly b, poly &rest, const ring r); /*julia*/
 
 /// polynomial gcd

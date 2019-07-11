@@ -1989,6 +1989,7 @@ poly      p_mInit(const char *s, BOOLEAN &ok, const ring r); /* monom s -> poly,
 const char *    p_Read(const char *s, poly &p,const ring r); /* monom -> poly */
 poly      p_MDivide(poly a, poly b, const ring r);
 poly      p_DivideM(poly a, poly b, const ring r);
+poly      pp_DivideM(poly a, poly b, const ring r);
 poly      p_Div_nn(poly p, const number n, const ring r);
 
 // returns the LCM of the head terms of a and b in *m, does not p_Setm
