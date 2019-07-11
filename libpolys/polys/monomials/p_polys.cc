@@ -1615,8 +1615,9 @@ poly p_DivideM(poly a, poly b, const ring r)
 poly pp_DivideM(poly a, poly b, const ring r)
 {
   if (a==NULL) { return NULL; }
-  poly result=a;
 
+  poly result=p_Copy(a,r);
+  a=result;
   if(!p_IsConstant(b,r))
   {
     if (rIsLPRing(r))
@@ -1625,7 +1626,6 @@ poly pp_DivideM(poly a, poly b, const ring r)
       return NULL;
     }
     poly prev=NULL;
-    a=p_Copy(a,r);
     while (a!=NULL)
     {
       if (p_DivisibleBy(b,a,r))
@@ -1657,11 +1657,12 @@ poly pp_DivideM(poly a, poly b, const ring r)
     {
       inv = n_Invers(inv,r->cf);
       __p_Mult_nn(result,inv,r);
-      n_Delete(&inv, r->cf);
     }
     else
     {
+      inv=n_Copy(inv,r->cf);
       result = p_Div_nn(result,inv,r);
+      n_Delete(&inv, r->cf);
     }
   }
   return result;
