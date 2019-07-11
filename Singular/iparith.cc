@@ -1313,7 +1313,7 @@ static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
                                            q /*(poly)(v->Data())*/, currRing );
       }
       else
-        MATELEM(mm,i,j) = ppDivideM(MATELEM(m,i,j),q);
+        MATELEM(mm,i,j) = pp_DivideM(MATELEM(m,i,j),q,currRing);
     }
   }
   id_Normalize((ideal)mm,currRing);
