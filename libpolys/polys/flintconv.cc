@@ -95,15 +95,30 @@ number convFlintNSingN (fmpq_t f, const coeffs cf)
 number convFlintNSingN_QQ (fmpq_t f, const coeffs cf)
 {
 #if __FLINT_RELEASE > 20502
+  if (fmpz_is_one(fmpq_denref(f)))
+  {
+    if (fmpz_fits_si(fmpq_numref(f)))
+    {
+      long i=fmpz_get_si(fmpq_numref(f));
+      return n_Init(i,cf);
+    }
+  }
   number z=ALLOC_RNUMBER();
   #if defined(LDEBUG)
   z->debug=123456;
   #endif
-  z->s=0;
   mpz_init(z->z);
-  mpz_init(z->n);
-  fmpq_get_mpz_frac(z->z,z->n,f);
-  n_Normalize(z,cf);
+  if (fmpz_is_one(fmpq_denref(f)))
+  {
+    z->s=3;
+    fmpz_get_mpz(z->z,fmpq_numref(f));
+  }
+  else
+  {
+    z->s=0;
+    mpz_init(z->n);
+    fmpq_get_mpz_frac(z->z,z->n,f);
+  }
   n_Test(z,cf);
   return z;
 #else
