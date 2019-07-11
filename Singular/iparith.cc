@@ -1283,10 +1283,10 @@ static BOOLEAN jjDIV_N(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
 {
-  poly q=(poly)v->CopyD();
-  poly p=(poly)(u->CopyD());
-  res->data=(void*)(p_Divide(p /*(poly)(u->CopyD())*/ ,
-                                         q /*(poly)(v->CopyD())*/ ,currRing));
+  poly q=(poly)v->Data();
+  poly p=(poly)(u->Data());
+  res->data=(void*)(pp_Divide(p /*(poly)(u->Data())*/ ,
+                                         q /*(poly)(v->Data())*/ ,currRing));
   if (res->data!=NULL) pNormalize((poly)res->data);
   return errorreported; /*there may be errors in p_Divide: div. ny 0, etc.*/
 }
@@ -1313,7 +1313,7 @@ static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
                                            q /*(poly)(v->Data())*/, currRing );
       }
       else
-        MATELEM(mm,i,j) = pDivideM(pCopy(MATELEM(m,i,j)),pHead(q));
+        MATELEM(mm,i,j) = ppDivideM(MATELEM(m,i,j),q);
     }
   }
   id_Normalize((ideal)mm,currRing);
