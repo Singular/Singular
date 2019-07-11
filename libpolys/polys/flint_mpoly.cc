@@ -63,7 +63,7 @@ BOOLEAN convSingRFlintR(nmod_mpoly_ctx_t ctx, const ring r)
 /******** polynomial conversion ***********/
 
 #if 1
-// malloc is not thread safe; singular polynomials must be constructed in serial
+// memory allocation is not thread safe; singular polynomials must be constructed in serial
 
 void convSingPFlintMP(fmpq_mpoly_t res, fmpq_mpoly_ctx_t ctx, poly p, int lp, const ring r)
 {
@@ -164,7 +164,7 @@ void convSingPFlintMP(nmod_mpoly_t res, nmod_mpoly_ctx_t ctx, poly p, int lp,con
 }
 
 #else
-// malloc is thread safe; singular polynomials may be constructed in serial
+// memory allocator is thread safe; singular polynomials may be constructed in parallel
 
 // like convSingNFlintN_QQ but it takes an initialized fmpq_t f
 static void my_convSingNFlintN_QQ(fmpq_t f, number n)
@@ -198,30 +198,22 @@ public:
     ring r;
 
     convert_sing_to_fmpq_mpoly_base(slong num_threads_, fmpq_mpoly_struct * res_,
-                             const fmpq_mpoly_ctx_struct * ctx_, const ring r_)
+                             const fmpq_mpoly_ctx_struct * ctx_, const ring r_, poly p)
       : num_threads(num_threads_),
         res(res_),
         ctx(ctx_),
         r(r_)
     {
-    }
-
-    void init_poly(poly p)
-    {
         length = 0;
-        while (p != NULL)
+        while (1)
         {
-            markers.push_back(p);
-            for (int i = 4096; i > 0; i--)
-            {
-                pIter(p);
-                length++;
-                if (p == NULL)
-                    break;
-            }
+            if ((length % 4096) == 0)
+                markers.push_back(p);
+            if (p == NULL)
+                return;
+            length++;
+            pIter(p);
         }
-
-        fmpq_mpoly_init3(res, length, SI_LOG2(r->bitmask), ctx);
     }
 };
 
@@ -231,14 +223,17 @@ public:
     fmpq_t content;
     slong start_idx, end_idx;
     convert_sing_to_fmpq_mpoly_base* base;
+    flint_bitcnt_t required_bits;
 
     convert_sing_to_fmpq_mpoly_arg() {fmpq_init(content);}
     ~convert_sing_to_fmpq_mpoly_arg() {fmpq_clear(content);}
 };
 
-static void convert_sing_to_fmpq_mpoly_content_worker(void * varg)
+static void convert_sing_to_fmpq_mpoly_content_bits(void * varg)
 {
     convert_sing_to_fmpq_mpoly_arg* arg = (convert_sing_to_fmpq_mpoly_arg*) varg;
+    convert_sing_to_fmpq_mpoly_base * base = arg->base;
+    ulong * exp = (ulong*) flint_malloc((base->r->N + 1)*sizeof(ulong));
     fmpq_t c;
     fmpq_init(c);
 
@@ -251,17 +246,32 @@ static void convert_sing_to_fmpq_mpoly_content_worker(void * varg)
         idx++;
     }
 
-    /* first find gcd of coeffs */
+    flint_bitcnt_t required_bits = MPOLY_MIN_BITS;
     fmpq_zero(arg->content);
+
     while (idx < arg->end_idx)
     {
         my_convSingNFlintN_QQ(c, number(pGetCoeff(p)));
         fmpq_gcd(arg->content, arg->content, c);
+
+        #if SIZEOF_LONG==8
+        p_GetExpVL(p, (int64*)exp, base->r);
+        flint_bitcnt_t exp_bits = mpoly_exp_bits_required_ui(exp, base->ctx->zctx->minfo);
+        #else
+        p_GetExpV(p, (int*)exp, base->r);
+        flint_bitcnt_t exp_bits = mpoly_exp_bits_required_ui(&(exp[1]), base->ctx->zctx->minfo);
+        #endif
+
+        required_bits = FLINT_MAX(required_bits, exp_bits);
+
         pIter(p);
         idx++;
     }
 
+    arg->required_bits = required_bits;
+
     fmpq_clear(c);
+    flint_free(exp);
 }
 
 static void convert_sing_to_fmpq_mpoly_zpoly_worker(void * varg)
@@ -329,9 +339,9 @@ void convSingPFlintMP(fmpq_mpoly_t res, fmpq_mpoly_ctx_t ctx, poly p, int lp, co
         }
     }
 
-    convert_sing_to_fmpq_mpoly_base base(num_handles + 1, res, ctx, r);
-    base.init_poly(p);
+    convert_sing_to_fmpq_mpoly_base base(num_handles + 1, res, ctx, r, p);
 
+    /* fill in thread division points */
     convert_sing_to_fmpq_mpoly_arg * args = new convert_sing_to_fmpq_mpoly_arg[base.num_threads];
     slong cur_idx = 0;
     for (slong i = 0; i < base.num_threads; i++)
@@ -345,14 +355,19 @@ void convSingPFlintMP(fmpq_mpoly_t res, fmpq_mpoly_ctx_t ctx, poly p, int lp, co
         cur_idx = next_idx;
     }
 
-    /* get content */
+    /* get content and bits */
     for (slong i = 0; i < num_handles; i++)
-        thread_pool_wake(global_thread_pool, handles[i], convert_sing_to_fmpq_mpoly_content_worker, args + i);
-    convert_sing_to_fmpq_mpoly_content_worker(args + num_handles);
+        thread_pool_wake(global_thread_pool, handles[i], convert_sing_to_fmpq_mpoly_content_bits, args + i);
+    convert_sing_to_fmpq_mpoly_content_bits(args + num_handles);
     for (slong i = 0; i < num_handles; i++)
-    {
         thread_pool_wait(global_thread_pool, handles[i]);
-    }
+
+    flint_bitcnt_t required_bits = MPOLY_MIN_BITS;
+    for (slong i = 0; i <= num_handles; i++)
+        required_bits = FLINT_MAX(required_bits, args[i].required_bits);
+
+    /* initialize res with optimal bits */
+    fmpq_mpoly_init3(res, base.length, mpoly_fix_bits(required_bits, ctx->zctx->minfo), ctx);
 
     /* sign of content should match sign of first coeff */
     fmpq_zero(base.res->content);
@@ -417,7 +432,7 @@ static void convert_fmpq_mpoly_to_sing_worker(void * varg)
 {
     convert_fmpq_mpoly_to_sing_arg * arg = (convert_fmpq_mpoly_to_sing_arg *) varg;
     convert_fmpq_mpoly_to_sing_base * base = arg->base;
-    ulong* exp = (ulong*) flint_calloc(base->r->N + 1, sizeof(ulong));
+    ulong* exp = (ulong*) flint_malloc((base->r->N + 1)*sizeof(ulong));
     fmpq_t c;
     fmpq_init(c);
 
@@ -527,30 +542,22 @@ public:
     ring r;
 
     convert_sing_to_nmod_mpoly_base(slong num_threads_, nmod_mpoly_struct * res_,
-                            const nmod_mpoly_ctx_struct * ctx_, const ring r_)
+                            const nmod_mpoly_ctx_struct * ctx_, const ring r_, poly p)
       : num_threads(num_threads_),
         res(res_),
         ctx(ctx_),
         r(r_)
     {
-    }
-
-    void init_poly(poly p)
-    {
         length = 0;
-        while (p != NULL)
+        while (1)
         {
-            markers.push_back(p);
-            for (int i = 4096; i > 0; i--)
-            {
-                pIter(p);
-                length++;
-                if (p == NULL)
-                    break;
-            }
+            if ((length % 4096) == 0)
+                markers.push_back(p);
+            if (p == NULL)
+                return;
+            length++;
+            pIter(p);
         }
-
-        nmod_mpoly_init3(res, length, SI_LOG2(r->bitmask), ctx);
     }
 };
 
@@ -559,7 +566,47 @@ class convert_sing_to_nmod_mpoly_arg
 public:
     slong start_idx, end_idx;
     convert_sing_to_nmod_mpoly_base* base;
+    flint_bitcnt_t required_bits;
 };
+
+static void convert_sing_to_nmod_mpoly_bits(void * varg)
+{
+    convert_sing_to_nmod_mpoly_arg * arg = (convert_sing_to_nmod_mpoly_arg *) varg;
+    convert_sing_to_nmod_mpoly_base * base = arg->base;
+    ulong * exp = (ulong*) flint_malloc((base->r->N + 1)*sizeof(ulong));
+
+    slong idx = arg->start_idx/4096;
+    poly p = base->markers[idx];
+    idx *= 4096;
+    while (idx < arg->start_idx)
+    {
+        pIter(p);
+        idx++;
+    }
+
+    flint_bitcnt_t required_bits = MPOLY_MIN_BITS;
+
+    while (idx < arg->end_idx)
+    {
+        #if SIZEOF_LONG==8
+        p_GetExpVL(p, (int64*)exp, base->r);
+        flint_bitcnt_t exp_bits = mpoly_exp_bits_required_ui(exp, base->ctx->minfo);
+        #else
+        p_GetExpV(p, (int*)exp, base->r);
+        flint_bitcnt_t exp_bits = mpoly_exp_bits_required_ui(&(exp[1]), base->ctx->minfo);
+        #endif
+
+        required_bits = FLINT_MAX(required_bits, exp_bits);
+
+        pIter(p);
+        idx++;
+    }
+
+    arg->required_bits = required_bits;
+
+    flint_free(exp);
+}
+
 
 static void convert_sing_to_nmod_mpoly_worker(void * varg)
 {
@@ -617,9 +664,9 @@ void convSingPFlintMP(nmod_mpoly_t res, nmod_mpoly_ctx_t ctx, poly p, int lp, co
         }
     }
 
-    convert_sing_to_nmod_mpoly_base base(num_handles + 1, res, ctx, r);
-    base.init_poly(p);
+    convert_sing_to_nmod_mpoly_base base(num_handles + 1, res, ctx, r, p);
 
+    /* fill in thread division points */
     convert_sing_to_nmod_mpoly_arg * args = new convert_sing_to_nmod_mpoly_arg[base.num_threads];
     slong cur_idx = 0;
     for (slong i = 0; i < base.num_threads; i++)
@@ -633,6 +680,20 @@ void convSingPFlintMP(nmod_mpoly_t res, nmod_mpoly_ctx_t ctx, poly p, int lp, co
         args[i].end_idx   = next_idx;
         cur_idx = next_idx;
     }
+
+    /* find required bits */
+    for (slong i = 0; i < num_handles; i++)
+        thread_pool_wake(global_thread_pool, handles[i], convert_sing_to_nmod_mpoly_bits, args + i);
+    convert_sing_to_nmod_mpoly_bits(args + num_handles);
+    for (slong i = 0; i < num_handles; i++)
+        thread_pool_wait(global_thread_pool, handles[i]);
+
+    flint_bitcnt_t required_bits = MPOLY_MIN_BITS;
+    for (slong i = 0; i <= num_handles; i++)
+        required_bits = FLINT_MAX(required_bits, args[i].required_bits);
+
+    /* initialize res with optimal bits */
+    nmod_mpoly_init3(res, base.length, mpoly_fix_bits(required_bits, ctx->minfo), ctx);
 
     /* fill in res */
     for (slong i = 0; i < num_handles; i++)
@@ -684,7 +745,7 @@ static void convert_nmod_mpoly_to_sing_worker(void * varg)
 {
     convert_nmod_mpoly_to_sing_arg * arg = (convert_nmod_mpoly_to_sing_arg *) varg;
     convert_nmod_mpoly_to_sing_base * base = arg->base;
-    ulong* exp = (ulong*) flint_calloc(base->r->N + 1, sizeof(ulong));
+    ulong* exp = (ulong*) flint_malloc((base->r->N + 1)*sizeof(ulong));
 
     for (slong idx = arg->end_idx - 1; idx >= arg->start_idx; idx--)
     {
@@ -803,6 +864,39 @@ poly Flint_Mult_MP(poly p,int lp, poly q, int lq, nmod_mpoly_ctx_t ctx, const ri
   convSingPFlintMP(qq,ctx,q,lq,r);
   nmod_mpoly_init(res,ctx);
   nmod_mpoly_mul(res,pp,qq,ctx);
+  poly pres=convFlintMPSingP(res,ctx,r);
+  nmod_mpoly_clear(res,ctx);
+  nmod_mpoly_clear(pp,ctx);
+  nmod_mpoly_clear(qq,ctx);
+  nmod_mpoly_ctx_clear(ctx);
+  p_Test(pres,r);
+  return pres;
+}
+
+// Zero will be returned if the division is not exact
+poly Flint_Divide_MP(poly p,int lp, poly q, int lq, fmpq_mpoly_ctx_t ctx, const ring r)
+{
+  fmpq_mpoly_t pp,qq,res;
+  convSingPFlintMP(pp,ctx,p,lp,r);
+  convSingPFlintMP(qq,ctx,q,lq,r);
+  fmpq_mpoly_init(res,ctx);
+  fmpq_mpoly_divides(res,pp,qq,ctx);
+  poly pres = convFlintMPSingP(res,ctx,r);
+  fmpq_mpoly_clear(res,ctx);
+  fmpq_mpoly_clear(pp,ctx);
+  fmpq_mpoly_clear(qq,ctx);
+  fmpq_mpoly_ctx_clear(ctx);
+  p_Test(pres,r);
+  return pres;
+}
+
+poly Flint_Divide_MP(poly p,int lp, poly q, int lq, nmod_mpoly_ctx_t ctx, const ring r)
+{
+  nmod_mpoly_t pp,qq,res;
+  convSingPFlintMP(pp,ctx,p,lp,r);
+  convSingPFlintMP(qq,ctx,q,lq,r);
+  nmod_mpoly_init(res,ctx);
+  nmod_mpoly_divides(res,pp,qq,ctx);
   poly pres=convFlintMPSingP(res,ctx,r);
   nmod_mpoly_clear(res,ctx);
   nmod_mpoly_clear(pp,ctx);
