@@ -873,6 +873,39 @@ poly Flint_Mult_MP(poly p,int lp, poly q, int lq, nmod_mpoly_ctx_t ctx, const ri
   return pres;
 }
 
+// Zero will be returned if the division is not exact
+poly Flint_Divide_MP(poly p,int lp, poly q, int lq, fmpq_mpoly_ctx_t ctx, const ring r)
+{
+  fmpq_mpoly_t pp,qq,res;
+  convSingPFlintMP(pp,ctx,p,lp,r);
+  convSingPFlintMP(qq,ctx,q,lq,r);
+  fmpq_mpoly_init(res,ctx);
+  fmpq_mpoly_divides(res,pp,qq,ctx);
+  poly pres = convFlintMPSingP(res,ctx,r);
+  fmpq_mpoly_clear(res,ctx);
+  fmpq_mpoly_clear(pp,ctx);
+  fmpq_mpoly_clear(qq,ctx);
+  fmpq_mpoly_ctx_clear(ctx);
+  p_Test(pres,r);
+  return pres;
+}
+
+poly Flint_Divide_MP(poly p,int lp, poly q, int lq, nmod_mpoly_ctx_t ctx, const ring r)
+{
+  nmod_mpoly_t pp,qq,res;
+  convSingPFlintMP(pp,ctx,p,lp,r);
+  convSingPFlintMP(qq,ctx,q,lq,r);
+  nmod_mpoly_init(res,ctx);
+  nmod_mpoly_divides(res,pp,qq,ctx);
+  poly pres=convFlintMPSingP(res,ctx,r);
+  nmod_mpoly_clear(res,ctx);
+  nmod_mpoly_clear(pp,ctx);
+  nmod_mpoly_clear(qq,ctx);
+  nmod_mpoly_ctx_clear(ctx);
+  p_Test(pres,r);
+  return pres;
+}
+
 poly Flint_GCD_MP(poly p,int lp,poly q,int lq,nmod_mpoly_ctx_t ctx,const ring r)
 {
   nmod_mpoly_t pp,qq,res;
