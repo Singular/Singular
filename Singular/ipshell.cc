@@ -5230,8 +5230,15 @@ static leftv rOptimizeOrdAsSleftv(leftv ord)
       {
         if ((*iv)[2]==1)
         {
-          (*iv)[1]=ringorder_lp;
-          change=TRUE;
+          if(h->next!=NULL)
+          {
+            intvec *iv2 = (intvec *)(h->next->data);
+            if ((*iv2)[1]==ringorder_lp)
+            {
+              (*iv)[1]=ringorder_lp;
+              change=TRUE;
+            }
+          }
         }
       }
     }
