@@ -1618,6 +1618,7 @@ poly pp_DivideM(poly a, poly b, const ring r)
 
   poly result=p_Copy(a,r);
   a=result;
+  b=p_Head(b,r);
   if(!p_IsConstant(b,r))
   {
     if (rIsLPRing(r))
@@ -1665,6 +1666,7 @@ poly pp_DivideM(poly a, poly b, const ring r)
       n_Delete(&inv, r->cf);
     }
   }
+  p_Delete(&b,r);
   return result;
 }
 
