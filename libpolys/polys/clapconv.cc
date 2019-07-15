@@ -67,11 +67,11 @@ static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, 
   else
   {
     number n=r->cf->convFactoryNSingN(f, r->cf);
-    //if ( n_IsZero(n, r->cf) )
-    //{
-    //  n_Delete(&n,r->cf);
-    //}
-    //else
+    if ( n_IsZero(n, r->cf) )
+    {
+      n_Delete(&n,r->cf);
+    }
+    else
     {
       poly term = p_Init(r);
       //pNext( term ) = NULL; // done by p_Init
@@ -280,11 +280,11 @@ poly convFactoryASingA ( const CanonicalForm & f, const ring r )
   for( CFIterator i=f; i.hasTerms(); i++)
   {
     number n= convFactoryNSingAN( i.coeff(), r );
-    //if (n_IsZero(n,r->cf->extRing->cf))
-    //{
-    //  n_Delete(&n,r->cf->extRing->cf);
-    //}
-    //else
+    if (n_IsZero(n,r->cf->extRing->cf))
+    {
+      n_Delete(&n,r->cf->extRing->cf);
+    }
+    else
     {
       poly t= p_Init (r->cf->extRing);
       pGetCoeff(t)=n;
