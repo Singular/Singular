@@ -1615,59 +1615,8 @@ poly p_DivideM(poly a, poly b, const ring r)
 poly pp_DivideM(poly a, poly b, const ring r)
 {
   if (a==NULL) { return NULL; }
-
-  poly result=p_Copy(a,r);
-  a=result;
-  b=p_Head(b,r);
-  if(!p_IsConstant(b,r))
-  {
-    if (rIsLPRing(r))
-    {
-      WerrorS("not implemented for letterplace rings");
-      return NULL;
-    }
-    poly prev=NULL;
-    while (a!=NULL)
-    {
-      if (p_DivisibleBy(b,a,r))
-      {
-        p_ExpVectorSub(a,b,r);
-        prev=a;
-        pIter(a);
-      }
-      else
-      {
-        if (prev==NULL)
-        {
-          p_LmDelete(&result,r);
-          a=result;
-        }
-        else
-        {
-          p_LmDelete(&pNext(prev),r);
-          a=pNext(prev);
-        }
-      }
-    }
-  }
-  if (result!=NULL)
-  {
-    number inv=pGetCoeff(b);
-    //if ((!rField_is_Ring(r)) || n_IsUnit(inv,r->cf))
-    if (rField_is_Zp(r))
-    {
-      inv = n_Invers(inv,r->cf);
-      __p_Mult_nn(result,inv,r);
-    }
-    else
-    {
-      inv=n_Copy(inv,r->cf);
-      result = p_Div_nn(result,inv,r);
-      n_Delete(&inv, r->cf);
-    }
-  }
-  p_Delete(&b,r);
-  return result;
+  // TODO: better implementation without copying a,b
+  return p_DivideM(p_Copy(a,r),p_Head(b,r),r);
 }
 
 #ifdef HAVE_RINGS
