@@ -16,7 +16,7 @@ PROCEDURES:
  pause([prompt]);       stop the computation until user input
            (parameters in square brackets [] are optional)
 ";
-
+LIB "ring.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc allprint (list #)
@@ -569,7 +569,7 @@ EXAMPLE: example showrecursive; shows an example
    }
    newvar = newvar[2,size(newvar)-1];
 
-   execute("ring newP=("+newchar+"),("+newvar+"),("+neword+");");
+   ring newP = create_ring("("+newchar+")", "("+newvar+")", "("+neword+")");
    def @@id = imap(P,@@id);
    show(@@id);
    return();
