@@ -54,7 +54,6 @@ KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
 ";
 
 LIB "linalg.lib";
-LIB "ring.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 

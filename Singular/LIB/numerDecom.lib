@@ -43,7 +43,6 @@ KEYWORDS: numerical irreducible decomposition; decomposition, numerical; primary
 
 LIB "solve.lib";
 LIB "matrix.lib";
-LIB "ring.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -804,7 +803,7 @@ EXAMPLE: example JuReTopDim;shows an example
   rw[k]=repart(w[k]);
   iw[k]=impart(w[k]);
  }
- ring R = create_ring(list("real"), "("+varstr(S)+",I)", "dp"); 
+ ring R = create_ring(list("real"), "("+varstr(S)+",I)", "dp");
  list iw=imap(S,iw);
  list rw=imap(S,rw);
  ideal J=imap(S,J);
@@ -1101,7 +1100,7 @@ EXAMPLE: example WitSet;shows an example
            list W(i)=imap(TJ(0),Ww(i));
            if(ts>0)
            {
-           ring A(j) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp"); 
+           ring A(j) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
            list W(i)=imap(TJ(0),Ww(i));
            list w(j)=var(1);
            ii=d+1;

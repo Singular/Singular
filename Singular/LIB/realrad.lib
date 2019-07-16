@@ -26,7 +26,6 @@ LIB "algebra.lib";
 LIB "standard.lib";
 LIB "primdec.lib";
 LIB "elim.lib";
-LIB "ring.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 

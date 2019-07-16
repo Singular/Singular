@@ -101,7 +101,7 @@ LIB "random.lib";
 LIB "homolog.lib";
 LIB "integralbasis.lib";
 LIB "normal.lib";
-LIB "ring.lib";
+
 
 ///////////////////////////////////////////////////////////////////////////////
 proc invertBirMap(ideal phi, ideal I)

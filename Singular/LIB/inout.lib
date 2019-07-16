@@ -16,7 +16,7 @@ PROCEDURES:
  pause([prompt]);       stop the computation until user input
            (parameters in square brackets [] are optional)
 ";
-LIB "ring.lib";
+
 ///////////////////////////////////////////////////////////////////////////////
 
 proc allprint (list #)
