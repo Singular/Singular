@@ -35,6 +35,7 @@ LIB "nctools.lib";
 LIB "ncalg.lib";
 LIB "poly.lib";
 LIB "primdec.lib";
+LIB "ring.lib";
 ///////////////////////////////////////////////////////////////////////////////
 proc ncdetection()
 "USAGE:  ncdetection();
@@ -460,11 +461,11 @@ EXAMPLE: example findInvo; shows examples
 
   if (Par=="") // if there are no parameters
   {
-    execute("ring @@@KK=0,("+varstr(@B)+","+@ss+"), dp;"); //new ring with new variables
+    ring @@@KK = create_ring(0, "("+varstr(@B)+","+@ss+")", "dp"); //new ring with new variables
   }
   else //if there exist parameters
   {
-     execute("ring @@@KK=(0,"+Par+") ,("+varstr(@B)+","+@ss+"), dp;");//new ring with new variables
+     ring @@@KK = create_ring("(0,"+Par+")", "("+varstr(@B)+","+@ss+")", "dp"); //new ring with new variables
   }
 
   matrix Rel = imap(@B, Rel); //consider the matrix of relations in new ring
@@ -518,11 +519,11 @@ EXAMPLE: example findInvo; shows examples
   //-------------------------------------------------
   if ( Par=="" ) //initializes the ring of relations
   {
-    execute("ring @@KK=0,("+@ss+"), dp;");
+    ring @@KK = create_ring(0, "("+@ss+")", "dp");
   }
   else
   {
-    execute("ring @@KK=(0,"+Par+"),("+@ss+"), dp;");
+    ring @@KK = create_ring("(0,"+Par+")", "("+@ss+")", "dp");
   }
   ideal J = imap(@@K,J); // ideal, considered in @@KK now
   string snv = "["+string(NVars)+"]";
@@ -600,11 +601,11 @@ EXAMPLE: example findInvoDiag; shows examples
 
   if (Par=="") // if there are no parameters
   {
-    execute("ring @@@KK=0,("+varstr(@B)+","+@ss+"), dp;"); //new ring with new variables
+    ring @@@KK = create_ring(0, "("+varstr(@B)+","+@ss+")", "dp"); //new ring with new variables 
   }
   else //if there exist parameters
   {
-    execute("ring @@@KK=(0,"+Par+") ,("+varstr(@B)+","+@ss+"), dp;");//new ring with new variables
+    ring @@@KK = create_ring("(0,"+Par+")", "("+varstr(@B)+","+@ss+")", "dp"); //new ring with new variables
   }
 
   matrix Rel = imap(@B, Rel); //consider the matrix of relations in new ring
@@ -654,11 +655,11 @@ EXAMPLE: example findInvoDiag; shows examples
 
   if ( Par=="" ) //initializes the ring of relations
   {
-    execute("ring @@KK=0,("+@ss+"), dp;");
+    ring @@KK = create_ring(0, "("+@ss+")", "dp"); 
   }
   else
   {
-    execute("ring @@KK=(0,"+Par+"),("+@ss+"), dp;");
+    ring @@KK = create_ring("(0,"+Par+")", "("+@ss+")", "dp");  
   }
 
   ideal J = imap(@@K,J); // ideal, considered in @@KK now
@@ -752,11 +753,11 @@ EXAMPLE: example findAuto; shows examples
 
   if (Par=="") // if there are no parameters
   {
-    execute("ring @@@K=0,("+varstr(@B)+","+@ss+"), dp;"); //new ring with new variables
+    ring @@@K = create_ring(0, "("+varstr(@B)+","+@ss+")", "dp");  //new ring with new variables
   }
   else //if there exist parameters
   {
-     execute("ring @@@K=(0,"+Par+") ,("+varstr(@B)+","+@ss+"), dp;");//new ring with new variables
+     ring @@@K = create_ring("(0,"+Par+")", "("+varstr(@B)+","+@ss+")", "dp");  //new ring with new variables
   }
 
   matrix Rel = imap(@B, Rel); //consider the matrix of relations in new ring
@@ -810,15 +811,15 @@ EXAMPLE: example findAuto; shows examples
   //-------------------------------------------------
   if (( Par=="" ) && (n!=0)) //initializes the ring of relations
   {
-    execute("ring @@KK=0,("+@ss+"), dp;");
+    ring @@KK = create_ring(0, "("+@ss+")", "dp"); 
   }
   if (( Par=="" ) && (n==0)) //initializes the ring of relations
   {
-    execute("ring @@KK=(0,@p),("+@ss+"), dp;");
+    ring @@KK = create_ring("(0,@p)", "("+@ss+")", "dp");
   }
   if ( Par!="" )
   {
-    execute("ring @@KK=(0,"+Par+"),("+@ss+"), dp;");
+    ring @@KK = create_ring("(0,"+Par+")", "("+@ss+")", "dp"); 
   }
   //  basering;
   ideal J = imap(@@K,J); // ideal, considered in @@KK now

@@ -315,7 +315,7 @@ EXAMPLE: example splitring;  shows an example
        }
   }
   //-- erzeuge einen String, der das Minimalpolynom des neuen Rings enthaelt: -
-  execute("ring splt1="+charakt+","+algname+",dp;");
+  ring splt1 = create_ring(charakt, algname, "dp");
   ideal abbnach=var(1);
   for (i=1; i<anzvar; i++) { abbnach=abbnach,var(1); }
   map nach_splt1=altring,abbnach;
@@ -323,8 +323,7 @@ EXAMPLE: example splitring;  shows an example
   string Rminp=string(mipol);
 
   //--------------------- definiere den neuen Ring: ---------------------------
-  execute("ring neuring = ("+charakt+","+algname+"),("+varnames+"),("
-           +ordstr(altring)+");");
+  ring neuring = create_ring("("+charakt+","+algname+")", "("+varnames+")", "("+ordstr(altring)+")");
   execute("minpoly="+Rminp+";");
 
   //---------------------- Berechne die zurueckzugebende Liste: ---------------

@@ -1111,7 +1111,7 @@ static proc extractZ(ideal J, int j, list L, list B)
       {
          //=== if u in x is an independent set of L then we compute a Groebner
          //=== Basis in Z[u][x-u]
-         execute("ring S=integer,("+L[1][1]+"),lp;");
+         ring S = create_ring(list("integer"), "("+L[1][1]+")", "lp");
          ideal I=imap(R,I);
          I=stdZ(I);
          list rl=ringlist(S);
@@ -1434,7 +1434,7 @@ static proc extractZM(list M, list L)
       {
          //=== if u in x is an independent set of L then we compute a Groebner
          //=== Basis in Z[u][x-u]
-         execute("ring S=integer,("+L[1][1]+"),lp;");
+         ring S = create_ring(list("integer"), "("+L[1][1]+")", "lp");
          module I=imap(R,I);
          I=std(I);
          list rl=ringlist(S);
