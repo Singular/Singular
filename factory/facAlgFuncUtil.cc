@@ -379,8 +379,6 @@ int hasAlgVar (const CanonicalForm &f)
   }
   if (f.inPolyDomain())
   {
-    if (hasAlgVar(f.LC()))
-      return 1;
     for (CFIterator i= f; i.hasTerms(); i++)
     {
       if (hasAlgVar (i.coeff()))
