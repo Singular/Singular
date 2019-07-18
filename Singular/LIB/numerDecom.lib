@@ -231,7 +231,7 @@ EXAMPLE: example bertini2Singular;shows an example
  def S=basering;
  int nn=nvars(basering);
  int n=q;
- execute("ring R=(complex,18,I),("+varstr(S)+"),dp;");
+ ring R = create_ring("(complex,18,I)", "("+varstr(S)+")", "dp");
  number r1,r2;
  list re,ru;
  string sss=read(snp);
@@ -308,7 +308,7 @@ EXAMPLE: example WitSupSet;shows an example
  {
   if(dd==0)
   {
-   execute("ring R=0,("+varstr(S)+"),dp;");
+   ring R = create_ring(0, "("+varstr(S)+")", "dp");
    int i,j;
    ideal I=imap(S,I);
    list V(dd),W(dd);
@@ -404,7 +404,7 @@ EXAMPLE: example WitSupSet;shows an example
    {
     def T=solve(N(dd),100,"nodisplay");
     setring T;
-    execute("ring T(dd+1)=(complex,16,I),("+varstr(S)+"),dp;");
+    ring T(dd+1) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
     list M,Y;
     list W(dd),V(dd);
     list SOL=imap(T,SOL);
@@ -604,7 +604,7 @@ EXAMPLE: example WitSupSet;shows an example
       }
      }
     }
-    execute("ring D=(complex,16,I),("+varstr(S)+"),dp;");
+    ring D = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
     for(i=0;i<=dd;i++)
     {
      list W(i)=imap(T(i+1),W(i));
@@ -620,7 +620,7 @@ EXAMPLE: example WitSupSet;shows an example
    }
    else
    {
-    execute("ring R=0,("+varstr(S)+"),dp;");
+    ring R = create_ring(0, "("+varstr(S)+")", "dp");
     int i,j,c(0);
     poly p;
     ideal LL;
@@ -710,7 +710,7 @@ EXAMPLE: example ReJunkUseHomo;shows an example
   LL[jj]=pp;
  }
  export(LL);
- execute("ring R=(complex,16,I),("+varstr(S)+",gamma,s),dp;");
+ ring R = create_ring("(complex,16,I)", "("+varstr(S)+",gamma,s)", "dp");
  ideal L=imap(S,L);
  ideal LL=imap(S,LL);
  ideal I=imap(S,I);
@@ -762,7 +762,7 @@ EXAMPLE: example ReJunkUseHomo;shows an example
  }
  else
  {
- execute("ring TT=(complex,16,I),("+varstr(S)+"),dp;");
+ ring TT = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
  list w=imap(S,w);
  number t=1.0;
  }
@@ -803,11 +803,11 @@ EXAMPLE: example JuReTopDim;shows an example
   rw[k]=repart(w[k]);
   iw[k]=impart(w[k]);
  }
- execute("ring R=real,("+varstr(S)+",I),dp;");
+ ring R = create_ring(list("real"), "("+varstr(S)+",I)", "dp");
  list iw=imap(S,iw);
  list rw=imap(S,rw);
  ideal J=imap(S,J);
- execute("ring RR=0,("+varstr(S)+",I),dp;");
+ ring RR = create_ring(0, "("+varstr(S)+",I)", "dp");
  ideal J=imap(R,J);
  list iw=imap(R,iw);
  list rw=imap(R,rw);
@@ -855,7 +855,7 @@ EXAMPLE: example JuReTopDim;shows an example
  }
  else
  {
-  execute("ring T(d)=(complex,16,I),("+varstr(S)+"),dp;");
+  ring T(d) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
   "Try Again";
    -----
  }
@@ -893,11 +893,11 @@ EXAMPLE: example JuReZeroDim;shows an example
   rw[k]=repart(w[k]);
   iw[k]=impart(w[k]);
  }
- execute("ring R=real,("+varstr(S)+",I),dp;");
+ ring R = create_ring(list("real"), "("+varstr(S)+",I)", "dp");
  list iw=imap(S,iw);
  ideal J=imap(S,J);
  list rw=imap(S,rw);
- execute("ring RR=0,("+varstr(S)+",I),dp;");
+ ring RR = create_ring(0, "("+varstr(S)+",I)", "dp");
  list iw=imap(R,iw);
  ideal J=imap(R,J);
  list rw=imap(R,rw);
@@ -918,7 +918,7 @@ EXAMPLE: example JuReZeroDim;shows an example
  def TT(d)=solve(TT,16,"nodisplay");
  setring TT(d);
  int zii=size(SOL);
- execute("ring RR1=0,("+varstr(S)+",I),dp;");
+ ring RR1 = create_ring(0, "("+varstr(S)+",I)", "dp");
  list iw=imap(R,iw);
  ideal J=imap(R,J);
  list rw=imap(R,rw);
@@ -956,7 +956,7 @@ EXAMPLE: example JuReZeroDim;shows an example
  }
  else
  {
-  execute("ring T(d)=(complex,16,I),("+varstr(S)+"),dp;");
+  ring T(d) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
   "Try Again";
    -----
  }
@@ -1013,7 +1013,7 @@ EXAMPLE: example WitSet;shows an example
    {
     for(j=1;j<=z(i);j++)
     {
-     execute("ring Rr(j+i)=(complex,106,I),("+varstr(S)+"),ds;");
+     ring Rr(j+i) = create_ring("(complex,106,I)", "("+varstr(S)+")", "ds");
      list W(i)=imap(TJ(0),Ww(i));
      list w=W(i)[j];
      ideal J=imap(TJ(0),N(0));
@@ -1036,7 +1036,7 @@ EXAMPLE: example WitSet;shows an example
      ideal JJ=f(j)(K(j));
      if(dim(std(JJ))>i)
      {
-      execute("ring A(j)=(complex,16,I),("+varstr(S)+"),dp;");
+      ring A(j) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
       list W(i)=imap(TJ(0),Ww(i));
       list w(j)=var(1);
      }
@@ -1044,7 +1044,7 @@ EXAMPLE: example WitSet;shows an example
      {
       if(i==0)
       {
-       execute("ring RR(j)=(complex,16,I),("+varstr(S)+"),dp;");
+       ring RR(j) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
        list W(i)=imap(TJ(0),Ww(i));
        list w=W(i)[j];
        ideal J=imap(TJ(0),N(0));
@@ -1053,13 +1053,13 @@ EXAMPLE: example WitSet;shows an example
        list W(i)=imap(TJ(0),Ww(i));
        if(t<1)
        {
-        execute("ring A(j)=(complex,16,I),("+varstr(S)+"),dp;");
+        ring A(j) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
         list W(i)=imap(TJ(0),Ww(i));
         list w(j)=W(i)[j];
        }
        else
        {
-        execute("ring RRR(j)=(complex,106,I),("+varstr(S)+"),dp;");
+        ring RRR(j) = create_ring("(complex,106,I)", "("+varstr(S)+")", "dp");
         list W(i)=imap(TJ(0),Ww(i));
         list w=W(i)[j];
         ideal J=imap(TJ(0),N(0));
@@ -1079,11 +1079,11 @@ EXAMPLE: example WitSet;shows an example
         {
          for(ii=i+1;ii<=dt;ii++)
          {
-          execute("ring RRRR(ii+j)=(complex,106,I),("+varstr(S)+"),ds;");
+          ring RRRR(ii+j) = create_ring("(complex,106,I)", "("+varstr(S)+")", "ds");
           list Ww(ii)=imap(TJ(0),Ww(ii));
           if(size(Ww(ii)[1])>1)
           {
-           execute("ring RRRRR(ii+j)=(complex,16,I),("+varstr(S)+"),dp;");
+           ring RRRRR(ii+j) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
            list W(i)=imap(TJ(0),Ww(i));
            list w=W(i)[j];
            list Ww(ii)=imap(TJ(0),Ww(ii));
@@ -1100,7 +1100,7 @@ EXAMPLE: example WitSet;shows an example
            list W(i)=imap(TJ(0),Ww(i));
            if(ts>0)
            {
-           execute("ring A(j)=(complex,16,I),("+varstr(S)+"),dp;");
+           ring A(j) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
            list W(i)=imap(TJ(0),Ww(i));
            list w(j)=var(1);
            ii=d+1;
@@ -1109,7 +1109,7 @@ EXAMPLE: example WitSet;shows an example
            {
             if(ii==dt)
             {
-             execute("ring A(j)=(complex,16,I),("+varstr(S)+"),dp;");
+             ring A(j) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
              list W(i)=imap(TJ(0),Ww(i));
             }
             list w(j)=W(i)[j];
@@ -1119,7 +1119,7 @@ EXAMPLE: example WitSet;shows an example
         }
         else
         {
-         execute("ring A(j)=(complex,16,I),("+varstr(S)+"),dp;");
+         ring A(j) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
          list W(i)=imap(TJ(0),Ww(i));
          list w(j)=W(i)[j];
         }
@@ -1127,7 +1127,7 @@ EXAMPLE: example WitSet;shows an example
       }
       else
       {
-       execute("ring RRRRRRR(j)=(complex,106,I),("+varstr(S)+"),dp;");
+       ring RRRRRRR(j) = create_ring("(complex,106,I)", "("+varstr(S)+")", "dp");
        list W(i)=imap(TJ(0),Ww(i));
        list w=W(i)[j];
        ideal J=imap(TJ(0),N(0));
@@ -1147,11 +1147,11 @@ EXAMPLE: example WitSet;shows an example
        {
         for(ii=i+1;ii<=dt;ii++)
         {
-         execute("ring RRRRRRRR(ii+j)=(complex,106,I),("+varstr(S)+"),ds;");
+         ring RRRRRRRR(ii+j) = create_ring("(complex,106,I)", "("+varstr(S)+")", "ds");
          list Ww(ii)=imap(TJ(0),Ww(ii));
          if(size(Ww(ii)[1])>1)
          {
-          execute("ring R1(ii+j)=(complex,16,I),("+varstr(S)+"),dp;");
+          ring R1(ii+j) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
           list W(i)=imap(TJ(0),Ww(i));
           list w=W(i)[j];
           list Ww(ii)=imap(TJ(0),Ww(ii));
@@ -1168,7 +1168,7 @@ EXAMPLE: example WitSet;shows an example
           list W(i)=imap(TJ(0),Ww(i));
           if(ts>0)
           {
-           execute("ring A(j)=(complex,16,I),("+varstr(S)+"),dp;");
+           ring A(j) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
            list W(i)=imap(TJ(0),Ww(i));
            list w(j)=var(1);
            ii=d+1;
@@ -1177,7 +1177,7 @@ EXAMPLE: example WitSet;shows an example
           {
            if(ii==dt)
            {
-           execute("ring A(j)=(complex,16,I),("+varstr(S)+"),dp;");
+           ring A(j) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
            list W(i)=imap(TJ(0),Ww(i));
            }
            list w(j)=W(i)[j];
@@ -1187,7 +1187,7 @@ EXAMPLE: example WitSet;shows an example
        }
        else
        {
-        execute("ring A(j)=(complex,16,I),("+varstr(S)+"),dp;");
+        ring A(j) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
         list W(i)=imap(TJ(0),Ww(i));
         list w(j)=W(i)[j];
        }
@@ -1195,7 +1195,7 @@ EXAMPLE: example WitSet;shows an example
      }
      if(j==z(i))
      {
-      execute("ring R(i)=(complex,16,I),("+varstr(S)+"),dp;");
+      ring R(i) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
       list W(i),w;
       int k(i)=0;
       for(k=1;k<=z(i);k++)
@@ -1215,7 +1215,7 @@ EXAMPLE: example WitSet;shows an example
     }
    }
   }
-  execute("ring T=(complex,16,I),("+varstr(S)+"),dp;");
+  ring T = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
   int bt=0;
   for(i=0;i<=d-1;i++)
   {
@@ -1270,7 +1270,7 @@ EXAMPLE: example ZSR1;shows an example
  int c(1)=5*n;
  int c(2)=23*n;
  int iii=size(L);
- execute("ring R=(complex,16,I),("+varstr(S)+"),ds;");
+ ring R = create_ring("(complex,16,I)", "("+varstr(S)+")", "ds");
  number c(0);
  ideal LL=imap(S,L);
  c(0)=leadcoef(LL[iii]);
@@ -1281,7 +1281,7 @@ EXAMPLE: example ZSR1;shows an example
  list W=imap(S,W);
  VV[1]=W;
  def SB1=Singular2bertini(VV);
- execute("ring R=(complex,16,I),("+varstr(S)+",gamma,s),dp;");
+ ring R = create_ring("(complex,16,I)", "("+varstr(S)+",gamma,s)", "dp");
  ideal I=imap(S,I);
  zi=size(I);
  ideal LL=imap(S,L);
@@ -1313,7 +1313,7 @@ EXAMPLE: example ZSR1;shows an example
  list wr=re;
  if(size(wr)==0)
  {
-  execute("ring TT(2)=(complex,16,I),("+varstr(S)+"),dp;");
+  ring TT(2) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
   number tte, ts;
   tte=11;
   ts=0;
@@ -1322,7 +1322,7 @@ EXAMPLE: example ZSR1;shows an example
  }
  else
  {
-  execute("ring R1=(complex,16,I),("+varstr(S)+",gamma,s),dp;");
+  ring R1 = create_ring("(complex,16,I)", "("+varstr(S)+",gamma,s)", "dp");
   ideal I=imap(S,I);
   si=size(I);
   ideal LL=imap(S,L);
@@ -1423,7 +1423,7 @@ EXAMPLE: example ZSR1;shows an example
    ts=s(0)*(c(1)-c(2))+s(1)*(c(2)-c(0))+s(2)*(c(0)-c(1));
   }
  }
- execute("ring e=(complex,16,I),("+varstr(S)+"),dp;");
+ ring e = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
  number ts=imap(TT(2),ts);
  export(ts);
  number tte;
@@ -1527,7 +1527,7 @@ EXAMPLE: example ZSROFWitSet;shows an example
    {
     if(size(V(i))==1)
     {
-     execute("ring L(i)(1)=(complex,16,I),("+varstr(S)+"),dp;");
+     ring L(i)(1) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
      list W(i),ZSR(i);
      list V(i)=imap(T(0),W(i));
      W(i)=V(i);
@@ -1537,7 +1537,7 @@ EXAMPLE: example ZSROFWitSet;shows an example
     {
      if(i>1)
      {
-      execute("ring ee(i)=(complex,16,I),("+varstr(S)+"),dp;");
+      ring ee(i) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
       list V(i)=imap(T(0),W(i));
      }
      sv(i)=size(V(i));
@@ -1570,7 +1570,7 @@ EXAMPLE: example ZSROFWitSet;shows an example
     }
    }
   }
-  execute("ring Q=(complex,12,I),("+varstr(S)+"),dp;");
+  ring Q = create_ring("(complex,12,I)", "("+varstr(S)+")", "dp");
   list W(0)=imap(T(0),W(0));
   export(W(0));
   for(jj=1;jj<=dd;jj++)
@@ -1638,7 +1638,7 @@ EXAMPLE: example ReWitZSR;shows an example
 "
 {
  def S=basering;
- execute("ring e=(complex,16,I),("+varstr(S)+"),dp;");
+ ring e = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
  list A=imap(S,A);
  list W=imap(S,W);
  list  D, B(1..size(A)),C(1..size(A)),D(1..size(A)),Z1(1..size(A)),Z(1..size(A)),Z,Y,ZY;
@@ -1805,7 +1805,7 @@ EXAMPLE: example NumIrrDecom;shows an example
    int co(i)=0;
    if(i==0)
    {
-    execute("ring q(i)=(complex,16,I),("+varstr(S)+"),dp;");
+    ring q(i) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
     list V(i)=imap(WW,W(i));
     list W(0..size(V(i)));
     if(size(V(i)[1])>1)
@@ -1858,14 +1858,14 @@ EXAMPLE: example NumIrrDecom;shows an example
     }
     else
     {
-     execute("ring q(i)=(complex,16,I),("+varstr(S)+"),dp;");
+     ring q(i) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
      WW(i)[1]="Empty Set";
     }
    }
   }
   for(i=0;i<=d;i++)
   {
-   execute("ring qq(i)=(complex,16,I),("+varstr(S)+"),dp;");
+   ring qq(i) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
    for(ii=1;ii<=co(i);ii++)
    {
     list w(ii)=imap(q(i),w(ii));
@@ -1959,7 +1959,7 @@ EXAMPLE:  example defl; shows an example
    J(i)=subst(J(i),x(j),var(n+j));
   }
  }
- execute("ring R=0,("+varstr(S)+"),dp;");
+ ring R = create_ring(0, "("+varstr(S)+")", "dp");
  ideal I=imap(S,I);
  if(d>1)
  {
@@ -2038,7 +2038,7 @@ EXAMPLE: NIDofDI; shows an example
    int co(i)=0;
    if(i==0)
    {
-    execute("ring q(i)=(complex,16,I),("+varstr(S)+"),dp;");
+    ring q(i) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
     list V(i)=imap(WW,W(i));
     list W(0..size(V(i)));
     if(size(V(i)[1])>1)
@@ -2091,14 +2091,14 @@ EXAMPLE: NIDofDI; shows an example
     }
     else
     {
-     execute("ring q(i)=(complex,16,I),("+varstr(S)+"),dp;");
+     ring q(i) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
      WW(i)[1]="Empty Set";
     }
    }
   }
   for(i=0;i<=d;i++)
   {
-   execute("ring qq(i)=(complex,16,I),("+varstr(S)+"),dp;");
+   ring qq(i) = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
    list ww(i);
    if(co(i)>0)
    {
@@ -2188,7 +2188,7 @@ EXAMPLE:  example NumPrimDecom; shows an example
    list W(1)=var(1);
   }
  }
- execute("ring R=(complex,16,I),("+varstr(S)+"),dp;");
+ ring R = create_ring("(complex,16,I)", "("+varstr(S)+")", "dp");
  jj=0;
  for(i=0;i<=Dd;i++)
  {
