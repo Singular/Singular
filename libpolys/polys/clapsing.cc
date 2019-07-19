@@ -110,6 +110,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
       res= convFactoryAPSingAP( gcd( F, G ),r );
       prune (a);
       if (!b1) Off(SW_USE_QGCD);
+      if ( rField_is_Zp_a(r)) p_Norm(res,r); // leading coef. 1
     }
     else
     {

@@ -25,6 +25,7 @@
 #include "cfGcdAlgExt.h"
 #include "cfSubResGcd.h"
 #include "cfModGcd.h"
+#include "facAlgFuncUtil.h"
 
 #ifdef HAVE_NTL
 #include <NTL/ZZX.h>
@@ -134,6 +135,7 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
   {
     fc = subResGCD_0( fc, gc );
   }
+  if ((getCharacteristic()>0)&&(!hasAlgVar(fc))) fc/=fc.lc();
   return fc;
 }
 
