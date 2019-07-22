@@ -736,7 +736,8 @@ EXAMPLE: example switchRingsAndComputeInitialIdeal; shows an example
 {
   def origin = basering;
   intvec wOne = oneVector(nvars(origin));
-  ring rInitialIdeal = create_ring(ringlist(origin)[1], "("+varstr(origin)+")", "(a(wOne),wp(w))", "no_minpoly");
+  list ordering = list(list("a", wOne), list("wp", w));
+  ring rInitialIdeal = create_ring(ringlist(origin)[1], "("+varstr(origin)+")", ordering, "no_minpoly");
   ideal I = imap(origin,I);
   int tinI = timer;
   option(redSB);
