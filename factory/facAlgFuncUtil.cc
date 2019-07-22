@@ -371,11 +371,9 @@ int hasAlgVar (const CanonicalForm &f)
 {
   if (f.inBaseDomain())
     return 0;
-  if (f.inCoeffDomain())
+  if (f.inExtension())
   {
-    if (f.level() != 0)
-      return 1;
-    return hasAlgVar(f.LC());
+    return 1;
   }
   if (f.inPolyDomain())
   {
