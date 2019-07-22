@@ -229,10 +229,10 @@ EXAMPLE: example Equal; shows an example
  def W1=Incl(J,I);
  setring W1;
  number j1=jj;
- execute("ring q=(real,0),("+varstr(S)+"),dp;");
+ ring q = create_ring("(real,0)", "("+varstr(S)+")", "dp");
  ideal I=imap(W1,I);
  ideal J=imap(W1,J);
- execute("ring qq=0,("+varstr(S)+"),dp;");
+ ring qq = create_ring(0, "("+varstr(S)+")", "dp");
  ideal I=imap(S,I);
  ideal J=imap(S,J);
  def W2=Incl(I,J);
@@ -314,7 +314,7 @@ EXAMPLE: example NumLocalDim; shows an example
  number u=leadcoef(pp);
  if((u^2)==0)
  {
-  execute("ring A=(real,e-1),("+varstr(S)+",I),ds;");
+  ring A = create_ring("(real,e-1)", "("+varstr(S)+",I)", "ds");
   ideal II=imap(S,J);
   list rw=imap(S,rw);
   list iw=imap(S,iw);
@@ -331,7 +331,7 @@ EXAMPLE: example NumLocalDim; shows an example
  else
  {
   int d=dim(std(J));
-  execute("ring R=(complex,e-1,I),("+varstr(S)+"),ds;");
+  ring R = create_ring("(complex,e-1,I)", "("+varstr(S)+")", "ds");
   list w=imap(S,w);
   ideal II=imap(S,J);
   ideal JJ;
@@ -354,12 +354,12 @@ EXAMPLE: example NumLocalDim; shows an example
   tt=dim(std(T));
   if(tt==d)
   {
-   execute("ring A=(complex,e,I),("+varstr(S)+"),dp;");
+   ring A = create_ring("(complex,e,I)", "("+varstr(S)+")", "dp");
    t=tt;
   }
   else
   {
-   execute("ring RR=(real,e-2),("+varstr(S)+",I),dp;");
+   ring RR = create_ring("(real,e-2)", "("+varstr(S)+",I)", "dp");
    ideal II=imap(S,J);
    list rw=imap(S,rw);
    list iw=imap(S,iw);
@@ -397,7 +397,7 @@ EXAMPLE: example NumLocalDim; shows an example
     def M=solve(H,100,"nodisplay");
     setring M;
     sz1=size(SOL);
-    execute("ring RRRQ=(real,e-1),("+varstr(S)+",I),dp;");
+    ring RRRQ = create_ring("(real,e-1)", "("+varstr(S)+",I)", "dp");
     ideal HH=imap(RR,HH);
     if(dim(std(HH))==0)
     {
@@ -412,12 +412,12 @@ EXAMPLE: example NumLocalDim; shows an example
    }
    if(sz1==sz2)
    {
-    execute("ring A=(complex,e,I),("+varstr(S)+"),dp;");
+    ring A = create_ring("(complex,e,I)", "("+varstr(S)+")", "dp");
     t=d;
    }
    else
    {
-    execute("ring RQ=(real,e-1),("+varstr(S)+"),dp;");
+    ring RQ = create_ring("(real,e-1)", "("+varstr(S)+")", "dp");
     ideal II=imap(S,J);
     def RW=WitSet(II);
     setring RW;
@@ -447,7 +447,7 @@ EXAMPLE: example NumLocalDim; shows an example
         }
         if((ni+nr)<1/10^(2*e-3))
         {
-         execute("ring A=(complex,e,I),("+varstr(S)+"),dp;");
+         ring A = create_ring("(complex,e,I)", "("+varstr(S)+")", "dp");
          list W(ii)=imap(RW,W(ii));
          t=0;
          i=size(W(ii))+1;
@@ -458,7 +458,7 @@ EXAMPLE: example NumLocalDim; shows an example
       else
       {
        def SS=Singular2bertini(W(ii));
-       execute("ring D=(complex,e,I),("+varstr(S)+",s,gamma),dp;");
+       ring D = create_ring("(complex,e,I)", "("+varstr(S)+",s,gamma)", "dp");
        string nonsin;
        ideal H,L;
        ideal J=imap(RW,N(0));
@@ -503,7 +503,7 @@ EXAMPLE: example NumLocalDim; shows an example
          }
          if(tr<=1/10^(2*e-3))
          {
-          execute("ring A=(complex,e,I),("+varstr(S)+"),dp;");
+          ring A = create_ring("(complex,e,I)", "("+varstr(S)+")", "dp");
           t=ii;
           ii=d+1;
           jj=ci+1;

@@ -657,7 +657,7 @@ EXAMPLE: example InvariantRing; shows an example
           parName = parstr(basering);
           minPoly = string(minpoly);
         }
-        execute("ring RA1=0,(" + varstr(basering) + "," + parName + "), lp;");
+        ring RA1 = create_ring(0, "(" + varstr(basering) + "," + parName + ")", "lp");
         if (minPoly!="0") { execute("ideal mpoly = std(" + minPoly + ");"); }
         ideal I = imap(RIRR,invarsGens);
         setring RORN;
@@ -961,7 +961,7 @@ ASSUME:  basering = K[s(1..r),t(1..n)], K = Q or K = Q(a') and minpoly != 0,
     parName = parstr(basering);
     minPoly = string(minpoly);
   }
-  execute("ring RA1=0,(" + varstr(basering) + "," + parName + "), lp;");
+  ring RA1 = create_ring(0, "(" + varstr(basering) + "," + parName + ")", "lp");
   if (minPoly!="0") { execute("ideal mpoly = std(" + minPoly + ");"); }
   ideal Grp = imap(ROBR,Grp);
   ideal Gaction = imap(ROBR,Gaction);

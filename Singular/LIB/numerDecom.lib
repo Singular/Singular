@@ -348,7 +348,12 @@ EXAMPLE: example WitSupSet;shows an example
    I=J;
    if((n-rn)!=dd)
    {
-    execute("ring R=0,("+varstr(S)+",z(1..dd)),dp;");
+    list l2 = ringlist(S)[1];
+    for (int ii = 1; ii <= dd; ii++)
+    {
+    l2[size(l2)+1] = "z("+string(ii)+")";
+    }
+    ring R = create_ring(0, l2, "dp");
     ideal I=imap(rs,I);
     ideal H(0..n),L,LL,L(1..dd),LL(1..dd),h(1..dd),N(0..dd);
     poly p,p(0..n),e;
@@ -482,7 +487,12 @@ EXAMPLE: example WitSupSet;shows an example
      if(nv(q)!=0)
      {
       int w(q-1)=0;
-      execute("ring D(q)=(0,s,gamma),("+varstr(S)+",z(1..q)),dp;");
+      list l2 = ringlist(S)[1];
+      for (int ii = 1; ii <= q; ii++)
+      {
+      l2[size(l2)+1] = "z("+string(ii)+")";
+      }
+      ring D(q) = create_ring("(0,s,gamma)", l2, "dp");
       string nonsin(q),stnonsin(q);
       ideal H(1..q);
       ideal N(q)=imap(R,N(q));
@@ -578,7 +588,12 @@ EXAMPLE: example WitSupSet;shows an example
         {
          for(qq=q-1;qq>=1;qq--)
          {
-          execute("ring T(qq)=(complex,16,I),("+varstr(S)+",z(1..qq)),dp;");
+          list l2 = ringlist(S)[1];
+           for (int ii = 1; ii <= qq; ii++)
+           {
+           l2[size(l2)+1] = "z("+string(ii)+")";
+           }
+          ring T(qq) = create_ring("(complex,16,I)", l2, "dp");
           list W(qq-1)=var(1);
          }
          q=1;
@@ -590,7 +605,12 @@ EXAMPLE: example WitSupSet;shows an example
        for(qq=q;qq>=1;qq--)
        {
         int w(qq-1);
-        execute("ring T(qq)=(complex,16,I),("+varstr(S)+",z(1..qq)),dp;");
+        list l2 = ringlist(S)[1];
+        for (int ii = 1; ii <= qq; ii++)
+        {
+         l2[size(l2)+1] = "z("+string(ii)+")";
+        }
+        ring T(qq) = create_ring("(complex,16,I)", l2, "dp"); 
         list W(qq-1)=var(1);
        }
       }
@@ -599,7 +619,12 @@ EXAMPLE: example WitSupSet;shows an example
      {
       for(qq=q;qq>=1;qq--)
       {
-       execute("ring T(qq)=(complex,16,I),("+varstr(S)+",z(1..qq)),dp;");
+       list l2 = ringlist(S)[1];
+       for (int ii = 1; ii <= qq; ii++)
+       {
+        l2[size(l2)+1] = "z("+string(ii)+")";
+       }
+       ring T(qq) = create_ring("(complex,16,I)", l2, "dp");
        list W(qq-1)=var(1);
       }
      }
@@ -1950,7 +1975,13 @@ EXAMPLE:  example defl; shows an example
   ideal J(i)=symBasis;
   export(J(i));
  }
- execute("ring RR=0,(x(1..n),"+varstr(S)+"),dp;");
+ list l2;
+ for (int ii = 1; ii <= n; ii++)
+ {
+  l2[ii] = "x("+string(ii)+")";
+ }
+ l2[n+1] = ringlist(S)[1];
+ ring RR = create_ring(0, l2, "dp");
  for(i=1;i<=d;i++)
  {
   ideal J(i)=imap(R(i),J(i));
@@ -1994,7 +2025,12 @@ EXAMPLE:  example defl; shows an example
  }
  int zc=size(D(d));
  export(zc);
- execute("ring DR=0,("+varstr(S)+",x(1..zc)),dp;");
+ list l2 = ringlist(S)[1];
+ for (int ii = 1; ii <= zc; ii++)
+ {
+  l2[size(l2)+1] = "x("+string(ii)+")";
+ }
+ ring DR = create_ring(0, l2, "dp");
  matrix TT(d)=imap(R,TT(d));
  ideal I=imap(S,I);
  vector v=[x(1..zc)];
