@@ -348,10 +348,10 @@ EXAMPLE: example WitSupSet;shows an example
    I=J;
    if((n-rn)!=dd)
    {
-    list l2 = ringlist(S)[1];
+    list l2 = ringlist(S)[2];
     for (int ii = 1; ii <= dd; ii++)
     {
-    l2[size(l2)+1] = "z("+string(ii)+")";
+     l2[size(l2)+1] = "z("+string(ii)+")";
     }
     ring R = create_ring(0, l2, "dp");
     ideal I=imap(rs,I);
@@ -487,10 +487,10 @@ EXAMPLE: example WitSupSet;shows an example
      if(nv(q)!=0)
      {
       int w(q-1)=0;
-      list l2 = ringlist(S)[1];
+      list l2 = ringlist(S)[2];
       for (int ii = 1; ii <= q; ii++)
       {
-      l2[size(l2)+1] = "z("+string(ii)+")";
+       l2[size(l2)+1] = "z("+string(ii)+")";
       }
       ring D(q) = create_ring("(0,s,gamma)", l2, "dp");
       string nonsin(q),stnonsin(q);
@@ -588,11 +588,11 @@ EXAMPLE: example WitSupSet;shows an example
         {
          for(qq=q-1;qq>=1;qq--)
          {
-          list l2 = ringlist(S)[1];
-           for (int ii = 1; ii <= qq; ii++)
-           {
+          list l2 = ringlist(S)[2];
+          for (int ii = 1; ii <= qq; ii++)
+          {
            l2[size(l2)+1] = "z("+string(ii)+")";
-           }
+          }
           ring T(qq) = create_ring("(complex,16,I)", l2, "dp");
           list W(qq-1)=var(1);
          }
@@ -605,7 +605,7 @@ EXAMPLE: example WitSupSet;shows an example
        for(qq=q;qq>=1;qq--)
        {
         int w(qq-1);
-        list l2 = ringlist(S)[1];
+        list l2 = ringlist(S)[2];
         for (int ii = 1; ii <= qq; ii++)
         {
          l2[size(l2)+1] = "z("+string(ii)+")";
@@ -619,7 +619,7 @@ EXAMPLE: example WitSupSet;shows an example
      {
       for(qq=q;qq>=1;qq--)
       {
-       list l2 = ringlist(S)[1];
+       list l2 = ringlist(S)[2];
        for (int ii = 1; ii <= qq; ii++)
        {
         l2[size(l2)+1] = "z("+string(ii)+")";
@@ -1980,7 +1980,7 @@ EXAMPLE:  example defl; shows an example
  {
   l2[ii] = "x("+string(ii)+")";
  }
- l2[n+1] = ringlist(S)[1];
+ l2 = l2+ringlist(S)[2];
  ring RR = create_ring(0, l2, "dp");
  for(i=1;i<=d;i++)
  {
@@ -2025,7 +2025,7 @@ EXAMPLE:  example defl; shows an example
  }
  int zc=size(D(d));
  export(zc);
- list l2 = ringlist(S)[1];
+ list l2 = ringlist(S)[2];
  for (int ii = 1; ii <= zc; ii++)
  {
   l2[size(l2)+1] = "x("+string(ii)+")";
