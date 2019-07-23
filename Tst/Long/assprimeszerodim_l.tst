@@ -6,8 +6,11 @@ LIB "assprimeszerodim.lib";
 ring R1 = 0,x(1..6),dp;
 ideal I = cyclic(6);
 assPrimes(I, "GTZ");
+system("random", 138256896);
 assPrimes(I, "EHV");
+system("random", 570594853);
 assPrimes(I, "Monico");
+system("random", 17715229);
 
 // example from manual
 ring R2 = 0,(a,b,c,d,e,f),dp;

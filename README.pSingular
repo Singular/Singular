@@ -1,0 +1,10 @@
+How to build pSingular:
+
+unset RUN_PPCC
+cd ppcc
+./configure && make
+cd ..
+./configure CC="ppcc gcc" CXX="ppcc g++" --disable-omalloc
+export RUN_PPCC=1
+make
+

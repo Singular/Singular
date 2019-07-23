@@ -28,6 +28,7 @@ SEE ALSO: grwalk_lib;swalk_lib;rwalk_lib
 LIB "rwalk.lib";
 LIB "grwalk.lib";
 LIB "modular.lib";
+LIB "ring.lib";
 
 proc modWalk(ideal I, list #)
 "USAGE:   modWalk(I, [, v, w]); I ideal, v intvec or string, w intvec
@@ -480,7 +481,7 @@ static proc finalTest_std(string command, alias list args, ideal result)
    }
    ideal xI = args[1];
    ring xR = basering;
-   execute("ring yR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");
+   ring yR = create_ring(ringlist(xR)[1], "("+varstr(xR)+")", ord_str, "no_minpoly");
    ideal yI = fetch(xR,xI);
    ideal yresult = fetch(xR,result);
    attrib(yI, "isSB", 1);

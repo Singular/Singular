@@ -151,7 +151,7 @@ inline int ff_inv ( const int a )
     if ( ff_big )
         return ff_biginv( a );
     else {
-        register int b;
+        int b;
         if ( (b = (int)(ff_invtab[a])) )
             return b;
         else

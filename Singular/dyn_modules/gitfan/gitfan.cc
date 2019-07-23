@@ -546,22 +546,6 @@ BOOLEAN findPlaceToInsert(leftv res, leftv args)
 }
 
 
-void subset(std::vector<int> &arr, int size, int left, int index, std::vector<int> &l, std::vector<std::vector<int> > &L)
-{
-  if(left==0)
-  {
-    L.push_back(l);
-    return;
-  }
-
-  for(int i=index; i<size;i++)
-  {
-    l.push_back(arr[i]);
-    subset(arr,size,left-1,i+1,l,L);
-    l.pop_back();
-  }
-}
-
 extern "C" int SI_MOD_INIT(gitfan) (SModulFunctions* p)
 {
   gfan::initializeCddlibIfRequired();

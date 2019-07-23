@@ -606,11 +606,13 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
     return F*G;
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
   ASSERT (F.level() == G.level(), "expected polys of same level");
+#if (!defined(HAVE_FLINT) ||  __FLINT_RELEASE < 20400)
   if (fac_NTL_char != getCharacteristic())
   {
     fac_NTL_char= getCharacteristic();
     zz_p::init (getCharacteristic());
   }
+#endif
   Variable alpha;
   CanonicalForm result;
   if (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha))
@@ -787,11 +789,13 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
   ASSERT (F.level() == G.level(), "expected polys of same level");
+#if (!defined(HAVE_FLINT) ||  __FLINT_RELEASE < 20400)
   if (fac_NTL_char != getCharacteristic())
   {
     fac_NTL_char= getCharacteristic();
     zz_p::init (getCharacteristic());
   }
+#endif
   Variable alpha;
   CanonicalForm result;
   if (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha))
@@ -1048,11 +1052,13 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
   ASSERT (F.level() == G.level(), "expected polys of same level");
+#if (!defined(HAVE_FLINT) ||  __FLINT_RELEASE < 20400)
   if (fac_NTL_char != getCharacteristic())
   {
     fac_NTL_char= getCharacteristic();
     zz_p::init (getCharacteristic());
   }
+#endif
   Variable alpha;
   CanonicalForm result;
   if (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha))
@@ -3641,11 +3647,13 @@ uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
   }
   if (p > 0)
   {
+#if (!defined(HAVE_FLINT) ||  __FLINT_RELEASE < 20400)
     if (fac_NTL_char != p)
     {
       fac_NTL_char= p;
       zz_p::init (p);
     }
+#endif
     Variable alpha;
     if (hasFirstAlgVar (A, alpha) || hasFirstAlgVar (B, alpha))
     {

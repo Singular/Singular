@@ -277,6 +277,8 @@ int size ( const CanonicalForm & f, const Variable & v );
 
 int size ( const CanonicalForm & f );
 
+int size_maxexp ( const CanonicalForm & f, int& maxexp );
+
 CanonicalForm reduce ( const CanonicalForm& f, const CanonicalForm & M);
 
 bool hasFirstAlgVar( const CanonicalForm & f, Variable & a);

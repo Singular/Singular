@@ -282,7 +282,7 @@ EXAMPLE: example PrimdecB; shows an example
       }
 
       @U[size(@U)]=")";           // we compute the extractor (w.r.t. @U)
-      execute("ring RAU="+charstr(basering)+",("+@A+@U+",(C,dp("+string(szA)+"),dp);");
+      ring RAU = create_ring(ringlist(basering)[1],"("+@A+@U,"(C,dp("+string(szA)+"),dp)","no_minpoly");
       module @N=std(imap(BAS,@N));
                                   // this is also a standard basis in (R[U])[A]
       @A[size(@A)]=")";
@@ -669,7 +669,7 @@ EXAMPLE: example GTZmod; shows an example
     }
   }
   @U[size(@U)]=")";             // we compute the extractor (w.r.t. @U)
-  execute("ring RAU="+charstr(basering)+",("+@A+@U+",(C,dp("+string(szA)+"),dp);");
+  ring RAU = create_ring(ringlist(basering)[1],"("+@A+@U,"(C,dp("+string(szA)+"),dp)","no_minpoly");
   module @N=std(imap(BAS,@N));  // this is also a standard basis in (R[U])[A]
   @A[size(@A)]=")";
   execute("ring Rloc=("+charstr(basering)+","+@U+",("+@A+",(C,dp);");
@@ -772,7 +772,7 @@ proc lcm_chr(poly @i, poly @j)
        string strg=parstr(basering)+",";
      }
   }
-  execute("ring PRing="+string(char(basering))+",("+strg+varstr(basering)+"),dp");
+  ring PRing = create_ring(char(basering), "("+strg+varstr(basering)+")", "dp");
   ideal @a=ideal(imap(LBAS,@i),imap(LBAS,@j));
   poly @p=lcm(@a);
   setring LBAS;
@@ -1493,7 +1493,7 @@ EXAMPLE: example GTZmod; shows an example
        }
        newva[size(newva)]=")";
        newma[size(newma)]=";";
-       execute("ring @deirf=("+charstr(BAS)+"),("+newva+",(C,lp);");
+       ring @deirf = create_ring(ringlist(BAS)[1],"("+newva,"(C,lp)","no_minpoly");
        execute("map @kappa=BAS,"+newma);
        ideal @j = @kappa(ann);
        module @N = @kappa(@N);
@@ -1550,7 +1550,7 @@ EXAMPLE: example GTZmod; shows an example
     szIndep=size(indep[@k1]);
     for (@k2=1;@k2<=szIndep;@k2++)
     {
-      execute("ring RAU=("+charstr(basering)+"),("+indep[@k1][@k2][1]+","+indep[@k1][@k2][2]+"),"+indep[@k1][@k2][3]+";");
+      ring RAU = create_ring(ringlist(basering)[1], "("+indep[@k1][@k2][1]+","+indep[@k1][@k2][2]+")", indep[@k1][@k2][3], "no_minpoly");
       module @N=std(imap(BAS,@N)); // the standard basis in (R[U])[A]
       execute("ring Rloc=("+charstr(basering)+","+indep[@k1][@k2][2]+"),("+indep[@k1][@k2][1]+"),(C,dp);");
       module @N=imap(RAU,@N); //std in lokalisierung
@@ -2152,7 +2152,7 @@ NOTE:    result is a std basis in the basering
    def @P= basering;
    if(ordstr(basering)[1,2]!="dp")
    {
-      execute("ring @Phelp=("+charstr(@P)+"),("+varstr(@P)+"),(C,dp);");
+      ring @Phelp = create_ring(ringlist(@P)[1],"("+varstr(@P)+")","(C,dp)","no_minpoly");
       module inew=std(imap(@P,id));
       ideal  @h=imap(@P,h1);
    }
