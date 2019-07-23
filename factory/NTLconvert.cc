@@ -32,8 +32,13 @@
 #include <limits.h>
 #include "NTLconvert.h"
 
+#ifdef HAVE_OMALLOC
+#define Alloc(L) omAlloc(L)
+#define Free(A,L) omFreeSize(A,L)
+#else
 #define Alloc(L) malloc(L)
 #define Free(A,L) free(A)
+#endif
 
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 

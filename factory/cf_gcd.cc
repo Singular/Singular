@@ -25,6 +25,7 @@
 #include "cfGcdAlgExt.h"
 #include "cfSubResGcd.h"
 #include "cfModGcd.h"
+#include "FLINTconvert.h"
 #include "facAlgFuncUtil.h"
 
 #ifdef HAVE_NTL
@@ -99,6 +100,15 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
   gc = g;
   if ( getCharacteristic() != 0 )
   {
+    #if defined(HAVE_FLINT) && ( __FLINT_RELEASE >= 20503)
+    if ( isOn( SW_USE_FL_GCD_P)
+    && (CFFactory::gettype() != GaloisFieldDomain)
+    && (getCharacteristic()>500)
+    &&(!hasAlgVar(fc)) && (!hasAlgVar(gc)))
+    {
+      return gcdFlintMP_Zp(fc,gc);
+    }
+    #endif
     #ifdef HAVE_NTL
     if ((!fc_and_gc_Univariate) && (isOn( SW_USE_EZGCD_P )))
     {
@@ -118,14 +128,22 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     #endif
     fc = subResGCD_p( fc, gc );
   }
-  else if (!fc_and_gc_Univariate)
+  else if (!fc_and_gc_Univariate) /* && char==0*/
   {
+    #if defined(HAVE_FLINT) && ( __FLINT_RELEASE >= 20503)
+    if (( isOn( SW_USE_FL_GCD_0) )
+    &&(!hasAlgVar(fc)) && (!hasAlgVar(gc)))
+    {
+      return gcdFlintMP_QQ(fc,gc);
+    }
+    else
+    #endif
     if ( isOn( SW_USE_EZGCD ) )
       fc= ezgcd (fc, gc);
-#ifdef HAVE_NTL
+    #ifdef HAVE_NTL
     else if (isOn(SW_USE_CHINREM_GCD))
       fc = modGCDZ( fc, gc);
-#endif
+    #endif
     else
     {
        fc = subResGCD_0( fc, gc );
