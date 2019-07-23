@@ -2571,7 +2571,7 @@ static proc parse_L2(string l2)
 static proc parse_ordering(string ordering, int n_vars)
 {
   string name;
-  intvec w;
+  def w;   // int for name == "L", intvec otherwise
   int b1 = find(ordering, "(", 1);
   if (b1 == 0)   // no parentheses
   {
@@ -2592,7 +2592,14 @@ static proc parse_ordering(string ordering, int n_vars)
     int c = find(ordering, ",", b1+1);
     if (c == 0)
     {
-      w = 1:int(ordering[b1+1, b2-b1-1]);
+      if (name == "L")
+      {
+        w = int(ordering[b1+1, b2-b1-1]);
+      }
+      else
+      {
+        w = 1:int(ordering[b1+1, b2-b1-1]);
+      }
     }
     else
     {
