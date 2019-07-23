@@ -620,7 +620,7 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w, GbVarian
     // non multiplicative variable
     if (rIsLPRing(currRing))
     {
-      pSetExp(q, currRing->isLPring - i + j + 1, 1);
+      pSetExp(q, currRing->isLPring - currRing->LPncGenCount + j + 1, 1);
       p_Setm(q, currRing);
     }
 #endif

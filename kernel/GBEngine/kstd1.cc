@@ -2831,15 +2831,9 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   intvec* temp_w=NULL;
 
   strat->rightGB = rightGB;
-  // this relies on the implementation of idPrepare,
-  // nonMultiplicativeVars should be the number of rows added in idPrepare() (relevant for syzygies)
-  strat->nonMultiplicativeVars = syzComp > 0 ? F->rank - syzComp : 0;
-  assume(syzComp <= 0 || strat->nonMultiplicativeVars == IDELEMS(F));
-  Print("#tagvars: %d\n", strat->nonMultiplicativeVars);
 
   if(!TEST_OPT_RETURN_SB)
     strat->syzComp = syzComp;
-  Print("syzComp: %d\n", strat->syzComp);
   if (TEST_OPT_SB_1)
     if(!rField_is_Ring(currRing))
       strat->newIdeal = newIdeal;

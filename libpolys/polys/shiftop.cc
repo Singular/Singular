@@ -528,6 +528,7 @@ void p_LPExpVappend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const 
 #ifdef SHIFT_MULT_DEBUG
   PrintLn(); WriteLPExpV(m1ExpV, ri);
 #endif
+  assume(_p_mLPNCGenValid(m1ExpV, ri));
 }
 
 // prepends m2ExpV to m1ExpV, also adds their components (one of them is always zero)
@@ -563,6 +564,7 @@ void p_LPExpVprepend(int *m1ExpV, int *m2ExpV, int m1Length, int m2Length, const
 #ifdef SHIFT_MULT_DEBUG
   PrintLn(); WriteLPExpV(m1ExpV, ri);
 #endif
+  assume(_p_mLPNCGenValid(m1ExpV, ri));
 }
 
 void WriteLPExpV(int *expV, ring ri)
@@ -607,6 +609,29 @@ void k_SplitFrame(poly &m1, poly &m2, int at, const ring r)
 
   assume(p_FirstVblock(m1,r) <= 1);
   assume(p_FirstVblock(m2,r) <= 1);
+}
+
+BOOLEAN _p_mLPNCGenValid(int *mExpV, const ring r)
+{
+  BOOLEAN hasNCGen = FALSE;
+  int lV = r->isLPring;
+  int degbound = r->N/lV;
+  int ncGenCount = r->LPncGenCount;
+  for (int i = 1; i <= degbound; i++)
+  {
+    for (int j = i*lV; j > (i*lV - ncGenCount); j--)
+    {
+      if (mExpV[j])
+      {
+        if (hasNCGen)
+        {
+          return FALSE;
+        }
+        hasNCGen = TRUE;
+      }
+    }
+  }
+  return TRUE;
 }
 
 /* tests whether each polynomial of an ideal I lies in in V */
@@ -672,10 +697,23 @@ int p_mIsInV(poly p, const ring r)
   {
     if (B[j]!=0) break;
   }
-  /* do not need e anymore */
+
+  if (j==0)
+  {
+    omFreeSize((ADDRESS) e, (r->N+1)*sizeof(int));
+    omFreeSize((ADDRESS) B, (b+1)*sizeof(int));
+    return 1;
+  }
+
+  if (!_p_mLPNCGenValid(e, r))
+  {
+    omFreeSize((ADDRESS) e, (r->N+1)*sizeof(int));
+    omFreeSize((ADDRESS) B, (b+1)*sizeof(int));
+    return 0;
+  }
+
   omFreeSize((ADDRESS) e, (r->N+1)*sizeof(int));
 
-  if (j==0) goto ret_true;
 //   {
 //     /* it is a zero exp vector, which is in V */
 //     freeT(B, b);
@@ -687,12 +725,12 @@ int p_mIsInV(poly p, const ring r)
     if (B[j]!=1)
     {
       omFreeSize((ADDRESS) B, (b+1)*sizeof(int));
-      return(0);
+      return 0;
     }
   }
- ret_true:
+
   omFreeSize((ADDRESS) B, (b+1)*sizeof(int));
-  return(1);
+  return 1;
 }
 
 BOOLEAN p_LPDivisibleBy(poly a, poly b, const ring r)
@@ -782,8 +820,18 @@ static BOOLEAN freeAlgebra_weights(const ring old_ring, ring new_ring, int p, in
   return FALSE;
 }
 
-ring freeAlgebra(ring r, int d)
+ring freeAlgebra(ring r, int d, int ncGenCount)
 {
+  if (ncGenCount) r = rCopy0(r);
+  for (int i = 1; i <= ncGenCount; i++)
+  {
+    char *varname=(char *)omAlloc(256);
+    sprintf(varname, "ncgen(%d)", i);
+    ring save = r;
+    r = rPlusVar(r, varname, 0);
+    omFreeSize(varname, 256);
+    rDelete(save);
+  }
   ring R=rCopy0(r);
   int p;
   if((r->order[0]==ringorder_C)
@@ -794,6 +842,7 @@ ring freeAlgebra(ring r, int d)
   // create R->N
   R->N=r->N*d;
   R->isLPring=r->N;
+  R->LPncGenCount=ncGenCount;
   // create R->order
   BOOLEAN has_order_a=FALSE;
   while (r->order[p]==ringorder_a)
@@ -882,6 +931,7 @@ ring freeAlgebra(ring r, int d)
   omFree(R->names);
   R->names=names;
 
+  if (ncGenCount) rDelete(r);
   rComplete(R,TRUE);
   return R;
 }

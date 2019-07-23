@@ -5152,6 +5152,16 @@ static BOOLEAN jjSYZYGY(leftv res, leftv v)
   intvec *w=NULL;
   ideal v_id=(ideal)v->Data();
   tHomog hom=testHomog;
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
+  {
+    if (currRing->LPncGenCount < IDELEMS(v_id))
+    {
+      Werror("At least %d ncgen variables are needed for this computation.", IDELEMS(v_id));
+      return TRUE;
+    }
+  }
+#endif
   if (ww!=NULL)
   {
     if (idTestHomModule(v_id,currRing->qideal,ww))
