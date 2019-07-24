@@ -240,9 +240,9 @@ public:
     ring r;
     fmpq_t content;
 
-    convert_sing_to_fmpq_mpoly_base(slong num_threads_, fmpq_mpoly_struct * res_,
-                             const fmpq_mpoly_ctx_struct * ctx_, const ring r_, poly p)
-      : num_threads(num_threads_),
+    convert_sing_to_fmpq_mpoly_base(fmpq_mpoly_struct * res_,
+                     const fmpq_mpoly_ctx_struct * ctx_, const ring r_, poly p)
+      : num_threads(0),
         res(res_),
         ctx(ctx_),
         r(r_)
@@ -427,9 +427,13 @@ void convSingPFlintMP(fmpq_mpoly_t res, fmpq_mpoly_ctx_t ctx, poly p, int lp, co
 {
     thread_pool_handle * handles;
     slong num_handles;
-    slong thread_limit = 1000;
+    slong thread_limit = 1000; // TODO: should be paramter to this function
 
-    /* get workers */
+    /* the constructor works out the length of p and sets some markers */
+    convert_sing_to_fmpq_mpoly_base base(res, ctx, r, p);
+
+    /* sensibly limit thread count and get workers */
+    thread_limit = FLINT_MIN(thread_limit, base.length/1024);
     handles = NULL;
     num_handles = 0;
     if (thread_limit > 1 && global_thread_pool_initialized)
@@ -443,10 +447,8 @@ void convSingPFlintMP(fmpq_mpoly_t res, fmpq_mpoly_ctx_t ctx, poly p, int lp, co
         }
     }
 
-    /* the constructor works out the length of p and sets some markers */
-    convert_sing_to_fmpq_mpoly_base base(num_handles + 1, res, ctx, r, p);
-
     /* fill in thread division points */
+    base.num_threads = 1 + num_handles;
     convert_sing_to_fmpq_mpoly_arg * args = new convert_sing_to_fmpq_mpoly_arg[base.num_threads];
     slong cur_idx = 0;
     for (slong i = 0; i < base.num_threads; i++)
@@ -605,9 +607,10 @@ poly convFlintMPSingP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, const ring r)
 {
     thread_pool_handle * handles;
     slong num_handles;
-    slong thread_limit = 1000;
+    slong thread_limit = 1000;// TODO: should be paramter to this function
 
-    /* get workers */
+    /* sensibly limit threads and get workers */
+    thread_limit = FLINT_MIN(thread_limit, f->zpoly->length/1024);
     handles = NULL;
     num_handles = 0;
     if (thread_limit > 1 && global_thread_pool_initialized)
@@ -622,7 +625,6 @@ poly convFlintMPSingP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, const ring r)
     }
 
     convert_fmpq_mpoly_to_sing_base base(num_handles + 1, f, ctx, r);
-
     convert_fmpq_mpoly_to_sing_arg * args = new convert_fmpq_mpoly_to_sing_arg[base.num_threads];
     slong cur_idx = 0;
     for (slong i = 0; i < base.num_threads; i++)
@@ -680,9 +682,9 @@ public:
     std::vector<poly> markers;
     ring r;
 
-    convert_sing_to_nmod_mpoly_base(slong num_threads_, nmod_mpoly_struct * res_,
-                            const nmod_mpoly_ctx_struct * ctx_, const ring r_, poly p)
-      : num_threads(num_threads_),
+    convert_sing_to_nmod_mpoly_base(nmod_mpoly_struct * res_,
+                     const nmod_mpoly_ctx_struct * ctx_, const ring r_, poly p)
+      : num_threads(0),
         res(res_),
         ctx(ctx_),
         r(r_)
@@ -791,9 +793,13 @@ void convSingPFlintMP(nmod_mpoly_t res, nmod_mpoly_ctx_t ctx, poly p, int lp, co
 {
     thread_pool_handle * handles;
     slong num_handles;
-    slong thread_limit = 1000;
+    slong thread_limit = 1000; // TODO: should be paramter to this function
 
-    /* get workers */
+    /* the constructor works out the length of p and sets some markers */
+    convert_sing_to_nmod_mpoly_base base(res, ctx, r, p);
+
+    /* sensibly limit thread count and get workers */
+    thread_limit = FLINT_MIN(thread_limit, base.length/1024);
     handles = NULL;
     num_handles = 0;
     if (thread_limit > 1 && global_thread_pool_initialized)
@@ -807,9 +813,8 @@ void convSingPFlintMP(nmod_mpoly_t res, nmod_mpoly_ctx_t ctx, poly p, int lp, co
         }
     }
 
-    convert_sing_to_nmod_mpoly_base base(num_handles + 1, res, ctx, r, p);
-
     /* fill in thread division points */
+    base.num_threads = 1 + num_handles;
     convert_sing_to_nmod_mpoly_arg * args = new convert_sing_to_nmod_mpoly_arg[base.num_threads];
     slong cur_idx = 0;
     for (slong i = 0; i < base.num_threads; i++)
@@ -920,9 +925,10 @@ poly convFlintMPSingP(nmod_mpoly_t f, nmod_mpoly_ctx_t ctx, const ring r)
 {
     thread_pool_handle * handles;
     slong num_handles;
-    slong thread_limit = 1000;
+    slong thread_limit = 1000; // TODO: should be paramter to this function
 
-    /* get workers */
+    /* sensibly limit threads and get workers */
+    thread_limit = FLINT_MIN(thread_limit, f->length/1024);
     handles = NULL;
     num_handles = 0;
     if (thread_limit > 1 && global_thread_pool_initialized)
@@ -937,7 +943,6 @@ poly convFlintMPSingP(nmod_mpoly_t f, nmod_mpoly_ctx_t ctx, const ring r)
     }
 
     convert_nmod_mpoly_to_sing_base base(num_handles + 1, f, ctx, r);
-
     convert_nmod_mpoly_to_sing_arg * args = new convert_nmod_mpoly_to_sing_arg[base.num_threads];
     slong cur_idx = 0;
     for (slong i = 0; i < base.num_threads; i++)
