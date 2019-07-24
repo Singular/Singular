@@ -66,6 +66,7 @@ and @code{LIB} no brackets are allowed.
 * coef::
 * coeffs::
 * contract::
+* create_ring::
 * crossprod::
 * datetime::
 * dbprint::
@@ -1126,7 +1127,7 @@ See
 @ref{kbase}.
 @c ref
 @c ---------------------------------------
-@node contract, crossprod, coeffs, Functions
+@node contract
 @subsection contract
 @cindex contract
 
@@ -1182,7 +1183,13 @@ See
 @c ref
 
 @c ---------------------------------------
-@node crossprod, datetime, contract, Functions
+@node create_ring
+@subsection create_ring
+@cindex create_ring
+@c lib standard.lib:create_ring lib_fun lib_ex subsection
+
+@c ---------------------------------------
+@node crossprod
 @subsection crossprod
 @cindex crossprod
 
