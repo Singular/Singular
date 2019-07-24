@@ -617,6 +617,7 @@ void convFactoryPFlintMP ( const CanonicalForm & f, fmpq_mpoly_t res, fmpq_mpoly
   ulong * exp = (ulong*)Alloc(N*sizeof(ulong));
   memset(exp,0,N*sizeof(ulong));
   convFlint_RecPP( f, exp, res, ctx, N );
+  fmpq_mpoly_reduce(res,ctx);
   Free(exp,N*sizeof(ulong));
 }
 
