@@ -1389,7 +1389,7 @@ EXAMPLE: example partial_molien; shows an example
     }
     poly A(1)=M[1,2];                 // denominator of Molien series (for now)
     string mp=string(minpoly);
-    execute("ring R=("+charstr(br)+"),("+varstr(br)+"),ds;");
+    ring R = create_ring(ringlist(br)[1], "("+varstr(br)+")", "ds", "no_minpoly");
     if (mp!="0")
     {
       execute("minpoly=number("+mp+");");

@@ -2571,18 +2571,17 @@ static proc parse_L2(string l2)
 static proc parse_ordering(string ordering, int n_vars)
 {
   string name;
-  intvec w;
   int b1 = find(ordering, "(", 1);
   if (b1 == 0)   // no parentheses
   {
     name = ordering;
     if (name == "C" || name == "c")
     {
-      w = intvec(0);
+      intvec w = intvec(0);
     }
     else
     {
-      w = 1:n_vars;
+      intvec w = 1:n_vars;
     }
   }
   else
@@ -2592,12 +2591,19 @@ static proc parse_ordering(string ordering, int n_vars)
     int c = find(ordering, ",", b1+1);
     if (c == 0)
     {
-      w = 1:int(ordering[b1+1, b2-b1-1]);
+      if (name == "L")
+      {
+        int w = int(ordering[b1+1, b2-b1-1]);
+      }
+      else
+      {
+        intvec w = 1:int(ordering[b1+1, b2-b1-1]);
+      }
     }
     else
     {
       list W = tuple_to_tokens(ordering[b1, b2-b1+1]);
-      w = intvec(int(W[1..size(W)]));
+      intvec w = intvec(int(W[1..size(W)]));
     }
   }
   return(list(name, w));

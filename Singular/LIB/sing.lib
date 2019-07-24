@@ -1075,8 +1075,7 @@ EXAMPLE: example locstd; shows an example
 {
   int ii;
   def bas = basering;
-  execute("ring  @r_locstd
-     =("+charstr(bas)+"),(@t@,"+varstr(bas)+"),(dp(1),dp);");
+  ring @r_locstd = create_ring(ringlist(bas)[1], "(@t@,"+varstr(bas)+")", "(dp(1),dp)", "no_minpoly");
   ideal @id = imap(bas,id);
   ideal @hid = homog(@id,@t@);
   @hid = std(@hid);

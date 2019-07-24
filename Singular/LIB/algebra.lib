@@ -1031,7 +1031,12 @@ EXAMPLE: example mapIsFinite; shows an example
   { PHI[n]=0;
   }
   // --------------------- change of variable names -------------------------
-  execute("ring @bsr = ("+charstr(bsr)+"),y(1..m),("+os+");");
+  list l2;
+  for (int ii = 1; ii <= m; ii++)
+  {
+    l2[ii] = "y("+string(ii)+")";
+  }
+  ring @bsr = create_ring(ringlist(bsr)[1], l2, "("+os+")", "no_minpoly");
   ideal J = fetch(bsr,J);
   ideal PHI = fetch(bsr,PHI);
 

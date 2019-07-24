@@ -3643,7 +3643,7 @@ EXAMPLE:     example solveTInitialFormPar;   shows an example"
   string CHARAKTERISTIK=charstr(basering);
   CHARAKTERISTIK=CHARAKTERISTIK[1..size(CHARAKTERISTIK)-2];
   def BASERING=basering;
-  execute("ring INITIALRING=("+CHARAKTERISTIK+"),("+varstr(basering)+"),("+ordstr(basering)+");");
+  ring INITIALRING = create_ring("("+CHARAKTERISTIK+")", "("+varstr(basering)+")", "("+ordstr(basering)+")");
   list l=solve(imap(BASERING,i));
   l;
   setring BASERING;
@@ -5550,7 +5550,7 @@ NOTE:     the procedure is called from tropicalLifting"
     {
       setring LIFTRing;
       poly mp=minpoly;
-      execute("ring TESTRing=("+charstr(LIFTRing)+"),("+varstr(BASERING)+"),dp;");
+      ring TESTRing = create_ring(ringlist(LIFTRing)[1], "("+varstr(BASERING)+")", "dp", "no_minpoly");
       minpoly=number(imap(LIFTRing,mp));
       ideal i=imap(BASERING,i);
     }
@@ -5938,7 +5938,7 @@ NOTE:    - the procedure is also called recursively by itself, and
         }
         else
         {
-          execute("ring PARARing=("+charstr(basering)+"),t,ls;");
+          ring PARARing = create_ring(ringlist(basering)[1], "t", "ls", "no_minpoly");
         }
         ideal PARA; // will contain the parametrisation
         // we start by initialising the entries to be zero;
@@ -6199,7 +6199,7 @@ NOTE:    - the procedure is called from inside the recursive
         }
         else
         {
-          execute("ring SATURATERING=("+charstr(basering)+"),("+varstr(basering)+"),("+ordstr(basering)+");");
+          ring SATURATERING = create_ring(ringlist(basering)[1], "("+varstr(basering)+")", "("+ordstr(basering)+")", "no_minpoly");
           ideal i=imap(BASERING,i);
           export(i);
           setring BASERING;
@@ -6340,7 +6340,7 @@ NOTE:     -  the procedure is called from inside the recursive procedure
   // move to a polynomial ring with global monomial ordering
   // - the variable t is superflous,
   // the variable @a is not if it was already present
-  execute("ring INITIALRING=("+charstr(basering)+"),("+string(variablen)+"),dp;");
+  ring INITIALRING = create_ring(ringlist(basering)[1], "("+string(variablen)+")", "dp", "no_minpoly");
   ideal ini=imap(BASERING,ini);
   // compute the minimal associated primes of the
   // initialideal over the algebraic closure;
@@ -6366,7 +6366,7 @@ NOTE:     -  the procedure is called from inside the recursive procedure
     {
       // define the extension ring which contains
       // the new variable @a, if it is not yet present
-      execute("ring EXTENSIONRING=("+charstr(BASERING)+"),("+string(imap(BASERING,variablen))+",@a,"+tvar+"),(dp("+string(anzahlvariablen-1)+"),dp(1),lp(1));");
+      ring EXTENSIONRING = create_ring(ringlist(BASERING)[1], "("+string(imap(BASERING,variablen))+",@a,"+tvar+")", "(dp("+string(anzahlvariablen-1)+"),dp(1),lp(1))", "no_minpoly");
       // phi maps x_i to x_i, @a to @a (if present in the ring),
       // and the additional variable
       // for the field extension is mapped to @a as well
@@ -6377,7 +6377,7 @@ NOTE:     -  the procedure is called from inside the recursive procedure
     }
     else // @a was already present in the BASERING or no
     { // field extension is necessary
-      execute("ring EXTENSIONRING=("+charstr(BASERING)+"),("+varstr(BASERING)+"),("+ordstr(BASERING)+");");
+      ring EXTENSIONRING = create_ring(ringlist(BASERING)[1], "("+varstr(BASERING)+")", "("+ordstr(BASERING)+")", "no_minpoly");
       // phi maps x_i to x_i, @a to @a (if present in the ring),
       // and the additional variable
       // for the field extension is mapped to @a as well respectively to 0,
@@ -7254,9 +7254,9 @@ NOTE:        the procedure is called by texDrawTropical and conicWithTangents
              and f will actually be a number"
 {
   def BASERING=basering;
-  execute("ring INTERRING=0,("+varstr(basering)+"),("+ordstr(basering)+");");
+  ring INTERRING = create_ring(0, "("+varstr(basering)+")", "("+ordstr(basering)+")");
   poly n=imap(BASERING,n);
-  execute("ring REALRING=(real,50,100),("+varstr(basering)+"),("+ordstr(basering)+");");
+  ring REALRING = create_ring("(real,50,100)", "("+varstr(basering)+")", "("+ordstr(basering)+")");
   map phi=INTERRING,maxideal(1);
   string s=string(phi(n));
   int check=0;
@@ -7872,7 +7872,7 @@ NOTE:    the procedure is called by jInvariant"
   else
   {
     def BASERING=basering;
-    execute("ring TRING="+string(char(BASERING))+",t,ds;");
+    ring TRING = create_ring(string(char(BASERING)), "t", "ds");
     poly hn=imap(BASERING,hn);
     poly c4=imap(BASERING,c4);
     poly delta=imap(BASERING,delta);

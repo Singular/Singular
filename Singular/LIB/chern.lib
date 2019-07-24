@@ -3304,7 +3304,7 @@ NOTE:
 {
   int n=nvars(basering);
   def br@=basering; // remember the base ring
-  execute("ring r@=("+ charstr(basering) +"),("+varstr(basering)+",homvar@), dp;");
+  ring r@ = create_ring(ringlist(basering)[1], "("+varstr(basering)+",homvar@)", "dp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   ideal I=F(I);
   ideal J=homog(I, homvar@);
