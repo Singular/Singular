@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 
 # Local imports
-from common.keyword_vector import vector_distance
+from keyword_vector import vector_distance
 
 
 class HelpPagePredictor(BaseEstimator, ClassifierMixin):

@@ -116,3 +116,4 @@ test-suite.log
 test.log
 ylwrap
 /resources/singular_resourcesconfig.h
+__pycache__
