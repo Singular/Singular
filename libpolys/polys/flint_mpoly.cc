@@ -65,6 +65,19 @@ BOOLEAN convSingRFlintR(nmod_mpoly_ctx_t ctx, const ring r)
 #if 1
 // memory allocation is not thread safe; singular polynomials must be constructed in serial
 
+/*
+    We agree the that result of a singular -> fmpq_mpoly conversion is
+    readonly. This restricts the usage of the result in flint functions to
+    const arguments. However, the real readonly conversion is currently only
+    implemented in the threaded conversion below since it requires a scan of
+    all coefficients anyways. The _fmpq_mpoly_clear_readonly_sing needs to
+    be provided for a consistent interface in the polynomial operations.
+*/
+static void _fmpq_mpoly_clear_readonly_sing(fmpq_mpoly_t a, fmpq_mpoly_ctx_t ctx)
+{
+    fmpq_mpoly_clear(a, ctx);
+}
+
 void convSingPFlintMP(fmpq_mpoly_t res, fmpq_mpoly_ctx_t ctx, poly p, int lp, const ring r)
 {
   fmpq_mpoly_init2(res, lp, ctx);
@@ -185,6 +198,35 @@ static void my_convSingNFlintN_QQ(fmpq_t f, number n)
     }
 }
 
+
+/*
+    In order that flint may sometimes borrow the large integer coeffs of
+    polynomials over QQ (borrow means: simply point to the same GMP structs
+    that singular has already allocated), we define the result of a
+    singular -> fmpq_mpoly conversion to be readonly. This means we agree
+    that
+        - it can only be used as an const argument to a flint function
+        - singular must not mutate the original coeffs while the readonly object is in use
+*/
+
+static void _fmpq_mpoly_clear_readonly_sing(fmpq_mpoly_t a, fmpq_mpoly_ctx_t ctx)
+{
+    if (fmpq_is_one(a->content))
+    {
+        if (a->zpoly->alloc > 0)
+        {
+            flint_free(a->zpoly->coeffs);
+            flint_free(a->zpoly->exps);
+        }
+
+        fmpq_clear(a->content);
+    }
+    else
+    {
+        fmpq_mpoly_clear(a, ctx);
+    }
+}
+
 /* singular -> fmpq_mpoly conversion */
 
 class convert_sing_to_fmpq_mpoly_base
@@ -196,24 +238,41 @@ public:
     const fmpq_mpoly_ctx_struct * ctx;
     std::vector<poly> markers;
     ring r;
+    fmpq_t content;
 
-    convert_sing_to_fmpq_mpoly_base(slong num_threads_, fmpq_mpoly_struct * res_,
-                             const fmpq_mpoly_ctx_struct * ctx_, const ring r_, poly p)
-      : num_threads(num_threads_),
+    convert_sing_to_fmpq_mpoly_base(fmpq_mpoly_struct * res_,
+                     const fmpq_mpoly_ctx_struct * ctx_, const ring r_, poly p)
+      : num_threads(0),
         res(res_),
         ctx(ctx_),
         r(r_)
     {
+        fmpq_t c;
+        fmpq_init(c);
+        fmpq_init(content);
+        fmpq_zero(content);
+
         length = 0;
         while (1)
         {
             if ((length % 4096) == 0)
+            {
+                my_convSingNFlintN_QQ(c, number(pGetCoeff(p)));
+                fmpq_gcd(content, content, c);
                 markers.push_back(p);
+            }
             if (p == NULL)
                 return;
             length++;
             pIter(p);
         }
+
+        fmpq_clear(c);
+    }
+
+    ~convert_sing_to_fmpq_mpoly_base()
+    {
+        fmpq_clear(content);
     }
 };
 
@@ -247,12 +306,21 @@ static void convert_sing_to_fmpq_mpoly_content_bits(void * varg)
     }
 
     flint_bitcnt_t required_bits = MPOLY_MIN_BITS;
-    fmpq_zero(arg->content);
+    fmpq_set(arg->content, base->content);
 
     while (idx < arg->end_idx)
     {
-        my_convSingNFlintN_QQ(c, number(pGetCoeff(p)));
-        fmpq_gcd(arg->content, arg->content, c);
+        number n = number(pGetCoeff(p));
+
+        if (fmpq_is_one(arg->content) && (SR_HDL(n)&SR_INT || n->s >= 3))
+        {
+            /* content is 1 and n is an integer, nothing to do */
+        }
+        else
+        {
+            my_convSingNFlintN_QQ(c, n);
+            fmpq_gcd(arg->content, arg->content, c);
+        }
 
         #if SIZEOF_LONG==8
         p_GetExpVL(p, (int64*)exp, base->r);
@@ -292,21 +360,57 @@ static void convert_sing_to_fmpq_mpoly_zpoly_worker(void * varg)
         idx++;
     }
 
+    slong N = mpoly_words_per_exp(base->res->zpoly->bits, base->ctx->zctx->minfo);
+    fmpz * res_coeffs = base->res->zpoly->coeffs;
+    ulong * res_exps = base->res->zpoly->exps;
+    flint_bitcnt_t res_bits = base->res->zpoly->bits;
+
     while (idx < arg->end_idx)
     {
-        my_convSingNFlintN_QQ(c, number(pGetCoeff(p)));
-        FLINT_ASSERT(!fmpq_is_zero(base->res->content));
-        fmpq_div(t, c, base->res->content);
-        FLINT_ASSERT(fmpz_is_one(fmpq_denref(t)));
+        if (fmpq_is_one(base->res->content))
+        {
+            // borrowing singular integers
+            // the entry res_coeffs[idx] is junk, we should just overwrite it
 
-        slong N = mpoly_words_per_exp(base->res->zpoly->bits, base->ctx->zctx->minfo);
-        fmpz_swap(base->res->zpoly->coeffs + idx, fmpq_numref(t));
+            number n = number(pGetCoeff(p));
+
+            if (SR_HDL(n)&SR_INT)
+            {
+                // n is a singular-small integer
+                res_coeffs[idx] = SR_TO_INT(n);
+            }
+            else if (n->s<3)
+            {
+                // n is an element of QQ \ ZZ, should not happen
+                assume(false);
+            }
+            else
+            {
+                // n is a singular-large integer, n may be flint-small
+                res_coeffs[idx] = PTR_TO_COEFF(n->z);
+                if (fmpz_fits_si(res_coeffs + idx))
+                {
+                    slong val = fmpz_get_si(res_coeffs + idx);
+                    if (val >= COEFF_MIN && val <= COEFF_MAX)
+                        res_coeffs[idx] = val;
+                }
+            }
+        }
+        else
+        {
+            my_convSingNFlintN_QQ(c, number(pGetCoeff(p)));
+            FLINT_ASSERT(!fmpq_is_zero(base->res->content));
+            fmpq_div(t, c, base->res->content);
+            FLINT_ASSERT(fmpz_is_one(fmpq_denref(t)));
+            fmpz_swap(res_coeffs + idx, fmpq_numref(t));
+        }
+
         #if SIZEOF_LONG==8
         p_GetExpVL(p, (int64*)exp, base->r);
-        mpoly_set_monomial_ui(base->res->zpoly->exps + N*idx, exp, base->res->zpoly->bits, base->ctx->zctx->minfo);
+        mpoly_set_monomial_ui(res_exps + N*idx, exp, res_bits, base->ctx->zctx->minfo);
         #else
         p_GetExpV(p, (int*)exp, base->r);
-        mpoly_set_monomial_ui(base->res->zpoly->exps + N*idx, &(exp[1]), base->res->zpoly->bits, base->ctx->minfo);
+        mpoly_set_monomial_ui(res_exps + N*idx, &(exp[1]), res_bits, base->ctx->minfo);
         #endif
 
         pIter(p);
@@ -323,9 +427,13 @@ void convSingPFlintMP(fmpq_mpoly_t res, fmpq_mpoly_ctx_t ctx, poly p, int lp, co
 {
     thread_pool_handle * handles;
     slong num_handles;
-    slong thread_limit = 1000;
+    slong thread_limit = 1000; // TODO: should be paramter to this function
 
-    /* get workers */
+    /* the constructor works out the length of p and sets some markers */
+    convert_sing_to_fmpq_mpoly_base base(res, ctx, r, p);
+
+    /* sensibly limit thread count and get workers */
+    thread_limit = FLINT_MIN(thread_limit, base.length/1024);
     handles = NULL;
     num_handles = 0;
     if (thread_limit > 1 && global_thread_pool_initialized)
@@ -339,14 +447,14 @@ void convSingPFlintMP(fmpq_mpoly_t res, fmpq_mpoly_ctx_t ctx, poly p, int lp, co
         }
     }
 
-    convert_sing_to_fmpq_mpoly_base base(num_handles + 1, res, ctx, r, p);
-
     /* fill in thread division points */
+    base.num_threads = 1 + num_handles;
     convert_sing_to_fmpq_mpoly_arg * args = new convert_sing_to_fmpq_mpoly_arg[base.num_threads];
     slong cur_idx = 0;
     for (slong i = 0; i < base.num_threads; i++)
     {
         slong next_idx = i + 1 < base.num_threads ? (i + 1)*base.length/base.num_threads : base.length;
+        FLINT_ASSERT(cur_idx <= base.length);
         next_idx = FLINT_MAX(next_idx, cur_idx);
         next_idx = FLINT_MIN(next_idx, base.length);
         args[i].base = &base;
@@ -366,22 +474,54 @@ void convSingPFlintMP(fmpq_mpoly_t res, fmpq_mpoly_ctx_t ctx, poly p, int lp, co
     for (slong i = 0; i <= num_handles; i++)
         required_bits = FLINT_MAX(required_bits, args[i].required_bits);
 
-    /* initialize res with optimal bits */
-    fmpq_mpoly_init3(res, base.length, mpoly_fix_bits(required_bits, ctx->zctx->minfo), ctx);
-
     /* sign of content should match sign of first coeff */
-    fmpq_zero(base.res->content);
+    fmpq_t content;
+    fmpq_init(content);
+    fmpq_zero(content);
     for (slong i = 0; i < base.num_threads; i++)
-        fmpq_gcd(base.res->content, base.res->content, args[i].content);
+        fmpq_gcd(content, content, args[i].content);
     if (p != NULL)
     {
         fmpq_t c;
         fmpq_init(c);
         my_convSingNFlintN_QQ(c, number(pGetCoeff(p)));
         if (fmpq_sgn(c) < 0)
-            fmpq_neg(base.res->content, base.res->content);
+            fmpq_neg(content, content);
         fmpq_clear(c);
     }
+
+    /* initialize res with optimal bits */
+    required_bits = mpoly_fix_bits(required_bits, ctx->zctx->minfo);
+    if (fmpq_is_one(content))
+    {
+        /* initialize borrowed coeffs */
+        slong N = mpoly_words_per_exp(required_bits, ctx->zctx->minfo);
+        slong alloc = base.length;
+        if (alloc != 0)
+        {
+            res->zpoly->coeffs = (fmpz *) flint_malloc(alloc*sizeof(fmpz));
+            res->zpoly->exps   = (ulong *) flint_malloc(alloc*N*sizeof(ulong));
+        }
+        else
+        {
+            res->zpoly->coeffs = NULL;
+            res->zpoly->exps = NULL;
+        }
+        res->zpoly->alloc = alloc;
+        res->zpoly->length = 0;
+        res->zpoly->bits = required_bits;
+
+        fmpq_init(res->content);
+        fmpq_one(res->content);
+    }
+    else
+    {
+        /* initialize coeffs that will be created and destroyed */
+        fmpq_mpoly_init3(res, base.length, required_bits, ctx);
+        fmpq_swap(res->content, content);
+    }
+
+    fmpq_clear(content);
 
     /* fill in res->zpoly */
     for (slong i = 0; i < num_handles; i++)
@@ -467,9 +607,10 @@ poly convFlintMPSingP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, const ring r)
 {
     thread_pool_handle * handles;
     slong num_handles;
-    slong thread_limit = 1000;
+    slong thread_limit = 1000;// TODO: should be paramter to this function
 
-    /* get workers */
+    /* sensibly limit threads and get workers */
+    thread_limit = FLINT_MIN(thread_limit, f->zpoly->length/1024);
     handles = NULL;
     num_handles = 0;
     if (thread_limit > 1 && global_thread_pool_initialized)
@@ -484,13 +625,13 @@ poly convFlintMPSingP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, const ring r)
     }
 
     convert_fmpq_mpoly_to_sing_base base(num_handles + 1, f, ctx, r);
-
     convert_fmpq_mpoly_to_sing_arg * args = new convert_fmpq_mpoly_to_sing_arg[base.num_threads];
     slong cur_idx = 0;
     for (slong i = 0; i < base.num_threads; i++)
     {
         slong next_idx = i + 1 < base.num_threads ? (i + 1)*base.f->zpoly->length/base.num_threads
                                                   : base.f->zpoly->length;
+        FLINT_ASSERT(cur_idx <= base.f->zpoly->length);
         next_idx = FLINT_MAX(next_idx, cur_idx);
         next_idx = FLINT_MIN(next_idx, base.f->zpoly->length);
         args[i].base = &base;
@@ -541,9 +682,9 @@ public:
     std::vector<poly> markers;
     ring r;
 
-    convert_sing_to_nmod_mpoly_base(slong num_threads_, nmod_mpoly_struct * res_,
-                            const nmod_mpoly_ctx_struct * ctx_, const ring r_, poly p)
-      : num_threads(num_threads_),
+    convert_sing_to_nmod_mpoly_base(nmod_mpoly_struct * res_,
+                     const nmod_mpoly_ctx_struct * ctx_, const ring r_, poly p)
+      : num_threads(0),
         res(res_),
         ctx(ctx_),
         r(r_)
@@ -623,18 +764,22 @@ static void convert_sing_to_nmod_mpoly_worker(void * varg)
         idx++;
     }
 
+    slong N = mpoly_words_per_exp(base->res->bits, base->ctx->minfo);
+    ulong * res_coeffs = base->res->coeffs;
+    ulong * res_exps = base->res->exps;
+    flint_bitcnt_t res_bits = base->res->bits;
+
     while (idx < arg->end_idx)
     {
-        slong N = mpoly_words_per_exp(base->res->bits, base->ctx->minfo);
         #if SIZEOF_LONG==8
         p_GetExpVL(p, (int64*)exp, base->r);
-        mpoly_set_monomial_ui(base->res->exps + N*idx, exp, base->res->bits, base->ctx->minfo);
+        mpoly_set_monomial_ui(res_exps + N*idx, exp, res_bits, base->ctx->minfo);
         #else
         p_GetExpV(p, (int*)exp, base->r);
-        mpoly_set_monomial_ui(base->res->exps + N*idx, &(exp[1]), base->res->bits, base->ctx->minfo);
+        mpoly_set_monomial_ui(res_exps + N*idx, &(exp[1]), res_bits, base->ctx->minfo);
         #endif
 
-        base->res->coeffs[idx] = (ulong)(number(pGetCoeff(p)));
+        res_coeffs[idx] = (ulong)(number(pGetCoeff(p)));
 
         pIter(p);
         idx++;
@@ -648,9 +793,13 @@ void convSingPFlintMP(nmod_mpoly_t res, nmod_mpoly_ctx_t ctx, poly p, int lp, co
 {
     thread_pool_handle * handles;
     slong num_handles;
-    slong thread_limit = 1000;
+    slong thread_limit = 1000; // TODO: should be paramter to this function
 
-    /* get workers */
+    /* the constructor works out the length of p and sets some markers */
+    convert_sing_to_nmod_mpoly_base base(res, ctx, r, p);
+
+    /* sensibly limit thread count and get workers */
+    thread_limit = FLINT_MIN(thread_limit, base.length/1024);
     handles = NULL;
     num_handles = 0;
     if (thread_limit > 1 && global_thread_pool_initialized)
@@ -664,15 +813,15 @@ void convSingPFlintMP(nmod_mpoly_t res, nmod_mpoly_ctx_t ctx, poly p, int lp, co
         }
     }
 
-    convert_sing_to_nmod_mpoly_base base(num_handles + 1, res, ctx, r, p);
-
     /* fill in thread division points */
+    base.num_threads = 1 + num_handles;
     convert_sing_to_nmod_mpoly_arg * args = new convert_sing_to_nmod_mpoly_arg[base.num_threads];
     slong cur_idx = 0;
     for (slong i = 0; i < base.num_threads; i++)
     {
         slong next_idx = i + 1 < base.num_threads ? (i + 1)*base.length/base.num_threads
                                                   : base.length;
+        FLINT_ASSERT(cur_idx <= base.length);
         next_idx = FLINT_MAX(next_idx, cur_idx);
         next_idx = FLINT_MIN(next_idx, base.length);
         args[i].base = &base;
@@ -776,9 +925,10 @@ poly convFlintMPSingP(nmod_mpoly_t f, nmod_mpoly_ctx_t ctx, const ring r)
 {
     thread_pool_handle * handles;
     slong num_handles;
-    slong thread_limit = 1000;
+    slong thread_limit = 1000; // TODO: should be paramter to this function
 
-    /* get workers */
+    /* sensibly limit threads and get workers */
+    thread_limit = FLINT_MIN(thread_limit, f->length/1024);
     handles = NULL;
     num_handles = 0;
     if (thread_limit > 1 && global_thread_pool_initialized)
@@ -793,13 +943,13 @@ poly convFlintMPSingP(nmod_mpoly_t f, nmod_mpoly_ctx_t ctx, const ring r)
     }
 
     convert_nmod_mpoly_to_sing_base base(num_handles + 1, f, ctx, r);
-
     convert_nmod_mpoly_to_sing_arg * args = new convert_nmod_mpoly_to_sing_arg[base.num_threads];
     slong cur_idx = 0;
     for (slong i = 0; i < base.num_threads; i++)
     {
         slong next_idx = i + 1 < base.num_threads ? (i + 1)*base.f->length/base.num_threads
                                                   : base.f->length;
+        FLINT_ASSERT(cur_idx <= base.f->length);
         next_idx = FLINT_MAX(next_idx, cur_idx);
         next_idx = FLINT_MIN(next_idx, base.f->length);
         args[i].base = &base;
@@ -844,14 +994,14 @@ poly convFlintMPSingP(nmod_mpoly_t f, nmod_mpoly_ctx_t ctx, const ring r)
 poly Flint_Mult_MP(poly p,int lp, poly q, int lq, fmpq_mpoly_ctx_t ctx, const ring r)
 {
   fmpq_mpoly_t pp,qq,res;
-  convSingPFlintMP(pp,ctx,p,lp,r);
-  convSingPFlintMP(qq,ctx,q,lq,r);
+  convSingPFlintMP(pp,ctx,p,lp,r); // pp read only
+  convSingPFlintMP(qq,ctx,q,lq,r); // qq read only
   fmpq_mpoly_init(res,ctx);
   fmpq_mpoly_mul(res,pp,qq,ctx);
   poly pres=convFlintMPSingP(res,ctx,r);
   fmpq_mpoly_clear(res,ctx);
-  fmpq_mpoly_clear(pp,ctx);
-  fmpq_mpoly_clear(qq,ctx);
+  _fmpq_mpoly_clear_readonly_sing(pp,ctx);
+  _fmpq_mpoly_clear_readonly_sing(qq,ctx);
   fmpq_mpoly_ctx_clear(ctx);
   p_Test(pres,r);
   return pres;
@@ -877,14 +1027,14 @@ poly Flint_Mult_MP(poly p,int lp, poly q, int lq, nmod_mpoly_ctx_t ctx, const ri
 poly Flint_Divide_MP(poly p,int lp, poly q, int lq, fmpq_mpoly_ctx_t ctx, const ring r)
 {
   fmpq_mpoly_t pp,qq,res;
-  convSingPFlintMP(pp,ctx,p,lp,r);
-  convSingPFlintMP(qq,ctx,q,lq,r);
+  convSingPFlintMP(pp,ctx,p,lp,r); // pp read only
+  convSingPFlintMP(qq,ctx,q,lq,r); // qq read only
   fmpq_mpoly_init(res,ctx);
   fmpq_mpoly_divides(res,pp,qq,ctx);
   poly pres = convFlintMPSingP(res,ctx,r);
   fmpq_mpoly_clear(res,ctx);
-  fmpq_mpoly_clear(pp,ctx);
-  fmpq_mpoly_clear(qq,ctx);
+  _fmpq_mpoly_clear_readonly_sing(pp,ctx);
+  _fmpq_mpoly_clear_readonly_sing(qq,ctx);
   fmpq_mpoly_ctx_clear(ctx);
   p_Test(pres,r);
   return pres;
@@ -933,8 +1083,8 @@ poly Flint_GCD_MP(poly p,int lp,poly q,int lq,nmod_mpoly_ctx_t ctx,const ring r)
 poly Flint_GCD_MP(poly p,int lp,poly q,int lq,fmpq_mpoly_ctx_t ctx,const ring r)
 {
   fmpq_mpoly_t pp,qq,res;
-  convSingPFlintMP(pp,ctx,p,lp,r);
-  convSingPFlintMP(qq,ctx,q,lq,r);
+  convSingPFlintMP(pp,ctx,p,lp,r); // pp read only
+  convSingPFlintMP(qq,ctx,q,lq,r); // qq read only
   fmpq_mpoly_init(res,ctx);
   int ok=fmpq_mpoly_gcd(res,pp,qq,ctx);
   poly pres;
@@ -958,8 +1108,8 @@ poly Flint_GCD_MP(poly p,int lp,poly q,int lq,fmpq_mpoly_ctx_t ctx,const ring r)
     pres=p_One(r);
   }
   fmpq_mpoly_clear(res,ctx);
-  fmpq_mpoly_clear(pp,ctx);
-  fmpq_mpoly_clear(qq,ctx);
+  _fmpq_mpoly_clear_readonly_sing(pp,ctx);
+  _fmpq_mpoly_clear_readonly_sing(qq,ctx);
   fmpq_mpoly_ctx_clear(ctx);
   return pres;
 }
