@@ -691,7 +691,7 @@ CanonicalForm mulFlintMP_Zp(const CanonicalForm& F,int lF, const CanonicalForm& 
   nmod_mpoly_init3(g,lG,bits,ctx);
   convFactoryPFlintMP(F,f,ctx,N);
   convFactoryPFlintMP(G,g,ctx,N);
-  nmod_mpoly_init3(res,lF+lG,bits+1,ctx);
+  nmod_mpoly_init(res,ctx);
   nmod_mpoly_mul(res,f,g,ctx);
   nmod_mpoly_clear(g,ctx);
   nmod_mpoly_clear(f,ctx);
@@ -712,7 +712,7 @@ CanonicalForm mulFlintMP_QQ(const CanonicalForm& F,int lF, const CanonicalForm& 
   fmpq_mpoly_init3(g,lG,bits,ctx);
   convFactoryPFlintMP(F,f,ctx,N);
   convFactoryPFlintMP(G,g,ctx,N);
-  fmpq_mpoly_init3(res,lF+lG,bits+1,ctx);
+  fmpq_mpoly_init(res,ctx);
   fmpq_mpoly_mul(res,f,g,ctx);
   fmpq_mpoly_clear(g,ctx);
   fmpq_mpoly_clear(f,ctx);
@@ -736,7 +736,7 @@ CanonicalForm gcdFlintMP_Zp(const CanonicalForm& F, const CanonicalForm& G)
   nmod_mpoly_init3(g,lg,bits,ctx);
   convFactoryPFlintMP(F,f,ctx,N);
   convFactoryPFlintMP(G,g,ctx,N);
-  nmod_mpoly_init3(res,lf,bits,ctx);
+  nmod_mpoly_init(res,ctx);
   int ok=nmod_mpoly_gcd(res,f,g,ctx);
   nmod_mpoly_clear(g,ctx);
   nmod_mpoly_clear(f,ctx);
