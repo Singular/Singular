@@ -28,7 +28,7 @@ def read_dictionary(filename):
     return dictionary
 
 
-def count_occurances(filename, dictionary):
+def count_occurances(filename, dictionary, normalise=True):
     """
     Create a vector from a dictionary and populate the counts according to
     a specified file
@@ -51,6 +51,8 @@ def count_occurances(filename, dictionary):
                 if word in vector.keys():
                     vector[word] = vector[word] + 1
             line = file.readline()
+    if normalise:
+        normalise_vector(vector)
     return vector
 
 
@@ -96,14 +98,10 @@ def vector_distance(vec1, vec2):
         print("Dictionaries don't have the same keys")
         return -1
 
-    nvec1 = copy_vector(vec1)
-    nvec2 = copy_vector(vec2)
-    normalise_vector(nvec1)
-    normalise_vector(nvec2)
 
     dist = 0
-    for key in nvec1:
-        dist = dist + (nvec1[key] - nvec2[key]) ** 2
+    for key in vec1:
+        dist = dist + (vec1[key] - vec2[key]) ** 2
 
     dist = math.sqrt(dist)
 
@@ -141,7 +139,9 @@ def main():
     print("normalised vector: " + str(testvector))
 
     vector1 = {"hello":3, "bye":4}
+    normalise_vector(vector1)
     vector2 = {"hello":4, "bye":3}
+    normalise_vector(vector2)
     print("distance same vector: " + str(vector_distance(vector1, vector1)))
     print("distance different vector: " + str(vector_distance(vector1, vector2)))
     print(vector1)

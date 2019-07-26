@@ -2,6 +2,9 @@
 Define the predictor class for classifying according to help page.
 """
 
+import cProfile
+import time
+
 # Third party imports
 import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
@@ -92,11 +95,17 @@ def main():
     print(prediction)
 
     dictionary = read_dictionary(KEYWORDS_FILE)
+    start = time.time()
     vectors, file_list = create_table(dictionary=dictionary)
+    end = time.time()
+    print(end - start, "seconds to create_table")
     test_vec = count_occurances("extract.lib", dictionary)
     predictor.fit(vectors, file_list)
+    start = time.time()
     prediction = predictor.predict(np.array([test_vec]))
+    end = time.time()
     print(prediction)
+    print(end - start, "seconds to make prediction")
 
 if __name__ == '__main__':
-    main()
+    cProfile.run("main()")

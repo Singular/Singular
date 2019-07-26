@@ -13,7 +13,8 @@ import numpy as np
 from six.moves import urllib
 
 # local imports
-from common.keyword_vector import count_occurances, read_dictionary
+from common.keyword_vector import count_occurances, read_dictionary, \
+        normalise_vector
 from common.constants import HELP_FILE_URL, HELP_FILE_PATH, SINGULAR_BIN, \
                         EXTRACT_SCRIPT, KEYWORDS_FILE, HELPFILE_NPY, \
                         VECTORS_NPY
@@ -63,13 +64,17 @@ def create_table(dictionary=read_dictionary(KEYWORDS_FILE)):
 
         for file in file_list:
             vector = count_occurances(os.path.join(HELP_FILE_PATH, "html",
-                                                   file), dictionary)
+                                                   file), 
+                                      dictionary, 
+                                      normalise=False)
             vectors.append(vector)
         vectors = np.array(vectors)
         np.save(VECTORS_NPY, vectors)
     else:
         vectors = np.load(VECTORS_NPY)
         file_list = np.load(HELPFILE_NPY)
+    for vector in vectors:
+        normalise_vector(vector)
 
     return (vectors, file_list)
 
