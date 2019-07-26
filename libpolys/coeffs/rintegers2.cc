@@ -514,6 +514,11 @@ static number nrzInitMPZ(mpz_t m, const coeffs)
   return (number)z;
 }
 
+static void nrzMPZ(mpz_t res, number &a, const coeffs)
+{
+  mpz_init_set(res, (mpz_ptr) a);
+}
+
 static number nrzFarey(number r, number N, const coeffs R)
 {
   number a0 = nrzCopy(N, R);
@@ -620,6 +625,7 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfExactDiv= nrzExactDiv;
   r->cfInit = nrzInit;
   r->cfInitMPZ = nrzInitMPZ;
+  r->cfMPZ = nrzMPZ;
   r->cfSize  = nrzSize;
   r->cfInt  = nrzInt;
   r->cfDivComp = nrzDivComp;
