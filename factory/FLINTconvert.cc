@@ -573,8 +573,7 @@ static void convFlint_RecPP ( const CanonicalForm & f, ulong * exp, nmod_mpoly_t
   }
   else
   {
-    int c=f.intval();
-    if (c<0) c+=getCharacteristic();
+    int c=f.intval(); // with Off(SW_SYMMETRIC_FF): 0<=c<p
     nmod_mpoly_push_term_ui_ui(result,c,exp,ctx);
   }
 }
@@ -607,7 +606,10 @@ void convFactoryPFlintMP ( const CanonicalForm & f, nmod_mpoly_t res, nmod_mpoly
   if (f.isZero()) return;
   ulong * exp = (ulong*)Alloc(N*sizeof(ulong));
   memset(exp,0,N*sizeof(ulong));
+  bool save_sym_ff= isOn (SW_SYMMETRIC_FF);
+  if (save_sym_ff) Off (SW_SYMMETRIC_FF);
   convFlint_RecPP( f, exp, res, ctx, N );
+  if (save_sym_ff) On(SW_SYMMETRIC_FF);
   Free(exp,N*sizeof(ulong));
 }
 
