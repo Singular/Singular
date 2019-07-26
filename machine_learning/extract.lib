@@ -5,14 +5,16 @@ list k = reservedNameList();
 int i;
 
 // create file, overwrite if exists
-write(":w test.txt", l[1]);
+write(":w keywords.txt", l[1]);
 
 // write entries from "names" procedure
 for (i = 1; i < size(l); i++) {
-	write(":a test.txt", l[i+1]);
+	write(":a keywords.txt", l[i+1]);
 }
 
 // write entries from "reservedNameList" procedure
 for (i = 1; i < size(k) + 1; i++) {
-	write(":a test.txt", l[i]);
+	write(":a keywords.txt", l[i]);
 }
+
+exit;

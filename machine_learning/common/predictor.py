@@ -21,6 +21,7 @@ class HelpPagePredictor(BaseEstimator, ClassifierMixin):
         self.vectors = None
         self.files = None
 
+
     def fit(self, X, y): # pylint: disable=invalid-name
         """
         Setup the correspondence of vectors to help-files
@@ -30,6 +31,7 @@ class HelpPagePredictor(BaseEstimator, ClassifierMixin):
         self.vectors = X
         self.files = y
         return self
+
 
     def predict(self, X): # pylint: disable=invalid-name
         """
@@ -55,19 +57,22 @@ class HelpPagePredictor(BaseEstimator, ClassifierMixin):
         return np.array(ret_list)
 
 
-if __name__ == '__main__':
+def main():
+    """
+    Run some basic tests
+    """
     print("Running some tests")
-    predictor = HelpPagePredictor() # pylint: disable=invalid-name
-    vector1 = {"hello":1, "bye":4, "pizza": 10} # pylint: disable=invalid-name
-    vector2 = {"hello":2, "bye":3, "pizza": 1} # pylint: disable=invalid-name
-    vector3 = {"hello":3, "bye":9, "pizza": 3} # pylint: disable=invalid-name
+    predictor = HelpPagePredictor()
+    vector1 = {"hello":1, "bye":4, "pizza": 10}
+    vector2 = {"hello":2, "bye":3, "pizza": 1}
+    vector3 = {"hello":3, "bye":9, "pizza": 3}
 
-    vectors = np.array([vector1, vector2, vector3]) # pylint: disable=invalid-name
-    files = np.array(["file1", "file2", "file3"]) # pylint: disable=invalid-name
+    vectors = np.array([vector1, vector2, vector3])
+    files = np.array(["file1", "file2", "file3"])
     print(vectors)
     print(files)
 
-    testvec = {"hello":1, "bye":1, "pizza": 1} # pylint: disable=invalid-name
+    testvec = {"hello":1, "bye":1, "pizza": 1}
 
     print("distance to 1")
     print(vector_distance(testvec, vector1))
@@ -80,5 +85,8 @@ if __name__ == '__main__':
     print()
 
     predictor.fit(vectors, files)
-    prediction = predictor.predict(np.array([testvec])) # pylint: disable=invalid-name
+    prediction = predictor.predict(np.array([testvec]))
     print(prediction)
+
+if __name__ == '__main__':
+    main()

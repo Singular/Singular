@@ -125,23 +125,29 @@ def normalise_vector(vec):
         vec[key] = (vec[key] + 0.0) / sum_vals
 
 
-if __name__ == '__main__':
+def main():
+    """
+    Run some basic tests
+    """
     if len(sys.argv) != 2:
         print("Usage: ")
         print(sys.argv[0] + " <dict_name>")
         sys.exit(1)
 
-    dic = read_dictionary(sys.argv[1]) # pylint: disable=invalid-name
+    dic = read_dictionary(sys.argv[1])
 
-    testvector = {"hello":3, "bye":4} # pylint: disable=invalid-name
+    testvector = {"hello":3, "bye":4}
     normalise_vector(testvector)
     print("normalised vector: " + str(testvector))
 
-    vector1 = {"hello":3, "bye":4} # pylint: disable=invalid-name
-    vector2 = {"hello":4, "bye":3} # pylint: disable=invalid-name
+    vector1 = {"hello":3, "bye":4}
+    vector2 = {"hello":4, "bye":3}
     print("distance same vector: " + str(vector_distance(vector1, vector1)))
     print("distance different vector: " + str(vector_distance(vector1, vector2)))
     print(vector1)
     print(vector2)
 
     print(count_occurances("../Singular/table.h", dic))
+
+if __name__ == '__main__':
+    main()
