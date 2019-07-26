@@ -119,3 +119,4 @@ ylwrap
 __pycache__
 keywords.txt
 helpfiles
+*.npy

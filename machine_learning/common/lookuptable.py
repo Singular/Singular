@@ -1,4 +1,5 @@
 """
+j
 A Module for fetching helpfiles, creating vectors for each and bundling
 these up in a lookup table.
 """
@@ -12,8 +13,8 @@ import numpy as np
 from six.moves import urllib
 
 # local imports
-from keyword_vector import count_occurances, read_dictionary
-from constants import HELP_FILE_URL, HELP_FILE_PATH, SINGULAR_BIN, \
+from common.keyword_vector import count_occurances, read_dictionary
+from common.constants import HELP_FILE_URL, HELP_FILE_PATH, SINGULAR_BIN, \
                         EXTRACT_SCRIPT, KEYWORDS_FILE, HELPFILE_NPY, \
                         VECTORS_NPY
 
@@ -50,12 +51,11 @@ def extract_keywords():
     os.system(SINGULAR_BIN + " " + EXTRACT_SCRIPT)
 
 
-def create_table():
+def create_table(dictionary=read_dictionary(KEYWORDS_FILE)):
     """
     Get a list of helpfiles, and generate a word occurance vector for each.
     """
-    vectors = []
-    dictionary = read_dictionary(KEYWORDS_FILE)
+    vectors = [] 
 
     if not os.path.isfile(VECTORS_NPY) or not os.path.isfile(HELPFILE_NPY):
         file_list = np.array(get_list_of_htm_files())

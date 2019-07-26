@@ -7,7 +7,10 @@ import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 
 # Local imports
-from keyword_vector import vector_distance
+from common.keyword_vector import vector_distance, count_occurances, \
+                                    read_dictionary
+from common.lookuptable import create_table
+from common.constants import KEYWORDS_FILE
 
 
 class HelpPagePredictor(BaseEstimator, ClassifierMixin):
@@ -86,6 +89,13 @@ def main():
 
     predictor.fit(vectors, files)
     prediction = predictor.predict(np.array([testvec]))
+    print(prediction)
+
+    dictionary = read_dictionary(KEYWORDS_FILE)
+    vectors, file_list = create_table(dictionary=dictionary)
+    test_vec = count_occurances("extract.lib", dictionary)
+    predictor.fit(vectors, file_list)
+    prediction = predictor.predict(np.array([test_vec]))
     print(prediction)
 
 if __name__ == '__main__':
