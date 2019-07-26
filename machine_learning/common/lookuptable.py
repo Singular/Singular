@@ -52,11 +52,13 @@ def extract_keywords():
     os.system(SINGULAR_BIN + " " + EXTRACT_SCRIPT)
 
 
-def create_table(dictionary=read_dictionary(KEYWORDS_FILE)):
+def create_table(dictionary=None):
     """
     Get a list of helpfiles, and generate a word occurance vector for each.
     """
-    vectors = [] 
+    if dictionary is None:
+        dictionary = read_dictionary(KEYWORDS_FILE)
+    vectors = []
 
     if not os.path.isfile(VECTORS_NPY) or not os.path.isfile(HELPFILE_NPY):
         file_list = np.array(get_list_of_htm_files())
@@ -64,8 +66,8 @@ def create_table(dictionary=read_dictionary(KEYWORDS_FILE)):
 
         for file in file_list:
             vector = count_occurances(os.path.join(HELP_FILE_PATH, "html",
-                                                   file), 
-                                      dictionary, 
+                                                   file),
+                                      dictionary,
                                       normalise=False)
             vectors.append(vector)
         vectors = np.array(vectors)
