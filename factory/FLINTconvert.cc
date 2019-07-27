@@ -162,8 +162,7 @@ void convertCF2Fmpq (fmpq_t result, const CanonicalForm& f)
   //ASSERT (isOn (SW_RATIONAL), "expected rational");
   if (f.isImm ())
   {
-    fmpz_set_si (fmpq_numref (result), f.intval());
-    fmpz_set_si (fmpq_denref (result), 1);
+    fmpq_set_si (result, f.intval(), 1);
   }
   else if(f.inQ())
   {
@@ -181,7 +180,7 @@ void convertCF2Fmpq (fmpq_t result, const CanonicalForm& f)
     f.mpzval(gmp_val);
     fmpz_set_mpz (fmpq_numref (result), gmp_val);
     mpz_clear (gmp_val);
-    fmpz_set_si (fmpq_denref (result), 1);
+    fmpz_one(fmpq_denref(result));
   }
   else
   {
