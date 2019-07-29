@@ -36,13 +36,13 @@ def count_occurances(filename, dictionary, normalise=True):
     """
     if not os.path.isfile(filename):
         print("Please provide a valid input file as argument")
-        return {}
+        return []
     if dictionary == []:
         print("Please provide a valid dictionary as argument")
-        return {}
+        return []
     if dictionary is None:
         print("Please provide a valid dictionary as argument")
-        return {}
+        return []
     vector = create_vector_dictionary(dictionary)
     with open(filename, "r+") as file:
         line = file.readline()
@@ -84,6 +84,8 @@ def create_vector_dictionary(dictionary):
     """
     Create a zero vector for a given dictionary
     """
+    assert not dictionary == None, "Please give a dictionary"
+    assert not len(dictionary) == 0, "Please give a dictionary"
     vector = {}
     for word in dictionary:
         vector[word] = 0
@@ -98,8 +100,7 @@ def vector_distance(vec1, vec2):
         print("Vectors don't have the same sizes")
         return -1
 
-    diff_vec = vec1 - vec2
-    dist = np.linalg.norm(diff_vec)
+    dist = np.linalg.norm(vec1 - vec2)
 
     return dist
 
