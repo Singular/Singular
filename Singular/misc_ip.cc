@@ -713,7 +713,7 @@ BOOLEAN setOption(leftv res, leftv v)
   } while (v!=NULL);
 
    // set global variable to show memory usage
-  int om_sing_opt_show_mem;
+  extern int om_sing_opt_show_mem;
   if (BVERBOSE(V_SHOW_MEM)) om_sing_opt_show_mem = 1;
   else om_sing_opt_show_mem = 0;
 
@@ -1410,8 +1410,8 @@ void siInit(char *name)
     //IDDATA(h)=(char*)nInitChar(n_R,NULL);
     //h=enterid("CC",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
     //IDDATA(h)=(char*)nInitChar(n_long_C,NULL);
-    n_coeffType t;
 #ifdef SINGULAR_4_2
+    n_coeffType t;
     t=nRegister(n_unknown,n_AEInitChar);
     if (t!=n_unknown)
     {

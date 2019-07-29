@@ -1612,6 +1612,13 @@ poly p_DivideM(poly a, poly b, const ring r)
   return result;
 }
 
+poly pp_DivideM(poly a, poly b, const ring r)
+{
+  if (a==NULL) { return NULL; }
+  // TODO: better implementation without copying a,b
+  return p_DivideM(p_Copy(a,r),p_Head(b,r),r);
+}
+
 #ifdef HAVE_RINGS
 /* TRUE iff LT(f) | LT(g) */
 BOOLEAN p_DivisibleByRingCase(poly f, poly g, const ring r)

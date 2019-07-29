@@ -110,6 +110,7 @@ KEYWORDS:       Intersection theory; Enumerative geometry; Schubert calculus;
 LIB "general.lib";
 LIB "homolog.lib";
 LIB "parallel.lib";
+LIB "ring.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
 /////////// create new objects in this library  ////////////////////////////////
@@ -1906,7 +1907,7 @@ EXAMPLE:    example projectiveSpace; shows examples
     }
     variety P;
     P.dimension = n;
-    execute("ring r = 0, ("+h+"), wp(1);");
+    ring r = create_ring(0, "("+h+")", "wp(1)");
     setring r;
     P.baseRing = r;
     ideal rels = var(1)^(n+1);
@@ -1964,7 +1965,7 @@ EXAMPLE:    example projectiveBundle; shows examples
     int r = rankSheaf(S);
     A.dimension = r - 1 + B.dimension;
     poly c = totalChernClass(S);
-    execute("ring P = 0, ("+z+"), wp(1);");
+    ring P = create_ring(0, "("+z+")", "wp(1)");
     def CR = P + R;
     setring CR;
     A.baseRing = CR;

@@ -82,8 +82,8 @@ void printBlackboxTypes();
 
 /// struct for containing list of blackbox names and the number of them.  
 struct blackbox_list {
-	int count = 0;
-	void **list = NULL;
+	int count;
+	void **list;
 };
 
 /// return array of all define types.

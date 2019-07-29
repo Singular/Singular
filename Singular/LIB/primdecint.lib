@@ -31,6 +31,7 @@ KEYWORDS: primary decomposition
 ";
 
 LIB "primdec.lib";
+LIB "ring.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1110,7 +1111,7 @@ static proc extractZ(ideal J, int j, list L, list B)
       {
          //=== if u in x is an independent set of L then we compute a Groebner
          //=== Basis in Z[u][x-u]
-         execute("ring S=integer,("+L[1][1]+"),lp;");
+         ring S = create_ring(list("integer"), "("+L[1][1]+")", "lp");
          ideal I=imap(R,I);
          I=stdZ(I);
          list rl=ringlist(S);
@@ -1240,7 +1241,7 @@ static proc quotientOneZ(ideal I, poly f)
    //ideal K=intersect(I,ideal(f));
    //=== K[i]/f; does not work in rings with integer! This should be replaced
    //=== later
-   execute("ring Rhelp=0,("+varstr(R)+"),dp;");
+   ring Rhelp = create_ring(0, "("+varstr(R)+")", "dp");
    ideal K=imap(R,K);
    poly f=imap(R,f);
    ASSUME(1, ncols(K)==size(K) || size(K)==0 ); // postcondition intersectZ
@@ -1281,7 +1282,7 @@ static proc reduceZ(poly f, ideal I)
    if(f==0){return(f);}
    if (not attrib(I,"isSB") ) { print ("// ** I is no standard basis"); }
    def R=basering;
-   execute("ring Rhelp=0,("+varstr(R)+"),dp;");
+   ring Rhelp = create_ring(0, "("+varstr(R)+")", "dp");
    ideal I=imap(R,I);
    poly f=imap(R,f);
    int i,j;
@@ -1433,7 +1434,7 @@ static proc extractZM(list M, list L)
       {
          //=== if u in x is an independent set of L then we compute a Groebner
          //=== Basis in Z[u][x-u]
-         execute("ring S=integer,("+L[1][1]+"),lp;");
+         ring S = create_ring(list("integer"), "("+L[1][1]+")", "lp");
          module I=imap(R,I);
          I=std(I);
          list rl=ringlist(S);

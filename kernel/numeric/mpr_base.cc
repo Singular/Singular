@@ -2397,7 +2397,7 @@ void resMatrixDense::generateBaseData()
 
       // compute row poly
       poly pi= ppMult_qq( (gls->m)[ resVectorList[k].elementOfS ] , resVectorList[k].mon );
-      pi= pDivideM( pCopy( pi ), pCopy( resVectorList[k].dividedBy ) );
+      pi= pp_DivideM( pi, resVectorList[k].dividedBy, currRing  );
 
       // fill in "matrix"
       while ( pi != NULL )
@@ -2429,7 +2429,7 @@ void resMatrixDense::generateBaseData()
       resVectorList[k].numColParNr= (int *)omAlloc0( ((currRing->N)+1) * sizeof(int) );
 
       pi= (gls->m)[ resVectorList[k].elementOfS ];
-      factor= pDivideM( pCopy( resVectorList[k].mon ), pCopy( resVectorList[k].dividedBy ) );
+      factor= pp_DivideM( resVectorList[k].mon, resVectorList[k].dividedBy, currRing );
 
       j=0;
       while ( pi  != NULL )

@@ -80,7 +80,7 @@ static proc stdtrans(ideal I)
     os[j..j+1]="  ";
   }
 
-  execute("ring @S="+charstr(@R)+",(gmspoly,"+varstr(@R)+"),(c,dp,"+os+");");
+  ring @S = create_ring(ringlist(@R)[1], "(gmspoly,"+varstr(@R)+")", "(c,dp(1),"+os+")", "no_minpoly");
 
   ideal I=homog(imap(@R,I),gmspoly);
   module M=transpose(transpose(I)+freemodule(ncols(I)));

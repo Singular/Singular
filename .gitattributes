@@ -4,6 +4,4 @@
 /doc/ export-ignore
 /factory/old/ export-ignore
 /old_modgen/ export-ignore
-/clone_autogen_generated_stuff.sh export-ignore
 /git-archive export-ignore
-

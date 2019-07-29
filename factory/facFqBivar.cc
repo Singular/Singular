@@ -6882,14 +6882,14 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
 
 #ifdef HAVE_FLINT
   nmod_mat_t FLINTN;
-#else
+#endif
+
   if (fac_NTL_char != getCharacteristic())
   {
     fac_NTL_char= getCharacteristic();
     zz_p::init (getCharacteristic());
   }
   mat_zz_p NTLN;
-#endif
 
   if (alpha.level() != 1)
   {
@@ -6897,6 +6897,7 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     zz_pE::init (NTLMipo);
   }
   mat_zz_pE NTLNe;
+
   if (alpha.level() == 1)
   {
 #ifdef HAVE_FLINT

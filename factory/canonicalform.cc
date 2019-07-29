@@ -16,6 +16,7 @@
 #include "imm.h"
 #include "gfops.h"
 #include "facMul.h"
+#include "facAlgFuncUtil.h"
 #include "FLINTconvert.h"
 
 #ifndef NOSTREAMIO
@@ -706,6 +707,32 @@ CanonicalForm::operator *= ( const CanonicalForm & cf )
         value = value->mulcoeff( cf.value );
     else  if ( value->level() == cf.value->level() ) {
 #if (HAVE_NTL && HAVE_FLINT && __FLINT_RELEASE >= 20400)
+#if (__FLINT_RELEASE >= 20503)
+        int l_this,l_cf,m=1;
+        if ((getCharacteristic()>0)
+        && (CFFactory::gettype() != GaloisFieldDomain)
+        &&(!hasAlgVar(*this))
+        &&(!hasAlgVar(cf))
+        &&((l_cf=size_maxexp(cf,m))>10)
+        &&((l_this=size_maxexp(*this,m))>10)
+        )
+        {
+          *this=mulFlintMP_Zp(*this,l_this,cf,l_cf,m);
+        }
+        else
+	/*-----------------------------------------------------*/
+        if ((getCharacteristic()==0)
+        &&(!hasAlgVar(*this))
+        &&(!hasAlgVar(cf))
+        &&((l_cf=size_maxexp(cf,m))>10)
+        &&((l_this=size_maxexp(*this,m))>10)
+        )
+        {
+          *this=mulFlintMP_QQ(*this,l_this,cf,l_cf,m);
+        }
+        else
+#endif
+
         if (value->levelcoeff() == cf.value->levelcoeff() && cf.isUnivariate() && (*this).isUnivariate())
         {
           if (value->level() < 0 || CFFactory::gettype() == GaloisFieldDomain || (size (cf) <= 10 || size (*this) <= 10) )

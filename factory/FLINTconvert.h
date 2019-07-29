@@ -249,5 +249,11 @@ convertFLINTFq_nmod_poly_factor2FacCFFList (const fq_nmod_poly_factor_t fac, ///
 #endif
 
 
+#if __FLINT_RELEASE >= 20503
+CanonicalForm mulFlintMP_Zp(const CanonicalForm& F,int lF, const CanonicalForm& Gi, int lG, int m);
+CanonicalForm mulFlintMP_QQ(const CanonicalForm& F,int lF, const CanonicalForm& Gi, int lG, int m);
+CanonicalForm gcdFlintMP_Zp(const CanonicalForm& F, const CanonicalForm& G);
+CanonicalForm gcdFlintMP_QQ(const CanonicalForm& F, const CanonicalForm& G);
+#endif
 #endif
 #endif

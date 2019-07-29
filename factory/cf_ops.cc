@@ -624,8 +624,7 @@ size ( const CanonicalForm & f, const Variable & v )
  * Returns one if f is in an coefficient domain.
  *
 **/
-int
-size ( const CanonicalForm & f )
+int size ( const CanonicalForm & f )
 {
     if ( f.inCoeffDomain() )
         return 1;
@@ -635,6 +634,21 @@ size ( const CanonicalForm & f )
         CFIterator i;
         for ( i = f; i.hasTerms(); i++ )
             result += size( i.coeff() );
+        return result;
+    }
+}
+
+int size_maxexp ( const CanonicalForm & f, int& maxexp )
+{
+    if ( f.inCoeffDomain() )
+        return 1;
+    else
+    {
+        if (f.degree()>maxexp) maxexp=f.degree();
+        int result = 0;
+        CFIterator i;
+        for ( i = f; i.hasTerms(); i++ )
+            result += size_maxexp( i.coeff(), maxexp );
         return result;
     }
 }

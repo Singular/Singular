@@ -4,15 +4,16 @@ list l = names();
 list k = reservedNameList();
 int i;
 
+// combine lists, leaving out the first entry of l, which is "l"
+list combined = delete(l, 1) + k;
+
 // create file, overwrite if exists
-write(":w test.txt", l[1]);
+write(":w keywords.txt", combined[1]);
 
-// write entries from "names" procedure
-for (i = 1; i < size(l); i++) {
-	write(":a test.txt", l[i+1]);
+
+// write remaining entries to file
+for (i = 2; i < size(combined) + 1; i++) {
+	write(":a keywords.txt", combined[i]);
 }
 
-// write entries from "reservedNameList" procedure
-for (i = 1; i < size(k) + 1; i++) {
-	write(":a test.txt", l[i]);
-}
+exit;

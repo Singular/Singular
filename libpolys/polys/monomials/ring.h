@@ -408,7 +408,7 @@ static inline BOOLEAN rIsPluralRing(const ring r)
 static inline BOOLEAN rIsLPRing(const ring r)
 {
   assume(r != NULL);
-#ifdef HAVE_SHIFTBBA
+#if defined(HAVE_PLURAL) && defined(HAVE_SHIFTBBA)
   return (r->isLPring!=0);
 #else
   return FALSE;
@@ -417,7 +417,11 @@ static inline BOOLEAN rIsLPRing(const ring r)
 
 static inline BOOLEAN rIsNCRing(const ring r)
 {
+#ifdef HAVE_PLURAL
   return rIsLPRing(r) || rIsPluralRing(r);
+#else
+  return FALSE;
+#endif
 }
 
 static inline BOOLEAN rIsRatGRing(const ring r)
@@ -466,8 +470,11 @@ BOOLEAN rSamePolyRep(ring r1, ring r2);
 
 void   rUnComplete(ring r);
 
-BOOLEAN rRing_is_Homog(ring r);
-BOOLEAN rRing_has_CompLastBlock(ring r);
+BOOLEAN rRing_is_Homog(const ring r);
+BOOLEAN rRing_has_CompLastBlock(const ring r);
+BOOLEAN rRing_ord_pure_dp(const ring r);
+BOOLEAN rRing_ord_pure_Dp(const ring r);
+BOOLEAN rRing_ord_pure_lp(const ring r);
 
 #ifdef HAVE_RINGS
 static inline BOOLEAN rField_is_Ring_2toM(const ring r)

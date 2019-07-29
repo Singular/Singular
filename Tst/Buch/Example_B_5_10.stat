@@ -1,4 +1,4 @@
-1 >> tst_memory_0 :: 1184759752:2007071811:3-0-3:ix86-Linux:nepomuck:170748 1292524760:3120- 13145 :3-1-2:ix86-Linux:mamawutz:177828
-1 >> tst_memory_1 :: 1184759752:2007071811:3-0-3:ix86-Linux:nepomuck:705860 1292524760:3120- 13145 :3-1-2:ix86-Linux:mamawutz:667336
-1 >> tst_memory_2 :: 1184759752:2007071811:3-0-3:ix86-Linux:nepomuck:705860 1292524760:3120- 13145 :3-1-2:ix86-Linux:mamawutz:700120
-1 >> tst_timer_1 :: 1184759752:2007071811:3-0-3:ix86-Linux:nepomuck:3 1292524760:3120- 13145 :3-1-2:ix86-Linux:mamawutz:8
+1 >> tst_memory_0 :: 1563549933:4120, 64 bit:4.1.2:x86_64-Linux:nepomuck:94032
+1 >> tst_memory_1 :: 1563549933:4120, 64 bit:4.1.2:x86_64-Linux:nepomuck:2150192
+1 >> tst_memory_2 :: 1563549933:4120, 64 bit:4.1.2:x86_64-Linux:nepomuck:2191296
+1 >> tst_timer_1 :: 1563549933:4120, 64 bit:4.1.2:x86_64-Linux:nepomuck:4

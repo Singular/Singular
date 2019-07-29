@@ -1011,21 +1011,22 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
   poly b;
   if (v->next==NULL)
   {
-    a=(poly)u->CopyD(POLY_CMD); // works also for VECTOR_CMD
     if (u->next==NULL)
     {
-      b=(poly)v->CopyD(POLY_CMD); // works also for VECTOR_CMD
+      a=(poly)u->Data(); // works also for VECTOR_CMD
+      b=(poly)v->Data(); // works also for VECTOR_CMD
       if ((a!=NULL) && (b!=NULL)
       && ((long)pTotaldegree(a)>si_max((long)rVar(currRing),(long)currRing->bitmask/2)-(long)pTotaldegree(b)))
       {
         Warn("possible OVERFLOW in mult(d=%ld, d=%ld, max=%ld)",
           pTotaldegree(a),pTotaldegree(b),currRing->bitmask/2);
       }
-      res->data = (char *)(pMult( a, b));
+      res->data = (char *)(pp_Mult_qq( a, b, currRing));
       pNormalize((poly)res->data);
       return FALSE;
     }
     // u->next exists: copy v
+    a=(poly)u->CopyD(POLY_CMD); // works also for VECTOR_CMD
     b=pCopy((poly)v->Data());
     if ((a!=NULL) && (b!=NULL)
     && (pTotaldegree(a)+pTotaldegree(b)>si_max((long)rVar(currRing),(long)currRing->bitmask/2)))
@@ -1282,10 +1283,10 @@ static BOOLEAN jjDIV_N(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
 {
-  poly q=(poly)v->CopyD();
-  poly p=(poly)(u->CopyD());
-  res->data=(void*)(p_Divide(p /*(poly)(u->CopyD())*/ ,
-                                         q /*(poly)(v->CopyD())*/ ,currRing));
+  poly q=(poly)v->Data();
+  poly p=(poly)(u->Data());
+  res->data=(void*)(pp_Divide(p /*(poly)(u->Data())*/ ,
+                                         q /*(poly)(v->Data())*/ ,currRing));
   if (res->data!=NULL) pNormalize((poly)res->data);
   return errorreported; /*there may be errors in p_Divide: div. ny 0, etc.*/
 }
@@ -1312,7 +1313,7 @@ static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
                                            q /*(poly)(v->Data())*/, currRing );
       }
       else
-        MATELEM(mm,i,j) = pDivideM(pCopy(MATELEM(m,i,j)),pHead(q));
+        MATELEM(mm,i,j) = pp_DivideM(MATELEM(m,i,j),q,currRing);
     }
   }
   id_Normalize((ideal)mm,currRing);
@@ -4958,6 +4959,11 @@ static BOOLEAN jjROWS_IV(leftv res, leftv v)
 static BOOLEAN jjRPAR(leftv res, leftv v)
 {
   res->data = (char *)(long)rPar(((ring)v->Data()));
+  return FALSE;
+}
+static BOOLEAN jjS2I(leftv res, leftv v)
+{
+  res->data = (char *)(long)atoi((char*)v->Data());
   return FALSE;
 }
 static BOOLEAN jjSLIM_GB(leftv res, leftv u)

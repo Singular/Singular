@@ -46,7 +46,7 @@ int     IsCmd(const char *n, int & tok);
 
 BOOLEAN iiPStart(idhdl pn, leftv sl);
 BOOLEAN iiEStart(char* example, procinfo *pi);
-BOOLEAN iiAllStart(procinfov pi, char *p,feBufferTypes t, int l);
+BOOLEAN iiAllStart(procinfov pi, const char *p,feBufferTypes t, int l);
 void    type_cmd(leftv v);
 void    test_cmd(int i);
 void    list_cmd(int typ, const char* what, const char * prefix,

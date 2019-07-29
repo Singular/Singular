@@ -559,7 +559,7 @@ EXAMPLE: example elimpartanyr; shows an example
    }
    if ( size(b) != 0 ) { b = b[1,size(b)-1]; }
    else { a = a[1,size(a)-1]; }
-   execute("ring gnir ="+charstr(P)+",("+a+b+"),dp;");
+   ring gnir = create_ring(ringlist(P)[1], "("+a+b+")", "dp", "no_minpoly");
    ideal i = imap(P,i);
    list L = elimpart(i,n,e)+list(n);
    setring P;
@@ -612,7 +612,7 @@ EXAMPLE: example fastelim; shows an example.
 //---------------- create new ring with remaining variables -------------------
    string newvar = string(L[4]);
    L = L[1],p;
-   execute("ring r1=("+charstr(P)+"),("+newvar+"),"+"dp;");
+   ring r1 = create_ring(ringlist(P)[1], "("+newvar+")", "dp", "no_minpoly");
    list L = imap(P,L);
 //------------------- find "best" ordering of variables  ----------------------
    newvar = string(maxideal(1));
@@ -639,7 +639,7 @@ EXAMPLE: example fastelim; shows an example.
 //------- h!=0: homogenize and compute Hilbert series using hilbvec ----------
    {
       intvec hi = hilbvec(L[1]);         // Hilbert series of i
-      execute("ring r2=("+charstr(P)+"),("+varstr(basering)+",@homo),dp;");
+      ring r2 = create_ring(ringlist(P)[1], "("+varstr(basering)+",@homo)", "dp", "no_minpoly");
       list L = imap(r1,L);
       L[1] = homog(L[1],@homo);          // @homo = homogenizing var
 //---- use Hilbert-series to eliminate variables with Hilbert-driven std -----
@@ -728,7 +728,7 @@ EXAMPLE: example faststd; shows an example.
 //-------------------- nosort: create ring with new name ----------------------
    if ( @s==0 )
    {
-      execute("ring @S1 =("+charstr(@P)+"),("+varstr(@P)+"),("+@o+");");
+      ring @S1 = create_ring(ringlist(@P)[1], "("+varstr(@P)+")", "("+@o+")", "no_minpoly");
       def STD_id = imap(@P,@id);
       if ( @h==0 ) { STD_id = std(STD_id); }
    }
@@ -750,7 +750,7 @@ EXAMPLE: example faststd; shows an example.
 // this uses another standardbasis computation
    if ( @h != 0 )
    {
-      execute("ring @Q=("+charstr(@P)+"),("+varstr(@P)+",@homo),("+@o+");");
+      ring @Q = create_ring(ringlist(@P)[1], "("+varstr(@P)+",@homo)", "("+@o+")", "no_minpoly");
       def @id = imap(@P,@id);
       @id = homog(@id,@homo);               // @homo = homogenizing var
       if ( @s != 0 )
@@ -781,7 +781,7 @@ EXAMPLE: example faststd; shows an example.
          else { @o = @o[1,size(@o)-8] + @o[size(@o)-1,2]; }
       }
       kill @S1;
-      execute("ring @S1=("+charstr(@Q)+"),("+@va+"),("+@o+");");
+      ring @S1 = create_ring(ringlist(@Q)[1], "("+@va+")", "("+@o+")", "no_minpoly");
       def STD_id = imap(@Q,@id);
    }
    attrib(STD_id,"isSB",1);
@@ -894,7 +894,7 @@ EXAMPLE: example hilbvec; shows an example
    if ( size(#) == 1 ) {  @c = #[1]; }
    if ( size(#) == 2 ) {  @c = #[1]; @o = #[2]; }
    string @si = typeof(@id)+" @i = "+string(@id)+";";  //** weg
-   execute("ring @r=("+@c+"),("+varstr(basering)+"),("+@o+");");
+   ring @r = create_ring("("+@c+")", "("+varstr(basering)+")", "("+@o+")");
    //**def i = imap(P,@id);
    execute(@si);                   //** weg
    //show(basering);
@@ -958,7 +958,7 @@ EXAMPLE: example tolessvars; shows an example
    }
    if ( size(#) ==1 ) { s2=#[1]; }
    dbprint( pr,"","// variables which did not occur:",L[3] );
-   execute("ring S1=("+charstr(P)+"),("+newvar+"),("+s2+");");
+   ring S1 = create_ring(ringlist(P)[1], "("+newvar+")", "("+s2+")", "no_minpoly");
    def IMAG = imap(P,id);
    export IMAG;
    dbprint(printlevel-voice+3,"
@@ -1100,7 +1100,7 @@ EXAMPLE: example sortandmap; shows an example
       }
    }
    @o=@o[1..size(@o)-1];
-   execute("ring @S1 =("+charstr(@P)+"),("+@va+"),("+@o+");");
+   ring @S1 = create_ring(ringlist(@P)[1], "("+@va+")", "("+@o+")", "no_minpoly");
    def IMAG = imap(@P,@id);
    export IMAG;
    dbprint(printlevel-voice+3,"

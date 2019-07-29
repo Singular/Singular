@@ -2563,9 +2563,7 @@ EXAMPLE: example equidimMax; shows an example
   }
 
   indep=maxIndependSet(j);
-
-  execute("ring gnir1 = ("+charstr(basering)+"),("+indep[1][1]+"),("
-                              +indep[1][2]+");");
+  ring gnir1 = create_ring(ringlist(basering)[1],"("+indep[1][1]+")","("+indep[1][2]+")","no_minpoly");
   if(homo==1)
   {
      ideal j=std(imap(gnir,j),hil,w);
@@ -3111,7 +3109,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
       }
       newva[size(newva)]=")";
       newma[size(newma)]=";";
-      execute("ring @deirf=("+charstr(gnir)+"),("+newva+",lp;");
+      ring @deirf = create_ring(ringlist(gnir)[1],"("+newva,"lp","no_minpoly");
       execute("map @kappa=gnir,"+newma);
       ideal @j= @kappa(@j);
       @j=std(@j);
@@ -3336,8 +3334,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
       {
         @j=fetch(@P,i);
       }
-      execute("ring gnir1 = ("+charstr(basering)+"),("+indep[@m][1]+"),("
-                              +indep[@m][2]+");");
+      ring gnir1 = create_ring(ringlist(basering)[1],"("+indep[@m][1]+")","("+indep[@m][2]+")","no_minpoly");
       execute("map phi=gnir,"+@va+";");
       op=option(get);
       option(redSB);
@@ -3645,8 +3642,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
         else
         {
           @va=string(maxideal(1));
-          execute("ring gnir1 = ("+charstr(basering)+"),("+
-                      restindep[@m][1]+"),(" +restindep[@m][2]+");");
+          ring gnir1 = create_ring(ringlist(basering)[1],"("+restindep[@m][1]+")","("+restindep[@m][2]+")","no_minpoly");
           execute("map phi=gnir,"+@va+";");
           op=option(get);
           option(redSB);
@@ -4613,7 +4609,7 @@ static proc min_ass_prim_charsets1_i (int patchPrimaryDecomposition, ideal PS)
   intvec op;
   def oldring=basering;
   string n=system("neworder",PS);
-  execute("ring r=("+charstr(oldring)+"),("+n+"),dp;");
+  ring r = create_ring(ringlist(oldring)[1],"("+n+")","dp","no_minpoly");
   ideal PS=imap(oldring,PS);
   matrix m=char_series(PS);  // We compute an irreducible
                              // characteristic series
@@ -4628,7 +4624,7 @@ static proc min_ass_prim_charsets1_i (int patchPrimaryDecomposition, ideal PS)
     n=string(var(nvars(oldring)));
     for(i=1;i<nvars(oldring);i++) { n=n+","+string(var(i)); }
     kill r;
-    execute("ring r=("+charstr(oldring)+"),("+n+"),dp;");
+    ring r = create_ring(ringlist(oldring)[1],"("+n+")","dp","no_minpoly");
     ideal PS=imap(oldring,PS);
     matrix m=char_series(PS);
   }
@@ -5271,7 +5267,7 @@ static proc extraction (ideal SI, ideal SP)
       }
 
       U[size(U)]=")";           // we compute the extractor of I (w.r.t. U)
-      execute("ring RAU=("+charstr(basering)+"),("+A+U+",(dp("+string(a)+"),dp);");
+      ring RAU = create_ring(ringlist(basering)[1],"("+A+U,"(dp("+string(a)+"),dp)","no_minpoly");
       ideal I=imap(R,SI);
       //I=std(I,hv);            // the standard basis in (R[U])[A]
       I=std(I);            // the standard basis in (R[U])[A]
@@ -6762,8 +6758,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
     {
       @va = string(maxideal(1));
 
-      execute("ring gnir1 = (" + charstr(basering) + "), (" + indep[@m][1] + "),("
-                              + indep[@m][2] + ");");
+      ring gnir1 = create_ring(ringlist(basering)[1],"(" + indep[@m][1] + ")","(" + indep[@m][2] + ")","no_minpoly");
       execute("map phi = @P," + @va + ";");
       ideal @j = groebner(phi(I));
     }
@@ -7324,7 +7319,7 @@ EXAMPLE: example zerodec; shows an example
     "// time for computing multiplication matrix (with generic element) : "+
     string(timer-time));
 //---------------- compute characteristic polynomial of matrix --------------
-  execute("ring P1=("+charstr(R)+"),T,dp;");
+  ring P1 = create_ring(ringlist(R)[1],"T","dp","no_minpoly");
   matrix n=imap(R,n);
   time = timer;
   poly charpol=det(n-var(1)*freemodule(d));
@@ -7354,7 +7349,7 @@ EXAMPLE: example zerodec; shows an example
 //f_i may result in a huge object although the final result may be small.
 //Hence it is better to simultaneously reduce with I. For this we need a new
 //ring.
-    execute("ring P=("+charstr(R)+"),(T,"+varstr(R)+"),(dp(1),dp);");
+    ring P = create_ring(ringlist(R)[1],"(T,"+varstr(R)+")","(dp(1),dp)","no_minpoly");
     list rfac=imap(P1,fac);
     intvec ov=option(get);;
     option(redSB);
@@ -7651,7 +7646,7 @@ EXAMPLE: example newDecompStep; shows an example
       }
       newva[size(newva)]=")";
       newma[size(newma)]=";";
-      execute("ring @deirf=("+charstr(gnir)+"),("+newva+",lp;");
+      ring @deirf = create_ring(ringlist(gnir)[1],"("+newva,"lp","no_minpoly");
       execute("map @kappa=gnir,"+newma);
       ideal @j= @kappa(@j);
       @j=simplify(@j, 2);
@@ -8042,8 +8037,7 @@ EXAMPLE: example newDecompStep; shows an example
           else
           {
              @va=string(maxideal(1));
-             execute("ring gnir1 = ("+charstr(basering)+"),("+
-                     restindep[@m][1]+"),(" +restindep[@m][2]+");");
+             ring gnir1 = create_ring(ringlist(basering)[1],"(" +restindep[@m][1]+")","(" +restindep[@m][2]+")","no_minpoly");
              execute("map phi=gnir,"+@va+";");
              op=option(get);
              option(redSB);
@@ -8386,8 +8380,7 @@ static proc newReduction(ideal @j, ideal ser, intvec @hilb, intvec @w, int jdim,
      //  @j=fetch(@P,i);
      //}
 //=======================
-     execute("ring gnir1 = ("+charstr(basering)+"),("+indepInfo[1]+"),("
-                              +indepInfo[2]+");");
+     ring gnir1 = create_ring(ringlist(basering)[1],"("+indepInfo[1]+")","(" +indepInfo[2]+")","no_minpoly");
      execute("map phi=gnir,"+@va+";");
      op=option(get);
      option(redSB);

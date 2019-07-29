@@ -1485,9 +1485,9 @@ static inline void p_SetExpVL(poly p, int64 *ev, const ring r)
 {
   p_LmCheckPolyRing1(p, r);
   for (unsigned j = r->N; j!=0; j--)
-      p_SetExp(p, j, ev[j], r);
+      p_SetExp(p, j, ev[j-1], r);
+  p_SetComp(p, 0,r);
 
-  if(ev[0]!=0) p_SetComp(p, ev[0],r);
   p_Setm(p, r);
 }
 
@@ -1989,6 +1989,7 @@ poly      p_mInit(const char *s, BOOLEAN &ok, const ring r); /* monom s -> poly,
 const char *    p_Read(const char *s, poly &p,const ring r); /* monom -> poly */
 poly      p_MDivide(poly a, poly b, const ring r);
 poly      p_DivideM(poly a, poly b, const ring r);
+poly      pp_DivideM(poly a, poly b, const ring r);
 poly      p_Div_nn(poly p, const number n, const ring r);
 
 // returns the LCM of the head terms of a and b in *m, does not p_Setm
