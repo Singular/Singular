@@ -75,8 +75,9 @@ def create_table(dictionary=None):
     else:
         vectors = np.load(VECTORS_NPY)
         file_list = np.load(HELPFILE_NPY)
-    for vector in vectors:
-        normalise_vector(vector)
+
+    # normalise the vectors
+    vectors = vectors / np.sqrt((vectors ** 2).sum(-1))[..., np.newaxis]
 
     return (vectors, file_list)
 

@@ -6,6 +6,7 @@ import math
 import os
 import re
 import sys
+import numpy as np
 
 ### Read from file ########################################################
 
@@ -39,21 +40,23 @@ def count_occurances(filename, dictionary, normalise=True):
     if dictionary == []:
         print("Please provide a valid dictionary as argument")
         return {}
-    vector = create_vector(dictionary)
+    if dictionary is None:
+        print("Please provide a valid dictionary as argument")
+        return {}
+    vector = create_vector_dictionary(dictionary)
     with open(filename, "r+") as file:
         line = file.readline()
 
         while not line == "":
-            # DONE: replace all non-alphanumeric characters with space
-            # words = line.split()
             words = re.sub('[^0-9a-zA-Z\-\_]', ' ', line).split() # pylint: disable=anomalous-backslash-in-string
             for word in words:
                 if word in vector.keys():
                     vector[word] = vector[word] + 1
             line = file.readline()
+    vector = np.array(list(vector.values()))
     if normalise:
-        normalise_vector(vector)
-    return vector
+        vector = normalise_vector(vector)
+    return vector 
 
 
 ### Copying ###############################################################
@@ -72,15 +75,12 @@ def copy_vector(vector):
     """
     Return an identical copy of a vector
     """
-    new_vector = {}
-    for key in vector.keys():
-        new_vector[key] = vector[key]
-    return new_vector
+    return np.copy(np.array(vector))
 
 
 ### Vector specific logic #################################################
 
-def create_vector(dictionary):
+def create_vector_dictionary(dictionary):
     """
     Create a zero vector for a given dictionary
     """
@@ -94,16 +94,12 @@ def vector_distance(vec1, vec2):
     """
     Calculate the Euclidean distance between two vectors.
     """
-    if not set(vec1.keys()) == set(vec2.keys()):
-        print("Dictionaries don't have the same keys")
+    if not len(vec1) == len(vec2):
+        print("Vectors don't have the same sizes")
         return -1
 
-
-    dist = 0
-    for key in vec1:
-        dist = dist + (vec1[key] - vec2[key]) ** 2
-
-    dist = math.sqrt(dist)
+    diff_vec = vec1 - vec2
+    dist = np.linalg.norm(diff_vec)
 
     return dist
 
@@ -113,14 +109,8 @@ def normalise_vector(vec):
     Take a given vector and normalise each entry to get a Euclidean
     distance of 1 between the zero vector and the vector itself.
     """
-    sum_vals = 0
-    for key in vec.keys():
-        sum_vals = sum_vals + (vec[key] * vec[key])
-
-    sum_vals = math.sqrt(sum_vals)
-
-    for key in vec.keys():
-        vec[key] = (vec[key] + 0.0) / sum_vals
+    vec = vec / np.linalg.norm(vec)
+    return vec
 
 
 def main():
@@ -132,21 +122,21 @@ def main():
         print(sys.argv[0] + " <dict_name>")
         sys.exit(1)
 
-    dic = read_dictionary(sys.argv[1])
-
-    testvector = {"hello":3, "bye":4}
+    testvector = np.array([3,4])
     normalise_vector(testvector)
     print("normalised vector: " + str(testvector))
 
-    vector1 = {"hello":3, "bye":4}
-    normalise_vector(vector1)
-    vector2 = {"hello":4, "bye":3}
+    vector1 = np.array([3,4])
+    vector1 = normalise_vector(vector1)
+    vector2 = np.array([4,3])
     normalise_vector(vector2)
+    vector2 = normalise_vector(vector2)
     print("distance same vector: " + str(vector_distance(vector1, vector1)))
     print("distance different vector: " + str(vector_distance(vector1, vector2)))
     print(vector1)
     print(vector2)
 
+    dic = read_dictionary(sys.argv[1])
     print(count_occurances("../Singular/table.h", dic))
 
 if __name__ == '__main__':
