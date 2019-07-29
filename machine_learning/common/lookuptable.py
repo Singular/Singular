@@ -119,7 +119,7 @@ def main():
     dictionary = read_dictionary(KEYWORDS_FILE)
     test_vec = count_occurances(os.path.join(HELP_FILE_PATH, "html",
                                              files[1]), dictionary)
-    print((test_vec==vectors[1]).all())
+    print((test_vec == vectors[1]).all())
 
 
 if __name__ == '__main__':

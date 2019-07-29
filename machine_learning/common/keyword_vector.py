@@ -2,11 +2,10 @@
 
 """Some vector logic"""
 
-import numpy as np
 import os
 import re
 import sys
-import traceback
+import numpy as np
 
 from common.constants import KEYWORDS_FILE
 
@@ -18,7 +17,7 @@ def read_dictionary(filename=KEYWORDS_FILE):
     """
     if not os.path.isfile(filename):
         print("Please provide a valid input file as argument")
-        return []
+        return np.array([])
 
     dictionary = []
 
@@ -147,11 +146,11 @@ def main():
     print()
 
     print("Attempt to normalise the zero vector")
-    print(normalise_vector(np.array([0,0,0,0,0])))
+    print(normalise_vector(np.array([0, 0, 0, 0, 0])))
     print()
 
     print("Attempt to normalise list")
-    print(normalise_vector([3,4,0,0,0]))
+    print(normalise_vector([3, 4, 0, 0, 0]))
     print()
 
     print("Attempt to normalise empty vector")

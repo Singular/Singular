@@ -2,7 +2,7 @@
 Define the predictor class for classifying according to help page.
 """
 
-import cProfile
+# import cProfile
 import os
 import sys
 import time
@@ -55,7 +55,7 @@ class HelpPagePredictor(BaseEstimator, ClassifierMixin):
             for vec in self.vectors:
                 # dist = vector_distance(x, vec)
                 # Dot product is much faster
-                dist = -np.dot(x, vec)
+                dist = -1 * np.dot(x, vec)
                 if dist < min_val:
                     min_val = dist
                     index = i
@@ -67,15 +67,14 @@ class HelpPagePredictor(BaseEstimator, ClassifierMixin):
         return np.array(ret_list)
 
 
-def main():
+def basic_vector_tests():
     """
-    Run some basic tests
+    Some basic sanity tests
     """
-    print("Running some tests")
     predictor = HelpPagePredictor()
-    vector1 = normalise_vector([1, 4, 10])
-    vector2 = normalise_vector([2, 3, 1])
-    vector3 = normalise_vector([3, 9, 3])
+    vector1 = normalise_vector(np.array([1, 4, 10]))
+    vector2 = normalise_vector(np.array([2, 3, 1]))
+    vector3 = normalise_vector(np.array([3, 9, 3]))
 
     vectors = np.array([vector1, vector2, vector3])
     files = np.array(["file1", "file2", "file3"])
@@ -83,7 +82,7 @@ def main():
     print(files)
     print()
 
-    testvec = normalise_vector([1, 1, 1])
+    testvec = normalise_vector(np.array([1, 1, 1]))
     print("test vector:")
     print(testvec)
     print()
@@ -104,6 +103,15 @@ def main():
     print(prediction)
     print()
 
+
+def main():
+    """
+    Run some basic tests
+    """
+    print("Running some tests")
+
+    basic_vector_tests()
+
     dictionary = read_dictionary(KEYWORDS_FILE)
 
     start = time.time()
@@ -112,6 +120,7 @@ def main():
     print(end - start, "seconds to create_table")
 
     test_vec = count_occurances("extract.lib", dictionary)
+    predictor = HelpPagePredictor()
     predictor.fit(vectors, file_list)
 
     start = time.time()
@@ -123,7 +132,6 @@ def main():
 
     print("prediction for zero vector")
     zerovec = np.zeros(len(dictionary) - 2)
-    print(len(zerovec))
     start = time.time()
     prediction = predictor.predict(np.array([zerovec]))
     end = time.time()
@@ -137,7 +145,7 @@ def main():
                 continue
             if not os.path.isfile(sys.argv[i]):
                 continue
-            print ("predicting for file", sys.argv[i])
+            print("predicting for file", sys.argv[i])
             test_vec = count_occurances(sys.argv[i], dictionary)
             start = time.time()
             prediction = predictor.predict(np.array([test_vec]))
