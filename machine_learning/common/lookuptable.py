@@ -13,8 +13,7 @@ import numpy as np
 from six.moves import urllib
 
 # local imports
-from common.keyword_vector import count_occurances, read_dictionary, \
-        normalise_vector
+from common.keyword_vector import count_occurances, read_dictionary
 from common.constants import HELP_FILE_URL, HELP_FILE_PATH, SINGULAR_BIN, \
                         EXTRACT_SCRIPT, KEYWORDS_FILE, HELPFILE_NPY, \
                         VECTORS_NPY

@@ -2,7 +2,6 @@
 
 """Some vector logic"""
 
-import math
 import os
 import re
 import sys
@@ -56,7 +55,7 @@ def count_occurances(filename, dictionary, normalise=True):
     vector = np.array(list(vector.values()))
     if normalise:
         vector = normalise_vector(vector)
-    return vector 
+    return vector
 
 
 ### Copying ###############################################################
@@ -84,8 +83,8 @@ def create_vector_dictionary(dictionary):
     """
     Create a zero vector for a given dictionary
     """
-    assert not dictionary == None, "Please give a dictionary"
-    assert not len(dictionary) == 0, "Please give a dictionary"
+    assert not dictionary is None, "Please give a dictionary"
+    assert not np.array(dictionary).size == 0, "Please give a dictionary"
     vector = {}
     for word in dictionary:
         vector[word] = 0
@@ -123,13 +122,13 @@ def main():
         print(sys.argv[0] + " <dict_name>")
         sys.exit(1)
 
-    testvector = np.array([3,4])
+    testvector = np.array([3, 4])
     normalise_vector(testvector)
     print("normalised vector: " + str(testvector))
 
-    vector1 = np.array([3,4])
+    vector1 = np.array([3, 4])
     vector1 = normalise_vector(vector1)
-    vector2 = np.array([4,3])
+    vector2 = np.array([4, 3])
     normalise_vector(vector2)
     vector2 = normalise_vector(vector2)
     print("distance same vector: " + str(vector_distance(vector1, vector1)))
