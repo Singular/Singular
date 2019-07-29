@@ -48,10 +48,25 @@ def extract_keywords():
     Run Singular script to extract current keywords and save as file
     'keywords.txt'
     """
+    # extract keywords using the singular script
     os.system(SINGULAR_BIN + " " + EXTRACT_SCRIPT)
 
+    # read from the file created by singular
+    dictionary = read_dictionary()
+    print(dictionary)
 
-def create_table(dictionary=None):
+    # sort alphabetically
+    dictionary = np.sort(dictionary)
+    print(dictionary)
+
+    # write back to the same file
+    with open(KEYWORDS_FILE, "w") as file:
+        for word in dictionary:
+            file.write(word + "\n")
+
+
+
+def create_table(dictionary=None, attempt_cached=True):
     """
     Get a list of helpfiles, and generate a word occurance vector for each.
     """
@@ -59,7 +74,9 @@ def create_table(dictionary=None):
         dictionary = read_dictionary(KEYWORDS_FILE)
     vectors = []
 
-    if not os.path.isfile(VECTORS_NPY) or not os.path.isfile(HELPFILE_NPY):
+    if not os.path.isfile(VECTORS_NPY) or \
+            not os.path.isfile(HELPFILE_NPY) or \
+            not attempt_cached:
         file_list = np.array(get_list_of_htm_files())
         np.save(HELPFILE_NPY, file_list)
 
@@ -89,11 +106,20 @@ def main():
     for file in get_list_of_htm_files():
         print(file)
     extract_keywords()
-    vectors, files = create_table()
+    vectors, files = create_table(attempt_cached=False)
+    vectors1, files1 = create_table()
+
+    if not (vectors == vectors1).all():
+        print("Cached version differs from original version")
+    elif not (files == files1).all():
+        print("Cached version differs from original version")
+    else:
+        print("Cached version corresponds with original")
+
     dictionary = read_dictionary(KEYWORDS_FILE)
     test_vec = count_occurances(os.path.join(HELP_FILE_PATH, "html",
                                              files[1]), dictionary)
-    print((test_vec == vectors[1]).all())
+    print((test_vec==vectors[1]).all())
 
 
 if __name__ == '__main__':

@@ -116,5 +116,13 @@ def main():
     print(end - start, "seconds to make prediction")
     print(prediction)
 
+
+    test_vec = count_occurances("test.txt", dictionary)
+    start = time.time()
+    prediction = predictor.predict(np.array([test_vec]))
+    end = time.time()
+    print(end - start, "seconds to make prediction")
+    print(prediction)
+
 if __name__ == '__main__':
     cProfile.run("main()")

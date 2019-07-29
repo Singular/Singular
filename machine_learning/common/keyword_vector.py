@@ -2,14 +2,17 @@
 
 """Some vector logic"""
 
+import numpy as np
 import os
 import re
 import sys
-import numpy as np
+import traceback
+
+from common.constants import KEYWORDS_FILE
 
 ### Read from file ########################################################
 
-def read_dictionary(filename):
+def read_dictionary(filename=KEYWORDS_FILE):
     """
     Read a dictionary saved as a textfile
     """
@@ -25,7 +28,7 @@ def read_dictionary(filename):
         while not line == "":
             dictionary.append(line.strip())
             line = file.readline()
-    return dictionary
+    return np.array(dictionary)
 
 
 def count_occurances(filename, dictionary, normalise=True):
@@ -36,7 +39,7 @@ def count_occurances(filename, dictionary, normalise=True):
     if not os.path.isfile(filename):
         print("Please provide a valid input file as argument")
         return []
-    if dictionary == []:
+    if dictionary.size == 0:
         print("Please provide a valid dictionary as argument")
         return []
     if dictionary is None:
@@ -109,7 +112,17 @@ def normalise_vector(vec):
     Take a given vector and normalise each entry to get a Euclidean
     distance of 1 between the zero vector and the vector itself.
     """
-    vec = vec / np.linalg.norm(vec)
+
+    if vec is None:
+        print("Please provide a valid vector")
+        print("Returning empty vector by default")
+        return np.array([])
+
+    if not isinstance(vec, np.ndarray):
+        print("Warning, vector should be a numpy array")
+    norm = np.linalg.norm(vec)
+    if not norm == 0:
+        vec = vec / norm
     return vec
 
 
@@ -117,10 +130,6 @@ def main():
     """
     Run some basic tests
     """
-    if len(sys.argv) != 2:
-        print("Usage: ")
-        print(sys.argv[0] + " <dict_name>")
-        sys.exit(1)
 
     testvector = np.array([3, 4])
     normalise_vector(testvector)
@@ -135,8 +144,29 @@ def main():
     print("distance different vector: " + str(vector_distance(vector1, vector2)))
     print(vector1)
     print(vector2)
+    print()
 
-    dic = read_dictionary(sys.argv[1])
+    print("Attempt to normalise the zero vector")
+    print(normalise_vector(np.array([0,0,0,0,0])))
+    print()
+
+    print("Attempt to normalise list")
+    print(normalise_vector([3,4,0,0,0]))
+    print()
+
+    print("Attempt to normalise empty vector")
+    print(normalise_vector(np.array([])))
+    print()
+
+    print("Attempt to normalise None")
+    print(normalise_vector(None))
+    print()
+
+    if len(sys.argv) == 2:
+        dic = read_dictionary(filename=sys.argv[1])
+    else:
+        dic = read_dictionary()
+    print("vector of ../Singular/table.h")
     print(count_occurances("../Singular/table.h", dic))
 
 if __name__ == '__main__':
