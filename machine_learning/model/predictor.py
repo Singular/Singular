@@ -3,6 +3,8 @@ Define the predictor class for classifying according to help page.
 """
 
 import cProfile
+import os
+import sys
 import time
 
 # Third party imports
@@ -51,7 +53,9 @@ class HelpPagePredictor(BaseEstimator, ClassifierMixin):
             index = -1
             i = 0
             for vec in self.vectors:
-                dist = vector_distance(x, vec)
+                # dist = vector_distance(x, vec)
+                # Dot product is much faster
+                dist = -np.dot(x, vec)
                 if dist < min_val:
                     min_val = dist
                     index = i
@@ -115,14 +119,34 @@ def main():
     end = time.time()
     print(end - start, "seconds to make prediction")
     print(prediction)
+    print()
 
-
-    test_vec = count_occurances("test.txt", dictionary)
+    print("prediction for zero vector")
+    zerovec = np.zeros(len(dictionary) - 2)
+    print(len(zerovec))
     start = time.time()
-    prediction = predictor.predict(np.array([test_vec]))
+    prediction = predictor.predict(np.array([zerovec]))
     end = time.time()
     print(end - start, "seconds to make prediction")
     print(prediction)
+    print()
+
+    if len(sys.argv) >= 2:
+        for i in range(len(sys.argv)):
+            if i == 0:
+                continue
+            if not os.path.isfile(sys.argv[i]):
+                continue
+            print ("predicting for file", sys.argv[i])
+            test_vec = count_occurances(sys.argv[i], dictionary)
+            start = time.time()
+            prediction = predictor.predict(np.array([test_vec]))
+            end = time.time()
+            print(end - start, "seconds to make prediction")
+            print(prediction)
+            print()
+
 
 if __name__ == '__main__':
-    cProfile.run("main()")
+    #cProfile.run("main()")
+    main()
