@@ -252,7 +252,7 @@ EXAMPLE:  example computeConstant; shows an example
   while (tst==0)
   {
     ff=f*xx^k;
-    for (j=1; j<=k; j++)i
+    for (j=1; j<=k; j++)
     {
       ff=diff(ff,xx)/j;
     }
@@ -359,7 +359,7 @@ EXAMPLE:  example partitions; shows an example
   ring R = 2,(x(1..n)),dp;
   ideal I = maxideal(a);
   list L;
-  for (int j=1;j<=size(I);j++)i
+  for (int j=1;j<=size(I);j++)
   {
     L[j]=leadexp(I[j]);
   }
