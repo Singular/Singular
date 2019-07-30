@@ -120,3 +120,4 @@ __pycache__
 keywords.txt
 helpfiles
 *.npy
+.coverage
