@@ -119,11 +119,11 @@ def main():
     end = time.time()
     print(end - start, "seconds to create_table")
 
-    test_vec = count_occurances("extract.lib", dictionary)
     predictor = HelpPagePredictor()
     predictor.fit(vectors, file_list)
 
     start = time.time()
+    test_vec = count_occurances("extract.lib", dictionary)
     prediction = predictor.predict(np.array([test_vec]))
     end = time.time()
     print(end - start, "seconds to make prediction")
@@ -131,8 +131,8 @@ def main():
     print()
 
     print("prediction for zero vector")
-    zerovec = np.zeros(len(dictionary) - 2)
     start = time.time()
+    zerovec = np.zeros(len(dictionary) - 2)
     prediction = predictor.predict(np.array([zerovec]))
     end = time.time()
     print(end - start, "seconds to make prediction")
@@ -146,8 +146,8 @@ def main():
             if not os.path.isfile(sys.argv[i]):
                 continue
             print("predicting for file", sys.argv[i])
-            test_vec = count_occurances(sys.argv[i], dictionary)
             start = time.time()
+            test_vec = count_occurances(sys.argv[i], dictionary)
             prediction = predictor.predict(np.array([test_vec]))
             end = time.time()
             print(end - start, "seconds to make prediction")
