@@ -129,6 +129,5 @@ class TestKeywordMethods(unittest.TestCase):
         self.assertTrue((vec == vec_copy).all())
 
 
-
 if __name__ == '__main__':
     unittest.main()

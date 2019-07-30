@@ -56,7 +56,7 @@ def extract_keywords():
     print(dictionary)
 
     # sort alphabetically
-    dictionary = np.sort(dictionary)
+    dictionary = np.sort(np.unique(dictionary))
     print(dictionary)
 
     # write back to the same file
@@ -98,29 +98,3 @@ def create_table(dictionary=None, attempt_cached=True):
     return (vectors, file_list)
 
 
-def main():
-    """
-    Run some tests to check if the functions work.
-    """
-    fetch_tbz2_data()
-    for file in get_list_of_htm_files():
-        print(file)
-    extract_keywords()
-    vectors, files = create_table(attempt_cached=False)
-    vectors1, files1 = create_table()
-
-    if not (vectors == vectors1).all():
-        print("Cached version differs from original version")
-    elif not (files == files1).all():
-        print("Cached version differs from original version")
-    else:
-        print("Cached version corresponds with original")
-
-    dictionary = read_dictionary(KEYWORDS_FILE)
-    test_vec = count_occurances(os.path.join(HELP_FILE_PATH, "html",
-                                             files[1]), dictionary)
-    print((test_vec == vectors[1]).all())
-
-
-if __name__ == '__main__':
-    main()
