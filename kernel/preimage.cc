@@ -87,8 +87,6 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
      return NULL;
   }
 
-  assume(n_SetMap(theImageRing->cf, dst_r->cf) == ndCopyMap);
-
   if (theImageRing->cf != dst_r->cf)
   {
     /// TODO: there might be extreme cases where this doesn't hold...
