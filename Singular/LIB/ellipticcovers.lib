@@ -474,7 +474,7 @@ EXAMPLE:  example computeGromovWitten; shows an example
       ti=timer-ti;
       if (vb>0){print(string(j)+" / "+string(size(pa))+"    "+string(pa[j])+"     "+string(re[j])+"      "+string(lsum(re))+"     "+string(ti));}
     }
-    else 
+    else
     {re[j]=s;}
   }
   //list re = parallelWaitAll("gromovWitten", pararg, list(list(list(2))));

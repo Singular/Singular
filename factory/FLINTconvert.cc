@@ -779,6 +779,8 @@ CanonicalForm gcdFlintMP_QQ(const CanonicalForm& F, const CanonicalForm& G)
       fmpq_clear(content);
     }
     RES=convFlintMPFactoryP(res,ctx,N);
+    // gcd(2x,4x) should be 2x, so RES should also have the gcd(lc(F),lc(G))
+    RES*=gcd(F.lc(),G.lc());
   }
   fmpq_mpoly_clear(res,ctx);
   fmpq_mpoly_ctx_clear(ctx);
