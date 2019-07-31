@@ -58,7 +58,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
   }
   #ifdef HAVE_FLINT
   #if __FLINT_RELEASE >= 20503
-  if (rField_is_Zp(r) && (r->cf->ch>500))
+  if (rField_is_Zp(r) && (r->cf->ch>10))
   {
     nmod_mpoly_ctx_t ctx;
     if (!convSingRFlintR(ctx,r))
