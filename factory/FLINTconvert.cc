@@ -751,6 +751,21 @@ CanonicalForm gcdFlintMP_Zp(const CanonicalForm& F, const CanonicalForm& G)
   return RES;
 }
 
+static CanonicalForm b_content ( const CanonicalForm & f )
+{
+    if ( f.inCoeffDomain() )
+        return f;
+    else
+    {
+        CanonicalForm result = 0;
+        CFIterator i;
+        for ( i = f; i.hasTerms() && (!result.isOne()); i++ )
+            result=bgcd( b_content(i.coeff()) , result );
+        return result;
+    }
+}
+
+
 CanonicalForm gcdFlintMP_QQ(const CanonicalForm& F, const CanonicalForm& G)
 {
   int N=F.level();
@@ -780,7 +795,7 @@ CanonicalForm gcdFlintMP_QQ(const CanonicalForm& F, const CanonicalForm& G)
     }
     RES=convFlintMPFactoryP(res,ctx,N);
     // gcd(2x,4x) should be 2x, so RES should also have the gcd(lc(F),lc(G))
-    RES*=gcd(F.lc(),G.lc());
+    RES*=bgcd(b_content(F),b_content(G));
   }
   fmpq_mpoly_clear(res,ctx);
   fmpq_mpoly_ctx_clear(ctx);
