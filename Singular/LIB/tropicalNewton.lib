@@ -124,7 +124,7 @@ EXAMPLE: example val; shows an example
     def origin = basering;
     number c_denom = denominator(c);
     number c_num = numerator(c);
-    execute("ring r_Val=0,"+string(uniformizingParameter)+",ds");
+    ring r_Val = create_ring(0, string(uniformizingParameter), "ds");
     poly c_denom = imap(origin,c_denom);
     poly c_num = imap(origin,c_num);
     vc = ord(c_num)-ord(c_denom);

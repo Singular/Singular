@@ -699,8 +699,7 @@ EXAMPLE: example solve; shows an example
     }
     if (oldr!=1)
     {
-      execute("ring rinC =(complex,"+string(outprec)+
-                 "),("+varstr(basering)+"),lp;");
+      ring rinC = create_ring("(complex,"+string(outprec)+")", "("+varstr(basering)+")", "lp");
       list SOL;
       if (mu==0){SOL[1] = zerolist(nv);}
       else{SOL[1] = list(zerolist(nv),list(vdG));}
@@ -770,7 +769,7 @@ EXAMPLE: example solve; shows an example
       list L = laguerre_solve(H[1],prec,prec,mu,0); // list of strings
       if (oldr!=1)
       {
-        execute("ring rinC =(complex,"+string(outprec)+"),("+varstr(basering)+"),lp;");
+        ring rinC = create_ring("(complex,"+string(outprec)+")", "("+varstr(basering)+")", "lp");
         list SOL;
         for (ii=1; ii<=size(L); ii++ ) { execute("SOL[ii]=number("+L[ii]+");"); }
         export SOL;
@@ -799,7 +798,7 @@ EXAMPLE: example solve; shows an example
     }
     else
     {
-      execute("ring internC=(complex,"+string(prec)+"),("+varstr(basering)+"),lp;");
+      ring internC = create_ring("(complex,"+string(prec)+")", "("+varstr(basering)+")", "lp");
       ideal H = imap(hr,H);
       list sp = splittolist(splitsqrfree(H[1],var(1)));
       jj = size(sp);
@@ -811,7 +810,7 @@ EXAMPLE: example solve; shows an example
       setring hr;
       if (oldr!=1)
       {
-        execute("ring rinC =(complex,"+string(outprec)+"),("+varstr(basering)+"),lp;");
+        ring rinC = create_ring("(complex,"+string(outprec)+")", "("+varstr(basering)+")", "lp");
         list SOL;
         list sp=imap(internC,sp);
         if(mu!=0){ SOL=sp; }
@@ -877,11 +876,11 @@ EXAMPLE: example solve; shows an example
 //   create the complex ring and map the result
   if (outprec<prec)
   {
-    execute("ring internC=(complex,"+string(prec)+"),("+varstr(hr)+"),lp;");
+    ring internC = create_ring("(complex,"+string(prec)+")", "("+varstr(hr)+")", "lp");
   }
   else
   {
-    execute("ring rinC =(complex,"+string(outprec)+"),("+varstr(basering)+"),lp;");
+    ring rinC = create_ring("(complex,"+string(outprec)+")", "("+varstr(basering)+")", "lp");
   }
   list triC = imap(hr,sp);
 
@@ -940,7 +939,7 @@ EXAMPLE: example solve; shows an example
   {
     if (oldr!=1)
     {
-      execute("ring rinC =(complex,"+string(outprec)+"),("+varstr(basering)+"),lp;");
+      ring rinC = create_ring("(complex,"+string(outprec)+")", "("+varstr(basering)+")", "lp");
       list SOL=imap(internC,ret1);
       export SOL;
       if (nodisp==0) { print(SOL); }
@@ -1435,8 +1434,7 @@ EXAMPLE: example ures_solve; shows an example
   {
     int ii,jj;
     int nv=size(LL[1]);
-    execute("ring rinC =(complex,"+string(prec)+",I),("
-                           +varstr(basering)+"),lp;");
+    ring rinC = create_ring("(complex,"+string(prec)+",I)", "("+varstr(basering)+")", "lp");
     list SOL,SOLnew;
     for (ii=1; ii<=sizeLL; ii++)
     {
