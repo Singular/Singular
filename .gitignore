@@ -121,3 +121,4 @@ keywords.txt
 helpfiles
 *.npy
 .coverage
+*.pyc

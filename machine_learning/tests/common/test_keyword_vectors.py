@@ -1,3 +1,4 @@
+import sys
 import unittest
 import numpy as np
 
@@ -12,7 +13,15 @@ class TestKeywordMethods(unittest.TestCase):
         print("Testing read_dictionary function:")
 
         print("Non-existant file")
-        self.assertRaises(FileNotFoundError, read_dictionary, "asdfasdf")
+        if sys.version_info[0] == 3:
+            self.assertRaises(FileNotFoundError,
+                              read_dictionary,
+                              "asdfasdf")
+        else:
+            self.assertRaises(IOError,
+                              read_dictionary,
+                              "asdfasdf")
+
 
         print("Reading default file")
         correct = True
@@ -27,8 +36,16 @@ class TestKeywordMethods(unittest.TestCase):
 
         dic = read_dictionary()
         print("Test non-existant file")
-        self.assertRaises(FileNotFoundError, count_occurances, "asdfasdf",
-                dic)
+        if sys.version_info[0] == 3:
+            self.assertRaises(FileNotFoundError,
+                              count_occurances,
+                              "asdfasdf",
+                              dic)
+        else:
+            self.assertRaises(IOError,
+                              count_occurances,
+                              "asdfasdf",
+                              dic)
 
         print("Count occurances with None dictionary:")
         self.assertRaises(AssertionError, count_occurances,

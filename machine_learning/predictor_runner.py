@@ -7,6 +7,24 @@ import sys
 import numpy as np
 from model.predictor import *
 
+def find_prediction(filename):
+    dictionary = read_dictionary(KEYWORDS_FILE)
+    start = time.time()
+    vectors, file_list = create_table(dictionary=dictionary)
+    end = time.time()
+    print(end - start, "seconds to create_table")
+
+    predictor = HelpPagePredictor()
+    predictor.fit(vectors, file_list)
+
+    start = time.time()
+    test_vec = count_occurances(filename, dictionary)
+    prediction = predictor.predict(np.array([test_vec]))
+    end = time.time()
+    print(end - start, "seconds to make prediction")
+    return prediction
+    
+
 def main():
     """
     Run some basic tests

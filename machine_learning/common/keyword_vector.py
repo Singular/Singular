@@ -4,6 +4,7 @@
 
 import os
 import re
+import sys
 import numpy as np
 
 from common.constants import KEYWORDS_FILE
@@ -17,7 +18,11 @@ def read_dictionary(filename=KEYWORDS_FILE):
     if not os.path.isfile(filename):
         print("Please provide a valid input file as argument to read "
               "dictionary")
-        raise FileNotFoundError
+        if sys.version_info[0] == 3:
+            raise FileNotFoundError
+        else:
+            raise IOError
+
 
     dictionary = []
 
@@ -37,7 +42,10 @@ def count_occurances(filename, dictionary, normalise=True):
     """
     if not os.path.isfile(filename):
         print("Please provide a valid input file as argument")
-        raise FileNotFoundError
+        if sys.version_info[0] == 3:
+            raise FileNotFoundError
+        else:
+            raise IOError
     assert dictionary is not None, \
             "Please provide a valid dictionary as argument"
     assert not dictionary.size == 0, \

@@ -27,6 +27,7 @@ def fetch_tbz2_data(tbz2_url=HELP_FILE_URL, data_path=HELP_FILE_PATH,
     if not os.path.isdir(data_path):
         os.makedirs(data_path)
     tbz2_path = os.path.join(data_path, file_name)
+    urllib.request.urlcleanup()
     urllib.request.urlretrieve(tbz2_url, tbz2_path)
 
     tbz2_file = tarfile.open(tbz2_path)
