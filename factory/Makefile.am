@@ -100,6 +100,7 @@ nodist_libfactory_la_SOURCES = factory.h factoryconf.h
 
 # factory header files
 factory_headers = \
+		globaldefs.h \
 		cf_assert.h \
 		canonicalform.h \
 		cf_algorithm.h \
@@ -172,7 +173,7 @@ noinst_HEADERS = $(factory_headers)
 
 libfactory_includedir = ${includedir}/factory
 
-nodist_libfactory_include_HEADERS = factory.h factoryconf.h globaldefs.h
+nodist_libfactory_include_HEADERS = factory.h factoryconf.h
 
 
 ####################################################
