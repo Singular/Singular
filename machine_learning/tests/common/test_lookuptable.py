@@ -1,8 +1,10 @@
 import os
 import unittest
 import numpy as np
+import cProfile
 
 from common.lookuptable import *
+from common.keyword_vector import count_occurances
 from common.constants import KEYWORDS_FILE
 
 class TestLookuptableMethods(unittest.TestCase):
@@ -31,4 +33,5 @@ class TestLookuptableMethods(unittest.TestCase):
         self.assertTrue((test_vec == vectors[1]).all())
 
 if __name__ == '__main__':
+    #cProfile.run("unittest.main()")
     unittest.main()

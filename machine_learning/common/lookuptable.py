@@ -13,7 +13,7 @@ import numpy as np
 from six.moves import urllib
 
 # local imports
-from common.keyword_vector import count_occurances, read_dictionary
+from common.keyword_vector import get_vectors, read_dictionary
 from common.constants import HELP_FILE_URL, HELP_FILE_PATH, SINGULAR_BIN, \
                         EXTRACT_SCRIPT, KEYWORDS_FILE, HELPFILE_NPY, \
                         VECTORS_NPY
@@ -81,13 +81,12 @@ def create_table(dictionary=None, attempt_cached=True):
         file_list = np.array(get_list_of_htm_files())
         np.save(HELPFILE_NPY, file_list)
 
+        filenames = []
         for file in file_list:
-            vector = count_occurances(os.path.join(HELP_FILE_PATH, "html",
-                                                   file),
-                                      dictionary,
-                                      normalise=False)
-            vectors.append(vector)
-        vectors = np.array(vectors)
+            filename = os.path.join(HELP_FILE_PATH, "html", file)
+            filenames.append(filename)
+        filenames = np.array(filenames)
+        vectors = get_vectors(filenames, dictionary, normalise=False)
         np.save(VECTORS_NPY, vectors)
     else:
         vectors = np.load(VECTORS_NPY)
@@ -97,5 +96,3 @@ def create_table(dictionary=None, attempt_cached=True):
     vectors = vectors / np.sqrt((vectors ** 2).sum(-1))[..., np.newaxis]
 
     return (vectors, file_list)
-
-

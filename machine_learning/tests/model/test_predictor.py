@@ -5,6 +5,8 @@ import numpy as np
 from model.predictor import *
 from common.constants import KEYWORDS_FILE
 
+from common.keyword_vector import normalise_vector, vector_distance
+
 class TestPredictionMethods(unittest.TestCase):
 
     def test_fit(self):

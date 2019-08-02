@@ -3,19 +3,10 @@ Define the predictor class for classifying according to help page.
 """
 
 # import cProfile
-import os
-import sys
-import time
 
 # Third party imports
 import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
-
-# Local imports
-from common.keyword_vector import vector_distance, count_occurances, \
-        read_dictionary, normalise_vector
-from common.lookuptable import create_table
-from common.constants import KEYWORDS_FILE
 
 
 class HelpPagePredictor(BaseEstimator, ClassifierMixin):

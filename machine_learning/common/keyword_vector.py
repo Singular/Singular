@@ -6,6 +6,7 @@ import os
 import re
 import sys
 import numpy as np
+from sklearn.feature_extraction.text import CountVectorizer
 
 from common.constants import KEYWORDS_FILE
 
@@ -18,7 +19,7 @@ def read_dictionary(filename=KEYWORDS_FILE):
     if not os.path.isfile(filename):
         print("Please provide a valid input file as argument to read "
               "dictionary")
-        if sys.version_info[0] == 3:
+        if sys.version_info[0] == 3: # pylint: disable=no-else-raise
             raise FileNotFoundError
         else:
             raise IOError
@@ -34,37 +35,59 @@ def read_dictionary(filename=KEYWORDS_FILE):
             line = file.readline()
     return np.array(dictionary)
 
+def get_vectors(filenames, dictionary, normalise=True):
+    """
+    Create vectors from a dictionary and populate the counts according to
+    specified files
+    """
+    assert filenames is not None, \
+            "Please provide a valid list of files as argument"
+    assert not filenames.size == 0, \
+            "Please provide a valid list of files as argument"
+    for filename in filenames:
+        if not os.path.isfile(filename):
+            print("Please provide a valid input file as argument")
+            if sys.version_info[0] == 3: # pylint: disable=no-else-raise
+                raise FileNotFoundError
+            else:
+                print(filename)
+                raise IOError
+    assert dictionary is not None, \
+            "Please provide a valid dictionary as argument"
+    assert not dictionary.size == 0, \
+            "Please provide a valid dictionary as argument"
+
+    doc_strings = []
+    for filename in filenames:
+        doc_string = ""
+        with open(filename, "r+") as file:
+            line = file.readline()
+
+            while not line == "":
+                doc_string = doc_string + " " + line
+                line = file.readline()
+
+        doc_string = re.sub('[^0-9a-zA-Z\-\_]', ' ', doc_string) # pylint: disable=anomalous-backslash-in-string
+        doc_strings.append(doc_string)
+    doc_strings = np.array(doc_strings)
+
+    vectorizer = CountVectorizer(vocabulary=dictionary)
+    vectors = vectorizer.fit_transform(doc_strings)
+    vectors = vectors.toarray()
+    if normalise:
+        vectors = vectors / np.sqrt((vectors ** 2).sum(-1))[..., np.newaxis]
+    return vectors
+
 
 def count_occurances(filename, dictionary, normalise=True):
     """
     Create a vector from a dictionary and populate the counts according to
     a specified file
     """
-    if not os.path.isfile(filename):
-        print("Please provide a valid input file as argument")
-        if sys.version_info[0] == 3:
-            raise FileNotFoundError
-        else:
-            raise IOError
-    assert dictionary is not None, \
-            "Please provide a valid dictionary as argument"
-    assert not dictionary.size == 0, \
-            "Please provide a valid dictionary as argument"
-
-    vector = create_vector_dictionary(dictionary)
-    with open(filename, "r+") as file:
-        line = file.readline()
-
-        while not line == "":
-            words = re.sub('[^0-9a-zA-Z\-\_]', ' ', line).split() # pylint: disable=anomalous-backslash-in-string
-            for word in words:
-                if word in vector.keys():
-                    vector[word] = vector[word] + 1
-            line = file.readline()
-    vector = np.array(list(vector.values()))
-    if normalise:
-        vector = normalise_vector(vector)
-    return vector
+    res = get_vectors(np.array([filename]),
+                      dictionary,
+                      normalise=normalise)
+    return res[0]
 
 
 ### Copying ###############################################################
