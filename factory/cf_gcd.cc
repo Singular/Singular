@@ -103,7 +103,7 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     #if defined(HAVE_FLINT) && ( __FLINT_RELEASE >= 20503)
     if ( isOn( SW_USE_FL_GCD_P)
     && (CFFactory::gettype() != GaloisFieldDomain)
-    && (getCharacteristic()>500)
+    && (getCharacteristic()>10)
     &&(!hasAlgVar(fc)) && (!hasAlgVar(gc)))
     {
       return gcdFlintMP_Zp(fc,gc);
@@ -328,12 +328,9 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
             {
                 CanonicalForm cdF = bCommonDen( f );
                 CanonicalForm cdG = bCommonDen( g );
+                CanonicalForm F = f * cdF, G = g * cdG;
                 Off( SW_RATIONAL );
-                CanonicalForm l = lcm( cdF, cdG );
-                On( SW_RATIONAL );
-                CanonicalForm F = f * l, G = g * l;
-                Off( SW_RATIONAL );
-                l = gcd_poly( F, G );
+                CanonicalForm l = gcd_poly( F, G );
                 On( SW_RATIONAL );
                 return abs( l );
             }

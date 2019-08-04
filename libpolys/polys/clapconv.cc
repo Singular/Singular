@@ -86,7 +86,7 @@ static inline void convPhalf(poly p,int l,poly &p1,poly &p2)
 {
   p1=p;
   l=l/2;
-  while(l>0) { p=pNext(p); l--; }
+  while(l>1) { p=pNext(p); l--; }
   p2=pNext(p);
   pNext(p)=NULL;
 }
@@ -100,27 +100,28 @@ static inline poly convPunhalf(poly p1,poly p2)
 }
 
 #define MIN_CONV_LEN 7
-CanonicalForm convSingPFactoryP( poly p, const ring r )
+static CanonicalForm convSingPFactoryP_intern( poly p, int l, BOOLEAN & setChar,const ring r )
 {
   CanonicalForm result = 0;
   int e, n = rVar(r);
-  BOOLEAN setChar=TRUE;
+  assume(l==pLength(p));
 
-  int l;
-  if ((l=pLength(p))>MIN_CONV_LEN)
+  if (l>MIN_CONV_LEN)
   {
     poly p1,p2;
     convPhalf(p,l,p1,p2);
-    CanonicalForm P=convSingPFactoryP(p1,r);
-    P+=convSingPFactoryP(p2,r);
+    CanonicalForm P=convSingPFactoryP_intern(p1,l/2,setChar,r);
+    P+=convSingPFactoryP_intern(p2,l-l/2,setChar,r);
     convPunhalf(p1,p2);
     return P;
   }
+  BOOLEAN setChar_loc=setChar;
+  setChar=FALSE;
   while ( p!=NULL )
   {
-    CanonicalForm term=r->cf->convSingNFactoryN(pGetCoeff( p ),setChar, r->cf);
+    CanonicalForm term=r->cf->convSingNFactoryN(pGetCoeff( p ),setChar_loc, r->cf);
     if (errorreported) break;
-    setChar=FALSE;
+    setChar_loc=FALSE;
     for ( int i = 1; i <=n; i++ )
     {
       if ( (e = p_GetExp( p, i, r)) != 0 )
@@ -130,6 +131,12 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
     pIter( p );
  }
  return result;
+}
+
+CanonicalForm convSingPFactoryP( poly p, const ring r )
+{
+  BOOLEAN setChar=TRUE;
+  return convSingPFactoryP_intern(p,pLength(p),setChar,r);
 }
 
 int convFactoryISingI( const CanonicalForm & f)

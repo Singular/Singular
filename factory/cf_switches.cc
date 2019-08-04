@@ -31,9 +31,11 @@ CFSwitches::CFSwitches ()
 // and set the default (recommended) On-values:
 #ifdef HAVE_NTL
   On(SW_USE_CHINREM_GCD);
-  //Off(SW_USE_NTL_SORT);
+  On(SW_USE_NTL_SORT);
+#endif
+#ifdef HAVE_FLINT
   On(SW_USE_FL_GCD_P);
-  //On(SW_USE_FL_GCD_0);
+  On(SW_USE_FL_GCD_0);
 #endif
   On(SW_USE_EZGCD);
   On(SW_USE_EZGCD_P);

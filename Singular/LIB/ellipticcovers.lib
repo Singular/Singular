@@ -66,35 +66,34 @@ lsum(list)                                sum of the elements of a list
 LIB "parallel.lib";
 
 
-proc mod_init()
+static proc mod_init()
 {
-newstruct("graph","list vertices, list edges");
-newstruct("Net","list rows");
+  newstruct("graph","list vertices, list edges");
+  newstruct("Net","list rows");
 
-system("install","graph","print",printGraph,1);
-system("install","Net","print",printNet,1);
-system("install","Net","+",catNet,2);
-
+  system("install","graph","print",printGraph,1);
+  system("install","Net","print",printNet,1);
+  system("install","Net","+",catNet,2);
 }
-
 
 static proc catNet(Net N, Net M)
 {
-list L;
-list LN=N.rows;
-list LM=M.rows;
-int widthN=size(LN[1]);
-int widthM=size(LM[1]);
-int nm=max(size(LN),size(LM));
-for (int j=1; j<=nm; j++)
-{
+  list L;
+  list LN=N.rows;
+  list LM=M.rows;
+  int widthN=size(LN[1]);
+  int widthM=size(LM[1]);
+  int nm=max(size(LN),size(LM));
+  for (int j=1; j<=nm; j++)
+  {
     if (j>size(LN)){LN[j]=emptyString(widthN);}
     if (j>size(LM)){LM[j]=emptyString(widthM);}
     L[j]=LN[j]+LM[j];
+  }
+  Net NM;
+  NM.rows=L;
+  return(NM);
 }
-Net NM;
-NM.rows=L;
-return(NM);}
 
 
 static proc netList(list L1)
@@ -110,22 +109,25 @@ static proc netList(list L1)
 
 static proc printNet(Net N)
 {
-list L = N.rows;
-for (int j=1; j<=size(L); j++)
-{
-   print(L[j]);
-}
+  list L = N.rows;
+  for (int j=1; j<=size(L); j++)
+  {
+    print(L[j]);
+  }
 }
 
-static proc net(def M){
-  if (typeof(M)=="list"){
+static proc net(def M)
+{
+  if (typeof(M)=="list")
+  {
     return(netList(M));
   }
   Net N;
   list L;
   L[1]=string(M);
   N.rows=L;
-return(N);}
+  return(N);
+}
 
 
 
@@ -147,8 +149,6 @@ example
   G;
 }
 
-
-
 proc makeGraph(list v, list e)
 "USAGE:  makeGraph(v,e); v list, e list@*
 ASSUME:  v is a list of integers, e is a list of two element lists of v.
@@ -169,7 +169,6 @@ example
   graph G = makeGraph(list(1,2,3,4),list(list(1,3),list(1,2),list(1,2),list(2,4),list(3,4),list(3,4)));
   G;
 }
-
 
 proc propagator(def xy, def d)
 "USAGE:  propagator(xy,d); xy list, d int@*
@@ -194,22 +193,26 @@ KEYWORDS: elliptic curve
 EXAMPLE:  example propagator; shows an example
 "
 {
-  if ((typeof(xy)=="list")||(typeof(d)=="int")) {
+  if ((typeof(xy)=="list")||(typeof(d)=="int"))
+  {
     number x = xy[1];
     number y = xy[2];
     if (d<0) {ERROR("expected non-negative degree");}
     if (d==0) {return(x^2*y^2/(x^2-y^2)^2);}
     number p=0;
-    for (int j=1; j<=d; j++){
+    for (int j=1; j<=d; j++)
+    {
        if (d%j==0){p=p+(j*x^(4*j)+j*y^(4*j))/(x*y)^(2*j);}
     }
     return(p);
   }
-  if ((typeof(xy)=="graph")||(typeof(d)=="list"))  {
+  if ((typeof(xy)=="graph")||(typeof(d)=="list"))
+  {
     list xl = ringlist(basering)[1][2];
     list ed = xy.edges;
     number f=1;
-    for (int j=1; j<=size(ed); j++){
+    for (int j=1; j<=size(ed); j++)
+    {
        execute("number xx1 = "+xl[ed[j][1]]);
        execute("number xx2 = "+xl[ed[j][2]]);
        f=f*propagator(list(xx1,xx2),d[j]);
@@ -218,9 +221,11 @@ EXAMPLE:  example propagator; shows an example
     }
     return(f);
   }
-  if ((typeof(xy)=="graph")||(typeof(d)=="int"))  {
+  if ((typeof(xy)=="graph")||(typeof(d)=="int"))
+  {
   }
-ERROR("wrong input type");}
+  ERROR("wrong input type");
+}
 example
 { "EXAMPLE:"; echo=2;
   ring R=(0,x1,x2,x3,x4),(q1,q2,q3,q4,q5,q6),dp;
@@ -230,16 +235,11 @@ example
   propagator(G,list(1,1,1,0,0,0));
 }
 
-
-
-
-
 proc computeConstant(number f,number xx)
 "USAGE:  computeConstant(f,x); f number, x number@*
 ASSUME:  f is a number in a rational function field, x is a variable of the field.@*
 RETURN:  number, the constant coefficient of the Laurent series of f in the variable x.
 THEORY:  Computes the constant coefficient of the Laurent series by iterative differentiation.
-
 KEYWORDS: Laurent series
 EXAMPLE:  example computeConstant; shows an example
 "
@@ -249,19 +249,23 @@ EXAMPLE:  example computeConstant; shows an example
   int k;
   int j;
   poly de;
-  while (tst==0){
-     ff=f*xx^k;
-     for (j=1; j<=k; j++){
-        ff=diff(ff,xx)/j;
-     }
-  de = subst(denominator(ff),xx,0);
-  if (de!=0){
-     poly nu = subst(numerator(ff),xx,0);
-     return(number(nu/de));
+  while (tst==0)
+  {
+    ff=f*xx^k;
+    for (j=1; j<=k; j++)
+    {
+      ff=diff(ff,xx)/j;
+    }
+    de = subst(denominator(ff),xx,0);
+    if (de!=0)
+    {
+      poly nu = subst(numerator(ff),xx,0);
+      return(number(nu/de));
+    }
+    k++;
   }
-  k=k+1;
-  }
-ERROR("error in computeConstant");}
+  ERROR("error in computeConstant");
+}
 example
 { "EXAMPLE:"; echo=2;
   ring R=(0,x1,x2,x3,x4),(q1,q2,q3,q4,q5,q6),dp;
@@ -269,9 +273,6 @@ example
   number P = propagator(G,list(1,1,1,0,0,0));
   computeConstant(P,x2);
 }
-
-
-
 
 proc evaluateIntegral(number P, list xL)
 "USAGE:  evaluateIntegral(P,xx); P number, xx list@*
@@ -288,10 +289,12 @@ EXAMPLE:  example evaluateIntegral; shows an example
 "
 {
   number p = P;
-  for(int j=1; j<=size(xL); j++){
+  for(int j=1; j<=size(xL); j++)
+  {
      p=computeConstant(p,xL[j]);
   }
-return(p);}
+  return(p);
+}
 example
 { "EXAMPLE:"; echo=2;
   ring R=(0,x1,x2,x3,x4),(q1,q2,q3,q4,q5,q6),dp;
@@ -299,7 +302,6 @@ example
   number p = propagator(G,list(0,2,1,0,0,1));
   evaluateIntegral(p,list(x1,x3,x4,x2));
 }
-
 
 proc permute (list N)
 "USAGE:  permute(N); N list@*
@@ -313,21 +315,27 @@ KEYWORDS: permutations
 EXAMPLE:  example permute; shows an example
 "
 {
-   int i,j,k;
-   list L,L1;
-   if (size(N)==1){
-     return(list(N));
-   } else {
-     k=1;
-     for (i=1; i<=size(N); i++){
-       L=permute(delete(N,i));
-       for (j=1; j<=size(L); j++){
-          L1[k]=L[j]+list(N[i]);
-          k=k+1;
-       }
-     }
-   }
-return(L1);}
+  int i,j,k;
+  list L,L1;
+  if (size(N)==1)
+  {
+    return(list(N));
+  }
+  else
+  {
+    k=1;
+    for (i=1; i<=size(N); i++)
+    {
+      L=permute(delete(N,i));
+      for (j=1; j<=size(L); j++)
+      {
+        L1[k]=L[j]+list(N[i]);
+        k=k+1;
+      }
+    }
+  }
+  return(L1);
+}
 example
 { "EXAMPLE:"; echo=2;
   ring R=(0,x1,x2,x3,x4),(q),dp;
@@ -348,19 +356,19 @@ KEYWORDS: partitions
 EXAMPLE:  example partitions; shows an example
 "
 {
-ring R = 2,(x(1..n)),dp;
-ideal I = maxideal(a);
-list L;
-for (int j=1;j<=size(I);j++){
-  L[j]=leadexp(I[j]);
+  ring R = 2,(x(1..n)),dp;
+  ideal I = maxideal(a);
+  list L;
+  for (int j=1;j<=size(I);j++)
+  {
+    L[j]=leadexp(I[j]);
+  }
+  return(L);
 }
-return(L);}
 example
 { "EXAMPLE:"; echo=2;
   partitions(3,7);
 }
-
-
 
 proc gromovWitten(def P,list #)
 "USAGE:  gromovWitten(P); P number@*
@@ -384,37 +392,45 @@ KEYWORDS: Gromov-Witten invariants; elliptic curves; coverings; Hurwitz numbers
 EXAMPLE:  example gromovWitten; shows an example
 "
 {
-  if (typeof(P)=="number") {
-  list xl = ringlist(basering)[1][2];
-  int j;
-  for(j=1; j<=size(xl); j++){
-     execute("number n= "+xl[j]);
-     xl[j]=n;
-     kill n;
+  if (typeof(P)=="number")
+  {
+    list xl = ringlist(basering)[1][2];
+    int j;
+    for(j=1; j<=size(xl); j++)
+    {
+      execute("number n= "+xl[j]);
+      xl[j]=n;
+      kill n;
+    }
+    list pxl = permute(xl);
+    number p = 0;
+    for(j=1; j<=size(pxl); j++)
+    {
+      p=p+evaluateIntegral(P,pxl[j]);
+    }
+    return(p);
   }
-  list pxl = permute(xl);
-  number p = 0;
-  for(j=1; j<=size(pxl); j++){
-     p=p+evaluateIntegral(P,pxl[j]);
-  }
-  return(p);
-  }
-  if (typeof(P)=="graph"){
-     if (size(#)>1){
-       return(gromovWitten(propagator(P,#)));
-     } else {
+  if (typeof(P)=="graph")
+  {
+    if (size(#)>1)
+    {
+      return(gromovWitten(propagator(P,#)));
+    }
+    else
+    {
       int d =#[1];
       list pa = partitions(size(P.edges),d);
       list re;
       int ti;
-      for (int j=1; j<=size(pa); j++) {
-       ti=timer;
-       re[j]=gromovWitten(propagator(P,pa[j]));
-       ti=timer-ti;
-       //print(string(j)+" / "+string(size(pa))+"    "+string(pa[j])+"     "+string(re[j])+"      "+string(sum(re))+"     "+string(ti));
+      for (int j=1; j<=size(pa); j++)
+      {
+        ti=timer;
+        re[j]=gromovWitten(propagator(P,pa[j]));
+        ti=timer-ti;
+        //print(string(j)+" / "+string(size(pa))+"    "+string(pa[j])+"     "+string(re[j])+"      "+string(sum(re))+"     "+string(ti));
       }
-     return(lsum(re));
-     }
+      return(lsum(re));
+    }
   }
 }
 example
@@ -426,8 +442,6 @@ example
   gromovWitten(G,list(0,2,1,0,0,1));
   gromovWitten(G,2);
 }
-
-
 
 proc computeGromovWitten(graph P,int d, int st, int en, list #)
 "USAGE:  computeGromovWitten(G, d, st, en [, vb] ); G graph, d int, st int, en  int, optional: vb int@*
@@ -442,25 +456,29 @@ KEYWORDS: Gromov-Witten invariants; elliptic curves; coverings; Hurwitz numbers
 EXAMPLE:  example computeGromovWitten; shows an example
 "
 {
-     number s =0;
-     list pararg;
-     list re;
-     list pa = partitions(size(P.edges),d);
-     int vb=0;
-     if (size(#)>0){vb=#[1];}
-     int ti;
-     if (vb>0){print(size(pa));}
-     for (int j=1; j<=size(pa); j++) {
-      if ((j>=st)&(j<=en)){
-       ti=timer;
-       //pararg[j]=list(propagator(G,pa[j]));
-       re[j]=gromovWitten(propagator(P,pa[j]));
-       ti=timer-ti;
-       if (vb>0){print(string(j)+" / "+string(size(pa))+"    "+string(pa[j])+"     "+string(re[j])+"      "+string(lsum(re))+"     "+string(ti));}
-      } else {re[j]=s;}
-     }
-     //list re = parallelWaitAll("gromovWitten", pararg, list(list(list(2))));
-     return(re);
+  number s =0;
+  list pararg;
+  list re;
+  list pa = partitions(size(P.edges),d);
+  int vb=0;
+  if (size(#)>0){vb=#[1];}
+  int ti;
+  if (vb>0){print(size(pa));}
+  for (int j=1; j<=size(pa); j++)
+  {
+    if ((j>=st)&(j<=en))
+    {
+      ti=timer;
+      //pararg[j]=list(propagator(G,pa[j]));
+      re[j]=gromovWitten(propagator(P,pa[j]));
+      ti=timer-ti;
+      if (vb>0){print(string(j)+" / "+string(size(pa))+"    "+string(pa[j])+"     "+string(re[j])+"      "+string(lsum(re))+"     "+string(ti));}
+    }
+    else
+    {re[j]=s;}
+  }
+  //list re = parallelWaitAll("gromovWitten", pararg, list(list(list(2))));
+  return(re);
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -470,7 +488,6 @@ example
   computeGromovWitten(G,2,3,7);
   computeGromovWitten(G,2,3,7,1);
 }
-
 
 proc lsum(list L)
 "USAGE:  lsum(L); L list@*
@@ -484,17 +501,17 @@ EXAMPLE:  example lsum; shows an example
 "
 {
   execute(typeof(L[1])+" s");
-  for(int j=1; j<=size(L); j++){
-     s=s+L[j];
+  for(int j=1; j<=size(L); j++)
+  {
+    s=s+L[j];
   }
-return(s);}
+  return(s);
+}
 example
 { "EXAMPLE:"; echo=2;
   list L = 1,2,3,4,5;
   lsum(L);
 }
-
-
 
 proc generatingFunction(graph G, int d)
 "USAGE:  generatingFunction(G, d); G graph, d int@*
@@ -511,14 +528,17 @@ EXAMPLE:  example generatingFunction; shows an example
   poly  s =0;
   int j,jj;
   list pa,L;
-  for (j=1; j<=d; j++){
+  for (j=1; j<=d; j++)
+  {
     pa = partitions(size(G.edges),j);
     L = computeGromovWitten(G,j,1,size(pa));
-    for (jj=1; jj<=size(pa); jj++) {
-       s=s+L[jj]*monomial(pa[jj]);
+    for (jj=1; jj<=size(pa); jj++)
+    {
+      s=s+L[jj]*monomial(pa[jj]);
     }
   }
-return(s);}
+  return(s);
+}
 example
 { "EXAMPLE:"; echo=2;
   ring R=(0,x1,x2),(q1,q2,q3),dp;

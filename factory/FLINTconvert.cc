@@ -162,8 +162,7 @@ void convertCF2Fmpq (fmpq_t result, const CanonicalForm& f)
   //ASSERT (isOn (SW_RATIONAL), "expected rational");
   if (f.isImm ())
   {
-    fmpz_set_si (fmpq_numref (result), f.intval());
-    fmpz_set_si (fmpq_denref (result), 1);
+    fmpq_set_si (result, f.intval(), 1);
   }
   else if(f.inQ())
   {
@@ -181,7 +180,7 @@ void convertCF2Fmpq (fmpq_t result, const CanonicalForm& f)
     f.mpzval(gmp_val);
     fmpz_set_mpz (fmpq_numref (result), gmp_val);
     mpz_clear (gmp_val);
-    fmpz_set_si (fmpq_denref (result), 1);
+    fmpz_one(fmpq_denref(result));
   }
   else
   {
@@ -573,8 +572,7 @@ static void convFlint_RecPP ( const CanonicalForm & f, ulong * exp, nmod_mpoly_t
   }
   else
   {
-    int c=f.intval();
-    if (c<0) c+=getCharacteristic();
+    int c=f.intval(); // with Off(SW_SYMMETRIC_FF): 0<=c<p
     nmod_mpoly_push_term_ui_ui(result,c,exp,ctx);
   }
 }
@@ -607,7 +605,10 @@ void convFactoryPFlintMP ( const CanonicalForm & f, nmod_mpoly_t res, nmod_mpoly
   if (f.isZero()) return;
   ulong * exp = (ulong*)Alloc(N*sizeof(ulong));
   memset(exp,0,N*sizeof(ulong));
+  bool save_sym_ff= isOn (SW_SYMMETRIC_FF);
+  if (save_sym_ff) Off (SW_SYMMETRIC_FF);
   convFlint_RecPP( f, exp, res, ctx, N );
+  if (save_sym_ff) On(SW_SYMMETRIC_FF);
   Free(exp,N*sizeof(ulong));
 }
 
@@ -691,7 +692,7 @@ CanonicalForm mulFlintMP_Zp(const CanonicalForm& F,int lF, const CanonicalForm& 
   nmod_mpoly_init3(g,lG,bits,ctx);
   convFactoryPFlintMP(F,f,ctx,N);
   convFactoryPFlintMP(G,g,ctx,N);
-  nmod_mpoly_init3(res,lF+lG,bits+1,ctx);
+  nmod_mpoly_init(res,ctx);
   nmod_mpoly_mul(res,f,g,ctx);
   nmod_mpoly_clear(g,ctx);
   nmod_mpoly_clear(f,ctx);
@@ -712,7 +713,7 @@ CanonicalForm mulFlintMP_QQ(const CanonicalForm& F,int lF, const CanonicalForm& 
   fmpq_mpoly_init3(g,lG,bits,ctx);
   convFactoryPFlintMP(F,f,ctx,N);
   convFactoryPFlintMP(G,g,ctx,N);
-  fmpq_mpoly_init3(res,lF+lG,bits+1,ctx);
+  fmpq_mpoly_init(res,ctx);
   fmpq_mpoly_mul(res,f,g,ctx);
   fmpq_mpoly_clear(g,ctx);
   fmpq_mpoly_clear(f,ctx);
@@ -736,7 +737,7 @@ CanonicalForm gcdFlintMP_Zp(const CanonicalForm& F, const CanonicalForm& G)
   nmod_mpoly_init3(g,lg,bits,ctx);
   convFactoryPFlintMP(F,f,ctx,N);
   convFactoryPFlintMP(G,g,ctx,N);
-  nmod_mpoly_init3(res,lf,bits,ctx);
+  nmod_mpoly_init(res,ctx);
   int ok=nmod_mpoly_gcd(res,f,g,ctx);
   nmod_mpoly_clear(g,ctx);
   nmod_mpoly_clear(f,ctx);
@@ -749,6 +750,21 @@ CanonicalForm gcdFlintMP_Zp(const CanonicalForm& F, const CanonicalForm& G)
   nmod_mpoly_ctx_clear(ctx);
   return RES;
 }
+
+static CanonicalForm b_content ( const CanonicalForm & f )
+{
+    if ( f.inCoeffDomain() )
+        return f;
+    else
+    {
+        CanonicalForm result = 0;
+        CFIterator i;
+        for ( i = f; i.hasTerms() && (!result.isOne()); i++ )
+            result=bgcd( b_content(i.coeff()) , result );
+        return result;
+    }
+}
+
 
 CanonicalForm gcdFlintMP_QQ(const CanonicalForm& F, const CanonicalForm& G)
 {
@@ -778,6 +794,8 @@ CanonicalForm gcdFlintMP_QQ(const CanonicalForm& F, const CanonicalForm& G)
       fmpq_clear(content);
     }
     RES=convFlintMPFactoryP(res,ctx,N);
+    // gcd(2x,4x) should be 2x, so RES should also have the gcd(lc(F),lc(G))
+    RES*=bgcd(b_content(F),b_content(G));
   }
   fmpq_mpoly_clear(res,ctx);
   fmpq_mpoly_ctx_clear(ctx);
