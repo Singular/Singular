@@ -2595,7 +2595,12 @@ static proc parse_ordering(string ordering, int n_vars)
       {
         int w = int(ordering[b1+1, b2-b1-1]);
       }
-      else
+      if (name == "wp" || name == "Wp" || name == "ws" || name == "Ws"
+          || name == "a")
+      {
+        intvec w = int(ordering[b1+1, b2-b1-1]);
+      }
+      if (!defined(w))   // else
       {
         intvec w = 1:int(ordering[b1+1, b2-b1-1]);
       }
