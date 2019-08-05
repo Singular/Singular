@@ -54,17 +54,16 @@ def extract_keywords():
 
     # read from the file created by singular
     dictionary = read_dictionary()
-    print(dictionary)
 
     # sort alphabetically
     dictionary = np.sort(np.unique(dictionary))
-    print(dictionary)
 
     # write back to the same file
     with open(KEYWORDS_FILE, "w") as file:
         for word in dictionary:
             file.write(word + "\n")
 
+    return dictionary
 
 
 def create_table(dictionary=None, attempt_cached=True):
@@ -96,3 +95,23 @@ def create_table(dictionary=None, attempt_cached=True):
     vectors = vectors / np.sqrt((vectors ** 2).sum(-1))[..., np.newaxis]
 
     return (vectors, file_list)
+
+def init_table_on_system():
+    """
+    check whether the various files exist, and create if necessary. 
+    """
+    # check for and download help files if necessary
+    tbz2_path = os.path.join(HELP_FILE_PATH, "helpfiles.tbz2")
+    if not os.path.isdir(HELP_FILE_PATH) or not os.path.isfile(tbz2_path):
+        fetch_tbz2_data()
+
+    # Use Singular to extract the keywords and save in a file.
+    if not os.path.isfile(KEYWORDS_FILE):
+        dictionary = extract_keywords()
+    else:
+        dictionary = None
+
+
+    if not os.path.isfile(VECTORS_NPY) or not os.path.isfile(HELPFILE_NPY):
+        vectors, file_list = create_table(dictionary=dictionary,
+                                          attempt_cached=False)

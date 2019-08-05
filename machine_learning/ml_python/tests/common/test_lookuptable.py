@@ -5,7 +5,7 @@ import cProfile
 
 from common.lookuptable import *
 from common.keyword_vector import count_occurances
-from common.constants import KEYWORDS_FILE
+from common.constants import KEYWORDS_FILE, VECTORS_NPY, HELP_FILE_PATH
 
 class TestLookuptableMethods(unittest.TestCase):
 
@@ -31,6 +31,21 @@ class TestLookuptableMethods(unittest.TestCase):
         test_vec = count_occurances(os.path.join(HELP_FILE_PATH, "html",
                                                  files[1]), dictionary)
         self.assertTrue((test_vec == vectors[1]).all())
+
+    def test_init_table_on_system(self):
+        tbz2_path = os.path.join(HELP_FILE_PATH, "helpfiles.tbz2")
+        os.remove(tbz2_path)
+        os.remove(KEYWORDS_FILE)
+        os.remove(VECTORS_NPY)
+
+        init_table_on_system()
+
+        self.assertTrue(os.path.isfile(tbz2_path))
+        self.assertTrue(os.path.isfile(KEYWORDS_FILE))
+        self.assertTrue(os.path.isfile(VECTORS_NPY))
+
+        init_table_on_system()
+
 
 if __name__ == '__main__':
     #cProfile.run("unittest.main()")

@@ -1,5 +1,5 @@
 [run]
 branch = True
-omit = tests/*, *__init__.py, predictor_runner.py
+omit = *tests/*, *__init__.py, *predictor_runner.py
 
 

@@ -72,7 +72,7 @@ class TestKeywordMethods(unittest.TestCase):
         """
         print("Testing create_vector_dictionary function:")
 
-        read_dictionary()
+        dictionary = read_dictionary()
 
         print("Create Vector Dictionary with None as dictionary:")
         self.assertRaises(AssertionError, create_vector_dictionary, None)
@@ -81,7 +81,7 @@ class TestKeywordMethods(unittest.TestCase):
         self.assertRaises(AssertionError,
                           create_vector_dictionary,
                           np.array([]))
-        print()
+        vec_dic = create_vector_dictionary(dictionary)
 
     def test_vector_distance(self):
         """
