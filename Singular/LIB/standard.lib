@@ -2517,7 +2517,7 @@ static proc tuple_to_tokens(string s)
 static proc parse_L1(string l1)
 {
   list tokens;
-  if (find(l1, "(", 1) == 0)   // no parentheses
+  if (l1[1] != "(")
   {
     tokens[1] = l1;
   }
@@ -2589,7 +2589,7 @@ static proc parse_var(string v)
  */
 static proc parse_L2(string l2)
 {
-  if (find(l2, "(", 1) == 0)   // no parentheses
+  if (l2[1] != "(")
   {
     return(list(parse_var(l2)));
   }
