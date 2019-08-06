@@ -9,8 +9,10 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	i = ml_initialise();
-	
 	printf("Returnvalue for initialise: %d\n", i);
+
+	i = ml_finalise();
+	printf("Returnvalue for finalise: %d\n", i);
 
 	return 0;
 }

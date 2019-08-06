@@ -1,3 +1,10 @@
+/**
+ * @file   mlpredict.c
+ * @brief  Functions for using python to do machine learning in Singular
+ *
+ * @author Murray Heymann
+ * @date   August 2019
+ */
 #include <stdio.h>
 #include <Python.h>
 
@@ -19,20 +26,24 @@ int ml_is_initialised()
 	return 1;
 }
 
+
 /**
- * Initialise the machine learning system by downloading the helpfiles if
+ * Initialise the machine learning system by starting the python
+ * interpreter,  downloading the helpfiles if
  * not present, and calculating the bag of words vectors for the helpfiles,
- * saving this info on the local system.  
+ * saving this info on the local system.
  *
  * @return An integer: 1 if successful, 0 if some error were to occur.
  */
-
 int ml_initialise()
 {
 	char lookuptable[] = "common.lookuptable";
 	char init_table_on_system[] = "init_table_on_system";
 	PyObject *pValue = NULL;
 
+	if (!Py_IsInitialized()) {
+		Py_Initialize();
+	}
 	pValue = call_python_function(lookuptable, init_table_on_system);
 	if (pValue != NULL) {
 		Py_DECREF(pValue);
@@ -42,6 +53,21 @@ int ml_initialise()
 	}
 
 }
+
+/**
+ * Finalize the python interpreter
+ *
+ * @return An integer: 1 if successful, 0 if not.
+ */
+int ml_finalise()
+{
+	if (Py_IsInitialized()) {
+		Py_Finalize();
+	}
+	return 1;
+}
+
+
 
 /**
  * Local helper function to call a function that takes no arguments.
@@ -55,12 +81,13 @@ PyObject *call_python_function(char *module, char *func)
 {
 	PyObject *pName = NULL, *pModule = NULL, *pFunc = NULL;
 	PyObject *pValue = NULL;
-	int retValue = 1;
 		
-	Py_Initialize();
+	if (!Py_IsInitialized()) {
+		Py_Initialize();
+	}
 
 	/* import the module */
-	pName = PyUnicode_DecodeFSDefault(module);
+	pName = PyString_FromString(module);
 	pModule = PyImport_Import(pName);
 	Py_DECREF(pName);
 
@@ -89,10 +116,6 @@ PyObject *call_python_function(char *module, char *func)
 	} else {
 		PyErr_Print();
 		fprintf(stderr, "Failed to load \"%s\"\n", module);
-		retValue = 0;
-	}
-	if (Py_FinalizeEx() < 0) {
-		retValue = 0;
 	}
 
 	return pValue;
@@ -117,15 +140,10 @@ int ml_make_prediction(char *filename,
 					   char *prediction_buffer,
 					   int *pred_len)
 {
-	Py_Initialize();
 
 
 
-	if (Py_FinalizeEx() < 0) {
-		return 0;
-	} else {
-		return 1;
-	}
+	return 1;
 }
 
 

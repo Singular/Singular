@@ -26,13 +26,21 @@
 int ml_is_initialised();
 
 /**
- * Initialise the machine learning system by downloading the helpfiles if
+ * Initialise the machine learning system by starting the python
+ * interpreter,  downloading the helpfiles if
  * not present, and calculating the bag of words vectors for the helpfiles,
- * saving this info on the local system.  
+ * saving this info on the local system.
  *
  * @return An integer: 1 if successful, 0 if some error were to occur.
  */
 int ml_initialise();
+
+/**
+ * Finalize the python interpreter
+ *
+ * @return An integer: 1 if successful, 0 if not.
+ */
+int ml_finalise();
 
 /**
  * Take a filename as string, pass it to the machine learning system, and
