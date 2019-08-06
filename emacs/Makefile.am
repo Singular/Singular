@@ -3,9 +3,7 @@ ACLOCAL_AMFLAGS = -I ../m4
 emacsdir=$(datadir)/singular/emacs
 
 EMACS = \
-    ChangeLog \
     COPYING \
-    NEWS \
     singular.el \
     singular.xpm  .emacs-general  .emacs-singular \
     cmd-cmpl.el ex-cmpl.el hlp-cmpl.el lib-cmpl.el
