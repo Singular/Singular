@@ -214,15 +214,15 @@ CanonicalForm convertFmpq_t2CF (const fmpq_t q)
     }
     else if (mpz_cmp_si(nden,1)==0)
     {
-      result= make_cf(nnum);
+      result= CanonicalForm( CFFactory::basic(nnum));
       mpz_clear (nden);
     }
     else
-      result= make_cf (nnum, nden, false);
+      result= CanonicalForm( CFFactory::rational( nnum, nden, false));
   }
   else
   {
-    result= make_cf (nnum, nden, false);
+    result= CanonicalForm( CFFactory::rational( nnum, nden, false));
   }
   if (!isRat)
     Off (SW_RATIONAL);
