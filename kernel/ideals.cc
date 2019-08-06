@@ -616,12 +616,29 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w, GbVarian
   {
     p = h2->m[j];
     q = pOne();
+#ifdef HAVE_SHIFTBBA
+    // non multiplicative variable
+    if (rIsLPRing(currRing))
+    {
+      pSetExp(q, currRing->isLPring - currRing->LPncGenCount + j + 1, 1);
+      p_Setm(q, currRing);
+    }
+#endif
     pSetComp(q,syzcomp+1+j);
     pSetmComp(q);
     if (p!=NULL)
     {
-      while (pNext(p)) pIter(p);
-      p->next = q;
+#ifdef HAVE_SHIFTBBA
+      if (rIsLPRing(currRing))
+      {
+        h2->m[j] = pAdd(p, q);
+      }
+      else
+#endif
+      {
+        while (pNext(p)) pIter(p);
+        p->next = q;
+      }
     }
     else
       h2->m[j]=q;
@@ -629,6 +646,9 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w, GbVarian
 
   idTest(h2);
 
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing)) alg = GbStd;
+#endif
   ideal h3=NULL;
   if (alg==GbDefault) alg=GbStd;
   if (alg==GbStd)

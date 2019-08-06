@@ -54,9 +54,11 @@ BOOLEAN p_LPDivisibleBy(poly a, poly b, const ring r);
 BOOLEAN p_LPLmDivisibleBy(poly a, poly b, const ring r);
 BOOLEAN _p_LPLmDivisibleByNoComp(poly a, poly b, const ring r);
 
+BOOLEAN _p_mLPNCGenValid(int *mExpV, const ring r);
+
 poly p_LPVarAt(poly p, int pos, const ring r);
 
 /// create the letterplace ring corresponding to r up to degree d
-ring freeAlgebra(ring r, int d);
+ring freeAlgebra(ring r, int d, int LPncGenCount = 0);
 #endif
 #endif

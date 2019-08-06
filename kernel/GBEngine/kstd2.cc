@@ -4519,17 +4519,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   return (strat->Shdl);
 }
 
-
-ideal freegb(ideal F, ideal Q)
-{
-  assume(rIsLPRing(currRing));
-  assume(idIsInV(F));
-  ideal RS = kStdShift(F, Q, testHomog, NULL);
-  idSkipZeroes(RS); // is this even necessary?
-  assume(idIsInV(RS));
-  return(RS);
-}
-
+#ifdef HAVE_SHIFTBBA
 ideal rightgb(ideal F, ideal Q)
 {
   assume(rIsLPRing(currRing));
@@ -4539,6 +4529,7 @@ ideal rightgb(ideal F, ideal Q)
   assume(idIsInV(RS));
   return(RS);
 }
+#endif
 
 /*2
 *reduces h with elements from T choosing  the first possible

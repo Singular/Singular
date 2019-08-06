@@ -41,7 +41,6 @@ ideal kStd(ideal F, ideal Q, tHomog h, intvec ** mw,intvec *hilb=NULL,
 ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** mw, intvec *hilb=NULL,
     int syzComp=0, int newIdeal=0, intvec *vw=NULL, BOOLEAN rightGB=FALSE);
 
-ideal freegb(ideal F, ideal Q);
 ideal rightgb(ideal F, ideal Q);
 
 /* the following global data are defined in kutil.cc */

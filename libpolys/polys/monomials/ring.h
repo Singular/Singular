@@ -311,6 +311,7 @@ struct ip_sring
 
 #ifdef HAVE_SHIFTBBA
   short          isLPring; /* 0 for non-letterplace rings, otherwise the number of LP blocks, at least 1, known also as lV */
+  short          LPncGenCount;
 #endif
 
   BOOLEAN   VectorOut;
