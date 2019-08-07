@@ -46,6 +46,23 @@ class TestLookuptableMethods(unittest.TestCase):
 
         init_table_on_system()
 
+    def test_is_lookup_initialised(self):
+        tbz2_path = os.path.join(HELP_FILE_PATH, "helpfiles.tbz2")
+        os.remove(tbz2_path)
+        self.assertFalse(is_lookup_initialised())
+        init_table_on_system()
+        self.assertTrue(is_lookup_initialised())
+
+        os.remove(KEYWORDS_FILE)
+        self.assertFalse(is_lookup_initialised())
+        init_table_on_system()
+        self.assertTrue(is_lookup_initialised())
+
+        os.remove(VECTORS_NPY)
+        self.assertFalse(is_lookup_initialised())
+        init_table_on_system()
+        self.assertTrue(is_lookup_initialised())
+        
 
 if __name__ == '__main__':
     #cProfile.run("unittest.main()")

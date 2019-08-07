@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <Python.h>
 #include "mlpredict.h"
 
 int main(int argc, char *argv[])
@@ -8,11 +9,22 @@ int main(int argc, char *argv[])
 		printf("Usage: %s\n", argv[0]);
 		return 1;
 	}
+
+	i = ml_is_initialised();
+	printf("Returnvalue for ml_is_initialised: %d\n", i);
+	Py_Initialize();
+
+	i = ml_is_initialised();
+	printf("Returnvalue for ml_is_initialised: %d\n", i);
+
 	i = ml_initialise();
-	printf("Returnvalue for initialise: %d\n", i);
+	printf("Returnvalue for ml_initialise: %d\n", i);
+
+	i = ml_is_initialised();
+	printf("Returnvalue for ml_is_initialised: %d\n", i);
 
 	i = ml_finalise();
-	printf("Returnvalue for finalise: %d\n", i);
+	printf("Returnvalue for ml_finalise: %d\n", i);
 
 	return 0;
 }

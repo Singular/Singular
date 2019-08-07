@@ -20,10 +20,32 @@ PyObject *call_python_function(char *module, char *func);
  */
 int ml_is_initialised()
 {
-	/*
-	 * TODO
-	 */
-	return 1;
+	int retvalue = 1;
+	int t_value = 0;
+	PyObject *pValue = NULL;
+
+	if (!Py_IsInitialized()) {
+		retvalue = 0;
+	} else {
+		/* python system is initialised */
+		pValue = call_python_function(LOOKUPTABLE, IS_LOOKUP_INITIALISED);
+		/* is this a boolean? */
+		if (pValue != NULL && PyBool_Check(pValue)) {
+			t_value = PyObject_IsTrue(pValue);
+			/* errors? */
+			if (t_value == -1) {
+				PyErr_Print();
+				retvalue = 0;
+			} else {
+				/* no errors */
+				retvalue = t_value;
+			}
+			Py_DECREF(pValue);
+		} else {
+			retvalue = 0;
+		}
+	}
+	return retvalue;
 }
 
 
@@ -37,14 +59,12 @@ int ml_is_initialised()
  */
 int ml_initialise()
 {
-	char lookuptable[] = "common.lookuptable";
-	char init_table_on_system[] = "init_table_on_system";
 	PyObject *pValue = NULL;
 
 	if (!Py_IsInitialized()) {
 		Py_Initialize();
 	}
-	pValue = call_python_function(lookuptable, init_table_on_system);
+	pValue = call_python_function(LOOKUPTABLE, INIT_TABLE_ON_SYSTEM);
 	if (pValue != NULL) {
 		Py_DECREF(pValue);
 		return 1;
@@ -55,16 +75,21 @@ int ml_initialise()
 }
 
 /**
- * Finalize the python interpreter
+ * A wrapper for Py_Finalize, checking whether it is necessary in the first
+ * place.
  *
  * @return An integer: 1 if successful, 0 if not.
  */
 int ml_finalise()
 {
+	int retvalue = 1;
 	if (Py_IsInitialized()) {
 		Py_Finalize();
+		retvalue = 1;
+	} else {
+		retvalue = 0;
 	}
-	return 1;
+	return retvalue;
 }
 
 

@@ -115,3 +115,19 @@ def init_table_on_system():
     if not os.path.isfile(VECTORS_NPY) or not os.path.isfile(HELPFILE_NPY):
         vectors, file_list = create_table(dictionary=dictionary,
                                           attempt_cached=False)
+
+def is_lookup_initialised():
+    """
+    Check whether the various files exist, return True if so, False
+    otherwise.
+    """
+    retvalue = True
+    tbz2_path = os.path.join(HELP_FILE_PATH, "helpfiles.tbz2")
+    if not os.path.isdir(HELP_FILE_PATH) or not os.path.isfile(tbz2_path):
+        retvalue = False
+    if not os.path.isfile(KEYWORDS_FILE):
+        retvalue = False
+    if not os.path.isfile(VECTORS_NPY) or not os.path.isfile(HELPFILE_NPY):
+        retvalue = False
+
+    return retvalue

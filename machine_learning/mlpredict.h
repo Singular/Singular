@@ -17,6 +17,10 @@
 #define HELP_FILE_URL	"ftp://jim.mathematik.uni-kl.de/pub/Math/Singular/src/4-1-2/doc.tbz2" 
 #define HELP_FILE_PATH  "helpfiles/singular"
 
+#define LOOKUPTABLE "common.lookuptable"
+#define IS_LOOKUP_INITIALISED "is_lookup_initialised"
+#define INIT_TABLE_ON_SYSTEM "init_table_on_system"
+
 /**
  * Check whether the helpfiles have been downloaded and the relevant
  * vectors have been calculated and saved.
