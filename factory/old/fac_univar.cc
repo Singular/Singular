@@ -26,7 +26,7 @@ TIMING_DEFINE_PRINT(fac_combineFactors)
 
 const int max_fp_fac = 3;
 
-STATIC_INST_VAR modpk theModulus;
+THREAD_INST_VAR static modpk theModulus;
 
 #ifdef DEBUGOUTPUT
 #define DEBOUTHPRINT(stream, msg, hg) \

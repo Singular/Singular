@@ -3635,7 +3635,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 /*==================== n_SwitchChinRem =================*/
     if(strcmp(sys_cmd,"cache_chinrem")==0)
     {
-      EXTERN_VAR int n_SwitchChinRem;
+      THREAD_VAR extern int n_SwitchChinRem;
       Print("caching inverse in chines remainder:%d\n",n_SwitchChinRem);
       if ((h!=NULL)&&(h->Typ()==INT_CMD))
         n_SwitchChinRem=(int)(long)h->Data();

@@ -114,7 +114,7 @@ void setListEntry_ui(lists L, int index, unsigned long ui)
 }
 
 /* Factoring with Pollard's rho method. stolen from GMP/demos */
-STATIC_VAR unsigned add[] = {4, 2, 4, 2, 4, 6, 2, 6};
+THREAD_VAR static unsigned add[] = {4, 2, 4, 2, 4, 6, 2, 6};
 
 static int factor_using_division (mpz_t t, unsigned int limit,lists primes, int *multiplicities,int &index, unsigned long bound)
 {
@@ -682,7 +682,7 @@ BOOLEAN setOption(leftv res, leftv v)
         #ifdef YYDEBUG
         #if YYDEBUG
         /*debugging the bison grammar --> grammar.cc*/
-        EXTERN_VAR int    yydebug;
+        THREAD_VAR extern int    yydebug;
         if (BVERBOSE(V_YACC)) yydebug=1;
         else                  yydebug=0;
         #endif
@@ -696,7 +696,7 @@ BOOLEAN setOption(leftv res, leftv v)
         #ifdef YYDEBUG
         #if YYDEBUG
         /*debugging the bison grammar --> grammar.cc*/
-        EXTERN_VAR int    yydebug;
+        THREAD_VAR extern int    yydebug;
         if (BVERBOSE(V_YACC)) yydebug=1;
         else                  yydebug=0;
         #endif
@@ -1097,7 +1097,7 @@ void m2_end(int i)
 {
   if (!m2_end_called)
   {
-    EXTERN_VAR FILE* File_Profiling;
+    THREAD_VAR extern FILE* File_Profiling;
     if (File_Profiling!=NULL) { fclose(File_Profiling); File_Profiling=NULL; }
     m2_end_called = TRUE;
 #ifdef HAVE_SIMPLEIPC
@@ -1202,7 +1202,7 @@ extern "C"
 }
 
 #ifdef SINGULAR_4_2
-STATIC_VAR n_coeffType n_pAE=n_unknown;
+THREAD_VAR static n_coeffType n_pAE=n_unknown;
 static BOOLEAN ii_pAE_init(leftv res,leftv a)
 {
   if (a->Typ()!=INT_CMD)
@@ -1219,8 +1219,8 @@ static BOOLEAN ii_pAE_init(leftv res,leftv a)
 }
 #endif
 #ifdef HAVE_FLINT
-STATIC_VAR n_coeffType n_FlintZn=n_unknown;
-STATIC_VAR n_coeffType n_FlintQ=n_unknown;
+THREAD_VAR static n_coeffType n_FlintZn=n_unknown;
+THREAD_VAR static n_coeffType n_FlintQ=n_unknown;
 static BOOLEAN ii_FlintZn_init(leftv res,leftv a)
 {
   const short t[]={2,INT_CMD,STRING_CMD};

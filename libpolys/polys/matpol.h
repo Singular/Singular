@@ -101,7 +101,7 @@ void iiWriteMatrix(matrix im, const char *n, int dim, const ring r, int spaces);
 
 char * iiStringMatrix(matrix im, int dim, const ring r, char ch=',');
 
-EXTERN_VAR omBin ip_smatrix_bin;
+THREAD_VAR extern omBin ip_smatrix_bin;
 
 int mp_Compare(matrix a, matrix b, const ring r);
 

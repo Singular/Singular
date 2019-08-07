@@ -14,7 +14,7 @@
 extern const char SHORT_OPTS_STRING[];
 
 /* specifies format of options */
-EXTERN_VAR struct fe_option feOptSpec[];
+THREAD_VAR extern struct fe_option feOptSpec[];
 
 /* provides feOptIndex enum type for fast accesses to feOptSpec */
 #if ! defined(GENERATE_DEPEND)

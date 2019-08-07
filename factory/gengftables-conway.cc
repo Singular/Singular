@@ -56,7 +56,7 @@ const int primes_len = 54;
  * primes, primes_len:
  *   used to step through possible extensions
 **/
-STATIC_VAR unsigned short primes [] =
+THREAD_VAR static unsigned short primes [] =
 {
       2,   3,   5,   7,  11,  13,  17,  19,
      23,  29,  31,  37,  41,  43,  47,  53,

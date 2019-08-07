@@ -14,10 +14,10 @@
 #include <sys/resource.h>
 #include <unistd.h>
 
-VAR int        timerv = 0;
-STATIC_VAR double timer_resolution = TIMER_RESOLUTION;
+THREAD_VAR int        timerv = 0;
+THREAD_VAR static double timer_resolution = TIMER_RESOLUTION;
 
-STATIC_VAR double mintime = 0.5;
+THREAD_VAR static double mintime = 0.5;
 
 void SetTimerResolution(int res)
 {
@@ -55,13 +55,13 @@ void SetMinDisplayTime(double mtime)
 /*3
 * the start time of the timer
 */
-STATIC_VAR int64 siStartTime;
-STATIC_VAR int64 startl;
+THREAD_VAR static int64 siStartTime;
+THREAD_VAR static int64 startl;
 
 /*3
 * temp structure to get the time
 */
-STATIC_VAR struct rusage t_rec;
+THREAD_VAR static struct rusage t_rec;
 /*0 implementation*/
 
 int initTimer()
@@ -113,7 +113,7 @@ int getTimer()
 * if this time is > mintime sec
 */
 #ifdef EXTEND_TIMER_D
-EXTERN_VAR int iiOp;
+THREAD_VAR extern int iiOp;
 #endif
 
 void writeTime(const char* v)
@@ -143,10 +143,10 @@ void writeTime(const char* v)
 }
 
 /*0 Real timer implementation*/
-VAR int rtimerv = 0;
-STATIC_VAR struct timeval  startRl;
-STATIC_VAR struct timeval  siStartRTime;
-STATIC_VAR struct timezone tzp;
+THREAD_VAR int rtimerv = 0;
+THREAD_VAR static struct timeval  startRl;
+THREAD_VAR static struct timeval  siStartRTime;
+THREAD_VAR static struct timezone tzp;
 
 void startRTimer()
 {

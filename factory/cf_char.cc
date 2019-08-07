@@ -17,8 +17,8 @@
 #include "cf_primes.h"
 #include "cf_util.h"
 
-STATIC_VAR int theCharacteristic = 0;
-STATIC_VAR int theDegree = 1;
+THREAD_VAR static int theCharacteristic = 0;
+THREAD_VAR static int theDegree = 1;
 
 void setCharacteristic( int c )
 {

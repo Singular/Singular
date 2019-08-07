@@ -30,7 +30,7 @@ void nrnWrite (number a, const coeffs);
 BOOLEAN nrnDBTest      (number a, const char *f, const int l, const coeffs r);
 #endif
 
-EXTERN_VAR omBin gmp_nrz_bin;
+THREAD_VAR extern omBin gmp_nrz_bin;
 
 static void nrnCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
@@ -82,7 +82,7 @@ coeffs nrnInitCfByName(char *s,n_coeffType n)
   else return NULL;
 }
 
-STATIC_VAR char* nrnCoeffName_buff=NULL;
+THREAD_VAR static char* nrnCoeffName_buff=NULL;
 static char* nrnCoeffName(const coeffs r)
 {
   if(nrnCoeffName_buff!=NULL) omFree(nrnCoeffName_buff);
@@ -702,7 +702,7 @@ static number nrnQuotRem(number a, number b, number  * rem, const coeffs r)
  * Helper function for computing the module
  */
 
-STATIC_VAR mpz_ptr nrnMapCoef = NULL;
+THREAD_VAR static mpz_ptr nrnMapCoef = NULL;
 
 static number nrnMapModN(number from, const coeffs /*src*/, const coeffs dst)
 {

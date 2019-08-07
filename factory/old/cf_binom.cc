@@ -14,13 +14,13 @@
 
 #define INITPT 10
 
-VAR CFArray * ptZ = 0;
-VAR CFArray * ptF = 0;
+THREAD_VAR CFArray * ptZ = 0;
+THREAD_VAR CFArray * ptF = 0;
 
-VAR int charac = 0;
-VAR int gfdeg = 0;
-VAR int ptZmax = INITPT;
-VAR int ptFmax = 0;
+THREAD_VAR int charac = 0;
+THREAD_VAR int gfdeg = 0;
+THREAD_VAR int ptZmax = INITPT;
+THREAD_VAR int ptFmax = 0;
 
 void
 resetFPT()
@@ -31,7 +31,7 @@ resetFPT()
 void
 initPT ( )
 {
-    STATIC_VAR bool initialized = false;
+    THREAD_VAR static bool initialized = false;
 
     if ( ! initialized ) {
         initialized = true;

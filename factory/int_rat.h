@@ -40,7 +40,7 @@ class InternalRational : public InternalCF
 private:
     mpz_t _num;
     mpz_t _den;
-    STATIC_VAR int initialized;
+    THREAD_VAR static int initialized;
     static mpz_ptr MPQNUM( const InternalCF * const c );
     static mpz_ptr MPQDEN( const InternalCF * const c );
     static void normalize( const mpz_ptr, const mpz_ptr, mpz_ptr, mpz_ptr );

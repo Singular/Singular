@@ -10,7 +10,7 @@
 
 #include "gfanlib/gfanlib_zfan.h"
 
-VAR BITSET bitsetSave1, bitsetSave2;
+THREAD_VAR BITSET bitsetSave1, bitsetSave2;
 
 
 /***

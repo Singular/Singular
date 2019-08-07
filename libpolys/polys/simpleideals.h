@@ -55,7 +55,7 @@ struct sideal_list
 #endif
 };
 
-EXTERN_VAR omBin sip_sideal_bin;
+THREAD_VAR extern omBin sip_sideal_bin;
 
 /// creates an ideal / module
 ideal idInit (int size, int rank=1);

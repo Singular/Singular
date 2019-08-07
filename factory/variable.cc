@@ -38,11 +38,11 @@ public:
     bool & reduce () { return _reduce; }
 };
 
-STATIC_VAR ext_entry * algextensions = 0;
-STATIC_VAR char * var_names = 0;
-STATIC_VAR char * var_names_ext = 0;
-STATIC_VAR char default_name = 'v';
-STATIC_VAR char default_name_ext = 'a';
+THREAD_VAR static ext_entry * algextensions = 0;
+THREAD_VAR static char * var_names = 0;
+THREAD_VAR static char * var_names_ext = 0;
+THREAD_VAR static char default_name = 'v';
+THREAD_VAR static char default_name_ext = 'a';
 
 Variable::Variable( int l, bool flag ) : _level(l)
 {

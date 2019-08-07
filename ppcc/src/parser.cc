@@ -378,7 +378,7 @@ void EmitEpilogue(Parser *parser) {
 
 void TransformVarDecl(Parser *parser, Str *storage_class,
     bool is_class, bool is_toplevel, DeclType decl_type) {
-  // We rewrite: VAR type a, b = init, c;
+  // We rewrite: THREAD_VAR type a, b = init, c;
   // as:
   // storage_class type a;
   // storage_class type b;

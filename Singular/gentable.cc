@@ -28,7 +28,7 @@
 inline int RingDependend(int t) { return (BEGIN_RING<t)&&(t<END_RING); }
 
 // to produce convert_table.texi for doc:
-VAR int produce_convert_table=0;
+THREAD_VAR int produce_convert_table=0;
 
 // bits 0,1 for PLURAL
 #define NO_NC            0
@@ -262,7 +262,7 @@ const char * iiTwoOps(int t)
 {
   if (t<127)
   {
-    STATIC_VAR char ch[2];
+    THREAD_VAR static char ch[2];
     switch (t)
     {
       case '&':
@@ -326,7 +326,7 @@ int iiTestConvert (int inputType, int outputType)
   // Tok2Cmdname(inputType), Tok2Cmdname(outputType));
   return 0;
 }
-VAR char *iparith_inc;
+THREAD_VAR char *iparith_inc;
 void ttGen1()
 {
   iparith_inc=strdup("iparith.xxxxxx");

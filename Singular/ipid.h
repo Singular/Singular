@@ -11,10 +11,10 @@
 #include "Singular/subexpr.h"
 #include "Singular/lists.h"
 
-EXTERN_VAR idhdl currPackHdl;
-EXTERN_VAR idhdl basePackHdl;
-EXTERN_VAR package currPack;
-EXTERN_VAR package basePack;
+THREAD_VAR extern idhdl currPackHdl;
+THREAD_VAR extern idhdl basePackHdl;
+THREAD_VAR extern package currPack;
+THREAD_VAR extern package basePack;
 #define IDROOT (currPack->idroot)
 
 struct sip_command;
@@ -62,7 +62,7 @@ class proclevel
   void    push(char *);
   void    pop();
 };
-EXTERN_VAR proclevel *procstack;
+THREAD_VAR extern proclevel *procstack;
 
 typedef struct
 {
@@ -74,7 +74,7 @@ typedef struct
 } SModulFunctions;
 
 
-EXTERN_VAR idhdl      currRingHdl;
+THREAD_VAR extern idhdl      currRingHdl;
 /* ================================================================== */
 /* module support */
 typedef int (*SModulFunc_t)(SModulFunctions*);
@@ -134,12 +134,12 @@ void ipListFlag(idhdl h);
 #define IDPACKAGE(a) ((a)->data.pack)
 #define IDPROC(a)   ((a)->data.pinf)
 
-EXTERN_VAR omBin sip_command_bin;
-EXTERN_VAR omBin sip_package_bin;
-EXTERN_VAR omBin idrec_bin;
-EXTERN_VAR omBin sleftv_bin;
+THREAD_VAR extern omBin sip_command_bin;
+THREAD_VAR extern omBin sip_package_bin;
+THREAD_VAR extern omBin idrec_bin;
+THREAD_VAR extern omBin sleftv_bin;
 
-EXTERN_VAR coeffs coeffs_BIGINT;
+THREAD_VAR extern coeffs coeffs_BIGINT;
 
 /* options */
 struct soptionStruct

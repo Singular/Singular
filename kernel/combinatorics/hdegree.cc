@@ -18,8 +18,8 @@
 #include "kernel/combinatorics/hilb.h"
 #include "kernel/combinatorics/stairc.h"
 
-VAR int  hCo, hMu, hMu2;
-VAR omBin indlist_bin = omGetSpecBin(sizeof(indlist));
+THREAD_VAR int  hCo, hMu, hMu2;
+THREAD_VAR omBin indlist_bin = omGetSpecBin(sizeof(indlist));
 
 /*0 implementation*/
 
@@ -127,7 +127,7 @@ int  scDimInt(ideal S, ideal Q)
 }
 
 // independent set
-STATIC_VAR scmon hInd;
+THREAD_VAR static scmon hInd;
 
 static void hIndSolve(scmon pure, int Npure, scfmon rad, int Nrad,
  varset var, int Nvar)
@@ -275,7 +275,7 @@ intvec * scIndIntvec(ideal S, ideal Q)
   return Set;
 }
 
-VAR indset ISet, JSet;
+THREAD_VAR indset ISet, JSet;
 
 static BOOLEAN hNotZero(scfmon rad, int Nrad, varset var, int Nvar)
 {
@@ -927,7 +927,7 @@ int  scMult0Int(ideal S, ideal Q, const ring tailRing)
 
 // HC
 
-STATIC_VAR poly pWork;
+THREAD_VAR static poly pWork;
 
 static void hHedge(poly hEdge)
 {
@@ -1073,8 +1073,8 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
 
 //  kbase
 
-STATIC_VAR poly last;
-STATIC_VAR scmon act;
+THREAD_VAR static poly last;
+THREAD_VAR static scmon act;
 
 static void scElKbase()
 {

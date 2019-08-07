@@ -30,8 +30,8 @@
 #define modp_number int
 #define exponent int
 
-STATIC_VAR modp_number myp;  // all modp computation done mod myp
-STATIC_VAR int myp_index; // index of small prime in Singular table of primes
+THREAD_VAR static modp_number myp;  // all modp computation done mod myp
+THREAD_VAR static int myp_index; // index of small prime in Singular table of primes
 
 static inline modp_number modp_mul (modp_number x,modp_number y)
 {
@@ -80,63 +80,63 @@ typedef mpq_t *q_coordinates;
 typedef mpz_t *int_coordinates;
 typedef bool *coord_exist_table;
 
-STATIC_VAR int final_base_dim;    // dimension of the quotient space, known from the beginning
-STATIC_VAR int last_solve_column;  // last non-zero column in "solve" part of matrix, used for speed up
-STATIC_VAR int n_points;  // modp_number of ideals (points)
-STATIC_VAR int *multiplicity;  // multiplicities of points
-STATIC_VAR int variables;  // modp_number of variables
-STATIC_VAR int max_coord;  // maximal possible coordinate product used during Evaluation
-STATIC_VAR bool only_modp;  // perform only one modp computations
+THREAD_VAR static int final_base_dim;    // dimension of the quotient space, known from the beginning
+THREAD_VAR static int last_solve_column;  // last non-zero column in "solve" part of matrix, used for speed up
+THREAD_VAR static int n_points;  // modp_number of ideals (points)
+THREAD_VAR static int *multiplicity;  // multiplicities of points
+THREAD_VAR static int variables;  // modp_number of variables
+THREAD_VAR static int max_coord;  // maximal possible coordinate product used during Evaluation
+THREAD_VAR static bool only_modp;  // perform only one modp computations
 
-STATIC_VAR modp_coordinates *modp_points; // coordinates of points for modp problem - used by Evaluate (this is also initial data for only modp)
-STATIC_VAR q_coordinates *q_points; // coordinates of points for rational data (not used for modp)
-STATIC_VAR int_coordinates *int_points; // coordinates of points for integer data - used to check generators (not used for modp)
-STATIC_VAR coord_exist_table *coord_exist; // checks whether all coordinates has been initialized
-STATIC_VAR mon_list_entry *check_list; // monomials to be checked in next stages
-STATIC_VAR coordinates *points; // power products of coordinates of points used in modp cycles
-STATIC_VAR condition_type *condition_list; // conditions stored in an array
-STATIC_VAR mon_list_entry *lt_list; // leading terms found so far
-STATIC_VAR mon_list_entry *base_list; // standard monomials found so far
-STATIC_VAR row_list_entry *row_list; // rows of the matrix (both parts)
-STATIC_VAR modp_number *my_row; // one special row to perform operations
-STATIC_VAR modp_number *my_solve_row; // one special row to find the linear dependence ("solve" part)
-STATIC_VAR mono_type *column_name; // monomials assigned to columns in solve_row
+THREAD_VAR static modp_coordinates *modp_points; // coordinates of points for modp problem - used by Evaluate (this is also initial data for only modp)
+THREAD_VAR static q_coordinates *q_points; // coordinates of points for rational data (not used for modp)
+THREAD_VAR static int_coordinates *int_points; // coordinates of points for integer data - used to check generators (not used for modp)
+THREAD_VAR static coord_exist_table *coord_exist; // checks whether all coordinates has been initialized
+THREAD_VAR static mon_list_entry *check_list; // monomials to be checked in next stages
+THREAD_VAR static coordinates *points; // power products of coordinates of points used in modp cycles
+THREAD_VAR static condition_type *condition_list; // conditions stored in an array
+THREAD_VAR static mon_list_entry *lt_list; // leading terms found so far
+THREAD_VAR static mon_list_entry *base_list; // standard monomials found so far
+THREAD_VAR static row_list_entry *row_list; // rows of the matrix (both parts)
+THREAD_VAR static modp_number *my_row; // one special row to perform operations
+THREAD_VAR static modp_number *my_solve_row; // one special row to find the linear dependence ("solve" part)
+THREAD_VAR static mono_type *column_name; // monomials assigned to columns in solve_row
 
-STATIC_VAR int n_results;  // modp_number of performed modp computations (not discarded)
-STATIC_VAR modp_number modp_denom; // denominator of mod p computations
-STATIC_VAR modp_result_entry *modp_result; // list of results for various mod p calculations (used for modp - first result is the desired one)
-STATIC_VAR modp_result_entry *cur_result; // pointer to current result (as before)
-STATIC_VAR modp_number *congr; // primes used in computations (chinese remainder theorem) (not used for modp)
-STATIC_VAR modp_number *in_gamma; // inverts used in chinese remainder theorem (not used for modp)
-STATIC_VAR mpz_t bigcongr; // result, in fact, is given in mod bigcongr (not used for modp)
+THREAD_VAR static int n_results;  // modp_number of performed modp computations (not discarded)
+THREAD_VAR static modp_number modp_denom; // denominator of mod p computations
+THREAD_VAR static modp_result_entry *modp_result; // list of results for various mod p calculations (used for modp - first result is the desired one)
+THREAD_VAR static modp_result_entry *cur_result; // pointer to current result (as before)
+THREAD_VAR static modp_number *congr; // primes used in computations (chinese remainder theorem) (not used for modp)
+THREAD_VAR static modp_number *in_gamma; // inverts used in chinese remainder theorem (not used for modp)
+THREAD_VAR static mpz_t bigcongr; // result, in fact, is given in mod bigcongr (not used for modp)
 
-STATIC_VAR mpz_t *polycoef; // polynomial integercoefficients (not used for modp)
-STATIC_VAR mono_type *polyexp; // polynomial exponents
+THREAD_VAR static mpz_t *polycoef; // polynomial integercoefficients (not used for modp)
+THREAD_VAR static mono_type *polyexp; // polynomial exponents
 
 struct gen_list_struct {mpz_t *polycoef;
                         mono_type *polyexp;
                         struct gen_list_struct *next;};
 typedef struct gen_list_struct gen_list_entry;
 
-STATIC_VAR gen_list_entry *gen_list=NULL; // list of resulting generators - output data (integer version)
+THREAD_VAR static gen_list_entry *gen_list=NULL; // list of resulting generators - output data (integer version)
 
-STATIC_VAR int generic_n_generators; // modp_number of generators - should be the same for all modp comp (not used for modp)
-STATIC_VAR mono_type *generic_column_name; // monomials assigned to columns in solve_row - should be the same for all modp comp (!!! used for modp)
-STATIC_VAR mon_list_entry *generic_lt=NULL; // leading terms for ordered generators - should be the same for all modp comp (not used for modp)
-STATIC_VAR int good_primes; // modp_number of good primes so far;
-STATIC_VAR int bad_primes; // modp_number of bad primes so far;
-STATIC_VAR mpz_t common_denom; // common denominator used to force points coordinates to Z (not used for modp)
-STATIC_VAR bool denom_divisible; // common denominator is divisible by p (not used for modp)
+THREAD_VAR static int generic_n_generators; // modp_number of generators - should be the same for all modp comp (not used for modp)
+THREAD_VAR static mono_type *generic_column_name; // monomials assigned to columns in solve_row - should be the same for all modp comp (!!! used for modp)
+THREAD_VAR static mon_list_entry *generic_lt=NULL; // leading terms for ordered generators - should be the same for all modp comp (not used for modp)
+THREAD_VAR static int good_primes; // modp_number of good primes so far;
+THREAD_VAR static int bad_primes; // modp_number of bad primes so far;
+THREAD_VAR static mpz_t common_denom; // common denominator used to force points coordinates to Z (not used for modp)
+THREAD_VAR static bool denom_divisible; // common denominator is divisible by p (not used for modp)
 
-STATIC_VAR poly comparizon_p1;  //polynomials used to do comparizons by Singular
-STATIC_VAR poly comparizon_p2;
+THREAD_VAR static poly comparizon_p1;  //polynomials used to do comparizons by Singular
+THREAD_VAR static poly comparizon_p2;
 
-STATIC_VAR modp_number *modp_Reverse; // reverses in mod p
+THREAD_VAR static modp_number *modp_Reverse; // reverses in mod p
 
-STATIC_VAR bool protocol; // true to show the protocol
+THREAD_VAR static bool protocol; // true to show the protocol
 
 #ifdef checksize
-STATIC_VAR int maximal_size=0;
+THREAD_VAR static int maximal_size=0;
 #endif
 
 #if 0  /* only for debuggig*/

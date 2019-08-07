@@ -36,27 +36,27 @@
 // minimal value for MAX_FILE_BUFFER: 4*4096 - see Tst/Long/gcd0_l.tst
 // this is an upper limit for the size of monomials/numbers read via the interpreter
 #define MAX_FILE_BUFFER 4*4096
-STATIC_VAR long feBufferLength=0;
-STATIC_VAR char * feBuffer=NULL;
-STATIC_VAR long feBufferLength_save[8];
-STATIC_VAR char * feBuffer_save[8];
-STATIC_VAR int feBuffer_cnt=0;
-STATIC_VAR char * feBufferStart_save[8];
+THREAD_VAR static long feBufferLength=0;
+THREAD_VAR static char * feBuffer=NULL;
+THREAD_VAR static long feBufferLength_save[8];
+THREAD_VAR static char * feBuffer_save[8];
+THREAD_VAR static int feBuffer_cnt=0;
+THREAD_VAR static char * feBufferStart_save[8];
 
 
-VAR char *  feErrors=NULL;
-VAR int     feErrorsLen=0;
-VAR BOOLEAN feWarn = TRUE;
-VAR BOOLEAN feOut = TRUE;
+THREAD_VAR char *  feErrors=NULL;
+THREAD_VAR int     feErrorsLen=0;
+THREAD_VAR BOOLEAN feWarn = TRUE;
+THREAD_VAR BOOLEAN feOut = TRUE;
 
 //void (*WerrorS_callback)(const char *s) = NULL;
 
 const char feNotImplemented[]="not implemented";
 
-VAR int feProt = FALSE;
-VAR FILE*   feProtFile;
+THREAD_VAR int feProt = FALSE;
+THREAD_VAR FILE*   feProtFile;
 
-STATIC_VAR char * feBufferStart;
+THREAD_VAR static char * feBufferStart;
   /* only used in StringSet(S)/StringAppend(S)*/
 void StringAppend(const char *fmt, ...)
 {
@@ -197,7 +197,7 @@ void Werror(const char *fmt, ...)
   va_end(ap);
 }
 
-VAR void (*WarnS_callback)(const char *s) = NULL;
+THREAD_VAR void (*WarnS_callback)(const char *s) = NULL;
 
 void WarnS(const char *s)
 {
@@ -241,8 +241,8 @@ void Warn(const char *fmt, ...)
 
 
 // some routines which redirect the output of print to a string
-STATIC_VAR char* sprint = NULL;
-STATIC_VAR char* sprint_backup = NULL;
+THREAD_VAR static char* sprint = NULL;
+THREAD_VAR static char* sprint_backup = NULL;
 void SPrintStart()
 {
   if (sprint!=NULL)

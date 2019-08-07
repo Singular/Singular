@@ -408,7 +408,7 @@ static char* ngfCoeffString(const coeffs r)
 
 static char* ngfCoeffName(const coeffs r)
 {
-  STATIC_VAR char ngfCoeffName_buf[30];
+  THREAD_VAR static char ngfCoeffName_buf[30];
   snprintf(ngfCoeffName_buf,30,"Float(%d,%d)",r->float_len,r->float_len2);
   return ngfCoeffName_buf;
 }

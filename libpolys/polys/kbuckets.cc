@@ -42,9 +42,9 @@
 #else
 #define MULTIPLY_BUCKET(B,I)
 #endif
-STATIC_VAR omBin kBucket_bin = omGetSpecBin(sizeof(kBucket));
+THREAD_VAR static omBin kBucket_bin = omGetSpecBin(sizeof(kBucket));
 #ifdef USE_COEF_BUCKETS
-STATIC_VAR int coef_start=1;
+THREAD_VAR static int coef_start=1;
 #endif
 //////////////////////////////////////////////////////////////////////////
 ///

@@ -13471,7 +13471,7 @@ static const struct Jim_ExprOperator *JimExprOperatorInfoByOpcode(int opcode)
 const char *jim_tt_name(int type)
 {
     static const char * const tt_names[JIM_TT_EXPR_OP] =
-        { "NIL", "STR", "ESC", "VAR", "ARY", "CMD", "SEP", "EOL", "EOF", "LIN", "WRD", "(((", ")))", ",,,", "INT",
+        { "NIL", "STR", "ESC", "THREAD_VAR", "ARY", "CMD", "SEP", "EOL", "EOF", "LIN", "WRD", "(((", ")))", ",,,", "INT",
             "DBL", "BOO", "$()" };
     if (type < JIM_TT_EXPR_OP) {
         return tt_names[type];

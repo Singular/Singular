@@ -42,8 +42,8 @@ enum noeof_t
   noeof_string
 };  /* for scanner.l */
 
-EXTERN_VAR int yylineno;
-EXTERN_VAR char my_yylinebuf[80];
+THREAD_VAR extern int yylineno;
+THREAD_VAR extern char my_yylinebuf[80];
 extern const char sNoName_fe[];
 
 #ifdef __cplusplus
@@ -88,7 +88,7 @@ class Voice
   void Next();
 } ;
 
-EXTERN_VAR Voice  *currentVoice;
+THREAD_VAR extern Voice  *currentVoice;
 
 Voice * feInitStdin(Voice *pp);
 

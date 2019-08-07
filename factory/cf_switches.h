@@ -67,6 +67,6 @@ public:
 **/
 // extern CFSwitches& cf_glob_switches;
 // CFSwitches& cf_glob_switches = CFSwitches::getInstance();
-EXTERN_INST_VAR CFSwitches cf_glob_switches;
+THREAD_INST_VAR extern CFSwitches cf_glob_switches;
 
 #endif /* ! INCL_CF_SWITCHES_H */

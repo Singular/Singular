@@ -1360,7 +1360,7 @@ char* naCoeffName(const coeffs r) // currently also for tranext.
   {
     l+=(strlen(p[i])+1);
   }
-  STATIC_VAR char s[200];
+  THREAD_VAR static char s[200];
   s[0]='\0';
   snprintf(s,10+1,"%d",r->ch); /* Fp(a) or Q(a) */
   char tt[2];
@@ -1632,7 +1632,7 @@ char* n2pCoeffName(const coeffs cf)
     l+=(strlen(p[i])+1);
   }
   char *cf_s=nCoeffString(n2pRing->cf);
-  STATIC_VAR char s[200];
+  THREAD_VAR static char s[200];
   s[0]='\0';
   snprintf(s,strlen(cf_s)+2,"%s",cf_s);
   omFree(cf_s);

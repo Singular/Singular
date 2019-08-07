@@ -26,21 +26,21 @@ BOOLEAN iiAssignCR(leftv, leftv);
 
 BOOLEAN iiARROW (leftv, char*,char *);
 
-EXTERN_VAR leftv iiCurrArgs;
-EXTERN_VAR idhdl iiCurrProc;
-EXTERN_VAR int iiOp; /* the current operation*/
+THREAD_VAR extern leftv iiCurrArgs;
+THREAD_VAR extern idhdl iiCurrProc;
+THREAD_VAR extern int iiOp; /* the current operation*/
 extern const char *  currid;
-EXTERN_VAR int     iiRETURNEXPR_len;
-EXTERN_INST_VAR sleftv  iiRETURNEXPR;
-EXTERN_VAR ring   *iiLocalRing;
+THREAD_VAR extern int     iiRETURNEXPR_len;
+THREAD_INST_VAR extern sleftv  iiRETURNEXPR;
+THREAD_VAR extern ring   *iiLocalRing;
 //extern cmdnames cmds[];
 extern const char *lastreserved;
-EXTERN_VAR int myynest;
-EXTERN_VAR int printlevel;
-EXTERN_VAR int si_echo;
+THREAD_VAR extern int myynest;
+THREAD_VAR extern int printlevel;
+THREAD_VAR extern int si_echo;
 
 
-EXTERN_VAR BOOLEAN yyInRingConstruction; /* 1: during ring construction */
+THREAD_VAR extern BOOLEAN yyInRingConstruction; /* 1: during ring construction */
 
 int     IsCmd(const char *n, int & tok);
 

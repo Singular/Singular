@@ -30,8 +30,8 @@ extern void p_Setm_Syz(poly p, ring r,
 
 /*--------------static variables------------------------*/
 /*---points to the real components, shifted of the actual module-*/
-VAR int *  currcomponents=NULL;
-VAR long *  currShiftedComponents=NULL;
+THREAD_VAR int *  currcomponents=NULL;
+THREAD_VAR long *  currShiftedComponents=NULL;
 
 
 /*---counts number of applications of GM-criteria-------*/

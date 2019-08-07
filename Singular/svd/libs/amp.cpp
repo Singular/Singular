@@ -5,8 +5,8 @@
 Storage of mpfr lists
 ************************************************************************/
 std::vector< amp::mpfr_record* > _mpfr_storage_v;
-VAR gmp_randstate_t _mpfr_storage_rs;
-VAR bool _mpfr_storage_init = false;
+THREAD_VAR gmp_randstate_t _mpfr_storage_rs;
+THREAD_VAR bool _mpfr_storage_init = false;
 
 amp::mpfr_record* amp::mpfr_storage::newMpfr(unsigned int Precision)
 {
@@ -63,7 +63,7 @@ gmp_randstate_t* amp::mpfr_storage::getRandState()
 amp::mpfr_record_ptr& amp::mpfr_storage::getList(unsigned int Precision)
 {
     static amp::mpfr_record_ptr tmp       = NULL;
-    STATIC_VAR int lastPrec                   = -1;
+    THREAD_VAR static int lastPrec                   = -1;
     static amp::mpfr_record_ptr &lastList = tmp;
     if( lastPrec!=Precision )
     {

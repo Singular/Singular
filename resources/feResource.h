@@ -30,7 +30,7 @@ typedef struct feResourceConfig_s
 } feResourceConfig_s;
 typedef feResourceConfig_s * feResourceConfig;
 
-EXTERN_VAR feResourceConfig_s feResourceConfigs[];
+THREAD_VAR extern feResourceConfig_s feResourceConfigs[];
 
 // returns value of Resource as read-only string, or NULL
 // if Resource not found
@@ -53,7 +53,7 @@ void feInitResources(const char* argv0);
 void feReInitResources();
 #endif /* end ifdef __cplusplus */
 
-EXTERN_VAR char* feArgv0;
+THREAD_VAR extern char* feArgv0;
 
 const char fePathSep = ':' ;
 

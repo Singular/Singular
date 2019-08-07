@@ -77,19 +77,19 @@
 #include <cmath>
 #include "misc/mylimits.h"
 
-VAR int nstep;
+THREAD_VAR int nstep;
 
 extern BOOLEAN ErrorCheck();
 
-EXTERN_VAR BOOLEAN pSetm_error;
+THREAD_VAR extern BOOLEAN pSetm_error;
 
 void Set_Error( BOOLEAN f) { pSetm_error=f; }
 
-VAR BOOLEAN Overflow_Error =  FALSE;
+THREAD_VAR BOOLEAN Overflow_Error =  FALSE;
 
 #ifdef TIME_TEST
-VAR clock_t xtif, xtstd, xtlift, xtred, xtnw;
-VAR clock_t xftostd, xtextra, xftinput, to;
+THREAD_VAR clock_t xtif, xtstd, xtlift, xtred, xtnw;
+THREAD_VAR clock_t xftostd, xtextra, xftinput, to;
 #endif
 
 /****************************
@@ -1508,7 +1508,7 @@ intvec* MivUnit(int nV)
 /************************************************************************
 *  compute a perturbed weight vector of a matrix order w.r.t. an ideal  *
 *************************************************************************/
-VAR int Xnlev;
+THREAD_VAR int Xnlev;
 intvec* Mfpertvector(ideal G, intvec* ivtarget)
 {
   int i, j, nG = IDELEMS(G);
@@ -3655,10 +3655,10 @@ static intvec* TranPertVector(ideal G, intvec* iva)
  //PrintS("\n// choose the \"small\" inverse epsilon:");
  //mpz_out_str(stdout, 10, ndeg);
 #endif
-  VAR mpz_t deg_tmp;
+  THREAD_VAR mpz_t deg_tmp;
   mpz_init_set(deg_tmp, ndeg);
 
-  VAR mpz_t *ivres=( mpz_t *) omAlloc(nV*sizeof(mpz_t));
+  THREAD_VAR mpz_t *ivres=( mpz_t *) omAlloc(nV*sizeof(mpz_t));
   mpz_init_set_ui(ivres[nV-1],1);
 
   for(i=nV-2; i>=0; i--)
@@ -3667,15 +3667,15 @@ static intvec* TranPertVector(ideal G, intvec* iva)
     mpz_mul(deg_tmp, deg_tmp, ndeg);
   }
 
-  VAR mpz_t *ivtmp=(mpz_t *)omAlloc(nV*sizeof(mpz_t));
+  THREAD_VAR mpz_t *ivtmp=(mpz_t *)omAlloc(nV*sizeof(mpz_t));
   for(i=0; i<nV; i++)
   {
     mpz_init(ivtmp[i]);
   }
-  VAR mpz_t sing_int;
+  THREAD_VAR mpz_t sing_int;
   mpz_init_set_ui(sing_int,  2147483647);
 
-  VAR intvec* repr_vector = new intvec(nV);
+  THREAD_VAR intvec* repr_vector = new intvec(nV);
 
   // define ivtmp := ndeg^(n-1).w_1 + ndeg^(n-2).w_2 + ... + w_n
   for(i=0; i<nV; i++)
@@ -3694,9 +3694,9 @@ static intvec* TranPertVector(ideal G, intvec* iva)
       mpz_add(ivtmp[j], ivtmp[j], ivres[i]);
     }
   }
-  VAR delete ivMat;
+  THREAD_VAR delete ivMat;
 
-  VAR int ntrue=0;
+  THREAD_VAR int ntrue=0;
   for(i=0; i<nV; i++)
   {
     (*repr_vector)[i] = mpz_get_si(ivtmp[i]);
@@ -3779,10 +3779,10 @@ static intvec* TranPertVector_lp(ideal G)
  // mpz_out_str(stdout, 10, ndeg);
 #endif
 
-  VAR mpz_t deg_tmp;
+  THREAD_VAR mpz_t deg_tmp;
   mpz_init_set(deg_tmp, ndeg);
 
-  VAR mpz_t *ivres=(mpz_t *)omAlloc(nV*sizeof(mpz_t));
+  THREAD_VAR mpz_t *ivres=(mpz_t *)omAlloc(nV*sizeof(mpz_t));
   mpz_init_set_ui(ivres[nV-1], 1);
 
   for(i=nV-2; i>=0; i--)
@@ -3791,11 +3791,11 @@ static intvec* TranPertVector_lp(ideal G)
     mpz_mul(deg_tmp, deg_tmp, ndeg);
   }
 
-  VAR mpz_t sing_int;
+  THREAD_VAR mpz_t sing_int;
   mpz_init_set_ui(sing_int,  2147483647);
 
-  VAR intvec* repr_vector = new intvec(nV);
-  VAR int ntrue=0;
+  THREAD_VAR intvec* repr_vector = new intvec(nV);
+  THREAD_VAR int ntrue=0;
   for(i=0; i<nV; i++)
   {
     (*repr_vector)[i] = mpz_get_si(ivres[i]);
@@ -4502,12 +4502,12 @@ static intvec* NewVectorlp(ideal I)
   return result;
 }
 
-VAR int ngleich;
-VAR intvec* Xsigma;
-VAR intvec* Xtau;
-VAR int xn;
-VAR intvec* Xivinput;
-VAR intvec* Xivlp;
+THREAD_VAR int ngleich;
+THREAD_VAR intvec* Xsigma;
+THREAD_VAR intvec* Xtau;
+THREAD_VAR int xn;
+THREAD_VAR intvec* Xivinput;
+THREAD_VAR intvec* Xivlp;
 
 
 /********************************
@@ -6924,7 +6924,7 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
   return(Eresult);
 }
 
-VAR intvec* XivNull;
+THREAD_VAR intvec* XivNull;
 
 /*****************************
  * define a matrix (1 ... 1) *
@@ -6941,9 +6941,9 @@ intvec* MMatrixone(int nV)
   return(ivM);
 }
 
-VAR int nnflow;
-VAR int Xcall;
-VAR int Xngleich;
+THREAD_VAR int nnflow;
+THREAD_VAR int Xcall;
+THREAD_VAR int Xngleich;
 
 /***********************************************************************
  * Perturb the start weight vector at the top level, i.e. nlev = 1     *
@@ -8834,29 +8834,29 @@ ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, i
   //Print("\n// ring ro = %s;", rString(currRing));
 
 #ifdef TIME_TEST
-  VAR clock_t tostd, tif=0, tstd=0, tlift=0, tred=0, tnw=0, textra=0;
-  VAR clock_t tinput = clock();
+  THREAD_VAR clock_t tostd, tif=0, tstd=0, tlift=0, tred=0, tnw=0, textra=0;
+  THREAD_VAR clock_t tinput = clock();
 #endif
-  VAR int nsteppert=0, i, nV = currRing->N, nwalk=0, npert_tmp=0;
-  VAR int *npert=(int*)omAlloc(2*nV*sizeof(int));
-  INST_VAR ideal Gomega, M,F,  G1, Gomega1, Gomega2, M1, F1;
+  THREAD_VAR int nsteppert=0, i, nV = currRing->N, nwalk=0, npert_tmp=0;
+  THREAD_VAR int *npert=(int*)omAlloc(2*nV*sizeof(int));
+  THREAD_INST_VAR ideal Gomega, M,F,  G1, Gomega1, Gomega2, M1, F1;
   //ring endRing;
-  VAR ring newRing, oldRing, lpRing;
-  VAR intvec* next_weight;
-  VAR intvec* ivNull = new intvec(nV); //define (0,...,0)
-  VAR intvec* iv_dp = MivUnit(nV);// define (1,1,...,1)
-  VAR intvec* iv_lp = Mivlp(nV); //define (1,0,...,0)
-  INST_VAR ideal H0;
+  THREAD_VAR ring newRing, oldRing, lpRing;
+  THREAD_VAR intvec* next_weight;
+  THREAD_VAR intvec* ivNull = new intvec(nV); //define (0,...,0)
+  THREAD_VAR intvec* iv_dp = MivUnit(nV);// define (1,1,...,1)
+  THREAD_VAR intvec* iv_lp = Mivlp(nV); //define (1,0,...,0)
+  THREAD_INST_VAR ideal H0;
   //ideal H1;
-  INST_VAR ideal H2, Glp;
-  VAR int weight_norm, nGB, endwalks = 0,  nwalkpert=0,  npertstep=0;
-  VAR intvec* Mlp =  MivMatrixOrderlp(nV);
-  VAR intvec* vector_tmp = new intvec(nV);
+  THREAD_INST_VAR ideal H2, Glp;
+  THREAD_VAR int weight_norm, nGB, endwalks = 0,  nwalkpert=0,  npertstep=0;
+  THREAD_VAR intvec* Mlp =  MivMatrixOrderlp(nV);
+  THREAD_VAR intvec* vector_tmp = new intvec(nV);
 #ifndef BUCHBERGER_ALG
-  VAR intvec* hilb_func;
+  THREAD_VAR intvec* hilb_func;
 #endif
   // to avoid (1,0,...,0) as the target vector
-  VAR intvec* last_omega = new intvec(nV);
+  THREAD_VAR intvec* last_omega = new intvec(nV);
   for(i=nV-1; i>0; i--)
   {
     (*last_omega)[i] = 1;
@@ -8864,12 +8864,12 @@ ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, i
   (*last_omega)[0] = 10000;
 
 //intvec* extra_curr_weight = new intvec(nV);
-  VAR intvec* target_weight = new intvec(nV);
+  THREAD_VAR intvec* target_weight = new intvec(nV);
   for(i=nV-1; i>=0; i--)
   {
     (*target_weight)[i] = (*target_tmp)[i];
   }
-  VAR ring XXRing = currRing;
+  THREAD_VAR ring XXRing = currRing;
   newRing = currRing;
 
 #ifdef TIME_TEST
@@ -8900,7 +8900,7 @@ ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, i
 #endif
 
 #ifdef REPRESENTATION_OF_SIGMA
-  INST_VAR ideal Gw = MwalkInitialForm(G, curr_weight);
+  THREAD_INST_VAR ideal Gw = MwalkInitialForm(G, curr_weight);
 
   if(islengthpoly2(Gw)==1)
   {
@@ -8941,7 +8941,7 @@ ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, i
   }
 
   idDelete(&Gw);
-  VAR delete iv_dp;
+  THREAD_VAR delete iv_dp;
 #endif
 
 
@@ -9354,8 +9354,8 @@ ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, i
 
  FINISH:
   delete ivNull;
-  VAR delete next_weight;
-  VAR delete iv_lp;
+  THREAD_VAR delete next_weight;
+  THREAD_VAR delete iv_lp;
   omFree(npert);
 
 #ifdef TIME_TEST

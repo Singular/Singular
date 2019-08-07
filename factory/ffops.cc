@@ -11,10 +11,10 @@
 #include "cf_defs.h"
 #include "ffops.h"
 
-VAR int ff_prime = 0;
-VAR int ff_halfprime = 0;
-VAR bool ff_big = false;
-VAR short * ff_invtab = new short [32767];
+THREAD_VAR int ff_prime = 0;
+THREAD_VAR int ff_halfprime = 0;
+THREAD_VAR bool ff_big = false;
+THREAD_VAR short * ff_invtab = new short [32767];
 
 void ff_setprime ( const int p )
 {

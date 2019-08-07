@@ -21,8 +21,8 @@
 // They are more difficult to clean up after a process crash
 // but are supported more widely.
 
-VAR sipc_sem_t *semaphore[SIPC_MAX_SEMAPHORES];
-VAR int sem_acquired[SIPC_MAX_SEMAPHORES];
+THREAD_VAR sipc_sem_t *semaphore[SIPC_MAX_SEMAPHORES];
+THREAD_VAR int sem_acquired[SIPC_MAX_SEMAPHORES];
 
 /* return 1 on success,
  *        0 if already initialized,

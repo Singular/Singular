@@ -17,7 +17,7 @@ typedef union
   sleftv    lv;
 } MYYSTYPE;
 #define YYSTYPE MYYSTYPE
-EXTERN_VAR YYSTYPE  yylval;
+THREAD_VAR extern YYSTYPE  yylval;
 
 int yylex(MYYSTYPE *l);
 

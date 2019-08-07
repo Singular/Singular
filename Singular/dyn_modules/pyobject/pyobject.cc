@@ -64,7 +64,7 @@ private:
   /// safely takes care of destruction on program termination
   static PythonInterpreter& instance()
   {
-    STATIC_INST_VAR PythonInterpreter init_interpreter;
+    THREAD_INST_VAR static PythonInterpreter init_interpreter;
     return init_interpreter;
   }
 

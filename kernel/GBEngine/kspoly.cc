@@ -24,8 +24,8 @@
 #endif
 
 #ifdef KDEBUG
-VAR int red_count = 0;
-VAR int create_count = 0;
+THREAD_VAR int red_count = 0;
+THREAD_VAR int create_count = 0;
 // define this if reductions are reported on TEST_OPT_DEBUG
 #define TEST_OPT_DEBUG_RED
 #endif

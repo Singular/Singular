@@ -70,7 +70,7 @@ getopt_long (argc, argv, options, long_options, opt_index)
      char *const *argv;
      const char *options;
      const struct option *long_options;
-     VAR int *opt_index;
+     THREAD_VAR int *opt_index;
 {
   return _getopt_internal (argc, argv, options, long_options, opt_index, 0);
 }
@@ -86,7 +86,7 @@ getopt_long_only (argc, argv, options, long_options, opt_index)
      char *const *argv;
      const char *options;
      const struct option *long_options;
-     VAR int *opt_index;
+     THREAD_VAR int *opt_index;
 {
   return _getopt_internal (argc, argv, options, long_options, opt_index, 1);
 }
@@ -101,7 +101,7 @@ getopt_long_only (argc, argv, options, long_options, opt_index)
 int
 main (argc, argv)
      int argc;
-     VAR char **argv;
+     THREAD_VAR char **argv;
 {
   int c;
   int digit_optind = 0;
@@ -110,7 +110,7 @@ main (argc, argv)
     {
       int this_option_optind = optind ? optind : 1;
       int option_index = 0;
-      STATIC_VAR struct option long_options[] =
+      THREAD_VAR static struct option long_options[] =
       {
 	{"add", 1, 0, 0},
 	{"append", 0, 0, 0},

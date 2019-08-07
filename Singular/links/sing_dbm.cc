@@ -103,7 +103,7 @@ LINKAGE BOOLEAN dbClose(si_link l)
 }
 
 //**************************************************************************/
-STATIC_VAR datum d_value;
+THREAD_VAR static datum d_value;
 LINKAGE leftv dbRead2(si_link l, leftv key)
 {
   GDBM_info *db = (GDBM_info *)l->data;
@@ -328,7 +328,7 @@ LINKAGE BOOLEAN dbClose(si_link l)
 }
 
 //**************************************************************************/
-STATIC_VAR datum d_value;
+THREAD_VAR static datum d_value;
 LINKAGE leftv dbRead2(si_link l, leftv key)
 {
   DBM_info *db = (DBM_info *)l->data;

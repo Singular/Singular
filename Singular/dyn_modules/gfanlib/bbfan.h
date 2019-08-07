@@ -9,7 +9,7 @@
 
 #include "gfanlib/gfanlib.h"
 
-EXTERN_VAR int fanID;
+THREAD_VAR extern int fanID;
 
 void bbfan_setup(SModulFunctions* p);
 

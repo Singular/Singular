@@ -374,7 +374,7 @@ homogenize( const CanonicalForm & f, const Variable & x, const Variable & v1, co
 #endif
 }
 
-VAR int singular_homog_flag=1;
+THREAD_VAR int singular_homog_flag=1;
 
 int cmpCF( const CFFactor & f, const CFFactor & g )
 {

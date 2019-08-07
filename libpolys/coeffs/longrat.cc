@@ -2958,7 +2958,7 @@ void    nlCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
   PrintS("ZZ");
 }
 
-VAR int n_SwitchChinRem=0;
+THREAD_VAR int n_SwitchChinRem=0;
 number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, CFArray &inv_cache,const coeffs CF)
 // elemenst in the array are x[0..(rl-1)], q[0..(rl-1)]
 {

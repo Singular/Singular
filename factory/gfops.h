@@ -28,16 +28,16 @@
 #include "cf_defs.h"
 #include "canonicalform.h"
 
-EXTERN_VAR int gf_q;
-EXTERN_VAR int gf_p;
-EXTERN_VAR int gf_n;
-EXTERN_VAR int gf_q1;
-EXTERN_VAR int gf_m1;
-EXTERN_VAR char gf_name;
+THREAD_VAR extern int gf_q;
+THREAD_VAR extern int gf_p;
+THREAD_VAR extern int gf_n;
+THREAD_VAR extern int gf_q1;
+THREAD_VAR extern int gf_m1;
+THREAD_VAR extern char gf_name;
 
-EXTERN_VAR unsigned short * gf_table;
+THREAD_VAR extern unsigned short * gf_table;
 
-EXTERN_INST_VAR CanonicalForm gf_mipo;
+THREAD_INST_VAR extern CanonicalForm gf_mipo;
 
 //{{{ predicates
 inline bool gf_iszero ( int a )

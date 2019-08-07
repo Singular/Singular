@@ -32,15 +32,15 @@
 // this is an upper limit for the size of monomials/numbers read via the interpreter
 #define MAX_FILE_BUFFER 4*4096
 
-VAR int     si_echo = 0;
-VAR int     printlevel = 0;
-VAR int     colmax = 80;
-VAR int     pagelength = 24;
-VAR char    prompt_char = '>'; /*1 either '>' or '.'*/
-VAR int     yylineno  = 0;
-VAR int  myynest = -1;
-VAR int  traceit = 0;
-VAR char       my_yylinebuf[80];
+THREAD_VAR int     si_echo = 0;
+THREAD_VAR int     printlevel = 0;
+THREAD_VAR int     colmax = 80;
+THREAD_VAR int     pagelength = 24;
+THREAD_VAR char    prompt_char = '>'; /*1 either '>' or '.'*/
+THREAD_VAR int     yylineno  = 0;
+THREAD_VAR int  myynest = -1;
+THREAD_VAR int  traceit = 0;
+THREAD_VAR char       my_yylinebuf[80];
 
 
 #if 0

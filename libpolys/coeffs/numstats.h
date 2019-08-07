@@ -127,7 +127,7 @@ static inline void number_stats_Init(const unsigned long defaultvalue = 0)
   WarnS("Please enable NUMSTATS first!");
   (void)(defaultvalue);
 #else
-  EXTERN_VAR struct SNumberStatistic number_stats;
+  THREAD_VAR extern struct SNumberStatistic number_stats;
   number_stats.Init(defaultvalue);
 #endif
 }
@@ -139,7 +139,7 @@ static inline void number_stats_Print(const char * const msg = NULL)
 #ifndef HAVE_NUMSTATS
   WarnS("Please enable NUMSTATS first!");
 #else
-  EXTERN_VAR struct SNumberStatistic number_stats;
+  THREAD_VAR extern struct SNumberStatistic number_stats;
   number_stats.Print();
 #endif
   ::PrintLn();

@@ -44,7 +44,7 @@ extern "C" {
    Also, when `ordering' is RETURN_IN_ORDER,
    each non-option ARGV-element is returned here.  */
 
-EXTERN_VAR char *optarg;
+THREAD_VAR extern char *optarg;
 
 /* Index in ARGV of the next element to be scanned.
    This is used for communication to and from the caller
@@ -58,16 +58,16 @@ EXTERN_VAR char *optarg;
    Otherwise, `optind' communicates from one call to the next
    how much of ARGV has been scanned so far.  */
 
-EXTERN_VAR int optind;
+THREAD_VAR extern int optind;
 
 /* Callers store zero here to inhibit the error message `getopt' prints
    for unrecognized options.  */
 
-EXTERN_VAR int opterr;
+THREAD_VAR extern int opterr;
 
 /* Set to an option character which was unrecognized.  */
 
-EXTERN_VAR int optopt;
+THREAD_VAR extern int optopt;
 
 #ifndef __need_getopt
 /* Describe the long-named options requested by the application.

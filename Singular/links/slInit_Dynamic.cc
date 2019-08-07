@@ -21,7 +21,7 @@
 #ifdef HAVE_DBM
 #include "dbm_sl.h"
 
-STATIC_VAR void* dbm_so_handle = NULL;
+THREAD_VAR static void* dbm_so_handle = NULL;
 static void* slInitDBMHandle()
 {
   if (dbm_so_handle == NULL)

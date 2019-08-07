@@ -9,7 +9,7 @@
 
 #include "polys/monomials/ring.h"
 
-EXTERN_VAR short * ecartWeights;
+THREAD_VAR extern short * ecartWeights;
 //extern pFDegProc pFDegOld;
 //extern pLDegProc pLDegOld;
 

@@ -833,7 +833,7 @@ int rTypeOfMatrixOrder(const intvec *order);
 
 void rDelete(ring r); // To be used instead of rKill!
 
-EXTERN_VAR omBin sip_sring_bin;
+THREAD_VAR extern omBin sip_sring_bin;
 
 // ring manipulation
 /// K[x],"y" -> K[x,y] resp. K[y,x]

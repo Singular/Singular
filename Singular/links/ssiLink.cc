@@ -58,8 +58,8 @@
 // 11->12: add rank to ideal/module, add smatrix
 // 12->13: NC rings
 
-VAR link_list ssiToBeClosed=NULL;
-VAR volatile BOOLEAN ssiToBeClosed_inactive=TRUE;
+THREAD_VAR link_list ssiToBeClosed=NULL;
+THREAD_VAR volatile BOOLEAN ssiToBeClosed_inactive=TRUE;
 
 // forward declarations:
 void ssiWritePoly_R(const ssiInfo *d, int typ, poly p, const ring r);
@@ -1919,10 +1919,10 @@ int ssiBatch(const char *host, const char * port)
   exit(0);
 }
 
-STATIC_VAR int ssiReserved_P=0;
-STATIC_VAR int ssiReserved_sockfd;
-STATIC_VAR struct sockaddr_in ssiResverd_serv_addr;
-STATIC_VAR int  ssiReserved_Clients;
+THREAD_VAR static int ssiReserved_P=0;
+THREAD_VAR static int ssiReserved_sockfd;
+THREAD_VAR static struct sockaddr_in ssiResverd_serv_addr;
+THREAD_VAR static int  ssiReserved_Clients;
 int ssiReservePort(int clients)
 {
   if (ssiReserved_P!=0)
@@ -1958,7 +1958,7 @@ int ssiReservePort(int clients)
   return portno;
 }
 
-EXTERN_VAR si_link_extension si_link_root;
+THREAD_VAR extern si_link_extension si_link_root;
 si_link ssiCommandLink()
 {
   if (ssiReserved_P==0)

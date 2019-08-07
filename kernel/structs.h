@@ -79,7 +79,7 @@ typedef procinfo *         procinfov;
 
 #define loop for(;;)
 
-EXTERN_VAR omBin char_ptr_bin;
+THREAD_VAR extern omBin char_ptr_bin;
 
 #endif
 

@@ -7,14 +7,14 @@
 *  ABSTRACT - get the computing time
 */
 
-EXTERN_VAR int timerv;
+THREAD_VAR extern int timerv;
 void startTimer(void);
 void writeTime(const char* s);
 
 int initTimer();
 int  getTimer();
 
-EXTERN_VAR int rtimerv;
+THREAD_VAR extern int rtimerv;
 void startRTimer(void);
 void writeRTime(const char* s);
 

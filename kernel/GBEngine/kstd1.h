@@ -46,11 +46,11 @@ ideal rightgb(ideal F, ideal Q);
 /* the following global data are defined in kutil.cc */
 //extern int syzComp;
   /*stop building pairs after that component --> ideals.cc, syz.cc */
-EXTERN_VAR int LazyPass,LazyDegree,Kstd1_mu,Kstd1_deg;
+THREAD_VAR extern int LazyPass,LazyDegree,Kstd1_mu,Kstd1_deg;
   /*parameters for Lazy or global stops --> ipshell.cc, grammar.y*/
-EXTERN_VAR BITSET kOptions;
+THREAD_VAR extern BITSET kOptions;
   /*the known test options (a constant)*/
-EXTERN_VAR BITSET validOpts;
+THREAD_VAR extern BITSET validOpts;
 
 void initMora(ideal F,kStrategy strat);
 
@@ -65,8 +65,8 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M,
               intvec *hilb=NULL, int syzComp=0,int reduced=0);
 
 
-EXTERN_VAR intvec * kModW;
-EXTERN_VAR intvec * kHomW;
+THREAD_VAR extern intvec * kModW;
+THREAD_VAR extern intvec * kHomW;
 
 
 /* options:

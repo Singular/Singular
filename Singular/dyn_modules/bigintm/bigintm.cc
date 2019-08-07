@@ -21,7 +21,7 @@ namespace
 {
 
 #ifdef HAVE_BIGINTM
-STATIC_VAR int bigintm_type_id = -1;
+THREAD_VAR static int bigintm_type_id = -1;
 #endif
 
 #ifdef HAVE_BIGINTM

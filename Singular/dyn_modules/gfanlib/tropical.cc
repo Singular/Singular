@@ -14,7 +14,7 @@
 #include "groebnerComplex.h"
 #include "tropicalVariety.h"
 
-VAR int tropicalVerboseLevel = 0;
+THREAD_VAR int tropicalVerboseLevel = 0;
 
 gfan::ZCone homogeneitySpace(ideal I, ring r)
 {

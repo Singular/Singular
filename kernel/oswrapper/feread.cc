@@ -53,8 +53,8 @@ extern char *iiArithGetCmd(int);
 extern "C"
 char *command_generator (char *text, int state)
 {
-  STATIC_VAR int list_index, len;
-  STATIC_VAR idhdl h;
+  THREAD_VAR static int list_index, len;
+  THREAD_VAR static idhdl h;
   const char *name;
 
   /* If this is a new word to complete, initialize now.  This includes
@@ -125,14 +125,14 @@ extern "C" {
   #endif
   #ifndef READLINE_READLINE_H_OK
     /* declare everything we need explicitely and do not rely on includes */
-    EXTERN_VAR char * rl_readline_name;
-    EXTERN_VAR char *rl_line_buffer;
+    THREAD_VAR extern char * rl_readline_name;
+    THREAD_VAR extern char *rl_line_buffer;
     char *rl_filename_completion_function(const char*, int);
     typedef char **CPPFunction ();
 
     extern char ** rl_completion_matches (const char*, RL_PROC);
-    EXTERN_VAR CPPFunction * rl_attempted_completion_function;
-    EXTERN_VAR FILE * rl_outstream;
+    THREAD_VAR extern CPPFunction * rl_attempted_completion_function;
+    THREAD_VAR extern FILE * rl_outstream;
     extern char * readline (const char *);
     extern void add_history (char *);
     extern int write_history ();
@@ -163,16 +163,16 @@ extern "C"
   int fe_init_dyn_rl();
   char *(*fe_filename_completion_function)(); /* 3 */
   char *(* fe_readline) (char *);             /* 4 */
-  VAR void (*fe_add_history) (char *);            /* 5 */
-  VAR char ** fe_rl_readline_name;                /* 6 */
-  VAR char **fe_rl_line_buffer;                   /* 7 */
+  THREAD_VAR void (*fe_add_history) (char *);            /* 5 */
+  THREAD_VAR char ** fe_rl_readline_name;                /* 6 */
+  THREAD_VAR char **fe_rl_line_buffer;                   /* 7 */
   char **(*fe_completion_matches)(...);          /* 8 */
-  VAR CPPFunction **fe_rl_attempted_completion_function; /* 9 */
-  VAR FILE ** fe_rl_outstream;                    /* 10 */
-  VAR int (*fe_write_history) ();                 /* 11 */
-  VAR int (*fe_history_total_bytes) ();           /* 12 */
-  VAR void (*fe_using_history) ();                /* 13 */
-  VAR int (*fe_read_history) (char *);            /* 14 */
+  THREAD_VAR CPPFunction **fe_rl_attempted_completion_function; /* 9 */
+  THREAD_VAR FILE ** fe_rl_outstream;                    /* 10 */
+  THREAD_VAR int (*fe_write_history) ();                 /* 11 */
+  THREAD_VAR int (*fe_history_total_bytes) ();           /* 12 */
+  THREAD_VAR void (*fe_using_history) ();                /* 13 */
+  THREAD_VAR int (*fe_read_history) (char *);            /* 14 */
 
 }
 #endif

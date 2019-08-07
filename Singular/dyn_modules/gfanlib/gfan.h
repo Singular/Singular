@@ -28,7 +28,7 @@ Author: monerjan
 #endif
 #include "bbfan.h"
 #include "bbcone.h"
-EXTERN_VAR int gfanHeuristic;
+THREAD_VAR extern int gfanHeuristic;
 
 #ifndef USE_ZFAN
 #define USE_ZFAN
@@ -145,45 +145,45 @@ class gcone
                 int64vec *ivIntPt;        //an interior point of the cone
                 int UCN;                //unique number of the cone
                 int pred;                //UCN of the cone this one is derived from
-                 STATIC_VAR int counter;
+                 THREAD_VAR static int counter;
 
         public:
                 /** \brief Pointer to the first facet */
                 facet *facetPtr;        //Will hold the adress of the first facet; set by gcone::getConeNormals
 #ifdef gfanp
-                STATIC_VAR float time_getConeNormals;
-                STATIC_VAR float time_getCodim2Normals;
-                STATIC_VAR float t_getExtremalRays;
-                STATIC_VAR float t_ddPolyh;
-                STATIC_VAR float time_flip;
-                STATIC_VAR float time_flip2;
-                STATIC_VAR float t_areEqual;
-                STATIC_VAR float t_ffG;
-                STATIC_VAR float t_markings;
-                STATIC_VAR float t_dd;
-                STATIC_VAR float t_kStd;
-                STATIC_VAR float time_enqueue;
-                STATIC_VAR float time_computeInv;
-                STATIC_VAR float t_ddMC;
-                STATIC_VAR float t_mI;
-                STATIC_VAR float t_iP;
-                STATIC_VAR float t_isParallel;
-                STATIC_VAR unsigned parallelButNotEqual;
-                STATIC_VAR unsigned numberOfFacetChecks;
+                THREAD_VAR static float time_getConeNormals;
+                THREAD_VAR static float time_getCodim2Normals;
+                THREAD_VAR static float t_getExtremalRays;
+                THREAD_VAR static float t_ddPolyh;
+                THREAD_VAR static float time_flip;
+                THREAD_VAR static float time_flip2;
+                THREAD_VAR static float t_areEqual;
+                THREAD_VAR static float t_ffG;
+                THREAD_VAR static float t_markings;
+                THREAD_VAR static float t_dd;
+                THREAD_VAR static float t_kStd;
+                THREAD_VAR static float time_enqueue;
+                THREAD_VAR static float time_computeInv;
+                THREAD_VAR static float t_ddMC;
+                THREAD_VAR static float t_mI;
+                THREAD_VAR static float t_iP;
+                THREAD_VAR static float t_isParallel;
+                THREAD_VAR static unsigned parallelButNotEqual;
+                THREAD_VAR static unsigned numberOfFacetChecks;
 #endif
                 /** Matrix to contain the homogeneity/lineality space */
-                STATIC_VAR dd_MatrixPtr dd_LinealitySpace;
-                STATIC_VAR int lengthOfSearchList;
+                THREAD_VAR static dd_MatrixPtr dd_LinealitySpace;
+                THREAD_VAR static int lengthOfSearchList;
                 /** Maximum size of the searchlist*/
-                STATIC_VAR int maxSize;
+                THREAD_VAR static int maxSize;
                 /** is the ideal homogeneous? */
-                STATIC_VAR bool hasHomInput;
+                THREAD_VAR static bool hasHomInput;
                 /** # of variables in the ring */
-                STATIC_VAR int numVars;                //#of variables in the ring
+                THREAD_VAR static int numVars;                //#of variables in the ring
                 /** The hilbert function - for the homogeneous case*/
-                STATIC_VAR int64vec *hilbertFunction;
+                THREAD_VAR static int64vec *hilbertFunction;
                 /** The zero vector. Needed in case of fNormal mismatch*/
-                STATIC_VAR int64vec *ivZeroVector;
+                THREAD_VAR static int64vec *ivZeroVector;
 
                 /** # of facets of the cone
                  * This value is set by gcone::getConeNormals

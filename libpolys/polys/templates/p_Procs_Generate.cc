@@ -29,7 +29,7 @@
 #include "polys/templates/p_Procs_Impl.h"
 
 #ifndef p_Procs_Static
-VAR int FieldGeneralProcs = 0,
+THREAD_VAR int FieldGeneralProcs = 0,
   FieldIndepProcs = 0,
   FieldZpProcs = 0,
   FieldQProcs = 0,
@@ -64,7 +64,7 @@ int IsKernelProc(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
 #define DoSetProc(what, field, length, ord) \
       GenerateProc(#what, what##_Proc, field, length, ord)
 
-VAR char*** generated_p_procs;
+THREAD_VAR char*** generated_p_procs;
 
 inline int AlreadyHaveProc(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
 {
@@ -77,9 +77,9 @@ const char* macros_length[] =
 {"p_MemCopy", "p_MemAdd", "p_MemSum", "p_MemDiff", NULL};
 
 const char* macros_length_ord[] = {"p_MemCmp", NULL};
-VAR int DummyProcs = 0;
+THREAD_VAR int DummyProcs = 0;
 
-VAR int NumberOfHaveProcs = 0;
+THREAD_VAR int NumberOfHaveProcs = 0;
 
 void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_Ord ord)
 {

@@ -28,7 +28,7 @@
   //DEBUG_BLOCK(true / false); to enable/disable debugging in this block
 # define DEBUG_BLOCK(x) bool debug_block = x;
   //standard if DEBUG_BLOCK( ); not used
-  STATIC_VAR bool debug_block = false;
+  THREAD_VAR static bool debug_block = false;
   //use like: DEBUG_PRINT(("Status %d",i))
 # define DEBUG_PRINT(x) do {if(debug_block) {Print x ;}} while(0)
 # define DEBUG_CMD(x) do {if(debug_block) {x;}} while(0)

@@ -4,7 +4,7 @@
 
 typedef std::unordered_set<int> si_intset; /* intset is already defined in std*/
 
-STATIC_VAR int si_intset_type_id = -1;
+THREAD_VAR static int si_intset_type_id = -1;
 
 void* si_intset_Init(blackbox *b)
 {
@@ -197,7 +197,7 @@ BOOLEAN equal_set (leftv result, leftv arg)
 
 extern "C" int mod_init(SModulFunctions* psModulFunctions)
 {
-  VAR blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
+  THREAD_VAR blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
   b->blackbox_Init=si_intset_Init;
   b->blackbox_destroy=si_intset_destroy;
   b->blackbox_Copy=si_intset_Copy;

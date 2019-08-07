@@ -88,6 +88,6 @@ CFMatrix* convertNTLmat_zz_p2FacCFMatrix(const mat_zz_p &m);
 mat_zz_pE* convertFacCFMatrix2NTLmat_zz_pE(const CFMatrix &m);
 CFMatrix* convertNTLmat_zz_pE2FacCFMatrix(const mat_zz_pE &m, const Variable & alpha);
 
-EXTERN_VAR long fac_NTL_char;
+THREAD_VAR extern long fac_NTL_char;
 #endif
 #endif

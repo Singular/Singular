@@ -61,8 +61,8 @@ NTL_CLIENT
    static void stack_trace (char *const*args);
  #endif
 
-VAR si_link pipeLastLink=NULL;
-VAR BOOLEAN singular_in_batchmode=FALSE;
+THREAD_VAR si_link pipeLastLink=NULL;
+THREAD_VAR BOOLEAN singular_in_batchmode=FALSE;
 
 void sig_pipe_hdl(int /*sig*/)
 {
@@ -74,8 +74,8 @@ void sig_pipe_hdl(int /*sig*/)
  }
 }
 
-VAR volatile BOOLEAN do_shutdown = FALSE;
-VAR volatile int defer_shutdown = 0;
+THREAD_VAR volatile BOOLEAN do_shutdown = FALSE;
+THREAD_VAR volatile int defer_shutdown = 0;
 
 void sig_term_hdl(int /*sig*/)
 {
@@ -92,9 +92,9 @@ void sig_term_hdl(int /*sig*/)
  *
  *---------------------------------------------------------------------*/
 /* data */
-VAR jmp_buf si_start_jmpbuf;
-VAR int siRandomStart;
-VAR short si_restart=0;
+THREAD_VAR jmp_buf si_start_jmpbuf;
+THREAD_VAR int siRandomStart;
+THREAD_VAR short si_restart=0;
 
 typedef void (*si_hdl_typ)(int);
 
@@ -305,7 +305,7 @@ void sigsegv_handler(int sig)
 /*2
 * signal handler for SIGINT
 */
-VAR int sigint_handler_cnt=0;
+THREAD_VAR int sigint_handler_cnt=0;
 void sigint_handler(int /*sig*/)
 {
   mflush();
@@ -401,7 +401,7 @@ void sigint_handler(int /*sig*/)
 //}
 
 #  ifndef __OPTIMIZE__
-VAR volatile int si_stop_stack_trace_x;
+THREAD_VAR volatile int si_stop_stack_trace_x;
 #    ifdef CALL_GDB
 static void debug (int method)
 {

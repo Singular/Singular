@@ -15,11 +15,11 @@
 
 #include "crctab.h"
 
-VAR int modlineno;    /* lineno within module */
+THREAD_VAR int modlineno;    /* lineno within module */
 
 #include "modgen.h"
 
-EXTERN_VAR int do_create_srcdir;
+THREAD_VAR extern int do_create_srcdir;
 
 /*========================================================================*/
 int init_modgen(
@@ -101,7 +101,7 @@ char *build_filename(
   int what
 )
 {
-  STATIC_VAR char p[512];
+  THREAD_VAR static char p[512];
 
   if(do_create_srcdir)
   {

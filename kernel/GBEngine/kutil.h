@@ -59,7 +59,7 @@ typedef struct denominator_list_s denominator_list_s;
 typedef denominator_list_s *denominator_list;
 
 struct denominator_list_s{number n; denominator_list next;};
-EXTERN_VAR denominator_list DENOMINATOR_LIST;
+THREAD_VAR extern denominator_list DENOMINATOR_LIST;
 
 class sTObject
 {
@@ -173,7 +173,7 @@ public:
 #endif
 };
 
-EXTERN_VAR int strat_nr;
+THREAD_VAR extern int strat_nr;
 
 class sLObject : public sTObject
 {
@@ -262,7 +262,7 @@ public:
 };
 
 
-EXTERN_VAR int HCord;
+THREAD_VAR extern int HCord;
 
 class skStrategy
 #ifdef HAVE_OMALLOC
@@ -864,8 +864,8 @@ int redFirstShift (LObject* h,kStrategy strat); // ok
 
 ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
 // test syz strategy: // will be removed soon
-EXTERN_VAR int (*test_PosInT)(const TSet T,const int tl,LObject &h);
-EXTERN_VAR int (*test_PosInL)(const LSet set, const int length,
+THREAD_VAR extern int (*test_PosInT)(const TSet T,const int tl,LObject &h);
+THREAD_VAR extern int (*test_PosInL)(const LSet set, const int length,
                 LObject* L,const kStrategy strat);
 
 static inline void kDeleteLcm(LObject *P)
