@@ -23,22 +23,22 @@ def find_prediction(filename):
     end = time.time()
     print(end - start, "seconds to create_table")
 
-    return _find_prediction(filename, dictionary, vectors, file_list)
+    start = time.time()
+    pred = get_prediction(filename, dictionary, vectors, file_list)
+    end = time.time()
+    print(end - start, "seconds to make prediction.")
+    return pred
 
-
-def _find_prediction(filename, dictionary, vectors, file_list):
+def get_prediction(filename, dictionary, vectors, file_list):
     """
     Train a predictor, get the predicted help page name
     """
     predictor = HelpPagePredictor()
     predictor.fit(vectors, file_list)
 
-    start = time.time()
     test_vec = count_occurances(filename, dictionary)
     prediction = predictor.predict(np.array([test_vec]))
-    end = time.time()
-    print(end - start, "seconds to make prediction")
-    return prediction
+    return prediction[0]
 
 
 def main():
@@ -66,10 +66,10 @@ def main():
     print(prediction)
     print()
 
-    prediction = _find_prediction("extract.lib",
-                                  dictionary,
-                                  vectors,
-                                  file_list)
+    prediction = get_prediction("extract.lib",
+                                dictionary,
+                                vectors,
+                                file_list)
     print(prediction)
     print()
 
@@ -82,10 +82,10 @@ def main():
                 continue
 
             print("predicting for file", sys.argv[i])
-            prediction = _find_prediction(sys.argv[i],
-                                          dictionary,
-                                          vectors,
-                                          file_list)
+            prediction = get_prediction(sys.argv[i],
+                                        dictionary,
+                                        vectors,
+                                        file_list)
             print(prediction)
             print()
 

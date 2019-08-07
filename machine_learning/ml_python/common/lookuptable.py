@@ -98,7 +98,7 @@ def create_table(dictionary=None, attempt_cached=True):
 
 def init_table_on_system():
     """
-    check whether the various files exist, and create if necessary. 
+    check whether the various files exist, and create if necessary.
     """
     # check for and download help files if necessary
     tbz2_path = os.path.join(HELP_FILE_PATH, "helpfiles.tbz2")
@@ -113,8 +113,8 @@ def init_table_on_system():
 
 
     if not os.path.isfile(VECTORS_NPY) or not os.path.isfile(HELPFILE_NPY):
-        vectors, file_list = create_table(dictionary=dictionary,
-                                          attempt_cached=False)
+        create_table(dictionary=dictionary,
+                     attempt_cached=False)
 
 def is_lookup_initialised():
     """
