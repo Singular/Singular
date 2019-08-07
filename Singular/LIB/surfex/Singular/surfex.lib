@@ -297,9 +297,7 @@ The basering is characteristic zero and without parameters.
 				    "str:",str_tmp_l;
 				    string str_num_mp = "number "+parstr(1)+"="+
 					decstr2ratstr(rootminpoly())+";";
-				    execute("ring Iring = 0,("
-//					    +string(coords)+","+str_para+"),dp;");
-					    +string(coords)+"),dp;");
+                                    ring Iring = create_ring(0, "("+string(coords)+")", "dp");
 				    basering;
 				    execute(str_num_mp);
 				    execute(str_tmp_l);
@@ -319,7 +317,7 @@ The basering is characteristic zero and without parameters.
 			    short=0;
 			    string str_tmp_l = "ideal eqd_tmp = "+string(tmp_l)+";";
 			    def cur_ring = basering;
-			    execute("ring Iring = (real,30),("+string(coords)+"),("+ordstr(oring)+");");
+                            ring Iring = create_ring("(real,30)", "("+string(coords)+")", "("+ordstr(oring)+")");
 //			    basering;
 			    execute(str_I);
 			    execute(str_tmp_l);
@@ -1010,7 +1008,7 @@ EXAMPLE: example surfEqn; shows an example
 		if(n-params==3) {
 		    if(minp==1) {
 			// switch to a ring without minimal polynomial:
-			execute("ring rr = (real,30,30),("+varstr(base)+"), dp;");
+                        ring rr = create_ring("(real,30,30)", "("+varstr(base)+")", "dp");
 //			rr;
 //			"str_I",str_I;
 			execute(str_I);
@@ -1031,7 +1029,7 @@ EXAMPLE: example surfEqn; shows an example
 	    if(params == 3) {
 		if(n-params==3) {
 		    p=cleardenom(p);
-		    execute("ring rr = (real,30,30),("+varstr(base)+","+parstr(base)+"), dp;");
+                    ring rr = create_ring("(real,30,30)", "("+varstr(base)+","+parstr(base)+")", "dp");
 		    rr;
 		    "str_I",str_I;
 		    execute(str_I);

@@ -340,14 +340,14 @@ EXAMPLE: example splitring;  shows an example
   if (npars(altring)>1) {"only one Parameter is allowed!!"; return(altring);}
 
   //---------------- Minimalpolynom in ein Polynom umwandeln: -----------------
-  execute("ring splt2="+charakt+","+algname+",dp;");
+  ring splt2 = create_ring(charakt, algname, "dp");
   execute("poly mipol="+minp+";");
   // f ist Polynom in algname und einer weiteren Variablen -> mache f bivariat:
-  execute("ring splt3="+charakt+",("+algname+","+varnames+"),dp;");
+  ring splt3 = create_ring(charakt, "("+algname+","+varnames+")", "dp");
   poly f=imap(altring,f);
 
   //-------------- Vorbereitung des Aufrufes von primitive: -------------------
-  execute("ring splt1="+charakt+",(x,y),dp;");
+  ring splt1 = create_ring(charakt, "(x,y)", "dp");
   ideal abbnach=x;
   for (i=1; i<=anzvar; i++) { abbnach=abbnach,y; }
   map nach_splt1_3=splt3,abbnach;
@@ -363,8 +363,7 @@ EXAMPLE: example splitring;  shows an example
   minp=string(nach_splt2(primit)[1]);
   if (printlevel > -1) { "// new minimal polynomial:",minp; }
   //--------------------- definiere den neuen Ring: ---------------------------
-  execute("ring neuring = ("+charakt+","+algname+"),("+varnames+"),("
-          +ordstr(altring)+");");
+  ring neuring = create_ring("("+charakt+","+algname+")", "("+varnames+")", "("+ordstr(altring)+")");
   execute("minpoly="+minp+";");
 
   if (L_groesse>0) {
