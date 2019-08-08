@@ -8,15 +8,6 @@
 #ifndef MLPREDICT_H
 #define MLPREDICT_H
 
-#define SINGULAR_BIN	"~/Singular/Singular4/bin/Singular"
-#define EXTRACT_SCRIPT	"extract.lib"
-#define KEYWORDS_FILE	"keywords.txt"
-#define VECTORS_NPY		".vectors.npy"
-#define HELPFILE_NPY	".helpfilelist.npy"
-
-#define HELP_FILE_URL	"ftp://jim.mathematik.uni-kl.de/pub/Math/Singular/src/4-1-2/doc.tbz2" 
-#define HELP_FILE_PATH  "helpfiles/singular"
-
 /**
  * Check whether the helpfiles have been downloaded and the relevant
  * vectors have been calculated and saved.
