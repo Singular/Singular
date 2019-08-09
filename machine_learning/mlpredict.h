@@ -7,6 +7,7 @@
  */
 #ifndef MLPREDICT_H
 #define MLPREDICT_H
+extern "C" {
 
 /**
  * Check whether the helpfiles have been downloaded and the relevant
@@ -52,4 +53,5 @@ int ml_make_prediction(char *filename,
 					   char *prediction_buffer,
 					   int *pred_len);
 
+}
 #endif

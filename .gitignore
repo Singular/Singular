@@ -122,3 +122,4 @@ helpfiles
 *.npy
 .coverage
 *.pyc
+machine_learning/machine_learning-config.h

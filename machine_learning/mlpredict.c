@@ -8,8 +8,6 @@
 #include <stdio.h>
 #include <Python.h>
 
-#include "mlpredict.h"
-
 /* Locally defined macros */
 #define LOOKUPTABLE "common.lookuptable"
 #define KEYWORD_VECTOR "common.keyword_vector"

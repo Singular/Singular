@@ -232,6 +232,8 @@ fi
 
 AC_CONFIG_SUBDIRS([libpolys])
 
+AC_CONFIG_SUBDIRS([machine_learning])
+
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([kernel/Makefile])
 AC_CONFIG_FILES([kernel/numeric/Makefile])

@@ -50,6 +50,8 @@
 #include "kernel/polys.h"
 #include "kernel/ideals.h"
 
+#include "machine_learning/mlpredict.h"
+
 #include "Singular/mod_lib.h"
 #include "Singular/fevoices.h"
 #include "Singular/tok.h"
@@ -7944,6 +7946,13 @@ static BOOLEAN jjRESERVEDLIST0(leftv res, leftv)
 	lists L = (lists)omAllocBin(slists_bin);
 	struct blackbox_list *bb_list = NULL;
 	unsigned nCount = (sArithBase.nCmdUsed-1) / 3;
+
+	if (ml_is_initialised()) {
+		printf("ml is initialised\n");
+	} else {
+		printf("ml is NOT initialised\n");
+	}
+
 	if ((3*nCount) < sArithBase.nCmdUsed) {
 		nCount++;
 	}
