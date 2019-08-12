@@ -16,7 +16,7 @@ from six.moves import urllib
 from common.keyword_vector import get_vectors, read_dictionary
 from common.constants import HELP_FILE_URL, HELP_FILE_PATH, SINGULAR_BIN, \
                         EXTRACT_SCRIPT, KEYWORDS_FILE, HELPFILE_NPY, \
-                        VECTORS_NPY
+                        VECTORS_NPY, HOME_DIR
 
 
 def fetch_tbz2_data(tbz2_url=HELP_FILE_URL, data_path=HELP_FILE_PATH,
@@ -49,19 +49,16 @@ def extract_keywords():
     Run Singular script to extract current keywords and save as file
     'keywords.txt'
     """
+    # ensure the homedir exists
+    if not os.path.isdir(HOME_DIR):
+        os.makedirs(HOME_DIR)
+
     # extract keywords using the singular script
-    os.system(SINGULAR_BIN + " " + EXTRACT_SCRIPT)
+    os.system(SINGULAR_BIN + " -q " + EXTRACT_SCRIPT + 
+            " | sort | uniq > " + KEYWORDS_FILE)
 
     # read from the file created by singular
     dictionary = read_dictionary()
-
-    # sort alphabetically
-    dictionary = np.sort(np.unique(dictionary))
-
-    # write back to the same file
-    with open(KEYWORDS_FILE, "w") as file:
-        for word in dictionary:
-            file.write(word + "\n")
 
     return dictionary
 
@@ -70,6 +67,7 @@ def create_table(dictionary=None, attempt_cached=True):
     """
     Get a list of helpfiles, and generate a word occurance vector for each.
     """
+
     if dictionary is None:
         dictionary = read_dictionary(KEYWORDS_FILE)
     vectors = []
@@ -77,6 +75,7 @@ def create_table(dictionary=None, attempt_cached=True):
     if not os.path.isfile(VECTORS_NPY) or \
             not os.path.isfile(HELPFILE_NPY) or \
             not attempt_cached:
+        os.makedirs(HOME_DIR, exist_ok=True)
         file_list = np.array(get_list_of_htm_files())
         np.save(HELPFILE_NPY, file_list)
 
@@ -100,6 +99,9 @@ def init_table_on_system():
     """
     check whether the various files exist, and create if necessary.
     """
+    if not os.path.isdir(HOME_DIR):
+        os.makedirs(HOME_DIR)
+
     # check for and download help files if necessary
     tbz2_path = os.path.join(HELP_FILE_PATH, "helpfiles.tbz2")
     if not os.path.isdir(HELP_FILE_PATH) or not os.path.isfile(tbz2_path):
@@ -110,7 +112,6 @@ def init_table_on_system():
         dictionary = extract_keywords()
     else:
         dictionary = None
-
 
     if not os.path.isfile(VECTORS_NPY) or not os.path.isfile(HELPFILE_NPY):
         create_table(dictionary=dictionary,
@@ -127,7 +128,9 @@ def is_lookup_initialised():
         retvalue = False
     if not os.path.isfile(KEYWORDS_FILE):
         retvalue = False
-    if not os.path.isfile(VECTORS_NPY) or not os.path.isfile(HELPFILE_NPY):
+    if not os.path.isdir(HOME_DIR) or \
+            not os.path.isfile(VECTORS_NPY) or \
+            not os.path.isfile(HELPFILE_NPY):
         retvalue = False
 
     return retvalue

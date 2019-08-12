@@ -7,13 +7,9 @@ int i;
 // combine lists, leaving out the first entry of l, which is "l"
 list combined = delete(l, 1) + k;
 
-// create file, overwrite if exists
-write(":w keywords.txt", combined[1]);
-
-
-// write remaining entries to file
-for (i = 2; i < size(combined) + 1; i++) {
-	write(":a keywords.txt", combined[i]);
+// printentries to STDOUT
+for (i = 1; i < size(combined) + 1; i++) {
+	print(combined[i]);
 }
 
 exit;

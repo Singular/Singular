@@ -7947,11 +7947,8 @@ static BOOLEAN jjRESERVEDLIST0(leftv res, leftv)
 	struct blackbox_list *bb_list = NULL;
 	unsigned nCount = (sArithBase.nCmdUsed-1) / 3;
 
-	if (ml_is_initialised()) {
-		printf("ml is initialised\n");
-	} else {
-		printf("ml is NOT initialised\n");
-	}
+	ml_initialise();
+	ml_finalise();
 
 	if ((3*nCount) < sArithBase.nCmdUsed) {
 		nCount++;

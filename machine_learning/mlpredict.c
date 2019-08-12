@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <Python.h>
 
+#include "mlpredict.h"
+
 /* Locally defined macros */
 #define LOOKUPTABLE "common.lookuptable"
 #define KEYWORD_VECTOR "common.keyword_vector"
@@ -106,8 +108,8 @@ int ml_initialise()
 }
 
 /**
- * A wrapper for Py_Finalize, checking whether it is necessary in the first
- * place.
+ * Tell python to decrement the global variables, checking whether it is
+ * necessary in the first place.
  *
  * @return An integer: 1 if successful, 0 if not.
  */
@@ -115,13 +117,16 @@ int ml_finalise()
 {
 	int retvalue = 1;
 
-	Py_XDECREF(pDictionary);
-	Py_XDECREF(pVectors);
-	Py_XDECREF(pFile_list);
-
 	if (Py_IsInitialized()) {
-		Py_Finalize();
-		retvalue = 1;
+		Py_XDECREF(pDictionary);
+		Py_XDECREF(pVectors);
+		Py_XDECREF(pFile_list);
+		pDictionary = NULL;
+		pVectors = NULL;
+		pFile_list = NULL;
+
+		/* this breaks libpython2.7.so, so leave out: */
+		/* Py_Finalize(); */ 
 	} else {
 		retvalue = 0;
 	}

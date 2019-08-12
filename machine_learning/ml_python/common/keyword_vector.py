@@ -19,10 +19,8 @@ def read_dictionary(filename=KEYWORDS_FILE):
     if not os.path.isfile(filename):
         print("Please provide a valid input file as argument to read "
               "dictionary")
-        if sys.version_info[0] == 3: # pylint: disable=no-else-raise
-            raise FileNotFoundError
-        else:
-            raise IOError
+        print(filename)
+        raise IOError
 
 
     dictionary = []
@@ -47,11 +45,8 @@ def get_vectors(filenames, dictionary, normalise=True):
     for filename in filenames:
         if not os.path.isfile(filename):
             print("Please provide a valid input file as argument")
-            if sys.version_info[0] == 3: # pylint: disable=no-else-raise
-                raise FileNotFoundError
-            else:
-                print(filename)
-                raise IOError
+            print(filename)
+            raise IOError
     assert dictionary is not None, \
             "Please provide a valid dictionary as argument"
     assert not dictionary.size == 0, \

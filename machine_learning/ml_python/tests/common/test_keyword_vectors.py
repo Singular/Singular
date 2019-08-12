@@ -14,7 +14,8 @@ class TestKeywordMethods(unittest.TestCase):
 
         print("Non-existant file")
         if sys.version_info[0] == 3:
-            self.assertRaises(FileNotFoundError,
+            #self.assertRaises(FileNotFoundError,
+            self.assertRaises(IOError,
                               read_dictionary,
                               "asdfasdf")
         else:
@@ -37,7 +38,8 @@ class TestKeywordMethods(unittest.TestCase):
         dic = read_dictionary()
         print("Test non-existant file")
         if sys.version_info[0] == 3:
-            self.assertRaises(FileNotFoundError,
+            #self.assertRaises(FileNotFoundError,
+            self.assertRaises(IOError,
                               count_occurances,
                               "asdfasdf",
                               dic)

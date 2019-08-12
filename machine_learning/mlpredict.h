@@ -7,7 +7,10 @@
  */
 #ifndef MLPREDICT_H
 #define MLPREDICT_H
+
+#ifdef __cplusplus
 extern "C" {
+#endif /* ifdef cpp */
 
 /**
  * Check whether the helpfiles have been downloaded and the relevant
@@ -28,7 +31,8 @@ int ml_is_initialised();
 int ml_initialise();
 
 /**
- * Finalize the python interpreter
+ * Tell python to decrement the global variables, checking whether it is
+ * necessary in the first place.
  *
  * @return An integer: 1 if successful, 0 if not.
  */
@@ -53,5 +57,7 @@ int ml_make_prediction(char *filename,
 					   char *prediction_buffer,
 					   int *pred_len);
 
+#ifdef __cplusplus
 }
-#endif
+#endif /* ifdef cpp */
+#endif 

@@ -5,19 +5,19 @@ import cProfile
 
 from common.lookuptable import *
 from common.keyword_vector import count_occurances
-from common.constants import KEYWORDS_FILE, VECTORS_NPY, HELP_FILE_PATH
+from common.constants import KEYWORDS_FILE, VECTORS_NPY, HELP_FILE_PATH, \
+        HOME_DIR
 
 class TestLookuptableMethods(unittest.TestCase):
 
     def test_get_list_of_htm_files(self):
         os.system("rm -r " + HELP_FILE_PATH)
         fetch_tbz2_data()
-        fetch_tbz2_data()
         files = get_list_of_htm_files()
         self.assertGreater(len(files), 0)
 
     def test_extract_keywords(self):
-        extract_keywords()
+        #extract_keywords()
         self.assertTrue(os.path.isfile(KEYWORDS_FILE))
 
     def test_create_table(self):
@@ -34,9 +34,7 @@ class TestLookuptableMethods(unittest.TestCase):
 
     def test_init_table_on_system(self):
         tbz2_path = os.path.join(HELP_FILE_PATH, "helpfiles.tbz2")
-        os.remove(tbz2_path)
-        os.remove(KEYWORDS_FILE)
-        os.remove(VECTORS_NPY)
+        os.system("rm -r " + HOME_DIR)
 
         init_table_on_system()
 
@@ -65,5 +63,9 @@ class TestLookuptableMethods(unittest.TestCase):
         
 
 if __name__ == '__main__':
+    if os.path.isdir(HOME_DIR):
+        os.system("rm -r " + HOME_DIR)
+    extract_keywords()
+    fetch_tbz2_data()
     #cProfile.run("unittest.main()")
     unittest.main()
