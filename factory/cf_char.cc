@@ -32,10 +32,13 @@ void setCharacteristic( int c )
     {
         theDegree = 1;
         CFFactory::settype( FiniteFieldDomain );
-        theCharacteristic = c;
         ff_big = c > cf_getSmallPrime( cf_getNumSmallPrimes()-1 );
-        if (c > 536870909) factoryError("characteristic is too large(max is 2^29)");
-        ff_setprime( c );
+        if (c!=theCharacteristic)
+        {
+          if (c > 536870909) factoryError("characteristic is too large(max is 2^29)");
+          ff_setprime( c );
+        }
+        theCharacteristic = c;
     }
 }
 

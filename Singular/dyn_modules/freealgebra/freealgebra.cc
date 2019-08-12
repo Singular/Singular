@@ -5,7 +5,8 @@
 static BOOLEAN freeAlgebra(leftv res, leftv args)
 {
   const short t1[]={2,RING_CMD,INT_CMD};
-  if (iiCheckTypes(args,t1,1))
+  const short t2[]={3,RING_CMD,INT_CMD,INT_CMD};
+  if (iiCheckTypes(args, t2, 0) || iiCheckTypes(args, t1, 1))
   {
     ring r=(ring)args->Data();
     int d=(int)(long)args->next->Data();
@@ -32,7 +33,10 @@ static BOOLEAN freeAlgebra(leftv res, leftv args)
       //Werror("only for rings with a global ordering of one block,i=%d, o=%d",i,r->order[i]);
       return TRUE;
     }
-    ring R=freeAlgebra(r,d);
+    int ncGenCount = 0; 
+    if (iiCheckTypes(args,t2,0))
+      ncGenCount = (int)(long) args->next->next->Data();
+    ring R=freeAlgebra(r,d,ncGenCount);
     res->rtyp=RING_CMD;
     res->data=R;
     return R==NULL;

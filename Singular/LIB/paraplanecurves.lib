@@ -1615,7 +1615,7 @@ KEYWORDS: delta invariant; Tjurina number
       map beta=S,a,a;
       poly p=beta(p);
 
-      execute("ring C=("+charstr(S)+",a),("+varstr(S)+"),ds;");
+      ring C = create_ring("("+charstr(S)+",a)", "("+varstr(S)+")", "ds");
       number p=number(imap(B,p));
       minpoly=p;
 

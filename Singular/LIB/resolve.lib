@@ -395,7 +395,7 @@ EXAMPLE: example blowUp2;  shows an example
          {
             laM=subst(laM,var(templist[4][j]),0);
          }
-         execute("ring Rnew=("+charstr(basering)+"),("+string(templist[1])+"),dp;");
+         ring Rnew = create_ring(ringlist(basering)[1], "("+string(templist[1])+")", "dp", "no_minpoly");
          ideal Jnew=imap(R,Jsub);
          ideal eD=imap(R,Esub);
          ideal bM=imap(R,laM);
@@ -638,7 +638,7 @@ EXAMPLE: example blowUpBO;  shows an example
          newvar=string(N[1]);
          v=N[4];
          for(j=1;j<=size(v);j++){BO[5]=subst(BO[5],var(v[j]),0);}
-         execute("ring R1=("+charstr(R0)+"),("+newvar+"),dp;");
+         ring R1 = create_ring(ringlist(R0)[1], "("+newvar+")", "dp", "no_minpoly");
          list BO=imap(R0,BO);
          ideal C=imap(R0,C);
          n=nvars(R1);
@@ -1114,7 +1114,7 @@ EXAMPLE: example blowUpBO;  shows an example
               B[5]=subst(B[5],var(v[j]),0);
               laM=subst(laM,var(v[j]),0);
            }
-           execute("ring R2=("+charstr(S)+"),("+newvar+"),dp;");
+           ring R2 = create_ring(ringlist(S)[1], "("+newvar+")", "dp", "no_minpoly");
            list BO=imap(S,B);
            ideal laM=imap(S,laM);
         }
@@ -2983,7 +2983,7 @@ static proc CoverCenter(list BO,int b, ideal Jb)
        @p=K[merk[i]];
 //--- hypersurface is V(@f)
        @f=Jb[fvec[i]];
-       execute("ring R1=("+charstr(R)+"),(@y,"+varstr(R)+"),dp;");
+       ring R1 = create_ring(ringlist(R)[1], "(@y,"+varstr(R)+")", "dp", "no_minpoly");
        poly p=imap(R,@p);
        poly f=imap(R,@f);
        list @ce;
@@ -4232,7 +4232,7 @@ EXAMPLE: example resolve;  shows an example
              }
              kill tr,L;
           }
-          execute("ring R1=("+charstr(S)+"),(@z,"+varstr(S)+"),dp;");
+          ring R1 = create_ring(ringlist(S)[1], "(@z,"+varstr(S)+")", "dp", "no_minpoly");
           poly p=imap(S,@p);
           list BO=imap(S,BO);
           list invSat=imap(S,invSat);
@@ -4799,7 +4799,7 @@ static proc testBlowUp(list BO,ideal cent,list tmpList, int j, int extra)
       if(size(N[1])<n)
       {
          string newvar=string(N[1]);
-         execute("ring R1=("+charstr(R)+"),("+newvar+"),dp;");
+         ring R1 = create_ring(ringlist(R)[1], "("+newvar+")", "dp", "no_minpoly");
          list BO=imap(R,BO);
          ideal cent=imap(R,cent);
          n=nvars(R1);

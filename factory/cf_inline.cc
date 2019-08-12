@@ -142,7 +142,7 @@ CanonicalForm::CanonicalForm ()
 **/
 CF_INLINE
 CanonicalForm::CanonicalForm ( const int i )
-    : value( CFFactory::basic( (const long)i ) )
+    : value( CFFactory::basic( (long)i ) )
 {
 }
 

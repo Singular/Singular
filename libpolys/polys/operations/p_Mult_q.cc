@@ -66,6 +66,36 @@ BOOLEAN pqLength(poly p, poly q, int &lp, int &lq, const int min)
   while (1);
 }
 
+static void pqLengthApprox(poly p, poly q, int &lp, int &lq, const int min)
+{
+  int l = 0;
+
+  do
+  {
+    if (p == NULL)
+    {
+      lp=l;
+      lq=l+(q!=NULL);
+      return;
+    }
+    if (q == NULL) /* && p!=NULL */
+    {
+      lp=l+1;
+      lq=l;
+      return;
+    }
+    if (l>min) /* && p,q!=NULL */
+    {
+      lp=l; lq=l;
+      return;
+    }
+    pIter(p);
+    pIter(q);
+    l++;
+  }
+  while (1);
+}
+
 
 static poly _p_Mult_q_Bucket(poly p, const int lp,
                              poly q, const int lq,
@@ -289,7 +319,8 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   int lp, lq, l;
   poly pt;
 
-  pqLength(p, q, lp, lq, MIN_LENGTH_FACTORY);
+  // MIN_LENGTH_FACTORY must be >= MIN_LENGTH_FACTORY_QQ, MIN_FLINT_QQ, MIN_FLINT_Zp 20
+  pqLengthApprox(p, q, lp, lq, MIN_LENGTH_FACTORY);
 
   if (lp < lq)
   {
@@ -308,9 +339,8 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
     fmpq_mpoly_ctx_t ctx;
     if (pure_polys && rField_is_Q(r) && !convSingRFlintR(ctx,r))
     {
-      lp=pLength(p);
-      //printf("mul in flint\n");
-      poly res=Flint_Mult_MP(p,lp,q,lq,ctx,r);
+      // lq is a lower bound for the length of p and  q
+      poly res=Flint_Mult_MP(p,lq,q,lq,ctx,r);
       if (!copy)
       {
         p_Delete(&p,r);
@@ -324,9 +354,8 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
     nmod_mpoly_ctx_t ctx;
     if (pure_polys && rField_is_Zp(r) && !convSingRFlintR(ctx,r))
     {
-      lp=pLength(p);
-      //printf("mul in flint\n");
-      poly res=Flint_Mult_MP(p,lp,q,lq,ctx,r);
+      // lq is a lower bound for the length of p and  q
+      poly res=Flint_Mult_MP(p,lq,q,lq,ctx,r);
       if (!copy)
       {
         p_Delete(&p,r);
@@ -356,7 +385,7 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   else
   {
     lp=pLength(p);
-    assume(lq == pLength(q));
+    lq=pLength(q);
     return _p_Mult_q_Bucket(p, lp, q, lq, copy, r);
   }
 }

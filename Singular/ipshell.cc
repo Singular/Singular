@@ -2251,62 +2251,43 @@ void rComposeC(lists L, ring R)
   }
 //  R->cf->ch=0;
   // ----------------------------------------
-  // 1:
+  // 0, (r1,r2) [, "i" ]
   if (L->m[1].rtyp!=LIST_CMD)
   {
     WerrorS("invalid coeff. field description, expecting precision list");
     return;
   }
   lists LL=(lists)L->m[1].data;
-  if (((LL->nr!=2)
+  if ((LL->nr!=1)
     || (LL->m[0].rtyp!=INT_CMD)
     || (LL->m[1].rtyp!=INT_CMD))
-  && ((LL->nr!=1)
-    || (LL->m[0].rtyp!=INT_CMD)))
   {
-    WerrorS("invalid coeff. field description list");
+    WerrorS("invalid coeff. field description list, expected list(`int`,`int`)");
     return;
   }
   int r1=(int)(long)LL->m[0].data;
   int r2=(int)(long)LL->m[1].data;
+  r1=si_min(r1,32767);
+  r2=si_min(r2,32767);
+  LongComplexInfo par; memset(&par, 0, sizeof(par));
+  par.float_len=r1;
+  par.float_len2=r2;
   if (L->nr==2) // complex
-    R->cf = nInitChar(n_long_C, NULL);
-  else if ((r1<=SHORT_REAL_LENGTH)
-  && (r2<=SHORT_REAL_LENGTH))
-    R->cf = nInitChar(n_R, NULL);
-  else
   {
-    LongComplexInfo* p = (LongComplexInfo *)omAlloc0(sizeof(LongComplexInfo));
-    p->float_len=r1;
-    p->float_len2=r2;
-    R->cf = nInitChar(n_long_R, p);
-  }
-
-  if ((r1<=SHORT_REAL_LENGTH)   // should go into nInitChar
-  && (r2<=SHORT_REAL_LENGTH))
-  {
-    R->cf->float_len=SHORT_REAL_LENGTH/2;
-    R->cf->float_len2=SHORT_REAL_LENGTH;
-  }
-  else
-  {
-    R->cf->float_len=si_min(r1,32767);
-    R->cf->float_len2=si_min(r2,32767);
-  }
-  // ----------------------------------------
-  // 2: list (par)
-  if (L->nr==2)
-  {
-    //R->cf->extRing->N=1;
     if (L->m[2].rtyp!=STRING_CMD)
     {
       WerrorS("invalid coeff. field description, expecting parameter name");
       return;
     }
-    //(rParameter(R))=(char**)omAlloc0(rPar(R)*sizeof(char_ptr));
-    rParameter(R)[0]=omStrDup((char *)L->m[2].data);
+    par.par_name=(char*)L->m[2].data;
+    R->cf = nInitChar(n_long_C, &par);
   }
-  // ----------------------------------------
+  else if ((r1<=SHORT_REAL_LENGTH) && (r2<=SHORT_REAL_LENGTH)) /* && L->nr==1*/
+    R->cf = nInitChar(n_R, NULL);
+  else /* && L->nr==1*/
+  {
+    R->cf = nInitChar(n_long_R, &par);
+  }
 }
 
 #ifdef HAVE_RINGS

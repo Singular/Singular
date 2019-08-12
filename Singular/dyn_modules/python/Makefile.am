@@ -50,3 +50,4 @@ python_module_la_CXXFLAGS = ${AM_CXXFLAGS}
 
 python_moduledir =  ${datadir}/singular/LIB
 python_module_DATA = cart.py  interpreter.py  perf.py  symm.py  util.py
+EXTRA_DIST=cart.py  interpreter.py  perf.py  symm.py  util.py

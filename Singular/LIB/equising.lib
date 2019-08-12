@@ -1398,7 +1398,7 @@ EXAMPLE: example tau_es; shows an example.
   }
 
   def old_ring=basering;
-  execute("ring @myRing=("+charstr(basering)+"),("+varstr(basering)+"),ds;");
+  ring @myRing = create_ring(ringlist(basering)[1], "("+varstr(basering)+")", "ds", "no_minpoly");
   poly f=imap(old_ring,f);
 
   ideal Jacobi_Id = jacob(f);

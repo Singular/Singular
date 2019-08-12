@@ -223,7 +223,7 @@ EXAMPLE: example PrimdecB; shows an example
   if(size(ann)==0)
   {
     def BAS=basering;
-    execute("ring Rloc=("+charstr(basering)+","+varstr(basering)+"),dummy,(C,dp);");
+    ring Rloc = create_ring("("+charstr(basering)+","+varstr(basering)+")", "dummy", "(C,dp)");
     module @N=imap(BAS, @N);
     poly @q=prepareSat(@N);
 
@@ -633,7 +633,7 @@ EXAMPLE: example GTZmod; shows an example
   ////////////////////////////////////////////////////////////////
   if(size(ann)==0)
   {
-    execute("ring Rloc=("+charstr(basering)+","+varstr(basering)+"),dummy,(C,dp);");
+    ring Rloc = create_ring("("+charstr(basering)+","+varstr(basering)+")", "dummy", "(C,dp)");
     module @N=imap(BAS, @N);
     poly @q=prepareSat(@N);
 
@@ -1423,7 +1423,7 @@ EXAMPLE: example GTZmod; shows an example
   def BAS = basering;
   if(size(ann)==0)      //check, whether ann=0
   {
-   execute("ring Rloc=("+charstr(basering)+","+varstr(basering)+"),dummy,(C,dp);");
+   ring Rloc = create_ring("("+charstr(basering)+","+varstr(basering)+")", "dummy", "(C,dp)");
    module @N=clrSBmod(imap(BAS, @N));
    module @M=freemodule(nrows(@N));
    poly @q=prepareSat(@N);
@@ -1552,7 +1552,7 @@ EXAMPLE: example GTZmod; shows an example
     {
       ring RAU = create_ring(ringlist(basering)[1], "("+indep[@k1][@k2][1]+","+indep[@k1][@k2][2]+")", indep[@k1][@k2][3], "no_minpoly");
       module @N=std(imap(BAS,@N)); // the standard basis in (R[U])[A]
-      execute("ring Rloc=("+charstr(basering)+","+indep[@k1][@k2][2]+"),("+indep[@k1][@k2][1]+"),(C,dp);");
+      ring Rloc = create_ring("("+charstr(basering)+","+indep[@k1][@k2][2]+")", "("+indep[@k1][@k2][1]+")", "(C,dp)");
       module @N=imap(RAU,@N); //std in lokalisierung
       @N=clrSBmod(@N);
       kill RAU;

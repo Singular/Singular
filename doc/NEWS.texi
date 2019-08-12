@@ -20,6 +20,13 @@
 @end ifset
 
 @heading News for version @value{VERSION}
+
+Changes in the kernel/build system:
+@itemize
+@item improved gcd and multiplication via FLINT
+@end itemize
+
+@heading News for version 4-1-2
 New libraries:
 @itemize
 @item arnoldclassify.lib: Arnol'd Classifier of Singularities (@nref{arnoldclassify_lib})

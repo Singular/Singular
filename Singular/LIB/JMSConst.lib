@@ -175,27 +175,17 @@ jmp m=Q[1][1];
 jmp M=Q[size(Q)][1];
 int minimo=deg(m.h);
 int massimo=deg(M.h);
-//print(minimo);
-//print(massimo);
 int i=2;
 jmp qi;
 while(i<=size(Q))
      {
-       //print("entro nel ciclo");
-       //print(i);
        qi=Q[i][1];
        if(deg(qi.h)!=minimo+1)
          {
-          //print("qui riempire");
-          //print(i);
           Q=insert(Q,list(),i-1);//Insert empty list for all intermediate degree between the minimum and the maximum, not having polynomials.
-          //print(Q);
          }
        minimo=minimo+1;
        i=i+1;
-       //print("ora ho");
-       //print(minimo);
-       //print(i);
      }
 return(Q);
 }
@@ -249,7 +239,6 @@ for(i=1;i<=size(B);i++)
           pp.t=M[1];
           Q[i][j]=pp;
           s=s+M[2];
-          //print(s);
         }
     }
 list P=ArrangeTails(Q);
@@ -323,7 +312,6 @@ EXAMPLE:  example VConst; shows an example"
 jmp f=G[1][1];
 int aJ=deg(f.h);
 // minimal degree of polynomials in G
-//print(aJ);
 list V=list();
 V[1]=Terns(G,1);
 // V[1]=G[1] (keeping in memory only [head, position])
@@ -352,16 +340,9 @@ jmp p;
           for(j=1; j<=size(V[m-1]); j=j+1)
              {
                    p=G[V[m-1][j][2]][V[m-1][j][3]];
-                  //print(p.h);
-                  //print(p.t);
-                  //print(var(i));
-                  //print(Minimus(V[m-1][j][1]*p.h));
                if(var(i)<=Minimus(variables(V[m-1][j][1]*p.h)))
                   {
 //Can I multiply by the current variable?
-                    //print("minoremin");
-                    //print("fin qui ci sono");
-                     //print(V[m-1][j][1]);
                      OO=list(var(i)*V[m-1][j][1],V[m-1][j][2],V[m-1][j][3]);
                     V[m]=insert(V[m], OO ,size(V[m]));
                   }
@@ -753,138 +734,131 @@ proc FinalVm(list V1 , list G1 , def r)
 RETURN:   intvec: u
 EXAMPLE:  example FinalVm; shows an example"
 {
-//multiply and reduce, degree by degree
-intvec u=NewWeight(nvars(r)+1);
-list L=ringlist(r);
-L[2]=insert(L[2],"t",size(L[2]));
-//print(L[2]);
-list ordlist="a",u;
-L[3]=insert(L[3],ordlist,0);
-def H=ring(L);
-//print(V1);
-//print(G1);
-list M=list();
-jmp p;
-list N;
-poly q;
-poly s;
-int i;
-int j;
-for(i=1; i<=size(G1); i++)
-   {
-           N=list();
-           for(j=1; j<=size(G1[i]); j++)
-              {
-                p=G1[i][j];
-                q=p.h;
-                s=p.t;
-                N[j]=list(q,s);
-               }
-           M[i]=N;
-    }
-//print("M is");
-//print(M);
-p.h=poly(0);
-p.t=poly(0);
-setring H;
-list R=list();
-list S=list();
-//print("anello definito");
-list V=imap(r,V1);
-//def G=imap(r,G1);
-//print(V);
-list MM=imap(r,M);
-list G=list();
-list N=list();
-for(i=1; i<=size(MM); i++)
-   {
-           for(j=1; j<=size(MM[i]); j++)
-              {
-                p.h=MM[i][j][1];
-                p.t=MM[i][j][2];
-                N[j]=p;
-               }
-           G[i]=N;
-    }
-ideal I=0;
-jmp LL;
-jmp UU;
-//print("pronta x ridurre");
- for(i=1; i<=size(V);i++)
+  //multiply and reduce, degree by degree
+  intvec u=NewWeight(nvars(r)+1);
+  list L=ringlist(r);
+  L[2]=insert(L[2],"t",size(L[2]));
+  list ordlist="a",u;
+  L[3]=insert(L[3],ordlist,0);
+  def H=ring(L);
+  list M=list();
+  jmp p;
+  list N;
+  poly q;
+  poly s;
+  int i;
+  int j;
+  for(i=1; i<=size(G1); i++)
+  {
+    N=list();
+    for(j=1; j<=size(G1[i]); j++)
     {
-//print("sono a V di");
-//print(i);
-       R[i]=list();
-       S[i]=list();
-       I=0;
-              attrib(I,"isSB",1);
-       for(j=1;j<=size(V[i]); j++)
-          {
-//print(j);
-//print("esimo elem");
-            LL=MultiplyJmP(V[i][j],G);
-              LL.t=reduce(t*LL.t,I);
-//I only reduce the tail
-//print(LL.t);
-              LL.t=subst(LL.t,t,1);
-              S[i]=insert(S[i],LL,size(S[i]));
-              LL.h=t*LL.h;
-            R[i]=insert(R[i],LL,size(R[i]));
-             UU=R[i][j];
-              I=I+ideal(UU.h+UU.t);
-              attrib(I,"isSB",1);
-          }
+      p=G1[i][j];
+      q=p.h;
+      s=p.t;
+      N[j]=list(q,s);
     }
-//print("ho ridotto");
-list M=list();
-poly q;
-poly s;
-for(i=1; i<=size(S); i++)
-   {
-           N=list();
-           for(j=1; j<=size(S[i]); j++)
-              {
-                p=S[i][j];
-                q=p.h;
-                s=p.t;
-                N[j]=list(q,s);
-               }
-           M[i]=N;
+    M[i]=N;
+  }
+  p.h=poly(0);
+  p.t=poly(0);
+  setring H;
+  list R=list();
+  list S=list();
+  //print("anello definito");
+  list V=imap(r,V1);
+  list MM=imap(r,M);
+  list G=list();
+  list N=list();
+  for(i=1; i<=size(MM); i++)
+  {
+    for(j=1; j<=size(MM[i]); j++)
+    {
+      p.h=MM[i][j][1];
+      p.t=MM[i][j][2];
+      N[j]=p;
     }
-p.h=poly(0);
-p.t=poly(0);
-setring r;
-def MM=imap(H,M);
-list MMM=list();
-for(i=1; i<=size(MM); i++)
-   {
-           N=list();
-           for(j=1; j<=size(MM[i]); j++)
-              {
-                p.h=MM[i][j][1];
-                p.t=MM[i][j][2];
-                N[j]=p;
-               }
-           MMM[i]=N;
+    G[i]=N;
+  }
+  ideal I=0;
+  jmp LL;
+  jmp UU;
+  //print("pronta x ridurre");
+  for(i=1; i<=size(V);i++)
+  {
+    //print("sono a V di");
+    //print(i);
+    R[i]=list();
+    S[i]=list();
+    I=0;
+    attrib(I,"isSB",1);
+    for(j=1;j<=size(V[i]); j++)
+    {
+      //print(j);
+      //print("esimo elem");
+      LL=MultiplyJmP(V[i][j],G);
+      LL.t=reduce(t*LL.t,I);
+      //I only reduce the tail
+      //print(LL.t);
+      LL.t=subst(LL.t,t,1);
+      S[i]=insert(S[i],LL,size(S[i]));
+      LL.h=t*LL.h;
+      R[i]=insert(R[i],LL,size(R[i]));
+      UU=R[i][j];
+      I=I+ideal(UU.h+UU.t);
+      attrib(I,"isSB",1);
     }
-return(MMM);
+  }
+  //print("ho ridotto");
+  list M=list();
+  poly q;
+  poly s;
+  for(i=1; i<=size(S); i++)
+  {
+    N=list();
+    for(j=1; j<=size(S[i]); j++)
+    {
+      p=S[i][j];
+      q=p.h;
+      s=p.t;
+      N[j]=list(q,s);
+    }
+    M[i]=N;
+  }
+  p.h=poly(0);
+  p.t=poly(0);
+  setring r;
+  def MM=imap(H,M);
+  list MMM=list();
+  for(i=1; i<=size(MM); i++)
+  {
+    N=list();
+    for(j=1; j<=size(MM[i]); j++)
+    {
+      p.h=MM[i][j][1];
+      p.t=MM[i][j][2];
+      N[j]=p;
+    }
+    MMM[i]=N;
+  }
+  return(MMM);
 }
 example
 { "EXAMPLE:"; echo = 2;
  ring r=0, (x,y,z), rp;
-jmp r1;
-r1.h=z^3;
-r1.t=poly(0);
-jmp r2;
-r2.h=z^2*y;
-r2.t=poly(0);
-jmp r3;
-r3.h=z*y^2 ;
-r3.t=-x^2*y;
-jmp r4;
-r4.h=y^5;
-r4.t=poly(0);
-list G2F=list(list(r1,r2,r3),list(r4));
+ jmp r1;
+ r1.h=z^3;
+ r1.t=poly(0);
+ jmp r2;
+ r2.h=z^2*y;
+ r2.t=poly(0);
+ jmp r3;
+ r3.h=z*y^2 ;
+ r3.t=-x^2*y;
+ jmp r4;
+ r4.h=y^5;
+ r4.t=poly(0);
+ list G2F=list(list(r1,r2,r3),list(r4));
  FinalVm(VConst(G2F,6,r) , G2F, r);
 }
 ////////////////////////////////////////////////////////////////////
@@ -1092,206 +1066,207 @@ This procedure performs the reduction of EK-polynomials, obtaining
 the J-marked scheme.
 EXAMPLE:  example SchemeEq; shows an example"
 {
-list Jms=list();
-//ideal I;
-list M=list();
-jmp mini;
-mini=W[1][1];
-int minimo=deg(mini.h);
-//multiply variables
-poly pd=poly(1);
-for(int i=1;i<=nvars(r);i++)
-{pd=pd*var(i);}
-//CHANGE RING
-intvec u=NewWeight(nvars(r)+1);
-list L=ringlist(r);
-L[2]=insert(L[2],"t",size(L[2]));
-//print(L[2]);
-list ordlist="a",u;
-L[3]=insert(L[3],ordlist,0);
-def H=ring(L);
-//list
-M=list();
-jmp pu;
-list N;
-poly q;
-poly s;
-i=0;
-int j;
-for(i=1; i<=size(Q); i++)
-   {
-           N=list();
-           for(j=1; j<=size(Q[i]); j++)
-              {
-                pu=Q[i][j];
-                q=pu.h;
-                s=pu.t;
-                N[j]=list(q,s);
-               }
-           M[i]=N;
+  list Jms=list();
+  //ideal I;
+  list M=list();
+  jmp mini;
+  mini=W[1][1];
+  int minimo=deg(mini.h);
+  //multiply variables
+  poly pd=poly(1);
+  for(int i=1;i<=nvars(r);i++)
+  { pd=pd*var(i);}
+  //CHANGE RING
+  intvec u=NewWeight(nvars(r)+1);
+  list L=ringlist(r);
+  L[2]=insert(L[2],"t",size(L[2]));
+  //print(L[2]);
+  list ordlist="a",u;
+  L[3]=insert(L[3],ordlist,0);
+  def H=ring(L);
+  //list
+  M=list();
+  jmp pu;
+  list N;
+  poly q;
+  poly s;
+  i=0;
+  int j;
+  for(i=1; i<=size(Q); i++)
+  {
+    N=list();
+    for(j=1; j<=size(Q[i]); j++)
+    {
+      pu=Q[i][j];
+      q=pu.h;
+      s=pu.t;
+      N[j]=list(q,s);
     }
-list O;
-pu.h=poly(0);
-pu.t=poly(0);
-for(i=1; i<=size(W); i++)
-   {
-           N=list();
-           for(j=1; j<=size(W[i]); j++)
-              {
-                pu=W[i][j];
-                q=pu.h;
-                s=pu.t;
-                N[j]=list(q,s);
-               }
-           O[i]=N;
-    }
-pu.h=poly(0);
-pu.t=poly(0);
-setring H;
-list R=list();
-list S=list();
-//print("anello definito");
-def EK=imap(r,EK);
-def MM=imap(r,M);
-def OO=imap(r,O);
-def pd=imap(r,pd);
-list G=list();
-list N=list();
-for(i=1; i<=size(MM); i++)
-   {
-           for(j=1; j<=size(MM[i]); j++)
-              {
-                pu.h=MM[i][j][1];
-                pu.t=MM[i][j][2];
-                N[j]=pu;
-               }
-           G[i]=N;
-    }
-list V;
-for(i=1; i<=size(OO); i++)
-   {
-           for(j=1; j<=size(OO[i]); j++)
-              {
-                pu.h=OO[i][j][1];
-                pu.t=OO[i][j][2];
-                N[j]=pu;
-               }
-           V[i]=N;
-    }
-//print(V);
-//print(G);
-matrix C;
-list COEFF;
-poly p=0;
-poly q=0;
-ideal I;
-list M;
-i=0;
-jmp g;
-int k;
-for(j=1; j<=size(EK);j++)
-      {
-       //print("arrivo");
-       //print(j);
-       p=MultEKPolys(EK[j],G);
-       //ideal
-        I=0;
-       if (size(V[D[j]-minimo+1])!=0)
-           {
-            M=list();
-          //  jmp g;
-       for(i=1; i<= size(V[D[j]-minimo+1]); i++)
-           {
-            g=V[D[j]-minimo+1][i];
-            g.h=(g.h)*t;
-            M[i]=g.h+g.t;
-          }
-      I=M[1..size(M)];
-     attrib(I,"isSB",1);
-//print(I);
+    M[i]=N;
   }
-//print(I);
-q=reduce(t*p,I);
-q=subst(q,t,1);
-       C=coef(q,pd);
-       COEFF=C[2,1..ncols(C)];
-       for(k=1;k<=size(COEFF);k++)
-          {
-            if(COEFF[k]!=0)
-           { Jms=insert(Jms,COEFF[k],size(Jms));}
-          }
+  list O;
+  pu.h=poly(0);
+  pu.t=poly(0);
+  for(i=1; i<=size(W); i++)
+  {
+    N=list();
+    for(j=1; j<=size(W[i]); j++)
+    {
+      pu=W[i][j];
+      q=pu.h;
+      s=pu.t;
+      N[j]=list(q,s);
+    }
+    O[i]=N;
+  }
+  pu.h=poly(0);
+  pu.t=poly(0);
+  setring H;
+  list R=list();
+  list S=list();
+  //print("anello definito");
+  def EK=imap(r,EK);
+  def MM=imap(r,M);
+  def OO=imap(r,O);
+  def pd=imap(r,pd);
+  list G=list();
+  list N=list();
+  for(i=1; i<=size(MM); i++)
+  {
+    for(j=1; j<=size(MM[i]); j++)
+    {
+      pu.h=MM[i][j][1];
+      pu.t=MM[i][j][2];
+      N[j]=pu;
+    }
+    G[i]=N;
+  }
+  list V;
+  for(i=1; i<=size(OO); i++)
+  {
+    for(j=1; j<=size(OO[i]); j++)
+    {
+      pu.h=OO[i][j][1];
+      pu.t=OO[i][j][2];
+      N[j]=pu;
+    }
+    V[i]=N;
+  }
+  //print(V);
+  //print(G);
+  matrix C;
+  list COEFF;
+  poly p=0;
+  poly q=0;
+  ideal I;
+  list M;
+  i=0;
+  jmp g;
+  int k;
+  for(j=1; j<=size(EK);j++)
+  {
+    //print("arrivo");
+    //print(j);
+    p=MultEKPolys(EK[j],G);
+    //ideal
+    I=0;
+    if (size(V[D[j]-minimo+1])!=0)
+    {
+      M=list();
+      //  jmp g;
+      for(i=1; i<= size(V[D[j]-minimo+1]); i++)
+      {
+        g=V[D[j]-minimo+1][i];
+        g.h=(g.h)*t;
+        M[i]=g.h+g.t;
       }
-setring r;
-def Jms=imap(H,Jms);
-return(Jms);
+      I=M[1..size(M)];
+      attrib(I,"isSB",1);
+      //print(I);
+    }
+    //print(I);
+    q=reduce(t*p,I);
+    q=subst(q,t,1);
+    C=coef(q,pd);
+    COEFF=C[2,1..ncols(C)];
+    for(k=1;k<=size(COEFF);k++)
+    {
+      if(COEFF[k]!=0)
+      { Jms=insert(Jms,COEFF[k],size(Jms));}
+    }
+  }
+  setring r;
+  def Jms=imap(H,Jms);
+  return(Jms);
 }
 example
 { "EXAMPLE:"; echo = 2;
  ring r=0, (x,y,z),rp;
  ideal Borid=y^2*z,y*z^2,z^3,y^5;
-attrib(Borid,"isSB",1);
-    list B=ArrangeBorel(Borid);
-    list NumN;
-    list N;
-    int i;
-    int d;
-    for(i=1;i<=size(B);i++)
-       {
-        d=deg(B[i][1]);
-        N[i]=kbase(Borid,d);
-        NumN[i]=size(N[i]);
-       }
-int qc=NumNewVar(B, NumN);
-//Now I must define the NEW RING,
-//putting the c parameters inside.
-list L=ringlist(r);
-list L2;
-L2[1]=L[1];
-L2[2]=list();
-for(i=qc;i>=1;i--)
-    {
-     L2[2][i]="c("+string(i)+")";
-    }
-L2[3]=list(list("rp",qc));
-L2[4]=L[4];
-L[1]=L2;
-if(defined(K)){kill K;}
-def K=ring(L);
-export K;
-setring(K);
-def Borid=imap(r,Borid);
-def N=imap(r,N);
-def B=imap(r,B);
-//NumN contains only scalars so I do not imap it
-int j;
-list Q;
-int s;
-list M;
-jmp pp;
-for(i=1;i<=size(B);i++)
-    {
-      Q[i]=list();
-     for(j=1;j<=size(B[i]);j++)
-        {
-          M=NewTails(N[i],s);
-          pp.h=B[i][j];
-          pp.t=M[1];
-          Q[i][j]=pp;
-          s=s+M[2];
-          //print(s);
-        }
-    }
-list P=ArrangeTails(Q);
-list EK,D= EKPolynomials(P);
-     int massimo=Max(D);
-//list V=VConst(P, massimo);
-//pause();
-list V=VmConstructor(P,massimo,r);
-list W=FinalVm(V,P,K);
-//print("I V ridotti in ordine sono");
-//print(W);
-list Jms=SchemeEq(W,EK,D,P,K);
-Jms;}
+ attrib(Borid,"isSB",1);
+ list B=ArrangeBorel(Borid);
+ list NumN;
+ list N;
+ int i;
+ int d;
+ for(i=1;i<=size(B);i++)
+ {
+   d=deg(B[i][1]);
+   N[i]=kbase(Borid,d);
+   NumN[i]=size(N[i]);
+ }
+ int qc=NumNewVar(B, NumN);
+ //Now I must define the NEW RING,
+ //putting the c parameters inside.
+ list L=ringlist(r);
+ list L2;
+ L2[1]=L[1];
+ L2[2]=list();
+ for(i=qc;i>=1;i--)
+ {
+   L2[2][i]="c("+string(i)+")";
+ }
+ L2[3]=list(list("rp",qc));
+ L2[4]=L[4];
+ L[1]=L2;
+ if(defined(K)){kill K;}
+ def K=ring(L);
+ export K;
+ setring(K);
+ def Borid=imap(r,Borid);
+ def N=imap(r,N);
+ def B=imap(r,B);
+ //NumN contains only scalars so I do not imap it
+ int j;
+ list Q;
+ int s;
+ list M;
+ jmp pp;
+ for(i=1;i<=size(B);i++)
+ {
+   Q[i]=list();
+   for(j=1;j<=size(B[i]);j++)
+   {
+     M=NewTails(N[i],s);
+     pp.h=B[i][j];
+     pp.t=M[1];
+     Q[i][j]=pp;
+     s=s+M[2];
+     //print(s);
+   }
+ }
+ list P=ArrangeTails(Q);
+ list EK,D= EKPolynomials(P);
+ int massimo=Max(D);
+ //list V=VConst(P, massimo);
+ //pause();
+ list V=VmConstructor(P,massimo,r);
+ list W=FinalVm(V,P,K);
+ //print("I V ridotti in ordine sono");
+ //print(W);
+ list Jms=SchemeEq(W,EK,D,P,K);
+ Jms;
+}
 
 //////////////////////////////////////////////////////////////////////
 proc JMarkedScheme(ideal Borid,def r)
@@ -1302,94 +1277,94 @@ This procedure performs automatically the whole construction
 of the J-marked scheme.
 EXAMPLE:  example JMarkedScheme; shows an example"
 {
-list Jms;
-if(BorelCheck(Borid,r))
+  list Jms;
+  if(BorelCheck(Borid,r))
   {
-   if(size(Borid)==1)
-     { Jms=list();}
-  else{
-    //print("Input is OK");
-    attrib(Borid,"isSB",1);
-    list B=ArrangeBorel(Borid);
-    list NumN;
-    list N;
-    int i;
-    int d;
-    for(i=1;i<=size(B);i++)
-       {
+    if(size(Borid)==1) { Jms=list();}
+    else
+    {
+      //print("Input is OK");
+      attrib(Borid,"isSB",1);
+      list B=ArrangeBorel(Borid);
+      list NumN;
+      list N;
+      int i;
+      int d;
+      for(i=1;i<=size(B);i++)
+      {
         d=deg(B[i][1]);
         N[i]=kbase(Borid,d);
         NumN[i]=size(N[i]);
-       }
-int qc=NumNewVar(B, NumN);
-if(qc==0)
-{Jms=list(0);}
-else
- {
-//Now I must define the NEW RING,
-//putting the c parameters inside.
-list L=ringlist(r);
-list L2;
-L2[1]=L[1];
-L2[2]=list();
-for(i=qc;i>=1;i--)
-    {
-     L2[2][i]="c("+string(i)+")";
-    }
-L2[3]=list(list("rp",qc));
-L2[4]=L[4];
-L[1]=L2;
-if(defined(K)){kill K;}
-def K=ring(L);
-export K;
-setring(K);
-def Borid=imap(r,Borid);
-def N=imap(r,N);
-def B=imap(r,B);
-//NumN contains only scalars so I do not imap it
-int j;
-list Q;
-int s;
-list M;
-jmp pp;
-for(i=1;i<=size(B);i++)
-    {
-      Q[i]=list();
-     for(j=1;j<=size(B[i]);j++)
+      }
+      int qc=NumNewVar(B, NumN);
+      if(qc==0) {Jms=list(0);}
+      else
+      {
+        //Now I must define the NEW RING,
+        //putting the c parameters inside.
+        list L=ringlist(r);
+        list L2;
+        L2[1]=L[1];
+        L2[2]=list();
+        for(i=qc;i>=1;i--)
         {
-          M=NewTails(N[i],s);
-          pp.h=B[i][j];
-          pp.t=M[1];
-          Q[i][j]=pp;
-          s=s+M[2];
-          //print(s);
+          L2[2][i]="c("+string(i)+")";
         }
+        L2[3]=list(list("rp",qc));
+        L2[4]=L[4];
+        L[1]=L2;
+        if(defined(K)){kill K;}
+        def K=ring(L);
+        export K;
+        setring(K);
+        def Borid=imap(r,Borid);
+        def N=imap(r,N);
+        def B=imap(r,B);
+        //NumN contains only scalars so I do not imap it
+        int j;
+        list Q;
+        int s;
+        list M;
+        jmp pp;
+        for(i=1;i<=size(B);i++)
+        {
+          Q[i]=list();
+          for(j=1;j<=size(B[i]);j++)
+          {
+            M=NewTails(N[i],s);
+            pp.h=B[i][j];
+            pp.t=M[1];
+            Q[i][j]=pp;
+            s=s+M[2];
+            //print(s);
+          }
+        }
+        list P=ArrangeTails(Q);
+        list EK,D= EKPolynomials(P);
+        int massimo=Max(D);
+        //list V=VConst(P, massimo);
+        //pause();
+        list V=VmConstructor(P,massimo,r);
+        list W=FinalVm(V,P,K);
+        //print("I V ridotti in ordine sono");
+        //print(W);
+        //list
+        Jms=SchemeEq(W,EK,D,P,K);
+        keepring K;
+      }
     }
-list P=ArrangeTails(Q);
-list EK,D= EKPolynomials(P);
-     int massimo=Max(D);
-//list V=VConst(P, massimo);
-//pause();
-list V=VmConstructor(P,massimo,r);
-list W=FinalVm(V,P,K);
-//print("I V ridotti in ordine sono");
-//print(W);
-//list
-Jms=SchemeEq(W,EK,D,P,K);
-keepring K;}
-}
   }
-else
-   {
+  else
+  {
     print("WRONG IDEAL IN INPUT");
     print("It is NOT BOREL");
-   }
-return(Jms);
+  }
+  return(Jms);
 }
 example
 { "EXAMPLE:"; echo = 2;
  ring r=0, (x,y,z),rp;
  ideal Borid=y^2*z,y*z^2,z^3,y^5;
-JMarkedScheme(Borid,r);
+ JMarkedScheme(Borid,r);
 }
 ////////////////////////////////////////////////////////////////////

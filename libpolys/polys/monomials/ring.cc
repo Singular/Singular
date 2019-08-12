@@ -431,7 +431,7 @@ void   rWrite(ring r, BOOLEAN details)
   }
   if (rIsLPRing(r))
   {
-    Print("\n// letterplace ring (block size %d)",r->isLPring);
+    Print("\n// letterplace ring (block size %d, ncgen count %d)",r->isLPring, r->LPncGenCount);
   }
 #endif
   if (r->qideal!=NULL)
@@ -1392,6 +1392,7 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
 
 #ifdef HAVE_SHIFTBBA
   res->isLPring=r->isLPring; /* 0 for non-letterplace rings, otherwise the number of LP blocks, at least 1, known also as lV */
+  res->LPncGenCount=r->LPncGenCount;
 #endif
 
   res->VectorOut=r->VectorOut;
@@ -1521,6 +1522,7 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
 
 #ifdef HAVE_SHIFTBBA
   res->isLPring=r->isLPring; /* 0 for non-letterplace rings, otherwise the number of LP blocks, at least 1, known also as lV */
+  res->LPncGenCount=r->LPncGenCount;
 #endif
 
   res->VectorOut=r->VectorOut;
@@ -1666,6 +1668,7 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
   if (r1->bitmask!=r2->bitmask) return FALSE;
   #ifdef HAVE_SHIFTBBA
   if (r1->isLPring!=r2->isLPring) return FALSE;
+  if (r1->LPncGenCount!=r2->LPncGenCount) return FALSE;
   #endif
 
   if( !rSamePolyRep(r1, r2) )

@@ -283,7 +283,7 @@ example
 static proc specialAlgDepEHV(ideal I, poly f)
 {
    def R = basering;
-   execute("ring QT = ("+charstr(R)+"), "+varstr(R, nvars(R))+", dp;");
+   ring QT = create_ring(ringlist(R)[1], varstr(R, nvars(R)), "dp", "no_minpoly");
    setring(R);
    map phi = QT, f;
    setring QT;
@@ -348,7 +348,7 @@ static proc specialAlgDepMonico(ideal I, poly f, int d)
    {
      M[1..d, j] = coeffs(reduce(f*basis[j], J), basis, vars);
    }
-   execute("ring QT = ("+charstr(R)+"), "+varstr(R, nvars(R))+", dp;");
+   ring QT = create_ring(ringlist(R)[1], varstr(R, nvars(R)), "dp", "no_minpoly");
    matrix M = imap(R, M);
    ideal F = det(M-var(1)*freemodule(d));
    setring(R);
@@ -363,7 +363,7 @@ static proc specialTest(int d, poly p, ideal I)
 //=== computes a poly F in Q[T] such that <F>=kernel(Q[T]--->basering)
 //=== mapping T to p and test if d=deg(F)
    def R = basering;
-   execute("ring Rhelp = ("+charstr(R)+"), T, dp;");
+   ring Rhelp = create_ring(ringlist(R)[1], "T", "dp", "no_minpoly");
    setring R;
    map phi = Rhelp,p;
    setring Rhelp;

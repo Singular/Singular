@@ -2516,14 +2516,54 @@ static proc tuple_to_tokens(string s)
  */
 static proc parse_L1(string l1)
 {
-  if (find(l1, "(", 1) == 0)   // no parentheses
+  list tokens;
+  if (l1[1] != "(")
   {
-      return(int(l1));
+    tokens[1] = l1;
   }
-  list tokens = tuple_to_tokens(l1);
+  else
+  {
+    tokens = tuple_to_tokens(l1);
+  }
+  if (tokens[1] == "real")
+  {
+    int p1 = 6;
+    int p2 = 6;
+    if (size(tokens) > 1)
+    {
+      p1 = int(tokens[2]);
+      p2 = p1;
+    }
+    if (size(tokens) > 2)
+    {
+      p2 = int(tokens[3]);
+    }
+    return(list(0, list(p1, p2)));
+  }
+  if (tokens[1] == "complex")
+  {
+    int p1 = 6;
+    int p2 = 6;
+    string imag_unit = "i";
+    if (int(tokens[size(tokens)]) == 0)   // not an integer
+    {
+      imag_unit = tokens[size(tokens)];
+      tokens = delete(tokens, size(tokens));
+    }
+    if (size(tokens) > 1)
+    {
+      p1 = int(tokens[2]);
+      p2 = p1;
+    }
+    if (size(tokens) > 2)
+    {
+      p2 = int(tokens[3]);
+    }
+    return(list(0, list(p1, p2), imag_unit));
+  }
   if (size(tokens) == 1)
   {
-      return(int(tokens[1]));
+    return(int(tokens[1]));
   }
   list L = int(tokens[1]);
   L[2] = list(tokens[2..size(tokens)]);
@@ -2536,8 +2576,8 @@ static proc parse_var(string v)
 {
   if (v[1, 4] == "var(" && defined(basering))
   {
-      int i = int(v[5,size(v)-5]);
-      v = ringlist(basering)[2][i];
+    int i = int(v[5,size(v)-5]);
+    v = ringlist(basering)[2][i];
   }
   return(v);
 }
@@ -2549,14 +2589,14 @@ static proc parse_var(string v)
  */
 static proc parse_L2(string l2)
 {
-  if (find(l2, "(", 1) == 0)   // no parentheses
+  if (l2[1] != "(")
   {
-      return(list(parse_var(l2)));
+    return(list(parse_var(l2)));
   }
   list V = tuple_to_tokens(l2);
   for (int i = size(V); i > 0; i--)
   {
-      V[i] = parse_var(V[i]);
+    V[i] = parse_var(V[i]);
   }
   return(V);
 }
@@ -2571,18 +2611,17 @@ static proc parse_L2(string l2)
 static proc parse_ordering(string ordering, int n_vars)
 {
   string name;
-  intvec w;
   int b1 = find(ordering, "(", 1);
   if (b1 == 0)   // no parentheses
   {
     name = ordering;
     if (name == "C" || name == "c")
     {
-      w = intvec(0);
+      intvec w = intvec(0);
     }
     else
     {
-      w = 1:n_vars;
+      intvec w = 1:n_vars;
     }
   }
   else
@@ -2592,12 +2631,24 @@ static proc parse_ordering(string ordering, int n_vars)
     int c = find(ordering, ",", b1+1);
     if (c == 0)
     {
-      w = 1:int(ordering[b1+1, b2-b1-1]);
+      if (name == "L")
+      {
+        int w = int(ordering[b1+1, b2-b1-1]);
+      }
+      if (name == "wp" || name == "Wp" || name == "ws" || name == "Ws"
+          || name == "a")
+      {
+        intvec w = int(ordering[b1+1, b2-b1-1]);
+      }
+      if (!defined(w))   // else
+      {
+        intvec w = 1:int(ordering[b1+1, b2-b1-1]);
+      }
     }
     else
     {
       list W = tuple_to_tokens(ordering[b1, b2-b1+1]);
-      w = intvec(int(W[1..size(W)]));
+      intvec w = intvec(int(W[1..size(W)]));
     }
   }
   return(list(name, w));
