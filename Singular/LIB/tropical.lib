@@ -343,7 +343,12 @@ EXAMPLE: example tropicalLifting;   shows an example"
   }
   else
   {
-    ring BASERING = create_ring(ringlist(ALTERRING)[1], "(t,x(1.."+string(nvars(ALTERRING)-1)+"))", "("+ordstr(ALTERRING)+")", "no_minpoly");
+    list V = "t";
+    for (int ii = nvars(ALTERRING)-1; ii > 0; ii--)
+    {
+      V[ii+1] = "x("+string(ii)+")";
+    }
+    ring BASERING = create_ring(ringlist(ALTERRING)[1], V, "("+ordstr(ALTERRING)+")", "no_minpoly");
   }
   map altphi=ALTERRING,maxideal(1);
   ideal i=altphi(i);
