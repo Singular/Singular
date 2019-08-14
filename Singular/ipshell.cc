@@ -1691,6 +1691,8 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
         case ringorder_ds:
         case ringorder_Ds:
         case ringorder_lp:
+        case ringorder_rp:
+        case ringorder_ls:
           for(;j>=0; j--) (*iv)[j]=1;
           break;
         default: /* do nothing */;
@@ -2204,6 +2206,8 @@ lists rDecompose(const ring r)
         case ringorder_ds:
         case ringorder_Ds:
         case ringorder_lp:
+        case ringorder_ls:
+        case ringorder_rp:
           for(;j>=0; j--) (*iv)[j]=1;
           break;
         default: /* do nothing */;
@@ -2531,7 +2535,8 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
           j_in_R--;
           continue;
         }
-        if ((vv->m[1].Typ()!=INTVEC_CMD) && (vv->m[1].Typ()!=INT_CMD))
+        if ((vv->m[1].Typ()!=INTVEC_CMD) && (vv->m[1].Typ()!=INT_CMD)
+        && (vv->m[1].Typ()!=INTMAT_CMD))
         {
           PrintS(lString(vv));
           WerrorS("ordering name must be a (string,intvec)(1)");
@@ -2561,14 +2566,23 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
         }
         intvec *iv;
         if (vv->m[1].Typ()==INT_CMD)
-          iv=new intvec((int)(long)vv->m[1].Data(),(int)(long)vv->m[1].Data());
+        {
+          int l=si_max(1,(int)(long)vv->m[1].Data());
+          iv=new intvec(l);
+          for(int i=0;i<l;i++) (*iv)[i]=1;
+        }
         else
-          iv=ivCopy((intvec*)vv->m[1].Data()); //assume INTVEC
+          iv=ivCopy((intvec*)vv->m[1].Data()); //assume INTVEC/INTMAT
         int iv_len=iv->length();
         if (iv_len==0)
         {
-          Werror("empty intvec for ordering %d (%s)",j_in_R,rSimpleOrdStr(R->order[j_in_R]));
+          Werror("empty intvec for ordering %d (%s)",j_in_R+1,rSimpleOrdStr(R->order[j_in_R]));
           return TRUE;
+        }
+        if (R->order[j_in_R]==ringorder_M)
+        {
+          if (vv->m[1].rtyp==INTMAT_CMD) iv->makeVector();
+          iv_len=iv->length();
         }
         if ((R->order[j_in_R]!=ringorder_s)
         &&(R->order[j_in_R]!=ringorder_c)
@@ -2635,6 +2649,18 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
            case ringorder_dp:
            case ringorder_Dp:
            case ringorder_rp:
+	     #if 0
+             for (i=0; i<iv_len;i++)
+             {
+               if (((*iv)[i]!=1)&&(iv_len!=1))
+               {
+                 iv->show(1);
+                 Warn("ignore weight %d for ord %d (%s) at pos %d\n>>%s<<",
+                   (*iv)[i],j_in_R+1,rSimpleOrdStr(R->order[j_in_R]),i+1,my_yylinebuf);
+                 break;
+               }
+             }
+	     #endif // break absfact.tst
              break;
            case ringorder_S:
              break;
