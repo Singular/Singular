@@ -4517,6 +4517,7 @@ static BOOLEAN jjLEADCOEF(leftv res, leftv v)
   }
   else
   {
+    nNormalize(pGetCoeff(p));
     res->data=(char *)nCopy(pGetCoeff(p));
   }
   return FALSE;
