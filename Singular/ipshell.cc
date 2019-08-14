@@ -2417,7 +2417,7 @@ static void rRenameVars(ring R)
     {
       if (strcmp(rParameter(R)[i],R->names[j])==0)
       {
-        Warn("name conflict par(%d) and var(%d): `%s`, renaming the VARIABLE to `@@(%d)`",i+1,j+1,R->names[j],i+1);
+        Warn("name conflict par(%d) and var(%d): `%s`, renaming the VARIABLE to `@@(%d)`in >>%s<<\nin %s:%d",i+1,j+1,R->names[j],i+1,my_yylinebuf,currentVoice->filename,yylineno);
 //        omFree(rParameter(R)[i]);
 //        rParameter(R)[i]=(char *)omAlloc(10);
 //        sprintf(rParameter(R)[i],"@@(%d)",i+1);
