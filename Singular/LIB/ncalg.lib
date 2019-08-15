@@ -594,7 +594,12 @@ EXAMPLE: example GKZsystem; shows examples
 "{
   int @d = nrows(A);
   int n = ncols(A);
-  execute("ring r1=0,(d(1..n)),"+sord+";");
+  list l2;
+  for (int ii = 1; ii <= n; ii++)
+  {
+   l2[ii] = "d("+string(ii)+")";
+  }
+  ring r1 = create_ring(0, l2, sord);
   ideal I0;
   if (size(#)==0)
   {
@@ -614,7 +619,20 @@ EXAMPLE: example GKZsystem; shows examples
     }
   }
   string sord2 = "(a(0:" + string(n) + ")," + sord + ")";
-  execute("ring GR = (0,b(1..@d)),(x(1..n),d(1..n)),"+sord2+";");
+  string l3 = "(0";
+  int ii;
+  for (ii = 1; ii <= @d; ii++)
+  {
+   l3 = l3+",b("+string(ii)+")";
+  }
+  l3 = l3+")";
+  list l4;
+  for (ii = 1; ii <= n; ii++)
+  {
+   l4[ii] = "x("+string(ii)+")";
+   l4[n+ii] = "d("+string(ii)+")";
+  }
+  ring GR = create_ring(l3, l4, sord2);
   def W=Weyl(); setring W;
   kill GR;
   int i,j;
