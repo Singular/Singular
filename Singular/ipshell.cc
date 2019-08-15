@@ -2402,7 +2402,7 @@ static void rRenameVars(ring R)
         if (strcmp(R->names[i],R->names[j])==0)
         {
           ch=TRUE;
-          Warn("name conflict var(%d) and var(%d): `%s`, rename to `@%s`",i+1,j+1,R->names[i],R->names[i]);
+          Warn("name conflict var(%d) and var(%d): `%s`, rename to `@%s`in >>%s<<\nin %s:%d",i+1,j+1,R->names[i],R->names[i],my_yylinebuf,currentVoice->filename,yylineno);
           omFree(R->names[j]);
           R->names[j]=(char *)omAlloc(2+strlen(R->names[i]));
           sprintf(R->names[j],"@%s",R->names[i]);
@@ -2417,7 +2417,7 @@ static void rRenameVars(ring R)
     {
       if (strcmp(rParameter(R)[i],R->names[j])==0)
       {
-        Warn("name conflict par(%d) and var(%d): `%s`, renaming the VARIABLE to `@@(%d)`in >>%s<<\nin %s:%d",i+1,j+1,R->names[j],i+1,my_yylinebuf,currentVoice->filename,yylineno);
+        Warn("name conflict par(%d) and var(%d): `%s`, rename the VARIABLE to `@@(%d)`in >>%s<<\nin %s:%d",i+1,j+1,R->names[j],i+1,my_yylinebuf,currentVoice->filename,yylineno);
 //        omFree(rParameter(R)[i]);
 //        rParameter(R)[i]=(char *)omAlloc(10);
 //        sprintf(rParameter(R)[i],"@@(%d)",i+1);
