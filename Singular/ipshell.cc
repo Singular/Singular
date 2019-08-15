@@ -2633,11 +2633,10 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
            case ringorder_M:
              R->wvhdl[j_in_R] =( int *)omAlloc((iv->length())*sizeof(int));
              for (i=0; i<iv->length();i++) R->wvhdl[j_in_R][i]=(*iv)[i];
-             R->block1[j_in_R]=si_max(R->block0[j_in_R],R->block0[j_in_R]+(int)sqrt((double)(iv->length()-1)));
+             R->block1[j_in_R]=si_max(R->block0[j_in_R],R->block0[j_in_R]+(int)sqrt((double)(iv->length())));
              if (R->block1[j_in_R]>R->N)
              {
-               WerrorS("ordering matrix too big");
-               return TRUE;
+               R->block1[j_in_R]=R->N;
              }
              break;
            case ringorder_ls:
@@ -2649,7 +2648,7 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
            case ringorder_dp:
            case ringorder_Dp:
            case ringorder_rp:
-	     #if 0
+             #if 0
              for (i=0; i<iv_len;i++)
              {
                if (((*iv)[i]!=1)&&(iv_len!=1))
@@ -2660,7 +2659,7 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
                  break;
                }
              }
-	     #endif // break absfact.tst
+             #endif // break absfact.tst
              break;
            case ringorder_S:
              break;
