@@ -62,7 +62,7 @@ BOOLEAN convSingRFlintR(nmod_mpoly_ctx_t ctx, const ring r)
 
 /******** polynomial conversion ***********/
 
-#if 1
+#if HAVE_OMALLOC
 // memory allocation is not thread safe; singular polynomials must be constructed in serial
 
 /*

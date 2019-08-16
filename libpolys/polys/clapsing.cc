@@ -601,7 +601,7 @@ poly singclap_pdivide ( poly f, poly g, const ring r )
     nmod_mpoly_ctx_t ctx;
     if (!convSingRFlintR(ctx,r))
     {
-      res = Flint_Divide_MP(f,pLength(f),g,pLength(g),ctx,r);
+      res = Flint_Divide_MP(f,0,g,0,ctx,r);
       if (res != NULL)
         return res;
     }
@@ -612,7 +612,7 @@ poly singclap_pdivide ( poly f, poly g, const ring r )
     fmpq_mpoly_ctx_t ctx;
     if (!convSingRFlintR(ctx,r))
     {
-      res = Flint_Divide_MP(f,pLength(f),g,pLength(g),ctx,r);
+      res = Flint_Divide_MP(f,0,g,0,ctx,r);
       if (res != NULL)
         return res;
     }
