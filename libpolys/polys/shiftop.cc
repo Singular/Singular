@@ -12,7 +12,7 @@
  * NOTE: it already works, but all tests and the libraries need to be updated first
  * -> wait until the new interface is released
 */
-/* #define SHIFT_MULT_COMPAT_MODE */
+#define SHIFT_MULT_COMPAT_MODE // ncHilb.lib still relies on it
 
 #ifdef SHIFT_MULT_DEBUG
 #include "../kernel/polys.h"
