@@ -3962,20 +3962,20 @@ static BOOLEAN jjDEFINED(leftv res, leftv v)
 }
 
 /// Return the denominator of the input number
-/// NOTE: the input number is normalized as a side effect
 static BOOLEAN jjDENOMINATOR(leftv res, leftv v)
 {
-  number n = reinterpret_cast<number>(v->Data());
+  number n = reinterpret_cast<number>(v->CopyD());
   res->data = reinterpret_cast<void*>(n_GetDenom(n, currRing->cf));
+  n_Delete(&n,currRing);
   return FALSE;
 }
 
 /// Return the numerator of the input number
-/// NOTE: the input number is normalized as a side effect
 static BOOLEAN jjNUMERATOR(leftv res, leftv v)
 {
-  number n = reinterpret_cast<number>(v->Data());
+  number n = reinterpret_cast<number>(v->CopyD());
   res->data = reinterpret_cast<void*>(n_GetNumerator(n, currRing->cf));
+  n_Delete(&n,currRing);
   return FALSE;
 }
 
