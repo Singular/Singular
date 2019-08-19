@@ -666,7 +666,8 @@ EXAMPLE: example blowUpBO;  shows an example
 //---------------------------------------------------------------------------
 //--- control the names of the variables
    list l2;
-   for (int ii = 1; ii <= n; ii++)
+   int ii;
+   for (ii = 1; ii <= n; ii++)
    {
     l2[ii] = "x("+string(ii)+")";
    }
@@ -710,21 +711,21 @@ EXAMPLE: example blowUpBO;  shows an example
    Ex[size(Ex)+1]=var(1);
          //to have the list depending on R in case BO[4] is empty
 
-   list l2 = ringlist(R)[2];
-   for (int ii = 0; ii <= s-1; ii++)
+   l2 = ringlist(R)[2];
+   for (ii = 0; ii <= s-1; ii++)
    {
     l2[size(l2)+1] = "y("+string(ii)+")";
    }
    ring S = create_ring(ringlist(R)[1], l2, "dp", "no_minpoly"); 
    list resu;
    list B;
-   list l2 = ringlist(R)[2];
-   for (int ii = 0; ii <= s-1; ii++)
+   l2 = ringlist(R)[2];
+   for (ii = 0; ii <= s-1; ii++)
    {
     l2[size(l2)+1] = "y("+string(ii)+")";
    }
    l2[size(l2)+1] = "t";
-   ring S = create_ring(ringlist(R)[1], l2, "dp", "no_minpoly");
+   ring T = create_ring(ringlist(R)[1], l2, "dp", "no_minpoly");
    ideal C=imap(R,C);
    ideal W=imap(R,W);
    execute("map phi=S,"+varstr(R)+",t*C;")
