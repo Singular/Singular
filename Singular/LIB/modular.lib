@@ -135,7 +135,8 @@ EXAMPLE:  example modular; shows an example"
         }
         else
         {
-            ncores_available = system("semaphore", "get_value", sem_cores)+1;
+            ncores_available = max(1, system("semaphore", "get_value",
+                    sem_cores)+1);
             if (nAllPrimes < ncores_available)
             {
                 nNewPrimes = nAllPrimes;
@@ -414,7 +415,7 @@ static proc par_range(int N, list #)
 
 static proc NbModProcs()
 {
-    int available = system("semaphore", "get_value", sem_cores)+1;
+    int available = max(1, system("semaphore", "get_value", sem_cores)+1);
     int nb;
     if (available < 16) {
         nb = ((10 div available)+1-(10%available == 0))*available;
