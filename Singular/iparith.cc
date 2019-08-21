@@ -1549,12 +1549,11 @@ static BOOLEAN jjKLAMMER_rest(leftv res, leftv u, leftv v);
 static BOOLEAN jjKLAMMER(leftv res, leftv u, leftv v)
 {
   if(u->name==NULL) return TRUE;
-  char * nn = (char *)omAlloc(strlen(u->name) + 14);
+  long slen = strlen(u->name) + 14;
+  char *nn = (char*) omAlloc(slen);
   sprintf(nn,"%s(%d)",u->name,(int)(long)v->Data());
-  omFree((ADDRESS)u->name);
-  u->name=NULL;
   char *n=omStrDup(nn);
-  omFree((ADDRESS)nn);
+  omFreeSize((ADDRESS)nn,slen);
   syMake(res,n);
   if (u->next!=NULL) return jjKLAMMER_rest(res,u->next,v);
   return FALSE;
@@ -1581,8 +1580,6 @@ static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
     sprintf(n,"%s(%d)",u->name,(*iv)[i]);
     syMake(p,omStrDup(n));
   }
-  omFree((ADDRESS)u->name);
-  u->name = NULL;
   omFreeSize(n, slen);
   if (u->next!=NULL) return jjKLAMMER_rest(res,u->next,v);
   return FALSE;
