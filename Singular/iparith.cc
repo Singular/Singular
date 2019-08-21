@@ -1560,6 +1560,7 @@ static BOOLEAN jjKLAMMER(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
 {
+  if(u->name==NULL) return TRUE;
   intvec * iv=(intvec *)v->Data();
   leftv p=NULL;
   int i;
