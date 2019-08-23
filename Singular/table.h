@@ -947,14 +947,15 @@ const struct sValCmdM dArithM[]=
 ,{D(jjNAMES0),    NAMES_CMD,       LIST_CMD,            0      , ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL2ARG),  CNUMBER_CMD,     CNUMBER_CMD,         2      , ALLOW_NC |ALLOW_RING}
 ,{D(jjOPTION_PL), OPTION_CMD,      STRING_CMD/*or set by p*/,-1, ALLOW_NC |ALLOW_RING}
+,{D(jjPREDHELP0), PREDHELP_CMD,    LIST_CMD,            0      , ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL2ARG),  REDUCE_CMD,      IDEAL_CMD/*or set by p*/,  2, ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL3ARG),  REDUCE_CMD,      IDEAL_CMD/*or set by p*/,  3, ALLOW_NC |ALLOW_RING}
 ,{D(jjREDUCE4),   REDUCE_CMD,      IDEAL_CMD/*or set by p*/,  4, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjREDUCE5),   REDUCE_CMD,      IDEAL_CMD/*or set by p*/,  5, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL1ARG),  RESERVEDNAME_CMD, INT_CMD,            1      , ALLOW_NC |ALLOW_RING}
 ,{D(jjRESERVED0), RESERVEDNAME_CMD, NONE,               0      , ALLOW_NC |ALLOW_RING}
-//,{D(jjCALL1ARG),  RESERVEDNAMELIST_CMD, LIST_CMD,            1      , ALLOW_NC |ALLOW_RING}
-,{D(jjRESERVEDLIST0), RESERVEDNAMELIST_CMD, LIST_CMD,               0      , ALLOW_NC |ALLOW_RING}
+//,{D(jjCALL1ARG),  RESERVEDNAMELIST_CMD, LIST_CMD,       1      , ALLOW_NC |ALLOW_RING}
+,{D(jjRESERVEDLIST0), RESERVEDNAMELIST_CMD, LIST_CMD,   0      , ALLOW_NC |ALLOW_RING}
 ,{D(jjSTRING_PL), STRING_CMD,      STRING_CMD,         -1      , ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL3ARG),  SUBST_CMD,       NONE/*set by p*/,   3       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSUBST_M),   SUBST_CMD,       NONE/*set by p*/,   -2      , ALLOW_PLURAL |ALLOW_RING}
@@ -1155,6 +1156,7 @@ VAR cmdnames cmds[] =
   { "parstr",      0, PARSTR_CMD ,        CMD_12},
   { "poly",        0, POLY_CMD ,          RING_DECL},
   { "polyBucket",  0, BUCKET_CMD ,        RING_DECL},
+  { "predictHelp", 0, PREDHELP_CMD ,      CMD_M},
   { "preimage",    0, PREIMAGE_CMD ,      CMD_13},
   { "prime",       0, PRIME_CMD ,         CMD_1},
   { "primefactors",0, PFAC_CMD ,          CMD_12},

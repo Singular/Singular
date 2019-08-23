@@ -75,7 +75,8 @@ def create_table(dictionary=None, attempt_cached=True):
     if not os.path.isfile(VECTORS_NPY) or \
             not os.path.isfile(HELPFILE_NPY) or \
             not attempt_cached:
-        os.makedirs(HOME_DIR, exist_ok=True)
+        if not os.path.exists(HOME_DIR):
+            os.makedirs(HOME_DIR)
         file_list = np.array(get_list_of_htm_files())
         np.save(HELPFILE_NPY, file_list)
 

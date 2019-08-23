@@ -99,6 +99,7 @@ int ml_initialise()
 		Py_DECREF(pValue);
 	} else {
 		retvalue = 0;
+		printf("HERE!!!!\n");
 	}
 
 	retvalue = retvalue && _get_dictionary();

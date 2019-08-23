@@ -7795,6 +7795,31 @@ static BOOLEAN jjOPTION_PL(leftv res, leftv v)
   res->rtyp=NONE;
   return setOption(res,v);
 }
+
+
+//HERE
+static BOOLEAN jjPREDHELP0(leftv res, leftv)
+{
+	lists L = (lists)omAllocBin(slists_bin);
+	if (!ml_initialise()) {
+		Print("Not as advertised.");
+		PrintLn();
+	}
+
+	L->Init(1);
+
+	L->m[0].rtyp = STRING_CMD;
+	L->m[0].data = omStrDup("SomeString");
+
+	// pass the resultant list to the res datastructure
+	res->data=(void *)L;
+
+	ml_finalise();
+	return FALSE;
+}
+
+
+
 static BOOLEAN jjREDUCE4(leftv res, leftv u)
 {
   leftv u1=u;
@@ -8001,7 +8026,9 @@ static BOOLEAN jjRESERVEDLIST0(leftv res, leftv)
 			k++;
 		}
 	}
-	// free the struct (not the list itself)
+	// free the struct (not the list entries itself, which were allocated
+	// by strdup)
+	omfree(bb_list->list);
 	omfree(bb_list);
 
 	// pass the resultant list to the res datastructure
