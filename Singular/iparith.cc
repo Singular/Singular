@@ -7802,7 +7802,7 @@ static BOOLEAN jjPREDHELP0(leftv res, leftv)
 {
 	lists L = (lists)omAllocBin(slists_bin);
 	if (!ml_initialise()) {
-		Print("Not as advertised.");
+		Print("Initialise of ml failed.");
 		PrintLn();
 	}
 

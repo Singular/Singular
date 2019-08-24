@@ -6,6 +6,8 @@
  * @date   August 2019
  */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <Python.h>
 
 #include "mlpredict.h"
@@ -19,6 +21,7 @@
 #define GET_PREDICTION "get_prediction"
 #define READ_DICTIONARY "read_dictionary"
 #define CREATE_TABLE "create_table"
+#define PYTPATH(B) sprintf(B, "%s/ml_python", DATA_PATH)
 
 /**** Local Function Decleartions ****************************************/
 
@@ -39,7 +42,7 @@ static PyObject *pFile_list = NULL;
  * Check whether the helpfiles have been downloaded and the relevant
  * vectors have been calculated and saved. Furthermore, the local static
  * variables must have been set with pointers to the relevant data
- * structures in the python instance. 
+ * structures in the python instance.
  *
  * @return An integer:  1 if it has been intialised, 0 otherwise
  */
@@ -88,24 +91,62 @@ int ml_is_initialised()
  */
 int ml_initialise()
 {
-	int retvalue = 1;
+	char buffer[50];
+	char *spath = NULL;
+	PyObject *pString = NULL;
 	PyObject *pValue = NULL;
+	PyObject *pPath = NULL;
+	PyObject *pMyPath = NULL;
+
+	PyObject *pName = NULL;
+	PyObject *pModule = NULL;
 
 	if (!Py_IsInitialized()) {
 		Py_Initialize();
 	}
-	pValue = _call_python_function(LOOKUPTABLE, INIT_TABLE_ON_SYSTEM);
-	if (pValue != NULL) {
-		Py_DECREF(pValue);
-	} else {
-		retvalue = 0;
-		printf("HERE!!!!\n");
+
+	pName = PyString_FromString("sys");
+	pModule = PyImport_Import(pName);
+	Py_DECREF(pName);
+	if (pModule == NULL){
+		PyErr_Print();
+		fprintf(stderr, "Failed to load \"%s\"\n", "sys");
+		return 0;
 	}
 
-	retvalue = retvalue && _get_dictionary();
-	retvalue = retvalue && _get_vectors_file_list();
+	/* Get the path list */
+	pPath = PyObject_GetAttrString(pModule, "path");
 
-	return retvalue;
+	if (!pPath) {
+		fprintf(stderr, "Failed to get python path list\n");
+		Py_DECREF(pModule);
+		return 0;
+	}
+	Py_DECREF(pModule);
+
+	/* get a string representation of the path list for comparison */
+	pString = PyObject_Str(pPath);
+	spath = PyString_AsString(pString);
+	/* get the path to be set */
+	PYTPATH(buffer);
+	if (!strstr(spath, buffer)) {
+		pMyPath = PyString_FromString(buffer);
+		/* pPath set to tuple, so no decref needed later */
+		PyList_Append(pPath, pMyPath);
+		Py_DECREF(pMyPath);
+	}
+	Py_DECREF(pString);
+	Py_DECREF(pPath);
+
+	pValue = _call_python_function(LOOKUPTABLE, INIT_TABLE_ON_SYSTEM);
+	if (pValue == NULL) return 0;
+
+	Py_DECREF(pValue);
+
+	if (!_get_dictionary()) return 0;
+	if (!_get_vectors_file_list()) return 0;
+
+	return 1;
 }
 
 /**
@@ -127,7 +168,7 @@ int ml_finalise()
 		pFile_list = NULL;
 
 		/* this breaks libpython2.7.so, so leave out: */
-		/* Py_Finalize(); */ 
+		/* Py_Finalize(); */
 	} else {
 		retvalue = 0;
 	}
@@ -143,14 +184,14 @@ int ml_finalise()
  * must be made
  * @param[in]  buffer_size The maximum length of the prediction string.
  * @param[out] prediction_buffer The buffer into which the prediction
- * filename is copied.  
+ * filename is copied.
  * @param[out] pred_len A pointer to an integer, at which the string length
- * of the prediction filename is set. 
+ * of the prediction filename is set.
  *
  * @return 1 if successful, 0 if some error occurs.
  */
 int ml_make_prediction(char *filename,
-					   int buffer_size, 
+					   int buffer_size,
 					   char *prediction_buffer,
 					   int *pred_len)
 {
@@ -158,7 +199,7 @@ int ml_make_prediction(char *filename,
 	PyObject *pValue = NULL; PyObject *pString = NULL;
 	int retvalue = 1;
 	int ret_string_len = 0;
-	
+
 	pFName = PyString_FromString(filename);
 	if (!pFName) {
 		fprintf(stderr, "This is weird\n");
@@ -245,7 +286,7 @@ PyObject *_call_python_function_args(char *module, char *func, PyObject *pArgs)
 {
 	PyObject *pName = NULL, *pModule = NULL, *pFunc = NULL;
 	PyObject *pValue = NULL;
-		
+
 	if (!Py_IsInitialized()) {
 		Py_Initialize();
 		printf("I don't like this\n");
@@ -256,33 +297,40 @@ PyObject *_call_python_function_args(char *module, char *func, PyObject *pArgs)
 	pModule = PyImport_Import(pName);
 	Py_DECREF(pName);
 
-	if (pModule != NULL){
-		/* Get the init function we want to call */
-		pFunc = PyObject_GetAttrString(pModule, func);
-		if (pFunc && PyCallable_Check(pFunc)) {
-			/* Callable function. Good. Call with the args supplied,
-			 * assuming the arguments are correct for the function */
-			pValue = PyObject_CallObject(pFunc, pArgs);
-			if (pValue == NULL) {
-				printf("No return for function\n");
-				PyErr_Print();
-			}
-		} else {
-			/* Somehow not executable. Clean up! */
-			if(PyErr_Occurred()) {
-				PyErr_Print();
-			}
-			fprintf(stderr,
-					"Cannot find function \"%s\"\n",
-					func);
-		}
-		Py_XDECREF(pFunc);
-		Py_DECREF(pModule);
-	} else {
+	if (pModule == NULL){
 		PyErr_Print();
 		fprintf(stderr, "Failed to load \"%s\"\n", module);
+		return NULL;
+	}
+	/* Get the init function we want to call */
+	pFunc = PyObject_GetAttrString(pModule, func);
+	if (!pFunc || !PyCallable_Check(pFunc)) {
+		/* Somehow not executable. Clean up! */
+		if(PyErr_Occurred()) {
+			PyErr_Print();
+		}
+		fprintf(stderr,
+				"Cannot find function \"%s\"\n",
+				func);
+
+		Py_XDECREF(pFunc);
+		Py_DECREF(pModule);
+
+		return NULL;
 	}
 
+	/* Callable function. Good. Call with the args supplied,
+	 * assuming the arguments are correct for the function */
+	pValue = PyObject_CallObject(pFunc, pArgs);
+
+	Py_XDECREF(pFunc);
+	Py_DECREF(pModule);
+
+	if (pValue == NULL) {
+		printf("No return for function\n");
+		PyErr_Print();
+		return NULL;
+	}
 	return pValue;
 }
 
@@ -317,6 +365,7 @@ int _get_dictionary()
  *
  * @return 1 if successful, 0 if something goes wrong.
  */
+
 int _get_vectors_file_list()
 {
 	int retvalue = 1;
@@ -352,6 +401,6 @@ int _get_vectors_file_list()
 			}
 		}
 	}
-	
+
 	return retvalue;
 }

@@ -5,7 +5,7 @@ import os
 
 HOME_DIR       = os.path.expanduser("~/.singular")
 SINGULAR_BIN   = os.path.expanduser("~/Singular/Singular4/bin/Singular")
-EXTRACT_SCRIPT = "extract.lib"
+EXTRACT_SCRIPT = "ml_singular/extract.lib"
 KEYWORDS_FILE  = os.path.expanduser("~/.singular/keywords.txt")
 VECTORS_NPY    = os.path.expanduser("~/.singular/vectors.npy")
 HELPFILE_NPY   = os.path.expanduser("~/.singular/helpfilelist.npy")
