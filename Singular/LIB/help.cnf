@@ -16,7 +16,7 @@
 #  %h: the local html file (in the form file://localhost/some/dir/sing_123.htm)
 #  %f: the local html file (in the form /some/dir/sing_123.htm)
 #  %H: the www html  file
-#             (in the form http://www.singular.uni-kl.de/some/dir/sing_123.htm)
+#             (in the form https://www.singular.uni-kl.de/some/dir/sing_123.htm)
 #  %i: the complete path of singular.hlp
 #  %n: the info node
 #  %v: Singular version (in the form 4-0-0)
@@ -41,17 +41,17 @@ info!xiE:info:!info -f %i --node='%n'
 lynx!xhE:lynx:!lynx %h
 #----------------------------------------------------------------
 # dummy versions for pure online help
-mac-www!E:open:O:x86_64-Darwin:!open http://www.singular.uni-kl.de/Manual/%v/ &
-mozilla-www!DE:mozilla:!(mozilla -remote "openURL(http://www.singular.uni-kl.de/Manual/%v/)")||(mozilla http://www.singular.uni-kl.de/Manual/%v/) &
+mac-www!E:open:O:x86_64-Darwin:!open https://www.singular.uni-kl.de/Manual/%v/ &
+mozilla-www!DE:mozilla:!(mozilla -remote "openURL(https://www.singular.uni-kl.de/Manual/%v/)")||(mozilla https://www.singular.uni-kl.de/Manual/%v/) &
 firefox-www-idx!xDE:firefox:!firefox %H &
-firefox-www!DE:firefox:!firefox http://www.singular.uni-kl.de/Manual/%v/ &
+firefox-www!DE:firefox:!firefox https://www.singular.uni-kl.de/Manual/%v/ &
 konqueror-www-idx!xDE:konqueror:!konqueror %H &
-konqueror-www!DE:konqueror:!konqueror http://www.singular.uni-kl.de/Manual/%v/ &
+konqueror-www!DE:konqueror:!konqueror https://www.singular.uni-kl.de/Manual/%v/ &
 galeon-www-idx!xDE:galeon:!galeon -n %H &
-galeon-www!DE:galeon:!galeon -n http://www.singular.uni-kl.de/Manual/%v/ &
-netscape-www!DE:netscape:!(netscape -remote "openURL(http://www.singular.uni-kl.de/Manual/%v/)")||(netscape http://www.singular.uni-kl.de/Manual/%v/) &
+galeon-www!DE:galeon:!galeon -n https://www.singular.uni-kl.de/Manual/%v/ &
+netscape-www!DE:netscape:!(netscape -remote "openURL(https://www.singular.uni-kl.de/Manual/%v/)")||(netscape https://www.singular.uni-kl.de/Manual/%v/) &
 safari-www-idx!xE:/Applications/Safari.app:!open -a /Applications/Safari.app %H
-safari-www!E:/Applications/Safari.app:!open -a /Applications/Safari.app http://www.singular.uni-kl.de/Manual/%v/
+safari-www!E:/Applications/Safari.app:!open -a /Applications/Safari.app https://www.singular.uni-kl.de/Manual/%v/
 lynx-www-idx!xE:lynx:!lynx %H
-lynx-www!E:lynx:!lynx http://www.singular.uni-kl.de/Manual/%v/
+lynx-www!E:lynx:!lynx https://www.singular.uni-kl.de/Manual/%v/
 

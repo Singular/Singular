@@ -10,7 +10,7 @@ NOTE:
  Using this library requires the program @code{surf} to be installed.
  You can download @code{surf} either from
   @uref{http://sourceforge.net/projects/surf}
-  or from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}.
+  or from @uref{ftp://jim.mathematik.uni-kl.de/pub/Math/Singular/utils/}.
  The procedure surfer requires the program @code{surfer} (version 1.4.1 or newwer)
  to be installed.
  You can download @code{surfer} from
