@@ -252,7 +252,7 @@ has @emph{explicitely} been set (see @ref{Command line options} and
 @ref{system} for more info on
 setting values of command-line options), then it dispatches the html
 pages from
-@url{http://www.singular.uni-kl.de/Manual}. (Note that
+@url{https://www.singular.uni-kl.de/Manual}. (Note that
 the non-local net-access of HTML pages is disabled, by default.)
 @*An
 alternative location of a local directory where the html pages reside
@@ -3764,7 +3764,7 @@ after typesetting (with one subsection for each procedure):
 @cindex  Formal Checker
 
 There is a formal library checker for SINGULAR which can be used online:
-see @url{http://www.singular.uni-kl.de/index.php/new-libraries/formal-library-checker.html}.
+see @url{https://www.singular.uni-kl.de/index.php/new-libraries/formal-library-checker.html}.
 
 After uploading your library file, you will receive an output of hints, warnings,
 and errors which may help you to improve your library.

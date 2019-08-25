@@ -77,14 +77,14 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @center @strong{SINGULAR}
 @center A Computer Algebra System for Polynomial Computations
 @center User Manual for @sc{Singular} Version @value{VERSION}
-@center @uref{http://www.singular.uni-kl.de}
+@center @uref{https://www.singular.uni-kl.de}
 @end ifinfo
 @end ifnothtml
 
 @ifhtml
 @html
 <CENTER>
-<A HREF="http://www.singular.uni-kl.de">
+<A HREF="https://www.singular.uni-kl.de">
 <IMG SRC="singular.jpg"></A><br>
 <h3> A Computer Algebra System for Polynomial Computations </h3>
 <p></p>
@@ -94,10 +94,9 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @html
 </h4>
 </center>
-<CENTER><A HREF="http://www.uni-kl.de/"><I>University of Kaiserslautern</I></A></CENTER>
-<CENTER><A HREF="http://www.mathematik.uni-kl.de/"><I>Department of Mathematics</I></A></CENTER>
-<CENTER><A HREF="http://www.mathematik.uni-kl.de/~zca/">
-<I>Centre for Computer Algebra</I></A></CENTER><p></p>
+<CENTER><A HREF="https://www.uni-kl.de/"><I>University of Kaiserslautern</I></A></CENTER>
+<CENTER><A HREF="https://www.mathematik.uni-kl.de/"><I>Department of Mathematics</I></A></CENTER>
+<CENTER><I>Centre for Computer Algebra</I></CENTER><p></p>
 @end html
 @end ifhtml
 
