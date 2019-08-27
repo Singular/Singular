@@ -12,6 +12,13 @@
 extern "C" {
 #endif /* ifdef cpp */
 
+#include <Python.h>
+typedef struct ml_internal {
+	PyObject *pDictionary;
+	PyObject *pVectors;
+	PyObject *pFile_list;
+} ml_internal;
+
 /**
  * Check whether the helpfiles have been downloaded and the relevant
  * vectors have been calculated and saved.

@@ -27,14 +27,16 @@
 
 PyObject *_call_python_function(char *module, char *func);
 PyObject *_call_python_function_args(char *module, char *func, PyObject *pArgs);
+ml_internal *_get_internals();
 int _get_dictionary();
 int _get_vectors_file_list();
 
 /**** Static Variables ***************************************************/
 
-static PyObject *pDictionary = NULL;
-static PyObject *pVectors = NULL;
-static PyObject *pFile_list = NULL;
+//static PyObject *pDictionary = NULL;
+//static PyObject *pVectors = NULL;
+//static PyObject *pFile_list = NULL;
+static ml_internal internal_obs = {NULL,NULL,NULL};
 
 /**** Public Functions ***************************************************/
 
@@ -72,9 +74,9 @@ int ml_is_initialised()
 	}
 
 	if (!t_value)		return 0;
-	if (!pDictionary)	return 0;
-	if (!pVectors)		return 0;
-	if (!pFile_list)	return 0;
+	if (!internal_obs.pDictionary)	return 0;
+	if (!internal_obs.pVectors)		return 0;
+	if (!internal_obs.pFile_list)	return 0;
 
 	return 1;
 }
@@ -157,16 +159,16 @@ int ml_finalise()
 	if (!Py_IsInitialized())
 		return 0;
 
-	Py_XDECREF(pDictionary);
-	Py_XDECREF(pVectors);
-	Py_XDECREF(pFile_list);
-	pDictionary = NULL;
-	pVectors = NULL;
-	pFile_list = NULL;
+	Py_XDECREF(internal_obs.pDictionary);
+	Py_XDECREF(internal_obs.pVectors);
+	Py_XDECREF(internal_obs.pFile_list);
+	internal_obs.pDictionary = NULL;
+	internal_obs.pVectors = NULL;
+	internal_obs.pFile_list = NULL;
 
-	/* this breaks libpython2.7.so, so leave out: */
-	/* Py_Finalize(); */
-
+	/* Note Py_Finalize should only be called when the program quits. not
+	 * here.
+	 */
 	return 1;
 }
 
@@ -210,12 +212,12 @@ int ml_make_prediction(char *filename,
 	/* Since each of the following is handed over, we need to increase the
 	 * reference, otherwise our static variable pointers might be freed by
 	 * the python interpreter. */
-	PyTuple_SetItem(pArgs, 1, pDictionary);
-	Py_INCREF(pDictionary);
-	PyTuple_SetItem(pArgs, 2, pVectors);
-	Py_INCREF(pVectors);
-	PyTuple_SetItem(pArgs, 3, pFile_list);
-	Py_INCREF(pFile_list);
+	PyTuple_SetItem(pArgs, 1, internal_obs.pDictionary);
+	Py_INCREF(internal_obs.pDictionary);
+	PyTuple_SetItem(pArgs, 2, internal_obs.pVectors);
+	Py_INCREF(internal_obs.pVectors);
+	PyTuple_SetItem(pArgs, 3, internal_obs.pFile_list);
+	Py_INCREF(internal_obs.pFile_list);
 
 	pValue = _call_python_function_args(PRD_RUNNER,
 					    GET_PREDICTION,
@@ -324,6 +326,15 @@ PyObject *_call_python_function_args(char *module, char *func, PyObject *pArgs)
 }
 
 /**
+ * This is intended to be used ONLY by the testing library.
+ */
+ml_internal *_get_internals()
+{
+	return &internal_obs;
+}
+
+
+/**
  * Get the PyObject of the list of keywords called dictionary and set it to
  * the local static variable.  If already set, simply return without any
  * action.
@@ -334,7 +345,7 @@ int _get_dictionary()
 {
 	PyObject *pValue = NULL;
 
-	if (pDictionary) {
+	if (internal_obs.pDictionary) {
 		/* already set */
 		return 1;
 	}
@@ -342,7 +353,7 @@ int _get_dictionary()
 	if (!pValue) {
 		return 0;
 	}
-	pDictionary = pValue;
+	internal_obs.pDictionary = pValue;
 
 	return 1;
 }
@@ -361,15 +372,15 @@ int _get_vectors_file_list()
 	PyObject *pValue = NULL;
 	PyObject *pVal1 = NULL, *pVal2 = NULL;
 
-	if (pVectors && pFile_list) {
+	if (internal_obs.pVectors && internal_obs.pFile_list) {
 		return 1;
 	}
 
 	/* Ensure *both* are free */
-	Py_XDECREF(pVectors);
-	Py_XDECREF(pFile_list);
-	pVectors = NULL;
-	pFile_list = NULL;
+	Py_XDECREF(internal_obs.pVectors);
+	Py_XDECREF(internal_obs.pFile_list);
+	internal_obs.pVectors = NULL;
+	internal_obs.pFile_list = NULL;
 
 	pValue = _call_python_function(LOOKUPTABLE, CREATE_TABLE);
 	if (!pValue) {
@@ -391,8 +402,8 @@ int _get_vectors_file_list()
 		Py_XDECREF(pVal2);
 		return 0;
 	}
-	pVectors = pVal1;
-	pFile_list = pVal2;
+	internal_obs.pVectors = pVal1;
+	internal_obs.pFile_list = pVal2;
 
 	return 1;
 }
