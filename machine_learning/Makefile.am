@@ -17,17 +17,26 @@ nobase_libmlearn_include_HEADERS= $(LIBMLEARNHEADERS)
 
 ###########################################################################
 
-check_PROGRAMS = testml
+TESTS = test_bufsize test_init_ml
 
-testml_LDADD=libmlearn.la
-testml_LDFLAGS= -lpython2.7
+check_PROGRAMS = test_bufsize test_init_ml
 
-testml_SOURCES=testml.c
-testml_CFLAGS= -Wall -Wextra
+test_bufsize_LDADD=libmlearn.la
+test_bufsize_LDFLAGS= -lpython2.7
+
+test_bufsize_SOURCES=tests/test_bufsize.c
+test_bufsize_CFLAGS= -Wall -Wextra
+
+test_init_ml_LDADD=libmlearn.la
+test_init_ml_LDFLAGS= -lpython2.7
+
+test_init_ml_SOURCES=tests/test_init_ml.c
+test_init_ml_CFLAGS= -Wall -Wextra
 
 #mlmoduledir = ${datadir}/singular/mlearn
 nobase_dist_data_DATA = \
 	ml_python/__init__.py \
+	ml_python/predictor_runner.py \
 	ml_python/common/__init__.py \
 	ml_python/common/constants.py \
 	ml_python/common/keyword_vector.py \

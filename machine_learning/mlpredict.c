@@ -13,17 +13,17 @@
 #include "mlpredict.h"
 
 /* Locally defined macros */
-#define LOOKUPTABLE "common.lookuptable"
-#define KEYWORD_VECTOR "common.keyword_vector"
-#define PRD_RUNNER "predictor_runner"
-#define IS_LOOKUP_INITIALISED "is_lookup_initialised"
-#define INIT_TABLE_ON_SYSTEM "init_table_on_system"
-#define GET_PREDICTION "get_prediction"
-#define READ_DICTIONARY "read_dictionary"
-#define CREATE_TABLE "create_table"
-#define PYTPATH(B) sprintf(B, "%s/ml_python", DATA_PATH)
+#define LOOKUPTABLE		"common.lookuptable"
+#define KEYWORD_VECTOR		"common.keyword_vector"
+#define PRD_RUNNER		"predictor_runner"
+#define IS_LOOKUP_INITIALISED	"is_lookup_initialised"
+#define INIT_TABLE_ON_SYSTEM	"init_table_on_system"
+#define GET_PREDICTION		"get_prediction"
+#define READ_DICTIONARY		"read_dictionary"
+#define CREATE_TABLE		"create_table"
+#define PYTPATH(B)		sprintf(B, "%s/ml_python", DATA_PATH)
 
-/**** Local Function Decleartions ****************************************/
+/**** Local Function Declarations ****************************************/
 
 PyObject *_call_python_function(char *module, char *func);
 PyObject *_call_python_function_args(char *module, char *func, PyObject *pArgs);
@@ -48,38 +48,36 @@ static PyObject *pFile_list = NULL;
  */
 int ml_is_initialised()
 {
-	int retvalue = 1;
 	int t_value = 0;
 	PyObject *pValue = NULL;
 
-	if (!Py_IsInitialized()) {
-		retvalue = 0;
-	} else {
-		/* python system is initialised */
-		pValue = _call_python_function(LOOKUPTABLE, IS_LOOKUP_INITIALISED);
-		/* is this a boolean? */
-		if (pValue != NULL && PyBool_Check(pValue)) {
-			t_value = PyObject_IsTrue(pValue);
-			/* errors? */
-			if (t_value == -1) {
-				PyErr_Print();
-				retvalue = 0;
-			} else {
-				/* no errors */
-				retvalue = t_value;
-			}
-			Py_DECREF(pValue);
-		} else {
-			retvalue = 0;
-		}
+	if (!Py_IsInitialized()) return 0;
+
+	pValue = _call_python_function(LOOKUPTABLE, IS_LOOKUP_INITIALISED);
+
+	if (pValue == NULL)	return 0;
+	if (!PyBool_Check(pValue)) {
+		/* Not a boolean type */
+		Py_DECREF(pValue);
+		return 0;
 	}
 
-	retvalue = retvalue && pDictionary;
-	retvalue = retvalue && pVectors;
-	retvalue = retvalue && pFile_list;
-	return retvalue;
-}
+	t_value = PyObject_IsTrue(pValue);
+	Py_DECREF(pValue);
+	if (t_value == -1) {
+		/* errors */
+		PyErr_Print();
+		Py_DECREF(pValue);
+		return 0;
+	}
 
+	if (!t_value)		return 0;
+	if (!pDictionary)	return 0;
+	if (!pVectors)		return 0;
+	if (!pFile_list)	return 0;
+
+	return 1;
+}
 
 /**
  * Initialise the machine learning system by starting the python
@@ -139,12 +137,11 @@ int ml_initialise()
 	Py_DECREF(pPath);
 
 	pValue = _call_python_function(LOOKUPTABLE, INIT_TABLE_ON_SYSTEM);
-	if (pValue == NULL) return 0;
+	Py_XDECREF(pValue);
 
-	Py_DECREF(pValue);
-
-	if (!_get_dictionary()) return 0;
-	if (!_get_vectors_file_list()) return 0;
+	if (pValue == NULL)		return 0;
+	if (!_get_dictionary())		return 0;
+	if (!_get_vectors_file_list())	return 0;
 
 	return 1;
 }
@@ -157,23 +154,20 @@ int ml_initialise()
  */
 int ml_finalise()
 {
-	int retvalue = 1;
+	if (!Py_IsInitialized())
+		return 0;
 
-	if (Py_IsInitialized()) {
-		Py_XDECREF(pDictionary);
-		Py_XDECREF(pVectors);
-		Py_XDECREF(pFile_list);
-		pDictionary = NULL;
-		pVectors = NULL;
-		pFile_list = NULL;
+	Py_XDECREF(pDictionary);
+	Py_XDECREF(pVectors);
+	Py_XDECREF(pFile_list);
+	pDictionary = NULL;
+	pVectors = NULL;
+	pFile_list = NULL;
 
-		/* this breaks libpython2.7.so, so leave out: */
-		/* Py_Finalize(); */
-	} else {
-		retvalue = 0;
-	}
+	/* this breaks libpython2.7.so, so leave out: */
+	/* Py_Finalize(); */
 
-	return retvalue;
+	return 1;
 }
 
 /**
@@ -191,67 +185,61 @@ int ml_finalise()
  * @return 1 if successful, 0 if some error occurs.
  */
 int ml_make_prediction(char *filename,
-					   int buffer_size,
-					   char *prediction_buffer,
-					   int *pred_len)
+		       int buffer_size,
+		       char *prediction_buffer,
+		       int *pred_len)
 {
 	PyObject *pFName = NULL, *pArgs = NULL;
 	PyObject *pValue = NULL; PyObject *pString = NULL;
-	int retvalue = 1;
 	int ret_string_len = 0;
 
 	pFName = PyString_FromString(filename);
 	if (!pFName) {
 		fprintf(stderr, "This is weird\n");
 
-		retvalue = 0;
+		return 0;
+	}
+	pArgs = PyTuple_New(4);
+	if (!pArgs) {
+		fprintf(stderr, "This is also weird\n");
+		Py_DECREF(pFName);
+		return 0;
+	}
+	/* pFName is handed over to the tuple, so not DECREF later */
+	PyTuple_SetItem(pArgs, 0, pFName);
+	/* Since each of the following is handed over, we need to increase the
+	 * reference, otherwise our static variable pointers might be freed by
+	 * the python interpreter. */
+	PyTuple_SetItem(pArgs, 1, pDictionary);
+	Py_INCREF(pDictionary);
+	PyTuple_SetItem(pArgs, 2, pVectors);
+	Py_INCREF(pVectors);
+	PyTuple_SetItem(pArgs, 3, pFile_list);
+	Py_INCREF(pFile_list);
+
+	pValue = _call_python_function_args(PRD_RUNNER,
+					    GET_PREDICTION,
+					    pArgs);
+	Py_DECREF(pArgs);
+
+	if (!pValue) {
+		return 0;
+	}
+
+	pString = PyObject_Str(pValue);
+	strncpy(prediction_buffer, PyString_AsString(pString), buffer_size - 1);
+	ret_string_len = strlen(PyString_AsString(pString));
+	if (ret_string_len >= buffer_size - 1) {
+		prediction_buffer[buffer_size - 1] = '\0';
+		*pred_len = buffer_size - 1;
 	} else {
-		pArgs = PyTuple_New(4);
-		if (!pArgs) {
-			fprintf(stderr, "This is also weird\n");
-			retvalue = 0;
-			Py_DECREF(pFName);
-		} else {
-			/* pFName is handed over to the tuple, so not DECREF later */
-			PyTuple_SetItem(pArgs, 0, pFName);
-			/* Since each of the following is handed over, we need to
-			 * increase the reference, otherwise our static variable
-			 * pointers might be freed by the python interpreter. */
-			PyTuple_SetItem(pArgs, 1, pDictionary);
-			Py_INCREF(pDictionary);
-			PyTuple_SetItem(pArgs, 2, pVectors);
-			Py_INCREF(pVectors);
-			PyTuple_SetItem(pArgs, 3, pFile_list);
-			Py_INCREF(pFile_list);
-		}
-
-	}
-	if (pArgs) {
-		pValue = _call_python_function_args(PRD_RUNNER,
-											GET_PREDICTION,
-											pArgs);
-		Py_DECREF(pArgs);
-		if (!pValue) {
-			retvalue = 0;
-		} else {
-			pString = PyObject_Str(pValue);
-			strncpy(prediction_buffer,
-					PyString_AsString(pString),
-					buffer_size - 1);
-			ret_string_len = strlen(PyString_AsString(pString));
-			if (ret_string_len >= buffer_size - 1) {
-				prediction_buffer[buffer_size - 1] = '\0';
-				*pred_len = buffer_size - 1;
-			} else {
-				*pred_len = ret_string_len;
-			}
-
-			Py_DECREF(pString);
-			Py_DECREF(pValue);
-		}
+		*pred_len = ret_string_len;
 	}
 
-	return retvalue;
+	Py_DECREF(pString);
+	Py_DECREF(pValue);
+
+	return 1;
 }
 
 /**** Local Functions ****************************************************/
@@ -264,7 +252,8 @@ int ml_make_prediction(char *filename,
  *
  * @return the returned PyObject.
  */
-PyObject *_call_python_function(char *module, char *func) {
+PyObject *_call_python_function(char *module, char *func)
+{
 	PyObject *pArgs = PyTuple_New(0);
 	PyObject *retvalue = _call_python_function_args(module, func, pArgs);
 
@@ -343,18 +332,19 @@ PyObject *_call_python_function_args(char *module, char *func, PyObject *pArgs)
  */
 int _get_dictionary()
 {
-	int retvalue = 1;
 	PyObject *pValue = NULL;
 
-	if (!pDictionary) {
-		pValue = _call_python_function(KEYWORD_VECTOR, READ_DICTIONARY);
-		if (!pValue) {
-			retvalue = 0;
-		} else {
-			pDictionary = pValue;
-		}
+	if (pDictionary) {
+		/* already set */
+		return 1;
 	}
-	return retvalue;
+	pValue = _call_python_function(KEYWORD_VECTOR, READ_DICTIONARY);
+	if (!pValue) {
+		return 0;
+	}
+	pDictionary = pValue;
+
+	return 1;
 }
 
 /**
@@ -368,39 +358,41 @@ int _get_dictionary()
 
 int _get_vectors_file_list()
 {
-	int retvalue = 1;
 	PyObject *pValue = NULL;
 	PyObject *pVal1 = NULL, *pVal2 = NULL;
 
-	if (!pVectors || !pFile_list) {
-		/* Ensure *both* are free */
-		Py_XDECREF(pVectors);
-		Py_XDECREF(pFile_list);
-		pVectors = NULL;
-		pFile_list = NULL;
-		pValue = _call_python_function(LOOKUPTABLE, CREATE_TABLE);
-		if (!pValue) {
-			retvalue = 0;
-		} else {
-			pVal1 = PyTuple_GetItem(pValue, 0);
-			pVal2 = PyTuple_GetItem(pValue, 1);
-			/* Decreasing the reference to the tuple causes the content to
-			 * be freed.  To prevent that (leading to a segfault), we have
-			 * to manually increase the reference to the contents */
-			Py_INCREF(pVal1);
-			Py_INCREF(pVal2);
-			Py_DECREF(pValue);
-			pValue = NULL;
-			if (pVal1 && pVal2) {
-				pVectors = pVal1;
-				pFile_list = pVal2;
-			} else {
-				Py_XDECREF(pVal1);
-				Py_XDECREF(pVal2);
-				retvalue = 0;
-			}
-		}
+	if (pVectors && pFile_list) {
+		return 1;
 	}
 
-	return retvalue;
+	/* Ensure *both* are free */
+	Py_XDECREF(pVectors);
+	Py_XDECREF(pFile_list);
+	pVectors = NULL;
+	pFile_list = NULL;
+
+	pValue = _call_python_function(LOOKUPTABLE, CREATE_TABLE);
+	if (!pValue) {
+		return 0;
+	}
+	pVal1 = PyTuple_GetItem(pValue, 0);
+	pVal2 = PyTuple_GetItem(pValue, 1);
+	/* Decreasing the reference to the tuple causes the content to be freed.
+	 * To prevent that (leading to a segfault), we have to manually increase
+	 * the reference to the contents */
+	Py_INCREF(pVal1);
+	Py_INCREF(pVal2);
+
+	Py_DECREF(pValue);
+	pValue = NULL;
+
+	if (!pVal1 || !pVal2) {
+		Py_XDECREF(pVal1);
+		Py_XDECREF(pVal2);
+		return 0;
+	}
+	pVectors = pVal1;
+	pFile_list = pVal2;
+
+	return 1;
 }
