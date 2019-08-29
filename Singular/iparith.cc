@@ -7804,6 +7804,8 @@ static BOOLEAN jjPREDHELP0(leftv res, leftv)
 	if (!ml_initialise()) {
 		Print("Initialise of ml failed.");
 		PrintLn();
+		/* Notify singular that an error occured */
+		return TRUE;
 	}
 
 	L->Init(1);
