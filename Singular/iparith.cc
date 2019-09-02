@@ -2562,6 +2562,16 @@ static BOOLEAN jjLIFT(leftv res, leftv u, leftv v)
 {
   int ul= IDELEMS((ideal)u->Data());
   int vl= IDELEMS((ideal)v->Data());
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
+  {
+    if (currRing->LPncGenCount < ul)
+    {
+      Werror("At least %d ncgen variables are needed for this computation.", ul);
+      return TRUE;
+    }
+  }
+#endif
   ideal m = idLift((ideal)u->Data(),(ideal)v->Data(),NULL,FALSE,
                    hasFlag(u,FLAG_STD));
   if (m==NULL) return TRUE;
@@ -6771,6 +6781,16 @@ static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
   if (w->rtyp!=IDHDL) return TRUE;
   int ul= IDELEMS((ideal)u->Data());
   int vl= IDELEMS((ideal)v->Data());
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
+  {
+    if (currRing->LPncGenCount < ul)
+    {
+      Werror("At least %d ncgen variables are needed for this computation.", ul);
+      return TRUE;
+    }
+  }
+#endif
   ideal m
     = idLift((ideal)u->Data(),(ideal)v->Data(),NULL,FALSE,hasFlag(u,FLAG_STD),
              FALSE, (matrix *)(&(IDMATRIX((idhdl)(w->data)))));
