@@ -100,12 +100,14 @@ int ml_initialise()
 
 	PyObject *pName = NULL;
 	PyObject *pModule = NULL;
+	PyObject *pTemp = NULL;
 
 	if (!Py_IsInitialized()) {
 		Py_Initialize();
 	}
 
 	pName = PyString_FromString("sys");
+	//pName = PyUnicode_FromString("sys");
 	pModule = PyImport_Import(pName);
 	Py_DECREF(pName);
 	if (pModule == NULL){
@@ -127,15 +129,19 @@ int ml_initialise()
 	/* get a string representation of the path list for comparison */
 	pString = PyObject_Str(pPath);
 	spath = PyString_AsString(pString);
+	//pTemp = PyUnicode_AsASCIIString(pString);
+	//spath = PyBytes_AsString(pTemp);
 	/* get the path to be set */
 	PYTPATH(buffer);
 	if (!strstr(spath, buffer)) {
 		pMyPath = PyString_FromString(buffer);
+		//pMyPath = PyUnicode_FromString(buffer);
 		/* pPath set to tuple, so no decref needed later */
 		PyList_Append(pPath, pMyPath);
 		Py_DECREF(pMyPath);
 	}
 	Py_DECREF(pString);
+	//Py_XDECREF(pTemp);
 	Py_DECREF(pPath);
 
 	pValue = _call_python_function(LOOKUPTABLE, INIT_TABLE_ON_SYSTEM);
@@ -193,9 +199,11 @@ int ml_make_prediction(char *filename,
 {
 	PyObject *pFName = NULL, *pArgs = NULL;
 	PyObject *pValue = NULL; PyObject *pString = NULL;
+	PyObject *pTemp = NULL;
 	int ret_string_len = 0;
 
 	pFName = PyString_FromString(filename);
+	//pFName = PyUnicode_FromString(filename);
 	if (!pFName) {
 		fprintf(stderr, "This is weird\n");
 
@@ -230,7 +238,10 @@ int ml_make_prediction(char *filename,
 
 	pString = PyObject_Str(pValue);
 	strncpy(prediction_buffer, PyString_AsString(pString), buffer_size - 1);
+	//pTemp = PyUnicode_AsASCIIString(pString);
+	//strncpy(prediction_buffer, PyBytes_AsString(pTemp), buffer_size - 1);
 	ret_string_len = strlen(PyString_AsString(pString));
+	//ret_string_len = strlen(PyBytes_AsString(pTemp));
 	if (ret_string_len >= buffer_size - 1) {
 		prediction_buffer[buffer_size - 1] = '\0';
 		*pred_len = buffer_size - 1;
@@ -239,6 +250,7 @@ int ml_make_prediction(char *filename,
 	}
 
 	Py_DECREF(pString);
+	//Py_XDECREF(pTemp);
 	Py_DECREF(pValue);
 
 	return 1;
@@ -285,6 +297,7 @@ PyObject *_call_python_function_args(char *module, char *func, PyObject *pArgs)
 
 	/* import the module */
 	pName = PyString_FromString(module);
+	//pName = PyUnicode_FromString(module);
 	pModule = PyImport_Import(pName);
 	Py_DECREF(pName);
 

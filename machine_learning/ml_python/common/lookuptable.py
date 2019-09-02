@@ -54,7 +54,7 @@ def extract_keywords():
         os.makedirs(HOME_DIR)
 
     # extract keywords using the singular script
-    os.system(SINGULAR_BIN + " -q " + EXTRACT_SCRIPT + 
+    os.system(SINGULAR_BIN + " -q " + EXTRACT_SCRIPT +
             " | sort | uniq > " + KEYWORDS_FILE)
 
     # read from the file created by singular

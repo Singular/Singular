@@ -80,6 +80,8 @@
 
 #include <ctype.h>
 
+#include <readline/history.h>
+
 // defaults for all commands: NO_NC | NO_RING | ALLOW_ZERODIVISOR
 
 #ifdef HAVE_PLURAL
@@ -7797,16 +7799,29 @@ static BOOLEAN jjOPTION_PL(leftv res, leftv v)
 }
 
 
-//HERE
 static BOOLEAN jjPREDHELP0(leftv res, leftv)
 {
+	char buffer[30];
+	char filename[15] = "~/.history";
+	int i;
 	lists L = (lists)omAllocBin(slists_bin);
+
+	buffer[0] = '\0';
+
+	if(write_history(NULL)) {
+		printf("Failed to write history\n");
+		return TRUE;
+	}
+
 	if (!ml_initialise()) {
 		Print("Initialise of ml failed.");
 		PrintLn();
 		/* Notify singular that an error occured */
 		return TRUE;
 	}
+
+	ml_make_prediction(filename, 30, buffer, &i);
+	printf("prediciton %s\n", buffer);
 
 	L->Init(1);
 
@@ -7819,6 +7834,7 @@ static BOOLEAN jjPREDHELP0(leftv res, leftv)
 	ml_finalise();
 	return FALSE;
 }
+
 
 
 

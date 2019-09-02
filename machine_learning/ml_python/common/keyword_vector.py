@@ -70,6 +70,7 @@ def get_vectors(filenames, dictionary, normalise=True):
     vectors = vectorizer.fit_transform(doc_strings)
     vectors = vectors.toarray()
     if normalise:
+        #print(sys.version)
         vectors = vectors / np.sqrt((vectors ** 2).sum(-1))[..., np.newaxis]
     return vectors
 

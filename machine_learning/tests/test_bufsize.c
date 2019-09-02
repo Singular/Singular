@@ -11,7 +11,6 @@ int main(int argc, char *argv[])
 	char buffer11[11];
 	char buffer12[12];
 	char buffer20[20];
-	double time_taken;
 	if (argc != 1) {
 		printf("Usage: %s\n", argv[0]);
 		return 1;
