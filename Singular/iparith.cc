@@ -2582,6 +2582,16 @@ static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
 {
   if ((v->rtyp!=IDHDL)||(v->e!=NULL)) return TRUE;
   idhdl h=(idhdl)v->data;
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
+  {
+    if (currRing->LPncGenCount < IDELEMS((ideal)u->Data()))
+    {
+      Werror("At least %d ncgen variables are needed for this computation.", IDELEMS((ideal)u->Data()));
+      return TRUE;
+    }
+  }
+#endif
   // CopyD for IDEAL_CMD and MODUL_CMD are identical:
   res->data = (char *)idLiftStd((ideal)u->Data(),
                                 &(h->data.umatrix),testHomog);
@@ -6804,6 +6814,16 @@ static BOOLEAN jjLIFTSTD3(leftv res, leftv u, leftv v, leftv w)
   if ((w->rtyp!=IDHDL)||(w->e!=NULL)) return TRUE;
   idhdl hv=(idhdl)v->data;
   idhdl hw=(idhdl)w->data;
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
+  {
+    if (currRing->LPncGenCount < IDELEMS((ideal)u->Data()))
+    {
+      Werror("At least %d ncgen variables are needed for this computation.", IDELEMS((ideal)u->Data()));
+      return TRUE;
+    }
+  }
+#endif
   // CopyD for IDEAL_CMD and MODUL_CMD are identical:
   res->data = (char *)idLiftStd((ideal)u->Data(),
                                 &(hv->data.umatrix),testHomog,
