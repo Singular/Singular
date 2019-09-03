@@ -11,5 +11,5 @@ VECTORS_NPY    = os.path.expanduser("~/.singular/vectors.npy")
 HELPFILE_NPY   = os.path.expanduser("~/.singular/helpfilelist.npy")
 
 HELP_FILE_URL  = "ftp://jim.mathematik.uni-kl.de/pub/Math/Singular/src/4-1-2/doc.tbz2"
-HELP_FILE_PATH = os.path.join(os.path.expanduser("~/.singular"), 
+HELP_FILE_PATH = os.path.join(os.path.expanduser("~/.singular"),
         "helpfiles", "singular")

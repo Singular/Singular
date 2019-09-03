@@ -1,7 +1,8 @@
 ACLOCAL_AMFLAGS = -I ../m4
 
 #AM_CPPFLAGS 		= -I/usr/include/python3.6 -DDATA_PATH=\"$(datadir)\"
-AM_CPPFLAGS 		= -I/usr/include/python2.7 -DDATA_PATH=\"$(datadir)\"
+AM_CPPFLAGS 		= -I/usr/include/python2.7 -DDATA_PATH=\"$(datadir)\" \
+			  -DBIN_PATH=\"$(bindir)\"
 
 libmlearn_LTLIBRARIES 	= libmlearn.la
 libmlearndir = $(libdir)

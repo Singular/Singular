@@ -22,8 +22,9 @@
 #define READ_DICTIONARY		"read_dictionary"
 #define CREATE_TABLE		"create_table"
 #define PYTPATH(B)		sprintf(B, "%s/ml_python", DATA_PATH)
+#define SING_BIN(B)		sprintf(B, "%s/Singular", BIN_PATH)
 #define SING_EXT_SCRIPT(B)	sprintf(B, "%s/ml_singular/extract.lib", \
-		DATA_PATH)
+					DATA_PATH)
 
 /**** Local Function Declarations ****************************************/
 
@@ -105,6 +106,7 @@ int ml_initialise()
 	PyObject *pArgs = NULL;
 	PyObject *pTemp = NULL;
 
+
 	if (!Py_IsInitialized()) {
 		Py_Initialize();
 	}
@@ -149,10 +151,14 @@ int ml_initialise()
 
 
 	/* Setup arguments */
-	pArgs = PyTuple_New(1);
+	pArgs = PyTuple_New(2);
 	SING_EXT_SCRIPT(buffer);
 	pString = PyString_FromString(buffer);
 	PyTuple_SetItem(pArgs, 0, pString);
+
+	SING_BIN(buffer);
+	pString = PyString_FromString(buffer);
+	PyTuple_SetItem(pArgs, 1, pString);
 
 	pValue = _call_python_function_args(LOOKUPTABLE,
 					    INIT_TABLE_ON_SYSTEM,
