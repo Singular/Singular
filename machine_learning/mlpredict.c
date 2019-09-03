@@ -22,14 +22,16 @@
 #define READ_DICTIONARY		"read_dictionary"
 #define CREATE_TABLE		"create_table"
 #define PYTPATH(B)		sprintf(B, "%s/ml_python", DATA_PATH)
+#define SING_EXT_SCRIPT(B)	sprintf(B, "%s/ml_singular/extract.lib", \
+		DATA_PATH)
 
 /**** Local Function Declarations ****************************************/
 
 PyObject *_call_python_function(char *module, char *func);
 PyObject *_call_python_function_args(char *module, char *func, PyObject *pArgs);
 ml_internal *_get_internals();
-int _get_dictionary();
-int _get_vectors_file_list();
+int _set_dictionary();
+int _set_vectors_file_list();
 
 /**** Static Variables ***************************************************/
 
@@ -91,7 +93,7 @@ int ml_is_initialised()
  */
 int ml_initialise()
 {
-	char buffer[50];
+	char buffer[100];
 	char *spath = NULL;
 	PyObject *pString = NULL;
 	PyObject *pValue = NULL;
@@ -100,6 +102,7 @@ int ml_initialise()
 
 	PyObject *pName = NULL;
 	PyObject *pModule = NULL;
+	PyObject *pArgs = NULL;
 	PyObject *pTemp = NULL;
 
 	if (!Py_IsInitialized()) {
@@ -144,12 +147,22 @@ int ml_initialise()
 	//Py_XDECREF(pTemp);
 	Py_DECREF(pPath);
 
-	pValue = _call_python_function(LOOKUPTABLE, INIT_TABLE_ON_SYSTEM);
-	Py_XDECREF(pValue);
+
+	/* Setup arguments */
+	pArgs = PyTuple_New(1);
+	SING_EXT_SCRIPT(buffer);
+	pString = PyString_FromString(buffer);
+	PyTuple_SetItem(pArgs, 0, pString);
+
+	pValue = _call_python_function_args(LOOKUPTABLE,
+					    INIT_TABLE_ON_SYSTEM,
+					    pArgs);
+	Py_DECREF(pArgs);
 
 	if (pValue == NULL)		return 0;
-	if (!_get_dictionary())		return 0;
-	if (!_get_vectors_file_list())	return 0;
+	Py_XDECREF(pValue);
+	if (!_set_dictionary())		return 0;
+	if (!_set_vectors_file_list())	return 0;
 
 	return 1;
 }
@@ -354,7 +367,7 @@ ml_internal *_get_internals()
  *
  * @return 1 if successful, 0 if something goes wrong.
  */
-int _get_dictionary()
+int _set_dictionary()
 {
 	PyObject *pValue = NULL;
 
@@ -380,7 +393,7 @@ int _get_dictionary()
  * @return 1 if successful, 0 if something goes wrong.
  */
 
-int _get_vectors_file_list()
+int _set_vectors_file_list()
 {
 	PyObject *pValue = NULL;
 	PyObject *pVal1 = NULL, *pVal2 = NULL;

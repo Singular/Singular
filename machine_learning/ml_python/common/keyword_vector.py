@@ -48,9 +48,10 @@ def get_vectors(filenames, dictionary, normalise=True):
             print(filename)
             raise IOError
     assert dictionary is not None, \
-            "Please provide a valid dictionary as argument"
+            "Please provide a valid (Not None) dictionary as argument"
     assert not dictionary.size == 0, \
-            "Please provide a valid dictionary as argument"
+            "Please provide a valid (Non empty) dictionary as argument"
+
 
     doc_strings = []
     for filename in filenames:

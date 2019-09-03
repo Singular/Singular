@@ -7821,7 +7821,7 @@ static BOOLEAN jjPREDHELP0(leftv res, leftv)
 	}
 
 	ml_make_prediction(filename, 30, buffer, &i);
-	printf("prediciton %s\n", buffer);
+	printf("prediction %s\n", buffer);
 
 	L->Init(1);
 
@@ -7989,9 +7989,6 @@ static BOOLEAN jjRESERVEDLIST0(leftv res, leftv)
 	lists L = (lists)omAllocBin(slists_bin);
 	struct blackbox_list *bb_list = NULL;
 	unsigned nCount = (sArithBase.nCmdUsed-1) / 3;
-
-	ml_initialise();
-	ml_finalise();
 
 	if ((3*nCount) < sArithBase.nCmdUsed) {
 		nCount++;

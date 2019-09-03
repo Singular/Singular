@@ -44,7 +44,7 @@ def get_list_of_htm_files(path=os.path.join(HELP_FILE_PATH, "html")):
     return files
 
 
-def extract_keywords():
+def extract_keywords(extract_script=None):
     """
     Run Singular script to extract current keywords and save as file
     'keywords.txt'
@@ -53,8 +53,11 @@ def extract_keywords():
     if not os.path.isdir(HOME_DIR):
         os.makedirs(HOME_DIR)
 
+    if extract_script is None:
+        extract_script = EXTRACT_SCRIPT
+
     # extract keywords using the singular script
-    os.system(SINGULAR_BIN + " -q " + EXTRACT_SCRIPT +
+    os.system(SINGULAR_BIN + " -q " + extract_script +
             " | sort | uniq > " + KEYWORDS_FILE)
 
     # read from the file created by singular
@@ -96,7 +99,7 @@ def create_table(dictionary=None, attempt_cached=True):
 
     return (vectors, file_list)
 
-def init_table_on_system():
+def init_table_on_system(extract_script=None):
     """
     check whether the various files exist, and create if necessary.
     """
@@ -110,7 +113,7 @@ def init_table_on_system():
 
     # Use Singular to extract the keywords and save in a file.
     if not os.path.isfile(KEYWORDS_FILE):
-        dictionary = extract_keywords()
+        dictionary = extract_keywords(extract_script)
     else:
         dictionary = None
 
