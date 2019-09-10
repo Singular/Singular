@@ -135,10 +135,12 @@ static proc ORDstr2list (string ORD, int NN)
 {
   /* convert an ordering defined in NN variables in the  */
   /* string form into the same ordering in the list form */
-  string st;
-  st = "ring @Z = 0,z(1.." + string(NN) + "),";
-  st = st + ORD + ";";
-  execute(st); kill st;
+  list l2;
+  for (int ii = 1; ii <= NN; ii++)
+  {
+   l2[ii] = "z("+string(ii)+")";
+  }
+  ring @Z = create_ring(0, l2, "ORD");
   list L = ringlist(@Z)[3];
   kill @Z;
   return(L);

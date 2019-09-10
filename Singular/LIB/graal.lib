@@ -403,12 +403,13 @@ EXAMPLE:  example graalMixed; shows an example
    **/
   string ostring = ordstr(basering);
   ostring = ostring[1..size(ostring)-2];
+  int ii;
   list l2;
-  for (int ii = 1; ii <= s; ii++)
+  for (ii = 1; ii <= s; ii++)
   {
    l2[ii] = "Y("+string(ii)+")";
   }
-  l2[s+1] = ringlist(basering)[2];
+  l2 = l2+ringlist(basering)[2];
   ring Q0y = create_ring(ringlist(basering)[1], l2, "(ds(s),c,"+ostring+")", "no_minpoly");
   setring Q0y;
   ideal H = imap(Gr.A,H);
@@ -427,7 +428,13 @@ EXAMPLE:  example graalMixed; shows an example
   /***
    * construct Ky and sigmainI
    **/
-  execute("ring KKy = ("+charstr(Q0)+"),(Y(1..s),"+varstr(Q0,nvars(Q0))+"),(c,dp(s),dp(1));");
+  list l3;
+  for (ii = 1; ii <= s; ii++)
+  {
+   l3[ii] = "Y("+string(ii)+")";
+  }
+  l3 = l3+ringlist(Q0)[2][nvars(Q0)];
+  ring KKy = create_ring(ringlist(Q0)[1], l3, "(c,dp(s),dp(1))", "no_minpoly");
   poly minpolyOfK = imap(Q0,g(n));
   qring Ky = std(minpolyOfK);
 

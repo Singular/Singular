@@ -2023,7 +2023,13 @@ EXAMPLE: example displayHNE; shows an example
  else   { ring dazu=char(altring),z(0..size(v)-1),ls; }
  def displayring=dazu+altring;
 */
- execute("ring displayring=("+charstr(basering)+"),(z(0.."+string(size(v)-1)+"),"+varstr(basering)+"),(ls("+string(size(v))+"),"+ordstr(basering)+");");
+ list l2;
+  for (int ii = 0; ii <= (size(v)-1); ii++)
+  {
+   l2[ii] = "z("+string(ii)+")";
+  }
+  l2 = l2 + ringlist(basering)[2];
+  ring displayring = create_ring(ringlist(basering)[1], l2, "(ls("+string(size(v))+"),"+ordstr(basering)+")", "no_minpoly");
  // End change by T. Keilen
  //////////////////////////////////////////////////////////////
  setring displayring;

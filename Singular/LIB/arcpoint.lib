@@ -326,8 +326,7 @@ static proc atoz (int n)
 ASSUME:  1<=n<=26
 RETURN:  string, the nth letter of the alphabet"
 {
- string s="ring r=0,("+A_Z("a",n)+"),ds;";
- execute(s);
+ ring r = create_ring(0, "("+A_Z("a",n)+")", "ds");
  return (string(var(n)));
 }
 

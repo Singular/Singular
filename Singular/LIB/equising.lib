@@ -345,15 +345,21 @@ static proc createMyRing_new(poly p_F, string ordStr,
   string charaStr;
   int i;
   string helpStr;
+  int ii;
   int nDefParams = nvars(r_old)-2;
 
   ideal qIdeal = ideal(basering);
 
   if ((npars(basering)==0) and (minPolyStr==""))
   {
-    helpStr = "ring myRing1 ="
-              + string(chara)+ ", (t(1..nDefParams), x, y),("+ ordStr +");";
-    execute(helpStr);
+   list l2;
+   for (ii = 1; ii<= nDefParams; ii++)
+   {
+    l2[ii] = "t("+string(ii)+")";
+   }
+   l2[nDefParams+1] = "x";
+   l2[nDefParams+2] = "y";
+   ring myRing1 = create_ring("string(chara)", l2, "("+ ordStr +")");
   }
   else
   {
@@ -362,19 +368,33 @@ static proc createMyRing_new(poly p_F, string ordStr,
     {
       if (minPolyStr<>"")
       {
-        helpStr = "ring myRing1 =
-                 (" + string(chara) + ",a),
-                 (t(1..nDefParams), x, y),(" + ordStr + ");";
-        execute(helpStr);
+        list l3;
+        for (ii = 1; ii<= nDefParams; ii++)
+         {
+          l3[ii] = "t("+string(ii)+")";
+         }
+        l3[nDefParams+1] = "x";
+        l3[nDefParams+2] = "y";
+        ring myRing1 = create_ring("(" + string(chara) + ",a)", l3, "("+ ordStr +")");
 
         execute (minPolyStr);
       }
       else // no minpoly given
       {
-        helpStr = "ring myRing1 =
-                  (" + string(chara) + ",a(1..npars(basering)) ),
-                  (t(1..nDefParams), x, y),(" + ordStr + ");";
-        execute(helpStr);
+        string l6 = "(" + string(chara) + "";
+        for (ii = 1; ii <= npars(basering); ii++)
+        {
+         l6 = l6+",a("+string(ii)+")";
+        }
+        l6 = l6+")";
+        list l7;
+        for (ii = 1; ii<= nDefParams; ii++)
+        {
+         l7[ii] = "t("+string(ii)+")";
+        }
+        l7[size(l7)+1] = "x";
+        l7[size(l7)+1] = "y";
+        ring myRing1 = create_ring(l6, l7, "(" + ordStr + ")");
       }
     }
     else
@@ -398,10 +418,20 @@ static proc createMyRing_new(poly p_F, string ordStr,
     if (npars(basering) == 0)
     {
       ordStr = "(dp("+string(no_b)+"),"+ordStr+")";
-      helpStr = "ring myRing ="
-                + string(chara)+ ", (b(1..no_b), t(1..nDefParams), x, y),"
-                + ordStr +";";
-      execute(helpStr);
+      list l4;
+      for (ii = 1; ii<= no_b; ii++)
+      {
+       l4[ii] = "b("+string(ii)+")";
+      }
+      list l5;
+      for (ii = 1; ii<= nDefParams; ii++)
+      {
+       l5[ii] = "t("+string(ii)+")";
+      }
+      l4 = l4 + l5;
+      l4[size(l4)+1] = "x";
+      l4[size(l4)+1] = "y";
+      ring myRing = create_ring("string(chara)", l4, "ordStr"); 
     }
     else
     {
