@@ -67,7 +67,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
       return Flint_GCD_MP(f,pLength(f),g,pLength(g),ctx,r);
     }
   }
-  else 
+  else
   if (rField_is_Q(r))
   {
     fmpq_mpoly_ctx_t ctx;
