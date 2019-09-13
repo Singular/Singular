@@ -7191,7 +7191,12 @@ EXAMPLE: example orbit_variety; shows an example
     int n=nvars(br);
     int m=ncols(F);
     string mp=string(minpoly);
-    execute("ring R=("+charstr(br)+"),("+varstr(br)+",y(1..m)),dp;");
+    list l2 = ringlist(br)[2];
+    for (int ii = 1; ii <= m; ii++)
+    {
+     l2[size(l2)+1] = "y("+string(ii)+")";
+    }
+    ring R = create_ring(ringlist(br)[1], l2, "dp", "no_minpoly");
     if (mp!="0")
     { execute("minpoly=number("+mp+");"); }
     ideal I=ideal(imap(br,F));
@@ -7413,7 +7418,12 @@ EXAMPLE: example relative_orbit_variety; shows an example
     int n=nvars(br);
     int m=ncols(F);
     string mp=string(minpoly);
-    execute("ring R=("+charstr(br)+"),("+varstr(br)+",y(1..m)),lp;");
+    list l2 = ringlist(br)[2];
+    for (int ii = 1; ii <= m; ii++)
+    {
+     l2[size(l2)+1] = "y("+string(ii)+")";
+    }
+    ring R = create_ring(ringlist(br)[1], l2, "lp", "no_minpoly");
     if (mp!="0")
     { execute("minpoly=number("+mp+");"); }
     ideal J=ideal(imap(br,F));

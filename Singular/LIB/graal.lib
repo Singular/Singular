@@ -403,7 +403,13 @@ EXAMPLE:  example graalMixed; shows an example
    **/
   string ostring = ordstr(basering);
   ostring = ostring[1..size(ostring)-2];
-  execute("ring Q0y = ("+charstr(basering)+"),(Y(1..s),"+varstr(basering)+"),(ds(s),c,"+ostring+")");
+  list l2;
+  for (int ii = 1; ii <= s; ii++)
+  {
+   l2[ii] = "Y("+string(ii)+")";
+  }
+  l2[s+1] = ringlist(basering)[2];
+  ring Q0y = create_ring(ringlist(basering)[1], l2, "(ds(s),c,"+ostring+")", "no_minpoly");
   setring Q0y;
   ideal H = imap(Gr.A,H);
   ideal J = imap(Gr.A,L);
