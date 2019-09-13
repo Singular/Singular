@@ -357,7 +357,7 @@ EXAMPLE:  example graalMixed; shows an example
   }
   else
     { string pars; string vars = varstr(basering); }
-  ring Q0 = create_ring("("+charstr(basering)+pars+")", "("+vars+")", "dp");
+  execute("ring Q0 = ("+charstr(basering)+pars+"),("+vars+"),dp;");
   ideal J0 = imap(Q,J);
   Gr.Q0 = Q0;
   Gr.J0 = J0;
@@ -409,7 +409,7 @@ EXAMPLE:  example graalMixed; shows an example
    l2[ii] = "Y("+string(ii)+")";
   }
   l2[s+1] = ringlist(basering)[2];
-  ring Q0y = create_ring(ringlist(basering)[1], l2, "(ds(s),c,"+ostring+")", "no_minpoly");
+  execute("ring Q0y = ("+charstr(basering)+"),(Y(1..s),"+varstr(basering)+"),(ds(s),c,"+ostring+")");
   setring Q0y;
   ideal H = imap(Gr.A,H);
   ideal J = imap(Gr.A,L);
