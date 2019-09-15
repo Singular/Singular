@@ -40,19 +40,34 @@ class HelpPagePredictor(BaseEstimator, ClassifierMixin):
         ret_list = []
         for x in X: # pylint: disable=invalid-name
             # find the closest vector
-            min_val = float("inf")
-            index = -1
+            indices = [-1, -1, -1, -1, -1]
+            vals = [float("inf"), float("inf"),
+                    float("inf"), float("inf"),
+                    float("inf")]
             i = 0
             for vec in self.vectors:
                 # dist = vector_distance(x, vec)
                 # Dot product is much faster
                 dist = -1 * np.dot(x, vec)
-                if dist < min_val:
-                    min_val = dist
-                    index = i
+                # go through current list
+                for j in range(5):
+                    # first entry with greater dist is the insertion position
+                    if dist < vals[j]:
+                        k = (5 - 1)
+                        # shift the values to the right, discarding the last
+                        while k > j:
+                            indices[k] = indices[k-1]
+                            vals[k] = vals[k-1]
+                            k = k - 1
+                        # insert new value
+                        indices[j] = i
+                        vals[j] = dist
+                        break
                 i = i + 1
 
-            # find corresponding filename
-            file = self.files[index]
-            ret_list.append(file)
+            # find corresponding filenames
+            files = []
+            for i in range(5):
+                files.append(self.files[indices[i]])
+            ret_list.append(files)
         return np.array(ret_list)

@@ -51,18 +51,16 @@ int ml_finalise();
  *
  * @param[in]  filename A String indicating the for which the prediction
  * must be made
- * @param[in]  buffer_size The maximum length of the prediction string.
- * @param[out] prediction_buffer The buffer into which the prediction
- * filename is copied.  
+ * @param[out] prediction_buffers The buffers into which the prediction
+ * filename is copied.
  * @param[out] pred_len A pointer to an integer, at which the string length
- * of the prediction filename is set. 
+ * of the prediction filename is set.
  *
  * @return 1 if successful, 0 if some error occurs.
  */
 int ml_make_prediction(char *filename,
-					   int buffer_size, 
-					   char *prediction_buffer,
-					   int *pred_len);
+		       char *prediction_buffers[],
+		       int *pred_len);
 
 #ifdef __cplusplus
 }

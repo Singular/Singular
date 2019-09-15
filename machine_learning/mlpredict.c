@@ -104,8 +104,7 @@ int ml_initialise()
 	PyObject *pName = NULL;
 	PyObject *pModule = NULL;
 	PyObject *pArgs = NULL;
-	PyObject *pTemp = NULL;
-
+	//PyObject *pTemp = NULL;
 
 	if (!Py_IsInitialized()) {
 		Py_Initialize();
@@ -203,23 +202,23 @@ int ml_finalise()
  *
  * @param[in]  filename A String indicating the for which the prediction
  * must be made
- * @param[in]  buffer_size The maximum length of the prediction string.
- * @param[out] prediction_buffer The buffer into which the prediction
- * filename is copied.
+ * @param[out] prediction_buffers The buffer into which the prediction
+ * filenames are copied. Must contain exactly 5 char *.
  * @param[out] pred_len A pointer to an integer, at which the string length
  * of the prediction filename is set.
  *
  * @return 1 if successful, 0 if some error occurs.
  */
 int ml_make_prediction(char *filename,
-		       int buffer_size,
-		       char *prediction_buffer,
+		       char *prediction_buffers[],
 		       int *pred_len)
 {
-	PyObject *pFName = NULL, *pArgs = NULL;
-	PyObject *pValue = NULL; PyObject *pString = NULL;
-	PyObject *pTemp = NULL;
-	int ret_string_len = 0;
+	PyObject *pFName = NULL;
+	PyObject *pArgs = NULL;
+	PyObject *pValue = NULL;
+	PyObject *pString = NULL;
+	// PyObject *pTemp = NULL;
+	int i = 0;
 
 	pFName = PyString_FromString(filename);
 	//pFName = PyUnicode_FromString(filename);
@@ -254,22 +253,28 @@ int ml_make_prediction(char *filename,
 	if (!pValue) {
 		return 0;
 	}
-
-	pString = PyObject_Str(pValue);
-	strncpy(prediction_buffer, PyString_AsString(pString), buffer_size - 1);
-	//pTemp = PyUnicode_AsASCIIString(pString);
-	//strncpy(prediction_buffer, PyBytes_AsString(pTemp), buffer_size - 1);
-	ret_string_len = strlen(PyString_AsString(pString));
-	//ret_string_len = strlen(PyBytes_AsString(pTemp));
-	if (ret_string_len >= buffer_size - 1) {
-		prediction_buffer[buffer_size - 1] = '\0';
-		*pred_len = buffer_size - 1;
-	} else {
-		*pred_len = ret_string_len;
+	if (!PyList_Check(pValue)) {
+		printf("Expected a list for prediction.\n");
+		Py_DECREF(pValue);
+		return 0;
+	}
+	if (PyList_Size(pValue) != 5) {
+		printf("List length is supposed to be five, but is %d.\n",
+				PyList_Size(pValue));
+		Py_DECREF(pValue);
+		return 0;
+	}
+	// pString = PyObject_Str(pValue);
+	for (i = 0; i < 5; i++) {
+		pString = PyObject_Str(PyList_GetItem(pValue, i));
+		prediction_buffers[i] = strdup(PyString_AsString(pString));
+		//pTemp = PyUnicode_AsASCIIString(pString);
+		//prediction_buffers[i] = strdup(PyBytes_AsString(pTemp));
+		pred_len[i] = strlen(prediction_buffers[i]);
+		Py_DECREF(pString);
+		pString = NULL;
 	}
 
-	Py_DECREF(pString);
-	//Py_XDECREF(pTemp);
 	Py_DECREF(pValue);
 
 	return 1;

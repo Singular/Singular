@@ -39,7 +39,7 @@ def get_prediction(filename, dictionary, vectors, file_list):
     filename = os.path.expanduser(filename)
     test_vec = count_occurances(filename, dictionary)
     prediction = predictor.predict(np.array([test_vec]))
-    return prediction[0]
+    return prediction[0].tolist()
 
 
 def main():
