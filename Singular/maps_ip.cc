@@ -403,6 +403,12 @@ poly pSubstPoly(poly p, int var, poly image)
     return pSubst(pCopy(p),var,image);
   }
 #endif
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
+  {
+    return pSubst(pCopy(p),var,image);
+  }
+#endif
   return p_SubstPoly(p,var,image,currRing,currRing,ndCopyMap);
 }
 
@@ -415,6 +421,19 @@ ideal  idSubstPoly(ideal id, int n, poly e)
 
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing))
+  {
+    int k=MATROWS((matrix)id)*MATCOLS((matrix)id);
+    ideal res=(ideal)mpNew(MATROWS((matrix)id),MATCOLS((matrix)id));
+    res->rank = id->rank;
+    for(k--;k>=0;k--)
+    {
+      res->m[k]=pSubst(pCopy(id->m[k]),n,e);
+    }
+    return res;
+  }
+#endif
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
   {
     int k=MATROWS((matrix)id)*MATCOLS((matrix)id);
     ideal res=(ideal)mpNew(MATROWS((matrix)id),MATCOLS((matrix)id));

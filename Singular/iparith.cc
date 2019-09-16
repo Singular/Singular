@@ -6644,6 +6644,13 @@ static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
   }
   else
   {
+#ifdef HAVE_SHIFTBBA
+    if (rIsLPRing(currRing))
+    {
+      WerrorS("Substituting parameters not implemented for Letterplace rings.");
+      return TRUE;
+    }
+#endif
     res->data=pSubstPar(p,-ringvar,monomexpr);
   }
   return FALSE;
@@ -6686,6 +6693,13 @@ static BOOLEAN jjSUBST_Id(leftv res, leftv u, leftv v,leftv w)
   }
   else
   {
+#ifdef HAVE_SHIFTBBA
+    if (rIsLPRing(currRing))
+    {
+      WerrorS("Substituting parameters not implemented for Letterplace rings.");
+      return TRUE;
+    }
+#endif
     res->data = idSubstPar(id,-ringvar,monomexpr);
   }
   return FALSE;
