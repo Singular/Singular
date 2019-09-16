@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
 	if (test_ml_is_initialised())	return 1;
 
 	i = ml_finalise();
-	printf("Returnvalue for ml_finalise: \t%d\n", i);
+	printf("Returnvalue for ml_finalise: \t\t%d\n", i);
 	if (i != 1)	return 1;
 
 	i = ml_is_initialised();

@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 	i = system("echo \"ring\" > test.txt");
 	if (i != 0)				return 1;
 
-	i = ml_make_prediction("test.txt", buffer, length);
+	i = ml_make_prediction("test.txt", buffer, length, strdup);
 	printf("Returnvalue for ml_make_prediciton: \t%d\n", i);
 	for (k = 0; k < 5; k++) {
 		printf("String %d in buffer: \t\t%s\n", k, buffer[k]);

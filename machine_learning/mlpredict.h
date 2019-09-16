@@ -60,7 +60,8 @@ int ml_finalise();
  */
 int ml_make_prediction(char *filename,
 		       char *prediction_buffers[],
-		       int *pred_len);
+		       int *pred_len,
+		       char *(*custom_strdup)(const char *));
 
 #ifdef __cplusplus
 }

@@ -7801,12 +7801,17 @@ static BOOLEAN jjOPTION_PL(leftv res, leftv v)
 
 static BOOLEAN jjPREDHELP0(leftv res, leftv)
 {
-	char buffer[30];
+	char *buffer[5];
+	int lengths[5];
 	char filename[15] = "~/.history";
 	int i;
 	lists L = (lists)omAllocBin(slists_bin);
 
-	buffer[0] = '\0';
+	buffer[0] = NULL;
+	buffer[1] = NULL;
+	buffer[2] = NULL;
+	buffer[3] = NULL;
+	buffer[4] = NULL;
 
 	if(write_history(NULL)) {
 		printf("Failed to write history\n");
@@ -7820,13 +7825,15 @@ static BOOLEAN jjPREDHELP0(leftv res, leftv)
 		return TRUE;
 	}
 
-	ml_make_prediction(filename, 30, buffer, &i);
-	printf("prediction %s\n", buffer);
+	ml_make_prediction(filename, buffer, lengths, _omStrDup);
 
-	L->Init(1);
+	L->Init(5);
 
-	L->m[0].rtyp = STRING_CMD;
-	L->m[0].data = omStrDup("SomeString");
+	for (i = 0; i < 5; i++) {
+		//printf("prediction %d: %s\n", i, buffer[i]);
+		L->m[i].rtyp = STRING_CMD;
+		L->m[i].data = buffer[i];
+	}
 
 	// pass the resultant list to the res datastructure
 	res->data=(void *)L;

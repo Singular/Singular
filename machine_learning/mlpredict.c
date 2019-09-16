@@ -211,7 +211,8 @@ int ml_finalise()
  */
 int ml_make_prediction(char *filename,
 		       char *prediction_buffers[],
-		       int *pred_len)
+		       int *pred_len,
+		       char *(*custom_strdup)(const char *))
 {
 	PyObject *pFName = NULL;
 	PyObject *pArgs = NULL;
@@ -260,16 +261,16 @@ int ml_make_prediction(char *filename,
 	}
 	if (PyList_Size(pValue) != 5) {
 		printf("List length is supposed to be five, but is %d.\n",
-				PyList_Size(pValue));
+				(int)PyList_Size(pValue));
 		Py_DECREF(pValue);
 		return 0;
 	}
 	// pString = PyObject_Str(pValue);
 	for (i = 0; i < 5; i++) {
 		pString = PyObject_Str(PyList_GetItem(pValue, i));
-		prediction_buffers[i] = strdup(PyString_AsString(pString));
+		prediction_buffers[i] = custom_strdup(PyString_AsString(pString));
 		//pTemp = PyUnicode_AsASCIIString(pString);
-		//prediction_buffers[i] = strdup(PyBytes_AsString(pTemp));
+		//prediction_buffers[i] = custom_strdup(PyBytes_AsString(pTemp));
 		pred_len[i] = strlen(prediction_buffers[i]);
 		Py_DECREF(pString);
 		pString = NULL;
