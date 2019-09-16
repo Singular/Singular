@@ -146,7 +146,7 @@ LINKAGE poly p_Minus_mm_Mult_qq__T(poly p, poly m, poly q, int& Shorter, const p
     else
     {
       pNext(a) = r->p_Procs->pp_Mult_mm(q, m, r);
-#ifdef HAVE_RINGS
+#ifdef HAVE_ZERODIVISORS
       if (! rField_is_Domain(r))
       {
         shorter += pLength(q) - pLength(pNext(a));
