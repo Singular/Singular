@@ -286,6 +286,9 @@ const struct sValCmd1 dArith1[]=
 #if defined(HAVE_PLURAL) || defined(HAVE_SHIFTBBA)
 ,{D(jjTWOSTD),     TWOSTD_CMD,      IDEAL_CMD,      IDEAL_CMD     , ALLOW_NC |NO_RING}
 #endif
+#ifdef HAVE_SHIFTBBA
+,{D(jjTWOSTD),     TWOSTD_CMD,      MODUL_CMD,      MODUL_CMD     , ALLOW_LP |NO_RING}
+#endif
 //,{  jjWRONG ,      TRACE_CMD,       0,              INTVEC_CMD    , ALLOW_NC |ALLOW_RING}
 //,{  jjWRONG ,      TRACE_CMD,       0,              IDEAL_CMD     , ALLOW_NC |ALLOW_RING}
 ,{D(jjTRACE_IV),   TRACE_CMD,       INT_CMD,        INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING|NO_CONVERSION}

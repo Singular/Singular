@@ -189,7 +189,17 @@ NOTE:     constants are not considered symmetric
   c=append_by_zeroes(nV, c); // append c by zeroes if it is too short
   def br@=basering; // remember the base ring
   // add additional variables to the base ring
-  execute("ring r@= ("+ charstr(basering) +"),("+varstr(basering)+",c@(1..nV),A@(1..nV)), dp;" );
+  int ii;
+  list l2 = ringlist(basering)[2];
+  for (ii = 1; ii <= nV; ii++)
+  {
+   l2[size(l2)+1] = "c@("+string(ii)+")";
+  }
+    for (ii = 1; ii <= nV; ii++)
+  {
+   l2[size(l2)+1] = "A@("+string(ii)+")";
+  }
+  ring r@ = create_ring(ringlist(basering)[1], l2, "dp", "no_minpoly"); 
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   ideal V=F(V);
   poly f=F(f);
@@ -687,7 +697,13 @@ NOTE:     uses the elimination and is extremely inefficient,
   {
     def br@=basering; // remember the base ring
     // add additional variables c@, a@(1..n) to the base ring
-    execute("ring r@= (" + charstr(basering) + "),(c@,"+varstr(basering)+", a@(1..n)), lp;" );
+    list l3 = "c@";
+    l3 = l3+ ringlist(basering)[2];
+    for (int ii = 1; ii <= n; ii++)
+    {
+     l3[size(l3)+1] = "a@("+string(ii)+")";
+    }
+    ring r@ = create_ring(ringlist(basering)[1], l3, "lp", "no_minpoly");
     execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
     list c=F(c); // embed c in the bigger ring
     poly rez;
@@ -1017,7 +1033,18 @@ NOTE:     makes sense only for (lists of) polynomials;
   int n=r*R; // the rank of the product of two vector bundles
   def br@=basering; // remember the base ring
   // add additional variables a@(1..r), b@(1..R), x@ to the base ring
-  execute("ring r@=("+ charstr(basering) +"),(x@,"+varstr(basering)+",a@(1..r),b@(1..R)), lp;");
+  int ii;
+  list l4 = "x@";
+  l4 = l4+ ringlist(basering)[2];
+  for (ii = 1; ii <= r; ii++)
+  {
+   l4[size(l4)+1] = "a@("+string(ii)+")";
+  }
+  for (ii = 1; ii <= R; ii++)
+  {
+   l4[size(l4)+1] = "b@("+string(ii)+")";
+  }
+  ring r@ = create_ring(ringlist(basering)[1], l4, "lp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c=F(c); // embed c in the bigger ring
   list C=F(C); // embed C in the bigger ring
@@ -1100,7 +1127,18 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
   //----------------------------------------------------------
   def br@=basering; // remember the base ring
   // add  additional variables to the base ring
-  execute("ring r@=("+charstr(basering)+"), ("+varstr(basering)+", t@, c@(1..r), C@(1..R)), dp;");
+  int ii;
+  list l5 = ringlist(basering)[2];  
+  l5[size(l5)+1] = "t@";
+  for (ii = 1; ii <= r; ii++)
+  {
+   l5[size(l5)+1] = "c@("+string(ii)+")";
+  }
+  for (ii = 1; ii <= R; ii++)
+  {
+   l5[size(l5)+1] = "C@("+string(ii)+")";
+  }
+  ring r@ = create_ring(ringlist(basering)[1], l5, "dp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c, C;
   int i;
@@ -1234,7 +1272,18 @@ NOTE:     Implementation of the formula of Manivel
   //----------------------------------------------------------
   def br@=basering; // remember the base ring
   // add  additional variables to the base ring
-  execute("ring r@=("+charstr(basering)+"), ("+varstr(basering)+", t@, c@(1..r), C@(1..R)), dp;");
+  int ii;
+  list l6 = ringlist(basering)[2];  
+  l6[size(l6)+1] = "t@";
+  for (ii = 1; ii <= r; ii++)
+  {
+   l6[size(l6)+1] = "c@("+string(ii)+")";
+  }
+  for (ii = 1; ii <= R; ii++)
+  {
+   l6[size(l6)+1] = "C@("+string(ii)+")";
+  }
+  ring r@ = create_ring(ringlist(basering)[1], l6, "dp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c, C;
   int i;
@@ -1570,7 +1619,14 @@ NOTE:     for the second symmetric power chSymm2L(...) could be faster
   //-------------------------------
   def br@=basering; // remember the base ring
   // add additional variables to the base ring
-  execute("ring r@=(" + charstr(basering) +  "),(x@,"+varstr(basering)+", a@(1..r)), lp;" );
+  int ii;
+  list l7 = "x@";
+  l7 = l7+ ringlist(basering)[2];
+  for (ii = 1; ii <= r; ii++)
+  {
+   l7[size(l7)+1] = "a@("+string(ii)+")";
+  }
+  ring r@ = create_ring(ringlist(basering)[1], l7, "lp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c=F(c); // embed c into the bigger ring
   list rez; // the Chern classes of the symmetric power are going to be written here
@@ -1696,7 +1752,13 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
   c=c[1..r];
   def br@=basering; // remember the base ring
   // add  additional variables to the base ring
-  execute("ring r@=(" + charstr(basering) +  "), ("+varstr(basering)+", t@, c@(1..r)), dp;" );
+  list l8 = ringlist(basering)[2];  
+  l8[size(l8)+1] = "t@";
+  for (int ii = 1; ii <= r; ii++)
+  {
+   l8[size(l8)+1] = "c@("+string(ii)+")";
+  }
+  ring r@ = create_ring(ringlist(basering)[1], l8, "dp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c;
   for(i=1;i<=r;i++)
@@ -1862,7 +1924,13 @@ NOTE:     for the second exterior power chWedge2L(...) could be faster
   //-----------------------------
   def br@=basering; // remember the base ring
   // add additional variables a@(1..r), x@ to the base ring
-  execute("ring r@= (" + charstr(basering) + "), (x@,"+varstr(basering)+", a@(1..r)), lp;" );
+  list l9 = "x@";
+  l9 = l9+ ringlist(basering)[2];
+  for (int ii = 1; ii <= r; ii++)
+  {
+   l9[size(l9)+1] = "a@("+string(ii)+")";
+  }
+  ring r@ = create_ring(ringlist(basering)[1], l9, "lp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c = F(c); // embed c into the bigger ring
   list rez; // the result should be computed here
@@ -1990,7 +2058,13 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
   c=c[1..r];
   def br@=basering; // remember the base ring
   // add  additional variables to the base ring
-  execute("ring r@=(" + charstr(basering) +  "), ("+varstr(basering)+", t@, c@(1..r)), dp;" );
+  list l10 = ringlist(basering)[2];  
+  l10[size(l10)+1] = "t@";
+  for (int ii = 1; ii <= r; ii++)
+  {
+   l10[size(l10)+1] = "c@("+string(ii)+")";
+  }
+  ring r@ = create_ring(ringlist(basering)[1], l10, "dp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c;
   for(i=1;i<=r;i++)
@@ -2112,7 +2186,13 @@ NOTE:     returns an empty list if l is empty
   {
     def br@=basering; // remember the base ring
     // add  additional variables to the base ring
-    execute("ring r@=(" + charstr(basering) +  "), ("+varstr(basering)+", a@, c@(1..n)), dp;" );
+    list l11 = ringlist(basering)[2];  
+    l11[size(l11)+1] = "a@";
+    for (int ii = 1; ii <= n; ii++)
+    {
+     l11[size(l11)+1] = "c@("+string(ii)+")";
+    }
+    ring r@ = create_ring(ringlist(basering)[1], l11, "dp", "no_minpoly");
     execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
     list c=F(c); // embed c into the bigger ring
     list prev;
@@ -2194,7 +2274,13 @@ NOTE:     returns an empty list if l is empty,
   {
     def br@=basering; // remember the base ring
     // add additional variables a@(1..n), x@ to the base ring
-    execute("ring r@=(" + charstr(basering) + "), (x@,"+varstr(basering)+", a@(1..n)), lp;" );
+    list l12 = "x@";
+    l12 = l12+ ringlist(basering)[2];
+    for (int ii = 1; ii <= n; ii++)
+    {
+     l12[size(l12)+1] = "a@("+string(ii)+")";
+    }
+    ring r@ = create_ring(ringlist(basering)[1], l12, "lp", "no_minpoly");
     execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
     list c=F(c); // embed c into the bigger ring
     int j;
@@ -3075,7 +3161,13 @@ NOTE:
   int sz=ncols(I); // the number of new generators is stored here
   def br@=basering; // remember the base ring
   // add additional variables t@(1), ... , t@(sz) and u@ to the base ring
-  execute("ring r@=("+ charstr(basering) +"),("+varstr(basering)+",t@(1..sz),u@), dp;");
+  list l13 = ringlist(basering)[2];
+  for (int ii = 1; ii <= sz; ii++)
+  {
+   l13[size(l13)+1] = "t@("+string(ii)+")";
+  }
+  l13[size(l13)+1] = "u@";
+  ring r@ = create_ring(ringlist(basering)[1], l13, "dp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   ideal I=F(I); // the ideal generated by I in the new ring
   ideal J(0..n); // define n+1 ideals J(0), ... , J(n)
@@ -3169,7 +3261,13 @@ NOTE:
   int sz=ncols(I); // the number of new generators is stored here
   def br@=basering; // remember the base ring
   // add additional variables t@(1), ... , t@(sz) and u@ to the base ring
-  execute("ring r@=("+ charstr(basering) +"),("+varstr(basering)+",t@(1..sz),u@), dp;");
+  list l14 = ringlist(basering)[2];
+  for (int ii = 1; ii <= sz; ii++)
+  {
+   l14[size(l14)+1] = "t@("+string(ii)+")";
+  }
+  l14[size(l14)+1] = "u@";
+  ring r@ = create_ring(ringlist(basering)[1], l14, "dp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   ideal I=F(I); // the ideal generated by I in the new ring
   ideal J(0..n); // define n+1 ideals J(0), ... , J(n)
@@ -3882,7 +3980,13 @@ NOTE:
   //TODO need to check the zero ideal and I==1;
   int sz=ncols(I);
   def br@=basering; // remember the base ring
-  execute("ring r@=("+ charstr(basering) +"),("+varstr(basering)+",t@(1..sz),u@), dp;");
+  list l15 = ringlist(basering)[2];
+  for (int ii = 1; ii <= sz; ii++)
+  {
+   l15[size(l15)+1] = "t@("+string(ii)+")";
+  }
+  l15[size(l15)+1] = "u@";
+  ring r@ = create_ring(ringlist(basering)[1], l15, "dp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   ideal I=F(I);
   ideal J(0..n);
