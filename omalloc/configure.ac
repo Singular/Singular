@@ -155,7 +155,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h,,
   AC_MSG_ERROR(Can not compile without limits.h))
 
-AC_CHECK_HEADERS(unistd.h sys/mman.h fcntl.h /usr/include/malloc.h)
+AC_CHECK_HEADERS(unistd.h sys/mman.h fcntl.h malloc.h malloc/malloc.h)
 
 AC_CHECK_FUNCS(popen mmap sbrk random malloc_usable_size malloc_size)
 
