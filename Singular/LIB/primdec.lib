@@ -5272,7 +5272,7 @@ static proc extraction (ideal SI, ideal SP)
       //I=std(I,hv);            // the standard basis in (R[U])[A]
       I=std(I);            // the standard basis in (R[U])[A]
       A[size(A)]=")";
-      execute("ring Rloc=("+charstr(basering)+","+U+",("+A+",dp;");
+      ring Rloc = create_ring("("+charstr(basering)+","+U, "("+A, "dp");
       ideal I=imap(RAU,I);
       //"std in lokalisierung:"+newline,I;
       ideal h;
