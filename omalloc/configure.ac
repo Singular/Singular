@@ -148,6 +148,14 @@ if test "$ac_cv_prog_ADDR2LINE" = addr2line; then
   AC_DEFINE_UNQUOTED(OM_PROG_ADDR2LINE, "$ac_cv_prog_ADDR2LINE", "Name of addr2line")
 fi
 
+AC_MSG_NOTICE(HOSTCC set)
+HOSTCC=${HOSTCC:=$CC}
+HOSTLD=${HOSTLD:=$LD}
+HOSTCFLAGS=${HOSTCFLAGS:=$CFLAGS}
+  AC_SUBST(HOSTCC)
+  AC_SUBST(HOSTLD)
+  AC_SUBST(HOSTCFLAGS)
+
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl header file checks
 dnl
@@ -155,7 +163,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h,,
   AC_MSG_ERROR(Can not compile without limits.h))
 
-AC_CHECK_HEADERS(unistd.h sys/mman.h fcntl.h /usr/include/malloc.h)
+AC_CHECK_HEADERS(unistd.h sys/mman.h fcntl.h malloc.h malloc/malloc.h)
 
 AC_CHECK_FUNCS(popen mmap sbrk random malloc_usable_size malloc_size)
 

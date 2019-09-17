@@ -3092,7 +3092,7 @@ the intersection matrix and genera of the exceptional curves on a surface
 obtained from resolving the A6 surface singularity. A separate tutorial,
 which introduces the complete functionality of the package and explains
 the rather complicated data structures appearing in intermediate results,
-can be found at @code{https://www.singular.uni-kl.de/tutor_resol.ps}.
+can be found at @url{https://www.singular.uni-kl.de/tutor_resol.ps}.
 
 @smallexample
 @c example
