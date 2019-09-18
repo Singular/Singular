@@ -11,7 +11,7 @@ int ilog2 (int a);
 int igcd (int a, int b);
 int ipower ( int b, int n );
 void factoryError_intern(const char *s);
-EXTERN_VAR void (*factoryError)(const char *s);
+THREAD_VAR extern void (*factoryError)(const char *s);
 /*ENDPUBLIC*/
 
 

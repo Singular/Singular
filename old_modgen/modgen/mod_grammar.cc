@@ -50,13 +50,13 @@
 #include "typmap.h"
 #include "stype.h"
 
-VAR int sectnum = 1;
-VAR int iseof = 0;
-VAR int initdone = 0;
-EXTERN_INST_VAR moddef module_def;
-EXTERN_VAR int yylineno;
-EXTERN_VAR int do_create_makefile;
-EXTERN_VAR char *sectname[];
+THREAD_VAR int sectnum = 1;
+THREAD_VAR int iseof = 0;
+THREAD_VAR int initdone = 0;
+THREAD_INST_VAR extern moddef module_def;
+THREAD_VAR extern int yylineno;
+THREAD_VAR extern int do_create_makefile;
+THREAD_VAR extern char *sectname[];
 
 extern int init_modgen(moddef *module_def, char *filename);
 extern int write_intro(moddefv module);
@@ -64,7 +64,7 @@ extern void write_mod_init(moddefv module, FILE *fp);
 extern void enter_id(FILE *fp, char *name, char *value,
                      int lineno, char *file);
 
-INST_VAR procdef procedure_decl;
+THREAD_INST_VAR procdef procedure_decl;
 
 
 void yyerror(char * fmt)
@@ -440,20 +440,20 @@ while (0)
 
 #ifndef YYPURE
 
-VAR int	yychar;			/*  the lookahead symbol		*/
-VAR YYSTYPE	yylval;			/*  the semantic value of the		*/
+THREAD_VAR int	yychar;			/*  the lookahead symbol		*/
+THREAD_VAR YYSTYPE	yylval;			/*  the semantic value of the		*/
 				/*  lookahead symbol			*/
 
 #ifdef YYLSP_NEEDED
-VAR YYLTYPE yylloc;			/*  location data for the lookahead	*/
+THREAD_VAR YYLTYPE yylloc;			/*  location data for the lookahead	*/
 				/*  symbol				*/
 #endif
 
-VAR int yynerrs;			/*  number of parse errors so far       */
+THREAD_VAR int yynerrs;			/*  number of parse errors so far       */
 #endif  /* not YYPURE */
 
 #if YYDEBUG != 0
-VAR int yydebug;			/*  nonzero means print parse trace	*/
+THREAD_VAR int yydebug;			/*  nonzero means print parse trace	*/
 /* Since this is uninitialized, it does not stop multiple parsers
    from coexisting.  */
 #endif
@@ -490,8 +490,8 @@ VAR int yydebug;			/*  nonzero means print parse trace	*/
 static void
 __yy_memcpy (to, from, count)
      char *to;
-     VAR char *from;
-     VAR unsigned int count;
+     THREAD_VAR char *from;
+     THREAD_VAR unsigned int count;
 {
   register char *f = from;
   register char *t = to;

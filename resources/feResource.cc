@@ -16,7 +16,7 @@
 #include <sys/param.h>
 
 
-VAR char* feArgv0 = NULL;
+THREAD_VAR char* feArgv0 = NULL;
 
 #ifdef AIX_4
 #ifndef HAVE_PUTENV
@@ -51,7 +51,7 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 // feCleanResource makes furthermore  the following transformations (except for URL resources)
 // 1.) '/' characters are replaced by respective directory - separators
 // 2.) ';' characters are replaced by respective path separators
-VAR feResourceConfig_s feResourceConfigs[] =
+THREAD_VAR feResourceConfig_s feResourceConfigs[] =
 {
   {"SearchPath",    's', feResPath,  NULL,
    "$SINGULARPATH;"

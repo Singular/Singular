@@ -2850,7 +2850,7 @@ void idDelEquals(ideal id)
   omFreeSize((ADDRESS)(id_sort), idsize*sizeof(poly_sort));
 }
 
-STATIC_VAR int * id_satstdSaturatingVariables=NULL;
+THREAD_VAR static int * id_satstdSaturatingVariables=NULL;
 
 static BOOLEAN id_sat_vars_sp(kStrategy strat)
 {

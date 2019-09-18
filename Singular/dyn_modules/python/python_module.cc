@@ -59,8 +59,8 @@ static BOOLEAN mod_python(leftv __res, leftv __h)
 //  )
 extern "C" int SI_MOD_INIT(python_module)(SModulFunctions* psModulFunctions)
 {
-  VAR char *py=getenv("PYTHONPATH");
-  VAR char buf[1024];
+  THREAD_VAR char *py=getenv("PYTHONPATH");
+  THREAD_VAR char buf[1024];
   if (py!=NULL)
   {
     strcpy(buf,py);

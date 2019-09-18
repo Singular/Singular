@@ -19,7 +19,7 @@
 #define INLINE_THIS inline
 #endif
 
-EXTERN_VAR omBin slists_bin;
+THREAD_VAR extern omBin slists_bin;
 class slists
 {
   public:

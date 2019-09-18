@@ -192,7 +192,7 @@ typedef struct
  *                       the same file )
  *
  *---------------------------------------------------------------------*/
-STATIC_VAR SArithBase sArithBase;  /**< Base entry for arithmetic */
+THREAD_VAR static SArithBase sArithBase;  /**< Base entry for arithmetic */
 
 /*---------------------------------------------------------------------*
  * Extern Functions declarations
@@ -208,12 +208,12 @@ static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op);
 static Subexpr jjMakeSub(leftv e);
 
 /*============= vars ======================*/
-EXTERN_VAR int cmdtok;
-EXTERN_VAR BOOLEAN expected_parms;
+THREAD_VAR extern int cmdtok;
+THREAD_VAR extern BOOLEAN expected_parms;
 
 #define ii_div_by_0 "div. by 0"
 
-VAR int iiOp; /* the current operation*/
+THREAD_VAR int iiOp; /* the current operation*/
 
 /*=================== simple helpers =================*/
 static int iin_Int(number &n,coeffs cf)
@@ -2009,7 +2009,7 @@ static BOOLEAN jjEXPORTTO(leftv, leftv u, leftv v)
 static BOOLEAN jjERROR(leftv, leftv u)
 {
   WerrorS((char *)u->Data());
-  EXTERN_VAR int inerror;
+  THREAD_VAR extern int inerror;
   inerror=3;
   return TRUE;
 }
@@ -2072,7 +2072,7 @@ static BOOLEAN jjEXTGCD_P(leftv res, leftv u, leftv v)
   L->m[2].rtyp=POLY_CMD;
   return FALSE;
 }
-EXTERN_VAR int singclap_factorize_retry;
+THREAD_VAR extern int singclap_factorize_retry;
 static BOOLEAN jjFAC_P2(leftv res, leftv u,leftv dummy)
 {
   intvec *v=NULL;
@@ -3287,7 +3287,7 @@ static BOOLEAN jjSIMPL_ID(leftv res, leftv u, leftv v)
   res->data = (char * )id;
   return FALSE;
 }
-EXTERN_VAR int singclap_factorize_retry;
+THREAD_VAR extern int singclap_factorize_retry;
 static BOOLEAN jjSQR_FREE2(leftv res, leftv u, leftv dummy)
 {
   intvec *v=NULL;
@@ -3750,7 +3750,7 @@ static BOOLEAN jjSetRing(leftv, leftv u)
     if (h==NULL)
     {
       char name_buffer[100];
-      STATIC_VAR int ending=1000000;
+      THREAD_VAR static int ending=1000000;
       ending++;
       sprintf(name_buffer, "PYTHON_RING_VAR%d",ending);
       h=enterid(name_buffer,0,RING_CMD,&IDROOT);
@@ -5529,7 +5529,7 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
   }
   return TRUE;
 }
-STATIC_VAR int WerrorS_dummy_cnt=0;
+THREAD_VAR static int WerrorS_dummy_cnt=0;
 static void WerrorS_dummy(const char *)
 {
   WerrorS_dummy_cnt++;
@@ -9296,7 +9296,7 @@ static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op)
 }
 
 typedef char si_char_2[2];
-STATIC_VAR si_char_2 Tok2Cmdname_buf=" ";
+THREAD_VAR static si_char_2 Tok2Cmdname_buf=" ";
 const char * Tok2Cmdname(int tok)
 {
   if (tok <= 0)

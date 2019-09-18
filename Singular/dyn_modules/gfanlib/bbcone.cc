@@ -22,7 +22,7 @@
 #include "bbfan.h"
 #include "bbpolytope.h"
 
-VAR int coneID;
+THREAD_VAR int coneID;
 
 std::string toString(const gfan::ZCone* const c)
 {

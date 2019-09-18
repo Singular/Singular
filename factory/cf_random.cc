@@ -51,7 +51,7 @@ RandomGenerator::generate()
     return s;
 }
 
-INST_VAR RandomGenerator ranGen;
+THREAD_INST_VAR RandomGenerator ranGen;
 
 CanonicalForm FFRandom::generate () const
 {

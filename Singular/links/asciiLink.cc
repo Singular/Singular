@@ -29,7 +29,7 @@ static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl);
 static BOOLEAN CollectLibs(char *name, char ***list_of_libs);
 //static BOOLEAN DumpLibs(FILE *fd, char ***list_of_libs);
 
-EXTERN_VAR si_link_extension si_link_root;
+THREAD_VAR extern si_link_extension si_link_root;
 
 /* =============== ASCII ============================================= */
 BOOLEAN slOpenAscii(si_link l, short flag, leftv /*h*/)

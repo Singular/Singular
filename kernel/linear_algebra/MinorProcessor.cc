@@ -16,21 +16,21 @@
 using namespace std;
 
 #ifdef COUNT_AND_PRINT_OPERATIONS
-VAR long addsPoly        = 0;    /* for the number of additions of two polynomials */
-VAR long multsPoly       = 0;    /* for the number of multiplications of two polynomials */
-VAR long addsPolyForDiv  = 0;    /* for the number of additions of two polynomials for
+THREAD_VAR long addsPoly        = 0;    /* for the number of additions of two polynomials */
+THREAD_VAR long multsPoly       = 0;    /* for the number of multiplications of two polynomials */
+THREAD_VAR long addsPolyForDiv  = 0;    /* for the number of additions of two polynomials for
                                 polynomial division part */
-VAR long multsPolyForDiv = 0;    /* for the number of multiplications of two polynomials
+THREAD_VAR long multsPolyForDiv = 0;    /* for the number of multiplications of two polynomials
                                 for polynomial division part */
-VAR long multsMon        = 0;    /* for the number of multiplications of two monomials */
-VAR long multsMonForDiv  = 0;    /* for the number of m-m-multiplications for polynomial
+THREAD_VAR long multsMon        = 0;    /* for the number of multiplications of two monomials */
+THREAD_VAR long multsMonForDiv  = 0;    /* for the number of m-m-multiplications for polynomial
                                 division part */
-VAR long savedMultsMFD   = 0;    /* number of m-m-multiplications that could be saved
+THREAD_VAR long savedMultsMFD   = 0;    /* number of m-m-multiplications that could be saved
                                 when polynomial division would be optimal
                                 (if p / t1 = t2 + ..., then t1 * t2 = LT(p), i.e.,
                                 this multiplication need not be performed which
                                 would save one m-m-multiplication) */
-VAR long divsMon         = 0;    /* for the number of divisions of two monomials;
+THREAD_VAR long divsMon         = 0;    /* for the number of divisions of two monomials;
                                 these are all guaranteed to work, i.e., m1/m2 only
                                 when exponentVector(m1) >= exponentVector(m2) */
 void printCounters (char* prefix, bool resetToZero)

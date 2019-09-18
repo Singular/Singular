@@ -59,11 +59,11 @@
  *   6.    finished
  */
 
-EXTERN_VAR FILE* yyin;
-EXTERN_VAR int   yylineno;
-EXTERN_VAR char *yytext;
+THREAD_VAR extern FILE* yyin;
+THREAD_VAR extern int   yylineno;
+THREAD_VAR extern char *yytext;
 
-INST_VAR moddef module_def;
+THREAD_INST_VAR moddef module_def;
 
 extern int iiInitArithmetic();
 int init_modgen(
@@ -73,11 +73,11 @@ int init_modgen(
 
 extern int yyparse (void);
 extern void init_type_conv();
-VAR int debug = 0;
-VAR int trace = 0;
-VAR int do_create_makefile = 1;
-VAR int do_create_srcdir = 1;
-VAR char* inst_dir = "${SINGULARROOT}/${SINGUNAME}";
+THREAD_VAR int debug = 0;
+THREAD_VAR int trace = 0;
+THREAD_VAR int do_create_makefile = 1;
+THREAD_VAR int do_create_srcdir = 1;
+THREAD_VAR char* inst_dir = "${SINGULARROOT}/${SINGUNAME}";
 
 #ifdef IRIX_6
 struct option
@@ -90,7 +90,7 @@ struct option
   int val;
 };
 #endif
-STATIC_VAR struct option long_options[] =
+THREAD_VAR static struct option long_options[] =
 {
   {"debug", 0, 0, 'd'},
   {"help", 0, 0, '?'},

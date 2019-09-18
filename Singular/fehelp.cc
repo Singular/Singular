@@ -68,8 +68,8 @@ static BOOLEAN heGenInit(int,int);    static void heGenHelp(heEntry hentry,int);
 static BOOLEAN heDummyInit(int,int);   static void heDummyHelp(heEntry hentry,int);
 static BOOLEAN heEmacsInit(int,int);   static void heEmacsHelp(heEntry hentry,int);
 
-STATIC_VAR heBrowser heCurrentHelpBrowser = NULL;
-STATIC_VAR int heCurrentHelpBrowserIndex= -1;
+THREAD_VAR static heBrowser heCurrentHelpBrowser = NULL;
+THREAD_VAR static int heCurrentHelpBrowserIndex= -1;
 
 
 /*****************************************************************
@@ -79,7 +79,7 @@ STATIC_VAR int heCurrentHelpBrowserIndex= -1;
  *****************************************************************/
 // order is important -- first possible help is chosen
 // moved to LIB/help.cnf
-STATIC_VAR heBrowser_s *heHelpBrowsers=NULL;
+THREAD_VAR static heBrowser_s *heHelpBrowsers=NULL;
 
 /*****************************************************************
  *
@@ -698,7 +698,7 @@ static BOOLEAN heOnlineHelp(char* s)
        ||
        ((fp=feFopen(str,"rb", libnamebuf))!=NULL)))
   {
-    EXTERN_VAR FILE *yylpin;
+    THREAD_VAR extern FILE *yylpin;
     lib_style_types lib_style; // = OLD_LIBSTYLE;
 
     yylpin = fp;
@@ -763,7 +763,7 @@ static long heKeyChksum(char* key)
  *
  *****************************************************************/
 
-STATIC_VAR BOOLEAN feHelpCalled = FALSE;
+THREAD_VAR static BOOLEAN feHelpCalled = FALSE;
 
 static void heBrowserHelp(heEntry hentry)
 {

@@ -57,11 +57,11 @@ extern int iiArithAddCmd(const char *szName, short nAlias, short nTokval,
 #ifdef HAVE_LIBPARSER
 void yylprestart (FILE *input_file );
 int current_pos(int i=0);
-EXTERN_VAR int yylp_errno;
-EXTERN_VAR int yylplineno;
+THREAD_VAR extern int yylp_errno;
+THREAD_VAR extern int yylplineno;
 extern const char *yylp_errlist[];
 void print_init();
-VAR libstackv library_stack;
+THREAD_VAR libstackv library_stack;
 #endif
 
 //int IsCmd(char *n, int tok);
@@ -452,9 +452,9 @@ BOOLEAN iiPStart(idhdl pn, leftv v)
   return err;
 }
 
-VAR ring    *iiLocalRing;
-INST_VAR sleftv  iiRETURNEXPR;
-VAR int     iiRETURNEXPR_len=0;
+THREAD_VAR ring    *iiLocalRing;
+THREAD_INST_VAR sleftv  iiRETURNEXPR;
+THREAD_VAR int     iiRETURNEXPR_len=0;
 
 #ifdef RDEBUG
 static void iiShowLevRings()
@@ -953,7 +953,7 @@ static void iiRunInit(package p)
 BOOLEAN iiLoadLIB(FILE *fp, const char *libnamebuf, const char*newlib,
              idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror)
 {
-  EXTERN_VAR FILE *yylpin;
+  THREAD_VAR extern FILE *yylpin;
   libstackv ls_start = library_stack;
   lib_style_types lib_style;
 
@@ -961,7 +961,7 @@ BOOLEAN iiLoadLIB(FILE *fp, const char *libnamebuf, const char*newlib,
   #if YYLPDEBUG > 1
   print_init();
   #endif
-  EXTERN_VAR int lpverbose;
+  THREAD_VAR extern int lpverbose;
   if (BVERBOSE(V_DEBUG_LIB)) lpverbose=1;
   else lpverbose=0;
   // yylplex sets also text_buffer

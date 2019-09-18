@@ -110,9 +110,9 @@ static inline char* slString(si_link l)
   }
 }
 
-EXTERN_VAR omBin s_si_link_extension_bin;
-EXTERN_VAR omBin sip_link_bin;
-EXTERN_VAR omBin ip_link_bin;
+THREAD_VAR extern omBin s_si_link_extension_bin;
+THREAD_VAR extern omBin sip_link_bin;
+THREAD_VAR extern omBin ip_link_bin;
 
 int slStatusSsiL(lists L, int timeout);
 int ssiBatch(const char *host, const char * port);
@@ -127,6 +127,6 @@ typedef struct
 
 typedef link_struct* link_list;
 
-EXTERN_VAR link_list ssiToBeClosed;
-EXTERN_VAR volatile BOOLEAN ssiToBeClosed_inactive;
+THREAD_VAR extern link_list ssiToBeClosed;
+THREAD_VAR extern volatile BOOLEAN ssiToBeClosed_inactive;
 #endif // SILINK_H

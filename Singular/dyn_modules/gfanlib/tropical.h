@@ -4,7 +4,7 @@
 #include "Singular/ipid.h"
 
 
-EXTERN_VAR int tropicalVerboseLevel;
+THREAD_VAR extern int tropicalVerboseLevel;
 
 
 gfan::ZCone maximalGroebnerCone(const ideal &I, const ring &r);

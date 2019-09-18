@@ -75,7 +75,7 @@ namespace CxxTest
         const char *_suiteName;
         List *_tests;
 
-        STATIC_INST_VAR List _suites;
+        THREAD_INST_VAR static List _suites;
         friend class RealWorldDescription;
     };
 

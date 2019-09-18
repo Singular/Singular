@@ -34,17 +34,17 @@ struct sindlist
 
 #define LEN_MON (sizeof(scfmon) + sizeof(int))
 
-EXTERN_VAR omBin indlist_bin;
+THREAD_VAR extern omBin indlist_bin;
 
-EXTERN_VAR scfmon hexist, hstc, hrad, hwork;
-EXTERN_VAR scmon hpure, hpur0;
-EXTERN_VAR varset hvar, hsel;
-EXTERN_VAR int hNexist, hNstc, hNrad, hNvar, hNpure;
-EXTERN_VAR monf stcmem, radmem;
-EXTERN_VAR int hisModule;
-EXTERN_VAR monf stcmem, radmem;
-EXTERN_VAR indset ISet, JSet;
-EXTERN_VAR int  hCo, hMu, hMu2;
+THREAD_VAR extern scfmon hexist, hstc, hrad, hwork;
+THREAD_VAR extern scmon hpure, hpur0;
+THREAD_VAR extern varset hvar, hsel;
+THREAD_VAR extern int hNexist, hNstc, hNrad, hNvar, hNpure;
+THREAD_VAR extern monf stcmem, radmem;
+THREAD_VAR extern int hisModule;
+THREAD_VAR extern monf stcmem, radmem;
+THREAD_VAR extern indset ISet, JSet;
+THREAD_VAR extern int  hCo, hMu, hMu2;
 
 
 void hDelete(scfmon ev, int ev_length);

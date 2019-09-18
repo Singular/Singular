@@ -82,7 +82,7 @@ namespace CxxTest
         TestTracker( const TestTracker & );
         TestTracker &operator=( const TestTracker & );
 
-        STATIC_VAR bool _created;
+        THREAD_VAR static bool _created;
         TestListener _dummyListener;
         DummyWorldDescription _dummyWorld;
         unsigned _warnings, _failedTests, _testFailedAsserts, _suiteFailedTests, _failedSuites;

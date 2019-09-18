@@ -73,6 +73,6 @@ void factoryError_intern(const char *s)
   fputs(s,stderr);
   abort();
 }
-VAR void (*factoryError)(const char *s) = factoryError_intern;
+THREAD_VAR void (*factoryError)(const char *s) = factoryError_intern;
 
 

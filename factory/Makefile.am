@@ -87,8 +87,7 @@ SOURCES = \
 		NTLconvert.cc \
 		singext.cc \
 		parseutil.cc \
-		ftmpl_inst.cc \
-		threadsupport.cc
+		ftmpl_inst.cc
 
 if WITH_PARSER_FOR_CANONICAL_FORM
     SOURCES +=  readcf.yy

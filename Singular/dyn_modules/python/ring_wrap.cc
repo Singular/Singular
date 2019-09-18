@@ -19,7 +19,7 @@ void ring_set(Ring & R)
     if (h==NULL)
     {
       char name_buffer[100];
-      STATIC_VAR int ending=0;
+      THREAD_VAR static int ending=0;
       ending++;
       sprintf(name_buffer, "PYTHON_RING_VAR%d",ending);
       h=enterid(name_buffer,0,RING_CMD,&IDROOT);

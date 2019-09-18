@@ -28,20 +28,20 @@
 
 #define pDeg(A) p_Deg(A,currRing)
 
-VAR int notInG              =   0;
-VAR int numberOfRules       =   0;
-VAR int reductionsToZero    =   0;
-VAR int reductionTime       =   0;
-VAR int spolsTime           =   0;
-VAR int highestDegree       =   0;
-VAR int degreeBound         =   0;
-VAR int numberUsefulPairs   =   0;
-VAR int numberUselessPairs  =   0;
-VAR int numberUsefulPairsMinDeg = 0;
-VAR int highestDegreeGBCriticalPair = 0;
-VAR int numberRejectedF5CriticalPairs = 0;
-VAR int numberOfReductions  = 0;
-VAR int numberOfSpolys  = 0;
+THREAD_VAR int notInG              =   0;
+THREAD_VAR int numberOfRules       =   0;
+THREAD_VAR int reductionsToZero    =   0;
+THREAD_VAR int reductionTime       =   0;
+THREAD_VAR int spolsTime           =   0;
+THREAD_VAR int highestDegree       =   0;
+THREAD_VAR int degreeBound         =   0;
+THREAD_VAR int numberUsefulPairs   =   0;
+THREAD_VAR int numberUselessPairs  =   0;
+THREAD_VAR int numberUsefulPairsMinDeg = 0;
+THREAD_VAR int highestDegreeGBCriticalPair = 0;
+THREAD_VAR int numberRejectedF5CriticalPairs = 0;
+THREAD_VAR int numberOfReductions  = 0;
+THREAD_VAR int numberOfSpolys  = 0;
 /*
 ====================================================================
 sorting ideals by decreasing total degree "left" and "right" are the
@@ -151,12 +151,12 @@ LList* F5inc(int i, poly f_i, LList* gPrev, LList* reducers, ideal gbPrev, poly 
     // computation of critical pairs with checking of criterion 1 and criterion 2 and saving them
     // in the list critPairs
     criticalPair(gPrev, critPairs, lTag, rTag, rules, rejectedGBList, plus);
-    STATIC_VAR LList* sPolyList        =   new LList();
+    THREAD_VAR static LList* sPolyList        =   new LList();
     //sPolyList->print();
     // labeled polynomials which have passed reduction() and have to be added to list gPrev
-    STATIC_VAR LList* completed        =   new LList();
+    THREAD_VAR static LList* completed        =   new LList();
     // the reduced labeled polynomials which are returned from subalgorithm reduction()
-    STATIC_VAR LList* reducedLPolys     =   new LList();
+    THREAD_VAR static LList* reducedLPolys     =   new LList();
     // while there are critical pairs to be further checked and deleted/computed
     while(NULL != critPairs->getFirst()) {
         // critPairs->getMinDeg() deletes the first elements of minimal degree from

@@ -35,7 +35,7 @@ public:
 }
 ;
 
-STATIC_VAR omBin sBucket_bin = omGetSpecBin(sizeof(sBucket));
+THREAD_VAR static omBin sBucket_bin = omGetSpecBin(sizeof(sBucket));
 
 
 //////////////////////////////////////////////////////////////////////////

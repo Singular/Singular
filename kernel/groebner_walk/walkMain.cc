@@ -34,7 +34,7 @@
 ///////////////////////////////////////////////////////////////////
 
 
-VAR int overflow_error; //global variable
+THREAD_VAR int overflow_error; //global variable
 
 /*
 overflow_error table

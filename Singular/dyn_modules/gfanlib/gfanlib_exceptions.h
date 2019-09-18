@@ -11,7 +11,7 @@ class weightOverflowException: public std::exception
   }
 };
 
-EXTERN_INST_VAR weightOverflowException weightOverflow;
+THREAD_INST_VAR extern weightOverflowException weightOverflow;
 
 class exponentOverflowException: public std::exception
 {
@@ -21,6 +21,6 @@ class exponentOverflowException: public std::exception
   }
 };
 
-EXTERN_INST_VAR exponentOverflowException exponentOverflow;
+THREAD_INST_VAR extern exponentOverflowException exponentOverflow;
 
 #endif

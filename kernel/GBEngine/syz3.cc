@@ -45,8 +45,8 @@
 #define USE_REGULARITY
 #define WITH_SORT
 //#define FULL_TOTAKE
-VAR int discard_pairs;
-VAR int short_pairs;
+THREAD_VAR int discard_pairs;
+THREAD_VAR int short_pairs;
 
 /*3
 * assumes the ideals old_ideal and new_ideal to be homogeneous

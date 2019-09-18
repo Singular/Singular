@@ -4,7 +4,7 @@
 
 #ifndef _TYPMAP_H
 #define _TYPMAP_H
-VAR char type_conv[MAX_TOK][32];
+THREAD_VAR char type_conv[MAX_TOK][32];
 
 void init_type_conv()
 {

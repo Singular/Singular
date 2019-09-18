@@ -41,9 +41,9 @@
 #include <iostream>
 #endif
 
-STATIC_VAR int  **Qpol;
-STATIC_VAR int  *Q0, *Ql;
-STATIC_VAR int  hLength;
+THREAD_VAR static int  **Qpol;
+THREAD_VAR static int  *Q0, *Ql;
+THREAD_VAR static int  hLength;
 
 
 static int hMinModulweight(intvec *modulweight)

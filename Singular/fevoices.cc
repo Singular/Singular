@@ -28,8 +28,8 @@
 /*0 implementation */
 
 
-VAR char fe_promptstr[] ="  ";
-VAR FILE *File_Profiling=NULL;
+THREAD_VAR char fe_promptstr[] ="  ";
+THREAD_VAR FILE *File_Profiling=NULL;
 
 // line buffer for reading:
 // minimal value for MAX_FILE_BUFFER: 4*4096 - see Tst/Long/gcd0_l.tst
@@ -40,11 +40,11 @@ VAR FILE *File_Profiling=NULL;
 * handling of 'voices'
 **************************************************************************/
 
-EXTERN_VAR int blocknest; /* scaner.l internal */
+THREAD_VAR extern int blocknest; /* scaner.l internal */
 
-VAR int    yy_noeof=0;     // the scanner "state"
-VAR int    yy_blocklineno; // to get the lineno of the block start from scanner
-VAR Voice  *currentVoice = NULL;
+THREAD_VAR int    yy_noeof=0;     // the scanner "state"
+THREAD_VAR int    yy_blocklineno; // to get the lineno of the block start from scanner
+THREAD_VAR Voice  *currentVoice = NULL;
 // FILE   *feFilePending; /*temp. storage for grammar.y */
 
 //static const char * BT_name[]={"BT_none","BT_break","BT_proc","BT_example",

@@ -36,13 +36,13 @@
 // #endif
 // #endif
 
-VAR omBin s_si_link_extension_bin = omGetSpecBin(sizeof(s_si_link_extension));
-VAR omBin sip_link_bin = omGetSpecBin(sizeof(sip_link));
-VAR omBin ip_link_bin = omGetSpecBin(sizeof(ip_link));
+THREAD_VAR omBin s_si_link_extension_bin = omGetSpecBin(sizeof(s_si_link_extension));
+THREAD_VAR omBin sip_link_bin = omGetSpecBin(sizeof(sip_link));
+THREAD_VAR omBin ip_link_bin = omGetSpecBin(sizeof(ip_link));
 
 /* ====================================================================== */
 static si_link_extension slTypeInit(si_link_extension s, const char* type);
-VAR si_link_extension si_link_root=NULL;
+THREAD_VAR si_link_extension si_link_root=NULL;
 
 BOOLEAN slInit(si_link l, char *istr)
 {

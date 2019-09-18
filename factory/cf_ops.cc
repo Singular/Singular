@@ -40,7 +40,7 @@
  * replacevar_between().
  *
 **/
-STATIC_INST_VAR Variable sv_x1, sv_x2;
+THREAD_INST_VAR static Variable sv_x1, sv_x2;
 
 /** static void swapvar_between ( const CanonicalForm & f, CanonicalForm & result, const CanonicalForm & term, int expx2 )
  *

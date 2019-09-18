@@ -21,7 +21,7 @@
 #include "Singular/ipshell.h"
 #include "Singular/attrib.h"
 
-STATIC_VAR omBin sattr_bin = omGetSpecBin(sizeof(sattr));
+THREAD_VAR static omBin sattr_bin = omGetSpecBin(sizeof(sattr));
 
 void sattr::Print()
 {

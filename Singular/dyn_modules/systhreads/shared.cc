@@ -227,7 +227,7 @@ Lock global_objects_lock;
 SharedObjectTable global_objects;
 Lock master_lock(true);
 Lock name_lock(true);
-VAR long thread_id;
+THREAD_VAR long thread_id;
 long thread_counter;
 
 int type_region;
@@ -1626,8 +1626,8 @@ struct SchedInfo {
   int num;
 };
 
-STATIC_VAR ThreadPool *currentThreadPoolRef;
-STATIC_VAR Job *currentJobRef;
+THREAD_VAR static ThreadPool *currentThreadPoolRef;
+THREAD_VAR static Job *currentJobRef;
 
 class ThreadPool : public SharedObject {
 public:

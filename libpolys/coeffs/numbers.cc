@@ -39,13 +39,13 @@
 
 
 #ifdef HAVE_NUMSTATS
-VAR struct SNumberStatistic number_stats;
+THREAD_VAR struct SNumberStatistic number_stats;
 #endif /* HAVE_NUMSTATS */
 
 //static int characteristic = 0;
 //extern int IsPrime(int p);
 
-VAR n_Procs_s *cf_root=NULL;
+THREAD_VAR n_Procs_s *cf_root=NULL;
 
 void   nNew(number* d) { *d=NULL; }
 
@@ -59,7 +59,7 @@ static char* ndCoeffString(const coeffs r)
 }
 static char* ndCoeffName(const coeffs r)
 {
-  STATIC_VAR char s[20];
+  THREAD_VAR static char s[20];
   snprintf(s,11,"Coeffs(%d)",r->type);
   return s;
 }
@@ -310,8 +310,8 @@ static number ndQuotRem (number a, number b, number * r, const coeffs R)
   *r=n_Init(0,R);
   return n_Div(a,b,R);
 }
-STATIC_VAR n_coeffType nLastCoeffs=n_CF;
-VAR cfInitCharProc nInitCharTableDefault[]=
+THREAD_VAR static n_coeffType nLastCoeffs=n_CF;
+THREAD_VAR cfInitCharProc nInitCharTableDefault[]=
 { NULL,        /*n_unknown */
  npInitChar,   /* n_Zp */
  nlInitChar,   /* n_Q */
@@ -343,7 +343,7 @@ VAR cfInitCharProc nInitCharTableDefault[]=
  NULL         /* n_CF */
 };
 
-STATIC_VAR cfInitCharProc *nInitCharTable=nInitCharTableDefault;
+THREAD_VAR static cfInitCharProc *nInitCharTable=nInitCharTableDefault;
 /*2
 * init operations for coeffs r
 */
@@ -576,7 +576,7 @@ struct nFindCoeffByName_s
   nFindCoeffByName_p next;
 };
 
-VAR nFindCoeffByName_p nFindCoeffByName_Root=NULL;
+THREAD_VAR nFindCoeffByName_p nFindCoeffByName_Root=NULL;
 void nRegisterCfByName(cfInitCfByNameProc p,n_coeffType n)
 {
   nFindCoeffByName_p h=(nFindCoeffByName_p)omAlloc0(sizeof(*h));

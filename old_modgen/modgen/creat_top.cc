@@ -12,8 +12,8 @@
 #include <unistd.h>
 
 
-EXTERN_VAR int yylineno;
-EXTERN_VAR int do_create_srcdir;
+THREAD_VAR extern int yylineno;
+THREAD_VAR extern int do_create_srcdir;
 
 void enter_id(FILE *fp, char *name, char *value);
 /*========================================================================*/

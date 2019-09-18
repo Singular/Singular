@@ -15,7 +15,7 @@
 #include "polys/monomials/ring.h"
 #include "polys/monomials/p_polys.h"
 
-EXTERN_VAR ring currRing;
+THREAD_VAR extern ring currRing;
 void rChangeCurrRing(ring r);
 
 #include "coeffs/numbers.h"

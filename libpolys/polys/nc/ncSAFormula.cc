@@ -119,7 +119,7 @@ static inline BOOLEAN AreCommutingVariables(const ring r, int i, int j/*, number
       return FALSE;
   }
 
-  return TRUE; // [VAR(I), VAR(J)] = 0!!
+  return TRUE; // [THREAD_VAR(I), THREAD_VAR(J)] = 0!!
 
 /*
   if (reverse)

@@ -16,8 +16,8 @@
 #endif
 /*#define DEBUG 1*/
 
-STATIC_VAR char default_do_typecheck = 1;
-STATIC_VAR char default_do_return = 1;
+THREAD_VAR static char default_do_typecheck = 1;
+THREAD_VAR static char default_do_return = 1;
 
 /*========================================================================*/
 int init_proc(
@@ -209,7 +209,7 @@ void proc_set_var(
 }
 
 /*========================================================================*/
-VAR char *ReservedVarnames[] = {
+THREAD_VAR char *ReservedVarnames[] = {
   "__v",
   "__h"
   "__res",

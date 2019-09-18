@@ -12,9 +12,9 @@
 #ifdef HAVE_SDB
 #include "kernel/structs.h"
 
-EXTERN_VAR int    sdb_lines[];
-EXTERN_VAR char * sdb_files[];
-EXTERN_VAR int    sdb_flags;
+THREAD_VAR extern int    sdb_lines[];
+THREAD_VAR extern char * sdb_files[];
+THREAD_VAR extern int    sdb_flags;
 
 void sdb_edit(procinfo *pi);
 void sdb_show_bp();

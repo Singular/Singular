@@ -43,7 +43,7 @@
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
 
-VAR long fac_NTL_char = -1;         // the current characterstic for NTL calls
+THREAD_VAR long fac_NTL_char = -1;         // the current characterstic for NTL calls
                                 // -1: undefined
 #ifdef NTL_CLIENT               // in <NTL/tools.h>: using of name space NTL
 NTL_CLIENT
@@ -476,8 +476,8 @@ CFFList convertNTLvec_pair_GF2X_long2FacCFFList
   return result;
 }
 
-STATIC_VAR unsigned char *cf_stringtemp;
-STATIC_VAR unsigned long cf_stringtemp_l=0L;
+THREAD_VAR static unsigned char *cf_stringtemp;
+THREAD_VAR static unsigned long cf_stringtemp_l=0L;
 ////////////////////////////////////////////////////////////////////////////////
 /// NAME: convertZZ2CF
 ///

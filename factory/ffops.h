@@ -27,10 +27,10 @@
 #endif
 #endif
 
-EXTERN_VAR int ff_prime;
-EXTERN_VAR int ff_halfprime;
-EXTERN_VAR short * ff_invtab;
-EXTERN_VAR bool ff_big;
+THREAD_VAR extern int ff_prime;
+THREAD_VAR extern int ff_halfprime;
+THREAD_VAR extern short * ff_invtab;
+THREAD_VAR extern bool ff_big;
 
 int ff_newinv ( const int );
 int ff_biginv ( const int );

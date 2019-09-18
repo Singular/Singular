@@ -38,8 +38,8 @@
  * somethings goes wrong
  *
  *****************************************************************************/
-STATIC_VAR BOOLEAN warn_handle = FALSE;
-STATIC_VAR BOOLEAN warn_proc = FALSE;
+THREAD_VAR static BOOLEAN warn_handle = FALSE;
+THREAD_VAR static BOOLEAN warn_proc = FALSE;
 #ifndef DL_TAIL
 #define DL_TAIL ".so"
 //#define DL_TAIL "_g.so"
@@ -134,7 +134,7 @@ extern "C" {
 #include <dlfcn.h>
 #define DL_IMPLEMENTED
 
-STATIC_VAR void* kernel_handle = NULL;
+THREAD_VAR static void* kernel_handle = NULL;
 int dynl_check_opened(
   char *filename    /* I: filename to check */
   )
@@ -234,7 +234,7 @@ int dynl_close (void *handle)
 
 const char *dynl_error()
 {
-  STATIC_VAR char errmsg[] = "shl_load failed";
+  THREAD_VAR static char errmsg[] = "shl_load failed";
 
   return errmsg;
 }
@@ -267,7 +267,7 @@ int dynl_close (void *handle)
 
 const char *dynl_error()
 {
-  STATIC_VAR char errmsg[] = "support for dynamic loading not implemented";
+  THREAD_VAR static char errmsg[] = "support for dynamic loading not implemented";
   return errmsg;
 }
 #endif

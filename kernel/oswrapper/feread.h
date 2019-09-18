@@ -9,7 +9,7 @@
 
 #include "kernel/structs.h"
 
-EXTERN_VAR char    prompt_char; /*1 either '>' or '.'*/
+THREAD_VAR extern char    prompt_char; /*1 either '>' or '.'*/
 
 #ifdef __cplusplus
 

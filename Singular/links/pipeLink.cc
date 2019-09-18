@@ -133,7 +133,7 @@ LINKAGE leftv pipeRead1(si_link l)
   return res;
 }
 //**************************************************************************/
-EXTERN_VAR si_link pipeLastLink;
+THREAD_VAR extern si_link pipeLastLink;
 LINKAGE BOOLEAN pipeWrite(si_link l, leftv data)
 {
   if(!SI_LINK_W_OPEN_P(l)) slOpen(l,SI_LINK_OPEN|SI_LINK_WRITE,NULL);

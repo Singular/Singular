@@ -146,7 +146,7 @@ findEvaluation ( const CanonicalForm & U, const CanonicalForm & V, const Canonic
 }
 
 #ifdef HAVE_NTL
-VAR int prime_number=0;
+THREAD_VAR int prime_number=0;
 void find_good_prime(const CanonicalForm &f, int &start)
 {
   if (! f.inBaseDomain() )

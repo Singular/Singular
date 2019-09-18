@@ -21,7 +21,7 @@
 
 #include <string.h>
 
-VAR omBin gmp_nrz_bin = omGetSpecBin(sizeof(mpz_t));
+THREAD_VAR omBin gmp_nrz_bin = omGetSpecBin(sizeof(mpz_t));
 
 static void nrzCoeffWrite  (const coeffs, BOOLEAN /*details*/)
 {

@@ -12,8 +12,8 @@
 #include "Singular/grammar.h"
 #endif
 
-EXTERN_VAR int      yylineno;
-EXTERN_VAR char     my_yylinebuf[80];
+THREAD_VAR extern int      yylineno;
+THREAD_VAR extern char     my_yylinebuf[80];
 
 #if defined(__cplusplus)
 extern int  yyparse(void);

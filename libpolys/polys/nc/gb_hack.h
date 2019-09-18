@@ -6,8 +6,8 @@
 #ifdef PLURAL_INTERNAL_DECLARATIONS
 #include "polys/nc/nc.h"
 
-EXTERN_VAR NF_Proc nc_NF;
-EXTERN_VAR BBA_Proc gnc_gr_bba, gnc_gr_mora, sca_bba, sca_mora, sca_gr_bba;
+THREAD_VAR extern NF_Proc nc_NF;
+THREAD_VAR extern BBA_Proc gnc_gr_bba, gnc_gr_mora, sca_bba, sca_mora, sca_gr_bba;
 
 /* the realiziation of the routines above in libkernel:*/
 ideal k_gnc_gr_bba(const ideal, const ideal, const intvec *, const intvec *, kStrategy, const ring _currRing);

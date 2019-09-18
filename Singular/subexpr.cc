@@ -37,15 +37,15 @@
 
 #include <ctype.h>
 
-VAR omBin sSubexpr_bin = omGetSpecBin(sizeof(_ssubexpr));
-VAR omBin sleftv_bin = omGetSpecBin(sizeof(sleftv));
-VAR omBin procinfo_bin = omGetSpecBin(sizeof(procinfo));
-VAR omBin libstack_bin = omGetSpecBin(sizeof(libstack));
-STATIC_VAR omBin size_two_bin = omGetSpecBin(2);
+THREAD_VAR omBin sSubexpr_bin = omGetSpecBin(sizeof(_ssubexpr));
+THREAD_VAR omBin sleftv_bin = omGetSpecBin(sizeof(sleftv));
+THREAD_VAR omBin procinfo_bin = omGetSpecBin(sizeof(procinfo));
+THREAD_VAR omBin libstack_bin = omGetSpecBin(sizeof(libstack));
+THREAD_VAR static omBin size_two_bin = omGetSpecBin(2);
 
-INST_VAR sleftv     sLastPrinted;
+THREAD_INST_VAR sleftv     sLastPrinted;
 #ifdef SIQ
-VAR BOOLEAN siq=FALSE;
+THREAD_VAR BOOLEAN siq=FALSE;
 #endif
 
 int sleftv::listLength()
@@ -1170,8 +1170,8 @@ int  sleftv::LTyp()
 }
 
 #ifdef SINGULAR_4_2
-STATIC_VAR snumber2 iiNumber2Data[4];
-STATIC_VAR int iiCmatrix_index=0;
+THREAD_VAR static snumber2 iiNumber2Data[4];
+THREAD_VAR static int iiCmatrix_index=0;
 #endif
 void * sleftv::Data()
 {

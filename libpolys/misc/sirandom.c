@@ -27,7 +27,7 @@
 #define  R         2836        /*  M % A                  */
 
 
-VAR int siSeed = 1;
+THREAD_VAR int siSeed = 1;
 
 int siRandNext(int r)
 {

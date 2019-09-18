@@ -222,7 +222,7 @@ public:
 
   static idhdl newid(leftv head, idhdl* root) {
 
-    STATIC_VAR unsigned int counter = 0;
+    THREAD_VAR static unsigned int counter = 0;
     char* name = (char*) omAlloc0(512);
     sprintf(name, " :%u:%p:_shared_: ", ++counter, head->data);
     if ((*root) == NULL )

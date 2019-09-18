@@ -73,7 +73,7 @@ struct _ssubexpr
 
 typedef struct _ssubexpr *Subexpr;
 
-EXTERN_VAR BOOLEAN siq;
+THREAD_VAR extern BOOLEAN siq;
 
 class sleftv;
 typedef sleftv * leftv;
@@ -140,7 +140,7 @@ class sleftv
 };
 
 inline BOOLEAN RingDependend(int t) { return (BEGIN_RING<t)&&(t<END_RING); }
-EXTERN_INST_VAR sleftv sLastPrinted;
+THREAD_INST_VAR extern sleftv sLastPrinted;
 
 void syMake(leftv v,const char * name, package pa = NULL);
 void syMakeMonom(leftv v,const char * name);
@@ -171,9 +171,9 @@ class libstack
 };
 #endif /* HAVE_LIBPARSER */
 
-EXTERN_VAR omBin sSubexpr_bin;
-EXTERN_VAR omBin procinfo_bin;
-EXTERN_VAR omBin libstack_bin;
+THREAD_VAR extern omBin sSubexpr_bin;
+THREAD_VAR extern omBin procinfo_bin;
+THREAD_VAR extern omBin libstack_bin;
 
 void s_internalDelete(const int t,  void *d, const ring r);
 

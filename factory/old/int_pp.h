@@ -26,11 +26,11 @@ class InternalPrimePower : public InternalCF
 {
 private:
     mpz_t thempi;
-    STATIC_VAR bool initialized;
-    STATIC_VAR int prime;
-    STATIC_VAR int exp;
-    STATIC_VAR mpz_t primepow;
-    STATIC_VAR mpz_t primepowhalf;
+    THREAD_VAR static bool initialized;
+    THREAD_VAR static int prime;
+    THREAD_VAR static int exp;
+    THREAD_VAR static mpz_t primepow;
+    THREAD_VAR static mpz_t primepowhalf;
     static void initialize();
     static mpz_ptr MPI( const InternalCF * const c );
 public:

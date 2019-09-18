@@ -63,12 +63,12 @@ static ideal BBA_Proc_Dummy (const ideal, const ideal, const intvec *, const int
 
 // the following funtion poiters are quasi-static:
 // they will be set in siInit and never changes afterwards:
-VAR NF_Proc nc_NF=NF_Proc_Dummy;
-VAR BBA_Proc gnc_gr_bba=BBA_Proc_Dummy;
-VAR BBA_Proc gnc_gr_mora=BBA_Proc_Dummy;
-VAR BBA_Proc sca_bba=BBA_Proc_Dummy;
-VAR BBA_Proc sca_mora=BBA_Proc_Dummy;
-VAR BBA_Proc sca_gr_bba=BBA_Proc_Dummy;
+THREAD_VAR NF_Proc nc_NF=NF_Proc_Dummy;
+THREAD_VAR BBA_Proc gnc_gr_bba=BBA_Proc_Dummy;
+THREAD_VAR BBA_Proc gnc_gr_mora=BBA_Proc_Dummy;
+THREAD_VAR BBA_Proc sca_bba=BBA_Proc_Dummy;
+THREAD_VAR BBA_Proc sca_mora=BBA_Proc_Dummy;
+THREAD_VAR BBA_Proc sca_gr_bba=BBA_Proc_Dummy;
 
 /* copy : */
 poly nc_p_CopyGet(poly a, const ring r);
@@ -77,7 +77,7 @@ poly nc_p_CopyPut(poly a, const ring r);
 poly nc_p_Bracket_qq(poly p, const poly q, const ring r);
 
 // only SCA can be used by default, formulas are off by default
-VAR int  iNCExtensions = SCAMASK | NOFORMULAMASK;
+THREAD_VAR int  iNCExtensions = SCAMASK | NOFORMULAMASK;
 
 int& getNCExtensions()
 {

@@ -10,7 +10,7 @@
 
 /// Widely used global variable which specifies the current polynomial ring for Singular interpreter and legacy implementatins.
 /// @Note: one should avoid using it in newer designs, for example due to possible problems in parallelization with threads.
-VAR ring  currRing = NULL;
+THREAD_VAR ring  currRing = NULL;
 
 void rChangeCurrRing(ring r)
 {
