@@ -13,7 +13,11 @@
 #include <string.h>
 #include "omalloc/omConfig.h"
 #if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
-#include <malloc.h>
+  #ifdef HAVE_MALLOC_H
+  #include <malloc.h>
+  #elif defined(HAVE_MALLOC_MALLOC_H)
+  #include <malloc/malloc.h>
+  #endif
 #endif
 #ifdef __cplusplus
 extern "C" {

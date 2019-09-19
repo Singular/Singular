@@ -773,8 +773,7 @@ static proc victors_genericity(matrix M)
   NM = simplify(NM,4); // delete identical
   string newvars = parstr(basering);
   def save = basering;
-  string NewRing = "ring @NR =" +string(char(basering))+",("+newvars+"),Dp;";
-  execute(NewRing);
+  ring @NR = create_ring("string(char(basering))", "("+newvars+")", "Dp");
   // get params as variables
   // create a list of non-monomials
   ideal @L;
@@ -837,8 +836,7 @@ static proc evas_genericity(matrix M)
   Den = simplify(Den,2+4);
   string newvars = parstr(basering);
   def save = basering;
-  string NewRing = "ring @NR =(" +string(char(basering))+"),("+newvars+"),Dp;";
-  execute(NewRing);
+  ring @NR = create_ring("("+string(char(basering))+")", "("+newvars+")", "Dp");
   ideal F;
   ideal Den = imap(save,Den);
   Den = simplify(Den,2);
