@@ -583,16 +583,13 @@ void ttGen2b()
 
   fprintf(
     outfile,
-    "#ifdef MODULE_GENERATOR\n"
-    "#define omAlloc0(A) malloc(A)\n"
-    "#endif\n"
     "void iiInitCmdName()\n{\n"
     "  sArithBase.nCmdUsed      = 0;\n"
     "  sArithBase.nCmdAllocated = %d;\n"
-    "  sArithBase.sCmds = (cmdnames*)omAlloc0(sArithBase.nCmdAllocated*sizeof(cmdnames));\n"
+    "  sArithBase.sCmds = (cmdnames*)omAlloc0(%d/*sArithBase.nCmdAllocated*/ *sizeof(cmdnames));\n"
     "\n"
     "  // name-string                   alias  tokval toktype index\n",
-    cmd_size);
+    cmd_size,cmd_size);
   int m=0;
   int id_nr=0;
 
