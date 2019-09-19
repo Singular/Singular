@@ -286,7 +286,7 @@ EXAMPLE: example PrimdecB; shows an example
       module @N=std(imap(BAS,@N));
                                   // this is also a standard basis in (R[U])[A]
       @A[size(@A)]=")";
-      execute("ring Rloc=("+charstr(basering)+","+@U+",("+@A+",(C,dp);");
+      ring Rloc = create_ring("("+charstr(basering)+","+@U, "("+@A, "(C,dp)");
       module @N=imap(RAU,@N);
       ideal @h;
       for(@j=ncols(@N);@j>=1;@j--)
@@ -672,7 +672,7 @@ EXAMPLE: example GTZmod; shows an example
   ring RAU = create_ring(ringlist(basering)[1],"("+@A+@U,"(C,dp("+string(szA)+"),dp)","no_minpoly");
   module @N=std(imap(BAS,@N));  // this is also a standard basis in (R[U])[A]
   @A[size(@A)]=")";
-  execute("ring Rloc=("+charstr(basering)+","+@U+",("+@A+",(C,dp);");
+  ring Rloc = create_ring("("+charstr(basering)+","+@U, "("+@A, "(C,dp)");
   module @N=imap(RAU,@N);
   kill RAU;
 

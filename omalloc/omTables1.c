@@ -62,64 +62,6 @@ size_t om_BinSize [SIZEOF_OM_BIN_PAGE / MIN_BIN_BLOCKS] =
 
 #endif /* OM_ALIGN_8 */
 
-void OutputSize2Bin(size_t *binSize, size_t max_block_size, int track)
-{
-  long i, j;
-  printf("omBin om_Size2%sBin[/*%ld*/] = {\n",
-         (track? "Track" : ""), (long)(max_block_size / SIZEOF_OM_ALIGNMENT));
-  i=0;
-  j=SIZEOF_OM_ALIGNMENT;
-  while (j < max_block_size)
-  {
-    printf("&om_Static%sBin[%ld], /* %ld */ \n", (track? "Track" : ""), i, j);
-    if (binSize[i] == j) i++;
-    j += SIZEOF_OM_ALIGNMENT;
-  }
-  printf("&om_Static%sBin[%ld] /* %ld */};\n\n", (track? "Track" : ""), i, j);
-}
-
-void OutputSize2AlignedBin(size_t *binSize, size_t max_block_size, int track)
-{
-  long i, j;
-  if (OM_MAX_BLOCK_SIZE % 8 != 0)
-  {
-    fprintf(stderr, "OM_MAX_BLOCK_SIZE == %d not divisible by 8\n", OM_MAX_BLOCK_SIZE);fflush(stdout);
-    _exit(1);
-  }
-  printf("omBin om_Size2%sBin[/*%ld*/] = {\n",
-         (track ? "Track" : "Aligned"), (long)(max_block_size / SIZEOF_OM_ALIGNMENT));
-  i=0;
-  while (binSize[i] % SIZEOF_STRICT_ALIGNMENT != 0) i++;
-  j=SIZEOF_OM_ALIGNMENT;
-  while (j < max_block_size)
-  {
-    printf("&om_Static%sBin[%ld], /* %ld */ \n", (track ? "Track" : ""), i, j);
-    if (binSize[i] == j)
-    {
-      i++;
-      while (binSize[i] % SIZEOF_STRICT_ALIGNMENT != 0) i++;
-    }
-    j += SIZEOF_OM_ALIGNMENT;
-  }
-  printf("&om_Static%sBin[%ld] /* %ld */};\n\n", (track ? "Track" : ""), i, j);
-}
-
-void OutputStaticBin(size_t *binSize, int max_bin_index, int track)
-{
-  long i;
-  printf("omBin_t om_Static%sBin[/*%d*/] = {\n", (track ? "Track" : ""), max_bin_index+1);
-
-  for (i=0;  i< max_bin_index; i++)
-  {
-    printf("{om_ZeroPage, NULL, NULL, %ld, %ld, 0},\n",
-           (long)(binSize[i] / SIZEOF_LONG),
-           (long)(SIZEOF_OM_BIN_PAGE/binSize[i]));
-  }
-  printf("{om_ZeroPage, NULL, NULL, %ld, %ld, 0}\n};\n\n",
-         (long)(binSize[i] / SIZEOF_LONG),
-         (long)(SIZEOF_OM_BIN_PAGE/binSize[i]));
-}
-
 int GetMaxBlockThreshold()
 {
   int i;
@@ -174,33 +116,17 @@ int main(int argc, char* argv[])
     max_bin_index++;
     if (om_BinSize[max_bin_index] == OM_MAX_BLOCK_SIZE) break;
   }
-
+  {
+    /* output what goes into omTables.h */
   printf(
-"#ifndef OM_TABLES_INC\n"
-"#define OM_TABLES_INC\n"
-);
-
-  /* Output om_StaticBin */
-  OutputStaticBin(om_BinSize, max_bin_index, 0);
-  /* Output om_Size2Bin */
-  OutputSize2Bin(om_BinSize, OM_MAX_BLOCK_SIZE, 0);
-
-#ifdef OM_ALIGNMENT_NEEDS_WORK
-  OutputSize2AlignedBin(om_BinSize, OM_MAX_BLOCK_SIZE, 0);
-#endif
-
-  printf("\n#ifdef OM_HAVE_TRACK\n");
-  /* Output om_StaticBin */
-  OutputStaticBin(om_BinSize, max_bin_index, 1);
-  /* Output om_Size2Bin */
-#ifdef OM_ALIGNMENT_NEEDS_WORK
-  OutputSize2AlignedBin(om_BinSize, OM_MAX_BLOCK_SIZE, 1);
-#else
-  OutputSize2Bin(om_BinSize, OM_MAX_BLOCK_SIZE, 1);
-#endif
-  printf("\n#endif /* OM_HAVE_TRACK */\n");
-
-  printf("\n#endif /* OM_TABLES_INC */\n");
+"#ifndef OM_TABLES_H\n"
+"#define OM_TABLES_H\n"
+"#define OM_MAX_BLOCK_SIZE %d\n"
+"#define OM_MAX_BIN_INDEX %d\n"
+"#define OM_SIZEOF_UNIQUE_MAX_BLOCK_THRESHOLD %d\n"
+"#endif /* OM_TABLES_H */\n"
+,  OM_MAX_BLOCK_SIZE, max_bin_index, GetMaxBlockThreshold());
   return 0;
+  }
 }
 #endif /* MH_TABLES_C */
