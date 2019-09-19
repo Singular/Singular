@@ -146,7 +146,7 @@ nobase_libSingular_include_HEADERS = $(SingularHEADERS)
 
 noinst_PROGRAMS = gentable1 feOptGen feOptES feOptTS
 
-gentable1_SOURCES = gentable.cc grammar.h tok.h table.h
+gentable1_SOURCES = gentable.c grammar.h tok.h table.h
 gentable1_CPPFLAGS = ${AM_CPPFLAGS}
 
 feOptGen_SOURCES = feOptGen.cc feOptGen.h

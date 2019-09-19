@@ -973,7 +973,7 @@ void ttGen4()
 }
 /*-------------------------------------------------------------------*/
 
-int main(int argc, char**)
+int main(int argc, char** argv)
 {
   if (argc>1)
   {
