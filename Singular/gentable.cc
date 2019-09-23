@@ -25,7 +25,7 @@
   #define ZERODIVISOR_MASK 0
 #endif
 
-inline int RingDependend(int t) { return (BEGIN_RING<t)&&(t<END_RING); }
+static inline int RingDependend(int t) { return (BEGIN_RING<t)&&(t<END_RING); }
 
 // to produce convert_table.texi for doc:
 VAR int produce_convert_table=0;
@@ -349,6 +349,8 @@ void ttGen1()
   fprintf(outfile,"// - otherwise search for the first possibility\n");
   fprintf(outfile,"//   with converted types of the arguments\n");
   fprintf(outfile,"// - otherwise report an error\n//\n");
+  fprintf(outfile,"// --------------------------------------------------\n");
+  fprintf(outfile,"// depends on Singular/table.h and kernel/mod2.h\n\n");
 
   int op;
   i=0;

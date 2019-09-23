@@ -1,0 +1,12 @@
+#!/bin/sh
+# generate iparith.inc, feOpt.inc, feOptTS.inc,feOptES.inc
+BUILD_DIR=/tmp2/wawa
+g++ -I.. -I../libpolys -I$BUILD_DIR -I$BUILD_DIR/libpolys gentable.cc -o gentable
+./gentable
+g++ feOptGen.cc -I.. -I../libpolys -I$BUILD_DIR -I$BUILD_DIR/libpolys -o feOptGen
+
+./feOptGen
+g++ feOptGen.cc -DESINGULAR -I.. -I../libpolys -I$BUILD_DIR -I$BUILD_DIR/libpolys -o feOptGen
+./feOptGen
+g++ feOptGen.cc -DTSINGULAR -I.. -I../libpolys -I$BUILD_DIR -I$BUILD_DIR/libpolys -o feOptGen
+./feOptGen
