@@ -634,7 +634,7 @@ static inline int index(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
         return index(length, ord);
 
       default:
-        assume(0);
+        printf("error in index (%d)- should not happen", (int)proc);
         return -1;
   }
 }
