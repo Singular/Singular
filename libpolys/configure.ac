@@ -44,7 +44,37 @@ AC_SEARCH_LIBS(sem_wait,[rt pthreads pthread],[],[
   AC_MSG_ERROR([sem_wait not found in rt,pthreads,pthread])
 ])
 
-LB_CHECK_GMP(3.1.1,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
+# Check whether --with-gmp was given.
+if test "${with_gmp+set}" = set; then :
+  if test "$with_gmp" = yes ; then
+	GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+   elif test "$with_gmp" != no ; then
+	GMP_HOME_PATH="$with_gmp ${DEFAULT_CHECKING_PATH}"
+    fi
+else
+  GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+fi
+
+BACKUP_CFLAGS=${CFLAGS}
+BACKUP_LIBS=${LIBS}
+
+for GMP_HOME in ${GMP_HOME_PATH}
+do
+  if test "x$GMP_HOME" != "x/usr"; then
+    GMP_CPPFLAGS="-I${GMP_HOME}/include"
+    GMP_LIBS="-L${GMP_HOME}/lib -Wl,-rpath -Wl,${GMP_HOME}/lib -lgmp"
+  else
+    GMP_CPPFLAGS=""
+    GMP_LIBS="-lgmp"
+  fi
+  CFLAGS="${BACKUP_CFLAGS} ${GMP_CPPFLAGS}"
+  LIBS="${BACKUP_LIBS} ${GMP_LIBS}"
+done
+AC_SUBST(GMP_CPPFLAGS)
+AC_SUBST(GMP_LIBS)
+
+AC_CHECK_LIB(gmp, __gmpz_init, , [AC_MSG_ERROR([GNU MP not found])])
+
 LB_CHECK_NTL(5.0,,AC_MSG_WARN([Unable to find NTL (which is strongly recommended) on your machine: please use --with-ntl=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 LB_CHECK_FLINT(2.4,,AC_MSG_WARN([Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 
