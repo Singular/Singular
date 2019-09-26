@@ -235,7 +235,9 @@ done
 AC_SUBST(GMP_CPPFLAGS)
 AC_SUBST(GMP_LIBS)
 
+AC_CHECK_HEADERS([gmp.h], ,[AC_MSG_ERROR([GNU MP not found])])
 AC_CHECK_LIB(gmp, __gmpz_init, , [AC_MSG_ERROR([GNU MP not found])])
+
 #NTL 9.6.4 requires -lpthread/-pthread
 # This test for -lpthread etc has to come before AX_PTHREAD,
 # because libtool tends to ignore -pthread in linking shared C++-libs
