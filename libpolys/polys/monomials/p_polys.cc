@@ -3884,9 +3884,8 @@ static poly p_Subst0(poly p, int n, const ring r)
 */
 poly p_Subst(poly p, int n, poly e, const ring r)
 {
-  if (e == NULL) return p_Subst0(p, n,r);
-
 #ifdef HAVE_SHIFTBBA
+  // also don't even use p_Subst0 for Letterplace
   if (rIsLPRing(r))
   {
     poly subst = p_LPSubst(p, n, e, r);
@@ -3894,6 +3893,8 @@ poly p_Subst(poly p, int n, poly e, const ring r)
     return subst;
   }
 #endif
+
+  if (e == NULL) return p_Subst0(p, n,r);
 
   if (p_IsConstant(e,r))
   {

@@ -808,14 +808,19 @@ poly p_mLPSubst(poly m, int n, poly e, const ring r)
   int lV = r->isLPring;
   int degbound = r->N/lV;
 
-  poly res = p_One(r);
+  poly result = p_One(r);
   poly remaining = p_Head(m, r);
-  p_SetComp(res, p_GetComp(remaining, r), r);
+  p_SetComp(result, p_GetComp(remaining, r), r);
   p_SetComp(remaining, 0, r);
   for (int i = 0; i < degbound; i++)
   {
     int var = n + lV*i;
     if (p_GetExp(remaining, var, r)) {
+      if (e == NULL) {
+        p_Delete(&result, r);
+        result = NULL;
+        break;
+      }
       int startOfBlock = 1 + lV*i;
       int endOfBlock = lV*(i+1);
 
@@ -828,12 +833,15 @@ poly p_mLPSubst(poly m, int n, poly e, const ring r)
       remaining = right;
 
       left = p_Mult_q(left, p_Copy(e, r), r);
-      res = p_Mult_q(res, left, r);
+      result = p_Mult_q(result, left, r);
     }
   }
-  p_mLPunshift(remaining, r);
-  res = p_Mult_q(res, remaining, r);
-  return res;
+  if (result == NULL) {
+    return NULL;
+  } else {
+    p_mLPunshift(remaining, r);
+    return p_Mult_q(result, remaining, r);
+  }
 }
 
 /*
