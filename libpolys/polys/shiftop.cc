@@ -599,7 +599,7 @@ void k_SplitFrame(poly &m1, poly &m2, int at, const ring r)
 {
   int lV = r->isLPring;
 
-  number m1Coeff = pGetCoeff(m1);
+  number m1Coeff = n_Copy(pGetCoeff(m1), r->cf); // important to copy
 
   int hole = lV * at;
   m2 = p_GetExp_k_n(m1, 1, hole, r);
@@ -802,6 +802,7 @@ poly p_LPVarAt(poly p, int pos, const ring r)
 */
 poly p_mLPSubst(poly m, int n, poly e, const ring r)
 {
+  assume(p_GetComp(e, r) == 0);
   if (m == NULL) return NULL;
 
   int lV = r->isLPring;
@@ -809,6 +810,8 @@ poly p_mLPSubst(poly m, int n, poly e, const ring r)
 
   poly res = p_One(r);
   poly remaining = p_Head(m, r);
+  p_SetComp(res, p_GetComp(remaining, r), r);
+  p_SetComp(remaining, 0, r);
   for (int i = 0; i < degbound; i++)
   {
     int var = n + lV*i;
@@ -817,7 +820,7 @@ poly p_mLPSubst(poly m, int n, poly e, const ring r)
       int endOfBlock = lV*(i+1);
 
       poly left = p_GetExp_k_n(remaining, startOfBlock, r->N, r);
-      p_SetCoeff(left, p_GetCoeff(remaining, r), r);
+      p_SetCoeff(left, n_Copy(p_GetCoeff(remaining, r), r->cf), r);
       p_mLPunshift(left, r);
 
       poly right = p_GetExp_k_n(remaining, 1, endOfBlock, r);
