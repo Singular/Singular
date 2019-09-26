@@ -154,9 +154,6 @@ int ksReducePolyZ(LObject* PR,
     number an = pGetCoeff(p2);
     int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
     p_SetCoeff(lm, bn, tailRing);
-#ifdef HAVE_SHIFTBBA
-    if (tailRing->isLPring) pSetCoeff0(p1, bn); // lm doesn't point to p1 anymore, if the coef was a pointer, it has been deleted
-#endif
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
@@ -286,9 +283,6 @@ int ksReducePoly(LObject* PR,
     number an = pGetCoeff(p2);
     int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
     p_SetCoeff(lm, bn, tailRing);
-#ifdef HAVE_SHIFTBBA
-    if (tailRing->isLPring) pSetCoeff0(p1, bn); // lm doesn't point to p1 anymore, if the coef was a pointer, it has been deleted
-#endif
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
@@ -642,9 +636,6 @@ int ksReducePolyBound(LObject* PR,
     number an = pGetCoeff(p2);
     int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
     p_SetCoeff(lm, bn, tailRing);
-#ifdef HAVE_SHIFTBBA
-    if (tailRing->isLPring) pSetCoeff0(p1, bn); // lm doesn't point to p1 anymore, if the coef was a pointer, it has been deleted
-#endif
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
@@ -856,9 +847,6 @@ int ksReducePolySig(LObject* PR,
     number an = pGetCoeff(p2);
     int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
     p_SetCoeff(lm, bn, tailRing);
-#ifdef HAVE_SHIFTBBA
-    if (tailRing->isLPring) pSetCoeff0(p1, bn); // lm doesn't point to p1 anymore, if the coef was a pointer, it has been deleted
-#endif
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
@@ -1100,9 +1088,6 @@ int ksReducePolySigRing(LObject* PR,
   if(rField_is_Ring(currRing))
   {
     p_SetCoeff(lm, nDiv(pGetCoeff(lm),pGetCoeff(p2)), tailRing);
-#ifdef HAVE_SHIFTBBA
-    if (tailRing->isLPring) pSetCoeff0(p1, pGetCoeff(lm)); // lm doesn't point to p1 anymore, if the coef was a pointer, it has been deleted
-#endif
     if (coef != NULL) *coef = n_Init(1, tailRing->cf);
   }
   else
@@ -1113,9 +1098,6 @@ int ksReducePolySigRing(LObject* PR,
       number an = pGetCoeff(p2);
       int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
       p_SetCoeff(lm, bn, tailRing);
-#ifdef HAVE_SHIFTBBA
-      if (tailRing->isLPring) pSetCoeff0(p1, bn); // lm doesn't point to p1 anymore, if the coef was a pointer, it has been deleted
-#endif
       if (((ct == 0) || (ct == 2)))
         PR->Tail_Mult_nn(an);
       if (coef != NULL) *coef = an;
