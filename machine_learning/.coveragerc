@@ -1,5 +1,0 @@
-[run]
-branch = True
-omit = *tests/*, *__init__.py, *predictor_runner.py
-
-

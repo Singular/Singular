@@ -50,8 +50,6 @@
 #include "kernel/polys.h"
 #include "kernel/ideals.h"
 
-#include "machine_learning/mlpredict.h"
-
 #include "Singular/mod_lib.h"
 #include "Singular/fevoices.h"
 #include "Singular/tok.h"
@@ -7797,52 +7795,6 @@ static BOOLEAN jjOPTION_PL(leftv res, leftv v)
   res->rtyp=NONE;
   return setOption(res,v);
 }
-
-
-static BOOLEAN jjPREDHELP0(leftv res, leftv)
-{
-	char *buffer[5];
-	int lengths[5];
-	char filename[15] = "~/.history";
-	int i;
-	lists L = (lists)omAllocBin(slists_bin);
-
-	buffer[0] = NULL;
-	buffer[1] = NULL;
-	buffer[2] = NULL;
-	buffer[3] = NULL;
-	buffer[4] = NULL;
-
-	if(write_history(NULL)) {
-		printf("Failed to write history\n");
-		return TRUE;
-	}
-
-	if (!ml_initialise()) {
-		Print("Initialise of ml failed.");
-		PrintLn();
-		/* Notify singular that an error occured */
-		return TRUE;
-	}
-
-	ml_make_prediction(filename, buffer, lengths, _omStrDup);
-
-	L->Init(5);
-
-	for (i = 0; i < 5; i++) {
-		//printf("prediction %d: %s\n", i, buffer[i]);
-		L->m[i].rtyp = STRING_CMD;
-		L->m[i].data = buffer[i];
-	}
-
-	// pass the resultant list to the res datastructure
-	res->data=(void *)L;
-
-	ml_finalise();
-	return FALSE;
-}
-
-
 
 
 static BOOLEAN jjREDUCE4(leftv res, leftv u)

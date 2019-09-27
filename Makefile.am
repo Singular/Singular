@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = resources omalloc factory \
-libpolys machine_learning gfanlib IntegerProgramming \
+libpolys gfanlib IntegerProgramming \
 kernel Singular \
 dox emacs redhat desktop
 

@@ -15,9 +15,13 @@ else !SI_BUILTIN_MACHINELEARNING
 endif !SI_BUILTIN_MACHINELEARNING
 
 ##########################################################################
-AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(FACTORY_INCLUDES)  $(GMP_CPPFLAGS) $(NTL_CPPFLAGS) $(FLINT_CFLAGS)
+AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel \
+	      -I${top_builddir}/kernel -I${top_srcdir}/libpolys \
+	      -I${top_builddir}/libpolys $(FACTORY_INCLUDES)  $(GMP_CPPFLAGS) \
+	      $(NTL_CPPFLAGS) $(FLINT_CFLAGS) -DDATA_PATH=\"$(datadir)\" \
+	      -DBIN_PATH=\"$(bindir)\" -I/usr/include/python2.7
 
-machinelearning_la_SOURCES = machinelearning.cc
+machinelearning_la_SOURCES = machinelearning.cc mlpredict.c
 
 ### if HAVE_PYTHON???
 machinelearning_la_CXXFLAGS = $(PYTHON_CSPEC)
@@ -30,3 +34,28 @@ if !SI_BUILTIN_MACHINELEARNING
   machinelearning_la_LIBADD += ${top_builddir}/Singular/libSingular.la
 endif
 endif
+
+TESTS	 		= test_bufsize test_init_ml
+check_PROGRAMS 		= test_bufsize test_init_ml
+
+#test_bufsize_LDFLAGS	= -lpython3.6m
+test_bufsize_LDFLAGS	= -lpython2.7
+test_bufsize_SOURCES	= tests/test_bufsize.c mlpredict.c
+test_bufsize_CFLAGS	= -Wall -Wextra -I/usr/include/python2.7
+
+#test_init_ml_LDFLAGS	= -lpython3.6m
+test_init_ml_LDFLAGS	= -lpython2.7
+test_init_ml_SOURCES	= tests/test_init_ml.c mlpredict.c
+test_init_ml_CFLAGS	= -Wall -Wextra -I/usr/include/python2.7
+
+
+nobase_dist_data_DATA 	= \
+	ml_python/__init__.py \
+	ml_python/predictor_runner.py \
+	ml_python/common/__init__.py \
+	ml_python/common/constants.py \
+	ml_python/common/keyword_vector.py \
+	ml_python/common/lookuptable.py \
+	ml_python/model/__init__.py \
+	ml_python/model/predictor.py \
+	ml_singular/extract.lib
