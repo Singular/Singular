@@ -85,13 +85,13 @@ and software platforms.
 Instructions to download and install @sc{Singular} can be found
 at
 @display
-@uref{http://www.singular.uni-kl.de/index.php/singular-download.html}.
+@uref{https://www.singular.uni-kl.de/index.php/singular-download.html}.
 @end display
 
 Release versions of @sc{Singular} are also available
 from our FTP site
 @display
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/src/4-1-1/}.
+@uref{ftp://jim.mathematik.uni-kl.de/pub/Math/Singular/src/4-1-2/}.
 @end display
 
 @c @include README_download.texi
@@ -104,7 +104,7 @@ from our FTP site
 @cindex howto, install on Unix
 
 Install binaries:
-@uref{http://www.singular.uni-kl.de/index.php/singular-download/install-linuxunix.html}
+@uref{https://www.singular.uni-kl.de/index.php/singular-download/install-linuxunix.html}
 
 or build it yourself:
 @itemize
@@ -157,7 +157,7 @@ which includes instructions adapted for debian and fedora based systems.
 Singular relies on Cygwin as its environment under Windows.
 There is a 32bit and a 64bit version of Cygwin.
 
-@url{http://www.singular.uni-kl.de/index.php/singular-download/install-windows.html}
+@url{https://www.singular.uni-kl.de/index.php/singular-download/install-windows.html}
 
 @c ----------------------------------------------------------
 @node Macintosh installation instructions
@@ -167,5 +167,5 @@ There is a 32bit and a 64bit version of Cygwin.
 @cindex howto, install on Macintosh
 
 @strong{Installation of the provided binaries}
-@url{http://www.singular.uni-kl.de/index.php/singular-download/install-mac-os.html}
+@url{https://www.singular.uni-kl.de/index.php/singular-download/install-mac-os.html}
 

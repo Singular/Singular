@@ -106,7 +106,6 @@ EXAMPLE:  example VConst; shows an example"
 jmp f=G[1][1];
 int aJ=deg(f.h);
 // minimal degree of polynomials in G
-//print(aJ);
 list V=list();
 V[1]=Terns(G,1);
 // V[1]=G[1] (keeping in memory only [head, position])
@@ -226,7 +225,6 @@ EXAMPLE:  example GJmpMins; shows an example"
      {
 //Compare degrees;
       d=-1;
-      //print("Per Grado");
      }
   if(deg(P.h)==deg(Q.h))
      {
@@ -236,7 +234,6 @@ EXAMPLE:  example GJmpMins; shows an example"
               {
 //head=tail
                d=0;
-               //print("Uguali");
               }
          }
      else
@@ -494,7 +491,6 @@ jmp g;
          M[i]=g.h+g.t;
        }
    I=M[1..size(M)];
-//print("IdealOfV");
   //I=std(I);
   }
 return(I);
@@ -537,128 +533,125 @@ proc FinalVm(list V1 , list G1 ,def r)
 RETURN:   intvec: u
 EXAMPLE:  example NewWeight; shows an example"
 {
-//multiply and reduce, degree by degree
-intvec u=NewWeight(nvars(r)+1);
-list L=ringlist(r);
-L[2]=insert(L[2],"t",size(L[2]));
-//print(L[2]);
-list ordlist="a",u;
-L[3]=insert(L[3],ordlist,0);
-def H=ring(L);
-//print(V1);
-//print(G1);
-list M=list();
-jmp p;
-list N;
-poly q;
-poly s;
-int i;
-int j;
-for(i=1; i<=size(G1); i++)
-   {
-           N=list();
-           for(j=1; j<=size(G1[i]); j++)
-              {
-                p=G1[i][j];
-                q=p.h;
-                s=p.t;
-                N[j]=list(q,s);
-               }
-           M[i]=N;
-    }
-p.h=poly(0);
-p.t=poly(0);
-setring H;
-list R=list();
-list S=list();
-//print("anello definito");
-def V=imap(r,V1);
-//def G=imap(r,G1);
-//print(V);
-def MM=imap(r,M);
-list G=list();
-list N=list();
-for(i=1; i<=size(MM); i++)
-   {
-           for(j=1; j<=size(MM[i]); j++)
-              {
-                p.h=MM[i][j][1];
-                p.t=MM[i][j][2];
-                N[j]=p;
-               }
-           G[i]=N;
-    }
-ideal I=0;
-jmp LL;
-jmp UU;
- for(i=1; i<=size(V);i++)
+  //multiply and reduce, degree by degree
+  intvec u=NewWeight(nvars(r)+1);
+  list L=ringlist(r);
+  L[2]=insert(L[2],"t",size(L[2]));
+  list ordlist="a",u;
+  L[3]=insert(L[3],ordlist,0);
+  def H=ring(L);
+  list M=list();
+  jmp p;
+  list N;
+  poly q;
+  poly s;
+  int i;
+  int j;
+  for(i=1; i<=size(G1); i++)
+  {
+    N=list();
+    for(j=1; j<=size(G1[i]); j++)
     {
-       R[i]=list();
-       S[i]=list();
-       I=0;
-       for(j=1;j<=size(V[i]); j++)
-          {
-            LL=Multiply(V[i][j],G);
-            LL.t=reduce(t*LL.t,I);
-//I only reduce the tail
-              LL.t=subst(LL.t,t,1);
-              S[i]=insert(S[i],LL,size(S[i]));
-              LL.h=t*LL.h;
-            R[i]=insert(R[i],LL,size(R[i]));
-             UU=R[i][j];
-              I=I+ideal(UU.h+UU.t);
-              attrib(I,"isSB",1);
-          }
+      p=G1[i][j];
+      q=p.h;
+      s=p.t;
+      N[j]=list(q,s);
     }
-list M=list();
-poly q;
-poly s;
-for(i=1; i<=size(S); i++)
-   {
-           N=list();
-           for(j=1; j<=size(S[i]); j++)
-              {
-                p=S[i][j];
-                q=p.h;
-                s=p.t;
-                N[j]=list(q,s);
-               }
-           M[i]=N;
+    M[i]=N;
+  }
+  p.h=poly(0);
+  p.t=poly(0);
+  setring H;
+  list R=list();
+  list S=list();
+  //print("anello definito");
+  def V=imap(r,V1);
+  //def G=imap(r,G1);
+  //print(V);
+  def MM=imap(r,M);
+  list G=list();
+  list N=list();
+  for(i=1; i<=size(MM); i++)
+  {
+    for(j=1; j<=size(MM[i]); j++)
+    {
+      p.h=MM[i][j][1];
+      p.t=MM[i][j][2];
+      N[j]=p;
     }
-p.h=poly(0);
-p.t=poly(0);
-setring r;
-def MM=imap(H,M);
-list MMM=list();
-for(i=1; i<=size(MM); i++)
-   {
-           N=list();
-           for(j=1; j<=size(MM[i]); j++)
-              {
-                p.h=MM[i][j][1];
-                p.t=MM[i][j][2];
-                N[j]=p;
-               }
-           MMM[i]=N;
+    G[i]=N;
+  }
+  ideal I=0;
+  jmp LL;
+  jmp UU;
+  for(i=1; i<=size(V);i++)
+  {
+    R[i]=list();
+    S[i]=list();
+    I=0;
+    for(j=1;j<=size(V[i]); j++)
+    {
+      LL=Multiply(V[i][j],G);
+      LL.t=reduce(t*LL.t,I);
+      //I only reduce the tail
+      LL.t=subst(LL.t,t,1);
+      S[i]=insert(S[i],LL,size(S[i]));
+      LL.h=t*LL.h;
+      R[i]=insert(R[i],LL,size(R[i]));
+      UU=R[i][j];
+      I=I+ideal(UU.h+UU.t);
+      attrib(I,"isSB",1);
     }
-return(MMM);
+  }
+  list M=list();
+  poly q;
+  poly s;
+  for(i=1; i<=size(S); i++)
+  {
+    N=list();
+    for(j=1; j<=size(S[i]); j++)
+    {
+      p=S[i][j];
+      q=p.h;
+      s=p.t;
+      N[j]=list(q,s);
+    }
+    M[i]=N;
+  }
+  p.h=poly(0);
+  p.t=poly(0);
+  setring r;
+  def MM=imap(H,M);
+  list MMM=list();
+  for(i=1; i<=size(MM); i++)
+  {
+    N=list();
+    for(j=1; j<=size(MM[i]); j++)
+    {
+      p.h=MM[i][j][1];
+      p.t=MM[i][j][2];
+      N[j]=p;
+    }
+    MMM[i]=N;
+  }
+  return(MMM);
 }
 example
 { "EXAMPLE:"; echo = 2;
  ring r=0, (x,y,z), rp;
-jmp r1;
-r1.h=z^3;
-r1.t=poly(0);
-jmp r2;
-r2.h=z^2*y;
-r2.t=poly(0);
-jmp r3;
-r3.h=z*y^2 ;
-r3.t=-x^2*y;
-jmp r4;
-r4.h=y^5;
-r4.t=poly(0);
-list G2F=list(list(r1,r2,r3),list(r4));
+ jmp r1;
+ r1.h=z^3;
+ r1.t=poly(0);
+ jmp r2;
+ r2.h=z^2*y;
+ r2.t=poly(0);
+ jmp r3;
+ r3.h=z*y^2 ;
+ r3.t=-x^2*y;
+ jmp r4;
+ r4.h=y^5;
+ r4.t=poly(0);
+ list G2F=list(list(r1,r2,r3),list(r4));
  FinalVm(VConst(G2F,6,r) , G2F, r);
 }
 ////////////////////////////////////////////////////////////////////
@@ -670,7 +663,6 @@ EXAMPLE:  example Costruttore; shows an example"
 {
 list V=list();
 V= VConst(G,c);
-//print("VConst");
 //V non ordered
 list L=list();
 list R=list();
@@ -718,19 +710,13 @@ string s=varstr(basering);
 list VVV=varstr(basering);
 //L will contain results
 poly h=Minimus(variables(A.h));
-//print(h);
 int l=findvars(h,1)[2][1];
 if(l!=nvars(basering))
  {
-//print("vero");
-//print(l);
   for(int j=l+1;j<=nvars(basering); j++)
    {
-    //print("entrata");
-    //print(var(j));
     E=var(j)*A.h/B.h;
 //Candidate for * product
-    //print(E);
     if(E!=0)
       {
         //print("primo if passato");
@@ -788,7 +774,6 @@ for(i=1; i<=size(G); i++)
                        {
 //Loop on polynomials
                         C=EKCouples(G[i][j], G[k][l]);
-//print("coppia");
                         if(C[2]!=0)
                           {
                            C=insert(C,list(i,j,k,l),size(C));
@@ -864,154 +849,134 @@ by degree, so G1 is a list of list.@*
 The output is a boolean evaluation:
 True=1/False=0
 EXAMPLE:  example TestJMark; shows an example"
-{int flag=1;
-if(size(G1)==1 && size(G1[1])==1)
- {
-  //Hypersurface
-  print("Only One Polynomial");
-  flag=1;
- }
-else
+{
+  int flag=1;
+  if(size(G1)==1 && size(G1[1])==1)
   {
-   int d=0;
-   list EK,D=EKPolys(G1);
-//print("PolysEK");
-   //I found EK couples
-   int massimo=Max(D);
-   list V1=ConstructorMain(G1,massimo,r);
-//print("Costruttore");
-//print(V1);
-   jmp mi=V1[1][1];
-   int minimo=Min(deg(mi.h));
-   intvec u=NewWeight(nvars(r)+1);
-list L=ringlist(r);
-L[2]=insert(L[2],"t",size(L[2]));
-//print(L[2]);
-list ordlist="a",u;
-L[3]=insert(L[3],ordlist,0);
-def H=ring(L);
-list JJ=list();
-jmp pp;
-jmp qq;
-int i;
-int j;
-list NN;
-for(i=size(V1);i>0;i--)
-    {
-     NN=list();
-     for(j=size(V1[i]);j>0;j--)
-         {
-          //print(j);
-          pp=V1[i][j];
-          NN[j]=list(pp.h,pp.t);
-          }
-//print(NN);
-JJ[i]=NN;
-//print(JJ[i]);
-//print(i);
-    }
-//print(JJ);
-list KK=list();
-list UU=list();
-//jmp qq;
-for(i=size(G1);i>0;i--)
-    {
-     for(j=size(G1[i]);j>0;j--)
-         {
-          //print(j);
-          qq=G1[i][j];
-          UU[j]=list(qq.h,qq.t);
-          }
-//print(UU);
-KK[i]=UU;
-    }
-setring H;
-//I defined the new ring with the weighted
-//variable t
-poly p;
-//print("anello definito");
-def JJJ=imap(r,JJ);
-def EK=imap(r,EK);
-//print(flag);
-//imap(r,D);
-list V=list();
-jmp fp;
-//int i;
-//int j;
-list N;
-for(i=size(JJJ); i>0; i--)
-   {
-           N=list();
-           for(j=size(JJJ[i]); j>0; j--)
-              {
-                fp.h=JJJ[i][j][1];
-                fp.t=JJJ[i][j][2];
-                N[j]=fp;
-               }
-           V[i]=N;
-            }
-//print(V);
-def KKJ=imap(r,KK);
-list G=list();
-list U=list();
-for(i=1; i<=size(KKJ); i++)
-   {
-           for(j=1; j<=size(KKJ[i]); j++)
-              {
-                fp.h=KKJ[i][j][1];
-                fp.t=KKJ[i][j][2];
-                U[j]=fp;
-               }
-           G[i]=U;
-    }
-// print(V);
-//print(G);
-//I imported in H everithing I need
-poly q;
-ideal I;
-   for(j=1; j<=size(EK);j++)
-      {
-       d=D[j];
-       p=EKPolynomials(EK[j],G);
-       //print("arrivo");
-       I=IdealOfV(V[d-minimo+1]);
-attrib(I,"isSB",1);
-//print(I);
-q=reduce(t*p,I);
-//print(I[1]);
-//print(t*p);
-q=subst(q,t,1);
-//I reduce all the EK polynomials
-//       q=RiduzPoly(V[d-minimo+1], p);
-       if(q!=0)
-         {
-//check whether reduction is 0
-          print("NOT A BASIS");
-         flag=0;
-          break;
-         }
-     }
+    //Hypersurface
+    print("Only One Polynomial");
+    flag=1;
   }
-//print(flag);
-setring r;
-//typeof(flag);
-return(flag);
+  else
+  {
+    int d=0;
+    list EK,D=EKPolys(G1);
+    //I found EK couples
+    int massimo=Max(D);
+    list V1=ConstructorMain(G1,massimo,r);
+    jmp mi=V1[1][1];
+    int minimo=Min(deg(mi.h));
+    intvec u=NewWeight(nvars(r)+1);
+    list L=ringlist(r);
+    L[2]=insert(L[2],"t",size(L[2]));
+    list ordlist="a",u;
+    L[3]=insert(L[3],ordlist,0);
+    def H=ring(L);
+    list JJ=list();
+    jmp pp;
+    jmp qq;
+    int i;
+    int j;
+    list NN;
+    for(i=size(V1);i>0;i--)
+    {
+      NN=list();
+      for(j=size(V1[i]);j>0;j--)
+      {
+        pp=V1[i][j];
+        NN[j]=list(pp.h,pp.t);
+      }
+      JJ[i]=NN;
+    }
+    list KK=list();
+    list UU=list();
+    //jmp qq;
+    for(i=size(G1);i>0;i--)
+    {
+      for(j=size(G1[i]);j>0;j--)
+      {
+        qq=G1[i][j];
+        UU[j]=list(qq.h,qq.t);
+      }
+      KK[i]=UU;
+    }
+    setring H;
+    //I defined the new ring with the weighted
+    //variable t
+    poly p;
+    //print("anello definito");
+    def JJJ=imap(r,JJ);
+    def EK=imap(r,EK);
+    list V=list();
+    jmp fp;
+    //int i;
+    //int j;
+    list N;
+    for(i=size(JJJ); i>0; i--)
+    {
+      N=list();
+      for(j=size(JJJ[i]); j>0; j--)
+      {
+        fp.h=JJJ[i][j][1];
+        fp.t=JJJ[i][j][2];
+        N[j]=fp;
+      }
+      V[i]=N;
+    }
+    def KKJ=imap(r,KK);
+    list G=list();
+    list U=list();
+    for(i=1; i<=size(KKJ); i++)
+    {
+      for(j=1; j<=size(KKJ[i]); j++)
+      {
+        fp.h=KKJ[i][j][1];
+        fp.t=KKJ[i][j][2];
+        U[j]=fp;
+      }
+      G[i]=U;
+    }
+    //I imported in H everithing I need
+    poly q;
+    ideal I;
+    for(j=1; j<=size(EK);j++)
+    {
+      d=D[j];
+      p=EKPolynomials(EK[j],G);
+      I=IdealOfV(V[d-minimo+1]);
+      attrib(I,"isSB",1);
+      q=reduce(t*p,I);
+      q=subst(q,t,1);
+      //I reduce all the EK polynomials
+      //       q=RiduzPoly(V[d-minimo+1], p);
+      if(q!=0)
+      {
+        //check whether reduction is 0
+        print("NOT A BASIS");
+        flag=0;
+        break;
+      }
+    }
+  }
+  setring r;
+  //typeof(flag);
+  return(flag);
 }
 example
 { "EXAMPLE:"; echo = 2;
  ring r=0, (x,y,z), rp;
-jmp r1;
-r1.h=z^3;
-r1.t=poly(0);
-jmp r2;
-r2.h=z^2*y;
-r2.t=poly(0);
-jmp r3;
-r3.h=z*y^2 ;
-r3.t=-x^2*y;
-jmp r4;
-r4.h=y^5;
-r4.t=poly(0);
-list G2F=list(list(r1,r2,r3),list(r4));
-TestJMark(G2F,r);
+ jmp r1;
+ r1.h=z^3;
+ r1.t=poly(0);
+ jmp r2;
+ r2.h=z^2*y;
+ r2.t=poly(0);
+ jmp r3;
+ r3.h=z*y^2 ;
+ r3.t=-x^2*y;
+ jmp r4;
+ r4.h=y^5;
+ r4.t=poly(0);
+ list G2F=list(list(r1,r2,r3),list(r4));
+ TestJMark(G2F,r);
 }

@@ -1691,6 +1691,8 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
         case ringorder_ds:
         case ringorder_Ds:
         case ringorder_lp:
+        case ringorder_rp:
+        case ringorder_ls:
           for(;j>=0; j--) (*iv)[j]=1;
           break;
         default: /* do nothing */;
@@ -2204,6 +2206,8 @@ lists rDecompose(const ring r)
         case ringorder_ds:
         case ringorder_Ds:
         case ringorder_lp:
+        case ringorder_ls:
+        case ringorder_rp:
           for(;j>=0; j--) (*iv)[j]=1;
           break;
         default: /* do nothing */;
@@ -2251,62 +2255,43 @@ void rComposeC(lists L, ring R)
   }
 //  R->cf->ch=0;
   // ----------------------------------------
-  // 1:
+  // 0, (r1,r2) [, "i" ]
   if (L->m[1].rtyp!=LIST_CMD)
   {
     WerrorS("invalid coeff. field description, expecting precision list");
     return;
   }
   lists LL=(lists)L->m[1].data;
-  if (((LL->nr!=2)
+  if ((LL->nr!=1)
     || (LL->m[0].rtyp!=INT_CMD)
     || (LL->m[1].rtyp!=INT_CMD))
-  && ((LL->nr!=1)
-    || (LL->m[0].rtyp!=INT_CMD)))
   {
-    WerrorS("invalid coeff. field description list");
+    WerrorS("invalid coeff. field description list, expected list(`int`,`int`)");
     return;
   }
   int r1=(int)(long)LL->m[0].data;
   int r2=(int)(long)LL->m[1].data;
+  r1=si_min(r1,32767);
+  r2=si_min(r2,32767);
+  LongComplexInfo par; memset(&par, 0, sizeof(par));
+  par.float_len=r1;
+  par.float_len2=r2;
   if (L->nr==2) // complex
-    R->cf = nInitChar(n_long_C, NULL);
-  else if ((r1<=SHORT_REAL_LENGTH)
-  && (r2<=SHORT_REAL_LENGTH))
-    R->cf = nInitChar(n_R, NULL);
-  else
   {
-    LongComplexInfo* p = (LongComplexInfo *)omAlloc0(sizeof(LongComplexInfo));
-    p->float_len=r1;
-    p->float_len2=r2;
-    R->cf = nInitChar(n_long_R, p);
-  }
-
-  if ((r1<=SHORT_REAL_LENGTH)   // should go into nInitChar
-  && (r2<=SHORT_REAL_LENGTH))
-  {
-    R->cf->float_len=SHORT_REAL_LENGTH/2;
-    R->cf->float_len2=SHORT_REAL_LENGTH;
-  }
-  else
-  {
-    R->cf->float_len=si_min(r1,32767);
-    R->cf->float_len2=si_min(r2,32767);
-  }
-  // ----------------------------------------
-  // 2: list (par)
-  if (L->nr==2)
-  {
-    //R->cf->extRing->N=1;
     if (L->m[2].rtyp!=STRING_CMD)
     {
       WerrorS("invalid coeff. field description, expecting parameter name");
       return;
     }
-    //(rParameter(R))=(char**)omAlloc0(rPar(R)*sizeof(char_ptr));
-    rParameter(R)[0]=omStrDup((char *)L->m[2].data);
+    par.par_name=(char*)L->m[2].data;
+    R->cf = nInitChar(n_long_C, &par);
   }
-  // ----------------------------------------
+  else if ((r1<=SHORT_REAL_LENGTH) && (r2<=SHORT_REAL_LENGTH)) /* && L->nr==1*/
+    R->cf = nInitChar(n_R, NULL);
+  else /* && L->nr==1*/
+  {
+    R->cf = nInitChar(n_long_R, &par);
+  }
 }
 
 #ifdef HAVE_RINGS
@@ -2417,7 +2402,7 @@ static void rRenameVars(ring R)
         if (strcmp(R->names[i],R->names[j])==0)
         {
           ch=TRUE;
-          Warn("name conflict var(%d) and var(%d): `%s`, rename to `@%s`",i+1,j+1,R->names[i],R->names[i]);
+          Warn("name conflict var(%d) and var(%d): `%s`, rename to `@%s`in >>%s<<\nin %s:%d",i+1,j+1,R->names[i],R->names[i],my_yylinebuf,currentVoice->filename,yylineno);
           omFree(R->names[j]);
           R->names[j]=(char *)omAlloc(2+strlen(R->names[i]));
           sprintf(R->names[j],"@%s",R->names[i]);
@@ -2432,7 +2417,7 @@ static void rRenameVars(ring R)
     {
       if (strcmp(rParameter(R)[i],R->names[j])==0)
       {
-        Warn("name conflict par(%d) and var(%d): `%s`, renaming the VARIABLE to `@@(%d)`",i+1,j+1,R->names[j],i+1);
+        Warn("name conflict par(%d) and var(%d): `%s`, rename the VARIABLE to `@@(%d)`in >>%s<<\nin %s:%d",i+1,j+1,R->names[j],i+1,my_yylinebuf,currentVoice->filename,yylineno);
 //        omFree(rParameter(R)[i]);
 //        rParameter(R)[i]=(char *)omAlloc(10);
 //        sprintf(rParameter(R)[i],"@@(%d)",i+1);
@@ -2550,7 +2535,8 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
           j_in_R--;
           continue;
         }
-        if ((vv->m[1].Typ()!=INTVEC_CMD) && (vv->m[1].Typ()!=INT_CMD))
+        if ((vv->m[1].Typ()!=INTVEC_CMD) && (vv->m[1].Typ()!=INT_CMD)
+        && (vv->m[1].Typ()!=INTMAT_CMD))
         {
           PrintS(lString(vv));
           WerrorS("ordering name must be a (string,intvec)(1)");
@@ -2580,14 +2566,23 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
         }
         intvec *iv;
         if (vv->m[1].Typ()==INT_CMD)
-          iv=new intvec((int)(long)vv->m[1].Data(),(int)(long)vv->m[1].Data());
+        {
+          int l=si_max(1,(int)(long)vv->m[1].Data());
+          iv=new intvec(l);
+          for(int i=0;i<l;i++) (*iv)[i]=1;
+        }
         else
-          iv=ivCopy((intvec*)vv->m[1].Data()); //assume INTVEC
+          iv=ivCopy((intvec*)vv->m[1].Data()); //assume INTVEC/INTMAT
         int iv_len=iv->length();
         if (iv_len==0)
         {
-          Werror("empty intvec for ordering %d (%s)",j_in_R,rSimpleOrdStr(R->order[j_in_R]));
+          Werror("empty intvec for ordering %d (%s)",j_in_R+1,rSimpleOrdStr(R->order[j_in_R]));
           return TRUE;
+        }
+        if (R->order[j_in_R]==ringorder_M)
+        {
+          if (vv->m[1].rtyp==INTMAT_CMD) iv->makeVector();
+          iv_len=iv->length();
         }
         if ((R->order[j_in_R]!=ringorder_s)
         &&(R->order[j_in_R]!=ringorder_c)
@@ -2638,11 +2633,10 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
            case ringorder_M:
              R->wvhdl[j_in_R] =( int *)omAlloc((iv->length())*sizeof(int));
              for (i=0; i<iv->length();i++) R->wvhdl[j_in_R][i]=(*iv)[i];
-             R->block1[j_in_R]=si_max(R->block0[j_in_R],R->block0[j_in_R]+(int)sqrt((double)(iv->length()-1)));
+             R->block1[j_in_R]=si_max(R->block0[j_in_R],R->block0[j_in_R]+(int)sqrt((double)(iv->length())));
              if (R->block1[j_in_R]>R->N)
              {
-               WerrorS("ordering matrix too big");
-               return TRUE;
+               R->block1[j_in_R]=R->N;
              }
              break;
            case ringorder_ls:
@@ -2654,6 +2648,18 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
            case ringorder_dp:
            case ringorder_Dp:
            case ringorder_rp:
+             #if 0
+             for (i=0; i<iv_len;i++)
+             {
+               if (((*iv)[i]!=1)&&(iv_len!=1))
+               {
+                 iv->show(1);
+                 Warn("ignore weight %d for ord %d (%s) at pos %d\n>>%s<<",
+                   (*iv)[i],j_in_R+1,rSimpleOrdStr(R->order[j_in_R]),i+1,my_yylinebuf);
+                 break;
+               }
+             }
+             #endif // break absfact.tst
              break;
            case ringorder_S:
              break;

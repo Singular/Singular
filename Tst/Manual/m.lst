@@ -976,6 +976,7 @@ _lll
 localInvar
 lp2ivId
 lpMonomialPrinting
+lpGkDim
 magnitude
 makeHeisenberg
 makeUgl
@@ -1192,6 +1193,7 @@ EOrdlist
 findInvo
 _invariantRing
 lpHilbert
+lpLmDivisible
 sheafCoh
 sheafCohBGG
 charInfo

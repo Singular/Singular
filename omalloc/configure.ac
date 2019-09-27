@@ -148,6 +148,14 @@ if test "$ac_cv_prog_ADDR2LINE" = addr2line; then
   AC_DEFINE_UNQUOTED(OM_PROG_ADDR2LINE, "$ac_cv_prog_ADDR2LINE", "Name of addr2line")
 fi
 
+AC_MSG_NOTICE(HOSTCC set)
+HOSTCC=${HOSTCC:=$CC}
+HOSTLD=${HOSTLD:=$LD}
+HOSTCFLAGS=${HOSTCFLAGS:=$CFLAGS}
+  AC_SUBST(HOSTCC)
+  AC_SUBST(HOSTLD)
+  AC_SUBST(HOSTCFLAGS)
+
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl header file checks
 dnl
@@ -155,7 +163,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h,,
   AC_MSG_ERROR(Can not compile without limits.h))
 
-AC_CHECK_HEADERS(unistd.h sys/mman.h fcntl.h /usr/include/malloc.h)
+AC_CHECK_HEADERS(unistd.h sys/mman.h fcntl.h malloc.h malloc/malloc.h)
 
 AC_CHECK_FUNCS(popen mmap sbrk random malloc_usable_size malloc_size)
 
@@ -192,17 +200,7 @@ dnl figure out page size of the system
 dnl
 AC_MSG_CHECKING(size of system page)
 AC_CACHE_VAL(ac_cv_pagesize,
-AC_TRY_RUN([#include <stdio.h>
-#include <stdlib.h>
-#include "omGetPageSize.h"
-
-int main()
-{
-  FILE *f=fopen("conftestval", "w");
-  if (!f) exit(1);
-  fprintf(f, "%d\n", (int)omalloc_getpagesize);
-  exit(0);
-}], ac_cv_pagesize=`cat conftestval`, ac_cv_pagesize=0, ac_cv_pagesize=0))
+ac_cv_pagesize=`getconf PAGESIZE`)
 # can not really handle pagesizes which are greater -- there must be a
 # bug somewhere
 if test $ac_cv_pagesize -gt 8192; then

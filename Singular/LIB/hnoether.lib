@@ -2735,8 +2735,7 @@ EXAMPLE: example hnexpansion;  shows an example
  {
    string strmip=string(minpoly);
    string strf=string(f);
-   execute("ring tempr=("+string(char(basering))+","+parstr(basering)+"),("
-           +varstr(basering)+"),dp;");
+   ring tempr = create_ring("("+string(char(basering))+","+parstr(basering)+")", "("+varstr(basering)+")", "dp");
    execute("minpoly="+strmip+";");
    execute("poly f="+strf+";");
    field_ext=1;

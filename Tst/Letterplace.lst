@@ -8,6 +8,7 @@ Manual/iv2lpMat.tst
 Manual/lpKDimCheck.tst
 Manual/makeLetterplaceRing.tst
 Manual/serreRelations.tst
+Manual/lpGkDim.tst
 Manual/lpKDim.tst
 Manual/lpMonomialPrinting.tst
 Manual/letterplace_reduce.tst
@@ -17,3 +18,4 @@ Manual/lpNF.tst
 Manual/lpMonomialBasis.tst
 Manual/lpSickleDim.tst
 Manual/lpHilbert.tst
+Manual/lpLmDivisible.tst

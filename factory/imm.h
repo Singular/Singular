@@ -164,18 +164,21 @@ imm_iszero_gf ( const InternalCF * const ptr )
 inline long imm_intval ( const InternalCF* const op )
 {
     if ( is_imm( op ) == FFMARK )
+    {
         if ( cf_glob_switches.isOn( SW_SYMMETRIC_FF ) )
             return ff_symmetric( imm2int( op ) );
         else
             return imm2int( op );
-    else  if ( is_imm( op ) == GFMARK ) {
+    }
+    else  if ( is_imm( op ) == GFMARK )
+    {
         ASSERT( gf_isff( imm2int( op ) ), "invalid conversion" );
         if ( cf_glob_switches.isOn( SW_SYMMETRIC_FF ) )
             return ff_symmetric( gf_gf2ff( imm2int( op ) ) );
         else
             return gf_gf2ff( imm2int( op ) );
     }
-    else
+    /*else*/
         return imm2int( op );
 }
 //}}}

@@ -195,8 +195,7 @@ EXAMPLE:  example gmsring; shows examples
     os[j..j+1]="  ";
   }
 
-  execute("ring G="+string(charstr(@R))+",("+s+","+varstr(@R)+"),(ws("+
-    string(deg(highcorner(g))+2*gmsmaxdeg)+"),"+os+",c);");
+  ring G = create_ring(string(charstr(@R)), "("+s+","+varstr(@R)+")", "(ws("+string(deg(highcorner(g))+2*gmsmaxdeg)+"),"+os+",c)"); 
 
   poly gmspoly=imap(@R,t);
   ideal gmsjacob=imap(@R,dt);

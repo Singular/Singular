@@ -134,7 +134,7 @@ static proc mod_init()
   option(noredefine);
   LIB "customstd.so";
   LIB "gfanlib.so";
-  LIB "polymake.so";
+  load("polymake.so","try");
   option(set,save);
 }
 
