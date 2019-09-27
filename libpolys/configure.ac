@@ -86,7 +86,6 @@ SING_CHECK_JULIA
 AC_FUNC_ERROR_AT_LINE
 AC_CHECK_FUNCS([memmove memset pow sqrt strchr setenv putenv])
 AC_FUNC_VPRINTF
-AC_FUNC_MALLOC
 AC_CHECK_FUNC([vsnprintf], [AC_DEFINE([HAVE_VSNPRINTF], [1], [Define if vsnprintf exists.])])
 
 # Checks for header files.
