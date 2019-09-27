@@ -2,7 +2,7 @@ ACLOCAL_AMFLAGS = -I../m4
 
 GIT_VERSION := $(shell $(top_srcdir)/git-version-gen $(top_srcdir)/.tarball-git-version)
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(FACTORY_INCLUDES) $(CCLUSTER_CPPFLAGS)  $(GMP_CPPFLAGS) $(FLINT_CFLAGS) -DGIT_VERSION='"$(GIT_VERSION)"' -I/usr/include/python2.7
+AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(FACTORY_INCLUDES) $(CCLUSTER_CPPFLAGS)  $(GMP_CPPFLAGS) $(FLINT_CFLAGS) -DGIT_VERSION='"$(GIT_VERSION)"'
 
 AM_CXXFLAGS=$(NTL_CPPFLAGS)
 
@@ -136,8 +136,9 @@ SingularHEADERS = \
 # plural_cmd.inc
 nodist_libSingular_la_SOURCES = feOpt.inc iparith.inc
 
-libSingular_la_LDFLAGS    =$(SINGULAR_LDFLAGS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION} $(CCLUSTER_LIBS) ${PTHREAD_LDFLAGS} -lpython2.7
+libSingular_la_LDFLAGS    =$(SINGULAR_LDFLAGS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION} $(CCLUSTER_LIBS) ${PTHREAD_LDFLAGS}
 libSingular_la_LIBADD     =${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${BUILTIN_FLAGS} ${top_builddir}/kernel/libkernel.la ${PTHREAD_LIBS}
+
 libSingular_includedir = ${includedir}/singular/Singular
 nobase_libSingular_include_HEADERS = $(SingularHEADERS)
 

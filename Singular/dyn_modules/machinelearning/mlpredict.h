@@ -66,4 +66,4 @@ int ml_make_prediction(char *filename,
 #ifdef __cplusplus
 }
 #endif /* ifdef cpp */
-#endif 
+#endif

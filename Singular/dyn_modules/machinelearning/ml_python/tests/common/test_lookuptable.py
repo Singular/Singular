@@ -60,7 +60,7 @@ class TestLookuptableMethods(unittest.TestCase):
         self.assertFalse(is_lookup_initialised())
         init_table_on_system()
         self.assertTrue(is_lookup_initialised())
-        
+
 
 if __name__ == '__main__':
     if os.path.isdir(HOME_DIR):

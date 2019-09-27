@@ -51,22 +51,22 @@ class TestKeywordMethods(unittest.TestCase):
 
         print("Count occurances with None dictionary:")
         self.assertRaises(AssertionError, count_occurances,
-                          "../Singular/table.h",
+                          "../../../table.h",
                           None)
 
         print("Count occurances with empty dictionary:")
         self.assertRaises(AssertionError, count_occurances,
-                          "../Singular/table.h",
+                          "../../../table.h",
                           np.array([]))
 
-        print("vector of ../Singular/table.h")
-        vec = count_occurances("../Singular/table.h", dic)
+        print("vector of ../../../table.h")
+        vec = count_occurances("../../../table.h", dic)
         print(vec)
         print("Don't normalise")
-        vec = count_occurances("../Singular/table.h", dic, False)
+        vec = count_occurances("../../../table.h", dic, False)
         self.assertGreater(np.linalg.norm(vec), 1)
         print()
-        
+
 
     def test_create_vector_dictionary(self):
         """

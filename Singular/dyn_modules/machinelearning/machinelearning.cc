@@ -2,10 +2,11 @@
 
 #include "kernel/mod2.h"
 #include "Singular/ipid.h"
+#include "Singular/mod_lib.h"
 
 #include "mlpredict.h"
 
-BOOLEAN predictHelp(leftv result, leftv arg)
+static BOOLEAN predictHelp(leftv result, leftv arg)
 {
 	char *buffer[5];
 	int lengths[5];
@@ -51,7 +52,8 @@ BOOLEAN predictHelp(leftv result, leftv arg)
 	//result->rtyp=NONE; // set the result type
 }
 
-extern "C" int mod_init(SModulFunctions* psModulFunctions)
+// initialisation of the module
+extern "C" int SI_MOD_INIT(machinelearning)(SModulFunctions* psModulFunctions)
 {
 	// this is the initialization routine of the module
 	// adding the routine predictHelp:
@@ -60,5 +62,5 @@ extern "C" int mod_init(SModulFunctions* psModulFunctions)
 			"predictHelp",// for the singular interpreter
 			FALSE, // should enter the global name space
 			predictHelp); // the C/C++ routine
-	return 1;
+	return MAX_TOK;
 }

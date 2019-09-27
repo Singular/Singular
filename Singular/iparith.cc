@@ -78,8 +78,6 @@
 
 #include <ctype.h>
 
-#include <readline/history.h>
-
 // defaults for all commands: NO_NC | NO_RING | ALLOW_ZERODIVISOR
 
 #ifdef HAVE_PLURAL
@@ -7793,8 +7791,6 @@ static BOOLEAN jjOPTION_PL(leftv res, leftv v)
   res->rtyp=NONE;
   return setOption(res,v);
 }
-
-
 static BOOLEAN jjREDUCE4(leftv res, leftv u)
 {
   leftv u1=u;
