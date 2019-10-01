@@ -3433,7 +3433,7 @@ NOTE:     uses CSMA(...)
     print("The ideal must be homogeneous, zero is returned.");
     return( int(0) );
   }
-  int n=nvars(basering)-1;
+  int n=nvars(basering);
   return( CSMA(I)[n] );
 }
 example
