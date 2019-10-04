@@ -1,6 +1,9 @@
 #include "kernel/mod2.h"
 
 #ifdef HAVE_POLYMAKE
+#ifndef POLYMAKE_VERSION
+#define POLYAMKE_VERSION POLYMAKEVERSION
+#endif
 
 #include "Singular/dyn_modules/gfanlib/bbcone.h"
 #include "Singular/dyn_modules/gfanlib/bbfan.h"
@@ -35,7 +38,11 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
           polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
           polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
           polymake::perl::Object pms;
+          #if (POLYMAKE_VERSION >= 305)
           polymake::call_function("minkowski_sum", *pp, *pq) >> pms;
+          #else
+          CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+          #endif
           ms = PmPolytope2ZPolytope(&pms);
           delete pp;
           delete pq;
@@ -156,10 +163,10 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
 //     {
 //       int ambientDim = (int)(long)u->Data();
 //       if (ambientDim < 0)
-// 	{
+//         {
 //           Werror("expected non-negative ambient dim but got %d", ambientDim);
-// 	  return TRUE;
-// 	}
+//           return TRUE;
+//         }
 //       gfan::ZMatrix zm(ambientDim*2,ambientDim+1);
 //       int j=1;
 //       for (int i=0; i<ambientDim*2; i=i+2)
@@ -186,10 +193,10 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
 //     {
 //       int ambientDim = (int)(long)u->Data();
 //       if (ambientDim < 0)
-// 	{
+//         {
 //           Werror("expected non-negative ambient dim but got %d", ambientDim);
-// 	  return TRUE;
-// 	}
+//           return TRUE;
+//         }
 //       gfan::ZMatrix zm(ambientDim*2,ambientDim+1);
 //       int j=1;
 //       for (int i=0; i<ambientDim*2; i=i+2)
@@ -1380,7 +1387,11 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
         polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
         polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
         polymake::perl::Object pms;
+        #if (POLYMAKE_VERSION >= 305)
         polymake::call_function("minkowski_sum", *pp, *pq) >> pms;
+        #else
+        CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+        #endif
         delete pp;
         delete pq;
         ms = PmPolytope2ZPolytope(&pms);
@@ -1408,7 +1419,11 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
         polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
         polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
         polymake::perl::Object pms;
+        #if (POLYMAKE_VERSION >= 305)
         polymake::call_function("minkowski_sum", *pp, *pq) >> pms;
+        #else
+        CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+        #endif
         delete pp;
         delete pq;
         ms = PmPolytope2ZPolytope(&pms);
@@ -1442,7 +1457,11 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
         polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
         polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
         polymake::perl::Object pms;
+        #if (POLYMAKE_VERSION >= 305)
         polymake::call_function("minkowski_sum", *pp, *pq) >> pms;
+        #else
+        CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+        #endif
         delete pp;
         delete pq;
         ms = PmPolytope2ZPolytope(&pms);
@@ -1471,7 +1490,11 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
         polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
         polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
         polymake::perl::Object pms;
+        #if (POLYMAKE_VERSION >= 305)
         polymake::call_function("minkowski_sum", *pp, *pq) >> pms;
+        #else
+        CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+        #endif
         delete pp;
         delete pq;
         ms = PmPolytope2ZPolytope(&pms);
@@ -1499,10 +1522,17 @@ polymake::Matrix<polymake::Integer> verticesOf(const polymake::perl::Object* p,
   polymake::Matrix<polymake::Integer> allrays = p->give("VERTICES");
   polymake::Matrix<polymake::Integer> wantedrays;
   bool ok = true;
+  #if (POLYMAKE_VERSION >= 305)
   for(const auto i : *s)
   {
     wantedrays = wantedrays / allrays.row(PmInteger2Int(i,ok));
   }
+  #else
+  for(polymake::Entire<polymake::Set<polymake::Integer> >::const_iterator i=polymake::entire(*s); !i.at_end(); i++)
+  {
+    wantedrays = wantedrays / allrays.row(PmInteger2Int(*i,ok));
+  }
+  #endif
   if (!ok)
   {
     WerrorS("overflow while converting polymake::Integer to int in raysOf");
@@ -1714,7 +1744,11 @@ BOOLEAN visual(leftv res, leftv args)
     try
     {
       polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
+      #if (POLYMAKE_VERSION >= 305)
       polymake::call_function("jreality",pp->call_method("VISUAL"));
+      #else
+      VoidCallPolymakeFunction("jreality",pp->CallPolymakeMethod("VISUAL"));
+      #endif
       delete pp;
     }
     catch (const std::exception& ex)
@@ -1735,7 +1769,11 @@ BOOLEAN visual(leftv res, leftv args)
     try
     {
       polymake::perl::Object* pf=ZFan2PmFan(zf);
+      #if (POLYMAKE_VERSION >= 305)
       polymake::call_function("jreality",pf->call_method("VISUAL"));
+      #else
+      VoidCallPolymakeFunction("jreality",pf->CallPolymakeMethod("VISUAL"));
+      #endif
     }
     catch (const std::exception& ex)
     {
@@ -1764,7 +1802,11 @@ BOOLEAN normalFan(leftv res, leftv args)
     {
       polymake::perl::Object* p=ZPolytope2PmPolytope(zp);
       polymake::perl::Object pf;
+      #if (POLYMAKE_VERSION >= 305)
       polymake::call_function("normal_fan", *p) >> pf;
+      #else
+      CallPolymakeFunction("normal_fan",*p) >> pf;
+      #endif
       delete p;
       zf = PmFan2ZFan(&pf);
     }
