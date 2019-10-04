@@ -403,7 +403,7 @@ gfan::ZFan* PmFan2ZFan (polymake::perl::Object* pf)
     int n = pf->give("N_MAXIMAL_CONES");
     for (int i=0; i<n; i++)
     {
-      polymake::perl::Object pmcone=pf->CallPolymakeMethod("cone",i);
+      polymake::perl::Object pmcone=pf->call_method("cone",i);
       gfan::ZCone* zc=PmCone2ZCone(&pmcone);
       zf->insert(*zc);
     }

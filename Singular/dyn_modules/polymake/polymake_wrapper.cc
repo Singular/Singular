@@ -11,6 +11,7 @@
 #include "Singular/subexpr.h"
 #include "Singular/mod_lib.h"
 
+#include <polymake/client.h>
 #include <polymake_conversion.h>
 #include <polymake_documentation.h>
 #include <polymake/Graph.h>
@@ -34,7 +35,7 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
           polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
           polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
           polymake::perl::Object pms;
-          CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+          polymake::call_function("minkowski_sum", *pp, *pq) >> pms;
           ms = PmPolytope2ZPolytope(&pms);
           delete pp;
           delete pq;
@@ -1063,7 +1064,7 @@ BOOLEAN PMlatticePoints(leftv res, leftv args)
     {
       polymake::perl::Object* p = ZPolytope2PmPolytope(zp);
       #if (POLYMAKEVERSION >=214)
-      polymake::Matrix<polymake::Integer> lp = p->CallPolymakeMethod("LATTICE_POINTS");
+      polymake::Matrix<polymake::Integer> lp = p->call_method("LATTICE_POINTS");
       #elif (POLYMAKEVERSION >=212)
       polymake::Matrix<polymake::Integer> lp = p->give("LATTICE_POINTS");
       #else
@@ -1291,7 +1292,7 @@ BOOLEAN PMhilbertBasis(leftv res, leftv args)
     {
       polymake::perl::Object* p = ZPolytope2PmPolytope(zp);
       #if (POLYMAKEVERSION >=214)
-      polymake::Matrix<polymake::Integer> lp = p->CallPolymakeMethod("HILBERT_BASIS");
+      polymake::Matrix<polymake::Integer> lp = p->call_method("HILBERT_BASIS");
       #elif (POLYMAKEVERSION >=212)
       polymake::Matrix<polymake::Integer> lp = p->give("HILBERT_BASIS");
       #else
@@ -1375,7 +1376,7 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
         polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
         polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
         polymake::perl::Object pms;
-        CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+        polymake::call_function("minkowski_sum", *pp, *pq) >> pms;
         delete pp;
         delete pq;
         ms = PmPolytope2ZPolytope(&pms);
@@ -1403,7 +1404,7 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
         polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
         polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
         polymake::perl::Object pms;
-        CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+        polymake::call_function("minkowski_sum", *pp, *pq) >> pms;
         delete pp;
         delete pq;
         ms = PmPolytope2ZPolytope(&pms);
@@ -1437,7 +1438,7 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
         polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
         polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
         polymake::perl::Object pms;
-        CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+        polymake::call_function("minkowski_sum", *pp, *pq) >> pms;
         delete pp;
         delete pq;
         ms = PmPolytope2ZPolytope(&pms);
@@ -1466,7 +1467,7 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
         polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
         polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
         polymake::perl::Object pms;
-        CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+        polymake::call_function("minkowski_sum", *pp, *pq) >> pms;
         delete pp;
         delete pq;
         ms = PmPolytope2ZPolytope(&pms);
@@ -1494,9 +1495,9 @@ polymake::Matrix<polymake::Integer> verticesOf(const polymake::perl::Object* p,
   polymake::Matrix<polymake::Integer> allrays = p->give("VERTICES");
   polymake::Matrix<polymake::Integer> wantedrays;
   bool ok = true;
-  for(polymake::Entire<polymake::Set<polymake::Integer> >::const_iterator i=polymake::entire(*s); !i.at_end(); i++)
+  for(const auto i : *s)
   {
-    wantedrays = wantedrays / allrays.row(PmInteger2Int(*i,ok));
+    wantedrays = wantedrays / allrays.row(PmInteger2Int(i,ok));
   }
   if (!ok)
   {
@@ -1709,7 +1710,7 @@ BOOLEAN visual(leftv res, leftv args)
     try
     {
       polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
-      VoidCallPolymakeFunction("jreality",pp->CallPolymakeMethod("VISUAL"));
+      polymake::call_function("jreality",pp->call_method("VISUAL"));
       delete pp;
     }
     catch (const std::exception& ex)
@@ -1730,7 +1731,7 @@ BOOLEAN visual(leftv res, leftv args)
     try
     {
       polymake::perl::Object* pf=ZFan2PmFan(zf);
-      VoidCallPolymakeFunction("jreality",pf->CallPolymakeMethod("VISUAL"));
+      polymake::call_function("jreality",pf->call_method("VISUAL"));
     }
     catch (const std::exception& ex)
     {
@@ -1759,7 +1760,7 @@ BOOLEAN normalFan(leftv res, leftv args)
     {
       polymake::perl::Object* p=ZPolytope2PmPolytope(zp);
       polymake::perl::Object pf;
-      CallPolymakeFunction("normal_fan", *p) >> pf;
+      polymake::call_function("normal_fan", *p) >> pf;
       delete p;
       zf = PmFan2ZFan(&pf);
     }
