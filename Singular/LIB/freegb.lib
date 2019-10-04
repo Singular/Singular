@@ -3767,6 +3767,19 @@ example
   lp2ivId(G); // returns the list of intmats for this ideal
 }
 
+// just for internal testing purposes
+proc testLift(ideal M, matrix T) {
+  ideal R;
+  if (ncols(M) != nrows(T)) { ERROR("cols(M) != rows(T)") }
+  for (int i=1; i <= nrows(T); i++) {
+    T = subst(T, ncgen(i), M[i]);
+  }
+  for (int i=1; i <= ncols(T); i++) {
+    R[i] = sum(T[i]);
+  }
+  return(R);
+}
+
 static proc mod_init()
 {
   LIB"freealgebra.so";
