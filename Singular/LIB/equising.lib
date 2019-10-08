@@ -1,4 +1,1289 @@
-ring ESSring = create_ring(s3, "("+ varstr(basering)+")", "("+ ordstr(basering) +")");
+///////////////////////////////////////////////////////////////////////
+version="version equising.lib 4.1.2.0 Feb_2019 "; // $Id$
+category="Singularities";
+info="
+LIBRARY:  equising.lib  Equisingularity Stratum of a Family of Plane Curves
+AUTHOR:   Christoph Lossen, lossen@mathematik.uni-kl.de
+          Andrea Mindnich, mindnich@mathematik.uni-kl.de
+
+PROCEDURES:
+ tau_es(f);             codim of mu-const stratum in semi-universal def. base
+ esIdeal(f);            (Wahl's) equisingularity ideal of f
+ esStratum(F[,m,L]);    equisingularity stratum of a family F
+ isEquising(F[,m,L]);   tests if a given deformation is equisingular
+
+ control_Matrix(M);     computes list of blowing-up data
+";
+
+LIB "hnoether.lib";
+LIB "poly.lib";
+LIB "elim.lib";
+LIB "deform.lib";
+LIB "sing.lib";
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  The following (static) procedures are used by esComputation
+//
+////////////////////////////////////////////////////////////////////////////////
+// COMPUTES  a weight vector. x and y get weight 1 and all other
+//           variables get weight 0.
+static proc xyVector()
+{
+  intvec iv ;
+  iv[nvars(basering)]=0 ;
+  iv[rvar(x)] =1;
+  iv[rvar(y)] =1;
+  return (iv);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// exchanges the variables x and y in the polynomial f
+static proc swapXY(poly f)
+{
+  def r_base = basering;
+  ideal MI = maxideal(1);
+  MI[rvar(x)]=y;
+  MI[rvar(y)]=x;
+  map phi = r_base, MI;
+  f=phi(f);
+  return (f);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// computes m-jet w.r.t. the variables x,y (other variables weighted 0
+static proc m_Jet(poly F,int m);
+{
+  intvec w=xyVector();
+  poly Fd=jet(F,m,w);
+  return(Fd);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// computes the 4 control matrices (input is multsequence(L))
+proc control_Matrix(list M);
+"USAGE:   control_Matrix(L); L list
+ASSUME:  L is the output of multsequence(hnexpansion(f)).
+RETURN:  list M of 4 intmat's:
+@format
+  M[1] contains the multiplicities at the respective infinitely near points
+       p[i,j] (i=step of blowup+1, j=branch) -- if branches j=k,...,k+m pass
+       through the same p[i,j] then the multiplicity is stored in M[1][k,j],
+       while M[1][k+1]=...=M[1][k+m]=0.
+  M[2] contains the number of branches meeting at p[i,j] (again, the information
+       is stored according to the above rule)
+  M[3] contains the information about the splitting of M[1][i,j] with respect to
+       different tangents of branches at p[i,j] (information is stored only for
+       minimal j>=k corresponding to a new tangent direction).
+       The entries are the sum of multiplicities of all branches with the
+       respective tangent.
+  M[4] contains the maximal sum of higher multiplicities for a branch passing
+       through p[i,j] ( = degree Bound for blowing up)
+@end format
+NOTE:    the branches are ordered in such a way that only consecutive branches
+         can meet at an infinitely near point. @*
+         the final rows of the matrices M[1],...,M[3] is (1,1,1,...,1), and
+         correspond to infinitely near points such that the strict transforms
+         of the branches are smooth and intersect the exceptional divisor
+         transversally.
+SEE ALSO: multsequence
+EXAMPLE: example control_Matrix; shows an example
+"
+{
+  int i,j,k,dummy;
+
+  dummy=0;
+  for (j=1;j<=ncols(M[2]);j++)
+  {
+    dummy=dummy+M[1][nrows(M[1])-1,j]-M[1][nrows(M[1]),j];
+  }
+  intmat S[nrows(M[1])+dummy][ncols(M[1])];
+  intmat T[nrows(M[1])+dummy][ncols(M[1])];
+  intmat U[nrows(M[1])+dummy][ncols(M[1])];
+  intmat maxDeg[nrows(M[1])+dummy][ncols(M[1])];
+
+  for (i=1;i<=nrows(M[2]);i++)
+  {
+    dummy=1;
+    for (j=1;j<=ncols(M[2]);j++)
+    {
+      for (k=dummy;k<dummy+M[2][i,j];k++)
+      {
+        T[i,dummy]=T[i,dummy]+1;
+        S[i,dummy]=S[i,dummy]+M[1][i,k];
+        if (i>1)
+        {
+          U[i-1,dummy]=U[i-1,dummy]+M[1][i-1,k];
+        }
+      }
+      dummy=k;
+    }
+  }
+
+  // adding an extra row (in some cases needed to control ES-Stratum
+  // computation)
+  for (i=nrows(M[1]);i<=nrows(S);i++)
+  {
+    for (j=1;j<=ncols(M[2]);j++)
+    {
+      S[i,j]=1;
+      T[i,j]=1;
+      U[i,j]=1;
+    }
+  }
+
+  // Computing the degree Bounds to be stored in M[4]:
+  for (i=1;i<=nrows(S);i++)
+  {
+    dummy=1;
+    for (j=1;j<=ncols(S);j++)
+    {
+      for (k=dummy;k<dummy+T[i,j];k++)
+      {
+        maxDeg[i,k]=S[i,dummy];  // multiplicity at i-th blowup
+      }
+      dummy=k;
+    }
+  }
+  // adding up multiplicities
+  for (i=nrows(S);i>=2;i--)
+  {
+    for (j=1;j<=ncols(S);j++)
+    {
+      maxDeg[i-1,j]=maxDeg[i-1,j]+maxDeg[i,j];
+    }
+  }
+
+  list L=S,T,U,maxDeg;
+  return(L);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+//  matrix of higher tangent directions:
+//  returns list: 1) tangent directions
+//                2) swapping information (x <--> y)
+static proc inf_Tangents(list L,int s); // L aus hnexpansion,
+{
+  int nv=nvars(basering);
+  matrix M;
+  matrix B[s][size(L)];
+  intvec V;
+  intmat Mult=multsequence(L)[1];
+
+  int i,j,k,counter,e;
+  for (k=1;k<=size(L);k++)
+  {
+    V[k]=L[k][3];  // switch: 0 --> tangent 2nd parameter
+                   //         1 --> tangent 1st parameter
+    e=0;
+    M=L[k][1];
+    counter=1;
+    B[counter,k]=M[1,1];
+
+    for (i=1;i<=nrows(M);i++)
+    {
+      for (j=2;j<=ncols(M);j++)
+      {
+        counter=counter+1;
+        if (M[i,j]==var(nv-1))
+        {
+          if (i<>nrows(M))
+          {
+            B[counter,k]=M[i,j];
+            j=ncols(M)+1; // goto new row of HNmatrix...
+            if (counter<>s)
+            {
+              if (counter+1<=nrows(Mult))
+              {
+                e=Mult[counter-1,k]-Mult[counter,k]-Mult[counter+1,k];
+              }
+              else
+              {
+                e=Mult[counter-1,k]-Mult[counter,k]-1;
+              }
+            }
+          }
+          else
+          {
+            B[counter,k]=0;
+            j=ncols(M)+1; // goto new row of HNmatrix...
+          }
+        }
+        else
+        {
+          if (e<=0)
+          {
+            B[counter,k]=M[i,j];
+          }
+          else  // point is still proximate to an earlier point
+          {
+            B[counter,k]=y; // marking proximity (without swap....)
+            if (counter+1<=nrows(Mult))
+            {
+              e=e-Mult[counter+1,k];
+            }
+            else
+            {
+              e=e-1;
+            }
+          }
+        }
+
+        if (counter==s) // given number of points determined
+        {
+            j=ncols(M)+1;
+            i=nrows(M)+1;
+            // leave procedure
+        }
+      }
+    }
+  }
+  L=B,V;
+  return(L);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// compute "good" upper bound for needed number of help variables
+//
+static proc Determine_no_b(intmat U,matrix B)
+// U is assumed to be 3rd output of control_Matrix
+// B is assumed to be 1st output of inf_Tangents
+{
+  int nv=nvars(basering);
+  int i,j,counter;
+  for (j=1;j<=ncols(U);j++)
+  {
+    for (i=1;i<=nrows(U);i++)
+    {
+      if (U[i,j]>1)
+      {
+        if (B[i,j]<>var(nv-1) and B[i,j]<>var(nv))
+        {
+          counter=counter+1;
+        }
+      }
+
+    }
+  }
+  counter=counter+ncols(U);
+  return(counter);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// compute number of infinitely near free points corresponding to non-zero
+// entries in control_Matrix[1] (except first row)
+//
+static proc no_freePoints(intmat Mult,matrix B)
+// Mult is assumed to be 1st output of control_Matrix
+// U is assumed to be 3rd output of control_Matrix
+// B is assumed to be 1st output of inf_Tangents
+{
+  int i,j,k,counter;
+  for (j=1;j<=ncols(Mult);j++)
+  {
+    for (i=2;i<=nrows(Mult);i++)
+    {
+      if (Mult[i,j]>=1)
+      {
+        if (B[i-1,j]<>x and B[i-1,j]<>y)
+        {
+          counter=counter+1;
+        }
+      }
+    }
+  }
+  return(counter);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// COMPUTES string(minpoly) and substitutes the parameter by newParName
+static proc makeMinPolyString (string newParName)
+{
+  int i;
+  string parName = parstr(basering);
+  int parNameSize = size(parName);
+
+  string oldMinPolyStr = string (minpoly);
+  int minPolySize = size(oldMinPolyStr);
+
+  string newMinPolyStr = "";
+
+  for (i=1;i <= minPolySize; i++)
+  {
+    if (oldMinPolyStr[i,parNameSize] == parName)
+    {
+      newMinPolyStr = newMinPolyStr + newParName;
+      i = i + parNameSize-1;
+    }
+    else
+    {
+      newMinPolyStr = newMinPolyStr + oldMinPolyStr[i];
+    }
+  }
+
+  return(newMinPolyStr);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// DEFINES: A new basering, "myRing",
+//          with new names for the parameters and variables.
+//          The new names for the parameters are a(1..k),
+//          and t(1..s),x,y for the variables
+//          The ring ordering is ordStr.
+// NOTE:    This proc uses 'execute'.
+static proc createMyRing_new(poly p_F, string ordStr,
+                                string minPolyStr, int no_b)
+{
+  def r_old = basering;
+
+  int chara = char(basering);
+  string charaStr;
+  int i;
+  string helpStr;
+  int nDefParams = nvars(r_old)-2;
+
+  ideal qIdeal = ideal(basering);
+
+  if ((npars(basering)==0) and (minPolyStr==""))
+  {
+    helpStr = "ring myRing1 ="
+              + string(chara)+ ", (t(1..nDefParams), x, y),("+ ordStr +");";
+    execute(helpStr);
+  }
+  else
+  {
+    charaStr = charstr(basering);
+    if ((charaStr == string(chara) + "," + parstr(basering)) or (minPolyStr<>""))
+    {
+      if (minPolyStr<>"")
+      {
+        helpStr = "ring myRing1 =
+                 (" + string(chara) + ",a),
+                 (t(1..nDefParams), x, y),(" + ordStr + ");";
+        execute(helpStr);
+
+        execute (minPolyStr);
+      }
+      else // no minpoly given
+      {
+        helpStr = "ring myRing1 =
+                  (" + string(chara) + ",a(1..npars(basering)) ),
+                  (t(1..nDefParams), x, y),(" + ordStr + ");";
+        execute(helpStr);
+      }
+    }
+    else
+    {
+      // ground field is of type (p^k,a)....
+      i = find (charaStr,",");
+      helpStr = "ring myRing1 = (" + charaStr[1,i] + "a),
+              (t(1..nDefParams), x, y),(" + ordStr + ");";
+      execute (helpStr);
+    }
+  }
+
+  ideal mIdeal = maxideal(1);
+  ideal qIdeal = fetch(r_old, qIdeal);
+  poly p_F = fetch(r_old, p_F);
+  export p_F,mIdeal;
+
+  // Extension by no_b auxiliary variables
+  if (no_b>0)
+  {
+    if (npars(basering) == 0)
+    {
+      ordStr = "(dp("+string(no_b)+"),"+ordStr+")";
+      helpStr = "ring myRing ="
+                + string(chara)+ ", (b(1..no_b), t(1..nDefParams), x, y),"
+                + ordStr +";";
+      execute(helpStr);
+    }
+    else
+    {
+      charaStr = charstr(basering);
+      if (charaStr == string(chara) + "," + parstr(basering))
+      {
+        if (minpoly !=0)
+        {
+          ordStr = "(dp(" + string(no_b) + ")," + ordStr + ")";
+          minPolyStr = makeMinPolyString("a");
+          helpStr = "ring myRing =
+                   (" + string(chara) + ",a),
+                   (b(1..no_b), t(1..nDefParams), x, y)," + ordStr + ";";
+          execute(helpStr);
+
+          helpStr = "minpoly =" + minPolyStr + ";";
+          execute (helpStr);
+        }
+        else // no minpoly given
+        {
+          ordStr = "(dp(" + string(no_b) + ")," + ordStr + ")";
+          helpStr = "ring myRing =
+                    (" + string(chara) + ",a(1..npars(basering)) ),
+                    (b(1..no_b), t(1..nDefParams), x, y)," + ordStr + ";";
+          execute(helpStr);
+        }
+      }
+      else
+      {
+        i = find (charaStr,",");
+        ordStr = "(dp(" + string(no_b) + ")," + ordStr + ")";
+        helpStr = "ring myRing =
+                (" + charaStr[1,i] + "a),
+                (b(1..no_b), t(1..nDefParams), x, y)," + ordStr + ";";
+        execute (helpStr);
+      }
+    }
+    ideal qIdeal = imap(myRing1, qIdeal);
+
+    if(size(qIdeal) != 0)
+    {
+      def r_base = basering;
+      setring r_base;
+      kill myRing;
+      qring myRing = std(qIdeal);
+    }
+
+    poly p_F = imap(myRing1, p_F);
+    ideal mIdeal = imap(myRing1, mIdeal);
+    export p_F,mIdeal;
+    kill myRing1;
+  }
+  else
+  {
+    if(size(qIdeal) != 0)
+    {
+      def r_base = basering;
+      setring r_base;
+      kill myRing1;
+      qring myRing = std(qIdeal);
+      poly p_F = imap(myRing1, p_F);
+      ideal mIdeal = imap(myRing1, mIdeal);
+      export p_F,mIdeal;
+    }
+    else
+    {
+      def myRing=myRing1;
+    }
+    kill myRing1;
+  }
+
+  setring r_old;
+  return(myRing);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// returns list of coef, leadmonomial
+//
+static proc determine_coef (poly Fm)
+{
+  def r_base = basering; // is assumed to be the result of createMyRing
+
+  int chara = char(basering);
+  string charaStr;
+  int i;
+  string minPolyStr = "";
+  string helpStr = "";
+
+  if (npars(basering) == 0)
+  {
+    helpStr = "ring myRing1 ="
+              + string(chara)+ ", (y,x),ds;";
+    execute(helpStr);
+  }
+  else
+  {
+    charaStr = charstr(basering);
+    if (charaStr == string(chara) + "," + parstr(basering))
+    {
+      if (minpoly !=0)
+      {
+        minPolyStr = makeMinPolyString("a");
+        helpStr = "ring myRing1 = (" + string(chara) + ",a), (y,x),ds;";
+        execute(helpStr);
+
+        helpStr = "minpoly =" + minPolyStr + ";";
+        execute (helpStr);
+      }
+      else // no minpoly given
+      {
+        helpStr = "ring myRing1 =
+                  (" + string(chara) + ",a(1..npars(basering)) ), (y,x),ds;";
+        execute(helpStr);
+      }
+    }
+    else
+    {
+      i = find (charaStr,",");
+
+      helpStr = " ring myRing1 = (" + charaStr[1,i] + "a), (y,x),ds;";
+      execute (helpStr);
+    }
+  }
+  poly f=imap(r_base,Fm);
+  poly g=leadmonom(f);
+  setring r_base;
+  poly g=imap(myRing1,g);
+  kill myRing1;
+  def M=coef(Fm,xy);
+
+  for (i=1; i<=ncols(M); i++)
+  {
+    if (M[1,i]==g)
+    {
+      poly h=M[2,i];  // determine coefficient of leading monomial (in K[t])
+      i=ncols(M)+1;
+    }
+  }
+  return(list(h,g));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// RETURNS: 1, if p_f = 0 or char(basering) divides the order of p_f
+//             or p_f is not squarefree.
+//          0, otherwise
+static proc checkPoly (poly p_f)
+{
+  int i_print = printlevel - voice + 3;
+  int i_ord;
+
+  if (p_f == 0)
+  {
+    print("Input is a 'deformation'  of the zero polynomial!");
+    return(1);
+  }
+
+  i_ord = mindeg1(p_f);
+
+  if (number(i_ord) == 0)
+  {
+    print("Characteristic of coefficient field "
+            +"divides order of zero-fiber !");
+    return(1);
+  }
+
+  if (squarefree(p_f) != p_f)
+  {
+    print("Original polynomial (= zero-fiber) is not reduced!");
+    return(1);
+  }
+
+  return(0);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+static proc make_ring_small(ideal J)
+// returns varstr for new ring, the map and the number of vars
+{
+  attrib(J,"isSB",1);
+  int counter=0;
+  ideal newmap;
+  string newvar="";
+  for (int i=1; i<=nvars(basering); i++)
+  {
+    if (reduce(var(i),J)<>0)
+    {
+      newmap[i]=var(i);
+
+      if (newvar=="")
+      {
+        newvar=newvar+string(var(i));
+        counter=counter+1;
+      }
+      else
+      {
+        newvar=newvar+","+string(var(i));
+        counter=counter+1;
+      }
+    }
+    else
+    {
+      newmap[i]=0;
+    }
+  }
+  list L=newvar,newmap,counter;
+  attrib(J,"isSB",0);
+  return(L);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//  The following procedure is called by esStratum (typ=0), resp. by
+//  isEquising (typ=1)
+///////////////////////////////////////////////////////////////////////////////
+
+static proc esComputation (int typ, poly p_F, list #)
+{
+  intvec ov=option(get);  // store options set at beginning
+  option(redSB);
+  // Initialize variables
+  int branch=1;
+  int blowup=1;
+  int auxVar=1;
+  int nVars;
+
+  intvec upper_bound, upper_bound_old, fertig, soll;
+  list blowup_string;
+  int i_print= printlevel-voice+2;
+
+  int no_b, number_of_branches, swapped;
+  int i,j,k,m, counter, dummy;
+  string helpStr = "";
+  string ordStr = "";
+  string MinPolyStr = "";
+
+  if (nvars(basering)<=2)
+  {
+    print("family is trivial (no deformation parameters)!");
+    if (typ==1) //isEquising
+    {
+      option(set,ov);
+      return(1);
+    }
+    else
+    {
+      option(set,ov);
+      return(list(ideal(0),0));
+    }
+  }
+
+  if (size(#)>0)
+  {
+    if (typeof(#[1])=="int")
+    {
+      def artin_bd=#[1];  // compute modulo maxideal(artin_bd)
+      if (artin_bd <= 1)
+      {
+        print("Do you really want to compute over Basering/maxideal("
+              +string(artin_bd)+") ?");
+        print("No computation performed !");
+        if (typ==1) //isEquising
+        {
+          option(set,ov);
+          return(1);
+        }
+        else
+        {
+          option(set,ov);
+          return(list(ideal(0),int(1)));
+        }
+      }
+      if (size(#)>1)
+      {
+        if (typeof(#[2])=="list")
+        {
+          def @L=#[2];  // is assumed to be the Hamburger-Noether matrix
+        }
+      }
+    }
+    else
+    {
+      if (typeof(#)=="list")
+      {
+        def @L=#;  // is assumed to be the Hamburger-Noether matrix
+      }
+    }
+  }
+  int ring_is_changed;
+  def old_ring=basering;
+  if(defined(@L)<=0)
+  {
+    // define a new ring without deformation-parameters and change to it:
+    string str;
+    string minpolyStr = string(minpoly);
+    str = " ring HNERing = (" + charstr(basering) + "), (x,y), ls;";
+    execute (str);
+    if (minpolyStr!="0")
+    {str = "minpoly ="+ minpolyStr+";";execute(str);}
+    ring_is_changed=1;
+    // Basering changed to HNERing (variables x,y, with ls ordering)
+
+    k=nvars(old_ring);
+    matrix Map_Phi[1][k];
+    Map_Phi[1,k-1]=x;
+    Map_Phi[1,k]=y;
+    map phi=old_ring,Map_Phi;
+    poly f=phi(p_F);
+
+    // Heuristics: if x,y are transversal parameters then computation of HNE
+    // can be much faster when exchanging variables...!
+    if (2*size(coeffs(f,x))<size(coeffs(f,y)))
+    {
+      swapped=1;
+      f=swapXY(f);
+    }
+
+    int error=checkPoly(f);
+    if (error)
+    {
+      setring old_ring;
+      if (typ==1) //isEquising
+      {
+        print("Return value (=0) has no meaning!");
+        option(set,ov);
+        return(0);
+      }
+      else
+      {
+        option(set,ov);
+        return(list( ideal(0),error));
+      }
+    }
+
+    dbprint(i_print,"// ");
+    dbprint(i_print,"// Compute HN expansion");
+    dbprint(i_print,"// ---------------------");
+    i=printlevel;
+    printlevel=printlevel-5;
+    list LLL=hnexpansion(f);
+
+    if (size(LLL)==0) { // empty list returned by hnexpansion
+      setring old_ring;
+      print(i_print,"Unable to compute HN expansion !");
+      if (typ==1) //isEquising
+      {
+        print("Return value (=0) has no meaning!");
+        option(set,ov);
+        return(0);
+      }
+      else
+      {
+        option(set,ov);
+        return(list(ideal(0),int(1)));
+      }
+      option(set,ov);
+      return(0);
+    }
+    else
+    {
+      if (typeof(LLL[1])=="ring") {
+        def HNering = LLL[1];
+        setring HNering;
+        def @L=stripHNE(hne);
+      }
+      else {
+        def @L=stripHNE(LLL);
+      }
+    }
+    printlevel=i;
+    dbprint(i_print,"// finished");
+    dbprint(i_print,"// ");
+  }
+  def HNEring=basering;
+  list M=multsequence(@L);
+  M=control_Matrix(M);     // this returns the 4 control matrices
+  def maxDeg=M[4];
+
+  list L1=inf_Tangents(@L,nrows(M[1]));
+  matrix B=L1[1];
+  intvec V=L1[2];
+  kill L1;
+
+  // if we have computed the HNE for f after swapping x and y, we have
+  // to reinterprete the (swap) matrix V:
+  if (swapped==1)
+  {
+    for (i=1;i<=size(V);i++) { V[i]=V[i]-1; } // turns 0 into -1, 1 into 0
+  }
+
+  // Determine maximal number of needed auxiliary parameters (free tangents):
+  no_b=Determine_no_b(M[3],B);
+
+  // test whether HNexpansion needed field extension....
+  string minPolyStr = "";
+  if (minpoly !=0)
+  {
+    minPolyStr = makeMinPolyString("a");
+    minPolyStr = "minpoly =" + minPolyStr + ";";
+  }
+
+  setring old_ring;
+
+  def myRing=createMyRing_new(p_F,"dp",minPolyStr,no_b);
+  setring myRing;  // comes with mIdeal
+  map hole=HNEring,mIdeal;
+  // basering has changed to myRing, in particular, the "old"
+  // variable names, e.g., A,B,C,z,y are replaced by t(1),t(2),t(3),x,y
+
+  ideal bNodes;
+
+  // Initialize some variables:
+  map phi;
+  poly G, F_save;
+  poly b_dummy;
+  ideal J,Jnew,final_Map;
+  number_of_branches=ncols(M[1]);
+  for (i=1;i<=number_of_branches;i++)
+  {
+    poly F(i);
+    ideal bl_Map(i);
+  }
+  upper_bound[number_of_branches]=0;
+  upper_bound[1]=number_of_branches;
+  upper_bound_old=upper_bound;
+  fertig[number_of_branches]=0;
+  for (i=1;i<=number_of_branches;i++){ soll[i]=1; }
+
+  // Hole:  B = matrix of blowup points
+  if (ring_is_changed==0) { matrix B=hole(B); }
+  else                    { matrix B=imap(HNEring,B); }
+  m=M[1][blowup,branch];    // multiplicity at 0
+
+  // now, we start by checking equimultiplicity along trivial section
+  poly Fm=m_Jet(p_F,m-1);
+
+  matrix coef_Mat = coef(Fm,xy);
+  Jnew=coef_Mat[2,1..ncols(coef_Mat)];
+  J=J,Jnew;
+
+  if (defined(artin_bd)) // the artin_bd-th power of the maxideal of
+                         // deformation parameters can be cutted off
+  {
+    J=jet(J,artin_bd-1);
+  }
+
+  J=interred(J);
+  if (defined(artin_bd)) { J=jet(J,artin_bd-1); }
+
+// J=std(J);
+
+  if (typ==1) // isEquising
+  {
+    if(ideal(nselect(J,1..no_b))<>0)
+    {
+      setring old_ring;
+      option(set,ov);
+      return(0);
+    }
+  }
+
+  F(1)=p_F;
+
+  // and reduce the remaining terms in F(1):
+  bl_Map(1)=maxideal(1);
+
+  attrib(J,"isSB",1);
+  bl_Map(1)=reduce(bl_Map(1),J);
+  attrib(J,"isSB",0);
+
+  phi=myRing,bl_Map(1);
+  F(1)=phi(F(1));
+
+  // simplify F(1)
+  attrib(J,"isSB",1);
+  F(1)=reduce(F(1),J);
+  attrib(J,"isSB",0);
+
+  // now we compute the m-jet:
+  Fm=m_Jet(F(1),m);
+
+  G=1;
+  counter=branch;
+  k=upper_bound[branch];
+
+  F_save=F(1);  // is truncated differently in the following loop
+
+  while(counter<=k)
+  {
+    F(counter)=m_Jet(F_save,maxDeg[blowup,counter]);
+    if (V[counter]==0) // 2nd ring variable is tangent to this branch
+    {
+      G=G*(y-(b(auxVar)+B[blowup,counter])*x)^(M[3][blowup,counter]);
+    }
+    else // 1st ring variable is tangent to this branch
+    {
+      G=G*(x-(b(auxVar)+B[blowup,counter])*y)^(M[3][blowup,counter]);
+      F(counter)=swapXY(F(counter));
+    }
+    bl_Map(counter)=maxideal(1);
+    bl_Map(counter)[nvars(basering)]=xy+(b(auxVar)+B[blowup,counter])*x;
+
+    bNodes[counter]=b(auxVar);
+
+    auxVar=auxVar+1;
+    upper_bound[counter]=counter+M[2][blowup+1,counter]-1;
+    counter=counter+M[2][blowup+1,counter];
+
+  }
+
+  list LeadDataFm=determine_coef(Fm);
+  def LeadDataG=coef(G,xy);
+
+  for (i=1; i<=ncols(LeadDataG); i++)
+  {
+    if (LeadDataG[1,i]==LeadDataFm[2])
+    {
+      poly LeadG = LeadDataG[2,i];  // determine the coefficient of G
+      i=ncols(LeadDataG)+1;
+    }
+  }
+
+  G=LeadDataFm[1]*G-LeadG*Fm;  // leading terms in y should cancel...
+
+  coef_Mat = coef(G,xy);
+  Jnew=coef_Mat[2,1..ncols(coef_Mat)];
+
+  // simplification of Jnew
+
+  if (defined(artin_bd)) // the artin_bd-th power of the maxideal of
+                         // deformation parameters can be cutted off
+  {
+    Jnew=jet(Jnew,artin_bd-1);
+  }
+  Jnew=interred(Jnew);
+  if (defined(artin_bd)) { Jnew=jet(Jnew,artin_bd-1); }
+  J=J,Jnew;
+
+  if (typ==1) // isEquising
+  {
+    if(ideal(nselect(J,1..no_b))<>0)
+    {
+      setring old_ring;
+      option(set,ov);
+      return(0);
+    }
+  }
+
+  while (fertig<>soll and blowup<nrows(M[3]))
+  {
+    upper_bound_old=upper_bound;
+    dbprint(i_print,"// Blowup Step "+string(blowup)+" completed");
+    blowup=blowup+1;
+
+    for (branch=1;branch<=number_of_branches;branch=branch+1)
+    {
+      Jnew=0;
+
+      // First we check if the branch still has to be considered:
+      if (branch==upper_bound_old[branch] and fertig[branch]<>1)
+      {
+        if (M[3][blowup-1,branch]==1 and
+               ((B[blowup,branch]<>x and B[blowup,branch]<>y)
+            or (blowup==nrows(M[3])) ))
+        {
+          fertig[branch]=1;
+          dbprint(i_print,"// 1 branch finished");
+        }
+      }
+
+      if (branch<=upper_bound_old[branch] and fertig[branch]<>1)
+      {
+        for (i=branch;i>=1;i--)
+        {
+          if (M[1][blowup-1,i]<>0)
+          {
+            m=M[1][blowup-1,i]; // multiplicity before blowup
+            i=0;
+          }
+        }
+
+        // we blow up the branch and take the strict transform:
+        attrib(J,"isSB",1);
+        bl_Map(branch)=reduce(bl_Map(branch),J);
+        attrib(J,"isSB",0);
+
+        phi=myRing,bl_Map(branch);
+        F(branch)=phi(F(branch))/x^m;
+
+        // simplify F
+        attrib(Jnew,"isSB",1);
+
+        F(branch)=reduce(F(branch),Jnew);
+        attrib(Jnew,"isSB",0);
+
+        m=M[1][blowup,branch]; // multiplicity after blowup
+        Fm=m_Jet(F(branch),m); // homogeneous part of lowest degree
+
+
+        // we check for Fm=F[k]*...*F[k+s] where
+        //
+        //    F[j]=(y-b'(j)*x)^m(j), respectively F[j]=(-b'(j)*y+x)^m(j)
+        //
+        // according to the entries m(j)= M[3][blowup,j] and
+        //                          b'(j) mod m_A = B[blowup,j]
+        // computed from the HNE of the special fibre of the family:
+        G=1;
+        counter=branch;
+        k=upper_bound[branch];
+
+        F_save=F(branch);
+
+        while(counter<=k)
+        {
+          F(counter)=m_Jet(F_save,maxDeg[blowup,counter]);
+
+          if (B[blowup,counter]<>x and B[blowup,counter]<>y)
+          {
+            G=G*(y-(b(auxVar)+B[blowup,counter])*x)^(M[3][blowup,counter]);
+            bl_Map(counter)=maxideal(1);
+            bl_Map(counter)[nvars(basering)]=
+                                        xy+(b(auxVar)+B[blowup,counter])*x;
+            bNodes[counter]=b(auxVar);
+            auxVar=auxVar+1;
+          }
+          else
+          {
+            if (B[blowup,counter]==x)
+            {
+              G=G*x^(M[3][blowup,counter]);  // branch has tangent x !!
+              F(counter)=swapXY(F(counter)); // will turn x to y for blow up
+              bl_Map(counter)=maxideal(1);
+              bl_Map(counter)[nvars(basering)]=xy;
+            }
+            else
+            {
+              G=G*y^(M[3][blowup,counter]); // tangent has to be y
+              bl_Map(counter)=maxideal(1);
+              bl_Map(counter)[nvars(basering)]=xy;
+            }
+            bNodes[counter]=0;
+          }
+          upper_bound[counter]=counter+M[2][blowup+1,counter]-1;
+          counter=counter+M[2][blowup+1,counter];
+        }
+        G=determine_coef(Fm)[1]*G-Fm;  // leading terms in y should cancel
+        coef_Mat = coef(G,xy);
+        Jnew=coef_Mat[2,1..ncols(coef_Mat)];
+        if (defined(artin_bd)) // the artin_bd-th power of the maxideal of
+                              // deformation parameters can be cutted off
+        {
+          Jnew=jet(Jnew,artin_bd-1);
+        }
+
+        // simplification of J
+        Jnew=interred(Jnew);
+
+        J=J,Jnew;
+        if (typ==1) // isEquising
+        {
+          if (defined(artin_bd)) { J=jet(Jnew,artin_bd-1); }
+          if(ideal(nselect(J,1..no_b))<>0)
+          {
+            setring old_ring;
+            option(set,ov);
+            return(0);
+          }
+        }
+      }
+    }
+    if (number_of_branches>=2)
+    {
+      J=interred(J);
+      if (typ==1) // isEquising
+      {
+        if (defined(artin_bd)) { J=jet(Jnew,artin_bd-1); }
+        if(ideal(nselect(J,1..no_b))<>0)
+        {
+          setring old_ring;
+          option(set,ov);
+          return(0);
+        }
+      }
+    }
+  }
+
+  // Computation for all equimultiple sections being trivial (I^s(f))
+  ideal Jtriv=J;
+  for (i=1;i<=no_b; i++)
+  {
+    if (reduce(b(i),std(bNodes))!=0){
+      Jtriv=subst(Jtriv,b(i),0);
+    }
+  }
+  Jtriv=std(Jtriv);
+
+
+
+  dbprint(i_print,"// ");
+  dbprint(i_print,"// Elimination starts:");
+  dbprint(i_print,"// -------------------");
+
+  poly gg;
+  int b_left=no_b;
+
+  for (i=1;i<=no_b; i++)
+  {
+    attrib(J,"isSB",1);
+    gg=reduce(b(i),J);
+    if (gg==0)
+    {
+      b_left = b_left-1;  // another b(i) has to be 0
+    }
+    J = subst(J, b(i), gg);
+    attrib(J,"isSB",0);
+  }
+  J=simplify(J,10);
+  if (typ==1) // isEquising
+  {
+    if (defined(artin_bd)) { J=jet(Jnew,artin_bd-1); }
+    if(ideal(nselect(J,1..no_b))<>0)
+    {
+      setring old_ring;
+      option(set,ov);
+      return(0);
+    }
+  }
+
+  //new CL 11/06:  check in which equations b(k) appears and remove those b(k)
+  //               which appear in exactly one of the equations (by removing this
+  //               equation)
+  dbprint(i_print,"// ");
+  dbprint(i_print,"// Remove superfluous equations:");
+  dbprint(i_print,"// -----------------------------");
+  int Z,App_in;
+  ideal J_Tmp;
+  int ncJ=ncols(J);
+
+  intmat Mdet[ncJ][1];
+  for (Z=1;Z<=ncJ;Z++){ Mdet[Z,1]=Z; }
+
+  for (i=1;i<=no_b; i++)
+  {
+    ideal b_appears_in(i);            // Eintraege sind spaeter 1 oder 0
+    intmat b_app_in(i)[1][ncJ];       // Eintraege sind spaeter 1 oder 0
+    b_appears_in(i)[ncJ]=0;
+    J_Tmp = matrix(J)-subst(J,b(i),0);
+    for (Z=1; Z<=ncJ; Z++) {
+      if (J_Tmp[Z]<>0) {      // b(i) appear in J_Tmp[Z]
+        b_appears_in(i)[Z]=1;
+        b_app_in(i)[1,Z]=1;
+      }
+    }
+    if (size(b_appears_in(i))==1) { //b(i) appears only in one J_Tmp[Z]
+      App_in = (b_app_in(i)*Mdet)[1,1];  // determines Z
+      J[App_in]=0;
+      b_appears_in(i)[App_in]=0;
+      b_app_in(i)[1,App_in]=0;
+    }
+  }
+
+  for (i=1;i<=no_b; i++)
+  {
+    if (size(b_appears_in(i))==1) { //b(i) appears only in one J_Tmp[Z]
+      App_in = (b_app_in(i)*Mdet)[1,1];  // determines Z
+      J[App_in]=0;
+      b_appears_in(i)[App_in]=0;
+      b_app_in(i)[1,Z]=1;
+      i=0;
+    }
+  }
+
+  Jtriv = nselect(Jtriv,1..no_b);
+  ideal J_no_b = nselect(J,1..no_b);
+  if (size(J) > size(J_no_b))
+  {
+    dbprint(i_print,"// std computation started");
+    // some b(i) didn't appear in linear conditions and have to be eliminated
+    if (defined(artin_bd))
+    {
+      // first we make the ring smaller (removing variables, which are
+      // forced to 0 by J
+      list LL=make_ring_small(J);
+      ideal Shortmap=LL[2];
+      minPolyStr = "";
+      if (minpoly !=0)
+      {
+        minPolyStr = "minpoly = "+string(minpoly);
+      }
+      ordStr = "dp(" + string(b_left) + "),dp";
+      ideal qId = ideal(basering);
+
+      helpStr = "ring Shortring = ("
+                + charstr(basering) + "),("+ LL[1] +") , ("+ ordStr  +");";
+      execute(helpStr);
+      execute(minPolyStr);
+      // ring has changed to "Shortring"
+
+      ideal MM=maxideal(artin_bd);
+      MM=subst(MM,x,0);
+      MM=subst(MM,y,0);
+      MM=simplify(MM,2);
+      dbprint(i_print-1,"// maxideal("+string(artin_bd)+") has "
+                         +string(size(MM))+" elements");
+      dbprint(i_print-1,"//");
+
+      // we change to the qring mod m^artin_bd
+      // first, we have to check if we were in a qring when starting
+      ideal qId = imap(myRing, qId);
+      if (size(qId) == 0)
+      {
+         attrib(MM,"isSB",1);
+         qring QQ=MM;
+      }
+      else
+      {
+         qId=qId,MM;
+         qring QQ = std(qId);
+      }
+
+      ideal Shortmap=imap(myRing,Shortmap);
+      map phiphi=myRing,Shortmap;
+
+      ideal J=phiphi(J);
+      option(redSB);
+      J=std(J);
+      J=nselect(J,1..no_b);
+
+      setring myRing;
+      // back to "myRing"
+
+      J=nselect(J,1..no_b);
+      Jnew=imap(QQ,J);
+
+      J=J,Jnew;
+      J=interred(J);
+      if (defined(artin_bd)){ J=jet(J,artin_bd-1); }
+    }
+    else
+    {
+      J=std(J);
+      J=nselect(J,1..no_b);
+      if (defined(artin_bd)){ J=jet(J,artin_bd-1); }
+    }
+  }
+
+  dbprint(i_print,"// finished");
+  dbprint(i_print,"// ");
+
+  minPolyStr = "";option(set,ov);
+  if (minpoly !=0)
+  {
+   minPolyStr = "minpoly = "+string(minpoly);
+  }
+
+  kill HNEring;
+
+  if (typ==1) // isEquising
+  {
+    if (defined(artin_bd)) { J=jet(Jnew,artin_bd-1); }
+    if(J<>0)
+    {
+      setring old_ring;
+      option(set,ov);
+      return(0);
+    }
+    else
+    {
+      setring old_ring;
+      option(set,ov);
+      return(1);
+    }
+  }
+
+  setring old_ring;
+  // we are back in the original ring
+
+  if (npars(myRing)<>0)
+  {
+    ideal qIdeal = ideal(basering);
+    helpStr = "ring ESSring = ("
+                 + string(char(basering))+ "," + parstr(myRing) +
+                 ") , ("+ varstr(basering)+") , ("+ ordstr(basering) +");";
+    execute(helpStr);
     execute(minPolyStr);
     // basering has changed to ESSring
 
