@@ -20,6 +20,10 @@
 @end ifset
 
 @heading News for version @value{VERSION}
+Changed libraries:
+@itemize
+@item chern.lib:  new version (@nref{chern_lib})
+@end itemize
 
 Changes in the kernel/build system:
 @itemize
