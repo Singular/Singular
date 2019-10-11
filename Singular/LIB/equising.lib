@@ -1731,17 +1731,9 @@ EXAMPLE: example esIdeal; shows examples.
   ideal JJ=maxideal(1)*jacob(f);
   ideal kbase_versal=kbase(std(JJ));
   s=size(kbase_versal);
-  string ring_versal="ring @Px = ("+charstr(basering)+"),(t(1.."+string(s)+"),"
-                        +varstr(basering)+"),(ds("+string(s)+"),"
-                        +ordstr(basering)+");";
-  MinPolyStr = string(minpoly);
-
-  execute(ring_versal);
-  if (MinPolyStr<>"0")
-  {
-    MinPolyStr = "minpoly="+MinPolyStr;
-    execute(MinPolyStr);
-  }
+  ring @Pt=QQ,(t(1..s)),ds;
+  def @Px=@Pt+old_ring;
+  setring @Px;
   // basering has changed to @Px
 
   poly F=imap(old_ring,f);
