@@ -59,17 +59,22 @@ EXAMPLE: example regIdeal; shows some examples
 "
 {
 //--------------------------- initialisation ---------------------------------
-   int e,ii,jj,H,h,d,time,lastv,sat,firstind;
+   int e,ii,jj,H,h,d,time,lastv,sat,firstind,zz;
    int lastind,ch,nesttest,NPtest,nl,N,acc;
    intmat ran;
+   string s;
    def r0 = basering;
    int n = nvars(r0)-1;
    if ( size(#) > 0 )
    {
       e = #[1];
    }
-   string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-   execute(s);
+   list l1;
+   for (zz = 0; zz<= n; zz++)
+   {
+    l1[zz+1] = "x("+string(zz)+")";
+   }
+   ring r1 = create_ring(ringlist(r0)[1], l1, "dp", "no_minpoly");
    ideal i,sbi,I,J,K,chcoord,m;
    poly P;
    map phi;
@@ -134,8 +139,18 @@ EXAMPLE: example regIdeal; shows some examples
      if ( NPtest == 0 )
      {
        N=d*n-d*(d-1)/2;
-       s = "ring rtr = (ch,t(1..N)),x(0..n),dp;";
-       execute(s);
+       string l2 = "("+string(ch)+"";
+       for (zz = 1; zz <= N; zz++)
+       {
+        l2 = l2+",t("+string(zz)+")";
+       }
+       l2 = l2+")";
+       list l3;
+       for (zz = 0; zz<= n; zz++)
+       {
+        l3[zz+1] = "x("+string(zz)+")";
+       }
+       ring rtr = create_ring(l2, l3, "dp");
        ideal chcoord,m,i,I;
        poly P;
        map phi;
@@ -166,8 +181,18 @@ EXAMPLE: example regIdeal; shows some examples
        if ( nesttest == 0 )
        {
          N=d*(d-1)/2;
-         s = "ring rtr = (ch,t(1..N)),x(0..n),dp;";
-         execute(s);
+         string l4 = "("+string(ch)+"";
+         for (zz = 1; zz <= N; zz++)
+         {
+          l4 = l4+",t("+string(zz)+")";
+         }
+         l4 = l4+")";
+         list l5;
+         for (int zz = 0; zz<= n; zz++)
+         {
+          l5[zz+1] = "x("+string(zz)+")";
+         }
+         ring rtr = create_ring(l4, l5, "dp");
          ideal chcoord,m,i,I;
          poly P;
          map phi;
@@ -290,8 +315,12 @@ EXAMPLE: example regIdeal; shows some examples
    }
    if ( size(K) == 0 )
    {
-     s="ring nr = ",charstr(r0),",x(0..n-d),dp;";
-     execute(s);
+     list l6;
+     for (zz = 0; zz<= n-d; zz++)
+     {
+      l6[zz+1] = "x("+string(zz)+")";
+     }
+     ring nr = create_ring(ringlist(r0)[1], l6, "dp", "no_minpoly");
      ideal I;
      I = imap(r1,I);
      H=maxdeg1(minbase(quotient(I,maxideal(1))))+1;
@@ -317,8 +346,12 @@ EXAMPLE: example regIdeal; shows some examples
      H=maxdeg1(simplify(reduce(quotient(I,maxideal(1)),I),2))+1;
      sat=H;
      J=subst(I,x(n),1);
-     s = "ring nr = ",charstr(r0),",x(0..n-1),dp;";
-     execute(s);
+     list l7;
+     for (zz = 0; zz<= n-1; zz++)
+     {
+      l7[zz+1] = "x("+string(zz)+")";
+     }
+     ring nr = create_ring(ringlist(r0)[1], l7, "dp", "no_minpoly");
      ideal J=imap(r1,J);
      attrib(J,"isSB",1);
      h=maxdeg1(minbase(quotient(J,maxideal(1))))+1;
@@ -373,8 +406,12 @@ EXAMPLE: example regIdeal; shows some examples
      }
    }
 //----- and compute Castelnuovo-Mumford regularity:
-   s = "ring nr = ",charstr(r0),",x(0..lastv),dp;";
-   execute(s);
+   list l8;
+   for (zz = 0; zz<= lastv; zz++)
+   {
+    l8[zz+1] = "x("+string(zz)+")";
+   }
+   ring nr = create_ring(ringlist(r0)[1], l8, "dp", "no_minpoly");
    ideal I,K,KK,LL;
    I=imap(r1,I);
    attrib(I,"isSB",1);
@@ -386,8 +423,12 @@ EXAMPLE: example regIdeal; shows some examples
    {
      LL=minbase(subst(I,x(n-ii-1),1));
      attrib(LL,"isSB",1);
-     s = "ring mr = ",charstr(r0),",x(0..n-ii-1),dp;";
-     execute(s);
+     list l9;
+     for (zz = 0; zz<= n-ii-1; zz++)
+     {
+      l9[zz+1] = "x("+string(zz)+")";
+     }
+     ring mr = create_ring(ringlist(r0)[1], l9, "dp", "no_minpoly");
      ideal K,KK;
      KK=imap(nr,KK);
      attrib(KK,"isSB",1);
@@ -402,8 +443,12 @@ EXAMPLE: example regIdeal; shows some examples
      KK=LL;
    }
    // We must determine one more sat. index:
-   s = "ring mr = ",charstr(r0),",x(0..n-d),dp;";
-   execute(s);
+   list l10;
+   for (zz = 0; zz<= n-d; zz++)
+   {
+    l10[zz+1] = "x("+string(zz)+")";
+   }
+   ring mr = create_ring(ringlist(r0)[1], l10, "dp", "no_minpoly");
    ideal KK,K;
    KK=imap(nr,KK);
    attrib(KK,"isSB",1);
@@ -565,7 +610,7 @@ EXAMPLE: example depthIdeal; shows some examples
 "
 {
 //--------------------------- initialisation ---------------------------------
-   int e,ii,jj,h,d,time,lastv,ch,nesttest,NPtest,nl,N,acc;
+   int e,ii,jj,h,d,time,lastv,ch,nesttest,NPtest,nl,N,acc,zz;
    intmat ran;
    def r0 = basering;
    int n = nvars(r0)-1;
@@ -573,8 +618,12 @@ EXAMPLE: example depthIdeal; shows some examples
    {
       e = #[1];
    }
-   string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-   execute(s);
+   list l11;
+   for (zz = 0; zz<= n; zz++)
+   {
+    l11[zz+1] = "x("+string(zz)+")";
+   }
+   ring r1 = create_ring(ringlist(r0)[1], l11, "dp", "no_minpoly");
    ideal i,sbi,I,J,K,chcoord,m;
    poly P;
    map phi;
@@ -638,8 +687,18 @@ EXAMPLE: example depthIdeal; shows some examples
        if ( NPtest == 0 )
          {
            N=d*n-d*(d-1)/2;
-           s = "ring rtr = (ch,t(1..N)),x(0..n),dp;";
-           execute(s);
+           string l12 = "("+string(ch)+"";
+           for (zz = 1; zz <= N; zz++)
+           {
+            l12 = l12+",t("+string(zz)+")";
+           }
+           l12 = l12+")";
+           list l13;
+           for (int zz = 0; zz<= n; zz++)
+           {
+            l13[zz+1] = "x("+string(zz)+")";
+           }
+           ring rtr = create_ring(l12, l13, "dp");
            ideal chcoord,m,i,I;
            poly P;
            map phi;
@@ -670,8 +729,18 @@ EXAMPLE: example depthIdeal; shows some examples
            if ( nesttest == 0 )
              {
                N=d*(d-1)/2;
-               s = "ring rtr = (ch,t(1..N)),x(0..n),dp;";
-               execute(s);
+               string l14 = "("+string(ch)+"";
+               for (zz = 1; zz <= N; zz++)
+               {
+                l14 = l14+",t("+string(zz)+")";
+               }
+               l14 = l14+")";
+               list l15;
+               for (int zz = 0; zz<= n; zz++)
+               {
+                l15[zz+1] = "x("+string(zz)+")";
+               }
+               ring rtr = create_ring(l14, l15, "dp");
                ideal chcoord,m,i,I;
                poly P;
                map phi;
@@ -958,7 +1027,7 @@ EXAMPLE: example satiety; shows some examples
 "
 {
 //--------------------------- initialisation ---------------------------------
-   int e,ii,jj,h,d,time,lastv,nesttest,NPtest,nl,sat;
+   int e,ii,jj,h,d,time,lastv,nesttest,NPtest,nl,sat,zz;
    intmat ran;
    def r0 = basering;
    int n = nvars(r0)-1;
@@ -966,8 +1035,12 @@ EXAMPLE: example satiety; shows some examples
    {
       e = #[1];
    }
-   string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-   execute(s);
+   list l16;
+   for (zz = 0; zz<= n; zz++)
+   {
+    l16[zz+1] = "x("+string(zz)+")";
+   }
+   ring r1 = create_ring(ringlist(r0)[1], l16, "dp", "no_minpoly");
    ideal i,sbi,I,K,chcoord,m,KK;
    poly P;
    map phi;
@@ -1460,13 +1533,17 @@ EXAMPLE: example NoetherPosition; shows some examples
 "
 {
 //--------------------------- initialisation ---------------------------------
-   int ii,jj,d,time,nl,NPtest;
+   int ii,jj,d,time,nl,NPtest,zz;
    intmat ran;
    def r0 = basering;
    ideal K,chcoord;
    int n = nvars(r0)-1;
-   string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-   execute(s);
+   list l17;
+   for (zz = 0; zz<= n; zz++)
+   {
+    l17[zz+1] = "x("+string(zz)+")";
+   }
+   ring r1 = create_ring(ringlist(r0)[1], l17, "dp", "no_minpoly");
    ideal i,sbi,I,K,chcoord,m;
    poly P;
    map phi;
@@ -1611,11 +1688,15 @@ EXAMPLE: example is_NP; shows some examples
 "
 {
 //--------------------------- initialisation ---------------------------------
-   int ii,d,dz;
+   int ii,d,dz,zz;
    def r0 = basering;
    int n = nvars(r0)-1;
-   string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-   execute(s);
+   list l18;
+   for (zz = 0; zz<= n; zz++)
+   {
+    l18[zz+1] = "x("+string(zz)+")";
+   }
+   ring r1 = create_ring(ringlist(r0)[1], l18, "dp", "no_minpoly");
    ideal i,sbi,I,J;
    i = fetch(r0,i);
    sbi=std(i);
@@ -1692,11 +1773,15 @@ EXAMPLE: example is_nested; shows some examples
 "
 {
 //--------------------------- initialisation ---------------------------------
-   int ii,d,tev,lastv,h,NPtest;
+   int ii,d,tev,lastv,h,NPtest,zz;
    def r0 = basering;
    int n = nvars(r0)-1;
-   string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-   execute(s);
+   list l19;
+   for (zz = 0; zz<= n; zz++)
+   {
+    l19[zz+1] = "x("+string(zz)+")";
+   }
+   ring r1 = create_ring(ringlist(r0)[1], l19, "dp", "no_minpoly");
    ideal I,K,KK,LL;
    I = fetch(r0,i);
    I=minbase(I);
