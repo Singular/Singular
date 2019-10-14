@@ -163,8 +163,8 @@ SEE ALSO: Gweights
     }
     // End of generation.
     def lr=ncRelations(r);
-    string newringstring="ring newring=("+charstr(r)+"),("+varstr(r)+"),M("+string(m)+")";
-    execute (newringstring);
+    setring(r);
+    ring newring = create_ring(ringlist(r)[1], ringlist(r)[2], "M("+string(m)+")", "no_minpoly");
     def lnewring=imap(r,lr);
     return( nc_algebra(lnewring[1],lnewring[2]) );
   }
@@ -1289,8 +1289,7 @@ EXAMPLE: example Exterior; shows examples
     return();
   }
   int N = nvars(basering);
-  string NewRing = "ring @R=("+charstr(basering)+"),("+varstr(basering)+"),("+ordstr(basering)+");";
-  execute(NewRing);
+  ring @R = create_ring(ringlist(basering)[1], ringlist(basering)[2], "("+ordstr(basering)+")", "no_minpoly");
   matrix @E = UpOneMatrix(N);
   @E = -1*(@E);
   def @@RR = nc_algebra(@E,0); setring @@RR;
