@@ -3,10 +3,6 @@
 
 #define LONG_OPTION_RETURN 13
 
-#ifdef HAVE_FLINT
-#include <flint/flint.h>
-#endif
-
 // Define here which cmd-line options are recognized
 #ifndef FE_OPT_STRUCTURE
 EXTERN_VAR struct fe_option feOptSpec[];
@@ -147,13 +143,8 @@ VAR struct fe_option feOptSpec[] =
   {"threads",         required_argument,    LONG_OPTION_RETURN,
    "#threads", "maximal number of CPUs to use for threads",            feOptInt,    (void*)2,      0},
 
-#ifdef HAVE_FLINT
-#if __FLINT_RELEASE >= 20503
   {"flint-threads",   required_argument,    LONG_OPTION_RETURN,
    "#flintthreads", "maximal number of threads to use in flint library", feOptInt,    (void*)1,      0},
-#endif
-#endif
-
 
   {"MPport",           required_argument,   LONG_OPTION_RETURN,
    "PORT",     "Use PORT number for connections",                       feOptString,    0,      0},

@@ -1624,6 +1624,13 @@ static void ntNormalize (number &a, const coeffs cf)
   ntTest(a); // !!!!
 }
 
+static number ntExactDiv(number a, number b, const coeffs cf)
+{
+  number r=ntDiv(a,b,cf);
+  ntNormalize(r,cf);
+  return r;
+}
+
 /* expects *param to be castable to TransExtInfo */
 static BOOLEAN ntCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
 {
@@ -2557,7 +2564,7 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->cfSub          = ntSub;
   cf->cfMult         = ntMult;
   cf->cfDiv          = ntDiv;
-  cf->cfExactDiv     = ntDiv;
+  cf->cfExactDiv     = ntExactDiv;
   cf->cfPower        = ntPower;
   cf->cfCopy         = ntCopy;
   cf->cfWriteLong    = ntWriteLong;

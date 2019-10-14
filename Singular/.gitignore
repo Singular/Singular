@@ -1,16 +1,9 @@
 /Singular
-/Singulars
-/feOpt.inc
-/feOptES.inc
-/feOptTS.inc
-/iparith.inc
-/mpsr_Tok.inc
 /plural_cmd.inc
 /feOpt
 /feOptES
 /feOptTS
-/gentable1
-/gentable2
+/gentable
 /test
 /test-suite.log
 /test.log

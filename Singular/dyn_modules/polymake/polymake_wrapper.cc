@@ -1,6 +1,9 @@
 #include "kernel/mod2.h"
 
 #ifdef HAVE_POLYMAKE
+#ifndef POLYMAKE_VERSION
+#define POLYAMKE_VERSION POLYMAKEVERSION
+#endif
 
 #include "Singular/dyn_modules/gfanlib/bbcone.h"
 #include "Singular/dyn_modules/gfanlib/bbfan.h"
@@ -11,6 +14,7 @@
 #include "Singular/subexpr.h"
 #include "Singular/mod_lib.h"
 
+#include <polymake/client.h>
 #include <polymake_conversion.h>
 #include <polymake_documentation.h>
 #include <polymake/Graph.h>
@@ -34,7 +38,11 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
           polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
           polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
           polymake::perl::Object pms;
+          #if (POLYMAKE_VERSION >= 305)
+          polymake::call_function("minkowski_sum", *pp, *pq) >> pms;
+          #else
           CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+          #endif
           ms = PmPolytope2ZPolytope(&pms);
           delete pp;
           delete pq;
@@ -155,10 +163,10 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
 //     {
 //       int ambientDim = (int)(long)u->Data();
 //       if (ambientDim < 0)
-// 	{
+//         {
 //           Werror("expected non-negative ambient dim but got %d", ambientDim);
-// 	  return TRUE;
-// 	}
+//           return TRUE;
+//         }
 //       gfan::ZMatrix zm(ambientDim*2,ambientDim+1);
 //       int j=1;
 //       for (int i=0; i<ambientDim*2; i=i+2)
@@ -185,10 +193,10 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
 //     {
 //       int ambientDim = (int)(long)u->Data();
 //       if (ambientDim < 0)
-// 	{
+//         {
 //           Werror("expected non-negative ambient dim but got %d", ambientDim);
-// 	  return TRUE;
-// 	}
+//           return TRUE;
+//         }
 //       gfan::ZMatrix zm(ambientDim*2,ambientDim+1);
 //       int j=1;
 //       for (int i=0; i<ambientDim*2; i=i+2)
@@ -1062,7 +1070,9 @@ BOOLEAN PMlatticePoints(leftv res, leftv args)
     try
     {
       polymake::perl::Object* p = ZPolytope2PmPolytope(zp);
-      #if (POLYMAKEVERSION >=214)
+      #if (POLYMAKEVERSION >=305)
+      polymake::Matrix<polymake::Integer> lp = p->call_method("LATTICE_POINTS");
+      #elif (POLYMAKEVERSION >=214)
       polymake::Matrix<polymake::Integer> lp = p->CallPolymakeMethod("LATTICE_POINTS");
       #elif (POLYMAKEVERSION >=212)
       polymake::Matrix<polymake::Integer> lp = p->give("LATTICE_POINTS");
@@ -1290,7 +1300,9 @@ BOOLEAN PMhilbertBasis(leftv res, leftv args)
     try
     {
       polymake::perl::Object* p = ZPolytope2PmPolytope(zp);
-      #if (POLYMAKEVERSION >=214)
+      #if (POLYMAKEVERSION >=305)
+      polymake::Matrix<polymake::Integer> lp = p->call_method("HILBERT_BASIS");
+      #elif (POLYMAKEVERSION >=214)
       polymake::Matrix<polymake::Integer> lp = p->CallPolymakeMethod("HILBERT_BASIS");
       #elif (POLYMAKEVERSION >=212)
       polymake::Matrix<polymake::Integer> lp = p->give("HILBERT_BASIS");
@@ -1375,7 +1387,11 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
         polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
         polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
         polymake::perl::Object pms;
+        #if (POLYMAKE_VERSION >= 305)
+        polymake::call_function("minkowski_sum", *pp, *pq) >> pms;
+        #else
         CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+        #endif
         delete pp;
         delete pq;
         ms = PmPolytope2ZPolytope(&pms);
@@ -1403,7 +1419,11 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
         polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
         polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
         polymake::perl::Object pms;
+        #if (POLYMAKE_VERSION >= 305)
+        polymake::call_function("minkowski_sum", *pp, *pq) >> pms;
+        #else
         CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+        #endif
         delete pp;
         delete pq;
         ms = PmPolytope2ZPolytope(&pms);
@@ -1437,7 +1457,11 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
         polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
         polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
         polymake::perl::Object pms;
+        #if (POLYMAKE_VERSION >= 305)
+        polymake::call_function("minkowski_sum", *pp, *pq) >> pms;
+        #else
         CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+        #endif
         delete pp;
         delete pq;
         ms = PmPolytope2ZPolytope(&pms);
@@ -1466,7 +1490,11 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
         polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
         polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
         polymake::perl::Object pms;
+        #if (POLYMAKE_VERSION >= 305)
+        polymake::call_function("minkowski_sum", *pp, *pq) >> pms;
+        #else
         CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+        #endif
         delete pp;
         delete pq;
         ms = PmPolytope2ZPolytope(&pms);
@@ -1494,10 +1522,17 @@ polymake::Matrix<polymake::Integer> verticesOf(const polymake::perl::Object* p,
   polymake::Matrix<polymake::Integer> allrays = p->give("VERTICES");
   polymake::Matrix<polymake::Integer> wantedrays;
   bool ok = true;
+  #if (POLYMAKE_VERSION >= 305)
+  for(const auto i : *s)
+  {
+    wantedrays = wantedrays / allrays.row(PmInteger2Int(i,ok));
+  }
+  #else
   for(polymake::Entire<polymake::Set<polymake::Integer> >::const_iterator i=polymake::entire(*s); !i.at_end(); i++)
   {
     wantedrays = wantedrays / allrays.row(PmInteger2Int(*i,ok));
   }
+  #endif
   if (!ok)
   {
     WerrorS("overflow while converting polymake::Integer to int in raysOf");
@@ -1709,7 +1744,11 @@ BOOLEAN visual(leftv res, leftv args)
     try
     {
       polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
+      #if (POLYMAKE_VERSION >= 305)
+      polymake::call_function("jreality",pp->call_method("VISUAL"));
+      #else
       VoidCallPolymakeFunction("jreality",pp->CallPolymakeMethod("VISUAL"));
+      #endif
       delete pp;
     }
     catch (const std::exception& ex)
@@ -1730,7 +1769,11 @@ BOOLEAN visual(leftv res, leftv args)
     try
     {
       polymake::perl::Object* pf=ZFan2PmFan(zf);
+      #if (POLYMAKE_VERSION >= 305)
+      polymake::call_function("jreality",pf->call_method("VISUAL"));
+      #else
       VoidCallPolymakeFunction("jreality",pf->CallPolymakeMethod("VISUAL"));
+      #endif
     }
     catch (const std::exception& ex)
     {
@@ -1759,7 +1802,11 @@ BOOLEAN normalFan(leftv res, leftv args)
     {
       polymake::perl::Object* p=ZPolytope2PmPolytope(zp);
       polymake::perl::Object pf;
-      CallPolymakeFunction("normal_fan", *p) >> pf;
+      #if (POLYMAKE_VERSION >= 305)
+      polymake::call_function("normal_fan", *p) >> pf;
+      #else
+      CallPolymakeFunction("normal_fan",*p) >> pf;
+      #endif
       delete p;
       zf = PmFan2ZFan(&pf);
     }
@@ -1937,46 +1984,46 @@ extern "C" int SI_MOD_INIT(polymake)(SModulFunctions* p)
   init_polymake->set_application("fan");
   // p->iiAddCproc("polymake.so","coneViaPoints",FALSE,PMconeViaRays);
   // p->iiAddCproc("polymake.so","polytopeViaPoints",FALSE,PMpolytopeViaVertices);
-  p->iiAddCproc("polymakeInterface.lib","isLatticePolytope",FALSE,PMisLatticePolytope);
-  p->iiAddCproc("polymakeInterface.lib","isBounded",FALSE,PMisBounded);
-  p->iiAddCproc("polymakeInterface.lib","isReflexive",FALSE,PMisReflexive);
-  p->iiAddCproc("polymakeInterface.lib","isGorenstein",FALSE,PMisGorenstein);
-  p->iiAddCproc("polymakeInterface.lib","gorensteinIndex",FALSE,PMgorensteinIndex);
-  p->iiAddCproc("polymakeInterface.lib","gorensteinVector",FALSE,PMgorensteinVector);
-  p->iiAddCproc("polymakeInterface.lib","isCanonical",FALSE,PMisCanonical);
-  p->iiAddCproc("polymakeInterface.lib","isTerminal",FALSE,PMisTerminal);
-  p->iiAddCproc("polymakeInterface.lib","isLatticeEmpty",FALSE,PMisLatticeEmpty);
-  p->iiAddCproc("polymakeInterface.lib","latticeVolume",FALSE,PMlatticeVolume);
-  p->iiAddCproc("polymakeInterface.lib","latticeDegree",FALSE,PMlatticeDegree);
-  p->iiAddCproc("polymakeInterface.lib","latticeCodegree",FALSE,PMlatticeCodegree);
-  p->iiAddCproc("polymakeInterface.lib","ehrhartPolynomialCoeff",FALSE,PMehrhartPolynomialCoeff);
-  p->iiAddCproc("polymakeInterface.lib","fVectorP",FALSE,PMfVector);
-  p->iiAddCproc("polymakeInterface.lib","hVector",FALSE,PMhVector);
-  p->iiAddCproc("polymakeInterface.lib","hStarVector",FALSE,PMhStarVector);
-  p->iiAddCproc("polymakeInterface.lib","isNormal",FALSE,PMisNormal);
-  p->iiAddCproc("polymakeInterface.lib","facetWidths",FALSE,PMfacetWidths);
-  p->iiAddCproc("polymakeInterface.lib","facetWidth",FALSE,PMfacetWidth);
-  p->iiAddCproc("polymakeInterface.lib","facetVertexLatticeDistances",FALSE,PMfacetVertexLatticeDistances);
-  p->iiAddCproc("polymakeInterface.lib","isCompressed",FALSE,PMisCompressed);
-  p->iiAddCproc("polymakeInterface.lib","isSmooth",FALSE,PMisSmooth);
-  p->iiAddCproc("polymakeInterface.lib","isVeryAmple",FALSE,PMisVeryAmple);
-  p->iiAddCproc("polymakeInterface.lib","latticePoints",FALSE,PMlatticePoints);
-  p->iiAddCproc("polymakeInterface.lib","nLatticePoints",FALSE,PMnLatticePoints);
-  p->iiAddCproc("polymakeInterface.lib","interiorLatticePoints",FALSE,PMinteriorLatticePoints);
-  p->iiAddCproc("polymakeInterface.lib","nInteriorLatticePoints",FALSE,PMnInteriorLatticePoints);
-  p->iiAddCproc("polymakeInterface.lib","boundaryLatticePoints",FALSE,PMboundaryLatticePoints);
-  p->iiAddCproc("polymakeInterface.lib","nBoundaryLatticePoints",FALSE,PMnBoundaryLatticePoints);
-  p->iiAddCproc("polymakeInterface.lib","hilbertBasis",FALSE,PMhilbertBasis);
-  p->iiAddCproc("polymakeInterface.lib","nHilbertBasis",FALSE,PMnHilbertBasis);
-  p->iiAddCproc("polymakeInterface.lib","minkowskiSum",FALSE,PMminkowskiSum);
-  p->iiAddCproc("polymakeInterface.lib","maximalFace",FALSE,PMmaximalFace);
-  p->iiAddCproc("polymakeInterface.lib","minimalFace",FALSE,PMminimalFace);
-  p->iiAddCproc("polymakeInterface.lib","maximalValue",FALSE,PMmaximalValue);
-  p->iiAddCproc("polymakeInterface.lib","minimalValue",FALSE,PMminimalValue);
-  p->iiAddCproc("polymakeInterface.lib","visual",FALSE,visual);
-  p->iiAddCproc("polymakeInterface.lib","normalFan",FALSE,normalFan);
-  p->iiAddCproc("polymakeInterface.lib","vertexAdjacencyGraph",FALSE,PMvertexAdjacencyGraph);
-  p->iiAddCproc("polymakeInterface.lib","vertexEdgeGraph",FALSE,PMvertexEdgeGraph);
+  p->iiAddCproc("polymake.lib","isLatticePolytope",FALSE,PMisLatticePolytope);
+  p->iiAddCproc("polymake.lib","isBounded",FALSE,PMisBounded);
+  p->iiAddCproc("polymake.lib","isReflexive",FALSE,PMisReflexive);
+  p->iiAddCproc("polymake.lib","isGorenstein",FALSE,PMisGorenstein);
+  p->iiAddCproc("polymake.lib","gorensteinIndex",FALSE,PMgorensteinIndex);
+  p->iiAddCproc("polymake.lib","gorensteinVector",FALSE,PMgorensteinVector);
+  p->iiAddCproc("polymake.lib","isCanonical",FALSE,PMisCanonical);
+  p->iiAddCproc("polymake.lib","isTerminal",FALSE,PMisTerminal);
+  p->iiAddCproc("polymake.lib","isLatticeEmpty",FALSE,PMisLatticeEmpty);
+  p->iiAddCproc("polymake.lib","latticeVolume",FALSE,PMlatticeVolume);
+  p->iiAddCproc("polymake.lib","latticeDegree",FALSE,PMlatticeDegree);
+  p->iiAddCproc("polymake.lib","latticeCodegree",FALSE,PMlatticeCodegree);
+  p->iiAddCproc("polymake.lib","ehrhartPolynomialCoeff",FALSE,PMehrhartPolynomialCoeff);
+  p->iiAddCproc("polymake.lib","fVectorP",FALSE,PMfVector);
+  p->iiAddCproc("polymake.lib","hVector",FALSE,PMhVector);
+  p->iiAddCproc("polymake.lib","hStarVector",FALSE,PMhStarVector);
+  p->iiAddCproc("polymake.lib","isNormal",FALSE,PMisNormal);
+  p->iiAddCproc("polymake.lib","facetWidths",FALSE,PMfacetWidths);
+  p->iiAddCproc("polymake.lib","facetWidth",FALSE,PMfacetWidth);
+  p->iiAddCproc("polymake.lib","facetVertexLatticeDistances",FALSE,PMfacetVertexLatticeDistances);
+  p->iiAddCproc("polymake.lib","isCompressed",FALSE,PMisCompressed);
+  p->iiAddCproc("polymake.lib","isSmooth",FALSE,PMisSmooth);
+  p->iiAddCproc("polymake.lib","isVeryAmple",FALSE,PMisVeryAmple);
+  p->iiAddCproc("polymake.lib","latticePoints",FALSE,PMlatticePoints);
+  p->iiAddCproc("polymake.lib","nLatticePoints",FALSE,PMnLatticePoints);
+  p->iiAddCproc("polymake.lib","interiorLatticePoints",FALSE,PMinteriorLatticePoints);
+  p->iiAddCproc("polymake.lib","nInteriorLatticePoints",FALSE,PMnInteriorLatticePoints);
+  p->iiAddCproc("polymake.lib","boundaryLatticePoints",FALSE,PMboundaryLatticePoints);
+  p->iiAddCproc("polymake.lib","nBoundaryLatticePoints",FALSE,PMnBoundaryLatticePoints);
+  p->iiAddCproc("polymake.lib","hilbertBasis",FALSE,PMhilbertBasis);
+  p->iiAddCproc("polymake.lib","nHilbertBasis",FALSE,PMnHilbertBasis);
+  p->iiAddCproc("polymake.lib","minkowskiSum",FALSE,PMminkowskiSum);
+  p->iiAddCproc("polymake.lib","maximalFace",FALSE,PMmaximalFace);
+  p->iiAddCproc("polymake.lib","minimalFace",FALSE,PMminimalFace);
+  p->iiAddCproc("polymake.lib","maximalValue",FALSE,PMmaximalValue);
+  p->iiAddCproc("polymake.lib","minimalValue",FALSE,PMminimalValue);
+  p->iiAddCproc("polymake.lib","visual",FALSE,visual);
+  p->iiAddCproc("polymake.lib","normalFan",FALSE,normalFan);
+  p->iiAddCproc("polymake.lib","vertexAdjacencyGraph",FALSE,PMvertexAdjacencyGraph);
+  p->iiAddCproc("polymake.lib","vertexEdgeGraph",FALSE,PMvertexEdgeGraph);
 
   blackbox* b=getBlackboxStuff(polytopeID);
   b->blackbox_Op2=bbpolytope_Op2;

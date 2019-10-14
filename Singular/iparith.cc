@@ -2052,7 +2052,6 @@ static BOOLEAN jjEXTGCD_I(leftv res, leftv u, leftv v)
   L->m[0].rtyp=INT_CMD;   L->m[0].data=(void *)(long)p0;
   L->m[1].rtyp=INT_CMD;   L->m[1].data=(void *)(long)a;
   L->m[2].rtyp=INT_CMD;   L->m[2].data=(void *)(long)b;
-  res->rtyp=LIST_CMD;
   res->data=(char *)L;
   return FALSE;
 }
@@ -2362,7 +2361,6 @@ static BOOLEAN jjGCD_I(leftv res, leftv u, leftv v)
     r=p0 % p1;
     p0 = p1; p1 = r;
   }
-  res->rtyp=INT_CMD;
   res->data=(char *)(long)p0;
   return FALSE;
 }
@@ -6418,7 +6416,6 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
            "with zero divisors.");
     return TRUE;
   }
-  res->rtyp=IDEAL_CMD;
   if ((mk < 1) || (mk > m->rows()) || (mk > m->cols()))
   {
     ideal I=idInit(1,1);
@@ -7114,7 +7111,6 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   L->m[0].data=(char *)T;
 
   res->data=L;
-  res->rtyp=LIST_CMD;
 
   return FALSE;
 }
@@ -7879,7 +7875,6 @@ static BOOLEAN jjREDUCE4(leftv res, leftv u)
       WerrorS("2nd argument must be a diagonal matrix of units");
       return TRUE;
     }
-    res->rtyp=IDEAL_CMD;
     res->data=(char*)redNF(
                            idCopy((ideal)u3->Data()),
                            idCopy((ideal)u1->Data()),
@@ -7933,7 +7928,6 @@ static BOOLEAN jjREDUCE5(leftv res, leftv u)
       WerrorS("2nd argument must be a diagonal matrix of units");
       return TRUE;
     }
-    res->rtyp=IDEAL_CMD;
     res->data=(char*)redNF(
                            idCopy((ideal)u3->Data()),
                            idCopy((ideal)u1->Data()),

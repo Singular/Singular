@@ -1029,6 +1029,7 @@ syStrategy sySchreyer(ideal arg, int maxlength)
   {
     if (fr[i]!=NULL)
     {
+      idSkipZeroes(fr[i]);
       result->fullres[i] = fr[i];
       fr[i] = NULL;
     }

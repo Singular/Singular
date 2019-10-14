@@ -344,6 +344,7 @@ static proc createMyRing_new(poly p_F, string ordStr,
   int chara = char(basering);
   string charaStr;
   int i;
+  int ii;
   string helpStr;
   int nDefParams = nvars(r_old)-2;
 
@@ -351,9 +352,14 @@ static proc createMyRing_new(poly p_F, string ordStr,
 
   if ((npars(basering)==0) and (minPolyStr==""))
   {
-    helpStr = "ring myRing1 ="
-              + string(chara)+ ", (t(1..nDefParams), x, y),("+ ordStr +");";
-    execute(helpStr);
+     list l1;
+     for (ii = 1; ii<= nDefParams; ii++)
+     {
+      l1[ii] = "t("+string(ii)+")";
+     }
+     l1[size(l1)+1] = "x";
+     l1[size(l1)+1] = "y";
+     ring myRing1 = create_ring("string(chara)", l1, "("+ ordStr +")");
   }
   else
   {
@@ -362,28 +368,47 @@ static proc createMyRing_new(poly p_F, string ordStr,
     {
       if (minPolyStr<>"")
       {
-        helpStr = "ring myRing1 =
-                 (" + string(chara) + ",a),
-                 (t(1..nDefParams), x, y),(" + ordStr + ");";
-        execute(helpStr);
+        list l2;
+        for (ii = 1; ii<= nDefParams; ii++)
+        {
+         l2[ii] = "t("+string(ii)+")";
+        }
+        l2[size(l2)+1] = "x";
+        l2[size(l2)+1] = "y";
+        ring myRing1 = create_ring("(" + string(chara) + ",a)", l2, "("+ ordStr +")");
 
         execute (minPolyStr);
       }
       else // no minpoly given
       {
-        helpStr = "ring myRing1 =
-                  (" + string(chara) + ",a(1..npars(basering)) ),
-                  (t(1..nDefParams), x, y),(" + ordStr + ");";
-        execute(helpStr);
+        string l3 = "(" + string(chara) + "";
+        for (ii = 1; ii <= npars(basering); ii++)
+        {
+         l3 = l3+",a("+string(ii)+")";
+        }
+        l3 = l3+")";
+        list l4;
+        for (ii = 1; ii<= nDefParams; ii++)
+        {
+         l4[ii] = "t("+string(ii)+")";
+        }
+        l4[size(l4)+1] = "x";
+        l4[size(l4)+1] = "y";
+        ring myRing1 = create_ring(l3, l4, "(" + ordStr + ")");
       }
     }
     else
     {
       // ground field is of type (p^k,a)....
       i = find (charaStr,",");
-      helpStr = "ring myRing1 = (" + charaStr[1,i] + "a),
-              (t(1..nDefParams), x, y),(" + ordStr + ");";
-      execute (helpStr);
+      list l5;
+      for (ii = 1; ii<= nDefParams; ii++)
+      {
+       l5[ii] = "t("+string(ii)+")";
+      }
+      l5[size(l5)+1] = "x";
+      l5[size(l5)+1] = "y";
+      ring myRing1 = create_ring("(" + charaStr[1,i] + "a)", l5, "(" + ordStr + ")");
     }
   }
 
@@ -398,10 +423,18 @@ static proc createMyRing_new(poly p_F, string ordStr,
     if (npars(basering) == 0)
     {
       ordStr = "(dp("+string(no_b)+"),"+ordStr+")";
-      helpStr = "ring myRing ="
-                + string(chara)+ ", (b(1..no_b), t(1..nDefParams), x, y),"
-                + ordStr +";";
-      execute(helpStr);
+      list l6;
+      for (ii = 1; ii <= no_b; ii++)
+      {
+       l6[ii] = "b("+string(ii)+")"; 
+      }
+      for (ii = 1; ii <= nDefParams; ii++)
+      {
+       l6[no_b+ii] = "t("+string(ii)+")";
+      }
+      l6[size(l6)+1] = "x";
+      l6[size(l6)+1] = "y";
+      ring myRing = create_ring("string(chara)", l6, ordStr);
     }
     else
     {
@@ -412,10 +445,18 @@ static proc createMyRing_new(poly p_F, string ordStr,
         {
           ordStr = "(dp(" + string(no_b) + ")," + ordStr + ")";
           minPolyStr = makeMinPolyString("a");
-          helpStr = "ring myRing =
-                   (" + string(chara) + ",a),
-                   (b(1..no_b), t(1..nDefParams), x, y)," + ordStr + ";";
-          execute(helpStr);
+          list l7;
+          for (ii = 1; ii <= no_b; ii++)
+          {
+           l7[ii] = "b("+string(ii)+")"; 
+          }
+          for (ii = 1; ii <= nDefParams; ii++)
+          {
+           l7[no_b+ii] = "t("+string(ii)+")";
+          }
+          l7[size(l7)+1] = "x";
+          l7[size(l7)+1] = "y";
+          ring myRing = create_ring("(" + string(chara) + ",a)", l7, ordStr);
 
           helpStr = "minpoly =" + minPolyStr + ";";
           execute (helpStr);
@@ -423,20 +464,42 @@ static proc createMyRing_new(poly p_F, string ordStr,
         else // no minpoly given
         {
           ordStr = "(dp(" + string(no_b) + ")," + ordStr + ")";
-          helpStr = "ring myRing =
-                    (" + string(chara) + ",a(1..npars(basering)) ),
-                    (b(1..no_b), t(1..nDefParams), x, y)," + ordStr + ";";
-          execute(helpStr);
+          string l8 = "(" + string(chara) + "";
+          for (ii = 1; ii <= npars(basering); ii++)
+          {
+           l8 = l8+",a("+string(ii)+")";
+          }
+          l8 = l8+")";
+          list l9;
+          for (ii = 1; ii<= no_b; ii++)
+          {
+           l9[ii] = "b("+string(ii)+")";
+          }
+          for (ii = 1; ii<= nDefParams; ii++)
+          {
+           l9[no_b+ii] = "t("+string(ii)+")";
+          }
+          l9[size(l9)+1] = "x";
+          l9[size(l9)+1] = "y";
+          ring myRing = create_ring(l8, l9, ordStr);
         }
       }
       else
       {
         i = find (charaStr,",");
         ordStr = "(dp(" + string(no_b) + ")," + ordStr + ")";
-        helpStr = "ring myRing =
-                (" + charaStr[1,i] + "a),
-                (b(1..no_b), t(1..nDefParams), x, y)," + ordStr + ";";
-        execute (helpStr);
+        list l10;
+        for (ii = 1; ii<= no_b; ii++)
+        {
+         l10[ii] = "b("+string(ii)+")";
+        }
+        for (ii = 1; ii<= nDefParams; ii++)
+        {
+         l10[no_b+ii] = "t("+string(ii)+")";
+        }
+        l10[size(l10)+1] = "x";
+        l10[size(l10)+1] = "y";
+        ring myRing = create_ring("(" + charaStr[1,i] + "a)", l10, ordStr);
       }
     }
     ideal qIdeal = imap(myRing1, qIdeal);
@@ -492,9 +555,7 @@ static proc determine_coef (poly Fm)
 
   if (npars(basering) == 0)
   {
-    helpStr = "ring myRing1 ="
-              + string(chara)+ ", (y,x),ds;";
-    execute(helpStr);
+    ring myRing1 = create_ring("string(chara)", "(y,x)", "ds");
   }
   else
   {
@@ -504,25 +565,27 @@ static proc determine_coef (poly Fm)
       if (minpoly !=0)
       {
         minPolyStr = makeMinPolyString("a");
-        helpStr = "ring myRing1 = (" + string(chara) + ",a), (y,x),ds;";
-        execute(helpStr);
+        ring myRing1 = create_ring("(" + string(chara) + ",a)", "(y,x)", "ds");
 
         helpStr = "minpoly =" + minPolyStr + ";";
         execute (helpStr);
       }
       else // no minpoly given
       {
-        helpStr = "ring myRing1 =
-                  (" + string(chara) + ",a(1..npars(basering)) ), (y,x),ds;";
-        execute(helpStr);
+        string l11 = "(" + string(chara) + "";
+        for (ii = 1; ii <= npars(basering); ii++)
+        {
+         l11 = l11+",a("+string(ii)+")";
+        }
+        l11 = l11+")";
+        ring myRing1 = create_ring(l11, "(y,x)", "ds"); 
       }
     }
     else
     {
       i = find (charaStr,",");
 
-      helpStr = " ring myRing1 = (" + charaStr[1,i] + "a), (y,x),ds;";
-      execute (helpStr);
+      ring myRing1 = create_ring("(" + charaStr[1,i] + "a)", "(y,x)", "ds");
     }
   }
   poly f=imap(r_base,Fm);
@@ -695,8 +758,7 @@ static proc esComputation (int typ, poly p_F, list #)
     // define a new ring without deformation-parameters and change to it:
     string str;
     string minpolyStr = string(minpoly);
-    str = " ring HNERing = (" + charstr(basering) + "), (x,y), ls;";
-    execute (str);
+    ring HNERing = create_ring(ringlist(basering)[1], "(x,y)", "ls", "no_minpoly");
     if (minpolyStr!="0")
     {str = "minpoly ="+ minpolyStr+";";execute(str);}
     ring_is_changed=1;
@@ -1192,9 +1254,7 @@ static proc esComputation (int typ, poly p_F, list #)
       ordStr = "dp(" + string(b_left) + "),dp";
       ideal qId = ideal(basering);
 
-      helpStr = "ring Shortring = ("
-                + charstr(basering) + "),("+ LL[1] +") , ("+ ordStr  +");";
-      execute(helpStr);
+      ring Shortring = create_ring(ringlist(basering)[1], "("+ LL[1] +")", "("+ ordStr  +")", "no_minpoly");
       execute(minPolyStr);
       // ring has changed to "Shortring"
 
@@ -1280,10 +1340,7 @@ static proc esComputation (int typ, poly p_F, list #)
   if (npars(myRing)<>0)
   {
     ideal qIdeal = ideal(basering);
-    helpStr = "ring ESSring = ("
-                 + string(char(basering))+ "," + parstr(myRing) +
-                 ") , ("+ varstr(basering)+") , ("+ ordstr(basering) +");";
-    execute(helpStr);
+    ring ESSring = create_ring("("+ string(char(basering))+ "," + parstr(myRing) +")", "("+ varstr(basering)+")", "("+ ordstr(basering) +")");
     execute(minPolyStr);
     // basering has changed to ESSring
 
@@ -1731,17 +1788,9 @@ EXAMPLE: example esIdeal; shows examples.
   ideal JJ=maxideal(1)*jacob(f);
   ideal kbase_versal=kbase(std(JJ));
   s=size(kbase_versal);
-  string ring_versal="ring @Px = ("+charstr(basering)+"),(t(1.."+string(s)+"),"
-                        +varstr(basering)+"),(ds("+string(s)+"),"
-                        +ordstr(basering)+");";
-  MinPolyStr = string(minpoly);
-
-  execute(ring_versal);
-  if (MinPolyStr<>"0")
-  {
-    MinPolyStr = "minpoly="+MinPolyStr;
-    execute(MinPolyStr);
-  }
+  ring @Pt=QQ,(t(1..s)),ds;
+  def @Px=@Pt+old_ring;
+  setring @Px;
   // basering has changed to @Px
 
   poly F=imap(old_ring,f);

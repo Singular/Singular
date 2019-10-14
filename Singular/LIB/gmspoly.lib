@@ -479,8 +479,7 @@ EXAMPLE:  example goodBasis; shows examples
   int i,j,k,l;
 
   ideal X=maxideal(1);
-  string c="ring @XS=0,(s,"+varstr(@X)+"),(C,dp(1),dp(n));";
-  execute(c);
+  ring @XS = create_ring(0, "(s,"+varstr(@X)+")", "(C,dp(1),dp("+string(n)+"))");
   poly f=imap(@X,f);
   ideal J=imap(@X,J);
   ideal JS=std(J+var(1));

@@ -55,7 +55,7 @@ nodist_omTables1_SOURCES = omConfig.h
 omTables_CPPFLAGS = ${AM_CPPFLAGS} -DOM_GENERATE_INC
 omTables1_CPPFLAGS = ${AM_CPPFLAGS} -DOM_GENERATE_INC
 
-CLEANFILES = $(BUILT_SOURCES)
+CLEANFILES = $(BUILT_SOURCES) omTables omTables1
 DISTCLEANFILES = omConfig.h
 ####################################################
 ## Test program

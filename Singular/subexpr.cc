@@ -682,35 +682,6 @@ void s_internalDelete(const int t,  void *d, const ring r)
   }
 }
 
-void * slInternalCopy(leftv source, const int t, void *d, Subexpr e)
-{
-  if (t==STRING_CMD)
-  {
-      if ((e==NULL)
-      || (source->rtyp==LIST_CMD)
-      || ((source->rtyp==IDHDL)
-          &&((IDTYP((idhdl)source->data)==LIST_CMD)
-            || (IDTYP((idhdl)source->data)>MAX_TOK)))
-      || (source->rtyp>MAX_TOK))
-        return (void *)omStrDup((char *)d);
-      else if (e->next==NULL)
-      {
-        char *s=(char*)omAllocBin(size_two_bin);
-        s[0]=*(char *)d;
-        s[1]='\0';
-        return s;
-      }
-      #ifdef TEST
-      else
-      {
-        Werror("not impl. string-op in `%s`",my_yylinebuf);
-        return NULL;
-      }
-      #endif
-  }
-  return s_internalCopy(t,d);
-}
-
 void sleftv::Copy(leftv source)
 {
   Init();
@@ -756,7 +727,7 @@ void * sleftv::CopyD(int t)
     return x;
   }
   void *d=Data(); // will also do a iiCheckRing
-  if ((!errorreported) && (d!=NULL)) return slInternalCopy(this,t,d,e);
+  if ((!errorreported) && (d!=NULL)) return s_internalCopy(t,d);
   return NULL;
 }
 

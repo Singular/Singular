@@ -1,4 +1,31 @@
 How to add new kernel commands
+- create a new dynamic module, add your new commands as PROC:
+  - create a sub directory of Singular/dyn_modules: Singular/dyn_modules/bla
+  - add the name of your sub directory to Singular/dyn_modules/Makefile.am
+  - create Singular/dyn_modules/bla/Makefile.am
+    (have a look at the other Singular/dyn_modules/*/Makefile.am for an example)
+  - your module must contain the following initialization routine,
+    where "bla" refers to the (Singular) name for your new procedure
+    and bla_proc refers to the C++-implementation of it with
+    the following head: static BOOLEAN bla_proc(leftv result, leftv args)
+
+//------------------------------------------------------------------------
+// initialisation of the module
+extern "C" int SI_MOD_INIT(bla)(SModulFunctions* p)
+{
+  p->iiAddCproc("bla.so","bla",FALSE,bla_proc);
+  return (MAX_TOK);
+}
+
+-----------------------------------------------------------------------------
+The following describes how the main Singular kernel commands were constructed,
+but we do not want to change this any more as this would change the Singular
+language (unless an error is found).
+The files not to change are: grammar.y, scanner.l, table.h, tok.h
+and the derived files: grammar.cc, grammar.h, scanner.cc, iparith.inc
+If one of these files really need a change, run make_grammar (for grammar.*)
+or make_table (for table.h).
+The following text serves only as a remainder how iiExprArith etc. work:
 
 Example: bla
 

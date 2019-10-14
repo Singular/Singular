@@ -200,17 +200,7 @@ dnl figure out page size of the system
 dnl
 AC_MSG_CHECKING(size of system page)
 AC_CACHE_VAL(ac_cv_pagesize,
-AC_TRY_RUN([#include <stdio.h>
-#include <stdlib.h>
-#include "omGetPageSize.h"
-
-int main()
-{
-  FILE *f=fopen("conftestval", "w");
-  if (!f) exit(1);
-  fprintf(f, "%d\n", (int)omalloc_getpagesize);
-  exit(0);
-}], ac_cv_pagesize=`cat conftestval`, ac_cv_pagesize=0, ac_cv_pagesize=0))
+ac_cv_pagesize=`getconf PAGESIZE`)
 # can not really handle pagesizes which are greater -- there must be a
 # bug somewhere
 if test $ac_cv_pagesize -gt 8192; then

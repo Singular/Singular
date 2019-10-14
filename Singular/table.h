@@ -914,9 +914,9 @@ const struct sValCmdM dArithM[]=
 #endif
 ,{D(jjCALL2ARG),  COEF_CMD,        MATRIX_CMD,         2       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCOEF_M),    COEF_CMD,        NONE,               4       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCALL2ARG),  DIVISION_CMD,    ANY_TYPE/*or set by p*/,2   , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDIVISION4), DIVISION_CMD,    ANY_TYPE/*or set by p*/,3   , NO_NC |NO_RING}
-,{D(jjDIVISION4), DIVISION_CMD,    ANY_TYPE/*or set by p*/,4   , NO_NC |NO_RING}
+,{D(jjCALL2ARG),  DIVISION_CMD,    LIST_CMD,            2      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjDIVISION4), DIVISION_CMD,    LIST_CMD,            3      , NO_NC |NO_RING}
+,{D(jjDIVISION4), DIVISION_CMD,    LIST_CMD,            4      , NO_NC |NO_RING}
 ,{D(jjDBPRINT),   DBPRINT_CMD,     NONE,               -2      , ALLOW_NC |ALLOW_RING}
 //,{D(jjEXPORTTO_M),  EXPORTTO_CMD,    NONE,             -2      , ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL2ARG),  FETCH_CMD,       ANY_TYPE/*or set by p*/,2   , ALLOW_PLURAL |ALLOW_RING}
