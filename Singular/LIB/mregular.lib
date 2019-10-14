@@ -419,11 +419,11 @@ EXAMPLE: example regIdeal; shows some examples
    H=maxdeg1(K)+1;
    firstind=H;
    KK=minbase(subst(I,x(lastv),1));
+   list l9;
    for ( ii = n-lastv; ii<=d-2; ii++ )
    {
      LL=minbase(subst(I,x(n-ii-1),1));
      attrib(LL,"isSB",1);
-     list l9;
      for (zz = 0; zz<= n-ii-1; zz++)
      {
       l9[zz+1] = "x("+string(zz)+")";
