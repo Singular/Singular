@@ -28,6 +28,7 @@ Changed libraries:
 Changes in the kernel/build system:
 @itemize
 @item improved gcd and multiplication via FLINT
+@item port to polymake 3.5.x
 @end itemize
 
 @heading News for version 4-1-2
