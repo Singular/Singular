@@ -290,7 +290,7 @@ NOTE:    It uses the procedure  modNpos_test to test Noether position.
      }
      phi=r1,chcoord;
      I=phi(i);
-     if ( modNPos_test(I)[1] == 1 )
+     if ( modNpos_test(I)[1] == 1 )
      {
        setring r0;
        chcoord=fetch(r1,chcoord);
