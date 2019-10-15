@@ -609,7 +609,7 @@ KEYWORDS: regularity
   }
   else
   {
-    def r2=changechar(ringlist(r1),r1);
+    def r2=changechar(ringlist(r1)[1],r1);
     setring r2;
     ideal sbi,I,i,K,T,ic,Ic;
     map phi;
