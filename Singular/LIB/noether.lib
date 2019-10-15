@@ -448,11 +448,8 @@ KEYWORDS: saturation
 }
 example
 { "EXAMPLE:"; echo = 2;
-ring r=0,(X,Y,a,b),dp;
-poly f=X^8+a*Y^4-Y;
-poly g=Y^8+b*X^4-X;
-poly h=diff(f,X)*diff(g,Y)-diff(f,Y)*diff(g,X);
-ideal i=f,g,h;
+ring r=0,(t,a,b,c,d),dp;
+ideal i=b4-a3d, ab3-a3c, bc4-ac3d-bcd3+ad4, c6-bc3d2-c3d3+bd5, ac5-b2c3d-ac2d3+b2d4, a2c4-a3d3+b3d3-a2cd3, b3c3-a3d3, ab2c3-a3cd2+b3cd2-ab2d3, a2bc3-a3c2d+b3c2d-a2bd3, a3c3-a3bd2, a4c2-a3b2d;
 nsatiety(i);
 }
 
@@ -562,11 +559,8 @@ KEYWORDS: saturation
 }
 example
 { "EXAMPLE:"; echo = 2;
-ring r=0,(X,Y,a,b),dp;
-poly f=X^8+a*Y^4-Y;
-poly g=Y^8+b*X^4-X;
-poly h=diff(f,X)*diff(g,Y)-diff(f,Y)*diff(g,X);
-ideal i=f,g,h;
+ring r=0,(t,a,b,c,d),dp;
+ideal i=b4-a3d, ab3-a3c, bc4-ac3d-bcd3+ad4, c6-bc3d2-c3d3+bd5, ac5-b2c3d-ac2d3+b2d4, a2c4-a3d3+b3d3-a2cd3, b3c3-a3d3, ab2c3-a3cd2+b3cd2-ab2d3, a2bc3-a3c2d+b3c2d-a2bd3, a3c3-a3bd2, a4c2-a3b2d;
 modsatiety(i);
 }
 
@@ -800,11 +794,8 @@ KEYWORDS: regularity
 }
 example
 { "EXAMPLE:"; echo = 2;
-ring r=0,(X,Y,a,b),dp;
-poly f=X^8+a*Y^4-Y;
-poly g=Y^8+b*X^4-X;
-poly h=diff(f,X)*diff(g,Y)-diff(f,Y)*diff(g,X);
-ideal i=f,g,h;
+ring r=0,(t,a,b,c,d),dp;
+ideal i=b4-a3d, ab3-a3c, bc4-ac3d-bcd3+ad4, c6-bc3d2-c3d3+bd5, ac5-b2c3d-ac2d3+b2d4, a2c4-a3d3+b3d3-a2cd3, b3c3-a3d3, ab2c3-a3cd2+b3cd2-ab2d3, a2bc3-a3c2d+b3c2d-a2bd3, a3c3-a3bd2, a4c2-a3b2d;
 regCM(i);
 }
 
@@ -981,11 +972,8 @@ KEYWORDS: regularity
 }
 example
 { "EXAMPLE:"; echo = 2;
-ring r=0,(X,Y,a,b),dp;
-poly f=X^8+a*Y^4-Y;
-poly g=Y^8+b*X^4-X;
-poly h=diff(f,X)*diff(g,Y)-diff(f,Y)*diff(g,X);
-ideal i=f,g,h;
+ring r=0,(t,a,b,c,d),dp;
+ideal i=b4-a3d, ab3-a3c, bc4-ac3d-bcd3+ad4, c6-bc3d2-c3d3+bd5, ac5-b2c3d-ac2d3+b2d4, a2c4-a3d3+b3d3-a2cd3, b3c3-a3d3, ab2c3-a3cd2+b3cd2-ab2d3, a2bc3-a3c2d+b3c2d-a2bd3, a3c3-a3bd2, a4c2-a3b2d;
 modregCM(i);
 }
 /*
