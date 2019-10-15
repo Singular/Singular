@@ -113,6 +113,15 @@ ASSUME: i is a nonzero monomial ideal.
    print("The dimension of the ideal is:");print(d);
    return(list(1,P1+P3));
 }
+example
+{ "EXAMPLE:"; echo = 2;
+ring r=0,(X,Y,a,b),dp;
+poly f=X^8+a*Y^4-Y;
+poly g=Y^8+b*X^4-X;
+poly h=diff(f,X)*diff(g,Y)-diff(f,Y)*diff(g,X);
+ideal i=f,g,h;
+NPos_test(i);
+}
 //////////////////////////////////////////
 proc modNpos_test (ideal i)
 "USAGE: modNpos_test(i); i an ideal
@@ -142,12 +151,22 @@ NOTE:   This test is a probabilistic test, and it computes the initial of the id
   attrib(I,"isSB",1);
   return(NPos_test(I));
 }
+example
+{ "EXAMPLE:"; echo = 2;
+ring r=0,(X,Y,a,b),dp;
+poly f=X^8+a*Y^4-Y;
+poly g=Y^8+b*X^4-X;
+poly h=diff(f,X)*diff(g,Y)-diff(f,Y)*diff(g,X);
+ideal i=f,g,h;
+modNpos_test(i);
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
 proc NPos (ideal i)
 "USAGE:  NPos(i); i ideal
 RETURN:  A linear map phi such that  phi(i) is in Noether position
+KEYWORDS: Noether position
 "
 {
 //--------------------------- initialisation ---------------------------------
@@ -224,6 +243,15 @@ RETURN:  A linear map phi such that  phi(i) is in Noether position
 // The procedure has entered in more than 30 loops: in your example
 // the method may enter an infinite loop over a finite field!";
   return (-1);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ring r=0,(X,Y,a,b),dp;
+poly f=X^8+a*Y^4-Y;
+poly g=Y^8+b*X^4-X;
+poly h=diff(f,X)*diff(g,Y)-diff(f,Y)*diff(g,X);
+ideal i=f,g,h;
+NPos(i);
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc modNPos (ideal i)
@@ -305,6 +333,15 @@ NOTE:    It uses the procedure  modNPos_test to test Noether position.
 // the method may enter an infinite loop over a finite field!";
    return (-1);
 }
+example
+{ "EXAMPLE:"; echo = 2;
+ring r=0,(X,Y,a,b),dp;
+poly f=X^8+a*Y^4-Y;
+poly g=Y^8+b*X^4-X;
+poly h=diff(f,X)*diff(g,Y)-diff(f,Y)*diff(g,X);
+ideal i=f,g,h;
+modNPos(i);
+}
 
 ////////////////////////////////////////////////////////////////////////////////////
 static proc TestLastVarIsInGenericPos (ideal i)
@@ -333,7 +370,6 @@ THEORY:  The last variable is in generic position if the quotient of the ideal
   return(ret);
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////////
 proc nsatiety (ideal i)
 "USAGE:   nsatiety (i); i ideal,
@@ -343,6 +379,7 @@ ASSUME:  i is a homogeneous ideal of the basering R=K[x(0)..x(n)].
 THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
          least integer s such that, for all d>=s, the degree d part of the
          ideals i and isat=sat(i,maxideal(1))[1] coincide.
+KEYWORDS: saturation
 "
 {
 //--------------------------- initialisation ---------------------------------
@@ -409,6 +446,15 @@ THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
     }
   }
 }
+example
+{ "EXAMPLE:"; echo = 2;
+ring r=0,(X,Y,a,b),dp;
+poly f=X^8+a*Y^4-Y;
+poly g=Y^8+b*X^4-X;
+poly h=diff(f,X)*diff(g,Y)-diff(f,Y)*diff(g,X);
+ideal i=f,g,h;
+nsatiety(i);
+}
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -421,6 +467,7 @@ THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
          least integer s such that, for all d>=s, the degree d part of the
          ideals i and isat=sat(i,maxideal(1))[1] coincide.
 NOTE:    This is a probabilistic procedure, and it computes the initial of the ideal modulo the prime number 2147483647 (the biggest prime less than 2^31).
+KEYWORDS: saturation
 "
 {
 //--------------------------- initialisation ---------------------------------
@@ -513,6 +560,15 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
     }
   }
 }
+example
+{ "EXAMPLE:"; echo = 2;
+ring r=0,(X,Y,a,b),dp;
+poly f=X^8+a*Y^4-Y;
+poly g=Y^8+b*X^4-X;
+poly h=diff(f,X)*diff(g,Y)-diff(f,Y)*diff(g,X);
+ideal i=f,g,h;
+modsatiety(i);
+}
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -521,6 +577,7 @@ proc regCM (ideal i)
 RETURN:  the Castelnuovo-Mumford regularity of i.
          (returns -1 if i is not homogeneous)
 ASSUME:  i is a homogeneous ideal.
+KEYWORDS: regularity
 "
 {
 //--------------------------- initialisation ---------------------------------
@@ -741,6 +798,15 @@ ASSUME:  i is a homogeneous ideal.
     return();
   }
 }
+example
+{ "EXAMPLE:"; echo = 2;
+ring r=0,(X,Y,a,b),dp;
+poly f=X^8+a*Y^4-Y;
+poly g=Y^8+b*X^4-X;
+poly h=diff(f,X)*diff(g,Y)-diff(f,Y)*diff(g,X);
+ideal i=f,g,h;
+regCM(i);
+}
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -750,6 +816,7 @@ RETURN:  an integer, the Castelnuovo-Mumford regularity of i.
          (returns -1 if i is not homogeneous)
 ASSUME:  i is a homogeneous ideal and the characteristic of base field is zero..
 NOTE:    This is a probabilistic procedure, and it computes the initial of the ideal modulo the prime number 2147483647 (the biggest prime less than 2^31).
+KEYWORDS: regularity
 "
 {
 //--------------------------- initialisation ---------------------------------
@@ -911,6 +978,15 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
   }
   dbprint(2,"mreg(i)=" + string(h) + " and the time of this computation: " + string(rtimer-time) + "sec./100");
   return();
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ring r=0,(X,Y,a,b),dp;
+poly f=X^8+a*Y^4-Y;
+poly g=Y^8+b*X^4-X;
+poly h=diff(f,X)*diff(g,Y)-diff(f,Y)*diff(g,X);
+ideal i=f,g,h;
+modregCM(i);
 }
 /*
 //////////////////////////////////////////////////////////////
