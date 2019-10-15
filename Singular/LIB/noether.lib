@@ -257,7 +257,7 @@ NPos(i);
 proc modNPos (ideal i)
 "USAGE:  modNPos(i); i ideal
 RETURN:  A linear map phi such that  phi(i) is in Noether position
-NOTE:    It uses the procedure  modNPos_test to test Noether position.
+NOTE:    It uses the procedure  modNpos_test to test Noether position.
 "
 {
 //--------------------------- initialisation ---------------------------------
@@ -275,7 +275,7 @@ NOTE:    It uses the procedure  modNPos_test to test Noether position.
    i = fetch(r0,i);
    time=rtimer;
    system("--ticks-per-sec",10);
-   #=modNPos_test(i);
+   #=modNpos_test(i);
    if ( #[1]== 1 )
    {
      return ("The ideal is in Noether position and the time of this computation is:",rtimer-time,"/10 sec.");
