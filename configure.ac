@@ -294,6 +294,7 @@ AC_CONFIG_FILES([Singular/dyn_modules/gitfan/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/interval/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/cohomo/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/systhreads/Makefile])
+AC_CONFIG_FILES([Singular/dyn_modules/loctriv/Makefile])
 
 AC_CONFIG_FILES([Singular/Makefile])
 
