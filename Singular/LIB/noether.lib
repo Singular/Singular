@@ -936,8 +936,12 @@ KEYWORDS: regularity
   for ( ii = n; ii>=n-d+1; ii-- )
   {
     i=subst(i,x(ii),0);
-    s = "ring mr = ","0",",x(0..ii-1),dp;";
-    execute(s);
+    list l11;
+    for (int zz = 0; zz <= ii-1; zz++)
+    {
+     l11[zz+1] = "x("+string(zz)+")";
+    }
+    ring mr = create_ring(0, l11, "dp");
     ideal i,sbi,I,J,K,L,lsbi1;
     poly P;
     list #;
