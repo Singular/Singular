@@ -58,9 +58,7 @@ EXAMPLE: example nt_solve; shows an example
     if ((acc <= 0)||(acc > prec-1)){acc = prec-1;}
 
     int dpl = di+1;
-    string out;
-    out = "ring rnewton=(real,prec),("+varstr(basering)+"),(c,dp);";
-    execute(out);
+    ring rnewton = create_ring("(real,prec)", "("+varstr(basering)+")", "(c,dp)");
 
     ideal gls1=imap(rn,gls);
     module nt,sub;

@@ -140,8 +140,12 @@ EXAMPLE: example ModEqn; shows an example
       ideal newid = sList[1];
       dbprint(dbPrt, " number of equations = " + string(size(sList[1])));
       dbprint(dbPrt, " number of variables = " + string(size(sList[3])));
-      ringSTR = "ring RME5 = (" + charstr(basering) + "), (Y(1.." + string(size(sList[3])) + ")),dp;";
-      execute(ringSTR);
+      list l3;
+      for (int ii = 1; ii <= size(sList[3]); ii++)
+      {
+       l3[ii] = "Y("+string(ii)+")";
+      }
+      ring RME5 = create_ring(ringlist(basering)[1], l3, "dp", "no_minpoly");
       execute("minpoly = number(" + @mPoly + ");");
       ideal modid = imap(RME4, newid);
     }
@@ -334,21 +338,17 @@ EXAMPLE: example ArnoldAction; shows an example
   // setup new ring with s(..) and t(..) as parameters
 
   varSTR = string(maxideal(1));
-  ringSTR2 = "ring RAAS = ";
   if(npars(basering) == 1) {
     parName = parstr(basering);
-    ringSTR2 = ringSTR2 + "(0, " + parstr(1) + "), ";
+    ringSTR2 = "(0, " + parstr(1) + "), ";
   }
   else {
     parName = "a";
-    ringSTR2 = ringSTR2 + "0, ";
+    ringSTR2 = "0, ";
   }
   offset = 1 + nrStabVars;
-  namesSTR = "s(1.." + string(nrStabVars) + "), t(1.." + string(size(B)) + ")";
-  ringSTR2 = ringSTR2 + "(" + namesSTR + "), lp;";
-  ringSTR1 = "ring RAAR = (0, " + parName + "," + namesSTR + "), (" + varSTR + "), ls;";  // lp ?
 
-  execute(ringSTR1);
+  ring RAAR = create_ring("(0, " + parName + "," + namesSTR + ")", "(" + varSTR + ")", "ls");
   export(RAAR);
   ideal upperBasis, stabaction, action, reduceIdeal;
   poly f, F, monos, h;
@@ -379,7 +379,18 @@ EXAMPLE: example ArnoldAction; shows an example
     pos = FirstEntryQHM(upperBasis, parts[1][i]);
     if (pos!=0) { action[pos] = parts[2][i]/parts[1][i];}
   }
-  execute(ringSTR2);
+  list l4;
+  for (int ii = 1; ii <= nrStabVars; ii++)
+  {
+   l4[ii] = "s("+string(ii)+")";
+  }
+  list l5;
+  for (int ii = 1; ii <= size(B); ii++)
+  {
+   l5[ii] = "t("+string(ii)+")";
+  }
+  l5 = l4+l5;
+  ring RAAS = create_ring("ringSTR2", l5, "lp");
   execute("minpoly = number(" + @mPoly + ");");
   ideal actionid = imap(RAAR, action);
   ideal stabid = imap(STR1, stabid);
@@ -507,16 +518,15 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
 
   def RSTB = basering;
   string @mPoly = string(minpoly);
-  ringSTR = "ring RSTR = " + parString + ", (" + varstr(basering) + ", " + varString + "), dp;";  // dp
-        ringSTR1 = "ring RSTT = " + parString + ", (" + varString + ", " + varstr(basering) + "), dp;";
 
   if(defined(RSTR)) { kill RSTR;}
         if(defined(RSTT)) { kill RSTT;}
-        execute(ringSTR1);      // this ring is only used for the result, where the variables
+        ring RSTT = create_ring("parString", "(" + varString + ", " + varstr(basering) + ")", "dp");
+      // this ring is only used for the result, where the variables
   export(RSTT);           // are s(1..m),t(1..n), as needed for Derksens algorithm (NullCone)
   execute("minpoly = number(" + @mPoly + ");");
 
-  execute(ringSTR);
+  ring RSTR = create_ring("parString", "(" + varstr(basering) + ", " + varString + ")", "dp");
   export(RSTR);
   execute("minpoly = number(" + @mPoly + ");");
   poly f, f1, g, h, vars, pp;      // f1 is the polynomial after subs,
@@ -609,8 +619,7 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
   dbprint(dbPrt, "  equations of stabilizer = " + string(stabid));
 
   varString = "s(1.." + string(sln) + ")";
-  ringSTR = "ring RSTS = " + parString + ", (" + varString + "), dp;";
-  execute(ringSTR);
+  ring RSTS = create_ring("parString", "(" + varString + ")", "dp");
   execute("minpoly = number(" + @mPoly + ");");
   ideal stabid = std(imap(RSTR, stabid));
   export(stabid);
@@ -621,8 +630,6 @@ dbprint(dbPrt, "
      show(stab);
 // To access the 1-st ring and map (and similair for the others), type:
      def S1 = stab[1]; setring S1;  stabid;
-// S1/stabid is the coordinate ring of the variety of the
-// stabilizer, say G. If G x K^n --> K^n is the action of G on
 // K^n, then the ideal 'actionid' in the second ring describes
 // the dual map on the ring level.
 // To access the 2-nd ring and map (and similair for the others), type:
@@ -1020,11 +1027,9 @@ GLOBAL:  'computedPowers'
     @ringVars = @ringVars + "s(1.." + string(nrs) + "), ";
   }
   @ringVars = @ringVars + "t(1.." + string(nrt) + "))";
-  ringSTR = "ring RASR = 0, " + @ringVars + ", dp;";    // new basering
-
+  ring RASR = create_ring(0, "@ringVars", "dp");    // new basering
   // built the "reduction" ring with the reduction ideal
 
-  execute(ringSTR);
   export(RASR);
   ideal reduceIdeal, substitution, newSubs;
   intvec w1, degVec;

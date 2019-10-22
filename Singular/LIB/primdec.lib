@@ -778,8 +778,7 @@ static proc splitCharp(list l)
         j=size(va);
         while(va[j]!=","){j--;}
         va=va[1..j-1];
-        gnir="ring RL=("+string(char(P))+","+string(var(n))+"),("+va+"),lp;";
-        execute(gnir);
+        ring RL = create_ring("("+string(char(P))+","+string(var(n))+")", "("+va+")", "lp");
         minpoly=leadcoef(imap(P,ni));
         ideal act;
         ideal t=imap(P,t);
@@ -1223,11 +1222,9 @@ proc extF(list l,list #)
   }
   if(size(peek)==0){return(peek1);}
 
-  string gnir="ring RH=("+string(p)+"^"+string(ex)+",@a),("+varstr(R)+"),lp;";
-  execute(gnir);
+  ring RH = create_ring("("+string(p)+"^"+string(ex)+",@a)", "("+varstr(R)+")", "lp");
   string mp="minpoly="+string(minpoly)+";";
-  gnir="ring RL=("+string(p)+",@a),("+varstr(R)+"),lp;";
-  execute(gnir);
+  ring RL = create_ring("("+string(p)+",@a)", "("+varstr(R)+")", "lp");
   execute(mp);
   list L=imap(R,peek);
   list pr, keep;
@@ -1244,8 +1241,7 @@ proc extF(list l,list #)
   }
   mp="poly pp="+string(minpoly)+";";
 
-  string gnir1="ring RS="+string(p)+",("+varstr(R)+",@a),lp;";
-  execute(gnir1);
+  ring RS = create_ring("string(p)", "("+varstr(R)+",@a)", "lp");
   execute(mp);
   list L=imap(RL,keep);
 
@@ -4035,12 +4031,17 @@ EXAMPLE: example zeroRad; shows an example"
       F[i]=powerCoeffs(F[i],k-l[i][2]);
    }
 
-   string cR="ring @R="+string(p)+",("+parstr(R)+","+varstr(R)+"),dp;";
-   execute(cR);
+   ring @R = create_ring("string(p)", "("+parstr(R)+","+varstr(R)+")", "dp");
    ideal F=imap(R,F);
 
-   string nR="ring @S="+string(p)+",(@y(1..m),"+varstr(R)+","+parstr(R)+"),dp;";
-   execute(nR);
+   list l2;
+   for (int ii = 1; ii <= m; ii++)
+   {
+    l2[ii] = "@y("+string(ii)+")";
+   }
+   l2[size(l2)+1] = ringlist(R)[2];
+   l2[size(l2)+1] = ringlist(R)[1][2];
+   ring @S = create_ring("string(p)", l2, "dp");
 
    ideal G=fetch(@R,F);    //G[i](t(1)^(p^-k),...,t(m)^(p^-k),x(i))=sep(F[i])
 
@@ -4078,16 +4079,12 @@ static proc algeRad(ideal i)
    int n=nvars(R);
 
    string mp="poly @p="+string(minpoly)+";";
-   string gnir="ring RH="+string(char(R))+",("+varstr(R)+","+string(par(1))
-                +"),dp;";
-   execute(gnir);
+   ring RH = create_ring("string(char(R))", "("+varstr(R)+","+string(par(1))+")", "dp");
    execute(mp);
    ideal i=imap(R,i);
    i=i,@p;
    ideal ra=radical(i);
-   gnir="ring RS="+string(char(R))+",("+varstr(RH)
-                +"),(dp("+string(n)+"),lp);";
-   execute(gnir);
+   ring RS = create_ring("string(char(R))", "("+varstr(RH)+")", "(dp("+string(n)+"),lp)");
    ideal K=imap(RH,ra);
    K=std(K);
    if (ncols(K)>1) { K=K[2..size(K)];}

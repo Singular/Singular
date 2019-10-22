@@ -749,9 +749,7 @@ proc prepareDcE(list re, list inter, list endCharts)
          if(defined(nullj)){kill nullj;}
          list nullj=imap(S,dcE)[inter[3][ii][1][2]][inter[3][ii][1][3]][7];
          if(defined(rcomp)){kill rcomp;}
-         strId="ring rcomp=complex,(" +varstr(basering) +"),(" +
-                           ordstr(basering) + ");";
-         execute(strId);
+         ring rcomp = create_ring(complex, "(" +varstr(basering) +")", "(" +ordstr(basering) + ")");
          def id1=imap(St,id1);
          def idj=imap(St,idj);
          ideal id10,idj0;

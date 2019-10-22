@@ -42,8 +42,7 @@ EXAMPE: example realrad; shows an example"
   def r=basering;
   int n=nvars(basering);
   // for faster Groebner basis and dimension compuations
-  string neuring ="ring schnell=("+charstr(r)+"),("+varstr(r)+"),dp;";
-  execute(neuring);
+  ring schnell = create_ring(ringlist(r)[1], "("+varstr(r)+")", "dp", "no_minpoly");
   def ri=basering;
 
   list reddim;//reduct dimension to 0
@@ -94,8 +93,7 @@ EXAMPE: example realrad; shows an example"
       vari=vari+","+string(lvar[j]);
     }
     vari=vari[2..size(vari)];
-    neuring="ring neu=("+charstr(r)+pari+"),("+vari+"),dp;";
-    execute(neuring);
+    ring neu = create_ring("("+charstr(r)+pari+")", "("+vari+")", "dp");
     ideal id=imap(r,id);
     ideal buffer=zeroreduct(id);
     buffer=realzero(buffer);
@@ -141,8 +139,7 @@ RETURN: an ideal j of dimension <=0 s.th. i is contained in
 
  //chance ring to get faster groebner bases computation for dimensions
 
- string rneu="ring neu=("+charstr(r)+"),("+varstr(r)+"),dp;";
- execute(rneu);
+ ring neu = create_ring(ringlist(r)[1], "("+varstr(r)+")", "dp", "no_minpoly");
  ideal i=imap(r,i);
 
  i=groebner(i);
@@ -359,15 +356,12 @@ EXAMPLE:   example radzero; shows no example"
    }
    else
    {
-     ri="ring rhelp=("+charstr(r)+ "),(" +varstr(r)+ ",@t),dp;";
-     execute(ri);
+     ring rhelp = create_ring(ringlist(r)[1], "(" +varstr(r)+ ",@t)", "dp", "no_minpoly");
      ideal trans=homog(imap(r,trans),@t);
 
      ideal trans1=std(trans);
      @hilb=hilb(trans1,1);
-     ri= "ring rhelp1=("
-                   +charstr(r)+ "),(" +varstr(rhelp)+ "),lp;";
-     execute(ri);
+     ring rhelp1 = create_ring(ringlist(r)[1], "(" +varstr(rhelp)+ ")", "lp", "no_minpoly");
      ideal trans=homog(imap(r,trans),@t);
      kill rhelp;
      trans=std(trans,@hilb);
@@ -448,8 +442,7 @@ EXAMPLE:   example realpoly; shows an example"
  int tester;
  if (size(parstr(r))!=0)
  {
-   string changering="ring rneu=0,("+parstr(r)+","+varstr(r)+"),lp";
-   execute(changering);
+   ring rneu = create_ring(0, "("+parstr(r)+","+varstr(r)+")", "lp");
    poly f=imap(r,f);
    tester=1;
  }
@@ -556,8 +549,7 @@ EXAMPLE: decision shows an example
    lessvar=string(varlist);
 
    parvar=string(var(n));
-   ri="ring r_neu="+charstr(r)+",(@t,"+parvar+","+lessvar+"),dp;";
-   execute(ri);
+   ring r_neu = create_ring(ringlist(r)[1], "(@t,"+parvar+","+lessvar+")", "dp", "no_minpoly");
    poly f=imap(r,f);
    list varlist=imap(r,varlist);
    ideal jac=jacob(@t+f);
@@ -622,8 +614,7 @@ EXAMPLE: decision shows an example
      }
      rbuffer=basering;
      //perm=@t,x_n,x_1,..,x_ik,x\(x_i1,..,x_ik)
-     ri="ring rh=0,("+perm+"),dp;";
-     execute(ri);
+     ring rh = create_ring(0, "("+perm+")", "dp");
      ideal jacs=imap(rbuffer,jacs);
      poly p=imap(rbuffer,p);
      matrix m=char_series(jacs);
@@ -639,9 +630,7 @@ EXAMPLE: decision shows an example
      {
        l[zz,n-zz]=1;
      }
-     ri="ring rcoef="+"(0,@t,"+parvar+"),
-     ("+lessvar+"),M(l);";
-     execute(ri);
+     ring rcoef = create_ring("(0,@t,"+parvar+")", "("+lessvar+")", "M(l)");
      kill l;
      poly e=imap(rh,e);
      e=leadcoef(e);
@@ -660,8 +649,7 @@ EXAMPLE: decision shows an example
    ///////////found polynomial p /////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////////////
    //Compute an isolating set for p
-   ri="ring iso="+charstr(r)+","+parvar+",lp;";
-   execute(ri);
+   ring iso = create_ring(ringlist(r)[1], "parvar", "lp", "no_minpoly");
    poly p=imap(r,p);
    isol=isolset(p);
    setring r;
@@ -669,9 +657,8 @@ EXAMPLE: decision shows an example
    tester=1;
    for (@z=1;@z<=size(isol);@z++)
    {
-     ri="ring rless="+charstr(r)+",("+lessvar+"),lp;";
      g=subst(f,var(n),isol[@z]);
-     execute(ri);
+     ring rless = create_ring(ringlist(r)[1], "("+lessvar+")", "lp", "no_minpoly");
      poly g=imap(r,g);
      tester=tester*decision(g);
      setring r;
@@ -933,8 +920,7 @@ EXAMPLE: is_in_shape shows an exmaple;
       vari=vari+","+string(perm[i][j]);
     }
     vari=vari[2..size(vari)];
-    wechsler="ring r_neu=("+charstr(r)+"),("+vari+"),lp;";
-    execute(wechsler);
+    ring r_neu = create_ring(ringlist(r)[1], "("+vari+")", "lp", "no_minpoly");
     ideal id=imap(r,m);
     id=groebner(id);
     k=search_first(id,2,2);
@@ -1168,8 +1154,7 @@ EXAMPLE: contnonloc shows an example
   int i,l,tester;
   ideal primcomp;
   def r=basering;
-  string neu="ring r_neu=("+charstr(r)+pari+"),("+vari+"),dp;";
-  execute(neu);
+  ring r_neu = create_ring("("+charstr(r)+pari+")", "("+vari+")", "dp");
   def r1=basering;
   ideal buffer;
   setring r;
