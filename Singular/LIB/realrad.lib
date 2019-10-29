@@ -111,7 +111,6 @@ EXAMPE: example realrad; shows an example"
   setring r;
   id=imap(ri,id);
   return(id);
-
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -139,7 +138,9 @@ RETURN: an ideal j of dimension <=0 s.th. i is contained in
 
  //chance ring to get faster groebner bases computation for dimensions
 
- ring neu = create_ring(ringlist(r)[1], "("+varstr(r)+")", "dp", "no_minpoly");
+ list rneu=ringlist(r);
+ rneu[3]=list(list("dp",1:nvars(r)),list("c",0));
+ ring neu=ring(rneu);
  ideal i=imap(r,i);
 
  i=groebner(i);
@@ -630,7 +631,9 @@ EXAMPLE: decision shows an example
      {
        l[zz,n-zz]=1;
      }
-     ring rcoef = create_ring("(0,@t,"+parvar+")", "("+lessvar+")", "M(l)");
+     ri="ring rcoef="+"(0,@t,"+parvar+"),
+     ("+lessvar+"),M(l);";
+     execute(ri);
      kill l;
      poly e=imap(rh,e);
      e=leadcoef(e);
@@ -649,7 +652,7 @@ EXAMPLE: decision shows an example
    ///////////found polynomial p /////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////////////
    //Compute an isolating set for p
-   ring iso = create_ring(ringlist(r)[1], "parvar", "lp", "no_minpoly");
+   ring iso = create_ring(ringlist(r)[1], parvar, "lp", "no_minpoly");
    poly p=imap(r,p);
    isol=isolset(p);
    setring r;
@@ -1144,7 +1147,7 @@ EXAMPLE:simplify_gen gives no example"
 }
 static proc contnonloc(ideal id,string pari, string vari)
 "INPUT : a radical ideal id in in F[pari+vari] which is radical in
-         F(pari)[vari), pari and vari strings of variables
+         F(pari)[vari], pari and vari strings of variables
 OUTPUT : the contraction ideal of id, i.e. idF(pari)[vari]\cap F[pari+vari]
 EXAMPLE: contnonloc shows an example
 "

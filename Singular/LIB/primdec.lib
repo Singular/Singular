@@ -1222,7 +1222,7 @@ proc extF(list l,list #)
   }
   if(size(peek)==0){return(peek1);}
 
-  ring RH = create_ring("("+string(p)+"^"+string(ex)+",@a)", "("+varstr(R)+")", "lp");
+  ring RH = create_ring("("+string(p^ex)+",@a)", "("+varstr(R)+")", "lp");
   string mp="minpoly="+string(minpoly)+";";
   ring RL = create_ring("("+string(p)+",@a)", "("+varstr(R)+")", "lp");
   execute(mp);
@@ -1241,7 +1241,7 @@ proc extF(list l,list #)
   }
   mp="poly pp="+string(minpoly)+";";
 
-  ring RS = create_ring("string(p)", "("+varstr(R)+",@a)", "lp");
+  ring RS = create_ring(p, "("+varstr(R)+",@a)", "lp");
   execute(mp);
   list L=imap(RL,keep);
 
@@ -4031,17 +4031,12 @@ EXAMPLE: example zeroRad; shows an example"
       F[i]=powerCoeffs(F[i],k-l[i][2]);
    }
 
-   ring @R = create_ring("string(p)", "("+parstr(R)+","+varstr(R)+")", "dp");
+   string cR="ring @R="+string(p)+",("+parstr(R)+","+varstr(R)+"),dp;";
+   execute(cR);
    ideal F=imap(R,F);
 
-   list l2;
-   for (int ii = 1; ii <= m; ii++)
-   {
-    l2[ii] = "@y("+string(ii)+")";
-   }
-   l2[size(l2)+1] = ringlist(R)[2];
-   l2[size(l2)+1] = ringlist(R)[1][2];
-   ring @S = create_ring("string(p)", l2, "dp");
+   string nR="ring @S="+string(p)+",(@y(1..m),"+varstr(R)+","+parstr(R)+"),dp;";
+   execute(nR);
 
    ideal G=fetch(@R,F);    //G[i](t(1)^(p^-k),...,t(m)^(p^-k),x(i))=sep(F[i])
 
@@ -4079,12 +4074,16 @@ static proc algeRad(ideal i)
    int n=nvars(R);
 
    string mp="poly @p="+string(minpoly)+";";
-   ring RH = create_ring("string(char(R))", "("+varstr(R)+","+string(par(1))+")", "dp");
+   string gnir="ring RH="+string(char(R))+",("+varstr(R)+","+string(par(1))
+                +"),dp;";
+   execute(gnir);
    execute(mp);
    ideal i=imap(R,i);
    i=i,@p;
    ideal ra=radical(i);
-   ring RS = create_ring("string(char(R))", "("+varstr(RH)+")", "(dp("+string(n)+"),lp)");
+   gnir="ring RS="+string(char(R))+",("+varstr(RH)
+                +"),(dp("+string(n)+"),lp);";
+   execute(gnir);
    ideal K=imap(RH,ra);
    K=std(K);
    if (ncols(K)>1) { K=K[2..size(K)];}
