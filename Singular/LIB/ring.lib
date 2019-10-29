@@ -840,9 +840,9 @@ example
 { "EXAMPLE:"; echo=2;
   ring S =0,(x,y,z),dp;
   ring R0=0,(x,y,z),ds;
-  qring R=std(x+x2);
-  map psi=S,x,y,z;
-  ideal null;
+  qring R=std(x+x2); if(voice>1) {export R;}
+  map psi=S,x,y,z;   if(voice>1) {export psi;}
+  ideal null;        if(voice>1) {export null;}
   setring S;
   ideal nu=preimageLoc("R","psi","null");
   nu;
