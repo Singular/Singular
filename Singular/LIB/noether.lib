@@ -170,13 +170,17 @@ KEYWORDS: Noether position
 "
 {
 //--------------------------- initialisation ---------------------------------
-  int ii,jj,d,time,n,nl;
+  int ii,jj,d,time,n,nl,zz;
   intmat ran;
   def r0 = basering;
   ideal K,chcoord;
   n = nvars(r0)-1;
-  string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-  execute(s);
+  list l1;
+  for (zz = 0; zz<= n; zz++)
+  {
+   l1[zz+1] = "x("+string(zz)+")";
+  }
+  ring r1 = create_ring(ringlist(r0)[1], l1, "dp", "no_minpoly");
   ideal i,sbi,I,K,chcoord,m,L;
   list #;
   poly P;
@@ -261,13 +265,17 @@ NOTE:    It uses the procedure  modNpos_test to test Noether position.
 "
 {
 //--------------------------- initialisation ---------------------------------
-   int ii,jj,d,time,n,nl;
+   int ii,jj,d,time,n,nl,zz;
    intmat ran;
    def r0 = basering;
    ideal K,chcoord;
    n = nvars(r0)-1;
-   string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-   execute(s);
+   list l2;
+   for (zz = 0; zz<= n; zz++)
+   {
+     l2[zz+1] = "x("+string(zz)+")";
+   }
+   ring r1 = create_ring(ringlist(r0)[1], l2, "dp", "no_minpoly");
    ideal i,sbi,I,K,chcoord,m,L;
    poly P;
    list #;
@@ -352,11 +360,15 @@ THEORY:  The last variable is in generic position if the quotient of the ideal
 "
 {
 //--------------------------- initialisation ---------------------------------
-  int n,ret;
+  int n,ret,zz;
   def r0 = basering;
   n = nvars(r0)-1;
-  string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-  execute(s);
+  list l3;
+  for (zz = 0; zz<= n; zz++)
+  {
+    l3[zz+1] = "x("+string(zz)+")";
+  }
+  ring r1 = create_ring(ringlist(r0)[1], l3, "dp", "no_minpoly");
   ideal I,i;
   i = fetch(r0,i);
   attrib(i,"isSB",1);
@@ -383,12 +395,16 @@ KEYWORDS: saturation
 "
 {
 //--------------------------- initialisation ---------------------------------
-  int e,ii,jj,h,d,time,lastv,nl,ret;
+  int e,ii,jj,h,d,time,lastv,nl,ret,zz;
   intmat ran;
   def r0 = basering;
   int n = nvars(r0)-1;
-  string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-  execute(s);
+  list l4;
+  for (zz = 0; zz<= n; zz++)
+  {
+    l4[zz+1] = "x("+string(zz)+")";
+  }
+  ring r1 = create_ring(ringlist(r0)[1], l4, "dp", "no_minpoly");
   ideal i,sbi,I,K,chcoord,m,L;
   poly P;
   map phi;
@@ -471,13 +487,17 @@ KEYWORDS: saturation
   "// WARNING: The characteristic of base field must be zero.
 // The procedure is probabilistic and  it computes the
 //initial ideals modulo the prime number 2147483647.";
-  int e,ii,jj,h,d,time,lastv,nl,ret,s1,d1,siz,j,si,u,k,p;
+  int e,ii,jj,h,d,time,lastv,nl,ret,s1,d1,siz,j,si,u,k,p,zz;
   intvec v1;
   intmat ran;
   def r0 = basering;
   int n = nvars(r0)-1;
-  string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-  execute(s);
+  list l5;
+  for (zz = 0; zz<= n; zz++)
+  {
+    l5[zz+1] = "x("+string(zz)+")";
+  }
+  ring r1 = create_ring(ringlist(r0)[1], l5, "dp", "no_minpoly");
   ideal i,sbi,I,K,chcoord,m,L,sbi1,lsbi1,id1;
   vector V1;
   list #,LL,PL,Gb1,VGb1,Gb2,VGb2,Res1,Res2;
@@ -575,11 +595,15 @@ KEYWORDS: regularity
 "
 {
 //--------------------------- initialisation ---------------------------------
-  int e,ii,jj,H,h,d,time,nl;
+  int e,ii,jj,H,h,d,time,nl,zz;
   def r0 = basering;
   int n = nvars(r0)-1;
-  string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-  execute(s);
+  list l6;
+  for (zz = 0; zz<= n; zz++)
+  {
+    l6[zz+1] = "x("+string(zz)+")";
+  }
+  ring r1 = create_ring(ringlist(r0)[1], l6, "dp", "no_minpoly");
   ideal i,sbi,I,J,K,L;
   list #;
   poly P;
@@ -652,11 +676,16 @@ KEYWORDS: regularity
       i=T;
     }
   }
+  list l7;
   for ( ii = n; ii>=n-d+1; ii-- )
   {
+    l7=list();
     i=subst(i,x(ii),0);
-    s = "ring mr = ",charstr(r1),",x(0..ii-1),dp;";
-    execute(s);
+    for (zz = 0; zz<= ii-1; zz++)
+    {
+      l7[zz+1] = "x("+string(zz)+")";
+    }
+    ring mr = create_ring(ringlist(r1)[1], l7, "dp", "no_minpoly");
     ideal i,sbi,I,J,K,L,T;
     poly P;
     map phi;
@@ -734,11 +763,16 @@ KEYWORDS: regularity
       }
     }
     h=maxdeg1(simplify(reduce(quotient(I,maxideal(1)),I),2))+1;
+    list l8;
     for ( ii = n; ii> n-d+1; ii-- )
     {
+      l8=list();
       sbi=subst(sbi,x(ii),0);
-      s = "ring mr = ",charstr(r0),",x(0..ii-1),dp;";
-      execute(s);
+      for (zz = 0; zz<= ii-1; zz++)
+      {
+        l8[zz+1] = "x("+string(zz)+")";
+      }
+      ring mr = create_ring(ringlist(r0)[1], l8, "dp", "no_minpoly");
       ideal sbi,I,L,K,T;
       map phi;
       sbi=imap(r1,sbi);
@@ -776,8 +810,12 @@ KEYWORDS: regularity
       kill mr;
     }
     sbi=subst(sbi,x(n-d+1),0);
-    s = "ring mr = ",charstr(r0),",x(0..n-d),dp;";
-    execute(s);
+    list l9;
+    for (zz = 0; zz<= n-d; zz++)
+    {
+      l9[zz+1] = "x("+string(zz)+")";
+    }
+    ring mr = create_ring(ringlist(r0)[1], l9, "dp", "no_minpoly");
     ideal sbi,I,L,K,T;
     map phi;
     sbi=imap(r1,sbi);
@@ -892,11 +930,16 @@ KEYWORDS: regularity
       i=sbi;
     }
   }
+  list l11;int zz;
   for ( ii = n; ii>=n-d+1; ii-- )
   {
+    l11=list();
     i=subst(i,x(ii),0);
-    s = "ring mr = ","0",",x(0..ii-1),dp;";
-    execute(s);
+    for (zz = 0; zz <= ii-1; zz++)
+    {
+     l11[zz+1] = "x("+string(zz)+")";
+    }
+    ring mr = create_ring(0, l11, "dp");
     ideal i,sbi,I,J,K,L,lsbi1;
     poly P;
     list #;
