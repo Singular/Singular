@@ -1135,7 +1135,15 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
   }
   else
   {
-    if (*root!=IDROOT) return TRUE;
+    if (root==NULL) return TRUE;
+    if (*root!=IDROOT)
+    {
+      if ((currRing==NULL) || (*root!=currRing->idroot))
+      {
+        Werror("can not define `%s` in other package",name->name);
+        return TRUE;
+      }
+    }
     if (t==QRING_CMD) t=RING_CMD; // qring is always RING_CMD
 
     if (TEST_V_ALLWARN
