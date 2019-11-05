@@ -128,7 +128,7 @@ int  scDimInt(ideal S, ideal Q)
 
 int  scDimIntRing(ideal vid, ideal Q)
 {
-#ifdef HAVE_RING
+#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     int i = idPosConstant(vid);
@@ -138,23 +138,23 @@ int  scDimIntRing(ideal vid, ideal Q)
     }
     ideal vv = id_Head(vid,currRing);
     idSkipZeroes(vv);
-    int j = idPosConstant(vv);
-    long d;
-    if(j == -1)
+    i = idPosConstant(vid);
+    int d;
+    if(i == -1)
     {
-      d = (long)scDimInt(vv, Q);
+      d = scDimInt(vv, Q);
       if(rField_is_Z(currRing))
         d++;
     }
     else
     {
-      if(n_IsUnit(pGetCoeff(vv->m[j]),currRing->cf))
+      if(n_IsUnit(pGetCoeff(vv->m[i]),currRing->cf))
         d = -1;
       else
-        d = (long)scDimInt(vv, Q);
+        d = scDimInt(vv, Q);
     }
     //Anne's Idea for std(4,2x) = 0 bug
-    long dcurr = d;
+    int dcurr = d;
     for(unsigned ii=0;ii<(unsigned)IDELEMS(vv);ii++)
     {
       if(vv->m[ii] != NULL && !n_IsUnit(pGetCoeff(vv->m[ii]),currRing->cf))
@@ -173,11 +173,11 @@ int  scDimIntRing(ideal vid, ideal Q)
           }
         }
         idSkipZeroes(vc);
-        j = idPosConstant(vc);
-        if (j != -1) pDelete(&vc->m[j]);
-        dcurr = (long)scDimInt(vc, currRing->qideal);
+        i = idPosConstant(vc);
+        if (i != -1) pDelete(&vc->m[i]);
+        dcurr = scDimInt(vc, Q);
         // the following assumes the ground rings to be either zero- or one-dimensional
-        if((j==-1) && rField_is_Z(currRing))
+        if((i==-1) && rField_is_Z(currRing))
         {
           // should also be activated for other euclidean domains as groundfield
           dcurr++;
@@ -1076,7 +1076,7 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
 
   int  i;
   int  k = ak;
-  #if HAVE_RINGS
+  #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))
   {
     //consider just monic generators (over rings with zero-divisors)
