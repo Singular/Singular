@@ -1909,33 +1909,12 @@ static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
   {
      Warn("dim(%s,...) may be wrong because the mixed monomial ordering",v->Name());
   }
-#ifdef HAVE_RINGS
-  if (rField_is_Ring(currRing))
-  {
-    ideal vid = (ideal)v->Data();
-    int i = idPosConstant(vid);
-    if ((i != -1) && (n_IsUnit(pGetCoeff(vid->m[i]),currRing->cf)))
-    { /* ideal v contains unit; dim = -1 */
-      res->data = (char *)-1;
-      return FALSE;
-    }
-    ideal vv = id_Copy(vid, currRing);
-    ideal ww = id_Copy((ideal)w->Data(), currRing);
-    /* drop degree zero generator from vv (if any) */
-    if (i != -1) pDelete(&vv->m[i]);
-    long d = (long)scDimInt(vv, ww);
-    if (rField_is_Z(currRing) && (i == -1)) d++;
-    res->data = (char *)d;
-    idDelete(&vv); idDelete(&ww);
-    return FALSE;
-  }
-#endif
   if(currRing->qideal==NULL)
-    res->data = (char *)((long)scDimInt((ideal)(v->Data()),(ideal)w->Data()));
+    res->data = (char *)((long)scDimIntRing((ideal)(v->Data()),(ideal)w->Data()));
   else
   {
     ideal q=idSimpleAdd(currRing->qideal,(ideal)w->Data());
-    res->data = (char *)((long)scDimInt((ideal)(v->Data()),q));
+    res->data = (char *)((long)scDimIntRing((ideal)(v->Data()),q));
     idDelete(&q);
   }
   return FALSE;

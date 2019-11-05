@@ -151,7 +151,7 @@ int  scDimIntRing(ideal vid, ideal Q)
       if(n_IsUnit(pGetCoeff(vv->m[j]),currRing->cf))
         d = -1;
       else
-        d = (long)scDimInt(vv, currRing->qideal);
+        d = (long)scDimInt(vv, Q);
     }
     //Anne's Idea for std(4,2x) = 0 bug
     long dcurr = d;
