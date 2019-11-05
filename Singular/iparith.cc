@@ -4044,73 +4044,7 @@ static BOOLEAN jjDIM(leftv res, leftv v)
   {
      Warn("dim(%s) may be wrong because the mixed monomial ordering",v->Name());
   }
-#ifdef HAVE_RINGS
-  if (rField_is_Ring(currRing))
-  {
-    ideal vid = (ideal)v->Data();
-    int i = idPosConstant(vid);
-    if ((i != -1) && (n_IsUnit(pGetCoeff(vid->m[i]),currRing->cf)))
-    { /* ideal v contains unit; dim = -1 */
-      res->data = (char *)-1L;
-      return FALSE;
-    }
-    ideal vv = id_Head(vid,currRing);
-    idSkipZeroes(vv);
-    int j = idPosConstant(vv);
-    long d;
-    if(j == -1)
-    {
-      d = (long)scDimInt(vv, currRing->qideal);
-      if(rField_is_Z(currRing))
-        d++;
-    }
-    else
-    {
-      if(n_IsUnit(pGetCoeff(vv->m[j]),currRing->cf))
-        d = -1;
-      else
-        d = (long)scDimInt(vv, currRing->qideal);
-    }
-    //Anne's Idea for std(4,2x) = 0 bug
-    long dcurr = d;
-    for(unsigned ii=0;ii<(unsigned)IDELEMS(vv);ii++)
-    {
-      if(vv->m[ii] != NULL && !n_IsUnit(pGetCoeff(vv->m[ii]),currRing->cf))
-      {
-        ideal vc = idCopy(vv);
-        poly c = pInit();
-        pSetCoeff0(c,nCopy(pGetCoeff(vv->m[ii])));
-        idInsertPoly(vc,c);
-        idSkipZeroes(vc);
-        for(unsigned jj = 0;jj<(unsigned)IDELEMS(vc)-1;jj++)
-        {
-          if((vc->m[jj]!=NULL)
-          && (n_DivBy(pGetCoeff(vc->m[jj]),pGetCoeff(c),currRing->cf)))
-          {
-            pDelete(&vc->m[jj]);
-          }
-        }
-        idSkipZeroes(vc);
-        j = idPosConstant(vc);
-        if (j != -1) pDelete(&vc->m[j]);
-        dcurr = (long)scDimInt(vc, currRing->qideal);
-        // the following assumes the ground rings to be either zero- or one-dimensional
-        if((j==-1) && rField_is_Z(currRing))
-        {
-          // should also be activated for other euclidean domains as groundfield
-          dcurr++;
-        }
-        idDelete(&vc);
-      }
-      if(dcurr > d)
-          d = dcurr;
-    }
-    res->data = (char *)d;
-    idDelete(&vv);
-    return FALSE;
-  }
-#endif
-  res->data = (char *)(long)scDimInt((ideal)(v->Data()),currRing->qideal);
+  res->data = (char *)(long)scDimIntRing((ideal)(v->Data()),currRing->qideal);
   return FALSE;
 }
 static BOOLEAN jjDUMP(leftv, leftv v)
