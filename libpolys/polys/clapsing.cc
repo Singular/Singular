@@ -993,8 +993,8 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
   number old_lead_coeff=n_Copy(pGetCoeff(f), r->cf);
 
   Variable a;
-  if (!rField_is_Zp(r) && !rField_is_Zp_a(r) && !rField_is_Z(r)
-  && !(rField_is_Zn(r) && (r->cf->convSingNFactoryN!=ndConvSingNFactoryN))) /* Q, Q(a) */
+  if ((rField_is_Q(r) || rField_is_Q_a(r)
+  && (r->cf->convSingNFactoryN!=ndConvSingNFactoryN))) /* Q, Q(a) */
   {
     //if (f!=NULL) // already tested at start of routine
     {
@@ -1045,24 +1045,16 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
   {
     if (rField_is_Q_a (r)) setCharacteristic (0);
     else                   setCharacteristic( rChar(r) );
-    if (r->cf->extRing->qideal!=NULL)
+    if (r->cf->extRing->qideal!=NULL) /*algebraic extension */
     {
       CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->qideal->m[0],
                                            r->cf->extRing);
       a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f, a, r ) );
-      if (rField_is_Zp_a(r))
-      {
-        L = factorize( F, a );
-      }
-      else
-      {
-        //  over Q(a)
-        L= factorize (F, a);
-      }
+      L = factorize( F, a );
       prune(a);
     }
-    else
+    else /* rational functions */
     {
       CanonicalForm F( convSingTrPFactoryP( f,r ) );
       L = factorize( F );
