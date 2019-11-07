@@ -41,6 +41,21 @@ poly p_Divide(poly p, poly q, const ring r)
     p_Delete(&q,r);
     return NULL;
   }
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(r))
+  {
+    if (!rField_is_Domain(r))
+    {
+      WerrorS("division only defined over coefficient domains");
+      return NULL;
+    }
+    if (pNext(q)!=NULL)
+    {
+      WerrorS("division over a coefficient domain only implemented for terms");
+      return NULL;
+    }
+  }
+#endif
   if (pNext(q)!=NULL)
   { /* This means that q != 0 consists of at least two terms*/
     if (rIsLPRing(r))
@@ -159,20 +174,7 @@ poly p_Divide(poly p, poly q, const ring r)
     }
   }
   else
-  { /* This means that q != 0 consists of just one term,
-       or that r is over a coefficient ring. */
-#ifdef HAVE_RINGS
-    if (!rField_is_Domain(r))
-    {
-      WerrorS("division only defined over coefficient domains");
-      return NULL;
-    }
-    if (pNext(q)!=NULL)
-    {
-      WerrorS("division over a coefficient domain only implemented for terms");
-      return NULL;
-    }
-#endif
+  { /* This means that q != 0 consists of just one term */
     return p_DivideM(p,q,r);
   }
   return NULL;
