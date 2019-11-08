@@ -49,11 +49,6 @@ poly p_Divide(poly p, poly q, const ring r)
       WerrorS("division only defined over coefficient domains");
       return NULL;
     }
-    if (pNext(q)!=NULL)
-    {
-      WerrorS("division over a coefficient domain only implemented for terms");
-      return NULL;
-    }
   }
 #endif
   if (pNext(q)!=NULL)
