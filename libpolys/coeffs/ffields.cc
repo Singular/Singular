@@ -947,6 +947,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
 
   if( r->m_nfPlus1Table == NULL )
   {
+    Werror("reading table for field with %d elements failed",c);
     return TRUE;
   }
 
