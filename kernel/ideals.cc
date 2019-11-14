@@ -1910,7 +1910,7 @@ poly idMinor(matrix a, int ar, unsigned long which, ideal R)
 /*2
 * compute all ar-minors of the matrix a
 */
-ideal idMinors(matrix a, int ar, ideal R)
+ideal id_Minors(matrix a, int ar, const ring origR, ideal J)
 {
   int     i,j,/*k,*/size;
   int *rowchoise,*colchoise;
@@ -1926,8 +1926,8 @@ ideal idMinors(matrix a, int ar, ideal R)
   colchoise=(int *)omAlloc(ar*sizeof(int));
   if ((i>512) || (j>512) || (i*j >512)) size=512;
   else size=i*j;
-  result=idInit(size,1);
-  tmp=mpNew(ar,ar);
+  result=id_Init(size,1,origR);
+  tmp=mp_New(ar,ar,origR);
   // k = 0; /* the index in result*/
   idInitChoise(ar,1,a->rows(),&rowch,rowchoise);
   while (!rowch)
@@ -1942,14 +1942,14 @@ ideal idMinors(matrix a, int ar, ideal R)
           MATELEM(tmp,i,j) = MATELEM(a,rowchoise[i-1],colchoise[j-1]);
         }
       }
-      p = mp_DetBareiss(tmp,currRing);
+      p = mp_DetBareiss(tmp,origR);
       if (p!=NULL)
       {
-        if (R!=NULL)
+        if (J!=NULL)
         {
           q = p;
-          p = kNF(R,currRing->qideal,q);
-          p_Delete(&q,currRing);
+        -->  p = kNF(J,origR->qideal,q);
+          p_Delete(&q,origR);
         }
         if (p!=NULL)
         {
@@ -1971,7 +1971,7 @@ ideal idMinors(matrix a, int ar, ideal R)
   {
     for (j=1; j<=ar; j++) MATELEM(tmp,i,j) = NULL;
   }
-  idDelete((ideal*)&tmp);
+  id_Delete((ideal*)&tmp, origR);
   if (k==0)
   {
     k=1;
@@ -1989,10 +1989,8 @@ ideal idMinors(matrix a, int ar, ideal R)
 /// compute all ar-minors of the matrix a
 /// the caller of mpRecMin
 /// the elements of the result are not in R (if R!=NULL)
-ideal idMinors(matrix a, int ar, ideal R)
+ideal id_Minors(matrix a, int ar, const ring origR, ideal J)
 {
-
-  const ring origR=currRing;
   id_Test((ideal)a, origR);
 
   const int r = a->nrows;
@@ -2010,7 +2008,7 @@ ideal idMinors(matrix a, int ar, ideal R)
 
   ring tmpR = sm_RingChange(origR,bound);
 
-  matrix b = mpNew(r,c);
+  matrix b = mp_New(r,c, origR);
 
   for (int i=r*c-1;i>=0;i--)
     if (a->m[i] != NULL)
@@ -2018,36 +2016,34 @@ ideal idMinors(matrix a, int ar, ideal R)
 
   id_Test( (ideal)b, tmpR);
 
-  if (R!=NULL)
+  if (J!=NULL)
   {
-    R = idrCopyR(R,origR,tmpR); // TODO: overwrites R? memory leak?
+    J = idrCopyR(J,origR,tmpR);
     //if (ar>1) // otherwise done in mpMinorToResult
     //{
     //  matrix bb=(matrix)kNF(R,currRing->qideal,(ideal)b);
     //  bb->rank=b->rank; bb->nrows=b->nrows; bb->ncols=b->ncols;
     //  idDelete((ideal*)&b); b=bb;
     //}
-    id_Test( R, tmpR);
+    id_Test( J, tmpR);
   }
 
 
-  ideal result = idInit(32,1);
+  ideal result = id_Init(32,1,tmpR);
 
   int elems = 0;
 
   if(ar>1)
-    mp_RecMin(ar-1,result,elems,b,r,c,NULL,R,tmpR);
+    mp_RecMin(ar-1,result,elems,b,r,c,NULL,J,tmpR);
   else
-    mp_MinorToResult(result,elems,b,r,c,R,tmpR);
+    mp_MinorToResult(result,elems,b,r,c,J,tmpR);
 
   id_Test( (ideal)b, tmpR);
 
   id_Delete((ideal *)&b, tmpR);
 
-  if (R!=NULL) id_Delete(&R,tmpR);
+  if (J!=NULL) id_Delete(&J,tmpR);
 
-  idSkipZeroes(result);
-  rChangeCurrRing(origR);
   result = idrMoveR(result,tmpR,origR);
   sm_KillModifiedRing(tmpR);
   idTest(result);

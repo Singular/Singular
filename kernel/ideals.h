@@ -158,7 +158,8 @@ ideal   idElimination (ideal h1,poly delVar, intvec *hilb=NULL, GbVariant a=GbDe
 #ifdef WITH_OLD_MINOR
 poly idMinor(matrix a, int ar, unsigned long which, ideal R = NULL);
 #endif
-ideal   idMinors(matrix a, int ar, ideal R = NULL);
+ideal   id_Minors(matrix a, int ar, const ring R, ideal J = NULL);
+#define idMinors(A,ar) id_Minors(A,ar,currRing,NULL)
 
 ideal idMinEmbedding(ideal arg,BOOLEAN inPlace=FALSE, intvec **w=NULL);
 
