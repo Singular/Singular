@@ -217,6 +217,7 @@ ideal getMinorIdeal_toBeDone (const matrix mat, const int minorSize,
            for this implementation). */
       iii = (i == 0 ? id_Minors(mat, minorSize, currRing)
                     : id_Minors(mat, minorSize, currRing, i));
+      idSkipZeroes(iii);
     }
     else
     {
@@ -264,6 +265,7 @@ ideal getMinorIdeal (const matrix mat, const int minorSize, const int k,
          allowed for this implementation). */
     iii = (iSB == NULL ? id_Minors(mat, minorSize, currRing)
                        : id_Minors(mat, minorSize, currRing, iSB));
+    idSkipZeroes(iii);
   }
   else
   {
