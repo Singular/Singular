@@ -382,6 +382,16 @@ int ksReducePolyGCD(LObject* PR,
     ret = 1;
   }
 
+#ifdef HAVE_SHIFTBBA
+  poly lmRight;
+  if (tailRing->isLPring)
+  {
+    assume(PR->shift == 0);
+    assume(PW->shift == si_max(p_mFirstVblock(PW->p, tailRing) - 1, 0));
+    k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
+  }
+#endif
+
   number ct, an, bn;
   // take care of coef buisness
   if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
@@ -399,23 +409,18 @@ int ksReducePolyGCD(LObject* PR,
 
 
   // and finally,
-  PR->Tail_Minus_mm_Mult_qq(lm, t2, pLength(t2) /*PW->GetpLength() - 1*/, spNoether);
+#ifdef HAVE_SHIFTBBA
+  if (tailRing->isLPring)
+  {
+    PR->Tail_Minus_mm_Mult_qq(lm, tailRing->p_Procs->pp_Mult_mm(t2, lmRight, tailRing), pLength(t2), spNoether);
+  }
+  else
+#endif
+  {
+    PR->Tail_Minus_mm_Mult_qq(lm, t2, pLength(t2) /*PW->GetpLength() - 1*/, spNoether);
+  }
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
   pSetCoeff(PR->p, ct);
-
-  // the following is commented out: shrinking
-#ifdef HAVE_SHIFTBBA_NONEXISTENT
-  if ( (currRing->isLPring) && (!strat->homog) )
-  {
-    // assume? h->p in currRing
-    PR->GetP();
-    poly qq = p_Shrink(PR->p, currRing->isLPring, currRing);
-    PR->Clear(); // does the right things
-    PR->p = qq;
-    PR->t_p = NULL;
-    PR->SetShortExpVector();
-  }
-#endif
 
   return ret;
 }
@@ -502,27 +507,31 @@ int ksReducePolyLC(LObject* PR,
     ret = 1;
   }
 
+#ifdef HAVE_SHIFTBBA
+  poly lmRight;
+  if (tailRing->isLPring)
+  {
+    assume(PR->shift == 0);
+    assume(PW->shift == si_max(p_mFirstVblock(PW->p, tailRing) - 1, 0));
+    k_SplitFrame(lm, lmRight, PW->shift + 1, tailRing);
+  }
+#endif
+
   // and finally,
-  PR->Tail_Minus_mm_Mult_qq(lm, p2, pLength(p2) /*PW->GetpLength() - 1*/, spNoether);
+#ifdef HAVE_SHIFTBBA
+  if (tailRing->isLPring)
+  {
+    PR->Tail_Minus_mm_Mult_qq(lm, tailRing->p_Procs->pp_Mult_mm(p2, lmRight, tailRing), pLength(p2), spNoether);
+  }
+  else
+#endif
+  {
+    PR->Tail_Minus_mm_Mult_qq(lm, p2, pLength(p2) /*PW->GetpLength() - 1*/, spNoether);
+  }
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
 
   PR->LmDeleteAndIter();
   p_SetCoeff(PR->p, *coef, currRing);
-
-
-  // the following is commented out: shrinking
-#ifdef HAVE_SHIFTBBA_NONEXISTENT
-  if ( (currRing->isLPring) && (!strat->homog) )
-  {
-    // assume? h->p in currRing
-    PR->GetP();
-    poly qq = p_Shrink(PR->p, currRing->isLPring, currRing);
-    PR->Clear(); // does the right things
-    PR->p = qq;
-    PR->t_p = NULL;
-    PR->SetShortExpVector();
-  }
-#endif
 
 #if defined(KDEBUG) && defined(TEST_OPT_DEBUG_RED)
   if (TEST_OPT_DEBUG)
@@ -1187,11 +1196,9 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   poly m12, m22;
   if (tailRing->isLPring)
   {
-    assume(si_max(p_mFirstVblock(p2, tailRing) - 1, 0) == 0);
-    // note: because of how the pairs are created, p2 should never be shifted
-    int split = p_mFirstVblock(p1, tailRing);
-    k_SplitFrame(m1, m12, split, tailRing);
-    k_SplitFrame(m2, m22, split, tailRing);
+    assume(p_mFirstVblock(p1, tailRing) <= 1 || p_mFirstVblock(p2, tailRing) <= 1);
+    k_SplitFrame(m1, m12, p_mFirstVblock(p1, tailRing), tailRing);
+    k_SplitFrame(m2, m22, p_mFirstVblock(p2, tailRing), tailRing);
     // manually free the coeffs, because pSetCoeff0 is used in the next step
     n_Delete(&(m1->coef), tailRing->cf);
     n_Delete(&(m2->coef), tailRing->cf);

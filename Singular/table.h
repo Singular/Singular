@@ -284,10 +284,10 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjOPPOSITE),   OPPOSITE_CMD,    RING_CMD,       RING_CMD      , ALLOW_PLURAL |NO_RING}
 #endif
 #if defined(HAVE_PLURAL) || defined(HAVE_SHIFTBBA)
-,{D(jjTWOSTD),     TWOSTD_CMD,      IDEAL_CMD,      IDEAL_CMD     , ALLOW_NC |NO_RING}
+,{D(jjTWOSTD),     TWOSTD_CMD,      IDEAL_CMD,      IDEAL_CMD     , ALLOW_NC |ALLOW_RING}
 #endif
 #ifdef HAVE_SHIFTBBA
-,{D(jjTWOSTD),     TWOSTD_CMD,      MODUL_CMD,      MODUL_CMD     , ALLOW_LP |NO_RING}
+,{D(jjTWOSTD),     TWOSTD_CMD,      MODUL_CMD,      MODUL_CMD     , ALLOW_LP |ALLOW_RING}
 #endif
 //,{  jjWRONG ,      TRACE_CMD,       0,              INTVEC_CMD    , ALLOW_NC |ALLOW_RING}
 //,{  jjWRONG ,      TRACE_CMD,       0,              IDEAL_CMD     , ALLOW_NC |ALLOW_RING}

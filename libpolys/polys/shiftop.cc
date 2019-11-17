@@ -598,15 +598,17 @@ char* LPExpVString(int *expV, ring ri)
 void k_SplitFrame(poly &m1, poly &m2, int at, const ring r)
 {
   int lV = r->isLPring;
+  int split = (lV * (at - 1));
 
-  number m1Coeff = n_Copy(pGetCoeff(m1), r->cf); // important to copy
-
-  int hole = lV * at;
-  m2 = p_GetExp_k_n(m1, 1, hole, r);
-  m1 = p_GetExp_k_n(m1, hole, r->N, r);
-
+  m2 = p_GetExp_k_n(m1, 1, split, r);
   p_mLPunshift(m2, r);
-  p_SetCoeff(m1, m1Coeff, r);
+
+  m1 = p_Head(m1, r);
+  for(int i = split + 1; i <= r->N; i++)
+  {
+    p_SetExp(m1, i, 0, r);
+  }
+  p_Setm(m1, r);
 
   assume(p_FirstVblock(m1,r) <= 1);
   assume(p_FirstVblock(m2,r) <= 1);

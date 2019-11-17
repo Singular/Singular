@@ -594,6 +594,9 @@ BOOLEAN findMinLMPair(poly sig, unsigned long not_sevSig, kStrategy strat, int s
 
 /// returns index of p in TSet, or -1 if not found
 int kFindInT(poly p, TSet T, int tlength);
+#ifdef HAVE_SHIFTBBA
+int kFindInTShift(poly p, TSet T, int tlength);
+#endif
 
 /// return -1 if no divisor is found
 ///        number of first divisor in T, otherwise
@@ -856,7 +859,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 
 void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR);
 
-void initBbaShift(kStrategy strat);
+void superenterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR);
 
 poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN normalize);
 

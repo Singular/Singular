@@ -996,6 +996,16 @@ static inline poly pp_Mult_mm(poly p, poly m, const ring r)
     return r->p_Procs->pp_Mult_mm(p, m, r);
 }
 
+// returns m*Copy(p), does neither destroy p nor m
+static inline poly pp_mm_Mult(poly p, poly m, const ring r)
+{
+  if (p==NULL) return NULL;
+  if (p_LmIsConstant(m, r))
+    return __pp_Mult_nn(p, pGetCoeff(m), r);
+  else
+    return r->p_Procs->pp_mm_Mult(p, m, r);
+}
+
 // returns p*m, destroys p, const: m
 static inline poly p_Mult_mm(poly p, poly m, const ring r)
 {
@@ -1004,6 +1014,16 @@ static inline poly p_Mult_mm(poly p, poly m, const ring r)
     return __p_Mult_nn(p, pGetCoeff(m), r);
   else
     return r->p_Procs->p_Mult_mm(p, m, r);
+}
+
+// returns m*p, destroys p, const: m
+static inline poly p_mm_Mult(poly p, poly m, const ring r)
+{
+  if (p==NULL) return NULL;
+  if (p_LmIsConstant(m, r))
+    return __p_Mult_nn(p, pGetCoeff(m), r);
+  else
+    return r->p_Procs->p_mm_Mult(p, m, r);
 }
 
 static inline poly p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp, int lq,
