@@ -326,12 +326,29 @@ EXAMPLE: example blowUp2;  shows an example
 // (in the comments n=nvars(S) and m=ncols(C))
 //---------------------------------------------------------------------------
 //--- set up rings for the elimination
-  string r1="ring R=("+charstr(basering)+"),(x(1.."+string(nvars(S));
-  r1=r1+"),y(1.."+string(ncols(C))+")),dp;";
-  string r1t="ring Rt=("+charstr(basering)+"),(x(1.."+string(nvars(S));
-  r1t=r1t+"),y(1.."+string(ncols(C))+"),t),(dp,dp(1));";
-  execute(r1);       // ring for describing the transforms
-  execute(r1t);      // like r1, but with additional variable t
+  int ii;
+  list l5;
+  for (ii = 1; ii<= nvars(S); ii++)
+  {
+   l5[ii] = "x("+string(ii)+")";
+  }
+  for (ii = 1; ii<= ncols(C); ii++)
+  {
+   l5[nvars(S)+ii] = "y("+string(ii)+")";
+  }
+  ring R = create_ring(ringlist(basering)[1], l5, "dp", "no_minpoly");     // ring for describing the transforms
+  def C=fetch(S,C);
+  list l6;
+  for (ii = 1; ii<= nvars(S); ii++)
+  {
+   l6[ii] = "x("+string(ii)+")";
+  }
+  for (ii = 1; ii<= ncols(C); ii++)
+  {
+   l6[nvars(S)+ii] = "y("+string(ii)+")";
+  }
+  l6[size(l6)+1] = "t";
+  ring Rt = create_ring(ringlist(basering)[1], l6, "(dp("+string(ncols(C)+nvars(S))+"),dp(1))", "no_minpoly");
   def J=fetch(S,J);
   def C=fetch(S,C);
 //--- we need to eliminate t from J,y(1)-t*C[1],...y(m)-t*C[m]
@@ -563,7 +580,7 @@ EXAMPLE: example blowUpBO;  shows an example
    intvec v;
    int shortC=defined(shortcut);
    int invS=defined(invSat);
-   int eq,hy;
+   int eq,hy,ii;
    int extra,noDel,keepDiv;
    if(e==1){extra=1;}
 //---keeps all charts
@@ -666,7 +683,6 @@ EXAMPLE: example blowUpBO;  shows an example
 //---------------------------------------------------------------------------
 //--- control the names of the variables
    list l2;
-   int ii;
    for (ii = 1; ii <= n; ii++)
    {
     l2[ii] = "x("+string(ii)+")";
@@ -711,21 +727,21 @@ EXAMPLE: example blowUpBO;  shows an example
    Ex[size(Ex)+1]=var(1);
          //to have the list depending on R in case BO[4] is empty
 
-   l2 = ringlist(R)[2];
+   list l3 = ringlist(R)[2];
    for (ii = 0; ii <= s-1; ii++)
    {
-    l2[size(l2)+1] = "y("+string(ii)+")";
+    l3[size(l3)+1] = "y("+string(ii)+")";
    }
-   ring S = create_ring(ringlist(R)[1], l2, "dp", "no_minpoly"); 
+   ring S = create_ring(ringlist(R)[1], l3, "dp", "no_minpoly"); 
    list resu;
    list B;
-   l2 = ringlist(R)[2];
+   list l4 = ringlist(R)[2];
    for (ii = 0; ii <= s-1; ii++)
    {
-    l2[size(l2)+1] = "y("+string(ii)+")";
+    l4[size(l4)+1] = "y("+string(ii)+")";
    }
-   l2[size(l2)+1] = "t";
-   ring T = create_ring(ringlist(R)[1], l2, "dp", "no_minpoly");
+   l4[size(l4)+1] = "t";
+   ring T = create_ring(ringlist(R)[1], l4, "dp", "no_minpoly");
    ideal C=imap(R,C);
    ideal W=imap(R,W);
    execute("map phi=S,"+varstr(R)+",t*C;")
@@ -1376,8 +1392,12 @@ EXAMPLE: internal procedure - no example available
 // we leave it to the kernel by translating it into monomial
 // ideals in a new ring with variables t(i)
 //---------------------------------------------------------------------
-  string rstr="ring rcomb=0,(t(1.." + string(size(E)) + ")),dp;";
-  execute(rstr);
+  list l7;
+  for (int zz = 1; zz<= size(E); zz++)
+  {
+   l7[zz] = "t("+string(zz)+")";
+  }
+  ring rcomb = create_ring(0, l7, "dp");
   ideal potid,potid2;
   list monlist,comblist,merkmon;
   for(kk=1;kk<=count;kk++)

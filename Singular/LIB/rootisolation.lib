@@ -982,7 +982,7 @@ EXAMPLE: example rootIsolationNoPreprocessing; exclusion test for intersection
           Isubst = I;
           // name ring rSubst(voice) to avoid name conflicts if
           // we (unlikely) enter another level of recursion
-          rSubstString = "ring rSubst(" + string(voice) + ") = 0,(";
+          rSubstString = "(";
           for (j = 1; j <= N; j++)
           {
             if (empty[j])
@@ -994,9 +994,9 @@ EXAMPLE: example rootIsolationNoPreprocessing; exclusion test for intersection
               rSubstString = rSubstString + varstr(j) + ",";
             }
           }
-          rSubstString = string(rSubstString[1..(size(rSubstString)-1)]) + "),dp;";
+          rSubstString = string(rSubstString[1..(size(rSubstString)-1)]) + ")";
           dbprint("passing to subring");
-          execute(rSubstString);
+          ring rSubst(voice) = create_ring(0, rSubstString, "dp");
           ideal Isubst = imap(rSource, Isubst);
           number eps = imap(rSource, eps);
           lSubstBoxesSize, lSubstBoxesUnique = rootIsolation(Isubst,
