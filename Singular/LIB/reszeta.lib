@@ -5285,6 +5285,7 @@ proc fetchInTree(list L,
    }
    path_togo=path_togo[2..size(path_togo)],m1;
    i=1;
+   list l2;
    while(i<size(path_togo))
    {
 //--- we need to blow up following the path path_togo through the tree
@@ -5296,7 +5297,7 @@ proc fetchInTree(list L,
          if(defined(T0)){kill T0;}
          def T0=L[2][path_togo[i+1]];
          if(defined(tstr)){kill tstr;}
-         list l2 = ringlist(T0)[2];
+         l2 = ringlist(T0)[2];
          ring T = create_ring("(0,t)", l2, "(" +ordstr(T0)+")");
          setring T;
          execute(algext);
