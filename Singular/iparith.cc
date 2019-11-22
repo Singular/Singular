@@ -4817,7 +4817,7 @@ static BOOLEAN jjRINGLIST(leftv res, leftv v)
     res->data = (char *)rDecompose((ring)v->Data());
     if (res->data!=NULL)
     {
-      long mm=r->bitmask/2;
+      long mm=r->bitmask;
       if (mm>MAX_INT_VAL) mm=MAX_INT_VAL;
       atSet(res,omStrDup("maxExp"),(void*)mm,INT_CMD);
       return FALSE;

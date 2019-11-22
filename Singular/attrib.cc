@@ -300,7 +300,7 @@ BOOLEAN atATTRIB2(leftv res,leftv v,leftv b)
   &&(/*v->Typ()*/t==RING_CMD))
   {
     res->rtyp=INT_CMD;
-    res->data=(void *)(long)(((ring)v->Data())->bitmask/2);
+    res->data=(void *)(long)(((ring)v->Data())->bitmask);
   }
   else if ((strcmp(name,"ring_cf")==0)
   &&(/*v->Typ()*/t==RING_CMD))

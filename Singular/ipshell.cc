@@ -2771,7 +2771,7 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
     WerrorS("ordering must be given as `list`");
     return TRUE;
   }
-  if (bitmask!=0) R->bitmask=bitmask*2;
+  if (bitmask!=0) R->bitmask=bitmask;
   return FALSE;
 }
 
@@ -2922,7 +2922,7 @@ ring rCompose(const lists  L, const BOOLEAN check_comp, const long bitmask,const
     R->CanShortOut=FALSE;
   }
   #endif
-  if (bitmask!=0x7fff) R->bitmask=bitmask*2;
+  if (bitmask!=0x7fff) R->bitmask=bitmask;
   rComplete(R);
 
   // ------------------------ Q-IDEAL ------------------------
