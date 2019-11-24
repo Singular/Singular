@@ -2505,8 +2505,106 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
                 &olddeg,&reduc,strat, red_result);
 
+      // extract transformation coeffs
+      if(strat != NULL && strat->syzComp > 0 && !(TEST_OPT_REDTAIL_SYZ)) {
+        if(strat->P.bucket != NULL) {
+            if(strat->P.p == NULL) {
+                printf("strat->P.p is NULL, reducing a syzygy?\n");
+                exit(1);
+            }
+            if(pGetComp(strat->P.p) > strat->syzComp) {
+                printf("pGetComp(strat->P.p) > strat->syzComp, reducing a syzygy?\n");
+                exit(1);
+            }
+
+            poly transformation_coeffs = NULL;
+            int transformation_coeffs_length = 0;
+            
+            for(int loop_index = 1; loop_index <= strat->P.bucket->buckets_used; loop_index++) {
+                if(strat->P.bucket->buckets[loop_index] != NULL) {
+                    
+                    poly polynomial = strat->P.bucket->buckets[loop_index];
+                    
+                    if(pGetComp(polynomial) > strat->syzComp) {
+                        int new_transformation_coeffs_length = pLength(polynomial);
+
+                        transformation_coeffs = pAdd(transformation_coeffs, polynomial);
+                        strat->P.transformation_coeffs = transformation_coeffs;
+
+                        if(pLength(transformation_coeffs) != transformation_coeffs_length + new_transformation_coeffs_length) {
+                            printf("Merge did not preserve length\n");
+                            exit(1);
+                        }
+                        
+                        // set tail to NULL
+                        strat->P.bucket->buckets_length[loop_index] -= new_transformation_coeffs_length;
+                        strat->P.pLength -= new_transformation_coeffs_length;
+
+                        if(strat->P.bucket->buckets_length[loop_index] != 0) {
+                            printf("assertion failed, bucket length is not 0\n");
+                            exit(1);
+                        }
+                        
+                        strat->P.bucket->buckets[loop_index] = NULL;
+                        
+                        transformation_coeffs_length += new_transformation_coeffs_length;
+                    }
+                    else {
+                    
+                        while (pNext(polynomial) != NULL)
+                        {
+                            if(pGetComp(pNext(polynomial)) > strat->syzComp) {
+            
+                                int new_transformation_coeffs_length = pLength(pNext(polynomial));
+
+                                transformation_coeffs = pAdd(transformation_coeffs, pNext(polynomial));
+                                strat->P.transformation_coeffs = transformation_coeffs;
+
+                                if(pLength(transformation_coeffs) != transformation_coeffs_length + new_transformation_coeffs_length) {
+                                    printf("Merge did not preserve length\n");
+                                    exit(1);
+                                }
+                                
+                                // set tail to NULL
+                                strat->P.bucket->buckets_length[loop_index] -= new_transformation_coeffs_length;
+                                strat->P.pLength -= new_transformation_coeffs_length;
+
+                                pNext(polynomial) = NULL;
+                                
+                                transformation_coeffs_length += new_transformation_coeffs_length;
+                                
+                                break;
+                            }
+                            pIter(polynomial);
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            printf("bucket is NULL\n");
+            exit(1);
+        }
+        if(strat->P.transformation_coeffs == NULL && strat != NULL && strat->syzComp > 0) {
+            printf("could not find transformation coeffs of dividend\n");
+            exit(1);
+        }
+      }
+      
+      strat->P.transformation_coeffs_parts_length = 0;
+      number transformation_coeffs_parts_numbers[1000];
+      poly transformation_coeffs_parts_lms[1000];
+      poly transformation_coeffs_parts_divisor_transformation_coeffs[1000];
+      strat->P.transformation_coeffs_parts_numbers = &transformation_coeffs_parts_numbers;
+      strat->P.transformation_coeffs_parts_lms = &transformation_coeffs_parts_lms;
+      strat->P.transformation_coeffs_parts_divisor_transformation_coeffs = &transformation_coeffs_parts_divisor_transformation_coeffs;
+      
       /* reduction of the element chosen from L */
       red_result = strat->red(&strat->P,strat);
+
+      if(red_result != 1) {
+          strat->P.transformation_coeffs = NULL;
+      }
       if (errorreported) break;
     }
 
@@ -2520,6 +2618,38 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     {
       // get the polynomial (canonicalize bucket, make sure P.p is set)
       strat->P.GetP(strat->lmBin);
+      if(strat->syzComp > 0) {
+          poly polynomial = strat->P.p;
+          while(polynomial != NULL) {
+              if(pGetComp(polynomial) > strat->syzComp && !(TEST_OPT_REDTAIL_SYZ)) {
+                  printf("p contains a transformation component\n");
+                  exit(1);
+              }
+              pIter(polynomial);
+          }
+      }
+      // compute/append transformation_coeffs
+      if(strat->P.transformation_coeffs != NULL) {
+          poly transformation_coeffs = strat->P.transformation_coeffs;
+          for(int loop_index = 0; loop_index < strat->P.transformation_coeffs_parts_length; loop_index++) {
+              number n = (*strat->P.transformation_coeffs_parts_numbers)[loop_index];
+              if(n != NULL) {
+                  transformation_coeffs = pMult_nn(transformation_coeffs, n);
+              }
+
+              poly lm = (*strat->P.transformation_coeffs_parts_lms)[loop_index];
+              poly divisor_transformation_coeffs = (*strat->P.transformation_coeffs_parts_divisor_transformation_coeffs)[loop_index];
+              transformation_coeffs = pMinus_mm_Mult_qq(transformation_coeffs, lm, divisor_transformation_coeffs);
+          }
+
+          poly polynomial = strat->P.p;
+          while(pNext(polynomial) != NULL) {
+              pIter(polynomial);
+          }
+          pNext(polynomial) = transformation_coeffs;
+          strat->P.pLength += pLength(transformation_coeffs);
+          strat->P.transformation_coeffs = NULL;
+      }
       // in the homogeneous case FDeg >= pFDeg (sugar/honey)
       // but now, for entering S, T, we reset it
       // in the inhomogeneous case: FDeg == pFDeg

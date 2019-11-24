@@ -188,6 +188,51 @@ int ksReducePoly(LObject* PR,
                  number *coef,
                  kStrategy strat)
 {
+  if(strat != NULL && strat->syzComp > 0 && !(TEST_OPT_REDTAIL_SYZ)) {
+  
+      
+      // extract transformation coeffs of divisor
+      if(PW->p != NULL) {
+          
+          poly polynomial = PW->p;
+          
+          while (pNext(polynomial) != NULL)
+          {
+              if(pGetComp(pNext(polynomial)) > strat->syzComp) {
+                  
+                  if(PW->transformation_coeffs != NULL && PW->transformation_coeffs != pNext(polynomial)) {
+                      printf("transformation_coeffs:\n");
+                      pWrite(PW->transformation_coeffs);
+                      printf("polynomial:\n");
+                      pWrite(pNext(polynomial));
+                      printf("got transformation coeffs from somewhere unexpected\n");
+                      exit(1);
+                  }
+  
+                  PW->transformation_coeffs = pNext(polynomial);
+                  pNext(polynomial) = NULL;
+                  
+                  if(PW->transformation_coeffs_length == 0) {
+                      PW->transformation_coeffs_length = pLength(PW->transformation_coeffs);
+                  }
+  
+                  PW->pLength -= PW->transformation_coeffs_length;
+                  
+                  break;
+              }
+              pIter(polynomial);
+          }
+      }
+      else {
+          printf("PW->p is NULL, reducing by zero?\n");
+          exit(1);
+      }
+      if(PW->transformation_coeffs == NULL && strat != NULL && strat->syzComp > 0) {
+          printf("could not find transformation coeffs of divisor\n");
+          exit(1);
+      }
+  }
+
 #ifdef KDEBUG
   red_count++;
 #ifdef TEST_OPT_DEBUG_RED
@@ -238,10 +283,12 @@ int ksReducePoly(LObject* PR,
   }
 #endif
 
-  if (t2==NULL)           // Divisor is just one term, therefore it will
+  if (t2==NULL && false)           // Divisor is just one term, therefore it will
   {                       // just cancel the leading term
     PR->LmDeleteAndIter();
     if (coef != NULL) *coef = n_Init(1, tailRing->cf);
+    printf("unhandled case: divisor is only a single term\n");
+    exit(1);
     return 0;
   }
 
@@ -254,8 +301,16 @@ int ksReducePoly(LObject* PR,
     {
       // undo changes of lm
       p_ExpVectorAdd(lm, p2, tailRing);
-      if (strat == NULL) return 2;
-      if (! kStratChangeTailRing(strat, PR, PW)) return -1;
+      if (strat == NULL) {
+          printf("unhandled case 3\n");
+          exit(1);
+          return 2;
+      }
+      if (! kStratChangeTailRing(strat, PR, PW)) {
+          printf("unhandled case 4\n");
+          exit(1);
+          return -1;
+      }
       tailRing = strat->tailRing;
       p1 = PR->GetLmTailRing();
       p2 = PW->GetLmTailRing();
@@ -277,16 +332,23 @@ int ksReducePoly(LObject* PR,
 #endif
 
   // take care of coef buisness
+  if(PR->transformation_coeffs != NULL) {
+    (*PR->transformation_coeffs_parts_numbers)[PR->transformation_coeffs_parts_length] = NULL;
+  }
   if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
   {
     number bn = pGetCoeff(lm);
     number an = pGetCoeff(p2);
     int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
     p_SetCoeff(lm, bn, tailRing);
-    if ((ct == 0) || (ct == 2))
+    if ((ct == 0) || (ct == 2)) {
+      if(PR->transformation_coeffs != NULL) {
+          (*PR->transformation_coeffs_parts_numbers)[PR->transformation_coeffs_parts_length] = an;
+      }
       PR->Tail_Mult_nn(an);
+    }
     if (coef != NULL) *coef = an;
-    else n_Delete(&an, tailRing->cf);
+    if(coef == NULL && (PR->transformation_coeffs == NULL || (*PR->transformation_coeffs_parts_numbers)[PR->transformation_coeffs_parts_length] == NULL)) n_Delete(&an, tailRing->cf);
   }
   else
   {
@@ -298,16 +360,46 @@ int ksReducePoly(LObject* PR,
 #ifdef HAVE_SHIFTBBA
   if (tailRing->isLPring)
   {
+    printf("unhandled case: 5\n");
+    exit(1);
     PR->Tail_Minus_mm_Mult_qq(lm, tailRing->p_Procs->pp_Mult_mm(t2, lmRight, tailRing), pLength(t2), spNoether);
   }
   else
 #endif
   {
+    if(PR->transformation_coeffs != NULL) {
+        (*PR->transformation_coeffs_parts_lms)[PR->transformation_coeffs_parts_length] = ppMult_mm(lm, pOne());
+        (*PR->transformation_coeffs_parts_divisor_transformation_coeffs)[PR->transformation_coeffs_parts_length] = PW->transformation_coeffs;
+        PR->transformation_coeffs_parts_length++;
+        if(PR->transformation_coeffs_parts_length == 1000) {
+            printf("reducing by more than 1000 polys, this is not supported\n");
+            exit(1);
+        }
+    }
     PR->Tail_Minus_mm_Mult_qq(lm, t2, pLength(t2) /*PW->GetpLength() - 1*/, spNoether);
   }
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
   PR->LmDeleteAndIter();
 
+  // restore divisor transformation_coeffs
+  if(PW->transformation_coeffs != NULL) {
+      if (PW->p != NULL) {
+          poly polynomial = PW->p;
+          while (pNext(polynomial) != NULL) {
+              pIter(polynomial);
+          }
+
+          pNext(polynomial) = PW->transformation_coeffs;
+
+          PW->pLength += PW->transformation_coeffs_length;
+
+          PW->transformation_coeffs = NULL;
+      }
+      else {
+          printf("could not find additional component in divisor\n");
+          exit(1);
+      }
+  }
   return ret;
 }
 
