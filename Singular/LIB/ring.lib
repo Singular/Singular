@@ -64,7 +64,7 @@ EXAMPLE:     example optionIsSet;
    return(pos>0);
 }
 example
-{
+{  "EXAMPLE:"; echo = 2;
     // check if the option "warn" is set.
     optionIsSet("warn");
     option("warn");
@@ -1084,7 +1084,7 @@ example
   hasGFCoefficient(r2);
   ring r3 = (2,a),x,dp;
   minpoly=a2+a+1;
-  hasGFCoefficient(r2);
+  hasGFCoefficient(r3);
 }
 
 proc hasZp_aCoefficient(def rng )
@@ -1105,7 +1105,7 @@ example
   hasZp_aCoefficient(r2);
   ring r3 = (2,a),x,dp;
   minpoly=a2+a+1;
-  hasZp_aCoefficient(r2);
+  hasZp_aCoefficient(r3);
 }
 
 proc hasZpCoefficient(def rng )
@@ -1154,7 +1154,7 @@ EXAMPLE: example hasGlobalOrdering; shows an example
   return (attrib(rng,"global")==1);
 }
 example
-{
+{ "EXAMPLE:"; echo=2;
   ring rng = integer,x,dp;
   hasGlobalOrdering(rng); //yes
   ring rng2 = 0, x, ds;
@@ -1172,7 +1172,7 @@ EXAMPLE: example hasCommutativeVars; shows an example
   return (size(rl)==4);
 }
 example
-{
+{ "EXAMPLE:", echo=2;
  ring r=0,(x,y,z),dp;
  hasCommutativeVars(r);
 }
