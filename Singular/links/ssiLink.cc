@@ -74,7 +74,12 @@ BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
   //  Print("need to change the ring, currRing:%s, switch to: ssiRing%d\n",IDID(currRingHdl),nr);
   //  else
   //  Print("no ring, switch to ssiRing%d\n",nr);
-  if (!rEqual(r,currRing,1))
+  if (r==currRing)
+  {
+    r->ref++;
+    return TRUE;
+  }
+  else if (!rEqual(r,currRing,1))
   {
     char name[20];
     int nr=0;
@@ -134,6 +139,7 @@ void ssiCheckCurrRing(const ring r)
     }
     rSetHdl(h);
   }
+  assume(currRing==r);
 }
 // the implementation of the functions:
 void ssiWriteInt(const ssiInfo *d,const int i)
@@ -486,7 +492,6 @@ number ssiReadBigInt(const ssiInfo *d)
 
 number ssiReadNumber(ssiInfo *d)
 {
-  if(ssiSetCurrRing(d->r)) { d->r=currRing; }
   return ssiReadNumber_CF(d,d->r->cf);
 }
 
@@ -643,7 +648,6 @@ poly ssiReadPoly_R(const ssiInfo *d, const ring r)
 
 poly ssiReadPoly(ssiInfo *d)
 {
-  if(ssiSetCurrRing(d->r)) { d->r=currRing; }
   return ssiReadPoly_R(d,d->r);
 }
 
@@ -663,7 +667,6 @@ ideal ssiReadIdeal_R(const ssiInfo *d,const ring r)
 
 ideal ssiReadIdeal(ssiInfo *d)
 {
-  if(ssiSetCurrRing(d->r)) { d->r=currRing; }
   return ssiReadIdeal_R(d,d->r);
 }
 
