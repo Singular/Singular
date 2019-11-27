@@ -1860,6 +1860,23 @@ int redHoney (LObject* h, kStrategy strat)
         }
       }
     }
+    if (strat->syzComp > 0)
+    {
+      if (h->p!=NULL)
+      {
+        if(p_GetComp(h->p,currRing)>strat->syzComp)
+        {
+          return 1;
+        }
+      }
+      else if (h->t_p!=NULL)
+      {
+        if(p_GetComp(h->t_p,strat->tailRing)>strat->syzComp)
+        {
+          return 1;
+        }
+      }
+    }
     h->SetShortExpVector();
     not_sev = ~ h->sev;
     h_d = h->SetpFDeg();
