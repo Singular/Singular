@@ -108,6 +108,33 @@ BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
     return TRUE;
   }
 }
+void ssiCheckCurrRing(const ring r)
+{
+  if (r!=currRing)
+  {
+    char name[20];
+    int nr=0;
+    idhdl h=NULL;
+    loop
+    {
+      sprintf(name,"ssiRing%d",nr); nr++;
+      h=IDROOT->get(name, 0);
+      if (h==NULL)
+      {
+        h=enterid(name,0,RING_CMD,&IDROOT,FALSE);
+        IDRING(h)=r;
+        r->ref=2; /*d->r and h */
+        break;
+      }
+      else if ((IDTYP(h)==RING_CMD)
+      && (rEqual(r,IDRING(h),1)))
+      {
+        break;
+      }
+    }
+    rSetHdl(h);
+  }
+}
 // the implementation of the functions:
 void ssiWriteInt(const ssiInfo *d,const int i)
 {
@@ -1342,6 +1369,8 @@ leftv ssiRead1(si_link l)
            res->data=(char *)ssiReadString(d);
            break;
     case 3:res->rtyp=NUMBER_CMD;
+           if (d->r==NULL) goto no_ring;
+           ssiCheckCurrRing(d->r);
            res->data=(char *)ssiReadNumber(d);
            break;
     case 4:res->rtyp=BIGINT_CMD;
@@ -1364,24 +1393,29 @@ leftv ssiRead1(si_link l)
            break;
     case 6:res->rtyp=POLY_CMD;
            if (d->r==NULL) goto no_ring;
+           ssiCheckCurrRing(d->r);
            res->data=(char*)ssiReadPoly(d);
            break;
     case 7:res->rtyp=IDEAL_CMD;
            if (d->r==NULL) goto no_ring;
+           ssiCheckCurrRing(d->r);
            res->data=(char*)ssiReadIdeal(d);
            break;
     case 8:res->rtyp=MATRIX_CMD;
            if (d->r==NULL) goto no_ring;
+           ssiCheckCurrRing(d->r);
            res->data=(char*)ssiReadMatrix(d);
            break;
     case 9:res->rtyp=VECTOR_CMD;
            if (d->r==NULL) goto no_ring;
+           ssiCheckCurrRing(d->r);
            res->data=(char*)ssiReadPoly(d);
            break;
     case 10:
     case 22:if (t==22) res->rtyp=SMATRIX_CMD;
            else        res->rtyp=MODUL_CMD;
            if (d->r==NULL) goto no_ring;
+           ssiCheckCurrRing(d->r);
            {
              int rk=s_readint(d->f_read);
              ideal M=ssiReadIdeal(d);
