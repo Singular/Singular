@@ -850,7 +850,7 @@ example
 
 //////////////////////////////////////////////////////////////////////////////
 /* moved here from the nctools.lib */
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 proc rootofUnity(int n)
 "USAGE:  rootofUnity(n); n an integer
 RETURN:  number
@@ -869,15 +869,13 @@ EXAMPLE: example rootofUnity; shows examples
   if (n==1) { return(mp-1); }
   if (n==2) { return(mp+1); }
   def OldRing = basering;
-  string CH = charstr(basering);
-  string MCH;
+  list l10=ringlist(OldRing);
+  l10[2]=l10[1][2];
+  l10[1]=l10[1][1];
+  l10[3]=list(list("dp",1:1),list("C",0));
+  l10[4]=ideal(0);
   int j=1;
-  while ( (CH[j] !=",") && (j<=size(CH)))
-  {
-    MCH=MCH+CH[j]; j++;
-  }
-  string SR = "ring @@rR="+MCH+","+parstr(basering)+",dp;";
-  execute(SR);
+  ring @@rR = ring(l10);
   poly @t=var(1)^n-1; // (x^2i-1)=(x^i-1)(x^i+1)
   list l=factorize(@t);
   ideal @l=l[1];
@@ -943,6 +941,7 @@ example
   minpoly = rootofUnity(8);
   r;
 }
+
 
 proc isQuotientRing(def rng )
 "USAGE: isQuotientRing ( rng );
