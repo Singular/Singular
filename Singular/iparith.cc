@@ -3084,6 +3084,8 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
      add_row_shift = ww->min_in();
      (*ww) -= add_row_shift;
   }
+  unsigned save_opt=si_opt_1;
+  si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
   if ((iiOp == RES_CMD) || (iiOp == MRES_CMD))
   {
     r=syResolution(u_id,maxl, ww, iiOp==MRES_CMD);
@@ -3167,6 +3169,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   else
     assume( (r->orderedRes != NULL) || (r->res != NULL) ); // analog for hres...
 
+  si_opt_1=save_opt;
   return FALSE;
 }
 static BOOLEAN jjPFAC2(leftv res, leftv u, leftv v)
@@ -5047,10 +5050,7 @@ static BOOLEAN jjSYZYGY(leftv res, leftv v)
 // activate, if idSyz handle module weights correctly !
 static BOOLEAN jjSYZYGY(leftv res, leftv v)
 {
-  intvec *ww=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
-  intvec *w=NULL;
   ideal v_id=(ideal)v->Data();
-  tHomog hom=testHomog;
 #ifdef HAVE_SHIFTBBA
   if (rIsLPRing(currRing))
   {
@@ -5061,6 +5061,9 @@ static BOOLEAN jjSYZYGY(leftv res, leftv v)
     }
   }
 #endif
+  intvec *ww=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
+  intvec *w=NULL;
+  tHomog hom=testHomog;
   if (ww!=NULL)
   {
     if (idTestHomModule(v_id,currRing->qideal,ww))
@@ -5083,7 +5086,10 @@ static BOOLEAN jjSYZYGY(leftv res, leftv v)
       if (idHomIdeal(v_id,currRing->qideal))
         hom=isHomog;
   }
+  unsigned save_opt=si_opt_1;
+  si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
   ideal S=idSyzygies(v_id,hom,&w);
+  si_opt_1=save_opt;
   res->data = (char *)S;
   if (hom==isHomog)
   {
