@@ -1860,7 +1860,7 @@ int redHoney (LObject* h, kStrategy strat)
         }
       }
     }
-    if (strat->syzComp > 0)
+    if ((strat->syzComp > 0)&&(!TEST_OPT_REDTAIL_SYZ))
     {
       if (h->p!=NULL)
       {
