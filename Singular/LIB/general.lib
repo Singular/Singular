@@ -134,6 +134,7 @@ EXAMPLE: example A_Z_L; shows an example
     else
     { ERROR(s+" sis not a letter");}
   }
+  if (n>26) { s=s[1]+"("; }
   if (s[2]=="(")
   {
     for(ii=1;ii<=n;ii++)
