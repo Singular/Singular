@@ -2548,7 +2548,7 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
         && (vv->m[1].Typ()!=INTMAT_CMD))
         {
           PrintS(lString(vv));
-          WerrorS("ordering name must be a (string,intvec)(1)");
+          Werror("ordering name must be a (string,intvec), not (string,%s)",Tok2Cmdname(vv->m[1].Typ()));
           return TRUE;
         }
         R->order[j_in_R]=rOrderName(omStrDup((char*)vv->m[0].Data())); // assume STRING
