@@ -227,18 +227,12 @@ NOTE:    This proc is useful for defining a ring in a procedure.
 EXAMPLE: example defring; shows an example
 "
 {
-   string @newring = "ring newring =("+s2+"),(";
-   if( n>26 or s3[2]=="(" ) { string @v = s3[1]+"(1.."+string(n)+")"; }
-   else { string @v = A_Z(s3,n); }
-   @newring=@newring+@v+"),("+s4+");";
-   execute(@newring);
-   return(newring);
+   return(create_ring(s2,A_Z_L(s3,n),s4));
 }
 example
 { "EXAMPLE:"; echo = 2;
    def r=defring("0",5,"u","ls"); r; setring r;"";
-   def R=defring("2,A",10,"x(","dp(3),ws(1,2,3),ds"); R; setring R;
-   kill R,r;
+   def R=defring("(2,A)",10,"x(","dp(3),ws(1,2,3),ds"); R; setring R;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
