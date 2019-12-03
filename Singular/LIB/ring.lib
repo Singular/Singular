@@ -1061,11 +1061,6 @@ KEYWORDS: ring coefficients
 EXAMPLE: example hasGFCoefficient; shows an example
 "
 {
-  //return((charstr(rng)!=string(char(rng))) &&
-  //(npars(rng)==1) &&
-  //(find(charstr(rng),string(char(rng)))!=1) &&
-  //(charstr(basering)<>"real")&&
-  //(charstr(basering)<>"complex") );
   return(attrib(rng,"cf_class")==4);
 }
 example
