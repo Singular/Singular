@@ -16,6 +16,7 @@
 #include "coeffs/numbers.h"
 #include "coeffs/longrat.h"
 #include "coeffs/ffields.h"
+#include "coeffs/modulop.h"
 
 #include <cmath>
 #include <errno.h>
@@ -922,6 +923,10 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   r->has_simple_Alloc=TRUE;
   r->has_simple_Inverse=TRUE;
 
+  if (IsPrime(p->GFChar)==p->GFChar) /* for oscar-system/Singular.jl/issues/177 */
+  {
+    return npInitChar(r,(void*)(long)p->GFChar);
+  }
   if(p->GFChar > (2<<15))
   {
 #ifndef SING_NDEBUG

@@ -374,6 +374,14 @@ static number npRandom(siRandProc p, number, number, const coeffs cf)
   return npInit(p(),cf);
 }
 
+
+#ifndef HAVE_GENERIC_MULT
+static number npPar(int i, coeffs r)
+{
+  return (number)(long)r->npExpTable[1];
+}
+#endif
+
 BOOLEAN npInitChar(coeffs r, void* p)
 {
   assume( getCoeffType(r) == n_Zp );
@@ -462,6 +470,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
     r->npInvTable=(unsigned short*)omAlloc0( r->ch*sizeof(unsigned short) );
 #endif
 #ifndef HAVE_GENERIC_MULT
+    r->cfParameter=npPar; /* Singular.jl */
     r->npExpTable=(unsigned short *)omAlloc0( r->ch*sizeof(unsigned short) );
     r->npLogTable=(unsigned short *)omAlloc0( r->ch*sizeof(unsigned short) );
     r->npExpTable[0] = 1;
