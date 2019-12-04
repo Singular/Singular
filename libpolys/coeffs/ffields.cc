@@ -923,7 +923,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   r->has_simple_Alloc=TRUE;
   r->has_simple_Inverse=TRUE;
 
-  if (IsPrime(p->GFChar)==p->GFChar) /* for oscar-system/Singular.jl/issues/177 */
+  if ((IsPrime(p->GFChar)==p->GFChar)&&(p->GFDegree==1)) /* for oscar-system/Singular.jl/issues/177 */
   {
     return npInitChar(r,(void*)(long)p->GFChar);
   }
