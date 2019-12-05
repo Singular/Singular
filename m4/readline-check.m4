@@ -17,12 +17,14 @@ AC_CHECK_HEADERS(sys/file.h sys/ioctl.h sys/time.h sys/times.h sys/types.h \
 
 AC_ARG_WITH(
   readline,
-  [  --with-readline=[dynamic,static,no]
-                        do use dynamic/static/no readline for fancy display])
+  [  --with-readline=[dynamic,static,no,ncurses]
+                        use dynamic/static/no readline/ncurses for fancy display])
 
-AC_CHECK_LIB(ncurses,tgetent,,\
- AC_CHECK_LIB(curses,tgetent,,\
-  AC_CHECK_LIB(termcap,tgetent)))
+if test "$with_readline" != no; then
+ AC_CHECK_LIB(ncurses,tgetent,,\
+  AC_CHECK_LIB(curses,tgetent,,\
+   AC_CHECK_LIB(termcap,tgetent)))
+fi
 
 # readline
 if test "$with_readline" = dynamic && test "$ac_have_dl" != yes; then
