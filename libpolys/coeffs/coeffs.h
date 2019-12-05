@@ -717,25 +717,26 @@ static FORCE_INLINE number n_Lcm(number a, number b, const coeffs r)
 static FORCE_INLINE number n_NormalizeHelper(number a, number b, const coeffs r)
 { STATISTIC(n_NormalizeHelper); assume(r != NULL); assume(r->cfNormalizeHelper!=NULL); return r->cfNormalizeHelper(a,b,r); }
 
+number ndCopyMap(number a, const coeffs src, const coeffs dst);
 /// set the mapping function pointers for translating numbers from src to dst
 static FORCE_INLINE nMapFunc n_SetMap(const coeffs src, const coeffs dst)
-{ STATISTIC(n_SetMap); assume(src != NULL && dst != NULL); assume(dst->cfSetMap!=NULL); return dst->cfSetMap(src,dst); }
+{ STATISTIC(n_SetMap);
+  assume(src != NULL && dst != NULL); assume(dst->cfSetMap!=NULL);
+  if (src==dst) return ndCopyMap;
+  return dst->cfSetMap(src,dst);
+}
 
 #ifdef LDEBUG
 /// test whether n is a correct number;
 /// only used if LDEBUG is defined
 static FORCE_INLINE BOOLEAN n_DBTest(number n, const char *filename, const int linenumber, const coeffs r)
 { STATISTIC(n_Test); assume(r != NULL); assume(r->cfDBTest != NULL); return r->cfDBTest(n, filename, linenumber, r); }
-#else
-// is it really necessary to define this function in any case?
-/// test whether n is a correct number;
-/// only used if LDEBUG is defined
-static FORCE_INLINE BOOLEAN n_DBTest(number, const char*, const int, const coeffs)
-{ STATISTIC(n_Test);  return TRUE; }
-#endif
-
 /// BOOLEAN n_Test(number a, const coeffs r)
 #define n_Test(a,r)  n_DBTest(a, __FILE__, __LINE__, r)
+#else
+#define n_Test(a,r)  do{}while(0)
+#endif
+
 
 /// output the coeff description
 static FORCE_INLINE void   n_CoeffWrite(const coeffs r, BOOLEAN details = TRUE)

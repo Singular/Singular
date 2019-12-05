@@ -725,10 +725,6 @@ static number nfMapGGrev(number c, const coeffs src, const coeffs)
 */
 static nMapFunc nfSetMap(const coeffs src, const coeffs dst)
 {
-  if (nCoeff_is_GF(src,src->m_nfCharQ))
-  {
-    return ndCopyMap;   /* GF(p,n) -> GF(p,n) */
-  }
   if (nCoeff_is_GF(src))
   {
     const coeffs r = dst;

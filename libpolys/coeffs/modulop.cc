@@ -682,14 +682,7 @@ nMapFunc npSetMap(const coeffs src, const coeffs dst)
   }
   if ((src->rep==n_rep_int) &&  nCoeff_is_Zp(src) )
   {
-    if (n_GetChar(src) == n_GetChar(dst))
-    {
-      return ndCopyMap;
-    }
-    else
-    {
-      return npMapP;
-    }
+    return npMapP;
   }
   if ((src->rep==n_rep_gmp_float) && nCoeff_is_long_R(src))
   {
