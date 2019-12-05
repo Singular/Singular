@@ -411,29 +411,33 @@ EXAMPLE: example extendring; shows an example
       if( @k>0 and o[size(o)]!=")" ) { o=o+"("+string(@k)+")"; }
    }
 //------------------------ prepare string of new ring -------------------------
-   @newring = "ring na =("+charstr(@r)+"),(";
-   if( n>26 or va[2]=="(" ) { @v = va[1]+"(1.."+string(n)+")"; }
-   else                     { @v = A_Z(va,n); }
-   if( @i==0 )
+   list @ringlist=ringlist(@r);
+   list @varlist=A_Z_L(va,n);
+   if (@i==0)
    {
-      @v=@v+","+varstr(@r);
-      o=@o1+o+","+@ro+@o2;
+     @varlist=@varlist+@ringlist[2];
+     o=@o1+o+","+@ro+@o2;
    }
    else
    {
-      @v=varstr(@r)+","+@v;
-      o=@o1+@ro+","+o+@o2;
+     @varlist=@ringlist[2]+@varlist;
+     o=@o1+@ro+","+o+@o2;
    }
-   @newring=@newring+@v+"),("+o+");";
+   @i=find(o," ");
+   while(@i!=0)
+   {
+     o=o[1,@i-1]+o[@i+1,size(o)-@i];
+     @i=find(o," ");
+   }
 //---------------------------- execute and export -----------------------------
-   execute(@newring);
    dbprint(printlevel-voice+2,"
 // 'extendring' created a new ring.
 // To see the ring, type (if the name 'R' was assigned to the return value):
      show(R);
 ");
 
-   return(na);
+   o="("+o+")";
+   return(create_ring(@ringlist[1],@varlist,o));
 }
 example
 { "EXAMPLE:"; echo = 2;
