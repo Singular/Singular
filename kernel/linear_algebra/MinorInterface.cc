@@ -215,9 +215,7 @@ ideal getMinorIdeal_toBeDone (const matrix mat, const int minorSize,
          - requested minors need not be mutually distinct, and
          - coefficients come from a field (i.e., Z is also not allowed
            for this implementation). */
-      iii = (i == 0 ? id_Minors(mat, minorSize, currRing)
-                    : id_Minors(mat, minorSize, currRing, i));
-      idSkipZeroes(iii);
+      iii = (i == 0 ? idMinors(mat, minorSize) : idMinors(mat, minorSize, i));
     }
     else
     {
@@ -263,9 +261,8 @@ ideal getMinorIdeal (const matrix mat, const int minorSize, const int k,
        - requested minors need not be mutually distinct, and
        - coefficients come from a field (i.e., the ring Z is not
          allowed for this implementation). */
-    iii = (iSB == NULL ? id_Minors(mat, minorSize, currRing)
-                       : id_Minors(mat, minorSize, currRing, iSB));
-    idSkipZeroes(iii);
+    iii = (iSB == NULL ? idMinors(mat, minorSize) : idMinors(mat, minorSize,
+                                                          iSB));
   }
   else
   {
