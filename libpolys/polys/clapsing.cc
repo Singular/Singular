@@ -993,71 +993,75 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
   number old_lead_coeff=n_Copy(pGetCoeff(f), r->cf);
 
   Variable a;
-  if ((rField_is_Q(r) || rField_is_Q_a(r)
-  && (r->cf->convSingNFactoryN!=ndConvSingNFactoryN))) /* Q, Q(a) */
+  if (r->cf->convSingNFactoryN!=ndConvSingNFactoryN)
   {
-    //if (f!=NULL) // already tested at start of routine
+    if (rField_is_Q(r) || rField_is_Q_a(r)) /* Q, Q(a) */
     {
-      number n0=n_Copy(pGetCoeff(f),r->cf);
-      if (with_exps==0)
-        N=n_Copy(n0,r->cf);
-      p_Cleardenom(f, r);
-      //after here f should not have a denominator!!
-      //PrintS("S:");p_Write(f,r);PrintLn();
-      NN=n_Div(n0,pGetCoeff(f),r->cf);
-      n_Delete(&n0,r->cf);
-      if (with_exps==0)
+      //if (f!=NULL) // already tested at start of routine
       {
-        n_Delete(&N,r->cf);
-        N=n_Copy(NN,r->cf);
+        number n0=n_Copy(pGetCoeff(f),r->cf);
+        if (with_exps==0)
+          N=n_Copy(n0,r->cf);
+        p_Cleardenom(f, r);
+        //after here f should not have a denominator!!
+        //PrintS("S:");p_Write(f,r);PrintLn();
+        NN=n_Div(n0,pGetCoeff(f),r->cf);
+        n_Delete(&n0,r->cf);
+        if (with_exps==0)
+        {
+          n_Delete(&N,r->cf);
+          N=n_Copy(NN,r->cf);
+        }
       }
     }
-  }
-  else if (rField_is_Zp_a(r))
-  {
-    //if (f!=NULL) // already tested at start of routine
-    if (singclap_factorize_retry==0)
+    else if (rField_is_Zp_a(r))
     {
-      number n0=n_Copy(pGetCoeff(f),r->cf);
-      if (with_exps==0)
-        N=n_Copy(n0,r->cf);
-      p_Norm(f,r);
-      p_Cleardenom(f, r);
-      NN=n_Div(n0,pGetCoeff(f),r->cf);
-      n_Delete(&n0,r->cf);
-      if (with_exps==0)
+      //if (f!=NULL) // already tested at start of routine
+      if (singclap_factorize_retry==0)
       {
-        n_Delete(&N,r->cf);
-        N=n_Copy(NN,r->cf);
+        number n0=n_Copy(pGetCoeff(f),r->cf);
+        if (with_exps==0)
+          N=n_Copy(n0,r->cf);
+        p_Norm(f,r);
+        p_Cleardenom(f, r);
+        NN=n_Div(n0,pGetCoeff(f),r->cf);
+        n_Delete(&n0,r->cf);
+        if (with_exps==0)
+        {
+          n_Delete(&N,r->cf);
+          N=n_Copy(NN,r->cf);
+        }
       }
     }
-  }
-  if ((rField_is_Q(r) || rField_is_Zp(r) || (rField_is_Z(r)))
-  || (rField_is_Zn(r)&&(r->cf->convSingNFactoryN!=ndConvSingNFactoryN)))
-  {
-    setCharacteristic( rChar(r) );
-    CanonicalForm F( convSingPFactoryP( f,r ) );
-    L = factorize( F );
-  }
-  // and over Q(a) / Fp(a)
-  else if ((r->cf->extRing!=NULL)
-  &&(r->cf->extRing->cf->convSingNFactoryN!=ndConvSingNFactoryN))
-  {
-    if (rField_is_Q_a (r)) setCharacteristic (0);
-    else                   setCharacteristic( rChar(r) );
-    if (r->cf->extRing->qideal!=NULL) /*algebraic extension */
+    if (rField_is_Q(r) || rField_is_Zp(r) || rField_is_Z(r) || rField_is_Zn(r))
     {
-      CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->qideal->m[0],
-                                           r->cf->extRing);
-      a=rootOf(mipo);
-      CanonicalForm F( convSingAPFactoryAP( f, a, r ) );
-      L = factorize( F, a );
-      prune(a);
-    }
-    else /* rational functions */
-    {
-      CanonicalForm F( convSingTrPFactoryP( f,r ) );
+      setCharacteristic( rChar(r) );
+      CanonicalForm F( convSingPFactoryP( f,r ) );
       L = factorize( F );
+    }
+    // and over Q(a) / Fp(a)
+    else if (r->cf->extRing!=NULL)
+    {
+      if (rField_is_Q_a (r)) setCharacteristic (0);
+      else                   setCharacteristic( rChar(r) );
+      if (r->cf->extRing->qideal!=NULL) /*algebraic extension */
+      {
+        CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->qideal->m[0],
+                                             r->cf->extRing);
+        a=rootOf(mipo);
+        CanonicalForm F( convSingAPFactoryAP( f, a, r ) );
+        L = factorize( F, a );
+        prune(a);
+      }
+      else /* rational functions */
+      {
+        CanonicalForm F( convSingTrPFactoryP( f,r ) );
+        L = factorize( F );
+      }
+    }
+    else
+    {
+      goto notImpl;
     }
   }
   else
@@ -1088,7 +1092,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
     {
       if (with_exps!=1) (**v)[j] = J.getItem().exp();
       if (rField_is_Zp(r) || rField_is_Q(r)||  rField_is_Z(r)
-      || (rField_is_Zn(r) && r->cf->convSingNFactoryN!=ndConvSingNFactoryN))           /* Q, Fp, Z */
+      || rField_is_Zn(r))           /* Q, Fp, Z */
       {
         //count_Factors(res,*v,f, j, convFactoryPSingP( J.getItem().factor() );
         res->m[j] = convFactoryPSingP( J.getItem().factor(),r );
