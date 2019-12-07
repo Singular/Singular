@@ -253,7 +253,7 @@ poly _nc_p_Mult_q(poly pPolyP, poly pPolyQ, const ring rRing)
 // return pPolyP * pPolyQ; preserve pPolyP and pPolyQ
 poly _nc_pp_Mult_qq(const poly pPolyP, const poly pPolyQ, const ring rRing)
 {
-  assume( rIsPluralRing(rRing) );
+  assume( rIsNCRing(rRing) );
 #ifdef PDEBUG
   p_Test(pPolyP, rRing);
   p_Test(pPolyQ, rRing);

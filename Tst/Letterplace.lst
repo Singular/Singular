@@ -12,6 +12,8 @@ Manual/lpGkDim.tst
 Manual/lpKDim.tst
 Manual/lpMonomialPrinting.tst
 Manual/letterplace_reduce.tst
+Manual/letterplace_multiplication.tst
+Manual/letterplace_bracket.tst
 Manual/Example_of_use_of_@sc{Letterplace}.tst
 Manual/letterplace_std.tst
 Manual/lpNF.tst
