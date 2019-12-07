@@ -1078,7 +1078,7 @@ static inline poly p_Mult_q(poly p, poly q, const ring r)
     p_LmDelete(&q, r);
     return p;
   }
-#ifdef HAVE_PLURAL
+#if defined(HAVE_PLURAL) || defined(HAVE_SHIFTBBA)
   if (rIsNCRing(r))
     return _nc_p_Mult_q(p, q, r);
   else
@@ -1106,8 +1106,8 @@ static inline poly pp_Mult_qq(poly p, poly q, const ring r)
     qq = p_Copy(q, r);
 
   poly res;
-#ifdef HAVE_PLURAL
-  if (rIsPluralRing(r))
+#if defined(HAVE_PLURAL) || defined(HAVE_SHIFTBBA)
+  if (rIsNCRing(r))
     res = _nc_pp_Mult_qq(p, qq, r);
   else
 #endif
