@@ -3329,7 +3329,9 @@ defines a package (Only relevant in very special situations).
 @smallexample
 @c example error
   package Test;
-  int Test::i;
+  int i=3; exportto(Test,i);
+  Test::i+2;
+  i;
   listvar();
   listvar(Test);
   package dummy = Test;

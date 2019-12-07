@@ -70,10 +70,6 @@ EXAMPLE:example versal; shows an example
       if (@size>4) {@out   = #[5];}
     }
   }
-  string myPx = @my+"Px";
-  string myQx = @my+"Qx";
-  string myOx = @my+"Ox";
-  string mySo = @my+"So";
   if (ord_test(basering)==-1) {  Fo   = minbase(Fo);}
   else                        {  Fo   =interred(Fo);}
   @is_qh      = qhweight(Fo);
@@ -120,12 +116,12 @@ setring  Po;
   }
  //---- create new rings and objects ------------------------------------------
   list list_of_rings=get_rings(Fo,t1',1,@order,@param);
-  def `myPx`= list_of_rings[1];
-  def `myQx`= list_of_rings[2];
-  def `myOx`= list_of_rings[3];
-  def `mySo`= list_of_rings[4];
+  def myPx= list_of_rings[1];
+  def myQx= list_of_rings[2];
+  def myOx= list_of_rings[3];
+  def mySo= list_of_rings[4];
   kill list_of_rings;
-  setring `myPx`;
+  setring myPx;
   @jv=0; @jv[t1']=0; @jv=@jv+1; @jv[nvars(basering)]=0;
                                                //weight-vector for calculating
                                                //rel-jet with resp to def-para
@@ -149,11 +145,11 @@ setring  Po;
   F_R = Fs*Rs;
   tid = 0 + ideal(F_R);
   if (tid[1]==0) {d_max=1;}                   //finished ?
- setring `myOx`;
+ setring myOx;
   matrix Fs,Rs,Cup,Cup',F_R,homFR,New,Rn,Fn;
   module hom';
   ideal  null,tid;  attrib(null,"isSB",1);
- setring `myQx`;
+ setring myQx;
   poly X_s = imap(Po,X_s);
   matrix Cup,Cup',MASS;
   ideal  tid,null;               attrib(null,"isSB",1);
@@ -163,8 +159,8 @@ setring  Po;
   module PreO'= imap(Po,PreO');  attrib(PreO',"isSB",1);
   module PreT = imap(Po,PreT);   attrib(PreT,"isSB",1);
   matrix kbT_2 = imap(Po,kbT_2);
-  matrix Mon  = fetch(`myPx`,Mon);
-  matrix F_R  = fetch(`myPx`,F_R);
+  matrix Mon  = fetch(myPx,Mon);
+  matrix F_R  = fetch(myPx,F_R);
   matrix Js[1][@t2];
 //------- start the loop ------------------------------------------------------
    for (@d=2;@d<=d_max;@d=@d+1)
@@ -200,31 +196,31 @@ setring  Po;
       { Js = transpose(MASS);
         dbprint(p-2,"// next equation of base space:",
         simplify(ideal(Js),10));
- setring `myPx`;
-        Js   = imap(`myQx`,Js);
-      degBound = @d+1;
+        setring myPx;
+        Js   = imap(myQx,Js);
+        degBound = @d+1;
         J    = std(ideal(Js));
         m_J  = std(J*ideal(Mon));
-      degBound = 0;
+        degBound = 0;
 //--------------- obtain new base-ring ----------------------------------------
-        if(defined(`myOx`)) {kill `myOx`;}
-  attrib(J,"isSB",1); // J is a degBound-SB (deg @d)
-  qring `myOx` = J;
+        if(defined(myOx)) {kill myOx;}
+        attrib(J,"isSB",1); // J is a degBound-SB (deg @d)
+        qring myOx = J;
         matrix Fs,Rs,F_R,Cup,Cup',homFR,New,Rn,Fn;
         module hom';
         ideal  null,tid;  attrib(null,"isSB",1);
       }
 //---------------- lift equations F and relations R ---------------------------
- setring `myOx`;
-      Fs    = fetch(`myPx`,Fs);
-      Rs    = fetch(`myPx`,Rs);
+      setring myOx;
+      Fs    = fetch(myPx,Fs);
+      Rs    = fetch(myPx,Rs);
       F_R   = Fs*Rs;
       F_R   = matrix(reduce(ideal(F_R),null));
       tid   = 0 + ideal(F_R);
       if (tid[1]==0) { dbprint(p-1,"// finished"); break;}
       Cup   = (-1)*transpose(jet(F_R,@d,@jv));
-      homFR = fetch(`myPx`,homFR);
-      hom'  = fetch(`myPx`,hom');  attrib(hom',"isSB",1);
+      homFR = fetch(myPx,homFR);
+      hom'  = fetch(myPx,hom');  attrib(hom',"isSB",1);
       Cup'  = simplify(reduce(Cup,hom'),10);
       tid   = simplify(ideal(Cup'),10);
       if (tid[1]!=0)
@@ -239,20 +235,20 @@ setring  Po;
       F_R   = Fs*Rs;
       tid   = 0+reduce(ideal(F_R),null);
 //---------------- fetch results into other rings -----------------------------
-  setring `myPx`;
-      Fs    = fetch(`myOx`,Fs);
-      Rs    = fetch(`myOx`,Rs);
+      setring myPx;
+      Fs    = fetch(myOx,Fs);
+      Rs    = fetch(myOx,Rs);
       F_R   = Fs*Rs;
-  setring `myQx`;
-      F_R = fetch(`myPx`,F_R);
-      m_J = fetch(`myPx`,m_J);  attrib(m_J,"isSB",1);
-      J   = fetch(`myPx`,J);    attrib(J,"isSB",1);
-      Js  = fetch(`myPx`,Js);
-      tid = fetch(`myOx`,tid);
+      setring myQx;
+      F_R = fetch(myPx,F_R);
+      m_J = fetch(myPx,m_J);  attrib(m_J,"isSB",1);
+      J   = fetch(myPx,J);    attrib(J,"isSB",1);
+      Js  = fetch(myPx,Js);
+      tid = fetch(myOx,tid);
       if (tid[1]==0) { dbprint(p-1,"// finished");break;}
    }
 //---------  end loop and final output ----------------------------------------
-  setring `myPx`;
+   setring myPx;
    if (@out!="no")
    {  string out = @out+"_"+string(@d);
       "// writing file "+out+" with matrix Js, matrix Fs, matrix Rs ready
@@ -281,7 +277,7 @@ setring  Po;
 // L[3] = the embedding ring of the versal base space,
 // L[4] = L[1]/Js extending L[3]/Js.
 ");
-   return(list(`myPx`,`myQx`,`mySo`,`myOx`));
+   return(list(myPx,myQx,mySo,myOx));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -354,10 +350,6 @@ EXAMPLE:example mod_versal; shows an example
       if (@size>4) {@out   = #[5];}
     }
   }
-  string myPx = @my+"Px";
-  string myQx = @my+"Qx";
-  string myOx = @my+"Ox";
-  string mySo = @my+"So";
   @is_qh      = qhweight(I);
   def    Po   = basering;
  setring Po;
@@ -386,14 +378,14 @@ EXAMPLE:example mod_versal; shows an example
     kb1,lift1,e1' = interact2(kb1,@jv,lift1);
   }
 //-------- get new rings and objects ------------------------------------------
- setring Po;
+  setring Po;
   list list_of_rings=get_rings(I,e1',0,@order,@param);
-  def `myPx`= list_of_rings[1];
-  def `myQx`= list_of_rings[2];
-  def `myOx`= list_of_rings[3];
-  def `mySo`= list_of_rings[4];
+  def ooPx= list_of_rings[1];
+  def ooQx= list_of_rings[2];
+  def ooOx= list_of_rings[3];
+  def ooSo= list_of_rings[4];
   kill list_of_rings;
- setring `myPx`;
+  setring ooPx;
   ideal  J,m_J;
   ideal  I_J  = imap(Po,I);
   ideal  Io   = I_J;
@@ -401,15 +393,15 @@ EXAMPLE:example mod_versal; shows an example
   matrix Ms   = imap(Qo,Mo);
   matrix Ls   = imap(Qo,Ls);
   matrix Js[1][e2];
- setring `myQx`;
+  setring ooQx;
   ideal  J,I_J,tet,null;              attrib(null,"isSB",1);
-  ideal  m_J  = fetch(`myPx`,m_J);   attrib(m_J,"isSB",1);
-  @jv=0;  @jv[e1] = 0; @jv = @jv+1;   @jv[nvars(`myPx`)] = 0;
+  ideal  m_J  = fetch(ooPx,m_J);   attrib(m_J,"isSB",1);
+  @jv=0;  @jv[e1] = 0; @jv = @jv+1;   @jv[nvars(ooPx)] = 0;
   matrix Ms   = imap(Qo,Mo);          export(Ms);
   matrix Ls   = imap(Qo,Ls);          export(Ls);
   matrix Js[e2][1];                   export(Js);
   matrix MASS;
-  matrix Mon  = fetch(`myPx`,Mon);
+  matrix Mon  = fetch(ooPx,Mon);
   matrix Mn,Ln,ML,Cup,Cup',Lift;
   matrix C'   = imap(Qo,C');
   module Co   = imap(Qo,Co);          attrib(Co,"isSB",1);
@@ -457,19 +449,19 @@ EXAMPLE:example mod_versal; shows an example
     if (@noObstr == 0)
     { Js = MASS;
       dbprint(p-2,"// next equation of base space:",simplify(ideal(Js),10));
- setring `myPx`;
-      Js = imap(`myQx`,Js);
-     degBound=@d+1;
+      setring ooPx;
+      Js = imap(ooQx,Js);
+      degBound=@d+1;
       J   = std(ideal(Js));
       m_J = std(ideal(Mon)*J);
-     degBound=0;
+      degBound=0;
       I_J = Io,J;                attrib(I_J,"isSB",1);
 //-------- obtain new base ring -----------------------------------------------
-      if (defined(`myOx`)) {kill `myOx`;}
- qring `myOx` = I_J;
+      if (defined(ooOx)) {kill ooOx;}
+      qring ooOx = I_J;
       ideal null,tet;            attrib(null,"isSB",1);
-      matrix Ms  = imap(`myQx`,Ms);
-      matrix Ls  = imap(`myQx`,Ls);
+      matrix Ms  = imap(ooQx,Ms);
+      matrix Ls  = imap(ooQx,Ls);
       matrix Mn,Ln,ML,Cup,Cup',Lift;
       matrix C'  = imap(Qo,C');
       module Co  = imap(Qo,Co);   attrib(Co,"isSB",1);
@@ -478,7 +470,7 @@ EXAMPLE:example mod_versal; shows an example
       poly   X_s = imap(Po,X_s);
     }
 //-------- get lifts ----------------------------------------------------------
-   setring `myOx`;
+    setring ooOx;
     ML  = matrix(reduce(ideal(Ms*Ls),null),f0,f2);
     Cup = matrix(ideal(ML),f0*f2,1);
     Cup = jet(Cup,@d,@jv);
@@ -500,22 +492,22 @@ EXAMPLE:example mod_versal; shows an example
     tet  = simplify(ideal(ML),10);
     if (tet[1]==0) { dbprint(p-1,"// finished in degree ",@d);}
 //---------fetch results into Qx and Px ---------------------------------------
-   setring `myPx`;
-    Ms   = fetch(`myOx`,Ms);
-    Ls   = fetch(`myOx`,Ls);
-   setring `myQx`;
-    Ms   = fetch(`myOx`,Ms);
-    Ls   = fetch(`myOx`,Ls);
+    setring ooPx;
+    Ms   = fetch(ooOx,Ms);
+    Ls   = fetch(ooOx,Ls);
+   setring ooQx;
+    Ms   = fetch(ooOx,Ms);
+    Ls   = fetch(ooOx,Ls);
     ML   = Ms*Ls;
     ML   = matrix(reduce(ideal(ML),null),f0,f2);
-    tet  = imap(`myOx`,tet);
+    tet  = imap(ooOx,tet);
     if (tet[1]==0) { break;}
   }
 //------- end of loop, final output -------------------------------------------
   if (@out != "no")
   { string out = @out+"_"+string(@d);
     "// writing file '"+out+"' with matrix Js, matrix Ms, matrix Ls
-    ready for reading in rings "+myPx+" or "+myQx;
+    ready for reading in rings qqPx or qqQx";
     write(out,"matrix Js[1][",e2,"]=",Js,";matrix Ms[",f0,"][",f1,"]=",Ms,
     ";matrix Ls[",f1,"][",f2,"]=",Ls,";");
   }
@@ -534,7 +526,7 @@ EXAMPLE:example mod_versal; shows an example
      def Qx=L[2]; setring Qx; print(Ms); print(Ls); print(Js);
 ");
   option(set,save_opt);
-  return(list(`myPx`,`myQx`,`mySo`,`myOx`));
+  return(list(ooPx,ooQx,ooSo,ooOx));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -550,42 +542,6 @@ example
   print(Js);
   printlevel = p;
   if (defined(Px)) {kill Px,Qx,So;}
-}
-///////////////////////////////////////////////////////////////////////////////
-proc kill_rings(list #)
-"USAGE: kill_rings([string]);
-RETURN: nothing, but kills exported rings generated by procedures
-        'versal' and 'mod_versal' with optional prefix 'string'
-NOTE: obsolete
-"
-{
-  string my,br;
-  if (size(#)>0)     { my = #[1];}
-  string na=nameof(basering);
-  br = my+"Qx";
-  if (defined(`br`)) { kill `br`;}
-  br = my+"Px";
-  if (defined(`br`)) { kill `br`;}
-  br = my+"So";
-  if (defined(`br`)) { kill `br`;}
-  br = my+"Ox";
-  if (defined(`br`)) { kill `br`;}
-  br = my+"Sx";
-  if (defined(`br`)) { kill `br`}
-  //Namespaces:
-  br = my+"Qx";
-  if (defined(Top::`br`)) { kill Top::`br`;}
-  br = my+"Ox";
-  if (defined(Top::`br`)) { kill Top::`br`;}
-  br = my+"Px";
-  if (defined(Ring::`br`)) { kill Ring::`br`;}
-  br = my+"So";
-  if (defined(Ring::`br`)) { kill Ring::`br`;}
-  if (defined(basering)==0)
-  { "// choose new basering?";
-    listvar(Top,ring);
-  }
-  return();
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc compute_ext(matrix Mo,int p)

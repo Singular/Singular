@@ -1909,33 +1909,12 @@ static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
   {
      Warn("dim(%s,...) may be wrong because the mixed monomial ordering",v->Name());
   }
-#ifdef HAVE_RINGS
-  if (rField_is_Ring(currRing))
-  {
-    ideal vid = (ideal)v->Data();
-    int i = idPosConstant(vid);
-    if ((i != -1) && (n_IsUnit(pGetCoeff(vid->m[i]),currRing->cf)))
-    { /* ideal v contains unit; dim = -1 */
-      res->data = (char *)-1;
-      return FALSE;
-    }
-    ideal vv = id_Copy(vid, currRing);
-    ideal ww = id_Copy((ideal)w->Data(), currRing);
-    /* drop degree zero generator from vv (if any) */
-    if (i != -1) pDelete(&vv->m[i]);
-    long d = (long)scDimInt(vv, ww);
-    if (rField_is_Z(currRing) && (i == -1)) d++;
-    res->data = (char *)d;
-    idDelete(&vv); idDelete(&ww);
-    return FALSE;
-  }
-#endif
   if(currRing->qideal==NULL)
-    res->data = (char *)((long)scDimInt((ideal)(v->Data()),(ideal)w->Data()));
+    res->data = (char *)((long)scDimIntRing((ideal)(v->Data()),(ideal)w->Data()));
   else
   {
     ideal q=idSimpleAdd(currRing->qideal,(ideal)w->Data());
-    res->data = (char *)((long)scDimInt((ideal)(v->Data()),q));
+    res->data = (char *)((long)scDimIntRing((ideal)(v->Data()),q));
     idDelete(&q);
   }
   return FALSE;
@@ -3125,6 +3104,8 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
      add_row_shift = ww->min_in();
      (*ww) -= add_row_shift;
   }
+  unsigned save_opt=si_opt_1;
+  si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
   if ((iiOp == RES_CMD) || (iiOp == MRES_CMD))
   {
     r=syResolution(u_id,maxl, ww, iiOp==MRES_CMD);
@@ -3208,6 +3189,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   else
     assume( (r->orderedRes != NULL) || (r->res != NULL) ); // analog for hres...
 
+  si_opt_1=save_opt;
   return FALSE;
 }
 static BOOLEAN jjPFAC2(leftv res, leftv u, leftv v)
@@ -4064,73 +4046,7 @@ static BOOLEAN jjDIM(leftv res, leftv v)
   {
      Warn("dim(%s) may be wrong because the mixed monomial ordering",v->Name());
   }
-#ifdef HAVE_RINGS
-  if (rField_is_Ring(currRing))
-  {
-    ideal vid = (ideal)v->Data();
-    int i = idPosConstant(vid);
-    if ((i != -1) && (n_IsUnit(pGetCoeff(vid->m[i]),currRing->cf)))
-    { /* ideal v contains unit; dim = -1 */
-      res->data = (char *)-1L;
-      return FALSE;
-    }
-    ideal vv = id_Head(vid,currRing);
-    idSkipZeroes(vv);
-    int j = idPosConstant(vv);
-    long d;
-    if(j == -1)
-    {
-      d = (long)scDimInt(vv, currRing->qideal);
-      if(rField_is_Z(currRing))
-        d++;
-    }
-    else
-    {
-      if(n_IsUnit(pGetCoeff(vv->m[j]),currRing->cf))
-        d = -1;
-      else
-        d = (long)scDimInt(vv, currRing->qideal);
-    }
-    //Anne's Idea for std(4,2x) = 0 bug
-    long dcurr = d;
-    for(unsigned ii=0;ii<(unsigned)IDELEMS(vv);ii++)
-    {
-      if(vv->m[ii] != NULL && !n_IsUnit(pGetCoeff(vv->m[ii]),currRing->cf))
-      {
-        ideal vc = idCopy(vv);
-        poly c = pInit();
-        pSetCoeff0(c,nCopy(pGetCoeff(vv->m[ii])));
-        idInsertPoly(vc,c);
-        idSkipZeroes(vc);
-        for(unsigned jj = 0;jj<(unsigned)IDELEMS(vc)-1;jj++)
-        {
-          if((vc->m[jj]!=NULL)
-          && (n_DivBy(pGetCoeff(vc->m[jj]),pGetCoeff(c),currRing->cf)))
-          {
-            pDelete(&vc->m[jj]);
-          }
-        }
-        idSkipZeroes(vc);
-        j = idPosConstant(vc);
-        if (j != -1) pDelete(&vc->m[j]);
-        dcurr = (long)scDimInt(vc, currRing->qideal);
-        // the following assumes the ground rings to be either zero- or one-dimensional
-        if((j==-1) && rField_is_Z(currRing))
-        {
-          // should also be activated for other euclidean domains as groundfield
-          dcurr++;
-        }
-        idDelete(&vc);
-      }
-      if(dcurr > d)
-          d = dcurr;
-    }
-    res->data = (char *)d;
-    idDelete(&vv);
-    return FALSE;
-  }
-#endif
-  res->data = (char *)(long)scDimInt((ideal)(v->Data()),currRing->qideal);
+  res->data = (char *)(long)scDimIntRing((ideal)(v->Data()),currRing->qideal);
   return FALSE;
 }
 static BOOLEAN jjDUMP(leftv, leftv v)
@@ -4924,7 +4840,7 @@ static BOOLEAN jjRINGLIST(leftv res, leftv v)
     res->data = (char *)rDecompose((ring)v->Data());
     if (res->data!=NULL)
     {
-      long mm=r->bitmask/2;
+      long mm=r->bitmask;
       if (mm>MAX_INT_VAL) mm=MAX_INT_VAL;
       atSet(res,omStrDup("maxExp"),(void*)mm,INT_CMD);
       return FALSE;
@@ -5154,10 +5070,7 @@ static BOOLEAN jjSYZYGY(leftv res, leftv v)
 // activate, if idSyz handle module weights correctly !
 static BOOLEAN jjSYZYGY(leftv res, leftv v)
 {
-  intvec *ww=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
-  intvec *w=NULL;
   ideal v_id=(ideal)v->Data();
-  tHomog hom=testHomog;
 #ifdef HAVE_SHIFTBBA
   if (rIsLPRing(currRing))
   {
@@ -5168,6 +5081,9 @@ static BOOLEAN jjSYZYGY(leftv res, leftv v)
     }
   }
 #endif
+  intvec *ww=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
+  intvec *w=NULL;
+  tHomog hom=testHomog;
   if (ww!=NULL)
   {
     if (idTestHomModule(v_id,currRing->qideal,ww))
@@ -5190,7 +5106,10 @@ static BOOLEAN jjSYZYGY(leftv res, leftv v)
       if (idHomIdeal(v_id,currRing->qideal))
         hom=isHomog;
   }
+  unsigned save_opt=si_opt_1;
+  si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
   ideal S=idSyzygies(v_id,hom,&w);
+  si_opt_1=save_opt;
   res->data = (char *)S;
   if (hom==isHomog)
   {

@@ -664,11 +664,6 @@ static number nr2mMapZ(number from, const coeffs src, const coeffs dst)
 static nMapFunc nr2mSetMap(const coeffs src, const coeffs dst)
 {
   if ((src->rep==n_rep_int) && nCoeff_is_Ring_2toM(src)
-     && (src->mod2mMask == dst->mod2mMask))
-  {
-    return ndCopyMap;
-  }
-  if ((src->rep==n_rep_int) && nCoeff_is_Ring_2toM(src)
      && (src->mod2mMask < dst->mod2mMask))
   { /* i.e. map an integer mod 2^s into Z mod 2^t, where t < s */
     return nr2mMapMachineInt;

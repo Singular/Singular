@@ -43,6 +43,7 @@ enum DetVariant
 typedef ip_smatrix *       matrix;
 
 matrix mpNew(int r, int c);
+#define mp_New(r,c,R) mpNew(r,c)
 
 void   mp_Delete(matrix* a, const ring r);
 matrix mp_Copy(const matrix a, const ring rSrc, const ring rDst);

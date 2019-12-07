@@ -312,12 +312,10 @@ void    nAEpDelete       (number *, const coeffs)
     return;
 }
 
-/*
 number    nAEpSetMap        (number a, const coeffs)
 {
-        return a;
+        return NULL;
 }
-*/
 
 void    nAEpInpMult       (number &a, number b, const coeffs)
 {
@@ -395,7 +393,7 @@ BOOLEAN n_pAEInitChar(coeffs r, void *p)
     r->cfLcm  = nAEpLcm; // ZU BEARBEITEN
     r->cfDelete= nAEpDelete;
 
-    r->cfSetMap = npSetMap; // extern nMapFunc npSetMap(const coeffs src, const coeffs dst); // FIXME: WHY??? // TODO: this seems to be a bug!
+    r->cfSetMap = nAEpSetMap;
 
     r->cfInpMult=nAEpInpMult; //????
     r->cfCoeffWrite=nAEpCoeffWrite; //????

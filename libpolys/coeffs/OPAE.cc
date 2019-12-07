@@ -305,8 +305,7 @@ void    nAEDelete       (number *, const coeffs)
 
 nMapFunc  nAESetMap (const coeffs src, const coeffs dst)
 {
-  if (src==dst) return ndCopyMap; // UNDEFINED: nAECopyMap; // BUG :(
-  else return NULL;
+  return NULL;
 }
 
 void    nAEInpMult       (number &, number, const coeffs)

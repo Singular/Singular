@@ -103,56 +103,6 @@ PROCEDURES:
 
 
 // helpers
-
-static proc desInt(string intname, int value)
-// define, export and set an integer
-{
-    int exists;
-    if(defined(`intname`)){exists=1;}
-    if(!exists)
-    {
-        int `intname`=value;export(`intname`);
-    }
-    `intname`=value;
-}
-
-static proc desString(string stringname, string value)
-// define, export and set a string
-{
-    int exists;
-    if(defined(`stringname`)){exists=1;}
-    if(!exists)
-    {
-        string `stringname`=value;export(`stringname`);
-    }
-    `stringname`=value;
-}
-
-static proc queryInt(string intname)
-// if intname is defined, return(intname), else return(0)
-{
-    int exists,value;
-    if(defined(`intname`)){exists=1;}
-    if(!exists)
-    {
-        return(0);
-    }
-    return(`intname`);
-}
-
-static proc queryString(string stringname)
-// if stringname is defined, return(stringname), else return("")
-{
-    int exists;
-    string value;
-    if(defined(`stringname`)){exists=1;}
-    if(!exists)
-    {
-        return("");
-    }
-    return(`stringname`);
-}
-
 static proc fileExists(string f)
 {
     return(status (f,"exists")=="yes");
@@ -182,7 +132,7 @@ NOTE:     It is not necessary to use this function if the Normaliz executable
 SEE ALSO: setNmzOption
 EXAMPLE:  example setNmzExecPath; shows an example"
 {
-    desString("nmz_exec_path",nmz_exec_path_name);
+    nmz_exec_path=nmz_exec_path_name;
     nmz_exec_path=appendSlash(nmz_exec_path);
 }
 example
@@ -205,14 +155,14 @@ NOTE:     The function sets the filename for the exchange of data. Unless a
 SEE ALSO: writeNmzData, readNmzData, setNmzDataPath, rmNmzFiles
 EXAMPLE:  example setNmzFilename; shows an example"
 {
-    desString("nmz_filename",nmz_filename_name);
+    nmz_filename=nmz_filename_name;
     if(nmz_filename_name!="")
     {
-        desInt("nmz_files_keep_switch",1);
+        nmz_files_keep_switch=1;
     }
     else
     {
-        desInt("nmz_files_keep_switch",0);
+        nmz_files_keep_switch=0;
     }
 }
 example
@@ -235,7 +185,7 @@ NOTE:     The function sets the path for the exchange of data. By default the
 SEE ALSO: writeNmzData, readNmzData, rmNmzFiles, setNmzFilename
 EXAMPLE:  example setNmzDataPath; shows an example"
 {
-    desString("nmz_data_path",nmz_data_path_name);
+    nmz_data_path=nmz_data_path_name;
     nmz_data_path=appendSlash(nmz_data_path);
 }
 example
@@ -258,11 +208,11 @@ SEE ALSO: setNmzDataPath, setNmzExecPath, startNmz
 EXAMPLE:  example writeNmzPaths; shows an example
 "{
     link outf=":w nmz_sing_exec.path";
-    write(outf, queryString("nmz_exec_path"));
+    write(outf, nmz_exec_path);
     close(outf);
 
     outf=":w nmz_sing_data.path";
-    write(outf, queryString("nmz_data_path"));
+    write(outf, nmz_data_path);
     close(outf);
 }
 example
@@ -297,7 +247,7 @@ EXAMPLE:  example startNmz; shows an example
                 break;
             }
         }
-        desString("nmz_exec_path",s);
+        nmz_exec_path=s;
         "nmz_exec_path is",nmz_exec_path;
     }
     else
@@ -318,7 +268,7 @@ EXAMPLE:  example startNmz; shows an example
                 break;
             }
         }
-        desString("nmz_data_path",s);
+        nmz_data_path=s;
         "nmz_data_path is",nmz_data_path;
     }
     else
@@ -333,13 +283,13 @@ example
 
 static proc getNmzFile()
 {
-    if(queryInt("nmz_files_keep_switch"))
+    if(nmz_files_keep_switch)
     {
-        return(queryString("nmz_data_path")+queryString("nmz_filename"));
+        return(nmz_data_path+nmz_filename);
     }
     else
     {
-        return(queryString("nmz_filename"));
+        return(nmz_filename);
     }
 }
 
@@ -356,7 +306,7 @@ static proc makeTempNmzDataPath()
         testdir=testdir1+string(i);
     }
     dummy=system("sh","mkdir "+ testdir);
-    desString("nmz_filename",testdir+"/nmz"); //files are nmz+suffix in testdir
+    nmz_filename=testdir+"/nmz"; //files are nmz+suffix in testdir
 }
 
 static proc eraseTempNmzDataPath();
@@ -371,7 +321,7 @@ static proc eraseTempNmzDataPath();
 
 static proc setNmzExec()
 {
-    return(queryString("nmz_exec_path")+"normaliz");
+    return(nmz_exec_path+"normaliz");
 }
 
 proc rmNmzFiles()
@@ -383,7 +333,7 @@ SEE ALSO: writeNmzData, readNmzData, setNmzFilename, setNmzDataPath
 EXAMPLE:  example rmNmzFiles; shows an example
 "{
 
-    if(!queryInt("nmz_files_keep_switch"))
+    if(!nmz_files_keep_switch)
     {
         ERROR("rmNmzFiles: no filename specified");
     }
@@ -660,7 +610,7 @@ NOTE:     Needs an explicit filename set. The filename is created from the
 SEE ALSO: readNmzData, rmNmzFiles, setNmzFilename, setNmzDataPath
 EXAMPLE:  example writeNmzData; shows an example"
 {
-    if(queryString("nmz_filename")=="")
+    if(nmz_filename=="")
     {
         ERROR("writeNmzData: no filename specified");
     }
@@ -695,7 +645,7 @@ NOTE:    Needs an explicit filename set by setNmzFilename.
 SEE ALSO: writeNmzData, rmNmzFiles, setNmzFilename, setNmzDataPath
 EXAMPLE:  example readNmzData; shows an example"
 {
-    if(queryString("nmz_filename")=="")
+    if(nmz_filename=="")
     {
         ERROR("readNmzData: no filename specified");
     }
@@ -737,36 +687,6 @@ example
 }
 
 
-// running normaliz (with options)
-
-// component 1 is name of option
-// 2 is default value
-// 3 is command line option to be passed to Normaliz
-// 4 indictes whether file "gen" is generated
-// value 2 of 4 indicates "no influence"
-
-static proc defNmzOptions()
-{
-    if(!defined(nmz_options)) // can be defined only once
-    {
-        list nmz_options=
-        list("supp",0,"-s",0),
-        list("triang",0,"-tT",0),
-        list("volume",0,"-v",0),
-        list("hvect",0,"-p",0),
-        list("height1",0,"-1",0),
-        list("normal",0,"-n",1),
-        list("normal_l",0,"-N",1),
-        list("hilb",0,"-h",1),
-        list("dual",0,"-d",1),
-        list("control",0,"-c",2),
-        list("allf",0,"-a",2),
-        list("errorcheck",0,"-e",2),
-        list("bigint",0,"-B",2),
-        list("threads",0,"-x=",2);
-        export(nmz_options);
-    }
-}
 
 proc setNmzOption(string s, int onoff)
 "USAGE:   setNmzOption(string s, int onoff);
@@ -796,7 +716,6 @@ SEE ALSO: showNmzOptions
 EXAMPLE:  example setNmzOption; shows an example
 "
 {
-    defNmzOptions();
     for(int i=1;i<=size(nmz_options);i++)
     {
         if(s==nmz_options[i][1])
@@ -816,9 +735,7 @@ example
 
 static proc collectNmzOptions()
 {
-    defNmzOptions();
     string run_options=" -f ";
-    desInt("GenGen",1); // indicates whether "gen" is generated
     for(int i=1;i<=size(nmz_options);i++)
     {
         if(nmz_options[i][2])
@@ -856,14 +773,14 @@ example
 
 static proc runNormaliz(intmat sgr, int nmz_mode, list #)
 {
-    if(!queryInt("nmz_files_keep_switch"))
+    if(!nmz_files_keep_switch)
     {
         makeTempNmzDataPath();
     }
 
     doWriteNmzData(list(sgr, nmz_mode) + #);
 
-    if(queryInt("nmz_files_keep_switch"))
+    if(nmz_files_keep_switch)
     {
        int dummy=system("sh",setNmzExec()+ collectNmzOptions() + getNmzFile());
     }
@@ -880,7 +797,7 @@ static proc runNormaliz(intmat sgr, int nmz_mode, list #)
 
     if(!GenGen) // return input matrix if "gen" has not been generated
     {
-        if(!queryInt("nmz_files_keep_switch"))
+        if(!nmz_files_keep_switch)
         {
             eraseTempNmzDataPath();
         }
@@ -888,14 +805,9 @@ static proc runNormaliz(intmat sgr, int nmz_mode, list #)
     }
     intmat Gen=readNmzData("gen");
 
-    if(!defined(Num_Invs))
-    {
-        list Num_Invs;
-        export Num_Invs;
-    }
     Num_Invs=getNuminvs();
 
-    if(!queryInt("nmz_files_keep_switch"))
+    if(!nmz_files_keep_switch)
     {
         eraseTempNmzDataPath();
     }
@@ -1761,4 +1673,38 @@ example
  ring R=0,(x,y,z,w),dp;
  intmat V[2][5]=0,1,2,3,4, -1,1,2,1,3;
  intersectionValRingIdeals(V);
+}
+
+static proc mod_init()
+{
+  string nmz_exec_path; export nmz_exec_path;
+  string nmz_filename; export nmz_filename;
+  int nmz_files_keep_switch;export nmz_files_keep_switch;
+  string nmz_data_path; export nmz_data_path;
+  int GenGen=1; export GenGen; // indicates whether "gen" is generated
+  list Num_Invs; export Num_Invs;
+// running normaliz (with options)
+
+// component 1 is name of option
+// 2 is default value
+// 3 is command line option to be passed to Normaliz
+// 4 indictes whether file "gen" is generated
+// value 2 of 4 indicates "no influence"
+
+  list nmz_options=
+        list("supp",0,"-s",0),
+        list("triang",0,"-tT",0),
+        list("volume",0,"-v",0),
+        list("hvect",0,"-p",0),
+        list("height1",0,"-1",0),
+        list("normal",0,"-n",1),
+        list("normal_l",0,"-N",1),
+        list("hilb",0,"-h",1),
+        list("dual",0,"-d",1),
+        list("control",0,"-c",2),
+        list("allf",0,"-a",2),
+        list("errorcheck",0,"-e",2),
+        list("bigint",0,"-B",2),
+        list("threads",0,"-x=",2);
+  export nmz_options;
 }

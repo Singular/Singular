@@ -6,6 +6,7 @@ LIBRARY:  general.lib   Elementary Computations of General Type
 
 PROCEDURES:
  A_Z(\"a\",n);          string a,b,... of n comma separated letters
+ A_Z_L(\"a\",n);        list of strings a,b,... of n letters
  ASCII([n,m]);          string of printable ASCII characters (number n to m)
  absValue(c);           absolute value of c
  binomial(n,m[,../..]); n choose m (type int), [type bigint]
@@ -91,6 +92,65 @@ example
    string sR = "ring R = (0,"+A_Z("A",6)+"),("+A_Z("a",10)+"),dp;";
    sR;
    execute(sR);
+   R;
+}
+proc A_Z_L (string s,int n)
+"USAGE:   A_Z_L(\"a\",n);  a any letter, n integer (-26<= n <=26, !=0)
+RETURN:  list of n small (if a is small) or capital (if a is capital)
+         letters, beginning with a, in alphabetical
+         order (or reverse alphabetical order if n<0)
+EXAMPLE: example A_Z_L; shows an example
+"
+{
+  list l;
+  int ii;
+  if ( n>=-26 and n<=26 and n!=0 and size(s)==1)
+  {
+    string alpha =
+    "abcdefghijklmnopqrstuvwxyz"+
+    "abcdefghijklmnopqrstuvwxyz";
+    int aa=find(alpha,s);
+    if (aa==0)
+    {
+      alpha =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"+
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      aa=find(alpha,s);
+    }
+    if (aa>0)
+    {
+      if (n>0)
+      {
+        for(ii=aa; ii<aa+n; ii++) { l=l+list(alpha[ii]); }
+        return(l);
+      }
+      else
+      {
+        aa=aa+26;
+        for(ii=aa; ii>aa+n; ii--) { l=l+list(alpha[ii]); }
+        return(l);
+      }
+    }
+    else
+    { ERROR(s+" sis not a letter");}
+  }
+  if (n>26) { s=s[1]+"("; }
+  if (s[2]=="(")
+  {
+    for(ii=1;ii<=n;ii++)
+    {
+      l=l+list(s+string(ii)+")");
+    }
+    return(l);
+  }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   A_Z_L("c",5);
+   A_Z_L("Z",-5);
+   ring r;
+   list L=list(0,A_Z_L("A",6),list(list("dp",1:6),list("C",0)),ideal(0));
+   ring R=ring(L);
    R;
 }
 ///////////////////////////////////////////////////////////////////////////////

@@ -60,6 +60,26 @@ BOOLEAN convSingRFlintR(nmod_mpoly_ctx_t ctx, const ring r)
   return TRUE;
 }
 
+BOOLEAN convSingRFlintR(fmpz_mpoly_ctx_t ctx, const ring r)
+{
+  if (rRing_ord_pure_dp(r))
+  {
+    fmpz_mpoly_ctx_init(ctx,r->N,ORD_DEGREVLEX);
+    return FALSE;
+  }
+  else if (rRing_ord_pure_Dp(r))
+  {
+    fmpz_mpoly_ctx_init(ctx,r->N,ORD_DEGLEX);
+    return FALSE;
+  }
+  else if (rRing_ord_pure_lp(r))
+  {
+    fmpz_mpoly_ctx_init(ctx,r->N,ORD_LEX);
+    return FALSE;
+  }
+  return TRUE;
+}
+
 /******** polynomial conversion ***********/
 
 #if HAVE_OMALLOC
@@ -105,7 +125,7 @@ poly convFlintMPSingP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, const ring r)
 {
   int d=fmpq_mpoly_length(f,ctx)-1;
   poly p=NULL;
-  ulong* exp=(ulong*)omAlloc((r->N+1)*sizeof(ulong));
+  ulong* exp=(ulong*)omAlloc0((r->N+1)*sizeof(ulong));
   fmpq_t c;
   fmpq_init(c);
   for(int i=d; i>=0; i--)
@@ -131,11 +151,63 @@ poly convFlintMPSingP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, const ring r)
   return p;
 }
 
+void convSingPFlintMP(fmpz_mpoly_t res, fmpz_mpoly_ctx_t ctx, poly p, int lp, const ring r)
+{
+  fmpz_mpoly_init2(res, lp, ctx);
+  ulong* exp=(ulong*)omAlloc((r->N+1)*sizeof(ulong));
+  while(p!=NULL)
+  {
+    number n=pGetCoeff(p);
+    fmpz_t c;
+    convSingNFlintN(c,n);
+    #if SIZEOF_LONG==8
+    p_GetExpVL(p,(int64*)exp,r);
+    fmpz_mpoly_push_term_fmpz_ui(res, c, exp, ctx);
+    #else
+    p_GetExpV(p,(int*)exp,r);
+    fmpz_mpoly_push_term_fmpz_ui(res, c, &(exp[1]), ctx);
+    #endif
+    fmpz_clear(c);
+    pIter(p);
+  }
+  omFreeSize(exp,(r->N+1)*sizeof(ulong));
+}
+
+poly convFlintMPSingP(fmpz_mpoly_t f, fmpz_mpoly_ctx_t ctx, const ring r)
+{
+  int d=fmpz_mpoly_length(f,ctx)-1;
+  poly p=NULL;
+  ulong* exp=(ulong*)omAlloc0((r->N+1)*sizeof(ulong));
+  fmpz_t c;
+  fmpz_init(c);
+  for(int i=d; i>=0; i--)
+  {
+    fmpz_mpoly_get_term_coeff_fmpz(c,f,i,ctx);
+    poly pp=p_Init(r);
+    #if SIZEOF_LONG==8
+    fmpz_mpoly_get_term_exp_ui(exp,f,i,ctx);
+    p_SetExpVL(pp,(int64*)exp,r);
+    #else
+    fmpz_mpoly_get_term_exp_ui(&(exp[1]),f,i,ctx);
+    p_SetExpV(pp,(int*)exp,r);
+    #endif
+    p_Setm(pp,r);
+    number n=convFlintNSingN(c,r->cf);
+    pSetCoeff0(pp,n);
+    pNext(pp)=p;
+    p=pp;
+  }
+  fmpz_clear(c);
+  omFreeSize(exp,(r->N+1)*sizeof(ulong));
+  p_Test(p,r);
+  return p;
+}
+
 poly convFlintMPSingP(nmod_mpoly_t f, nmod_mpoly_ctx_t ctx, const ring r)
 {
   int d=nmod_mpoly_length(f,ctx)-1;
   poly p=NULL;
-  ulong* exp=(ulong*)omAlloc((r->N+1)*sizeof(ulong));
+  ulong* exp=(ulong*)omAlloc0((r->N+1)*sizeof(ulong));
   for(int i=d; i>=0; i--)
   {
     ulong c=nmod_mpoly_get_term_coeff_ui(f,i,ctx);
@@ -1019,6 +1091,22 @@ poly Flint_Mult_MP(poly p,int lp, poly q, int lq, nmod_mpoly_ctx_t ctx, const ri
   nmod_mpoly_clear(pp,ctx);
   nmod_mpoly_clear(qq,ctx);
   nmod_mpoly_ctx_clear(ctx);
+  p_Test(pres,r);
+  return pres;
+}
+
+poly Flint_Mult_MP(poly p,int lp, poly q, int lq, fmpz_mpoly_ctx_t ctx, const ring r)
+{
+  fmpz_mpoly_t pp,qq,res;
+  convSingPFlintMP(pp,ctx,p,lp,r); // pp read only
+  convSingPFlintMP(qq,ctx,q,lq,r); // qq read only
+  fmpz_mpoly_init(res,ctx);
+  fmpz_mpoly_mul(res,pp,qq,ctx);
+  poly pres=convFlintMPSingP(res,ctx,r);
+  fmpz_mpoly_clear(res,ctx);
+  fmpz_mpoly_clear(pp,ctx);
+  fmpz_mpoly_clear(qq,ctx);
+  fmpz_mpoly_ctx_clear(ctx);
   p_Test(pres,r);
   return pres;
 }

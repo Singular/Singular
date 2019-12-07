@@ -1,6 +1,6 @@
 LIB "tst.lib"; tst_init();
   package Test;
-  int Test::i;
+  int i; exportto(Test,i);
   listvar();
   listvar(Test);
   package dummy = Test;

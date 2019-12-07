@@ -126,6 +126,74 @@ int  scDimInt(ideal S, ideal Q)
   return (currRing->N) - hCo;
 }
 
+int  scDimIntRing(ideal vid, ideal Q)
+{
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing))
+  {
+    int i = idPosConstant(vid);
+    if ((i != -1) && (n_IsUnit(pGetCoeff(vid->m[i]),currRing->cf)))
+    { /* ideal v contains unit; dim = -1 */
+      return(-1);
+    }
+    ideal vv = id_Head(vid,currRing);
+    idSkipZeroes(vv);
+    i = idPosConstant(vid);
+    int d;
+    if(i == -1)
+    {
+      d = scDimInt(vv, Q);
+      if(rField_is_Z(currRing))
+        d++;
+    }
+    else
+    {
+      if(n_IsUnit(pGetCoeff(vv->m[i]),currRing->cf))
+        d = -1;
+      else
+        d = scDimInt(vv, Q);
+    }
+    //Anne's Idea for std(4,2x) = 0 bug
+    int dcurr = d;
+    for(unsigned ii=0;ii<(unsigned)IDELEMS(vv);ii++)
+    {
+      if(vv->m[ii] != NULL && !n_IsUnit(pGetCoeff(vv->m[ii]),currRing->cf))
+      {
+        ideal vc = idCopy(vv);
+        poly c = pInit();
+        pSetCoeff0(c,nCopy(pGetCoeff(vv->m[ii])));
+        idInsertPoly(vc,c);
+        idSkipZeroes(vc);
+        for(unsigned jj = 0;jj<(unsigned)IDELEMS(vc)-1;jj++)
+        {
+          if((vc->m[jj]!=NULL)
+          && (n_DivBy(pGetCoeff(vc->m[jj]),pGetCoeff(c),currRing->cf)))
+          {
+            pDelete(&vc->m[jj]);
+          }
+        }
+        idSkipZeroes(vc);
+        i = idPosConstant(vc);
+        if (i != -1) pDelete(&vc->m[i]);
+        dcurr = scDimInt(vc, Q);
+        // the following assumes the ground rings to be either zero- or one-dimensional
+        if((i==-1) && rField_is_Z(currRing))
+        {
+          // should also be activated for other euclidean domains as groundfield
+          dcurr++;
+        }
+        idDelete(&vc);
+      }
+      if(dcurr > d)
+          d = dcurr;
+    }
+    idDelete(&vv);
+    return d;
+  }
+#endif
+  return scDimInt(vid,Q);
+}
+
 // independent set
 STATIC_VAR scmon hInd;
 
@@ -1008,7 +1076,7 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
 
   int  i;
   int  k = ak;
-  #if HAVE_RINGS
+  #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))
   {
     //consider just monic generators (over rings with zero-divisors)

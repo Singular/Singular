@@ -3,7 +3,7 @@ LIB "tst.lib"; tst_init();
   ring r;
   poly f;
   package p;
-  int p::j;
+  int j; exportto(p,j);
   poly g;
   setring r;
   list l=names();

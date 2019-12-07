@@ -2340,7 +2340,10 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
   }
 
   idTest(s_temp);
+  unsigned save_opt=si_opt_1;
+  si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
   ideal s_temp1 = kStd(s_temp,currRing->qideal,hom,&wtmp,NULL,length);
+  si_opt_1=save_opt;
 
   //if (wtmp!=NULL)  Print("output weights:");wtmp->show(1);PrintLn();
   if ((w!=NULL) && (*w !=NULL) && (wtmp!=NULL))

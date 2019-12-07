@@ -326,8 +326,7 @@ example
 proc exponent(number n, number root)
 { int i=0;
    while((n/root^i)<>1)
-   { i++;
-   }
+   { i++; }
    return(i);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -335,8 +334,8 @@ proc exponent(number n, number root)
 proc molien (list #)
 "USAGE:   molien(G1,G2,...[,ringname,lcm,flags]);
          G1,G2,...: nxn <matrices>, all elements of a finite matrix group,
-         ringname: a <string> giving a name for a new ring of characteristic 0
-         for the Molien series in case of prime characteristic, lcm: an <int>
+         Finvar::newring: a new ring of characteristic 0 for the Molien
+         series in case of prime characteristic, lcm: an <int>
          giving the lowest common multiple of the elements' orders in case of
          prime characteristic, minpoly==0 and a non-cyclic group, flags: an
          optional <intvec> with three components: if the first element is not
@@ -354,7 +353,7 @@ ASSUME:  n is the number of variables of the basering, G1,G2... are the group
          of group_reynolds()
 RETURN:  in case of characteristic 0 a 1x2 <matrix> giving enumerator and
          denominator of Molien series; in case of prime characteristic a ring
-         with the name `ringname` of characteristic 0 is created where the same
+         with the name newring of characteristic 0 is created where the same
          Molien series (named M) is stored
 DISPLAY: information if the third component of flags does not equal 0
 THEORY:  In characteristic 0 the terms 1/det(1-xE) for all group elements of
@@ -385,9 +384,7 @@ EXAMPLE: example molien; shows an example
         if (typeof(#[size(#)-2])<>"string")
         { ERROR("In characteristic p>0 a <string> must be given for the name of a new ring where the Molien series can be stored"); }
         else
-        { if (#[size(#)-2]=="")
-          { ERROR("<string> may not be empty"); }
-          string newring=#[size(#)-2];
+        {
           g=size(#)-3;
         }
       }
@@ -395,9 +392,7 @@ EXAMPLE: example molien; shows an example
       { if (typeof(#[size(#)-1])<>"string")
         { ERROR("In characteristic p>0 a <string> must be given for the name of a new ring where the Molien series can be stored"); }
         else
-        { if (#[size(#)-1]=="")
-          { ERROR("<string> may not be empty"); }
-          string newring=#[size(#)-1];
+        {
           g=size(#)-2;
           int r=g;
         }
@@ -416,12 +411,9 @@ EXAMPLE: example molien; shows an example
       { int r=#[size(#)];
         if (typeof(#[size(#)-1])<>"string")
         { ERROR("in characteristic p>0 a <string> must be given for the name of a new ring where the Molien series can be stored");
-            return();
         }
         else
-        { if (#[size(#)-1]=="")
-          { ERROR("<string> may not be empty"); }
-          string newring=#[size(#)-1];
+        {
           g=size(#)-2;
         }
       }
@@ -429,9 +421,7 @@ EXAMPLE: example molien; shows an example
       { if (typeof(#[size(#)])<>"string")
         { ERROR("in characteristic p>0 a <string> must be given for the name of a new ring where the Molien series can be stored"); }
         else
-        { if (#[size(#)]=="")
-          { ERROR("<string> may not be empty"); }
-          string newring=#[size(#)];
+        {
           g=size(#)-1;
           int r=g;
         }
@@ -563,7 +553,7 @@ EXAMPLE: example molien; shows an example
       poly minq=cyclotomic(r);        // minq now contains the size-of-group-th
                                       // cyclotomic polynomial of Q, it is
                                       // irreducible there
-      ring `newring`=(0,e),x,dp;
+      ring newring=(0,e),x,dp;
       map f=Q,ideal(e);
       minpoly=number(f(minq));         // e is now a r-th primitive root of
                                        // unity -
@@ -611,7 +601,7 @@ EXAMPLE: example molien; shows an example
                                       // it is a power of a primitive r-th root
                                       // of unity -
           k=exponent(number(F[j]),e); // F[j]==e^k
-          setring `newring`;
+          setring newring;
           p=p*(1-x*(e^k))^C[j];       // building the denominator of the new
           setring bre;                // term
         }
@@ -621,7 +611,7 @@ EXAMPLE: example molien; shows an example
 //         { map f3=basering,ideal(e^k);
 //           while (f3(p)==0)
 //           { p=p/(x-e^k);
-//             setring `newring`;
+//             setring newring;
 //             p=p*(1-x*(e^k));        // building the denominator of the new
 //             setring bre;
 //           }
@@ -631,7 +621,7 @@ EXAMPLE: example molien; shows an example
 //           }
 //           k=k+1;
 //         }
-        setring `newring`;
+        setring newring;
         M[1,1]=M[1,1]*p+M[1,2];        // expanding M[1,1]/M[1,2] + 1/p
         M[1,2]=M[1,2]*p;
         if (interval<0)
@@ -677,7 +667,7 @@ EXAMPLE: example molien; shows an example
       if (v)
       { "";
       }
-      setring `newring`;
+      setring newring;
       if (interval==0)                 // canceling common terms of denominator
       {                                // and enumerator -
         s=matrix(syz(ideal(M)));       // once gcd() is faster than syz() these
@@ -687,7 +677,7 @@ EXAMPLE: example molien; shows an example
         // M[1,1]=M[1,1]/p;
         // M[1,2]=M[1,2]/p;
       }
-      map slead=`newring`,ideal(0);
+      map slead=newring,ideal(0);
       s=slead(M);                     // forcing the constant term of numerator
       M[1,1]=1/s[1,1]*M[1,1];         // and denominator to be 1
       M[1,2]=1/s[1,2]*M[1,2];
@@ -696,10 +686,10 @@ EXAMPLE: example molien; shows an example
       kill p;
     }
     else                              // if the group only contains an identity
-    { ring `newring`=0,x,dp;          // element, it is very easy to calculate
+    { ring newring=0,x,dp;          // element, it is very easy to calculate
       matrix M[1][2]=1,(1-x)^n;       // the Molien series
     }
-    export(`newring`);                // we keep the ring where we computed the
+    export(newring);                // we keep the ring where we computed the
     export M;                         // Molien series in such that we can
     setring br;                       // keep it
     if (v)
@@ -723,19 +713,19 @@ EXAMPLE: example molien; shows an example
  //----------------- generating ring of characteristic 0 ----------------------
     if (minpoly==0)
     { if (i>size(chst))
-      { execute("ring "+newring+"=0,("+varstr(br)+"),("+ordstr(br)+")");
+      { execute("ring newring=0,("+varstr(br)+"),("+ordstr(br)+")");
       }
       else
       { chst=chst[i..size(chst)];
         execute
-        ("ring "+newring+"=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")");
+        ("ring newring=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")");
       }
     }
     else
     { string minp=string(minpoly);
       minp=minp[2..size(minp)-1];
       chst=chst[i..size(chst)];
-      execute("ring "+newring+"=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")");
+      execute("ring newring=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")");
       execute("minpoly="+minp);
     }
     matrix I=diag(1,n);
@@ -767,7 +757,7 @@ EXAMPLE: example molien; shows an example
           stM(i)=links+rechts;
         }
       }
-      setring `newring`;
+      setring newring;
       execute("matrix G(i)["+string(n)+"]["+string(n)+"]="+stM(i));
       p=det(I-v1*G(i));                // denominator of new term -
       M[1,1]=M[1,1]*p+M[1,2];          // expanding M[1,1]/M[1,2] + 1/p
@@ -796,7 +786,7 @@ EXAMPLE: example molien; shows an example
       // M[1,1]=M[1,1]/p;
       // M[1,2]=M[1,2]/p;
     }
-    map slead=`newring`,ideal(0);
+    map slead=newring,ideal(0);
     s=slead(M);
     M[1,1]=1/s[1,1]*M[1,1];           // numerator and denominator have to have
     M[1,2]=1/s[1,2]*M[1,2];           // a constant term of 1
@@ -806,7 +796,7 @@ EXAMPLE: example molien; shows an example
       "";
     }
     kill G(1..g), s, slead, p, v1, I;
-    export `newring`;                 // we keep the ring where we computed the
+    export newring;                 // we keep the ring where we computed the
     export M;                         // the Molien series such that we can
     setring br;                       // keep it
   }
@@ -820,21 +810,20 @@ example
          matrix M=molien(L[2..size(L)]);
          print(M);
          ring S=3,(x,y,z),dp;
-         string newring="alksdfjlaskdjf";
          matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
          list L=group_reynolds(A);
-         molien(L[2..size(L)],newring);
-         setring Finvar::alksdfjlaskdjf;
+         molien(L[2..size(L)],"");
+         setring Finvar::newring;
          print(M);
          setring S;
-         kill Finvar::alksdfjlaskdjf;
+         kill Finvar::newring;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc reynolds_molien (list #)
 "USAGE:   reynolds_molien(G1,G2,...[,ringname,flags]);
-         G1,G2,...: nxn <matrices> generating a finite matrix group, ringname:
-         a <string> giving a name for a new ring of characteristic 0 for the
+         G1,G2,...: nxn <matrices> generating a finite matrix group,
+         Finvar::newring: a new ring of characteristic 0 for the
          Molien series in case of prime characteristic, flags: an optional
          <intvec> with three components: if the first element is not equal to 0
          characteristic 0 is simulated, i.e. the Molien series is computed as
@@ -851,7 +840,7 @@ ASSUME:  n is the number of variables of the basering, G1,G2... are the group
 RETURN:  a gxn <matrix> representing the Reynolds operator is the first return
          value and in case of characteristic 0 a 1x2 <matrix> giving enumerator
          and denominator of Molien series is the second one; in case of prime
-         characteristic a ring with the name `ringname` of characteristic 0 is
+         characteristic a ring with the name newring of characteristic 0 is
          created where the same Molien series (named M) is stored
 DISPLAY: information if the third component of flags does not equal 0
 THEORY:  The entire matrix group is generated by getting all left products of
@@ -886,10 +875,9 @@ EXAMPLE: example reynolds_molien; shows an example
     { ERROR("<intvec> should have three components"); }
     if (ch<>0)
     { if (typeof(#[size(#)-1])<>"string")
-      { ERROR("in characteristic p a <string> must be given for the name of a new ring where the Molien series can be stored"); }
+      { ERROR("in characteristic p a <string> must be given"); }
       else
-      { if (#[size(#)-1]=="")
-        { ERROR("<string> may not be empty"); }
+      {
         string newring=#[size(#)-1];
         gen_num=size(#)-2;
       }
@@ -904,11 +892,9 @@ EXAMPLE: example reynolds_molien; shows an example
     int mol_flag=0;                    // computing of Molien series is default
     if (ch<>0)
     { if (typeof(#[size(#)])<>"string")
-      { ERROR("in characteristic p a <string> must be given for the name of a new ring where the Molien series can be stored"); }
+      { ERROR("in characteristic p a <string> must be given"); }
       else
-      { if (#[size(#)]=="")
-        { ERROR("<string> may not be empty"); }
-        string newring=#[size(#)];
+      {
         gen_num=size(#)-1;
       }
     }
@@ -947,10 +933,10 @@ EXAMPLE: example reynolds_molien; shows an example
       }
     }
     if (typeof(L[2])=="int")
-    { molien(L[3..size(L)],newring,L[2],intvec(mol_flag,interval,v));
+    { molien(L[3..size(L)],"",L[2],intvec(mol_flag,interval,v));
     }
     else
-    { molien(L[2..size(L)],newring,intvec(mol_flag,interval,v));
+    { molien(L[2..size(L)],"",intvec(mol_flag,interval,v));
     }
     return(L[1]);
   }
@@ -1125,19 +1111,19 @@ EXAMPLE: example reynolds_molien; shows an example
     }
     if (minpoly==0)
     { if (i>size(chst))
-      { execute("ring "+newring+"=0,("+varstr(br)+"),("+ordstr(br)+")");
+      { execute("ring newring=0,("+varstr(br)+"),("+ordstr(br)+")");
       }
       else
       { chst=chst[i..size(chst)];
         execute
-        ("ring "+newring+"=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")");
+        ("ring newring=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")");
       }
     }
     else
     { string minp=string(minpoly);
       minp=minp[2..size(minp)-1];
       chst=chst[i..size(chst)];
-      execute("ring "+newring+"=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")");
+      execute("ring newring=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")");
       execute("minpoly="+minp);
     }
     poly v1=var(1);                    // the Molien series will be in terms of
@@ -1157,7 +1143,7 @@ EXAMPLE: example reynolds_molien; shows an example
         stM(1)=links+rechts;
       }
     }
-    setring `newring`;
+    setring newring;
     execute("matrix G(1)["+string(n)+"]["+string(n)+"]="+stM(1));
     matrix A(2)[1][2];                 // A(2) will contain the Molien series -
     A(2)[1,1]=1;                       // A(2)[1,1] will be the numerator
@@ -1190,7 +1176,7 @@ EXAMPLE: example reynolds_molien; shows an example
             stM(i)=links+rechts;
           }
         }
-        setring `newring`;
+        setring newring;
         execute("matrix G(i)["+string(n)+"]["+string(n)+"]="+stM(i));
         p=det(I-v1*G(i));              // denominator of new term -
         A(2)[1,1]=A(2)[1,1]*p+A(2)[1,2]; // expanding A(2)[1,1]/A(2)[1,2] +1/p
@@ -1249,7 +1235,7 @@ EXAMPLE: example reynolds_molien; shows an example
               stM(g)=links+rechts;
             }
           }
-          setring `newring`;
+          setring newring;
           execute("matrix G(g)["+string(n)+"]["+string(n)+"]="+stM(g));
           p=det(I-v1*G(g));            // denominator of new term
           A(2)[1,1]=A(2)[1,1]*p+A(2)[1,2];
@@ -1285,7 +1271,7 @@ EXAMPLE: example reynolds_molien; shows an example
     A(1)=transpose(A(1));              // when we evaluate the Reynolds operator
                                        // later on, we actually want 1xn
                                        // matrices
-    setring `newring`;
+    setring newring;
     if (interval==0)                   // canceling common terms of denominator
     {                                  // and enumerator -
       s=matrix(syz(ideal(A(2))));      // once gcd() is faster than syz()
@@ -1306,7 +1292,7 @@ EXAMPLE: example reynolds_molien; shows an example
         // A(2)[1,2]=A(2)[1,2]/p;
       }
     }
-    map slead=`newring`,ideal(0);
+    map slead=newring,ideal(0);
     s=slead(A(2));
     A(2)[1,1]=1/s[1,1]*A(2)[1,1];     // numerator and denominator have to have
     A(2)[1,2]=1/s[1,2]*A(2)[1,2];     // a constant term of 1
@@ -1316,7 +1302,7 @@ EXAMPLE: example reynolds_molien; shows an example
     }
     matrix M=A(2);
     kill G(1..g), s, slead, p, v1, I, A(2);
-    export `newring`;                 // we keep the ring where we computed the
+    export newring;                 // we keep the ring where we computed the
     export M;                         // the Molien series such that we can
     setring br;                       // keep it
     return(A(1));
@@ -1331,14 +1317,13 @@ example
          print(REY);
          print(M);
          ring S=3,(x,y,z),dp;
-         string newring="Qadjoint";
          matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
-         matrix REY=reynolds_molien(A,newring);
+         matrix REY=reynolds_molien(A,"");
          print(REY);
-         setring Finvar::Qadjoint;
+         setring Finvar::newring;
          print(M);
          setring S;
-         kill Finvar::Qadjoint;
+         kill Finvar::newring;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -2092,8 +2077,8 @@ example
 
 proc primary_charp (matrix REY,string ring_name,list #)
 "USAGE:   primary_charp(REY,ringname[,v]);
-         REY: a <matrix> representing the Reynolds operator, ringname: a
-         <string> giving the name of a ring where the Molien series is stored,
+         REY: a <matrix> representing the Reynolds operator,
+         Finvar::newring: the ring where the Molien series is stored,
          v: an optional <int>
 ASSUME:  REY is the first return value of group_reynolds or reynolds_molien and
          ringname gives the name of a ring of characteristic 0 that has been
@@ -2129,8 +2114,6 @@ EXAMPLE: example primary_charp; shows an example
                                        // we should get
   if (ncols(REY)<>n)
   { ERROR("First parameter ought to be the Reynolds operator"): }
-  if (typeof(`ring_name`)<>"ring")
-  { ERROR("Second parameter ought to be ring where the Molien series is stored"); }
  //----------------------------------------------------------------------------
   if (v && voice<>2)
   { "  We can start looking for primary invariants...";
@@ -2141,7 +2124,7 @@ EXAMPLE: example primary_charp; shows an example
   }
  //----------------------- initializing variables -----------------------------
   int dB;
-  setring `ring_name`;                 // the Molien series is stores here -
+  setring newring;                 // the Molien series is stores here -
   poly p(1..2);                        // p(1) will be used for single terms of
                                        // the partial expansion, p(2) to store
   p(1..2)=partial_molien(M,1);         // the intermediate result -
@@ -2166,7 +2149,7 @@ EXAMPLE: example primary_charp; shows an example
  //---------------- loop that searches for primary invariants -----------------
   while(1)                             // repeat until n primary invariants are
   {                                    // found
-    setring `ring_name`;
+    setring newring;
     p(1..2)=partial_molien(M,1,p(2));  // next term of the partial expansion -
     d=deg(p(1));                       // degree where we'll search -
     cd=int(coef(p(1),v1)[2,1]);        // dimension of the homogeneous space of
@@ -2225,10 +2208,9 @@ example
          ring R=3,(x,y,z),dp;
          matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
          list L=group_reynolds(A);
-         string newring="alskdfj";
-         molien(L[2..size(L)],newring);
-         matrix P=primary_charp(L[1],newring);
-         kill Finvar::`newring`;
+         molien(L[2..size(L)],"");
+         matrix P=primary_charp(L[1],"");
+         kill Finvar::newring;
          print(P);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -3155,8 +3137,8 @@ example
 
 proc primary_charp_random (matrix REY,string ring_name,int max,list #)
 "USAGE:   primary_charp_random(REY,ringname,r[,v]);
-         REY: a <matrix> representing the Reynolds operator, ringname: a
-         <string> giving the name of a ring where the Molien series is stored,
+         REY: a <matrix> representing the Reynolds operator,
+         Finvar::newring: the ring where the Molien series is stored,
          r: an <int> where -|r| to |r| is the range of coefficients of the
          random combinations of bases elements, v: an optional <int>
 ASSUME:  REY is the first return value of group_reynolds or reynolds_molien and
@@ -3194,8 +3176,6 @@ EXAMPLE: example primary_charp_random; shows an example
                                        // we should get
   if (ncols(REY)<>n)
   { ERROR("First parameter ought to be the Reynolds operator"); }
-  if (typeof(`ring_name`)<>"ring")
-  { EROOR("Second parameter ought to the name of a ring where the Molien is stored"); }
  //----------------------------------------------------------------------------
   if (v && voice<>2)
   { "  We can start looking for primary invariants...";
@@ -3206,7 +3186,7 @@ EXAMPLE: example primary_charp_random; shows an example
   }
  //----------------------- initializing variables -----------------------------
   int dB;
-  setring `ring_name`;                 // the Molien series is stores here -
+  setring newring;                 // the Molien series is stores here -
   poly p(1..2);                        // p(1) will be used for single terms of
                                        // the partial expansion, p(2) to store
   p(1..2)=partial_molien(M,1);         // the intermediate result -
@@ -3230,7 +3210,7 @@ EXAMPLE: example primary_charp_random; shows an example
  //---------------- loop that searches for primary invariants -----------------
   while(1)                             // repeat until n primary invariants are
   {                                    // found
-    setring `ring_name`;
+    setring newring;
     p(1..2)=partial_molien(M,1,p(2));  // next term of the partial expansion -
     d=deg(p(1));                       // degree where we'll search -
     cd=int(coef(p(1),v1)[2,1]);        // dimension of the homogeneous space of
@@ -3288,10 +3268,9 @@ example
          ring R=3,(x,y,z),dp;
          matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
          list L=group_reynolds(A);
-         string newring="alskdfj";
-         molien(L[2..size(L)],newring);
-         matrix P=primary_charp_random(L[1],newring,1);
-         kill Finvar::`newring`;
+         molien(L[2..size(L)],"");
+         matrix P=primary_charp_random(L[1],"",1);
+         kill Finvar::newring;
          print(P);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -5104,12 +5083,12 @@ IS;
 proc old_secondary_charp (matrix P, matrix REY, string ring_name, list #)
 "USAGE:   secondary_charp(P,REY,ringname[,v]);
          P: a 1xn <matrix> with primary invariants, REY: a gxn <matrix>
-         representing the Reynolds operator, ringname: a <string> giving the
-         name of a ring of characteristic 0 where the Molien series is stored,
+         representing the Reynolds operator,  Finvar::newring is
+         the ring of characteristic 0 where the Molien series is stored,
          v: an optional <int>
 ASSUME:  n is the number of variables of the basering, g the size of the group,
          REY is the 1st return value of group_reynolds(), reynolds_molien() or
-         the second one of primary_invariants(), `ringname` is a ring of
+         the second one of primary_invariants(), Finvar::newring is the ring of
          char 0 that has been created by molien() or reynolds_molien() or
          primary_invariants()
 RETURN:  secondary invariants of the invariant ring (type <matrix>) and
@@ -5148,8 +5127,6 @@ EXAMPLE: example secondary_charp; shows an example
   { ERROR("The first parameter ought to be the matrix of the primary invariants"); }
   if (ncols(REY)<>n)
   { ERROR("The second parameter ought to be the Reynolds operator"); }
-  if (typeof(`ring_name`)<>"ring")
-  { ERROR("The <string> should give the name of the ring where the Molien series is stored"); }
   if (v && voice==2)
   { "";
   }
@@ -5159,7 +5136,7 @@ EXAMPLE: example secondary_charp; shows an example
   for (j=1;j<=n;j++)
   { deg_dim_vec[j]=deg(P[j]);
   }
-  setring `ring_name`;
+  setring newring;
   poly p=1;
   for (j=1;j<=n;j++)                   // calculating the denominator of the
   { p=p*(1-var(1)^deg_dim_vec[j]);     // Hilbert series of the ring generated
@@ -5298,9 +5275,6 @@ EXAMPLE: example secondary_charp; shows an example
   { "  We're done!";
     "";
   }
-  if (ring_name=="aksldfalkdsflkj")
-  { kill `ring_name`;
-  }
   return(matrix(S),matrix(IS));
 }
 example
@@ -5308,7 +5282,7 @@ example
          ring R=3,(x,y,z),dp;
          matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
          list L=primary_invariants(A);
-         matrix S,IS=secondary_charp(L[1..size(L)]);
+         matrix S,IS=old_secondary_charp(L[1..size(L)]);
          print(S);
          print(IS);
 }
@@ -5321,7 +5295,7 @@ proc secondary_charp (matrix P, matrix REY, string ring_name, list #)
                n is the number of variables of the basering;
 @*          REY: a gxn <matrix> representing the Reynolds operator, where
                g the size of the corresponding group;
-@*          ringname: a <string> giving the name of a ring of characteristic 0
+@*          Finvar::newring is the ring of characteristic 0
                containing a 1x2 <matrix> M giving numerator and denominator of the Molien
                series;
 @*          v: an optional <int>;
@@ -5331,7 +5305,7 @@ proc secondary_charp (matrix P, matrix REY, string ring_name, list #)
 ASSUME:   The characteristic of basering is not zero;
           REY is the 1st return value of group_reynolds(), reynolds_molien() or
           the second one of primary_invariants();
-@*        `ringname` is the name of a ring of characteristic 0 that has been created
+@*        Finvar::newring is the ring of characteristic 0 that has been created
           by molien() or reynolds_molien() or primary_invariants()
 RETURN:   secondary invariants of the invariant ring (type <matrix>) and
           irreducible secondary invariants (type <matrix>)
@@ -5395,8 +5369,6 @@ EXAMPLE:  example secondary_charp; shows an example
   { ERROR("The first parameter ought to be the matrix of the primary invariants"); }
   if (ncols(REY)<>n)
   { ERROR("The second parameter ought to be the Reynolds operator"); }
-  if (typeof(`ring_name`)<>"ring")
-  { ERROR("The <string> should give the name of the ring where the Molien series is stored"); }
   if (v && voice==2)
   { "";
   }
@@ -5406,7 +5378,7 @@ EXAMPLE:  example secondary_charp; shows an example
   for (j=1;j<=n;j++)
   { deg_dim_vec[j]=deg(P[j]);
   }
-  setring `ring_name`;
+  setring newring;
   poly p=1;
   for (j=1;j<=n;j++)                   // calculating the denominator of the
   { p=p*(1-var(1)^deg_dim_vec[j]);     // Hilbert series of the ring generated
@@ -5748,9 +5720,6 @@ EXAMPLE:  example secondary_charp; shows an example
       SSort[k][k2]=ideal();
      }
     }
-  }
-  if (ring_name=="aksldfalkdsflkj")
-  { kill `ring_name`;
   }
   option(set,saveopt);
   return(matrix(S),matrix(compress(IS)));
@@ -7173,19 +7142,18 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc orbit_variety (matrix F,string newring)
+proc orbit_variety (matrix F,string s)
 "USAGE:   orbit_variety(F,s);
          F: a 1xm <matrix> defing an invariant ring, s: a <string> giving the
          name for a new ring
 RETURN:  a Groebner basis (type <ideal>, named G) for the ideal defining the
-         orbit variety (i.e. the syzygy ideal) in the new ring (named `s`)
+         orbit variety (i.e. the syzygy ideal) in the new ring (named newring)
 THEORY:  The ideal of algebraic relations of the invariant ring generators is
          calculated, then the variables of the original ring are eliminated and
          the polynomials that are left over define the orbit variety
 EXAMPLE: example orbit_variety; shows an example
 "
-{ if (newring=="")
-  { ERROR("the second parameter may not be an empty <string>"); }
+{
   if (nrows(F)==1)
   { def br=basering;
     int n=nvars(br);
@@ -7203,7 +7171,7 @@ EXAMPLE: example orbit_variety; shows an example
     for (int i=1;i<=m;i++)
     { I[i]=I[i]-y(i); }
     I=elim(I,1..n);
-    execute("ring "+newring+"=("+charstr(br)+"),(y(1..m)),dp(m);");
+    execute("ring newring=("+charstr(br)+"),(y(1..m)),dp(m);");
     if (mp!="0")
     { execute("minpoly=number("+mp+");"); }
     ideal vars;
@@ -7214,7 +7182,7 @@ EXAMPLE: example orbit_variety; shows an example
     map emb=R,vars;
     ideal G=emb(I);
     kill emb, vars, R;
-    keepring `newring`;
+    keepring newring;
     return();
   }
   else
@@ -7224,8 +7192,7 @@ example
 { "EXAMPLE: Sturmfels: Algorithms in Invariant Theory 2.3.7:"; echo=2;
          ring R=0,(x,y,z),dp;
          matrix F[1][7]=x2+y2,z2,x4+y4,1,x2z-1y2z,xyz,x3y-1xy3;
-         string newring="E";
-         orbit_variety(F,newring);
+         orbit_variety(F,"");
          print(G);
          basering;
 }
@@ -7390,12 +7357,12 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc relative_orbit_variety(ideal I,matrix F,string newring)
+proc relative_orbit_variety(ideal I,matrix F,string s)
 "USAGE:   relative_orbit_variety(I,F,s);
          I: an <ideal> invariant under the action of a group,
 @*       F: a 1xm  <matrix> defining the invariant ring of this group,
-@*       s: a <string> giving a name for a new ring
-RETURN:  The procedure ends with a new ring named s.
+@*       Finvar::newring: the new ring
+RETURN:  The procedure ends with a new ring named newring.
          It contains a Groebner basis
          (type <ideal>, named G) for the ideal defining the
          relative orbit variety with respect to I in the new ring.
@@ -7410,8 +7377,7 @@ NOTE:    This procedure is now replaced by rel_orbit_variety
 SEE ALSO: rel_orbit_variety
 EXAMPLE: example relative_orbit_variety; shows an example
 "
-{ if (newring=="")
-  { ERROR("the third parameter may not be empty a <string>"); }
+{
   degBound=0;
   if (nrows(F)==1)
   { def br=basering;
@@ -7450,7 +7416,7 @@ EXAMPLE: example relative_orbit_variety; shows an example
       }
     }
     G=compress(G);
-    execute("ring "+newring+"=("+charstr(br)+"),(y(1..m)),lp;");
+    execute("ring newring=("+charstr(br)+"),(y(1..m)),lp;");
     if (mp!="0")
     { execute("minpoly=number("+mp+");"); }
     ideal vars;
@@ -7461,7 +7427,7 @@ EXAMPLE: example relative_orbit_variety; shows an example
     map emb=R,vars;
     ideal G=emb(G);
     kill vars, emb;
-    keepring `newring`;
+    keepring newring;
     return();
   }
   else

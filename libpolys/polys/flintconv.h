@@ -48,6 +48,7 @@ void convSingNFlintN(fmpq_t f, number n, const coeffs cf);
 void convSingNFlintNN(fmpq_t re, fmpq_t im, number n, const coeffs cf);
 number convFlintNSingN (fmpz_t f);
 number convFlintNSingN (fmpq_t f, const coeffs cf);
+number convFlintNSingN (fmpz_t f, const coeffs cf);
 number convFlintNSingN_QQ(fmpq_t f, const coeffs cf);
 void convSingPFlintP(fmpq_poly_t res, poly p, const ring r);
 void convSingImPFlintP(fmpq_poly_t res, poly p, const ring r);

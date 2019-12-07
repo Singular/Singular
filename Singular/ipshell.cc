@@ -1135,6 +1135,15 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
   }
   else
   {
+    if (root==NULL) return TRUE;
+    if (*root!=IDROOT)
+    {
+      if ((currRing==NULL) || (*root!=currRing->idroot))
+      {
+        Werror("can not define `%s` in other package",name->name);
+        return TRUE;
+      }
+    }
     if (t==QRING_CMD) t=RING_CMD; // qring is always RING_CMD
 
     if (TEST_V_ALLWARN
@@ -2539,7 +2548,7 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
         && (vv->m[1].Typ()!=INTMAT_CMD))
         {
           PrintS(lString(vv));
-          WerrorS("ordering name must be a (string,intvec)(1)");
+          Werror("ordering name must be a (string,intvec), not (string,%s)",Tok2Cmdname(vv->m[1].Typ()));
           return TRUE;
         }
         R->order[j_in_R]=rOrderName(omStrDup((char*)vv->m[0].Data())); // assume STRING
@@ -2762,7 +2771,7 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
     WerrorS("ordering must be given as `list`");
     return TRUE;
   }
-  if (bitmask!=0) R->bitmask=bitmask*2;
+  if (bitmask!=0) R->bitmask=bitmask;
   return FALSE;
 }
 
@@ -2913,7 +2922,7 @@ ring rCompose(const lists  L, const BOOLEAN check_comp, const long bitmask,const
     R->CanShortOut=FALSE;
   }
   #endif
-  if (bitmask!=0x7fff) R->bitmask=bitmask*2;
+  if (bitmask!=0x7fff) R->bitmask=bitmask;
   rComplete(R);
 
   // ------------------------ Q-IDEAL ------------------------

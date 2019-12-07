@@ -2617,11 +2617,11 @@ static proc parse_ordering(string ordering, int n_vars)
     name = ordering;
     if (name == "C" || name == "c")
     {
-      intvec w = intvec(0);
+      intvec @w = intvec(0);
     }
     else
     {
-      intvec w = 1:n_vars;
+      intvec @w = 1:n_vars;
     }
   }
   else
@@ -2633,25 +2633,25 @@ static proc parse_ordering(string ordering, int n_vars)
     {
       if (name == "L")
       {
-        int w = int(ordering[b1+1, b2-b1-1]);
+        int @w = int(ordering[b1+1, b2-b1-1]);
       }
       if (name == "wp" || name == "Wp" || name == "ws" || name == "Ws"
           || name == "a")
       {
-        intvec w = int(ordering[b1+1, b2-b1-1]);
+        intvec @w = int(ordering[b1+1, b2-b1-1]);
       }
-      if (!defined(w))   // else
+      if (!defined(@w))   // else
       {
-        intvec w = 1:int(ordering[b1+1, b2-b1-1]);
+        intvec @w = 1:int(ordering[b1+1, b2-b1-1]);
       }
     }
     else
     {
       list W = tuple_to_tokens(ordering[b1, b2-b1+1]);
-      intvec w = intvec(int(W[1..size(W)]));
+      intvec @w = intvec(int(W[1..size(W)]));
     }
   }
-  return(list(name, w));
+  return(list(name, @w));
 }
 
 static proc parse_L3(string l3, int n_vars)

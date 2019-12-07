@@ -7,11 +7,10 @@ matrix REY,M=reynolds_molien(A);
 print(REY);
 print(M);
 ring S=3,(x,y,z),dp;
-string newring="Qadjoint";
 matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
-matrix REY=reynolds_molien(A,newring);
+matrix REY=reynolds_molien(A,"");
 print(REY);
-setring Finvar::Qadjoint;
+setring Finvar::newring;
 print(M);
 setring S;
 tst_status(1);$

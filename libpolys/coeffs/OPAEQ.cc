@@ -292,12 +292,10 @@ void    nAEQDelete       (number *, const coeffs)
     return;
 }
 
-/*
 number    nAEQSetMap        (number a, const coeffs)
 {
-        return a;
+        return NULL;
 }
-*/
 
 void    nAEQInpMult       (number &, number, const coeffs)
 {
@@ -378,7 +376,7 @@ BOOLEAN n_QAEInitChar(coeffs r, void *)
     r->cfLcm  = nAEQLcm; // ZU BEARBEITEN
     r->cfDelete= nAEQDelete;
 
-    r->cfSetMap = npSetMap; // extern nMapFunc npSetMap(const coeffs src, const coeffs dst); // FIXME: WHY??? // TODO: this seems to be a bug!
+    r->cfSetMap = nAEQSetMap;
 
     r->cfInpMult=nAEQInpMult; //????
     r->cfCoeffWrite=nAEQCoeffWrite; //????
