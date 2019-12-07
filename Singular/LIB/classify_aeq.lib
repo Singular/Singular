@@ -681,7 +681,7 @@ EXAMPLE: example sagbiAlg;  shows an example
     int z,n;
 
     if(size(I)==0){return(I);}
-    if(size(#)==0)              // AENDERUNG ANFANG
+    if(size(#)==0)
     {
        int b=ConductorBound(I);
     // int b=200;
@@ -691,7 +691,6 @@ EXAMPLE: example sagbiAlg;  shows an example
     {
        int b=#[1];
     }
-                          //AENERUNG ENDE
    ideal S=interReduceSagbi(I,b) ;
   // b=correctBound(S,b);
    while(size(S)!=n)
@@ -708,7 +707,7 @@ EXAMPLE: example sagbiAlg;  shows an example
         }
    }
    b=semiGroup(S)[2]+1;
-   S=jet(S,b);
+   // S=jet(S,b);
    setring R;
    ideal S=imap(O,S);
    return(S);

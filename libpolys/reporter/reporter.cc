@@ -109,10 +109,10 @@ void StringAppendS(const char *st)
   if (*st!='\0')
   {
     /* feBufferStart is feBuffer + strlen(feBuffer);*/
-    int l;
+    int l=strlen(st);
     long more;
     int ll=feBufferStart-feBuffer;
-    if ((more=ll+2+(l=strlen(st)))>feBufferLength)
+    if ((more=ll+2+l)>feBufferLength)
     {
       more = ((more + (8*1024-1))/(8*1024))*(8*1024);
       feBuffer=(char *)omreallocSize((void *)feBuffer,feBufferLength,
@@ -120,7 +120,7 @@ void StringAppendS(const char *st)
       feBufferLength=more;
       feBufferStart=feBuffer+ll;
     }
-    strcat(feBufferStart, st);
+    strncat(feBufferStart, st,l);
     feBufferStart +=l;
   }
 }
@@ -135,9 +135,9 @@ void StringSetS(const char *st)
   feBufferStart=feBuffer;
   feBuffer_cnt++;
   assume(feBuffer_cnt<8);
-  int l;
+  int l=strlen(st);
   long more;
-  if ((l=strlen(st))>feBufferLength)
+  if (l>feBufferLength)
   {
     more = ((l + (4*1024-1))/(4*1024))*(4*1024);
     feBuffer=(char *)omReallocSize((ADDRESS)feBuffer,feBufferLength,

@@ -16,6 +16,7 @@
 #include "coeffs/numbers.h"
 #include "coeffs/longrat.h"
 #include "coeffs/ffields.h"
+#include "coeffs/modulop.h"
 
 #include <cmath>
 #include <errno.h>
@@ -724,10 +725,6 @@ static number nfMapGGrev(number c, const coeffs src, const coeffs)
 */
 static nMapFunc nfSetMap(const coeffs src, const coeffs dst)
 {
-  if (nCoeff_is_GF(src,src->m_nfCharQ))
-  {
-    return ndCopyMap;   /* GF(p,n) -> GF(p,n) */
-  }
   if (nCoeff_is_GF(src))
   {
     const coeffs r = dst;
@@ -922,6 +919,10 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   r->has_simple_Alloc=TRUE;
   r->has_simple_Inverse=TRUE;
 
+  if ((IsPrime(p->GFChar)==p->GFChar)&&(p->GFDegree==1)) /* for oscar-system/Singular.jl/issues/177 */
+  {
+    return npInitChar(r,(void*)(long)p->GFChar);
+  }
   if(p->GFChar > (2<<15))
   {
 #ifndef SING_NDEBUG
@@ -947,6 +948,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
 
   if( r->m_nfPlus1Table == NULL )
   {
+    Werror("reading table for field with %d elements failed",c);
     return TRUE;
   }
 

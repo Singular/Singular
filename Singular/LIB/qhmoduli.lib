@@ -845,7 +845,7 @@ GLOBAL:  computedPowers
     g = jet(g, ub - w1[i] * degVec[i] - 1, w1);
     h = jet(powerList[i], ub - minDeg - 1, w1);
     g = PolyProduct(g, h, reduceI, w1, ub);
-    if(g == 0) { Print(" g = 0 "); break;}
+    if(g == 0) { print(" g = 0 "); break;}
     minDeg = minDeg + w1[i] * degVec[i];
   }
   return(g);
@@ -929,7 +929,7 @@ GLOBAL:  'computedPowers'
       {
         // no computation necessary, f^e has already benn computed
         g = computedPowers[varIndex][2][e - 1];
-        //Print("No computation, from list : g = elem [", varIndex, ", 2, ", e - 1, "]");
+        //print("No computation, from list : g = elem [", varIndex, ", 2, ", e - 1, "]");
         lb = e + 1;
       }
       else {  // f^d computed, where d < e

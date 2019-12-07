@@ -113,6 +113,15 @@ ASSUME: i is a nonzero monomial ideal.
    print("The dimension of the ideal is:");print(d);
    return(list(1,P1+P3));
 }
+example
+{ "EXAMPLE:"; echo = 2;
+ring r=0,(X,Y,a,b),dp;
+poly f=X^8+a*Y^4-Y;
+poly g=Y^8+b*X^4-X;
+poly h=diff(f,X)*diff(g,Y)-diff(f,Y)*diff(g,X);
+ideal i=f,g,h;
+NPos_test(i);
+}
 //////////////////////////////////////////
 proc modNpos_test (ideal i)
 "USAGE: modNpos_test(i); i an ideal
@@ -142,22 +151,36 @@ NOTE:   This test is a probabilistic test, and it computes the initial of the id
   attrib(I,"isSB",1);
   return(NPos_test(I));
 }
+example
+{ "EXAMPLE:"; echo = 2;
+ring r=0,(X,Y,a,b),dp;
+poly f=X^8+a*Y^4-Y;
+poly g=Y^8+b*X^4-X;
+poly h=diff(f,X)*diff(g,Y)-diff(f,Y)*diff(g,X);
+ideal i=f,g,h;
+modNpos_test(i);
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
 proc NPos (ideal i)
 "USAGE:  NPos(i); i ideal
 RETURN:  A linear map phi such that  phi(i) is in Noether position
+KEYWORDS: Noether position
 "
 {
 //--------------------------- initialisation ---------------------------------
-  int ii,jj,d,time,n,nl;
+  int ii,jj,d,time,n,nl,zz;
   intmat ran;
   def r0 = basering;
   ideal K,chcoord;
   n = nvars(r0)-1;
-  string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-  execute(s);
+  list l1;
+  for (zz = 0; zz<= n; zz++)
+  {
+   l1[zz+1] = "x("+string(zz)+")";
+  }
+  ring r1 = create_ring(ringlist(r0)[1], l1, "dp", "no_minpoly");
   ideal i,sbi,I,K,chcoord,m,L;
   list #;
   poly P;
@@ -225,21 +248,34 @@ RETURN:  A linear map phi such that  phi(i) is in Noether position
 // the method may enter an infinite loop over a finite field!";
   return (-1);
 }
+example
+{ "EXAMPLE:"; echo = 2;
+ring r=0,(X,Y,a,b),dp;
+poly f=X^8+a*Y^4-Y;
+poly g=Y^8+b*X^4-X;
+poly h=diff(f,X)*diff(g,Y)-diff(f,Y)*diff(g,X);
+ideal i=f,g,h;
+NPos(i);
+}
 ///////////////////////////////////////////////////////////////////////////////
 proc modNPos (ideal i)
 "USAGE:  modNPos(i); i ideal
 RETURN:  A linear map phi such that  phi(i) is in Noether position
-NOTE:    It uses the procedure  modNPos_test to test Noether position.
+NOTE:    It uses the procedure  modNpos_test to test Noether position.
 "
 {
 //--------------------------- initialisation ---------------------------------
-   int ii,jj,d,time,n,nl;
+   int ii,jj,d,time,n,nl,zz;
    intmat ran;
    def r0 = basering;
    ideal K,chcoord;
    n = nvars(r0)-1;
-   string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-   execute(s);
+   list l2;
+   for (zz = 0; zz<= n; zz++)
+   {
+     l2[zz+1] = "x("+string(zz)+")";
+   }
+   ring r1 = create_ring(ringlist(r0)[1], l2, "dp", "no_minpoly");
    ideal i,sbi,I,K,chcoord,m,L;
    poly P;
    list #;
@@ -247,7 +283,7 @@ NOTE:    It uses the procedure  modNPos_test to test Noether position.
    i = fetch(r0,i);
    time=rtimer;
    system("--ticks-per-sec",10);
-   #=modNPos_test(i);
+   #=modNpos_test(i);
    if ( #[1]== 1 )
    {
      return ("The ideal is in Noether position and the time of this computation is:",rtimer-time,"/10 sec.");
@@ -262,7 +298,7 @@ NOTE:    It uses the procedure  modNPos_test to test Noether position.
      }
      phi=r1,chcoord;
      I=phi(i);
-     if ( modNPos_test(I)[1] == 1 )
+     if ( modNpos_test(I)[1] == 1 )
      {
        setring r0;
        chcoord=fetch(r1,chcoord);
@@ -290,7 +326,7 @@ NOTE:    It uses the procedure  modNPos_test to test Noether position.
        P=0;
        phi=r1,chcoord;
        I=phi(I);
-       if ( modNPos_test(I)[1] == 1 )
+       if ( modNpos_test(I)[1] == 1 )
        {
          K=x(ii..n);
          setring r0;
@@ -305,6 +341,15 @@ NOTE:    It uses the procedure  modNPos_test to test Noether position.
 // the method may enter an infinite loop over a finite field!";
    return (-1);
 }
+example
+{ "EXAMPLE:"; echo = 2;
+ring r=0,(X,Y,a,b),dp;
+poly f=X^8+a*Y^4-Y;
+poly g=Y^8+b*X^4-X;
+poly h=diff(f,X)*diff(g,Y)-diff(f,Y)*diff(g,X);
+ideal i=f,g,h;
+modNPos(i);
+}
 
 ////////////////////////////////////////////////////////////////////////////////////
 static proc TestLastVarIsInGenericPos (ideal i)
@@ -315,11 +360,15 @@ THEORY:  The last variable is in generic position if the quotient of the ideal
 "
 {
 //--------------------------- initialisation ---------------------------------
-  int n,ret;
+  int n,ret,zz;
   def r0 = basering;
   n = nvars(r0)-1;
-  string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-  execute(s);
+  list l3;
+  for (zz = 0; zz<= n; zz++)
+  {
+    l3[zz+1] = "x("+string(zz)+")";
+  }
+  ring r1 = create_ring(ringlist(r0)[1], l3, "dp", "no_minpoly");
   ideal I,i;
   i = fetch(r0,i);
   attrib(i,"isSB",1);
@@ -333,7 +382,6 @@ THEORY:  The last variable is in generic position if the quotient of the ideal
   return(ret);
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////////
 proc nsatiety (ideal i)
 "USAGE:   nsatiety (i); i ideal,
@@ -343,15 +391,20 @@ ASSUME:  i is a homogeneous ideal of the basering R=K[x(0)..x(n)].
 THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
          least integer s such that, for all d>=s, the degree d part of the
          ideals i and isat=sat(i,maxideal(1))[1] coincide.
+KEYWORDS: saturation
 "
 {
 //--------------------------- initialisation ---------------------------------
-  int e,ii,jj,h,d,time,lastv,nl,ret;
+  int e,ii,jj,h,d,time,lastv,nl,ret,zz;
   intmat ran;
   def r0 = basering;
   int n = nvars(r0)-1;
-  string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-  execute(s);
+  list l4;
+  for (zz = 0; zz<= n; zz++)
+  {
+    l4[zz+1] = "x("+string(zz)+")";
+  }
+  ring r1 = create_ring(ringlist(r0)[1], l4, "dp", "no_minpoly");
   ideal i,sbi,I,K,chcoord,m,L;
   poly P;
   map phi;
@@ -409,6 +462,12 @@ THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
     }
   }
 }
+example
+{ "EXAMPLE:"; echo = 2;
+ring r=0,(t,a,b,c,d),dp;
+ideal i=b4-a3d, ab3-a3c, bc4-ac3d-bcd3+ad4, c6-bc3d2-c3d3+bd5, ac5-b2c3d-ac2d3+b2d4, a2c4-a3d3+b3d3-a2cd3, b3c3-a3d3, ab2c3-a3cd2+b3cd2-ab2d3, a2bc3-a3c2d+b3c2d-a2bd3, a3c3-a3bd2, a4c2-a3b2d;
+nsatiety(i);
+}
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -421,19 +480,24 @@ THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
          least integer s such that, for all d>=s, the degree d part of the
          ideals i and isat=sat(i,maxideal(1))[1] coincide.
 NOTE:    This is a probabilistic procedure, and it computes the initial of the ideal modulo the prime number 2147483647 (the biggest prime less than 2^31).
+KEYWORDS: saturation
 "
 {
 //--------------------------- initialisation ---------------------------------
   "// WARNING: The characteristic of base field must be zero.
 // The procedure is probabilistic and  it computes the
 //initial ideals modulo the prime number 2147483647.";
-  int e,ii,jj,h,d,time,lastv,nl,ret,s1,d1,siz,j,si,u,k,p;
+  int e,ii,jj,h,d,time,lastv,nl,ret,s1,d1,siz,j,si,u,k,p,zz;
   intvec v1;
   intmat ran;
   def r0 = basering;
   int n = nvars(r0)-1;
-  string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-  execute(s);
+  list l5;
+  for (zz = 0; zz<= n; zz++)
+  {
+    l5[zz+1] = "x("+string(zz)+")";
+  }
+  ring r1 = create_ring(ringlist(r0)[1], l5, "dp", "no_minpoly");
   ideal i,sbi,I,K,chcoord,m,L,sbi1,lsbi1,id1;
   vector V1;
   list #,LL,PL,Gb1,VGb1,Gb2,VGb2,Res1,Res2;
@@ -513,6 +577,12 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
     }
   }
 }
+example
+{ "EXAMPLE:"; echo = 2;
+ring r=0,(t,a,b,c,d),dp;
+ideal i=b4-a3d, ab3-a3c, bc4-ac3d-bcd3+ad4, c6-bc3d2-c3d3+bd5, ac5-b2c3d-ac2d3+b2d4, a2c4-a3d3+b3d3-a2cd3, b3c3-a3d3, ab2c3-a3cd2+b3cd2-ab2d3, a2bc3-a3c2d+b3c2d-a2bd3, a3c3-a3bd2, a4c2-a3b2d;
+modsatiety(i);
+}
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -521,14 +591,19 @@ proc regCM (ideal i)
 RETURN:  the Castelnuovo-Mumford regularity of i.
          (returns -1 if i is not homogeneous)
 ASSUME:  i is a homogeneous ideal.
+KEYWORDS: regularity
 "
 {
 //--------------------------- initialisation ---------------------------------
-  int e,ii,jj,H,h,d,time,nl;
+  int e,ii,jj,H,h,d,time,nl,zz;
   def r0 = basering;
   int n = nvars(r0)-1;
-  string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-  execute(s);
+  list l6;
+  for (zz = 0; zz<= n; zz++)
+  {
+    l6[zz+1] = "x("+string(zz)+")";
+  }
+  ring r1 = create_ring(ringlist(r0)[1], l6, "dp", "no_minpoly");
   ideal i,sbi,I,J,K,L;
   list #;
   poly P;
@@ -558,7 +633,7 @@ ASSUME:  i is a homogeneous ideal.
   }
   else
   {
-    def r2=changechar(ringlist(r1),r1);
+    def r2=changechar(ringlist(r1)[1],r1);
     setring r2;
     ideal sbi,I,i,K,T,ic,Ic;
     map phi;
@@ -601,11 +676,16 @@ ASSUME:  i is a homogeneous ideal.
       i=T;
     }
   }
+  list l7;
   for ( ii = n; ii>=n-d+1; ii-- )
   {
+    l7=list();
     i=subst(i,x(ii),0);
-    s = "ring mr = ",charstr(r1),",x(0..ii-1),dp;";
-    execute(s);
+    for (zz = 0; zz<= ii-1; zz++)
+    {
+      l7[zz+1] = "x("+string(zz)+")";
+    }
+    ring mr = create_ring(ringlist(r1)[1], l7, "dp", "no_minpoly");
     ideal i,sbi,I,J,K,L,T;
     poly P;
     map phi;
@@ -683,11 +763,16 @@ ASSUME:  i is a homogeneous ideal.
       }
     }
     h=maxdeg1(simplify(reduce(quotient(I,maxideal(1)),I),2))+1;
+    list l8;
     for ( ii = n; ii> n-d+1; ii-- )
     {
+      l8=list();
       sbi=subst(sbi,x(ii),0);
-      s = "ring mr = ",charstr(r0),",x(0..ii-1),dp;";
-      execute(s);
+      for (zz = 0; zz<= ii-1; zz++)
+      {
+        l8[zz+1] = "x("+string(zz)+")";
+      }
+      ring mr = create_ring(ringlist(r0)[1], l8, "dp", "no_minpoly");
       ideal sbi,I,L,K,T;
       map phi;
       sbi=imap(r1,sbi);
@@ -725,8 +810,12 @@ ASSUME:  i is a homogeneous ideal.
       kill mr;
     }
     sbi=subst(sbi,x(n-d+1),0);
-    s = "ring mr = ",charstr(r0),",x(0..n-d),dp;";
-    execute(s);
+    list l9;
+    for (zz = 0; zz<= n-d; zz++)
+    {
+      l9[zz+1] = "x("+string(zz)+")";
+    }
+    ring mr = create_ring(ringlist(r0)[1], l9, "dp", "no_minpoly");
     ideal sbi,I,L,K,T;
     map phi;
     sbi=imap(r1,sbi);
@@ -741,6 +830,12 @@ ASSUME:  i is a homogeneous ideal.
     return();
   }
 }
+example
+{ "EXAMPLE:"; echo = 2;
+ring r=0,(t,a,b,c,d),dp;
+ideal i=b4-a3d, ab3-a3c, bc4-ac3d-bcd3+ad4, c6-bc3d2-c3d3+bd5, ac5-b2c3d-ac2d3+b2d4, a2c4-a3d3+b3d3-a2cd3, b3c3-a3d3, ab2c3-a3cd2+b3cd2-ab2d3, a2bc3-a3c2d+b3c2d-a2bd3, a3c3-a3bd2, a4c2-a3b2d;
+regCM(i);
+}
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -750,6 +845,7 @@ RETURN:  an integer, the Castelnuovo-Mumford regularity of i.
          (returns -1 if i is not homogeneous)
 ASSUME:  i is a homogeneous ideal and the characteristic of base field is zero..
 NOTE:    This is a probabilistic procedure, and it computes the initial of the ideal modulo the prime number 2147483647 (the biggest prime less than 2^31).
+KEYWORDS: regularity
 "
 {
 //--------------------------- initialisation ---------------------------------
@@ -834,11 +930,16 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
       i=sbi;
     }
   }
+  list l11;int zz;
   for ( ii = n; ii>=n-d+1; ii-- )
   {
+    l11=list();
     i=subst(i,x(ii),0);
-    s = "ring mr = ","0",",x(0..ii-1),dp;";
-    execute(s);
+    for (zz = 0; zz <= ii-1; zz++)
+    {
+     l11[zz+1] = "x("+string(zz)+")";
+    }
+    ring mr = create_ring(0, l11, "dp");
     ideal i,sbi,I,J,K,L,lsbi1;
     poly P;
     list #;
@@ -911,6 +1012,12 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
   }
   dbprint(2,"mreg(i)=" + string(h) + " and the time of this computation: " + string(rtimer-time) + "sec./100");
   return();
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ring r=0,(t,a,b,c,d),dp;
+ideal i=b4-a3d, ab3-a3c, bc4-ac3d-bcd3+ad4, c6-bc3d2-c3d3+bd5, ac5-b2c3d-ac2d3+b2d4, a2c4-a3d3+b3d3-a2cd3, b3c3-a3d3, ab2c3-a3cd2+b3cd2-ab2d3, a2bc3-a3c2d+b3c2d-a2bd3, a3c3-a3bd2, a4c2-a3b2d;
+modregCM(i);
 }
 /*
 //////////////////////////////////////////////////////////////

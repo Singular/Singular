@@ -1,7 +1,7 @@
 LIB "tst.lib"; tst_init();
 
 LIB "gradedModules.lib";
-int GradedModules::assumeLevel = 5;
+int assumeLevel = 5; exportto(GradedModules,assumeLevel);
 
   example grdeg;
   example grview;

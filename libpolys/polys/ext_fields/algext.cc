@@ -1019,8 +1019,6 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
   /* dst is expected to be an algebraic field extension */
   assume(getCoeffType(dst) == n_algExt);
 
-  if( src == dst ) return ndCopyMap;
-
   int h = 0; /* the height of the extension tower given by dst */
   coeffs bDst = nCoeff_bottom(dst, h); /* the bottom field in the tower dst */
   coeffs bSrc = nCoeff_bottom(src, h); /* the bottom field in the tower src */

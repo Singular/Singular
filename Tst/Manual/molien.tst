@@ -7,11 +7,10 @@ list L=group_reynolds(A);
 matrix M=molien(L[2..size(L)]);
 print(M);
 ring S=3,(x,y,z),dp;
-string newring="alksdfjlaskdjf";
 matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
 list L=group_reynolds(A);
-molien(L[2..size(L)],newring);
-setring Finvar::alksdfjlaskdjf;
+molien(L[2..size(L)],"");
+setring Finvar::newring;
 print(M);
 setring S;
 tst_status(1);$

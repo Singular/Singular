@@ -305,6 +305,7 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 #define MIN_LENGTH_FACTORY_QQ 60
 #define MIN_FLINT_QQ 10
 #define MIN_FLINT_Zp 20
+#define MIN_FLINT_Z 10
 
 /// Returns:  p * q,
 /// Destroys: if !copy then p, q
@@ -353,6 +354,21 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   {
     nmod_mpoly_ctx_t ctx;
     if (pure_polys && rField_is_Zp(r) && !convSingRFlintR(ctx,r))
+    {
+      // lq is a lower bound for the length of p and  q
+      poly res=Flint_Mult_MP(p,lq,q,lq,ctx,r);
+      if (!copy)
+      {
+        p_Delete(&p,r);
+        p_Delete(&q,r);
+      }
+      return res;
+    }
+  }
+  if (lq>MIN_FLINT_Z)
+  {
+    fmpz_mpoly_ctx_t ctx;
+    if (pure_polys && rField_is_Z(r) && !convSingRFlintR(ctx,r))
     {
       // lq is a lower bound for the length of p and  q
       poly res=Flint_Mult_MP(p,lq,q,lq,ctx,r);

@@ -2775,8 +2775,8 @@ static proc grad(ideal I)
 //!!!minAssGTZ vermeiden durch direkte Betrachtung von
 //!!!p und mp und evtl. Quotientenbildung
 //!!!bisher nicht zeitkritisch
-  string Tesr="ring Tes=(0,t),("+varstr(R)+"),dp;";
-  execute(Tesr);
+  list l1 = ringlist(R)[2];
+  ring Tes = create_ring("(0,t)", l1, "dp");
   execute(mp);
   minpoly=leadcoef(p);
   ideal I=fetch(R,I);
@@ -4833,8 +4833,7 @@ proc fetchInTree(list L,
    {
 //--- size(algext)>0: case of algebraic extension of base field
       if(defined(tstr)){kill tstr;}
-      string tstr="ring So1=(0,t),("+varstr(L[2][o1])+"),("+ordstr(L[2][o1])+");";
-      execute(tstr);
+      ring So1 = create_ring("(0,t)", "("+varstr(L[2][o1])+")", "("+ordstr(L[2][o1])+")");
       setring So1;
       execute(algext);
       minpoly=leadcoef(p);
@@ -5026,14 +5025,10 @@ proc fetchInTree(list L,
            if(defined(T0)){kill T0;}
            def T0=L[2][int(leadcoef(path[1,ncols(path)]))];
            if(defined(tstr)){kill tstr;}
-           string tstr="ring T=(0,t),("
-                      +varstr(L[2][int(leadcoef(path[1,ncols(path)]))])+"),("
-                      +ordstr(L[2][int(leadcoef(path[1,ncols(path)]))])+");";
-           execute(tstr);
+           ring T = create_ring("(0,t)", "("+varstr(L[2][int(leadcoef(path[1,ncols(path)]))])+")", "("+ordstr(L[2][int(leadcoef(path[1,ncols(path)]))])+")");
            setring T;
            execute(algext);
            minpoly=leadcoef(p);
-           kill tstr;
            def BO=imap(T0,BO);
            if(!defined(und_jetzt_raus))
            {
@@ -5290,6 +5285,7 @@ proc fetchInTree(list L,
    }
    path_togo=path_togo[2..size(path_togo)],m1;
    i=1;
+   list l2;
    while(i<size(path_togo))
    {
 //--- we need to blow up following the path path_togo through the tree
@@ -5301,12 +5297,11 @@ proc fetchInTree(list L,
          if(defined(T0)){kill T0;}
          def T0=L[2][path_togo[i+1]];
          if(defined(tstr)){kill tstr;}
-         string tstr="ring T=(0,t),(" +varstr(T0)+"),(" +ordstr(T0)+");";
-         execute(tstr);
+         l2 = ringlist(T0)[2];
+         ring T = create_ring("(0,t)", l2, "(" +ordstr(T0)+")");
          setring T;
          execute(algext);
          minpoly=leadcoef(p);
-         kill tstr;
          def path=imap(T0,path);
          def BO=imap(T0,BO);
          def lastMap=imap(T0,lastMap);
