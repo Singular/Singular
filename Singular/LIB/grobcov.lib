@@ -984,9 +984,7 @@ EXAMPLE:  pdivi; shows an example"
 }
 example
 {
-  echo = 2;
-  "EXAMPLE:";
-  if(defined(R)){kill R;}
+  "EXAMPLE:"; echo = 2;
   ring R=(0,a,b,c),(x,y),dp;
   short=0;
   // Divisor
@@ -1188,7 +1186,6 @@ EXAMPLE: pnormalf; shows an example"
 example
 {
 "EXAMPLE:"; echo = 2;
-  if(defined(R)){kill R;}
   ring R=(0,a,b,c),(x,y),dp;
   short=0;
   poly f=(b^2-1)*x^3*y+(c^2-1)*x*y^2+(c^2*b-b)*x+(a-bc)*y;
@@ -1513,7 +1510,6 @@ example
 {
   "EXAMPLE:"; echo = 2;
   short=0;
-  if(defined(R)){kill R;}
   ring R=0,(a,b,c),lp;
   ideal p=a*b;
   ideal q=a,b-2;;
@@ -1600,7 +1596,6 @@ example
 {
   "EXAMPLE:"; echo = 2;
   short=0;
-  if(defined(R)){kill R;}
   ring R=0,(a,b,c),lp;
   ideal p=a*b;;
   ideal q=a,b-1;
@@ -1696,7 +1691,6 @@ EXAMPLE:  PtoCrep; shows an example"
 example
 {
  "EXAMPLE:"; echo = 2;
-  if(defined(R)){kill R;}
   ring R=0,(a,b,c),lp;
   short=0;
   ideal p=a*(a^2+b^2+c^2-25);
@@ -2010,7 +2004,6 @@ example
 {
   "EXAMPLE:"; echo = 2;
   // Casas conjecture for degree 4:
-  if(defined(R)){kill R;}
   ring R=(0,a0,a1,a2,a3,a4),(x1,x2,x3),dp;
   short=0;
   ideal F=x1^4+(4*a3)*x1^3+(6*a2)*x1^2+(4*a1)*x1+(a0),
@@ -7393,7 +7386,7 @@ example
 // Auxiliary rutine for intersecting ideal only in the parameters a
 // when the ideals are defined in Q[a][x]
 proc intersectpar(list S)
-"USAGE: interectpar(list of ideals S)
+"USAGE: intersectpar(list of ideals S)
     list S=ideal I1,...,ideal Ik;
 RETURN: The intersection of the ideals I1 ...  Ik  in Q[x,a]
 NOTE: The routine is called in Q[a][x],
@@ -7411,13 +7404,13 @@ EXAMPLE: intersectpar shows an example"
   //"T_SP="; SP;
   //"T_typeof(SP[1])="; typeof(SP[1]);
   ideal EP;
-  EP=SP[1];
+  //EP=SP[1];
   int i;
-  for(i=2;i<=size(SP);i++)
-  {
-    EP=intersect(EP,SP[i]);
-  }
-  //def EP=intersect(SPL);
+  //for(i=2;i<=size(SP);i++)
+  //{
+  //  EP=intersect(EP,SP[i]);
+  //}
+  EP=intersect(SP[1..size(SP)]);
   setring RR;
   def E=imap(RP,EP);
   return(E);
