@@ -6658,7 +6658,7 @@ example
   A;
   // The basis of the parameter values of the associated
   // tangent component is
-  A[1][2][1];
+  A[2];
   // Thus t=-(5/12)*y0 and the associated tangent component at (x0,y0) is
   subst(F,t,-(5/12)*y0);
 
@@ -6774,14 +6774,14 @@ example
   A;
   // The basis of the parameter values of the associated
   //    tangent component is
-  A[1][2][1];
+  A[2];
   // Thus t=(5/12)*y0, and  the assocoated tangent family
   //    element at (x0,y0) is
   subst(F,t,(5/12)*y0);
 
-  def FE=FamElemsAtEnvCompPoints(F,C,E);
-   FE;
-  def val=factorize(FE[1][2][1]);
+  FE=FamElemsAtEnvCompPoints(F,C,E);
+  FE;
+  def val=factorize(FE[2][1]);
   val;
 
   def val0=subst(val[1][2],y,y0);
