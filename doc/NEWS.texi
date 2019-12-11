@@ -23,6 +23,9 @@
 Changed libraries:
 @itemize
 @item chern.lib:  new version (@nref{chern_lib})
+@item grobcov.lib: new version (@nref{grobcov_lib}), 
+      new functions @nref{ConsLevels}, @nref{Levels}, @nref{Grob1Levels}, 
+      @nref{DifConsLCSets}
 @end itemize
 
 Changes in the kernel/build system:
