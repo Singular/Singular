@@ -16,7 +16,7 @@ SOURCES = \
   numbers.cc rintegers.cc rmodulo2m.cc rmodulon.cc shortfl.cc \
   gnumpc.cc gnumpfl.cc longrat.cc longrat0.cc ffields.cc \
   modulop.cc mpr_complex.cc ntupel.cc \
-  bigintmat.cc  AE.cc OPAE.cc AEp.cc OPAEp.cc AEQ.cc OPAEQ.cc \
+  bigintmat.cc  \
   flintcf_Q.cc flintcf_Zn.cc
 
 libcoeffs_la_SOURCES   = $(SOURCES)
@@ -25,7 +25,7 @@ libcoeffs_la_includedir  =$(includedir)/singular/coeffs
 libcoeffs_la_include_HEADERS = \
   coeffs.h numbers.h si_gmp.h gnumpc.h gnumpfl.h longrat.h modulop.h ffields.h rintegers.h rmodulo2m.h rmodulon.h \
   shortfl.h mpr_complex.h mpr_global.h numstats.h ntupel.h \
-  bigintmat.h Enumerator.h AE.h OPAE.h AEp.h OPAEp.h AEQ.h OPAEQ.h \
+  bigintmat.h Enumerator.h \
   flintcf_Q.h flintcf_Zn.h
 
 libcoeffs_la_LIBADD = ${top_builddir}/reporter/libreporter.la ${top_builddir}/misc/libmisc.la \
