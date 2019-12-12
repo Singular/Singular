@@ -1888,16 +1888,16 @@ poly idMinor(matrix a, int ar, unsigned long which, ideal R)
             p = kNF(R,currRing->qideal,q);
             p_Delete(&q,currRing);
           }
-          /*delete the matrix tmp*/
-          for (i=1; i<=ar; i++)
-          {
-            for (j=1; j<=ar; j++) MATELEM(tmp,i,j) = NULL;
-          }
-          idDelete((ideal*)&tmp);
-          omFreeSize((ADDRESS)rowchoise,ar*sizeof(int));
-          omFreeSize((ADDRESS)colchoise,ar*sizeof(int));
-          return (p);
+	}
+        /*delete the matrix tmp*/
+        for (i=1; i<=ar; i++)
+        {
+          for (j=1; j<=ar; j++) MATELEM(tmp,i,j) = NULL;
         }
+        idDelete((ideal*)&tmp);
+        omFreeSize((ADDRESS)rowchoise,ar*sizeof(int));
+        omFreeSize((ADDRESS)colchoise,ar*sizeof(int));
+        return (p);
       }
       curr++;
       idGetNextChoise(ar,a->cols(),&colch,colchoise);
@@ -1951,17 +1951,14 @@ ideal idMinors(matrix a, int ar, ideal R)
           p = kNF(R,currRing->qideal,q);
           p_Delete(&q,currRing);
         }
-        if (p!=NULL)
-        {
-          if (k>=size)
-          {
-            pEnlargeSet(&result->m,size,32);
-            size += 32;
-          }
-          result->m[k] = p;
-          k++;
-        }
       }
+      if (k>=size)
+      {
+        pEnlargeSet(&result->m,size,32);
+        size += 32;
+      }
+      result->m[k] = p;
+      k++;
       idGetNextChoise(ar,a->cols(),&colch,colchoise);
     }
     idGetNextChoise(ar,a->rows(),&rowch,rowchoise);
@@ -2031,7 +2028,12 @@ ideal idMinors(matrix a, int ar, ideal R)
   }
 
 
-  ideal result = idInit(32,1);
+  int i = binom(r,ar);
+  int j = binom(c,ar);
+  int size;
+  if ((i>512) || (j>512) || (i*j >512)) size=512;
+  else size=i*j;
+  ideal result = idInit(size,1);
 
   int elems = 0;
 
@@ -2046,7 +2048,6 @@ ideal idMinors(matrix a, int ar, ideal R)
 
   if (R!=NULL) id_Delete(&R,tmpR);
 
-  idSkipZeroes(result);
   rChangeCurrRing(origR);
   result = idrMoveR(result,tmpR,origR);
   sm_KillModifiedRing(tmpR);
