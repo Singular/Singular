@@ -1853,16 +1853,9 @@ poly idMinor(matrix a, int ar, unsigned long which, ideal R)
   matrix tmp;
   poly p,q;
 
-  i = binom(a->rows(),ar);
-  j = binom(a->cols(),ar);
-
   rowchoise=(int *)omAlloc(ar*sizeof(int));
   colchoise=(int *)omAlloc(ar*sizeof(int));
-  // if ((i>512) || (j>512) || (i*j >512)) size=512;
-  // else size=i*j;
-  // result=idInit(size,1);
   tmp=mpNew(ar,ar);
-  // k = 0; /* the index in result*/
   curr = 0; /* index of current minor */
   idInitChoise(ar,1,a->rows(),&rowch,rowchoise);
   while (!rowch)
@@ -1921,11 +1914,10 @@ ideal idMinors(matrix a, int ar, ideal R)
 
   i = binom(a->rows(),ar);
   j = binom(a->cols(),ar);
+  size=i*j;
 
   rowchoise=(int *)omAlloc(ar*sizeof(int));
   colchoise=(int *)omAlloc(ar*sizeof(int));
-  if ((i>512) || (j>512) || (i*j >512)) size=512;
-  else size=i*j;
   result=idInit(size,1);
   tmp=mpNew(ar,ar);
   // k = 0; /* the index in result*/
@@ -2027,12 +2019,7 @@ ideal idMinors(matrix a, int ar, ideal R)
     id_Test( R, tmpR);
   }
 
-
-  int i = binom(r,ar);
-  int j = binom(c,ar);
-  int size;
-  if ((i>512) || (j>512) || (i*j >512)) size=512;
-  else size=i*j;
+  int size=binom(r,ar)*binom(c,ar);
   ideal result = idInit(size,1);
 
   int elems = 0;
