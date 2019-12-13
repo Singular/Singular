@@ -944,6 +944,10 @@ int binom (int n,int r)
 ideal id_FreeModule (int i, const ring r)
 {
   assume(i >= 0);
+  if (r->isLPring)
+  {
+	PrintS("In order to address bimodules, the command freeAlgebra should be used.");  
+  }
   ideal h = idInit(i, i);
 
   for (int j=0; j<i; j++)
