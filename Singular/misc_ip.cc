@@ -1198,23 +1198,6 @@ extern "C"
   }
 }
 
-#ifdef SINGULAR_4_2
-STATIC_VAR n_coeffType n_pAE=n_unknown;
-static BOOLEAN ii_pAE_init(leftv res,leftv a)
-{
-  if (a->Typ()!=INT_CMD)
-  {
-    WerrorS("`int` expected");
-    return TRUE;
-  }
-  else
-  {
-    res->rtyp=CRING_CMD;
-    res->data=(void*)nInitChar(n_pAE,(void*)a->Data());
-    return FALSE;
-  }
-}
-#endif
 #ifdef HAVE_FLINT
 STATIC_VAR n_coeffType n_FlintZn=n_unknown;
 STATIC_VAR n_coeffType n_FlintQ=n_unknown;
@@ -1407,26 +1390,6 @@ void siInit(char *name)
     //IDDATA(h)=(char*)nInitChar(n_R,NULL);
     //h=enterid("CC",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
     //IDDATA(h)=(char*)nInitChar(n_long_C,NULL);
-#ifdef SINGULAR_4_2
-    n_coeffType t;
-    t=nRegister(n_unknown,n_AEInitChar);
-    if (t!=n_unknown)
-    {
-      h=enterid("AE",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
-      IDDATA(h)=(char*)nInitChar(t,NULL);
-    }
-    t=nRegister(n_unknown,n_QAEInitChar);
-    if (t!=n_unknown)
-    {
-      h=enterid("QAE",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
-      IDDATA(h)=(char*)nInitChar(t,NULL);
-    }
-    n_pAE=nRegister(n_unknown,n_pAEInitChar);
-    if (n_pAE!=n_unknown)
-    {
-      iiAddCproc("kernel","pAE",FALSE,ii_pAE_init);
-    }
-#endif
     #ifdef HAVE_FLINT
     n_FlintQ=nRegister(n_unknown,flintQ_InitChar);
     if (n_FlintQ!=n_unknown)
