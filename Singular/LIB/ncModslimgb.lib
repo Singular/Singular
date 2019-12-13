@@ -5,13 +5,14 @@ info="
 LIBRARY:  ncModslimgb.lib A library for computing Groebner bases over G-algebras
                          defined over the rationals using modular techniques.
 
-AUTHORS:    W. Decker, C. Eder, V. Levandovskyy, and 
- Sharwan K. Tiwari shrawant@gmail.com
+AUTHORS: Wolfram Decker, Christian Eder, Viktor Levandovskyy, and 
+Sharwan K. Tiwari shrawant@gmail.com
 
 REFERENCES:
  Wolfram Decker, Christian Eder, Viktor Levandovskyy, and
  Sharwan K. Tiwari, Modular Techniques For Noncommutative
- Groebner Bases, https://arxiv.org/abs/1704.02852.
+ Groebner Bases, https://link.springer.com/article/10.1007/s11786-019-00412-9
+ and https://arxiv.org/abs/1704.02852.
 
  E. A. Arnold, Modular algorithms for computing Groebner bases.
  Journal of Symbolic Computation 35, 403-419 (2003).
@@ -22,7 +23,6 @@ REFERENCES:
 PROCEDURES:
  ncmodslimgb(ideal I, list #); Groebner basis of a given left ideal I
  using modular methods (Chinese remainder theorem and Farey map).
-
 ";
 
 LIB "parallel.lib";
