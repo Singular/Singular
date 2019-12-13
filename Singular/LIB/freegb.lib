@@ -3773,10 +3773,10 @@ proc testLift(ideal M, matrix T) {
   if (ncols(M) != nrows(T)) { ERROR("cols(M) != rows(T)") }
   for (int i=1; i <= nrows(T); i++) {
     T = subst(T, ncgen(i), M[i]);
-  }
+  } kill i;
   for (int i=1; i <= ncols(T); i++) {
     R[i] = sum(T[i]);
-  }
+  } kill i;
   return(R);
 }
 
