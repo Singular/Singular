@@ -1,3 +1,4 @@
+Manual/freeAlgebra.tst
 Manual/letterplace_reduce.tst
 Manual/letterplace_multiplication.tst
 Manual/letterplace_bracket.tst
@@ -5,6 +6,16 @@ Manual/letterplace_std.tst
 Manual/letterplace_lift.tst
 Manual/letterplace_liftstd.tst
 Manual/letterplace_syz.tst
+Manual/letterplace_reduce.tst
+Manual/letterplace_print.tst
+
+Manual/lpGkDim.tst
+Manual/lpKDim.tst
+Manual/lpKDimCheck.tst
+Manual/lpMonomialBasis.tst
+Manual/lpSickleDim.tst
+Manual/lpHilbert.tst
+Manual/lpLmDivisible.tst
 
 Manual/lp2iv.tst
 Manual/iv2lp.tst
@@ -13,17 +24,6 @@ Manual/iv2lpList.tst
 Manual/lp2ivId.tst
 Manual/lpId2ivLi.tst
 Manual/iv2lpMat.tst
-
-Manual/makeLetterplaceRing.tst
-Manual/lpNF.tst
-Manual/lpGkDim.tst
-Manual/lpKDim.tst
-Manual/lpKDimCheck.tst
-Manual/lpMonomialPrinting.tst
-Manual/lpMonomialBasis.tst
-Manual/lpSickleDim.tst
-Manual/lpHilbert.tst
-Manual/lpLmDivisible.tst
 
 Manual/Example_of_use_of_@sc{Letterplace}.tst
 Manual/serreRelations.tst
