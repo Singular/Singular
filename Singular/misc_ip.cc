@@ -1230,6 +1230,7 @@ static BOOLEAN ii_FlintQ_init(leftv res,leftv a)
   }
   return TRUE;
 }
+#if __FLINT_RELEASE >= 20503
 static BOOLEAN ii_FlintQrat_init(leftv res,leftv a)
 {
   if (a==NULL)
@@ -1260,6 +1261,7 @@ static BOOLEAN ii_FlintQrat_init(leftv res,leftv a)
   omFreeSize(par.names,par.N*sizeof(char*));
   return FALSE;
 }
+#endif
 #endif
 
 static BOOLEAN iiFloat(leftv res, leftv pnn)
@@ -1429,12 +1431,10 @@ void siInit(char *name)
       iiAddCproc("kernel","flintQp",FALSE,ii_FlintQ_init);
       nRegisterCfByName(flintQInitCfByName,n_FlintQ);
     }
-    //n_FlintQrat=nRegister(n_unknown,flintQrat_InitChar);
-    //if (n_FlintQrat!=n_unknown)
-    {
-      iiAddCproc("kernel","flintQ",FALSE,ii_FlintQrat_init);
-      nRegisterCfByName(flintQInitCfByName,n_FlintQ);
-    }
+#if __FLINT_RELEASE >= 20503
+    iiAddCproc("kernel","flintQ",FALSE,ii_FlintQrat_init);
+    nRegisterCfByName(flintQInitCfByName,n_FlintQ);
+#endif
     n_FlintZn=nRegister(n_unknown,flintZn_InitChar);
     if (n_FlintZn!=n_unknown)
     {
