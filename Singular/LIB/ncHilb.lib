@@ -63,15 +63,6 @@ L[3] of type int: the truncation degree for truncated Hilbert series (if >2 valu
 L[4] of type string: if nonempty, then the details about the orbit computations will be printed.
 EXAMPLE: example fpahilb; shows an example "
 {
-	/* VERY NEW DOC PART HERE !*/
-	/* PRINTING explanations:
-Let the orbit be O_I = T_(w_1)(I),...,T_(w_r)(I)} (w_i in W), where we assume that if T_(w_i)(I)=T_(w_i')(I)
-for some w'_i in W, then deg(w_i) <= deg(w'_i) follows.
-Then the description of orbit in the form w_1,...,w_r will be printed.
-It also prints the maximal degree and the cardinality of sum_j R(w_i, b_j) corresponding to each w_i,
-where b_j is a generating set of I.
-Moreover, it also prints the linear system (for the information about adjacency matrix).
-*/
     if (!isFreeAlgebra(basering))
     {
       ERROR("Basering should be Letterplace ring");
@@ -172,7 +163,7 @@ Moreover, it also prints the linear system (for the information about adjacency 
     if(odp == "")
     {
       //system("nc_hilb", J_lm, lV, ig, mgrad,tdeg);
-	  system("nc_hilb", J_lm, L[1], L[2], L[3]); //  or even better with the list L!!!
+      system("nc_hilb", J_lm, L[1], L[2], L[3]); //  or even better with the list L!!!
     }
     else
     {
@@ -388,7 +379,6 @@ Hilbert series:
 static proc boo()
 {
 // very different input; long example
-  LIB "./ncHilb.lib";
   ring r2=0,(x,y,z),dp;
   def R2 = makeLetterplaceRing(10); setring R2; // tdeg=6 => dgb = 2*5=10
   ideal I = y*z-z*y, x*z*x-z*x*z, x*z^2*x*z-z*x*z^2*x, x*z^3*x*z-z*x*z^2*x^2;
@@ -408,7 +398,7 @@ static proc boo()
 static proc rcolon(ideal I, poly W)
 "USAGE:  rcolon(I,w); ideal I, poly w
 RETURNS: ideal
-ASSUME: - basering is a Letterplace ring with degree bound 
+ASSUME: - basering is a Letterplace ring with degree bound
 equal to 2*maximal degree of elements in I
 - I is a monomial ideal
 - w is a monomial
@@ -439,7 +429,7 @@ EXAMPLE: example rcolon; shows an example"
     }
     poly wc = leadmonom(W);
     //"Debug: rcolon is called with lV="+string(lV);
-	// VL: printlevel here? before only printing was there, no output
+    // VL: printlevel here? before only printing was there, no output
     ideal J = system("rcolon", I, wc, lV);
     return(J);
  }
@@ -455,19 +445,6 @@ example
   rcolon_new(I,Y*Z); // 1 will be the result
   rcolon_new(I,X); // nothing to add
 }
-/* VERY NEW PART HERE (ABOVE) !*/
-
-
-/*
-// second example, original
-  ring r=0,(X,Y,Z),dp;
-  def R = makeLetterplaceRing(20); setring R;
-  ideal I = Y*Z, Y*Z*X, Y*Z*Z*X, Y*Z*Z*Z*X, Y*Z*Z*Z*Z*X, Y*Z*Z*Z*Z*Z*X, Y*Z*Z*Z*Z*Z*Z*X, Y*Z*Z*Z*Z*Z*Z*Z*X;
-  poly w = Y;
-  ideal J = rcolon(I,w);
-  J; // new generators, which need to be added to I
-*/
-
 
 // original version of the proc +
 // minor fixes by VL in the example: redefine ring excluded, binomial fixed
