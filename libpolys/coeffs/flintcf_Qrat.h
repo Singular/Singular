@@ -10,6 +10,7 @@
 #define FLINTCF_QRAT_H
 
 #include "misc/auxiliary.h"
+#include "coeffs/coeffs.h"
 #ifdef HAVE_FLINT
 #include <flint/flint.h>
 #if __FLINT_RELEASE >= 20503
