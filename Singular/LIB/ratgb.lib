@@ -91,8 +91,8 @@ ASSUME: the variables of basering are organized in two blocks and
 dominance for the variables in the second block
 NOTE: the output ring C is commutative. The ideal @code{rGBid} in C
 represents the rational form of the output ideal @code{pGBid} in the basering.
-- During the computation, the D-dimension of I, @code{Ddim} and the corresponding
-dimension as K(x)-vector space of I (@code{KXdim}, if @code{Ddim}=0) are computed and exported.
+- During the computation, the D-dimension of I, @code{Ratgb::Ddim} and the corresponding
+dimension as K(x)-vector space of I (@code{Ratgb::KXdim}, if @code{Ratgb::Ddim}=0) are computed and exported.
 - Setting optional integer eng to 1, std is taken as Groebner engine; default is slimgb.
 DISPLAY: In order to see the steps of the computation, set printlevel to >=2
 EXAMPLE: example ratstd; shows examples
@@ -363,8 +363,8 @@ example
   pGBid; // polynomial form of the basis in the localized ring
   setring A; // A is a commutative ring used for presentation
   rGBid; // "rational" or "localized" form of the basis
-  Ddim; // the Krull-like dimension of A/I
-  KXdim; // the dimension of A/I as a left K(x,y)-vector space
+  Ratgb::Ddim; // the Krull-like dimension of A/I
+  Ratgb::KXdim; // the dimension of A/I as a left K(x,y)-vector space
   //--- Now, let us compute a K(x,y) basis explicitly
   print(matrix(kbase(rGBid)));
 }
