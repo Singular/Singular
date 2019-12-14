@@ -10,6 +10,7 @@
 
 #ifdef HAVE_FLINT
 #include <flint/flint.h>
+#include "polys/monomials/monomials.h"
 
 #if __FLINT_RELEASE >= 20503
 #include <flint/fmpq.h>

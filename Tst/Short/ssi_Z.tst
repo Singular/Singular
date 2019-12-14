@@ -19,7 +19,7 @@ basering;
 listvar();
 close(l2);
 
-ring r3=flintQ("bb"),x,dp;
+ring r3=flintQp("bb"),x,dp;
 poly p=x+11+bb;
 p;
 write(l1,p);

@@ -22,6 +22,7 @@
 #include "coeffs/si_gmp.h"
 #include "coeffs/coeffs.h"
 #include "coeffs/flintcf_Q.h"
+#include "coeffs/flintcf_Qrat.h"
 #include "coeffs/flintcf_Zn.h"
 #include "coeffs/rmodulon.h"
 #include "polys/ext_fields/algext.h"
@@ -1201,6 +1202,7 @@ extern "C"
 #ifdef HAVE_FLINT
 STATIC_VAR n_coeffType n_FlintZn=n_unknown;
 STATIC_VAR n_coeffType n_FlintQ=n_unknown;
+//STATIC_VAR n_coeffType n_FlintQrat=n_unknown;
 static BOOLEAN ii_FlintZn_init(leftv res,leftv a)
 {
   const short t[]={2,INT_CMD,STRING_CMD};
@@ -1227,6 +1229,36 @@ static BOOLEAN ii_FlintQ_init(leftv res,leftv a)
     return FALSE;
   }
   return TRUE;
+}
+static BOOLEAN ii_FlintQrat_init(leftv res,leftv a)
+{
+  if (a==NULL)
+  {
+    WerrorS("at least one name required");
+    return TRUE;
+  }
+  QaInfo par;
+  #ifdef QA_DEBUG
+  par.C=r->cf;
+  a=a->next;
+  #endif
+  par.N=a->listLength();
+  par.names=(char**)omAlloc(par.N*sizeof(char*));
+  int i=0;
+  while(a!=NULL)
+  {
+    par.names[i]=omStrDup(a->Name());
+    i++;
+    a=a->next;
+  }
+  res->rtyp=CRING_CMD;
+  res->data=(void*)nInitChar(n_FlintQrat,&par);
+  for(i=par.N-1;i>=0;i--)
+  {
+    omFree(par.names[i]);
+  }
+  omFreeSize(par.names,par.N*sizeof(char*));
+  return FALSE;
 }
 #endif
 
@@ -1394,7 +1426,13 @@ void siInit(char *name)
     n_FlintQ=nRegister(n_unknown,flintQ_InitChar);
     if (n_FlintQ!=n_unknown)
     {
-      iiAddCproc("kernel","flintQ",FALSE,ii_FlintQ_init);
+      iiAddCproc("kernel","flintQp",FALSE,ii_FlintQ_init);
+      nRegisterCfByName(flintQInitCfByName,n_FlintQ);
+    }
+    //n_FlintQrat=nRegister(n_unknown,flintQrat_InitChar);
+    //if (n_FlintQrat!=n_unknown)
+    {
+      iiAddCproc("kernel","flintQ",FALSE,ii_FlintQrat_init);
       nRegisterCfByName(flintQInitCfByName,n_FlintQ);
     }
     n_FlintZn=nRegister(n_unknown,flintZn_InitChar);
