@@ -1973,6 +1973,13 @@ static ideal colonIdeal(ideal S, poly w, int lV, ideal Jwi, int trunDegHs)
 
 void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp, int trunDegHs)
 {
+	
+	/* new story: 
+	no lV is needed, i.e.  it is to be determined
+	the rest is extracted from the interface input list in extra.cc and makes the input of this proc
+	called from extra.cc
+	*/
+	
   /*
    * This is based on iterative right colon operations on a
    * two-sided monomial ideal of the free associative algebra.
