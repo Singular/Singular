@@ -58,6 +58,11 @@ BOOLEAN _p_mLPNCGenValid(int *mExpV, const ring r);
 
 poly p_LPVarAt(poly p, int pos, const ring r);
 
+#define pLPSubst(p, n, e) p_LPSubst(p, n, e, r)
+#define pmLPSubst(m, n, e) p_LPSubst(m, n, e, r)
+poly p_LPSubst(poly p, int n, poly e, const ring r);
+poly p_mLPSubst(poly m, int n, poly e, const ring r);
+
 /// create the letterplace ring corresponding to r up to degree d
 ring freeAlgebra(ring r, int d, int LPncGenCount = 0);
 #endif

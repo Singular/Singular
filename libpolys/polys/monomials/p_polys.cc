@@ -42,6 +42,10 @@
 #include "nc/sca.h"
 #endif
 
+#ifdef HAVE_SHIFTBBA
+#include "polys/shiftop.h"
+#endif
+
 #include "clapsing.h"
 
 /*
@@ -3881,6 +3885,16 @@ static poly p_Subst0(poly p, int n, const ring r)
 */
 poly p_Subst(poly p, int n, poly e, const ring r)
 {
+#ifdef HAVE_SHIFTBBA
+  // also don't even use p_Subst0 for Letterplace
+  if (rIsLPRing(r))
+  {
+    poly subst = p_LPSubst(p, n, e, r);
+    p_Delete(&p, r);
+    return subst;
+  }
+#endif
+
   if (e == NULL) return p_Subst0(p, n,r);
 
   if (p_IsConstant(e,r))

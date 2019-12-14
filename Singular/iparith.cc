@@ -2539,6 +2539,16 @@ static BOOLEAN jjLIFT(leftv res, leftv u, leftv v)
 {
   int ul= IDELEMS((ideal)u->Data());
   int vl= IDELEMS((ideal)v->Data());
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
+  {
+    if (currRing->LPncGenCount < ul)
+    {
+      Werror("At least %d ncgen variables are needed for this computation.", ul);
+      return TRUE;
+    }
+  }
+#endif
   ideal m = idLift((ideal)u->Data(),(ideal)v->Data(),NULL,FALSE,
                    hasFlag(u,FLAG_STD));
   if (m==NULL) return TRUE;
@@ -2549,6 +2559,16 @@ static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
 {
   if ((v->rtyp!=IDHDL)||(v->e!=NULL)) return TRUE;
   idhdl h=(idhdl)v->data;
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
+  {
+    if (currRing->LPncGenCount < IDELEMS((ideal)u->Data()))
+    {
+      Werror("At least %d ncgen variables are needed for this computation.", IDELEMS((ideal)u->Data()));
+      return TRUE;
+    }
+  }
+#endif
   // CopyD for IDEAL_CMD and MODUL_CMD are identical:
   res->data = (char *)idLiftStd((ideal)u->Data(),
                                 &(h->data.umatrix),testHomog);
@@ -6538,6 +6558,13 @@ static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
   }
   else
   {
+#ifdef HAVE_SHIFTBBA
+    if (rIsLPRing(currRing))
+    {
+      WerrorS("Substituting parameters not implemented for Letterplace rings.");
+      return TRUE;
+    }
+#endif
     res->data=pSubstPar(p,-ringvar,monomexpr);
   }
   return FALSE;
@@ -6580,6 +6607,13 @@ static BOOLEAN jjSUBST_Id(leftv res, leftv u, leftv v,leftv w)
   }
   else
   {
+#ifdef HAVE_SHIFTBBA
+    if (rIsLPRing(currRing))
+    {
+      WerrorS("Substituting parameters not implemented for Letterplace rings.");
+      return TRUE;
+    }
+#endif
     res->data = idSubstPar(id,-ringvar,monomexpr);
   }
   return FALSE;
@@ -6685,6 +6719,16 @@ static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
   if (w->rtyp!=IDHDL) return TRUE;
   int ul= IDELEMS((ideal)u->Data());
   int vl= IDELEMS((ideal)v->Data());
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
+  {
+    if (currRing->LPncGenCount < ul)
+    {
+      Werror("At least %d ncgen variables are needed for this computation.", ul);
+      return TRUE;
+    }
+  }
+#endif
   ideal m
     = idLift((ideal)u->Data(),(ideal)v->Data(),NULL,FALSE,hasFlag(u,FLAG_STD),
              FALSE, (matrix *)(&(IDMATRIX((idhdl)(w->data)))));
@@ -6698,6 +6742,16 @@ static BOOLEAN jjLIFTSTD3(leftv res, leftv u, leftv v, leftv w)
   if ((w->rtyp!=IDHDL)||(w->e!=NULL)) return TRUE;
   idhdl hv=(idhdl)v->data;
   idhdl hw=(idhdl)w->data;
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
+  {
+    if (currRing->LPncGenCount < IDELEMS((ideal)u->Data()))
+    {
+      Werror("At least %d ncgen variables are needed for this computation.", IDELEMS((ideal)u->Data()));
+      return TRUE;
+    }
+  }
+#endif
   // CopyD for IDEAL_CMD and MODUL_CMD are identical:
   res->data = (char *)idLiftStd((ideal)u->Data(),
                                 &(hv->data.umatrix),testHomog,

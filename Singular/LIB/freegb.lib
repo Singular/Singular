@@ -32,6 +32,8 @@ makeLetterplaceRing(d);          (deprecated, use freeAlgebra) creates a Letterp
 letplaceGBasis(I);               (deprecated, use twostd) two-sided Groebner basis of a letterplace ideal I
 lieBracket(a,b[, N]);            (deprecated, use bracket) iterated Lie bracket of two letterplace polynomials
 setLetterplaceAttributes(R,d,b); (for testing purposes) supplies ring R with the letterplace structure
+testLift(M,T);                   verify the output of lift
+testSyz(M,S);                    verify the output of syz
 
 SEE ALSO: fpadim_lib, fpaprops_lib, fpalgebras_lib, LETTERPLACE
 ";
@@ -3765,6 +3767,30 @@ example
   // intvec representation
   ideal G = p,q,w;
   lp2ivId(G); // returns the list of intmats for this ideal
+}
+
+proc testLift(ideal M, matrix T) {
+  ideal R;
+  if (ncols(M) != nrows(T)) { ERROR("cols(M) != rows(T)") }
+  for (int i=1; i <= nrows(T); i++) {
+    T = subst(T, ncgen(i), M[i]);
+  } kill i;
+  for (int i=1; i <= ncols(T); i++) {
+    R[i] = sum(T[i]);
+  } kill i;
+  return(R);
+}
+
+proc testSyz(ideal M, module S) {
+  ideal R;
+  if (ncols(M) != nrows(S)) { ERROR("cols(M) != rows(T)") }
+  for (int i=1; i <= nrows(S); i++) {
+    S = subst(S, ncgen(i), M[i]);
+  } kill i;
+  for (int i=1; i <= ncols(S); i++) {
+    R[i] = sum(S[i]);
+  } kill i;
+  return(R);
 }
 
 static proc mod_init()

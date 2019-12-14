@@ -1079,8 +1079,20 @@ static void idPrepareStd(ideal s_temp, int k)
       //pGetCoeff(q)=nInpNeg(pGetCoeff(q));   //set q to -1
       pSetComp(q,k+1+j);
       pSetmComp(q);
-      while (pNext(p)) pIter(p);
-      pNext(p) = q;
+#ifdef HAVE_SHIFTBBA
+      // non multiplicative variable
+      if (rIsLPRing(currRing))
+      {
+        pSetExp(q, currRing->isLPring - currRing->LPncGenCount + j + 1, 1);
+        p_Setm(q, currRing);
+        s_temp->m[j] = pAdd(p, q);
+      }
+      else
+#endif
+      {
+        while (pNext(p)) pIter(p);
+        pNext(p) = q;
+      }
     }
   }
   s_temp->rank = k+IDELEMS(s_temp);
