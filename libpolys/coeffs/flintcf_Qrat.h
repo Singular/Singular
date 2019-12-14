@@ -12,6 +12,7 @@
 #include "misc/auxiliary.h"
 #ifdef HAVE_FLINT
 #include <flint/flint.h>
+#if __FLINT_RELEASE >= 20503
 #include <flint/fmpq_mpoly.h>
 
 
@@ -38,11 +39,12 @@ typedef struct /* this is a temporary hack until we define this structure proper
    fmpq_mpoly_ctx_struct * ctx;
    coeffs C;
 } fmpq_rat_data_struct;
+#endif
+#endif
 
 BOOLEAN flintQrat_InitChar(coeffs cf, void * infoStruct);
 
 coeffs flintQratInitCfByName(char *s, n_coeffType n);
-#endif
 
 #endif
 
