@@ -9,6 +9,8 @@
 #include "misc/auxiliary.h"
 
 #ifdef HAVE_FLINT
+#if __FLINT_RELEASE >= 20503
+
 #include "factory/factory.h"
 
 #include "coeffs/coeffs.h"
@@ -1665,4 +1667,10 @@ BOOLEAN flintQrat_InitChar(coeffs cf, void * infoStruct)
   cf->data=ps;
   return FALSE;
 }
+#else
+BOOLEAN flintQrat_InitChar(coeffs cf, void * infoStruct)
+{ return TRUE; }
+#else
+BOOLEAN flintQrat_InitChar(coeffs cf, void * infoStruct)
+{ return TRUE; }
 #endif
