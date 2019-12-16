@@ -1888,7 +1888,7 @@ SEE ALSO: kbase
 EXAMPLE: example weightKB; shows an example
 "
 {
-  if(checkww(wim)){ERROR("wrong weights";);}
+  if(checkww(wim)){ERROR("wrong weights");}
   kbclass();
   wwtop=wim[1];
   stc=interred(lead(stc));
