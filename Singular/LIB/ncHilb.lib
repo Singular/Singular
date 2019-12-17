@@ -51,135 +51,134 @@ LIB "freegb.lib";
 // under construction by VL; need kernel adjustments by Sharwan Tiwari
 
 /* VERY NEW DOC PART HERE !*/
-static proc fpahilb(ideal I, list #)
-"USAGE: fpahilb(I[, L]), ideal I, optional list L
-PURPOSE: compute Hilbert series of a non-commutative algebra, presented by I
-RETURN: nothing (prints data out)
-ASSUME: basering is a Letterplace ring, I is given via its Groebner basis
-NOTE: the sequence of the values in the list L is as follows:
-L[1] of type int: 0 if I stands for finitely generated regular ideal, 1 otherwise
-L[2] of type int: 0 if univariate Hilbert series is to be computed, 1 otherwise (e.g. for multi-graded Hilbert series)
-L[3] of type int: the truncation degree for truncated Hilbert series (if >2 value is given)
-L[4] of type string: if nonempty, then the details about the orbit computations will be printed.
-EXAMPLE: example fpahilb; shows an example "
-{
-    if (!isFreeAlgebra(basering))
-    {
-      ERROR("Basering should be Letterplace ring");
-    }
-    def save = basering;
-    int sz=size(#);
-    int lV=lpVarBlockSize(save); // nvars(orig comm ring)
-    int ig=0;
-    int mgrad=0;
-    int tdeg=0;
-    string odp="";
-    int i;
-    for(i=sz; i >= 1; i--)
-    {
-      if(typeof(#[i])=="string")
-      {
-        if(#[i]!="")
-        {
-          odp = "p";
-        }
-        # = delete(#,i);
-        sz = sz-1;
-        break;
-      }
-    }
-    i=1;
-// VL: changing the old "only one optional parameter (for printing the details) is allowed as a string."
-    while( (typeof(#[i])=="int") && (i<=sz) )
-    {
-      if( (#[i] == 1) && (ig==0) )
-      {
-        ig = 1;
-      }
-      else
-      {
-        if ( (#[i] == 2) && (mgrad==0) )
-        {
-          mgrad = 2;
-        }
-        else
-        {
-          if ( (#[i] > 2) && (tdeg==0) )
-          {
-            tdeg = #[i];
-          }
-          else
-          {
-            ERROR("error: only int 1,2 and >2 are allowed as optional parameters");
-          }
-        }
-      }
-      i = i + 1;
-    }
-    if( i <= sz)
-    {
-      ERROR("error:only int 1,2, >2, and a string are allowed as optional parameters");
-    }
-    int maxdegJ = 0;
-    ideal J_lm = I;
-    for(i=1; i<=size(J_lm); i++)
-    {
-        J_lm[i]=leadmonom(J_lm[i]);
-        if ( deg(J_lm[i]) > maxdegJ )
-        {
-          maxdegJ = deg(J_lm[i]);
-        }
-    }
-    // new: truncation should be < than degbound/2
-    int degbnd = lpDegBound(save);
-    if (tdeg == 0)
-    {
-        // orig code: LPRing is created with degree bound=2*d
-        // therefore check here, that maxdeg(gens) <=uptodeg/2
-        if ( 2*maxdegJ != degbnd)
-        {
-            ERROR("Degree bound on the basering should be precisely "+ string(2*maxdegJ));
-        }
-    }
-    else
-    { // ie tdeg>0
-        // orig code: LPRing is created with degree bound=2*(tdeg-1)
-        if ( 2*(tdeg - 1) != degbnd)
-        {
-            ERROR("Degree bound on the basering should be precisely "+ string(2*(tdeg - 1)));
-        }
-    }
-    // if (tdeg > (degbnd-1) div 2)
-    // {
-       // ERROR("Degree bound on the basering should be at least 2*N+1");
-    // }
-//    def save2 = basering;
-//    setring save2;
-    //compute the Hilbert series
-        // system call : HilbertSeries_OrbitData: sharwan need to change it as well...
-        //(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp, int trunDegHs)
-
-    //"Debug: nc hilb is called with with lV="+string(lV)+", ig="+string(ig)+", mgrad="+string(mgrad)+", tdeg="+string(tdeg);
-    if(odp == "")
-    {
-      //system("nc_hilb", J_lm, lV, ig, mgrad,tdeg);
-      system("nc_hilb", J_lm, L[1], L[2], L[3]); //  or even better with the list L!!!
-    }
-    else
-    {
-      system("nc_hilb", J_lm, L[1], L[2], L[3], L[4]); // the final part: only one call without if-else will be made
-    }
-}
-
-example
-{
-"EXAMPLE:"; echo = 2;
-  ring r=0,(X,Y,Z),dp;
-  def R = makeLetterplaceRing(4); setring R;
-  ideal I = Y*Z, Y*Z*X, Y*Z*Z*X, Y*Z*Z*Z*X;
-  list L = 0, 0, 3, ""; // ie finitely generated, univariate HS, truncated up to degree 3, no printing
-  fpahilb(I, L);
-}
+//static proc fpahilb(ideal I, list #)
+//"USAGE: fpahilb(I[, L]), ideal I, optional list L
+//PURPOSE: compute Hilbert series of a non-commutative algebra, presented by I
+//RETURN: nothing (prints data out)
+//ASSUME: basering is a Letterplace ring, I is given via its Groebner basis
+//NOTE: the sequence of the values in the list L is as follows:
+//L[1] of type int: 0 if I stands for finitely generated regular ideal, 1 otherwise
+//L[2] of type int: 0 if univariate Hilbert series is to be computed, 1 otherwise (e.g. for multi-graded Hilbert series)
+//L[3] of type int: the truncation degree for truncated Hilbert series (if >2 value is given)
+//L[4] of type string: if nonempty, then the details about the orbit computations will be printed.
+//EXAMPLE: example fpahilb; shows an example "
+//{
+//    if (!isFreeAlgebra(basering))
+//    {
+//      ERROR("Basering should be Letterplace ring");
+//    }
+//    def save = basering;
+//    int sz=size(#);
+//    int lV=lpVarBlockSize(save); // nvars(orig comm ring)
+//    int ig=0;
+//    int mgrad=0;
+//    int tdeg=0;
+//    string odp="";
+//    int i;
+//    for(i=sz; i >= 1; i--)
+//    {
+//      if(typeof(#[i])=="string")
+//      {
+//        if(#[i]!="")
+//        {
+//          odp = "p";
+//        }
+//        # = delete(#,i);
+//        sz = sz-1;
+//        break;
+//      }
+//    }
+//    i=1;
+//// VL: changing the old "only one optional parameter (for printing the details) is allowed as a string."
+//    while( (typeof(#[i])=="int") && (i<=sz) )
+//    {
+//      if( (#[i] == 1) && (ig==0) )
+//      {
+//        ig = 1;
+//      }
+//      else
+//      {
+//        if ( (#[i] == 2) && (mgrad==0) )
+//        {
+//          mgrad = 2;
+//        }
+//        else
+//        {
+//          if ( (#[i] > 2) && (tdeg==0) )
+//          {
+//            tdeg = #[i];
+//          }
+//          else
+//          {
+//            ERROR("error: only int 1,2 and >2 are allowed as optional parameters");
+//          }
+//        }
+//      }
+//      i = i + 1;
+//    }
+//    if( i <= sz)
+//    {
+//      ERROR("error:only int 1,2, >2, and a string are allowed as optional parameters");
+//    }
+//    int maxdegJ = 0;
+//    ideal J_lm = I;
+//    for(i=1; i<=size(J_lm); i++)
+//    {
+//        J_lm[i]=leadmonom(J_lm[i]);
+//        if ( deg(J_lm[i]) > maxdegJ )
+//        {
+//          maxdegJ = deg(J_lm[i]);
+//        }
+//    }
+//    // new: truncation should be < than degbound/2
+//    int degbnd = lpDegBound(save);
+//    if (tdeg == 0)
+//    {
+//        // orig code: LPRing is created with degree bound=2*d
+//        // therefore check here, that maxdeg(gens) <=uptodeg/2
+//        if ( 2*maxdegJ != degbnd)
+//        {
+//            ERROR("Degree bound on the basering should be precisely "+ string(2*maxdegJ));
+//        }
+//    }
+//    else
+//    { // ie tdeg>0
+//        // orig code: LPRing is created with degree bound=2*(tdeg-1)
+//        if ( 2*(tdeg - 1) != degbnd)
+//        {
+//            ERROR("Degree bound on the basering should be precisely "+ string(2*(tdeg - 1)));
+//        }
+//    }
+//    // if (tdeg > (degbnd-1) div 2)
+//    // {
+//       // ERROR("Degree bound on the basering should be at least 2*N+1");
+//    // }
+////    def save2 = basering;
+////    setring save2;
+//    //compute the Hilbert series
+//        // system call : HilbertSeries_OrbitData: sharwan need to change it as well...
+//        //(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp, int trunDegHs)
+//
+//    //"Debug: nc hilb is called with with lV="+string(lV)+", ig="+string(ig)+", mgrad="+string(mgrad)+", tdeg="+string(tdeg);
+//    if(odp == "")
+//    {
+//      //system("nc_hilb", J_lm, lV, ig, mgrad,tdeg);
+//      system("nc_hilb", J_lm, L[1], L[2], L[3]); //  or even better with the list L!!!
+//    }
+//    else
+//    {
+//      system("nc_hilb", J_lm, L[1], L[2], L[3], L[4]); // the final part: only one call without if-else will be made
+//    }
+//}
+//example
+//{
+//"EXAMPLE:"; echo = 2;
+//  ring r=0,(X,Y,Z),dp;
+//  def R = makeLetterplaceRing(4); setring R;
+//  ideal I = Y*Z, Y*Z*X, Y*Z*Z*X, Y*Z*Z*Z*X;
+//  list L = 0, 0, 3, ""; // ie finitely generated, univariate HS, truncated up to degree 3, no printing
+//  fpahilb(I, L);
+//}
 /* VERY NEW PART HERE (ABOVE) !*/
 
 
