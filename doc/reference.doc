@@ -2339,6 +2339,7 @@ cring
 @item @strong{Purpose:}
 returns a coefficient ring of multivariate rational functions over Q
 to be used in ring definitions.
+Require flint >=2.5.3.
 @item @strong{Example:}
 @smallexample
 @c example

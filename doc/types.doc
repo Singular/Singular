@@ -163,7 +163,7 @@ crooss product of several objects of type cring (see @ref{crossprod})
 several variants of Floating point (inexact) real and complex numbers
 (see @ref{Float}).
 @item flintQ
-multivariate rational functions over Q
+multivariate rational functions over Q (via flint, requires >=2.5.3)
 (see @ref{flintQ}).
 @end table
 
