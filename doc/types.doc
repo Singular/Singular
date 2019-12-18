@@ -107,11 +107,17 @@ none
 @node cring expressions, cring operations, cring declarations, cring
 @subsection cring expressions
 @cindex cring expressions
+@cindex QQ
+@cindex ZZ
 
 A cring expression is:
 @enumerate
 @item
-an identifier of type cring
+an identifier of type cring:
+  @itemize
+  @item QQ - the rational numbers
+  @item ZZ - the integers
+  @end itemize
 @item
 a function returning cring
 @item
