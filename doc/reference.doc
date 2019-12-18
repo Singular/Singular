@@ -96,6 +96,7 @@ and @code{LIB} no brackets are allowed.
 * filecmd::
 * find::
 * finduni::
+* flintQ::
 * Float::
 * fprintf::
 * freemodule::
@@ -2291,7 +2292,7 @@ See
 @ref{string}.
 @c ref
 @c ---------------------------------------
-@node finduni, Float, find, Functions
+@node finduni
 @subsection finduni
 @cindex finduni
 @table @code
@@ -2327,7 +2328,33 @@ See
 @c ref
 
 @c ---------------------------------------
-@node Float, fprintf, finduni, Functions
+@node flintQ
+@subsection flintQ
+@cindex flintQ
+@table @code
+@item @strong{Syntax:}
+@code{flintQ (} list_of_names @code{)}
+@item @strong{Type:}
+cring
+@item @strong{Purpose:}
+returns a coefficient ring of multivariate rational functions over Q
+to be used in ring definitions.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring R1=flintQ(a,b),(x,y),dp;
+  R1;
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ring};
+@ref{cring}.
+@c ref
+
+@c ---------------------------------------
+@node Float
 @subsection Float
 @cindex Float
 @table @code

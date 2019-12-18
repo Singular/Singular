@@ -162,11 +162,16 @@ crooss product of several objects of type cring (see @ref{crossprod})
 @item Float
 several variants of Floating point (inexact) real and complex numbers
 (see @ref{Float}).
+@item flintQ
+multivariate rational functions over Q
+(see @ref{flintQ}).
 @end table
 
 @c ref
 See
 @ref{crossprod};
+@ref{flintQ};
+@ref{Float}.
 @c ref
 
 @c ---------------------------------------
