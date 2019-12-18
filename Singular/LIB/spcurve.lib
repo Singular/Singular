@@ -359,8 +359,8 @@ EXAMPLE: example qhmatrix; shows an example"
 // its maximal minors are, and check, whether M is really quasihomogeneous
 //---------------------------------------------------------------------------
   intvec a=weight(m);
-  string tempstr="ring rneu=" + charstr(r) + ",(" + varstr(r) + "),Ws(" + string(a) + ");";
-  execute(tempstr);
+  list l1 = ringlist(r)[2];
+  ring rneu = create_ring(ringlist(r)[1], l1, "Ws(" + string(a) + ")", "no_minpoly");
   def M=imap(r,M);
   int difset=0;
   list l;
@@ -785,8 +785,8 @@ EXAMPLE:   example KSpencerKernel; shows an example"
   {
     ERROR("The matrix was not n x (n+1) or not quasihomogenous");
   }
-  string ringre=" ring r=" + charstr(rt) + ",(x,y,z), Ws(" + string(wl[1]) + ");";
-  execute(ringre);
+  string orderKSK;
+  ring r = create_ring(ringlist(rt)[1], "(x,y,z)", "Ws(" + string(wl[1]) + ")", "no_minpoly");
   matrix M=imap(rt,M);
   int ne=size(M);
   if (defined(desiredorder)>1)
@@ -826,22 +826,33 @@ EXAMPLE:   example KSpencerKernel; shows an example"
   }
   if(defined(desiredorder)>1)
   {
-    ringre="ring re=" + charstr(r) +",(e(1.." + string(ne) + "),"+
-                        varstr(basering) + "),Ws(";
+    orderKSK ="Ws(";
     intvec tempiv=intvec(wl[2]);
     for(i=1;i<=ne;i++)
     {
-      ringre=ringre + string((-1)*tempiv[desiredorder[i]]) + ",";
+      orderKSK = orderKSK + string((-1)*tempiv[desiredorder[i]]) + ",";
     }
-    ringre= ringre  + string(wl[1]) + ");";
+    orderKSK = orderKSK  + string(wl[1]) + ");";
+    list l2;
+    for (int zz = 1; zz <= ne; zz++)
+    {
+     l2[zz] = "e("+string(zz)+")";
+    }
+    list l3 = ringlist(basering)[2];
+    l2 = l2+l3;
+    ring re = create_ring(ringlist(r)[1], l2, orderKSK, "no_minpoly");
   }
   else
   {
-    ringre="ring re=" + charstr(r) +",(e(1.." + string(ne) + "),"+ varstr(basering)
-                        + "),Ws(" + string((-1)*intvec(wl[2])) + ","
-                        + string(wl[1]) + ");";
+    list l4;
+    for (int zz = 1; zz <= ne; zz++)
+    {
+     l4[zz] = "e("+string(zz)+")";
+    }
+    list l5 = ringlist(basering)[2];
+    l4 = l4+l5;
+    ring re = create_ring(ringlist(r)[1], l4, "Ws(" + string((-1)*intvec(wl[2])) + ","+ string(wl[1]) + ")", "no_minpoly");
   }
-  execute(ringre);
   module temp=imap(r,t1qh);
   ideal t1qh=mod2id(temp,iv);
   if (defined(watchProgress))
