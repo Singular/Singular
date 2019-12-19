@@ -47,19 +47,12 @@ AC_LANG_PUSH([C])
 
 for FLINT_HOME in ${FLINT_HOME_PATH}
  do
-## if test -r "$FLINT_HOME/include/flint/fmpz.h"; then
+ if test -r "$FLINT_HOME/include/flint/fmpz.h"; then
 
-	if test "x$FLINT_HOME" != "x/usr"; then
-		FLINT_CFLAGS="-I${FLINT_HOME}/include/"
-		FLINT_LIBS="-L${FLINT_HOME}/lib"
-	else
-		FLINT_CFLAGS=""
-		FLINT_LIBS=""
-	fi
+	FLINT_CFLAGS="-I${FLINT_HOME}/include/"
+	FLINT_LIBS="-L${FLINT_HOME}/lib -lflint -lmpfr"
 
 	# we suppose that mpfr and mpir to be in the same place or available by default
-	FLINT_LIBS="$FLINT_LIBS -lflint -lmpfr"
-
 	CFLAGS="${BACKUP_CFLAGS} ${FLINT_CFLAGS} ${GMP_CPPFLAGS}"
 	LIBS="${BACKUP_LIBS} ${FLINT_LIBS} ${GMP_LIBS}"
 
@@ -89,9 +82,9 @@ for FLINT_HOME in ${FLINT_HOME_PATH}
 	unset FLINT_CFLAGS
 	unset FLINT_LIBS
 	])
-#else
-#	flint_found="no"
-#fi
+else
+	flint_found="no"
+fi
 done
 AC_LANG_POP([C])
 
