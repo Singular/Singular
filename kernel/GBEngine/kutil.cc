@@ -9581,10 +9581,6 @@ void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat)
 
   /* enter p to T set */
   enterT(p, strat);
-#ifdef HAVE_SHIFTBBA
-  if (rIsLPRing(currRing) && !strat->rightGB)
-    enterTShift(p,strat);
-#endif
 
   for (j = 0; j <= strat->sl; ++j) {
     if (pLtCmp(tp, strat->S[j]) == 0) {
@@ -9625,6 +9621,12 @@ void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat)
   }
   /* enter p to S set */
   strat->enterS(p, pos, strat, strat->tl);
+
+#ifdef HAVE_SHIFTBBA
+  /* do this after enterS so that the index in R (which is strat->tl) is correct */
+  if (rIsLPRing(currRing) && !strat->rightGB)
+    enterTShift(p,strat);
+#endif
 }
 
 /*2
