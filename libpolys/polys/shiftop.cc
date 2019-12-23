@@ -597,6 +597,8 @@ char* LPExpVString(int *expV, ring ri)
 // at is the number of the block, starting at 1
 void k_SplitFrame(poly &m1, poly &m2, int at, const ring r)
 {
+  assume(at >= 1);
+  assume(at <= r->N/r->isLPring);
   int lV = r->isLPring;
   int split = (lV * (at - 1));
 

@@ -1197,8 +1197,8 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   if (tailRing->isLPring)
   {
     assume(p_mFirstVblock(p1, tailRing) <= 1 || p_mFirstVblock(p2, tailRing) <= 1);
-    k_SplitFrame(m1, m12, p_mFirstVblock(p1, tailRing), tailRing);
-    k_SplitFrame(m2, m22, p_mFirstVblock(p2, tailRing), tailRing);
+    k_SplitFrame(m1, m12, si_max(p_mFirstVblock(p1, tailRing), 1), tailRing);
+    k_SplitFrame(m2, m22, si_max(p_mFirstVblock(p2, tailRing), 1), tailRing);
     // manually free the coeffs, because pSetCoeff0 is used in the next step
     n_Delete(&(m1->coef), tailRing->cf);
     n_Delete(&(m2->coef), tailRing->cf);
