@@ -4860,6 +4860,9 @@ void clearSbatch (poly h,int k,int pos,kStrategy strat)
 void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 {
   assume (rField_is_Ring(currRing));
+#if HAVE_SHIFTBBA
+  assume(!rIsLPRing(currRing)); /* LP should use enterpairsShift */
+#endif
   // enter also zero divisor * poly, if this is non zero and of smaller degree
   if (!(rField_is_Domain(currRing))) enterExtendedSpoly(h, strat);
   initenterstrongPairs(h, k, ecart, 0, strat, atR);
