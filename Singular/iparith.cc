@@ -6237,7 +6237,6 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
     {
       k = (int)(long)u->next->next->Data();
       noK = false;
-      assume(k != 0);
       if ((u->next->next->next != NULL) &&
           (u->next->next->next->Typ() == STRING_CMD))
       {
@@ -6263,7 +6262,6 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
   {
     k = (int)(long)u->next->Data();
     noK = false;
-    assume(k != 0);
     if ((u->next->next != NULL) && (u->next->next->Typ() == STRING_CMD))
     {
       algorithm = (char*)u->next->next->Data();

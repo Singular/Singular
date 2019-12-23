@@ -192,7 +192,7 @@ libparse_CPPFLAGS = ${AM_CPPFLAGS} -DSTANDALONE_PARSER
 
 libparse_SOURCES = libparse.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
-libparse_LDADD = ${OMALLOC_LIBS}
+libparse_LDADD =
 libparse_LDFLAGS = -static ${AM_LDFLAGS}
 
 #########################################################

@@ -45,6 +45,7 @@ enum n_coeffType
   n_Zn, /**< only used if HAVE_RINGS is defined */
   n_Znm, /**< only used if HAVE_RINGS is defined */
   n_Z2m, /**< only used if HAVE_RINGS is defined */
+  n_FlintQrat, /**< rational funtion field over Q */
   n_CF /**< ? */
 };
 
@@ -734,7 +735,7 @@ static FORCE_INLINE BOOLEAN n_DBTest(number n, const char *filename, const int l
 /// BOOLEAN n_Test(number a, const coeffs r)
 #define n_Test(a,r)  n_DBTest(a, __FILE__, __LINE__, r)
 #else
-#define n_Test(a,r)  do{}while(0)
+#define n_Test(a,r)  1
 #endif
 
 

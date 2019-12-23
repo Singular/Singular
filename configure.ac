@@ -150,10 +150,7 @@ SING_USE_RESOURCES()
 SING_USE_FACTORY()
 
 SING_CHECK_P_PROCS
-AC_ARG_WITH([readline],
-            [],
-            [SING_CHECK_READLINE],
-            [])
+SING_CHECK_READLINE
 
 SING_CHECK_DBM
 

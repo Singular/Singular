@@ -23,12 +23,16 @@
 Changed libraries:
 @itemize
 @item chern.lib:  new version (@nref{chern_lib})
+@item grobcov.lib: new version (@nref{grobcov_lib}), 
+      new functions @nref{ConsLevels}, @nref{Levels}, @nref{Grob1Levels}, 
+      @nref{DifConsLCSets}
 @end itemize
 
 Changes in the kernel/build system:
 @itemize
 @item improved gcd and multiplication via FLINT
 @item port to polymake 3.5.x
+@item rational functions via flint (@nref{flintQ})
 @end itemize
 
 @heading News for version 4-1-2

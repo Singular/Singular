@@ -301,9 +301,10 @@ void ssiWriteRing(ssiInfo *d,const ring r)
   /* ch=-1: transext, coeff ring follows */
   /* ch=-2: algext, coeff ring and minpoly follows */
   /* ch=-3: cf name follows */
+  /* ch=-4: NULL */
   if ((r==NULL)||(r->cf==NULL))
   {
-    WerrorS("undefined ring");
+    fputs("-4 ",d->f_write);
     return;
   }
   if (r==currRing) // see recursive calls for transExt/algExt
@@ -498,10 +499,12 @@ number ssiReadNumber(ssiInfo *d)
 ring ssiReadRing(const ssiInfo *d)
 {
 /* syntax is <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <Q-ideal> */
-  int ch, N,i;
-  char **names;
+  int ch;
   ch=s_readint(d->f_read);
-  N=s_readint(d->f_read);
+  if (ch==-4)
+    return NULL;
+  int N=s_readint(d->f_read);
+  char **names;
   coeffs cf=NULL;
   if (ch==-3)
   {
@@ -517,7 +520,7 @@ ring ssiReadRing(const ssiInfo *d)
   if (N!=0)
   {
     names=(char**)omAlloc(N*sizeof(char*));
-    for(i=0;i<N;i++)
+    for(int i=0;i<N;i++)
     {
       names[i]=ssiReadString(d);
     }
@@ -529,7 +532,7 @@ ring ssiReadRing(const ssiInfo *d)
   int *block0=(int *)omAlloc0((num_ord+1)*sizeof(int));
   int *block1=(int *)omAlloc0((num_ord+1)*sizeof(int));
   int **wvhdl=(int**)omAlloc0((num_ord+1)*sizeof(int*));
-  for(i=0;i<num_ord;i++)
+  for(int i=0;i<num_ord;i++)
   {
     ord[i]=(rRingOrder_t)s_readint(d->f_read);
     block0[i]=s_readint(d->f_read);
@@ -596,7 +599,7 @@ ring ssiReadRing(const ssiInfo *d)
     else
     {
       Werror("ssi: read unknown coeffs type (%d)",ch);
-      for(i=0;i<N;i++)
+      for(int i=0;i<N;i++)
       {
         omFree(names[i]);
       }
@@ -606,7 +609,7 @@ ring ssiReadRing(const ssiInfo *d)
     ideal q=ssiReadIdeal_R(d,r);
     if (IDELEMS(q)==0) omFreeBin(q,sip_sideal_bin);
     else r->qideal=q;
-    for(i=0;i<N;i++)
+    for(int i=0;i<N;i++)
     {
       omFree(names[i]);
     }
@@ -1382,9 +1385,9 @@ leftv ssiRead1(si_link l)
     case 15:
     case 5:{
              d->r=ssiReadRing(d);
-             if (d->r==NULL) return NULL;
+             if (errorreported) return NULL;
              res->data=(char*)d->r;
-             d->r->ref++;
+             if (d->r!=NULL) d->r->ref++;
              res->rtyp=RING_CMD;
              if (t==15) // setring
              {
