@@ -1047,7 +1047,7 @@ static void lpmakemonoms(int vars, int deg, const ring r)
     for (int i = 0; i < size; i++)
     {
       idpowerpoint = (j-1)*size + i;
-      p_SetExp(idpower[idpowerpoint], ((deg - 1)*vars) + j, 1, r);
+      p_SetExp(idpower[idpowerpoint], ((deg - 1) * r->isLPring) + j, 1, r);
       p_Setm(idpower[idpowerpoint],r);
       p_Test(idpower[idpowerpoint],r);
     }
@@ -1066,7 +1066,11 @@ ideal id_MaxIdeal(int deg, const ring r)
     I->m[0]=p_One(r);
     return I;
   }
-  if (deg == 1)
+  if (deg == 1
+#ifdef HAVE_SHIFTBBA
+      && !r->isLPring
+#endif
+     )
   {
     return id_MaxIdeal(r);
   }
@@ -1075,7 +1079,7 @@ ideal id_MaxIdeal(int deg, const ring r)
 #ifdef HAVE_SHIFTBBA
   if (r->isLPring)
   {
-    vars = r->isLPring;
+    vars = r->isLPring - r->LPncGenCount;
     i = 1;
     // i = vars^deg
     for (int j = 0; j < deg; j++)
