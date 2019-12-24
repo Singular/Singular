@@ -12766,14 +12766,13 @@ static void enterOnePairWithoutShifts (int p_inS /*also i*/, poly q, poly p, int
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
-    assume(q_shift <= p_lastVblock);
+    assume(q_shift <= p_lastVblock); // we allow the special case where there is no overlap
     enterOneStrongPolyAndEnterOnePairRingShift(q, p, ecartp, p_isFromQ, strat, -1, ecartq, q_isFromQ, q_shift, -1);
   }
   else
 #endif
   {
-    int maxNeededShift = p_lastVblock - 1;
-    assume(q_shift <= maxNeededShift);
+    assume(q_shift <= p_lastVblock - 1); // there should be an overlap
     enterOnePairShift(q, p, ecartp, p_isFromQ, strat, -1, ecartq, q_isFromQ, q_shift, -1);
   }
 }
@@ -13197,7 +13196,22 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
               if (!strat->fromQ[j])
               {
                 poly s = strat->S[j];
-                enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, pmLastVblock(s), i);
+                int s_lastVblock = pmLastVblock(s);
+                if (i < s_lastVblock)
+                  enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, s_lastVblock, i);
+#ifdef HAVE_RINGS
+                else if (rField_is_Ring(currRing))
+                {
+                  assume(i >= s_lastVblock); // this is always the case, but just to be very sure
+                  ideal fillers = id_MaxIdeal(i - s_lastVblock, currRing);
+                  for (int k = 0; k < IDELEMS(fillers); k++)
+                  {
+                    poly hhh = pLPCopyAndShiftLM(pp_mm_Mult(h, fillers->m[k], currRing), s_lastVblock);
+                    enterOnePairWithoutShifts(j, hhh, s, ecart, isFromQ, strat, atR, s_lastVblock, s_lastVblock);
+                  }
+                  idDelete(&fillers);
+                }
+#endif
               }
             }
           }
@@ -13209,7 +13223,6 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
         // pairs (shifts(s[1..k]),h), (s[1..k],h)
         for (j=0; j<=k; j++) {
           poly s = strat->S[j];
-          // TODO: cache lastVblock of s[1..k] for later use
           enterOnePairWithShifts(j, s, h, ecart, isFromQ, strat, atR, h_lastVblock, pmLastVblock(s));
         }
         // pairs (shifts(h),s[1..k]), (shifts(h), h)
@@ -13256,6 +13269,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
     }
     else
     {
+      assume(isFromQ == 0); // an element from Q should always has 0 component
       new_pair=TRUE;
       if (strat->rightGB)
       {
@@ -13264,7 +13278,6 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
           if ((pGetComp(h)==pGetComp(strat->S[j]))
               || (pGetComp(strat->S[j])==0))
           {
-            assume(isFromQ == 0); // this case is not handeled here and should also never happen
             poly s = strat->S[j];
             if (strat->fromQ != NULL && strat->fromQ[j])
             {
