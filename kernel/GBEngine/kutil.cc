@@ -13223,36 +13223,32 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
             if (i < s_lastVblock)
               enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, s_lastVblock, i);
 #ifdef HAVE_RINGS
-            else if (rField_is_Ring(currRing) && i == s_lastVblock)
+            else if (rField_is_Ring(currRing))
             {
-              for (int l = s_lastVblock; l <= maxShift; l++)
+              assume(i >= s_lastVblock); // this is always the case, but just to be very sure
+              ideal fillers = id_MaxIdeal(i - s_lastVblock, currRing);
+              for (int k = 0; k < IDELEMS(fillers); k++)
               {
-                ideal fillers = id_MaxIdeal(l - s_lastVblock, currRing);
-                for (int k = 0; k < IDELEMS(fillers); k++)
-                {
-                  poly hhh = pLPCopyAndShiftLM(pp_mm_Mult(h, fillers->m[k], currRing), s_lastVblock);
-                  enterOnePairWithoutShifts(j, hhh, s, ecart, isFromQ, strat, atR, s_lastVblock, s_lastVblock);
-                }
-                idDelete(&fillers);
+                poly hhh = pLPCopyAndShiftLM(pp_mm_Mult(h, fillers->m[k], currRing), s_lastVblock);
+                enterOnePairWithoutShifts(j, hhh, s, ecart, isFromQ, strat, atR, s_lastVblock, s_lastVblock);
               }
+              idDelete(&fillers);
             }
 #endif
           }
           if (i < h_lastVblock)
             enterOnePairWithoutShifts(-1, hh, h, ecart, isFromQ, strat, atR, h_lastVblock, i);
 #ifdef HAVE_RINGS
-          else if (rField_is_Ring(currRing) && i == h_lastVblock)
+          else if (rField_is_Ring(currRing))
           {
-            for (int l = h_lastVblock; l <= maxShift; l++)
+            assume(i >= h_lastVblock); // this is always the case, but just to be very sure
+            ideal fillers = id_MaxIdeal(i - h_lastVblock, currRing);
+            for (int k = 0; k < IDELEMS(fillers); k++)
             {
-              ideal fillers = id_MaxIdeal(l - h_lastVblock, currRing);
-              for (int k = 0; k < IDELEMS(fillers); k++)
-              {
-                poly hhh = pLPCopyAndShiftLM(pp_mm_Mult(h, fillers->m[k], currRing), h_lastVblock);
-                enterOnePairWithoutShifts(-1, hhh, h, ecart, isFromQ, strat, atR, h_lastVblock, h_lastVblock);
-              }
-              idDelete(&fillers);
+              poly hhh = pLPCopyAndShiftLM(pp_mm_Mult(h, fillers->m[k], currRing), h_lastVblock);
+              enterOnePairWithoutShifts(-1, hhh, h, ecart, isFromQ, strat, atR, h_lastVblock, h_lastVblock);
             }
+            idDelete(&fillers);
           }
 #endif
         }
@@ -13308,18 +13304,16 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
               if (i < s_lastVblock)
                 enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, s_lastVblock, i);
 #ifdef HAVE_RINGS
-              else if (rField_is_Ring(currRing) && i == s_lastVblock)
+              else if (rField_is_Ring(currRing))
               {
-                for (int l = s_lastVblock; l <= maxShift; l++)
+                assume(i >= s_lastVblock); // this is always the case, but just to be very sure
+                ideal fillers = id_MaxIdeal(i - s_lastVblock, currRing);
+                for (int k = 0; k < IDELEMS(fillers); k++)
                 {
-                  ideal fillers = id_MaxIdeal(l - s_lastVblock, currRing);
-                  for (int k = 0; k < IDELEMS(fillers); k++)
-                  {
-                    poly hhh = pLPCopyAndShiftLM(pp_mm_Mult(h, fillers->m[k], currRing), s_lastVblock);
-                    enterOnePairWithoutShifts(j, hhh, s, ecart, isFromQ, strat, atR, s_lastVblock, s_lastVblock);
-                  }
-                  idDelete(&fillers);
+                  poly hhh = pLPCopyAndShiftLM(pp_mm_Mult(h, fillers->m[k], currRing), s_lastVblock);
+                  enterOnePairWithoutShifts(j, hhh, s, ecart, isFromQ, strat, atR, s_lastVblock, s_lastVblock);
                 }
+                idDelete(&fillers);
               }
 #endif
             }
@@ -13327,18 +13321,16 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
           if (i < h_lastVblock)
             enterOnePairWithoutShifts(-1, hh, h, ecart, isFromQ, strat, atR, h_lastVblock, i);
 #ifdef HAVE_RINGS
-          else if (rField_is_Ring(currRing) && i == h_lastVblock)
+          else if (rField_is_Ring(currRing))
           {
-            for (int l = h_lastVblock; l <= maxShift; l++)
+            assume(i >= h_lastVblock); // this is always the case, but just to be very sure
+            ideal fillers = id_MaxIdeal(i - h_lastVblock, currRing);
+            for (int k = 0; k < IDELEMS(fillers); k++)
             {
-              ideal fillers = id_MaxIdeal(l - h_lastVblock, currRing);
-              for (int k = 0; k < IDELEMS(fillers); k++)
-              {
-                poly hhh = pLPCopyAndShiftLM(pp_mm_Mult(h, fillers->m[k], currRing), h_lastVblock);
-                enterOnePairWithoutShifts(-1, hhh, h, ecart, isFromQ, strat, atR, h_lastVblock, h_lastVblock);
-              }
-              idDelete(&fillers);
+              poly hhh = pLPCopyAndShiftLM(pp_mm_Mult(h, fillers->m[k], currRing), h_lastVblock);
+              enterOnePairWithoutShifts(-1, hhh, h, ecart, isFromQ, strat, atR, h_lastVblock, h_lastVblock);
             }
+            idDelete(&fillers);
           }
 #endif
         }
