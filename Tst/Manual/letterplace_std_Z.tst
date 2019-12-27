@@ -11,7 +11,7 @@ kill R;
 
 ring r = ZZ,(x,y),lp;
 ring R = freeAlgebra(r,7);
-ideal I = 2*x*y, 3*y^3+3, x^2-3*x;
+ideal I = 2*x*y, 3*y*y*y+3, x*x-3*x;
 std(I);
 ideal I2 = I, x*y - y*x;
 std(I2);
