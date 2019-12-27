@@ -3242,17 +3242,40 @@ void chainCritNormal (poly p,int ecart,kStrategy strat)
   */
   if (strat->pairtest!=NULL)
   {
-    /*- i.e. there is an i with pairtest[i]==TRUE -*/
-    for (j=0; j<=strat->sl; j++)
+#ifdef HAVE_SHIFTBBA
+    // only difference is pLPDivisibleBy instead of pDivisibleBy
+    if (rIsLPRing(currRing))
     {
-      if (strat->pairtest[j])
+      for (j=0; j<=strat->sl; j++)
       {
-        for (i=strat->Bl; i>=0; i--)
+        if (strat->pairtest[j])
         {
-          if (pDivisibleBy(strat->S[j],strat->B[i].lcm))
+          for (i=strat->Bl; i>=0; i--)
           {
-            deleteInL(strat->B,&strat->Bl,i,strat);
-            strat->c3++;
+            if (pLPDivisibleBy(strat->S[j],strat->B[i].lcm))
+            {
+              deleteInL(strat->B,&strat->Bl,i,strat);
+              strat->c3++;
+            }
+          }
+        }
+      }
+    }
+    else
+#endif
+    {
+      /*- i.e. there is an i with pairtest[i]==TRUE -*/
+      for (j=0; j<=strat->sl; j++)
+      {
+        if (strat->pairtest[j])
+        {
+          for (i=strat->Bl; i>=0; i--)
+          {
+            if (pDivisibleBy(strat->S[j],strat->B[i].lcm))
+            {
+              deleteInL(strat->B,&strat->Bl,i,strat);
+              strat->c3++;
+            }
           }
         }
       }
@@ -13065,15 +13088,14 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
   if (Lp.p == NULL)
   {
     /*- the case that the s-poly is 0 -*/
-    /* TEMPORARILY DISABLED FOR SHIFTS because there is no i*/
-//      if (strat->pairtest==NULL) initPairtest(strat);
-//      strat->pairtest[i] = TRUE;/*- hint for spoly(S^[i],p)=0 -*/
-//      strat->pairtest[strat->sl+1] = TRUE;
-// new: visual check how often this happens: ! for the debug situation
-#ifdef KDEBUG
-      Print("!");
+    // TODO: currently ifromS is only > 0 if called from enterOnePairWithShifts
+    if (ifromS > 0)
+    {
+      if (strat->pairtest==NULL) initPairtest(strat);
+      strat->pairtest[ifromS] = TRUE;/*- hint for spoly(S^[i],p)=0 -*/
+      strat->pairtest[strat->sl+1] = TRUE;
+    }
       //if (TEST_OPT_DEBUG){Print("!");} // option teach
-#endif /* KDEBUG */
     /* END _ TEMPORARILY DISABLED FOR SHIFTS */
     /*hint for spoly(S[i],p) == 0 for some i,0 <= i <= sl*/
     /*
