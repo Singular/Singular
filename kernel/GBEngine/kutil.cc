@@ -232,6 +232,19 @@ static inline int pDivComp(poly p, poly q)
   return 0;
 }
 
+#ifdef HAVE_SHIFTBBA
+static inline int pLPDivComp(poly p, poly q) {
+  if ((currRing->pCompIndex < 0) || (__p_GetComp(p,currRing) == __p_GetComp(q,currRing)))
+  {
+    // maybe there is a more performant way to do this? This will get called quite often in bba.
+    if (_p_LPLmDivisibleByNoComp(p, q, currRing)) return 1;
+    if (_p_LPLmDivisibleByNoComp(q, p, currRing)) return -1;
+  }
+
+  return 0;
+}
+#endif
+
 
 VAR int     HCord;
 VAR int     Kstd1_deg;
@@ -12888,7 +12901,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
       loop
       {
         if (j < 0)  break;
-        compare=pDivComp(strat->B[j].lcm,Lp.lcm);
+        compare=pLPDivComp(strat->B[j].lcm,Lp.lcm);
         if ((compare==1)
         &&(sugarDivisibleBy(strat->B[j].ecart,Lp.ecart)))
         {
@@ -12897,7 +12910,9 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
           {
             pLmFree(Lp.lcm);
 #ifdef CRITERION_DEBUG
-            if (TEST_OPT_DEBUG) Print("--- divided by B[%d]\n", j);
+            if (TEST_OPT_DEBUG) {
+              Print("--- chain crit using B[%d].lcm=%s\n", j, pString(strat->B[j].lcm));
+            }
 #endif
             return;
           }
@@ -12907,10 +12922,12 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
         if ((compare ==-1)
         && sugarDivisibleBy(Lp.ecart,strat->B[j].ecart))
         {
-          deleteInL(strat->B,&strat->Bl,j,strat);
 #ifdef CRITERION_DEBUG
-          if (TEST_OPT_DEBUG) Print("divides B[%d] -> delete B[%d]\n", j, j);
+          if (TEST_OPT_DEBUG) {
+            Print("--- chain crit using pair to remove B[%d].lcm=%s\n", j, pString(strat->B[j].lcm));
+          }
 #endif
+          deleteInL(strat->B,&strat->Bl,j,strat);
           strat->c3++;
         }
         j--;
@@ -12962,7 +12979,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
       */
       for(j = strat->Bl;j>=0;j--)
       {
-        compare=pDivComp(strat->B[j].lcm,Lp.lcm);
+        compare=pLPDivComp(strat->B[j].lcm,Lp.lcm);
         if (compare==1)
         {
           strat->c3++;
@@ -12970,7 +12987,9 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
           {
             pLmFree(Lp.lcm);
 #ifdef CRITERION_DEBUG
-            if (TEST_OPT_DEBUG) Print("--- divided by B[%d]\n", j);
+            if (TEST_OPT_DEBUG) {
+              Print("--- chain crit using B[%d].lcm=%s\n", j, pString(strat->B[j].lcm));
+            }
 #endif
             return;
           }
@@ -12979,10 +12998,12 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
         else
         if (compare ==-1)
         {
-          deleteInL(strat->B,&strat->Bl,j,strat);
 #ifdef CRITERION_DEBUG
-          if (TEST_OPT_DEBUG) Print("divides B[%d] -> delete B[%d]\n", j, j);
+          if (TEST_OPT_DEBUG) {
+            Print("--- chain crit using pair to remove B[%d].lcm=%s\n", j, pString(strat->B[j].lcm));
+          }
 #endif
+          deleteInL(strat->B,&strat->Bl,j,strat);
           strat->c3++;
         }
       }
@@ -13005,7 +13026,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
   {
     Lp.p=NULL;
 #ifdef CRITERION_DEBUG
-    if (TEST_OPT_DEBUG) PrintS("--- pair from Q\n");
+    if (TEST_OPT_DEBUG) PrintS("--- pair is from Q\n");
 #endif
   }
   else

@@ -766,10 +766,12 @@ BOOLEAN _p_LPLmDivisibleByNoComp(poly a, poly b, const ring r)
   b = p_Head(b, r);
   p_mLPunshift(b, r);
 #endif
-  for (int i = (r->N / r->isLPring) - p_LastVblock(a, r); i >= 0; i--)
+  int aLastVblock = p_mLastVblock(a, r);
+  int bLastVblock = p_mLastVblock(b, r);
+  for (int i = 0; i <= bLastVblock - aLastVblock; i++)
   {
     bool divisible = true;
-    for (int j = r->N - (i * r->isLPring); j >= 0; j--)
+    for (int j = 1; j <= aLastVblock * r->isLPring; j++)
     {
       if (p_GetExp(a, j, r) > p_GetExp(b, j + (i * r->isLPring), r))
       {
