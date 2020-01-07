@@ -3407,13 +3407,13 @@ NOTE:
   ideal I=F(I);
   ideal J=homog(I, homvar@);
   ideal JJ=J, homvar@;
-  return( CSMA(J)[n]-CSMA(JJ)[n] );
+  return( CSMA(J)[n+1]-CSMA(JJ)[n+1] );
 }
 example
 {
   "EXAMPLE:";echo =2;
   ring r = 0, (x, y), dp;
-  // compute the Euler characteristic of the affine ellipric curve y^2=x^3+x+1;
+  // compute the Euler characteristic of the affine elliptic curve y^2=x^3+x+1;
   ideal I=y2-x3-x-1;
   EulerAff(I);
 }
@@ -3433,7 +3433,7 @@ NOTE:     uses CSMA(...)
     print("The ideal must be homogeneous, zero is returned.");
     return( int(0) );
   }
-  int n=nvars(basering)-1;
+  int n=nvars(basering);
   return( CSMA(I)[n] );
 }
 example

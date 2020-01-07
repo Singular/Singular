@@ -50,22 +50,17 @@ LIB "freegb.lib";
 
 // under construction by VL; need kernel adjustments by Sharwan Tiwari
 
+/* VERY NEW DOC PART HERE !*/
 static proc fpahilb(ideal I, list #)
 "USAGE: fpahilb(I[, L]), ideal I, optional list L
 PURPOSE: compute Hilbert series of a non-commutative algebra, presented by I
 RETURN: nothing (prints data out)
 ASSUME: basering is a Letterplace ring, I is given via its Groebner basis
-NOTE: the appearance of following values among the optional arguments triggers the following:
-@* 1: computation for non-finitely generated regular ideals,
-@* 2: computation of multi-graded Hilbert series,
-@* N>2: computation of truncated Hilbert series up to degree N-1, and
-@* nonempty string: the details about the orbit and system of equations will be printed.
-Let the orbit be O_I = T_(w_1)(I),...,T_(w_r)(I)} (w_i in W), where we assume that if T_(w_i)(I)=T_(w_i')(I)
-for some w'_i in W, then deg(w_i) <= deg(w'_i) follows.
-Then the description of orbit in the form w_1,...,w_r will be printed.
-It also prints the maximal degree and the cardinality of sum_j R(w_i, b_j) corresponding to each w_i,
-where b_j is a basis of I.
-Moreover, it also prints the linear system (for the information about adjacency matrix).
+NOTE: the sequence of the values in the list L is as follows:
+L[1] of type int: 0 if I stands for finitely generated regular ideal, 1 otherwise
+L[2] of type int: 0 if univariate Hilbert series is to be computed, 1 otherwise (e.g. for multi-graded Hilbert series)
+L[3] of type int: the truncation degree for truncated Hilbert series (if >2 value is given)
+L[4] of type string: if nonempty, then the details about the orbit computations will be printed.
 EXAMPLE: example fpahilb; shows an example "
 {
     if (!isFreeAlgebra(basering))
@@ -164,25 +159,28 @@ EXAMPLE: example fpahilb; shows an example "
         // system call : HilbertSeries_OrbitData: sharwan need to change it as well...
         //(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp, int trunDegHs)
 
-    "Debug: nc hilb is called with with lV="+string(lV)+", ig="+string(ig)+", mgrad="+string(mgrad)+", tdeg="+string(tdeg);
+    //"Debug: nc hilb is called with with lV="+string(lV)+", ig="+string(ig)+", mgrad="+string(mgrad)+", tdeg="+string(tdeg);
     if(odp == "")
     {
-      system("nc_hilb", J_lm, lV, ig, mgrad,tdeg);
+      //system("nc_hilb", J_lm, lV, ig, mgrad,tdeg);
+      system("nc_hilb", J_lm, L[1], L[2], L[3]); //  or even better with the list L!!!
     }
     else
     {
-      system("nc_hilb", J_lm, lV, ig, mgrad,tdeg, odp);
+      system("nc_hilb", J_lm, L[1], L[2], L[3], L[4]); // the final part: only one call without if-else will be made
     }
 }
-
 example
 {
 "EXAMPLE:"; echo = 2;
   ring r=0,(X,Y,Z),dp;
   def R = makeLetterplaceRing(4); setring R;
   ideal I = Y*Z, Y*Z*X, Y*Z*Z*X, Y*Z*Z*Z*X;
-  fpahilb(I,3,"p");
+  list L = 0, 0, 3, ""; // ie finitely generated, univariate HS, truncated up to degree 3, no printing
+  fpahilb(I, L);
 }
+/* VERY NEW PART HERE (ABOVE) !*/
+
 
 /*
 // // examples
@@ -217,15 +215,19 @@ example
     nchilb(l3,5); // new vl: usual HS
     nchilb(l3,5,2);//third argument '2' is to compute multi-graded HS
 // ** TEST 3: NEW
-  LIB "./ncHilb.lib";
+  LIB "ncHilb.lib";
   ring r=0,(a,b),dp;
-  def R2 = makeLetterplaceRing(8); setring R2; // tdeg=5 => dgb = 2*4=8
+  def R2 = freeAlgebra(r,8); setring R2; // tdeg=5 => dgb = 2*4=8
   ideal I = a*a*a, a*b*b, a*a*b;
   fpahilb(I,4,"p");//fpahilb(I,5,"p");
   //nchilb(l3,5);// no third argument '2' = to compute the usual HS
   fpahilb(I,5,2,"p");
   //nchilb(l3,5,2);//third argument '2' is to compute multi-graded HS
 
+       //(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp, int trunDegHs)
+//system("nc_hilb", J_lm, lV, ig, mgrad,tdeg,trunDegHs);
+system("nc_hilb", I, 2, 0, 0, 0, 0); // ok
+system("nc_hilb", I, 2, 0, 2, 0, 0); // ok
 
 */
 
@@ -376,7 +378,6 @@ Hilbert series:
 static proc boo()
 {
 // very different input; long example
-  LIB "./ncHilb.lib";
   ring r2=0,(x,y,z),dp;
   def R2 = makeLetterplaceRing(10); setring R2; // tdeg=6 => dgb = 2*5=10
   ideal I = y*z-z*y, x*z*x-z*x*z, x*z^2*x*z-z*x*z^2*x, x*z^3*x*z-z*x*z^2*x^2;
@@ -392,65 +393,57 @@ static proc boo()
 
 
 // overhauled by VL, seem to work fine
-static proc rcolon_new(ideal I, poly W)
-"USAGE:  rcolon(I,w); ideal I, poly w
-RETURNS: ideal
-ASSUME: - basering is a Letterplace ring
-- I is a monomial ideal
-- w is a monomial
-PURPOSE: compute a right colon ideal of I by a monomial w
-NOTE: Output is the set of generators, which should be added to I
-EXAMPLE: example rcolon; shows an example"
-{
-    int lV =  lpVarBlockSize(R); //nvars(save);
-    if (lV == 0)
-    {
-      ERROR("Basering must be a Letterplace ring");
-    }
-    // test whether degree bound == 2*maxdeg(elts of the ideal)
-    int maxdegI = 0;
-    int i;
-    for(i=1; i<=ncols(I); i++)
-    {
-        I[i]=leadmonom(I[i]);
-        if ( deg(I[i]) > maxdegI )
-        {
-          maxdegI = deg(I[i]);
-        }
-    }
-    int degbnd = lpDegBound(R);
-    if ( 2*maxdegI != degbnd)
-    {
-      ERROR("Degree bound on the basering should be precisely "+ string(2*maxdegI));
-    }
-    poly wc = leadmonom(W);
-    "Debug: rcolon is called with lV="+string(lV);
-    ideal J = system("rcolon", I, wc, lV);
-    // VL: printlevel here? before only printing was there, no output
-    return(J);
- }
-example
-{
-"EXAMPLE:"; echo = 2;
-  ring r=0,(X,Y,Z),dp;
-  def R = makeLetterplaceRing(10); setring R;
-  ideal I = Y*Z, Y*Z*X, Y*Z*Z*X, Y*Z*Z*Z*X;
-  //, Y*Z*Z*Z*Z*X, Y*Z*Z*Z*Z*Z*X, Y*Z*Z*Z*Z*Z*Z*X, Y*Z*Z*Z*Z*Z*Z*Z*X;
-  poly w = Y;
-  ideal J = rcolon_new(I,w);
-  J; // new generators, which need to be added to I
-  rcolon_new(I,Y*Z);
-}
-/*
-// second example, original
-  ring r=0,(X,Y,Z),dp;
-  def R = makeLetterplaceRing(20); setring R;
-  ideal I = Y*Z, Y*Z*X, Y*Z*Z*X, Y*Z*Z*Z*X, Y*Z*Z*Z*Z*X, Y*Z*Z*Z*Z*Z*X, Y*Z*Z*Z*Z*Z*Z*X, Y*Z*Z*Z*Z*Z*Z*Z*X;
-  poly w = Y;
-  ideal J = rcolon(I,w);
-  J; // new generators, which need to be added to I
-*/
-
+/* VERY NEW PART HERE !*/
+//static proc rcolon(ideal I, poly W)
+//"USAGE:  rcolon(I,w); ideal I, poly w
+//RETURNS: ideal
+//ASSUME: - basering is a Letterplace ring with degree bound
+//equal to 2*maximal degree of elements in I
+//- I is a monomial ideal
+//- w is a monomial
+//PURPOSE: compute a right colon ideal of I by a monomial w
+//NOTE: Output is the set of generators, which should be added to I
+//EXAMPLE: example rcolon; shows an example"
+//{
+//    int lV =  lpVarBlockSize(R); //nvars(save);
+//    if (lV == 0)
+//    {
+//      ERROR("Basering must be a Letterplace ring");
+//    }
+//    // test whether degree bound == 2*maxdeg(elts of the ideal)
+//    int maxdegI = 0;
+//    int i;
+//    for(i=1; i<=ncols(I); i++)
+//    {
+//        I[i]=leadmonom(I[i]);
+//        if ( deg(I[i]) > maxdegI )
+//        {
+//          maxdegI = deg(I[i]);
+//        }
+//    }
+//    int degbnd = lpDegBound(R);
+//    if ( 2*maxdegI != degbnd)
+//    {
+//      ERROR("Degree bound on the basering should be precisely "+ string(2*maxdegI));
+//    }
+//    poly wc = leadmonom(W);
+//    //"Debug: rcolon is called with lV="+string(lV);
+//    // VL: printlevel here? before only printing was there, no output
+//    ideal J = system("rcolon", I, wc, lV);
+//    return(J);
+// }
+//example
+//{
+//"EXAMPLE:"; echo = 2;
+//  ring r=0,(X,Y,Z),dp;
+//  def R = freeAlgebra(r,10); setring R;
+//  ideal I = Y*Z, Y*Z*X, Y*Z*Z*X, Y*Z*Z*Z*X;
+//  poly w = Y;
+//  ideal J = rcolon_new(I,w);
+//  J; // new generators, which need to be added to I
+//  rcolon_new(I,Y*Z); // 1 will be the result
+//  rcolon_new(I,X); // nothing to add
+//}
 
 // original version of the proc +
 // minor fixes by VL in the example: redefine ring excluded, binomial fixed

@@ -1079,8 +1079,20 @@ static void idPrepareStd(ideal s_temp, int k)
       //pGetCoeff(q)=nInpNeg(pGetCoeff(q));   //set q to -1
       pSetComp(q,k+1+j);
       pSetmComp(q);
-      while (pNext(p)) pIter(p);
-      pNext(p) = q;
+#ifdef HAVE_SHIFTBBA
+      // non multiplicative variable
+      if (rIsLPRing(currRing))
+      {
+        pSetExp(q, currRing->isLPring - currRing->LPncGenCount + j + 1, 1);
+        p_Setm(q, currRing);
+        s_temp->m[j] = pAdd(p, q);
+      }
+      else
+#endif
+      {
+        while (pNext(p)) pIter(p);
+        pNext(p) = q;
+      }
     }
   }
   s_temp->rank = k+IDELEMS(s_temp);
@@ -1853,16 +1865,9 @@ poly idMinor(matrix a, int ar, unsigned long which, ideal R)
   matrix tmp;
   poly p,q;
 
-  i = binom(a->rows(),ar);
-  j = binom(a->cols(),ar);
-
   rowchoise=(int *)omAlloc(ar*sizeof(int));
   colchoise=(int *)omAlloc(ar*sizeof(int));
-  // if ((i>512) || (j>512) || (i*j >512)) size=512;
-  // else size=i*j;
-  // result=idInit(size,1);
   tmp=mpNew(ar,ar);
-  // k = 0; /* the index in result*/
   curr = 0; /* index of current minor */
   idInitChoise(ar,1,a->rows(),&rowch,rowchoise);
   while (!rowch)
@@ -1888,16 +1893,16 @@ poly idMinor(matrix a, int ar, unsigned long which, ideal R)
             p = kNF(R,currRing->qideal,q);
             p_Delete(&q,currRing);
           }
-          /*delete the matrix tmp*/
-          for (i=1; i<=ar; i++)
-          {
-            for (j=1; j<=ar; j++) MATELEM(tmp,i,j) = NULL;
-          }
-          idDelete((ideal*)&tmp);
-          omFreeSize((ADDRESS)rowchoise,ar*sizeof(int));
-          omFreeSize((ADDRESS)colchoise,ar*sizeof(int));
-          return (p);
+	}
+        /*delete the matrix tmp*/
+        for (i=1; i<=ar; i++)
+        {
+          for (j=1; j<=ar; j++) MATELEM(tmp,i,j) = NULL;
         }
+        idDelete((ideal*)&tmp);
+        omFreeSize((ADDRESS)rowchoise,ar*sizeof(int));
+        omFreeSize((ADDRESS)colchoise,ar*sizeof(int));
+        return (p);
       }
       curr++;
       idGetNextChoise(ar,a->cols(),&colch,colchoise);
@@ -1921,11 +1926,10 @@ ideal idMinors(matrix a, int ar, ideal R)
 
   i = binom(a->rows(),ar);
   j = binom(a->cols(),ar);
+  size=i*j;
 
   rowchoise=(int *)omAlloc(ar*sizeof(int));
   colchoise=(int *)omAlloc(ar*sizeof(int));
-  if ((i>512) || (j>512) || (i*j >512)) size=512;
-  else size=i*j;
   result=idInit(size,1);
   tmp=mpNew(ar,ar);
   // k = 0; /* the index in result*/
@@ -1951,17 +1955,14 @@ ideal idMinors(matrix a, int ar, ideal R)
           p = kNF(R,currRing->qideal,q);
           p_Delete(&q,currRing);
         }
-        if (p!=NULL)
-        {
-          if (k>=size)
-          {
-            pEnlargeSet(&result->m,size,32);
-            size += 32;
-          }
-          result->m[k] = p;
-          k++;
-        }
       }
+      if (k>=size)
+      {
+        pEnlargeSet(&result->m,size,32);
+        size += 32;
+      }
+      result->m[k] = p;
+      k++;
       idGetNextChoise(ar,a->cols(),&colch,colchoise);
     }
     idGetNextChoise(ar,a->rows(),&rowch,rowchoise);
@@ -2030,8 +2031,8 @@ ideal idMinors(matrix a, int ar, ideal R)
     id_Test( R, tmpR);
   }
 
-
-  ideal result = idInit(32,1);
+  int size=binom(r,ar)*binom(c,ar);
+  ideal result = idInit(size,1);
 
   int elems = 0;
 
@@ -2046,7 +2047,6 @@ ideal idMinors(matrix a, int ar, ideal R)
 
   if (R!=NULL) id_Delete(&R,tmpR);
 
-  idSkipZeroes(result);
   rChangeCurrRing(origR);
   result = idrMoveR(result,tmpR,origR);
   sm_KillModifiedRing(tmpR);
@@ -2328,7 +2328,10 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
   }
 
   idTest(s_temp);
+  unsigned save_opt=si_opt_1;
+  si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
   ideal s_temp1 = kStd(s_temp,currRing->qideal,hom,&wtmp,NULL,length);
+  si_opt_1=save_opt;
 
   //if (wtmp!=NULL)  Print("output weights:");wtmp->show(1);PrintLn();
   if ((w!=NULL) && (*w !=NULL) && (wtmp!=NULL))

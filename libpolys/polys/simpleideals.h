@@ -59,6 +59,7 @@ EXTERN_VAR omBin sip_sideal_bin;
 
 /// creates an ideal / module
 ideal idInit (int size, int rank=1);
+#define id_Init(s,r,R) idInit(s,r)
 
 /*- deletes an ideal -*/
 void id_Delete (ideal* h, ring r);
@@ -68,6 +69,8 @@ void idSkipZeroes (ideal ide);
 
 /// number of non-zero polys in F
 int     idElem(const ideal F);
+#define id_Elem(F,R) idElem(F)
+
 /// normialize all polys in id
 void    id_Normalize(ideal id, const ring r);
 

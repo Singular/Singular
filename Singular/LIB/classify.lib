@@ -159,7 +159,7 @@ static proc Klassifiziere (poly f)
   }
   @ringdisplay = "setring RingB;";
   if(defined(RingB)!=0) { kill RingB; }
-  execute ("ring RingB="+charstr(basering)+",("+A_Z("x", n)+"),(c,ds);");
+  ring RingB = create_ring(ringlist(basering)[1], "("+A_Z("x", n)+")", "(c,ds)", "no_minpoly");
   export RingB;
   setring ring_top;
 

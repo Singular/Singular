@@ -1081,8 +1081,6 @@ EXAMPLE: example subrInterred; shows an example
   }
   itemp=simplify(itemp,10);
   def r=basering;
-  string tempstr="ring rtemp=" + charstr(basering) + ",(" + string(itemp)
-                               + "),(C,dp);";
 //-----------------------------------------------------------------------
 // express m in terms of the generators of mon and check whether m
 // can be considered as a submodule of k[t_1,..,t_n]*mon
@@ -1115,7 +1113,7 @@ EXAMPLE: example subrInterred; shows an example
 //----------------------------------------------------------------------
 // do the interreduction and convert back
 //----------------------------------------------------------------------
-  execute(tempstr);
+  ring rtemp = create_ring(ringlist(basering)[1], "(" + string(itemp)+ ")", "(C,dp)", "no_minpoly");
   def motemp=imap(r,motemp);
   intvec save=option(get);
   option(redSB);

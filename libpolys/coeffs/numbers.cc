@@ -25,6 +25,7 @@
 #include "coeffs/ffields.h"
 #include "coeffs/shortfl.h"
 #include "coeffs/ntupel.h"
+#include "coeffs/flintcf_Qrat.h"
 
 #ifdef HAVE_RINGS
 #include "coeffs/rmodulo2m.h"
@@ -340,6 +341,7 @@ VAR cfInitCharProc nInitCharTableDefault[]=
  NULL,         /* n_Znm */
  NULL,         /* n_Z2m */
  #endif
+ flintQrat_InitChar, /* n_FlintQrat */
  NULL         /* n_CF */
 };
 

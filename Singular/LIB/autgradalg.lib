@@ -1242,8 +1242,17 @@ static proc createAutMatrix(list BL)
     QS[1..nrows(Q),l] = Q[1..nrows(Q),l];
   }
 
-  string Sstr = "ring S = (" + charstr(basering) + "),(T(1..n0), Y(1..n0*n)),dp;";
-  execute(Sstr); // creates the ring 0,(T(1..n0), Y(1..n0*n)),dp;
+  int ii;
+  list l3;
+  for (ii = 1; ii <= n0; ii++)
+  {
+   l3[ii] = "T("+string(ii)+")"; 
+  }
+  for (ii = 1; ii <= n0*n; ii++)
+  {
+   l3[n0+ii] = "Y("+string(ii)+")";
+  }
+  ring S = create_ring(ringlist(basering)[1], l3, "dp("+string(n0+n0*n)+")", "no_minpoly");
   setring S;
   setBaseMultigrading(QS);
 
@@ -1787,8 +1796,18 @@ static proc getFullRingS(intmat Q, int n0, int n1){
     QS[1..nrows(Q),l] = Q[1..nrows(Q),l];
   }
 
-  string Sstr = "ring S = (" + charstr(basering) + "),(T(1..n0), Y(1..n1),Z),(dp(n0+n1),dp(1));";
-  execute(Sstr);
+  int ii;
+  list l4;
+  for (ii = 1; ii <= n0; ii++)
+  {
+   l4[ii] = "T("+string(ii)+")"; 
+  }
+  for (ii = 1; ii <= n1; ii++)
+  {
+   l4[n0+ii] = "Y("+string(ii)+")";
+  }
+  l4[size(l4)+1] = "Z";
+  ring S = create_ring(ringlist(basering)[1], l4, "(dp("+string(n0+n1)+"),dp(1))", "no_minpoly");
   setring S;
   setBaseMultigrading(QS);
 
@@ -3034,8 +3053,12 @@ EXAMPLE: example autX; shows an example
     kill v;
   }
 
-  string Sstr = "ring S = (" + charstr(RR) + "),(T(1..size(V))),dp;";
-  execute(Sstr); // creates the ring 0,(T(1..size(V))),dp;
+  list l5;
+  for (int ii = 1; ii <= size(V); ii++)
+  {
+   l5[ii] = "T("+string(ii)+")"; 
+  }
+  ring S = create_ring(ringlist(RR)[1], l5, "dp", "no_minpoly");
   setring S;
   setring RR;
 

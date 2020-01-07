@@ -1,4 +1,4 @@
-1 >> tst_memory_0 :: 1355525762:3150:3-1-5:x86_64-Linux:snork:184440
-1 >> tst_memory_1 :: 1355525762:3150:3-1-5:x86_64-Linux:snork:2240216
-1 >> tst_memory_2 :: 1355525762:3150:3-1-5:x86_64-Linux:snork:2273016
-1 >> tst_timer_1 :: 1355525762:3150:3-1-5:x86_64-Linux:snork:3
+1 >> tst_memory_0 :: 1572884108:4122, 64 bit:4.1.2:x86_64-Linux:nepomuck:84408
+1 >> tst_memory_1 :: 1572884108:4122, 64 bit:4.1.2:x86_64-Linux:nepomuck:2150192
+1 >> tst_memory_2 :: 1572884108:4122, 64 bit:4.1.2:x86_64-Linux:nepomuck:2191296
+1 >> tst_timer_1 :: 1572884108:4122, 64 bit:4.1.2:x86_64-Linux:nepomuck:5

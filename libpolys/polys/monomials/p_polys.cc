@@ -42,6 +42,10 @@
 #include "nc/sca.h"
 #endif
 
+#ifdef HAVE_SHIFTBBA
+#include "polys/shiftop.h"
+#endif
+
 #include "clapsing.h"
 
 /*
@@ -3098,12 +3102,13 @@ void p_ProjectiveUnique(poly ph, const ring r)
   if( ph == NULL )
     return;
 
-  assume( r != NULL ); assume( r->cf != NULL ); const coeffs C = r->cf;
+  assume( r != NULL ); assume( r->cf != NULL );
+  const coeffs C = r->cf;
 
   number h;
   poly p;
 
-  if (rField_is_Ring(r))
+  if (nCoeff_is_Ring(C))
   {
     p_ContentForGB(ph,r);
     if(!n_GreaterZero(pGetCoeff(ph),C)) ph = p_Neg(ph,r);
@@ -3111,7 +3116,7 @@ void p_ProjectiveUnique(poly ph, const ring r)
     return;
   }
 
-  if (rField_is_Zp(r) && TEST_OPT_INTSTRATEGY)
+  if (nCoeff_is_Zp(C) && TEST_OPT_INTSTRATEGY)
   {
     assume( n_GreaterZero(pGetCoeff(ph),C) );
     if(!n_GreaterZero(pGetCoeff(ph),C)) ph = p_Neg(ph,r);
@@ -3129,7 +3134,7 @@ void p_ProjectiveUnique(poly ph, const ring r)
 
   assume(pNext(p)!=NULL);
 
-  if(!rField_is_Q(r) && !nCoeff_is_transExt(C))
+  if(!nCoeff_is_Q(C) && !nCoeff_is_transExt(C))
   {
     h = p_GetCoeff(p, C);
     number hInv = n_Invers(h, C);
@@ -3880,6 +3885,16 @@ static poly p_Subst0(poly p, int n, const ring r)
 */
 poly p_Subst(poly p, int n, poly e, const ring r)
 {
+#ifdef HAVE_SHIFTBBA
+  // also don't even use p_Subst0 for Letterplace
+  if (rIsLPRing(r))
+  {
+    poly subst = p_LPSubst(p, n, e, r);
+    p_Delete(&p, r);
+    return subst;
+  }
+#endif
+
   if (e == NULL) return p_Subst0(p, n,r);
 
   if (p_IsConstant(e,r))

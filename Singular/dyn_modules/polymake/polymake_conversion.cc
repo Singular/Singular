@@ -1,6 +1,9 @@
 #include "kernel/mod2.h"
 
 #ifdef HAVE_POLYMAKE
+#ifndef POLYMAKE_VERSION
+#define POLYMAKE_VERSION POLYMAKEVERSION
+#endif
 
 #include <gmpxx.h>
 
@@ -403,7 +406,11 @@ gfan::ZFan* PmFan2ZFan (polymake::perl::Object* pf)
     int n = pf->give("N_MAXIMAL_CONES");
     for (int i=0; i<n; i++)
     {
+      #if (POLYMAKE_VERSION >= 305)
+      polymake::perl::Object pmcone=pf->call_method("cone",i);
+      #else
       polymake::perl::Object pmcone=pf->CallPolymakeMethod("cone",i);
+      #endif
       gfan::ZCone* zc=PmCone2ZCone(&pmcone);
       zf->insert(*zc);
     }

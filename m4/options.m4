@@ -334,6 +334,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
   bi_gitfan=false
   bi_interval=false
   bi_systhreads=false
+  bi_loctriv=false
 
 
  if test -z "$with_builtinmodules"; then
@@ -372,6 +373,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
        gitfan ) bi_gitfan=true ;;
        interval ) bi_interval=true ;;
        systhreads ) bi_systhreads=true;;
+       loctriv ) bi_loctriv=true;;
       esac
 
 ###### In case of out-of tree building: the build dir is empty in configure time!!!
@@ -414,6 +416,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
  AM_CONDITIONAL([SI_BUILTIN_GITFAN], [test x$bi_gitfan = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_INTERVAL], [test x$bi_interval = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_SYSTHREADS], [test x$bi_systhreads = xtrue])
+ AM_CONDITIONAL([SI_BUILTIN_LOCTRIV], [test x$bi_loctriv = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_MACHINELEARNING], [test x$bi_machinelearning = xtrue])
 
  AC_MSG_CHECKING([BUILTIN_LIBS...])

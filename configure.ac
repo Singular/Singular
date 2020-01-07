@@ -135,7 +135,6 @@ AX_PYTHON_WITH_VERSION([2.4])
 LB_CHECK_MATHICGB
 
 AC_FUNC_ERROR_AT_LINE
-AC_FUNC_MALLOC
 
 # check for cpu properties
 AC_CHECK_SIZEOF(long,4)
@@ -152,6 +151,7 @@ SING_USE_FACTORY()
 
 SING_CHECK_P_PROCS
 SING_CHECK_READLINE
+
 SING_CHECK_DBM
 
 SING_CHECK_GFANLIB
@@ -295,6 +295,7 @@ AC_CONFIG_FILES([Singular/dyn_modules/gitfan/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/interval/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/cohomo/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/systhreads/Makefile])
+AC_CONFIG_FILES([Singular/dyn_modules/loctriv/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/machinelearning/Makefile])
 
 AC_CONFIG_FILES([Singular/Makefile])

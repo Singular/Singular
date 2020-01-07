@@ -820,8 +820,8 @@ RETURN:  a list of ideals I(1),...,I(t) such that
   ideal J = eliminate(I,f);
   def base = basering;
   j = j[1,size(j)-1];
-  j = "ring @r = (" + charstr(basering) + "),(" + j + "),(" + ordstr(basering) + ");";
-  execute(j);
+  j;
+  ring @r = create_ring(ringlist(basering)[1], (" + j + "), "(" + ordstr(basering) + ")", "no_minpoly");
   ideal J = imap(base,J);
 
   //...and compute the associated primes of the zero-dimensional ideal J.
@@ -1043,7 +1043,7 @@ EXAMPLE: example AssEHV; shows an example"
               {
                 l2[i] = "x("+string(ii)+")";
               }
-              l2[n+1] = "t";
+              l2[size(l2)+1] = "t";
               ring newR = create_ring(ringlist(base)[1], l2, "dp", "no_minpoly");
               ideal homoK = fetch(homoR,homoJ);
               homoK = homog(homoK,t);

@@ -21,10 +21,8 @@
 #include "factory/factory.h"
 #include "coeffs/si_gmp.h"
 #include "coeffs/coeffs.h"
-#include "coeffs/OPAE.h"
-#include "coeffs/OPAEQ.h"
-#include "coeffs/OPAEp.h"
 #include "coeffs/flintcf_Q.h"
+#include "coeffs/flintcf_Qrat.h"
 #include "coeffs/flintcf_Zn.h"
 #include "coeffs/rmodulon.h"
 #include "polys/ext_fields/algext.h"
@@ -1201,26 +1199,10 @@ extern "C"
   }
 }
 
-#ifdef SINGULAR_4_2
-STATIC_VAR n_coeffType n_pAE=n_unknown;
-static BOOLEAN ii_pAE_init(leftv res,leftv a)
-{
-  if (a->Typ()!=INT_CMD)
-  {
-    WerrorS("`int` expected");
-    return TRUE;
-  }
-  else
-  {
-    res->rtyp=CRING_CMD;
-    res->data=(void*)nInitChar(n_pAE,(void*)a->Data());
-    return FALSE;
-  }
-}
-#endif
 #ifdef HAVE_FLINT
 STATIC_VAR n_coeffType n_FlintZn=n_unknown;
 STATIC_VAR n_coeffType n_FlintQ=n_unknown;
+//STATIC_VAR n_coeffType n_FlintQrat=n_unknown;
 static BOOLEAN ii_FlintZn_init(leftv res,leftv a)
 {
   const short t[]={2,INT_CMD,STRING_CMD};
@@ -1248,6 +1230,38 @@ static BOOLEAN ii_FlintQ_init(leftv res,leftv a)
   }
   return TRUE;
 }
+#if __FLINT_RELEASE >= 20503
+static BOOLEAN ii_FlintQrat_init(leftv res,leftv a)
+{
+  if (a==NULL)
+  {
+    WerrorS("at least one name required");
+    return TRUE;
+  }
+  QaInfo par;
+  #ifdef QA_DEBUG
+  par.C=r->cf;
+  a=a->next;
+  #endif
+  par.N=a->listLength();
+  par.names=(char**)omAlloc(par.N*sizeof(char*));
+  int i=0;
+  while(a!=NULL)
+  {
+    par.names[i]=omStrDup(a->Name());
+    i++;
+    a=a->next;
+  }
+  res->rtyp=CRING_CMD;
+  res->data=(void*)nInitChar(n_FlintQrat,&par);
+  for(i=par.N-1;i>=0;i--)
+  {
+    omFree(par.names[i]);
+  }
+  omFreeSize(par.names,par.N*sizeof(char*));
+  return FALSE;
+}
+#endif
 #endif
 
 static BOOLEAN iiFloat(leftv res, leftv pnn)
@@ -1410,33 +1424,17 @@ void siInit(char *name)
     //IDDATA(h)=(char*)nInitChar(n_R,NULL);
     //h=enterid("CC",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
     //IDDATA(h)=(char*)nInitChar(n_long_C,NULL);
-#ifdef SINGULAR_4_2
-    n_coeffType t;
-    t=nRegister(n_unknown,n_AEInitChar);
-    if (t!=n_unknown)
-    {
-      h=enterid("AE",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
-      IDDATA(h)=(char*)nInitChar(t,NULL);
-    }
-    t=nRegister(n_unknown,n_QAEInitChar);
-    if (t!=n_unknown)
-    {
-      h=enterid("QAE",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
-      IDDATA(h)=(char*)nInitChar(t,NULL);
-    }
-    n_pAE=nRegister(n_unknown,n_pAEInitChar);
-    if (n_pAE!=n_unknown)
-    {
-      iiAddCproc("kernel","pAE",FALSE,ii_pAE_init);
-    }
-#endif
     #ifdef HAVE_FLINT
     n_FlintQ=nRegister(n_unknown,flintQ_InitChar);
     if (n_FlintQ!=n_unknown)
     {
-      iiAddCproc("kernel","flintQ",FALSE,ii_FlintQ_init);
+      iiAddCproc("kernel","flintQp",FALSE,ii_FlintQ_init);
       nRegisterCfByName(flintQInitCfByName,n_FlintQ);
     }
+#if __FLINT_RELEASE >= 20503
+    iiAddCproc("kernel","flintQ",FALSE,ii_FlintQrat_init);
+    nRegisterCfByName(flintQInitCfByName,n_FlintQ);
+#endif
     n_FlintZn=nRegister(n_unknown,flintZn_InitChar);
     if (n_FlintZn!=n_unknown)
     {

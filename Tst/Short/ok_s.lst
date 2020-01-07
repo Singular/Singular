@@ -2,6 +2,7 @@ arr
 abusalem
 branchTo
 bug_bucket
+bug_content
 bug_curvepar
 bug_ecart
 bug_mem_Z
@@ -146,5 +147,5 @@ combinat
 methods
 sets
 ssi_Z
-
+ssi_ringref
 

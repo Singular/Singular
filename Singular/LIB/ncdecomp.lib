@@ -279,9 +279,13 @@ EXAMPLE: example CenCharDec; shows examples
   dbprint(ppl-1, @JcapZ);
 // do not forget parameters of a basering!
 // hmmm: todo ringlist
-  string strZ="ring @@Z=("+charstr(@A)+"),(@z(1.."+string(sZ)+")),dp;";
-//  print(strZ);
-  execute(strZ);
+  list l1;
+  for (int zz = 1; zz<= sZ; zz++)
+  {
+   l1[zz] = "@z("+string(zz)+")";
+  }
+  setring(@A);
+  ring @@Z = create_ring(ringlist(@A)[1], l1, "dp", "no_minpoly");
   setring @@Z;
   ideal @JcapZ = imap(@ZplusA,@JcapZ);
   dbprint(ppl,"// -1-3- starting the cosmetic Groebner basis in Z");
@@ -431,12 +435,12 @@ EXAMPLE: example IntersectWithSub; shows an example
   // main action
   def B = basering;
   setring B;
-  string s1,s2;
-  // todo: make ringlist from it!
-  s1 = "ring @Z = (";
-  s2 = s1 + charstr(basering) + "),(z(1.." + string(nz)+")),Dp";
-  //  s2;
-  execute(s2);
+  list l2;
+  for (int zz = 1; zz<= nz; zz++)
+  {
+   l2[zz] = "z("+string(zz)+")";
+  }
+  ring @Z = create_ring(ringlist(basering)[1], l2, "Dp", "no_minpoly");
   setring B;
   map F = @Z,Z;
   setring @Z;

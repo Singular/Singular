@@ -55,28 +55,7 @@ else
   GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
 fi
 
-BACKUP_CFLAGS=${CFLAGS}
-BACKUP_LIBS=${LIBS}
-
-for GMP_HOME in ${GMP_HOME_PATH}
-do
-  if test "x$GMP_HOME" != "x/usr"; then
-    GMP_CPPFLAGS="-I${GMP_HOME}/include"
-    GMP_LIBS="-L${GMP_HOME}/lib -Wl,-rpath -Wl,${GMP_HOME}/lib -lgmp"
-  else
-    GMP_CPPFLAGS=""
-    GMP_LIBS="-lgmp"
-  fi
-  CFLAGS="${BACKUP_CFLAGS} ${GMP_CPPFLAGS}"
-  LIBS="${BACKUP_LIBS} ${GMP_LIBS}"
-done
-AC_SUBST(GMP_CPPFLAGS)
-AC_SUBST(GMP_LIBS)
-
-AC_CHECK_HEADERS([gmp.h], ,[AC_MSG_ERROR([GNU MP not found])])
-AC_CHECK_LIB(gmp, __gmpz_init, , [AC_MSG_ERROR([GNU MP not found])])
-
-LB_CHECK_NTL(5.0,,AC_MSG_WARN([Unable to find NTL (which is strongly recommended) on your machine: please use --with-ntl=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
+dnl gmp, ntl check in factory
 LB_CHECK_FLINT(2.4,,AC_MSG_WARN([Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 
 SING_CHECK_JULIA
@@ -86,7 +65,6 @@ SING_CHECK_JULIA
 AC_FUNC_ERROR_AT_LINE
 AC_CHECK_FUNCS([memmove memset pow sqrt strchr setenv putenv])
 AC_FUNC_VPRINTF
-AC_FUNC_MALLOC
 AC_CHECK_FUNC([vsnprintf], [AC_DEFINE([HAVE_VSNPRINTF], [1], [Define if vsnprintf exists.])])
 
 # Checks for header files.

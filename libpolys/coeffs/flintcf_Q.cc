@@ -517,14 +517,14 @@ static CanonicalForm ConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs 
 char * CoeffName(const coeffs r)
 {
   STATIC_VAR char CoeffName_flint_Q[20];
-  sprintf(CoeffName_flint_Q,"flint:QQ[%s]",r->pParameterNames[0]);
+  sprintf(CoeffName_flint_Q,"flintQp[%s]",r->pParameterNames[0]);
   return (char*)CoeffName_flint_Q;
 
 }
 static char* CoeffString(const coeffs r)
 {
   char *buf=(char*)omAlloc(12+strlen(r->pParameterNames[0]));
-  sprintf(buf,"flintQ(\"%s\")",r->pParameterNames[0]);
+  sprintf(buf,"flintQp(\"%s\")",r->pParameterNames[0]);
   return buf;
 }
 static void CoeffWrite(const coeffs r, BOOLEAN details)
@@ -533,7 +533,7 @@ static void CoeffWrite(const coeffs r, BOOLEAN details)
 }
 coeffs flintQInitCfByName(char *s,n_coeffType n)
 {
-  const char start[]="flint:QQ[";
+  const char start[]="flintQp[";
   const int start_len=strlen(start);
   if (strncmp(s,start,start_len)==0)
   {

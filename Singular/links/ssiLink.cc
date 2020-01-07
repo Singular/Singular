@@ -74,7 +74,12 @@ BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
   //  Print("need to change the ring, currRing:%s, switch to: ssiRing%d\n",IDID(currRingHdl),nr);
   //  else
   //  Print("no ring, switch to ssiRing%d\n",nr);
-  if (!rEqual(r,currRing,1))
+  if (r==currRing)
+  {
+    r->ref++;
+    return TRUE;
+  }
+  else if (!rEqual(r,currRing,1))
   {
     char name[20];
     int nr=0;
@@ -87,12 +92,16 @@ BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
       {
         h=enterid(name,0,RING_CMD,&IDROOT,FALSE);
         IDRING(h)=r;
-        r->ref++;
+        r->ref=2; /*d->r and h */
         break;
       }
       else if ((IDTYP(h)==RING_CMD)
       && (rEqual(r,IDRING(h),1)))
-        break;
+      {
+        IDRING(h)->ref++;
+        rSetHdl(h);
+        return TRUE;
+      }
     }
     rSetHdl(h);
     return FALSE;
@@ -100,8 +109,37 @@ BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
   else
   {
     rKill(r);
+    currRing->ref++;
     return TRUE;
   }
+}
+void ssiCheckCurrRing(const ring r)
+{
+  if (r!=currRing)
+  {
+    char name[20];
+    int nr=0;
+    idhdl h=NULL;
+    loop
+    {
+      sprintf(name,"ssiRing%d",nr); nr++;
+      h=IDROOT->get(name, 0);
+      if (h==NULL)
+      {
+        h=enterid(name,0,RING_CMD,&IDROOT,FALSE);
+        IDRING(h)=r;
+        r->ref=2; /*d->r and h */
+        break;
+      }
+      else if ((IDTYP(h)==RING_CMD)
+      && (rEqual(r,IDRING(h),1)))
+      {
+        break;
+      }
+    }
+    rSetHdl(h);
+  }
+  assume(currRing==r);
 }
 // the implementation of the functions:
 void ssiWriteInt(const ssiInfo *d,const int i)
@@ -263,9 +301,10 @@ void ssiWriteRing(ssiInfo *d,const ring r)
   /* ch=-1: transext, coeff ring follows */
   /* ch=-2: algext, coeff ring and minpoly follows */
   /* ch=-3: cf name follows */
+  /* ch=-4: NULL */
   if ((r==NULL)||(r->cf==NULL))
   {
-    WerrorS("undefined ring");
+    fputs("-4 ",d->f_write);
     return;
   }
   if (r==currRing) // see recursive calls for transExt/algExt
@@ -452,19 +491,20 @@ number ssiReadBigInt(const ssiInfo *d)
   return n;
 }
 
-number ssiReadNumber(const ssiInfo *d)
+number ssiReadNumber(ssiInfo *d)
 {
-  if (currRing==NULL) ssiSetCurrRing(d->r);
   return ssiReadNumber_CF(d,d->r->cf);
 }
 
 ring ssiReadRing(const ssiInfo *d)
 {
 /* syntax is <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <Q-ideal> */
-  int ch, N,i;
-  char **names;
+  int ch;
   ch=s_readint(d->f_read);
-  N=s_readint(d->f_read);
+  if (ch==-4)
+    return NULL;
+  int N=s_readint(d->f_read);
+  char **names;
   coeffs cf=NULL;
   if (ch==-3)
   {
@@ -480,7 +520,7 @@ ring ssiReadRing(const ssiInfo *d)
   if (N!=0)
   {
     names=(char**)omAlloc(N*sizeof(char*));
-    for(i=0;i<N;i++)
+    for(int i=0;i<N;i++)
     {
       names[i]=ssiReadString(d);
     }
@@ -492,7 +532,7 @@ ring ssiReadRing(const ssiInfo *d)
   int *block0=(int *)omAlloc0((num_ord+1)*sizeof(int));
   int *block1=(int *)omAlloc0((num_ord+1)*sizeof(int));
   int **wvhdl=(int**)omAlloc0((num_ord+1)*sizeof(int*));
-  for(i=0;i<num_ord;i++)
+  for(int i=0;i<num_ord;i++)
   {
     ord[i]=(rRingOrder_t)s_readint(d->f_read);
     block0[i]=s_readint(d->f_read);
@@ -559,7 +599,7 @@ ring ssiReadRing(const ssiInfo *d)
     else
     {
       Werror("ssi: read unknown coeffs type (%d)",ch);
-      for(i=0;i<N;i++)
+      for(int i=0;i<N;i++)
       {
         omFree(names[i]);
       }
@@ -569,7 +609,7 @@ ring ssiReadRing(const ssiInfo *d)
     ideal q=ssiReadIdeal_R(d,r);
     if (IDELEMS(q)==0) omFreeBin(q,sip_sideal_bin);
     else r->qideal=q;
-    for(i=0;i<N;i++)
+    for(int i=0;i<N;i++)
     {
       omFree(names[i]);
     }
@@ -578,11 +618,11 @@ ring ssiReadRing(const ssiInfo *d)
   }
 }
 
-poly ssiReadPoly_R(const ssiInfo *D, const ring r)
+poly ssiReadPoly_R(const ssiInfo *d, const ring r)
 {
 // < # of terms> < term1> < .....
   int n,i,l;
-  n=ssiReadInt(D->f_read); // # of terms
+  n=ssiReadInt(d->f_read); // # of terms
   //Print("poly: terms:%d\n",n);
   poly p;
   poly ret=NULL;
@@ -591,14 +631,14 @@ poly ssiReadPoly_R(const ssiInfo *D, const ring r)
   {
 // coef,comp.exp1,..exp N
     p=p_Init(r,r->PolyBin);
-    pSetCoeff0(p,ssiReadNumber_CF(D,r->cf));
-    int d;
-    d=s_readint(D->f_read);
-    p_SetComp(p,d,r);
+    pSetCoeff0(p,ssiReadNumber_CF(d,r->cf));
+    int D;
+    D=s_readint(d->f_read);
+    p_SetComp(p,D,r);
     for(i=1;i<=rVar(r);i++)
     {
-      d=s_readint(D->f_read);
-      p_SetExp(p,i,d,r);
+      D=s_readint(d->f_read);
+      p_SetExp(p,i,D,r);
     }
     p_Setm(p,r);
     p_Test(p,r);
@@ -609,10 +649,9 @@ poly ssiReadPoly_R(const ssiInfo *D, const ring r)
  return ret;
 }
 
-poly ssiReadPoly(const ssiInfo *D)
+poly ssiReadPoly(ssiInfo *d)
 {
-  if (currRing==NULL) ssiSetCurrRing(D->r);
-  return ssiReadPoly_R(D,D->r);
+  return ssiReadPoly_R(d,d->r);
 }
 
 ideal ssiReadIdeal_R(const ssiInfo *d,const ring r)
@@ -629,13 +668,12 @@ ideal ssiReadIdeal_R(const ssiInfo *d,const ring r)
   return I;
 }
 
-ideal ssiReadIdeal(const ssiInfo *d)
+ideal ssiReadIdeal(ssiInfo *d)
 {
-  if (currRing==NULL) ssiSetCurrRing(d->r);
   return ssiReadIdeal_R(d,d->r);
 }
 
-matrix ssiReadMatrix(const ssiInfo *d)
+matrix ssiReadMatrix(ssiInfo *d)
 {
   int n,m;
   m=s_readint(d->f_read);
@@ -1337,6 +1375,8 @@ leftv ssiRead1(si_link l)
            res->data=(char *)ssiReadString(d);
            break;
     case 3:res->rtyp=NUMBER_CMD;
+           if (d->r==NULL) goto no_ring;
+           ssiCheckCurrRing(d->r);
            res->data=(char *)ssiReadNumber(d);
            break;
     case 4:res->rtyp=BIGINT_CMD;
@@ -1345,13 +1385,13 @@ leftv ssiRead1(si_link l)
     case 15:
     case 5:{
              d->r=ssiReadRing(d);
-             if (d->r==NULL) return NULL;
+             if (errorreported) return NULL;
              res->data=(char*)d->r;
-             d->r->ref++;
+             if (d->r!=NULL) d->r->ref++;
              res->rtyp=RING_CMD;
              if (t==15) // setring
              {
-               if(ssiSetCurrRing(d->r)) { d->r=currRing; d->r->ref++; }
+               if(ssiSetCurrRing(d->r)) { d->r=currRing; }
                omFreeBin(res,sleftv_bin);
                return ssiRead1(l);
              }
@@ -1359,24 +1399,29 @@ leftv ssiRead1(si_link l)
            break;
     case 6:res->rtyp=POLY_CMD;
            if (d->r==NULL) goto no_ring;
+           ssiCheckCurrRing(d->r);
            res->data=(char*)ssiReadPoly(d);
            break;
     case 7:res->rtyp=IDEAL_CMD;
            if (d->r==NULL) goto no_ring;
+           ssiCheckCurrRing(d->r);
            res->data=(char*)ssiReadIdeal(d);
            break;
     case 8:res->rtyp=MATRIX_CMD;
            if (d->r==NULL) goto no_ring;
+           ssiCheckCurrRing(d->r);
            res->data=(char*)ssiReadMatrix(d);
            break;
     case 9:res->rtyp=VECTOR_CMD;
            if (d->r==NULL) goto no_ring;
+           ssiCheckCurrRing(d->r);
            res->data=(char*)ssiReadPoly(d);
            break;
     case 10:
     case 22:if (t==22) res->rtyp=SMATRIX_CMD;
            else        res->rtyp=MODUL_CMD;
            if (d->r==NULL) goto no_ring;
+           ssiCheckCurrRing(d->r);
            {
              int rk=s_readint(d->f_read);
              ideal M=ssiReadIdeal(d);

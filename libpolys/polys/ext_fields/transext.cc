@@ -1624,6 +1624,13 @@ static void ntNormalize (number &a, const coeffs cf)
   ntTest(a); // !!!!
 }
 
+static number ntExactDiv(number a, number b, const coeffs cf)
+{
+  number r=ntDiv(a,b,cf);
+  ntNormalize(r,cf);
+  return r;
+}
+
 /* expects *param to be castable to TransExtInfo */
 static BOOLEAN ntCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
 {
@@ -2072,8 +2079,6 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
 {
   /* dst is expected to be a rational function field */
   assume(getCoeffType(dst) == n_transExt);
-
-  if( src == dst ) return ndCopyMap;
 
   int h = 0; /* the height of the extension tower given by dst */
   coeffs bDst = nCoeff_bottom(dst, h); /* the bottom field in the tower dst */
@@ -2557,7 +2562,7 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->cfSub          = ntSub;
   cf->cfMult         = ntMult;
   cf->cfDiv          = ntDiv;
-  cf->cfExactDiv     = ntDiv;
+  cf->cfExactDiv     = ntExactDiv;
   cf->cfPower        = ntPower;
   cf->cfCopy         = ntCopy;
   cf->cfWriteLong    = ntWriteLong;

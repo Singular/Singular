@@ -92,6 +92,24 @@ number convFlintNSingN (fmpq_t f, const coeffs cf)
 #endif
 }
 
+number convFlintNSingN (fmpz_t f, const coeffs cf)
+{
+#if __FLINT_RELEASE > 20502
+  number z;
+  mpz_t a;
+  mpz_init(a);
+  fmpz_get_mpz(a,f);
+  z=n_InitMPZ(a,cf);
+  mpz_clear(a);
+  n_Normalize(z,cf);
+  n_Test(z,cf);
+  return z;
+#else
+  WerrorS("not implemented");
+  return NULL;
+#endif
+}
+
 number convFlintNSingN_QQ (fmpq_t f, const coeffs cf)
 {
 #if __FLINT_RELEASE > 20502

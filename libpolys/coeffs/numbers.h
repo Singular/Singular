@@ -62,7 +62,6 @@
 // void ndDelete(number* d, const coeffs r);
 number ndGcd(number a, number b, const coeffs);
 // number ndCopy(number a, const coeffs r);
-number ndCopyMap(number a, const coeffs src, const coeffs dst);
 // int ndSize(number a, const coeffs r);
 // number ndGetDenom(number &n, const coeffs r);
 // number ndGetNumerator(number &a,const coeffs r);

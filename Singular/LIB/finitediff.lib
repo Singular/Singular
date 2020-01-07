@@ -188,12 +188,11 @@ static proc pos(string D,list L)
 static proc re(list L)
 {
   def n=size(L);
-  int j;
+  int j; string s;
   for(j=1;j<=n;j++)
   {
-    string s="string "+print(L[j],"%s")+"="+"nameof("+print(L[j],"%s")+")"+";";
+    s="string "+print(L[j],"%s")+"="+"nameof("+print(L[j],"%s")+")"+";";
     execute(s);
-    kill s;
     exportto(Top,`L[j]`);
   }
 }

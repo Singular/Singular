@@ -594,11 +594,12 @@ char* LPExpVString(int *expV, ring ri)
 
 // splits a frame (e.g. x(1)*y(5)) m1 into m1 and m2 (e.g. m1=x(1) and m2=y(1))
 // according to p which is inside the frame
+// at is the number of the block, starting at 1
 void k_SplitFrame(poly &m1, poly &m2, int at, const ring r)
 {
   int lV = r->isLPring;
 
-  number m1Coeff = pGetCoeff(m1);
+  number m1Coeff = n_Copy(pGetCoeff(m1), r->cf); // important to copy
 
   int hole = lV * at;
   m2 = p_GetExp_k_n(m1, 1, hole, r);
@@ -792,6 +793,71 @@ poly p_LPVarAt(poly p, int pos, const ring r)
     }
   }
   return v;
+}
+
+
+/*
+* substitute the n-th variable by e in m
+* does not destroy m
+*/
+poly p_mLPSubst(poly m, int n, poly e, const ring r)
+{
+  assume(p_GetComp(e, r) == 0);
+  if (m == NULL) return NULL;
+
+  int lV = r->isLPring;
+  int degbound = r->N/lV;
+
+  poly result = p_One(r);
+  poly remaining = p_Head(m, r);
+  p_SetComp(result, p_GetComp(remaining, r), r);
+  p_SetComp(remaining, 0, r);
+  for (int i = 0; i < degbound; i++)
+  {
+    int var = n + lV*i;
+    if (p_GetExp(remaining, var, r)) {
+      if (e == NULL) {
+        p_Delete(&result, r);
+        result = NULL;
+        break;
+      }
+      int startOfBlock = 1 + lV*i;
+      int endOfBlock = lV*(i+1);
+
+      poly left = p_GetExp_k_n(remaining, startOfBlock, r->N, r);
+      p_SetCoeff(left, n_Copy(p_GetCoeff(remaining, r), r->cf), r);
+      p_mLPunshift(left, r);
+
+      poly right = p_GetExp_k_n(remaining, 1, endOfBlock, r);
+      p_Delete(&remaining, r);
+      remaining = right;
+
+      left = p_Mult_q(left, p_Copy(e, r), r);
+      result = p_Mult_q(result, left, r);
+    }
+  }
+  if (result == NULL) {
+    return NULL;
+  } else {
+    p_mLPunshift(remaining, r);
+    return p_Mult_q(result, remaining, r);
+  }
+}
+
+/*
+* also see p_Subst()
+* substitute the n-th variable by e in p
+* does not destroy p
+*/
+poly p_LPSubst(poly p, int n, poly e, const ring r)
+{
+  poly res = NULL;
+  while (p!=NULL)
+  {
+    res = p_Add_q(res, p_mLPSubst(p, n, e, r), r);
+    pIter(p);
+  }
+  return res;
 }
 
 /// substitute weights from orderings a,wp,Wp
