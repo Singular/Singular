@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <readline/history.h>
 
 #include "kernel/mod2.h"
