@@ -1685,5 +1685,7 @@ BOOLEAN flintQrat_InitChar(coeffs cf, void * infoStruct)
 BOOLEAN flintQrat_InitChar(coeffs cf, void * infoStruct)
 { return TRUE; }
 #endif
-
+#else
+BOOLEAN flintQrat_InitChar(coeffs cf, void * infoStruct)
+{ return TRUE; }
 #endif
