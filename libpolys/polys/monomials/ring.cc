@@ -3862,10 +3862,30 @@ static void rCheckOrdSgn(ring r,int b/*last block*/)
           }
           else
           {
-            // very bad:
-            nonpos++;
-            nonneg++;
-            found=1;
+            // very bad: try next row(s)
+            int add=r->block1[j]-r->block0[j]+1;
+            int max_i=r->block0[j]+add*add-add-1;
+            while(found==0)
+            {
+              i+=add;
+              if (r->wvhdl[j][i-r->block0[j]]<0)
+              {
+                r->OrdSgn=-1;
+                nonpos++;
+                found=1;
+              }
+              else if(r->wvhdl[j][i-r->block0[j]]>0)
+              {
+                nonneg++;
+                found=1;
+              }
+              else if(i>max_i)
+              {
+                nonpos++;
+                nonneg++;
+                found=1;
+              }
+            }
           }
         }
         else if ((r->order[j]==ringorder_lp)
