@@ -3844,6 +3844,32 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+/* ====== maEvalAt ============================*/
+    if(strcmp(sys_cmd,"evaluate")==0)
+    {
+      extern number maEvalAt(const poly p,const number* pt, const ring r);
+      if (h->Typ()!=POLY_CMD)
+      {
+        WerrorS("expected system(\"evaluate\",<poly>,..)");
+	return TRUE;
+      }
+      poly p=(poly)h->Data();
+      number *pt=(number*)omAlloc(sizeof(number)*currRing->N);
+      for(int i=0;i<currRing->N;i++)
+      {
+        h=h->next;
+	if ((h==NULL)||(h->Typ()!=NUMBER_CMD))
+	{
+	  WerrorS("system(\"evaluate\",<poly>,<number>..) - expect number");
+	  return TRUE;
+	}
+	pt[i]=(number)h->Data();
+      }
+      res->data=maEvalAt(p,pt,currRing);
+      res->rtyp=NUMBER_CMD;
+      return FALSE;
+    }
+    else
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
