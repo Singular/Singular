@@ -65,10 +65,10 @@ matrix mp_Copy (matrix a, const ring r)
 {
   id_Test((ideal)a, r);
   poly t;
-  int i, m=MATROWS(a), n=MATCOLS(a);
+  int m=MATROWS(a), n=MATCOLS(a);
   matrix b = mpNew(m, n);
 
-  for (i=m*n-1; i>=0; i--)
+  for (long i=(long)m*(long)n-1; i>=0; i--)
   {
     t = a->m[i];
     if (t!=NULL)

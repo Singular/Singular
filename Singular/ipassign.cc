@@ -2053,11 +2053,11 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
     {
       sleftv t;
       matrix olm = (matrix)l->Data();
-      int rk;
+      long rk;
       char *pr=((map)olm)->preimage;
       BOOLEAN module_assign=(/*l->Typ()*/ lt==MODUL_CMD);
       matrix lm ;
-      int  num;
+      long  num;
       int j,k;
       int i=0;
       int mtyp=MATRIX_CMD; /*Type of left side object*/
@@ -2107,7 +2107,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
             }
             lm->m[i]=(poly)t.CopyD(etyp);
             pNormalize(lm->m[i]);
-            if (module_assign) rk=si_max(rk,(int)pMaxComp(lm->m[i]));
+            if (module_assign) rk=si_max(rk,pMaxComp(lm->m[i]));
             i++;
           }
           else
@@ -2122,11 +2122,11 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
             rm = (matrix)t.CopyD(mtyp);
             if (module_assign)
             {
-              j = si_min(num,rm->cols());
-              rk=si_max(rk,(int)rm->rank);
+              j = si_min((int)num,rm->cols());
+              rk=si_max(rk,rm->rank);
             }
             else
-              j = si_min(num-i,rm->rows() * rm->cols());
+              j = si_min(num-i,(long)rm->rows() * (long)rm->cols());
             for(k=0;k<j;k++,i++)
             {
               lm->m[i]=rm->m[k];
