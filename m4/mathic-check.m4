@@ -21,6 +21,8 @@ AC_DEFUN([LB_CHECK_MATHICGB],
     [AC_MSG_ERROR([Cannot find libmemtailor, which is required for MathicGB.])])
   AC_CHECK_LIB(mathic, libmathicIsPresent, [],
     [AC_MSG_ERROR([Cannot find libmathic, which is required for MathicGB.])])
+  AC_CHECK_LIB(tbb, libtbbIsPresent, [],
+    [])
   AC_CHECK_LIB(mathicgb, libmathicgbIsPresent, [],
     [AC_MSG_ERROR([Cannot find the MathicGB library.])])
   AC_CHECK_HEADER([mathicgb.h])
