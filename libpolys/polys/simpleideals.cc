@@ -1539,7 +1539,7 @@ ideal id_Jet(const ideal i,int d, const ring R)
   r->ncols = i-> ncols;
   //r->rank = i-> rank;
 
-  for(int k=(i->nrows)*(i->ncols)-1;k>=0; k--)
+  for(long k=((long)(i->nrows))*((long)(i->ncols))-1;k>=0; k--)
     r->m[k]=pp_Jet(i->m[k],d,R);
 
   return r;
