@@ -11,7 +11,7 @@
 #include "coeffs/coeffs.h"
 
 #ifdef HAVE_FLINT
-#include <flint/flint.h>
+#include "flint/flint.h"
 #if __FLINT_RELEASE >= 20503
 #include "factory/factory.h"
 
