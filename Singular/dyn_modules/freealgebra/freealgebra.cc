@@ -352,6 +352,11 @@ static int gkDim(const ideal _G)
       WerrorS("GK-Dim not implemented for modules");
       return -2;
     }
+    if (pGetNCGen(_G->m[i]) != 0)
+    {
+      WerrorS("GK-Dim not implemented for bi-modules");
+      return -2;
+    }
   }
 
   ideal G = id_Head(_G, currRing); // G = LM(G) (and copy)
