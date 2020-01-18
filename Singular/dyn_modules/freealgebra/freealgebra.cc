@@ -135,6 +135,7 @@ static BOOLEAN lpVarAt(leftv res, leftv h)
 
 static void _computeStandardWords(ideal words, int n, ideal M, int& last)
 {
+  // assume <M> != <1>
   if (n <= 0){
     words->m[0] = pOne();
     last = 0;
@@ -143,7 +144,7 @@ static void _computeStandardWords(ideal words, int n, ideal M, int& last)
 
   _computeStandardWords(words, n - 1, M, last);
 
-  int nVars = currRing->isLPring;
+  int nVars = currRing->isLPring - currRing->LPncGenCount;
 
   for (int j = nVars - 1; j >= 0; j--)
   {
@@ -157,7 +158,7 @@ static void _computeStandardWords(ideal words, int n, ideal M, int& last)
           words->m[index] = pCopy(words->m[i]);
         }
 
-        int varOffset = ((n - 1) * nVars) + 1;
+        int varOffset = ((n - 1) * currRing->isLPring) + 1;
         pSetExp(words->m[index], varOffset + j, 1);
         pSetm(words->m[index]);
         pTest(words->m[index]);
@@ -176,7 +177,7 @@ static void _computeStandardWords(ideal words, int n, ideal M, int& last)
 
 static ideal computeStandardWords(int n, ideal M)
 {
-  int nVars = currRing->isLPring;
+  int nVars = currRing->isLPring - currRing->LPncGenCount;
 
   int maxElems = 1;
   for (int i = 0; i < n; i++) // maxElems = nVars^n
@@ -381,11 +382,12 @@ static int gkDim(const ideal _G)
   if (maxDeg <= 1)
   {
     int lV = currRing->isLPring;
-    if (IDELEMS(G) == lV) // V = {1} no edges
+    int ncGenCount = currRing->LPncGenCount;
+    if (IDELEMS(G) == lV - ncGenCount) // V = {1} no edges
       return 0;
-    if (IDELEMS(G) == lV - 1) // V = {1} with loop
+    if (IDELEMS(G) == lV - ncGenCount - 1) // V = {1} with loop
       return 1;
-    if (IDELEMS(G) <= lV - 2) // V = {1} with more than one loop
+    if (IDELEMS(G) <= lV - ncGenCount - 2) // V = {1} with more than one loop
       return -1;
   }
 
