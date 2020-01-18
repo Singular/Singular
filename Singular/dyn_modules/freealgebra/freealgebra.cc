@@ -190,7 +190,7 @@ static ideal computeStandardWords(int n, ideal M)
 }
 
 // NULL if graph is undefined
-static intvec* ufnarovskiGraph(ideal G)
+static intvec* ufnarovskiGraph(ideal G, ideal &standardWords)
 {
   long l = 0;
   for (int i = 0; i < IDELEMS(G); i++)
@@ -203,7 +203,7 @@ static intvec* ufnarovskiGraph(ideal G)
   }
   int lV = currRing->isLPring;
 
-  ideal standardWords = computeStandardWords(l, G);
+  standardWords = computeStandardWords(l, G);
 
   int n = IDELEMS(standardWords);
   intvec* UG = new intvec(n, n, 0);
@@ -248,6 +248,32 @@ static intvec* ufnarovskiGraph(ideal G)
     }
   }
   return UG;
+}
+
+static BOOLEAN lpUfGraph(leftv res, leftv h)
+{
+  const short t[]={1,IDEAL_CMD};
+  if (iiCheckTypes(h,t,1))
+  {
+    ideal I = (ideal) h->Data();
+    res->rtyp = LIST_CMD;
+
+    ideal standardWords;
+    intvec* graph = ufnarovskiGraph(I, standardWords);
+
+    lists li=(lists)omAllocBin(slists_bin);
+    li->Init(2);
+    li->m[0].rtyp=INTMAT_CMD;
+    li->m[1].rtyp=IDEAL_CMD;
+    li->m[0].data=graph;
+    li->m[1].data=standardWords;
+
+    res->data = li;
+
+    if (errorreported) return TRUE;
+    return FALSE;
+  }
+  else return TRUE;
 }
 
 static std::vector<int> countCycles(const intvec* _G, int v, std::vector<int> path, std::vector<BOOLEAN> visited, std::vector<BOOLEAN> cyclic, std::vector<int> cache)
@@ -391,7 +417,8 @@ static int gkDim(const ideal _G)
       return -1;
   }
 
-  intvec* UG = ufnarovskiGraph(G);
+  ideal standardWords;
+  intvec* UG = ufnarovskiGraph(G, standardWords);
   if (errorreported || UG == NULL) return -2;
   return graphGrowth(UG);
 }
@@ -422,6 +449,7 @@ extern "C" int SI_MOD_INIT(freealgebra)(SModulFunctions* p)
   p->iiAddCproc("freealgebra.so","lpLmDivides",FALSE,lpLmDivides);
   p->iiAddCproc("freealgebra.so","lpVarAt",FALSE,lpVarAt);
   p->iiAddCproc("freealgebra.so","lpGkDim",FALSE,lpGkDim);
+  p->iiAddCproc("freealgebra.so","lpUfGraph",FALSE,lpUfGraph);
 
   p->iiAddCproc("freealgebra.so","stest",TRUE,stest);
   p->iiAddCproc("freealgebra.so","btest",TRUE,btest);
