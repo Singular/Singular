@@ -21,10 +21,6 @@ struct sip_sideal
   int nrows;
   int ncols;
   #define IDELEMS(i) ((i)->ncols)
-  #define MATCOLS(i) ((i)->ncols)
-  #define MATROWS(i) ((i)->nrows)
-  #define MATELEM(mat,i,j) ((mat)->m)[MATCOLS((mat)) * ((i)-1) + (j)-1]
-
 };
 /* the settings of rank, nrows, ncols, m ,   entries:
  * for IDEAL_CMD:     1    1    n    size n   poly              (n>=0)

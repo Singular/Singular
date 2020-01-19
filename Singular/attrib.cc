@@ -258,6 +258,7 @@ BOOLEAN atATTRIB1(leftv res,leftv v)
       PrintS("attr:ring_cf, type int\n");
       #ifdef HAVE_SHIFTBBA
       PrintS("attr:isLetterplaceRing, type int\n");
+      PrintS("attr:ncgenCount, type int\n");
       #endif
 
       haveNoAttribute=FALSE;
@@ -329,6 +330,12 @@ BOOLEAN atATTRIB2(leftv res,leftv v,leftv b)
   {
     res->rtyp=INT_CMD;
     res->data=(void *)(long)(((ring)v->Data())->isLPring);
+  }
+  else if ((strcmp(name,"ncgenCount")==0)
+  &&(/*v->Typ()*/t==RING_CMD))
+  {
+    res->rtyp=INT_CMD;
+    res->data=(void *)(long)(((ring)v->Data())->LPncGenCount);
   }
 #endif
   else
@@ -432,6 +439,17 @@ BOOLEAN atATTRIB3(leftv /*res*/,leftv v,leftv b,leftv c)
     else
     {
       WerrorS("attribute `isLetterplaceRing` must be int");
+      return TRUE;
+    }
+  }
+  else if ((strcmp(name,"ncgenCount")==0)
+  &&(/*v->Typ()*/t==RING_CMD))
+  {
+    if (c->Typ()==INT_CMD)
+      ((ring)v->Data())->LPncGenCount=(int)(long)c->Data();
+    else
+    {
+      WerrorS("attribute `ncgenCount` must be int");
       return TRUE;
     }
   }

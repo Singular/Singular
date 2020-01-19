@@ -616,6 +616,16 @@ void k_SplitFrame(poly &m1, poly &m2, int at, const ring r)
   assume(p_FirstVblock(m2,r) <= 1);
 }
 
+BOOLEAN _p_mLPNCGenValid(poly p, const ring r)
+{
+  if (p == NULL) return TRUE;
+  int *e=(int *)omAlloc((r->N+1)*sizeof(int));
+  p_GetExpV(p,e,r);
+  int b = _p_mLPNCGenValid(e, r);
+  omFreeSize((ADDRESS) e, (r->N+1)*sizeof(int));
+  return b;
+}
+
 BOOLEAN _p_mLPNCGenValid(int *mExpV, const ring r)
 {
   BOOLEAN hasNCGen = FALSE;
@@ -637,6 +647,27 @@ BOOLEAN _p_mLPNCGenValid(int *mExpV, const ring r)
     }
   }
   return TRUE;
+}
+
+int p_GetNCGen(poly p, const ring r)
+{
+  if (p == NULL) return 0;
+  assume(_p_mLPNCGenValid(p, r));
+
+  int lV = r->isLPring;
+  int degbound = r->N/lV;
+  int ncGenCount = r->LPncGenCount;
+  for (int i = 1; i <= degbound; i++)
+  {
+    for (int j = i*lV; j > (i*lV - ncGenCount); j--)
+    {
+      if (p_GetExp(p, j, r))
+      {
+        return j - i*lV + ncGenCount;
+      }
+    }
+  }
+  return 0;
 }
 
 /* tests whether each polynomial of an ideal I lies in in V */

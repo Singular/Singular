@@ -12,8 +12,13 @@ Manual/letterplace_std_Z.tst
 Manual/letterplace_maxideal.tst
 
 Manual/lpGkDim.tst
+Manual/lpNoetherian.tst
+Manual/lpIsPrime.tst
+Manual/lpIsSemiPrime.tst
+Manual/lpGlDimBound.tst
 Manual/lpKDim.tst
 Manual/lpKDimCheck.tst
+Manual/lpUfnarovskiGraph.tst
 Manual/lpMonomialBasis.tst
 Manual/lpSickleDim.tst
 Manual/lpHilbert.tst
@@ -29,3 +34,4 @@ Manual/iv2lpMat.tst
 
 Manual/Example_of_use_of_@sc{Letterplace}.tst
 Manual/serreRelations.tst
+Manual/letterplace_maxideal.tst

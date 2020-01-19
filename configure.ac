@@ -89,14 +89,11 @@ AC_SUBST(CC)
 AC_CHECK_LIB(rt,clock_gettime)
 
 # Check whether --with-gmp was given.
-if test "${with_gmp+set}" = set; then :
-  if test "$with_gmp" = yes ; then
+GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+if test "$with_gmp" = yes ; then
 	GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
-   elif test "$with_gmp" != no ; then
+elif test "$with_gmp" != no ; then
 	GMP_HOME_PATH="$with_gmp ${DEFAULT_CHECKING_PATH}"
-    fi
-else
-  GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
 fi
 
 BACKUP_CFLAGS=${CFLAGS}
@@ -105,15 +102,14 @@ BACKUP_LIBS=${LIBS}
 for GMP_HOME in ${GMP_HOME_PATH}
 do
   if test "x$GMP_HOME" != "x/usr"; then
-    GMP_CPPFLAGS="-I${GMP_HOME}/include"
-    GMP_LIBS="-L${GMP_HOME}/lib -Wl,-rpath -Wl,${GMP_HOME}/lib -lgmp"
-  else
-    GMP_CPPFLAGS=""
-    GMP_LIBS="-lgmp"
+    if test -e ${GMP_HOME}/include/gmp.h; then
+      GMP_CPPFLAGS="-I${GMP_HOME}/include"
+      GMP_LIBS="-L${GMP_HOME}/lib -Wl,-rpath -Wl,${GMP_HOME}/lib -lgmp"
+    fi
   fi
-  CFLAGS="${BACKUP_CFLAGS} ${GMP_CPPFLAGS}"
-  LIBS="${BACKUP_LIBS} ${GMP_LIBS}"
 done
+CFLAGS="${BACKUP_CFLAGS} ${GMP_CPPFLAGS}"
+LIBS="${BACKUP_LIBS} ${GMP_LIBS}"
 AC_SUBST(GMP_CPPFLAGS)
 AC_SUBST(GMP_LIBS)
 

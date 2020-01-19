@@ -127,7 +127,7 @@ void id_Delete (ideal * h, ring r)
 
   id_Test(*h, r);
 
-  const int elems = (*h)->nrows * (*h)->ncols;
+  const long elems = (long)(*h)->nrows * (long)(*h)->ncols;
 
   if ( elems > 0 )
   {
@@ -135,7 +135,7 @@ void id_Delete (ideal * h, ring r)
 
     if (r!=NULL)
     {
-      int j = elems;
+      long j = elems;
       do
       {
         j--;
@@ -434,7 +434,7 @@ void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r, con
 
     assume( h1->rank >= 0 );
 
-    const int n = (h1->ncols * h1->nrows);
+    const long n = ((long)h1->ncols * (long)h1->nrows);
 
     assume( !( n > 0 && h1->m == NULL) );
 
@@ -444,7 +444,7 @@ void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r, con
     long new_rk = 0; // inlining id_RankFreeModule(h1, r, tailRing);
 
     /* to be able to test matrices: */
-    for (int i=n - 1; i >= 0; i--)
+    for (long i=n - 1; i >= 0; i--)
     {
       _pp_Test(h1->m[i], r, tailRing, level);
       const long k = p_MaxComp(h1->m[i], r, tailRing);
@@ -1539,7 +1539,7 @@ ideal id_Jet(const ideal i,int d, const ring R)
   r->ncols = i-> ncols;
   //r->rank = i-> rank;
 
-  for(int k=(i->nrows)*(i->ncols)-1;k>=0; k--)
+  for(long k=((long)(i->nrows))*((long)(i->ncols))-1;k>=0; k--)
     r->m[k]=pp_Jet(i->m[k],d,R);
 
   return r;

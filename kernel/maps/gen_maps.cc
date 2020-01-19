@@ -173,7 +173,13 @@ number maEvalAt(const poly p,const number* pt, const ring r)
   }
   poly v=maMapPoly(p,r,map,r,ndCopyMap);
   id_Delete(&map,r);
-  number vv=pGetCoeff(v);
-  p_LmFree(&v,r);
+  number vv;
+  if (v==NULL)
+    vv=n_Init(0,r->cf);
+  else
+  {
+    vv=pGetCoeff(v);
+    p_LmFree(&v,r);
+  }
   return vv;
 }

@@ -24,7 +24,7 @@ if test "x$ENABLE_GFANLIB" != "xno"; then
 
  BACKUP_LIBS=$LIBS
 
- LIBS="$LIBS -lcddgmp $GMP_LIBS "
+ LIBS="-lcddgmp -lgmp $GMP_LIBS $LIBS"
 
  AC_LANG_PUSH(C++)
  AC_LINK_IFELSE(

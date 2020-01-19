@@ -11,9 +11,10 @@
 #include "coeffs/coeffs.h"
 
 #ifdef HAVE_FLINT
-#include <flint/flint.h>
+#include "flint/flint.h"
 #if __FLINT_RELEASE >= 20503
 #include "factory/factory.h"
+
 #include "coeffs/numbers.h"
 #include "coeffs/longrat.h"
 #include "coeffs/flintcf_Qrat.h"
@@ -1220,11 +1221,25 @@ static number Q2Frac(number a, const coeffs src, const coeffs dst)
   return res;
 }
 
+static number Z2Frac(number a, const coeffs src, const coeffs dst)
+{
+  return InitMPZ((mpz_ptr)a,dst);
+}
+
+static number Zp2Frac(number a, const coeffs src, const coeffs dst)
+{
+  return Init(n_Int(a,src),dst);
+}
+
 static nMapFunc SetMap(const coeffs src, const coeffs dst)
 {
   if (src == dst) return ndCopyMap;
-  if (nCoeff_is_Q_or_BI(src))  /*Q, coeffs_BIGINT */
+  if (nCoeff_is_Q_or_BI(src) && (src->rep==n_rep_gap_rat))  /*Q, coeffs_BIGINT */
     return Q2Frac;
+  if(src->rep==n_rep_gap_gmp) /*Z */
+    return Z2Frac;
+  if(nCoeff_is_Zp(src))
+    return Zp2Frac;
 
   return NULL;
 }
