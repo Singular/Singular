@@ -80,7 +80,7 @@ the acc (ascending chain condition).
 
     // also if G is the whole ring
     if (leadmonom(G[i]) == 1) {
-      ERROR("noetherianity not defined for 0-ring")
+      ERROR("Noetherianity not defined for 0-ring")
     }
     kill d;
   } kill i;
