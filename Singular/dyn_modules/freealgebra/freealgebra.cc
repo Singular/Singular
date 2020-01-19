@@ -250,7 +250,7 @@ static intvec* ufnarovskiGraph(ideal G, ideal &standardWords)
   return UG;
 }
 
-static BOOLEAN lpUfGraph(leftv res, leftv h)
+static BOOLEAN lpUfnarovskiGraph(leftv res, leftv h)
 {
   const short t[]={1,IDEAL_CMD};
   if (iiCheckTypes(h,t,1))
@@ -449,7 +449,7 @@ extern "C" int SI_MOD_INIT(freealgebra)(SModulFunctions* p)
   p->iiAddCproc("freealgebra.so","lpLmDivides",FALSE,lpLmDivides);
   p->iiAddCproc("freealgebra.so","lpVarAt",FALSE,lpVarAt);
   p->iiAddCproc("freealgebra.so","lpGkDim",FALSE,lpGkDim);
-  p->iiAddCproc("freealgebra.so","lpUfGraph",FALSE,lpUfGraph);
+  p->iiAddCproc("freealgebra.so","lpUfnarovskiGraph",FALSE,lpUfnarovskiGraph);
 
   p->iiAddCproc("freealgebra.so","stest",TRUE,stest);
   p->iiAddCproc("freealgebra.so","btest",TRUE,btest);

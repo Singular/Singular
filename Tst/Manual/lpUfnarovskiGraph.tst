@@ -6,7 +6,7 @@ ring r = 0,(x,y),Dp;
 def R = freeAlgebra(r, 5);
 setring R;
 ideal G = x*y*y; // already a GB
-lpUfGraph(G);
+lpUfnarovskiGraph(G);
 
 kill r;
 kill R;
@@ -22,7 +22,7 @@ x3*x3-9*x3*x2+2*x1*x4+x1*x1,
 x2*x2-13*x2*x1-4*x1*x3+2*x1*x2-x1*x1,
 x2*x1+4*x1*x2-3*x1*x1;
 ideal G = std(I);
-lpUfGraph(G);
+lpUfnarovskiGraph(G);
 
 kill r;
 kill R;
@@ -33,7 +33,7 @@ def R = freeAlgebra(r, 4);
 setring(R);
 ideal I = x*y*x, y*x*y;
 ideal G = std(I);
-lpUfGraph(G);
+lpUfnarovskiGraph(G);
 
 kill r;
 kill R;
@@ -44,6 +44,6 @@ def R = makeLetterplaceRing(4);
 setring(R);
 ideal I = x1*x1*x2, x1*x2*x2;
 ideal G = std(I);
-lpUfGraph(G);
+lpUfnarovskiGraph(G);
 
 tst_status(1);$

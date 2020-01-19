@@ -100,7 +100,7 @@ the acc (ascending chain condition).
     }
   }
 
-  intmat UG = lpUfGraph(G)[1];
+  intmat UG = lpUfnarovskiGraph(G)[1];
 
   // check special case 2
   intmat zero[nrows(UG)][ncols(UG)];
@@ -309,7 +309,7 @@ A/<G>.
     return(1);
   }
 
-  list VUG = lpUfGraph(G);
+  list VUG = lpUfnarovskiGraph(G);
   intmat UG = VUG[1]; // the Ufnarovskij graph
   ideal V = VUG[2]; // the vertices of UG (standard words with length = l-1)
 
@@ -417,7 +417,7 @@ a negative answer applies only to A/<LM(G)> and not necessarily to A/<G>.
     return(1);
   }
 
-  list VUG = lpUfGraph(G);
+  list VUG = lpUfnarovskiGraph(G);
   intmat UG = VUG[1]; // the Ufnarovskij graph
   ideal V = VUG[2]; // the vertices of UG (standard words with length = l-1)
 
@@ -725,10 +725,10 @@ ASSUME: Basering is a Letterplace ring
 }
 
 // Ufnarovskii graph is now implemented in the dynamic module (freeAlgebra.cc)
-/* proc lpUfGraph(ideal G, list #) */
-/* "USAGE: lpUfGraph(G); G a set of monomials in a letterplace ring. */
+/* proc lpUfnarovskiGraph(ideal G, list #) */
+/* "USAGE: lpUfnarovskiGraph(G); G a set of monomials in a letterplace ring. */
 /* RETURN: intmat or list */
-/* NOTE: lpUfGraph(G); returns intmat. lpUfGraph(G,1); returns list L with L[1] an intmat and L[2] an ideal. */
+/* NOTE: lpUfnarovskiGraph(G); returns intmat. lpUfnarovskiGraph(G,1); returns list L with L[1] an intmat and L[2] an ideal. */
 /*       The intmat is the Ufnarovskij Graph and the ideal contains the vertices. */
 /* PURPOSE: Constructs the Ufnarovskij graph induced by G */
 /*       the adjacency matrix of the Ufnarovskij graph induced by G */
@@ -787,8 +787,8 @@ ASSUME: Basering is a Letterplace ring
 /*   def R = freeAlgebra(r, 5); // constructs a Letterplace ring */
 /*   setring R; // sets basering to Letterplace ring */
 /*   ideal I = x*y, x*z, z*y, z*z; */
-/*   lpUfGraph(I); */
-/*   lpUfGraph(I,1); */
+/*   lpUfnarovskiGraph(I); */
+/*   lpUfnarovskiGraph(I,1); */
 /* } */
 
 static proc maxDeg(ideal G)
@@ -918,7 +918,7 @@ static proc ivdivides(list G, intvec iv) {
 /*   } */
 
 /*   dbprint("computing Ufnarovskii graph"); */
-/*   intmat UG = lpUfGraph(G)[1]; */
+/*   intmat UG = lpUfnarovskiGraph(G)[1]; */
 /*   if (printlevel >= voice + 1) { */
 /*     UG; */
 /*   } */
