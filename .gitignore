@@ -116,3 +116,9 @@ test-suite.log
 test.log
 ylwrap
 /resources/singular_resourcesconfig.h
+__pycache__
+keywords.txt
+helpfiles
+*.npy
+.coverage
+*.pyc
