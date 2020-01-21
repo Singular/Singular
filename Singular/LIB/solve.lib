@@ -58,7 +58,6 @@ EXAMPLE: example laguerre_solve; shows an example
   if (char(basering)!=0){ERROR("characteristic of basering not 0");}
   if ((charstr(basering)[1]=="0") and (npars(basering)!=0))
     {ERROR("basering has parameters");}
-  int OLD_COMPLEX=0;
   int iv=checkv(f);  // check for variable appearing in f
   if(iv==0){ERROR("Wrong polynomial!");}
   poly v=var(iv);    // f univariate in v
@@ -89,22 +88,13 @@ EXAMPLE: example laguerre_solve; shows an example
   ss="";oo=ss;
   if(npars(basering)==1)
   {
-    if(OLD_COMPLEX)
+    tt=charstr(basering);
+    if(size(tt)>7)
     {
-      tt="1,"+string(par(1));
-      if(tt==charstr(basering))
-      {ss=tt;ringprec=system("getPrecDigits");}
-    }
-    else
-    {
-      tt=charstr(basering);
-      if(size(tt)>7)
+      if(string(tt[1..7])=="complex")
       {
-        if(string(tt[1..7])=="complex")
-        {
-          ss=tt;
-          ringprec=system("getPrecDigits");
-        }
+        ss=tt;
+        ringprec=system("getPrecDigits");
       }
     }
   }
