@@ -7907,6 +7907,7 @@ static BOOLEAN jjRESERVEDLIST0(leftv res, leftv)
 	lists L = (lists)omAllocBin(slists_bin);
 	struct blackbox_list *bb_list = NULL;
 	unsigned nCount = (sArithBase.nCmdUsed-1) / 3;
+
 	if ((3*nCount) < sArithBase.nCmdUsed) {
 		nCount++;
 	}
@@ -7958,7 +7959,9 @@ static BOOLEAN jjRESERVEDLIST0(leftv res, leftv)
 			k++;
 		}
 	}
-	// free the struct (not the list itself)
+	// free the struct (not the list entries itself, which were allocated
+	// by strdup)
+	omfree(bb_list->list);
 	omfree(bb_list);
 
 	// pass the resultant list to the res datastructure
