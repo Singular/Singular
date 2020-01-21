@@ -135,6 +135,7 @@ static BOOLEAN lpVarAt(leftv res, leftv h)
 
 static void _computeStandardWords(ideal words, int n, ideal M, int& last)
 {
+  // assume <M> != <1>
   if (n <= 0){
     words->m[0] = pOne();
     last = 0;
@@ -143,7 +144,7 @@ static void _computeStandardWords(ideal words, int n, ideal M, int& last)
 
   _computeStandardWords(words, n - 1, M, last);
 
-  int nVars = currRing->isLPring;
+  int nVars = currRing->isLPring - currRing->LPncGenCount;
 
   for (int j = nVars - 1; j >= 0; j--)
   {
@@ -157,7 +158,7 @@ static void _computeStandardWords(ideal words, int n, ideal M, int& last)
           words->m[index] = pCopy(words->m[i]);
         }
 
-        int varOffset = ((n - 1) * nVars) + 1;
+        int varOffset = ((n - 1) * currRing->isLPring) + 1;
         pSetExp(words->m[index], varOffset + j, 1);
         pSetm(words->m[index]);
         pTest(words->m[index]);
@@ -176,7 +177,7 @@ static void _computeStandardWords(ideal words, int n, ideal M, int& last)
 
 static ideal computeStandardWords(int n, ideal M)
 {
-  int nVars = currRing->isLPring;
+  int nVars = currRing->isLPring - currRing->LPncGenCount;
 
   int maxElems = 1;
   for (int i = 0; i < n; i++) // maxElems = nVars^n
@@ -189,7 +190,7 @@ static ideal computeStandardWords(int n, ideal M)
 }
 
 // NULL if graph is undefined
-static intvec* ufnarovskiGraph(ideal G)
+static intvec* ufnarovskiGraph(ideal G, ideal &standardWords)
 {
   long l = 0;
   for (int i = 0; i < IDELEMS(G); i++)
@@ -202,7 +203,7 @@ static intvec* ufnarovskiGraph(ideal G)
   }
   int lV = currRing->isLPring;
 
-  ideal standardWords = computeStandardWords(l, G);
+  standardWords = computeStandardWords(l, G);
 
   int n = IDELEMS(standardWords);
   intvec* UG = new intvec(n, n, 0);
@@ -247,6 +248,32 @@ static intvec* ufnarovskiGraph(ideal G)
     }
   }
   return UG;
+}
+
+static BOOLEAN lpUfnarovskiGraph(leftv res, leftv h)
+{
+  const short t[]={1,IDEAL_CMD};
+  if (iiCheckTypes(h,t,1))
+  {
+    ideal I = (ideal) h->Data();
+    res->rtyp = LIST_CMD;
+
+    ideal standardWords;
+    intvec* graph = ufnarovskiGraph(I, standardWords);
+
+    lists li=(lists)omAllocBin(slists_bin);
+    li->Init(2);
+    li->m[0].rtyp=INTMAT_CMD;
+    li->m[1].rtyp=IDEAL_CMD;
+    li->m[0].data=graph;
+    li->m[1].data=standardWords;
+
+    res->data = li;
+
+    if (errorreported) return TRUE;
+    return FALSE;
+  }
+  else return TRUE;
 }
 
 static std::vector<int> countCycles(const intvec* _G, int v, std::vector<int> path, std::vector<BOOLEAN> visited, std::vector<BOOLEAN> cyclic, std::vector<int> cache)
@@ -352,6 +379,11 @@ static int gkDim(const ideal _G)
       WerrorS("GK-Dim not implemented for modules");
       return -2;
     }
+    if (pGetNCGen(_G->m[i]) != 0)
+    {
+      WerrorS("GK-Dim not implemented for bi-modules");
+      return -2;
+    }
   }
 
   ideal G = id_Head(_G, currRing); // G = LM(G) (and copy)
@@ -376,15 +408,17 @@ static int gkDim(const ideal _G)
   if (maxDeg <= 1)
   {
     int lV = currRing->isLPring;
-    if (IDELEMS(G) == lV) // V = {1} no edges
+    int ncGenCount = currRing->LPncGenCount;
+    if (IDELEMS(G) == lV - ncGenCount) // V = {1} no edges
       return 0;
-    if (IDELEMS(G) == lV - 1) // V = {1} with loop
+    if (IDELEMS(G) == lV - ncGenCount - 1) // V = {1} with loop
       return 1;
-    if (IDELEMS(G) <= lV - 2) // V = {1} with more than one loop
+    if (IDELEMS(G) <= lV - ncGenCount - 2) // V = {1} with more than one loop
       return -1;
   }
 
-  intvec* UG = ufnarovskiGraph(G);
+  ideal standardWords;
+  intvec* UG = ufnarovskiGraph(G, standardWords);
   if (errorreported || UG == NULL) return -2;
   return graphGrowth(UG);
 }
@@ -415,6 +449,7 @@ extern "C" int SI_MOD_INIT(freealgebra)(SModulFunctions* p)
   p->iiAddCproc("freealgebra.so","lpLmDivides",FALSE,lpLmDivides);
   p->iiAddCproc("freealgebra.so","lpVarAt",FALSE,lpVarAt);
   p->iiAddCproc("freealgebra.so","lpGkDim",FALSE,lpGkDim);
+  p->iiAddCproc("freealgebra.so","lpUfnarovskiGraph",FALSE,lpUfnarovskiGraph);
 
   p->iiAddCproc("freealgebra.so","stest",TRUE,stest);
   p->iiAddCproc("freealgebra.so","btest",TRUE,btest);

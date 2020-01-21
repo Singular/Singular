@@ -25,6 +25,7 @@ PROCEDURES:
 isFreeAlgebra(r);                check whether r is a letterplace ring (free algebra)
 lpDegBound(R);                   returns the degree bound of a letterplace ring
 lpVarBlockSize(R);               returns the size of the letterplace blocks
+lpNcgenCount(R);                 returns the number of ncgen variables
 lpDivision(f,I);                 two-sided division with remainder
 lpGBPres2Poly(L,I);              reconstructs a polynomial from the output of lpDivision
 isOrderingShiftInvariant(i);     tests shift-invariance of the monomial ordering
@@ -1003,6 +1004,23 @@ example
   isFreeAlgebra(r);
   def R = freeAlgebra(r, 7);
   isFreeAlgebra(R);
+}
+
+proc lpNcgenCount(def R)
+"USAGE:  lpNcgenCount(R); R a letterplace ring
+RETURN:  int
+PURPOSE: returns the number of ncgen variables in the letterplace ring.
+EXAMPLE: example ncgenCount; shows examples
+"
+{
+  return(attrib(R, "ncgenCount"));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  def R = freeAlgebra(r, 7, 10);
+  lpNcgenCount(R); // should be 10
 }
 
 // united all previous makes, including mLR1 (homog) and mLR2 (nonhomog)
