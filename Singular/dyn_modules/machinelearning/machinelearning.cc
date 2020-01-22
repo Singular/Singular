@@ -5,6 +5,8 @@
 #include "Singular/ipid.h"
 #include "Singular/mod_lib.h"
 
+#ifdef HAVE_PYTHON
+
 #include "mlpredict.h"
 
 static BOOLEAN predictHelp(leftv result, leftv arg)
@@ -72,3 +74,4 @@ extern "C" int SI_MOD_INIT(machinelearning)(SModulFunctions* psModulFunctions)
                         predictHelp); // the C/C++ routine
         return MAX_TOK;
 }
+#endif

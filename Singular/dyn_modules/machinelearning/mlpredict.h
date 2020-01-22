@@ -8,6 +8,7 @@
 #ifndef MLPREDICT_H
 #define MLPREDICT_H
 
+#ifdef HAVE_PYTHON
 #ifdef __cplusplus
 extern "C" {
 #endif /* ifdef cpp */
@@ -66,4 +67,6 @@ int ml_make_prediction(char *filename,
 #ifdef __cplusplus
 }
 #endif /* ifdef cpp */
+
+#endif /* HAVE_PYTHON */
 #endif
