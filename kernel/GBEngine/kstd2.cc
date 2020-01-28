@@ -1860,7 +1860,7 @@ int redHoney (LObject* h, kStrategy strat)
         }
       }
     }
-    if ((strat->syzComp > 0)&&(!TEST_OPT_REDTAIL_SYZ))
+    else if ((strat->syzComp > 0)&&(!TEST_OPT_REDTAIL_SYZ))
     {
       if (h->p!=NULL)
       {
@@ -2413,7 +2413,8 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       /* if we are computing over Z we always want to try and cut down
        * the coefficients in the tail terms */
-      if (rField_is_Z(currRing) && !rHasLocalOrMixedOrdering(currRing)) {
+      if (rField_is_Z(currRing) && !rHasLocalOrMixedOrdering(currRing))
+      {
         redtailBbaAlsoLC_Z(&(strat->P), strat->tl, strat);
         strat->P.pCleardenom();
       }
