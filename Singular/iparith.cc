@@ -5107,7 +5107,7 @@ static BOOLEAN jjSYZYGY(leftv res, leftv v)
         hom=isHomog;
   }
   unsigned save_opt=si_opt_1;
-  si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
+  if (TEST_OPT_RETURN_SB) si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
   ideal S=idSyzygies(v_id,hom,&w);
   si_opt_1=save_opt;
   res->data = (char *)S;
@@ -6807,6 +6807,8 @@ static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
   intvec **weights=NULL;
   int wmaxl=maxl;
   maxl--;
+  unsigned save_opt=si_opt_1;
+  si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
   if ((maxl==-1) && (iiOp!=MRES_CMD))
     maxl = currRing->N-1;
   if ((iiOp == RES_CMD) || (iiOp == MRES_CMD))
@@ -6833,6 +6835,7 @@ static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
   if (r==NULL) return TRUE;
   int t3=u->Typ();
   iiMakeResolv(r,l,wmaxl,w->name,t3,weights);
+  si_opt_1=save_opt;
   return FALSE;
 }
 #endif
