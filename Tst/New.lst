@@ -24,6 +24,7 @@ New/interred_prot.tst
 New/longalg_missing_2.tst
 New/longalg_missing_3.tst
 New/minpoly_locals.tst
+New/modulo_homalg.tst
 New/modulo_homalg_full.tst
 New/mstd_integer.tst
 New/nc_algebra_c_poly.tst
