@@ -2743,7 +2743,6 @@ EXAMPLE: example create_ring; shows an example
   L[4] = l4;
 
   /* return ring */
-  //L;
   def S = ring(L); 
   if (kill_ring)
   {
