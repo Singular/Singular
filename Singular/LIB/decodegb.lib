@@ -301,7 +301,7 @@ SEE ALSO: sysCRHT, sysBin
 EXAMPLE:  example sysNewton; shows an example
 "
 {
- string s="ring @newton=("+string(q)+",a),(";
+ string s="(";
  int i,j;
  int flag;
  int tr;
@@ -327,15 +327,16 @@ EXAMPLE:  example sysNewton; shows an example
     s=s+"S("+string(i)+"),";
   }
  }
- s=s+"sigma(1.."+string(t)+"),";
+ for (int zz = 1; zz <= t; zz++)
+ {
+  s = s + "sigma("+string(zz)+"),";
+ }
  for (i=size(defset); i>=2; i--)
  {
   s=s+"S("+string(defset[i])+"),";
  }
- s=s+"S("+string(defset[1])+")),lp;";
-
- execute(s);
-
+ s=s+"S("+string(defset[1])+"))";
+ ring @newton = create_ring("("+string(q)+",a)", s, "lp");
  ideal newton;
  poly sum;
 
