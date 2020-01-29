@@ -205,6 +205,10 @@ ideal idSect (ideal h1,ideal h2, GbVariant alg)
   int rank=si_max(h1->rank,h2->rank);
   if ((idIs0(h1)) || (idIs0(h2)))  return idInit(1,rank);
 
+  BITSET save_opt;
+  SI_SAVE_OPT1(save_opt);
+  if (TEST_OPT_RETURN_SB) si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
+
   ideal first,second,temp,temp1,result;
   poly p,q;
 
@@ -403,6 +407,7 @@ ideal idSect (ideal h1,ideal h2, GbVariant alg)
   }
 
   idSkipZeroes(result);
+  SI_RESTORE_OPT1(save_opt);
   if (TEST_OPT_RETURN_SB)
   {
      w=NULL;
@@ -792,7 +797,13 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
 
   idTest(s_h1);
 
+  BITSET save_opt;
+  SI_SAVE_OPT1(save_opt);
+  if (TEST_OPT_RETURN_SB) si_opt_1|=Sy_bit(OPT_REDTAIL_SYZ);
+
   ideal s_h3=idPrepare(s_h1,h,k,w,alg); // main (syz) GB computation
+
+  SI_RESTORE_OPT1(save_opt);
 
   if (s_h3==NULL)
   {
@@ -1509,18 +1520,19 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   PrintS("last elem:");wrp(s_h4->m[IDELEMS(s_h4)-1]);PrintLn();
   #endif
   ideal s_h3;
+  BITSET old_test1;
+  SI_SAVE_OPT1(old_test1);
+  if (TEST_OPT_RETURN_SB) si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
   if (addOnlyOne)
   {
-    BITSET old_test1;
-    SI_SAVE_OPT1(old_test1);
     if(!rField_is_Ring(currRing)) si_opt_1 |= Sy_bit(OPT_SB_1);
     s_h3 = kStd(s_h4,currRing->qideal,hom,&weights1,NULL,0/*kmax-1*/,IDELEMS(s_h4)-1);
-    SI_RESTORE_OPT1(old_test1);
   }
   else
   {
     s_h3 = kStd(s_h4,currRing->qideal,hom,&weights1,NULL,kmax-1);
   }
+  SI_RESTORE_OPT1(old_test1);
   #if 0
   // only together with the above debug stuff
   idSkipZeroes(s_h3);
@@ -1893,7 +1905,7 @@ poly idMinor(matrix a, int ar, unsigned long which, ideal R)
             p = kNF(R,currRing->qideal,q);
             p_Delete(&q,currRing);
           }
-	}
+        }
         /*delete the matrix tmp*/
         for (i=1; i<=ar; i++)
         {
@@ -2328,10 +2340,11 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
   }
 
   idTest(s_temp);
-  unsigned save_opt=si_opt_1;
+  unsigned save_opt;
+  SI_SAVE_OPT1(save_opt);
   si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
   ideal s_temp1 = kStd(s_temp,currRing->qideal,hom,&wtmp,NULL,length);
-  si_opt_1=save_opt;
+  SI_RESTORE_OPT1(save_opt);
 
   //if (wtmp!=NULL)  Print("output weights:");wtmp->show(1);PrintLn();
   if ((w!=NULL) && (*w !=NULL) && (wtmp!=NULL))

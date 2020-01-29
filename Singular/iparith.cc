@@ -5106,10 +5106,7 @@ static BOOLEAN jjSYZYGY(leftv res, leftv v)
       if (idHomIdeal(v_id,currRing->qideal))
         hom=isHomog;
   }
-  unsigned save_opt=si_opt_1;
-  if (TEST_OPT_RETURN_SB) si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
   ideal S=idSyzygies(v_id,hom,&w);
-  si_opt_1=save_opt;
   res->data = (char *)S;
   if (hom==isHomog)
   {
