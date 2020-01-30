@@ -8,7 +8,7 @@
 #ifndef MLPREDICT_H
 #define MLPREDICT_H
 
-#ifdef HAVE_READLINE
+#if define(HAVE_READLINE) && defined(HAVE_READLINE_READLINE_H)
 #ifdef HAVE_PYTHON
 #ifdef __cplusplus
 extern "C" {
@@ -70,5 +70,5 @@ int ml_make_prediction(char *filename,
 #endif /* ifdef cpp */
 
 #endif /* HAVE_PYTHON */
-#endif /* hAVE_READLINE */
+#endif /* HAVE_READLINE */
 #endif
