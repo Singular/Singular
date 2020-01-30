@@ -682,7 +682,9 @@ int redRing_Z (LObject* h,kStrategy strat)
             }
             return 1;
           }
-        } else {
+        }
+	else
+	{
           /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
            * => we try to cut down the lead coefficient at least */
           /* first copy T[j] in order to multiply it with a coefficient later on */
@@ -701,7 +703,9 @@ int redRing_Z (LObject* h,kStrategy strat)
           tj.Delete();
           tj.Clear();
         }
-      } else {
+      }
+      else
+      {
         /* same lead monomial but lead coefficients do not divide each other:
          * change the polys to h <- spoly(h,tj) and h2 <- gpoly(h,tj). */
         LObject h2  = *h;
@@ -716,7 +720,9 @@ int redRing_Z (LObject* h,kStrategy strat)
         /* replace h2 for tj in L (already generated pairs with tj), S and T */
         replaceInLAndSAndT(h2, j, strat);
       }
-    } else {
+    }
+    else
+    {
       ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
     }
     /* printf("\nAfter small red: ");pWrite(h->p); */
