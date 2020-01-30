@@ -9373,16 +9373,19 @@ void enterSBba (LObject &p,int atS,kStrategy strat, int atR)
 #ifdef HAVE_SHIFTBBA
 void enterSBbaShift (LObject &p,int atS,kStrategy strat, int atR)
 {
+  enterSBba(p, atS, strat, atR);
+
   int maxPossibleShift = p_mLPmaxPossibleShift(p.p, strat->tailRing);
   for (int i = maxPossibleShift; i > 0; i--)
   {
+
     LObject qq;
     qq.p = pLPCopyAndShiftLM(p.p, i); // don't use Set() because it'll test the poly order
     qq.shift = i;
     strat->initEcart(&qq); // initEcartBBA sets length, pLength, FDeg and ecart
+    int atS = posInS(strat, strat->sl, qq.p, qq.ecart); // S needs to stay sorted because this is for example assumed when searching S later
     enterSBba(qq, atS, strat, -1);
   }
-  enterSBba(p, atS, strat, atR);
 }
 #endif
 
