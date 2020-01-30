@@ -10,7 +10,7 @@
 #include <string.h>
 
 #include "kernel/mod2.h"
-#if define(HAVE_READLINE) && defined(HAVE_READLINE_READLINE_H)
+#if defined(HAVE_READLINE) && defined(HAVE_READLINE_READLINE_H)
 #ifdef HAVE_PYTHON
 
 #include <Python.h>

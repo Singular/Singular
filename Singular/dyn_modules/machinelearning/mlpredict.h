@@ -8,7 +8,7 @@
 #ifndef MLPREDICT_H
 #define MLPREDICT_H
 
-#if define(HAVE_READLINE) && defined(HAVE_READLINE_READLINE_H)
+#if defined(HAVE_READLINE) && defined(HAVE_READLINE_READLINE_H)
 #ifdef HAVE_PYTHON
 #ifdef __cplusplus
 extern "C" {
