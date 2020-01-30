@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "kernel/mod2.h"
+#ifdef HAVE_READLINE
 #ifdef HAVE_PYTHON
 
 #include <Python.h>
@@ -449,4 +450,5 @@ int _set_vectors_file_list()
 
 	return 1;
 }
+#endif
 #endif

@@ -1,7 +1,8 @@
 #include <stdio.h>
-#include <readline/history.h>
 
 #include "kernel/mod2.h"
+#ifdef HAVE_READLINE
+#include <readline/history.h>
 #include "Singular/ipid.h"
 #include "Singular/mod_lib.h"
 
@@ -74,4 +75,5 @@ extern "C" int SI_MOD_INIT(machinelearning)(SModulFunctions* psModulFunctions)
                         predictHelp); // the C/C++ routine
         return MAX_TOK;
 }
+#endif
 #endif
