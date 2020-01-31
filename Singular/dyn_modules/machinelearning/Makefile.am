@@ -17,8 +17,8 @@ endif !SI_BUILTIN_MACHINELEARNING
 ##########################################################################
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel \
 	      -I${top_builddir}/kernel -I${top_srcdir}/libpolys \
-	      -I${top_builddir}/libpolys $(FACTORY_INCLUDES)  $(GMP_CPPFLAGS) \
-	      $(NTL_CPPFLAGS) $(FLINT_CFLAGS) -DDATA_PATH=\"$(datadir)\" \
+	      -I${top_builddir}/libpolys \
+	      -DDATA_PATH=\"$(datadir)\" \
 	      -DBIN_PATH=\"$(bindir)\" -I/usr/include/python2.7
 
 machinelearning_la_SOURCES = machinelearning.cc mlpredict.c
