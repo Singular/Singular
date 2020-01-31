@@ -533,7 +533,7 @@ const struct soptionStruct optionStruct[]=
   {"staircaseBound",Sy_bit(OPT_STAIRCASEBOUND),~Sy_bit(OPT_STAIRCASEBOUND)  },
   {"multBound",    Sy_bit(OPT_MULTBOUND),      ~Sy_bit(OPT_MULTBOUND)  },
   {"degBound",     Sy_bit(OPT_DEGBOUND),       ~Sy_bit(OPT_DEGBOUND)  },
-  {"redTailSyz"    Sy_bit(OPT_REDTAIL_SYZ),    ~Sy_bit(OPT_REDTAIL_SYZ) },
+  {"redTailSyz",   Sy_bit(OPT_REDTAIL_SYZ),    ~Sy_bit(OPT_REDTAIL_SYZ) },
   /* 25 no redTail(p)/redTail(s) */
   {"redTail",      Sy_bit(OPT_REDTAIL),        ~Sy_bit(OPT_REDTAIL)  },
   {"redThrough",   Sy_bit(OPT_REDTHROUGH),     ~Sy_bit(OPT_REDTHROUGH)  },
