@@ -1,5 +1,5 @@
 from probstat import Cartesian
-from itertools import repeat,imap, ifilter
+from itertools import repeat
 from util import EquivalenceRelation
 from interpreter import *
 singular=SingularGlobalsProxy()
@@ -27,13 +27,13 @@ class modPNumber:
     return str(self.val)
 
 colors=3
-value_range=[modPNumber(i,colors) for i in xrange(colors)]
+value_range=[modPNumber(i,colors) for i in range(colors)]
 
 wrel=EquivalenceRelation()
 for i in value_range:
   wrel[i]=-i
 weights_canonical_to_index=dict((weight,i+1) \
-    for (i,weight) in enumerate(ifilter( \
+    for (i,weight) in enumerate(filter( \
         wrel.isCanonical,value_range)))
 wtrans=dict((weight,weights_canonical_to_index[wrel.canonical(weight)]) for weight in \
     value_range)
@@ -41,13 +41,13 @@ weights=len(weights_canonical_to_index)
 
 
 def constr_variations():
-  return imap(tuple,Cartesian(list(repeat(value_range,6))))
+  return list(map(tuple,Cartesian(list(repeat(value_range,6)))))
 relation=EquivalenceRelation()
 for (a,b,c,d,e,f) in constr_variations():
   relation[(a,b,c,d,e,f)]=(b,c,a,f,-d,-e)
   relation[(a,b,c,d,e,f)]=(a,-d,-e,-b,-c,-f)
 canonical_to_index=dict((symbol,weights+i+1) for (i,symbol) in \
-    enumerate(ifilter( \
+    enumerate(filter( \
        relation.isCanonical,constr_variations())))
 vartrans=dict((symbol,canonical_to_index[relation.canonical(symbol)]) for symbol in \
     constr_variations())
@@ -62,7 +62,7 @@ def w(i):
   return var_cache[wtrans[i]-1]
 r=create_ring(char=0,nvars=weights+symbols)
 r.set()
-print r
+print(r)
 myideal=Ideal()
 def polysum(l):
   acc=Polynomial(0)
@@ -89,11 +89,11 @@ back_table_w=dict((weights_canonical_to_index[w],w) for w\
     in weights_canonical_to_index)
 back_table_joint=dict(back_table_v)
 back_table_joint.update(back_table_w)
-print "back", back_table_joint
-print "original length",len(myideal)
-print "now calculating"
+print(("back", back_table_joint))
+print(("original length",len(myideal)))
+print("now calculating")
 myideal=singular.simplify(myideal,4)
-print "simplified", len(myideal)
+print(("simplified", len(myideal)))
 gb=singular.slimgb(myideal)
-print gb
-print len(gb), "GB elements"
+print(gb)
+print((len(gb), "GB elements"))
