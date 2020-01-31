@@ -632,11 +632,10 @@ int redRing_Z (LObject* h,kStrategy strat)
   if (h->IsNull()) return 0; // spoly is zero (can only occure with zero divisors)
   if (strat->tl<0) return 1;
 
-  int at/*,i*/;
+  int at;
   long d;
   int j = 0;
   int pass = 0;
-  // poly zeroPoly = NULL;
 
 // TODO warum SetpFDeg notwendig?
   h->SetpFDeg();
@@ -979,6 +978,44 @@ int redHomog (LObject* h,kStrategy strat)
       kDeleteLcm(h);
       return 0;
     }
+    if (TEST_OPT_IDLIFT)
+    {
+      if (h->p!=NULL)
+      {
+        if(p_GetComp(h->p,currRing)>strat->syzComp)
+        {
+          h->Delete();
+          return 0;
+        }
+      }
+      else if (h->t_p!=NULL)
+      {
+        if(p_GetComp(h->t_p,strat->tailRing)>strat->syzComp)
+        {
+          h->Delete();
+          return 0;
+        }
+      }
+    }
+    #if 0
+    else if ((strat->syzComp > 0)&&(!TEST_OPT_REDTAIL_SYZ))
+    {
+      if (h->p!=NULL)
+      {
+        if(p_GetComp(h->p,currRing)>strat->syzComp)
+        {
+          return 1;
+        }
+      }
+      else if (h->t_p!=NULL)
+      {
+        if(p_GetComp(h->t_p,strat->tailRing)>strat->syzComp)
+        {
+          return 1;
+        }
+      }
+    }
+    #endif
     h->SetShortExpVector();
     not_sev = ~ h->sev;
     /*
@@ -1676,6 +1713,44 @@ int redLazy (LObject* h,kStrategy strat)
       kDeleteLcm(h);
       return 0;
     }
+    if (TEST_OPT_IDLIFT)
+    {
+      if (h->p!=NULL)
+      {
+        if(p_GetComp(h->p,currRing)>strat->syzComp)
+        {
+          h->Delete();
+          return 0;
+        }
+      }
+      else if (h->t_p!=NULL)
+      {
+        if(p_GetComp(h->t_p,strat->tailRing)>strat->syzComp)
+        {
+          h->Delete();
+          return 0;
+        }
+      }
+    }
+    #if 0
+    else if ((strat->syzComp > 0)&&(!TEST_OPT_REDTAIL_SYZ))
+    {
+      if (h->p!=NULL)
+      {
+        if(p_GetComp(h->p,currRing)>strat->syzComp)
+        {
+          return 1;
+        }
+      }
+      else if (h->t_p!=NULL)
+      {
+        if(p_GetComp(h->t_p,strat->tailRing)>strat->syzComp)
+        {
+          return 1;
+        }
+      }
+    }
+    #endif
     h->SetShortExpVector();
     not_sev = ~ h->sev;
     d = h->SetpFDeg();

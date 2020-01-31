@@ -64,7 +64,7 @@ ideal i0=
 x(1)+x(2)+x(3)+x(4),
 x(1)^2*x(2)^2+x(2)*x(3)*x(5)*x(6),
 x(1)*x(2)^2*x(3)+x(2)*x(3)*x(6)^2;
-module m=syz(i0);
+option(returnSB); module m=syz(i0);
 dim(m);
 mult(m);
 degree(m);
