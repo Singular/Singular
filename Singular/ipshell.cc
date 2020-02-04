@@ -6603,3 +6603,34 @@ BOOLEAN iiCheckTypes(leftv args, const short *type_list, int report)
   }
   return TRUE;
 }
+
+void iiSetReturn(const leftv source)
+{
+  if ((source->next==NULL)&&(source->e==NULL))
+  {
+    if ((source->rtyp!=IDHDL)&&(source->rtyp!=ALIAS_CMD))
+    {
+      memcpy(&iiRETURNEXPR,source,sizeof(sleftv));
+      source->Init();
+      return;
+    }
+    if (source->rtyp==IDHDL)
+    {
+      if ((IDLEV((idhdl)source->data)==myynest)
+      &&(IDTYP((idhdl)source->data)!=RING_CMD))
+      {
+        memset(&iiRETURNEXPR,0,sizeof(sleftv));
+        iiRETURNEXPR.rtyp=IDTYP((idhdl)source->data);
+        iiRETURNEXPR.data=IDDATA((idhdl)source->data);
+        iiRETURNEXPR.flag=IDFLAG((idhdl)source->data);
+        iiRETURNEXPR.attribute=IDATTR((idhdl)source->data);
+        IDATTR((idhdl)source->data)=NULL;
+        IDDATA((idhdl)source->data)=NULL;
+        source->name=NULL;
+        source->attribute=NULL;
+        return;
+      }
+    }
+  }
+  iiRETURNEXPR.Copy(source);
+}

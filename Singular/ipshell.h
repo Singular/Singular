@@ -299,5 +299,7 @@ lists rDecompose(const ring r);
 lists rDecompose_list_cf(const ring r);
 BOOLEAN rDecompose_CF(leftv res,const coeffs C);
 ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE, const long bitmask=0x7fff, const int isLetterplace=FALSE);
+
+void iiSetReturn(const leftv h);
 #endif
 

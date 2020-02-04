@@ -4184,7 +4184,7 @@ yyreduce:
 /* Line 1464 of yacc.c  */
 #line 1599 "grammar.y"
     {
-            iiRETURNEXPR.Copy(&(yyvsp[(3) - (4)].lv));
+            iiSetReturn(&(yyvsp[(3) - (4)].lv));
             (yyvsp[(3) - (4)].lv).CleanUp();
             if (exitBuffer(BT_proc)) YYERROR;
           ;}
