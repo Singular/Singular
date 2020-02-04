@@ -1834,7 +1834,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
   int rl;
   int lt=l->Typ();
   int rt=NONE;
-  BOOLEAN b;
+  BOOLEAN b=FALSE;
   if (l->rtyp==ALIAS_CMD)
   {
     Werror("`%s` is read-only",l->Name());
@@ -1999,21 +1999,20 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
   }
 
   leftv hh=r;
-  BOOLEAN nok=FALSE;
   BOOLEAN map_assign=FALSE;
   switch (lt)
   {
     case INTVEC_CMD:
-      nok=jjA_L_INTVEC(l,r,new intvec(exprlist_length(r)));
+      b=jjA_L_INTVEC(l,r,new intvec(exprlist_length(r)));
       break;
     case INTMAT_CMD:
     {
-      nok=jjA_L_INTVEC(l,r,new intvec(IDINTVEC((idhdl)l->data)));
+      b=jjA_L_INTVEC(l,r,new intvec(IDINTVEC((idhdl)l->data)));
       break;
     }
     case BIGINTMAT_CMD:
     {
-      nok=jjA_L_BIGINTMAT(l, r, new bigintmat(IDBIMAT((idhdl)l->data)));
+      b=jjA_L_BIGINTMAT(l, r, new bigintmat(IDBIMAT((idhdl)l->data)));
       break;
     }
     case MAP_CMD:
@@ -2029,20 +2028,20 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
       else
       {
         WerrorS("expected ring-name");
-        nok=TRUE;
+        b=TRUE;
         break;
       }
       if (hh==NULL) /* map-assign: map f=r; */
       {
         WerrorS("expected image ideal");
-        nok=TRUE;
+        b=TRUE;
         break;
       }
       if ((hh->next==NULL)&&(hh->Typ()==IDEAL_CMD))
       {
-        BOOLEAN bo=jiAssign_1(l,hh,toplevel); /* map-assign: map f=r,i; */
+        b=jiAssign_1(l,hh,toplevel); /* map-assign: map f=r,i; */
         omFreeBin(hh,sleftv_bin);
-        return bo;
+        return b;
       }
       //no break, handle the rest like an ideal:
       map_assign=TRUE;
@@ -2099,9 +2098,9 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
           ht=hh->Typ();
           if ((j=iiTestConvert(ht,etyp))!=0)
           {
-            nok=iiConvert(ht,etyp,j,hh,&t);
+            b=iiConvert(ht,etyp,j,hh,&t);
             hh->next=t.next;
-            if (nok)
+            if (b)
             { Werror("can not convert %s(%s) -> %s",Tok2Cmdname(ht),hh->Name(),Tok2Cmdname(etyp));
                break;
             }
@@ -2113,9 +2112,9 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
           else
           if ((j=iiTestConvert(ht,mtyp))!=0)
           {
-            nok=iiConvert(ht,mtyp,j,hh,&t);
+            b=iiConvert(ht,mtyp,j,hh,&t);
             hh->next=t.next;
-            if (nok)
+            if (b)
             { Werror("can not convert %s(%s) -> %s",Tok2Cmdname(ht),hh->Name(),Tok2Cmdname(mtyp));
                break;
             }
@@ -2137,10 +2136,8 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
           }
           else
           {
-            nok=TRUE;
-            if (nok)
-            { Werror("can not convert %s(%s) -> %s",Tok2Cmdname(ht),hh->Name(),Tok2Cmdname(mtyp));
-            }
+            b=TRUE;
+            Werror("can not convert %s(%s) -> %s",Tok2Cmdname(ht),hh->Name(),Tok2Cmdname(mtyp));
             break;
           }
           t.next=NULL;t.CleanUp();
@@ -2148,7 +2145,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
           hh=hh->next;
         }
       }
-      if (nok)
+      if (b)
         idDelete((ideal *)&lm);
       else
       {
@@ -2164,25 +2161,25 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
       break;
     }
     case STRING_CMD:
-      nok=jjA_L_STRING(l,r);
+      b=jjA_L_STRING(l,r);
       break;
     //case DEF_CMD:
     case LIST_CMD:
-      nok=jjA_L_LIST(l,r);
+      b=jjA_L_LIST(l,r);
       break;
     case NONE:
     case 0:
       Werror("cannot assign to %s",l->Fullname());
-      nok=TRUE;
+      b=TRUE;
       break;
     default:
       WerrorS("assign not impl.");
-      nok=TRUE;
+      b=TRUE;
       break;
   } /* end switch: typ */
-  if (nok && (!errorreported)) WerrorS("incompatible type in list assignment");
+  if (b && (!errorreported)) WerrorS("incompatible type in list assignment");
   r->CleanUp();
-  return nok;
+  return b;
 }
 void jjNormalizeQRingId(leftv I)
 {
