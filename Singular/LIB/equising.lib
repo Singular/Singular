@@ -327,7 +327,6 @@ static proc makeMinPolyString (string newParName)
   return(newMinPolyStr);
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 // DEFINES: A new basering, "myRing",
@@ -343,35 +342,17 @@ static proc createMyRing_new(poly p_F, string ordStr,
 
   int chara = char(basering);
   string charaStr;
-  int i,zz;
+  int i;
   string helpStr;
   int nDefParams = nvars(r_old)-2;
 
   ideal qIdeal = ideal(basering);
-  list l1;  
-  for (zz = 1; zz <= nDefParams; zz++)
-  {
-   l1[size(l1)+1] = "t("+string(zz)+")";
-  }
-  l1[size(l1)+1] = "x";
-  l1[size(l1)+1] = "y";
-  
-  list l2;  
-  for (zz = 1; zz <= npars(basering); zz++)
-  {
-   l2[size(l2)+1] = "a("+string(zz)+")";
-  }
-  
-  list l3;  
-  for (zz = 1; zz <= no_b; zz++)
-  {
-   l3[size(l3)+1] = "b("+string(zz)+")";
-  }
-      
-  list l4 = l3 + l1;
+
   if ((npars(basering)==0) and (minPolyStr==""))
   {
-    ring myRing1 = create_ring("("+string(chara)+")", l1, ordStr);
+    helpStr = "ring myRing1 ="
+              + string(chara)+ ", (t(1..nDefParams), x, y),("+ ordStr +");";
+    execute(helpStr);
   }
   else
   {
@@ -380,19 +361,28 @@ static proc createMyRing_new(poly p_F, string ordStr,
     {
       if (minPolyStr<>"")
       {
-        ring myRing1 = create_ring("("+string(chara)+",a)", l1, ordStr);
+        helpStr = "ring myRing1 =
+                 (" + string(chara) + ",a),
+                 (t(1..nDefParams), x, y),(" + ordStr + ");";
+        execute(helpStr);
+
         execute (minPolyStr);
       }
       else // no minpoly given
       {
-        ring myRing1 = create_ring("("+string(chara)+","+string(l2)+")", l1, ordStr);
+        helpStr = "ring myRing1 =
+                  (" + string(chara) + ",a(1..npars(basering)) ),
+                  (t(1..nDefParams), x, y),(" + ordStr + ");";
+        execute(helpStr);
       }
     }
     else
     {
       // ground field is of type (p^k,a)....
       i = find (charaStr,",");
-      ring myRing1 = create_ring("(" + charaStr[1,i] + ",a)", l1, ordStr);
+      helpStr = "ring myRing1 = (" + charaStr[1,i] + "a),
+              (t(1..nDefParams), x, y),(" + ordStr + ");";
+      execute (helpStr);
     }
   }
 
@@ -407,7 +397,10 @@ static proc createMyRing_new(poly p_F, string ordStr,
     if (npars(basering) == 0)
     {
       ordStr = "(dp("+string(no_b)+"),"+ordStr+")";
-      ring myRing = create_ring("("+string(chara)+")", l4, ordStr);
+      helpStr = "ring myRing ="
+                + string(chara)+ ", (b(1..no_b), t(1..nDefParams), x, y),"
+                + ordStr +";";
+      execute(helpStr);
     }
     else
     {
@@ -418,7 +411,10 @@ static proc createMyRing_new(poly p_F, string ordStr,
         {
           ordStr = "(dp(" + string(no_b) + ")," + ordStr + ")";
           minPolyStr = makeMinPolyString("a");
-          ring myRing = create_ring("("+string(chara)+",a)", l4, ordStr);
+          helpStr = "ring myRing =
+                   (" + string(chara) + ",a),
+                   (b(1..no_b), t(1..nDefParams), x, y)," + ordStr + ";";
+          execute(helpStr);
 
           helpStr = "minpoly =" + minPolyStr + ";";
           execute (helpStr);
@@ -426,14 +422,20 @@ static proc createMyRing_new(poly p_F, string ordStr,
         else // no minpoly given
         {
           ordStr = "(dp(" + string(no_b) + ")," + ordStr + ")";
-          ring myRing1 = create_ring("("+string(chara)+","+string(l2)+")", l4, ordStr);
+          helpStr = "ring myRing =
+                    (" + string(chara) + ",a(1..npars(basering)) ),
+                    (b(1..no_b), t(1..nDefParams), x, y)," + ordStr + ";";
+          execute(helpStr);
         }
       }
       else
       {
         i = find (charaStr,",");
         ordStr = "(dp(" + string(no_b) + ")," + ordStr + ")";
-        ring myRing = create_ring("(" + charaStr[1,i] + ",a)", l4, ordStr);
+        helpStr = "ring myRing =
+                (" + charaStr[1,i] + "a),
+                (b(1..no_b), t(1..nDefParams), x, y)," + ordStr + ";";
+        execute (helpStr);
       }
     }
     ideal qIdeal = imap(myRing1, qIdeal);
