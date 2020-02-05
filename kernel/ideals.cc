@@ -207,7 +207,7 @@ ideal idSect (ideal h1,ideal h2, GbVariant alg)
 
   BITSET save_opt;
   SI_SAVE_OPT1(save_opt);
-  if (TEST_OPT_RETURN_SB) si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
+  si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
 
   ideal first,second,temp,temp1,result;
   poly p,q;
@@ -799,7 +799,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
 
   BITSET save_opt;
   SI_SAVE_OPT1(save_opt);
-  if (TEST_OPT_RETURN_SB) si_opt_1|=Sy_bit(OPT_REDTAIL_SYZ);
+  si_opt_1|=Sy_bit(OPT_REDTAIL_SYZ);
 
   ideal s_h3=idPrepare(s_h1,h,k,w,alg); // main (syz) GB computation
 
