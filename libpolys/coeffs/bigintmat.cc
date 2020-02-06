@@ -199,7 +199,7 @@ bigintmat * bimAdd(bigintmat * a, bigintmat * b)
 bigintmat * bimAdd(bigintmat * a, int b)
 {
 
-  const int mn = si_min(a->rows(),a->cols());
+  const int mn = a->rows()*a->cols();
 
   const coeffs basecoeffs = a->basecoeffs();
   number bb=n_Init(b,basecoeffs);
