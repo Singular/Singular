@@ -18,7 +18,7 @@ PROCEDURES:
   SLreynolds(f)          applies the Reynolds operator to f
   torusreynolds(f)       applies the Reynolds operator to f if the group is a torus or a finite group.
   cyclotomic(n,z)        the n-th cyclotomic polynomial in the variable z.
-
+";
 
 ////////////////////////////////////////////////////////////////////////////////
 // SL(n) sets the current group to SL_n.
@@ -56,7 +56,7 @@ example
 {       "> SL(3);";
         SL(3);
         "> group;";
-        group;
+        Invar::group;
         "> groupideal;";
         groupideal;
         "> print(SLrep);";
@@ -127,13 +127,13 @@ example
         "> print(SLrep);";
         print(SLrep);
         "> print(sympower(SLrep,3));";
-//      print(sympower(SLrep,3));               // doesn't work in the example
+        print(sympower(SLrep,3));               // doesn't work in the example
                                                 // environment. Bug in Singular??
                                                 // We'll have to cheat:
-"g(1)^3,     3*g(1)^2*g(2),          3*g(1)*g(2)^2,          g(2)^3,";
-"g(1)^2*g(3),3*g(1)^2*g(4)-2*g(1),   3*g(1)*g(2)*g(4)-1*g(2),g(2)^2*g(4),";
-"g(1)*g(3)^2,3*g(1)*g(3)*g(4)-1*g(3),3*g(1)*g(4)^2-2*g(4),   g(2)*g(4)^2,";
-"g(3)^3,     3*g(3)^2*g(4),          3*g(3)*g(4)^2,          g(4)^3";
+//"g(1)^3,     3*g(1)^2*g(2),          3*g(1)*g(2)^2,          g(2)^3,";
+//"g(1)^2*g(3),3*g(1)^2*g(4)-2*g(1),   3*g(1)*g(2)*g(4)-1*g(2),g(2)^2*g(4),";
+//"g(1)*g(3)^2,3*g(1)*g(3)*g(4)-1*g(3),3*g(1)*g(4)^2-2*g(4),   g(2)*g(4)^2,";
+//"g(3)^3,     3*g(3)^2*g(4),          3*g(3)*g(4)^2,          g(4)^3";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -170,7 +170,7 @@ RETURNS: If m is a n x n matrix with coefficients in the ring 'group',
       print("Ideal B:");
       print(B);
       ring polyring=0,(x(1..n)),dp;
-      keepring polyring;
+      export polyring;
       ideal ZFideal=imap(r,B);
       ZFideal=minbase(ZFideal);
       print("");
@@ -297,7 +297,7 @@ example
 {       "> torus(3);";
         torus(3);
         "> group;";
-        group;
+        Invar::group;
         "> groupideal;";
         groupideal;
 }
