@@ -731,7 +731,7 @@ iniD, reslist, sumlist, dividelist, createlist
 * finvar_lib:: procedures to compute invariant rings of finite groups
 * ainvar_lib:: procedures to compute invariants rings of the additive group
 * rinvar_lib:: procedures to compute invariants ring of reductive groups
-* ibar_lib:: procedures to compute invariants ring of SL(n) and torus groups
+* invar_lib:: procedures to compute invariants ring of SL(n) and torus groups
 * stratify_lib:: algorithmic stratification by the Greuel-Pfister algorithm
 @end menu
 
