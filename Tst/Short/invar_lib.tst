@@ -7,7 +7,7 @@ tst_init();
 ////////////////////////////////////////////////////////////////////////////////
 
 
-LIB "matrix.lib";               // read the libraries
+LIB "matrix.lib";
 LIB "invar.lib";
 
 "EXAMPLE 1:";
@@ -15,8 +15,9 @@ SL(2);                          // Take the group SL_2
 matrix m=dsum(SLrep,SLrep,SLrep,SLrep);
                                 // 4 copies of the standard representation
 invar(m);                       // empirical evidence for FFT
-reynolds(x(1)*x(4));            // The reynolds operator is computed using
-                                // the Omega process.
+setring Invar::polyring;
+// The reynolds operator is computed using the Omega process.
+Invar::reynolds(x(1)*x(4)); 
 
 setring Invar::group;                  
 
@@ -32,9 +33,6 @@ invar(m);                       // more empirical evidence for FFT
 ////////////////////////////////////////////////////////////////////////////////
 
 
-LIB "matrix.lib";               // read the libraries
-LIB "invar.lib";
-
 SL(2);
 
 matrix m=dsum(sympower(SLrep,2),SLrep,SLrep);
@@ -45,8 +43,6 @@ invar(m);
 // Examples
 // Tori
 ////////////////////////////////////////////////////////////////////////////////
-
-LIB "invar.lib";                // read the library
 
 "EXAMPLE 1:";
 
@@ -88,9 +84,6 @@ invar(m);
 // Finite groups
 ////////////////////////////////////////////////////////////////////////////////
 
-LIB "matrix.lib";               // read the libraries
-LIB "invar.lib";
-
 "EXAMPLE 1:";
 finite(6);                              // The symmetric group S_3
 matrix id=unitmat(3);                   // identity matrix
@@ -118,7 +111,6 @@ invar(rep);                             // compute the invariant ring
 // Binary forms
 ////////////////////////////////////////////////////////////////////////////////
 
-LIB "invar.lib";                // read the library
 "EXAMPLE 1:";
 SL(2);                          // set the current group to SL_2
 invar(SLrep);                   // invariants of the standard representation

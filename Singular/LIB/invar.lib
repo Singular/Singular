@@ -11,8 +11,6 @@ PROCEDURES:
   torus(n)               sets the current group to an n-dimensional torus
   torusrep(list m)       representation of a torus given by the weights m[1],m[2],...
   finiterep(<list>)      representation of a by a list of matrices
-  prod(l)                gives the product of all entries of list l
-  monsum(n,d)            sum of all monomials in x(1),x(2),...,x(n) of degree d
   sympower(m,d)          computes the d-th symmetric power of a representation m
   invar(m)               computes the invariant ring of the representation m.
   SLreynolds(f)          applies the Reynolds operator to f
@@ -53,20 +51,17 @@ EXAMPLE: example SL; shows an example"
         export reynolds;
 }
 example
-{       "> SL(3);";
-        SL(3);
-        "> group;";
-        Invar::group;
-        "> groupideal;";
-        groupideal;
-        "> print(SLrep);";
-        print(SLrep);
+{"EXAMPLE:"; echo=2;
+  SL(3);
+  Invar::group;
+  groupideal;
+  print(SLrep);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // prod(<list>) just gives the product of all entries of <list>.
 ////////////////////////////////////////////////////////////////////////////////
-proc prod(list #)
+static proc prod(list #)
 "USAGE: prod(<list>)
 RETURN: the product of all entries of <list>"
 {       if (size(#)==1) {return(#[1]);};
@@ -76,7 +71,7 @@ RETURN: the product of all entries of <list>"
 ////////////////////////////////////////////////////////////////////////////////
 // monsum(n,d) is the sum of all monomials in x(1),x(2),...,x(n) of degree d
 ////////////////////////////////////////////////////////////////////////////////
-proc monsum(int n,int d)
+static proc monsum(int n,int d)
 "USAGE: monsum(n,d)
 RETURNS: the sum of all monomials in x(1),x(2),...,x(n) of degree d"
 {       if (n==1) {return(x(1)^d);};
@@ -122,18 +117,10 @@ EXAMPLE: example sympower; shows an example"
         return(imap(r,sp));
 }
 example
-{       "> SL(2);";
-        SL(2);
-        "> print(SLrep);";
-        print(SLrep);
-        "> print(sympower(SLrep,3));";
-        print(sympower(SLrep,3));               // doesn't work in the example
-                                                // environment. Bug in Singular??
-                                                // We'll have to cheat:
-//"g(1)^3,     3*g(1)^2*g(2),          3*g(1)*g(2)^2,          g(2)^3,";
-//"g(1)^2*g(3),3*g(1)^2*g(4)-2*g(1),   3*g(1)*g(2)*g(4)-1*g(2),g(2)^2*g(4),";
-//"g(1)*g(3)^2,3*g(1)*g(3)*g(4)-1*g(3),3*g(1)*g(4)^2-2*g(4),   g(2)*g(4)^2,";
-//"g(3)^3,     3*g(3)^2*g(4),          3*g(3)*g(4)^2,          g(4)^3";
+{ "EXAMPLE:"; echo=2;
+  SL(2);
+  print(SLrep);
+  print(sympower(SLrep,3));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -150,7 +137,9 @@ RETURNS: If m is a n x n matrix with coefficients in the ring 'group',
            representation  of type <matrix>
          The base ring will be set to 'polyring' which is a global
          variable representing the polynomial ring on which the group acts.
-         The variable 'representation' will be set to the input m."
+         The variable 'representation' will be set to the input m.
+EXAMPLE: example invar; shows an example
+"
 {
       int n=nrows(m);
       int l=nvars(group);
@@ -187,6 +176,16 @@ RETURNS: If m is a n x n matrix with coefficients in the ring 'group',
      print("Generating Invariants:");
      print(invring);
 }
+example
+{ "EXAMPLE:"; echo=2;
+  SL(2);                          // Take the group SL_2
+  matrix m=dsum(SLrep,SLrep,SLrep,SLrep);
+                                  // 4 copies of the standard representation
+  invar(m);                       // empirical evidence for FFT
+  reynolds(x(1)*x(4));            // The reynolds operator is computed using
+                                  // the Omega process.
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // omega(f,n,i_1,i_2,...,i_t) does the following:
@@ -293,12 +292,10 @@ EXAMPLE: example torus; shows an example"
         export reynolds;
 }
 example
-{       "> torus(3);";
-        torus(3);
-        "> group;";
-        Invar::group;
-        "> groupideal;";
-        groupideal;
+{"EXAMPLE:"; echo=2;
+  torus(3);
+  Invar::group;
+  groupideal;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -311,7 +308,9 @@ proc torusrep(list m)
          n, where n is the dimension of the current torusgroup.
 RETURNS: torusrep(m) gives a matrix with entries in 'group'. This matrix
          represents the action of the torus with weights
-         m[1],m[2],...,m[size(m)]"
+         m[1],m[2],...,m[size(m)]
+EXAMPLE: example torusreynolds; shows an example
+"
 {       int r=size(m[1]);
         int n=size(m);
         matrix mm[n][n];
@@ -327,6 +326,13 @@ RETURNS: torusrep(m) gives a matrix with entries in 'group'. This matrix
                         {f=f*g(j)**(m[i][j]-min);};
                 mm[i,i]=f;};
         return(mm);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  torus(1);                  // Take the 1-dimensional torus, the multiplicative group.
+  list weights=-2,-3,7;      // 3-dimensial action with weights -2,-3,7
+  matrix m=torusrep(weights);// compute the matrix of the representation
+  invar(m);                  // compute the invariant ring
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -365,10 +371,10 @@ RETURNS:  the n-th cyclotomic polynomial in z"
         poly f=z-1;
         int i=prime(n-1);
         while(i<>2)
-                {if (n%i==0) {f=f*(z**(n/i)-1);};
+                {if (n%i==0) {f=f*(z**(n div i)-1);};
                 i=prime(i-1);};
-        if (n%2==0) {f=f*(z**(n/2)-1);};
-        h=h/GCD(f,h);
+        if (n%2==0) {f=f*(z**(n div 2)-1);};
+        h=h/gcd(f,h);
         return(h/leadcoef(h));
 }
 
@@ -382,7 +388,9 @@ RETURNS: finite(n) sets the current group to a finite group of order n.
            group        of type <ring>
            groupideal   of type <ideal>
            reynolds     of type <proc>
-         The basering will be set to 'group'."
+         The basering will be set to 'group'.
+EXAMPLE: example finite; shows an example
+"
 {       ring group=0,(g(1),g(2)),dp(2);
         export group;
         ideal groupideal=g(2)^n-1,cyclotomic(n,g(1));
@@ -394,6 +402,17 @@ RETURNS: finite(n) sets the current group to a finite group of order n.
                                                 // no need to implement
                                                 // 'finitereynolds'
 }
+example
+{"EXAMPLE:"; echo=2;
+  finite(6);                              // The symmetric group S_3
+  matrix id=unitmat(3);                   // identity matrix
+  matrix m3[3][3]=0,1,0,0,0,1,1,0,0;      // corresponds with (1 2 3)
+  matrix m2[3][3]=0,1,0,1,0,0,0,0,1;      // corresponds with (1 2)
+  list a=id,m3,m3*m3,m2,m2*m3,m2*m3*m3;   // all elements of S_3
+  matrix rep=finiterep(a);                // compute matrix of standard repr.
+  invar(rep);                             // compute the invariant ring
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // If m is a list of matrices, then finiterep(m) gives a matrix with
@@ -405,7 +424,9 @@ proc finiterep(list m)
 "USAGE:   finiterep(<list>), <list> must be a list of matrices
 RETURNS: finiterep(m) gives a matrix with coefficients in the ring 'group'
          which represents the action of the finite group where the elements
-         of the finite group act as m[1],m[2],...m[size(m)]."
+         of the finite group act as m[1],m[2],...m[size(m)].
+EXAMPLE: example finiterep; shows an example
+"
 {       int l=size(m);
         int n=nrows(m[1]);
         int i;
@@ -418,5 +439,15 @@ RETURNS: finiterep(m) gives a matrix with coefficients in the ring 'group'
                         {h=h+g(2)^j*g(1)^((i*j)%l)/l;};
                 finiterep=finiterep+h*m[i+1];}
         return(finiterep);
+}
+example
+{"EXAMPLE:"; echo=2;
+  finite(6);                              // The symmetric group S_3
+  matrix id=unitmat(3);                   // identity matrix
+  matrix m3[3][3]=0,1,0,0,0,1,1,0,0;      // corresponds with (1 2 3)
+  matrix m2[3][3]=0,1,0,1,0,0,0,0,1;      // corresponds with (1 2)
+  list a=id,m3,m3*m3,m2,m2*m3,m2*m3*m3;   // all elements of S_3
+  matrix rep=finiterep(a);                // compute matrix of standard repr.
+  invar(rep);                             // compute the invariant ring
 }
 
