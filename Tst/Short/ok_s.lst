@@ -112,6 +112,7 @@ gcd5test
 gcd_univar_p_s
 gcd_univar_p_alpha_s
 homalg
+invar_lib
 modular_s
 modstd_s
 modules

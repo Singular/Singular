@@ -164,7 +164,6 @@ RETURNS: If m is a n x n matrix with coefficients in the ring 'group',
       matrix w[1][n]=transpose(vx)*mm-transpose(vy);
       ideal Gamma=ideal(w),gideal;
       poly prodg=prod(g(1..l));
-      "hallo";
       ideal B=eliminate(Gamma,prodg);
       print("");
       print("Ideal B:");
