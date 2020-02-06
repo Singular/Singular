@@ -577,9 +577,9 @@ a local  variable (w.r.t. a procedure),
 @item
 a local ring variable (w.r.t. the current basering locally set in a procedure),
 @item
-a global variable,
-@item
 a global ring variable (w.r.t. the current basering)
+@item
+a global variable,
 @item
 a monomial consisting of local ring variables written without operators,
 @item

@@ -183,7 +183,8 @@ example
   matrix m=dsum(SLrep,SLrep,SLrep,SLrep);
                                   // 4 copies of the standard representation
   invar(m);                       // empirical evidence for FFT
-  reynolds(x(1)*x(4));            // The reynolds operator is computed using
+  setring Invar::polyring;
+  Invar::reynolds(x(1)*x(4));            // The reynolds operator is computed using
                                   // the Omega process.
 }
 
