@@ -17,6 +17,7 @@ PROCEDURES:
   torusreynolds(f)       applies the Reynolds operator to f if the group is a torus or a finite group.
   cyclotomic(n,z)        the n-th cyclotomic polynomial in the variable z.
 ";
+LIB "matrix.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
 // SL(n) sets the current group to SL_n.
