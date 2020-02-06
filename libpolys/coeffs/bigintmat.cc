@@ -199,7 +199,7 @@ bigintmat * bimAdd(bigintmat * a, bigintmat * b)
 bigintmat * bimAdd(bigintmat * a, int b)
 {
 
-  const int mn = a->rows()*a->cols();
+  const int mn = si_min(a->rows(),a->cols());
 
   const coeffs basecoeffs = a->basecoeffs();
   number bb=n_Init(b,basecoeffs);
@@ -208,8 +208,8 @@ bigintmat * bimAdd(bigintmat * a, int b)
 
   bigintmat * bim = new bigintmat(a->rows(),a->cols() , basecoeffs);
 
-  for (i=0; i<mn; i++)
-    bim->rawset(i, n_Add((*a)[i], bb, basecoeffs), basecoeffs);
+  for (i=1; i<=mn; i++)
+    BIMATELEM(*bim,i,i)=n_Add(BIMATELEM(*a,i,i), bb, basecoeffs);
 
   n_Delete(&bb,basecoeffs);
   return bim;
