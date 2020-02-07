@@ -1963,8 +1963,13 @@ example {
   AF = minimalAfaces(AF);
   list OC = orbitCones(AF,Q);
   bigintmat w[1][nrows(Q)];
-  for(int i = 1; i <= nrows(Q); i++){
-    w = w + Q[1..nrows(Q),i];
+  int j;
+  for(int i = 1; i <= nrows(Q); i++)
+  {
+    for(j=1;j<=nrows(Q);j++)
+    {
+      w[1,j]= w[1,j] + Q[1,i];
+    }
   }
   GITcone(OC,w);
 }
