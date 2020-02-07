@@ -67,7 +67,7 @@ static proc prod(list #)
 RETURN: the product of all entries of <list>"
 {       if (size(#)==1) {return(#[1]);};
         return(#[1]*prod(#[2..size(#)]));
-};
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // monsum(n,d) is the sum of all monomials in x(1),x(2),...,x(n) of degree d
@@ -80,7 +80,7 @@ RETURNS: the sum of all monomials in x(1),x(2),...,x(n) of degree d"
         for(int i=0;i<=d;i=i+1)
                 {output=output+x(n)^i*monsum(n-1,d-i);};
         return(output);
-};
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // sympower(m,d) computes the d-th symmetric power of a representation m
@@ -235,7 +235,7 @@ Cramer's rule is used, which gives us a recursion.
                         else {a=#[1..i-1];};};
                 output=output+(-1)**(i-1)*omega(diff(f,g((#[i]-1)*n+m)),n,a);};
         return(output);
-};
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // SLreynolds(f) applies the reynolds operator to f, if the group is SL_n,
@@ -270,7 +270,7 @@ NOTE: if the group is SL_n the omega-process is used"
                 i=i+1;};
         setring polyring;
         return(imap(r,output));
-};
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // torus(n) sets the current group to an n-dimensional torus
