@@ -3,7 +3,7 @@
 version="version invar.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Invariant theory";
 info="
-LIBRARY:  invar.lib Procedures to compute invariants ring of SL(n) and torus groups
+LIBRARY:  invar.lib Procedures to compute invariant rings of SL(n) and torus groups
 AUTHOR: Harm Derksen, hderksen@math.unibas.ch
 
 PROCEDURES:
