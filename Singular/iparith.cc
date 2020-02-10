@@ -1643,20 +1643,22 @@ BOOLEAN jjPROC(leftv res, leftv u, leftv v)
 static BOOLEAN jjMAP(leftv res, leftv u, leftv v)
 {
   //Print("try to map %s with %s\n",$3.Name(),$1.Name());
-  leftv sl=NULL;
-  if ((v->e==NULL)&&(v->name!=NULL))
+  if ((v->e==NULL)&&(v->name!=NULL)&&(v->next==NULL))
   {
     map m=(map)u->Data();
-    sl=iiMap(m,v->name);
+    leftv sl=iiMap(m,v->name);
+    if (sl!=NULL)
+    {
+      memcpy(res,sl,sizeof(sleftv));
+      omFreeBin((ADDRESS)sl, sleftv_bin);
+      return FALSE;
+    }
   }
   else
   {
     Werror("%s(<name>) expected",u->Name());
   }
-  if (sl==NULL) return TRUE;
-  memcpy(res,sl,sizeof(sleftv));
-  omFreeBin((ADDRESS)sl, sleftv_bin);
-  return FALSE;
+  return TRUE; /*sl==NULL or Werror*/
 }
 static BOOLEAN jjRING_1(leftv res, leftv u, leftv v)
 {
