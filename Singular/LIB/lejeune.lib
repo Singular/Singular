@@ -139,6 +139,7 @@ proc trunc (poly f, int i)
    print(result[k]);
    newline;
  }
+ export result;
  // return the ring
  return(R1);
 }
@@ -146,7 +147,7 @@ proc trunc (poly f, int i)
 example
 {
   "EXAMPLE:"; echo=2;
-  def r=basering;
+  ring r=QQ,(x,y),dp;
   poly f=y2-x3;
   def R=trunc(f,3);
   setring R;
@@ -227,7 +228,7 @@ proc fgset (poly f,intvec H)
 example
 {
   "EXAMPLE:"; echo=2;
-  def r= basering;
+  ring r=QQ,(x,y),dp;
   poly f=y2-x3;
   intvec H1=2,2,2;
   intvec H2=2,2,2,1;
