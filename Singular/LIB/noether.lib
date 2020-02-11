@@ -855,8 +855,12 @@ KEYWORDS: regularity
   int e,ii,jj,H,h,d,time,p,nl;
   def r0 = basering;
   int n = nvars(r0)-1;
-  string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
-  execute(s);
+  list l12;
+  for (int zz = 0; zz <= n; zz++)
+  {
+   l12[zz+1] = "x("+string(zz)+")";
+  }
+  ring r1 = create_ring(ringlist(r0)[1], l12, "dp", "no_minpoly");
   ideal i,sbi,I,J,K,L,lsbi1,lsbi2;
   list #;
   poly P;
