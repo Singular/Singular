@@ -101,9 +101,10 @@ void jjNormalizeQRingP(poly &p);
 void jjNormalizeQRingId(leftv I);
 void *idrecDataInit(int t);
 
-#define FLAG_STD   0
-#define FLAG_TWOSTD  3
-#define FLAG_QRING   4
+#define FLAG_STD       0
+#define FLAG_TWOSTD    3
+#define FLAG_QRING     4
+#define FLAG_QRING_DEF 5
 #define hasFlag(A,F) Sy_inset((F),(A)->flag)
 #define setFlag(A,F) (A)->flag|=Sy_bit(F)
 #define resetFlag(A,F) (A)->flag&=~Sy_bit(F)

@@ -163,6 +163,7 @@ static void jjMINPOLY_red(idhdl h)
       {
         jjMINPOLY_red((idhdl)&(L->m[i]));
       }
+      break;
     }
     default:
     //case RESOLUTION_CMD:
@@ -1113,7 +1114,7 @@ static BOOLEAN jiA_CRING(leftv res, leftv a, Subexpr)
 /*2
 * assign a = b
 */
-static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
+static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel, BOOLEAN is_qring=FALSE)
 {
   int rt=r->Typ();
   if (rt==0)
@@ -1198,6 +1199,12 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
     Print("bb-assign: bb=%lx\n",bb);
 #endif
     return (bb==NULL) || bb->blackbox_Assign(l,r);
+  }
+  if ((is_qring)
+  &&(lt==RING_CMD)
+  &&(rt==RING_CMD))
+  {
+    Warn("qring .. = <ring>; is misleading in >>%s<<",my_yylinebuf);
   }
   int start=0;
   while ((dAssign[start].res!=lt)
@@ -1834,6 +1841,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
   int rl;
   int lt=l->Typ();
   int rt=NONE;
+  int is_qring=FALSE;
   BOOLEAN b=FALSE;
   if (l->rtyp==ALIAS_CMD)
   {
@@ -1843,6 +1851,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
   if (l->rtyp==IDHDL)
   {
     atKillAll((idhdl)l->data);
+    is_qring=hasFlag((idhdl)l->data,FLAG_QRING_DEF);
     IDFLAG((idhdl)l->data)=0;
     l->attribute=NULL;
     toplevel=FALSE;
@@ -1928,7 +1937,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
       &&(lt!=INTMAT_CMD)
       &&((lt==rt)||(lt!=LIST_CMD)))
       {
-        b=jiAssign_1(l,r,toplevel);
+        b=jiAssign_1(l,r,toplevel,is_qring);
         if (l->rtyp==IDHDL)
         {
           if ((lt==DEF_CMD)||(lt==LIST_CMD))

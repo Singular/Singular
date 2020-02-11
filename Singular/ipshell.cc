@@ -1125,6 +1125,7 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
 int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isring, BOOLEAN init_b)
 {
   BOOLEAN res=FALSE;
+  BOOLEAN is_qring=FALSE;
   const char *id = name->name;
 
   memset(sy,0,sizeof(sleftv));
@@ -1144,7 +1145,11 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
         return TRUE;
       }
     }
-    if (t==QRING_CMD) t=RING_CMD; // qring is always RING_CMD
+    if (t==QRING_CMD)
+    {
+      t=RING_CMD; // qring is always RING_CMD
+      is_qring=TRUE;
+    }
 
     if (TEST_V_ALLWARN
     && (name->rtyp!=0)
@@ -1161,6 +1166,10 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
     {
       sy->rtyp=IDHDL;
       currid=sy->name=IDID((idhdl)sy->data);
+      if (is_qring)
+      {
+        IDFLAG((idhdl)sy->data)=sy->flag=Sy_bit(FLAG_QRING_DEF);
+      }
       // name->name=NULL; /* used in enterid */
       //sy->e = NULL;
       if (name->next!=NULL)
