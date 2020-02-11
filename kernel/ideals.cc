@@ -2907,7 +2907,8 @@ static BOOLEAN id_sat_vars_sp(kStrategy strat)
       //  for (int i=rVar(currRing); i>0; i--)
       //    if (mm[i]!=0) Print("x_%d:%d ",i,mm[i]);
       //PrintLn();
-      memset(&strat->P,0,sizeof(strat->P));
+      strat->P.Init(currRing);
+      //memset(&strat->P,0,sizeof(strat->P));
       strat->P.tailRing = strat->tailRing;
       strat->P.p=p;
       while(p!=NULL)
@@ -2958,7 +2959,8 @@ static BOOLEAN id_sat_vars_sp(kStrategy strat)
       //  for (int i=rVar(currRing); i>0; i--)
       //    if (mm[i]!=0) Print("x_%d:%d ",i,mm[i]);
       //PrintLn();
-      memset(&strat->P,0,sizeof(strat->P));
+      strat->P.Init(currRing);
+      //memset(&strat->P,0,sizeof(strat->P));
       strat->P.tailRing = strat->tailRing;
       strat->P.t_p=p;
       while(p!=NULL)
