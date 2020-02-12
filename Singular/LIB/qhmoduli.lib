@@ -356,7 +356,7 @@ EXAMPLE: example ArnoldAction; shows an example
    l4[zz] = "s("+string(zz)+")";
   }
   list l5;
-  for (int zz = 1; zz <= size(B); zz++)
+  for (zz = 1; zz <= size(B); zz++)
   {
    l5[zz] = "t("+string(zz)+")";
   }
@@ -1036,17 +1036,18 @@ GLOBAL:  'computedPowers'
   // set ideal mpoly = minpoly for reduction !
 
   @ringVars = "(" + varstr(basering) + ", " + parstr(1) + ",";  // precondition
+  int zz;
   if(nrs > 0)
   {
     list l8;
-    for (int zz = 1; zz <= nrs; zz++)
+    for (zz = 1; zz <= nrs; zz++)
     {
      l8[zz] = "s("+string(zz)+")";
     }
     @ringVars = @ringVars + ""+string(l8)+", ";
   }
   list l9;
-  for (int zz = 1; zz <= nrt; zz++)
+  for (zz = 1; zz <= nrt; zz++)
   {
    l9[zz] = "t("+string(zz)+")";
   }
