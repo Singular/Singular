@@ -4031,12 +4031,15 @@ EXAMPLE: example zeroRad; shows an example"
       F[i]=powerCoeffs(F[i],k-l[i][2]);
    }
 
-   string cR="ring @R="+string(p)+",("+parstr(R)+","+varstr(R)+"),dp;";
-   execute(cR);
+   ring @R = create_ring(p, "("+parstr(R)+","+varstr(R)+")", "dp");
    ideal F=imap(R,F);
 
-   string nR="ring @S="+string(p)+",(@y(1..m),"+varstr(R)+","+parstr(R)+"),dp;";
-   execute(nR);
+   list l2;  
+   for (int zz = 1; zz <= m; zz++)
+   {
+    l2[size(l2)+1] = "@y("+string(zz)+")";
+   }
+   ring @S = create_ring(p, "("+string(l2)+","+varstr(R)+","+parstr(R)+")", "dp");
 
    ideal G=fetch(@R,F);    //G[i](t(1)^(p^-k),...,t(m)^(p^-k),x(i))=sep(F[i])
 
@@ -4074,16 +4077,12 @@ static proc algeRad(ideal i)
    int n=nvars(R);
 
    string mp="poly @p="+string(minpoly)+";";
-   string gnir="ring RH="+string(char(R))+",("+varstr(R)+","+string(par(1))
-                +"),dp;";
-   execute(gnir);
+   ring RH = create_ring(char(R), "("+varstr(R)+","+string(par(1))+")", "dp");
    execute(mp);
    ideal i=imap(R,i);
    i=i,@p;
    ideal ra=radical(i);
-   gnir="ring RS="+string(char(R))+",("+varstr(RH)
-                +"),(dp("+string(n)+"),lp);";
-   execute(gnir);
+   ring RS = create_ring(char(R), "("+varstr(RH)+")", "(dp("+string(n)+"),lp)");
    ideal K=imap(RH,ra);
    K=std(K);
    if (ncols(K)>1) { K=K[2..size(K)];}
