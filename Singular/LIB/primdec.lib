@@ -4077,12 +4077,16 @@ static proc algeRad(ideal i)
    int n=nvars(R);
 
    string mp="poly @p="+string(minpoly)+";";
-   ring RH = create_ring(char(R), "("+varstr(R)+","+string(par(1))+")", "dp");
+   string gnir="ring RH="+string(char(R))+",("+varstr(R)+","+string(par(1))
+                +"),dp;";
+   execute(gnir);
    execute(mp);
    ideal i=imap(R,i);
    i=i,@p;
    ideal ra=radical(i);
-   ring RS = create_ring(char(R), "("+varstr(RH)+")", "(dp("+string(n)+"),lp)");
+   gnir="ring RS="+string(char(R))+",("+varstr(RH)
+                +"),(dp("+string(n)+"),lp);";
+   execute(gnir);
    ideal K=imap(RH,ra);
    K=std(K);
    if (ncols(K)>1) { K=K[2..size(K)];}
