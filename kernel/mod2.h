@@ -76,7 +76,7 @@
 #define ALIGN_8
 #endif
 
-#define SINGULAR_PATCHLEVEL 3
+#define SINGULAR_PATCHLEVEL 4
 #define SINGULAR_VERSION ((SINGULAR_MAJOR_VERSION*1000 + SINGULAR_MINOR_VERSION*100 + SINGULAR_SUB_VERSION*10)+SINGULAR_PATCHLEVEL)
 
 /*******************************************************************
