@@ -29,11 +29,6 @@
 #define NV_MAX_PRIME 32749
 #define FACTORY_MAX_PRIME 536870909
 
-#ifdef USE_NTL_XGCD
-// in ntl.a
-extern void XGCD(long& d, long& s, long& t, long a, long b);
-#endif
-
 struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
 struct snumber; typedef struct snumber *   number;
 
@@ -186,18 +181,13 @@ static inline long npInvMod(long a, const coeffs R)
 {
    long s, t;
 
-#ifdef USE_NTL_XGCD
-   long d;
-   XGCD(d, s, t, a, R->ch);
-   assume (d == 1);
-#else
    long  u, v, u0, v0, u1, u2, q, r;
 
    assume(a>0);
    u1=1; u2=0;
    u = a; v = R->ch;
 
-   while (v != 0)
+   do
    {
       q = u / v;
       //r = u % v;
@@ -207,11 +197,10 @@ static inline long npInvMod(long a, const coeffs R)
       u0 = u2;
       u2 = u1 - q*u2;
       u1 = u0;
-   }
+   } while (v != 0);
 
    assume(u==1);
    s = u1;
-#endif
 #ifdef HAVE_GENERIC_ADD
    if (s < 0)
       return s + R->ch;
