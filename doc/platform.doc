@@ -119,6 +119,10 @@ the command line (inspecting also PATH, following symlinks).
 @item SINGULAR_BIN_DIR
 @*the directory of the main executable, usually derived from
 $SINGULAR_EXECUTABLE
+@item SINGULAR_ROOT_DIR
+@*the root of the singular tree, default: $SINGULAR_BIN_DIR/..
+@item SINGULAR_DATA_DIR
+@*the root of the singular data files, default: $SINGULAR_BIN_DIR/../share
 @item SINGULARPATH
 @*the directories for libraries and optional dynamic modules (seperated by @code{;}), default:
   @itemize
@@ -136,8 +140,6 @@ $SINGULAR_EXECUTABLE
   @item $prefix/libexec/singular/MOD
   @item $SINGULAR_BIN_DIR
   @end itemize
-@item SINGULAR_ROOT_DIR
-@*the root of the singular tree, default: $SINGULAR_BIN_DIR/..
 @item SINGULAR_PROCS_DIR
 @*the directories for dynamic modules (seperated by @code{;}), default:
   @itemize
@@ -147,8 +149,6 @@ $SINGULAR_EXECUTABLE
   @item $prefix/lib/singular/MOD
   @item $prefix/libexec/singular/MOD
   @end itemize
-@item SINGULAR_DATA_DIR
-@*the root of the singular data files, default: $SINGULAR_BIN_DIR/../share
 @item SINGULAR_INFO_FILE
 @*@code{singular.hlp}, default: $SINGULAR_DATA_DIR/info/singular.hlp
 @item SINGULAR_IDX_FILE
