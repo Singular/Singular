@@ -65,11 +65,6 @@ Please send any comments or bug reports to
 
 If you want to be informed of new releases,
 please register as a @sc{Singular} user by
-@c using the
-@c registration form on the @sc{Singular} homepage
-@c               @uref{http://www.singular.uni-kl.de}.
-@c If for some reason you cannot access the registration form, you
-@c can also register by
 sending an email to
               @email{singular@@mathematik.uni-kl.de}
 with subject line @code{register} and body containing the following data:
@@ -77,7 +72,7 @@ with subject line @code{register} and body containing the following data:
 
 
 For information on how to cite @sc{Singular} see
-@*@uref{http://www.singular.uni-kl.de/index.php/how-to-cite-singular}.
+@*@uref{https://www.singular.uni-kl.de/index.php/how-to-cite-singular}.
 
 You can also support @sc{Singular} by informing us about
 your result obtained by using @sc{Singular}.
@@ -85,7 +80,7 @@ your result obtained by using @sc{Singular}.
 @heading Availability
 
 The latest information regarding the status of @sc{Singular} is always
-available from @uref{http://www.singular.uni-kl.de}.
+available from @uref{https://www.singular.uni-kl.de}.
 @ifset singularmanual
 The program @sc{Singular} and the above mentioned parts are available via
 anonymous ftp through the following addresses:

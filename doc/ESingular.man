@@ -27,7 +27,7 @@ Do not start program. Print call to stdout
 all other options are passed to Singular.
 .PP
 For more information, type `help;' from within Singular or visit
-http://www.singular.uni\-kl.de or consult the
+https://www.singular.uni\-kl.de or consult the
 Singular manual (available as on\-line info or html manual).
 .SH "SEE ALSO"
 The full documentation for
