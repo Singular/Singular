@@ -133,6 +133,9 @@ default: $SINGULAR_DATA_DIR/singular/html
 @item SINGULAR_URL
 the URL of the manual, default: https://www.singular.uni-kl.de/Manual/
 @end itemize
+
+The effective list of directories/files can be printed by @code{Singular -v},
+see @ref{Command line options}.
 @c ----------------------------------------------------------
 @node Unix installation instructions
 @section Unix installation instructions
