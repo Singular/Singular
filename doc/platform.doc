@@ -102,18 +102,43 @@ from our FTP site
 @section Used environment variables
 @cindex environment variables
 @cindex used environment variables
+@cindex path
+@cindex paths
+
+@sc{Singular} needs to find some files (dynamic modules, libraries, help files).
+Usually they are found relative to the location of the (main) executable
+(after following symlinks).
+This can be changed by setting the following environment variables.
 
 @itemize
 @item SINGULAR_EXECUTABLE
-the complete filename of the main executable, usually derived from
-the command line (inspecting also PATH, following symlinks)
+@*the complete filename of the main executable, usually derived from
+the command line (inspecting also PATH, following symlinks).
+@*If SINGULAR_EXECUTABLE cannot be found, $prefix/bin/Singular is assumed.
 @item SINGULAR_BIN_DIR
-the directory of the main executable, usually derived from
+@*the directory of the main executable, usually derived from
 the command line
+@item SINGULARPATH
+@*the directories for @sc{Singular}'s libraries and optional dynamic modules (seperated by @code{;}), default:
+  @begin itemize
+  @item $SINGULAR_DATA_DIR/singular/LIB
+  @item $SINGULAR_ROOT_DIR/share/singular/LIB
+  @item $SINGULAR_BIN_DIR/../share/singular/LIB
+  @item $SINGULAR_DATA_DIR/factory
+  @item $SINGULAR_ROOT_DIR/share/factory
+  @item $SINGULAR_BIN_DIR/LIB
+  @item $SINGULAR_BIN_DIR/../factory
+  @item $SINGULAR_BIN_DIR/MOD
+  @item $SINGULAR_ROOT_DIR/lib/singular/MOD
+  @item $SINGULAR_ROOT_DIR/libexec/singular/MOD
+  @item $prefix/lib/singular/MOD
+  @item $prefix/libexec/singular/MOD
+  @item $SINGULAR_BIN_DIR
+  @rend itemize
 @item SINGULAR_ROOT_DIR
-the root of the singular tree, default: $SINGULAR_BIN_DIR/..
+@*the root of the singular tree, default: $SINGULAR_BIN_DIR/..
 @item SINGULAR_PROCS_DIR
-the directories for dynamic modules (seperated by @code{;}), defaults:
+@*the directories for dynamic modules (seperated by @code{;}), default:
   @itemize
   @item $SINGULAR_BIN_DIR/MOD
   @item $SINGULAR_ROOT_DIR/lib/singular/MOD
@@ -122,20 +147,22 @@ the directories for dynamic modules (seperated by @code{;}), defaults:
   @item $prefix/libexec/singular/MOD
   @end itemize
 @item SINGULAR_DATA_DIR
-the root of the singular data files, default: $SINGULAR_BIN_DIR/../share
+@*the root of the singular data files, default: $SINGULAR_BIN_DIR/../share
 @item SINGULAR_INFO_FILE
-@code{singular.hlp}, default: $SINGULAR_DATA_DIR/info/singular.hlp
+@*@code{singular.hlp}, default: $SINGULAR_DATA_DIR/info/singular.hlp
 @item SINGULAR_IDX_FILE
-the help index, default: $SINGULAR_DATA_DIR/singular/singular.idx
+@*the help index, default: $SINGULAR_DATA_DIR/singular/singular.idx
 @item SINGULAR_HTML_DIR
-the directory of the manual as html files,
+@*the directory of the manual as html files,
 default: $SINGULAR_DATA_DIR/singular/html
 @item SINGULAR_URL
-the URL of the manual, default: https://www.singular.uni-kl.de/Manual/
+@*the URL of the manual, default: https://www.singular.uni-kl.de/Manual/
 @end itemize
 
 The effective list of directories/files can be printed by @code{Singular -v},
 see @ref{Command line options}.
+
+Depending on the used functions, these environment vraiables apply also to @code{libSingular}.
 @c ----------------------------------------------------------
 @node Unix installation instructions
 @section Unix installation instructions
