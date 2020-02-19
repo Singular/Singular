@@ -117,9 +117,9 @@ the command line (inspecting also PATH, following symlinks).
 @*If SINGULAR_EXECUTABLE cannot be found, $prefix/bin/Singular is assumed.
 @item SINGULAR_BIN_DIR
 @*the directory of the main executable, usually derived from
-the command line
+$SINGULAR_EXECUTABLE
 @item SINGULARPATH
-@*the directories for @sc{Singular}'s libraries and optional dynamic modules (seperated by @code{;}), default:
+@*the directories for libraries and optional dynamic modules (seperated by @code{;}), default:
   @itemize
   @item $SINGULAR_DATA_DIR/singular/LIB
   @item $SINGULAR_ROOT_DIR/share/singular/LIB
