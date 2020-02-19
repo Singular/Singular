@@ -123,9 +123,7 @@ EXAMPLE: example cyclotomic; shows an example
       s=matrix(syz(ideal(s)));         // dividing
       min=s[2,1];
     }
-    if (n*j==i)                        // the earliest possible point to break
-    { break;
-    }
+    if (n*j==i) break;                 // the earliest possible point to break
     j++;
   }
   min=min/leadcoef(min);               // making sure that the leading

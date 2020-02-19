@@ -15,9 +15,9 @@ PROCEDURES:
   invar(m)               computes the invariant ring of the representation m.
   SLreynolds(f)          applies the Reynolds operator to f
   torusreynolds(f)       applies the Reynolds operator to f if the group is a torus or a finite group.
-  cyclotomic(n,z)        the n-th cyclotomic polynomial in the variable z.
 ";
 LIB "matrix.lib";
+LIB "finvar.lib"; // for cyclotomic
 
 ////////////////////////////////////////////////////////////////////////////////
 // SL(n) sets the current group to SL_n.
@@ -361,26 +361,6 @@ proc torusreynolds(poly f)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// cyclotomic(n,z) gives the n-th cyclotomic polynomial in z, where z is
-// a variable.
-////////////////////////////////////////////////////////////////////////////////
-proc cyclotomic(n,poly z)
-"USAGE: cyclotomic(n,z) int n, variable z
-RETURNS:  the n-th cyclotomic polynomial in z"
-{       poly h=z**n-1;
-        ideal id=h;
-        id=std(id);
-        poly f=z-1;
-        int i=prime(n-1);
-        while(i<>2)
-                {if (n%i==0) {f=f*(z**(n div i)-1);};
-                i=prime(i-1);};
-        if (n%2==0) {f=f*(z**(n div 2)-1);};
-        h=h/gcd(f,h);
-        return(h/leadcoef(h));
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // finite(n) sets the current group to a finite group of order n.
 ////////////////////////////////////////////////////////////////////////////////
 proc finite(int n)
@@ -395,7 +375,7 @@ EXAMPLE: example finite; shows an example
 "
 {       ring group=0,(g(1),g(2)),dp(2);
         export group;
-        ideal groupideal=g(2)^n-1,cyclotomic(n,g(1));
+        ideal groupideal=g(2)^n-1,cyclotomic(n);
         groupideal=std(groupideal);
         export groupideal;
         proc reynolds(poly f){return(torusreynolds(f));};
