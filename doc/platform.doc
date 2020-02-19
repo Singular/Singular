@@ -66,7 +66,7 @@ memory allocation functions for GMP
 signal handlers
 (see @code{init_signals} in @code{Singular/cntrlc.cc}).@*
 At least a handler for @code{SIGCHLD} must be installed
-for the commands @code{waitfirst}, @code{waitall} and the routines from @ref{parallel_lib}, @ref{modstd_lib}, @ref{modnormal_lib}, @ref{tasks_lib}.@*
+for the commands @ref{waitfirst}, @ref{waitall} and the routines from @ref{parallel_lib}, @ref{modstd_lib}, @ref{modnormal_lib}, @ref{tasks_lib}.@*
 If the child was started by @code{libSingular} the handler
 has to call @code{sig_chld_hdl} from @code{Singular/links/ssiLink.cc}
 or implement something similiar (call @code{slClose(l)} for ssi links).
@@ -163,7 +163,7 @@ default: $SINGULAR_DATA_DIR/singular/html
 The effective list of directories/files can be printed by @code{Singular -v},
 see @ref{Command line options}.
 
-Depending on the used functions, these environment vraiables apply also to @code{libSingular}.
+Depending on the used functions, these environment variables apply also to @code{libSingular}.
 @c ----------------------------------------------------------
 @node Unix installation instructions
 @section Unix installation instructions
