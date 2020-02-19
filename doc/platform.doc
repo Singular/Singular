@@ -120,7 +120,7 @@ the command line (inspecting also PATH, following symlinks).
 the command line
 @item SINGULARPATH
 @*the directories for @sc{Singular}'s libraries and optional dynamic modules (seperated by @code{;}), default:
-  @begin itemize
+  @itemize
   @item $SINGULAR_DATA_DIR/singular/LIB
   @item $SINGULAR_ROOT_DIR/share/singular/LIB
   @item $SINGULAR_BIN_DIR/../share/singular/LIB
@@ -134,7 +134,7 @@ the command line
   @item $prefix/lib/singular/MOD
   @item $prefix/libexec/singular/MOD
   @item $SINGULAR_BIN_DIR
-  @rend itemize
+  @end itemize
 @item SINGULAR_ROOT_DIR
 @*the root of the singular tree, default: $SINGULAR_BIN_DIR/..
 @item SINGULAR_PROCS_DIR
