@@ -111,10 +111,11 @@ Usually they are found relative to the location of the (main) executable
 This can be changed by setting the following environment variables.
 
 @itemize
-@item SINGULAR_EXECUTABLE
+@item SINGULAR_EXECUTABLE (should usually not be set)
 @*the complete filename of the main executable, usually derived from
 the command line (inspecting also PATH, following symlinks).
 @*If SINGULAR_EXECUTABLE cannot be found, $prefix/bin/Singular is assumed.
+@*For @code{libSingular}: SINGULAR_EXECUTABLE is set to the argument of @code{siInit} (it must exist).
 @item SINGULAR_BIN_DIR
 @*the directory of the main executable, usually derived from
 $SINGULAR_EXECUTABLE
