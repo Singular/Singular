@@ -13,7 +13,7 @@ dnl FLINT_CFLAGS and FLINT_LIBS
 
 AC_DEFUN([LB_CHECK_FLINT],
 [
-DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
+DEFAULT_CHECKING_PATH="/sw /opt/local"
 
 AC_ARG_WITH(flint,
 [  --with-flint=<path>|yes|no  Use FLINT library. If argument is no, you do not have
@@ -34,38 +34,56 @@ dnl Check for existence
 BACKUP_CFLAGS=${CFLAGS}
 BACKUP_LIBS=${LIBS}
 
-if test -n "$FLINT_HOME_PATH"; then
-AC_MSG_CHECKING(for FLINT >= $min_flint_version)
-fi
-
 AC_LANG_PUSH([C])
 
-for FLINT_HOME in ${FLINT_HOME_PATH}
- do
- if test -r "$FLINT_HOME/include/flint/fmpz.h"; then
-
-	FLINT_CFLAGS="-I${FLINT_HOME}/include/"
-	FLINT_LIBS="-L${FLINT_HOME}/lib -lflint -lmpfr"
+flint_found="no"
+dnl check for system installed libraries if FLINT_HOME_PATH is the default
+if test "$FLINT_HOME_PATH" = "$DEFAULT_CHECKING_PATH" ; then
+	FLINT_CFLAGS=""
+	FLINT_LIBS="-lflint -lmpfr"
 
 	# we suppose that mpfr and mpir to be in the same place or available by default
-	CFLAGS="${BACKUP_CFLAGS} ${FLINT_CFLAGS} ${GMP_CPPFLAGS}"
+	CFLAGS="${BACKUP_CFLAGS} ${GMP_CPPFLAGS}"
 	LIBS="${FLINT_LIBS} ${GMP_LIBS} ${BACKUPLIBS}"
 
-	AC_CHECK_LIB(flint,fmpz_init,
-	[flint_found="yes"],
-	[flint_found="mo"],
-	[]
-	)
-else
-	flint_found="no"
+	AC_CHECK_HEADER([flint/fmpz.h],
+		[AC_CHECK_LIB(flint,fmpz_init,
+			[flint_found="yes"],
+			[],
+			[])],
+		[],
+		[])
 fi
-done
+
+dnl if flint was not previously found, search FLINT_HOME_PATH
+if test "x$flint_found" = "xno" ; then
+	for FLINT_HOME in ${FLINT_HOME_PATH}
+	do
+		if test -r "$FLINT_HOME/include/flint/fmpz.h"; then
+
+		FLINT_CFLAGS="-I${FLINT_HOME}/include/"
+		FLINT_LIBS="-L${FLINT_HOME}/lib -lflint -lmpfr"
+
+	# we suppose that mpfr and mpir to be in the same place or available by default
+		CFLAGS="${BACKUP_CFLAGS} ${FLINT_CFLAGS} ${GMP_CPPFLAGS}"
+		LIBS="${FLINT_LIBS} ${GMP_LIBS} ${BACKUPLIBS}"
+
+		AC_CHECK_LIB(flint,fmpz_init,
+		[flint_found="yes"],
+		[],
+		[]
+		)
+		fi
+	done
+fi
+
 AC_LANG_POP([C])
 
 CFLAGS=${BACKUP_CFLAGS}
 LIBS=${BACKUP_LIBS}
 #unset LD_LIBRARY_PATH
 
+AC_MSG_CHECKING(for FLINT)
 
 if test "x$flint_found" = "xyes" ; then
 	AC_SUBST(FLINT_CFLAGS)
