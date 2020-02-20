@@ -34,10 +34,6 @@ dnl Check for existence
 BACKUP_CFLAGS=${CFLAGS}
 BACKUP_LIBS=${LIBS}
 
-if test -n "$FLINT_HOME_PATH"; then
-AC_MSG_CHECKING(for FLINT >= $min_flint_version)
-fi
-
 AC_LANG_PUSH([C])
 
 flint_found="no"
@@ -87,6 +83,7 @@ CFLAGS=${BACKUP_CFLAGS}
 LIBS=${BACKUP_LIBS}
 #unset LD_LIBRARY_PATH
 
+AC_MSG_CHECKING(for FLINT)
 
 if test "x$flint_found" = "xyes" ; then
 	AC_SUBST(FLINT_CFLAGS)
