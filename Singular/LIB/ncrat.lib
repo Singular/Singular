@@ -730,7 +730,6 @@ static proc ncRingDefine()
   s = s + "), dp; minpoly = I^2+1;";
   execute(s);
   short = 0;
-  export NCRING;
   exportto(Top, NCRING);
 }
 
