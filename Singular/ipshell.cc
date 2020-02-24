@@ -1340,7 +1340,7 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
   //Print("iiInternalExport('%s',%d)%s\n", v->name, toLev,"");
   if (IDLEV(h)==0)
   {
-    if (BVERBOSE(V_REDEFINE)) Warn("`%s` is already global",IDID(h));
+    if ((myynest>0) && (BVERBOSE(V_REDEFINE))) Warn("`%s` is already global",IDID(h));
   }
   else
   {
