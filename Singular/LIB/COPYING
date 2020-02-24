@@ -1,4 +1,4 @@
-                        SINGULAR version 4-0
+                        SINGULAR version 4-1
                          Singular-libraries
 
                      University of Kaiserslautern
@@ -7,7 +7,7 @@
 
            Authors: see the header of the libraries or the list below
 
-                        Copyright (C) 1986-2016
+                        Copyright (C) 1986-2020
 
 This directory contains all Singular libraries,
 some came from the Singular team, some were contributed by users.
@@ -88,6 +88,7 @@ hyperel.lib     Markus Hochstetter              markushochstetter@gmx.de
 inout.lib       Gert-Martin Greuel              greuel@mathematik.uni-kl.de
                 Bernd Martin                    martin@math.tu-cottbus.de
 intprog.lib     Christine Theis                 ctheis@math.uni-sb.de
+invar.lib       Harm Derksen                    hderksen@math.unibas.ch
 involut.lib     Oleksandr Iena                  yena@mathematik.uni-kl.de
                 Markus Becker                   mbecker@mathematik.uni-kl.de
                 Viktor Levandovskyy             levandov@mathematik.uni-kl.de
