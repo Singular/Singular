@@ -390,7 +390,6 @@ BOOLEAN iiPStart(idhdl pn, leftv v)
   {
     iiCurrArgs=NULL;
   }
-  iiCurrProc=pn;
   /* start interpreter ======================================*/
   myynest++;
   if (myynest > SI_MAX_NEST)
@@ -400,7 +399,9 @@ BOOLEAN iiPStart(idhdl pn, leftv v)
   }
   else
   {
+    iiCurrProc=pn;
     err=iiAllStart(pi,pi->data.s.body,BT_proc,pi->data.s.body_lineno-(v!=NULL));
+    iiCurrProc=NULL;
 
     if (iiLocalRing[myynest-1] != currRing)
     {

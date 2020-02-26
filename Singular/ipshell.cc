@@ -1248,7 +1248,8 @@ BOOLEAN iiBranchTo(leftv, leftv args)
   {
     // get the proc:
     iiCurrProc=(idhdl)h->data;
-    procinfo * pi=IDPROC(iiCurrProc);
+    idhdl currProc=iiCurrProc; /*iiCurrProc may be changed after yyparse*/
+    procinfo * pi=IDPROC(currProc);
     // already loaded ?
     if( pi->data.s.body==NULL )
     {
@@ -1269,6 +1270,7 @@ BOOLEAN iiBranchTo(leftv, leftv args)
     newBuffer( omStrDup(pi->data.s.body), BT_proc,
                pi, pi->data.s.body_lineno-(iiCurrArgs==NULL) );
     BOOLEAN err=yyparse();
+    iiCurrProc=NULL;
     si_opt_1=save1;
     si_opt_2=save2;
     // now save the return-expr.
@@ -1278,7 +1280,7 @@ BOOLEAN iiBranchTo(leftv, leftv args)
     // warning about args.:
     if (iiCurrArgs!=NULL)
     {
-      if (err==0) Warn("too many arguments for %s",IDID(iiCurrProc));
+      if (err==0) Warn("too many arguments for %s",IDID(currProc));
       iiCurrArgs->CleanUp();
       omFreeBin((ADDRESS)iiCurrArgs, sleftv_bin);
       iiCurrArgs=NULL;
