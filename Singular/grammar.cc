@@ -230,7 +230,7 @@ void yyerror(const char * fmt)
 #endif
   )
   {
-    Werror("leaving %s",VoiceName());
+    Werror("leaving %s (%d)",VoiceName(),VoiceLine());
   }
 }
 
