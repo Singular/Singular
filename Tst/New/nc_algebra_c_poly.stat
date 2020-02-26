@@ -1,4 +1,4 @@
-1 >> tst_memory_0 :: 1410457434:4.0.0, 64 bit:4.0.0:x86_64-Linux:dilbert:174016
-1 >> tst_memory_1 :: 1410457434:4.0.0, 64 bit:4.0.0:x86_64-Linux:dilbert:2240312
-1 >> tst_memory_2 :: 1410457434:4.0.0, 64 bit:4.0.0:x86_64-Linux:dilbert:2281296
-1 >> tst_timer_1 :: 1410457434:4.0.0, 64 bit:4.0.0:x86_64-Linux:dilbert:6
+1 >> tst_memory_0 :: 1582725041:4124, 64 bit:4.1.2:x86_64-Linux:nepomuck:87896
+1 >> tst_memory_1 :: 1582725041:4124, 64 bit:4.1.2:x86_64-Linux:nepomuck:2150192
+1 >> tst_memory_2 :: 1582725041:4124, 64 bit:4.1.2:x86_64-Linux:nepomuck:2191296
+1 >> tst_timer_1 :: 1582725041:4124, 64 bit:4.1.2:x86_64-Linux:nepomuck:4
