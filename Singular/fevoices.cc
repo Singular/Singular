@@ -61,6 +61,14 @@ const char * VoiceName()
   return sNoName_fe;
 }
 
+int VoiceLine()
+{
+  if ((currentVoice!=NULL)
+  && (currentVoice->curr_lineno>=0))
+    return currentVoice->curr_lineno;
+  return -1;
+}
+
 /*2
 * the calling chain of Voices
 */

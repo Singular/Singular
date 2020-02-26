@@ -93,6 +93,7 @@ EXTERN_VAR Voice  *currentVoice;
 Voice * feInitStdin(Voice *pp);
 
 const  char * VoiceName();
+int VoiceLine();
 void    VoiceBackTrack();
 BOOLEAN contBuffer(feBufferTypes typ);
 BOOLEAN exitBuffer(feBufferTypes typ);
