@@ -9278,7 +9278,7 @@ const char * Tok2Cmdname(int tok)
   if (tok==NONE) return "nothing";
   if (tok < 128)
   {
-    Tok2Cmdname_buf[1]=(char)tok;
+    Tok2Cmdname_buf[0]=(char)tok;
     return Tok2Cmdname_buf;
   }
   //if (tok==IFBREAK) return "if_break";
