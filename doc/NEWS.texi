@@ -23,7 +23,7 @@
 New libraries:
 @itemize
 @item invar.lib: Invariant theory @nref{invar_lib}
-@item moddiq.lib: ideal quotaient and saturation @nref{moddiq_lib}
+@item moddiq.lib: ideal quotient and saturation @nref{moddiq_lib}
 @end itemize
 
 Changed libraries:
