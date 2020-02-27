@@ -45,7 +45,7 @@ SLIB1 = arr.lib arnoldclassify.lib \
 	hess.lib hdepth.lib \
 	JMBTest.lib JMSConst.lib \
         locnormal.lib \
-	methods.lib modnormal.lib modular.lib modules.lib multigrading.lib modwalk.lib\
+	methods.lib moddiq.lib modnormal.lib modular.lib modules.lib multigrading.lib modwalk.lib\
 	nets.lib ncfrac.lib ncloc.lib ncModslimgb.lib\
 	nfmodstd.lib nfmodsyz.lib numerAlg.lib numerDecom.lib \
         olga.lib orbitparam.lib \

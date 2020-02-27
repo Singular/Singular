@@ -1,0 +1,317 @@
+///////////////////////////////////////////////////////////////////////////////
+version="version moddiq.lib 4.1.2.0 Feb_2020 "; // $Id$
+category="Commutative Algebra";
+info="
+LIBRARY:  moddiq.lib       Double ideal quotient using modular methods
+
+AUTHORS:  Y. Ishihara     yishihara@rikkyo.ac.jp
+
+OVERVIEW:
+  A library for computing ideal quotient and saturation in the polynomial ring
+  over the rational numbers using modular methods.
+
+REFERENCES:
+  M. Noro, K. Yokoyama: Usage of Modular Techniques for Efficient Computation of Ideal Operations. 
+  Math.Comput.Sci. 12: 1, 1-32. (2017). 
+
+PROCEDURES:
+  modQuotient(I,J); standard basis of (I:J) using modular methods
+  modSat(I,J); standard basis of (I:J^\infty) using modular methods
+";
+//UPCOMING PROCEDURES:
+//  moddiq(I,J); standard basis of (I:(I:J)) using modular methods
+//  modAssCheck(I,P); check if P is associated of I or not using modular methods
+//  IntermediatePrimaryDecomposition(I); compute intermediate primary decomposition of I
+//                                       by using modular method
+
+LIB "poly.lib";
+LIB "elim.lib";
+LIB "modular.lib";
+LIB "modstd.lib";
+
+proc modQuotient(def I, def J)
+"USAGE:   modQuotient(I,J); I,J ideal
+RETURN:   a standard basis of (I:J)
+NOTE:     The procedure computes a standard basis of (I:J) (over the rational
+          numbers) by using modular methods.
+SEE ALSO: modular; quotient
+EXAMPLE:  example modQuotient; shows an example"
+{
+    I = modStd(I);
+    def IJ=modular("quotient",list(I,J),primeTest_quotient,
+      Modstd::deleteUnluckyPrimes_std,pTest_quotient,finalTest_quotient);
+    return(IJ);
+}
+example
+{
+    "EXAMPLE:";
+    echo=2;
+    ring r=0,x(1..6),dp;
+    ideal i=cyclic(6);
+    ideal j=-15*var(5)+16*var(6)^3-60*var(6)^2+225*var(6)-4,2*var(5)^2-7*var(5)+2*var(6)^2-7*var(6)+28,(4*var(6)-1)*var(5)-var(6)+4,4*var(1)+var(5)+var(6),4*var(2)+var(5)+var(6),4*var(3)+var(5)+var(6),4*var(4)+var(5)+var(6); 
+    modQuotient(i,modQuotient(i,j));
+}
+
+/* test if a prime number p is permissible for an ideal I 
+ * i.e. it does not divide the denominator of any of the coeffients
+ * or numerator of any of the leading coefficients */
+static proc isPermissible(int p,ideal I)
+{
+    /* erase zero generators */
+    def J = simplify(I, 2);
+
+    /* clear denominators and compute the leading coeffients of
+       the cleared one and the original one*/
+    int n = ncols(J);
+    int i;
+    ideal K;
+    for(i = n; i > 0; i--)
+    {
+        K[i] = leadcoef(cleardenom(J[i]))*var(1)+leadcoef(J[i]);
+    }
+
+    /* change to characteristic p */
+    def br = basering;
+    list lbr = ringlist(br);
+    if (typeof(lbr[1]) == "int") { lbr[1] = p; }
+    else { lbr[1][1] = p; }
+    def rp = ring(lbr);
+    setring(rp);
+    ideal Kp = fetch(br, K);
+
+    /* test if any leading coefficient is missing */
+    if (intvec(size(Kp[1..n])) != 2:n) { setring(br); return(0); }
+    setring(br);
+    return(1);
+}
+
+/* test if the prime p is permissible for I and J */
+static proc primeTest_quotient(int p, alias list args)
+{
+    def I = args[1];
+    def J = args[2];
+    if(!isPermissible(p,I)){print("not permissible");return(0);}
+    if(!isPermissible(p,J)){print("not permissible");return(0);}
+    return(1);
+}
+
+/* test if 'command' applied to 'args' in characteristic p is the same as
+   'result' mapped to characteristic p */
+static proc pTest_quotient(string command, alias list args, alias def result,
+    int p)
+{
+    /* change to characteristic p */
+    def br = basering;
+    list lbr = ringlist(br);
+    if (typeof(lbr[1]) == "int") { lbr[1] = p; }
+    else { lbr[1][1] = p; }
+    def rp = ring(lbr);
+    setring(rp);
+    list args_fetched = fetch(br, args);
+    def Ip = args_fetched[1];
+    def Jp = args_fetched[2];
+    def Gp = fetch(br, result);
+    def IJp;
+    attrib(Ip, "isSB", 1);
+    attrib(Gp, "isSB", 1);
+
+    /* test if (Ip:Jp) is in Gp */
+    /* compute command(args) */
+    execute("IJp = "+command+"(Ip,Jp);");
+    int i;
+    for (i = ncols(IJp); i > 0; i--)
+    {
+        if (reduce(IJp[i], Gp, 1) != 0)
+        {
+            setring(br);
+            return(0);
+        }
+    }
+    
+    /* test if Gp is in (Ip:Jp) */
+    ideal GpJp=Gp*Jp;
+    for (i = ncols(GpJp); i > 0; i--)
+    {
+        if (reduce(GpJp[i], Ip, 1) != 0) { setring(br); return(0); }
+    }
+    setring(br);
+    return(1);
+}
+
+/* test if 'result' is a GB of (I:J) */
+static proc finalTest_quotient(string command, alias list args, def result)
+{
+    /* test if result is in (I:J)*/
+    attrib(result, "isSB", 1);
+    int i;
+    def IJ=result*args[2];
+    for (i = ncols(IJ); i > 0; i--)
+    {
+        if (reduce(IJ[i], args[1], 1) != 0) {print("fail") return(0); }
+    }
+    return(1);
+}
+
+proc modSat(def I, def J)
+"USAGE:   modSat(I,J); I,J ideal
+RETURN:   a standard basis of (I:J^\infty)
+NOTE:     The procedure computes a standard basis of (I:J^\infty) (over the rational
+          numbers) by using modular methods.
+SEE ALSO: modular; sat
+EXAMPLE:  example modSat; shows an example"
+{
+    I = modStd(I);
+    def IJ=modular("sat",list(I,J),primeTest_sat,
+      deleteUnluckyPrimes_sat,pTest_sat,finalTest_sat);
+    return(IJ);
+}
+example
+{
+    "EXAMPLE:";
+    echo=2;
+    ring r=0,x(1..6),dp;
+    ideal i=cyclic(6);
+    ideal j=-15*var(5)+16*var(6)^3-60*var(6)^2+225*var(6)-4,2*var(5)^2-7*var(5)+2*var(6)^2-7*var(6)+28,(4*var(6)-1)*var(5)-var(6)+4,4*var(1)+var(5)+var(6),4*var(2)+var(5)+var(6),4*var(3)+var(5)+var(6),4*var(4)+var(5)+var(6); 
+    modSat(i,modSat(i,j)[1])[1];
+}
+
+/* test if the prime p is permissible for I and J */
+static proc primeTest_sat(int p, alias list args)
+{
+    return(primeTest_quotient(p,args));
+}
+
+/* find entries in modresults which come from unlucky primes.
+ * For this, sort the entries into categories depending on their leading
+ * ideal and return the indices in all but the biggest category. 
+ * Referring to Modstd::deleteUnlickyPrimes_std. */
+static proc deleteUnluckyPrimes_sat(alias list modresults)
+{
+    int size_modresults = size(modresults);
+
+    /* sort results into categories.
+     * each category is represented by three entries:
+     * - the corresponding leading ideal
+     * - the number of elements
+     * - the indices of the elements
+     */
+    list cat;
+    int size_cat;
+    def L=modresults[1][1]; // dummy assign to get the type of L
+    int i;
+    int j;
+    for (i = 1; i <= size_modresults; i++)
+    {
+        L = lead(modresults[i][1]);
+        attrib(L, "isSB", 1);
+        for (j = 1; j <= size_cat; j++)
+        {
+            if (size(L) == size(cat[j][1]))
+            {
+            if (size(reduce(L, cat[j][1], 5)) == 0)
+            {
+            if (size(reduce(cat[j][1], L, 5)) == 0)
+            {
+                cat[j][2] = cat[j][2]+1;
+                cat[j][3][cat[j][2]] = i;
+                break;
+            }
+            }
+            }
+        }
+        if (j > size_cat)
+        {
+            size_cat++;
+            cat[size_cat] = list();
+            cat[size_cat][1] = L;
+            cat[size_cat][2] = 1;
+            cat[size_cat][3] = list(i);
+        }
+    }
+
+    /* find the biggest categories */
+    int cat_max = 1;
+    int max = cat[1][2];
+    for (i = 2; i <= size_cat; i++)
+    {
+        if (cat[i][2] > max)
+        {
+            cat_max = i;
+            max = cat[i][2];
+        }
+    }
+
+    /* return all other indices */
+    list unluckyIndices;
+    for (i = 1; i <= size_cat; i++)
+    {
+        if (i != cat_max) { unluckyIndices = unluckyIndices + cat[i][3]; }
+    }
+    return(unluckyIndices);
+}
+
+/* test if 'command' applied to 'args' in characteristic p is the same as
+   'result' mapped to characteristic p */
+static proc pTest_sat(string command, alias list args, alias def result,
+    int p)
+{
+    /* change to characteristic p */
+    def br = basering;
+    list lbr = ringlist(br);
+    if (typeof(lbr[1]) == "int") { lbr[1] = p; }
+    else { lbr[1][1] = p; }
+    def rp = ring(lbr);
+    setring(rp);
+    list args_fetched = fetch(br, args);
+    def Ip = args_fetched[1];
+    def Jp = args_fetched[2];
+    def pResult = fetch(br, result);
+    def Gp=pResult[1];
+    def IJp;
+    attrib(Ip, "isSB", 1);
+    attrib(Gp, "isSB", 1);
+
+    /* test if (Ip:Jp^\infty) is in Gp */
+    /* compute command(args) */
+    execute("IJp = "+command+"(Ip,Jp)[1];");
+    int i;
+    for (i = ncols(IJp); i > 0; i--)
+    {
+        if (reduce(IJp[i], Gp, 1) != 0)
+        {
+            setring(br);
+            return(0);
+        }
+    }
+    
+    /* test if Gp is in (Ip:Jp^\infty) */
+    for (i = ncols(Gp); i > 0; i--)
+    {
+        if (reduce(Gp[i], IJp, 1) != 0) { setring(br); return(0); }
+    }
+    setring(br);
+    return(1);
+}
+
+/* test if 'result' is a GB of (I:J^\infty) */
+static proc finalTest_sat(string command, alias list args, def result)
+{
+    /* test if result is in (I:J^\infty)*/
+    int i;
+    ideal H = result[1];
+    int m=0;
+    for (i = 0 ; i < result[2]; i++){m++;}
+    ideal JGm;
+    for (i = 0 ; i < size(args[2]); i++)
+    {
+      JGm = JGm + args[2]^m;
+    }
+    def K=H*JGm;
+    for (i = ncols(K); i > 0; i--)
+    {
+        if (reduce(K[i], args[1], 1) != 0) {print("fail") return(0); }
+    }
+    return(1);
+}
+
+

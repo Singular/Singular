@@ -391,6 +391,7 @@ LIB "all.lib";
 * integralbasis_lib:: Integral basis in algebraic function fields
 * intprog_lib:: Integer Programming
 * locnormal_lib:: Normalization of affine domains using local methods
+* moddiq_lib:: ideal quotient and saturation using modular methods
 * modnormal_lib:: Normalization of affine domains using modular methods
 * modstd_lib:: Groebner basis of ideals via modular computations
 * monomialideal_lib:: Primary and irreducible decompositions of monomial ideals
@@ -457,6 +458,10 @@ LIB "all.lib";
 @subsection locnormal_lib
 @c lib locnormal.lib
 @c ----------------------------------------------------------
+@node moddiq_lib
+@subsection moddiq_lib
+@c lib moddiq.lib
+@c ---------------------------------------------------------
 @node modnormal_lib
 @subsection modnormal_lib
 @c lib modnormal.lib
