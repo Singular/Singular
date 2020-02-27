@@ -49,8 +49,9 @@ example
     ring r=0,x(1..6),dp;
     ideal i=cyclic(6);
     ideal j=-15*var(5)+16*var(6)^3-60*var(6)^2+225*var(6)-4,2*var(5)^2-7*var(5)+2*var(6)^2-7*var(6)+28,(4*var(6)-1)*var(5)-var(6)+4,4*var(1)+var(5)+var(6),4*var(2)+var(5)+var(6),4*var(3)+var(5)+var(6),4*var(4)+var(5)+var(6); 
-    modQuotient(i,j);
     modQuotient(i,modQuotient(i,j));
+    ideal id2=x(1)^2+x(1)*x(2)*x(3),x(2)^2-x(3)^3*x(2),x(3)^3+x(2)^5*x(1)*x(3);
+    quotient(id2,maxideal(3));
 }
 
 /* test if a prime number p is permissible for an ideal I 
@@ -174,8 +175,10 @@ example
     ring r=0,x(1..6),dp;
     ideal i=cyclic(6);
     ideal j=-15*var(5)+16*var(6)^3-60*var(6)^2+225*var(6)-4,2*var(5)^2-7*var(5)+2*var(6)^2-7*var(6)+28,(4*var(6)-1)*var(5)-var(6)+4,4*var(1)+var(5)+var(6),4*var(2)+var(5)+var(6),4*var(3)+var(5)+var(6),4*var(4)+var(5)+var(6); 
-    modSat(i,j);
     modSat(i,modSat(i,j)[1])[1];
+    poly F     = x(1)^5+x(2)^5+(x(1)-x(2))^2*x(1)*x(2)*x(3);
+    ideal J    = jacob(F);
+    modSat(J,maxideal(1));
 }
 
 /* test if the prime p is permissible for I and J */
