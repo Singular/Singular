@@ -724,7 +724,8 @@ RETURN:  list of an ideal/module [1] and an integer [2]:
          [2] = saturation exponent (= min( k | id:j^k = id:j^(k+1) ))
 NOTE:    [1] is a standard basis in the basering
 DISPLAY: saturation exponent during computation if printlevel >=1
-KEYWORDS: Saturation
+KEYWORDS: saturation
+SEE ALSO: modSat
 EXAMPLE: example sat; shows an example
 "{
    int ii,kk;

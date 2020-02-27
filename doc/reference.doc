@@ -6184,6 +6184,7 @@ quotient(m,id3);
 See
 @ref{fglmquot};
 @ref{ideal};
+@ref{modQuotient};
 @ref{module}.
 @c ref
 @c ---------------------------------------
