@@ -2530,10 +2530,10 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
     if (bitmask!=0) n--;
 
     // initialize fields of R
-    R->order=(rRingOrder_t *)omAlloc0(n*sizeof(rRingOrder_t));
-    R->block0=(int *)omAlloc0(n*sizeof(int));
-    R->block1=(int *)omAlloc0(n*sizeof(int));
-    R->wvhdl=(int**)omAlloc0(n*sizeof(int_ptr));
+    R->order=(rRingOrder_t *)omAlloc0((n+1)*sizeof(rRingOrder_t));
+    R->block0=(int *)omAlloc0((n+1)*sizeof(int));
+    R->block1=(int *)omAlloc0((n+1)*sizeof(int));
+    R->wvhdl=(int**)omAlloc0((n+1)*sizeof(int_ptr));
     // init order, so that rBlocks works correctly
     for (j_in_R= n-2; j_in_R>=0; j_in_R--)
       R->order[j_in_R] = ringorder_unspec;
