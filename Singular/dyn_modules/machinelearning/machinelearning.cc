@@ -38,7 +38,7 @@ static BOOLEAN predictHelp(leftv result, leftv arg)
                 return TRUE;
         }
 
-        ml_make_prediction(filename, buffer, lengths, _omStrDup);
+        ml_make_prediction(filename, buffer, lengths, omStrDup);
 
         L->Init(5);
 
