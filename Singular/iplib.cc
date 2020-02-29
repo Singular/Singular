@@ -889,6 +889,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN f
   }
   else
   {
+    omFree(plib);
     if(IDTYP(pl)!=PACKAGE_CMD)
     {
       WarnS("not of type package.");
@@ -902,8 +903,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN f
 
   if(!LoadResult) IDPACKAGE(pl)->loaded = TRUE;
   omFree((ADDRESS)plib);
-
- return LoadResult;
+  return LoadResult;
 }
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 static void iiCleanProcs(idhdl &root)
@@ -1306,6 +1306,7 @@ BOOLEAN load_builtin(const char *newlib, BOOLEAN autoexport, SModulFunc_t init)
     pl = enterid( plib,0, PACKAGE_CMD, &IDROOT, TRUE );
     IDPACKAGE(pl)->libname=omStrDup(newlib);
   }
+  omFree(plib);
   IDPACKAGE(pl)->language = LANG_C;
 
   IDPACKAGE(pl)->handle=(void *)NULL;
