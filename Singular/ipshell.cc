@@ -2782,7 +2782,7 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
     WerrorS("ordering must be given as `list`");
     return TRUE;
   }
-  if (bitmask!=0) R->bitmask=bitmask;
+  if (bitmask!=0) { R->bitmask=bitmask; R->wanted_maxExp=bitmask; }
   return FALSE;
 }
 
@@ -2933,7 +2933,7 @@ ring rCompose(const lists  L, const BOOLEAN check_comp, const long bitmask,const
     R->CanShortOut=FALSE;
   }
   #endif
-  if (bitmask!=0x7fff) R->bitmask=bitmask;
+  if ((bitmask!=0)&&(R->wanted_maxExp==0)) R->wanted_maxExp=bitmask;
   rComplete(R);
 
   // ------------------------ Q-IDEAL ------------------------
@@ -5308,7 +5308,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
       i++;
     else if ((*iv)[1]==ringorder_L)
     {
-      R->bitmask=(*iv)[2]*2+1;
+      R->wanted_maxExp=(*iv)[2]*2+1;
       n--;
     }
     else if (((*iv)[1]!=ringorder_a)
