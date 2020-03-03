@@ -608,9 +608,9 @@ char * rOrdStr(ring r)
 
     if (l==nblocks)
     {
-      if (r->bitmask!=0xffff)
+      if (r->wanted_maxExp!=0)
       {
-        long mm=r->bitmask;
+        long mm=r->wanted_maxExp;
         if (mm>MAX_INT_VAL) mm=MAX_INT_VAL;
         StringAppend(",L(%ld)",mm);
       }
@@ -2801,7 +2801,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   res->block0=block0;
   res->block1=block1;
   res->bitmask=exp_limit;
-  res->wanted_maxExp=exp_limit;
+  res->wanted_maxExp=r->wanted_maxExp;
   //int tmpref=r->cf->ref0;
   rComplete(res, 1);
   //r->cf->ref=tmpref;
@@ -2973,7 +2973,7 @@ ring rModifyRing_Simple(ring r, BOOLEAN ommit_degree, BOOLEAN ommit_comp, unsign
     res->block0=block0;
     res->block1=block1;
     res->bitmask=exp_limit;
-    res->wanted_maxExp=exp_limit;
+    res->wanted_maxExp=r->wanted_maxExp;
     //int tmpref=r->cf->ref;
     rComplete(res, 1);
     //r->cf->ref=tmpref;
