@@ -1132,7 +1132,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
     {
       *rest=idInit(1,mod->rank);
     }
-    return idInit(1,mod->rank);
+    return idInit(1,IDELEMS(mod));
   }
   if (idIs0(mod)) /* and not idIs0(submod) */
   {
@@ -1229,7 +1229,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
             WerrorS("2nd module does not lie in the first");
           idDelete(&s_result);
           idDelete(&s_rest);
-          s_result=idInit(IDELEMS(submod),submod->rank);
+          s_result=idInit(IDELEMS(submod),IDELEMS(mod));
           break;
         }
         else
@@ -1302,6 +1302,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
       p_Shift(&s_result->m[i],-comps_to_add,currRing);
     }
   }
+  s_result->rank=IDELEMS(mod);
   return s_result;
 }
 
