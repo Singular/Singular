@@ -1136,8 +1136,20 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
   }
   if (idIs0(mod)) /* and not idIs0(submod) */
   {
-    WerrorS("2nd module does not lie in the first");
-    return NULL;
+    if (rest!=NULL)
+    {
+      *rest=idCopy(submod);
+      if (unit!=NULL)
+      {
+        *unit=mpNew(1,1);
+      }
+      return idInit(1,IDELEMS(mod));
+    }
+    else
+    {
+      WerrorS("2nd module does not lie in the first");
+      return NULL;
+    }
   }
   if (unit!=NULL)
   {
@@ -1220,17 +1232,31 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
       {
         if (!divide)
         {
-          if (isSB)
+          if (rest==NULL)
           {
-            WarnS("first module not a standardbasis\n"
+            if (isSB)
+            {
+              WarnS("first module not a standardbasis\n"
               "// ** or second not a proper submodule");
+            }
+            else
+              WerrorS("2nd module does not lie in the first");
           }
-          else
-            WerrorS("2nd module does not lie in the first");
           idDelete(&s_result);
           idDelete(&s_rest);
+          if(syz_ring!=orig_ring)
+          {
+            idDelete(&s_mod);
+            rChangeCurrRing(orig_ring);
+            rDelete(syz_ring);
+          }
+          if (unit!=NULL)
+          {
+            *unit=mpNew(comps_to_add,comps_to_add);
+          }
+          s_rest=idCopy(submod);
           s_result=idInit(IDELEMS(submod),IDELEMS(mod));
-          break;
+          return s_result;
         }
         else
         {
@@ -1263,7 +1289,10 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
     rDelete(syz_ring);
   }
   if (rest!=NULL)
+  {
+    s_rest->rank=mod->rank;
     *rest = s_rest;
+  }
   else
     idDelete(&s_rest);
 //idPrint(s_result);
