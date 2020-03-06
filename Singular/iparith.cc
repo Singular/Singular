@@ -1930,7 +1930,7 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
   ideal R; matrix U;
   ideal m = idLift(vi,ui,&R, FALSE,hasFlag(v,FLAG_STD),TRUE,&U);
   if (m==NULL) return TRUE;
-  // now make sure that all matrices have the corect size:
+  // now make sure that all matrices have the correct size:
   matrix T = id_Module2formatedMatrix(m,vl,ul,currRing);
   int i;
   if (MATCOLS(U) != (int)ul)
