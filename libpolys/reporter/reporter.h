@@ -22,6 +22,7 @@ EXTERN_VAR int     feProt;
 EXTERN_VAR BOOLEAN feWarn;
 EXTERN_VAR BOOLEAN feOut;
 EXTERN_VAR int  traceit ;
+EXTERN_VAR int  traceit_stop ;
 EXTERN_VAR void (*WarnS_callback)(const char *s);
 
 // show entering/leaving proc:

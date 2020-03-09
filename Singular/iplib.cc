@@ -293,16 +293,29 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
 
 BOOLEAN iiAllStart(procinfov pi, const char *p, feBufferTypes t, int l)
 {
+  int save_trace=traceit;
+  int restore_traceit=0;
+  if (traceit_stop
+  && (traceit & TRACE_SHOW_LINE))
+  {
+    traceit &=(~TRACE_SHOW_LINE);
+    traceit_stop=0;
+    restore_traceit=1;
+  }
   // see below:
   BITSET save1=si_opt_1;
   BITSET save2=si_opt_2;
   newBuffer( omStrDup(p /*pi->data.s.body*/), t /*BT_proc*/,
                pi, l );
   BOOLEAN err=yyparse();
+
   if (sLastPrinted.rtyp!=0)
   {
     sLastPrinted.CleanUp();
   }
+
+  if (restore_traceit) traceit=save_trace;
+
   // the access to optionStruct and verboseStruct do not work
   // on x86_64-Linux for pic-code
   if ((TEST_V_ALLWARN) &&
