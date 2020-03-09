@@ -1933,27 +1933,7 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
   // now make sure that all matrices have the correct size:
   matrix T = id_Module2formatedMatrix(m,vl,ul,currRing);
   int i;
-  if (MATCOLS(U) != (int)ul)
-  {
-    unsigned mul=si_min(ul,MATCOLS(U));
-    matrix UU=mpNew(ul,ul);
-    unsigned j;
-    for(i=mul;i>0;i--)
-    {
-      for(j=mul;j>0;j--)
-      {
-        MATELEM(UU,i,j)=MATELEM(U,i,j);
-        MATELEM(U,i,j)=NULL;
-      }
-    }
-    idDelete((ideal *)&U);
-    U=UU;
-  }
-  // make sure that U is a diagonal matrix of units
-  for(i=ul;i>0;i--)
-  {
-    if(MATELEM(U,i,i)==NULL) MATELEM(U,i,i)=pOne();
-  }
+  assume (MATCOLS(U) == (int)ul);
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(3);
   L->m[0].rtyp=MATRIX_CMD;   L->m[0].data=(void *)T;

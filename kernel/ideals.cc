@@ -1109,6 +1109,18 @@ static void idPrepareStd(ideal s_temp, int k)
   s_temp->rank = k+IDELEMS(s_temp);
 }
 
+static void idLift_setUnit(int e_mod, int e_smod,matrix *unit)
+{
+  if (unit!=NULL)
+  {
+    *unit=mpNew(e_mod,e_smod);
+    // make sure that U is a diagonal matrix of units
+    for(int i=e_smod;i>0;i--)
+    {
+      MATELEM(*unit,i,i)=pOne();
+    }
+  }
+}
 /*2
 *computes a representation of the generators of submod with respect to those
 * of mod
@@ -1119,31 +1131,26 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
 {
   int lsmod =id_RankFreeModule(submod,currRing), j, k;
   int comps_to_add=0;
+  int idelems_mod=IDELEMS(mod);
+  int idelems_submod=IDELEMS(submod);
   poly p;
 
   if (idIs0(submod))
   {
-    if (unit!=NULL)
-    {
-      *unit=mpNew(1,1);
-      MATELEM(*unit,1,1)=pOne();
-    }
     if (rest!=NULL)
     {
       *rest=idInit(1,mod->rank);
     }
-    return idInit(1,IDELEMS(mod));
+    idLift_setUnit(idelems_mod,idelems_submod,unit);
+    return idInit(1,idelems_mod);
   }
   if (idIs0(mod)) /* and not idIs0(submod) */
   {
     if (rest!=NULL)
     {
       *rest=idCopy(submod);
-      if (unit!=NULL)
-      {
-        *unit=mpNew(1,1);
-      }
-      return idInit(1,IDELEMS(mod));
+      idLift_setUnit(idelems_mod,idelems_submod,unit);
+      return idInit(1,idelems_mod);
     }
     else
     {
@@ -1153,7 +1160,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
   }
   if (unit!=NULL)
   {
-    comps_to_add = IDELEMS(submod);
+    comps_to_add = idelems_submod;
     while ((comps_to_add>0) && (submod->m[comps_to_add-1]==NULL))
       comps_to_add--;
   }
@@ -1254,8 +1261,8 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
           {
             *unit=mpNew(comps_to_add,comps_to_add);
           }
-          s_rest=idCopy(submod);
-          s_result=idInit(IDELEMS(submod),IDELEMS(mod));
+          if (rest!=NULL) *rest=idCopy(submod);
+          s_result=idInit(idelems_submod,idelems_mod);
           return s_result;
         }
         else
@@ -1331,7 +1338,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
       p_Shift(&s_result->m[i],-comps_to_add,currRing);
     }
   }
-  s_result->rank=IDELEMS(mod);
+  s_result->rank=idelems_mod;
   return s_result;
 }
 
