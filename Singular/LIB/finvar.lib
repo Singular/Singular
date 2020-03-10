@@ -711,12 +711,17 @@ EXAMPLE: example molien; shows an example
  //----------------- generating ring of characteristic 0 ----------------------
     if (minpoly==0)
     { if (i>size(chst))
-      { execute("ring newring=0,("+varstr(br)+"),("+ordstr(br)+")");
+      {
+         ring newring = create_ring(0, "("+varstr(br)+")", "("+ordstr(br)+")");
       }
       else
       { chst=chst[i..size(chst)];
         execute
         ("ring newring=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")");
+        string  strr2 = "First else";     // comment by sachin
+        strr2;    // comment by sachin
+        ringlist(newring);
+        
       }
     }
     else

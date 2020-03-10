@@ -148,9 +148,16 @@ EXAMPLE: example ImageGroup; shows an example
   // s(1..newVars) as the original basering and map the ideal
   // Gn (contians only z(1..newVars)) to this ring
 
-  ringSTR2 = "ring RIGS = (" + charstr(basering) + "), (s(1.."
-                     + string(newVars) + "), t(1.." + string(nrt) + ")), lp;";
-  execute(ringSTR2);
+  list l1;  
+  for (int zz = 1; zz <= newVars; zz++)
+  {
+   l1[size(l1)+1] = "s("+string(zz)+")";
+  }
+  for (int yy = 1; yy <= nrt; yy++)
+  {
+   l1[size(l1)+1] = "t("+string(yy)+")";
+  }
+  ring RIGS = create_ring(ringlist(basering)[1], l1, "lp", "no_minpoly");
   execute("minpoly = number(" + @mPoly + ");");
   ideal mapIdeal, groupid, actionid;
   int offset;
@@ -420,12 +427,10 @@ EXAMPLE: example LinearizeAction; shows an example
         dbprint(dbPrt, "  the polynomial " + string(actCoeff)
                    + " is not a linear combination of the elements of basis");
         nrt++;
-        str = charstr(basering) + ", (" + varstr(basering)
-                   + ",t(" + string(nrt) + ")),";
         if(defined(RLAB)) { kill RLAB;}
         def RLAB = basering;
         if(defined(RLAR)) { kill RLAR;}
-        execute("ring RLAR = " + str + "(" + order + ");");
+        ring RLAR = create_ring(ringlist(basering)[1], "(" + varstr(basering)+ ",t(" + string(nrt) + "))", "(" + order + ")", "no_minpoly");
         execute("minpoly = number(" + @mPoly + ");");
 
         ideal basis, action, G, reduceIdeal;
@@ -866,15 +871,25 @@ EXAMPLE: example NullCone; shows an example
   // y(1...) additional 'slack' variables
 
   nt = size(action);
-  order = "(dp(" + string(nvars(basering) - nt) + "), dp);";
-  vars = "(s(1.." + string(nvars(basering) - nt);
-  vars = vars +"),t(1.."+string(nt) + "), Y(1.." + string(nt) + "))," + order;
-  ringSTR = "ring RNCR = (" + charstr(basering) +  "),"  + vars;
+  order = "(dp(" + string(nvars(basering) - nt) + "), dp)";
   // ring for the computation
 
   string @minPoly = string(minpoly);
   offset =  size(G) + nt;
-  execute(ringSTR);
+  list l2;
+  for (int xx = 1; xx <= (nvars(basering) - nt); xx++)
+  {
+   l2[size(l2)+1] = "s("+string(xx)+")";
+  }
+  for (int yy = 1; yy <= nt; yy++)
+  {
+   l2[size(l2)+1] = "t("+string(yy)+")";
+  }
+  for (int zz = 1; zz <= nt; zz++)
+  {
+   l2[size(l2)+1] = "Y("+string(zz)+")";
+  }
+  ring RNCR = create_ring(ringlist(basering)[1], l2, order, "no_minpoly");
   execute("poly aaa = number(" + @minPoly + ");");
   if (aaa!=0) { minpoly = number(aaa); }
   ideal action, G, I, J, N, generators;
