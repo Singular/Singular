@@ -164,28 +164,16 @@ EXAMPLE: example changevar; shows an example
    if( size(#)==1 ) { def @r=#[1]; }
    setring @r;
    ideal i = ideal(@r); int @q = size(i);
-   string @newring = "(";
-   string  strr1 = "printing vars";     // comment by sachin
-   strr1;    // comment by sachin
-   vars;
+   if( @q!=0 )
+      { string @s = "Rnew1"; }
+   else
+      { string @s = "Rnew"; }
+   string @newring = @s+"=("+charstr(@r)+"),(";
    if( vars[size(vars)-1]=="(" and vars[size(vars)]==")" )
    {
-//      @newring = @newring+vars[1,size(vars)-2]+"(1.."+string(nvars(@r))+")";
-      list l6;
-      for (int zz = 1; zz <= nvars(@r); zz++)
-      {    
-       l6[zz] = vars[1,size(vars)-2] + "("+string(zz)+")";
-      }
+      @newring = @newring+vars[1,size(vars)-2]+"(1.."+string(nvars(@r))+")";
    }
-   else
-   {
-//      @newring = @newring+vars;
-    list l6;
-    for(int zz=1 ; zz <= size(vars); zz++)
-    {    
-     if(vars[zz] != ","){ l6[size(l6)+1] = vars[zz]; }
-    }
-   }
+   else { @newring = @newring+vars; }
    string ords=ordstr(@r);
    int l=size(ords);
    int l1,l2;
@@ -203,15 +191,8 @@ EXAMPLE: example changevar; shows an example
      if (l2==size(ords)) { ords=string(ords[1..l1-1]); }
      else { ords=string(ords[1..l1-1])+string(ords[l2+1..size(ords)]); }
    }
-   @newring = @newring+")";
-   string  strr1 = "printing newring";     // comment by sachin
-   strr1;    // comment by sachin
-   @newring;
-//   execute("ring "+@newring);
-   if( @q!=0 )
-      { ring Rnew1 = create_ring(ringlist(@r)[1], l6, "("+ords+")", "no_minpoly"); ringlist(Rnew1); }
-   else
-      { ring Rnew = create_ring(ringlist(@r)[1], l6, "("+ords+")", "no_minpoly"); ringlist(Rnew); }
+   @newring = @newring+"),("+ords+");";
+   execute("ring "+@newring);
    if( @q!=0 )
    {
       map phi = @r,maxideal(1);
@@ -220,7 +201,6 @@ EXAMPLE: example changevar; shows an example
       qring Rnew=i;
    }
    return(Rnew);
-   
 }
 example
 {  "EXAMPLE:"; echo = 2;
