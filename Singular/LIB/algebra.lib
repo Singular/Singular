@@ -389,16 +389,16 @@ EXAMPLE: example algDependent; shows an example
     ideal B = ideal(br);
     int m = ncols(A);
     int s = size(B);
-    int i;
+    int i,@xx,@yy;
     string mp = string(minpoly);
  // --------------------- 1st variant of algorithm ----------------------
  // use internal preimage command (should be equivalent to 2nd variant)
     if ( tt == 1 )
     {
       list l6;  
-      for (int xx = 1; xx <= m; xx++)
+      for (@xx = 1; @xx <= m; @xx++)
       {
-       l6[size(l6)+1] = "y("+string(xx)+")";
+       l6[size(l6)+1] = "y("+string(@xx)+")";
       }
       ring R1 = create_ring(ringlist(br)[1], l6, "dp", "no_minpoly");
       if (mp!="0")
@@ -410,13 +410,13 @@ EXAMPLE: example algDependent; shows an example
     }
  // ---------- create new ring with extra variables --------------------
     list l7;  
-    for (int xx = 1; xx <= n; xx++)
+    for (@xx = n; @xx >= 1; @xx--)
     {
-     l7[size(l7)+1] = "x("+string(xx)+")";
+     l7[@xx] = "x("+string(@xx)+")";
     }
-    for (int yy = 1; yy <= m; yy++)
+    for (@yy = m; @yy >= 1; @yy--)
     {
-     l7[size(l7)+1] = "y("+string(yy)+")";
+     l7[n+@yy] = "y("+string(@yy)+")";
     }
     ring R2 = create_ring(ringlist(br)[1], l7, "dp", "no_minpoly");
     if (mp!="0")
@@ -446,13 +446,13 @@ EXAMPLE: example algDependent; shows an example
  // order
        {
         list l8;  
-        for (int xx = 1; xx <= n; xx++)
+        for (@xx = n; @xx >=1; @xx--)
         {
-         l8[size(l8)+1] = "x("+string(xx)+")";
+         l8[@xx] = "x("+string(@xx)+")";
         }
-        for (int yy = 1; yy <= m; yy++)
+        for (@yy = m; @yy >= 1; @yy--)
         {
-         l8[size(l8)+1] = "y("+string(yy)+")";
+         l8[n+@yy] = "y("+string(@yy)+")";
         }
         setring(br);
         ring R3 = create_ring(ringlist(br)[1], l8, "(dp("+string(n)+"),dp("+string(m)+"))", "no_minpoly");
