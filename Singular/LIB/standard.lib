@@ -2666,7 +2666,7 @@ EXAMPLE: example create_ring; shows an example
 "
 {
   /* setup */
-  list L;
+  list L; L[4]=def(0);
   int kill_ring;
   if (!defined(basering))
   {

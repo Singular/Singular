@@ -1307,8 +1307,7 @@ ASSUME: The current minpoly is non-zero.
     }
     short = 0;
     string str_lag = sprintf("list lag = laguerre_solve(%s);", minpoly);
-    string str_ring = sprintf("ring r_sqrt = (complex,prec,I),(%s),lp;", parstr(basering));
-    execute(str_ring);
+    ring r_sqrt = create_ring("(complex,prec,I)", "(" + parstr(basering) +")", "lp");
     execute(str_lag);
 //    lag;
     // choose a real solution, if it exists:
@@ -1370,8 +1369,7 @@ ASSUME: The current minpoly is non-zero.
     }
     short = 0;
     string str_lag = sprintf("list lag = laguerre_solve(%s);", minpoly);
-    string str_ring = sprintf("ring r_sqrt = (complex,prec,I),(%s),lp;", parstr(basering));
-    execute(str_ring);
+    ring r_sqrt = create_ring("(complex,prec,I)", "(" + parstr(basering) +")", "lp");
     execute(str_lag);
 
     // only take the real solutions:

@@ -89,9 +89,7 @@ example
 { "EXAMPLE:"; echo = 2;
    A_Z("c",5);
    A_Z("Z",-5);
-   string sR = "ring R = (0,"+A_Z("A",6)+"),("+A_Z("a",10)+"),dp;";
-   sR;
-   execute(sR);
+   ring R = create_ring("(0,"+A_Z("A",6)+")", "("+A_Z("a",10)+")", "dp");
    R;
 }
 proc A_Z_L (string s,int n)
@@ -1241,7 +1239,7 @@ example
    ring r=0,(x,y),dp;
    poly p=((x2+y3)^2+xy6)*((x3+y2)^2+x10y);
    p=p^2;
-   //timeFactorize(p,2);
+   timeFactorize(p,2);
    //timeFactorize(p,20);
 }
 
