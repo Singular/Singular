@@ -21,7 +21,7 @@ AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel \
 	      -DDATA_PATH=\"$(datadir)\" \
 	      -DBIN_PATH=\"$(bindir)\" -I/usr/include/python2.7
 
-machinelearning_la_SOURCES = machinelearning.cc mlpredict.c
+machinelearning_la_SOURCES = machinelearning.cc mlpredict.c mlpredict.h
 
 ### if HAVE_PYTHON???
 machinelearning_la_CXXFLAGS = $(PYTHON_CSPEC)
