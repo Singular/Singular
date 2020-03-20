@@ -902,14 +902,18 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN f
   }
   else
   {
-    omFree(plib);
     if(IDTYP(pl)!=PACKAGE_CMD)
     {
+      omFree(plib);
       WarnS("not of type package.");
       fclose(fp);
       return TRUE;
     }
-    if (!force) return FALSE;
+    if (!force)
+    {
+      omFree(plib);
+      return FALSE;
+    }
   }
   LoadResult = iiLoadLIB(fp, libnamebuf, newlib, pl, autoexport, tellerror);
   omFree((ADDRESS)newlib);
