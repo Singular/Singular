@@ -40,6 +40,7 @@ Changes in the kernel/build system:
 @item improved lift (and related)
 @item port to polymake 3.5.x
 @item rational functions via flint (@nref{flintQ})
+@item adaptions/functions for @code{Singular.jl}
 @end itemize
 
 @heading News for version 4-1-2
