@@ -48,6 +48,7 @@ bfun.lib        Daniel Andres                   daniel.andres@math.rwth-aachen.d
 brnoeth.lib     Jose Ignacio Farran Martin      ignfar@eis.uva.es
                 Christoph Lossen                lossen@mathematik.uni-kl.de
 central.lib     Oleksandr Motsak                motsak at mathematik dot uni minus kl dot de
+chern.lib	Oleksandr Iena                  o.g.yena@gmail.com
 cimonom.lib     I.Bermejo                       ibermejo@ull.es
                 I.Garcia-Marco                  iggarcia@ull.es
                 J.-J.Salazar-Gonzalez           jjsalaza@ull.es
@@ -78,6 +79,8 @@ gkdim.lib       Lobillo, F.J.                   jlobillo@ugr.es
 gmspoly.lib     Mathias Schulze                 mschulze@mathematik.uni-kl.de
 gmssing.lib     Mathias Schulze                 mschulze@mathematik.uni-kl.de
 graphics.lib    Christian Gorzel                gorzelc@math.uni-muenster.de
+grobcov.lib	Antonio Montes
+		Hans Schoenemann
 groups.lib      Gert-Martin Greuel              greuel@mathematik.uni-kl.de
                 Gerhard Pfister                 pfister@mathematik.uni-kl.de
 grwalk.lib      I Made Sulandra
@@ -104,6 +107,7 @@ makedbm.lib     Kai Krueger                     krueger@mathematik.uni-kl.de
 matrix.lib      Gert-Martin Greuel              greuel@mathematik.uni-kl.de
                 Bernd Martin                    martin@math.tu-cottbus.de
 mprimdec.lib    Alexander Dreyer                dreyer@mathematik.uni-kl.de
+moddiq.lib	Y. Ishihara                     yishihara@rikkyo.ac.jp
 modstd.lib      A. Hashemi                      Amir.Hashemi@lip6.fr
                 G. Pfister                      pfister@mathematik.uni-kl.de
                 H. Schoenemann                  hannes@mathematik.uni-kl.de
