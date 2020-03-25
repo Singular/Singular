@@ -1,6 +1,6 @@
 #!/bin/sh
-TARVERSION=4.1.2
-VERSION=4.1.2
+TARVERSION=4.1.3
+VERSION=4.1.3
 export VERSION TARVERSION
 
 git archive --prefix=singular-$VERSION/ HEAD |tar xf -
