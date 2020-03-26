@@ -190,7 +190,7 @@ EOD`
 		fi
 
 		# Make the versioning information available to the compiler
-		AC_DEFINE_UNQUOTED([HAVE_PYTHON], ["$ac_python_version"],
+		AC_DEFINE_UNQUOTED([HAVE_PYTHON_VER], ["$ac_python_version"],
                                    [If available, contains the Python version number currently in use.])
 
 		# First, the library directory:

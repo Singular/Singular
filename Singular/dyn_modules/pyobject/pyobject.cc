@@ -14,7 +14,6 @@
 
 #include "kernel/mod2.h"
 #ifdef HAVE_PYTHON
-#ifdef HAVE_PYTHON_H
 
 #include "omalloc/omalloc.h"
 #include "misc/intvec.h"
@@ -742,5 +741,4 @@ extern "C" int SI_MOD_INIT(pyobject)(SModulFunctions* psModulFunctions)
 }
 #undef PYOBJECT_ADD_C_PROC
 
-#endif /* HAVE_PYTHON_H */
 #endif /* HAVE_PYTHON */

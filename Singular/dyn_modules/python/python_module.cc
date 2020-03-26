@@ -1,6 +1,5 @@
 #include "kernel/mod2.h"
 #ifdef HAVE_PYTHON_MOD
-#ifdef HAVE_PYTHON_H
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -82,5 +81,4 @@ path.insert(0,'.')\n");
   psModulFunctions->iiAddCproc(currPack->libname,"python",FALSE, mod_python);
   return MAX_TOK;
 }
-#endif
 #endif

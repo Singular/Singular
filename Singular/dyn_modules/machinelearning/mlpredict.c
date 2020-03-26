@@ -11,7 +11,7 @@
 
 #include "kernel/mod2.h"
 #if defined(HAVE_READLINE) && defined(HAVE_READLINE_READLINE_H)
-#if defined(HAVE_PYTHON) && defined(HAVE_PYTHON_H)
+#ifdef HAVE_PYTHON
 
 #include <Python.h>
 
