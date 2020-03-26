@@ -7,6 +7,7 @@
 #include "Singular/mod_lib.h"
 
 #ifdef HAVE_PYTHON
+#ifdef HAVE_PYTHON_H
 
 #include "mlpredict.h"
 
@@ -78,5 +79,6 @@ extern "C" int SI_MOD_INIT(machinelearning)(SModulFunctions* psModulFunctions)
                         predictHelp); // the C/C++ routine
         return MAX_TOK;
 }
+#endif
 #endif
 #endif

@@ -9,7 +9,7 @@
 #define MLPREDICT_H
 
 #if defined(HAVE_READLINE) && defined(HAVE_READLINE_READLINE_H)
-#ifdef HAVE_PYTHON
+#if defined(HAVE_PYTHON) && defined(HAVE_PYTHON_H)
 #ifdef __cplusplus
 extern "C" {
 #endif /* ifdef cpp */
