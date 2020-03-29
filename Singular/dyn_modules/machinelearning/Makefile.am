@@ -19,9 +19,13 @@ AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel \
 	      -I${top_builddir}/kernel -I${top_srcdir}/libpolys \
 	      -I${top_builddir}/libpolys $(FACTORY_INCLUDES) $(GMP_CPPFLAGS) \
 	      -DDATA_PATH=\"$(datadir)\" \
-	      -DBIN_PATH=\"$(bindir)\" -I/usr/include/python2.7
+	      -DBIN_PATH=\"$(bindir)\" ${PYTHON_CSPEC}
 
+if PYTHON_USE
 machinelearning_la_SOURCES = machinelearning.cc mlpredict.c mlpredict.h
+else
+machinelearning_la_SOURCES =
+endif
 
 ### if HAVE_PYTHON???
 machinelearning_la_CXXFLAGS = $(PYTHON_CSPEC)
@@ -38,15 +42,13 @@ endif
 TESTS	 		= test_bufsize test_init_ml
 check_PROGRAMS 		= test_bufsize test_init_ml
 
-#test_bufsize_LDFLAGS	= -lpython3.6m
-test_bufsize_LDFLAGS	= -lpython2.7
+test_bufsize_LDFLAGS	= ${PYTHON_LSPEC}
 test_bufsize_SOURCES	= tests/test_bufsize.c mlpredict.c
-test_bufsize_CFLAGS	= -Wall -Wextra -I/usr/include/python2.7
+test_bufsize_CFLAGS	= -Wall -Wextra ${PYTHON_CSPEC}
 
-#test_init_ml_LDFLAGS	= -lpython3.6m
-test_init_ml_LDFLAGS	= -lpython2.7
+test_init_ml_LDFLAGS	= ${PYTHON_LSPEC}
 test_init_ml_SOURCES	= tests/test_init_ml.c mlpredict.c
-test_init_ml_CFLAGS	= -Wall -Wextra -I/usr/include/python2.7
+test_init_ml_CFLAGS	= -Wall -Wextra ${PYTHON_CSPEC}
 
 
 nobase_dist_data_DATA 	= \

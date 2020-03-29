@@ -2,12 +2,16 @@ ACLOCAL_AMFLAGS = -I ../../m4
 
 PYTHON_VERSION=2.7
 
+if PYTHON_USE
 SOURCES =  python_module.cc poly_wrap.cc vector_wrap.cc CF_wrap.cc\
   number_wrap.cc ring_wrap.cc ideal_wrap.cc intvec_wrap.cc \
   interpreter_support.cc \
   CF_wrap.h  Number.h ideal_wrap.h number_wrap.h  ring_wrap.h \
   IIntvec.h  Poly.h   interpreter_support.h  vector_wrap.h \
   Ideal.h    PowerSeries.h  intvec_wrap.h poly_wrap.h wrapper.h
+else
+SOURCES=
+endif
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} \
 -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
@@ -28,7 +32,7 @@ endif
 
 python_module_la_SOURCES  = $(SOURCES)
 
-python_module_la_CPPFLAGS = -I/usr/include/python${PYTHON_VERSION} ${AM_CPPFLAGS} ${P_PROCS_CPPFLAGS_COMMON}
+python_module_la_CPPFLAGS = ${PYTHON_CSPEC} ${AM_CPPFLAGS} ${P_PROCS_CPPFLAGS_COMMON}
 python_module_la_LDFLAGS  = ${P_PROCS_MODULE_LDFLAGS} $(SINGULAR_LDFLAGS)
 
 # forcefully enable exceptions for python
@@ -42,7 +46,7 @@ endif
 endif
 
 if HAVE_PYTHON_MODULE
- python_module_la_LIBADD   += -lboost_python-${PYTHON_VERSION} -lpython${PYTHON_VERSION}
+ python_module_la_LIBADD   += -lboost_python-${PYTHON_VERSION} ${PYTHON_LSPEC}
 endif
 
 python_module_la_CXXFLAGS = ${AM_CXXFLAGS}
