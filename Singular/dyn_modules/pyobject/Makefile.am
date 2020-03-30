@@ -1,6 +1,5 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
-if PYTHON_USE
 if SI_BUILTIN_PYOBJECT
   noinst_LTLIBRARIES = pyobject.la
 ##  moduledir = $(libdir)/singular
@@ -15,9 +14,6 @@ else !SI_BUILTIN_PYOBJECT
 ###  -export-dynamic -shared -module -avoid-version (add to all DMs?)
 endif !SI_BUILTIN_PYOBJECT
 pyobject_la_SOURCES = pyobject.cc
-else
-pyobject_la_SOURCES =
-endif
 
 
 ##########################################################################

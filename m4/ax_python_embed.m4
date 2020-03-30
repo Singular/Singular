@@ -308,6 +308,7 @@ strLinkSpec += " %s" % (dictConfig.get('LINKFORSHARED'))
 print(strLinkSpec)
         ])
         AC_SUBST([PYTHON_LSPEC], [${ax_python_output}])
+	AC_DEFINE(HAVE_PYTHON,1,[can embed python])
         AC_MSG_NOTICE([PYTHON_LSPEC=${ax_python_output}])
     fi
 ])
