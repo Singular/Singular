@@ -253,7 +253,7 @@ Note, that both @strong{Control structures} and @strong{System variables} of
 @end menu
 
 @c ------------------------------
-@node freeAlgebra BR_LETTERPLACE_BR, ncgen, Functions BR_LETTERPLACE_BR, Non-commutative subsystem
+@node freeAlgebra BR_LETTERPLACE_BR
 @subsection freeAlgebra BR_LETTERPLACE_BR
 @cindex freeAlgebra BR_LETTERPLACE_BR
 
@@ -290,7 +290,7 @@ See @ref{Monomial orderings on free algebras}.
 @c ref
 
 @c ----------------------------------------
-@node ncgen, lift BR_LETTERPLACE_BR, freeAlgebra BR_LETTERPLACE_BR, Functions BR_LETTERPLACE_BR
+@node ncgen
 @subsection ncgen
 @cindex ncgen
 
@@ -325,7 +325,7 @@ See
 @ref{vector}.
 
 @c -------------------------------------------------
-@node lift BR_LETTERPLACE_BR, liftstd BR_LETTERPLACE_BR, ncgen, Functions BR_LETTERPLACE_BR
+@node lift BR_LETTERPLACE_BR
 @subsection lift  BR_LETTERPLACE_BR
 @cindex lift  BR_LETTERPLACE_BR
 @table @code
@@ -373,7 +373,7 @@ See
 @ref{liftstd (letterplace)}.
 @c ref
 @c -----------------------------------------
-@node liftstd BR_LETTERPLACE_BR, reduce BR_LETTERPLACE_BR, lift BR_LETTERPLACE_BR, Functions BR_LETTERPLACE_BR
+@node liftstd BR_LETTERPLACE_BR
 @subsection liftstd BR_LETTERPLACE_BR
 @cindex liftstd BR_LETTERPLACE_BR
 @table @code
@@ -419,7 +419,7 @@ See
 @ref{lift (letterplace)}.
 
 @c ------------------------------
-@node reduce BR_LETTERPLACE_BR, rightstd BR_LETTERPLACE_BR, liftstd BR_LETTERPLACE_BR, Functions BR_LETTERPLACE_BR
+@node reduce BR_LETTERPLACE_BR
 @subsection reduce BR_LETTERPLACE_BR
 @cindex reduce BR_LETTERPLACE_BR
 @cindex NF BR_LETTERPLACE_BR
@@ -482,7 +482,7 @@ See also
 @c ref
 
 @c ------------------------------
-@node rightstd BR_LETTERPLACE_BR, std BR_LETTERPLACE_BR, reduce BR_LETTERPLACE_BR, Functions BR_LETTERPLACE_BR
+@node rightstd BR_LETTERPLACE_BR
 @subsection rightstd BR_LETTERPLACE_BR
 @cindex rightstd BR_LETTERPLACE_BR
 @table @code
@@ -510,7 +510,7 @@ reduce(I,twostd(0)); // an explanation for the latter
 
 
 @c ------------------------------
-@node std BR_LETTERPLACE_BR, syz BR_LETTERPLACE_BR, rightstd BR_LETTERPLACE_BR, Functions BR_LETTERPLACE_BR
+@node std BR_LETTERPLACE_BR
 @subsection std BR_LETTERPLACE_BR
 @cindex std BR_LETTERPLACE_BR
 @table @code
@@ -523,7 +523,7 @@ Alias to @ref{twostd BR_LETTERPLACE_BR}.
 @end table
 
 @c -------------------------------------------------
-@node syz BR_LETTERPLACE_BR, twostd BR_LETTERPLACE_BR, std BR_LETTERPLACE_BR, Functions BR_LETTERPLACE_BR
+@node syz BR_LETTERPLACE_BR
 @subsection syz BR_LETTERPLACE_BR
 @cindex syz BR_LETTERPLACE_BR
 @table @code
@@ -547,6 +547,7 @@ generators) bimodile of the ideal, resp.@: module.
   module S = syz(I);
   print(S);
   testSyz(I,S);
+@c example
 @end smallexample
 @end table
 @c ref
@@ -558,7 +559,7 @@ See
 @ref{liftstd (letterplace)}.
 
 @c ------------------------------
-@node twostd BR_LETTERPLACE_BR, Mathematical background BR_LETTERPLACE_BR, std BR_LETTERPLACE_BR, Functions BR_LETTERPLACE_BR
+@node twostd BR_LETTERPLACE_BR
 @subsection twostd BR_LETTERPLACE_BR
 @cindex twostd BR_LETTERPLACE_BR
 
@@ -606,7 +607,7 @@ twostd(J);
 @end menu
 
 @c ---------------------------------------------------------------------------
-@node Free associative algebras, Monomial orderings on free algebras, Mathematical background BR_LETTERPLACE_BR, Mathematical background BR_LETTERPLACE_BR
+@node Free associative algebras
 @subsection Free associative algebras
 @cindex Free associative algebras
 @cindex free associative algebra, tensor algebra
@@ -634,7 +635,7 @@ such that @math{I} is given via its @strong{finite} Groebner basis @math{G}.
 @cindex finitely presented algebra, standard finitely presented algebra
 
 @c ---------------------------------------------------------------------------
-@node Monomial orderings on free algebras, Groebner bases for two-sided ideals in free associative algebras, Free associative algebras, LETTERPLACE 
+@node Monomial orderings on free algebras
 @subsection Monomial orderings on free algebras
 @cindex Monomial orderings on free algebras
 
@@ -807,7 +808,7 @@ wr;
 @end smallexample
 
 @c ---------------------------------------------------------------------------
-@node Groebner bases for two-sided ideals in free associative algebras, Letterplace correspondence, Monomial orderings on free algebras, LETTERPLACE 
+@node Groebner bases for two-sided ideals in free associative algebras
 @subsection Groebner bases for two-sided ideals in free associative algebras
 @cindex Groebner bases for two-sided ideals in free associative algebras
 @cindex Groebner bases in free associative algebras
@@ -860,7 +861,7 @@ it is the complete finite Groebner basis, if and only if @math{G(2d-1)=G(d)} hol
 
 
 @c ---------------------------------------------------------------------------
-@node Letterplace correspondence, LETTERPLACE libraries, Groebner bases for two-sided ideals in free associative algebras, LETTERPLACE 
+@node Letterplace correspondence
 @subsection Letterplace correspondence
 @cindex Letterplace correspondence
 
@@ -926,7 +927,7 @@ $K$-algebra operations of the letterplace algebra \textbf{and} simultaneous shif
 
 
 @c ---------------------------------------------------------------------------
-@node Bimodules and syzygies and lifts, LETTERPLACE libraries, Letterplace correspondence, LETTERPLACE 
+@node Bimodules and syzygies and lifts
 @section Bimodules and syzygies and lifts
 @cindex Bimodules
 @cindex Syzygy bimodule
@@ -983,7 +984,7 @@ its Groebner basis are computed up to a specified length bound.
 
 
 @c ---------------------------------------------------------------------------
-@node LETTERPLACE libraries,  , Letterplace correspondence, LETTERPLACE 
+@node LETTERPLACE libraries
 @section LETTERPLACE libraries
 @cindex LETTERPLACE libraries
 @cindex Letterplace libraries
