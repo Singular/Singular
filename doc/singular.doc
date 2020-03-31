@@ -163,7 +163,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 
 @c ----------------------------------------------------------------------------
 @ifset withplural
-@node Non-commutative subsystem, Examples, Tricks and pitfalls, Top
+@node Non-commutative subsystem
 @chapter Non-commutative subsystem
 @cindex Non-commutative subsystem
 
