@@ -962,13 +962,13 @@ $N = \langle g_1,\ldots,g_m \rangle \subset \bigoplus_{i=1}^r A e_i A$
 @end ifinfo
 is the kernel of the natural homomorphism of @math{A}-bimodules
 @tex 
-\[
+$
 \bigoplus_{j=1}^m A \epsilon_j A \Longrightarrow \bigoplus_{i=1}^r A e_i A,
 \;
 \epsilon_j  \mapsto \sum_k \ell_{jk} g_j r_{jk}
 \sum_{j=1}^m \sum_k  \ell_{jk} \epsilon_j r_{jk} 
 \mapsto \sum_{j=1}^m \sum_k \ell_{jk} g_j r_{jk}.
-\]
+$
 @end tex
 @ifinfo
 @display
