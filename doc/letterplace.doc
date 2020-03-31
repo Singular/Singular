@@ -307,6 +307,7 @@ which encodes the component or the position in a vector.
 @item @strong{Example:}
 @smallexample
 @c example
+  LIB"freegb.lib";
   ring r= 0,(x,y),dp;
   ring R = freeAlgebra(r,4,3); // R supports free bimodule up to rank 3
   typeof(ncgen(2));
