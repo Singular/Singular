@@ -101,14 +101,10 @@ ideal J = twostd(I);
 J;
 poly p = reduce(x*y*z*y,J);
 p; // since p!=0, x*y*z*y is not contained in J
-@c example
-@end smallexample
 
-Now, we introduce a factor algebra @math{K<x,y,z>/J} of type @code{qring},
-and demonstrate @code{reduce} and @code{rightstd} functions:
+// Now, we introduce a factor algebra @math{K<x,y,z>/J} of type @code{qring},
+// and demonstrate @code{reduce} and @code{rightstd} functions:
 
-@smallexample
-@c example
 qring Q = J; // J is a Groebner basis
 poly p = reduce(x*x, twostd(0)); // the canonical representative of x*x in Q
 p;
