@@ -225,9 +225,10 @@ described in the following subsections.
 Use the @code{LIB} command (see @ref{LIB}) for loading of single libraries,
 and the command @code{LIB "all.lib";} for loading all libraries.
 
-@ifset withplural
-See also @ref{PLURAL libraries}.
-@end ifset
+@c levandov: moved to below
+@c @ifset withplural
+@c See also @ref{PLURAL libraries} and .
+@c @end ifset
 
 @strong{Interpreter libraries:}
 
@@ -249,7 +250,8 @@ See also @ref{PLURAL libraries}.
 * Experimental libraries::
 @end menu
 @ifset withplural
-@xref{PLURAL libraries}, @xref{LETTERPLACE libraries}.
+@c @xref{PLURAL libraries}, @xref{LETTERPLACE libraries}.
+See also @ref{PLURAL libraries} and @ref{LETTERPLACE libraries}.
 @end ifset
 
 @c ----------------------------------------------------------
