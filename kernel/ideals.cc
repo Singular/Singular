@@ -1109,13 +1109,13 @@ static void idPrepareStd(ideal s_temp, int k)
   s_temp->rank = k+IDELEMS(s_temp);
 }
 
-static void idLift_setUnit(int e_mod, int e_smod,matrix *unit)
+static void idLift_setUnit(int e_mod, matrix *unit)
 {
   if (unit!=NULL)
   {
-    *unit=mpNew(e_mod,e_smod);
+    *unit=mpNew(e_mod,e_mod);
     // make sure that U is a diagonal matrix of units
-    for(int i=e_smod;i>0;i--)
+    for(int i=e_mod;i>0;i--)
     {
       MATELEM(*unit,i,i)=pOne();
     }
@@ -1141,7 +1141,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
     {
       *rest=idInit(1,mod->rank);
     }
-    idLift_setUnit(idelems_mod,idelems_submod,unit);
+    idLift_setUnit(idelems_submod,unit);
     return idInit(1,idelems_mod);
   }
   if (idIs0(mod)) /* and not idIs0(submod) */
@@ -1149,7 +1149,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
     if (rest!=NULL)
     {
       *rest=idCopy(submod);
-      idLift_setUnit(idelems_mod,idelems_submod,unit);
+      idLift_setUnit(idelems_submod,unit);
       return idInit(1,idelems_mod);
     }
     else
@@ -1259,7 +1259,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
           }
           if (unit!=NULL)
           {
-            *unit=mpNew(comps_to_add,comps_to_add);
+            idLift_setUnit(idelems_submod,unit);
           }
           if (rest!=NULL) *rest=idCopy(submod);
           s_result=idInit(idelems_submod,idelems_mod);
@@ -1305,7 +1305,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
 //idPrint(s_result);
   if (unit!=NULL)
   {
-    *unit=mpNew(comps_to_add,comps_to_add);
+    *unit=mpNew(idelems_submod,idelems_submod);
     int i;
     for(i=0;i<IDELEMS(s_result);i++)
     {
