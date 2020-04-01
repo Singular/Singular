@@ -323,10 +323,10 @@ print(strLinkSpec)
 AC_DEFUN([AX_PYTHON_PATH],
 [
     AC_ARG_VAR( [PYTHON], [Python Executable Path] )
-    AC_PATH_PROG( PYTHON, python, [], $1 )
+    #AC_PATH_PROG( PYTHON, python, [], $1 )
     if test -z "$PYTHON"
     then
-        AC_MSG_ERROR([Python Executable not found])
+        AC_MSG_RESULT([Python Executable not found])
     else
         ax_python_use=true
     fi
@@ -384,7 +384,7 @@ _ACEOF
 
 # AX_PYTHON_VERSION_CHECK( VERSION, [ACTION-IF-TRUE], [ACTION-IF-FALSE] )
 # -----------------------------------------------------------------------------
-# Run ACTION-IF-TRUE if the Python interpreter has version >= VERSION.
+# Run ACTION-IF-TRUE if the Python interpreter has version == VERSION.
 # Run ACTION-IF-FALSE otherwise.
 # This test uses sys.hexversion instead of the string equivalent (first
 # word of sys.version), in order to cope with versions such as 2.2c1.
@@ -396,7 +396,7 @@ AC_DEFUN([AX_PYTHON_VERSION_CHECK],
     AC_ARG_VAR( [PYTHON], [Python Executable Path] )
     if test -n "$PYTHON"
     then
-        AC_MSG_CHECKING([whether $PYTHON version >= $1])
+        AC_MSG_CHECKING([whether $PYTHON version == $1])
         AX_PYTHON_RUN([
 import sys
 # split strings by '.' and convert to numeric.  Append some zeros
@@ -408,7 +408,11 @@ minver[3] = 255
 minverhex = 0
 for i in range(0, 4): minverhex = (minverhex << 8) + minver[[i]]
 if sys.hexversion >= minverhex:
-    sys.exit( 0 )
+    if sys.hexversion <=0x03000000:
+        sys.exit( 0 )
+    else:
+        sys.exit( 1 )
+    fi
 else:
     sys.exit( 1 )
         ])
@@ -436,7 +440,9 @@ AC_DEFUN([AX_PYTHON_VERSION_ENSURE],
     AX_PYTHON_VERSION_CHECK(
         [$1],
         [AC_MSG_RESULT(yes)],
-        [AC_MSG_ERROR(too old)]
+        [AC_MSG_RESULT(no)
+	PYTHON=""
+	ax_ython_use=false]
     )
 ])
 

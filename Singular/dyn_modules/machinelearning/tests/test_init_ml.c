@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "kernel/mod2.h"
+#if defined(HAVE_READLINE) && defined(HAVE_READLINE_READLINE_H)
+#ifdef HAVE_PYTHON
 #include <Python.h>
 #include "mlpredict.h"
 
-#if defined(HAVE_READLINE) && defined(HAVE_READLINE_READLINE_H)
-#ifdef HAVE_PYTHON
 
 /* this is found as an internal function in mlpredict.c, for use in testing */
 ml_internal *_get_internals();
