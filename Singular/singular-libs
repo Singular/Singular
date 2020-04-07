@@ -58,7 +58,8 @@ SLIB1 = arr.lib arnoldclassify.lib \
 PLIBS = bimodules.lib bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib\
         fpadim.lib fpalgebras.lib fpaprops.lib freegb.lib\
 	gkdim.lib involut.lib\
-	ncall.lib ncalg.lib ncdecomp.lib ncfactor.lib nchomolog.lib ncpreim.lib nctools.lib \
+	ncall.lib ncalg.lib ncdecomp.lib ncfactor.lib nchomolog.lib \
+        ncModslimgb.lib ncpreim.lib nctools.lib \
 	perron.lib purityfiltration.lib  qmatrix.lib \
         ratgb.lib
 

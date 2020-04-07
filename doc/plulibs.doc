@@ -35,6 +35,7 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 * ncfrac_lib:: fractions in Ore localizations of a G-algebras
 * nchomolog_lib:: Noncommutative Homological Algebra
 * ncloc_lib:: Ore-localization in G-Algebras
+* ncModslimgb_lib:: modular slimgb for G-algebras
 * ncpreim_lib:: Non-commutative elimination and preimage computations
 * nctools_lib::  General tools for noncommutative algebras
 * olga_lib:: Ore-localization in G-Algebras
