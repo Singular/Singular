@@ -120,6 +120,10 @@ Status: experimental
 @section ncloc_lib
 @c lib ncloc.lib
 @c ----------------------------------------------------------
+@node ncModslimgb_lib
+@section ncModslimgb_lib
+@c lib ncModslimgb.lib
+@c ----------------------------------------------------------
 @node ncpreim_lib
 @section ncpreim_lib
 @c lib ncpreim.lib
