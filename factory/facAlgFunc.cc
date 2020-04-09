@@ -192,8 +192,10 @@ resultante (const CanonicalForm & f, const CanonicalForm& g, const Variable & v)
   if (getCharacteristic() == 0)
     result= resultantZ (fz, gz,v);
   else
-#endif
+    result= resultantFp (fz,gz,v);
+#else
     result= resultant (fz,gz,v);
+#endif
 
   return result;
 }
