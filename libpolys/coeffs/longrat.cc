@@ -503,6 +503,122 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
   return res;
 }
 
+#ifndef P_NUMBERS_H
+
+static number nlInitMPZ(mpz_t m, const coeffs)
+{
+  number z = ALLOC_RNUMBER();
+  z->s = 3;
+  #ifdef LDEBUG
+  z->debug=123456;
+  #endif
+  mpz_init_set(z->z, m);
+  z=nlShort3(z);
+  return z;
+}
+#endif
+
+static number nlMapC(number from, const coeffs src, const coeffs dst)
+{
+  assume( getCoeffType(src) == n_long_C );
+  if ( ! ((gmp_complex*)from)->imag().isZero() )
+    return INT_TO_SR(0);
+
+  if (dst->is_field==FALSE) /* ->ZZ */
+  {
+    char *s=floatToStr(((gmp_complex*)from)->real(),src->float_len);
+    mpz_t z;
+    mpz_init(z);
+    char *ss=nEatLong(s,z);
+    if (*ss=='\0')
+    {
+      omFree(s);
+      number n=nlInitMPZ(z,dst);
+      mpz_clear(z);
+      return n;
+    }
+    omFree(s);
+    mpz_clear(z);
+    WarnS("conversion problem in CC -> ZZ mapping");
+    return INT_TO_SR(0);
+  }
+      
+  mpf_t *f = ((gmp_complex*)from)->real()._mpfp();
+
+  number res;
+  mpz_ptr dest,ndest;
+  int size, i,negative;
+  int e,al,bl;
+  mp_ptr qp,dd,nn;
+
+  size = (*f)[0]._mp_size;
+  if (size == 0)
+    return INT_TO_SR(0);
+  if(size<0)
+  {
+    negative = 1;
+    size = -size;
+  }
+  else
+    negative = 0;
+
+  qp = (*f)[0]._mp_d;
+  while(qp[0]==0)
+  {
+    qp++;
+    size--;
+  }
+
+  e=(*f)[0]._mp_exp-size;
+  res = ALLOC_RNUMBER();
+#if defined(LDEBUG)
+  res->debug=123456;
+#endif
+  dest = res->z;
+
+  void* (*allocfunc) (size_t);
+  mp_get_memory_functions (&allocfunc,NULL, NULL);
+  if (e<0)
+  {
+    al = dest->_mp_size = size;
+    if (al<2) al = 2;
+    dd = (mp_ptr)allocfunc(sizeof(mp_limb_t)*al);
+    for (i=0;i<size;i++) dd[i] = qp[i];
+    bl = 1-e;
+    nn = (mp_ptr)allocfunc(sizeof(mp_limb_t)*bl);
+    memset(nn,0,sizeof(mp_limb_t)*bl);
+    nn[bl-1] = 1;
+    ndest = res->n;
+    ndest->_mp_d = nn;
+    ndest->_mp_alloc = ndest->_mp_size = bl;
+    res->s = 0;
+  }
+  else
+  {
+    al = dest->_mp_size = size+e;
+    if (al<2) al = 2;
+    dd = (mp_ptr)allocfunc(sizeof(mp_limb_t)*al);
+    memset(dd,0,sizeof(mp_limb_t)*al);
+    for (i=0;i<size;i++) dd[i+e] = qp[i];
+    for (i=0;i<e;i++) dd[i] = 0;
+    res->s = 3;
+  }
+
+  dest->_mp_d = dd;
+  dest->_mp_alloc = al;
+  if (negative) mpz_neg(dest,dest);
+
+  if (res->s==0)
+    nlNormalize(res,dst);
+  else if (mpz_size1(res->z)<=MP_SMALL)
+  {
+    // res is new, res->ref is 1
+    res=nlShort3(res);
+  }
+  nlTest(res, dst);
+  return res;
+}
+
 //static number nlMapLongR(number from)
 //{
 //  gmp_float *ff=(gmp_float*)from;
@@ -2363,6 +2479,10 @@ nMapFunc nlSetMap(const coeffs src, const coeffs dst)
   {
     return nlMapLongR; /* long R -> Q */
   }
+  if (nCoeff_is_long_C(src))
+  {
+    return nlMapC; /* C -> Q */
+  }
 #ifdef HAVE_RINGS
   if (src->rep==n_rep_gmp) // nCoeff_is_Z(src) || nCoeff_is_Ring_PtoM(src) || nCoeff_is_Zn(src))
   {
@@ -2679,18 +2799,6 @@ void nlMPZ(mpz_t m, number &n, const coeffs r)
   else             mpz_init_set(m, (mpz_ptr)n->z);
 }
 
-
-static number nlInitMPZ(mpz_t m, const coeffs)
-{
-  number z = ALLOC_RNUMBER();
-  z->s = 3;
-  #ifdef LDEBUG
-  z->debug=123456;
-  #endif
-  mpz_init_set(z->z, m);
-  z=nlShort3(z);
-  return z;
-}
 
 number  nlXExtGcd (number a, number b, number *s, number *t, number *u, number *v, const coeffs r)
 {
