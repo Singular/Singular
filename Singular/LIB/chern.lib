@@ -3146,11 +3146,11 @@ NOTE:
   }
   // modify the generators of the ideal so that all of them are of the same degree
   I=equal_deg(I);
-  int d=deg(I[1]); // this degree is stored in this variable
+  int degGen=deg(I[1]); // this degree d is stored in this variable
   int i;
   list rez; // define the variable for the result
   int n=nvars(basering)-1; // the dimension of the projective space
-  if(d==-1) // if the ideal is zero
+  if(degGen==-1) // if the ideal is zero
   {
     for(i=0;i<=n;i++)
     {
@@ -3191,9 +3191,9 @@ NOTE:
     // eliminate all t@(i) from J(i)
     // compute the degree of the scheme defined by this ideal
     // and use it to compute the class corresponding to c(O(d))^n * G\otimes O(d)
-    cl=cl+mult(std(eliminate(J(i), prd)))*u@^i*(1+d*u@)^(n-i);
+    cl=cl+mult(std(eliminate(J(i), prd)))*u@^i*(1+degGen*u@)^(n-i);
     // the (n+1)-st power of the inverse of the Chern class of O(d)
-    mlt=mlt+binomial(n+i, i)*(-d*u@)^i;
+    mlt=mlt+binomial(n+i, i)*(-degGen*u@)^i;
   }
   poly resPoly;
   // compute the Segre class by the Aluffi's formula from Proposition 3.1 as polynomial in u@
@@ -3245,11 +3245,11 @@ NOTE:
   }
   // modify the generators of the ideal so that all of them are of the same degree
   I=equal_deg(I);
-  int d=deg(I[1]); // this degree is stored in this variable
+  int degGen=deg(I[1]); // this degree d is stored in this variable
   int i;
   list rez; // define the variable for the result
   int n=nvars(basering)-1; // the dimension of the projective space
-  if(d==-1) // if the ideal is zero
+  if(degGen==-1) // if the ideal is zero
   {
     rez=rez+list(int(1));
     for(i=1;i<=n;i++)
@@ -3291,9 +3291,9 @@ NOTE:
     // eliminate all t@(i) from J(i)
     // compute the degree of the scheme defined by this ideal
     // the class corresponding to c(O(d))^n * G\otimes O(d)
-    cl=cl+ mult(std( eliminate( J(i),  prd) ))*u@^i*(1+d*u@)^(n-i);
+    cl=cl+ mult(std( eliminate( J(i),  prd) ))*u@^i*(1+degGen*u@)^(n-i);
     // the (n+1)-st power of the inverse of the Chern class of O(d)
-    mlt=mlt+binomial(n+i, i)*(-d*u@)^i;
+    mlt=mlt+binomial(n+i, i)*(-degGen*u@)^i;
   }
   poly resPoly;
   // compute the Fulton class using the Aluffi's formula for the Segre class and
@@ -3965,11 +3965,11 @@ NOTE:
   ideal I=jacob(f);
   I=simplify(I, 8+2); // ignore repetitions and zero generators
   I=sort(I)[1]; // sort the generators, it speeds up the computations
-  int d=deg(I[1]); // the degree of the generators of the Jacobian ideal
+  int degGen=deg(I[1]); // the degree of the generators of the Jacobian ideal
   int i;
   int n=nvars(basering)-1; // the dimension of the projective space
   bigintmat REZ[1][n+1];
-  if(d==-1) // if the Jacobian ideal is zero
+  if(degGen==-1) // if the Jacobian ideal is zero
   {
     for(i=0;i<=n;i++)
     {
