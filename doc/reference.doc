@@ -7103,7 +7103,7 @@ ideal or module
 Returns a Groebner basis of an ideal or module with respect to the monomial
 ordering of the basering (which has to be global).
 @item @strong{Note:}
-The algorithm is designed to keep polynomials slim (short with small coefficients). For details see @code{http://www.mathematik.uni-kl.de/~zca/Reports_on_ca/35/paper_35_full.ps.gz}.
+The algorithm is designed to keep polynomials slim (short with small coefficients). For details see @code{https://www.singular.uni-kl.de/reports/35/paper_35_full.ps.gz}.
 A reduced Groebner basis is returned if option(redSB) is set
 (see @ref{option(redSB)}).
 To view the progress of long running computations, use option(prot)

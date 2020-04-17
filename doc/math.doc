@@ -740,9 +740,9 @@ See @ref{Mathematical background (plural)}, @ref{Mathematical background (letter
 
 The Centre for Computer Algebra Kaiserslautern publishes a series of preprints
 which are electronically available at
-@code{http://www.mathematik.uni-kl.de/~zca/Reports_on_ca}.
+@code{https://www.singular.uni-kl.de/reports}.
 Other sources to check are @code{http://symbolicnet.org/},
-@code{http://www-sop.inria.fr/galaad/}, @code{http://www.bath.ac.uk/~masjpf/CAIN.html},... and the following list of books.
+@code{http://www-sop.inria.fr/galaad/},... and the following list of books.
 
 @ifset withplural
 For references on non-commutative algebras and algorithms, see @ref{References (plural)}.
