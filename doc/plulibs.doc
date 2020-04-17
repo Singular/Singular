@@ -9,8 +9,7 @@
 @c @sc{Plural} comes with a set of standard libraries.
 @c Their content is described in the following subsections.
 
-The content of libraries, created for non-commutative extensions of
-@sc{Singular} like @sc{Plural} and @sc{Letterplace} is described in the following subsections.
+The content of libraries, created for @sc{Plural} is described in the following subsections.
 
 Use the @code{LIB} command for loading of single libraries.
 
@@ -23,11 +22,11 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 * bfun_lib::  Algorithms for b-functions and Bernstein-Sato polynomial
 * central_lib:: Computation of centralizer and center in GR-algebras
 * dmod_lib:: Fundamental algorithms for algebraic D-modules
-* dmodapp_lib::  Applications of algebraic D-modules
+* dmodapp_lib::  Applications of algebraic D-modules such as integration
 * dmodideal_lib:: Algorithms for Bernstein-Sato ideals of morphisms
-* dmodloc_lib:: Localization of algebraic D-modules
+* dmodloc_lib:: Localization of algebraic D-modules such as Weyl closure
 * dmodvar_lib:: Algebraic D-modules and Bernstein-Sato polynomial for varieties
-* involut_lib::  Computations and operations with involutions
+* involut_lib::  Computations and operations with involutive endomorphisms
 * gkdim_lib::  Computation of the Gelfand-Kirillov dimension of modules
 * ncalg_lib::  Definitions of important G- and GR-algebras
 * ncdecomp_lib::  Algorithmic decomposition of a module with central characters
@@ -35,13 +34,13 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 * ncfrac_lib:: fractions in Ore localizations of a G-algebras
 * nchomolog_lib:: Noncommutative Homological Algebra
 * ncloc_lib:: Ore-localization in G-Algebras
-* ncModslimgb_lib:: modular slimgb for G-algebras
+* ncModslimgb_lib:: modular slimgb for Groebner bases in G-algebras
 * ncpreim_lib:: Non-commutative elimination and preimage computations
-* nctools_lib::  General tools for noncommutative algebras
+* nctools_lib:: General tools for noncommutative algebras
 * olga_lib:: Ore-localization in G-Algebras
 * perron_lib::  Method of Perron to compute algebraic dependence
-* purityfiltration_lib:: purity filtration of a given module
-* qmatrix_lib::  Quantum matrices, quantum minors and symmetric groups
+* purityfiltration_lib:: Purity (equidimensional) filtration of a given module
+* qmatrix_lib:: Quantum matrices, quantum minors and symmetric groups
 * ratgb_lib:: Groebner bases in Ore localizations of noncommutative G-algebras
 @end menu
 
@@ -155,4 +154,3 @@ Status: experimental
 @c lib ratgb.lib
 @c ----------------------------------------------------------
 @raisesections
-
