@@ -71,7 +71,7 @@ Note, that the elements of the coefficient field (or a ring) mutually commute wi
 
 @c ---------------------------------------------------------------------------
 @node Examples of use of Letterplace
-@subsection Examples of use of @sc{Letterplace}
+@subsection Examples of use of BR_LETTERPLACE_BR
 @cindex Examples of use of Letterplace
 
 First, define a commutative ring @math{K[X]} in @sc{Singular}, equipped with a monomial well-ordering
@@ -108,14 +108,10 @@ ideal J = twostd(I);
 J;
 poly p = reduce(x*y*z*y,J);
 p; // since p!=0, x*y*z*y is not contained in J
-@c example
-@end smallexample
 
-Now, we introduce a factor algebra @math{K<x,y,z>/J} of type @code{qring},
- and demonstrate the functions @code{reduce} and @code{rightstd}:
+// Now, we introduce a factor algebra K<x,y,z>/J} of type qring,
+// and demonstrate the functions reduce and rightstd:
 
-@smallexample
-@c example
 qring Q = J; // J is a Groebner basis
 poly p = reduce(x*x, twostd(0)); // the canonical representative of x*x in Q
 p;
@@ -133,8 +129,8 @@ We work further on implementing more algorithms for non-commutative ideals and m
 
 
 @c ---------------------------------------------------------------------------
-@node Examples of use of Letterplace over @math{Z}
-@subsection Example of use of @sc{Letterplace} over @math{Z}
+@node Examples of use of Letterplace over Z
+@subsection Example of use of BR_LETTERPLACE_BR over Z
 @cindex Examples of use of Letterplace over Z
 
 
