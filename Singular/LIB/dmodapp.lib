@@ -1,10 +1,10 @@
 /////////////////////////////////////////////////////////////////////////////
-version="version dmodapp.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version dmodapp.lib 4.1.3.0 Mar_2020 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
 AUTHORS: Viktor Levandovskyy,  levandov@math.rwth-aachen.de
-@*       Daniel Andres,   daniel.andres@math.rwth-aachen.de
+         Daniel Andres,   daniel.andres@math.rwth-aachen.de
 
 Support: DFG Graduiertenkolleg 1632 'Experimentelle und konstruktive Algebra'
 
@@ -13,17 +13,17 @@ Let K be a field of characteristic 0, R = K[x1,...,xN] and
 D be the Weyl algebra in variables x1,...,xN,d1,...,dN.
 In this library there are the following procedures for algebraic D-modules:
 
-@* - given a cyclic representation D/I of a holonomic module and a polynomial
+- given a cyclic representation D/I of a holonomic module and a polynomial
  F in R, it is proved that the localization of D/I with respect to the mult.
  closed set of all powers of F is a holonomic D-module. Thus we aim to compute
  its cyclic representaion D/L for an ideal L in D. The procedures for the
  localization are DLoc, SDLoc and DLoc0.
 
-@* - annihilator in D of a given polynomial F from R as well as
+- annihilator in D of a given polynomial F from R as well as
  of a given rational function G/F from Quot(R). These can be computed via
  procedures annPoly resp. annRat.
 
-@* - Groebner bases with respect to weights (according to (SST), given an
+- Groebner bases with respect to weights (according to (SST), given an
  arbitrary integer vector containing weights for variables, one computes the
  homogenization of a given ideal relative to this vector, then one computes a
  Groebner basis and returns the dehomogenization of the result), initial
@@ -31,27 +31,27 @@ In this library there are the following procedures for algebraic D-modules:
  vector can be computed with GBWeight, inForm, initialMalgrange and
  initialIdealW.
 
-@* - restriction and integration of a holonomic module D/I. Suppose I
+- restriction and integration of a holonomic module D/I. Suppose I
  annihilates a function F(x1,...,xn). Our aim is to compute an ideal J
  directly from I, which annihilates
-@*   - F(0,...,0,xk,...,xn) in case of restriction or
-@*   - the integral of F with respect to x1,...,xm in case of integration.
+   - F(0,...,0,xk,...,xn) in case of restriction or
+   - the integral of F with respect to x1,...,xm in case of integration.
  The corresponding procedures are restrictionModule, restrictionIdeal,
  integralModule and integralIdeal.
 
-@* - characteristic varieties defined by ideals in Weyl algebras can be computed
+- characteristic varieties defined by ideals in Weyl algebras can be computed
  with charVariety and charInfo.
 
-@* - appelF1, appelF2 and appelF4 return ideals in parametric Weyl algebras,
+- appelF1, appelF2 and appelF4 return ideals in parametric Weyl algebras,
  which annihilate corresponding Appel hypergeometric functions.
 
 
 REFERENCES:
-@* (SST) Saito, Sturmfels, Takayama 'Groebner Deformations of Hypergeometric
+(SST) Saito, Sturmfels, Takayama 'Groebner Deformations of Hypergeometric
          Differential Equations', Springer, 2000
-@* (OTW) Oaku, Takayama, Walther 'A Localization Algorithm for D-modules',
+(OTW) Oaku, Takayama, Walther 'A Localization Algorithm for D-modules',
          Journal of Symbolic Computation, 2000
-@* (OT)  Oaku, Takayama 'Algorithms for D-modules',
+(OT)  Oaku, Takayama 'Algorithms for D-modules',
          Journal of Pure and Applied Algebra, 1998
 
 
@@ -78,8 +78,6 @@ deRhamCohomIdeal(I[,w,eng,m,G]);  computes basis of n-th de Rham cohom. group
 charVariety(I); computes characteristic variety of the ideal I
 charInfo(I);    computes char. variety, singular locus and primary decomp.
 isFsat(I,F);    checks whether the ideal I is F-saturated
-
-
 
 appelF1();     creates an ideal annihilating Appel F1 function
 appelF2();     creates an ideal annihilating Appel F2 function
@@ -138,7 +136,7 @@ SEE ALSO: bfun_lib, dmod_lib, dmodvar_lib, gmssing_lib
   documentation in deRhamCohom
   - changed charVariety: no homogenization is needed
   - changed inForm: code is much simpler using jet
-  
+ 
   06.04.20 by VL:
   - engine updated with 2 more modular choices
 
@@ -268,7 +266,7 @@ proc engine(def I, int i)
 "USAGE:  engine(I,i);  I ideal/module/matrix, i an int
 RETURN:  the same type as I
 PURPOSE: compute the Groebner basis of I with the algorithm, chosen via i
-NOTE:    By default and if i=0, slimgb is used; 
+NOTE:    By default and if i=0, slimgb is used;
 if i=1, std does the job;
 if i=2, modular slimgb is run without final exactness check;
 if i=3, modular slimgb is run with final exactness check.
@@ -301,7 +299,7 @@ EXAMPLE: example engine; shows examples
   {
       // modular slimgb with final exactness check
       J = ncmodslimgb(I,1);
-  }  
+  } 
   return(J);
 }
 example
