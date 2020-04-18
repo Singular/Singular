@@ -316,43 +316,6 @@ example
   engine(I,3); // uses modular slimgb with exactness check
 }
 
-/* 
-proc engine(def I, int i)
-"USAGE:  engine(I,i);  I  ideal/module/matrix, i an int
-RETURN:  the same type as I
-PURPOSE: compute the Groebner basis of I with the algorithm, chosen via i
-NOTE:    By default and if i=0, slimgb is used; otherwise std does the job.
-EXAMPLE: example engine; shows examples
-"
-{
-  /* std - slimgb mix */
-  def J;
-  //  ideal J;
-  if (i==0)
-  {
-    J = slimgb(I);
-  }
-  else
-  {
-    // without options -> strange! (ringlist?)
-    intvec v = option(get);
-    option(redSB);
-    option(redTail);
-    J = std(I);
-    option(set, v);
-  }
-  return(J);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y),Dp;
-  ideal I  = y*(x3-y2),x*(x3-y2);
-  engine(I,0); // uses slimgb
-  engine(I,1); // uses std
-} 
-*/
-
 proc poly2list (poly f)
 "USAGE:  poly2list(f); f a poly
 RETURN:  list of exponents and corresponding terms of f
