@@ -96,7 +96,6 @@ fl2poly(L,s);  reconstructs a monic univariate polynomial from its factorization
 insertGenerator(id,p[,k]); inserts an element into an ideal/module
 deleteGenerator(id,k);     deletes the k-th element from an ideal/module
 
-engine(I,i);   computes a Groebner basis with the algorithm specified by i
 isInt(n);      checks whether number n is actually an int
 sortIntvec(v); sorts intvec
 
