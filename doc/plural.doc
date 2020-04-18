@@ -2749,7 +2749,7 @@ Hence there is no special command for computing the kernel of a map in
 @item @strong{Remark:}
 In the non-commutative case, the command @code{preimage} is implemented only for maps @math{A} -> @math{B}, 
 where @math{A} is  a commutative ring.
-See @ref{ncpreimage_lib} for the most general available implementation.
+See @ref{ncpreim_lib} for the most general available implementation.
 @item @strong{Example:}
 @smallexample
 @c example
