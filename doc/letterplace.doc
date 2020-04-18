@@ -1237,7 +1237,7 @@ Status: experimental
 @c lib ncrat.lib
 
 @c ----------------------------------------------------------
-@node Release Notes
+@node Release Notes BR_LETTERPLACE_BR
 @section Release Notes BR_LETTERPLACE_BR
 @cindex Release Notes BR_LETTERPLACE_BR
 @include NEWS-letterplace.texi
