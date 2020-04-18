@@ -192,7 +192,7 @@ and indeed, confirm it via a routine computation by hands.
 
 @c Next bigger example and comparison with Q
 
-@strong{Comparing computations over @math{Q} with computations over @math{Z}}.
+@strong{Comparing computations over Q with computations over Z}.
 In the next example, we first compute over @math{Q} and a bit later 
 compare the result with computations over @math{Z}.
 @smallexample
@@ -1105,7 +1105,7 @@ N_i = \sum_{j=1}^m \sum_k \ell_{jk} M_j r_{jk} = \sum_{j=1}^m T_{ij} M_j,
 @end display
 @end ifinfo
 
-where @math{T_{ij}} are elements from the enveloping algebra 
+where T_ij are elements from the enveloping algebra 
 @tex
 $R \langle X \rangle \otimes R \langle X \rangle,$
 @end tex
