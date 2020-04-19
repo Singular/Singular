@@ -262,8 +262,46 @@ int redEcart (LObject* h,kStrategy strat)
       h->Clear();
       return 0;
     }
+    if (TEST_OPT_IDLIFT)
+    {
+      if (h->p!=NULL)
+      {
+        if(p_GetComp(h->p,currRing)>strat->syzComp)
+        {
+          h->Delete();
+          return 0;
+        }
+      }
+      else if (h->t_p!=NULL)
+      {
+        if(p_GetComp(h->t_p,strat->tailRing)>strat->syzComp)
+        {
+          h->Delete();
+          return 0;
+        }
+      }
+    }
+    #if 0
+    else if ((strat->syzComp > 0)&&(!TEST_OPT_REDTAIL_SYZ))
+    {
+      if (h->p!=NULL)
+      {
+        if(p_GetComp(h->p,currRing)>strat->syzComp)
+        {
+          return 1;
+        }
+      }
+      else if (h->t_p!=NULL)
+      {
+        if(p_GetComp(h->t_p,strat->tailRing)>strat->syzComp)
+        {
+          return 1;
+        }
+      }
+    }
+    #endif
 
-    // NO!
+    // done ? NO!
     h->SetShortExpVector();
     h->SetpFDeg();
     if (strat->honey)
@@ -794,6 +832,44 @@ int redFirst (LObject* h,kStrategy strat)
       h->Clear();
       return 0;
     }
+    if (TEST_OPT_IDLIFT)
+    {
+      if (h->p!=NULL)
+      {
+        if(p_GetComp(h->p,currRing)>strat->syzComp)
+        {
+          h->Delete();
+          return 0;
+        }
+      }
+      else if (h->t_p!=NULL)
+      {
+        if(p_GetComp(h->t_p,strat->tailRing)>strat->syzComp)
+        {
+          h->Delete();
+          return 0;
+        }
+      }
+    }
+    #if 0
+    else if ((strat->syzComp > 0)&&(!TEST_OPT_REDTAIL_SYZ))
+    {
+      if (h->p!=NULL)
+      {
+        if(p_GetComp(h->p,currRing)>strat->syzComp)
+        {
+          return 1;
+        }
+      }
+      else if (h->t_p!=NULL)
+      {
+        if(p_GetComp(h->t_p,strat->tailRing)>strat->syzComp)
+        {
+          return 1;
+        }
+      }
+    }
+    #endif
     h->SetShortExpVector();
 
 #if 0

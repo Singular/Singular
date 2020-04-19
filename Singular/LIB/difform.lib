@@ -22,8 +22,6 @@ operations, evaluation and Lie-derivative.
 PROCEDURES:
     diffAlgebra();                  provides the differential algebra structure and the differential forms dx_1,...,dx_n
     diffAlgebraStructure();         generates the structure of the differential algebra from the basering
-    diffAlgebraCheck();             checks if the basering already has a differential algebra
-    diffAlgebraSwitch();            changes the basering to the differential algebra for computations
     diffAlgebraGens();              defines the differential forms dx_1,...,dx_n
     diffAlgebraUnivDerIdeal(ideal); computes the image of an ideal under the universal derivation
     diffAlgebraChangeOrd(list);     returns a ring with the structure of the differential algebra but changed monomial ordering
@@ -70,23 +68,19 @@ PROCEDURES:
 
 KEYWORDS: differential forms;differentials;differential algebra
 ";
-////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
+// Libraries needed
+LIB "inout.lib";
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
-//                                  Initialization of library                                 //
-////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
-
+////////////////////////////////////////////////////////////////////////////////
+//                       Initialization of library                            //
+////////////////////////////////////////////////////////////////////////////////
 
 static proc mod_init()
 {
-        // Type of differential forms:
-        // These are considered as elements (polynomials) in the differential algebra
+    // Type of differential forms:
+    // These are considered as elements (polynomials) in the differential algebra
     // NOTE: the polynomials 'form' are not visible in the basering - only in the differential algebra
-        newstruct("difform","poly form");
+    newstruct("difform","poly form");
 
     // Type of derivations - these are maps: Omega_R^1 -> R
     // The maps are uniquely determined by the images of the R-generators of Omega_R^1: dx_1,...,dx_n
@@ -94,21 +88,21 @@ static proc mod_init()
     // The list of generators is always ordered by the ordering given on the differential algebra
     newstruct("derivation","list genIm");
 
-        // Overloads for difform
-        system("install", "difform", "=", difformFromPoly, 1);
-        system("install", "difform", "print", difformPrint, 1);
+    // Overloads for difform
+    system("install", "difform", "=", difformFromPoly, 1);
+    system("install", "difform", "print", difformPrint, 1);
 
-        system("install", "difform", "+", difformAdd, 2);
-        system("install", "difform", "-", difformSub, 2);
-        system("install", "difform", "-", difformNeg, 1);
-        system("install", "difform", "*", difformMul, 2);
+    system("install", "difform", "+", difformAdd, 2);
+    system("install", "difform", "-", difformSub, 2);
+    system("install", "difform", "-", difformNeg, 1);
+    system("install", "difform", "*", difformMul, 2);
     system("install", "difform", "/", difformDiv, 2);
-        system("install", "difform", "==", difformEqu, 2);
-        system("install", "difform", "<>", difformNeq, 2);
+    system("install", "difform", "==", difformEqu, 2);
+    system("install", "difform", "<>", difformNeq, 2);
     system("install", "difform", ">", difformIsBigger,2);
     system("install", "difform", "<", difformIsSmaller,2);
 
-        system("install", "difform", "deg", difformDeg, 1);
+    system("install", "difform", "deg", difformDeg, 1);
     system("install", "difform", "homog", difformIsHomog, 1);
 
     // Overloads for derivation
@@ -125,36 +119,32 @@ static proc mod_init()
 
     system("install", "derivation", "diff", derivationLie, 2);
 
-    // Libraries needed
-    LIB "inout.lib";
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
-//                            Construction of differential algebra                            //
-////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//                  Construction of differential algebra                      //
+////////////////////////////////////////////////////////////////////////////////
 
 
 // TODO: check if qringNF option is set - if yes: turn off and set afterwards on
 proc diffAlgebra()
-"USAGE:         diffAlgebra();
-SIDE EFFECTS:   If R is the basering, the differential algebra is constructed with name Omega_R
-                and the differential forms dx_1,...,dx_n are available. The name of the differential
-                algebra is stored in the attribute attrib(R,"diffAlgebra").
-NOTE:           - computations with differential forms need the structure of the differential algebra,
-                so this procedure should be executed first.
-                - the variable names 'd' or 'D' should be avoided.
-                - the procedure also works for quotient rings
-KEYWORDS:       differential algebra; differential forms; differentials
-SEE ALSO:       diffAlgebraStructure, diffAlgebraGens, diffAlgebraUnivDerIdeal
-EXAMPLE:        example diffAlgebra; shows an example"
+"USAGE:       diffAlgebra();
+SIDE EFFECTS: If R is the basering, the differential algebra is constructed with name Omega_R
+              and the differential forms dx_1,...,dx_n are available. The name of the differential
+              algebra is stored in the attribute attrib(R,"diffAlgebra").
+NOTE:         - computations with differential forms need the structure of the differential algebra,
+              so this procedure should be executed first.
+              - the variable names 'd' or 'D' should be avoided.
+              - the procedure also works for quotient rings
+KEYWORDS:     differential algebra; differential forms; differentials
+SEE ALSO:     diffAlgebraStructure; diffAlgebraGens; diffAlgebraUnivDerIdeal
+EXAMPLE:      example diffAlgebra; shows an example"
 {
 
     // Build the differential algebra and store its name as an attribute
-    string diffAlg_name = diffAlgebraStructure();
-    attrib(basering,"diffAlgebra",diffAlg_name);
+    ring Omega_R = diffAlgebraStructure();
+    attrib(basering,"diffAlgebra","Omega_R");
 
     // Construct the differential forms dx_1,...,dx_n over the basering
     diffAlgebraGens();
@@ -172,8 +162,6 @@ EXAMPLE:        example diffAlgebra; shows an example"
 
     string info_text = "// The differential algebra " + attrib(basering,"diffAlgebra") + " was constructed and the differential forms " + basic_forms + " are available.";
     print(info_text);
-    return();
-
 }
 example
 {
@@ -199,16 +187,16 @@ ring R = 0,(x,y,z),lp;
 ideal I = x+y+z,xyz;
 qring S = std(I);
 diffAlgebra();
-setring Omega_S;
+setring Omega_R;
 
 // The differential algebra is given by:
 basering;
 
-kill Omega_S,dx,dy,dz;
+kill Omega_R,dx,dy,dz;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc diffAlgebraStructure()
@@ -223,129 +211,97 @@ KEYWORDS:   differential algebra
 SEE ALSO:   diffAlgebra, diffAlgebraGens, diffAlgebraUnivDerIdeal"
 {
 
-    string basering_name = nameof(basering);
-        list base_list = ringlist(basering);
+    list base_list = ringlist(basering);
     def R_old = basering;
     ideal quot_ideal = base_list[4];
 
-        // Add Dx_1,...,Dx_n as first variables
-        list ext_var = base_list[2];
-        int n = size(ext_var);
-        int i;
+    // Add Dx_1,...,Dx_n as first variables
+    list ext_var = base_list[2];
+    int n = size(ext_var);
+    int i;
 
-        for(i = 1; i <= n; i++){
-        ext_var[n+i] = ext_var[i];
-                ext_var[i] = "D" + ext_var[n+i];
-        }
+    for(i = 1; i <= n; i++)
+    {
+      ext_var[n+i] = ext_var[i];
+      ext_var[i] = "D" + ext_var[n+i];
+    }
 
-        base_list[2] = ext_var;
+    base_list[2] = ext_var;
 
     // Preserve the monomial order of the basering
     // Add a new first block for the variables dx_i with dp ordering
     intvec weight_vec = 1:n;
     base_list[3] = list(list("dp",weight_vec)) + base_list[3];
 
-        // Add relations x_i*x_j = x_j*x_i and dx_i*dx_j = -dx_j*dx_i
-        int k = 2*n;
-        matrix C[k][k];
-        matrix D[k][k];
-        int j;
+    // Add relations x_i*x_j = x_j*x_i and dx_i*dx_j = -dx_j*dx_i
+    int k = 2*n;
+    matrix C[k][k];
+    matrix D[k][k];
+    int j;
 
-        // Generate strictly upper triangular matrix describing the relations
-        for(i = 1; i <= k; i++){
-            for(j = i+1; j <= k ; j++){
-            if(j <= n){
-                        C[i,j] = -1;
-            }else{
-                C[i,j] = 1;
-            }
-                }
+    // Generate strictly upper triangular matrix describing the relations
+    for(i = 1; i <= k; i++)
+    {
+      for(j = i+1; j <= k ; j++)
+      {
+        if(j <= n)
+        {
+          C[i,j] = -1;
         }
+        else
+        {
+          C[i,j] = 1;
+        }
+      }
+    }
 
     base_list[4] = ideal(0);
-        base_list[5] = C;
-        base_list[6] = D;
+    base_list[5] = C;
+    base_list[6] = D;
 
-        // Pass to non-commutative ring with extra variables and relations
-        ring R_intermediate = ring(base_list);
+    // Pass to non-commutative ring with extra variables and relations
+    ring R_intermediate = ring(base_list);
 
-        // Add relations Dx_i*Dx_i = 0 via generating a quotient ring
-        ideal REL;
-        for(i = 1; i <= n; i++){
-                REL[i] = var(i)*var(i);
-        }
+    // Add relations Dx_i*Dx_i = 0 via generating a quotient ring
+    ideal REL;
+    for(i = 1; i <= n; i++)
+    {
+      REL[i] = var(i)*var(i);
+    }
 
-        // Build the differential algebra for the polynomial ring - the free module
+    // Build the differential algebra for the polynomial ring - the free module
     qring diffAlg_poly = twostd(REL);
 
     // Need the relations describing the differential algebra if R is a quotient ring
     ideal quot_ideal = imap(R_old,quot_ideal);
 
-    if(quot_ideal != 0){
+    if(size(quot_ideal) != 0)
+    {
+      // Compute the universal derivation of the generators of the ideal
+      quot_ideal = quot_ideal + diffAlgebraUnivDerIdeal(quot_ideal);
 
-        // Compute the universal derivation of the generators of the ideal
-        quot_ideal = quot_ideal + diffAlgebraUnivDerIdeal(quot_ideal);
+      // Add the additional relations, generate the differential algebra with name Omega_R and export it
+      qring Omega_R = twostd(quot_ideal);
+      exportto(Top,Omega_R);
 
-        // Add the additional relations, generate the differential algebra with name Omega_R and export it
-        string diffAlg_name = "Omega_" + basering_name;
-            execute("qring " + diffAlg_name + " = twostd(quot_ideal);");
-        execute("exportto(Top," + diffAlg_name + ");");
-
-        return(diffAlg_name);
+      return(Omega_R);
     }
 
     // Give the differential algebra the name Omega_basering and export it
-    string diffAlg_name = "Omega_" + basering_name;
-        execute("ring " + diffAlg_name + " = diffAlg_poly;");
-    execute("exportto(Top," + diffAlg_name + ");");
+    ring Omega_R = diffAlg_poly;
+    exportto(Top,Omega_R);
 
-    return(diffAlg_name);
-
+    return(Omega_R);
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
-proc diffAlgebraCheck()
-"USAGE:         diffAlgebraCheck();
-SIDE EFFECTS:   Checks if the basering has a differential algebra and aborts with an error if this is not the case
-REMARKS:        The procedure checks if the name in the attribute attrib(basering,"diffAlgebra") is not empty. This
-                is the case if the procedure diffAlgebra was executed first.
-NOTE:           whenever computations with differential forms are done, it should be checked if the differential
-                algebra was already generated since differential forms are polynomials in the differential algebra
-KEYWORDS:       differential algebra
-SEE ALSO:       diffAlgebraSwitch"
-{
-    string diffAlg_name = attrib(basering,"diffAlgebra");
-    if(size(diffAlg_name) == 0){
-        ERROR("Ring does not have a differential algebra!");
-    }
-}
+////////////////////////////////////////////////////////////////////////////////
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-proc diffAlgebraSwitch()
-"USAGE:         diffAlgebraSwitch();
-ASSUME:         The differential algebra was already constructed.
-SIDE EFFECTS:   Changes the ring: from the basering to the differential algebra.
-NOTE:           whenever computations with differential forms are done, the ring must be changed to the differential
-                algebra since differential forms are polynomials there. But first it should be checked if the algebra
-                is actually available: so before executing diffAlgebraSwitch there should always be an preceding diffAlgebraCheck
-KEYWORDS:       differential algebra
-SEE ALSO:       diffAlgebraCheck"
-{
-
-    string diffAlg_name = attrib(basering,"diffAlgebra");
-    execute("setring " + diffAlg_name);
-    execute("keepring " + diffAlg_name);
-
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc diffAlgebraGens()
@@ -355,9 +311,9 @@ KEYWORDS:       differential algebra; generator
 SEE ALSO:       diffAlgebra, diffAlgebraStructure, diffAlgebraUnivDerIdeal"
 {
 
-    diffAlgebraSwitch();
+    setring Omega_R;
 
-    list ext_var = ringlist(basering)[2];
+    list ext_var = ringlist(Omega_R)[2];
     int n = size(ext_var) div 2;
     int i;
     string dif_cons;
@@ -390,13 +346,14 @@ SEE ALSO:   diffAlgebra, diffAlgebraStructure, diffAlgebraGens"
     int i,j;
     ideal d_I;
 
-    for(j = 1; j <= k; j++){
+    for(j = 1; j <= k; j++)
+    {
         d_I[j] = 0;
-        for(i = 1; i <= n; i++){
+        for(i = 1; i <= n; i++)
+        {
             d_I[j] = d_I[j] + diff(I[j],var(i+n))*var(i);
         }
     }
-
     return(d_I);
 
 }
@@ -434,19 +391,23 @@ SEE ALSO:   difformListSort, difformIsBigger, difformIsSmaller"
     string ringvar_ord = "";
 
     // Get information from input
-    for(i = 1; i <= n; i++){
-        if(typeof(#[i]) == "string"){
-
-            if(#[i] == "gen" && typeof(#[i+1]) == "string"){
+    for(i = 1; i <= n; i++)
+    {
+        if(typeof(#[i]) == "string")
+        {
+            if(#[i] == "gen" && typeof(#[i+1]) == "string")
+            {
                 gen_ord = #[i+1];
-                if(typeof(#[i+2]) == "intvec"){
+                if(typeof(#[i+2]) == "intvec")
+                {
                     intvec gen_weight = #[i+2];
                 }
             }
-
-            if(#[i] == "ringvar" && typeof(#[i+1]) == "string"){
+            if(#[i] == "ringvar" && typeof(#[i+1]) == "string")
+            {
                 ringvar_ord = #[i+1];
-                if(typeof(#[i+2]) == "intvec"){
+                if(typeof(#[i+2]) == "intvec")
+                {
                     intvec ringvar_weight = #[i+2];
                 }
             }
@@ -455,81 +416,94 @@ SEE ALSO:   difformListSort, difformIsBigger, difformIsSmaller"
 
     // Check input for consistency
     // Generator ordering must be a valid monomial ordering
-    if(gen_ord != "" && gen_ord != "lp" && gen_ord != "rp" && gen_ord != "dp" && gen_ord != "Dp" && gen_ord != "wp" && gen_ord != "Wp"){
-        if(gen_ord != "ls" && gen_ord != "ds" && gen_ord != "Ds" && gen_ord != "ws" && gen_ord != "Ws"){
+    if(gen_ord != "" && gen_ord != "lp" && gen_ord != "rp" && gen_ord != "dp" && gen_ord != "Dp" && gen_ord != "wp" && gen_ord != "Wp")
+    {
+        if(gen_ord != "ls" && gen_ord != "ds" && gen_ord != "Ds" && gen_ord != "ws" && gen_ord != "Ws")
+        {
             ERROR("Not a valid ordering!");
         }
     }
-
     // Ringvariable ordering must be a valid monomial ordering
-    if(ringvar_ord != "" && ringvar_ord != "lp" && ringvar_ord != "rp" && ringvar_ord != "dp" && ringvar_ord != "Dp" && ringvar_ord != "wp" && ringvar_ord != "Wp"){
-        if(ringvar_ord != "ls" && ringvar_ord != "ds" && ringvar_ord != "Ds" && ringvar_ord != "ws" && ringvar_ord != "Ws"){
+    if(ringvar_ord != "" && ringvar_ord != "lp" && ringvar_ord != "rp" && ringvar_ord != "dp" && ringvar_ord != "Dp" && ringvar_ord != "wp" && ringvar_ord != "Wp")
+    {
+        if(ringvar_ord != "ls" && ringvar_ord != "ds" && ringvar_ord != "Ds" && ringvar_ord != "ws" && ringvar_ord != "Ws")
+        {
             ERROR("Not a valid ordering!");
         }
     }
-
     // If the generator ordering is a weighted monomial ordering, a weight-vector is needed
-    if(gen_ord == "wp" || gen_ord == "Wp" || gen_ord == "ws" || gen_ord == "Ws"){
-        if(!defined(gen_weight)){
+    if(gen_ord == "wp" || gen_ord == "Wp" || gen_ord == "ws" || gen_ord == "Ws")
+    {
+        if(!defined(gen_weight))
+        {
             ERROR("No weight vector given!");
         }
-
-        if(size(gen_weight) != k){
+        if(size(gen_weight) != k)
+        {
             ERROR("Weight vector has wrong size!");
         }
-    }else{
+    }
+    else
+    {
     // If a weight vector is given although the monomial ordering is not weighted
-        if(defined(gen_weight)){
+        if(defined(gen_weight))
+        {
             kill gen_weight;
         }
     }
-
     // If the ordering for the ring variables is a weighted monmial ordering, a weight-vector is needed
-    if(ringvar_ord == "wp" || ringvar_ord == "Wp" || ringvar_ord == "ws" || ringvar_ord == "Ws"){
-        if(!defined(ringvar_weight)){
+    if(ringvar_ord == "wp" || ringvar_ord == "Wp" || ringvar_ord == "ws" || ringvar_ord == "Ws")
+    {
+        if(!defined(ringvar_weight))
+        {
             ERROR("No weight vector given!");
         }
-
-        if(size(ringvar_weight) != k){
+        if(size(ringvar_weight) != k)
+        {
             ERROR("Weight vector has wrong size!");
         }
-    }else{
+    }
+    else
+    {
     // If a weight vector is given although the monomial ordering is not weighted
-        if(defined(ringvar_weight)){
+        if(defined(ringvar_weight))
+        {
             kill ringvar_weight;
         }
     }
-
     list L_diff_Alg = ringlist(basering);
     n = size(L_diff_Alg[3]);
 
     // Change ordering of generators
-    if(gen_ord != ""){
+    if(gen_ord != "")
+    {
         L_diff_Alg[3][1][1] = gen_ord;
-        if(defined(gen_weight)){
+        if(defined(gen_weight))
+        {
             L_diff_Alg[3][1][2] = gen_weight;
         }
     }
 
     // Change the ordering of the ringvariables
-    if(ringvar_ord != ""){
+    if(ringvar_ord != "")
+    {
         list L;
         L[1] = L_diff_Alg[3][1];
-
         L[2] = list();
         L[2][1] = ringvar_ord;
-        if(defined(ringvar_weight)){
+        if(defined(ringvar_weight))
+        {
             L[2][2] = ringvar_weight;
-        }else{
+        }
+        else
+        {
             L[2][2] = 1:k;
         }
-
         L_diff_Alg[3] = L;
     }
 
     def T = ring(L_diff_Alg);
     return(T);
-
 }
 
 
@@ -538,7 +512,7 @@ SEE ALSO:   difformListSort, difformIsBigger, difformIsSmaller"
 
 proc diffAlgebraListGen(list #)
 "USAGE: diffAlgebraListGen(#); # list
-RETURN:     - a list of generetors of the differential algebra as module over the basering
+RETURN:     - a list of generators of the differential algebra as module over the basering
             - a list of generators of a graded part of the differential algebra
 REMARKS:    In order to find all generators, they are counted 'binary': The generators are in
             1:1 - correspondance to the dual number representations of 1 up to (2^n-1)
@@ -551,9 +525,6 @@ NOTE:       - if all generators of the differential algebra are needed, apply th
 KEYWORDS:   generators; graded
 EXAMPLE:    example diffAlgebraListGen; shows an example"
 {
-
-    diffAlgebraCheck();
-
     int n = size(ringlist(basering)[2]);
     int i,k,j;
     int degr = -1;
@@ -563,17 +534,20 @@ EXAMPLE:    example diffAlgebraListGen; shows an example"
     difform current_gen;
 
     // Get optional degree
-    if(size(#) > 0){
-        if(typeof(#[1]) == "int"){
+    if(size(#) > 0)
+    {
+        if(typeof(#[1]) == "int")
+        {
             degr = #[1];
         }
     }
 
     // Build the list of all dx_i
     def R_old = basering;
-    diffAlgebraSwitch();
+    setring Omega_R;
 
-    for(i = 1; i <= n; i++){
+    for(i = 1; i <= n; i++)
+    {
         current_var.form = var(i);
         var_list[i] = current_var;
     }
@@ -582,33 +556,37 @@ EXAMPLE:    example diffAlgebraListGen; shows an example"
 
     // Find all generators (of given degree)
     list dual_i;
-    for(i = 1; i < 2^n; i++){
+    for(i = 1; i < 2^n; i++)
+    {
         // Compute dual number representation
         dual_i = diffAlgebraIntToDual(i);
         k = size(dual_i);
         current_gen = 1;
 
         // Convert dual number to generator
-        for(j = 1; j <= k; j++){
-            if(dual_i[j] != 0){
+        for(j = 1; j <= k; j++)
+        {
+            if(dual_i[j] != 0)
+            {
                 current_gen = current_gen*var_list[j];
             }
         }
 
         // Add generator if it has the given degree or degree was not chosen
-        if(degr == -1 || difformDeg(current_gen) == degr){
+        if(degr == -1 || difformDeg(current_gen) == degr)
+        {
             GEN_list = GEN_list + list(current_gen);
         }
     }
 
     // Add generator 1
-    if(degr == 0 || degr == -1){
+    if(degr == 0 || degr == -1)
+    {
         difform gen_one = 1;
         GEN_list = list(gen_one) + GEN_list;
     }
 
     return(difformListSort(GEN_list));
-
 }
 example
 {
@@ -630,7 +608,7 @@ kill Omega_R,dx,dy,dz;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 static proc diffAlgebraIntToDual(int l)
@@ -640,31 +618,28 @@ NOTE:       the LSBF (least significant bit first) representation is computed
 KEYWORDS:   dual; int
 SEE ALSO:   diffAlgebraListGen"
 {
-
     list dual_number;
 
-    while(l div 2 != 0){
+    while(l div 2 != 0)
+    {
         dual_number = dual_number + list(l mod 2);
         l = l div 2;
     }
-
     dual_number = dual_number + list(l mod 2);
-
     return(dual_number);
-
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
-//                                Procedures for type difform                                 //
-////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//                     Procedures for type difform                            //
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-//----------------------------------- Structural procedures ----------------------------------//
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//----------------------- Structural procedures ------------------------------//
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc difformFromPoly(poly f)
@@ -676,16 +651,14 @@ KEYWORDS:   constructor; differential
 EXAMPLE:    example difformFromPoly; shows an example"
 {
 
-    diffAlgebraCheck();
     def R_old = basering;
-    diffAlgebraSwitch();
+    setring Omega_R;
 
     poly g = imap(R_old,f);
     difform df;
     df.form = g;
 
     return(df);
-
 }
 example
 {
@@ -711,7 +684,7 @@ kill Omega_R,df,dg,dx,dy,dz;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc difformCoef(difform df)
@@ -725,23 +698,22 @@ NOTE:       the returned list can be sorted with the procedure difformListSort a
 KEYWORDS:   decomposition; generators; coefficients
 EXAMPLE:    example difformCoef; shows an example"
 {
-
-    diffAlgebraCheck();
     def R_old = basering;
-    diffAlgebraSwitch();
+    setring Omega_R;
     def diff_Alg = basering;
 
     poly f = df.form;
     int n = size(ringlist(basering)[2]) div 2;
     int i;
 
-        // Build the wedge product of all differential forms dx_i
-        poly wedge_mon = 1;
-        for(i = 1; i <= n; i++){
-                wedge_mon = wedge_mon*var(i);
-        }
+    // Build the wedge product of all differential forms dx_i
+    poly wedge_mon = 1;
+    for(i = 1; i <= n; i++)
+    {
+      wedge_mon = wedge_mon*var(i);
+    }
 
-        // Find the coefficients of the generators
+    // Find the coefficients of the generators
     matrix df_coefs = coef(f,wedge_mon);
     int k = ncols(df_coefs);
 
@@ -752,25 +724,25 @@ EXAMPLE:    example difformCoef; shows an example"
     poly coeff;
     list repr;
 
-    for(i = 1;i <= k;i++){
-        repr[i] = list();
-        setring diff_Alg;
+    for(i = 1;i <= k;i++)
+    {
+      repr[i] = list();
+      setring diff_Alg;
 
-        // Generators as differential forms
-        current_gen.form = df_coefs[1,i];
+      // Generators as differential forms
+      current_gen.form = df_coefs[1,i];
 
-        // Coefficients are polynomials in the basering
-        coeff_above = df_coefs[2,i];
-        setring R_old;
-        coeff = imap(diff_Alg,coeff_above);
+      // Coefficients are polynomials in the basering
+      coeff_above = df_coefs[2,i];
+      setring R_old;
+      coeff = imap(diff_Alg,coeff_above);
 
-        repr[i][1] = current_gen;
-        repr[i][2] = coeff;
+      repr[i][1] = current_gen;
+      repr[i][2] = coeff;
     }
 
     // Return representation
     return(repr);
-
 }
 example
 {
@@ -796,7 +768,7 @@ kill Omega_R,df,dx,dy,dz,L_1;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc difformGenToString(difform df)
@@ -808,30 +780,27 @@ NOTE:       - this is only used to print generators
 KEYWORDS:   string; print; generators
 SEE ALSO:   difformToString"
 {
-
-    diffAlgebraSwitch();
+    setring Omega_R;
     string df_out_un = string(df.form);
-    list vars_ = ringlist(basering)[2];
+    list vars_ = ringlist(Omega_R)[2];
     int n = size(vars_) div 2;
     int i,j;
 
     // Replace the Dx_i in the string with the dx_i
-    for(i = 1; i <= n; i++){
+    for(i = 1; i <= n; i++)
+    {
         j = find(df_out_un,string(vars_[i]));
 
-        while(j!=0){
+        while(j!=0)
+        {
             df_out_un[j] = "d";
             j = find(df_out_un,vars_[i]);
         }
     }
-
     return(df_out_un);
-
 }
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-
+////////////////////////////////////////////////////////////////////////////////
 
 // TODO: check optionIsSet("qringNF") - ADD ring.lib !!! and reduce by hand
 proc difformToString(difform df, list #)
@@ -847,7 +816,6 @@ KEYWORDS:   string; print
 SEE ALSO:   difformPrint, difformGenToString
 EXAMPLE:    example difformToString; shows an example"
 {
-
     // Get the coefficients
     list repr = difformCoef(df);
 
@@ -856,11 +824,15 @@ EXAMPLE:    example difformToString; shows an example"
     int n = size(#);
     int i;
 
-    for(i = 1; i <= n; i++){
-        if(typeof(#[i]) == "string"){
-            if(#[i] == "gen" && typeof(#[i+1]) == "string"){
+    for(i = 1; i <= n; i++)
+    {
+        if(typeof(#[i]) == "string")
+        {
+            if(#[i] == "gen" && typeof(#[i+1]) == "string")
+            {
                 gen_ord = #[i+1];
-                if(typeof(#[i+2]) == "intvec"){
+                if(typeof(#[i+2]) == "intvec")
+                {
                     intvec gen_weight = #[i+2];
                 }
             }
@@ -868,13 +840,19 @@ EXAMPLE:    example difformToString; shows an example"
     }
 
     // Sort the generator/coefficients by the chosen ordering
-    if(gen_ord != ""){
-        if(defined(gen_weight)){
+    if(gen_ord != "")
+    {
+        if(defined(gen_weight))
+        {
             repr = difformListSort(repr,"Llist","gen",gen_ord,gen_weight);
-        }else{
+        }
+        else
+        {
             repr = difformListSort(repr,"Llist","gen",gen_ord);
         }
-    }else{
+    }
+    else
+    {
         repr = difformListSort(repr,"Llist");
     }
 
@@ -887,14 +865,16 @@ EXAMPLE:    example difformToString; shows an example"
     poly df_coef;
     string df_coef_str;
 
-    for(i = n; i >= 1; i--){
+    for(i = n; i >= 1; i--)
+    {
         df_gen = repr[i][1];
         df_gen_str = difformGenToString(df_gen);
         df_coef = repr[i][2];
         df_coef_str = string(df_coef);
 
         // Check the coefficients and generators
-        while(1){
+        while(1)
+        {
             // Special cases without brackets:
 
             // Generator one
@@ -911,13 +891,13 @@ EXAMPLE:    example difformToString; shows an example"
         }
 
         // Add a plus sign
-        if(i > 1){
+        if(i > 1)
+        {
             df_out = df_out + "+";
         }
     }
 
-        return(df_out);
-
+    return(df_out);
 }
 example
 {
@@ -954,11 +934,8 @@ KEYWORDS:       print; string
 SEE ALSO:       difformToString, difformGenToString
 EXAMPLE:        example difformPrint; shows an example"
 {
-
     // Print in ds-order on the generators
-        print(difformToString(df,"gen","ds"));
-    return();
-
+    print(difformToString(df,"gen","ds"));
 }
 example
 {
@@ -989,17 +966,14 @@ SEE ALSO:   difformCoef
 EXAMPLE:    example difformIsGen; shows an example
 "
 {
-
-    diffAlgebraCheck();
     list df_gen_repr = difformCoef(df);
     int n = size(df_gen_repr);
 
-    if(n == 1 && df_gen_repr[1][2] == 1){
+    if(n == 1 && df_gen_repr[1][2] == 1)
+    {
         return(1);
     }
-
     return(0);
-
 }
 example
 {
@@ -1042,9 +1016,7 @@ KEYWORDS:   add; sum
 SEE ALSO:   difformSub
 EXAMPLE:    example difformAdd; shows an example"
 {
-
-    diffAlgebraCheck();
-    diffAlgebraSwitch();
+    setring Omega_R;
 
     difform dsum;
     poly sum_form = df.form + dg.form;
@@ -1088,16 +1060,13 @@ KEYWORDS:   minus; difference
 SEE ALSO:   difformAdd, difformNeg
 EXAMPLE:    example difformSub; shows an example"
 {
-
-        diffAlgebraCheck();
-    diffAlgebraSwitch();
+    setring Omega_R;
 
     difform dsub;
     poly sub_form = df.form - dg.form;
     dsub.form = sub_form;
 
     return(dsub);
-
 }
 example
 {
@@ -1134,16 +1103,13 @@ KEYWORDS:   minus; negation
 SEE ALSO:   difformSub
 EXAMPLE:    example difformNeg; shows an example"
 {
-
-        diffAlgebraCheck();
-    diffAlgebraSwitch();
+    setring Omega_R;
 
     difform dneg;
     poly neg_form = -df.form;
     dneg.form = neg_form;
 
     return(dneg);
-
 }
 example
 {
@@ -1162,7 +1128,7 @@ kill Omega_R,df,dx,dy,dz;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc difformMul(difform df, difform dg)
@@ -1172,16 +1138,13 @@ KEYWORDS:   multiplication; product
 SEE ALSO:   difformDiv
 EXAMPLE:    example difformMul; shows an example"
 {
-
-        diffAlgebraCheck();
-    diffAlgebraSwitch();
+    setring Omega_R;
 
     difform dmul;
     poly mul_form = df.form*dg.form;
     dmul.form = mul_form;
 
     return(dmul);
-
 }
 example
 {
@@ -1218,16 +1181,13 @@ KEYWORDS:   division
 SEE ALSO:   difformMul
 EXAMPLE:    example difformDiv; shows an example"
 {
-
-    diffAlgebraCheck();
-    diffAlgebraSwitch();
+    setring Omega_R;
 
     difform ddiv;
     poly div_form = df.form / dg.form;
     ddiv.form = div_form;
 
     return(ddiv);
-
 }
 example
 {
@@ -1254,7 +1214,7 @@ kill Omega_R,dx,dy,dz;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc difformEqu(difform df, difform dg)
@@ -1264,12 +1224,8 @@ KEYWORDS:   compare; equal
 SEE ALSO:   difformNeq
 EXAMPLE:    example difformEqu; shows an example"
 {
-
-        diffAlgebraCheck();
-    diffAlgebraSwitch();
-
+    setring Omega_R;
     return(df.form == dg.form);
-
 }
 example
 {
@@ -1292,7 +1248,7 @@ kill Omega_R,df,dg,dx,dy,dz;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc difformNeq(difform df, difform dg)
@@ -1302,9 +1258,7 @@ KEYWORDS:   compare; equal; not equal
 SEE ALSO:   difformEqu
 EXAMPLE:    example difformNeq; shows an example"
 {
-
         return(!difformEqu(df,dg));
-
 }
 example
 {
@@ -1346,15 +1300,14 @@ KEYWORDS:   bigger; compare; ordering
 SEE ALSO:   difformIsSmaller, diffAlgebraChangeOrd
 EXAMPLE:    example difformIsBigger; shows an example"
 {
-
-    diffAlgebraCheck();
-    diffAlgebraSwitch();
+    setring Omega_R;
 
     poly df_form = df.form;
     poly dg_form = dg.form;
 
-    if(size(#) > 0){
-        def diff_Alg = basering;
+    if(size(#) > 0)
+    {
+        def diff_Alg = Omega_R;
         ring T = diffAlgebraChangeOrd(#);
 
         poly df_form_T = imap(diff_Alg,df_form);
@@ -1363,7 +1316,6 @@ EXAMPLE:    example difformIsBigger; shows an example"
     }
 
     return(df_form > dg_form);
-
 }
 example
 {
@@ -1391,7 +1343,7 @@ kill Omega_R,dx,dy,dz;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc difformIsSmaller(difform df, difform dg, list #)
@@ -1410,14 +1362,13 @@ KEYWORDS:   smaller; compare; ordering
 SEE ALSO:   difformIsBigger, diffAlgebraChangeOrd
 EXAMPLE:    example difformIsSmaller; shows an example"
 {
-
-    diffAlgebraCheck();
-    diffAlgebraSwitch();
+    setring Omega_R;
 
     poly df_form = df.form;
     poly dg_form = dg.form;
 
-    if(size(#) > 0){
+    if(size(#) > 0)
+    {
         def diff_Alg = basering;
         ring T = diffAlgebraChangeOrd(#);
 
@@ -1425,9 +1376,7 @@ EXAMPLE:    example difformIsSmaller; shows an example"
         poly dg_form_T = imap(diff_Alg,dg_form);
         return(df_form_T < dg_form_T);
     }
-
     return(df.form < dg.form);
-
 }
 example
 {
@@ -1455,9 +1404,9 @@ kill Omega_R,dx,dy,dz;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-//------------------------- Procedures for computing with the degree -------------------------//
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//------------ Procedures for computing with the degree ----------------------//
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc difformDeg(difform df)
@@ -1470,22 +1419,19 @@ KEYWORDS:   degree
 SEE ALSO:   difformIsHomog, difformIsHomogDeg
 EXAMPLE:    example difformDeg; shows an example"
 {
-
-    diffAlgebraCheck();
-    diffAlgebraSwitch();
+    setring Omega_R;
 
     // Degree of a difform is the degree of the poly with weights 0 for the basering variables
-    int n = size(ringlist(basering)[2]) div 2;
+    int n = size(ringlist(Omega_R)[2]) div 2;
     int i;
     intvec var_weights;
 
-    for(i = 1; i <= n; i++){
+    for(i = 1; i <= n; i++)
+    {
         var_weights[i] = 1;
         var_weights[i+n] = 0;
     }
-
     return(deg(df.form,var_weights));
-
 }
 example
 {
@@ -1510,8 +1456,7 @@ deg(df);
 kill Omega_R,df,dx,dy,dz;
 }
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc difformIsHomog(difform df)
@@ -1524,21 +1469,18 @@ KEYWORDS:   homogeneous; homog
 SEE ALSO:   difformDeg, difformIsHomogDeg
 EXAMPLE:    example difformIsHomog; shows an example"
 {
+    setring Omega_R;
 
-        diffAlgebraCheck();
-    diffAlgebraSwitch();
-
-    int n = size(ringlist(basering)[2]) div 2;
+    int n = size(ringlist(Omega_R)[2]) div 2;
     int i;
     intvec var_weights;
 
-    for(i = 1; i <= n; i++){
+    for(i = 1; i <= n; i++)
+    {
         var_weights[i] = 1;
         var_weights[i+n] = 0;
     }
-
     return(homog(df.form,var_weights));
-
 }
 example
 {
@@ -1571,7 +1513,7 @@ kill Omega_R,dx,dy,dz,df;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc difformIsHomogDeg(difform df, int p)
@@ -1582,11 +1524,9 @@ KEYWORDS:   homogeneous; degree
 SEE ALSO:   difformDeg, difformIsHomog
 EXAMPLE:    example difformIsHomogDeg; shows an example"
 {
-
         int df_deg = difformDeg(df);
         int is_hom = difformIsHomog(df);
         return(df_deg == p && is_hom == 1);
-
 }
 example
 {
@@ -1619,7 +1559,7 @@ kill Omega_R,df,dg,dh,dt,dx,dy,dz;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc difformHomogDecomp(difform df)
@@ -1631,9 +1571,6 @@ KEYWORDS:   homogeneous; homogeneous decomposition
 SEE ALSO:   difformCoef, difformDeg
 EXAMPLE:    example difformHomogDecomp; shows an example"
 {
-
-    diffAlgebraCheck();
-
     // Highest degree is the nr. of variables in the basering
     int n = size(ringlist(basering)[2]);
     int i,j,k;
@@ -1642,7 +1579,8 @@ EXAMPLE:    example difformHomogDecomp; shows an example"
     list homog_part;
 
     // Generate a list full of 0s
-    for(i = 1;i <= (n+1); i++){
+    for(i = 1;i <= (n+1); i++)
+    {
         homog_part[i] = 0;
     }
 
@@ -1651,20 +1589,22 @@ EXAMPLE:    example difformHomogDecomp; shows an example"
     k = size(df_gen_repr);
 
     // Sort in list
-    for(i = 1; i <= k; i++){
+    for(i = 1; i <= k; i++)
+    {
         current_gen = df_gen_repr[i][1];
         current_coef = df_gen_repr[i][2];
         j = difformDeg(current_gen);
 
-        if(j == 0){
+        if(j == 0)
+	{
             homog_part[n+1] = homog_part[n+1] + current_coef*current_gen;
-        }else{
+        }
+	else
+	{
             homog_part[j] = homog_part[j] + current_coef*current_gen;
         }
     }
-
     return(homog_part);
-
 }
 example
 {
@@ -1685,9 +1625,9 @@ kill Omega_R,df,L,dx,dy,dz;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-//------------------------ Procedures for lists of differential forms ------------------------//
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//--------------- Procedures for lists of differential forms -----------------//
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc difformListCont(list L, difform df)
@@ -1698,22 +1638,20 @@ KEYWORDS:   containment; list
 SEE ALSO:   difformEqu
 EXAMPLE:    example difformListCont; shows an example"
 {
-
-    diffAlgebraCheck();
-
     int n = size(L);
     int i;
 
-    for(i = 1; i <= n; i++){
-        if(typeof(L[i]) == "difform"){
-            if(difformEqu(df,L[i])){
+    for(i = 1; i <= n; i++)
+    {
+        if(typeof(L[i]) == "difform")
+	{
+            if(difformEqu(df,L[i]))
+	    {
                 return(1);
             }
         }
     }
-
     return(0);
-
 }
 example
 {
@@ -1741,7 +1679,7 @@ kill Omega_R,L,da,db,dc;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc difformListSort(list L, list #)
@@ -1767,9 +1705,6 @@ KEYWORDS:   sort; list
 SEE ALSO:   difformIsBigger, difformIsSmaller
 EXAMPLE:    example difformListSort; shows an example"
 {
-
-    diffAlgebraCheck();
-
     list orderings = #;
     int n = size(orderings);
     int i,j;
@@ -1777,9 +1712,12 @@ EXAMPLE:    example difformListSort; shows an example"
     int Llist_flag = 0;
 
     // Check for double list
-    for(i = 1; i <= n; i++){
-        if(typeof(orderings[i]) == "string"){
-            if(orderings[i] == "Dlist"){
+    for(i = 1; i <= n; i++)
+    {
+        if(typeof(orderings[i]) == "string")
+	{
+            if(orderings[i] == "Dlist")
+	    {
                 Dlist_flag = 1;
                 orderings = delete(orderings,i);
             }
@@ -1787,9 +1725,12 @@ EXAMPLE:    example difformListSort; shows an example"
     }
 
     // Check for list of lists
-    for(i = 1; i <= n; i++){
-        if(typeof(orderings[i]) == "string"){
-            if(orderings[i] == "Llist"){
+    for(i = 1; i <= n; i++)
+    {
+        if(typeof(orderings[i]) == "string")
+	{
+            if(orderings[i] == "Llist")
+	    {
                 Llist_flag = 1;
                 orderings = delete(orderings,i);
             }
@@ -1797,26 +1738,30 @@ EXAMPLE:    example difformListSort; shows an example"
     }
 
     // Not both list forms allowed
-    if(Dlist_flag == 1 && Llist_flag == 1){
+    if(Dlist_flag == 1 && Llist_flag == 1)
+    {
         ERROR("Cannot sort double list of lists!");
     }
 
     // Double list detected
-    if(Dlist_flag == 1){
+    if(Dlist_flag == 1)
+    {
         poly temp_form_sec;
         list L_sec = L[2];
         L = L[1];
     }
 
     // List of lists detected
-    if(Llist_flag == 1){
+    if(Llist_flag == 1)
+    {
         poly temp_form_sec;
         n = size(L);
         list L_temp;
         list L_sec;
 
         // Transform list of lists to double list
-        for(i = 1; i <= n; i++){
+        for(i = 1; i <= n; i++)
+	{
             L_temp[i] = L[i][1];
             L_sec[i] = L[i][2];
         }
@@ -1828,53 +1773,62 @@ EXAMPLE:    example difformListSort; shows an example"
     difform temp_form;
     n = size(L);
 
-    for(i = 1; i <= n; i++){
+    for(i = 1; i <= n; i++)
+    {
         temp_form = L[i];
 
-        if(Dlist_flag == 1 || Llist_flag == 1){
+        if(Dlist_flag == 1 || Llist_flag == 1)
+	{
             temp_form_sec = L_sec[i];
         }
 
         j = i;
 
-        while(j > 1){
-            if(difformIsBigger(L[j-1],temp_form,orderings)){
+        while(j > 1)
+	{
+            if(difformIsBigger(L[j-1],temp_form,orderings))
+	    {
                 L[j] = L[j-1];
 
-                if(Dlist_flag == 1 || Llist_flag == 1){
+                if(Dlist_flag == 1 || Llist_flag == 1)
+		{
                     L_sec[j] = L_sec[j-1];
                 }
 
                 j--;
-            }else{
+            }
+	    else
+	    {
                 break;
             }
         }
 
         L[j] = temp_form;
 
-        if(Dlist_flag == 1 || Llist_flag == 1){
+        if(Dlist_flag == 1 || Llist_flag == 1)
+	{
             L_sec[j] = temp_form_sec;
         }
     }
 
     // For double list - return a double list
-    if(Dlist_flag == 1){
+    if(Dlist_flag == 1)
+    {
         return(list(L,L_sec));
     }
 
     // For list of lists - return a list of lists
-    if(Llist_flag == 1){
+    if(Llist_flag == 1)
+    {
         L_temp = list();
-        for(i = 1; i <= n; i++){
+        for(i = 1; i <= n; i++)
+	{
             L_temp[i] = list(L[i],L_sec[i]);
         }
 
         return(L_temp);
     }
-
     return(L);
-
 }
 example
 {
@@ -1917,9 +1871,9 @@ kill Omega_R,dx,dy,dz,dt,L,DL,LL;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-//------------ Procedures for computing with universal derivation and differential -----------//
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//---- Procedures for computing with universal derivation and differential ---//
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc difformUnivDer(poly f)
@@ -1929,22 +1883,18 @@ KEYWORDS:   derivation; universal
 SEE ALSO:   difformDiff
 EXAMPLE:    example difformUnivDer; shows an example"
 {
-
-    diffAlgebraCheck();
-
-        difform df = 0;
+    difform df = 0;
     difform d_var;
-        int n = size(ringlist(basering)[2]);
-        int i;
+    int n = size(ringlist(basering)[2]);
+    int i;
 
-        // Build the image under the universal derivation
-        for(i = 1; i <= n; i++){
+    // Build the image under the universal derivation
+    for(i = 1; i <= n; i++)
+    {
         execute("d_var = d" + string(var(i)));
                 df = df + diff(f,var(i))*d_var;
-        }
-
-        return(df);
-
+    }
+    return(df);
 }
 example
 {
@@ -1964,7 +1914,7 @@ kill Omega_R,dx,dy,dz;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc difformDiff(difform df)
@@ -1979,21 +1929,17 @@ KEYWORDS:   differential; universal; derivation
 SEE ALSO:   difformUnivDer
 EXAMPLE:    example difformDiff; shows an example"
 {
-
-    diffAlgebraCheck();
-
     difform d_df = 0;
     list df_gen_repr = difformCoef(df);
     int n = size(df_gen_repr);
     int i;
 
     // Derivate each coefficient
-    for(i = 1; i <= n; i++){
+    for(i = 1; i <= n; i++)
+    {
         d_df = d_df + difformUnivDer(df_gen_repr[i][2])*df_gen_repr[i][1];
     }
-
     return(d_df);
-
 }
 example
 {
@@ -2024,16 +1970,16 @@ kill Omega_R,df_1,df_2,f,dx,dy,dz,da,db,dc;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
-//                               Procedures for type derivation                               //
-////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//                      Procedures for type derivation                        //
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-//----------------------------------- Structural procedures ----------------------------------//
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//-------------------------- Structural procedures ---------------------------//
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc derivationFromList(list L)
@@ -2050,9 +1996,6 @@ KEYWORDS:   constructor; derivation
 SEE ALSO:   derivationCheckList, derivationConstructor, derivationFromPoly
 EXAMPLE:    example derivationFromList; shows an example"
 {
-
-    diffAlgebraCheck();
-
     // Check the structure of the given list
     derivationCheckList(L);
 
@@ -2061,9 +2004,7 @@ EXAMPLE:    example derivationFromList; shows an example"
 
     derivation phi;
     phi.genIm = L;
-
     return(phi);
-
 }
 example
 {
@@ -2094,7 +2035,7 @@ kill Omega_R,du,dv,dw,dx,phi,psi,L_1,L_2;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc derivationCheckList(list L)
@@ -2110,16 +2051,16 @@ NOTE:       like in derivationFromList, the structure of L must follow the rules
 KEYWORDS:   constructor; derivation; structure
 SEE ALSO:   derivationFromList, difformIsGen, difformListCont"
 {
-
-    if(size(L) != 2){
+    if(size(L) != 2)
+    {
         ERROR("Given list has wrong size!");
     }
-
-    if(typeof(L[1]) != "list" || typeof(L[2]) != "list"){
+    if(typeof(L[1]) != "list" || typeof(L[2]) != "list")
+    {
         ERROR("Given list does not contain lists!");
     }
-
-    if(size(L[1]) != size(L[2])){
+    if(size(L[1]) != size(L[2]))
+    {
         ERROR("Given list does not have the right form!");
     }
 
@@ -2127,34 +2068,40 @@ SEE ALSO:   derivationFromList, difformIsGen, difformListCont"
     int i;
 
     // Need an image for any generator
-    if(n != size(ringlist(basering)[2])){
+    if(n != size(ringlist(basering)[2]))
+    {
         ERROR("Given list has wrong size!");
     }
 
-    for(i = 1; i <= n; i++){
+    for(i = 1; i <= n; i++)
+    {
         // Right type needed
-        if(typeof(L[1][i]) != "difform" || (typeof(L[2][i]) != "poly" && typeof(L[2][i]) != "int" && typeof(L[2][i]) != "number")){
+        if(typeof(L[1][i]) != "difform" || (typeof(L[2][i]) != "poly" && typeof(L[2][i]) != "int" && typeof(L[2][i]) != "number"))
+	{
             ERROR("Given list contains wrong type!");
         }
 
         // Generator of Omega_R^1
-        if(!(difformIsGen(L[1][i]) && deg(L[1][i]) == 1)){
+        if(!(difformIsGen(L[1][i]) && deg(L[1][i]) == 1))
+	{
             ERROR("Given list contains a non-generator or a generator not of degree 1!");
         }
     }
 
     // Now check the list L[1] for duplicates of the generators
     list L_i;
-    for(i = 1; i <= n; i++){
+    for(i = 1; i <= n; i++)
+    {
         L_i = delete(L[1],i);
-        if(difformListCont(L_i,L[1][i])){
+        if(difformListCont(L_i,L[1][i]))
+	{
             ERROR("Given list contains duplicate of a generator!");
         }
     }
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc derivationFromPoly(poly f)
@@ -2166,9 +2113,6 @@ KEYWORDS:   constructor; derivation; polynomial
 SEE ALSO:   derivationConstructor, derivationFromList
 EXAMPLE:    example derivationFromPoly; shows an example"
 {
-
-    diffAlgebraCheck();
-
     list L;
     // First entry of list are the degree-1 generators
     L[1] = list();
@@ -2178,7 +2122,8 @@ EXAMPLE:    example derivationFromPoly; shows an example"
     L[2] = list();
     int n = size(L[1]);
     int i;
-    for(i = 1; i <= n; i++){
+    for(i = 1; i <= n; i++)
+    {
         L[2][i] = f;
     }
 
@@ -2186,7 +2131,6 @@ EXAMPLE:    example derivationFromPoly; shows an example"
     derivation phi;
     phi.genIm = L;
     return(phi);
-
 }
 example
 {
@@ -2205,7 +2149,7 @@ kill Omega_R,dx,dy,dz,phi,psi;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc derivationConstructor(def inp)
@@ -2219,12 +2163,13 @@ KEYWORDS:   constructor; derivation
 SEE ALSO:   derivationFromList, derivationFromPoly
 EXAMPLE:    example derivationConstructor; shows an example"
 {
-
-    if(typeof(inp) == "list"){
+    if(typeof(inp) == "list")
+    {
         derivation der_cons = derivationFromList(inp);
         return(der_cons);
     }
-    if(typeof(inp) == "poly" || typeof(inp) == "number" || typeof(inp) == "int" || typeof(inp) == "bigint"){
+    if(typeof(inp) == "poly" || typeof(inp) == "number" || typeof(inp) == "int" || typeof(inp) == "bigint")
+    {
         derivation der_cons = derivationFromPoly(inp);
         return(der_cons);
     }
@@ -2265,8 +2210,6 @@ KEYWORDS:   string; print
 SEE ALSO:   derivationPrint, difformListSort, difformGenToString
 EXAMPLE:    example derivationToString; shows an example"
 {
-
-    diffAlgebraCheck();
     list temp_genIm = phi.genIm;
 
     // Get the optional ordering on the generators
@@ -2274,11 +2217,15 @@ EXAMPLE:    example derivationToString; shows an example"
     int n = size(#);
     int i;
 
-    for(i = 1; i <= n; i++){
-        if(typeof(#[i]) == "string"){
-            if(#[i] == "gen" && typeof(#[i+1]) == "string"){
+    for(i = 1; i <= n; i++)
+    {
+        if(typeof(#[i]) == "string")
+	{
+            if(#[i] == "gen" && typeof(#[i+1]) == "string")
+	    {
                 gen_ord = #[i+1];
-                if(typeof(#[i+2]) == "intvec"){
+                if(typeof(#[i+2]) == "intvec")
+		{
                     intvec gen_weight = #[i+2];
                 }
             }
@@ -2286,10 +2233,14 @@ EXAMPLE:    example derivationToString; shows an example"
     }
 
     // Sort the generator/coefficients by the chosen ordering
-    if(gen_ord != ""){
-        if(defined(gen_weight)){
+    if(gen_ord != "")
+    {
+        if(defined(gen_weight))
+	{
             temp_genIm = difformListSort(temp_genIm,"Dlist","gen",gen_ord,gen_weight);
-        }else{
+        }
+	else
+	{
             temp_genIm = difformListSort(temp_genIm,"Dlist","gen",gen_ord);
         }
     }
@@ -2303,12 +2254,12 @@ EXAMPLE:    example derivationToString; shows an example"
     string phi_out = " Omega_" + ring_name + "^1 --> " + ring_name + newline;
     int ring_name_size = size(ring_name);
 
-    for(i = 1; i <= n; i++){
+    for(i = 1; i <= n; i++)
+    {
         phi_out = phi_out + tab(6 + ring_name_size) + difformGenToString(gens[i]) + " |--> " + string(images[i]) + newline;
     }
 
     return(phi_out);
-
 }
 example
 {
@@ -2335,7 +2286,7 @@ kill Omega_R,dx,dy,dz,L,phi;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc derivationPrint(derivation phi)
@@ -2346,10 +2297,8 @@ KEYWORDS:       print; string
 SEE ALSO:       derivationToString
 EXAMPLE:        example derivationPrint; shows an example"
 {
-
     // Orders the generators in ls-order
     print(derivationToString(phi,"gen","ls"));
-
 }
 example
 {
@@ -2376,9 +2325,9 @@ kill Omega_R,da,db,dc,dx,dy,dz,L,phi,phi_poly;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-//------------------------------ Basic computational procedures ------------------------------//
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//-------------------- Basic computational procedures ------------------------//
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc derivationAdd(derivation phi, derivation psi)
@@ -2391,9 +2340,6 @@ KEYWORDS:   add; sum
 SEE ALSO:   derivationSub
 EXAMPLE:    example derivationAdd; shows an example"
 {
-
-    diffAlgebraCheck();
-
     // Structure for derivation
     derivation add_der;
     list add_list;
@@ -2404,7 +2350,8 @@ EXAMPLE:    example derivationAdd; shows an example"
     int n = size(add_list[1]);
     int i;
 
-    for(i = 1; i <= n; i++){
+    for(i = 1; i <= n; i++)
+    {
         // Lists are sorted the same way
         add_list[2][i] = phi.genIm[2][i] + psi.genIm[2][i];
     }
@@ -2412,7 +2359,6 @@ EXAMPLE:    example derivationAdd; shows an example"
     // The list is already sorted
     add_der.genIm = add_list;
     return(add_der);
-
 }
 example
 {
@@ -2442,7 +2388,7 @@ kill Omega_R,dx,dy,dz,L_1,L_2,phi_1,phi_2;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc derivationSub(derivation phi, derivation psi)
@@ -2455,9 +2401,6 @@ KEYWORDS:   minus; difference
 SEE ALSO:   derivationAdd, derivationNeg
 EXAMPLE:    example derivationSub; shows an example"
 {
-
-    diffAlgebraCheck();
-
     // Structure for derivation
     derivation sub_der;
     list sub_list;
@@ -2468,7 +2411,8 @@ EXAMPLE:    example derivationSub; shows an example"
     int n = size(sub_list[1]);
     int i;
 
-    for(i = 1; i <= n; i++){
+    for(i = 1; i <= n; i++)
+    {
         // Lists are sorted the same way
         sub_list[2][i] = phi.genIm[2][i] - psi.genIm[2][i];
     }
@@ -2476,7 +2420,6 @@ EXAMPLE:    example derivationSub; shows an example"
     // The list is already sorted
     sub_der.genIm = sub_list;
     return(sub_der);
-
 }
 example
 {
@@ -2506,7 +2449,7 @@ kill Omega_R,dx,dy,L_1,L_2,phi_1,phi_2;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc derivationNeg(derivation phi)
@@ -2516,9 +2459,6 @@ KEYWORDS:   minus; difference
 SEE ALSO:   derivationSub
 EXAMPLE:    example derivationNeg; shows an example"
 {
-
-    diffAlgebraCheck();
-
     // Structure for derivation
     derivation neg_der;
     list neg_list;
@@ -2529,14 +2469,14 @@ EXAMPLE:    example derivationNeg; shows an example"
     int n = size(neg_list[1]);
     int i;
 
-    for(i = 1; i <= n; i++){
+    for(i = 1; i <= n; i++)
+    {
         neg_list[2][i] = -phi.genIm[2][i];
     }
 
     // The list is already sorted
     neg_der.genIm = neg_list;
     return(neg_der);
-
 }
 example
 {
@@ -2565,7 +2505,7 @@ kill Omega_R,dx,dy,dz,dt,L_1,phi_1,phi_poly;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc derivationMul(derivation phi, derivation psi)
@@ -2577,9 +2517,6 @@ NOTE:       one can also multiply polynomials and derivations
 KEYWORDS:   multiplication; product
 EXAMPLE:    derivationMul; shows an example"
 {
-
-    diffAlgebraCheck();
-
     // Structure for derivation
     derivation mul_der;
     list mul_list;
@@ -2590,7 +2527,8 @@ EXAMPLE:    derivationMul; shows an example"
     int n = size(mul_list[1]);
     int i;
 
-    for(i = 1; i <= n; i++){
+    for(i = 1; i <= n; i++)
+    {
         // Lists are sorted the same way
         mul_list[2][i] = phi.genIm[2][i]*psi.genIm[2][i];
     }
@@ -2598,7 +2536,6 @@ EXAMPLE:    derivationMul; shows an example"
     // The list is already sorted
     mul_der.genIm = mul_list;
     return(mul_der);
-
 }
 example
 {
@@ -2628,7 +2565,7 @@ kill Omega_R,da,db,dt,L_1,L_2,phi_1,phi_2;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc derivationEqu(derivation phi, derivation psi)
@@ -2641,15 +2578,14 @@ KEYWORDS:   compare; equal
 SEE ALSO:   derivationNeq
 EXAMPLE:    example derivationEqu; shows an example"
 {
-
-    diffAlgebraCheck();
-
     int n = size(phi.genIm[1]);
     int i;
 
-    for(i = 1; i <= n; i++){
+    for(i = 1; i <= n; i++)
+    {
         // Lists are sorted the same way
-        if(phi.genIm[2][i] != psi.genIm[2][i]){
+        if(phi.genIm[2][i] != psi.genIm[2][i])
+	{
             // Different images
             return(0);
         }
@@ -2657,7 +2593,6 @@ EXAMPLE:    example derivationEqu; shows an example"
 
     // Images are the same
     return(1);
-
 }
 example
 {
@@ -2686,7 +2621,7 @@ kill Omega_R,du,dv,phi_1,phi_poly;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc derivationNeq(derivation phi, derivation psi)
@@ -2698,9 +2633,7 @@ KEYWORDS:   compare; equal; not equal
 SEE ALSO:   derivationEqu
 EXAMPLE:    example derivationNeq; shows an example"
 {
-
     return(!derivationEqu(phi,psi));
-
 }
 example
 {
@@ -2729,7 +2662,7 @@ kill Omega_R,du,dv,phi_1,phi_poly;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc derivationEval(derivation phi, difform df)
@@ -2746,14 +2679,13 @@ KEYWORDS:   evaluation; derivation; application
 SEE ALSO:   difformListSort, difformCoef
 EXAMPLE:    example derivationEval; shows an example"
 {
-
-    diffAlgebraCheck();
-
-    if(!homog(df)){
+    if(!homog(df))
+    {
         ERROR("Cannot apply derivation to non-homogeneous element!");
     }
 
-    if(deg(df) != 1 && deg(df) != -1){
+    if(deg(df) != 1 && deg(df) != -1)
+    {
         ERROR("Cannot apply derivation to differential form not of degree 1!");
     }
 
@@ -2764,20 +2696,21 @@ EXAMPLE:    example derivationEval; shows an example"
     int i;
     int j = 1;
 
-    for(i = 1; i <= n; i++){
+    for(i = 1; i <= n; i++)
+    {
         // Both lists are sorted by the monomial ordering on the differential algebra
         // So the generators are sorted the same way in both lists
         // If given df does not involve all generators avoid gaps using j
-        if(j <= k){
-            if(df_gen_repr[j][1] == phi.genIm[1][i]){
+        if(j <= k)
+	{
+            if(df_gen_repr[j][1] == phi.genIm[1][i])
+	    {
                 df_eval = df_eval + df_gen_repr[j][2]*phi.genIm[2][i];
                 j++;
             }
         }
     }
-
     return(df_eval);
-
 }
 example
 {
@@ -2818,9 +2751,9 @@ kill Omega_R,dx,dy,dz,dt,L_1,L_2,L_3,phi_1,phi_2,phi_3;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-//----------------------- Procedures for computing the Lie-Derivative ------------------------//
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//------------ Procedures for computing the Lie-Derivative -------------------//
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc derivationContractionGen(derivation phi, difform d_gen)
@@ -2833,7 +2766,6 @@ NOTE:       this procedure should only be applied to generators
 KEYWORDS:   contraction; generator
 SEE ALSO:   derivationContraction"
 {
-
     // Sort the list, that dx_1 is the first form, dx_2 the second,...
     list gen_list = phi.genIm[1];
     gen_list = difformListSort(gen_list,"gen","ls");
@@ -2844,8 +2776,10 @@ SEE ALSO:   derivationContraction"
     difform applic = 0;
 
     // Go through all degree-1 generators and test if, dx_i occurs in d_gen
-    for(i = 1; i <= n; i++){
-        if(d_gen / gen_list[i] != 0){
+    for(i = 1; i <= n; i++)
+    {
+        if(d_gen / gen_list[i] != 0)
+	{
             applic = applic + ((-1)^(j+1))*derivationEval(phi,gen_list[i])*(d_gen/gen_list[i]);
             j++;
         }
@@ -2854,7 +2788,7 @@ SEE ALSO:   derivationContraction"
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc derivationContraction(derivation phi, difform df)
@@ -2868,21 +2802,17 @@ KEYWORDS:   contraction
 SEE ALSO:   derivationContraction, derivationLie
 EXAMPLE:    example derivationContraction; shows an example"
 {
-
-    diffAlgebraCheck();
-
     list coef_list = difformCoef(df);
     int k = size(coef_list);
     int i;
     difform applic = 0;
 
     // Apply the contraction map to the generators since it is linear
-    for(i = 1; i <= k; i++){
+    for(i = 1; i <= k; i++)
+    {
         applic = applic + coef_list[i][2]*derivationContractionGen(phi,coef_list[i][1]);
     }
-
     return(applic);
-
 }
 example
 {
@@ -2916,7 +2846,7 @@ kill Omega_R,dx,dy,dz,L_1,L_2,phi_1,phi_2;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 proc derivationLie(derivation phi, difform df)
@@ -2929,10 +2859,8 @@ KEYWORDS:   Lie; contraction
 SEE ALSO:   derivationContraction, difformDiff
 EXAMPLE:    example derivationLie; shows an example"
 {
-
     difform lie_form = derivationContraction(phi,difformDiff(df)) + difformDiff(derivationContraction(phi,df));
     return(lie_form);
-
 }
 example
 {
@@ -2968,69 +2896,70 @@ kill Omega_R,dx,dy,dz,L,phi,phi_poly;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
-//                                       Test examples                                        //
-////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//                             Test examples                                  //
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 // EXAMPLE: differential algebra over ring of characteristic 0
-proc diffAlgebra_example_1(){
+proc diffAlgebra_example_1()
+{
     ring R = 0,(x,y,z),dp;
     diffAlgebra();
-
     exportto(Top,R);
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 // EXAMPLE: differential algebra over big ring of characteristic 0 and block ordering
-proc diffAlgebra_example_2(){
+proc diffAlgebra_example_2()
+{
     ring R = 0,(a,b,x,y,z,t,s,e,r,w,i),(ls(3),dp(4),lp);
     diffAlgebra();
-
     exportto(Top,R);
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 // EXAMPLE: differential algebra over ring of positive characteristic
-proc diffAlgebra_example_3(){
+proc diffAlgebra_example_3()
+{
     ring R = 31,(a,b,x),dp;
     diffAlgebra();
-
     exportto(Top,R);
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 // EXAMPLE: differential algebra over quotient ring
-proc diffAlgebra_example_4(){
+proc diffAlgebra_example_4()
+{
     ring S = 0,(x,y,z),lp;
     ideal I = x2-y4,xyz;
     qring R = std(I);
     diffAlgebra();
-
     exportto(Top,R);
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 // EXAMPLE: differential form over ring of characteristic 0
-proc difform_example_1(){
+proc difform_example_1()
+{
     ring R = 0,(x,y,z),ds;
     diffAlgebra();
 
@@ -3041,11 +2970,12 @@ proc difform_example_1(){
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 // EXAMPLE: differential form over ring of positive characteristic
-proc difform_example_2(){
+proc difform_example_2()
+{
     ring R = 31,(x,y,z,a,b,c),lp;
     diffAlgebra();
 
@@ -3056,11 +2986,12 @@ proc difform_example_2(){
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 // EXAMPLE: derivation by list
-proc derivation_example_1(){
+proc derivation_example_1()
+{
     ring R = 0,(x,y,z),lp;
     diffAlgebra();
 
@@ -3075,11 +3006,12 @@ proc derivation_example_1(){
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 // EXAMPLE: derivation by list
-proc derivation_example_2(){
+proc derivation_example_2()
+{
     ring R = 0,(a,b,c,x,y,z),lp;
     diffAlgebra();
 
@@ -3093,11 +3025,12 @@ proc derivation_example_2(){
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 // EXAMPLE: derivations by list
-proc derivation_example_3(){
+proc derivation_example_3()
+{
     ring R = 0,(x,y,z),dp;
     diffAlgebra();
 
@@ -3119,5 +3052,4 @@ proc derivation_example_3(){
     exportto(Top,phi_2);
     exportto(Top,phi_3);
 }
-
 

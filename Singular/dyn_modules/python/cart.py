@@ -19,8 +19,8 @@ combinations in memory at once.'''
 
 def cartn(sequence, n):
   tocombine=list(itertools.repeat(sequence,n))
-  return itertools.imap(tuple,xcombine(*tocombine))
+  return list(map(tuple,xcombine(*tocombine)))
 
 if __name__=='__main__':
   for i in cartn([1,2,3],4):
-    print i
+    print(i)

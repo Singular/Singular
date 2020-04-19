@@ -10,9 +10,9 @@
 - \subpage bs_page "Singular build system",
 - \subpage changes_in_sw_page "Significant changes in Singular 4",
 - Short introduction to general concepts (types, paths, etc.)<br/>
-  <http://www.singular.uni-kl.de/Manual/intro_sing.pdf>,
+  <https://www.singular.uni-kl.de/Manual/intro_sing.pdf>,
 - Short description of the Singular restructurization: <br/>
-  <http://www.singular.uni-kl.de/gap-meeting-2012/SW.Aug.12.motsak.2.pdf> and
+  <https://www.singular.uni-kl.de/gap-meeting-2012/SW.Aug.12.motsak.2.pdf> and
 - Current internal structure and dependencies can be seen at \subpage deps_page.
   Top-level packages are:
   - \subpage omalloc_page "Singular Memory Manager",

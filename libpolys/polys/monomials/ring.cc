@@ -121,7 +121,7 @@ ring rDefault(const coeffs cf, int N, char **n,int ord_size, rRingOrder_t *ord, 
   r->order = ord;
   r->block0 = block0;
   r->block1 = block1;
-  r->bitmask = bitmask;
+  if (bitmask!=0) r->wanted_maxExp=bitmask;
 
   /* complete ring intializations */
   rComplete(r);
@@ -608,9 +608,9 @@ char * rOrdStr(ring r)
 
     if (l==nblocks)
     {
-      if (r->bitmask!=0xffff)
+      if (r->wanted_maxExp!=0)
       {
-        long mm=r->bitmask;
+        long mm=r->wanted_maxExp;
         if (mm>MAX_INT_VAL) mm=MAX_INT_VAL;
         StringAppend(",L(%ld)",mm);
       }
@@ -2648,14 +2648,13 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
 {
   assume (r != NULL );
   assume (exp_limit > 1);
-  BOOLEAN need_other_ring;
   BOOLEAN omitted_degree = FALSE;
 
-  int iNeedInducedOrderingSetup = 0; ///< How many induced ordering block do we have?
   int bits;
-
   exp_limit=rGetExpSize(exp_limit, bits, r->N);
-  need_other_ring = (exp_limit != r->bitmask);
+  BOOLEAN need_other_ring = (exp_limit != r->bitmask);
+
+  int iNeedInducedOrderingSetup = 0; ///< How many induced ordering block do we have?
 
   int nblocks=rBlocks(r);
   rRingOrder_t *order=(rRingOrder_t*)omAlloc0((nblocks+1)*sizeof(rRingOrder_t));
@@ -2802,6 +2801,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   res->block0=block0;
   res->block1=block1;
   res->bitmask=exp_limit;
+  res->wanted_maxExp=r->wanted_maxExp;
   //int tmpref=r->cf->ref0;
   rComplete(res, 1);
   //r->cf->ref=tmpref;
@@ -2973,6 +2973,7 @@ ring rModifyRing_Simple(ring r, BOOLEAN ommit_degree, BOOLEAN ommit_comp, unsign
     res->block0=block0;
     res->block1=block1;
     res->bitmask=exp_limit;
+    res->wanted_maxExp=r->wanted_maxExp;
     //int tmpref=r->cf->ref;
     rComplete(res, 1);
     //r->cf->ref=tmpref;
@@ -3405,7 +3406,7 @@ BOOLEAN rComplete(ring r, int force)
   int n=rBlocks(r)-1;
   int i;
   int bits;
-  r->bitmask=rGetExpSize(r->bitmask,bits,r->N);
+  r->bitmask=rGetExpSize(r->wanted_maxExp,bits,r->N);
   r->BitsPerExp = bits;
   r->ExpPerLong = BIT_SIZEOF_LONG / bits;
   r->divmask=rGetDivMask(bits);

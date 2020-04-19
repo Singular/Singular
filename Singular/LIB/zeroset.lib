@@ -420,8 +420,7 @@ NOTE:    outdated, use / instead
 
   int n = nvars(basering);
   def RINB = basering;
-  string ringSTR = "ring RINR = 0, " + string(var(n)) + ", dp;";
-  execute(ringSTR);        // new ring = Q[a]
+  ring RINR = create_ring(0, string(var(n)), "dp");       // new ring = Q[a]
 
   list gcdList;
   poly f, g, inv;
@@ -636,8 +635,7 @@ EXAMPLE: example MEGCD; shows an example
 
   if(npars(basering) == 0) { @parName = "0";}
   else { @parName = "(0, " + parstr(basering) + ")"; }
-  @str = "ring @RGCD = " + @parName + ", " + string(var(varIndex)) + ", dp;";
-  execute(@str);
+  ring @RGCD = create_ring(@parName, string(var(varIndex)), "dp");
   if(@mp != "0") { execute ("minpoly = " + @mp + ";"); }
   execute("poly @f = " + @sf + ";");
   execute("poly @g = " + @sg + ";");
@@ -716,8 +714,7 @@ EXAMPLE: example SqfrNorm; shows an example
   N1 = diff(N, var(1));
   g = f;
 
-  ringSTR = "ring SNRM1 = 0, " + string(var(1)) + ", dp;";  // univariate ring
-  execute(ringSTR);
+  ring SNRM1 = create_ring(0, string(var(1)), "dp");     // univariate ring
   poly N, N1, h;        // N, N1 do not contain 'a', use built-in gcd
   h = gcd(imap(SNRMB, N), imap(SNRMB, N1));
   setring(SNRMB);
@@ -1099,8 +1096,7 @@ NOTE:    might change 'mpoly' !!
 
       // create univariate ring
 
-      ringSTR = "ring RIS1 = 0, (" + string(var(vars[1])) + ", " + string(var(n+1)) + "), lp;";
-      execute(ringSTR);
+      ring RIS1 = create_ring(0, "(" + string(var(vars[1])) + ", " + string(var(n+1)) + ")", "lp");
       ideal mpoly = std(imap(NLZR, mpoly));
       list roots;
       poly f = imap(NLZR, f);
@@ -1404,9 +1400,7 @@ NOTE:    Creates the ring needed for all prodecures with name 'proc-name'Main
     parName = parstr(basering);
     minPoly = string(minpoly);
   }
-  ringSTR = "ring TR = 0, (" + varstr(basering) + "," + parName + "), lp;";
-
-  execute(ringSTR);
+  ring TR = create_ring(0, "(" + varstr(basering) + "," + parName + ")", "lp");
   execute("ideal mpoly = std(" + minPoly + ");");
   export(mpoly);
   setring altring;
@@ -1443,8 +1437,7 @@ ASSUME:  basering = Q[x_1,...,x_n, a], 'mpoly' must be defined
   }
   varString = varString + string(var(n-1));
 
-  ringSTR = "ring TR = " + parName + ", (" + varString + "), lp;";
-  execute(ringSTR);
+  ring TR = create_ring(parName, "(" + varString + ")", "lp");
   if(MP) { minpoly = number(imap(BR, mpoly)[1]); }
   setring BR;
   return(TR);

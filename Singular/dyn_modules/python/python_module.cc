@@ -1,5 +1,4 @@
 #include "kernel/mod2.h"
-#ifdef HAVE_PYTHON_MOD
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -7,8 +6,6 @@
 
 #include <unistd.h>
 #include <sys/stat.h>
-#include <boost/python.hpp>
-#include <Python.h>
 #include "Singular/tok.h"
 #include "kernel/structs.h"
 #include "Singular/mod_lib.h"
@@ -18,10 +15,10 @@
 
 #include "omalloc/omalloc.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <time.h>
+#if defined(HAVE_PYTHON_MOD) && defined(HAVE_PYTHON)
+#include <boost/python.hpp>
+#include <Python.h>
 #include <Python.h>
 #include "wrapper.h"
 
@@ -79,6 +76,12 @@ path.insert(0,'.')\n");
   init_Singular();
 
   psModulFunctions->iiAddCproc(currPack->libname,"python",FALSE, mod_python);
+  return MAX_TOK;
+}
+#else
+extern "C" int SI_MOD_INIT(python_module)(SModulFunctions* psModulFunctions)
+{
+  PrintS("no python_mod support\n");
   return MAX_TOK;
 }
 #endif

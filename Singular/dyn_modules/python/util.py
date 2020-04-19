@@ -4,12 +4,12 @@ singular=SingularGlobalsProxy()
 
 def create_ring(char=0, nvars=1, varNames=None, ordering="dp", degvec=None, register=None):
   if not varNames:
-    varNames=["x("+str(i)+")" for i in xrange(1,nvars+1)]
+    varNames=["x("+str(i)+")" for i in range(1,nvars+1)]
   else:
     nvars=len(varNames)
   if not degvec:
     degvec=IntVector()
-    for i in xrange(0,nvars):
+    for i in range(0,nvars):
       degvec.append(1)
   modulweights=IntVector()
   modulweights.append(0)

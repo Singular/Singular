@@ -163,7 +163,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 
 @c ----------------------------------------------------------------------------
 @ifset withplural
-@node Non-commutative subsystem, Examples, Tricks and pitfalls, Top
+@node Non-commutative subsystem
 @chapter Non-commutative subsystem
 @cindex Non-commutative subsystem
 
@@ -225,9 +225,10 @@ described in the following subsections.
 Use the @code{LIB} command (see @ref{LIB}) for loading of single libraries,
 and the command @code{LIB "all.lib";} for loading all libraries.
 
-@ifset withplural
-See also @ref{PLURAL libraries}.
-@end ifset
+@c levandov: moved to below
+@c @ifset withplural
+@c See also @ref{PLURAL libraries} and .
+@c @end ifset
 
 @strong{Interpreter libraries:}
 
@@ -249,7 +250,8 @@ See also @ref{PLURAL libraries}.
 * Experimental libraries::
 @end menu
 @ifset withplural
-@xref{PLURAL libraries}, @xref{LETTERPLACE libraries}.
+@c @xref{PLURAL libraries}, @xref{LETTERPLACE libraries}.
+See also @ref{PLURAL libraries} and @ref{LETTERPLACE libraries}.
 @end ifset
 
 @c ----------------------------------------------------------
@@ -391,6 +393,7 @@ LIB "all.lib";
 * integralbasis_lib:: Integral basis in algebraic function fields
 * intprog_lib:: Integer Programming
 * locnormal_lib:: Normalization of affine domains using local methods
+* moddiq_lib:: ideal quotient and saturation using modular methods
 * modnormal_lib:: Normalization of affine domains using modular methods
 * modstd_lib:: Groebner basis of ideals via modular computations
 * monomialideal_lib:: Primary and irreducible decompositions of monomial ideals
@@ -457,6 +460,10 @@ LIB "all.lib";
 @subsection locnormal_lib
 @c lib locnormal.lib
 @c ----------------------------------------------------------
+@node moddiq_lib
+@subsection moddiq_lib
+@c lib moddiq.lib
+@c ---------------------------------------------------------
 @node modnormal_lib
 @subsection modnormal_lib
 @c lib modnormal.lib
@@ -729,8 +736,9 @@ iniD, reslist, sumlist, dividelist, createlist
 
 @menu
 * finvar_lib:: procedures to compute invariant rings of finite groups
-* ainvar_lib:: procedures to compute invariants rings of the additive group
-* rinvar_lib:: procedures to compute invariants ring of reductive groups
+* ainvar_lib:: procedures to compute invariant rings of the additive group
+* rinvar_lib:: procedures to compute invariant rings of reductive groups
+* invar_lib:: procedures to compute invariant rings of SL(n) and torus groups
 * stratify_lib:: algorithmic stratification by the Greuel-Pfister algorithm
 @end menu
 
@@ -746,6 +754,10 @@ iniD, reslist, sumlist, dividelist, createlist
 @node rinvar_lib
 @subsection rinvar_lib
 @c lib rinvar.lib
+@c ----------------------------------------------------------
+@node invar_lib
+@subsection invar_lib
+@c lib invar.lib
 @c ----------------------------------------------------------
 @node stratify_lib
 @subsection stratify_lib

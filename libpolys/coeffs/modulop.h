@@ -29,11 +29,6 @@
 #define NV_MAX_PRIME 32749
 #define FACTORY_MAX_PRIME 536870909
 
-#ifdef USE_NTL_XGCD
-// in ntl.a
-extern void XGCD(long& d, long& s, long& t, long a, long b);
-#endif
-
 struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
 struct snumber; typedef struct snumber *   number;
 
@@ -121,12 +116,12 @@ inline number npSubAsm(number a, number b, int m)
 static inline number npAddM(number a, number b, const coeffs r)
 {
   unsigned long R = (unsigned long)a + (unsigned long)b;
-  return (number)(R >= r->ch ? R - r->ch : R);
+  return (number)(R >= (unsigned long)r->ch ? R - (unsigned long)r->ch : R);
 }
 static inline void npInpAddM(number &a, number b, const coeffs r)
 {
   unsigned long R = (unsigned long)a + (unsigned long)b;
-  a=(number)(R >= r->ch ? R - r->ch : R);
+  a=(number)(R >= (unsigned long)r->ch ? R - (unsigned long)r->ch : R);
 }
 static inline number npSubM(number a, number b, const coeffs r)
 {
@@ -136,7 +131,7 @@ static inline number npSubM(number a, number b, const coeffs r)
 #else
 static inline number npAddM(number a, number b, const coeffs r)
 {
-   unsigned long res = (long)((unsigned long)a + (unsigned long)b);
+   unsigned long res = ((unsigned long)a + (unsigned long)b);
    res -= r->ch;
 #if SIZEOF_LONG == 8
    res += ((long)res >> 63) & r->ch;
@@ -147,7 +142,7 @@ static inline number npAddM(number a, number b, const coeffs r)
 }
 static inline void npInpAddM(number &a, number b, const coeffs r)
 {
-   unsigned long res = (long)((unsigned long)a + (unsigned long)b);
+   unsigned long res = ((unsigned long)a + (unsigned long)b);
    res -= r->ch;
 #if SIZEOF_LONG == 8
    res += ((long)res >> 63) & r->ch;
@@ -184,20 +179,15 @@ static inline BOOLEAN npIsOne (number a, const coeffs)
 
 static inline long npInvMod(long a, const coeffs R)
 {
-   long s, t;
+   long s;
 
-#ifdef USE_NTL_XGCD
-   long d;
-   XGCD(d, s, t, a, R->ch);
-   assume (d == 1);
-#else
-   long  u, v, u0, v0, u1, u2, q, r;
+   long  u, v, u0, u1, u2, q, r;
 
    assume(a>0);
    u1=1; u2=0;
    u = a; v = R->ch;
 
-   while (v != 0)
+   do
    {
       q = u / v;
       //r = u % v;
@@ -207,11 +197,10 @@ static inline long npInvMod(long a, const coeffs R)
       u0 = u2;
       u2 = u1 - q*u2;
       u1 = u0;
-   }
+   } while (v != 0);
 
    assume(u==1);
    s = u1;
-#endif
 #ifdef HAVE_GENERIC_ADD
    if (s < 0)
       return s + R->ch;
@@ -265,8 +254,6 @@ long    npInt         (number &n, const coeffs r);
 
 // The folloing is reused inside tgb*.cc
 number  npMult        (number a, number b, const coeffs r);
-// The following is currently used in OPAE.cc, OPAEQ.cc and OPAEp.cc for setting their SetMap...
-nMapFunc npSetMap(const coeffs src, const coeffs dst); // FIXME! BUG?
 
 #define npEqualM(A,B,r)  ((A)==(B))
 

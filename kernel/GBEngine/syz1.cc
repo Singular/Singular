@@ -2010,8 +2010,7 @@ void syPrint(syStrategy syzstr, const char *sn)
     syPrintEmptySpaces((*resolution)[k]);
     k++;
   }
-  PrintLn();
-  PrintLn();
+  PrintS("\n\n");
   k = 0;
   loop
   {

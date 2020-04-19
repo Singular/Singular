@@ -456,8 +456,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = freeAlgebra(r, 4); // R with letterplace structure
-  setring R;
+  ring R = freeAlgebra(r, 4);
   poly a = x*y; poly b = y;
   lieBracket(a,b);
   lieBracket(x,y,2);
@@ -489,8 +488,7 @@ example
 {
  "EXAMPLE:"; echo = 2;
  ring r = (0,a,b,g),(x,y),Dp;
- def R = freeAlgebra(r, 4); // constructs a Letterplace ring
- setring R; // downup algebra A
+ ring R = freeAlgebra(r, 4); // downup algebra A
  ideal J = x*x*y-a*x*y*x - b*y*x*x - g*x,
  x*y*y-a*y*x*y - b*y*y*x - g*y;
  list L = lpPrint(J,r);
@@ -980,7 +978,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
-  def R = freeAlgebra(r, 7);
+  ring R = freeAlgebra(r, 7);
   lpVarBlockSize(R);
 }
 
@@ -1002,7 +1000,7 @@ example
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
   isFreeAlgebra(r);
-  def R = freeAlgebra(r, 7);
+  ring R = freeAlgebra(r, 7);
   isFreeAlgebra(R);
 }
 
@@ -1019,8 +1017,8 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),dp;
-  def R = freeAlgebra(r, 7, 10);
-  lpNcgenCount(R); // should be 10
+  ring R = freeAlgebra(r, 7, 3);
+  lpNcgenCount(R); // should be 3
 }
 
 // united all previous makes, including mLR1 (homog) and mLR2 (nonhomog)
@@ -2849,9 +2847,8 @@ example
 {
   "EXAMPLE:"; echo = 2;
 ring r = 0,(x,y,z),dp;
-int d =5; // degree
-def R = freeAlgebra(r, d);
-setring R;
+int d = 5; // degree
+ring R = freeAlgebra(r, d);
 ideal I = y*x*y - z*y*z, x*y*x - z*x*y, z*x*z - y*z*x, x*x*x + y*y*y + z*z*z + x*y*z;
 ideal J = letplaceGBasis(I); // compute a Letterplace Groebner basis
 poly p = y*x*y*z*y - y*z*z*y + z*y*z;
@@ -2867,7 +2864,7 @@ PURPOSE: compute a two-sided division with remainder of p wrt G; two-sided nonco
 ASSUME: G = {g1,...,gN} is a Groebner basis, the original ring of the Letterplace ring has the name 'r' and no variable is called 'tag_i' for i in 1...N
 RETURN: list L
 NOTE: - L[1] is NF(p,I)
-      - L[2] is the list of expressions [i,l_(ij),r_(ij)] with \sum_(i,j) l_(ij) g_i r_(ij) = p - NF(p,I)
+      - L[2] is the list of expressions [i,l_(ij),r_(ij)] with \sum_(i,j) l_(ij) g_i r_(ij) = p - NF(p,I) 
       - procedure lpGBPres2Poly, applied to L, reconstructs p
 EXAMPLE: example lpDivision; shows examples
 "
@@ -2939,14 +2936,15 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = freeAlgebra(r, 4); setring R;
+  ring R = freeAlgebra(r, 4); 
   ideal I = x*x + y*y - 1; // 2D sphere
-  ideal J = letplaceGBasis(I); // compute a Letterplace Groebner basis
+  ideal J = twostd(I); // compute a two-sided Groebner basis
   J; // it is finite and nice
   poly h = x*x*y-y*x*x+x*y;
-  lpDivision(h,J); // what means that the NF of h wrt J is x*y
+  list L = lpDivision(h,J); L; // what means that the NF of h wrt J is x*y
   h - lpNF(h,J); // and this poly has the folowing two-sided Groebner presentation:
   -y*J[1] + J[1]*y;
+  lpGBPres2Poly(L,J); // reconstructs the above automatically
 }
 
 proc lpGBPres2Poly(list L, ideal I)
@@ -2968,16 +2966,15 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  def R = freeAlgebra(r, 4); setring R;
+  ring R = freeAlgebra(r, 4); 
   ideal I = x*x + y*y - 1; // 2D sphere
-  ideal J = letplaceGBasis(I); // compute a Letterplace Groebner basis
+  ideal J = twostd(I); // compute a two-sided Groebner basis
   J; // it is finite and nice
   poly h = x*x*y-y*x*x+x*y;
-  list L = lpDivision(h,J); // what means that the NF of h wrt J is x*y
+  list L = lpDivision(h,J); 
+  L[1]; // what means that the normal form (or the remainder) of h wrt J is x*y
   lpGBPres2Poly(L,J); // we see, that it is equal to h from above
 }
-
-
 
 
 //procedures to convert monomials into the DVec representation, all static
@@ -3781,13 +3778,21 @@ example
   poly p = x*x*z;
   poly q = y*y*x*x;
   poly w = z*y*x*z;
-  // p,q,w are some polynomials we want to transform into their
+  // p, q, w are some polynomials we want to transform into their
   // intvec representation
   ideal G = p,q,w;
   lp2ivId(G); // returns the list of intmats for this ideal
 }
 
-proc testLift(ideal M, matrix T) {
+proc testLift(ideal M, matrix T) 
+"USAGE: testLift(M,T); module M, matrix T
+RETURN: module
+PURPOSE: assembles the result of the lift procedure
+ASSUME: T is the lift matrix of a submodule of M
+NOTE: the inverse of the lift procedure
+EXAMPLE: example testLift; shows examples
+"
+{
   ideal R;
   if (ncols(M) != nrows(T)) { ERROR("cols(M) != rows(T)") }
   for (int i=1; i <= nrows(T); i++) {
@@ -3798,8 +3803,29 @@ proc testLift(ideal M, matrix T) {
   } kill i;
   return(R);
 }
+example
+{
+  "EXAMPLE:"; echo = 2;
+  LIB "freegb.lib";
+  ring r = 0,(x,y),(c,Dp);
+  ring R = freeAlgebra(r, 7, 2);
+  ideal I = std(x*y*x + 1);
+  print(matrix(I)); // finite two-sided Groebner basis
+  ideal SI = x*I[1]*y + y*x*I[2], I[1]*y*x + I[2]*y;
+  matrix T = lift(I, SI); // T is the lifting matrix of SI wrt I
+  print(T); //
+  print(matrix(SI)); // the original generators of SI as a matrix
+  print(matrix(testLift(I,T))); // and the result of testLift
+}
 
-proc testSyz(ideal M, module S) {
+proc testSyz(ideal M, module S)
+"USAGE: testSyz(M,S); module M, S
+RETURN: module
+PURPOSE: tests the result of the syz procedure
+ASSUME: S is the syzygy bimodule of M
+EXAMPLE: example testSyz; shows examples
+"
+{
   ideal R;
   if (ncols(M) != nrows(S)) { ERROR("cols(M) != rows(T)") }
   for (int i=1; i <= nrows(S); i++) {
@@ -3809,6 +3835,18 @@ proc testSyz(ideal M, module S) {
     R[i] = sum(S[i]);
   } kill i;
   return(R);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  LIB "freegb.lib";
+  ring r = 0,(x,y),(c,Dp);
+  ring R = freeAlgebra(r, 7, 2);
+  ideal I = twostd(x*y*x + 1);
+  print(matrix(I));
+  module S = syz(I);
+  print(S);
+  testSyz(I,S); // returns zero
 }
 
 static proc mod_init()

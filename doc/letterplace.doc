@@ -10,7 +10,7 @@
 %**start
 @end ignore
 
-@node LETTERPLACE
+@node LETTERPLACE, , ,Non-commutative subsystem
 @section LETTERPLACE
 @cindex LETTERPLACE
 @cindex Letterplace
@@ -18,10 +18,10 @@
 @ifhtml
 @html
 <CENTER>
-<A HREF="http://www.singular.uni-kl.de">
+<A HREF="https://www.singular.uni-kl.de">
 <IMG SRC="letterplace.jpg" ALT="Singular:Letterplace logo"></A><br>
 </CENTER>
-<h3> A Subsystem for Non-commutative Finitely Presented Algebras </h3>
+<h3> A Subsystem for Non-commutative Finitely Presented Associative Algebras </h3>
 <p></p>
 @end html
 @end ifhtml
@@ -31,20 +31,37 @@ the @sc{Letterplace} subsystem of @sc{Singular}.
 
 All algebras are assumed to be associative @math{K}-algebras for some field @math{K}.
 
+@table @strong
+@item @strong{What is and what does @sc{Letterplace}?}
+
 What is @sc{Letterplace}? It is a subsystem of @sc{Singular}, providing the
 manipulations and computations within free associative algebras
-@math{K} @math{<x_1},@dots{},@math{x_n >}
-as well as in the factor-algebras of those by two-sided ideal.
+over rings @math{R} @math{<x_1},@dots{},@math{x_n >},
+where the coefficient domain @math{R} is either a ring @math{Z} or
+a field, supported by @sc{Singular}. 
 
-Free algebras are represented in @sc{Singular} as so-called Letterplace rings.
-Each such ring is constructed from a commutative ring @math{K}[ @math{x_1},@dots{},@math{x_n} ]
+@sc{Letterplace} can perform computations also in the factor-algebras 
+of the above (via data type @code{qring}) by two-sided ideals.
+
+Free algebras are internally represented in @sc{Singular} as so-called Letterplace rings.
+
+Each such ring is constructed from a commutative ring @math{R}[ @math{x_1},@dots{},@math{x_n} ]
 and a @strong{degree (length) bound} @math{d}.
 
 This encodes a sub-@math{K}-vector space (also called a filtered part) of @math{K} @math{<x_1},@dots{},@math{x_n >},
-spanned by all monomials of @strong{length} at most @math{d}.
+spanned by all monomials of @strong{length} at most @math{d}. 
+Analogously for free @math{R}-submodules of a free @math{R}-module.
 
-Within such a construction we offer the computations of Groebner bases, normal forms and many more.
-A variety of monomial orderings is supported.
+Within such a construction we offer the computations of Groebner (also known as Groebner-Shirshov) bases,
+normal forms, syzygies and many more.
+We address both ideals and submodules of the free bimodule of the fixed rank.
+
+A variety of monomial and module orderings is supported, including @strong{elimination} orderings for both
+variables and bimodule components. A monomial ordering has to be a well-ordering.
+
+@sc{Letterplace} works with every field, supported by @sc{Singular}, and with the coefficient ring @math{Z}.
+Note, that the elements of the coefficient field (or a ring) mutually commute with all variables.
+@end table
 
 @menu
 * Examples of use of Letterplace::
@@ -54,7 +71,7 @@ A variety of monomial orderings is supported.
 
 @c ---------------------------------------------------------------------------
 @node Examples of use of Letterplace
-@subsection Examples of use of @sc{Letterplace}
+@subsection Examples of use of BR_LETTERPLACE_BR
 @cindex Examples of use of Letterplace
 
 First, define a commutative ring @math{K[X]} in @sc{Singular}, equipped with a monomial well-ordering
@@ -64,40 +81,160 @@ Then, decide what should be the degree (length) bound @math{d},
 that is how long may the words (monomials in the free algebra) become
 and run the procedure @code{freeAlgebra(r, d)}.
 
-This procedure creates a commutative Letterplace ring with an ordering,
+This procedure creates free algebra @math{K<X>} with a monomial ordering,
 corresponding to the one in the original commutative ring @math{K[X]}, see @ref{Monomial orderings on free algebras}.
+@c commutative Letterplace ring 
 
-In this @math{K}-algebra, define an ideal @code{I} as a list of polynomials in the
-free algebra (@code{x*y} and @code{y*x} are different) and run, for example, @code{twostd (letterplace)}.
-The answer is a two-sided Groebner bases of the two-sided ideal @math{I}.
-Then, we want to compute the two-sided normal form of @code{xyzy} with respect to @code{J} with the
-function @code{reduce}.
+Polynomial arithmetics in this @math{K}-algebra is the usual one: @code{+,-,*} while
+ of course, @code{x*y} and @code{y*x} are different monomials while @code{x*7=7*x}.
+
+Let us define an ideal @code{I} as a list of polynomials in the
+free algebra and run, for example, @code{twostd} (see @ref{twostd (letterplace)}).
+The answer is a two-sided Groebner basis @code{J} of the two-sided ideal @math{I} 
+up to the length bound @code{d}.
+
+Then, we want to compute the two-sided normal form of @code{xyzy} with respect to @code{J} 
+using the function @code{reduce} (see @ref{reduce (letterplace)}).
 
 We illustrate the approach with the following example:
 
 @smallexample
 @c example
 LIB "freegb.lib";
-ring r = 0,(x,y,z),dp;
-def R = freeAlgebra(r, 4);  // degree (length) bound 4; the ordering will be degree right lex
-setring R;
-ideal I = x*y + y*z, x*x + x*y - z; // a non-graded ideal
+ring r = 0,(x,y,z),dp; // the ordering on the free algebra will be degree right lex
+ring R = freeAlgebra(r, 4);  // 4 the is degree (length) bound;
+ideal I = x*y + y*z, x*x + x*y - z; // define a non-graded ideal
 ideal J = twostd(I);
 J;
 poly p = reduce(x*y*z*y,J);
 p; // since p!=0, x*y*z*y is not contained in J
-qring Q = J;
+
+// Now, we introduce a factor algebra K<x,y,z>/J} of type qring,
+// and demonstrate the functions reduce and rightstd:
+
+qring Q = J; // J is a Groebner basis
 poly p = reduce(x*x, twostd(0)); // the canonical representative of x*x in Q
 p;
 rightstd(ideal(p)); // right Groebner basis of the right ideal, generated by p in Q
 @c example
 @end smallexample
 
+See @ref{Functions BR_LETTERPLACE_BR} for the list of all available kernel functions.
+
 There are various conversion routines in the library @code{freegb_lib} (see @ref{freegb_lib}).
 Many algebras are predefined in the library @code{fpalgebras_lib} (see @ref{fpalgebras_lib}).
 Important ring-theoretic properties can be established with the help of the library @code{fpaprops_lib} (see @ref{fpaprops_lib}),
 while K-dimension and monomial bases and Hilbert data - with the help of the library @code{fpadim_lib} (see @ref{fpadim_lib}).
 We work further on implementing more algorithms for non-commutative ideals and modules over free associative algebra.
+
+
+@c ---------------------------------------------------------------------------
+@node Examples of use of Letterplace over Z
+@subsection Example of use of BR_LETTERPLACE_BR over Z
+@cindex Examples of use of Letterplace over Z
+
+
+Consider the following paradigmatic example:
+@smallexample
+@c example
+LIB "freegb.lib";
+ring r = integer,(x,y),Dp;
+ring R = freeAlgebra(r,5); // length bound is 5
+ideal I = 2*x, 3*y; 
+I = twostd(I); 
+print(matrix(I)); // pretty prints the generators
+@c example
+@end smallexample
+
+As we can see, over @math{Z<x,y>} the ideal @math{<2x,3y>} has
+a finite Groebner basis and indeed
+@math{Z<x,y>/<2x,3y> =} @math{Z<x,y>/<2x,3y,yx,xy> =} @math{Z<x,y>/<2x,3y,yx-xy,xy> =} 
+@math{Z[x,y]/<2x,3y,xy>} holds.
+
+Now, we analyze the same ideal in the ring with one more variable @math{z}:
+@smallexample
+@c example
+LIB "freegb.lib";
+ring r = integer,(x,y,z),Dp;
+ring R = freeAlgebra(r,5,2); // length bound is 5
+ideal I = 2*x, 3*y; 
+I = twostd(I); 
+print(matrix(I)); // pretty prints the generators
+ideal J = y*z*x,x*z*y;
+matrix T = lift(J,I);
+@c example
+@end smallexample
+
+Now we see, that this Groebner basis is potentially infinite and 
+the following argument delivers a proof. Namely, @math{y*z^i*x} and 
+@math{x*z^i*y} are present in the ideal for all @math{i>=0}.
+How can we do this? We wish to express @math{y*z^i*x} and 
+@math{x*z^i*y} via the original generators:
+@smallexample
+@c example
+LIB "freegb.lib";
+ring r = integer,(x,y,z),Dp;
+ring R = freeAlgebra(r,5,2); // length bound is 5, rank of the free bimodule is 2
+ideal I = 2*x, 3*y; 
+matrix T1 = lift(I, ideal(y*z*x,x*z*y)); 
+print(T1);
+-y*z*I[1] + I[2]*z*x; // gives y*z*x
+matrix T2 = lift(I, ideal(y*z^2*x,x*z^2*y)); 
+print(T2);
+-y*z^2*I[1] + I[2]*z^2*x; // gives y*z^2*x
+@c example
+@end smallexample
+
+The columns of matrices, returned by @code{lift}, encode the presentation of new
+elements in terms of generators. From this we conjecture, that in particular 
+@math{-y*z^i*(2x) + (3y)*z^i*x = y*z^i*x} holds for all @math{i>=0}
+and indeed, confirm it via a routine computation by hands.
+
+@c Next bigger example and comparison with Q
+
+@strong{Comparing computations over Q with computations over Z}.
+In the next example, we first compute over @math{Q} and a bit later 
+compare the result with computations over @math{Z}.
+@smallexample
+@c example
+LIB "freegb.lib"; // initialization of free algebras
+ring r = 0,(z,y,x),Dp; // degree left lex ord on z>y>x
+ring R = freeAlgebra(r,7); // length bound is 7
+ideal I = y*x - 3*x*y - 3*z, z*x - 2*x*z +y, z*y-y*z-x;
+option(redSB); option(redTail); // for minimal reduced GB
+option(intStrategy); // avoid divisions by coefficients
+ideal J = twostd(I); // compute a two-sided GB of I
+J; // prints generators of J  
+LIB "fpadim.lib"; // load the library for K-dimensions
+lpMonomialBasis(7,0,J); // compute all monomials 
+// of length up to 7 in Q<x,y,z>/J
+@c example
+@end smallexample
+
+As we see, we obtain a nice finite Groebner basis @code{J}.
+Moreover, from the form of its leading monomials, we conjecture that
+@math{Q<x,y,z>/J} is finite dimensional @math{Q}-vector space. 
+We check it with @code{lpMonomialBasis} and obtain an affirmative answer.
+
+Now, for doing similar computations over @math{Z} one needs to change
+only the initialization of the ring, the rest stays the same
+@smallexample
+@c example
+LIB "freegb.lib"; // initialization of free algebras
+ring r = integer,(z,y,x),Dp; // Z and deg left lex ord on z>y>x
+ring R = freeAlgebra(r,7); // length bound is 7
+ideal I = y*x - 3*x*y - 3*z, z*x - 2*x*z +y, z*y-y*z-x;
+option(redSB); option(redTail); // for minimal reduced GB
+option(intStrategy); // avoid divisions by coefficients
+ideal J = twostd(I); // compute a two-sided GB of I
+J; // prints generators of J  
+@c example
+@end smallexample
+
+The output has plenty of elements in each degree (which is the same as length 
+because of the degree ordering), what hints at potentially infinite Groebner basis. 
+Indeed, one can show that for every @math{i>=2} the ideal @math{J} contains an element 
+with the leading monomial @math{x y^i z}.
 
 @c ---------------------------------------------------------------------------
 @node Functionality and release notes of Letterplace
@@ -106,29 +243,39 @@ We work further on implementing more algorithms for non-commutative ideals and m
 
 With the present functionality it is possible to compute two-sided Groebner basis
 of an arbitrary two-sided ideal in a free associative algebra up to a given degree.
-The weights of variables are determined by the current monomial ordering.
+
+The weights of variables are nonnegative and are determined by the current monomial ordering.
 
 Restrictions/conventions of the @sc{Letterplace} subsystem:
 @itemize
-@item Since free algebra is not Noetherian, one has to define an explicit degree (length) bound,
-up to which a partial Groebner basis will be computed. Note, that @code{freeAlgebra (letterplace)} call stores the bound
-in the structure of the ring it creates. Thus running @code{twostd (letterplace)} or @code{rightstd (letterplace)} in such a
-ring does not require the degree bound in its argument.
-@item The options @code{redSB, redTail} are effective for Groebner basis computations,
+@item Since free algebra is not Noetherian, one has to work with explicitly fixed degree (length) bound,
+up to which a partial Groebner basis will be computed. The initialization
+routine @code{freeAlgebra (letterplace)} constructs the ring with this bound. 
+For increasing the length bound one needs to define another ring and to use 
+@code{imap} for mapping the objects over. 
+@item All the computations happen up to the explicitly fixed length bound.
+@item The options @code{redSB, redTail} are effective for computations involving Groebner bases,
 @item The options @code{prot, mem} are effective for the whole @sc{Letterplace} subsystem.
+@item For monomial orderings, which are not compatible with the length, the following error
+message might appear: 
+@code{degree bound of Letterplace ring is 11, but at least 12 is needed for this multiplication}
+In such a situation, activating @code{option(redSB)}, @code{option(redTail)} and increaing the
+length (degree) bound might help. Though there are situations, where nothing leads to a finite
+computation.
 @end itemize
 
-Operations for polynomials in Letterplace rings are @code{+} (addition),
-@code{-} (subtraction), @code{*} (multiplication) and @code{^} (power).
+Operations for polynomials in Letterplace rings are the usual ones: 
+@code{+} (addition), @code{-} (subtraction), @code{*} (multiplication) and @code{^} (power).
 
-Functions for objects from Letterplace rings are: @ref{twostd (letterplace)}, @ref{rightstd (letterplace)}, @ref{reduce (letterplace)}. Also, the functions @ref{bracket}, @ref{maxideal} and @ref{std} (an alias for @ref{twostd (letterplace)}) work within letterplace rings:
+@c Functions for objects from Letterplace rings are: @ref{twostd BR_LETTERPLACE_BR}, @ref{rightstd BR_LETTERPLACE_BR}, @ref{reduce BR_LETTERPLACE_BR}.
+
+The functions @ref{bracket}, @ref{maxideal} and @ref{std} (an alias for @ref{twostd BR_LETTERPLACE_BR}) also work within letterplace rings:
 
 @smallexample
 @c example
 LIB "freegb.lib";
-ring r = 0,(x,y,z),dp;
-def R = freeAlgebra(r, 5);  // degree (length) bound 5; the ordering will be degree right lex
-setring R;
+ring r = 0,(x,y,z),dp; // the ordering will be degree right lex
+ring R = freeAlgebra(r, 5);  // degree (length) bound is 5
 // maxideal in a letterplace ring:
 print(matrix(maxideal(2))); // all monomials of length 2
 // bracket in a letterplace ring:
@@ -139,11 +286,11 @@ bracket(f,x,2);
 @c example
 @end smallexample
 
-Further functionality is provided in the libraries for the @sc{Letterpace} subsystem.
+Further functionality is provided in the libraries for the @sc{Letterpace} subsystem: 
+see @ref{LETTERPLACE libraries} for details.
 
-In the @ref{freegb_lib} one finds e.g. Letterplace arithmetics procedures, conversion tools,
-procedures for creating some common ideals of relations as well as the normal form
-procedure, providing effective ideal membership test.
+In the @ref{freegb_lib} one finds e.g. Letterplace initialization together with 
+legacy, conversion and convenience tools.
 
 The @ref{fpadim_lib} contains procedures for computations with vector space basis
 of a factor algebra including finiteness check and dimension computation.
@@ -159,10 +306,10 @@ The @ref{ncfactor_lib} contains the procedure @code{ncfactor} for factorizing po
 See
 @ref{bracket};
 @ref{maxideal};
-@ref{reduce (letterplace)};
-@ref{rightstd (letterplace)};
-@ref{std (letterplace)};
-@ref{twostd (letterplace)}.
+@ref{reduce BR_LETTERPLACE_BR};
+@ref{rightstd BR_LETTERPLACE_BR};
+@ref{std BR_LETTERPLACE_BR};
+@ref{twostd BR_LETTERPLACE_BR}.
 @c ref
 
 @c ---------------------------------------------------------------------------
@@ -184,6 +331,10 @@ The next stage started in 2017, when K. Abou Zeid joined the team of
 H. Schoenemann and V. Levandovskyy. Those recent activities led to the change
 of interface to the one, usual in the free algebra. The Letterplace data structure
 is still at heart of the implementation, though not explicitly visible by default.
+It has been generalized to support @math{Z} as coefficient ring (together 
+with T. Metzlaff (RWTH Aachen and INRIA Sophia Antipolis)); to support bimodules and 
+compute syzygies and lifts, to name a few.
+We are grateful to L. Schmitz (RWTH Aachen) for his contributions to the development.
 
 References:
 
@@ -194,6 +345,15 @@ References:
 [LSS13]: Viktor Levandovskyy, Grischa Studzinski and Benjamin Schnitzler , "Enhanced Computations of Groebner Bases in Free Algebras as a New Application of the Letterplace Paradigm", Proc. ISSAC 2013, ACM Press, 259-266, see @url{https://doi.org/10.1145/2465506.2465948}.
 
 [L14]: Roberto La Scala, "Extended letterplace correspondence for nongraded noncommutative ideals and related algorithms", International Journal of Algebra and Computation, Volume 24, Number 08, Pages 1157-1182, 2014, see also @url{https://doi.org/10.1142/S0218196714500519}.
+
+[Mora16]: Teo Mora, "Solving Polynomial Equation Systems IV: Volume 4, Buchberger Theory and Beyond.", 
+Cambridge University Press, 2016.
+
+[LMZ20]: Viktor Levandovskyy, Tobias Metzlaff and Karim Abou Zeid, "Computation of free non-commutative Groebner Bases over @math{Z} with @sc{Singular:Letterplace}", Proc. ISSAC 2020, accepted
+
+[LSZ20]: Viktor Levandovskyy, Hans Schoenemann  and Karim Abou Zeid, "@sc{Letterplace} - a Subsystem of @sc{Singular} for  computations with free algebras via Letterplace Embedding", Proc. ISSAC 2020, accepted
+
+[LMSZ20]: Viktor Levandovskyy, Tobias Metzlaff, Hans Schoenemann and Karim Abou Zeid, "Groebner Bases over @math{K<X>} and @math{Z<X>} in theory and practice", Proc. ICMS 2020, accepted
 
 @c ---------------------------------------------------------------------------
 
@@ -216,9 +376,13 @@ Note, that both @strong{Control structures} and @strong{System variables} of
 
 @menu
 * freeAlgebra BR_LETTERPLACE_BR::
+* lift BR_LETTERPLACE_BR::
+* liftstd BR_LETTERPLACE_BR::
+* ncgen ::
 * reduce BR_LETTERPLACE_BR::
 * rightstd BR_LETTERPLACE_BR::
 * std BR_LETTERPLACE_BR::
+* syz BR_LETTERPLACE_BR::
 * twostd BR_LETTERPLACE_BR::
 @end menu
 
@@ -245,11 +409,11 @@ it encodes, otherwise.
 @c example
 LIB "freegb.lib";
 ring r = 0,(x,y,z),dp;
-def R = freeAlgebra(r, 7); // this ordering is degree right lex
+ring R = freeAlgebra(r, 7); // this ordering is degree right lex
 R;
 attrib(R,"isLetterplaceRing");
 ring r2 = 0,(x,y,z),lp;
-def R2 = freeAlgebra(r2, 5); // note, that this ordering is NOT left or right lex
+ring R2 = freeAlgebra(r2, 5); // note, that this ordering is NOT left or right lex
 R2;
 attrib(R2,"isLetterplaceRing");
 @c example
@@ -259,6 +423,137 @@ attrib(R2,"isLetterplaceRing");
 See @ref{Monomial orderings on free algebras}.
 @c ref
 
+@c -------------------------------------------------
+@node lift BR_LETTERPLACE_BR
+@subsection lift BR_LETTERPLACE_BR
+@cindex lift BR_LETTERPLACE_BR
+@table @code
+@item @strong{Syntax:}
+@code{lift (} ideal_expression@code{,} subideal_expression @code{)}
+@*@code{lift (} module_expression@code{,} submodule_expression @code{)}
+@item @strong{Type:}
+matrix
+@item @strong{Purpose:}
+computes the transformation matrix which expresses the generators of a
+subbimodule in terms of the generators of a bimodule.
+@* More precisely, if @code{m} is the
+module (or ideal), @code{sm} the submodule (or ideal),
+and @code{T} the transformation matrix returned by
+lift, then the substitution of each @code{ncgen(i)} in
+@code{T} by the @code{m[i]} delivers a matrix, say @code{N}.
+The @code{i}-th generator of @code{sm} is equal to the sum of
+elements in the @code{i}-th column of @code{N}.
+@item @strong{Note:}
+Gives a warning if @code{sm} is not a submodule.
+@item @strong{Note:}
+The procedure @ref{testLift} can be used for testing the result.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "freegb.lib";
+ring r = 0,(x,y),(c,Dp);
+ring R = freeAlgebra(r, 7, 2);
+ideal I = std(x*y*x + 1);
+print(matrix(I));
+ideal SI = x*I[1]*y + y*x*I[2], I[1]*y*x + I[2]*y;
+matrix T = lift(I, SI);
+print(T);
+print(matrix(SI)); // the original generators
+print(matrix(testLift(I,T))); // test for the result of lift
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ideal};
+@ref{module}
+@ref{twostd BR_LETTERPLACE_BR};
+@ref{syz BR_LETTERPLACE_BR};
+@ref{liftstd BR_LETTERPLACE_BR}.
+@c ref
+@c -----------------------------------------
+@node liftstd BR_LETTERPLACE_BR
+@subsection liftstd BR_LETTERPLACE_BR
+@cindex liftstd BR_LETTERPLACE_BR
+@table @code
+@item @strong{Syntax:}
+@code{liftstd (} ideal_expression@code{,} matrix_name @code{)}
+@*@code{liftstd (} module_expression@code{,} matrix_name @code{)}
+@*@code{liftstd (} ideal_expression@code{,} matrix_name@code{,} module_name @code{)}
+@*@code{liftstd (} module_expression@code{,} matrix_name@code{,} module_name @code{)}
+@item @strong{Type:}
+ideal or module
+@item @strong{Purpose:}
+returns a Groebner basis of a two-sided ideal or a bimodule and
+the transformation matrix from the given ideal, resp.@: module, to the
+Groebner basis from the output.
+@*That is, if  @code{m} is the
+module (or ideal), @code{sm} the submodule (or ideal),
+and @code{T} the transformation matrix returned by
+lift, then the substitution of each @code{ncgen(i)} in
+@code{T} by the @code{m[i]} delivers a matrix, say @code{N}.
+The @code{i}-th generator of @code{sm} is equal to the sum of
+elements in the @code{i}-th column of @code{N}.
+@*In an optional third argument the syzygy bimodule will be returned.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "freegb.lib";
+ring r = 0,(x,y),(c,Dp);
+ring R = freeAlgebra(r, 7, 2);
+ideal I = x*y*x + 1;
+matrix T; module S;
+ideal SI = liftstd(I,T,S);
+print(matrix(SI));
+print(matrix(testLift(I,T))); // test for the result of lift
+S; // the bisyzygy module of I
+testSyz(I,S);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ideal};
+@ref{twostd BR_LETTERPLACE_BR};
+@ref{syz BR_LETTERPLACE_BR};
+@ref{lift BR_LETTERPLACE_BR}.
+@c ref
+
+@c ----------------------------------------
+@node ncgen
+@subsection ncgen
+@cindex ncgen
+
+@table @code
+@item @strong{Syntax:}
+@code{ncgen (} int_expression @code{)}
+@item @strong{Type:}
+poly
+@item @strong{Purpose:}
+returns the i-th free non-commutative generator of a free bimodule.
+@item @strong{Note:}
+@code{ncgen} in bimodules is used together with the commutative @code{gen},
+which encodes the component or the position in a vector.
+@item @strong{Example:}
+@smallexample
+@c example
+  LIB"freegb.lib";
+  ring r= 0,(x,y),dp;
+  ring R = freeAlgebra(r,4,3); // R supports free bimodule up to rank 3
+  typeof(ncgen(2));
+  vector v = [ncgen(1)*x, x*ncgen(2), y*ncgen(3)*x];
+  v;
+  print(v*x);
+  print(x*v);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{freeAlgebra BR_LETTERPLACE_BR};
+@ref{module};
+@ref{vector}.
+@c ref
 
 @c ------------------------------
 @node reduce BR_LETTERPLACE_BR
@@ -289,7 +584,7 @@ default
 @item 1
 consider only the leading term and do no tail reduction.
 @item 2
-tail reduction:n the local/mixed ordering case: reduce also with bad ecart
+tail reduction: in the local/mixed ordering case: reduce also with bad ecart
 @item 4
 reduce without division, return possibly a non-zero constant multiple of the remainder
 @end itemize
@@ -303,7 +598,7 @@ can be computed by the procedure @ref{lpDivision} from @ref{freegb_lib}.
 @c example
 LIB "freegb.lib";
 ring r = 0,(x,y),dp;
-def R = freeAlgebra(r,5); setring R;
+ring R = freeAlgebra(r,5);
 ideal I = x*x + y*y - 1; // 2D sphere
 ideal J = twostd(I); // computes a two-sided Groebner basis
 J; // it is finite and nice
@@ -320,7 +615,8 @@ reduce(x*y*y*x - y*x*x,std(0)); //image of h above
 
 @c ref
 See also
-@ref{twostd BR_LETTERPLACE_BR}.
+@ref{twostd BR_LETTERPLACE_BR},
+@ref{lift BR_LETTERPLACE_BR}.
 @c ref
 
 @c ------------------------------
@@ -330,17 +626,19 @@ See also
 @table @code
 @item @strong{Syntax:}
   @code{rightstd(} ideal_expression@code{)};
+  @code{rightstd(} module_expression@code{)};
 @item @strong{Type:}
-ideal
+ideal or module
 @item @strong{Purpose:}
-Compute a right Groebner basis of the set of generators of the input ideal.
-It is also effective in factor rings.
+Compute a right Groebner basis of the set of generators of the input ideal/module.
+@item @strong{Note:} It is effective also in factor rings.
+@item @strong{Example:}
 @smallexample
 @c example
 LIB "freegb.lib";
 ring r = 0,(x,z),dp;
-def R = freeAlgebra(r,7); setring R;
-ideal I = z,x*z,x*x*z;
+ring R = freeAlgebra(r,7);
+ideal I = z, x*z, x*x*z;
 rightstd(I); // a right GB of I in K<x,z>
 qring Q = twostd(x*z); // now we change to the factor algebra modulo x*z
 ideal I = imap(R,I);
@@ -358,11 +656,50 @@ reduce(I,twostd(0)); // an explanation for the latter
 @table @code
 @item @strong{Syntax:}
   @code{std(} ideal_expression@code{)};
+  @code{std(} module_expression@code{)};
 @item @strong{Type:}
-ideal
+ideal or module
 @item @strong{Purpose:}
 Alias to @ref{twostd BR_LETTERPLACE_BR}.
 @end table
+
+@c -------------------------------------------------
+@node syz BR_LETTERPLACE_BR
+@subsection syz BR_LETTERPLACE_BR
+@cindex syz BR_LETTERPLACE_BR
+@table @code
+@item @strong{Syntax:}
+@code{syz (} ideal_expression @code{)}
+@*@code{syz (} module_expression @code{)}
+@item @strong{Type:}
+module
+@item @strong{Purpose:}
+computes the first syzygy (i.e., the module of relations of the given
+generators) bimodule of the ideal, resp.@: module.
+@*If @code{option(returnSB)} is set, a Groebner basis is returned, otherwise a generating set.
+@item @strong{Example:}
+@smallexample
+@c example
+  LIB "freegb.lib";
+  ring r = 0,(x,y),(c,Dp);
+  ring R = freeAlgebra(r, 7, 2);
+  ideal I = twostd(x*y*x + 1);
+  I;
+  module S = syz(I);
+  print(S);
+  testSyz(I,S);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ideal};
+@ref{lift BR_LETTERPLACE_BR};
+@ref{liftstd BR_LETTERPLACE_BR};
+@ref{module};
+@ref{ncgen};
+@ref{option}.
+@c ref
 
 @c ------------------------------
 @node twostd BR_LETTERPLACE_BR
@@ -372,6 +709,7 @@ Alias to @ref{twostd BR_LETTERPLACE_BR}.
 @table @code
 @item @strong{Syntax:}
   @code{twostd(} ideal_expression@code{)};
+  @code{twostd(} module_expression@code{)};
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
@@ -382,7 +720,7 @@ generated by the input, which is treated as a set of two-sided generators.
 @c example
 LIB "freegb.lib";
 ring r = 3,(x,d),dp; // notice: we work over Z/3Z
-def R = freeAlgebra(r,5); setring R;
+ring R = freeAlgebra(r,5);
 ideal I = x^4, d^3, d*x - x*d - 1;
 twostd(I); // a proper ideal, note x^3 as a generator
 ideal J = x^2, d^3, d*x - x*d - 1;
@@ -397,6 +735,17 @@ twostd(J);
 @c example
 @end smallexample
 @end table
+@c ref
+See
+@ref{ideal};
+@ref{lift BR_LETTERPLACE_BR};
+@ref{liftstd BR_LETTERPLACE_BR};
+@ref{module};
+@ref{ncgen};
+@ref{option};
+@ref{rightstd BR_LETTERPLACE_BR};
+@ref{syz BR_LETTERPLACE_BR}.
+@c ref
 
 
 @c ---------------------------------------------------------------------------
@@ -409,10 +758,11 @@ twostd(J);
 * Monomial orderings on free algebras::
 * Groebner bases for two-sided ideals in free associative algebras::
 * Letterplace correspondence::
+* Bimodules and syzygies and lifts::
 @end menu
 
 @c ---------------------------------------------------------------------------
-@node Free associative algebras, Monomial orderings on free algebras, , Mathematical background BR_LETTERPLACE_BR
+@node Free associative algebras
 @subsection Free associative algebras
 @cindex Free associative algebras
 @cindex free associative algebra, tensor algebra
@@ -445,16 +795,14 @@ such that @math{I} is given via its @strong{finite} Groebner basis @math{G}.
 @cindex Monomial orderings on free algebras
 
 @c Leo's code
-Monomial orderings are of critical importance when dealing with Groebner bases.
-Especially in the non-commutative Groebner theory up to a degree (length) bound it might be vital
-to have many choices for orderings since it is not guaranteed that there exists a finite Groebner
-bases with respect to the given ordering.
-
+We provide many types of orderings for non-commutative Groebner bases up to a degree (length) bound.
+In general it is not clear, whether a given generating set has a finite Groebner
+bases with respect to some ordering.
 
 Let @math{X} = @{@math{x_1},@dots{},@math{x_n}@} be a set of symbols. A total ordering < on the free monoid @math{< X >} with @math{1} as the neutral element is called a @strong{monomial ordering} if
 @itemize
 @item it is a well-ordering, i.e., every non empty subset has a least element with respect to <, and
-@item it respects multiplication, that is @math{u < v} implies @math{aub < avb} for all @math{u}, @math{v}, @math{a} and @math{b} in @math{<X>}.
+@item it is compatible with multiplication, that is @math{u < v} implies @math{aub < avb} for all @math{u}, @math{v}, @math{a} and @math{b} in @math{<X>}.
 @end itemize
 Note that the latter implies @math{1 <= m} for all @math{m} in @math{<X>}.
 
@@ -471,16 +819,17 @@ there exists @math{u} in < @math{X} > with @math{u} != @math{1\}, @math{au=b} or
 
 @item
 @tex
-$\exists u,\,v,\,w\in \langle X\rangle\;\exists x_i,\,x_j\in X: a=ux_iv,\;b=ux_jw$ and $i>j$ holds.
+$\exists u,\,v,\,w\in \langle X\rangle\;\exists x_i,\,x_j\in X: a=ux_iv,\;b=ux_jw$ and $i<j$ holds.
 @end tex
 
 @ifinfo
-there exists @math{u}, @math{v}, @math{w} in @math{<X>} and there exists @math{x_i}, @math{x_j} in @math{X} such that @math{a=ux_i v}, @math{b=ux_j w} and @math{i>j} holds.
+there exists @math{u}, @math{v}, @math{w} in @math{<X>} and there exists @math{x_i}, @math{x_j} in @math{X} such that @math{a=ux_i v}, @math{b=ux_j w} and @math{i<j} holds.
 @end ifinfo
 
 @end itemize
 
-@strong{Note}: left lex is @strong{not} a monomial ordering, though it is a natural choice to break ties in further definitions.
+@strong{Note}: left lex is @strong{not} a monomial ordering, though it is a natural choice to break ties 
+after, say, comparing elements by the total degree.
 
 In a similar manner one can define the @strong{right lexicographical ordering}.
 
@@ -505,24 +854,29 @@ $N_0$
 @ifinfo
 @math{N_0}
 @end ifinfo
-for @math{1 <= i <= n}. As a special case, define the @strong{length}
+for @math{1 <= i <= n}. 
+
+As a special case, define the @strong{length}
 @tex
 len:$ \langle X\rangle\rightarrow N_0$
 @end tex
 @ifinfo
 @math{len:<X>->N_0}
 @end ifinfo
- by @math{len(x_i)=1} for @math{1 <= i <= n}. For any ordering << on @math{<X>} and any weight
+ by @math{len(x_i)=1} for @math{1 <= i <= n}. 
+ 
+For any ordering << on @math{<X>} and any weight
 @tex
 $w: \langle X\rangle\rightarrow N_0$
 @end tex
 @ifinfo
 @math{w:<X>->N_0}
 @end ifinfo
- define an ordering <, the @math{w}-@strong{weight extension of} << as follows: For arbitrary @math{a}, @math{b} in @math{<X>} we say that @math{a<b} if
+ define an ordering @math{<}, called the @math{w}-@strong{weight extension of} @math{<<} as follows: 
+ For arbitrary @math{a}, @math{b} in @math{<X>} we say that @math{a<b} if
 @itemize
 @item @math{w(a)<w(b)} or
-@item @math{w(a)=w(b)} and @math{a}<<@math{b} holds.
+@item @math{w(a)=w(b)} and @math{a<<b} holds.
 @end itemize
 An ordering < on @math{<X>} @strong{eliminates} a certain subset
 @tex
@@ -533,6 +887,7 @@ $\emptyset\not=Y\subset X$ if for all $f\in K\langle X\rangle\setminus\{0\}$ one
 @end ifinfo
 
 In a ring declaration, @sc{Letterplace} supports the following monomial orderings.
+
 We illustrate each of the available choices by an example on the free monoid @math{<x_1},@math{x_2},@math{x_3>},
 where we order the monomials
 @math{x_1 x_1 x_1}, @math{x_3 x_2 x_1}, @math{x_1 x_2 x_3}, @math{x_3 x_3 x_3}, @math{x_3 x_1}, @math{x_2 x_2}, @math{x_1 x_3}, @math{x_2 x_3}, @math{x_1}, @math{x_2} and @math{x_3} correspondingly.
@@ -607,10 +962,9 @@ The examples are generated by the following code but with customized orderings d
 @c example
 LIB "freegb.lib";
 ring r = 0, (x1,x2,x3),Dp; // variate ordering here
-def R = freeAlgebra(r, 4);
-setring R;
+ring R = freeAlgebra(r, 4);
 poly wr = x1*x1*x1+x3*x3*x3+x1*x2*x3+x3*x2*x1+x2*x2+x2*x3+x1*x3+x3*x1+x1+x2+x3;
-wr;
+wr; // polynomial will be automatically ordered according to the ordering on R
 @c example
 @end smallexample
 
@@ -619,6 +973,8 @@ wr;
 @subsection Groebner bases for two-sided ideals in free associative algebras
 @cindex Groebner bases for two-sided ideals in free associative algebras
 @cindex Groebner bases in free associative algebras
+@cindex Groebner-Shirshov bases in free associative algebras
+@cindex Groebner-Shirshov bases
 
 @c Hence the notions like a leading monomial and a leading coefficient transfer to this situation.
 
@@ -641,6 +997,8 @@ We say that a subset $G \subset I$ is a \textbf{(two-sided) Groebner basis} for 
 $lm(g)$ divides $lm(f)$.
 @end tex
 
+The notion of @strong{Groebner-Shirshov} basis applies to more general algebraic structures,
+but means the same as Groebner basis for associative algebras.
 
 @ifinfo
 For a subset @math{G} in @math{K< x_1},@dots{},@math{x_n > =: T},
@@ -652,7 +1010,7 @@ We say that a subset @math{G} of @math{I} is a @strong{(two-sided) Groebner basi
 @end ifinfo
 
 Suppose, that the weights of the ring variables are strictly positive.
-We can interprete these weights as defining a nonstandard grading on the ring.
+We can interprete these weights as defining a non-standard grading on the ring.
 If the set of input polynomials is weighted homogeneous with respect to the given
 weights of the ring variables, then computing up to a weighted degree (and thus, also length) bound @math{d}
 results in the @strong{truncated Groebner basis} @math{G(d)}. In other words, by trimming elements
@@ -661,6 +1019,104 @@ of degree exceeding @math{d} from the complete Groebner basis @math{G}, one obta
 In general, given a set @math{G(d)}, which is the result of Groebner basis computation
 up to weighted degree bound @math{d}, then
 it is the complete finite Groebner basis, if and only if @math{G(2d-1)=G(d)} holds.
+
+@strong{Note:} If the set of input polynomials is @strong{not} weighted homogeneous with respect to the 
+ weights of the ring variables, and a Groebner is @strong{not} finite, then actually not much can be
+ said precisely on the properties of the given ideal. By increasing the length bound bigger generating
+ sets will be computed, but in contrast to the weighted homogeneous case some polynomials in
+ of small length first enter the basis after computing up to a much higher length bound.
+
+@c ---------------------------------------------------------------------------
+@node Bimodules and syzygies and lifts
+@subsection Bimodules and syzygies and lifts
+@cindex Bimodules
+@cindex Syzygy bimodule
+@cindex Bisyzygy
+
+@c Bimodules, (bi-)syzygies and lifts
+
+Let @math{A = K} @math{<x_1},@dots{},@math{x_n >} be the free algebra.
+A free bimodule of rank @math{r} over @math{A} is
+@tex
+$A e_1 A \oplus \ldots \oplus A e_r A$,
+@end tex
+@ifinfo
+@math{A e_1 A} + @dots{} + @math{A e_r A},
+@end ifinfo
+where @math{e_i} are the generators of the free bimodule.
+
+NOTE: these @math{e_i} are freely non-commutative with respect to
+elements of @math{A} except constants from the ground field @math{K}.
+
+The free bimodule of rank 1 @math{AeA} surjects onto the algebra @math{A} itself.
+A two-sided ideal of the algebra @math{A} can be converted to a subbimodule of @math{AeA}.
+
+The @strong{syzygy bimodule} or even @strong{module of bisyzygies}
+of the given finitely generated subbimodule
+@tex
+$N = \langle g_1,\ldots,g_m \rangle \subset \bigoplus_{i=1}^r A e_i A$
+@end tex
+@ifinfo
+@math{N = < g_1},@dots{},@math{g_m > \subset \bigoplus_{i=1}^r A e_i A}
+@end ifinfo
+is the kernel of the natural homomorphism of @math{A}-bimodules
+@tex
+$
+\bigoplus_{j=1}^m A \epsilon_j A \longrightarrow \bigoplus_{i=1}^r A e_i A,
+\;
+\epsilon_j  \mapsto g_j,
+$
+@end tex
+that is 
+@tex
+$\sum_{j=1}^m \sum_k  \ell_{jk} \epsilon_j r_{jk}
+\mapsto \sum_{j=1}^m \sum_k \ell_{jk} g_j r_{jk}.
+$
+@end tex
+@ifinfo
+@display
+\bigoplus_{j=1}^m A \epsilon_j A \longrightarrow \bigoplus_{i=1}^r A e_i A,
+\;
+\epsilon_j  \mapsto \sum_k \ell_{jk} g_j r_{jk},
+@end display
+that is 
+@display
+\sum_{j=1}^m \sum_k  \ell_{jk} \epsilon_j r_{jk}
+\mapsto \sum_{j=1}^m \sum_k \ell_{jk} g_j r_{jk}.
+@end display
+@end ifinfo
+
+The syzygy bimodule is in general not finitely generated. 
+Therefore as a bimodule, both the set of generators of the 
+syzygy bimodule and its Groebner basis 
+are computed up to a specified length bound.
+
+
+@c lifting
+Given a subbimodule @math{N} of a bimodule @math{M}, the @strong{lift(ing)} process
+returns a matrix, which encodes the expression of generators @math{N_1, \ldots, N_s} 
+in terms of generators of @math{M_1, \ldots, M_m} like this:
+@tex
+$N_i = \sum_{j=1}^m \sum_k \ell_{jk} M_j r_{jk} = \sum_{j=1}^m T_{ij} M_j,$
+@end tex
+@ifinfo
+@display
+N_i = \sum_{j=1}^m \sum_k \ell_{jk} M_j r_{jk} = \sum_{j=1}^m T_{ij} M_j,
+@end display
+@end ifinfo
+
+where T_ij are elements from the enveloping algebra 
+@tex
+$R \langle X \rangle \otimes R \langle X \rangle,$
+@end tex
+@ifinfo
+@display
+R \langle X \rangle \otimes R \langle X \rangle,
+@end display
+@end ifinfo
+encoded as elements of the free bimodule of rank @math{m},
+namely by using the non-commutative generators of the
+free bimodule which we call @code{ncgen}.
 
 
 @c ---------------------------------------------------------------------------
@@ -692,7 +1148,7 @@ via the double-indexed letterplace
 and @math{N} is the semigroup of natural numbers, starting with 1 as the first possible place.
 Note, that the letterplace algebra @math{K[X \times N]} is an infinitely generated commutative polynomial @math{K}-algebra.
 Since @math{K<} @math{x_1},@dots{},@math{x_n} @math{>} is not Noetherian, it is common to perform the computations with
-its ideals and modules up to a given degree bound.
+its ideals and modules up to a given length (degree) bound.
 @end ifinfo
 
 @tex
@@ -708,8 +1164,9 @@ In [LL09] a natural shifting on letterplace polynomials was introduced and used.
 Indeed, there is 1-to-1 correspondence between two-sided ideals
 of a free algebra and so-called letterplace ideals in the letterplace algebra,
 see [LL09], [LL13], [LSS13] and [L14] for details.
-Note, that first this correspondence was established for graded ideals.
-All the computations take place in the letterplace algebra.
+Note, that first this correspondence was established for graded ideals, but holds more
+generally for arbitrary ideals and subbimodules of a free bimodule of a finite rank.
+All the computations internally take place in the Letterplace algebra.
 
 A letterplace monomial of length @math{m} is a monomial of a letterplace algebra,
 such that its @math{m} places are exactly 1,2,@dots{},@math{m}.
@@ -727,6 +1184,10 @@ $K$-algebra operations of the letterplace algebra \textbf{and} simultaneous shif
 @math{K}-algebra operations of the letterplace algebra @strong{and} simultaneous shifting of places by any natural number @math{n}.
 @end ifinfo
 
+@strong{Note:} Letterplace correspondence naturally extends to the correspondence over
+@math{R<} @math{x_1},@dots{},@math{x_n} @math{>}, where @math{R} is a 
+commutative unital ring. The case @math{R=Z} is implemented, in addition to 
+@math{R} being a field.
 
 @c ---------------------------------------------------------------------------
 @node LETTERPLACE libraries
@@ -734,14 +1195,20 @@ $K$-algebra operations of the letterplace algebra \textbf{and} simultaneous shif
 @cindex LETTERPLACE libraries
 @cindex Letterplace libraries
 
+The content of libraries, created for @sc{Letterplace} is described in the following subsections.
+
+Use the @code{LIB} command for loading of single libraries.
+
 @menu
-* fpadim_lib::  Vector space dimension, basis and Hilbert series for finitely presented algebras (Letterplace)
-* fpalgebras_lib:: Numerous algebras predefined for the Letterplace case
-* fpaprops_lib:: Algorithms for properties of quotient algebras in the Letterplace case
-* freegb_lib::  Two-sided Groebner bases in free algebras via Letterplace
-* ncHilb_lib:: Hilbert functions for non-commutative algebras via Letterplace
-* ncrat_lib::  Handling non-commutative rational functions
+* fpadim_lib:: Vector space dimension, basis and Hilbert series for finitely presented algebras
+* fpalgebras_lib:: Numerous predefined finitely presented algebras
+* fpaprops_lib:: Algorithms for properties of finitely presented algebras
+* freegb_lib:: Initialization and convenience tools for Letterplace
+* ncHilb_lib:: Hilbert functions for non-commutative finitely presented algebras
+* ncrat_lib:: Handling non-commutative rational functions
 @end menu
+
+See also @ref{ncfactor_lib} for the factorization of polynomials in noncommutative algebras.
 
 @c ----------------------------------------------------------
 @node fpadim_lib
@@ -768,3 +1235,85 @@ $K$-algebra operations of the letterplace algebra \textbf{and} simultaneous shif
 @subsection ncrat_lib
 Status: experimental
 @c lib ncrat.lib
+
+@c ----------------------------------------------------------
+@node Release Notes BR_LETTERPLACE_BR
+@section Release Notes BR_LETTERPLACE_BR
+@cindex Release Notes BR_LETTERPLACE_BR
+@ifclear VERSION
+@include version.texi
+@end ifclear
+
+@majorheading NEWS in SINGULAR:LETTERPLACE @value{VERSION}
+
+@ifclear singularmanual
+@macro nref{what}
+\what\
+@end macro
+@end ifclear
+
+@ifset singularmanual
+@macro nref{what}
+@ref{\what\}
+@end macro
+@end ifset
+
+@heading News for SINGULAR:LETTERPLACE version @value{VERSION}
+New functions:
+@itemize
+@item added support for free bimodules of a fixed rank (@nref{freeAlgebra BR_LETTERPLACE_BR}, @nref{ncgen})
+@item several types of monomial orderings become available, among them three types of elimination orderings
+@item twostd (@nref{twostd (letterplace)}), reduce (@nref{reduce (letterplace)}) and other functions support subbimodules
+@item syz (@nref{syz (letterplace)}), lift (@nref{lift (letterplace)}), liftstd (@nref{liftstd (letterplace)}) implemented
+@item bracket (@nref{bracket}) and maxideal (@ref{maxideal}) work in Letterplace
+@item the options @code{redSB}, @code{redTail} are effective for computations related to Groebner bases
+@item the options @code{prot}, @code{mem} are effective for the whole @sc{Letterplace} subsystem
+@end itemize
+
+
+New libraries:
+@itemize
+@item fpaprops_lib: Algorithms for properties of quotient algebras (@nref{fpaprops_lib})
+@item ncHilb.lib: Hilbert functions for non-commutative algebras (@nref{ncHilb_lib})
+@end itemize
+
+Changed libraries:
+@itemize
+@item fpadim.lib: Vector space dimension, basis and Hilbert series for finitely presented algebras (@nref{fpadim_lib}),
+numerous enhancements, partially implemented in the kernel
+@item freegb.lib: Main initialization and convenience tools (@nref{freegb_lib})
+@end itemize
+
+Changes in the kernel/build system:
+@itemize
+@item SINGULAR:LETTERPLACE is available as the dynamical module
+@item adaptions/functions for @code{Singular.jl}(@uref{https://github.com/oscar-system/Singular.jl})
+@end itemize
+
+@heading News for SINGULAR:LETTERPLACE version 4-1-2
+New libraries:
+@itemize
+@item fpalgebras.lib: Generation of various algebras in the letterplace case (@nref{fpalgebras_lib})
+@item ncrat.lib: Manipulating non-commutative rational functions (@nref{ncrat_lib})
+@end itemize
+
+Changed/updated libraries:
+@itemize
+@item freegb.lib: lpDivision, lpPrint (@nref{freegb_lib})
+@item fpadim.lib (@nref{fpadim_lib})
+@item ncfactor.lib (@nref{ncfactor_lib}) is available for Letterplace rings
+@end itemize
+
+Changes in the kernel/build system:
+@itemize
+@item code for free algebras (letterplace rings) rewritten
+(using now the standard @code{+,-,*,^,std},...) (@nref{LETTERPLACE})
+@item new command @code{rightstd} (@nref{rightstd (letterplace)})
+@item extended @code{twostd} to @sc{Letterplace} (@nref{twostd (letterplace)}, @nref{twostd (plural)})
+@end itemize
+
+
+
+
+
+

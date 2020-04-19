@@ -1,0 +1,435 @@
+// Harm Derksen, hderksen@math.unibas.ch
+////////////////////////////////////////////////////////////////////////////////
+version="version invar.lib 4.1.2.0 Feb_2019 "; // $Id$
+category="Invariant theory";
+info="
+LIBRARY:  invar.lib Procedures to compute invariant rings of SL(n) and torus groups
+AUTHOR: Harm Derksen, hderksen@math.unibas.ch
+
+PROCEDURES:
+  SL(n)                  sets the current group to SL_n
+  torus(n)               sets the current group to an n-dimensional torus
+  torusrep(list m)       representation of a torus given by the weights m[1],m[2],...
+  finiterep(<list>)      representation of a by a list of matrices
+  sympower(m,d)          computes the d-th symmetric power of a representation m
+  invar(m)               computes the invariant ring of the representation m.
+  SLreynolds(f)          applies the Reynolds operator to f
+  torusreynolds(f)       applies the Reynolds operator to f if the group is a torus or a finite group.
+";
+LIB "matrix.lib";
+LIB "finvar.lib"; // for cyclotomic
+
+////////////////////////////////////////////////////////////////////////////////
+// SL(n) sets the current group to SL_n.
+////////////////////////////////////////////////////////////////////////////////
+proc SL(int n)
+"USAGE:   SL(<int>)
+RETURNS: SL(n) sets the current group to SL_n. The following global variables
+          will be set:
+            group        of type <ring>
+            groupideal   of type <ideal>
+            SLrep        of type <matrix>
+            reynolds     of type <proc>
+          The quotient of of `group` and `groupideal` is the coordinate
+          ring of SL_n. The matrix `SLrep` will be set to the standard
+          representation of SL_n. The basering will be set to 'group'.
+EXAMPLE: example SL; shows an example"
+{       ring group=0,(g(1..n^2)),dp;
+        export group;
+        matrix SLrep[n][n];                     // SLrep is a generic n x n
+        int i;                                  // matrix
+        int j;
+        for(i=1;i<=n;i=i+1)
+        {
+          for(j=1;j<=n;j=j+1)
+          {SLrep[i,j]=g(j+n*(i-1));}
+        }
+        ideal groupideal=det(SLrep)-1;          // SL(n) are those matrices m
+        groupideal=std(groupideal);             // with determinant equal to 1.
+        export groupideal;
+        export SLrep;
+        proc reynolds(poly f){return(SLreynolds(f));};
+        export reynolds;
+}
+example
+{"EXAMPLE:"; echo=2;
+  SL(3);
+  Invar::group;
+  groupideal;
+  print(SLrep);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// prod(<list>) just gives the product of all entries of <list>.
+////////////////////////////////////////////////////////////////////////////////
+static proc prod(list #)
+"USAGE: prod(<list>)
+RETURN: the product of all entries of <list>"
+{       if (size(#)==1) {return(#[1]);};
+        return(#[1]*prod(#[2..size(#)]));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// monsum(n,d) is the sum of all monomials in x(1),x(2),...,x(n) of degree d
+////////////////////////////////////////////////////////////////////////////////
+static proc monsum(int n,int d)
+"USAGE: monsum(n,d)
+RETURNS: the sum of all monomials in x(1),x(2),...,x(n) of degree d"
+{       if (n==1) {return(x(1)^d);};
+        poly output=0;
+        for(int i=0;i<=d;i=i+1)
+                {output=output+x(n)^i*monsum(n-1,d-i);};
+        return(output);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// sympower(m,d) computes the d-th symmetric power of a representation m
+////////////////////////////////////////////////////////////////////////////////
+proc sympower(matrix m,int d)
+"USAGE:   sympower(<matrix>,<int>)
+RETURNS: If m is a matrix with coefficients in the ring 'group', representing
+         the action on some vector space V, then sympower(m,n) gives the
+         matrix of the representation of the group on the n-th symmetric
+         power of V.
+EXAMPLE: example sympower; shows an example"
+{       int n=nrows(m);
+        int l=nvars(group);
+        ring r=0,(z,x(1..n),g(1..l)),(dp(1),dp(n),dp(l));
+        matrix mm=imap(group,m);
+        ideal gideal=std(imap(group,groupideal));
+        matrix vx[n][1]=matrix([x(1..n)]);      // vector (x(1),...,x(n))^T
+        poly prodx=prod(x(1..n));               // prodx=x(1)*x(2)*...*x(n)
+        matrix w[n][1]=mm*vx;
+        map act=r,z,ideal(w);
+        poly ms=monsum(n,d);
+        matrix monlist=coef(ms,prodx);          // list of all monomials
+        int j;
+        poly f;
+        matrix q;
+        int s=ncols(monlist);                   // number of monomials
+        matrix sp[s][s];                        // sp : matrix of sym. power
+        for(int i=1;i<=s;i=i+1)
+                {f=monlist[1,i];
+                f=reduce(act(f),gideal)+z*ms;   // z*ms is added because then
+                q=coef(f,prodx);                // all monomials must appear and
+                for(j=1;j<=s;j=j+1)             // coef(f,prodx) has right size.
+                        {sp[i,j]=q[2,j]-z;}};   // Now subtract the z.
+        setring group;
+        return(imap(r,sp));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  SL(2);
+  print(SLrep);
+  print(sympower(SLrep,3));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// invar(m) computes the invariant ring of the representation m.
+////////////////////////////////////////////////////////////////////////////////
+proc invar(matrix m)
+"USAGE:   invar(<matrix>)
+RETURNS: If m is a n x n matrix with coefficients in the ring 'group',
+         representing the action on some vector space V, then invar(m);
+         gives polynomials in x(1),x(2),...,x(n) who generate the invariant
+         ring. The following global variables will be set:
+           polyring        of type <ring>    polynomial ring in x(1),...,x(n)
+           invring         of type <ideal>   entries generate the inv. ring
+           representation  of type <matrix>
+         The base ring will be set to 'polyring' which is a global
+         variable representing the polynomial ring on which the group acts.
+         The variable 'representation' will be set to the input m.
+EXAMPLE: example invar; shows an example
+"
+{
+      int n=nrows(m);
+      int l=nvars(group);
+      matrix representation=m;
+      export representation;
+      ring r=0,(g(1..l),x(1..n),y(1..n)),(dp(l),dp(2*n));
+      matrix mm=imap(group,m);
+      ideal gideal=imap(group,groupideal);
+      matrix vx[n][1]=matrix([x(1..n)]);
+      matrix vy[n][1]=matrix([y(1..n)]);
+      matrix w[1][n]=transpose(vx)*mm-transpose(vy);
+      ideal Gamma=ideal(w),gideal;
+      poly prodg=prod(g(1..l));
+      ideal B=eliminate(Gamma,prodg);
+      print("");
+      print("Ideal B:");
+      print(B);
+      ring polyring=0,(x(1..n)),dp;
+      export polyring;
+      ideal ZFideal=imap(r,B);
+      ZFideal=minbase(ZFideal);
+      print("");
+      print("Zero Fiber Ideal:");
+      print(ZFideal);
+      ideal invring;
+      poly invariant;
+     for(int i=1;i<=size(ZFideal);i=i+1)
+     {invariant=reynolds(ZFideal[i]);
+        if (invariant!=0)
+        {if (invring==0) {invring=invariant;}
+        else {invring=invring,invariant;}}}
+     export invring;
+     print("");
+     print("Generating Invariants:");
+     print(invring);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  SL(2);                          // Take the group SL_2
+  matrix m=dsum(SLrep,SLrep,SLrep,SLrep);
+                                  // 4 copies of the standard representation
+  invar(m);                       // empirical evidence for FFT
+  setring Invar::polyring;
+  Invar::reynolds(x(1)*x(4));            // The reynolds operator is computed using
+                                  // the Omega process.
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// omega(f,n,i_1,i_2,...,i_t) does the following:
+// Let M be the matrix of partial derivatives:
+//
+//     d/d g(1)     d/d g(2)   ...  d/d g(n)
+//    d/d g(n+1)   d/d g(n+2)  ...  d/d g(2n)
+//       .            .        .       .
+//       .            .          .     .
+// d/d g(n^2-n-1) d/d g(n^2-n+2)... d/d g(n^2)
+//
+// Take the submatrix with rows i_1,i_2,...,i_t and columns
+// 1,2,...,t and apply its determinant (a differential operator) to f.
+// i_1,i_2,...,i_t is assumed to be descending.
+//
+// Cramer's rule is used, which gives us a recursion.
+////////////////////////////////////////////////////////////////////////////////
+proc omega(poly f,int n,intvec #)
+"USAGE: omega(f,n,i_1,i_2,...,i_t)
+RETURNS: poly (determinant)
+NOTE:
+Let M be the matrix of partial derivatives:
+
+     d/d g(1)     d/d g(2)   ...  d/d g(n)
+    d/d g(n+1)   d/d g(n+2)  ...  d/d g(2n)
+       .            .        .       .
+       .            .          .     .
+ d/d g(n^2-n-1) d/d g(n^2-n+2)... d/d g(n^2)
+
+Take the submatrix with rows i_1,i_2,...,i_t and columns
+1,2,...,t and apply its determinant (a differential operator) to f.
+i_1,i_2,...,i_t is assumed to be descending.
+
+Cramer's rule is used, which gives us a recursion.
+"
+{       if (#==0) {return(f);};
+        int m=size(#);
+        if (f==0) {return(0);};
+        if (m==0) {return(f);};
+        poly output=0;
+        intvec a;
+        for(int i=1;i<=m;i=i+1)
+                {if (i==1) {if (m>1) {a=#[i+1..m];};}
+                else    {if (m>i) {a=#[1..i-1],#[i+1..m];}
+                        else {a=#[1..i-1];};};
+                output=output+(-1)**(i-1)*omega(diff(f,g((#[i]-1)*n+m)),n,a);};
+        return(output);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// SLreynolds(f) applies the reynolds operator to f, if the group is SL_n,
+// using the omega-process
+////////////////////////////////////////////////////////////////////////////////
+proc SLreynolds(poly f)
+"USAGE: SLreynolds(f) poly f
+RETURNS: the reynolds operator applied to f
+NOTE: if the group is SL_n the omega-process is used"
+{       int nsq=nvars(group);
+        for(int q=1;(q+1)^2<=nsq;q=q+1) {};
+        setring group;
+        int n=nrows(representation);
+        int l=nvars(group);
+        ring r=0,(x(1..n),g(1..l)),(dp(n),dp(l));
+        matrix m=imap(group,representation);
+        ideal gideal=std(imap(group,groupideal));
+        matrix vx[n][1]=matrix([x(1..n)]);      // vector (x(1),...,x(n))^T
+        poly prodx=prod(x(1..n));               // prodx=x(1)*x(2)*...*x(n)
+        matrix w[1][n]=transpose(vx)*m;
+        map act=polyring,ideal(w);
+        poly h=reduce(act(f),gideal);
+        map gtozero=r,x(1..n);
+        poly output=0;number c=1;
+        int i=1;
+        int j;
+        while (h!=0)
+                {output=output+gtozero(h)/c;
+                h=omega(h,q,q..1);
+                for(j=i;j<=i+q-1;j=j+1)
+                        {c=c*j;};
+                i=i+1;};
+        setring polyring;
+        return(imap(r,output));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// torus(n) sets the current group to an n-dimensional torus
+////////////////////////////////////////////////////////////////////////////////
+proc torus(int n)
+"USAGE:   torus(<int>)
+RETURNS: torus(n) sets the current group to an n-dimensional torus. The
+         following global variables will be changed:
+           group        of type <ring>
+           groupideal   of type <ideal>
+           reynolds     of type <proc>
+         The quotient of of `group` and `groupideal` is the coordinate
+         ring of an n-dimensional torus. The basering will be set to
+         'group'.
+EXAMPLE: example torus; shows an example"
+{       ring group=0,(g(1..n+1)),dp;
+        export group;
+        ideal groupideal=prod(g(1..n+1))-1;
+        export groupideal;
+        proc reynolds(poly f){return(torusreynolds(f));};
+        export reynolds;
+}
+example
+{"EXAMPLE:"; echo=2;
+  torus(3);
+  Invar::group;
+  groupideal;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// If m is a list of integer vectors, then torusrep(list m) computes
+// a matrix with entries in the ring 'group' which represents the
+// representation of a torus given by the weights m[1],m[2],...
+////////////////////////////////////////////////////////////////////////////////
+proc torusrep(list m)
+"USAGE:   torusrep(<list>), <list> must be a list of integer vectors of length
+         n, where n is the dimension of the current torusgroup.
+RETURNS: torusrep(m) gives a matrix with entries in 'group'. This matrix
+         represents the action of the torus with weights
+         m[1],m[2],...,m[size(m)]
+EXAMPLE: example torusreynolds; shows an example
+"
+{       int r=size(m[1]);
+        int n=size(m);
+        matrix mm[n][n];
+        int min;
+        poly f;
+        int j;
+        for(int i=1;i<=n;i=i+1)
+                {min=0;
+                for(j=1;j<=r;j=j+1)
+                        {if (m[i][j]<min) {min=m[i][j];};};
+                f=g(r+1)**(-min);
+                for(j=1;j<=r;j=j+1)
+                        {f=f*g(j)**(m[i][j]-min);};
+                mm[i,i]=f;};
+        return(mm);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  torus(1);                  // Take the 1-dimensional torus, the multiplicative group.
+  list weights=-2,-3,7;      // 3-dimensial action with weights -2,-3,7
+  matrix m=torusrep(weights);// compute the matrix of the representation
+  invar(m);                  // compute the invariant ring
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// torusreynolds(f) applies the Reynolds operator to f if the group is
+// a torus or a finite group.
+////////////////////////////////////////////////////////////////////////////////
+proc torusreynolds(poly f)
+"USAGE: torusreynolds(f) - poly f
+"RETURNS: the Reynolds operator applied to f if the group is
+          a torus or a finite group.
+"
+{       setring group;
+        int n=nrows(representation);
+        int l=nvars(group);
+        ring r=0,(x(1..n),g(1..l)),(dp(n),dp(l));
+        ideal gideal=std(imap(group,groupideal));
+        matrix m=imap(group,representation);
+        matrix vx[n][1]=matrix([x(1..n)]);      // vector (x(1),...,x(n))^T
+        matrix w[1][n]=transpose(vx)*m;
+        map act=polyring,ideal(w);
+        poly h=reduce(act(f),gideal);
+        setring polyring;
+        return(imap(r,h));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// finite(n) sets the current group to a finite group of order n.
+////////////////////////////////////////////////////////////////////////////////
+proc finite(int n)
+"USAGE:  finite(<int>)
+RETURNS: finite(n) sets the current group to a finite group of order n.
+         The following global variables will be set:
+           group        of type <ring>
+           groupideal   of type <ideal>
+           reynolds     of type <proc>
+         The basering will be set to 'group'.
+EXAMPLE: example finite; shows an example
+"
+{       ring group=0,(g(1),g(2)),dp(2);
+        export group;
+        ideal groupideal=g(2)^n-1,cyclotomic(n);
+        groupideal=std(groupideal);
+        export groupideal;
+        proc reynolds(poly f){return(torusreynolds(f));};
+        export reynolds;                        // the procedure torusreynolds
+                                                // does exactely the right thing
+                                                // no need to implement
+                                                // 'finitereynolds'
+}
+example
+{"EXAMPLE:"; echo=2;
+  finite(6);                              // The symmetric group S_3
+  matrix id=unitmat(3);                   // identity matrix
+  matrix m3[3][3]=0,1,0,0,0,1,1,0,0;      // corresponds with (1 2 3)
+  matrix m2[3][3]=0,1,0,1,0,0,0,0,1;      // corresponds with (1 2)
+  list a=id,m3,m3*m3,m2,m2*m3,m2*m3*m3;   // all elements of S_3
+  matrix rep=finiterep(a);                // compute matrix of standard repr.
+  invar(rep);                             // compute the invariant ring
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// If m is a list of matrices, then finiterep(m) gives a matrix with
+// coefficients in the ring 'group' which represents the action of the
+// finite group where the elements of the finite group act as
+// m[1],m[2],...m[size(m)].
+////////////////////////////////////////////////////////////////////////////////
+proc finiterep(list m)
+"USAGE:   finiterep(<list>), <list> must be a list of matrices
+RETURNS: finiterep(m) gives a matrix with coefficients in the ring 'group'
+         which represents the action of the finite group where the elements
+         of the finite group act as m[1],m[2],...m[size(m)].
+EXAMPLE: example finiterep; shows an example
+"
+{       int l=size(m);
+        int n=nrows(m[1]);
+        int i;
+        int j;
+        poly h;
+        matrix finiterep[n][n];
+        for(i=0;i<l;i=i+1)
+                {h=0;
+                for(j=0;j<l;j=j+1)
+                        {h=h+g(2)^j*g(1)^((i*j)%l)/l;};
+                finiterep=finiterep+h*m[i+1];}
+        return(finiterep);
+}
+example
+{"EXAMPLE:"; echo=2;
+  finite(6);                              // The symmetric group S_3
+  matrix id=unitmat(3);                   // identity matrix
+  matrix m3[3][3]=0,1,0,0,0,1,1,0,0;      // corresponds with (1 2 3)
+  matrix m2[3][3]=0,1,0,1,0,0,0,0,1;      // corresponds with (1 2)
+  list a=id,m3,m3*m3,m2,m2*m3,m2*m3*m3;   // all elements of S_3
+  matrix rep=finiterep(a);                // compute matrix of standard repr.
+  invar(rep);                             // compute the invariant ring
+}
+

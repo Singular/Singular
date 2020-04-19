@@ -249,13 +249,17 @@ EXAMPLE: example defrings; shows an example
    else { p=#[1]; }
    if (n >26)
    {
-      string s="ring S ="+string(p)+",x(1.."+string(n)+"),ds;";
+    list l1;
+    for (int zz = 1; zz <= n; zz++)
+    {
+     l1[zz] = "x("+string(zz)+")";
+    }
+    ring S = create_ring(p, l1, "ds");
    }
    else
    {
-      string s="ring S ="+string(p)+",("+A_Z("x",n)+"),ds;";
+    ring S = create_ring(p, "("+A_Z("x",n)+")", "ds");
    }
-   execute(s);
    dbprint(printlevel-voice+2,"
 // 'defrings' created a ring. To see the ring, type (if the name R was
 // assigned to the return value):
@@ -285,13 +289,17 @@ EXAMPLE: example defringp; shows an example
    else { p=#[1]; }
    if (n >26)
    {
-      string s="ring P="+string(p)+",x(1.."+string(n)+"),dp;";
+    list l2;
+    for (int zz = 1; zz <= n; zz++)
+    {
+     l2[zz] = "x("+string(zz)+")";
+    }
+    ring P = create_ring(p, l2, "dp");
    }
    else
    {
-     string s="ring P="+string(p)+",("+A_Z("x",n)+"),dp;";
+    ring P = create_ring(p, "("+A_Z("x",n)+")", "dp");
    }
-   execute(s);
    dbprint(printlevel-voice+2,"
 // 'defringp' created a ring. To see the ring, type (if the name R was
 // assigned to the return value):
@@ -760,14 +768,13 @@ EXAMPLE: example preimageLoc ; shows an example
     if(size(ideal(S))>0) /*qring*/
     {
       ideal I=ideal(S);
-      newRing="ring S0=("+charstr(S)+"),("+varstr(S)+"),dp;";
       minpoly_string=string(minpoly);
-      execute(newRing);
+      list l8 = ringlist(S)[2];
+      ring S0 = create_ring(ringlist(S)[1], l8, "dp", "no_minpoly");
       execute("minpoly="+minpoly_string+";");
       ideal I=imap(S,I);
       list pr=primdecGTZ(I);
-      newRing="ring SL=("+charstr(S)+"),("+varstr(S)+"),("+ordstr(S)+");";
-      execute(newRing);
+      ring SL = create_ring(ringlist(S)[1], l8, "("+ordstr(S)+")", "no_minpoly");
       execute("minpoly="+minpoly_string+";");
       list pr=imap(S0,pr);
       ideal I0=std(pr[1][1]);
@@ -798,14 +805,14 @@ EXAMPLE: example preimageLoc ; shows an example
     if(size(ideal(@R))>0) /*qring*/
     {
       ideal J=ideal(@R);
-      newRing="ring R0=("+charstr(@R)+"),("+varstr(@R)+"),dp;";
+      list l9 = ringlist(@R)[2];
       minpoly_string=string(minpoly);
-      execute(newRing);
+      ring R0 = create_ring(ringlist(@R)[1], l9, "dp", "no_minpoly");
       execute("minpoly="+minpoly_string+";");
       ideal J=imap(@R,J);
       list pr=primdecGTZ(J);
-      newRing="ring RL=("+charstr(@R)+"),("+varstr(@R)+"),("+ordstr(@R)+");";
-      execute(newRing);
+      setring(@R);
+      ring RL = create_ring(ringlist(@R)[1], l9, "("+ordstr(@R)+")", "no_minpoly");
       execute("minpoly="+minpoly_string+";");
       list pr=imap(R0,pr);
       ideal J0=std(pr[1][1]);
@@ -1164,7 +1171,7 @@ EXAMPLE: example hasCommutativeVars; shows an example
   return (size(rl)==4);
 }
 example
-{ "EXAMPLE:", echo=2;
+{ "EXAMPLE:"; echo=2;
  ring r=0,(x,y,z),dp;
  hasCommutativeVars(r);
 }

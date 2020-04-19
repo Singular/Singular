@@ -53,7 +53,7 @@ BEGIN
    VALUE "ProductName","Singular\000"
    VALUE "ProductVersion","@SINGULAR_VERSION@\000"
    VALUE "ProductDate", "@VERSION_DATE@\000"
-   VALUE "URL", "http://www.singular.uni-kl.de\000"
+   VALUE "URL", "https://www.singular.uni-kl.de\000"
   END
  END
 END

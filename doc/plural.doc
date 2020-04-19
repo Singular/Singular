@@ -62,7 +62,7 @@ In @sc{Plural} one can only work with @math{G}-algebras and with their factor-al
 by two-sided ideals (@math{GR}-algebras).
 
 @item @sc{Plural} requires a global monomial ordering (see @ref{General definitions for orderings}).
-However, @sc{Sca} provides the possibility of computations in a tensor product of
+However, @sc{Sca} (@ref{Graded commutative algebras (SCA)}) provides the possibility of computations in a tensor product of
 a non-commutative graded commutative algebra (equipped with a global ordering)
 with a commutative algebra (equipped with any ordering).
 
@@ -70,7 +70,10 @@ with a commutative algebra (equipped with any ordering).
 the coefficient field (or a ring) mutually commute with all variables.
 Defining parameters, one @strong{cannot} impose non-commutative relations
 on them. Moreover, it is impossible to introduce parameters which do not commute with variables.
-However, @ref{olga_lib} offers a rich functionality for working within Ore localizations of @math{G}-algebras.
+However, @ref{olga_lib} offers a rich functionality for working within Ore localizations of @math{G}-algebras
+and @ref{ratgb_lib} provides Groebner bases for so-called rational localizations of @math{G}-algebras.
+
+@item @sc{Plural} does not yet support rings like @math{Z} as coefficients.
 @end itemize
 @end table
 
@@ -84,7 +87,7 @@ in the non-commutative case, the correct multiplication of @code{y} by
  @code{x} must be written as @code{y*x}.
 @* Both expressions @code{yx} and @code{xy} are equal, since they are
 interpreted as commutative expressions. See example in @ref{poly expressions BR_PLURAL_BR}.
-@* Note, that @sc{Plural} output consists only of monomials, even when the signs @code{*} are omitted.
+@* Note, that @sc{Plural} output consists only of standard monomials, even when the signs @code{*} are omitted.
 
 @item  @code{ideal} BR_PLURAL_BR
 
@@ -96,12 +99,13 @@ the two-sided Groebner basis of @code{T}.
  Groebner basis of @code{I}.
 
 @item @code{module} BR_PLURAL_BR
-Unless stated otherwise, a @code{module} as understood by @sc{Plural}, is
-@strong{either} a fininitely generated @strong{left} submodule of a free module (of finite rank)
-@* @strong{or} a factor module of a free module (of finite rank) by its left submodule (see @ref{module BR_PLURAL_BR} for details).
+Unless stated otherwise, a @code{module} as understood by @sc{Plural} 
+is @strong{either} a finitely generated @strong{left} submodule of a free module (of finite rank)
+@* @strong{or} a factor module of a free module (of finite rank) by its left submodule (see @ref{module BR_PLURAL_BR} for details). The concrete interpretation left to a function.
 
 @item @code{qring} BR_PLURAL_BR
-In @sc{Plural} it is only possible to build factor-algebras modulo @strong{two-sided} ideals (see @ref{qring BR_PLURAL_BR}).
+It is only possible to build factor-algebras modulo @strong{two-sided} ideals (see @ref{qring BR_PLURAL_BR}), which have
+to be given via their two-sided Groebner basis (see @ref{twostd BR_PLURAL_BR}).
 @end table
 
 @c ----------------------------------------------------------------------------
@@ -447,14 +451,11 @@ R -> C
 @end itemize
 
 Possible are furthermore
+@c % This is quite a hack, but for now it works.
 @itemize @bullet
 @item
 @tex
-% This is quite a hack, but for now it works.
-$Z/p \rightarrow Q,
-\quad
-[i]_p \mapsto i \in [-p/2, \, p/2]
-\subseteq Z$
+$Z/p \rightarrow Q, \quad [i]_p \mapsto i \in [-p/2, \, p/2] \subseteq Z$
 @end tex
 @ifinfo
 Z/p -> Q : [i]_p -> i in [-p/2, p/2] in Z
@@ -564,7 +565,7 @@ ring r2 = 0,(x,y),dp;
 def W=nc_algebra(1,-1); // a Weyl algebra
 setring W;
 map M = r1, x^2, -y^3;
-// note: M is a map and not a morphism
+// note: M is just a map and not a morphism of K-algebras
 M(P);
 // now, a more involved example
 LIB "ncalg.lib";
@@ -575,8 +576,7 @@ poly  P  = 4*e*f+h^2-2*h; // the central el-t of Usl2
 poly  Q  = e^3*f-h^4;     // some polynomial
 ring W1  = 0,(D,X),dp;
 def W2=nc_algebra(1,-1);
-setring W2;
-// this algebra is the opposite Weyl algebra
+setring W2; // this is the opposite Weyl algebra
 map F = Usl2, -X, D*D*X, 2*D*X;
 F(P); // 0, because P is in the kernel of F
 F(Q);
@@ -668,6 +668,7 @@ preimage under a ring map (see @ref{preimage BR_PLURAL_BR})
 substitute a ring variable (see @ref{subst BR_PLURAL_BR})
 @end table
 
+See also @ref{ncpreim_lib} for the advanced preimage algorithm.
 
 @c ---------------------------------------
 
@@ -1602,10 +1603,12 @@ Computes the Lie bracket @code{[p,q]=pq-qp} of the first polynomial with
 the second. Uses special routines, based on the Leibniz rule.
 If the third argument is @code{N>1}, then the right normed bracket
 @code{[a,[...[a,b]]]]} will be computed.
+@item @strong{Note:} 
+effective both with @sc{Plural} and @sc{Letterplace} rings.
 @item @strong{Example:}
 @smallexample
 @c example
-ring r=(0,Q),(x,y,z),Dp;
+ring r=(0,Q),(x,y,z),Dp; // first, let us do a Plural example
 minpoly=Q^2-Q+1;
 matrix C[3][3];  matrix D[3][3];
 C[1,2]=Q2;    C[1,3]=1/Q2;  C[2,3]=Q2;
@@ -1622,6 +1625,13 @@ size(q); // check how many monomials are in big polynomial q
 bracket(p,q); // check p*q=q*p
 // a more common behaviour of the bracket follows:
 bracket(x+Q*y+Q^2*z,z);
+kill R; setring r; // Now consider an example for Letterplace
+LIB "freegb.lib";
+ring R = freeAlgebra(r,5); // F<x,y,z> with deg left lex ordering
+bracket(x,y); 
+bracket(x,y,2);
+bracket(x,y,3);
+bracket(z^2,x+Q*y,2);
 @c example
 @end smallexample
 @end table
@@ -1645,7 +1655,7 @@ This is also the dimension of the ideal resp. submodule, if it is represented by
 The dimension of a submodule of a free module is defined to be
 the Gelfand-Kirillov dimension of the left module with
 the presentation via given submodule.
-@* The computed Gelfand-Kirillov dimension is taken relative to the ground field. In order to compute the complete Gelfand-Kirillov dimension, one has to add the transcendence degree of the ground field.
+@* The computed Gelfand-Kirillov dimension is taken relative to the ground field. In order to compute the complete Gelfand-Kirillov dimension, one has to add the transcendence degree of the ground field over its prime field.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -1753,8 +1763,9 @@ ideal (resp.@: a submodule of a free module), by intersecting it
 Moreover, @code{eliminate} does not work in non-commutative quotients.
 @item @strong{Remark:}
  in a non-commutative algebra, not every subset of a set of variables generates
-a proper subalgebra. But if it is so, there may be cases, when no elimination is possible.
-In these situations error messages will be reported.
+a proper subalgebra. But if it is so, there may be cases, when no elimination 
+(by means of Groebner bases) is possible; in such situations error messages will be reported. 
+See also @ref{ncpreim_lib} for the advanced algorithm for elimination and preimage.
 
 @item @strong{Example:}
 @smallexample
@@ -2026,7 +2037,8 @@ to the second argument. Here, the quotient does not need to be finite dimensiona
 @item @strong{Note:}
 in the non-commutative case, a ring modulo an ideal has a ring stucture
 if and only if the ideal is two-sided.
-@code{kbase} respects module-grading given by the @code{isHomog} attribute of input modules.
+
+Also, @code{kbase} respects module grading given by the @code{isHomog} attribute of input modules.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -2066,13 +2078,13 @@ See
 matrix
 @item @strong{Purpose:}
 computes the (left) transformation matrix which expresses the (left) generators of a
-submodule in terms of the (left) generators of a module.  Uses different
-algorithms for modules which are (resp.@: are not) represented by a
-Groebner basis.
+submodule in terms of the (left) generators of a module.  
+Uses different algorithms for modules which are (resp.@: are not) represented by 
+Groebner bases.
 @* More precisely, if  @code{m} is the module, @code{sm} the submodule, and @code{T} the
 transformation matrix returned by lift, then @code{transpose(matrix(sm)) = transpose(T)*transpose(matrix(m))}.
-If  @code{m} and @code{sm} are ideals, @code{ideal(sm) = ideal(transpose(T)*transpose(matrix(m)))}.
 
+@* If  @code{m} and @code{sm} are ideals, @code{ideal(sm) = ideal(transpose(T)*transpose(matrix(m)))}.
 @item @strong{Note:}
 Gives a warning if @code{sm} is not a submodule.
 @item @strong{Example:}
@@ -2083,16 +2095,16 @@ matrix D[3][3];
 D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
 def R=nc_algebra(1,D); // this algebra is a parametric U(sl_2)
 setring R;
-ideal i = e,h-a; // consider this parametric ideal
-i = std(i);
-print(matrix(i)); // print a compact presentation of i
-poly Z = 4*e*f+h^2-2*h; // a central element
-Z = Z - NF(Z,i); // a central character
+ideal I = e,h-a; // consider this parametric ideal
+I = std(I); // left Groebner basis
+print(matrix(I)); // print a compact presentation of I
+poly Z = 4*e*f+h^2-2*h; // a central element in R
+Z = Z - NF(Z,I); // a central character
 ideal j = std(Z);
 j;
-matrix T = lift(i,j);
+matrix T = lift(I,j);
 print(T);
-ideal tj = ideal(transpose(T)*transpose(matrix(i)));
+ideal tj = ideal(transpose(T)*transpose(matrix(I)));
 size(ideal(matrix(j)-matrix(tj))); // test for 0
 @c example
 @end smallexample
@@ -2735,7 +2747,9 @@ To compute the kernel of a map, the preimage of zero has to be determined.
 Hence there is no special command for computing the kernel of a map in
 @sc{Plural}.
 @item @strong{Remark:}
-In the non-commutative case, it is implemented only for maps @math{A} -> @math{B}, where @math{A} is  a commutative ring.
+In the non-commutative case, the command @code{preimage} is implemented only for maps @math{A} -> @math{B}, 
+where @math{A} is  a commutative ring.
+See @ref{ncpreim_lib} for the most general available implementation.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -2761,7 +2775,7 @@ ideal PreK = preimage(Usl2,Phi,K);
 PreK;
 factorize(PreK[1],1);
 // hence, there are three simple characters for K
-preimage(Usl2, Phi, Z);  // kernel pf phi
+preimage(Usl2, Phi, Z);  // kernel of phi
 
 @c example
 @end smallexample
@@ -2791,7 +2805,7 @@ ideal
 module
 @item @strong{Purpose:}
 computes the ideal quotient, resp.@: module quotient. Let @code{R} be the
-basering, @code{I,J} ideals and @code{M, N} modules in
+basering, @code{I,J} ideals and @code{M, N} submodules in
 @ifinfo
 R^n.
 @end ifinfo
@@ -2818,7 +2832,7 @@ $\{b \in R^n \mid bJ \subset M\}$.
 @end tex
 @end itemize
 @item @strong{Note:}
-It can only be used for two-sided ideals (bimodules), otherwise the
+It can only be used for two-sided ideals (bimodules) in the second argument, otherwise the
 result may have no meaning.
 
 @item @strong{Example:}
@@ -3025,9 +3039,8 @@ For a detailed commutative example see @ref{slim Groebner bases}.
 @c example
 LIB "nctools.lib";
 LIB "ncalg.lib";
-def U = makeUsl(2);
+def U = makeUsl(2); setring U;
 // U is the U(sl_2) algebra
-setring U;
 ideal I = e^3, f^3, h^3-4*h;
 option(redSB);
 ideal J = slimgb(I);
@@ -3036,12 +3049,10 @@ J;
 ideal K = std(I);
 print(matrix(NF(K,J)));
 print(matrix(NF(J,K)));
-// hence both Groebner bases are equal
-;
-// another example for exterior algebras
+// hence both Groebner bases are equal.
+// Another example for exterior algebras
 ring r;
-def E = Exterior();
-setring E; E;
+def E = Exterior(); setring E; E;
 slimgb(xy+z);
 @c example
 @end smallexample
@@ -3118,10 +3129,10 @@ See also
 @cindex subst BR_PLURAL_BR
 @table @code
 @item @strong{Syntax:}
-@code{subst (} poly_expression,ring_variable, poly_expression  @code{)}
-@*@code{subst (} vector _expression,ring_variable, poly_expression  @code{)}
-@*@code{subst (} ideal_expression,ring_variable, poly_expression  @code{)}
-@*@code{subst (} module _expression,ring_variable, poly_expression @code{)}
+@code{subst (} poly_expression, ring_variable, poly_expression  @code{)}
+@*@code{subst (} vector _expression, ring_variable, poly_expression  @code{)}
+@*@code{subst (} ideal_expression, ring_variable, poly_expression  @code{)}
+@*@code{subst (} module _expression, ring_variable, poly_expression @code{)}
 
 @item @strong{Type:}
 poly, vector, ideal or module (corresponding to the first argument)
@@ -3145,6 +3156,8 @@ C2;
 @end smallexample
 @end table
 @c ref
+See also
+@ref{map BR_PLURAL_BR}.
 @c ref
 
 
@@ -3168,11 +3181,9 @@ if @code{S} is a matrix of a left syzygy module of left submodule given by matri
 @smallexample
 @c example
 LIB "ncalg.lib";
-def R = makeQso3(3);
-setring R;
-option(redSB);
+def R = makeQso3(3); setring R;
 // we wish to have completely reduced bases:
-option(redTail);
+option(redSB);  option(redTail);
 ideal tst;
 ideal J = x3+x,x*y*z;
 print(syz(J));
@@ -3182,7 +3193,7 @@ print(S);
 tst = ideal(transpose(S)*transpose(K));
 // check the property of a syzygy module (tst==0):
 size(tst);
- // now compute the Groebner basis of K ...
+// Now compute the Groebner basis of K ...
 K = std(K);
 // ... print a matrix presentation of K ...
 print(matrix(K));
@@ -3191,7 +3202,7 @@ print(S);
 tst = ideal(transpose(S)*transpose(K));
 // check the property of a syzygy module (tst==0):
 size(tst);
-// but the "commutative" syzygy property does not hold
+// Note the "commutative" (not transposed) syzygy property does not hold
 size(ideal(matrix(K)*matrix(S)));
 @c example
 @end smallexample
@@ -3217,10 +3228,13 @@ See also
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
-returns a left Groebner basis of the two-sided ideal,
-generated by the input, treated as a set of two-sided generators.
+returns a two-sided Groebner basis of an input
+@item @strong{Note:} Treating the input as a set of 
+two-sided generators of a two-sided ideal @code{T}, 
+two-sided Groebner basis is a left (and a right) Groebner basis 
+of @code{T}.
 @ifset singularmanual
-see @ref{std}
+(see @ref{std}).
 @end ifset
 @item @strong{Remark:}
 There are algebras with no two-sided ideals except 0 and the
@@ -3266,9 +3280,9 @@ ring (resp. free module) modulo the ideal (resp. submodule),
 generated by the leading terms of the given generators.
 @* If the factor-module is not of finite dimension, -1 is returned.
 
-If the generators form a Groebner basis,
+If the generators form a left Groebner basis,
 this is the same as the vector space dimension of the
-factor-module.
+left factor module.
 
 @item @strong{Note:}
 In the non-commutative case, a ring modulo an ideal has a ring stucture if and only if the ideal is two-sided.
@@ -3400,7 +3414,9 @@ c_@{jk@} x_j d_@{ik@} - c_@{ij@} d_@{ik@} x_j + d_@{jk@}x_i
 
 @end itemize
 
-@strong{Note:} Note that non-degeneracy conditions simply ensure associativity of multiplication.
+@strong{Note:} Note that non-degeneracy conditions ensure associativity of multiplication,
+defined by the relations. It is also proved, that they are necessary and sufficient to
+guarantee the PBW property of an algebra, defined via @code{C_{ij}} and @code{D_{ij}} as above.
 
 @c @end table
 
@@ -3483,7 +3499,14 @@ $R= K[x_1, \ldots, x_n]$,
  @{x_i@}
 @end ifinfo
 and an ordering <.
-@* From the sequence of variables we will build a G-algebra with the Poincar@'e-Birkhoff-Witt (PBW) basis
+@* From the sequence of variables we will build a G-algebra with the 
+@tex
+Poincar\'e
+@end tex
+@ifinfo
+Poincar\'e
+@end ifinfo
+-Birkhoff-Witt (PBW) basis
 @tex
 $\{x^{a_1}_1 x^{a_2}_2 \dots x^{a_n}_n\}$.
 @end tex
@@ -3529,7 +3552,7 @@ n x n
 
 
 @item
-Call the initialization function @code{nc_algebra(C,D)} (see @ref{nc_algebra}) with the data
+ - Call the initialization function @code{nc_algebra(C,D)} (see @ref{nc_algebra}) with the data
 @tex
 $C$ and $D$.
 @end tex
@@ -3585,6 +3608,7 @@ a in N^n, 1<= i <= r @}.
 For a set $S \subset A^r$, define
 $L(S)$ to be the $K$-vector space, spanned on the leading monomials
 of elements of $S$, $L(S) = \oplus \{K x^{\alpha} e_i \mid \exists s \in S, \hbox{LM(s)}=x^{\alpha}e_i\}$.
+
 We call $L(S)$ the \textbf{span of leading monomials} of $S$.
 @end tex
 
@@ -3690,11 +3714,11 @@ NF(f|G) is called a @strong{left normal form of} f @strong{with respect to}
 
 @*@strong{ Remark:}
 As we have already mentioned in the definitions @code{ideal} and @code{module} (see
- @ref{PLURAL}), by @code{NF} @sc{Plural} understands a left normal form.
+ @ref{PLURAL}), by @code{NF} (or @code{reduce}) @sc{Plural} understands a left normal form.
  Note, that @code{rightNF} from @ref{nctools_lib} allows to compute a right normal form.
 
-@subheading Left ideal membership
-@cindex Left ideal membership
+@subheading Left ideal membership (plural)
+@cindex Left ideal membership (plural)
 
 @tex
 For a left Groebner basis $G$ of $I$ the following holds:
@@ -3705,6 +3729,39 @@ $f \in I$ if and only if the left normal form $\hbox{NF}(f|G) = 0$.
 For a left Groebner basis G of I the following holds:
 f is in I if and only if the left normal form NF(f|G) = 0.
 @end ifinfo
+
+For computing a left Groebner basis @code{G} of @code{I}, use @ref{std (plural)}.
+
+For computing a left normal form of @code{f} with respect to @code{G}, use @ref{reduce (plural)}.
+
+
+@subheading Right ideal membership (plural)
+@cindex Right ideal membership (plural)
+
+The right ideal membership is analogous to the left one:
+
+for computing a right Groebner basis @code{G} of @code{I}, use @ref{rightStd} from @ref{nctools_lib},
+
+for computing a right normal form of @code{f} with respect to @code{G}, use @ref{rightNF} from @ref{nctools_lib}.
+
+
+@subheading Two-sided ideal membership (plural)
+@cindex Two-sided ideal membership (plural)
+
+@tex
+Let $J$ be a two-sided ideal and $T$ be a two-sided Groebner basis of $J$.
+
+Then $f \in J$ if and only if the left normal form $\hbox{NF}(f|T) = 0$.
+@end tex
+@ifinfo
+Let J be a two-sided ideal and T be a two-sided Groebner basis of J.
+
+Then f  is in J if and only if the left normal form NF(f|T) = 0.
+@end ifinfo
+
+For computing a two-sided Groebner basis @code{T} of @code{J}, use @ref{twostd (plural)},
+
+for computing a normal form of @code{f} with respect to @code{T}, use @ref{reduce (plural)}.
 
 @c ---------------------------------------------------------------------------
 @node Syzygies and resolutions BR_PLURAL_BR

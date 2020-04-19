@@ -40,6 +40,7 @@ VAR char    prompt_char = '>'; /*1 either '>' or '.'*/
 VAR int     yylineno  = 0;
 VAR int  myynest = -1;
 VAR int  traceit = 0;
+VAR int  traceit_stop = 0;
 VAR char       my_yylinebuf[80];
 
 

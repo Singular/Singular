@@ -631,9 +631,7 @@ EXAMPLE: decision shows an example
      {
        l[zz,n-zz]=1;
      }
-     ri="ring rcoef="+"(0,@t,"+parvar+"),
-     ("+lessvar+"),M(l);";
-     execute(ri);
+     ring rcoef = create_ring("(0,@t,"+parvar+")", "("+lessvar+")", "M("+string((l))+")");
      kill l;
      poly e=imap(rh,e);
      e=leadcoef(e);

@@ -1351,10 +1351,7 @@ See also
    //mres for the global non homogeneous case
    if(find(ordstr(P),"s")==0)
    {
-      string ri= "ring Phelp ="
-                  +string(char(P))+",("+varstr_P+"),(dp,C);";
-      ri = ri + "minpoly = "+string(minpoly) + ";";
-      execute(ri);
+      ring Phelp = create_ring("+string(char(P))+", "("+varstr_P+")", "(dp,C)", "+string(minpoly)+");
       def m=imap(P,m);
       if (p_opt) { "using mres in another ring";}
       list re=mres(m,i);
@@ -1367,10 +1364,7 @@ See also
    //sres for the local case and not minimal resolution
    if(size(#)<=2)
    {
-      string ri= "ring Phelp ="
-                  +string(char(P))+",("+varstr_P+"),(ls,c);";
-      ri = ri + "minpoly = "+string(minpoly) + ";";
-      execute(ri);
+      ring Phelp = create_ring("+string(char(P))+", "("+varstr_P+")", "(ls,c)", "+string(minpoly)+");
       def m=imap(P,m);
       m=std(m);
       if (p_opt) { "using sres in another ring";}
@@ -1381,10 +1375,7 @@ See also
    }
 
    //mres for the local case and minimal resolution
-   string ri= "ring Phelp ="
-                  +string(char(P))+",("+varstr_P+"),(ls,C);";
-   ri = ri + "minpoly = "+string(minpoly) + ";";
-   execute(ri);
+   ring Phelp = create_ring("+string(char(P))+", "("+varstr_P+")", "(ls,C)", "+string(minpoly)+");
    def m=imap(P,m);
     if (p_opt) { "using mres in another ring";}
    list re=mres(m,i);
@@ -1588,10 +1579,8 @@ proc quotient3(module a,module b)   //89sec
          only for global rings
 RETURN:  the quotient of m1 and m2"
 {
-  string s="ring @newr=("+charstr(basering)+
-           "),("+varstr(basering)+",@t,@w),dp;";
   def @newP=basering;
-  execute(s);
+  ring @newr = create_ring(ringlist(basering)[1], "("+varstr(basering)+", @t, @w)", "dp", "no_minpoly");
   module b=imap(@newP,b);
   module a=imap(@newP,a);
   int i;
@@ -1611,10 +1600,8 @@ proc quotient5(module a,module b)   //89sec
          only for global rings
 RETURN:  the quotient of m1 and m2"
 {
-  string s="ring @newr=("+charstr(basering)+
-           "),("+varstr(basering)+",@t),dp;";
   def @newP=basering;
-  execute(s);
+  ring @newr = create_ring(ringlist(basering)[1], "("+varstr(basering)+", @t)", "dp", "no_minpoly");
   module b=imap(@newP,b);
   module a=imap(@newP,a);
   int i;
@@ -1635,10 +1622,8 @@ proc quotient4(module a,module b)   //95sec
          only for global rings
 RETURN:  the quotient of m1 and m2"
 {
-  string s="ring @newr=("+charstr(basering)+
-           "),("+varstr(basering)+",@t),dp;";
   def @newP=basering;
-  execute(s);
+  ring @newr = create_ring(ringlist(basering)[1], "("+varstr(basering)+", @t)", "dp", "no_minpoly");
   module b=imap(@newP,b);
   module a=imap(@newP,a);
   int i;
@@ -2681,7 +2666,7 @@ EXAMPLE: example create_ring; shows an example
 "
 {
   /* setup */
-  list L;
+  list L; L[4]=def(0);
   int kill_ring;
   if (!defined(basering))
   {
@@ -2758,7 +2743,7 @@ EXAMPLE: example create_ring; shows an example
   L[4] = l4;
 
   /* return ring */
-  def S = ring(L);
+  def S = ring(L); 
   if (kill_ring)
   {
     kill(R);
@@ -2769,6 +2754,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring R = (0,a), x, lp;
+  ringlist(R);
   minpoly = a^2+1;
   qring Q = ideal(x^3-2);
   ring S = create_ring(ringlist(Q)[1], "(x,y,t)", "dp", "no_minpoly");

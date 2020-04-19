@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////
+graalMixed////////////////////////////////////////////////////////////////////////////
 version="version graal.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Commutative Algebra";
 info="
@@ -331,7 +331,9 @@ EXAMPLE:  example graalMixed; shows an example
    * construct ring Q and ideals H,J
    **/
   ideal H = ringlist(Gr.A)[4];
-  execute("ring Q = "+string(Gr.A)+";");
+  list l3 = ringlist(Gr.A);
+  def Q = ring(l3);
+  setring Q;
   ideal H = fetch(Gr.A,H); H = sort(std(H))[1];
   ideal J = fetch(Gr.A,L) + H; J = sort(std(J))[1];
   Gr.Q = Q; Gr.H = H; Gr.J = J;
@@ -357,7 +359,7 @@ EXAMPLE:  example graalMixed; shows an example
   }
   else
     { string pars; string vars = varstr(basering); }
-  execute("ring Q0 = ("+charstr(basering)+pars+"),("+vars+"),dp;");
+  ring Q0 = create_ring("("+charstr(basering)+pars+")", "("+vars+")", "dp");
   ideal J0 = imap(Q,J);
   Gr.Q0 = Q0;
   Gr.J0 = J0;
@@ -403,13 +405,12 @@ EXAMPLE:  example graalMixed; shows an example
    **/
   string ostring = ordstr(basering);
   ostring = ostring[1..size(ostring)-2];
-  list l2;
-  for (int ii = 1; ii <= s; ii++)
+  list l4;
+  for (int zz = 1; zz <= s; zz++)
   {
-   l2[ii] = "Y("+string(ii)+")";
+   l4[zz] = "Y("+string(zz)+")";
   }
-  l2[s+1] = ringlist(basering)[2];
-  execute("ring Q0y = ("+charstr(basering)+"),(Y(1..s),"+varstr(basering)+"),(ds(s),c,"+ostring+")");
+  ring Q0y = create_ring(ringlist(basering)[1], "("+string(l4)+","+varstr(basering)+")", "(ds("+string(s)+"),c,"+ostring+")", "no_minpoly");
   setring Q0y;
   ideal H = imap(Gr.A,H);
   ideal J = imap(Gr.A,L);
@@ -427,7 +428,7 @@ EXAMPLE:  example graalMixed; shows an example
   /***
    * construct Ky and sigmainI
    **/
-  execute("ring KKy = ("+charstr(Q0)+"),(Y(1..s),"+varstr(Q0,nvars(Q0))+"),(c,dp(s),dp(1));");
+  ring KKy = create_ring(ringlist(Q0)[1], "("+string(l4)+","+varstr(Q0,nvars(Q0))+")", "(c,dp("+string(s)+"),dp(1))", "no_minpoly");
   poly minpolyOfK = imap(Q0,g(n));
   qring Ky = std(minpolyOfK);
 

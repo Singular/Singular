@@ -520,6 +520,8 @@ Print extended information about the version and configuration of
 @sc{Singular}  (used optional parts, compilation date, start of random
 generator etc.). This information should be included if a user reports
 an error to the authors.
+@*It also list all the used directories/files
+(see @ref{Used environment variables}).
 @end table
 
 The following command line options allow manipulations of the timer and

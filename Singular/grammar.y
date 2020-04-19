@@ -166,7 +166,7 @@ void yyerror(const char * fmt)
 #endif
   )
   {
-    Werror("leaving %s",VoiceName());
+    Werror("leaving %s (%d)",VoiceName(), VoiceLine());
   }
 }
 
@@ -1597,7 +1597,7 @@ parametercmd:
 returncmd:
         RETURN '(' exprlist ')'
           {
-            iiRETURNEXPR.Copy(&$3);
+            iiSetReturn(&$3);
             $3.CleanUp();
             if (exitBuffer(BT_proc)) YYERROR;
           }

@@ -1,5 +1,5 @@
-AC_INIT([singular], [4.1.2], [singular@mathematik.uni-kl.de])
-AC_DEFINE([VERSION_DATE],["Feb 2019"],[release date])
+AC_INIT([singular], [4.1.3], [singular@mathematik.uni-kl.de])
+AC_DEFINE([VERSION_DATE],["Mar 2020"],[release date])
 
 _AC_SRCDIRS(["$ac_dir"])
 
@@ -126,7 +126,12 @@ AC_CONFIG_GOOGLE_PERFTOOLS()
 LB_CHECK_CCLUSTER()
 
 AX_PYTHON_DEFAULT()
-AX_PYTHON_WITH_VERSION([2.4])
+AX_PYTHON_WITH()
+AX_PYTHON_ENABLE()
+AX_PYTHON_PATH()
+AX_PYTHON_VERSION_ENSURE([2.7])
+AX_PYTHON_CSPEC
+AX_PYTHON_LSPEC
 
 LB_CHECK_MATHICGB
 
@@ -292,6 +297,7 @@ AC_CONFIG_FILES([Singular/dyn_modules/interval/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/cohomo/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/systhreads/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/loctriv/Makefile])
+AC_CONFIG_FILES([Singular/dyn_modules/machinelearning/Makefile])
 
 AC_CONFIG_FILES([Singular/Makefile])
 

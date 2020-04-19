@@ -293,16 +293,29 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
 
 BOOLEAN iiAllStart(procinfov pi, const char *p, feBufferTypes t, int l)
 {
+  int save_trace=traceit;
+  int restore_traceit=0;
+  if (traceit_stop
+  && (traceit & TRACE_SHOW_LINE))
+  {
+    traceit &=(~TRACE_SHOW_LINE);
+    traceit_stop=0;
+    restore_traceit=1;
+  }
   // see below:
   BITSET save1=si_opt_1;
   BITSET save2=si_opt_2;
   newBuffer( omStrDup(p /*pi->data.s.body*/), t /*BT_proc*/,
                pi, l );
   BOOLEAN err=yyparse();
+
   if (sLastPrinted.rtyp!=0)
   {
     sLastPrinted.CleanUp();
   }
+
+  if (restore_traceit) traceit=save_trace;
+
   // the access to optionStruct and verboseStruct do not work
   // on x86_64-Linux for pic-code
   if ((TEST_V_ALLWARN) &&
@@ -390,7 +403,6 @@ BOOLEAN iiPStart(idhdl pn, leftv v)
   {
     iiCurrArgs=NULL;
   }
-  iiCurrProc=pn;
   /* start interpreter ======================================*/
   myynest++;
   if (myynest > SI_MAX_NEST)
@@ -400,7 +412,9 @@ BOOLEAN iiPStart(idhdl pn, leftv v)
   }
   else
   {
+    iiCurrProc=pn;
     err=iiAllStart(pi,pi->data.s.body,BT_proc,pi->data.s.body_lineno-(v!=NULL));
+    iiCurrProc=NULL;
 
     if (iiLocalRing[myynest-1] != currRing)
     {
@@ -890,19 +904,23 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN f
   {
     if(IDTYP(pl)!=PACKAGE_CMD)
     {
+      omFree(plib);
       WarnS("not of type package.");
       fclose(fp);
       return TRUE;
     }
-    if (!force) return FALSE;
+    if (!force)
+    {
+      omFree(plib);
+      return FALSE;
+    }
   }
   LoadResult = iiLoadLIB(fp, libnamebuf, newlib, pl, autoexport, tellerror);
   omFree((ADDRESS)newlib);
 
   if(!LoadResult) IDPACKAGE(pl)->loaded = TRUE;
   omFree((ADDRESS)plib);
-
- return LoadResult;
+  return LoadResult;
 }
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 static void iiCleanProcs(idhdl &root)
@@ -1305,6 +1323,7 @@ BOOLEAN load_builtin(const char *newlib, BOOLEAN autoexport, SModulFunc_t init)
     pl = enterid( plib,0, PACKAGE_CMD, &IDROOT, TRUE );
     IDPACKAGE(pl)->libname=omStrDup(newlib);
   }
+  omFree(plib);
   IDPACKAGE(pl)->language = LANG_C;
 
   IDPACKAGE(pl)->handle=(void *)NULL;

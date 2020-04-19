@@ -20,6 +20,13 @@
 @end ifset
 
 @heading News for version @value{VERSION}
+New libraries:
+@itemize
+@item invar.lib: Invariant theory @nref{invar_lib}
+@item moddiq.lib: ideal quotient and saturation @nref{moddiq_lib}
+@item ncModslimgb.lib: modular Groebner bases for G-algebras @nref{ncModslimgb_lib}
+@end itemize
+
 Changed libraries:
 @itemize
 @item chern.lib:  new version (@nref{chern_lib})
@@ -31,8 +38,10 @@ Changed libraries:
 Changes in the kernel/build system:
 @itemize
 @item improved gcd and multiplication via FLINT
+@item improved lift (and related)
 @item port to polymake 3.5.x
 @item rational functions via flint (@nref{flintQ})
+@item adaptions/functions for @code{Singular.jl}(@uref{https://github.com/oscar-system/Singular.jl})
 @end itemize
 
 @heading News for version 4-1-2

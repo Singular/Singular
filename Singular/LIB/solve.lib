@@ -58,7 +58,6 @@ EXAMPLE: example laguerre_solve; shows an example
   if (char(basering)!=0){ERROR("characteristic of basering not 0");}
   if ((charstr(basering)[1]=="0") and (npars(basering)!=0))
     {ERROR("basering has parameters");}
-  int OLD_COMPLEX=0;
   int iv=checkv(f);  // check for variable appearing in f
   if(iv==0){ERROR("Wrong polynomial!");}
   poly v=var(iv);    // f univariate in v
@@ -89,22 +88,13 @@ EXAMPLE: example laguerre_solve; shows an example
   ss="";oo=ss;
   if(npars(basering)==1)
   {
-    if(OLD_COMPLEX)
+    tt=charstr(basering);
+    if(size(tt)>7)
     {
-      tt="1,"+string(par(1));
-      if(tt==charstr(basering))
-      {ss=tt;ringprec=system("getPrecDigits");}
-    }
-    else
-    {
-      tt=charstr(basering);
-      if(size(tt)>7)
+      if(string(tt[1..7])=="complex")
       {
-        if(string(tt[1..7])=="complex")
-        {
-          ss=tt;
-          ringprec=system("getPrecDigits");
-        }
+        ss=tt;
+        ringprec=system("getPrecDigits");
       }
     }
   }
@@ -134,9 +124,7 @@ EXAMPLE: example laguerre_solve; shows an example
   def rn = basering;// set the complex ground field
   if (ringprec<numberprec)
   {
-    tt="ring lagc=(complex,"+string(numberprec)+","+string(numberprec)+
-       "),"+string(var(iv))+",lp;";
-    execute(tt);
+    ring lagc = create_ring("(complex,"+string(numberprec)+","+string(numberprec)+")", string(var(iv)), "lp");
     poly p=imap(rn,p);
     poly v=var(1);
   }
@@ -172,8 +160,7 @@ EXAMPLE: example laguerre_solve; shows an example
       }
       else
       {
-        oo="ring exa=0,"+string(var(1))+",lp;";
-        execute(oo);
+        ring exa = create_ring(0, string(var(1)), "lp");
         ideal SQQQQ=splitsqrfree(imap(rn,p),var(1));
         setring lagc;
         SPLIT=imap(exa,SQQQQ);
@@ -236,9 +223,7 @@ EXAMPLE: example laguerre_solve; shows an example
 
   if((solutionprec<numberprec)&&(size(ss)==0))// shorter output
   {
-    oo="ring lout=(complex,"+string(solutionprec)+",1),"
-    +string(var(1))+",lp;";
-    execute(oo);
+    ring lout = create_ring("(complex,"+string(solutionprec)+",1)", string(var(1)), "lp");
     list roots=imap(lagc,roots);
     roots=transroots(roots);
     if(iz>0){roots=addzero(roots,ss,iz,splitcontrol);}
@@ -1857,9 +1842,8 @@ EXAMPLE: example lex_solve; shows an example
     def oring= basering;
 
     // change the ground field to complex numbers
-    string nrings= "ring RC =(complex,"+string(prec)
-        +"),("+varstr(basering)+"),lp;";
-    execute(nrings);
+    list l1 = ringlist(basering)[2];
+    ring RC = create_ring("(complex,"+string(prec)+")", l1, "lp");
 
     // map fi from old to new ring
     ideal fi= imap(oring,fi);
@@ -2058,9 +2042,8 @@ EXAMPLE: example triang_solve; shows an example
     list LL;
 
     // change the ground field to complex numbers
-    string nrings= "ring RC =(complex,"+string(prec)
-        +",I),("+varstr(basering)+"),lp;";
-    execute(nrings);
+    list l2 = ringlist(basering)[2];
+    ring RC = create_ring("(complex,"+string(prec)+",I)", l2, "lp");
 
     // list with entry 0 (number)
     number nn=0;

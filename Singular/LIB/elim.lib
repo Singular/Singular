@@ -580,13 +580,12 @@ EXAMPLE: example elim2; shows examples
 //---- get variables to be eliminated and create string for new ordering ------
    int ii; poly vars=1;
    for( ii=1; ii<=size(va); ii++ ) { vars=vars*var(va[ii]); }
-   if(  attrib(basering,"global")) { string ordering = "),dp;"; }
-   else { string ordering = "),ls;"; }
+   if(  attrib(basering,"global")) { string ordering = "dp"; }
+   else { string ordering = "ls"; }
    string mpoly=string(minpoly);
 //-------------- create new ring and map objects to new ring ------------------
    def br = basering;
-   string str = "ring @newr = ("+charstr(br)+"),("+varstr(br)+ordering;
-   execute(str);
+   ring @newr = create_ring(ringlist(br)[1], "("+varstr(br)+")", ordering, "no_minpoly");
    if (mpoly!="0") { execute("minpoly="+mpoly+";"); }
    def i = imap(br,id);
    poly vars = imap(br,vars);
@@ -644,11 +643,10 @@ EXAMPLE: example elim1; shows examples
    {
       if( vars/var(ii)==0 ) { poly p = 1+var(ii); break;}
    }
-   if( ord(p)==0 ) { string ordering = "),ls;"; }
-   if( ord(p)>0 ) { string ordering = "),dp;"; }
+   if( ord(p)==0 ) { string ordering = "ls"; }
+   if( ord(p)>0 ) { string ordering = "dp"; }
 //-------------- create new ring and map objects to new ring ------------------
-   string str = "ring @newr = ("+charstr(br)+"),("+varstr(br)+ordering;
-   execute(str);
+   ring @newr = create_ring(ringlist(br)[1], "("+varstr(br)+")", ordering, "no_minpoly");
    def id = fetch(br,id);
    poly vars = fetch(br,vars);
 //---------- now eliminate in new ring and map back to old ring ---------------
@@ -726,7 +724,8 @@ RETURN:  list of an ideal/module [1] and an integer [2]:
          [2] = saturation exponent (= min( k | id:j^k = id:j^(k+1) ))
 NOTE:    [1] is a standard basis in the basering
 DISPLAY: saturation exponent during computation if printlevel >=1
-KEYWORDS: Saturation
+KEYWORDS: saturation
+SEE ALSO: modSat
 EXAMPLE: example sat; shows an example
 "{
    int ii,kk;

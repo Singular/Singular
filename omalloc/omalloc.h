@@ -30,6 +30,7 @@ extern "C" {
   #define REGISTER register
 #endif
 
+extern int om_sing_opt_show_mem;
 
 #if defined(OM_NDEBUG) && !defined(OM_ALLOC_INTERNAL)
 #if (SIZEOF_LONG == 8)
