@@ -632,11 +632,10 @@ int redRing_Z (LObject* h,kStrategy strat)
   if (h->IsNull()) return 0; // spoly is zero (can only occure with zero divisors)
   if (strat->tl<0) return 1;
 
-  int at/*,i*/;
+  int at;
   long d;
   int j = 0;
   int pass = 0;
-  // poly zeroPoly = NULL;
 
 // TODO warum SetpFDeg notwendig?
   h->SetpFDeg();
@@ -682,7 +681,9 @@ int redRing_Z (LObject* h,kStrategy strat)
             }
             return 1;
           }
-        } else {
+        }
+	else
+	{
           /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
            * => we try to cut down the lead coefficient at least */
           /* first copy T[j] in order to multiply it with a coefficient later on */
@@ -701,7 +702,9 @@ int redRing_Z (LObject* h,kStrategy strat)
           tj.Delete();
           tj.Clear();
         }
-      } else {
+      }
+      else
+      {
         /* same lead monomial but lead coefficients do not divide each other:
          * change the polys to h <- spoly(h,tj) and h2 <- gpoly(h,tj). */
         LObject h2  = *h;
@@ -716,7 +719,9 @@ int redRing_Z (LObject* h,kStrategy strat)
         /* replace h2 for tj in L (already generated pairs with tj), S and T */
         replaceInLAndSAndT(h2, j, strat);
       }
-    } else {
+    }
+    else
+    {
       ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
     }
     /* printf("\nAfter small red: ");pWrite(h->p); */
@@ -973,6 +978,44 @@ int redHomog (LObject* h,kStrategy strat)
       kDeleteLcm(h);
       return 0;
     }
+    if (TEST_OPT_IDLIFT)
+    {
+      if (h->p!=NULL)
+      {
+        if(p_GetComp(h->p,currRing)>strat->syzComp)
+        {
+          h->Delete();
+          return 0;
+        }
+      }
+      else if (h->t_p!=NULL)
+      {
+        if(p_GetComp(h->t_p,strat->tailRing)>strat->syzComp)
+        {
+          h->Delete();
+          return 0;
+        }
+      }
+    }
+    #if 0
+    else if ((strat->syzComp > 0)&&(!TEST_OPT_REDTAIL_SYZ))
+    {
+      if (h->p!=NULL)
+      {
+        if(p_GetComp(h->p,currRing)>strat->syzComp)
+        {
+          return 1;
+        }
+      }
+      else if (h->t_p!=NULL)
+      {
+        if(p_GetComp(h->t_p,strat->tailRing)>strat->syzComp)
+        {
+          return 1;
+        }
+      }
+    }
+    #endif
     h->SetShortExpVector();
     not_sev = ~ h->sev;
     /*
@@ -1680,6 +1723,44 @@ int redLazy (LObject* h,kStrategy strat)
       kDeleteLcm(h);
       return 0;
     }
+    if (TEST_OPT_IDLIFT)
+    {
+      if (h->p!=NULL)
+      {
+        if(p_GetComp(h->p,currRing)>strat->syzComp)
+        {
+          h->Delete();
+          return 0;
+        }
+      }
+      else if (h->t_p!=NULL)
+      {
+        if(p_GetComp(h->t_p,strat->tailRing)>strat->syzComp)
+        {
+          h->Delete();
+          return 0;
+        }
+      }
+    }
+    #if 0
+    else if ((strat->syzComp > 0)&&(!TEST_OPT_REDTAIL_SYZ))
+    {
+      if (h->p!=NULL)
+      {
+        if(p_GetComp(h->p,currRing)>strat->syzComp)
+        {
+          return 1;
+        }
+      }
+      else if (h->t_p!=NULL)
+      {
+        if(p_GetComp(h->t_p,strat->tailRing)>strat->syzComp)
+        {
+          return 1;
+        }
+      }
+    }
+    #endif
     h->SetShortExpVector();
     not_sev = ~ h->sev;
     d = h->SetpFDeg();
@@ -1880,7 +1961,7 @@ int redHoney (LObject* h, kStrategy strat)
         }
       }
     }
-    if ((strat->syzComp > 0)&&(!TEST_OPT_REDTAIL_SYZ))
+    else if ((strat->syzComp > 0)&&(!TEST_OPT_REDTAIL_SYZ))
     {
       if (h->p!=NULL)
       {
@@ -2443,7 +2524,8 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       /* if we are computing over Z we always want to try and cut down
        * the coefficients in the tail terms */
-      if (rField_is_Z(currRing) && !rHasLocalOrMixedOrdering(currRing)) {
+      if (rField_is_Z(currRing) && !rHasLocalOrMixedOrdering(currRing))
+      {
         redtailBbaAlsoLC_Z(&(strat->P), strat->tl, strat);
         strat->P.pCleardenom();
       }

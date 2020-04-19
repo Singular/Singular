@@ -12,6 +12,6 @@ Requires: @PKG_REQUIRE@
 Conflicts:
 
 Cflags: -I${includedir} -I${includedir}/singular @SINGULAR_CFLAGS@ @FLINT_CFLAGS@ @GMP_CPPFLAGS@
-Libs: -L${libdir} -lpolys @FLINT_LIBS@ @NTL_LIBS@ @GMP_LIBS@ @USEPPROCSDYNAMICLD@
+Libs: -L${libdir} -lpolys @FLINT_LIBS@ @GMP_LIBS@ @USEPPROCSDYNAMICLD@
 Libs.private:
 

@@ -1491,6 +1491,15 @@ static inline void p_GetExpVL(poly p, int64 *ev, const ring r)
   for (unsigned j = r->N; j!=0; j--)
       ev[j-1] = p_GetExp(p, j, r);
 }
+// p_GetExpVLV is used in Singular,jl
+static inline int64 p_GetExpVLV(poly p, int64 *ev, const ring r)
+{
+  p_LmCheckPolyRing1(p, r);
+  for (unsigned j = r->N; j!=0; j--)
+      ev[j-1] = p_GetExp(p, j, r);
+  return (int64)p_GetComp(p,r);
+}
+// p_GetExpVL is used in Singular,jl
 static inline void p_SetExpV(poly p, int *ev, const ring r)
 {
   p_LmCheckPolyRing1(p, r);
@@ -1500,13 +1509,23 @@ static inline void p_SetExpV(poly p, int *ev, const ring r)
   if(ev[0]!=0) p_SetComp(p, ev[0],r);
   p_Setm(p, r);
 }
-// p_SetExpVL is used in Singular,jl
 static inline void p_SetExpVL(poly p, int64 *ev, const ring r)
 {
   p_LmCheckPolyRing1(p, r);
   for (unsigned j = r->N; j!=0; j--)
       p_SetExp(p, j, ev[j-1], r);
   p_SetComp(p, 0,r);
+
+  p_Setm(p, r);
+}
+
+// p_SetExpVLV is used in Singular,jl
+static inline void p_SetExpVLV(poly p, int64 *ev, int64 comp, const ring r)
+{
+  p_LmCheckPolyRing1(p, r);
+  for (unsigned j = r->N; j!=0; j--)
+      p_SetExp(p, j, ev[j-1], r);
+  p_SetComp(p, comp,r);
 
   p_Setm(p, r);
 }

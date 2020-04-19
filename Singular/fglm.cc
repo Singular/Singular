@@ -104,7 +104,7 @@ fglmUpdateresult( ideal & result )
     idSkipZeroes( result );
 }
 
-// Checks if the two rings sringHdl and dringHdl are compatible enough to
+// Checks if the two rings sring and dring are compatible enough to
 // be used for the fglm. This means:
 //  1) Same Characteristic, 2) globalOrderings in both rings,
 //  3) Same number of variables, 4) same number of parameters
@@ -114,16 +114,14 @@ fglmUpdateresult( ideal & result )
 //  8) if they are qrings, the quotientIdeals of both must coincide.
 // vperm must be a vector of length pVariables+1, initialized by 0.
 // If both rings are compatible, it stores the permutation of the
-// variables if mapped from sringHdl to dringHdl.
+// variables if mapped from sring to dring.
 // if the rings are compatible, it returns FglmOk.
-// Should be called with currRing= IDRING( sringHdl );
+// Should be called with currRing==sring
 FglmState
-fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
+fglmConsistency( ring sring, ring dring, int * vperm )
 {
     int k;
     FglmState state= FglmOk;
-    ring dring = IDRING( dringHdl );
-    ring sring = IDRING( sringHdl );
 
     if ( rChar(sring) != rChar(dring) )
     {
@@ -178,17 +176,17 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
     {
         if ( dring->qideal == NULL )
         {
-            Werror( "%s is a qring, current ring not", sringHdl->id );
+            WerrorS( "source ring is a qring, destination ring not" );
             return FglmIncompatibleRings;
         }
         // both rings are qrings, now check if both quotients define the same ideal.
         // check if sring->qideal is contained in dring->qideal:
-        rSetHdl( dringHdl );
-        nMapFunc nMap=n_SetMap(currRing->cf, sring->cf );
+        rChangeCurrRing( dring );
+        nMapFunc nMap=n_SetMap(dring->cf, sring->cf );
         ideal sqind = idInit( IDELEMS( sring->qideal ), 1 );
         for ( k= IDELEMS( sring->qideal )-1; k >= 0; k-- )
           (sqind->m)[k]= p_PermPoly( (sring->qideal->m)[k], vperm, sring,
-                          currRing, nMap);
+                          dring, nMap);
         ideal sqindred = kNF( dring->qideal, NULL, sqind );
         if ( ! idIs0( sqindred ) )
         {
@@ -197,7 +195,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         }
         idDelete( & sqind );
         idDelete( & sqindred );
-        rSetHdl( sringHdl );
+        rChangeCurrRing( sring );
         if ( state != FglmOk ) return state;
         // check if dring->qideal is contained in sring->qideal:
         int * dsvperm = (int *)omAlloc0( (nvar+1)*sizeof( int ) );
@@ -223,7 +221,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
     {
         if ( dring->qideal != NULL )
         {
-            Werror( "current ring is a qring, %s not", sringHdl->id );
+            WerrorS( "source ring is a qring, destination ring not" );
             return FglmIncompatibleRings;
         }
     }
@@ -280,24 +278,24 @@ fglmProc( leftv result, leftv first, leftv second )
 {
     FglmState state = FglmOk;
 
-    idhdl destRingHdl = currRingHdl;
+    ring destRing = currRing;
     // ring destRing = currRing;
     ideal destIdeal = NULL;
-    idhdl sourceRingHdl = (idhdl)first->data;
-    rSetHdl( sourceRingHdl );
+    ring sourceRing = (ring)first->Data();
+    rChangeCurrRing( sourceRing );
     // ring sourceRing = currRing;
 
-    int * vperm = (int *)omAlloc0( (currRing->N+1)*sizeof( int ) );
-    state= fglmConsistency( sourceRingHdl, destRingHdl, vperm );
-    omFreeSize( (ADDRESS)vperm, (currRing->N+1)*sizeof(int) );
+    int * vperm = (int *)omAlloc0( (sourceRing->N+1)*sizeof( int ) );
+    state= fglmConsistency( sourceRing, destRing, vperm );
+    omFreeSize( (ADDRESS)vperm, (sourceRing->N+1)*sizeof(int) );
 
     if ( state == FglmOk )
     {
-        idhdl ih = currRing->idroot->get( second->Name(), myynest );
+        idhdl ih = sourceRing->idroot->get( second->Name(), myynest );
         if ( (ih != NULL) && (IDTYP(ih)==IDEAL_CMD) )
         {
             ideal sourceIdeal;
-            if ( currRing->qideal != NULL )
+            if ( sourceRing->qideal != NULL )
                 sourceIdeal= fglmUpdatesource( IDIDEAL( ih ) );
             else
                 sourceIdeal = IDIDEAL( ih );
@@ -306,13 +304,13 @@ fglmProc( leftv result, leftv first, leftv second )
             {
                 // Now the settings are compatible with FGLM
                 assumeStdFlag( (leftv)ih );
-                if ( fglmzero( IDRING(sourceRingHdl), sourceIdeal, IDRING(destRingHdl), destIdeal, FALSE, (currRing->qideal != NULL) ) == FALSE )
+                if ( fglmzero( sourceRing, sourceIdeal, destRing, destIdeal, FALSE, (currRing->qideal != NULL) ) == FALSE )
                     state= FglmNotReduced;
             }
         } else state= FglmNoIdeal;
     }
-    if ( currRingHdl != destRingHdl )
-        rSetHdl( destRingHdl );
+    if ( currRing != destRing )
+        rChangeCurrRing( destRing );
     switch (state)
     {
         case FglmOk:
@@ -324,11 +322,11 @@ fglmProc( leftv result, leftv first, leftv second )
             state= FglmOk;
             break;
         case FglmIncompatibleRings:
-            Werror( "ring %s and current ring are incompatible", first->Name() );
+            WerrorS( "source ring and current ring are incompatible" );
             destIdeal= NULL;
             break;
         case FglmNoIdeal:
-            Werror( "Can't find ideal %s in ring %s", second->Name(), first->Name() );
+            Werror( "Can't find ideal %s in source ring", second->Name() );
             destIdeal= NULL;
             break;
         case FglmNotZeroDim:

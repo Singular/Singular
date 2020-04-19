@@ -6,7 +6,7 @@
 
      Authors: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann
 
-                        Copyright (C) 1986-2019
+                        Copyright (C) 1986-2020
 
 
 
@@ -45,15 +45,12 @@ Please send any comments or bug reports to
 <singular@mathematik.uni-kl.de>.
 
 If you want to be informed of new releases,  please register yourself
-as a SINGULAR user by using the registration form on the SINGULAR
-homepage               `http://www.singular.uni-kl.de'.  If for some
-reason you cannot access the registration form, you can also register
-by sending an email to               <singular@mathematik.uni-kl.de>
+as a SINGULAR user by sending an email to <singular@mathematik.uni-kl.de>
 with subject line `register' and body containing the following data:
  your name, email address, organisation, country and platform(s).
 
 For the citation of SINGULAR see
-`http://www.singular.uni-kl.de/how_to_cite.html', for information on
+`https://www.singular.uni-kl.de/how_to_cite.html', for information on
 how to cite Singular.
 
 You can also support SINGULAR by informing us about your result
@@ -63,7 +60,7 @@ Availability
 ============
 
 The latest information about SINGULAR is always available from
-`http://www.singular.uni-kl.de'.
+`https://www.singular.uni-kl.de'.
 
 Acknowledgements
 ================

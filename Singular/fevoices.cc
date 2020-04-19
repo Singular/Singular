@@ -61,6 +61,14 @@ const char * VoiceName()
   return sNoName_fe;
 }
 
+int VoiceLine()
+{
+  if ((currentVoice!=NULL)
+  && (currentVoice->curr_lineno>=0))
+    return currentVoice->curr_lineno;
+  return -1;
+}
+
 /*2
 * the calling chain of Voices
 */
@@ -447,7 +455,13 @@ static int fePrintEcho(char *anf, char */*b*/)
     }
     if (traceit&TRACE_SHOW_LINE)
     {
-      while(fgetc(stdin)!='\n');
+      char c;
+      do
+      {
+        c=fgetc(stdin);
+	if (c=='n') traceit_stop=1;
+      }
+      while(c!='\n');
     }
   }
   else if (traceit&TRACE_SHOW_LINENO)

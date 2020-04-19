@@ -23,6 +23,7 @@ VAR void (*PrintS_callback)(const char *s) = NULL;
 VAR short errorreported=0;
 void WerrorS(const char *s)
 {
+  errorreported = 1;
   if (WerrorS_callback == NULL)
   {
      fwrite("   ? ",1,5,stderr);
@@ -34,7 +35,6 @@ void WerrorS(const char *s)
   {
     WerrorS_callback(s);
   }
-  errorreported = 1;
 }
 }
 

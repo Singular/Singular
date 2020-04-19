@@ -11,6 +11,6 @@ External Packages Singular may rely on {#external_packages_page}
 * FLINT (works on cygwin32, does not work on cygwin64 due to failing mpir 2.6.0)
 * NTL (works on cygwin32/cygwin64, tested with 6.0.0)
 
-ps: [3rd party software used by Singular](http://www.singular.uni-kl.de/index.php/third-party-software/software-used-by-singular.html) and [Preface](http://www.singular.uni-kl.de/Manual/3-1-6/sing_1.htm#SEC1)
+ps: [3rd party software used by Singular](https://www.singular.uni-kl.de/index.php/third-party-software/software-used-by-singular.html) and [Preface](https://www.singular.uni-kl.de/Manual/3-1-6/sing_1.htm#SEC1)
 
 

@@ -284,7 +284,7 @@ struct ip_sring
 
   omBin    PolyBin; /* Bin from where monoms are allocated */
   intvec * pModW;   /* std: module weights */
-  poly      ppNoether; /*  variables, set by procedures from hecke/kstd1:
+  poly     ppNoether; /*  variables, set by procedures from hecke/kstd1:
                             the highest monomial below pHEdge */
   void * ext_ref;   /* libsing GAP object */
 // #ifdef HAVE_RINGS
@@ -346,8 +346,10 @@ struct ip_sring
      VarL_Offset[i] gets i-th long var in exp vector */
   int*      VarL_Offset;
 
-  /* mask for getting single exponents */
+  /* mask for getting single exponents, also maxExp */
   unsigned long bitmask;
+  /* wanted maxExp */
+  unsigned long wanted_maxExp;
   /* mask used for divisiblity tests */
   unsigned long divmask; // rComplete
 

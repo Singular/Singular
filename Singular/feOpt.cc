@@ -416,7 +416,7 @@ void feOptHelp(const char* name)
   }
 
   printf("\nFor more information, type `help;' from within Singular or visit\n");
-  printf("http://www.singular.uni-kl.de or consult the\n");
+  printf("https://www.singular.uni-kl.de or consult the\n");
   printf("Singular manual (available as on-line info or html manual).\n");
 }
 

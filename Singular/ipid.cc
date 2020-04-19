@@ -190,8 +190,6 @@ void *idrecDataInit(int t)
     //the types with the standard init: set the struct to zero
     case LINK_CMD:
       return (void*) omAlloc0Bin(sip_link_bin);
-    case RING_CMD:
-      return NULL;
     case PACKAGE_CMD:
     {
       package pa=(package)omAlloc0Bin(sip_package_bin);
@@ -208,14 +206,15 @@ void *idrecDataInit(int t)
     }
     case RESOLUTION_CMD:
       return  (void *)omAlloc0(sizeof(ssyStrategy));
-    //other types: without init (int,script,poly,def,package)
-    case CRING_CMD:
+    //other types: without alloc. (int,script,poly,def,package,..)
     case INT_CMD:
     case DEF_CMD:
     case POLY_CMD:
     case VECTOR_CMD:
+    case RING_CMD:
+    case CRING_CMD:
     case QRING_CMD:
-       return (void*)0L;
+      return NULL;
     default:
       {
         if (t>MAX_TOK)

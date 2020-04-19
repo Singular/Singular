@@ -345,8 +345,6 @@ void deleteHC(poly* p, int* e, int* l,kStrategy strat)
 */
 void cancelunit (LObject* L,BOOLEAN inNF)
 {
-  number lc;
-
   if(rHasGlobalOrdering (currRing)) return;
   if(TEST_OPT_CANCELUNIT) return;
 
@@ -354,15 +352,14 @@ void cancelunit (LObject* L,BOOLEAN inNF)
   poly p = L->GetLmTailRing();
   if(p_GetComp(p, r) != 0 && !p_OneComp(p, r)) return;
 
+  number lc=NULL; /*dummy, is always set if rField_is_Ring(r) */
   if (rField_is_Ring(r) /*&& (rHasLocalOrMixedOrdering(r))*/)
     lc = pGetCoeff(p);
-#ifdef HAVE_RINGS
+
   // Leading coef have to be a unit
   // example 2x+4x2 should be simplified to 2x*(1+2x)
   // and 2 is not a unit in Z
   //if ( !(n_IsUnit(pGetCoeff(p), r->cf)) ) return;
-#endif
-
 
 //    for(i=r->N;i>0;i--)
 //    {
@@ -12060,6 +12057,7 @@ void kDebugPrint(kStrategy strat)
     else if (strat->red==redHoney) PrintS("redHoney\n");
     else if (strat->red==redEcart) PrintS("redEcart\n");
     else if (strat->red==redHomog) PrintS("redHomog\n");
+    else if (strat->red==redLazy) PrintS("redLazy\n");
     else  Print("%p\n",(void*)strat->red);
   PrintS("posInT: ");
     if (strat->posInT==posInT0) PrintS("posInT0\n");

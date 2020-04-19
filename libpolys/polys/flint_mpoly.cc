@@ -97,7 +97,9 @@ static void _fmpq_mpoly_clear_readonly_sing(fmpq_mpoly_t a, fmpq_mpoly_ctx_t ctx
 {
     fmpq_mpoly_clear(a, ctx);
 }
+#endif
 
+#if HAVE_OMALLOC
 void convSingPFlintMP(fmpq_mpoly_t res, fmpq_mpoly_ctx_t ctx, poly p, int lp, const ring r)
 {
   fmpq_mpoly_init2(res, lp, ctx);
@@ -120,7 +122,9 @@ void convSingPFlintMP(fmpq_mpoly_t res, fmpq_mpoly_ctx_t ctx, poly p, int lp, co
   fmpq_mpoly_reduce(res, ctx); // extra step for QQ ensures res has content canonically factored out
   omFreeSize(exp,(r->N+1)*sizeof(ulong));
 }
+#endif
 
+#if HAVE_OMALLOC
 poly convFlintMPSingP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, const ring r)
 {
   int d=fmpq_mpoly_length(f,ctx)-1;
@@ -150,6 +154,7 @@ poly convFlintMPSingP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, const ring r)
   p_Test(p,r);
   return p;
 }
+#endif
 
 void convSingPFlintMP(fmpz_mpoly_t res, fmpz_mpoly_ctx_t ctx, poly p, int lp, const ring r)
 {
@@ -203,6 +208,7 @@ poly convFlintMPSingP(fmpz_mpoly_t f, fmpz_mpoly_ctx_t ctx, const ring r)
   return p;
 }
 
+#if HAVE_OMALLOC
 poly convFlintMPSingP(nmod_mpoly_t f, nmod_mpoly_ctx_t ctx, const ring r)
 {
   int d=nmod_mpoly_length(f,ctx)-1;
@@ -228,7 +234,9 @@ poly convFlintMPSingP(nmod_mpoly_t f, nmod_mpoly_ctx_t ctx, const ring r)
   p_Test(p,r);
   return p;
 }
+#endif
 
+#if HAVE_OMALLOC
 void convSingPFlintMP(nmod_mpoly_t res, nmod_mpoly_ctx_t ctx, poly p, int lp,const ring r)
 {
   nmod_mpoly_init2(res, lp, ctx);
@@ -247,8 +255,9 @@ void convSingPFlintMP(nmod_mpoly_t res, nmod_mpoly_ctx_t ctx, poly p, int lp,con
   }
   omFreeSize(exp,(r->N+1)*sizeof(ulong));
 }
+#endif
 
-#else
+#ifndef HAVE_OMALLOC
 // memory allocator is thread safe; singular polynomials may be constructed in parallel
 
 // like convSingNFlintN_QQ but it takes an initialized fmpq_t f

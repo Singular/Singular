@@ -55,12 +55,15 @@ attr sattr::Copy()
 
 static void attr_free(attr h, const ring r=currRing)
 {
+  if (h->name!=NULL)
+  {
+    omFree(h->name);
+    h->name=NULL;
+  }
   if (h->data!=NULL) /*avoid assume failure */
   {
     s_internalDelete(h->atyp,h->data,r);
     h->data=NULL;
-    omFree(h->name);
-    h->name=NULL;
   }
 }
 

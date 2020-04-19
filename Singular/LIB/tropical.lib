@@ -4884,7 +4884,12 @@ NOTE:    - the procedure is also called recursively by itself, and
     // displays the lowest term in t first
     if (anzahlvariablen+numberdeletedvariables<nvars(basering))
     {
-      execute("ring PARARing=("+charstr(basering)+",X("+string(1)+".."+string(nvars(basering)-anzahlvariablen-numberdeletedvariables)+")),t,ls;");
+      list l2; 
+      for (int zz = 1; zz <= (nvars(basering)-anzahlvariablen-numberdeletedvariables); zz++)
+      {
+       l2[zz] = "X("+string(zz)+")";
+      }
+      ring PARARing = create_ring("("+charstr(basering)+","+string(l2)+")", "t", "ls");
     }
     else
     {
@@ -5077,7 +5082,12 @@ NOTE:    the procedure is called from inside the recursive procedure
     {
       variablen=variablen+var(j);
     }
-    execute("ring TRANSFORMRING=("+charstr(basering)+"),("+string(variablen)+",X("+string(nvars(BASERING)-anzahlvariablen+1)+".."+string(nvars(BASERING)-anzahlvariablen+neuvar)+"),t),(dp("+string(anzahlvariablen-1)+"),dp("+string(nvars(BASERING)+neuvar-anzahlvariablen)+"),lp(1));");
+    list l3; 
+    for (int zz = string(nvars(BASERING)-anzahlvariablen+1); zz <= string(nvars(BASERING)-anzahlvariablen+neuvar); zz++)
+    {
+     l3[zz] = "X("+string(zz)+")";
+    }
+    ring TRANSFORMRING = create_ring(ringlist(basering)[1], "("+string(variablen)+","+string(l3)+",t)", "(dp("+string(anzahlvariablen-1)+"),dp("+string(nvars(BASERING)+neuvar-anzahlvariablen)+"),lp(1))", "no_minpoly");
     // map i into the new ring
     ideal i=imap(BASERING,i);
     // define a map phi which maps the true variables, which are not
@@ -6180,18 +6190,18 @@ NOTE:    - the procedure is called from inside the recursive
       // pass to a new ring whith one variable less
       if (anzahlvariablen>2)
       {
-        string elring="ring ELIMINATERING=("+charstr(basering)+"),("+string(simplify(reduce(maxideal(1),std(var(lastvar))),2))+"),(dp("+string(anzahlvariablen-2)+"),";
+        string elring="(dp("+string(anzahlvariablen-2)+"),";
       }
       else
       {
-        string elring="ring ELIMINATERING=("+charstr(basering)+"),("+string(simplify(reduce(maxideal(1),std(var(lastvar))),2))+"),(";
+        string elring="(";
       }
       if (anzahlvariablen<nvars(basering)) // if @a was present, the
       { // ordersting needs an additional entry
         elring=elring+"dp(1),";
       }
       elring=elring+"lp(1));";
-      execute(elring);
+      ring ELIMINATERING = create_ring(ringlist(basering)[1], "("+string(simplify(reduce(maxideal(1),std(var(lastvar))),2))+")", elring, "no_minpoly");
       ideal i=imap(BASERING,I); // move the ideal I to the new ring
       // if not yet all variables have been checked,
       // then go on with the next smaller variable,
@@ -6314,18 +6324,18 @@ NOTE:    - the procedure is called from inside the recursive
     // only realises these variables else we are done
     if (anzahlvariablen>1)
     {
-      string elring="ring ELIMINATERING=("+charstr(basering)+"),("+string(variablen)+"),(dp("+string(anzahlvariablen-1)+"),";
+      string elring="(dp("+string(anzahlvariablen-1)+"),";
     }
     else
     {
-      string elring="ring ELIMINATERING=("+charstr(basering)+"),("+string(variablen)+"),(";
+      string elring="(";
     }
     if (size(deletedvariables)+1<nvars(basering)) // if @a was present,
     { // the ordersting needs an additional entry
       elring=elring+"dp(1),";
     }
     elring=elring+"lp(1));";
-    execute(elring);
+    ring ELIMINATERING = create_ring(ringlist(basering)[1], "("+string(variablen)+")", elring, "no_minpoly");
     ideal i=imap(BASERING,i);
     ideal m=imap(BASERING,m);
     export(i);

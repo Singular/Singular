@@ -820,7 +820,6 @@ RETURN:  a list of ideals I(1),...,I(t) such that
   ideal J = eliminate(I,f);
   def base = basering;
   j = j[1,size(j)-1];
-  j;
   ring @r = create_ring(ringlist(basering)[1], (" + j + "), "(" + ordstr(basering) + ")", "no_minpoly");
   ideal J = imap(base,J);
 

@@ -1125,6 +1125,7 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
 int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isring, BOOLEAN init_b)
 {
   BOOLEAN res=FALSE;
+  BOOLEAN is_qring=FALSE;
   const char *id = name->name;
 
   memset(sy,0,sizeof(sleftv));
@@ -1144,7 +1145,11 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
         return TRUE;
       }
     }
-    if (t==QRING_CMD) t=RING_CMD; // qring is always RING_CMD
+    if (t==QRING_CMD)
+    {
+      t=RING_CMD; // qring is always RING_CMD
+      is_qring=TRUE;
+    }
 
     if (TEST_V_ALLWARN
     && (name->rtyp!=0)
@@ -1161,6 +1166,10 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
     {
       sy->rtyp=IDHDL;
       currid=sy->name=IDID((idhdl)sy->data);
+      if (is_qring)
+      {
+        IDFLAG((idhdl)sy->data)=sy->flag=Sy_bit(FLAG_QRING_DEF);
+      }
       // name->name=NULL; /* used in enterid */
       //sy->e = NULL;
       if (name->next!=NULL)
@@ -1239,7 +1248,8 @@ BOOLEAN iiBranchTo(leftv, leftv args)
   {
     // get the proc:
     iiCurrProc=(idhdl)h->data;
-    procinfo * pi=IDPROC(iiCurrProc);
+    idhdl currProc=iiCurrProc; /*iiCurrProc may be changed after yyparse*/
+    procinfo * pi=IDPROC(currProc);
     // already loaded ?
     if( pi->data.s.body==NULL )
     {
@@ -1260,6 +1270,7 @@ BOOLEAN iiBranchTo(leftv, leftv args)
     newBuffer( omStrDup(pi->data.s.body), BT_proc,
                pi, pi->data.s.body_lineno-(iiCurrArgs==NULL) );
     BOOLEAN err=yyparse();
+    iiCurrProc=NULL;
     si_opt_1=save1;
     si_opt_2=save2;
     // now save the return-expr.
@@ -1269,7 +1280,7 @@ BOOLEAN iiBranchTo(leftv, leftv args)
     // warning about args.:
     if (iiCurrArgs!=NULL)
     {
-      if (err==0) Warn("too many arguments for %s",IDID(iiCurrProc));
+      if (err==0) Warn("too many arguments for %s",IDID(currProc));
       iiCurrArgs->CleanUp();
       omFreeBin((ADDRESS)iiCurrArgs, sleftv_bin);
       iiCurrArgs=NULL;
@@ -1331,7 +1342,7 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
   //Print("iiInternalExport('%s',%d)%s\n", v->name, toLev,"");
   if (IDLEV(h)==0)
   {
-    if (BVERBOSE(V_REDEFINE)) Warn("`%s` is already global",IDID(h));
+    if ((myynest>0) && (BVERBOSE(V_REDEFINE))) Warn("`%s` is already global",IDID(h));
   }
   else
   {
@@ -2519,10 +2530,10 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
     if (bitmask!=0) n--;
 
     // initialize fields of R
-    R->order=(rRingOrder_t *)omAlloc0(n*sizeof(rRingOrder_t));
-    R->block0=(int *)omAlloc0(n*sizeof(int));
-    R->block1=(int *)omAlloc0(n*sizeof(int));
-    R->wvhdl=(int**)omAlloc0(n*sizeof(int_ptr));
+    R->order=(rRingOrder_t *)omAlloc0((n+1)*sizeof(rRingOrder_t));
+    R->block0=(int *)omAlloc0((n+1)*sizeof(int));
+    R->block1=(int *)omAlloc0((n+1)*sizeof(int));
+    R->wvhdl=(int**)omAlloc0((n+1)*sizeof(int_ptr));
     // init order, so that rBlocks works correctly
     for (j_in_R= n-2; j_in_R>=0; j_in_R--)
       R->order[j_in_R] = ringorder_unspec;
@@ -2771,7 +2782,7 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
     WerrorS("ordering must be given as `list`");
     return TRUE;
   }
-  if (bitmask!=0) R->bitmask=bitmask;
+  if (bitmask!=0) { R->bitmask=bitmask; R->wanted_maxExp=bitmask; }
   return FALSE;
 }
 
@@ -2922,7 +2933,7 @@ ring rCompose(const lists  L, const BOOLEAN check_comp, const long bitmask,const
     R->CanShortOut=FALSE;
   }
   #endif
-  if (bitmask!=0x7fff) R->bitmask=bitmask;
+  if ((bitmask!=0)&&(R->wanted_maxExp==0)) R->wanted_maxExp=bitmask;
   rComplete(R);
 
   // ------------------------ Q-IDEAL ------------------------
@@ -5297,7 +5308,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
       i++;
     else if ((*iv)[1]==ringorder_L)
     {
-      R->bitmask=(*iv)[2]*2+1;
+      R->wanted_maxExp=(*iv)[2]*2+1;
       n--;
     }
     else if (((*iv)[1]!=ringorder_a)
@@ -6602,4 +6613,35 @@ BOOLEAN iiCheckTypes(leftv args, const short *type_list, int report)
     }
   }
   return TRUE;
+}
+
+void iiSetReturn(const leftv source)
+{
+  if ((source->next==NULL)&&(source->e==NULL))
+  {
+    if ((source->rtyp!=IDHDL)&&(source->rtyp!=ALIAS_CMD))
+    {
+      memcpy(&iiRETURNEXPR,source,sizeof(sleftv));
+      source->Init();
+      return;
+    }
+    if (source->rtyp==IDHDL)
+    {
+      if ((IDLEV((idhdl)source->data)==myynest)
+      &&(IDTYP((idhdl)source->data)!=RING_CMD))
+      {
+        memset(&iiRETURNEXPR,0,sizeof(sleftv));
+        iiRETURNEXPR.rtyp=IDTYP((idhdl)source->data);
+        iiRETURNEXPR.data=IDDATA((idhdl)source->data);
+        iiRETURNEXPR.flag=IDFLAG((idhdl)source->data);
+        iiRETURNEXPR.attribute=IDATTR((idhdl)source->data);
+        IDATTR((idhdl)source->data)=NULL;
+        IDDATA((idhdl)source->data)=NULL;
+        source->name=NULL;
+        source->attribute=NULL;
+        return;
+      }
+    }
+  }
+  iiRETURNEXPR.Copy(source);
 }

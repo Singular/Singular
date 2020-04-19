@@ -10,13 +10,15 @@ GNU General Public Licence (See [COPYING](@ref copying_page)).
     <https://github.com/Singular/Sources/wiki/Step-by-Step-Installation-Instructions-for-Singular>
 
 * Homepage:
-    <http://www.singular.uni-kl.de/>
+    <https://www.singular.uni-kl.de/>
 
 * Source code:
-    <https://github.com/Singular/Sources>
+    <https://github.com/Singular/Sources> (git repository)
+
+    <ftp://jim.mathematik.uni-kl.de/pub/Math/Singular/src> (tar balls)
 
 * User Manual:
-    <http://www.singular.uni-kl.de/Manual/latest>
+    <https://www.singular.uni-kl.de/Manual/latest>
 
 * Bug/Issue-Tracker:
     <http://www.singular.uni-kl.de:8002/trac>
@@ -25,5 +27,5 @@ GNU General Public Licence (See [COPYING](@ref copying_page)).
     <https://github.com/Singular/Sources/wiki/>
 
 * [Developer and Reference Manual:](@ref main_page)
-   <http://www.singular.uni-kl.de/dox/html>
+   <https://www.singular.uni-kl.de/dox/html>
 

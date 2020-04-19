@@ -167,7 +167,7 @@ rings and a supporting framework for making them
 accessible to the user.
 
 In particular we have separated everything related to coeffcient rings into a separate library @code{libcoeffs}.
-Dependency tree between restructured packages is show at @uref{http://www.singular.uni-kl.de/dox/singular.png}
+Dependency tree between restructured packages is show at @uref{https://www.singular.uni-kl.de/dox/singular.png}
 
 In order to use @code{libSingular} as a C++ library, see @ref{libSingular}.
 

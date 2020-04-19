@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version ncModslimgb.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version ncModslimgb.lib 4.1.3.0 Apr_2020 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY:  ncModslimgb.lib A library for computing Groebner bases over G-algebras
@@ -154,7 +154,7 @@ EXAMPLE: example ncmodslimgb; shows an example
       {
         argumentpar[i-nextbp+1] = list(I,L[i]);
       }
-      P = parallelWaitAll("ModpSlim",argumentpar, 0,ncores);
+      P = parallelWaitAll("NcModslimgb::ModpSlim",argumentpar, 0,ncores);
 
       for(i = 1; i <= size(P); i++)
       {
@@ -357,10 +357,10 @@ EXAMPLE: example PrimeList; shows an example
           arguments[i] = list("Id", p);
           arguments2[i] = list(p);
       }
-      parallelResults = parallelWaitAll("PrimeTestId", arguments, 0, ncores);
+      parallelResults = parallelWaitAll("NcModslimgb::PrimeTestId", arguments, 0, ncores);
 
       //check that primes are suitable for commutator relations
-      parallelResults2 = parallelWaitAll("PrimeTestCommutatorRel", arguments2,
+      parallelResults2 = parallelWaitAll("NcModslimgb::PrimeTestCommutatorRel", arguments2,
                                                                      0, ncores);
 
       for(i = size(arguments); i > 0; i--)

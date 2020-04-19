@@ -205,6 +205,10 @@ ideal idSect (ideal h1,ideal h2, GbVariant alg)
   int rank=si_max(h1->rank,h2->rank);
   if ((idIs0(h1)) || (idIs0(h2)))  return idInit(1,rank);
 
+  BITSET save_opt;
+  SI_SAVE_OPT1(save_opt);
+  si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
+
   ideal first,second,temp,temp1,result;
   poly p,q;
 
@@ -403,6 +407,7 @@ ideal idSect (ideal h1,ideal h2, GbVariant alg)
   }
 
   idSkipZeroes(result);
+  SI_RESTORE_OPT1(save_opt);
   if (TEST_OPT_RETURN_SB)
   {
      w=NULL;
@@ -792,7 +797,13 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
 
   idTest(s_h1);
 
+  BITSET save_opt;
+  SI_SAVE_OPT1(save_opt);
+  si_opt_1|=Sy_bit(OPT_REDTAIL_SYZ);
+
   ideal s_h3=idPrepare(s_h1,h,k,w,alg); // main (syz) GB computation
+
+  SI_RESTORE_OPT1(save_opt);
 
   if (s_h3==NULL)
   {
@@ -1098,6 +1109,18 @@ static void idPrepareStd(ideal s_temp, int k)
   s_temp->rank = k+IDELEMS(s_temp);
 }
 
+static void idLift_setUnit(int e_mod, matrix *unit)
+{
+  if (unit!=NULL)
+  {
+    *unit=mpNew(e_mod,e_mod);
+    // make sure that U is a diagonal matrix of units
+    for(int i=e_mod;i>0;i--)
+    {
+      MATELEM(*unit,i,i)=pOne();
+    }
+  }
+}
 /*2
 *computes a representation of the generators of submod with respect to those
 * of mod
@@ -1108,29 +1131,36 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
 {
   int lsmod =id_RankFreeModule(submod,currRing), j, k;
   int comps_to_add=0;
+  int idelems_mod=IDELEMS(mod);
+  int idelems_submod=IDELEMS(submod);
   poly p;
 
   if (idIs0(submod))
   {
-    if (unit!=NULL)
-    {
-      *unit=mpNew(1,1);
-      MATELEM(*unit,1,1)=pOne();
-    }
     if (rest!=NULL)
     {
       *rest=idInit(1,mod->rank);
     }
-    return idInit(1,mod->rank);
+    idLift_setUnit(idelems_submod,unit);
+    return idInit(1,idelems_mod);
   }
   if (idIs0(mod)) /* and not idIs0(submod) */
   {
-    WerrorS("2nd module does not lie in the first");
-    return NULL;
+    if (rest!=NULL)
+    {
+      *rest=idCopy(submod);
+      idLift_setUnit(idelems_submod,unit);
+      return idInit(1,idelems_mod);
+    }
+    else
+    {
+      WerrorS("2nd module does not lie in the first");
+      return NULL;
+    }
   }
   if (unit!=NULL)
   {
-    comps_to_add = IDELEMS(submod);
+    comps_to_add = idelems_submod;
     while ((comps_to_add>0) && (submod->m[comps_to_add-1]==NULL))
       comps_to_add--;
   }
@@ -1209,17 +1239,31 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
       {
         if (!divide)
         {
-          if (isSB)
+          if (rest==NULL)
           {
-            WarnS("first module not a standardbasis\n"
+            if (isSB)
+            {
+              WarnS("first module not a standardbasis\n"
               "// ** or second not a proper submodule");
+            }
+            else
+              WerrorS("2nd module does not lie in the first");
           }
-          else
-            WerrorS("2nd module does not lie in the first");
           idDelete(&s_result);
           idDelete(&s_rest);
-          s_result=idInit(IDELEMS(submod),submod->rank);
-          break;
+          if(syz_ring!=orig_ring)
+          {
+            idDelete(&s_mod);
+            rChangeCurrRing(orig_ring);
+            rDelete(syz_ring);
+          }
+          if (unit!=NULL)
+          {
+            idLift_setUnit(idelems_submod,unit);
+          }
+          if (rest!=NULL) *rest=idCopy(submod);
+          s_result=idInit(idelems_submod,idelems_mod);
+          return s_result;
         }
         else
         {
@@ -1252,13 +1296,16 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
     rDelete(syz_ring);
   }
   if (rest!=NULL)
+  {
+    s_rest->rank=mod->rank;
     *rest = s_rest;
+  }
   else
     idDelete(&s_rest);
 //idPrint(s_result);
   if (unit!=NULL)
   {
-    *unit=mpNew(comps_to_add,comps_to_add);
+    *unit=mpNew(idelems_submod,idelems_submod);
     int i;
     for(i=0;i<IDELEMS(s_result);i++)
     {
@@ -1291,6 +1338,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
       p_Shift(&s_result->m[i],-comps_to_add,currRing);
     }
   }
+  s_result->rank=idelems_mod;
   return s_result;
 }
 
@@ -1509,18 +1557,19 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   PrintS("last elem:");wrp(s_h4->m[IDELEMS(s_h4)-1]);PrintLn();
   #endif
   ideal s_h3;
+  BITSET old_test1;
+  SI_SAVE_OPT1(old_test1);
+  if (TEST_OPT_RETURN_SB) si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
   if (addOnlyOne)
   {
-    BITSET old_test1;
-    SI_SAVE_OPT1(old_test1);
     if(!rField_is_Ring(currRing)) si_opt_1 |= Sy_bit(OPT_SB_1);
     s_h3 = kStd(s_h4,currRing->qideal,hom,&weights1,NULL,0/*kmax-1*/,IDELEMS(s_h4)-1);
-    SI_RESTORE_OPT1(old_test1);
   }
   else
   {
     s_h3 = kStd(s_h4,currRing->qideal,hom,&weights1,NULL,kmax-1);
   }
+  SI_RESTORE_OPT1(old_test1);
   #if 0
   // only together with the above debug stuff
   idSkipZeroes(s_h3);
@@ -1893,7 +1942,7 @@ poly idMinor(matrix a, int ar, unsigned long which, ideal R)
             p = kNF(R,currRing->qideal,q);
             p_Delete(&q,currRing);
           }
-	}
+        }
         /*delete the matrix tmp*/
         for (i=1; i<=ar; i++)
         {
@@ -2328,10 +2377,11 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
   }
 
   idTest(s_temp);
-  unsigned save_opt=si_opt_1;
+  unsigned save_opt;
+  SI_SAVE_OPT1(save_opt);
   si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
   ideal s_temp1 = kStd(s_temp,currRing->qideal,hom,&wtmp,NULL,length);
-  si_opt_1=save_opt;
+  SI_RESTORE_OPT1(save_opt);
 
   //if (wtmp!=NULL)  Print("output weights:");wtmp->show(1);PrintLn();
   if ((w!=NULL) && (*w !=NULL) && (wtmp!=NULL))
@@ -2894,7 +2944,8 @@ static BOOLEAN id_sat_vars_sp(kStrategy strat)
       //  for (int i=rVar(currRing); i>0; i--)
       //    if (mm[i]!=0) Print("x_%d:%d ",i,mm[i]);
       //PrintLn();
-      memset(&strat->P,0,sizeof(strat->P));
+      strat->P.Init(currRing);
+      //memset(&strat->P,0,sizeof(strat->P));
       strat->P.tailRing = strat->tailRing;
       strat->P.p=p;
       while(p!=NULL)
@@ -2945,7 +2996,8 @@ static BOOLEAN id_sat_vars_sp(kStrategy strat)
       //  for (int i=rVar(currRing); i>0; i--)
       //    if (mm[i]!=0) Print("x_%d:%d ",i,mm[i]);
       //PrintLn();
-      memset(&strat->P,0,sizeof(strat->P));
+      strat->P.Init(currRing);
+      //memset(&strat->P,0,sizeof(strat->P));
       strat->P.tailRing = strat->tailRing;
       strat->P.t_p=p;
       while(p!=NULL)

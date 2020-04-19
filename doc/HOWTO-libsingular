@@ -1,5 +1,5 @@
 The following is valid for Singular 4-x-x:
-(for technical details see http://www.singular.uni-kl.de/Manual/modules.pdf)
+(for technical details see https://www.singular.uni-kl.de/Manual/modules.pdf)
 
 ./configure --disable-static ....
 

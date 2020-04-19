@@ -1315,6 +1315,10 @@ EXAMPLE:  example ncInit;
   // In this case just add missing variables
   if (defined(NCRATINITIALIZE))
   {
+    if (!defined(basering))
+    {
+      ncRingDefine();
+    }
     return ();
   }
   int NCRATINITIALIZE = 1;

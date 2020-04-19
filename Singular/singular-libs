@@ -14,9 +14,9 @@ SLIB0 = absfact.lib ainvar.lib aksaka.lib alexpoly.lib algebra.lib \
 	homolog.lib hyperel.lib integralbasis.lib inout.lib intprog.lib \
 	jacobson.lib \
 	kskernel.lib latex.lib linalg.lib makedbm.lib \
-	matrix.lib modstd.lib mondromy.lib monomialideal.lib \
+	matrix.lib moddiq.lib modnormal.lib modular.lib modstd.lib mondromy.lib monomialideal.lib \
 	mprimdec.lib mregular.lib \
-	noether.lib normal.lib normaliz.lib ntsolve.lib \
+	nfmodstd.lib nfmodsyz.lib noether.lib normal.lib normaliz.lib ntsolve.lib \
 	paraplanecurves.lib phindex.lib \
 	pointid.lib poly.lib \
 	presolve.lib primdec.lib primdecint.lib \
@@ -45,9 +45,9 @@ SLIB1 = arr.lib arnoldclassify.lib \
 	hess.lib hdepth.lib \
 	JMBTest.lib JMSConst.lib \
         locnormal.lib \
-	methods.lib modnormal.lib modular.lib modules.lib multigrading.lib modwalk.lib\
+	methods.lib modules.lib multigrading.lib modwalk.lib\
 	nets.lib ncfrac.lib ncloc.lib ncModslimgb.lib\
-	nfmodstd.lib nfmodsyz.lib numerAlg.lib numerDecom.lib \
+	numerAlg.lib numerDecom.lib \
         olga.lib orbitparam.lib \
 	parallel.lib polyclass.lib polymake.lib polybori.lib \
 	realclassify.lib realizationMatroids.lib resources.lib ringgb.lib \
@@ -58,10 +58,11 @@ SLIB1 = arr.lib arnoldclassify.lib \
 PLIBS = bimodules.lib bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib\
         fpadim.lib fpalgebras.lib fpaprops.lib freegb.lib\
 	gkdim.lib involut.lib\
-	ncall.lib ncalg.lib ncdecomp.lib ncfactor.lib nchomolog.lib ncpreim.lib nctools.lib \
+	ncall.lib ncalg.lib ncdecomp.lib ncfactor.lib nchomolog.lib \
+        ncModslimgb.lib ncpreim.lib nctools.lib \
 	perron.lib purityfiltration.lib  qmatrix.lib \
         ratgb.lib
 
 # contributed libs, status not yet decided
-SLIB2 = KVequiv.lib deflation.lib lejeune.lib ncHilb.lib ncrat.lib \
+SLIB2 = KVequiv.lib deflation.lib invar.lib lejeune.lib ncHilb.lib ncrat.lib \
 	mathml.lib maxlike.lib recover.lib redcgs.lib difform.lib autgradalg.lib

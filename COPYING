@@ -1,9 +1,9 @@
-                        SINGULAR version 4-1-2
+                        SINGULAR version 4-1-3
                      University of Kaiserslautern
        Department of Mathematics and Centre for Computer Algebra
      Authors: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann
 
-                        Copyright (C) 1986-2019
+                        Copyright (C) 1986-2020
 
 
                                *NOTICE*
@@ -46,7 +46,7 @@ with subject line 'register' and body containing the following data:
 your name, email address, organisation, country and platform(s).
 
 For information on how to cite SINGULAR see
-<http://www.singular.uni-kl.de/index.php/how-to-cite-singular>.
+<https://www.singular.uni-kl.de/index.php/how-to-cite-singular>.
 
 You can also support SINGULAR by informing us about your result obtained
 by using SINGULAR.
@@ -55,7 +55,7 @@ Availability
 ============
 
 The latest information regarding the status of SINGULAR is always
-available from <http://www.singular.uni-kl.de>.
+available from <https://www.singular.uni-kl.de>.
 
 Acknowledgements
 ================

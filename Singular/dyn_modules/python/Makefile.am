@@ -28,7 +28,7 @@ endif
 
 python_module_la_SOURCES  = $(SOURCES)
 
-python_module_la_CPPFLAGS = -I/usr/include/python${PYTHON_VERSION} ${AM_CPPFLAGS} ${P_PROCS_CPPFLAGS_COMMON}
+python_module_la_CPPFLAGS = ${PYTHON_CSPEC} ${AM_CPPFLAGS} ${P_PROCS_CPPFLAGS_COMMON}
 python_module_la_LDFLAGS  = ${P_PROCS_MODULE_LDFLAGS} $(SINGULAR_LDFLAGS)
 
 # forcefully enable exceptions for python
@@ -42,7 +42,7 @@ endif
 endif
 
 if HAVE_PYTHON_MODULE
- python_module_la_LIBADD   += -lboost_python-${PYTHON_VERSION} -lpython${PYTHON_VERSION}
+ python_module_la_LIBADD   += -lboost_python-${PYTHON_VERSION} ${PYTHON_LSPEC}
 endif
 
 python_module_la_CXXFLAGS = ${AM_CXXFLAGS}

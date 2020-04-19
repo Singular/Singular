@@ -1547,8 +1547,12 @@ static proc sortMons(list BL){
   // sort MON according to the degrevlex ordering (dp)
   def R = basering;
 
-  string Sstr = "ring S = (" + charstr(basering)  + "), Y(nvars(basering)..1), dp;";
-  execute(Sstr);
+  list l6;
+  for (int zz = 1; zz <= nvars(basering); zz++)
+  {
+   l6[zz] = "Y("+string(nvars(basering)+1-zz)+")";
+  }
+  ring S = create_ring(ringlist(basering)[1], l6, "dp", "no_minpoly");
   setring S;  //creates a ring of shape '0, Y(nvars(basering)..1), dp'
 
   map f = R, Y(1..nvars(basering));
@@ -2481,7 +2485,7 @@ static proc setGLnGrading(intmat Qnew, poly deter, list #){
 
 // helper
 static proc adjoinVar(int n0){
-  string S2str = "ring S2 = (" + charstr(basering) + "),((";
+  string S2str = "(";
 
   for(int i = n0 + 1; i <= nvars(basering); i++){
     S2str = S2str + string(var(i));
@@ -2489,11 +2493,10 @@ static proc adjoinVar(int n0){
     if(i < nvars(basering)){
       S2str = S2str + ", ";
     } else {
-      S2str = S2str + "), Z),(dp(nvars(basering) - n0), dp(1))";
+      S2str = S2str + ", Z)";
     }
   }
-
-  execute(S2str);
+  ring S2 = create_ring(ringlist(basering)[1], S2str, "(dp("+string(nvars(basering) - n0)+"), dp(1))", "no_minpoly");
   return(S2);
 }
 
@@ -3312,7 +3315,7 @@ EXAMPLE: example shrink; shows an example
     take[zeros[i]] = 0;
   }
 
-  string s  = "ring S = ("+ charstr(R) + "), ("; //charstr: e.g. 0,a
+  string s  = "(";
   int firstone = 1;
   int n = 0; // no of variables in new ring
 
@@ -3329,8 +3332,8 @@ EXAMPLE: example shrink; shows an example
     }
   }
 
-  s = s + "),(dp(" + string(n-1) + "), dp(1));";
-  execute(s);
+  s = s + ")";
+  ring S = create_ring(ringlist(R)[1], s, "(dp(" + string(n-1) + "), dp(1))", "no_minpoly");     //charstr: e.g. 0,a
 
   // map the ideal to Small:
   ideal Ishrink = imap(R, I);

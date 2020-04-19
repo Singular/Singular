@@ -24,6 +24,7 @@
 * Singular 3 and Singular 4::
 * libSingular::
 * Download instructions::
+* Used environment variables::
 * Unix installation instructions::
 * Windows installation instructions::
 * Macintosh installation instructions::
@@ -65,7 +66,7 @@ memory allocation functions for GMP
 signal handlers
 (see @code{init_signals} in @code{Singular/cntrlc.cc}).@*
 At least a handler for @code{SIGCHLD} must be installed
-for the routines from @ref{parallel_lib}, @ref{modstd_lib}, @ref{modnormal_lib}, @ref{tasks_lib}.@*
+for the commands @ref{waitfirst}, @ref{waitall} and the routines from @ref{parallel_lib}, @ref{modstd_lib}, @ref{modnormal_lib}, @ref{tasks_lib}.@*
 If the child was started by @code{libSingular} the handler
 has to call @code{sig_chld_hdl} from @code{Singular/links/ssiLink.cc}
 or implement something similiar (call @code{slClose(l)} for ssi links).
@@ -97,6 +98,73 @@ from our FTP site
 @c @include README_download.texi
 
 @c ----------------------------------------------------------
+@node Used environment variables
+@section Used environment variables
+@cindex environment variables
+@cindex used environment variables
+@cindex path
+@cindex paths
+
+@sc{Singular} needs to find some files (dynamic modules, libraries, help files).
+Usually they are found relative to the location of the (main) executable
+(after following symlinks).
+This can be changed by setting the following environment variables.
+
+@itemize
+@item SINGULAR_EXECUTABLE (should usually not be set)
+@*the complete filename of the main executable, usually derived from
+the command line (inspecting also PATH, following symlinks).
+@*If SINGULAR_EXECUTABLE cannot be found, $prefix/bin/Singular is assumed.
+@*For @code{libSingular}: SINGULAR_EXECUTABLE is set to the argument of @code{siInit} (it must exist).
+@item SINGULAR_BIN_DIR
+@*the directory of the main executable, usually derived from
+$SINGULAR_EXECUTABLE
+@item SINGULAR_ROOT_DIR
+@*the root of the singular tree, default: $SINGULAR_BIN_DIR/..
+@item SINGULAR_DATA_DIR
+@*the root of the singular data files, default: $SINGULAR_BIN_DIR/../share
+@item SINGULARPATH
+@*the directories for libraries and optional dynamic modules (seperated by @code{;}), default:
+  @itemize
+  @item $SINGULAR_DATA_DIR/singular/LIB
+  @item $SINGULAR_ROOT_DIR/share/singular/LIB
+  @item $SINGULAR_BIN_DIR/../share/singular/LIB
+  @item $SINGULAR_DATA_DIR/factory
+  @item $SINGULAR_ROOT_DIR/share/factory
+  @item $SINGULAR_BIN_DIR/LIB
+  @item $SINGULAR_BIN_DIR/../factory
+  @item $SINGULAR_BIN_DIR/MOD
+  @item $SINGULAR_ROOT_DIR/lib/singular/MOD
+  @item $SINGULAR_ROOT_DIR/libexec/singular/MOD
+  @item $prefix/lib/singular/MOD
+  @item $prefix/libexec/singular/MOD
+  @item $SINGULAR_BIN_DIR
+  @end itemize
+@item SINGULAR_PROCS_DIR
+@*the directories for dynamic modules (seperated by @code{;}), default:
+  @itemize
+  @item $SINGULAR_BIN_DIR/MOD
+  @item $SINGULAR_ROOT_DIR/lib/singular/MOD
+  @item $SINGULAR_ROOT_DIR/libexec/singular/MOD
+  @item $prefix/lib/singular/MOD
+  @item $prefix/libexec/singular/MOD
+  @end itemize
+@item SINGULAR_INFO_FILE
+@*@code{singular.hlp}, default: $SINGULAR_DATA_DIR/info/singular.hlp
+@item SINGULAR_IDX_FILE
+@*the help index, default: $SINGULAR_DATA_DIR/singular/singular.idx
+@item SINGULAR_HTML_DIR
+@*the directory of the manual as html files,
+default: $SINGULAR_DATA_DIR/singular/html
+@item SINGULAR_URL
+@*the URL of the manual, default: https://www.singular.uni-kl.de/Manual/
+@end itemize
+
+The effective list of directories/files can be printed by @code{Singular -v},
+see @ref{Command line options}.
+
+Depending on the used functions, these environment variables apply also to @code{libSingular}.
+@c ----------------------------------------------------------
 @node Unix installation instructions
 @section Unix installation instructions
 @cindex Unix installation
@@ -120,15 +188,15 @@ Install the necessary packages:
   @item
   libreadline
   @item
-  gmp
+  gmp, mpfr
   @item
   ntl
   @item
   libcdd
   @end itemize
 @item
-Install flint 2.5:
-@code{./configure --with-gmp=/usr --prefix=$HOME/tmp --disable-shared}
+Install flint 2.5 (or newer):
+@code{./configure --with-gmp=/usr --prefix=$HOME/tmp}
 @*@code{make && make install}
 @item
 Install Singular

@@ -5,9 +5,9 @@ Release: 1%{?dist}
 License: GPLv2+
 Group: Applications/Math
 Vendor: Singular Team
-URL: http://www.singular.uni-kl.de
+URL: https://www.singular.uni-kl.de
 Packager: Mathias Schulze <mschulze@mathematik.uni-kl.de>
-Source0: http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/UNIX/%{name}-%{version}.tar.gz
+Source0: https://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/UNIX/%{name}-%{version}.tar.gz
 BuildArch: %{_arch}
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: cddlib-devel, gmp-devel, ntl-devel

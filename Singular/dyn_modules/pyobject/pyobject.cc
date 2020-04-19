@@ -13,7 +13,6 @@
 //*****************************************************************************
 
 #include "kernel/mod2.h"
-#ifdef HAVE_PYTHON
 
 #include "omalloc/omalloc.h"
 #include "misc/intvec.h"
@@ -29,6 +28,7 @@
 
 #include "Singular/mod_lib.h"
 
+#ifdef HAVE_PYTHON
 #include <Python.h>
 
 // #include <iterator>             // std::distance
@@ -740,5 +740,11 @@ extern "C" int SI_MOD_INIT(pyobject)(SModulFunctions* psModulFunctions)
   return MAX_TOK;
 }
 #undef PYOBJECT_ADD_C_PROC
+#else
+extern "C" int SI_MOD_INIT(pyobject)(SModulFunctions* psModulFunctions)
+{
+  PrintS("no pyobject support\n");
+  return MAX_TOK;
+}
 
 #endif /* HAVE_PYTHON */

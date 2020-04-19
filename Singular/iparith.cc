@@ -1643,20 +1643,22 @@ BOOLEAN jjPROC(leftv res, leftv u, leftv v)
 static BOOLEAN jjMAP(leftv res, leftv u, leftv v)
 {
   //Print("try to map %s with %s\n",$3.Name(),$1.Name());
-  leftv sl=NULL;
-  if ((v->e==NULL)&&(v->name!=NULL))
+  if ((v->e==NULL)&&(v->name!=NULL)&&(v->next==NULL))
   {
     map m=(map)u->Data();
-    sl=iiMap(m,v->name);
+    leftv sl=iiMap(m,v->name);
+    if (sl!=NULL)
+    {
+      memcpy(res,sl,sizeof(sleftv));
+      omFreeBin((ADDRESS)sl, sleftv_bin);
+      return FALSE;
+    }
   }
   else
   {
     Werror("%s(<name>) expected",u->Name());
   }
-  if (sl==NULL) return TRUE;
-  memcpy(res,sl,sizeof(sleftv));
-  omFreeBin((ADDRESS)sl, sleftv_bin);
-  return FALSE;
+  return TRUE; /*sl==NULL or Werror*/
 }
 static BOOLEAN jjRING_1(leftv res, leftv u, leftv v)
 {
@@ -1928,30 +1930,10 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
   ideal R; matrix U;
   ideal m = idLift(vi,ui,&R, FALSE,hasFlag(v,FLAG_STD),TRUE,&U);
   if (m==NULL) return TRUE;
-  // now make sure that all matrices have the corect size:
+  // now make sure that all matrices have the correct size:
   matrix T = id_Module2formatedMatrix(m,vl,ul,currRing);
   int i;
-  if (MATCOLS(U) != (int)ul)
-  {
-    unsigned mul=si_min(ul,MATCOLS(U));
-    matrix UU=mpNew(ul,ul);
-    unsigned j;
-    for(i=mul;i>0;i--)
-    {
-      for(j=mul;j>0;j--)
-      {
-        MATELEM(UU,i,j)=MATELEM(U,i,j);
-        MATELEM(U,i,j)=NULL;
-      }
-    }
-    idDelete((ideal *)&U);
-    U=UU;
-  }
-  // make sure that U is a diagonal matrix of units
-  for(i=ul;i>0;i--)
-  {
-    if(MATELEM(U,i,i)==NULL) MATELEM(U,i,i)=pOne();
-  }
+  assume (MATCOLS(U) == (int)ul);
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(3);
   L->m[0].rtyp=MATRIX_CMD;   L->m[0].data=(void *)T;
@@ -4495,7 +4477,6 @@ static BOOLEAN jjLISTRING(leftv res, leftv v)
 {
   lists l=(lists)v->Data();
   long mm=(long)atGet(v,"maxExp",INT_CMD);
-  if (mm==0) mm=0x7fff;
   int isLetterplace=(int)(long)atGet(v,"isLetterplaceRing",INT_CMD);
   ring r=rCompose(l,TRUE,mm,isLetterplace);
   res->data=(char *)r;
@@ -4840,9 +4821,8 @@ static BOOLEAN jjRINGLIST(leftv res, leftv v)
     res->data = (char *)rDecompose((ring)v->Data());
     if (res->data!=NULL)
     {
-      long mm=r->bitmask;
-      if (mm>MAX_INT_VAL) mm=MAX_INT_VAL;
-      atSet(res,omStrDup("maxExp"),(void*)mm,INT_CMD);
+      long mm=r->wanted_maxExp;
+      if (mm!=0) atSet(res,omStrDup("maxExp"),(void*)mm,INT_CMD);
       return FALSE;
     }
   }
@@ -5106,10 +5086,7 @@ static BOOLEAN jjSYZYGY(leftv res, leftv v)
       if (idHomIdeal(v_id,currRing->qideal))
         hom=isHomog;
   }
-  unsigned save_opt=si_opt_1;
-  si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
   ideal S=idSyzygies(v_id,hom,&w);
-  si_opt_1=save_opt;
   res->data = (char *)S;
   if (hom==isHomog)
   {
@@ -6807,6 +6784,8 @@ static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
   intvec **weights=NULL;
   int wmaxl=maxl;
   maxl--;
+  unsigned save_opt=si_opt_1;
+  si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
   if ((maxl==-1) && (iiOp!=MRES_CMD))
     maxl = currRing->N-1;
   if ((iiOp == RES_CMD) || (iiOp == MRES_CMD))
@@ -6833,6 +6812,7 @@ static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
   if (r==NULL) return TRUE;
   int t3=u->Typ();
   iiMakeResolv(r,l,wmaxl,w->name,t3,weights);
+  si_opt_1=save_opt;
   return FALSE;
 }
 #endif
@@ -7907,6 +7887,7 @@ static BOOLEAN jjRESERVEDLIST0(leftv res, leftv)
 	lists L = (lists)omAllocBin(slists_bin);
 	struct blackbox_list *bb_list = NULL;
 	unsigned nCount = (sArithBase.nCmdUsed-1) / 3;
+
 	if ((3*nCount) < sArithBase.nCmdUsed) {
 		nCount++;
 	}
@@ -7958,7 +7939,9 @@ static BOOLEAN jjRESERVEDLIST0(leftv res, leftv)
 			k++;
 		}
 	}
-	// free the struct (not the list itself)
+	// free the struct (not the list entries itself, which were allocated
+	// by strdup)
+	omfree(bb_list->list);
 	omfree(bb_list);
 
 	// pass the resultant list to the res datastructure
@@ -9273,7 +9256,7 @@ const char * Tok2Cmdname(int tok)
   if (tok==NONE) return "nothing";
   if (tok < 128)
   {
-    Tok2Cmdname_buf[1]=(char)tok;
+    Tok2Cmdname_buf[0]=(char)tok;
     return Tok2Cmdname_buf;
   }
   //if (tok==IFBREAK) return "if_break";
