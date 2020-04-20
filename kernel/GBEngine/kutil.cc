@@ -967,10 +967,13 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
     ring r;
     poly p;
     L->GetLm(p, r);
-    if (L->sev != 0 && p_GetShortExpVector(p, r) != L->sev)
+    if (L->sev != 0L)
     {
-      return dReportError("L[%d] wrong sev: has %o, specified to have %o",
+      if (p_GetShortExpVector(p, r) != L->sev)
+      {
+        return dReportError("L[%d] wrong sev: has %lo, specified to have %lo",
                           lpos, p_GetShortExpVector(p, r), L->sev);
+      }
     }
   }
   if (L->p1 == NULL)
@@ -1556,6 +1559,8 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
   h.sev = pGetShortExpVector(h.p);
   if (currRing!=strat->tailRing)
     h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
+  if (strat->P.p!=NULL) strat->P.sev = pGetShortExpVector(strat->P.p);
+  else strat->P.sev=0L;
   enterL(&strat->B,&strat->Bl,&strat->Bmax,h,posx);
   kTest_TS(strat);
 }
@@ -6983,7 +6988,7 @@ int posInL17_c (const LSet set, const int length,
 
   int cc = (-1+2*currRing->order[0]==ringorder_c);
   /* cc==1 for (c,..), cc==-1 for (C,..) */
-  unsigned long c = pGetComp(p->p)*cc;
+  long c = pGetComp(p->p)*cc;
   int o = p->GetpFDeg() + p->ecart;
 
   if (pGetComp(set[length].p)*cc > c)
@@ -9595,9 +9600,11 @@ void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat)
   p.GetP(strat->lmBin);
   if (strat->homog) strat->initEcart(&p);
       strat->redTailChange=FALSE;
-  if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing))) {
+  if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
+  {
     p.pCleardenom();
-    if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL)) {
+    if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+    {
 #ifdef HAVE_SHIFTBBA
       if (rIsLPRing(currRing))
         p.p = redtailBba(&p,strat->tl,strat, TRUE,!TEST_OPT_CONTENTSB);
@@ -9609,6 +9616,8 @@ void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat)
       p.pCleardenom();
       if (strat->redTailChange)
         p.t_p=NULL;
+      if (strat->P.p!=NULL) strat->P.sev=p_GetShortExpVector(strat->P.p,currRing);
+      else strat->P.sev=0;
     }
   }
 
@@ -9621,14 +9630,17 @@ void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat)
   /* enter p to T set */
   enterT(p, strat);
 
-  for (j = 0; j <= strat->sl; ++j) {
-    if (pLtCmp(tp, strat->S[j]) == 0) {
+  for (j = 0; j <= strat->sl; ++j)
+  {
+    if (pLtCmp(tp, strat->S[j]) == 0)
+    {
       break;
     }
   }
   /* it may be that the exchanged element
    * is until now only in T and not in S */
-  if (j <= strat->sl) {
+  if (j <= strat->sl)
+  {
     deleteInS(j, strat);
   }
 
@@ -9638,13 +9650,16 @@ void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat)
   assume(p.FDeg == p.pFDeg());
 
   /* remove useless pairs from L set */
-  for (i = 0; i <= strat->Ll; ++i) {
-    if (strat->L[i].p1 != NULL && pLtCmp(tp, strat->L[i].p1) == 0) {
+  for (i = 0; i <= strat->Ll; ++i)
+  {
+    if (strat->L[i].p1 != NULL && pLtCmp(tp, strat->L[i].p1) == 0)
+    {
       deleteInL(strat->L, &(strat->Ll), i, strat);
       i--;
       continue;
     }
-    if (strat->L[i].p2 != NULL && pLtCmp(tp, strat->L[i].p2) == 0) {
+    if (strat->L[i].p2 != NULL && pLtCmp(tp, strat->L[i].p2) == 0)
+    {
       deleteInL(strat->L, &(strat->Ll), i, strat);
       i--;
     }
