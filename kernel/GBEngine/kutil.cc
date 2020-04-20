@@ -232,6 +232,19 @@ static inline int pDivComp(poly p, poly q)
   return 0;
 }
 
+#ifdef HAVE_SHIFTBBA
+static inline int pLPDivComp(poly p, poly q) {
+  if ((currRing->pCompIndex < 0) || (__p_GetComp(p,currRing) == __p_GetComp(q,currRing)))
+  {
+    // maybe there is a more performant way to do this? This will get called quite often in bba.
+    if (_p_LPLmDivisibleByNoComp(p, q, currRing)) return 1;
+    if (_p_LPLmDivisibleByNoComp(q, p, currRing)) return -1;
+  }
+
+  return 0;
+}
+#endif
+
 
 VAR int     HCord;
 VAR int     Kstd1_deg;
@@ -729,6 +742,33 @@ int kFindInT(poly p, kStrategy strat)
   return -1;
 }
 
+#ifdef HAVE_SHIFTBBA
+int kFindInTShift(poly p, TSet T, int tlength)
+{
+  int i;
+
+  for (i=0; i<=tlength; i++)
+  {
+    // in the Letterplace ring the LMs in T and L are copies thus we have to use pEqualPolys() instead of ==
+    if (pEqualPolys(T[i].p, p)) return i;
+  }
+  return -1;
+}
+
+int kFindInTShift(poly p, kStrategy strat)
+{
+  int i;
+  do
+  {
+    i = kFindInTShift(p, strat->T, strat->tl);
+    if (i >= 0) return i;
+    strat = strat->next;
+  }
+  while (strat != NULL);
+  return -1;
+}
+#endif
+
 #ifdef KDEBUG
 
 void sTObject::wrp()
@@ -920,7 +960,7 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
         pNext(L->p) = NULL;
       }
     }
-    if (testp!=2) kFalseReturn(kTest_T(L, strat_tailRing, lpos, 'L'));
+    kFalseReturn(kTest_T(L, strat_tailRing, lpos, 'L'));
     if (pn != NULL)
       pNext(L->p) = pn;
 
@@ -938,16 +978,27 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
     // L->p2 either NULL or "normal" poly
     pFalseReturn(pp_Test(L->p2, currRing, L->tailRing));
   }
-  else if (tlength > 0 && T != NULL && (lpos >=0) && (testp!=2))
+  else if (tlength > 0 && T != NULL && (lpos >=0))
   {
     // now p1 and p2 must be != NULL and must be contained in T
-    // unless for SHIFTGB: here each p_i must be in T or
-    // be shifted from an element in T -> to difficult to test
     int i;
-    i = kFindInT(L->p1, T, tlength);
+#ifdef HAVE_SHIFTBBA
+    if (rIsLPRing(currRing))
+      i = kFindInTShift(L->p1, T, tlength);
+    else
+#endif
+      i = kFindInT(L->p1, T, tlength);
     if (i < 0)
       return dReportError("L[%d].p1 not in T",lpos);
-    i = kFindInT(L->p2, T, tlength);
+#ifdef HAVE_SHIFTBBA
+    if (rIsLPRing(currRing))
+    {
+      if (rField_is_Ring(currRing)) return TRUE; // m*shift(q) is not in T
+      i = kFindInTShift(L->p2, T, tlength);
+    }
+    else
+#endif
+      i = kFindInT(L->p2, T, tlength);
     if (i < 0)
       return dReportError("L[%d].p2 not in T",lpos);
   }
@@ -976,18 +1027,6 @@ BOOLEAN kTest (kStrategy strat)
   // test L
   if (strat->L != NULL)
   {
-  #ifdef HAVE_SHIFTBBA
-    if (strat->red==redFirstShift) // is this in bbaShift ?
-    {
-      for (i=0; i<=strat->Ll; i++)
-      {
-        kFalseReturn(kTest_L(&(strat->L[i]), strat->tailRing,
-                           2, i,
-                           strat->T, strat->tl));
-      }
-    }
-    else
-  #endif
     for (i=0; i<=strat->Ll; i++)
     {
       kFalseReturn(kTest_L(&(strat->L[i]), strat->tailRing,
@@ -1057,7 +1096,7 @@ BOOLEAN kTest_TS(kStrategy strat)
   }
   // test strat->L[i].i_r1
   #ifdef HAVE_SHIFTBBA
-  if (strat->red!=redFirstShift) // not from bbaShift
+  if (!rIsLPRing(currRing)) // in the Letterplace ring we currently don't set/use i_r1 and i_r2
   #endif
   if (strat->L!=NULL)
   {
@@ -3200,17 +3239,40 @@ void chainCritNormal (poly p,int ecart,kStrategy strat)
   */
   if (strat->pairtest!=NULL)
   {
-    /*- i.e. there is an i with pairtest[i]==TRUE -*/
-    for (j=0; j<=strat->sl; j++)
+#ifdef HAVE_SHIFTBBA
+    // only difference is pLPDivisibleBy instead of pDivisibleBy
+    if (rIsLPRing(currRing))
     {
-      if (strat->pairtest[j])
+      for (j=0; j<=strat->sl; j++)
       {
-        for (i=strat->Bl; i>=0; i--)
+        if (strat->pairtest[j])
         {
-          if (pDivisibleBy(strat->S[j],strat->B[i].lcm))
+          for (i=strat->Bl; i>=0; i--)
           {
-            deleteInL(strat->B,&strat->Bl,i,strat);
-            strat->c3++;
+            if (pLPDivisibleBy(strat->S[j],strat->B[i].lcm))
+            {
+              deleteInL(strat->B,&strat->Bl,i,strat);
+              strat->c3++;
+            }
+          }
+        }
+      }
+    }
+    else
+#endif
+    {
+      /*- i.e. there is an i with pairtest[i]==TRUE -*/
+      for (j=0; j<=strat->sl; j++)
+      {
+        if (strat->pairtest[j])
+        {
+          for (i=strat->Bl; i>=0; i--)
+          {
+            if (pDivisibleBy(strat->S[j],strat->B[i].lcm))
+            {
+              deleteInL(strat->B,&strat->Bl,i,strat);
+              strat->c3++;
+            }
           }
         }
       }
@@ -4831,6 +4893,9 @@ void clearSbatch (poly h,int k,int pos,kStrategy strat)
 void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 {
   assume (rField_is_Ring(currRing));
+#if HAVE_SHIFTBBA
+  assume(!rIsLPRing(currRing)); /* LP should use enterpairsShift */
+#endif
   // enter also zero divisor * poly, if this is non zero and of smaller degree
   if (!(rField_is_Domain(currRing))) enterExtendedSpoly(h, strat);
   initenterstrongPairs(h, k, ecart, 0, strat, atR);
@@ -9533,7 +9598,14 @@ void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat)
   if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing))) {
     p.pCleardenom();
     if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL)) {
-      p.p = redtailBba(&p,strat->sl,strat, FALSE,!TEST_OPT_CONTENTSB);
+#ifdef HAVE_SHIFTBBA
+      if (rIsLPRing(currRing))
+        p.p = redtailBba(&p,strat->tl,strat, TRUE,!TEST_OPT_CONTENTSB);
+      else
+#endif
+      {
+        p.p = redtailBba(&p,strat->sl,strat, FALSE,!TEST_OPT_CONTENTSB);
+      }
       p.pCleardenom();
       if (strat->redTailChange)
         p.t_p=NULL;
@@ -9577,10 +9649,23 @@ void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat)
       i--;
     }
   }
-  /* generate new pairs with p, probably removing older, now useless pairs */
-  superenterpairs(p.p, strat->sl, p.ecart, pos, strat, strat->tl);
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
+    enterpairsShift(p.p, strat->sl, p.ecart, pos, strat, strat->tl); // TODO LP
+  else
+#endif
+  {
+    /* generate new pairs with p, probably removing older, now useless pairs */
+    superenterpairs(p.p, strat->sl, p.ecart, pos, strat, strat->tl);
+  }
   /* enter p to S set */
   strat->enterS(p, pos, strat, strat->tl);
+
+#ifdef HAVE_SHIFTBBA
+  /* do this after enterS so that the index in R (which is strat->tl) is correct */
+  if (rIsLPRing(currRing) && !strat->rightGB)
+    enterTShift(p,strat);
+#endif
 }
 
 /*2
@@ -11178,7 +11263,11 @@ void postReduceByMon(LObject* h, kStrategy strat)
       //pWrite(strat->S[i]);
       while(ok == FALSE && p != NULL)
       {
-        if(pLmDivisibleBy(strat->S[i], p))
+        if(pLmDivisibleBy(strat->S[i], p)
+#ifdef HAVE_SHIFTBBA
+            || (rIsLPRing(currRing) && pLPLmDivisibleBy(strat->S[i], p))
+#endif
+          )
         {
           number dummy = n_IntMod(p->coef, strat->S[i]->coef, currRing->cf);
           p_SetCoeff(p,dummy,currRing);
@@ -11199,7 +11288,11 @@ void postReduceByMon(LObject* h, kStrategy strat)
         pp = pNext(p);
         while(pp != NULL)
         {
-          if(pLmDivisibleBy(strat->S[i], pp))
+          if(pLmDivisibleBy(strat->S[i], pp)
+#ifdef HAVE_SHIFTBBA
+            || (rIsLPRing(currRing) && pLPLmDivisibleBy(strat->S[i], pp))
+#endif
+            )
           {
             number dummy = n_IntMod(pp->coef, strat->S[i]->coef, currRing->cf);
             p_SetCoeff(pp,dummy,currRing);
@@ -11335,7 +11428,11 @@ void finalReduceByMon(kStrategy strat)
         if((i != j) && (strat->Shdl->m[i] != NULL))
         {
           p = strat->Shdl->m[i];
-          while((p!=NULL) && pLmDivisibleBy(strat->Shdl->m[j], p))
+          while((p!=NULL) && (pLmDivisibleBy(strat->Shdl->m[j], p)
+#if HAVE_SHIFTBBA
+                || (rIsLPRing(currRing) && pLPLmDivisibleBy(strat->Shdl->m[j], p))
+#endif
+                ))
           {
             number dummy = n_IntMod(p->coef, strat->Shdl->m[j]->coef, currRing->cf);
             if (!nEqual(dummy,p->coef))
@@ -11363,7 +11460,11 @@ void finalReduceByMon(kStrategy strat)
             pp = pNext(p);
             while(pp != NULL)
             {
-              if(pLmDivisibleBy(strat->Shdl->m[j], pp))
+              if(pLmDivisibleBy(strat->Shdl->m[j], pp)
+#if HAVE_SHIFTBBA
+                  || (rIsLPRing(currRing) && pLPLmDivisibleBy(strat->Shdl->m[j], pp))
+#endif
+                )
               {
                 number dummy = n_IntMod(pp->coef, strat->Shdl->m[j]->coef, currRing->cf);
                 if (!nEqual(dummy,pp->coef))
@@ -12209,6 +12310,424 @@ poly pCopyL2p(LObject H, kStrategy strat)
 // }
 
 #ifdef HAVE_SHIFTBBA
+/*2
+* put the  lcm(q,p)  into the set B, q is the shift of some s[i]
+*/
+static BOOLEAN enterOneStrongPolyShift (poly q, poly p, int /*ecart*/, int /*isFromQ*/, kStrategy strat, int atR, int /*ecartq*/, int qisFromQ, int shiftcount, int ifromS)
+{
+  number d, s, t;
+  /* assume(atR >= 0); */
+  assume(ifromS <= strat->sl);
+  assume(rField_is_Ring(currRing));
+  poly m1, m2, gcd;
+  //printf("\n--------------------------------\n");
+  //pWrite(p);pWrite(si);
+  d = n_ExtGcd(pGetCoeff(p), pGetCoeff(q), &s, &t, currRing->cf);
+
+  if (nIsZero(s) || nIsZero(t))  // evtl. durch divBy tests ersetzen
+  {
+    nDelete(&d);
+    nDelete(&s);
+    nDelete(&t);
+    return FALSE;
+  }
+
+  assume(pIsInV(p));
+
+  k_GetStrongLeadTerms(p, q, currRing, m1, m2, gcd, strat->tailRing);
+
+  /* the V criterion */
+  if (!pmIsInV(gcd))
+  {
+    strat->cv++;
+    nDelete(&d);
+    nDelete(&s);
+    nDelete(&t);
+    pLmFree(gcd);
+    return FALSE;
+  }
+
+  // disabled for Letterplace because it is not so easy to check
+  /* if (!rHasLocalOrMixedOrdering(currRing)) { */
+  /*   unsigned long sev = pGetShortExpVector(gcd); */
+
+  /*   for (int j = 0; j < strat->sl; j++) { */
+  /*     if (j == i) */
+  /*       continue; */
+
+  /*     if (n_DivBy(d, pGetCoeff(strat->S[j]), currRing->cf) && */
+  /*         !(strat->sevS[j] & ~sev) && */
+  /*         p_LmDivisibleBy(strat->S[j], gcd, currRing)) { */
+  /*       nDelete(&d); */
+  /*       nDelete(&s); */
+  /*       nDelete(&t); */
+  /*       return FALSE; */
+  /*     } */
+  /*   } */
+  /* } */
+
+  poly m12, m22;
+  assume(p_mFirstVblock(p, currRing) <= 1 || p_mFirstVblock(q, currRing) <= 1);
+  k_SplitFrame(m1, m12, si_max(p_mFirstVblock(p, currRing), 1), currRing);
+  k_SplitFrame(m2, m22, si_max(p_mFirstVblock(q, currRing), 1), currRing);
+  // manually free the coeffs, because pSetCoeff0 is used in the next step
+  n_Delete(&(m1->coef), currRing->cf);
+  n_Delete(&(m2->coef), currRing->cf);
+
+  //p_Test(m1,strat->tailRing);
+  //p_Test(m2,strat->tailRing);
+  /*if(!enterTstrong)
+  {
+    while (! kCheckStrongCreation(atR, m1, i, m2, strat) )
+    {
+      memset(&(strat->P), 0, sizeof(strat->P));
+      kStratChangeTailRing(strat);
+      strat->P = *(strat->R[atR]);
+      p_LmFree(m1, strat->tailRing);
+      p_LmFree(m2, strat->tailRing);
+      p_LmFree(gcd, currRing);
+      k_GetStrongLeadTerms(p, si, currRing, m1, m2, gcd, strat->tailRing);
+    }
+  }*/
+  pSetCoeff0(m1, s);
+  pSetCoeff0(m2, t);
+  pSetCoeff0(gcd, d);
+  p_Test(m1,strat->tailRing);
+  p_Test(m2,strat->tailRing);
+  p_Test(m12,strat->tailRing);
+  p_Test(m22,strat->tailRing);
+  assume(pmIsInV(m1));
+  assume(pmIsInV(m2));
+  assume(pmIsInV(m12));
+  assume(pmIsInV(m22));
+  //printf("\n===================================\n");
+  //pWrite(m1);pWrite(m2);pWrite(gcd);
+#ifdef KDEBUG
+  if (TEST_OPT_DEBUG)
+  {
+    // Print("t = %d; s = %d; d = %d\n", nInt(t), nInt(s), nInt(d));
+    PrintS("m1 = ");
+    p_wrp(m1, strat->tailRing);
+    PrintS("m12 = ");
+    p_wrp(m12, strat->tailRing);
+    PrintS(" ; m2 = ");
+    p_wrp(m2, strat->tailRing);
+    PrintS(" ; m22 = ");
+    p_wrp(m22, strat->tailRing);
+    PrintS(" ; gcd = ");
+    wrp(gcd);
+    PrintS("\n--- create strong gcd poly: ");
+    PrintS("\n p: ");
+    wrp(p);
+    Print("\n q (strat->S[%d]): ", ifromS);
+    wrp(q);
+    PrintS(" ---> ");
+  }
+#endif
+
+  pNext(gcd) = p_Add_q(pp_Mult_mm(pp_mm_Mult(pNext(p), m1, strat->tailRing), m12, strat->tailRing), pp_Mult_mm(pp_mm_Mult(pNext(q), m2, strat->tailRing), m22, strat->tailRing), strat->tailRing);
+  p_LmDelete(m1, strat->tailRing);
+  p_LmDelete(m2, strat->tailRing);
+  p_LmDelete(m12, strat->tailRing);
+  p_LmDelete(m22, strat->tailRing);
+
+  assume(pIsInV(gcd));
+
+#ifdef KDEBUG
+  if (TEST_OPT_DEBUG)
+  {
+    wrp(gcd);
+    PrintLn();
+  }
+#endif
+
+  LObject h;
+  h.p = gcd;
+  h.tailRing = strat->tailRing;
+  int posx;
+  h.pCleardenom();
+  strat->initEcart(&h);
+  h.sev = pGetShortExpVector(h.p);
+  h.i_r1 = -1;h.i_r2 = -1;
+  if (currRing!=strat->tailRing)
+    h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
+#if 1
+  h.p1 = p;
+  h.p2 = q;
+#endif
+  if (atR >= 0 && shiftcount == 0 && ifromS >= 0)
+  {
+    h.i_r2 = kFindInT(h.p1, strat);
+    h.i_r1 = atR;
+  }
+  else
+  {
+    h.i_r1 = -1;
+    h.i_r2 = -1;
+  }
+  if (strat->Ll==-1)
+    posx =0;
+  else
+    posx = strat->posInL(strat->L,strat->Ll,&h,strat);
+
+  assume(pIsInV(h.p));
+  assume(pIsInV(h.p1));
+
+  enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
+  return TRUE;
+}
+
+/*2
+* put the pair (q,p)  into the set B, ecart=ecart(p), q is the shift of some s[i] (ring case)
+*/
+static void enterOnePairRingShift (poly q, poly p, int /*ecart*/, int isFromQ, kStrategy strat, int atR, int /*ecartq*/, int qisFromQ, int shiftcount, int ifromS)
+{
+  /* assume(atR >= 0); */
+  /* assume(i<=strat->sl); */
+  assume(p!=NULL);
+  assume(rField_is_Ring(currRing));
+  assume(pIsInV(p));
+  #if ALL_VS_JUST
+  //Over rings, if we construct the strong pair, do not add the spair
+  if(rField_is_Ring(currRing))
+  {
+    number s,t,d;
+    d = n_ExtGcd(pGetCoeff(p), pGetCoeff(q, &s, &t, currRing->cf);
+
+    if (!nIsZero(s) && !nIsZero(t))  // evtl. durch divBy tests ersetzen
+    {
+      nDelete(&d);
+      nDelete(&s);
+      nDelete(&t);
+      return;
+    }
+    nDelete(&d);
+    nDelete(&s);
+    nDelete(&t);
+  }
+  #endif
+  int      j,compare,compareCoeff;
+  LObject  h;
+
+#ifdef KDEBUG
+  h.ecart=0; h.length=0;
+#endif
+  /*- computes the lcm(s[i],p) -*/
+  if(pHasNotCFRing(p,q))
+  {
+      strat->cp++;
+      return;
+  }
+  h.lcm = p_Lcm(p,q,currRing);
+  pSetCoeff0(h.lcm, n_Lcm(pGetCoeff(p), pGetCoeff(q), currRing->cf));
+  if (nIsZero(pGetCoeff(h.lcm)))
+  {
+      strat->cp++;
+      pLmDelete(h.lcm);
+      return;
+  }
+
+  /* the V criterion */
+  if (!pmIsInV(h.lcm))
+  {
+    strat->cv++;
+    pLmDelete(h.lcm);
+    return;
+  }
+  // basic chain criterion
+  /*
+  *the set B collects the pairs of type (S[j],p)
+  *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p) != lcm(r,p)
+  *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
+  *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
+  */
+
+  for(j = strat->Bl;j>=0;j--)
+  {
+    compare=pDivCompRing(strat->B[j].lcm,h.lcm);
+    compareCoeff = n_DivComp(pGetCoeff(strat->B[j].lcm), pGetCoeff(h.lcm), currRing->cf);
+    if(compare == pDivComp_EQUAL)
+    {
+      //They have the same LM
+      if(compareCoeff == pDivComp_LESS)
+      {
+        if ((strat->fromQ==NULL) || (isFromQ==0) || (qisFromQ==0))
+        {
+          strat->c3++;
+          pLmDelete(h.lcm);
+          return;
+        }
+        break;
+      }
+      if(compareCoeff == pDivComp_GREATER)
+      {
+        deleteInL(strat->B,&strat->Bl,j,strat);
+        strat->c3++;
+      }
+      if(compareCoeff == pDivComp_EQUAL)
+      {
+        if ((strat->fromQ==NULL) || (isFromQ==0) || (qisFromQ==0))
+        {
+          strat->c3++;
+          pLmDelete(h.lcm);
+          return;
+        }
+        break;
+      }
+    }
+    if(compareCoeff == compare || compareCoeff == pDivComp_EQUAL)
+    {
+      if(compare == pDivComp_LESS)
+      {
+        if ((strat->fromQ==NULL) || (isFromQ==0) || (qisFromQ==0))
+        {
+          strat->c3++;
+          pLmDelete(h.lcm);
+          return;
+        }
+        break;
+      }
+      if(compare == pDivComp_GREATER)
+      {
+        deleteInL(strat->B,&strat->Bl,j,strat);
+        strat->c3++;
+      }
+    }
+  }
+  number s, t;
+  poly m1, m2, gcd = NULL;
+  s = pGetCoeff(q);
+  t = pGetCoeff(p);
+  k_GetLeadTerms(p,q,currRing,m1,m2,currRing);
+
+  poly m12, m22;
+  assume(p_mFirstVblock(p, currRing) <= 1 || p_mFirstVblock(q, currRing) <= 1);
+  k_SplitFrame(m1, m12, si_max(p_mFirstVblock(p, currRing), 1), currRing);
+  k_SplitFrame(m2, m22, si_max(p_mFirstVblock(q, currRing), 1), currRing);
+  // manually free the coeffs, because pSetCoeff0 is used in the next step
+  n_Delete(&(m1->coef), currRing->cf);
+  n_Delete(&(m2->coef), currRing->cf);
+
+  ksCheckCoeff(&s, &t, currRing->cf);
+  pSetCoeff0(m1, s);
+  pSetCoeff0(m2, t);
+  m2 = pNeg(m2);
+  p_Test(m1,strat->tailRing);
+  p_Test(m2,strat->tailRing);
+  p_Test(m12,strat->tailRing);
+  p_Test(m22,strat->tailRing);
+  assume(pmIsInV(m1));
+  assume(pmIsInV(m2));
+  assume(pmIsInV(m12));
+  assume(pmIsInV(m22));
+  poly pm1 = pp_Mult_mm(pp_mm_Mult(pNext(p), m1, strat->tailRing), m12, strat->tailRing);
+  poly sim2 = pp_Mult_mm(pp_mm_Mult(pNext(q), m2, strat->tailRing), m22, strat->tailRing);
+  assume(pIsInV(pm1));
+  assume(pIsInV(sim2));
+  p_LmDelete(m1, currRing);
+  p_LmDelete(m2, currRing);
+  p_LmDelete(m12, currRing);
+  p_LmDelete(m22, currRing);
+  if(sim2 == NULL)
+  {
+    if(pm1 == NULL)
+    {
+      if(h.lcm != NULL)
+      {
+        pLmDelete(h.lcm);
+        h.lcm=NULL;
+      }
+      h.Clear();
+      /* TEMPORARILY DISABLED FOR SHIFTS because there is no i*/
+      /* if (strat->pairtest==NULL) initPairtest(strat); */
+      /* strat->pairtest[i] = TRUE; */
+      /* strat->pairtest[strat->sl+1] = TRUE; */
+      return;
+    }
+    else
+    {
+      gcd = pm1;
+      pm1 = NULL;
+    }
+  }
+  else
+  {
+    if((pGetComp(q) == 0) && (0 != pGetComp(p)))
+    {
+      p_SetCompP(sim2, pGetComp(p), strat->tailRing);
+      pSetmComp(sim2);
+    }
+    //p_Write(pm1,strat->tailRing);p_Write(sim2,strat->tailRing);
+    gcd = p_Add_q(pm1, sim2, strat->tailRing);
+  }
+  p_Test(gcd, strat->tailRing);
+  assume(pIsInV(gcd));
+#ifdef KDEBUG
+  if (TEST_OPT_DEBUG)
+  {
+    wrp(gcd);
+    PrintLn();
+  }
+#endif
+  h.p = gcd;
+  h.i_r = -1;
+  if(h.p == NULL)
+  {
+    /* TEMPORARILY DISABLED FOR SHIFTS because there is no i*/
+    /* if (strat->pairtest==NULL) initPairtest(strat); */
+    /* strat->pairtest[i] = TRUE; */
+    /* strat->pairtest[strat->sl+1] = TRUE; */
+    return;
+  }
+  h.tailRing = strat->tailRing;
+  int posx;
+  //h.pCleardenom();
+  //pSetm(h.p);
+  h.i_r1 = -1;h.i_r2 = -1;
+  strat->initEcart(&h);
+  #if 1
+  h.p1 = p;
+  h.p2 = q;
+  #endif
+  #if 1
+  /* TEMPORARILY DISABLED FOR SHIFTS because there's no i*/
+  /* at the beginning we DO NOT set atR = -1 ANYMORE*/
+  if (atR >= 0 && shiftcount == 0 && ifromS >= 0)
+  {
+    h.i_r2 = kFindInT(h.p1, strat); //strat->S_2_R[i];
+    h.i_r1 = atR;
+  }
+  else
+  {
+    /* END _ TEMPORARILY DISABLED FOR SHIFTS */
+    h.i_r1 = -1;
+    h.i_r2 = -1;
+  }
+  #endif
+  if (strat->Bl==-1)
+    posx =0;
+  else
+    posx = strat->posInL(strat->B,strat->Bl,&h,strat);
+  h.sev = pGetShortExpVector(h.p);
+  if (currRing!=strat->tailRing)
+    h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
+
+  assume(pIsInV(h.p));
+  assume(pIsInV(h.p1));
+  assume(h.lcm != NULL);
+  assume(pIsInV(h.lcm));
+
+  enterL(&strat->B,&strat->Bl,&strat->Bmax,h,posx);
+  kTest_TS(strat);
+}
+
+// adds the strong pair and the normal pair for rings (aka gpoly and spoly)
+static void enterOneStrongPolyAndEnterOnePairRingShift(poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS)
+{
+  enterOneStrongPolyShift(q, p, ecart, isFromQ, strat, atR, ecartq, qisFromQ, shiftcount, ifromS); // "gpoly"
+  enterOnePairRingShift(q, p, ecart, isFromQ, strat, atR, ecartq, qisFromQ, shiftcount, ifromS); // "spoly"
+}
+
 // creates if possible (q,p), (shifts(q),p)
 static void enterOnePairWithShifts (int q_inS /*also i*/, poly q, poly p, int ecartp, int p_isFromQ, kStrategy strat, int atR, int p_lastVblock, int q_lastVblock)
 {
@@ -12226,6 +12745,14 @@ static void enterOnePairWithShifts (int q_inS /*also i*/, poly q, poly p, int ec
   if (strat->fromQ != NULL && q_inS >= 0)
     q_isFromQ = strat->fromQ[q_inS];
 
+  void (*enterPair)(poly, poly, int, int, kStrategy, int, int, int, int, int);
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing))
+    enterPair = enterOneStrongPolyAndEnterOnePairRingShift;
+  else
+#endif
+    enterPair = enterOnePairShift;
+
   int degbound = currRing->N/currRing->isLPring;
   int neededShift = p_lastVblock - 1;
   int maxPossibleShift = degbound - q_lastVblock;
@@ -12234,13 +12761,30 @@ static void enterOnePairWithShifts (int q_inS /*also i*/, poly q, poly p, int ec
   for (int j = firstShift; j <= maxShift; j++)
   {
     poly qq = pLPCopyAndShiftLM(q, j);
-    enterOnePairShift(qq, p, ecartp, p_isFromQ, strat, -1, ecartq, q_isFromQ, j, q_inS);
+    enterPair(qq, p, ecartp, p_isFromQ, strat, -1, ecartq, q_isFromQ, j, q_inS);
   }
+
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing) && p_lastVblock >= firstShift && p_lastVblock <= maxPossibleShift)
+  {
+    // add pairs (m*shifts(q), p) where m is a monomial and the pair has no overlap
+    for (int j = p_lastVblock; j <= maxPossibleShift; j++)
+    {
+      ideal fillers = id_MaxIdeal(j - p_lastVblock, currRing);
+      for (int k = 0; k < IDELEMS(fillers); k++)
+      {
+        poly qq = pLPCopyAndShiftLM(pp_mm_Mult(q, fillers->m[k], currRing), p_lastVblock);
+        enterPair(qq, p, ecartp, p_isFromQ, strat, -1, ecartq, q_isFromQ, p_lastVblock, q_inS);
+      }
+      idDelete(&fillers);
+    }
+  }
+#endif
 }
 #endif
 
 #ifdef HAVE_SHIFTBBA
-// creates if possible (q,p), use it when q is already shifted
+// creates (q,p), use it when q is already shifted
 static void enterOnePairWithoutShifts (int p_inS /*also i*/, poly q, poly p, int ecartq, int q_isFromQ, kStrategy strat, int atR, int p_lastVblock, int q_shift)
 {
   // note: ecart and isFromQ is for p
@@ -12256,9 +12800,18 @@ static void enterOnePairWithoutShifts (int p_inS /*also i*/, poly q, poly p, int
   if (strat->fromQ != NULL && p_inS >= 0)
     p_isFromQ = strat->fromQ[p_inS];
 
-  int maxNeededShift = p_lastVblock - 1;
-  if (q_shift <= maxNeededShift)
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing))
+  {
+    assume(q_shift <= p_lastVblock); // we allow the special case where there is no overlap
+    enterOneStrongPolyAndEnterOnePairRingShift(q, p, ecartp, p_isFromQ, strat, -1, ecartq, q_isFromQ, q_shift, -1);
+  }
+  else
+#endif
+  {
+    assume(q_shift <= p_lastVblock - 1); // there should be an overlap
     enterOnePairShift(q, p, ecartp, p_isFromQ, strat, -1, ecartq, q_isFromQ, q_shift, -1);
+  }
 }
 #endif
 
@@ -12372,7 +12925,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
       loop
       {
         if (j < 0)  break;
-        compare=pDivComp(strat->B[j].lcm,Lp.lcm);
+        compare=pLPDivComp(strat->B[j].lcm,Lp.lcm);
         if ((compare==1)
         &&(sugarDivisibleBy(strat->B[j].ecart,Lp.ecart)))
         {
@@ -12381,7 +12934,9 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
           {
             pLmFree(Lp.lcm);
 #ifdef CRITERION_DEBUG
-            if (TEST_OPT_DEBUG) Print("--- divided by B[%d]\n", j);
+            if (TEST_OPT_DEBUG) {
+              Print("--- chain crit using B[%d].lcm=%s\n", j, pString(strat->B[j].lcm));
+            }
 #endif
             return;
           }
@@ -12391,10 +12946,12 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
         if ((compare ==-1)
         && sugarDivisibleBy(Lp.ecart,strat->B[j].ecart))
         {
-          deleteInL(strat->B,&strat->Bl,j,strat);
 #ifdef CRITERION_DEBUG
-          if (TEST_OPT_DEBUG) Print("divides B[%d] -> delete B[%d]\n", j, j);
+          if (TEST_OPT_DEBUG) {
+            Print("--- chain crit using pair to remove B[%d].lcm=%s\n", j, pString(strat->B[j].lcm));
+          }
 #endif
+          deleteInL(strat->B,&strat->Bl,j,strat);
           strat->c3++;
         }
         j--;
@@ -12446,7 +13003,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
       */
       for(j = strat->Bl;j>=0;j--)
       {
-        compare=pDivComp(strat->B[j].lcm,Lp.lcm);
+        compare=pLPDivComp(strat->B[j].lcm,Lp.lcm);
         if (compare==1)
         {
           strat->c3++;
@@ -12454,7 +13011,9 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
           {
             pLmFree(Lp.lcm);
 #ifdef CRITERION_DEBUG
-            if (TEST_OPT_DEBUG) Print("--- divided by B[%d]\n", j);
+            if (TEST_OPT_DEBUG) {
+              Print("--- chain crit using B[%d].lcm=%s\n", j, pString(strat->B[j].lcm));
+            }
 #endif
             return;
           }
@@ -12463,10 +13022,12 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
         else
         if (compare ==-1)
         {
-          deleteInL(strat->B,&strat->Bl,j,strat);
 #ifdef CRITERION_DEBUG
-          if (TEST_OPT_DEBUG) Print("divides B[%d] -> delete B[%d]\n", j, j);
+          if (TEST_OPT_DEBUG) {
+            Print("--- chain crit using pair to remove B[%d].lcm=%s\n", j, pString(strat->B[j].lcm));
+          }
 #endif
+          deleteInL(strat->B,&strat->Bl,j,strat);
           strat->c3++;
         }
       }
@@ -12489,7 +13050,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
   {
     Lp.p=NULL;
 #ifdef CRITERION_DEBUG
-    if (TEST_OPT_DEBUG) PrintS("--- pair from Q\n");
+    if (TEST_OPT_DEBUG) PrintS("--- pair is from Q\n");
 #endif
   }
   else
@@ -12528,15 +13089,14 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
   if (Lp.p == NULL)
   {
     /*- the case that the s-poly is 0 -*/
-    /* TEMPORARILY DISABLED FOR SHIFTS because there is no i*/
-//      if (strat->pairtest==NULL) initPairtest(strat);
-//      strat->pairtest[i] = TRUE;/*- hint for spoly(S^[i],p)=0 -*/
-//      strat->pairtest[strat->sl+1] = TRUE;
-// new: visual check how often this happens: ! for the debug situation
-#ifdef KDEBUG
-      Print("!");
+    // TODO: currently ifromS is only > 0 if called from enterOnePairWithShifts
+    if (ifromS > 0)
+    {
+      if (strat->pairtest==NULL) initPairtest(strat);
+      strat->pairtest[ifromS] = TRUE;/*- hint for spoly(S^[i],p)=0 -*/
+      strat->pairtest[strat->sl+1] = TRUE;
+    }
       //if (TEST_OPT_DEBUG){Print("!");} // option teach
-#endif /* KDEBUG */
     /* END _ TEMPORARILY DISABLED FOR SHIFTS */
     /*hint for spoly(S[i],p) == 0 for some i,0 <= i <= sl*/
     /*
@@ -12593,15 +13153,261 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 #endif
   }
 }
-#endif
 
-#ifdef HAVE_SHIFTBBA
 /*3
 *(s[0], s \dot h),...,(s[k],s \dot h) will be put to the pairset L
 * also the pairs (h, s\dot s[0]), ..., (h, s\dot s[k]) enter L
 * additionally we put the pairs (h, s \sdot h) for s>=1 to L
 */
 void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, int atR)
+{
+  int h_lastVblock = pmLastVblock(h);
+  assume(h_lastVblock != 0 || pLmIsConstantComp(h));
+  // TODO: is it allowed to skip pairs with constants? also with constants from other components?
+  if (h_lastVblock == 0) return;
+  assume(pmFirstVblock(h) == 1);
+  /* h comes from strat->P.p, that is LObject with LM in currRing and Tail in tailRing */
+  //  atR = -1;
+  if ((strat->syzComp==0)
+  || (pGetComp(h)<=strat->syzComp))
+  {
+    int i,j;
+    BOOLEAN new_pair=FALSE;
+
+    int degbound = currRing->N/currRing->isLPring;
+    int maxShift = degbound - h_lastVblock;
+
+    if (pGetComp(h)==0)
+    {
+      if (strat->rightGB)
+      {
+        if (isFromQ)
+        {
+          // pairs (shifts(h),s[1..k]), (h, s[1..k])
+          for (i=0; i<=maxShift; i++)
+          {
+            poly hh = pLPCopyAndShiftLM(h, i);
+            for (j=0; j<=k; j++)
+            {
+              if (strat->fromQ == NULL || !strat->fromQ[j])
+              {
+                new_pair=TRUE;
+                poly s = strat->S[j];
+                enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, pmLastVblock(s), i);
+              }
+            }
+          }
+        }
+        else
+        {
+          new_pair=TRUE;
+          for (j=0; j<=k; j++)
+          {
+            poly s = strat->S[j];
+            if (strat->fromQ != NULL && strat->fromQ[j])
+            {
+              // pairs (shifts(s[j]),h), (s[j],h)
+              enterOnePairWithShifts(j, s, h, ecart, isFromQ, strat, atR, h_lastVblock, pmLastVblock(s));
+            }
+            else
+            {
+              // pair (h, s[j])
+              enterOnePairWithoutShifts(j, h, s, ecart, isFromQ, strat, atR, pmLastVblock(s), 0);
+            }
+          }
+        }
+      }
+      /* for Q!=NULL: build pairs (f,q),(f1,f2), but not (q1,q2)*/
+      else if ((isFromQ)&&(strat->fromQ!=NULL))
+      {
+        // pairs (shifts(s[1..k]),h), (s[1..k],h)
+        for (j=0; j<=k; j++) {
+          if (!strat->fromQ[j])
+          {
+            new_pair=TRUE;
+            poly s = strat->S[j];
+            enterOnePairWithShifts(j, s, h, ecart, isFromQ, strat, atR, h_lastVblock, pmLastVblock(s));
+          }
+        }
+        // pairs (shifts(h),s[1..k])
+        if (new_pair)
+        {
+          for (i=1; i<=maxShift; i++)
+          {
+            poly hh = pLPCopyAndShiftLM(h, i);
+            for (j=0; j<=k; j++)
+            {
+              if (!strat->fromQ[j])
+              {
+                poly s = strat->S[j];
+                int s_lastVblock = pmLastVblock(s);
+                if (i < s_lastVblock)
+                  enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, s_lastVblock, i);
+#ifdef HAVE_RINGS
+                else if (rField_is_Ring(currRing))
+                {
+                  assume(i >= s_lastVblock); // this is always the case, but just to be very sure
+                  ideal fillers = id_MaxIdeal(i - s_lastVblock, currRing);
+                  for (int k = 0; k < IDELEMS(fillers); k++)
+                  {
+                    poly hhh = pLPCopyAndShiftLM(pp_mm_Mult(h, fillers->m[k], currRing), s_lastVblock);
+                    enterOnePairWithoutShifts(j, hhh, s, ecart, isFromQ, strat, atR, s_lastVblock, s_lastVblock);
+                  }
+                  idDelete(&fillers);
+                }
+#endif
+              }
+            }
+          }
+        }
+      }
+      else
+      {
+        new_pair=TRUE;
+        // pairs (shifts(s[1..k]),h), (s[1..k],h)
+        for (j=0; j<=k; j++) {
+          poly s = strat->S[j];
+          enterOnePairWithShifts(j, s, h, ecart, isFromQ, strat, atR, h_lastVblock, pmLastVblock(s));
+        }
+        // pairs (shifts(h),s[1..k]), (shifts(h), h)
+        for (i=1; i<=maxShift; i++)
+        {
+          poly hh = pLPCopyAndShiftLM(h, i);
+          for (j=0; j<=k; j++)
+          {
+            poly s = strat->S[j];
+            int s_lastVblock = pmLastVblock(s);
+            if (i < s_lastVblock)
+              enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, s_lastVblock, i);
+#ifdef HAVE_RINGS
+            else if (rField_is_Ring(currRing))
+            {
+              assume(i >= s_lastVblock); // this is always the case, but just to be very sure
+              ideal fillers = id_MaxIdeal(i - s_lastVblock, currRing);
+              for (int k = 0; k < IDELEMS(fillers); k++)
+              {
+                poly hhh = pLPCopyAndShiftLM(pp_mm_Mult(h, fillers->m[k], currRing), s_lastVblock);
+                enterOnePairWithoutShifts(j, hhh, s, ecart, isFromQ, strat, atR, s_lastVblock, s_lastVblock);
+              }
+              idDelete(&fillers);
+            }
+#endif
+          }
+          if (i < h_lastVblock)
+            enterOnePairWithoutShifts(-1, hh, h, ecart, isFromQ, strat, atR, h_lastVblock, i);
+#ifdef HAVE_RINGS
+          else if (rField_is_Ring(currRing))
+          {
+            assume(i >= h_lastVblock); // this is always the case, but just to be very sure
+            ideal fillers = id_MaxIdeal(i - h_lastVblock, currRing);
+            for (int k = 0; k < IDELEMS(fillers); k++)
+            {
+              poly hhh = pLPCopyAndShiftLM(pp_mm_Mult(h, fillers->m[k], currRing), h_lastVblock);
+              enterOnePairWithoutShifts(-1, hhh, h, ecart, isFromQ, strat, atR, h_lastVblock, h_lastVblock);
+            }
+            idDelete(&fillers);
+          }
+#endif
+        }
+      }
+    }
+    else
+    {
+      assume(isFromQ == 0); // an element from Q should always has 0 component
+      new_pair=TRUE;
+      if (strat->rightGB)
+      {
+        for (j=0; j<=k; j++)
+        {
+          if ((pGetComp(h)==pGetComp(strat->S[j]))
+              || (pGetComp(strat->S[j])==0))
+          {
+            poly s = strat->S[j];
+            if (strat->fromQ != NULL && strat->fromQ[j])
+            {
+              // pairs (shifts(s[j]),h), (s[j],h)
+              enterOnePairWithShifts(j, s, h, ecart, isFromQ, strat, atR, h_lastVblock, pmLastVblock(s));
+            }
+            else
+            {
+              // pair (h, s[j])
+              enterOnePairWithoutShifts(j, h, s, ecart, isFromQ, strat, atR, pmLastVblock(s), 0);
+            }
+          }
+        }
+      }
+      else
+      {
+        // pairs (shifts(s[1..k]),h), (s[1..k],h)
+        for (j=0; j<=k; j++) {
+          if ((pGetComp(h)==pGetComp(strat->S[j]))
+              || (pGetComp(strat->S[j])==0))
+          {
+            poly s = strat->S[j];
+            enterOnePairWithShifts(j, s, h, ecart, isFromQ, strat, atR, h_lastVblock, pmLastVblock(s));
+          }
+        }
+        // pairs (shifts(h),s[1..k]), (shifts(h), h)
+        for (i=1; i<=maxShift; i++)
+        {
+          poly hh = pLPCopyAndShiftLM(h, i);
+          for (j=0; j<=k; j++)
+          {
+            if ((pGetComp(h)==pGetComp(strat->S[j]))
+                || (pGetComp(strat->S[j])==0))
+            {
+              poly s = strat->S[j];
+              int s_lastVblock = pmLastVblock(s);
+              if (i < s_lastVblock)
+                enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, s_lastVblock, i);
+#ifdef HAVE_RINGS
+              else if (rField_is_Ring(currRing))
+              {
+                assume(i >= s_lastVblock); // this is always the case, but just to be very sure
+                ideal fillers = id_MaxIdeal(i - s_lastVblock, currRing);
+                for (int k = 0; k < IDELEMS(fillers); k++)
+                {
+                  poly hhh = pLPCopyAndShiftLM(pp_mm_Mult(h, fillers->m[k], currRing), s_lastVblock);
+                  enterOnePairWithoutShifts(j, hhh, s, ecart, isFromQ, strat, atR, s_lastVblock, s_lastVblock);
+                }
+                idDelete(&fillers);
+              }
+#endif
+            }
+          }
+          if (i < h_lastVblock)
+            enterOnePairWithoutShifts(-1, hh, h, ecart, isFromQ, strat, atR, h_lastVblock, i);
+#ifdef HAVE_RINGS
+          else if (rField_is_Ring(currRing))
+          {
+            assume(i >= h_lastVblock); // this is always the case, but just to be very sure
+            ideal fillers = id_MaxIdeal(i - h_lastVblock, currRing);
+            for (int k = 0; k < IDELEMS(fillers); k++)
+            {
+              poly hhh = pLPCopyAndShiftLM(pp_mm_Mult(h, fillers->m[k], currRing), h_lastVblock);
+              enterOnePairWithoutShifts(-1, hhh, h, ecart, isFromQ, strat, atR, h_lastVblock, h_lastVblock);
+            }
+            idDelete(&fillers);
+          }
+#endif
+        }
+      }
+    }
+
+    if (new_pair)
+    {
+      strat->chainCrit(h,ecart,strat);
+    }
+    kMergeBintoL(strat);
+  }
+}
+
+/*3
+*(s[0], s \dot h),...,(s[k],s \dot h) will be put to the pairset L
+* also the pairs (h, s\dot s[0]), ..., (h, s\dot s[k]) enter L
+* additionally we put the pairs (h, s \sdot h) for s>=1 to L
+*/
+void initenterstrongPairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, int atR)
 {
   int h_lastVblock = pmLastVblock(h);
   assume(h_lastVblock != 0 || pLmIsConstantComp(h));
@@ -12771,9 +13577,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
     kMergeBintoL(strat);
   }
 }
-#endif
 
-#ifdef HAVE_SHIFTBBA
 /*2
 *(s[0],h),...,(s[k],h) will be put to the pairset L(via initenterpairs)
 *superfluous elements in S will be deleted
@@ -12784,7 +13588,7 @@ void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
   /* Q: what is exactly the strat->fromT ? A: a local case trick; don't need it yet*/
   int j=pos;
 
-  assume (!rField_is_Ring(currRing));
+  /* if (!(rField_is_Domain(currRing))) enterExtendedSpoly(h, strat); */ // TODO: enterExtendedSpoly not for LP yet
   initenterpairsShift(h,k,ecart,0,strat, atR);
   if ( (!strat->fromT)
   && ((strat->syzComp==0)
@@ -12801,9 +13605,7 @@ void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
     }
   }
 }
-#endif
 
-#ifdef HAVE_SHIFTBBA
 /*2
 * enteres all admissible shifts of p into T
 * assumes that p is already in T!

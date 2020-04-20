@@ -597,16 +597,20 @@ char* LPExpVString(int *expV, ring ri)
 // at is the number of the block, starting at 1
 void k_SplitFrame(poly &m1, poly &m2, int at, const ring r)
 {
+  assume(at >= 1);
+  assume(at <= r->N/r->isLPring);
   int lV = r->isLPring;
+  int split = (lV * (at - 1));
 
-  number m1Coeff = n_Copy(pGetCoeff(m1), r->cf); // important to copy
-
-  int hole = lV * at;
-  m2 = p_GetExp_k_n(m1, 1, hole, r);
-  m1 = p_GetExp_k_n(m1, hole, r->N, r);
-
+  m2 = p_GetExp_k_n(m1, 1, split, r);
   p_mLPunshift(m2, r);
-  p_SetCoeff(m1, m1Coeff, r);
+
+  m1 = p_Head(m1, r);
+  for(int i = split + 1; i <= r->N; i++)
+  {
+    p_SetExp(m1, i, 0, r);
+  }
+  p_Setm(m1, r);
 
   assume(p_FirstVblock(m1,r) <= 1);
   assume(p_FirstVblock(m2,r) <= 1);
@@ -793,10 +797,12 @@ BOOLEAN _p_LPLmDivisibleByNoComp(poly a, poly b, const ring r)
   b = p_Head(b, r);
   p_mLPunshift(b, r);
 #endif
-  for (int i = (r->N / r->isLPring) - p_LastVblock(a, r); i >= 0; i--)
+  int aLastVblock = p_mLastVblock(a, r);
+  int bLastVblock = p_mLastVblock(b, r);
+  for (int i = 0; i <= bLastVblock - aLastVblock; i++)
   {
     bool divisible = true;
-    for (int j = r->N - (i * r->isLPring); j >= 0; j--)
+    for (int j = 1; j <= aLastVblock * r->isLPring; j++)
     {
       if (p_GetExp(a, j, r) > p_GetExp(b, j + (i * r->isLPring), r))
       {

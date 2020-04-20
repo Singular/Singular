@@ -1148,7 +1148,7 @@ number kBucketPolyRed(kBucket_pt bucket,
   poly lmRight;
   if (r->isLPring) {
     int firstBlock = p_mFirstVblock(p1, r);
-    k_SplitFrame(lm, lmRight, firstBlock, r);
+    k_SplitFrame(lm, lmRight, si_max(firstBlock, 1), r);
   }
 #endif
 #if 0
