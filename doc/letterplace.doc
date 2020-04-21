@@ -161,8 +161,6 @@ ring R = freeAlgebra(r,5,2); // length bound is 5
 ideal I = 2*x, 3*y; 
 I = twostd(I); 
 print(matrix(I)); // pretty prints the generators
-ideal J = y*z*x,x*z*y;
-matrix T = lift(J,I);
 @c example
 @end smallexample
 
