@@ -87,19 +87,19 @@ anonymous ftp through the following addresses:
 @table @asis
 @item GMP, libreadline
 @copyright{} Free Software Foundation
-@* @uref{http://gmplib.org}
+@* @uref{https://gmplib.org}
 @item NTL
 @copyright{} Victor Shoup
 @* @uref{http://www.shoup.net/ntl}
 @item cdd (C implementation of the Double Description Method of Motzkin et al)
 @copyright{} Komei Fukuda
-@* @uref{http://www.ifor.math.ethz.ch/~fukuda/cdd_home}
+@* @uref{http://www-oldurls.inf.ethz.ch/personal/fukudak/cdd_home/}
 @item FLINT
 @copyright{} Bill Hart, Sebastian Pancratz, Fredrik Johansson
 @* @uref{http://www.flintlib.org}
 @item gfanlib
 @copyright{} Anders Jensen
-@* @uref{http://home.imf.au.dk/jensen/software/gfan/gfan.html}
+@* @uref{https://users-math.au.dk/~jensen/software/gfan/gfan.html}
 @item Singular-Factory
 @copyright{} Gert-Martin Greuel/R@"udiger Stobbe/Martin Lee, University of Kaiserslautern:
 @* @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Factory}
@@ -111,24 +111,24 @@ anonymous ftp through the following addresses:
 WWW brow@-ser from
 @uref{http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/}
 @item Cygwin
-@uref{http://www.cygwin.com/}
+@uref{https://www.cygwin.com/}
 @item Xemacs
-@uref{http://www.xemacs.org}
+@uref{https://www.xemacs.org}
 @end table
 Some external programs are optional:
 @table @asis
 @item 4ti2 (used by sing4ti2.lib, @pxref{sing4ti2_lib})
-@uref{http://www.4ti2.de/}
+@uref{https://4ti2.github.io}
 @item gfan (used by tropical.lib, @pxref{tropical_lib})
-@uref{http://home.imf.au.dk/jensen/software/gfan/gfan.html}
+@uref{https://users-math.au.dk/~jensen/software/gfan/gfan.html}
 @item graphviz (used by resgraph.lib, @pxref{resgraph_lib})
-@uref{http://www.graphviz.org/}
+@uref{https://www.graphviz.org/}
 @item normaliz (used by normaliz.lib, @pxref{normaliz_lib})
 @copyright{} Winfried Bruns and Bogdan Ichim
-@* @uref{http://www.mathematik.uni-osnabrueck.de/normaliz/}
+@* @uref{https://www.normaliz.uni-osnabrueck.de}
 @item polymake (used by polymake.lib, @pxref{polymake_lib})
 @copyright{} Ewgenij Gawrilow and Michael Joswig
-@* @uref{http://polymake.org/}
+@* @uref{https://polymake.org/}
 @item surf (used by surf.lib, @pxref{surf_lib})
 @copyright{} Stephan Endrass
 @* @uref{http://surf.sf.net}
