@@ -593,8 +593,7 @@ char* LPExpVString(int *expV, ring ri)
 }
 
 // splits a frame (e.g. x(1)*y(5)) m1 into m1 and m2 (e.g. m1=x(1) and m2=y(1))
-// according to p which is inside the frame
-// at is the number of the block, starting at 1
+// at is the number of the block to split at, starting at 1
 void k_SplitFrame(poly &m1, poly &m2, int at, const ring r)
 {
   assume(at >= 1);
@@ -603,6 +602,8 @@ void k_SplitFrame(poly &m1, poly &m2, int at, const ring r)
   int split = (lV * (at - 1));
 
   m2 = p_GetExp_k_n(m1, 1, split, r);
+  p_SetComp(m2, 0, r); // important, otherwise both m1 and m2 have a component set, this leads to problems later
+  p_Setm(m2, r); // p_mLPunshift also implicitly calls p_Setm(), but just for the case this changes in future.
   p_mLPunshift(m2, r);
 
   m1 = p_Head(m1, r);
