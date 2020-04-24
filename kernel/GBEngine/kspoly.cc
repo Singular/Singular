@@ -311,6 +311,7 @@ int ksReducePoly(LObject* PR,
   return ret;
 }
 
+#ifdef HAVE_RINGS
 int ksReducePolyGCD(LObject* PR,
                  TObject* PW,
                  poly spNoether,
@@ -398,15 +399,17 @@ int ksReducePolyGCD(LObject* PR,
   {
     ct = n_ExtGcd(pGetCoeff(p1), pGetCoeff(p2), &an, &bn, tailRing->cf);    // Calculate GCD
 #ifdef HAVE_SHIFTBBA
-    if (n_IsZero(an, tailRing->cf) || n_IsZero(bn, tailRing->cf))
+    if(rIsLPRing(tailRing)) /* with this test: error at New/stdZtests.tst, infinite : Long/primdecint.tst */
     {
-      // NOTE: not sure why this is not checked in the commutative case, this *does* happen and then zero coeff errors are reported
-
-      // NOTE: we are probably leaking memory of lm=pOne(), but we cannot delete it since it could also be lm=p1
-      n_Delete(&an, tailRing->cf);
-      n_Delete(&bn, tailRing->cf);
-      n_Delete(&ct, tailRing->cf);
-      return ret;
+      if (n_IsZero(an, tailRing->cf) || n_IsZero(bn, tailRing->cf))
+      {
+        // NOTE: not sure why this is not checked in the commutative case, this *does* happen and then zero coeff errors are reported
+        // NOTE: we are probably leaking memory of lm=pOne(), but we cannot delete it since it could also be lm=p1
+        n_Delete(&an, tailRing->cf);
+        n_Delete(&bn, tailRing->cf);
+        n_Delete(&ct, tailRing->cf);
+        return ret;
+      }
     }
 #endif
     /* negate bn since we subtract in Tail_Minus_mm_Mult_qq */
@@ -436,6 +439,7 @@ int ksReducePolyGCD(LObject* PR,
 
   return ret;
 }
+#endif
 
 /* Computes a reduction of the lead coefficient only. We have already tested
  * that lm(PW) divides lm(PR), but lc(PW) does not divide lc(PR). We have
@@ -1412,7 +1416,8 @@ poly ksCreateShortSpoly(poly p1, poly p2, ring tailRing)
   poly a1 = pNext(p1), a2 = pNext(p2);
 #ifdef HAVE_SHIFTBBA
   int shift1, shift2;
-  if (tailRing->isLPring) {
+  if (tailRing->isLPring)
+  {
     // assume: LM is shifted, tail unshifted
     assume(p_FirstVblock(a1, tailRing) <= 1);
     assume(p_FirstVblock(a2, tailRing) <= 1);

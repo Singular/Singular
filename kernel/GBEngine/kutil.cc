@@ -233,7 +233,8 @@ static inline int pDivComp(poly p, poly q)
 }
 
 #ifdef HAVE_SHIFTBBA
-static inline int pLPDivComp(poly p, poly q) {
+static inline int pLPDivComp(poly p, poly q)
+{
   if ((currRing->pCompIndex < 0) || (__p_GetComp(p,currRing) == __p_GetComp(q,currRing)))
   {
     // maybe there is a more performant way to do this? This will get called quite often in bba.
@@ -754,7 +755,9 @@ int kFindInTShift(poly p, TSet T, int tlength)
   }
   return -1;
 }
+#endif
 
+#ifdef HAVE_SHIFTBBA
 int kFindInTShift(poly p, kStrategy strat)
 {
   int i;
@@ -1599,16 +1602,19 @@ static BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,k
 
   k_GetStrongLeadTerms(p, si, currRing, m1, m2, gcd, strat->tailRing);
 
-  if (!rHasLocalOrMixedOrdering(currRing)) {
+  if (!rHasLocalOrMixedOrdering(currRing))
+  {
     unsigned long sev = pGetShortExpVector(gcd);
 
-    for (int j = 0; j < strat->sl; j++) {
+    for (int j = 0; j < strat->sl; j++)
+    {
       if (j == i)
         continue;
 
-      if (n_DivBy(d, pGetCoeff(strat->S[j]), currRing->cf) &&
-          !(strat->sevS[j] & ~sev) &&
-          p_LmDivisibleBy(strat->S[j], gcd, currRing)) {
+      if (n_DivBy(d, pGetCoeff(strat->S[j]), currRing->cf)
+      && !(strat->sevS[j] & ~sev)
+      && p_LmDivisibleBy(strat->S[j], gcd, currRing))
+      {
         nDelete(&d);
         nDelete(&s);
         nDelete(&t);
@@ -3229,6 +3235,7 @@ void kMergeBintoLSba(kStrategy strat)
   }
   strat->Bl = -1;
 }
+
 /*2
 *the pairset B of pairs of type (s[i],p) is complete now. It will be updated
 *using the chain-criterion in B and L and enters B to L
@@ -7286,7 +7293,8 @@ BOOLEAN arriRewCriterionPre(poly sig, unsigned long not_sevSig, poly lm, kStrate
   if(rField_is_Ring(currRing))
     return FALSE;
   int found = -1;
-  for (int i=strat->Bl; i>-1; i--) {
+  for (int i=strat->Bl; i>-1; i--)
+  {
     if (pLmEqual(strat->B[i].sig,sig))
     {
       found = i;
@@ -7822,11 +7830,15 @@ void redtailBbaAlsoLC_Z (LObject* L, int end_pos, kStrategy strat )
       Ln.SetShortExpVector();
       int j;
       j = kFindDivisibleByInT(strat, &Ln);
-      if (j < 0) {
+      if (j < 0)
+      {
         j = kFindDivisibleByInT_Z(strat, &Ln);
-        if (j < 0) {
+        if (j < 0)
+	{
           break;
-        } else {
+        }
+	else
+	{
           /* reduction not cancelling a tail term, but reducing its coefficient */
           With = &(strat->T[j]);
           assume(With->GetpLength()==pLength(With->p != __null ? With->p : With->t_p));
@@ -12324,10 +12336,10 @@ poly pCopyL2p(LObject H, kStrategy strat)
 //   return(p);
 // }
 
-#ifdef HAVE_SHIFTBBA
 /*2
 * put the  lcm(q,p)  into the set B, q is the shift of some s[i]
 */
+#ifdef HAVE_SHIFTBBA
 static BOOLEAN enterOneStrongPolyShift (poly q, poly p, int /*ecart*/, int /*isFromQ*/, kStrategy strat, int atR, int /*ecartq*/, int qisFromQ, int shiftcount, int ifromS)
 {
   number d, s, t;
@@ -12491,10 +12503,13 @@ static BOOLEAN enterOneStrongPolyShift (poly q, poly p, int /*ecart*/, int /*isF
   enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
   return TRUE;
 }
+#endif
+
 
 /*2
 * put the pair (q,p)  into the set B, ecart=ecart(p), q is the shift of some s[i] (ring case)
 */
+#ifdef HAVE_SHIFTBBA
 static void enterOnePairRingShift (poly q, poly p, int /*ecart*/, int isFromQ, kStrategy strat, int atR, int /*ecartq*/, int qisFromQ, int shiftcount, int ifromS)
 {
   /* assume(atR >= 0); */
@@ -12735,14 +12750,18 @@ static void enterOnePairRingShift (poly q, poly p, int /*ecart*/, int isFromQ, k
   enterL(&strat->B,&strat->Bl,&strat->Bmax,h,posx);
   kTest_TS(strat);
 }
+#endif
 
+#ifdef HAVE_SHIFTBBA
 // adds the strong pair and the normal pair for rings (aka gpoly and spoly)
 static void enterOneStrongPolyAndEnterOnePairRingShift(poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS)
 {
   enterOneStrongPolyShift(q, p, ecart, isFromQ, strat, atR, ecartq, qisFromQ, shiftcount, ifromS); // "gpoly"
   enterOnePairRingShift(q, p, ecart, isFromQ, strat, atR, ecartq, qisFromQ, shiftcount, ifromS); // "spoly"
 }
+#endif
 
+#ifdef HAVE_SHIFTBBA
 // creates if possible (q,p), (shifts(q),p)
 static void enterOnePairWithShifts (int q_inS /*also i*/, poly q, poly p, int ecartp, int p_isFromQ, kStrategy strat, int atR, int p_lastVblock, int q_lastVblock)
 {
@@ -12830,7 +12849,6 @@ static void enterOnePairWithoutShifts (int p_inS /*also i*/, poly q, poly p, int
 }
 #endif
 
-#ifdef HAVE_SHIFTBBA
 
 #ifdef KDEBUG
 // enable to print which pairs are considered or discarded and why
@@ -12839,6 +12857,7 @@ static void enterOnePairWithoutShifts (int p_inS /*also i*/, poly q, poly p, int
 /*2
 * put the pair (q,p)  into the set B, ecart=ecart(p), q is the shift of some s[i]
 */
+#ifdef HAVE_SHIFTBBA
 void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS)
 {
 #ifdef CRITERION_DEBUG
@@ -12949,7 +12968,8 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
           {
             pLmFree(Lp.lcm);
 #ifdef CRITERION_DEBUG
-            if (TEST_OPT_DEBUG) {
+            if (TEST_OPT_DEBUG)
+	    {
               Print("--- chain crit using B[%d].lcm=%s\n", j, pString(strat->B[j].lcm));
             }
 #endif
@@ -12962,7 +12982,8 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
         && sugarDivisibleBy(Lp.ecart,strat->B[j].ecart))
         {
 #ifdef CRITERION_DEBUG
-          if (TEST_OPT_DEBUG) {
+          if (TEST_OPT_DEBUG)
+	  {
             Print("--- chain crit using pair to remove B[%d].lcm=%s\n", j, pString(strat->B[j].lcm));
           }
 #endif
@@ -13026,7 +13047,8 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
           {
             pLmFree(Lp.lcm);
 #ifdef CRITERION_DEBUG
-            if (TEST_OPT_DEBUG) {
+            if (TEST_OPT_DEBUG)
+	    {
               Print("--- chain crit using B[%d].lcm=%s\n", j, pString(strat->B[j].lcm));
             }
 #endif
@@ -13038,7 +13060,8 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
         if (compare ==-1)
         {
 #ifdef CRITERION_DEBUG
-          if (TEST_OPT_DEBUG) {
+          if (TEST_OPT_DEBUG)
+	  {
             Print("--- chain crit using pair to remove B[%d].lcm=%s\n", j, pString(strat->B[j].lcm));
           }
 #endif
@@ -13168,12 +13191,14 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 #endif
   }
 }
+#endif
 
 /*3
 *(s[0], s \dot h),...,(s[k],s \dot h) will be put to the pairset L
 * also the pairs (h, s\dot s[0]), ..., (h, s\dot s[k]) enter L
 * additionally we put the pairs (h, s \sdot h) for s>=1 to L
 */
+#ifdef HAVE_SHIFTBBA
 void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, int atR)
 {
   int h_lastVblock = pmLastVblock(h);
@@ -13236,7 +13261,8 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
       else if ((isFromQ)&&(strat->fromQ!=NULL))
       {
         // pairs (shifts(s[1..k]),h), (s[1..k],h)
-        for (j=0; j<=k; j++) {
+        for (j=0; j<=k; j++)
+	{
           if (!strat->fromQ[j])
           {
             new_pair=TRUE;
@@ -13280,7 +13306,8 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
       {
         new_pair=TRUE;
         // pairs (shifts(s[1..k]),h), (s[1..k],h)
-        for (j=0; j<=k; j++) {
+        for (j=0; j<=k; j++)
+	{
           poly s = strat->S[j];
           enterOnePairWithShifts(j, s, h, ecart, isFromQ, strat, atR, h_lastVblock, pmLastVblock(s));
         }
@@ -13354,7 +13381,8 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
       else
       {
         // pairs (shifts(s[1..k]),h), (s[1..k],h)
-        for (j=0; j<=k; j++) {
+        for (j=0; j<=k; j++)
+	{
           if ((pGetComp(h)==pGetComp(strat->S[j]))
               || (pGetComp(strat->S[j])==0))
           {
@@ -13416,12 +13444,14 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
     kMergeBintoL(strat);
   }
 }
+#endif
 
 /*3
 *(s[0], s \dot h),...,(s[k],s \dot h) will be put to the pairset L
 * also the pairs (h, s\dot s[0]), ..., (h, s\dot s[k]) enter L
 * additionally we put the pairs (h, s \sdot h) for s>=1 to L
 */
+#ifdef HAVE_SHIFTBBA
 void initenterstrongPairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, int atR)
 {
   int h_lastVblock = pmLastVblock(h);
@@ -13484,7 +13514,8 @@ void initenterstrongPairsShift (poly h,int k,int ecart,int isFromQ, kStrategy st
       else if ((isFromQ)&&(strat->fromQ!=NULL))
       {
         // pairs (shifts(s[1..k]),h), (s[1..k],h)
-        for (j=0; j<=k; j++) {
+        for (j=0; j<=k; j++)
+	{
           if (!strat->fromQ[j])
           {
             new_pair=TRUE;
@@ -13513,7 +13544,8 @@ void initenterstrongPairsShift (poly h,int k,int ecart,int isFromQ, kStrategy st
       {
         new_pair=TRUE;
         // pairs (shifts(s[1..k]),h), (s[1..k],h)
-        for (j=0; j<=k; j++) {
+        for (j=0; j<=k; j++)
+	{
           poly s = strat->S[j];
           // TODO: cache lastVblock of s[1..k] for later use
           enterOnePairWithShifts(j, s, h, ecart, isFromQ, strat, atR, h_lastVblock, pmLastVblock(s));
@@ -13559,7 +13591,8 @@ void initenterstrongPairsShift (poly h,int k,int ecart,int isFromQ, kStrategy st
       else
       {
         // pairs (shifts(s[1..k]),h), (s[1..k],h)
-        for (j=0; j<=k; j++) {
+        for (j=0; j<=k; j++)
+	{
           if ((pGetComp(h)==pGetComp(strat->S[j]))
               || (pGetComp(strat->S[j])==0))
           {
@@ -13592,11 +13625,13 @@ void initenterstrongPairsShift (poly h,int k,int ecart,int isFromQ, kStrategy st
     kMergeBintoL(strat);
   }
 }
+#endif
 
 /*2
 *(s[0],h),...,(s[k],h) will be put to the pairset L(via initenterpairs)
 *superfluous elements in S will be deleted
 */
+#ifdef HAVE_SHIFTBBA
 void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 {
   /* h is strat->P.p, that is LObject with LM in currRing and Tail in tailRing */
@@ -13620,11 +13655,13 @@ void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
     }
   }
 }
+#endif
 
 /*2
 * enteres all admissible shifts of p into T
 * assumes that p is already in T!
 */
+#ifdef HAVE_SHIFTBBA
 void enterTShift(LObject p, kStrategy strat, int atT)
 {
   /* determine how many elements we have to insert */

@@ -104,8 +104,9 @@ int kFindSameLMInT_Z(const kStrategy strat, const LObject* L, const int start)
       if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r) && p_LmEqual(T[j].p, p, r))
       {
         gcd = n_Gcd(pGetCoeff(p), pGetCoeff(T[j].p), r->cf);
-        if (o == -1 ||
-            n_Greater(n_EucNorm(ogcd, r->cf), n_EucNorm(gcd, r->cf), r->cf) == TRUE) {
+        if (o == -1
+        || n_Greater(n_EucNorm(ogcd, r->cf), n_EucNorm(gcd, r->cf), r->cf))
+        {
           ogcd = gcd;
           o = j;
         }
@@ -124,8 +125,9 @@ int kFindSameLMInT_Z(const kStrategy strat, const LObject* L, const int start)
       if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r) && p_LmEqual(T[j].p, p, r))
       {
         gcd = n_Gcd(pGetCoeff(p), pGetCoeff(T[j].p), r->cf);
-        if (o == -1 ||
-            n_Greater(n_EucNorm(ogcd, r->cf), n_EucNorm(gcd, r->cf), r->cf) == TRUE) {
+        if (o == -1
+        || n_Greater(n_EucNorm(ogcd, r->cf), n_EucNorm(gcd, r->cf), r->cf))
+        {
           ogcd = gcd;
           o = j;
         }
@@ -156,7 +158,8 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
         if (p_LmShortDivisibleBy(T0p, sevT0, p, not_sev, r))
         {
             mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
-            if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
+            if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
+            {
                 return 0;
             }
         }
@@ -164,7 +167,8 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
         if (!(sevT0 & not_sev) && p_LmDivisibleBy(T0p, p, r))
         {
             mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
-            if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
+            if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
+            {
                 return 0;
             }
         }
@@ -181,7 +185,8 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
                     p, not_sev, r))
         {
             mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
-            if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
+            if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
+            {
                 return 0;
             }
         }
@@ -189,7 +194,8 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
         if (!(sevT0 & not_sev) && p_LmDivisibleBy(T0p, p, r))
         {
             mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
-            if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
+            if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
+            {
                 return 0;
             }
         }
@@ -222,7 +228,8 @@ int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int sta
       if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
       {
         mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p), &rest, r->cf);
-        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
+        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
+        {
           o = j;
           orest = rest;
         }
@@ -231,7 +238,8 @@ int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int sta
       if (!(sevT[j] & not_sev) && p_LmDivisibleBy(T[j].p, p, r))
       {
         mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p), &rest, r->cf);
-        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
+        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
+        {
           o = j;
           orest = rest;
         }
@@ -253,7 +261,8 @@ int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int sta
             p, not_sev, r))
       {
         mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].t_p), &rest, r->cf);
-        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
+        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
+        {
           o = j;
           orest = rest;
         }
@@ -262,7 +271,8 @@ int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int sta
       if (!(sevT[j] & not_sev) && p_LmDivisibleBy(T[j].t_p, p, r))
       {
         mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].t_p), &rest, r->cf);
-        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf) == TRUE) {
+        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
+        {
           o = j;
           orest = rest;
         }
@@ -647,10 +657,12 @@ int redRing_Z (LObject* h,kStrategy strat)
   {
     /* check if a reducer of the lead term exists */
     j = kFindDivisibleByInT(strat, h);
-    if (j < 0) {
+    if (j < 0)
+    {
       /* check if a reducer with the same lead monomial exists */
       j = kFindSameLMInT_Z(strat, h);
-      if (j < 0) {
+      if (j < 0)
+      {
         /* check if a reducer of the lead monomial exists, by the above
          * check this is a real divisor of the lead monomial */
         j = kFindDivisibleByInT_Z(strat, h);
@@ -682,8 +694,8 @@ int redRing_Z (LObject* h,kStrategy strat)
             return 1;
           }
         }
-	else
-	{
+        else
+        {
           /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
            * => we try to cut down the lead coefficient at least */
           /* first copy T[j] in order to multiply it with a coefficient later on */
@@ -712,7 +724,8 @@ int redRing_Z (LObject* h,kStrategy strat)
 
         ksReducePolyZ(h, &(strat->T[j]), NULL, NULL, strat);
         ksReducePolyGCD(&h2, &(strat->T[j]), NULL, NULL, strat);
-        if (!rHasLocalOrMixedOrdering(currRing)) {
+        if (!rHasLocalOrMixedOrdering(currRing))
+        {
           redtailBbaAlsoLC_Z(&h2, j, strat);
           h2.pCleardenom();
         }
@@ -4349,8 +4362,6 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
 
 /* shiftgb stuff */
 #ifdef HAVE_SHIFTBBA
-
-
 ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 {
   int   red_result = 1;
@@ -4507,10 +4518,11 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // in the ring case we cannot expect LC(f) = 1,
       // therefore we call pCleardenom instead of pNorm
       strat->redTailChange=FALSE;
-      
+
       /* if we are computing over Z we always want to try and cut down
        * the coefficients in the tail terms */
-      if (rField_is_Z(currRing) && !rHasLocalOrMixedOrdering(currRing)) {
+      if (rField_is_Z(currRing) && !rHasLocalOrMixedOrdering(currRing))
+      {
         redtailBbaAlsoLC_Z(&(strat->P), strat->tl, strat);
         strat->P.pCleardenom();
       }
@@ -4629,7 +4641,8 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           assume(strat->sevS[k] == pGetShortExpVector(strat->S[k]));
           if (pLmShortDivisibleBy(strat->T[j].p, strat->sevT[j], strat->S[k], ~strat->sevS[k]))
           {
-            if (pLmCmp(strat->T[j].p, strat->S[k]) != 0) { // check whether LM is different
+            if (pLmCmp(strat->T[j].p, strat->S[k]) != 0)
+            { // check whether LM is different
               deleteInS(k, strat);
               --k;
               break;
@@ -4709,6 +4722,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
   return (strat->Shdl);
 }
+#endif
 
 #ifdef HAVE_SHIFTBBA
 ideal rightgb(ideal F, ideal Q)
@@ -4726,6 +4740,7 @@ ideal rightgb(ideal F, ideal Q)
 *reduces h with elements from T choosing  the first possible
 * element in t with respect to the given pDivisibleBy
 */
+#ifdef HAVE_SHIFTBBA
 int redFirstShift (LObject* h,kStrategy strat)
 {
   if (h->IsNull()) return 0;
