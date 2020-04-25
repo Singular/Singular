@@ -220,7 +220,6 @@ void rSetHdl(idhdl h);
 ring rInit(leftv pn, leftv rv, leftv ord);
 idhdl  rDefault(const char *s);
 
-idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n=NULL);
 idhdl rFindHdl(ring r, idhdl n);
 void   rKill(idhdl h);
 void   rKill(ring r);

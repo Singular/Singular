@@ -222,6 +222,7 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
     case RING_CMD:
                    if ((IDRING(h)==currRing) && (currRingHdl!=h))
                      PrintS("(*)"); /* this is an alias to currRing */
+                   //Print("ref:%d",IDRING(h)->ref);
 #ifdef RDEBUG
                    if (traceit &TRACE_SHOW_RINGS)
                      Print(" <%lx>",(long)(IDRING(h)));
@@ -1627,6 +1628,7 @@ idhdl rDefault(const char *s)
   return currRingHdl;
 }
 
+static idhdl rSimpleFindHdl(const ring r, const idhdl root, const idhdl n);
 idhdl rFindHdl(ring r, idhdl n)
 {
   if  ((r==NULL)||(r->VarOffset==NULL))
@@ -6250,7 +6252,7 @@ void rKill(idhdl h)
   }
 }
 
-idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n)
+static idhdl rSimpleFindHdl(const ring r, const idhdl root, const idhdl n)
 {
   idhdl h=root;
   while (h!=NULL)
