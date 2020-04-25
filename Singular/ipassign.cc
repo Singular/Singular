@@ -1114,9 +1114,8 @@ static BOOLEAN jiA_CRING(leftv res, leftv a, Subexpr)
 /*2
 * assign a = b
 */
-static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel, BOOLEAN is_qring=FALSE)
+static BOOLEAN jiAssign_1(leftv l, leftv r, int rt, BOOLEAN toplevel, BOOLEAN is_qring=FALSE)
 {
-  int rt=r->Typ();
   if (rt==0)
   {
     if (!errorreported) Werror("`%s` is undefined",r->Fullname());
@@ -1383,7 +1382,7 @@ static BOOLEAN jiA_INTVEC_L(leftv l,leftv r)
     t.data=(char *)(long)(*iv)[i];
     h=l->next;
     l->next=NULL;
-    nok=jiAssign_1(l,&t,TRUE);
+    nok=jiAssign_1(l,&t,INT_CMD,TRUE);
     l->next=h;
     if (nok) return TRUE;
     i++;
@@ -1417,7 +1416,7 @@ static BOOLEAN jiA_VECTOR_L(leftv l,leftv r)
     }
     h=l->next;
     l->next=NULL;
-    nok=jiAssign_1(l,&t,TRUE);
+    nok=jiAssign_1(l,&t,POLY_CMD,TRUE);
     l->next=h;
     t.CleanUp();
     if (nok)
@@ -1655,7 +1654,7 @@ static BOOLEAN jiA_MATRIX_L(leftv l,leftv r)
       l->next=NULL;
       idhdl hh=NULL;
       if ((l->rtyp==IDHDL)&&(l->Typ()==DEF_CMD)) hh=(idhdl)l->data;
-      nok=jiAssign_1(l,&t,TRUE);
+      nok=jiAssign_1(l,&t,POLY_CMD,TRUE);
       if (hh!=NULL) { ipMoveId(hh);hh=NULL;}
       l->next=h;
       if (nok)
@@ -1731,7 +1730,7 @@ static BOOLEAN jiA_STRING_L(leftv l,leftv r)
     t.data=ss;
     h=l->next;
     l->next=NULL;
-    nok=jiAssign_1(l,&t,TRUE);
+    nok=jiAssign_1(l,&t,STRING_CMD,TRUE);
     if (nok)
     {
       break;
@@ -1937,7 +1936,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
       &&(lt!=INTMAT_CMD)
       &&((lt==rt)||(lt!=LIST_CMD)))
       {
-        b=jiAssign_1(l,r,toplevel,is_qring);
+        b=jiAssign_1(l,r,rt,toplevel,is_qring);
         if (l->rtyp==IDHDL)
         {
           if ((lt==DEF_CMD)||(lt==LIST_CMD))
@@ -1962,7 +1961,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
         &&(rt==RESOLUTION_CMD))
       )
       {
-        b=jiAssign_1(l,r,toplevel);
+        b=jiAssign_1(l,r,rt,toplevel);
         if((l->rtyp==IDHDL)&&(l->data!=NULL))
         {
           if ((lt==DEF_CMD) || (lt==LIST_CMD))
@@ -2048,7 +2047,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
       }
       if ((hh->next==NULL)&&(hh->Typ()==IDEAL_CMD))
       {
-        b=jiAssign_1(l,hh,toplevel); /* map-assign: map f=r,i; */
+        b=jiAssign_1(l,hh,IDEAL_CMD,toplevel); /* map-assign: map f=r,i; */
         omFreeBin(hh,sleftv_bin);
         return b;
       }
