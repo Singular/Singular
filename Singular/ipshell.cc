@@ -1629,6 +1629,8 @@ idhdl rDefault(const char *s)
 
 idhdl rFindHdl(ring r, idhdl n)
 {
+  if  ((r==NULL)||(r->VarOffset==NULL))
+    return NULL;
   idhdl h=rSimpleFindHdl(r,IDROOT,n);
   if (h!=NULL)  return h;
   if (IDROOT!=basePack->idroot) h=rSimpleFindHdl(r,basePack->idroot,n);
@@ -6539,9 +6541,11 @@ BOOLEAN iiAssignCR(leftv r, leftv arg)
     sleftv tmp;
     memset(&tmp,0,sizeof(tmp));
     tmp.rtyp=IDHDL;
-    tmp.data=(char*)rDefault(ring_name);
-    if (tmp.data!=NULL)
+    idhdl h=rDefault(ring_name);
+    tmp.data=(char*)h;
+    if (h!=NULL)
     {
+      tmp.name=h->id;
       BOOLEAN b=iiAssign(&tmp,arg);
       if (b) return TRUE;
       rSetHdl(ggetid(ring_name));
