@@ -18,7 +18,6 @@ _config.h.in
 *.swp
 *.trs
 *~
-/.tarball-git-version
 /AUTOGEN_generated_stuff
 /desktop/Singular-manual.desktop
 /desktop/Singular.desktop
