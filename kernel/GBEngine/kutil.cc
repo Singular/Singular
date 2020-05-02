@@ -12788,7 +12788,7 @@ static void enterOnePairWithShifts (int q_inS /*also i*/, poly q, poly p, int ec
     enterPair = enterOnePairShift;
 
   int degbound = currRing->N/currRing->isLPring;
-  int neededShift = p_lastVblock - 1;
+  int neededShift = p_lastVblock - ((pGetComp(p) > 0 || pGetComp(q) > 0) ? 0 : 1); // in the module case, product criterion does not hold
   int maxPossibleShift = degbound - q_lastVblock;
   int maxShift = si_min(neededShift, maxPossibleShift);
   int firstShift = (q == p ? 1 : 0); // do not add (q,p) if q=p
@@ -12843,7 +12843,7 @@ static void enterOnePairWithoutShifts (int p_inS /*also i*/, poly q, poly p, int
   else
 #endif
   {
-    assume(q_shift <= p_lastVblock - 1); // there should be an overlap
+    assume(q_shift <= p_lastVblock - ((pGetComp(q) > 0 || pGetComp(p) > 0) ? 0 : 1)); // there should be an overlap (in the module case epsilon overlap is also allowed)
     enterOnePairShift(q, p, ecartp, p_isFromQ, strat, -1, ecartq, q_isFromQ, q_shift, -1);
   }
 }
@@ -13282,7 +13282,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
               {
                 poly s = strat->S[j];
                 int s_lastVblock = pmLastVblock(s);
-                if (i < s_lastVblock)
+                if (i < s_lastVblock || (pGetComp(s) > 0 && i == s_lastVblock)) // in the module case, product criterion does not hold (note: comp h is always zero here)
                   enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, s_lastVblock, i);
 #ifdef HAVE_RINGS
                 else if (rField_is_Ring(currRing))
@@ -13319,7 +13319,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
           {
             poly s = strat->S[j];
             int s_lastVblock = pmLastVblock(s);
-            if (i < s_lastVblock)
+            if (i < s_lastVblock || (pGetComp(s) > 0 && i == s_lastVblock)) // in the module case, product criterion does not hold (note: comp h is always zero here)
               enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, s_lastVblock, i);
 #ifdef HAVE_RINGS
             else if (rField_is_Ring(currRing))
@@ -13335,7 +13335,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
             }
 #endif
           }
-          if (i < h_lastVblock)
+          if (i < h_lastVblock) // in the module case, product criterion does not hold (note: comp h is always zero here)
             enterOnePairWithoutShifts(-1, hh, h, ecart, isFromQ, strat, atR, h_lastVblock, i);
 #ifdef HAVE_RINGS
           else if (rField_is_Ring(currRing))
@@ -13382,7 +13382,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
       {
         // pairs (shifts(s[1..k]),h), (s[1..k],h)
         for (j=0; j<=k; j++)
-	{
+        {
           if ((pGetComp(h)==pGetComp(strat->S[j]))
               || (pGetComp(strat->S[j])==0))
           {
@@ -13401,7 +13401,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
             {
               poly s = strat->S[j];
               int s_lastVblock = pmLastVblock(s);
-              if (i < s_lastVblock)
+              if (i <= s_lastVblock) // in the module case, product criterion does not hold
                 enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, s_lastVblock, i);
 #ifdef HAVE_RINGS
               else if (rField_is_Ring(currRing))
@@ -13418,7 +13418,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
 #endif
             }
           }
-          if (i < h_lastVblock)
+          if (i <= h_lastVblock) // in the module case, product criterion does not hold
             enterOnePairWithoutShifts(-1, hh, h, ecart, isFromQ, strat, atR, h_lastVblock, i);
 #ifdef HAVE_RINGS
           else if (rField_is_Ring(currRing))
