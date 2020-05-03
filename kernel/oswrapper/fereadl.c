@@ -764,6 +764,8 @@ int fe_init_dyn_rl()
     if (fe_rl_hdl==NULL) fe_rl_hdl=dynl_open("libreadline.so.5");
     if (fe_rl_hdl==NULL) fe_rl_hdl=dynl_open("libreadline.so.6");
     if (fe_rl_hdl==NULL) fe_rl_hdl=dynl_open("libreadline.so.7");
+    if (fe_rl_hdl==NULL) fe_rl_hdl=dynl_open("libreadline.so.8");
+    if (fe_rl_hdl==NULL) fe_rl_hdl=dynl_open("libreadline.so.9");
     if (fe_rl_hdl==NULL) { return 1;}
 
     fe_filename_completion_function=
