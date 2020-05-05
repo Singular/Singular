@@ -40,7 +40,7 @@ flint_found="no"
 dnl check for system installed libraries if FLINT_HOME_PATH is the default
 if test "$FLINT_HOME_PATH" = "$DEFAULT_CHECKING_PATH" ; then
 	FLINT_CFLAGS=""
-	FLINT_LIBS="-lflint -lmpfr"
+	FLINT_LIBS="-lflint -lmpfr -lgmp"
 
 	# we suppose that mpfr and mpir to be in the same place or available by default
 	CFLAGS="${BACKUP_CFLAGS} ${GMP_CPPFLAGS}"
@@ -62,7 +62,7 @@ if test "x$flint_found" = "xno" ; then
 		if test -r "$FLINT_HOME/include/flint/fmpz.h"; then
 
 		FLINT_CFLAGS="-I${FLINT_HOME}/include/"
-		FLINT_LIBS="-L${FLINT_HOME}/lib -lflint -lmpfr"
+		FLINT_LIBS="-L${FLINT_HOME}/lib -lflint -lmpfr -lgmp"
 
 	# we suppose that mpfr and mpir to be in the same place or available by default
 		CFLAGS="${BACKUP_CFLAGS} ${FLINT_CFLAGS} ${GMP_CPPFLAGS}"
