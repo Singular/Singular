@@ -55,8 +55,7 @@ static void   ndDelete(number* d, const coeffs) { *d=NULL; }
 static number ndAnn(number, const coeffs) { return NULL;}
 static char* ndCoeffString(const coeffs r)
 {
-  char *s=(char *)omAlloc(11);snprintf(s,11,"Coeffs(%d)",r->type);
-  return s;
+  return omStrDup(r->cfCoeffName(r));
 }
 static char* ndCoeffName(const coeffs r)
 {
