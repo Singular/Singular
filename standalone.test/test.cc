@@ -23,12 +23,7 @@ BOOLEAN Test(const n_coeffType type, void* param)
     return FALSE;
   }
 
-  assume( r->cfCoeffWrite != NULLp );
-
-  if( r->cfCoeffWrite != NULL )
-  {
-    PrintS( "Coeff-domain: " ); n_CoeffWrite(r); PrintLn();
-  }
+  PrintS( "Coeff-domain: " ); n_CoeffWrite(r); PrintLn();
 
   number t = n_Init(1, r);
   ndInpAdd(t, t, r);

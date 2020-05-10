@@ -1456,16 +1456,6 @@ char * QratCoeffName(const coeffs c)
 
 }
 
-static char* CoeffString(const coeffs c)
-{
-  return omStrDup(QratCoeffName(c));
-}
-
-static void CoeffWrite(const coeffs c, BOOLEAN)
-{
-  PrintS(QratCoeffName(c));
-}
-
 coeffs flintQratInitCfByName(char *s, n_coeffType n)
 {
   const char start[] = "flintQ(";
@@ -1597,9 +1587,7 @@ static void KillChar(coeffs cf)
 BOOLEAN flintQrat_InitChar(coeffs cf, void * infoStruct)
 {
   QaInfo *pp=(QaInfo*)infoStruct;
-  cf->cfCoeffString  = CoeffString;
   cf->cfCoeffName    = QratCoeffName;
-  cf->cfCoeffWrite   = CoeffWrite;
   cf->nCoeffIsEqual  = CoeffIsEqual;
   cf->cfKillChar     = KillChar;
   cf->ch             = 0; //char 0

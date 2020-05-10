@@ -613,9 +613,7 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->rep=n_rep_gmp;
 
   //r->nCoeffIsEqual = ndCoeffIsEqual;
-  r->cfCoeffString = nrzCoeffString;
   r->cfCoeffName = nrzCoeffName;
-  r->cfCoeffWrite = nrzCoeffWrite;
   //r->cfKillChar = ndKillChar;
   r->cfMult  = nrzMult;
   r->cfSub   = nrzSub;

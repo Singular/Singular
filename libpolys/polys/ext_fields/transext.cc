@@ -2544,7 +2544,6 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 
   cf->factoryVarOffset = R->cf->factoryVarOffset + rVar(R);
 
-  cf->cfCoeffString = naCoeffString; // FIXME? TODO? // extern char* naCoeffString(const coeffs r);
   cf->cfCoeffName =  naCoeffName; // FIXME? TODO? // extern char* naCoeffString(const coeffs r);
 
   cf->cfGreaterZero  = ntGreaterZero;

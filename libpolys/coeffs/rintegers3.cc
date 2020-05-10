@@ -1176,7 +1176,6 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->rep=n_rep_gap_gmp;
 
   //r->nCoeffIsEqual = ndCoeffIsEqual;
-  r->cfCoeffString = nrzCoeffString;
   r->cfCoeffName = nrzCoeffName;
   //r->cfKillChar = ndKillChar;
   r->cfMult  = nrzMult;
@@ -1216,7 +1215,6 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfLcm  = nrzLcm;
   r->cfDelete= nrzDelete;
   r->cfSetMap = nrzSetMap;
-  r->cfCoeffWrite = nrzCoeffWrite;
   r->convSingNFactoryN = nrzConvSingNFactoryN;
   r->convFactoryNSingN = nrzConvFactoryNSingN;
   r->cfMPZ = nrzMPZ;

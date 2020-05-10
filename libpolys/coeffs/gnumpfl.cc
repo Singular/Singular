@@ -399,13 +399,6 @@ static void ngfSetChar(const coeffs r)
   setGMPFloatDigits(r->float_len, r->float_len2);
 }
 
-static char* ngfCoeffString(const coeffs r)
-{
-  char *s=(char*)omAlloc(30);
-  snprintf(s,30,"Float(%d,%d)",r->float_len,r->float_len2);
-  return s;
-}
-
 static char* ngfCoeffName(const coeffs r)
 {
   STATIC_VAR char ngfCoeffName_buf[30];
@@ -505,11 +498,6 @@ static nMapFunc ngfSetMap(const coeffs src, const coeffs dst)
   return NULL;
 }
 
-static void ngfCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
-{
-  Print("Float(%d,%d)", r->float_len,r->float_len2);  /* long R */
-}
-
 BOOLEAN ngfInitChar(coeffs n, void *parameter)
 {
   assume( getCoeffType(n) == n_long_R );
@@ -522,7 +510,6 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
 
   n->cfSetChar = ngfSetChar;
   n->ch = 0;
-  n->cfCoeffString=ngfCoeffString;
   n->cfCoeffName=ngfCoeffName;
 
   n->cfDelete  = ngfDelete;
@@ -548,7 +535,6 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
   n->cfRead    = ngfRead;
   n->cfPower   = ngfPower;
   n->cfSetMap = ngfSetMap;
-  n->cfCoeffWrite = ngfCoeffWrite;
 #ifdef LDEBUG
   //n->cfDBTest  = ndDBTest; // not yet implemented: ngfDBTest
 #endif

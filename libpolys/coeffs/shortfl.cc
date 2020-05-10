@@ -58,14 +58,6 @@ SI_FLOAT nrFloat(number n)
   return nf(n).F();
 }
 
-
-static void nrCoeffWrite (const coeffs r, BOOLEAN /*details*/)
-{
-  assume( getCoeffType(r) == n_R );
-  PrintS("Float()");  /* R */
-}
-
-
 static BOOLEAN nrGreaterZero (number k, const coeffs r)
 {
   assume( getCoeffType(r) == n_R );
@@ -683,7 +675,6 @@ BOOLEAN nrInitChar(coeffs n, void* p)
 
   //n->cfKillChar = ndKillChar; /* dummy */
   n->ch = 0;
-  n->cfCoeffString = nrCoeffString;
   n->cfCoeffName = nrCoeffName;
 
   n->cfInit = nrInit;
@@ -706,7 +697,6 @@ BOOLEAN nrInitChar(coeffs n, void* p)
   n->cfRead = nrRead;
   //n->cfPower = nrPower;
   n->cfSetMap = nrSetMap;
-  n->cfCoeffWrite  = nrCoeffWrite;
 
     /* nName= ndName; */
     /*nSize  = ndSize;*/

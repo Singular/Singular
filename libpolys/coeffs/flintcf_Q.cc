@@ -521,16 +521,6 @@ char * CoeffName(const coeffs r)
   return (char*)CoeffName_flint_Q;
 
 }
-static char* CoeffString(const coeffs r)
-{
-  char *buf=(char*)omAlloc(12+strlen(r->pParameterNames[0]));
-  sprintf(buf,"flintQp(\"%s\")",r->pParameterNames[0]);
-  return buf;
-}
-static void CoeffWrite(const coeffs r, BOOLEAN details)
-{
-  PrintS(CoeffName(r));
-}
 coeffs flintQInitCfByName(char *s,n_coeffType n)
 {
   const char start[]="flintQp[";
@@ -562,9 +552,7 @@ static void KillChar(coeffs cf)
 BOOLEAN flintQ_InitChar(coeffs cf, void * infoStruct)
 {
   char *pp=(char*)infoStruct;
-  cf->cfCoeffString  = CoeffString;
   cf->cfCoeffName    = CoeffName;
-  cf->cfCoeffWrite   = CoeffWrite;
   cf->nCoeffIsEqual  = CoeffIsEqual;
   cf->cfKillChar     = KillChar;
   cf->cfSetChar      = SetChar;

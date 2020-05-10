@@ -781,20 +781,12 @@ static void nfKillChar(coeffs r)
   omFreeSize((ADDRESS)p, sizeof(char*));
 }
 
-static char* nfCoeffString(const coeffs r)
-{
-  const char *p=n_ParameterNames(r)[0];
-  char *s=(char*)omAlloc(11+1+strlen(p));
-  sprintf(s,"%d,%s",r->m_nfCharQ,p);
-  return s;
-}
-
 static char* nfCoeffName(const coeffs r)
 {
   STATIC_VAR char nfCoeffName_buf[32];
   const char *p=n_ParameterNames(r)[0];
   nfCoeffName_buf[31]='\0';
-  snprintf(nfCoeffName_buf,31,"ZZ/%d[%s]",r->m_nfCharQ,p);
+  snprintf(nfCoeffName_buf,31,"%d,%s",r->m_nfCharQ,p);
   return nfCoeffName_buf;
 }
 
@@ -835,7 +827,6 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   //r->cfInitChar=npInitChar;
   r->cfKillChar=nfKillChar;
   r->nCoeffIsEqual=nfCoeffIsEqual;
-  r->cfCoeffString=nfCoeffString;
   r->cfCoeffName=nfCoeffName;
 
   r->cfMult  = nfMult;

@@ -409,14 +409,6 @@ static void ngcKillChar(coeffs r)
   omFreeSize((ADDRESS)p, P * sizeof(char*));
 }
 
-static char* ngcCoeffString(const coeffs r)
-{
-  const char *p=n_ParameterNames(r)[0];
-  char *s=(char*)omAlloc(31+strlen(p));
-  sprintf(s,"complex,%d,%d,%s",r->float_len,r->float_len2,p);
-  return s;
-}
-
 static char* ngcCoeffName(const coeffs r)
 {
   STATIC_VAR char ngcCoeffName_buf[40];
@@ -567,8 +559,8 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
 
   n->cfKillChar = ngcKillChar;
   n->ch = 0;
-  n->cfCoeffString=ngcCoeffString;
   n->cfCoeffName=ngcCoeffName;
+  n->cfCoeffWrite = ngcCoeffWrite;
 
   n->cfDelete  = ngcDelete;
   //n->cfNormalize=ndNormalize;
@@ -598,7 +590,6 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   n->cfSetMap = ngcSetMap;
   n->cfRePart  = ngcRePart;
   n->cfImPart  = ngcImPart;
-  n->cfCoeffWrite = ngcCoeffWrite;
     // cfSize  = ndSize;
 #ifdef LDEBUG
   //n->cfDBTest  = ndDBTest; // not yet implemented: ngcDBTest

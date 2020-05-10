@@ -76,7 +76,6 @@ void     nlPower(number x, int exp, number *lu, const coeffs r);
 const char *   nlRead (const char *s, number *a, const coeffs r);
 void     nlWrite(number a, const coeffs r);
 
-void     nlCoeffWrite(const coeffs r, BOOLEAN details);
 number   nlFarey(number nN, number nP, const coeffs CF);
 
 #ifdef LDEBUG
@@ -3058,13 +3057,11 @@ number nlExtGcd(number a, number b, number *s, number *t, const coeffs)
   return g;
 }
 
-void    nlCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
-{
-  if (r->is_field)
-  PrintS("QQ");
-  else
-  PrintS("ZZ");
-}
+//void    nlCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
+//{
+//  if (r->is_field)  PrintS("QQ");
+//  else  PrintS("ZZ");
+//}
 
 VAR int n_SwitchChinRem=0;
 number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, CFArray &inv_cache,const coeffs CF)
@@ -3302,13 +3299,6 @@ char * nlCoeffName(const coeffs r)
   else                 return (char*)"ZZ";
 }
 
-static char* nlCoeffString(const coeffs r)
-{
-  //return omStrDup(nlCoeffName(r));
-  if (r->cfDiv==nlDiv) return omStrDup("QQ");
-  else                 return omStrDup("ZZ");
-}
-
 void nlWriteFd(number n, const ssiInfo* d, const coeffs)
 {
   if(SR_HDL(n) & SR_INT)
@@ -3461,7 +3451,7 @@ BOOLEAN nlInitChar(coeffs r, void*p)
 
   r->nCoeffIsEqual=nlCoeffIsEqual;
   //r->cfKillChar = ndKillChar; /* dummy */
-  r->cfCoeffString=nlCoeffString;
+  //r->cfCoeffString=nlCoeffString;
   r->cfCoeffName=nlCoeffName;
 
   r->cfInitMPZ = nlInitMPZ;
@@ -3523,7 +3513,7 @@ BOOLEAN nlInitChar(coeffs r, void*p)
   //r->cfName = ndName;
   r->cfInpMult=nlInpMult;
   r->cfInpAdd=nlInpAdd;
-  r->cfCoeffWrite=nlCoeffWrite;
+  //r->cfCoeffWrite=nlCoeffWrite;
 
   r->cfClearContent = nlClearContent;
   r->cfClearDenominators = nlClearDenominators;

@@ -37,7 +37,6 @@ number  npInvers      (number c,const coeffs r);
 BOOLEAN npGreater     (number a, number b,const coeffs r);
 BOOLEAN npEqual       (number a, number b,const coeffs r);
 void    npWrite       (number a, const coeffs r);
-void    npCoeffWrite  (const coeffs r, BOOLEAN details);
 const char *  npRead  (const char *s, number *a,const coeffs r);
 void nvInpMult(number &a, number b, const coeffs r);
 
@@ -351,11 +350,6 @@ static char* npCoeffName(const coeffs cf)
   return npCoeffName_buf;
 }
 
-static char* npCoeffString(const coeffs cf)
-{
-  return omStrDup(npCoeffName(cf));
-}
-
 static void npWriteFd(number n, const ssiInfo* d, const coeffs)
 {
   fprintf(d->f_write,"%d ",(int)(long)n);
@@ -401,9 +395,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
   //r->cfInitChar=npInitChar;
   r->cfKillChar=npKillChar;
   r->nCoeffIsEqual=npCoeffsEqual;
-  r->cfCoeffString=npCoeffString;
   r->cfCoeffName=npCoeffName;
-  r->cfCoeffWrite=npCoeffWrite;
 
   r->cfMult  = npMult;
   r->cfInpMult  = npInpMult;
@@ -764,9 +756,4 @@ void nvPower (number a, int i, number * result, const coeffs r)
 }
 #endif
 #endif
-
-void    npCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
-{
-  Print("ZZ/%d",r->ch);
-}
 

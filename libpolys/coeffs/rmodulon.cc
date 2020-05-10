@@ -32,28 +32,6 @@ BOOLEAN nrnDBTest      (number a, const char *f, const int l, const coeffs r);
 
 EXTERN_VAR omBin gmp_nrz_bin;
 
-static void nrnCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
-{
-  size_t l = (size_t)mpz_sizeinbase(r->modBase, 10) + 2;
-  char* s = (char*) omAlloc(l);
-  s= mpz_get_str (s, 10, r->modBase);
-
-  #ifdef TEST_ZN_AS_ZP
-  if (l<10)
-  {
-    if (nCoeff_is_Zn(r)) Print("ZZ/%s", s);
-    else if (nCoeff_is_Ring_PtoM(r)) Print("ZZ/(%s^%lu)", s, r->modExponent);
-  }
-  else
-  #endif
-  {
-    if (nCoeff_is_Zn(r)) Print("ZZ/bigint(%s)", s);
-    else if (nCoeff_is_Ring_PtoM(r)) Print("ZZ/(bigint(%s)^%lu)", s, r->modExponent);
-  }
-
-  omFreeSize((ADDRESS)s, l);
-}
-
 coeffs nrnInitCfByName(char *s,n_coeffType n)
 {
   const char start[]="ZZ/bigint(";
@@ -88,14 +66,19 @@ static char* nrnCoeffName(const coeffs r)
   if(nrnCoeffName_buff!=NULL) omFree(nrnCoeffName_buff);
   size_t l = (size_t)mpz_sizeinbase(r->modBase, 10) + 2;
   char* s = (char*) omAlloc(l);
-  l+=22;
+  l+=24;
   nrnCoeffName_buff=(char*)omAlloc(l);
   s= mpz_get_str (s, 10, r->modBase);
   int ll;
   if (nCoeff_is_Zn(r))
-    ll=snprintf(nrnCoeffName_buff,l,"ZZ/bigint(%s)",s);
+  {
+    if (strlen(s)<10)
+      ll=snprintf(nrnCoeffName_buff,l,"ZZ/(%s)",s);
+    else
+      ll=snprintf(nrnCoeffName_buff,l,"ZZ/bigint(%s)",s);
+  }
   else if (nCoeff_is_Ring_PtoM(r))
-    ll=snprintf(nrnCoeffName_buff,l,"ZZ/bigint(%s)^%lu",s,r->modExponent);
+    ll=snprintf(nrnCoeffName_buff,l,"ZZ/(bigint(%s)^%lu)",s,r->modExponent);
   assume(ll<(int)l); // otherwise nrnCoeffName_buff too small
   omFreeSize((ADDRESS)s, l-22);
   return nrnCoeffName_buff;
@@ -107,18 +90,6 @@ static BOOLEAN nrnCoeffIsEqual(const coeffs r, n_coeffType n, void * parameter)
   ZnmInfo *info=(ZnmInfo*)parameter;
   return (n==r->type) && (r->modExponent==info->exp)
   && (mpz_cmp(r->modBase,info->base)==0);
-}
-
-static char* nrnCoeffString(const coeffs r)
-{
-  size_t l = (size_t)mpz_sizeinbase(r->modBase, 10) +2;
-  char* b = (char*) omAlloc(l);
-  b= mpz_get_str (b, 10, r->modBase);
-  char* s = (char*) omAlloc(15+l);
-  if (nCoeff_is_Zn(r)) sprintf(s,"ZZ/%s",b);
-  else /*if (nCoeff_is_Ring_PtoM(r))*/ sprintf(s,"ZZ/(bigint(%s)^%lu)",b,r->modExponent);
-  omFreeSize(b,l);
-  return s;
 }
 
 static void nrnKillChar(coeffs r)
@@ -1013,9 +984,6 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->is_domain=FALSE;
   r->rep=n_rep_gmp;
 
-
-  r->cfCoeffString = nrnCoeffString;
-
   r->cfInit        = nrnInit;
   r->cfDelete      = nrnDelete;
   r->cfCopy        = nrnCopy;
@@ -1051,7 +1019,6 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->cfXExtGcd     = nrnXExtGcd;
   r->cfQuotRem     = nrnQuotRem;
   r->cfCoeffName   = nrnCoeffName;
-  r->cfCoeffWrite  = nrnCoeffWrite;
   r->nCoeffIsEqual = nrnCoeffIsEqual;
   r->cfKillChar    = nrnKillChar;
   r->cfQuot1       = nrnQuot1;

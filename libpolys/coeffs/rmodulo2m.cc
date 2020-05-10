@@ -69,11 +69,6 @@ static char* nr2mCoeffName(const coeffs cf)
   return n2mCoeffName_buf;
 }
 
-static void    nr2mCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
-{
-  PrintS(nr2mCoeffName(r));
-}
-
 static BOOLEAN nr2mCoeffIsEqual(const coeffs r, n_coeffType n, void * p)
 {
   if (n==n_Z2m)
@@ -83,11 +78,6 @@ static BOOLEAN nr2mCoeffIsEqual(const coeffs r, n_coeffType n, void * p)
     if (((mm+1)>>m)==1L) return TRUE;
   }
   return FALSE;
-}
-
-static char* nr2mCoeffString(const coeffs r)
-{
-  return omStrDup(nr2mCoeffName(r));
 }
 
 static coeffs nr2mQuot1(number c, const coeffs r)
@@ -783,7 +773,6 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
 
   //r->cfKillChar    = ndKillChar; /* dummy*/
   r->nCoeffIsEqual = nr2mCoeffIsEqual;
-  r->cfCoeffString = nr2mCoeffString;
 
   r->modBase = (mpz_ptr) omAllocBin (gmp_nrz_bin);
   mpz_init_set_si (r->modBase, 2L);
@@ -824,7 +813,6 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->cfIsUnit      = nr2mIsUnit;
   r->cfGetUnit     = nr2mGetUnit;
   r->cfExtGcd      = nr2mExtGcd;
-  r->cfCoeffWrite  = nr2mCoeffWrite;
   r->cfCoeffName   = nr2mCoeffName;
   r->cfQuot1       = nr2mQuot1;
 #ifdef LDEBUG

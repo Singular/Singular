@@ -38,10 +38,6 @@ static void gCoeffWrite(const coeffs r, BOOLEAN b)
   coeffs1->cfCoeffWrite(coeffs1,b);
 }
 
-char* gCoeffString(const coeffs r)
-{
-  return coeffs1->cfCoeffString(coeffs1);
-}
 char* gCoeffName(const coeffs r)
 {
   return coeffs1->cfCoeffName(coeffs1);
@@ -479,7 +475,6 @@ BOOLEAN gInitChar(coeffs r, void* p)
   r->ch = 0;
   r->cfKillChar=gKillChar;
   //r->nCoeffIsEqual=gCoeffsEqual;
-  r->cfCoeffString=gCoeffString;
   r->cfCoeffName=gCoeffName;
   r->cfCoeffWrite=gCoeffWrite;
 

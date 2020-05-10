@@ -44,11 +44,6 @@ static const char* Eati(const char *s, int *i)
   return s;
 }
 
-static void CoeffWrite(const coeffs r, BOOLEAN details)
-{
-  Print("flint:Z/%d[%s]",r->ch,r->pParameterNames[0]);
-}
-
 static BOOLEAN CoeffIsEqual(const coeffs r, n_coeffType n, void * parameter)
 {
   flintZn_struct *pp=(flintZn_struct*)parameter;
@@ -424,12 +419,6 @@ static char * CoeffName(const coeffs r)
   sprintf(CoeffName_flint_Zn,"flint:Z/%d[%s]",r->ch,r->pParameterNames[0]);
   return (char*)CoeffName_flint_Zn;
 }
-static char* CoeffString(const coeffs r)
-{
-  char *buf=(char*)omAlloc(12+10 /*ch*/+strlen(r->pParameterNames[0]));
-  sprintf(buf,"flintZn(%d,\"%s\")",r->ch,r->pParameterNames[0]);
-  return buf;
-}
 coeffs flintZnInitCfByName(char *s,n_coeffType n)
 {
   const char start[]="flint:Z/";
@@ -489,9 +478,7 @@ BOOLEAN flintZn_InitChar(coeffs cf, void * infoStruct)
   flintZn_struct *pp=(flintZn_struct*)infoStruct;
   cf->ch=pp->ch;
 
-  cf->cfCoeffString  = CoeffString;
   cf->cfCoeffName    = CoeffName;
-  cf->cfCoeffWrite   = CoeffWrite;
   cf->nCoeffIsEqual  = CoeffIsEqual;
   cf->cfKillChar     = KillChar;
   cf->cfSetChar      = SetChar;

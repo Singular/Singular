@@ -57,6 +57,10 @@ static char* ndCoeffString(const coeffs r)
 {
   return omStrDup(r->cfCoeffName(r));
 }
+static void ndCoeffWrite(const coeffs r,BOOLEAN)
+{
+  PrintS(r->cfCoeffName(r));
+}
 static char* ndCoeffName(const coeffs r)
 {
   STATIC_VAR char s[20];
@@ -370,7 +374,8 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfImPart=ndReturn0;
     n->cfDelete= ndDelete;
     n->cfAnn = ndAnn;
-    n->cfCoeffString = ndCoeffString; // should alway be changed!
+    n->cfCoeffString = ndCoeffString;
+    n->cfCoeffWrite = ndCoeffWrite;
     n->cfCoeffName = ndCoeffName; // should alway be changed!
     n->cfInpMult=ndInpMult;
     n->cfInpAdd=ndInpAdd;
@@ -440,7 +445,6 @@ coeffs nInitChar(n_coeffType t, void * parameter)
 
     assume(n->nCoeffIsEqual!=NULL);
     assume(n->cfSetChar!=NULL);
-    assume(n->cfCoeffString!=ndCoeffString);
     assume(n->cfCoeffName!=ndCoeffName);
     assume(n->cfMult!=NULL);
     assume(n->cfSub!=NULL);

@@ -23,19 +23,9 @@
 
 VAR omBin gmp_nrz_bin = omGetSpecBin(sizeof(mpz_t));
 
-static void nrzCoeffWrite  (const coeffs, BOOLEAN /*details*/)
-{
-  PrintS("ZZ");
-}
-
 static char* nrzCoeffName(const coeffs)
 {
   return (char*)"ZZ";
-}
-
-static char* nrzCoeffString(const coeffs cf)
-{
-  return omStrDup(nrzCoeffName(cf));
 }
 
 #if SI_INTEGER_VARIANT == 2
