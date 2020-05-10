@@ -41,4 +41,4 @@ S;
 
 tst_status(1);$
 
-// to test the results testLift(I, T) should be equal to J and reduce(J, std(I)) and reduce(std(I), J) should be zero
+// to test the results testLift(I, T) should be equal to J, testLift(I, S) should be zero and reduce(J, std(I)) and reduce(std(I), J) should be zero
