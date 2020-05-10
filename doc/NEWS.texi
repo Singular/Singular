@@ -41,6 +41,7 @@ Changes in the kernel/build system:
 @item improved lift (and related)
 @item port to polymake 3.5.x
 @item rational functions via flint (@nref{flintQ})
+@item free algebra over Z (@nref{LETTERPLACE})
 @item adaptions/functions for @code{Singular.jl}(@uref{https://github.com/oscar-system/Singular.jl})
 @end itemize
 
