@@ -5,7 +5,7 @@ option(redSB); option(redTail);
 
 // name: Uso3squared_c_dp
 ring r = 0,(x,y,z),(C,dp);
-ring R = freeAlgebra(r, 13, 12);
+ring R = freeAlgebra(r, 13, 76);
 ideal I = (bracket(x,y)-z)^2, (bracket(z,x)-y)^2, (bracket(y,z)-x)^2;
 I = twostd(I); // deg = 7
 module S = syz(I); // 6 gens
@@ -21,7 +21,7 @@ kill r; kill R;
 
 // name: Uso3squared_C_dp
 ring r = 0,(x,y,z),(C,dp);
-ring R = freeAlgebra(r, 13, 12);
+ring R = freeAlgebra(r, 13, 76);
 ideal I = (bracket(x,y)-z)^2, (bracket(z,x)-y)^2, (bracket(y,z)-x)^2;
 I = twostd(I); // deg = 7
 module S = syz(I); // 12 gens
@@ -37,7 +37,7 @@ kill r; kill R;
 
 // name: Uso3squared_dp_c
 ring r = 0,(x,y,z),(dp,c);
-ring R = freeAlgebra(r, 13, 9);
+ring R = freeAlgebra(r, 13, 39);
 ideal I = (bracket(x,y)-z)^2, (bracket(z,x)-y)^2, (bracket(y,z)-x)^2;
 I = twostd(I); // deg = 7
 module S = syz(I); // 6 gens
