@@ -3,6 +3,13 @@ LIB"freegb.lib";
 
 option(redSB); option(redTail);
 
+ring r = 0,(x,y),(c,dp);
+ring R = freeAlgebra(r, 10, 2);
+ideal I = x,y;
+syz(I);
+
+kill r; kill R;
+
 // name: Uso3squared_c_dp
 ring r = 0,(x,y,z),(C,dp);
 ring R = freeAlgebra(r, 13, 76);
