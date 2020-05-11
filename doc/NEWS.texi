@@ -23,6 +23,7 @@
 Changes in the kernel/build system:
 @itemize
 @item: Letterplace: modulo,syz,lift,liftstd (qnref[LETTERPLACE})
+@end itemize
 
 @heading News for version 4-1-3
 New libraries:
