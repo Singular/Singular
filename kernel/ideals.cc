@@ -2322,38 +2322,47 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
     }
     //Print("weights:");wtmp->show(1);PrintLn();
   }
-  for (i=0;i<IDELEMS(h2);i++)
-  {
-    temp->m[i] = pCopy(h2->m[i]);
-    q = pOne();
 #ifdef HAVE_SHIFTBBA
-    // non multiplicative variable
-    if (rIsLPRing(currRing))
+  if (rIsLPRing(currRing))
+  {
+    for (i=0;i<IDELEMS(h2);i++)
     {
+      temp->m[i] = pCopy(h2->m[i]);
+      q = pOne();
+      // non multiplicative variable
       pSetExp(q, currRing->isLPring - currRing->LPncGenCount + i + 1, 1);
       p_Setm(q, currRing);
-    }
-#endif
-    pSetComp(q,i+1+length);
-    pSetmComp(q);
-    if(temp->m[i]!=NULL)
-    {
-      if (slength==0) p_Shift(&(temp->m[i]),1,currRing);
-      p = temp->m[i];
-#ifdef HAVE_SHIFTBBA
-      if (rIsLPRing(currRing))
+      pSetComp(q,i+1+length);
+      pSetmComp(q);
+      if(temp->m[i]!=NULL)
       {
+        if (slength==0) p_Shift(&(temp->m[i]),1,currRing);
+        p = temp->m[i];
         temp->m[i] = pAdd(p, q);
       }
       else
+        temp->m[i]=q;
+    }
+  }
+  else
 #endif
+  {
+    for (i=0;i<IDELEMS(h2);i++)
+    {
+      temp->m[i] = pCopy(h2->m[i]);
+      q = pOne();
+      pSetComp(q,i+1+length);
+      pSetmComp(q);
+      if(temp->m[i]!=NULL)
       {
+        if (slength==0) p_Shift(&(temp->m[i]),1,currRing);
+        p = temp->m[i];
         while (pNext(p)!=NULL) pIter(p);
         pNext(p) = q; // will be sorted later correctly
       }
+      else
+        temp->m[i]=q;
     }
-    else
-      temp->m[i]=q;
   }
   rk = k = IDELEMS(h2);
   if (!idIs0(h1))
