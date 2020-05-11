@@ -20,6 +20,11 @@
 @end ifset
 
 @heading News for version @value{VERSION}
+Changes in the kernel/build system:
+@itemize
+@item: Letterplace: modulo,syz,lift,liftstd (qnref[LETTERPLACE})
+
+@heading News for version 4-1-3
 New libraries:
 @itemize
 @item invar.lib: Invariant theory @nref{invar_lib}
