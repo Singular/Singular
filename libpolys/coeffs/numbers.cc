@@ -126,12 +126,12 @@ static BOOLEAN ndDBTest(number, const char *, const int, const coeffs){ return T
 
 static number ndFarey(number,number,const coeffs r)
 {
-  Werror("farey not implemented for %s (c=%d)",r->cfCoeffString(r),getCoeffType(r));
+  Werror("farey not implemented for %s (c=%d)",r->cfCoeffName(r),getCoeffType(r));
   return NULL;
 }
 static number ndChineseRemainder(number *,number *,int,BOOLEAN,CFArray&,const coeffs r)
 {
-  Werror("ChineseRemainder not implemented for %s (c=%d)",r->cfCoeffString(r),getCoeffType(r));
+  Werror("ChineseRemainder not implemented for %s (c=%d)",r->cfCoeffName(r),getCoeffType(r));
   return r->cfInit(0,r);
 }
 
@@ -503,7 +503,6 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     if(n->cfKillChar==NULL) Warn("cfKillChar is NULL for coeff %d",t);
     if(n->cfWriteLong==NULL) Warn("cfWrite is NULL for coeff %d",t);
     if(n->cfWriteShort==NULL) Warn("cfWriteShort is NULL for coeff %d",t);
-    if(n->cfCoeffString==ndCoeffString) Warn("cfCoeffString is undefined for coeff %d",t);
 #endif
   }
   else
