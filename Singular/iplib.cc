@@ -875,14 +875,11 @@ BOOLEAN iiLocateLib(const char* lib, char* where)
     return FALSE;;
 }
 
-BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN force )
+BOOLEAN iiLibCmd( const char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN force )
 {
+  if (strcmp(newlib,"Singular")==0) return FALSE;
   char libnamebuf[1024];
-  // procinfov pi;
-  // idhdl h;
   idhdl pl;
-  // idhdl hl;
-  // long pos = 0L;
   char *plib = iiConvName(newlib);
   FILE * fp = feFopen( newlib, "r", libnamebuf, tellerror );
   // int lines = 1;
