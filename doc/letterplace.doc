@@ -499,7 +499,7 @@ elements in the @code{i}-th column of @code{N}.
 @c example
 LIB "freegb.lib";
 ring r = 0,(x,y),(c,Dp);
-ring R = freeAlgebra(r, 7, 2);
+ring R = freeAlgebra(r, 8, 2);
 ideal I = x*y*x + 1;
 matrix T; module S;
 ideal SI = liftstd(I,T,S);
