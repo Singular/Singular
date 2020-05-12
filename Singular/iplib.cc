@@ -662,7 +662,7 @@ ideal ii_CallProcId2Id(const char *lib,const char *proc, ideal arg, const ring R
   omFree(plib);
   if (h==NULL)
   {
-    BOOLEAN bo=iiLibCmd(lib,TRUE,TRUE,FALSE);
+    BOOLEAN bo=iiLibCmd(omStrDup(lib),TRUE,TRUE,FALSE);
     if (bo) return NULL;
   }
   ring oldR=currRing;
@@ -681,7 +681,7 @@ int ii_CallProcId2Int(const char *lib,const char *proc, ideal arg, const ring R)
   omFree(plib);
   if (h==NULL)
   {
-    BOOLEAN bo=iiLibCmd(lib,TRUE,TRUE,FALSE);
+    BOOLEAN bo=iiLibCmd(omStrDup(lib),TRUE,TRUE,FALSE);
     if (bo) return 0;
   }
   BOOLEAN err;
@@ -836,10 +836,7 @@ BOOLEAN iiTryLoadLib(leftv v, const char *id)
       #endif
 
       if (LT==LT_SINGULAR)
-      {
-        omFree(s);
-        LoadResult = iiLibCmd(libname, FALSE, FALSE,TRUE);
-      }
+        LoadResult = iiLibCmd(s, FALSE, FALSE,TRUE);
       #ifdef HAVE_DYNAMIC_LOADING
       else if ((LT==LT_ELF) || (LT==LT_HPUX))
         LoadResult = load_modules(s,libnamebuf,FALSE);
@@ -878,12 +875,15 @@ BOOLEAN iiLocateLib(const char* lib, char* where)
     return FALSE;;
 }
 
-BOOLEAN iiLibCmd( const char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN force )
+BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN force )
 {
   char libnamebuf[1024];
+  // procinfov pi;
+  // idhdl h;
   idhdl pl;
-  // handle "special" lib Singular:
-  if (strcmp(newlib,"Singular")==0) return FALSE;
+  // idhdl hl;
+  // long pos = 0L;
+  char *plib = iiConvName(newlib);
   FILE * fp = feFopen( newlib, "r", libnamebuf, tellerror );
   // int lines = 1;
   BOOLEAN LoadResult = TRUE;
@@ -892,7 +892,6 @@ BOOLEAN iiLibCmd( const char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOO
   {
     return TRUE;
   }
-  char *plib = iiConvName(newlib);
   pl = basePack->idroot->get(plib,0);
   if (pl==NULL)
   {
@@ -917,6 +916,7 @@ BOOLEAN iiLibCmd( const char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOO
     }
   }
   LoadResult = iiLoadLIB(fp, libnamebuf, newlib, pl, autoexport, tellerror);
+  omFree((ADDRESS)newlib);
 
   if(!LoadResult) IDPACKAGE(pl)->loaded = TRUE;
   omFree((ADDRESS)plib);
