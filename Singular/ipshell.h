@@ -67,11 +67,7 @@ static inline char *  iiGetLibName(const procinfov pi) { return pi->libname; }
 char *  iiGetLibProcBuffer( procinfov pi, int part=1 );
 char *  iiProcName(char *buf, char & ct, char* &e);
 char *  iiProcArgs(char *e,BOOLEAN withParenth);
-BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN force );
-/* sees wheter library lib has already been loaded
-   if yes, writes filename of lib into where and returns TRUE,
-   if  no, returns FALSE
-*/
+BOOLEAN iiLibCmd(const char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN force );
 /// load lib/module given in v
 BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport = FALSE);
 BOOLEAN jjLOAD_TRY(const char *s);

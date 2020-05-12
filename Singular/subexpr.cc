@@ -484,7 +484,7 @@ static inline void * s_internalCopy(const int t,  void *d)
         if (r!=NULL)
         {
           r->ref++;
-          //Print("s_internalCopy:+  ring %d, ref %d\n",r,r->ref);
+          Print("s_internalCopy:+  ring %lx, ref %d\n",r,r->ref);
         }
         return d;
       }
