@@ -1459,7 +1459,7 @@ void siInit(char *name)
     BITSET save1,save2;
     SI_SAVE_OPT(save1,save2);
     si_opt_2 &= ~Sy_bit(V_LOAD_LIB);
-    iiLibCmd(omStrDup("standard.lib"), TRUE,TRUE,TRUE);
+    iiLibCmd("standard.lib", TRUE,TRUE,TRUE);
     SI_RESTORE_OPT(save1,save2);
   }
   errorreported = 0;

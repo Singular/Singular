@@ -662,7 +662,7 @@ ideal ii_CallProcId2Id(const char *lib,const char *proc, ideal arg, const ring R
   omFree(plib);
   if (h==NULL)
   {
-    BOOLEAN bo=iiLibCmd(omStrDup(lib),TRUE,TRUE,FALSE);
+    BOOLEAN bo=iiLibCmd(lib,TRUE,TRUE,FALSE);
     if (bo) return NULL;
   }
   ring oldR=currRing;
@@ -681,7 +681,7 @@ int ii_CallProcId2Int(const char *lib,const char *proc, ideal arg, const ring R)
   omFree(plib);
   if (h==NULL)
   {
-    BOOLEAN bo=iiLibCmd(omStrDup(lib),TRUE,TRUE,FALSE);
+    BOOLEAN bo=iiLibCmd(lib,TRUE,TRUE,FALSE);
     if (bo) return 0;
   }
   BOOLEAN err;
@@ -830,20 +830,19 @@ BOOLEAN iiTryLoadLib(leftv v, const char *id)
     *libname = mytolower(*libname);
     if((LT = type_of_LIB(libname, libnamebuf)) > LT_NOTFOUND)
     {
-      char *s=omStrDup(libname);
       #ifdef HAVE_DYNAMIC_LOADING
       char libnamebuf[1024];
       #endif
 
       if (LT==LT_SINGULAR)
-        LoadResult = iiLibCmd(s, FALSE, FALSE,TRUE);
+        LoadResult = iiLibCmd(libname, FALSE, FALSE,TRUE);
       #ifdef HAVE_DYNAMIC_LOADING
       else if ((LT==LT_ELF) || (LT==LT_HPUX))
-        LoadResult = load_modules(s,libnamebuf,FALSE);
+        LoadResult = load_modules(libname,libnamebuf,FALSE);
       #endif
       else if (LT==LT_BUILTIN)
       {
-        LoadResult=load_builtin(s,FALSE, iiGetBuiltinModInit(s));
+        LoadResult=load_builtin(libname,FALSE, iiGetBuiltinModInit(libname));
       }
       if(!LoadResult )
       {
@@ -913,7 +912,6 @@ BOOLEAN iiLibCmd( const char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOO
     }
   }
   LoadResult = iiLoadLIB(fp, libnamebuf, newlib, pl, autoexport, tellerror);
-  omFree((ADDRESS)newlib);
 
   if(!LoadResult) IDPACKAGE(pl)->loaded = TRUE;
   omFree((ADDRESS)plib);
@@ -1280,7 +1278,8 @@ BOOLEAN load_modules_aux(const char *newlib, char *fullname, BOOLEAN autoexport)
 #endif /*STATIC */
 }
 
-BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport) {
+BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
+{
   GLOBAL_VAR static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
   pthread_mutex_lock(&mutex);
   BOOLEAN r = load_modules_aux(newlib, fullname, autoexport);
