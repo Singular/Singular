@@ -2716,11 +2716,6 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
   assume( (CCC != NULL) != (CCN != NULL) ); // exactly one data about coeffs (C).
   assume( !((DDD != NULL) && (DDN != NULL)) ); // at most one data about tails (D).
 
-//  ring save = currRing;
-//  if( save != curr )
-//    rChangeCurrRing(curr);
-
-
 #if OUTPUT
   if( CCC != NULL )
   {
@@ -2744,9 +2739,6 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
 
   if( (!bBeQuiet) && (r->GetNC() != NULL) )
     WarnS("going to redefine the algebra structure");
-
-//  if( currRing != r )
-//    rChangeCurrRing(r);
 
   matrix CC = NULL;
   poly CN = NULL;
@@ -2778,9 +2770,6 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
     if ((CCC != NULL) && ( (MATCOLS(CCC)!=r->N) || (MATROWS(CCC)!=r->N) ))
     {
       Werror("Square %d x %d  matrix expected", r->N, r->N);
-
-//      if( currRing != save )
-//        rChangeCurrRing(save);
       return TRUE;
     }
   }
@@ -2797,9 +2786,6 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
     if ((DDD != NULL) && ( (MATCOLS(DDD)!=r->N) || (MATROWS(DDD)!=r->N) ))
     {
       Werror("Square %d x %d  matrix expected",r->N,r->N);
-
-//      if( currRing != save )
-//        rChangeCurrRing(save);
       return TRUE;
     }
   }
@@ -2822,9 +2808,6 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
     if (n_IsZero(nN, curr->cf))
     {
       WerrorS("Incorrect input : zero coefficients are not allowed");
-
-//      if( currRing != save )
-//        rChangeCurrRing(save);
       return TRUE;
     }
 
@@ -2846,8 +2829,8 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
     id_Test((ideal)C, r);
 #endif
 
-  } else
-  if ( (CN == NULL) && (CC != NULL) ) /* copy matrix C */
+  }
+  else if ( (CN == NULL) && (CC != NULL) ) /* copy matrix C */
   {
     /* analyze C */
 
@@ -2880,14 +2863,10 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
           qN = p_GetCoeff(MATELEM(CC,i,j),curr);
         }
 
-
         if ( qN == NULL )   /* check the consistency: Cij!=0 */
         // find also illegal pN
         {
           WerrorS("Incorrect input : matrix of coefficients contains zeros in the upper triangle");
-
-//        if( currRing != save )
-//            rChangeCurrRing(save);
           return TRUE;
         }
 
@@ -2987,9 +2966,6 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
     if( bDnew ) mp_Delete( &D, r );
 
     WerrorS("Matrix of polynomials violates the ordering condition");
-
-//    if( currRing != save )
-//      rChangeCurrRing(save);
     return TRUE;
   }
 
@@ -3017,9 +2993,6 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
   r->GetNC() = nc_new;
 
   r->ext_ref=NULL;
-
-//  if( currRing != save )
-//    rChangeCurrRing(save);
 
   return gnc_InitMultiplication(r, bSetupQuotient);
 }
