@@ -12,7 +12,7 @@
 **/
 
 
-#include "factory/globaldefs.h"
+#include "globaldefs.h"
 #include "config.h"
 
 

@@ -7,7 +7,7 @@ SOURCES = nforder.cpp nforder.h \
 
 MYINCLUDES =  -I${top_srcdir} -I${top_builddir} -I${srcdir} \
 -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
--I${top_srcdir}/factory/include -I${top_builddir}/factory/include \
+$(FACTORY_INCLUDES) \
 $(FACTORY_CFLAGS) $(NTL_CPPFLAGS) $(GMP_CPPFLAGS) $(GOOGLE_PERFTOOLS_CFLAGS)
 
 if SI_BUILTIN_ORDER

@@ -199,9 +199,9 @@ AC_DEFUN([SING_USE_FACTORY],
 
  if test x$ENABLE_FACTORY = xyes; then
 
-  FACTORY_INCLUDES="-I$ac_abs_top_srcdir -I$ac_abs_top_srcdir/factory/include"
+  FACTORY_INCLUDES="-I$ac_abs_top_srcdir -I$ac_abs_top_srcdir/factory -I$ac_abs_top_srcdir/factory/include"
   if test "x$ac_abs_top_srcdir" != "x$ac_abs_top_builddir"; then
-    FACTORY_INCLUDES="$FACTORY_INCLUDES -I$ac_abs_top_builddir -I$ac_abs_top_builddir/factory/include"
+    FACTORY_INCLUDES="$FACTORY_INCLUDES -I$ac_abs_top_builddir -I$ac_abs_top_builddir/factory -I$ac_abs_top_builddir/factory/include"
   fi
 
   FACTORY_LIBS="$ac_abs_top_builddir/factory/libfactory.la"
