@@ -210,7 +210,7 @@ example
 }
 
 
-//========== multiplikation of polynomials in the coordinate ring =============
+//========== multiplication of polynomials in the coordinate ring =============
 
 proc multi(poly a, poly b, poly c, poly d, poly h, poly f)
 "USAGE:   multi(a,b,c,d,h,f);
@@ -465,7 +465,7 @@ proc divisor(poly a, poly b, poly h, poly f, list #)
 RETURN:  list P
 NOTE:    P[1][3]*(P[1][1], P[1][2]) +...+ P[size(P)][3]*
          *(P[size(P)][1], P[size(P)][2]) - (*)infty=div(a(x)-b(x)y)
-         if there is an optional parameter s!=0, then divisor additonally
+         if there is an optional parameter s!=0, then divisor additionally
          returns a parameter, which says, whether irreducible polynomials
          occurred during computations or not. Otherwise only warnings are
          displayed on the monitor. For s=0 nothing happens.
@@ -498,7 +498,7 @@ EXAMPLE: example divisor; shows an example
       {
          if (s==0)
          {
-         "WARNIG: ", fa[1][i], "is irreducible over this field !";
+         "WARNING: ", fa[1][i], "is irreducible over this field !";
          }
          else
          {
@@ -847,7 +847,7 @@ example
 
 /*
 //=============================================================================
-//   In the following you find a large example, which demostrates the use of
+//   In the following you find a large example, which demonstrates the use of
 //   the most important procedures.
 //=============================================================================
 //---- field with 2^5=32 elements ----
@@ -950,7 +950,7 @@ while (E[1] != 1 or E[2] != 0 )
 }
 i;   // 482
 
-//---- proof with multiplikation validates the result ----
+//---- proof with multiplication validates the result ----
 cantormult(i,D1,h,f);
 //[1]:
 //   1

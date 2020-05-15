@@ -7,8 +7,8 @@
 #  x- requires singular.idx
 #  i- requires singular.hlp
 #  h- requires html dir
-#  D- requires the enviroment variable DISPLAY
-#  E:executable:- requires the named exectable
+#  D- requires the environment variable DISPLAY
+#  E:executable:- requires the named executable
 #  O:`uname -m`-`uname -s`:- requires the named uname
 #  (ubuntu has an open completely different from open on OsX)
 #----------------------------------------------------

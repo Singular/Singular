@@ -85,7 +85,7 @@ EXAMPLE: example ncdetection; shows an example
       }
       d = rel[i,j];
       d_lead = lead(d);
-      v = leadexp(d_lead); //in the next lines we check wether we have a  relation of differential or shift type
+      v = leadexp(d_lead); //in the next lines we check whether we have a  relation of differential or shift type
       LExp=0;
       for(k=1; k<=NVars; k++)
       {

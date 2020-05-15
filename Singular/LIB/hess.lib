@@ -704,7 +704,7 @@ RETURN: - If # is not given:
         then f1 is a monic polynomial in u with coefficients in
         k[t].
         InfBasis[3] a list containing the infinite places of
-        the function field, if the compuation was possible. Else
+        the function field, if the computation was possible. Else
         the list is empty.
 "
 {
@@ -1142,7 +1142,7 @@ THEORY For computing a normal form with coefficients. in k[1/x]
 }
 
 //////////////////////////////////////////////////////////////////
-///////////////////// AUXILARY STATIC PROCEDURES /////////////////
+//////////////////// AUXILIARY STATIC PROCEDURES /////////////////
 
 //_________________________________________________________________
 static proc colDegree(matrix A, int j)
@@ -1588,7 +1588,7 @@ ASSUME: - f is an absolutely irreducible homogeneous polynomial in
         - list Infin contains an integral basis of IntCl(k[1/x],F),
         an integer k and the infinite places of F if their
         computation was possible
-RETUN:  The corresponding divisor on F in ideal representation
+RETURN: The corresponding divisor on F in ideal representation
         (needed for the procedure RiemannRochHess).
         A list of size 2, say divisortrans.
         If (s = "ideals"), then the transformed divisor is given in

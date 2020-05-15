@@ -228,7 +228,7 @@ static proc integralBasisMain(poly f, string algorithm, ideal inputJ, ideal inpu
 
 //--------------- computes the integral basis from the normalization ----------
   // We define a new ring where the integral variable is the first (needed for
-  // reduction) and has the appropiate ordering.
+  // reduction) and has the appropriate ordering.
   list rl = ringlist(R);
   rl[2] = list(var(intVar), var(3-intVar));
   rl[3] = list(list("C", 0), list("lp", intvec(1,1)));

@@ -195,7 +195,7 @@ example
 
 static proc is_neg_def(matrix H)
 {//determines whether the given matrix is negative definite
-  //returns 1 if it is, 0 if it isnt
+  //returns 1 if it is, 0 if it isn't
   matrix M=H-diag(var(1),ncols(H));
   poly f=det(M);
   list S=laguerre_solve(f);
@@ -253,7 +253,7 @@ EXAMPLE: example getMaxPoints; shows an example
         c=0;
         break;
       }
-      if(entk[l] < 0)//and those wich are negative
+      if(entk[l] < 0)//and those which are negative
       {
         c=0;
         break;
@@ -427,7 +427,7 @@ EXAMPLE: example maxPointsProb; shows an example
         c=0;
         break;
       }
-      if(entk[l] < 0)//and those wich are negative
+      if(entk[l] < 0)//and those which are negative
       {
         c=0;
         break;
@@ -661,7 +661,7 @@ proc getguaranteedmaxPoints(ideal Iu, matrix H, list #)
         c=0;
         break;
       }
-      if(entk[l] < 0)//and those wich are negative
+      if(entk[l] < 0)//and those which are negative
       {
         c=0;
         break;
@@ -691,7 +691,7 @@ proc getguaranteedmaxPoints(ideal Iu, matrix H, list #)
     hessi=hessi+list(Hsubst);
   }
 
-  //now check all elements of hessi and only keep those which arent neg def or indef
+  //now check all elements of hessi and only keep those which aren't neg def or indef
   //also do the respective changes in the list of solutions L
   list hessi2;
   list L2;

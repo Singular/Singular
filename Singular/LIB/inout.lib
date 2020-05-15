@@ -7,7 +7,7 @@ LIBRARY:  inout.lib     Printing and Manipulating In- and Output
 PROCEDURES:
  allprint(list);        print list if ALLprint is defined, with pause if >0
  lprint(poly/...[,n]);  display poly/... fitting to pagewidth [size n]
- pmat(matrix[,n]);      print form-matrix [first n chars of each colum]
+ pmat(matrix[,n]);      print form-matrix [first n chars of each column]
  rMacaulay(string);     read Macaulay_1 output and return its Singular format
  show(any);             display any object in a compact format
  showrecursive(id,p);   display id recursively with respect to variables in p
@@ -317,7 +317,7 @@ example
    execute(sid);
    id; "";
    // Now treat a matrix in Macaulay format. Using the execute
-   // command, this could be assinged to a Singular matrix as above.
+   // command, this could be assiged to a Singular matrix as above.
    string s2 = "
    0  0  0  0  0
    a3 0  0  0  0
@@ -542,7 +542,7 @@ proc showrecursive (def @@id,poly p,list #)
 "USAGE:   showrecursive(id,p[,ord]); id any object of basering, p= product of
          variables and ord=string (any allowed ordstr)
 DISPLAY: display 'id' in a recursive format as a polynomial in the variables
-         occuring in p with coefficients in the remaining variables. This is
+         occurring in p with coefficients in the remaining variables. This is
          done by mapping to a ring with parameters [and ordering 'ord',
          if a 3rd argument is present (default: ord=\"dp\")] and applying
          procedure 'show'

@@ -21,7 +21,7 @@ PROCEDURES:
  gaussred_pivot(A);   gaussian reduction: P*A=U*S, uses row pivoting
  gauss_nf(A);         gaussian normal form of A
  mat_rk(A);           rank of constant matrix A
- U_D_O(A);            P*A=U*D*O, P,D,U,O=permutaion,diag,lower-,upper-triang
+ U_D_O(A);            P*A=U*D*O, P,D,U,O=permutation,diag,lower-,upper-triang
  pos_def(A,i);        test symmetric matrix for positive definiteness
  hessenberg(M);       Hessenberg form of M
  eigenvals(M);        eigenvalues with multiplicities of M
@@ -134,7 +134,7 @@ EXAMPLE:  example inverse; shows an example
      ERROR("// ** no square matrix");
    }
 //----------------------- choose heurisitically best option ------------------
-// This may change later, depending on improvements of the implemantation
+// This may change later, depending on improvements of the implementation
 // at the monent we use if opt=0 or opt not given:
 // opt = 1 (std) for everything
 // opt = 2 (interred) for nothing, NOTE: interred is ok for constant matricea
@@ -297,7 +297,7 @@ example
 //////////////////////////////////////////////////////////////////////////////
 proc orthogonalize(matrix A)
 "USAGE:    orthogonalize(A); A = matrix of constants
-RETURN:    matrix, orthogonal basis of the colum space of A
+RETURN:    matrix, orthogonal basis of the column space of A
 EXAMPLE:   example orthogonalize; shows an example "
 {
   int i,j;
@@ -491,7 +491,7 @@ proc charpoly(matrix A, list #)
 RETURN:  poly, the characteristic polynomial det(E*v-A)
          (default: v=name of last variable)
 NOTE:    A must be independent of the variable v. The computation uses det.
-         If printlevel>0, det(E*v-A) is diplayed recursively.
+         If printlevel>0, det(E*v-A) is displayed recursively.
 EXAMPLE: example charpoly; shows an example"
 {
   int n = nrows(A);

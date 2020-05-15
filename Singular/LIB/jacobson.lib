@@ -383,7 +383,7 @@ int ppl = printlevel-voice+2;
    if (flag mod 2!=0) { STD=transpose(STD); }
 
 
-   //zero colums to the end
+   //zero columns to the end
     matrix STDMM=STD;
     pos=list();
     fehlpos=0;
@@ -868,7 +868,7 @@ proc triangle(matrix MA, int B)
          { COM=COM[1..size(COM)],i; COM_EX=COM_EX[1..size(COM_EX)],i; }
       nz=size(STD_EX)-size(STD);
 
-      //zero rows in the begining
+      //zero rows in the beginning
 
        if(size(STD)!=size(STD_EX) )
        {
@@ -1000,7 +1000,7 @@ if (flag mod 2 ==0){ STD = involution(STD,inv);} else { STD = transpose(STD);  }
 
 static proc divideByContent(matrix M)
 {
-//find first entrie not equal to zero
+//find first entry not equal to zero
 int i,k;
 k=1;
 vector CON;

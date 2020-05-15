@@ -277,7 +277,7 @@ proc awalk1_tmp(ideal Go, int n2, list #)
    //assume(n1 >= 1 && n1 <= nV && n2 >= 1 && n2 <= nV);
    if(n1 < 1 || n1 > nV || n2 < 1 || n2 > nV)
    {
-     print("//Erorr: The perturbed degree is wrong!!");
+     print("//Error: The perturbed degree is wrong!!");
      print("//       It must be between 1 and " + string(nV));
      return();
    }
@@ -417,7 +417,7 @@ EXAMPLE: example pwalk; shows an example"
   //assume(n1 >= 1 && n1 <= nV && n2 >= 1 && n2 <= nV);
   if(n1 < 1 || n1 > nV || n2 < 1 || n2 > nV)
   {
-    print("//Erorr: The perturbed degree is wrong!!");
+    print("//Error: The perturbed degree is wrong!!");
     print("//       It must be between 1 and " + string(nV));
     return();
   }

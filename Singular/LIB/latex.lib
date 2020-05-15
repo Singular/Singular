@@ -396,7 +396,7 @@ EXAMPLE: example texmap; shows an example
   list l1,l2;
   string rr1,rr2 = "@r1","@r2";
 
-// --- store all actual informations
+// --- store all actual information
   if(TX) { Tw = TeXwidth; TeXwidth = -1;}
   else { int TeXwidth = -1; export TeXwidth;}
   if (!(saveDollars)) { int  NoDollars; export NoDollars;}
@@ -1781,7 +1781,7 @@ static proc parselong(string s)
    b = i;
    while(s[i]>="0" and s[i]<="9" or s[i]=="-"){ i++;}  // "-" for neg indices
    j = i-b;
-   // if (j){ t = t + "_{" +s[b,j] + "}";}  // formely
+   // if (j){ t = t + "_{" +s[b,j] + "}";}  // formerly
    if (j and in<=1) {t = t + "_{";in++;}  // and j  i.e. there was an index
    if (j){ t = t  +s[b,j];}
    if(s[i]==")") {i++;}
