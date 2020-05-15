@@ -51,7 +51,7 @@ LIB "poly.lib";
 
 static proc subst1(def id, int m)
 {
-//id = poly/ideal/list, substitute the first m variables occuring in id by 1
+//id = poly/ideal/list, substitute the first m variables occurring in id by 1
 
   int i,j;
   def I = id;

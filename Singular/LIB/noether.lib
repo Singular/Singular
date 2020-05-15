@@ -2,7 +2,7 @@
 version="version noether.lib 4.1.2.0 Feb_2019 "; // $Id$
 category="Commutative Algebra";
 info="
-LIBRARY: noether.lib   Noether normalization of an ideal (not nessecary
+LIBRARY: noether.lib   Noether normalization of an ideal (not necessary
                        homogeneous)
 AUTHORS: A. Hashemi,  Amir.Hashemi@lip6.fr
 

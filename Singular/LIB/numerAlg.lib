@@ -15,7 +15,7 @@ OVERVIEW:
 AUTHOR: Shawki AlRashed, rashed@mathematik.uni-kl.de; sh.shawki@yahoo.de
 PROCEDURES:
 
- Incl(ideal I, ideal J);   test if I containes J
+ Incl(ideal I, ideal J);   test if I contains J
 
  Equal(ideal I, ideal J);  test if I equals to J
 

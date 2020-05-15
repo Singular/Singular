@@ -106,7 +106,7 @@ KEYWORDS:    polytope; fan; secondary fan; secondary polytope; polymake;
 ";
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Auxilary Static Procedures in this Library
+/// Auxiliary Static Procedures in this Library
 ////////////////////////////////////////////////////////////////////////////////
 /// - scalarproduct
 /// - intmatcoldelete
@@ -158,7 +158,7 @@ RETURN:  list, L with four entries
                      -- i.e. L[3][i] is an integer vector and an entry k in
                         there means that the vertex L[1][i] is connected to the
                         vertex L[1][k]
-@*            L[4] : an matrix of type bigintmat whose rows mulitplied by
+@*            L[4] : an matrix of type bigintmat whose rows multiplied by
                      (1,var(1),...,var(nvar)) give a linear system of equations
                      describing the affine hull of the polytope,
                      i.e. the smallest affine space containing the polytope
@@ -221,7 +221,7 @@ RETURN: list, L with four entries
                      -- i.e. L[3][i] is an integer vector and an entry k in
                         there means that the vertex L[1][i] is
                         connected to the vertex L[1][k]
-@*            L[4] : an matrix of type bigintmat whose rows mulitplied by
+@*            L[4] : an matrix of type bigintmat whose rows multiplied by
                      (1,var(1),...,var(nvar)) give a linear system of equations
                      describing the affine hull of the Newton polytope, i.e. the
                      smallest affine space containing the Newton polytope
@@ -283,7 +283,7 @@ example
 
 proc newtonPolytopeLP (poly f)
 "USAGE:  newtonPolytopeLP(f);  f poly
-RETURN: list, the exponent vectors of the monomials occuring in f,
+RETURN: list, the exponent vectors of the monomials occurring in f,
               i.e. the lattice points of the Newton polytope of f
 EXAMPLE: example newtonPolytopeLP;   shows an example"
 {
@@ -825,7 +825,7 @@ ASSUME:  polygon has the format of the output of splitPolygon, i.e. it is a
          triang is the vector (i,j,k) then the triangle is built by the vertices
          with indices i, j and k
 RETURN:  intvec, the integer vector eta describing that vertex of the Newton
-                 polytope discriminant of the polygone whose dual cone in the
+                 polytope discriminant of the polygon whose dual cone in the
                  Groebner fan contains the cone of the secondary fan of the
                  polygon corresponding to the given triangulation
 NOTE:  for a better description of eta see Gelfand, Kapranov,
@@ -1620,7 +1620,7 @@ EXAMPLE: example ellipticNF;   shows an example"
   // Case 15:
   if (sbd==intvec(2,2,2,3,3))
   {
-    // find the vertix to be mapped to (2,0)
+    // find the vertex to be mapped to (2,0)
     if (tboundary[max+1]!=3)
     {
       max=5;
@@ -1747,7 +1747,7 @@ example
 
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
-/// AUXILARY PROCEDURES, WHICH ARE DECLARED STATIC
+/// AUXILIARY PROCEDURES, WHICH ARE DECLARED STATIC
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
 /// - scalarproduct
@@ -2108,7 +2108,7 @@ ASSUME:      points is a list of integer vectors each of size two describing the
              marked points of a convex lattice polygon like the output of
              polygonDB
 RETURN:      list, the first entry is a string representing the coordinates
-                   corresponding to the latticpoints seperated by commata
+                   corresponding to the latticpoints separated by commata
                    the second entry is a list where the ith entry is a string
                    representing the coordinate of corresponding to the ith
                    lattice point the third entry is the latex format of the
@@ -2742,7 +2742,7 @@ example
 
 proc latticeCodegree()
 "USAGE:   latticeCodegree(p);  p polytope
-RETURN:  int, the smalles number n such that n*p has a relative interior lattice point
+RETURN:  int, the smallest number n such that n*p has a relative interior lattice point
 NOTE:    dimension(p)+1==latticeDegree(p)+latticeCodegree(p)
 EXAMPLE: example latticeCodegree; shows an example
 "

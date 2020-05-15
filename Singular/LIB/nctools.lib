@@ -1768,7 +1768,7 @@ EXAMPLE: example makeModElimRing; shows an example
 "
 {
   // supports qring;
-  // can be extended to handle C istead of c
+  // can be extended to handle C instead of c
   /* input/basering business */
   def save; int Noinput = 0;
   if ( size(#)>0 )

@@ -1350,7 +1350,7 @@ RETURN:  list L:
          than ordinary multiple points.@*
 @item @code{L[3]}; list:
          consists of one list for each primary component
-         of the singular locus of C which correponds to a set of conjugated
+         of the singular locus of C which corresponds to a set of conjugated
          ordinary multiple points. Each list consists of an int, the
          multiplicity of the points, and an ideal, the primary component.
 @end table
@@ -2417,7 +2417,7 @@ static proc testRationalPointConic(poly pp)
 "USAGE:  testRationalPointConic(pp); pp poly
 RETURN:  returns 0 in case of unexpected input (e.g. non-quadratic,
          reducible); 1 otherwise
-NOTE:    This method calles rationalPointConic, measures time consumption
+NOTE:    This method calls rationalPointConic, measures time consumption
          and checks whether the computed point lies indeed on the conic pp.
          The results will be printed to standard output.
 "
@@ -2874,7 +2874,7 @@ kill RR;kill RP1;
 // Example 10
 // -------------------------------------------------------
 ring SS = 0, (u,v,z), dp;
-poly f = u^4-14*u^2*v^2+v^4+8*u^2*v*z+8*v^3*z; // 1 OMP of mult 3 at orgin
+poly f = u^4-14*u^2*v^2+v^4+8*u^2*v*z+8*v^3*z; // 1 OMP of mult 3 at origin
 adjointIdeal(f,1);
 adjointIdeal(f,2);
 def RP1 = paraPlaneCurve(f);  // time 0

@@ -26,7 +26,7 @@ and @code{ring}, as well as @code{bset} which corresponds to the type @code{zdd}
 introduced here. In addition @code{bvar(i)} constructs the Boolean variable corresponding
 to @code{var(i)} from current @code{ring};
 
-For convenience, the corresponding types can be converted explictely or implicitely
+For convenience, the corresponding types can be converted explicitly or implicitly
 while assigning.
 Also several SINGULAR operators were overloaded: @code{bring} comes with @code{nvars},
 @code{bpoly} implements @code{lead}, @code{leadmonom} and @code{leadcoef}.
@@ -60,7 +60,7 @@ NOTE:
  from @uref{http://polybori.sf.net/}.
 
  For building your own @code{PolyBoRi} please ensure that you have @code{scons} and a
- development version of the boost libaries installed on you system.
+ development version of the boost libraries installed on you system.
  Then you may execute the following commands in a @code{bash}-style shell
  to build @code{PolyBoRi} available to @code{python}:
 
@@ -1189,7 +1189,7 @@ example
   poly f4=x(1)*x(2)-x(3);
   ideal I=f1,f2,f3,f4;
 
-  boolean_std(I);        // implicitely add x(i)^2-x(i)
+  boolean_std(I);        // implicitly add x(i)^2-x(i)
 
   bideal bI=I;           // alternative syntax
   bideal re = std(bI);  // Continue PolyBoRi computations

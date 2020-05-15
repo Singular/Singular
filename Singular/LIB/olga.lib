@@ -1358,7 +1358,7 @@ static proc commutativeFactorization(poly p, list #)
 PURPOSE:  compute a factorization of p ignoring non-commutative relations
 RETURN:   list or ideal
 NOTE:     the optional parameter is passed to factorize after changing to a
-          commutative ring, the result of factorize is transfered back to
+          commutative ring, the result of factorize is transferred back to
           basering
 SEE ALSO: factorize
 EXAMPLE:  "

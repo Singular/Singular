@@ -1035,7 +1035,7 @@ EXAMPLE: example locAtZero; shows an example
 
    //Now the ideal is 0-dim
    //First an easy test
-   //If I is homogenous and not constant it is concentrated at 0
+   //If I is homogeneous and not constant it is concentrated at 0
    if( homog(I)==1 && size(jet(I,0))==0)
    {
       caz=1;
@@ -2000,22 +2000,22 @@ example
 static proc substpart(ideal endid, ideal endphi, int homo, intvec rw)
 
 "//Repeated application of elimpart to endid, until no variables can be
-//directy substituded. homo=1 if input is homogeneous, rw contains
+//directly substituted. homo=1 if input is homogeneous, rw contains
 //original weights, endphi (partial) normalization map";
 
 //NOTE concerning iteration of maps: Let phi: x->f(y,z), y->g(x,z) then
 //phi: x+y+z->f(y,z)+g(x,z)+z, phi(phi):x+y+z->f(g(x,z),z)+g(f(y,z),z)+z
 //and so on: none of the x or y will be eliminated
 //Now subst: first x and then y: x+y+z->f(g(x,z),z)+g(x,z)+z eliminates y
-//further subst replaces x by y, makes no sense (objects more compicated).
+//further subst replaces x by y, makes no sense (objects more complicated).
 //Subst first y and then x eliminates x
 //In our situation we have triangular form: x->f(y,z), y->g(z).
 //phi: x+y+z->f(y,z)+g(z)+z, phi(phi):x+y+z->f(g(z),z)+g(z)+z eliminates x,y
 //subst x,y: x+y+z->f(g(z),z)+g(z)+z, eliminates x,y
 //subst y,x: x+y+z->f(y,z)+g(z)+z eliminates only x
 //HENCE: substitute vars depending on most other vars first
-//However, if the sytem xi-fi is reduced then xi does not appear in any of the
-//fj and hence the order does'nt matter when substitutinp xi by fi
+//However, if the system xi-fi is reduced then xi does not appear in any of the
+//fj and hence the order doesn't matter when substitutinp xi by fi
 
 {
    ASSUME(1, not isQuotientRing(basering) );
@@ -3506,7 +3506,7 @@ proc closureGenerators(list L);
         }
         p = NF(backmap(h),std(ker));
      }
-     // Whe are down to R(1), store here the result in the list preimages
+     // We are down to R(1), store here the result in the list preimages
      preimages = insert(preimages,p,j-1);
   }
   ideal preim;                  //make the list preimages to an ideal preim
@@ -4801,7 +4801,7 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
 
     if(isNormal == 1)
     {
-      // We go one step back. In the last step we didnt get antyhing new,
+      // We go one step back. In the last step we didn't get anything new,
       // we just verified that the ring was already normal.
       dbprint(dbg, "The ring in the previous step was already normal.");
       dbprint(dbg, "");
@@ -5328,7 +5328,7 @@ static proc degSubring(poly p, intvec @v)
 // The degree is taken w.r.t. the variables indicated in v.
   int i;      // Counter
   int d = 0;  // The degree
-  int e;      // Degree (auxiliar variable)
+  int e;      // Degree (auxiliary variable)
   for(i = 1; i <= size(p); i++)
   {
     e = sum(leadexp(p[i]), @v);
@@ -6362,7 +6362,7 @@ example
 
 // Used for timing and comparing the different normalization procedures.
 // Option (can be entered in any order)
-// "normal"   -> uses the new algortihm (normal)
+// "normal"   -> uses the new algorithm (normal)
 // "normalP"  -> uses normalP
 // "normalC"  -> uses normalC, without "withGens" option
 // "primCl"   -> uses normalC, with option "withGens".
@@ -6625,7 +6625,7 @@ EXAMPLE: example norTest; shows an example
 
     def BAS = basering;
 
-    //### make a copy of nor to have a cpoy of nor[1][1]  (not a reference to)
+    //### make a copy of nor to have a copy of nor[1][1]  (not a reference to)
     // in order not to override norid and normap.
     // delete nor[2] (if it contains the module generators, which are not used)
     // s.t. newnor does not belong to a ring.
@@ -7356,7 +7356,7 @@ ideal i=wy-vz,vx-uy,tv-sw,su-bv,tuy-bvz;
 //normalC: char 2,32003: 0  sec
 //normalP char withRing 2: 1sec, char 11: 40sec
 
-//Horrocks: cahr 0: 17 (8 in char 11) Komponenten alle normal, delta 1
+//Horrocks: char 0: 17 (8 in char 11) Komponenten alle normal, delta 1
 //char 11: 8 Komponenten alle normal, delta -1
 ring r=0,(a,b,c,d,e,f),dp;
 //ring r=11,(a,b,c,d,e,f),dp; //Charp bis p = 200 ca 3sec

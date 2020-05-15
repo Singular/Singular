@@ -934,7 +934,7 @@ example
 // The idea of the procedures mod2id, id2mod and subrInterred is, to
 // perform standard basis computation or interreduction of a submodule
 // of a free module with generators gen(1),...,gen(n) over a ring R
-// in a ring R[t1,...,tn]/<ti*tj> with gen(i) maped to ti
+// in a ring R[t1,...,tn]/<ti*tj> with gen(i) mapped to ti
 ////////////////////////////////////////////////////////////////////////
 
 proc mod2id(matrix M,intvec vpos)

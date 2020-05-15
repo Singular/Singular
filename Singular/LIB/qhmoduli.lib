@@ -133,7 +133,7 @@ EXAMPLE: example ModEqn; shows an example
     kill RME3;
     export(RME4);
 
-    // simplify the ideal and create a new ring with propably less variables
+    // simplify the ideal and create a new ring with probably less variables
 
     if(opt == 1 || opt == 3) {      // equations computed ?
       sList = SimplifyIdeal(id, 0, "Y");
@@ -448,7 +448,7 @@ proc StabEqn(poly f)
 PURPOSE: compute the equations of the isometry group of f.
 ASSUME:  f semiquasihomogeneous polynomial with an isolated singularity at 0
 RETURN:  list of two rings 'S1', 'S2'
-         - 'S1' contians the equations of the stabilizer (ideal 'stabid') @*
+         - 'S1' contains the equations of the stabilizer (ideal 'stabid') @*
          - 'S2' contains the action of the stabilizer (ideal 'actionid')
 EXAMPLE: example StabEqn; shows an example
 GLOBAL: varSubsList, contains the index j s.t. x(i) -> x(i)t(j) ...
@@ -561,7 +561,7 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
     }
     qhsubs[i] = g;
   }
-  dbprint(dbPrt, "  qhasihomogenous substituion =" + string(qhsubs));
+  dbprint(dbPrt, "  qhasihomogenous substitution =" + string(qhsubs));
   map F = RSTR, qhsubs;
   kill varSubsList;
 
@@ -611,7 +611,7 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
 
   actionid = phi(qhsubs);
 
-        // change to new ring, auxillary construction
+        // change to new ring, auxiliary construction
 
         setring(RSTT);
         ideal actionid, stabid;
@@ -755,7 +755,7 @@ EXAMPLE: example ArnoldAction; shows an example
 
 static proc MonosAndTerms(poly f,def wt, int ub)
 "USAGE:   MonosAndTerms(f, w, ub); poly f, intvec w, int ub
-PURPOSE: returns a list of all monomials and terms occuring in f of
+PURPOSE: returns a list of all monomials and terms occurring in f of
          weighted degree < ub
 RETURN:  list
          _[1]  list of monomials
@@ -793,7 +793,7 @@ example
 
 static proc SelectMonos(def parts, intvec wt, int d)
 "USAGE:   SelectMonos(parts, w, d); list/ideal parts, intvec w, int d
-PURPOSE: returns a list of all monomials and terms occuring in f of
+PURPOSE: returns a list of all monomials and terms occurring in f of
          weighted degree = d
 RETURN:  list
          _[1]  list of monomials
@@ -1079,7 +1079,7 @@ GLOBAL:  'computedPowers'
     degOfSubs[i] = degList;
   }
 
-  // substitute in each monomial seperately
+  // substitute in each monomial separately
 
   g = 0;
   for(i = 1; i <= size(degVecList); i++)
@@ -1134,7 +1134,7 @@ GLOBAL:  'computedPowers'
 
 static proc StabVar(intvec wt)
 "USAGE:   StabVar(w); intvec w
-PURPOSE: compute the indicies for quasihomogeneous substitutions of each
+PURPOSE: compute the indices for quasihomogeneous substitutions of each
          variable.
 ASSUME:  f semiquasihomogeneous polynomial with an isolated singularity at 0
 RETURN:  list
@@ -1542,7 +1542,7 @@ proc Min(def data)
 "USAGE:   Min(data); intvec/list of integers
 PURPOSE: find the minimal integer contained in 'data'
 RETURN:  list
-ASSUME:  'data' contians only integers and is not empty
+ASSUME:  'data' contains only integers and is not empty
 "
 {
   int i;

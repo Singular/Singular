@@ -11,10 +11,10 @@ PROCEDURES:
  elimpart(id[,n]);      partial elimination of vars [among first n vars]
  elimpartanyr(i,p);     factors of p partially eliminated from i in any ring
  fastelim(i,p[..]);     fast elimination of factors of p from i [options]
- findvars(id);          variables occuring/not occurring  in id
+ findvars(id);          variables occurrring/not occurring  in id
  hilbvec(id[,c,o]);     intvec of Hilberseries of id [in char c and ord o]
  linearpart(id);        elements of id of total degree <=1
- tolessvars(id[,]);     maps id to new basering having only vars occuring in id
+ tolessvars(id[,]);     maps id to new basering having only vars occurring in id
  solvelinearpart(id);   reduced std-basis of linear part of id
  sortandmap(id[..]);    map to new basering with vars sorted w.r.t. complexity
  sortvars(id[n1,p1..]); sort vars w.r.t. complexity in id [different blocks]
@@ -366,7 +366,7 @@ EXAMPLE: example elimpart; shows an example
 /*
 Alte Version mit interred:
 // Then go to ring newBAS with ordering c,dp(n) and create a matrix with
-// size(k1) colums and 2 rows, such that if [f1,f2] is a column of M then f1+f2
+// size(k1) columns and 2 rows, such that if [f1,f2] is a column of M then f1+f2
 // is one of the polys of lin containing a pure degree 1 part and f1 is this
 // part interreduce this matrix (i.e. Gauss elimination on linear part, with
 // rest transformed accordingly).
@@ -407,7 +407,7 @@ Da interred oder NF aber die Laenge der polys vergroessern kann, nicht gemacht
    //since lin1 != 0 there are candidates for substituting variables
 
    lin2 = matrix(lin) - matrix(lin1);      //difference as matrix
-   // rest of lin, part of pure degree 1 substracted from each generator of lin
+   // rest of lin, part of pure degree 1 subtracted from each generator of lin
 
    for( ii=1; ii<=l; ii++ )
    {
@@ -465,7 +465,7 @@ Da interred oder NF aber die Laenge der polys vergroessern kann, nicht gemacht
                   kip = cand/p;     //normalized polynomial of kin w.r.t var(ii)
                   eva = eva+var(ii); //var(ii) added to list of elimin. vars
                   neva[ii] = 0;
-                  sub = sub+kip;     //polynomial defining substituion
+                  sub = sub+kip;     //polynomial defining substitution
                   //## gmg: geaendert 08/2008, map durch subst ersetzt
                   //(viel schneller)
                   vip = var(ii) - kip;  //polynomial to be substituted
@@ -838,10 +838,10 @@ proc findvars(def id, list #)
 "USAGE:   findvars(id ); id=poly/ideal/vector/module/matrix
 RETURN:  list L with 4 entries:
   @format
-  L[1]: ideal of variables occuring in id
-  L[2]: intvec of variables occuring in id
-  L[3]: ideal of variables not occuring in id
-  L[4]: intvec of variables not occuring in id
+  L[1]: ideal of variables occurring in id
+  L[2]: intvec of variables occurring in id
+  L[3]: ideal of variables not occurring in id
+  L[4]: intvec of variables not occurring in id
   @end format
 SEE ALSO: variables
 EXAMPLE: example findvars; shows an example
@@ -926,7 +926,7 @@ DISPLAY: If printlevel >=0, display ideal of vars, which have been omitted
 EXAMPLE: example tolessvars; shows an example
 "
 {
-//---------------- initialisation and check occurence of vars -----------------
+//---------------- initialisation and check occurrence of vars -----------------
    int s,ii,n,fp,fs;
    string s2,newvar;
    int pr = printlevel-voice+3;  // p = printlevel+1 (default: p=1)
@@ -1043,8 +1043,8 @@ RETURN:  a ring R, in which a poly/ideal/vector/module IMAG is stored: @*
          - IMAG is the image (under imap) of the input ideal/module id @*
          The new monomial ordering and sorting of vars is as follows:
   @format
-  - each block of vars occuring in pi is sorted w.r.t. its complexity in id,
-  - ni controls the sorting in i-th block (= vars occuring in pi):
+  - each block of vars occurring in pi is sorted w.r.t. its complexity in id,
+  - ni controls the sorting in i-th block (= vars occurring in pi):
     ni=0 (resp. ni!=0) means that least complex (resp. most complex) vars come
     first
   - oi and mi define the monomial ordering of the i-th block:
@@ -1060,7 +1060,7 @@ NOTE:    We define a variable x to be more complex than y (with respect to id)
          valuation vector of x:@*
          consider id as list of polynomials in x with coefficients in the
          remaining variables. Then:@*
-         val(x) = (maximal occuring power of x,  # of all monomials in leading
+         val(x) = (maximal occurring power of x,  # of all monomials in leading
          coefficient, # of all monomials in coefficient of next smaller power
          of x,...).
 EXAMPLE: example sortandmap; shows an example
@@ -1135,7 +1135,7 @@ COMPUTE: sort variables with respect to their complexity in id
 RETURN:  list of two elements, an ideal and a list:
   @format
   [1]: ideal, variables of basering sorted w.r.t their complexity in id
-       ni controls the ordering in i-th block (= vars occuring in pi):
+       ni controls the ordering in i-th block (= vars occurring in pi):
        ni=0 (resp. ni!=0) means that less (resp. more) complex vars come first
   [2]: a list with 4 entries for each pi:
        _[1]: ideal ai : vars of pi in correct order,
@@ -1150,7 +1150,7 @@ NOTE:    We define a variable x to be more complex than y (with respect to id)
          valuation vector of x:@*
          consider id as list of polynomials in x with coefficients in the
          remaining variables. Then:@*
-         val(x) = (maximal occuring power of x,  # of all monomials in leading
+         val(x) = (maximal occurring power of x,  # of all monomials in leading
          coefficient, # of all monomials in coefficient of next smaller power
          of x,...).
 EXAMPLE: example sortvars; shows an example
@@ -1192,11 +1192,11 @@ proc valvars (def id, list #)
          p1,p2,...= polynomials (product of vars),@*
          n1,n2,...= integers,
 
-         ni controls the ordering of vars occuring in pi: ni=0 (resp. ni!=0)
+         ni controls the ordering of vars occurring in pi: ni=0 (resp. ni!=0)
          means that less (resp. more) complex vars come first (default: p1=product of all vars, n1=0),@*
          the last pi (containing the remaining vars) may be omitted
 COMPUTE: valuation (complexity) of variables with respect to id.@*
-         ni controls the ordering of vars occuring in pi:@*
+         ni controls the ordering of vars occurring in pi:@*
          ni=0 (resp. ni!=0) means that less (resp. more) complex vars come first.
 RETURN:  list with 3 entries:
   @format
@@ -1215,7 +1215,7 @@ NOTE:    Use @code{sortvars} in order to actually sort the variables!
          valuation vector of x:@*
          consider id as list of polynomials in x with coefficients in the
          remaining variables. Then:@*
-         val(x) = (maximal occuring power of x,  # of all monomials in leading
+         val(x) = (maximal occurring power of x,  # of all monomials in leading
          coefficient, # of all monomials in coefficient of next smaller power
          of x,...).
 EXAMPLE: example valvars; shows an example
@@ -1285,13 +1285,13 @@ EXAMPLE: example valvars; shows an example
       for ( ii=1; ii<=size(a(kk)); ii++ )
       {
          C = coeffs(i,a(kk)[ii]);
-         w = nrows(C); // =(maximal occuring power of a(kk)[ii])+1
+         w = nrows(C); // =(maximal occurring power of a(kk)[ii])+1
          for ( jj=w[1]; jj>1; jj-- )
          {
             s = size(C[jj,1..ncols(C)]);
             w[w[1]-jj+2] = sum(s);
          }
-         // w[1] should represent the maximal occuring power of a(kk)[ii] so it
+         // w[1] should represent the maximal occurring power of a(kk)[ii] so it
          // has to be decreased by 1 since otherwise the constant term is also
          // counted
          w[1]=w[1]-1;

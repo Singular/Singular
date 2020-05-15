@@ -475,7 +475,7 @@ proc primaryTest (ideal i, poly p)
         {
           "// WARNING: The characteristic is perhaps too small to use";
           "// the algorithm of Gianni/Trager/Zacharias.";
-          "// This may result in an infinte loop";
+          "// This may result in an infinite loop";
           "// loop in primaryTest, voice:",voice;"";
         }
         while(e mod char(basering)==0)
@@ -2836,7 +2836,7 @@ static proc decompE(ideal I,list #)
 RETURN:  list = list of primary ideals and their associated primes
          (at even positions in the list)
          (resp. a list of the minimal associated primes)
-         if I is unit ideal, returns emtpy list
+         if I is unit ideal, returns empty list
 NOTE:    Algorithm of Gianni/Trager/Zacharias
 EXAMPLE: example decompE; shows an example
 "
@@ -3919,7 +3919,7 @@ proc sep(poly f,int i, list #)
          an integer k considering the polynomial f defined over Fp(t1,...,tm)
          as polynomial over Fp(t(1)^(p^-k),...,t(m)^(p^-k))
  RETURN: the separabel part of f as polynomial in Fp(t1,...,tm)
-        and an integer k to indicate that f should be considerd
+        and an integer k to indicate that f should be considered
         as polynomial over Fp(t(1)^(p^-k),...,t(m)^(p^-k))
  EXAMPLE: example sep; shows an example
 {
@@ -5355,7 +5355,7 @@ static proc minsat(ideal SI, poly p)
   quotM[1]=SI;
   quotM[2]=fac;
   quotM[3]=f0;
-  // we deal seperately with the first quotient;
+  // we deal separately with the first quotient;
   // factors, which do not contribute to this one,
   // are omitted
   iold=quotM[1];
@@ -5404,7 +5404,7 @@ static proc minsat_ppd(ideal SI, ideal fac)
   quotM[1]=SI;
   quotM[2]=fac;
   quotM[3]=f0;
-  // we deal seperately with the first quotient;
+  // we deal separately with the first quotient;
   // factors, which do not contribute to this one,
   // are omitted
   iold=quotM[1];
@@ -7403,7 +7403,7 @@ static proc newDecompStep_i(int patchPrimaryDecomposition, ideal i, list #)
          newDecompStep_i(patchPrimaryDecomposition, I,2);        (for the minimal associated primes)
          newDecompStep_i(patchPrimaryDecomposition, I,3);        (for the absolute primary decomposition (not tested!))
          "oneIndep";        (for using only one max indep set)
-         "intersect";        (returns alse the intersection of the components founded)
+         "intersect";        (returns also the intersection of the components founded)
 
 RETURN:  list = list of primary ideals and their associated primes
          (at even positions in the list)

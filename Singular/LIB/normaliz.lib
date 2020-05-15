@@ -1368,7 +1368,7 @@ proc intclMonIdeal(ideal I, list #)
           intclMonIdeal(ideal I, intvec grading);
 RETURN:   The exponent vectors of the leading monomials of the elements of I
           are considered as generators of a monomial ideal for which the
-          normalization of its Rees algebra is computed. For a Definiton of the
+          normalization of its Rees algebra is computed. For a Definition of the
           Rees algebra (or Rees ring) see Bruns and Herzog, Cohen-Macaulay
           rings, Cambridge University Press 1998, p. 182.
           The function returns a list of ideals:
@@ -1688,7 +1688,7 @@ static proc mod_init()
 // component 1 is name of option
 // 2 is default value
 // 3 is command line option to be passed to Normaliz
-// 4 indictes whether file "gen" is generated
+// 4 indicates whether file "gen" is generated
 // value 2 of 4 indicates "no influence"
 
   list nmz_options=

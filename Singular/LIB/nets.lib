@@ -1136,7 +1136,7 @@ EXAMPLE: example netPoly; shows an example
   /*
   0. Erstellung der benötigten Datenstrukturen
   2. Überprüfung ob P das Nullpolynom ist und dieses gegenfalls ausgeben
-  3. Entscheidung ob es sich um den ersten Term handel oder nicht
+  3. Entscheidung ob es sich um den ersten Term handelt oder nicht
     3.1 Verarbeitung des ersten Term
     3.2 Verarbeitung foldender Terme
   */

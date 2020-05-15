@@ -97,7 +97,7 @@ EXAMPLE: example primdecZ; shows an example
       def Rhelp=ring(rp);
       setring Rhelp;
       number q=imap(R,q);
-      //=== computes the primes occuring in a generator of I intersect Z
+      //=== computes the primes occurring in a generator of I intersect Z
       list L = primefactors(q);
 
       list A;
@@ -327,7 +327,7 @@ EXAMPLE: example primdecZ; shows an example
       pr[i]=list(coefZ(pr[i][1])[1],coefZ(pr[i][2])[1]);
    }
    //=== find h in Z such that I is the intersection of I:h and <I,h>
-   //=== and I:h = IQ[variables] intersected with Z[varables]
+   //=== and I:h = IQ[variables] intersected with Z[variables]
    list H =coefZ(J);
    ideal Y=H[1];
    int h=H[2];
@@ -426,7 +426,7 @@ EXAMPLE: example minAssZ; shows an example
       def Rhelp=ring(rp);
       setring Rhelp;
       number q=imap(R,q);
-      //=== computes the primes occuring in a generator of I intersect Z
+      //=== computes the primes occurring in a generator of I intersect Z
       //list L=PollardRho(q,5000,1);
       list L=primefactors(q)[1];
       for(i=1;i<=size(L);i++)
@@ -479,7 +479,7 @@ EXAMPLE: example minAssZ; shows an example
       pr[i]=coefZ(pr[i])[1];
    }
    //=== find h in Z such that I is the intersection of I:h and I,h
-   //=== and I:h =IQ[variables] intersected with Z[varables]
+   //=== and I:h =IQ[variables] intersected with Z[variables]
    list H=coefZ(J);
    int h=H[2];
    J=J,h;
@@ -565,7 +565,7 @@ EXAMPLE: example heightZ; shows an example
       def Rhelp=ring(rp);
       setring Rhelp;
       number q=imap(R,q);
-      //=== computes the primes occuring in a generator of I intersect Z
+      //=== computes the primes occurring in a generator of I intersect Z
       //list L=PollardRho(q,5000,1);
       list L=primefactors(q)[1];
       for(i=1;i<=size(L);i++)
@@ -596,7 +596,7 @@ EXAMPLE: example heightZ; shows an example
    //=== of I:h for a suitable integer h
    setring R;
    //=== find h in Z such that I is the intersection of I:h and I,h
-   //=== and I:h =IQ[variables] intersected with Z[varables]
+   //=== and I:h =IQ[variables] intersected with Z[variables]
    list H=coefZ(J);
    int h=H[2];
    J=J,h;
@@ -657,7 +657,7 @@ EXAMPLE: example radicalZ; shows an example
       def Rhelp=ring(rp);
       setring Rhelp;
       number q=imap(R,q);
-      //=== computes the primes occuring in a generator of I intersect Z
+      //=== computes the primes occurring in a generator of I intersect Z
       //list L=PollardRho(q,5000,1);
       list L=primefactors(q)[1];
       for(i=1;i<=size(L);i++)
@@ -696,7 +696,7 @@ EXAMPLE: example radicalZ; shows an example
    //=== intersection with Z[variables]
    K=coefZ(K)[1];
    //=== find h in Z such that I is the intersection of I:h and I,h
-   //=== and I:h =IQ[variables] intersected with Z[varables]
+   //=== and I:h =IQ[variables] intersected with Z[variables]
    list H=coefZ(J);
    int h=H[2];
    J=J,h;
@@ -764,7 +764,7 @@ EXAMPLE: example equidimZ; shows an example
       def Rhelp=ring(rp);
       setring Rhelp;
       number q=imap(R,q);
-      //=== computes the primes occuring in a generator of I intersect Z
+      //=== computes the primes occurring in a generator of I intersect Z
       //list L=PollardRho(q,5000,1);
       list L=primefactors(q)[1];
       list Le;
@@ -876,7 +876,7 @@ EXAMPLE: example equidimZ; shows an example
    //=== intersection with Z[variables]
    E=coefZ(E)[1];
    //=== find h in Z such that I is the intersection of I:h and I,h
-   //=== and I:h =IQ[variables] intersected with Z[varables]
+   //=== and I:h =IQ[variables] intersected with Z[variables]
    int h =coefZ(J)[2];
    J=J,h;
    //=== call equidimensional part over Z for I,h
@@ -988,7 +988,7 @@ static proc modp(ideal J, int p, int nu)
 
 static proc coefPrimeZ(ideal I)
 {
-//=== computes the primes occuring in the product of the leading coefficients
+//=== computes the primes occurring in the product of the leading coefficients
 //=== of I
    number h=1;
    int i;
@@ -1326,7 +1326,7 @@ static proc reduceZ(poly f, ideal I)
 static proc stdZ(ideal I)
 {
 //=== this is needed because we want the leading coefficients to be positive
-//=== otherwhise reduce gives wrong results! should be replaced later by std
+//=== otherwise reduce gives wrong results! should be replaced later by std
    I=simplify(I,2);
    I=normalizeZ(I);  // why is this done before std() call?
                      // normalizeZ works only if I[1] == ( std(I) )[1]
