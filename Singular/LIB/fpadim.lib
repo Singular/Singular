@@ -60,7 +60,7 @@ OVERVIEW:
 
 
 REFERENCES:
-[Ufn] V. Ufnarovskij: Combinatorical and asymptotic methods in algebra, 1990.
+[Ufn] V. Ufnarovskij: Combinatorial and asymptotic methods in algebra, 1990.
 [LL09] R. La Scala, V. Levandovskyy: Letterplace ideals and non-commutative
 Groebner bases, Journal of Symbolic Computation, 2009.
 [Stu] G. Studzinski: Dimension computations in non-commutative,
@@ -613,7 +613,7 @@ PURPOSE:Compute the K-dimension and the Mistletoes all at once
 
 static proc findmistletoes(intvec V, int n, list L, intvec P, list #)
 "USAGE: findmistletoes(V,n,L,P,degbound); V a normal word, n the number of
-@*      variables, L the GB, P the occuring degrees,
+@*      variables, L the GB, P the occurring degrees,
 @*      and degbound the (optional) degreebound
 RETURN:  list
 PURPOSE:Compute mistletoes starting in V

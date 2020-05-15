@@ -753,7 +753,7 @@ static proc MaxVecZero(intvec ToTest, intvec Reference) //KGV, size=size(input)
 }
 //////////////////////////////////
 proc matrixsystem(list Matrices,list Approx)
-"USAGE:   matrixsytem(M,A); where the M=Mt,M1,..,Mn is a list with square matrices of the same dimension as entries, and A=At,A1,..,An gives the corresponding approximations for the several variables (t,x1,..,xn) as vector. Intended to solve Mt*U_t + M1*U_x1+..+Mn*U_xn=0 as a linear sytem of partial differential equations numerically by a finite difference scheme;
+"USAGE:   matrixsystem(M,A); where the M=Mt,M1,..,Mn is a list with square matrices of the same dimension as entries, and A=At,A1,..,An gives the corresponding approximations for the several variables (t,x1,..,xn) as vector. Intended to solve Mt*U_t + M1*U_x1+..+Mn*U_xn=0 as a linear sytem of partial differential equations numerically by a finite difference scheme;
 RETURN:   type matrix; gives back the matrices B1,B2 that represent the finite difference scheme, partitioned into different time levels in the form:  B1*U(t=N)=B2*U(t<N), where N is the maximal occurring degree (timelevel) of t.
 EXAMPLE:  example matrixsystem; shows an example
 "
@@ -981,7 +981,7 @@ example
 //////////////////////////////////
 proc ComplexValue(poly f)
 "USAGE:   ComplexValue(f); f a poly in the basering;
-RETURN:   type poly; gives back the formal complex-value of f, where var(1) is redarded as the imaginary unit. Does only make sence, if the proc <setinitials> is executed before -> nvars <= npars
+RETURN:   type poly; gives back the formal complex-value of f, where var(1) is redarded as the imaginary unit. Does only make sense, if the proc <setinitials> is executed before -> nvars <= npars
 EXAMPLE:  example ComplexValue; shows an example
 "
 {
@@ -1007,7 +1007,7 @@ example
 //////////////////////////////////
 proc VarToPar(poly f)
 "USAGE:   VarToPar(f); f a poly in the basering;
-RETURN:   type poly; gives back the poly obtained by substituting var(i) by par(i), for all variables. Does only make sence, if the proc <setinitials> is executed before -> nvars <= npars;
+RETURN:   type poly; gives back the poly obtained by substituting var(i) by par(i), for all variables. Does only make sense, if the proc <setinitials> is executed before -> nvars <= npars;
 EXAMPLE:  example VarToPar; shows an example
 "
 {
@@ -1035,7 +1035,7 @@ example
 /////////////////////////////////////
 proc ParToVar(poly f)
 "USAGE:   ParToVar(f); f a poly in the basering;
-RETURN:   type poly; gives back the poly obtained by substituting par(i) by var(i), for the first nvars(basering parameters. Does only make sence, if setinitials is executed before -> nvars <= npars. Is the opposite action to VarToPar, see example ParToVar;
+RETURN:   type poly; gives back the poly obtained by substituting par(i) by var(i), for the first nvars(basering parameters. Does only make sense, if setinitials is executed before -> nvars <= npars. Is the opposite action to VarToPar, see example ParToVar;
 EXAMPLE:  example ParToVar; shows an example
 "
 {

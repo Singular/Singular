@@ -24,7 +24,7 @@ OVERVIEW:
   <z-z_i>, and univariate rational interpolation [2,7]. Note that since Q[z]/<z-z_i> = Q
   we also use (if required) modular algorithms [1] over Q. The procedure is repeated for
   many rational points b until their number is sufficiently large to recover the correct
-  coeffcients in Q(T). Once we have these points, we obtain a set of polynomials G by
+  coefficients in Q(T). Once we have these points, we obtain a set of polynomials G by
   applying the sparse multivariate rational interpolation algorithm from [4] coefficient-
   wise to the list of Groebner bases G_b in Q(z)[X], where this algorithm makes use of
   the following algorithms: univariate polynomial interpolation [2], univariate rational
@@ -317,7 +317,7 @@ static proc list_of_primes(int pa, list #)
 static proc reverse_coef(poly f, int i)
 {
     /* keeping the monomials (in f) fixed returns a polynomial g by reversing
-     * the coeffcients in f, example (1,2,3) to (3,2,1) */
+     * the coefficients in f, example (1,2,3) to (3,2,1) */
     poly g;
     for(int j = size(f);j >= 1;j--)
     {
@@ -1014,8 +1014,8 @@ static proc return_coef_indx_wrtk(def I, int i, int k)
 
 static proc arrangeListofIdeals(list L, list #)
 {
-    /* the procedure returns list of coeffcients in the given list of ideals. The
-     * coeffcients are correspond to polynomials whose leading monomials are the same.
+    /* the procedure returns list of coefficients in the given list of ideals. The
+     * coefficients are correspond to polynomials whose leading monomials are the same.
      * Moreover, if optional parameter # is given, then it also returns a list
      * of monomials in one of these ideals
     */
@@ -1297,7 +1297,7 @@ static proc stdoverFF(ideal I, list pr, list shft,string Command, list JL)
                                /* elements in the sequence l3[i] are not large enough.
                                 * We thus add more elements to l3 and continue with the
                                 * early termination strategy until size(bp)=2 where bp[2]
-                                * is the length of the sequence that the early temination
+                                * is the length of the sequence that the early termination
                                 * of BMA requires
                                 */
                                  l3n = bp[6];
@@ -2010,7 +2010,7 @@ example
     ring rr=0, (x,y,z), dp;
     list L = 150,3204,79272,2245968, 70411680, 2352815424, 81496927872;
     modberlekampMassey(L);// default w.r.t x
-    modberlekampMassey(L,3);// returns an ouput in the ring Q[z]
+    modberlekampMassey(L,3);// returns an output in the ring Q[z]
 }
 
 //////////////////////////////////////////////////////////////////////////////////

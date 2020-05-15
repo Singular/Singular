@@ -1904,7 +1904,7 @@ or consisting of a ring and an integer, where
 @format
   l[1]=ESSring is a ring extension of basering containing the ideal ES
         (describing the ES-stratum), the ideal ES_all_triv (describing the
-        part with trival equimultiple sections) and the polynomial p_F=F,
+        part with trivial equimultiple sections) and the polynomial p_F=F,
   l[2]=1 if some error has occurred,  l[2]=0 otherwise.
 @end format
 NOTE:    L is supposed to be the output of hnexpansion (with the given ordering

@@ -399,7 +399,7 @@ example
 
 /*
 //// this was the part of example in the old good Letterplace
-  // now transfom letterplace polynomials into strings of words
+  // now transform letterplace polynomials into strings of words
   lp2lstr(J,r); // export an object called @code{@LN} to the ring r
   setring r;  // change to the ring r
   lst2str(@LN,1);
@@ -2401,7 +2401,7 @@ static proc lastBlock(poly p)
 "USAGE:  lastBlock(p); p letterplace poly
 RETURN: int
 ASSUME: basering has letterplace ring structure
-PURPOSE: get the number of the last block occuring in the poly
+PURPOSE: get the number of the last block occurring in the poly
 EXAMPLE: example lastBlock; shows examples
 "
 {
@@ -2688,7 +2688,7 @@ example
 //   }
 //   // decompose f,g into graded pieces with inForm: need dmodapp.lib
 //   int b = attrib(basering,"isLetterplaceRing");  // the length of the block
-//   intvec w; // inherit the graded on the oridinal ring
+//   intvec w; // inherit the graded on the ordinal ring
 //   int i;
 //   for(i=1; i<=b; i++)
 //   {
@@ -2820,7 +2820,7 @@ PURPOSE: computation of the normal form of p with respect to G
 ASSUME: p is a Letterplace polynomial, G is a set Letterplace polynomials,
 being a Letterplace Groebner basis (no check for this will be done)
 NOTE: Strategy: take the smallest monomial wrt ordering for reduction
--     For homogenous ideals the shift does not matter
+-     For homogeneous ideals the shift does not matter
 -     For non-homogenous ideals the first shift will be the smallest monomial
 EXAMPLE: example lpNF; shows examples
 "
@@ -2942,7 +2942,7 @@ example
   J; // it is finite and nice
   poly h = x*x*y-y*x*x+x*y;
   list L = lpDivision(h,J); L; // what means that the NF of h wrt J is x*y
-  h - lpNF(h,J); // and this poly has the folowing two-sided Groebner presentation:
+  h - lpNF(h,J); // and this poly has the following two-sided Groebner presentation:
   -y*J[1] + J[1]*y;
   lpGBPres2Poly(L,J); // reconstructs the above automatically
 }
@@ -2982,7 +2982,7 @@ example
 
 
 static proc getExpVecs(ideal G)
-"USUAGE: getExpVecs(G);
+"USAGE: getExpVecs(G);
 RETURN: list of intvecs
 PURPOSE: convert G into a list of intvecs, corresponding to the exponent vector
  of the leading monomials of G
@@ -2993,7 +2993,7 @@ PURPOSE: convert G into a list of intvecs, corresponding to the exponent vector
 }
 
 static proc delSupZero(intvec I)
-"USUAGE:delSupZero(I);
+"USAGE:delSupZero(I);
 RETURN: intvec
 PURPOSE: Deletes superfluous zero blocks of an exponent vector
 ASSUME: Intvec is an exponent vector of a letterplace monomial contained in V'
@@ -3018,7 +3018,7 @@ ASSUME: Intvec is an exponent vector of a letterplace monomial contained in V'
 }
 
 static proc delSupZeroList(list L)
-"USUAGE:delSupZeroList(L); L a list, containing intvecs
+"USAGE:delSupZeroList(L); L a list, containing intvecs
 RETURN: list, containing intvecs
 PURPOSE: Deletes all superfluous zero blocks for a list of exponent vectors
 ASSUME: All intvecs are exponent vectors of letterplace monomials contained in V'
@@ -3030,10 +3030,10 @@ ASSUME: All intvecs are exponent vectors of letterplace monomials contained in V
 
 
 static proc makeDVec(intvec V)
-"USUAGE:makeDVec(V);
+"USAGE:makeDVec(V);
 RETURN: intvec
 PURPOSE: Converts an modified exponent vector into an Dvec
-NOTE: Superfluos zero blocks must have been deleted befor using this procedure
+NOTE: Superfluous zero blocks must have been deleted before using this procedure
 "
 {int i,j,k,r1,r2; intvec D;
  int n = lpVarBlockSize(basering);
@@ -3050,7 +3050,7 @@ NOTE: Superfluos zero blocks must have been deleted befor using this procedure
 }
 
 static proc makeDVecL(list L)
-"USUAGE:makeDVecL(L); L, a list containing intvecs
+"USAGE:makeDVecL(L); L, a list containing intvecs
 RETURN: list, containing intvecs
 ASSUME:
 "
@@ -3060,7 +3060,7 @@ ASSUME:
 }
 
 static proc makeDVecI(ideal G)
-"USUAGE:makeDVecI(G);
+"USAGE:makeDVecI(G);
 RETURN:list, containing intvecs
 PURPOSE:computing the DVec representation for lead(G)
 ASSUME:
@@ -3073,7 +3073,7 @@ ASSUME:
 //procedures, which are dealing with the DVec representation, all static
 
 static proc dShiftDiv(intvec V, intvec W)
-"USUAGE: dShiftDiv(V,W);
+"USAGE: dShiftDiv(V,W);
 RETURN: a list,containing integers, or -1, if no shift of W divides V
 PURPOSE: find all possible shifts s, such that s.W|V
 ASSUME: V,W are DVecs of monomials contained in V'
@@ -3097,7 +3097,7 @@ ASSUME: V,W are DVecs of monomials contained in V'
 
 //the first normal form procedure, if a user want not to presort the ideal, just make it not static
 static proc lpNormalForm1(poly p, ideal G, list L)
-"USUAGE:lpNormalForm1(p,G);
+"USAGE:lpNormalForm1(p,G);
 RETURN:poly
 PURPOSE:computation of the normalform of p w.r.t. G
 ASSUME: p is a Letterplace polynomial, G is a set of Letterplace polynomials
@@ -3124,7 +3124,7 @@ NOTE: Taking the first possible reduction
 
 // VL; called from lpNF
 static proc lpNormalForm2(poly pp, ideal G, list L)
-"USUAGE:lpNormalForm2(p,G);
+"USAGE:lpNormalForm2(p,G);
 RETURN:poly
 PURPOSE:computation of the normal form of p w.r.t. G
 ASSUME: p is a Letterplace polynomial, G is a set of Letterplace polynomials

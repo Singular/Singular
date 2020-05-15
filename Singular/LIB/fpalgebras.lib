@@ -584,7 +584,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
     def save = basering;
     baseringdef = 1;
    }
-   if (m < 0 || n < 0) {ERROR("Exponent can't be negativ in monoid rings!");}
+   if (m < 0 || n < 0) {ERROR("Exponent can't be negative in monoid rings!");}
    if (d < 1 || d < m || d < n) {ERROR("Degree bound must be positiv and greater then m,n!");}
    int i;
    ring mr = 0,(a,b),Dp;
@@ -706,7 +706,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       -d gives the degreebound for the Letterplace ring
 "
 {
- if (d < 2){ERROR("Degreebound is to small for choosen example!");}
+ if (d < 2){ERROR("Degreebound is to small for chosen example!");}
 
  int baseringdef;
  if (defined(basering)) // if a basering is defined, it should be saved for later use
@@ -738,7 +738,7 @@ example
 /* Note: r = r^(-1) */
 /* " */
 /* { */
-/*  if (d < 3){ERROR("Degreebound is to small for choosen example!");} */
+/*  if (d < 3){ERROR("Degreebound is to small for chosen example!");} */
 
 /*  int baseringdef; */
 /*  if (defined(basering)) // if a basering is defined, it should be saved for later use */
@@ -766,7 +766,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       - d gives the degreebound for the Letterplace ring
 "
 {
- if (d < 3){ERROR("Degreebound is to small for choosen example!");}
+ if (d < 3){ERROR("Degreebound is to small for chosen example!");}
 
  int baseringdef;
  if (defined(basering)) // if a basering is defined, it should be saved for later use
@@ -800,7 +800,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       - d gives the degreebound for the Letterplace ring
 "
 {
- if (d < 3){ERROR("Degreebound is to small for choosen example!");}
+ if (d < 3){ERROR("Degreebound is to small for chosen example!");}
 
  int baseringdef;
  if (defined(basering)) // if a basering is defined, it should be saved for later use
@@ -835,7 +835,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       - d gives the degreebound for the Letterplace ring
 "
 {
- if (d < 3){ERROR("Degreebound is to small for choosen example!");}
+ if (d < 3){ERROR("Degreebound is to small for chosen example!");}
 
  int baseringdef;
  if (defined(basering)) // if a basering is defined, it should be saved for later use
@@ -870,7 +870,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       - d gives the degreebound for the Letterplace ring
 "
 {
- if (d < 3){ERROR("Degreebound is to small for choosen example!");}
+ if (d < 3){ERROR("Degreebound is to small for chosen example!");}
 
  int baseringdef;
  if (defined(basering)) // if a basering is defined, it should be saved for later use
@@ -905,7 +905,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       - d gives the degreebound for the Letterplace ring
 "
 {
- if (d < 4){ERROR("Degreebound is to small for choosen example!");}
+ if (d < 4){ERROR("Degreebound is to small for chosen example!");}
 
  int baseringdef;
  if (defined(basering)) // if a basering is defined, it should be saved for later use
@@ -940,7 +940,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       - d gives the degreebound for the Letterplace ring
 "
 {
- if (d < 3){ERROR("Degreebound is to small for choosen example!");}
+ if (d < 3){ERROR("Degreebound is to small for chosen example!");}
 
  int baseringdef;
  if (defined(basering)) // if a basering is defined, it should be saved for later use
@@ -975,7 +975,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       - d gives the degreebound for the Letterplace ring
 "
 {
- if (d < 3){ERROR("Degreebound is to small for choosen example!");}
+ if (d < 3){ERROR("Degreebound is to small for chosen example!");}
 
  int baseringdef;
  if (defined(basering)) // if a basering is defined, it should be saved for later use
@@ -1010,7 +1010,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       - d gives the degreebound for the Letterplace ring
 "
 {
- if (d < 5){ERROR("Degreebound is to small for choosen example!");}
+ if (d < 5){ERROR("Degreebound is to small for chosen example!");}
 
  int baseringdef;
  if (defined(basering)) // if a basering is defined, it should be saved for later use
@@ -1045,7 +1045,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       - d gives the degreebound for the Letterplace ring
 "
 {
- if (d < 5){ERROR("Degreebound is to small for choosen example!");}
+ if (d < 5){ERROR("Degreebound is to small for chosen example!");}
 
  int baseringdef;
  if (defined(basering)) // if a basering is defined, it should be saved for later use
@@ -1080,7 +1080,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       - d gives the degreebound for the Letterplace ring
 "
 {
- if (d < 5){ERROR("Degreebound is to small for choosen example!");}
+ if (d < 5){ERROR("Degreebound is to small for chosen example!");}
 
  int baseringdef;
  if (defined(basering)) // if a basering is defined, it should be saved for later use
@@ -1115,7 +1115,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       - d gives the degreebound for the Letterplace ring
 "
 {
- if (d < 4){ERROR("Degreebound is to small for choosen example!");}
+ if (d < 4){ERROR("Degreebound is to small for chosen example!");}
 
  int baseringdef;
  if (defined(basering)) // if a basering is defined, it should be saved for later use
@@ -1149,7 +1149,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       - d gives the degreebound for the Letterplace ring
 "
 {
- if (d < 6){ERROR("Degreebound is to small for choosen example!");}
+ if (d < 6){ERROR("Degreebound is to small for chosen example!");}
 
  int baseringdef;
  if (defined(basering)) // if a basering is defined, it should be saved for later use
@@ -1186,7 +1186,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       - d gives the degreebound for the Letterplace ring
 "
 {
- if (d < 4){ERROR("Degreebound is to small for choosen example!");}
+ if (d < 4){ERROR("Degreebound is to small for chosen example!");}
 
  int baseringdef;
  if (defined(basering)) // if a basering is defined, it should be saved for later use
@@ -1221,7 +1221,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       - d gives the degreebound for the Letterplace ring
 "
 {
- if (d < 7){ERROR("Degreebound is to small for choosen example!");}
+ if (d < 7){ERROR("Degreebound is to small for chosen example!");}
 
  int baseringdef;
  if (defined(basering)) // if a basering is defined, it should be saved for later use
@@ -1256,7 +1256,7 @@ NOTE: - the ring contains the ideal I, which contains the required relations
       - d gives the degreebound for the Letterplace ring
 "
 {
- if (d < 7){ERROR("Degreebound is to small for choosen example!");}
+ if (d < 7){ERROR("Degreebound is to small for chosen example!");}
 
  int baseringdef;
  if (defined(basering)) // if a basering is defined, it should be saved for later use
@@ -1518,7 +1518,7 @@ not equivalent to a presentation for an ordinary tetrahedron group.
 {
  if (g < 1 || g > 5) {ERROR("There are only 5 examples!");}
  if ((g == 1 && d < 6)||(g == 2 && d < 6)||(g == 3 && d < 5)||(g == 4 && d < 4)||(g == 5 && d < 5))
- {ERROR("Degreebound is to small for choosen example!");}
+ {ERROR("Degreebound is to small for chosen example!");}
 
  int baseringdef,i,j;
  if (defined(basering)) // if a basering is defined, it should be saved for later use
@@ -1582,7 +1582,7 @@ The 14 examples are denoted in theorem 2.12
 {
  if (g < 1 || g > 14) {ERROR("There are only 14 examples!");}
  if ((g == 1 && d < 20)||(g == 2 && d < 21)||(g == 3 && d < 10)||(g == 4 && d < 12)||(g == 5 && d < 10)||(g == 6 && d < 18)||(g == 7 && d < 20)||(g == 8 && d < 16)||(g == 9 && d < 10)||(g == 10 && d < 14)||(g == 11 && d < 16)||(g == 12 && d < 24)||(g == 13 && d < 28)||(g == 14 && d < 37))
- {ERROR("Degreebound is to small for choosen example!");}
+ {ERROR("Degreebound is to small for chosen example!");}
 
  int baseringdef;
  if (defined(basering)) // if a basering is defined, it should be saved for later use

@@ -44,7 +44,7 @@ graph
 
 PROCEDURES:
 
-makeGraph(list, list)                     generate a graph from a list of vertices and a lsit of edges
+makeGraph(list, list)                     generate a graph from a list of vertices and a list of edges
 printGraph(graph)                         print procedure for graphs
 propagator(list,int)                      propagator factor of degree d in the quotient of two variables, or
                                           propagator for fixed graph and branch type

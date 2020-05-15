@@ -21,7 +21,7 @@ a free module with respect to the ordering, eliminating module components.
 Support: SpezialForschungsBereich F1301 of the Austrian FWF
 
 PROCEDURES:
-findifs_example();  containes a guided explanation of our approach
+findifs_example();  contains a guided explanation of our approach
 decoef(P,n);  decompose polynomial P into summands with respect to the number n
 difpoly2tex(S,P[,Q]); present the difference scheme in the nodal form
 
@@ -408,7 +408,7 @@ EXAMPLE: example decoef; shows examples
     "Warning: problem in decoef";
   }
   return(I);
-// substract the pure part from orig and check if n is remained there
+// subtract the pure part from orig and check if n is remained there
 }
 example
 {
