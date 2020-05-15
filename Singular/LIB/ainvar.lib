@@ -233,7 +233,7 @@ EXAMPLE: example reduction; shows an example
   //### hier Variante analog zu algebra_containment einbauen!
      ideal kern=eliminate(dom,imap(bsr,v));
 
-  //---------  test wether @(0)-h(@(1),...,@(z)) is in ker ---------------
+  //---------  test whether @(0)-h(@(1),...,@(z)) is in ker ---------------
   // for some polynomial h and divide by maximal power of q=#[1]
      poly h;
      z=size(kern);
@@ -438,7 +438,7 @@ EXAMPLE: example furtherInvar; shows an example
   map psi=r1,id;
   // -------------------  compute psi(ker(phi)) --------------------------
   ideal rel=psi(ker);
-  // divide by maximal power of q, test wether we really obtain invariants
+  // divide by maximal power of q, test whether we really obtain invariants
   for (i=1;i<=size(rel);i++)
   {
     while ((rel[i]!=0) && (rel[i]!=q) &&(subst(rel[i],q,0)==0))

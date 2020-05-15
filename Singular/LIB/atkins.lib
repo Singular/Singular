@@ -271,7 +271,7 @@ RETURN: a list of factors of n or the message: no factor found
 NOTE:   Pollard's p-factorization
         creates the product k of powers of primes (bounded by B)  from
         the list P with the idea that for a prime divisor p of n p-1|k
-        then p devides gcd(a^k-1,n) for some random a
+        then p divides gcd(a^k-1,n) for some random a
 EXAMPLE:example pFactor1; shows an example
 "
 {

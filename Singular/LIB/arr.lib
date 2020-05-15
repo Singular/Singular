@@ -7,7 +7,7 @@ category="Miscellaneous";
 ** TOPICS ** (Ctrl+f to search)
 #1 NEWSTRUCTS & OVERLOADS
 #2 CONSTRUCTORS
-#3 ACCESS & ASSIGNEMENT
+#3 ACCESS & ASSIGNMENT
 #4 DELETION
 #5 COMPERATORS
 #6 TYPE CASTING
@@ -62,7 +62,7 @@ size        arrSize         number of planes
 subst       arrSubst        substitute variables
 
 // MULTI-ARRANGEMENTS
-=       multarrAdd          assignement of multarr
+=       multarrAdd          assignment of multarr
 +       multarrAdd          union of multarr
 poly    multarr2poly        defining polynomial
 size    multarrSize         number of hyperplanes with mult.
@@ -164,7 +164,7 @@ static proc mod_init()
     system("install","arr","subst"      ,arrSubst       ,4);    // substitute variables
 
     // MULTI-ARRANGEMENTS
-    system("install","multarr","="      ,multarrAdd     ,1);    // assignement of multarr
+    system("install","multarr","="      ,multarrAdd     ,1);    // assignment of multarr
     system("install","multarr","+"      ,multarrAdd     ,2);    // union of multarr
     system("install","multarr","poly"   ,multarr2poly   ,1);    // defining polynomial
     system("install","multarr","size"   ,multarrSize    ,1);    // number of hyperplanes with mult.
@@ -192,7 +192,7 @@ static proc mod_init()
 static proc arrAdd
 "USAGE:     A = #; A +#;  # list containing arr/ideal/list/matrix/poly
 RETURN:     [arr] Arrangement constructed by input parameters.
-REMARKS:    The algorithm splits up the list # and uses the appropiate procedure
+REMARKS:    The algorithm splits up the list # and uses the appropriate procedure
             to handle the input.
 NOTE:       arrAdd simplifies certain inputs, for example A = (x,y,2x); gives the same arrangement
             as A = (x,y);
@@ -268,7 +268,7 @@ static proc arrAddMatrix(arr A, matrix M){
 
 
 //============================================================================//
-//--------------------------- #3 ACCESS & ASSIGNEMENT ------------------------//
+//--------------------------- #3 ACCESS & ASSIGNMENT -------------------------//
 //============================================================================//
 
 
@@ -276,7 +276,7 @@ static proc arrAddMatrix(arr A, matrix M){
 static proc arrGet(arr A, intvec v)
 "USAGE:     A[v]; v int/intvec
 RETURN:     [poly] if v is [int] The defining poly of the the v-th hyperplane+
-            [arr] if v is [intvec] The corresponing subarrangement
+            [arr] if v is [intvec] The corresponding subarrangement
 SEE ALSO:   arrGet, arrSet
 KEYWORDS:   arrangement; get; operator
 EXAMPLE:    example arrGet; shows an example"
@@ -379,7 +379,7 @@ static proc arrMinus
 RETURN:     [arr] arrangement A without the hyperplanes of the arrangement defined by #.
 REMARKS:    algorithm creates an arrangement B from # using arrAdd and
             then deletes hyperplanes which occur in both A and B.
-NOTE:       The alorithm does not simplify by scalars, i.e. some hyperplanes might
+NOTE:       The algorithm does not simplify by scalars, i.e. some hyperplanes might
             not be deleted. See example.
 SEE ALSO:   arrDelete, arrMinus
 KEYWORDS:   arrangement; delete; operator
@@ -569,7 +569,7 @@ typeof(type2arr(I));
 // ARRANGEMENT => POLY
 static proc arr2poly(arr A)
 "USAGE:     poly(A);  arr A
-RETURN:     [poly] The defining polynomial which is the product of polynomials occuring in arr
+RETURN:     [poly] The defining polynomial which is the product of polynomials occurring in arr
 NOTE:       The procedure will automatically simplify the polynomial by scalar multiplication.
 SEE ALSO:   arrAdd, arr2poly, arr2mat, arr2list, arr2ideal, type2arr
 KEYWORDS:   typecasting; defining polynomial
@@ -816,7 +816,7 @@ arrSimplify(A);
 // number of hyperplanes
 static proc arrSize(arr A)
 "USAGE:     size(A); arr A;
-RETURN:     [int] number of hyperplanes in the arangement
+RETURN:     [int] number of hyperplanes in the arrangement
 NOTE:       size(A) also useable for multi-arrangements
 SEE ALSO:   arrSize, multarrSize
 KEYWORDS:   hyperplanes; size; number
@@ -1131,7 +1131,7 @@ arrCentral(B);
 }
 
 
-// checks wether arrangement has a center
+// checks whether arrangement has a center
 proc arrCentered(arr A)
 "USAGE:     arrCentered(A); arr A
 RETURN:     [0,1] true if A is centered(i.e. intersection of all planes not empty)
@@ -1337,9 +1337,9 @@ arrCoordChange(A,T);
 proc arrCoordNormalize(arr A, intvec v)
 "USAGE:     arrCoordChange(A, v);
 RETURN:     [arr]: Arrangement after a coordinate change that transforms the arrangement such that
-            after a tranformation x -> Tx + c we have the arrangement has the matrix representation
+            after a transformation x -> Tx + c we have the arrangement has the matrix representation
             [AT^-1|b+AT^-1c] such that [AT^-1]_v = I and [b+AT^-1c]_v = 0;
-NOTE:       algorithm performs a base change if H_k is homogenous (i.e. has no)
+NOTE:       algorithm performs a base change if H_k is homogeneous (i.e. has no)
             constant term and an affine transformation otherwise
             Ax+b = 0, Transformation x = Ty+c: AT^-1y + AT^-1c + b = 0
             Now we want to have (AT^-1)_v = I and (AT^-1c +b)_v = AT^-1_v*c + b_v = 0
@@ -1361,7 +1361,7 @@ EXAMPLE:    example arrCoordChange; shows an example"
 
     if(rank(Av) != n){
         if(rank(Av) != size(v)){
-            ERROR("Normal vectors of the given hyperplanes are not linearily " +
+            ERROR("Normal vectors of the given hyperplanes are not linearly " +
             "independent. Cannot perform coordinate change!");
         }
         // Adds linearly independent lines to Av in order to make it invertible
@@ -1601,7 +1601,7 @@ EXAMPLE:    example arrIsEssential; shows an example"
 
 example
 {
-"EXAMPLE: We check wether theseare essential and a non-essential arrangement ";
+"EXAMPLE: We check whether theseare essential and a non-essential arrangement ";
 echo = 2;
 ring S = 0,(x,y,z),lp;
 arr A = ideal(x,y,z);
@@ -1964,7 +1964,7 @@ I;
 }
 
 
-// The following 3 procedures were replaced by their faster combinatorical counterparts
+// The following 3 procedures were replaced by their faster combinatorial counterparts
 
 /*
 
@@ -2245,7 +2245,7 @@ static proc multIdeal(multarr A){
 static proc multarrAdd
 "USAGE:     A = #; A +#;  # list containing arr/ideal/list/matrix/poly
 RETURN:     [multarr] multiarrangement constructed by the input parameters.
-NOTE:       algorithm splits up the list # and uses appropiate procedure
+NOTE:       algorithm splits up the list # and uses appropriate procedure
             to handle the input
 KEYWORDS:   multiarrangement; equal; constructor; operator
 EXAMPLE:    example multarrAdd; shows an example"
@@ -3183,7 +3183,7 @@ EXAMPLE:    example arrFlats;"
         // REL[i,j] = -1 means that H_i does NOT intersect F_j, i.e. they are parallel
         // resetting the REL-matrix
         REL = intmat(intvec(0),m,size(L));
-        // filles in the trivial entries, i.e. each flat intersects all hplanes it is composed of.
+        // fills in the trivial entries, i.e. each flat intersects all hplanes it is composed of.
         for(j=1; j<=size(L); j++){
             u = L[j];
             for(k=1; k<= size(u); k++){
@@ -3230,7 +3230,7 @@ EXAMPLE:    example arrFlats;"
         }
 
         print("rank: "+string(i)+", expected OPS: "+string(binomial(size(L),2))
-                +", excecuted OPS: " + string(counter));
+                +", executed OPS: " + string(counter));
         counter  = 0;
 
         //cleanup => doing this during computation increases speed!!
@@ -3461,7 +3461,7 @@ type2arr(input)         returns arrangement defined by the input which may consi
 
 supported inherited functions:
 delete(A, intvec)       deletes indexed hyperplanes from the arrangement
-homog(A)                checks wether the defining polys are all homogenous <=> arr is central
+homog(A)                checks whether the defining polys are all homogeneous <=> arr is central
 homog(A, rvar)          homogenizes the def. polys with respect to the given ring variable
 size(A)                 number of hyperplanes in the arrangement
 subst(A,rvar,poly,...)  substitutes ringvariables with given polynomials, though they need to remain linear

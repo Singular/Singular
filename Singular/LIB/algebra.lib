@@ -321,7 +321,7 @@ EXAMPLE: example inSubring; shows an example
   //-----------------
   ideal ker=eliminate(nett,product(va));
   ker=std(ker);
-  //---------- test wether y(0)-h(y(1),...,y(z)) is in ker --------------
+  //---------- test whether y(0)-h(y(1),...,y(z)) is in ker --------------
   l[1]=0;
   l[2]="";
   for (i=1;i<=size(ker);i++)
@@ -602,7 +602,7 @@ RETURN:
            basering has n variables and the map m components, it contains the
            ideal 'ker', depending only on the y(i), the kernel of the given map
 @end format
-NOTE:    Three differnt algorithms are used depending on c = 1,2,3.
+NOTE:    Three different algorithms are used depending on c = 1,2,3.
          If c is not given or c=0, a heuristically best method is chosen.
          The basering may be a quotient ring. However, if the preimage ring is
          a quotient ring, say pr = P/I, consider phi as a map from P and then
@@ -772,7 +772,7 @@ proc is_bijective ( map phi,def pr )
 "USAGE:   is_bijective(phi,pr); phi map to basering, pr preimage ring
 RETURN:  an integer,  1 if phi is bijective, 0 if not
 NOTE:    The algorithm checks first injectivity and then surjectivity.
-         To interprete this for local/mixed orderings, or for quotient rings
+         To interpret this for local/mixed orderings, or for quotient rings
          type help is_surjective; and help is_injective;
 DISPLAY: A comment if printlevel >= voice-1 (default)
 EXAMPLE: example is_bijective; shows an example
@@ -977,7 +977,7 @@ EXAMPLE: example noetherNormal; shows an example
       {
        "// WARNING: In case of a finite ground field";
        "// the characteristic may be too small.";
-       "// This could result in an infinte loop.";
+       "// This could result in an infinite loop.";
        "// Loop in noetherNormal, voice:";, voice;"";
       }
      if ( voice >= 16 )

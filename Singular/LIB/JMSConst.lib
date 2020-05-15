@@ -306,7 +306,7 @@ proc VConst(list G, int c)
 RETURN:   list: V
 NOTES: this procedure computes the Vm polynomials following the
 algorithm in [CR],but it only keeps in memory the monomials by
-which the G's must be multplied and their positions.
+which the G's must be multiplied and their positions.
 EXAMPLE:  example VConst; shows an example"
 {
 jmp f=G[1][1];

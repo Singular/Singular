@@ -217,7 +217,7 @@ static proc Classify_Z_Y( singclass f, poly fPoly )
 //* classifies singularity f defined by polynomial fPoly which is of type
 //* Z or Y with zero 3-jet and non-zero 4-jet.
 //* The idea is to transform the Newton Polygon of fPoly until we can decide
-//* wether f is of type Z or Y. For further information abouth the algorithm
+//* whether f is of type Z or Y. For further information abouth the algorithm
 //* refer to [Hem17]
 
 //* Apply Splitting lemma if needed such that fPoly is given in two variables
@@ -345,7 +345,7 @@ static proc Classify_Z_Y_FindWeights( poly fPoly, int k )
 {
 //* Input poly f with zero 3-jet and non-zero 4-jet with var(1) contained
 //* in 4-jet. Computes the weights for all monomials lying in the Newton
-//* Diagramm under the line defined by x^4 and x^3y^k and returns the
+//* Diagram under the line defined by x^4 and x^3y^k and returns the
 //* smallest one. In case there is no other monomial than x^4, return
 //* weights (k,1)
 
@@ -495,7 +495,7 @@ return (Transform_Newton_Polygon_Y( f, fPoly, bound ) );
 static proc Classify_Y_FindWeights( poly f, int k, intvec weights1 )
 {
 //* Assume f is a polynomial with no polynomials lying in the Newton
-//* Diagramm above the line defined by x^2y^2 and x^2y^(bound)
+//* Diagram above the line defined by x^2y^2 and x^2y^(bound)
 //* Computes the weight of all monomials lying under the line and
 //* returns the smallest one
 
@@ -903,7 +903,7 @@ EXAMPLE: example arnoldMorseSplit; shows an example
  def @br = basering;
  int n = nvars(basering);
 
-//* Set Determinacy (Needed for Splitting Lemma) wether given in # or compute
+//* Set Determinacy (Needed for Splitting Lemma) whether given in # or compute
  int Determinacy;
  if (size(#) == 0 ){
   Determinacy = arnoldDeterminacy(std(jacob(f)));
@@ -988,9 +988,7 @@ static proc Morse_arnold( poly f , int Determinacy)
       Q = Coeff( f2, var(i), var(i)^2);
 
    //* Check if
-   if( Q == 0 && i == n ){
-    ERROR("Someting went wrong");
-   }
+   if( Q == 0 && i == n ){ ERROR("Something went wrong"); }
 
    //* Find coordinate change Phi2 such that Q(0) != 0
    Phi2 = @br, maxideal(1);  //* Identity
@@ -1374,7 +1372,7 @@ ASSUME:  If S is of type string, then S is the name of a singularity series
          Optional suitable polynomial parameters a,b,c,d can be appended to l.
          If a,b,c,d are not given, valid values are chosen automatically.
 RETURN:  string NF is the normal form of the series S if no parameters given,
-         or poly NF is the normal form of the class S with paramaters k,r,s.
+         or poly NF is the normal form of the class S with parameters k,r,s.
 EXAMPLE: example arnoldNormalForm; shows an example"
 {
 

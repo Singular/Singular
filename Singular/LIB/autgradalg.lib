@@ -95,7 +95,7 @@ EXAMPLE: shows an example."
   }
 
   // Choose a maximal linearly independent
-  // subset out of the elemnts of Iw0:
+  // subset out of the elements of Iw0:
   // Iteratively add columns from Tmp:
   int rg1 = 0;
   int rg2 = 0;
@@ -344,7 +344,7 @@ example
 ///////////////////////////////////
 
 static proc wmonomials(intvec w1, int dd, list #)
-  "USAGE: wmonomials(w, dd): w is an intvec and dd either 1 or 0; 1 means that the funtion should compute a list of exponent vectors and 0 means the function should compute a list of monomials. As an optional third argument a list of integers may be provided to indicate that the last rows of the degree matrix are residue classes in ZZ/aZZ. For instance [2,3] means that the second to last row consists of elements in ZZ/2ZZ and the last one of elements in ZZ/3ZZ.
+"USAGE: wmonomials(w, dd): w is an intvec and dd either 1 or 0; 1 means that the function should compute a list of exponent vectors and 0 means the function should compute a list of monomials. As an optional third argument a list of integers may be provided to indicate that the last rows of the degree matrix are residue classes in ZZ/aZZ. For instance [2,3] means that the second to last row consists of elements in ZZ/2ZZ and the last one of elements in ZZ/3ZZ.
 ASSUME: the basering must be graded (see setBAseMultigrading()) and the cone over
 the degrees of the variables must be pointed; there mustn't be 0-degrees.
 PURPOSE: computes all monomials T^\nu with deg(T^\nu) = w where
@@ -1680,7 +1680,7 @@ example
 // n0 is the number of variables of the very first basering,
 // i.e., the number of 'meaningful' rows of the resulting matrix.
 static proc getAgeneral(int n0){
-  int coldim = (nvars(basering) - 1) div n0; // there is the additonal var 'Z'
+  int coldim = (nvars(basering) - 1) div n0; // there is the additional var 'Z'
   matrix A[coldim][coldim];
 
   // write the variables into A
@@ -2157,7 +2157,7 @@ EXAMPLE: shows an example."
     poly lp = lead(p) / mon;
 
     if(lp != 0){
-      // test wether there is still some T(i)-factor in lp:
+      // test whether there is still some T(i)-factor in lp:
       for(int i = 1; i <= n0; i++){
         lp = subst(lp, var(i), 0);
       }
@@ -2195,7 +2195,7 @@ example
   poly m = T(1)^2;
 
   // only the first three variables
-  // are considered for taking the coefficent:
+  // are considered for taking the coefficient:
   moncoef2(f, m, 3);
 }
 
@@ -2537,7 +2537,7 @@ static proc getAdmissibleEquations(list adMons, matrix A, int n0, list MONS){
   def S = basering;
   map applyA = S, imageVars;
 
-  // go through all possiblities:
+  // go through all possibilities:
   int k, l;
   ideal IadmissibleExported;
 
@@ -2919,7 +2919,7 @@ static proc relabelEntries(matrix A, int n0){
   // this is true for the first n0 rows of A:
   // Store in Img[i] the image of Y(i):
   intvec v = 0:(nvars(R));
-  list Img = v[1..size(v)]; // initialze with 0.
+  list Img = v[1..size(v)]; // initialize with 0.
 
   int i, j, pos, k, m;
 
