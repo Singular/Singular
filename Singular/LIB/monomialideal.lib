@@ -762,7 +762,7 @@ EXAMPLE:  example gcdMon; shows an example.
 //  int k;
 //  intvec exp;
 //  int nvar = nvars(basering);
-//  // intput: monomials
+//  // input: monomials
 //
 //  intvec expf = leadexp(f);
 //  intvec expg = leadexp(g);
@@ -3642,7 +3642,7 @@ NOTE:     This procesure returns the irreducible decomposition of I.
             (alg=ad),
           - the formula of irreducible components (alg=for),
           - via the Scarf complex following Milowski (alg=mil),
-          - using the label algorihtm of Roune (alg=lr),
+          - using the label algorithm of Roune (alg=lr),
           - using the algorithm of Gao-Zhu (alg=gz).
           - using the slice algorithm of Roune (alg=sr).
 EXAMPLE:  example irreddecMon; shows some examples.
@@ -3738,7 +3738,7 @@ proc primdecMon
 RETURN:   list, the components in a minimal primary decomposition of I.
           (returns -1 if I is not a monomial ideal).
 ASSUME:   I is a monomial ideal of the basering k[x(1)..x(n)].
-NOTE:     This procesure returns a minimal primary decomposition of I.
+NOTE:     This procedure returns a minimal primary decomposition of I.
           One may call the procedure with different algorithms using
           the optional argument 'alg':
           - the direct method for a primary decomposition following
@@ -3754,7 +3754,7 @@ NOTE:     This procesure returns a minimal primary decomposition of I.
           - from the irreducible decomposition obtained via the Scarf
             complex following Milowski (alg=mil),
           - from the irreducible decomposition obtained using the label
-            algorihtm of Roune (alg=lr),
+            algorithm of Roune (alg=lr),
           - from the irreducible decomposition obtained using the
             algorithm of Gao-Zhu (alg=gz),
           - from the irreducible decomposition obtained using the slice

@@ -17,7 +17,7 @@ Suppose A is an affine domain over a perfect field.@*
 This library implements a modular strategy for finding the normalization of A.
 Following [1], the idea is to apply the normalization algorithm given in [2]
 over finite fields and lift the results via Chinese remaindering and rational
-reconstruction as described in [3]. This approch is inherently parallel.@*
+reconstruction as described in [3]. This approach is inherently parallel.@*
 The strategy is available both as a randomized and as a verified algorithm.
 
 REFERENCES:
@@ -81,7 +81,7 @@ static proc pTestNormal(ideal I, list L, int p, ideal normalIP)
 ////////////////////////////////////////////////////////////////////////////////
 
 
-// Computes the normalization of I in characterisitic p.
+// Computes the normalization of I in characteristic p.
 // Returns an ideal Out such that the normalization mod p is the
 // module 1/condu * Out
 static proc modpNormal(ideal I, int p, poly condu,int printTimings,list #)
@@ -128,7 +128,7 @@ static proc modpNormal(ideal I, int p, poly condu,int printTimings,list #)
   // Currently, the algorithm only works if no splitting occurs during the
   // normalization process. (For example, if I is prime.)
   if(size(l[2]) > 1){
-    ERRROR("Original ideal is not prime (Not implemented.) or unlucky prime");
+    ERROR("Original ideal is not prime (Not implemented.) or unlucky prime");
   }
 
   ideal outP = l[2][1];

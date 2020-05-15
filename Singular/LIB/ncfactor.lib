@@ -13,7 +13,7 @@ OVERVIEW: In this library, new methods for factorization on polynomials
 @* The determination of the best algorithm available for users input is done
 @* automatically in the procedure ncfactor().
 
-@* More detailled description of the algorithms and related publications can be found at
+@* More detailed description of the algorithms and related publications can be found at
 @url{https://cs.uwaterloo.ca/\~aheinle/}.
 
 PROCEDURES:
@@ -690,9 +690,9 @@ OUTPUT: All possibilities (without permutation of the given list) to combine the
     return(result);
   }//g was the empty list
   if (nof <= 0)
-  {//The user wants to recieve a negative number or no element as a result
+  {//The user wants to receive a negative number or no element as a result
     return(result);
-  }//The user wants to recieve a negative number or no element as a result
+  }//The user wants to receive a negative number or no element as a result
   if (nofgl == nof)
   {//There are no factors to combine
     result = result + list(g);
@@ -1360,7 +1360,7 @@ static proc test_fromIntvecToList()
     print(obtained);
     result = 0;
   }
-  //Test 3: Intvec with arbitarily many elements
+  //Test 3: Intvec with arbitrarily many elements
   input= intvec(6,4,7,1,24);
   expected = list(6,4,7,1,24);
   obtained = fromIntvecToList(input);
@@ -1558,7 +1558,7 @@ OUTPUT: A list of possible points in Z^n that can lie between pmax and
   if (size(pmax) != size(pmin) || 2*size(pmax)!=size(maxDegrees) || pmax<=pmin)
   {
     ERROR("pmax and pmin shall have the same size, and maxDegrees
-    shall be double the size of both. Furhtermore, it must hold that pmax>pmin. The
+    shall be double the size of both. Furthermore, it must hold that pmax>pmin. The
     Input was: " + string(pmax) + ", " + string(pmin) + ", " + string(maxDegrees));
   }
   list result;
@@ -1772,7 +1772,7 @@ OUTPUT: A list of possible points in Z^n that can lie between pmax and
   if (size(pmax) != size(pmin) || 2*size(pmax)!=size(maxDegrees) || pmax<=pmin)
   {
     ERROR("pmax and pmin shall have the same size, and maxDegrees
-    shall be double the size of both. Furhtermore, it must hold that pmax>pmin. The
+    shall be double the size of both. Furthermore, it must hold that pmax>pmin. The
     Input was: " + string(pmax) + ", " + string(pmin) + ", " + string(maxDegrees));
   }
   list result = list(pmax);
@@ -4925,7 +4925,7 @@ PURPOSE: Inserts newFact into factList, if not yet contained in
 static proc test_sortedInsert()
 {//testing sortedInsert
   int result = 1;
-  //Test 1: empty list to insert into emtpy list
+  //Test 1: empty list to insert into empty list
   ring R = 0,(x,d),dp;
   def r = nc_algebra(1,1);
   setring r;
@@ -6113,12 +6113,12 @@ SEE ALSO: facSubWeyl, testNCfac, facFirstShift, facFirstWeyl
       for (j = i+1; j<=size(the_vars); j++)
       {
         if (the_vars[j]*the_vars[i]-the_vars[i]*the_vars[j]==1)
-        {//In this case, we matched a var x to a repective d
+        {//In this case, we matched a var x to a respective d
           tempVariable = the_vars[i + size(the_vars) div 2];
           the_vars[i + size(the_vars) div 2] = the_vars[j];
           the_vars[j] = tempVariable;
           break;
-        }//In this case, we matched a var x to a repective d
+        }//In this case, we matched a var x to a respective d
         if (the_vars[i]*the_vars[j]-the_vars[j]*the_vars[i]==1)
         {//In this case, x and d were wrongly positioned
           tempVariable = the_vars[j];
@@ -8386,7 +8386,7 @@ minimal homogeneous part");
   list coeffTuplesMin = getAllCoeffTuplesComb(factorizeInt(number(f2[1][1])));
   dbprint(p,dbprintWhitespace + "Done. The Combinations are:");
   dbprint(p,coeffTuplesMin);
-  //Now, we will be actally dealing with the Combinations.
+  //Now, we will be actually dealing with the Combinations.
   //Let's start with the pqmax
   if (size(f1[1]) == 1)
   {//the maximal homogeneous factor is a constant
@@ -11710,12 +11710,12 @@ ASSUMPTIONS:
   is " +string(expVec));
   list listToPermute = list();
   for (i = 1;i<=nvars(r);i++)
-  {//filling an inital list
+  {//filling an initial list
     for(j=1; j<=expVec[i];j++)
     {//different powers of the respective variable at position i
       listToPermute = listToPermute + list(var(i));
     }//different powers of the respective variable at position i
-  }//filling an inital list
+  }//filling an initial list
   dbprint(p,dbprintWhitespace + "Initial list to permute is "+
   string(listToPermute));
   list M = permpp(listToPermute);
@@ -12512,7 +12512,7 @@ SEE ALSO: ncfactor
   dbprint(p, dbprintWhitespace + "The leading monomial of h is: " + string(expVec));
   list M;
   for (i = 1; i<size(expVec); i++)
-  {//The set M consists of all posssible two-word-combinations of the leading monomial
+  {//The set M consists of all possible two-word-combinations of the leading monomial
     M = M + list(list(intvec(expVec[1..i]), intvec(expVec[i+1..size(expVec)])));
   }
   dbprint(p,dbprintWhitespace+"The set M is:");

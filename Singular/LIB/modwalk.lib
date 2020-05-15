@@ -2,7 +2,7 @@
 version="version modwalk.lib 4.1.2.0 Feb_2019 "; // $Id$
 category = "Commutative Algebra";
 info="
-LIBRARY:  modwalk.lib      Groebner basis convertion
+LIBRARY:  modwalk.lib      Groebner basis conversion
 
 AUTHORS:  S. Oberfranz    oberfran@mathematik.uni-kl.de
 

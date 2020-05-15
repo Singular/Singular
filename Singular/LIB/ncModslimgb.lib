@@ -118,7 +118,7 @@ EXAMPLE: example ncmodslimgb; shows an example
   option(redSB);
 
   //PrimeList procedure selects suitable primes such that
-  //these primes do not divide coefficients occuring
+  //these primes do not divide coefficients occurring
   //in the generating polynomials of input ideal and
   //in the defining relations of input algebra
 

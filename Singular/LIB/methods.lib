@@ -9,7 +9,7 @@ AUTHORS:  J. Boehm, boehm @ mathematik.uni-kl.de
 OVERVIEW:
 
 Methods select the function to execute by the types of the input tuple.
-The central function is installMethod, which takes a hashtable assocating a tuple of
+The central function is installMethod, which takes a hashtable associating a tuple of
 input types to function names and creates a corresponding procedure.
 
 HashTables are lists with arbitrary index sets. They can be created by the

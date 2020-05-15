@@ -14,8 +14,8 @@ This library is used for the computation of graded free resolutions with an own 
 the monomials. For these Resolution is a new class of modules needed. These modules, can be
 computed via the image, kernel, cokernel of a matrix or the subquotient of two matrices.
 The used matrices also have a free module as source and target, with graded generators if the
-matrix is homogenous. A matrix of this new form is created by a normal matrix, source, target and
-the graduatin, if the matrix is homogenous, are done automatically. With this matrices it is then
+matrix is homogeneous. A matrix of this new form is created by a normal matrix, source, target and
+the graduatin, if the matrix is homogeneous, are done automatically. With this matrices it is then
 possible to compute the new class of modules.
 This library also offers the opppurtunity to create R-module-homomorphisms betweens two modules.
 For these homorphisms the kernel can be computed an will be returned as a module of the new class.
@@ -38,7 +38,7 @@ PROCEDURES:
 id(int n)      return a nxn identity Matrix
 zero(int n,int m)    return a nxm zero Matrix
 freeModule(ring,int,list)  creating a graded free module
-makeMatrix(matrix,#int)    creating a Matrix with graded target and source if the matrix is homogenous. If # is set to 1, makeMatrix ignores the grading of source & target.
+makeMatrix(matrix,#int)    creating a Matrix with graded target and source if the matrix is homogeneous. If # is set to 1, makeMatrix ignores the grading of source & target.
 makeIdeal(ideal)    creates an Ideal from an given ideal, is used to compute a resolution of the ideal
 Target(Matrix)      return target of the Matrix
 Source(Matrix)      return source of the Matrix
@@ -82,8 +82,8 @@ tensorProduct(def,def)      computes tensorproduct
 pruneModule(Module)      simplifies the presentation of a Module
 hom(Module,Module)      computes Hom(M,N)
 kerHom(Homomorphism)      computes the kernel of a Homomorphism
-interpret(Vector)      interpretes the Vector in some Module or abstract space
-interpretInv(def,Module)    interpretes a Vector or Homomorphism into the given Module
+interpret(Vector)      interprets the Vector in some Module or abstract space
+interpretInv(def,Module)    interprets a Vector or Homomorphism into the given Module
 reduceIntChain(Module,#int)    reduces a chain of interpretations to minimal size or # steps
 interpretElem(Vector,#int)    interpret a Vector with # steps or until can't interpret further
 interpretList(list,#int)    interpret a list of Vectors as far as possible
@@ -101,7 +101,7 @@ static proc mod_init()
 LIB "nets.lib";
 
 newstruct("FreeModule","int Rank,ring over,int isgraded,list grading");
-newstruct("Matrix","matrix hom, FreeModule source, FreeModule target, ring over,int ishomogenous");
+newstruct("Matrix","matrix hom, FreeModule source, FreeModule target, ring over,int ishomogeneous");
 newstruct("Module","Matrix generators,Matrix relations,ring over,int isgraded, list grading, list interpretation");
 //interpretation is a list of two sublists: the first one gives the interpretation into another module M (entries are of type Vector), while the second denotes the inverse of this map (entries are of type vector, since the targetspace is clear).
 newstruct("Vector","Module space, vector entries");
@@ -221,7 +221,7 @@ if(typeof(mydeg)=="intvec"){
     }
   }
   else{
-  ERROR("Intput isn't a list or intvec");
+  ERROR("Input isn't a list or intvec");
   }
 }
 attrib(basering,"Grading",I);
@@ -324,7 +324,7 @@ example
 
 static proc gradedMatrix(matrix m,list mydeg){
 Matrix M;
-M.ishomogenous=1;
+M.ishomogeneous=1;
 M.over=basering;
 M.target = freeModule(basering,nrows(m),0);
 M.source = freeModule(basering,ncols(m),mydeg);
@@ -339,7 +339,7 @@ def R=basering;
 setring(N.over);
 list mydeg;
 Matrix M;
-M.ishomogenous=1;
+M.ishomogeneous=1;
 M.over=basering;
 int a;
 int j;
@@ -462,7 +462,7 @@ proc mRes(def M,int #)
 "USAGE: mRes(M,n); M Module or Ideal, n integer
 RETURN: Resolution, minimized resolution with graded modules
 NOTE: n is optional, if n ist positiv only that many steps will be computed
-      use R.dd[i]; to return the diffrent modules as image of matrices, R Resolution i integer
+      use R.dd[i]; to return the different modules as image of matrices, R Resolution i integer
 EXAMPLE. example mRes, shows an example"
 {
 module m;
@@ -484,7 +484,7 @@ Resolution R;
 R.reso=mres(m,j);
 matrix a=R.reso[1];
 R.dd[1]=makeMatrix(a);
-if(!(R.dd[1].ishomogenous)){
+if(!(R.dd[1].ishomogeneous)){
   R.isgraded=0;
   for(int i=2;i<=(size(R.reso)+1);i++){
     a=R.reso[i];
@@ -524,7 +524,7 @@ proc sRes(def M,int #)
 "USAGE: sRes(M,n); M Module or Ideal, n integer
 RETURN: Resolution, with graded modules, computed with Schreyer's method using the function sres
 NOTE: n is optional, if n ist positiv only that many steps will be computed
-      use R.dd[i]; to return the diffrent modules as image of matrices, R Resolution i integer
+      use R.dd[i]; to return the different modules as image of matrices, R Resolution i integer
 EXAMPLE. example sRes, shows an example"
 {
 module m;
@@ -546,7 +546,7 @@ Resolution R;
 R.reso=sres(m,j);
 matrix a=R.reso[1];
 R.dd[1]=makeMatrix(a);
-if(!(R.dd[1].ishomogenous)){
+if(!(R.dd[1].ishomogeneous)){
   R.isgraded=0;
   for(int i=2;i<(size(R.reso)+1);i++){
     a=R.reso[i];
@@ -586,7 +586,7 @@ proc Res(def M,int #)
 "USAGE: Res(M,n); M Module or Ideal, n integer
 RETURN: Resolution, resolution with graded modules
 NOTE: n is optional, if n ist positiv only that many steps will be computed
-      use R.dd[i]; to return the diffrent modules as image of matrices, R Resolution i integer
+      use R.dd[i]; to return the different modules as image of matrices, R Resolution i integer
 EXAMPLE. example Res, shows an example"
 {
 module m;
@@ -608,7 +608,7 @@ Resolution R;
 R.reso=res(m,j);
 matrix a=R.reso[1];
 R.dd[1]=makeMatrix(a);
-if(!(R.dd[1].ishomogenous)){
+if(!(R.dd[1].ishomogeneous)){
   R.isgraded=0;
   for(int i=2;i<(size(R.reso)+1);i++){
     a=R.reso[i];
@@ -647,7 +647,7 @@ proc Betti(Resolution resi)
 "USAGE: Betti(reso); reso Resolution
 RETURN: intmat, Bettimatrix of the resolution
 NOTE: for a clear overview use printBetti
-EXAMPLE: exaple Betti, shows an example"
+EXAMPLE: example Betti, shows an example"
 {
 Matrix M;
 int j;
@@ -718,8 +718,8 @@ example
 
 proc makeMatrix(matrix m, int #)
 "USAGE:makeMatrix(m), m matrix
-RETURN Matrix, with graded source and target if the matrix is homogenous
-EXAMPLE: exmaple makeMatrix, shows an example"
+RETURN Matrix, with graded source and target if the matrix is homogeneous
+EXAMPLE: example makeMatrix, shows an example"
 {
 Matrix M;
 list mydeg=isHomogenous(m);
@@ -743,7 +743,7 @@ example
 
 static proc nongradedMatrix(matrix m){
 Matrix M;
-M.ishomogenous=0;
+M.ishomogeneous=0;
 M.over=basering;
 M.target = freeModule(basering,nrows(m),-1);
 M.source = freeModule(basering,ncols(m),-1);
@@ -826,7 +826,7 @@ EXAMPLE: example printMatrix, shows an example"
 def R=basering;
 setring(M.over);
 matrix m=M.hom;
-if(M.ishomogenous){
+if(M.ishomogeneous){
   string s1;
   string s2;
   list l1;
@@ -920,7 +920,7 @@ ring R=basering;
 setring(gens.over);
 Module S;
 S.isgraded=0;
-if(gens.ishomogenous){
+if(gens.ishomogeneous){
 S.grading=gens.source.grading;
 S.isgraded=1;
 }
@@ -1004,7 +1004,7 @@ for (i=2;i<ncols(new);i++) {
   }
 }
 Module M;
-if(rels.ishomogenous){M.isgraded=1;}
+if(rels.ishomogeneous){M.isgraded=1;}
 else{M.isgraded=0;}
 Matrix New = new;
 M=subquotient(id(nrows(new)),New);
@@ -2240,7 +2240,7 @@ EXAMPLE: example interpretInv; shows an example"
 {
   if (typeof(V)=="Vector"){
     Module M = V.space;
-    //Check wheter there is a inverse interpretationlist:
+    //Check whether there is a inverse interpretationlist:
     if ((size(N.interpretation)!=0) && (size((N.interpretation)[2])!=0) && (((N.interpretation)[1][1]).space == M)) {
     // third condition checks whether the given modules are related
       //in this case we decompose v into the generators of its Module and project those onto the generators of N
@@ -2255,7 +2255,7 @@ EXAMPLE: example interpretInv; shows an example"
       Vector W = w,N;
       return(W);
     }
-    //If not, check wheter there exists an interpretationlist to N in the Module of V:
+    //If not, check whether there exists an interpretationlist to N in the Module of V:
     if ((size(M.interpretation)!=0) && (((M.interpretation)[1][1]).space == N)){return(interpret(V));}
     //If neither exist, can't interpretInv:
     ERROR("There exists no inverse map into the given module");
@@ -2395,7 +2395,7 @@ ring R=0,(x,y),(lp,c);
 
 static proc concMatrix(Matrix A,Matrix B)
 "USAGE = concMatrix(A,B); A,B Matrix over the same ring
-RETURN: concatinated Matrix with concatinated grading
+RETURN: concatenated Matrix with concatenated grading
 EXAMPLE: example concMatrix; shows an example"
 {
   //TODO Grading

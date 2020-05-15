@@ -674,7 +674,7 @@ proc primeList(ideal I, int n, list #)
          n integer
 RETURN:  the intvec of n greatest primes <= 2147483647 (resp. n greatest primes
          < L[size(L)] union with L) such that none of these primes divides any
-         coefficient occuring in I
+         coefficient occurring in I
 NOTE:    The number of cores to use can be defined by ncores, default is 1.
 EXAMPLE: example primeList; shows an example
 "

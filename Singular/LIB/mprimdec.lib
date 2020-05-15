@@ -11,7 +11,7 @@ OVERVIEW:
  the algorithms of Gianni, Trager and Zacharias and
  Shimoyama and Yokoyama (generalization of the latter
  suggested by Hans-Gert Graebe, Leipzig  )
- using elments of primdec.lib
+ using elements of primdec.lib
 
 REMARK:
 These procedures are implemented to be used in characteristic 0.
@@ -36,7 +36,7 @@ PROCEDURES:
   splitting(N[,check[,ann]]);  splitting to simpler modules
   primTest(i[,p]);             tests whether i is prime or homogeneous
   preComp(N,check[,ann]);      enhanced Version of splitting
-  indSet(i);                   lists with varstrings of(in)dependend variables
+  indSet(i);                   lists with varstrings of(in)dependent variables
   GTZopt(N[,check[,ann]]);     a faster version of GTZmod
   zeroOpt(N[,check[,ann]]);    a faster version of zeroMod
 
@@ -114,7 +114,7 @@ example
 // computes a primary decomposition, not necessarily minimal,
 // using a generalization of the algorithm of Shimoyama/Yokoyama,
 // suggested by Hans-Gerd Graebe, Leipzig
-// [Hans-Gert Graebe, Minimal Primary Decompostion
+// [Hans-Gert Graebe, Minimal Primary Decomposition
 //  and Factorized Groebner Bases, AAECC 8, 265-278 (1997)]
 /////////////////////////////////////////////////////////////////////////////
 
@@ -1259,7 +1259,7 @@ EXAMPLE: example preComp; shows an example
   }
 
   ////////////////////////////////////////////////////////////////
-  // the modules which are not primary are splitted
+  // the modules which are not primary are split
   ////////////////////////////////////////////////////////////////
   list splitTemp;
   int sz=size(primary);
@@ -1661,7 +1661,7 @@ example
 
 /////////////////////////////////////////////////////////////////////////////
 // dec1var(N[,check[, ann]])
-// primary decompostion for a ring with one variable
+// primary decomposition for a ring with one variable
 /////////////////////////////////////////////////////////////////////////////
 
 proc dec1var (module @N, list #)

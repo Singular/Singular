@@ -20,7 +20,7 @@ REFERENCES:   T. Mai: On the analytic theory of non-commutative
 KEYWORDS:     noncommutative, rational expressions;
    rational functions; formal linear representations; minimal representations
 
-NOTE: an almost self-explaining introduction to the posibilities of the framework
+NOTE: an almost self-explaining introduction to the possibilities of the framework
 can be achieved by running the example for the procedure ncrepGetRegularMinimal.
 
 PROCEDURES:
@@ -29,7 +29,7 @@ PROCEDURES:
   ncVarsAdd(list);              Add variables from list to 'NCRING'
   ncratDefine();                Define element of type ncrat
   ncratAdd();                   Addition of two ncrat's
-  ncratSubstract();             Substraction of two ncrat's
+  ncratSubstract();             Subtraction of two ncrat's
   ncratMultiply();              Multiplication of two ncrat's
   ncratInvert();                Invert an ncrat
   ncratSPrint();                Print-to-string for ncrat
@@ -40,7 +40,7 @@ PROCEDURES:
   ncratEvaluateAt();            Evaluate ncrat at scalar or matrix point
   ncrepGet();                   Calculate representation of ncrat
   ncrepAdd();                   Addition of two ncrep's
-  ncrepSubstract();             Substraction of two ncrep's
+  ncrepSubstract();             Subtraction of two ncrep's
   ncrepMultiply();              Multiplication of two ncrep's
   ncrepInvert();                Invert an ncrep
   ncrepPrint();                 Print for ncrep
@@ -917,7 +917,7 @@ static proc ncSubMat(matrix M, matrix A, poly VARIABLE)
 
 /*
   list # = (x1, ..., xg) contains the nc variables
-  occuring in g
+  occurring in g
   return list(Q0, Q1,... Qg) with scalar matrices Qi s.t.
     Q = Q0 + Q1*x1 + ... + Qg*xg
 */
@@ -966,7 +966,7 @@ static proc ncrepLinearPencil(ncrep q, list #)
   g - number of nc variables
   n - dimension
   q - REGULAR ncrep
-  # - contains occuring ncvariables as 'poly'
+  # - contains occurring ncvariables as 'poly'
   Returns list(B, C, l) with l = list(A1, ..., Ag) such that
   -u*Q^-1*v = C * (1 - A1*x1 - ... - Ag*xg)^-1 * B.
 
@@ -1160,7 +1160,7 @@ static proc calculateComplement(int n, list b)
 }
 
 // INPUT: list containing basis vectors
-// OUTPUT: orthogonal matrix, whose colums span the same space
+// OUTPUT: orthogonal matrix, whose columns span the same space
 static proc orthogonalBase(list b)
 {
   matrix B;
@@ -1338,7 +1338,7 @@ EXAMPLE:  example ncInit;
         ("Const", [number])           constant
         ("Var",   [string])           variable
         ("Add",   [ncrat, ncrat])     addition
-        ("Sub",   [ncrat, ncrat])     substraction
+        ("Sub",   [ncrat, ncrat])     sustraction
         ("Mult",  [ncrat, ncrat])     multiplication
         ("Inv",   [ncrat])            inverse
 
@@ -2533,13 +2533,13 @@ proc ncrepPencilGet(ncrep r, list vars)
 
 RETURN:     pencil = list(vars, matrices),
   where vars = list(1, x1, ..., xg) are the variables
-  occuring in r and matrices = (Q0, ..., Qg) is a list of
+  occurring in r and matrices = (Q0, ..., Qg) is a list of
   matrices such that
     r.mat = Q0 * x0 + ... + Qg * xg
   with x0 = 1
 
 NOTE:       list vars = list(x1, ..., xn) has to consist
-  exactly of the nc variables occuring in f
+  exactly of the nc variables occurring in f
 
 EXAMPLE:    example ncrepPencilGet;
   shows an example"
@@ -2615,7 +2615,7 @@ ASSUMPTION: q is regular at zero, i.e.,
   then q.mat has to be invertible
 
 NOTE:       list l = list(x1, ..., xn) has to consist
-  exactly of the nc variables occuring in q
+  exactly of the nc variables occurring in q
 
 EXAMPLE:    example ncrepRegularZeroMinimize;
   shows an example"
@@ -2695,7 +2695,7 @@ ASSUMPTION: q is regular at scalar point a, i.e.,
   then q.mat has to be invertible
 
 NOTE:       list vars = list(x1, ..., xn) has to consist
-  exactly of the nc variables occuring in q and
+  exactly of the nc variables occurring in q and
   list point = list(a1, ..., an) consists of scalars
 
 EXAMPLE:    example ncrepRegularMinimize;
@@ -2769,7 +2769,7 @@ ASSUMPTION: f is regular at zero, i.e.,
   f(0) has to be defined
 
 NOTE:       list vars = list(x1, ..., xn) has to consist
-  exactly of the nc variables occuring in f
+  exactly of the nc variables occurring in f
 
 EXAMPLE:    example ncrepGetRegularZeroMinimal;
   shows an example"
@@ -2799,7 +2799,7 @@ ASSUMPTION: f is regular at point, i.e.,
   f(point) has to be defined
 
 NOTE:       list vars = list(x1, ..., xn) has to consist
-  exactly of the nc variables occuring in f and
+  exactly of the nc variables occurring in f and
   list point = (p1, ..., pn) of scalars such that
   f(point) is defined
 

@@ -55,14 +55,14 @@ example
 }
 
 /* test if a prime number p is permissible for an ideal I 
- * i.e. it does not divide the denominator of any of the coeffients
+ * i.e. it does not divide the denominator of any of the coefficients
  * or numerator of any of the leading coefficients */
 static proc isPermissible(int p,ideal I)
 {
     /* erase zero generators */
     def J = simplify(I, 2);
 
-    /* clear denominators and compute the leading coeffients of
+    /* clear denominators and compute the leading coefficients of
        the cleared one and the original one*/
     int n = ncols(J);
     int i;

@@ -188,8 +188,8 @@ proc detadj(module U)
 "USAGE:   detadj(U); U matrix
 ASSUME:  U is a square matrix with non zero determinant.
 RETURN:  The procedure returns a list with at most 2 entries.
-         If U is not a sqaure matrix, the list is empty.
-         If U is a sqaure matrix, then the first entry is the determinant of U.
+         If U is not a square matrix, the list is empty.
+         If U is a square matrix, then the first entry is the determinant of U.
          If U is a square matrix and the determinant of U not zero,
          then the second entry is the adjoint matrix of U.
 DISPLAY: The procedure displays comments if printlevel>=1.

@@ -390,7 +390,7 @@ EXAMPLE: example regIdeal; shows some examples
    }
 //----- Now d>1 and S/i is not Cohen-Macaulay:
 //
-//----- First, determine the last variable really occuring
+//----- First, determine the last variable really occurring
    lastv=n-d;
    h=n;
    while ( lastv == n-d and h > n-d )
@@ -889,7 +889,7 @@ EXAMPLE: example depthIdeal; shows some examples
      }
 //----- Now d>1 and S/i is not Cohen-Macaulay:
 //
-//----- First, determine the last variable really occuring
+//----- First, determine the last variable really occurring
        lastv=n-d;
        h=n;
        while ( lastv == n-d and h > n-d )
@@ -1215,7 +1215,7 @@ EXAMPLE: example satiety; shows some examples
          }
 //----- Now d>1 and S/i is not Cohen-Macaulay:
 //
-//----- First, determine the last variable really occuring
+//----- First, determine the last variable really occurring
        lastv=n-d;
        h=n;
        while ( lastv == n-d and h > n-d )
@@ -1817,7 +1817,7 @@ EXAMPLE: example is_nested; shows some examples
      {
        return (1);
      }
-//----- Determ. of the last variable really occuring
+//----- Determ. of the last variable really occurring
    lastv=n-d;
    h=n;
    while ( lastv == n-d and h > n-d )
