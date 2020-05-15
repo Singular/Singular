@@ -16,7 +16,7 @@ In this library there are the following procedures for algebraic D-modules:
 - given a cyclic representation D/I of a holonomic module and a polynomial
  F in R, it is proved that the localization of D/I with respect to the mult.
  closed set of all powers of F is a holonomic D-module. Thus we aim to compute
- its cyclic representaion D/L for an ideal L in D. The procedures for the
+ its cyclic representation D/L for an ideal L in D. The procedures for the
  localization are DLoc, SDLoc and DLoc0.
 
 - annihilator in D of a given polynomial F from R as well as
@@ -374,7 +374,7 @@ EXAMPLE: example fl2poly; shows examples
   intvec IV = L[2];
   if (sl <> nrows(IV))
   {
-    ERROR("number of roots doesn't match number of multiplicites");
+    ERROR("number of roots doesn't match number of multiplicities");
   }
   for(int i=1; i<=sl; i++)
   {
@@ -1484,7 +1484,7 @@ EXAMPLE: example SDLoc; shows examples
   intvec iv;
   L[1] = RL[1];
   L[4] = RL[4];  // char, minpoly
-  // check whether vars hava admissible names -> done earlier
+  // check whether vars have admissible names -> done earlier
   // now, create the names for new var
   tmp[1] = "s";
   list NName = Name + tmp;

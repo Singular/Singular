@@ -441,7 +441,7 @@ EXAMPLE: example Sannfslog; shows examples
   dbprint(ppl,"// -1-1- starting the computation of syz(-F,_Dx(F))");
   dbprint(ppl-1, I);
   matrix M = syz(I);
-  M = transpose(M);  // it is more usefull working with columns
+  M = transpose(M);  // it is more useful working with columns
   dbprint(ppl,"// -1-2- the module syz(-F,_Dx(F)) has been computed");
   dbprint(ppl-1, M);
   // ------------ the ring @R ------------
@@ -529,7 +529,7 @@ example
 
 
 // alternative code for SannfsBM, renamed from annfsBM to ALTannfsBM
-// is superfluos - will not be included in the official documentation
+// is superfluous - will not be included in the official documentation
 static proc ALTannfsBM (poly F, list #)
 "USAGE:  ALTannfsBM(f [,eng]);  f a poly, eng an optional int
 RETURN:  ring
@@ -850,7 +850,7 @@ EXAMPLE: example bernsteinBM; shows examples
   intvec iv;
   L[1] = RL[1];
   L[4] = RL[4];  //char, minpoly
-  // check whether vars hava admissible names -> done earlier
+  // check whether vars have admissible names -> done earlier
   // now, create the names for new var
   tmp[1] = "s";
   // DName is defined earlier
@@ -1080,7 +1080,7 @@ EXAMPLE: example annfsBM; shows examples
   intvec iv;
   L[1] = RL[1];
   L[4] = RL[4];  //char, minpoly
-  // check whether vars hava admissible names -> done earlier
+  // check whether vars have admissible names -> done earlier
   // now, create the names for new var
   tmp[1] = "s";
   // DName is defined earlier
@@ -1734,7 +1734,7 @@ EXAMPLE: example operatorBM; shows examples
   intvec iv;
   L[1] = RL[1];
   L[4] = RL[4];  //char, minpoly
-  // check whether vars hava admissible names -> done earlier
+  // check whether vars have admissible names -> done earlier
   // now, create the names for new var
   tmp[1] = "s";
   // DName is defined earlier
@@ -2517,7 +2517,7 @@ EXAMPLE: example annfsBMI; shows examples
   intvec iv;
   L[1] = RL[1];  //char
   L[4] = RL[4];  //char, minpoly
-  // check whether vars hava admissible names -> done earlier
+  // check whether vars have admissible names -> done earlier
   // now, create the names for new var
   for (j=1; j<=P; j++)
   {
@@ -2648,7 +2648,7 @@ EXAMPLE: example annfsBMI; shows examples
   intvec iv;
   L[1] = RL[1];  //char
   L[4] = RL[4];  //char, minpoly
-  // check whether vars hava admissible names -> done earlier
+  // check whether vars have admissible names -> done earlier
   // now, create the names for new var
   for (j=1; j<=P; j++)
   {
@@ -3320,7 +3320,7 @@ EXAMPLE: example SannfsOT; shows examples
   intvec iv;
   L[1] = RL[1];
   L[4] = RL[4];  // char, minpoly
-  // check whether vars hava admissible names -> done earlier
+  // check whether vars have admissible names -> done earlier
   // now, create the names for new var
   tmp[1] = "s";
   // DName is defined earlier
@@ -3528,7 +3528,7 @@ EXAMPLE: example SannfsBM; shows examples
   list RL=imap(save,RL);
   L[1] = RL[1];
   L[4] = RL[4];  // char, minpoly
-  // check whether vars hava admissible names -> done earlier
+  // check whether vars have admissible names -> done earlier
   // now, create the names for new var
   tmp[1] = "s";
   // DName is defined earlier
@@ -4044,7 +4044,7 @@ EXAMPLE: example SannfsBFCTstd; shows examples
   list RL=imap(save,RL);
   L[1] = RL[1];
   L[4] = RL[4];  // char, minpoly
-  // check whether vars hava admissible names -> done earlier
+  // check whether vars have admissible names -> done earlier
   // now, create the names for new var
   tmp[1] = "s";
   // DName is defined earlier
@@ -4287,7 +4287,7 @@ EXAMPLE: example SannfsLOT; shows examples
   intvec iv;
   L[1] = RL[1];
   L[4] = RL[4];  // char, minpoly
-  // check whether vars hava admissible names -> done earlier
+  // check whether vars have admissible names -> done earlier
   // now, create the names for new var
   tmp[1] = "s";
   // DName is defined earlier
@@ -4512,7 +4512,7 @@ EXAMPLE: example SannfsLOT; shows examples
   intvec iv;
   L[1] = RL[1];
   L[4] = RL[4];  // char, minpoly
-  // check whether vars hava admissible names -> done earlier
+  // check whether vars have admissible names -> done earlier
   // now, create the names for new var
   tmp[1] = "s";
   // DName is defined earlier

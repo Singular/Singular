@@ -15,7 +15,7 @@ PROCEDURES:
  basicinvariants(f); computes Milnor number, determinacy-bound and corank of
  classify(f);        normal form of polynomial f determined with Arnold's method
  corank(f);          computes the corank of f (i.e. of the Hessian of f)
- Hcode(v);           coding of intvec v acoording to the number repetitions
+ Hcode(v);           coding of intvec v according to the number repetitions
  init_debug([n]);    print trace and debugging information depending on int n
  internalfunctions();display names of internal procedures of this library
  milnorcode(f[,e]);  Hilbert polynomial of [e-th] Milnor algebra coded with Hcode
@@ -1743,7 +1743,7 @@ static proc Morse(poly f, int K, int corank, int ShowPhi)
   }
   if( ShowPhi > 1) { PhiG; }
 
-//------------------------ compute spliting lemma -----------------------------
+//------------------------ compute splitting lemma -----------------------------
   fc = fi;
   i  = 1;              // Index fuer Variablen wird bearbeitet
   while( i <= n)
@@ -2061,7 +2061,7 @@ static proc Cubic (poly f)
   if(Dim == 2)
   {
     if(Mult == 1) { return("V:doubleline + line"); }    // x2y
-    if(Mult == 2) { return("V': tripple line"); }       // x3
+    if(Mult == 2) { return("V': triple line"); }       // x3
   }
   if(Dim == 3) { return("P[9]:nodal cubic"); }  // x3 + y3 + xyz
 
@@ -2454,7 +2454,7 @@ static proc HKclass7_teil_1 (intvec sg, string SG_Typ, int cnt)
 ///////////////////////////////////////////////////////////////////////////////
 proc singularity(string typ, list #)
 "USAGE:    singularity(t, l); t=string (name of singularity),
-          l=list of integers/polynomials (indices/parmeters of singularity)
+          l=list of integers/polynomials (indices/parameters of singularity)
 COMPUTE:  get the singularity named by type t from the database.
           list l is as follows: @*
           l= k [,r [,s [,a [,b [,c [,d]..]: k,r,s=int   a,b,c,d=poly. @*
@@ -2657,7 +2657,7 @@ COMPUTE:  Set the global variable @DeBug to level. The variable @DeBug is
           used by the function debug_log(level, list of strings) to know
           when to print the list of strings. init_debug() reports only
           changes of @DeBug.
-NOTE:     The procedure init_debug(n); is usefull as trace-mode. n may
+NOTE:     The procedure init_debug(n); is useful as trace-mode. n may
           range from 0 to 10, higher values of n give more information.
 EXAMPLE:  example init_debug; shows an example"
 {
@@ -2736,7 +2736,7 @@ example
 proc corank(poly f)
 "USAGE:    corank(f);   f=poly
 RETURN:   the corank of the Hessian matrix of f, of type int
-REMARK:   corank(f) is the number of variables occuring in the residual
+REMARK:   corank(f) is the number of variables occurring in the residual
           singularity after applying 'morsesplit' to f
 EXAMPLE:  example corank; shows an example"
 {

@@ -429,7 +429,7 @@ static proc curveColengthDerivationsComp(module Der_P, ideal U, ideal relid)
 "USAGE:     curveColengthDerivationsComp(Der_P,U,relid); Der_P module, U ideal, relid ideal
 ASSUME:     - the basering is the normalization of R/P, where P is a prime
             - Der_P is the module of P-preserving derivations
-            - U containts the generators of the normalization of R/P
+            - U contains the generators of the normalization of R/P
             - relid is the ideal of relations that hold in the normalization of R/P
 RETURN:     the colength of derivations of R/P
 NOTE:       the procedure is for interior use only - it is part of the computation of
@@ -474,7 +474,7 @@ static proc curveExtDerModule(module Der_P, ideal U, ideal relid)
 "USAGE:     curveExtDerModule(Der_P,U,relid); Der_P module, U ideal, relid ideal
 ASSUME:     - the basering is the normalization of R/P, where P is prime
             - Der_P is the module of P-preserving derivations (with adjusted generators)
-            - U containts the generators of the normalization of R/P
+            - U contains the generators of the normalization of R/P
             - relid is the ideal of relations that hold in the normalization of R/P
 RETURN:     The derivation module lifted to the normalization
 REMARKS:    the generators of Der_P are extended via the quotient rule

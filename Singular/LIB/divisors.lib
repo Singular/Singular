@@ -38,7 +38,7 @@ PROCEDURES:
 
 makeDivisor(ideal,ideal)                        create a divisor
 divisorplus(divisor,divisor)                    add two divisors
-multdivisor(int,divisor)                        multiply a divisor by an interger
+multdivisor(int,divisor)                        multiply a divisor by an integer
 negativedivisor(divisor)                        compute the negative of the divisor
 normalForm(divisor)                             normal form of a divisor
 isEqualDivisor(divisor,divisor)                 test whether two divisors are equal
@@ -49,10 +49,10 @@ effective(divisor)                              compute an effective divisor
                                                 linearly equivalent to a divisor
 
 makeFormalDivisor(list)                         make a formal integer sum of divisors
-evaluateFormalDivisor(formaldivisor)            evalutate a formal sum of divisors to a divisor
+evaluateFormalDivisor(formaldivisor)            evaluate a formal sum of divisors to a divisor
 formaldivisorplus(formaldivisor,formaldivisor)  add two formal divisors
 negativeformaldivisor(formaldivisor)            compute the negative of the formal divisor
-multformaldivisor(int,formaldivisor)            multiply a formal divisor by an interger
+multformaldivisor(int,formaldivisor)            multiply a formal divisor by an integer
 degreeFormalDivisor(formaldivisor)              degree of a formal divisor
 
 makePDivisor(List)                              make a formal polyhedral sum of divisors

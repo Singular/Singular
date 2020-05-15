@@ -271,7 +271,7 @@ NOTE:    ord describes the desired order from the following choices:
           3 - elimination order for x and s, 'dp' in the parts
           4 - elimination order for x and D, 'dp' in the parts
               (used for the further work in the Bernstein-Sato ideal)
-         n and r desribe the number of components x_i/Dx_i and s_j
+         n and r describe the number of components x_i/Dx_i and s_j
 "
 {
   list tmp = 0;

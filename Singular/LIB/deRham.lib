@@ -13,7 +13,7 @@ varieties.
 
 REFERENCES:
 [OT] Oaku, T.; Takayama, N.: Algorithms of D-modules - restriction, tensor product,
-     localzation, and local cohomology groups}, J. Pure Appl. Algebra 156, 267-308
+     localization, and local cohomology groups}, J. Pure Appl. Algebra 156, 267-308
      (2001)
 [R]  Rottner, C.: Computing de Rham Cohomology,diploma thesis (2012)@*
 [W1] Walther, U.: Algorithmic computation of local cohomology modules and the local
@@ -58,11 +58,11 @@ proc deRhamCohomology(list L,list #)
          resolutions in the homogenized Weyl algebra via Schreyer's method@*
         one of the strings@*
         -'iterativeloc': compute localizations by factorizing the polynomials and
-         sucessive localization of the factors @*
+         successive localization of the factors @*
         -'no iterativeloc': compute localizations by directly localizing the
          product@*
         and one of the strings
-        -'onlybounds': computes bounds for the minimal and maximal interger roots
+        -'onlybounds': computes bounds for the minimal and maximal integer roots
          of the global b-function
         -'exactroots' computes the minimal and maximal integer root of the global
          b-function
@@ -1824,9 +1824,9 @@ static proc shortExactPiecesToVdStrict(list C,int d,list #)
             }
         }
     }
-  out[1]=list(list());//initalize our list
+  out[1]=list(list());//initialize our list
   C[1][2][5]=out[2][1][1][1];
-  /*Compute the last V_d-strict seqeunce*/
+  /*Compute the last V_d-strict sequence*/
   if (Syzstring=="Vdres")
     {
       out[1][2]=toVdStrictSequence(C[1][2],d,out[2][1][6][1],Syzstring,s,"J_Agiv");
@@ -3417,7 +3417,7 @@ static proc assemblingDoubleComplexes(list L)
           out[i][j+1][3]=L[i][2][3][j];//vertical differential P^i_j->P^(i+1)_j
           if (size(L[i][2][5][j])!=0)
             {
-              //horizonal differential P^i_j->P^(i-1)_j
+              //horizontal differential P^i_j->P^(i-1)_j
               nr=nrows(L[i][2][3][j])-nrows(L[i][2][5][j]);
               out[i][j+1][4]=(-1)^j*prodr(nr,nrows(L[i][2][5][j]));
             }
@@ -3437,7 +3437,7 @@ static proc assemblingDoubleComplexes(list L)
 
           for (k=1; k<=Min(list(oldj,newj)); k++)
             {
-              /*horizonal differential P^(i-1)_(k-1)->P^i_(k-1)*/
+              /*horizontal differential P^(i-1)_(k-1)->P^i_(k-1)*/
               nr=nrows(out[i-1][k][4]);
               out[i-1][k][4]=matrix(out[i-1][k][4],nr,out[i][k][1]);
             }
@@ -4586,7 +4586,7 @@ RETURN:a n_1 x n_2-matrix N such that:@*
   def Whom=ring(Data);//new ring D_n[nvh] this new commuative variable nhv
   setring Whom;
   matrix Mnew=imap(W,M);
-  list forMnew=homogenize(Mnew,d,v,1);//commputes homogenization of M;
+  list forMnew=homogenize(Mnew,d,v,1);//computes homogenization of M;
   Mnew=forMnew[1];
   int rightexp=forMnew[2];
   matrix Fnew=imap(W,F);

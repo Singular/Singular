@@ -647,7 +647,7 @@ EXAMPLE: example bfctVarIn; shows examples
   setring D;
   dbprint(ppl-1,"// Computing in " + string(n+r) + "-th Weyl algebra:", D);
   dbprint(ppl-1,"// The Malgrange ideal: ", IF);
-  // step 2: compute the b-function of the Malgrange ideal w.r.t. approriate weights
+  // step 2: compute the b-function of the Malgrange ideal w.r.t. appropriate weights
   intvec w = 1:r;
   w[r+n] = 0;
   dbprint(ppl,"// Computing the b-function of the Malgrange ideal...");

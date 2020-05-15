@@ -38,7 +38,7 @@ RETURN:  a ring, say B, containing the ideals C,J,W and the ideals
 @*         - bM (ideal of the blowup map from basering to B)
 @*       such that B/bR is isomorphic to the blowup ring BC.
 PURPOSE: compute the projective blowup of the basering in the center C, the
-         exceptional locus, the total and strict tranform of J,
+         exceptional locus, the total and strict transform of J,
          and the blowup map.
          The projective blowup is a presentation of the blowup ring
          BC = R[C] = R + t*C + t^2*C^2 + ... (also called Rees ring) of the
@@ -107,7 +107,7 @@ EXAMPLE: example blowup0; shows examples
    //---- change l[3]:
    l[3][s+1] = l[3][s];         // save the module ordering of the basering
    intvec w=1:k;
-   intvec v;                    // containing the weights for the varibale
+   intvec v;                    // containing the weights for the variable
    if( homog(C) )
    {
       for( i=k; i>=1; i--)
@@ -201,7 +201,7 @@ RETURN:  a list, say L, with R:=L[1] a ring and L[2] an intvec.
          (parameters are not touched).
 @*       The intvec L[2] is the intvec of variable weights (or the given w)
          with weights <= 0 replaced by 1.
-PURPOSE: Prepare a ring for eliminating vars from an ideal/moduel by
+PURPOSE: Prepare a ring for eliminating vars from an ideal/module by
          computing a standard basis in R with a fast monomial ordering.
          This procedure is used by the procedure elim.
 EXAMPLE: example elimRing; shows an example
@@ -295,7 +295,7 @@ EXAMPLE: example elimRing; shows an example
   //Assume that the first r of the n variables are to be eliminated.
   //Then, in case of an a-ordering (default), the new ring ordering will be
   //of the form (a(1..1,0..0),dp) with r 1's and n-r 0's or (a(w1,0..0),wp(@w))
-  //if there are varaible weights which are not 1.
+  //if there are variable weights which are not 1.
   //In the case of a b-ordering the ordering will be a block ordering with two
   //blocks of the form (dp(r),dp(n-r))  resp. (wp(w1),dp(w2))
 

@@ -866,7 +866,7 @@ EXAMPLE:example PollardRho; shows an example
     if(n<0){n=-n;}
     if(n==1){return(re);}
 
-//this is optional: test whether a prime of the list # devides n
+//this is optional: test whether a prime of the list # divides n
     if(size(#)>0)
     {
        L=#;
@@ -1845,7 +1845,7 @@ proc factorLenstraECM(bigint N, list S, int B, list #)
          d+1 the number of loops in the algorithm (default d=0)
 RETURN: a factor of N or the message no factor found
 NOTE: - computes a factor of N using Lenstra's ECM factorization@*
-      - the idea is that the fact that N is not prime is dedected using
+      - the idea is that the fact that N is not prime is detected using
         the operations on the elliptic curve
       - is similarly to Pollard's p-1-factorization
 EXAMPLE:example factorLenstraECM; shows an example
@@ -1878,7 +1878,7 @@ EXAMPLE:example factorLenstraECM; shows an example
          }
          M=M*w;
          P=ellipticMult(N,L[1],L[2]^2,P,w);
-         if(size(P)==4){return(P[4]);}  //some inverse did not exsist
+         if(size(P)==4){return(P[4]);}  //some inverse did not exist
          if(P[3]==0){break;}            //the case M*P=0
       }
       i++;
@@ -2759,7 +2759,7 @@ EXAMPLE: example subset_sum02; shows an example;
   int counter = 1;
   while((counter<=size(worksack))&&(sol>0))
   {
-    //Try to substract an element of the knapsack from the capacity. Create a list with all the summands used
+    //Try to subtract an element of the knapsack from the capacity. Create a list with all the summands used
     calcu = sol-worksack[counter];
     if (calcu>=0)
     {
@@ -2773,7 +2773,7 @@ EXAMPLE: example subset_sum02; shows an example;
     return(0);
   }
 
-  //Get the index of the summands of the original knapsack and change the bits in the binary list wich will be the solution
+  //Get the index of the summands of the original knapsack and change the bits in the binary list which will be the solution
   list binary_list;
   for (i=1;i<=size(knapsack);i++)
   {
@@ -2877,7 +2877,7 @@ EXAMPLE: example multidimensional_knapsack; shows an example;
       //Sort the elements so that it is easy to pick the smallest one
       minmax_list = bubblesort(minmax_list);
 
-      //insert Element y_i into y_list, wich is the smallest of (b_i/w_ij) like in the PECH algorithm description.
+      //insert Element y_i into y_list, which is the smallest of (b_i/w_ij) like in the PECH algorithm description.
       y_list = insert(y_list,minmax_list[size(minmax_list)],size(y_list));
 
 
@@ -2908,7 +2908,7 @@ EXAMPLE: example multidimensional_knapsack; shows an example;
 
     output_list[E[index]]=1;
 
-    //Update the capacities by substracting the weights of the selection
+    //Update the capacities by subtracting the weights of the selection
     for (i=1;i<=size(capacities);i++)
     {
       capacities[i] = capacities[i]- m[i,E[index]];
@@ -3490,10 +3490,10 @@ EXAMPLE: is_fix_injective; shows an example;
 
   int set_destination;
 
-  //create list of lists wich contain the lists of a certain length as elements
+  //create list of lists which contain the lists of a certain length as elements
   for (i = 1; i<= size(subsetlist); i++)
   {
-    //Determine the size of the acutal list to choose where to insert it in the listoflists
+    //Determine the size of the actual list to choose where to insert it in the listoflists
     set_destination = size(subsetlist[i]);
     if (set_contains(alreadycreatedlist,set_destination)==1)
     {
@@ -3508,7 +3508,7 @@ EXAMPLE: is_fix_injective; shows an example;
     }
   }
 
-  //Check for injectivity of each seperate list. Works as in injectivity or h-injectivity
+  //Check for injectivity of each separate list. Works as in injectivity or h-injectivity
   for (v=1; v<=size(listoflists); v++)
   {
     worklist = listoflists[v];
@@ -3632,7 +3632,7 @@ number r= power(g,k,p) mod q;    //76646
 
 number s=ki*(h+a*r) mod q;       //2065
 
-//========== signatur is (r,s)=(76646,2065) =====================
+//========== signature is (r,s)=(76646,2065) ====================
 //==================== verification  ============================
 
 number si=exgcd(s,q)[1];  //inverse von s mod q

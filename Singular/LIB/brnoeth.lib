@@ -404,7 +404,7 @@ static proc closed_points_ext (poly f,int d,ideal SL)
 {
   // computes : (closed affine non-singular) points over an extension of
   //            degree d
-  // remark(1) : singular points are supposed to be listed appart
+  // remark(1) : singular points are supposed to be listed apart
   // remark(2) : std SL=s_locus(f) is supposed to be computed in advance
   // remark(3) : ideal SL is used to remove those points which are singular
   // output : list of list of prime ideals with an intvec for storing the
@@ -488,7 +488,7 @@ NOTE:       If P is a (homogeneous irreducible) polynomial the point is at
 static proc closed_points_deg (poly f,int d,ideal SL)
 {
   // computes : (closed affine non-singular) points of degree d
-  // remark(1) : singular points are supposed to be listed appart
+  // remark(1) : singular points are supposed to be listed apart
   // remark(2) : std SL=s_locus(f) is supposed to be computed in advance
   list L=closed_points_ext(f,d,SL);
   int s=size(L);
@@ -507,7 +507,7 @@ static proc closed_points_deg (poly f,int d,ideal SL)
 ///////////////////////////////////////////////////////////////////////////////
 static proc idealSubset (ideal I,ideal J)
 {
-  // checks wether I is contained in J and returns a boolean
+  // checks whether I is contained in J and returns a boolean
   // remark : J is assumed to be given by a standard basis
   int s=ncols(I);
   int i;
@@ -711,7 +711,7 @@ static proc conj_b (list L,int r)
 static proc grad_b (list L,int r)
 {
   // computes the degree of a list of type HNE which is actually defined over
-  //    F_{p^r} eventhough it is given in an extension of such field
+  //    F_{p^r} even though it is given in an extension of such field
   int gr=1;
   int rd=res_deg() div r;
   list LL=L;
@@ -859,7 +859,7 @@ static proc subfield (def sf)
 ///////////////////////////////////////////////////////////////////////////////
 static proc importdatum (def sf,string datum,string rel)
 {
-  // fetchs a poly with name "datum" to the current basering from the ring sf
+  // fetches a poly with name "datum" to the current basering from the ring sf
   //   such that the generator is given by string "rel"
   // warning : ring sf must have only variables (x,y) and basering must have
   //   at least (x,y)
@@ -892,7 +892,7 @@ static proc importdatum (def sf,string datum,string rel)
 ///////////////////////////////////////////////////////////////////////////////
 static proc rationalize (def lf,string datum,string rel)
 {
-  // fetchs a poly with name "datum" to the current basering from the ring lf
+  // fetches a poly with name "datum" to the current basering from the ring lf
   //   and larger coefficients field, where the generator of current ring is
   //   given by string "rel" and "datum" is actually defined over the small
   //   field
@@ -3263,7 +3263,7 @@ static proc local_eq (poly H,def SS,int m)
 {
   // computes a local equation of polynomial H in the ring SS related to the place
   //     "m"
-  // list POINT/POINTS is searched depending on wether m=0 or m>0 respectively
+  // list POINT/POINTS is searched depending on whether m=0 or m>0 respectively
   // warning : the procedure must be called from ring "Proj_R" and returns a
   //     string
   def BRing=basering;
@@ -3475,7 +3475,7 @@ static proc simplifyRF (ideal F)
 {
   // simplifies a rational function f/g extracting the gcd(f,g)
   // maybe add a "restriction" to the curve "CHI" but it is not easy to
-  // programm
+  // program
   poly auxp=gcd(F[1],F[2]);
   return(ideal(division(F,auxp)[1]));
 }
@@ -3610,7 +3610,7 @@ EXAMPLE:  example Weierstrass; shows an example
   //   together with the functions achieving each value up to m, via
   //   Brill-Noether
   // returns 2 lists : the first consists of all the poles up to m in
-  //   increasing order and the second consists of the corresponging rational
+  //   increasing order and the second consists of the corresponding rational
   //   functions
   list Places=CURVE[3];
   intvec pl=Places[P];
@@ -4190,7 +4190,7 @@ EXAMPLE:  example extcurve; shows an example
         if (typeof(CURVE[5][i])=="list")
         {
           def S(i)=CURVE[5][i][1];
-          // embedd S(i) inside basering == RatPl " ==S(d) "
+          // embed S(i) inside basering == RatPl " ==S(d) "
           olda=subfield(S(i));
           setring S(i);
           s=size(POINTS);
@@ -4556,7 +4556,7 @@ EXAMPLE:    example decodeSV; shows an example
       {
         sol=(number(1)/number(pivote))*sol;
       }
-      // check at least that the number of comitted errors is less than half
+      // check at least that the number of committed errors is less than half
       //     the Goppa distance
       // imposing Hamming_wt(sol)<=K[n+3][1] would be more correct, but maybe
       //     is too strong

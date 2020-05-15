@@ -899,7 +899,7 @@ EXAMPLE:  example canonize; shows an example
     if (typeof(M[i])=="module")
     {
       M[i] = std(M[i]);
-      //      M[i] = prune(M[i]); // mimimal embedding: no need yet
+      //      M[i] = prune(M[i]); // minimal embedding: no need yet
       //      M[i] = std(M[i]);
     }
   }
@@ -1416,7 +1416,7 @@ example
 proc controlExample(string s)
 "USAGE:  controlExample(s);   s a string
 RETURN:  ring
-PURPOSE: set up an example from the mini database by initalizing a ring and a module in a ring
+PURPOSE: set up an example from the mini database by initializing a ring and a module in a ring
 NOTE: in order to see the list of available examples, execute @code{controlExample(\"show\");}
 @* To use an example, one has to do the following. Suppose one calls the ring, where the example will be activated, A. Then, by executing
 @*  @code{def A = controlExample(\"Antenna\");} and @code{setring A;},

@@ -152,7 +152,7 @@ NOTE:
         in the first case, it shows the setting of the control parameters;@*
         in the second case, it kills the user-defined control parameters and@*
                             resets to the default setting which will then
-                            be diplayed. @* @*
+                            be displayed. @* @*
         int DECMETH; Method for computing the univariate decomposition@*
                  0 : (default) Kozen-Landau @*
                  1 : von zur Gathen @*
@@ -269,7 +269,7 @@ EXAMPLE: example decompmonom; shows an example
     else { g = g + leadcoef(ff[i])*vvar^k; }
   }
   g = g + zeropart;
-  dbprint("* Sucessfully multivariate decomposed by a monomial"+newline);
+  dbprint("* Successfully multivariate decomposed by a monomial"+newline);
   return(ideal(g,monomial(minv)));
 }
 example
@@ -936,7 +936,7 @@ EXAMPLE: example decompmultivmonic; shows an example
   return(f);
  }
  else {
-   dbprint("* Sucessfully multivariate decomposed"+newline);
+   dbprint("* Successfully multivariate decomposed"+newline);
   return(I);
  }
 }
@@ -1037,7 +1037,7 @@ EXAMPLE: example decompunivmonic; shows an example
     dbprint("* Kozen-Landau method");
 
    // Determine ord(f);
-   //cc  = coef(f,vvar);  // extract coefficents of f
+   //cc  = coef(f,vvar);  // extract coefficients of f
    //print(cc); read("");
 
    // dbprint("time: "+string(timer-tt)); tt = timer;
@@ -1120,7 +1120,7 @@ EXAMPLE: example decompunivmonic; shows an example
   dbprint("* END STEP 2: time: "+string(timer -tt));
   if (iscomposed)
   {
-   dbprint("** Sucessfully univariate decomposed with deg g = "+string(r)+newline);
+   dbprint("** Successfully univariate decomposed with deg g = "+string(r)+newline);
     I = g,h;
   } else {
    dbprint("** Failed in STEP 2: not decomposed with deg g = "+string(r)+newline);
@@ -1556,7 +1556,7 @@ int MINS =1;
 
  // --  Example -------------
 
-//  Comparision Kozen-Landau vs. von zur Gathen
+//  Comparison Kozen-Landau vs. von zur Gathen
 
  ring r02 = 0,(x,y),dp;
 

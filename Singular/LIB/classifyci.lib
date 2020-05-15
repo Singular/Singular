@@ -668,7 +668,7 @@ lineatpart(g,f);
 ////////////////////////////////////////////////////////////////////////////////
 static  proc typejet2(poly g1,poly g2)
 "USAGE:  typejet2(g1,g2);  g1,g2 are polynomials
-ASSUME: g1,g2 are homogenous polynomials of degree 2
+ASSUME: g1,g2 are homogeneous polynomials of degree 2
 PURPOSE: Check whether (g1,g2) is a quadratic form in the list of Guisti or not
 RETURN: string  type for the quadratic forms appearing in Guist's list
 @*       or not simple
@@ -1018,7 +1018,7 @@ RETURN: list A  , which gives generators set of the Weierstrass semigroup corres
        for(j=1;j<=d;j++)
        {
          T=WSemigroup(TTT,w);
-         A[e]=T[1];       //  intersted only in semigroup
+         A[e]=T[1];       //  interested only in semigroup
          e++;
        }
        setring S;

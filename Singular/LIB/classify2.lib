@@ -964,7 +964,7 @@ static proc eliminateMonomialOnDiagonal(poly f,poly mon,list NPNF){
   if (printlevel>0){"possible transformations "+string(L);}
   poly equ;
   for (int i=2;i<=size(L[1]);i++){if (deg(L[1][i])==1){equ=L[1][i];break;}}
-  if (equ==0){ERROR("There should be a tranformation on the diagonal defined over the current field");}
+  if (equ==0){ERROR("There should be a transformation on the diagonal defined over the current field");}
   number a1=number(subst(equ,aa,0));
   number a2=number(diff(equ,aa));
   number valueforaa=-a1/a2;

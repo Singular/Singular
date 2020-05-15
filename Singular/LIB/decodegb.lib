@@ -100,7 +100,7 @@ proc sysCRHT (int n, list defset, int e, int q, int m, list #)
          error positions are either different or at least one of them is zero
 @end format
 RETURN: the ring to work with the CRHT-ideal (with Sala's additions),
-        containig an ideal with name 'crht'
+        containing an ideal with name 'crht'
 THEORY:  Based on 'defset' of the given cyclic code, the procedure constructs
          the corresponding Cooper-Reed-Heleseth-Truong ideal 'crht'. With its
          help one can solve the decoding problem. For basics of the method @ref{Cooper philosophy}.
@@ -476,7 +476,7 @@ proc sysBin (int v, list Q, int n, list #)
           - n the length,
           - odd is an additional parameter: if
            set to 1, then the defining set is enlarged by odd elements,
-           which are 2^(some power)*(some elment in the def.set) mod n
+           which are 2^(some power)*(some element in the def.set) mod n
 @end format
 RETURN:    the ring with the resulting system called 'bin'
 THEORY:  Based on Q of the given cyclic code, the procedure constructs
@@ -1736,7 +1736,7 @@ EXAMPLE:   example sysFL; shows an example
      poly temp;
      int i,j,k;
 
-     //--------------- add vanishing realtions ---------------------
+     //--------------- add vanishing relations ---------------------
      for (i=1; i<=t; i++)
      {
           for (j=1; j<=size(id); j++)
@@ -1765,7 +1765,7 @@ EXAMPLE:   example sysFL; shows an example
 
      result=simplify(result,8);
 
-     //--------------- add check realtions --------------------
+     //--------------- add check relations --------------------
      poly sum;
      matrix syn[m][1]=syndrome(check,y);
      for (i=1; i<=size(funcs); i++)
@@ -1906,7 +1906,7 @@ proc FLpreprocess (int p, int e, int n, int t, string minp)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// imitating two indeces
+// imitating two indices
 static proc x_var (int i, int j, int s)
 {
      return(x1(s*(i-1)+j));
@@ -1977,7 +1977,7 @@ proc decodeRandomFL(int n, int redun, int p, int e, int t, int ncodes, int ntria
           - t is the number of errors to correct,
           - ncodes is the number of random codes to be processed,
           - ntrials is the number of received vectors per code to be corrected,
-          - minpol: due to some pecularities of SINGULAR one needs to provide
+          - minpol: due to some peculiarities of SINGULAR one needs to provide
           minimal polynomial for the extension explicitly
 @end format
 RETURN:    nothing

@@ -515,7 +515,7 @@ proc diffAlgebraListGen(list #)
 RETURN:     - a list of generators of the differential algebra as module over the basering
             - a list of generators of a graded part of the differential algebra
 REMARKS:    In order to find all generators, they are counted 'binary': The generators are in
-            1:1 - correspondance to the dual number representations of 1 up to (2^n-1)
+            1:1 - correspondence to the dual number representations of 1 up to (2^n-1)
 NOTE:       - if all generators of the differential algebra are needed, apply the
             procedure without input
             - if the generator(s) of a graded part are needed, apply the procedure with
@@ -675,7 +675,7 @@ difform df = f;
 df;
 
 // For the construction of more general differential forms,
-// the constructor difformFromPoly is used implicitely:
+// the constructor difformFromPoly is used implicitly:
 
 difform dg = 3*x*dx - y*dy + dx*dy*dz + 1;
 dg;
@@ -1848,7 +1848,7 @@ difformListSort(L);
 difformListSort(L,"gen","ls","ringvar","wp",intvec(-1,1,1,1));
 
 /////////////////////////////////////////////
-// Sortation of list with strcture "Dlist" //
+// Sortation of list with structure "Dlist" //
 /////////////////////////////////////////////
 
 list DL;
@@ -1858,7 +1858,7 @@ DL[1] = list(dx,x,t,dt); DL[2] = list(y,t*z,4,x);
 difformListSort(DL,"Dlist","ringvar","ls");
 
 /////////////////////////////////////////////
-// Sortation of list with strcture "Llist" //
+// Sortation of list with structure "Llist" //
 /////////////////////////////////////////////
 
 list LL;
@@ -1924,7 +1924,7 @@ REMARK:     To compute the image, the universal derivation is applied to each co
             corresponding generator
 NOTE:       - the differential is a map Omega_R^(p) -> Omega_R^(p+1) and this procedure applies
             the differential to all homogeneous parts of df
-            - this procedure can also be apllied to polynomials - in this case it is just the universal derivation
+            - this procedure can also be applied to polynomials - in this case it is just the universal derivation
 KEYWORDS:   differential; universal; derivation
 SEE ALSO:   difformUnivDer
 EXAMPLE:    example difformDiff; shows an example"
@@ -1988,7 +1988,7 @@ RETURN:     the derivation defined by the list L
 REMARKS:    The structure of L is checked and L is sorted,
             then it is set as structure list of phi
 NOTE:       the structure of L must follow the rules:
-                - L[1] is a list of all degree-1 generators: all dx_i must occure once and no other
+                - L[1] is a list of all degree-1 generators: all dx_i must occur once and no other
                 differential forms are allowed. The order of the list is not important
                 - L[2] is the list of images of the dx_i: these must be polynomials
             Since the map is linear, it is enough to store the images of the dx_i
@@ -2045,7 +2045,7 @@ REMARKS:    The procedure checks if a given list has the right form for a deriva
                 - Only degree-1 generators are allowed in L[1] - this is checked via difformIsGen
                 - Any degree-1 generator must occur once - this is checked via difformListCont
 NOTE:       like in derivationFromList, the structure of L must follow the rules:
-                - L[1] is a list of all degree-1 generators: all dx_i must occure once and no other
+                - L[1] is a list of all degree-1 generators: all dx_i must occur once and no other
                 differential forms are allowed. The order of the list is not important
                 - L[2] is the list of images of the dx_i: these must be polynomials
 KEYWORDS:   constructor; derivation; structure
@@ -2108,7 +2108,7 @@ proc derivationFromPoly(poly f)
 "USAGE:     derivation phi = derivationFromPoly(f); f poly
 RETURN:     a derivation which maps any degree-1 generator to f
 REMARKS:    The degree-1 generators are returned by diffAlgebraListGen
-NOTE:       the procedure allows to interprete polynomials as derivations
+NOTE:       the procedure allows to interpret polynomials as derivations
 KEYWORDS:   constructor; derivation; polynomial
 SEE ALSO:   derivationConstructor, derivationFromList
 EXAMPLE:    example derivationFromPoly; shows an example"
@@ -2674,7 +2674,7 @@ REMARKS:    - By linearity it is enough to compute the sum of all differential f
             - To avoid searching generators in lists, the coefficient list of df and the
             structure list of phi are sorted the same way
 NOTE:       - the differential form 0 is allowed as input
-            - an error will occure if the given differential form is not of degree 1 or -1
+            - an error will occur if the given differential form is not of degree 1 or -1
 KEYWORDS:   evaluation; derivation; application
 SEE ALSO:   difformListSort, difformCoef
 EXAMPLE:    example derivationEval; shows an example"

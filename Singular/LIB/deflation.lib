@@ -131,7 +131,7 @@ static proc append_var_list(int nv, list RL, list VN)
 
 static proc remove_constants(ideal H);
 {
-   //remove contants and scalar multiples from H
+   //remove constants and scalar multiples from H
    H=1,H;
    H=simplify(H,2+4+8);
    H=H[2..size(H)];

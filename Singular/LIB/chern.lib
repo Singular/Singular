@@ -71,8 +71,8 @@ PROCEDURES:
   Bern(n);                  the second Bernoulli numbers
   tdCf(n);                  the coefficients of the Todd class of a line bundle
   tdTerms(n, f);            the terms of the Todd class of a line bundle
-                            coresponding to the Chern root t
-  tdFactor(n, t);           the Todd class of a line bundle coresponding
+                            corresponding to the Chern root t
+  tdFactor(n, t);           the Todd class of a line bundle corresponding
                             to the Chern root t
   cProj(n);                 the total Chern class of (the tangent bundle on)
                             the projective space P_n
@@ -274,7 +274,7 @@ NOTE:
   int i, j;
   int sign;
   poly f;
-  for(i=1; i<=N; i++) // use the resursive formula
+  for(i=1; i<=N; i++) // use the recursive formula
   {
     f=0;
     sign=1;
@@ -326,7 +326,7 @@ NOTE:
   list rez=list(1); // the result will be computed here
   int i, j;
   poly f;
-  for(i=1; i<=N; i++) // use the resursive formula
+  for(i=1; i<=N; i++) // use the recursive formula
   {
     f=0;
     for(j=1;j<=i; j++) // compute the next Segre class
@@ -513,7 +513,7 @@ PURPOSE:  computes the expressions for the sums of powers [up to degree N]
           in terms of the elementary symmetric polynomials (entries of l),
 EXAMPLE:  example powSumSym; shows an example
 NOTE:     returns the terms of the Chern character
-          multiplied by the correspoding factorials
+          multiplied by the corresponding factorials
 "
 {
   int n;
@@ -534,7 +534,7 @@ NOTE:     returns the terms of the Chern character
     }
     else // if the optional parameter is not an integer, then
     {
-      n=size(c); // ingore it and set n to be the length of c
+      n=size(c); // ignore it and set n to be the length of c
     }
   }
   list rez; // the result will be computed here
@@ -933,7 +933,7 @@ NOTE:
   }
   else // otherwise define the rank of the product vector bundle by
   {
-    n=size(c)*size(C); // looking at the lenghts of c and C
+    n=size(c)*size(C); // looking at the lengths of c and C
   }
   if( size(#) != 0 ) // if there is an optional parameter
   {
@@ -1590,10 +1590,10 @@ NOTE:     for the second symmetric power chSymm2L(...) could be faster
   // than the rank of the vector bundle,
   // the higher classes are assumed to be zero and the list is appended by zeroes up to length r
   c=append_by_zeroes(r, c);
-  // if the lenght of the list of the Chern classes is greater than the rank
+  // if the length of the list of the Chern classes is greater than the rank
     c=c[1..r]; // throw away the redundant data
   //-----------------------------------
-  // from now on the lenght of c is r>0
+  // from now on the length of c is r>0
   //-----------------------------------
   if(k<0)
   {
@@ -1669,7 +1669,7 @@ NOTE:     for the second symmetric power chSymm2L(...) could be faster
     int NN = min( size(#), N);
     for(j=1; j <= NN; j++) // process the optional parameters
     {
-      // process the optional parameters only untill they are not bigger than N;
+      // process the optional parameters only until they are not bigger than N;
       // notice they are positive anyway after integer_list(...)
       if( #[j]<=N  )
       {
@@ -1975,7 +1975,7 @@ NOTE:     for the second exterior power chWedge2L(...) could be faster
     int NN = min( size(#), N);
     for(j=1; j <= NN; j++) // process the optional parameters
     {
-      // process the optional parameters only untill they are not bigger than N;
+      // process the optional parameters only until they are not bigger than N;
       // notice they are positive anyway after integer_list(...)
       if( #[j]<=N  )
       {
@@ -2424,7 +2424,7 @@ proc tdFactor(int n, poly t)
 "USAGE:   tdFactor(n, a);  n integer, a polynomial
 RETURN:   polynomial
 PURPOSE:  computes up to degree n the Todd class
-          of the line bundle coresponding to the Chern root t
+          of the line bundle corresponding to the Chern root t
 EXAMPLE:  example tdFactor; shows an example
 NOTE:     returns 0 if n is negative
 "
@@ -2580,7 +2580,7 @@ proc eulerChProj(int n, def r, list c)
 "USAGE:   eulerChProj(n, r, c);  n  integer, r polynomial (or integer), c list of polynomials
 RETURN:   polynomial
 PURPOSE:  computes the Euler characteristic of a vector bundle on P_n
-          in terms of its rank and Chern classses
+          in terms of its rank and Chern classes
 EXAMPLE:  example eulerChProj; shows an example
 NOTE:
 "
@@ -2986,7 +2986,7 @@ example
 proc PartC(list I, int m)
 "USAGE:   PartC( I, m);  I list of integers, m integer
 RETURN:   list of integers
-PURPOSE:  commputes the complement of a partition with respect to m
+PURPOSE:  computes the complement of a partition with respect to m
 EXAMPLE:  example PartC; shows an example
 NOTE:     returns the zero partition if the maximal element of the partition is smaller than m
 "
@@ -3030,11 +3030,11 @@ NOTE:
   {
     // give a warning
     print("You are trying to compute partitions over an empty partition!");
-    return( list() ); // and return the emty list
+    return( list() ); // and return the empty list
   }
   if( J[m] > n ) // if the biggest summand of the partition is bigger than n
   {
-    return( list( ) ); // return the emty list
+    return( list( ) ); // return the empty list
   }
   if( J[m] == 0 ) // if J consists of zeroes
   {
@@ -3061,7 +3061,7 @@ NOTE:
   {
     P=rez[i]; // for each partition P of this type
     last = max( P[size(P)], J[m] );
-    for(j = last;j<= n;j++) // run through the integers exceding the last summands of P and J
+    for(j = last;j<= n;j++) // run through the integers exceeding the last summands of P and J
     {
       // append them to P at the end and add the resulting partition to the result
       rez1=rez1 + list(P+list(j));
@@ -3482,7 +3482,7 @@ example
   "EXAMPLE:";echo =2;
   ring r = 0, (x, y, z), dp;
   list l=(x, y, z);
-  //append the list by two zeroes and get a list of lenght 5
+  //append the list by two zeroes and get a list of length 5
   print( append_by_zeroes(5, l) );
 }
 //-----------------------------------------------------------------------
@@ -3522,7 +3522,7 @@ static proc integer_list(list l)
 "USAGE:   integer_list(l);  l list
 RETURN:   list
 PURPOSE:  gets the first positive ingerer entries of l, computes their maximum;
-          used for adjusting the lists of optional parameters that are suposed to be integers
+          used for adjusting the lists of optional parameters that are supposed to be integers
 EXAMPLE:  example integer_list; shows an example
 NOTE:     used in chWedge(...) and chSymm(...)
 "
@@ -3778,7 +3778,7 @@ example
   "EXAMPLE:";echo =2;
   ring r = 0, (x, y, z), dp;
   list l=(1, 2, 3);
-  //append the list by two zeroes and get a list of lenght 5
+  //append the list by two zeroes and get a list of length 5
   print( apn0_int(5, l) );
 }
 //---------------------------------------------------------------------------------------
@@ -3942,7 +3942,7 @@ example
   // and is generated by elements of different degrees
   print(I);
   ideal J=equal_deg(I);
-  // now the ideal is generated by elemets of degree 2
+  // now the ideal is generated by elements of degree 2
   // and defines the same subscheme in the projective plane
   J;
   // notice that both ideals have the same saturation

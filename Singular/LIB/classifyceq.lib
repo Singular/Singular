@@ -559,7 +559,7 @@ static proc classifyCeq2(poly p)
 //====Classification of hypersurface singularities in Characteristic p=2.
 {
        //    input    poly p
-       //    output   The normal form to which f is contact equvalent or the function is not simple.
+       //    output   The normal form to which f is contact equivalent or the function is not simple.
        def R=basering;
        int t=tjurina(p);
        list T;
@@ -821,7 +821,7 @@ E^2[8]:z2+x3+y5+xy2z.");
 
                               if(size(lengthBL(f))==4)
                               {
-                                     retrun("The given function defines an isolated Singularity.
+                                     return("The given function defines an isolated Singularity.
 The Tjurina number is "+string(tjurina(f))+".
 E^0[7]:z2+x3+xy3.");
 
@@ -1112,7 +1112,7 @@ static proc formf(poly f)
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static proc whichSUR(poly f)
-//====This procedure is required to separate the Surface Case D_2m from D_2m+1 as discribes in [2].
+//====This procedure is required to separate the Surface Case D_2m from D_2m+1 as describes in [2].
 {
    int d=tjurina(f);
    list L;

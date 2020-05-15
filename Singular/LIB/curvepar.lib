@@ -1060,7 +1060,7 @@ RETURN: list M
 ///////////////////////////////////////////////////////////////////////////////////////////
 proc WSemigroup(list X,int b0)
 "USAGE:    WSemigroup(X,b0);
-           X a list of polinomials in one vaiable, say t.
+           X a list of polynomials in one variable, say t.
            b0 an integer
 COMPUTE:   Weierstrass semigroup of space curve C,which is given by a parametrization
            X[1](t),...,X[k](t), till the bound b0.
@@ -1070,7 +1070,7 @@ RETURN:    list M of size 5.
            M[1]= list of integers, which are minimal generators set of the Weierstrass semigroup.
            M[2]=integer, conductor of the Weierstrass semigroup.
            M[3]=intvec, all elements of the Weierstrass semigroup till some bound b,
-           which is greather than conductor.
+           which is greater than conductor.
 WARNING:   works only over the ring with one variable with ordering ds
 EXAMPLE: example WSemigroup; shows an example"
 

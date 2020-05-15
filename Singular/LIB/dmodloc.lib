@@ -938,7 +938,7 @@ example
 // TODO remove this proc once chern.lib is ready
 static proc orderedPartition(int n, list #)
 "
-USUAGE:  orderedPartition(n,a); n,a positive ints
+USAGE:   orderedPartition(n,a); n,a positive ints
          orderedPartition(n,w); n positive int, w positive intvec
 RETURN:  list of intvecs
 PURPOSE: Computes all partitions of n of length a, if the second
